@@ -13,7 +13,7 @@ extern float math_fabs(float f);
    before folding the starter's result against the state's own reading of that float: the
    twin of func_L00_003BFF68 with fixed turn rates. One `char scratch[0x50]` gives retail's
    frame. */
-float func_PAL_L13_0040ED20(char *a0, char *a1, char *a2, char *a3)
+float creature_turn_toward_target_pal(char *a0, char *a1, char *a2, char *a3)
 {
     char scratch[0x50];
     float f;

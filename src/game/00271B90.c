@@ -8,9 +8,9 @@ typedef struct {
     Vec prev_pos, delta, side, projection;
     float distance, side_distance, up_distance, yaw[5];
 } Follow;
-extern Follow D_001B53A0;
+extern Follow g_camera_follow_state;
 typedef struct {char prefix[0x80]; Vec pos, rot; char padA0[0x21f4]; int state; char pad2298[0x208]; int mode;} Hero;
-extern char g_hero_state[], D_0018A0E0[];
+extern char g_hero_state[], g_hero_state_block[];
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -21,8 +21,8 @@ extern float math_step_spring_damper_clamped(float *, float, float, float, float
 void cam_update_follow_hero(void)
 {
     Vec dir, projection;
-    Follow *follow = &D_001B53A0;
-    char *hero = D_0018A0E0;
+    Follow *follow = &g_camera_follow_state;
+    char *hero = g_hero_state_block;
     float d;
     int i;
     vec_scale_to_length(&dir, hero, -1.0f);

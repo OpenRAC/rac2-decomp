@@ -69,11 +69,11 @@ extern void moby_fade_out_update(void);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
 extern void endako_boss_play_voice_lines(void *);
 /* Incomplete arrays: retail reaches these two with `lui` + `lw`, not through $gp. */
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u8 D_0019B2E8[] NOT_SDA;
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u8 g_moby_group_flags[] NOT_SDA;
 extern int g_current_map_index[] __attribute__((sda));
-extern u8 *D_L03_001FE700[] NOT_SDA;
-extern float D_L03_001B1070 __attribute__((sda));
+extern u8 *g_path_l03_entry_table[] NOT_SDA;
+extern float g_endako_boss_damage_scale __attribute__((sda));
 
 /* Sets up the boss on its first frame, then handles the damage it takes each frame:
  * it hurts, loses armor pieces at set health levels, and dies at zero health. */
@@ -89,8 +89,8 @@ void endako_boss_update_damage(u8 *entity) {
         state->timer48 = FloatToInt(30);
         state->timer4A = FloatToInt(32);
         state->hitMode = 1;
-        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->startRecord << 8), 1);
-        if (D_0019B2E8[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
+        moby_set_flag_bit(g_moby_record_base[0] + (state->startRecord << 8), 1);
+        if (g_moby_group_flags[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
             moby_mark_spawned(entity);
             return;
         }
@@ -120,7 +120,7 @@ void endako_boss_update_damage(u8 *entity) {
         }
         state->flag30B = 1;
         state->active = 1;
-        path = (EntityPath *)D_L03_001FE700[state->path];
+        path = (EntityPath *)g_path_l03_entry_table[state->path];
         for (index = 0, count = 0; index < path->count; index++) {
             if (path->point[index][3] >= 0) {
                 state->entries[count] = index;
@@ -130,10 +130,10 @@ void endako_boss_update_damage(u8 *entity) {
                 }
             }
         }
-        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->spawnRecord << 8), 1);
+        moby_set_flag_bit(g_moby_record_base[0] + (state->spawnRecord << 8), 1);
         endako_boss_process_group(entity);
     }
-    *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * D_L03_001B1070;
+    *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * g_endako_boss_damage_scale;
 
     hit = part_find_owned_effect_slot(entity, 0x10000, 0);
     if (hit && *(u8 **)(hit + 0x20) && *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0x9DF /* moby class 2527 */) {

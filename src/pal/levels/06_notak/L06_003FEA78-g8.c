@@ -5,7 +5,7 @@ extern void path_sample_position(char *, int, float *, float *, int, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_random_float_range(float, float);
-extern float D_L06_001AFCA0 __attribute__((sda));
+extern float g_bob_l06_amplitude __attribute__((sda));
 
 /* Advance a moving object's path and keep its spacing from the next object. */
 void func_PAL_L06_00401D78(char *moby)
@@ -18,7 +18,7 @@ void func_PAL_L06_00401D78(char *moby)
                  (float *)(moby + 0x10), (float *)(moby + 0xF0), 0, *(float *)(state + 0x10));
     phase = FastAddRotations(*(float *)(state + 0x4C), *(float *)(state + 0x50));
     *(float *)(state + 0x4C) = phase;
-    *(float *)(moby + 0x18) += D_L06_001AFCA0 * math_fast_sin_or_cos_b(phase);
+    *(float *)(moby + 0x18) += g_bob_l06_amplitude * math_fast_sin_or_cos_b(phase);
     length = **(int **)(state + 0x30);
     pathPosition = *(float *)(state + 0x10) + *(float *)(state + 0x14);
     *(float *)(state + 0x10) = pathPosition;

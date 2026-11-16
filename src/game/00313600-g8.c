@@ -16,10 +16,10 @@
    argument order forbids.
    The draft needs a -g8.c source unit (the two angles are small data) and
    the D_ names carry the boot's addresses. */
-extern char D_00229BF0[];
-extern char D_00229B70[];
-extern float D_001AF108 __attribute__((sda));
-extern float D_001AF130 __attribute__((sda));
+extern char g_nanotech_ball_slot_axes[];
+extern char g_nanotech_ball_slot_offsets[];
+extern float g_nanotech_slot_rotation_step __attribute__((sda));
+extern float g_nanotech_base_length __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 
@@ -28,8 +28,8 @@ void update_nanotech_ball_slot_offsets(void)
     int i;
 
     for (i = 0; i < 8; i++) {
-        char *entry = D_00229B70 + i * 16;
-        math_apply_axis_rotation_to_quat(entry, entry, D_00229BF0 + i * 16, D_001AF108);
-        vec_scale_to_length(entry, entry, D_001AF130);
+        char *entry = g_nanotech_ball_slot_offsets + i * 16;
+        math_apply_axis_rotation_to_quat(entry, entry, g_nanotech_ball_slot_axes + i * 16, g_nanotech_slot_rotation_step);
+        vec_scale_to_length(entry, entry, g_nanotech_base_length);
     }
 }

@@ -3,7 +3,7 @@
 
 extern void anim_start_blended(void *, int, int, int);
 
-void func_PAL_L04_003E9100(char *a0)
+void object_release_linked_pal(char *a0)
 {
     char *s0 = *(char **)(a0 + 0x68);
 

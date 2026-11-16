@@ -18,35 +18,35 @@ typedef struct {
     char header[0x40];
     MenuEntry entries[3];
 } Menu;
-extern char *D_001A8CFC;
-extern int D_001AA430 __attribute__((sda));
-extern int D_001AA434 __attribute__((sda));
-extern int D_001AA438 __attribute__((sda));
+extern char *g_resident_data_base;
+extern int g_extras_unlock_flag_a __attribute__((sda));
+extern int g_extras_unlock_flag_b __attribute__((sda));
+extern int g_special_items_unlock_flag __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
-extern unsigned char D_001A7A80[] __attribute__((sda));
+extern unsigned char g_movie_seen_flags[] __attribute__((sda));
 extern unsigned char g_weapon_table[];
-extern Menu D_00261750;
-extern char D_002615F8[], D_00261698[];
-extern char D_0025C450[], D_0025C5E8[], D_0025CCF8[];
-extern void func_PAL_003435C0(char *, char *, char *, char *);
+extern Menu g_extras_tab_table_c;
+extern char g_extras_tab_table_a[], g_extras_tab_table_b[];
+extern char g_extras_unlock_entry_a[], g_extras_unlock_entry_b[], g_extras_unlock_entry_c[];
+extern void tab_menu_set_tables_pal(char *, char *, char *, char *);
 extern void func_PAL_00343690(char *, int);
 
 int func_PAL_002D0290(void)
 {
     int i, j;
 
-    if (D_001A8CFC) {
-        D_001AA430 = 1;
-        D_001AA434 = 1;
-        D_001AA438 = 1;
+    if (g_resident_data_base) {
+        g_extras_unlock_flag_a = 1;
+        g_extras_unlock_flag_b = 1;
+        g_special_items_unlock_flag = 1;
         for (i = 0; i < 56; i++) {
             if (((ClassRecord *)(g_item_slot_to_record[i] * 0xE0 + (int)g_weapon_table))->active && i != 9 && i != 10) {
                 if (!g_item_owned_flags[i]) {
-                    D_001AA430 = 0;
-                    D_001AA434 = 0;
-                    D_001AA438 = 0;
+                    g_extras_unlock_flag_a = 0;
+                    g_extras_unlock_flag_b = 0;
+                    g_special_items_unlock_flag = 0;
                 } else {
                     for (j = 0; j < 3; j++) {
                         int value;
@@ -68,16 +68,16 @@ int func_PAL_002D0290(void)
                             value = 0;
                             break;
                         }
-                        if (value && !((unsigned long)D_001A7A80[i] & ((1U << (j * 2)) & 255UL))) {
-                            D_001AA434 = 0;
-                            D_001AA438 = 0;
+                        if (value && !((unsigned long)g_movie_seen_flags[i] & ((1U << (j * 2)) & 255UL))) {
+                            g_extras_unlock_flag_b = 0;
+                            g_special_items_unlock_flag = 0;
                         }
                     }
                 }
             }
         }
-        if (!D_001A7A0A) {
-            Menu *menu = &D_00261750;
+        if (!g_extras_unlocked_flag) {
+            Menu *menu = &g_extras_tab_table_c;
             menu->entries[0].text_id = 0xBD1;
             menu->entries[0].data = 0;
             menu->entries[1].text_id = 0xBD1;
@@ -85,16 +85,16 @@ int func_PAL_002D0290(void)
             menu->entries[2].text_id = 0xBD1;
             menu->entries[2].data = 0;
         } else {
-            Menu *menu = &D_00261750;
+            Menu *menu = &g_extras_tab_table_c;
             menu->entries[0].text_id = 0x1114;
-            menu->entries[0].data = D_0025C450;
+            menu->entries[0].data = g_extras_unlock_entry_a;
             menu->entries[1].text_id = 0x111E;
-            menu->entries[1].data = D_0025C5E8;
+            menu->entries[1].data = g_extras_unlock_entry_b;
             menu->entries[2].text_id = 0x1408;
-            menu->entries[2].data = D_0025CCF8;
+            menu->entries[2].data = g_extras_unlock_entry_c;
         }
-        func_PAL_003435C0(D_001A8CFC + 0x3C210, D_002615F8, D_00261698, (char *)&D_00261750);
-        func_PAL_00343690(D_001A8CFC + 0x3C210, 2);
+        tab_menu_set_tables_pal(g_resident_data_base + 0x3C210, g_extras_tab_table_a, g_extras_tab_table_b, (char *)&g_extras_tab_table_c);
+        func_PAL_00343690(g_resident_data_base + 0x3C210, 2);
     }
     return 0;
 }

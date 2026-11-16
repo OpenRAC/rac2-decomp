@@ -3,8 +3,8 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } RibbonVector;
 struct RibbonQuad { RibbonVector position[4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
-extern float D_L11_001BA8C0[4];
-extern float D_L11_001AECFC __attribute__((sda));
+extern float g_hero_l11_position[4];
+extern float g_ribbon_u_step __attribute__((sda));
 extern long long GetEffectTextureDescriptor(int);
 extern void ref_L11_00397E68_00(char *);
 extern void FastVecSub(void *, void *, void *);
@@ -40,8 +40,8 @@ void ribbon_draw_two_layer(RibbonVector *points, int count, int flags, u32 color
     ref_L11_00397E68_00((char *)&innerQuad);
     innerQuad.uv[0][0] = 0.0f; innerQuad.uv[0][1] = 0.0f;
     innerQuad.uv[1][0] = 0.0f; innerQuad.uv[1][1] = 1.0f;
-    innerQuad.uv[2][0] = D_L11_001AECFC; innerQuad.uv[2][1] = 0.0f;
-    innerQuad.uv[3][0] = D_L11_001AECFC; innerQuad.uv[3][1] = 1.0f;
+    innerQuad.uv[2][0] = g_ribbon_u_step; innerQuad.uv[2][1] = 0.0f;
+    innerQuad.uv[3][0] = g_ribbon_u_step; innerQuad.uv[3][1] = 1.0f;
     template0.q = 0;
     template1.q = 0;
     template0.f[3] = 1.0f;
@@ -50,7 +50,7 @@ void ribbon_draw_two_layer(RibbonVector *points, int count, int flags, u32 color
     template1.f[2] = width * scale;
     FastVecSub(&basis[0], &points[1], &points[0]);
     vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-    FastVecSub(&basis[1], D_L11_001BA8C0, &points[0]);
+    FastVecSub(&basis[1], g_hero_l11_position, &points[0]);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1.0f);
     FastVecCross(&basis[1], &basis[0], &basis[2]);
@@ -70,7 +70,7 @@ void ribbon_draw_two_layer(RibbonVector *points, int count, int flags, u32 color
         FastVecScale(&innerQuad.position[3], &innerQuad.position[2], -1.0f);
         FastVecSub(&basis[0], &points[i + 1], &points[i]);
         vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-        FastVecSub(&basis[1], D_L11_001BA8C0, &points[i]);
+        FastVecSub(&basis[1], g_hero_l11_position, &points[i]);
         FastVecCross(&basis[2], &basis[1], &basis[0]);
         vec_scale_to_length(&basis[2], &basis[2], 1.0f);
         FastVecCross(&basis[1], &basis[0], &basis[2]);
@@ -85,8 +85,8 @@ void ribbon_draw_two_layer(RibbonVector *points, int count, int flags, u32 color
         }
         draw_world_quad(&mainQuad, 0, 0);
         draw_world_quad(&innerQuad, 0, 0);
-        u = D_L11_001AECFC * IntToFloat(i);
-        nextU = u + D_L11_001AECFC;
+        u = g_ribbon_u_step * IntToFloat(i);
+        nextU = u + g_ribbon_u_step;
         if (u >= 1.0f) {
             u -= 1.0f;
             nextU -= 1.0f;

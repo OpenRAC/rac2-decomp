@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned char D_001395B8[0x100];
-extern int D_001A7A08[2];
+extern unsigned char g_game_flag_table[0x100];
+extern int g_challenge_score_words[2];
 extern int g_player_bolts;
-extern unsigned char D_001A7A60 __attribute__((sda));
-extern int D_001A903C;
+extern unsigned char g_item_enabled_flags __attribute__((sda));
+extern int g_scene_trigger_flag;
 typedef struct {
     char pad0[0x22C8];
     int w22C8;
@@ -18,9 +18,9 @@ extern int moby_handle_request_slot_state(int);
 extern int math_random_int_below(int);
 extern int moby_compute_scaled_entry_value_shifted(int);
 extern int moby_compute_scaled_entry_value(int);
-extern void func_US2_L00_0030D9F8(int);
+extern void module_l00_call_handler_with_arg_4_us2(int);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern void func_US2_002B1880(int, int);
+extern void value_set_entry_by_index_us2(int, int);
 extern int MemcardSave(int, int);
 
 /* Starts the next scene for a1 and counts the entry, as func_L02_003FCCA0 does in level 2. For
@@ -28,36 +28,36 @@ extern int MemcardSave(int, int);
    +0x22C8; otherwise it takes scene func_002A77E0(2) + 0x1E, adds the two scores and starts
    func_US2_L00_0030D9F8(0x168). For a1 == 10
    with the once-only byte clear it sets it, starts func_002E5E58 and raises D_001A903C. */
-void func_US2_L11_00444008(char *a0, int a1) {
+void arena_start_challenge_result_scene_us2(char *a0, int a1) {
     char *state = *(char **)(a0 + 0x68);
     int saved;
     int v;
 
-    if (a1 == 0 && D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
+    if (a1 == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
         saved = g_hero_state.w22C8;
         arena_queue_voice_line(a0, 1);
         help_unlock_entry(0x13);
         moby_handle_request_slot_state(0x13);
         g_hero_state.w22C8 = saved;
-    } else if (a1 == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
+    } else if (a1 == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
         saved = g_hero_state.w22C8;
         arena_queue_voice_line(a0, 3);
         help_unlock_entry(0x33);
         g_hero_state.w22C8 = saved;
     } else {
         arena_queue_voice_line(a0, math_random_int_below(2) + 0x1E);
-        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(a1);
+        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(a1);
         v = moby_compute_scaled_entry_value(a1);
         *(int *)(state + 0x1E0) = v;
         g_player_bolts = g_player_bolts + v;
-        func_US2_L00_0030D9F8(0x168);
+        module_l00_call_handler_with_arg_4_us2(0x168);
     }
-    if (a1 == 10 && D_001A7A60 == 0) {
-        D_001A7A60 = 1;
+    if (a1 == 10 && g_item_enabled_flags == 0) {
+        g_item_enabled_flags = 1;
         snd_play_from_global_bank(1, 0, 0);
-        func_US2_002B1880(0x1233, -1);
-        D_001A903C = 1;
+        value_set_entry_by_index_us2(0x1233, -1);
+        g_scene_trigger_flag = 1;
     }
-    D_001395B8[arena_get_challenge_flag_index(a1)] += 1;
+    g_game_flag_table[arena_get_challenge_flag_index(a1)] += 1;
     MemcardSave(0, -1);
 }

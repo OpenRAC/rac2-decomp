@@ -2,18 +2,18 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L16_001B18A0 __attribute__((sda));
-extern float D_L16_001B18A4;
-extern u32 D_L16_001B18A8 __attribute__((sda));
-extern u32 D_L16_001B18AC;
-extern u32 D_L16_001B18B0;
-extern u32 D_L16_001B18B4;
-extern u32 D_L16_001B18B8;
-extern u32 D_L16_001B18BC;
-extern u32 D_L16_001B18C0 __attribute__((sda));
-extern u32 D_L16_001B18C4;
-extern u32 D_L16_001B18C8;
-extern s32 D_L16_001B2648;
+extern float g_snivelak_fire_speed_min __attribute__((sda));
+extern float g_snivelak_fire_speed_max;
+extern u32 g_snivelak_fire_big_param_a __attribute__((sda));
+extern u32 g_snivelak_fire_big_param_b;
+extern u32 g_snivelak_fire_mid_param_a;
+extern u32 g_snivelak_fire_mid_param_b;
+extern u32 g_snivelak_fire_small_param_a;
+extern u32 g_snivelak_fire_small_param_b;
+extern u32 g_snivelak_fire_big_end_param __attribute__((sda));
+extern u32 g_snivelak_fire_mid_end_param;
+extern u32 g_snivelak_fire_small_end_param;
+extern s32 g_frame_l16_counter;
 
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern float math_random_float_range(float, float);
@@ -33,15 +33,15 @@ void snivelak_emit_fire_burst(char *moby) {
 
     for (i = 0; i < 2; i++) {
         *(TI128 *)fall = 0;
-        speed = math_random_float_range(D_L16_001B18A0, D_L16_001B18A4);
+        speed = math_random_float_range(g_snivelak_fire_speed_min, g_snivelak_fire_speed_max);
         fall[2] = -(speed * rate);
         *(TI128 *)velocity = *(TI128 *)fall;
         moby_transform_joint_to_world(moby, i, position);
-        if (D_L16_001B2648 & 1) {
-            part_spawn_scaling(position, velocity, D_L16_001B18A8, D_L16_001B18AC, math_random_int_range(0x12, 0x16), D_L16_001B18C0, -10, 1);
+        if (g_frame_l16_counter & 1) {
+            part_spawn_scaling(position, velocity, g_snivelak_fire_big_param_a, g_snivelak_fire_big_param_b, math_random_int_range(0x12, 0x16), g_snivelak_fire_big_end_param, -10, 1);
         } else {
-            part_spawn_scaling(position, velocity, D_L16_001B18B0, D_L16_001B18B4, math_random_int_range(0x14, 0x18), D_L16_001B18C4, -10, 1);
+            part_spawn_scaling(position, velocity, g_snivelak_fire_mid_param_a, g_snivelak_fire_mid_param_b, math_random_int_range(0x14, 0x18), g_snivelak_fire_mid_end_param, -10, 1);
         }
-        part_spawn_scaling(position, velocity, D_L16_001B18B8, D_L16_001B18BC, math_random_int_range(0xA, 0xF), D_L16_001B18C8, -10, 1);
+        part_spawn_scaling(position, velocity, g_snivelak_fire_small_param_a, g_snivelak_fire_small_param_b, math_random_int_range(0xA, 0xF), g_snivelak_fire_small_end_param, -10, 1);
     }
 }

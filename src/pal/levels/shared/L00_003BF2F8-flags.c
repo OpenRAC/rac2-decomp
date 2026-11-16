@@ -11,7 +11,7 @@ extern void spark_process_owned_records(char *a0);
 
 /* Opens the block, lays seven oriented sprites over it from two helper draws and the shared
    colour word, then runs the two slot-table passes and closes the block. */
-void func_PAL_L00_003BF2F8(char *a0)
+void spark_draw_projectile_pal(char *a0)
 {
     char *ctx;
 

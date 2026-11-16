@@ -15,10 +15,10 @@ extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float,float);
 extern float fast_subtract_rotations(float,float);
 extern f32 math_approach_target_with_direction_mode(void *,void *,float,float,float,float,int);
-extern u8 D_L03_00188660[] NOT_SDA;
-extern float D_0018A138 NOT_SDA;
-extern float D_L03_001B1088 __attribute__((sda)), D_L03_001B1074 __attribute__((sda)), D_L03_001B1078 __attribute__((sda));
-extern float D_L03_001B107C __attribute__((sda)), D_L03_001B1080 __attribute__((sda)), D_L03_001B1084 __attribute__((sda)), D_L03_001B108C __attribute__((sda));
+extern u8 g_sound_l03_slot_table[] NOT_SDA;
+extern float g_height_threshold NOT_SDA;
+extern float g_endako_boss_path_approach_speed __attribute__((sda)), g_endako_boss_path_speed_target __attribute__((sda)), g_endako_boss_path_tilt_target __attribute__((sda));
+extern float g_endako_boss_path_step_rate __attribute__((sda)), g_endako_boss_path_tilt_scale __attribute__((sda)), g_endako_boss_path_turn_speed __attribute__((sda)), g_endako_boss_forced_behaviour __attribute__((sda));
 
 void func_PAL_L03_003FA3C0(u8 *entity) {
     u8 *state = *(u8 **)(entity+0x68);
@@ -32,18 +32,18 @@ void func_PAL_L03_003FA3C0(u8 *entity) {
         FastVecSub(delta, *(u8 **)(state+0x2CC)+(next*16+16), state+0x290);
         distance = FastVecLength(delta);
         remaining=fast_vec_dist(state+0x290,*(u8 **)(state+0x2CC)+(*(int *)(state+0x2DC)*16+16));
-        math_approach_target_with_braking(state+0x2D0,remaining,D_L03_001B1088*0.00040000002f,D_L03_001B1088*0.00040000002f,0.20000002f);
+        math_approach_target_with_braking(state+0x2D0,remaining,g_endako_boss_path_approach_speed*0.00040000002f,g_endako_boss_path_approach_speed*0.00040000002f,0.20000002f);
         vec_scale_to_length(delta,delta,*(float *)(state+0x2D0));
         FastVecAdd(state+0x290,state+0x290,delta);
         if (distance <= *(float *)(state+0x2D0)) *(int *)(state+0x2D8)=next;
         {
-            u8 *sound=D_L03_00188660+*(int *)(state+0x3CC)*0x70;
+            u8 *sound=g_sound_l03_slot_table+*(int *)(state+0x3CC)*0x70;
             if (*(u8 **)(sound+0x88)!=entity || !sound[0x74]) *(int *)(state+0x3CC)=PlayMobySound(0,4,entity);
         }
     }
     switch(entity[0x95]) {
     case 3:
-        distance=D_0018A138-155.0f;
+        distance=g_height_threshold-155.0f;
         if(distance>1.5f) distance=1.5f;
         else if(distance<0) distance=0;
         ApproachValue(state+0x300,0.1f,0.010000001f);
@@ -58,12 +58,12 @@ void func_PAL_L03_003FA3C0(u8 *entity) {
         ApproachValue(state+0x304,1.5f,0.030000001f);
         break;
     default:
-        ApproachValue(state+0x300,D_L03_001B1074,0.010000001f);
-        ApproachValue(state+0x304,D_L03_001B1078,0.030000001f);
+        ApproachValue(state+0x300,g_endako_boss_path_speed_target,0.010000001f);
+        ApproachValue(state+0x304,g_endako_boss_path_tilt_target,0.030000001f);
     }
     qcopy(entity+0x10,state+0x290);
     wave=math_fast_sin_or_cos_b(*(float *)(state+0x2C0));
-    step=D_L03_001B107C*0.0003490659f;
+    step=g_endako_boss_path_step_rate*0.0003490659f;
     *(float *)(entity+0x18)+=*(float *)(state+0x300)*wave+*(float *)(state+0x304);
     *(float *)(state+0x2C0)=FastAddRotations(*(float *)(state+0x2C0),step);
     if(entity[0x95]==0 && vec_length_xy(delta)>0.020000001f) {
@@ -78,11 +78,11 @@ void func_PAL_L03_003FA3C0(u8 *entity) {
         if(blend!=0) {
             if(entity[0x95]!=4) {
                 if(fast_subtract_rotations(mat_fast_helper_a(delta[0],delta[1]),*(float *)(entity+0xF8))<0)
-                    speed=-(D_L03_001B1084*0.017453294f);
-                else speed=D_L03_001B1084*0.017453294f;
+                    speed=-(g_endako_boss_path_turn_speed*0.017453294f);
+                else speed=g_endako_boss_path_turn_speed*0.017453294f;
                 target=FastAddRotations(target,speed*blend);
             }
-            tilt=D_L03_001B1080*(blend*0.017453294f);
+            tilt=g_endako_boss_path_tilt_scale*(blend*0.017453294f);
         }
     }
     rate=0.0025132746f;

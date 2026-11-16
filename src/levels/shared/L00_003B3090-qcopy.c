@@ -3,7 +3,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int coll_process_hit(void *, int, int, void *, float);
-extern int D_L00_0018C0B0;
+extern int g_collision_hero_owner;
 
 struct S {
     float f0;
@@ -37,5 +37,5 @@ void shot_damage_around(char *moby, char *vars, char *position) {
     hit.b18 = 3;
     hit.b19 = 2;
     hit.h1A = *(unsigned short *)(owner + 0xAA);
-    coll_process_hit(center, 1, D_L00_0018C0B0, &hit, *(float *)(shot + 0x30));
+    coll_process_hit(center, 1, g_collision_hero_owner, &hit, *(float *)(shot + 0x30));
 }

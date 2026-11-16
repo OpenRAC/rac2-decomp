@@ -33,29 +33,29 @@ typedef struct {
     f32 k44;
 } Pv;
 
-extern f32 D_L00_001B0A98 __attribute__((sda));
-extern f32 D_L00_001B0A9C __attribute__((sda));
-extern s32 D_L00_001B0AA4 __attribute__((sda));
-extern s32 D_L00_001B0AA8 __attribute__((sda));
-extern s32 D_L00_001B0B54 __attribute__((sda));
-extern f32 D_L00_001B0B58 __attribute__((sda));
-extern f32 D_L00_001B0B5C __attribute__((sda));
-extern f32 D_L00_001B0B70 __attribute__((sda));
-extern s32 D_L00_001B0B74 __attribute__((sda));
-extern f32 D_L00_001B0B7C __attribute__((sda));
-extern f32 D_L00_001B0B80 __attribute__((sda));
-extern s32 D_L00_001B0B84 __attribute__((sda));
-extern s32 D_L00_001B0B88 __attribute__((sda));
-extern f32 D_L00_001B0B8C __attribute__((sda));
-extern f32 D_L00_001B0B90 __attribute__((sda));
-extern f32 D_L00_001B0B94 __attribute__((sda));
-extern s32 D_L00_001B0B98 __attribute__((sda));
-extern s32 D_L00_001B0B9C __attribute__((sda));
-extern f32 D_L00_001B0BA0 __attribute__((sda));
-extern f32 D_L00_001B0BA4 __attribute__((sda));
-extern f32 D_L00_001B0BA8 __attribute__((sda));
-extern f32 D_L00_001B0BAC __attribute__((sda));
-extern TI128 D_L00_001AA310[];
+extern f32 g_glow_size_max __attribute__((sda));
+extern f32 g_glow_size_min __attribute__((sda));
+extern s32 g_glow_color_bits __attribute__((sda));
+extern s32 g_glow_alpha_max __attribute__((sda));
+extern s32 g_glow_alpha_scale __attribute__((sda));
+extern f32 g_glow_radius_max __attribute__((sda));
+extern f32 g_glow_radius_min __attribute__((sda));
+extern f32 g_glow_flare_length __attribute__((sda));
+extern s32 g_glow_flash_time_limit __attribute__((sda));
+extern f32 g_glow_sprite_size_max __attribute__((sda));
+extern f32 g_glow_sprite_size_min __attribute__((sda));
+extern s32 g_glow_texture_front __attribute__((sda));
+extern s32 g_glow_texture_back __attribute__((sda));
+extern f32 g_glow_dir_length __attribute__((sda));
+extern f32 g_glow_range_max __attribute__((sda));
+extern f32 g_glow_range_ref __attribute__((sda));
+extern s32 g_glow_color_rgb __attribute__((sda));
+extern s32 g_glow_quad_color __attribute__((sda));
+extern f32 g_glow_alpha_value __attribute__((sda));
+extern f32 g_glow_edge_value_a __attribute__((sda));
+extern f32 g_glow_edge_value_b __attribute__((sda));
+extern f32 g_glow_edge_value_c __attribute__((sda));
+extern TI128 g_billboard_corner_table[];
 extern char g_camera_l00_position[];
 
 extern void gfx_project_world_point_to_screen(void *, void *);
@@ -106,10 +106,10 @@ static __inline__ void set_edge(f32 *v, s32 i, f32 t, f32 half)
     f32 y = 0.0f;
     if (t < half) {
         y = 2.0f * t;
-        v[i] = D_L00_001B0BA4 + (D_L00_001B0BA8 - D_L00_001B0BA4) * y;
+        v[i] = g_glow_edge_value_a + (g_glow_edge_value_b - g_glow_edge_value_a) * y;
     } else {
         x = 2.0f * (t - half);
-        v[i] = D_L00_001B0BA8 + (D_L00_001B0BAC - D_L00_001B0BA8) * x;
+        v[i] = g_glow_edge_value_b + (g_glow_edge_value_c - g_glow_edge_value_b) * x;
     }
 }
 
@@ -180,12 +180,12 @@ void func_PAL_L00_003FF050(u8 *self)
     }
     dot = FastVecDot(dir, (f32 *)(moby + 0xC0));
     a = IntToFloat(pv->t1C) * pv->k20;
-    size = D_L00_001B0A9C + (D_L00_001B0A98 - D_L00_001B0A9C) * a;
+    size = g_glow_size_min + (g_glow_size_max - g_glow_size_min) * a;
     if (pv->t1C < pv->n28) {
         k = IntToFloat(pv->t1C) * pv->k2C;
-        a = IntToFloat(D_L00_001B0AA8) * k;
+        a = IntToFloat(g_glow_alpha_max) * k;
     } else {
-        a = IntToFloat(D_L00_001B0AA8);
+        a = IntToFloat(g_glow_alpha_max);
     }
     a *= dot;
     /* A scheduling barrier: the shift stays ahead of the next call's argument load. */
@@ -208,7 +208,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     gfx_init_quad_packet_state(&q, 0x38, 1, 0x80);
-    c = alpha | D_L00_001B0AA4;
+    c = alpha | g_glow_color_bits;
     q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
     q.uv[0][0] = 0.0f;
     q.uv[0][1] = 0.0f;
@@ -219,7 +219,7 @@ void func_PAL_L00_003FF050(u8 *self)
     q.uv[3][0] = 1.0f;
     q.uv[3][1] = 1.0f;
     for (i1 = 0; i1 < 4; i1++) {
-        transform_vector(&q.corner[i1], &D_L00_001AA310[i1], m);
+        transform_vector(&q.corner[i1], &g_billboard_corner_table[i1], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -238,19 +238,19 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i2 = 0; i2 < 4; i2++) {
-        transform_vector(&q.corner[i2], &D_L00_001AA310[i2], m);
+        transform_vector(&q.corner[i2], &g_billboard_corner_table[i2], m);
     }
     draw_world_quad(&q, 0, 0);
 
     a = IntToFloat(pv->t1E) * pv->k24;
-    size = D_L00_001B0B5C + (D_L00_001B0B58 - D_L00_001B0B5C) * a;
+    size = g_glow_radius_min + (g_glow_radius_max - g_glow_radius_min) * a;
     if (pv->t1E < pv->n2A) {
         a = IntToFloat(pv->t1E) * pv->k30;
         k = cubic_hermite_scalar(1.0f, 0.0f, 1.0f, 2.0f, a);
     } else {
         k = 1.0f;
     }
-    alpha = to_int(IntToFloat(D_L00_001B0B54) * k * fade);
+    alpha = to_int(IntToFloat(g_glow_alpha_scale) * k * fade);
     a = IntToFloat(alpha) * 0.2f;
     alpha = pack_alpha(alpha);
     b = pack_alpha(to_int(a));
@@ -270,12 +270,12 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i3 = 0; i3 < 4; i3++) {
-        transform_vector(&q.corner[i3], &D_L00_001AA310[i3], m);
+        transform_vector(&q.corner[i3], &g_billboard_corner_table[i3], m);
     }
     draw_world_quad(&q, 0, 0);
 
     {
-        b = FloatToInt(IntToFloat(D_L00_001B0B54) * k * fade * 1.5f);
+        b = FloatToInt(IntToFloat(g_glow_alpha_scale) * k * fade * 1.5f);
         if (b >= 0x100) {
             b = 0xFF;
         }
@@ -306,7 +306,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i4 = 0; i4 < 4; i4++) {
-        transform_vector(&q.corner[i4], &D_L00_001AA310[i4], m);
+        transform_vector(&q.corner[i4], &g_billboard_corner_table[i4], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -325,7 +325,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i5 = 0; i5 < 4; i5++) {
-        transform_vector(&q.corner[i5], &D_L00_001AA310[i5], m);
+        transform_vector(&q.corner[i5], &g_billboard_corner_table[i5], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -355,7 +355,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i6 = 0; i6 < 4; i6++) {
-        transform_vector(&q.corner[i6], &D_L00_001AA310[i6], m);
+        transform_vector(&q.corner[i6], &g_billboard_corner_table[i6], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -374,7 +374,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i7 = 0; i7 < 4; i7++) {
-        transform_vector(&q.corner[i7], &D_L00_001AA310[i7], m);
+        transform_vector(&q.corner[i7], &g_billboard_corner_table[i7], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -397,7 +397,7 @@ void func_PAL_L00_003FF050(u8 *self)
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i8 = 0; i8 < 4; i8++) {
-        transform_vector(&q.corner[i8], &D_L00_001AA310[i8], m);
+        transform_vector(&q.corner[i8], &g_billboard_corner_table[i8], m);
     }
     draw_world_quad(&q, 0, 0);
 
@@ -411,14 +411,14 @@ void func_PAL_L00_003FF050(u8 *self)
             v140[1] -= 28492.0f;
             span = 8590.0f;
             k = (f32)pv->t36 * pv->k38;
-            alpha = pack_alpha(to_int(D_L00_001B0BA0 * k));
+            alpha = pack_alpha(to_int(g_glow_alpha_value * k));
             math_apply_axis_rotation_to_quat(v150, basis[4], dir, 0.78539824f);
-            gfx_init_quad_packet_state(&q, D_L00_001B0B88, 1, 0x80);
+            gfx_init_quad_packet_state(&q, g_glow_texture_back, 1, 0x80);
             least = v140[1] <= v140[0] ? v140[1] : v140[0];
             t = least * inv;
-            c = alpha | D_L00_001B0B98;
+            c = alpha | g_glow_color_rgb;
             q.d70 = 5;
-            k = D_L00_001B0B94 / D_L00_001B0B90;
+            k = g_glow_range_ref / g_glow_range_max;
             q.uv[0][0] = 0.0f;
             q.uv[0][1] = one;
             q.uv[1][0] = one;
@@ -427,7 +427,7 @@ void func_PAL_L00_003FF050(u8 *self)
             q.uv[2][1] = 0.0f;
             q.uv[3][0] = one;
             q.uv[3][1] = 0.0f;
-            q.rgba[0] = q.rgba[1] = D_L00_001B0B9C;
+            q.rgba[0] = q.rgba[1] = g_glow_quad_color;
             q.rgba[2] = q.rgba[3] = c;
             h = 0.5f;
             set_edge(v160, 3, t, h);
@@ -443,12 +443,12 @@ void func_PAL_L00_003FF050(u8 *self)
             least = v140[1] <= nx ? v140[1] : nx;
             t = least * inv;
             set_edge(v160, 0, t, 0.5f);
-            vec_scale_to_length(v170, dir, D_L00_001B0B8C);
+            vec_scale_to_length(v170, dir, g_glow_dir_length);
             s = v160;
             for (i9 = 0; i9 < 4; i9++) {
                 vec_scale_to_length(v150, v150, *s);
                 FastVecCross(v180, dir, v150);
-                vec_scale_to_length(v180, v180, D_L00_001B0B90);
+                vec_scale_to_length(v180, v180, g_glow_range_max);
                 FastVecAdd(v190, g_camera_l00_position, v170);
                 FastVecSub(v1A0, v190, (f32 *)(moby + 0x10));
                 FastVecAdd(&q.corner[0], v190, v180);
@@ -484,9 +484,9 @@ void func_PAL_L00_003FF050(u8 *self)
         vec_scale_to_length(v150, v140, 0.1f);
         FastVecAdd(v160, g_camera_l00_position, v150);
         FastVecCross(v170, v140, basis[4]);
-        vec_scale_to_length(v170, v170, D_L00_001B0B70);
+        vec_scale_to_length(v170, v170, g_glow_flare_length);
         FastVecCross(v180, v170, v140);
-        vec_scale_to_length(v180, v180, D_L00_001B0B70);
+        vec_scale_to_length(v180, v180, g_glow_flare_length);
         FastVecAdd(v190, v160, v180);
         FastVecAdd(&q.corner[0], v190, v170);
         FastVecSub(&q.corner[1], v190, v170);
@@ -496,14 +496,14 @@ void func_PAL_L00_003FF050(u8 *self)
         draw_world_quad(&q, 0, 0);
     }
 
-    if (pv->t40 != 0 && pv->t40 <= (((int)(D_L00_001B0B74) * 5 + 2) / 6)) {
+    if (pv->t40 != 0 && pv->t40 <= (((int)(g_glow_flash_time_limit) * 5 + 2) / 6)) {
         f32 sz;
         k = IntToFloat(pv->t40) * pv->k44;
-        sz = D_L00_001B0B80 + (D_L00_001B0B7C - D_L00_001B0B80) * k;
+        sz = g_glow_sprite_size_min + (g_glow_sprite_size_max - g_glow_sprite_size_min) * k;
         FastVecSub(v140, (f32 *)(moby + 0x10), g_camera_l00_position);
         vec_scale_to_length(v140, v140, 0.3f);
         FastVecAdd(v150, g_camera_l00_position, v140);
-        gfx_init_quad_packet_state(&q, D_L00_001B0B84, 1, 0x80);
+        gfx_init_quad_packet_state(&q, g_glow_texture_front, 1, 0x80);
         q.d88 = (0x8000LL << 24) | 0x4A;
         c = pack_alpha(to_int(k * 255.0f)) | 0x808080;
         q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;

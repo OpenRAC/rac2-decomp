@@ -8,9 +8,9 @@
    size keeps the `lui`/`lw` pair here, and the assembler turns the count's load into a $gp
    access when it lands in a branch delay slot), and the table of id lists: halfwords whose low
    15 bits index the 256-byte records, the last one with its sign bit set. */
-extern s32 D_L03_001B2A38[] __attribute__((sda));
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u16 *D_L03_001FB5A0[];
+extern s32 g_object_group_count[] __attribute__((sda));
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u16 *g_entity_id_lists[];
 
 extern void moby_mark_spawned(void *);
 extern float math_fast_float_g(float);
@@ -39,17 +39,17 @@ void object_group_pulse_colors(u8 *moby)
 
     switch (moby[0x20]) {
     case 0:
-        if (GROUP >= D_L03_001B2A38[0] || D_L03_001FB5A0[GROUP] == 0 || GROUP == -1) {
+        if (GROUP >= g_object_group_count[0] || g_entity_id_lists[GROUP] == 0 || GROUP == -1) {
             moby_mark_spawned(moby);
         } else {
             *(f32 *)(state + 4) = -0.052359886f;
             *(f32 *)(state + 8) = *(f32 *)(state + 8) * 0.017453294f;
             moby[0x30] = 0xFF;
-            for (p = D_L03_001FB5A0[GROUP];
-                 (GROUP & 0xFF) != 0xFF && GROUP <= D_L03_001B2A38[0] && p != 0 &&
-                 ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[GROUP]);
+            for (p = g_entity_id_lists[GROUP];
+                 (GROUP & 0xFF) != 0xFF && GROUP <= g_object_group_count[0] && p != 0 &&
+                 ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[GROUP]);
                  p++) {
-                member = D_L03_001B2A1C[0] + ((*p & 0x7FFF) << 8);
+                member = g_moby_record_base[0] + ((*p & 0x7FFF) << 8);
                 if (member == 0)
                     break;
                 *(u16 *)(member + 0x34) |= 0x10;
@@ -64,11 +64,11 @@ void object_group_pulse_colors(u8 *moby)
         }
         break;
     case 1:
-        for (p = D_L03_001FB5A0[GROUP];
-             (GROUP & 0xFF) != 0xFF && GROUP <= D_L03_001B2A38[0] && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[GROUP]);
+        for (p = g_entity_id_lists[GROUP];
+             (GROUP & 0xFF) != 0xFF && GROUP <= g_object_group_count[0] && p != 0 &&
+             ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[GROUP]);
              p++) {
-            member = D_L03_001B2A1C[0] + ((*p & 0x7FFF) << 8);
+            member = g_moby_record_base[0] + ((*p & 0x7FFF) << 8);
             if (member == 0)
                 break;
             member_vars = *(u8 **)(member + 0x68);

@@ -14,24 +14,24 @@ typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int D_001ABA04 __attribute__((sda));
-extern short D_001A63AC[];
+extern int g_extras_page_cursor __attribute__((sda));
+extern short g_sequence_active_flag[];
 typedef struct { char reserved00[0x10]; int flags; } FlagTarget;
 typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int f54; int f58; } MenuFields;
 
-extern int D_001ABA08[4];
+extern int g_extras_page_unlocked[4];
 extern int D_001ABA08_gp[] SDATA(D_001ABA08);
 extern int D_001A7478_sda __attribute__((sda));
-extern int D_001B1580;
-extern int D_001A7478;
-extern int D_0025C2B8[];
-extern char D_001BAD40[];
+extern int g_extras_menu_page;
+extern int g_loader_state_word;
+extern int g_extras_page_value_block[];
+extern char g_loader_movie[];
 extern void menu_restore_saved_screen_image(int);
 extern int request_begin_slot(int, int, int, int, int);
 extern int req_push_queue(char *, int);
 extern int req_launch_queued(char *);
-extern MenuFields D_0025C250;
-extern FlagTarget *D_0025C210[];
+extern MenuFields g_extras_page_fields;
+extern FlagTarget *g_extras_page_flag_targets[];
 typedef struct { char p00[8]; int f08; char p0c[8]; int f14; int f18; char pad[0xE4]; int f100; int f104; char pad2[0x38]; int f140; } GameObj;
 
 
@@ -42,12 +42,12 @@ int func_PAL_002D1120(void)
     int c = -1;
     int result = 0;
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int old = D_001ABA04;
+    int old = g_extras_page_cursor;
 
     if (flags & 0x10) {
         int value;
         int status;
-        D_001ABA04 = 0;
+        g_extras_page_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -60,38 +60,38 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        D_001ABA04 = 0;
+        g_extras_page_cursor = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (--D_001ABA04 < 0)
-                D_001ABA04 = 3;
+            if (--g_extras_page_cursor < 0)
+                g_extras_page_cursor = 3;
         } else if (flags & 0x4000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (++D_001ABA04 >= 4)
-                D_001ABA04 = 0;
+            if (++g_extras_page_cursor >= 4)
+                g_extras_page_cursor = 0;
         }
         if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
-            switch (D_001ABA04) {
+            switch (g_extras_page_cursor) {
             case 2:
-                if (D_001ABA08[D_001ABA04] != 0) { a = 4; b = 0xBD; c = 0xBE; } else a = 5;
+                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { a = 4; b = 0xBD; c = 0xBE; } else a = 5;
                 break;
             case 3:
-                if (D_001ABA08[D_001ABA04] != 0) { a = 4; b = 0xC1; } else a = 5;
+                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { a = 4; b = 0xC1; } else a = 5;
                 break;
             case 1:
-                if (D_001ABA08[D_001ABA04] != 0) {
+                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) {
                     menu_restore_saved_screen_image(1);
                     a = 4;
-                    D_001B1580 = 2;
+                    g_extras_menu_page = 2;
                     ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
                     ((GameObj *)&g_pause_menu_state)->f104 = ((GameObj *)&g_pause_menu_state)->f08;
                     request_begin_slot(9, 1, 0, 0, 0);
                 } else a = 5;
                 break;
             case 0:
-                g_pause_menu_state.value = (int)D_0025C2B8;
+                g_pause_menu_state.value = (int)g_extras_page_value_block;
                 a = 4;
                 break;
             default:
@@ -102,9 +102,9 @@ finish:
                 menu_restore_saved_screen_image(0);
                 ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
                 ((GameObj *)&g_pause_menu_state)->f104 = ((GameObj *)&g_pause_menu_state)->f08;
-                ((GameObj *)&g_pause_menu_state)->f140 = D_001A7478;
+                ((GameObj *)&g_pause_menu_state)->f140 = g_loader_state_word;
                 D_001A7478_sda = 2;
-                obj = D_001BAD40;
+                obj = g_loader_movie;
                 req_push_queue(obj, b);
                 if (c != -1)
                     req_push_queue(obj, c);
@@ -113,23 +113,23 @@ finish:
             if (a != -1)
                 snd_play_from_global_bank(a, 0, 0);
         }
-        if (D_001ABA04 >= 2)
-            ((MenuFields *)&D_0025C250)->f58 = D_001ABA04 + 1;
+        if (g_extras_page_cursor >= 2)
+            ((MenuFields *)&g_extras_page_fields)->f58 = g_extras_page_cursor + 1;
         else
-            ((MenuFields *)&D_0025C250)->f58 = D_001ABA04;
-        if (D_001ABA08_gp[D_001ABA04] != 0) {
-            if (old == D_001ABA04) {
-                if (D_001A63AC[0] == 0) {
-                    MenuFields *menu = &D_0025C250;
+            ((MenuFields *)&g_extras_page_fields)->f58 = g_extras_page_cursor;
+        if (D_001ABA08_gp[g_extras_page_cursor] != 0) {
+            if (old == g_extras_page_cursor) {
+                if (g_sequence_active_flag[0] == 0) {
+                    MenuFields *menu = &g_extras_page_fields;
                     if (menu->f50 == old && menu->f44 == 2) {
-                        D_0025C210[0]->flags &= -5;
+                        g_extras_page_flag_targets[0]->flags &= -5;
                     } else if (menu->f54 == old && menu->f44 == 4) {
-                        D_0025C210[0]->flags &= -5;
+                        g_extras_page_flag_targets[0]->flags &= -5;
                     }
                 }
             }
         } else {
-            D_0025C210[0]->flags |= 4;
+            g_extras_page_flag_targets[0]->flags |= 4;
         }
     }
     return result;

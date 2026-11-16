@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int Vector __attribute__((mode(TI)));
-extern float D_L02_001B03E0[4] __attribute__((sda));
+extern float g_sliding_platform_local_offset[4] __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -16,9 +16,9 @@ extern void func_002A10E8(char *);
 extern int flag_set_first_pending(char *);
 extern int FastDecTimer(void *);
 extern float IntToFloat(int);
-extern void func_PAL_L02_003DBA08(char *);
+extern void chainblade_release_held_actors_pal(char *);
 
-void func_PAL_L02_003DB438(char *self) {
+void sliding_l02_platform_update_pal(char *self) {
     float offset[4] __attribute__((aligned(16)));
     /* Separate initial and final query events use four measured local vectors. */
     float updated[4] __attribute__((aligned(16)));
@@ -46,7 +46,7 @@ void func_PAL_L02_003DB438(char *self) {
         *(unsigned char *)(*(char **)(state + 0x1C) + 0x30) = *(unsigned char *)(self + 0x30);
         *(short *)(*(char **)(state + 0x1C) + 0x32) = 0;
         moby_transform_joint_to_world(self, 0, (char *)position);
-        matrix_mul_vec3(transformed, D_L02_001B03E0, self + 0xC0);
+        matrix_mul_vec3(transformed, g_sliding_platform_local_offset, self + 0xC0);
         FastVecAdd(position, transformed, position);
         {
             char *child = *(char **)(state + 0x1C);
@@ -95,7 +95,7 @@ void func_PAL_L02_003DB438(char *self) {
         moby_set_state(self, 5, -1);
         *(float *)(self + 0x48) = 1.0f;
         if (*(unsigned char *)(self + 0x43) != 1) func_PAL_002A7E68(self, 1, 0, 0);
-        func_PAL_L02_003DBA08(self);
+        chainblade_release_held_actors_pal(self);
         break;
     case 5:
         if (*(unsigned char *)(self + 0x60) & 2) {
@@ -122,7 +122,7 @@ void func_PAL_L02_003DB438(char *self) {
     }
     if (*(char **)(state + 0x1C) && *(float *)(self + 0x48) != 0.0f) {
         moby_transform_joint_to_world(self, 0, (char *)updated);
-        matrix_mul_vec3(position, D_L02_001B03E0, self + 0xC0);
+        matrix_mul_vec3(position, g_sliding_platform_local_offset, self + 0xC0);
         FastVecAdd(updated, position, updated);
         {
             char *child = *(char **)(state + 0x1C);

@@ -7,9 +7,9 @@ typedef int s32;
 typedef float f32;
 extern s32 g_player_bolts;
 extern s32 g_current_map_index __attribute__((sda));
-extern s32 D_001A8C70;
-extern u32 D_001B1B60 __attribute__((sda));
-extern s32 D_0018D208[];
+extern s32 g_bolt_pickup_enabled;
+extern u32 g_moby_pool_end __attribute__((sda));
+extern s32 g_level_bolt_scores[];
 extern void level_forward_value(s32);
 extern void vec_random_direction(f32 *, f32, f32);
 extern void FastVecScale(f32 *, f32 *, f32);
@@ -54,8 +54,8 @@ void func_PAL_00302E18(u8 *obj) {
         break;
     }
     g_player_bolts = g_player_bolts + score;
-    if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (D_001A8C70 != 0 && (u32)obj < D_001B1B60))
-        D_0018D208[g_current_map_index] += score;
+    if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (g_bolt_pickup_enabled != 0 && (u32)obj < g_moby_pool_end))
+        g_level_bolt_scores[g_current_map_index] += score;
     level_forward_value(0x96);
     vec_random_direction(buf, 0.014f, 0.020000001f);
     FastVecScale(pos, buf, 10.0f);

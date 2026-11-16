@@ -3,7 +3,7 @@
 
 typedef unsigned char u8;
 
-extern float D_L02_001B1FC4 __attribute__((sda));
+extern float g_spinning_moby_rot_rate __attribute__((sda));
 
 extern void func_002F2270(void *, void *, float);
 extern void func_00322F98(void *, void *, float);
@@ -31,6 +31,6 @@ void moby_update_spinning_frame_orientation(char *moby) {
     func_002F1F70(frame, mobyPos, frame);
     func_002F1F70(vars + 0x20, mobyPos, vars + 0x20);
     *(float *)(vars + 0x30) =
-        func_002F3048(*(float *)(vars + 0x30), D_L02_001B1FC4 * 0.000290888245f);
+        func_002F3048(*(float *)(vars + 0x30), g_spinning_moby_rot_rate * 0.000290888245f);
     func_002EA180(gfx_draw_beam_effect_passes, moby);
 }

@@ -8,8 +8,8 @@ extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
 extern int audio_menu_update(void *, int);
-extern int D_001ADE48[2] __attribute__((sda));
-extern char D_001ADC88[];
+extern int g_audio_menu_prompt_ids[2] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
 extern void object_init_derived_b(void *, int, int, void *, void *);
 extern void widget_set_pos_y(void *, int);
 extern void meter_set_max(void *, int);
@@ -19,7 +19,7 @@ extern void object_set_second_pair(void *, int, int);
 extern void text_set_alignment(void *, int);
 extern void widget_store_field(void *, int);
 
-void func_US2_0033DE10(char *object, void *argument)
+void audio_menu_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child, *widget, *secondWidget;
@@ -39,13 +39,13 @@ void func_US2_0033DE10(char *object, void *argument)
     child = object + 8;
     widget = object + 0x2DC;
     secondWidget = object + 0x324;
-    prompt_bar_init(child, argument, D_001ADE48);
+    prompt_bar_init(child, argument, g_audio_menu_prompt_ids);
     text = GetLocalizedString(0x2C2D);
     second = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2BE5));
     prompt_bar_set_text_offsets(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing(child, 0.67f);
-    table = D_001ADC88;
+    table = g_circle_menu_icon_data;
     object_init_derived_b(widget, 150, 1, table, argument);
     widget_set_pos_y(widget, 16);
     meter_set_max(widget, 0x400);

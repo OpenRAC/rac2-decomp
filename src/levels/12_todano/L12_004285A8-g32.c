@@ -27,7 +27,7 @@ extern void FastVecAdd(void *,void *,void *), FastVecScale(void *,void *,f32), e
 extern u8 *CreateMoby(s32);
 extern void moby_mark_spawned(void *);
 extern u8 g_sound_state[], g_hero_position[];
-extern u8 D_001A7A60[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] __attribute__((sda));
 typedef struct {
     u8 pad[0x160];
     f32 value160;
@@ -36,13 +36,13 @@ typedef struct {
     f32 value180;
     s32 value184, value188;
 } L12EffectState;
-extern L12EffectState D_L12_001B9CC0;
-extern s32 D_L12_001B3DB4, D_001A903C;
-extern u8 *D_L12_001B2EA0, *D_L12_001B2E9C;
-extern u8 D_L12_001B2290 __attribute__((sda)), D_L12_001B2288 __attribute__((sda)), D_L12_001B2280 __attribute__((sda));
-extern s32 D_L12_001B22D0 __attribute__((sda));
-extern f32 D_L12_001B2260[4] __attribute__((sda));
-extern s32 D_L12_001B2270[4] __attribute__((sda));
+extern L12EffectState g_hero_state_copy_a;
+extern s32 g_flying_boss_piece_counter, g_scene_trigger_flag;
+extern u8 *g_moby_l12_list_end, *g_moby_list_start;
+extern u8 g_explosion_piece_table_a __attribute__((sda)), g_explosion_piece_table_b __attribute__((sda)), g_explosion_piece_table_c __attribute__((sda));
+extern s32 g_explosion_piece_effect __attribute__((sda));
+extern f32 g_flying_boss_vec_scales[4] __attribute__((sda));
+extern s32 g_flying_boss_debris_ids[4] __attribute__((sda));
 typedef struct { u8 pad[0x74]; u8 active; u8 gap[0x13]; u8 *owner; } L12Sound;
 /* Updates a boss-like flying object. It has health, takes hits, goes through a set of moves, drops down and finally breaks into pieces. */
 void flying_boss_update(u8 *self) {
@@ -60,7 +60,7 @@ void flying_boss_update(u8 *self) {
         F(st,0x70)=F(self,0x18)+50.0f;
         F(st,0x7c)=coll_probe_ground_height_below(self+0x10,0,0.5f);
         I(st,0x80)=-1;
-        D_L12_001B3DB4=0;
+        g_flying_boss_piece_counter=0;
         moby_set_state(self,1,-1);
         break;
     case 1: {
@@ -74,21 +74,21 @@ void flying_boss_update(u8 *self) {
         if (F(st,0x20)<0.0f) {
             u8 *p;
             count=0;
-            for (p=D_L12_001B2E9C;p<D_L12_001B2EA0;p+=0x100)
+            for (p=g_moby_list_start;p<g_moby_l12_list_end;p+=0x100)
                 if (*(s16 *)(p+0xaa)==*(s16 *)(self+0xaa) && p[0x20]<2 && p!=self) count++;
-            if (!count && !D_001A7A60[9]) {
-                D_001A7A60[9]=1;
+            if (!count && !g_item_enabled_flags[9]) {
+                g_item_enabled_flags[9]=1;
                 snd_play_from_global_bank(1,0,0);
                 value_set_entry_by_index(0x1233,-1);
-                D_001A903C=1;
+                g_scene_trigger_flag=1;
             }
-            i=D_L12_001B3DB4;
+            i=g_flying_boss_piece_counter;
             if (i==0) moby_set_state(self,2,-1);
             else if (i==1) moby_set_state(self,7,-1);
             else if (i==2) moby_set_state(self,3,-1);
             else if (i==3) moby_set_state(self,4,-1);
             else moby_set_state(self,7,-1);
-            D_L12_001B3DB4++;
+            g_flying_boss_piece_counter++;
         }
         self[0xa8]=255;
         break;
@@ -109,8 +109,8 @@ void flying_boss_update(u8 *self) {
             }
         }
         if (F(self,0xf0)>1.431170105934143f) {
-            D_L12_001B9CC0.value180=0.2f; D_L12_001B9CC0.value188=90;
-            D_L12_001B9CC0.value160=0.2f; D_L12_001B9CC0.value168=60; D_L12_001B9CC0.value16c=0;
+            g_hero_state_copy_a.value180=0.2f; g_hero_state_copy_a.value188=90;
+            g_hero_state_copy_a.value160=0.2f; g_hero_state_copy_a.value168=60; g_hero_state_copy_a.value16c=0;
             moby_set_state(self,8,-1);
         }
         break;
@@ -118,8 +118,8 @@ void flying_boss_update(u8 *self) {
     case 4:
         if (flag_set_first_pending(self)) {
             I(st,0x68)=260; I(st,0x6c)=0;
-            D_L12_001B9CC0.value180=0.1f; D_L12_001B9CC0.value188=90;
-            D_L12_001B9CC0.value160=0.2f; D_L12_001B9CC0.value168=60; D_L12_001B9CC0.value16c=0;
+            g_hero_state_copy_a.value180=0.1f; g_hero_state_copy_a.value188=90;
+            g_hero_state_copy_a.value160=0.2f; g_hero_state_copy_a.value168=60; g_hero_state_copy_a.value16c=0;
             self[0x30]=255;
         }
         part_l12_spawn_spark_spray(self,0);
@@ -143,8 +143,8 @@ void flying_boss_update(u8 *self) {
     case 3:
         if (flag_set_first_pending(self)) {
             I(st,0x68)=180; I(st,0x6c)=0;
-            D_L12_001B9CC0.value180=0.1f; D_L12_001B9CC0.value188=90;
-            D_L12_001B9CC0.value160=0.2f; D_L12_001B9CC0.value168=60; D_L12_001B9CC0.value16c=0;
+            g_hero_state_copy_a.value180=0.1f; g_hero_state_copy_a.value188=90;
+            g_hero_state_copy_a.value160=0.2f; g_hero_state_copy_a.value168=60; g_hero_state_copy_a.value16c=0;
         }
         if (I(st,0x68)) {
             {
@@ -168,7 +168,7 @@ void flying_boss_update(u8 *self) {
         break;
     case 5: {
         u8 *p;
-        p=D_L12_001B2E9C+(I(st,0x74)<<8);
+        p=g_moby_list_start+(I(st,0x74)<<8);
         if (p && p[0x20]!=254 && p[0x20]!=253) {
             if (vec_distance_xy(p+0x10,g_hero_position)<45.0f && p[0x31]) {
                 H(self,0x34)=(H(self,0x34)&0xffbe)|0x1000;
@@ -203,19 +203,19 @@ void flying_boss_update(u8 *self) {
             }
             I(st,0x80)=-1;
             SpawnExplosion(pos,1,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
-            part_explode_object_into_pieces(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,4,255,timed_explosion_debris_update);
+            part_explode_object_into_pieces(self,&g_explosion_piece_table_a,&g_explosion_piece_table_b,&g_explosion_piece_table_c,255,-1,g_explosion_piece_effect,15,4,255,timed_explosion_debris_update);
             part_spawn_scaled_bolts(self,25,0.0f);
             moby_mark_spawned(self);
             return;
         }
         if (F(self,0x18)<F(st,0x78)+11.2f && (H(self,0x7c)&2)) {
             SpawnExplosion(pos,1,25,20,20,20,45,1,2.0f,20.0f,1,1,0,0);
-            part_explode_object_into_pieces(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,2,255,timed_explosion_debris_update);
+            part_explode_object_into_pieces(self,&g_explosion_piece_table_a,&g_explosion_piece_table_b,&g_explosion_piece_table_c,255,-1,g_explosion_piece_effect,15,2,255,timed_explosion_debris_update);
             H(self,0x7c)=0x8004;
         } else if (F(self,0x18)<F(st,0x78)+16.27f && !H(self,0x7c)) {
             PlayMobySound(1,0,self);
             SpawnExplosion(pos,1,25,20,20,20,45,1,3.0f,20.0f,1,1,0,0);
-            part_explode_object_into_pieces(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,1,255,timed_explosion_debris_update);
+            part_explode_object_into_pieces(self,&g_explosion_piece_table_a,&g_explosion_piece_table_b,&g_explosion_piece_table_c,255,-1,g_explosion_piece_effect,15,1,255,timed_explosion_debris_update);
             H(self,0x7c)=0x8006;
         } else {
         vecv.q=0; vec[2]=-12.27f;
@@ -228,7 +228,7 @@ void flying_boss_update(u8 *self) {
         if (flag_set_first_pending(self)) PlayMobySound(4,0,self);
         qcopy(pos,self+0x10);
         SpawnExplosion(pos,1,25,20,20,20,45,1,4.0f,20.0f,1,1,0,0);
-        part_explode_object_into_pieces(self,&D_L12_001B2290,&D_L12_001B2288,&D_L12_001B2280,255,-1,D_L12_001B22D0,15,255,255,timed_explosion_debris_update);
+        part_explode_object_into_pieces(self,&g_explosion_piece_table_a,&g_explosion_piece_table_b,&g_explosion_piece_table_c,255,-1,g_explosion_piece_effect,15,255,255,timed_explosion_debris_update);
         part_spawn_scaled_bolts(self,25,0.0f);
         moby_mark_spawned(self);
         return;
@@ -237,13 +237,13 @@ void flying_boss_update(u8 *self) {
         for (i=0;i<3;i++) {
             p=CreateMoby(0x12e2-i);
             if (p) {
-                FastVecScale(p+0x10,self+0xe0,D_L12_001B2260[i]);
+                FastVecScale(p+0x10,self+0xe0,g_flying_boss_vec_scales[i]);
                 FastVecAdd(p+0x10,p+0x10,self+0x10);
                 qcopy_nc(p+0xf0,self+0xf0);
                 euler_rotation_basis(p+0xc0,self+0xf0);
                 F(p,0x2c)=F(P(p,0x24),0x24)*(F(self,0x2c)/F(P(self,0x24),0x24));
                 posv.q=0; pos[2]=0.13333334028720856f;
-                part_spawn_masked_debris(p,D_L12_001B2270[i],pos,6.0f,12.0f,6.0f,12.0f,255);
+                part_spawn_masked_debris(p,g_flying_boss_debris_ids[i],pos,6.0f,12.0f,6.0f,12.0f,255);
                 SpawnExplosion(p+0x10,0,25,20,20,20,45,1,1.0f,20.0f,1,1,0,0);
                 moby_mark_spawned(p);
             }

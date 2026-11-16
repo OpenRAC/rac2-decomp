@@ -52,14 +52,14 @@ typedef struct {
     char pad58[0xe0 - 0x58];
 } RateEntry;
 
-extern int D_L00_001A8F00;
-extern int D_00138324 __attribute__((nosda));
-extern int D_L00_001B0F90 __attribute__((sda));
-extern unsigned char D_00139593 __attribute__((nosda));
+extern int g_game_l00_mode;
+extern int g_pad_held_flags __attribute__((nosda));
+extern int g_charging_weapon_initial_value __attribute__((sda));
+extern unsigned char g_charging_weapon_index __attribute__((nosda));
 extern RateEntry g_weapon_l00_table[];
-extern float D_L00_0025C64C __attribute__((nosda));
-extern char D_L00_0029FBE0[];
-extern char D_L00_001B8FF0[];
+extern float g_weapon_effect_scale __attribute__((nosda));
+extern char g_charging_weapon_sound_records[];
+extern char g_cam_follow_matrix[];
 
 #define I(p, n) (*(int *)((char *)(p) + (n)))
 #define F(p, n) (*(float *)((char *)(p) + (n)))
@@ -84,7 +84,7 @@ void charging_weapon_update(char *object)
         ref_L00_00408E58_00(29, 1);
     }
     if (B(object, 0x31)) {
-        D_L00_0025C64C = 0.1f;
+        g_weapon_effect_scale = 0.1f;
     }
     if (B(object, 0x42) == B(object, 0x43) && (B(object, 0x60) & 2)) {
         anim_start_blended_with_flags(object, 1, 0, 2, 0);
@@ -92,19 +92,19 @@ void charging_weapon_update(char *object)
     FastVecAdd(base, base, object + 16);
     vec_fast_helper_b(vars);
     if (B(object, 32) == 1) {
-        if (D_L00_001A8F00 || g_hero_state.disabled || !(D_00138324 & g_hero_state.mask) || g_hero_state.level < 23) {
+        if (g_game_l00_mode || g_hero_state.disabled || !(g_pad_held_flags & g_hero_state.mask) || g_hero_state.level < 23) {
             return;
         }
         if (get_ammo(-1)) {
             start_equipped_item_animation();
-            I(vars, 24) = slot_copy_records_to_free(D_L00_0029FBE0);
+            I(vars, 24) = slot_copy_records_to_free(g_charging_weapon_sound_records);
             B(object, 32) = 2;
-            I(vars, 4) = D_L00_001B0F90;
+            I(vars, 4) = g_charging_weapon_initial_value;
         } else {
             PlayMobySound(4, 0, object);
         }
         {
-            RateEntry *entry = &g_weapon_l00_table[D_00139593];
+            RateEntry *entry = &g_weapon_l00_table[g_charging_weapon_index];
             F(vars, 0) = 1.0f / entry->rate;
         }
     } else if (B(object, 32) == 2) {
@@ -141,7 +141,7 @@ void charging_weapon_update(char *object)
     } else if (B(object, 32) == 3) {
         int done = 0;
 
-        qcopy(v, D_L00_001B8FF0);
+        qcopy(v, g_cam_follow_matrix);
         hits.timer = (int *)(vars + 4);
         mem_fast_helper_b(list, 128);
         ReleaseDeadOrExpiredSlots(object);

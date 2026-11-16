@@ -72,9 +72,9 @@ typedef unsigned char u8;
 extern void object_set_first_float4(char *, float, float, float, float);
 typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
-extern MenuGridEntry D_00259F58[];
+extern MenuGridEntry g_menu_item_table_first[];
 extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
-extern u8 D_001A7A80[] __attribute__((section(".sdata")));
+extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 extern MenuLabelOffset ref_003472B8_00;
 extern void object_set_flag_value(void *, int);
 extern void object_set_flag_value(void *, int);
@@ -87,13 +87,13 @@ void func_PAL_00349450(char *obj)
     float x, y, x2, y2;
     u8 *flags;
     int bits;
-    int index = D_00259F58[*(int *)(obj + 0x574) + *(int *)(obj + 0x578) * 4].id;
+    int index = g_menu_item_table_first[*(int *)(obj + 0x574) + *(int *)(obj + 0x578) * 4].id;
 
     if (g_item_owned_flags[index] == 0)
         return;
     a = obj + 0x318;
     pad = ref_003472B8_00;
-    flags = &D_001A7A80[index];
+    flags = &g_movie_seen_flags[index];
     b = obj + 0x370;
     bits = flags[0] & 4;
     object_set_flag_value(a, (flags[0] & 1) | (bits != 0));

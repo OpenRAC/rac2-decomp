@@ -29,11 +29,11 @@ typedef struct {
     unsigned long trxdir; long trxdiraddr;
 } SiStoreImage __attribute__((aligned(16)));
 
-extern char D_0013B520[];
-extern char D_0013B558[];
-extern char D_0013B588[];
-extern char D_0013B5C8[];
-extern u128_si D_00137E10;
+extern char g_str_gs_store_image_msg_a[];
+extern char g_str_gs_store_image_msg_b[];
+extern char g_str_gs_store_image_msg_c[];
+extern char g_str_gs_store_image_msg_d[];
+extern u128_si g_zero_quad;
 extern unsigned long GsGetIMR(void);
 extern int GsPutIMR(unsigned long);
 
@@ -139,7 +139,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
 
     while (D1_CHCR & 0x100) {
         if (pollCount++ > 0x1000000) {
-            printf_to_deci2_console(D_0013B520);
+            printf_to_deci2_console(g_str_gs_store_image_msg_a);
             return -1;
         }
     }
@@ -155,15 +155,15 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
     D1_CHCR = 0x101;
     while (D1_CHCR & 0x100) {
         if (pollCount++ > 0x1000000) {
-            printf_to_deci2_console(D_0013B520);
+            printf_to_deci2_console(g_str_gs_store_image_msg_a);
             return -1;
         }
     }
 
     while (!(GS_CSR & 2)) {
         if (pollCount++ > 0x1000000) {
-            printf_to_deci2_console(D_0013B558);
-            VIF1_FIFO = D_00137E10;
+            printf_to_deci2_console(g_str_gs_store_image_msg_b);
+            VIF1_FIFO = g_zero_quad;
             return -1;
         }
     }
@@ -181,7 +181,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
         D1_CHCR = 0x100;
         while (D1_CHCR & 0x100) {
             if (pollCount++ > 0x1000000) {
-                printf_to_deci2_console(D_0013B588);
+                printf_to_deci2_console(g_str_gs_store_image_msg_c);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -194,7 +194,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
     for (i = 0; i < nrem; i++) {
         while (!(VIF1_STAT & 0x1F000000)) {
             if (pollCount++ > 0x1000000) {
-                printf_to_deci2_console(D_0013B5C8);
+                printf_to_deci2_console(g_str_gs_store_image_msg_d);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -208,7 +208,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
     if (nbyte) {
         while (!(VIF1_STAT & 0x1F000000)) {
             if (pollCount++ > 0x1000000) {
-                printf_to_deci2_console(D_0013B5C8);
+                printf_to_deci2_console(g_str_gs_store_image_msg_d);
                 GS_CSR = 0x100;
                 GS_BUSDIR = 0;
                 GIF_CTRL = 1;
@@ -223,7 +223,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
         for (i = 0; i < nrest; i++) {
             while (!(VIF1_STAT & 0x1F000000)) {
                 if (pollCount++ > 0x1000000) {
-                    printf_to_deci2_console(D_0013B5C8);
+                    printf_to_deci2_console(g_str_gs_store_image_msg_d);
                     GS_CSR = 0x100;
                     GS_BUSDIR = 0;
                     GIF_CTRL = 1;
@@ -239,7 +239,7 @@ int sceGsExecStoreImage(SiStoreImage *packet, u128_si *dest)
     GS_BUSDIR = 0;
     GsPutIMR(oldImr);
     {
-        u128_si zeroQuad = D_00137E10;
+        u128_si zeroQuad = g_zero_quad;
         GS_CSR = 2;
         VIF1_FIFO = zeroQuad;
     }

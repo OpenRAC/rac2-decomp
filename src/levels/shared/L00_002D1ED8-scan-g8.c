@@ -10,8 +10,8 @@ extern u8 g_hero_state[];
 extern u8 g_hero_moby_default[];
 /* A level object list: its count and its entry pointers. */
 typedef struct { u8 pad[0x44]; s16 count; u8 pad46[0x18C - 0x46]; u8 *entries[1]; } ObjectTable;
-extern ObjectTable D_L00_001BCAC0;
-extern s32 D_L00_001A8F00;
+extern ObjectTable g_tutorial_probe_context;
+extern s32 g_game_l00_mode;
 extern s32 hero_is_action_allowed(void);
 
 /* Sets bit 0 of the halfword flags at +0x34 of the hero's main object, of the three objects of
@@ -41,11 +41,11 @@ void hero_set_objects_flag_bit(void)
         base = g_hero_state;
         if (i == 0 && hero_is_action_allowed())
             continue;
-        mode = D_L00_001A8F00;
+        mode = g_game_l00_mode;
         if (mode == 2) {
             found = 0;
-            for (count = 0; count < D_L00_001BCAC0.count; count++) {
-                if (*(s16 *)(D_L00_001BCAC0.entries[count] + 0xAA) == 0)
+            for (count = 0; count < g_tutorial_probe_context.count; count++) {
+                if (*(s16 *)(g_tutorial_probe_context.entries[count] + 0xAA) == 0)
                     found = 1;
             }
             if (found)
@@ -70,7 +70,7 @@ void hero_set_objects_flag_bit(void)
     }
     if (H->i[0x1248 / 4] == 10) {
         tail = H->ptr[0x1220 / 4];
-        if (tail && D_L00_001A8F00 == 0 && tail[0x20])
+        if (tail && g_game_l00_mode == 0 && tail[0x20])
             *(u16 *)(tail + 0x34) &= ~0x41;
     }
 }

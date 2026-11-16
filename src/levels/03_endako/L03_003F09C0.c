@@ -21,7 +21,7 @@ extern void func_31EBA8(void *, float, float);
 extern int func_360A80(int, int, void *);
 extern void func_360780(int);
 extern void func_32CEA0(void *, void *);
-extern u8 D_L03_00188660[];
+extern u8 g_sound_l03_slot_table[];
 
 extern void func_31B920(void *entity, int a, int b);
 extern int func_31B9F0(int id);
@@ -52,8 +52,8 @@ extern void gfx_draw_beam_quad_packets(u8 *entity);
 
 /* `lui $v0,%hi ; lw $v0,%lo($v0)` in the retail: one register, no HIGH/LO_SUM
  * split, which is what the sda attribute (SYMBOL_REF_FLAG) gives in -G0. */
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_moby_record_base __attribute__((sda));
+extern u8 *g_entity_id_lists[];
 
 /* One word of a stream: bits 0..14 name a record, bit 15 ends the walk. */
 typedef struct {
@@ -81,7 +81,7 @@ typedef struct {
     u8 field10[1];
 } Entry41D1D8;
 
-extern Entry41D1D8 *D_L03_001FE700[];
+extern Entry41D1D8 *g_path_l03_entry_table[];
 
 /* func_L03_003F09C0 is in L03_003F09C0-help-g8.c. */
 
@@ -96,8 +96,8 @@ extern int MemcardSave(s32, s32);
 /* Two flag bytes of the boot's state block, reached as members of one object: the stores
  * are then `lui $at ; sb` pairs that stay out of the call's delay slot, as in retail (a
  * separate symbol per byte puts the second store into the slot). */
-extern u8 D_001A7B08[0x40] __attribute__((sda));
-extern s32 D_L03_001B2A38[] __attribute__((sda));
+extern u8 g_status_flag_b[0x40] __attribute__((sda));
+extern s32 g_object_group_count[] __attribute__((sda));
 
 /* Starts the boss area and wakes every object in the boss's group. */
 /* Raises the two flags, sets the entity up from the state's words 0x58 and 0x5C, runs the two
@@ -110,15 +110,15 @@ void endako_boss_start_area_objects(u8 *entity) {
     u8 *e;
 
     part_start_record_effect_by_index(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
-    D_001A7B08[0x04] = 1;
-    D_001A7B08[0x3C] = 1;
+    g_status_flag_b[0x04] = 1;
+    g_status_flag_b[0x3C] = 1;
     help_unlock_entry(13);
     moby_handle_request_slot_state(13);
-    for (p = (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)];
-         (*(s32 *)(state + 0x80) & 0xFF) != 0xFF && *(s32 *)(state + 0x80) <= D_L03_001B2A38[0] &&
-         p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L03_001FB5A0[*(s32 *)(state + 0x80)]);
+    for (p = (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)];
+         (*(s32 *)(state + 0x80) & 0xFF) != 0xFF && *(s32 *)(state + 0x80) <= g_object_group_count[0] &&
+         p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)]);
          p++) {
-        e = D_L03_001B2A1C + ((*p & 0x7FFF) << 8);
+        e = g_moby_record_base + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         moby_mark_spawned(e);
@@ -197,10 +197,10 @@ void endako_boss_process_group(u8 *entity) {
     StreamEntry *entry;
 
     if (index == -1) return;
-    entry = (StreamEntry *)D_L03_001FB5A0[index];
+    entry = (StreamEntry *)g_entity_id_lists[index];
     if (entry == 0) return;
     do {
-        func_3A2F48(D_L03_001B2A1C + ((entry->raw & 0x7FFF) << 8));
+        func_3A2F48(g_moby_record_base + ((entry->raw & 0x7FFF) << 8));
         if ((s16)entry->raw < 0) break;
         entry++;
     } while (1);
@@ -296,11 +296,11 @@ void sweeper_bot_reset_delays(u8 *entity) {
     u8 *record;
 
     if (entity[0x21] == 0xFF) return;
-    entry = (StreamEntry *)D_L03_001FB5A0[entity[0x21]];
+    entry = (StreamEntry *)g_entity_id_lists[entity[0x21]];
     if (entry == 0) return;
     p = entry;
     do {
-        record = D_L03_001B2A1C + ((p->raw & 0x7FFF) << 8);
+        record = g_moby_record_base + ((p->raw & 0x7FFF) << 8);
         if (*(signed char *)(record + 0x20) >= 0) {
             if (*(short *)(record + 0xAA) == MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
                 u8 *owner = *(u8 **)(record + 0x68);
@@ -318,7 +318,7 @@ void sweeper_bot_reset_delays(u8 *entity) {
 u32 path_check_point_reached(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     u8 *sub = entity + 0x10;
-    Entry41D1D8 *entry = D_L03_001FE700[*(s32 *)(state + 0x290)];
+    Entry41D1D8 *entry = g_path_l03_entry_table[*(s32 *)(state + 0x290)];
     u32 local[4];
 
     if (func_31CFF8(sub, entry->field10, entry->field00)) {
@@ -337,7 +337,7 @@ u32 path_check_point_reached(u8 *entity) {
  * advances the path blend nearby, and maintains its movement sound. */
 void rivet_bot_move_along_path(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
-    u8 *entry = (u8 *)D_L03_001FE700[*(int *)(state + 0x210)];
+    u8 *entry = (u8 *)g_path_l03_entry_table[*(int *)(state + 0x210)];
     float delta[4], along[4], across[4], axis[4], point[4], scaled[4];
     float distance;
     float side;
@@ -363,13 +363,13 @@ void rivet_bot_move_along_path(u8 *entity) {
         func_31EBA8(state + 0x340, target, 0.016666668f);
     }
     if (func_2EF158(entity + 0x10, point) >= 0.5f) {
-        u8 *sound = D_L03_00188660 + *(int *)(state + 0x350) * 0x70;
+        u8 *sound = g_sound_l03_slot_table + *(int *)(state + 0x350) * 0x70;
         if (*(u8 **)(sound + 0x88) != entity || !sound[0x74])
             *(int *)(state + 0x350) = func_360A80(0, 4, entity);
     } else {
         int slot = *(int *)(state + 0x350);
         if (slot != -1) {
-            u8 *sound = D_L03_00188660 + slot * 0x70;
+            u8 *sound = g_sound_l03_slot_table + slot * 0x70;
             if (*(u8 **)(sound + 0x88) == entity && sound[0x74]) func_360780(slot);
         }
         *(int *)(state + 0x350) = -1;

@@ -4,14 +4,14 @@
 typedef struct { char pad[0x80]; float x, y; } PositionBase;
 extern PositionBase g_hero_state __attribute__((nosda));
 extern char g_hero_position[] __attribute__((nosda));
-extern float D_L00_001B0788 __attribute__((sda));
-extern float D_L00_001B078C __attribute__((sda));
-extern float D_L00_001B0790 __attribute__((sda));
-extern float D_L00_001B07B8 __attribute__((sda));
-extern float D_L00_001B07BC __attribute__((sda));
-extern float D_L00_001B07C0 __attribute__((sda));
-extern float D_L00_001B07C4 __attribute__((sda));
-extern float D_L00_001B07C8 __attribute__((sda));
+extern float g_synthenoid_yaw_rate __attribute__((sda));
+extern float g_synthenoid_pitch_rate __attribute__((sda));
+extern float g_synthenoid_turn_rate __attribute__((sda));
+extern float g_synthenoid_move_param __attribute__((sda));
+extern float g_synthenoid_move_param_b __attribute__((sda));
+extern float g_synthenoid_move_param_c __attribute__((sda));
+extern float g_synthenoid_turn_limit __attribute__((sda));
+extern float g_synthenoid_turn_scale __attribute__((sda));
 extern void ref_L00_003EBC68_00(void *, void *, void *);
 extern float ref_L00_003EBC68_01(void *, void *);
 extern void ref_L00_003EBC68_02(void *, void *, void *, float, float, float);
@@ -48,9 +48,9 @@ void func_PAL_L00_003D85E0(char *object, char *state)
                                0.0025132746f, 0.0012566373f, 0.2303835f);
         else
             ref_L00_003EBC68_02(object, target + 0x10, state + 0x30,
-                               D_L00_001B0788 * 6.981318e-06f,
-                               D_L00_001B078C * 6.981318e-06f,
-                               D_L00_001B0790 * 0.0003490659f);
+                               g_synthenoid_yaw_rate * 6.981318e-06f,
+                               g_synthenoid_pitch_rate * 6.981318e-06f,
+                               g_synthenoid_turn_rate * 0.0003490659f);
         ref_L00_003EBC68_03(difference, difference, 0.048f);
         ref_L00_003EBC68_00(difference, difference, state + 0x10);
         if (distance > 1.3f)
@@ -86,11 +86,11 @@ void func_PAL_L00_003D85E0(char *object, char *state)
         if (distance > 1.3f) *(unsigned char *)(object + 0xbc) = 2;
         break;
     }
-    *(float *)(state + 0x54) = ref_L00_003EBC68_11(*(float *)(state + 0x54), D_L00_001B07C4);
+    *(float *)(state + 0x54) = ref_L00_003EBC68_11(*(float *)(state + 0x54), g_synthenoid_turn_limit);
     ref_L00_003EBC68_03(offset, object + 0xe0, *(float *)(state + 0x50));
     ref_L00_003EBC68_00(object + 0x10, object + 0x10, offset);
-    *(float *)(state + 0x50) = ref_L00_003EBC68_10(*(float *)(state + 0x54)) * D_L00_001B07C8;
+    *(float *)(state + 0x50) = ref_L00_003EBC68_10(*(float *)(state + 0x54)) * g_synthenoid_turn_scale;
     ref_L00_003EBC68_03(offset, object + 0xe0, *(float *)(state + 0x50));
     ref_L00_003EBC68_04(object + 0x10, object + 0x10, offset);
-    ref_L00_003EBC68_12(object, state + 0x48, state + 0x4c, D_L00_001B07B8, D_L00_001B07BC, D_L00_001B07C0);
+    ref_L00_003EBC68_12(object, state + 0x48, state + 0x4c, g_synthenoid_move_param, g_synthenoid_move_param_b, g_synthenoid_move_param_c);
 }

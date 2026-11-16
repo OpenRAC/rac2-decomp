@@ -38,7 +38,7 @@ extern int ref_L00_002F5FB8_13 __attribute__((sda));
 extern int ref_L00_002F5FB8_14 __attribute__((sda));
 extern int ref_L00_002F5FB8_16[];
 extern int g_memcard_state[];
-extern char D_001339B0[];
+extern char g_str_movie_name[];
 extern void func_US2_0029DAD0(int, int);
 extern void req_flush_queue(void *);
 extern int request_end_slot(int,int);
@@ -50,7 +50,7 @@ extern int gfx_wait_paths_idle(int,int);
 extern void snd_clear_all_voices(void);
 extern void snd_wait_for_music_idle(void);
 extern int snd_CheckLoadInProgress(int);
-extern void func_US2_00299CF0(void);
+extern void mc_update_state_us2(void);
 extern int load_read_disc_with_pause(char *,int,int);
 extern int mpeg_play_movie_2(void *,void *,char *,char *,int,int);
 extern int req_pop_queue(void *,int *,int *);
@@ -105,7 +105,7 @@ void func_US2_002F6E10(void)
     snd_wait_for_music_idle();
     snd_CheckLoadInProgress(0);
     g_music_state.pendingVoice = -1;
-    while (g_memcard_state[0x15C/4] >= 3 || g_memcard_state[0x164/4] >= 0) func_US2_00299CF0();
+    while (g_memcard_state[0x15C/4] >= 3 || g_memcard_state[0x164/4] >= 0) mc_update_state_us2();
     frame = 0;
     status = -1;
     done = 0;
@@ -145,7 +145,7 @@ void func_US2_002F6E10(void)
         if (done) break;
     }
     snd_CheckLoadInProgress(0);
-    func_00126DC0(D_001339B0);
+    func_00126DC0(g_str_movie_name);
     gfx_wait_paths_idle(0,0);
     slot = &ref_L00_002F5FB8_07[textureIndex];
     sceGsExecLoadImage(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);

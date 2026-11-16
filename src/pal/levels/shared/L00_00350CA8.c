@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int level_l00_call_module_handler_with_arg_11(int a);
 
-int func_PAL_L00_00350CA8(void)
+int input_l00_update_return_zero_pal(void)
 {
-    level_l00_call_module_handler_with_arg_11(D_00138344);
+    level_l00_call_module_handler_with_arg_11(g_menu_input_flags);
     return 0;
 }
 

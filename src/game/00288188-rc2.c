@@ -24,8 +24,8 @@
  */
 #include "common.h"
 
-extern s16 D_00259F58[];
-extern s16 D_00259CE0[];
+extern s16 g_menu_item_table_first[];
+extern s16 g_menu_item_table_second[];
 
 /* Returns 1 when the help id appears in either of the two help id tables, otherwise 0. */
 s32 help_is_id_in_either_table(s32 help_id) {
@@ -33,7 +33,7 @@ s32 help_is_id_in_either_table(s32 help_id) {
     s16 *table_b;
     s16 *id_ptr;
 
-    table_a = D_00259F58;
+    table_a = g_menu_item_table_first;
     if (table_a[3] != -1) {
         id_ptr = table_a + 3;
         do {
@@ -43,7 +43,7 @@ s32 help_is_id_in_either_table(s32 help_id) {
             id_ptr += 5;
         } while (*id_ptr != -1);
     }
-    table_b = D_00259CE0;
+    table_b = g_menu_item_table_second;
     if (table_b[3] != -1) {
         id_ptr = table_b + 3;
         do {

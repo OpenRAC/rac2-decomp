@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L20_001A8F00;
-extern int D_L20_001C0418 NOT_SDA;
-extern float D_L20_001B2468 __attribute__((sda));
-extern int D_L20_001B2460 __attribute__((sda));
+extern int g_hero_vehicle_mode;
+extern int g_hit_l20_result NOT_SDA;
+extern float g_homing_shot_radius __attribute__((sda));
+extern int g_homing_shot_trail_param __attribute__((sda));
 extern void moby_mark_spawned(void *object);
 extern float FastAddRotations(float, float);
 extern void lerp_vector(float *out, char *a, char *b, float k);
@@ -18,13 +18,13 @@ extern float math_random_float_range(float lo, float hi);
 extern void *part_spawn_gravity_fade(void *, void *, float, float, float, int, int, int, int, int,
                            int);
 extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
-extern char *func_PAL_L00_003FB330(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
+extern char *SpawnExplosion_pal(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
                           int a7, float f12, float f13, int s1, int s2, int s3,
                           int s4);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void part_spawn_two_glow_effects(void *);
 
-void func_PAL_L20_00450AD0(char *arg0) {
+void homing_l20_shot_update_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     float buf20[4] __attribute__((aligned(16)));
     float buf30[4] __attribute__((aligned(16)));
@@ -32,7 +32,7 @@ void func_PAL_L20_00450AD0(char *arg0) {
     float buf50[4] __attribute__((aligned(16)));
     u8 mode;
 
-    if (D_L20_001A8F00 == 2) {
+    if (g_hero_vehicle_mode == 2) {
         moby_mark_spawned(arg0);
         return;
     }
@@ -55,8 +55,8 @@ void func_PAL_L20_00450AD0(char *arg0) {
                       *(float *)(state + 0x30));
         ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
         FastVecAdd(buf20, base, buf30);
-        if (coll_test_point(buf20, 0, arg0, D_L20_001B2468) != 0) {
-            int id = D_L20_001C0418;
+        if (coll_test_point(buf20, 0, arg0, g_homing_shot_radius) != 0) {
+            int id = g_hit_l20_result;
 
             if (id != 0 && id != *(int *)(arg0 + 0xB8)) {
                 moby_set_state(arg0, 1, -1);
@@ -69,14 +69,14 @@ void func_PAL_L20_00450AD0(char *arg0) {
         a = math_random_float_range(2.5f, 3.0f) * 210000.0f;
         b = math_random_float_range(0.2f, 0.4f) * 210000.0f;
         part_spawn_gravity_fade(arg0 + 0x10, buf40, a, b, 0.0f, 0xF,
-                      D_L20_001B2460, 3, 0x50, 0, 0);
+                      g_homing_shot_trail_param, 3, 0x50, 0, 0);
     } break;
     case 1: {
         char *base;
         base = arg0 + 0x10;
         coll_sweep_from_object(arg0, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
                       1.0f, 1, 0);
-        func_PAL_L00_003FB330(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
+        SpawnExplosion_pal(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
                       mode, 0, 0);
         moby_mark_spawned(arg0);
         return;

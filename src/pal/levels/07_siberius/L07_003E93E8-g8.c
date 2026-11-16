@@ -11,9 +11,9 @@ extern void entity_set_group_alert_a(char *);
 extern void func_PAL_L07_003E9FD0(char *);
 extern void entity_follow_platform(char *);
 extern int weapon_select_aim_target(char *, int, void *, int, float, float);
-extern float D_L07_001B0AA0 __attribute__((sda));
-extern float D_L07_001B0AA4 __attribute__((sda));
-extern char D_L07_001B9200[];
+extern float g_group_entity_accel_step __attribute__((sda));
+extern float g_group_entity_speed_limit __attribute__((sda));
+extern char g_hero_position_block[];
 extern char g_sound_state[];
 
 /* In state 0, set up the object's state block (offsets in ascending order, with +0x98 first and
@@ -21,7 +21,7 @@ extern char g_sound_state[];
    +0x31 is set, call func_002A93B0; restart the sound when its slot no longer belongs to the
    object; run func_L07_003E5AC8 and func_PAL_L07_003E9FD0 on a func_PAL_002B1A50 count of two or more or
    when +0x2E is 2; and follow the platform at +0x260 unless the state byte is 8. */
-void func_PAL_L07_003E9908(char *arg)
+void group_entity_base_update_pal(char *arg)
 {
     char *o = *(char **)(arg + 0x68);
     char *slot;
@@ -33,8 +33,8 @@ void func_PAL_L07_003E9908(char *arg)
         *(unsigned char *)(o + 0x60) = 7;
         *(unsigned char *)(o + 0x2E) = 1;
         *(unsigned char *)(o + 0xC7) = 1;
-        f = D_L07_001B0AA0;
-        g = D_L07_001B0AA4;
+        f = g_group_entity_accel_step;
+        g = g_group_entity_speed_limit;
         f *= 0.00040000002f;
         g *= 0.020000001f;
         *(int *)(o + 0x98) = 3;
@@ -59,7 +59,7 @@ void func_PAL_L07_003E9908(char *arg)
             moby_set_state(arg, 8, 4);
         }
     }
-    if (*(unsigned char *)(arg + 0x31) && fast_vec_dist(arg + 0x10, D_L07_001B9200) < 24.0f) {
+    if (*(unsigned char *)(arg + 0x31) && fast_vec_dist(arg + 0x10, g_hero_position_block) < 24.0f) {
         moby_update_ground_check(arg);
         *(unsigned char *)(arg + 0x6F) = 22;
     }
@@ -96,17 +96,17 @@ typedef struct {
     f32 rot[4];
 } Moby_L07_003E5910;
 extern char g_hero_state[];
-extern f32 D_L07_001B0AA0 __attribute__((sda));
-extern f32 D_L07_001B0AA4 __attribute__((sda));
-extern f32 D_L07_001B0AA8 __attribute__((sda));
+extern f32 g_group_entity_accel_step __attribute__((sda));
+extern f32 g_group_entity_speed_limit __attribute__((sda));
+extern f32 g_tracked_height_offset __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
-extern int func_PAL_002B5BA8(void *, float *, float);
+extern int moby_turn_toward_target_and_step_pal(void *, float *, float);
 
 /* Follow the camera height between the moby's home and the hero, never under the floor. */
-float func_PAL_L07_003E9B60(Moby_L07_003E5910 *m, float *arg1, float arg2)
+float entity_move_to_tracked_height_pal(Moby_L07_003E5910 *m, float *arg1, float arg2)
 {
     f32 pos[4] __attribute__((aligned(16)));
     Vars_L07_003E5910 *v = m->vars;
@@ -120,13 +120,13 @@ float func_PAL_L07_003E9B60(Moby_L07_003E5910 *m, float *arg1, float arg2)
     }
     lo = pos[2] - 2.0f;
     hi = lo + 5.0f;
-    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + D_L07_001B0AA8;
+    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + g_tracked_height_offset;
     if (hi < h) h = hi;
     else if (h < lo) h = lo;
-    floor = coll_probe_ground_height_below(m->pos, 0, 0.5f) + D_L07_001B0AA8;
+    floor = coll_probe_ground_height_below(m->pos, 0, 0.5f) + g_tracked_height_offset;
     if (h < floor) h = floor;
-    math_approach_target_with_braking(v->cam, h - m->pos[2], D_L07_001B0AA0 * 0.00040000002f, D_L07_001B0AA0 * 0.00040000002f,
-                  D_L07_001B0AA4 * 0.020000001f);
-    func_PAL_002B5BA8(m, arg1, arg2);
+    math_approach_target_with_braking(v->cam, h - m->pos[2], g_group_entity_accel_step * 0.00040000002f, g_group_entity_accel_step * 0.00040000002f,
+                  g_group_entity_speed_limit * 0.020000001f);
+    moby_turn_toward_target_and_step_pal(m, arg1, arg2);
     return v->f1EC;
 }

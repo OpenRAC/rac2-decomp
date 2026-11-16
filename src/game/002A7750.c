@@ -325,8 +325,8 @@ float moby_turn_toward_position(struct family_27f9_object *object, float *target
 /* func_002A8240 is defined in 002A8240.c. */
 
 
-extern unsigned short *D_001EE5A0[];
-extern char *D_001B1B5C __attribute__((sda));
+extern unsigned short *g_moby_group_lists[];
+extern char *g_moby_pool_start __attribute__((sda));
 
 /* Counts the entries of the 0x7FFF-masked id list at table[index] whose class
    byte (0x20) is not value; an entry with the high bit of the id set ends the
@@ -340,13 +340,13 @@ int moby_count_group_not_in_state(int index, int value) {
     int count;
     if (index == -1)
         return 0;
-    list = D_001EE5A0[index];
+    list = g_moby_group_lists[index];
     count = 0;
     if (list == 0)
         return 0;
     entry = list;
     do {
-        object = (char *)(((*entry & 0x7FFF) << 8) + (unsigned int)D_001B1B5C);
+        object = (char *)(((*entry & 0x7FFF) << 8) + (unsigned int)g_moby_pool_start);
         if (object[0x20] >= 0) {
             if (value == -1 || (unsigned char)object[0x20] != value)
                 count++;
@@ -377,10 +377,10 @@ void moby_set_byte_on_group(int group, int value) {
 }
 
 
-extern unsigned char *D_001B1D40 MACRO_ADDR;
-extern unsigned short *D_001B1D38 MACRO_ADDR;
-extern short D_001B1D3C MACRO_ADDR;
-extern int D_001B1B78 MACRO_ADDR;
+extern unsigned char *g_moby_group_current MACRO_ADDR;
+extern unsigned short *g_moby_group_cursor MACRO_ADDR;
+extern short g_moby_group_index MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
 extern int GetNextMobyInGroup(int *out, unsigned char *m, int includeInactive, int onlyInactive);
 
 /* rac1-decomp src/overlays/shared/moby_ground_collision.c: get_first_moby_in_group */
@@ -393,29 +393,29 @@ int GetFirstMobyInGroup(int *out, int group, int includeInactive, int onlyInacti
     int index;
     int inactive;
 
-    if (group < 0 || D_001B1B78 < group) {
+    if (group < 0 || g_moby_group_count < group) {
         *out = 0;
         return -1;
     }
     *out = 0;
-    D_001B1D40 = 0;
-    entry = D_001EE5A0[group];
-    D_001B1D38 = entry;
+    g_moby_group_current = 0;
+    entry = g_moby_group_lists[group];
+    g_moby_group_cursor = entry;
     if (entry == 0) {
         return -1;
     }
     index = *entry & 0x7FFF;
-    D_001B1D3C = index;
-    m = (unsigned char *)D_001B1B5C + (index << 8);
-    D_001B1D40 = m;
+    g_moby_group_index = index;
+    m = (unsigned char *)g_moby_pool_start + (index << 8);
+    g_moby_group_current = m;
     *out = (int)m;
-    inactive = (signed char)D_001B1D40[0x20] < 0;
+    inactive = (signed char)g_moby_group_current[0x20] < 0;
     if (!includeInactive) {
         if (!onlyInactive && !inactive) goto found;
     } else if (!onlyInactive || inactive) {
         goto found;
     }
-    return GetNextMobyInGroup(out, D_001B1D40, includeInactive, onlyInactive);
+    return GetNextMobyInGroup(out, g_moby_group_current, includeInactive, onlyInactive);
 found:
     return 0;
 }
@@ -526,7 +526,7 @@ typedef struct {
 
 extern void vec_clear_128(void *);
 extern s32 g_collision_hit[];
-extern L_A8E20Entry D_001BF200[];
+extern L_A8E20Entry g_impact_queue[];
 
 /* Adds a hit effect to the queue for a moby, merging with its existing one if it is stronger. */
 void QueueMobyImpact(u8 *moby, L_A8E20Req *request)
@@ -536,7 +536,7 @@ void QueueMobyImpact(u8 *moby, L_A8E20Req *request)
     L_A8E20Entry *entry;
 
     if (moby[0xA8] != 0xFF) {
-        L_A8E20Entry *oldEntry = &D_001BF200[moby[0xA8]];
+        L_A8E20Entry *oldEntry = &g_impact_queue[moby[0xA8]];
 
         if (oldEntry->owner == moby) {
             if (oldEntry->f2C > request->f1C) {
@@ -546,9 +546,9 @@ void QueueMobyImpact(u8 *moby, L_A8E20Req *request)
             flags = oldEntry->flags;
         }
     }
-    entry = &D_001BF200[idx];
+    entry = &g_impact_queue[idx];
     vec_clear_128(entry);
-    qcopy(D_001BF200[idx].pos, request->pos);
+    qcopy(g_impact_queue[idx].pos, request->pos);
     entry->flags = request->flags | flags;
     entry->i20 = request->i10;
     entry->b28 = request->b18;
@@ -567,10 +567,10 @@ void QueueMobyImpact(u8 *moby, L_A8E20Req *request)
 
 
 
-extern int D_001B22D8 __attribute__((sda));
-extern int D_001B22DC __attribute__((sda));
+extern int g_surface_box_count __attribute__((sda));
+extern int g_height_plane_active __attribute__((sda));
 typedef struct { float x, y, height, radius; } HeightPlane;
-extern HeightPlane D_001B22E0 __attribute__((sda));
+extern HeightPlane g_height_plane __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float, float, float);
 extern float math_fabs(float);
 extern float vec_distance_xy(void *, void *);
@@ -580,16 +580,16 @@ extern void vec_copy_helper_a(void *);
 float coll_get_ground_height_at_position(float *position, void *direction)
 {
     float result;
-    if (D_001B22D8 != 0) {
+    if (g_surface_box_count != 0) {
         result = position[2];
         if (SampleSurfaceHeightMap(&result, position[0], position[1], position[2]) != 0)
             return result;
     }
-    if (D_001B22DC != 0 && math_fabs(position[2] - D_001B22E0.height) < 0.5f &&
-        vec_distance_xy(position, &D_001B22E0) < D_001B22E0.radius) {
+    if (g_height_plane_active != 0 && math_fabs(position[2] - g_height_plane.height) < 0.5f &&
+        vec_distance_xy(position, &g_height_plane) < g_height_plane.radius) {
         if (direction != 0)
             vec_copy_helper_a(direction);
-        return D_001B22E0.height;
+        return g_height_plane.height;
     }
     if (direction != 0)
         vec_copy_helper_a(direction);
@@ -613,9 +613,9 @@ void mat_build_rotation_from_angles(void *out, float *angles) {
 
 /* func_002A9288 uses the quadword-copy profile in 002A9288-qcopy.c. */
 
-extern int D_001A8CA0[] __attribute__((sda));
-extern float D_001BAFA0[];
-extern float D_001BAFA8;
+extern int g_ground_check_inhibit[] __attribute__((sda));
+extern float g_coll_hit_position[];
+extern float g_coll_ground_height;
 extern void scale_vector(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -630,7 +630,7 @@ void moby_update_ground_check(char *moby)
     float end[4] __attribute__((aligned(16)));
     float normal[4] __attribute__((aligned(16)));
 
-    if (D_001A8CA0[0] == 0) {
+    if (g_ground_check_inhibit[0] == 0) {
         if (*(float *)(moby + 0xE8) < 0.9f) {
             *(float *)(moby + 0x70) = 0.0f;
             *(float *)(moby + 0x74) = 0.0f;
@@ -643,7 +643,7 @@ void moby_update_ground_check(char *moby)
         qcopy(end, moby + 0x10);
         end[2] = end[2] + 0.5f;
         if (CollLine(end, start, 0x22, 0, 0) != 0) {
-            *(float *)(moby + 0x70) = D_001BAFA8 - *(float *)(moby + 0x18);
+            *(float *)(moby + 0x70) = g_coll_ground_height - *(float *)(moby + 0x18);
             *(float *)(moby + 0x74) = *(float *)(moby + 0xC) * 0.000244140625f;
         } else {
             *(float *)(moby + 0x70) = 0.0f;
@@ -654,7 +654,7 @@ void moby_update_ground_check(char *moby)
         FastVecScale(end, moby + 0xE0, -8.0f);
         FastVecAdd(end, start, end);
         if (CollLine(start, end, 0x22, 0, 0) != 0) {
-            FastVecSub(normal, D_001BAFA0, moby + 0x10);
+            FastVecSub(normal, g_coll_hit_position, moby + 0x10);
             *(float *)(moby + 0x70) = FastVecDot(normal, moby + 0xE0);
             *(float *)(moby + 0x74) = 0.2f;
             *(unsigned char *)(moby + 0xBD) = 0xFF;

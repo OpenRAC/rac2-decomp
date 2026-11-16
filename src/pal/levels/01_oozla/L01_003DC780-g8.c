@@ -27,16 +27,16 @@ typedef int Quad __attribute__((mode(TI)));
 typedef struct { u8 pad[0x34E]; s16 mode; } Hero;
 extern Hero g_hero_state NOT_SDA;
 extern u8 *g_moby_l01_table;
-extern u8 D_L01_002A4E20[];
-extern f32 D_L01_001B0768 __attribute__((sda));
-extern f32 D_L01_001B076C __attribute__((sda));
-extern f32 D_L01_001B0774 __attribute__((sda));
-extern f32 D_L01_001B077C __attribute__((sda));
-extern f32 D_L01_001B0780 __attribute__((sda));
-extern f32 D_L01_001B0784 __attribute__((sda));
-extern f32 D_L01_001B0788 __attribute__((sda));
-extern f32 D_L01_001B078C __attribute__((sda));
-extern f32 D_L01_001B0790 __attribute__((sda));
+extern u8 g_str_water_raft_debug[];
+extern f32 g_raft_water_splash_margin __attribute__((sda));
+extern f32 g_raft_tilt_scale __attribute__((sda));
+extern f32 g_raft_speed __attribute__((sda));
+extern f32 g_raft_tilt_approach_accel __attribute__((sda));
+extern f32 g_raft_tilt_approach_max_speed __attribute__((sda));
+extern f32 g_raft_tilt_approach_damping __attribute__((sda));
+extern f32 g_raft_level_approach_accel __attribute__((sda));
+extern f32 g_raft_level_approach_max_speed __attribute__((sda));
+extern f32 g_raft_level_approach_damping __attribute__((sda));
 extern void FastVecScale(void *,void *,f32);
 extern f32 func_PAL_L01_003BEB40(void);
 extern f32 math_random_float_range(f32,f32);
@@ -78,7 +78,7 @@ void func_PAL_L01_003DC780(u8 *m)
                 F(m,0xF4)=math_random_float_range(-1.57079637f,1.57079637f);
                 m[0x20]=1;
             } else {
-                STUB_printf(D_L01_002A4E20,H(m,0xB2),H(m,0xAA));
+                STUB_printf(g_str_water_raft_debug,H(m,0xB2),H(m,0xAA));
                 m[0x20]=2;
             }
         }
@@ -92,27 +92,27 @@ void func_PAL_L01_003DC780(u8 *m)
             FastVecSub(relative,((u8 *)&g_hero_state)+0x80,m+0x10);
             x=FastVecDot(relative,m+0xC0);
             y=FastVecDot(relative,m+0xD0);
-            k=D_L01_001B076C;
+            k=g_raft_tilt_scale;
             pitch=-k*y;
             *(Quad *)oldAngle=*(Quad *)(s+0x60);
             *(Quad *)oldPos=*(Quad *)(m+0x10);
             scale=k*x;
-            math_approach_with_velocity(s+0x60,pitch,s+0x70,D_L01_001B077C*1.44f,D_L01_001B0780*1.44f,D_L01_001B0784*1.2f,0);
-            math_approach_with_velocity(s+0x64,scale,s+0x74,D_L01_001B077C*1.44f,D_L01_001B0780*1.44f,D_L01_001B0784*1.2f,0);
+            math_approach_with_velocity(s+0x60,pitch,s+0x70,g_raft_tilt_approach_accel*1.44f,g_raft_tilt_approach_max_speed*1.44f,g_raft_tilt_approach_damping*1.2f,0);
+            math_approach_with_velocity(s+0x64,scale,s+0x74,g_raft_tilt_approach_accel*1.44f,g_raft_tilt_approach_max_speed*1.44f,g_raft_tilt_approach_damping*1.2f,0);
             mat_transform_offset_two_matrices(((u8 *)&g_hero_state)+0x80,move,m+0x10,oldAngle,s+0x60);
             FastVecSub(((u8 *)&g_hero_state)+0x100,move,((u8 *)&g_hero_state)+0x80);
             F(((u8 *)&g_hero_state),0x108)+=F(m,0x18)-oldPos[2];
         } else {
-            speed=D_L01_001B0774;
+            speed=g_raft_speed;
             step=(F(s,0x84)-F(m,0x18))*0.020000001f;
             F(m,0x18)=F(m,0x18)+speed*step;
             if(F(m,0x18)<F(s,0x84)-2.0f) F(m,0x18)+=speed*0.020000001f;
             else {
-                math_approach_with_velocity(s+0x60,0.0f,s+0x70,D_L01_001B0788*1.44f,D_L01_001B078C*1.44f,D_L01_001B0790*1.2f,0);
-                math_approach_with_velocity(s+0x64,0.0f,s+0x74,D_L01_001B0788*1.44f,D_L01_001B078C*1.44f,D_L01_001B0790*1.2f,0);
+                math_approach_with_velocity(s+0x60,0.0f,s+0x70,g_raft_level_approach_accel*1.44f,g_raft_level_approach_max_speed*1.44f,g_raft_level_approach_damping*1.2f,0);
+                math_approach_with_velocity(s+0x64,0.0f,s+0x74,g_raft_level_approach_accel*1.44f,g_raft_level_approach_max_speed*1.44f,g_raft_level_approach_damping*1.2f,0);
             }
             if(F(m,0x18)>F(s,0x84)) F(m,0x18)=F(s,0x84);
-            if(previous<height-D_L01_001B0768 && F(m,0x18)>=height-D_L01_001B0768 && !I(s,0xA0)) {
+            if(previous<height-g_raft_water_splash_margin && F(m,0x18)>=height-g_raft_water_splash_margin && !I(s,0xA0)) {
                 PlayMobySound(0,0,m);
                 I(s,0xA0)=1;
             }

@@ -13,19 +13,19 @@ typedef struct {
     char pad[0x140];
     float pos[4];
 } ParticleCamera99268;
-extern ParticleCamera99268 D_L05_001B9580;
-extern unsigned char *D_L05_001FF240[];
+extern ParticleCamera99268 g_hero_l05_state;
+extern unsigned char *g_particle_params_table[];
 typedef struct {
     int v[2];
 } __attribute__((packed)) ParticleColors99268;
-extern ParticleColors99268 D_L05_001AEC00;
+extern ParticleColors99268 g_record_particle_colors;
 extern void func_33B330(void *, float, float, float);
 
-extern int D_L05_00221D3C;
+extern int g_player_view_mode;
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
-extern char *D_L05_001BFB18;
+extern char *g_hit_l05_result;
 extern void copy_matrix_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -40,9 +40,9 @@ extern int func_002A7820_1(int, int);
 
 extern int func_001163B0(void);
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
-extern int D_L05_00221D28;
+extern int g_group_release_limit;
 
 extern /* Clears all the link fields of an object so it is free again. */
 void moby_clear_links(char *);
@@ -76,7 +76,7 @@ typedef struct {
     int dying;
     int pad2;
 } Record233560;
-extern Record233560 D_L05_00233560[24];
+extern Record233560 g_effect_records[24];
 extern void gfx_draw_jittered_curve(char *, char *);
 extern float math_random_float_range(float, float);
 extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
@@ -90,7 +90,7 @@ extern void lerp_vector(void *, void *, void *, float);
 extern int math_fast_float_d(void *);
 
 typedef unsigned int Quad37DA58 __attribute__((mode(TI)));
-extern char D_L05_001B96C0[];
+extern char g_origin_vec[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
@@ -109,7 +109,7 @@ void moby_start_movement_state(char *obj)
     if (*(int *)(vars + 288) == 0)
         return;
     if (*(int *)(vars + 284) != 0) {
-        int *counters = D_L05_00221D10;
+        int *counters = g_feltzin_challenge_state;
         int one = 1;
 
         *(int *)(vars + 280) = one;
@@ -129,7 +129,7 @@ void moby_start_movement_state(char *obj)
         }
         *(int *)(vars + 304) = func_002A7820_1(120, 500);
     } else {
-        int *counters = D_L05_00221D10;
+        int *counters = g_feltzin_challenge_state;
 
         *(int *)(vars + 280) = 1;
         counters[3] += 1;
@@ -163,14 +163,14 @@ void moby_check_player_in_view_and_range(char *obj, int check, float range)
     *(int *)(vars + 0x104) = 0;
     *(int *)(vars + 0x108) = 0;
     limit = 0.7068582773f;
-    if (D_L05_00221D3C == 1)
+    if (g_player_view_mode == 1)
         return;
     if (fast_vec_dist(*(char **)(vars + 0x120) + 0x10, obj + 0x10) > range)
         return;
     if (CollLine(obj + 0x10, *(char **)(vars + 0x120) + 0x10, 0, obj, 0)) {
-        if (!D_L05_001BFB18)
+        if (!g_hit_l05_result)
             return;
-        if (*(short *)(D_L05_001BFB18 + 0xAA) != *(short *)(*(char **)(vars + 0x120) + 0xAA))
+        if (*(short *)(g_hit_l05_result + 0xAA) != *(short *)(*(char **)(vars + 0x120) + 0xAA))
             return;
     }
     copy_matrix_rotation(matrix, obj + 0xC0);
@@ -254,7 +254,7 @@ void moby_release_from_group(char *obj)
     group_vars = (int *)moby_get_motion_data(child);
     group_vars[6] = group_vars[6] - 1;
     moby_clear_links(obj);
-    if (group_vars[6] < D_L05_00221D28)
+    if (group_vars[6] < g_group_release_limit)
         group_free_members_and_self(child);
     else
         group_layout_members_in_grid(child);
@@ -295,7 +295,7 @@ struct S_L05_002A1800 {
     char pad1[0x10];
 };
 
-extern struct S_L05_002A1800 D_L05_002A1800[];
+extern struct S_L05_002A1800 g_spawn_entry_table[];
 
 extern int table_find_last_used_entry(int);
 
@@ -305,11 +305,11 @@ void table_reset_working_values(void)
     int i;
 
     for (i = 0; i < 15; i++)
-        D_L05_002A1800[i].f14 = D_L05_002A1800[i].f0C;
-    D_L05_002A1800[7].f14 = D_L05_002A1800[7].f0C;
-    D_L05_002A1800[13].f14 = D_L05_002A1800[13].f0C;
+        g_spawn_entry_table[i].f14 = g_spawn_entry_table[i].f0C;
+    g_spawn_entry_table[7].f14 = g_spawn_entry_table[7].f0C;
+    g_spawn_entry_table[13].f14 = g_spawn_entry_table[13].f0C;
     i = table_find_last_used_entry(6);
-    D_L05_002A1800[i].f14 = D_L05_002A1800[i].f10;
+    g_spawn_entry_table[i].f14 = g_spawn_entry_table[i].f10;
 }
 
 
@@ -325,7 +325,7 @@ void EmitParticlePairBurst(float *position, int count, int color, int duration)
     *(Quad37DA58 *)axis = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
-    FastVecSub(direction, D_L05_001B96C0, position);
+    FastVecSub(direction, g_origin_vec, position);
     vec_scale_to_length(half, direction, 0.5f);
     direction[2] = 0;
     for (i = 0; i < count; i++) {
@@ -342,12 +342,12 @@ void EmitParticlePairBurst(float *position, int count, int color, int duration)
         position[2] += math_random_signed_float_range(0, 0.15f);
         particle = part_spawn_ground_effect(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
         if (particle) {
-            particle[2] = D_L05_001FF240[0x61][6];
+            particle[2] = g_particle_params_table[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
         }
         particle = part_spawn_ground_effect(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
         if (particle) {
-            particle[2] = D_L05_001FF240[0x61][6];
+            particle[2] = g_particle_params_table[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
         }
     }
@@ -365,7 +365,7 @@ void record_update_owned_effects(char *owner)
 {
     int i;
     for (i = 0; i < 24; i++) {
-        Record233560 *record = &D_L05_00233560[i];
+        Record233560 *record = &g_effect_records[i];
         float *position = &record->f[12];
         if (record->owner == owner) {
             gfx_draw_jittered_curve(owner, (char *)record);
@@ -388,7 +388,7 @@ void record_animate_owned(char *obj)
     int i;
     char *state = *(char **)(obj + 0x68);
     for (i = 0; i < 24; i++) {
-        Record233560 *r = &D_L05_00233560[i];
+        Record233560 *r = &g_effect_records[i];
         if (r->owner == obj) {
             Record233560 *p = r;
             float *end = &p->f[16];
@@ -475,7 +475,7 @@ void EmitScaledParticleBurst(char *obj)
         func_352B28(pos, vel, life, 0x8FFF, type, 127, 127, 5, scale * 210000.0f, *(float *)(s + 0x14) * 2100.0f, 0.004055555909872055f);
     }
 
-    angle = func_306CD0(D_L05_001B9580.pos[0] - *(float *)(obj + 0x10), D_L05_001B9580.pos[1] - *(float *)(obj + 0x14));
+    angle = func_306CD0(g_hero_l05_state.pos[0] - *(float *)(obj + 0x10), g_hero_l05_state.pos[1] - *(float *)(obj + 0x14));
     sign = 1;
     for (k = 0; (float)k < (float)*(int *)(s + 0x2C) * 3.0f + (float)(*(int *)(s + 0x3C) * 10); k++) {
         float scale, a, b;
@@ -489,7 +489,7 @@ void EmitScaledParticleBurst(char *obj)
         b = func_332BB0(0.0f, 1.5707964897155762f);
         func_33B330(vel, scale, func_307620(angle, b), a);
         p = func_347040(pos, sign, vel, *(int *)(s + 0x3C) ? 0xD10572 : 0x5A182, 0.0f, 1.0f, 1.01f, *(float *)(s + 0x14) * 31500.001953125f, 0);
-        colors = D_L05_001AEC00;
+        colors = g_record_particle_colors;
         if (p) {
             d = p + 0x20;
             {
@@ -506,9 +506,9 @@ void EmitScaledParticleBurst(char *obj)
             d[0xA] = func_332AF8(64, 128);
             d[0xB] = p[0xA];
             if (func_332AB8(4) != 0)
-                p[2] = D_L05_001FF240[34][0];
+                p[2] = g_particle_params_table[34][0];
             else
-                p[2] = D_L05_001FF240[105][0];
+                p[2] = g_particle_params_table[105][0];
         }
     }
 }
@@ -569,9 +569,9 @@ int moby_class_id_to_table_index(int class_id)
 
 /* func_L05_003CFF90 is in L05_003CFF90.c. */
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
-extern char *D_L05_001B2614 __attribute__((sda));
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
 extern void func_37AEC0(char *, int);
 
@@ -591,7 +591,7 @@ void moby_init_reach_and_position(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 1;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x1BC) = -1;
     *(int *)(sub + 0x1C0) = -1;
     *(float *)(sub + 0x180) = 1.0f;
@@ -737,7 +737,7 @@ void moby_init_state_and_position(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 5;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(float *)(sub + 0x180) = 5.0f;
     *(int *)(sub + 0x2F0) = -1;
     *(int *)(sub + 0x2F4) = -1;

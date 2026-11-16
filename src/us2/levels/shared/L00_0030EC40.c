@@ -5,7 +5,7 @@ extern int D_L00_001A904C_2 __attribute__((sda));
 extern int list_page_update(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EC40(int argument)
+int level_l00_call_module_handler_with_arg_2_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -14,7 +14,7 @@ int func_US2_L00_0030EC40(int argument)
     return 0;
 }
 
-void func_US2_L00_0030EC80(void)
+void level_l00_call_module_handler_3_us2(void)
 {
     int value = D_L00_001A904C_2;
 

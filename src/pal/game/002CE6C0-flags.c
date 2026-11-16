@@ -8,7 +8,7 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 typedef struct {
     char pad0[0x44];
     int f44;
@@ -17,21 +17,21 @@ typedef struct {
     int f54;
     int f58;
 } State_0025E2B8_002CD720;
-extern State_0025E2B8_002CD720 D_0025E2B8;
-extern char *D_0025E284;
-extern int D_0025E464;
-extern short D_001A63AC;
-extern char *D_001A8CFC[] __attribute__((sda));
+extern State_0025E2B8_002CD720 g_menu_highlight_state;
+extern char *g_menu_highlight_base;
+extern int g_menu_highlight_timer;
+extern short g_sequence_active_flag;
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int menu_get_setting_value(void);
 extern int func_0029C480(int);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 /* The same flag dispatch as func_002CD660 between two reads of func_00336EF0, then, when
    D_001A8CFC[0] is set, clears bit 2 of the word at D_0025E284 + 0x10 if the two reads agree,
    D_001A63AC is clear and the state at D_0025E2B8 matches one of its two modes, and sets it
    otherwise. The unit is built with -frac2-gcse-unsplit-edges (config/cflags.txt): the high
    half of D_0025E2B8 is computed once before the compare, as in retail. */
-int func_PAL_002CE6C0(void) {
+int menu_handle_input_with_highlight_pal(void) {
     int result = 0;
     int result1;
     int result2;
@@ -39,7 +39,7 @@ int func_PAL_002CE6C0(void) {
     int value;
 
     result1 = menu_get_setting_value();
-    flags = D_00138344;
+    flags = g_menu_input_flags;
     if (flags & 0x10) {
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -55,25 +55,25 @@ int func_PAL_002CE6C0(void) {
         func_0029C480(flags);
     }
 after_first:
-    if (D_001A8CFC[0] == 0)
+    if (g_resident_data_base[0] == 0)
         return result;
     result2 = menu_get_setting_value();
-    if (result1 == result2 && D_001A63AC == 0 &&
-        ((D_0025E2B8.f50 == result1 && D_0025E2B8.f44 == 2) ||
-         (D_0025E2B8.f54 == result1 && D_0025E2B8.f44 == 4)))
-        *(int *)(D_0025E284 + 0x10) &= ~4;
+    if (result1 == result2 && g_sequence_active_flag == 0 &&
+        ((g_menu_highlight_state.f50 == result1 && g_menu_highlight_state.f44 == 2) ||
+         (g_menu_highlight_state.f54 == result1 && g_menu_highlight_state.f44 == 4)))
+        *(int *)(g_menu_highlight_base + 0x10) &= ~4;
     else
-        *(int *)(D_0025E284 + 0x10) |= 4;
+        *(int *)(g_menu_highlight_base + 0x10) |= 4;
     if (result2 != result1)
-        D_0025E464 = -0x22C;
-    D_0025E2B8.f58 = menu_get_setting_value();
+        g_menu_highlight_timer = -0x22C;
+    g_menu_highlight_state.f58 = menu_get_setting_value();
     return result;
 }
 
 extern int grid_menu_get_selected_text_id(void *);
 
-int func_PAL_002CE818(char *object) {
-    if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(D_001A8CFC[0] + 0x3A0B0);
+int menu_set_object_panel_pointer_pal(char *object) {
+    if (g_resident_data_base[0] != 0)
+        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(g_resident_data_base[0] + 0x3A0B0);
     return 0;
 }

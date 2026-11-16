@@ -1,6 +1,6 @@
 #include "names.h"
 extern int info_panel_update(char *, int);
-extern char D_001ADC88[];
+extern char g_circle_menu_icon_data[];
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, void *);
 extern void *pool_alloc_cell(void *);
@@ -14,9 +14,9 @@ extern unsigned int *object_get_fourth_field(void *);
 extern void object_init_derived_c(void *, void *, void *);
 extern void hud_set_widget_value_pair(void *, int, int);
 extern void object_set_helper_result(void *, void *, int);
-extern int D_001ADF00[2] __attribute__((sda));
-extern char *D_001A8CFC;
-extern char D_001ADF08[], D_001ADF10[], D_001ADF18[], D_001ADF20[];
+extern int g_info_panel_prompt_ids[2] __attribute__((sda));
+extern char *g_resident_data_base;
+extern char g_info_panel_count_desc_header[], g_info_panel_count_desc_first[], g_info_panel_count_desc_second[], g_info_panel_count_desc_third[];
 
 /* Sets up the info panel with its labels, icon, counters and box. */
 void info_panel_init(char *object, void *owner)
@@ -55,8 +55,8 @@ void info_panel_init(char *object, void *owner)
     hintText = object + 0x4E8;
     icon = object + 0x2AC;
     color = 0x80F0F0F0;
-    prompt_bar_init(object + 8, owner, D_001ADF00);
-    table = D_001ADC88;
+    prompt_bar_init(object + 8, owner, g_info_panel_prompt_ids);
+    table = g_circle_menu_icon_data;
     hud_init_widget_defaults(buttonText, table, owner);
     hud_init_widget_defaults(titleText, table, owner);
     countText1 = object + 0x410;
@@ -87,10 +87,10 @@ void info_panel_init(char *object, void *owner)
     hud_set_widget_value_pair(icon, 0xEAA2, 0);
     object_set_second_float4(icon, 32.0f, 32.0f, 0.0f, 0.0f);
     *object_get_fourth_field(icon) = 0x60F0F0B0;
-    object_set_helper_result(boxText, D_001A8CFC + 0x8710, 0x5D);
-    hud_init_widget_defaults(countText1, D_001ADF10, *(void **)object);
-    hud_init_widget_defaults(countText2, D_001ADF18, *(void **)object);
-    hud_init_widget_defaults(countText3, D_001ADF20, *(void **)object);
+    object_set_helper_result(boxText, g_resident_data_base + 0x8710, 0x5D);
+    hud_init_widget_defaults(countText1, g_info_panel_count_desc_first, *(void **)object);
+    hud_init_widget_defaults(countText2, g_info_panel_count_desc_second, *(void **)object);
+    hud_init_widget_defaults(countText3, g_info_panel_count_desc_third, *(void **)object);
     *object_get_fourth_field(countText1) = color;
     *object_get_fourth_field(countText2) = color;
     *object_get_fourth_field(countText3) = color;

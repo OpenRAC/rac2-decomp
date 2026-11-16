@@ -75,12 +75,12 @@ typedef char InitialMobyExtent[(sizeof(InitialMoby) == 0x100) ? 1 : -1];
 typedef char InitialClassPrefix[(sizeof(InitialClass) == 0x4C) ? 1 : -1];
 typedef char InitialSequencePrefix[(sizeof(InitialSequence) == 0x20) ? 1 : -1];
 
-extern u8 D_001CE4E0[];
-extern s16 D_001CE300[];
-extern MobyUpdate D_001CDF40[];
-extern MobyUpdate D_001D04E0[];
-extern InitialClass *D_001CDB80[];
-extern u8 *D_001B1B5C __attribute__((sda));
+extern u8 g_class_slot_lookup[];
+extern s16 g_class_cache_ids[];
+extern MobyUpdate g_moby_class_updates[];
+extern MobyUpdate g_moby_class_updates_second[];
+extern InitialClass *g_class_cache_objects[];
+extern u8 *g_moby_pool_start __attribute__((sda));
 extern void mem_clear(void *, int, int);
 extern void update_moby_animation_state(u8 *);
 
@@ -92,7 +92,7 @@ void func_PAL_0029FA60(void *object, int classId)
     InitialClass *resource;
 
     mem_clear(m, 0, 0x100);
-    slot = D_001CE4E0[classId];
+    slot = g_class_slot_lookup[classId];
     m->unknown23 = 0x80;
     m->classSlot = slot;
     m->unknownA8 = 0xFF;
@@ -102,7 +102,7 @@ void func_PAL_0029FA60(void *object, int classId)
     m->classId = classId;
     m->drawFlags = 0x40404000000000ULL;
     m->opacity = 0x7F80;
-    index = ((u8 *)m - D_001B1B5C) >> 8;
+    index = ((u8 *)m - g_moby_pool_start) >> 8;
     m->packedSlot = index << 16;
     m->triggerCount = 0;
     m->sound = 0xFF;
@@ -111,19 +111,19 @@ void func_PAL_0029FA60(void *object, int classId)
     m->voice = 0xFF;
     m->green = 0x7F;
     m->alpha = 0x80;
-    if (D_001CE300[m->classSlot] != classId) {
+    if (g_class_cache_ids[m->classSlot] != classId) {
         m->pClass = 0;
         m->flags |= 5;
         m->renderData = 0;
-        m->update = D_001D04E0[m->classSlot];
+        m->update = g_moby_class_updates_second[m->classSlot];
         if (m->update == 0)
             m->flags |= 2;
         return;
     }
-    m->update = D_001CDF40[m->classSlot];
+    m->update = g_moby_class_updates[m->classSlot];
     if (m->update == 0)
         m->flags |= 2;
-    resource = D_001CDB80[m->classSlot];
+    resource = g_class_cache_objects[m->classSlot];
     m->pClass = resource;
     m->meshCount = resource->meshCount;
     m->flags |= resource->flags;

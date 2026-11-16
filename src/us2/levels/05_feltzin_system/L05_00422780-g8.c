@@ -22,7 +22,7 @@ extern void pad_set_raw_input_value(unsigned int value);
 
 extern void feltzin_challenge_reset(u8 *a0);
 
-extern s32 D_L05_001B13E4 __attribute__((sda));
+extern s32 g_feltzin_failure_flag __attribute__((sda));
 
 void func_US2_L05_00422780(u8 *a0, s32 a1)
 {
@@ -42,6 +42,6 @@ void func_US2_L05_00422780(u8 *a0, s32 a1)
         func_002FF9F8(0x1E);
         feltzin_challenge_reset(a0);
         func_0037B210();
-        D_L05_001B13E4 = 0;
+        g_feltzin_failure_flag = 0;
     }
 }

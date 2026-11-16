@@ -11,13 +11,13 @@ typedef struct {
 typedef struct { char reserved00[0x1C4]; int flags; } MenuGameState;
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern unsigned char D_001A7BB4;
-extern int D_0025E0B0 __attribute__((nosda));
-extern int D_US2_001ABAF0[2] __attribute__((sda));
+extern unsigned char g_language;
+extern int g_menu_selection_input_state __attribute__((nosda));
+extern int g_screen_mode_values[2] __attribute__((sda));
 int func_US2_002D5C58(int selection)
 {
     CallbackState *state = &g_pause_menu_state;
-    D_0025E0B0 = D_US2_001ABAF0[D_001A7BB4];
+    g_menu_selection_input_state = g_screen_mode_values[g_language];
     if (*(int *)(state->source + 0xE8) != selection)
         return 0;
     if ((g_pad_state.flags & 0x900) && state->fallback == 0)

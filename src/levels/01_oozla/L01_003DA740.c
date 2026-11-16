@@ -2,7 +2,7 @@
 
 typedef struct { u8 data[256]; } AttachObject;
 extern AttachObject *g_moby_l01_table __attribute__((sda));
-extern u8 *D_L01_001FE180[] NOT_SDA;
+extern u8 *g_path_l01_table[] NOT_SDA;
 extern f32 vec_distance_xy(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -50,7 +50,7 @@ extern void *memset(void *buf, s32 value, s32 count);
 extern s32 coll_process_hit(f32 radius, void *pos, s32 flag, void *obj, s32 arg);
 
 /* The level's table of the records the spawner looks through. */
-extern u32 D_L01_001C3980[];
+extern u32 g_contact_moby_list[];
 
 /* func_L01_003DA740 is in L01_003DA740-particles-g8.c. */
 
@@ -197,13 +197,13 @@ void muckdweller_mark_nearby_objects(u8 *obj, void *records_out, void *count_out
     if (found_count <= 0)
         return;
     for (i = 0; i < found_count; i++) {
-        if (D_L01_001C3980[i] == 0)
+        if (g_contact_moby_list[i] == 0)
             continue;
-        if (*(s16 *)(D_L01_001C3980[i] + 0xAA) != 0xA26)
+        if (*(s16 *)(g_contact_moby_list[i] + 0xAA) != 0xA26)
             continue;
-        *(s32 *)(D_L01_001C3980[i] + 0x9C) = 1;
-        *(u8 *)(D_L01_001C3980[i] + 0xBC) = 1;
-        out[*count] = D_L01_001C3980[i];
+        *(s32 *)(g_contact_moby_list[i] + 0x9C) = 1;
+        *(u8 *)(g_contact_moby_list[i] + 0xBC) = 1;
+        out[*count] = g_contact_moby_list[i];
         *count = *count + 1;
         if (*count >= 16)
             return;
@@ -261,7 +261,7 @@ void moby_follow_attached(void *moby_arg, void *fallback) {
     } else {
         s32 pathIndex=*(s32 *)(state+0x1FC);
         if(pathIndex!=-1) {
-            path=D_L01_001FE180[pathIndex];
+            path=g_path_l01_table[pathIndex];
             if(path && !point_in_path_xy(obj+0x10,path+0x10,*(s32 *)path)) qcopy(obj+0x10,fallback);
         }
         {
@@ -352,7 +352,7 @@ typedef struct {
     unsigned char padBD[0x33];
     float rotation[4];              /* 0xF0 */
 } PoseMoby;
-extern PoseRecord *D_L01_001B264C MACRO_ADDR;
+extern PoseRecord *g_swamp_patrol_positions MACRO_ADDR;
 extern unsigned char g_sound_state[];
 extern float math_fast_sin_or_cos_a(float);
 extern void FastVecScale(void *, void *, float);
@@ -393,12 +393,12 @@ void pose_ease_update(PoseMoby *m)
         p->t += 1.0f / p->duration;
         if (p->t > 1.0f) p->t = 1.0f;
         blend = (1.0f - math_fast_sin_or_cos_a(p->t * 3.1415927f)) * 0.5f;
-        FastVecSub(delta, D_L01_001B264C[p->index].position, p->start_position);
+        FastVecSub(delta, g_swamp_patrol_positions[p->index].position, p->start_position);
         FastVecScale(delta, delta, blend);
         FastVecAdd(m->position, p->start_position, delta);
-        m->rotation[2] = math_move_angle_toward_target(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
-        m->rotation[1] = math_move_angle_toward_target(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
-        m->rotation[0] = math_move_angle_toward_target(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
+        m->rotation[2] = math_move_angle_toward_target(p->start_rotation[2], g_swamp_patrol_positions[p->index].rotation[2], blend);
+        m->rotation[1] = math_move_angle_toward_target(p->start_rotation[1], g_swamp_patrol_positions[p->index].rotation[1], blend);
+        m->rotation[0] = math_move_angle_toward_target(p->start_rotation[0], g_swamp_patrol_positions[p->index].rotation[0], blend);
         if (p->t >= 1.0f) {
             int handle = p->sound;
             if (handle != -1) {
@@ -427,9 +427,9 @@ extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
 typedef struct { u8 pad[0x80]; f32 pos[4]; u8 pad90[0x2AC]; u8 *object; s32 active; } PlayerECC;
 extern PlayerECC g_hero_state;
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
-extern LevelSaveState D_L01_0021E4B0;
+extern LevelSaveState g_level_save_state_backup;
 
 /* Pulses the object's grey colour until the player touches it (save nibble counter at
    D_0019B4A8) or its id is already collected; then marks it and its linked record active
@@ -451,18 +451,18 @@ void collectible_marker_update(u8 *obj) {
             u16 objectId;
             objectId = *(u16 *)(obj + 0xB2);
             if (objectId & 1) {
-                if (((D_0019B4A8[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] >> 4) & 7) != 7)
-                    D_0019B4A8[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 16;
+                if (((g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] >> 4) & 7) != 7)
+                    g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 16;
             } else {
-                if ((D_0019B4A8[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] & 7) != 7)
-                    D_0019B4A8[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 1;
+                if ((g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] & 7) != 7)
+                    g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 1;
             }
         }
         if (obj[0xB0] != 255) {
             s32 nibble;
             id = *(u16 *)(obj + 0xB2);
-            if (D_L01_0021E4B0.collected[(s16)id] != 0) goto activate;
-            nibble = D_0019B4A8[((s16)id >> 1) + (g_current_map_index[0] << 10)];
+            if (g_level_save_state_backup.collected[(s16)id] != 0) goto activate;
+            nibble = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index[0] << 10)];
             if ((id & 1) ? ((nibble >> 4) & 7) : (nibble & 7)) {
 activate:
                 obj[0x20] = 1;
@@ -543,14 +543,14 @@ typedef struct L01_0042CE78_OBJ {
     s16 f84;
 } L01_0042CE78_OBJ;
 
-extern u8 *D_L01_001B1F04 __attribute__((sda));
+extern u8 *g_camera_path_configs __attribute__((sda));
 
 extern s32 cam_is_hero_in_trigger(void *);
 
 /* Tells whether the camera path is done (-1), blocked (1) or still free (0). */
 s32 cam_get_path_status(L01_0042CE78_OBJ *camera, u8 *other)
 {
-    L01_0042CE78_ENTRY *entry = *(L01_0042CE78_ENTRY **)(D_L01_001B1F04 + camera->f84 * 0x20 + 0x1C);
+    L01_0042CE78_ENTRY *entry = *(L01_0042CE78_ENTRY **)(g_camera_path_configs + camera->f84 * 0x20 + 0x1C);
     s32 result;
 
     if (entry->f39 != 0) {

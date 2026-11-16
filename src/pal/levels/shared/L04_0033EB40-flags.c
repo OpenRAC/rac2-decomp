@@ -3,9 +3,9 @@
 #include "common.h"
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern int func_PAL_L04_0033EB40(char *,char *,float *,float *,float);
+extern int moby_move_toward_target_pal(char *,char *,float *,float *,float);
 
-void func_PAL_L04_0033F000(char *a0, char *a1)
+void coll_probe_ahead_of_moby_pal(char *a0, char *a1)
 {
     float v[4];
     float w[4];
@@ -18,5 +18,5 @@ void func_PAL_L04_0033F000(char *a0, char *a1)
         v[0] = x;
         v[1] += math_fast_sin_or_cos_b(angle) * 100.0f;
     }
-    func_PAL_L04_0033EB40(a0, a1, v, w, 1.0f);
+    moby_move_toward_target_pal(a0, a1, v, w, 1.0f);
 }

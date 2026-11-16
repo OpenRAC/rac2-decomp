@@ -2,15 +2,15 @@
 /* func_PAL_L19_003ED868, the PAL copy of func_L19_003E9400: the same C, where rename func_00288E18 becomes func_PAL_00289730; scale D_001A7390[0]. */
 #include "common.h"
 extern u8 g_hero_position[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_001A7B2F[1] __attribute__((sda));
-extern unsigned int D_001A7390[1] __attribute__((sda));
-extern unsigned int D_0018CE48[1];
-extern u8 *D_L19_001B2B0C __attribute__((sda));
+extern u8 g_mover_trigger_flag[1] __attribute__((sda));
+extern unsigned int g_frame_counter[1] __attribute__((sda));
+extern unsigned int g_linked_mover_start_time[1];
+extern u8 *g_linked_object_table __attribute__((sda));
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern float D_L19_001B2628 __attribute__((sda));
-extern int D_L19_001C9FC0;
+extern float g_mover_current_value __attribute__((sda));
+extern int g_mover_var_index;
 extern int IsPointInCuboid(void *, int);
 extern void moby_set_state(void *, int, int);
 extern int func_PAL_00289730(int,int);
@@ -31,22 +31,22 @@ void func_PAL_L19_003ED868(u8 *obj)
     u8 *s = *(u8 **)(obj + 0x68);
     u8 *other, *os;
     if (I(s,0x38) > 0 && IsPointInCuboid(g_hero_position,I(s,0x38))) {
-        D_L19_001B2628 = F((u8 *)((I(s,0x38) << 7) + (int)D_L19_001B2B0C),0x38);
+        g_mover_current_value = F((u8 *)((I(s,0x38) << 7) + (int)g_linked_object_table),0x38);
     } else {
-        if (*(float *)((int)s + (D_L19_001C9FC0 << 2)) > 0.0f)
-            D_L19_001B2628 = *(float *)((int)s + (D_L19_001C9FC0 << 2));
+        if (*(float *)((int)s + (g_mover_var_index << 2)) > 0.0f)
+            g_mover_current_value = *(float *)((int)s + (g_mover_var_index << 2));
     }
     switch (obj[0x20]) {
     case 0:
         obj[0x30] = 0xFF;
-        I(s,0x24) = (D_0019B2E8[I(s,0x20) + g_current_map_index * 16] >> 7) ^ 1;
+        I(s,0x24) = (g_moby_group_flags[I(s,0x20) + g_current_map_index * 16] >> 7) ^ 1;
         moby_set_state(obj,1,-1);
         break;
     case 1:
-        if (!D_001A7B2F[0] && IsPointInCuboid(g_hero_position,I(s,0x10)) &&
-            (((int)(D_001A7390[0]) * 5 + 2) / 6) - D_0018CE48[0] > 3000)
+        if (!g_mover_trigger_flag[0] && IsPointInCuboid(g_hero_position,I(s,0x10)) &&
+            (((int)(g_frame_counter[0]) * 5 + 2) / 6) - g_linked_mover_start_time[0] > 3000)
             func_PAL_00289730(0xA12,0x69);
-        if (D_0019B2E8[I(s,0x20) + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[I(s,0x20) + g_current_map_index * 16] & 0x80) {
             if (I(s,0x24)) moby_set_state(obj,2,-1);
         }
         break;

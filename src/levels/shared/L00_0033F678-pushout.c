@@ -8,8 +8,8 @@ extern void vec_scale_to_length(void *, const void *, float);
 /* The EE keeps integer and FP argument order in independent register banks. */
 extern void scale_vector_radius(float, void *, const void *) __asm__("func_00282F20");
 extern void FastVecAdd(void *, const void *, const void *);
-extern const Vector D_0018A0E0;
-extern const Path *D_L00_001FDA80[];
+extern const Vector g_hero_state_block;
+extern const Path *g_launch_path_table[];
 extern float FastVecDot(const void *, const void *);
 extern void FastVecCross(void *, const void *, const void *);
 extern float math_fabs(float);
@@ -25,22 +25,22 @@ int path_push_point_out_of_edges(int pathIndex, const Vector *point, Vector *out
     float height, side, length, along;
     const Vector *start;
     qcopy(&position, point);
-    path = D_L00_001FDA80[pathIndex];
-    height = FastVecDot(&position, &D_0018A0E0);
+    path = g_launch_path_table[pathIndex];
+    height = FastVecDot(&position, &g_hero_state_block);
     for (i = 0; i < path->count - 1; ++i) {
         if (path->points[i].f[3] == 0.0f && path->points[i + 1].f[3] == 0.0f)
             continue;
         start = &path->points[i];
         FastVecSub(&relative, &position, start);
         FastVecSub(&segment, &path->points[i + 1], start);
-        along = FastVecDot(&relative, &D_0018A0E0);
-        vec_scale_to_length(&planePart, &D_0018A0E0, along);
+        along = FastVecDot(&relative, &g_hero_state_block);
+        vec_scale_to_length(&planePart, &g_hero_state_block, along);
         FastVecSub(&relative, &relative, &planePart);
-        vec_scale_to_length(&planePart, &D_0018A0E0, FastVecDot(&segment, &D_0018A0E0));
+        vec_scale_to_length(&planePart, &g_hero_state_block, FastVecDot(&segment, &g_hero_state_block));
         FastVecSub(&segment, &segment, &planePart);
         vec_scale_to_length(&unit, &segment, 1.0f);
         FastVecCross(&cross, &relative, &unit);
-        side = math_fabs(FastVecDot(&cross, &D_0018A0E0));
+        side = math_fabs(FastVecDot(&cross, &g_hero_state_block));
         if (!(side > radius)) {
             length = FastVecLength(&segment);
             along = FastVecDot(&relative, &unit);
@@ -61,8 +61,8 @@ int path_push_point_out_of_edges(int pathIndex, const Vector *point, Vector *out
         }
     }
     if (hit) {
-        height -= FastVecDot(&position, &D_0018A0E0);
-        vec_scale_to_length(&segment, &D_0018A0E0, height);
+        height -= FastVecDot(&position, &g_hero_state_block);
+        vec_scale_to_length(&segment, &g_hero_state_block, height);
         FastVecAdd(out, &position, &segment);
     }
     return hit;

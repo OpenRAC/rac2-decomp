@@ -33,11 +33,11 @@ extern void fade_set_parameter_row(void *,int,float,float,float,float,float);
 extern void anim_set_key_range(void *,int,float,float);
 extern void fade_start_direction(void *,int);
 extern int fade_swap_field_28(void *,int);
-extern char D_001AE5F8[],D_001AE608[],D_001AE610[],D_001AE618[];
-extern float D_001B23A4 __attribute__((sda));
-extern int D_001B23A0 __attribute__((sda));
+extern char g_hud_fade_widget_data_a[],g_hud_fade_widget_data_b[],g_hud_fade_widget_data_c[],g_hud_fade_label_data[];
+extern float g_hud_scale __attribute__((sda));
+extern int g_hud_mode __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int D_001A7A00 __attribute__((sda));
+extern int g_player_stats __attribute__((sda));
 
 /* Sets up one HUD gauge: its texts, sprites and the fade animations that show, hide and pulse them. */
 void hud_fade_widget_init(char *object,char *data,void *context)
@@ -57,19 +57,19 @@ void hud_fade_widget_init(char *object,char *data,void *context)
         *(int **)(object+0x1c8)=zeroBlock;
         zeroBlock[1]=0;zeroBlock[2]=0;zeroBlock[3]=0;zeroBlock[0]=0;
     }
-    object_init_derived_arrays(object+0x10,D_001AE5F8,context);
-    object_init_derived_arrays((object+0x5c),D_001AE608,context);
-    object_init_derived_arrays((object+0xa8),D_001AE610,context);
+    object_init_derived_arrays(object+0x10,g_hud_fade_widget_data_a,context);
+    object_init_derived_arrays((object+0x5c),g_hud_fade_widget_data_b,context);
+    object_init_derived_arrays((object+0xa8),g_hud_fade_widget_data_c,context);
     label=object+0xf4;
-    object_init_derived_b(label,146,0,D_001AE618,context);
+    object_init_derived_b(label,146,0,g_hud_fade_label_data,context);
     object_set_helper_result((object+0x5c),data+0x8710,17);
     object_set_helper_result((object+0xa8),data+0x8710,18);
     object_set_first_pair(label,0x8049c1ff,0x80001eff);
     object_set_second_pair(label,0x50f0c070,0x50f0c070);
     text_set_alignment(label,0x60442d00);
     meter_set_max(label,100);
-    scaledSize=3.0f*D_001B23A4+0.5f;
-    widget_set_pos_y(label,D_001B23A0==1?(int)(scaledSize+1.0f):(int)scaledSize);
+    scaledSize=3.0f*g_hud_scale+0.5f;
+    widget_set_pos_y(label,g_hud_mode==1?(int)(scaledSize+1.0f):(int)scaledSize);
     *((int *)object_get_fourth_field((object+0x5c)))=0x60442d00;
     *((int *)object_get_fourth_field((object+0xa8)))=0x55f0c070;
     anim0=object+0x140;
@@ -135,6 +135,6 @@ void hud_fade_widget_init(char *object,char *data,void *context)
     *(int *)(object+0x400)=-1;
     *(int *)(object+0x3f8)=0;
     /* +4 before +0xC: swapped, sw $zero,0xC issues before the D_001A7A00 load, retail's after. */
-    *(int *)(object+4)=D_001A7A00;
+    *(int *)(object+4)=g_player_stats;
     *(int *)(object+0xc)=0;
 }

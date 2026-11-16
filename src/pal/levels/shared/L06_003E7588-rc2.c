@@ -9,7 +9,7 @@ extern f32 ref_L06_003E4F08_04 __attribute__((sda));
 extern void ref_L06_003E4F08_05(void *, void *, void *, f32, f32, f32);
 extern void ref_L06_003E4F08_06(void *, void *, void *, f32, f32, f32);
 
-void func_PAL_L06_003E8568(void *arg0) {
+void moby_turn_parts_toward_targets_pal(void *arg0) {
     u8 temp_v1;
     s8 *temp_s0;
 

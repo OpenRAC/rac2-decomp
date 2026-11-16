@@ -198,7 +198,7 @@ extern int coll_check_ground_below_point(void *,void *,int,float,float);
 extern int math_blend_scaled_count(float,void *,void *,int,float,int);
 extern float coll_probe_ground_height_below(void *,int,float);
 typedef struct { float fields[16]; float normal[4]; } CollisionResult;
-extern CollisionResult D_L04_001BFAC0;
+extern CollisionResult g_probe_hit;
 typedef union { int q __attribute__((mode(TI))); float f[4]; } CollisionVec;
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 typedef union { float f[20]; int i[20]; } MovementConfig;
@@ -235,16 +235,16 @@ int moby_move_toward_target(char *obj,MovementConfig *cfg,float *target,void *ou
     FastVecAdd(test,obj+0x10,move);
     test[2]=F(obj,0x18)-cfg->f[0x30/4];
     if (coll_check_ground_below_point(test,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
-        step=mat_fast_helper_a(D_L04_001BFAC0.normal[2],vec_length_xy(D_L04_001BFAC0.normal));
-        first=D_L04_001BFAC0.fields[10];
+        step=mat_fast_helper_a(g_probe_hit.normal[2],vec_length_xy(g_probe_hit.normal));
+        first=g_probe_hit.fields[10];
         if (step>0.5f) {
             if (vec_length_xy(move)>0.1f) {
                 vec_scale_to_length(probe,move,0.57f);
                 FastVecAdd(probe,probe,obj+0x10);
                 probe[2]=F(obj,0x18)-cfg->f[0x30/4];
                 if (coll_check_ground_below_point(probe,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
-                    second=D_L04_001BFAC0.fields[10];
-                    if (mat_fast_helper_a(D_L04_001BFAC0.normal[2],vec_length_xy(D_L04_001BFAC0.normal))>=0.5f) {
+                    second=g_probe_hit.fields[10];
+                    if (mat_fast_helper_a(g_probe_hit.normal[2],vec_length_xy(g_probe_hit.normal))>=0.5f) {
                         flags=0x22;
                         if ((cfg->i[0x38/4]&8) && second<height && first<height) flags=8;
                     }

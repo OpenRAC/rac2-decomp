@@ -18,7 +18,7 @@ typedef struct {
     unsigned int color;
 } Hero5CB0;
 extern Hero5CB0 g_hero_state;
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 extern char *CreateMoby(int);
 extern void func_002A0F48(char *);
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -72,7 +72,7 @@ void UpdateHeroJointEffect(void)
             copy_matrix3x4(g_hero_state.object + 0xC0, matrix);
             func_002A0F48(g_hero_state.object);
             scale = 1.7f;
-            if (D_001A7A40[3])
+            if (g_unlocked_item_flags[3])
                 scale = 3.1f;
             if (g_hero_state.timer)
                 scale *= 1.4f;

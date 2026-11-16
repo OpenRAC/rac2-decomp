@@ -18,9 +18,9 @@ typedef unsigned char u8;
 
 typedef unsigned int u32;
 
-extern MappingEntry D_002403C0[];
+extern MappingEntry g_help_mapping_table[];
 
-extern Blob D_L00_001A8E60;
+extern Blob g_help_fixed_id_list;
 
 extern unsigned char g_item_slot_to_record[];
 
@@ -60,7 +60,7 @@ extern ClassRecord g_weapon_table[];
 
 extern int g_weapon_menu_slots[] __attribute__((section(".sdata")));
 
-extern PendingEntry D_0025E328[];
+extern PendingEntry g_help_pending_entries[];
 
 extern int help_is_id_in_either_table(int);
 
@@ -74,7 +74,7 @@ int help_is_id_in_fixed_list(int helpId)
 {
     Blob table;
     int i;
-    table = D_L00_001A8E60;
+    table = g_help_fixed_id_list;
     for (i = 0; table.v[i]; i++)
         if (helpId == table.v[i])
             return 1;
@@ -91,8 +91,8 @@ void help_queue_pending_id(int helpId)
 
     if (help_is_id_in_either_table(helpId) == 0)
         return;
-    if (D_0025E328[0].value != -1) {
-        idPtr = &D_0025E328[0].value;
+    if (g_help_pending_entries[0].value != -1) {
+        idPtr = &g_help_pending_entries[0].value;
         do {
             if (helpId == *idPtr)
                 return;
@@ -136,7 +136,7 @@ typedef struct {
 
 extern SlotTable ref_L00_00288508_00;
 
-extern unsigned short D_0018C964;
+extern unsigned short g_help_message_flag;
 
 extern int subtitle_request_voice_line(int, int);
 
@@ -153,7 +153,7 @@ void help_show_message_for_id(int helpId)
         subtitle_request_voice_line(0x9F8, 0x4F);
     } else if (helpId == 27) {
         subtitle_request_voice_line(0x9F7, 0x4E);
-    } else if (D_0018C964 == 0) {
+    } else if (g_help_message_flag == 0) {
         subtitle_request_voice_line(0x9AA, 1);
     }
 
@@ -195,8 +195,8 @@ int help_is_id_value_in_mapping_range(int id, int value)
 
     if (id == 9 && flag_is_byte_set() != 0)
         return 1;
-    for (i = 0; D_002403C0[i].id != -2; i++) {
-        if (id == D_002403C0[i].id && value >= D_002403C0[i].value && value < 0x15)
+    for (i = 0; g_help_mapping_table[i].id != -2; i++) {
+        if (id == g_help_mapping_table[i].id && value >= g_help_mapping_table[i].value && value < 0x15)
             return 1;
     }
     return 0;
@@ -205,8 +205,8 @@ int help_is_id_value_in_mapping_range(int id, int value)
 /* Returns 1 when the id is in the mapping table. */
 int help_is_id_in_mapping_table(int id) {
     int i;
-    for (i = 0; D_002403C0[i].id != -2; i++)
-        if (id == D_002403C0[i].id) return 1;
+    for (i = 0; g_help_mapping_table[i].id != -2; i++)
+        if (id == g_help_mapping_table[i].id) return 1;
     return 0;
 }
 

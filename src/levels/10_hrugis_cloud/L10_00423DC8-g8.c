@@ -3,23 +3,23 @@
 /* The owner record keeps its effect slot at +0x270. */
 typedef struct { u8 pad[0x270]; s32 effect; } RewardOwnerState;
 
-extern u8 *D_001B251C;
-extern u8 D_L10_00188660[];
-extern s32 D_L10_001A8F00;
-extern s32 D_L10_001A904C __attribute__((sda));
-extern s32 D_L10_001B1440 __attribute__((sda));
+extern u8 *g_moby_pool_base;
+extern u8 g_effect_l10_record_table[];
+extern s32 g_mission_reward_state;
+extern s32 g_hud_sprite_table_base __attribute__((sda));
+extern s32 g_reward_active_flag __attribute__((sda));
 /* Completion counts per kind: retail reads count 0 and the kind-indexed count through
    $gp and counts 1 and 2 with absolute addresses, so the table has both views. */
 extern s32 g_mission_completion_counts[] __attribute__((sda));
 extern s32 D_L10_001B1390_gp[] SDATA(D_L10_001B1390);
 /* Reward per kind and capped count. */
 extern s32 D_L10_001B1448_gp[][3] SDATA(D_L10_001B1448);
-extern s32 D_L10_001B355C;
-extern s32 D_L10_001B13EC __attribute__((sda));
-extern s32 D_L10_001B13E8 __attribute__((sda));
+extern s32 g_reward_kind;
+extern s32 g_hud_state_flag __attribute__((sda));
+extern s32 g_hud_setup_done __attribute__((sda));
 extern s32 g_player_bolts;
-extern u8 D_001A7A0A;
-extern u32 D_00138324;
+extern u8 g_extras_unlocked_flag;
+extern u32 g_pad_held_flags;
 extern s32 g_selected_mission_index __attribute__((sda));
 
 extern void func_00373410(s32);
@@ -42,33 +42,33 @@ extern int request_begin_slot(s32, s32, s32, s32, s32);
    test: retail allocates it that way (the test in $v1, the pad word kept in $v0). */
 void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
     u8 *s = *(u8 **)(obj + 0x68);
-    u8 *owner_moby = D_001B251C + *(s32 *)(s + 0x24) * 256;
+    u8 *owner_moby = g_moby_pool_base + *(s32 *)(s + 0x24) * 256;
     RewardOwnerState *os = *(RewardOwnerState **)(owner_moby + 0x68);
     s32 id = os->effect;
     s32 completed_count, reward, tmp, capped;
     u8 multiplier;
 
     if (id != -1) {
-        u8 *record = D_L10_00188660 + id * 0x70;
+        u8 *record = g_effect_l10_record_table + id * 0x70;
         if (*(u8 **)(record + 0x88) == owner_moby && record[0x74])
             func_00373410(id);
     }
     os->effect = -1;
-    tmp = D_L10_001A8F00;
+    tmp = g_mission_reward_state;
     if (tmp == 2)
         return;
     if (!math_fast_float_d(s + 0x58))
         return;
-    if (D_L10_001A904C && !D_L10_001B1440) {
+    if (g_hud_sprite_table_base && !g_reward_active_flag) {
         FadeToBlack(30);
         level_store_value_pair(0, menu_draw_reward_panel);
         completed_count = D_L10_001B1390_gp[kind];
         capped = completed_count < 3 ? completed_count : 2;
-        multiplier = D_001A7A0A;
-        D_L10_001B1440 = 1;
-        D_L10_001B355C = kind;
-        D_L10_001B13EC = 0;
-        D_L10_001B13E8 = 0;
+        multiplier = g_extras_unlocked_flag;
+        g_reward_active_flag = 1;
+        g_reward_kind = kind;
+        g_hud_state_flag = 0;
+        g_hud_setup_done = 0;
         reward = D_L10_001B1448_gp[kind][capped];
         if (multiplier)
             reward *= 10;
@@ -79,9 +79,9 @@ void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
     }
     hero_set_state_value_c(1);
     if (!math_fast_float_d(s + 0x40)) {
-        tmp = D_00138324 & 0x40;
+        tmp = g_pad_held_flags & 0x40;
         if (tmp) {
-            D_L10_001B1440 = 0;
+            g_reward_active_flag = 0;
             *(s32 *)(s + 0x40) = 0x278D0;
             FadeToBlack(30);
             hero_set_state_value_c(0);
@@ -94,7 +94,7 @@ void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
             else if (D_L10_001B1390_gp[0])
                 g_selected_mission_index = 1;
             hrugis_reset_mission_state(obj);
-        } else if (D_00138324 & 0x10)
+        } else if (g_pad_held_flags & 0x10)
             request_begin_slot(3, 1, 4, 0, 0);
     } else
         *(s32 *)(s + 0x40) = 0x278D0;

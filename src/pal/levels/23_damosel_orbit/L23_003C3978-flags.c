@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L23_001B36F0 __attribute__((sda));
+extern int g_enemy_effect_param __attribute__((sda));
 extern void moby_play_anim_and_link(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
 extern void func_367150(int);
 
-void func_PAL_L23_003C3978(char *arg0) {
+void enemy_reset_calm_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     int none = -1;
 
@@ -20,8 +20,8 @@ void func_PAL_L23_003C3978(char *arg0) {
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
     moby_play_anim_and_link(arg0, 1, 0, 0, 3, 1.0f);
     {
-        unsigned short d = D_L23_001B36F0;
-        float f = (float)D_L23_001B36F0;
+        unsigned short d = g_enemy_effect_param;
+        float f = (float)g_enemy_effect_param;
 
         *(short *)(state + 0x24) = d;
         *(float *)(state + 0x20) = f;

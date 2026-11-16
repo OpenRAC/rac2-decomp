@@ -4,14 +4,14 @@
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define P(p,o) (*(int **)((u8 *)(p)+(o)))
 
-extern int D_L01_001B2088 MACRO_ADDR;
-extern void *D_L01_001FE180[];
-extern float D_L01_001AFDB4 __attribute__((sda));
-extern float D_L01_001AFDB8 __attribute__((sda));
-extern float D_L01_001AFDC0 __attribute__((sda));
-extern float D_L01_001AFDC4 __attribute__((sda));
-extern float D_L01_001AFDC8 __attribute__((sda));
-extern float D_L01_001AFDD0 __attribute__((sda));
+extern int g_oozla_intro_stage MACRO_ADDR;
+extern void *g_path_l01_table[];
+extern float g_swamp_beast_accel_param __attribute__((sda));
+extern float g_swamp_beast_speed_param __attribute__((sda));
+extern float g_swamp_beast_move_step_param __attribute__((sda));
+extern float g_swamp_beast_angular_accel_param __attribute__((sda));
+extern float g_swamp_beast_angular_speed_param __attribute__((sda));
+extern float g_swamp_beast_angular_step_param __attribute__((sda));
 extern float level_get_water_height(void);
 extern int FloatToInt(float);
 extern int math_random_int_range(int,int);
@@ -29,10 +29,10 @@ void swamp_beast_init_state(u8 *object)
     float height, scale, angularStep, movementStep;
     float acceleration, velocity, angularAcceleration, angularVelocity;
     int handle;
-    if (D_L01_001B2088 == 0 && object[0x21] != 255) *P(state,0x33C) = 0;
+    if (g_oozla_intro_stage == 0 && object[0x21] != 255) *P(state,0x33C) = 0;
     height = level_get_water_height();
     if (height > 0.0f) F(state,0x34C) = height;
-    if (!(height > 0.0f) && D_L01_001B2088 < 4) return;
+    if (!(height > 0.0f) && g_oozla_intro_stage < 4) return;
     I(state,0x378) = 0;
     if (object[0x21] != 255) {
         *P(state,0x368) = 0;
@@ -51,8 +51,8 @@ void swamp_beast_init_state(u8 *object)
     if (F(state,0x37C) == 0.0f) F(state,0x37C) = 1.0f;
     state[0x28] = 3;
     state[0x2A] = 6;
-    angularStep = D_L01_001AFDD0 * 0.00029088825f;
-    movementStep = D_L01_001AFDC0 * 0.016666668f;
+    angularStep = g_swamp_beast_angular_step_param * 0.00029088825f;
+    movementStep = g_swamp_beast_move_step_param * 0.016666668f;
     F(state,0x30) = 0.5f;
     F(state,0x210) = 1.0f;
     F(state,0x21C) = 5.0f;
@@ -61,10 +61,10 @@ void swamp_beast_init_state(u8 *object)
     F(state,0x214) = movementStep;
     handle = math_random_int_range(120,0);
     scale = F(state,0x37C);
-    acceleration = D_L01_001AFDB4*(scale*0.00027777778f);
-    velocity = D_L01_001AFDB8*(scale*0.016666668f);
-    angularAcceleration = D_L01_001AFDC4*(scale*0.0000048481375f);
-    angularVelocity = D_L01_001AFDC8*(scale*0.00029088825f);
+    acceleration = g_swamp_beast_accel_param*(scale*0.00027777778f);
+    velocity = g_swamp_beast_speed_param*(scale*0.016666668f);
+    angularAcceleration = g_swamp_beast_angular_accel_param*(scale*0.0000048481375f);
+    angularVelocity = g_swamp_beast_angular_speed_param*(scale*0.00029088825f);
     F(state,0x110) = 1.0f;
     I(state,0x32C) = handle;
     F(state,0x114) = 0.2f;
@@ -74,12 +74,12 @@ void swamp_beast_init_state(u8 *object)
     F(state,0x140) = 0.52359885f;
     F(state,0x13C) = 0.005f;
     moby_set_controller_speed_limits(object,acceleration,velocity,angularAcceleration,angularVelocity);
-    if (I(state,0x30C) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[I(state,0x30C)]);
-    if (I(state,0x364) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[I(state,0x364)]);
+    if (I(state,0x30C) != -1) path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x30C)]);
+    if (I(state,0x364) != -1) path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x364)]);
     if (I(state,0x308) == -1) {
         if (I(state,0x374) == 0) goto grounded;
     } else {
-        path_l01_compute_segment_lengths(D_L01_001FE180[I(state,0x308)]);
+        path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x308)]);
         I(state,0x14C) = I(state,0x308);
         moby_set_state(object,1,1);
         F(object,0x18) = F(state,0x34C);

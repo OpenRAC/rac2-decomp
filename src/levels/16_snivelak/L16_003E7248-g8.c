@@ -1,30 +1,30 @@
 #include "common.h"
 
-extern unsigned int D_L16_001B0C9C __attribute__((sda));
-extern unsigned int D_L16_001B0CA0 __attribute__((sda));
-extern unsigned int D_L16_001B0C98 __attribute__((sda));
-extern unsigned int D_L16_001B0CB0 __attribute__((sda));
-extern unsigned int D_L16_001B0CB4 __attribute__((sda));
-extern unsigned int D_L16_001B0CB8 __attribute__((sda));
-extern unsigned int D_L16_001B0CBC __attribute__((sda));
-extern unsigned int D_L16_001B0CC0 __attribute__((sda));
-extern unsigned int D_L16_001B0CC4 __attribute__((sda));
-extern unsigned int D_L16_001B0CC8 __attribute__((sda));
-extern unsigned int D_L16_001B0CCC __attribute__((sda));
-extern unsigned int D_L16_001B0CD0 __attribute__((sda));
-extern unsigned int D_L16_001B0CD4 __attribute__((sda));
-extern unsigned int D_L16_001B0CD8 __attribute__((sda));
-extern unsigned int D_L16_001B0CDC __attribute__((sda));
-extern unsigned int D_L16_001B0CE0 __attribute__((sda));
-extern unsigned int D_L16_001B0CE4 __attribute__((sda));
-extern unsigned int D_L16_001B0CE8 __attribute__((sda));
-extern unsigned int D_L16_001B0CEC __attribute__((sda));
-extern unsigned int D_L16_001B0CF0 __attribute__((sda));
-extern float D_L16_001B0C88 __attribute__((sda));
-extern float D_L16_001B0C7C __attribute__((sda));
-extern float D_L16_001B0C80 __attribute__((sda));
-extern float D_L16_001B0C8C __attribute__((sda));
-extern float D_L16_001B9B00[];
+extern unsigned int g_effect_texture_a __attribute__((sda));
+extern unsigned int g_effect_texture_b __attribute__((sda));
+extern unsigned int g_billboard_color_a __attribute__((sda));
+extern unsigned int g_billboard_color_b __attribute__((sda));
+extern unsigned int g_color_red_a __attribute__((sda));
+extern unsigned int g_color_green_a __attribute__((sda));
+extern unsigned int g_color_blue_a __attribute__((sda));
+extern unsigned int g_color_alpha_a __attribute__((sda));
+extern unsigned int g_color_red_b __attribute__((sda));
+extern unsigned int g_color_green_b __attribute__((sda));
+extern unsigned int g_color_blue_b __attribute__((sda));
+extern unsigned int g_color_alpha_b __attribute__((sda));
+extern unsigned int g_color_red_c __attribute__((sda));
+extern unsigned int g_color_green_c __attribute__((sda));
+extern unsigned int g_color_blue_c __attribute__((sda));
+extern unsigned int g_color_alpha_c __attribute__((sda));
+extern unsigned int g_color_red_d __attribute__((sda));
+extern unsigned int g_color_green_d __attribute__((sda));
+extern unsigned int g_color_blue_d __attribute__((sda));
+extern unsigned int g_color_alpha_d __attribute__((sda));
+extern float g_billboard_side_length_c __attribute__((sda));
+extern float g_billboard_side_length_a __attribute__((sda));
+extern float g_billboard_side_length_b __attribute__((sda));
+extern float g_billboard_size __attribute__((sda));
+extern float g_scene_origin_transform[];
 extern void gfx_init_quad_packet_block_copy(void *);
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -53,20 +53,20 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     float random;
 
     gfx_init_quad_packet_block_copy(&packet);
-    gfx_init_quad_packet_state(&packet, D_L16_001B0C9C, 0, 128);
+    gfx_init_quad_packet_state(&packet, g_effect_texture_a, 0, 128);
     /* Separate packing stages preserve the left-associated color operations. */
     {
-        unsigned alpha = (D_L16_001B0CC0 << 24);
-        unsigned alphaBlue = alpha | (D_L16_001B0CBC << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L16_001B0CB8 << 8);
-        unsigned rgba = alphaBlueGreen | D_L16_001B0CB4;
+        unsigned alpha = (g_color_alpha_a << 24);
+        unsigned alphaBlue = alpha | (g_color_blue_a << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_color_green_a << 8);
+        unsigned rgba = alphaBlueGreen | g_color_red_a;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned alpha = (D_L16_001B0CD0 << 24);
-        unsigned alphaBlue = alpha | (D_L16_001B0CCC << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L16_001B0CC8 << 8);
-        unsigned rgba = alphaBlueGreen | D_L16_001B0CC4;
+        unsigned alpha = (g_color_alpha_b << 24);
+        unsigned alphaBlue = alpha | (g_color_blue_b << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_color_green_b << 8);
+        unsigned rgba = alphaBlueGreen | g_color_red_b;
         packet.color[2] = packet.color[3] = rgba;
     }
     packet.uv[0] = 0;
@@ -89,11 +89,11 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     vec_scale_to_length(nearPoint, state, -0.17f);
     position = (float *)(object + 0x10);
     FastVecAdd(nearPoint, position, nearPoint);
-    FastVecSub(viewDelta, position, D_L16_001B9B00);
+    FastVecSub(viewDelta, position, g_scene_origin_transform);
     vec_scale_to_length(beamStep, state, -4.0f);
     FastVecAdd(farPoint, nearPoint, beamStep);
     FastVecCross(side, viewDelta, beamStep);
-    vec_scale_to_length(side, side, D_L16_001B0C88);
+    vec_scale_to_length(side, side, g_billboard_side_length_c);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     FastVecAdd(packet.v[2], farPoint, side);
@@ -107,12 +107,12 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecAdd(packet.v[2], packet.v[2], beamStep);
     FastVecAdd(packet.v[3], packet.v[3], beamStep);
     draw_world_quad(&packet, 0, 0);
-    gfx_init_quad_packet_state(&packet, D_L16_001B0CA0, 1, 128);
+    gfx_init_quad_packet_state(&packet, g_effect_texture_b, 1, 128);
     {
-        unsigned alpha = (D_L16_001B0CE0 << 24);
-        unsigned alphaBlue = alpha | (D_L16_001B0CDC << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L16_001B0CD8 << 8);
-        unsigned rgba = alphaBlueGreen | D_L16_001B0CD4;
+        unsigned alpha = (g_color_alpha_c << 24);
+        unsigned alphaBlue = alpha | (g_color_blue_c << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_color_green_c << 8);
+        unsigned rgba = alphaBlueGreen | g_color_red_c;
         packet.color[1] = rgba;
         packet.color[0] = packet.color[1];
     }
@@ -125,13 +125,13 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     packet.uv[6] = 1;
     packet.uv[7] = 1;
     {
-        unsigned blue = (D_L16_001B0CDC << 16);
-        unsigned blueGreen = blue | (D_L16_001B0CD8 << 8);
-        unsigned rgb = blueGreen | D_L16_001B0CD4;
+        unsigned blue = (g_color_blue_c << 16);
+        unsigned blueGreen = blue | (g_color_green_c << 8);
+        unsigned rgb = blueGreen | g_color_red_c;
         packet.color[3] = rgb;
         packet.color[2] = packet.color[3];
     }
-    vec_scale_to_length(side, side, D_L16_001B0C7C);
+    vec_scale_to_length(side, side, g_billboard_side_length_a);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     FastVecAdd(farPoint, position, beamStep);
@@ -140,19 +140,19 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     {
-        unsigned alpha = (D_L16_001B0CE0 << 24);
-        unsigned alphaBlue = alpha | (D_L16_001B0CDC << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L16_001B0CD8 << 8);
-        unsigned rgba = alphaBlueGreen | D_L16_001B0CD4;
+        unsigned alpha = (g_color_alpha_c << 24);
+        unsigned alphaBlue = alpha | (g_color_blue_c << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_color_green_c << 8);
+        unsigned rgba = alphaBlueGreen | g_color_red_c;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned blue = (D_L16_001B0CDC << 16);
-        unsigned blueGreen = blue | (D_L16_001B0CD8 << 8);
-        unsigned rgb = blueGreen | D_L16_001B0CD4;
+        unsigned blue = (g_color_blue_c << 16);
+        unsigned blueGreen = blue | (g_color_green_c << 8);
+        unsigned rgb = blueGreen | g_color_red_c;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L16_001B0C80);
+    vec_scale_to_length(side, side, g_billboard_side_length_b);
     vec_scale_to_length(nearPoint, state, -0.1f);
     FastVecAdd(nearPoint, position, nearPoint);
     FastVecAdd(packet.v[0], nearPoint, side);
@@ -163,19 +163,19 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     {
-        unsigned alpha = (D_L16_001B0CF0 << 24);
-        unsigned alphaBlue = alpha | (D_L16_001B0CEC << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L16_001B0CE8 << 8);
-        unsigned rgba = alphaBlueGreen | D_L16_001B0CD4;
+        unsigned alpha = (g_color_alpha_d << 24);
+        unsigned alphaBlue = alpha | (g_color_blue_d << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_color_green_d << 8);
+        unsigned rgba = alphaBlueGreen | g_color_red_c;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned blue = (D_L16_001B0CEC << 16);
-        unsigned blueGreen = blue | (D_L16_001B0CE8 << 8);
-        unsigned rgb = blueGreen | D_L16_001B0CE4;
+        unsigned blue = (g_color_blue_d << 16);
+        unsigned blueGreen = blue | (g_color_green_d << 8);
+        unsigned rgb = blueGreen | g_color_red_d;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L16_001B0C80);
+    vec_scale_to_length(side, side, g_billboard_side_length_b);
     vec_scale_to_length(nearPoint, state, -0.1f);
     FastVecAdd(nearPoint, position, nearPoint);
     FastVecAdd(packet.v[0], nearPoint, side);
@@ -187,12 +187,12 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     draw_world_quad(&packet, 0, 0);
     packet.color[0] = packet.color[1] = 0x40FFFFFF;
     {
-        unsigned blue = (D_L16_001B0CDC << 16);
-        unsigned blueGreen = blue | (D_L16_001B0CD8 << 8);
-        unsigned rgb = blueGreen | D_L16_001B0CD4;
+        unsigned blue = (g_color_blue_c << 16);
+        unsigned blueGreen = blue | (g_color_green_c << 8);
+        unsigned rgb = blueGreen | g_color_red_c;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L16_001B0C7C);
+    vec_scale_to_length(side, side, g_billboard_side_length_a);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     vec_scale_to_length(beamStep, state, -0.6f);
@@ -202,5 +202,5 @@ void DrawLayeredBeam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     random = math_random_angle();
-    gfx_draw_billboard_quad(position, D_L16_001B0C98, D_L16_001B0CB0, 1, D_L16_001B0C8C, 0.08f, random);
+    gfx_draw_billboard_quad(position, g_billboard_color_a, g_billboard_color_b, 1, g_billboard_size, 0.08f, random);
 }

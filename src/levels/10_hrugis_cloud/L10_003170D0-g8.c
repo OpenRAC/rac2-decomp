@@ -1,28 +1,28 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern s32 D_L10_001B0F44 __attribute__((sda));
-extern s32 D_L10_001B0F48 __attribute__((sda));
+extern s32 g_boss_flag_a __attribute__((sda));
+extern s32 g_boss_flag_b __attribute__((sda));
 
 /* Returns the first boss flag and clears it, so each event is seen only once. */
 s32 hrugis_take_boss_flag_a(void) {
-    s32 value = D_L10_001B0F44;
-    D_L10_001B0F44 = 0;
+    s32 value = g_boss_flag_a;
+    g_boss_flag_a = 0;
     return value;
 }
 
 /* Returns the second boss flag and clears it, so each event is seen only once. */
 s32 hrugis_take_boss_flag_b(void) {
-    s32 value = D_L10_001B0F48;
-    D_L10_001B0F48 = 0;
+    s32 value = g_boss_flag_b;
+    g_boss_flag_b = 0;
     return value;
 }
 
-extern s32 D_L10_001B0F44 __attribute__((sda));
-extern s32 D_L10_001B0F48 __attribute__((sda));
-extern u8 D_L10_00265BA0[];
-extern u8 *D_L10_001FB1E0[];
-extern u8 *D_001B251C;
+extern s32 g_boss_flag_a __attribute__((sda));
+extern s32 g_boss_flag_b __attribute__((sda));
+extern u8 g_group_state_buffer[];
+extern u8 *g_group_moby_id_lists[];
+extern u8 *g_moby_pool_base;
 
 /* Clears the arena's 128 records of 0x60 bytes and then walks the entry's two-byte
    id list, flagging every live object of one class. */
@@ -33,20 +33,20 @@ void hrugis_init_group_states(u8 *group) {
     u16 *id_ptr;
     u8 *moby;
 
-    D_L10_001B0F44 = 0;
-    clear_ptr = (s32 *)D_L10_00265BA0;
-    D_L10_001B0F48 = 0;
+    g_boss_flag_a = 0;
+    clear_ptr = (s32 *)g_group_state_buffer;
+    g_boss_flag_b = 0;
     clear_ptr = (s32 *)((u8 *)clear_ptr + 0x2FE0);
     for (i = 0x7F; i >= 0; i--) {
         *clear_ptr = 0;
         clear_ptr -= 0x18;
     }
-    id_list = D_L10_001FB1E0[group[0x21]];
+    id_list = g_group_moby_id_lists[group[0x21]];
     if (id_list == 0)
         return;
     id_ptr = (u16 *)id_list;
     do {
-        moby = D_001B251C + ((*id_ptr & 0x7FFF) << 8);
+        moby = g_moby_pool_base + ((*id_ptr & 0x7FFF) << 8);
         moby[0x20] = 1;
         if ((s16)*id_ptr < 0)
             break;
@@ -67,12 +67,12 @@ void hrugis_release_group_effects(u8 *group) {
     u8 *id_list;
     u32 child_vars;
 
-    id_list = D_L10_001FB1E0[group[0x21]];
+    id_list = g_group_moby_id_lists[group[0x21]];
     if (id_list == 0)
         return;
     id_ptr = (u16 *)id_list;
     do {
-        moby = D_001B251C + ((*id_ptr & 0x7FFF) << 8);
+        moby = g_moby_pool_base + ((*id_ptr & 0x7FFF) << 8);
         vars = *(u8 **)(moby + 0x68);
         if (*(u8 **)(vars + 0x2C4) != 0) {
             func_0032BD98((s32)*(u8 **)(vars + 0x2C4), vars + 0x370);
@@ -114,11 +114,11 @@ typedef struct {
     u8 tail[16];
 } RewardSlot;
 
-extern s32 D_L10_001B13A0 __attribute__((sda));  /* the selected kind, -2 for none */
+extern s32 g_selected_mission_kind __attribute__((sda));  /* the selected kind, -2 for none */
 extern s32 g_mission_initialized __attribute__((sda));
-extern s32 D_L10_001B1438 __attribute__((sda));  /* set while a kind is being chosen */
-extern MissionState D_L10_00221CD0;
-extern RewardSlot D_L10_002A3C70[];
+extern s32 g_kind_choosing_flag __attribute__((sda));  /* set while a kind is being chosen */
+extern MissionState g_mission_state;
+extern RewardSlot g_reward_slot_table[];
 
 extern s32 table_find_last_used_entry(s32 kind);
 extern void entry_init_all_registered(void);
@@ -130,17 +130,17 @@ extern void level_clear_object_records(void);
 void hrugis_reset_mission_state(void *object) {
     s32 slot;
 
-    D_L10_001B13A0 = -2;
-    D_L10_001B1438 = 1;
-    D_L10_00221CD0.waiting = 1;
-    D_L10_00221CD0.f28 = 100;
+    g_selected_mission_kind = -2;
+    g_kind_choosing_flag = 1;
+    g_mission_state.waiting = 1;
+    g_mission_state.f28 = 100;
     g_mission_initialized = 0;
-    D_L10_00221CD0.rounds = 0;
+    g_mission_state.rounds = 0;
     slot = table_find_last_used_entry(6);
-    D_L10_002A3C70[slot].value = D_L10_002A3C70[slot].limit;
+    g_reward_slot_table[slot].value = g_reward_slot_table[slot].limit;
     entry_init_all_registered();
-    D_L10_00221CD0.f30 = 8.0f;
-    D_L10_00221CD0.f10 = 0;
+    g_mission_state.f30 = 8.0f;
+    g_mission_state.f10 = 0;
     hero_set_state_value_b(0);
     table_reset_working_values();
     level_clear_object_records();

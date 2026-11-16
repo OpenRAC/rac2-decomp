@@ -4,7 +4,7 @@
  * two moby lists and a table) within range, and records it in the aim block. */
 #include "common.h"
 
-extern int D_001A8CA0 __attribute__((sda));
+extern int g_ground_check_inhibit __attribute__((sda));
 extern int weapon_is_target_in_range(char *p, char *q, float f12, float f13);
 extern float weapon_rate_aim_target(char *object, char *target);
 
@@ -28,11 +28,11 @@ typedef struct {
 
 extern Player_2B3BA8 g_hero_state;
 extern int g_current_game_mode __attribute__((sda));
-extern short D_001B1CB0[2] __attribute__((sda));
-extern short D_001B1CF0[2] __attribute__((sda));
-extern char *D_001B1B5C __attribute__((sda));
-extern int D_001A8CD4 __attribute__((sda));
-extern char *D_001C13E8[];
+extern short g_projectile_moby_index_list[2] __attribute__((sda));
+extern short g_explosion_moby_index_list[2] __attribute__((sda));
+extern char *g_moby_pool_start __attribute__((sda));
+extern int g_aim_target_count __attribute__((sda));
+extern char *g_weapon_target_candidates_2[];
 extern char *weapon_pick_best_linked_target(char *, int, int *);
 extern float *moby_get_private_value_0(char *);
 extern void vec_add_transformed_point(char *, char *, float, float, float);
@@ -77,7 +77,7 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
                 qcopy(&aim->position, mob + 0x10);
                 info = moby_get_private_value_0(mob);
                 if (info != 0) {
-                    if (D_001A8CA0 == 0)
+                    if (g_ground_check_inhibit == 0)
                         *(float *)((char *)aim + 8) += info[4];
                     else
                         vec_add_transformed_point(mob, (char *)aim, 0.0f, 0.0f, info[4]);
@@ -98,8 +98,8 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
                 best_kind = 1;
             }
         }
-        for (i = 1; i <= D_001B1CB0[0]; i++) {
-            mob = D_001B1B5C + (D_001B1CB0[i] << 8);
+        for (i = 1; i <= g_projectile_moby_index_list[0]; i++) {
+            mob = g_moby_pool_start + (g_projectile_moby_index_list[i] << 8);
             if (mob != 0 && *(short *)(mob + 0xAA) == MOBY_CLASS_DECOY
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
@@ -113,8 +113,8 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
                 }
             }
         }
-        for (i = 0; i < D_001A8CD4; i++) {
-            mob = D_001C13E8[i];
+        for (i = 0; i < g_aim_target_count; i++) {
+            mob = g_weapon_target_candidates_2[i];
             if (weapon_is_target_in_range(mob, (char *)origin, range, height)) {
                 float distance = weapon_rate_aim_target(self, mob);
                 if (distance < best_distance) {
@@ -124,8 +124,8 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
                 }
             }
         }
-        for (i = 1; i <= D_001B1CF0[0]; i++) {
-            mob = D_001B1B5C + (D_001B1CF0[i] << 8);
+        for (i = 1; i <= g_explosion_moby_index_list[0]; i++) {
+            mob = g_moby_pool_start + (g_explosion_moby_index_list[i] << 8);
             if (mob != 0 && *(short *)(mob + 0xAA) == MOBY_CLASS_DARK_SHEEP
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
@@ -149,7 +149,7 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
                 qcopy(&aim->position, best + 0x10);
                 info = moby_get_private_value_0(best);
                 if (info != 0) {
-                    if (D_001A8CA0 != 0)
+                    if (g_ground_check_inhibit != 0)
                         vec_add_transformed_point(best, (char *)aim, 0.0f, 0.0f, info[4]);
                     else
                         *(float *)((char *)aim + 8) += info[4];

@@ -29,7 +29,7 @@ typedef struct { char pad00[4]; unsigned char color; char pad05[0x37]; unsigned 
 extern ListState g_vendor_menu_state;
 extern unsigned char g_item_slot_to_record[];
 extern IconInfo g_weapon_table[];
-extern float D_001B2280[] MACRO_ADDR;
+extern float g_pal_aspect_scale[] MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR, g_screen_height MACRO_ADDR;
 extern void gfx_set_scissor_clamped(int,int,int,int);
@@ -40,25 +40,25 @@ extern unsigned int ui_get_item_color(int);
 extern void hud_draw_sprite_gradient(int,int,int,int,int,unsigned int *);
 extern char *GetLocalizedString(int);
 extern int text_measure_width_small_scaled(char *,int,float);
-static __inline__ int screen_y(int y) { int result = (int)((float)y * D_001B2280[0] + 0.5f); if (g_is_pal_video) result += 4; return result; }
-extern int D_001AD39C MACRO_ADDR;
-extern int D_001AD394 MACRO_ADDR;
-extern int D_001AD3A4 MACRO_ADDR;
-extern int D_001AD3AC MACRO_ADDR;
-extern int D_001AD3A8 MACRO_ADDR;
-extern int D_001AD3CC MACRO_ADDR;
-extern int D_001AD398 __attribute__((sda));
-extern int D_001AD390 __attribute__((sda));
-extern int D_001AD3A0 __attribute__((sda));
-extern int D_001AD3B0 __attribute__((sda));
-extern int D_001AD3B4 __attribute__((sda));
-extern int D_001AD3B8 __attribute__((sda));
-extern int D_001AD3C0 __attribute__((sda));
-extern int D_001AD3C8 __attribute__((sda));
-extern int D_001AD3BC __attribute__((sda));
+static __inline__ int screen_y(int y) { int result = (int)((float)y * g_pal_aspect_scale[0] + 0.5f); if (g_is_pal_video) result += 4; return result; }
+extern int g_ammo_scissor_height MACRO_ADDR;
+extern int g_ammo_scissor_y MACRO_ADDR;
+extern int g_ammo_frame_top_pad MACRO_ADDR;
+extern int g_ammo_frame_height_pad MACRO_ADDR;
+extern int g_ammo_frame_width_pad MACRO_ADDR;
+extern int g_ammo_icon_extra_x MACRO_ADDR;
+extern int g_ammo_scissor_width __attribute__((sda));
+extern int g_ammo_scissor_x __attribute__((sda));
+extern int g_ammo_frame_left_pad __attribute__((sda));
+extern int g_ammo_icon_base_y __attribute__((sda));
+extern int g_ammo_icon_offset_x __attribute__((sda));
+extern int g_ammo_icon_size __attribute__((sda));
+extern int g_ammo_icon_scale __attribute__((sda));
+extern int g_ammo_icon_base_x __attribute__((sda));
+extern int g_ammo_icon_extra_y __attribute__((sda));
 static __inline__ void draw_icon(int tex, int x, int y, int size, unsigned int *colors)
 {
-    hud_draw_sprite_gradient(tex, x, screen_y(y), size, (int)((float)size * D_001B2280[0] + 0.5f), colors);
+    hud_draw_sprite_gradient(tex, x, screen_y(y), size, (int)((float)size * g_pal_aspect_scale[0] + 0.5f), colors);
 }
 
 /* Draws the scrolling row of ammo icons in the vendor menu, each with its overlay pictures and
@@ -71,17 +71,17 @@ void DrawAmmoSelectList(void)
     unsigned int color, colors[4];
     char *text;
     double distance;
-    gfx_set_scissor_clamped(D_001AD390,D_001AD394,(int)((float)D_001AD398 * D_001B2280[0]+0.5f),screen_y(D_001AD39C));
+    gfx_set_scissor_clamped(g_ammo_scissor_x,g_ammo_scissor_y,(int)((float)g_ammo_scissor_width * g_pal_aspect_scale[0]+0.5f),screen_y(g_ammo_scissor_height));
     if (g_vendor_menu_state.scroll < 0) g_vendor_menu_state.scroll += 4;
     else if (g_vendor_menu_state.scroll > 0) g_vendor_menu_state.scroll -= 4;
     i = -5;
     frame_left = 233;
     inset = 4;
     pulse = ((subtract_integer_with_clamp(((g_vendor_menu_state.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    DrawFramebufferRect(frame_left-(D_001AD3A0+inset),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),g_screen_width,g_screen_height,
+    DrawFramebufferRect(frame_left-(g_ammo_frame_left_pad+inset),screen_y(325-g_ammo_frame_top_pad),g_ammo_frame_width_pad+285,screen_y(g_ammo_frame_height_pad+381),g_screen_width,g_screen_height,
         pulse);
     inset = 2;
-    DrawFramebufferRect(frame_left-(D_001AD3A0+inset),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),g_screen_width,g_screen_height,0x80442d00);
+    DrawFramebufferRect(frame_left-(g_ammo_frame_left_pad+inset),screen_y(327-g_ammo_frame_top_pad),g_ammo_frame_width_pad+283,screen_y(g_ammo_frame_height_pad+379),g_screen_width,g_screen_height,0x80442d00);
     y = g_vendor_menu_state.scroll - 47;
     do {
         index = i + g_vendor_menu_state.selected;
@@ -106,11 +106,11 @@ void DrawAmmoSelectList(void)
             alpha0 <<= 24;
             colors[3] = colors[1] = alpha1|color;
             colors[2] = colors[0] = alpha0|color;
-            x = y+(D_001AD3B4+inset);
-            draw_icon(icon,x+D_001AD3C8,D_001AD3B0+D_001AD3CC,D_001AD3C0,colors);
-            draw_icon(overlay,y+(D_001AD3B4+inset),D_001AD3B0-D_001AD3B8,D_001AD3B8,colors);
+            x = y+(g_ammo_icon_offset_x+inset);
+            draw_icon(icon,x+g_ammo_icon_base_x,g_ammo_icon_base_y+g_ammo_icon_extra_x,g_ammo_icon_scale,colors);
+            draw_icon(overlay,y+(g_ammo_icon_offset_x+inset),g_ammo_icon_base_y-g_ammo_icon_size,g_ammo_icon_size,colors);
             icon = GetIconFrame(0xeaa3,3);
-            draw_icon(icon,y+(D_001AD3B4+inset),(D_001AD3B0-D_001AD3B8)+D_001AD3BC,D_001AD3B8,colors);
+            draw_icon(icon,y+(g_ammo_icon_offset_x+inset),(g_ammo_icon_base_y-g_ammo_icon_size)+g_ammo_icon_extra_y,g_ammo_icon_size,colors);
         }
         i++;
         y += 56;

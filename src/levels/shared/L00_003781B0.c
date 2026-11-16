@@ -3,7 +3,7 @@
 
 /* Draw purchase/back labels according to the selected 12-byte record and funds. */
 extern int g_purchase_menu_model[];
-extern float D_L00_001B25E0 __attribute__((sda));
+extern float g_menu_slide_scale __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
 extern char *GetLocalizedString(int id);
 extern void text_draw_medium(int sprite, int x, unsigned long color, int id, int y);

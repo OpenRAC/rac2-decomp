@@ -6,7 +6,7 @@ extern void vec_random_direction(char *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern char *func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
 extern void moby_mark_spawned(char *);
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 
 void func_PAL_L11_0044EDC0(char *self, TI128 *pos) {
     char *state = *(char **)(self + 0x68);
@@ -16,9 +16,9 @@ void func_PAL_L11_0044EDC0(char *self, TI128 *pos) {
     *(TI128 *)copy = *pos;
     if (*(unsigned char *)(self + 0x31) != 0) {
         vec_random_direction((char *)vec, 0.120000005f, 0.20000002f);
-        FastVecAdd(vec, vec, D_L02_001A8F20);
+        FastVecAdd(vec, vec, g_zero_l02_vector);
         func_PAL_L02_0032D5F8(self, 0x9D8, *(char **)(state + 0x354) + 0x10, *(char **)(state + 0x354) + 0xF0,
-                    0, 0, vec, D_L02_001A8F20, D_L02_001A8F20, 0.004f);
+                    0, 0, vec, g_zero_l02_vector, g_zero_l02_vector, 0.004f);
     }
     moby_mark_spawned(*(char **)(state + 0x354));
     *(char **)(state + 0x354) = 0;
@@ -30,7 +30,7 @@ extern void func_PAL_002A7E68(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
-extern int func_PAL_002B3F18(char *, char *, char *);
+extern int part_spawn_damage_debris_pal(char *, char *, char *);
 extern int moby_spawn_linked(char *, int, float, float);
 extern void get_moby_color(char *, int *, int *, int *);
 extern u16 *g_group_id_lists[];
@@ -71,7 +71,7 @@ void func_PAL_L11_0044F150(char *object, int mode, int active) {
     security_robot_spawn_held_item(object);
     *(short *)(state + 0x36C) = mode;
     *(int *)(state + 0x200) = 0;
-    func_PAL_002B3F18(object, state + 0x1F0, state + 0x20);
+    part_spawn_damage_debris_pal(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
         set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),

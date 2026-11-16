@@ -10,18 +10,18 @@ typedef union { EQ q; float f[4]; } EVec;
 #define EH(p,o) (*(s16 *)((char *)(p)+(o)))
 #define EI(p,o) (*(s32 *)((char *)(p)+(o)))
 #define EF(p,o) (*(float *)((char *)(p)+(o)))
-extern char *D_L04_001B25CC;
-extern EVec D_L04_0023BDD0[];
-extern u8 D_L04_0023D090[];
-extern s16 D_L04_0023D860[];
-extern float D_L04_001AF3E0 __attribute__((sda));
-extern int D_L04_001AF3BC __attribute__((sda));
-extern int D_L04_001AF3C0 __attribute__((sda));
-extern int D_L04_001AF3C4 __attribute__((sda));
-extern int D_L04_001AF3C8 __attribute__((sda));
-extern float D_L04_001AF3B4 __attribute__((sda));
-extern float D_L04_001AF3B8 __attribute__((sda));
-extern char D_L04_001B9680[];
+extern char *g_linked_record_table;
+extern EVec g_particle_positions[];
+extern u8 g_particle_mirror_flags[];
+extern s16 g_particle_fade_in_timers[];
+extern float g_spark_bound_radius __attribute__((sda));
+extern int g_spark_particle_count __attribute__((sda));
+extern int g_spark_kind_min __attribute__((sda));
+extern int g_spark_kind_max __attribute__((sda));
+extern int g_spark_color_rgb __attribute__((sda));
+extern float g_spark_particle_param_a __attribute__((sda));
+extern float g_spark_particle_param_b __attribute__((sda));
+extern char g_tether_zero_vec[];
 extern float FastVecLength(void *);
 extern int math_fast_helper_a(void *,float);
 extern float vec_distance_xy(void *,void *);
@@ -48,37 +48,37 @@ void func_PAL_L04_003C7130(char *self) {
     case 0:
         EB(self,0x20)=1; EB(self,0x30)=255;
         if (((EmitterView *)state)->matrix==-1) { moby_mark_spawned(self); return; }
-        ((EmitterView *)state)->radius=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x10);
-        r=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128);
+        ((EmitterView *)state)->radius=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128+0x10);
+        r=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128);
         if (((EmitterView *)state)->radius<r) ((EmitterView *)state)->radius=r;
         EF(state,0x44)=EH(state,0x40) ? ((EmitterView *)state)->radius : 3.0f;
-        EF(state,0x50)=FastVecLength(D_L04_001B25CC+((EmitterView *)state)->matrix*128+0x20)*0.5f;
+        EF(state,0x50)=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128+0x20)*0.5f;
         EH(state,0)=math_add_to_running_total(EH(state,2)+EH(state,0x40));
         end=EH(state,0)+EH(state,2);
         for(i=EH(state,0);i<end;i++) {
-            D_L04_0023D090[i]=math_random_int_below(2);
-            D_L04_0023BDD0[i].f[3]=1.0f;
+            g_particle_mirror_flags[i]=math_random_int_below(2);
+            g_particle_positions[i].f[3]=1.0f;
             part_init_from_ranges(self,i);
-            D_L04_0023D860[i]=0;
+            g_particle_fade_in_timers[i]=0;
         }
         { int start=end; end+=EH(state,0x40);
         for(i=start;i<end;i++) {
-            D_L04_0023D090[i]=math_random_int_below(2);
-            D_L04_0023BDD0[i].f[3]=1.0f;
+            g_particle_mirror_flags[i]=math_random_int_below(2);
+            g_particle_positions[i].f[3]=1.0f;
             part_init_simple(self,i);
         }
         }
-        EF(D_L04_001B25CC+((EmitterView *)state)->matrix*128,0x3C)=1.0f;
+        EF(g_linked_record_table+((EmitterView *)state)->matrix*128,0x3C)=1.0f;
         EI(state,0x38)=(EB(state,0x3E)<<16)|(EB(state,0x3D)<<8)|EB(state,0x3C);
         break;
     case 1: {
         int j;
-        matrix=D_L04_001B25CC+((EmitterView *)state)->matrix*128;
+        matrix=g_linked_record_table+((EmitterView *)state)->matrix*128;
         qcopy(&bound,matrix+0x30);
         bound.f[2]+=9.0f; bound.f[3]=10.0f;
-        if (math_fast_helper_a(&bound,D_L04_001AF3E0)<0) return;
-        if (EH(state,0x42) && vec_distance_xy(D_L04_001B9680,self+0x10)<128.0f) {
-            for(j=0;j<D_L04_001AF3BC;j++) {
+        if (math_fast_helper_a(&bound,g_spark_bound_radius)<0) return;
+        if (EH(state,0x42) && vec_distance_xy(g_tether_zero_vec,self+0x10)<128.0f) {
+            for(j=0;j<g_spark_particle_count;j++) {
                 velocity.f[0]=math_random_signed_float_range(0.0f,1.0f);
                 velocity.f[1]=math_random_signed_float_range(0.0f,1.0f);
                 velocity.f[2]=1.0f; velocity.f[3]=1.0f;
@@ -88,9 +88,9 @@ void func_PAL_L04_003C7130(char *self) {
                 velocity.f[1]=math_random_signed_float_range(0.0f,0.0050000004f);
                 velocity.f[2]=EF(state,0x20)*0.020000001f;
                 size=math_random_float_range(EF(state,0x24),EF(state,0x28));
-                color=(math_random_int_range(EH(state,0x2C),EH(state,0x2E))<<24)|D_L04_001AF3C8;
-                kind=math_random_int_range(D_L04_001AF3C0,D_L04_001AF3C4);
-                particle=func_PAL_002BE9A8(D_L04_001AF3B4,&position,kind,1.0f,&velocity,D_L04_001AF3B8,color,size,0);
+                color=(math_random_int_range(EH(state,0x2C),EH(state,0x2E))<<24)|g_spark_color_rgb;
+                kind=math_random_int_range(g_spark_kind_min,g_spark_kind_max);
+                particle=func_PAL_002BE9A8(g_spark_particle_param_a,&position,kind,1.0f,&velocity,g_spark_particle_param_b,color,size,0);
                 if (particle) {
                     data=particle+0x20;
                     EH(particle,0xA)=((s32)math_random_int_range(EI(state,0x30),EI(state,0x34)) * 5 + 2) / 6;

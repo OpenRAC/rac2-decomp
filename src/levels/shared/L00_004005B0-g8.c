@@ -17,8 +17,8 @@ extern void vec_clear_128(char *a);
 extern int part_alloc_effect_slot(char *a, int b, float x, float y, float z);
 extern void func_002A0F48(char *a);
 extern float g_hero_state[];
-extern char *D_L00_001B0CA0 __attribute__((sda));
-extern int D_L00_001B2C28;
+extern char *g_global_object_data __attribute__((sda));
+extern int g_object_effect_slot;
 
 /* Looks the actor up, resets its two state fields, copies the two 16-byte vectors it was
    given, then sets the record's vector and flags. */
@@ -50,7 +50,7 @@ char *spider_bot_create(char *position, char *velocity)
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
 
         *(int *)(rec + 0x5C) = 0x7F000000;
-        D_L00_001B0CA0 = obj;
+        g_global_object_data = obj;
         iv = slot_alloc_for_object(obj, 0);
         *(int *)(rec + 0x6C) = iv;
         *(int *)(rec + 0x70) = slot_alloc_for_object(obj, 4);
@@ -60,7 +60,7 @@ char *spider_bot_create(char *position, char *velocity)
         *(float *)(rec + 0x10) = 1.0f;
         *(TI128 *)(rec + 0x20) = *(TI128 *)(rec + 0x10);
 
-        D_L00_001B2C28 = part_alloc_effect_slot(obj, 0, 1.0f, 1.0f, 1.0f);
+        g_object_effect_slot = part_alloc_effect_slot(obj, 0, 1.0f, 1.0f, 1.0f);
         *(float *)(rec + 0x7C) = 1.75f;
         func_002A0F48(obj);
     }

@@ -15,7 +15,7 @@ extern void follower_start_random_push(char *object);
 
 extern void moby_reset_action_state(char *object);
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
 /* Initialises a spawned sub-object from the owner's fields and increments a shared counter, then runs three follow-up calls and conditionally two more. */
 void moby_init_spawned_sub_object(char *object, int flag)
@@ -42,13 +42,13 @@ void moby_init_spawned_sub_object(char *object, int flag)
     *(int *)(sub + 348) = 0;
     slotPtr = *(int ***)(object + 104);
     *(float *)*slotPtr = (float)*(int *)(sub + 328);
-    D_L05_00221D10[4] = D_L05_00221D10[4] + 1;
+    g_feltzin_challenge_state[4] = g_feltzin_challenge_state[4] + 1;
     moby_clear_links(object);
     follower_set_state(object, 1);
     moby_l05_set_state_value(object, 1);
     if (flag)
         follower_start_random_push(object);
-    if (D_L05_00221D10[13] == 1)
+    if (g_feltzin_challenge_state[13] == 1)
         moby_reset_action_state(object);
 }
 

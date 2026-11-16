@@ -4,7 +4,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_00189F70[];
+extern char g_hero_velocity[];
 extern char g_camera_eye_state[];
 
 extern void FastVecAdd(void *, void *, void *);
@@ -28,7 +28,7 @@ int func_PAL_00270FC0(char *a0, char *a1)
     if (w[3] == 1.0f && w[0] == 1.0f)
         return 1;
     t = math_cosine_blend(0.0f, 1.0f, w[3]);
-    FastVecAdd(a1 + 0x30, D_00189F70, a1 + 0x30);
+    FastVecAdd(a1 + 0x30, g_hero_velocity, a1 + 0x30);
     x = *(float *)(a1 + 0x30);
     y = *(float *)(a1 + 0x34);
     z = *(float *)(a1 + 0x38);

@@ -15,13 +15,13 @@ typedef int Quad __attribute__((mode(TI)));
 /* Two five-part windows share this ten-pointer table. */
 typedef struct { u8 prefix[0x358]; char *parts[10]; } PartState;
 extern char *g_mothership_boss_moby __attribute__((sda));
-extern int D_L23_001B1468 __attribute__((sda));
-extern int D_L23_001B1434 __attribute__((sda));
-extern char *D_L23_001B13D0 __attribute__((sda));
-extern float D_L23_001B16D0 __attribute__((sda));
-extern int D_L23_001B3720;
+extern int g_boss_phase_timer_base __attribute__((sda));
+extern int g_boss_damage_phase_started __attribute__((sda));
+extern char *g_mothership_moby __attribute__((sda));
+extern float g_boss_debris_speed __attribute__((sda));
+extern int g_boss_debris_countdown;
 /* PlayerStats. */
-extern u8 D_001A7A00[] __attribute__((sda));
+extern u8 g_player_stats[] __attribute__((sda));
 extern int game_is_either_mode_two(void);
 extern void SetDeathBits(char *, int, int);
 extern void mothership_destroy_parts(void);
@@ -46,44 +46,44 @@ void boss_update_damage_phases(char *object) {
     unsigned short timer;
     float scale;
     cursor.state = *(PartState **)(g_mothership_boss_moby + 0x68);
-    if (D_001A7A00[0xFD]) {
-        if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
+    if (g_player_stats[0xFD]) {
+        if (*(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 60) {
             SetDeathBits(object, 0, 3);
             mothership_destroy_parts();
             return;
         }
     } else {
-        if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 200 && !game_is_either_mode_two()) {
+        if (*(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 200 && !game_is_either_mode_two()) {
             SetDeathBits(object, 0, 3);
             mothership_destroy_parts();
             return;
         }
-        if (!D_001A7A00[0xFD] && *(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
+        if (!g_player_stats[0xFD] && *(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 60) {
             char *entryState;
-            if (!D_L23_001B13D0) return;
-            entryState = *(char **)(D_L23_001B13D0 + 0x68);
+            if (!g_mothership_moby) return;
+            entryState = *(char **)(g_mothership_moby + 0x68);
             entryState[13] = 1;
             entryState[8] = 0;
-            moby_set_flag_bit((unsigned char *)D_L23_001B13D0, 1);
-            D_L23_001B13D0 = 0;
+            moby_set_flag_bit((unsigned char *)g_mothership_moby, 1);
+            g_mothership_moby = 0;
             return;
         }
     }
-    if (D_L23_001B1434) {
+    if (g_boss_damage_phase_started) {
         int i;
         cursor.parts = cursor.state->parts + 5;
         for (i = 5; i < 10; i++, cursor.parts++) {
-            if (!D_L23_001B3720) {
+            if (!g_boss_debris_countdown) {
                 moby_mark_spawned(*cursor.parts);
                 *cursor.parts = 0;
                 *(unsigned short *)(object + 0x34) |= 0x41;
                 SpawnExplosion(object + 16, 1, 135, 120, 120, 115, 125, 1, 6.5f, 20.0f, 1, 1, 1, 0);
                 PlayMobySound(12, 0, object);
             } else if (*cursor.parts) {
-                int debrisIndex = 10 - D_L23_001B3720;
+                int debrisIndex = 10 - g_boss_debris_countdown;
                 moby_transform_joint_point(object, i - 4, (char *)local.matrix);
-                FastVecScale((char *)&local.velocity, (char *)&local.matrix[1], D_L23_001B16D0);
-                scale = math_random_float_range(0.0f, D_L23_001B16D0 * 0.5f);
+                FastVecScale((char *)&local.velocity, (char *)&local.matrix[1], g_boss_debris_speed);
+                scale = math_random_float_range(0.0f, g_boss_debris_speed * 0.5f);
                 FastVecScale((char *)&local.random, object + 0xE0, scale);
                 FastVecAdd((char *)&local.velocity, (char *)&local.velocity, (char *)&local.random);
                 {
@@ -93,11 +93,11 @@ void boss_update_damage_phases(char *object) {
                 }
             }
         }
-        D_L23_001B3720--;
+        g_boss_debris_countdown--;
         return;
     }
     timer = *(unsigned short *)(object + 0x96);
-    if ((D_L23_001B1468 << 1) / 3 < timer) {
+    if ((g_boss_phase_timer_base << 1) / 3 < timer) {
         int i;
         cursor.parts = cursor.state->parts;
         SpawnExplosion(object + 16, 1, 45, 30, 40, 25, 85, 1, 4.5f, 20.0f, 1, 1, 1, 0);
@@ -120,12 +120,12 @@ void boss_update_damage_phases(char *object) {
         }
         {
             int countdown = 10;
-            D_L23_001B1434 = 1;
-            D_L23_001B3720 = countdown;
+            g_boss_damage_phase_started = 1;
+            g_boss_debris_countdown = countdown;
         }
         return;
     }
-    if (D_L23_001B1468 / 3 < timer) {
+    if (g_boss_phase_timer_base / 3 < timer) {
         if (timer & 15) return;
         {
             int index = math_random_int_below(5);

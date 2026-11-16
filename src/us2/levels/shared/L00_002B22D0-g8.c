@@ -4,15 +4,15 @@
  * sets (as in PAL's func_PAL_L00_002B20F8, which also has 250 for 300). */
 #include "common.h"
 
-extern int D_L00_001A903C;
-extern int D_L00_001A7F8C __attribute__((sda));
-extern u8 D_001A7BE0;
-extern u8 D_001A7A60[] MACRO_ADDR;
-extern u8 D_001395B8[];
+extern int g_collection_progress_flag;
+extern int g_voice_line_cooldown __attribute__((sda));
+extern u8 g_progress_flag;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
+extern u8 g_game_flag_table[];
 extern int math_fast_float_d(char *);
 extern int save_count_nonzero_flags(void);
 extern int level_get_resident_byte(void);
-extern void func_US2_002B1880(int, int);
+extern void value_set_entry_by_index_us2(int, int);
 
 void func_US2_L00_002B22D0(void)
 {
@@ -21,28 +21,28 @@ void func_US2_L00_002B22D0(void)
     int flag;
     u8 *state;
 
-    if (D_L00_001A903C == 0)
+    if (g_collection_progress_flag == 0)
         return;
-    if (math_fast_float_d((char *)&D_L00_001A7F8C) == 0)
+    if (math_fast_float_d((char *)&g_voice_line_cooldown) == 0)
         return;
     count = save_count_nonzero_flags();
     selector = level_get_resident_byte();
-    flag = D_001A7BE0;
+    flag = g_progress_flag;
     if (flag != 0 || selector > 0) {
         if (count == 3 || count == 10 || count == 15 || count == 19 || count == 25 || count == 29)
-            func_US2_002B1880(0x1b90, -1);
+            value_set_entry_by_index_us2(0x1b90, -1);
         else if (count == 18 || count == 26)
-            func_US2_002B1880(0x1b91, -1);
+            value_set_entry_by_index_us2(0x1b91, -1);
     }
     if (count == 7 || count == 20 || count == 30)
-        func_US2_002B1880(0x1b93, -1);
-    state = D_001395B8;
+        value_set_entry_by_index_us2(0x1b93, -1);
+    state = g_game_flag_table;
     if (state[0xAB] == 0) {
-        if (D_001A7A60[0] != 0) {
-            func_US2_002B1880(0x1b93, -1);
+        if (g_item_enabled_flags[0] != 0) {
+            value_set_entry_by_index_us2(0x1b93, -1);
             state[0xAB] = 1;
         }
     }
-    D_L00_001A903C = 0;
-    D_L00_001A7F8C = 300;
+    g_collection_progress_flag = 0;
+    g_voice_line_cooldown = 300;
 }

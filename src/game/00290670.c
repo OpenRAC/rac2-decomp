@@ -39,16 +39,16 @@ void hud_update_letterbox_bars(void)
         gfx_set_clear_color_packet(0, 0, 0, bar_height);
 }
 
-extern int D_001A901C __attribute__((sda));
+extern int g_hud_flag_a __attribute__((sda));
 
 /* Clears a HUD flag. */
 void hud_clear_flag_a(void) {
-    D_001A901C = 0;
+    g_hud_flag_a = 0;
 }
 
-extern int D_001A9020 __attribute__((sda));
+extern int g_hud_flag_b __attribute__((sda));
 
 /* Clears a second HUD flag. */
 void hud_clear_flag_b(void) {
-    D_001A9020 = 0;
+    g_hud_flag_b = 0;
 }

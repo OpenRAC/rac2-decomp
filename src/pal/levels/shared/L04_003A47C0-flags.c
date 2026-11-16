@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern unsigned char D_001A7A33 MACRO_ADDR;
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern unsigned char g_contact_hit_flag MACRO_ADDR;
 extern unsigned char g_bolt_multiplier MACRO_ADDR;
 typedef struct {
     u8 pad00[0x7A8];
@@ -18,7 +18,7 @@ extern void func_002FD1B8_ripple(void *, int, int, float, float, float, float) _
 extern int point_in_path_xy(void *, void *, int);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
-extern char D_L04_001ADA00[];
+extern char g_str_water_controller_fmt[];
 extern char *g_route_path_table[];
 #define WBYTE(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define WSHORT(p,o) (*(short *)((char *)(p)+(o)))
@@ -29,8 +29,8 @@ extern u32 FastDecTimer(u8 *);
 extern int FloatToInt(float);
 extern float FastVecDot(void *, void *);
 extern float math_fast_sin_or_cos_a(float);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
 extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 typedef struct {
@@ -58,47 +58,47 @@ extern u8 *ref_L04_00358868_00[];
 extern s32 FloatToInt(f32);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
-extern f32 D_002A7A40[];
-extern f32 D_002A7BC0[];
-extern s32 D_002A7D90[];
+extern f32 g_water_texture_coords[];
+extern f32 g_water_base_texture_coords[];
+extern s32 g_water_scroll_flags[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
 extern u32 FastDecTimer(u8 *ptr);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
 /* Toggle the water controller, animate its height, and disturb its ripple tiles. */
-void func_PAL_L04_003A49E0(char *self) {
+void water_update_controller_pal(char *self) {
     char *state = WPTR(WPTR(self, 0x28), 0x68);
     float x, y, half, r;
 
     if (WBYTE(WPTR(self, 0x28), 0xBC) >= WBYTE(state, 0x15)) {
-        STUB_printf(D_L04_001ADA00, WSHORT(WPTR(self, 0x28), 0xB2),
+        STUB_printf(g_str_water_controller_fmt, WSHORT(WPTR(self, 0x28), 0xB2),
                       WSHORT(WPTR(self, 0x28), 0xAA), WBYTE(WPTR(self, 0x28), 0xBC),
                       WBYTE(state, 0x15));
         WBYTE(WPTR(self, 0x28), 0x20) = 2;

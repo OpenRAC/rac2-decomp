@@ -9,7 +9,7 @@ extern char g_hero_position[];
 
 extern int FastTweenColor(int,int,float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern unsigned char *D_001F25F4, *D_001F26A8;
+extern unsigned char *g_part_tex_drifting, *g_part_tex_spark_trail_table;
 extern int moby_forward_two_values_and_amount(int, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
@@ -102,7 +102,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned char *D_001F25F4;
+extern unsigned char *g_part_tex_drifting;
 
 void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color);
 

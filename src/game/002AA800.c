@@ -556,7 +556,7 @@ void vec_add_random_offset(float *vector, float scale)
     vector[2] = vector[2] + math_random_float_range(negative, scale);
 }
 
-extern char *D_001B1C4C __attribute__((sda));
+extern char *g_vec_record_table __attribute__((sda));
 extern void matrix_mul_vec3(char *, char *, char *);
 
 int IsPointInCuboid(void *point, int index)
@@ -566,7 +566,7 @@ int IsPointInCuboid(void *point, int index)
     char *record;
 
     if (index != -1) {
-        record = D_001B1C4C + (index << 7);
+        record = g_vec_record_table + (index << 7);
         FastVecSub(local, point, record + 0x30);
         local[3] = 0.0f;
         matrix_mul_vec3((char *)transformed, (char *)local, record + 0x40);
@@ -579,7 +579,7 @@ int IsPointInCuboid(void *point, int index)
 }
 
 
-extern char *D_001B1C54 __attribute__((sda));
+extern char *g_follower_tuning_table __attribute__((sda));
 
 /* Transforms a point by the record of its index and returns whether the result lies inside the unit sphere. */
 int coll_is_point_inside_unit_sphere(void *point, int index)
@@ -591,7 +591,7 @@ int coll_is_point_inside_unit_sphere(void *point, int index)
     if (index < 0) {
         return 0;
     } else {
-        record = D_001B1C54 + (index << 7);
+        record = g_follower_tuning_table + (index << 7);
         FastVecSub(local, point, record + 0x30);
         local[3] = 0.0f;
         matrix_mul_vec3((char *)transformed, (char *)local, record + 0x40);
@@ -703,8 +703,8 @@ int moby_get_attachment_rotation_angles(char *unused, char *obj, char *arg2, cha
 
 /* func_002AD6F0 uses the quadword-copy profile in 002AA800-qcopy.c. */
 
-extern u8 D_001A7BC8[] __attribute__((sda));
-extern int D_00139948[];
+extern u8 g_map_visited_flags[] __attribute__((sda));
+extern int g_menu_entry_ids[];
 
 /* Sets the byte flag of `index` once and, for indices below 0x15 and index 24, appends it to
    the 28-entry list. The sum over the set flags is never read: flow deletes it after the
@@ -716,20 +716,20 @@ void moby_mark_flag_and_append_to_list(int index)
     int sum;
     int count;
 
-    if (D_001A7BC8[index] != 0)
+    if (g_map_visited_flags[index] != 0)
         return;
     sum = 0;
     for (j = 0; j < 28; j++)
-        if (D_001A7BC8[j] != 0)
+        if (g_map_visited_flags[j] != 0)
             sum += j;
-    D_001A7BC8[index] = 1;
+    g_map_visited_flags[index] = 1;
     if (index >= 0x15 && index != 24)
         return;
     count = 0;
     for (i = 0; i < 28; i++)
-        if (D_00139948[i] != 0)
+        if (g_menu_entry_ids[i] != 0)
             count++;
-    D_00139948[count] = index;
+    g_menu_entry_ids[count] = index;
 }
 
 /* func_002AD860 is in 002AD860.c. */
@@ -938,7 +938,7 @@ void vec_build_spherical_offset(float *p, float a, float b, float c)
 
 typedef struct { int items[21]; } Table_002AF0A8;
 
-extern const Table_002AF0A8 D_0026CB30;
+extern const Table_002AF0A8 g_snd_indexed_table;
 
 extern void value_set_entry_by_index(int, int);
 
@@ -948,7 +948,7 @@ extern int ForceClaimNotice(int, int, int);
    other player. */
 void snd_play_indexed(int index)
 {
-    Table_002AF0A8 table = D_0026CB30;
+    Table_002AF0A8 table = g_snd_indexed_table;
 
     if (index < 0)
         index = 0;

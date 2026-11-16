@@ -10,11 +10,11 @@ extern void object_init_derived_arrays (s32_Fee27d7bc, const void *, s32_Fee27d7
 extern int *func_00335E20_2 (s32_Fee27d7bc);
 extern void object_set_helper_result (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
 extern void popup_init_texts_hidden (s32_Fee27d7bc);
-extern char D_L04_001ADF08[];
-extern s32_Fee27d7bc D_L04_001A904C;
-extern s32_Fee27d7bc D_L04_001ADEF8 __attribute__ ((sda));
+extern char g_popup_derived_arrays[];
+extern s32_Fee27d7bc g_popup_resource_table;
+extern s32_Fee27d7bc g_popup_layout_data __attribute__ ((sda));
 
-void func_US2_0033A678 (s32_Fee27d7bc self, s32_Fee27d7bc arg)
+void popup_init_us2 (s32_Fee27d7bc self, s32_Fee27d7bc arg)
 {
   s32_Fee27d7bc p;
   *(s32_Fee27d7bc *) self = arg;
@@ -30,27 +30,27 @@ void func_US2_0033A678 (s32_Fee27d7bc self, s32_Fee27d7bc arg)
   ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 804))[0] = 256.0f;
   ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 804))[1] = 212.0f;
   *(s32_Fee27d7bc *) (self + 808) = 0;
-  func_0033ABD8_2 (self + 8, arg, &D_L04_001ADEF8);
+  func_0033ABD8_2 (self + 8, arg, &g_popup_layout_data);
   func_0033B030_2 (self + 8, 64.0f, -164.0f, 10.0f, 136.0f, 10.0f, 99.0f);
-  object_init_derived_arrays (self + 728, D_L04_001ADF08, arg);
+  object_init_derived_arrays (self + 728, g_popup_derived_arrays, arg);
   p = func_00335E20_2 (self + 728);
   *(s32_Fee27d7bc *) p = 0x70FFFEED;
-  object_set_helper_result (self + 728, D_L04_001A904C + 0x8710, 214);
+  object_set_helper_result (self + 728, g_popup_resource_table + 0x8710, 214);
   popup_init_texts_hidden (self);
   *(s32_Fee27d7bc *) (self + 816) = 0;
 }
 
-extern int D_00138344[4];
-extern int D_L04_001ADF14[4] __attribute__((sda));
-extern int D_L04_001ADF10 __attribute__((sda));
-extern int D_L04_001ADF18 __attribute__((sda));
+extern int g_menu_input_flags[4];
+extern int g_popup_label_y_offsets[4] __attribute__((sda));
+extern int g_popup_label_x_offset __attribute__((sda));
+extern int g_popup_row_spacing __attribute__((sda));
 extern void mem_store_two_floats_through_cell(char *, float, float);
 extern void prompt_bar_update(char *);
 extern int func_002A9588_1(int, int, int, int, int);
 extern void *object_get_fourth_field(char *);
 extern void func_00335E38_3(char *, float, float, float, float);
 
-int func_US2_0033A8F0(char *p)
+int popup_update_position_us2(char *p)
 {
     char *a = p + 8;
     char *b;
@@ -60,15 +60,15 @@ int func_US2_0033A8F0(char *p)
 
     mem_store_two_floats_through_cell(a, ((float *)(*(int *)(p + 804)))[0], ((float *)(*(int *)(p + 804)))[1]);
     prompt_bar_update(a);
-    if (D_00138344[0] & 0x5000)
+    if (g_menu_input_flags[0] & 0x5000)
         func_002A9588_1(0, 0, 1, 0, 1);
     b = p + 728;
     r = object_get_fourth_field(b);
     *(int *)r = func_002A9588_1(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    x = ((float *)(*(int *)(p + 804)))[0] + (float)D_L04_001ADF10;
+    x = ((float *)(*(int *)(p + 804)))[0] + (float)g_popup_label_x_offset;
     y = ((float *)(*(int *)(p + 804)))[1]
-        + (float)(*(int *)(p + 808) * D_L04_001ADF18);
-    y = y + (float)D_L04_001ADF14[0];
+        + (float)(*(int *)(p + 808) * g_popup_row_spacing);
+    y = y + (float)g_popup_label_y_offsets[0];
     func_00335E38_3(b, x, y, 0.0f, 0.0f);
     return 0;
 }

@@ -13,9 +13,9 @@ typedef struct {
     char reserved00[0x10];
     RotorVector position, direction;
 } RotorStatePrefix;
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern int g_frame_l00_counter MACRO_ADDR;
-extern RotorVector D_L00_001AF7C0[] MACRO_ADDR;
+extern RotorVector g_spinning_quad_rotors[] MACRO_ADDR;
 extern RotorVector D_L00_001AF7C0_gp[] SDATA(D_L00_001AF7C0) __attribute__((sda));
 extern float square_root(float);
 extern float mat_fast_helper_a(float, float);
@@ -27,7 +27,7 @@ extern void multiply_matrix(void *, void *, void *);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 
-void func_PAL_L00_003B0FB8(unsigned char *object)
+void gfx_draw_spinning_quad_pair_pal(unsigned char *object)
 {
     RotorQuad quad;
     RotorMatrix model, phaseMatrix;
@@ -35,7 +35,7 @@ void func_PAL_L00_003B0FB8(unsigned char *object)
     RotorStatePrefix *state = *(RotorStatePrefix **)(object + 0x68);
     int i;
     float one, minus;
-    if (D_L00_001A8F00 == 2)
+    if (g_game_l00_mode == 2)
         return;
     minus = -1.0f;
     one = 1.0f;
@@ -53,9 +53,9 @@ void func_PAL_L00_003B0FB8(unsigned char *object)
         phase = math_fast_float_g(IntToFloat(g_frame_l00_counter % 150) * 0.041795027f);
         if (side)
             phase = -phase;
-        D_L00_001AF7C0[0].y = phase;
-        D_L00_001AF7C0[0].z = 0.0f;
-        D_L00_001AF7C0[0].w = 0.0f;
+        g_spinning_quad_rotors[0].y = phase;
+        g_spinning_quad_rotors[0].z = 0.0f;
+        g_spinning_quad_rotors[0].w = 0.0f;
         euler_to_matrix(&phaseMatrix, &D_L00_001AF7C0_gp[0]);
         euler_to_matrix(&model, &angles);
         multiply_matrix(&model, &model, &phaseMatrix);

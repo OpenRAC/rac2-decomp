@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 extern int TryClaimNotice(int, int, int);
 
-void func_PAL_L02_00416108(u8 *a0) {
+void hud_show_message_for_state_pal(u8 *a0) {
     int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);
     int msg;
 

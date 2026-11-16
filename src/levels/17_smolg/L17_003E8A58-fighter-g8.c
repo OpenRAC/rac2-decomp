@@ -95,8 +95,8 @@ typedef struct FighterState {
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define U(p,o) (*(u8 *)((char *)(p)+(o)))
 extern char *g_moby_l17_pool;
-extern float D_L17_001B0E40 __attribute__((sda)),D_L17_001B0F38 __attribute__((sda)),D_L17_001B0E48 __attribute__((sda));
-extern char D_L17_001B9BC0[];
+extern float g_snapper_init_value __attribute__((sda)),g_snapper_float_param_c __attribute__((sda)),g_snapper_init_value_b __attribute__((sda));
+extern char g_tether_origin_pos[];
 extern int FloatToInt(float);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *,int,int);
@@ -134,7 +134,7 @@ void snapper_init_state_check_hits(char *object)
         index=state->f6B8;
         if((unsigned)(index+1)>=2) F(object,0x18)=F(g_moby_l17_pool+index*256,0x18)+1.4f;
         state->f6C0.q=*(Q *)(object+0x10);
-        state->f110=D_L17_001B0E40;
+        state->f110=g_snapper_init_value;
         state->f6C0.f[3]=F(object,0xf8);state->f6E8=0;state->f6EC=0;
 t=15.0f;state->f48=FloatToInt(t);state->f4A=FloatToInt(12.8f);
 /*BEGIN*/
@@ -155,8 +155,8 @@ state->f29=c1;
 state->f75=c7;
 state->f77=c9;
 o2=o1; /* FAKEMATCH: chain copy */
-vf80=D_L17_001B0F38*0.016666668f;
-vf90=D_L17_001B0E40;
+vf80=g_snapper_float_param_c*0.016666668f;
+vf90=g_snapper_init_value;
 vf94=vf90+0.1f;
 state->fD3=c12;
 state->f80=vf80;
@@ -187,7 +187,7 @@ state->f90=vf90;
 state->f14C=vf14C;
 o5=o4; /* FAKEMATCH: chain copy */
 state->fA0=40.0f;
-e48=D_L17_001B0E48;
+e48=g_snapper_init_value_b;
 state->f11C=e48;
 o6=o5; /* FAKEMATCH: chain copy */
 state->f120=1.308997035f;
@@ -205,7 +205,7 @@ state->f98=0;
         if(state->f744) I(state->f744,0)=-1;
         state->f750=path_build_route_nodes(object,state->f684,(char *)state+0x280,32);
     }
-    if(U(object,0x31) && fast_vec_dist(object+16,D_L17_001B9BC0)<24.0f) {moby_update_ground_check(object);U(object,0x6f)=22;}
+    if(U(object,0x31) && fast_vec_dist(object+16,g_tether_origin_pos)<24.0f) {moby_update_ground_check(object);U(object,0x6f)=22;}
     hit=part_find_owned_effect_slot(object,0x10000,1);
     if(hit && P(hit,0x20) && (H(P(hit,0x20),0xaa)==0x31a /* moby class 794 */ || H(P(hit,0x20),0xaa)==0x1256 /* moby class 4694 */ || H(P(hit,0x20),0xaa)==0x1305 /* moby class 4869 */)) goto impact;
     if(U(object,0x20)!=1) moby_apply_damage_to_object(object,(char *)state+0x60,0);

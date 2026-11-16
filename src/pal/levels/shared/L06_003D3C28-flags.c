@@ -3,10 +3,10 @@
 
 typedef unsigned char u8;
 typedef unsigned short u16;
-extern u8 D_001A7BC8[] __attribute__((sda));
-extern u8 D_001A7BE0 __attribute__((sda));
+extern u8 g_map_visited_flags[] __attribute__((sda));
+extern u8 g_progress_flag __attribute__((sda));
 extern char g_hero_position[];
-extern int D_L06_001B2348 __attribute__((sda));
+extern int g_game_l06_frame_counter __attribute__((sda));
 extern void moby_set_state(void *, int, int);
 extern float vec_distance_xy(void *, void *);
 extern float FastVecLength(void *);
@@ -27,7 +27,7 @@ void func_PAL_L06_003E4348(u8 *moby)
     switch ((u8)moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        if (!D_001A7BC8[*(int *)st]) moby_set_state(moby, 1, -1);
+        if (!g_map_visited_flags[*(int *)st]) moby_set_state(moby, 1, -1);
         else moby_mark_spawned(moby);
         break;
     case 1:
@@ -38,7 +38,7 @@ void func_PAL_L06_003E4348(u8 *moby)
             *(u16 *)(moby + 0x34) |= 0x100;
             *(int *)(st + 8) = 150;
         }
-        if (*(int *)st == 24 && D_001A7BE0) {
+        if (*(int *)st == 24 && g_progress_flag) {
             moby_mark_flag_and_append_to_list(24);
             moby_set_state(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
@@ -59,7 +59,7 @@ void func_PAL_L06_003E4348(u8 *moby)
             }
         }
         gfx_add_draw_callback_first(hud_show_pickup_notice, moby);
-        if ((D_L06_001B2348 ^ 1) & 1) (*(int *)(st + 4))++;
+        if ((g_game_l06_frame_counter ^ 1) & 1) (*(int *)(st + 4))++;
         if (math_fast_float_d((int *)(st + 8))) {
             ApproachValue((float *)(st + 12), 0, 0.060000002f);
             if (*(float *)(st + 12) <= 0) moby_mark_spawned(moby);

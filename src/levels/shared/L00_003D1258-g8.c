@@ -26,9 +26,9 @@ typedef struct {
 extern char g_hero_state[];
 #define PLAYER ((PickupPlayer *)D_00189E20)
 
-extern int D_L00_001A8FF0[] __attribute__((sda));
+extern int g_hero_locked_flag[] __attribute__((sda));
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern int D_L00_001B2ADC[] MACRO_ADDR;
+extern int g_sound_last_frame[] MACRO_ADDR;
 
 extern void *g_hero_moby NOT_SDA;
 extern void vec_store_helper(void *);
@@ -101,7 +101,7 @@ void AmmoPickupUpdate(char *moby)
         }
         if(g_item_ammo_counts[I(vars,0x68)] >=
            ((PickupResource *)(g_item_slot_to_record[I(vars,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)can_pick_up=0;
-        if(D_L00_001A8FF0[0]) {
+        if(g_hero_locked_flag[0]) {
             if(gravity_get_center_distance(moby+0x10)<F(vars,0x78)-2.0f)goto force_pickup;
         } else if(F(moby,0x18)<F(vars,0x78)-2.0f)goto force_pickup;
         if(!PLAYER->override)goto check_enabled;
@@ -126,8 +126,8 @@ check_enabled:
             moby_set_state(moby,2,-1);
             F(vars,0x74)=0.13333334f;
             vec_clear_128(vars);
-            if(subtract_integer_with_clamp(g_frame_l00_counter[0]-D_L00_001B2ADC[0])>10) {
-                PlayMobySound(0,0,moby);D_L00_001B2ADC[0]=g_frame_l00_counter[0];
+            if(subtract_integer_with_clamp(g_frame_l00_counter[0]-g_sound_last_frame[0])>10) {
+                PlayMobySound(0,0,moby);g_sound_last_frame[0]=g_frame_l00_counter[0];
             }
         }
         break;

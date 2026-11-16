@@ -2,17 +2,17 @@
 
 #include "common.h"
 extern int FloatToInt(float);
-extern unsigned char *D_L01_001FF164;
+extern unsigned char *g_burst_particle_color_table;
 extern float math_random_float_range(float f12, float f13);
 typedef int Quad331CA0 __attribute__((mode(TI)));
 typedef struct { unsigned char b0, b1, b2, b3; int color; unsigned char seed, alpha; unsigned short size; float life; union { Quad331CA0 q; float f[4]; } position; float payload[8]; } Particle331CA0;
 extern Particle331CA0 *part_alloc(int kind);
 extern float math_random_float_range(float low, float high);
 extern int FloatToInt(float value);
-extern unsigned char *D_L01_001FF164;
+extern unsigned char *g_burst_particle_color_table;
 
 /* Spawns the burst particle of the given kind at position, carrying the velocity and the size scale in its payload. */
-void func_PAL_L01_00333E88(Quad331CA0 *position, int kind, Quad331CA0 *velocity, float scale)
+void part_l01_spawn_burst_2_pal(Quad331CA0 *position, int kind, Quad331CA0 *velocity, float scale)
 {
     Quad331CA0 saved = *velocity;
     Quad331CA0 *vp = &saved;
@@ -39,7 +39,7 @@ void func_PAL_L01_00333E88(Quad331CA0 *position, int kind, Quad331CA0 *velocity,
         p->alpha = FloatToInt(4.0f) + 0x20;
         p->b1 = 0;
         p->b3 = 0x48;
-        p->b2 = D_L01_001FF164[kind];
+        p->b2 = g_burst_particle_color_table[kind];
         p->life = life * 210000.0f;
         p->seed = math_random_float_range(0.0f, 360.0f);
         p->position.q = *position;

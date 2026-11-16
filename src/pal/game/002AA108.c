@@ -28,7 +28,7 @@ extern Rec_002A96A0 *moby_get_private_value_0(s32);
 extern char *moby_get_private_value_4(s32);
 extern u8 moby_get_kind_slot(u8 *);
 
-f32 func_PAL_002AA108(s32 a0, Src_002A96A0 *a1) {
+f32 moby_update_aim_target_strength_pal(s32 a0, Src_002A96A0 *a1) {
     Rec_002A96A0 *p = moby_get_private_value_0(a0);
     f32 f = 0.0f;
     if (p != 0) {

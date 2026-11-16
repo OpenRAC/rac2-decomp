@@ -7,8 +7,8 @@ typedef struct HrugisEffectCamera {
     float position[4];
 } HrugisEffectCamera;
 
-extern HrugisEffectCamera D_L10_001B9540;
-extern unsigned char *D_L10_001FF36C;
+extern HrugisEffectCamera g_effect_camera;
+extern unsigned char *g_smoke_particle_colors;
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
@@ -27,8 +27,8 @@ void func_PAL_L10_0041C7A0(char *object, int joint, float radius) {
     unsigned char *data;
 
     *(TI128 *)initial = *(TI128 *)(object + 0x10);
-    heading = mat_fast_helper_a(D_L10_001B9540.position[0] - *(float *)(object + 0x10),
-                            D_L10_001B9540.position[1] - *(float *)(object + 0x14));
+    heading = mat_fast_helper_a(g_effect_camera.position[0] - *(float *)(object + 0x10),
+                            g_effect_camera.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);
@@ -48,6 +48,6 @@ void func_PAL_L10_0041C7A0(char *object, int joint, float radius) {
         *(int *)(data + 4) = 3;
         data[0xA] = 0x7F;
         data[0xB] = particle[0xA];
-        particle[2] = D_L10_001FF36C[1];
+        particle[2] = g_smoke_particle_colors[1];
     }
 }

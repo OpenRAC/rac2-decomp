@@ -22,11 +22,11 @@ extern void gfx_draw_pulsing_glow_strip(void *);
 extern float ApproachValue(float *,float,float);
 extern int g_current_map_index;
 
-extern char *D_L13_001BFD18 NOT_SDA;
-extern Quad16 D_L13_001A8F20 MACRO_ADDR;
-extern float D_L13_001B1A30 __attribute__((sda));
-extern float D_L13_001B1A34 __attribute__((sda));
-extern float D_L13_001B1A38 __attribute__((sda));
+extern char *g_hit_l13_result NOT_SDA;
+extern Quad16 g_default_l13_effect_vector MACRO_ADDR;
+extern float g_marker_rotation_speed __attribute__((sda));
+extern float g_marker_l13_rise_speed __attribute__((sda));
+extern float g_marker_value_speed __attribute__((sda));
 /* Updates a floating marker the player can target. It spins, glows, and reacts when the player aims at it or touches it. */
 void targetable_marker_update(char *moby)
 {
@@ -53,8 +53,8 @@ active:
         qcopy(&work.position,&H->q[8]);
         vec_scale_to_length(&work.offset,H->ptr[2212]+0xe0,0.75f);
         FastVecAdd(&work.position,&work.position,&work.offset);
-        if (coll_test_point(&work.position,0,H->ptr[2212],0.5f)!=0 && D_L13_001BFD18!=0 && D_L13_001BFD18==moby) {
-            make_hit_descriptor((char *)&work.request,(int)moby,1,100.0f,&D_L13_001A8F20);
+        if (coll_test_point(&work.position,0,H->ptr[2212],0.5f)!=0 && g_hit_l13_result!=0 && g_hit_l13_result==moby) {
+            make_hit_descriptor((char *)&work.request,(int)moby,1,100.0f,&g_default_l13_effect_vector);
             work.request.id=*(unsigned short *)(moby+0xaa);
             hero_record_play_counters();
         }
@@ -72,11 +72,11 @@ active:
 common:
     if (vars[0]!=0.0f) {
         scale_vector(&work.position,moby,0.0009765625f);
-        vars[8]=FastAddRotations(vars[8],D_L13_001B1A30*0.0002908882452f);
-        vars[3]+=(D_L13_001B1A34+math_random_signed_float_range(0.25f,0.5f))*0.016666668f;
+        vars[8]=FastAddRotations(vars[8],g_marker_rotation_speed*0.0002908882452f);
+        vars[3]+=(g_marker_l13_rise_speed+math_random_signed_float_range(0.25f,0.5f))*0.016666668f;
         if (vars[3]>1.0f) vars[3]-=1.0f;
         for(i=1;i<=2;i++) {
-            value=vars[i]+D_L13_001B1A38*0.016666668f;
+            value=vars[i]+g_marker_value_speed*0.016666668f;
             vars[i]=value;
             if(value>1.0f) vars[i]=value-1.0f;
         }

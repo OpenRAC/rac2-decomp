@@ -20,21 +20,21 @@ typedef struct {
     int row;        /* 0x38: this bolt's row of the vertex table */
 } BoltState;
 
-extern int D_L11_001B25A0 __attribute__((sda));
-extern Path *D_L11_001FF580[];
-extern BoltBuffer D_L11_00264760[];
-extern float D_L11_001B25A8 __attribute__((sda));
-extern float D_L11_001B25C0 __attribute__((sda));
-extern float D_L11_001B25C8 __attribute__((sda));
-extern float D_L11_001B25D0 __attribute__((sda));
-extern float D_L11_001B25D4 __attribute__((sda));
-extern float D_L11_001B25D8 __attribute__((sda));
-extern float D_L11_001B25DC __attribute__((sda));
-extern float D_L11_001B25E0 __attribute__((sda));
-extern float D_L11_001B25E4 __attribute__((sda));
-extern float D_L11_001B25F8 __attribute__((sda));
-extern float D_L11_001B25FC __attribute__((sda));
-extern char D_L11_001A8F20[] __attribute__((sda));
+extern int g_lightning_point_count __attribute__((sda));
+extern Path *g_path_l11_table[];
+extern BoltBuffer g_ribbon_row_table[];
+extern float g_lightning_bolt_length __attribute__((sda));
+extern float g_lightning_start_angle __attribute__((sda));
+extern float g_lightning_l11_horizontal_phase __attribute__((sda));
+extern float g_lightning_horizontal_phase_step __attribute__((sda));
+extern float g_lightning_vertical_amplitude __attribute__((sda));
+extern float g_lightning_horizontal_amplitude __attribute__((sda));
+extern float g_lightning_vertical_angle __attribute__((sda));
+extern float g_lightning_vertical_angle_rate __attribute__((sda));
+extern float g_lightning_vertical_angle_step __attribute__((sda));
+extern float g_lightning_l11_noise_min __attribute__((sda));
+extern float g_lightning_l11_noise_max __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
 extern float math_random_angle(void);
 extern float FastAddRotations(float, float);
 extern void vec_clear_128(void *);
@@ -65,50 +65,50 @@ void lightning_rebuild_bolt_points(char *object)
     Path *path;
     Vector *wave, *prev;
     float phase, angle, amplitude, horizontalAmplitude, nx, nz, ny, f;
-    float scale = D_L11_001B25A8 / (float)D_L11_001B25A0;
+    float scale = g_lightning_bolt_length / (float)g_lightning_point_count;
     int i;
 
     state = *(BoltState **)(object + 0x68);
-    D_L11_001B25C0 = math_random_angle();
-    D_L11_001B25C8 = math_random_angle();
-    D_L11_001B25DC = FastAddRotations(D_L11_001B25DC, D_L11_001B25E0);
+    g_lightning_start_angle = math_random_angle();
+    g_lightning_l11_horizontal_phase = math_random_angle();
+    g_lightning_vertical_angle = FastAddRotations(g_lightning_vertical_angle, g_lightning_vertical_angle_rate);
     vec_clear_128(&position);
-    state->count = D_L11_001B25A0;
+    state->count = g_lightning_point_count;
     FastVecSub(&direction, &state->end, &state->start);
     vec_scale_to_length(&direction, &direction, 1.0f);
     FastVecScale(&step, &direction, scale);
-    path = D_L11_001FF580[state->path];
-    qcopy_nc(&D_L11_00264760[state->row].core[0], &path->points[0]);
-    qcopy_nc(&D_L11_00264760[state->row].wave[0], &path->points[0]);
-    for (i = 1; i < D_L11_001B25A0; i++) {
-        nz = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
-        nx = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
-        ny = math_random_signed_float_range(D_L11_001B25F8, D_L11_001B25FC);
-        qcopy_nc(&D_L11_00264760[state->row].core[i], &path->points[i]);
+    path = g_path_l11_table[state->path];
+    qcopy_nc(&g_ribbon_row_table[state->row].core[0], &path->points[0]);
+    qcopy_nc(&g_ribbon_row_table[state->row].wave[0], &path->points[0]);
+    for (i = 1; i < g_lightning_point_count; i++) {
+        nz = math_random_signed_float_range(g_lightning_l11_noise_min, g_lightning_l11_noise_max);
+        nx = math_random_signed_float_range(g_lightning_l11_noise_min, g_lightning_l11_noise_max);
+        ny = math_random_signed_float_range(g_lightning_l11_noise_min, g_lightning_l11_noise_max);
+        qcopy_nc(&g_ribbon_row_table[state->row].core[i], &path->points[i]);
         f = (float)i;
-        D_L11_00264760[state->row].core[i].z += nz;
-        D_L11_00264760[state->row].core[i].x += nx;
-        D_L11_00264760[state->row].core[i].y += ny;
+        g_ribbon_row_table[state->row].core[i].z += nz;
+        g_ribbon_row_table[state->row].core[i].x += nx;
+        g_ribbon_row_table[state->row].core[i].y += ny;
         /* Previous point: the row's points from index -1. */
-        prev = &D_L11_00264760[state->row].core[-1];
-        FastVecSub(&delta, &D_L11_00264760[state->row].core[i], &prev[i]);
-        phase = math_wrap_angle_to_pi(D_L11_001B25C8 + f * D_L11_001B25D0);
-        angle = math_wrap_angle_to_pi(D_L11_001B25DC + f * D_L11_001B25E4);
-        amplitude = D_L11_001B25D4 * math_fast_sin_or_cos_b(angle);
+        prev = &g_ribbon_row_table[state->row].core[-1];
+        FastVecSub(&delta, &g_ribbon_row_table[state->row].core[i], &prev[i]);
+        phase = math_wrap_angle_to_pi(g_lightning_l11_horizontal_phase + f * g_lightning_horizontal_phase_step);
+        angle = math_wrap_angle_to_pi(g_lightning_vertical_angle + f * g_lightning_vertical_angle_step);
+        amplitude = g_lightning_vertical_amplitude * math_fast_sin_or_cos_b(angle);
         /* Column i of the wave points, then this bolt's row. */
-        qcopy_nc(&D_L11_00264760[0].wave[i] + state->row * 40,
-                 &D_L11_00264760[state->row].core[i]);
+        qcopy_nc(&g_ribbon_row_table[0].wave[i] + state->row * 40,
+                 &g_ribbon_row_table[state->row].core[i]);
         nz = amplitude * math_fast_sin_or_cos_b(phase) + math_random_signed_float_range(0.0f, 0.1f);
-        D_L11_00264760[state->row].wave[i].z += nz;
+        g_ribbon_row_table[state->row].wave[i].z += nz;
         angle = FastAddRotations(mat_fast_helper_a(delta.x, delta.y), 1.5707964897155762f);
-        horizontalAmplitude = D_L11_001B25D8 * math_fast_sin_or_cos_a(phase);
+        horizontalAmplitude = g_lightning_horizontal_amplitude * math_fast_sin_or_cos_a(phase);
         perpendicular.x = math_fast_sin_or_cos_a(angle) * horizontalAmplitude;
         perpendicular.y = math_fast_sin_or_cos_b(angle) * horizontalAmplitude;
         perpendicular.z = 0.0f;
-        wave = D_L11_00264760[state->row].wave;
+        wave = g_ribbon_row_table[state->row].wave;
         FastVecAdd(&wave[i], &wave[i], &perpendicular);
-        if (i > 1 && (i == D_L11_001B25A0 - 1 || !(i & 1))) {
-            make_hit_descriptor(effect, object, 1, 10.0f, D_L11_001A8F20);
+        if (i > 1 && (i == g_lightning_point_count - 1 || !(i & 1))) {
+            make_hit_descriptor(effect, object, 1, 10.0f, g_identity_l11_matrix);
             *(unsigned short *)(effect + 26) = *(unsigned short *)(object + 0xaa);
             CollLine(&path->points[i - 2], &path->points[i], 16, object, effect);
         }

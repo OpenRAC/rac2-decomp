@@ -13,12 +13,12 @@ typedef struct { unsigned char pad[4]; unsigned char enabled; unsigned char rest
 typedef struct { char pad[0x160]; float shake; int unused; int duration, timer; } BurstCamera;
 typedef struct { char pad[0x2C]; unsigned char *texture; } BurstParticles;
 
-extern BurstTemplate D_L00_002A26A0;
+extern BurstTemplate g_particle_packet_template;
 extern unsigned char g_item_slot_to_record[];
 extern BurstWeapon g_weapon_l00_table[];
 extern char g_camera_l00_position[];
-extern BurstCamera D_L00_001B8C80;
-extern BurstParticles D_L00_001FE940;
+extern BurstCamera g_scalar_transition_state;
+extern BurstParticles g_effect_definitions;
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
@@ -56,7 +56,7 @@ void part_l00_spawn_impact_burst(char *object, BurstVector *velocity, BurstVecto
     int *pg;
     int kind, z1, z2;
 
-    tmpl = D_L00_002A26A0;
+    tmpl = g_particle_packet_template;
     scale = 1.0f + IntToFloat(((BurstWeapon *)(g_item_slot_to_record[12] * 224 + (int)g_weapon_l00_table))->enabled != 0);
     FastVecScale(velocity, velocity, scale);
     FastVecSub(&delta, g_camera_l00_position, object + 0x10);
@@ -178,20 +178,20 @@ void part_l00_spawn_impact_burst(char *object, BurstVector *velocity, BurstVecto
                 drift.f[2] = h5;
                 life = math_random_float_range(31500.001953125f, 52500.0f);
                 part_spawn_spark(&drift, &point, color1, color2, life, math_random_int_range(lmin, lmax),
-                one, *D_L00_001FE940.texture, ntex, zero);
+                one, *g_effect_definitions.texture, ntex, zero);
             }
         }
     }
     }
     {
-        BurstCamera *camera = &D_L00_001B8C80;
+        BurstCamera *camera = &g_scalar_transition_state;
         if (distance < 20.0f)
             camera->shake = 0.4f - distance * 0.0175f;
         else
             camera->shake = 0.050000011920928955f;
     }
-    D_L00_001B8C80.duration = 25;
-    D_L00_001B8C80.timer = 0;
+    g_scalar_transition_state.duration = 25;
+    g_scalar_transition_state.timer = 0;
     moby_spawn_template_effect(&tmpl, object + 0x10, 0, 0);
     moby_mark_spawned(object);
 }

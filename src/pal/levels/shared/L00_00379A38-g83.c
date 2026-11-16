@@ -11,22 +11,22 @@ typedef union {
 } prices;
 } UpgradeModel;
 extern UpgradeModel g_purchase_menu_model;
-extern unsigned char D_001A7A80[] __attribute__((sda));
-extern int D_L00_001A8E40[] __attribute__((sda));
+extern unsigned char g_movie_seen_flags[] __attribute__((sda));
+extern int g_shop_upgrade_string_ids[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 typedef struct { char prefix[8]; int name; char tail[0xE0-12]; } UpgradeInfo;
 extern UpgradeInfo g_weapon_l00_table[];
-extern char D_L00_001AD738[10];
-extern char D_L00_001AD748[9];
-extern char D_L00_001AD758[9];
-extern int D_L00_001AD718 __attribute__((sda));
-extern int D_L00_001AD71C;
-extern int D_L00_001AD724;
-extern int D_L00_001AD728 __attribute__((sda));
-extern int D_L00_001AD72C;
-extern int D_L00_001AD730 __attribute__((sda));
-extern int D_L00_001AD734;
-extern float D_L00_001B25E0;
+extern char g_str_shop_price_format[10];
+extern char g_str_shop_price_line_format[9];
+extern char g_str_shop_upgrade_format[9];
+extern int g_shop_price_line_x __attribute__((sda));
+extern int g_shop_price_line_y;
+extern int g_shop_price_line_extra_y;
+extern int g_shop_price_second_x __attribute__((sda));
+extern int g_shop_price_second_y;
+extern int g_shop_price_third_x __attribute__((sda));
+extern int g_shop_price_third_y;
+extern float g_menu_slide_scale;
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
@@ -45,18 +45,18 @@ void func_PAL_L00_0037A140(void) {
     int slot = g_purchase_menu_model.slots.rows[*(int *)(model + 0x80)].group;
     int handle;
     int width;
-    if (((unsigned long)D_001A7A80[group] & ((1U << (slot * 2)) & 255UL)) != 0) return;
+    if (((unsigned long)g_movie_seen_flags[group] & ((1U << (slot * 2)) & 255UL)) != 0) return;
     if (group != 0) {
-        sprintf(first, D_L00_001AD738,
-            (unsigned char *)GetLocalizedString(D_L00_001A8E40[slot]),
+        sprintf(first, g_str_shop_price_format,
+            (unsigned char *)GetLocalizedString(g_shop_upgrade_string_ids[slot]),
             (unsigned char *)GetLocalizedString(((UpgradeInfo *)((char *)g_weapon_l00_table + g_item_slot_to_record[g_purchase_menu_model.groups.rows[*(int *)(model + 0x80)].group] * 224))->name));
-        text_draw_centered_medium(D_L00_001AD728, (int)((float)D_L00_001AD72C * D_L00_001B25E0 + 0.5f),
+        text_draw_centered_medium(g_shop_price_second_x, (int)((float)g_shop_price_second_y * g_menu_slide_scale + 0.5f),
                       0x80F0F0F0ULL, (unsigned char *)first, -1);
     }
     func_PAL_002FAB40(first, g_purchase_menu_model.prices.rows[*(int *)(model + 0x80)].group);
-    sprintf(second, D_L00_001AD748, (unsigned char *)GetLocalizedString(0x114E), first,
+    sprintf(second, g_str_shop_price_line_format, (unsigned char *)GetLocalizedString(0x114E), first,
         (unsigned char *)GetLocalizedString(0x1B30));
-    text_draw_centered_medium(D_L00_001AD718, (int)((float)D_L00_001AD71C * D_L00_001B25E0 + 0.5f),
+    text_draw_centered_medium(g_shop_price_line_x, (int)((float)g_shop_price_line_y * g_menu_slide_scale + 0.5f),
                   0x80F0F0F0ULL, (unsigned char *)second, -1);
     colors[0] = 0x60F0F0B0;
     colors[1] = 0x60F0F0B0;
@@ -64,16 +64,16 @@ void func_PAL_L00_0037A140(void) {
     colors[3] = 0x60F0F0B0;
     handle = GetIconFrame(0xEAA2, 0);
     width = text_measure_width_second_set((unsigned char *)second, -1);
-    hud_draw_sprite_gradient(handle, D_L00_001AD718 + (width >> 1) + 4,
-                  (int)((float)D_L00_001AD724 * D_L00_001B25E0 + 0.5f), 16,
-                  (int)(D_L00_001B25E0 * 16.0f + 0.5f), colors);
-    sprintf(first, D_L00_001AD758, (unsigned char *)GetLocalizedString(0xE52),
+    hud_draw_sprite_gradient(handle, g_shop_price_line_x + (width >> 1) + 4,
+                  (int)((float)g_shop_price_line_extra_y * g_menu_slide_scale + 0.5f), 16,
+                  (int)(g_menu_slide_scale * 16.0f + 0.5f), colors);
+    sprintf(first, g_str_shop_upgrade_format, (unsigned char *)GetLocalizedString(0xE52),
         save_count_items_above_baseline(), (unsigned char *)GetLocalizedString(0x1B30));
-    text_draw_centered_medium(D_L00_001AD730, (int)((float)D_L00_001AD734 * D_L00_001B25E0 + 0.5f),
+    text_draw_centered_medium(g_shop_price_third_x, (int)((float)g_shop_price_third_y * g_menu_slide_scale + 0.5f),
                   0x80F0F0F0ULL, (unsigned char *)first, -1);
     handle = GetIconFrame(0xEAA2, 0);
     width = text_measure_width_second_set((unsigned char *)first, -1);
-    hud_draw_sprite_gradient(handle, D_L00_001AD730 + (width >> 1) + 4,
-                  (int)((float)D_L00_001AD734 * D_L00_001B25E0 + 0.5f), 16,
-                  (int)(D_L00_001B25E0 * 16.0f + 0.5f), colors);
+    hud_draw_sprite_gradient(handle, g_shop_price_third_x + (width >> 1) + 4,
+                  (int)((float)g_shop_price_third_y * g_menu_slide_scale + 0.5f), 16,
+                  (int)(g_menu_slide_scale * 16.0f + 0.5f), colors);
 }

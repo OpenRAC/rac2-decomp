@@ -3,9 +3,9 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern u8 g_sound_state[];
 extern u8 g_hero_position[];
-extern u8 D_0019B2E8[][16];
+extern u8 g_moby_group_flags[][16];
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 *D_L11_001FF580[];
+extern u8 *g_path_l11_table[];
 extern s32 PlayMobySound(s32, s32, u8 *);
 extern void snd_stop_voice(s32);
 extern s32 hero_is_current_selected_id(u8 *);
@@ -58,10 +58,10 @@ void UpdateJobaPathFollower(u8 *object) {
             }
             (*(u8 **)(state + 0x68))[0x1E] = 1;
             object[0x20] = 1;
-            if (D_0019B2E8[g_current_map_index[0]][object[0xB0]] & 0x80) {
+            if (g_moby_group_flags[g_current_map_index[0]][object[0xB0]] & 0x80) {
                 u8 *path;
                 cam_end_override(*(u8 **)(state + 0x68));
-                path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+                path = g_path_l11_table[*(s32 *)(state + 0x60)];
                 object[0x20] = 6;
                 *(s32 *)(state + 0x64) = *(s32 *)path - 1;
             }
@@ -76,7 +76,7 @@ void UpdateJobaPathFollower(u8 *object) {
     }
     if (object[0x20] == 1) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
             if (!hero_is_current_selected_id(object)) {
                 object[0x20] = 2;
@@ -114,7 +114,7 @@ void UpdateJobaPathFollower(u8 *object) {
     if (object[0x20] == 2) {
         u8 *path;
         if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 0x6C))) {
-            path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+            path = g_path_l11_table[*(s32 *)(state + 0x60)];
             moby_set_byte_on_group(object[0x21], 0);
             *(TI128 *)(position) = *(TI128 *)(path + 0x10);
             object[0x20] = 0;
@@ -130,7 +130,7 @@ void UpdateJobaPathFollower(u8 *object) {
     }
     if (object[0x20] == 3) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) < 0) {
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
@@ -144,7 +144,7 @@ void UpdateJobaPathFollower(u8 *object) {
     }
     if (object[0x20] == 5) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) < 0) {
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
@@ -164,7 +164,7 @@ void UpdateJobaPathFollower(u8 *object) {
     }
     if (object[0x20] == 6) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
             if (!hero_is_current_selected_id(object)) {
                 object[0x20] = 2;

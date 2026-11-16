@@ -42,16 +42,16 @@ extern void moby_get_facing_direction(void *, void *);
 
 extern RenderVec g_camera_eye_state;
 extern HeroPosBlock g_hero_state;
-extern long long D_001B2810;
-extern int D_001B059C __attribute__((sda));
-extern int D_001B05A0 __attribute__((sda));
-extern int D_001B05A4 __attribute__((sda));
-extern int D_001B05A8 __attribute__((sda));
-extern int D_001B05AC __attribute__((sda));
-extern unsigned int D_001B05B0 __attribute__((sda));
-extern QuadFace D_0026B210[];
-extern RenderVec D_0026AA00[];
-extern UVPair D_00235D00[];
+extern long long g_screen_fade_texture_desc;
+extern int g_quad_packet_tag_bits_base __attribute__((sda));
+extern int g_quad_packet_tag_bits_mid_a __attribute__((sda));
+extern int g_quad_packet_tag_bits_mid_b __attribute__((sda));
+extern int g_quad_packet_tag_bits_mid_c __attribute__((sda));
+extern int g_quad_packet_tag_bits_high __attribute__((sda));
+extern unsigned int g_quad_packet_color __attribute__((sda));
+extern QuadFace g_distortion_quad_faces[];
+extern RenderVec g_distortion_quad_vertices[];
+extern UVPair g_blast_uv_angles[];
 extern UVPair D_00235D00_1[];
 
 static inline void ClampUnit(float *value)
@@ -68,7 +68,7 @@ static inline void NextFace(int *value)
     *value = *value + 1;
 }
 
-void func_PAL_0032DB00(char *object)
+void DrawQuadFaces_pal(char *object)
 {
     RenderPacket packet;
     RenderVec up;
@@ -81,13 +81,13 @@ void func_PAL_0032DB00(char *object)
     UVPair *phase;
 
     state = *(char **)(object + 0x68);
-    packet.tag[1] = D_001B2810;
+    packet.tag[1] = g_screen_fade_texture_desc;
     packet.tag[2] = 0xFF9000000260LL;
-    packet.tag[3] = (long long)D_001B059C;
-    packet.tag[3] |= (long long)D_001B05A0 << 2;
-    packet.tag[3] |= (long long)D_001B05A4 << 4;
-    packet.tag[3] |= (long long)D_001B05A8 << 6;
-    packet.tag[3] |= (long long)D_001B05AC << 32;
+    packet.tag[3] = (long long)g_quad_packet_tag_bits_base;
+    packet.tag[3] |= (long long)g_quad_packet_tag_bits_mid_a << 2;
+    packet.tag[3] |= (long long)g_quad_packet_tag_bits_mid_b << 4;
+    packet.tag[3] |= (long long)g_quad_packet_tag_bits_mid_c << 6;
+    packet.tag[3] |= (long long)g_quad_packet_tag_bits_high << 32;
     packet.tag[0] = 0;
 
     moby_get_facing_direction(&g_hero_state.pos, &up);
@@ -102,7 +102,7 @@ void func_PAL_0032DB00(char *object)
     packet.matrix[3].z = g_hero_state.pos.z + difference.z;
     packet.matrix[3].w = 1.0f;
 
-    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = D_001B05B0;
+    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = g_quad_packet_color;
 
     {
         char *u = (char *)&packet + offsetof(RenderPacket, uv);
@@ -110,18 +110,18 @@ void func_PAL_0032DB00(char *object)
 
         face = 0;
         do {
-            faces = D_0026B210;
+            faces = g_distortion_quad_faces;
             quad = faces[face].corner;
             v = (char *)&packet + offsetof(RenderPacket, uv) + sizeof(float);
             u = (char *)&packet + offsetof(RenderPacket, uv);
             for (corner = 0; corner < 4; corner++) {
                 int index = quad[corner].uv;
 
-                FastVecScale(&packet.vertex[corner], &D_0026AA00[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
+                FastVecScale(&packet.vertex[corner], &g_distortion_quad_vertices[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
                 transform_vector(&packet.vertex[corner], &packet.vertex[corner], packet.matrix);
                 gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
-                *(float *)u += math_fast_sin_or_cos_a(D_00235D00[index].u) * 0.01f;
-                *(float *)v += math_fast_sin_or_cos_a(D_00235D00[index].v) * 0.02f;
+                *(float *)u += math_fast_sin_or_cos_a(g_blast_uv_angles[index].u) * 0.01f;
+                *(float *)v += math_fast_sin_or_cos_a(g_blast_uv_angles[index].v) * 0.02f;
                 ClampUnit((float *)u);
                 ClampUnit((float *)v);
                 v += 8;

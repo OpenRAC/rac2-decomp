@@ -10,9 +10,9 @@ extern int CollLine(void *, void *, int, void *, int);
 extern float cam_get_view_space_angle(void *);
 extern float cam_get_view_space_height(void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern char D_L00_001BF240[];
+extern char g_hero_l00_velocity[];
 
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 typedef int MotionQuad __attribute__((mode(TI)));
 
 /* Solve the forward collision time for each of the resident movement modes. */
@@ -35,8 +35,8 @@ float hero_find_collision_time(float time, float acceleration, float height)
             coll_push_vector_from_negative_axes(direction, end);
             qcopy(direction, pos);
             if (CollLine(direction, end, 0x22, 0, 0)) {
-                if (cam_get_view_space_angle(D_L00_001BF240) <= 0.8726647f)
-                    height = *(float *)(D_L00_001BF240 - 0x18);
+                if (cam_get_view_space_angle(g_hero_l00_velocity) <= 0.8726647f)
+                    height = *(float *)(g_hero_l00_velocity - 0x18);
             }
         }
         if (height > 0.0f) {
@@ -68,7 +68,7 @@ float hero_find_collision_time(float time, float acceleration, float height)
             half = acceleration * -0.5f;
             speed = cam_get_view_space_height(velocity) - half;
             position = cam_get_view_space_height(pos);
-            position -= cam_get_view_space_height(D_L00_001BF220);
+            position -= cam_get_view_space_height(g_hero_l00_position);
             if (math_solve_quadratic(&root1a, &root1b, half, speed, position) > 0
                     && root1a > 0.0f)
                 return root1a;
@@ -94,7 +94,7 @@ float hero_find_collision_time(float time, float acceleration, float height)
             half = acceleration * -0.5f;
             speed = cam_get_view_space_height(velocity) - half;
             position = cam_get_view_space_height(pos);
-            position -= cam_get_view_space_height(D_L00_001BF220);
+            position -= cam_get_view_space_height(g_hero_l00_position);
             if (math_solve_quadratic(&root2a, &root2b, half, speed, position) > 0
                     && root2a > 0.0f)
                 return root2a;

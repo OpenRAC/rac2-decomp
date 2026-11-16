@@ -6,16 +6,16 @@
 
 extern int g_ship_state __attribute__((sda));
 
-extern char *D_L05_001B1EC4 MACRO_ADDR;
-extern char *D_L05_001B251C MACRO_ADDR;
-extern float D_L05_001B1A58 __attribute__((sda));
-extern float D_L05_001B1A5C __attribute__((sda));
-extern float D_L05_001B1A64 __attribute__((sda));
-extern float D_L05_001B1A4C __attribute__((sda));
-extern float D_L05_001B1A50 __attribute__((sda));
-extern float D_L05_001B1A54 __attribute__((sda));
-extern float D_L05_001B1A70 __attribute__((sda));
-extern float D_L05_001B1A6C __attribute__((sda));
+extern char *g_path_l05_entry_table MACRO_ADDR;
+extern char *g_feltzin_target_mobys MACRO_ADDR;
+extern float g_cam_pitch_param_first __attribute__((sda));
+extern float g_cam_pitch_param_second __attribute__((sda));
+extern float g_cam_pitch_param_third __attribute__((sda));
+extern float g_cam_yaw_param_first __attribute__((sda));
+extern float g_cam_yaw_param_second __attribute__((sda));
+extern float g_cam_yaw_param_third __attribute__((sda));
+extern float g_cam_param_c_default __attribute__((sda));
+extern float g_cam_param_d_default __attribute__((sda));
 
 typedef struct ListMoby_0042C928 {
     char pad0[0x28];
@@ -24,12 +24,12 @@ typedef struct ListMoby_0042C928 {
     short oclass;
 } ListMoby_0042C928;
 
-extern float D_L05_001B1A10 __attribute__((sda));
-extern float D_L05_001B1A14 __attribute__((sda));
-extern float D_L05_001B1A18 __attribute__((sda));
-extern float D_L05_001B1AC0 __attribute__((sda));
-extern int D_L05_001B1B74 __attribute__((sda));
-extern int D_L05_001B1B78 __attribute__((sda));
+extern float g_cam_init_pos_x __attribute__((sda));
+extern float g_cam_init_pos_y __attribute__((sda));
+extern float g_cam_init_pos_z __attribute__((sda));
+extern float g_cam_chase_goal_rate __attribute__((sda));
+extern int g_ship_horizontal_input_ramp __attribute__((sda));
+extern int g_ship_vertical_input_ramp __attribute__((sda));
 extern void vec_clear_128(void *a0);
 extern void cam_load_entry_vectors(void *a0);
 extern void gfx_set_clamped_view_distance(float a0);
@@ -107,7 +107,7 @@ typedef struct Object_00441D40 {
     short f84;
 } Object_00441D40;
 
-void func_PAL_L05_00447F28(Object_00441D40 *object)
+void cam_init_state_pal(Object_00441D40 *object)
 {
     State_00441D40 *state;
     State_00441D40 *state2;
@@ -120,23 +120,23 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     float rate;
 
     state = object->state;
-    state->pos[0] = D_L05_001B1A10;
-    state->pos[1] = D_L05_001B1A14;
-    state->pos[2] = D_L05_001B1A18;
+    state->pos[0] = g_cam_init_pos_x;
+    state->pos[1] = g_cam_init_pos_y;
+    state->pos[2] = g_cam_init_pos_z;
     vec_clear_128(state->v10);
     state->f40 = 0;
     state->f44 = 0;
 
     state2 = object->state;
     blk = &state2->blk;
-    blk->f00 = D_L05_001B1A4C;
-    blk->f04 = D_L05_001B1A50;
-    blk->f08 = D_L05_001B1A54;
-    blk->f74 = D_L05_001B1A70;
-    blk->f78 = D_L05_001B1A6C;
-    blk->f0C = D_L05_001B1A58;
-    blk->f10 = D_L05_001B1A5C;
-    blk->f14 = D_L05_001B1A64;
+    blk->f00 = g_cam_yaw_param_first;
+    blk->f04 = g_cam_yaw_param_second;
+    blk->f08 = g_cam_yaw_param_third;
+    blk->f74 = g_cam_param_c_default;
+    blk->f78 = g_cam_param_d_default;
+    blk->f0C = g_cam_pitch_param_first;
+    blk->f10 = g_cam_pitch_param_second;
+    blk->f14 = g_cam_pitch_param_third;
     blk->f70 = 0;
     blk->f1C = 0;
     blk->f18 = 0;
@@ -148,14 +148,14 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     cam_load_entry_vectors(object);
     gfx_set_clamped_view_distance(4096.0f);
 
-    table = (Slot_00441D40 *)D_L05_001B1EC4;
-    actors = D_L05_001B251C;
+    table = (Slot_00441D40 *)g_path_l05_entry_table;
+    actors = g_feltzin_target_mobys;
     tail = &object->state->tail;
     tail->f06 = 0;
     tail->f0C = 0;
     tail->f10 = 0;
     tail->f04 = 0;
-    rate = D_L05_001B1AC0 * 0.020000001f;
+    rate = g_cam_chase_goal_rate * 0.020000001f;
     entry = table[object->f84].entry;
     entry->f58 = 0;
     vars = ((Actor_00441D40 *)(actors + (entry->index << 8)))->vars;
@@ -164,7 +164,7 @@ void func_PAL_L05_00447F28(Object_00441D40 *object)
     object->f7E = 0;
     g_ship_state = 0;
     func_L05_003D1E20();
-    D_L05_001B1B74 = 0;
-    D_L05_001B1B78 = 0;
+    g_ship_horizontal_input_ramp = 0;
+    g_ship_vertical_input_ramp = 0;
     ship_save_settings();
 }

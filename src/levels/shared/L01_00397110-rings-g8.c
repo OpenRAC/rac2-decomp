@@ -12,7 +12,7 @@ extern float math_fabs(float);
 extern int FastTweenColor(int, int, float);
 extern int FloatToInt(float);
 extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
-extern char D_L01_001B94C0[];
+extern char g_level_origin_vec[];
 extern int ref_L01_00397A28_00 __attribute__((sda));
 extern int ref_L01_00397A28_01 __attribute__((sda));
 extern int ref_L01_00397A28_02 __attribute__((sda));
@@ -33,7 +33,7 @@ void part_draw_bolt_glow_rings(char *moby) {
         scale = (160.0f - moby_get_anim_value(moby)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
-    FastVecSub(ring_pos, D_L01_001B94C0, moby_pos);
+    FastVecSub(ring_pos, g_level_origin_vec, moby_pos);
     vec_scale_to_length(ring_pos, ring_pos, -0.3f);
     vec_scale_to_length(ring_step, ring_pos, 0.1f);
     FastVecAdd(ring_pos, ring_pos, moby_pos);

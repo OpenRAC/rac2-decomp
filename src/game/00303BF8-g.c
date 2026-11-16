@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_002222E0[];
+extern float g_surface_grid_noise_table[];
 extern int g_game_time;
 
 extern float FloatFraction(float);
@@ -22,15 +22,15 @@ void surface_grid_update_wave_tables(char *object)
             int col = i % 8;
             int row = i / 8;
 
-            D_002222E0[i * 8] = math_fast_sin_or_cos_b(FloatFraction(*(float *)(state + 0x38) * (float)col + *(float *)(state + 0x3C) * (float)row + (float)g_game_time * *(float *)(state + 0x30)) * 6.2831855f);
+            g_surface_grid_noise_table[i * 8] = math_fast_sin_or_cos_b(FloatFraction(*(float *)(state + 0x38) * (float)col + *(float *)(state + 0x3C) * (float)row + (float)g_game_time * *(float *)(state + 0x30)) * 6.2831855f);
         }
     }
     if (~*(int *)(state + 0x4C) & 0x40) {
         for (i = 0; i < 64; i++)
-            D_002222E0[i * 8 + 1] = math_fast_sin_or_cos_a(FloatFraction((float)g_game_time * D_002222E0[i * 8 + 2] / *(float *)(state + 0x24)) * 6.2831855f);
+            g_surface_grid_noise_table[i * 8 + 1] = math_fast_sin_or_cos_a(FloatFraction((float)g_game_time * g_surface_grid_noise_table[i * 8 + 2] / *(float *)(state + 0x24)) * 6.2831855f);
     }
     if (~*(int *)(state + 0x4C) & 0x20) {
         for (i = 0; i < 64; i++)
-            D_002222E0[i * 8 + 4] = math_fast_sin_or_cos_b(FloatFraction((float)g_game_time * D_002222E0[i * 8 + 3]) * 6.2831855f);
+            g_surface_grid_noise_table[i * 8 + 4] = math_fast_sin_or_cos_b(FloatFraction((float)g_game_time * g_surface_grid_noise_table[i * 8 + 3]) * 6.2831855f);
     }
 }

@@ -14,14 +14,14 @@ typedef struct {
     int value;
     char remainder[0xA428];
 } Record_2B4038;
-extern Record_2B4038 D_00240450[];
+extern Record_2B4038 g_effect_record_table_2[];
 
 /* func_002B41A8 is matched in 002B41A8.c. */
 
-extern int D_001AA0F4 __attribute__((sda));
+extern int g_requested_setting_b __attribute__((sda));
 
 void func_PAL_002B5570(int value) {
-    D_001AA0F4 = value;
+    g_requested_setting_b = value;
 }
 
 /* func_002B49E0 is matched in 002B49E0-g8.c. */

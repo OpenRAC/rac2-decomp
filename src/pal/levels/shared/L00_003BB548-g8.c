@@ -39,11 +39,11 @@ typedef struct {
     u8 pad340[0x34E - 0x340];
     short f34E;                  
 } Hero;
-extern u8 D_0019B4A8[];
-extern u8 D_0019B2E8[][16];
-extern ProgressFlags D_L00_0021DDB0;
+extern u8 g_moby_nibble_table[];
+extern u8 g_moby_group_flags[][16];
+extern ProgressFlags g_controller_level_state;
 extern int g_current_map_index __attribute__((sda));
-extern PathSlot *D_L00_001FDA80[];
+extern PathSlot *g_launch_path_table[];
 extern Hero g_hero_state;
 extern float math_random_angle(void);
 extern float FastAddRotations(float angle, float delta);
@@ -60,21 +60,21 @@ static __inline__ void ClearPathTags(ButtonVars *vars)
     list = vars->path;
     if (list != -1) {
         i = 0;
-        if (D_L00_001FDA80[list]->count > 0) {
+        if (g_launch_path_table[list]->count > 0) {
             do {
-                slot = D_L00_001FDA80[list] + i;
+                slot = g_launch_path_table[list] + i;
                 if (slot[1].point.tag == vars->tag)
                     slot[1].point.tag = 0.0f;
                 list = vars->path;
                 ++i;
-            } while (i < D_L00_001FDA80[list]->count);
+            } while (i < g_launch_path_table[list]->count);
         }
     }
 }
 
 /* A floor button: sinks into place, then glows until the hero stands on it (or its mission
    is complete), then counts the press in the level's progress and unblocks its path. */
-void func_PAL_L00_003BB548(Moby *moby)
+void FloorButtonUpdate_pal(Moby *moby)
 {
     ButtonVars *vars = moby->vars;
     u8 *counter;
@@ -93,13 +93,13 @@ void func_PAL_L00_003BB548(Moby *moby)
         vars->phase = math_random_angle();
         id = moby->uid;
         moby->position[2] -= 0.35f;
-        if (!D_L00_0021DDB0.byUid[id]) {
-            count = D_0019B4A8[(id >> 1) + g_current_map_index * 0x400];
+        if (!g_controller_level_state.byUid[id]) {
+            count = g_moby_nibble_table[(id >> 1) + g_current_map_index * 0x400];
             if (moby->uid & 1)
                 count = (count >> 4) & 7;
             else
                 count &= 7;
-            if (!count && !(vars->byMission && (D_0019B2E8[g_current_map_index][moby->mission] & 0x80)))
+            if (!count && !(vars->byMission && (g_moby_group_flags[g_current_map_index][moby->mission] & 0x80)))
                 goto waiting;
         }
         moby->fBC = 2;
@@ -128,19 +128,19 @@ waiting:
         if (g_hero_state.groundMoby != moby || g_hero_state.f34E) {
             if (!vars->byMission)
                 return;
-            if (!(D_0019B2E8[g_current_map_index][moby->mission] & 0x80))
+            if (!(g_moby_group_flags[g_current_map_index][moby->mission] & 0x80))
                 return;
         }
 
         /* Count the press (up to 7), then unblock the path. */
         uid = moby->uid;
         if (uid & 1) {
-            counter = &D_0019B4A8[((short)uid >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)uid >> 1) + g_current_map_index * 0x400];
             value = *counter;
             if (((value >> 4) & 7) != 7)
                 *counter = value + 0x10;
         } else {
-            counter = &D_0019B4A8[((short)uid >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)uid >> 1) + g_current_map_index * 0x400];
             value = *counter;
             if ((value & 7) != 7)
                 *counter = value + 1;

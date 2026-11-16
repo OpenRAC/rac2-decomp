@@ -50,13 +50,13 @@ extern void euler_to_matrix(void *dst, void *src);
 
 extern void draw_world_quad(void *dst, void *src, int flag);
 
-extern float D_L11_001BA780[];
+extern float g_hero_l11_state_block[];
 
 extern int IsPointInCuboid(void *a, int b);
 
 extern int vec_fast_helper_b(void *a);
 
-extern unsigned char D_L11_00189EA0[];
+extern unsigned char g_hero_l11_state_data[];
 
 /* func_L11_002C5E80 lives in L11_002C5E80-nearby-g8.c. */
 
@@ -236,10 +236,10 @@ void part_draw_billboard_sprite(char *position, void *color, void *alpha, int te
     local.k0 = (int)color + ((int)alpha << 24);
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = mat_fast_helper_a(D_L11_001BA780[0x50] - *(float *)position,
-                                D_L11_001BA780[0x51] - *(float *)(position + 4));
-    pitch = mat_fast_helper_a(vec_distance_xy(position, D_L11_001BA780 + 0x50),
-                      D_L11_001BA780[0x52] - *(float *)(position + 8));
+    local.f216 = mat_fast_helper_a(g_hero_l11_state_block[0x50] - *(float *)position,
+                                g_hero_l11_state_block[0x51] - *(float *)(position + 4));
+    pitch = mat_fast_helper_a(vec_distance_xy(position, g_hero_l11_state_block + 0x50),
+                      g_hero_l11_state_block[0x52] - *(float *)(position + 8));
     local.f212 = -pitch;
     local.v208 = roll;
     euler_to_matrix(&local.m00, &local.v208);
@@ -352,17 +352,17 @@ void part_reset_quad_record_d(char *record)
 /* Checks that the hero is in state 0x82 on this object, then repeats one hero helper call nine times. */
 void hero_check_state_repeat_helper(char *moby)
 {
-    if (IsPointInCuboid(D_L11_00189EA0, *(int *)(*(char **)(moby + 0x68))) == 0) return;
-    if (*(int *)(D_L11_00189EA0 + 0x2214) != 0x82) return;
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
-    vec_fast_helper_b(D_L11_00189EA0 + 0x530);
+    if (IsPointInCuboid(g_hero_l11_state_data, *(int *)(*(char **)(moby + 0x68))) == 0) return;
+    if (*(int *)(g_hero_l11_state_data + 0x2214) != 0x82) return;
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
+    vec_fast_helper_b(g_hero_l11_state_data + 0x530);
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */

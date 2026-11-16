@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-s32 func_US2_003424C8(s32 arg0) {
+s32 tab_menu_get_selected_entry_us2(s32 arg0) {
     s32 temp_v1;
     s32 var_a0;
     s32 var_v0;

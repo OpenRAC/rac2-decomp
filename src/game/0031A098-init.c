@@ -1,7 +1,7 @@
 #include "common.h"
 
 typedef int QuadA098 __attribute__((mode(TI)));
-extern QuadA098 D_001AFAA0[4];
+extern QuadA098 g_gfx_quad_template_table[4];
 
 /* The four 16-byte blocks the record carries and scales. */
 #ifndef RAC2_T_BLOCK_0031A340
@@ -73,10 +73,10 @@ void gfx_fill_quad_from_template(Loc_0031a340 *p)
     int i;
     float scale = 2.0f;
 
-    local[0] = D_001AFAA0[0];
-    local[1] = D_001AFAA0[1];
-    local[2] = D_001AFAA0[2];
-    local[3] = D_001AFAA0[3];
+    local[0] = g_gfx_quad_template_table[0];
+    local[1] = g_gfx_quad_template_table[1];
+    local[2] = g_gfx_quad_template_table[2];
+    local[3] = g_gfx_quad_template_table[3];
     for (i = 3; i >= 0; i--) {
         qcopy(out, src);
         out->q[1] *= scale;

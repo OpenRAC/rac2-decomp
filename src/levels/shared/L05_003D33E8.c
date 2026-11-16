@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern char *CreateMoby(int);
-extern char D_L05_001B96C0[];
+extern char g_origin_vec[];
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecCross(void *, void *, void *);
 extern int math_fast_helper_a(void *, float);
@@ -31,9 +31,9 @@ typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } G
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L05_001B2614 __attribute__((sda));
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
 extern char *moby_get_motion_data(char *object);
 
@@ -61,14 +61,14 @@ extern int ref_L05_00424C88_00;
 
 extern void ref_L05_00424C88_01(void *, void *);
 
-extern float D_L05_0023F920[][4][137][4];
-extern float D_L05_0024A460[][4][137];
-extern float D_L05_0024D020[][4][4];
-extern int D_L05_0024CFD0[][4], D_L05_0024CF30[][4], D_L05_0024CF80[][4];
-extern float D_L05_001B2F58[] __attribute__((sda)), D_L05_001B2F88[] __attribute__((sda));
-extern float D_L05_001B2FB8[] __attribute__((sda)), D_L05_001B2FD0[] __attribute__((sda));
-extern int D_L05_001B2F70[] __attribute__((sda)), D_L05_001B2FE8[] __attribute__((sda));
-extern int D_L05_001B2FA0[] __attribute__((sda));
+extern float g_emitter_vertex_offsets[][4][137][4];
+extern float g_emitter_vertex_speeds[][4][137];
+extern float g_emitter_group_positions[][4][4];
+extern int g_emitter_group_timers[][4], g_emitter_group_alphas[][4], g_emitter_group_fade_rates[][4];
+extern float g_glow_effect_scales[] __attribute__((sda)), g_glow_effect_sizes[] __attribute__((sda));
+extern float g_glow_effect_angles_a[] __attribute__((sda)), g_glow_effect_angles_b[] __attribute__((sda));
+extern int g_glow_effect_alphas[] __attribute__((sda)), g_glow_effect_timers[] __attribute__((sda));
+extern int g_glow_effect_blends[] __attribute__((sda));
 extern int func_001163B0(void);
 extern void vec_clear_128(void *);
 
@@ -85,43 +85,43 @@ void part_reset_emitter_slot_effect(char *obj)
         for (j = 0; j < 137; j++) {
             float speed = math_random_float_range(0.5f, 4.0f);
 
-            vec_clear_128(D_L05_0023F920[*st][i][j]);
-            D_L05_0024A460[*st][i][j] = speed;
+            vec_clear_128(g_emitter_vertex_offsets[*st][i][j]);
+            g_emitter_vertex_speeds[*st][i][j] = speed;
         }
         /* This slot and the actor position do not contain the private index. */
-        qcopy_nc(D_L05_0024D020[*st][i], position);
-        D_L05_0024CFD0[*st][i] = 6;
-        D_L05_0024CF30[*st][i] = func_001163B0() % 128 + 128;
-        D_L05_0024CF80[*st][i] = func_001163B0() % 2 + 6;
+        qcopy_nc(g_emitter_group_positions[*st][i], position);
+        g_emitter_group_timers[*st][i] = 6;
+        g_emitter_group_alphas[*st][i] = func_001163B0() % 128 + 128;
+        g_emitter_group_fade_rates[*st][i] = func_001163B0() % 2 + 6;
         {
             float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
-            v = (float *)((char *)D_L05_0024D020 + offset);
+            v = (float *)((char *)g_emitter_group_positions + offset);
             v[0] += jitter;
         }
         {
             float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
-            v = (float *)((char *)D_L05_0024D020 + offset);
+            v = (float *)((char *)g_emitter_group_positions + offset);
             v[1] += jitter;
         }
         {
             float jitter = math_random_float_range(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
-            v = (float *)((char *)D_L05_0024D020 + offset);
+            v = (float *)((char *)g_emitter_group_positions + offset);
             v[2] += jitter;
         }
     }
-    D_L05_001B2F58[*st] = 0.01f;
-    D_L05_001B2F70[*st] = 128;
-    D_L05_001B2F88[*st] = 0.1f;
-    D_L05_001B2FE8[*st] = 6;
-    D_L05_001B2FA0[*st] = 128;
-    D_L05_001B2FB8[*st] = 0.0f;
-    D_L05_001B2FD0[*st] = 0.0f;
+    g_glow_effect_scales[*st] = 0.01f;
+    g_glow_effect_alphas[*st] = 128;
+    g_glow_effect_sizes[*st] = 0.1f;
+    g_glow_effect_timers[*st] = 6;
+    g_glow_effect_blends[*st] = 128;
+    g_glow_effect_angles_a[*st] = 0.0f;
+    g_glow_effect_angles_b[*st] = 0.0f;
 }
 
 
@@ -162,7 +162,7 @@ void moby_init_effect_from_table(char *object)
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
     *(int *)(moby_get_motion_data(object) + 0x148) = 1;
     moby_init_spawned_sub_object(object, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x1C8) = 0x78;
     *(int *)(sub + 0x1C0) = -1;
     *(int *)(sub + 0x1C4) = -1;
@@ -442,7 +442,7 @@ char *part_spawn_shockwave_burst(void *pos, int shake, int c20, int c24, int c28
         obj[0x20] = 0;
         qcopy(obj + 0x10, pos);
         *(float *)(obj + 0x1C) = 1.0f;
-        FastVecSub(toward, D_L05_001B96C0, (float *)(obj + 0x10));
+        FastVecSub(toward, g_origin_vec, (float *)(obj + 0x10));
         vec_scale_to_length(toward, toward, 1.0f);
         cam_compute_view_direction(obj + 0x10, up, 1);
         qcopy(obj + 0xC0, toward);
@@ -469,17 +469,17 @@ char *part_spawn_shockwave_burst(void *pos, int shake, int c20, int c24, int c28
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             *(short *)(st + 4) = 10;
             *(float *)(st + 0x10) = 0.1f;
-            if (fast_vec_dist(pos, D_L05_001B96C0) < 48.0f && shake) {
-                char *mgr = D_L05_001B96C0 - 0x140;
+            if (fast_vec_dist(pos, g_origin_vec) < 48.0f && shake) {
+                char *mgr = g_origin_vec - 0x140;
 
                 *(int *)(mgr + 0x16C) = 0;
                 *(int *)(mgr + 0x168) = 40;
                 *(float *)(mgr + 0x160) = 0.075f;
             }
             if (*(int *)(st + 0x18)) {
-                FastVecSub(cameraDir, obj + 0x10, (float *)D_L05_001B96C0);
+                FastVecSub(cameraDir, obj + 0x10, (float *)g_origin_vec);
                 vec_scale_to_length(cameraDir, cameraDir, 1.0f);
-                if (1.5707964f - math_fast_angle_helper(FastVecDot(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(cameraDir, g_origin_vec + 0x230)) < 0.45378566f)
                     *(int *)(st + 0x18) = 1;
                 else
                     *(int *)(st + 0x18) = 0;

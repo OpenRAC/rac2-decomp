@@ -33,15 +33,15 @@ typedef struct TriggerData {
 } TriggerData;
 
 extern char g_hero_position[];
-extern Row *D_L01_001B264C[] __attribute__((sda));
+extern Row *g_swamp_patrol_positions[] __attribute__((sda));
 extern Row *ref_L01_003D4270_00 __attribute__((sda));
-extern char *D_L01_001FE180[];
-extern char D_L01_001B94C0[];
+extern char *g_path_l01_table[];
+extern char g_level_origin_vec[];
 
 extern int IsPointInCuboid(void *, int);
 extern int moby_count_group_not_in_state(int, int);
 extern void cam_end_override(void *);
-extern Pool *func_PAL_L00_002D7850(int);
+extern Pool *cam_alloc_override_slot_pal(int);
 extern void FastVecSub(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
@@ -84,7 +84,7 @@ void func_PAL_L01_003D8528(char *m)
         } else if (!d->pool && active && !clear && d->target == -1) {
             Pool *created;
 
-            created = func_PAL_L00_002D7850(d->b33);
+            created = cam_alloc_override_slot_pal(d->b33);
             d->pool = created;
             if (!created)
                 return;
@@ -107,19 +107,19 @@ void func_PAL_L01_003D8528(char *m)
                 if (d->b49)
                     created->pos = ref_L01_003D4270_00[d->anchor].q0;
                 else {
-                    FastVecSub(pos, &D_L01_001B264C[0][d->anchor].centre, g_hero_position);
+                    FastVecSub(pos, &g_swamp_patrol_positions[0][d->anchor].centre, g_hero_position);
                     created->pos = *(Quad *)(pos);
                 }
             }
         } else if (active && !d->state && d->target != -1) {
-            char *camera = D_L01_001FE180[d->target];
+            char *camera = g_path_l01_table[d->target];
 
             *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
             rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
             rot[1] = -mat_fast_helper_a(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            SetCamera5Pose(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 100, 0);
+            SetCamera5Pose(g_level_origin_vec, g_level_origin_vec + 0x10, 3, 100, 0);
             object_copy_vector_to_selected(camera + 0x10);
             cam_set_state_rotation(rot);
             d->state = 1;
@@ -130,7 +130,7 @@ void func_PAL_L01_003D8528(char *m)
                 d->state = 2;
                 SetCamera5Mode(1, 0);
             }
-            camera = D_L01_001FE180[d->target];
+            camera = g_path_l01_table[d->target];
             *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
             rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
@@ -146,7 +146,7 @@ void func_PAL_L01_003D8528(char *m)
             if (d->b49)
                 p->pos = ref_L01_003D4270_00[d->anchor].q0;
             else {
-                FastVecSub(pos, &D_L01_001B264C[0][d->anchor].centre, g_hero_position);
+                FastVecSub(pos, &g_swamp_patrol_positions[0][d->anchor].centre, g_hero_position);
                 p->pos = *(Quad *)(pos);
             }
         }

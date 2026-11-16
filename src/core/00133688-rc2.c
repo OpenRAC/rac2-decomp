@@ -25,14 +25,14 @@
 #include "common.h"
 
 extern s32 sceCdGetError();
-extern s32 D_001A748C __attribute__((sda));
+extern s32 g_snd_cmd_result __attribute__((sda));
 
-extern s32 D_001A7110 __attribute__((nosda));
+extern s32 g_cd_read_error __attribute__((nosda));
 
 /* Returns the error code of the last disc read. */
 s32 snd_get_cd_read_error(void) {
-    if (D_001A748C == 0) {
+    if (g_snd_cmd_result == 0) {
         return sceCdGetError();
     }
-    return D_001A7110;
+    return g_cd_read_error;
 }

@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern f32 D_L12_001AF694 __attribute__((sda));
-extern s32 D_L12_001AF68C __attribute__((sda)), D_L12_001AF690 __attribute__((sda));
+extern f32 g_fade_speed __attribute__((sda));
+extern s32 g_fade_color_a __attribute__((sda)), g_fade_color_b __attribute__((sda));
 extern s32 g_current_map_index MACRO_ADDR;
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_b(f32);
@@ -22,8 +22,8 @@ void func_PAL_L12_003AA3F0(u8 *object)
         s32 color, alpha;
         s32 r, g, b;
         u32 packed;
-        *(f32 *)state = FastAddRotations(*(f32 *)state, D_L12_001AF694 * 0.0003490659f);
-        color = FastTweenColor(D_L12_001AF68C, D_L12_001AF690, math_fast_sin_or_cos_b(*(f32 *)state) * 0.5f + 0.5f);
+        *(f32 *)state = FastAddRotations(*(f32 *)state, g_fade_speed * 0.0003490659f);
+        color = FastTweenColor(g_fade_color_a, g_fade_color_b, math_fast_sin_or_cos_b(*(f32 *)state) * 0.5f + 0.5f);
         b = (color >> 16) & 255;
         g = (color >> 8) & 255;
         r = color & 255;

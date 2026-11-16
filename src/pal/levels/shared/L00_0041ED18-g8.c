@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 typedef float f32;
 extern void FastVecAdd(u8 *, u8 *, u8 *);
-extern f32 D_L03_001B1FC4 __attribute__((sda));
+extern f32 g_moby_hit_radius_scale __attribute__((sda));
 extern f32 FastAddRotations(f32, f32);
 extern void moby_mark_spawned(u8 *);
 
@@ -13,7 +13,7 @@ void func_PAL_L00_0041ED18(u8 *a0) {
     u8 *q = *(u8 **)(a0 + 0x68);
     u8 *r = *(u8 **)(a0 + 0x24);
 
-    *(f32 *)(a0 + 0x2C) = *(f32 *)(r + 0x24) * D_L03_001B1FC4;
+    *(f32 *)(a0 + 0x2C) = *(f32 *)(r + 0x24) * g_moby_hit_radius_scale;
     *(f32 *)(q + 0x8) = *(f32 *)(q + 0x8) - 0.006f;
     FastVecAdd(a0 + 0x10, a0 + 0x10, q);
     FastVecAdd(a0 + 0xF0, a0 + 0xF0, q + 0x10);

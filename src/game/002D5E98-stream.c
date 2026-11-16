@@ -112,19 +112,19 @@ extern int menu_stream_chunk_set_latch(int);
 extern int menu_stream_chunk_clear_latch(int);
 extern int fast_decompress(int, int);
 extern int load_start_disc_read(int, int, int);
-extern int D_001C51D0;
+extern int g_selected_map_index;
 /* The menu system's current page, D_001F2840.current. */
-extern MenuPage *D_001F2854;
+extern MenuPage *g_active_menu_object;
 extern MenuSystem g_pause_menu_state;
 extern MemoryCardState g_memcard_state;
 extern Settings g_is_pal_video __attribute__((sda));
-extern unsigned char D_001A7A60[] __attribute__((sda));
-extern ListEntry D_001AAB48[] SDATA(D_001AAB48);
-extern ListEntry D_0025A9F8[];
-extern LanguageOffsets D_001ABB30;
-extern short D_001A63AC;
-extern int D_0014D11C;
-extern int D_0014B8AC;
+extern unsigned char g_item_enabled_flags[] __attribute__((sda));
+extern ListEntry g_stream_list_entries[] SDATA(D_001AAB48);
+extern ListEntry g_stream_list_entries_2[];
+extern LanguageOffsets g_language_offsets;
+extern short g_sequence_active_flag;
+extern int g_stream_sector_base_alt;
+extern int g_stream_sector_base;
 
 /* Starts reading entry index into buffer (at its end when the entry is to be unpacked in
  * place); returns nonzero when the read started. */
@@ -137,20 +137,20 @@ static inline int startRead(MenuStream *stream, int index, int buffer)
         buffer += offset;
     }
     if (stream->flags & 0x10000)
-        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014D11C,
+        return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base_alt,
                              stream->entries[index].count);
     /* Flag 0x10 reads from the same base as the default. */
     if (stream->flags & 0x10)
-        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
+        return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base,
                              stream->entries[index].count);
-    return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
+    return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base,
                          stream->entries[index].count);
 }
 
 /* Reads entry index into buffer slot when the disc is free, then moves to the next state. */
 static inline void loadEntry(MenuStream *stream, int index, int slot)
 {
-    if (D_001A63AC != 0 || stream->entries[index].count == 0)
+    if (g_sequence_active_flag != 0 || stream->entries[index].count == 0)
         return;
     if (startRead(stream, index, stream->buffer[slot])) {
         menu_stream_chunk_set_latch(stream->buffer[slot]);
@@ -180,9 +180,9 @@ int UpdateMenuResourceStream(MenuStream *stream)
         if (index == -1)
             return 0;
     } else if (flags & 2) {
-        index = D_001C51D0;
+        index = g_selected_map_index;
     } else if (flags & 4) {
-        index = D_001F2854->focus->data.grid.cell;
+        index = g_active_menu_object->focus->data.grid.cell;
     } else if (flags & 0x100) {
         MenuSystem *menus = &g_pause_menu_state;
         MemoryCardState *card = &g_memcard_state;
@@ -204,7 +204,7 @@ int UpdateMenuResourceStream(MenuStream *stream)
             stream->state = -1;
         }
     } else if (flags & 8) {
-        MenuScreen *grid = D_001F2854->focus;
+        MenuScreen *grid = g_active_menu_object->focus;
 
         index = grid->data.grid.cells[grid->data.grid.cell].resource;
         if (grid->data.grid.rows == 0)
@@ -212,26 +212,26 @@ int UpdateMenuResourceStream(MenuStream *stream)
     } else if (flags & 0x400) {
         index = (stream->frames / 300) % 19;
     } else if (flags & 0x1000) {
-        offsets = D_001ABB30;
+        offsets = g_language_offsets;
         index = *stream->languageBase + offsets.values[g_is_pal_video.language];
     } else {
-        MenuScreen *list = D_001F2854->focus;
+        MenuScreen *list = g_active_menu_object->focus;
         ListEntry *entries = list->data.list.entries;
 
         index = list->data.list.selected;
         if (index < 0)
             index = 0;
-        if (entries == D_001AAB48) {
+        if (entries == g_stream_list_entries) {
             if (index >= 1)
                 index += 2;
             index = index > 5 ? 0 : index;
         }
-        if (entries == D_0025A9F8)
+        if (entries == g_stream_list_entries_2)
             index = index > 3 ? 0 : index;
         if ((flags & 0x4000) && entries[index].action == 2)
             index = 9;
     }
-    if ((stream->flags & 0x2000) && D_001A7A60[index] == 0)
+    if ((stream->flags & 0x2000) && g_item_enabled_flags[index] == 0)
         index = 30;
 
     switch (stream->state) {
@@ -242,7 +242,7 @@ int UpdateMenuResourceStream(MenuStream *stream)
     case 1:
     case 3:
     case 5:
-        if (D_001A63AC == 0) {
+        if (g_sequence_active_flag == 0) {
             if (stream->flags & 0x20) {
                 /* State 3 has read into the second buffer. */
                 int *slot = &stream->buffer[0];

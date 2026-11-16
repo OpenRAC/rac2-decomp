@@ -177,7 +177,7 @@ void func_PAL_L22_003A0498(ProjectileObject *obj)
 }
 
 extern s32 func_2F4BE0(f32);
-extern u16 D_L22_001AA5EC __attribute__((sda));
+extern u16 g_homing_trail_value __attribute__((sda));
 typedef struct {
     u8 pad0[0x188c];
     void *aim;
@@ -197,11 +197,11 @@ extern f32 ref_L22_0039CDC0_8(void *, void *);
 extern f32 ref_L22_0039CDC0_9(f32);
 extern f32 ref_L22_0039CDC0_10(void *, void *);
 extern s32 ref_L22_0039CDC0_11(s32, s32, void *);
-extern f32 D_L22_001AF2B0 __attribute__((sda));
-extern f32 D_L22_001AF2C8 __attribute__((sda));
+extern f32 g_homing_projectile_scale __attribute__((sda));
+extern f32 g_homing_dot_threshold __attribute__((sda));
 extern ProjectileObject *ref_L22_0039CDC0_12[] __attribute__((sda));
 extern Hero g_hero_state;
-extern Quad D_L22_001B1930 __attribute__((sda));
+extern Quad g_homing_projectile_aim __attribute__((sda));
 
 /* Spawns a class-0x100 moby at `position` with the owner's orientation and a 150-frame
    timer, picks its target (the argument, else the level's fallback), then drops the
@@ -219,7 +219,7 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
     if (obj) {
         data = obj->data;
         ref_L22_0039CDC0_1(obj, owner);
-        obj->scale *= D_L22_001AF2B0;
+        obj->scale *= g_homing_projectile_scale;
         obj->flags |= 0x100;
         data->turn = 0.40000004f;
         obj->basis[0] = owner->basis[0];
@@ -269,16 +269,16 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);
             if ((owner == g_hero_state.moby && !data->target->targetable)
-                || dot < D_L22_001AF2C8 || distance > 50.0f || reject)
+                || dot < g_homing_dot_threshold || distance > 50.0f || reject)
                 data->target = 0;
             if (owner == g_hero_state.moby) {
                 if (data->target) {
                     g_hero_state.aim = &data->direction;
                 } else if (g_hero_state.state == 0x5b) {
-                    qcopy(&D_L22_001B1930, &owner->basis[2]);
-                    ref_L22_0039CDC0_2(&D_L22_001B1930, &D_L22_001B1930, -1.0f);
-                    g_hero_state.aim = &D_L22_001B1930;
-                    qcopy(&data->direction, &D_L22_001B1930);
+                    qcopy(&g_homing_projectile_aim, &owner->basis[2]);
+                    ref_L22_0039CDC0_2(&g_homing_projectile_aim, &g_homing_projectile_aim, -1.0f);
+                    g_hero_state.aim = &g_homing_projectile_aim;
+                    qcopy(&data->direction, &g_homing_projectile_aim);
                     data->mode = 0;
                     data->target = (ProjectileObject *)1;
                     data->player = 0;

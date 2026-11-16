@@ -2,7 +2,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern void moby_set_state(void *, int, int);
 extern s32 PlayMobySound(s32, s32, s32);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -10,7 +10,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern int IsPointInCuboid(void *, int);
 
 extern char g_hero_position[];
-extern char D_L12_001B9E00[];
+extern char g_hero_prev_position[];
 extern float vec_distance_xy(void *, void *);
 extern int math_fast_float_d(void *);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
@@ -30,11 +30,11 @@ void secret_door_update(u8 *self)
         self[0x30] = 0x7F;
         break;
     case 1:
-        if (vec_distance_xy(self + 0x10, D_L12_001B2E9C + (vars[0] << 8) + 0x10) < 5.0f) {
+        if (vec_distance_xy(self + 0x10, g_moby_list_start + (vars[0] << 8) + 0x10) < 5.0f) {
             vars[0xB] = state;
             vars[8] = 0x3C;
         } else if ((IsPointInCuboid(g_hero_position, vars[1]) && vars[0xB] != 0) ||
-                   (IsPointInCuboid(D_L12_001B9E00, vars[1]) && vars[0xB] != 0)) {
+                   (IsPointInCuboid(g_hero_prev_position, vars[1]) && vars[0xB] != 0)) {
             vars[8] = 0x3C;
         }
         if (math_fast_float_d((u8 *)vars + 0x20))

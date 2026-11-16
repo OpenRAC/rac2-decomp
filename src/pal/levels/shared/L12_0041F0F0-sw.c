@@ -6,38 +6,38 @@
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern int D_L12_001A79F0 MACRO_ADDR;
-extern int D_L12_001A8F00 MACRO_ADDR;
+extern int g_robot_kill_counter MACRO_ADDR;
+extern int g_hero_l12_control_mode MACRO_ADDR;
 struct L12GlobalState {
     char pad0[0x24]; int f24;
     char pad28[0x40]; int f68; short f6C;
     char pad6E[4]; short f72;
 };
-extern struct L12GlobalState D_L12_001A63A8;
-extern char *D_L12_001FEAC0[];
-extern void func_PAL_L12_0041F568(void *);
+extern struct L12GlobalState g_path_shooter_state;
+extern char *g_path_zone_table[];
+extern void path_enemy_init_scale_pal(void *);
 extern int moby_dispatch_action_by_kind(void *,void *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *,int,int);
 extern int math_random_int_below(int);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern int enemy_claim_attack_turn(void *,int);
-extern int func_PAL_002B5E30(void *,float);
+extern int moby_step_at_own_position_factor_pal(void *,float);
 extern s32 snd_resume_music_stream(void);
 extern void tourist_increment_counters(int);
 extern int path_find_next_stop_point(void *,int);
-extern int func_PAL_L12_0041F710(void *);
+extern int AimAtPathCursorAndAdvance_pal(void *);
 extern float FastAddRotations(float,float);
 extern int math_fast_float_d(void *);
 extern int flag_set_first_pending(void *);
 extern void func_PAL_L02_003CDF48(void *);
 extern void enemy_tick_timers_age(void *);
 
-void func_PAL_L12_0041F0F0(char *obj) {
+void path_shooter_update_pal(char *obj) {
     char *s=P(obj,0x68);
     int r;
-    if(D_L12_001A79F0==13) {
-        if(D_L12_001A8F00!=2) {
+    if(g_robot_kill_counter==13) {
+        if(g_hero_l12_control_mode!=2) {
             U(obj,0x34)=(U(obj,0x34)&0xFFBE)|0x1000;
             W(obj,0x98)=W(P(obj,0x24),0x10);
         } else {
@@ -46,7 +46,7 @@ void func_PAL_L12_0041F0F0(char *obj) {
         }
         return;
     }
-    func_PAL_L12_0041F568(obj);
+    path_enemy_init_scale_pal(obj);
     switch(B(obj,0x95)) {
     case 1:
         { int flags=moby_dispatch_action_by_kind(obj,s+0x60);
@@ -65,13 +65,13 @@ void func_PAL_L12_0041F0F0(char *obj) {
         }
         break;
     case 8:
-        func_PAL_002B5E30(obj,F(s,0x228));
-        if(D_L12_001A63A8.f72==3 && D_L12_001A63A8.f6C<6000) {
+        moby_step_at_own_position_factor_pal(obj,F(s,0x228));
+        if(g_path_shooter_state.f72==3 && g_path_shooter_state.f6C<6000) {
             snd_resume_music_stream(); moby_set_state(obj,5,-1);
         }
         break;
     case 5:
-        if(!D_L12_001A63A8.f68 && D_L12_001A63A8.f24==-1) {
+        if(!g_path_shooter_state.f68 && g_path_shooter_state.f24==-1) {
             tourist_increment_counters(W(s,0x114));
             moby_set_state(obj,6,-1);
             if(B(obj,0x43)) func_PAL_002A7E68(obj,0,0,17);
@@ -84,8 +84,8 @@ void func_PAL_L12_0041F0F0(char *obj) {
         }
         break;
     case 6:
-        if(func_PAL_L12_0041F710(obj)) {
-            if(W(s,0x220)==W(D_L12_001FEAC0[W(s,0x110)],0)-1) {
+        if(AimAtPathCursorAndAdvance_pal(obj)) {
+            if(W(s,0x220)==W(g_path_zone_table[W(s,0x110)],0)-1) {
                 moby_set_state(obj,3,-1);
                 if(B(obj,0x43)!=9)func_PAL_002A7E68(obj,9,0,17);
             } else {
@@ -97,7 +97,7 @@ void func_PAL_L12_0041F0F0(char *obj) {
         }
         break;
     case 7:
-        func_PAL_002B5E30(obj,F(s,0x228));
+        moby_step_at_own_position_factor_pal(obj,F(s,0x228));
         if(math_fast_float_d(s+0x22C) && enemy_claim_attack_turn(obj,W(s,0x11C))) {
             moby_set_state(obj,8,-1);
             r=math_random_int_below(4);

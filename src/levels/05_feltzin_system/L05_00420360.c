@@ -42,20 +42,20 @@ extern void feltzin_challenge_reset(u8 *a0);
 extern void feltzin_target_spawner_init(u8 *a0);
 extern void feltzin_target_spawn_random(u8 *a0);
 
-extern s32 D_001B1364 __attribute__((sda));
-extern s32 D_001B13E4 __attribute__((sda));
-extern u8 D_L05_00221D10[];
-extern u8 D_L05_001B3550[];
-extern s32 D_L05_001B2048;
-extern u8 *D_001B2614;
-extern u8 D_L05_001B1354[];
-extern u8 D_L05_001B1358[];
-extern u8 D_L05_001B135C[];
-extern u8 D_L05_001495B8[];
-extern u8 *D_L05_0020B220[];
-extern u32 D_L05_001FB220[];
-extern u8 *D_L05_001B251C[] __attribute__((sda));
-extern s32 D_001B1350 __attribute__((sda));
+extern s32 g_sdata_word_unused_b __attribute__((sda));
+extern s32 g_sdata_word_unused_c __attribute__((sda));
+extern u8 g_feltzin_challenge_state[];
+extern u8 g_feltzin_timer[];
+extern s32 g_feltzin_mission_index;
+extern u8 *g_spot_record_table;
+extern u8 g_feltzin_challenge_param_a[];
+extern u8 g_feltzin_challenge_param_b[];
+extern u8 g_feltzin_challenge_param_c[];
+extern u8 g_level_data_block[];
+extern u8 *g_level_byte_ptr_table[];
+extern u32 g_spawn_list_table[];
+extern u8 *g_feltzin_target_mobys[] __attribute__((sda));
+extern s32 g_sdata_word_unused_a __attribute__((sda));
 
 /* func_L05_00420360 lives in L05_00420360-g8.c. */
 
@@ -105,7 +105,7 @@ void feltzin_target_spawner_update(u8 *moby)
 
     if (n >= 2) {
         s32 count = func_00332AF8(0, n - 1);
-        u16 *idPtr = (u16 *)D_L05_001FB220[moby[0x21]];
+        u16 *idPtr = (u16 *)g_spawn_list_table[moby[0x21]];
         u16 idWord;
         i = 0;
         do {
@@ -118,7 +118,7 @@ void feltzin_target_spawner_update(u8 *moby)
         } while ((s16)idWord >= 0);
         goto done;
 found:
-        target = D_L05_001B251C[0] + (n << 8);
+        target = g_feltzin_target_mobys[0] + (n << 8);
     } else {
         target = moby;
     }

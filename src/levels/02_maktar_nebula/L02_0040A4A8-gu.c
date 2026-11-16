@@ -24,7 +24,7 @@ typedef struct {
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; TI128 q[0x260]; } Hero;
 extern u8 g_hero_state[];
 typedef struct { u8 pad00[0x5C]; u8 *ids; } L02_Palette;
-extern L02_Palette D_L02_00200080;
+extern L02_Palette g_chain_link_palette;
 extern void flamethrower_robot_update_common(u8 *);
 extern void moby_set_state(u8 *, u8, s32);
 extern s32 math_random_int_below(s32);
@@ -250,7 +250,7 @@ void flamethrower_l02_robot_update(u8 *object)
                     u8 *part = part_spawn_burst(&near_point, tmpl, 15, 60, 0x606060, 3,
                         105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
                     if (part) {
-                        part[2] = *D_L02_00200080.ids;
+                        part[2] = *g_chain_link_palette.ids;
                         part[3] = 0x44;
                         if (math_random_int_range(0, 1)) {
                             u8 *tail;

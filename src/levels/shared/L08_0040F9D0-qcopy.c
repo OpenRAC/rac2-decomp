@@ -9,7 +9,7 @@ extern f32 func_3279B8(void);
 extern s32 func_3AE870(void *a0, s32 a1);
 extern void func_2B71F0(void *a0);
 extern void func_31D540(void *a0);
-extern u8 D_L08_001B14F0[];
+extern u8 g_spinning_object_data[];
 
 typedef int V4 __attribute__((mode(TI)));
 
@@ -45,7 +45,7 @@ s32 moby_spawn_spinning_object(void *owner, void *start_pos, void *start_vel, f3
         result = func_3AE870(position, 0);
         *(u32 *)(vars + 0x1C) = result;
         if (result == 0) {
-            func_2B71F0(D_L08_001B14F0);
+            func_2B71F0(g_spinning_object_data);
             func_31D540(moby);
             moby = 0;
         }

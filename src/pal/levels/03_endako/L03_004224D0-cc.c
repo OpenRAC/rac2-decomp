@@ -13,8 +13,8 @@ extern int math_random_int_range(int a, int b);
 extern void endako_boss_blend_parts(u8 *entity);
 /* `lui $v0,%hi ; lw $v0,%lo($v0)` in the retail: one register, no HIGH/LO_SUM
  * split, which is what the sda attribute (SYMBOL_REF_FLAG) gives in -G0. */
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_moby_record_base __attribute__((sda));
+extern u8 *g_entity_id_lists[];
 
 /* One word of a stream: bits 0..14 name a record, bit 15 ends the walk. */
 typedef struct {
@@ -28,7 +28,7 @@ typedef struct {
     u8 field10[1];
 } Entry41D1D8;
 
-extern Entry41D1D8 *D_L03_001FE700[];
+extern Entry41D1D8 *g_path_l03_entry_table[];
 
 /* func_L03_003F09C0 is in L03_003F09C0-help-g8.c. */
 
@@ -108,11 +108,11 @@ void func_PAL_L03_004224D0(u8 *entity) {
     u8 *record;
 
     if (entity[0x21] == 0xFF) return;
-    entry = (StreamEntry *)D_L03_001FB5A0[entity[0x21]];
+    entry = (StreamEntry *)g_entity_id_lists[entity[0x21]];
     if (entry == 0) return;
     p = entry;
     do {
-        record = D_L03_001B2A1C + ((p->raw & 0x7FFF) << 8);
+        record = g_moby_record_base + ((p->raw & 0x7FFF) << 8);
         if (*(signed char *)(record + 0x20) >= 0) {
             if (*(short *)(record + 0xAA) == 0xff3) {
                 u8 *owner = *(u8 **)(record + 0x68);

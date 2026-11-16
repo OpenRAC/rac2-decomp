@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L00_001A8FD8 __attribute__((sda));
+extern int g_menu_prompt_flag_a __attribute__((sda));
 
-extern int D_L00_001A8FDC __attribute__((sda));
+extern int g_menu_prompt_flag_b __attribute__((sda));
 
 extern void prompt_bar_set_extras_enabled(int *p, int flag);
 
@@ -49,7 +49,7 @@ extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 /* Draws a menu screen and its button prompt bar, then updates one more part of the screen. */
 void menu_draw_with_prompts(int *obj)
 {
-    if (D_L00_001A8FD8 != 0 || D_L00_001A8FDC != 0 || obj[192] != 0)
+    if (g_menu_prompt_flag_a != 0 || g_menu_prompt_flag_b != 0 || obj[192] != 0)
         prompt_bar_set_extras_enabled(obj + 2, 0);
     if (obj[191] == 1)
         prompt_bar_set_extras_enabled(obj + 2, 1);
@@ -91,10 +91,10 @@ extern void object_set_first_float4(void *, float, float, float, float);
 extern char *text_format_location_name(void *, int);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
-extern Point2_00339F28 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8, D_001ADD00;
+extern Point2_00339F28 g_list_screen_title_pos, g_list_screen_list_pos, g_list_screen_prev_pos, g_list_screen_next_pos, g_list_screen_scale;
 extern char g_map_overlay_state[];
-extern int D_00258D70[];
-extern char D_001ADC88[];
+extern int g_menu_text_id_table[];
+extern char g_circle_menu_icon_data[];
 
 /* Lays the screen out: scales the six list widgets, places every widget at its offset from
    the position block, then labels the zoom widget from the current planet's text id (" " when
@@ -112,11 +112,11 @@ int list_screen_layout(char *obj, int unused)
     memset(&z1, 0, 8);
     memset(&z2, 0, 8);
     memset(&z3, 0, 8);
-    title = D_001ADCE0;
-    list = D_001ADCE8;
-    prev = D_001ADCF0;
-    next = D_001ADCF8;
-    scale = D_001ADD00;
+    title = g_list_screen_title_pos;
+    list = g_list_screen_list_pos;
+    prev = g_list_screen_prev_pos;
+    next = g_list_screen_next_pos;
+    scale = g_list_screen_scale;
     object_set_second_float4(obj + 0x180, scale.x, scale.y, 0.0f, 0.0f);
     object_set_second_float4(obj + 0x1C8, scale.x, scale.y, 0.0f, 0.0f);
     object_set_second_float4(obj + 0x210, scale.x, scale.y, 0.0f, 0.0f);
@@ -151,11 +151,11 @@ int list_screen_layout(char *obj, int unused)
                   next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
     base = g_map_overlay_state;
     text_format_location_name(obj + 0x3C0, *(int *)(base + 0x230));
-    index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
+    index = g_menu_text_id_table[*(int *)(base + 0x230) * 2 + 1];
     if (index >= 0)
         hud_set_widget_field_b(obj + 0x378, GetLocalizedString(index));
     else
-        hud_set_widget_field_b(obj + 0x378, (int)D_001ADC88);
+        hud_set_widget_field_b(obj + 0x378, (int)g_circle_menu_icon_data);
     return 0;
 }
 
@@ -208,7 +208,7 @@ extern int *object_get_fourth_field(void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
-extern float D_001B23A4 __attribute__((sda));
+extern float g_hud_scale __attribute__((sda));
 /* Allocate the title position (scaled y, rounded) and set up its two labels.
  * The scale is read after the x store: retail issues 300.0 before it. */
 void title_screen_init_labels(unsigned char *obj, void *arg)
@@ -233,10 +233,10 @@ void title_screen_init_labels(unsigned char *obj, void *arg)
         p = *(TitlePosition **)(obj + 0x1FC);
         p->x = 70.0f;
         position = 300.0f;
-        y = (int)(D_001B23A4 * position + 0.5f);
+        y = (int)(g_hud_scale * position + 0.5f);
         value = y;
     } while (0);
-    text = D_001ADC88;
+    text = g_circle_menu_icon_data;
     p = *(TitlePosition **)(obj + 0x1FC);
     p->y = value;
     object_init_derived_c(obj + 0x134, text, *(void **)(obj + 0x200));

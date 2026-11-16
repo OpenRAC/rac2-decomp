@@ -12,13 +12,13 @@
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 
-extern int D_L17_001CA140[];
-extern int D_L17_001A8F00 MACRO_ADDR;
+extern int g_grulch_disabled_flag[];
+extern int g_spark_effect_state MACRO_ADDR;
 extern int g_current_map_index __attribute__((sda));
 extern char *g_moby_l17_pool[] __attribute__((sda));
-extern float D_L17_001B0CAC SDATA(D_L17_001B0CAC);
-extern float D_L17_001B0CB0 SDATA(D_L17_001B0CB0);
-extern float D_L17_001B0CB4 SDATA(D_L17_001B0CB4);
+extern float g_grulch_near_distance SDATA(D_L17_001B0CAC);
+extern float g_grulch_approach_speed_a SDATA(D_L17_001B0CB0);
+extern float g_grulch_approach_speed_b SDATA(D_L17_001B0CB4);
 typedef struct { char pad[0x80]; float x,y; } L17HeroRecord;
 extern L17HeroRecord g_hero_state;
 extern void func_PAL_L17_003E89B0(char *);
@@ -40,11 +40,11 @@ extern float math_random_float_range(float,float);
 extern int FloatToInt(float);
 extern int flag_set_second_pending(char *);
 extern int moby_dispatch_action_by_kind(char *,void *);
-extern void func_PAL_002A7650(char *,int,int);
+extern void SetDeathBits_pal(char *,int,int);
 extern void part_queue_moby_for_glow(char *,int,int);
 extern void moby_mark_spawned(char *);
 extern f32 ApproachValue(float *,float,float);
-extern void func_PAL_002AF420(char *,void *,float,float);
+extern void moby_wander_around_home_point_pal(char *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern void StepAngleTowardTarget(float *,int,float,float);
 extern int flag_set_first_pending(char *);
@@ -56,7 +56,7 @@ extern void moby_set_controller_speed_limits(char *,float,float,float,float);
 extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern int func_PAL_L02_00333638(char *,void *,int,float,float,float);
+extern int moby_move_to_target_temp_limits_pal(char *,void *,int,float,float,float);
 extern float math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
 extern void add_vectors(void *,void *,void *);
 extern float FastAddRotations(float,float);
@@ -68,9 +68,9 @@ void func_PAL_L17_003E79D8(char *object)
     char *vars, *other;
     int flags;
     float angle;
-    if (D_L17_001CA140[0]) return;
+    if (g_grulch_disabled_flag[0]) return;
     vars=P(object,0x68);
-    if (D_L17_001A8F00==2) {
+    if (g_spark_effect_state==2) {
         if (!B(object,0x31)) return;
         I(vars,0x454)=1;
         I(object,0x98)=0;
@@ -155,7 +155,7 @@ restoreCollision:
             flags=moby_dispatch_action_by_kind(object,vars+0x60);
             if(flags&1) {
                 H(vars,0x98)=0;
-                func_PAL_002A7650(object,0,3);
+                SetDeathBits_pal(object,0,3);
                 part_queue_moby_for_glow(object,0,0);
                 return;
             }
@@ -176,14 +176,14 @@ restoreCollision:
     if(F(object,0x18)-F(vars,0x3D8)>10.0f || F(object,0x18)<10.0f) {
         H(vars,0x98)=0;
         qzero(object+0xF0);
-        func_PAL_002A7650(object,0,3);
+        SetDeathBits_pal(object,0,3);
         moby_mark_spawned(object);
         return;
     }
     if(F(object,0x18)<75.0f && g_current_map_index==11) {
         H(vars,0x98)=0;
         qzero(object+0xF0);
-        func_PAL_002A7650(object,0,3);
+        SetDeathBits_pal(object,0,3);
         moby_mark_spawned(object);
         return;
     }
@@ -193,14 +193,14 @@ restoreCollision:
         if(B(object,0x43)==0 && H(vars,0x400)!=0) {
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
         }
-        if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),D_L17_001B0CB0*0.020000001f,0.0028000001f);
+        if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_a*0.020000001f,0.0028000001f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(B(object,0x43)==9) {
             F(object,0x48)=0.8f;
             if(H(vars,0x400)==0) {
                 if(B(object,0x43)!=math_random_int_below(2)) func_PAL_002A7E68(object,math_random_int_below(2),0,10);
             }
-            func_PAL_002AF420(object,vars+0x110,0.35f,0.25f);
+            moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if((B(object,0x43)==0 || B(object,0x43)==1) && (B(object,0x60)&2)) {
             H(vars,0x400)=math_random_int_range(100,417);
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,10);
@@ -211,14 +211,14 @@ restoreCollision:
         if(B(object,0x43)!=9 && B(object,0x43)!=5 && B(object,0x43)!=4) {
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
         }
-        if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),D_L17_001B0CB4*0.020000001f,0.0028000001f);
+        if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_b*0.020000001f,0.0028000001f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(B(object,0x43)==9) {
             if(H(vars,0x400)==0) {
                 func_PAL_002A7E68(object,5,0,10);
                 if(math_random_int_below(2)==1 && B(object,0x43)!=4) func_PAL_002A7E68(object,4,0,10);
             }
-            func_PAL_002AF420(object,vars+0x110,0.35f,0.25f);
+            moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if((B(object,0x43)==4 || B(object,0x43)==5) && (B(object,0x60)&2)) {
             H(vars,0x400)=math_random_int_range(100,167);
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,10);
@@ -234,7 +234,7 @@ restoreCollision:
     case 4:
         if(flag_set_first_pending(object)) I(vars,0x418)=math_random_int_range(67,83);
         F(object,0x48)=1.0f;
-        if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=D_L17_001B0CAC) {
+        if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=g_grulch_near_distance) {
             moby_set_state(object,5,2);
             if(B(object,0x43)!=6) func_PAL_002A7E68(object,6,2,5);
             F(vars,0x414)=0;
@@ -261,8 +261,8 @@ restoreCollision:
                     if(coll_sweep_from_object(object,1.0f,object+0x10,0x4000001,F(vars,0x430),1.0f,0,1,0)>0) I(vars,0x448)=1;
                     else I(vars,0x448)=0;
                 } else if(B(object,0x42)==6 && ((B(object,0x60)&2) || func_PAL_002AF6C0(object,11.0f))) {
-                    if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>D_L17_001B0CAC) {
-                        if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>D_L17_001B0CAC) {
+                    if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>g_grulch_near_distance) {
+                        if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>g_grulch_near_distance) {
                             if(math_random_int_range(0,7)>0) {
                                 moby_set_state(object,11,2);
                                 if(B(object,0x43)!=7) func_PAL_002A7E68(object,7,0,12);
@@ -291,7 +291,7 @@ restoreCollision:
             FastVecAdd(vars+0x3E0,vars+0x3E0,object+0x10);
             F(object,0x48)=-1.0f;
         }
-        func_PAL_L02_00333638(object,vars+0x3E0,16,mat_fast_helper_a(F(vars,0x3E0)-F(object,0x10),F(vars,0x3E4)-F(object,0x14)),-1.0f,-1.0f);
+        moby_move_to_target_temp_limits_pal(object,vars+0x3E0,16,mat_fast_helper_a(F(vars,0x3E0)-F(object,0x10),F(vars,0x3E4)-F(object,0x14)),-1.0f,-1.0f);
         if(B(object,0x42)==2 && (B(object,0x60)&2)) {
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,8);
             F(object,0x48)=1.0f;
@@ -326,7 +326,7 @@ restoreAnimationSpeed:
         break;
     case 9:
         if(func_PAL_L17_003E90E8(object)) {
-            func_PAL_002A7650(object,0,3);
+            SetDeathBits_pal(object,0,3);
             moby_mark_spawned(object);
             return;
         }

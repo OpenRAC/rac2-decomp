@@ -54,21 +54,21 @@ typedef struct {
     ActorObject *attackTarget;
 } ActorPlayerBlock;
 extern ActorPlayerBlock g_hero_state;
-extern s32 D_L11_001B30C8[] __attribute__((sda));
+extern s32 g_arena_progress_level[] __attribute__((sda));
 extern ActorObject *g_moby_l11_table[] __attribute__((sda));
-extern s32 D_L11_001B35B8[] __attribute__((sda));
+extern s32 g_tribe_group_limit[] __attribute__((sda));
 extern u16 *g_group_id_lists[];
-extern float D_L11_001B1D60 SDATA(D_L11_001B1D60);
-extern s32 D_L11_001B1D64 SDATA(D_L11_001B1D64);
-extern float D_L11_001B1D6C SDATA(D_L11_001B1D6C);
-extern float D_L11_001B1D70 SDATA(D_L11_001B1D70);
-extern float D_L11_001B1D74 SDATA(D_L11_001B1D74);
-extern float D_L11_001B1D78 SDATA(D_L11_001B1D78);
-extern float D_L11_001B1D7C SDATA(D_L11_001B1D7C);
-extern float D_L11_001B1D80 SDATA(D_L11_001B1D80);
-extern float D_L11_001B1D84 SDATA(D_L11_001B1D84);
-extern float D_L11_001B1D88 SDATA(D_L11_001B1D88);
-extern float D_L11_001B1D8C SDATA(D_L11_001B1D8C);
+extern float g_fighter_action_distance SDATA(D_L11_001B1D60);
+extern s32 g_fighter_state_timeout SDATA(D_L11_001B1D64);
+extern float g_fighter_damage_radius SDATA(D_L11_001B1D6C);
+extern float g_fighter_damage_param_a SDATA(D_L11_001B1D70);
+extern float g_fighter_damage_param_b SDATA(D_L11_001B1D74);
+extern float g_fighter_hit_param_a SDATA(D_L11_001B1D78);
+extern float g_fighter_hit_param_b SDATA(D_L11_001B1D7C);
+extern float g_fighter_hit_param_c SDATA(D_L11_001B1D80);
+extern float g_fighter_hit_param_d SDATA(D_L11_001B1D84);
+extern float g_fighter_hit_param_e SDATA(D_L11_001B1D88);
+extern float g_fighter_hit_param_f SDATA(D_L11_001B1D8C);
 extern void moby_set_state(void *, int, int);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
@@ -85,16 +85,16 @@ extern int arena_is_point_in_polygon(void *, void *);
 extern int arena_get_group_index(void *);
 extern int math_random_int_below(int);
 extern void fighter_pick_goal_near_target(void *, void *);
-extern int func_PAL_L01_00323068(void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int moby_dispatch_action_by_kind(void *, void *);
-extern void func_PAL_L02_004009A0(void *, int, int);
+extern void moby_set_anim_type_three_pal(void *, int, int);
 extern void part_queue_moby_for_glow(void *, int, void (*)(char *));
 extern void fighter_choose_action(void *);
 extern void fighter_reset_to_idle(char *);
 extern void func_PAL_L11_0045B9E8(void *);
 extern void fighter_count_frame_check_contact(void *);
-extern int func_PAL_L11_0045C2B0(void *);
-extern void func_PAL_L11_0045BC60(void *, void *);
+extern int joba_turn_toward_group_entity_pal(void *);
+extern void joba_fighter_walk_dust_pal(void *, void *);
 extern float MobySpringTurn(void *, float, float, float, float *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void joba_damage_objects_in_radius(void *, int, float, float, float, float, float, float, float);
@@ -155,14 +155,14 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
         }
         if (p->idleStage == 0 && vec_distance_xy(p->pos, q->goal) < 0.5f)
             p->idleStage = 1;
-        else func_PAL_L01_00323068(p, q->goal);
+        else moby_l01_turn_toward_target_pal(p, q->goal);
         break;
     case 3:
         break;
     case 4:
         flags = moby_dispatch_action_by_kind(p, q->contact);
         if (flags & 1) {
-            func_PAL_L02_004009A0(p, 0, -1);
+            moby_set_anim_type_three_pal(p, 0, -1);
             part_queue_moby_for_glow(p, 0, fighter_reset_to_idle);
         } else if (flags & 2) fighter_choose_action(p);
         break;
@@ -180,7 +180,7 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
         } else if (p->idleStage == 1) {
             if (arena_is_point_in_polygon(p->controller, p->pos))
                 moby_set_state(p, 4, 2);
-            func_PAL_L01_00323068(p, arena_get_center_point(p->controller));
+            moby_l01_turn_toward_target_pal(p, arena_get_center_point(p->controller));
         }
         break;
     case 5:
@@ -196,8 +196,8 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
             moby_set_controller_speed_limits(p, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
             if (p->nextAnimation != 2) func_PAL_002A7E68(p, 2, 0, 8);
         }
-        func_PAL_L01_00323068(p, target);
-        if (D_L11_001B1D60 < distance) fighter_choose_action(p);
+        moby_l01_turn_toward_target_pal(p, target);
+        if (g_fighter_action_distance < distance) fighter_choose_action(p);
         else if (distance < 2.7f) fighter_choose_action(p);
         break;
     case 7:
@@ -206,10 +206,10 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
             if (p->nextAnimation != 3) func_PAL_002A7E68(p, 3, 0, 8);
             p->timer = 0;
         }
-        if (q->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
+        if (q->aimTarget == 0 && (g_arena_progress_level[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
             for (ids = g_group_id_lists[arena_get_group_index(p->controller)];
                  (arena_get_group_index(p->controller) & 0xFF) != 0xFF &&
-                 arena_get_group_index(p->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 arena_get_group_index(p->controller) <= g_tribe_group_limit[0] && ids != 0 &&
                  ((s16)ids[-1] >= 0 || ids == g_group_id_lists[arena_get_group_index(p->controller)]); ids++) {
                 entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
@@ -224,15 +224,15 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
         } else if (q->aimTarget == 0 || (q->aimTarget->state == 0xFE || (q->aimTarget->state == 0xFD || q->aimTarget->state < 2))) {
             q->aimTarget = 0;
         }
-        if (!func_PAL_L11_0045C2B0(p)) {
-            if (q->aimTarget) func_PAL_L11_0045BC60(p, q->aimTarget->pos);
-            else func_PAL_L11_0045BC60(p, target);
+        if (!joba_turn_toward_group_entity_pal(p)) {
+            if (q->aimTarget) joba_fighter_walk_dust_pal(p, q->aimTarget->pos);
+            else joba_fighter_walk_dust_pal(p, target);
         }
         moby_transform_joint_to_world(p, 1, scratch);
-        joba_damage_objects_in_radius(p, (int)scratch, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
-                          D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(p, (int)scratch, g_fighter_damage_radius, 0.0f, 100.0f, g_fighter_damage_param_a,
+                          g_fighter_hit_param_a, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (distance < 2.7f && delta < 0.3490659f) moby_set_state(p, 11, -1);
-        if (p->timer > ((s32)(D_L11_001B1D64) * 5 + 2) / 6) moby_set_state(p, 6, -1);
+        if (p->timer > ((s32)(g_fighter_state_timeout) * 5 + 2) / 6) moby_set_state(p, 6, -1);
         break;
     case 9:
         if (flag_set_first_pending(p)) {
@@ -240,10 +240,10 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
             q->step = 0.010000001f;
             moby_set_controller_speed_limits(p, 0.0096f, 0.24000001f, 0.00031415932f, 0.00767945f);
         }
-        if (q->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
+        if (q->aimTarget == 0 && (g_arena_progress_level[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
             for (ids = g_group_id_lists[arena_get_group_index(p->controller)];
                  (arena_get_group_index(p->controller) & 0xFF) != 0xFF &&
-                 arena_get_group_index(p->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 arena_get_group_index(p->controller) <= g_tribe_group_limit[0] && ids != 0 &&
                  ((s16)ids[-1] >= 0 || ids == g_group_id_lists[arena_get_group_index(p->controller)]); ids++) {
                 entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
@@ -259,18 +259,18 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
             q->aimTarget = 0;
         }
         if (q->aimTarget) {
-            func_PAL_L01_00323068(p, q->aimTarget->pos);
+            moby_l01_turn_toward_target_pal(p, q->aimTarget->pos);
             MobySpringTurn(p,
                           mat_fast_helper_a(q->aimTarget->pos[0] - p->pos[0],
                                         q->aimTarget->pos[1] - p->pos[1]),
                           0.001f, 0.01f, &q->turnRate, 0.1f);
         } else {
-            func_PAL_L01_00323068(p, target);
+            moby_l01_turn_toward_target_pal(p, target);
             MobySpringTurn(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
         }
         moby_transform_joint_to_world(p, 1, scratch);
-        joba_damage_objects_in_radius(p, (int)scratch, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
-                          D_L11_001B1D7C, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(p, (int)scratch, g_fighter_damage_radius, (float)q->contactDamage, 100.0f, g_fighter_damage_param_b,
+                          g_fighter_hit_param_b, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (g_hero_state.attackTarget == p) moby_set_state(p, 10, -1);
         if (0.38397247f < delta) moby_set_state(p, 8, -1);
         break;
@@ -283,10 +283,10 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
         scratch[1] = 4.0f * math_fast_sin_or_cos_b(p->heading);
         scratch[2] = 0.0f;
         FastVecAdd(scratch, p->pos, scratch);
-        func_PAL_L01_00323068(p, scratch);
+        moby_l01_turn_toward_target_pal(p, scratch);
         moby_transform_joint_to_world(p, 1, hit);
-        joba_damage_objects_in_radius(p, (int)hit, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
-                          D_L11_001B1D7C, D_L11_001B1D84, D_L11_001B1D8C);
+        joba_damage_objects_in_radius(p, (int)hit, g_fighter_damage_radius, (float)q->contactDamage, 100.0f, g_fighter_damage_param_b,
+                          g_fighter_hit_param_b, g_fighter_hit_param_d, g_fighter_hit_param_f);
         if (p->animationFlags & 2) moby_set_state(p, 8, -1);
         break;
     case 8:
@@ -297,11 +297,11 @@ void func_PAL_L11_0045AAE4(ActorObject *p)
         scratch[1] = 4.0f * math_fast_sin_or_cos_b(p->heading);
         scratch[2] = 0.0f;
         FastVecAdd(scratch, p->pos, scratch);
-        func_PAL_L01_00323068(p, scratch);
+        moby_l01_turn_toward_target_pal(p, scratch);
         MobySpringTurn(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
         moby_transform_joint_to_world(p, 1, hit);
-        joba_damage_objects_in_radius(p, (int)hit, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
-                          D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(p, (int)hit, g_fighter_damage_radius, 0.0f, 100.0f, g_fighter_damage_param_a,
+                          g_fighter_hit_param_a, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (p->animationFlags & 2) fighter_choose_action(p);
         break;
     case 11:

@@ -13,13 +13,13 @@ typedef struct { char pad[48]; } Block48_F8c659bbc;
 typedef struct { char pad[16]; } Block16_F8c659bbc;
 #endif
 
-extern char D_L00_001B1B10[] __attribute__((sda));
+extern char g_camera_offset_vector[] __attribute__((sda));
 
 extern char g_camera_l00_position[];
 
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 
-extern char D_L00_001A8E30 __attribute__((sda));
+extern char g_camera_euler_angles __attribute__((sda));
 
 extern void FastVecSub(char *a, char *b, char *c);
 
@@ -49,9 +49,9 @@ void cam_update_follow_rotation(char *easeState, int useFixedAngle)
     Block16_F8c659bbc direction;
     float halfAngle;
 
-    FastVecSub((char *)&direction, g_camera_l00_position, D_L00_001B1B10);
+    FastVecSub((char *)&direction, g_camera_l00_position, g_camera_offset_vector);
     vec_scale_to_length((char *)&direction, (char *)&direction, 1.0f);
-    euler_rotation_basis((char *)&lookMatrix, (char *)&D_L00_001A8E30);
+    euler_rotation_basis((char *)&lookMatrix, (char *)&g_camera_euler_angles);
     multiply_matrix3x3((char *)&combined, g_camera_l00_position + 560, (char *)&lookMatrix);
     FastVecCross((char *)&axis, (char *)&combined, (char *)&direction);
     halfAngle = FastVecLength((char *)&axis) * 0.5f;
@@ -64,22 +64,22 @@ void cam_update_follow_rotation(char *easeState, int useFixedAngle)
         vec_set_direction_with_complement((char *)&axis, (char *)&axis, -*(float *)easeState);
     }
     quaternion_to_rotation_basis((char *)&axis, (char *)&finalRotation);
-    multiply_matrix3x3(D_L00_001B8FF0, (char *)&finalRotation, D_L00_001B8FF0);
+    multiply_matrix3x3(g_cam_follow_matrix, (char *)&finalRotation, g_cam_follow_matrix);
 }
 
-extern float D_L00_001A8DD0 __attribute__((sda));
+extern float g_camera_roll_scale __attribute__((sda));
 /* Rolls the camera by an amount taken from the stick roll value. */
-void cam_apply_roll(float *roll) { char rotation[0x40]; float angle = *roll * 0.0002908882452175021f * D_L00_001A8DD0; vec_set_direction_with_complement(rotation, D_L00_001B8FF0, angle); quaternion_to_rotation_basis(rotation, rotation + 0x10); multiply_matrix3x3(D_L00_001B8FF0, rotation + 0x10, D_L00_001B8FF0); }
+void cam_apply_roll(float *roll) { char rotation[0x40]; float angle = *roll * 0.0002908882452175021f * g_camera_roll_scale; vec_set_direction_with_complement(rotation, g_cam_follow_matrix, angle); quaternion_to_rotation_basis(rotation, rotation + 0x10); multiply_matrix3x3(g_cam_follow_matrix, rotation + 0x10, g_cam_follow_matrix); }
 
 extern void FastVecAdd(char *a, char *b, char *c);
 
-extern int D_L00_001A8DC8 __attribute__((sda));
+extern int g_camera_offset_length __attribute__((sda));
 
 /* Moves the camera direction by the given offset and re-normalizes it. */
 void cam_offset_direction(char *offset)
 {
-    FastVecSub(g_camera_l00_position, g_camera_l00_position, D_L00_001B1B10);
+    FastVecSub(g_camera_l00_position, g_camera_l00_position, g_camera_offset_vector);
     FastVecAdd(g_camera_l00_position, g_camera_l00_position, offset);
-    vec_scale_to_length(g_camera_l00_position, g_camera_l00_position, (float)D_L00_001A8DC8);
-    FastVecAdd(g_camera_l00_position, g_camera_l00_position, D_L00_001B1B10);
+    vec_scale_to_length(g_camera_l00_position, g_camera_l00_position, (float)g_camera_offset_length);
+    FastVecAdd(g_camera_l00_position, g_camera_l00_position, g_camera_offset_vector);
 }

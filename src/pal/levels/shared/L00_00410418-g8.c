@@ -32,9 +32,9 @@ typedef struct {
     f32 rot[3];
 } Moby40B838;
 
-extern s32 D_L00_001B0FE4 __attribute__((sda));
-extern s16 D_L00_001B2D40[3];
-extern s16 D_L00_001B2D50[3];
+extern s32 g_clank_zapper_timer __attribute__((sda));
+extern s16 g_strand_timers[3];
+extern s16 g_strand_periods[3];
 extern Moby40B838 *CreateMoby(int);
 extern Link40B838 *moby_get_private_value_0(void *);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -75,7 +75,7 @@ Moby40B838 *func_PAL_L00_00410418(f32 *pos, int arg1, f32 *parent, int arg3)
         }
         qcopy(m->pos, pos);
         {
-            int scaled = ((s32)(D_L00_001B0FE4) * 5 + 2) / 6;
+            int scaled = ((s32)(g_clank_zapper_timer) * 5 + 2) / 6;
             vars->f10 = scaled;
             vars->f14 = 1.0f / IntToFloat(scaled);
         }
@@ -93,8 +93,8 @@ Moby40B838 *func_PAL_L00_00410418(f32 *pos, int arg1, f32 *parent, int arg3)
         vars->dir[1] = math_random_angle();
         vars->dir[2] = math_random_angle();
         for (i = 0; i < 3; i++) {
-            D_L00_001B2D40[i] = -1;
-            D_L00_001B2D50[i] = 0x18;
+            g_strand_timers[i] = -1;
+            g_strand_periods[i] = 0x18;
         }
         m->state = 0;
         func_002A0F48(m);

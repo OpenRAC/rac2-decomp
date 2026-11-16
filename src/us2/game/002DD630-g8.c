@@ -5,18 +5,18 @@ extern char *menu_stream_chunk_claim_free(int);
 extern void menu_clear_block_fields(void);
 extern void menu_clear_counter(void);
 extern void popup_set_flag_on(void *);
-extern volatile int D_001A8C88;
-extern char *D_001A8CFC __attribute__((sda));
+extern volatile int g_menu_panel_active;
+extern char *g_resident_data_base __attribute__((sda));
 
-int func_US2_002DD7E8(char *object)
+int menu_preview_page_init_us2(char *object)
 {
     menu_stream_chunk_table_init(1);
     *(int *)(object + 0x48) = menu_stream_chunk_claim_free(0);
     *(int *)(object + 0x4C) = 0;
     menu_clear_block_fields();
     menu_clear_counter();
-    if (D_001A8C88 != 0 && D_001A8CFC != 0)
-        popup_set_flag_on(D_001A8CFC + 0x3CEA0);
+    if (g_menu_panel_active != 0 && g_resident_data_base != 0)
+        popup_set_flag_on(g_resident_data_base + 0x3CEA0);
     return 0;
 }
 
@@ -37,8 +37,8 @@ typedef struct {
 } Slots_002DC900;
 extern Slots_002DC900 g_memcard_state;
 extern char g_pause_menu_state[];
-extern int D_00258D70[];
-extern int D_001ABBEC __attribute__((sda));
+extern int g_menu_text_id_table[];
+extern int g_save_location_line_height __attribute__((sda));
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(int);
@@ -60,14 +60,14 @@ int func_US2_002DD630(int *box)
     SetupGifPaging(0);
     if (s->mode < 3 && s->selected < 0 && *(int *)(g + 0x164) >= 11 && s->state == 2) {
         if (idx == -1) {
-            text_draw_centered_small(box[6], box[7] + D_001ABBEC / 2, 0x80F0F0F0, GetLocalizedString(0x2DAA), -1);
+            text_draw_centered_small(box[6], box[7] + g_save_location_line_height / 2, 0x80F0F0F0, GetLocalizedString(0x2DAA), -1);
         } else {
-            next = D_00258D70[idx * 2 + 1];
+            next = g_menu_text_id_table[idx * 2 + 1];
             y = 0;
-            if (next < 0) y = D_001ABBEC >> 1;
+            if (next < 0) y = g_save_location_line_height >> 1;
             text_draw_centered_small(box[6], box[7] + y, 0x80F0F0F0, text_format_location_name(buf, idx), -1);
             if (next >= 0) {
-                text_draw_centered_small(box[6], box[7] + D_001ABBEC, 0x80F0F0F0, GetLocalizedString(D_00258D70[idx * 2 + 1]), -1);
+                text_draw_centered_small(box[6], box[7] + g_save_location_line_height, 0x80F0F0F0, GetLocalizedString(g_menu_text_id_table[idx * 2 + 1]), -1);
             }
         }
     }

@@ -21,11 +21,11 @@ extern s32 g_hero_charged_shot_moby __attribute__((sda));
 
 extern s32 g_hero_moby __attribute__((nosda));
 
-extern s32 D_L23_001B1430 __attribute__((sda));
+extern s32 g_counter_effect_active __attribute__((sda));
 
-extern s16 D_L23_001B1B94 __attribute__((sda));
+extern s16 g_effect_sound_handle_a __attribute__((sda));
 
-extern s16 D_L23_001B1B96 __attribute__((sda));
+extern s16 g_effect_sound_handle_b __attribute__((sda));
 
 extern void gfx_free_point_light(s32);
 
@@ -53,7 +53,7 @@ extern s32 mothership_is_blast_timer_running(void);
 
 extern s32 mothership_is_blast_cooling_down(void);
 
-extern float D_L23_001B3930 __attribute__((sda));
+extern float g_trail_ribbon_phase __attribute__((sda));
 
 /* reports whether the current state object carries byte 0x20 equal to four */
 /* Says whether the current boss-fight object is in state 4. Returns 0 if there is none. */
@@ -71,9 +71,9 @@ extern s32 g_hero_charge_sound_handle __attribute__((sda));
 extern s32 g_enemy_charge_sound_handle __attribute__((sda));
 
 /* two absolute level words: sized past the $gp limit so each store is a bare symbol through $at */
-extern s32 D_L23_001A8AB0[4] __attribute__((sda));
+extern s32 g_charged_shot_flag[4] __attribute__((sda));
 
-extern s32 D_L23_001A8AC0[4] __attribute__((sda));
+extern s32 g_screen_effect[4] __attribute__((sda));
 
 extern void snd_stop_voice(s32 handle);
 
@@ -112,8 +112,8 @@ void charged_shot_release(s32 key, s32 flag) {
                 return;
             }
             vars = *(u8 **)(obj + 0x68);
-            D_L23_001A8AB0[0] = 0;
-            D_L23_001A8AC0[0] = 0;
+            g_charged_shot_flag[0] = 0;
+            g_screen_effect[0] = 0;
             if (*(s16 *)(vars + 0x2C) != -1) {
                 gfx_free_point_light(*(s16 *)(vars + 0x2C));
             }
@@ -138,16 +138,16 @@ s32 charged_shot_get_for_owner(s32 key) {
 /* releases both measured handles and clears them */
 /* Stops both looping sounds and marks them as not playing. */
 void snd_stop_both_looping(void) {
-    s16 handle = D_L23_001B1B94;
+    s16 handle = g_effect_sound_handle_a;
 
     if (handle != -1) {
         gfx_free_point_light(handle);
-        D_L23_001B1B94 = -1;
+        g_effect_sound_handle_a = -1;
     }
-    handle = D_L23_001B1B96;
+    handle = g_effect_sound_handle_b;
     if (handle != -1) {
         gfx_free_point_light(handle);
-        D_L23_001B1B96 = -1;
+        g_effect_sound_handle_b = -1;
     }
 }
 
@@ -169,20 +169,20 @@ void effect_controller_update(u8 *moby) {
             payload[1] = 0;
         }
         if (mothership_is_blast_timer_running() == 0) {
-            s16 handle = D_L23_001B1B94;
+            s16 handle = g_effect_sound_handle_a;
 
             if (handle != -1) {
-                D_L23_001B3930 = 0.02f;
+                g_trail_ribbon_phase = 0.02f;
                 gfx_free_point_light(handle);
-                D_L23_001B1B94 = -1;
+                g_effect_sound_handle_a = -1;
             }
         }
         if (mothership_is_blast_cooling_down() == 0) {
-            s16 handle = D_L23_001B1B96;
+            s16 handle = g_effect_sound_handle_b;
 
             if (handle != -1) {
                 gfx_free_point_light(handle);
-                D_L23_001B1B96 = -1;
+                g_effect_sound_handle_b = -1;
             }
         }
     }
@@ -195,7 +195,7 @@ void effect_controller_update(u8 *moby) {
 void counter_effect_update(void *moby) {
     counter_effect_init_position(moby);
     if (D_L23_001B1484_2 != 0) {
-        if (D_L23_001B1430 != 0) {
+        if (g_counter_effect_active != 0) {
             gfx_add_draw_callback_first((void *)gfx_draw_spinning_quad_table, moby);
         }
     }
@@ -203,23 +203,23 @@ void counter_effect_update(void *moby) {
 }
 
 
-extern s32 D_L23_001B3714;
+extern s32 g_boss_fight_timer;
 
-extern s32 D_L23_001B13E8 __attribute__((sda));
+extern s32 g_boss_fight_start_value __attribute__((sda));
 
 extern int PlayMobySound(int, int, u8 *);
 
 /* publishes the boot stamp once, seeding the shared state first */
 /* Starts the boss fight state once and remembers the starting time. */
 void boss_start_fight_once(void) {
-    if (D_L23_001B3714 == 0) {
+    if (g_boss_fight_timer == 0) {
         u8 *state = g_mothership_boss_moby;
 
         if (state != 0) {
             PlayMobySound(0x10, 0, state);
         }
     }
-    D_L23_001B3714 = D_L23_001B13E8;
+    g_boss_fight_timer = g_boss_fight_start_value;
 }
 
 /* the three words at 0x1B17B0 are copied to the stack; the entries picked by the timing tests are chosen by a helper */
@@ -227,7 +227,7 @@ typedef struct {
     s32 v[3];
 } L23Table3;
 
-extern L23Table3 D_L23_001B17B0;
+extern L23Table3 g_boss_attack_table;
 
 typedef struct {
     u8 pad[0x18];
@@ -235,7 +235,7 @@ typedef struct {
     s32 f1C;
 } L23Block1F90;
 
-extern L23Block1F90 D_L23_001B1F90;
+extern L23Block1F90 g_hud_counters;
 
 typedef struct {
     u8 pad[0x1874];
@@ -250,7 +250,7 @@ extern s32 math_random_int_below(s32);
 /* Picks a random attack that is ready to be used. Returns -1 when none is ready. */
 s32 boss_pick_random_ready_attack(void) {
     u8 *obj = *(u8 **)(g_mothership_boss_moby + 0x68);
-    L23Table3 table = D_L23_001B17B0;
+    L23Table3 table = g_boss_attack_table;
     s32 count = 0;
 
     if (g_hero_state.f1874 < *(s16 *)(obj + 0x2F4) - 5) {
@@ -258,10 +258,10 @@ s32 boss_pick_random_ready_attack(void) {
         count = 1;
     }
     if (count == 0 || !(g_hero_state.f1874 < *(s16 *)(obj + 0x2F4) / 2)) {
-        if (D_L23_001B1F90.f18 < *(s16 *)(obj + 0x2FA)) {
+        if (g_hud_counters.f18 < *(s16 *)(obj + 0x2FA)) {
             table.v[count++] = 1;
         }
-        if (D_L23_001B1F90.f1C < *(s16 *)(obj + 0x2FE)) {
+        if (g_hud_counters.f1C < *(s16 *)(obj + 0x2FE)) {
             table.v[count++] = 2;
         }
     }
@@ -282,16 +282,16 @@ s32 boss_pick_random_ready_attack(void) {
 typedef int TI16 __attribute__((mode(TI)));
 
 /* level words written as bare symbols through $at: each sized past the $gp limit */
-extern s32 D_L23_001A8AB4[3] __attribute__((sda));
+extern s32 g_charged_shot_color_a[3] __attribute__((sda));
 
-extern s32 D_L23_001A8AC4[3] __attribute__((sda));
+extern s32 g_charged_shot_color_b[3] __attribute__((sda));
 
-extern long long D_L23_001A8AC8[2] __attribute__((sda));
+extern long long g_charged_shot_command_words[2] __attribute__((sda));
 
-extern long long D_L23_001A8AB8[2] __attribute__((sda));
+extern long long g_charged_shot_zero_words[2] __attribute__((sda));
 
 /* a plain small extern: $gp in the delay slot reorg copies it into, absolute where it stays */
-extern s32 D_L23_001A8FF0;
+extern s32 g_hero_special_mode;
 
 extern s16 gfx_add_point_light(TI16 *, s32, float, float);
 
@@ -319,16 +319,16 @@ u8 *charged_shot_create(u8 *owner, TI16 *position) {
         payload = *(u8 **)(obj + 0x68);
         *(TI16 *)(obj + 0x10) = *position;
         *word = (s32)obj;
-        D_L23_001A8AB4[0] = 0xFF;
-        D_L23_001A8AC4[0] = 0x00FFFFFF;
-        D_L23_001A8AC8[0] = 0x1F00000042LL;
-        D_L23_001A8AB8[0] = 0;
-        D_L23_001A8AB0[0] = 0;
-        D_L23_001A8AC0[0] = 0;
+        g_charged_shot_color_a[0] = 0xFF;
+        g_charged_shot_color_b[0] = 0x00FFFFFF;
+        g_charged_shot_command_words[0] = 0x1F00000042LL;
+        g_charged_shot_zero_words[0] = 0;
+        g_charged_shot_flag[0] = 0;
+        g_screen_effect[0] = 0;
         *(s32 *)(payload + 0x10) = 0;
         *(s16 *)(payload + 0x2C) = gfx_add_point_light(position, 0, 0.0f, 0.0f);
     }
-    if (D_L23_001A8FF0 != 0) {
+    if (g_hero_special_mode != 0) {
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
         *(TI16 *)(obj + 0xC0) = *(TI16 *)(owner + 0xC0);
         *(TI16 *)(obj + 0xD0) = *(TI16 *)(owner + 0xD0);
@@ -384,7 +384,7 @@ extern void moby_set_state(void *, s32, s32);
 extern void boss_part_handle_hit(u8 *);
 
 /* the timer the second state copies into the sub-object */
-extern float D_L23_001B36FC __attribute__((sda));
+extern float g_mothership_max_health __attribute__((sda));
 
 /* state 0 arms the draw distances and a 2000-tick timer and moves to state 1; state 1 copies the
    shared timer when it is set and moves to state 2; both then run the per-frame handler */
@@ -403,7 +403,7 @@ void boss_part_init_health(u8 *moby) {
         moby_set_state(moby, 1, 0);
         *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x4000;
     } else if (state == 1) {
-        float t = D_L23_001B36FC;
+        float t = g_mothership_max_health;
 
         if (t != 0.0f) {
             *(float *)(vars + 0x20) = t;
@@ -414,17 +414,17 @@ void boss_part_init_health(u8 *moby) {
     boss_part_handle_hit(moby);
 }
 
-extern s32 D_L23_001B19C4 __attribute__((sda));
+extern s32 g_trail_ribbon_color_scale_a __attribute__((sda));
 
-extern s32 D_L23_001B19C8 __attribute__((sda));
+extern s32 g_trail_ribbon_color_scale_b __attribute__((sda));
 
-extern float D_L23_001B19CC __attribute__((sda));
+extern float g_trail_ribbon_width_scale_a __attribute__((sda));
 
-extern float D_L23_001B19D0 __attribute__((sda));
+extern float g_trail_ribbon_width_scale_b __attribute__((sda));
 
-extern float D_L23_001B19D4 __attribute__((sda));
+extern float g_trail_ribbon_width_scale_c __attribute__((sda));
 
-extern s32 D_L23_001B19D8 __attribute__((sda));
+extern s32 g_trail_ribbon_halo_value __attribute__((sda));
 
 /* the three floats come before the two trailing words: that argument order is what keeps the
    two arms of the second call from sharing more than the jal */
@@ -444,13 +444,13 @@ void trail_draw_ribbon(u8 *moby) {
     if (vars[0x2B] != 0) {
         DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28], vars[0x29], 5,
                           *(float *)(vars + 0x10), *(float *)(vars + 0x14), *(float *)(vars + 0x18),
-                          D_L23_001B19D8, D_L23_001B19D8);
+                          g_trail_ribbon_halo_value, g_trail_ribbon_halo_value);
     } else {
         DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28], vars[0x29], 5,
                           *(float *)(vars + 0x10), *(float *)(vars + 0x14), *(float *)(vars + 0x18),
                           *(s32 *)vars, *(s32 *)(vars + 4));
     }
-    DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28] * D_L23_001B19C4, vars[0x29] * D_L23_001B19C8, 5,
-                      *(float *)(vars + 0x10) * D_L23_001B19CC, *(float *)(vars + 0x14) * D_L23_001B19D0,
-                      *(float *)(vars + 0x18) * D_L23_001B19D4, *(s32 *)vars, *(s32 *)(vars + 4));
+    DrawColoredRibbonWithHalo(vars + 0x30, vars[0x28] * g_trail_ribbon_color_scale_a, vars[0x29] * g_trail_ribbon_color_scale_b, 5,
+                      *(float *)(vars + 0x10) * g_trail_ribbon_width_scale_a, *(float *)(vars + 0x14) * g_trail_ribbon_width_scale_b,
+                      *(float *)(vars + 0x18) * g_trail_ribbon_width_scale_c, *(s32 *)vars, *(s32 *)(vars + 4));
 }

@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L05_001B2614 __attribute__((sda));
-extern int D_L05_00221D10[];
+extern char *g_feltzin_enemy_table __attribute__((sda));
+extern int g_feltzin_challenge_state[];
 extern char *moby_get_motion_data(char *object);
-extern void func_PAL_L05_0037D610(char *object, int flag);
+extern void moby_init_spawned_sub_object_pal(char *object, int flag);
 extern float math_random_float_range(float a, float b);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(char *dst, float a, float b, float c);
@@ -21,8 +21,8 @@ void func_PAL_L05_0041C138(char *object)
     *(unsigned char *)(object + 0x20) = 1;
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
     *(int *)(moby_get_motion_data(object) + 0x148) = 1;
-    func_PAL_L05_0037D610(object, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    moby_init_spawned_sub_object_pal(object, 1);
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x1C8) = 0x64;
     *(int *)(sub + 0x1C0) = -1;
     *(int *)(sub + 0x1C4) = -1;

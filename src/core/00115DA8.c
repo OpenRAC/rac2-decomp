@@ -19,7 +19,7 @@ typedef struct File_00115DA8 {
     void *data;                    /* 0x54 */
 } File_00115DA8;
 
-extern void *D_00133E74;
+extern void *g_libc_state_record;
 
 extern int vfprintf_dispatch(void *arg0, char *arg1, void *arg2);
 
@@ -33,7 +33,7 @@ int sprintf(char *buffer, char *format, ...) {
     f.flags = 0x208;
     f.base = buffer;
     f.size = 0x7FFFFFFF;
-    f.data = D_00133E74;
+    f.data = g_libc_state_record;
     result = vfprintf_dispatch(&f, format, (char *)__builtin_next_arg(format) - 0x30);
     *f.p = '\0';
     return result;

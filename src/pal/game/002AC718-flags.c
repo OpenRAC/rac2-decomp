@@ -13,7 +13,7 @@ extern void vec_clear_128(char *p);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
 
-void func_PAL_002AD288(unsigned char *object, void *position, int sound, float scale, float radius)
+void part_spawn_explosion_with_sparks_pal(unsigned char *object, void *position, int sound, float scale, float radius)
 {
     float zero[3];
     Colors1043 first, second;

@@ -26,8 +26,8 @@ extern int coll_test_point(void *, float, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecSub(void *, void *, void *);
-extern int *D_L06_001C3D00[];
-extern Vec4 D_L06_001BFCA0, D_L06_001BFCB0;
+extern int *g_candidate_list[];
+extern Vec4 g_trace_start_pos, g_trace_hit_info;
 
 /* Adapted from OpenRAC/rac1-decomp (GPL-3.0),
  * src/overlays/shared/moby_ground_collision.c, mine_fall. */
@@ -160,7 +160,7 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
     FastVecAdd(v30, v20, st);
     n = coll_process_hit(IntToFloat(*(int *)(st + 0x20)) * 0.0010742187732830644f, v30, 16, moby, 0);
     if (i < n) {
-        int **pp = D_L06_001C3D00;
+        int **pp = g_candidate_list;
         int k = n;
         do {
             if (moby_is_in_special_class_range(*pp) != 0) {
@@ -174,11 +174,11 @@ int func_PAL_L06_00360A78(char *moby, char *st) {
     t = FastVecLength(st);
     if ((float)*(int *)(st + 0x20) * sc < t) {
         CollLine(v0, v20, 36, moby, 0);
-        qcopy(v20, &D_L06_001BFCA0);
+        qcopy(v20, &g_trace_start_pos);
     }
     if (coll_test_point(v20, IntToFloat(*(int *)(st + 0x20)) * sc, 36, moby) != 0) {
         flags |= 2;
-        g = &D_L06_001BFCB0;
+        g = &g_trace_hit_info;
         qcopy((moby + 0x10), g);
         one = 1.0f;
         *(float *)(moby + 0x18) = *(float *)(moby + 0x18) - *(float *)(st + 0x28);

@@ -9,55 +9,55 @@ typedef int TI16 __attribute__((mode(TI)));
 /* the state object word, read through an absolute access */
 extern u8 *D_L23_001B1484_2;
 
-extern float D_L23_001B1470;
+extern float g_mothership_scale_factor;
 
-extern float D_L23_001B1478;
+extern float g_spinning_quad_alpha_scale;
 
-extern s32 D_L23_001B1474;
+extern s32 g_spinning_quad_period;
 
-extern s32 D_L23_001B1480;
+extern s32 g_spinning_quad_turn_speed;
 
-extern s32 D_L23_001B147C;
+extern s32 g_spinning_quad_alpha_base;
 
-extern float D_L23_001B39D0;
+extern float g_star_quad_scale;
 
-extern s32 D_L23_001B3714;
+extern s32 g_boss_fight_timer;
 
-extern s32 D_L23_001B1BAC __attribute__((sda));
+extern s32 g_alpha_blend_a __attribute__((sda));
 
-extern s32 D_L23_001B1BB0 __attribute__((sda));
+extern s32 g_alpha_blend_b __attribute__((sda));
 
-extern s32 D_L23_001B1BB4 __attribute__((sda));
+extern s32 g_alpha_blend_c __attribute__((sda));
 
-extern s32 D_L23_001B1BB8 __attribute__((sda));
+extern s32 g_alpha_blend_d __attribute__((sda));
 
-extern s32 D_L23_001B1BC0 __attribute__((sda));
+extern s32 g_star_effect_texture __attribute__((sda));
 
-extern s32 D_L23_001B1BC4 __attribute__((sda));
+extern s32 g_trail_color_start __attribute__((sda));
 
-extern s32 D_L23_001B1BC8 __attribute__((sda));
+extern s32 g_trail_color_end __attribute__((sda));
 
-extern float D_L23_001B1BCC __attribute__((sda));
+extern float g_star_spin_speed __attribute__((sda));
 
-extern float D_L23_001B1BD0 __attribute__((sda));
+extern float g_star_size_min __attribute__((sda));
 
-extern float D_L23_001B1BD4 __attribute__((sda));
+extern float g_star_size_max __attribute__((sda));
 
-extern float D_L23_001B1BD8 __attribute__((sda));
+extern float g_star_offset_a __attribute__((sda));
 
-extern float D_L23_001B1BDC __attribute__((sda));
+extern float g_star_offset_b __attribute__((sda));
 
-extern float D_L23_001B1BE0 __attribute__((sda));
+extern float g_star_offset_c __attribute__((sda));
 
-extern float D_L23_001B1BE4 __attribute__((sda));
+extern float g_star_offset_d __attribute__((sda));
 
-extern float D_L23_001B1BF0 __attribute__((sda));
+extern float g_star_offset_e __attribute__((sda));
 
-extern float D_L23_001B1BF4 __attribute__((sda));
+extern float g_star_offset_f __attribute__((sda));
 
-extern float D_L23_001B1BF8 __attribute__((sda));
+extern float g_star_offset_g __attribute__((sda));
 
-extern float D_L23_001B1BFC __attribute__((sda));
+extern float g_star_offset_h __attribute__((sda));
 
 /* the quad record handed to the draw helper */
 typedef struct {
@@ -79,11 +79,11 @@ typedef struct {
     s16 b;
 } L23Corner;
 
-extern L23Corner D_L23_002A68D0[][4];
+extern L23Corner g_star_quad_corners[][4];
 
-extern TI16 D_L23_002A6390[];
+extern TI16 g_star_quad_vertices[];
 
-extern float D_L23_002A6D50[][2];
+extern float g_star_quad_uvs[][2];
 
 extern float FastAddRotations(float, float);
 
@@ -110,7 +110,7 @@ extern void draw_world_quad(void *, void *, s32);
 /* updates the spin state at +0x68 and draws 72 quads of four corners each (corner positions from
    one table, uv from another; the colour and two GS words sit in the packet), the packet's matrix
    being the object's rotation rows turned about the spin angle */
-void func_PAL_L23_0042F560(u8 *moby) {
+void gfx_draw_spinning_star_quads_pal(u8 *moby) {
     L23Spin *vars;
     L23Quad pkt;
     TI16 m[4];
@@ -132,17 +132,17 @@ void func_PAL_L23_0042F560(u8 *moby) {
 
     if (D_L23_001B1484_2 != 0) {
         vars = *(L23Spin **)(moby + 0x68);
-        D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
-        vars->turn = FastAddRotations(vars->turn, (float)D_L23_001B1480 * 0.0003490659f);
-        f = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
-        vars->alpha = (s32)(f * D_L23_001B1478);
-        vars->alpha += D_L23_001B147C;
-        reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
-        reg |= (s64)D_L23_001B1BB4 << 4;
-        reg |= (s64)D_L23_001B1BB8 << 6;
+        g_star_quad_scale = g_mothership_scale_factor * 1.1f;
+        vars->turn = FastAddRotations(vars->turn, (float)g_spinning_quad_turn_speed * 0.0003490659f);
+        f = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % g_spinning_quad_period) * (1.0f / (float)g_spinning_quad_period) * 3.1415927f);
+        vars->alpha = (s32)(f * g_spinning_quad_alpha_scale);
+        vars->alpha += g_spinning_quad_alpha_base;
+        reg = g_alpha_blend_a | ((s64)g_alpha_blend_b << 2);
+        reg |= (s64)g_alpha_blend_c << 4;
+        reg |= (s64)g_alpha_blend_d << 6;
         reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
-        tex = GetEffectTextureDescriptor(D_L23_001B1BC0);
+        tex = GetEffectTextureDescriptor(g_star_effect_texture);
         pkt.tail[2] = 0xFF9000000260LL;
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
@@ -157,21 +157,21 @@ void func_PAL_L23_0042F560(u8 *moby) {
         ((float *)axis)[2] = vars->turn;
         euler_rotation_basis(rot, axis);
         multiply_matrix3x3(m, m, rot);
-        if (D_L23_001B3714 == 0) {
-            col = (vars->alpha << 24) + (D_L23_001B1BC4 & 0xFFFFFF);
+        if (g_boss_fight_timer == 0) {
+            col = (vars->alpha << 24) + (g_trail_color_start & 0xFFFFFF);
             pkt.col[3] = col;
             pkt.col[2] = col;
             pkt.col[1] = col;
             pkt.col[0] = col;
         } else {
-            col = (vars->alpha << 24) + (D_L23_001B1BC8 & 0xFFFFFF);
+            col = (vars->alpha << 24) + (g_trail_color_end & 0xFFFFFF);
             pkt.col[3] = col;
             pkt.col[2] = col;
             pkt.col[1] = col;
             pkt.col[0] = col;
         }
         for (i = 0, uvx0 = &pkt.uv[0][0], uvy0 = &pkt.uv[0][1]; i < 0x48; i++) {
-            L23Corner (*tab)[4] = D_L23_002A68D0;
+            L23Corner (*tab)[4] = g_star_quad_corners;
             L23Corner *e = tab[i];
             float *uvy = uvy0;
             float *uvx = uvx0;
@@ -180,23 +180,23 @@ void func_PAL_L23_0042F560(u8 *moby) {
             for (k = 3; k >= 0; k--) {
                 s32 b = e->b;
 
-                FastVecScale(pos, &D_L23_002A6390[e->a], D_L23_001B39D0);
-                vars->spin = FastAddRotations(vars->spin, D_L23_001B1BCC * 0.0003490659f);
+                FastVecScale(pos, &g_star_quad_vertices[e->a], g_star_quad_scale);
+                vars->spin = FastAddRotations(vars->spin, g_star_spin_speed * 0.0003490659f);
                 math_fast_float_g(vars->spin);
-                if (D_L23_001B3714 == 0) {
-                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BD8;
-                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BDC;
-                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BE0;
-                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BE4;
+                if (g_boss_fight_timer == 0) {
+                    fa = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_a;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_b;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_c;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_d;
                 } else {
-                    fa = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF0;
-                    fb = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BF4;
-                    fc = math_fast_sin_or_cos_a(vars->spin) * D_L23_001B1BF8;
-                    fd = math_fast_sin_or_cos_b(vars->spin) * D_L23_001B1BFC;
+                    fa = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_e;
+                    fb = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_f;
+                    fc = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_g;
+                    fd = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_h;
                 }
-                f = math_random_float_range(D_L23_001B1BD0, D_L23_001B1BD4);
-                *uvx = (D_L23_002A6D50[b][0] * fa + fb) * f;
-                *uvy = D_L23_002A6D50[b][1] * fc + fd;
+                f = math_random_float_range(g_star_size_min, g_star_size_max);
+                *uvx = (g_star_quad_uvs[b][0] * fa + fb) * f;
+                *uvy = g_star_quad_uvs[b][1] * fc + fd;
                 pos++;
                 e++;
                 uvx += 2;

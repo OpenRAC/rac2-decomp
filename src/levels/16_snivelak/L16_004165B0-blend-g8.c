@@ -6,8 +6,8 @@
    which the next segment starts blending. */
 extern f32 D_L16_001B1C40_gp[] SDATA(D_L16_001B1C40);
 extern f32 D_L16_001B1C50_gp[] SDATA(D_L16_001B1C50);
-extern f32 D_L16_001B1C5C __attribute__((sda));
-extern char D_L16_001B9B00[];
+extern f32 g_curved_projectile_weight_limit __attribute__((sda));
+extern char g_scene_origin_transform[];
 extern float math_step_value_toward_target(char *, char *, f32, f32, f32, f32);
 extern void FastVecSub(char *, char *, char *);
 extern void FastVecScale(char *, char *, f32);
@@ -41,7 +41,7 @@ void snivelak_curved_projectile_update(char *self) {
         rate = (f32 *)(vars + 0x50);
         w = weight;
         for (; i < 3; current += 16, weight++, next += 16, rate++, w++, i++) {
-            if (i == 0 || weight[-1] > D_L16_001B1C5C)
+            if (i == 0 || weight[-1] > g_curved_projectile_weight_limit)
                 math_step_value_toward_target((char *)w, (char *)rate, 1.0f,
                               D_L16_001B1C40_gp[i] * 0.00027777778450399637f,
                               D_L16_001B1C40_gp[i] * 0.00027777778450399637f,
@@ -60,7 +60,7 @@ void snivelak_curved_projectile_update(char *self) {
     case 1:
     {
         char *endPosition = self + 16;
-        FastVecSub(delta, D_L16_001B9B00, endPosition);
+        FastVecSub(delta, g_scene_origin_transform, endPosition);
         vec_scale_to_length(delta, delta, 1.0f);
         part_spawn_blast_effect_moby(self, endPosition, delta, 0.0f);
         /* radius 2.0f is the first FP argument: each register bank keeps its order */

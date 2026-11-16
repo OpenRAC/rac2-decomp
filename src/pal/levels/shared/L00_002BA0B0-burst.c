@@ -18,7 +18,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern char *part_spawn_scaling(void *, void *, unsigned, int, int, int, int, int);
 
 /* Emit ten particles radially around the hero, using the saved height outside level 6. */
-void func_PAL_L00_002BA198(void)
+void part_emit_hero_radial_particles_pal(void)
 {
     float pos[4], vec[4];
     char *origin = g_hero_position;

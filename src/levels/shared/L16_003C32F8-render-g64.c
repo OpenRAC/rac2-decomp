@@ -6,19 +6,19 @@ typedef struct {
     u8 attributes[0x50];
 } L16DrawPacket;
 
-extern int D_L16_001B2648 MACRO_ADDR;
-extern u16 *D_L16_001FB660[];
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern int D_L16_001B2B38 __attribute__((sda));
-extern int D_L16_001B02D8 __attribute__((sda));
-extern int D_L16_001B0308 __attribute__((sda));
-extern float D_L16_001B02E8[8] __attribute__((sda));
-extern float D_L16_001B0320[16] __attribute__((sda));
-extern float D_L16_001B0360[16] __attribute__((sda));
-extern int D_L16_001B02DC[] __attribute__((sda));
-extern int D_L16_001B0310[] __attribute__((sda));
-extern int D_L16_001B030C[] __attribute__((sda));
-extern int D_L16_001B0314[] __attribute__((sda));
+extern int g_frame_l16_counter MACRO_ADDR;
+extern u16 *g_group_l16_id_lists[];
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern int g_group_id_limit __attribute__((sda));
+extern int g_render_quad_color_a __attribute__((sda));
+extern int g_render_quad_texture_a __attribute__((sda));
+extern float g_render_quad_uv_table[8] __attribute__((sda));
+extern float g_render_quad_matrix_a[16] __attribute__((sda));
+extern float g_render_quad_matrix_b[16] __attribute__((sda));
+extern int g_render_quad_color_b[] __attribute__((sda));
+extern int g_render_quad_texture_b[] __attribute__((sda));
+extern int g_render_quad_attr_a[] __attribute__((sda));
+extern int g_render_quad_attr_b[] __attribute__((sda));
 extern float IntToFloat(int);
 extern void euler_to_matrix(void *, void *);
 extern void copy_matrix_rotation(void *, void *);
@@ -48,14 +48,14 @@ void DrawRotatingGroupInstances(u8 *object)
     sphere[0] = 30.0f;
     sphere[3] = 1.0f;
     *(Quad *)projected = 0;
-    phase = IntToFloat(D_L16_001B2648 % 1200) * 0.00083333335f;
+    phase = IntToFloat(g_frame_l16_counter % 1200) * 0.00083333335f;
     projected[2] = (phase + phase) * 3.1415927f - 3.1415927f;
     *(Quad *)angles = *(Quad *)projected;
     euler_to_matrix(rotation, angles);
-    list = D_L16_001FB660[object[0x21]];
-    while (object[0x21] != 255 && object[0x21] <= D_L16_001B2B38 && list &&
-            ((list && (s16)list[-1] >= 0) || list == D_L16_001FB660[object[0x21]])) {
-        other = D_L16_001B2B1C[0] + ((*list & 0x7FFF) << 8);
+    list = g_group_l16_id_lists[object[0x21]];
+    while (object[0x21] != 255 && object[0x21] <= g_group_id_limit && list &&
+            ((list && (s16)list[-1] >= 0) || list == g_group_l16_id_lists[object[0x21]])) {
+        other = g_moby_instance_table[0] + ((*list & 0x7FFF) << 8);
         if (!other)
             break;
         if (other[0x20] == 1) {
@@ -78,12 +78,12 @@ void DrawRotatingGroupInstances(u8 *object)
         }
         list++;
     }
-    FillQuadPacket(&packets[0], D_L16_001B02D8, D_L16_001B0308, D_L16_001B02E8, D_L16_001B0320, 1);
-    FillQuadPacket(&packets[1], D_L16_001B02DC[0], D_L16_001B0310[0], D_L16_001B02E8, D_L16_001B0360, 1);
-    *(int *)(packets[0].attributes + 12) = D_L16_001B030C[0];
-    *(int *)(packets[1].attributes + 12) = D_L16_001B0314[0];
-    *(int *)(packets[0].attributes + 4) = D_L16_001B030C[0];
-    *(int *)(packets[1].attributes + 4) = D_L16_001B0314[0];
+    FillQuadPacket(&packets[0], g_render_quad_color_a, g_render_quad_texture_a, g_render_quad_uv_table, g_render_quad_matrix_a, 1);
+    FillQuadPacket(&packets[1], g_render_quad_color_b[0], g_render_quad_texture_b[0], g_render_quad_uv_table, g_render_quad_matrix_b, 1);
+    *(int *)(packets[0].attributes + 12) = g_render_quad_attr_a[0];
+    *(int *)(packets[1].attributes + 12) = g_render_quad_attr_b[0];
+    *(int *)(packets[0].attributes + 4) = g_render_quad_attr_a[0];
+    *(int *)(packets[1].attributes + 4) = g_render_quad_attr_b[0];
     vec_clear_128((Quad *)angles);
     angles[2] = 0.3926991f;
     euler_rotation_basis(localRotation, angles);

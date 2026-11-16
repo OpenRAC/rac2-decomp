@@ -2,14 +2,14 @@
 
 /* The unsized macro-address view preserves the absolute flag load at -G8. */
 extern float g_camera_l00_position[4];
-extern float D_00189ED0[4];
-extern int D_L00_001A8FF0[] MACRO_ADDR;
-extern float D_L00_001B06E4 __attribute__((sda));
-extern float D_L00_001B06E8 __attribute__((sda));
-extern float D_L00_001B06EC __attribute__((sda));
-extern float D_L00_001B06F0 __attribute__((sda));
-extern float D_L00_001B06F8 __attribute__((sda));
-extern float D_L00_001B06FC __attribute__((sda));
+extern float g_camera_position[4];
+extern int g_hero_locked_flag[] MACRO_ADDR;
+extern float g_spark_l00_speed_min_2 __attribute__((sda));
+extern float g_spark_l00_speed_max_2 __attribute__((sda));
+extern float g_spark_vertical_speed_min __attribute__((sda));
+extern float g_spark_vertical_speed_max __attribute__((sda));
+extern float g_spark_l00_size_min_2 __attribute__((sda));
+extern float g_spark_l00_size_max_2 __attribute__((sda));
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *);
@@ -28,13 +28,13 @@ void part_spawn_sparks(void *position, int count, float brightness)
 {
     float velocity[4], lateral[4], axis[4], projected[4];
     FastVecSub(lateral, g_camera_l00_position, position);
-    if (D_L00_001A8FF0[0] == 0) {
+    if (g_hero_locked_flag[0] == 0) {
         lateral[2] = 0.0f;
         axis[0] = 0.0f;
         axis[1] = 0.0f;
         axis[3] = axis[2] = 1.0f;
     } else {
-        FastVecSub(projected, position, D_00189ED0);
+        FastVecSub(projected, position, g_camera_position);
         vec_scale_to_length(axis, projected, 1.0f);
         FastVecScale(projected, axis, FastVecDot(axis, lateral));
         FastVecSub(lateral, lateral, projected);
@@ -43,14 +43,14 @@ void part_spawn_sparks(void *position, int count, float brightness)
         do {
             char *particle;
             float angle;
-            float size = math_random_float_range(D_L00_001B06F8, D_L00_001B06FC);
+            float size = math_random_float_range(g_spark_l00_size_min_2, g_spark_l00_size_max_2);
             int spin = math_random_int_below(2);
             if (!spin)
                 spin--;
             angle = math_random_float_range(-1.0471977f, 1.0471977f);
             math_apply_axis_rotation_to_quat(velocity, lateral, axis, angle);
-            vec_scale_to_length(velocity, velocity, math_random_float_range(D_L00_001B06E4, D_L00_001B06E8) * (1.0f / 60.0f));
-            velocity[2] = math_random_float_range(D_L00_001B06EC, D_L00_001B06F0) * (1.0f / 60.0f);
+            vec_scale_to_length(velocity, velocity, math_random_float_range(g_spark_l00_speed_min_2, g_spark_l00_speed_max_2) * (1.0f / 60.0f));
+            velocity[2] = math_random_float_range(g_spark_vertical_speed_min, g_spark_vertical_speed_max) * (1.0f / 60.0f);
             vec_clear_128((VectorBits *)velocity);
             particle = part_spawn_ground_effect(position, 60, size * 0.1f, size,
                                      0x7F7F2020, 0, spin, velocity, brightness, 1);

@@ -13,13 +13,13 @@ extern void entity_start_launch_to_target(char *e, void *v, float a, float b, fl
 extern s32 func_PAL_L00_002C4480(int a0, int a1);
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool MACRO_ADDR;
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 struct Projection { char pad[0x38]; float height; char tail[0x44]; };
-extern struct Projection *D_L14_001B268C MACRO_ADDR;
+extern struct Projection *g_platform_projection_table MACRO_ADDR;
 extern char g_hero_state[];
 struct OwnerPrefix { char reserved00[0x60]; int tableIndex, groupIndex; };
 
-void func_PAL_L14_003CF6C8(char *self) {
+void UpdateLaunchVolume_pal(char *self) {
     float mtx[16] __attribute__((aligned(16)));
     float off[4] __attribute__((aligned(16)));
     float tmp[4] __attribute__((aligned(16)));
@@ -37,7 +37,7 @@ void func_PAL_L14_003CF6C8(char *self) {
 
     matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = g_group_entity_lists[state->groupIndex];
-         (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= D_L14_001B25B8 &&
+         (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[state->groupIndex]);
          p++) {
         e = ((*p & 0x7FFF) << 8) + g_moby_l14_pool;
@@ -51,9 +51,9 @@ void func_PAL_L14_003CF6C8(char *self) {
                 off[0] = off[0] + 2.0f;
                 inside = math_fabs(off[0]) < 1.0f && math_fabs(off[1]) < 1.0f;
                 if (inside) {
-                    transform_vector(tmp, off, &D_L14_001B268C[state->tableIndex]);
+                    transform_vector(tmp, off, &g_platform_projection_table[state->tableIndex]);
                     entity_start_launch_to_target((char *)e, tmp,
-                                      D_L14_001B268C[state->tableIndex].height +
+                                      g_platform_projection_table[state->tableIndex].height +
                                           math_random_float_range(1.0f, 2.0f),
                                       0.008f, 0.008f);
                 }
@@ -69,9 +69,9 @@ void func_PAL_L14_003CF6C8(char *self) {
         off[0] = off[0] + 2.0f;
         inside = math_fabs(off[0]) < 1.0f && math_fabs(off[1]) < 1.0f;
         if (inside) {
-            transform_vector(tmp, off, &D_L14_001B268C[state->tableIndex]);
+            transform_vector(tmp, off, &g_platform_projection_table[state->tableIndex]);
             hero2 = g_hero_state;
-            a = D_L14_001B268C[state->tableIndex].height + 1.5f;
+            a = g_platform_projection_table[state->tableIndex].height + 1.5f;
             b = a - *(float *)(hero2 + 0x88);
             b *= 2.0f; duration = square_root(b / 0.008f);
             c = (a - tmp[2]) * 2.0f; duration += square_root(c / 0.008f);

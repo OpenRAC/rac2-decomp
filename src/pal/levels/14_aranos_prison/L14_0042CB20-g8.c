@@ -80,11 +80,11 @@ extern void group_marker_alert_guards(unsigned char *);
 extern int weapon_select_aim_target(char *self, int index, void *point, int force, float range, float height);
 extern void cam_compute_view_direction(char *a0, char *a1, int a2);
 extern int g_current_map_index[] __attribute__((sda));
-extern int D_L14_001A8FF0;
-extern float D_L14_001B18B0 __attribute__((sda));
-extern char *D_L14_001B2200[] __attribute__((sda));
-extern char D_L14_001B2210[] __attribute__((sda));
-extern char D_L14_001B9500[];
+extern int g_aim_l14_blocked_flag;
+extern float g_guard_frame_scale __attribute__((sda));
+extern char *g_guard_entry_tables[] __attribute__((sda));
+extern char g_guard_reference_point[] __attribute__((sda));
+extern char g_tether_l14_origin_vec[];
 
 void func_PAL_L14_0042D918(char *self)
 {
@@ -93,13 +93,13 @@ void func_PAL_L14_0042D918(char *self)
 
     if (B(self, 0x20) == 0) {
         if (g_current_map_index[0] == 2 && F(self, 0x18) > 400.0f) {
-            if (D_L14_001A8FF0 == 0)
+            if (g_aim_l14_blocked_flag == 0)
                 return;
             coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
             s->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
-            s->f90 = fast_vec_dist(self + 0x10, D_L14_001B2210) - 1.5f;
+            s->f90 = fast_vec_dist(self + 0x10, g_guard_reference_point) - 1.5f;
         } else {
             W(self, 0x9C) = 12;
             s->f90 = F(self, 0x18) - 1.0f;
@@ -109,7 +109,7 @@ void func_PAL_L14_0042D918(char *self)
             return;
         }
         {
-            char *e = D_L14_001B2200[0] + s->i210 * 0x30;
+            char *e = g_guard_entry_tables[0] + s->i210 * 0x30;
             if (H(e, 0x30) != 0) {
                 s->i13C = s->i218 = **(int **)(e + 0x3C);
             } else {
@@ -141,7 +141,7 @@ void func_PAL_L14_0042D918(char *self)
         s->h1E2 = 100;
         s->h1E4 = 150;
         s->f1D4 = 3.0f;
-        s->f1D0 = D_L14_001B18B0 * 0.020000001f;
+        s->f1D0 = g_guard_frame_scale * 0.020000001f;
         s->f328 = math_random_angle();
         if (s->i214 != 0) {
             UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
@@ -158,7 +158,7 @@ void func_PAL_L14_0042D918(char *self)
     }
 
     if (B(self, 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, g_tether_l14_origin_vec) < 24.0f) {
             moby_update_ground_check(self);
             B(self, 0x6F) = 22;
         }

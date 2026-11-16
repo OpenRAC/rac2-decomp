@@ -4,7 +4,7 @@
    DIRECTION and spun in opposite senses, drawn with textures 17 and 18.  Its own
    -G8 unit, as for func_002FD828 and func_002FDF40. */
 
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int ref_L00_002FDBD8_00;
 extern int ref_L00_002FDBD8_01[] __attribute__((sda));
 extern int ref_L00_002FDBD8_02[2] __attribute__((sda));
@@ -34,9 +34,9 @@ void part_draw_spinning_billboard_pair(float *origin, float *direction, float sc
     float angles[4];
     float spin[4];
     int n, i, odd;
-    if ((unsigned int)(D_0018C0B4 - 23) < 2 || D_0018C0B4 == 27 ||
-        D_0018C0B4 == 25 || D_0018C0B4 == 26 || D_0018C0B4 == 111 ||
-        D_0018C0B4 == 98 || ref_L00_002FDBD8_00 == 2) return;
+    if ((unsigned int)(g_game_mode - 23) < 2 || g_game_mode == 27 ||
+        g_game_mode == 25 || g_game_mode == 26 || g_game_mode == 111 ||
+        g_game_mode == 98 || ref_L00_002FDBD8_00 == 2) return;
     n = 0;
     do {
         odd = n & 1;

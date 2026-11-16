@@ -14,7 +14,7 @@ typedef struct {
     f32 targetAngle;
     s32 timer;
 } LiftVars;
-extern u8 *D_L12_001B2F8C MACRO_ADDR;
+extern u8 *g_path_waypoint_table MACRO_ADDR;
 typedef struct {
     u8 pad0[0x80];
     f32 position[4];
@@ -31,7 +31,7 @@ typedef struct {
 } LiftSound;
 extern u8 g_sound_state[];
 extern u8 *g_hero_moby NOT_SDA;
-extern s32 D_00138324 NOT_SDA;
+extern s32 g_pad_held_flags NOT_SDA;
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fabs(f32);
 extern f32 vec_distance_xy(void *, void *);
@@ -49,7 +49,7 @@ extern f32 math_approach_target_with_direction_mode(void *, void *, f32, f32, f3
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
-void func_US2_L12_0041EC70(u8 *self)
+void UpdateTodanoRotatingLift_us2(u8 *self)
 {
     f32 oldpos[4] __attribute__((aligned(16)));
     f32 oldrot[4] __attribute__((aligned(16)));
@@ -68,14 +68,14 @@ void func_US2_L12_0041EC70(u8 *self)
         break;
     case 2:
         p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
+            F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38) : p->origin[2];
         p->targetAngle = p->destination ?
-            FastAddRotations(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x78),
                           4.7123894691467285f) : p->origin[3];
-        y = F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38);
+        y = F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38);
         if (g_hero_state.lift == self && g_hero_state.active) {
             TryClaimNotice(8, 0x12EC, 1);
-            if (D_00138324 & 16) {
+            if (g_pad_held_flags & 16) {
                 p->destination = (p->destination + 1) & 1;
                 moby_set_state(self, 3, -1);
             }
@@ -109,9 +109,9 @@ void func_US2_L12_0041EC70(u8 *self)
             p->speed = 0;
         }
         p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x38) : p->origin[2];
+            F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38) : p->origin[2];
         p->targetAngle = p->destination ?
-            FastAddRotations(F((u8 *)(p->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x78),
                           4.7123894691467285f) : p->origin[3];
         target = p->targetHeight;
         speed = 0.003888889f;

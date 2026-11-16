@@ -5,8 +5,8 @@ extern char *moby_get_motion_data(char *);
 extern void follower_set_state(char *, int);
 extern int math_random_int_range(int, int);
 extern int func_001163B0(void);
-extern int D_L05_00221D10[];
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
+extern int g_feltzin_challenge_state[];
 
 /* looks up an object, then sets flags, arms a stored value and calls one of two helper pairs before building a timer */
 void func_PAL_L05_0037DE20(char *obj)
@@ -19,7 +19,7 @@ void func_PAL_L05_0037DE20(char *obj)
     if (*(int *)(s + 288) == 0)
         return;
     if (*(int *)(s + 284) != 0) {
-        int *p = D_L05_00221D10;
+        int *p = g_feltzin_challenge_state;
         int one = 1;
 
         *(int *)(s + 280) = one;
@@ -39,7 +39,7 @@ void func_PAL_L05_0037DE20(char *obj)
         }
         *(int *)(s + 304) = ((s32)(math_random_int_range(120, 500)) * 5 + 2) / 6;
     } else {
-        int *p = D_L05_00221D10;
+        int *p = g_feltzin_challenge_state;
 
         *(int *)(s + 280) = 1;
         p[3] += 1;

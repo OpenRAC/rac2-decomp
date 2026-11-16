@@ -12,7 +12,7 @@ extern void func_00132BC0(int,int,int,int,int,int,void (*)(int,long),long);
 extern void request_store_result_once(int,long),snd_send_cmd46(int),snd_update_music_channel(void *);
 extern int snd_CheckLoadInProgress(int),load_start_disc_read(int,int,int);
 extern void STUB_printf(void *);
-extern char D_001AA1B0[],D_001AA1C0[],D_001AA1D0[];
+extern char g_str_music_update_message_a[],g_str_music_update_message_b[],g_str_music_callback_message[];
 /* Runs the music system once per frame: starts and swaps tracks, fades between them, updates the three channels and continues disc reads. */
 void snd_update_music_system(void) {
     short requested_track;
@@ -133,12 +133,12 @@ void snd_update_music_system(void) {
     snd_update_music_channel(&S.transition.handle);
     snd_update_music_channel(&S.secondary.handle);
     if (S.break_requested != 0) {
-        STUB_printf(D_001AA1B0);
+        STUB_printf(g_str_music_update_message_a);
         if (snd_CheckLoadInProgress(1) == 0) {
             S.read_state = 0;
             S.break_requested = 0;
-            STUB_printf(D_001AA1C0);
-            if(S.callback) { void (*cb)(int,int)=S.callback; int data=S.callback_data; S.callback=0; S.callback_data=0; STUB_printf(D_001AA1D0); cb(data,0); }
+            STUB_printf(g_str_music_update_message_b);
+            if(S.callback) { void (*cb)(int,int)=S.callback; int data=S.callback_data; S.callback=0; S.callback_data=0; STUB_printf(g_str_music_callback_message); cb(data,0); }
         }
     } else {
         pending_state = S.read_state;

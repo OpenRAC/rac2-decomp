@@ -5,14 +5,14 @@ extern void swamp_monster_release_attack_slot(u8 *);
 extern s32 FloatToInt(f32);
 extern void moby_set_state(u8 *, s32, s32);
 extern u8 *g_moby_l01_table;
-extern s32 D_L01_001B2578[] __attribute__((sda));
+extern s32 g_swamp_monster_thresholds[] __attribute__((sda));
 extern u8 *D_L01_001B255C_base[] __asm__("D_L01_001B255C") __attribute__((sda));
-extern u16 *D_L01_001FB020[];
-extern u8 g_hero_position[], D_L01_001B94C0[];
-extern u8 D_L01_001AFE18[] __attribute__((sda));
-extern f32 D_L01_001B2F40;
+extern u16 *g_group_list_table[];
+extern u8 g_hero_position[], g_level_origin_vec[];
+extern u8 g_water_l01_height[] __attribute__((sda));
+extern f32 g_angle_limit_radians;
 extern u8 *part_find_owned_effect_slot(void *, s32, s32);
-extern f32 func_PAL_002AA108(void *, void *);
+extern f32 moby_update_aim_target_strength_pal(void *, void *);
 extern u8 *moby_get_private_value_0(void *);
 extern void func_PAL_002AC290(void *, void *);
 extern void func_PAL_002AC3C0(void *, void *);
@@ -32,7 +32,7 @@ extern void moby_update_ground_check(void *);
    animation and effects, and adjusts the nearby-object reaction and height.
    The isolated profile retains the timer branch's state + 0x50 calculation and
    keeps the shared floating-point branch labels on their hazard nops. */
-void func_PAL_L01_003D0358(u8 *a0)
+void UpdateOozlaLinkedGroupDamage_pal(u8 *a0)
 {
     u8 pos[16] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(a0 + 0x68);
@@ -47,16 +47,16 @@ void func_PAL_L01_003D0358(u8 *a0)
         ent = part_find_owned_effect_slot(a0, 0x10000, 0);
         if (*(short *)(state + 0x26) >= 1)
             ent = 0;
-        damage = func_PAL_002AA108(a0, ent);
+        damage = moby_update_aim_target_strength_pal(a0, ent);
         if (ent && 0.0f < damage && a0[0x95] >= 5) {
             if (*(s32 *)(state + 0xB0) != -1) {
                 *(s32 *)(state + 0xC0) = 200;
                 if (a0[0x21] != 0xFF) {
                     cls = *(u16 *)(*(u8 **)(ent + 0x20) + 0xAA);
                     duration = (cls == 0xCE4 || cls == 0xCE5) ? 50 : 0;
-                    for (p = D_L01_001FB020[a0[0x21]];
-                         a0[0x21] != 0xFF && a0[0x21] <= D_L01_001B2578[0] && p &&
-                         ((p != 0 && (short)p[-1] >= 0) || p == D_L01_001FB020[a0[0x21]]); p++) {
+                    for (p = g_group_list_table[a0[0x21]];
+                         a0[0x21] != 0xFF && a0[0x21] <= g_swamp_monster_thresholds[0] && p &&
+                         ((p != 0 && (short)p[-1] >= 0) || p == g_group_list_table[a0[0x21]]); p++) {
                         e = g_moby_l01_table + ((*p & 0x7FFF) << 8);
                         if (!e)
                             break;
@@ -134,16 +134,16 @@ void func_PAL_L01_003D0358(u8 *a0)
         ((f32 *)pos)[2] = func_PAL_L01_003BEB40();
         damage = math_random_float_range(0.5f, 3.0f);
         color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-        part_spawn_drifting(&pos, D_L01_001AFE18, color, damage, 14400.001f);
+        part_spawn_drifting(&pos, g_water_l01_height, color, damage, 14400.001f);
     }
     weapon_select_aim_target(a0, *(s32 *)(state + 0xF0), 0, a0[0x95] < 5, 0.0f, 0.0f);
     kind = a0[0x31];
-    if (kind && fast_vec_dist(a0 + 0x10, D_L01_001B94C0) < 48.0f) {
+    if (kind && fast_vec_dist(a0 + 0x10, g_level_origin_vec) < 48.0f) {
         moby_update_ground_check(a0);
         a0[0x6F] = 45;
     }
     *(f32 *)(a0 + 0x74) = 1.0f;
     *(f32 *)(a0 + 0x70) = 109.0f - *(f32 *)(a0 + 0x18);
     if (a0[0x95] >= 3 && a0[0x95] <= 7)
-        D_L01_001B2F40 = 0.20943953f;
+        g_angle_limit_radians = 0.20943953f;
 }

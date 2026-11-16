@@ -8,17 +8,17 @@ extern s32 snd_play_from_class_bank(s32 a0, s32 a1, char *a2, s32 a3);
 extern s32 PlayMobySound(s32 a0, s32 a1, char *a2);
 extern int math_random_int_below(int);
 extern u8 *g_hero_moby;
-extern s32 D_L22_001B2128 __attribute__((sda));
-extern u8 D_L22_001A7A78 __attribute__((sda));
-extern s32 D_L22_001A903C __attribute__((sda));
-extern s32 D_L22_0018B6A8 __attribute__((sda));
+extern s32 g_trigger_event_list_head __attribute__((sda));
+extern u8 g_unused_level_byte __attribute__((sda));
+extern s32 g_trigger_event_flag __attribute__((sda));
+extern s32 g_unused_l22_level_word __attribute__((sda));
 extern s32 math_fast_float_d(s32);
 extern int FastDecTimer();
 extern void build_axis_rotation_quaternion(s32, s32, f32);
 extern f32 fast_subtract_rotations(f32, f32);
 extern void AttachManipulator(s32, s32, s32);
-extern u8 *D_L22_001AF314[] __attribute__((sda));
-extern f32 D_L22_001B2A98 __attribute__((sda));
+extern u8 *g_space_ship_owner_moby[] __attribute__((sda));
+extern f32 g_space_ship_param_y __attribute__((sda));
 extern u8 *g_hero_moby;
 
 /* func_L22_0040C888 is in L22_0040C888-g8.c. */
@@ -54,20 +54,20 @@ void func_PAL_L22_004128B8(u8 *a0, f32 *a1, f32 f12) {
     f32 vec2[4] __attribute__((aligned(16)));
     f32 scale = f12;
 
-    if (D_L22_001AF314[0] != 0 && *(f32 *)(*(u8 **)(D_L22_001AF314[0] + 0x68) + 0x20) <= 0.0f) {
+    if (g_space_ship_owner_moby[0] != 0 && *(f32 *)(*(u8 **)(g_space_ship_owner_moby[0] + 0x68) + 0x20) <= 0.0f) {
         return;
     }
     moby_transform_joint_to_world(a0, 2, vec1);
     if (scale == 0.0f) {
-        scale = D_L22_001B2A98;
+        scale = g_space_ship_param_y;
     }
     FastVecSub(vec2, a1, vec1);
     vec_scale_to_length(vec2, vec2, 0.8000001f);
-    func_PAL_L22_00412B98(vec1, vec2, &scale);
+    part_spawn_trail_effect_pal(vec1, vec2, &scale);
     moby_transform_joint_to_world(a0, 3, vec1);
     FastVecSub(vec2, a1, vec1);
     vec_scale_to_length(vec2, vec2, 0.8000001f);
-    func_PAL_L22_00412B98(vec1, vec2, &scale);
+    part_spawn_trail_effect_pal(vec1, vec2, &scale);
 }
 
 

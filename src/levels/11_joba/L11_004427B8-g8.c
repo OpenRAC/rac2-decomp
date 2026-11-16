@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
-extern int D_001A7A08[2];
+extern int g_challenge_score_words[2];
 
 extern int g_player_bolts;
 
-extern unsigned char D_001A7A60 __attribute__((sda));
+extern unsigned char g_item_enabled_flags __attribute__((sda));
 
-extern int D_001A903C;
+extern int g_scene_trigger_flag;
 
 typedef struct {
     char pad0[0x22C8];
@@ -51,31 +51,31 @@ void arena_start_challenge_result_scene(char *obj, int challengeIndex) {
     int saved;
     int score;
 
-    if (challengeIndex == 0 && D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
+    if (challengeIndex == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
         saved = g_hero_state.w22C8;
         arena_queue_voice_line(obj, 1);
         help_unlock_entry(0x13);
         moby_handle_request_slot_state(0x13);
         g_hero_state.w22C8 = saved;
-    } else if (challengeIndex == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
+    } else if (challengeIndex == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
         saved = g_hero_state.w22C8;
         arena_queue_voice_line(obj, 3);
         help_unlock_entry(0x33);
         g_hero_state.w22C8 = saved;
     } else {
         arena_queue_voice_line(obj, math_random_int_below(2) + 0x1E);
-        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(challengeIndex);
+        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(challengeIndex);
         score = moby_compute_scaled_entry_value(challengeIndex);
         *(int *)(state + 0x1E0) = score;
         g_player_bolts = g_player_bolts + score;
         module_l00_call_handler_with_arg_4(0x168);
     }
-    if (challengeIndex == 10 && D_001A7A60 == 0) {
-        D_001A7A60 = 1;
+    if (challengeIndex == 10 && g_item_enabled_flags == 0) {
+        g_item_enabled_flags = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index(0x1233, -1);
-        D_001A903C = 1;
+        g_scene_trigger_flag = 1;
     }
-    D_001395B8[arena_get_challenge_flag_index(challengeIndex)] += 1;
+    g_game_flag_table[arena_get_challenge_flag_index(challengeIndex)] += 1;
     MemcardSave(0, -1);
 }

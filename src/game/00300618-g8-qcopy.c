@@ -11,7 +11,7 @@ extern float ref_00302470_08 SDATA(ref_00302470_08);
 extern float ref_00302470_09 SDATA(ref_00302470_09);
 extern int ref_00302470_01 SDATA(ref_00302470_01);
 extern ParticleVector ref_00302470_02 __attribute__((nosda));
-extern int D_001A7A10[] MACRO_ADDR;
+extern int g_player_state_shorts[] MACRO_ADDR;
 extern char *g_hero_moby __attribute__((nosda));
 extern float fast_vec_dist(void *, void *);
 extern char *CreateMoby(int);
@@ -75,7 +75,7 @@ BoltSpawnObject *moby_spawn_bolt_pickup(BoltSpawnObject *source, void *position,
     u32 red, green, blue;
     float scale, spin, angle;
     if (fast_vec_dist(position,&ref_00302470_02)>=64.0f) {
-        D_001A7A10[1]+=value;
+        g_player_state_shorts[1]+=value;
         return 0;
     }
     switch (value) {

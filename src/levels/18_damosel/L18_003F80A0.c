@@ -13,8 +13,8 @@ typedef int s32;
 extern int math_random_int_below(int);
 extern u8 *part_spawn_gravity_fade(void *, void *, int, unsigned, int, int, int,
                           float, float, float, int);
-extern u8 D_L18_001A8F20[] __attribute__((sda));
-extern u8 *D_L18_001FF414[];
+extern u8 g_explosion_effect_desc[] __attribute__((sda));
+extern u8 *g_particle_template_table[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -31,7 +31,7 @@ extern void func_0033DD38(u8 *arg0, u8 *arg1, s32 arg2, float arg3, float arg4);
 extern void func_00340BD8(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3, float arg4);
 extern void func_00337920(u8 *arg0);
 extern float func_00308A98();
-extern u8 D_001C97C0[];
+extern u8 g_beam_target_vec[];
 
 /* Updates the enemy's body each frame: runs its animation helpers, clears its hit
    flags, and switches it to a new state when the hero's spot is close. */
@@ -51,7 +51,7 @@ void enemy_update_body_parts(u8 *moby) {
     *(u16 *)(vars + 0x768) = 0;
     *(u16 *)(vars + 0x76A) = 0;
     if (*(u8 *)(thisMoby + 0x31) != 0) {
-        if (func_00308A98(thisMoby + 0x10, D_001C97C0) < 24.0f) {
+        if (func_00308A98(thisMoby + 0x10, g_beam_target_vec) < 24.0f) {
             func_00337920(thisMoby);
             *(u8 *)(thisMoby + 0x6F) = 0x16;
         }
@@ -78,11 +78,11 @@ void part_spawn_joint_glow_flashes(u8 *moby) {
 
 /* func_L18_003FD858 is in L18_003FD858-g8.c. */
 
-extern u16 *D_L18_001FB320[];
+extern u16 *g_condition_target_lists[];
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 
 extern s32 IsPointInCuboid(u8 *, s32);
 
@@ -116,7 +116,7 @@ s32 door_check_open_condition(u8 *moby, u8 *heroPos)
         return 0;
     if (state->f74 == 1)
         return 1;
-    if (D_0019B2E8[moby[0xB0] + g_current_map_index * 16] & 0x80)
+    if (g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80)
         return 1;
     for (i = 0; i < 4; i++) {
         if (state->a[i] == -1)
@@ -134,9 +134,9 @@ s32 door_check_open_condition(u8 *moby, u8 *heroPos)
         if (state->d[i] == 0)
             continue;
         any = 1;
-        for (p = D_L18_001FB320[state->b[i]];
-             (state->b[i] & 0xFF) != 0xFF && state->b[i] <= D_L18_001B2838[0] &&
-             p != 0 && ((s16)p[-1] >= 0 || p == D_L18_001FB320[state->b[i]]);
+        for (p = g_condition_target_lists[state->b[i]];
+             (state->b[i] & 0xFF) != 0xFF && state->b[i] <= g_max_l18_group_index[0] &&
+             p != 0 && ((s16)p[-1] >= 0 || p == g_condition_target_lists[state->b[i]]);
              p++) {
             e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
@@ -177,7 +177,7 @@ s32 door_check_close_condition(u8 *moby, u8 *heroPos)
         return 1;
     if (state->f74 == 1)
         return 0;
-    if (D_0019B2E8[moby[0xB0] + g_current_map_index * 16] & 0x80)
+    if (g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80)
         return 0;
     for (i = 0; i < 4; i++) {
         if (state->a[i] == -1)
@@ -195,9 +195,9 @@ s32 door_check_close_condition(u8 *moby, u8 *heroPos)
         if (state->d[i] != 0)
             continue;
         any = 1;
-        for (p = D_L18_001FB320[state->b[i]];
-             (state->b[i] & 0xFF) != 0xFF && state->b[i] <= D_L18_001B2838[0] &&
-             p != 0 && ((s16)p[-1] >= 0 || p == D_L18_001FB320[state->b[i]]);
+        for (p = g_condition_target_lists[state->b[i]];
+             (state->b[i] & 0xFF) != 0xFF && state->b[i] <= g_max_l18_group_index[0] &&
+             p != 0 && ((s16)p[-1] >= 0 || p == g_condition_target_lists[state->b[i]]);
              p++) {
             e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
@@ -225,7 +225,7 @@ s32 door_check_close_condition(u8 *moby, u8 *heroPos)
 
 /* func_L18_0042F308 is in L18_0042F308.c. */
 
-extern int *D_L18_001FE480[];
+extern int *g_path_l18_table[];
 
 
 extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
@@ -358,12 +358,12 @@ s32 extermibot_is_facing_point(u8 *moby, float *point) {
            0.00872664712369442f;
 }
 
-extern u16 *D_L18_001FB320[];
+extern u16 *g_condition_target_lists[];
 
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
 
 /* Looks through the object's group (state word 0x7B4) for the entity of class 0xB69, other than
    the two states 0xFE and 0xFD and with bit 0 of its halfword at +0x34 clear, nearest to the
@@ -382,9 +382,9 @@ s32 extermibot_find_nearest_protopet(u8 *moby)
         return 0;
     found = 0;
     best = 1000.0f;
-    for (p = D_L18_001FB320[*(s32 *)(state + 0x7B4)];
-         (*(s32 *)(state + 0x7B4) & 0xFF) != 0xFF && *(s32 *)(state + 0x7B4) <= D_L18_001B2838[0] &&
-         p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == D_L18_001FB320[*(s32 *)(state + 0x7B4)]);
+    for (p = g_condition_target_lists[*(s32 *)(state + 0x7B4)];
+         (*(s32 *)(state + 0x7B4) & 0xFF) != 0xFF && *(s32 *)(state + 0x7B4) <= g_max_l18_group_index[0] &&
+         p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == g_condition_target_lists[*(s32 *)(state + 0x7B4)]);
          p++) {
         e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
@@ -419,7 +419,7 @@ void extermibot_set_fast_limits(u8 *moby) {
     moby_set_controller_speed_limits(moby, 0.1388889f, 0.18333334f, 0.027925272f, 0.8377582f);
 }
 
-extern u8 D_00190000[];
+extern u8 g_data_block_base[];
 extern void snd_stop_voice(s32 arg0);
 extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_mark_spawned(void *arg0);
@@ -434,7 +434,7 @@ void extermibot_destroy_piece_and_parts(u8 *moby) {
     vars = *(u8 **)(moby + 0x68);
     voiceSlot = *(s32 *)(vars + 0x7F0);
     if (voiceSlot != -1) {
-        u8 *voice = D_00190000 - 0x79A0 + voiceSlot * 0x70;
+        u8 *voice = g_data_block_base - 0x79A0 + voiceSlot * 0x70;
         if (*(u32 *)(voice + 0x88) != (u32)moby) goto end;
         if (voice[0x74] == 0) goto end;
         snd_stop_voice(voiceSlot);
@@ -532,9 +532,9 @@ void extermibot_release_all_group_pieces(u8 *arg0)
 
     if (arg0[0x21] == 0xFF)
         return;
-    p = D_L18_001FB320[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L18_001B2838[0] && p != 0 &&
-           ((p != 0 && (s16)p[-1] >= 0) || p == D_L18_001FB320[arg0[0x21]])) {
+    p = g_condition_target_lists[arg0[0x21]];
+    while (arg0[0x21] != 0xFF && arg0[0x21] <= g_max_l18_group_index[0] && p != 0 &&
+           ((p != 0 && (s16)p[-1] >= 0) || p == g_condition_target_lists[arg0[0x21]])) {
         e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
@@ -612,14 +612,14 @@ void extermibot_fire_shot_at_target(u8 *moby)
     *(s16 *)(vars + 0x804) = 0;
     moby_transform_joint_to_world(*(s32 *)(vars + 0x7C8), 0, pos);
     colorSeed = math_random_int_below(255);
-    particle = part_spawn_gravity_fade(pos, D_L18_001A8F20, 3, 0x808080, colorSeed, 127, 16,
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 3, 0x808080, colorSeed, 127, 16,
                             840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
-        particle[2] = D_L18_001FF414[0][0];
-    particle = part_spawn_gravity_fade(pos, D_L18_001A8F20, 3, 0x608080, (colorSeed + 128) % 255,
+        particle[2] = g_particle_template_table[0][0];
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 3, 0x608080, (colorSeed + 128) % 255,
                             127, 16, 840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
-        particle[2] = D_L18_001FF414[0][0];
+        particle[2] = g_particle_template_table[0][0];
     FastVecSub(delta, vars + 0x760, pos);
     vec_scale_to_length(delta, delta, 0.3f);
     FastVecAdd(pos, pos, delta);

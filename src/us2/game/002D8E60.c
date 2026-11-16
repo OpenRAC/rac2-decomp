@@ -6,8 +6,8 @@ typedef struct { char pad0[0x36C]; int offset; char pad370[0x16B0 - 0x370]; int 
 typedef struct { unsigned int key; unsigned int flags; } Slot2D81B0;
 typedef struct { char pad[0x118]; char *loaded; unsigned int limit; } State2D6E78;
 extern Stream2D81B0 g_copy_setup_data;
-extern Slot2D81B0 D_001B1F50[] MACRO_ADDR;
-extern int D_001F2958;
+extern Slot2D81B0 g_menu_chunk_table[] MACRO_ADDR;
+extern int g_block_load_disc_handle;
 extern State2D6E78 g_pause_menu_state;
 extern void menu_stream_chunk_table_init(int);
 
@@ -20,8 +20,8 @@ int func_US2_002D8E60(char *object)
     menu_stream_chunk_table_init(1);
     *(int *)(object + 0x54) = 0;
     *(int *)(object + 0x38) = 0;
-    flags = &D_001B1F50[0].flags;
-    key = &D_001B1F50[0].key;
+    flags = &g_menu_chunk_table[0].flags;
+    key = &g_menu_chunk_table[0].key;
     for (i = 0; i < 5; i++) {
         if (*key != 0 && *key < g_pause_menu_state.limit)
             *flags |= 2;
@@ -33,20 +33,20 @@ int func_US2_002D8E60(char *object)
     return 0;
 }
 extern void load_request_disc_read_break(void);
-extern short D_001A63AC;
+extern short g_sequence_active_flag;
 extern void load_request_disc_read_break(void);
 extern int g_subtitle_entries __attribute__((sda));
-extern int D_00254EA4;
+extern int g_block_load_object_word;
 
 int func_US2_002D8F00(char *object)
 {
-    if (D_001A63AC != 0 && *(int *)(object + 0x50) == 3)
+    if (g_sequence_active_flag != 0 && *(int *)(object + 0x50) == 3)
         load_request_disc_read_break();
     menu_stream_chunk_table_init(1);
     {
         int value = *(int *)(object + 0x54);
         if (value != 0) {
-            D_00254EA4 = *(int *)(object + 0x38);
+            g_block_load_object_word = *(int *)(object + 0x38);
             g_subtitle_entries = value;
         }
     }
@@ -54,9 +54,9 @@ int func_US2_002D8F00(char *object)
 }
 
 
-extern unsigned char D_001A7BB4 MACRO_ADDR;
+extern unsigned char g_language MACRO_ADDR;
 extern int g_subtitle_state[];
-extern int D_US2_001ABB38 SDATA(D_US2_001ABB38);
+extern int g_data_header_offset SDATA(D_US2_001ABB38);
 extern int load_start_disc_read(int, int, int);
 extern void mem_copy_aligned(void *, void *, int);
 
@@ -82,27 +82,27 @@ int func_US2_002D8F70(char *object)
     case 5:
         break;
     case 0:
-        D_US2_001ABB38 = 0;
-        if (D_001A63AC == 0) {
+        g_data_header_offset = 0;
+        if (g_sequence_active_flag == 0) {
             Stream2D81B0 *stream = &g_copy_setup_data;
 
-            if (load_start_disc_read(D_001F2958, stream->start + stream->offset, 1))
+            if (load_start_disc_read(g_block_load_disc_handle, stream->start + stream->offset, 1))
                 loader->state = 1;
             else
                 loader->state = 5;
         }
         break;
     case 1:
-        if (D_001A63AC == 0)
+        if (g_sequence_active_flag == 0)
             loader->state = 2;
         break;
     case 2:
-        if (D_001A63AC == 0) {
-            int data = D_001F2958;
-            int offset = ((int *)data)[D_001A7BB4];
+        if (g_sequence_active_flag == 0) {
+            int data = g_block_load_disc_handle;
+            int offset = ((int *)data)[g_language];
             Stream2D81B0 *stream = &g_copy_setup_data;
 
-            D_US2_001ABB38 = offset % 0x800;
+            g_data_header_offset = offset % 0x800;
             if (load_start_disc_read(data, stream->start + stream->offset + offset / 0x800, 100))
                 loader->state = 3;
             else
@@ -110,9 +110,9 @@ int func_US2_002D8F70(char *object)
         }
         break;
     case 3:
-        if (D_001A63AC == 0) {
+        if (g_sequence_active_flag == 0) {
             char *data = g_pause_menu_state.loaded;
-            int *header = (int *)(data + D_US2_001ABB38);
+            int *header = (int *)(data + g_data_header_offset);
             int count = *header++;
             int size = *header++;
             char *base;
@@ -138,10 +138,10 @@ int func_US2_002D8F70(char *object)
 }
 
 typedef struct { short fields[12]; } MenuTextRectangle;
-extern char *D_001F2854;
-extern char D_00263B50[], D_00264290[], D_00263EF0[];
-extern unsigned char D_001A7A60[] MACRO_ADDR;
-extern int D_US2_001ABB3C SDATA(D_US2_001ABB3C);
+extern char *g_active_menu_object;
+extern char g_font_glyphs_small[], g_font_glyphs_large[], g_font_glyphs_medium[];
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
+extern int g_initial_field_value SDATA(D_US2_001ABB3C);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void *memset(void *, int, int);
@@ -160,14 +160,14 @@ int func_US2_002D9178(char *object)
     short *row;
     int height = 12, texture = 1, lineHeight, top;
     int count, index, selected, enabled, text;
-    int active = *(char **)(D_001F2854 + 0xE8) == object;
-    char *font = D_00263B50;
+    int active = *(char **)(g_active_menu_object + 0xE8) == object;
+    char *font = g_font_glyphs_small;
     int spacing;
     unsigned long textureWord;
     int colour;
     int step, span, limit;
-    if (*(int *)(object + 0x30) & 4) { height = 14; font = D_00264290; texture = 3; }
-    if (*(int *)(object + 0x30) & 8) { height = 11; font = D_00263EF0; texture = 2; }
+    if (*(int *)(object + 0x30) & 4) { height = 14; font = g_font_glyphs_large; texture = 3; }
+    if (*(int *)(object + 0x30) & 8) { height = 11; font = g_font_glyphs_medium; texture = 2; }
     VU1_addGSregister(66, 68);
     lineHeight = height + 2;
     VU1_addGSregister(71, 0x2004B);
@@ -181,7 +181,7 @@ int func_US2_002D9178(char *object)
     memset(&initial, 0, 24);
     initial.fields[0] = 4;
     initial.fields[1] = *(int *)(object + 0x24) - 4;
-    initial.fields[2] = D_US2_001ABB3C;
+    initial.fields[2] = g_initial_field_value;
     initial.fields[3] = *(int *)(object + 0x20) - 2;
     initial.fields[5] = top - *(int *)(object + 0x44);
     initial.fields[8] = lineHeight;
@@ -212,9 +212,9 @@ int func_US2_002D9178(char *object)
         func_US2_00280550(rectangle.fields, colour, text, -1, textureWord, font, 1.0f);
         if (selected) gfx_enable_screen_flag();
         if (*(int *)(object + 0x30) & 0x200)
-            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7A60[index] != 0);
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_item_enabled_flags[index] != 0);
         if (*(int *)(object + 0x30) & 0x800)
-            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7BB4 == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_language == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
         rectangle.fields[5] += rectangle.fields[7];
         if ((*(short **)(object + 0x34))[index * 6 + 4]) {
             text = GetLocalizedString((*(short **)(object + 0x34))[index * 6 + 4]);

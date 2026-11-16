@@ -2,18 +2,18 @@
 #include "names.h"
 
 /* func_PAL_L00_00418768, the PAL copy of func_L00_00413870: the same C, where the step is scaled by 1.2f for 50 Hz. */
-extern float D_L00_001B13D8 __attribute__((sda));
-extern int D_L00_001B13C4 __attribute__((sda));
-extern int D_L00_001B13C8 __attribute__((sda));
-extern int D_L00_001B13CC __attribute__((sda));
-extern int D_L00_001B13D0 __attribute__((sda));
+extern float g_wave_line_scroll_step __attribute__((sda));
+extern int g_wave_ribbon_first_color __attribute__((sda));
+extern int g_wave_ribbon_second_color __attribute__((sda));
+extern int g_wave_ribbon_first_alpha __attribute__((sda));
+extern int g_wave_ribbon_second_alpha __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void wave_line_draw_ribbon(char *, int, int, int, int);
 
 void func_PAL_L00_00418768(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    float value = *(float *)(state + 0x14) - D_L00_001B13D8 * 1.2f;
+    float value = *(float *)(state + 0x14) - g_wave_line_scroll_step * 1.2f;
 
     *(float *)(state + 0x14) = value;
     if (value <= -8.0f) {
@@ -21,6 +21,6 @@ void func_PAL_L00_00418768(char *object)
     }
     VU1_addGSregister(0x47, 0x51001ULL);
 
-    wave_line_draw_ribbon(object, *(int *)(state + 0), D_L00_001B13C4, D_L00_001B13CC, 10);
-    wave_line_draw_ribbon(object, *(int *)(state + 4), D_L00_001B13C8, D_L00_001B13D0, 20);
+    wave_line_draw_ribbon(object, *(int *)(state + 0), g_wave_ribbon_first_color, g_wave_ribbon_first_alpha, 10);
+    wave_line_draw_ribbon(object, *(int *)(state + 4), g_wave_ribbon_second_color, g_wave_ribbon_second_alpha, 20);
 }

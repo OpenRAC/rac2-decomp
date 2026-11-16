@@ -28,7 +28,7 @@ typedef struct {
 
 extern L02_003D7900_Hero g_hero_state;
 
-extern int D_L02_001B01C0 __attribute__((sda));
+extern int g_chainblade_start_waypoint __attribute__((sda));
 
 /* Puts the Chainblade back at its start spot facing the hero and resets its timers and phase. */
 void chainblade_reset_to_start(char *self, int hitCooldown) {
@@ -59,7 +59,7 @@ void chainblade_reset_to_start(char *self, int hitCooldown) {
     {
         TI128 *dst = (TI128 *)(self + 0x10);
 
-        *dst = *(TI128 *)&D_L02_001B01C0;
+        *dst = *(TI128 *)&g_chainblade_start_waypoint;
     }
     hero = &g_hero_state;
     *(float *)(self + 0xF8) = mat_fast_helper_a(hero->x - *(float *)(self + 0x10),

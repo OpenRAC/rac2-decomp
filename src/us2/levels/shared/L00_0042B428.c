@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L00_0042B428, the USA v2.00 copy of func_L00_00429F68: the same C, with D_L00_001B19C8 and
    Giant Clank mode (D_0018C0D4 == 2) added to the guard. */
 #include "common.h"
@@ -11,7 +12,7 @@ typedef struct Row_429F68 {
     char *params;
 } Row_429F68;
 
-extern char *D_L00_001B1844 __attribute__((section(".sdata")));
+extern char *g_camera_def_table __attribute__((section(".sdata")));
 extern char *g_follow_camera_object;
 typedef struct Hero_429F68 {
     char pad[0x80];
@@ -29,9 +30,9 @@ extern void func_00282CC0_4(char *, char *, char *);
 extern int cam_claim_request_slot(char *);
 extern int cam_release_request_slot(char *);
 extern int cam_test_trigger_volumes(char *);
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 extern int g_frame_l00_counter __attribute__((section(".sdata")));
-extern unsigned char D_0018C0D4;
+extern unsigned char g_screen_mode_flag;
 extern float math_fabs(float);
 extern void follow_camera_set_distance(int, float, float);
 extern void cam_set_snap_flag(void);
@@ -48,7 +49,7 @@ void func_US2_L00_0042B428(char *camera)
     char to_position[16] __attribute__((aligned(16)));
     char gravity_offset[16] __attribute__((aligned(16)));
     char horizontal[16] __attribute__((aligned(16)));
-    char *params = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84)*32 + 0x1C);
+    char *params = *(char **)(g_camera_def_table + *(short *)(camera + 0x84)*32 + 0x1C);
     char *camera_position, *state, *reset, *tail, *follow, *snap, *rig;
     float yaw, height, tangent, pitch;
     if (g_frame_l00_counter>=4 && cam_test_trigger_volumes(camera)) {
@@ -57,7 +58,7 @@ void func_US2_L00_0042B428(char *camera)
             *(int *)(params + 0x20) = 0;
             return;
         }
-        if (!(D_00138320&4) || D_0018C0D4==2) goto run;
+        if (!(g_pad_pressed_flags&4) || g_screen_mode_flag==2) goto run;
     }
     if (*(int *)(params + 0x20)) *(short *)(params + 0x26) = 1;
     *(int *)(params + 0x20) = 0;
@@ -66,18 +67,18 @@ void func_US2_L00_0042B428(char *camera)
 run:
     if (*(int *)(params + 0x20)<2) {
         if (*(float *)(params + 0x2C)==0.0f && *(float *)(params + 0x30)==0.0f) {
-            char *table = D_L00_001B1844;
+            char *table = g_camera_def_table;
             *(float *)(params + 0x2C) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x14);
             *(float *)(params + 0x30) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x18);
         }
         yaw = func_00283248_1(
-            D_00189E20_6.position[0] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0],
-            D_00189E20_6.position[1] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1]);
+            D_00189E20_6.position[0] - ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[0],
+            D_00189E20_6.position[1] - ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[1]);
         if (FastDiffRots(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
             *(float *)(params + 0x44) = fast_subtract_rotations(*(float *)(params + 0x30), yaw);
-        position[0] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0];
-        position[1] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1];
-        position[2] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[2];
+        position[0] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[0];
+        position[1] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[1];
+        position[2] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[2];
         position[3] = 0.0f;
         FastVecSub(to_position, (char *)position, (char *)D_00189E20_6.position);
         height = FastVecDot(to_position, (char *)D_00189E20_6.axis);

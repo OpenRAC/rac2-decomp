@@ -13,12 +13,12 @@ extern int g_pad_state[];
 extern unsigned char g_item_slot_to_record[];
 extern EffectClassEntry g_weapon_l00_table[];
 extern EffectSoundSlot g_sound_state[];
-extern char *D_L00_001B1448 __attribute__((sda));
+extern char *g_lava_gun_particle_slots __attribute__((sda));
 extern char *g_lava_gun_ring_entries __attribute__((sda));
 extern char *g_lava_gun_beam_slots __attribute__((sda));
 extern char *g_area_hit_targets[];
-extern int D_L00_001A8FF0;
-extern int D_L00_001A8F00;
+extern int g_hero_locked_flag;
+extern int g_game_l00_mode;
 extern char ref_L00_00419C98_00[];
 extern void table_clear_entry_flag(int);
 extern int AcquireEntitySlot(char *, int, int *);
@@ -72,9 +72,9 @@ void func_PAL_L24_003FED38(char *object)
     if (!((unsigned char *)object)[0x20]) {
         *(int *)(state+0x34)=AcquireEntitySlot(object,0,&unused);
         g_lava_gun_beam_slots=level_get_slot_body(*(short *)(object+0xaa),*(int *)(state+0x34));
-        D_L00_001B1448=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_beam_slots+0x33e0);
-        g_lava_gun_ring_entries=(char *)mem_align_up_sixteen_alt((int)D_L00_001B1448+0x1f40);
-        for (i=124;i>=0;i--) ((EffectParticleSlot *)D_L00_001B1448)[i].active=1;
+        g_lava_gun_particle_slots=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_beam_slots+0x33e0);
+        g_lava_gun_ring_entries=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_particle_slots+0x1f40);
+        for (i=124;i>=0;i--) ((EffectParticleSlot *)g_lava_gun_particle_slots)[i].active=1;
         for (i=9;i>=0;i--) ((EffectLargeSlot *)g_lava_gun_beam_slots)[i].active=0;
         { int invalid=-1; for (i=34;i>=0;i--) ((EffectHandleSlot *)g_lava_gun_ring_entries)[i].handle=invalid; }
         *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; *(int *)(state+0x44)=0;
@@ -129,7 +129,7 @@ void func_PAL_L24_003FED38(char *object)
     if (g_hero_state.p[0x1450/4]) {
         g_hero_state.p[0xbf8/4]=g_hero_state.p[0x1450/4];
         vec_compute_object_to_target(g_hero_state.p[0x1450/4],state,vector,*(float *)(state+0x50)*0.05f);
-        if (D_L00_001A8FF0) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
+        if (g_hero_locked_flag) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
         else vector[2]+=0.02f;
     }
     qcopy(state+0x10,state);
@@ -140,5 +140,5 @@ void func_PAL_L24_003FED38(char *object)
     if (*(float *)(state+0x50)!=0) { lava_gun_update_blobs(object); lava_gun_update_ring_entries(object); }
     else { *(int *)(state+0x44)=0; *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; }
     part_l00_update_effect_slots_2(object);
-    if (D_L00_001A8F00!=2 && ((unsigned char *)object)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,object);
+    if (g_game_l00_mode!=2 && ((unsigned char *)object)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,object);
 }

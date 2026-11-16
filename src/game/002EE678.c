@@ -38,7 +38,7 @@ unsigned int follower_get_state(unsigned char *owner)
 extern int coll_is_point_inside_unit_sphere(unsigned char *a, int b);
 extern void moby_release_motion_slot(unsigned char *owner);
 extern void follower_start_push_from_target(char *owner);
-extern int D_00214F90[];
+extern int g_moby_motion_state_words[];
 
 /* Checks if the follower touches one of the listed hazard spots; if so, it dies and switches to state 13. */
 void follower_check_hazard_contact(unsigned char *owner)
@@ -46,7 +46,7 @@ void follower_check_hazard_contact(unsigned char *owner)
     int i;
     unsigned int state;
 
-    if (D_00214F90[36] == 0)
+    if (g_moby_motion_state_words[36] == 0)
         return;
     if (moby_get_motion_data(owner) == 0)
         return;
@@ -55,8 +55,8 @@ void follower_check_hazard_contact(unsigned char *owner)
         return;
     if (state == 0xD)
         follower_set_state(owner, 1);
-    for (i = 0; i < D_00214F90[36]; i++) {
-        if (coll_is_point_inside_unit_sphere(owner + 0x10, D_00214F90[39 + i])) {
+    for (i = 0; i < g_moby_motion_state_words[36]; i++) {
+        if (coll_is_point_inside_unit_sphere(owner + 0x10, g_moby_motion_state_words[39 + i])) {
             moby_release_motion_slot(owner);
             follower_set_state(owner, 0xD);
             follower_start_push_from_target((char *)owner);
@@ -69,7 +69,7 @@ extern float math_random_angle(void);
 extern float math_fast_sin_or_cos_a(float owner);
 extern float math_fast_sin_or_cos_b(float owner);
 extern float math_random_float_range(float owner, float a1);
-extern char *D_001B1C54 __attribute__((sda));
+extern char *g_follower_tuning_table __attribute__((sda));
 
 /* Gives the follower a random starting push, clamps it, and sets its life timer to 300. */
 void follower_start_random_push(unsigned char *owner)
@@ -82,7 +82,7 @@ void follower_start_random_push(unsigned char *owner)
     object = (char *)moby_get_motion_data(owner);
     if (object == 0)
         return;
-    table = D_001B1C54 + D_00214F90[0] * 128;
+    table = g_follower_tuning_table + g_moby_motion_state_words[0] * 128;
     randX = math_fast_sin_or_cos_a(math_random_angle()) * math_random_float_range(0.0f, *(float *)table);
     *(float *)(object + 0x60) = randX;
     randY = math_fast_sin_or_cos_b(math_random_angle()) * math_random_float_range(0.0f, *(float *)table);

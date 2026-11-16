@@ -1,10 +1,10 @@
 #include "ps2_hw.h"
 #include "names.h"
-extern char D_L00_001BD2C0[];
-extern int D_L00_001A8FB4;
-extern char *D_L00_001A904C;
-extern int D_L00_001AEA7C __attribute__((sda));
-extern int D_L00_001AEA80 __attribute__((sda));
+extern char g_hud_float_params[];
+extern int g_input_block_flag;
+extern char *g_bolt_counter_base;
+extern int g_radial_menu_layout_x __attribute__((sda));
+extern int g_radial_menu_layout_y __attribute__((sda));
 extern void UpdateViewContext(void);
 extern unsigned int menu_get_label_color_alpha(void *);
 extern void radial_menu_layout_items(void *, int, int, int);
@@ -17,15 +17,15 @@ void hud_item_bolt_draw(char *object)
 {
     float saved;
     char *camera;
-    char *state = D_L00_001BD2C0;
+    char *state = g_hud_float_params;
     saved = *(float *)(state + 0xB0);
     *(float *)(state + 0xB0) = 0.62f;
     UpdateViewContext();
-    if (D_L00_001A8FB4 == 0)
-        radial_menu_layout_items(object, D_L00_001AEA7C, D_L00_001AEA80, menu_get_label_color_alpha(object + 0x7A0) >> 24);
+    if (g_input_block_flag == 0)
+        radial_menu_layout_items(object, g_radial_menu_layout_x, g_radial_menu_layout_y, menu_get_label_color_alpha(object + 0x7A0) >> 24);
     menu_noop_hook(object);
     DrawBoltCounterPanel(object + 0x7A0);
-    camera = D_L00_001A904C + 0x38000;
+    camera = g_bolt_counter_base + 0x38000;
     *(int *)(camera + 0x7354) = 0;
     *(int *)(camera + 0x7358) = 0;
     text_panel_draw_scaled(object + 0x1FBC);
@@ -100,8 +100,8 @@ typedef long long ll;
 typedef unsigned int u32;
 typedef unsigned char u8;
 
-extern int D_001A72DC;
-extern int D_001B23C8;
+extern int g_vram_display_address;
+extern int g_movie_buffer_base;
 extern void BuildFrameDmaChain(void *, int);
 
 /* FMV GS packet builder: one 0x40-byte header record, then a 0x60-byte record per
@@ -119,7 +119,7 @@ void mpeg_build_frame_packet(void *packet, int textureAddress, int height, int w
     *(u64 *)(cursor + 0x08) = 0;
     *(u64 *)(cursor + 0x10) = 0x1000000000000002ULL;
     *(u64 *)(cursor + 0x18) = 0xE;
-    *(u64 *)(cursor + 0x20) = ((ll)D_001A72DC >> 8) << 32 | 0x8000000000000LL;
+    *(u64 *)(cursor + 0x20) = ((ll)g_vram_display_address >> 8) << 32 | 0x8000000000000LL;
     *(u64 *)(cursor + 0x28) = 0x50;
     *(u64 *)(cursor + 0x30) = 0x1000000010ULL;
     *(u64 *)(cursor + 0x38) = 0x52;
@@ -153,14 +153,14 @@ void mpeg_build_frame_packet(void *packet, int textureAddress, int height, int w
 
     *(u32 *)(cursor + 0x00) = 0x20000000;
     off = (bufferIndex << 14) + 0x1C81C0;
-    addr = D_001B23C8 + off;
+    addr = g_movie_buffer_base + off;
     *(u32 *)(cursor + 0x0C) = 0;
     *(u32 *)(cursor + 0x08) = 0;
     *(u32 *)(cursor + 0x04) = addr;
-    BuildFrameDmaChain((void *)(u32)(D_001B23C8 + off), 1);
+    BuildFrameDmaChain((void *)(u32)(g_movie_buffer_base + off), 1);
 }
 
-extern char D_001AE830[];
+extern char g_str_mpeg_feed_callback[];
 extern void mpeg_dec_get_free_regions(unsigned char *, int *, int *, int *, int *);
 extern int mpeg_dec_add_timestamp(char *, unsigned long long, unsigned long long, int, int);
 extern void mpeg_dec_add_pending_bytes(char *, int);
@@ -192,7 +192,7 @@ int mpeg_feed_decoder_callback(u8 *unused, char *src, char *dst)
                           *(unsigned long long *)(src + 0x10),
                           *(unsigned long long *)(src + 0x18),
                           first_address, result) == 0)
-            mpeg_set_debug_value((int)D_001AE830);
+            mpeg_set_debug_value((int)g_str_mpeg_feed_callback);
     }
     mpeg_dec_add_pending_bytes(g_movie_player_state[0] + 0xD9048, result);
     return result > 0;
@@ -211,12 +211,12 @@ extern int text_draw_centered_large(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int g_notice_owner[] __attribute__((sda));
 extern int g_player_bolts[] __attribute__((sda)); /* the player's bolts */
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern unsigned char g_bolt_multiplier[] __attribute__((sda)); /* bolt multiplier */
-extern char D_001AE6F8[], D_001AE700[], D_001AE708[]; /* "'", ".", "x%d" */
-extern int D_001ADAE8 __attribute__((sda));
-extern int D_001ADAEC __attribute__((sda));
-extern unsigned int D_001ADAF0 __attribute__((sda));
+extern char g_str_apostrophe[], g_str_period[], g_str_multiplier_format[]; /* "'", ".", "x%d" */
+extern int g_movie_text_x __attribute__((sda));
+extern int g_movie_text_y __attribute__((sda));
+extern unsigned int g_mpeg_foreground_color __attribute__((sda));
 
 /* A g++ 2.95 vtable entry: this-adjustment, index, function. */
 typedef struct HudVEntry {
@@ -315,8 +315,8 @@ void DrawBoltCounterPanel(void *arg)
     digits = 1;
     n = g_player_bolts[0];
     while (n >= 10) { n /= 10; digits++; }
-    apostrophe = D_001A7BB0[4] != 3 && D_001A7BB0[4] != 5;
-    sprintf(separator, apostrophe ? D_001AE6F8 : D_001AE700);
+    apostrophe = g_language_settings[4] != 3 && g_language_settings[4] != 5;
+    sprintf(separator, apostrophe ? g_str_apostrophe : g_str_period);
     yoffset = apostrophe ? 21 : 10;
     xoffset = apostrophe ? -34 : -29;
     step = 3.0f;
@@ -335,13 +335,13 @@ void DrawBoltCounterPanel(void *arg)
         } while (step < (float)digits);
     }
     if (g_bolt_multiplier[0] >= 2) {
-        sprintf(multiplierText, D_001AE708, g_bolt_multiplier[0]);
-        foreground = (D_001ADAF0 & 0xFFFFFF) | (color & 0xFF000000);
+        sprintf(multiplierText, g_str_multiplier_format, g_bolt_multiplier[0]);
+        foreground = (g_mpeg_foreground_color & 0xFFFFFF) | (color & 0xFF000000);
         shadow = color & 0xFF000000;
-        text_draw_centered_large(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y, foreground, multiplierText, -1);
     }
     DrawSegmentedRingMeter(object->final);
 }

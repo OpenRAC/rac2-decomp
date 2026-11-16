@@ -34,11 +34,11 @@ typedef struct {
 } Obj_397870;
 
 extern void part_spawn_sparkle_trail_above_ground(Obj_397870 *a0);
-extern float D_L01_001AF50C __attribute__((sda));
-extern float D_L01_001AF510 __attribute__((sda));
-extern float D_L01_001AF514 __attribute__((sda));
-extern float D_L01_001AF528 __attribute__((sda));
-extern int D_L01_001AF54C __attribute__((sda));
+extern float g_collectible_height_scale __attribute__((sda));
+extern float g_bob_base_height __attribute__((sda));
+extern float g_bob_l01_amplitude __attribute__((sda));
+extern float g_bolt_bob_spin_speed __attribute__((sda));
+extern int g_sparkle_chance __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
@@ -50,18 +50,18 @@ void bobbing_l01_moby_update(Obj_397870 *moby)
     State_397870 *vars = moby->st;
     float bob_sine;
 
-    moby->f2C = moby->cls->f24 * D_L01_001AF50C;
+    moby->f2C = moby->cls->f24 * g_collectible_height_scale;
 
     if (moby->b20 == 1) {
         bob_sine = math_fast_sin_or_cos_b(moby->fFC);
-        moby->f18 = vars->f18 + D_L01_001AF510 + D_L01_001AF514 * bob_sine;
+        moby->f18 = vars->f18 + g_bob_base_height + g_bob_l01_amplitude * bob_sine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
         moby->fF8 = FastAddRotations(moby->fF8, vars->f60);
-        moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * D_L01_001AF528);
+        moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * g_bolt_bob_spin_speed);
     }
 
     part_draw_bolt_glow_rings(moby);
-    if (math_random_int_below(D_L01_001AF54C) == 0)
+    if (math_random_int_below(g_sparkle_chance) == 0)
         part_spawn_sparkle_trail_above_ground(moby);
 }

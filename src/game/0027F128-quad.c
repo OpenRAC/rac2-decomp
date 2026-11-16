@@ -13,8 +13,8 @@ typedef struct {
     u64 primitive, texture, state, flags;
 } UiDrawPacket;
 extern float g_camera_eye_state[];
-extern float D_0018A0E0[];
-extern UiVector D_001A9FD0[];
+extern float g_hero_state_block[];
+extern UiVector g_billboard_quad_corners[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -38,14 +38,14 @@ void gfx_draw_billboard_quad_with_uv(UiVector *position, int alpha, float **uv,
     matrix[3].bits = position->bits;
     FastVecSub(&matrix[0], g_camera_eye_state, &matrix[3]);
     vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
-    FastVecCross(&matrix[1], &matrix[0], D_0018A0E0);
+    FastVecCross(&matrix[1], &matrix[0], g_hero_state_block);
     vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
     FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
     FastVecScale(&offset, &matrix[0], distance);
     FastVecAdd(&matrix[3], &matrix[3], &offset);
     for (i = 3; i >= 0; i--) {
         int index = 3 - i;
-        FastVecScale(&packet.vertices[index], D_001A9FD0 + index, size);
+        FastVecScale(&packet.vertices[index], g_billboard_quad_corners + index, size);
         transform_vector(&packet.vertices[index], &packet.vertices[index], matrix);
     }
     gfx_init_quad_packet_state((QuadPacket *)&packet, 59, 5, 128);

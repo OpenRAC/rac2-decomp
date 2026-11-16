@@ -21,36 +21,36 @@ typedef struct {
     int c;
 } Settings;
 
-extern int D_001B5600;
-extern Config D_001AD584 __attribute__((sda));
-extern Config D_001B1640 __attribute__((sda));
-extern Settings D_001B9040;
-extern int D_001B1DA0 __attribute__((sda));
-extern int D_001B1654 __attribute__((sda));
+extern int g_underwater_flag;
+extern Config g_display_config __attribute__((sda));
+extern Config g_fog_color __attribute__((sda));
+extern Settings g_view_params;
+extern int g_display_buffer_size __attribute__((sda));
+extern int g_display_config_flag __attribute__((sda));
 extern void UpdateViewContext(void);
 
 /* Loads one of two display settings into the live settings block and applies it. */
 void gfx_apply_display_config(void)
 {
-    if (D_001B5600 != 0) {
-        D_001B9040.a = D_001AD584.a;
-        D_001B9040.b = D_001AD584.b;
-        D_001B9040.c = D_001AD584.c;
-        D_001B9040.x = D_001AD584.x;
-        D_001B9040.y = D_001AD584.y;
-        D_001B9040.z = D_001AD584.z;
-        D_001B9040.w = D_001AD584.w;
-        D_001B1DA0 = 0x40000;
+    if (g_underwater_flag != 0) {
+        g_view_params.a = g_display_config.a;
+        g_view_params.b = g_display_config.b;
+        g_view_params.c = g_display_config.c;
+        g_view_params.x = g_display_config.x;
+        g_view_params.y = g_display_config.y;
+        g_view_params.z = g_display_config.z;
+        g_view_params.w = g_display_config.w;
+        g_display_buffer_size = 0x40000;
     } else {
-        D_001B9040.a = D_001B1640.a;
-        D_001B9040.b = D_001B1640.b;
-        D_001B9040.c = D_001B1640.c;
-        D_001B9040.x = D_001B1640.x;
-        D_001B9040.y = D_001B1640.y;
-        D_001B9040.z = D_001B1640.z;
-        D_001B9040.w = D_001B1640.w;
-        D_001B1DA0 = 0x1F4000;
+        g_view_params.a = g_fog_color.a;
+        g_view_params.b = g_fog_color.b;
+        g_view_params.c = g_fog_color.c;
+        g_view_params.x = g_fog_color.x;
+        g_view_params.y = g_fog_color.y;
+        g_view_params.z = g_fog_color.z;
+        g_view_params.w = g_fog_color.w;
+        g_display_buffer_size = 0x1F4000;
     }
     UpdateViewContext();
-    D_001B1654 = 0;
+    g_display_config_flag = 0;
 }

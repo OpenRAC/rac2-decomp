@@ -5,15 +5,15 @@ typedef unsigned char u8;
 typedef float f32;
 
 extern int math_random_int_below(int);
-extern int D_L22_001B2AA8;
-extern int *D_L22_001B2AB4;
+extern int g_space_ship_max_health;
+extern int *g_space_ship_pickup_slots;
 
 /* Restores one of three stats on the object, picking one at random and topping up the first one that is below its maximum. */
 void stat_restore_random(u8 *obj)
 {
     u8 *vars = *(u8 **)(obj + 0x68);
     int choice = math_random_int_below(3);
-    int limit = D_L22_001B2AA8;
+    int limit = g_space_ship_max_health;
     int *stats;
     int limitCopy;
     int startChoice;
@@ -21,7 +21,7 @@ void stat_restore_random(u8 *obj)
     if ((f32)(limit / 6) >= *(f32 *)(vars + 0x20)) {
         choice = 0;
     }
-    stats = D_L22_001B2AB4;
+    stats = g_space_ship_pickup_slots;
     limitCopy = limit;
     startChoice = choice;
     do {

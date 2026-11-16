@@ -30,20 +30,20 @@ typedef struct {
     Vars *vars;        /* 0x68 */
 } Moby;
 
-extern Transform *D_L12_001B2F8C[] __attribute__((sda));
-extern u32 D_L12_001B1B5C __attribute__((sda));
-extern f32 D_L12_001B1B30[4][2] MACRO_ADDR;
+extern Transform *g_path_waypoint_table[] __attribute__((sda));
+extern u32 g_barrier_quad_color __attribute__((sda));
+extern f32 g_barrier_l12_uv_table[4][2] MACRO_ADDR;
 extern f32 D_L12_001B1B30_gp[4][2] SDATA(D_L12_001B1B30) __attribute__((sda));
-extern s32 D_L12_001B1B20 __attribute__((sda));
-extern s32 D_L12_001B1B24 __attribute__((sda));
-extern s32 D_L12_001B1B28 __attribute__((sda));
-extern f32 D_L12_001B1BE0 __attribute__((sda));
-extern f32 D_L12_001B1BE4 __attribute__((sda));
-extern f32 D_L12_001B1BBC __attribute__((sda));
-extern f32 D_L12_001B1BB8 __attribute__((sda));
-extern u32 D_L12_001B1B60 __attribute__((sda));
-extern V D_L12_001C0260;
-extern V D_L12_001B9E00;
+extern s32 g_barrier_texture_id __attribute__((sda));
+extern s32 g_barrier_gs_state_a __attribute__((sda));
+extern s32 g_barrier_gs_state_b __attribute__((sda));
+extern f32 g_barrier_strip_retreat __attribute__((sda));
+extern f32 g_barrier_strip_advance __attribute__((sda));
+extern f32 g_barrier_strip_half_width __attribute__((sda));
+extern f32 g_barrier_strip_phase_step __attribute__((sda));
+extern u32 g_barrier_next_quad_color __attribute__((sda));
+extern V g_line_end_point;
+extern V g_hero_prev_position;
 
 extern void euler_to_matrix(void *, void *);
 extern u64 GetEffectTextureDescriptor(s32);
@@ -77,23 +77,23 @@ void func_PAL_L12_0041D6B4(Moby *self)
     initial.q = 0;
     initial.f.w = 1.0f;
     euler_to_matrix(matrix, &initial);
-    CopyVector(&matrix[3], &D_L12_001B2F8C[0][st->transform].rows[3]);
+    CopyVector(&matrix[3], &g_path_waypoint_table[0][st->transform].rows[3]);
     for (i = 0; i < 4; i++) {
-        quad.color[i] = D_L12_001B1B5C;
+        quad.color[i] = g_barrier_quad_color;
         quad.uv[i][0] = D_L12_001B1B30_gp[i][0];
-        quad.uv[i][1] = D_L12_001B1B30[i][1];
+        quad.uv[i][1] = g_barrier_l12_uv_table[i][1];
         if (i < 2)
             quad.v[i].f.y = -quad.v[i].f.y;
         if (i & 1)
             quad.v[i].f.z = -quad.v[i].f.z;
         quad.v[i].f.z += 0.25f;
     }
-    quad.reg[1] = GetEffectTextureDescriptor(D_L12_001B1B20);
+    quad.reg[1] = GetEffectTextureDescriptor(g_barrier_texture_id);
     low.q = 0;
     high.q = 0;
     quad.reg[2] = 0xFF9000000260ULL;
     quad.reg[0] = 0;
-    quad.reg[3] = ((u64)D_L12_001B1B24 << 2) | ((u64)D_L12_001B1B28 << 6) | 0x8000000000ULL;
+    quad.reg[3] = ((u64)g_barrier_gs_state_a << 2) | ((u64)g_barrier_gs_state_b << 6) | 0x8000000000ULL;
     low.f.y = -1.0f;
     low.f.w = 1.0f;
     high.f.y = 1.0f;
@@ -106,7 +106,7 @@ void func_PAL_L12_0041D6B4(Moby *self)
     st->phase = phase + 0.010000001f;
     if (st->phase > 1.0f)
         st->phase -= 1.0f;
-    step = 0.5f / D_L12_001B2F8C[0][st->transform].rows[2].f.x;
+    step = 0.5f / g_path_waypoint_table[0][st->transform].rows[2].f.x;
     for (i = 3; i >= 0; i--)
         quad.v[i].f.w = 0.0f;
     for (t = -1.0f; t <= 1.0f; t += 0.05f) {
@@ -114,14 +114,14 @@ void func_PAL_L12_0041D6B4(Moby *self)
         axis.q = 0;
         axis.f.z = 1.0f;
         axis.f.w = 1.0f;
-        matrix_mul_vec3(&axis, &axis, &D_L12_001B2F8C[0][st->transform]);
+        matrix_mul_vec3(&axis, &axis, &g_path_waypoint_table[0][st->transform]);
         len = FastVecLength(&axis);
         if (st->target != -1) {
             retreat = 2.3f;
             advance = 7.0f;
         } else {
-            retreat = D_L12_001B1BE0;
-            advance = D_L12_001B1BE4;
+            retreat = g_barrier_strip_retreat;
+            advance = g_barrier_strip_advance;
         }
         if (st->hit) {
             if (st->position - retreat / len * 1.5f <= t) {
@@ -140,10 +140,10 @@ void func_PAL_L12_0041D6B4(Moby *self)
         p2.f.z = t;
         p1.f.z = t + 0.01f;
         p3.f.z = t + 0.01f;
-        matrix_mul_vec3(&p0, &p0, &D_L12_001B2F8C[0][st->transform]);
-        matrix_mul_vec3(&p1, &p1, &D_L12_001B2F8C[0][st->transform]);
-        matrix_mul_vec3(&p2, &p2, &D_L12_001B2F8C[0][st->transform]);
-        matrix_mul_vec3(&p3, &p3, &D_L12_001B2F8C[0][st->transform]);
+        matrix_mul_vec3(&p0, &p0, &g_path_waypoint_table[0][st->transform]);
+        matrix_mul_vec3(&p1, &p1, &g_path_waypoint_table[0][st->transform]);
+        matrix_mul_vec3(&p2, &p2, &g_path_waypoint_table[0][st->transform]);
+        matrix_mul_vec3(&p3, &p3, &g_path_waypoint_table[0][st->transform]);
         transform_vector(&p0, &p0, matrix);
         transform_vector(&p1, &p1, matrix);
         transform_vector(&p2, &p2, matrix);
@@ -151,19 +151,19 @@ void func_PAL_L12_0041D6B4(Moby *self)
         if (collision) {
             CopyVector(&saved, &p2);
             if (CollLine(&p0, &p2, 2, 0, 0)) {
-                CopyVector(&p2, &D_L12_001C0260);
-                CopyVector(&p3, &D_L12_001C0260);
+                CopyVector(&p2, &g_line_end_point);
+                CopyVector(&p3, &g_line_end_point);
             }
         }
-        FastVecSub(&delta, &D_L12_001B9E00, &p0);
+        FastVecSub(&delta, &g_hero_prev_position, &p0);
         oldDistance = 0.0f;
         FastVecSub(&view, &p2, &p0);
         FastVecCross(&cross, &delta, &view);
         vec_scale_to_length(&cross, &cross, 1.0f);
-        vec_scale_to_length(&quad.v[0], &cross, D_L12_001B1BBC);
-        vec_scale_to_length(&quad.v[1], &cross, -D_L12_001B1BBC);
-        vec_scale_to_length(&quad.v[2], &cross, D_L12_001B1BBC);
-        vec_scale_to_length(&quad.v[3], &cross, -D_L12_001B1BBC);
+        vec_scale_to_length(&quad.v[0], &cross, g_barrier_strip_half_width);
+        vec_scale_to_length(&quad.v[1], &cross, -g_barrier_strip_half_width);
+        vec_scale_to_length(&quad.v[2], &cross, g_barrier_strip_half_width);
+        vec_scale_to_length(&quad.v[3], &cross, -g_barrier_strip_half_width);
         FastVecAdd(&quad.v[0], &quad.v[0], &p0);
         FastVecAdd(&quad.v[1], &quad.v[1], &p0);
         FastVecAdd(&quad.v[2], &quad.v[2], &p2);
@@ -173,10 +173,10 @@ void func_PAL_L12_0041D6B4(Moby *self)
             FastVecSub(&measure, &quad.v[2], &quad);
             oldDistance = func_L00_002EE290(&measure);
             CopyVector(&p2, &saved);
-            vec_scale_to_length(&quad.v[0], &cross, D_L12_001B1BBC);
-            vec_scale_to_length(&quad.v[1], &cross, -D_L12_001B1BBC);
-            vec_scale_to_length(&quad.v[2], &cross, D_L12_001B1BBC);
-            vec_scale_to_length(&quad.v[3], &cross, -D_L12_001B1BBC);
+            vec_scale_to_length(&quad.v[0], &cross, g_barrier_strip_half_width);
+            vec_scale_to_length(&quad.v[1], &cross, -g_barrier_strip_half_width);
+            vec_scale_to_length(&quad.v[2], &cross, g_barrier_strip_half_width);
+            vec_scale_to_length(&quad.v[3], &cross, -g_barrier_strip_half_width);
             FastVecAdd(&quad.v[0], &quad.v[0], &p0);
             FastVecAdd(&quad.v[1], &quad.v[1], &p0);
             FastVecAdd(&quad.v[2], &quad.v[2], &p2);
@@ -185,11 +185,11 @@ void func_PAL_L12_0041D6B4(Moby *self)
         speed = phase + step;
         next = quad;
         lerp_vector(&next.v[0], &quad.v[0], &quad.v[2], st->phase);
-        lerp_vector(&next.v[2], &quad.v[0], &quad.v[2], st->phase + D_L12_001B1BB8);
+        lerp_vector(&next.v[2], &quad.v[0], &quad.v[2], st->phase + g_barrier_strip_phase_step);
         lerp_vector(&next.v[1], &quad.v[1], &quad.v[3], st->phase);
-        lerp_vector(&next.v[3], &quad.v[1], &quad.v[3], st->phase + D_L12_001B1BB8);
+        lerp_vector(&next.v[3], &quad.v[1], &quad.v[3], st->phase + g_barrier_strip_phase_step);
         for (j = 3; j >= 0; j--)
-            next.color[j] = D_L12_001B1B60;
+            next.color[j] = g_barrier_next_quad_color;
         phase = speed;
         if (speed > 0.0f)
             phase = speed - 1.0f;

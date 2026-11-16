@@ -1,40 +1,40 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern s32 D_L08_001A9050 __attribute__((sda));
-extern f32 D_L08_001A9054 __attribute__((sda));
-extern f32 D_L08_001BE0B0 __attribute__((nosda));
+extern s32 g_saved_float_hold_active __attribute__((sda));
+extern f32 g_saved_float_hold_value __attribute__((sda));
+extern f32 g_saved_hold_float __attribute__((nosda));
 
 extern void UpdateViewContext();
 
 /* Starts a saved-state hold: remembers a global float and returns 1, or returns 0 if one is already active. */
 s32 hero_begin_saved_float_hold(void) {
-    if (D_L08_001A9050 != 0)
+    if (g_saved_float_hold_active != 0)
         return 0;
-    D_L08_001A9050 = 1;
-    D_L08_001A9054 = D_L08_001BE0B0;
+    g_saved_float_hold_active = 1;
+    g_saved_float_hold_value = g_saved_hold_float;
     return 1;
 }
 
 /* Ends the saved-state hold: puts the remembered float back and returns 1, or returns 0 if none is active. */
 s32 hero_end_saved_float_hold(void) {
-    if (D_L08_001A9050 == 0)
+    if (g_saved_float_hold_active == 0)
         return 0;
-    D_L08_001BE0B0 = D_L08_001A9054;
+    g_saved_hold_float = g_saved_float_hold_value;
     UpdateViewContext();
-    D_L08_001A9050 = 0;
+    g_saved_float_hold_active = 0;
     return 1;
 }
 
 /* The level's shared scalars: the aim values the camera reads, and the object
    the level keeps at a fixed place (its flag at +0x86, its target at +0x70). */
-extern f32 D_L08_001B00E0 __attribute__((sda));
-extern f32 D_L08_001B00E4 __attribute__((sda));
-extern f32 D_L08_001B00E8 __attribute__((sda));
-extern f32 D_L08_001B00F0 __attribute__((sda));
-extern s32 D_L08_001B00F4 __attribute__((sda));
-extern f32 D_L08_001B00F8 __attribute__((sda));
-extern u8 *D_L08_001B9B50 __attribute__((nosda));
+extern f32 g_aim_camera_distance_far __attribute__((sda));
+extern f32 g_aim_camera_distance_near __attribute__((sda));
+extern f32 g_aim_camera_height __attribute__((sda));
+extern f32 g_aim_camera_offset_x __attribute__((sda));
+extern s32 g_aim_camera_offset_y __attribute__((sda));
+extern f32 g_aim_camera_offset_z __attribute__((sda));
+extern u8 *g_camera_l08_state_ptr __attribute__((nosda));
 
 /* The boot's own vector, the one the aim is measured against. */
 extern char g_hero_position[] __attribute__((nosda));
@@ -60,19 +60,19 @@ void cam_update_aim_values(s32 *counter, u8 *moby) {
     f32 fade, scale_a, scale_b, scale_c;
 
     owner = *(u8 **)((u8 *)moby + 0x68);
-    if (*(s16 *)((u8 *)D_L08_001B9B50 + 0x86) == 0) {
-        *(s32 *)((u8 *)*(u8 **)((u8 *)D_L08_001B9B50 + 0x70) + 0x250) = 2;
+    if (*(s16 *)((u8 *)g_camera_l08_state_ptr + 0x86) == 0) {
+        *(s32 *)((u8 *)*(u8 **)((u8 *)g_camera_l08_state_ptr + 0x70) + 0x250) = 2;
     }
 
-    cam_set_aim_offset_target(D_L08_001B00F0, D_L08_001B00F4, D_L08_001B00F8);
-    follow_camera_set_distance(0, D_L08_001B00E4, D_L08_001B00E0);
+    cam_set_aim_offset_target(g_aim_camera_offset_x, g_aim_camera_offset_y, g_aim_camera_offset_z);
+    follow_camera_set_distance(0, g_aim_camera_distance_near, g_aim_camera_distance_far);
 
     if (*(s32 *)((u8 *)owner + 0xC8) >= 0 &&
         IsPointInCuboid(g_hero_position, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
         cam_set_tuning_value(0.52359885f);
     }
 
-    follow_camera_set_height(D_L08_001B00E8, 0.003f);
+    follow_camera_set_height(g_aim_camera_height, 0.003f);
     cam_set_lock_flag();
 
     fade = IntToFloat(*counter) / IntToFloat(0x5A);

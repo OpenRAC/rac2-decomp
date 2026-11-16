@@ -8,21 +8,21 @@
 #include "common.h"
 typedef int BurstQuad __attribute__((mode(TI)));
 typedef struct { float x,y,z,w; } BurstVec __attribute__((aligned(16)));
-extern char D_0018A550[] NOT_SDA;
+extern char g_hero_matrix[] NOT_SDA;
 typedef struct { char pad[0x110]; BurstVec velocity; char gap[0x220]; int active; } BurstResident;
 extern BurstResident g_hero_state NOT_SDA;
 typedef struct { char pad[0x16C]; unsigned char *burstColors; } BurstTables;
-extern BurstTables D_L00_001FE940;
-extern float D_L00_001B00FC __attribute__((sda));
-extern float D_L00_001B0100 __attribute__((sda));
-extern int D_L00_001B0104 __attribute__((sda));
-extern int D_L00_001B010C __attribute__((sda));
-extern float D_L00_001B0110 __attribute__((sda));
-extern float D_L00_001B0114 __attribute__((sda));
-extern float D_L00_001B0118 __attribute__((sda));
-extern float D_L00_001B011C __attribute__((sda));
-extern float D_L00_001B0120 __attribute__((sda));
-extern float D_L00_001B0124 __attribute__((sda));
+extern BurstTables g_effect_definitions;
+extern float g_muzzle_burst_rotation_degrees __attribute__((sda));
+extern float g_muzzle_burst_jitter __attribute__((sda));
+extern int g_muzzle_burst_count __attribute__((sda));
+extern int g_muzzle_burst_kind __attribute__((sda));
+extern float g_muzzle_burst_param __attribute__((sda));
+extern float g_muzzle_burst_speed_min __attribute__((sda));
+extern float g_muzzle_burst_speed_max __attribute__((sda));
+extern float g_muzzle_burst_life_min __attribute__((sda));
+extern float g_muzzle_burst_life_max __attribute__((sda));
+extern float g_muzzle_burst_size __attribute__((sda));
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
@@ -52,7 +52,7 @@ void func_PAL_L00_003CD388(char *object)
     FastVecAdd(&position,object+0x10,&local);
     angle=0.0f;
     object[0xBC]=5;
-    math_apply_axis_rotation_to_quat(&saved,D_0018A550,D_0018A550+0x10,0.3490659f);
+    math_apply_axis_rotation_to_quat(&saved,g_hero_matrix,g_hero_matrix+0x10,0.3490659f);
     qcopy(&start,&saved);
     for(i=0;i<10;i++) {
         BurstParticle *p;
@@ -75,11 +75,11 @@ void func_PAL_L00_003CD388(char *object)
             p->color2=0x307F7F7F;
         }
         if(math_fabs(angle)>0.00001f) {
-            math_build_axis_angle_quat(&matrix,D_0018A550,angle);
+            math_build_axis_angle_quat(&matrix,g_hero_matrix,angle);
             vec_rotate_by_quaternion(&start,&saved,&matrix);
         }
     }
-    math_apply_axis_rotation_to_quat(&saved,D_0018A550,D_0018A550+0x10,D_L00_001B00FC*0.017453294f);
+    math_apply_axis_rotation_to_quat(&saved,g_hero_matrix,g_hero_matrix+0x10,g_muzzle_burst_rotation_degrees*0.017453294f);
     angle=0.0f;
     qcopy(&start,&saved);
     qzero_nc(&offset);
@@ -87,20 +87,20 @@ void func_PAL_L00_003CD388(char *object)
     for(i=0;i<10;i++) {
         char *p;
         angle=FastAddRotations(angle,math_random_float_range(0.0f,0.6283186f));
-        speed=math_random_float_range(D_L00_001B0114*0.020000001f,D_L00_001B0118*0.020000001f);
+        speed=math_random_float_range(g_muzzle_burst_speed_min*0.020000001f,g_muzzle_burst_speed_max*0.020000001f);
         FastVecScale(&velocity,&start,speed);
         FastVecAdd(&velocity,&velocity,&offset);
-        kind=((int)(D_L00_001B010C) * 5 + 2) / 6;
+        kind=((int)(g_muzzle_burst_kind) * 5 + 2) / 6;
         mode=FloatToInt(math_random_signed_float_range(1.0f,2.0f));
-        temp.x=position.x+math_random_signed_float_range(0.0f,D_L00_001B0100);
-        temp.y=position.y+math_random_signed_float_range(0.0f,D_L00_001B0100);
-        temp.z=position.z+math_random_signed_float_range(0.0f,D_L00_001B0100);
-        life=math_random_float_range(D_L00_001B011C,D_L00_001B0120)*210000.0f;
+        temp.x=position.x+math_random_signed_float_range(0.0f,g_muzzle_burst_jitter);
+        temp.y=position.y+math_random_signed_float_range(0.0f,g_muzzle_burst_jitter);
+        temp.z=position.z+math_random_signed_float_range(0.0f,g_muzzle_burst_jitter);
+        life=math_random_float_range(g_muzzle_burst_life_min,g_muzzle_burst_life_max)*210000.0f;
         FastVecSub(&temp,&temp,&velocity);
-        p=func_PAL_002C23B8(&temp,&velocity,kind,D_L00_001B0104,0x505050,mode,life,D_L00_001B0124,D_L00_001B0110,0.0f,0.0f);
-        if(p) p[2]=D_L00_001FE940.burstColors[1];
+        p=func_PAL_002C23B8(&temp,&velocity,kind,g_muzzle_burst_count,0x505050,mode,life,g_muzzle_burst_size,g_muzzle_burst_param,0.0f,0.0f);
+        if(p) p[2]=g_effect_definitions.burstColors[1];
         if(math_fabs(angle)>0.00001f) {
-            math_build_axis_angle_quat(&matrix,D_0018A550,angle);
+            math_build_axis_angle_quat(&matrix,g_hero_matrix,angle);
             vec_rotate_by_quaternion(&start,&saved,&matrix);
         }
     }

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern char *CreateMoby(int);
-extern char D_L05_001B96C0[];
+extern char g_origin_vec[];
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecCross(void *, void *, void *);
 extern int math_fast_helper_a(void *, float);
@@ -30,7 +30,7 @@ char *func_PAL_L05_0042A240(void *pos, int shake, int c20, int c24, int c28,
         obj[0x20] = 0;
         qcopy(obj + 0x10, pos);
         *(float *)(obj + 0x1C) = 1.0f;
-        FastVecSub(toward, D_L05_001B96C0, (float *)(obj + 0x10));
+        FastVecSub(toward, g_origin_vec, (float *)(obj + 0x10));
         vec_scale_to_length(toward, toward, 1.0f);
         cam_compute_view_direction(obj + 0x10, up, 1);
         qcopy(obj + 0xC0, toward);
@@ -57,17 +57,17 @@ char *func_PAL_L05_0042A240(void *pos, int shake, int c20, int c24, int c28,
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             *(short *)(st + 4) = 8;
             *(float *)(st + 0x10) = 0.125f;
-            if (fast_vec_dist(pos, D_L05_001B96C0) < 48.0f && shake) {
-                char *mgr = D_L05_001B96C0 - 0x140;
+            if (fast_vec_dist(pos, g_origin_vec) < 48.0f && shake) {
+                char *mgr = g_origin_vec - 0x140;
 
                 *(int *)(mgr + 0x16C) = 0;
                 *(int *)(mgr + 0x168) = 33;
                 *(float *)(mgr + 0x160) = 0.075f;
             }
             if (*(int *)(st + 0x18)) {
-                FastVecSub(cameraDir, obj + 0x10, (float *)D_L05_001B96C0);
+                FastVecSub(cameraDir, obj + 0x10, (float *)g_origin_vec);
                 vec_scale_to_length(cameraDir, cameraDir, 1.0f);
-                if (1.5707964f - math_fast_angle_helper(FastVecDot(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(cameraDir, g_origin_vec + 0x230)) < 0.45378566f)
                     *(int *)(st + 0x18) = 1;
                 else
                     *(int *)(st + 0x18) = 0;

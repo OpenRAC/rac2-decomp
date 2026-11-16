@@ -9,7 +9,7 @@ typedef struct {
     Vector128 player, velocity, previous, point;
 } SparkWorkspace;
 
-extern char *D_L16_001B2B1C MACRO_ADDR;
+extern char *g_moby_instance_table MACRO_ADDR;
 /* Resident position and collision pointer, at +0 and +0x2210. */
 extern struct {
     float position[4];
@@ -62,7 +62,7 @@ void func_PAL_L16_0041D030(char *object)
         *(unsigned short *)(object + 0x34) |= 0x41;
     }
     if (*(unsigned char *)(object + 0x20) == 1) {
-        target = D_L16_001B2B1C + *(int *)state*0x100;
+        target = g_moby_instance_table + *(int *)state*0x100;
         if (target == 0 || *(unsigned char *)(target + 0x20) == 0xfe || *(unsigned char *)(target + 0x20) == 0xfd) {
             if (IsPointInCuboid(&g_hero_position, *(int *)(state + 8)) != 0) {
                 int snapshot = *(int *)(*(char **)(object + 0x24) + 0x10);
@@ -88,8 +88,8 @@ void func_PAL_L16_0041D030(char *object)
     }
     qcopy(&local.player, &g_hero_position);
     ((float *)&local.player)[2] = ((float *)&local.player)[2] + 0.75f;
-    if (coll_test_point(&local.player, 0, g_hero_position.collision, 0.5f) != 0 && D_L16_001BFF40.owner != 0 && *(short *)(D_L16_001BFF40.owner + 0xaa) == 0x10fb) {
-        qcopy(&local.point, &D_L16_001BFF40.point);
+    if (coll_test_point(&local.player, 0, g_hero_position.collision, 0.5f) != 0 && g_coll_hit_result.owner != 0 && *(short *)(g_coll_hit_result.owner + 0xaa) == 0x10fb) {
+        qcopy(&local.point, &g_coll_hit_result.point);
         {
             char *audioBank = g_sound_state;
             for (i = 2; i >= 0; i--) {

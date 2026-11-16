@@ -9,7 +9,7 @@ extern int FloatToInt(float);
 extern float math_random_signed_float_range(float, float);
 extern char *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 typedef struct { char prefix[0xD4]; unsigned char *material; } SceneMaterialPrefix;
-extern SceneMaterialPrefix D_L00_001FE940;
+extern SceneMaterialPrefix g_effect_definitions;
 
 extern float func_00283B98_2(float, float);
 
@@ -47,7 +47,7 @@ extern void func_00282CC0_4(char *a, char *b, char *c);
 
 extern void func_00283098_2(char *a, char *b, char *c);
 
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
 
 extern void func_0029FCC0_1(int a, int b, void *c);
 
@@ -261,7 +261,7 @@ void weapon_spawn_muzzle_effect(int moby)
 
     vars = *(int *)(moby + 104);
     func_0029FCC0_1(moby, 0, origin);
-    effect = projectile_spawn_targeted(moby, origin, *(int *)(vars + 16), D_L00_001A8F20, *(float *)(vars + 24), 2.0f, 5.0f, 0.6f);
+    effect = projectile_spawn_targeted(moby, origin, *(int *)(vars + 16), g_default_vector, *(float *)(vars + 24), 2.0f, 5.0f, 0.6f);
     if (effect != 0) {
         *(int *)(effect + 184) = moby;
     }
@@ -296,12 +296,12 @@ void EmitParticleTrailLayers(char *moby)
         jitter[1] = point[1] + math_random_signed_float_range(0.0f, 0.1f);
         jitter[2] = point[2] + math_random_signed_float_range(0.0f, 0.1f);
         rotation = math_random_int_below(255);
-        part_spawn_gravity_fade(jitter, D_L00_001A8F20, 4, 0x808080, rotation, 127, 127,
+        part_spawn_gravity_fade(jitter, g_default_vector, 4, 0x808080, rotation, 127, 127,
                       size * 210000.0f, size * 210000.0f, 0.0f, 1);
-        particle = part_spawn_gravity_fade(point, D_L00_001A8F20, 4, 0x203080, rotation, 16, 16,
+        particle = part_spawn_gravity_fade(point, g_default_vector, 4, 0x203080, rotation, 16, 16,
                                  262500.0f, 262500.0f, 0.0f, 1);
         if (particle)
-            *(unsigned char *)(particle + 2) = *D_L00_001FE940.material;
+            *(unsigned char *)(particle + 2) = *g_effect_definitions.material;
         FastVecAdd(point, point, step);
     }
 }

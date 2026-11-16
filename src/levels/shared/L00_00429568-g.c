@@ -2,16 +2,16 @@
 
 struct CamK_72D8 { int unused[4]; float vals[9]; };
 struct CamKeys { char pad[0x60]; float vals[8]; int ids[8]; };
-extern char *D_L00_001B1844 MACRO_ADDR;
-extern float D_L00_001B18E0 MACRO_ADDR;
-extern char *D_L00_001B1E9C MACRO_ADDR;
-extern char *D_L00_001FDA80[];
-extern int D_L00_001B18E8 MACRO_ADDR;
-extern int D_L00_001B1BE8 MACRO_ADDR;
-extern float D_L00_001BD370;
-extern char D_L00_001BD2C0[];
-extern char D_L00_001B8FF0[];
-extern char D_0018A0E0[];
+extern char *g_camera_def_table MACRO_ADDR;
+extern float g_hero_scalar_transition_value MACRO_ADDR;
+extern char *g_moby_array_base MACRO_ADDR;
+extern char *g_launch_path_table[];
+extern int g_cam_path_cinematic_flag MACRO_ADDR;
+extern int g_cinematic_phase_flag MACRO_ADDR;
+extern float g_fast_math_ratio;
+extern char g_hud_float_params[];
+extern char g_cam_follow_matrix[];
+extern char g_hero_state_block[];
 extern void func_L00_002D99A0(float);
 extern int FloatToInt(float);
 void matrix_mul_vec3(void *,void *,void *);
@@ -49,8 +49,8 @@ void cam_path_update_cinematic(char *moby) {
     vars = *(char **)(moby + 0x70);
     f = vars + 0x40;
     k = (struct CamK_72D8 *)(vars + 0x58);
-    desc = *(char **)(D_L00_001B1844 + *(short *)(moby + 0x84) * 0x20 + 0x1C);
-    D_L00_001B1BE8 = 1;
+    desc = *(char **)(g_camera_def_table + *(short *)(moby + 0x84) * 0x20 + 0x1C);
+    g_cinematic_phase_flag = 1;
     phase = *(short *)(f + 0x14);
 
     if (phase == 0) {
@@ -59,30 +59,30 @@ void cam_path_update_cinematic(char *moby) {
         char *pm;
         char *gb;
         float *c3;
-        D_L00_001B18E0 += 0.05f;
-        if (1.0f <= D_L00_001B18E0) {
-            a = D_L00_001FDA80[*(int *)(desc + 0x20)];
-            b = D_L00_001FDA80[*(int *)(desc + 0x24)];
+        g_hero_scalar_transition_value += 0.05f;
+        if (1.0f <= g_hero_scalar_transition_value) {
+            a = g_launch_path_table[*(int *)(desc + 0x20)];
+            b = g_launch_path_table[*(int *)(desc + 0x24)];
             pm = moby + 0x30;
-            D_L00_001B18E0 = 1.0f;
+            g_hero_scalar_transition_value = 1.0f;
             a = a + 0x10;
-            D_L00_001B18E8 = 1;
+            g_cam_path_cinematic_flag = 1;
             *(short *)(f + 0x14) = 1;
             qcopy(pm, a);
             if (*(int *)(desc + 0x28) >= 0) {
-                gb = D_L00_001B1E9C + (*(int *)(desc + 0x28) << 8);
+                gb = g_moby_array_base + (*(int *)(desc + 0x28) << 8);
                 c3 = (float *)(desc + 0x2C);
                 v1[0] = c3[0];
                 v1[1] = c3[1];
                 v1[2] = c3[2];
                 v1[3] = 0.0f;
-                matrix_mul_vec3(v1, v1, D_L00_001B8FF0);
+                matrix_mul_vec3(v1, v1, g_cam_follow_matrix);
                 FastVecAdd(v2, gb + 0x10, v1);
                 FastVecSub(va, v2, pm);
             } else {
                 FastVecSub(va, b + 0x10, pm);
             }
-            FastVecScale(v1, D_0018A0E0, -1.0f);
+            FastVecScale(v1, g_hero_state_block, -1.0f);
             vec_scale_to_length(moby, va, 1.0f);
             FastVecCross(moby + 0x10, moby, v1);
             vec_scale_to_length(moby + 0x10, moby + 0x10, 1.0f);
@@ -94,18 +94,18 @@ void cam_path_update_cinematic(char *moby) {
         float x;
         float aa;
         float bb;
-        D_L00_001B18E0 += 0.05f;
-        if (1.0f <= D_L00_001B18E0) {
+        g_hero_scalar_transition_value += 0.05f;
+        if (1.0f <= g_hero_scalar_transition_value) {
             *(short *)(f + 0x14) = 3;
-            D_L00_001B18E0 = 1.0f;
+            g_hero_scalar_transition_value = 1.0f;
             x = k->vals[8] * 0.5f;
             aa = math_fast_sin_or_cos_b(x);
-            bb = math_fast_sin_or_cos_a(x); D_L00_001BD370 = aa / bb;
+            bb = math_fast_sin_or_cos_a(x); g_fast_math_ratio = aa / bb;
             UpdateViewContext();
             *(unsigned char *)(desc + 0x39) = 1;
             func_L00_002D99A0(15.0f);
             *(short *)(moby + 0x7E) = 4;
-            D_L00_001B18E8 = 0;
+            g_cam_path_cinematic_flag = 0;
             if (*(int *)(desc + 0x4C) == 0) {
                 hero_l00_set_action(0, 1);
             }
@@ -116,9 +116,9 @@ void cam_path_update_cinematic(char *moby) {
     } else if (phase == 3) {
         return;
     } else {
-        D_L00_001B18E0 -= 0.05f;
-        if (D_L00_001B18E0 < 0.0f) {
-            D_L00_001B18E0 = 0.0f;
+        g_hero_scalar_transition_value -= 0.05f;
+        if (g_hero_scalar_transition_value < 0.0f) {
+            g_hero_scalar_transition_value = 0.0f;
         }
     }
 
@@ -129,7 +129,7 @@ void cam_path_update_cinematic(char *moby) {
         int i;
         struct CamKeys *keys;
 
-        path_data = D_L00_001FDA80[*(int *)(desc + 0x20)];
+        path_data = g_launch_path_table[*(int *)(desc + 0x20)];
         qcopy(va, (moby + 0x30));
         path_done = Spline_AdvanceByDistance(path_data, (moby + 0x30), (int *)f, (float *)(f + 4), *(float *)(desc + 0x3C) * 0.01666666753590107f, 0);
         if (*(short *)(f + 0x16) != 0) {
@@ -176,7 +176,7 @@ void cam_path_update_cinematic(char *moby) {
                 r = math_cosine_blend(keys->vals[i], keys->vals[i + 1], sum / total);
                 m = r * 0.00872664712369442f;
                 aa = math_fast_sin_or_cos_b(m);
-                bb = math_fast_sin_or_cos_a(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
+                bb = math_fast_sin_or_cos_a(m); cam = g_hud_float_params; *(float *)(cam + 0xB0) = aa / bb;
                 UpdateViewContext();
             }
             i++;
@@ -185,25 +185,25 @@ void cam_path_update_cinematic(char *moby) {
         nv = *(float *)(f + 0x10) + d;
         *(float *)(f + 0x10) = nv;
         if (*(int *)(desc + 0x28) >= 0) {
-            char *b17 = D_L00_001B1E9C + (*(int *)(desc + 0x28) << 8);
+            char *b17 = g_moby_array_base + (*(int *)(desc + 0x28) << 8);
             float *c3 = (float *)(desc + 0x2C);
             v2[0] = c3[0];
             v2[1] = c3[1];
             v2[2] = c3[2];
             v2[3] = 0.0f;
-            matrix_mul_vec3(v2, v2, D_L00_001B8FF0);
+            matrix_mul_vec3(v2, v2, g_cam_follow_matrix);
             FastVecAdd(v3, b17 + 0x10, v2);
             FastVecSub(v1, v3, (moby + 0x30));
         } else {
             char *h;
             d = (nv / *(float *)(f + 8)) * *(float *)(f + 0xC);
-            h = D_L00_001FDA80[*(int *)(desc + 0x24)];
+            h = g_launch_path_table[*(int *)(desc + 0x24)];
             ia = 0;
             ib = 0.0f;
             Spline_AdvanceByDistance(h, v2, &ia, &ib, d, 0);
             FastVecSub(v1, v2, (moby + 0x30));
         }
-        FastVecScale(v2, D_0018A0E0, -1.0f);
+        FastVecScale(v2, g_hero_state_block, -1.0f);
         vec_scale_to_length(moby, v1, 1.0f);
         FastVecCross(moby + 0x10, moby, v2);
         vec_scale_to_length(moby + 0x10, moby + 0x10, 1.0f);

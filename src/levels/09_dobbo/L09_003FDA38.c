@@ -5,7 +5,7 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 
-extern u32 D_L09_001FE6C0[];
+extern u32 g_path_l09_table[];
 extern f32 func_002EA630(u8 *a0, u8 *a1);
 extern void func_0033EB48(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, f32 f12);
 
@@ -15,7 +15,7 @@ void path_measure_start_followers(u8 *moby) {
     s32 i;
     f32 length;
 
-    list = (u8 *)D_L09_001FE6C0[*(u32 *)(vars + 0x318)];
+    list = (u8 *)g_path_l09_table[*(u32 *)(vars + 0x318)];
     *(f32 *)(vars + 0x38C) = 0.0f;
     for (i = 0; i < *(s32 *)list; i++) {
         length = func_002EA630(list + (i * 0x10 + 0x10),
@@ -24,7 +24,7 @@ void path_measure_start_followers(u8 *moby) {
         if (i != *(s32 *)list - 1)
             *(f32 *)(vars + 0x38C) = *(f32 *)(vars + 0x38C) + length;
     }
-    list = (u8 *)D_L09_001FE6C0[*(u32 *)(vars + 0x314)];
+    list = (u8 *)g_path_l09_table[*(u32 *)(vars + 0x314)];
     *(f32 *)(vars + 0x3B0) = 0.0f;
     for (i = 0; i < *(s32 *)list; i++) {
         length = func_002EA630(list + (i * 0x10 + 0x10),
@@ -34,7 +34,7 @@ void path_measure_start_followers(u8 *moby) {
             *(f32 *)(vars + 0x3B0) = *(f32 *)(vars + 0x3B0) + length;
     }
     if (*(f32 *)(vars + 0x430) != 0.0f) {
-        u8 *path = (u8 *)D_L09_001FE6C0[*(u32 *)(vars + 0x318)];
+        u8 *path = (u8 *)g_path_l09_table[*(u32 *)(vars + 0x318)];
         *(u32 *)(vars + 0x324) = 0;
         *(f32 *)(vars + 0x3EC) = 0.0f;
         func_0033EB48((s32)path, (s32)(moby + 0x10), (s32)(vars + 0x324), (s32)(vars + 0x3EC),

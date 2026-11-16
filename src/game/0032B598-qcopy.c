@@ -34,7 +34,7 @@ typedef struct Rec_0032B598 {
 } Rec_0032B598;
 
 extern Rec_0032B598 g_ring_pieces[];
-extern char D_00189F00[];
+extern char g_hero_target_point[];
 
 extern float math_random_float_range(float low, float high);
 extern float math_random_signed_float_range(float low, float high);
@@ -53,7 +53,7 @@ void part_claim_ring_piece(char *owner, char *src, int arg)
         if (slot->w_9C != 0)
             continue;
         slot->w_9C = (int)owner;
-        *(Rac2TI128 *)((char *)slot + 0x20) = *(Rac2TI128 *)D_00189F00;
+        *(Rac2TI128 *)((char *)slot + 0x20) = *(Rac2TI128 *)g_hero_target_point;
         *(Rac2TI128 *)((char *)slot + 0x40) = *(Rac2TI128 *)src;
         slot->f_50 = math_random_float_range(-3.14159274f, 3.14159274f);
         slot->f_54 = math_random_float_range(-3.14159274f, 3.14159274f);

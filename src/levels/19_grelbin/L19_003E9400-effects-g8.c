@@ -6,9 +6,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern void gfx_draw_billboard_quad(void *, float, float, float, int, int, int);
 extern void part_spawn_random_direction_effect(void *, float, float);
 extern float math_random_angle(void);
-extern int D_L19_001B1C00 __attribute__((sda));
-extern int D_L19_001B1BFC __attribute__((sda));
-extern float D_L19_001B1C04 __attribute__((sda));
+extern int g_beam_glow_alpha __attribute__((sda));
+extern int g_beam_l19_glow_color __attribute__((sda));
+extern float g_beam_l19_glow_size __attribute__((sda));
 
 /* Draws the glowing sprites at the tip of the beam and makes the glow grow a little each call. */
 void part_emit_beam_muzzle_glow(char *moby)
@@ -24,8 +24,8 @@ void part_emit_beam_muzzle_glow(char *moby)
  vec_scale_to_length(offset,mat,0.25f);
  FastVecAdd(pos,pos,offset);
  pos[2]+=1.0f;
- gfx_draw_billboard_quad(pos,D_L19_001B1C04 * *(float *)(vars+0x22C),0.08f,0.0f,D_L19_001B1C00,D_L19_001B1BFC,1);
- gfx_draw_billboard_quad(pos,D_L19_001B1C04 * *(float *)(vars+0x22C)*1.2f,0.08f,0.0f,D_L19_001B1C00,0xFF804020,1);
+ gfx_draw_billboard_quad(pos,g_beam_l19_glow_size * *(float *)(vars+0x22C),0.08f,0.0f,g_beam_glow_alpha,g_beam_l19_glow_color,1);
+ gfx_draw_billboard_quad(pos,g_beam_l19_glow_size * *(float *)(vars+0x22C)*1.2f,0.08f,0.0f,g_beam_glow_alpha,0xFF804020,1);
  *(float *)(vars+0x22C)+=0.12f;
  part_spawn_random_direction_effect(random,0.25f,0.45f);
  FastVecAdd(point,random,pos);

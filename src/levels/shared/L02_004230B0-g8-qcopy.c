@@ -22,8 +22,8 @@ extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern void ref_L02_004230B0_00(void *);
 extern Vector4 g_camera_l02_position;
-extern unsigned int D_L02_001B1FE0 __attribute__((sda));
-extern unsigned int D_L02_001B1FE4 __attribute__((sda));
+extern unsigned int g_spark_streak_inner_color __attribute__((sda));
+extern unsigned int g_spark_streak_outer_color __attribute__((sda));
 
 /* The func_L09_003AF9E8 spark with its colours from two level words (the second one's
    edge masked to RGB) and the owner's scale at +0x60. */
@@ -45,8 +45,8 @@ void gfx_draw_spark_streak(char *object, Vector4 *start)
     first.alpha = 0xFF9000000260UL;
     first.tag = 0;
     test = ((unsigned long)(func_001163B0() % 2 + 1) << 2) | 0x8000000040UL;
-    first.color[0] = first.color[1] = D_L02_001B1FE0;
-    first.color[2] = first.color[3] = D_L02_001B1FE0;
+    first.color[0] = first.color[1] = g_spark_streak_inner_color;
+    first.color[2] = first.color[3] = g_spark_streak_inner_color;
     first.test = test;
     second.tex = GetEffectTextureDescriptor(23);
     nearSize.bits = 0;
@@ -54,8 +54,8 @@ void gfx_draw_spark_streak(char *object, Vector4 *start)
     second.alpha = 0xFF9000000260UL;
     second.test = 0x8000000048UL;
     second.tag = 0;
-    second.color[0] = second.color[1] = D_L02_001B1FE4;
-    second.color[2] = second.color[3] = D_L02_001B1FE4 & 0xFFFFFF;
+    second.color[0] = second.color[1] = g_spark_streak_outer_color;
+    second.color[2] = second.color[3] = g_spark_streak_outer_color & 0xFFFFFF;
     nearSize.f[3] = 1;
     farSize.f[3] = 1;
     width = math_random_float_range(0.1f, 0.2f);

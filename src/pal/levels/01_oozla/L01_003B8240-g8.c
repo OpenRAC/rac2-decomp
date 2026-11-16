@@ -11,7 +11,7 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 
-void func_PAL_L01_003B8240(char *object)
+void moby_follow_attached_target_pal(char *object)
 {
     float position[4], offset[4], matrix[16];
     char *state = *(char **)(object + 0x68);

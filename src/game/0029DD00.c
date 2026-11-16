@@ -5,7 +5,7 @@
    through the destination register, never in a delay slot. -G0 splits the address into a
    high-part register of its own; the flag would change the other bodies of the old unit. */
 
-extern u8 D_001A7BD5;
-extern u8 D_001A7B08;
+extern u8 g_menu_status_flag_2;
+extern u8 g_status_flag_b;
 
-int func_0029DD00(void) { if (D_001A7BD5) { if (D_001A7B08) return 1; } return 0; }
+int func_0029DD00(void) { if (g_menu_status_flag_2) { if (g_status_flag_b) return 1; } return 0; }

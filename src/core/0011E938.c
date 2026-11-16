@@ -75,32 +75,32 @@ done:
     return 0;
 }
 extern int iop_loadfile_buffers_equal(void);
-extern char D_00134684[];
-extern char D_00140528[];
-extern char *D_0013474C;
+extern char g_iop_loadfile_reference[];
+extern char g_iop_loadfile_state_2[];
+extern char *g_iop_loadfile_magic;
 extern int memcmp(void *, void *, int);
 
 /* Compares three small buffers to see whether they all agree. Returns 1 only if they do. */
 int iop_loadfile_buffers_equal(void) {
-    char *reference = D_00134684;
-    char *state = D_00140528;
+    char *reference = g_iop_loadfile_reference;
+    char *state = g_iop_loadfile_state_2;
     int result = 0;
     if (memcmp(state, reference, 4) != 0) {
-        if (memcmp(state, D_0013474C, 4) != 0)
-            result = memcmp(reference, D_0013474C, 4) != 0;
+        if (memcmp(state, g_iop_loadfile_magic, 4) != 0)
+            result = memcmp(reference, g_iop_loadfile_magic, 4) != 0;
     }
     return result;
 }
 
 
-extern int D_00134748;
-extern char D_00140528[];
+extern int g_iop_loadfile_state;
+extern char g_iop_loadfile_state_2[];
 extern void *memset(void *, int, int);
 
 /* Marks the module loader as not ready and clears its saved buffer. */
 int iop_loadfile_reset_state(void) {
-    D_00134748 = -1;
-    memset(D_00140528, 0, 4);
+    g_iop_loadfile_state = -1;
+    memset(g_iop_loadfile_state_2, 0, 4);
     return 0;
 }
 

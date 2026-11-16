@@ -26,7 +26,7 @@
 
 extern s32 snd_play_from_global_bank(s32 a, s32 b, s32 c);
 extern void AddMenuItemToRing(void *o, void *p, s32 n);
-extern s16 D_00259F58[][5];
+extern s16 g_menu_item_table_first[][5];
 
 struct Obj {
     s8 pad[0x814];
@@ -89,7 +89,7 @@ void radial_menu_move_grid_selection(struct Obj *o, s32 flags) {
             }
         }
     } else if (flags & 0x40) {
-        AddMenuItemToRing(o, D_00259F58, 4);
+        AddMenuItemToRing(o, g_menu_item_table_first, 4);
     }
-    o->value = D_00259F58[o->column + o->page * 4][3];
+    o->value = g_menu_item_table_first[o->column + o->page * 4][3];
 }

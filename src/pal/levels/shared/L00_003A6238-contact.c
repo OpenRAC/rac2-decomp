@@ -40,7 +40,7 @@ extern int math_random_int_range(int, int);
 extern char *func_PAL_002BD790(void *, void *, int, int, int, int, int, int, int, float);
 
 /* Spawn layered particles and two falling streaks at the supplied position. */
-void func_PAL_L00_003A9668(void *owner, void *position)
+void SpawnLayeredParticleBurst_pal(void *owner, void *position)
 {
     Vector rotation, direction, base, origin, velocity, jitter, drift, offset, scatter;
     float angle = 0.0f;

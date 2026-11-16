@@ -80,17 +80,17 @@ typedef struct InputView {
 } InputView;
 extern InputView g_pad_state;
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001A7B2E;
+extern unsigned char g_action_flag;
 /* Four per-slot item ids (also read in src/game/002C7748-g8.c); 0x001A739C is element 1. */
-extern int D_001A7398[] __attribute__((sda));
-extern int D_L01_001A7CC4 __attribute__((sda));
-extern char D_L01_0025EC90[][44];
+extern int g_menu_choice_table[] __attribute__((sda));
+extern int g_hero_action_timer __attribute__((sda));
+extern char g_hero_anim_timing_table[][44];
 typedef struct ActionTableEntry {
     unsigned char prefix[0x14];
     int id;
     unsigned char suffix[0xC8];
 } ActionTableEntry;
-extern ActionTableEntry D_L01_002637A0[];
+extern ActionTableEntry g_action_table[];
 extern unsigned int PadPressedWithin(unsigned int, int, int *);
 extern int moby_is_class_71(unsigned char *);
 extern void hero_setup_attached_object_transform(void);
@@ -180,7 +180,7 @@ int ProcessHeroItemActionInput(void)
                 }
             }
             if (MOTION == 6) {
-                timing = D_L01_0025EC90[g_hero_state.animationIndex];
+                timing = g_hero_anim_timing_table[g_hero_state.animationIndex];
                 if (ACTION == 0x15 && g_hero_state.transitionTimer > 30) {
                     if (g_hero_state.actionLock) goto checkAnimationLock;
                     if (g_hero_state.animationLock) goto clearPending;
@@ -225,7 +225,7 @@ clearPending:
         }
         if (g_pad_state.buttons.word.pressed & 0x20)
             snd_play_from_class_bank(0, 0, g_hero_state.object,
-                         (D_L01_002637A0 + g_item_slot_to_record[request])->id);
+                         (g_action_table + g_item_slot_to_record[request])->id);
         break;
 
     case 46: {
@@ -297,15 +297,15 @@ clearPending:
 
 complete:
     if (g_hero_state.transitionTimer == previousTimer) {
-        if (D_001A7B2E && D_001A7398[1] == 0x36 &&
+        if (g_action_flag && g_menu_choice_table[1] == 0x36 &&
             ACTION != 0x1D && ACTION != 1 &&
             !(g_hero_state.flags & 0xFFFFFFFF00000000UL)) {
-            math_fast_float_d(&D_L01_001A7CC4);
-            if (D_L01_001A7CC4 &&
+            math_fast_float_d(&g_hero_action_timer);
+            if (g_hero_action_timer &&
                 (MOTION < 2 || MOTION == 12 || ((MOTION == 2 || MOTION == 4) && g_hero_state.platformMode)) &&
                 (g_pad_state.buttons.both & 0x800000008UL) == 0x800000008UL)
                 SetHeroMoveState(0x7B, 1);
-            if (g_pad_state.buttons.word.pressed & 8) D_L01_001A7CC4 = 30;
+            if (g_pad_state.buttons.word.pressed & 8) g_hero_action_timer = 30;
         }
     }
     return g_hero_state.transitionTimer < previousTimer;

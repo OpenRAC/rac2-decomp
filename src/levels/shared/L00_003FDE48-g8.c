@@ -20,16 +20,16 @@ typedef struct {
 extern AimHero g_hero_state;
 typedef struct { char pad000[0x1A0]; u32 held; u32 pressed; } AimPad;
 extern AimPad g_pad_state;
-extern u8 D_00139581;
-extern u8 D_0013958D[];
-extern int D_L00_001A8F00;
-extern int D_L00_001B2BE4;
-extern int D_L00_001B2BE8 __attribute__((sda));
-extern char D_L00_001B0BF0[] __attribute__((sda));
-extern u16 D_L00_001B0C00 __attribute__((sda));
-extern u16 D_L00_001B0C04 __attribute__((sda));
-extern u16 D_L00_001B0C08 __attribute__((sda));
-extern int D_L00_001B0C0C __attribute__((sda));
+extern u8 g_hoverbomb_weapon_index;
+extern u8 g_bouncer_weapon_index[];
+extern int g_game_l00_mode;
+extern int g_bouncer_timer;
+extern int g_tetrabomb_fire_held __attribute__((sda));
+extern char g_tetrabomb_gun_origin_offset[] __attribute__((sda));
+extern u16 g_tetrabomb_gun_delay_first __attribute__((sda));
+extern u16 g_tetrabomb_gun_delay_next __attribute__((sda));
+extern u16 g_tetrabomb_gun_repeat __attribute__((sda));
+extern int g_spread_shot_count __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
 extern void moby_init_private_data(char *);
@@ -58,7 +58,7 @@ extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *
 extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void slot_reset_active(int);
 extern void ref_L00_003FDE48_00(void *, void *);
@@ -83,7 +83,7 @@ void bouncer_update(unsigned char *object) {
         *(int *)(state + 0x28) = -1;
         *(float *)(state + 0x20) = 0.0f;
         *(int *)(state + 0x2C) = 0;
-        D_L00_001B2BE4 = 20;
+        g_bouncer_timer = 20;
     }
     if (g_hero_state.level == 1) hero_l00_set_action(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
@@ -106,9 +106,9 @@ void bouncer_update(unsigned char *object) {
     if (*(int *)(state + 0x2C) != 0 && math_fast_float_d((int *)(state + 0x2C))) cancel_hero_item_animation();
     if ((g_pad_state.pressed & g_hero_state.buttons) && !get_ammo(-1)) {
         PlayMobySound(1, 0, object);
-        D_L00_001B2BE4 = 20;
+        g_bouncer_timer = 20;
     }
-    if (D_L00_001A8F00 == 0 && *(float *)(state + 0x20) == 0.0f && g_hero_state.busy == 0 &&
+    if (g_game_l00_mode == 0 && *(float *)(state + 0x20) == 0.0f && g_hero_state.busy == 0 &&
         (u8)object[0x42] <= 1 && (g_pad_state.held & g_hero_state.buttons) && g_hero_state.resource >= 23 && allowed) {
         if (get_ammo(-1)) {
             PlayMobySound(0, 0, object);
@@ -118,7 +118,7 @@ void bouncer_update(unsigned char *object) {
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
             start_equipped_item_animation();
             *(int *)(state + 0x2C) = 16;
-            *(int *)(state + 0x28) = slot_copy_records_to_free(&D_L00_0029F210);
+            *(int *)(state + 0x28) = slot_copy_records_to_free(&g_bouncer_sound_record);
         }
         if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.f22B8 == 0) {
             handle = *(int *)(state + 0x28);
@@ -127,7 +127,7 @@ void bouncer_update(unsigned char *object) {
                 *(int *)(state + 0x28) = -1;
             }
         }
-        entry = g_weapon_l00_table + D_0013958D[0];
+        entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
         *(float *)(state + 0x20) = 1.0f / entry->rate;
     }
     ref_L00_003FDE48_00(moby_draw_attached_effect, object);

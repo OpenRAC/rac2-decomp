@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 D_L24_0025B710[];
+extern u8 g_attachment_records[];
 extern void vec_clear_128(void *);
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
 
 /* Keeps the hero's held object: creates it at the hero's position the first time,
    then poses it on the hand joint and picks its animation from the hero's state. */
-void func_PAL_L00_002A5E98(void) {
+void hero_update_held_object_pal(void) {
     L00_002A6008_Scratch s;
     u8 *obj;
     u8 *p;
@@ -83,12 +83,12 @@ typedef int Rac2Native_6b0741c38bf00fee_s32;
 typedef unsigned char Rac2Native_6b0741c38bf00fee_u8;
 typedef long Rac2Native_6b0741c38bf00fee_s64;
 typedef unsigned long Rac2Native_6b0741c38bf00fee_u64;
-extern Rac2Native_6b0741c38bf00fee_u8 D_0018B2BC[];
-extern void func_PAL_L00_002A6058(Rac2Native_6b0741c38bf00fee_u64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s32);
+extern Rac2Native_6b0741c38bf00fee_u8 g_footstep_effect_ids[];
+extern void hero_play_footstep_sound_dust_pal(Rac2Native_6b0741c38bf00fee_u64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s32);
 extern void hero_queue_delayed_event(short, short, short);
 
 /* passes the measured byte and constants to two callees */
-void func_PAL_L00_002A6018(void) {
- func_PAL_L00_002A6058(D_0018B2BC[1],0,1,0x32);
+void hero_play_footstep_effect_pal(void) {
+ hero_play_footstep_sound_dust_pal(g_footstep_effect_ids[1],0,1,0x32);
  hero_queue_delayed_event(0x16,6,0);
 }

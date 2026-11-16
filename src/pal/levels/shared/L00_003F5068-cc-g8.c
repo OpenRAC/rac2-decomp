@@ -18,7 +18,7 @@ extern float FastAddRotations(float a0, float a1);
 
 typedef unsigned int QuadWord __attribute__((mode(TI)));
 typedef union { QuadWord word; float v[4]; } Vector;
-extern Vector D_L00_0029AF40[];
+extern Vector g_quad_sphere_vertices[];
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
 /* One 0x30-byte joint of the chain func_L00_003F5870 lays out. */
@@ -52,11 +52,11 @@ typedef struct {
 } Light;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; QuadWord q[0x260]; } Hero;
 extern u8 g_hero_state[];
-extern Vector g_camera_l00_position, D_L00_001BF220;
-extern float D_L00_00252F60[137][2];
+extern Vector g_camera_l00_position, g_hero_l00_position;
+extern float g_lightning_burst_angles[137][2];
 extern char *g_area_hit_targets[];
-extern Light D_L00_001C6F40[];
-extern int D_L00_001B08D0 __attribute__((sda));
+extern Light g_light_table[];
+extern int g_lightning_burst_object __attribute__((sda));
 extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern float math_square(float);
@@ -64,8 +64,8 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecSub(Vector *, const Vector *, const Vector *);
 extern void vec_scale_to_length(Vector *, const Vector *, float);
 extern int CollLine(Vector *, Vector *, int, char *, int);
-extern void func_PAL_0032CDB0(char *, Vector *, int);
-extern void func_PAL_0032C3B0(char *);
+extern void part_claim_ring_piece_pal(char *, Vector *, int);
+extern void part_claim_debris_piece_pal(char *);
 extern int math_fast_float_d(int *);
 extern int coll_process_hit(Vector *, int, char *, DamageRequest *, float);
 extern void make_hit_descriptor(char *, int, int, float, Quad16 *);
@@ -73,7 +73,7 @@ extern void QueueMobyImpact(char *, DamageRequest *);
 /* Retail passes the object in $a0 although the matched definition in src/game/00327038.c
    takes no parameters, so this caller declares it without a prototype. */
 extern void math_init_random_direction_table();
-extern void func_PAL_0032C220(void *);
+extern void part_init_trail_sparkle_pairs_pal(void *);
 extern void moby_mark_spawned(void *);
 extern void gfx_free_point_light(int);
 extern float math_fast_sin_or_cos_a(float);
@@ -107,8 +107,8 @@ void func_PAL_L00_003F5068(char *object)
         state->timer = 50;
         state->radius = 0.0f;
         for (i = 0; i < 137; i++) {
-            D_L00_00252F60[i][0] = math_random_angle();
-            D_L00_00252F60[i][1] = math_random_angle();
+            g_lightning_burst_angles[i][0] = math_random_angle();
+            g_lightning_burst_angles[i][1] = math_random_angle();
         }
     case 1:
         *(unsigned char *)(object + 0x20) = 2;
@@ -122,11 +122,11 @@ void func_PAL_L00_003F5068(char *object)
             vec_build_spherical_offset(point.v, state->radius, first_angle, second_angle);
             FastVecAdd(&point, &point, (Vector *)&((Hero *)g_hero_state)->b[0xE0]);
             if (CollLine((Vector *)&((Hero *)g_hero_state)->b[0xE0], &point, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0) != 0)
-                qcopy(&point, &D_L00_001BF220);
-            func_PAL_0032CDB0(object, &point, 8);
+                qcopy(&point, &g_hero_l00_position);
+            part_claim_ring_piece_pal(object, &point, 8);
         }
         if (state->timer < 8 && (state->timer & 7) == 0)
-            func_PAL_0032C3B0(object);
+            part_claim_debris_piece_pal(object);
         if (math_fast_float_d(&state->timer) != 0) {
             state->timer = 100;
             *(unsigned char *)(object + 0x20) = 3;
@@ -159,9 +159,9 @@ void func_PAL_L00_003F5068(char *object)
         }
         break;
     case 3:
-        if ((state->timer & 7) == 0) func_PAL_0032C3B0(object);
+        if ((state->timer & 7) == 0) part_claim_debris_piece_pal(object);
         math_fast_float_d(&state->timer);
-        func_PAL_0032C220(object);
+        part_init_trail_sparkle_pairs_pal(object);
         if (state->timer == 33) *(unsigned char *)(object + 0x20) = 4;
         break;
     case 4:
@@ -169,7 +169,7 @@ void func_PAL_L00_003F5068(char *object)
             if (state->first != 0) moby_mark_spawned(state->first);
             if (state->second != 0) moby_mark_spawned(state->second);
             if (state->light != -1) gfx_free_point_light(state->light);
-            D_L00_001B08D0 = 0;
+            g_lightning_burst_object = 0;
             moby_mark_spawned(object);
             return;
         }
@@ -200,7 +200,7 @@ void func_PAL_L00_003F5068(char *object)
         qcopy(state->second + 0x10, ((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->light != -1) {
-        light = &D_L00_001C6F40[state->light];
+        light = &g_light_table[state->light];
         vec_scale_to_length(&point, (Vector *)&((Hero *)g_hero_state)->b[0x2A0], 0.5f);
         FastVecAdd(&light->position, (Vector *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10), &point);
         FastVecSub(&point, &g_camera_l00_position, &light->position);

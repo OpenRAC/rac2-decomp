@@ -7,7 +7,7 @@ extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
 extern int single_toggle_a_update(void *, int);
-extern int D_001ADE78[2] __attribute__((sda));
+extern int g_single_toggle_a_prompt_ids[2] __attribute__((sda));
 /* Sets up a menu page with a single on/off option. */
 void single_toggle_a_init(char *object, void *argument)
 {
@@ -26,7 +26,7 @@ void single_toggle_a_init(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADE78);
+    prompt_bar_init(child, argument, g_single_toggle_a_prompt_ids);
     text = GetLocalizedString(0x2D99);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -36,7 +36,7 @@ void single_toggle_a_init(char *object, void *argument)
     single_toggle_a_update(object, 0);
 }
 extern int two_toggle_b_update(void *, int);
-extern int D_001ADE88[2] __attribute__((sda));
+extern int g_two_toggle_b_prompt_ids[2] __attribute__((sda));
 /* Sets up a menu page with two on/off options. */
 void two_toggle_b_init(char *object, void *argument)
 {
@@ -55,7 +55,7 @@ void two_toggle_b_init(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADE88);
+    prompt_bar_init(child, argument, g_two_toggle_b_prompt_ids);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -65,7 +65,7 @@ void two_toggle_b_init(char *object, void *argument)
     two_toggle_b_update(object, 0);
 }
 extern int single_toggle_c_update(void *, int);
-extern int D_001ADE98[2] __attribute__((sda));
+extern int g_single_toggle_c_prompt_ids[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_c_init(char *object, void *argument)
 {
@@ -84,7 +84,7 @@ void single_toggle_c_init(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADE98);
+    prompt_bar_init(child, argument, g_single_toggle_c_prompt_ids);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -95,7 +95,7 @@ void single_toggle_c_init(char *object, void *argument)
 }
 
 extern int single_toggle_d_update(void *, int);
-extern int D_001ADEA8[2] __attribute__((sda));
+extern int g_single_toggle_d_prompt_ids[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_d_init(char *object, void *argument)
 {
@@ -114,7 +114,7 @@ void single_toggle_d_init(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADEA8);
+    prompt_bar_init(child, argument, g_single_toggle_d_prompt_ids);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -125,7 +125,7 @@ void single_toggle_d_init(char *object, void *argument)
 }
 
 extern int single_toggle_e_update(void *, int);
-extern int D_001ADEB8[2] __attribute__((sda));
+extern int g_single_toggle_e_prompt_ids[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_e_init(char *object, void *argument)
 {
@@ -144,7 +144,7 @@ void single_toggle_e_init(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADEB8);
+    prompt_bar_init(child, argument, g_single_toggle_e_prompt_ids);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -155,7 +155,7 @@ void single_toggle_e_init(char *object, void *argument)
 }
 
 extern int list_page_update(void *, int);
-extern int D_001ADEC8[2] __attribute__((sda));
+extern int g_list_page_prompt_ids[2] __attribute__((sda));
 extern void list_menu_reset_attach_items(void *, void *);
 extern void menu_set_settings(void *, int, int);
 extern void menu_set_field_b8(void *, int);
@@ -178,7 +178,7 @@ void list_page_init(char *object, void *argument)
     (*(float **)(object + 0x37C))[1] = 195.0f;
     child = object + 8;
     widget = object + 0x2B0;
-    prompt_bar_init(child, argument, D_001ADEC8);
+    prompt_bar_init(child, argument, g_list_page_prompt_ids);
     text = GetLocalizedString(0x2DA0);
     second = GetLocalizedString(0x2D75);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -192,8 +192,8 @@ void list_page_init(char *object, void *argument)
 }
 
 extern int audio_menu_update(void *, int);
-extern int D_001ADE48[2] __attribute__((sda));
-extern char D_001ADC88[];
+extern int g_audio_menu_prompt_ids[2] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
 extern void object_init_derived_b(void *, int, int, void *, void *);
 extern void widget_set_pos_y(void *, int);
 extern void meter_set_max(void *, int);
@@ -223,13 +223,13 @@ void audio_menu_init(char *object, void *argument)
     child = object + 8;
     widget = object + 0x2AC;
     secondWidget = object + 0x2F4;
-    prompt_bar_init(child, argument, D_001ADE48);
+    prompt_bar_init(child, argument, g_audio_menu_prompt_ids);
     text = GetLocalizedString(0x2D97);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
     prompt_bar_set_text_offsets(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing(child, 0.67f);
-    table = D_001ADC88;
+    table = g_circle_menu_icon_data;
     object_init_derived_b(widget, 150, 1, table, argument);
     widget_set_pos_y(widget, 16);
     meter_set_max(widget, 0x400);

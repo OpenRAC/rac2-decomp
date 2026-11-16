@@ -8,7 +8,7 @@ extern void moby_set_state(char *, int, int);
 extern int IsPointInCuboid(char *, int);
 extern void path_reset_follower_to_point(char *);
 extern int flag_set_first_pending(char *);
-extern float func_PAL_L07_003F3290(char *);
+extern float SteerTowardTarget_pal(char *);
 extern int moby_count_group_not_in_state(int, int);
 extern int math_fast_float_d(void *);
 extern int flag_is_third_pending_set(char *);
@@ -19,17 +19,17 @@ extern void func_PAL_L07_003EB648(char *, void *, void *, char *, int);
 extern void func_PAL_L07_003EFFD0(char *, void *, void *, char *, int);
 extern float ApproachValue(void *, float, float);
 extern void *part_find_owned_effect_slot(char *, int, int);
-extern float func_PAL_002AA108(char *, int);
+extern float moby_update_aim_target_strength_pal(char *, int);
 extern void func_PAL_002B15D8(char *, int, void *, int, float, float, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *func_PAL_0032F3B8(char *, void *, void *, float);
 extern char g_hero_position[];
-extern char D_L07_001B9200[];
-extern int D_L07_001B0C50 __attribute__((sda));
+extern char g_hero_position_block[];
+extern int g_launcher_launch_offset __attribute__((sda));
 extern unsigned short *g_moby_l07_group_lists[];
 extern char *g_moby_l07_array[] __attribute__((sda));
-extern int D_L07_001B22F8[] __attribute__((sda));
+extern int g_entity_group_count[] __attribute__((sda));
 extern void *D_L07_002A3380[];
 typedef struct {
     char pad00[0x20];
@@ -57,7 +57,7 @@ typedef struct {
 /* The object's six states, state 0 to 5 (anything above only runs the tail). The dispatch reads the
    level's own jump table (six code addresses in the level's data at 0x2A3380: the bodies come in
    the order 0, 1, 4, 2, 3, 5); `cases` only keeps the labels alive. */
-void func_PAL_L07_003F2B70(char *a0)
+void launcher_sequence_update_pal(char *a0)
 {
     static void *cases[6] = {&&c0, &&c1, &&c4, &&c2, &&c3, &&c5};
     char *s1 = a0;
@@ -92,7 +92,7 @@ c4: {
 
     if (flag_set_first_pending(s1))
         s3->f124 = 0x32;
-    func_PAL_L07_003F3290(s1);
+    SteerTowardTarget_pal(s1);
     i = s3->idx;
     if (i >= 6 || s3->ids[i + 1] == -1) {
         moby_set_state(s1, 5, -1);
@@ -107,7 +107,7 @@ c4: {
     goto tail;
 }
 c2:
-    func_PAL_L07_003F3290(s1);
+    SteerTowardTarget_pal(s1);
     if (flag_is_third_pending_set(s1))
         moby_set_state(s1, 3, -1);
     goto tail;
@@ -117,14 +117,14 @@ c3: {
     char *e;
     char buf[16];
 
-    f = func_PAL_L07_003F3290(s1);
+    f = SteerTowardTarget_pal(s1);
     if (f < 3.0f) {
         if (s3->ids[s3->idx] != -1) {
-            matrix_mul_vec3(buf, &D_L07_001B0C50, s1 + 0xC0);
+            matrix_mul_vec3(buf, &g_launcher_launch_offset, s1 + 0xC0);
             FastVecAdd(buf, buf, s1 + 0x10);
             for (p = g_moby_l07_group_lists[s3->ids[s3->idx]];
                  (s3->ids[s3->idx] & 0xFF) != 0xFF &&
-                 s3->ids[s3->idx] <= D_L07_001B22F8[0] && p != 0 &&
+                 s3->ids[s3->idx] <= g_entity_group_count[0] && p != 0 &&
                  ((short)p[-1] >= 0 || p == g_moby_l07_group_lists[s3->ids[s3->idx]]);
                  p++) {
                 e = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
@@ -151,7 +151,7 @@ c3: {
     goto tail;
 }
 c5: {
-    func_PAL_L07_003F3290(s1);
+    SteerTowardTarget_pal(s1);
     ApproachValue(&s3->f114, 0.20000002f, 0.0012f);
     s3->f118 += s3->f114;
     if (30.0f < s3->f118) {
@@ -172,12 +172,12 @@ tail:
         float f2;
 
         t = part_find_owned_effect_slot(s1, 0x10000, 0);
-        f2 = func_PAL_002AA108(s1, t);
+        f2 = moby_update_aim_target_strength_pal(s1, t);
         ApproachValue(&s3->f20, 0.0f, f2);
         *(unsigned char *)(s1 + 0xA8) = 0xFF;
         if (s3->f20 == 0.0f) {
             func_PAL_002B15D8(s1, 0x7F7, s3->b60, 0xFF, 5.0f, 10.0f, 5.0f, 10.0f);
-            FastVecSub(buf2, D_L07_001B9200, s1 + 0x10);
+            FastVecSub(buf2, g_hero_position_block, s1 + 0x10);
             vec_scale_to_length(buf2, buf2, 1.0f);
             func_PAL_0032F3B8(s1, s1 + 0x10, buf2, 0.0f);
             PlayMobySound(2, 0, s1);

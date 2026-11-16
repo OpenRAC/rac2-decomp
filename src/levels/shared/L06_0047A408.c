@@ -32,8 +32,8 @@ extern char *ref_L06_0047A408_01;
 extern char ref_L06_0047A408_02[];
 extern float ref_L06_0047A408_03, ref_L06_0047A408_04;
 extern char g_hero_position[];
-extern char D_0018A0E0[];
-extern s32 D_00138320[];
+extern char g_hero_state_block[];
+extern s32 g_pad_pressed_flags[];
 extern PadSt g_pad_state;
 extern int cam_claim_request_slot(void *);
 extern int cam_release_request_slot(void *);
@@ -101,7 +101,7 @@ void volume_camera_swing(char *arg) {
         && FastDiffRots(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
         goto stop;
     }
-    if (params->l_buttons_end != 0 && params->type == 5 && (D_00138320[0] & 4)) {
+    if (params->l_buttons_end != 0 && params->type == 5 && (g_pad_pressed_flags[0] & 4)) {
 stop:
         if (params->timer != 0) {
             params->done = 1;
@@ -131,11 +131,11 @@ stop:
         tail->distance = params->height;
         follow_copy->look_height = params->offset_scale;
         qcopy(state->tail.unk140, tail->unk130);
-        FastVecScale(dir, D_0018A0E0, -tail->distance);
+        FastVecScale(dir, g_hero_state_block, -tail->distance);
         pos = &rec->pos;
         FastVecAdd(state->follow.eye, hero_pos, dir);
         FastVecAdd(pos, state->follow.eye, tail->unk130);
-        FastVecScale(dir, D_0018A0E0, -follow_copy->look_height);
+        FastVecScale(dir, g_hero_state_block, -follow_copy->look_height);
         FastVecAdd(state->follow.look_target, hero_pos, dir);
         qcopy(state->follow.unkD0, state->follow.look_target);
         qcopy(follow_copy->focus, hero_pos);

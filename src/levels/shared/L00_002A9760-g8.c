@@ -34,13 +34,13 @@ typedef struct {
 } HeroHeightProbeState;
 extern HeroHeightProbeState D_00189E20_2;
 
-extern int D_L00_001A8FF0 __attribute__((sda));
-extern float D_L00_001A7F48[] SDATA(D_L00_001A7F48);
-extern float D_L00_001A7F58[] SDATA(D_L00_001A7F58);
-extern char D_L00_001BF220[];
+extern int g_hero_locked_flag __attribute__((sda));
+extern float g_aim_offset_table[] SDATA(D_L00_001A7F48);
+extern float g_aim_turn_table[] SDATA(D_L00_001A7F58);
+extern char g_hero_l00_position[];
 typedef struct { char pad[0x28]; float height; } HitResult;
 extern HitResult g_collision_result;
-extern char D_L00_001B1EE0[];
+extern char g_quad_copy_buffer[];
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int CollLine(void *, void *, int, int, int);
@@ -78,13 +78,13 @@ void UpdateHeroMobyProbedHeightBounds(void)
     if (D_00189E20_2.f22b4 == 4)
         return;
     P->flags |= 0x400;
-    if (D_L00_001A8FF0 || (O(float, 0xe8) < 0.99f && D_00189E20_2.f229c != 17)) {
+    if (g_hero_locked_flag || (O(float, 0xe8) < 0.99f && D_00189E20_2.f229c != 17)) {
         P->opacity = 255;
         FastVecScale(a, P, 0.0009765625f);
         FastVecScale(b, P->up, -16.0f);
         FastVecAdd(b, a, b);
         if (CollLine(a, b, 34, 0, 0)) {
-            FastVecSub(c, D_L00_001BF220, P->position);
+            FastVecSub(c, g_hero_l00_position, P->position);
             O(float, 0x70) = FastVecDot(c, P->up);
             O(float, 0x74) = O(float, 0xc) * 0.000244140625f;
         } else {
@@ -117,7 +117,7 @@ void UpdateHeroMobyProbedHeightBounds(void)
         a[1] = sn * cosine;
     }
     a[2] = -math_fast_sin_or_cos_b(D_00189E20_2.feb0);
-    qcopy(D_L00_001B1EE0, a);
+    qcopy(g_quad_copy_buffer, a);
     height = D_00189E20_2.f318;
     if (height < 1.0f) {
         if (D_00189E20_2.f330 >= 1.0f)
@@ -138,7 +138,7 @@ void UpdateHeroMobyProbedHeightBounds(void)
     if (!near) {
         float hi = height, lo = height;
         float *probeStart = b, *probeEnd = c;
-        float *offset = D_L00_001A7F48, *turn = D_L00_001A7F58;
+        float *offset = g_aim_offset_table, *turn = g_aim_turn_table;
 
         for (i = 3; i >= 0; offset++, i--, turn++) {
             float scale, t, step, cosine, distance;

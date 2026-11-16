@@ -2,11 +2,11 @@
 
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
-extern float D_L16_001B0C78 __attribute__((sda));
-extern int D_L16_001B0CA8 __attribute__((sda));
-extern int D_L16_001B0CAC __attribute__((sda));
-extern char *D_L16_001BFF58[];
-extern char D_L16_001A8F20[] __attribute__((sda));
+extern float g_rotation_step_degrees __attribute__((sda));
+extern int g_ground_effect_texture_a __attribute__((sda));
+extern int g_ground_effect_texture_b __attribute__((sda));
+extern char *g_aim_target_moby[];
+extern char g_particle_template[] __attribute__((sda));
 extern int coll_sweep_from_object(float, float, float, void *, void *, int, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -23,7 +23,7 @@ extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void gfx_draw_two_layered_sprites(void *);
 
 /* Updates the moving object, handles impact/timeout, and emits its death particles. */
-void func_PAL_L16_003EB0B0(char *object)
+void UpdateImpactProjectile_pal(char *object)
 {
     float position[4];
     char collision[48];
@@ -42,7 +42,7 @@ void func_PAL_L16_003EB0B0(char *object)
         *(unsigned short *)(collision + 26) = *(unsigned short *)(object + 170);
         if ((CollLine(object + 16, position, 0, object, collision) ||
              coll_test_point(object + 16, 0, object, 0.3f)) &&
-             (D_L16_001BFF58[0] == 0 || D_L16_001BFF58[0] != *(char **)(state + 16))) {
+             (g_aim_target_moby[0] == 0 || g_aim_target_moby[0] != *(char **)(state + 16))) {
             coll_sweep_from_object(0.6f, *(float *)(state + 20), 0.0f, object, object + 16, 0x10001, 0, 1, 0);
             moby_set_state(object, 1, -1);
             return;
@@ -53,12 +53,12 @@ void func_PAL_L16_003EB0B0(char *object)
         break;
     case 1:
         size = math_random_float_range(8.0f, 10.0f);
-        part_spawn_ground_effect(object + 16, 12, D_L16_001B0CA8, 0, 10, D_L16_001A8F20, size * 0.3f, size, 0.0f, 0);
-        part_spawn_ground_effect(object + 16, 12, D_L16_001B0CAC, 1, -10, D_L16_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(object + 16, 12, g_ground_effect_texture_a, 0, 10, g_particle_template, size * 0.3f, size, 0.0f, 0);
+        part_spawn_ground_effect(object + 16, 12, g_ground_effect_texture_b, 1, -10, g_particle_template, size * 0.04f, size * 0.4f, 0.0f, 0);
         moby_mark_spawned(object);
         return;
     }
-    math_apply_axis_rotation_to_quat(object + 224, object + 224, object + 208, D_L16_001B0C78 * 0.017453294f);
-    math_apply_axis_rotation_to_quat(object + 192, object + 192, object + 208, D_L16_001B0C78 * 0.017453294f);
+    math_apply_axis_rotation_to_quat(object + 224, object + 224, object + 208, g_rotation_step_degrees * 0.017453294f);
+    math_apply_axis_rotation_to_quat(object + 192, object + 192, object + 208, g_rotation_step_degrees * 0.017453294f);
     gfx_add_draw_callback_third(gfx_draw_two_layered_sprites, object);
 }

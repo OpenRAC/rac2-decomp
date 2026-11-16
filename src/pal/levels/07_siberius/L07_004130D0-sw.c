@@ -66,12 +66,12 @@ typedef struct {
 } ShipObject;
 extern void path_compute_centers_and_radii(void *);
 extern void flag_block_clear(void *);
-extern void func_PAL_L07_004138B8(void *);
-extern void func_PAL_L07_00415638(void *, int);
-extern void func_PAL_L07_00413B40(void *);
-extern void func_PAL_L07_00414BC0(void *);
-extern void func_PAL_L07_00414008(void *);
-extern void func_PAL_L07_00415868(void *);
+extern void ship_start_chain_pal(void *);
+extern void ship_start_second_phase_pal(void *, int);
+extern void ship_move_riders_along_path_pal(void *);
+extern void ship_run_sequence_events_pal(void *);
+extern void ship_update_attached_parts_pal(void *);
+extern void boss_enter_second_phase_pal(void *);
 extern void moby_build_matrix(void *);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
@@ -80,8 +80,8 @@ extern int PlayMobySound(int, int, void *);
 extern int flag_set_first_pending(void *);
 extern float math_approach_target_with_direction_mode(void *, void *, float, float, float, float, int);
 extern void timer_start_countdown(int, float);
-extern void func_PAL_L00_00305110(int, int);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void load_scene_chunk_pal(int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern s32 snd_resume_music_stream(void);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern float math_lerp_float(float, float, float);
@@ -94,33 +94,33 @@ extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
 extern float FastAddRotations(float, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern int D_L07_001B1740 __attribute__((sda));
-extern int D_L07_001C9780 NOT_SDA;
-extern int D_L07_001B19F8;
-extern u8 D_0018C0E2 NOT_SDA;
-extern u8 D_001A7BD0;
+extern int g_ship_update_pending_flag __attribute__((sda));
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern int g_ship_update_done_flag;
+extern u8 g_ship_flag_byte NOT_SDA;
+extern u8 g_moby_update_inhibit_flag;
 extern int g_current_map_index;
-extern u8 D_0019B2E8[][16];
-extern void *D_0018A15C[3] NOT_SDA;
-extern float D_L07_001B1D20;
+extern u8 g_moby_group_flags[][16];
+extern void *g_platform_actor_ref[3] NOT_SDA;
+extern float g_ship_fade_amount;
 extern GameStatus g_music_state;
-extern int D_L07_001B9330 NOT_SDA;
-extern CameraObject D_L07_001B90C0;
-extern float D_L07_001B9200[4];
-extern float D_L07_001B1744 __attribute__((sda));
-extern float D_L07_001B1748 __attribute__((sda));
-extern float D_L07_001B174C __attribute__((sda));
-extern float D_L07_001B1750 __attribute__((sda));
-extern float D_L07_001B1758 __attribute__((sda));
-extern float D_L07_001B175C __attribute__((sda));
-extern float D_L07_001B1760[2] __attribute__((sda));
+extern int g_ship_hit_flag NOT_SDA;
+extern CameraObject g_hero_l07_state_block;
+extern float g_hero_position_block[4];
+extern float g_ship_fade_seconds_param __attribute__((sda));
+extern float g_ship_approach_minutes_param __attribute__((sda));
+extern float g_ship_roll_approach_rate __attribute__((sda));
+extern float g_ship_roll_lerp_start __attribute__((sda));
+extern float g_ship_angular_speed_deg __attribute__((sda));
+extern float g_ship_velocity_z_param __attribute__((sda));
+extern float g_ship_local_offset_vecs[2] __attribute__((sda));
 extern struct {
     s16 f0;
     s16 f2;
     int f4;
 } D_L07_001B2024;
 
-void func_PAL_L07_004130D0(ShipObject *o)
+void siberius_ship_update_pal(ShipObject *o)
 {
     Vector p, r, v, w, x, y;
     ShipState *s = o->vars;
@@ -144,52 +144,52 @@ void func_PAL_L07_004130D0(ShipObject *o)
         } else {
             o->f30 = 255;
             flag_block_clear(o);
-            func_PAL_L07_004138B8(o);
+            ship_start_chain_pal(o);
             moby_set_state(o, 2, -1);
         }
         break;
     case 2:
-        if (D_L07_001B1740) {
-            D_L07_001B1740 = 0;
-            func_PAL_L07_00415638(s->f100, s->fD0);
+        if (g_ship_update_pending_flag) {
+            g_ship_update_pending_flag = 0;
+            ship_start_second_phase_pal(s->f100, s->fD0);
         }
-        if (D_L07_001C9780) {
+        if (g_cutscene_l07_active_flag) {
             moby_set_state(o, 1, -1);
             s->f16CC = PlayMobySound(2, 4, o);
             s->f16C8 = 6.0f;
         }
         break;
     case 1:
-        D_0018C0E2 = 1;
-        D_L07_001B19F8 = 1;
-        func_PAL_L07_00413B40(o);
-        func_PAL_L07_00414BC0(o);
+        g_ship_flag_byte = 1;
+        g_ship_update_done_flag = 1;
+        ship_move_riders_along_path_pal(o);
+        ship_run_sequence_events_pal(o);
         break;
     case 3:
         if (flag_set_first_pending(o))
             PlayMobySound(1, 0, o);
-        func_PAL_L07_00414008(o);
-        if (D_001A7BD0 || (D_0019B2E8[g_current_map_index][o->fB0] & 0x80)) {
-            func_PAL_L07_00414008(o);
+        ship_update_attached_parts_pal(o);
+        if (g_moby_update_inhibit_flag || (g_moby_group_flags[g_current_map_index][o->fB0] & 0x80)) {
+            ship_update_attached_parts_pal(o);
             o->flags |= 2;
             break;
         }
-        if (D_0018A15C[0] == o) {
+        if (g_platform_actor_ref[0] == o) {
             if (s->f110 >= 0.5f)
                 PlayMobySound(1, 0, o);
             math_approach_target_with_direction_mode(&s->f110, &s->f118, -1.0f, 0.0025132746f,
                           0.0025132746f, 0.12566373f, 0);
             if (s->f110 <= -1.0f) {
                 timer_start_countdown(1, 8.0f);
-                if (D_L07_001B1D20 >= 1.0f) {
+                if (g_ship_fade_amount >= 1.0f) {
                     p.q = 0;
                     r.q = 0;
                     p.f[0] = 191.5800018310547f;
                     p.f[1] = 501.15f;
                     p.f[2] = 457.69000244140625f;
                     r.f[2] = 3.1415927f;
-                    func_PAL_L00_00305110(1, 0);
-                    func_PAL_L00_002B9CD8(&p, &r, 0, 1);
+                    load_scene_chunk_pal(1, 0);
+                    hero_reset_position_and_direction_pal(&p, &r, 0, 1);
                 }
             }
         } else {
@@ -198,23 +198,23 @@ void func_PAL_L07_004130D0(ShipObject *o)
         }
         break;
     case 5:
-        if (s->f16B8 >= 1.0f && D_L07_001B1D20 >= 1.0f) {
+        if (s->f16B8 >= 1.0f && g_ship_fade_amount >= 1.0f) {
             if (g_music_state.f72 != 3 || g_music_state.f6C >= 6000)
                 break;
-            D_L07_001B9330 = 0;
+            g_ship_hit_flag = 0;
             snd_resume_music_stream();
         }
         p.q = *(TI128 *)o->pos;
         r.q = *(TI128 *)o->rot;
         if (s->f16B8 > 0.0f) {
-            math_step_value_toward_target(o->pos, &s->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00040000002f,
-                          D_L07_001B1744 * 0.020000001f);
+            math_step_value_toward_target(o->pos, &s->f11C, 400.0f, 0.0f, g_ship_approach_minutes_param * 0.00040000002f,
+                          g_ship_fade_seconds_param * 0.020000001f);
             s->f16B8 = (o->pos[0] - 400.0f) * 0.014285714f;
-            o->rot[2] = math_lerp_float(D_L07_001B1750, 0.0f, s->f16B8);
+            o->rot[2] = math_lerp_float(g_ship_roll_lerp_start, 0.0f, s->f16B8);
             o->rot[0] = math_lerp_float(0.7853975296020508f, 0.0f, s->f16B8);
             o->pos[2] = 213.0f - s->f16B8 * 3.0f;
-        } else if ((m = D_L07_001B1D20) == 0.0f) {
-            matrix_mul_vec3(&v, D_L07_001B1760, o->mtx);
+        } else if ((m = g_ship_fade_amount) == 0.0f) {
+            matrix_mul_vec3(&v, g_ship_local_offset_vecs, o->mtx);
             s->f16B4 += o->rot[0] * 0.00010471977f + 0.00010471977f;
             o->rot[0] += s->f16B4;
             if (o->rot[0] > 1.5707964f) {
@@ -225,37 +225,37 @@ void func_PAL_L07_004130D0(ShipObject *o)
                 else
                     s->f16B4 *= -0.333f;
                 if (!s->f16BC) {
-                    D_L07_001B90C0.f16C = 0;
-                    D_L07_001B90C0.f188 = 75;
-                    D_L07_001B90C0.f180 = 0.02f;
+                    g_hero_l07_state_block.f16C = 0;
+                    g_hero_l07_state_block.f188 = 75;
+                    g_hero_l07_state_block.f180 = 0.02f;
                     s->f16BC = 1;
                 }
             }
             euler_rotation_basis(o->mtx, o->rot);
-            matrix_mul_vec3(&w, D_L07_001B1760, o->mtx);
+            matrix_mul_vec3(&w, g_ship_local_offset_vecs, o->mtx);
             FastVecSub(&v, &w, &v);
             FastVecSub(o->pos, o->pos, &v);
         } else if (m >= 1.0f) {
-            func_PAL_L07_00415868(o);
+            boss_enter_second_phase_pal(o);
             break;
         }
 
-        D_L07_001B2024.f4 = 1;
-        ApproachValue(&s->f16B0, 1.0f, D_L07_001B174C * 0.00040000002f);
+        g_ship_state_2.f4 = 1;
+        ApproachValue(&s->f16B0, 1.0f, g_ship_roll_approach_rate * 0.00040000002f);
         k = s->f11C + s->f16B0;
         if (k > 0.0f)
             k = 0.0f;
-        v.q = *(TI128 *)D_L07_001B9200;
+        v.q = *(TI128 *)g_hero_position_block;
         v.f[0] += k;
-        v.f[2] += D_L07_001B175C * 0.020000001f;
+        v.f[2] += g_ship_velocity_z_param * 0.020000001f;
         object_copy_vector_to_selected(&v);
 
         qzero_nc(&w);
         x.q = *(TI128 *)o->pos;
         x.f[2] += 6.0f;
-        w.f[2] = mat_fast_helper_a(o->pos[0] - D_L07_001B90C0.pos[0], o->pos[1] - D_L07_001B90C0.pos[1]);
-        w.f[1] = mat_fast_helper_a(vec_distance_xy(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
-        w.f[0] = D_L07_001B1758 * 0.017453294f;
+        w.f[2] = mat_fast_helper_a(o->pos[0] - g_hero_l07_state_block.pos[0], o->pos[1] - g_hero_l07_state_block.pos[1]);
+        w.f[1] = mat_fast_helper_a(vec_distance_xy(&x, g_hero_l07_state_block.pos), g_hero_l07_state_block.pos[2] - x.f[2]);
+        w.f[0] = g_ship_angular_speed_deg * 0.017453294f;
         cam_set_state_rotation(&w);
 
         moby_build_matrix(o);

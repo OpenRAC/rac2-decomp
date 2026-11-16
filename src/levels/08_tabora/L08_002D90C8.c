@@ -11,7 +11,7 @@ extern void func_2F9DF0(void *, void *, void *);
 
 extern f32 func_2F9FD0(void *, void *);
 
-extern int *D_L08_001FE7C0[];
+extern int *g_path_list_table[];
 
 extern float vec_distance_xy(void *, void *);
 
@@ -21,13 +21,13 @@ extern float coll_box_max_depth_faces(ti_word *, int, float);
 
 extern float coll_box_max_depth_edges(ti_word *, int, float);
 
-extern char D_L08_002A0D00[];
+extern char g_water_spawn_table_zero[];
 
-extern char *D_L08_001B2ACC __attribute__((sda));
+extern char *g_collision_box_table __attribute__((sda));
 
-extern char *D_L08_001B2AD4 __attribute__((sda));
+extern char *g_collision_face_table __attribute__((sda));
 
-extern char *D_L08_001B2ADC __attribute__((sda));
+extern char *g_collision_edge_table __attribute__((sda));
 
 extern void render_water_grids(void *, int);
 
@@ -65,7 +65,7 @@ float coll_box_max_depth_all(ti_word *object, int index, float minimum) {
     float stepX, stepY, stepZ;
 
     if (index == -1) return minimum;
-    entry = (char *)D_L08_001B2ACC + index * 128;
+    entry = (char *)g_collision_box_table + index * 128;
     for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f)
         for (stepY = -1.0f; stepY <= 1.0f; stepY += 1.0f)
             for (stepX = -1.0f; stepX <= 1.0f; stepX += 1.0f)
@@ -79,7 +79,7 @@ float coll_box_max_depth_faces(ti_word *object, int index, float minimum) {
     float sign;
 
     if (index == -1) return minimum;
-    entry = (char *)D_L08_001B2AD4 + index * 128;
+    entry = (char *)g_collision_face_table + index * 128;
     for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
         minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, 0.0f, 0.0f, sign);
     for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
@@ -95,7 +95,7 @@ float coll_box_max_depth_edges(ti_word *object, int index, float minimum) {
     float stepX, stepY, stepZ;
 
     if (index == -1) return minimum;
-    entry = (char *)D_L08_001B2ADC + index * 128;
+    entry = (char *)g_collision_edge_table + index * 128;
     for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f) {
         for (stepX = -1.0f; stepX <= 1.0f; stepX += 2.0f)
             minimum = coll_box_corner_max_dist((char *)object, entry, entry + 0x30, minimum, 0.0f, stepX, stepZ);
@@ -110,7 +110,7 @@ float coll_plane_list_max_depth(ti_word *object, int index, float minimum) {
     int *planeList;
     int i;
     if (index == -1) return minimum;
-    planeList = D_L08_001FE7C0[index];
+    planeList = g_path_list_table[index];
 
     for (i = 0; i < *planeList; i++) {
         float planeValue = vec_distance_xy((char *)(planeList + 4) + i * 0x10, object);
@@ -141,12 +141,12 @@ float coll_point_depth_in_volumes(ti_word *point, int planeListIndex, int corner
 
 /* Starts the shared effect with the level effect table. */
 void water_start_effect(void) {
-    render_water_grids(D_L08_002A0D00, 7);
+    render_water_grids(g_water_spawn_table_zero, 7);
 }
 
 /* Stops the shared effect with the level effect table. */
 void water_stop_effect(void) {
-    water_start_ripple_patch(D_L08_002A0D00, 7);
+    water_start_ripple_patch(g_water_spawn_table_zero, 7);
 }
 
 /* Moves the object's two attached parts to the object. */

@@ -11,31 +11,31 @@ extern void text_draw_window_large(char *, long long, char *, int);
 extern void text_draw_window_small(char *, long long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int arena_get_challenge_save_index(int);
-extern unsigned char D_001395B8[0x100];
-extern unsigned char D_US2_001A7BBC;
-extern int D_US2_L02_001B1460[2] __attribute__((sda));
-extern float D_US2_L02_001B1458 __attribute__((sda));
-extern int D_US2_L02_001B145C __attribute__((sda));
-extern int D_US2_L02_001B1478 __attribute__((sda));
-extern int D_US2_L02_001B147C __attribute__((sda));
-extern int D_US2_L02_001B1480 __attribute__((sda));
-extern int D_US2_L02_001B1484 __attribute__((sda));
-extern int D_US2_L02_001B1488 __attribute__((sda));
-extern int D_US2_L02_001B148C __attribute__((sda));
-extern int D_US2_L02_001B1490 __attribute__((sda));
-extern int D_US2_L02_001B1498 __attribute__((sda));
-extern int D_US2_L02_001B14A8 __attribute__((sda));
-extern int D_US2_L02_001B149C;
-extern int D_US2_L02_001B14A0;
-extern int D_US2_L02_001B14A4;
-extern float D_US2_L02_001B3E04;
-extern int D_US2_L02_001B3E00;
-extern char D_US2_L02_001B11E8[];
-extern char D_US2_L02_0028EA10[];
+extern unsigned char g_game_flag_table[0x100];
+extern unsigned char g_display_mode_index;
+extern int g_text_l02_x_by_mode_2[2] __attribute__((sda));
+extern float g_text_l02_print_scale_2 __attribute__((sda));
+extern int g_text_l02_print_color_2 __attribute__((sda));
+extern int g_text_l02_window_coord_a_2 __attribute__((sda));
+extern int g_text_l02_window_large_param_2 __attribute__((sda));
+extern int g_font_l02_window_flags_a_2 __attribute__((sda));
+extern int g_text_l02_window_coord_b_2 __attribute__((sda));
+extern int g_text_l02_window_small_param_2 __attribute__((sda));
+extern int g_font_l02_window_flags_b_2 __attribute__((sda));
+extern int g_text_l02_window_coord_c_2 __attribute__((sda));
+extern int g_text_l02_window_coord_d_2 __attribute__((sda));
+extern int g_font_l02_window_param_c_2 __attribute__((sda));
+extern int g_text_l02_window_coord_e_2;
+extern int g_font_l02_window_param_a_2;
+extern int g_font_l02_window_param_b_2;
+extern float g_text_l02_layout_scale_2;
+extern int g_text_l02_layout_mode_2;
+extern char g_str_text_format[];
+extern char g_str_l02_effect_texture_2[];
 
 static __inline__ int scaled_coord(int value, float scale, float half, int active)
 {
-    int mode = D_US2_L02_001B3E00;
+    int mode = g_text_l02_layout_mode_2;
     float scaled = (float)value * scale + half;
     int result = (int)scaled;
 
@@ -62,37 +62,37 @@ void func_US2_L02_00400E04(char *a0) {
     state = *(char **)(a0 + 0x68);
     text = (char *)GetLocalizedString(0x2DDB);
     one = 1;
-    s = D_US2_L02_001B3E04;
-    x = (float)D_US2_L02_001B1460[D_US2_001A7BBC];
-    r0 = scaled_coord(D_US2_L02_001B1478, s, half, one);
-    FontPrintScaled(x, (float)r0, D_US2_L02_001B145C, text, D_US2_L02_001B1458, -1,
-                  GetEffectTextureDescriptor(1), D_US2_L02_0028EA10);
-    s = D_US2_L02_001B3E04;
-    r1 = scaled_coord(D_US2_L02_001B1498, s, half, one);
-    r2 = scaled_coord(D_US2_L02_001B149C, s, half, one);
-    r3 = scaled_coord(D_US2_L02_001B1484, s, half, one);
-    FontSetWindow(buf1, r1, r2, D_US2_L02_001B14A0, D_US2_L02_001B14A4, D_US2_L02_001B1480, r3,
-                  D_US2_L02_001B14A8, 3);
-    if (*(short *)(state + 0x118) == 0 && D_001395B8[arena_get_challenge_save_index(0)] < 2) {
+    s = g_text_l02_layout_scale_2;
+    x = (float)g_text_l02_x_by_mode_2[g_display_mode_index];
+    r0 = scaled_coord(g_text_l02_window_coord_a_2, s, half, one);
+    FontPrintScaled(x, (float)r0, g_text_l02_print_color_2, text, g_text_l02_print_scale_2, -1,
+                  GetEffectTextureDescriptor(1), g_str_l02_effect_texture_2);
+    s = g_text_l02_layout_scale_2;
+    r1 = scaled_coord(g_text_l02_window_coord_d_2, s, half, one);
+    r2 = scaled_coord(g_text_l02_window_coord_e_2, s, half, one);
+    r3 = scaled_coord(g_text_l02_window_coord_b_2, s, half, one);
+    FontSetWindow(buf1, r1, r2, g_font_l02_window_param_a_2, g_font_l02_window_param_b_2, g_font_l02_window_flags_a_2, r3,
+                  g_font_l02_window_param_c_2, 3);
+    if (*(short *)(state + 0x118) == 0 && g_game_flag_table[arena_get_challenge_save_index(0)] < 2) {
         text = (char *)GetLocalizedString(0x2DDC);
-        text_draw_window_large(buf1, D_US2_L02_001B147C, text, func_001157AC(text));
+        text_draw_window_large(buf1, g_text_l02_window_large_param_2, text, func_001157AC(text));
     } else {
         text = (char *)GetLocalizedString(0x2DF8);
         msg = (char *)GetLocalizedString(0x2DF4);
-        sprintf(buf2, D_US2_L02_001B11E8, text, *(int *)(state + 0x110), msg);
-        text_draw_window_large(buf1, D_US2_L02_001B147C, buf2, func_001157AC(buf2));
+        sprintf(buf2, g_str_text_format, text, *(int *)(state + 0x110), msg);
+        text_draw_window_large(buf1, g_text_l02_window_large_param_2, buf2, func_001157AC(buf2));
     }
     text = (char *)GetLocalizedString(0x2DDD);
     {
         float half = 0.5f;
         int one = 1;
 
-        s = D_US2_L02_001B3E04;
-        r1 = scaled_coord(D_US2_L02_001B1498, s, half, one);
-        r2 = scaled_coord(D_US2_L02_001B149C, s, half, one);
-        r3 = scaled_coord(D_US2_L02_001B1490, s, half, one);
-        FontSetWindow(buf1, r1, r2, D_US2_L02_001B14A0, D_US2_L02_001B14A4, D_US2_L02_001B148C, r3,
-                      D_US2_L02_001B14A8, 3);
+        s = g_text_l02_layout_scale_2;
+        r1 = scaled_coord(g_text_l02_window_coord_d_2, s, half, one);
+        r2 = scaled_coord(g_text_l02_window_coord_e_2, s, half, one);
+        r3 = scaled_coord(g_text_l02_window_coord_c_2, s, half, one);
+        FontSetWindow(buf1, r1, r2, g_font_l02_window_param_a_2, g_font_l02_window_param_b_2, g_font_l02_window_flags_b_2, r3,
+                      g_font_l02_window_param_c_2, 3);
     }
-    text_draw_window_small(buf1, D_US2_L02_001B1488, text, func_001157AC(text));
+    text_draw_window_small(buf1, g_text_l02_window_small_param_2, text, func_001157AC(text));
 }

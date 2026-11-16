@@ -20,15 +20,15 @@ extern void group_alert_peers_type_b(void *);
 extern int moby_count_group_not_in_state(int,int);
 extern int weapon_select_aim_target(void *,int,void *,float,float,int);
 extern void group_destroy_attached_parts(void *,void *);
-extern void func_PAL_002AD288(void *,void *,int,float,float);
-extern void func_PAL_002A7650(void *,int,int);
+extern void part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
+extern void SetDeathBits_pal(void *,int,int);
 extern void enemy_destroy_child_cleanup_b(void *);
-extern float D_001BAFA8 NOT_SDA;
-extern int D_001B1B78 MACRO_ADDR;
-extern char *D_001B1B5C MACRO_ADDR;
-extern char *D_001B1C4C MACRO_ADDR;
+extern float g_coll_ground_height NOT_SDA;
+extern int g_moby_group_count MACRO_ADDR;
+extern char *g_moby_pool_start MACRO_ADDR;
+extern char *g_vec_record_table MACRO_ADDR;
 extern char g_camera_eye_state[];
-extern unsigned short *D_001EE5A0[];
+extern unsigned short *g_moby_group_lists[];
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
@@ -69,7 +69,7 @@ int func_PAL_00326010(char *self)
         moby_transform_joint_to_world(self,3,d+0x300);
         F(d,0x308)+=20.0f;
         moby_transform_joint_to_world(self,3,d+0x310);
-        if(CollLine(d+0x310,d+0x300,0,self,0)) F(d,0x308)=D_001BAFA8;
+        if(CollLine(d+0x310,d+0x300,0,self,0)) F(d,0x308)=g_coll_ground_height;
         if(!I(d,0x27C) && I(d,0x288)==-1) {
             F(self,0x18)=coll_probe_ground_height_below(self+0x10,0,0.5f);
             moby_set_state(self,1,0);
@@ -94,7 +94,7 @@ int func_PAL_00326010(char *self)
         }
         if(I(d,0x288)!=-1) {
             moby_set_state(self,2,0);
-            qcopy(d+0x300,D_001B1C4C+(I(d,0x288)<<7)+0x30);
+            qcopy(d+0x300,g_vec_record_table+(I(d,0x288)<<7)+0x30);
             B(self,0x30)=128;
         }
         enemy_spawn_child_parts(self,d+0x2A0,0,2);
@@ -109,10 +109,10 @@ int func_PAL_00326010(char *self)
         F(d,0x30)=0.5f;
         if(result==5) { I(d,0xF0)=0; F(d,0xF4)=1.0053098f; }
         group_alert_peers_type_b(self);
-        if((result==4 || result==5 || changed) && B(self,0x21)<=D_001B1B78 && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+        if((result==4 || result==5 || changed) && B(self,0x21)<=g_moby_group_count && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
+            list=g_moby_group_lists[B(self,0x21)];
             for (;;) {
-                peer=D_001B1B5C+((*list&0x7FFF)<<8);
+                peer=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if (*(short *)(peer+0xAA)==0xB0A) {
                     pd=P(peer,0x68);
                     if (!I(pd,0x294)) { I(pd,0x294)=1; break; }
@@ -126,12 +126,12 @@ int func_PAL_00326010(char *self)
         }
     }
     qcopy(pos,self+0x10);
-    if(F(self,0x18)-coll_probe_ground_height_below(pos,0,0.5f)>20.0f && B(self,0x21)<=D_001B1B78 && !I(d,0x2C8)) {
+    if(F(self,0x18)-coll_probe_ground_height_below(pos,0,0.5f)>20.0f && B(self,0x21)<=g_moby_group_count && !I(d,0x2C8)) {
         I(d,0x2C8)=1;
         if(moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+            list=g_moby_group_lists[B(self,0x21)];
             for (;;) {
-                peer=D_001B1B5C+((*list&0x7FFF)<<8);
+                peer=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if (*(short *)(peer+0xAA)==0xB0A) {
                     pd=P(peer,0x68);
                     if (!I(pd,0x294)) { I(pd,0x294)=1; break; }
@@ -149,8 +149,8 @@ int func_PAL_00326010(char *self)
     I(d,0x25C)=weapon_select_aim_target(self,I(d,0x254),0,F(d,0x26C),10.0f,0);
     if(F(self,0x18)<90.0f) {
         group_destroy_attached_parts(self,d+0x2A0);
-        func_PAL_002AD288(self,self+0x10,-1,0.5f,13.0f);
-        func_PAL_002A7650(self,0,3);
+        part_spawn_explosion_with_sparks_pal(self,self+0x10,-1,0.5f,13.0f);
+        SetDeathBits_pal(self,0,3);
         return 1;
     }
     if(changed) {enemy_destroy_child_cleanup_b(self); return 1;}

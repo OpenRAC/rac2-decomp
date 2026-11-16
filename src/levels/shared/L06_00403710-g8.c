@@ -19,8 +19,8 @@ typedef struct {
 } HeroState;
 extern HeroState g_hero_state;
 extern s32 g_current_map_index;
-extern float D_L06_001B0090 __attribute__((sda));
-extern float D_L06_001B9858 NOT_SDA;
+extern float g_lift_path_offset __attribute__((sda));
+extern float g_hero_lift_angle NOT_SDA;
 extern s32 FloatToInt(float);
 extern void moby_mark_spawned(void *);
 extern s32 math_random_int_below(s32);
@@ -92,7 +92,7 @@ void hero_lift_update(char *obj)
             data->point = math_random_int_below(I(g_path_list[data->path],0));
             data->timeout = 600;
             if (B(obj,0x43) != 1) anim_start_blended(obj,1,0,10);
-            F(obj,0x18) = F(g_path_list[data->path],0x18) - D_L06_001B0090;
+            F(obj,0x18) = F(g_path_list[data->path],0x18) - g_lift_path_offset;
             data->pathZ = F(obj,0x18);
             B(obj,0x20) = 1;
         }
@@ -112,10 +112,10 @@ void hero_lift_update(char *obj)
         if (math_fabs(g_hero_state.height-data->homeZ)<0.8f && g_hero_state.action==18 && !IsPointInCuboid((char *)&g_hero_state+0x80,data->range)) {
             if (data->wait == 0) {
                 F(obj,0xF4) = -1.5533431768417358f;
-                F(obj,0xF8) = FastAddRotations(D_L06_001B9858,1.5707964897155762f);
+                F(obj,0xF8) = FastAddRotations(g_hero_lift_angle,1.5707964897155762f);
                 euler_rotation_basis(obj+0xC0,obj+0xF0);
                 qcopy(obj+0x10,(char *)&g_hero_state+0x80);
-                vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+                vec_scale_to_length(pos,obj+0xE0,g_lift_path_offset);
                 FastVecSub(obj+0x10,obj+0x10,pos);
                 data->speed = 0.13333334028720856f;
                 H(obj,0x34) &= 0xFFFE;
@@ -150,10 +150,10 @@ void hero_lift_update(char *obj)
                 data->speed -= 0.0055555556900799274f;
         }
         if (data->speed<0.03333333507180214f) {
-            vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+            vec_scale_to_length(pos,obj+0xE0,g_lift_path_offset);
             math_approach_target_with_direction_mode((float *)(obj+0xF4),1.5533431768417358f,0.0034906589426100254f,0.0034906589426100254f,0.41887909173965454f,&data->turn,0);
             euler_rotation_basis(obj+0xC0,obj+0xF0);
-            vec_scale_to_length(step,obj+0xE0,D_L06_001B0090);
+            vec_scale_to_length(step,obj+0xE0,g_lift_path_offset);
             FastVecSub(delta,step,pos);
             FastVecSub(obj+0x10,obj+0x10,delta);
         }

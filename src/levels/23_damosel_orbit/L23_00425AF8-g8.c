@@ -8,7 +8,7 @@ extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float FastVecLength(void *);
-extern int D_L23_001B19DC __attribute__((sda));
+extern int g_effect_texture_index __attribute__((sda));
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI orders the integer and FP banks independently: count is a3,
  * and coreWidth, width and extend are f12, f13 and f14. */
@@ -20,7 +20,7 @@ void DrawColoredRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float 
     u32 coreColor, haloColor;
     /* Initialization and the two loops have separate zero-value lifetimes. */
     const float zero = 0.0f;
-    core.texture = GetEffectTextureDescriptor(D_L23_001B19DC);
+    core.texture = GetEffectTextureDescriptor(g_effect_texture_index);
     coreColor = baseColor | (alpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;

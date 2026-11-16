@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -14,10 +14,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L26_001AC810 __attribute__((sda));
-extern int D_L26_001B23B0 __attribute__((sda)), D_L26_001B23B8 __attribute__((sda));
-extern Collision D_L26_001BEFC0;
-extern Material D_L26_002622F0[];
+extern int g_thrown_l26_model_id __attribute__((sda));
+extern int g_ripple_l26_x __attribute__((sda)), g_ripple_l26_y __attribute__((sda));
+extern Collision g_projectile_l26_collision;
+extern Material g_item_l26_materials[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -64,21 +64,21 @@ typedef struct {
     char gap46[0x18C - 0x46];
     char *parts[0];
 } Hero;
-extern Hero D_L26_001BC880;
+extern Hero g_hero_part_state;
 typedef struct { char pad[0x34]; unsigned short flags; char gap[0xAA - 0x36]; short id; } Object;
 extern int g_current_map_index[] __attribute__((sda));
-extern float D_L26_001A9450[][4] SDATA(D_L26_001A9450);
+extern float g_part_offset_positions[][4] SDATA(D_L26_001A9450);
 /* Min/max pairs: the first three lower bounds are read through $gp, every other bound absolute.
    The upper bounds are the second words of their pairs ([1]); the offset form keeps those absolute
    macro loads out of call delay slots, as in retail. */
-extern float D_L26_001A9420[] __attribute__((sda));
+extern float g_part_acceleration_params[] __attribute__((sda));
 extern float D_L26_001A9420_gp SDATA(D_L26_001A9420);
-extern unsigned int D_L26_001A9428[] __attribute__((sda));
+extern unsigned int g_part_color_range[] __attribute__((sda));
 extern unsigned int D_L26_001A9428_gp SDATA(D_L26_001A9428);
-extern int D_L26_001A9430[] __attribute__((sda));
+extern int g_part_kind_range[] __attribute__((sda));
 extern int D_L26_001A9430_gp SDATA(D_L26_001A9430);
-extern int D_L26_001A9438[] __attribute__((sda));
-extern int D_L26_001A9440[] __attribute__((sda));
+extern int g_part_duration_range[] __attribute__((sda));
+extern int g_part_size_range[] __attribute__((sda));
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
@@ -109,8 +109,8 @@ void hero_update_part_objects(void) {
     int j;
     int flags = -1;
     anim_start_startup_animations();
-    for (i = 0; i < D_L26_001BC880.count; i++) {
-        hero = &D_L26_001BC880;
+    for (i = 0; i < g_hero_part_state.count; i++) {
+        hero = &g_hero_part_state;
         slot = &hero->parts[i];
         object = *slot;
         if (object && ((Object *)object)->id == 0xE29 /* moby class 3625 */) {
@@ -121,23 +121,23 @@ void hero_update_part_objects(void) {
             math_store_angle_update_result(object, (float *)(*(char **)(object + 0x68) + 0xC),
                               (int)0x80AAAAD2, (int)0x80396464, 0.061086535f);
     }
-    if (g_current_map_index[0] == 26 && D_L26_001BC880.mode == 0 && D_L26_001BC880.timer < 260) {
-        object = D_L26_001BC880.parts[3];
+    if (g_current_map_index[0] == 26 && g_hero_part_state.mode == 0 && g_hero_part_state.timer < 260) {
+        object = g_hero_part_state.parts[3];
         moby_transform_joint_point(object, 0, (char *)transform);
         object += 0x10;
         qcopy((transform + 3), object);
         for (j = 0; j < 8; j++) {
-            transform_vector(&position, D_L26_001A9450[j & 1], transform);
+            transform_vector(&position, g_part_offset_positions[j & 1], transform);
             vec_scale_to_length(&velocity, transform, 0.06666667f);
             velocity.f[3] = D_L26_001A9420_gp;
             qzero_nc(&acceleration);
-            acceleration.f[3] = D_L26_001A9420[1];
-            color = FastTweenColor(D_L26_001A9428_gp, D_L26_001A9428[1], math_random_float_range(0.0f, 1.0f));
+            acceleration.f[3] = g_part_acceleration_params[1];
+            color = FastTweenColor(D_L26_001A9428_gp, g_part_color_range[1], math_random_float_range(0.0f, 1.0f));
             {
                 unsigned int rgb = color & 0xFFFFFF;
-                kind = math_random_int_range(D_L26_001A9430_gp, D_L26_001A9430[1]);
-                duration = math_random_int_range(D_L26_001A9438[0], D_L26_001A9438[1]);
-                size = math_random_int_range(D_L26_001A9440[0], D_L26_001A9440[1]);
+                kind = math_random_int_range(D_L26_001A9430_gp, g_part_kind_range[1]);
+                duration = math_random_int_range(g_part_duration_range[0], g_part_duration_range[1]);
+                size = math_random_int_range(g_part_size_range[0], g_part_size_range[1]);
                 effect = part_spawn_trail(&position, &velocity, &acceleration, color, rgb,
                                        kind, duration, size, flags);
                 if (effect) effect[9] = FloatToInt(2.0f) - 16;
@@ -206,7 +206,7 @@ void projectile_update_thrown(unsigned char *moby) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L26_002622F0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l26_materials + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -218,14 +218,14 @@ void projectile_update_thrown(unsigned char *moby) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L26_001B23B0, D_L26_001B23B8, 1,
+            RippleDisturb(g_ripple_l26_x, g_ripple_l26_y, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(moby + 0x10);
             frame.position.f[1] = *(float *)(moby + 0x14);
-            frame.position.f[2] = D_L26_001BEFC0.point.f[2];
+            frame.position.f[2] = g_projectile_l26_collision.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -245,16 +245,16 @@ void projectile_update_thrown(unsigned char *moby) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L26_001BEFC0;
+            Collision *collision = &g_projectile_l26_collision;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L26_001BEFC0;
+                reread = &g_projectile_l26_collision;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L26_001AC810 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_thrown_l26_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
@@ -316,7 +316,7 @@ void projectile_update_bouncing_aged(char *moby) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L26_002622F0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l26_materials)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -326,16 +326,16 @@ void projectile_update_bouncing_aged(char *moby) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
-        collision = &D_L26_001BEFC0;
+        collision = &g_projectile_l26_collision;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L26_001BEFC0;
+            reread = &g_projectile_l26_collision;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L26_001AC810 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_thrown_l26_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             moby[0xBC] = 1;
             {
@@ -347,7 +347,7 @@ void projectile_update_bouncing_aged(char *moby) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L26_001BEFC0;
+            collision = &g_projectile_l26_collision;
             if (collision->count <= 0)
                 goto finish;
             moby[0xBC] = 1;
@@ -387,7 +387,7 @@ extern int FastDecTimer(short *);
 extern void group_sync_counter(void *, void *);
 extern float FastAddRotations(float, float);
 extern void enemy_attach_turn_child_parts(float, void *, void *, int, void *);
-extern char D_L26_001A8F20[];
+extern char g_str_ground_effect_name[];
 
 
 

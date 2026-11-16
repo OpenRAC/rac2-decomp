@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern float D_L17_001B0240 __attribute__((sda));
+extern float g_anchor_move_seconds __attribute__((sda));
 
 extern void FastVecSub(float *, float *, float *);
 
@@ -33,7 +33,7 @@ void platform_place_on_path_by_timer(char *object_in, char *path_in, char *old_p
     vars = *(char **)(moby + 0x68);
     value = *(f32 *)(vars + 0xA8);
     value = value * 3.1415929f;
-    value = value / (D_L17_001B0240 * 60.0f);
+    value = value / (g_anchor_move_seconds * 60.0f);
     wave = math_fast_sin_or_cos_a(value);
     ease = 1.0f - wave;
     ease = ease * 0.5f;

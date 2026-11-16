@@ -18,20 +18,20 @@ typedef struct {
     int c;
 } Cfg_390F28;
 
-extern int D_L00_001A8A44 __attribute__((section(".sdata")));
-extern float D_L00_001B1984 __attribute__((section(".sdata")));
-extern float D_L00_001B1988 __attribute__((section(".sdata")));
-extern float D_L00_001B198C __attribute__((section(".sdata")));
-extern float D_L00_001B1990 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1980 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1981 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1982 __attribute__((section(".sdata")));
-extern float D_L00_001B2500 __attribute__((section(".sdata")));
-extern float D_L00_001B2408 __attribute__((section(".sdata")));
-extern int D_L00_001B1EB4 __attribute__((section(".sdata")));
-extern int D_L00_001B20C0 __attribute__((section(".sdata")));
-extern int D_L00_001B255C __attribute__((section(".sdata")));
-extern Cfg_390F28 D_L00_001BD2C0;
+extern int g_lighting_saved_flag __attribute__((section(".sdata")));
+extern float g_fog_near __attribute__((section(".sdata")));
+extern float g_fog_far __attribute__((section(".sdata")));
+extern float g_fog_near_intensity __attribute__((section(".sdata")));
+extern float g_fog_far_intensity __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_r __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_g __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_b __attribute__((section(".sdata")));
+extern float g_light_far_param __attribute__((section(".sdata")));
+extern float g_light_falloff_param __attribute__((section(".sdata")));
+extern int g_light_scale_first __attribute__((section(".sdata")));
+extern int g_light_distance_param __attribute__((section(".sdata")));
+extern int g_light_scale_second __attribute__((section(".sdata")));
+extern Cfg_390F28 g_hud_float_params;
 extern void SetBackgroundColor(int, int, int);
 
 /* Restores the lighting and fog settings saved by func_L00_00390E10; when full is set it also resets the view range. */
@@ -39,20 +39,20 @@ void level_restore_lighting(char *object, int full)
 {
     State_390F28 *st = *(State_390F28 **)(object + 0x68);
 
-    D_L00_001A8A44 = 0;
-    D_L00_001B1984 = st->f30;
-    D_L00_001B1988 = st->f34;
-    D_L00_001B198C = st->f38;
-    D_L00_001B1990 = st->f3C;
-    D_L00_001B1980 = st->b40;
-    D_L00_001B1981 = st->b41;
-    D_L00_001B1982 = st->b42;
+    g_lighting_saved_flag = 0;
+    g_fog_near = st->f30;
+    g_fog_far = st->f34;
+    g_fog_near_intensity = st->f38;
+    g_fog_far_intensity = st->f3C;
+    g_fog_color_r = st->b40;
+    g_fog_color_g = st->b41;
+    g_fog_color_b = st->b42;
     if (full) {
-        D_L00_001B2500 = 983040.0f;
-        D_L00_001B2408 = 500.0f;
-        D_L00_001B255C = 0x3C0;
-        D_L00_001B1EB4 = 0x3C0;
-        D_L00_001B20C0 = 0x1F4000;
+        g_light_far_param = 983040.0f;
+        g_light_falloff_param = 500.0f;
+        g_light_scale_second = 0x3C0;
+        g_light_scale_first = 0x3C0;
+        g_light_distance_param = 0x1F4000;
     }
-    SetBackgroundColor(D_L00_001BD2C0.a, D_L00_001BD2C0.b, D_L00_001BD2C0.c);
+    SetBackgroundColor(g_hud_float_params.a, g_hud_float_params.b, g_hud_float_params.c);
 }

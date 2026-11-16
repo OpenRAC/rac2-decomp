@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L00_001AA1D4 __attribute__((sda));
-extern int D_L00_001AA1D8 __attribute__((sda));
+extern int g_ping_pong_counter_a __attribute__((sda));
+extern int g_ping_pong_counter_b __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 
 /* Blends between two values, ping-ponging back and forth over a span of steps with a shared counter. */
 int math_ping_pong_blend_values(int first, int second, int span, int mode, int reset)
 {
-    int *counter = &D_L00_001AA1D8;
+    int *counter = &g_ping_pong_counter_b;
     int phase;
     float amount;
-    if (mode == 0) counter = &D_L00_001AA1D4;
+    if (mode == 0) counter = &g_ping_pong_counter_a;
     ++*counter;
     if (reset)
         *counter = 0;

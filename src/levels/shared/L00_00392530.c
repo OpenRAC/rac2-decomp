@@ -19,15 +19,15 @@ typedef struct {
 extern Hero g_hero_state;
 extern u32 g_pad_state[];
 extern u8 g_sound_state[];
-extern float D_0025C64C NOT_SDA;
-extern u8 D_0013957A[];
+extern float g_beam_damping_factor NOT_SDA;
+extern u8 g_tesla_claw_weapon_index[];
 typedef struct { u8 pad[4]; u8 flag; u8 rest[0xDB]; } LevelInfo;
 extern LevelInfo g_weapon_l00_table[];
 typedef struct { float color[3]; float pad; float pos[3]; float radius; } Light;
-extern Light D_L00_001C6F40[];
-extern int D_L00_001AF130 __attribute__((sda)), D_L00_001B2748 __attribute__((sda));
-extern u32 D_001A7390, g_current_map_index;
-extern Statistics D_0018C360[], g_progress_statistics[];
+extern Light g_light_table[];
+extern int g_tesla_claw_active __attribute__((sda)), g_tether_beam_cooldown __attribute__((sda));
+extern u32 g_frame_counter, g_current_map_index;
+extern Statistics g_statistics_table[], g_progress_statistics[];
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern int math_fast_float_d(int *), FastDecTimer(short *);
@@ -57,7 +57,7 @@ void tesla_claw_update(char *actor) {
     stopping = g_hero_state.i[0x1244 / 4] == 3;
     beam = *(DualBeamState **)(actor + 0x68);
     if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) beam->length = 0.8f;
-    D_0025C64C = 0.9f;
+    g_beam_damping_factor = 0.9f;
     active = 0;
     permitted = 1;
     ammo = get_ammo(-1);
@@ -121,7 +121,7 @@ void tesla_claw_update(char *actor) {
                     beam->secondaryReady = 0;
                 }
             } else beam->secondaryAge = 0;
-            beam->length += (((g_weapon_l00_table + D_0013957A[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.07f;
+            beam->length += (((g_weapon_l00_table + g_tesla_claw_weapon_index[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.07f;
             if (g_hero_state.h[0x24EC / 2] == 1) {
                 moby_transform_joint_to_world(actor, 0, &beam->start);
                 local[0] = 0;
@@ -153,7 +153,7 @@ void tesla_claw_update(char *actor) {
         beam->secondaryReady = 0;
     }
     if (!active) {
-        D_L00_001AF130 = 1;
+        g_tesla_claw_active = 1;
         if (beam->fade > 0) beam->fade--;
         if (beam->sound != -1) {
             sound = g_sound_state + beam->sound * 0x70;
@@ -173,7 +173,7 @@ void tesla_claw_update(char *actor) {
     case 0:
         beam->timer = 16;
         beam->light = gfx_add_point_light(&beam->start, 0, 0, 0);
-        D_L00_001AF130 = 1;
+        g_tesla_claw_active = 1;
         actor[0x20] = 1;
         beam->cooldown = 20;
         beam->sound = -1;
@@ -183,7 +183,7 @@ void tesla_claw_update(char *actor) {
         beam->secondaryReady = 0;
         beam->secondaryTimer = 0;
         beam->targetTimer = 0;
-        D_L00_001B2748 = 10;
+        g_tether_beam_cooldown = 10;
         break;
     case 1:
         math_fast_float_d(&beam->timer);
@@ -193,9 +193,9 @@ void tesla_claw_update(char *actor) {
         }
         if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) {
             if (active) {
-                if (D_0018C360[18].count < 0xFFFF) D_0018C360[18].count++;
-                if (D_001A7390 > D_0018C360[18].maximum) D_0018C360[18].maximum = D_001A7390;
-                D_0018C360[18].levels = (D_0018C360[18].levels | (1u << g_current_map_index)) | 0x80000000u;
+                if (g_statistics_table[18].count < 0xFFFF) g_statistics_table[18].count++;
+                if (g_frame_counter > g_statistics_table[18].maximum) g_statistics_table[18].maximum = g_frame_counter;
+                g_statistics_table[18].levels = (g_statistics_table[18].levels | (1u << g_current_map_index)) | 0x80000000u;
                 start_equipped_item_animation();
                 actor[0x20] = 3;
             } else {
@@ -214,7 +214,7 @@ void tesla_claw_update(char *actor) {
         if (g_hero_state.i[0x1D8 / 4] > 70) {
             if (g_progress_statistics[26].count < 0xFFFF) g_progress_statistics[26].count++;
         }
-        if (D_001A7390 > g_progress_statistics[26].maximum) g_progress_statistics[26].maximum = D_001A7390;
+        if (g_frame_counter > g_progress_statistics[26].maximum) g_progress_statistics[26].maximum = g_frame_counter;
         g_progress_statistics[26].levels = (g_progress_statistics[26].levels | (1u << g_current_map_index)) | 0x80000000u;
         if (g_hero_state.i[0x1D8 / 4] < 30) g_hero_state.b[0x22C5]++;
         else g_hero_state.b[0x22C5] = 0;
@@ -236,14 +236,14 @@ void tesla_claw_update(char *actor) {
         direction.f[0] = 2;
         direction.f[2] = 2;
         matrix_mul_vec3(&direction, &direction, &g_hero_state.f[0x730 / 4]);
-        (D_L00_001C6F40 + beam->light)->pos[0] = g_hero_state.f[0x80 / 4] + direction.f[0];
-        (D_L00_001C6F40 + beam->light)->pos[1] = g_hero_state.f[0x84 / 4] + direction.f[1];
-        (D_L00_001C6F40 + beam->light)->pos[2] = g_hero_state.f[0x88 / 4] + direction.f[2];
-        (D_L00_001C6F40 + beam->light)->radius = 7.5f;
+        (g_light_table + beam->light)->pos[0] = g_hero_state.f[0x80 / 4] + direction.f[0];
+        (g_light_table + beam->light)->pos[1] = g_hero_state.f[0x84 / 4] + direction.f[1];
+        (g_light_table + beam->light)->pos[2] = g_hero_state.f[0x88 / 4] + direction.f[2];
+        (g_light_table + beam->light)->radius = 7.5f;
         fade = IntToFloat(beam->fade) * 0.1f;
-        (D_L00_001C6F40 + beam->light)->color[2] = fade;
-        (D_L00_001C6F40 + beam->light)->color[1] = fade * 0.7f;
-        (D_L00_001C6F40 + beam->light)->color[0] = (D_L00_001C6F40 + beam->light)->color[1];
+        (g_light_table + beam->light)->color[2] = fade;
+        (g_light_table + beam->light)->color[1] = fade * 0.7f;
+        (g_light_table + beam->light)->color[0] = (g_light_table + beam->light)->color[1];
         if (stopping && beam->light != -1) {
             gfx_free_point_light(beam->light);
             beam->light = -1;

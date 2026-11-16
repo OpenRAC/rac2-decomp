@@ -11,7 +11,7 @@ extern f32 ref_L00_003DC1C0_05(f32, f32);
 extern void ref_L00_003DC1C0_06(s32, s32, s32, f32);
 extern void ref_L00_003DC1C0_07(s32, s32, s32, s32, f32, f32, f32, f32);
 
-s32 func_PAL_L00_003E0390(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+s32 weapon_throw_along_camera_arc_pal(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s8 *b;
     s32 temp_s0;
     s32 temp_s1;

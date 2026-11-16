@@ -6,7 +6,7 @@ extern void mat_get_euler_angles(void *, void *);
 extern int anim_copy_entry_data(void *, int, int, void *);
 extern void mem_copy_aligned(void *, void *, int);
 extern void func_002A0F48(void *);
-extern char D_L22_001B8EC0[];
+extern char g_carry_anim_buffer[];
 
 typedef struct { char pad[0x48]; char *animations[1]; } AnimationTable_b0847;
 
@@ -23,7 +23,7 @@ void companion_update_carry_anim(void) {
         mat_get_euler_angles(matrix, companion + 0xF0);
         *(u16 *)(companion + 0x34) &= 0xFFBE;
         if (*(u8 *)(companion + 0x43) != 0x7A) {
-            char *buf = D_L22_001B8EC0;
+            char *buf = g_carry_anim_buffer;
             companion[0x40] = 1;
             companion[0x42] = 0x7A;
             companion[0x43] = 0x7A;
@@ -35,7 +35,7 @@ void companion_update_carry_anim(void) {
             *(float *)(companion + 0x44) += *(float *)(companion + 0x4C);
         }
         if (*(float *)(companion + 0x44) >= 1.0f) {
-            char *buf = D_L22_001B8EC0;
+            char *buf = g_carry_anim_buffer;
             companion[0x40] = companion[0x41];
             *(void **)(companion + 0x58) = buf;
             mem_copy_aligned(buf, buf + 0x600, 0x600);

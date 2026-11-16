@@ -8,9 +8,9 @@ extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float FastVecLength(void *);
-extern float D_L00_001B0EFC __attribute__((sda)), D_L00_001B0EE4 __attribute__((sda));
-extern int D_L00_001B0F14 __attribute__((sda)), D_L00_001B0F18 __attribute__((sda));
-extern int D_L00_001B0EF0 __attribute__((sda));
+extern float g_beam_ribbon_uv_offset __attribute__((sda)), g_beam_ribbon_width_scale __attribute__((sda));
+extern int g_beam_ribbon_core_texture_id __attribute__((sda)), g_beam_ribbon_halo_texture_id __attribute__((sda));
+extern int g_beam_ribbon_core_color __attribute__((sda));
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The core takes its colour from D_L00_001B0EF0 with alpha coreAlpha; the halo
  * is haloRgb with alpha haloAlpha, fading to haloRgb alone at both ends.
@@ -22,28 +22,28 @@ void DrawScrollingRibbonWithHalo(Vector *points, int coreAlpha, int haloAlpha, f
     float length, initialLength, haloLength, firstLength, lastLength;
     int i;
     int coreColor, haloColor;
-    core.texture = GetEffectTextureDescriptor(D_L00_001B0F14);
-    coreColor = D_L00_001B0EF0 | (coreAlpha << 24);
+    core.texture = GetEffectTextureDescriptor(g_beam_ribbon_core_texture_id);
+    coreColor = g_beam_ribbon_core_color | (coreAlpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
     core.primitive = 0;
     core.color[3] = coreColor; core.color[2] = coreColor;
     core.color[1] = coreColor; core.color[0] = coreColor;
-    halo.texture = GetEffectTextureDescriptor(D_L00_001B0F18);
+    halo.texture = GetEffectTextureDescriptor(g_beam_ribbon_halo_texture_id);
     haloColor = haloRgb | (haloAlpha << 24);
     halo.flags = core.flags; halo.mode = core.mode; halo.primitive = core.primitive;
     halo.color[3] = haloColor; halo.color[2] = haloColor;
     halo.color[1] = haloColor; halo.color[0] = haloColor;
     halo.uv[0] = 0; halo.uv[1] = 0; halo.uv[2] = 0; halo.uv[3] = 1;
     halo.uv[4] = 1; halo.uv[5] = 0; halo.uv[6] = 1; halo.uv[7] = 1;
-    core.uv[0] = D_L00_001B0EFC; core.uv[1] = 0; core.uv[2] = D_L00_001B0EFC; core.uv[3] = 1;
-    core.uv[4] = D_L00_001B0EFC + 1.0f; core.uv[5] = 0; core.uv[6] = D_L00_001B0EFC + 1.0f; core.uv[7] = 1;
+    core.uv[0] = g_beam_ribbon_uv_offset; core.uv[1] = 0; core.uv[2] = g_beam_ribbon_uv_offset; core.uv[3] = 1;
+    core.uv[4] = g_beam_ribbon_uv_offset + 1.0f; core.uv[5] = 0; core.uv[6] = g_beam_ribbon_uv_offset + 1.0f; core.uv[7] = 1;
     FastVecSub(&eye, points, g_camera_l00_position);
     FastVecSub(&tangent, points + 1, points);
     FastVecCross(&normal, &tangent, &eye);
     initialLength = FastVecLength(&normal);
     if (initialLength != 0) initialLength = 1.0f / initialLength;
-    FastVecScale(&normal, &normal, D_L00_001B0EE4 * initialLength);
+    FastVecScale(&normal, &normal, g_beam_ribbon_width_scale * initialLength);
     FastVecAdd(&core.vertex[0], points, &normal);
     FastVecSub(&core.vertex[1], points, &normal);
     for (i = 1; i < count - 1; i++) {
@@ -52,11 +52,11 @@ void DrawScrollingRibbonWithHalo(Vector *points, int coreAlpha, int haloAlpha, f
         FastVecCross(&normal, &tangent, &eye);
         length = FastVecLength(&normal);
         if (length != 0) length = 1.0f / length;
-        FastVecScale(&normal, &normal, D_L00_001B0EE4 * length);
+        FastVecScale(&normal, &normal, g_beam_ribbon_width_scale * length);
         FastVecAdd(&core.vertex[2], points + i, &normal);
         FastVecSub(&core.vertex[3], points + i, &normal);
-        if (i == 1) { core.color[1] = D_L00_001B0EF0; core.color[0] = D_L00_001B0EF0; }
-        else if (i == count - 2) { core.color[3] = D_L00_001B0EF0; core.color[2] = D_L00_001B0EF0; }
+        if (i == 1) { core.color[1] = g_beam_ribbon_core_color; core.color[0] = g_beam_ribbon_core_color; }
+        else if (i == count - 2) { core.color[3] = g_beam_ribbon_core_color; core.color[2] = g_beam_ribbon_core_color; }
         else if (i == 2) { core.color[1] = coreColor; core.color[0] = coreColor; }
         draw_world_quad(&core, 0, 0);
         qcopy(&core.vertex[0], &core.vertex[2]); qcopy(&core.vertex[1], &core.vertex[3]);

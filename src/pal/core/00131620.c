@@ -8,7 +8,7 @@ extern void GetOsdConfigParam(unsigned int *);
 
 extern int console_is_tool(void);
 
-extern unsigned char D_PAL_001381D4[];
+extern unsigned char g_pal_byte_table[];
 
 int func_PAL_00131620(void) {
     unsigned int buf[4];
@@ -17,7 +17,7 @@ int func_PAL_00131620(void) {
 
     GetOsdConfigParam(buf);
     if (console_is_tool() != 0) {
-        r = D_PAL_001381D4[0];
+        r = g_pal_byte_table[0];
     } else {
         GetOsdConfigParam(buf);
         v = buf[0];

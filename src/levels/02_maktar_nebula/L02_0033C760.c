@@ -18,7 +18,7 @@ typedef struct {
     u8 *ids;
 } L02_Palette;
 
-extern L02_Palette D_L02_00200080;
+extern L02_Palette g_chain_link_palette;
 
 /* Creates one link of the glowing chain, joins it to the previous link and returns it. */
 char *part_spawn_chain_link(TI128 *pos, char *prev, int flag, float scale) {
@@ -44,11 +44,11 @@ char *part_spawn_chain_link(TI128 *pos, char *prev, int flag, float scale) {
         }
         if (flag == 0)
             *(short *)(tail + 0x1E) = 0xFF;
-        *(u8 *)(node + 2) = D_L02_00200080.ids[0];
+        *(u8 *)(node + 2) = g_chain_link_palette.ids[0];
         if (prev != 0) {
             ptail = prev + 0x20;
             if (*(u8 *)(node + 2) == *(u8 *)(prev + 2))
-                *(u8 *)(node + 2) = D_L02_00200080.ids[1];
+                *(u8 *)(node + 2) = g_chain_link_palette.ids[1];
             *(char **)(tail + 0x10) = prev;
             *(char **)(ptail + 0x14) = node;
         } else {

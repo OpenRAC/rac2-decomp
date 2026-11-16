@@ -26,9 +26,9 @@
 
 extern void STUB_printf();
 
-extern s8 D_001AD538[];
-extern s8 D_001AD550[];
-extern s8 D_001AD568[];
+extern s8 g_str_dma_error_a[];
+extern s8 g_str_dma_error_b[];
+extern s8 g_str_dma_error_c[];
 /* Error handler that reads the DMA registers, reports them and then hangs forever. */
 void gfx_handle_dma_error_hang(void) {
     s32 tadr;
@@ -36,9 +36,9 @@ void gfx_handle_dma_error_hang(void) {
 
     chcr = ((s32)D1_CHCR);
     tadr = ((s32)D1_TADR);
-    STUB_printf(((s32)D_001AD538));
-    STUB_printf(((s32)D_001AD550), chcr, tadr);
-    STUB_printf(((s32)D_001AD568));
+    STUB_printf(((s32)g_str_dma_error_a));
+    STUB_printf(((s32)g_str_dma_error_b), chcr, tadr);
+    STUB_printf(((s32)g_str_dma_error_c));
     for (;;) {
         continue;
     }

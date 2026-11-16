@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L00_004295B8, the PAL copy of func_L00_004240D8: the same C, where wrap D_L00_001B14B4 (({e}) * 1.2f). */
 #include "common.h"
 
@@ -7,7 +8,7 @@
  * type-based alias analysis allows. The bias and minimum distance are read-only tuning
  * values (their loads move freely across the float stores); the increment is not. */
 
-extern char D_L00_001BF220_1[], D_L00_001B8E50[];
+extern char D_L00_001BF220_1[], g_camera_up_vector[];
 /* The resident block at D_00189E20: an owner object pointer at +0x2290, a mode byte at +0x22B4. */
 typedef struct {
     char pad0[0x2290];
@@ -16,11 +17,11 @@ typedef struct {
     unsigned char mode;
 } L00_004240D8_Player;
 extern L00_004240D8_Player g_hero_state;
-extern const float D_L00_001B14D0 __attribute__((sda));
-extern float D_L00_001B14B4 __attribute__((sda));
-extern const float D_L00_001B14C8 __attribute__((sda));
-extern float D_00138280 NOT_SDA;
-extern void *D_L00_001B1850[] __attribute__((sda));
+extern const float g_cam_collision_base_radius __attribute__((sda));
+extern float g_cam_follow_distance_margin __attribute__((sda));
+extern const float g_cam_follow_min_distance __attribute__((sda));
+extern float g_stick_axis_x NOT_SDA;
+extern void *g_cam_collision_point_mask[] __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -50,24 +51,24 @@ int func_PAL_L00_004295B8(char *obj)
     qcopy(original,movement);
     total=0;
     qcopy(point,base+176);
-    step=D_L00_001B14D0;
+    step=g_cam_collision_base_radius;
     vec_scale_to_length(direction,original,1.0f);
     for(i=0;i<FloatToInt(F(state,64)-1.0f);i++) {
         if(i>0 && !coll_is_point_in_grid(point) &&
-           coll_test_point(point,D_L00_001B1850[0],g_hero_state.owner,step) &&
+           coll_test_point(point,g_cam_collision_point_mask[0],g_hero_state.owner,step) &&
            !cam_is_step_behind_plane(obj,i,point,step)) {
             qcopy(saved,D_L00_001BF220_1);
             qcopy(previous,point);
             if(cam_push_point_out_of_walls(obj,point,i,total,step)) {
                 result=1;
-                if (g_hero_state.mode!=2 && math_fabs(D_00138280)>0.05f) {
+                if (g_hero_state.mode!=2 && math_fabs(g_stick_axis_x)>0.05f) {
                     FastVecSub(difference,saved,previous);
                     vec_scale_to_length(difference,difference,1.0f);
-                    if(math_fabs(FastVecDot(D_L00_001B8E50,difference))<0.75f) {
-                        F(state,48) += ((D_L00_001B14B4) * 1.2f);
+                    if(math_fabs(FastVecDot(g_camera_up_vector,difference))<0.75f) {
+                        F(state,48) += ((g_cam_follow_distance_margin) * 1.2f);
                         S(state,52)=1817;
-                        if(F(movement,44)-F(state,48)<D_L00_001B14C8)
-                            F(state,48)=F(movement,44)-D_L00_001B14C8;
+                        if(F(movement,44)-F(state,48)<g_cam_follow_min_distance)
+                            F(state,48)=F(movement,44)-g_cam_follow_min_distance;
                     }
                 }
                 FastVecSub(difference,point,camera+80);

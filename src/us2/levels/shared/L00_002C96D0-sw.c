@@ -93,11 +93,11 @@ typedef struct {
 } InputState;
 extern InputState g_pad_state;
 extern unsigned char g_item_slot_to_record[];
-extern u8 D_001A7B08[0x40] __attribute__((sda));
-extern unsigned int D_001A7390[] __attribute__((sda));
-extern int D_L00_001A7CC4 __attribute__((sda));
+extern u8 g_status_flag_b[0x40] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
+extern int g_button_hold_timer __attribute__((sda));
 typedef struct { char pad[12]; int first_frame, trigger_frame; char rest[24]; } AnimationRange;
-extern AnimationRange D_L00_0025D990[];
+extern AnimationRange g_hero_l00_action_table[];
 typedef struct { char pad[20]; int sound; char rest[200]; } EffectDefinition;
 extern EffectDefinition g_weapon_l00_table[];
 extern int PadPressedWithin(u32, int, int *);
@@ -200,7 +200,7 @@ buffered_attack:
 
 ranged_attack:
     if (g_hero_state.state == 6) {
-        range = &D_L00_0025D990[g_hero_state.animation_index];
+        range = &g_hero_l00_action_table[g_hero_state.animation_index];
         if (g_hero_state.mode == 21 && g_hero_state.frame >= 31) {
             if (g_hero_state.input_locked) goto check_attack_delay;
             if (g_hero_state.attack_delay) goto clear_action;
@@ -365,16 +365,16 @@ clear_action:
     }
     }
 
-    if (g_hero_state.frame == previous_frame && D_001A7B08[0x26] && D_001A7390[3] == 54 &&
+    if (g_hero_state.frame == previous_frame && g_status_flag_b[0x26] && g_frame_counter[3] == 54 &&
         g_hero_state.mode != 29 && g_hero_state.mode != 1 &&
         (g_hero_state.motion_flags & 0xffffffff00000000ULL) == 0) {
-        math_fast_float_d(&D_L00_001A7CC4);
-        if (D_L00_001A7CC4 &&
+        math_fast_float_d(&g_button_hold_timer);
+        if (g_button_hold_timer &&
             (g_hero_state.state < 2 || g_hero_state.state == 12 ||
              ((g_hero_state.state == 2 || g_hero_state.state == 4) && g_hero_state.action_ready)) &&
             (g_pad_state.buttons.both & 0x800000008ULL) == 0x800000008ULL)
             func_US2_L00_002C4560(123, 1);
-        if (g_pad_state.buttons.word.pressed & 8) D_L00_001A7CC4 = 30;
+        if (g_pad_state.buttons.word.pressed & 8) g_button_hold_timer = 30;
     }
     return g_hero_state.frame < previous_frame;
 }

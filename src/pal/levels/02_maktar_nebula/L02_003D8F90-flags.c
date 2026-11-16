@@ -9,7 +9,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 
-void func_PAL_L02_003D8F90(char *arg0) {
+void chainblade_step_follow_point_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     char *dst = state + 0x2D0;
     char *src = state + 0x2C0;

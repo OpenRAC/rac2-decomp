@@ -5,7 +5,7 @@ extern void FastVecAdd(void *a, void *b, void *c);
 
 extern float fast_vec_dist(char *a, char *b);
 
-extern char D_L05_001B3510[];
+extern char g_light_spot_position[];
 
 extern char g_light_spot_sum[];
 
@@ -21,7 +21,7 @@ void light_spot_add_nearby_object(char *object)
     if (*(short *)(owner + 0xAA) != 0x957 /* moby class 2391 */)
         return;
     position = object + 0x10;
-    if (fast_vec_dist(position, D_L05_001B3510) > 15.0f)
+    if (fast_vec_dist(position, g_light_spot_position) > 15.0f)
         return;
     FastVecAdd(g_light_spot_sum, g_light_spot_sum, position);
     g_light_spot_count = g_light_spot_count + 1.0f;

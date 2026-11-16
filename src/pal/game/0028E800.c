@@ -18,14 +18,14 @@ typedef struct Anim28DF80_State {
     char pad8[4];
     s32 fC;
 } Anim28DF80_State;
-extern Anim28DF80_Frame *D_001B188C __attribute__((sda));
+extern Anim28DF80_Frame *g_hud_element_table __attribute__((sda));
 extern s32 g_game_time __attribute__((sda));
 extern s32 math_random_int_below(s32);
 
 /* Picks the frame of an animation record: clamp, loop, ping-pong or one-shot. */
 s32 func_PAL_0028E800(Anim28DF80_State *a0) {
     s32 r = 0;
-    Anim28DF80_Frame *t = D_001B188C + a0->f0;
+    Anim28DF80_Frame *t = g_hud_element_table + a0->f0;
 
     if (t->f0 != 0xFFFF) {
         switch (a0->f2) {
@@ -71,13 +71,13 @@ s32 func_PAL_0028E800(Anim28DF80_State *a0) {
 
 
 extern char g_hud_elements[];
-extern int D_001B1874 __attribute__((sda));
+extern int g_hud_record_timer_flag __attribute__((sda));
 extern void hud_finish_element_setup(char *);
 extern void weapon_menu_update_entry(void);
 
 /* Walks the records, caps their timers, moves their positions on, and lets a
    record run its own handler. */
-int func_PAL_0028E9B8(int arg)
+int hud_update_record_timers_pal(int arg)
 {
     char *rec;
     char *end;
@@ -89,7 +89,7 @@ int func_PAL_0028E9B8(int arg)
     do {
         int v;
 
-        if ((*(int *)(rec + 4) & 0x10) || D_001B1874) {
+        if ((*(int *)(rec + 4) & 0x10) || g_hud_record_timer_flag) {
             v = *(int *)(rec + 0x7C);
             if (v < 8) {
                 *(int *)(rec + 0x7C) = 8;

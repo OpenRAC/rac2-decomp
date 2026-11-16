@@ -55,7 +55,7 @@ extern LedgeProbeHit ledgeHit __asm__("D_L01_001BF900");
 #define FL(p,o) (*(float *)((char *)(p)+(o)))
 #define IN(p,o) (*(int *)((char *)(p)+(o)))
 /* The ledge probe of func_L00_002ACF88 without its vehicle == 1 branch. */
-int func_PAL_L01_002AE010(void *position, void *unused, char *out)
+int ProbeLedgeGrab_pal(void *position, void *unused, char *out)
 {
     float v0[4], v1[4], v2[4], v3[4], v4[4], v5[4], v6[4], v7[4], v8[4], v9[4], v10[4], v11[4], v12[4], v13[4], v14[4], v15[4], v16[4], v17[4], v18[4], v19[4];
     char *a, *b;

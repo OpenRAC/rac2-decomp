@@ -2,11 +2,11 @@
 /* func_PAL_L19_004205C8, the PAL copy of func_L19_0041B078: the same C, where rename func_L19_0041BFD0 becomes func_PAL_L19_00421568; rename func_002A7470 becomes func_PAL_002A7E68; rename func_002A6C58 becomes func_PAL_002A7650; rename func_L01_00321178 becomes func_PAL_L01_00323068; rename func_002AEB60 becomes func_PAL_002AF6C0; rename func_002B4FF0 becomes func_PAL_002B5BA8; rename func_L02_00331440 becomes func_PAL_L02_00333638; scale timer; scale func_002A7820(480,600). */
 #include "common.h"
 
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int g_active_yeti_count __attribute__((sda));
 extern int g_max_active_yetis __attribute__((sda));
 extern char *g_moby_l19_array __attribute__((sda));
-extern void *D_L19_001FB5A0[];
+extern void *g_group_ptr_table[];
 extern int moby_is_in_selected_zone(void *);
 extern int func_PAL_L19_00421568(void *);
 extern void moby_mark_spawned(void *);
@@ -18,7 +18,7 @@ extern int math_random_int_range(int,int);
 extern int flag_set_second_pending(void *);
 extern int flag_set_first_pending(void *);
 extern int moby_dispatch_action_by_kind(void *,void *);
-extern void func_PAL_002A7650(void *,int,int);
+extern void SetDeathBits_pal(void *,int,int);
 extern void part_queue_moby_for_glow(void *,int,void *);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float,float);
@@ -26,19 +26,19 @@ extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *,float,float,float);
 extern void FastVecAdd(void *,void *,void *);
 extern void moby_set_controller_speed_limits(void *,float,float,float,float);
-extern int func_PAL_L01_00323068(void *,void *);
+extern int moby_l01_turn_toward_target_pal(void *,void *);
 extern float vec_distance_xy(void *,void *);
 extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
 extern int func_PAL_002AF6C0(void *,float);
 extern float FastDiffRots(float,float);
-extern int func_PAL_002B5BA8(void *,void *,float);
+extern int moby_turn_toward_target_and_step_pal(void *,void *,float);
 extern float moby_get_anim_value(void *);
 extern int coll_test_hit_at_bone(float,float,float,void *,int,int,int,int,int);
 extern float FastAddRotations(float,float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern int func_PAL_L02_00333638(void *,void *,int,float,float,float);
+extern int moby_move_to_target_temp_limits_pal(void *,void *,int,float,float,float);
 extern void moby_update_timers_attachment(void *);
 
 #define I(p,n) (*(int *)((p)+(n)))
@@ -68,7 +68,7 @@ void func_PAL_L19_004205C8(char *obj)
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
     int mode, result;
-    if (!moby_is_in_selected_zone(obj+0x10) || D_0018C0B4==111) return;
+    if (!moby_is_in_selected_zone(obj+0x10) || g_game_mode==111) return;
     data=*(char **)(obj+0x68);
     if (func_PAL_L19_00421568(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
@@ -77,7 +77,7 @@ void func_PAL_L19_004205C8(char *obj)
     case 0:
         if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
-                if(I(data,0x250)==255 || !D_L19_001FB5A0[I(data,0x250)]) {
+                if(I(data,0x250)==255 || !g_group_ptr_table[I(data,0x250)]) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,8); g_active_yeti_count++;
                 } else if(!moby_count_group_not_in_state(I(data,0x250),-1)) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,8); g_active_yeti_count++;
@@ -114,7 +114,7 @@ void func_PAL_L19_004205C8(char *obj)
     case 3:
         result=moby_dispatch_action_by_kind(obj,data+0x140);
         if(result&1) {
-            func_PAL_002A7650(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
+            SetDeathBits_pal(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
         } else if(result&2) {
             if(I(data,0x204)==1 && g_active_yeti_count<=g_max_active_yetis) {
                 ANIM(3,0,8); moby_set_state(obj,14,2);
@@ -135,7 +135,7 @@ void func_PAL_L19_004205C8(char *obj)
         break;
     case 8:
         if(flag_set_first_pending(obj)) moby_set_controller_speed_limits(obj,0.0024f,0.060000002f,0.010053098f,1.0053098f);
-        func_PAL_L01_00323068(obj,data+0x290);
+        moby_l01_turn_toward_target_pal(obj,data+0x290);
         if(vec_distance_xy(obj+0x10,data+0x290)<0.5f) {moby_set_state(obj,3,-1); ANIM(1,0,8);}
         break;
     case 3:
@@ -169,13 +169,13 @@ void func_PAL_L19_004205C8(char *obj)
         } else if(vec_distance_xy(obj+0x10,*(char **)(data+0x200)+0x10)<=3.0f &&
             FastDiffRots(F(obj,0xF8),mat_fast_helper_a(F(data,0x1F0)-F(obj,0x10),F(data,0x1F4)-F(obj,0x14)))<0.52359885f) {
             ANIM(10,0,8);moby_set_state(obj,16,-1);
-        } else func_PAL_002B5BA8(obj,data+0x1F0,F(data,0x270));
+        } else moby_turn_toward_target_and_step_pal(obj,data+0x1F0,F(data,0x270));
         break;
     case 15: {
         float attackDistance;
         if(flag_set_first_pending(obj)) { SOLID(); }
         attackDistance=moby_get_anim_value(obj);
-        if(attackDistance>4.0f && attackDistance<15.0f) func_PAL_L01_00323068(obj,data+0x1F0);
+        if(attackDistance>4.0f && attackDistance<15.0f) moby_l01_turn_toward_target_pal(obj,data+0x1F0);
         if(func_PAL_002AF6C0(obj,30.0f)) {
             ANIM(7,0,8);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,8);} else if(math_random_int_below(2)) {ANIM(13,41,8);}
@@ -211,7 +211,7 @@ void func_PAL_L19_004205C8(char *obj)
             target=data+0x280;
             { float dx=F(data,0x280)-F(obj,0x10); float dy=F(data,0x284)-F(obj,0x14);
             angle=mat_fast_helper_a(dx,dy); }
-            func_PAL_L02_00333638(obj,target,16,angle,-1.0f,-1.0f);
+            moby_move_to_target_temp_limits_pal(obj,target,16,angle,-1.0f,-1.0f);
         }}
         if(func_PAL_002AF6C0(obj,21.0f)) {
             ANIM(7,0,8);moby_set_state(obj,24,-1);

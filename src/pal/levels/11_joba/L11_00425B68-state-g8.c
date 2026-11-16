@@ -24,14 +24,14 @@ typedef union { QuadWord word; float v[4]; } Vector;
 #define POINTER(p, o) (*(char **)((char *)(p) + (o)))
 #define QUAD(p, o) (*(QuadWord *)((char *)(p) + (o)))
 
-extern int D_L11_001AED04;
-extern int D_L11_001AED00 __attribute__((sda));
-extern int D_L11_001B30C8 __attribute__((sda));
+extern int g_active_rider_count;
+extern int g_enemy_spawn_enabled __attribute__((sda));
+extern int g_arena_progress_level __attribute__((sda));
 extern int g_moby_l11_table;
-extern int D_L11_001B35B8;
+extern int g_tribe_group_limit;
 extern unsigned short *g_group_id_lists[];
-extern Vector D_L11_001BA8C0;
-extern char D_L11_001B0FD8[], D_L11_002BACF0[];
+extern Vector g_hero_l11_position;
+extern char g_str_rider_debug_index[], g_str_debug_rider[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void STUB_printf(const char *, ...);
 extern int math_random_int_below(int);
@@ -43,13 +43,13 @@ extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
 extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern int moby_count_group_not_in_state(int, int);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 
 struct family_27f9_object;
-extern int D_L11_001CAE40 __attribute__((nosda));
+extern int g_enemy_freeze_flag __attribute__((nosda));
 /* One hero-state object: retail retains its common base across cases. */
 typedef struct {
     unsigned char unknown0000[0x80];
@@ -63,8 +63,8 @@ typedef struct {
     int mode;
 } Hero20C88;
 extern Hero20C88 g_hero_state;
-extern char *D_L11_001FF580[];
-extern char D_L11_001B0FC8[];
+extern char *g_path_l11_table[];
+extern char g_str_tribesman_debug[];
 extern int func_PAL_L11_00429B30(unsigned char *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -75,7 +75,7 @@ extern int flag_is_third_pending_set(unsigned char *);
 extern int flag_set_second_pending(unsigned char *);
 extern int math_random_int_range(int, int);
 extern int path_set_follower_nodes(void *, void *, int, int);
-extern int func_PAL_002B5C98(void *, void *, float);
+extern int moby_step_controller_pal(void *, void *, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern void part_queue_moby_for_glow(void *, int, void (*)(void *));
 extern int joba_enemy_apply_source_damage(unsigned char *);
@@ -91,15 +91,15 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int moby_move_over_ground(void *, void *, void *, float, float, float, float, int);
 extern u8 *moby_find_linked_object(unsigned char *);
-extern int func_PAL_L01_00323068(char *, char *);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern float moby_turn_toward_position(struct family_27f9_object *, float *, float *, float, float, float);
 extern float MobySpringTurn(struct family_27f9_object *, float *, float, float, float, float);
-extern int func_PAL_002B5BA8(char *, float *, float);
+extern int moby_turn_toward_target_and_step_pal(char *, float *, float);
 extern int func_PAL_L11_0042A858(char *, char *, float, float, float, float);
 extern float math_fabs(float);
 extern int func_PAL_002AF6C0(char *, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern char *func_PAL_L11_00455EB8(void *, void *, void *, int, float);
+extern char *robot_spawn_debris_pal(void *, void *, void *, int, float);
 extern int coll_sweep_from_object(void *, void *, int, float, float, float, int, int, int);
 extern void func_PAL_L11_0042AB20(char *);
 
@@ -146,7 +146,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
     float old_z, distance, angle, other_angle, pitch, limit;
     int flags;
 
-    if (D_L11_001CAE40 != 0) return;
+    if (g_enemy_freeze_flag != 0) return;
     if (g_hero_state.mode == 0x6f && BYTE(object, 0x95) != 4) return;
     old_z = REAL(object, 0x18);
     state = POINTER(object, 0x68);
@@ -301,14 +301,14 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_set_state(object, 0x1e, 2);
             node = 0;
             nearest = 0;
-            for (; node < WORD(D_L11_001FF580[WORD(state, 0x284)], 0); ++node) {
-                float d = vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x284)] + 0x10 + node * 0x10);
+            for (; node < WORD(g_path_l11_table[WORD(state, 0x284)], 0); ++node) {
+                float d = vec_distance_xy(((char *)object + 0x10), g_path_l11_table[WORD(state, 0x284)] + 0x10 + node * 0x10);
                 if (d < nearest_distance) {
                     nearest_distance = d;
                     nearest = node;
                 }
             }
-            path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x284)], -1, nearest);
+            path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x284)], -1, nearest);
         }
         if (WORD(state, 0x548) != -1) {
             linked = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
@@ -395,13 +395,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
     }
     case 4:
         if (REAL(state, 0x20) > 0.0f) {
-            func_PAL_002B5C98(object, ((char *)object + 0x10),
+            moby_step_controller_pal(object, ((char *)object + 0x10),
                           mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
         }
         flags = moby_dispatch_action_by_kind(object, state + 0x60);
         if ((flags & 1) != 0) {
-            --D_L11_001AED04;
-            func_PAL_002A7650(object, 0, 3);
+            --g_active_rider_count;
+            SetDeathBits_pal(object, 0, 3);
             part_queue_moby_for_glow(object, 0, 0);
             return;
         }
@@ -474,7 +474,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         if (WORD(state, 0x26c) == 0 || POINTER(state, 0x274) == 0 ||
             BYTE(POINTER(state, 0x274), 0x20) == 0xfe || BYTE(POINTER(state, 0x274), 0x20) == 0xfd) {
-            func_PAL_002AD288(object, POINTER(state, 0x278) + 0x10, -1, 0.5f, 3.0f);
+            part_spawn_explosion_with_sparks_pal(object, POINTER(state, 0x278) + 0x10, -1, 0.5f, 3.0f);
             moby_mark_spawned(POINTER(state, 0x278));
             POINTER(state, 0x278) = 0;
             moby_mark_spawned(POINTER(state, 0x280));
@@ -482,7 +482,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_set_state(object, 2, 6);
         } else {
             if (joba_enemy_apply_source_damage(object) == 0) break;
-            func_PAL_002AD288(object, POINTER(state, 0x278) + 0x10, -1, 0.5f, 3.0f);
+            part_spawn_explosion_with_sparks_pal(object, POINTER(state, 0x278) + 0x10, -1, 0.5f, 3.0f);
             moby_mark_spawned(POINTER(state, 0x278));
             POINTER(state, 0x278) = 0;
             moby_mark_spawned(POINTER(state, 0x280));
@@ -529,7 +529,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             }
         } else { REAL(linked, 0x48) = 1.0f; REAL(object, 0x48) = 1.0f; }
         if (BYTE(object, 0x20) != 0x28) {
-            func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
+            moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
             distance = vec_distance_xy(((char *)object + 0x10), &g_hero_state.aim);
             pitch = mat_fast_helper_a(distance, g_hero_state.aim.v[2] - REAL(object, 0x18));
             if (pitch < -0.52359885f) pitch = -0.52359885f;
@@ -647,20 +647,20 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         break;
     case 7:
-        if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x558)]) == 0) break;
+        if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x558)]) == 0) break;
         moby_set_state(object, 11, -1);
         PLAY(object, 0x18, 0, 17);
         if (BYTE(object, 0x95) == 1 && WORD(state, 0x56c) != -1) moby_set_state(object, 0x17, -1);
         break;
     case 8:
-        if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x574)]) != 0) {
+        if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x574)]) != 0) {
             moby_set_state(object, 11, -1);
             PLAY(object, 0x18, 0, 17);
         }
         break;
     case 9:
-        func_PAL_L01_00323068((char *)object, D_L11_001FF580[WORD(state, 0x574)] + 0x10);
-        if (vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x574)] + 0x10) < 0.5f) {
+        moby_l01_turn_toward_target_pal((char *)object, g_path_l11_table[WORD(state, 0x574)] + 0x10);
+        if (vec_distance_xy(((char *)object + 0x10), g_path_l11_table[WORD(state, 0x574)] + 0x10) < 0.5f) {
             PLAY(object, 0x25, 0, 8);
             moby_set_state(object, 10, -1);
         }
@@ -692,14 +692,14 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         break;
     case 13:
-        func_PAL_002B5C98(object, ((char *)object + 0x10),
+        moby_step_controller_pal(object, ((char *)object + 0x10),
                       mat_fast_helper_a(REAL(POINTER(state, 0x55c), 0x10) - REAL(object, 0x10), REAL(POINTER(state, 0x55c), 0x14) - REAL(object, 0x14)));
         angle = mat_fast_helper_a(REAL(POINTER(state, 0x55c), 0x10) - REAL(object, 0x10), REAL(POINTER(state, 0x55c), 0x14) - REAL(object, 0x14));
         if (FastDiffRots(REAL(object, 0xf8), angle) < 0.087266475f) moby_set_state(object, 5, -1);
         break;
     case 14:
         moby_set_controller_speed_limits(object, 0.0022f, 0.055000003f, 0.005445428f, 0.35604724f);
-        if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x54c)]) != 0) {
+        if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x54c)]) != 0) {
             moby_set_state(object, 0x11, -1);
             PLAY(object, 13, 0, 17);
         }
@@ -709,12 +709,12 @@ void func_PAL_L11_00425B68(unsigned char *object)
         float turned;
 
         moby_set_controller_speed_limits(object, 0.0022f, 0.055000003f, 0.010890856f, 0.7120945f);
-        if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x54c)]) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x54c)];
+        if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x54c)]) != 0) {
+            path = g_path_l11_table[WORD(state, 0x54c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             if (math_random_int_below(5) == 1) {
                 PLAY(object, 0x19, 0, 12);
                 moby_set_state(object, 0x10, -1);
@@ -733,7 +733,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         break;
     }
     case 16:
-        func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
+        moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
         if ((BYTE(object, 0x60) & 2) != 0) {
             moby_set_state(object, 15, -1);
             PLAY(object, 0x10, 0, 17);
@@ -741,11 +741,11 @@ void func_PAL_L11_00425B68(unsigned char *object)
         break;
     case 17:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x54c)];
+            path = g_path_l11_table[WORD(state, 0x54c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             moby_set_state(object, 14, -1);
             PLAY(object, 0x10, 0, 17);
         }
@@ -757,7 +757,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             PLAY(object, 0x17, 0, 17);
             moby_set_state(object, 0x14, -1);
             WORD(state, 0x178) |= 0x10;
-            if (WORD(state, 0x56c) != -1) QUAD(state, 0x110) = QUAD(D_L11_001FF580[WORD(state, 0x56c)], 0x10);
+            if (WORD(state, 0x56c) != -1) QUAD(state, 0x110) = QUAD(g_path_l11_table[WORD(state, 0x56c)], 0x10);
         }
         break;
     case 20:
@@ -765,7 +765,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         moby_turn_toward_position((struct family_27f9_object *)object, (float *)g_hero_state.moby, (float *)(state + 0x27c),
                      0.001f, 0.01f, 0.1f);
         moby_set_controller_speed_limits(object, 0.00080000004f, 0.020000001f, 0.0016755164f, 0.12566373f);
-        func_PAL_L01_00323068((char *)object, state + 0x110);
+        moby_l01_turn_toward_target_pal((char *)object, state + 0x110);
         if (vec_distance_xy(((char *)object + 0x10), state + 0x110) < 2.0f) {
             WORD(state, 0x178) &= ~0x10;
             moby_set_state(object, 0x15, -1);
@@ -775,18 +775,18 @@ void func_PAL_L11_00425B68(unsigned char *object)
         break;
     case 22:
         moby_set_controller_speed_limits(object, 0.0022f, 0.055000003f, 0.005445428f, 0.35604724f);
-        if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x56c)]) != 0) {
+        if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x56c)]) != 0) {
             moby_set_state(object, 0x17, -1);
             PLAY(object, 0x18, 0, 17);
         }
         break;
     case 23:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x56c)];
+            path = g_path_l11_table[WORD(state, 0x56c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
             moby_set_state(object, 22, -1);
             PLAY(object, 0x10, 0, 17);
         }
@@ -811,13 +811,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
             }
         }
         if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) < 2.5f) {
-            func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
+            moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
             break;
         }
         if (WORD(state, 0x528) == 0) {
-            func_PAL_002B5BA8((char *)object, g_hero_state.position.v, REAL(state, 0x298));
+            moby_turn_toward_target_and_step_pal((char *)object, g_hero_state.position.v, REAL(state, 0x298));
         } else if (func_PAL_L11_0042A858((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0 &&
-                   BYTE(object, 0x21) <= D_L11_001B35B8 && moby_count_group_not_in_state(BYTE(object, 0x21), -1) > 1) {
+                   BYTE(object, 0x21) <= g_tribe_group_limit && moby_count_group_not_in_state(BYTE(object, 0x21), -1) > 1) {
             unsigned short *ids;
             unsigned int id;
 
@@ -855,7 +855,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             euler_rotation_basis(linked + 0xc0, linked + 0xf0);
             REAL(linked, 0x18) += ((REAL(other_state, 0x5c) - 1.2f) - REAL(linked, 0x18)) * 0.11f;
         }
-        func_PAL_L01_00323068((char *)object, linked + 0x10);
+        moby_l01_turn_toward_target_pal((char *)object, linked + 0x10);
         if (vec_distance_xy(((char *)object + 0x10), linked + 0x10) < 1.5f && BYTE(linked, 0x20) != 5) {
             BYTE(linked, 0x20) = 6;
             REAL(object, 0x10) = REAL(linked, 0x10);
@@ -873,7 +873,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         char *linked;
 
         linked = (char *)(g_moby_l11_table + WORD(state, 0x580) * 0x100);
-        func_PAL_L01_00323068((char *)object, linked + 0x10);
+        moby_l01_turn_toward_target_pal((char *)object, linked + 0x10);
         if (vec_distance_xy(((char *)object + 0x10), linked + 0x10) < 0.25f) {
             if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) < 8.0f) {
                 WORD(state, 0x290) = 1;
@@ -915,13 +915,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_transform_joint_to_world(linked, 1, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
-            func_PAL_L11_00455EB8(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         } else if (func_PAL_002AF6C0(linked, 3.0f) != 0 || func_PAL_002AF6C0(linked, 9.0f) != 0 || func_PAL_002AF6C0(linked, 15.0f) != 0) {
             moby_transform_joint_to_world(linked, 0, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
-            func_PAL_L11_00455EB8(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         }
         break;
@@ -934,13 +934,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_transform_joint_to_world(linked, 1, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
-            func_PAL_L11_00455EB8(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         } else if (func_PAL_002AF6C0(linked, 3.0f) != 0 || func_PAL_002AF6C0(linked, 9.0f) != 0 || func_PAL_002AF6C0(linked, 15.0f) != 0) {
             moby_transform_joint_to_world(linked, 0, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
-            func_PAL_L11_00455EB8(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
         }
         break;
@@ -950,14 +950,14 @@ void func_PAL_L11_00425B68(unsigned char *object)
 
         if (WORD(state, 0x564) == -1) break;
         moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0027925272f, 0.0069813184f);
-        node = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
+        node = g_path_l11_table[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
         mount = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
-        func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(REAL(node, 0x10) - REAL(object, 0x10), REAL(node, 0x14) - REAL(object, 0x14)));
+        moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(REAL(node, 0x10) - REAL(object, 0x10), REAL(node, 0x14) - REAL(object, 0x14)));
         REAL(object, 0x10) = REAL(mount, 0x10);
         REAL(object, 0x14) = REAL(mount, 0x14);
         REAL(object, 0x18) = REAL(mount, 0x18) + 1.5f;
         euler_rotation_basis(mount + 0xc0, object + 0xf0);
-        next = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
+        next = g_path_l11_table[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
         angle = mat_fast_helper_a(REAL(next, 0x10) - REAL(object, 0x10), REAL(next, 0x14) - REAL(object, 0x14));
         if (FastDiffRots(REAL(object, 0xf8), angle) <= 0.087266475f) {
             ++WORD(state, 0x568);
@@ -968,7 +968,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             }
         }
         if (WORD(state, 0x584) != 0) {
-            STUB_printf(D_L11_001B0FC8);
+            STUB_printf(g_str_tribesman_debug);
             PLAY(object, 0x20, 0, 4);
             func_PAL_002A7E68(mount, 1, 0, 4);
             WORD(state, 0x584) = 0;
@@ -979,18 +979,18 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_transform_joint_to_world(mount, 1, (char *)&offset);
             vec_build_spherical_offset(side.v, 0.6f, REAL(object, 0xf8),
                           mat_fast_helper_a(vec_distance_xy(&offset, &g_hero_state.aim), g_hero_state.aim.v[2] - offset.v[2]));
-            func_PAL_L11_00455EB8(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
         } else if (func_PAL_002AF6C0(mount, 3.0f) != 0 || func_PAL_002AF6C0(mount, 9.0f) != 0 || func_PAL_002AF6C0(mount, 15.0f) != 0) {
             moby_transform_joint_to_world(mount, 0, (char *)&offset);
             vec_build_spherical_offset(side.v, 0.6f, REAL(object, 0xf8),
                           mat_fast_helper_a(vec_distance_xy(&offset, &g_hero_state.aim), g_hero_state.aim.v[2] - offset.v[2]));
-            func_PAL_L11_00455EB8(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
+            robot_spawn_debris_pal(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
         }
         break;
     }
     case 24:
         WORD(state, 0x290) = 0;
-        func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
+        moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
         if ((BYTE(object, 0x60) & 2) == 0 && WORD(state, 0x578) == 0 && BYTE(object, 0x42) != 15) break;
         if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) < 8.0f) {
             WORD(state, 0x290) = 1;
@@ -1007,7 +1007,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         break;
     case 31:
-        func_PAL_L01_00323068((char *)object, POINTER(state, 0x274) + 0x10);
+        moby_l01_turn_toward_target_pal((char *)object, POINTER(state, 0x274) + 0x10);
         if (vec_distance_xy(((char *)object + 0x10), POINTER(state, 0x274) + 0x10) < 2.1f) {
             PLAY(object, 0, 0, 17);
             moby_set_state(object, 0x21, -1);
@@ -1073,7 +1073,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
                 moby_set_state(object, 0x19, -1);
             }
         } else {
-            func_PAL_002B5BA8((char *)object, g_hero_state.position.v, REAL(state, 0x298));
+            moby_turn_toward_target_and_step_pal((char *)object, g_hero_state.position.v, REAL(state, 0x298));
         }
         if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) < 8.0f) {
             PLAY(object, 0x15, 0, 8);
@@ -1091,7 +1091,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             }
         }
         if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) < 2.5f) {
-            func_PAL_002B5C98(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
+            moby_step_controller_pal(object, ((char *)object + 0x10), mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14)));
             break;
         }
         if (vec_distance_xy(((char *)object + 0x10), &g_hero_state.position) > 5.0f) {
@@ -1100,7 +1100,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_set_state(object, 0x1c, -1);
         } else {
             moby_set_controller_speed_limits(object, 0.00080000004f, 0.020000001f, 0.0016755164f, 0.12566373f);
-            func_PAL_002B5BA8((char *)object, g_hero_state.position.v, REAL(state, 0x298));
+            moby_turn_toward_target_and_step_pal((char *)object, g_hero_state.position.v, REAL(state, 0x298));
         }
         break;
     case 30:
@@ -1111,7 +1111,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             REAL(state, 0x164) = 0.0012f;
         } else {
             REAL(state, 0x164) = 0.006f;
-            if (func_PAL_002B6CD8((char *)object, D_L11_001FF580[WORD(state, 0x284)]) != 0) {
+            if (path_follow_nodes_pal((char *)object, g_path_l11_table[WORD(state, 0x284)]) != 0) {
                 if (WORD(state, 0x294) == 1) {
                     PLAY(object, 15, 0, 8);
                     moby_set_state(object, 0x1c, 2);

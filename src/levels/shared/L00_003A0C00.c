@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 #include "moby_classes.h"
 #include "names.h"
 
-extern int D_0018C0B4;
-extern char *D_L00_001B1EA8[] __attribute__((sda));
-extern char *D_001FDA80[];
-extern int D_001A8A44 __attribute__((sda));
-extern char D_L00_003A09F8[];
+extern int g_game_mode;
+extern char *g_moby_l00_list_head[] __attribute__((sda));
+extern char *g_object_pointer_table[];
+extern int g_visibomb_watcher_flag __attribute__((sda));
+extern char g_visibomb_script_data[];
 
 extern int point_in_path_xy(char *a, char *b, int c);
 extern int IsPointInCuboid(char *a, int b);
@@ -27,9 +28,9 @@ void visibomb_missile_watcher_update(char *object)
 
     *(unsigned char *)(object + 0x30) = 0xFF;
     state = *(char **)(object + 0x68);
-    if (D_0018C0B4 != 0x1C)
+    if (g_game_mode != 0x1C)
         goto reset;
-    for (node = D_L00_001B1EA8[0]; node != 0; node = *(char **)(node + 0x28)) {
+    for (node = g_moby_l00_list_head[0]; node != 0; node = *(char **)(node + 0x28)) {
         if (*(short *)(node + 0xAA) == MOBY_CLASS_VISIBOMB_MISSILE) {
             target = node;
             break;
@@ -47,7 +48,7 @@ reset:
     do {
         if (*(int *)slot != none && *(float *)(target + 0x18) > *(float *)(slot + 4) &&
             *(float *)(target + 0x18) < *(float *)(slot + 8)) {
-            char *other = D_001FDA80[*(int *)slot];
+            char *other = g_object_pointer_table[*(int *)slot];
             if (point_in_path_xy(pos, other + 0x10, *(int *)other) != 0) {
                 *(int *)(state + 0x140) = 0;
                 break;
@@ -60,8 +61,8 @@ reset:
         slot += 0x10;
     } while ((int)slot < (int)state + 0x140);
     if (*(int *)(state + 0x140) > 0) {
-        if (D_001A8A44 != 0)
-            ref_L00_003A0C00_00(D_L00_003A09F8, object);
+        if (g_visibomb_watcher_flag != 0)
+            ref_L00_003A0C00_00(g_visibomb_script_data, object);
         if (*(int *)(state + 0x140) >= 0x5B)
             tether_release(target, *(char **)(target + 0x68));
     }

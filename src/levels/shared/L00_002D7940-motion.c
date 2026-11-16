@@ -6,14 +6,14 @@ typedef struct {
     char pad150[0x40];
     char *active;
 } CameraMotionState;
-extern CameraMotionState D_L00_001B8C80;
-extern char D_L00_001BF230[];
+extern CameraMotionState g_scalar_transition_state;
+extern char g_collision_position[];
 typedef struct {
     char pad000[0x2290];
     void *collision;
 } CameraCollisionContext;
 extern CameraCollisionContext g_hero_state;
-extern int D_L00_001B1850 __attribute__((sda));
+extern int g_cam_collision_point_mask __attribute__((sda));
 
 extern void FastVecSub(void *out, void *a, void *b);
 extern void FastVecAdd(void *out, void *a, void *b);
@@ -36,14 +36,14 @@ void ResolveCameraMovementCollisions(char *pos, float step)
     int i;
     int j;
 
-    cam_obj = D_L00_001B8C80.active;
+    cam_obj = g_scalar_transition_state.active;
     src = (float *)(cam_obj + 0x64);
     previous[0] = src[0];
     previous[1] = src[1];
     previous[2] = src[2];
     previous[3] = 0.0f;
     if (*(short *)(cam_obj + 0x8A) != 0) {
-        qcopy(D_L00_001B8C80.position, pos);
+        qcopy(g_scalar_transition_state.position, pos);
         *(short *)(cam_obj + 0x8A) = 0;
         return;
     }
@@ -54,15 +54,15 @@ void ResolveCameraMovementCollisions(char *pos, float step)
     for (j = 0; j < steps; j++) {
         FastVecAdd(pos, pos, delta);
         i = 0;
-        while (i < 6 && coll_test_point(pos, D_L00_001B1850, g_hero_state.collision, step) != 0) {
-            qcopy(pos, D_L00_001BF230);
+        while (i < 6 && coll_test_point(pos, g_cam_collision_point_mask, g_hero_state.collision, step) != 0) {
+            qcopy(pos, g_collision_position);
             {
-                char *hit = D_L00_001B8C80.active;
+                char *hit = g_scalar_transition_state.active;
                 if (*(unsigned char *)(hit + 0x89) == 0)
                     *(unsigned char *)(hit + 0x89) = 1;
             }
             i++;
         }
     }
-    qcopy(D_L00_001B8C80.position, pos);
+    qcopy(g_scalar_transition_state.position, pos);
 }

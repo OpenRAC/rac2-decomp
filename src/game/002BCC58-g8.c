@@ -13,7 +13,7 @@ extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern int g_game_time SDATA(D_001B1688);
 extern void *part_spawn_spark(void *,void *,int,int,float,int,int,int,int,int);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern void cam_compute_view_direction(void *,void *,int);
 extern void vec_transform_or_copy(void *,void *);
 /* Updates a spark. It falls, fades, and sometimes throws off small sparks of its own. */
@@ -33,7 +33,7 @@ void part_update_spark(char *particle) {
  *(int *)(particle+4)=moby_forward_two_values_and_amount(*(int *)(motion+20),*(int *)(motion+16),IntToFloat(*(short *)(particle+10))/IntToFloat(*(short *)(motion+24)));
  FastVecAdd(particle+16,particle+16,motion);
  pos=particle+16;
- if (D_001A8CA0) {
+ if (g_ground_check_inhibit) {
   cam_compute_view_direction(pos,accel,0);
   FastVecScale(accel,accel,*(float *)(motion+12));
   FastVecAdd(motion,motion,accel);

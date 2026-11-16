@@ -13,8 +13,8 @@ extern float math_random_float_range(float,float);
 
 typedef struct TodanoPartnerBlock { float x[12]; } TodanoPartnerBlock;
 typedef struct TodanoPartnerSlot { u8 pad[0x38]; u8 *object; u32 tail; } TodanoPartnerSlot;
-extern TodanoPartnerSlot D_L12_001C44C0[];
-extern u8 D_L12_001B9E00[];
+extern TodanoPartnerSlot g_contact_l12_push_table[];
+extern u8 g_hero_prev_position[];
 extern void InitStateDataWithPartner(u8 *);
 extern void enemy_apply_stored_values_helper(u8 *);
 extern void path_hand_state_to_nearest(u8 *);
@@ -30,7 +30,7 @@ extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(u8 *);
 extern int weapon_select_aim_target(u8 *, int, int, int, float, float);
 
-extern u8 D_L12_00188660[];
+extern u8 g_hero_l12_state_records[];
 
 extern s32 func_315148();
 
@@ -54,11 +54,11 @@ extern void func_314008(void *arg0);
 
 extern f32 func_2F2950(f32 x, f32 y);
 
-extern s32 D_L12_001B2E9C __attribute__((sda));
+extern s32 g_moby_list_start __attribute__((sda));
 
 extern s32 D_L12_001B2E9C_2;
 
-extern u16 *D_L12_001FB960[];
+extern u16 *g_moby_l12_group_lists[];
 
 extern s32 g_current_map_index __attribute__((sda));
 
@@ -80,11 +80,11 @@ typedef struct UpdateVars {
 /* An offset from a small symbol is retail's tied lui/load and lui $at/store, kept out of delay
    slots: these globals are read and written as elements, not as bare symbols. */
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern u8 D_001A7A40 MACRO_ADDR;
-extern u32 D_001397DC, D_00138324;
-extern int D_L12_001A8EFC[] __attribute__((sda));
-extern int D_L12_001B2BE4[] __attribute__((sda));
-extern u8 D_L12_001C0000[];
+extern u8 g_unlocked_item_flags MACRO_ADDR;
+extern u32 g_object_state_flags_f, g_pad_held_flags;
+extern int g_partner_mode_words[] __attribute__((sda));
+extern int g_glow_resize_flags[] __attribute__((sda));
+extern u8 g_requirement_queue[];
 typedef struct HeroUpdateView {
     u8 pad[0x80];
     float pos[4];
@@ -183,7 +183,7 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
                 *(u32 *)(vars->partner+0x78) = *(u32 *)(self+0x78);
                 vars->partner[0x31] = 1;
                 func_002A0F48(vars->partner);
-                if (D_001397DC & 0x200000) moby_set_state(self,2,-1);
+                if (g_object_state_flags_f & 0x200000) moby_set_state(self,2,-1);
                 else moby_set_state(self,1,-1);
             }
             moby_reset_vars_defaults(self);
@@ -195,19 +195,19 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
     case 1:
         if (hero_is_reachable_for_count(self,10,2.5f)) {
             level_apply_index_for_key(self);
-            if (req_push_queue(D_L12_001C0000,0x75)) {
-                req_launch_queued(D_L12_001C0000);
+            if (req_push_queue(g_requirement_queue,0x75)) {
+                req_launch_queued(g_requirement_queue);
                 moby_set_state(self,2,-1);
             }
         }
         break;
     case 2:
-        D_L12_001B2BE4[1] = 1;
-        if (D_L12_001A8EFC[1] == 2) {
+        g_glow_resize_flags[1] = 1;
+        if (g_partner_mode_words[1] == 2) {
             self[0x31] = 0;
             {
                 u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = D_L12_001A8EFC[1];
+                int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
                     *(u16 *)(vars->partner+0x34) |= 1;
@@ -216,7 +216,7 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L12_001B2BE4[1] = 0;
+            g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
             *(u16 *)(vars->partner+0x34) &= ~1;
@@ -237,19 +237,19 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
         else if (hero_is_reachable_for_count(self,10,2.5f)) {
             text_print_localized_formatted(0x27D4,-1);
             level_apply_index_for_key(self);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L12_001C0000,0x76)) {
-                req_launch_queued(D_L12_001C0000);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_requirement_queue,0x76)) {
+                req_launch_queued(g_requirement_queue);
                 moby_set_state(self,5,-1);
             }
         }
         break;
     case 5:
-        D_L12_001B2BE4[1] = 1;
-        if (D_L12_001A8EFC[1] == 2) {
+        g_glow_resize_flags[1] = 1;
+        if (g_partner_mode_words[1] == 2) {
             self[0x31] = 0;
             {
                 u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = D_L12_001A8EFC[1];
+                int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
                     *(u16 *)(vars->partner+0x34) |= 1;
@@ -258,7 +258,7 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L12_001B2BE4[1] = 0;
+            g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
             moby_mark_spawned(vars->partner);
@@ -323,7 +323,7 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
         *(float *)((u8 *)vars+0x68) = turn*0.6f;
         *(float *)((u8 *)vars+0xE8) = turn*0.4f;
     }
-    if (D_001A7A40) *(float *)((u8 *)vars+0x70) = 2.75f;
+    if (g_unlocked_item_flags) *(float *)((u8 *)vars+0x70) = 2.75f;
     TurnJoint(self,vars,0,rate);
     TurnJoint(self,(u8 *)vars+0x80,1,rate);
     if (vars->partner) moby_copy_joint_transform_to_object(self,vars->partner,2,0);
@@ -359,11 +359,11 @@ void squirrel_alert_group(s32 object) {
 
     if (*(u8 *)(object + 0x21) == 0xFF)
         return;
-    table = D_L12_001FB960[*(u8 *)(object + 0x21)];
+    table = g_moby_l12_group_lists[*(u8 *)(object + 0x21)];
     if (table == 0)
         return;
     entry = table;
-    moby_base = D_L12_001B2E9C;
+    moby_base = g_moby_list_start;
     do {
         u32 offset = (*(u16 *)entry & 0x7FFF) << 8;
 
@@ -374,7 +374,7 @@ void squirrel_alert_group(s32 object) {
     } while (*entry++ >= 0);
 }
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
@@ -383,7 +383,7 @@ extern void moby_set_state(void *, s32, s32);
    and makes it go for that object. */
 u8 *squirrel_alert_for_object(s32 index, u8 *obj)
 {
-    u16 *list = D_L12_001FB960[index];
+    u16 *list = g_moby_l12_group_lists[index];
     u16 *entry;
     u8 *found = 0;
 
@@ -392,11 +392,11 @@ u8 *squirrel_alert_for_object(s32 index, u8 *obj)
     }
     entry = list;
     do {
-        u8 *rec = (u8 *)D_L12_001B2E9C + (*entry & 0x7FFF) * 0x100;
+        u8 *rec = (u8 *)g_moby_list_start + (*entry & 0x7FFF) * 0x100;
 
         if (*(s16 *)(rec + 0xAA) == MOBY_CLASS_MUTANT_TEST_SQUIRREL) {
             u8 *vars = *(u8 **)(rec + 0x68);
-            s32 *zone = D_L12_001FEAC0[*(s32 *)(vars + 0x138)];
+            s32 *zone = g_path_zone_table[*(s32 *)(vars + 0x138)];
 
             if (point_in_path_xy(obj + 0x10, zone + 4, zone[0]) != 0) {
                 if (rec[0x20] == 9) {
@@ -453,7 +453,7 @@ void guard_handle_hit_handover(u8 *moby) {
         if (partner && *(short *)(partner+0xAA)==0x114B /* moby class 4427 */ && partner[0x20]!=254 && partner[0x20]!=253) {
             int index;
             if (partner[0xA8]!=255) {
-                TodanoPartnerSlot *slots=D_L12_001C44C0;
+                TodanoPartnerSlot *slots=g_contact_l12_push_table;
                 index=partner[0xA8];
                 if (slots[index].object==partner) {
                     moby[0xA8]=index;
@@ -522,7 +522,7 @@ void guard_handle_hit_handover(u8 *moby) {
             }
         }
     }
-    if(moby[0x31] && fast_vec_dist(moby+0x10,D_L12_001B9E00)<24.0f) {
+    if(moby[0x31] && fast_vec_dist(moby+0x10,g_hero_prev_position)<24.0f) {
         moby_update_ground_check(moby); moby[0x6F]=22;
     }
     weapon_select_aim_target(moby,*(int *)(vars+0x2D8),0,0,0,0);
@@ -673,7 +673,7 @@ void spinning_effect_update_todano(u8 *object) {
     }
     *(f32 *)(object + 0xF8) = func_2F2950(*(f32 *)(object + 0xF8), 0.017453294f);
     index = *(s32 *)(state + 0);
-    record = D_L12_00188660 + index * 0x70;
+    record = g_hero_l12_state_records + index * 0x70;
     if (*(u8 **)(record + 0x88) != object || *(u8 *)(record + 0x74) == 0)
         *(s32 *)(state + 0) = func_364DF8(0, 4, object);
     if (func_3205F8(object, 0x10000, 0) != 0)

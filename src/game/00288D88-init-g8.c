@@ -18,10 +18,10 @@ typedef struct {
 
 extern HudSlot g_hud_elements[13];
 extern int g_hud_state;
-extern int D_001B1874;
-extern char *D_001B18D8;
+extern int g_hud_record_timer_flag;
+extern char *g_moby_context_first;
 extern char *D_001B18E0_1;
-extern int D_001B18E4;
+extern int g_moby_context_fourth;
 extern char ref_L00_0028AB70_00[];
 extern char *D_001B18DC_1 __attribute__((sda));
 extern char *hud_alloc_mem(int, int, char *, int);
@@ -38,7 +38,7 @@ void InitializeHudSlotsAndBuffers(void)
     int i = 0;
 
     g_hud_state = 0;
-    D_001B1874 = 0;
+    g_hud_record_timer_flag = 0;
     do {
         slotWords = cursor + 9;
         slotWords[16] = -1;
@@ -51,15 +51,15 @@ void InitializeHudSlotsAndBuffers(void)
         slotWords[0] = 0;
         cursor = slotWords + 27;
     } while (i < 13);
-    if (D_001B18D8 == 0) {
+    if (g_moby_context_first == 0) {
         char *sourceFile = ref_L00_0028AB70_00;
-        D_001B18D8 = hud_alloc_mem(0x2800, 0, sourceFile, 0x2AB);
-        D_001B18E4 = (int)hud_alloc_mem(0x1400, 0, sourceFile, 0x2AC);
+        g_moby_context_first = hud_alloc_mem(0x2800, 0, sourceFile, 0x2AB);
+        g_moby_context_fourth = (int)hud_alloc_mem(0x1400, 0, sourceFile, 0x2AC);
     }
-    D_001B18E0_1 = D_001B18D8 + 0x2800;
-    D_001B18DC_1 = D_001B18D8;
-    mem_fast_helper_b(D_001B18D8, 0x2800);
-    *((unsigned char *)D_001B18D8 + 0x20) = 0xFF;
+    D_001B18E0_1 = g_moby_context_first + 0x2800;
+    D_001B18DC_1 = g_moby_context_first;
+    mem_fast_helper_b(g_moby_context_first, 0x2800);
+    *((unsigned char *)g_moby_context_first + 0x20) = 0xFF;
     weapon_menu_init_slots();
     hud_reset_bolt_counter_display();
 }

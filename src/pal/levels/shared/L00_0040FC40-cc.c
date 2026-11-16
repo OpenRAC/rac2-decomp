@@ -3,8 +3,8 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 typedef struct { char pad[0x5c]; u8 *texture; } ParticleResources;
-extern ParticleResources D_L00_001FE940;
-extern char D_0018A0E0[];
+extern ParticleResources g_effect_definitions;
+extern char g_hero_state_block[];
 extern s32 FloatToInt(float);
 extern f32 IntToFloat(s32);
 extern void vec_scale_to_length(float *, float *, float);
@@ -50,7 +50,7 @@ void func_PAL_L00_0040FC40(u8 *self, Vector *origin)
     for (i = 0; i < count; i++) {
         spin = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
         speed = -(math_random_float_range(0.2f, 1.0f) * 0.020000001f);
-        FastVecScale((float *)&velocity, D_0018A0E0, speed);
+        FastVecScale((float *)&velocity, g_hero_state_block, speed);
         life = math_random_int_range(30, 50);
         size = math_random_float_range(200.0f, 1000.0f);
         if (func_001163B0() & 2) {
@@ -63,7 +63,7 @@ void func_PAL_L00_0040FC40(u8 *self, Vector *origin)
         part = func_PAL_002C23B8(position.f, velocity.f, (((int)(life) * 5 + 2) / 6), alpha, color, spin, 21000.0f, size, 1.0f, 0.0f, 1.0f);
         FastVecAdd(position.f, position.f, step.f);
         if (part != 0) {
-            part[2] = *D_L00_001FE940.texture;
+            part[2] = *g_effect_definitions.texture;
             part[3] = alpha == 0x40 ? 0x48 : 0x44;
         }
     }

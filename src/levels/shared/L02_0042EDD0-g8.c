@@ -21,15 +21,15 @@ typedef struct {
     float pad[4];
 } Rec32;
 
-extern unsigned short **D_L02_001A9014;
+extern unsigned short **g_record_lists;
 
-extern Rec32 *D_L02_001B3C14;
+extern Rec32 *g_sky_records;
 
-extern u8 *D_L02_001B3C1C;
+extern u8 *g_record_table;
 
-extern u8 *D_L02_001AD410;
+extern u8 *g_actor_shared_state;
 
-extern float D_L02_001B2434 __attribute__((sda));
+extern float g_spinning_parts_timer_rate __attribute__((sda));
 
 extern void euler_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
@@ -47,9 +47,9 @@ void spinning_parts_group_update(u8 *object) {
         if (vars[0] == -1)
             break;
         object[0x30] = none;
-        for (p = D_L02_001A9014[vars[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[vars[0]]) &&
-             (e = D_L02_001B3C14 + (*p & 0x7FFF)) != 0;
+        for (p = g_record_lists[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[vars[0]]) &&
+             (e = g_sky_records + (*p & 0x7FFF)) != 0;
              p++)
             e->w = e->w + e->w;
         object[0x20] = 1;
@@ -63,17 +63,17 @@ void spinning_parts_group_update(u8 *object) {
         float timer;
         u8 *sharedState;
 
-        for (p = D_L02_001A9014[vars[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L02_001A9014[vars[0]]) &&
-             (e = D_L02_001B3C1C + ((*p & 0x7FFF) << 6)) != 0;
+        for (p = g_record_lists[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[vars[0]]) &&
+             (e = g_record_table + ((*p & 0x7FFF) << 6)) != 0;
              p++) {
             *(TI128 *)angles = 0;
             angles[2] = 0.00785398297f;
             euler_rotation_basis(rotationMatrix, angles);
             multiply_matrix3x3(e, e, rotationMatrix);
         }
-        sharedState = D_L02_001AD410;
-        timer = *(float *)(sharedState + 0x74) + D_L02_001B2434 * 0.016666668f;
+        sharedState = g_actor_shared_state;
+        timer = *(float *)(sharedState + 0x74) + g_spinning_parts_timer_rate * 0.016666668f;
         *(float *)(sharedState + 0x74) = timer;
         if (timer > 1.0f)
             *(float *)(sharedState + 0x74) = timer - 1.0f;

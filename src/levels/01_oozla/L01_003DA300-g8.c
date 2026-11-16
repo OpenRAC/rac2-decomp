@@ -3,7 +3,7 @@
 extern u8 *CreateMoby(s32);
 extern f32 math_random_angle(void);
 extern void anim_start_blended(u8 *, s32, s32, s32);
-extern f32 D_L01_001B0828 __attribute__((sda));
+extern f32 g_thrown_object_scale_factor __attribute__((sda));
 
 typedef int SpawnQuad __attribute__((mode(TI)));
 /* Measured state prefix; total allocation extent is unspecified. */
@@ -31,7 +31,7 @@ u8 *moby_spawn_thrown_object(u8 *spawn_position, u8 *target_position, u8 *owner_
         *(f32 *)(new_moby + 0xF8) = math_random_angle();
         *(f32 *)(new_moby + 0xF4) = math_random_angle();
         *(f32 *)(new_moby + 0xF0) = math_random_angle();
-        *(f32 *)(new_moby + 0x2C) = *(f32 *)(*(u8 **)(new_moby + 0x24) + 0x24) * D_L01_001B0828;
+        *(f32 *)(new_moby + 0x2C) = *(f32 *)(*(u8 **)(new_moby + 0x24) + 0x24) * g_thrown_object_scale_factor;
         state->handle = owner_handle;
         state->weight = weight;
         qcopy(new_moby + 0x10, spawn_position);

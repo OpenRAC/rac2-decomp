@@ -1,7 +1,7 @@
 #include "names.h"
 /* Selects the object action from its command, trigger readiness and linked parent state. */
 #include "common.h"
-extern int D_L09_001B0F40 __attribute__((sda));
+extern int g_trooper_anim_period __attribute__((sda));
 extern void trooper_fire_arm_shot(char *);
 extern int path_is_entry_reachable(void *, int);
 extern int enemy_select_path(void *, int, int);
@@ -47,7 +47,7 @@ void enemy_choose_next_action(char *obj)
             if (!*(u8 *)(vars + 0x303) || result) {
                 enemy_set_animation_state(obj, 12, 0, math_random_int_range(7, 12));
                 moby_set_state(obj, 8, 5);
-                *(short *)(vars + 0x2E4) = D_L09_001B0F40;
+                *(short *)(vars + 0x2E4) = g_trooper_anim_period;
             }
             return;
         }

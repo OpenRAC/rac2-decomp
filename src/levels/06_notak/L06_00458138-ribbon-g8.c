@@ -2,13 +2,13 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { Vector vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } RibbonPacket;
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float FastVecLength(void *);
-extern int D_L06_001B1924 __attribute__((sda)), D_L06_001B1928 __attribute__((sda));
+extern int g_ribbon_l06_core_texture __attribute__((sda)), g_ribbon_l06_halo_texture __attribute__((sda));
 
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI orders the integer and FP banks independently: count is a3,
@@ -19,14 +19,14 @@ void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float co
     float length, initialLength, haloLength, firstLength, lastLength;
     int i;
     u32 coreColor, haloColor;
-    core.texture = GetEffectTextureDescriptor(D_L06_001B1924);
+    core.texture = GetEffectTextureDescriptor(g_ribbon_l06_core_texture);
     coreColor = 0xFFFFFF | (alpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
     core.primitive = 0;
     core.color[3] = coreColor; core.color[2] = coreColor;
     core.color[1] = coreColor; core.color[0] = coreColor;
-    halo.texture = GetEffectTextureDescriptor(D_L06_001B1928);
+    halo.texture = GetEffectTextureDescriptor(g_ribbon_l06_halo_texture);
     halo.flags = core.flags; halo.mode = core.mode; halo.primitive = core.primitive;
     haloColor = 0x7F2020 | (outerAlpha << 24);
     halo.color[3] = haloColor; halo.color[2] = haloColor;
@@ -35,7 +35,7 @@ void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float co
     halo.uv[4] = 1; halo.uv[5] = 0.0f; halo.uv[6] = 1; halo.uv[7] = 1;
     core.uv[0] = 0.0f; core.uv[1] = 0.0f; core.uv[2] = 0.0f; core.uv[3] = 1;
     core.uv[4] = 1; core.uv[5] = 0.0f; core.uv[6] = 1; core.uv[7] = 1;
-    FastVecSub(&eye, points, D_L06_001B9840);
+    FastVecSub(&eye, points, g_hero_l06_position);
     FastVecSub(&tangent, points + 1, points);
     FastVecCross(&normal, &tangent, &eye);
     initialLength = FastVecLength(&normal);
@@ -44,7 +44,7 @@ void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float co
     FastVecAdd(&core.vertex[0], points, &normal);
     FastVecSub(&core.vertex[1], points, &normal);
     for (i = 1; i < count - 1; i++) {
-        FastVecSub(&eye, points + i, D_L06_001B9840);
+        FastVecSub(&eye, points + i, g_hero_l06_position);
         FastVecSub(&tangent, points + i + 1, points + i);
         FastVecCross(&normal, &tangent, &eye);
         length = FastVecLength(&normal);
@@ -59,8 +59,8 @@ void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float co
         qcopy(&core.vertex[0], &core.vertex[2]); qcopy(&core.vertex[1], &core.vertex[3]);
     }
     for (i = 0; i < count - 1; i++) {
-        FastVecSub(&firstRay, points + i, D_L06_001B9840);
-        FastVecSub(&lastRay, points + i + 1, D_L06_001B9840);
+        FastVecSub(&firstRay, points + i, g_hero_l06_position);
+        FastVecSub(&lastRay, points + i + 1, g_hero_l06_position);
         firstLength = FastVecLength(&firstRay);
         lastLength = FastVecLength(&lastRay);
         if (lastLength < firstLength) {
@@ -68,13 +68,13 @@ void DrawNotakRibbonWithHalo(Vector *points, u32 alpha, u32 outerAlpha, float co
             else FastVecScale(&lastRay, &lastRay, firstLength / lastLength);
         } else if (firstLength == 0.0f) { qcopy(&firstRay, &lastRay); }
         else FastVecScale(&firstRay, &firstRay, lastLength / firstLength);
-        FastVecAdd(&first, D_L06_001B9840, &firstRay);
-        FastVecAdd(&last, D_L06_001B9840, &lastRay);
+        FastVecAdd(&first, g_hero_l06_position, &firstRay);
+        FastVecAdd(&last, g_hero_l06_position, &lastRay);
         FastVecSub(&tangent, &last, &first);
         FastVecScale(&extension, &tangent, extend);
         FastVecSub(&first, &first, &extension);
         FastVecAdd(&last, &last, &extension);
-        FastVecSub(&toEye, D_L06_001B9840, &first);
+        FastVecSub(&toEye, g_hero_l06_position, &first);
         FastVecCross(&normal, &toEye, &tangent);
         haloLength = FastVecLength(&normal);
         if (haloLength != 0.0f) haloLength = 1.0f / haloLength;

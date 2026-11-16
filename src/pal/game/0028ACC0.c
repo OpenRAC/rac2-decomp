@@ -19,7 +19,7 @@ typedef struct {
 extern CounterState g_bolt_counter_state __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
 extern int g_player_bolts[] __attribute__((sda));
-extern int func_PAL_0029C118(void);
+extern int level_has_value_pair_pal(void);
 extern void func_0029CBA8(int);
 extern void hud_reset_bolt_counter_display(void);
 extern void level_forward_value(int);
@@ -27,7 +27,7 @@ extern void level_forward_value(int);
 /* Moves the shown bolt count (D_001A79F8 is the real one) to the real count: a change opens a
  * transition row, 60 frames without a further change commit it, and the pending amount is then
  * applied over 15 frames. */
-void func_PAL_0028ACC0(void)
+void UpdateBoltCounter_pal(void)
 {
     CounterRow *row;
     int index;
@@ -35,7 +35,7 @@ void func_PAL_0028ACC0(void)
     int previous;
     int delta;
 
-    if (func_PAL_0029C118())
+    if (level_has_value_pair_pal())
         return;
     func_0029CBA8((int)&g_bolt_counter_state.shown);
     if (g_current_game_mode[0] == 5 && g_player_bolts[0] < g_bolt_counter_state.shown) {

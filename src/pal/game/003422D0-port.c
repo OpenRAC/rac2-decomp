@@ -57,24 +57,24 @@ extern void *object_construct_derived_c(void *);
 /* Fills func_00337210's 23-word descriptor in the order of func_00344F98, with the child at
    o + 0x17C set up by func_00336390 just before f[10] takes it. */
 typedef struct { unsigned int lo; unsigned int hi; } Word2_340498;
-extern const Word2_340498 D_001AE078;
-extern const Word2_340498 D_001AE080;
-extern const Word2_340498 D_001AE088;
-extern const Word2_340498 D_001AE090;
-extern char D_00259F58[];
-extern char *D_001A8CFC __attribute__((sda));
+extern const Word2_340498 g_radial_info_left_word_pair_a;
+extern const Word2_340498 g_radial_info_left_word_pair_b;
+extern const Word2_340498 g_radial_info_left_word_pair_c;
+extern const Word2_340498 g_radial_info_shared_word_pair;
+extern char g_menu_item_table_first[];
+extern char *g_resident_data_base __attribute__((sda));
 extern void object_set_helper_result(void *, void *, int);
 extern void DrawItemGrid(int *);
 
 static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
 
-void func_PAL_00342518(char *o)
+void radial_menu_draw_info_left_pal(char *o)
 {
-    Word2_340498 q0 = D_001AE078;
-    Word2_340498 q1 = D_001AE080;
-    Word2_340498 q2 = D_001AE078;
-    Word2_340498 q3 = D_001AE088;
-    Word2_340498 q4 = D_001AE090;
+    Word2_340498 q0 = g_radial_info_left_word_pair_a;
+    Word2_340498 q1 = g_radial_info_left_word_pair_b;
+    Word2_340498 q2 = g_radial_info_left_word_pair_a;
+    Word2_340498 q3 = g_radial_info_left_word_pair_c;
+    Word2_340498 q4 = g_radial_info_shared_word_pair;
     int f[23];
     char *child;
 
@@ -87,12 +87,12 @@ void func_PAL_00342518(char *o)
     f[9] = (int)&q4;
     f[1] = 4;
     f[2] = 6;
-    f[0] = (int)D_00259F58;
+    f[0] = (int)g_menu_item_table_first;
     f[17] = (int)(o + 0x880);
     f[13] = (int)(o + 0x260);
     f[14] = 0;
     child = o + 0x17C;
-    object_set_helper_result(child, D_001A8CFC + 0x8710, 0x23);
+    object_set_helper_result(child, g_resident_data_base + 0x8710, 0x23);
     f[10] = (int)child;
     f[12] = (int)(o + 0x214);
     f[11] = (int)(o + 0x98);

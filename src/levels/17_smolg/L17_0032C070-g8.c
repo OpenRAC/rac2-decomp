@@ -2,17 +2,17 @@
 
 /* This unit is built with -G8: every body here reaches a global through $gp. */
 
-extern float D_L17_001B032C __attribute__((sda));
+extern float g_platform_bob_amplitude __attribute__((sda));
 
-extern float D_L17_001B0330 __attribute__((sda));
+extern float g_platform_bob_period __attribute__((sda));
 
-extern float D_L17_001B0334 __attribute__((sda));
+extern float g_platform_sway_amplitude __attribute__((sda));
 
-extern float D_L17_001B0338 __attribute__((sda));
+extern float g_platform_sway_period __attribute__((sda));
 
-extern float D_L17_001B033C __attribute__((sda));
+extern float g_platform_tilt_period __attribute__((sda));
 
-extern float D_L17_001B0360 __attribute__((sda));
+extern float g_platform_footprint_half_size __attribute__((sda));
 
 extern float g_hero_position[];
 
@@ -37,16 +37,16 @@ void platform_update_bob_sway(char *moby)
     char *state = *(char **)(moby + 0x68);
 
     if (*(u8 *)(moby + 0x20) == 3) {
-        math_update_wrapped_angle_offset(moby, state + 0x11C, state + 0x118, D_L17_001B032C,
-                      D_L17_001B0330 * 0.000290888245f,
+        math_update_wrapped_angle_offset(moby, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+                      g_platform_bob_period * 0.000290888245f,
                       *(f32 *)(state + 0x12C));
     } else {
-        math_update_wrapped_angle_offset(moby, state + 0x11C, state + 0x118, D_L17_001B032C,
-                      D_L17_001B0330 * 0.000290888245f, -1.0f);
+        math_update_wrapped_angle_offset(moby, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+                      g_platform_bob_period * 0.000290888245f, -1.0f);
     }
-    moby_scale_owner_words_by_angles(moby, state + 0x120, state + 0x124, D_L17_001B0334,
-                  D_L17_001B0338 * 0.000290888245f,
-                  D_L17_001B033C * 0.000290888245f);
+    moby_scale_owner_words_by_angles(moby, state + 0x120, state + 0x124, g_platform_sway_amplitude,
+                  g_platform_sway_period * 0.000290888245f,
+                  g_platform_tilt_period * 0.000290888245f);
 }
 
 /* Transforms the level's fixed point through the object's own matrix, then through the
@@ -60,23 +60,23 @@ int platform_is_player_inside_footprint(char *moby)
     FastVecSub(local_point, g_hero_position, moby + 0x10);
     mat_fast_helper_c(matrix, moby + 0xC0);
     matrix_mul_vec3(local_point, local_point, matrix);
-    if (!(math_fabs(local_point[0]) <= D_L17_001B0360))
+    if (!(math_fabs(local_point[0]) <= g_platform_footprint_half_size))
         return 0;
-    if (!(math_fabs(local_point[1]) <= D_L17_001B0360))
+    if (!(math_fabs(local_point[1]) <= g_platform_footprint_half_size))
         return 0;
     if (math_fabs(g_hero_position[2] - *(float *)(moby + 0x18)) < 2.0f)
         return 1;
     return 0;
 }
 
-extern s32 D_001B2748;
+extern s32 g_flashing_frame;
 
 /* Scales the level's shared word by the object's own signed halfword, takes it modulo
    sixty and paints the object with 0x80FFFFFF when the remainder is under fifteen and
    with 0x80404040 otherwise; then it sets the sub-object's two flag words. */
 void flashing_update(s32 moby)
 {
-    s32 frame = D_001B2748;
+    s32 frame = g_flashing_frame;
     s32 period = 60;
     s32 value = *(short *)(moby + 0xB2);
     s32 dim_color = 0x80404040;

@@ -10,17 +10,17 @@ typedef int TI128 __attribute__((mode(TI)));
 extern char g_hero_state[];
 extern char g_hero_position[];
 extern u8 *g_active_attacker_robot[];
-extern s32 D_0018C0B4[];
-extern s32 D_001A7A00[] __attribute__((section(".sdata")));
-extern u8 *D_L18_001BFC18[];
+extern s32 g_game_mode[];
+extern s32 g_player_stats[] __attribute__((section(".sdata")));
+extern u8 *g_tether_l18_hit_result[];
 extern u8 *g_nearby_hit_targets[];
-extern u32 D_L18_001B2348[] __attribute__((section(".sdata")));
+extern u32 g_frame_l18_counter[] __attribute__((section(".sdata")));
 /* The 16-byte offset vector (0, 0, 0.5, 0); its size keeps it $gp-relative at -G16. */
-extern float D_L18_001B0420[4] __attribute__((sda));
-extern u16 *D_L18_001FB320[];
-extern s32 D_L18_001B2838[] __attribute__((section(".sdata")));
+extern float g_protopet_offset_vec[4] __attribute__((sda));
+extern u16 *g_condition_target_lists[];
+extern s32 g_max_l18_group_index[] __attribute__((section(".sdata")));
 extern u8 *g_moby_l18_table[] __attribute__((section(".sdata")));
-extern s32 *D_L18_001FE480[];
+extern s32 *g_path_l18_table[];
 
 extern int coll_test_point(void *, int, void *, float);
 extern int coll_process_hit(void *, int, void *, int, float);
@@ -179,7 +179,7 @@ void protopet_run_state_machine(u8 *moby)
             moby_set_state(moby, 0xB, -1);
         } else if (*(s32 *)(vars + 0x278) != -1) {
             moby_set_state(moby, 0xD, -1);
-        } else if (*(s32 *)(vars + 0x248) == 1 && D_0018C0B4[0] != 0x6F) {
+        } else if (*(s32 *)(vars + 0x248) == 1 && g_game_mode[0] != 0x6F) {
             moby_set_state(moby, 0xC, -1);
         }
         if (moby[0x60] & 2) {
@@ -227,7 +227,7 @@ void protopet_run_state_machine(u8 *moby)
                 spawn = protopet_count_group(*(u8 **)(vars + 0x25C), &spawn_limit);
                 if (spawn != 0) {
                     float wobble;
-                    FastVecAdd(point, moby + 0x10, D_L18_001B0420);
+                    FastVecAdd(point, moby + 0x10, g_protopet_offset_vec);
                     vec_clear_128(vec);
                     vec[2] = 0.13333334f;
                     wobble = math_random_float_range(2.0f, 3.0f) * 0.016666668f;
@@ -346,13 +346,13 @@ void protopet_run_state_machine(u8 *moby)
         if (phase == 0) {
             qcopy(vars + 0x230, vars + 0x1F0);
             group_id = *(s32 *)(vars + 0x27C);
-            if (group_id != -1 && (D_L18_001B2348[0] & 7) == (((s32)moby >> 8) & 7)) {
+            if (group_id != -1 && (g_frame_l18_counter[0] & 7) == (((s32)moby >> 8) & 7)) {
                 u16 *group_entry;
                 float best = 1000.0f;
                 s32 lost = 1;
-                for (group_entry = D_L18_001FB320[group_id];
-                     (u8)group_id != 0xFF && group_id <= D_L18_001B2838[0] && group_entry != 0
-                     && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == D_L18_001FB320[group_id]);
+                for (group_entry = g_condition_target_lists[group_id];
+                     (u8)group_id != 0xFF && group_id <= g_max_l18_group_index[0] && group_entry != 0
+                     && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == g_condition_target_lists[group_id]);
                      group_id = *(s32 *)(vars + 0x27C), group_entry++) {
                     u8 *other = g_moby_l18_table[0] + ((*group_entry & 0x7FFF) << 8);
                     if (other == 0) {
@@ -415,13 +415,13 @@ void protopet_run_state_machine(u8 *moby)
         if (group_id == -1) {
             break;
         }
-        if ((D_L18_001B2348[0] & 0x3F) != (((s32)moby >> 8) & 0x3F)) {
+        if ((g_frame_l18_counter[0] & 0x3F) != (((s32)moby >> 8) & 0x3F)) {
             break;
         }
         lost = 1;
-        for (group_entry = D_L18_001FB320[group_id];
-             (*(s32 *)(vars + 0x27C) & 0xFF) != 0xFF && *(s32 *)(vars + 0x27C) <= D_L18_001B2838[0] && group_entry != 0
-             && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == D_L18_001FB320[*(s32 *)(vars + 0x27C)]);
+        for (group_entry = g_condition_target_lists[group_id];
+             (*(s32 *)(vars + 0x27C) & 0xFF) != 0xFF && *(s32 *)(vars + 0x27C) <= g_max_l18_group_index[0] && group_entry != 0
+             && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == g_condition_target_lists[*(s32 *)(vars + 0x27C)]);
              group_entry++) {
             u8 *other = g_moby_l18_table[0] + ((*group_entry & 0x7FFF) << 8);
             if (other == 0) {
@@ -451,17 +451,17 @@ void protopet_run_state_machine(u8 *moby)
             *(s16 *)(vars + 0x29A) = path_measure_moby_against_entry(moby + 0x10, *(s32 *)(vars + 0x26C), 0.0f);
             if (*(s16 *)(vars + 0x29C) != 0) {
                 if (*(s16 *)(vars + 0x29A) == 0) {
-                    next = *D_L18_001FE480[*(s32 *)(vars + 0x26C)] - 1;
+                    next = *g_path_l18_table[*(s32 *)(vars + 0x26C)] - 1;
                 } else {
                     next = *(s16 *)(vars + 0x29A) - 1;
                 }
             } else {
-                next = (*(s16 *)(vars + 0x29A) == *D_L18_001FE480[*(s32 *)(vars + 0x26C)] - 1) ? 0
+                next = (*(s16 *)(vars + 0x29A) == *g_path_l18_table[*(s32 *)(vars + 0x26C)] - 1) ? 0
                                                                                            : *(s16 *)(vars + 0x29A) + 1;
             }
-            path = D_L18_001FE480[*(s32 *)(vars + 0x26C)];
+            path = g_path_l18_table[*(s32 *)(vars + 0x26C)];
             FastVecSub(point, path + (next * 4 + 4), path + (*(s16 *)(vars + 0x29A) * 4 + 4));
-            FastVecSub(vec, D_L18_001FE480[*(s32 *)(vars + 0x26C)] + (*(s16 *)(vars + 0x29A) * 4 + 4), moby + 0x10);
+            FastVecSub(vec, g_path_l18_table[*(s32 *)(vars + 0x26C)] + (*(s16 *)(vars + 0x29A) * 4 + 4), moby + 0x10);
             if (FastVecDot(vec, point) < 0.0f) {
                 *(s16 *)(vars + 0x29A) = next;
             }
@@ -499,9 +499,9 @@ void protopet_run_state_machine(u8 *moby)
                     qcopy(point, pos);
                     point[2] = point[2] + (*(float *)(vars + 0x104) + *(float *)(vars + 0x100));
                     reach = *(float *)(vars + 0x100) + 0.2f;
-                    coll_sweep_from_object(moby, point, 1, 0, 1, 0, reach, IntToFloat(D_001A7A00[0]) * 0.25f, 1.0f);
+                    coll_sweep_from_object(moby, point, 1, 0, 1, 0, reach, IntToFloat(g_player_stats[0]) * 0.25f, 1.0f);
                     if (coll_test_point(point, 1, moby, *(float *)(vars + 0x100) + 0.2f) != 0) {
-                        hit = D_L18_001BFC18[0];
+                        hit = g_tether_l18_hit_result[0];
                         if (hit != 0 && *(s16 *)(hit + 0xAA) != MOBY_CLASS_PROTOPET) {
                             *(s32 *)(vars + 0x20) = 0;
                             vec_scale_to_length(vec, moby + 0xC0, -1.0f);

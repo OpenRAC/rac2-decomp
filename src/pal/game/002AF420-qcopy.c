@@ -23,7 +23,7 @@ extern GameState_189E20 g_hero_state;
    and applies the result to the object's 0x24 field, either from the target position or from
    the hero position. The unit needs -frac2-qcopy -frac2-qcopy-barrier so the 16-byte copy
    reaches addiu/lq/sq, and -g for the two nops in front of the division. */
-void func_PAL_002AF420(char *a0, char *a1, float a2, float a3)
+void moby_wander_around_home_point_pal(char *a0, char *a1, float a2, float a3)
 {
     char *obj = a0;
     char *st = a1;

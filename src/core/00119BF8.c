@@ -17,14 +17,14 @@ typedef struct {
     } status;
 } PrintFile;
 
-extern void *D_00133E74;
-extern int D_00133B80;
-extern const char D_0013A730[];
-extern const char D_0013A740[];
-extern char D_0013A750[];
-extern char D_0013A768[];
-extern char D_0013A770[];
-extern char D_0013A788[];
+extern void *g_libc_state_record;
+extern int g_multibyte_max_len;
+extern const char g_str_snprintf_pad_blanks[];
+extern const char g_str_snprintf_pad_zeros[];
+extern char g_str_snprintf_hex_lower[];
+extern char g_str_snprintf_null[];
+extern char g_str_snprintf_hex_upper[];
+extern char g_str_snprintf_empty[];
 extern int MultibyteToWideCharReentrant(void *, int *, const char *, unsigned int, int *);
 extern int BufferedWrite128Secondary(int, const char *, unsigned int, int);
 extern void *memcpy(void *, const void *, unsigned int) __asm__("func_001153D4");
@@ -80,7 +80,7 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
     mbstate = &state;
     for (;;) {
         cp = fmt;
-        while ((n = MultibyteToWideCharReentrant(D_00133E74, wide_char, fmt, D_00133B80, mbstate)) > 0) {
+        while ((n = MultibyteToWideCharReentrant(g_libc_state_record, wide_char, fmt, g_multibyte_max_len, mbstate)) > 0) {
             fmt += n;
             if (wc == '%') {
                 fmt--;
@@ -187,12 +187,12 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
         case 'p':
             value = (s64)(int)GET(void *);
             base = HEX;
-            xdigs = D_0013A750;
+            xdigs = g_str_snprintf_hex_lower;
             flags |= 0x002;
             ch = 'x';
             goto nosign;
         case 's':
-            if ((cp = GET(char *)) == 0) cp = D_0013A768;
+            if ((cp = GET(char *)) == 0) cp = g_str_snprintf_null;
             if (prec >= 0) {
                 char *p = memchr(cp, 0, prec);
                 if (p != 0) {
@@ -209,10 +209,10 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
             base = DEC;
             goto nosign;
         case 'X':
-            xdigs = D_0013A770;
+            xdigs = g_str_snprintf_hex_upper;
             goto hex;
         case 'x':
-            xdigs = D_0013A750;
+            xdigs = g_str_snprintf_hex_lower;
         hex:
             value = UARG();
             base = HEX;
@@ -245,7 +245,7 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
                     } while (value);
                     break;
                 default:
-                    cp = D_0013A788;
+                    cp = g_str_snprintf_empty;
                     size = strlen(cp);
                     goto skipsize;
                 }
@@ -265,7 +265,7 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
             int realsz = dprec > size ? dprec : size;
             if (sign) realsz++;
             else if (flags & 0x002) realsz += 2;
-            if ((flags & 0x084) == 0) PAD(width - realsz, D_0013A730);
+            if ((flags & 0x084) == 0) PAD(width - realsz, g_str_snprintf_pad_blanks);
             if (sign) {
                 PRINT(&sign, 1);
             } else if (flags & 0x002) {
@@ -273,10 +273,10 @@ int VfprintfInteger(void *data, PrintFile *fp, const char *fmt0, char *ap)
                 ox[1] = ch;
                 PRINT(ox, 2);
             }
-            if ((flags & 0x084) == 0x080) PAD(width - realsz, D_0013A740);
-            PAD(dprec - size, D_0013A740);
+            if ((flags & 0x084) == 0x080) PAD(width - realsz, g_str_snprintf_pad_zeros);
+            PAD(dprec - size, g_str_snprintf_pad_zeros);
             PRINT(cp, size);
-            if (flags & 0x004) PAD(width - realsz, D_0013A730);
+            if (flags & 0x004) PAD(width - realsz, g_str_snprintf_pad_blanks);
             ret += width > realsz ? width : realsz;
         }
     }

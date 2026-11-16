@@ -15,14 +15,14 @@ typedef struct {
     s32 fieldC;
 } L06Entry;
 
-extern L06Entry D_L06_00139A28[];
+extern L06Entry g_table_entries[];
 
 extern s32 level_find_key_in_pair_table();
 
-extern u8 D_001A7BC8[] __attribute__((sda));
-extern u8 D_001A7BE0 __attribute__((sda));
+extern u8 g_map_visited_flags[] __attribute__((sda));
+extern u8 g_progress_flag __attribute__((sda));
 extern char g_hero_position[];
-extern int D_L06_001B2348 __attribute__((sda));
+extern int g_game_l06_frame_counter __attribute__((sda));
 extern void moby_set_state(void *, int, int);
 extern float vec_distance_xy(void *, void *);
 extern float FastVecLength(void *);
@@ -47,7 +47,7 @@ extern void draw_world_quad(void *, int, int);
 void table_set_entry_field(s32 id, s32 value) {
     s32 entryIndex = level_find_key_in_pair_table(id);
     if (entryIndex != -1)
-        D_L06_00139A28[entryIndex].fieldC = value;
+        g_table_entries[entryIndex].fieldC = value;
 }
 
 /* func_L06_00382608 is defined in L06_00382608.c. */
@@ -122,7 +122,7 @@ void collectable_pickup_update(u8 *moby)
     switch ((u8)moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        if (!D_001A7BC8[*(int *)vars]) moby_set_state(moby, 1, -1);
+        if (!g_map_visited_flags[*(int *)vars]) moby_set_state(moby, 1, -1);
         else moby_mark_spawned(moby);
         break;
     case 1:
@@ -133,7 +133,7 @@ void collectable_pickup_update(u8 *moby)
             *(u16 *)(moby + 0x34) |= 0x100;
             *(int *)(vars + 8) = 180;
         }
-        if (*(int *)vars == 24 && D_001A7BE0) {
+        if (*(int *)vars == 24 && g_progress_flag) {
             moby_mark_flag_and_append_to_list(24);
             moby_set_state(moby, 2, -1);
             *(u16 *)(moby + 0x34) |= 0x100;
@@ -154,7 +154,7 @@ void collectable_pickup_update(u8 *moby)
             }
         }
         gfx_add_draw_callback_first(hud_show_pickup_notice, moby);
-        if ((D_L06_001B2348 ^ 1) & 1) (*(int *)(vars + 4))++;
+        if ((g_game_l06_frame_counter ^ 1) & 1) (*(int *)(vars + 4))++;
         if (math_fast_float_d((int *)(vars + 8))) {
             ApproachValue((float *)(vars + 12), 0, 0.05000000447034836f);
             if (*(float *)(vars + 12) <= 0) moby_mark_spawned(moby);
@@ -181,7 +181,7 @@ s32 taxi_is_flying(u8 *moby) {
 
 
 extern char g_path_l17_table[];
-extern char D_L17_00296F80[];
+extern char g_path_point_template[];
 extern u8 g_hero_state[];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_2EEEB8(void *, void *, void *);
@@ -208,7 +208,7 @@ void path_update_attached_point_table(char *moby)
         return;
     matrix = moby + 0xC0;
     position = moby + 0x10;
-    sourcePoint = D_L17_00296F80;
+    sourcePoint = g_path_point_template;
     outPoint = tableEntry + 0x10;
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(outPoint, sourcePoint, matrix);
@@ -274,11 +274,11 @@ void gfx_draw_double_layer_quad(char *moby)
     draw_world_quad(&q, 0, 0);
 }
 
-extern s32 D_L06_001B9890;
+extern s32 g_camera_l06_state_ptr;
 
 /* Sets a camera distance value, unless the camera is switched off. */
 void cam_set_follow_distance(float distance) {
-    s32 cameraState = D_L06_001B9890;
+    s32 cameraState = g_camera_l06_state_ptr;
     if (*(s16 *)(cameraState + 0x86) == 0)
         *(float *)(*(s32 *)(cameraState + 0x70) + 0x24C) = distance;
 }

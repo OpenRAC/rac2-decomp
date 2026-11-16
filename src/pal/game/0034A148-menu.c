@@ -13,7 +13,7 @@ extern void hud_set_widget_field_b(void *,int);
 extern char *GetLocalizedString(int);
 typedef struct {unsigned int first,second;} MenuColors;
 
-void func_PAL_0034A300(char *o)
+void option_list_draw_rows_pal(char *o)
 {
     float *pos=object_get_first_field(o);
     int i=0;

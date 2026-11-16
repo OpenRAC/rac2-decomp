@@ -15,8 +15,8 @@ extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
 extern int coll_process_hit(float, void *, int, int, int);
 extern char *part_spawn_debris(void *, int, int, int, int, int, int, float, float);
 extern char *part_spawn_debris_two_mode(void *, int, int, int, int, int, int, float, float);
-extern unsigned char *D_001F2628;
-extern char *D_001B1D90[] __attribute__((sda));
+extern unsigned char *g_part_tex_burst_ember_table;
+extern char *g_particle_pool_base[] __attribute__((sda));
 extern char g_hero_position[];
 
 typedef struct {
@@ -41,7 +41,7 @@ extern float fast_vec_dist(void *,void *);
 extern void vec_pack_direction(float *,int *);
 extern void vec_decode_byte_color(void *,void *);
 extern void lerp_vector(void *,void *,void *,float);
-extern char D_00189F00[];
+extern char g_hero_target_point[];
 
 extern char *part_spawn_smoke_alt(void *, void *, int, int);
 typedef unsigned int U128 __attribute__((mode(TI)));
@@ -85,8 +85,8 @@ extern char *part_spawn_scaled_smoke(void *, void *, int, void *, int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_clear_128(void *);
-extern float D_001BAFC0[];
-extern unsigned char *D_001F25F4, *D_001F26A8;
+extern float g_coll_hit_normal[];
+extern unsigned char *g_part_tex_drifting, *g_part_tex_spark_trail_table;
 extern int moby_forward_two_values_and_amount(int, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
@@ -96,8 +96,8 @@ extern int gfx_pack_color_floats(float, float, float, float);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern unsigned char *D_001F2570;
-extern unsigned char *D_001F2688;
+extern unsigned char *g_part_tex_smoke_table;
+extern unsigned char *g_part_tex_split_spark_low_table;
 extern int moby_decrement_top_byte(void *, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 
@@ -258,7 +258,7 @@ extern void ApproachValue(float *, float, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern float D_001B5358;
+extern float g_rotation_base_angle;
 
 /* Advances one object: the halfword at offset 10 is capped at 12 and, when the
    sub-object's float at 0x30 is below the object's float at 0x18, the word at
@@ -319,7 +319,7 @@ void part_update_smoke_wisp(char *self)
     *(float *)(motion + 8) = vec[2];
     f0 = FastAddRotations(*(float *)(motion + 0x14), *(float *)(motion + 0x18));
     *(float *)(motion + 0x14) = f0;
-    angle = FastAddRotations(D_001B5358, 1.5707964897155761718750e+00f);
+    angle = FastAddRotations(g_rotation_base_angle, 1.5707964897155761718750e+00f);
     f3 = math_fast_sin_or_cos_b(*(float *)(motion + 0x14));
     f2 = f3 * *(float *)(motion + 0x1C);
     f0 = math_fast_sin_or_cos_a(angle);
@@ -336,9 +336,9 @@ extern void *part_spawn_drifting(void *, float, void *, float, int);
 extern void *part_spawn_puff(void *, int, float, float);
 typedef union { unsigned char b[0x2600]; int i[0x980]; float f[0x980]; } L_BFC50Hero;
 extern char g_hero_state[];
-extern void *D_001A9E74 __attribute__((section(".sdata")));
+extern void *g_particle_drift_target __attribute__((section(".sdata")));
 extern float g_collision_hit[];
-extern char D_001BAFA0[];
+extern char g_coll_hit_position[];
 
 /* Moves a falling spark and checks if it hits something. On a hit it makes a small splash and removes the spark, otherwise it keeps falling and fades. */
 void part_update_falling_spark(char *self)
@@ -355,14 +355,14 @@ void part_update_falling_spark(char *self)
             goto copy;
         }
         if (GetCollHitMaterial() == 0) {
-            part_spawn_drifting(D_001BAFA0, 0.2f, D_001A9E74, 5250.0f, -1);
+            part_spawn_drifting(g_coll_hit_position, 0.2f, g_particle_drift_target, 5250.0f, -1);
         }
         part_kill(self);
         return;
     } else if (state == 3) {
         FastVecAdd(self + 0x10, self + 0x10, motion);
         if (*(float *)(self + 0x18) < ((L_BFC50Hero *)g_hero_state)->f[0x330 / 4]) {
-            void *t = D_001A9E74;
+            void *t = g_particle_drift_target;
 
             *(float *)(self + 0x18) = ((L_BFC50Hero *)g_hero_state)->f[0x330 / 4];
             part_spawn_drifting(self + 0x10, 0.2f, t, 5250.0f, -1);
@@ -480,7 +480,7 @@ void part_update_splitting_spark(SplitParticle *p) {
         p->posv.f[1] = p->posv.f[1] + math_random_float_range(nsp, sp);
         p->posv.f[2] = p->posv.f[2] + math_random_float_range(nsp, sp);
     }
-    table = D_001F2570;
+    table = g_part_tex_smoke_table;
     { int index = p->b02 - table[0];
     p->b02 = table[(p->h0A + pv->f16 + index) & 7]; }
     FastVecAdd((char *)v0u.f, (char *)p->posv.f, (char *)pv);
@@ -507,11 +507,11 @@ void part_update_splitting_spark(SplitParticle *p) {
         if (!(pv->f18 & 0x10)) hit = CollLine(v1u.f, v0u.f, 0, pv->f1C, &collision) != 0;
     }
     if (hit) {
-        vec_scale_to_length(v2, D_001BAFC0, 1.0f);
-        vec_fast_normalize(pv, pv, D_001BAFC0);
+        vec_scale_to_length(v2, g_coll_hit_normal, 1.0f);
+        vec_fast_normalize(pv, pv, g_coll_hit_normal);
         func_00282D30_12((char *)pv, (char *)pv, 0.02f);
-        vec_scale_to_length(v2, D_001BAFC0, 0.055f);
-        FastVecAdd((char *)p->posv.f, (char *)(D_001BAFC0 - 8), (char *)v2);
+        vec_scale_to_length(v2, g_coll_hit_normal, 0.055f);
+        FastVecAdd((char *)p->posv.f, (char *)(g_coll_hit_normal - 8), (char *)v2);
         if (p->f0C < 200000.0f && (pv->f18 & 8) == 0) {
             p->f0C = p->f0C + p->f0C;
         }
@@ -602,7 +602,7 @@ void part_update_fading_split_spark(FadeSplitParticle *particle) {
         particle->pos.f[1] += math_random_float_range(neg_spread, spread);
         particle->pos.f[2] += math_random_float_range(neg_spread, spread);
     }
-    table = D_001F2570;
+    table = g_part_tex_smoke_table;
     { int index = particle->b2 - table[0];
     particle->b2 = table[(particle->hA + motion->h16 + index) & 7]; }
     FastVecAdd((char *)&new_vel, (char *)&particle->pos, (char *)motion);
@@ -734,7 +734,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned char *D_001F25F4;
+extern unsigned char *g_part_tex_drifting;
 
 /* Creates a small drifting particle at a position with a random direction, a size, and an optional color. */
 void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color)
@@ -757,7 +757,7 @@ void *part_spawn_drifting(void *position, float size, void *owner, float spin, i
         p->alpha = FloatToInt(1.0f) + 32;
         p->b3 = 0x48;
         p->b1 = 1;
-        p->b2 = *D_001F25F4;
+        p->b2 = *g_part_tex_drifting;
         p->seed = func_001163B0();
         p->size = 4;
         p->life = size * 210000.0f;
@@ -944,7 +944,7 @@ typedef struct {
 
 extern void moby_queue_knockback_for_nodes(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
 
-extern int D_001BF000[];
+extern int g_nearby_mobys[];
 
 /* Updates one object: it copies its vector into a local, adds the two motion
    floats and hands the result with the motion's third float to a helper, then
@@ -985,7 +985,7 @@ void part_update_trail_emitter(char *obj)
     count = coll_process_hit(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
     local[1] = *(V4_Fc3cb9262 *)(obj + 0x10);
     moby_queue_knockback_for_nodes((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
-                   D_001BF000, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
+                   g_nearby_mobys, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
 }
 
 
@@ -1069,8 +1069,8 @@ void part_update_burst_effect(char *particle) {
   progress=(total-func_00283CE0_2(*(short *)(particle+10)))/total;
   *(int *)(particle+4)=FastTweenColor((*(unsigned char *)(motion+22)<<24)|0x4060,0x8fafff,progress);
   if(progress<0.6f)*(float *)(particle+12)+=9030.0f;else *(float *)(particle+12)-=16800.0f;
-  particle[2]=D_001F2628[func_001163B0()&7];
-  if((((particle-D_001B1D90[0])>>6)&1))particle[8]++;else particle[8]--;
+  particle[2]=g_part_tex_burst_ember_table[func_001163B0()&7];
+  if((((particle-g_particle_pool_base[0])>>6)&1))particle[8]++;else particle[8]--;
   if(FastDecTimer((short *)(particle+10)))part_kill(particle);
   break;
  }
@@ -1213,7 +1213,7 @@ void UpdateCollidingSpark(char *particle) {
  motion=particle+32;*(float *)(particle+12)+=-100.0f;
  FastVecAdd((char *)next_pos,particle+16,motion);
  if(*(float *)motion!=0 || *(float *)(motion+4)!=0 || *(float *)(motion+8)!=0){
- if(CollLine(particle+16,next_pos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)D_001BAFA0;vec_clear_128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
+ if(CollLine(particle+16,next_pos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)g_coll_hit_position;vec_clear_128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
  else {*(U128 *)(particle+16)=*(U128 *)next_pos;if(*(float *)(motion+12)!=0)*(float *)(motion+8)+=*(float *)(motion+12);else *(float *)(motion+8)+=-0.0063f;}}
  if(*(float *)(motion+28)<=0 || FastDecTimer((short *)(particle+10)) || *(float *)(particle+12)<0 || next_pos[0]<0.01f || next_pos[1]<0.01f || next_pos[2]<0.01f){part_kill(particle);return;}
  *(float *)(motion+16)+=-0.01f;if(*(float *)(motion+16)<0)*(float *)(motion+16)=0;
@@ -1347,7 +1347,7 @@ void part_step_fade_timer(u8 *particle) {
 void part_update_attracted(char *particle) {
  char *motion=particle+32; float v[4],a[4],b[4];float distance;
  if(g_game_time[0]&1)particle[8]++;
- distance=fast_vec_dist(particle+16,D_00189F00);
+ distance=fast_vec_dist(particle+16,g_hero_target_point);
  if(distance<5.0f && *(float *)(*(char **)(motion+24)+8)>0.0f) {
   FastVecSub(a,*(void **)(motion+24),particle+16);
   if(FastVecLength(a)>0.5f) {vec_scale_to_length(a,a,0.1f/distance);FastVecAdd(particle+16,particle+16,(char *)a);}
@@ -1507,8 +1507,8 @@ void part_update_burst_ember(char *particle) {
   progress=(total-func_00283CE0_2(*(short *)(particle+10)))/total;
   *(int *)(particle+4)=FastTweenColor((*(unsigned char *)(motion+22)<<24)|0x4060,0x8fafff,progress);
   if(progress<0.6f)*(float *)(particle+12)+=9030.0f;else *(float *)(particle+12)-=16800.0f;
-  particle[2]=D_001F2628[func_001163B0()&7];
-  if((((particle-D_001B1D90[0])>>6)&1))particle[8]++;else particle[8]--;
+  particle[2]=g_part_tex_burst_ember_table[func_001163B0()&7];
+  if((((particle-g_particle_pool_base[0])>>6)&1))particle[8]++;else particle[8]--;
   if(FastDecTimer((short *)(particle+10)))part_kill(particle);
   break;
  }
@@ -1554,7 +1554,7 @@ void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
         particle->pos.f[1] += math_random_float_range(neg_spread, spread);
         particle->pos.f[2] += math_random_float_range(neg_spread, spread);
     }
-    table = D_001F2688;
+    table = g_part_tex_split_spark_low_table;
     { int index = particle->b2 - table[0];
     particle->b2 = table[(particle->hA + motion->h16 + index) & 7]; }
     FastVecAdd((char *)&new_vel, (char *)&particle->pos, (char *)motion);
@@ -1820,7 +1820,7 @@ char *part_spawn_trail_2(void *origin, void *direction, int lifetime, float scal
         particle->b9 = (char)(fade + 0x20);
         particle->b3 = 0x48;
         particle->b1 = 3;
-        particle->b2 = *D_001F26A8;
+        particle->b2 = *g_part_tex_spark_trail_table;
         pos = &particle->v30;
         qcopy_nc(pos, direction);
         pos->f[3] = scale;

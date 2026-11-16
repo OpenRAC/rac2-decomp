@@ -3,7 +3,7 @@
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
-void func_PAL_L00_0030FA48(void)
+void level_l00_call_module_handler_7_pal(void)
 {
     int value = D_L00_001A904C_2;
 

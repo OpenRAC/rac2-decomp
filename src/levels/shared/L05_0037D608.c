@@ -10,13 +10,13 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void follower_set_push_vector(void *, float *);
 
-extern short *D_L05_001FB220[];
-extern u8 *D_L05_001B251C __attribute__((sda));
+extern short *g_spawn_list_table[];
+extern u8 *g_feltzin_target_mobys __attribute__((sda));
 
 /* Gives every piece in the object's slot list a small random push. */
 void func_L05_0037D608(void *object, void *argument, float value)
 {
-    unsigned short *q = (unsigned short *)D_L05_001FB220[((unsigned char *)object)[0x21]];
+    unsigned short *q = (unsigned short *)g_spawn_list_table[((unsigned char *)object)[0x21]];
     unsigned short *p;
 
     if (q != 0) {
@@ -26,13 +26,13 @@ void func_L05_0037D608(void *object, void *argument, float value)
         do {
             int offset = (*p & 0x7FFF) << 8;
 
-            if (moby_get_motion_data(D_L05_001B251C + offset) != 0) {
+            if (moby_get_motion_data(g_feltzin_target_mobys + offset) != 0) {
                 float a = math_random_angle();
                 float b = math_random_angle();
 
                 vec_build_spherical_offset(vector, value, a, b);
                 FastVecAdd(vector, vector, argument);
-                follower_set_push_vector(D_L05_001B251C + offset, vector);
+                follower_set_push_vector(g_feltzin_target_mobys + offset, vector);
             }
         } while ((short)*p++ >= 0);
     }

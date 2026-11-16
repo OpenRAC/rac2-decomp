@@ -6,12 +6,12 @@ extern void func_PAL_002A7E68(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
-extern int func_PAL_002B3F18(char *, char *, char *);
+extern int part_spawn_damage_debris_pal(char *, char *, char *);
 extern int moby_spawn_linked(char *, int, float, float);
 extern u16 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((sda));
 
-void func_PAL_L11_00458828(char *object, int mode, int active) {
+void flamethrower_robot_init_pal(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
 
     *(u8 *)(state + 0x2E) = 1;
@@ -40,7 +40,7 @@ void func_PAL_L11_00458828(char *object, int mode, int active) {
     *(short *)(state + 0x2D4) = mode;
     *(u8 *)(state + 0x6A) = 0;
     *(int *)(state + 0x200) = 0;
-    func_PAL_002B3F18(object, state + 0x1F0, state + 0x20);
+    part_spawn_damage_debris_pal(object, state + 0x1F0, state + 0x20);
     if (*(short *)(state + 0x50) != 0) {
         *(short *)(state + 0x50) = 0;
         set_moby_color(object, *(u8 *)(state + 0x54), *(u8 *)(state + 0x55),
@@ -53,21 +53,21 @@ void func_PAL_L11_00458828(char *object, int mode, int active) {
 extern void vec_random_direction(void *a0, float f12, float f13);
 extern void func_PAL_002B15D8(char *a0, int a1, void *a2, float f12, float f13, float f14,
                         float f15, int a3);
-extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int,
+extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int,
                          float, float, int, int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002B15D8(char *, int, void *, float, float, float, float, int);
 
-void func_PAL_L11_004589C8(char *object) {
+void flamethrower_robot_deactivate_pal(char *object) {
     char *state = *(char **)(object + 0x68);
     float direction[4];
 
     *(short *)(state + 0x2D2) = 0;
     *(int *)(state + 0x2C4) = 0;
     if (*(u8 *)(object + 0x31) != 0) {
-        func_PAL_L00_003FB330(object + 0x10, 0, 5, 5, 25, 20, 10, 1,
+        SpawnExplosion_pal(object + 0x10, 0, 5, 5, 25, 20, 10, 1,
                      0.5f, 0.0f, 1, 0, 0, 0);
         snd_play_from_class_bank(0, 0, object, 0xDF7);
         vec_random_direction(direction, 0.10000001f, 0.14000002f);

@@ -25,8 +25,8 @@ extern void moby_mark_spawned(void *);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void ref_L16_004051A8_00(void *);
 extern void ref_L16_004051A8_01(void (*)(void *),void *);
-extern char *D_L16_001BFF58 __attribute__((nosda));
-extern float D_L16_001B145C __attribute__((sda));
+extern char *g_aim_target_moby __attribute__((nosda));
+extern float g_projectile_spin_degrees __attribute__((sda));
 /* Projectile update: expires after 240 frames, moves along its velocity and, on a
  * hit, unless the object hit is the one its state records at +0x10, sends a blast
  * request (velocity scaled 1.5, or 3 with no object hit) through func_00277F48.
@@ -48,8 +48,8 @@ void projectile_l16_update(char *object)
         make_hit_descriptor((char *)&local.move,(int)object,3,*(float *)(state+0x14),(Quad16 *)state);
         local.move.id=*(unsigned short *)(object+0xaa);
         if (CollLine(object+0x10,&local.next,0,object,&local.move)!=0 || coll_test_point(object+0x10,0,object,0.3f)!=0) {
-            if (D_L16_001BFF58!=0) {
-                if (D_L16_001BFF58!=*(char **)(state+0x10)) {
+            if (g_aim_target_moby!=0) {
+                if (g_aim_target_moby!=*(char **)(state+0x10)) {
                     qcopy(&local.direction,state);
                     FastVecScale(&local.direction,&local.direction,1.5f);
                     ((float *)&local.direction)[2]=1.0f;
@@ -86,7 +86,7 @@ void projectile_l16_update(char *object)
         moby_mark_spawned(object);
         return;
     }
-    math_apply_axis_rotation_to_quat(object+0xe0,object+0xe0,object+0xd0,D_L16_001B145C*0.017453294f);
-    math_apply_axis_rotation_to_quat(object+0xc0,object+0xc0,object+0xd0,D_L16_001B145C*0.017453294f);
+    math_apply_axis_rotation_to_quat(object+0xe0,object+0xe0,object+0xd0,g_projectile_spin_degrees*0.017453294f);
+    math_apply_axis_rotation_to_quat(object+0xc0,object+0xc0,object+0xd0,g_projectile_spin_degrees*0.017453294f);
     ref_L16_004051A8_01(ref_L16_004051A8_00,object);
 }

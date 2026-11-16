@@ -14,14 +14,14 @@ extern int math_fast_float_d(s32 *);
 extern void table_clear_entry_flag(int);
 extern void part_spawn_big_explosion(void *, void *, void *);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 /* Partial camera prefix; the measured 0xE0 stride is explicit at use. */
 typedef struct { char reserved00[0x70]; float radius; } Camera;
 typedef struct { char pad[0x18]; char *object; int count; Quad position; char gap[16]; char normal[16]; } Hit;
-extern u8 D_L15_00276FF0[];
-extern Hit D_L15_001BFC00;
+extern u8 g_item_l15_slot_table[];
+extern Hit g_hit_l15_result;
 extern void *g_hero_moby;
-extern void *D_L15_001AC810 MACRO_ADDR;
+extern void *g_bounce_model_ptr MACRO_ADDR;
 
 
 
@@ -50,7 +50,7 @@ void projectile_bounce_count_update(unsigned char *object)
     *(int *)(collision + 0x14) = 0x830000;
     if (*(int *)(state + 0x18) < 0x122)
         *(int *)(collision + 0x14) = 0x830001;
-    *(float *)(collision + 0x1c) = ((Camera *)((char *)D_L15_00276FF0 + D_00139574 * 0xe0))->radius;
+    *(float *)(collision + 0x1c) = ((Camera *)((char *)g_item_l15_slot_table + g_bouncing_weapon_index * 0xe0))->radius;
     *(int *)(collision + 0x20) = 1;
     qcopy(collision, state);
     vec_fast_normalize_helper(collision, collision, 1.0f);
@@ -61,23 +61,23 @@ void projectile_bounce_count_update(unsigned char *object)
     collision[0x19] = 1;
     ++*(int *)(state + 0x14);
     if (CollLine(previous, position, 0x10, object, collision)) {
-        if (D_L15_001BFC00.object) {
-            if ((D_L15_001BFC00.object == g_hero_moby || *(short *)(D_L15_001BFC00.object + 0xaa) == MOBY_CLASS_BOMB_GLOVE) &&
+        if (g_hit_l15_result.object) {
+            if ((g_hit_l15_result.object == g_hero_moby || *(short *)(g_hit_l15_result.object + 0xaa) == MOBY_CLASS_BOMB_GLOVE) &&
                 *(int *)(state + 0x18) >= 0x122)
                 goto finished;
-            if (*(void **)(D_L15_001BFC00.object + 0x64) == D_L15_001AC810 && *(short *)(D_L15_001BFC00.object + 0xaa) != 0x336 /* moby class 822 */)
+            if (*(void **)(g_hit_l15_result.object + 0x64) == g_bounce_model_ptr && *(short *)(g_hit_l15_result.object + 0xaa) != 0x336 /* moby class 822 */)
                 goto finished;
             *(unsigned char *)(object + 0xbc) = 1;
-            qcopy(object + 0x10, &D_L15_001BFC00.position);
-            vec_fast_normalize(delta, state, D_L15_001BFC00.normal);
+            qcopy(object + 0x10, &g_hit_l15_result.position);
+            vec_fast_normalize(delta, state, g_hit_l15_result.normal);
             vec_scale_to_length(delta, delta, 0.03333333507180214f);
-            vec_scale_to_length(normal, D_L15_001BFC00.normal, 1.0f);
-        } else if (D_L15_001BFC00.count > 0) {
+            vec_scale_to_length(normal, g_hit_l15_result.normal, 1.0f);
+        } else if (g_hit_l15_result.count > 0) {
             *(unsigned char *)(object + 0xbc) = 1;
-            qcopy(position, &D_L15_001BFC00.position);
-            vec_fast_normalize(delta, state, D_L15_001BFC00.normal);
+            qcopy(position, &g_hit_l15_result.position);
+            vec_fast_normalize(delta, state, g_hit_l15_result.normal);
             vec_scale_to_length(delta, delta, 0.03333333507180214f);
-            vec_scale_to_length(normal, D_L15_001BFC00.normal, 1.0f);
+            vec_scale_to_length(normal, g_hit_l15_result.normal, 1.0f);
         }
     } else if (math_fast_float_d((s32 *)(state + 0x18))) {
         *(unsigned char *)(object + 0xbc) = 1;

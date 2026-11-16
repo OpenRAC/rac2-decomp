@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A0F68(char *);
-extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A0F68(char *);
@@ -21,7 +21,7 @@ extern int PlayMobySound(int index, int a1, char *a2);
 extern void moby_detach_manipulator(char *list, char *node);
 
 /* Spawns the object's jitter effect while its flag byte is set, then retires the state. */
-void func_PAL_L11_004400D0(char *obj)
+void drone_kill_with_effects_pal(char *obj)
 {
     char *state;
     unsigned short flags;
@@ -37,7 +37,7 @@ void func_PAL_L11_004400D0(char *obj)
         v[2] = math_random_float_range(0.10000001f, s);
         func_PAL_002B15D8(obj, 3, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         PlayMobySound(1, 0, obj);
-        func_PAL_L00_003FB330(obj + 0x10, 1, 0x19, 0xA, 0xA, 5, 0, 1, 1.0f, 20.0f, 0, 0, 0, 0);
+        SpawnExplosion_pal(obj + 0x10, 1, 0x19, 0xA, 0xA, 5, 0, 1, 1.0f, 20.0f, 0, 0, 0, 0);
         snd_play_from_class_bank(0, 0, obj, 0xDF7);
     }
 

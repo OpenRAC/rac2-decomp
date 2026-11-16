@@ -4,9 +4,9 @@
 typedef unsigned char u8;
 typedef signed int s32;
 extern void moby_set_state();
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
 extern char g_hero_position[];
 extern int IsPointInCuboid(void *, int);
 extern s32 req_push_queue(u8 *, s32);
@@ -22,7 +22,7 @@ extern void moby_mark_spawned(u8 *);
    record, then queues the messages 0x2D, 3 and 0x2E on D_L02_001C0700, sets the byte and calls
    func_002A7750 with 2. Kind 2 runs func_002AD7B8 and func_002AF0A8 with 3 and calls
    func_002A7750 with 3, unless func_002F5D10 answers yes. */
-void func_US2_L02_004112C8(u8 *a0) {
+void message_sequence_update_us2(u8 *a0) {
     u8 *state = *(u8 **)(a0 + 0x68);
 
     switch (a0[0x20]) {
@@ -33,13 +33,13 @@ void func_US2_L02_004112C8(u8 *a0) {
             moby_set_state(a0, 1, -1);
         break;
     case 1:
-        if (D_001A7BCB == 0 && D_L02_001395B8[4] == 0 &&
+        if (g_unlock_flag_c == 0 && g_message_sequence_flags[4] == 0 &&
             IsPointInCuboid(g_hero_position, *(s32 *)(state + 0xC)) != 0 &&
-            req_push_queue(D_L02_001C0700, 0x2D) != 0) {
-            req_push_queue(D_L02_001C0700, 3);
-            req_push_queue(D_L02_001C0700, 0x2E);
-            req_launch_queued(D_L02_001C0700);
-            D_L02_001395B8[4] = 1;
+            req_push_queue(g_message_queue, 0x2D) != 0) {
+            req_push_queue(g_message_queue, 3);
+            req_push_queue(g_message_queue, 0x2E);
+            req_launch_queued(g_message_queue);
+            g_message_sequence_flags[4] = 1;
             moby_set_state(a0, 2, -1);
         }
         break;

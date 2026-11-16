@@ -1,11 +1,12 @@
+#include "names.h"
 /* Set the initial state, then trigger the event when no active class 0xD3D remains. */
 #include "common.h"
 
-extern s32 D_L22_001B2128 __attribute__((sda));
+extern s32 g_trigger_event_list_head __attribute__((sda));
 
-extern u8 D_001A7A78 __attribute__((nosda));
+extern u8 g_trigger_event_flags __attribute__((nosda));
 
-extern s32 D_L22_001A903C __attribute__((sda));
+extern s32 g_trigger_event_flag __attribute__((sda));
 
 extern void moby_set_state(u8 *, s32, s32);
 
@@ -23,7 +24,7 @@ void moby_wait_no_active_trigger_event(s32 moby)
         break;
     case 1: {
         s32 active_found = 0;
-        s32 other = D_L22_001B2128;
+        s32 other = g_trigger_event_list_head;
 
         while (other != 0) {
             if (*(s16 *)(other + 0xAA) == 0xD3D /* moby class 3389 */) {
@@ -34,11 +35,11 @@ void moby_wait_no_active_trigger_event(s32 moby)
         }
         if (active_found != 0)
             break;
-        if (D_001A7A78 == 0) {
-            D_001A7A78 = 1;
+        if (g_trigger_event_flags == 0) {
+            g_trigger_event_flags = 1;
             snd_play_from_global_bank(1, 0, 0);
             value_set_entry_by_index(0x1233, -1);
-            D_L22_001A903C = 1;
+            g_trigger_event_flag = 1;
         }
         break;
     }

@@ -1,42 +1,42 @@
 #include "names.h"
 typedef int s32;
 
-extern s32 D_L00_001A8FB4;
-extern s32 D_L00_001A8FB8;
-extern s32 D_L00_001A8FB0;
+extern s32 g_input_block_flag;
+extern s32 g_pad_press_window;
+extern s32 g_hit_streak_state;
 extern s32 ref_L00_003266D8_00 __attribute__((sda));
 extern s32 ref_L00_003266D8_01 __attribute__((sda));
-extern s32 D_L00_001B2088 __attribute__((sda));
-extern s32 D_L00_001B2084 __attribute__((sda));
-extern unsigned char D_L00_002F7530[];
-extern unsigned char D_L00_002F7568[];
-extern unsigned char D_L00_002F7588[];
+extern s32 g_hit_streak_enabled __attribute__((sda));
+extern s32 g_hit_streak_hud_slot __attribute__((sda));
+extern unsigned char g_hit_streak_hud_data_a[];
+extern unsigned char g_hit_streak_hud_data_b[];
+extern unsigned char g_hit_streak_hud_data_c[];
 extern s32 hud_set_slot_contents(s32, s32, void *, void *, void *, s32, s32);
 extern s32 level_raise_record_peak(s32, s32);
 
 /* Counts down the hit streak timers each frame and shows or hides the streak effect while the streak is active. */
 void hero_update_hit_streak_effect(void) {
-    if (D_L00_001A8FB4 == 0) {
-        s32 count = D_L00_001A8FB8 + 1;
+    if (g_input_block_flag == 0) {
+        s32 count = g_pad_press_window + 1;
 
         ref_L00_003266D8_00 = count;
         if (count > 10)
             ref_L00_003266D8_00 = 10;
     } else {
-        D_L00_001A8FB8 = 0;
+        g_pad_press_window = 0;
     }
-    if (D_L00_001A8FB0 != 0) {
-        ref_L00_003266D8_01 = D_L00_001A8FB0 - 1;
+    if (g_hit_streak_state != 0) {
+        ref_L00_003266D8_01 = g_hit_streak_state - 1;
         if (ref_L00_003266D8_01 == 0)
-            D_L00_001A8FB4 = 0;
+            g_input_block_flag = 0;
     }
-    if (D_L00_001A8FB4 == 0 || D_L00_001B2088 == 0) {
-        D_L00_001B2084 = -1;
+    if (g_input_block_flag == 0 || g_hit_streak_enabled == 0) {
+        g_hit_streak_hud_slot = -1;
     } else {
-        if (D_L00_001B2084 == -1)
-            D_L00_001B2084 = hud_set_slot_contents(12, 0, D_L00_002F7530, D_L00_002F7568,
-                                           D_L00_002F7588, 0, 0);
+        if (g_hit_streak_hud_slot == -1)
+            g_hit_streak_hud_slot = hud_set_slot_contents(12, 0, g_hit_streak_hud_data_a, g_hit_streak_hud_data_b,
+                                           g_hit_streak_hud_data_c, 0, 0);
         else
-            level_raise_record_peak(D_L00_001B2084, 10);
+            level_raise_record_peak(g_hit_streak_hud_slot, 10);
     }
 }

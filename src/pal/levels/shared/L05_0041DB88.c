@@ -2,14 +2,14 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern short D_L05_00221D50;
+extern short g_thruster_glow_enabled;
 extern void FastVecAdd(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 extern int math_fast_float_d(char *);
 extern float FastAddRotations(float, float);
 extern void gfx_l04_draw_billboard_sprite(char *, int, int, int, float, float, float, float);
 
-void func_PAL_L05_0041DB88(char *arg0)
+void gfx_draw_thruster_glow_pal(char *arg0)
 {
     char *st = *(char **)(arg0 + 0x68);
     TI128 v;
@@ -27,7 +27,7 @@ void func_PAL_L05_0041DB88(char *arg0)
     vec_scale_to_length((char *)&v, (char *)&v, 0.05f);
     c2 = 0;
     FastVecAdd((char *)&v, arg0 + 0x10, (char *)&v);
-    if (D_L05_00221D50 != 0) {
+    if (g_thruster_glow_enabled != 0) {
         *(int *)(st + 0xA0) = 6;
     } else {
         c1 = 0x0FC85A5A;
@@ -49,7 +49,7 @@ void func_PAL_L05_0041DB88(char *arg0)
 
 /* func_L05_00419F10 is defined in L05_00419F10-g8.c. */
 
-void func_PAL_L05_0041EF70(void)
+void stub_l05_empty_pal(void)
 {
     char buf[0x20];
 }

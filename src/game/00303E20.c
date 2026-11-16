@@ -1,6 +1,6 @@
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } GridPoint;
-extern float D_00222AE0[][4];
+extern float g_surface_grid_points[][4];
 extern int IsPointInCuboid(void *, int);
 extern int coll_find_outside_edge_index(void *, void *, int);
 /* Finds which grid square of the surface a point is over and gives its column and row. */
@@ -37,20 +37,20 @@ int FindSurfaceGridCell(char *obj, GridPoint *point, int *column, int *row)
             float height;
             int current = base + j * 8 + i;
             int next = base + (j + 1) * 8 + i;
-            corners[0].f[0] = D_00222AE0[current][0];
-            corners[1].f[0] = D_00222AE0[current + 1][0];
-            corners[2].f[0] = D_00222AE0[next + 1][0];
-            corners[3].f[0] = D_00222AE0[next][0];
-            corners[0].f[1] = D_00222AE0[current][1];
-            corners[1].f[1] = D_00222AE0[current + 1][1];
-            corners[2].f[1] = D_00222AE0[next + 1][1];
-            corners[3].f[1] = D_00222AE0[next][1];
+            corners[0].f[0] = g_surface_grid_points[current][0];
+            corners[1].f[0] = g_surface_grid_points[current + 1][0];
+            corners[2].f[0] = g_surface_grid_points[next + 1][0];
+            corners[3].f[0] = g_surface_grid_points[next][0];
+            corners[0].f[1] = g_surface_grid_points[current][1];
+            corners[1].f[1] = g_surface_grid_points[current + 1][1];
+            corners[2].f[1] = g_surface_grid_points[next + 1][1];
+            corners[3].f[1] = g_surface_grid_points[next][1];
             if (coll_find_outside_edge_index(point, corners, 4))
                 continue;
-            height = (D_00222AE0[current][2] +
-                      D_00222AE0[current + 1][2] +
-                      D_00222AE0[next + 1][2] +
-                      D_00222AE0[next][2]) * 0.25f;
+            height = (g_surface_grid_points[current][2] +
+                      g_surface_grid_points[current + 1][2] +
+                      g_surface_grid_points[next + 1][2] +
+                      g_surface_grid_points[next][2]) * 0.25f;
             if (point->f[2] <= height && height - 1.2f <= point->f[2]) {
                 if (column) *column = i;
                 if (row) *row = j;

@@ -2,9 +2,9 @@
 typedef struct {float v[4];} Vec;
 typedef struct {Vec basis[3]; Vec pos;} Camera;
 typedef struct {float yaw,pitch,dist; int frames_left; float inv_frames; int frames; char pad[8]; Vec fwd,up,rot,pos,saved_rot;} CamBlendOrbit;
-extern unsigned char D_001B5490[];
+extern unsigned char g_camera_mode_state[];
 extern char g_hero_state[];
-extern Vec g_hero_position[], g_camera_eye_state[], D_001B5570[], D_0018A0E0[];
+extern Vec g_hero_position[], g_camera_eye_state[], g_camera_basis_vectors[], g_hero_state_block[];
 extern float math_cosine_blend(float,float,float);
 extern void FastVecCross(void*,void*,void*);
 extern void cam_compute_aim_angles(float*,void*,void*,void*,void*,void*);
@@ -46,7 +46,7 @@ int cam_advance_orbit_transition(Camera *cam, CamBlendOrbit *orbit) {
         return 1;
     }
     step = 1.0f / math_cosine_blend(1.0f, (float)orbit->frames, (float)orbit->frames_left * orbit->inv_frames);
-    if (D_001B5490[2] == 2) {
+    if (g_camera_mode_state[2] == 2) {
         qcopy(&target, g_hero_position);
         qcopy(&fwd, &orbit->fwd);
         qcopy(&up, &orbit->up);
@@ -114,12 +114,12 @@ int cam_advance_orbit_transition(Camera *cam, CamBlendOrbit *orbit) {
     }
     yaw *= pitch_sign;
     math_apply_axis_rotation_to_quat(&r0, &r0, &r1, yaw * step);
-    vec_scale_to_length(&D_001B5570[0], &r0, 1.0f);
-    FastVecCross(&D_001B5570[1], &D_001B5570[0], D_0018A0E0);
-    vec_scale_to_length(&D_001B5570[1], &D_001B5570[1], -1.0f);
-    FastVecCross(&D_001B5570[2], &D_001B5570[1], &D_001B5570[0]);
-    mat_transform_via_copy(&orbit->saved_rot, D_001B5570);
-    mat_transform_via_copy(&orbit->rot, D_001B5570);
+    vec_scale_to_length(&g_camera_basis_vectors[0], &r0, 1.0f);
+    FastVecCross(&g_camera_basis_vectors[1], &g_camera_basis_vectors[0], g_hero_state_block);
+    vec_scale_to_length(&g_camera_basis_vectors[1], &g_camera_basis_vectors[1], -1.0f);
+    FastVecCross(&g_camera_basis_vectors[2], &g_camera_basis_vectors[1], &g_camera_basis_vectors[0]);
+    mat_transform_via_copy(&orbit->saved_rot, g_camera_basis_vectors);
+    mat_transform_via_copy(&orbit->rot, g_camera_basis_vectors);
     math_fast_float_d(&orbit->frames_left);
     return 0;
 }

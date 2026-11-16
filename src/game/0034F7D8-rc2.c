@@ -26,7 +26,7 @@
 
 extern void mem_fast_helper_b(void *decoder, s32 a1);
 extern s32 func_00133850(s32 decoder, s32 a1, s32 a2, s32 a3, s32 t0, s32 t1);
-extern s32 D_001B23D4;
+extern s32 g_movie_audio_buffer;
 
 struct S0 {
     s32 w00;
@@ -65,7 +65,7 @@ s32 mpeg_audio_init(struct S0 *decoder, s32 a1, s32 a2, s32 a3) {
     decoder->w58 = 0;
     decoder->w5C = 0;
     decoder->w60 = 0;
-    D_001B23D4 = a3;
+    g_movie_audio_buffer = a3;
     decoder->w4C = 0x400;
     spu_addr = func_00133850(0x400, 0x1000, 0x400, 0, 5, 3);
     decoder->w48 = spu_addr;

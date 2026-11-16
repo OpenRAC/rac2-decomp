@@ -4,6 +4,7 @@
  * fold does not reassociate them: retail adds the 2 and the 10 first. */
 #include "include_asm.h"
 #include "names.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -25,14 +26,14 @@ typedef struct Anim28DF80_State {
     s32 fC;
 } Anim28DF80_State;
 
-extern Anim28DF80_Frame *D_001B188C __attribute__((sda));
+extern Anim28DF80_Frame *g_hud_element_table __attribute__((sda));
 extern s32 g_game_time __attribute__((sda));
 extern s32 math_random_int_below(s32);
 
 /* Picks the frame of an animation record: clamp, loop, ping-pong or one-shot. */
 s32 func_0028DF80(Anim28DF80_State *a0) {
     s32 r = 0;
-    Anim28DF80_Frame *t = D_001B188C + a0->f0;
+    Anim28DF80_Frame *t = g_hud_element_table + a0->f0;
 
     if (t->f0 != 0xFFFF) {
         switch (a0->f2) {

@@ -39,14 +39,14 @@ typedef struct {
     int c[8];
 } GroupTable_2CA5D0;
 extern char g_collision_hit[];
-extern int D_001A7398[] __attribute__((sda));
-extern GroupTable_2CA5D0 *D_001B1888;
-extern int D_001A72D4 __attribute__((sda));
+extern int g_menu_choice_table[] __attribute__((sda));
+extern GroupTable_2CA5D0 *g_hud_group_size_table;
+extern int g_vram_frame_base __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(int);
 extern void gfx_reset_packet_buffer(void);
 extern void Hud_SendResidentBank(int, int, int);
 extern void hud_unlink_bank_group(int);
-extern void func_PAL_0029C0B8(int);
+extern void level_forward_value_b_pal(int);
 extern void level_forward_value(int);
 extern void SubmitBufferedDmaChain(void);
 
@@ -67,19 +67,19 @@ void func_PAL_002CB410(void)
         ((MenuState_2CA5D0 *)&g_pause_menu_state)->object = 0;
     }
     for (j = 0; j < 4; j++) {
-        int old = D_001A7398[j];
+        int old = g_menu_choice_table[j];
         int selected = ((MenuState_2CA5D0 *)&g_pause_menu_state)->choices[j];
         if (old != selected)
             ((SavedChoices_2CA5D0 *)&g_hero_state)->choices[j] = selected ? selected : 0x77;
     }
-    D_001A72D4 = ((MenuState_2CA5D0 *)&g_pause_menu_state)->value;
-    Hud_SendResidentBank(0, D_001B1888->c[0], 0);
+    g_vram_frame_base = ((MenuState_2CA5D0 *)&g_pause_menu_state)->value;
+    Hud_SendResidentBank(0, g_hud_group_size_table->c[0], 0);
     hud_unlink_bank_group(2);
-    if (D_001B1888->c[3])
+    if (g_hud_group_size_table->c[3])
         hud_unlink_bank_group(3);
-    if (D_001B1888->c[4])
+    if (g_hud_group_size_table->c[4])
         hud_unlink_bank_group(4);
-    func_PAL_0029C0B8(300);
+    level_forward_value_b_pal(300);
     level_forward_value(150);
     ((MenuState_2CA5D0 *)&g_pause_menu_state)->state = 5;
     ((MenuState_2CA5D0 *)&g_pause_menu_state)->field4 = 0;

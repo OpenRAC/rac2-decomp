@@ -5,8 +5,8 @@ typedef int s32;
 typedef unsigned char u8;
 extern char *moby_get_motion_data(unsigned char *);
 typedef struct { float lim; char pad[0x2c]; float v[4]; char pad2[0x40]; } Rec128;
-extern Rec128 *D_001B1C54[] __attribute__((sda));
-extern int D_00214F90[];
+extern Rec128 *g_follower_tuning_table[] __attribute__((sda));
+extern int g_moby_motion_state_words[];
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -18,7 +18,7 @@ extern void *part_spawn_ground_effect(void *, unsigned int, unsigned int, unsign
 extern unsigned int scene_get_state_word(void);
 extern int follower_get_state();
 
-void func_PAL_002EE5C0(u8 *a0)
+void follower_clamp_range_spawn_sparks_pal(u8 *a0)
 {
     u8 *s2;
     float v[4] __attribute__((aligned(16)));
@@ -32,7 +32,7 @@ void func_PAL_002EE5C0(u8 *a0)
 
     s2 = (u8 *)moby_get_motion_data(a0);
     if (s2 != 0 && !scene_get_state_word() && follower_get_state(a0) != 2) {
-        s0 = &D_001B1C54[0][D_00214F90[0]];
+        s0 = &g_follower_tuning_table[0][g_moby_motion_state_words[0]];
         s3 = s0->v;
         FastVecSub(v, a0 + 0x10, s3);
         f = FastVecLength(v);

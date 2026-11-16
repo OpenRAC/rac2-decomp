@@ -4,7 +4,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern float g_active_slot_effect_count __attribute__((sda));
 extern s32 g_slot_effect_in_use[5] MACRO_ADDR;
-extern u8 D_L23_001BA500[];
+extern u8 g_hero_l23_state_block[];
 extern void *CreateMoby(s32);
 extern float math_random_signed_float_range(float, float);
 extern s32 math_fast_helper_a(void *, float);
@@ -18,7 +18,7 @@ extern void func_PAL_L05_0042E518(void *);
 /* spawns object 0x11DF at pos with parent's orientation, when one of the five slots is free:
    fills its vars from the arguments and, if it is in view, grades it against the reference
    point at D_L23_001BA500 + 0x140 */
-void *func_PAL_L23_0042B658(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 a4, s32 a5,
+void *slot_effect_create_pal(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 a4, s32 a5,
                         s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, s32 a11, s32 a12) {
     TI128 sphere;
     TI128 dir;
@@ -77,16 +77,16 @@ void *func_PAL_L23_0042B658(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, 
         if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x15;
             *(float *)(vars + 0x10) = 0.04761905f;
-            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && flag != 0) {
-                u8 *ref = D_L23_001BA500;
+            if (fast_vec_dist(pos, g_hero_l23_state_block + 0x140) < 48.0f && flag != 0) {
+                u8 *ref = g_hero_l23_state_block;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x21;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                FastVecSub(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
+                FastVecSub(&dir, obj + 0x10, g_hero_l23_state_block + 0x140);
                 vec_scale_to_length(&dir, &dir, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(&dir, D_L23_001BA500 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(&dir, g_hero_l23_state_block + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {

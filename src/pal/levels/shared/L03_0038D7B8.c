@@ -15,8 +15,8 @@ extern void gfx_add_draw_callback_third(EffectDrawCallback, void *);
 extern void ref_L03_0038A6D8_00(void *);
 extern int flag_is_third_pending_set(u8 *);
 extern void FastVecAdd(void *, void *, void *);
-extern u8 *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);
-extern unsigned short D_0018CDE4;
+extern u8 *SpawnExplosion_pal(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);
+extern unsigned short g_timed_effect_id;
 extern unsigned char g_sound_state[];
 typedef struct {
     u8 reserved00[0x74];
@@ -28,7 +28,7 @@ extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L03_0038D7B8(unsigned char *object) {
+void timed_state_effect_update_pal(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     union { EffectQuad quad; float values[4]; } position;
     int handle;
@@ -73,10 +73,10 @@ void func_PAL_L03_0038D7B8(unsigned char *object) {
         position.quad = 0;
         position.values[2] = 1.0f;
         FastVecAdd(&position, &position, object + 0x10);
-        func_PAL_L00_003FB330(&position,0,0,0,0,0x14,0x2D,1,1.0f,20.0f,1,0,0,0);
+        SpawnExplosion_pal(&position,0,0,0,0,0x14,0x2D,1,1.0f,20.0f,1,0,0,0);
         if (*(int *)(state + 0x10) != -1 && *(int *)(state + 0x14))
             route_set_node_enabled_flag(*(int *)(state + 0x10), object + 0x10, 1);
-        D_0018CDE4 = 0xFFFF;
+        g_timed_effect_id = 0xFFFF;
         handle = *(int *)(state + 0xD8);
         if (handle != -1) {
             if (((SoundSlotPrefix *)(g_sound_state + handle * 0x70))->owner == object && ((SoundSlotPrefix *)(g_sound_state + handle * 0x70))->active)

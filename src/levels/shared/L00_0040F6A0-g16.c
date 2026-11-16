@@ -59,13 +59,13 @@ extern u32 g_pad_state[];
 extern int g_item_ammo_counts[];
 extern u16 g_subtitle_history[];
 extern SoundSlot g_sound_state[];
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern Vector D_L00_001B1270 __attribute__((sda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern Vector g_megarocket_nozzle_offset __attribute__((sda));
 extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
-extern WeaponEntry D_00262570[];
-extern u8 D_0029FCC8[];
+extern WeaponEntry g_weapon_table_2[];
+extern u8 g_megarocket_sound_records[];
 
 extern s32 hero_l00_set_action(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -131,7 +131,7 @@ void megarocket_cannon_update(Moby *moby)
     }
     if (HERO->i[0x2294 / 4] == 1)
         hero_l00_set_action(0x1D, 1);
-    matrix_mul_vec3(&nozzle, &D_L00_001B1270, &moby->right);
+    matrix_mul_vec3(&nozzle, &g_megarocket_nozzle_offset, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
         HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
@@ -254,7 +254,7 @@ void megarocket_cannon_update(Moby *moby)
         vars->unknown20 = 0;
     }
 
-    if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
+    if (g_game_l00_mode == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
         HERO->i[0x1240 / 4] >= 23) {
         if (get_ammo(-1)) {
             if (candidate == 0) {
@@ -299,7 +299,7 @@ void megarocket_cannon_update(Moby *moby)
             charge_shot_start_effect(moby, &nozzle, charged);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             start_equipped_item_animation();
-            vars->sound = slot_copy_records_to_free(D_0029FCC8);
+            vars->sound = slot_copy_records_to_free(g_megarocket_sound_records);
             if (charged)
                 g_subtitle_history[0x3A8 / 2] = 0xFFFF;
             else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
@@ -311,7 +311,7 @@ void megarocket_cannon_update(Moby *moby)
             vars->sound = -1;
         }
         {
-            WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
+            WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
             vars->cooldown = 1.0f / weapon->rate;
         }
     }

@@ -34,7 +34,7 @@ extern struct ImpactQueueState g_collision_hit;
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
 
 /* Steps motion under a position-dependent gravity direction and answers collisions; returns motion flags. */
-int func_PAL_002B35A8(char *object, char *state)
+int moby_update_positional_gravity_motion_pal(char *object, char *state)
 {
     float predicted[4] __attribute__((aligned(16)));
     float oldPosition[4] __attribute__((aligned(16)));

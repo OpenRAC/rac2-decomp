@@ -18,13 +18,13 @@
      slot of its call;
    - D_L23_001B13CC is read as a variable (retail compares with its value), not written 0.0f. */
 
-extern float D_L23_001B13C8 __attribute__((sda));
+extern float g_mothership_hit_damage_scale __attribute__((sda));
 
-extern float D_L23_001B13CC __attribute__((sda));
+extern float g_mothership_hit_damage_floor __attribute__((sda));
 
 extern char *g_mothership_boss_moby __attribute__((sda));
 
-extern char D_L23_001BA500[];
+extern char g_hero_l23_state_block[];
 
 extern char *part_find_owned_effect_slot(char *, int, int);
 
@@ -81,22 +81,22 @@ void enemy_handle_hit_sparks(char *moby) {
         *(unsigned char *)(vars + 0x147) = 0xFF;
         gfx_start_color_fade(moby, vars + 0x140);
         part_l23_spawn_hit_sparks(*(char **)(hit + 0x20));
-        if (*(float *)(vars + 0x20) <= D_L23_001B13CC) {
+        if (*(float *)(vars + 0x20) <= g_mothership_hit_damage_floor) {
             mothership_attach_hit_effect(hit);
-            *(float *)(vars + 0x20) = D_L23_001B13CC;
+            *(float *)(vars + 0x20) = g_mothership_hit_damage_floor;
         } else {
             *(float *)(vars + 0x20) = *(float *)(vars + 0x20) - *(float *)(hit + 0x2C);
         }
-        if (*(float *)(vars + 0x20) <= D_L23_001B13CC)
-            *(float *)(vars + 0x20) = D_L23_001B13CC;
+        if (*(float *)(vars + 0x20) <= g_mothership_hit_damage_floor)
+            *(float *)(vars + 0x20) = g_mothership_hit_damage_floor;
         if (*(short *)(*(char **)(hit + 0x20) + 0xAA) != 0x118F /* moby class 4495 */)
             *(short *)(vars + 0x26) = 0x14;
         if (*(unsigned short *)(moby + 0x7C) != 0) {
             float damage_ratio;
 
-            damage_ratio = *(float *)(vars + 0x20) / D_L23_001B13C8;
+            damage_ratio = *(float *)(vars + 0x20) / g_mothership_hit_damage_scale;
             particle_count = 10 - (int)(damage_ratio * 10.0f);
-            if (*(float *)(vars + 0x20) <= D_L23_001B13CC)
+            if (*(float *)(vars + 0x20) <= g_mothership_hit_damage_floor)
                 particle_count = 10;
             for (i = 0; i < particle_count; i++) {
                 int mask = *(unsigned short *)(moby + 0x7C);
@@ -104,7 +104,7 @@ void enemy_handle_hit_sparks(char *moby) {
                 if ((mask >> i) & 1) {
                     float angle, speed;
                     char *particle;
-                    char *base = D_L23_001BA500;
+                    char *base = g_hero_l23_state_block;
                     float spread = 90.0f;
                     float per_tick = 0.016666668f;
                     float to_rad = 0.017453294f;

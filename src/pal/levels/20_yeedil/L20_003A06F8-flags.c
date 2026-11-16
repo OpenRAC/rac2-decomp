@@ -7,14 +7,14 @@ extern float FastAddRotations(float, float);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, float, float, int);
+extern void *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, float, float, int);
 extern int snd_play_from_global_bank(int, int, int);
 extern void moby_mark_spawned(void *);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void func_PAL_003120C0(unsigned char *);
-extern char D_L20_001B9E80[];
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void moby_fade_out_update_pal(unsigned char *);
+extern char g_hero_l20_extra_state[];
 
-void func_PAL_L20_003A07C8(char *self) {
+void SpawnHealthThresholdEffects_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     float buf[4];
     int i;
@@ -32,8 +32,8 @@ void func_PAL_L20_003A07C8(char *self) {
         float fraction;
         fraction = health / maximum;
         threshold = FloatToInt(fraction * 255.0f) & 0xFF;
-        global = D_L20_001B9E80;
-        callback = func_PAL_003120C0;
+        global = g_hero_l20_extra_state;
+        callback = moby_fade_out_update_pal;
         for (i = 0; i < 10; i++) {
             if ((unsigned int)(i - 4) < 2) continue;
             if (i == 7) continue;
@@ -46,7 +46,7 @@ void func_PAL_L20_003A07C8(char *self) {
             buf[1] = math_fast_sin_or_cos_b(angle) * speed;
             buf[2] = 0.0f;
             buf[2] = math_random_float_range(5.0f, 8.0f) * 0.020000001f;
-            effect = func_PAL_002735D0(*(char **)(state + 0x254), 1,
+            effect = cam_moby_create_pal(*(char **)(state + 0x254), 1,
                 *(short *)(*(char **)(state + 0x254) + 0xAA), i,
                 *(char **)(state + 0x254) + 0x10, *(char **)(state + 0x254) + 0xF0,
                 buf, 90.0f, 15.0f, 255);
@@ -69,7 +69,7 @@ void func_PAL_L20_003A07C8(char *self) {
             *(char **)(state + 0x254) = 0;
             qcopy(buf, self + 0x10);
             buf[2] += 1.0f;
-            func_PAL_L00_003FB330(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.5f, 20.0f, 1, 0, 0, 0);
+            SpawnExplosion_pal(buf, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, 0.5f, 20.0f, 1, 0, 0, 0);
         }
     }
 }

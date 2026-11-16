@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern float D_001B23A4[] __attribute__((sda));
+extern float g_hud_scale[] __attribute__((sda));
 extern void SetupGifPaging(int);
 extern void func_0029C530(void);
 extern char *GetLocalizedString(s32);
@@ -16,7 +16,7 @@ int menu_draw_centered_text(void)
     SetupGifPaging(0);
     func_0029C530();
     position = 329.0f;
-    y = (int)(D_001B23A4[0] * position + 0.5f);
+    y = (int)(g_hud_scale[0] * position + 0.5f);
     /* One-pass text draw group after coordinate conversion. */
     do {
         text_draw_centered_small(0x1A6, y, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);

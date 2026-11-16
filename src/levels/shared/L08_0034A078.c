@@ -5,7 +5,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
-extern unsigned char *D_L08_001FF794;
+extern unsigned char *g_particle_color_ptr;
 /* Creates a short-lived particle at a position with a velocity and owner, and returns it (or 0 if none is free). */
 unsigned char *part_spawn_short_lived(void *position, void *velocity, int kind, void *owner)
 {
@@ -23,7 +23,7 @@ unsigned char *part_spawn_short_lived(void *position, void *velocity, int kind, 
         particle[3] = 0x48;
         *(float *)(particle + 0xc) = math_random_float_range(8000.0f, 50000.0f);
         particle[8] = math_random_int_below(256);
-        particle[2] = *D_L08_001FF794;
+        particle[2] = *g_particle_color_ptr;
         lifetime = math_random_int_range(10, 30);
         *(short *)(particle + 0xa) = lifetime;
         {

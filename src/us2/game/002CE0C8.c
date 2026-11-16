@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_US2_0029CFA0(int);
 extern unsigned int stub_empty_29(void);
 extern unsigned int stub_empty_29(void);
@@ -19,9 +19,9 @@ extern unsigned int stub_empty_25(void);
 extern unsigned int stub_empty_28(void);
 extern unsigned int stub_empty_27(void);
 
-int func_US2_002CE0C8(void)
+int menu_handle_button_input_us2(void)
 {
-    unsigned int flags = D_00138344;
+    unsigned int flags = g_menu_input_flags;
     int res = 0;
 
     if (flags & 0x910) {

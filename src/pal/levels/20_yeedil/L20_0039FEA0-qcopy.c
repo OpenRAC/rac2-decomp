@@ -11,11 +11,11 @@ typedef struct {
     unsigned char payload[1];
 } DispatchContext;
 extern unsigned long moby_dispatch_action_by_kind(void *, DispatchContext *);
-extern void func_PAL_L20_003A0288(unsigned char *);
+extern void trooper_setup_stats_target_pal(unsigned char *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(unsigned char *, unsigned char, int);
-extern unsigned char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern void func_PAL_002A7650(void *, int, int);
+extern unsigned char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern void SetDeathBits_pal(void *, int, int);
 extern void trooper_destroy_parts(char *);
 extern void trooper_play_anim_with_torso(char *, int, int, float);
 extern int flag_set_first_pending(unsigned char *);
@@ -24,17 +24,17 @@ extern void trooper_choose_stand_point(void *);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(int, float);
 extern float FastDiffRots(float, float);
-extern int func_PAL_L01_00323068(char *, char *);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, const void *, float);
 extern int PlayMobySound(int, int, char *);
-extern unsigned char *func_PAL_L09_003A3CA0(void *, void *, void *, float);
-extern void func_PAL_L20_003A06F8(char *);
-extern int D_L20_001A8F00[] __attribute__((sda));
-extern int D_L20_001BDCF0;
+extern unsigned char *moby_spawn_aimed_effect_pal(void *, void *, void *, float);
+extern void trooper_update_body_pal(char *);
+extern int g_hero_vehicle_mode[] __attribute__((sda));
+extern int g_level_l20_progress_stage;
 
-void func_PAL_L20_0039FEA0(unsigned char *object) {
+void trooper_update_pal(unsigned char *object) {
     Vector position, velocity;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *child, *target;
@@ -46,9 +46,9 @@ void func_PAL_L20_0039FEA0(unsigned char *object) {
         unsigned char *initial = *(unsigned char **)(state + 0x254);
         if (initial) *(int *)(initial + 0x98) = 0;
     }
-    func_PAL_L20_003A0288(object);
-    if (D_L20_001A8F00[0] == 2) {
-        if (D_L20_001BDCF0 < 5) return;
+    trooper_setup_stats_target_pal(object);
+    if (g_hero_vehicle_mode[0] == 2) {
+        if (g_level_l20_progress_stage < 5) return;
         child = *(unsigned char **)(state + 0x258);
         if (child) moby_mark_spawned(child);
         child = *(unsigned char **)(state + 0x25C);
@@ -64,8 +64,8 @@ void func_PAL_L20_0039FEA0(unsigned char *object) {
         if ((flags & 1UL) == 1UL) {
             position.q = *(Quadword *)(object + 0x10);
             position.f[2] += 0.5f;
-            func_PAL_L00_003FB330(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
-            func_PAL_002A7650(object, 0, 3);
+            SpawnExplosion_pal(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
+            SetDeathBits_pal(object, 0, 3);
             trooper_destroy_parts((char *)object);
         } else if ((flags & 2UL) == 2UL) {
             moby_set_state(object, 3, 0);
@@ -93,7 +93,7 @@ void func_PAL_L20_0039FEA0(unsigned char *object) {
             if (FastDiffRots(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
                 moby_set_state(object, 4, -1);
         } else {
-            func_PAL_L01_00323068((char *)object, (char *)state + 0x260);
+            moby_l01_turn_toward_target_pal((char *)object, (char *)state + 0x260);
         }
         break;
     case 4:
@@ -107,13 +107,13 @@ void func_PAL_L20_0039FEA0(unsigned char *object) {
             FastVecSub(&velocity, state + 0x1F0, &position);
             vec_scale_to_length(&velocity, &velocity, 0.3f);
             PlayMobySound(1, 0, *(char **)(state + 0x254));
-            func_PAL_L09_003A3CA0(object, &velocity, &position, (float)state[0x34]);
+            moby_spawn_aimed_effect_pal(object, &velocity, &position, (float)state[0x34]);
         }
         if (*(unsigned short *)(object + 0x96) > 100 || ((target = *(unsigned char **)(state + 0x280)) && (*(unsigned short *)(target + 0x34) & 1)))
             moby_set_state(object, 3, -1);
         break;
     }
-    func_PAL_L20_003A06F8((char *)object);
+    trooper_update_body_pal((char *)object);
     child = *(unsigned char **)(state + 0x254);
     if (child) *(int *)(child + 0x98) = *(int *)(*(unsigned char **)(child + 0x24) + 0x10);
 finished:

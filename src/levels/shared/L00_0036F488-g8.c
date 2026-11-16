@@ -26,20 +26,20 @@ typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
 extern char g_hero_state[];
 extern char g_pad_state[];
 
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001A8FB8 MACRO_ADDR;
-extern int D_L00_001A8FF0 MACRO_ADDR;
-extern int D_001A7428 MACRO_ADDR;
-extern int D_L00_001B19C4 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
+extern int g_pad_press_window MACRO_ADDR;
+extern int g_hero_locked_flag MACRO_ADDR;
+extern int g_pad_device_idle_flag MACRO_ADDR;
+extern int g_pad_hold_frame_count MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
-extern u32 D_001A7390 MACRO_ADDR;
-extern int D_L00_001B1AE0 MACRO_ADDR;
+extern u32 g_frame_counter MACRO_ADDR;
+extern int g_pickup_request_pending MACRO_ADDR;
 extern Statistics g_progress_statistics[];
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern int g_save_menu_flags __attribute__((sda));
-extern int D_L00_001A8FB4 __attribute__((sda));
-extern int D_L00_001A8FF4 __attribute__((sda));
-extern float D_L00_001B18E0 __attribute__((sda));
+extern int g_input_block_flag __attribute__((sda));
+extern int g_hero_action_blocked_flag __attribute__((sda));
+extern float g_hero_scalar_transition_value __attribute__((sda));
 
 extern int level_get_flag_b(void);
 extern int request_begin_slot(int, int, int, int, int);
@@ -86,7 +86,7 @@ void level_update_game_frame_input(void)
 
     if (level_get_flag_b() && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (!D_L00_001A8F00 && (g_save_menu_flags & 1) && !request_begin_slot(4, 1, 1, 0, 0))
+    if (!g_game_l00_mode && (g_save_menu_flags & 1) && !request_begin_slot(4, 1, 1, 0, 0))
         return;
     if (ref_L00_0036F488_00())
         return;
@@ -105,10 +105,10 @@ void level_update_game_frame_input(void)
     blocked |= level_is_special_mode_active() != 0;
     level_update_countdown_state_machine();
 
-    if (PadPressedWithin(16, D_L00_001A8FB8, 0) && D_L00_001B19C4 >= 8) {
+    if (PadPressedWithin(16, g_pad_press_window, 0) && g_pad_hold_frame_count >= 8) {
         if (((Hero *)g_hero_state)->state != 0x6F && ((Hero *)g_hero_state)->mode != 2 && ((Hero *)g_hero_state)->state != 0x31 && blocked
-            && ((Hero *)g_hero_state)->state != 0x1C && !D_L00_001A8F00 && D_L00_001B18E0 < 0.2f
-            && ((Hero *)g_hero_state)->f22B4 < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
+            && ((Hero *)g_hero_state)->state != 0x1C && !g_game_l00_mode && g_hero_scalar_transition_value < 0.2f
+            && ((Hero *)g_hero_state)->f22B4 < 2 && !g_input_block_flag && g_language_settings[3]) {
             hud_request_open();
             if (hud_is_open_done()) {
                 if (((Hero *)g_hero_state)->f22B4 != 1)
@@ -120,11 +120,11 @@ void level_update_game_frame_input(void)
     }
 
     if (!level_is_counter_positive()) {
-        if ((((PadState *)g_pad_state)->pressed & 0x800) || D_001A7428) {
-            if (D_L00_001B19C4 < 8)
+        if ((((PadState *)g_pad_state)->pressed & 0x800) || g_pad_device_idle_flag) {
+            if (g_pad_hold_frame_count < 8)
                 goto normal;
             if (((Hero *)g_hero_state)->state != 0x6F && (((Hero *)g_hero_state)->mode != 2 || ((Hero *)g_hero_state)->submode == 10)) {
-                if (!blocked || D_L00_001A8F00)
+                if (!blocked || g_game_l00_mode)
                     goto second;
                 if (!request_begin_slot(3, 1, 1, 0, 0)) {
                     level_set_global_setting_value(level_get_setting_value() != 0);
@@ -135,21 +135,21 @@ void level_update_game_frame_input(void)
         }
     }
 second:
-    if (D_L00_001B19C4 >= 8 && (((PadState *)g_pad_state)->pressed & 0x500)) {
+    if (g_pad_hold_frame_count >= 8 && (((PadState *)g_pad_state)->pressed & 0x500)) {
         if (((Hero *)g_hero_state)->f229C != 22 && ((Hero *)g_hero_state)->state != 0x6F && blocked && ((Hero *)g_hero_state)->state != 0x1C
-            && !D_L00_001A8F00) {
+            && !g_game_l00_mode) {
             if (level_is_mode_in_set()) {
                 if (level_run_mode_update_zero())
                     goto normal;
             }
-            if (D_L00_001A8FF0 && !D_L00_001A8FF4) {
+            if (g_hero_locked_flag && !g_hero_action_blocked_flag) {
                 if ((g_current_map_index == 26 || (((Hero *)g_hero_state)->state != 0x5B && ((Hero *)g_hero_state)->state != 0x58))
                     && request_begin_slot(4, 1, 6, 0, 0)) {
                     if (g_progress_statistics[35].count < 0xFFFF)
                         g_progress_statistics[35].count++;
                 }
-                if (g_progress_statistics[35].maximum < D_001A7390)
-                    g_progress_statistics[35].maximum = D_001A7390;
+                if (g_progress_statistics[35].maximum < g_frame_counter)
+                    g_progress_statistics[35].maximum = g_frame_counter;
                 g_progress_statistics[35].levels = (g_progress_statistics[35].levels | (1 << g_current_map_index)) | 0x80000000;
                 return;
             }
@@ -158,7 +158,7 @@ second:
                 if (g_progress_statistics[9].count < 0xFFFF)
                     g_progress_statistics[9].count++;
                 {
-                    u32 tick = D_001A7390;
+                    u32 tick = g_frame_counter;
                     if (g_progress_statistics[9].maximum < tick)
                         g_progress_statistics[9].maximum = tick;
                 }
@@ -176,9 +176,9 @@ normal:
             func_L00_0030C710(180);
         }
     }
-    if (D_L00_001B1AE0 && !request_begin_slot(6, 1, 0, 0, 0)) {
+    if (g_pickup_request_pending && !request_begin_slot(6, 1, 0, 0, 0)) {
         level_set_global_setting_value(level_get_setting_value() != 0);
-        D_L00_001B1AE0 = 0;
+        g_pickup_request_pending = 0;
     } else {
         game_reset_frame_counters();
         level_run_per_frame_passes();

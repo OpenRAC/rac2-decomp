@@ -6,8 +6,8 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_001B5490[];
-extern char D_001B5570[];
+extern char g_camera_mode_state[];
+extern char g_camera_basis_vectors[];
 extern int cam_advance_blend(void *, void *);
 extern int cam_advance_orbit_transition(void *, void *);
 
@@ -16,7 +16,7 @@ extern int cam_advance_orbit_transition(void *, void *);
    state. */
 void moby_test_and_snapshot(char *object)
 {
-    unsigned char *state = (unsigned char *)D_001B5490;
+    unsigned char *state = (unsigned char *)g_camera_mode_state;
     char *dest;
     int ok;
 
@@ -27,7 +27,7 @@ void moby_test_and_snapshot(char *object)
     if (ok == 0)
         return;
 
-    dest = D_001B5570;
+    dest = g_camera_basis_vectors;
     *(TI128 *)(dest + 0x00) = *(TI128 *)object;
     *(TI128 *)(dest + 0x10) = *(TI128 *)(object + 0x10);
     *(TI128 *)(dest + 0x20) = *(TI128 *)(object + 0x20);
@@ -39,7 +39,7 @@ void moby_test_and_snapshot(char *object)
 /* Copies the resident object's saved vectors back into its working ones. */
 void moby_restore_vectors(void)
 {
-    unsigned char *object = (unsigned char *)D_001B5490;
+    unsigned char *object = (unsigned char *)g_camera_mode_state;
 
     if (object[2] != 0) {
         *(TI128 *)(object + 0x50) = *(TI128 *)(object + 0xC0);
@@ -47,19 +47,19 @@ void moby_restore_vectors(void)
     }
 }
 
-extern char D_00189F70[];
+extern char g_hero_velocity[];
 extern void FastVecAdd(char *first, char *second, char *third);
 
 /* Copies the resident object's two vectors and asks the engine to rebuild its
    matrix when the object's type says so. */
 void moby_save_vectors(void)
 {
-    unsigned char *object = (unsigned char *)D_001B5490;
+    unsigned char *object = (unsigned char *)g_camera_mode_state;
 
     if (object[2] == 0) {
         *(TI128 *)(object + 0xC0) = *(TI128 *)(object + 0x50);
         if (object[3] == 2)
-            FastVecAdd((char *)(object + 0xC0), D_00189F70, (char *)(object + 0xC0));
+            FastVecAdd((char *)(object + 0xC0), g_hero_velocity, (char *)(object + 0xC0));
         *(TI128 *)(object + 0xD0) = *(TI128 *)(object + 0x60);
     }
 }
@@ -76,9 +76,9 @@ typedef struct {
     int count;
 } F273418Marks;
 
-extern int D_0018C0B4;
-extern int D_001A7348[] __attribute__((sda));
-extern F273418Marks D_001B7600;
+extern int g_game_mode;
+extern int g_reticle_screen_params[] __attribute__((sda));
+extern F273418Marks g_hud_reticle_marks;
 extern void DrawTargetReticle(void);
 extern void gfx_project_world_point_to_screen(void *, void *);
 extern void gfx_draw_screen_sprite(void *, float, float);
@@ -91,34 +91,34 @@ void hud_draw_reticle_and_markers(void) {
     F273418Mark *m;
     int i;
 
-    if (D_0018C0B4 == 111) {
-        D_001B7600.count = 0;
+    if (g_game_mode == 111) {
+        g_hud_reticle_marks.count = 0;
         return;
     }
     DrawTargetReticle();
-    if (D_001B7600.count != 0) {
-        base[0] = IntToFloat(D_001A7348[0]);
-        base[1] = IntToFloat(D_001A7348[1]);
-        for (i = 0; i < D_001B7600.count; i++) {
-            m = &D_001B7600.e[i];
+    if (g_hud_reticle_marks.count != 0) {
+        base[0] = IntToFloat(g_reticle_screen_params[0]);
+        base[1] = IntToFloat(g_reticle_screen_params[1]);
+        for (i = 0; i < g_hud_reticle_marks.count; i++) {
+            m = &g_hud_reticle_marks.e[i];
             if (m->obj != 0 && m->obj[0x20] != 0xFE && m->obj[0x20] != 0xFD) {
                 if (m->flag != 0) {
                     gfx_project_world_point_to_screen(vec, m);
-                    vec[0] = (vec[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
-                    vec[1] = (vec[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
+                    vec[0] = (vec[0] - IntToFloat(g_reticle_screen_params[2])) * 0.0625f;
+                    vec[1] = (vec[1] - IntToFloat(g_reticle_screen_params[3])) * 0.0625f;
                 } else {
                     qcopy(vec, base);
                 }
                 gfx_draw_screen_sprite(m, vec[0], vec[1]);
             }
         }
-        D_001B7600.count = 0;
+        g_hud_reticle_marks.count = 0;
     }
 }
 
 extern char g_active_camera[];
-extern char D_0018B2F0[];
-extern unsigned char D_001A7A44[] __attribute__((sda));
+extern char g_camera_state_block[];
+extern unsigned char g_cheat_flags[] __attribute__((sda));
 extern void cam_update_scalar_transition(void);
 extern void cam_update_second_scalar_transition(void);
 extern void cam_select_coll_masks(void);
@@ -161,9 +161,9 @@ void cam_update_state(void) {
     }
     if (stub_empty_21()) {
         vectors = g_active_camera + 0x140;
-        qcopy(vectors, D_0018B2F0);
-        qcopy(vectors + 0x230, D_0018B2F0 + 0x10);
-        FastVecCross(vectors + 0x240, vectors + 0x230, D_0018B2F0 - 0x14B0);
+        qcopy(vectors, g_camera_state_block);
+        qcopy(vectors + 0x230, g_camera_state_block + 0x10);
+        FastVecCross(vectors + 0x240, vectors + 0x230, g_camera_state_block - 0x14B0);
         vec_scale_to_length(vectors + 0x240, vectors + 0x240, 1.0f);
         FastVecCross(vectors + 0x250, vectors + 0x240, vectors + 0x230);
         vec_scale_to_length(vectors + 0x250, vectors + 0x250, 1.0f);
@@ -175,7 +175,7 @@ void cam_update_state(void) {
     cam_update_shake(tail - 0x1F0, 2);
     cam_update_grounded();
     gfx_blend_fog_from_cam_region(tail - 0x230);
-    if (D_001A7A44[0])
+    if (g_cheat_flags[0])
         FastVecCross(tail + 0x10, tail + 0x20, tail);
     cam_update_fov_transition();
     qzero(tail + 0x50);

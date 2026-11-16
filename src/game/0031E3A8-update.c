@@ -12,7 +12,7 @@ typedef struct {
     float sign;
     float one;
 } ParticleE3;
-extern ParticleE3 *D_001B2754 __attribute__((section(".data")));
+extern ParticleE3 *g_glow_ring_entries __attribute__((section(".data")));
 extern float math_random_float_range(float, float);
 extern int math_fast_float_d(void *);
 extern int math_random_int_range(int, int);
@@ -23,7 +23,7 @@ void glow_ring_update_entries(char *object)
     int i;
     ParticleE3 *p;
     for (i = 0; i < 64; i++) {
-        p = (ParticleE3 *)(i * 48 + (unsigned int)D_001B2754);
+        p = (ParticleE3 *)(i * 48 + (unsigned int)g_glow_ring_entries);
         if (p->owner != object) continue;
         {
             float decrement = math_random_float_range(0.01f, 0.075f);

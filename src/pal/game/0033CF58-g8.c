@@ -13,9 +13,9 @@ extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_value_pair(void *, int, int);
 extern char *GetLocalizedString(int);
 extern int map_screen_update_layout(char *, int);
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[];
-extern char D_001ADD58[], D_001ADD60[], D_001ADD68[], D_001ADD70[], D_001ADD78[];
-extern char *D_001A8CFC;
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[];
+extern char g_menu_hud_desc_title[], g_menu_hud_desc_body[], g_menu_hud_desc_label[], g_map_screen_derived_desc_left[], g_map_screen_derived_desc_right[];
+extern char *g_resident_data_base;
 
 /* Constructor of an on-screen map object: stores the owner, allocates the 16-byte anchor (255, 207)
    at +0x1C8, then names and tints three sprites ("0", "1", "2" at +0x0, +0x4C, +0x98), three more
@@ -23,7 +23,7 @@ extern char *D_001A8CFC;
    map sprites (MapSpr +0x2B0, MapPlanetSpr +0x2EC), sets their strings and places them with
    func_0033B540. The three sprite loops keep their own counters (i, j, k): sharing one counter
    keeps the loop-invariant high half of the "3" name out of a register. */
-void func_PAL_0033D098(char *self, char *owner)
+void map_screen_init_pal(char *self, char *owner)
 {
     int i, j, k;
 
@@ -39,18 +39,18 @@ void func_PAL_0033D098(char *self, char *owner)
     *(int *)(self + 0x358) = 1;
     (*(float **)(self + 0x1C8))[0] = 255.0f;
     (*(float **)(self + 0x1C8))[1] = 207.0f;
-    object_init_derived_arrays(self, D_001ADC10, owner);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, owner);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, owner);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, owner);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, owner);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, owner);
     for (i = 0; i < 3; i++)
-        object_init_derived_arrays(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
-    hud_init_widget_defaults(self + 0x1D8, D_001ADD58, owner);
-    hud_init_widget_defaults(self + 0x288, D_001ADD60, owner);
-    hud_init_widget_defaults(self + 0x230, D_001ADD68, owner);
+        object_init_derived_arrays(self + 0xE4 + i * 0x4C, g_menu_widget_desc_fourth, owner);
+    hud_init_widget_defaults(self + 0x1D8, g_menu_hud_desc_title, owner);
+    hud_init_widget_defaults(self + 0x288, g_menu_hud_desc_body, owner);
+    hud_init_widget_defaults(self + 0x230, g_menu_hud_desc_label, owner);
     hud_set_widget_field_a(self + 0x288, 0);
     hud_set_widget_field_a(self + 0x230, 0);
-    object_init_derived_c(self + 0x2E0, D_001ADD70, owner);
-    object_init_derived_c(self + 0x31C, D_001ADD78, owner);
+    object_init_derived_c(self + 0x2E0, g_map_screen_derived_desc_left, owner);
+    object_init_derived_c(self + 0x31C, g_map_screen_derived_desc_right, owner);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -60,11 +60,11 @@ void func_PAL_0033D098(char *self, char *owner)
     *object_get_fourth_field(self + 0x1D8) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x288) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x230) = 0x80F0F0F0;
-    object_set_helper_result(self, D_001A8CFC + 0x8710, 0x87);
-    object_set_helper_result(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
-    object_set_helper_result(self + 0x98, D_001A8CFC + 0x8710, 0x89);
+    object_set_helper_result(self, g_resident_data_base + 0x8710, 0x87);
+    object_set_helper_result(self + 0x4C, g_resident_data_base + 0x8710, 0x88);
+    object_set_helper_result(self + 0x98, g_resident_data_base + 0x8710, 0x89);
     for (k = 0; k < 3; k++)
-        object_set_helper_result(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
+        object_set_helper_result(self + 0xE4 + k * 0x4C, g_resident_data_base + 0x8710, 0x8A);
     object_set_second_float4(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
     hud_set_widget_value_pair(self + 0x2E0, 0xE99A, 10);
     object_set_second_float4(self + 0x2E0, 240.0f, 194.0f, 0.0f, 0.0f);

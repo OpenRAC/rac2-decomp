@@ -37,11 +37,11 @@ extern int moby_apply_damage_to_object(void *, void *, int);
 extern void part_fire_burst_sound(void *);
 extern void group_destroy_attached_parts(void *, void *);
 extern int weapon_select_aim_target(void *, int, void *, int, float, float);
-extern char D_L14_001B9500[];
+extern char g_tether_l14_origin_vec[];
 extern int g_moby_l14_pool __attribute__((sda));
-extern float D_L14_001B1948 __attribute__((sda));
-extern unsigned short D_L14_001B1950 __attribute__((sda));
-extern unsigned short D_L14_001B1954[] __attribute__((sda));
+extern float g_enemy_turn_degrees __attribute__((sda));
+extern unsigned short g_enemy_u16_param_a __attribute__((sda));
+extern unsigned short g_enemy_u16_params[] __attribute__((sda));
 
 /* Initializes the entity on its first frame, then handles the player coming close, damage
    and the state-2 update. */
@@ -56,7 +56,7 @@ int enemy_update_common(unsigned char *o)
         DAMAGE(p)->f3c = 0.15f;
         DAMAGE(p)->hit_anim_mode = 2;
         DAMAGE(p)->f34 = DAMAGE(p)->f30 = 1.0f;
-        turn = D_L14_001B1948 * 0.017453294f;
+        turn = g_enemy_turn_degrees * 0.017453294f;
         DAMAGE(p)->f40 = FLOAT_AT(o, 0x18) - 3.0f;
         FLOAT_AT(p, 0x54) = 0.3f;
         FLOAT_AT(p, 0x50) = 1.0f;
@@ -65,8 +65,8 @@ int enemy_update_common(unsigned char *o)
         FLOAT_AT(p, 0x68) = FLOAT_AT(p, 0x64) = 0.0034906589f;
         FLOAT_AT(p, 0x60) = 3.1415927f;
         FLOAT_AT(p, 0x12C) = math_random_int_below(2) ? -turn : turn;
-        U16_AT(p, 0x132) = D_L14_001B1950;
-        U16_AT(p, 0x134) = D_L14_001B1954[0];
+        U16_AT(p, 0x132) = g_enemy_u16_param_a;
+        U16_AT(p, 0x134) = g_enemy_u16_params[0];
         p[0x2E] = 1;
         qcopy(p + 0x2E0, o + 0x10);
         INT_AT(p, 0x31C) = 1;
@@ -86,7 +86,7 @@ int enemy_update_common(unsigned char *o)
         if (INT_AT(p, 0x2B8) != -1)
             moby_init_with_callback((char *)g_moby_l14_pool + INT_AT(p, 0x2B8) * 256);
     }
-    if (o[0x31] && fast_vec_dist(o + 0x10, D_L14_001B9500) < 24.0f) {
+    if (o[0x31] && fast_vec_dist(o + 0x10, g_tether_l14_origin_vec) < 24.0f) {
         moby_update_ground_check(o);
         o[0x6F] = 22;
     }

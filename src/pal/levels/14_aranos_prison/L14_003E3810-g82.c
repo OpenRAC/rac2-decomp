@@ -16,11 +16,11 @@ extern float math_fabs(float a);
 extern void moby_mark_spawned();
 extern void gfx_add_draw_callback_first();
 extern void gfx_draw_flipbook_billboard();
-extern float D_L14_001B0388 __attribute__((sda));
-extern float D_L14_001B038C __attribute__((sda));
-extern float D_L14_001B0390 __attribute__((sda));
+extern float g_flying_away_speed __attribute__((sda));
+extern float g_flying_away_rate __attribute__((sda));
+extern float g_flying_away_scale __attribute__((sda));
 
-void func_PAL_L14_003E3968(char *arg0) {
+void flying_away_update_pal(char *arg0) {
     char *v = *(char **)(arg0 + 0x68);
 
     switch (*(unsigned char *)(arg0 + 0x20)) {
@@ -37,7 +37,7 @@ void func_PAL_L14_003E3968(char *arg0) {
             }
             moby_set_state(arg0, 2, -1);
             {
-                float s = D_L14_001B0388 * 0.020000001f;
+                float s = g_flying_away_speed * 0.020000001f;
 
                 *(float *)(v + 0xC) = s;
                 if (*(int *)(v + 0x8) != 0) {
@@ -65,12 +65,12 @@ void func_PAL_L14_003E3968(char *arg0) {
 
                 *(float *)(v + 0x10) = *(float *)(v + 0x10) + old;
                 if (*(int *)(v + 0x8) != 0) {
-                    m = old - D_L14_001B038C * 0.00040000002f;
+                    m = old - g_flying_away_rate * 0.00040000002f;
                 } else {
-                    m = old + D_L14_001B038C * 0.00040000002f;
+                    m = old + g_flying_away_rate * 0.00040000002f;
                 }
                 {
-                    float x = m * D_L14_001B0390;
+                    float x = m * g_flying_away_scale;
 
                     *(float *)(v + 0xC) = m;
                     *(float *)(arg0 + 0xF0) = FastAddRotations(*(float *)(arg0 + 0xF0), x);

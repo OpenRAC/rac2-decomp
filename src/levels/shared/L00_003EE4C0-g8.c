@@ -14,17 +14,17 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
     unsigned short s4,s6,s8,s10,s12;
     unsigned char e,f;
 };
-extern AimQueryConfig D_L00_001B0810;
+extern AimQueryConfig g_gravity_bomb_aim_config;
 extern AimTuning g_weapon_l00_table[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029AE70[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_gravity_bomb_sound_records[];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
-extern unsigned char D_00139592[];
-extern float D_L00_001B0800 __attribute__((sda));
-extern float D_L00_001B0804 __attribute__((sda));
-extern float D_L00_001B0808 __attribute__((sda));
-extern float D_L00_001B080C __attribute__((sda));
-extern int D_L00_001B2BB0;
+extern unsigned char g_gravity_bomb_weapon_index[];
+extern float g_gravity_bomb_aim_param_a __attribute__((sda));
+extern float g_gravity_bomb_aim_param_b __attribute__((sda));
+extern float g_gravity_bomb_speed __attribute__((sda));
+extern float g_gravity_bomb_launch_time __attribute__((sda));
+extern int g_gravity_bomb_fire_held;
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern char *moby_get_private_value_0(unsigned char *);
@@ -69,15 +69,15 @@ void gravity_bomb_launcher_update(unsigned char *object) {
     } else {
         H->i[0x2534 / 4] = 0x28;
         if (!target) {
-            config = D_L00_001B0810;
+            config = g_gravity_bomb_aim_config;
             target = SelectBestTargetInCone(&position, &H->b[0x760], &scratch, 0.392699093f, 0.785398185f,
                                   0, 0, 0, 11.1f, 0.0f, 0.0f, 0, &config);
         }
     }
-    CalculateAimedLaunchVelocity(&config, &position, target, 0, D_L00_001B0804, D_L00_001B0800,
-                   D_L00_001B080C * 0.016666668f, D_L00_001B0808 * 0.00027777778f);
+    CalculateAimedLaunchVelocity(&config, &position, target, 0, g_gravity_bomb_aim_param_b, g_gravity_bomb_aim_param_a,
+                   g_gravity_bomb_launch_time * 0.016666668f, g_gravity_bomb_speed * 0.00027777778f);
     *(int *)(state + 0x24) = coll_trace_projectile_to_impact(&position, &config, state, state + 0x10, object, 0, 0,
-                                          D_L00_001B0808 * 0.00027777778f);
+                                          g_gravity_bomb_speed * 0.00027777778f);
     switch (object[0x20]) {
     case 0:
         object[0x20] = 1;
@@ -88,19 +88,19 @@ void gravity_bomb_launcher_update(unsigned char *object) {
             cancel_hero_item_animation();
         if (*(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && allowed && H->i[0x1240 / 4] >= 23) {
             if (weapon_spend_ammo(-1, 1)) {
-                D_L00_001B2BB0 = 1;
+                g_gravity_bomb_fire_held = 1;
                 start_equipped_item_animation();
-                *(int *)(state + 0x2C) = slot_copy_records_to_free(D_L00_0029AE70);
+                *(int *)(state + 0x2C) = slot_copy_records_to_free(g_gravity_bomb_sound_records);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 gravity_bomb_spawn_projectile((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
                 {
-                AimTuning *tu = &g_weapon_l00_table[D_00139592[0]];
+                AimTuning *tu = &g_weapon_l00_table[g_gravity_bomb_weapon_index[0]];
                 *(float *)(state + 0x20) = 1.0f / tu->cooldown;
             }
-            } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B2BB0 == 1) {
+            } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || g_gravity_bomb_fire_held == 1) {
                 PlayMobySound(1, 0, (char *)object);
-                D_L00_001B2BB0 = 0;
+                g_gravity_bomb_fire_held = 0;
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(state + 0x2C) >= 0) {

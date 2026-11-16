@@ -56,7 +56,7 @@ extern void cam_set_view_space_height(Quadword *, Quadword *, float);
 extern void cam_set_view_space_vector_length(char *, int, float);
 extern void hero_apply_mode_transform_reversed(ContactVector3 *, ContactVector3 *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern int func_PAL_L00_002ACE70(void *, void *, void *);
+extern int hero_find_ledge_grab_pal(void *, void *, void *);
 extern int hero_test_reach_blend(float *, float, float);
 extern char *moby_get_private_value_2(unsigned char *);
 extern void hero_build_relative_offset(float *output, float scale, float angle, float height, int flag);
@@ -69,7 +69,7 @@ extern float FastDiffRots(float, float);
 extern float vec_distance_xy(void *, void *);
 
 /* Predict the next ledge contact, then validate the two obstruction probes. */
-void func_PAL_L00_002AC460(void)
+void ProbeHeroAirborneWallContact_pal(void)
 {
     Vector predicted, probeEnd, localNormal;
     unsigned char *state;
@@ -95,7 +95,7 @@ void func_PAL_L00_002AC460(void)
     distance = distance * steps - g_hero_state.f520 * steps * steps * 0.5f;
     hero_apply_mode_transform_reversed((ContactVector3 *)&predicted,
                      (ContactVector3 *)&predicted, distance);
-    if (func_PAL_L00_002ACE70(&predicted, (unsigned char *)&g_hero_state + 0x90, 0)) {
+    if (hero_find_ledge_grab_pal(&predicted, (unsigned char *)&g_hero_state + 0x90, 0)) {
         g_hero_state.f1D4 = 0;
         g_hero_state.f210 = 0x13;
         return;

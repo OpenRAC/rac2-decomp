@@ -18,7 +18,7 @@ typedef struct {
     float direction[4]; void *attacker; int flags; u8 kind, mode; u16 object_class;
     float damage; int enabled; float field24;
 } Impact;
-extern void func_PAL_L05_0041EF70(void *);
+extern void stub_l05_empty_pal(void *);
 extern int math_fast_float_d(void *);
 extern float vec_distance_xy(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -34,9 +34,9 @@ extern void QueueMobyImpact(void *, Impact *);
 extern void light_spot_add_nearby_object(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void gfx_draw_energy_blast(void *);
-extern char D_L05_001BFB20[], D_L05_001B9580[];
-extern u8 *D_L05_001C3B80[];
-extern float D_L05_001B104C __attribute__((sda));
+extern char g_projectile_target_pos[], g_hero_l05_state[];
+extern u8 *g_nearby_l05_mobys[];
+extern float g_equipment_trigger_radius __attribute__((sda));
 
 void func_PAL_L05_0041E5C8(u8 *actor)
 {
@@ -47,7 +47,7 @@ void func_PAL_L05_0041E5C8(u8 *actor)
     int count, i;
 
     qcopy(&previous, actor + 0x10);
-    func_PAL_L05_0041EF70(actor);
+    stub_l05_empty_pal(actor);
     FastVecAdd(actor + 0x10, actor + 0x10, state + 0x10);
     if (math_fast_float_d(state) != 0) {
         moby_mark_spawned(actor);
@@ -62,7 +62,7 @@ void func_PAL_L05_0041E5C8(u8 *actor)
         }
     }
     if (*(int *)(state + 0x38) != 0) {
-        if (vec_distance_xy(actor + 0x10, D_L05_001B9580 + 0x140) < 2.0f) {
+        if (vec_distance_xy(actor + 0x10, g_hero_l05_state + 0x140) < 2.0f) {
             moby_mark_spawned(actor);
             return;
         }
@@ -87,16 +87,16 @@ void func_PAL_L05_0041E5C8(u8 *actor)
     if (CollLine(&previous, actor + 0x10, 0, *(void **)(state + 4), &impact) != 0 &&
         GetCollHitMaterial() != 6) {
         snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
-        func_PAL_L05_0041EC50(D_L05_001BFB20, 20, *(u32 *)(state + 0x24), actor);
+        func_PAL_L05_0041EC50(g_projectile_target_pos, 20, *(u32 *)(state + 0x24), actor);
         moby_mark_spawned(actor);
         return;
     }
     if (*(s16 *)(*(u8 **)(state + 4) + 0xAA) != 0xFBF) {
-        coll_project_point_on_segment(&point, &previous, actor + 0x10, D_L05_001B9580 + 0x140);
-        if (fast_vec_dist(&point, D_L05_001B9580 + 0x140) < D_L05_001B104C) {
+        coll_project_point_on_segment(&point, &previous, actor + 0x10, g_hero_l05_state + 0x140);
+        if (fast_vec_dist(&point, g_hero_l05_state + 0x140) < g_equipment_trigger_radius) {
             snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
             {
-                char *camera = D_L05_001B9580;
+                char *camera = g_hero_l05_state;
                 *(int *)(camera + 0x16C) = 0;
                 *(int *)(camera + 0x168) = 25;
                 *(float *)(camera + 0x160) = 0.05f;
@@ -115,12 +115,12 @@ destroy:
     count = coll_process_hit(&point, 1, *(void **)(state + 4), 0, FastVecLength(&delta));
     if (count != 0) {
         for (i = 0; i < count; i++) {
-            coll_project_point_on_segment(&closest, &previous, actor + 0x10, D_L05_001C3B80[i] + 0x10);
-            FastVecSub(&delta, D_L05_001C3B80[i] + 0x10, &closest);
+            coll_project_point_on_segment(&closest, &previous, actor + 0x10, g_nearby_l05_mobys[i] + 0x10);
+            FastVecSub(&delta, g_nearby_l05_mobys[i] + 0x10, &closest);
             if (FastVecLength(&delta) < *(float *)(state + 0x3C)) {
                 snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
                 func_PAL_L05_0041EC50(&closest, 20, *(u32 *)(state + 0x24), actor);
-                QueueMobyImpact(D_L05_001C3B80[i], &impact);
+                QueueMobyImpact(g_nearby_l05_mobys[i], &impact);
                 goto destroy;
             }
         }

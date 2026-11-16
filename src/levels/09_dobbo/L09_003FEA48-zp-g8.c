@@ -12,9 +12,9 @@ extern void *part_spawn_object_following_effect(float *, u8 *, int, int, int, in
 extern void part_l00_spawn_spark_burst(u8 *, float *, float *, int, int, float, float, float, float, float);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern char *moby_l00_spawn_child(u8 *, int, int);
-extern float D_L09_001B1CA0 __attribute__((sda));
-extern float D_L09_001B1CA8 __attribute__((sda));
-extern float D_L09_001B1CB0 __attribute__((sda));
+extern float g_effect_explode_params_c __attribute__((sda));
+extern float g_effect_explode_params_b __attribute__((sda));
+extern float g_effect_explode_params_a __attribute__((sda));
 
 /* Three-state effect object: spawns its first effect, waits for the hit, then fires the closing effects and retires itself. */
 void three_state_effect_update(u8 *moby)
@@ -43,7 +43,7 @@ void three_state_effect_update(u8 *moby)
         b.value[1] = -0.05000000447034836f;
         b.value[2] = 0.016666668f;
         part_l00_spawn_spark_burst(moby, a.value, b.value, 25, 2, 0.2f, 0.083333336f, 1.5f, 6.0f, 0.8f);
-        part_explode_object_into_pieces(moby, &D_L09_001B1CB0, &D_L09_001B1CA8, &D_L09_001B1CA0,
+        part_explode_object_into_pieces(moby, &g_effect_explode_params_a, &g_effect_explode_params_b, &g_effect_explode_params_c,
                           0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
         moby_l00_spawn_child(moby, 0x1299, 0);
         moby_mark_spawned(moby);

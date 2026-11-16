@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L20_001B2168 __attribute__((sda));
-extern float D_L20_001B216C __attribute__((sda));
-extern float D_L20_001B2170 __attribute__((sda));
+extern float g_yeedil_lobbed_speed __attribute__((sda));
+extern float g_yeedil_lobbed_accel __attribute__((sda));
+extern float g_yeedil_lobbed_angle __attribute__((sda));
 extern void *CreateMoby(int);
 extern void moby_init_child_from_parent(char *, char *);
 extern void euler_rotation_basis(char *, char *);
@@ -16,7 +16,7 @@ extern float weapon_compute_shot_launch_speed(char *, char *, float *, float, fl
 extern int FloatToInt(float);
 extern void tumbling_debris_update(char *);
 
-char *func_PAL_L20_004491F0(char *arg0, int arg1, char *arg2) {
+char *yeedil_boss_spawn_lobbed_object_pal(char *arg0, int arg1, char *arg2) {
     char *obj = (char *)CreateMoby(arg1);
     char *state;
     char *p;
@@ -33,8 +33,8 @@ char *func_PAL_L20_004491F0(char *arg0, int arg1, char *arg2) {
         flags |= 0x100;
         flags &= 0xEFDF;
         state = *(char **)(obj + 0x68);
-        f20 = D_L20_001B2168 * 0.020000001f;
-        f21 = D_L20_001B216C * 0.00040000002f;
+        f20 = g_yeedil_lobbed_speed * 0.020000001f;
+        f21 = g_yeedil_lobbed_accel * 0.00040000002f;
         p = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
         local = 0.0f;
@@ -42,7 +42,7 @@ char *func_PAL_L20_004491F0(char *arg0, int arg1, char *arg2) {
         *(float *)(state + 8) = 0.0f;
         vec_scale_to_length(state, state, f20);
         FastVecCross(p, state, obj + 0xE0);
-        vec_set_direction_with_complement((float *)p, (float *)p, math_fast_sin_or_cos_b(D_L20_001B2170 * 0.0003490659f));
+        vec_set_direction_with_complement((float *)p, (float *)p, math_fast_sin_or_cos_b(g_yeedil_lobbed_angle * 0.0003490659f));
         *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, arg2, &local, f20, -f21);
         *(float *)(state + 0x20) = f21;
         *(int *)(state + 0x24) = FloatToInt(local);

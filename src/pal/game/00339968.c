@@ -38,7 +38,7 @@ void func_PAL_00339DC8(int object, int value, int count)
 
 
 /* clamps a caller-supplied terminator value (-1 meaning unset) to 180, then runs two callees on two sub-objects of one handle, the second with a float pair */
-void func_PAL_0033A528(int object, int value, int count)
+void msg_box_init_short_pal(int object, int value, int count)
 {
     int limit = (count == -1) ? 150 : count;
     int inner = object + 7564;

@@ -3,21 +3,21 @@
 
 /* Level 11's own data: the addresses are the ones in level 11, and every other
  * level that holds this function reads its own copy of them. */
-extern float D_L11_001B2600 __attribute__((sda));
-extern float D_L11_001B2604 __attribute__((sda));
-extern int D_L11_001B25E8 __attribute__((sda));
-extern int D_L11_001B25F0 __attribute__((sda));
-extern float D_L11_001B2610 __attribute__((sda));
-extern float D_L11_001B2614 __attribute__((sda));
-extern float D_L11_001B2628 __attribute__((sda));
-extern int D_L11_001B2618 __attribute__((sda));
-extern int D_L11_001B261C __attribute__((sda));
-extern float D_L11_001B2620 __attribute__((sda));
-extern float D_L11_001B2624 __attribute__((sda));
-extern float D_L11_001B262C __attribute__((sda));
+extern float g_trail_l11_uv_scroll __attribute__((sda));
+extern float g_trail_scroll_step __attribute__((sda));
+extern int g_trail_int_param_a __attribute__((sda));
+extern int g_trail_int_param_b __attribute__((sda));
+extern float g_trail_width_scale __attribute__((sda));
+extern float g_trail_float_param_a __attribute__((sda));
+extern float g_trail_float_param_d __attribute__((sda));
+extern int g_trail_int_param_c __attribute__((sda));
+extern int g_trail_int_param_d __attribute__((sda));
+extern float g_trail_float_param_b __attribute__((sda));
+extern float g_trail_float_param_c __attribute__((sda));
+extern float g_trail_float_param_e __attribute__((sda));
 
 /* The level's table of entries: addressed absolutely, never $gp-relative. */
-extern char D_L11_00264760[] __attribute__((nosda));
+extern char g_ribbon_row_table[] __attribute__((nosda));
 
 extern void DrawScrollingRibbonWithHaloAlpha(int moby, int a1, int a2, int a3, float f12, float f13, float f14);
 
@@ -28,15 +28,15 @@ void DrawObjectRibbonPair(char *moby)
     char *vars = *(char **)(moby + 0x68);
     float scroll;
 
-    scroll = D_L11_001B2600 - D_L11_001B2604;
-    D_L11_001B2600 = scroll;
+    scroll = g_trail_l11_uv_scroll - g_trail_scroll_step;
+    g_trail_l11_uv_scroll = scroll;
     if (scroll <= -8.0f) {
-        D_L11_001B2600 = scroll + 8.0f;
+        g_trail_l11_uv_scroll = scroll + 8.0f;
     }
-    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)D_L11_00264760,
-                      D_L11_001B25E8, D_L11_001B25F0, *(int *)(vars + 0x2C) - 2,
-                      D_L11_001B2610, D_L11_001B2614, D_L11_001B2628);
-    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)(D_L11_00264760 + 0x140),
-                      D_L11_001B2618, D_L11_001B261C, *(int *)(vars + 0x2C),
-                      D_L11_001B2620, D_L11_001B2624, D_L11_001B262C);
+    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)g_ribbon_row_table,
+                      g_trail_int_param_a, g_trail_int_param_b, *(int *)(vars + 0x2C) - 2,
+                      g_trail_width_scale, g_trail_float_param_a, g_trail_float_param_d);
+    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)(g_ribbon_row_table + 0x140),
+                      g_trail_int_param_c, g_trail_int_param_d, *(int *)(vars + 0x2C),
+                      g_trail_float_param_b, g_trail_float_param_c, g_trail_float_param_e);
 }

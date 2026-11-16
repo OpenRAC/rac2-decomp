@@ -10,8 +10,8 @@ extern void vec_random_direction(float *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void *part_spawn_random_tinted_effect(char *, char *, int, float, float);
 extern int FloatToInt(float);
-extern float D_L06_001B2FC8 MACRO_ADDR;
-extern char D_L06_001A8F20[] MACRO_ADDR;
+extern float g_splash_burst_data MACRO_ADDR;
+extern char g_effect_vector[] MACRO_ADDR;
 
 /* Spawns a splash of small particles and ring effects at a position. */
 void part_spawn_splash_burst(void *unused, void *position)
@@ -21,7 +21,7 @@ void part_spawn_splash_burst(void *unused, void *position)
     int life, kind;
     char *effect;
     int i;
-    float *data = &D_L06_001B2FC8;
+    float *data = &g_splash_burst_data;
     for (i = 15; i >= 0; --i) {
         angle = math_random_angle();
         radius = math_random_float_range(0.0f, 0.050000004f);
@@ -35,8 +35,8 @@ void part_spawn_splash_burst(void *unused, void *position)
     for (i = 0; i < 16; ++i) {
         vec_random_direction(vector, 1.0f, 1.0f);
         FastVecAdd(vector, vector, position);
-        vector[2] = D_L06_001B2FC8 + 0.05f;
-        effect = part_spawn_random_tinted_effect((char *)vector, D_L06_001A8F20, (int)data, math_random_float_range(0.7f, 1.0f), i == 0 ? 2.0f : -2.0f);
+        vector[2] = g_splash_burst_data + 0.05f;
+        effect = part_spawn_random_tinted_effect((char *)vector, g_effect_vector, (int)data, math_random_float_range(0.7f, 1.0f), i == 0 ? 2.0f : -2.0f);
         if (effect != 0)
             *(short *)(effect + 10) = FloatToInt(math_random_float_range(30.0f, 60.0f));
     }

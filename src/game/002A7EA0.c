@@ -7,7 +7,7 @@ extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, float, int, void *);
-extern float g_collision_hit[], D_001BAFA0[], D_001BAFB0[];
+extern float g_collision_hit[], g_coll_hit_position[], g_coll_hit_point[];
 extern float coll_get_ground_height_under_object(void *);
 extern float math_fabs(float);
 extern float vec_distance_xy(void *, void *);
@@ -65,7 +65,7 @@ int moby_move_over_ground(void *o, float *old, float *pos, int flags,
         }
     }
     if (!(flags & 2)) {
-        float *point = D_001BAFA0;
+        float *point = g_coll_hit_position;
         float *hit = point - 8;
         offset = height + radius;
         i = 0;
@@ -76,7 +76,7 @@ int moby_move_over_ground(void *o, float *old, float *pos, int flags,
                 break;
             angle = mat_fast_helper_a(vec_distance_xy(pos, point), hit[10] - pos[2]);
             if (((int *)hit)[6] != 0 || slope < angle) {
-                qcopy(pos, D_001BAFB0);
+                qcopy(pos, g_coll_hit_point);
                 pos[2] -= offset;
                 result = 0;
             }

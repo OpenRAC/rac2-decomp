@@ -19,7 +19,7 @@ typedef struct {
     float f228, f22C;
     int color[3];
 } ScreenState;
-extern ScreenState D_001B9040;
+extern ScreenState g_view_params;
 extern void UpdateViewContext(void);
 
 typedef struct {
@@ -34,7 +34,7 @@ extern void gfx_apply_display_config(void);
 
 void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, float c, float d)
 {
-    ScreenState *context = &D_001B9040;
+    ScreenState *context = &g_view_params;
     int halfW = width >> 1;
     int halfH = height >> 1;
     float halfHeight;
@@ -64,7 +64,7 @@ void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, flo
 void func_PAL_0027B810(void)
 {
     ScreenDimensions *dimensions = &g_screen_adjust_offsets;
-    ScreenState *view = &D_001B9040;
+    ScreenState *view = &g_view_params;
     short width = dimensions->width;
     short height = dimensions->height;
     int half_width = width >> 1;

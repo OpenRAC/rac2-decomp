@@ -10,12 +10,12 @@ typedef struct {
 extern void moby_set_state(void *, int, int);
 extern int hero_is_current_selected_id(void *);
 extern int TryClaimNotice(int, int, int);
-extern int D_00138324[];
-extern int D_L19_001A8FB4 __attribute__((sda));
+extern int g_pad_held_flags[];
+extern int g_warp_state __attribute__((sda));
 extern HandlerState g_hero_state;
-extern char *D_L19_001B9A90[];
-extern float D_L19_001B2420;
-extern char *D_L19_001B2B0C;
+extern char *g_hero_ptr_table[];
+extern float g_warp_pad_glow_amount;
+extern char *g_linked_object_table;
 extern float ApproachValue(float *, float, float);
 extern void load_scene_chunk(int, int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
@@ -38,7 +38,7 @@ void warp_pad_update(char *moby)
             if (*(int *)(vars + 8) == 0) TryClaimNotice(8, 0x27FA, 1);
             else if (*(int *)(vars + 8) == 1) TryClaimNotice(8, 0x27FC, 1);
             else TryClaimNotice(8, 0x27F9, 1);
-            if ((D_00138324[0] & 0x10) && D_L19_001A8FB4 == 8 && g_hero_state.state == 0 && *(short *)(D_L19_001B9A90[0]+0x86) != 5) {
+            if ((g_pad_held_flags[0] & 0x10) && g_warp_state == 8 && g_hero_state.state == 0 && *(short *)(g_hero_ptr_table[0]+0x86) != 5) {
                 *(u16 *)(moby + 0x96) = 0;
                 g_hero_state.state = 2;
                 moby_set_state(moby, 2, -1);
@@ -46,24 +46,24 @@ void warp_pad_update(char *moby)
         }
     }
     if (*(u8 *)(moby + 0x20) == 2) {
-        ApproachValue(&D_L19_001B2420, 1.0f, 0.033333335f);
+        ApproachValue(&g_warp_pad_glow_amount, 1.0f, 0.033333335f);
         timer = *(u16 *)(moby + 0x96);
         waiting = timer++ < 0x20;
         *(u16 *)(moby + 0x96) = timer;
         if (!waiting) {
-            target = D_L19_001B2B0C + (*(int *)(vars + 4)<<7);
+            target = g_linked_object_table + (*(int *)(vars + 4)<<7);
             g_hero_state.a = 0;
             g_hero_state.b = 0;
             load_scene_chunk(*(int *)vars, *(int *)(vars + 0x10));
             hero_reset_position_and_direction(target + 0x30, target + 0x70, 0, 1);
-            D_L19_001B2420 = 1.0f;
+            g_warp_pad_glow_amount = 1.0f;
             moby_set_state(moby, 3, -1);
         } else g_hero_state.state = 2;
     }
     if (*(u8 *)(moby + 0x20) == 3) {
-        ApproachValue(&D_L19_001B2420, 0.0f, 0.033333335f);
-        if (D_L19_001B2420 <= 0.0f) {
-            D_L19_001B2420 = 0.0f;
+        ApproachValue(&g_warp_pad_glow_amount, 0.0f, 0.033333335f);
+        if (g_warp_pad_glow_amount <= 0.0f) {
+            g_warp_pad_glow_amount = 0.0f;
             moby_set_state(moby, 1, -1);
             if (*(int *)(vars + 0x18) != -1) {
                 snd_stop_voice(*(int *)(vars + 0x18));

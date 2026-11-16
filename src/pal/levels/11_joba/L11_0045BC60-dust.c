@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int func_PAL_L01_00323068(char *, float *);
+extern int moby_l01_turn_toward_target_pal(char *, float *);
 extern float moby_get_anim_value(char *);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
-extern float D_L11_002B6C10[];
+extern float g_fighter_dust_scale_curve[];
 extern void FastVecScale(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern float mat_fast_helper_a(float, float);
-extern int func_PAL_002B5E30(char *, float);
+extern int moby_step_at_own_position_factor_pal(char *, float);
 extern void moby_transform_joint_to_world(char *, int, float *);
 extern void vec_random_direction(float *, float, float);
 extern float math_random_signed_float_range(float, float);
@@ -19,7 +19,7 @@ extern char *func_PAL_002BE9A8(float *, float, float, float, int, float *, float
 /* Steps along the vector at +0xC0, weighted by the walk table at the animation frame, and
    turns toward the target; on frames 5 and 15 it scatters ten dust particles at a joint
    (3, then 2). A state change hands over to the shared handler instead. */
-void func_PAL_L11_0045BC60(char *obj, float *target)
+void joba_fighter_walk_dust_pal(char *obj, float *target)
 {
     float offset[4], origin[4], half[4], velocity[4], pos[4];
     float frame, t, scale;
@@ -28,16 +28,16 @@ void func_PAL_L11_0045BC60(char *obj, float *target)
     char *particle, *data;
 
     if (*(unsigned char *)(obj + 0x42) != *(unsigned char *)(obj + 0x43)) {
-        func_PAL_L01_00323068(obj, target);
+        moby_l01_turn_toward_target_pal(obj, target);
         return;
     }
     frame = moby_get_anim_value(obj);
     index = FloatToInt(frame);
     next = index + 1;
     t = IntToFloat(index);
-    FastVecScale((char *)offset, obj + 0xC0, D_L11_002B6C10[index] + (D_L11_002B6C10[next] - D_L11_002B6C10[index]) * (frame - t));
+    FastVecScale((char *)offset, obj + 0xC0, g_fighter_dust_scale_curve[index] + (g_fighter_dust_scale_curve[next] - g_fighter_dust_scale_curve[index]) * (frame - t));
     FastVecAdd(obj + 0x10, (char *)offset, obj + 0x10);
-    func_PAL_002B5E30(obj, mat_fast_helper_a(target[0] - *(float *)(obj + 0x10), target[1] - *(float *)(obj + 0x14)));
+    moby_step_at_own_position_factor_pal(obj, mat_fast_helper_a(target[0] - *(float *)(obj + 0x10), target[1] - *(float *)(obj + 0x14)));
     if (index == 5 || index == 15) {
         if (index == 5) {
             moby_transform_joint_to_world(obj, 3, origin);

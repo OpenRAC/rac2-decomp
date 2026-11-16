@@ -13,16 +13,16 @@
 
 typedef int Quadword __attribute__((mode(TI)));
 
-extern float D_L16_001B10E4 __attribute__((sda));   /* particle count (200.0) */
-extern int D_L16_001B10E8 __attribute__((sda));     /* first colour pair */
-extern int D_L16_001B10EC[] __attribute__((sda));
-extern int D_L16_001B10F0[] __attribute__((sda));   /* second colour pair */
-extern int D_L16_001B10F4[] __attribute__((sda));
-extern float D_L16_001B10F8[2] __attribute__((sda)); /* sizes, picked by func_002A77E0(2) */
-extern int D_L16_001B1104 __attribute__((sda));
-extern int D_L16_001B1108 __attribute__((sda));
-extern int D_L16_001B110C[] __attribute__((sda));   /* lifetime bounds */
-extern int D_L16_001B1110[] __attribute__((sda));
+extern float g_burst_l16_particle_count __attribute__((sda));   /* particle count (200.0) */
+extern int g_burst_color_a_start __attribute__((sda));     /* first colour pair */
+extern int g_burst_color_a_end[] __attribute__((sda));
+extern int g_burst_color_b_start[] __attribute__((sda));   /* second colour pair */
+extern int g_burst_color_b_end[] __attribute__((sda));
+extern float g_burst_size_table[2] __attribute__((sda)); /* sizes, picked by func_002A77E0(2) */
+extern int g_burst_trail_flags __attribute__((sda));
+extern int g_burst_index_max __attribute__((sda));
+extern int g_burst_lifetime_min[] __attribute__((sda));   /* lifetime bounds */
+extern int g_burst_lifetime_max[] __attribute__((sda));
 
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
@@ -50,7 +50,7 @@ void EmitParticlesOutsideCentralBox(char *object)
     float size;
     float blend;
 
-    for (i = 0; (float)i < D_L16_001B10E4; ++i) {
+    for (i = 0; (float)i < g_burst_l16_particle_count; ++i) {
         *(Quadword *)random = 0;
         random[0] = math_random_signed_float_range(0.0f, 26.0f);
         random[1] = math_random_signed_float_range(0.0f, 8.0f);
@@ -63,16 +63,16 @@ void EmitParticlesOutsideCentralBox(char *object)
         matrix_mul_vec3(position, position, object + 192);
         FastVecAdd(position, position, object + 16);
         blend = math_random_float_range(0.0f, 1.0f);
-        first = FastTweenColor(D_L16_001B10E8, D_L16_001B10EC[0], blend);
+        first = FastTweenColor(g_burst_color_a_start, g_burst_color_a_end[0], blend);
         blend = math_random_float_range(0.0f, 1.0f);
-        second = FastTweenColor(D_L16_001B10F0[0], D_L16_001B10F4[0], blend);
-        size = D_L16_001B10F8[math_random_int_below(2)];
+        second = FastTweenColor(g_burst_color_b_start[0], g_burst_color_b_end[0], blend);
+        size = g_burst_size_table[math_random_int_below(2)];
         vec_clear_128(random);
         random[3] = size;
         vec_clear_128(direction);
         direction[3] = size;
-        third = math_random_int_range(1, D_L16_001B1108);
-        fourth = math_random_int_range(D_L16_001B110C[0], D_L16_001B1110[0]);
-        part_spawn_trail(position, random, direction, first, second, third, fourth, 60, D_L16_001B1104);
+        third = math_random_int_range(1, g_burst_index_max);
+        fourth = math_random_int_range(g_burst_lifetime_min[0], g_burst_lifetime_max[0]);
+        part_spawn_trail(position, random, direction, first, second, third, fourth, 60, g_burst_trail_flags);
     }
 }

@@ -10,7 +10,7 @@ typedef struct {
     char pad44[0x9C];
 } ClassRecord;
 
-extern char *D_001A8CFC __attribute__((sda));
+extern char *g_resident_data_base __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 extern ClassRecord g_weapon_table[];
 
@@ -23,17 +23,17 @@ int menu_preview_copy_class_fields(char *object)
     char *target;
     int i;
 
-    if (D_001A8CFC != 0) {
-        tab_menu_set_enabled(D_001A8CFC + 0x3BE08, 1);
-        i = item_menu_get_selected_id((unsigned char *)D_001A8CFC + 0x3C108);
+    if (g_resident_data_base != 0) {
+        tab_menu_set_enabled(g_resident_data_base + 0x3BE08, 1);
+        i = item_menu_get_selected_id((unsigned char *)g_resident_data_base + 0x3C108);
         {
             ClassRecord *r = &g_weapon_table[g_item_slot_to_record[i]];
             int v = r->f42;
-            char *a = D_001A8CFC + 0x3C108;
+            char *a = g_resident_data_base + 0x3C108;
             *(int *)(object + 0x34) = v;
             target = item_menu_get_extra_value(a);
         }
-        i = item_menu_get_selected_id((unsigned char *)D_001A8CFC + 0x3C108);
+        i = item_menu_get_selected_id((unsigned char *)g_resident_data_base + 0x3C108);
         *(int *)(target + 0x58) = g_weapon_table[g_item_slot_to_record[i]].f06;
     }
     return 0;

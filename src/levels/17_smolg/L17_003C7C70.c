@@ -10,13 +10,13 @@ extern void func_327E68(s32, s32, s32, s32, f32);
 extern s32 func_31B160(s32);
 extern f32 func_2EF0B0(s32, s32);
 
-extern s32 D_L17_001B2748 __attribute__((sda));
+extern s32 g_flash_frame_counter __attribute__((sda));
 extern s32 func_2F0108(u32, u32, f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 
 extern s32 g_moby_l17_pool __attribute__((sda));
 
-extern s32 D_L17_001C0018;
+extern s32 g_aim_hit_result;
 extern s32 func_2DF570(s32, s32, s32, s32, s32);
 
 /* func_L17_003C7C70 is defined in L17_003C7C70-tilt-g8.c. */
@@ -24,7 +24,7 @@ extern s32 func_2DF570(s32, s32, s32, s32, s32);
 /* Slowly pulses the object between two colours (moby class 2363). */
 void color_pulse_update(s32 moby)
 {
-    f32 t = (f32)(D_L17_001B2748 % 150) * (1.0f / 150.0f);
+    f32 t = (f32)(g_flash_frame_counter % 150) * (1.0f / 150.0f);
     f32 ang = (t + t) * 3.1415927f;
 
     if (ang > 3.1415927f)
@@ -83,7 +83,7 @@ typedef struct {
 } L17Player;
 
 extern L17Player g_hero_state;
-extern f32 D_L17_001B04BC SDATA(D_L17_001B04BC);
+extern f32 g_fan_var_value SDATA(D_L17_001B04BC);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
 extern f32 math_fast_sin_or_cos_a(f32);
@@ -98,7 +98,7 @@ void fan_l17_update(u8 *moby)
     TI128 here __attribute__((aligned(16)));
     f32 dir[4] __attribute__((aligned(16)));
 
-    vars[2] = D_L17_001B04BC;
+    vars[2] = g_fan_var_value;
     switch (moby[0x20]) {
     case 0:
         *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) - 0.05f;
@@ -155,7 +155,7 @@ void fan_l17_update(u8 *moby)
 
 
 
-extern u16 *D_L17_001FB720[];
+extern u16 *g_group_l17_member_table[];
 
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit; the limit
@@ -163,7 +163,7 @@ extern u16 *D_L17_001FB720[];
    the word D_L17_001B2C1C declared above as an int, reached here as a pointer under a second
    name. */
 extern u8 *D_L17_001B2C1C_base[] __asm__("D_L17_001B2C1C") __attribute__((sda));
-extern s32 D_L17_001B2C38[] __attribute__((sda));
+extern s32 g_max_l17_group_id[] __attribute__((sda));
 
 /* The object's state record up to the group word and the word stored beside it. */
 typedef struct {
@@ -180,9 +180,9 @@ void grulch_activate_group_members(u8 *moby)
     u16 *group_ids;
     u8 *entity;
 
-    for (group_ids = D_L17_001FB720[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L17_001B2C38[0] && group_ids != 0 &&
-         ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == D_L17_001FB720[state->group]);
+    for (group_ids = g_group_l17_member_table[state->group];
+         (state->group & 0xFF) != 0xFF && state->group <= g_max_l17_group_id[0] && group_ids != 0 &&
+         ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == g_group_l17_member_table[state->group]);
          group_ids++) {
         entity = D_L17_001B2C1C_base[0] + ((*group_ids & 0x7FFF) << 8);
         if (entity == 0)
@@ -294,7 +294,7 @@ s32 grulch_is_target_reachable(s32 moby) {
 
     if (func_2DF570(moby + 0x10, vars + 0x240, 0, moby, 0) == 0)
         return 1;
-    return D_L17_001C0018 == *(s32 *)(vars + 0x250);
+    return g_aim_hit_result == *(s32 *)(vars + 0x250);
 }
 
 /* func_L17_003E8A58 is defined in L17_003E8A58-fighter-g8.c. */
@@ -308,8 +308,8 @@ s32 grulch_is_target_reachable(s32 moby) {
 /* func_L17_0041EAA8 is defined in L17_003C7C70-g8.c. */
 
 typedef struct { unsigned char pad[0x464]; unsigned char flags[0]; } PickupFlags;
-extern PickupFlags D_L17_0021EBB0;
-extern unsigned char D_0019B4A8[], D_0013963C, D_001395B8[];
+extern PickupFlags g_level_l17_save_state;
+extern unsigned char g_moby_nibble_table[], g_grulch_reachable_flag, g_game_flag_table[];
 extern int g_current_map_index SDATA(D_001A79F0);
 typedef struct { unsigned char pad[0x20]; unsigned char state; unsigned char rest[0xDF]; } Entity;
 extern Entity *entity_base_ptr __asm__("D_L17_001B2C1C") __attribute__((sda));
@@ -337,9 +337,9 @@ void UpdateProximityPickup(unsigned char *moby)
     float pos[4] __attribute__((aligned(16)));
     if(moby[0x20]!=0) goto inactive;
     id=*(unsigned short *)(moby+0xb2);
-    if(D_L17_0021EBB0.flags[(short)id]!=0) goto remove_self;
+    if(g_level_l17_save_state.flags[(short)id]!=0) goto remove_self;
     {
-        bits=D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)];
+        bits=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)];
         if(id&1) bits=(bits>>4)&7; else bits=bits&7;
         if(bits) goto remove_self;
         position=moby+0x10;
@@ -363,13 +363,13 @@ void UpdateProximityPickup(unsigned char *moby)
             if(vec_distance_xy(position,g_hero_position)<1.5f) {
                 unsigned short pickupId;
                 unsigned char *counter;
-                D_0013963C=1;
+                g_grulch_reachable_flag=1;
                 pickupId=*(unsigned short *)(moby+0xb2);
                 if(pickupId&1) {
-                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if(((*counter>>4)&7)!=7)*counter+=16;
                 } else {
-                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if((*counter&7)!=7)++*counter;
                 }
                 if(*(int *)vars!=-1) {
@@ -395,8 +395,8 @@ inactive:
 dead:
     {
         value_set_entry_by_index(0x1292,0x78);
-        count=D_001395B8[0x86]?1:2;
-        if(D_001395B8[0x89])--count;
+        count=g_game_flag_table[0x86]?1:2;
+        if(g_game_flag_table[0x89])--count;
         if(count>0)subtitle_request_voice_line(0xa0f,0x66);else subtitle_request_voice_line(0xa10,0x67);
         moby_mark_spawned(moby);
     }

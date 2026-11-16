@@ -10,18 +10,18 @@ typedef struct {
     s32 timer;
 } HudTimerVars;
 
-extern u8 *D_L05_001B13B0 __attribute__((sda));
-extern s32 D_L05_001B354C __attribute__((sda));
-extern s32 D_L05_001B3548 __attribute__((sda));
+extern u8 *g_feltzin_controller_moby __attribute__((sda));
+extern s32 g_feltzin_hud_shown __attribute__((sda));
+extern s32 g_feltzin_last_time __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 *D_L05_001A904C;
-extern s32 D_L05_001B1428 __attribute__((sda)), D_L05_001B1430 __attribute__((sda));
-extern s32 D_L05_001B1438 __attribute__((sda)), D_L05_001B1440 __attribute__((sda));
-extern s32 D_L05_001B142C, D_L05_001B1434, D_L05_001B143C, D_L05_001B1444;
-extern f32 D_L05_001B2D84;
-extern s32 D_L05_001B2D80;
-extern Block D_L05_001B14A0;
-extern char D_L05_001B14B0[] MACRO_ADDR;
+extern u8 *g_feltzin_mission_data;
+extern s32 g_feltzin_hud_icon_x __attribute__((sda)), g_feltzin_hud_badge_x __attribute__((sda));
+extern s32 g_feltzin_hud_label_x __attribute__((sda)), g_feltzin_hud_label_alt_x __attribute__((sda));
+extern s32 g_feltzin_hud_icon_y, g_feltzin_hud_badge_y, g_feltzin_hud_label_y, g_feltzin_hud_label_alt_y;
+extern f32 g_screen_l05_scale;
+extern s32 g_label_mode;
+extern Block g_feltzin_hud_color;
+extern char g_str_feltzin_map_label[] MACRO_ADDR;
 
 extern void *table_find_by_id(void *, s32);
 extern void gfx_draw_scaled_object_two_axes(void *, s32, f32, f32, f32, f32, f32);
@@ -35,7 +35,7 @@ extern void text_draw_medium(s32, s32, u64, char *, s32);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L05_001B2D84 + 0.5f;
+    f32 scaled = value * g_screen_l05_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -45,7 +45,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 /* label_y, the HUD label idiom for text and sprite label y coordinates. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L05_001B2D80;
+    int mode = g_label_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -70,25 +70,25 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
                       b, c);                                                                        \
     }
 
-void func_PAL_L05_004273C8(s32 first, s32 timed, s32 third, s32 fourth)
+void hud_draw_feltzin_mission_sprites_pal(s32 first, s32 timed, s32 third, s32 fourth)
 {
-    HudTimerVars *vars = *(HudTimerVars **)(D_L05_001B13B0 + 0x68);
+    HudTimerVars *vars = *(HudTimerVars **)(g_feltzin_controller_moby + 0x68);
     f32 fade;
     void *sprite;
     char text[128];
     Block color;
 
-    if (!D_L05_001B354C) {
-        D_L05_001B3548 = g_current_map_index[3];
-        D_L05_001B354C = 1;
+    if (!g_feltzin_hud_shown) {
+        g_feltzin_last_time = g_current_map_index[3];
+        g_feltzin_hud_shown = 1;
     }
-    if (!D_L05_001A904C)
+    if (!g_feltzin_mission_data)
         return;
     if (first) {
-        HUD_SPRITE(0xBD, 0x60442D00, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
-        HUD_SPRITE(0xBE, 0x55F0C070, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBD, 0x60442D00, g_feltzin_hud_icon_x, g_feltzin_hud_icon_y, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBE, 0x55F0C070, g_feltzin_hud_icon_x, g_feltzin_hud_icon_y, -1.0f, 1.0f, 0.0f);
     }
-    if (timed && D_L05_001B3548 < g_current_map_index[3]) {
+    if (timed && g_feltzin_last_time < g_current_map_index[3]) {
         if (!math_fast_float_d(&vars->timer)) {
             if (vars->timer >= 291) {
                 fade = IntToFloat(250 - vars->timer) * 0.1f;
@@ -104,41 +104,41 @@ void func_PAL_L05_004273C8(s32 first, s32 timed, s32 third, s32 fourth)
                     fade = 0.0f;
             } else
                 goto full;
-            HUD_SPRITE(0xBF, 0x60442D00, D_L05_001B1430, D_L05_001B1434, fade, fade, 0.0f);
-            HUD_SPRITE(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, fade, fade, 0.0f);
+            HUD_SPRITE(0xBF, 0x60442D00, g_feltzin_hud_badge_x, g_feltzin_hud_badge_y, fade, fade, 0.0f);
+            HUD_SPRITE(0xC0, 0x55F0C070, g_feltzin_hud_badge_x, g_feltzin_hud_badge_y, fade, fade, 0.0f);
             goto timed_done;
         full:
-            HUD_SPRITE(0xBF, 0x60442D00, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
-            HUD_SPRITE(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
-            color = D_L05_001B14A0;
+            HUD_SPRITE(0xBF, 0x60442D00, g_feltzin_hud_badge_x, g_feltzin_hud_badge_y, 1.0f, 1.0f, 0.0f);
+            HUD_SPRITE(0xC0, 0x55F0C070, g_feltzin_hud_badge_x, g_feltzin_hud_badge_y, 1.0f, 1.0f, 0.0f);
+            color = g_feltzin_hud_color;
             {
                 s32 icon = GetIconFrame(0xEAA2, 3);
-                s32 x = D_L05_001B1430 - 51;
-                s32 y = screen_coord(D_L05_001B2D80, (f32)(D_L05_001B1434 - 13), 1.0f);
+                s32 x = g_feltzin_hud_badge_x - 51;
+                s32 y = screen_coord(g_label_mode, (f32)(g_feltzin_hud_badge_y - 13), 1.0f);
 
                 hud_draw_sprite_gradient(icon, x, y, 28, 28, &color);
             }
-            sprintf(text, D_L05_001B14B0, g_current_map_index[3]);
+            sprintf(text, g_str_feltzin_map_label, g_current_map_index[3]);
             {
-                s32 textX = D_L05_001B1430 + 5;
+                s32 textX = g_feltzin_hud_badge_x + 5;
 
-                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L05_001B1434 + 2), D_L05_001B2D84, 0.5f, 1),
+                text_draw_medium(textX, label_y((void *)textX, (f32)(g_feltzin_hud_badge_y + 2), g_screen_l05_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;
         } else {
             s32 reset = 250;
 
-            D_L05_001B3548 = g_current_map_index[3];
+            g_feltzin_last_time = g_current_map_index[3];
             vars->timer = reset;
         }
     }
     if (third) {
-        HUD_SPRITE(0xC1, 0x60442D00, D_L05_001B1438, D_L05_001B143C, 1.1f, 1.0f, 0.0f);
-        HUD_SPRITE(0xC2, 0x55F0C070, D_L05_001B1438, D_L05_001B143C, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC1, 0x60442D00, g_feltzin_hud_label_x, g_feltzin_hud_label_y, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC2, 0x55F0C070, g_feltzin_hud_label_x, g_feltzin_hud_label_y, 1.1f, 1.0f, 0.0f);
     }
     if (fourth) {
-        HUD_SPRITE(0xC1, 0x60442D00, D_L05_001B1440, D_L05_001B1444, 1.1f, 1.0f, 0.0f);
-        HUD_SPRITE(0xC2, 0x55F0C070, D_L05_001B1440, D_L05_001B1444, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC1, 0x60442D00, g_feltzin_hud_label_alt_x, g_feltzin_hud_label_alt_y, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC2, 0x55F0C070, g_feltzin_hud_label_alt_x, g_feltzin_hud_label_alt_y, 1.1f, 1.0f, 0.0f);
     }
 }

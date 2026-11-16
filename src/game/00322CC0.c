@@ -13,7 +13,7 @@ extern char g_hero_position[];
 extern char *g_active_attacker_robot;
 extern u8 g_sound_state[];
 extern u32 g_path_table[];
-extern char D_001B0020[];
+extern char g_str_robot_debug[];
 
 extern int group_enemy_init_update(char *);
 extern void moby_mark_spawned(void *);
@@ -362,7 +362,7 @@ void robot_update(char *self)
                     snd_stop_voice(index);
             }
             *(int *)(vars + 0x2C0) = -1;
-            STUB_printf(D_001B0020, *(int *)(vars + 0x2BC));
+            STUB_printf(g_str_robot_debug, *(int *)(vars + 0x2BC));
             moby_set_state(self, 8, -1);
             if (*(u8 *)(self + 0x43) != 0xF)
                 anim_start_blended(self, 0xF, 0, 3);

@@ -11,10 +11,10 @@ extern void func_32F140(s32 a0, s32 a1);
 extern void func_359FD0(char *a0, char *a1);
 extern void func_30D710(s32 a0, s32 a1);
 extern char D_00189E20_11[];
-extern u8   D_001395C0;
+extern u8   g_remote_view_done_flag;
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
-void func_US2_L03_003D3700(char *a0)
+void console_remote_view_cleanup_us2(char *a0)
 {
     char *s0 = a0;
     char *s1 = *(char **)(s0 + 0x68);
@@ -25,7 +25,7 @@ void func_US2_L03_003D3700(char *a0)
     s2 = D_00189E20_11;
     *(u16 *)(s2 + 0x24FC) = 0;
     func_313378(*(u8 *)(s0 + 0xB0));
-    D_001395C0 = 1;
+    g_remote_view_done_flag = 1;
     *(u8 *)0x001A7B3A = 1;
     *(u8 *)0x001A7B03 = 1;
     *(u8 *)0x001A7B3B = 1;

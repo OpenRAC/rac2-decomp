@@ -10,7 +10,7 @@ typedef struct {
     short delay, duration, frame, rise, fall;
     unsigned char amplitude, bias;
 } WaveChannel;
-extern WaveChannel D_001B5180[8];
+extern WaveChannel g_wave_channels[8];
 
 /* Adds up all active wave channels into two output values and returns how many channels are active. */
 int ActuatorCalcPower(int *out)
@@ -32,19 +32,19 @@ int ActuatorCalcPower(int *out)
         WaveChannel *s;
         int phase, value;
 
-        if (!D_001B5180[i].kind)
+        if (!g_wave_channels[i].kind)
             continue;
         active++;
-        if (!D_001B5180[i].permanent) {
-            if (D_001B5180[i].duration-- <= 0)
-                D_001B5180[i].kind = 0;
+        if (!g_wave_channels[i].permanent) {
+            if (g_wave_channels[i].duration-- <= 0)
+                g_wave_channels[i].kind = 0;
         }
-        if (D_001B5180[i].delay) {
-            D_001B5180[i].delay--;
+        if (g_wave_channels[i].delay) {
+            g_wave_channels[i].delay--;
             continue;
         }
-        s = &D_001B5180[i];
-        D_001B5180[i].frame++;
+        s = &g_wave_channels[i];
+        g_wave_channels[i].frame++;
         value = 0;
         phase = s->frame % (s->rise + s->fall);
         switch (s->kind) {

@@ -6,28 +6,28 @@ typedef int Quad __attribute__((mode(TI)));
 #define FLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define HALF(p,o) (*(short *)((char *)(p)+(o)))
 #define UHALF(p,o) (*(u16 *)((char *)(p)+(o)))
-extern u8 D_001A7B1F, D_001395C9 NOT_SDA, D_0013958F, D_001A7A40;
-extern unsigned D_00138324 NOT_SDA;
-extern u32 D_00139768[];
+extern u8 g_skill_point_zone_flag, g_level_event_flag NOT_SDA, g_level_event_byte, g_unlocked_item_flags;
+extern unsigned g_pad_held_flags NOT_SDA;
+extern u32 g_request_flag_table[];
 extern int g_current_map_index MACRO_ADDR;
 extern int g_player_bolts[] __attribute__((sda));
 typedef struct {
     u8 prefix[0x80]; float position[4]; u8 gap90[0x50];
     float target[4]; u8 gapF0[0x20]; float velocity[4];
 } ResidentPlayerPrefix;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 extern ResidentPlayerPrefix g_hero_state;
 /* The +0x80 cost field and 0xE0 record stride are independently measured. */
 typedef struct { u8 prefix[0x80]; int cost; u8 tail[0x5C]; } WeaponSettings;
-extern u8 D_L04_0027B470[];
+extern u8 g_item_l04_record_table[];
 extern u8 g_item_slot_to_record[];
 extern char *g_moby_l04_pool[] __attribute__((sda));
-extern int D_L04_001B2008, D_L04_001A8F00;
-extern int D_L04_001B2224[] __attribute__((sda));
-extern char D_L04_001BF880[];
+extern int g_game_tick_counter, g_game_l04_mode;
+extern int g_cutscene_flags[] __attribute__((sda));
+extern char g_request_l04_queue[];
 typedef struct { u8 pad[0x464]; u8 active[0]; } SlotFlagView;
 typedef struct { u8 pad[0x9c]; int x9c; } OtherVars;
-extern SlotFlagView D_L04_0021DA00, D_L04_0021E670;
+extern SlotFlagView g_slot_flag_view_a, g_slot_flag_view_b;
 extern void moby_reset_matching_effects_alt(char *);
 extern void moby_mark_spawned(char *);
 extern void anim_start_blended(void *,int,int,int);
@@ -82,8 +82,8 @@ void UpdateBarlowItemVendor(char *object)
     switch ((u8)object[0x20]) {
     case 0: {
         char *child;
-        if (D_L04_001B2008 < 2) return;
-        if (D_001A7B1F) {
+        if (g_game_tick_counter < 2) return;
+        if (g_skill_point_zone_flag) {
             char *other;
             unsigned index;
             int save;
@@ -91,11 +91,11 @@ void UpdateBarlowItemVendor(char *object)
             other[0x20] = 2;
             (*(OtherVars **)(other+0x68))->x9c = 0;
             save = g_current_map_index<<10;
-            D_L04_0021DA00.active[HALF(other,0xb2)] = 0;
-            D_L04_0021E670.active[HALF(other,0xb2)] = 0;
+            g_slot_flag_view_a.active[HALF(other,0xb2)] = 0;
+            g_slot_flag_view_b.active[HALF(other,0xb2)] = 0;
             index = UHALF(other,0xb2);
             {
-                u8 *entry = &D_0019B4A8[((short)index>>1)+save];
+                u8 *entry = &g_moby_nibble_table[((short)index>>1)+save];
                 unsigned flags = *entry;
                 unsigned value = flags & 0xf8;
                 if (index&1) value = flags & 0x8f;
@@ -105,7 +105,7 @@ void UpdateBarlowItemVendor(char *object)
             moby_mark_spawned(object);
             return;
         }
-        if (D_00139768[0x38 / sizeof(u32)] & 0x8000000) {
+        if (g_request_flag_table[0x38 / sizeof(u32)] & 0x8000000) {
             if (((u8 *)object)[0x43] != 1) anim_start_blended(object,1,0,10);
             moby_set_state(object,2,-1);
         }
@@ -120,7 +120,7 @@ void UpdateBarlowItemVendor(char *object)
             hero_copy_field_to_moby((u8 *)*(char **)(vars+0x11c));
         }
         moby_set_state(object,1,-1);
-        if (D_00139768[0x38 / sizeof(u32)] & 0x8000000) {
+        if (g_request_flag_table[0x38 / sizeof(u32)] & 0x8000000) {
             if (((u8 *)object)[0x43] != 1) anim_start_blended(object,1,0,10);
             moby_set_state(object,4,-1);
             if (INT(vars,0x12c) != -1)
@@ -132,18 +132,18 @@ void UpdateBarlowItemVendor(char *object)
         char *other = g_moby_l04_pool[0] + INT(vars,0x12c)*256;
         if (hero_is_reachable_for_count((u8 *)object,10,4.0f) &&
             (!other || (u8)other[0x20] == 254 || (u8)other[0x20] == 253)) {
-            D_001395C9 = 1;
+            g_level_event_flag = 1;
             FLOAT(object,0x48) = 1.0f;
             level_apply_index_for_key((int)object);
-            req_push_queue((u8 *)D_L04_001BF880,59);
-            req_launch_queued(D_L04_001BF880);
+            req_push_queue((u8 *)g_request_l04_queue,59);
+            req_launch_queued(g_request_l04_queue);
             moby_set_state(object,2,-1);
         }
         break;
     }
     case 2:
-        D_L04_001B2224[1] = 1;
-        if (D_L04_001A8F00 == 2) {
+        g_cutscene_flags[1] = 1;
+        if (g_game_l04_mode == 2) {
             object[0x31] = 0;
             UHALF(object,0x34) |= 1;
         }
@@ -154,7 +154,7 @@ void UpdateBarlowItemVendor(char *object)
             qcopy(&rotation, (object+0xf0));
             rotation.f[2] = FastAddRotations(rotation.f[2],3.1415929794311523f);
             hero_reset_position_and_direction(&target,&rotation,0,1);
-            D_L04_001B2224[1] = 0;
+            g_cutscene_flags[1] = 0;
             object[0x31] = 1;
             UHALF(object,0x34) &= 0xfffe;
             if (((u8 *)object)[0x43] != 1) anim_start_blended(object,1,0,10);
@@ -178,9 +178,9 @@ void UpdateBarlowItemVendor(char *object)
             func_L00_0030C710(180);
             text_print_localized_formatted(0x279f,COST,-1);
             level_apply_index_for_key((int)object);
-            if (D_00138324 & 16) {
-                req_push_queue((u8 *)D_L04_001BF880,60);
-                req_launch_queued(D_L04_001BF880);
+            if (g_pad_held_flags & 16) {
+                req_push_queue((u8 *)g_request_l04_queue,60);
+                req_launch_queued(g_request_l04_queue);
                 moby_set_state(object,5,-1);
             }
         }
@@ -189,8 +189,8 @@ void UpdateBarlowItemVendor(char *object)
         char *other;
         unsigned index;
         int save;
-        D_L04_001B2224[1] = 1;
-        if (D_L04_001A8F00 == 2) {
+        g_cutscene_flags[1] = 1;
+        if (g_game_l04_mode == 2) {
             object[0x31] = 0;
             UHALF(object,0x34) |= 1;
         }
@@ -201,11 +201,11 @@ void UpdateBarlowItemVendor(char *object)
             qcopy(&rotation, (object+0xf0));
             rotation.f[2] = FastAddRotations(rotation.f[2],-1.5707964897155762f);
             hero_reset_position_and_direction(&target,&rotation,0,1);
-            D_L04_001B2224[1] = 0;
+            g_cutscene_flags[1] = 0;
             object[0x31] = 1;
             UHALF(object,0x34) &= 0xfffe;
             if (((u8 *)object)[0x21] != 255) moby_set_byte_on_group(((u8 *)object)[0x21],1);
-            if (!D_001A7B1F) {
+            if (!g_skill_point_zone_flag) {
                 g_player_bolts[0] = g_player_bolts[0] - COST;
                 func_L00_0030C710(180);
                 help_unlock_entry(39);
@@ -217,11 +217,11 @@ void UpdateBarlowItemVendor(char *object)
             other[0x20] = 2;
             (*(OtherVars **)(other+0x68))->x9c = 0;
             save = g_current_map_index<<10;
-            D_L04_0021DA00.active[HALF(other,0xb2)] = 0;
-            D_L04_0021E670.active[HALF(other,0xb2)] = 0;
+            g_slot_flag_view_a.active[HALF(other,0xb2)] = 0;
+            g_slot_flag_view_b.active[HALF(other,0xb2)] = 0;
             index = UHALF(other,0xb2);
             {
-                u8 *entry = &D_0019B4A8[((short)index>>1)+save];
+                u8 *entry = &g_moby_nibble_table[((short)index>>1)+save];
                 unsigned flags = *entry;
                 unsigned value = flags & 0xf8;
                 if (index&1) value = flags & 0x8f;
@@ -287,7 +287,7 @@ stopTracking:
         FLOAT(vars,0x68) = yaw*0.6f;
         FLOAT(vars,0xe8) = yaw*0.4f;
     }
-    if (D_001A7A40) FLOAT(vars,0x70) = 2.75f;
+    if (g_unlocked_item_flags) FLOAT(vars,0x70) = 2.75f;
     moby_update_eased_node(object,vars,0,smoothing,blend);
     moby_update_eased_node(object,vars+0x80,1,smoothing,blend);
     if (INT(vars,0x11c)) moby_copy_joint_transform_to_object(object,*(char **)(vars+0x11c),2,0);

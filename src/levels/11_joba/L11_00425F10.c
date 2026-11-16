@@ -132,7 +132,7 @@ void MarkGroupClassCF5CF6Members(u8 *object) {
     } while (*(s16 *)id_ptr++ >= 0);
 }
 
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
 extern int math_random_int_below(int);
 extern float math_random_signed_float_range(float, float);
@@ -147,7 +147,7 @@ void part_l11_spawn_paired_sparks(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L11_001BA8C0, pos);
+    FastVecSub(direction, (float *)g_hero_l11_position, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;

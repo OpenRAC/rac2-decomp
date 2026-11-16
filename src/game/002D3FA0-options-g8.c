@@ -14,14 +14,14 @@ extern MenuEntryState g_pause_menu_state;
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
-extern PreviewChoice D_0026CFD0[];
+extern PreviewChoice g_preview_choices[];
 extern unsigned int g_equipment_bits[] __attribute__((sda));
-extern int D_001ABA74 __attribute__((sda));
+extern int g_preview_selection __attribute__((sda));
 extern int g_screen_width[] __attribute__((sda)), g_screen_height[] __attribute__((sda));
-extern float D_001B23A4[] __attribute__((sda));
+extern float g_hud_scale[] __attribute__((sda));
 typedef struct { unsigned char bytes[16]; } MenuCorners;
-extern MenuCorners D_001ABA78;
-extern char D_001AB998[];
+extern MenuCorners g_options_menu_corners;
+extern char g_str_two_string_fmt[];
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
@@ -40,11 +40,11 @@ extern void tex_upload_object_textures(char *, int), mem_restore_scratch_area(vo
 extern int tex_run_upload_and_setup(void);
 extern void render_environment_mapped_object(char *);
 extern void SetupGifPaging(int), DoGifPaging(void);
-extern char *D_001A8CFC[] __attribute__((sda));
-extern int D_001B23A0;
+extern char *g_resident_data_base[] __attribute__((sda));
+extern int g_hud_mode;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_001B23A0;
+    int mode = g_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -59,7 +59,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 static __inline__ int label_y2(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_001B23A0;
+    int mode = g_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     if (mode == active)
@@ -70,7 +70,7 @@ static __inline__ int label_y2(void *handle, float value, float scale, float hal
 }
 static __inline__ int hud_coord(float value, float scale, float half, int active)
 {
-    int mode = D_001B23A0;
+    int mode = g_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     int copy;
@@ -85,7 +85,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 }
 static __inline__ int hud_coord5(float value, float scale, float half, int active)
 {
-    int mode = D_001B23A0;
+    int mode = g_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     int copy;
@@ -115,7 +115,7 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
     copy = handle;
     if (copy != 0)
         scaled = half;
-    mode = D_001B23A0;
+    mode = g_hud_mode;
     if (mode == active)
         scaled = scale;
     return result;
@@ -123,7 +123,7 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
 /* Draws the options screen: the titles, the framed boxes, the row of choice icons around the selected one, the help text and the live model preview. */
 int options_menu_draw(void)
 {
-    MenuCorners corners = D_001ABA78;
+    MenuCorners corners = g_options_menu_corners;
     char text[32];
     int color = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
@@ -139,39 +139,39 @@ int options_menu_draw(void)
     unsigned long cC;
     float px, py;
     SetupGifPaging(0);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    ya = hud_coord(326.0f, D_001B23A4[0], 0.5f, one);
-    yb = hud_coord(387.0f, D_001B23A4[0], 0.5f, one);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, 0XD0), 0x60442D00, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), g_hud_scale[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, 0XD1), 0x60241700, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), g_hud_scale[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, 0XD2), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), g_hud_scale[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, 0XD3), 0x55F0C070, (float)(g_screen_width[0] / 2), (float)hud_coord((float)(g_screen_height[0] / 2), g_hud_scale[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    ya = hud_coord(326.0f, g_hud_scale[0], 0.5f, one);
+    yb = hud_coord(387.0f, g_hud_scale[0], 0.5f, one);
     cB = color;
     cC = cB;
     AppendScreenRectPacket(228, ya, 230, yb, cB, 0);
-    AppendScreenRectPacket(286, hud_coord5(326.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord5(387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    AppendScreenRectPacket(228, hud_coord(325.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    AppendScreenRectPacket(228, hud_coord(386.0f, D_001B23A4[0], 0.5f, one2), 288, hud_coord(388.0f, D_001B23A4[0], 0.5f, one2), cB, 0);
-    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    texture = GetIconFrame(0xEAA8, 1); hud_draw_sprite(texture, 402, label_y((void *)texture, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)texture, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
-    y1 = hud_coord(116.0f, D_001B23A4[0], 0.5f, one2);
+    AppendScreenRectPacket(286, hud_coord5(326.0f, g_hud_scale[0], 0.5f, one), 288, hud_coord5(387.0f, g_hud_scale[0], 0.5f, one), cC, 0);
+    AppendScreenRectPacket(228, hud_coord(325.0f, g_hud_scale[0], 0.5f, one), 288, hud_coord(327.0f, g_hud_scale[0], 0.5f, one), cC, 0);
+    AppendScreenRectPacket(228, hud_coord(386.0f, g_hud_scale[0], 0.5f, one2), 288, hud_coord(388.0f, g_hud_scale[0], 0.5f, one2), cB, 0);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 36.0f, g_hud_scale[0], 0.5f, one2), 192, label_y((void *)texture, 96.0f, g_hud_scale[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 36.0f, g_hud_scale[0], 0.5f, one2), -192, label_y((void *)texture, 96.0f, g_hud_scale[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 16, label_y((void *)texture, 228.0f, g_hud_scale[0], 0.5f, one2), 192, -label_y((void *)texture, 96.0f, g_hud_scale[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); hud_draw_sprite_gradient(texture, 400, label_y((void *)texture, 228.0f, g_hud_scale[0], 0.5f, one2), -192, -label_y((void *)texture, 96.0f, g_hud_scale[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 1); hud_draw_sprite(texture, 402, label_y((void *)texture, 50.0f, g_hud_scale[0], 0.5f, one2), 89, label_y((void *)texture, 115.0f, g_hud_scale[0], 0.5f, one2), 64);
+    y1 = hud_coord(116.0f, g_hud_scale[0], 0.5f, one2);
     textResult = text_draw_centered_medium(445, y1, 0x80F0F0F0ULL, GetLocalizedString(0x3212), -1);
-    y2 = hud_coord(134.0f, D_001B23A4[0], 0.5f, one2);
+    y2 = hud_coord(134.0f, g_hud_scale[0], 0.5f, one2);
     textResult = text_draw_centered_medium(445, y2, 0x80F0F0F0ULL, GetLocalizedString(0x3213), -1);
-    textResult = sprintf(text, D_001AB998, GetLocalizedString(0x3213), GetLocalizedString(0x2D55));
-    textResult = text_draw_centered_small(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
+    textResult = sprintf(text, g_str_two_string_fmt, GetLocalizedString(0x3213), GetLocalizedString(0x2D55));
+    textResult = text_draw_centered_small(159, hud_coord(18.0f, g_hud_scale[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
     do {
-    y3 = label_y3((void *)textResult, 187.0f, D_001B23A4[0], 0.5f, on3);
+    y3 = label_y3((void *)textResult, 187.0f, g_hud_scale[0], 0.5f, on3);
     } while (0);
     hintResult = text_draw_centered_small(445, y3, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
-        index = D_001ABA74 - i;
+        index = g_preview_selection - i;
         if (index >= 0 && index < 12) {
             while (index >= 0) {
-                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
                     break;
                 index--;
                 i++;
@@ -184,10 +184,10 @@ int options_menu_draw(void)
     }
     x = 291;
     for (i = 1; i < 12; i++) {
-        index = D_001ABA74 + i;
+        index = g_preview_selection + i;
         if (index >= 0 && index < 12) {
             while (index < 12) {
-                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
                     break;
                 index++;
                 i++;
@@ -199,7 +199,7 @@ int options_menu_draw(void)
         x += 56;
     }
     DoGifPaging();
-    gfx_set_scissor_clamped(30, 385, label_y2((void *)hintResult, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
+    gfx_set_scissor_clamped(30, 385, label_y2((void *)hintResult, 50.0f, g_hud_scale[0], 0.5f, on2), label_y((void *)i, 213.0f, g_hud_scale[0], 0.5f, on3));
     DrawMobysSetup();
     mem_fill_scratch_area();
     mem_save_scratch_area();

@@ -16,12 +16,12 @@ extern int weapon_select_aim_target(void *,int,float,float,int,int);
 extern void moby_mark_spawned(void *);
 extern void entity_set_group_alert_c(void *);
 extern void entity_spawn_death_effects_b(void *);
-extern float D_L07_001B0BA8 __attribute__((sda));
-extern unsigned short D_L07_001B0BB0 __attribute__((sda));
-extern unsigned short D_L07_001B0BB4[] __attribute__((sda));
-extern int D_L07_001C9780 NOT_SDA;
-extern char *D_L07_001B1F40[] __attribute__((sda));
-extern char D_L07_001B9200[];
+extern float g_shooter_alt_turn_rate __attribute__((sda));
+extern unsigned short g_shooter_alt_timer_init __attribute__((sda));
+extern unsigned short g_shooter_alt_timer_table[] __attribute__((sda));
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern char *g_shooter_path_table[] __attribute__((sda));
+extern char g_hero_position_block[];
 
 /* Initialize the entity, handle nearby collision targets, and update its animation. */
 void shooter_entity_base_update_b(unsigned char *moby)
@@ -42,7 +42,7 @@ void shooter_entity_base_update_b(unsigned char *moby)
         FLOAT_AT(vars,0x17C)=0.15f;
         FLOAT_AT(vars,0x170)=1.0f;
         FLOAT_AT(vars,0x174)=1.0f;
-        turn=D_L07_001B0BA8;
+        turn=g_shooter_alt_turn_rate;
         turn*=0.017453294f;
         FLOAT_AT(vars,0x180)=FLOAT_AT(moby,0x18)-3.0f;
         INT_AT(vars,0x88)|=0x201;
@@ -51,23 +51,23 @@ void shooter_entity_base_update_b(unsigned char *moby)
         FLOAT_AT(vars,0x60)=3.1415927f;
         if (math_random_int_below(2)) turn=-turn;
         FLOAT_AT(vars,0x12C)=turn;
-        U16_AT(vars,0x132)=D_L07_001B0BB0;
-        U16_AT(vars,0x134)=D_L07_001B0BB4[0];
+        U16_AT(vars,0x132)=g_shooter_alt_timer_init;
+        U16_AT(vars,0x134)=g_shooter_alt_timer_table[0];
         FLOAT_AT(vars,0x7C)=0.0055555557f;
         if (INT_AT(vars,0x2B0)!=-1) {
-            char *entry=D_L07_001B1F40[0]+INT_AT(vars,0x2B0)*0x30;
+            char *entry=g_shooter_path_table[0]+INT_AT(vars,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(vars,0x8C)=**(int **)(entry+0x3C);
             else INT_AT(vars,0x8C)=-1;
         }
         qcopy(vars+0x2E0,moby+0x10);
-        if (FLOAT_AT(moby,0x18)>FLOAT_AT((char *)&D_L07_001C9780,0x28)) {
+        if (FLOAT_AT(moby,0x18)>FLOAT_AT((char *)&g_cutscene_l07_active_flag,0x28)) {
             moby[0x30]=255;
             INT_AT(vars,0x320)=1;
         }
         FLOAT_AT(moby,0x18)+=0.5f;
         coll_get_ground_distance_below(moby+0x10,moby,moby+0x10);
         if (INT_AT(vars,0x2B0)!=-1) {
-            char *entry=D_L07_001B1F40[0]+INT_AT(vars,0x2B0)*0x30;
+            char *entry=g_shooter_path_table[0]+INT_AT(vars,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(vars,0x8C)=**(int **)(entry+0x3C);
             else INT_AT(vars,0x8C)=-1;
         }
@@ -84,7 +84,7 @@ void shooter_entity_base_update_b(unsigned char *moby)
             if (moby[0x43]) anim_start_blended(moby,0,0,0);
         }
     }
-    if (moby[0x31] && fast_vec_dist(moby+0x10,D_L07_001B9200)<24.0f) {
+    if (moby[0x31] && fast_vec_dist(moby+0x10,g_hero_position_block)<24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F]=22;
     }

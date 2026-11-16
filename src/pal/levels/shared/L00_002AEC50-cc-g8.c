@@ -48,13 +48,13 @@ extern struct {
  float f6d4;
  float f6d8;
 } D_L00_0025BE10;
-extern int D_L00_001A7D00[2] __attribute__((sda));
-extern unsigned char D_L00_001DA860[];
-extern int D_L00_001D9F00[];
+extern int g_hero_item_anim_ids[2] __attribute__((sda));
+extern unsigned char g_class_slot_indices[];
+extern int g_sound_bank_table[];
 typedef struct { char data[0x600]; } LargeBufferAED68;
 typedef struct { char data[0x400]; } SmallBufferAED68;
-extern LargeBufferAED68 D_L00_001B5C00[];
-extern SmallBufferAED68 D_L00_001B3400[];
+extern LargeBufferAED68 g_item_large_anim_buffers[];
+extern SmallBufferAED68 g_item_small_anim_buffers[];
 extern float ApproachValue(float *,float,float);
 extern void release_moby_animation_slot(void *,void *);
 extern SlotAED68 *allocate_moby_animation_slot(void *,int);
@@ -82,9 +82,9 @@ void func_PAL_L00_002AEC50(void)
    if(enabled) {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) {
-     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,D_L00_001A7D00[i]);
+     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,g_hero_item_anim_ids[i]);
      D_00189E20_26.slots[i]->opacity=0.0f;
-     D_00189E20_26.slots[i]->icon=D_L00_001D9F00[D_L00_001DA860[i+1]];
+     D_00189E20_26.slots[i]->icon=g_sound_bank_table[g_class_slot_indices[i+1]];
     }
    } else {
     StateAED68 *h=&D_00189E20_26;
@@ -108,9 +108,9 @@ void func_PAL_L00_002AEC50(void)
   active=hero_get_item_aim_adjustment(g->f2290->modes[1],&amount);
   if(active || p->active) {
    if(amount!=0.0f) {
-    D_L00_0025BE10.f6d4=0.072000004f; D_L00_0025BE10.f6d8=0.43200004f;
-    D_L00_0025BE10.f694=amount; D_L00_0025BE10.f5e4=amount;
-    D_L00_0025BE10.f624=0.072000004f; D_L00_0025BE10.f628=0.43200004f;
+    g_hero_item_attach_records.f6d4=0.072000004f; g_hero_item_attach_records.f6d8=0.43200004f;
+    g_hero_item_attach_records.f694=amount; g_hero_item_attach_records.f5e4=amount;
+    g_hero_item_attach_records.f624=0.072000004f; g_hero_item_attach_records.f628=0.43200004f;
    }
    if(active && (!p->active || p->modes[1])) {
      if(p->modes[0]==p->modes[1] || p->progress>0.5f) { p->modes[0]=p->modes[1]; p->ids[0]=p->ids[1]; }
@@ -128,8 +128,8 @@ void func_PAL_L00_002AEC50(void)
    } else p->scale=1.0f;
    { int k;
    for(k=0;k<2;k++) {
-    if(p->modes[k]<23) { p->flags[k]=1; p->buffers[k]=&D_L00_001B3400[i*2+k]; }
-    else { p->flags[k]=0; p->buffers[k]=&D_L00_001B5C00[i*2+k]; }
+    if(p->modes[k]<23) { p->flags[k]=1; p->buffers[k]=&g_item_small_anim_buffers[i*2+k]; }
+    else { p->flags[k]=0; p->buffers[k]=&g_item_large_anim_buffers[i*2+k]; }
    }
    }
    AdvanceAndDecodeAnimationFrames(g->f2290,p);
@@ -153,8 +153,8 @@ void func_PAL_L00_002AEC50(void)
    }
    { int l;
    for(l=0;l<2;l++) {
-    if(p->modes[l]<23) { p->flags[l]=1; p->buffers[l]=&D_L00_001B3400[i*2+l]; }
-    else { p->flags[l]=0; p->buffers[l]=&D_L00_001B5C00[i*2+l]; }
+    if(p->modes[l]<23) { p->flags[l]=1; p->buffers[l]=&g_item_small_anim_buffers[i*2+l]; }
+    else { p->flags[l]=0; p->buffers[l]=&g_item_large_anim_buffers[i*2+l]; }
    }
    }
    AdvanceAndDecodeAnimationFrames(g->f2290,p);

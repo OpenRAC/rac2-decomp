@@ -43,7 +43,7 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 /* Draws a frame when the level object exists: with the view scale at +0xB0 of D_001B9040
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
    ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed
@@ -58,7 +58,7 @@ extern int sprintf(char *, char *, ...);
    buffer at +0x1E14 of the object, then initialises the sub-object at +0x1D6C with a
    count that defaults to 120 when the caller passes -1. The two pointers are defined
    in this order on purpose: it is what puts the buffer in $s1 and the count in $s2. */
-void func_PAL_0033A4A0(char *object, int text_id, int value, int count)
+void msg_box_init_localized_pal(char *object, int text_id, int value, int count)
 {
     char *sub = object + 0x1d8c;
     int limit = (count == -1) ? 100 : count;

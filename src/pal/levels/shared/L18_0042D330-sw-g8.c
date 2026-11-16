@@ -4,22 +4,22 @@
    scaled to 50 Hz. */
 extern void STUB_printf(void *);
 
-extern int D_L18_001B1240 __attribute__((sda));
+extern int g_enemy_timer_reset_value __attribute__((sda));
 
-extern u8 D_L18_001B1360[];
+extern u8 g_str_debug_stub[];
 
 void func_PAL_L18_0042D330(u8 *a0) {
     u8 *state = *(u8 **)(a0 + 0x68);
     switch (*(s16 *)(a0 + 0xAA)) {
         case 0xEC0:
-            *(u16 *)(state + 0x392) = (D_L18_001B1240 * 5 + 2) / 6;
+            *(u16 *)(state + 0x392) = (g_enemy_timer_reset_value * 5 + 2) / 6;
             break;
         case 0xED4:
             break;
         case 0xEE1:
             break;
         default:
-            STUB_printf(D_L18_001B1360);
+            STUB_printf(g_str_debug_stub);
             break;
     }
 }

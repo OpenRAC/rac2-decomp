@@ -22,7 +22,7 @@ extern void FastVecCross(char *, char *, char *);
 extern void FastVecScale(char *, char *, float);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(char *, char *, int);
-extern char D_L09_001B9A00[];
+extern char g_camera_l09_position[];
 
 /* Draws three textured strips between the two stored endpoints, facing the camera. */
 void DrawLayeredBeamQuads(char *object)
@@ -102,7 +102,7 @@ void DrawLayeredBeamQuads(char *object)
 
     FastVecSub(&matrix[0], state + 0x20, state + 0x10);
     vec_scale_to_length((char *)&matrix[0], (char *)&matrix[0], 1.0f);
-    FastVecSub(&matrix[1], D_L09_001B9A00, state + 0x10);
+    FastVecSub(&matrix[1], g_camera_l09_position, state + 0x10);
     FastVecCross((char *)&matrix[2], (char *)&matrix[1], (char *)&matrix[0]);
     vec_scale_to_length((char *)&matrix[2], (char *)&matrix[2], 1.0f);
     FastVecCross((char *)&matrix[1], (char *)&matrix[0], (char *)&matrix[2]);

@@ -9,19 +9,19 @@ extern struct {
     char pad1248[0x104C];
     int planet;
 } D_00189E20;
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 extern int ref_L24_003EFA38_00[] __attribute__((sda));
 extern int ref_L24_003EFA38_01[] __attribute__((sda));
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float game_get_override_value(float);
-extern void func_PAL_002FEF98(void *, void *, char *, float, float, float, float, char *);
-extern int func_PAL_002FF5F8(float *, float *, float *, float *, void *, void *, int *, float);
+extern void CalculateAimedLaunchVelocity_pal(void *, void *, char *, float, float, float, float, char *);
+extern int coll_trace_projectile_to_impact_pal(float *, float *, float *, float *, void *, void *, int *, float);
 extern void moby_set_entry_list_flag_byte(int, int);
 extern float IntToFloat(int);
 extern void stub_empty_11(void);
 extern void stub_empty_12(void);
-extern char *func_PAL_0032B4A8(int, void *, void *);
-extern char *func_PAL_00329D88(int, void *, void *);
+extern char *part_spawn_flying_chunk_b_pal(int, void *, void *);
+extern char *part_spawn_flying_chunk_a_pal(int, void *, void *);
 extern int math_fast_float_d(void *);
 extern float FastVecLength(void *);
 extern float math_random_float_range(float, float);
@@ -30,7 +30,7 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern int gfx_blend_colors_by_cycle(int, int, int, int);
 extern void gauge_popup_show(int, int, int, float);
 extern void gfx_register_overlay_draw_callback(void *, void *);
-extern void func_PAL_00335D10(char *);
+extern void moby_update_attached_effect_by_state_pal(char *);
 typedef struct TargetClass {
     char pad0[0x46];
     s16 type;
@@ -86,8 +86,8 @@ void func_PAL_00335758(Target *obj)
     }
     v->hit = 0;
     v->valid = 0;
-    func_PAL_002FEF98(dir, pos, 0, 0.00001f, distance, 0.3f, 0.0044f, 0);
-    func_PAL_002FF5F8(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0044f);
+    CalculateAimedLaunchVelocity_pal(dir, pos, 0, 0.00001f, distance, 0.3f, 0.0044f, 0);
+    coll_trace_projectile_to_impact_pal(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0044f);
     hit = v->hit;
     if (hit != 0) {
         if (hit->class->type == 18) {
@@ -121,13 +121,13 @@ void func_PAL_00335758(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+        if ((g_pad_pressed_flags & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
             stub_empty_11();
             obj->state = 3;
             if (!v->reverse) {
-                func_PAL_0032B4A8((int)obj, v->position, dir);
+                part_spawn_flying_chunk_b_pal((int)obj, v->position, dir);
             } else {
-                func_PAL_00329D88((int)obj, v->position, dir);
+                part_spawn_flying_chunk_a_pal((int)obj, v->position, dir);
             }
             snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
@@ -138,7 +138,7 @@ void func_PAL_00335758(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+        if (!(g_pad_pressed_flags & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
             stub_empty_12();
             obj->state = 2;
         } else if (math_fast_float_d(&v->countdown)) {
@@ -149,9 +149,9 @@ void func_PAL_00335758(Target *obj)
             spread[2] += math_random_float_range(-0.005f, 0.005f);
             vec_scale_to_length(spread, spread, length);
             if (!v->reverse) {
-                func_PAL_0032B4A8((int)obj, v->position, spread);
+                part_spawn_flying_chunk_b_pal((int)obj, v->position, spread);
             } else {
-                func_PAL_00329D88((int)obj, v->position, spread);
+                part_spawn_flying_chunk_a_pal((int)obj, v->position, spread);
             }
             snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
@@ -196,5 +196,5 @@ void func_PAL_00335758(Target *obj)
     if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
         gauge_popup_show(0, a, b, v->smoothed);
     }
-    gfx_register_overlay_draw_callback(func_PAL_00335D10, obj);
+    gfx_register_overlay_draw_callback(moby_update_attached_effect_by_state_pal, obj);
 }

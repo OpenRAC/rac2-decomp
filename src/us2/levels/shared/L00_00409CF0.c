@@ -56,9 +56,9 @@ typedef struct {
     f32 rot[4];
 } Moby403730;
 
-extern s32 D_L00_001A8FF4[] __attribute__((sda));
-extern s32 D_L00_001A8FF0[] __attribute__((sda));
-extern u8 D_00139578[];
+extern s32 g_hero_action_blocked_flag[] __attribute__((sda));
+extern s32 g_hero_locked_flag[] __attribute__((sda));
+extern u8 g_sheepinator_weapon_index[];
 extern Weapon403730 g_weapon_l00_table[];
 
 extern void vec_clear_128(void *);
@@ -74,7 +74,7 @@ extern Link403730 *moby_get_private_value_0(void *);
 extern void mat_get_euler_angles(float *, float *);
 extern float mat_fast_helper_a(float, float);
 extern struct { char pad[0x80]; float x, y; } g_hero_state;
-extern short D_L00_001B2030[] __attribute__((sda));
+extern short g_dark_sheep_moby_index_list[] __attribute__((sda));
 extern void AddMobyToIndexList(void *, short *, short);
 
 /* func_US2_L00_00409CF0, the v2.00 copy of func_L00_00408800: the same C, except that the 0x1000
@@ -96,7 +96,7 @@ Moby403730 *func_US2_L00_00409CF0(Moby403730 *self) {
         vars = m->vars;
         m->scale = math_random_float_range(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
-        if (D_L00_001A8FF4[0] != 0 || D_L00_001A8FF0[0] != 0) {
+        if (g_hero_action_blocked_flag[0] != 0 || g_hero_locked_flag[0] != 0) {
             copy_matrix_rotation(mtx, self->mtx);
             mat_get_euler_angles(mtx, m->rot);
         } else {
@@ -112,7 +112,7 @@ Moby403730 *func_US2_L00_00409CF0(Moby403730 *self) {
         vars->f78 = 0;
         m->state = 4;
         m->f98 = m->cls->f10;
-        w = &g_weapon_l00_table[D_00139578[0]];
+        w = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
         rate = 1.0f;
         if (w->f4 != 0) {
             rate = 4.0f;
@@ -128,7 +128,7 @@ Moby403730 *func_US2_L00_00409CF0(Moby403730 *self) {
         } else {
             moby_mark_spawned(self);
         }
-        AddMobyToIndexList(m, D_L00_001B2030, 31);
+        AddMobyToIndexList(m, g_dark_sheep_moby_index_list, 31);
         func_002A0F48(m);
     }
     return m;

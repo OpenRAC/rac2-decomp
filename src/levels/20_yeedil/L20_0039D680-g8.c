@@ -5,10 +5,10 @@
 
 extern float vec_distance_xy(void *, void *);
 extern char g_hero_position[];
-extern char *D_L20_001FBB20[];
-extern char *D_L20_001B2F9C;
+extern char *g_group_l20_id_lists[];
+extern char *g_group_l20_member_table;
 /* 0x1AEFF0 + 0x3FC8: read through $gp. */
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern int g_group_count __attribute__((sda));
 
 /* Counts the other objects of this object's group (the 0x7FFF-masked id list at
    D_L20_001FBB20[object[0x21]]) that are closer to D_00189EA0 than the object itself,
@@ -23,11 +23,11 @@ void trooper_count_closer_mates(unsigned char *object) {
     unsigned char *e;
     int count = 0;
 
-    for (p = (unsigned short *)D_L20_001FBB20[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L20_001B2FB8 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)D_L20_001FBB20[object[0x21]]);
+    for (p = (unsigned short *)g_group_l20_id_lists[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_group_count && p != 0 &&
+         ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)g_group_l20_id_lists[object[0x21]]);
          p++) {
-        e = (unsigned char *)D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
+        e = (unsigned char *)g_group_l20_member_table + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         if (e != object && e[0x20] != 6 && vec_distance_xy(e + 0x10, g_hero_position) < limit)

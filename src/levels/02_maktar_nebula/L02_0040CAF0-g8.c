@@ -21,12 +21,12 @@ extern void moby_set_state(u8 *, s32, s32);
 extern void blade_ball_update_targeting(u8 *);
 extern u8 g_camera_l02_position[];
 extern u8 g_sound_state[];
-extern float D_L02_001B194C __attribute__((sda));
-extern float D_L02_001B1950 __attribute__((sda));
-extern float D_L02_001B1954 __attribute__((sda));
-extern float D_L02_001B1958 __attribute__((sda));
-extern float D_L02_001B1960 __attribute__((sda));
-extern float D_L02_001B1964 __attribute__((sda));
+extern float g_blade_ball_push_speed __attribute__((sda));
+extern float g_blade_ball_random_spread_min __attribute__((sda));
+extern float g_blade_ball_random_spread_max __attribute__((sda));
+extern float g_blade_ball_up_speed __attribute__((sda));
+extern float g_blade_ball_angle_spread_min __attribute__((sda));
+extern float g_blade_ball_angle_spread_max __attribute__((sda));
 
 /* Maintain the held effect slot and react to contacts with another actor. */
 /* Common work for the PX6 BladeBall each frame: sets it up on the first frame, keeps its sound going and hurts it when the player hits it. */
@@ -93,15 +93,15 @@ void blade_ball_update_common(u8 *object)
     object[0xA8] = 0xFF;
     if (amount != 0.0f) {
         scale = 0.00027777778f;
-        push = D_L02_001B194C * scale;
+        push = g_blade_ball_push_speed * scale;
         *(float *)(state + 0x20) -= amount;
         vec_scale_to_length(velocity, (float *)(contact + 0x10), push);
-        vec_random_direction(random, D_L02_001B1950 * scale, D_L02_001B1954 * scale);
+        vec_random_direction(random, g_blade_ball_random_spread_min * scale, g_blade_ball_random_spread_max * scale);
         FastVecAdd(velocity, velocity, random);
-        velocity[2] = math_random_float_range(D_L02_001B1958, D_L02_001B1958) * scale;
+        velocity[2] = math_random_float_range(g_blade_ball_up_speed, g_blade_ball_up_speed) * scale;
         velocity[3] = 5627.925f;
         FastVecAdd((float *)(state + 0x100), (float *)(state + 0x100), velocity);
-        vec_random_direction(random, D_L02_001B1960 * 0.0000048481375f, D_L02_001B1964 * 0.0000048481375f);
+        vec_random_direction(random, g_blade_ball_angle_spread_min * 0.0000048481375f, g_blade_ball_angle_spread_max * 0.0000048481375f);
         *(float *)(state + 0x170) = FastAddRotations(*(float *)(state + 0x170), random[0]);
         *(float *)(state + 0x174) = FastAddRotations(*(float *)(state + 0x174), random[1]);
         *(float *)(state + 0x178) = FastAddRotations(*(float *)(state + 0x178), random[2]);

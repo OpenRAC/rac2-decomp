@@ -36,8 +36,8 @@ extern f32 FastAddRotations(f32 a0, f32 a1);
 extern void euler_rotation_basis(void *a0, void *a1);
 extern f32 *arena_get_center_point(s32 a0);
 
-extern f32 D_L11_001B0558 __attribute__((sda));
-extern f32 D_L11_001B0540 __attribute__((sda));
+extern f32 g_joba_orbit_radius __attribute__((sda));
+extern f32 g_orbit_enemy_start_z __attribute__((sda));
 
 /* Puts the Joba rail object back on its rail at angle zero and resets its state. */
 void joba_rail_reset(u8 *moby_bytes) {
@@ -68,11 +68,11 @@ void joba_rail_reset(u8 *moby_bytes) {
     *(s32 *)(vars + 0x250) = 0;
     trig = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x250));
     rail_point = arena_get_center_point(moby->slot);
-    moby->x = D_L11_001B0558 * trig + rail_point[0];
+    moby->x = g_joba_orbit_radius * trig + rail_point[0];
     trig = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x250));
     rail_point = arena_get_center_point(moby->slot);
-    new_y = D_L11_001B0558 * trig + rail_point[1];
-    moby->z = D_L11_001B0540;
+    new_y = g_joba_orbit_radius * trig + rail_point[1];
+    moby->z = g_orbit_enemy_start_z;
     moby->rotX = -1.5707965f;
     moby->rotW = 0;
     moby->y = new_y;

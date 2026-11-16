@@ -2,14 +2,14 @@
 
 #include "common.h"
 extern int math_random_int_below(int);
-extern int D_001AF0FC __attribute__((sda));
-extern void func_PAL_002A7650(void *, int, int);
+extern int g_nanotech_cooldown __attribute__((sda));
+extern void SetDeathBits_pal(void *, int, int);
 extern int PickAmmoDropItem(void *, int *);
-extern char *func_PAL_00321958(void *, int, int, int);
+extern char *SpawnWeaponAmmoPickup_pal(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
  * halfword at +0xB4 before handing it to the state helper. */
-void func_PAL_003133E0(unsigned char *self)
+void crate_drop_loot_pal(unsigned char *self)
 {
     unsigned char *data = *(unsigned char **)(self + 0x68);
     int item = *(short *)(data + 0xC6) == 0;
@@ -18,13 +18,13 @@ void func_PAL_003133E0(unsigned char *self)
     if (*(short *)(self + 0xAA) == 0x1F5 || *(short *)(self + 0xAA) == 0x200)
         item = 0;
     if (item) {
-        if (D_001AF0FC >= 21)
+        if (g_nanotech_cooldown >= 21)
             i = 0;
-        else if (D_001AF0FC >= 11)
+        else if (g_nanotech_cooldown >= 11)
             i = 1;
         else
             i = 2;
-        func_PAL_002A7650(self, 256, math_random_int_below(2) + i);
+        SetDeathBits_pal(self, 256, math_random_int_below(2) + i);
     } else {
         if (*(short *)(self + 0xAA) != 0x1F5 && *(short *)(self + 0xAA) != 0x200) {
             {
@@ -56,13 +56,13 @@ void func_PAL_003133E0(unsigned char *self)
             if (n > 0) {
                 i = n;
                 do {
-                    func_PAL_00321958(self + 0x10, item, -1, 0);
+                    SpawnWeaponAmmoPickup_pal(self + 0x10, item, -1, 0);
                     --i;
                 } while (i);
             }
         }
         if (*(short *)(self + 0xB4))
             *(short *)(self + 0xB4) = 0;
-        func_PAL_002A7650(self, 256, 0);
+        SetDeathBits_pal(self, 256, 0);
     }
 }

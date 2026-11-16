@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern f32 D_001AC1A0[4] __attribute__((sda));
+extern f32 g_exhaust_puff_offset[4] __attribute__((sda));
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_random_float_range(float, float);
@@ -16,7 +16,7 @@ void ship_spawn_exhaust_puffs(char *object)
     f32 to[4] __attribute__((aligned(16)));
     int i;
 
-    matrix_mul_vec3(position, D_001AC1A0, object + 0xC0);
+    matrix_mul_vec3(position, g_exhaust_puff_offset, object + 0xC0);
     FastVecAdd(position, position, object + 0x10);
     for (i = 0; i < 2; i++) {
         from[0] = math_random_float_range(-0.008333334f, 0.008333334f);

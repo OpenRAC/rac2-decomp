@@ -7,11 +7,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L02_001B0318 __attribute__((sda));
-extern float D_L02_001B031C __attribute__((sda));
-extern int D_L02_001B0320 __attribute__((sda));
-extern unsigned int D_L02_001B0330 __attribute__((sda));
-extern float D_L02_001B0334 __attribute__((sda));
+extern float g_single_flare_size_a __attribute__((sda));
+extern float g_single_flare_size_b __attribute__((sda));
+extern int g_single_flare_local_offset __attribute__((sda));
+extern unsigned int g_single_flare_color __attribute__((sda));
+extern float g_single_flare_facing_threshold __attribute__((sda));
 extern float g_camera_l02_position[4];
 
 extern void moby_transform_joint_to_world(char *, int, void *);
@@ -37,16 +37,16 @@ void chainblade_draw_joint_flare(char *self, int joint) {
     moby_transform_joint_to_world(self, joint, origin);
     *(TI128 *)originCopy = *(TI128 *)origin;
     moby_transform_joint_point(self, joint, matrix);
-    transform_vector(offset, &D_L02_001B0320, matrix);
+    transform_vector(offset, &g_single_flare_local_offset, matrix);
     FastVecAdd(origin, origin, offset);
     FastVecSub(toCamera, g_camera_l02_position, origin);
     vec_scale_to_length(toCamera, toCamera, 1.0f);
     *(TI128 *)facing = *(TI128 *)matrix;
     facingDot = FastVecDot(toCamera, facing);
-    if (D_L02_001B0334 < facingDot) {
-        color = D_L02_001B0330;
+    if (g_single_flare_facing_threshold < facingDot) {
+        color = g_single_flare_color;
         facingDot = facingDot * facingDot;
         gfx_l00_draw_billboard_quad(origin, (color & 0xFFFFFF) | ((int)(facingDot * (float)(int)(color >> 24)) << 24),
-                          D_L02_001B031C, D_L02_001B0318);
+                          g_single_flare_size_b, g_single_flare_size_a);
     }
 }

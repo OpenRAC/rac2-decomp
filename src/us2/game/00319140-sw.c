@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_001B2758 MACRO_ADDR;
+extern int g_spark_slot_pool MACRO_ADDR;
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern int FloatToInt(float), math_random_int_range(int, int);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -12,8 +12,8 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr
 extern u8 g_hero_state[];
 extern char g_hero_position[];
 extern u8 g_sound_state[];
-extern char D_001A8BD0[16] MACRO_ADDR;
-extern char D_001AFA80[];
+extern char g_default_effect_vector[16] MACRO_ADDR;
+extern char g_str_hover_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -33,7 +33,7 @@ extern float math_step_value_toward_target(void *, void *, float, float, float, 
 extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
 extern int IsPointInCuboid(void *, int);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern int func_US2_002AF9C8(void *, float);
+extern int math_is_value_within_step_us2(void *, float);
 extern int flag_set_first_pending(void *);
 extern int flag_is_third_pending_set(void *);
 extern void *part_spawn_gravity_fade(void *, void *, int, u32, int, int, int, int, float, float, float);
@@ -242,7 +242,7 @@ void func_US2_00319140(char *obj)
         } else if (diff12 > 0.05f) {
             math_step_value_toward_target(obj + 0x18, pv + 0x290, h12, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            STUB_printf(D_001AFA80, *(s32 *)(pv + 0x2C0));
+            STUB_printf(g_str_hover_enemy_debug, *(s32 *)(pv + 0x2C0));
             moby_set_state(obj, 6, -1);
             if (*(u8 *)(obj + 0x43) != 0xE)
                 anim_start_blended(obj, 0xE, 0, 3);
@@ -317,7 +317,7 @@ void func_US2_00319140(char *obj)
             }
         }
         dist10 = moby_get_anim_value(obj);
-        if (func_US2_002AF9C8(obj, 17.0f) != 0) {
+        if (math_is_value_within_step_us2(obj, 17.0f) != 0) {
             moby_transform_joint_to_world(obj, 4, v0);
             tgt10 = *(char **)(pv + 0x30);
             if (tgt10 == (char *)((Hero_00318340 *)g_hero_state)->ptr[0x2290 / 4]) {
@@ -332,7 +332,7 @@ void func_US2_00319140(char *obj)
             }
             if (moby_is_target_outside_turn_limit(obj, 10.0f) != 0) {
                 FastVecSub(v40, pos, v0);
-                qcopy(v20, D_001A8BD0);
+                qcopy(v20, g_default_effect_vector);
                 v20[0] = 1.0f;
                 matrix_mul_vec3(v20, v20, obj + 0xC0);
                 FastVecCross(v30, v20, v40);
@@ -403,7 +403,7 @@ void func_US2_00319140(char *obj)
             }
         }
         dist16 = moby_get_anim_value(obj);
-        if (func_US2_002AF9C8(obj, 16.0f) != 0) {
+        if (math_is_value_within_step_us2(obj, 16.0f) != 0) {
             moby_transform_joint_to_world(obj, 4, v0);
             tgt16 = *(char **)(pv + 0x30);
             if (tgt16 == (char *)((Hero_00318340 *)g_hero_state)->ptr[0x2290 / 4]) {
@@ -425,7 +425,7 @@ void func_US2_00319140(char *obj)
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(v0, D_001A8BD0, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(v0, g_default_effect_vector, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }

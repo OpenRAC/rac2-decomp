@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern void menu_draw_frame(void *);
 
 void func_US2_0029D448(void) {
-    if (D_001A8CFC != 0)
-        menu_draw_frame(D_001A8CFC + 0x3C7E8);
+    if (g_resident_data_base != 0)
+        menu_draw_frame(g_resident_data_base + 0x3C7E8);
 }

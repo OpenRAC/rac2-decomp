@@ -5,9 +5,9 @@ extern void object_set_first_float4(void *, float, float, float, float);
 extern void hud_set_widget_value_pair(void *, int, int);
 extern int *object_get_fourth_field(void *);
 extern void hud_draw_colored_quad_widget(void *);
-extern float D_L01_001AE420 __attribute__((sda));
-extern float D_L01_001AE424;
-extern float D_L01_001AE428 __attribute__((sda));
+extern float g_tab_menu_icon_offset_x __attribute__((sda));
+extern float g_tab_menu_icon_offset_y;
+extern float g_tab_menu_icon_spacing __attribute__((sda));
 struct Obj {
     char pad[380];
     int h380;
@@ -22,13 +22,13 @@ struct Obj {
     int mode764;
 };
 
-void func_US2_00342998(struct Obj *o)
+void tab_menu_draw_icons_us2(struct Obj *o)
 {
     int i;
 
     for (i = 0; i < o->count460; i++) {
-        object_set_first_float4(&o->h380, o->fp536[0] + D_L01_001AE420,
-                o->fp536[1] + D_L01_001AE424 + D_L01_001AE428 * (float)i, 0.0f, 0.0f);
+        object_set_first_float4(&o->h380, o->fp536[0] + g_tab_menu_icon_offset_x,
+                o->fp536[1] + g_tab_menu_icon_offset_y + g_tab_menu_icon_spacing * (float)i, 0.0f, 0.0f);
         if (o->mode764 == 2) {
             int v = o->p456[i];
 

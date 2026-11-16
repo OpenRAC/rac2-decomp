@@ -21,18 +21,18 @@ struct Globals {
     char *hero;
 };
 extern struct Globals g_collision_result;
-extern char *D_L00_0018C0B0;
-extern u8 D_L00_00139588;
+extern char *g_collision_hero_owner;
+extern u8 g_selected_weapon_index;
 extern struct Ent g_weapon_l00_table[];
 extern int CollLine(void *, void *, int, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, float, int, void *);
 extern void QueueMobyImpact(void *, void *);
-extern int func_PAL_0032F0B8(void *, int, int);
-extern void func_PAL_L00_00408D50(void *, int, int);
+extern int StartAttachedEffect_pal(void *, int, int);
+extern void sheep_shot_spawn_hit_sparks_pal(void *, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 
-void func_PAL_L00_00408978(char *arg, void *p) {
+void sheep_shot_resolve_hit_pal(char *arg, void *p) {
     char *st = *(char **)(arg + 0x68);
     float vec[4];
     struct Fx fx;
@@ -45,11 +45,11 @@ void func_PAL_L00_00408978(char *arg, void *p) {
     if (CollLine(p, pos, 0, arg, 0) == 0) {
         return;
     }
-    if (g_collision_result.hero != 0 && g_collision_result.hero != D_L00_0018C0B0 &&
+    if (g_collision_result.hero != 0 && g_collision_result.hero != g_collision_hero_owner &&
         (*(short *)(*(char **)(g_collision_result.hero + 0x24) + 0x46) == 5 ||
          (*(u16 *)(g_collision_result.hero + 0x34) & 0x4000) != 0)) {
         vec_scale_to_length(vec, st, 1.0f);
-        e = &g_weapon_l00_table[D_L00_00139588];
+        e = &g_weapon_l00_table[g_selected_weapon_index];
         scale = 1.0f;
         is2 = e->used != 0 && e->mode == 2;
         if (is2) {
@@ -64,11 +64,11 @@ void func_PAL_L00_00408978(char *arg, void *p) {
         fx.kind = 5;
         fx.id = *(u16 *)(arg + 0xAA);
         QueueMobyImpact(g_collision_result.hero, &fx);
-        func_PAL_0032F0B8(g_collision_result.hero, 0x4E, *(int *)(*(char **)(st + 0x20) + 0xB8));
-        func_PAL_L00_00408D50(pos, 0xA, 1);
+        StartAttachedEffect_pal(g_collision_result.hero, 0x4E, *(int *)(*(char **)(st + 0x20) + 0xB8));
+        sheep_shot_spawn_hit_sparks_pal(pos, 0xA, 1);
     }
     if (g_collision_result.hero == 0) {
-        func_PAL_L00_00408D50(arg + 0x10, 0xF, 0);
+        sheep_shot_spawn_hit_sparks_pal(arg + 0x10, 0xF, 0);
     }
     snd_play_from_class_bank(7, 0, arg, 0xE79);
     arg[0x20] = 2;

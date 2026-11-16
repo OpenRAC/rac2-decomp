@@ -6,100 +6,100 @@ extern void func_302298(int, int, int, int, int, int);
 extern void func_2F0670(int, int, unsigned long long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern char *GetLocalizedString(int);
-extern int D_L30_001B1B50 __attribute__((sda));
-extern int D_L30_001B1B60 __attribute__((sda));
-extern int D_L30_001B1B68 __attribute__((sda));
-extern int D_L30_001B1B6C __attribute__((sda));
-extern int D_L30_001B1B64 __attribute__((sda));
-extern int D_L30_001B1B7C __attribute__((sda));
-extern int D_L30_001B1B54, D_L30_001B1B58;
-extern int D_L30_001B1B74;
-extern char D_L30_001B1BB0[];
-extern char D_L30_001B1BB8[];
-extern char D_L30_001B1BC0[];
-extern char D_L30_001B1BC8[];
-extern void *D_L30_00260E30[];
-extern char *D_L30_00260EB0[];
-extern unsigned char D_L30_001B3D30[] __attribute__((sda)) NOT_SDA;
+extern int g_museum_menu_box_left __attribute__((sda));
+extern int g_museum_menu_line_height __attribute__((sda));
+extern int g_museum_menu_label_x __attribute__((sda));
+extern int g_museum_menu_text_y __attribute__((sda));
+extern int g_museum_menu_value_x __attribute__((sda));
+extern int g_museum_menu_box_color __attribute__((sda));
+extern int g_museum_menu_box_top, g_museum_menu_box_right;
+extern int g_museum_menu_title_color;
+extern char g_str_museum_menu_label_format[];
+extern char g_str_museum_menu_blank[];
+extern char g_str_museum_menu_int_format[];
+extern char g_str_museum_menu_float_format[];
+extern void *g_tweak_item_ptrs[];
+extern char *g_tweak_item_labels[];
+extern unsigned char g_tweak_item_types[] __attribute__((sda)) NOT_SDA;
 extern void moby_set_state(void *, int, int);
 extern int IsPointInCuboid(void *, int);
 extern int ForceClaimNotice(int, int, int);
-extern long D_00138320 __attribute__((nosda));
+extern long g_pad_pressed_flags __attribute__((nosda));
 extern char g_hero_position[];
 extern int flag_set_first_pending(void *);
 extern char *museum_tweak_menu_spawn(void *);
 extern void MuseumTweakMenuAddItem(void *, void *, char *, int, int, int);
-extern unsigned int D_L30_001B1F28;
-extern float D_L30_001B1F04;
-extern int func_US2_002AF9C8(void *, float);
+extern unsigned int g_beam_l30_quad_color;
+extern float g_beam_l30_spin_degrees;
+extern int math_is_value_within_step_us2(void *, float);
 extern void moby_transform_joint_point(void *, int, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *museum_projectile_spawn(void *, void *, void *, int, float);
 extern void moby_mark_spawned(void *);
-extern char D_L30_001B1C38[];
-extern char D_L30_001B1C48[];
-extern char D_L30_001B1C58[];
-extern char D_L30_001B1C68[];
-extern char D_L30_001B1C78[];
-extern char D_L30_001B1C88[];
-extern char D_L30_001B1C98[];
-extern char D_L30_001B1CA8[];
-extern char D_L30_001B1CB8[];
-extern char D_L30_001B1CC8[];
-extern char D_L30_001B1CD8[];
-extern char D_L30_001B1CE8[];
-extern char D_L30_001B1CF0[];
-extern char D_L30_001B1D00[];
-extern char D_L30_001B1D10[];
-extern char D_L30_001B1D20[];
-extern char D_L30_001B1D30[];
-extern char D_L30_001B1D40[];
-extern char D_L30_001B1D50[];
-extern char D_L30_001B1D60[];
-extern char D_L30_001B1D70[];
-extern char D_L30_001B1D80[];
-extern char D_L30_001B1D90[];
-extern char D_L30_001B1DA0[];
-extern char D_L30_001B1DB0[];
-extern char D_L30_001B1DC0[];
-extern char D_L30_001B1DD0[];
-extern char D_L30_001B1DE0[];
-extern char D_L30_001B1DF0[];
-extern char D_L30_001B1E00[];
-extern char D_L30_001B1E10[];
-extern char D_L30_001B1E18[];
-extern char D_L30_001B1E20[];
-extern int D_L30_001B1F10[] __attribute__((sda));
-extern int D_L30_001B1F14[] __attribute__((sda));
-extern int D_L30_001B1F18[] __attribute__((sda));
-extern int D_L30_001B1F1C[] __attribute__((sda));
-extern int D_L30_001B1F20[] __attribute__((sda));
-extern int D_L30_001B1F24[] __attribute__((sda));
-extern int D_L30_001B1F2C[] __attribute__((sda));
-extern int D_L30_001B1F30[] __attribute__((sda));
-extern int D_L30_001B1F34[] __attribute__((sda));
-extern int D_L30_001B1F38[] __attribute__((sda));
-extern int D_L30_001B1F3C[] __attribute__((sda));
-extern int D_L30_001B1F40[] __attribute__((sda));
-extern int D_L30_001B1F44[] __attribute__((sda));
-extern int D_L30_001B1F48[] __attribute__((sda));
-extern int D_L30_001B1F54[] __attribute__((sda));
-extern int D_L30_001B1F58[] __attribute__((sda));
-extern int D_L30_001B1F5C[] __attribute__((sda));
-extern int D_L30_001B1F64[] __attribute__((sda));
-extern int D_L30_001B1F68[] __attribute__((sda));
-extern int D_L30_001B1F6C[] __attribute__((sda));
-extern int D_L30_001B1F74[] __attribute__((sda));
-extern int D_L30_001B1F78[] __attribute__((sda));
-extern int D_L30_001B1F7C[] __attribute__((sda));
-extern int D_L30_001B1F84[] __attribute__((sda));
-extern int D_L30_001B1F88[] __attribute__((sda));
-extern int D_L30_001B1F8C[] __attribute__((sda));
-extern int D_L30_001B1F94[] __attribute__((sda));
-extern int D_L30_001B1F98[] __attribute__((sda));
-extern int D_L30_001B1F9C[] __attribute__((sda));
+extern char g_str_museum_tweak_label_a[];
+extern char g_str_museum_tweak_label_b[];
+extern char g_str_museum_tweak_label_c[];
+extern char g_str_museum_tweak_label_d[];
+extern char g_str_museum_tweak_label_e[];
+extern char g_str_museum_tweak_label_f[];
+extern char g_str_museum_tweak_label_g[];
+extern char g_str_museum_tweak_label_h[];
+extern char g_str_museum_tweak_label_i[];
+extern char g_str_museum_tweak_label_j[];
+extern char g_str_museum_tweak_label_k[];
+extern char g_str_museum_tweak_label_l[];
+extern char g_str_museum_tweak_label_m[];
+extern char g_str_museum_tweak_label_n[];
+extern char g_str_museum_tweak_label_o[];
+extern char g_str_museum_tweak_label_p[];
+extern char g_str_museum_tweak_label_q[];
+extern char g_str_museum_tweak_label_r[];
+extern char g_str_museum_tweak_label_s[];
+extern char g_str_museum_tweak_label_t[];
+extern char g_str_museum_tweak_label_u[];
+extern char g_str_museum_tweak_label_v[];
+extern char g_str_museum_tweak_label_w[];
+extern char g_str_museum_tweak_label_x[];
+extern char g_str_museum_tweak_label_y[];
+extern char g_str_museum_tweak_label_z[];
+extern char g_str_museum_tweak_label_aa[];
+extern char g_str_museum_tweak_label_ab[];
+extern char g_str_museum_tweak_label_ac[];
+extern char g_str_museum_tweak_label_ad[];
+extern char g_str_beam_color_red[];
+extern char g_str_beam_color_green[];
+extern char g_str_beam_color_blue[];
+extern int g_beam_width_a[] __attribute__((sda));
+extern int g_beam_width_b[] __attribute__((sda));
+extern int g_beam_width_c[] __attribute__((sda));
+extern int g_beam_width_d[] __attribute__((sda));
+extern int g_beam_l30_quad_texture[] __attribute__((sda));
+extern int g_beam_l30_glow_size[] __attribute__((sda));
+extern int g_beam_alpha_a[] __attribute__((sda));
+extern int g_beam_alpha_b[] __attribute__((sda));
+extern int g_beam_alpha_c[] __attribute__((sda));
+extern int g_beam_spin_speed[] __attribute__((sda));
+extern int g_beam_back_offset_a[] __attribute__((sda));
+extern int g_beam_back_offset_b[] __attribute__((sda));
+extern int g_beam_packet_texture_a[] __attribute__((sda));
+extern int g_beam_packet_texture_b[] __attribute__((sda));
+extern int g_beam_start_color_red[] __attribute__((sda));
+extern int g_beam_start_color_green[] __attribute__((sda));
+extern int g_beam_start_color_blue[] __attribute__((sda));
+extern int g_beam_end_color_red[] __attribute__((sda));
+extern int g_beam_end_color_green[] __attribute__((sda));
+extern int g_beam_end_color_blue[] __attribute__((sda));
+extern int g_beam_alt_start_color_red[] __attribute__((sda));
+extern int g_beam_alt_start_color_green[] __attribute__((sda));
+extern int g_beam_alt_start_color_blue[] __attribute__((sda));
+extern int g_beam_alt_end_color_red[] __attribute__((sda));
+extern int g_beam_alt_end_color_green[] __attribute__((sda));
+extern int g_beam_alt_end_color_blue[] __attribute__((sda));
+extern int g_beam_color_red[] __attribute__((sda));
+extern int g_beam_color_green[] __attribute__((sda));
+extern int g_beam_color_blue[] __attribute__((sda));
 
 /* func_US2_L30_00413C18, the v2.00 copy of func_L30_004135A0: the same C, where the title string becomes a text lookup. */
 void func_US2_L30_00413C18(char *obj) {
@@ -107,81 +107,81 @@ void func_US2_L30_00413C18(char *obj) {
     int i = 0, count = 0;
     int *st = *(int **)(obj + 0x68);
     func_37BB30(0x42, 0x8000000044ULL);
-    func_302298(D_L30_001B1B50, D_L30_001B1B54, D_L30_001B1B58, D_L30_001B1B54 + D_L30_001B1B60 * (st[1] < 17 ? st[1] : 16), D_L30_001B1B7C, 0);
-    func_2F0670(2, 8, D_L30_001B1B74, GetLocalizedString(0x2BE5), -1);
+    func_302298(g_museum_menu_box_left, g_museum_menu_box_top, g_museum_menu_box_right, g_museum_menu_box_top + g_museum_menu_line_height * (st[1] < 17 ? st[1] : 16), g_museum_menu_box_color, 0);
+    func_2F0670(2, 8, g_museum_menu_title_color, GetLocalizedString(0x2BE5), -1);
     for (; i < 32 - st[2] && count < st[1] && count < 16; i++) {
-        if (!D_L30_00260E30[i + st[2]]) continue;
+        if (!g_tweak_item_ptrs[i + st[2]]) continue;
         count++;
-        if (D_L30_00260EB0[i]) {
-            sprintf(text, D_L30_001B1BB0, D_L30_00260EB0[i + st[2]]);
-            func_2F0670(D_L30_001B1B68, D_L30_001B1B6C + i * D_L30_001B1B60, D_L30_001B1B74, text, -1);
+        if (g_tweak_item_labels[i]) {
+            sprintf(text, g_str_museum_menu_label_format, g_tweak_item_labels[i + st[2]]);
+            func_2F0670(g_museum_menu_label_x, g_museum_menu_text_y + i * g_museum_menu_line_height, g_museum_menu_title_color, text, -1);
         }
         if (st[0] == i + st[2]) {
-            sprintf(text, D_L30_001B1BB8);
-            func_2F0670(D_L30_001B1B68 - 16, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008000ULL, text, -1);
+            sprintf(text, g_str_museum_menu_blank);
+            func_2F0670(g_museum_menu_label_x - 16, g_museum_menu_text_y + i * g_museum_menu_line_height, 0x80008000ULL, text, -1);
         }
-        switch (D_L30_001B3D30[i + st[2]]) {
+        switch (g_tweak_item_types[i + st[2]]) {
         case 0:
-            sprintf(text, D_L30_001B1BC0, *(int *)D_L30_00260E30[i + st[2]]);
-            func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
+            sprintf(text, g_str_museum_menu_int_format, *(int *)g_tweak_item_ptrs[i + st[2]]);
+            func_2F0670(g_museum_menu_value_x, g_museum_menu_text_y + i * g_museum_menu_line_height, 0x80008080ULL, text, -1);
             break;
         case 1:
-            sprintf(text, D_L30_001B1BC8, (double)*(float *)D_L30_00260E30[i + st[2]]);
-            func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
+            sprintf(text, g_str_museum_menu_float_format, (double)*(float *)g_tweak_item_ptrs[i + st[2]]);
+            func_2F0670(g_museum_menu_value_x, g_museum_menu_text_y + i * g_museum_menu_line_height, 0x80008080ULL, text, -1);
             break;
         case 2:
-            sprintf(text, D_L30_001B1BC0, *(unsigned char *)D_L30_00260E30[i + st[2]]);
-            func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
+            sprintf(text, g_str_museum_menu_int_format, *(unsigned char *)g_tweak_item_ptrs[i + st[2]]);
+            func_2F0670(g_museum_menu_value_x, g_museum_menu_text_y + i * g_museum_menu_line_height, 0x80008080ULL, text, -1);
             break;
         case 3:
-            sprintf(text, D_L30_001B1BC0, *(short *)D_L30_00260E30[i + st[2]]);
-            func_2F0670(D_L30_001B1B64, D_L30_001B1B6C + i * D_L30_001B1B60, 0x80008080ULL, text, -1);
+            sprintf(text, g_str_museum_menu_int_format, *(short *)g_tweak_item_ptrs[i + st[2]]);
+            func_2F0670(g_museum_menu_value_x, g_museum_menu_text_y + i * g_museum_menu_line_height, 0x80008080ULL, text, -1);
             break;
         }
     }
 }
 
-void func_US2_L30_00414F70(char *obj) {
+void museum_projectile_tester_update_us2(char *obj) {
     float matrix[16];
     float velocity[4];
     char *st = *(char **)(obj+0x68);
     unsigned int color;
     switch ((unsigned char)obj[0x20]) {
     case 0:
-        color = D_L30_001B1F28;
+        color = g_beam_l30_quad_color;
         *(int *)(st+0x10) = color & 0xff;
         *(int *)(st+0x14) = (int)(color & 0xff00) >> 8;
         *(int *)(st+0x18) = (color >> 16) & 0xff;
         *(int *)(st+0x1c) = (unsigned int)color >> 24;
-        D_L30_001B1F04 = 5.0f;
+        g_beam_l30_spin_degrees = 5.0f;
         moby_set_state(obj,1,-1);
         break;
     case 1:
         if (*(int *)(st+4) != -1 && IsPointInCuboid(g_hero_position,*(int *)(st+4))) {
             ForceClaimNotice(1,0x1338,1);
-            { long buttons = D_00138320;
+            { long buttons = g_pad_pressed_flags;
               if ((buttons & 3) == 3) moby_set_state(obj,2,-1); }
         }
         if (*(int *)(st+8) != -1 && IsPointInCuboid(g_hero_position,*(int *)(st+8))) {
             ForceClaimNotice(1,0x1343,1);
-            { long buttons = D_00138320;
+            { long buttons = g_pad_pressed_flags;
               if ((buttons & 3) == 3) moby_set_state(obj,3,-1); }
         }
         break;
     case 2:
         if (flag_set_first_pending(obj)) {
             *(char **)(st+0xc) = museum_tweak_menu_spawn(obj);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F10, D_L30_001B1C38, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F14, D_L30_001B1C48, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F18, D_L30_001B1C58, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F1C, D_L30_001B1C68, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F24, D_L30_001B1C78, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F38, D_L30_001B1C88, 1, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F3C, D_L30_001B1C98, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F40, D_L30_001B1CA8, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F20, D_L30_001B1CB8, 0, 0, 60);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F44, D_L30_001B1CC8, 0, 0, 60);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F48, D_L30_001B1CD8, 0, 0, 60);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_width_a, g_str_museum_tweak_label_a, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_width_b, g_str_museum_tweak_label_b, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_width_c, g_str_museum_tweak_label_c, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_width_d, g_str_museum_tweak_label_d, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_l30_glow_size, g_str_museum_tweak_label_e, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_spin_speed, g_str_museum_tweak_label_f, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_back_offset_a, g_str_museum_tweak_label_g, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_back_offset_b, g_str_museum_tweak_label_h, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_l30_quad_texture, g_str_museum_tweak_label_i, 0, 0, 60);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_packet_texture_a, g_str_museum_tweak_label_j, 0, 0, 60);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_packet_texture_b, g_str_museum_tweak_label_k, 0, 0, 60);
         }
         ForceClaimNotice(1,0,1);
         if (!*(char **)(st+0xc) || *(short *)(*(char **)(st+0xc)+0xaa) != 0x118a || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfd)
@@ -190,28 +190,28 @@ void func_US2_L30_00414F70(char *obj) {
     case 3:
         if (flag_set_first_pending(obj)) {
             *(char **)(st+0xc) = museum_tweak_menu_spawn(obj);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x10, D_L30_001B1CE8, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x14, D_L30_001B1CF0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x18, D_L30_001B1D00, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x1c, D_L30_001B1D10, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F30, D_L30_001B1D20, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F2C, D_L30_001B1D30, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F34, D_L30_001B1D40, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F54, D_L30_001B1D50, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F64, D_L30_001B1D60, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F58, D_L30_001B1D70, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F68, D_L30_001B1D80, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F5C, D_L30_001B1D90, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F6C, D_L30_001B1DA0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F74, D_L30_001B1DB0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F84, D_L30_001B1DC0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F78, D_L30_001B1DD0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F88, D_L30_001B1DE0, 0, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F7C, D_L30_001B1DF0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F8C, D_L30_001B1E00, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F94, D_L30_001B1E10, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F98, D_L30_001B1E18, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(st+0xc), D_L30_001B1F9C, D_L30_001B1E20, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x10, g_str_museum_tweak_label_l, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x14, g_str_museum_tweak_label_m, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x18, g_str_museum_tweak_label_n, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), st+0x1c, g_str_museum_tweak_label_o, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alpha_b, g_str_museum_tweak_label_p, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alpha_a, g_str_museum_tweak_label_q, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alpha_c, g_str_museum_tweak_label_r, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_start_color_red, g_str_museum_tweak_label_s, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_end_color_red, g_str_museum_tweak_label_t, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_start_color_green, g_str_museum_tweak_label_u, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_end_color_green, g_str_museum_tweak_label_v, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_start_color_blue, g_str_museum_tweak_label_w, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_end_color_blue, g_str_museum_tweak_label_x, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_start_color_red, g_str_museum_tweak_label_y, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_end_color_red, g_str_museum_tweak_label_z, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_start_color_green, g_str_museum_tweak_label_aa, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_end_color_green, g_str_museum_tweak_label_ab, 0, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_start_color_blue, g_str_museum_tweak_label_ac, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_alt_end_color_blue, g_str_museum_tweak_label_ad, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_color_red, g_str_beam_color_red, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_color_green, g_str_beam_color_green, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(st+0xc), g_beam_color_blue, g_str_beam_color_blue, 0, 0, 255);
         }
         ForceClaimNotice(1,0,1);
         if (!*(char **)(st+0xc) || *(short *)(*(char **)(st+0xc)+0xaa) != 0x118a || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfe || (unsigned char)(*(char **)(st+0xc))[0x20] == 0xfd)
@@ -224,9 +224,9 @@ void func_US2_L30_00414F70(char *obj) {
         packed |= *(int *)(st+0x18) << 16;
         packed |= *(int *)(st+0x14) << 8;
         packed |= *(int *)(st+0x1c);
-        D_L30_001B1F28 = packed;
+        g_beam_l30_quad_color = packed;
     }
-    if (func_US2_002AF9C8(obj,1.0f)) {
+    if (math_is_value_within_step_us2(obj,1.0f)) {
         moby_transform_joint_point(obj,0,matrix);
         velocity[0] = math_fast_sin_or_cos_a(*(float *)(obj+0xf8));
         velocity[1] = math_fast_sin_or_cos_b(*(float *)(obj+0xf8));

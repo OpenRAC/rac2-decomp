@@ -25,14 +25,14 @@
 #include "common.h"
 
 extern s32 snd_Pump();
-extern s32 D_001A74A0 __attribute__((sda));
-extern s32 D_001A74C0 __attribute__((sda));
+extern s32 g_snd_command_buffers __attribute__((sda));
+extern s32 g_snd_active_buffer_index __attribute__((sda));
 
 /* Counts one more queued sound command and then runs the sound update. */
 void snd_commit_queued_command(void) {
     s32 *count_ptr;
 
-    count_ptr = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
+    count_ptr = *(s32 *)((s32) ((s8 *) ((g_snd_active_buffer_index * 4)) + (s32) (&g_snd_command_buffers)));
     *count_ptr += 1;
     snd_Pump();
 }

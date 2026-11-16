@@ -25,8 +25,8 @@
 #include "common.h"
 
 extern void mem_clear(void *p, s32 c, s32 n);
-extern u8 *D_001C4FAC;
-extern s32 D_001A9720[];
+extern u8 *g_occlusion_source_image;
+extern s32 g_nibble_weights_table[];
 
 typedef struct { s32 w[16]; } Tab32;
 
@@ -43,8 +43,8 @@ void map_build_occlusion_from_image(u8 *occlusion_out)
     s32 group;
 
     dst = occlusion_out;
-    src = D_001C4FAC;
-    *(Tab32 *)nibble_weights = *(Tab32 *)D_001A9720;
+    src = g_occlusion_source_image;
+    *(Tab32 *)nibble_weights = *(Tab32 *)g_nibble_weights_table;
     for (row = 0; row < 0x200; row++) {
         if (row % 4 == 0) {
             mem_clear(row_sums, 0, 0x200);

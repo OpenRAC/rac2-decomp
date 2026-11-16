@@ -56,10 +56,10 @@ typedef struct {
 } PlayerContactEntry;
 
 extern PlayerContactState g_hero_state;
-extern PlayerContactEntry D_L01_001C3B80[];
-extern s32 D_L01_001A8F40 __attribute__((sda));
+extern PlayerContactEntry g_player_contact_table[];
+extern s32 g_hero_l01_control_mode __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
@@ -92,7 +92,7 @@ s32 hero_l01_apply_hazard_contact(s32 apply_impulse) {
     if (g_hero_state.f1DC != 0) {
         return 0;
     }
-    if (D_L01_001A8F40 != 0) {
+    if (g_hero_l01_control_mode != 0) {
         return 0;
     }
     g_hero_state.f249C = 0;
@@ -100,7 +100,7 @@ s32 hero_l01_apply_hazard_contact(s32 apply_impulse) {
     if (hero_moby[0xA8] == 0xFF) {
         return 0;
     }
-    contact_entry = &D_L01_001C3B80[hero_moby[0xA8]];
+    contact_entry = &g_player_contact_table[hero_moby[0xA8]];
     if (contact_entry->f38 != hero_moby) {
         return 0;
     }
@@ -108,7 +108,7 @@ s32 hero_l01_apply_hazard_contact(s32 apply_impulse) {
         return 0;
     }
     if (contact_entry->f2C != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {

@@ -24,7 +24,7 @@ extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern void gfx_add_draw_callback_first(void *, void *);
-extern void func_PAL_L09_002FA660(void *);
+extern void gfx_draw_state_nine_pulsing_quad_pal(void *);
 
 /* func_PAL_L09_002FAA98, the PAL copy of func_L09_002F8FD8: the same C, with a game-state
    test before the 0xFA0 mob's call and its angle 0.0610865355f becoming 0.07330384f. */
@@ -47,5 +47,5 @@ void func_PAL_L09_002FAA98(void) {
         }
     }
     if (g_current_map_index == 9 && ref_L09_002F8FD8_00.mode == 1)
-        gfx_add_draw_callback_first(func_PAL_L09_002FA660, *(void **)((char *)&ref_L09_002F8FD8_00 + 0x194));
+        gfx_add_draw_callback_first(gfx_draw_state_nine_pulsing_quad_pal, *(void **)((char *)&ref_L09_002F8FD8_00 + 0x194));
 }

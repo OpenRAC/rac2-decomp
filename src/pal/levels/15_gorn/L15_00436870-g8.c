@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L15_00436870, the PAL copy of func_L15_00430C80: the same C, which also deletes the two tracked mobys. */
 #include "common.h"
 
@@ -6,12 +7,12 @@ typedef struct {
     s16 uid;
 } Moby430C80;
 
-extern s32 D_L15_001B1534 __attribute__((sda));
-extern char *D_L15_001B1584 __attribute__((sda));
-extern char *D_L15_001B1588 __attribute__((sda));
-extern s32 D_L15_00221E10[];
-extern u8 *D_L15_001B2714[] __attribute__((sda));
-extern s32 D_L15_001B2148[] __attribute__((sda));
+extern s32 g_cutscene_l15_started_flag __attribute__((sda));
+extern char *g_gorn_path_first_node __attribute__((sda));
+extern char *g_gorn_path_next_node __attribute__((sda));
+extern s32 g_gorn_challenge_vars[];
+extern u8 *g_scene_object_base[] __attribute__((sda));
+extern s32 g_gorn_challenge_count[] __attribute__((sda));
 
 extern void moby_mark_spawned(void *);
 extern void music_Unpause(void);
@@ -20,8 +21,8 @@ extern Moby430C80 **level_get_object_list(void);
 extern void *level_find_object_by_class_id(int arg);
 extern void hero_set_state_value_a(int);
 extern void entry_init_all_registered(void);
-extern void func_PAL_L05_0037D9D0(void *object, int handler);
-extern void *func_PAL_L05_0037DB90(int, int);
+extern void entry_spawn_list_objects_with_flag_pal(void *object, int handler);
+extern void *SpawnFreeLevelObjectById_pal(int, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
 extern int CountActiveLinkedListObjects(int);
@@ -35,9 +36,9 @@ void func_PAL_L15_00436870(void *self) {
     s32 n;
     s32 i;
 
-    if (D_L15_001B1534 == 0) {
-        D_L15_001B1534 = 1;
-        D_L15_00221E10[0x2C / 4] = 0;
+    if (g_cutscene_l15_started_flag == 0) {
+        g_cutscene_l15_started_flag = 1;
+        g_gorn_challenge_vars[0x2C / 4] = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -45,26 +46,26 @@ void func_PAL_L15_00436870(void *self) {
         n = level_get_saved_value();
         for (i = 0; i < n; i++) {
             if (list[i]->uid == 0x957) {
-                func_PAL_L05_0037D9D0(list[i], 1);
-                func_L05_0037CEE0(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
-                func_L05_0037D608(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
+                entry_spawn_list_objects_with_flag_pal(list[i], 1);
+                func_L05_0037CEE0(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
+                func_L05_0037D608(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
             }
         }
-        obj = func_PAL_L05_0037DB90(0x1211, 1);
+        obj = SpawnFreeLevelObjectById_pal(0x1211, 1);
         if (obj != 0) {
             func_PAL_L15_0043BB70(obj);
             func_PAL_L15_0043BD80(obj);
         }
-        if (D_L15_001B1584 != 0) {
-            moby_mark_spawned(D_L15_001B1584);
-            D_L15_001B1584 = 0;
+        if (g_gorn_path_first_node != 0) {
+            moby_mark_spawned(g_gorn_path_first_node);
+            g_gorn_path_first_node = 0;
         }
-        if (D_L15_001B1588 != 0) {
-            moby_mark_spawned(D_L15_001B1588);
-            D_L15_001B1588 = 0;
+        if (g_gorn_path_next_node != 0) {
+            moby_mark_spawned(g_gorn_path_next_node);
+            g_gorn_path_next_node = 0;
         }
     }
-    if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
+    if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)) == 0 && g_gorn_challenge_count[0] >= 6) {
         func_PAL_L15_00436118(self, 2);
     }
 }

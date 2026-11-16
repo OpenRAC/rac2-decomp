@@ -75,11 +75,11 @@ void level_setup_lighting(void *first, void *second, void *third) {
 }
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
-extern int D_00139948[];
+extern int g_menu_entry_ids[];
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry12;
-extern SourceEntry12 D_L04_002A4420[];
-extern char D_L04_0029FEE0[];
-extern InitEntry12 D_L04_0021D7B0[];
+extern SourceEntry12 g_menu_l04_source_entries[];
+extern char g_menu_l04_entry_callback[];
+extern InitEntry12 g_menu_l04_entry_list[];
 /* Reloaded at each search step in retail. */
-extern int * volatile D_001AA770 __attribute__((sda));
-extern struct { char pad[0x230]; int selected; } D_L04_001C9C60;
+extern int * volatile g_menu_volatile_ptr __attribute__((sda));
+extern struct { char pad[0x230]; int selected; } g_menu_l04_state;

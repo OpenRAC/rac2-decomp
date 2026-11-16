@@ -42,13 +42,13 @@ extern u8 g_hero_state[];
 
 /* Mirror flag: swaps the two facing animations. Incomplete with sda: retail reads it through an
    absolute macro load that uses its destination as the address temporary. */
-extern u8 D_001A7A45[] __attribute__((sda));
-extern u8 D_L00_001B4400[];
-extern u8 D_L00_001B4A00[];
+extern u8 g_state_flag_c[] __attribute__((sda));
+extern u8 g_hero_current_anim_buffer[];
+extern u8 g_hero_next_anim_buffer[];
 /* One 16-byte record per animation id returned by func_0029FA88. */
-extern u8 D_L00_001D98C0[];
+extern u8 g_hero_l00_animation_table[];
 /* Frame counts per animation curve (two entries, the next symbol is 8 bytes on). */
-extern s32 D_L00_001A7DF8[2] __attribute__((sda));
+extern s32 g_hero_anim_speed_table[2] __attribute__((sda));
 
 extern s32 moby_alloc_object_slot(void *);
 extern void func_002A2450(void *, s32);
@@ -72,7 +72,7 @@ void set_hero_animation(s32 seq, s32 frame, float speed)
     if (HA->flags & 2)
         obj->time = 0.0f;
 
-    if (D_001A7A45[0] != 0) {
+    if (g_state_flag_c[0] != 0) {
         if (seq == 0x31)
             seq = 0x32;
         else if (seq == 0x32)
@@ -83,10 +83,10 @@ void set_hero_animation(s32 seq, s32 frame, float speed)
     if (id >= 0) {
         func_002A2450(obj, id | 0x300);
         FlushCache(0);
-        qcopy(D_L00_001D98C0 + id * 16, obj);
+        qcopy(g_hero_l00_animation_table + id * 16, obj);
         if (obj->seq != 0xFF)
             obj->prevSeq = obj->seq;
-        qcopy(D_L00_001D98C0 + id * 16, (u8 *)obj + 0x80);
+        qcopy(g_hero_l00_animation_table + id * 16, (u8 *)obj + 0x80);
         obj->seq = 0xFF;
         obj->frame = id;
     }
@@ -95,8 +95,8 @@ void set_hero_animation(s32 seq, s32 frame, float speed)
     update_moby_animation_state(obj);
 
     if (obj->seq != 0xFF)
-        obj->current = anim_copy_entry_data((char *)obj, obj->seq, obj->frame, (s32)D_L00_001B4400);
-    obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+        obj->current = anim_copy_entry_data((char *)obj, obj->seq, obj->frame, (s32)g_hero_current_anim_buffer);
+    obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)g_hero_next_anim_buffer);
 
     HA->speed = 1.0f;
     if (speed > 0.0f) {
@@ -115,7 +115,7 @@ void set_hero_animation(s32 seq, s32 frame, float speed)
     obj->sound = obj->model->seqs[seq]->sound;
     HA->changing = 1;
     if (speed < 0.0f)
-        speed = D_L00_001A7DF8[HA->curve];
+        speed = g_hero_anim_speed_table[HA->curve];
 
     if (HA->flag22b4 == 0)
         hero_sync_linked_object_anims(seq, frame, speed);

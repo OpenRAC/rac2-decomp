@@ -30,7 +30,7 @@ typedef struct DamoselWeaponView {
     float damage;
     u8 tail[0x6C];
 } DamoselWeaponView;
-extern u8 D_L18_0026BCF0[];
+extern u8 g_weapon_l18_table[];
 typedef struct DamoselHitRecord {
     float direction[4];
     u8 pad10[8];
@@ -41,11 +41,11 @@ typedef struct DamoselHitRecord {
 } __attribute__((aligned(16))) DamoselHitRecord;
 
 typedef int DamoselQuad __attribute__((mode(TI)));
-extern u8 *D_L18_001B1DCC __attribute__((sda));
-extern u8 *D_L18_001B1DD0 __attribute__((sda));
-extern u8 *D_L18_001B1DC8 __attribute__((sda));
+extern u8 *g_lava_gun_entries __attribute__((sda));
+extern u8 *g_lava_gun_slot_body __attribute__((sda));
+extern u8 *g_lava_gun_buffer_b __attribute__((sda));
 extern u8 *g_nearby_hit_targets[];
-extern int D_L18_001A8FF0, D_L18_001A8F00;
+extern int g_hero_l18_busy_flag, g_game_l18_mode_state;
 extern void table_clear_entry_flag(int);
 extern int AcquireEntitySlot(void *, int, void *);
 extern u8 *level_get_slot_body(int, int);
@@ -65,7 +65,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
-extern int func_PAL_0032F0B8(void *, int, void *);
+extern int StartAttachedEffect_pal(void *, int, void *);
 extern s32 func_PAL_L18_002E01E0(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -74,9 +74,9 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void AppendVectorRingEntry(void *, void *, void *, int);
-extern void func_PAL_L00_0041F868(void *);
+extern void lava_gun_update_blobs_pal(void *);
 extern void lava_gun_update_ring_entries(void *);
-extern void func_PAL_L00_00420D90(void *);
+extern void part_l00_update_effect_slots_2_pal(void *);
 extern void gfx_add_draw_callback_third(void (*)(char *), void *);
 extern void lava_gun_draw_shot(char *);
 
@@ -90,9 +90,9 @@ void func_PAL_L18_0044C9C0(u8 *obj)
     int i = 0, active, count;
     u8 *entry;
     u8 **targets;
-    if (g_hero_state.mode == 3 && D_L18_001B1DCC) {
+    if (g_hero_state.mode == 3 && g_lava_gun_entries) {
         for (i = 0; i < 35; i++) {
-            u8 *entry = D_L18_001B1DCC + i * 64;
+            u8 *entry = g_lava_gun_entries + i * 64;
             if (*(int *)(entry + 0x38) >= 0) {
                 table_clear_entry_flag(*(int *)(entry + 0x38));
                 *(int *)(entry + 0x38) = -1;
@@ -101,18 +101,18 @@ void func_PAL_L18_0044C9C0(u8 *obj)
     }
     if (!obj[0x20]) {
         *(int *)(state + 0x34) = AcquireEntitySlot(obj, 0, &scratch);
-        D_L18_001B1DD0 = level_get_slot_body(*(short *)(obj + 0xAA), *(int *)(state + 0x34));
-        D_L18_001B1DC8 = mem_align_up_sixteen_alt(D_L18_001B1DD0 + 0x33E0);
-        D_L18_001B1DCC = mem_align_up_sixteen_alt(D_L18_001B1DC8 + 0x1F40);
+        g_lava_gun_slot_body = level_get_slot_body(*(short *)(obj + 0xAA), *(int *)(state + 0x34));
+        g_lava_gun_buffer_b = mem_align_up_sixteen_alt(g_lava_gun_slot_body + 0x33E0);
+        g_lava_gun_entries = mem_align_up_sixteen_alt(g_lava_gun_buffer_b + 0x1F40);
         {
-            int *word = (int *)(D_L18_001B1DC8 + 0x1F30);
+            int *word = (int *)(g_lava_gun_buffer_b + 0x1F30);
             for (i = 124; i >= 0; i--, word -= 16) *word = 1;
         }
-        entry = D_L18_001B1DD0 + 0x33C4;
+        entry = g_lava_gun_slot_body + 0x33C4;
         for (i = 9; i >= 0; i--, entry -= 0x530) *(int *)entry = 0;
         {
             int invalid = -1;
-            entry = D_L18_001B1DCC + 0x8B8;
+            entry = g_lava_gun_entries + 0x8B8;
             for (i = 34; i >= 0; i--, entry -= 64) *(int *)entry = invalid;
         }
         *(int *)(state + 0x3C) = 0; *(int *)(state + 0x48) = 0;
@@ -154,7 +154,7 @@ void func_PAL_L18_0044C9C0(u8 *obj)
                         vec_scale_to_length(direction, direction, 1.0f);
                         vec_scale_to_length(&hit, &hit, 1.0f);
                         make_hit_descriptor(&hit, obj, 0x910000,
-                            ((DamoselWeaponView *)(D_L18_0026BCF0 + g_item_slot_to_record[0x1D] * 0xE0))->damage,
+                            ((DamoselWeaponView *)(g_weapon_l18_table + g_item_slot_to_record[0x1D] * 0xE0))->damage,
                             direction);
                         hit.flag = 1;
                         *(DamoselQuad *)&hit = *(DamoselQuad *)direction;
@@ -162,7 +162,7 @@ void func_PAL_L18_0044C9C0(u8 *obj)
                         hit.type = 9; hit.active = 1;
                         hit.classId = *(short *)(*targets + 0xAA);
                         QueueMobyImpact(*targets, &hit);
-                        func_PAL_0032F0B8(*targets, 29, obj);
+                        StartAttachedEffect_pal(*targets, 29, obj);
                         PlayMobySound(1, 0, obj);
                     }
                     ++targets;
@@ -190,7 +190,7 @@ void func_PAL_L18_0044C9C0(u8 *obj)
     if (g_hero_state.vehicle) {
         g_hero_state.saved = g_hero_state.vehicle;
         vec_compute_object_to_target(g_hero_state.vehicle, state, velocity, *(float *)(state + 0x50) * 0.05f);
-        if (D_L18_001A8FF0) {
+        if (g_hero_l18_busy_flag) {
             FastVecScale(direction, obj + 0xE0, 0.02f);
             FastVecAdd(velocity, velocity, direction);
         } else {
@@ -205,11 +205,11 @@ void func_PAL_L18_0044C9C0(u8 *obj)
     *(float *)(state + 0x5C) -= 0.025f;
     if (*(float *)(state + 0x5C) <= -8.0f) *(float *)(state + 0x5C) += 8.0f;
     if (*(float *)(state + 0x50) != 0.0f) {
-        func_PAL_L00_0041F868(obj); lava_gun_update_ring_entries(obj);
+        lava_gun_update_blobs_pal(obj); lava_gun_update_ring_entries(obj);
     } else {
         *(int *)(state + 0x44) = 0; *(int *)(state + 0x3C) = 0;
         *(int *)(state + 0x48) = 0; *(int *)(state + 0x40) = 0;
     }
-    func_PAL_L00_00420D90(obj);
-    if (D_L18_001A8F00 != 2 && obj[0x31]) gfx_add_draw_callback_third(lava_gun_draw_shot, obj);
+    part_l00_update_effect_slots_2_pal(obj);
+    if (g_game_l18_mode_state != 2 && obj[0x31]) gfx_add_draw_callback_third(lava_gun_draw_shot, obj);
 }

@@ -7,8 +7,8 @@ extern int PlayMobySound(int, int, void *);
 extern void SetCamera5Pose(void *, void *, int, int, int), object_copy_vector_to_selected(void *), cam_set_state_rotation(void *);
 extern void anim_start_blended(void *, int, int, int), set_hero_animation(int, int, float);
 
-extern unsigned char D_001A7A45;
-extern int D_L01_001B1FA8;
+extern unsigned char g_state_flag_c;
+extern int g_camera_lock_flag;
 typedef struct {
     char pad[0x80];
     float pos[4];
@@ -49,9 +49,9 @@ void teleporter_start_arrival(unsigned char *moby) {
     qcopy_nc(moby + 0xF0, g_hero_state.rot);
     if (moby[0x43] != 1) anim_start_blended(moby, 1, 0, 0);
     set_hero_animation(0x7B, 0, 0.0f);
-    if (D_001A7A45) *(unsigned short *)(moby + 0x34) |= 0x8000;
+    if (g_state_flag_c) *(unsigned short *)(moby + 0x34) |= 0x8000;
     g_hero_state.flag = 1;
-    D_L01_001B1FA8 = 1;
+    g_camera_lock_flag = 1;
     moby[0x20] = 2;
     *(int *)(vars + 0x6C) = 60;
 }

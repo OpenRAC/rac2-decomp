@@ -5,19 +5,19 @@ extern void path_sample_position(char *, int, float *, float *, int, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_random_float_range(float, float);
-extern float D_L06_001AFCA0 __attribute__((sda));
+extern float g_bob_l06_amplitude __attribute__((sda));
 
-extern unsigned short *D_L06_001FB3A0[];
+extern unsigned short *g_group_l06_id_lists[];
 typedef struct { char prefix[0x68]; char *state; char tail[0x94]; } PathMoby;
-extern PathMoby *D_L06_001B281C;
+extern PathMoby *g_moby_l06_table;
 extern char *g_path_list[];
 /* Tuning ranges, read only here. The upper bounds are read-only declarations: retail schedules
    their loads ahead of the stores before them and keeps them absolute; the lower bounds go to
    the call slots, where the assembler addresses them through $gp. */
-extern int D_L06_001AFC58;
-extern const int D_L06_001AFC5C;
-extern float D_L06_001AFC60;
-extern const float D_L06_001AFC64;
+extern int g_spawn_timer_min;
+extern const int g_spawn_timer_max;
+extern float g_spawn_spin_min;
+extern const float g_spawn_spin_max;
 extern float fast_vec_dist(void *, void *);
 extern float math_random_signed_float_range(float, float);
 extern float IntToFloat(int);
@@ -28,13 +28,13 @@ extern float math_random_angle(void);
 /* Space the group's objects around a path and initialize their movement. */
 void InitializePathMobyGroup(int group)
 {
-    unsigned short *entry = D_L06_001FB3A0[group];
+    unsigned short *entry = g_group_l06_id_lists[group];
     char *path, *state, *last;
     float reciprocal, pathLength;
     int count, reverse, closed;
     if (!entry)
         return;
-    state = D_L06_001B281C[*entry & 0x7FFF].state;
+    state = g_moby_l06_table[*entry & 0x7FFF].state;
     path = g_path_list[*(int *)state];
     count = 0;
     reciprocal = fast_vec_dist(path + 0x10, path + 0x20);
@@ -44,13 +44,13 @@ void InitializePathMobyGroup(int group)
     if (!(fast_vec_dist(path + 0x10, path + (*(int *)path << 4)) < 5.0f))
         closed = 0;
     do {
-        last = (char *)&D_L06_001B281C[*entry & 0x7FFF];
+        last = (char *)&g_moby_l06_table[*entry & 0x7FFF];
         count++;
     } while ((short)*entry++ >= 0);
-    entry = D_L06_001FB3A0[group];
+    entry = g_group_l06_id_lists[group];
     reverse = count - 1;
     do {
-        char *moby = (char *)&D_L06_001B281C[*entry & 0x7FFF];
+        char *moby = (char *)&g_moby_l06_table[*entry & 0x7FFF];
         float position;
         state = *(char **)(moby + 0x68);
         *(float *)(state + 0x14) = (reciprocal * (1.0f / 60.0f)) *
@@ -72,9 +72,9 @@ void InitializePathMobyGroup(int group)
         vec_clear_128(state + 0x20);
         *(float *)(state + 0x20) = math_random_signed_float_range(0.0f, *(float *)(state + 4));
         *(float *)(state + 0x28) = math_random_signed_float_range(0.0f, *(float *)(state + 4));
-        *(int *)(state + 0x48) = math_random_int_range(D_L06_001AFC58, D_L06_001AFC5C);
+        *(int *)(state + 0x48) = math_random_int_range(g_spawn_timer_min, g_spawn_timer_max);
         *(float *)(state + 0x4C) = math_random_angle();
-        *(float *)(state + 0x50) = math_random_signed_float_range(D_L06_001AFC60, D_L06_001AFC64) * 0.0002908882452f;
+        *(float *)(state + 0x50) = math_random_signed_float_range(g_spawn_spin_min, g_spawn_spin_max) * 0.0002908882452f;
         *(unsigned char *)(moby + 0x20) = 1;
         *(unsigned short *)(moby + 0x32) = 0xFF;
         *(int *)(state + 0x54) = -1;
@@ -93,7 +93,7 @@ void UpdatePathMobySpacing(char *moby)
                  (float *)(moby + 0x10), (float *)(moby + 0xF0), 0, *(float *)(state + 0x10));
     phase = FastAddRotations(*(float *)(state + 0x4C), *(float *)(state + 0x50));
     *(float *)(state + 0x4C) = phase;
-    *(float *)(moby + 0x18) += D_L06_001AFCA0 * math_fast_sin_or_cos_b(phase);
+    *(float *)(moby + 0x18) += g_bob_l06_amplitude * math_fast_sin_or_cos_b(phase);
     length = **(int **)(state + 0x30);
     pathPosition = *(float *)(state + 0x10) + *(float *)(state + 0x14);
     *(float *)(state + 0x10) = pathPosition;

@@ -18,7 +18,7 @@ typedef struct {
     int mode, reserved, kind;
     char *owner;
 } PoolRecord;
-extern PoolRecord *D_L00_001B2BB8 __attribute__((sda));
+extern PoolRecord *g_blast_l00_pool_2 __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern int func_001163B0(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -34,7 +34,7 @@ PoolRecord *blast_alloc_pool_record(char *owner, int kind, PoolVector *position,
     PoolVector direction, offset;
     PoolRecord *slot;
     char *slotOwner;
-    PoolRecord *pool = D_L00_001B2BB8;
+    PoolRecord *pool = g_blast_l00_pool_2;
     int displacement;
     int i, oldCount, random;
     float scale;
@@ -67,7 +67,7 @@ PoolRecord *blast_alloc_pool_record(char *owner, int kind, PoolVector *position,
             }
             break;
         }
-        slot = (PoolRecord *)((char *)D_L00_001B2BB8 + displacement);
+        slot = (PoolRecord *)((char *)g_blast_l00_pool_2 + displacement);
         slot->owner = owner;
         (*(int *)(owner + 0x38))++;
         slot->lifetime = slot->maximumLife = math_random_int_range(95, 127);

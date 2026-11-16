@@ -1,12 +1,12 @@
 #include "common.h"
 #define FIELD(p, type, off) (*(type *)((p) + (off)))
-extern int D_L08_001B29DC __attribute__((sda));
+extern int g_moby_array __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_0019B4A8[];
-extern char D_L08_001B9B00[];
-extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } D_L08_001B99C0;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
+extern unsigned char g_moby_nibble_table[];
+extern char g_hero_position_vec[];
+extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } g_hero_l08_extra_state;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_a;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_b;
 extern int moby_is_in_selected_zone(void *);
 extern void moby_mark_spawned(void *);
 extern float vec_distance_xy(void *, void *);
@@ -66,14 +66,14 @@ void dune_monster_update(char *actor) {
     vars = FIELD(actor, char *, 0x68);
     if (FIELD(actor, u8, 0x20) == 0) {
         u16 id = FIELD(actor, u16, 0xB2);
-        int bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+        int bits = g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
         if ((id & 1) ? (((bits >> 4) & 7) != 0) : ((bits & 7) != 0)) {
             moby_mark_spawned(actor);
             return;
         }
         hover_init_defaults(actor);
     }
-    if (vec_distance_xy(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
+    if (vec_distance_xy(actor + 0x10, g_hero_position_vec) > (float)FIELD(actor, u8, 0x30)) return;
     creature_update_hit_reaction(actor);
     switch (FIELD(actor, u8, 0x20)) {
     case 0: break;
@@ -116,9 +116,9 @@ ready_nonzero:
             FIELD(actor, u8, 0x31) = 1;
             FIELD(actor, u16, 0x34) &= 0xFFFE;
             moby_set_state(actor, 2, -1);
-            D_L08_001B99C0.amount = 0.25f;
-            D_L08_001B99C0.timer = 38;
-            D_L08_001B99C0.phase = 0;
+            g_hero_l08_extra_state.amount = 0.25f;
+            g_hero_l08_extra_state.timer = 38;
+            g_hero_l08_extra_state.phase = 0;
             if (FIELD(vars, char *, 0x22C)) {
                 FIELD(FIELD(vars, char *, 0x22C), u8, 0xBC) = 1;
                 FIELD(vars, char *, 0x22C) = 0;
@@ -418,10 +418,10 @@ patrol_heading:
                 8.0f, 4.0f, 9.0f, 2.0f, -1, 30.0f, 1, 2, -1, 0, 0x810001);
         group_remove_member(actor);
         SetDeathBits(actor, 0, 3);
-        D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = 0;
-        D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = 0;
+        g_moby_spawn_state_flags_a.flags[FIELD(actor, s16, 0xB2)] = 0;
+        g_moby_spawn_state_flags_b.flags[FIELD(actor, s16, 0xB2)] = 0;
         id = FIELD(actor, u16, 0xB2);
-        bits = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+        bits = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
         {
             u8 value = *bits;
             u8 low = value & 0xF8;
@@ -438,7 +438,7 @@ patrol_heading:
     if ((unsigned int)(FIELD(actor, u8, 0x20) - 2) < 4 && FIELD(actor, u8, 0x31)) {
         int index = FIELD(vars, int, 0x1E8);
         if (index != -1 && FIELD(FIELD(vars, char *, 0x1FC), int, 0)) {
-            char *target = (char *)(D_L08_001B29DC + (index << 8));
+            char *target = (char *)(g_moby_array + (index << 8));
             if (!target || FIELD(target, u8, 0x20) == 0xFE || FIELD(target, u8, 0x20) == 0xFD)
                 UpdateNearestTarget(actor, actor + 0x10);
             else UpdateNearestTarget(actor, target + 0x10);

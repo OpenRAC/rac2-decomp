@@ -4,7 +4,7 @@
 extern int ComputeRegionRouteHeading(char *, int, float *, char *, short, char *, char *, float, float);
 extern int moby_step_controller(char *, int, float);
 
-int func_PAL_L02_003CECB0(char *self, int arg1) {
+int enemy_follow_path_toward_point_pal(char *self, int arg1) {
     float out;
     char *p = *(char **)(self + 0x68);
     int r = ComputeRegionRouteHeading(self + 0x10, arg1, &out, p + 0x290, *(short *)(p + 0x3B6),

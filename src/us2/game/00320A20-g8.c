@@ -18,10 +18,10 @@ typedef struct {
     float groundZ;
 } AmmoSpawnData;
 extern unsigned int stub_empty_19(int);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern unsigned char g_item_slot_to_record[];
 extern AmmoSpawnWeapon g_weapon_table[];
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 extern char D_00189E20_9[];
 extern float math_random_angle(void);
 extern float mat_fast_helper_a(float, float);
@@ -38,7 +38,7 @@ extern void hero_copy_field_to_moby(char *);
 
 /* Spawns an ammo pickup (class 0xCDB, updated by func_US2_00320A20) for a weapon at a position;
    an amount of -1 takes the weapon's default, doubled while D_001A7A0A is set. */
-char *func_US2_003210E0(float *position, int weapon, int amount, int extra)
+char *SpawnWeaponAmmoPickup_us2(float *position, int weapon, int amount, int extra)
 {
     float rotation[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
@@ -57,7 +57,7 @@ char *func_US2_003210E0(float *position, int weapon, int amount, int extra)
     *(AmmoSpawnQuad *)velocity = 0;
     velocity[2] = math_random_angle();
     *(AmmoSpawnQuad *)rotation = *(AmmoSpawnQuad *)velocity;
-    if (D_001A8CA0) {
+    if (g_ground_check_inhibit) {
         cam_compute_view_direction(position, velocity, 1);
         rotation[1] = mat_fast_helper_a(velocity[2], vec_length_xy(velocity));
         rotation[2] = mat_fast_helper_a(velocity[0], velocity[1]);
@@ -79,12 +79,12 @@ char *func_US2_003210E0(float *position, int weapon, int amount, int extra)
                 + slots[stub_empty_19(weapon)] * stride))->pickupAmount;
         else
             data->amount = amount;
-        if (D_001A7A0A)
+        if (g_extras_unlocked_flag)
             data->amount *= 2;
         data->weapon = weapon;
         data->f6C = (float)extra;
         data->f70 = 16;
-        if (D_001A8CA0)
+        if (g_ground_check_inhibit)
             data->groundZ = gravity_get_center_distance((float *)(spawn + 0x10));
         else
             data->groundZ = *(float *)(spawn + 0x18);

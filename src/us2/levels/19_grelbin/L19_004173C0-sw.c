@@ -17,18 +17,18 @@ typedef struct {
     int mode;
 } GrelbinContext;
 extern char g_hero_state[];
-extern char D_L19_001A8F20[] MACRO_ADDR;
-extern char D_L19_001BFEA0[], D_L19_001B9900[];
-extern char D_L19_001FF5C0[];
+extern char g_particle_effect_template[] MACRO_ADDR;
+extern char g_hit_position_vec[], g_hero_l19_state_block[];
+extern char g_leviathan_data[];
 typedef struct { char pad[0x464]; u8 entries[1]; } ActorFlags;
-extern ActorFlags D_L19_0021EA30;
-extern char *D_L19_001FB5A0[];
+extern ActorFlags g_trigger_active_table;
+extern char *g_group_ptr_table[];
 extern char *g_moby_l19_array __attribute__((sda));
 extern void moby_fade_out_update(void *);
-extern int D_L19_001B1BF8 __attribute__((sda));
+extern int g_leviathan_particle_param __attribute__((sda));
 extern int g_active_yeti_count __attribute__((sda));
 extern int g_current_map_index MACRO_ADDR;
-extern unsigned char D_0019B4A8[];
+extern unsigned char g_moby_nibble_table[];
 extern int moby_is_in_selected_zone(void *);
 extern int FloatToInt(float);
 extern void cam_end_override(void *);
@@ -45,7 +45,7 @@ extern float math_step_value_toward_target(void *,void *,float,float,float,float
 extern float vec_distance_xy(void *,void *);
 extern void func_US2_002A7AA8(void *,int,int);
 extern void moby_mark_spawned(void *);
-extern int func_US2_002AF9C8(void *,float);
+extern int math_is_value_within_step_us2(void *,float);
 extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
 extern void hero_copy_field_to_moby(void *);
@@ -69,7 +69,7 @@ extern void FastVecSub(void *,void *,void *);
 extern int CollLine(void *,void *,int,void *,void *);
 extern void moby_tick_timers_age(void *);
 
-void func_US2_L19_004173C0(char *obj)
+void leviathan_update_us2(char *obj)
 {
     float v[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
@@ -110,7 +110,7 @@ void func_US2_L19_004173C0(char *obj)
     {
         char *idleTarget;
         ok=1;
-        if (B(obj,0x21)!=0xFF && D_L19_001FB5A0[B(obj,0x21)]) {
+        if (B(obj,0x21)!=0xFF && g_group_ptr_table[B(obj,0x21)]) {
             if (moby_count_group_not_in_state(W(s,0x308),-1)) ok=0;
         }
         if (W(s,0x30C)!=-1) {
@@ -173,17 +173,17 @@ void func_US2_L19_004173C0(char *obj)
         if (B(obj,0x60)&2) {func_US2_002A7AA8(obj,0,3);moby_mark_spawned(obj);return;}
     {
     char *childState;
-    if (F(s,0x20)<=0.0f && func_US2_002AF9C8(obj,45.0f) && !(D_L19_0021EA30.entries[(s16)(flags=H(obj,0xB2))])) {
-        int counts=D_0019B4A8[((s16)flags>>1)+(g_current_map_index<<10)];
+    if (F(s,0x20)<=0.0f && math_is_value_within_step_us2(obj,45.0f) && !(g_trigger_active_table.entries[(s16)(flags=H(obj,0xB2))])) {
+        int counts=g_moby_nibble_table[((s16)flags>>1)+(g_current_map_index<<10)];
         if (!((flags&1) ? (counts>>4)&7 : counts&7)) {
             spawnedActor=CreateMoby(0x1266);
             if (spawnedActor) {
                 u16 id=H(obj,0xB2);
                 if (id&1) {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
+                    u8 *marks=g_moby_nibble_table+(((s16)id>>1)+(g_current_map_index<<10));
                     if (((*marks>>4)&7)!=7) *marks+=0x10;
                 } else {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
+                    u8 *marks=g_moby_nibble_table+(((s16)id>>1)+(g_current_map_index<<10));
                     if ((*marks&7)!=7) *marks+=1;
                 }
                 B(spawnedActor,0x23)=0x50;
@@ -207,7 +207,7 @@ void func_US2_L19_004173C0(char *obj)
     {
         char *newActor;
         if (moby_get_anim_value(obj)>=4.0f && !W(s,0x304) && !B(obj,0x42)) {
-            char *shake=D_L19_001B9900;
+            char *shake=g_hero_l19_state_block;
             int j;
             F(shake,0x160)=0.25f;
             W(shake,0x168)=0x26;W(shake,0x16C)=0;
@@ -218,7 +218,7 @@ void func_US2_L19_004173C0(char *obj)
                 vec_random_direction(v,0.2833333611f,0.3500000238f);
                 v[2]=math_fabs(v[2])*6.5f;
                 if (v[2]>1.2500001192f) v[2]=1.2500001192f;
-                FastVecAdd(v,v,D_L19_001A8F20);
+                FastVecAdd(v,v,g_particle_effect_template);
                 src=P(s,0x2F0);
                 effect=cam_moby_create(src,1,S(src,0xAA),j,src+0x10,src+0xF0,v,0xFF,180.0f,45.0f);
                 P(effect,0x64)=(char *)moby_fade_out_update;
@@ -262,7 +262,7 @@ void func_US2_L19_004173C0(char *obj)
         }
         break;
     case 7:
-        if (func_US2_002AF9C8(obj,13.0f)) PlayMobySound(4,0,obj);
+        if (math_is_value_within_step_us2(obj,13.0f)) PlayMobySound(4,0,obj);
         if (moby_get_anim_value(obj)>17.0f && B(obj,0x42)==2) {
             F(obj,0x48)=0.5f;gfx_add_draw_callback_first(leviathan_draw_charge_flash,obj);
             if (B(obj,0x60)&2) {
@@ -280,22 +280,22 @@ void func_US2_L19_004173C0(char *obj)
     {
         char *particle;
         gfx_add_draw_callback_first(DrawGrelbinBeamEffect,obj);
-        qcopy(v,D_L19_001BFEA0);
+        qcopy(v,g_hit_position_vec);
         for (i=9;i>=0;i--) {
             part_spawn_random_direction_effect(vel,0.2333333492f,0.2666666806f);
             if (vel[2]<0.0f) vel[2]=-vel[2];
             n=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
             f=math_random_float_range(0.6f,1.0f);
-            part_spawn_fading_drift(s+0x2C0,vel,20,0x804020,n,127,127,210000.0f*f,2100.0f,0.00405555591f,D_L19_001B1BF8);
+            part_spawn_fading_drift(s+0x2C0,vel,20,0x804020,n,127,127,210000.0f*f,2100.0f,0.00405555591f,g_leviathan_particle_param);
             n=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
             f=math_random_float_range(0.6f,1.0f);
             particle=part_spawn_fading_drift(s+0x2C0,vel,20,0x804040,n,48,48,630000.0f*f,4200.0f,0.00405555591f,0);
             if (particle) {
-                char *g=D_L19_001FF5C0;
+                char *g=g_leviathan_data;
                 B(particle,2)=B(P(g,0xD4),0);
             }
         }
-        make_hit_descriptor(mat,obj,0x10001,D_L19_001A8F20,(float)B(s,0x34));
+        make_hit_descriptor(mat,obj,0x10001,g_particle_effect_template,(float)B(s,0x34));
         moby_transform_joint_point(obj,0,mat2);
         qcopy(vel,mat2+0x30);
         vec_scale_to_length(tmp,mat2,0.25f);
@@ -338,7 +338,7 @@ void func_US2_L19_004173C0(char *obj)
                 if (B(obj,0x43)!=1) anim_start_blended(obj,1,0,10);
             }
         }
-        if (func_US2_002AF9C8(obj,11.0f) && B(obj,0x42)==6) {
+        if (math_is_value_within_step_us2(obj,11.0f) && B(obj,0x42)==6) {
             GrelbinContext *ctx;
             char *next;
             char *dead=P(s,0x200);

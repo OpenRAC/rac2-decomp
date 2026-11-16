@@ -21,21 +21,21 @@ typedef int s32_F2144bf3d;
 
 extern char g_pad_state[];
 
-extern s32_F2144bf3d D_0018D198[];
+extern s32_F2144bf3d g_level_idle_frame_counts[];
 
-extern s32_F2144bf3d D_L06_001AD3A0 __attribute__((sda));
+extern s32_F2144bf3d g_idle_frame_counter __attribute__((sda));
 
-extern s32_F2144bf3d D_001A7390;
+extern s32_F2144bf3d g_frame_counter;
 
 extern s32_F2144bf3d g_current_map_index;
 
-extern s32_F2144bf3d D_L06_001B2348;
+extern s32_F2144bf3d g_game_l06_frame_counter;
 
-extern s32_F2144bf3d D_L06_001A8FC0;
+extern s32_F2144bf3d g_idle_counter_check;
 
-extern s32_F2144bf3d D_L06_001B2900;
+extern s32_F2144bf3d g_idle_frame_marker;
 
-extern s32_F2144bf3d D_L06_001AA0F0;
+extern s32_F2144bf3d g_idle_counter_reset;
 
 /* Applies the current cutscene camera key and returns its flag byte. */
 #include "common.h"
@@ -55,7 +55,7 @@ typedef struct {
 } Cam_2F5AF8;
 
 extern CamList_2F5AF8 g_scene_playback_state;
-extern CamView_2F5AF8 D_001B9040;
+extern CamView_2F5AF8 g_view_params;
 extern Cam_2F5AF8 g_active_camera;
 extern void UpdateViewContext(void);
 /* Publishes the slow-down factor and, while the frame rate is below one, asks
@@ -76,9 +76,9 @@ extern unsigned char g_item_slot_to_record[];
 extern F6510Record g_weapon_l00_table[];
 int GetSelectedShopItemPrice(void);
 
-extern unsigned char D_001A7AB8[] MACRO_ADDR;
+extern unsigned char g_movie_channel_flags[] MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern unsigned char D_001A7A80[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
 typedef struct { int active; char pad4[0x10]; int info; char pad18[0x80]; int channels[3]; char padA4[0x3C]; } F73Record;
 extern F73Record g_weapon_table[];
 typedef struct { char pad[0x140]; int rows[96][4]; int count; } F73StateType;
@@ -93,21 +93,21 @@ typedef struct { char *moby; char pad4[0x14]; int a; char pad1C[0x14]; int b; } 
 extern Shop_002F9198 g_vendor_menu_state;
 /* Its address is one `la` (assembler lui/addiu pair), not a split %hi/%lo: retail
    schedules the pair as one insn ahead of dst + 0x220. */
-extern Three_002F9198 D_001B2250 MACRO_ADDR;
+extern Three_002F9198 g_shop_preview_data MACRO_ADDR;
 /* 0x40-byte block that func_002DE990 saves and restores whole. */
 typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
 extern Settings_002F9198 g_player_bolts MACRO_ADDR;
-extern Five_002F9198 D_001AD308;
+extern Five_002F9198 g_shop_close_table;
 extern HeroMenu_002F9198 g_hero_moby_default;
 extern int PlayMobySound(int, int, void *);
-void func_US2_002FA028(void);
+void shop_close_sub_menu_us2(void);
 
-extern int D_001B2240, D_001B223C;
-extern int D_001B2244 __attribute__((sda));
+extern int g_shop_right_hold_timer, g_shop_left_hold_timer;
+extern int g_shop_prev_buttons __attribute__((sda));
 extern int g_item_ammo_counts[];
 extern void set_animation_parameter(int, unsigned int);
 extern int GetSelectedShopItemPrice(void);
-extern void func_US2_002FA028(void);
+extern void shop_close_sub_menu_us2(void);
 
 typedef struct { int id, kind; int fields[4]; } ShopRow_93;
 typedef struct {
@@ -119,7 +119,7 @@ typedef struct {
 } ShopInput_93;
 extern ShopInput_93 F93State __asm__("D_0021F240");
 typedef struct { char pad[0x1C4]; int buttons; } Input_93;
-void func_US2_002FA240(void)
+void UpdateShopMenuInput_us2(void)
 {
     ShopInput_93 *state = &F93State;
     int cost;
@@ -128,7 +128,7 @@ void func_US2_002FA240(void)
     {
         Input_93 *input = (Input_93 *)g_pad_state;
         if ((input->buttons & 0x2000) ||
-                (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
+                (g_shop_right_hold_timer >= 16 && g_shop_right_hold_timer % 10 == 1)) {
             if (state->scroll < 57) {
                 int moved = 0;
                 if (state->selected < state->count - 1) {
@@ -156,7 +156,7 @@ void func_US2_002FA240(void)
         Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
         if ((input->buttons & 0x8000) ||
-                (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
+                (g_shop_left_hold_timer >= 16 && g_shop_left_hold_timer % 10 == 1)) {
             state = &F93State;
             if (state->scroll >= -56) {
                 int moved = 0;
@@ -184,8 +184,8 @@ void func_US2_002FA240(void)
     {
         Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
-        if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
-            ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
+        if (((input->buttons & 0x40) && !(g_shop_prev_buttons & 0x40) && F93State.mode != 3) ||
+            ((input->buttons & 0x40) && !(g_shop_prev_buttons & 0x40) && F93State.mode == 3 &&
              *(int *)((char *)&F93State + 0x144 + F93State.selected * 12) != 0)) {
                 state = &F93State;
                 if (state->mode == 0) {
@@ -217,15 +217,15 @@ rejected:
         }
     }
 finish:
-    if (((Input_93 *)g_pad_state)->buttons & 0x10) func_US2_002FA028();
+    if (((Input_93 *)g_pad_state)->buttons & 0x10) shop_close_sub_menu_us2();
 }
 
-extern void func_US2_002FA240(void);
+extern void UpdateShopMenuInput_us2(void);
 
 /* One font glyph: its texture cell, its top offset and its advance. */
 typedef struct { u8 u, v; signed char top, adv; } Glyph_002F97A0;
 
-extern Glyph_002F97A0 D_00263EF0[];
+extern Glyph_002F97A0 g_font_glyphs_medium[];
 /* Prints up to `limit` characters of `text` from (x, y) at `scale`, in the large font, fading
    each glyph's left and right edges out with their distance from the screen centre (215 on
    the second screen layout, 256 elsewhere, three quarters as fast). Characters 0x80..0xa7

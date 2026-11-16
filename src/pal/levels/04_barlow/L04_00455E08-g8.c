@@ -10,8 +10,8 @@ extern u8 *g_moby_l04_pool;
 extern u16 *g_moby_l04_group_lists[] NOT_SDA;
 struct Resident502D0 { u8 pad[0x2290]; u8 *target; };
 extern struct Resident502D0 g_hero_state NOT_SDA;
-extern u8 D_L04_001B18A0[] NOT_SDA, D_L04_002CA650[] NOT_SDA, D_L04_001B9680[] NOT_SDA;
-extern int D_L04_001B24F8;
+extern u8 g_str_tribesman_debug_format[] NOT_SDA, g_str_tribesman_update[] NOT_SDA, g_tether_zero_vec[] NOT_SDA;
+extern int g_tribesman_group_limit;
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int path_build_route_nodes(void *, int, void *, int);
 extern void STUB_printf(void *, ...);
@@ -22,12 +22,12 @@ extern void moby_set_state(void *,int,int), func_PAL_002A7E68(void *,int,int,int
 extern u8 *CreateMoby(int);
 extern void func_002A0F48(void *), moby_copy_joint_transform_to_object(void *,void *,int,int),moby_mark_spawned(void *);
 extern float fast_vec_dist(void *,void *);
-extern void moby_update_ground_check(void *),linked_children_free(void *),func_PAL_002AD288(void *,void *,int,float,float);
+extern void moby_update_ground_check(void *),linked_children_free(void *),part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
 extern int func_PAL_002B1A50(void *,void *,int);
-extern void func_PAL_L04_00456C90(void *,int);
+extern void part_l04_spawn_spinning_pairs_pal(void *,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern int PlayMobySound(int,int,void *);
-extern void func_PAL_002AC290(void *,void *),tribesman_flag_group(void *),func_PAL_002A7650(void *,int,int);
+extern void func_PAL_002AC290(void *,void *),tribesman_flag_group(void *),SetDeathBits_pal(void *,int,int);
 extern int moby_count_group_not_in_state(int,int),hero_check_distance_zones(void *,void *,int,int,int,float,float);
 extern int weapon_select_aim_target(void *,void *,float,float,int,int);
 
@@ -42,7 +42,7 @@ int func_PAL_L04_00455E08(u8 *object) {
         if (I(data,0x560)) { H(object,0x34) |= 0x41; I(object,0x98)=0; }
         if (I(data,0x548)) {
             I(data,0x540) = path_build_route_nodes(object,I(data,0x544),data+0x340,16);
-            STUB_printf(D_L04_001B18A0,I(data,0x540));
+            STUB_printf(g_str_tribesman_debug_format,I(data,0x540));
         }
         if (F(data,0x2A8)==0.0f) F(data,0x2A8)=0.01745329424738884f*math_random_signed_float_range(15.0f,25.0f);
         else F(data,0x2A8)*=0.01745329424738884f;
@@ -85,7 +85,7 @@ int func_PAL_L04_00455E08(u8 *object) {
                 func_002A0F48(P(data,0x288)); moby_copy_joint_transform_to_object(object,P(data,0x288),1,0);
                 I(data,0x2A0)=0;
             } else {
-                STUB_printf(D_L04_002CA650); I(data,0x27C)=0; moby_set_state(object,4,0); return 1;
+                STUB_printf(g_str_tribesman_update); I(data,0x27C)=0; moby_set_state(object,4,0); return 1;
             }
         } else {
             moby_set_state(object,4,0);
@@ -111,12 +111,12 @@ int func_PAL_L04_00455E08(u8 *object) {
         F(data,0x120)=1.0f; F(data,0x12C)=F(data,0x298); F(data,0x130)=10.0f;
         I(data,0x294)=math_random_int_range(100,583);
     }
-        if (object[0x31] && fast_vec_dist(object+0x10,D_L04_001B9680)<24.0f) { moby_update_ground_check(object); object[0x6F]=22; }
+        if (object[0x31] && fast_vec_dist(object+0x10,g_tether_zero_vec)<24.0f) { moby_update_ground_check(object); object[0x6F]=22; }
     if (data[0x2E]==2) { linked_children_free(object); return 1; }
     if (P(data,0x2AC)) moby_copy_joint_transform_to_object(object,P(data,0x2AC),3,0);
     if (F(data,0x20)<=1.0f) {
         if (P(data,0x2AC)) {
-            func_PAL_002AD288(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
+            part_spawn_explosion_with_sparks_pal(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
             moby_mark_spawned(P(data,0x2AC)); P(data,0x2AC)=0;
         }
         I(data,0x2A0)=0;
@@ -130,10 +130,10 @@ int func_PAL_L04_00455E08(u8 *object) {
     if (result) {
 
         if (F(object,0x48)!=1.0f) F(object,0x48)=1.0f;
-        if (I(data,0x2A0)) { moby_transform_joint_to_world(object,3,position); func_PAL_L04_00456C90(position,8); }
+        if (I(data,0x2A0)) { moby_transform_joint_to_world(object,3,position); part_l04_spawn_spinning_pairs_pal(position,8); }
         if (result==4) PlayMobySound(24,0,object);
         I(data,0x2A0)=0; data[0x57]=210; func_PAL_002AC290(object,data+0x50); tribesman_flag_group(object);
-        if ((unsigned)(result-4)<2 && D_L04_001B24F8>=object[0x21] && moby_count_group_not_in_state(object[0x21],-1)>=2) {
+        if ((unsigned)(result-4)<2 && g_tribesman_group_limit>=object[0x21] && moby_count_group_not_in_state(object[0x21],-1)>=2) {
             u16 *ids=g_moby_l04_group_lists[object[0x21]];
             do {
                 u8 *other=P(g_moby_l04_pool+((*ids&0x7FFF)<<8),0x68);
@@ -156,10 +156,10 @@ int func_PAL_L04_00455E08(u8 *object) {
         if (F(object,0x18)<floor) F(object,0x18)=floor;
     }
     if (F(object,0x18)<40.0f) {
-        func_PAL_002A7650(object,0,3);
+        SetDeathBits_pal(object,0,3);
         if (P(data,0x288)) { moby_mark_spawned(P(data,0x288)); P(data,0x288)=0; }
         if (P(data,0x2AC)) {
-            func_PAL_002AD288(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
+            part_spawn_explosion_with_sparks_pal(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
             moby_mark_spawned(P(data,0x2AC)); P(data,0x2AC)=0;
         }
         return 1;

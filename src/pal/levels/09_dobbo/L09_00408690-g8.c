@@ -12,16 +12,16 @@ typedef struct {
     char *owner;
 } DobboSoundAnchor;
 
-extern s32 D_L09_001B13C0 __attribute__((sda));
-extern int D_L09_001B13D4 __attribute__((sda));
-extern char D_L09_001B13D8[], g_hero_position[], g_sound_state[];
+extern s32 g_dobbo_timer_value __attribute__((sda));
+extern int g_dobbo_path_sound __attribute__((sda));
+extern char g_str_dobbo_path_debug[], g_hero_position[], g_sound_state[];
 extern struct {
     char pad[0x80];
     char position[0x10];
     char pad2[0x240C];
     char *target;
 } D_00189E20;
-extern int *D_L09_001FE6C0[];
+extern int *g_path_l09_table[];
 
 extern void dobbo_update_large_release_record(char *);
 extern void dobbo_restore_saved_height(char *);
@@ -48,7 +48,7 @@ extern void part_spawn_masked_debris(char *, int, void *, u8, float, float, floa
 extern void SetDeathBits(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void func_PAL_L09_00408090(char *);
-extern void func_PAL_L09_00408290(char *);
+extern void dobbo_update_height_separation_pal(char *);
 extern void part_spawn_bone_sparks(char *);
 
 void func_PAL_L09_00408690(char *obj)
@@ -77,7 +77,7 @@ void func_PAL_L09_00408690(char *obj)
     case 2:
         if (*(int *)(p + 0x234) == 1 || *(s16 *)(p + 0x26C)) {
             dobbo_alert_path_enemies(obj);
-            *(u16 *)(p + 0x26C) = ((s32)(D_L09_001B13C0) * 5 + 2) / 6;
+            *(u16 *)(p + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
             if ((u8)obj[0x43] != state)
                 anim_start_blended(obj, 2, 0, 4);
             moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
@@ -109,7 +109,7 @@ void func_PAL_L09_00408690(char *obj)
             if (*(u8 *)(obj + 0x43) != 0)
                 anim_start_blended(obj, 0, 0, 20);
         }
-        path = D_L09_001FE6C0[*(int *)(p + 0x250)];
+        path = g_path_l09_table[*(int *)(p + 0x250)];
         length = IntToFloat(*path);
         *(float *)(p + 0x290) += length / (*(float *)(p + 0x25C) * 60.0f);
         if (length <= *(float *)(p + 0x290)) {
@@ -145,7 +145,7 @@ void func_PAL_L09_00408690(char *obj)
         if (flag_set_first_pending(obj)) {
             DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + *(s16 *)(p + 0x274) * 0x70);
             if (entry->owner != obj || !entry->active)
-                *(s16 *)(p + 0x274) = PlayMobySound(D_L09_001B13D4, 4, obj);
+                *(s16 *)(p + 0x274) = PlayMobySound(g_dobbo_path_sound, 4, obj);
         }
         moby_turn_toward_target_and_step(obj, p + 0x220, 0.0f);
         if (g_hero_state.target == obj || vec_distance_xy(obj + 0x10, g_hero_state.position) < 1.2f) {
@@ -164,7 +164,7 @@ void func_PAL_L09_00408690(char *obj)
     case 9:
         flags = moby_dispatch_action_by_kind(obj, p + 0x50);
         if (flags & 1) {
-            STUB_printf(D_L09_001B13D8, *(s16 *)(p + 0x274), *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_dobbo_path_debug, *(s16 *)(p + 0x274), *(s16 *)(obj + 0xB2));
             index = *(s16 *)(p + 0x274);
             if (index != -1) {
                 DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + index * 0x70);
@@ -181,7 +181,7 @@ void func_PAL_L09_00408690(char *obj)
             moby_mark_spawned(obj);
             return;
         } else if (flags & 2) {
-            *(u16 *)(p + 0x26C) = ((s32)(D_L09_001B13C0) * 5 + 2) / 6;
+            *(u16 *)(p + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
             moby_set_state(obj, 5, 3);
             PlayMobySound(3, 0, obj);
         }
@@ -198,6 +198,6 @@ void func_PAL_L09_00408690(char *obj)
         *(s16 *)(p + 0x274) = -1;
     }
     func_PAL_L09_00408090(obj);
-    func_PAL_L09_00408290(obj);
+    dobbo_update_height_separation_pal(obj);
     part_spawn_bone_sparks(obj);
 }

@@ -10,15 +10,15 @@ typedef struct {
     char reserved00[0x18];
     int left, top, width, height;
 } PromptMenuPrefix;
-extern int D_001F2924;
-extern unsigned char D_001ABB78[];
-extern int D_001B1E10 SDATA(D_001B1E10) __attribute__((sda));
-extern int D_001AA43C SDATA(D_001AA43C) __attribute__((sda));
-extern PromptCornerColors D_001B1E00[] SDATA(D_001B1E00) __attribute__((sda));
+extern int g_prompt_box_kind;
+extern unsigned char g_prompt_box_text[];
+extern int g_prompt_box_initialized SDATA(D_001B1E10) __attribute__((sda));
+extern int g_menu_panel_fill_color SDATA(D_001AA43C) __attribute__((sda));
+extern PromptCornerColors g_prompt_corner_colors[] SDATA(D_001B1E00) __attribute__((sda));
 /* Measured 16-byte record view of externally owned bounds storage. Its
  * complete allocation is unknown, so both views remain incompletely bounded.
  * Retail reads left through GP and the other three fields absolutely. */
-extern PromptBounds D_001ABB80[] MACRO_ADDR;
+extern PromptBounds g_prompt_bounds_table[] MACRO_ADDR;
 extern PromptBounds D_001ABB80_gp[] SDATA(D_001ABB80) __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
@@ -35,8 +35,8 @@ int menu_prompt_box_draw(PromptMenuPrefix *menu)
     VU1_addGSregister(0x42, 0x44ULL);
     VU1_addGSregister(0x47, 0x2004BULL);
     SetupGifPaging(0);
-    text = D_001ABB78;
-    kind = D_001F2924;
+    text = g_prompt_box_text;
+    kind = g_prompt_box_kind;
     switch (kind) {
     case 0:
     case 1:
@@ -52,19 +52,19 @@ int menu_prompt_box_draw(PromptMenuPrefix *menu)
                               menu->left, menu->left + menu->width + 1,
                               (menu->left + menu->width) >> 1, menu->top + 5,
                               menu->width - 5, menu->height - 5, 16, 5}};
-        if (!D_001B1E10) {
-            D_001B1E10 = 1;
-            D_001B1E00[0] = (PromptCornerColors){{D_001AA43C, D_001AA43C, D_001AA43C, D_001AA43C}};
+        if (!g_prompt_box_initialized) {
+            g_prompt_box_initialized = 1;
+            g_prompt_corner_colors[0] = (PromptCornerColors){{g_menu_panel_fill_color, g_menu_panel_fill_color, g_menu_panel_fill_color, g_menu_panel_fill_color}};
         }
         text_draw_window_medium((unsigned short *)&box, 0x80000000UL, text, -1);
         box.s[5] = (menu->height - box.s[7]) >> 1;
         box.s[9] ^= 4;
         text_draw_window_medium((unsigned short *)&box, 0x80000000UL, text, -1);
         {
-            int top = D_001ABB80[0].top;
-            int bottom = D_001ABB80[0].bottom;
-            int right = D_001ABB80[0].right;
-            gfx_draw_screen_rectangle(D_001ABB80_gp[0].left, top, right, bottom, 0, &D_001B1E00[0]);
+            int top = g_prompt_bounds_table[0].top;
+            int bottom = g_prompt_bounds_table[0].bottom;
+            int right = g_prompt_bounds_table[0].right;
+            gfx_draw_screen_rectangle(D_001ABB80_gp[0].left, top, right, bottom, 0, &g_prompt_corner_colors[0]);
         }
         box.s[0]--;
         box.s[1]--;

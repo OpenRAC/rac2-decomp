@@ -12,9 +12,9 @@ typedef struct {
 
 extern FadeEntry g_fading_moby_list[];
 extern int g_fading_moby_count[] __attribute__((sda));
-extern float D_L00_001B065C __attribute__((sda));
-extern int D_L00_001B0648[3] __attribute__((sda));
-extern char *D_L00_001B0650[] __attribute__((sda));
+extern float g_fade_duration_scale __attribute__((sda));
+extern int g_model_trail_params[3] __attribute__((sda));
+extern char *g_fade_color_table[] __attribute__((sda));
 extern void ref_L00_003E7C88_00(float *, float, float);
 extern void func_PAL_L00_003EC0E0(char *, void *, float);
 extern void moby_set_fading_alpha_color(int, char *);
@@ -33,9 +33,9 @@ void func_PAL_L01_003EE068(void) {
             FadeEntry *p = &g_fading_moby_list[i];
             char *o = p->object;
             if (*fade != zero) {
-                ref_L00_003E7C88_00(fade, 0.0f, D_L00_001B065C * 0.020000001f);
-                func_PAL_L00_003EC0E0(o, D_L00_001B0648, *fade);
-                moby_set_fading_alpha_color(i, D_L00_001B0650[0]);
+                ref_L00_003E7C88_00(fade, 0.0f, g_fade_duration_scale * 0.020000001f);
+                func_PAL_L00_003EC0E0(o, g_model_trail_params, *fade);
+                moby_set_fading_alpha_color(i, g_fade_color_table[0]);
             } else {
                 int callbacks = (int)&base->callback;
                 void (**callback)(char *) = (void (**)(char *))(i * 32 + callbacks);

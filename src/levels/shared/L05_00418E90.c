@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern short D_L05_00221D50;
+extern short g_thruster_glow_enabled;
 extern void FastVecAdd(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 extern int math_fast_float_d(char *);
@@ -27,7 +27,7 @@ void gfx_draw_thruster_glow(char *object)
     vec_scale_to_length((char *)&offset, (char *)&offset, 0.05f);
     color_b = 0;
     FastVecAdd((char *)&offset, object + 0x10, (char *)&offset);
-    if (D_L05_00221D50 != 0) {
+    if (g_thruster_glow_enabled != 0) {
         *(int *)(vars + 0xA0) = 7;
     } else {
         color_a = 0x0FC85A5A;

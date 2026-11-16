@@ -5,8 +5,8 @@ extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
-extern float D_L09_001B13BC __attribute__((sda));
-extern char *D_L09_001FE6C0[];
+extern float g_dobbo_height_base_offset __attribute__((sda));
+extern char *g_path_l09_table[];
 typedef struct {
     char pad_0[0x28];
     signed char field_28;
@@ -92,7 +92,7 @@ void dobbo_init_enemy_vars(char *obj) {
     float value;
     int one;
     data->field_288 = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
-    value = data->field_288 + D_L09_001B13BC;
+    value = data->field_288 + g_dobbo_height_base_offset;
     data->field_294 = value;
     if (value < data->field_264) data->field_294 = data->field_264;
     data->field_274 = -1;
@@ -112,7 +112,7 @@ void dobbo_init_enemy_vars(char *obj) {
     data->field_78 = 0.00833333377f;
     data->field_7C = data->field_74 = 0.00416666688f;
     data->field_80 = 0.5f;
-    data->field_84 = D_L09_001B13BC;
+    data->field_84 = g_dobbo_height_base_offset;
     data->field_8C = 0.4f;
     data->field_C3 = data->field_C2 = data->field_BF = data->field_BE = data->field_BD = data->field_BC = -1;
     data->field_C6 = one;
@@ -137,7 +137,7 @@ void dobbo_init_enemy_vars(char *obj) {
     data->field_28C = data->field_240;
     data->field_30 = 0;
     if (data->field_250 != -1) {
-        qcopy(obj+0x10, D_L09_001FE6C0[data->field_250] + 0x10);
+        qcopy(obj+0x10, g_path_l09_table[data->field_250] + 0x10);
         moby_set_state(obj, 1, 0);
     } else moby_set_state(obj, 2, 2);
     if (*(unsigned char *)(obj+0x43)) anim_start_blended(obj, 0, 0, 1);

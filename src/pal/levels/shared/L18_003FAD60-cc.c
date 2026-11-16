@@ -16,14 +16,14 @@ extern float mat_fast_helper_a(float, float);
 extern float math_approach_target_with_direction_mode(float *, float *, int, float, float, float, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern int func_PAL_L01_00323068(char *, char *);
-extern int func_PAL_002B5E30(unsigned char *, float);
-extern int func_PAL_002B5E10(char *);
-extern int func_PAL_002B5BA8(char *, float *, float);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
+extern int moby_step_at_own_position_factor_pal(unsigned char *, float);
+extern int moby_step_at_own_position_pal(char *);
+extern int moby_turn_toward_target_and_step_pal(char *, float *, float);
 extern void moby_set_state(unsigned char *, int, int);
 extern float func_L00_002EE290(void *);
 extern void vec_fast_normalize(void *, void *, void *);
-extern Vector128 D_L18_001BFC40;
+extern Vector128 g_normalize_scratch_vec;
 
 void func_PAL_L18_003FAD60(char *object)
 {
@@ -45,7 +45,7 @@ void func_PAL_L18_003FAD60(char *object)
                 return;
             }
             if (!(*(float *)(object + 0x48) == -1.0f && phase <= 4.0f)) return;
-            func_PAL_002B5E10(object);
+            moby_step_at_own_position_pal(object);
             return;
         }
         if (*(unsigned char *)(object + 0x20) == 14) {
@@ -62,8 +62,8 @@ void func_PAL_L18_003FAD60(char *object)
             return;
         }
         if (*(unsigned char *)(object + 0x20) == 9) return;
-        if (*(short *)(state + 0x290) != 0) func_PAL_002B5E30((unsigned char *)object, *(float *)(state + 0x264));
-        else func_PAL_002B5E10(object);
+        if (*(short *)(state + 0x290) != 0) moby_step_at_own_position_factor_pal((unsigned char *)object, *(float *)(state + 0x264));
+        else moby_step_at_own_position_pal(object);
         return;
     case 5: {
         float phase = moby_get_anim_value(object);
@@ -71,17 +71,17 @@ void func_PAL_L18_003FAD60(char *object)
             *(int *)(state + 0x180) == 0 && *(short *)(state + 0x1c2) == 0) {
             FastVecScale(local, object + 0xc0, 10.0f);
             FastVecAdd(local, object + 0x10, local);
-            func_PAL_L01_00323068(object, (char *)local);
+            moby_l01_turn_toward_target_pal(object, (char *)local);
             if (!(*(float *)(state + 0x190) <= *(float *)(object + 0x18))) return;
             if (*(float *)(state + 0x1a8) > 0.004f) *(float *)(state + 0x1a8) = 0.004f;
             return;
         }
-        if (*(short *)(state + 0x290) != 0) func_PAL_002B5E30((unsigned char *)object, *(float *)(state + 0x264));
-        else func_PAL_002B5E10(object);
+        if (*(short *)(state + 0x290) != 0) moby_step_at_own_position_factor_pal((unsigned char *)object, *(float *)(state + 0x264));
+        else moby_step_at_own_position_pal(object);
         return;
     }
     case 4:
-        func_PAL_002B5BA8(object, (float *)(state + 0x230), *(float *)(state + 0x24c));
+        moby_turn_toward_target_and_step_pal(object, (float *)(state + 0x230), *(float *)(state + 0x24c));
         if (*(float *)(object + 0x18) >= *(float *)(state + 0x190) && *(float *)(state + 0x1a8) > 0.004f)
             *(float *)(state + 0x1a8) = 0.004f;
         if ((unsigned int)(*(unsigned char *)(object + 0x20) - 11) > 1) return;
@@ -108,7 +108,7 @@ void func_PAL_L18_003FAD60(char *object)
             (*(short *)(state + 0x294))++;
             position = object + 0x10;
             FastVecAdd(position, position, state + 0x170);
-            vec_fast_normalize(velocity, local, &D_L18_001BFC40);
+            vec_fast_normalize(velocity, local, &g_normalize_scratch_vec);
             FastVecScale(velocity, velocity, 0.8f);
             FastVecAdd(position, position, velocity);
         }

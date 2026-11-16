@@ -8,7 +8,7 @@ extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern int FloatToInt(float);
-extern char *D_L00_001FE9B0;
+extern char *g_spark_effect_byte;
 
 #define FI(p, o) (*(int *)((char *)(p) + (o)))
 #define FF(p, o) (*(float *)((char *)(p) + (o)))
@@ -40,7 +40,7 @@ void part_spawn_spark_effect(char *position, char *matrix, float speed)
         FI(effect,4)=(r+143)|((g+143)<<8)|((b+111)<<16);
         FB(effect,9)=FloatToInt(4.0f)+64;
         FB(effect,3)=72; FB(effect,1)=0; FB(effect,8)=0;
-        FB(effect,2)=FB(D_L00_001FE9B0,0);
+        FB(effect,2)=FB(g_spark_effect_byte,0);
         FF(motion,4)=math_random_float_range(0.0f,0.02234560064971447f)+0.00001f;
         FF(effect,12)=math_random_float_range(10080.0f,19950.0f);
         FF(motion,8)=0.0f; FS(effect,10)=252; FF(motion,12)=1.0f;

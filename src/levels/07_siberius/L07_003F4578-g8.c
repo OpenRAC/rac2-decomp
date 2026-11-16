@@ -6,7 +6,7 @@ extern f32 func_2E5318(f32 a, f32 b);
 
 extern f32 func_2E4918(f32 a, f32 b);
 
-extern f32 D_L07_001B0F84 __attribute__((sda));
+extern f32 g_unused_float_param __attribute__((sda));
 
 extern u8 *g_moby_l07_array __attribute__((sda));
 
@@ -26,19 +26,19 @@ extern f32 func_313008(u8 *a, s32 b);
 
 extern void func_313DD8(void *a, f32 b, f32 c);
 
-extern f32 D_L07_001B10B8 __attribute__((sda));
+extern f32 g_boss_cam_distance __attribute__((sda));
 
-extern f32 D_L07_001B10BC __attribute__((sda));
+extern f32 g_boss_cam_height __attribute__((sda));
 
-extern u32 D_L07_001B10C0 __attribute__((sda));
+extern u32 g_boss_screen_color __attribute__((sda));
 
-extern f32 D_L07_001B0FD0 __attribute__((sda));
+extern f32 g_bomb_scale __attribute__((sda));
 
-extern f32 D_L07_001B0E98 __attribute__((sda));
+extern f32 g_beam_fade_in_rate __attribute__((sda));
 
-extern f32 D_L07_001B0E9C __attribute__((sda));
+extern f32 g_beam_fade_out_rate __attribute__((sda));
 
-extern f32 D_L07_001B0EA0 __attribute__((sda));
+extern f32 g_beam_spin_rate __attribute__((sda));
 
 extern f32 ApproachValue(f32 *value, f32 target, f32 step);
 
@@ -76,21 +76,21 @@ void beam_update(u8 *moby)
             if ((u16)frame_count == 1) {
                 break;
             }
-            ApproachValue((f32 *)(vars + 0x24), 1.0f, D_L07_001B0E98 * (1.0f / 60.0f));
+            ApproachValue((f32 *)(vars + 0x24), 1.0f, g_beam_fade_in_rate * (1.0f / 60.0f));
             if (1.0f <= *(f32 *)(vars + 0x24)) {
                 moby_set_state(beam_moby, 1, -1);
             }
         }
         break;
     case 1:
-        ApproachValue((f32 *)(vars + 0x24), 0.0f, D_L07_001B0E9C * (1.0f / 60.0f));
+        ApproachValue((f32 *)(vars + 0x24), 0.0f, g_beam_fade_out_rate * (1.0f / 60.0f));
         if (*(f32 *)(vars + 0x24) <= 0.0f) {
             moby_mark_spawned(beam_moby);
             return;
         }
         break;
     }
-    *(f32 *)(vars + 0x28) = FastAddRotations(*(f32 *)(vars + 0x28), D_L07_001B0EA0 * 0.00029088825f);
+    *(f32 *)(vars + 0x28) = FastAddRotations(*(f32 *)(vars + 0x28), g_beam_spin_rate * 0.00029088825f);
     gfx_add_draw_callback_first(DrawSegmentedBeam, beam_moby);
     if (0.333f < *(f32 *)(vars + 0x24)) {
         beam_get_end_points(beam_moby, start_point, end_point);
@@ -118,17 +118,17 @@ typedef struct {
     s32 groupD0;
 } SibGroups;
 
-extern f32 D_L07_001B173C;
+extern f32 g_hero_reset_offset_z;
 
-extern u8 D_L07_001B1730 __attribute__((sda));
+extern u8 g_hero_l07_reset_position __attribute__((sda));
 
-extern u16 **D_L07_001A9014;
+extern u16 **g_group_l07_id_lists;
 
-extern u8 *D_L07_001B2954;
+extern u8 *g_joint_record_table;
 
-extern u8 *D_L07_001B295C;
+extern u8 *g_matrix_l07_record_table;
 
-extern s32 D_L07_001B1E90;
+extern s32 g_ship_phase_state;
 
 extern void hero_reset_position_and_direction(void *obj, void *pos, s32 a2, s32 a3);
 
@@ -145,32 +145,32 @@ void boss_enter_second_phase(SibObj *moby)
     u8 *entry;
 
     *(TI128 *)offset = 0;
-    offset[2] = D_L07_001B173C;
+    offset[2] = g_hero_reset_offset_z;
     *(TI128 *)offset_copy = *(TI128 *)offset;
     state = (SibGroups *)moby->state;
-    hero_reset_position_and_direction(&D_L07_001B1730, offset_copy, 0, 1);
+    hero_reset_position_and_direction(&g_hero_l07_reset_position, offset_copy, 0, 1);
     moby->flags34 |= 2;
     moby->f98 = 0;
-    for (id_list = D_L07_001A9014[state->groupD0];
-         id_list != 0 && ((s16)id_list[-1] >= 0 || id_list == D_L07_001A9014[state->groupD0]) &&
-         (entry = D_L07_001B2954 + ((*id_list & 0x7FFF) << 5)) != 0;
+    for (id_list = g_group_l07_id_lists[state->groupD0];
+         id_list != 0 && ((s16)id_list[-1] >= 0 || id_list == g_group_l07_id_lists[state->groupD0]) &&
+         (entry = g_joint_record_table + ((*id_list & 0x7FFF) << 5)) != 0;
          id_list++) {
         entry[0x1E] &= 0xFB;
     }
-    for (id_list = D_L07_001A9014[state->groupCC];
-         id_list != 0 && ((s16)id_list[-1] >= 0 || id_list == D_L07_001A9014[state->groupCC]) &&
-         (entry = D_L07_001B2954 + ((*id_list & 0x7FFF) << 5)) != 0;
+    for (id_list = g_group_l07_id_lists[state->groupCC];
+         id_list != 0 && ((s16)id_list[-1] >= 0 || id_list == g_group_l07_id_lists[state->groupCC]) &&
+         (entry = g_joint_record_table + ((*id_list & 0x7FFF) << 5)) != 0;
          id_list++) {
         entry[0x1E] |= 4;
     }
-    for (id_list_b = D_L07_001A9014[state->groupCC];
-         id_list_b != 0 && ((s16)id_list_b[-1] >= 0 || id_list_b == D_L07_001A9014[state->groupCC]) &&
-         (entry = D_L07_001B295C + ((*id_list_b & 0x7FFF) << 6)) != 0;
+    for (id_list_b = g_group_l07_id_lists[state->groupCC];
+         id_list_b != 0 && ((s16)id_list_b[-1] >= 0 || id_list_b == g_group_l07_id_lists[state->groupCC]) &&
+         (entry = g_matrix_l07_record_table + ((*id_list_b & 0x7FFF) << 6)) != 0;
          id_list_b++) {
         *(f32 *)(entry + 0x38) -= 100.0f;
         gfx_setup_scale_record(*id_list_b & 0x7FFF, 1);
     }
-    D_L07_001B1E90 = 2;
+    g_ship_phase_state = 2;
 }
 
 
@@ -186,17 +186,17 @@ void boss_setup_screen_effect(u8 *moby)
 {
     EffectState *vars = *(EffectState **)(moby + 0x68);
 
-    follow_camera_set_distance(0, D_L07_001B10B8, 0.003f);
-    follow_camera_set_height(D_L07_001B10BC, 0.003f);
+    follow_camera_set_distance(0, g_boss_cam_distance, 0.003f);
+    follow_camera_set_height(g_boss_cam_height, 0.003f);
     if (*(u8 *)(moby + 0x95) != 0) {
         if (vars->effect == 0)
             vars->effect = (Effect *)cam_alloc_override_slot(5);
         {
-            f32 x = D_L07_001B10B8;
-            f32 y = D_L07_001B10BC;
+            f32 x = g_boss_cam_distance;
+            f32 y = g_boss_cam_height;
             u32 color;
             vars->effect->x = x;
-            color = D_L07_001B10C0;
+            color = g_boss_screen_color;
             vars->effect->y = y;
             vars->effect->color = color;
         }
@@ -218,15 +218,15 @@ extern f32 func_2E5360(f32 a, f32 b);
 extern void func_3144F0(void *a0, void *a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6);
 
 /* The two level floats the scaling uses; the pointers are reached absolutely. */
-extern f32 D_L07_001B17D4 __attribute__((sda));
+extern f32 g_aim_yaw_turn_accel __attribute__((sda));
 
-extern f32 D_L07_001B17D8 __attribute__((sda));
+extern f32 g_aim_yaw_max_turn_speed __attribute__((sda));
 
-extern u8 *D_L07_001B9250 __attribute__((nosda));
+extern u8 *g_world_info __attribute__((nosda));
 
-extern u8 *D_L07_001ADAAC MACRO_ADDR;
+extern u8 *g_snowfall_target_moby MACRO_ADDR;
 
-extern u8 D_L07_001B31A9;
+extern u8 g_aim_yaw_init_flag;
 
 /* Steers the object's two angles: the yaw toward the argument, the pitch from the shared
    record, and the two scaled fields of the state record. */
@@ -245,11 +245,11 @@ void moby_steer_aim_yaw(u8 *moby)
     f32 turn_accel;
     f32 pi;
 
-    world_info = D_L07_001B9250;
+    world_info = g_world_info;
     if (*(s16 *)(world_info + 0x86) != 0) {
         return;
     }
-    target_obj = D_L07_001ADAAC;
+    target_obj = g_snowfall_target_moby;
     if (target_obj == 0) {
         return;
     }
@@ -261,9 +261,9 @@ void moby_steer_aim_yaw(u8 *moby)
     record = owner + 0x1C0;
     dir_angle = func_2E49C8(dir_xy[0], dir_xy[1]);
     aim_angle = func_2E5360(target_yaw, dir_angle);
-    turn_accel = D_L07_001B17D4 * 0.0000048481375f;
-    max_turn_speed = D_L07_001B17D8 * 0.000290888245f;
-    if (D_L07_001B31A9 == 0) {
+    turn_accel = g_aim_yaw_turn_accel * 0.0000048481375f;
+    max_turn_speed = g_aim_yaw_max_turn_speed * 0.000290888245f;
+    if (g_aim_yaw_init_flag == 0) {
         aim_angle = func_2E5318(aim_angle, pi);
     }
     func_3144F0(&aim_angle, vars + 0x1A8, 0.0f, turn_accel, turn_accel, max_turn_speed, 0);
@@ -272,7 +272,7 @@ void moby_steer_aim_yaw(u8 *moby)
 }
 
 extern u8 g_hero_state[];
-extern u32 D_L07_001B1E08 MACRO_ADDR;
+extern u32 g_frame_l07_counter MACRO_ADDR;
 extern int coll_apply_push_to_object(u8 *a, u8 *b, u8 *c, u8 *d, u8 *e, u8 *f);
 extern void func_002A0F48(u8 *a);
 extern f32 fast_vec_dist(u8 *a, u8 *b);
@@ -302,10 +302,10 @@ void swingshot_nodes_update_attached(u8 *moby)
                 continue;
             }
         }
-        if ((D_L07_001B1E08 & 7) == frame_slot && *(s16 *)(part + 0xAA) == MOBY_CLASS_SWINGSHOT_NODE) {
+        if ((g_frame_l07_counter & 7) == frame_slot && *(s16 *)(part + 0xAA) == MOBY_CLASS_SWINGSHOT_NODE) {
             u8 *hero_b = g_hero_state;
             if (*(s32 *)(hero_b + 0x229C) != 13) {
-                if (D_L07_001ADAAC == moby)
+                if (g_snowfall_target_moby == moby)
                     *(u16 *)(part + 0x34) &= 0xEFFF;
                 else
                     *(u16 *)(part + 0x34) |= 0x1000;
@@ -314,10 +314,10 @@ void swingshot_nodes_update_attached(u8 *moby)
     }
 }
 
-extern f32 D_L07_001B0FD0 __attribute__((sda));
+extern f32 g_bomb_scale __attribute__((sda));
 extern char g_hero_position[];
-extern char D_L07_001B9200[];
-extern u8 *D_L07_001C36C0[];
+extern char g_hero_position_block[];
+extern u8 *g_hit_object_list[];
 extern int coll_process_hit(void *, float, int, char *, void *);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
@@ -343,12 +343,12 @@ void homing_bomb_update(u8 *moby)
         homing_bomb_tick_fuse(moby);
     switch (moby[0x20]) {
     case 2:
-        *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * D_L07_001B0FD0;
+        *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * g_bomb_scale;
         homing_bomb_move_to_target(moby, (float *)g_hero_position);
         part_spawn_falling_puff(moby);
         hit_count = coll_process_hit(moby + 0x10, 0.333f, 0, (char *)moby, 0);
         if (hit_count > 0) {
-            hit_cursor = (u8 *)D_L07_001C36C0;
+            hit_cursor = (u8 *)g_hit_object_list;
             for (remaining = hit_count; remaining != 0; remaining--, hit_cursor += 4) {
                 u8 *other = *(u8 **)hit_cursor;
                 if (other == moby)
@@ -363,10 +363,10 @@ void homing_bomb_update(u8 *moby)
         pos = (char *)moby + 0x10;
         coll_sweep_from_object((char *)moby, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
         coll_sweep_from_object((char *)moby, pos, 1, 4.0f, (f32)vars[0x34], 1.0f, 0, 1, 0);
-        FastVecSub(dir, D_L07_001B9200, pos);
+        FastVecSub(dir, g_hero_position_block, pos);
         vec_scale_to_length(dir, dir, 1.0f);
         part_spawn_blast_effect_moby((char *)moby, pos, (char *)dir, 0.0f);
-        tuning_base = D_L07_001B9200 - 0x140;
+        tuning_base = g_hero_position_block - 0x140;
         *(f32 *)(tuning_base + 0x180) = 0.1f;
         *(s32 *)(tuning_base + 0x188) = 0x5A;
         *(f32 *)(tuning_base + 0x160) = 0.2f;

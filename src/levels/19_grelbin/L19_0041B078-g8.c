@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int g_active_yeti_count __attribute__((sda));
 extern int g_max_active_yetis __attribute__((sda));
 extern char *g_moby_l19_array __attribute__((sda));
-extern void *D_L19_001FB5A0[];
+extern void *g_group_ptr_table[];
 extern int moby_is_in_selected_zone(void *);
 extern int yeti_init_stats(void *);
 extern void moby_mark_spawned(void *);
@@ -67,7 +67,7 @@ void yeti_update(char *obj)
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
     int ai_mode, path_result;
-    if (!moby_is_in_selected_zone(obj+0x10) || D_0018C0B4==111) return;
+    if (!moby_is_in_selected_zone(obj+0x10) || g_game_mode==111) return;
     data=*(char **)(obj+0x68);
     if (yeti_init_stats(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
@@ -76,7 +76,7 @@ void yeti_update(char *obj)
     case 0:
         if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
-                if(I(data,0x250)==255 || !D_L19_001FB5A0[I(data,0x250)]) {
+                if(I(data,0x250)==255 || !g_group_ptr_table[I(data,0x250)]) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
                 } else if(!moby_count_group_not_in_state(I(data,0x250),-1)) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;

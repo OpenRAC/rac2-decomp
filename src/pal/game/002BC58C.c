@@ -4,7 +4,7 @@
 extern float IntToFloat(int a);
 extern void FastVecAdd(char *p, char *q, char *r);
 extern int FastTweenColor(int, int, float);
-extern unsigned char *D_001F2560;
+extern unsigned char *g_color_blend_textures;
 
 /* blends a sub-object into a position, adds a float field, stores an interpolated value in the
    word at +4 and scales the frame count into a byte table at +2 */
@@ -28,7 +28,7 @@ void func_PAL_002BC58C(char *a0)
     if (*(short *)(s0 + 0xA) < 5) {
         *(int *)(s0 + 4) = (r & 0xFFFFFF) | (((int)(*(short *)(s0 + 0xA) * (r >> 24))) / 5 << 24);
     }
-    *(unsigned char *)(s0 + 2) = D_001F2560[((*(int *)(s1 + 0x18) - *(short *)(s0 + 0xA)) * 10) / *(int *)(s1 + 0x18)];
+    *(unsigned char *)(s0 + 2) = g_color_blend_textures[((*(int *)(s1 + 0x18) - *(short *)(s0 + 0xA)) * 10) / *(int *)(s1 + 0x18)];
 }
 
 

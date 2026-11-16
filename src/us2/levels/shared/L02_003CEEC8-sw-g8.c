@@ -7,12 +7,12 @@ typedef int Quad __attribute__((mode(TI)));
 #define S(p, o) (*(short *)((p) + (o)))
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
-extern char D_0018A0E0[], g_hero_position[];
+extern char g_hero_state_block[], g_hero_position[];
 extern int g_hero_moby __attribute__((nosda));
 extern int g_frame_l02_counter;
-extern float D_L02_001B00F8 __attribute__((sda));
+extern float g_chickenbot_wait_min __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
-extern volatile float D_L02_001B00FC MACRO_ADDR;
+extern volatile float g_chickenbot_wait_max MACRO_ADDR;
 extern void enemy_init(void *);
 extern void moby_l02_explode_and_remove(void *);
 extern void moby_reset_turn_place(void *);
@@ -27,7 +27,7 @@ extern int FastDecTimer(void *);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int moby_run_entry_hook_by_mode(void *, void *, int);
 extern int moby_count_group_side_from_object(void *, int, int);
-extern int func_US2_002AF9C8(void *, float);
+extern int math_is_value_within_step_us2(void *, float);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -47,7 +47,7 @@ extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, 
 extern int moby_check_target_point_from_offset(char *, void *);
 extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 
-void func_US2_L02_003CEEC8(char *o)
+void chickenbot_state_machine_update_us2(char *o)
 {
     char *p = *(char **)(o + 0x68);
     float angle, speed;
@@ -139,7 +139,7 @@ void func_US2_L02_003CEEC8(char *o)
                 if (U8(o, 0x60) & 2)
                     anim_start_blended(o, 0, 0, 20);
             } else if (!S(p, 0x312) &&
-                       (!S(p, 0x338) || FastVecDot(p + 0x300, D_0018A0E0) > 0.8f))
+                       (!S(p, 0x338) || FastVecDot(p + 0x300, g_hero_state_block) > 0.8f))
                 moby_set_state(o, 2, -1);
         }
         break;
@@ -200,8 +200,8 @@ void func_US2_L02_003CEEC8(char *o)
             if (U8(o, 0x43) != 6)
                 anim_start_blended(o, 6, 0, 10);
             {
-                float upper = D_L02_001B00FC;
-                F(p, 0x334) = math_random_float_range(D_L02_001B00F8, upper) + 0.5f;
+                float upper = g_chickenbot_wait_max;
+                F(p, 0x334) = math_random_float_range(g_chickenbot_wait_min, upper) + 0.5f;
             }
         }
         if ((moby_run_entry_hook_by_mode(o, p + 0x2E0, 0) & 0x80) ||
@@ -255,7 +255,7 @@ void func_US2_L02_003CEEC8(char *o)
                 anim_start_blended(o, 8, 2, 10);
         }
         moby_start_effect_from_entry(o, F(p, 0x320));
-        if (func_US2_002AF9C8(o, 13))
+        if (math_is_value_within_step_us2(o, 13))
             coll_test_hit_at_bone(o, 1, 0x4000001, 0, 1, 0, 0.75f, U8(p, 0x34), 1);
         if (U8(o, 0x60) & 2)
             moby_set_state(o, 9, -1);

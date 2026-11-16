@@ -36,7 +36,7 @@ typedef struct {
     float fCC;                          /* 0xCC */
 } Ctl_002B52A0;
 
-extern float D_001AA108 __attribute__((sda));
+extern float g_controller_velocity_limit __attribute__((sda));
 
 /* The float argument is the second declared parameter: that order fixes the instruction order of the call setup. */
 extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
@@ -84,10 +84,10 @@ void moby_update_controller_velocity(Self_002B52A0 *self, Ctl_002B52A0 *ctl, voi
             if (ctl->w80 != 0) {
                 x = FastAddRotations(mat_fast_helper_a(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
                 h = fast_subtract_rotations(h, x);
-                if (D_001AA108 < h)
-                    h = D_001AA108;
-                else if (h < -D_001AA108)
-                    h = -D_001AA108;
+                if (g_controller_velocity_limit < h)
+                    h = g_controller_velocity_limit;
+                else if (h < -g_controller_velocity_limit)
+                    h = -g_controller_velocity_limit;
                 h = FastAddRotations(h, x);
             }
             local[0] = math_fast_sin_or_cos_a(h) * scale;

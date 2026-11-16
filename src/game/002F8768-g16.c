@@ -10,7 +10,7 @@ extern Reset2F8768 g_vendor_menu_state;
 extern Mode2F8768 g_music_state;
 extern char g_hero_state[];
 extern int g_current_game_mode __attribute__((sda));
-extern Vec4_2F8768 D_001AD200 __attribute__((sda));
+extern Vec4_2F8768 g_shop_camera_vec __attribute__((sda));
 extern void set_animation_parameter(int, int);
 extern void hud_tick_countdown(void);
 extern unsigned int stub_empty_8(int, int);
@@ -44,7 +44,7 @@ void shop_reset_menu_camera(void)
     g_hero_state[0x22B5] = 0;
     stub_empty_4();
     if (g_vendor_menu_state.f60 == 0) {
-        qcopy(&in, &D_001AD200);
+        qcopy(&in, &g_shop_camera_vec);
         matrix_mul_vec3(&out, &in, g_vendor_menu_state.obj + 0xC0);
         FastVecAdd(&out, &out, g_vendor_menu_state.obj + 0x10);
         dir[0] = 0;

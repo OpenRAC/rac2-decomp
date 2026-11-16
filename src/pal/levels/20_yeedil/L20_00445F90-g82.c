@@ -10,21 +10,21 @@ extern void yeedil_boss_disable_hazards(char *,int);
 extern void moby_set_state(char *,int,int);
 extern void func_PAL_002A7E68(char *,int,int,int);
 extern char *part_find_owned_effect_slot(char *,int,int);
-extern float func_PAL_002AA108(char *,char *);
+extern float moby_update_aim_target_strength_pal(char *,char *);
 extern f32 ApproachValue(char *,float,float);
 extern int req_push_queue(char *,int);
 extern s32 req_launch_queued(char *);
-extern void func_PAL_002A7650(char *,int,int);
+extern void SetDeathBits_pal(char *,int,int);
 extern void game_set_stored_value_pair(void (*)(int),char *);
 extern void moby_start_screen_effect_state(int);
 extern void group_activate_waiting_members(int,float);
 extern int weapon_select_aim_target(char *,int,float,float,int,int);
 extern void euler_rotation_basis(char *,char *);
-extern const float D_L20_001B2030 __attribute__((sda));
-extern const float D_L20_001B2034 __attribute__((sda));
-extern char D_L20_001C01C0[];
+extern const float g_yeedil_boss_scale __attribute__((sda));
+extern const float g_yeedil_boss_init_value __attribute__((sda));
+extern char g_request_l20_queue[];
 
-void func_PAL_L20_004476F0(char *obj) {
+void yeedil_boss_init_damage_pal(char *obj) {
  char *st=*(char **)(obj+0x68), *p;
  float f, h;
  if (*(u8 *)(obj+0x20)==0) {
@@ -51,20 +51,20 @@ void func_PAL_L20_004476F0(char *obj) {
   qcopy(st+0x17E0,obj+0x10);
  }
  if (*(u8 *)(obj+0x95)==6) return;
- *(float *)(obj+0x2C)=*(float *)(*(char **)(obj+0x24)+0x24)*D_L20_001B2030;
- *(float *)(st+0x30)=D_L20_001B2034;
+ *(float *)(obj+0x2C)=*(float *)(*(char **)(obj+0x24)+0x24)*g_yeedil_boss_scale;
+ *(float *)(st+0x30)=g_yeedil_boss_init_value;
  p=part_find_owned_effect_slot(obj,0x10000,0);
  if(p && (p=*(char **)(p+0x20))) {
   switch (*(short *)(p+0xAA)) { case 0x5DE: case 0x3A6: case 0xD0F: *(u8 *)(obj+0xA8)=255; }
  }
- h=func_PAL_002AA108(obj,part_find_owned_effect_slot(obj,0x10000,0));
+ h=moby_update_aim_target_strength_pal(obj,part_find_owned_effect_slot(obj,0x10000,0));
  ApproachValue(st+0x20,0.0f,h); *(u8 *)(obj+0xA8)=255;
  f=*(float *)(st+0x20);
  if(f<=0.0f || *(u8 *)(st+0x2E)==2) {
   *(float *)(st+0x20)=0.0f;
-  if(!req_push_queue(D_L20_001C01C0,0xA1)) goto done;
-  if(*(u8 *)(st+0x2E)!=2) func_PAL_002A7650(obj,0,3);
-  req_push_queue(D_L20_001C01C0,0xA0); req_launch_queued(D_L20_001C01C0);
+  if(!req_push_queue(g_request_l20_queue,0xA1)) goto done;
+  if(*(u8 *)(st+0x2E)!=2) SetDeathBits_pal(obj,0,3);
+  req_push_queue(g_request_l20_queue,0xA0); req_launch_queued(g_request_l20_queue);
   moby_set_state(obj,17,6); game_set_stored_value_pair(moby_start_screen_effect_state,obj);
  } else if(f<=*(float *)(st+0x1828)) {
   moby_set_state(obj,15,5); ++*(int *)(st+0x182C);

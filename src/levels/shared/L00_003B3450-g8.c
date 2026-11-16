@@ -34,15 +34,15 @@ char pad22b6[9];
 unsigned char field22bf;
 } HeroView;
 extern HeroView g_hero_state;
-extern float D_L00_001AF8C4 __attribute__((sda));
-extern int D_L00_001AF8DC __attribute__((sda));
-extern int D_L00_001AF8E0 __attribute__((sda));
-extern int D_L00_001AF8EC __attribute__((sda));
-extern unsigned short D_L00_001AF8CC __attribute__((sda));
-extern float D_L00_001AF8E4 __attribute__((sda));
-extern float D_L00_001AF8E8 __attribute__((sda));
-extern float D_L00_001A8F20[4] MACRO_ADDR;
-extern Quad D_L00_001BF230;
+extern float g_orb_gravity __attribute__((sda));
+extern int g_orb_transition_frames __attribute__((sda));
+extern int g_effect_lifetime_frames __attribute__((sda));
+extern int g_active_orb __attribute__((sda));
+extern unsigned short g_orb_duration_frames __attribute__((sda));
+extern float g_orb_hit_radius_max __attribute__((sda));
+extern float g_orb_hit_radius_min __attribute__((sda));
+extern float g_default_vector[4] MACRO_ADDR;
+extern Quad g_collision_position;
 extern void FastVecAdd(void *,void *,void *),gravity_offset_position(void *,void *,void *,float);
 extern float FastAddRotations(float,float),FastVecDot(void *,void *),IntToFloat(int);
 extern int FastDecTimer(short *),math_fast_float_d(int *);
@@ -66,7 +66,7 @@ void glowing_orb_update(UpdateObject *object)
     case 1:
         qcopy(&previous,&object->position);
         FastVecAdd(&object->position,&object->position,&ctx->velocity);
-        gravity_offset_position(&object->position,&ctx->velocity,&ctx->velocity,D_L00_001AF8C4*0.00027777778f);
+        gravity_offset_position(&object->position,&ctx->velocity,&ctx->velocity,g_orb_gravity*0.00027777778f);
         object->rotX=FastAddRotations(object->rotX,ctx->rotC);
         object->rotY=FastAddRotations(object->rotY,ctx->rot10);
         coll_object_with_walls(object);
@@ -75,8 +75,8 @@ void glowing_orb_update(UpdateObject *object)
         if(FastVecDot((char *)&g_hero_state+0x2C0,&ctx->velocity)>0.0f && FastDecTimer(&ctx->timer6)) {
             object->state=2;
             {
-                unsigned short duration = D_L00_001AF8CC;
-                unsigned short transition = *(unsigned short *)&D_L00_001AF8DC;
+                unsigned short duration = g_orb_duration_frames;
+                unsigned short transition = *(unsigned short *)&g_orb_transition_frames;
                 ctx->timer8 = duration;
                 ctx->timerA = transition;
             }
@@ -87,21 +87,21 @@ void glowing_orb_update(UpdateObject *object)
     case 2: {
         float duration;
         fraction=IntToFloat(ctx->timerA);
-        duration=IntToFloat(D_L00_001AF8DC);
+        duration=IntToFloat(g_orb_transition_frames);
         fraction/=duration;
-        lerp_vector(&ctx->velocity,D_L00_001A8F20,&ctx->saved,fraction);
+        lerp_vector(&ctx->velocity,g_default_vector,&ctx->saved,fraction);
         FastVecAdd(&object->position,&object->position,&ctx->velocity);
         object->rotX=FastAddRotations(object->rotX,ctx->rotC);
         object->rotY=FastAddRotations(object->rotY,ctx->rot10);
         UpdateJitterTrails(object);
         ref_L00_003B3450_00(DrawTimedQuadEffects,object);
-        if(coll_test_point(&object->position,0,g_hero_state.field2290,0.25f)) qcopy(&object->position,&D_L00_001BF230);
+        if(coll_test_point(&object->position,0,g_hero_state.field2290,0.25f)) qcopy(&object->position,&g_collision_position);
         if(object->position.f[0]<2.0f || object->position.f[0]>1021.0f || object->position.f[1]<2.0f || object->position.f[1]>1021.0f || object->position.f[2]<2.0f || object->position.f[2]>1021.0f) {
         moby_mark_spawned(object);return;
         }
-        if(FastDecTimer(&ctx->timerA) && !D_L00_001AF8EC) {
-            object->state=3;ctx->timer14=D_L00_001AF8E0;
-            D_L00_001AF8EC=(int)object;part_l00_spawn_spark_ring(object);
+        if(FastDecTimer(&ctx->timerA) && !g_active_orb) {
+            object->state=3;ctx->timer14=g_effect_lifetime_frames;
+            g_active_orb=(int)object;part_l00_spawn_spark_ring(object);
         }
         return;
     }
@@ -113,14 +113,14 @@ void glowing_orb_update(UpdateObject *object)
         ref_L00_003B3450_00(DrawTimedQuadEffects,object);
         math_fast_float_d(&ctx->timer14);
         if(ctx->timer14) {
-            fraction=IntToFloat(ctx->timer14);fraction/=IntToFloat(D_L00_001AF8E0);
-            if(coll_test_point(&object->position,2,g_hero_state.field2290,D_L00_001AF8E8+(D_L00_001AF8E4-D_L00_001AF8E8)*fraction)) qcopy(&object->position,&D_L00_001BF230);
+            fraction=IntToFloat(ctx->timer14);fraction/=IntToFloat(g_effect_lifetime_frames);
+            if(coll_test_point(&object->position,2,g_hero_state.field2290,g_orb_hit_radius_min+(g_orb_hit_radius_max-g_orb_hit_radius_min)*fraction)) qcopy(&object->position,&g_collision_position);
         }
         blast_broadcast_area_message(object);
         if(FastDecTimer(&ctx->timer8)) {
             qzero_nc(&previous);
             SpawnExplosionEffects(object,&previous,&object->position,0.0f,0.0f,5,2,4,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,5,-1,0,0x810001);
-            D_L00_001AF8EC=0;object->state=90;
+            g_active_orb=0;object->state=90;
         }
         return;
     case 90:

@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern u8 *D_L12_001B2E9C __attribute__((sda));
+extern u8 *g_moby_list_start __attribute__((sda));
 
-extern u16 *D_L12_001FB960[];
+extern u16 *g_moby_l12_group_lists[];
 
-extern s32 D_L12_001B09F4 __attribute__((sda));
+extern s32 g_tourist_wait_counter __attribute__((sda));
 
 extern s32 func_31DEF0(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
@@ -20,15 +20,15 @@ extern void func_321940(u8 *arg0, s32 arg1, f32 x, f32 y);
 
 extern void func_3239B8(void *arg0, void *arg1, s32 arg2, f32 x, f32 y);
 
-extern s32 D_L12_001B1838 __attribute__((sda));
+extern s32 g_slot_timer_threshold __attribute__((sda));
 
-extern s32 D_L12_001B183C __attribute__((sda));
+extern s32 g_guard_cooldown_min __attribute__((sda));
 
-extern s32 D_L12_001B1840 __attribute__((sda));
+extern s32 g_guard_cooldown_max __attribute__((sda));
 
-extern u16 D_L12_001B1834 __attribute__((sda));
+extern u16 g_slot_timer_reset_value __attribute__((sda));
 
-extern f32 D_L12_001B1858 __attribute__((sda));
+extern f32 g_slot_timer_effect_param __attribute__((sda));
 
 extern s32 func_2F15C8(void *arg0);
 
@@ -38,13 +38,13 @@ extern void func_3296A8(void *arg0, void *arg1, s32 arg2, f32 x, s32 arg3);
 
 /* Walks the measured table of the given index down to its terminator. */
 s32 space_tourist_all_idle(s32 list_index) {
-    u16 *list_cursor = D_L12_001FB960[list_index];
+    u16 *list_cursor = g_moby_l12_group_lists[list_index];
     u16 packed_id;
     u8 *moby_base;
 
     if (list_cursor == 0)
         return 1;
-    moby_base = D_L12_001B2E9C;
+    moby_base = g_moby_list_start;
     do {
         u8 *moby_record;
         packed_id = *list_cursor;
@@ -73,7 +73,7 @@ void sub_object_start_move(u8 *object, u8 *source_obj, u8 *dims, s32 first_entry
     func_321940(object + 0xF8, 0, *(f32 *)(dims + 8), 0.20943954f);
     if (first_entry != 0) {
         old_flags = *(u16 *)(object + 0x34);
-        D_L12_001B09F4 = D_L12_001B09F4 + 1;
+        g_tourist_wait_counter = g_tourist_wait_counter + 1;
         *(s32 *)(object + 0x98) = 0;
         *(u16 *)(object + 0x34) = (old_flags | 0x41) & 0xEFFF;
         func_3239B8(object, object + 0x10, -1, 1.0f, 0.0f);
@@ -88,27 +88,27 @@ void slot_timers_update(u8 *object) {
 
     if (*(u8 *)(state + 0x2EA) != 0) {
         *(u8 *)(state + 0x2EA) = 0;
-        if (*(s16 *)(state + 0x2E0) < D_L12_001B1838)
-            *(u16 *)(state + 0x2E0) = func_31E2E0(D_L12_001B183C, D_L12_001B1840);
+        if (*(s16 *)(state + 0x2E0) < g_slot_timer_threshold)
+            *(u16 *)(state + 0x2E0) = func_31E2E0(g_guard_cooldown_min, g_guard_cooldown_max);
     }
     if (func_2F15C8(state + 0x2E0) == 0)
-        *(u16 *)(state + 0x2E8) = D_L12_001B1834;
+        *(u16 *)(state + 0x2E8) = g_slot_timer_reset_value;
     func_2F15C8(state + 0x2E2);
     func_2F15C8(state + 0x2E6);
     func_2F15C8(state + 0x2E8);
     age = *(u16 *)(object + 0x96);
     if (age <= 0xFFFE)
         *(u16 *)(object + 0x96) = age + 1;
-    func_3296A8(*(void **)(state + 0x2F8), state + 0x420, 3, D_L12_001B1858, 1);
+    func_3296A8(*(void **)(state + 0x2F8), state + 0x420, 3, g_slot_timer_effect_param, 1);
 }
 
-extern u8 *D_L12_001B090C __attribute__((sda));
+extern u8 *g_tracked_object_ptr __attribute__((sda));
 
-extern u8 *D_L12_001B1360 __attribute__((sda));
+extern u8 *g_second_tracked_object __attribute__((sda));
 
 /* Whether the tracked object is in a state that still counts as open. */
 s32 tracked_object_is_open(void) {
-    u8 *object = D_L12_001B090C;
+    u8 *object = g_tracked_object_ptr;
     s32 result = 1;
 
     if (object == 0) {
@@ -123,7 +123,7 @@ s32 tracked_object_is_open(void) {
 
 /* The same test, with one more state in the closed set. */
 s32 second_tracked_object_is_open(void) {
-    u8 *object = D_L12_001B1360;
+    u8 *object = g_second_tracked_object;
     s32 result = 1;
 
     if (object == 0) {
@@ -150,10 +150,10 @@ extern void squirrel_alert_group(void *);
 extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern int point_in_path_xy(void *,void *,int,float);
 extern void value_set_and_smooth(void *,void *,int,int,float);
-extern u8 D_L12_001B9E00[];
+extern u8 g_hero_prev_position[];
 extern u8 *g_hero_moby NOT_SDA;
-extern u8 *D_L12_001FEAC0[];
-extern float D_L12_001B0A40 __attribute__((sda));
+extern u8 *g_path_zone_table[];
+extern float g_guard_zone_range __attribute__((sda));
 
 /* Sets up the object's AI parameters on its first update, then refreshes its target state and
    clears it when the target leaves the object's zone. */
@@ -192,18 +192,18 @@ void guard_creature_update(u8 *creature) {
             *(u16 *)(creature+0x34)=(*(u16 *)(creature+0x34)|0x41)&0xEFFF;
         }
     }
-    if(creature[0x31] && fast_vec_dist(creature+0x10,D_L12_001B9E00)<24) {moby_update_ground_check(creature);creature[0x6F]=22;}
+    if(creature[0x31] && fast_vec_dist(creature+0x10,g_hero_prev_position)<24) {moby_update_ground_check(creature);creature[0x6F]=22;}
     if(moby_apply_damage_to_object(creature,vars+0x60,0)) squirrel_alert_group(creature);
     *(short *)(vars+0x364)=weapon_select_aim_target(creature,-1,0,0,*(float *)(vars+0x36C),3);
     if(*(u8 **)(vars+0x120)) *(u8 **)(vars+0x368)=*(u8 **)(vars+0x120); else *(u8 **)(vars+0x368)=g_hero_moby;
     if(*(short *)(vars+0x364)==1) {
-        float zone_range=D_L12_001B0A40;
+        float zone_range=g_guard_zone_range;
         if(*(int *)(vars+0x130)!=-1) {
-            u8 *zone_info=D_L12_001FEAC0[*(int *)(vars+0x130)];
+            u8 *zone_info=g_path_zone_table[*(int *)(vars+0x130)];
             if(!point_in_path_xy(*(u8 **)(vars+0x120)+0x10,zone_info+0x10,*(int *)zone_info,zone_range)) *(short *)(vars+0x364)=0;
         }
     }
-    value_set_and_smooth(creature,vars+0x3C0,1,1,D_L12_001B0A40);
+    value_set_and_smooth(creature,vars+0x3C0,1,1,g_guard_zone_range);
 }
 
 /* The subtitle history (src/game/00289178.c): per record, its play count, the time it was last
@@ -220,9 +220,9 @@ extern int subtitle_request_voice_line(int,int);
 extern u8 g_hero_position[];
 extern SubtitleHistory g_subtitle_history[];
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern u32 D_001A7390;
+extern u32 g_frame_counter;
 extern int g_current_map_index[] __attribute__((sda));
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int IsPointInCuboid(void *,int);
 extern int math_fast_float_d(void *);
 
@@ -243,7 +243,7 @@ void UpdateTodanoSubtitleTriggers(u8 *creature) {
             subtitle_request_voice_line(0xA22, 121);
         if (IsPointInCuboid(g_hero_position, *(int *)(vars + 4)) && !g_item_owned_flags[0x33]) {
             if (g_subtitle_history[92].count) {
-                u32 now_time = D_001A7390;
+                u32 now_time = g_frame_counter;
                 u32 last_time = g_subtitle_history[92].time;
 
                 if (now_time - last_time > 0x438 || last_time == 0)
@@ -253,13 +253,13 @@ void UpdateTodanoSubtitleTriggers(u8 *creature) {
             } else {
                 if (g_subtitle_history[92].count < 65535)
                     g_subtitle_history[92].count++;
-                if (g_subtitle_history[92].time < D_001A7390)
-                    g_subtitle_history[92].time = D_001A7390;
+                if (g_subtitle_history[92].time < g_frame_counter)
+                    g_subtitle_history[92].time = g_frame_counter;
                 g_subtitle_history[92].levels = (g_subtitle_history[92].levels | (1u << g_current_map_index[0])) | 0x80000000u;
             }
         }
         if (IsPointInCuboid(g_hero_position, *(int *)(vars + 8))) {
-            u8 *watched = D_L12_001B2E9C + (*(int *)(vars + 0xC) << 8);
+            u8 *watched = g_moby_list_start + (*(int *)(vars + 0xC) << 8);
 
             if (watched && *(s16 *)(watched + 0xAA) == 0xFB8 /* moby class 4024 */ && watched[0x20] != 254 && watched[0x20] != 253) {
                 if (*(int *)(vars + 0x10) < 0)
@@ -272,7 +272,7 @@ void UpdateTodanoSubtitleTriggers(u8 *creature) {
                 }
             }
         }
-        if (g_item_owned_flags[7] && D_0018C0B4 != 0x6F) {
+        if (g_item_owned_flags[7] && g_game_mode != 0x6F) {
             u32 seen_before = g_subtitle_history[127].levels & (1 << g_current_map_index[0]);
 
             if (!seen_before)

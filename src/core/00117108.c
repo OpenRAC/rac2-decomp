@@ -32,9 +32,9 @@ extern void malloc_lock_acquire(struct _reent *);
 extern void malloc_lock_release(struct _reent *);
 extern void *sbrk_reentrant(struct _reent *ptr, s32 delta);
 
-extern u32 D_001341E8[]; /* __malloc_av_ bins */
-extern u32 D_00134600[]; /* sbrk_base */
-extern u32 D_00134618[]; /* sbrked_mem */
+extern u32 g_malloc_arena[]; /* __malloc_av_ bins */
+extern u32 g_malloc_sbrk_base[]; /* sbrk_base */
+extern u32 g_malloc_sbrked_mem[]; /* sbrked_mem */
 
 extern s64 __udivdi3(s64, s64);
 extern s64 __muldi3(s64, s64);

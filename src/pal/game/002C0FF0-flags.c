@@ -26,16 +26,16 @@ typedef struct SplitParticle {
     SplitMotion pv;
 } SplitParticle;
 typedef struct { SplitVector v; void *f10; s32 f14; s32 f18; f32 f1C; s32 f20; char pad[0xC]; } SplitCollision;
-extern char *func_PAL_002C0FF0(void *, void *, int, void *, int, int);
+extern char *part_spawn_scaled_smoke_pal(void *, void *, int, void *, int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_clear_128(void *);
-extern float D_001BAFC0[];
+extern float g_coll_hit_normal[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_001F2570;
+extern unsigned char *g_part_tex_smoke_table;
 void part_kill(void *);
 int FastDecTimer(short *);
 extern float IntToFloat(int v);
@@ -59,7 +59,7 @@ extern void vec_scale_to_length(void *, void *, float);
 /* func_PAL_002C0FF0 uses the quadword-copy profile in 002C02F0-qcopy.c. */
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
-void func_PAL_002C11C0(SplitParticle *p) {
+void part_update_splitting_spark_pal(SplitParticle *p) {
     SplitVector v0u;
     SplitVector v1u;
     SplitCollision c;
@@ -92,7 +92,7 @@ void func_PAL_002C11C0(SplitParticle *p) {
         v0u.f[0] = v0u.f[0] + math_random_float_range(-p->pv.x * sc, p->pv.x * sc);
         v0u.f[1] = v0u.f[1] + math_random_float_range(-pv->y * sc, pv->y * sc);
         v0u.f[2] = v0u.f[2] + math_random_float_range(-pv->z * sc, zero);
-        r = (SplitParticle *)func_PAL_002C0FF0(v1u.f, v0u.f, (pv->f18 & 0x10) | 0x88, pv->f1C, (u8)pv->pad19[0], 128);
+        r = (SplitParticle *)part_spawn_scaled_smoke_pal(v1u.f, v0u.f, (pv->f18 & 0x10) | 0x88, pv->f1C, (u8)pv->pad19[0], 128);
         if (r != 0) {
             r->h0A = 2;
             r->f0C = p->f0C;
@@ -105,7 +105,7 @@ void func_PAL_002C11C0(SplitParticle *p) {
         p->posv.f[1] = p->posv.f[1] + math_random_float_range(nsp, sp);
         p->posv.f[2] = p->posv.f[2] + math_random_float_range(nsp, sp);
     }
-    tab = D_001F2570;
+    tab = g_part_tex_smoke_table;
     { int index = p->b02 - tab[0];
     p->b02 = tab[(p->h0A + pv->f16 + index) & 7]; }
     FastVecAdd((char *)v0u.f, (char *)p->posv.f, (char *)pv);
@@ -132,11 +132,11 @@ void func_PAL_002C11C0(SplitParticle *p) {
         if (!(pv->f18 & 0x10)) hit = CollLine(v1u.f, v0u.f, 0, pv->f1C, &c) != 0;
     }
     if (hit) {
-        vec_scale_to_length(v2, D_001BAFC0, 1.0f);
-        vec_fast_normalize(pv, pv, D_001BAFC0);
+        vec_scale_to_length(v2, g_coll_hit_normal, 1.0f);
+        vec_fast_normalize(pv, pv, g_coll_hit_normal);
         FastVecScale((char *)pv, (char *)pv, 0.02f);
-        vec_scale_to_length(v2, D_001BAFC0, 0.055f);
-        FastVecAdd((char *)p->posv.f, (char *)(D_001BAFC0 - 8), (char *)v2);
+        vec_scale_to_length(v2, g_coll_hit_normal, 0.055f);
+        FastVecAdd((char *)p->posv.f, (char *)(g_coll_hit_normal - 8), (char *)v2);
         if (p->f0C < 200000.0f && (pv->f18 & 8) == 0) {
             p->f0C = p->f0C + p->f0C;
         }

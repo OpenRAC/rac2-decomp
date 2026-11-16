@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_L00_00416638(void *);
+extern void tracked_target_offsets_update_pal(void *);
 extern void ref_L00_00410D20_00(void (*)(void *), void *);
-extern void func_PAL_L00_004169B0(void *);
+extern void tumbling_pieces_update_pal(void *);
 extern void set_moby_color(void *, int, int, int);
 extern int FastTweenColor(int, int, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -107,7 +107,7 @@ void func_PAL_L01_004186E8(char *m) {
         } else
             --*(int *)(s + 0x24);
     }
-    func_PAL_L00_004169B0(m);
-    ref_L00_00410D20_00(func_PAL_L00_00416638, m);
+    tumbling_pieces_update_pal(m);
+    ref_L00_00410D20_00(tracked_target_offsets_update_pal, m);
 }
 

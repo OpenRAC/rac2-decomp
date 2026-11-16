@@ -3,8 +3,8 @@
 typedef int Quad __attribute__((mode(TI)));
 
 extern char g_hero_position[];
-extern int D_L00_001A8FF0 __attribute__((sda));
-extern char D_0018A0E0[];
+extern int g_hero_locked_flag __attribute__((sda));
+extern char g_hero_state_block[];
 extern char *g_hero_moby;
 extern void vec_scale_to_length(char *, void *, float);
 extern void FastVecAdd(char *, char *, char *);
@@ -18,13 +18,13 @@ void BuildOffsetVectorPair(char *first, char *second, float x, float y, int mode
     float r;
 
     if (mode) {
-        if (D_L00_001A8FF0)
-            vec_scale_to_length(buffer, D_0018A0E0, -y);
+        if (g_hero_locked_flag)
+            vec_scale_to_length(buffer, g_hero_state_block, -y);
         else
             vec_scale_to_length(buffer, g_hero_moby + 0xe0, y);
         p = (char *)&g_hero_position;
         FastVecAdd(second, p, buffer);
-        if (D_L00_001A8FF0)
+        if (g_hero_locked_flag)
             vec_scale_to_length(buffer, p + 0x240, -x);
         else
             vec_scale_to_length(buffer, *(char **)(p + 0x2210) + 0xe0, x);

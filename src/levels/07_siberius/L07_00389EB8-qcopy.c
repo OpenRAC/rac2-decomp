@@ -12,7 +12,7 @@ extern int math_fast_float_d(char *);
 
 extern void value_set_and_smooth(char *, char *, int, int, float);
 
-extern int D_L07_001C9780;
+extern int g_cutscene_l07_active_flag;
 
 extern void RideMobyBelow(char *);
 
@@ -48,7 +48,7 @@ void entity_finish_update(char *moby)
     dst = vars + 0x2E0;
     FastVecSub(&oldPos, src, dst);
     *(TI128 *)dst = *(TI128 *)src;
-    if (D_L07_001C9780 != 0)
+    if (g_cutscene_l07_active_flag != 0)
         RideMobyBelow(moby);
     if (*(unsigned char *)(moby + 0x95) == 2) {
         smoothedAngle = FastAddRotations(*(float *)(vars + 0x2DC), 0.20943954586982727f);

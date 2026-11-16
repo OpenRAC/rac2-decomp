@@ -6,7 +6,7 @@ extern char *CreateMoby(int);
 extern f32 math_random_angle(void);
 extern void set_identity_rotation_rows(void *);
 extern void part_init_effect_slots(void *);
-extern int D_L22_001AF37C;
+extern int g_linked_object_spawn_counter;
 
 /* Creates a moby of class 3642 linked to the owner at the given position, with a size scale; a nonzero flag gives it a staggered timer. */
 char *SpawnLinkedScaledObject(char *owner, TI128 *pos, int staggered, f32 scale) {
@@ -15,8 +15,8 @@ char *SpawnLinkedScaledObject(char *owner, TI128 *pos, int staggered, f32 scale)
         u8 *ctl = *(u8 **)(created + 0x68);
         *(short *)(ctl + 0x2A) = staggered;
         if ((short)staggered != 0) {
-            int counter = D_L22_001AF37C;
-            D_L22_001AF37C = counter + 1;
+            int counter = g_linked_object_spawn_counter;
+            g_linked_object_spawn_counter = counter + 1;
             *(u16 *)(created + 0x96) = (counter + 2) % 31;
         }
         /* This order also preserves the retail flag-store scheduling. */

@@ -2,8 +2,8 @@
 #include "names.h"
 
 typedef struct { char prefix[20]; int *data; } SplashState;
-extern SplashState D_001BAEC0;
-extern int D_001A72DC[] __attribute__((sda));
+extern SplashState g_loader_memory;
+extern int g_vram_display_address[] __attribute__((sda));
 extern int fast_decompress(int, void *);
 extern void FlushCache(int);
 extern void gfx_reset_packet_buffer(void);
@@ -23,12 +23,12 @@ void ShowSplashImage(int arg)
     int *data;
     int count;
 
-    fast_decompress(arg, D_001BAEC0.data);
+    fast_decompress(arg, g_loader_memory.data);
     FlushCache(0);
     for (count = 0x80; count >= 0; count -= 2) {
         gfx_reset_packet_buffer();
-        data = D_001BAEC0.data;
-        tex_upload_blocks_return_setup(data + 4, D_001A72DC[0], data[0], data[1]);
+        data = g_loader_memory.data;
+        tex_upload_blocks_return_setup(data + 4, g_vram_display_address[0], data[0], data[1]);
         gfx_write_clear_color_packets();
         gfx_set_clear_color_packet(0, 0, 0, count);
         PutDrawBufferSmall();

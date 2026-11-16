@@ -6,7 +6,7 @@ extern int moby_l01_turn_toward_target(char *, float *);
 extern float moby_get_anim_value(char *);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
-extern float D_L11_002B6B60[];
+extern float g_walk_dust_scale_curve[];
 extern void FastVecScale(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern float mat_fast_helper_a(float, float);
@@ -36,7 +36,7 @@ void joba_walk_and_scatter_dust(char *obj, float *target)
     index = FloatToInt(frame);
     next = index + 1;
     frameStart = IntToFloat(index);
-    FastVecScale((char *)offset, obj + 0xC0, D_L11_002B6B60[index] + (D_L11_002B6B60[next] - D_L11_002B6B60[index]) * (frame - frameStart));
+    FastVecScale((char *)offset, obj + 0xC0, g_walk_dust_scale_curve[index] + (g_walk_dust_scale_curve[next] - g_walk_dust_scale_curve[index]) * (frame - frameStart));
     FastVecAdd(obj + 0x10, (char *)offset, obj + 0x10);
     moby_step_at_own_position_factor(obj, mat_fast_helper_a(target[0] - *(float *)(obj + 0x10), target[1] - *(float *)(obj + 0x14)));
     if (index == 5 || index == 15) {

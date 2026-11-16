@@ -6,18 +6,18 @@
    is taken before the first vector call: a frame address first used after a call is
    anchored behind it. */
 
-extern int D_L00_001AFF28 __attribute__((sda));
-extern float D_L00_001AFF2C __attribute__((sda));
-extern float D_L00_001AFF30 __attribute__((sda));
-extern float D_L00_001AFF34 __attribute__((sda));
-extern unsigned int D_L00_001AFF38 __attribute__((sda));
+extern int g_glow_sphere_texture __attribute__((sda));
+extern float g_glow_sphere_scale __attribute__((sda));
+extern float g_glow_sphere_inner_scale __attribute__((sda));
+extern float g_glow_sphere_outer_ratio __attribute__((sda));
+extern unsigned int g_glow_sphere_color __attribute__((sda));
 extern char g_camera_l00_position[];
-extern char D_0018A0E0[];
-extern float D_L00_0023A770[][3];
-extern float D_L00_00292370[][4];
-extern float D_L00_00293590[][2];
-extern float D_L00_00293EB0[][4];
-extern short D_L00_002944B0[][4];
+extern char g_hero_state_block[];
+extern float g_glow_sphere_points[][3];
+extern float g_glow_sphere_unit_points[][4];
+extern float g_glow_sphere_glint_uvs[][2];
+extern float g_glow_sphere_quad_points[][4];
+extern short g_glow_sphere_quad_indices[][4];
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void VU1_addGSregister(unsigned int, unsigned long);
 extern void FastVecSub(void *, void *, void *);
@@ -66,7 +66,7 @@ void gfx_draw_glow_sphere(char *owner)
     short *indices;
     float scale, scale2;
 
-    frame.quad.regs[1] = GetEffectTextureDescriptor(D_L00_001AFF28);
+    frame.quad.regs[1] = GetEffectTextureDescriptor(g_glow_sphere_texture);
     frame.quad.regs[2] = 0xFF9000000260UL;
     frame.quad.regs[3] = 0x8000000044UL;
     frame.quad.regs[0] = 0;
@@ -76,52 +76,52 @@ void gfx_draw_glow_sphere(char *owner)
     basis = frame.basis;
     FastVecSub(frame.delta, g_camera_l00_position, frame.position);
     vec_scale_to_length(basis[0], frame.delta, 1.0f);
-    FastVecScale(frame.up, D_0018A0E0, -1.0f);
+    FastVecScale(frame.up, g_hero_state_block, -1.0f);
     FastVecCross(basis[1], basis[0], frame.up);
     vec_scale_to_length(basis[1], basis[1], 1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
-    FastVecScale(basis[0], basis[0], D_L00_001AFF2C);
-    FastVecScale(basis[1], basis[1], D_L00_001AFF2C);
-    FastVecScale(basis[2], basis[2], D_L00_001AFF2C);
-    rgba = D_L00_001AFF38 | ctx->color;
+    FastVecScale(basis[0], basis[0], g_glow_sphere_scale);
+    FastVecScale(basis[1], basis[1], g_glow_sphere_scale);
+    FastVecScale(basis[2], basis[2], g_glow_sphere_scale);
+    rgba = g_glow_sphere_color | ctx->color;
     frame.quad.colors[3] = rgba;
     frame.quad.colors[2] = rgba;
     frame.quad.colors[1] = rgba;
     frame.quad.colors[0] = rgba;
-    VU1_addGSregister(6, GetEffectTextureDescriptor(D_L00_001AFF28));
+    VU1_addGSregister(6, GetEffectTextureDescriptor(g_glow_sphere_texture));
     VU1_addGSregister(0x42, 0x8000000044UL);
     VU1_addGSregister(8, 0);
     VU1_addGSregister(0x14, 0xFF9000000260UL);
     VU1_addGSregister(0x4A, 0);
     font_queue_vu_state();
     for (j = 0; j < 290; j++) {
-        transform_vector(frame.point, D_L00_00292370[j], frame.basis);
-        D_L00_0023A770[j][0] = frame.point[0];
-        D_L00_0023A770[j][1] = frame.point[1];
-        D_L00_0023A770[j][2] = frame.point[2];
+        transform_vector(frame.point, g_glow_sphere_unit_points[j], frame.basis);
+        g_glow_sphere_points[j][0] = frame.point[0];
+        g_glow_sphere_points[j][1] = frame.point[1];
+        g_glow_sphere_points[j][2] = frame.point[2];
         frame.colors[j] = frame.quad.colors[0];
     }
-    part_draw_glint_effect(148, D_L00_0023A770[0], &frame.colors[0], D_L00_00293590[0], 1);
-    part_draw_glint_effect(109, D_L00_0023A770[146], &frame.colors[146], D_L00_00293590[146], 1);
-    part_draw_glint_effect(36, D_L00_0023A770[254], &frame.colors[254], D_L00_00293590[254], 1);
+    part_draw_glint_effect(148, g_glow_sphere_points[0], &frame.colors[0], g_glow_sphere_glint_uvs[0], 1);
+    part_draw_glint_effect(109, g_glow_sphere_points[146], &frame.colors[146], g_glow_sphere_glint_uvs[146], 1);
+    part_draw_glint_effect(36, g_glow_sphere_points[254], &frame.colors[254], g_glow_sphere_glint_uvs[254], 1);
 
     frame.quad.regs[1] = GetEffectTextureDescriptor(11);
     frame.quad.regs[3] = 0x8000000048UL;
-    scale = D_L00_001AFF30;
+    scale = g_glow_sphere_inner_scale;
     rim = ctx->color | 0x40000000;
-    scale2 = scale * D_L00_001AFF34;
+    scale2 = scale * g_glow_sphere_outer_ratio;
     frame.quad.colors[3] = 0;
     frame.quad.colors[1] = rim;
     frame.quad.colors[0] = rim;
     frame.quad.colors[2] = 0;
     for (i = 0; i < 32; i++) {
-        indices = D_L00_002944B0[i];
+        indices = g_glow_sphere_quad_indices[i];
         for (j = 0; j < 4; j++) {
             k = indices[j];
             if (j >= 2)
-                FastVecScale(frame.quad.corners[j], D_L00_00293EB0[k], scale2);
+                FastVecScale(frame.quad.corners[j], g_glow_sphere_quad_points[k], scale2);
             else
-                FastVecScale(frame.quad.corners[j], D_L00_00293EB0[k], scale);
+                FastVecScale(frame.quad.corners[j], g_glow_sphere_quad_points[k], scale);
         }
         frame.quad.uvs[0][0] = 0.5f;
         frame.quad.uvs[0][1] = 0.5f;
@@ -135,7 +135,7 @@ void gfx_draw_glow_sphere(char *owner)
     }
 }
 
-extern char D_L00_0023DDA0[] __attribute__((nosda));
+extern char g_spark_slot_records[] __attribute__((nosda));
 
 extern void lightning_draw_curve(char *a0, char *a1);
 
@@ -155,7 +155,7 @@ void effect_draw_slot_sprites(char *owner)
 {
     unsigned int firstRGB = 0x103080;
     unsigned int secondRGB = 0xFFFFFF;
-    char *base = D_L00_0023DDA0;
+    char *base = g_spark_slot_records;
     char *p = base + 0x30;
     char *q = base;
     int i;

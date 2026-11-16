@@ -10,7 +10,7 @@ extern float fast_subtract_rotations(float, float);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 extern void set_follow_camera_orbit_clamp_mode(int);
 extern void cam_set_lock_flag(void);
-extern float D_L02_001B0E90 __attribute__((sda));
+extern float g_path_heading_easing_scale __attribute__((sda));
 extern char *g_route_polygons[];
 extern char *g_route_polygons[];
 extern float FastAddRotations(float, float);
@@ -25,7 +25,7 @@ extern float FastAddRotations(float, float);
    heading towards it, weighted by the progress (+0x34, minus 6, over 8, at least 0). The heading
    is then copied into the hero's state at +0x1D4, +0x1DC gets 1.0 and, from a progress of 0.9, the
    two shared calls run. Nothing happens while the hero's halfword at +0x86 is not 0. */
-void func_PAL_L02_003F3358(char *arg0) {
+void path_update_hero_heading_pal(char *arg0) {
     char *hero = *(char **)(&g_camera_l02_position + 0x50);
     char *state;
     char *hs;
@@ -70,7 +70,7 @@ void func_PAL_L02_003F3358(char *arg0) {
     if (math_fabs(a1) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
-        t = scale * D_L02_001B0E90;
+        t = scale * g_path_heading_easing_scale;
         math_approach_target_with_braking(state + 0x38, a1, (t + 0.5f) * 0.00040000002f,
                       (t + 0.5f) * 0.00040000002f, t * 0.020000001f);
     }

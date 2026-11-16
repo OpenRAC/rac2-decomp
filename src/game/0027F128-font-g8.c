@@ -6,9 +6,9 @@ typedef int s32;
 extern void VU1_addGSregister(unsigned int,unsigned long);
 /* Adapted from RAC1 draw.c func_001F6668_r (GPL-3.0), the FontPrint counterpart. */
 struct Glyph_F6668 { u8 u,v; signed char top,adv; };
-extern int D_001B166C;
-extern int D_001B1668 __attribute__((sda));
-extern int D_001A89B0[8] __attribute__((sda));
+extern int g_text_flag_enabled;
+extern int g_screen_flag_enabled __attribute__((sda));
+extern int g_text_color_table[8] __attribute__((sda));
 extern void DrawTexturedQuad(int,int,int,int,int,int,int,int,long,long);
 /* Draws a line of text one letter at a time. Special bytes change the color or add little icons. */
 void text_draw_line(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 texture,
@@ -21,8 +21,8 @@ void text_draw_line(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 
     s32 gray_value;
     s32 gray_color;
 
-    if (D_001B166C == 0) {
-        D_001A89B0[0] = color;
+    if (g_text_flag_enabled == 0) {
+        g_text_color_table[0] = color;
     }
     VU1_addGSregister(0x47, 0x33001);
     character_count = 0;
@@ -33,9 +33,9 @@ void text_draw_line(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 
     do {
         /* Bytes 8..15 select a palette color, preserving the current alpha. */
         if ((u8)(*cursor - 8) < 8) {
-            if (D_001B1668 != 0) {
+            if (g_screen_flag_enabled != 0) {
                 color &= 0xFF000000;
-                color |= D_001A89B0[*cursor - 8] & 0xFFFFFF;
+                color |= g_text_color_table[*cursor - 8] & 0xFFFFFF;
             }
         } else {
             character = *cursor;
@@ -87,8 +87,8 @@ void FontPrintScaled(float x, float y, u64 color, u8 *text, s32 character_limit,
     struct Glyph_F6668 *overlay_glyph;
     float height, offset, dx, dy;
 
-    if (D_001B166C == 0) {
-        D_001A89B0[0] = color;
+    if (g_text_flag_enabled == 0) {
+        g_text_color_table[0] = color;
     }
     character_count = 0;
     height = scale * 16.0f;
@@ -98,9 +98,9 @@ void FontPrintScaled(float x, float y, u64 color, u8 *text, s32 character_limit,
     cursor = text;
     do {
         if ((u8)(*cursor - 8) < 8) {
-            if (D_001B1668 != 0) {
+            if (g_screen_flag_enabled != 0) {
                 color &= 0xFF000000;
-                color |= D_001A89B0[*cursor - 8] & 0xFFFFFF;
+                color |= g_text_color_table[*cursor - 8] & 0xFFFFFF;
             }
         } else {
             if (glyphs[*cursor].adv != 0) {

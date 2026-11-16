@@ -1,10 +1,10 @@
 #include "common.h"
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
-extern float D_L12_001B09F8 __attribute__((sda));
-extern int D_L12_001B09F4 __attribute__((sda));
-extern u8 *D_L12_001B2F8C[] __attribute__((sda));
-extern u8 D_L12_001B9E00[];
+extern float g_creature_float_param __attribute__((sda));
+extern int g_tourist_wait_counter __attribute__((sda));
+extern u8 *g_path_waypoint_table[] __attribute__((sda));
+extern u8 g_hero_prev_position[];
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
 extern int path_build_route_nodes(void *, int, void *, int);
@@ -118,7 +118,7 @@ void todano_creature_update(TodanoInitObject *moby) {
         moby->f30 = 200;
         moby->f32 = 200;
         vars->f584 = 0.25f;
-        vars->f554 = D_L12_001B09F8;
+        vars->f554 = g_creature_float_param;
         vars->f550 = 0.3f;
         vars->f558 = 1;
         vars->f55C = 1;
@@ -129,8 +129,8 @@ void todano_creature_update(TodanoInitObject *moby) {
         vars->f588 |= 1;
         moby_set_controller_speed_limits(moby, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
         qcopy((u8 *)vars + 0x760, (u8 *)moby + 0x10);
-        FastVecSub((u8 *)vars + 0x770, (u8 *)moby + 0x10, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x30);
-        matrix_mul_vec3((u8 *)vars + 0x770, (u8 *)vars + 0x770, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x40);
+        FastVecSub((u8 *)vars + 0x770, (u8 *)moby + 0x10, g_path_waypoint_table[0] + (vars->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)vars + 0x770, (u8 *)vars + 0x770, g_path_waypoint_table[0] + (vars->f518 << 7) + 0x40);
         vars->f598 = (u8 *)vars + 0x6C0;
         vars->f59C = (u8 *)vars + 0x640;
         vars->f790 = path_build_route_nodes(moby, vars->f510, (u8 *)vars + 0x110, 32);
@@ -138,9 +138,9 @@ void todano_creature_update(TodanoInitObject *moby) {
         moby->f34 = (moby->f34 | 0x41) & 0xEFFF;
         moby_set_state(moby, 1, 0);
         if (moby->f43)anim_start_blended(moby, 0, 0, 0);
-        D_L12_001B09F4 = 0;
+        g_tourist_wait_counter = 0;
     }
-    if (moby->f31 && fast_vec_dist((u8 *)moby + 0x10, D_L12_001B9E00) < 24) {
+    if (moby->f31 && fast_vec_dist((u8 *)moby + 0x10, g_hero_prev_position) < 24) {
         moby_update_ground_check(moby);
         moby->f6F = 22;
     }

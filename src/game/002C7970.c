@@ -5,7 +5,7 @@ extern char *part_alloc(int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F26C4;
+extern unsigned char *g_part_tex_fading_drift_table;
 extern void part_update_fading_drift_alt(char *a0);
 
 /* Creates a fading, drifting particle that moves along a set direction with gravity. Returns the new particle, or null if none are free. */
@@ -22,7 +22,7 @@ char *part_spawn_fading_drift(void *position, float *velocity, int lifetime, int
         *(float *)(particle + 0xC) = start_size;
         particle[3] = 0x48;
         particle[8] = math_random_int_below(0xFF);
-        particle[2] = D_001F26C4[kind];
+        particle[2] = g_part_tex_fading_drift_table[kind];
         *(short *)(particle + 0xA) = lifetime;
         motion = particle + 0x20;
         *(float *)motion = velocity[0];

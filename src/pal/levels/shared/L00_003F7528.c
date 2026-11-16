@@ -8,8 +8,8 @@ typedef struct {
     float y_144;
     float z_148;
 } Aimvec_F0b10;
-extern Aimvec_F0b10 D_L00_001B8C80;
-extern Aimvec_F0b10 D_L00_001B8C80;
+extern Aimvec_F0b10 g_scalar_transition_state;
+extern Aimvec_F0b10 g_scalar_transition_state;
 extern void moby_mark_spawned(char *);
 extern int IsPointInCuboid(void *, int);
 extern float math_fast_sin_or_cos_b(float);
@@ -17,9 +17,9 @@ extern int FastTweenColor(int, int, float);
 extern void func_L00_0036EF68(char *, int, int, int);
 extern void ref_L00_003F3160_00(void *, void *);
 extern void gfx_draw_lit_group_points(char *);
-extern int D_L00_001A9018 __attribute__((sda));
-extern unsigned short **D_L00_001A9014 __attribute__((sda));
-extern unsigned char *D_L00_001B2514 __attribute__((sda));
+extern int g_tie_group_count __attribute__((sda));
+extern unsigned short **g_level_reloc_record __attribute__((sda));
+extern unsigned char *g_tie_table __attribute__((sda));
 extern void moby_mark_spawned(char *a0);
 
 /* A three-state object whose record (the pointer at +0x68) carries a group index at +0, two
@@ -32,7 +32,7 @@ extern void moby_mark_spawned(char *a0);
    colours; when it changed, its three bytes go to every entity of the group's id list. State 2
    re-binds the handler. The two stores of the byte at +0x30 sit in the arms of the select: the
    record's word at +0x68 either supplies its low byte or the object gets 0xFF. */
-void func_PAL_L00_003F7528(char *obj)
+void color_l00_fade_update_pal(char *obj)
 {
     unsigned char *st = *(unsigned char **)(obj + 0x68);
     int group;
@@ -48,7 +48,7 @@ void func_PAL_L00_003F7528(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         group = *(int *)st;
-        if (group >= D_L00_001A9018 || D_L00_001A9014[group] == 0 || group == -1) {
+        if (group >= g_tie_group_count || g_level_reloc_record[group] == 0 || group == -1) {
             moby_mark_spawned(obj);
             return;
         }
@@ -83,7 +83,7 @@ void func_PAL_L00_003F7528(char *obj)
         return;
     case 1:
         if (*(int *)(st + 0x64) != -1) {
-            if (IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
+            if (IsPointInCuboid(&g_scalar_transition_state.x_140, *(int *)(st + 0x64)) == 0)
                 return;
         }
         angle = FastAddRotations(*(float *)(st + 0xC), *(float *)(st + 4));
@@ -100,18 +100,18 @@ void func_PAL_L00_003F7528(char *obj)
         }
         if (*(int *)(st + 0x10) == prev)
             return;
-        q = D_L00_001A9014[*(int *)st];
+        q = g_level_reloc_record[*(int *)st];
         r = *(int *)(st + 0x10) & 0xFF;
         g = (*(int *)(st + 0x10) >> 8) & 0xFF;
         b = (*(int *)(st + 0x10) >> 16) & 0xFF;
-        for (; q != 0 && ((short)q[-1] >= 0 || q == D_L00_001A9014[*(int *)st]) &&
-               (e = D_L00_001B2514 + ((*q & 0x7FFF) << 5)) != 0;
+        for (; q != 0 && ((short)q[-1] >= 0 || q == g_level_reloc_record[*(int *)st]) &&
+               (e = g_tie_table + ((*q & 0x7FFF) << 5)) != 0;
              q++)
             func_L00_0036EF68((char *)e, r, g, b);
         return;
     case 2:
         if (*(int *)(st + 0x64) == -1 ||
-            IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
+            IsPointInCuboid(&g_scalar_transition_state.x_140, *(int *)(st + 0x64)) != 0)
             ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, obj);
         return;
     }

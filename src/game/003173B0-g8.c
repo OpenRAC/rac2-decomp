@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L00_001B0138 __attribute__((sda));
-extern int D_L00_002472C0[][4];
+extern int g_sheepinator_record_count __attribute__((sda));
+extern int g_sheepinator_slot_table[][4];
 extern void glow_ring_free_entries(void *);
 extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);
@@ -11,8 +11,8 @@ void spark_destroy_moby_free_slot(char *object)
 {
     char *data = *(char **)(object + 0x68);
     int index = *(int *)(data + 0x14);
-    --D_L00_001B0138;
-    D_L00_002472C0[index][0] = 0;
+    --g_sheepinator_record_count;
+    g_sheepinator_slot_table[index][0] = 0;
     glow_ring_free_entries(object);
     table_clear_entry_flag(*(int *)(data + 0x44));
     moby_mark_spawned(object);
@@ -34,16 +34,16 @@ void gfx_draw_trail_ribbon(char *object)
         count, state, *(float *)(data + 0x288));
 }
 
-extern unsigned short *D_001EE5A0[];
-extern char *D_001B1B5C __attribute__((sda));
+extern unsigned short *g_moby_group_lists[];
+extern char *g_moby_pool_start __attribute__((sda));
 
 /* Wakes up every live object of the same group that is a type 2460 moby. */
 void flyer_alert_group(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
-        unsigned short *list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+        unsigned short *list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
         if (list != 0) {
-            char *base = D_001B1B5C;
+            char *base = g_moby_pool_start;
             unsigned short *entry = list;
             int key;
             do {
@@ -60,9 +60,9 @@ void flyer_alert_group(char *self)
 void hover_enemy_alert_group(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
-        unsigned short *list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+        unsigned short *list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
         if (list != 0) {
-            char *base = D_001B1B5C;
+            char *base = g_moby_pool_start;
             unsigned short *entry = list;
             int key;
             do {
@@ -79,9 +79,9 @@ void hover_enemy_alert_group(char *self)
 void three_part_turret_alert_group(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
-        unsigned short *list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+        unsigned short *list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
         if (list != 0) {
-            char *base = D_001B1B5C;
+            char *base = g_moby_pool_start;
             unsigned short *entry = list;
             int key;
             do {
@@ -104,14 +104,14 @@ int group_claim_lead_token(char *self)
 
     if (*(unsigned char *)(self + 0x21) == 0xFF)
         return 0;
-    list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+    list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
     if (list == 0)
         return 0;
     {
         int busy = 0;
         entry = list;
         do {
-            object = (char *)((unsigned int)D_001B1B5C + ((*entry & 0x7FFF) << 8));
+            object = (char *)((unsigned int)g_moby_pool_start + ((*entry & 0x7FFF) << 8));
             if (object[0x20] >= 0 && *(short *)(object + 0xAA) == 0x9B4 /* moby class 2484 */
                 && *(int *)(*(char **)(object + 0x68) + 0x350) != 0) {
                 busy = 1;
@@ -138,14 +138,14 @@ int group_pass_lead_token(char *self)
 
     if (*(unsigned char *)(self + 0x21) == 0xFF)
         return 0;
-    list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+    list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
     if (list == 0)
         return 0;
     if (*(int *)(data + 0x350) == 0)
         return 0;
     entry = list;
     do {
-        object = (char *)((unsigned int)D_001B1B5C + ((*entry & 0x7FFF) << 8));
+        object = (char *)((unsigned int)g_moby_pool_start + ((*entry & 0x7FFF) << 8));
         if ((unsigned char)object[0x95] != 4 && object[0x20] >= 0
             && *(short *)(object + 0xAA) == 0x9B4 /* moby class 2484 */) {
             value = *(unsigned short *)(object + 0x96);
@@ -166,7 +166,7 @@ int group_pass_lead_token(char *self)
     return 0;
 }
 
-extern int D_001B2758;
+extern int g_spark_slot_pool;
 extern void gfx_draw_lightning_bolt_ribbon(char *, char *);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
@@ -183,7 +183,7 @@ void spark_update_owned_slots(char *owner)
 
     do {
         count--;
-        entry = (char *)(offset + (unsigned int)D_001B2758);
+        entry = (char *)(offset + (unsigned int)g_spark_slot_pool);
         if (*(int *)(entry + 0x8C) == (int)owner) {
             gfx_draw_lightning_bolt_ribbon(owner, entry);
             if (*(int *)(entry + 0x94) == 0) {

@@ -6,7 +6,7 @@ extern void hud_update_subobject_primary(int);
 extern void text_panel_update_mode(int);
 extern void func_0029CB58(void);
 
-void func_PAL_00350660(char *p)
+void hud_update_subsystems_pal(char *p)
 {
     UpdateItemStatusHud(p + 0x7A0);
     hud_update_subobject_primary((int)p);
@@ -16,14 +16,14 @@ void func_PAL_00350660(char *p)
 
 void text_panel_update_mode(int);
 
-void func_PAL_003506A0(int param_1)
+void hud_update_subobject_primary_pal(int param_1)
 {
   text_panel_update_mode(param_1 + 0x1D8C);
 }
 
 void text_panel_draw_scaled(int);
 
-void func_PAL_003506C0(int param_1)
+void hud_update_subobject_alt_pal(int param_1)
 {
   text_panel_draw_scaled(param_1 + 0x1D8C);
   return;

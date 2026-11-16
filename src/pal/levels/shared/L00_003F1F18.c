@@ -25,14 +25,14 @@ extern char *func_PAL_002BE9A8(char *p, float fa, float fb, float fc, float fd, 
 extern void *func_PAL_002C23B8(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
 extern char g_camera_l00_position[];
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 
 /* Twenty times over: take the angle of the constant vector at D_L00_001B8DC0 and the point,
    scale the hero facing direction by a random small amount, spawn a particle at the point
    jittered by a random amount on each axis and fill the new record's fields, then spawn a
    second particle along a random direction with a random magnitude; the original game role
    is unknown. */
-void func_PAL_L00_003F1F18(float *p)
+void part_l00_spawn_impact_spark_burst_pal(float *p)
 {
     float v[4];
     float dir[4];
@@ -52,7 +52,7 @@ void func_PAL_L00_003F1F18(float *p)
 
     for (i = 19; i >= 0; i--) {
         f = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)dir, D_0018A0E0, -(f * 0.020000001f));
+        FastVecScale((char *)dir, g_hero_state_block, -(f * 0.020000001f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         f = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         out[0] = p[0] + math_random_signed_float_range(0.0f, 0.2f);
@@ -86,7 +86,7 @@ void func_PAL_L00_003F1F18(float *p)
    build a direction from a random step and a random magnitude, jitter the point by a
    random small amount on each axis and hand the result to the spawn helper with
    210000.0f, 500.0f, 1.0f, 0.0f and 1.0f; the original game role is unknown. */
-void func_PAL_L00_003F2260(float *pos)
+void part_spawn_small_spark_burst_pal(float *pos)
 {
     float v[4];
     float dir[4];

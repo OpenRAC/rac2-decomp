@@ -26,7 +26,7 @@ typedef struct {
     float fade_scale;
 } ProjectileState;
 /* The hit pointer is outside the GP-relative displacement range. */
-extern char *D_L00_001BF218 NOT_SDA;
+extern char *g_hit_l00_result NOT_SDA;
 typedef struct {
     char pad[0x18];
     char *owner;
@@ -34,23 +34,23 @@ typedef struct {
     Vector position, pad30, normal;
 } Collision;
 extern Collision g_collision_result;
-extern int D_L00_001A8FF0;
-extern Vector D_L00_001A8F20 __attribute__((sda)) NOT_SDA;
+extern int g_hero_locked_flag;
+extern Vector g_default_vector __attribute__((sda)) NOT_SDA;
 extern char *g_area_hit_targets[];
-extern unsigned char D_00139587 NOT_SDA;
+extern unsigned char g_kilonoid_weapon_index NOT_SDA;
 typedef struct {
     unsigned char pad[0x74];
     float damage;
     unsigned char rest[0x68];
 } DamageTableRow;
 extern DamageTableRow g_weapon_l00_table[];
-extern Color D_L00_001B0920;
-extern float D_L00_001B0900 __attribute__((sda));
-extern int D_L00_001B0904 __attribute__((sda));
-extern float D_L00_001B0908 __attribute__((sda));
-extern float D_L00_001B090C __attribute__((sda));
-extern float D_L00_001B0918 __attribute__((sda));
-extern float D_L00_001B091C __attribute__((sda));
+extern Color g_bouncing_explosive_color;
+extern float g_bouncing_explosive_probe_radius __attribute__((sda));
+extern int g_bouncing_explosive_timer __attribute__((sda));
+extern float g_bouncing_explosive_min_time __attribute__((sda));
+extern float g_bouncing_explosive_slowdown __attribute__((sda));
+extern float g_bouncing_explosive_bounce_damping __attribute__((sda));
+extern float g_bouncing_explosive_friction __attribute__((sda));
 extern int coll_test_point(Vector *, int, char *, float);
 extern int math_fast_float_d(int *);
 extern int FastDecTimer(short *);
@@ -97,7 +97,7 @@ void UpdateBouncingExplosive(char *object)
     float speed, fade, damage, dot, minimum;
 
     if (coll_test_point((Vector *)(object + 0x10), 0, object, 0.64999998f) != 0 &&
-        D_L00_001BF218 != 0 && D_L00_001BF218 != state->owner)
+        g_hit_l00_result != 0 && g_hit_l00_result != state->owner)
         *(unsigned char *)(object + 0x20) = 3;
     if (math_fast_float_d(&state->timer) != 0)
         *(unsigned char *)(object + 0x20) = 3;
@@ -108,7 +108,7 @@ void UpdateBouncingExplosive(char *object)
         moby_forward_position_call(object, &scratch.motion.normal, 0);
         FastVecScale(&scratch.motion.scaled, &scratch.motion.normal, state->velocity.v[3]);
         FastVecAdd((&state->velocity), (&state->velocity), &scratch.motion.scaled);
-        if (D_L00_001A8FF0 != 0) {
+        if (g_hero_locked_flag != 0) {
             if (*(unsigned char *)(object + 0x20) == 1 && FastVecDot((&state->velocity), &scratch.motion.normal) > 0.0f)
                 *(unsigned char *)(object + 0x20) = 0;
         } else if (*(unsigned char *)(object + 0x20) == 1) {
@@ -128,10 +128,10 @@ void UpdateBouncingExplosive(char *object)
                 LerpVector4(&point, &temporary, &scratch.motion.end, (float)i * third);
                 spin = math_random_int_below(6);
                 if (math_random_int_below(2) != 0) spin = -spin;
-                fade = IntToFloat(D_L00_001B0904);
+                fade = IntToFloat(g_bouncing_explosive_timer);
                 life = (float)state->particle_timer;
                 life /= fade;
-                particle = SpawnSpinningSparkParticle(&point, 0.025f, one, one, spin, &D_L00_001A8F20,
+                particle = SpawnSpinningSparkParticle(&point, 0.025f, one, one, spin, &g_default_vector,
                                         life * life_range + life_min, (int)0x80808080, 1);
                 if (particle != 0) {
                     char *properties;
@@ -148,16 +148,16 @@ void UpdateBouncingExplosive(char *object)
             qcopy((Vector *)(object + 0x10), &g_collision_result.position);
         else
             qcopy((Vector *)(object + 0x10), &scratch.motion.end);
-        if (D_L00_001A8FF0 != 0) {
+        if (g_hero_locked_flag != 0) {
             FastVecSub(&point, (Vector *)(object + 0x10), &g_collision_result.position);
             crossed = FastVecDot(&point, &scratch.motion.normal) > 0.0f;
         } else {
             crossed = ((Vector *)(object + 0x10))->v[2] - g_collision_result.position.v[2] < 0.0f;
         }
-        if (coll_test_point((Vector *)(object + 0x10), 0, object, D_L00_001B0900) == 0) break;
+        if (coll_test_point((Vector *)(object + 0x10), 0, object, g_bouncing_explosive_probe_radius) == 0) break;
         if (*(unsigned char *)(object + 0x20) != 0 && !crossed) break;
         if (g_collision_result.owner != 0 && g_collision_result.owner == state->owner) break;
-        vec_scale_to_length(&point, &g_collision_result.normal, D_L00_001B0900);
+        vec_scale_to_length(&point, &g_collision_result.normal, g_bouncing_explosive_probe_radius);
         FastVecAdd((Vector *)(object + 0x10), &g_collision_result.position, &point);
         vec_fast_normalize((&state->velocity), (&state->velocity), &g_collision_result.normal);
         PlayMobySound(1, 0, object);
@@ -165,31 +165,31 @@ void UpdateBouncingExplosive(char *object)
             *(unsigned char *)(object + 0x20) = 3;
             ++state->bounces;
             if (state->bounces == 1) {
-                vec_fast_normalize_helper((&state->velocity), (&state->velocity), D_L00_001B091C * 0.016666668f);
-                if (D_L00_001A8FF0 != 0) {
+                vec_fast_normalize_helper((&state->velocity), (&state->velocity), g_bouncing_explosive_friction * 0.016666668f);
+                if (g_hero_locked_flag != 0) {
                     dot = FastVecDot((&state->velocity), &scratch.motion.normal);
                     FastVecScale(&temporary, &scratch.motion.normal, -dot);
                     FastVecSub(&vertical, (&state->velocity), &temporary);
-                    FastVecScale(&temporary, &temporary, D_L00_001B0918);
+                    FastVecScale(&temporary, &temporary, g_bouncing_explosive_bounce_damping);
                     FastVecAdd((&state->velocity), &vertical, &temporary);
                 } else {
-                    state->velocity.v[2] *= D_L00_001B0918;
+                    state->velocity.v[2] *= g_bouncing_explosive_bounce_damping;
                 }
                 vec_add_transformed_or_copy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
             } else {
-                FastVecScale(&temporary, (&state->velocity), D_L00_001B0918);
+                FastVecScale(&temporary, (&state->velocity), g_bouncing_explosive_bounce_damping);
                 speed = vec_length_xy(&temporary);
-                minimum = D_L00_001B0908 * 0.016666668f;
+                minimum = g_bouncing_explosive_min_time * 0.016666668f;
                 if (speed < minimum) {
                     vec_fast_normalize_helper((&state->velocity), (&state->velocity), minimum);
-                    if (D_L00_001A8FF0 != 0) {
+                    if (g_hero_locked_flag != 0) {
                         dot = FastVecDot((&state->velocity), &scratch.motion.normal);
                         FastVecScale(&vertical, &scratch.motion.normal, -dot);
                         FastVecSub(&tangent, (&state->velocity), &vertical);
-                        FastVecScale(&vertical, &vertical, D_L00_001B0918);
+                        FastVecScale(&vertical, &vertical, g_bouncing_explosive_bounce_damping);
                         FastVecAdd((&state->velocity), &tangent, &vertical);
                     } else {
-                        state->velocity.v[2] *= D_L00_001B0918;
+                        state->velocity.v[2] *= g_bouncing_explosive_bounce_damping;
                     }
                     vec_add_transformed_or_copy((&state->velocity), (&state->velocity), (Vector *)(object + 0x10));
                 } else {
@@ -199,7 +199,7 @@ void UpdateBouncingExplosive(char *object)
         }
         if (state->bounces >= 4) {
             *(unsigned char *)(object + 0x20) = 2;
-            if (D_L00_001A8FF0 != 0) {
+            if (g_hero_locked_flag != 0) {
                 dot = FastVecDot((&state->velocity), &scratch.motion.normal);
                 FastVecScale(&temporary, &scratch.motion.normal, -dot);
                 FastVecSub((&state->velocity), (&state->velocity), &temporary);
@@ -207,8 +207,8 @@ void UpdateBouncingExplosive(char *object)
             {
                 float min;
                 state->velocity.v[3] = vec_length_xy(&state->velocity);
-                state->velocity.v[3] *= D_L00_001B0918;
-                min = D_L00_001B0908 * 0.016666668f;
+                state->velocity.v[3] *= g_bouncing_explosive_bounce_damping;
+                min = g_bouncing_explosive_min_time * 0.016666668f;
                 if (state->velocity.v[3] < min)
                     state->velocity.v[3] = min;
             }
@@ -218,14 +218,14 @@ void UpdateBouncingExplosive(char *object)
         }
         break;
     case 2:
-        scratch.color = D_L00_001B0920;
+        scratch.color = g_bouncing_explosive_color;
         fade = (float)state->timer * state->fade_scale;
         red = FloatToInt((scratch.color.r - 255.0f) * fade + 255.0f);
         green = FloatToInt(scratch.color.g * fade);
         blue = FloatToInt(scratch.color.b * fade);
         {
-            float slowdown = (D_L00_001B090C - 1.0f) + 1.0f;
-            float min = D_L00_001B0908 * 0.016666668f;
+            float slowdown = (g_bouncing_explosive_slowdown - 1.0f) + 1.0f;
+            float min = g_bouncing_explosive_min_time * 0.016666668f;
             unsigned int packed = blue << 16;
             packed |= 0xff000000;
             packed |= green << 8;
@@ -240,7 +240,7 @@ void UpdateBouncingExplosive(char *object)
         vec_transform_or_copy((Vector *)(object + 0x10), (Vector *)(object + 0x10));
         break;
     case 3:
-        damage = ((DamageTableRow *)(D_00139587 * 0xe0 + (int)g_weapon_l00_table))->damage;
+        damage = ((DamageTableRow *)(g_kilonoid_weapon_index * 0xe0 + (int)g_weapon_l00_table))->damage;
         snd_play_from_class_bank(5, 0, object, 0xb02);
         SpawnExplosionEffects(object, 0.0f, (&state->velocity), 0.0f, (Vector *)(object + 0x10), 5, 2, 4,
                      6.0f, 2.0f, 9.0f, 1.0f, 0, 15.0f, 1, 1, -1, 0, 0x810001);

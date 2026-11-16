@@ -8,7 +8,7 @@ extern int PlayMobySound(int, int, void *);
 extern float math_ease_out_quad(float);
 extern int moby_move_and_collide(void *, void *, int, float, float, float);
 extern float MobySpringTurn(void *, float, float, float, float, void *);
-extern char D_L06_00188660[];
+extern char g_effect_target_records[];
 
 /* Steps the follower's weight toward its goal and blends the state vectors; returns 1 on arrival. */
 int actor_move_toward_goal(char *moby, float accel, float maxSpeed, float targetYaw, float blend)
@@ -27,7 +27,7 @@ int actor_move_toward_goal(char *moby, float accel, float maxSpeed, float target
     FastVecSub(toGoal, (float *)(vars + 0x220), (float *)(moby + 0x10));
     distance = FastVecLength(toGoal);
     speed = FastVecLength((float *)(vars + 0x230));
-    handleRecord = D_L06_00188660 + *(int *)(vars + 0x254) * 0x70;
+    handleRecord = g_effect_target_records + *(int *)(vars + 0x254) * 0x70;
     brakeRatio = speed / accelStep;
     if (*(char **)(handleRecord + 0x88) != moby || *(unsigned char *)(handleRecord + 0x74) == 0)
         *(int *)(vars + 0x254) = PlayMobySound(0, 4, moby);

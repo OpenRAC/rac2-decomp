@@ -14,8 +14,8 @@ extern void FastVecCross(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void draw_world_quad(void *, int, int);
 extern void VU1_addGSregister(int, unsigned long long);
-extern RibbonVector D_L03_00237F50;
-extern RibbonVector D_L03_001B9980;
+extern RibbonVector g_glow_ribbon_offset;
+extern RibbonVector g_camera_pose_buffer;
 
 /* Draws a glowing ribbon through a list of points: a bright inner strip with a wider glow, brighter where a pulse passes. */
 void gfx_draw_glow_ribbon(unsigned char *object, RibbonVector *points, int count,
@@ -43,7 +43,7 @@ void gfx_draw_glow_ribbon(unsigned char *object, RibbonVector *points, int count
         float phaseWidth = *(float *)(state + 0xCC);
         phase = (phaseWidth + phaseWidth + 1.0f) * (1.0f - (float)*(int *)(state + 0x24) / (float)*(int *)(state + 0x1C)) - phaseWidth;
         if (1.0f - phaseWidth < phase && (*(int *)(state + 0x3C) & 2)) {
-            vec_scale_to_length(&offset, &D_L03_00237F50, *(float *)(state + 0xD0));
+            vec_scale_to_length(&offset, &g_glow_ribbon_offset, *(float *)(state + 0xD0));
             FastVecAdd(object + 0x10, state, &offset);
         }
     }
@@ -88,7 +88,7 @@ void gfx_draw_glow_ribbon(unsigned char *object, RibbonVector *points, int count
             if (reach < *(float *)(state + 0xB0))
                 width = *(float *)(state + 0xAC) * (1.0f - reach / *(float *)(state + 0xB0)) + 1.0f;
         }
-        FastVecSub(&view, &points[i], &D_L03_001B9980);
+        FastVecSub(&view, &points[i], &g_camera_pose_buffer);
         FastVecSub(&direction, &points[i + 1], &points[i]);
         length = FastVecLength(&direction);
         FastVecCross(&side, &direction, &view);

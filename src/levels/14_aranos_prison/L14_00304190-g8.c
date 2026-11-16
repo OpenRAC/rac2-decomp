@@ -3,13 +3,13 @@
 
 extern int g_current_map_index;
 
-extern int D_001A72E0;
+extern int g_vram_zbuffer_address;
 
-extern int D_L14_001B23D0 __attribute__((sda));
+extern int g_level_record_table_ptr __attribute__((sda));
 
 extern char *g_moby_l14_pool __attribute__((sda));
 
-extern char D_L14_00284690[];
+extern char g_level_record_source[];
 
 extern void func_367708();
 
@@ -55,7 +55,7 @@ extern void func_2EE5F0();
 
 extern void gfx_draw_flipbook_billboard();
 
-extern int D_L14_001B092C __attribute__((sda));
+extern int g_fading_quad_texture __attribute__((sda));
 
 extern float math_random_signed_float_range(float a0, float a1);
 
@@ -71,18 +71,18 @@ extern void draw_world_quad(void *dst, void *src, int c);
 
 extern void coll_reset_box_record(char *a);
 
-extern float D_L14_001B0388 __attribute__((sda));
+extern float g_flying_away_speed __attribute__((sda));
 
-extern float D_L14_001B038C __attribute__((sda));
+extern float g_flying_away_rate __attribute__((sda));
 
-extern float D_L14_001B0390 __attribute__((sda));
+extern float g_flying_away_scale __attribute__((sda));
 
 /* This unit is built with -G8: these two bodies reach a global through $gp. */
 
 /* Sets up the level's scene at load time and starts the sound and graphics registers. */
 void level_init_scene(void) {
     func_367708();
-    D_L14_001B23D0 = (int)D_L14_00284690;
+    g_level_record_table_ptr = (int)g_level_record_source;
     if (g_current_map_index == 0xE) {
         level_init_record_table();
     } else {
@@ -90,7 +90,7 @@ void level_init_scene(void) {
     }
     func_367778();
     func_385CB8(0x47, 0x5360B);
-    func_385CB8(0x4E, 0x1000000 | (D_001A72E0 >> 13));
+    func_385CB8(0x4E, 0x1000000 | (g_vram_zbuffer_address >> 13));
 }
 
 extern char g_hero_position[];
@@ -296,7 +296,7 @@ void gfx_draw_moby_edge_lines(char *moby, int is_first) {
    its `.extern` comes last in the file, so the load in a branch delay slot is a $gp access and
    no other load is. */
 extern unsigned short *g_group_entity_lists[];
-extern int D_L14_001B25B8;
+extern int g_group_link_limit;
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
 extern void *moby_get_vars_word_18(char *a0);
 
@@ -309,7 +309,7 @@ int group_is_linked_to_owner(char *self) {
     char *t;
 
     for (p = g_group_entity_lists[*(int *)(state + 0x68)];
-         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
+         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         e = D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8);
@@ -337,7 +337,7 @@ int group_is_misaligned(char *self) {
     unsigned char *e;
 
     for (p = g_group_entity_lists[*(int *)(state + 0x68)];
-         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
+         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         e = D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8);
@@ -371,7 +371,7 @@ void flying_away_update(char *moby) {
             }
             func_321F58(moby, 2, -1);
             {
-                float s = D_L14_001B0388 * 0.016666668f;
+                float s = g_flying_away_speed * 0.016666668f;
 
                 *(float *)(vars + 0xC) = s;
                 if (*(int *)(vars + 0x8) != 0) {
@@ -399,12 +399,12 @@ void flying_away_update(char *moby) {
 
                 *(float *)(vars + 0x10) = *(float *)(vars + 0x10) + old;
                 if (*(int *)(vars + 0x8) != 0) {
-                    m = old - D_L14_001B038C * 0.00027777778f;
+                    m = old - g_flying_away_rate * 0.00027777778f;
                 } else {
-                    m = old + D_L14_001B038C * 0.00027777778f;
+                    m = old + g_flying_away_rate * 0.00027777778f;
                 }
                 {
-                    float x = m * D_L14_001B0390;
+                    float x = m * g_flying_away_scale;
 
                     *(float *)(vars + 0xC) = m;
                     *(float *)(moby + 0xF0) = func_2F6C80(*(float *)(moby + 0xF0), x);
@@ -471,7 +471,7 @@ void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int col
     fr.rec.f[6] = *(float *)vars + 1.0f;
     fr.rec.f[7] = 1.0f;
 
-    id = GetEffectTextureDescriptor(D_L14_001B092C);
+    id = GetEffectTextureDescriptor(g_fading_quad_texture);
     fr.rec.r = id;
     fr.rec.s = 280993940374112LL;
     fr.t = 0x8000000048LL;
@@ -522,9 +522,9 @@ void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int col
     draw_world_quad(&fr.rec, fr.mat, 0);
 }
 
-extern float D_L14_001B04B0 __attribute__((sda));
-extern float D_L14_001B04B4 __attribute__((sda));
-extern float D_L14_001B04B8 __attribute__((sda));
+extern float g_wobble_quad_offset __attribute__((sda));
+extern float g_wobble_frequency __attribute__((sda));
+extern float g_wobble_phase_divisor __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void gfx_world_to_screen_unit(void *, float *, float *);
 extern float math_fast_sin_or_cos_b(float);
@@ -550,12 +550,12 @@ void gfx_calc_wobble_quad_corner(char *object, L14Swing *base, int index, float 
     FastVecScale(v, c, (float)phase0 * 0.125f);
     FastVecAdd(base->rows[index], base->rows[index], v);
     gfx_world_to_screen_unit(base->rows[index], &base->pairs[index][0], &base->pairs[index][1]);
-    base->pairs[index][0] += (1.0f - moby_get_state_progress(object)) * D_L14_001B04B0
-        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((D_L14_001B04B4 + D_L14_001B04B4) * (moby_get_state_progress(object) * 3.1415927f)
-                                          + (float)phase0 * 3.1415927f / D_L14_001B04B8));
-    base->pairs[index][1] += (1.0f - moby_get_state_progress(object)) * D_L14_001B04B0
-        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((D_L14_001B04B4 + D_L14_001B04B4) * (moby_get_state_progress(object) * 3.1415927f)
-                                          + (float)phase1 * 3.1415927f / D_L14_001B04B8));
+    base->pairs[index][0] += (1.0f - moby_get_state_progress(object)) * g_wobble_quad_offset
+        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((g_wobble_frequency + g_wobble_frequency) * (moby_get_state_progress(object) * 3.1415927f)
+                                          + (float)phase0 * 3.1415927f / g_wobble_phase_divisor));
+    base->pairs[index][1] += (1.0f - moby_get_state_progress(object)) * g_wobble_quad_offset
+        * math_fast_sin_or_cos_b(math_wrap_angle_two_pi((g_wobble_frequency + g_wobble_frequency) * (moby_get_state_progress(object) * 3.1415927f)
+                                          + (float)phase1 * 3.1415927f / g_wobble_phase_divisor));
     if (1.0f < base->pairs[index][0])
         base->pairs[index][0] = 1.0f;
     else if (base->pairs[index][0] < 0.0f)
@@ -566,17 +566,17 @@ void gfx_calc_wobble_quad_corner(char *object, L14Swing *base, int index, float 
         base->pairs[index][1] = 0.0f;
 }
 
-extern float D_L14_001B04BC __attribute__((sda));
-extern s32 D_L14_001B04D4 __attribute__((sda));
-extern float D_L14_001B04D8 __attribute__((sda));
-extern float D_L14_001B04DC __attribute__((sda));
-extern s32 D_L14_001B04E0 __attribute__((sda));
-extern s32 D_L14_001B04E4 __attribute__((sda));
-extern s32 D_L14_001B04E8 __attribute__((sda));
-extern s32 D_L14_001B04EC __attribute__((sda));
-extern s32 D_L14_001B04F0 __attribute__((sda));
-extern float D_L14_001B04F4 __attribute__((sda));
-extern char D_L14_001A8F20[] MACRO_ADDR;
+extern float g_flash_spread __attribute__((sda));
+extern s32 g_flash_life __attribute__((sda));
+extern float g_flash_size_start __attribute__((sda));
+extern float g_flash_size_end __attribute__((sda));
+extern s32 g_flash_random_size __attribute__((sda));
+extern s32 g_flash_blue_max __attribute__((sda));
+extern s32 g_flash_green_max __attribute__((sda));
+extern s32 g_flash_red_max __attribute__((sda));
+extern s32 g_flash_spawn_param_int __attribute__((sda));
+extern float g_flash_spawn_param_float __attribute__((sda));
+extern char g_identity_l14_matrix[] MACRO_ADDR;
 
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
@@ -595,16 +595,16 @@ void part_l14_spawn_flash(char *obj)
     int argb, color, life, red, green, blue;
 
     qcopy(pos, obj + 0x10);
-    pos[0] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), D_L14_001B04BC * moby_get_state_progress(obj));
-    pos[1] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), D_L14_001B04BC * moby_get_state_progress(obj));
-    pos[2] += math_random_float_range(D_L14_001B04BC * -moby_get_state_progress(obj), 0.0f);
-    qcopy(vel, D_L14_001A8F20);
-    red = math_random_int_range(0, D_L14_001B04EC);
-    green = math_random_int_range(0, D_L14_001B04E8);
-    blue = math_random_int_range(0, D_L14_001B04E4);
+    pos[0] += math_random_float_range(g_flash_spread * -moby_get_state_progress(obj), g_flash_spread * moby_get_state_progress(obj));
+    pos[1] += math_random_float_range(g_flash_spread * -moby_get_state_progress(obj), g_flash_spread * moby_get_state_progress(obj));
+    pos[2] += math_random_float_range(g_flash_spread * -moby_get_state_progress(obj), 0.0f);
+    qcopy(vel, g_identity_l14_matrix);
+    red = math_random_int_range(0, g_flash_red_max);
+    green = math_random_int_range(0, g_flash_green_max);
+    blue = math_random_int_range(0, g_flash_blue_max);
     argb = 0xFF000000 | (green << 8);
     color = FastTweenColor((red << 16) | argb | blue, *(int *)(rec + 0x84), moby_get_state_progress(obj));
-    life = math_random_int_range(D_L14_001B04D4 / 2, D_L14_001B04D4);
-    part_spawn_size_changing((char *)pos, (char *)vel, life, color, math_random_int_range(0, D_L14_001B04E0), 0x80, 0,
-                  D_L14_001B04D8, D_L14_001B04DC, D_L14_001B04F4, D_L14_001B04F0);
+    life = math_random_int_range(g_flash_life / 2, g_flash_life);
+    part_spawn_size_changing((char *)pos, (char *)vel, life, color, math_random_int_range(0, g_flash_random_size), 0x80, 0,
+                  g_flash_size_start, g_flash_size_end, g_flash_spawn_param_float, g_flash_spawn_param_int);
 }

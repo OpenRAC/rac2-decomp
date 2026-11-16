@@ -15,12 +15,12 @@ typedef struct {
     int flag;
 } SlotTable;
 extern SlotTable ref_L00_00288508_00;
-extern unsigned short D_0018C964;
+extern unsigned short g_help_message_flag;
 extern int subtitle_request_voice_line(int, int);
 extern void value_set_entry_by_index(int, int);
 
 /* Pick the action of the mapped class of PARAM, then hand it to the game. */
-void func_PAL_00288E20(int param)
+void help_show_message_for_id_pal(int param)
 {
     SlotTable table;
     int code;
@@ -30,7 +30,7 @@ void func_PAL_00288E20(int param)
         subtitle_request_voice_line(0x9F8, 0x4F);
     } else if (param == 27) {
         subtitle_request_voice_line(0x9F7, 0x4E);
-    } else if (D_0018C964 == 0) {
+    } else if (g_help_message_flag == 0) {
         subtitle_request_voice_line(0x9AA, 1);
     }
 

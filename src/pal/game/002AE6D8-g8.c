@@ -2,9 +2,9 @@
 #include "names.h"
 
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_001B19A0[] __attribute__((section(".sdata")));
-extern char D_77FCB227[];
-extern int D_001A8C70;
+extern unsigned char g_render_command_flags[] __attribute__((section(".sdata")));
+extern char g_bolt_pickup_limit_marker[];
+extern int g_bolt_pickup_enabled;
 typedef struct {
     unsigned char pad0[0x0A];
     unsigned char x0A;
@@ -14,10 +14,10 @@ typedef struct {
     unsigned char pad18[0x1A];
     unsigned char x32;
 } Global001A7A00;
-extern Global001A7A00 D_001A7A00 __attribute__((section(".sdata")));
-extern int D_0018D198[], D_0018D208[];
+extern Global001A7A00 g_player_stats __attribute__((section(".sdata")));
+extern int g_level_idle_frame_counts[], g_level_bolt_scores[];
 extern char *g_path_table[];
-extern char D_001A9F58[], D_001A9F68[], D_001A9F78[], D_001A9F88[];
+extern char g_str_bolt_pickup_message_a[], g_str_bolt_pickup_message_b[], g_str_bolt_pickup_message_c[], g_str_bolt_pickup_message_d[];
 extern void vec_clear_128(void *);
 extern int math_random_int_below(int);
 extern void STUB_printf(char *, ...);
@@ -31,7 +31,7 @@ extern int math_solve_quadratic(float *, float *, float, float, float);
 extern int SegmentCrossPolyline(int, void *, void *, void *);
 extern void *func_PAL_00303578(void *, void *, void *, int, int, int);
 
-void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, int maximum, float height)
+void moby_spawn_bolt_pickups_pal(char *object, int low, int high, int flags, int surface, int maximum, float height)
 {
     float offset[4], position[4], velocity[4], half[4], end[4], hit[4], correction[4];
     float t0, t1;
@@ -44,39 +44,39 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
         (unsigned int)(*(unsigned short *)(object+0xaa)-500) >= 41)
         {
             unsigned int index=(unsigned char)object[0xb0];
-            unsigned char *table = D_001B19A0;
-            D_001A8C70 = table[index] >> 7;
+            unsigned char *table = g_render_command_flags;
+            g_bolt_pickup_enabled = table[index] >> 7;
         }
     {
         int allowed = ((flags >> 5)^1)&1;
         enabled=0;
-        if (D_001A8C70) enabled=allowed;
+        if (g_bolt_pickup_enabled) enabled=allowed;
     }
     if (!flags || (!low && !high)) return;
     if (low <= 0) low=1;
     value=math_random_int_below(high-low+1)+low;
-    if (D_001A7A00.x0A || D_001A7A00.x0B) value*=2;
-    if (value<500 && enabled && D_0018D198[g_current_map_index]) {
-        int rate=D_0018D208[g_current_map_index]*3000/D_0018D198[g_current_map_index];
-        if (D_001A7A00.x0A || D_001A7A00.x0B) rate/=2;
+    if (g_player_stats.x0A || g_player_stats.x0B) value*=2;
+    if (value<500 && enabled && g_level_idle_frame_counts[g_current_map_index]) {
+        int rate=g_level_bolt_scores[g_current_map_index]*3000/g_level_idle_frame_counts[g_current_map_index];
+        if (g_player_stats.x0A || g_player_stats.x0B) rate/=2;
         #define limit ((int)D_77FCB227)
         if (rate<limit/2) {
             if (rate<=limit*3/10) {
-                STUB_printf(D_001A9F58);
+                STUB_printf(g_str_bolt_pickup_message_a);
                 value*=5;
             } else {
-                STUB_printf(D_001A9F68,(limit*19/30-rate)/(limit/15));
+                STUB_printf(g_str_bolt_pickup_message_b,(limit*19/30-rate)/(limit/15));
                 value=value*(limit*19/30-rate)/(limit/15);
             }
-            if (D_001A7A00.x0B) {
+            if (g_player_stats.x0B) {
                 if(value>limit*10/3) value=limit*10/3;
             } else if(value>limit*5/3) value=limit*5/3;
         } else if (limit<rate) {
             if (limit*7/6<rate) {
-                STUB_printf(D_001A9F78,0x3fb99999a0000000L);
+                STUB_printf(g_str_bolt_pickup_message_c,0x3fb99999a0000000L);
                 value/=10;
             } else {
-                STUB_printf(D_001A9F78,__extendsfdf2(IntToFloat((limit*6/5-rate)/(limit*4/15))));
+                STUB_printf(g_str_bolt_pickup_message_c,__extendsfdf2(IntToFloat((limit*6/5-rate)/(limit*4/15))));
                 value=value*(limit*6/5-rate)/(limit*4/15);
             }
             if(value<=0) value=1;
@@ -100,8 +100,8 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
         }}}}}
 #undef TAKE
 #undef TAKE_MIN
-        if (D_001A7A00.x32) remaining /= D_001A7A00.x32;
-        D_001A7A00.x14 += remaining;
+        if (g_player_stats.x32) remaining /= g_player_stats.x32;
+        g_player_stats.x14 += remaining;
     } else {
 #define SPLIT(n, denom) if (remaining >= denom) { q = remaining / denom; n = q; remaining -= n * denom; }
         SPLIT(thousands, 1000); SPLIT(fivehundreds, 500); SPLIT(hundreds, 100);
@@ -109,7 +109,7 @@ void func_PAL_002AE6D8(char *object, int low, int high, int flags, int surface, 
 #undef SPLIT
         ones = remaining;
         if (thousands < 0 || fivehundreds < 0 || hundreds < 0 || fifties < 0 || twenties < 0 || fives < 0 || ones < 0) {
-            STUB_printf(D_001A9F88);
+            STUB_printf(g_str_bolt_pickup_message_d);
             thousands = thousands < 0 ? 0 : thousands; fivehundreds = fivehundreds < 0 ? 0 : fivehundreds;
             hundreds = hundreds < 0 ? 0 : hundreds; fifties = fifties < 0 ? 0 : fifties;
             twenties = twenties < 0 ? 0 : twenties; fives = fives < 0 ? 0 : fives;

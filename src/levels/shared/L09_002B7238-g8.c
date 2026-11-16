@@ -2,10 +2,10 @@
 #include "common.h"
 
 /* The level's resident spawn counters, in small data. */
-extern int D_L09_001B0F50 __attribute__((sda));
-extern int D_L09_001B0F54 __attribute__((sda));
-extern int D_L09_001B0F58 __attribute__((sda));
-extern unsigned short D_L09_001B0F4C __attribute__((sda));
+extern int g_trooper_rearm_threshold __attribute__((sda));
+extern int g_trooper_spawn_delay_min __attribute__((sda));
+extern int g_trooper_spawn_delay_max __attribute__((sda));
+extern unsigned short g_trooper_rearm_timer_init __attribute__((sda));
 
 extern int math_random_int_range(int a0, int a1);
 extern int FastDecTimer(char *a0);
@@ -14,13 +14,13 @@ extern void value_set_and_smooth(int a0, void *a1, int a2, int a3, f32 f12);
 /* Small data the run's step needs: the resident mode word (0x001A79F0), the level's
    release word (0x001A9040) and the level's record table (0x001B285C). */
 extern int g_current_map_index __attribute__((sda));
-extern int D_L09_001A9040 __attribute__((sda));
-extern char *D_L09_001B285C __attribute__((sda));
+extern int g_release_busy_flag __attribute__((sda));
+extern char *g_moby_record_table __attribute__((sda));
 
 extern void walker_init(char *object);
 extern float fast_vec_dist(char *a, char *b);
 extern void moby_update_ground_check(void *object);
-extern char D_L09_001B9A00[];
+extern char g_camera_l09_position[];
 extern int moby_apply_damage_to_object(char *object, char *frame, int flag);
 extern int moby_is_hero_or_special(char *entry);
 extern void moby_set_state(char *object, int a1, int a2);
@@ -39,12 +39,12 @@ extern char g_hero_position[];
 /* Small data: the query range, drop and radius are read $gp-relative; the two level weights
    and the toggle word are plain absolute loads (a weight load the scheduler moves into a delay
    slot comes out $gp-relative). */
-extern float D_L09_001B0C40 __attribute__((sda));
-extern float D_L09_001B0C44 __attribute__((sda));
-extern float D_L09_001B0C48 __attribute__((sda));
-extern float D_L09_001B2390 MACRO_ADDR;
-extern float D_L09_001B238C MACRO_ADDR;
-extern int D_L09_001B2388 MACRO_ADDR;
+extern float g_falling_part_hero_range __attribute__((sda));
+extern float g_falling_l09_part_gravity __attribute__((sda));
+extern float g_falling_part_sweep_radius __attribute__((sda));
+extern float g_hero_busy_amount_b MACRO_ADDR;
+extern float g_hero_busy_amount_a MACRO_ADDR;
+extern int g_frame_l09_counter MACRO_ADDR;
 
 typedef union {
     int q __attribute__((mode(TI)));
@@ -61,18 +61,18 @@ void part_spawn_falling(char *object) {
 
     for (i = 5; i < 8; i++) {
         moby_transform_joint_to_world(object, i, &pos);
-        if (vec_distance_xy(&pos, g_hero_position) < D_L09_001B0C40) {
+        if (vec_distance_xy(&pos, g_hero_position) < g_falling_part_hero_range) {
             qcopy(&vel, &pos);
-            vel.f[2] -= D_L09_001B0C44;
-            coll_sweep_from_object(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
+            vel.f[2] -= g_falling_l09_part_gravity;
+            coll_sweep_from_object(object, &vel, 0x10001, 0, 1, 0, g_falling_part_sweep_radius,
                           (float)*(unsigned char *)(vars + 0x35), 2.0f);
         }
-        if ((!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31))
+        if ((!(g_hero_busy_amount_b > 0.95f) && !(g_hero_busy_amount_a > 0.95f) && *(unsigned char *)(object + 0x31))
             || math_random_int_below(2)) {
             zero.q = 0;
             zero.f[2] = -(math_random_float_range(4.5f, 5.5f) * (1.0f / 60.0f));
             vel.q = zero.q;
-            if (D_L09_001B2388 & 1)
+            if (g_frame_l09_counter & 1)
                 part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, math_random_int_range(18, 22), 180, -10, 1);
             else
                 part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, math_random_int_range(20, 24), 350, -10, 1);
@@ -81,11 +81,11 @@ void part_spawn_falling(char *object) {
             part_spawn_scaling(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
-    if (!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31)) {
+    if (!(g_hero_busy_amount_b > 0.95f) && !(g_hero_busy_amount_a > 0.95f) && *(unsigned char *)(object + 0x31)) {
         for (j = 3; j < 5; j++) {
             vec_scale_to_length(&vel, object + 0xC0, -(math_random_float_range(4.5f, 5.5f) * (1.0f / 60.0f)));
             moby_transform_joint_to_world(object, j, &pos);
-            if (D_L09_001B2388 & 1)
+            if (g_frame_l09_counter & 1)
                 part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, math_random_int_range(18, 22), 50, -10, 1);
             else
                 part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, math_random_int_range(20, 24), 100, -10, 1);
@@ -107,7 +107,7 @@ void enemy_step_animation(char *object) {
         walker_init(object);
 
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 32.0f) {
+        if (fast_vec_dist(object + 0x10, g_camera_l09_position) < 32.0f) {
             moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 0x1E;
         }
@@ -118,8 +118,8 @@ void enemy_step_animation(char *object) {
         if (g_current_map_index == 9) {
             record_id = *(short *)(vars + 0x1F0);
             if (record_id != -1) {
-                if (moby_is_hero_or_special(D_L09_001B285C + (record_id << 8)) == 0)
-                    D_L09_001A9040 = 0;
+                if (moby_is_hero_or_special(g_moby_record_table + (record_id << 8)) == 0)
+                    g_release_busy_flag = 0;
                 *(short *)(vars + 0x1F0) = -1;
             }
         }
@@ -131,11 +131,11 @@ void enemy_step_animation(char *object) {
 /* The walks below read the group count through $gp; the group table of id lists is absolute
    and the entity base (the level's record table, D_L09_001B285C above through $gp) is the bare
    `lui`/`lw` pair here, a second name sized over 8 bytes with `sda` in this -G8 unit. */
-extern int D_L09_001B2878 __attribute__((sda));
+extern int g_max_l09_group_id __attribute__((sda));
 
 extern unsigned char *D_L09_001B285C_1[3] __attribute__((sda));
 
-extern unsigned short *D_L09_001FB560[];
+extern unsigned short *g_track_entry_table[];
 
 /* Counts the class-0xD0F entities of the object's group whose private state has bit 0 of its
    byte at +0x302 clear and the word a1 at +0x420; -1 when a1 is 0. */
@@ -147,9 +147,9 @@ int trooper_legs_count_with_value(unsigned char *object, int wanted_value) {
 
     if (wanted_value == 0)
         return -1;
-    for (id_ptr = D_L09_001FB560[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
-         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[object[0x21]]);
+    for (id_ptr = g_track_entry_table[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_max_l09_group_id && id_ptr != 0 &&
+         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == g_track_entry_table[object[0x21]]);
          id_ptr++) {
         entity = D_L09_001B285C_1[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
@@ -174,9 +174,9 @@ int trooper_legs_find_largest_value(unsigned char *object) {
     int largest = 0;
     int value;
 
-    for (id_ptr = D_L09_001FB560[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
-         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[object[0x21]]);
+    for (id_ptr = g_track_entry_table[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_max_l09_group_id && id_ptr != 0 &&
+         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == g_track_entry_table[object[0x21]]);
          id_ptr++) {
         entity = D_L09_001B285C_1[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
@@ -199,11 +199,11 @@ void trooper_rearm_spawn_timers(char *object) {
 
     if (*(unsigned char *)(vars + 0x2EA) != 0) {
         *(unsigned char *)(vars + 0x2EA) = 0;
-        if (*(short *)(vars + 0x2E0) < D_L09_001B0F50)
-            *(short *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+        if (*(short *)(vars + 0x2E0) < g_trooper_rearm_threshold)
+            *(short *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
     }
     if (FastDecTimer(vars + 0x2E0) == 0)
-        *(unsigned short *)(vars + 0x2E8) = D_L09_001B0F4C;
+        *(unsigned short *)(vars + 0x2E8) = g_trooper_rearm_timer_init;
     FastDecTimer(vars + 0x2E2);
     FastDecTimer(vars + 0x2E6);
     FastDecTimer(vars + 0x2E8);
@@ -239,8 +239,8 @@ typedef char Impact_L09_003A01D8_extent[sizeof(Impact_L09_003A01D8) == 0x28 ? 1 
 #define F(p, o) (*(float *)((p) + (o)))
 #define P(p, o) (*(u8 **)((p) + (o)))
 
-extern u8 *D_L09_001BFE58 NOT_SDA;
-extern float D_L09_001A8F20[] MACRO_ADDR;
+extern u8 *g_collision_hit_object NOT_SDA;
+extern float g_default_particle_vec[] MACRO_ADDR;
 extern float FastAddRotations(float angle, float step);
 extern float FastVecLength(void *v);
 extern float math_random_angle(void);
@@ -292,8 +292,8 @@ void projectile_update_trail_impact(u8 *object)
         return;
     F(object, 0xF0) = FastAddRotations(F(object, 0xF0), 0.10471977293491364f);
     FastVecAdd(f.predicted, object + 0x10, state);
-    busy = D_L09_001B238C > 0.9f || D_L09_001B2390 > 0.9f;
-    if (!busy || !(D_L09_001B2388 & 1)) {
+    busy = g_hero_busy_amount_a > 0.9f || g_hero_busy_amount_b > 0.9f;
+    if (!busy || !(g_frame_l09_counter & 1)) {
         length = FastVecLength(state);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[0] = math_random_float_range(-1.0f, 1.0f);
@@ -329,7 +329,7 @@ void projectile_update_trail_impact(u8 *object)
     collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
     if (collision || coll_test_point(object + 0x10, 1, object, 0.3f)
         || math_fast_float_d(state + 0x38)) {
-        hit = D_L09_001BFE58;
+        hit = g_collision_hit_object;
         if (hit) {
             if (hit == P(state, 0x3C)) {
                 qcopy(object + 0x10, f.predicted);
@@ -339,12 +339,12 @@ void projectile_update_trail_impact(u8 *object)
                 coll_process_hit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
-            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, g_default_particle_vec, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
                           0.666f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
             moby_mark_spawned(object);
         } else {
-            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, g_default_particle_vec, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
                           0.5f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
             moby_mark_spawned(object);

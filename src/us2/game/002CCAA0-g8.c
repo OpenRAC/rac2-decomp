@@ -15,41 +15,41 @@ typedef struct {
 typedef struct { char pad[0x1C4]; int flags; } InputState_US2_2CCAA0;
 extern MenuState_US2_2CCAA0 g_pause_menu_state;
 extern InputState_US2_2CCAA0 g_pad_state;
-extern char D_00259018[];
-extern char D_0025A738[];
-extern char D_0025A498[];
-extern char D_0025A190[];
-extern char D_0025A058[];
-extern char D_00259B48[];
-extern volatile int D_001AB910 __attribute__((sda));
-extern int (*D_00210ACC[])(int);
+extern char g_menu_page_pause[];
+extern char g_pause_page_d[];
+extern char g_pause_page_c[];
+extern char g_pause_page_b[];
+extern char g_pause_page_a[];
+extern char g_menu_page_source_alt[];
+extern volatile int g_pause_menu_busy_flag __attribute__((sda));
+extern int (*g_menu_page_input_handlers[])(int);
 extern void func_0029CE38(void);
 extern int func_US2_0029D0C8(int);
 extern int func_US2_002D7BA0(int);
 extern int func_US2_0029D138(int);
 
-int func_US2_002CCAA0(void)
+int menu_update_page_input_us2(void)
 {
     int result = 0;
 
-    if (g_pause_menu_state.source == D_00259018) {
+    if (g_pause_menu_state.source == g_menu_page_pause) {
         if (g_pad_state.flags & 0x910) {
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
             result = 1;
-        } else if (D_00210ACC[0](g_pad_state.flags) >= 0) {
+        } else if (g_menu_page_input_handlers[0](g_pad_state.flags) >= 0) {
             result = 1;
         }
-    } else if (g_pause_menu_state.source == D_0025A738) {
+    } else if (g_pause_menu_state.source == g_pause_page_d) {
         func_0029CE38();
-    } else if (g_pause_menu_state.source == D_0025A498 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == g_pause_page_c && !g_pause_menu_busy_flag) {
         func_US2_0029D0C8(0);
-    } else if (g_pause_menu_state.source == D_0025A190 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == g_pause_page_b && !g_pause_menu_busy_flag) {
         if (func_US2_002D7BA0(0))
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
         func_US2_0029D138(g_pad_state.flags);
-        result = g_pause_menu_state.destination != D_0025A498;
-    } else if ((g_pause_menu_state.source == D_0025A058 && !D_001AB910)
-               || (g_pause_menu_state.source == D_00259B48 && !D_001AB910)) {
+        result = g_pause_menu_state.destination != g_pause_page_c;
+    } else if ((g_pause_menu_state.source == g_pause_page_a && !g_pause_menu_busy_flag)
+               || (g_pause_menu_state.source == g_menu_page_source_alt && !g_pause_menu_busy_flag)) {
         /* nothing: only the tests remain */
     }
     return result;

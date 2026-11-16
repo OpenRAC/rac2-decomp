@@ -23,7 +23,7 @@ extern int FloatToInt(float a);
    is the record's number), asks the level's builder for a matrix with the flags the object's
    own word selects, then reads the record's two colour bytes and hands the level's renderer
    the object's record. */
-void func_PAL_L00_00423778(void *arg0)
+void rocket_draw_trail_pal(void *arg0)
 {
     unsigned char *self = arg0;
     unsigned char *rec;

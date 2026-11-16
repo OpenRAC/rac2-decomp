@@ -8,7 +8,7 @@ extern s32 ref_L00_00410430_03(void *, s32);
 extern u8 ref_L00_00410430_04[];
 extern volatile s32 ref_L00_00410430_05;
 
-void func_PAL_L00_00415238(void *arg0, s32 arg1, s32 arg2) {
+void charge_shot_start_effect_pal(void *arg0, s32 arg1, s32 arg2) {
     u8 *state = *(u8 **)((u8 *)arg0 + 0x68);
     void *result;
     s32 temp;

@@ -12,13 +12,13 @@ extern void part_spawn_masked_debris(f32, f32, f32, f32, char *, s32, f32 *, u8)
 
 /* level 12 data reached through $gp (small-data) */
 extern int g_current_map_index __attribute__((sda));
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
-extern u8 *D_L12_001B2E9C;
-extern int D_L12_001B18F0 __attribute__((sda));
+extern u8 *g_moby_list_start MACRO_ADDR;
+extern u8 *g_moby_list_start;
+extern int g_rise_controller_duration __attribute__((sda));
 
 /* level 12 data reached absolutely: out of the $gp window */
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 D_0019B4A8[];
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 g_moby_nibble_table[];
 
 typedef struct Actor {
     char pad00[0x18];
@@ -57,10 +57,10 @@ void single_child_rise_controller_update(Actor *self)
         self->f20 = 1;
         vars->f8 = self->f18;
         raw_id = self->fB2;
-        if (D_L12_0021EDF0.flags[(s16)raw_id] != 0)
+        if (g_object_flags.flags[(s16)raw_id] != 0)
             goto Destroy;
         {
-            s32 saved_bits = D_0019B4A8[((s16)raw_id >> 1) + (g_current_map_index << 10)];
+            s32 saved_bits = g_moby_nibble_table[((s16)raw_id >> 1) + (g_current_map_index << 10)];
             if (raw_id & 1) {
                 if (((saved_bits >> 4) & 7) != 0)
                     goto Destroy;
@@ -75,7 +75,7 @@ void single_child_rise_controller_update(Actor *self)
     }
     case 1:
         if (vars->f0 != -1) {
-            if (linked_moby_is_finished(D_L12_001B2E9C + (vars->f0 << 8)) == 0)
+            if (linked_moby_is_finished(g_moby_list_start + (vars->f0 << 8)) == 0)
                 return;
         }
         self->f20 = 2;
@@ -88,7 +88,7 @@ void single_child_rise_controller_update(Actor *self)
         self->f18 = self->f18 + vars->f4;
         index = vars->f0;
         if (index != -1) {
-            u8 *base = D_L12_001B2E9C;
+            u8 *base = g_moby_list_start;
             ((Actor *)base)[index].f18 += vars->f4;
         }
         if (vars->f8 + 8.0f < self->f18)
@@ -100,14 +100,14 @@ void single_child_rise_controller_update(Actor *self)
         if (math_fast_float_d(&vars->fC) != 0)
             return;
         moby_set_state((u8 *)self, 3, -1);
-        vars->fC = D_L12_001B18F0;
+        vars->fC = g_rise_controller_duration;
         return;
 
     case 3: {
         u16 raw_id;
 
         if (math_fast_float_d(&vars->fC) != 0) {
-            u8 *child = (u8 *)D_L12_001B2E9C + (vars->f0 << 8);
+            u8 *child = (u8 *)g_moby_list_start + (vars->f0 << 8);
             f32 offset[4];
 
             SpawnExplosion(child + 0x10, 1, 0xE, 0xA, 0xF, 0xA, 0x14, 1,
@@ -118,24 +118,24 @@ void single_child_rise_controller_update(Actor *self)
             vec_scale_to_length(offset, self->fC0, -0.10000000894069672f);
             part_spawn_masked_debris(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, offset, 0xFF);
             if (vars->f0 != -1) {
-                ((Actor *)D_L12_001B2E9C)[vars->f0].f34 &= 0xEFFF;
-                moby_mark_spawned(D_L12_001B2E9C + (vars->f0 << 8));
+                ((Actor *)g_moby_list_start)[vars->f0].f34 &= 0xEFFF;
+                moby_mark_spawned(g_moby_list_start + (vars->f0 << 8));
             }
         raw_id = self->fB2;
         if (raw_id & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
+            u8 *cell = g_moby_nibble_table + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
+            u8 *cell = g_moby_nibble_table + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
 Destroy:
         moby_mark_spawned(self);
-        } else if (vars->fC == D_L12_001B18F0 / 2) {
+        } else if (vars->fC == g_rise_controller_duration / 2) {
             if (vars->f0 != -1)
-                ((Actor *)D_L12_001B2E9C)[vars->f0].f20 = 4;
+                ((Actor *)g_moby_list_start)[vars->f0].f20 = 4;
         }
         return;
 
@@ -145,11 +145,11 @@ Destroy:
 
         raw_id = self->fB2;
         if (raw_id & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
+            u8 *cell = g_moby_nibble_table + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
+            u8 *cell = g_moby_nibble_table + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }

@@ -25,9 +25,9 @@ typedef struct {
 typedef struct { char pad[4]; unsigned char piercing; char pad5[0x6B]; float damage; char tail[0x6C]; } Material;
 
 extern Collision g_collision_result;
-extern Vector D_L00_0023B710[][4];
+extern Vector g_projectile_offset_points[][4];
 extern Material g_weapon_l00_table[];
-extern unsigned short D_L00_001B1FB0[] MACRO_ADDR;
+extern unsigned short g_homing_moby_index_list[] MACRO_ADDR;
 extern char g_camera_l00_position[];
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby;
@@ -193,14 +193,14 @@ void homing_l00_shot_update(char *object)
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f
         || *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
-        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        RemoveMobyFromIndexList(object, g_homing_moby_index_list);
         table_clear_entry_flag(*(int *)(state + 0x50));
         moby_mark_spawned(object);
         return;
     }
     moby_transform_offset_to_world(object, delta);
     {
-        Vector *trail = D_L00_0023B710[*(int *)(state + 0x2C)];
+        Vector *trail = g_projectile_offset_points[*(int *)(state + 0x2C)];
         int k;
 
         for (k = 3; k > 0; k--) {
@@ -284,13 +284,13 @@ checked:
         part_spawn_blast_effect_moby(object, object + 0x10, normal, spin);
         homing_shot_spawn_explosion(object, up, owner);
     }
-    RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+    RemoveMobyFromIndexList(object, g_homing_moby_index_list);
     table_clear_entry_flag(*(int *)(state + 0x50));
     moby_mark_spawned(object);
     return;
 far:
     if (FastDecTimer(state + 0x24) != 0 || vec_distance_xy(object + 0x10, g_hero_position) > 75.0f) {
-        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        RemoveMobyFromIndexList(object, g_homing_moby_index_list);
         table_clear_entry_flag(*(int *)(state + 0x50));
         moby_mark_spawned(object);
     }

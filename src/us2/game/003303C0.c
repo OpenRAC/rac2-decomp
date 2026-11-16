@@ -6,7 +6,7 @@
    func_US2_00327AB0. */
 
 extern char g_hero_state[];
-extern unsigned char D_US2_001A7A4C MACRO_ADDR;
+extern unsigned char g_level_status_byte MACRO_ADDR;
 extern void vec_clear_128(float *buf);
 extern float FastVecLength(float *buf);
 extern float g_stick_length MACRO_ADDR;
@@ -17,7 +17,7 @@ void func_US2_00330BE8(char *obj)
     char *e = *(char **)(obj + 104);
     float a, b, x;
 
-    if (D_US2_001A7A4C != 0) {
+    if (g_level_status_byte != 0) {
         char *d = g_hero_state;
         *(float *)(e + 84) = *(float *)(d + 8112);
     } else {

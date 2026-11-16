@@ -15,13 +15,13 @@ extern u32 g_entity_group_lists[];
 
 extern char g_hero_state[];
 
-extern f32 D_L02_001B1218 __attribute__((sda));
+extern f32 g_arena_tally_sum_weight __attribute__((sda));
 
-extern f32 D_L02_001B121C __attribute__((sda));
+extern f32 g_arena_tally_count_weight __attribute__((sda));
 
-extern f32 D_L02_001B1220 __attribute__((sda));
+extern f32 g_arena_tally_hero_weight __attribute__((sda));
 
-extern u16 D_L02_001B1214 __attribute__((sda));
+extern u16 g_arena_tally_reload_time __attribute__((sda));
 
 extern void actor_pick_idle_message(char *, s32, f32, f32);
 
@@ -124,14 +124,14 @@ void arena_update_enemy_tally(char *actor) {
                     weightedHero += weight * *(f32 *)(b8 + (ringIndex << 4));
                 }
                 *(f32 *)(state + 0x6C) =
-                    D_L02_001B1218 * weightedSum + D_L02_001B121C * weightedCount + D_L02_001B1220 * weightedHero;
+                    g_arena_tally_sum_weight * weightedSum + g_arena_tally_count_weight * weightedCount + g_arena_tally_hero_weight * weightedHero;
                 {
                     char *timer = state + 0x11E;
 
                     if (FastDecTimer(timer)) {
                         char *b4 = state + 4;
                         char *b8 = state + 8;
-                        u16 reload = D_L02_001B1214;
+                        u16 reload = g_arena_tally_reload_time;
                         s32 t;
                         s32 idx;
 

@@ -2,7 +2,7 @@
 #include "moby_classes.h"
 #include "names.h"
 
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 
 extern int g_current_map_index __attribute__((sda));
 
@@ -11,7 +11,7 @@ extern int math_sum_weighted_table_taps(int, int);
 /* Works out a level from the current difficulty and the given value, giving 3 when the mode flag is set. */
 int level_get_difficulty_scaled(int amount)
 {
-    int mode = D_001A7A0A;
+    int mode = g_extras_unlocked_flag;
     int steps;
     int v;
 
@@ -33,7 +33,7 @@ void moby_scale_by_difficulty(char *object)
 {
     char *glow;
 
-    if (D_001A7A0A == 0)
+    if (g_extras_unlocked_flag == 0)
         return;
     {
         short classId = *(short *)(object + 0xAA);

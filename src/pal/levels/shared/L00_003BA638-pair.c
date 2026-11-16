@@ -39,16 +39,16 @@ typedef struct {
 #define PAD_RIGHT  0x2000
 #define PAD_LEFT   0x8000
 extern PadState g_pad_state;
-extern PadState D_00138500;
-extern float D_L00_001B8FF0[12];
-extern float D_L00_001AFAA8 __attribute__((sda));
-extern float D_L00_001AFAAC __attribute__((sda));
-extern float D_L00_001AFAB0 __attribute__((sda));
-extern float D_L00_001AFAB4 __attribute__((sda));
-extern float D_L00_001AFAB8 __attribute__((sda));
-extern Vector D_L00_001AFAC0 __attribute__((sda));
-extern float D_L00_001AFA40 __attribute__((sda));
-extern int D_L00_001AFA48 __attribute__((sda));
+extern PadState g_pad_device_state;
+extern float g_cam_follow_matrix[12];
+extern float g_pair_game_turn_rate __attribute__((sda));
+extern float g_pair_game_turn_accel __attribute__((sda));
+extern float g_pair_game_thrust __attribute__((sda));
+extern float g_pair_game_top_speed __attribute__((sda));
+extern float g_pair_game_shot_speed __attribute__((sda));
+extern Vector g_pair_game_muzzle_offset __attribute__((sda));
+extern float g_pair_game_centre_pull __attribute__((sda));
+extern int g_pair_game_shot_interval __attribute__((sda));
 extern void matrix_from_basis_rows(void *out, void *matrix);
 extern void matrix_mul_vec3(void *out, void *vector, void *matrix);
 extern void vec_scale_to_length(void *out, void *in, float length);
@@ -80,31 +80,31 @@ void func_PAL_L00_003BA638(Moby *object)
         axes[0] = 1.0f;
     else if (g_pad_state.held & PAD_RIGHT)
         axes[0] = -1.0f;
-    axes[1] = -D_00138500.analog[2];
-    if (D_00138500.held & PAD_LEFT)
+    axes[1] = -g_pad_device_state.analog[2];
+    if (g_pad_device_state.held & PAD_LEFT)
         axes[1] = 1.0f;
-    else if (D_00138500.held & PAD_RIGHT)
+    else if (g_pad_device_state.held & PAD_RIGHT)
         axes[1] = -1.0f;
     held[0] = g_pad_state.held;
-    held[1] = D_00138500.held;
+    held[1] = g_pad_device_state.held;
     pressed[0] = g_pad_state.pressed;
-    pressed[1] = D_00138500.pressed;
+    pressed[1] = g_pad_device_state.pressed;
 
-    matrix_from_basis_rows(inverse, D_L00_001B8FF0);
+    matrix_from_basis_rows(inverse, g_cam_follow_matrix);
     for (i = 0; i < 2; ++i) {
         actor = context->actors[i];
         if (actor->modeBits & 1)
             continue;
 
         /* Turn by the stick (degrees per second to radians per frame). */
-        ApproachValue(&context->steering[i], D_L00_001AFAA8 * (axes[i] * 0.0003490659f),
-                      D_L00_001AFAAC * 6.981318e-06f);
+        ApproachValue(&context->steering[i], g_pair_game_turn_rate * (axes[i] * 0.0003490659f),
+                      g_pair_game_turn_accel * 6.981318e-06f);
         actor->rotation[2] = FastAddRotations(actor->rotation[2], context->steering[i]);
 
         /* Thrust along the actor's forward axis while cross is held. */
         if (held[i] & PAD_CROSS) {
             matrix_mul_vec3(&impulse, actor->matrix[0], inverse);
-            vec_scale_to_length(&impulse, &impulse, D_L00_001AFAB0 * 0.00040000002f);
+            vec_scale_to_length(&impulse, &impulse, g_pair_game_thrust * 0.00040000002f);
             impulse.v[0] = 0.0f;
             FastVecAdd(&context->velocities[i], &context->velocities[i], &impulse);
             local.q = 0;
@@ -121,20 +121,20 @@ void func_PAL_L00_003BA638(Moby *object)
             muzzle.v[1] = context->velocities[i].v[1];
             muzzle.v[2] = context->velocities[i].v[2];
             local.q = muzzle.q;
-            matrix_mul_vec3(&muzzle, &D_L00_001AFAC0, actor->matrix);
+            matrix_mul_vec3(&muzzle, &g_pair_game_muzzle_offset, actor->matrix);
             FastVecAdd(&muzzle, &muzzle, actor->position);
-            vec_scale_to_length(&impulse, actor->matrix[0], D_L00_001AFAB8 * 0.020000001f);
-            matrix_mul_vec3(&local, &local, D_L00_001B8FF0);
+            vec_scale_to_length(&impulse, actor->matrix[0], g_pair_game_shot_speed * 0.020000001f);
+            matrix_mul_vec3(&local, &local, g_cam_follow_matrix);
             FastVecAdd(&impulse, &impulse, &local);
             pair_game_spawn_shot(actor, &muzzle, &impulse, (void *)i);
-            context->timers[i] = ((s32)(D_L00_001AFA48) * 5 + 2) / 6;
+            context->timers[i] = ((s32)(g_pair_game_shot_interval) * 5 + 2) / 6;
         }
 
         /* Pull toward the centre, cap the speed and move. */
         func_PAL_L00_003BAD50(context->positions[i].v[1], context->positions[i].v[2],
-                          D_L00_001AFA40 * 0.00040000002f,
+                          g_pair_game_centre_pull * 0.00040000002f,
                           &context->velocities[i].v[1], &context->velocities[i].v[2]);
-        vec_clamp_length(context->velocities[i].v, D_L00_001AFAB4 * 0.020000001f);
+        vec_clamp_length(context->velocities[i].v, g_pair_game_top_speed * 0.020000001f);
         FastVecAdd(&context->positions[i], &context->positions[i], &context->velocities[i]);
     }
 }

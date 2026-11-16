@@ -9,11 +9,11 @@ extern void level_apply_index_for_key(int);
 extern int req_push_queue(void *, int);
 extern int req_launch_queued(void *);
 extern int game_is_either_mode_two(void);
-extern void func_PAL_002F6C18(void);
+extern void game_set_slowdown_factor_pal(void);
 extern void moby_set_state(void *, int, int);
 extern void help_unlock_entry(int);
 extern int moby_handle_request_slot_state(int);
-extern void func_PAL_002B1588(int, int);
+extern void value_set_entry_by_index_pal(int, int);
 extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern int MemcardSave(int, int);
@@ -34,15 +34,15 @@ extern void FastVecSub(void *, void *, void *);
 extern float fast_subtract_rotations(float, float);
 extern float vec_length_xy(void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
-extern unsigned char D_001A7B2E, D_001A7A40;
-extern int D_001397D8 NOT_SDA;
-extern unsigned char D_0013960F NOT_SDA;
-extern int D_L11_001A8F00;
+extern unsigned char g_action_flag, g_unlocked_item_flags;
+extern int g_object_state_flags_e NOT_SDA;
+extern unsigned char g_level_event_flag_c NOT_SDA;
+extern int g_arena_state;
 /* Both dialogue states set the gate D_L11_001B32E0[2] before polling and clear it on exit. */
-extern int D_L11_001B32E0[] __attribute__((sda));
+extern int g_level_state_flags[] __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_0019B2E8[][16];
-extern unsigned char D_L11_001C0AC0[];
+extern unsigned char g_moby_group_flags[][16];
+extern unsigned char g_request_l11_queue[];
 /* Measured player prefix used by the position, aiming and motion checks. */
 typedef struct {
     unsigned char pad[0x80];
@@ -54,7 +54,7 @@ typedef struct {
     float velocity[4];
 } JobaPlayerView;
 extern JobaPlayerView g_hero_state;
-extern char D_00189F00[];
+extern char g_hero_target_point[];
 
 void func_PAL_L11_003FCA30(unsigned char *moby) {
     float target[4] __attribute__((aligned(16)));
@@ -67,13 +67,13 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
     moby_reset_matching_effects(moby);
     switch (moby[0x20]) {
     case 0:
-        if (D_001A7B2E) {
+        if (g_action_flag) {
             moby_mark_spawned(moby);
             return;
         }
         {
             moby_reset_vars_defaults(moby);
-            if (D_001397D8 & 0x10000)
+            if (g_object_state_flags_e & 0x10000)
                 moby_set_state(moby, 3, -1);
             else
                 moby_set_state(moby, 1, -1);
@@ -82,52 +82,52 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
     case 1:
         if (IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
             level_apply_index_for_key((int)moby);
-            if (req_push_queue(D_L11_001C0AC0, 0x70)) {
-                req_launch_queued(D_L11_001C0AC0);
+            if (req_push_queue(g_request_l11_queue, 0x70)) {
+                req_launch_queued(g_request_l11_queue);
                 moby_set_state(moby, 2, -1);
             }
         }
         break;
     case 2:
-        D_L11_001B32E0[2] = 1;
-        if (D_L11_001A8F00 == 2) {
+        g_level_state_flags[2] = 1;
+        if (g_arena_state == 2) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L11_001B32E0[2] = 0;
+            g_level_state_flags[2] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
             moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
-        if (D_0013960F &&
+        if (g_level_event_flag_c &&
             IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
             level_apply_index_for_key((int)moby);
-            if (req_push_queue(D_L11_001C0AC0, 0x71)) {
-                req_launch_queued(D_L11_001C0AC0);
-                func_PAL_002F6C18();
+            if (req_push_queue(g_request_l11_queue, 0x71)) {
+                req_launch_queued(g_request_l11_queue);
+                game_set_slowdown_factor_pal();
                 moby_set_state(moby, 4, -1);
             }
         }
         break;
     case 4:
-        D_L11_001B32E0[2] = 1;
-        if (D_L11_001A8F00 == 2) {
+        g_level_state_flags[2] = 1;
+        if (g_arena_state == 2) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L11_001B32E0[2] = 0;
+            g_level_state_flags[2] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
-            if (!D_001A7B2E) {
+            if (!g_action_flag) {
                 help_unlock_entry(0x36);
                 moby_handle_request_slot_state(0x36);
-                func_PAL_002B1588(0x1232, -1);
+                value_set_entry_by_index_pal(0x1232, -1);
                 if (moby[0xB0] != 255) {
-                    if (!(D_0019B2E8[g_current_map_index][moby[0xB0]] & 0x80))
+                    if (!(g_moby_group_flags[g_current_map_index][moby[0xB0]] & 0x80))
                         moby_mark_table_entry_flagged(moby[0xB0]);
                     level_capture_checkpoint_state(g_hero_state.position, g_hero_state.rotation);
                 } else {
@@ -163,7 +163,7 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
                 math_fast_float_d(data + 0x114);
         } else if (*(int *)(data + 0x114)) {
             *(int *)(data + 0x114) = 0;
-            qcopy(data + 0x100, D_00189F00);
+            qcopy(data + 0x100, g_hero_target_point);
         }
         if (math_fast_float_d(data + 0x118)) {
             *(int *)(data + 0x118) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
@@ -174,7 +174,7 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
             FastVecAdd(data + 0x100, data + 0x100, moby + 0x10);
         }
         if (*(int *)(data + 0x114)) {
-            qcopy(target, D_00189F00);
+            qcopy(target, g_hero_target_point);
             speed = 0.04f;
             blend = 0.3f;
         } else {
@@ -200,7 +200,7 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
         *(float *)(data + 0x68) = angle * 0.6f;
         *(float *)(data + 0xE8) = angle * 0.4f;
     }
-    if (D_001A7A40)
+    if (g_unlocked_item_flags)
         *(float *)(data + 0x70) = 2.75f;
     {
         float scale = 1.44f;

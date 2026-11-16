@@ -2,23 +2,23 @@
 #include "names.h"
 
 typedef struct { unsigned char value; } ResidentFlag;
-extern ResidentFlag D_001A7BC9;
-extern ResidentFlag D_001A7BCA;
-extern ResidentFlag D_001A7BCB;
-extern ResidentFlag D_001A7BCC;
-extern ResidentFlag D_001A7BCE;
-extern short D_L00_001AA8C2;
-extern short D_L00_001AA8DA;
-extern short D_L00_001AA8F2;
-extern short D_L00_001AA90A;
-extern short D_L00_001AA922;
+extern ResidentFlag g_unlock_flag_a;
+extern ResidentFlag g_unlock_flag_b;
+extern ResidentFlag g_unlock_flag_c;
+extern ResidentFlag g_unlock_flag_d;
+extern ResidentFlag g_unlock_flag_e;
+extern short g_unlock_icon_state_a;
+extern short g_unlock_icon_state_b;
+extern short g_unlock_icon_state_c;
+extern short g_unlock_icon_state_d;
+extern short g_unlock_icon_state_e;
 
 /* Updates five menu icon values from five unlock flags: each becomes 3 when unlocked and 0 when not. */
 void menu_refresh_unlock_icon_states(void)
 {
-    D_L00_001AA8C2 = D_001A7BC9.value ? 3 : 0;
-    D_L00_001AA8DA = D_001A7BCA.value ? 3 : 0;
-    D_L00_001AA8F2 = D_001A7BCB.value ? 3 : 0;
-    D_L00_001AA90A = D_001A7BCC.value ? 3 : 0;
-    D_L00_001AA922 = D_001A7BCE.value ? 3 : 0;
+    g_unlock_icon_state_a = g_unlock_flag_a.value ? 3 : 0;
+    g_unlock_icon_state_b = g_unlock_flag_b.value ? 3 : 0;
+    g_unlock_icon_state_c = g_unlock_flag_c.value ? 3 : 0;
+    g_unlock_icon_state_d = g_unlock_flag_d.value ? 3 : 0;
+    g_unlock_icon_state_e = g_unlock_flag_e.value ? 3 : 0;
 }

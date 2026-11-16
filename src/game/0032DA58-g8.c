@@ -10,11 +10,11 @@ extern int CollLine(void *, void *, int, void *, int);
 extern int math_fast_helper_a(void *, float);
 extern void part_emit_blast_and_shake(void *, void *);
 extern char g_camera_eye_state[];
-extern float D_001B081C __attribute__((sda));
-extern short D_001B0750 __attribute__((sda)), D_001B0778 __attribute__((sda));
-extern short D_001B0754 __attribute__((sda)), D_001B077C __attribute__((sda));
-extern short D_001B0828 __attribute__((sda)), D_001B082C __attribute__((sda));
-extern int D_001B0834 __attribute__((sda)), D_001B0838 __attribute__((sda));
+extern float g_blast_moby_height_limit __attribute__((sda));
+extern short g_blast_moby_first_id_a __attribute__((sda)), g_blast_moby_second_id __attribute__((sda));
+extern short g_blast_moby_first_id_b __attribute__((sda)), g_blast_moby_first_id_c __attribute__((sda));
+extern short g_blast_moby_state_short_a __attribute__((sda)), g_blast_moby_state_short_b __attribute__((sda));
+extern int g_blast_moby_state_word __attribute__((sda)), g_blast_moby_extra_word __attribute__((sda));
 /* Spawns a small blast effect at a position, giving it random spin and timing values. It also adds a ground mark when the spot is on a surface. */
 char *part_spawn_blast_effect_moby(int unused, float *position, float *direction, float height)
 {
@@ -40,7 +40,7 @@ char *part_spawn_blast_effect_moby(int unused, float *position, float *direction
         FastVecScale(offset, self + 0xC0, 0.5f);
         FastVecAdd(self + 0x10, self + 0x10, offset);
         if (height != 0.0f) {
-            if (D_001B081C * 1.5f <= *(float *)(self + 0x18) - height) height = 0.0f;
+            if (g_blast_moby_height_limit * 1.5f <= *(float *)(self + 0x18) - height) height = 0.0f;
         }
         *(float *)(state + 0x18) = height;
         *(float *)(state + 0) = math_random_angle();
@@ -49,34 +49,34 @@ char *part_spawn_blast_effect_moby(int unused, float *position, float *direction
         *(float *)(state + 12) = math_random_angle();
         *(float *)(state + 16) = math_random_angle();
         value = math_random_angle();
-        first = D_001B0750;
-        second = D_001B0778;
+        first = g_blast_moby_first_id_a;
+        second = g_blast_moby_second_id;
         *(short *)(state + 0x1C) = first;
         *(short *)(state + 0x1E) = second;
         *(float *)(state + 20) = value;
         *(float *)(state + 0x20) = 1.0f / IntToFloat(*(short *)(state + 0x1C));
         value = 1.0f / IntToFloat(*(short *)(state + 0x1E));
-        first = D_001B0754;
+        first = g_blast_moby_first_id_b;
         *(short *)(state + 0x28) = *(short *)(state + 0x1C) - first;
         *(float *)(state + 0x24) = value;
         value = 1.0f / IntToFloat(*(short *)(state + 0x28));
-        first = D_001B077C;
+        first = g_blast_moby_first_id_c;
         *(short *)(state + 0x2A) = *(short *)(state + 0x1E) - first;
         *(float *)(state + 0x2C) = value;
         *(float *)(state + 0x30) = 1.0f / IntToFloat(*(short *)(state + 0x2A));
         if (CollLine(self + 0x10, g_camera_eye_state, 18, 0, 0)) {
             *(short *)(state + 0x36) = 0;
         } else {
-            *(short *)(state + 0x36) = D_001B0828;
+            *(short *)(state + 0x36) = g_blast_moby_state_short_a;
             *(float *)(state + 0x38) = 1.0f / IntToFloat(*(short *)(state + 0x36));
             qcopy(sphere, self + 0x10);
             sphere[3] = 1.0f;
             if (math_fast_helper_a(sphere, 128.0f) == 1) {
-                *(short *)(state + 0x34) = D_001B082C;
+                *(short *)(state + 0x34) = g_blast_moby_state_short_b;
                 *(float *)(state + 0x3C) = 1.0f / IntToFloat(*(short *)(state + 0x34));
-                *(int *)(state + 0x40) = D_001B0834;
+                *(int *)(state + 0x40) = g_blast_moby_state_word;
                 *(float *)(state + 0x44) = 1.0f / IntToFloat(*(int *)(state + 0x40));
-                extra = D_001B0838;
+                extra = g_blast_moby_extra_word;
                 *(int *)(state + 0x40) += extra;
             } else {
                 *(short *)(state + 0x34) = 0;

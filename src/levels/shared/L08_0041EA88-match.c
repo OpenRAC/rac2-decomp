@@ -14,8 +14,8 @@ typedef union L08Scratch {
 
 extern u8 g_hero_state[];
 extern u8 g_hero_position[];
-extern float D_L08_001B9D30[];
-extern Vec D_L08_001BFF60;
+extern float g_hero_l08_matrix[];
+extern Vec g_collision_l08_hit_point;
 
 extern void script_queue_keyed_request(void *, void *);
 extern int level_set_game_state_pair(int, int, unsigned int);
@@ -48,16 +48,16 @@ void vehicle_end_ride(u8 *vehicle)
     *(u32 *)(vars + 0x74) = 0;
     *(s16 *)(vars + 0x88) = 0;
     *(u8 *)(vars + 0x8A) = 0;
-    qcopy(&spot, D_L08_001B9D30);
+    qcopy(&spot, g_hero_l08_matrix);
     spot.s.scale = 0.0f;
     vec_scale_to_length((char *)&spot, (char *)&spot, 2.5f);
     spot.s.scale = 0.7f;
     FastVecAdd((char *)&spot, (char *)(vehicle + 0x10), (char *)&spot);
     *(u32 *)(vehicle + 0x98) = 0;
     if (CollLine(hero + 0x80, (char *)&spot, 2, (void *)*(u32 *)(hero + 0x2290), 0) != 0) {
-        qcopy(&spot, &D_L08_001BFF60);
+        qcopy(&spot, &g_collision_l08_hit_point);
         if (coll_test_point((char *)&spot, 2, (void *)*(u32 *)(hero + 0x2290), 0.4f) != 0) {
-            qcopy(&spot, &D_L08_001BFF60);
+            qcopy(&spot, &g_collision_l08_hit_point);
         }
     }
     qcopy(g_hero_position, &spot);

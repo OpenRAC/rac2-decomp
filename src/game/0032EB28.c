@@ -59,11 +59,11 @@ extern void F7242f0a4_FUN_00282D30(char *out, void *source, float value);
 extern int F7242f0a4_FUN_00334730(char *buffer, int mode);
 
 extern f32 math_random_signed_float_range(f32 low, f32 high);
-extern f32 D_001A8BD0[] __attribute__((sda));
+extern f32 g_default_effect_vector[] __attribute__((sda));
 
 typedef union { TI128 quad; float v[4]; } EffectVector;
 
-extern unsigned char *D_001F2540[];                     /* the texture table */
+extern unsigned char *g_particle_texture_table[];                     /* the texture table */
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_below(int);
@@ -118,15 +118,15 @@ extern void *F081de6c9_FUN_00336E40(int x);
 
 extern int *F081de6c9_FUN_00336DA8(int n, int x);
 
-extern int D_001B2860[] __attribute__((sda));
+extern int g_moby_slot_ids[] __attribute__((sda));
 
-extern char D_001B0A88[];
+extern char g_str_moby_release_debug[];
 
 extern void STUB_printf(void *);
 
-extern unsigned short *D_001EE5A0[];
+extern unsigned short *g_moby_group_lists[];
 
-extern char *D_001B1B5C __attribute__((sda));
+extern char *g_moby_pool_start __attribute__((sda));
 
 extern void part_draw_spinning_billboard_pair(void *, void *, int, float);
 
@@ -144,37 +144,37 @@ extern void FastVecAdd(void *, void *, void *);
 
 extern void moby_clear_visible_flags(void);
 
-extern char D_001AD9C8[] __attribute__((sda));
+extern char g_object_free_type_table[] __attribute__((sda));
 
 extern void ui_nop_a(void *);
 
 extern void assert_fail_abort(char *, int, char *);
 
-extern char D_001AD8B0[];
+extern char g_str_assert_file[];
 
-extern char D_001AD8C8[];
+extern char g_str_assert_expr[];
 
-extern char D_001AD9A8[] __attribute__((sda));
+extern char g_object_type_table[] __attribute__((sda));
 
 extern void object_reset_type_and_free(void *, int);
 
-extern int D_001B23A0 __attribute__((sda));
+extern int g_hud_mode __attribute__((sda));
 
-extern char D_001ADA78[] __attribute__((sda));
+extern char g_object_base_table[] __attribute__((sda));
 
-extern char D_001ADA78[] __attribute__((sda));
+extern char g_object_base_table[] __attribute__((sda));
 
 extern void ui_nop_a(void *);
 
 extern void *object_init_base(void *);
 
-extern char D_001ADA58[] __attribute__((sda));
+extern char g_object_derived_table_a[] __attribute__((sda));
 
 extern void *table_find_by_id(int, int);
 
-extern char D_001AD9F8[] __attribute__((sda));
+extern char g_object_derived_table_b[] __attribute__((sda));
 
-extern char D_001ADA38[] __attribute__((sda));
+extern char g_object_derived_table_c[] __attribute__((sda));
 
 /* Measured partial layouts; original type and game roles are unknown. */
 
@@ -233,18 +233,18 @@ void part_spawn_spark_burst_2(TI128 *a0, void *dir)
         pos[1] = base.v[1] + math_random_signed_float_range(0.0f, 0.1f);
         pos[2] = base.v[2] + math_random_signed_float_range(0.0f, 0.1f);
         rnd = math_random_int_below(0xFF);
-        p = part_spawn_gravity_fade(pos, D_001A8BD0, 10, 0x407FFF, rnd, 0x7F, 0, size, size, 0.0f, 1);
+        p = part_spawn_gravity_fade(pos, g_default_effect_vector, 10, 0x407FFF, rnd, 0x7F, 0, size, size, 0.0f, 1);
         if (p != 0)
-            p[2] = D_001F2540[92][5];
-        p = part_spawn_gravity_fade(pos, D_001A8BD0, 10, 0x406080, rnd, 0x7F, 0, size, size, 0.0f, 1);
+            p[2] = g_particle_texture_table[92][5];
+        p = part_spawn_gravity_fade(pos, g_default_effect_vector, 10, 0x406080, rnd, 0x7F, 0, size, size, 0.0f, 1);
         if (p != 0)
-            p[2] = D_001F2540[53][0];
+            p[2] = g_particle_texture_table[53][0];
     } while (i >= 0);
 }
 
 extern s32 FloatToInt(f32 value);
 extern u8 *part_spawn_burst(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
-extern u8 *D_001F26B0;
+extern u8 *g_part_tex_flash_puffs_table;
 /* Spawns a couple of puffs and one bright flash near a position. */
 void part_spawn_flash_puffs(f32 *pos, f32 scale)
 {
@@ -256,11 +256,11 @@ void part_spawn_flash_puffs(f32 *pos, f32 scale)
     v[0] = pos[0] + math_random_signed_float_range(0.0f, 0.04f);
     v[1] = pos[1] + math_random_signed_float_range(0.0f, 0.04f);
     v[2] = pos[2] + math_random_signed_float_range(0.0f, 0.04f);
-    part_spawn_burst(v, D_001A8BD0, 15, 0x5F, 0x7F7F7F, FloatToInt(math_random_signed_float_range(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
+    part_spawn_burst(v, g_default_effect_vector, 15, 0x5F, 0x7F7F7F, FloatToInt(math_random_signed_float_range(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
     }
-    effect = part_spawn_burst(v, D_001A8BD0, 15, 0x7F, 0x407FFF, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
+    effect = part_spawn_burst(v, g_default_effect_vector, 15, 0x7F, 0x407FFF, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
     if (effect != 0) {
-        effect[2] = D_001F26B0[5];
+        effect[2] = g_part_tex_flash_puffs_table[5];
     }
 }
 
@@ -273,12 +273,12 @@ void moby_release_slot_by_id(int slot_id) {
     int i;
 
     for (i = 0; i < 16; i++) {
-        if (D_001B2860[i] == slot_id) {
-            D_001B2860[i] = 0;
+        if (g_moby_slot_ids[i] == slot_id) {
+            g_moby_slot_ids[i] = 0;
             return;
         }
     }
-    STUB_printf(D_001B0A88);
+    STUB_printf(g_str_moby_release_debug);
 }
 
 /* Creates a new game object at a position and sets up its direction and starting values. */
@@ -326,12 +326,12 @@ char *moby_spawn_directed(void *a0, void *a1, void *a2)
 /* Sets one byte of private data on every object in a list. */
 void moby_set_entry_list_flag_byte(int index, int value)
 {
-    unsigned short *list = D_001EE5A0[index];
+    unsigned short *list = g_moby_group_lists[index];
     if (list != 0) {
         unsigned short *entry = list;
         int key;
         do {
-            char *object = (char *)(((*entry & 0x7FFF) << 8) + (unsigned int)D_001B1B5C);
+            char *object = (char *)(((*entry & 0x7FFF) << 8) + (unsigned int)g_moby_pool_start);
             *(unsigned char *)(*(char **)(object + 0x68) + 0x15) = value;
             key = *(short *)entry++;
         } while (key >= 0);
@@ -386,8 +386,8 @@ extern L_34730TI hero_copy_vector_to_out(int, L_34730TI *);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern char D_001B53A0[];
-extern float D_001BAFA0[];
+extern char g_camera_follow_state[];
+extern float g_coll_hit_position[];
 
 /* Works out the camera spot to use, checking whether something blocks the view. */
 int cam_resolve_position(float *out, int flag)
@@ -398,7 +398,7 @@ int cam_resolve_position(float *out, int flag)
     float ofs[4] __attribute__((aligned(16)));
     L_34730Hero *hero = (L_34730Hero *)&g_hero_state;
     float f;
-    char *cam = D_001B53A0;
+    char *cam = g_camera_follow_state;
 
     if (hero->h[0x34C / 2] == 0) {
         hero_copy_vector_to_out(((int *)cam)[-4], (L_34730TI *)out);
@@ -412,7 +412,7 @@ int cam_resolve_position(float *out, int flag)
         FastVecScale(ofs, cam + 0x30, -30.0f);
         FastVecAdd(far, base, ofs);
         if (CollLine(near, far, 0x12, (void *)hero->i[0x2290 / 4], 0) != 0) {
-            qcopy(out, D_001BAFA0);
+            qcopy(out, g_coll_hit_position);
             return 0;
         }
         qcopy(out, base);
@@ -518,7 +518,7 @@ void cam_call_helper(void) {
 
 /* Resets an object and frees it when the flag asks for it. */
 void object_reset_type_and_free(void *object, int flags) {
-    *(void **)((char *)object + 4) = D_001AD9C8;
+    *(void **)((char *)object + 4) = g_object_free_type_table;
     if (flags & 1)
         ui_nop_a(object);
 }
@@ -526,7 +526,7 @@ void object_reset_type_and_free(void *object, int flags) {
 /* Fills four numbers from a blend factor and its opposite. */
 void math_fill_blend_weights(void *unused, char *out, float factor) {
     if (out == 0)
-        assert_fail_abort(D_001AD8B0, 61, D_001AD8C8);
+        assert_fail_abort(g_str_assert_file, 61, g_str_assert_expr);
     *(float *)(out + 0x0) = factor;
     *(float *)(out + 0x4) = factor * 0.5f;
     *(float *)(out + 0x8) = 1.0f - factor;
@@ -538,13 +538,13 @@ void math_fill_blend_weights(void *unused, char *out, float factor) {
 
 /* Sets the type pointer of an object and returns it. */
 void *object_init_type_pointer(void *object) {
-    *(void **)object = D_001AD9A8;
+    *(void **)object = g_object_type_table;
     return object;
 }
 
 /* Resets an object type pointer and frees it when the flag asks for it. */
 void object_destroy_with_type(void *object, int flags) {
-    *(void **)object = D_001AD9A8;
+    *(void **)object = g_object_type_table;
     if (flags & 1)
         ui_nop_a(object);
 }
@@ -593,7 +593,7 @@ void object_destroy_wrapper(void *object, int flags) {
 
 /* Returns a stored number. */
 int object_get_stored_counter(void) {
-    return D_001B23A0;
+    return g_hud_mode;
 }
 
 /* Measured target: byte-identical across all 27 levels. */
@@ -655,7 +655,7 @@ void object_set_second_float4(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
 
 /* Sets the type pointer of an object and returns it. */
 void *object_init_base(void *object) {
-    *(void **)((char *)object + 0x30) = D_001ADA78;
+    *(void **)((char *)object + 0x30) = g_object_base_table;
     return object;
 }
 
@@ -719,7 +719,7 @@ void object_alloc_float4_arrays(Obj_F7b2f1854 *o, int a1, int count)
 /* Cleans up an object and frees its arrays. */
 void object_destroy_array(char *object, int flags)
 {
-    *(char **)(object + 0x30) = D_001ADA78;
+    *(char **)(object + 0x30) = g_object_base_table;
     if (*(int *)(object + 0x2C)) {
         if (*(int *)(object + 0x14) == 0)
             pool_free_cell(*(int *)(object + 0x2C), *(int *)object);
@@ -737,7 +737,7 @@ void object_destroy_array(char *object, int flags)
 /* Builds an object and sets its table pointer. */
 Constructor_3361A8 *object_construct_derived_a(Constructor_3361A8 *object) {
     object_init_base(object);
-    object->table = D_001ADA58;
+    object->table = g_object_derived_table_a;
     return object;
 }
 
@@ -785,7 +785,7 @@ void object_set_value_float(u8 *object, f32 value) { f32 *target = *(f32 **)(obj
 /* Builds an object and sets its table pointer. */
 Constructor_3361A8 *object_construct_derived_b(Constructor_3361A8 *object) {
     object_init_base(object);
-    object->table = D_001AD9F8;
+    object->table = g_object_derived_table_b;
     return object;
 }
 
@@ -831,7 +831,7 @@ void object_set_second_pair_top_bytes(u8 *a0, s32 a1, s32 a2) {
 /* Builds an object and sets its table pointer. */
 Constructor_3361A8 *object_construct_derived_c(Constructor_3361A8 *object) {
     object_init_base(object);
-    object->table = D_001ADA38;
+    object->table = g_object_derived_table_c;
     return object;
 }
 

@@ -19,11 +19,11 @@ extern u64 GetEffectTextureDescriptor(int);
 extern void mat_from_rotation(void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(void *, int, int);
-extern int D_001A89D0 __attribute__((sda));
-extern int D_001A89D4 __attribute__((sda));
-extern int D_001A89D8 __attribute__((sda));
+extern int g_trail_texture_id __attribute__((sda));
+extern int g_trail_flags_a __attribute__((sda));
+extern int g_trail_flags_b __attribute__((sda));
 typedef struct { float u, v; } UiTexCoord;
-extern UiTexCoord D_001A89E0[] __attribute__((sda));
+extern UiTexCoord g_trail_uv_table[] __attribute__((sda));
 extern UiTexCoord D_001A89E0_gp[] SDATA(D_001A89E0);
 
 /* Draws a fading ribbon trail behind a moving object by joining its past positions. */
@@ -48,15 +48,15 @@ void part_draw_trail_ribbon(UiVector *vertices, int vertex_count, UiVector *posi
     m = matrix;
     tp = &matrix[3];
     for (i = 0; i < (vertex_count >> 1); i++) {
-        packets[i].texture = GetEffectTextureDescriptor(D_001A89D0);
+        packets[i].texture = GetEffectTextureDescriptor(g_trail_texture_id);
         packets[i].state = 0xFF9000000260UL;
         packets[i].primitive = 5;
-        packets[i].flags = ((long)D_001A89D4 << 2) | ((long)D_001A89D8 << 6) | 0x8000000000UL;
+        packets[i].flags = ((long)g_trail_flags_a << 2) | ((long)g_trail_flags_b << 6) | 0x8000000000UL;
         packets[i].colors[0] = color;
         packets[i].colors[1] = color;
         for (j = 0; j < 4; j++) {
             packets[i].uv[j][0] = D_001A89E0_gp[j].u;
-            packets[i].uv[j][1] = D_001A89E0[j].v;
+            packets[i].uv[j][1] = g_trail_uv_table[j].v;
         }
     }
     cur = phase;

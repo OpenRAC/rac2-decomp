@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern s32 g_current_map_index;
-extern float D_L05_001B1B1C __attribute__((sda));
+extern float g_ship_reticle_size_scale __attribute__((sda));
 
 extern unsigned long GetEffectTextureDescriptor(s32);
 extern float FastAddRotations(float, float);
@@ -17,7 +17,7 @@ void DrawSpriteRing(u8 red, u8 green, u8 blue, u8 alpha, float x, float y, float
         sprite = GetEffectTextureDescriptor(0x41);
     else
         sprite = GetEffectTextureDescriptor(0x3F);
-    size = D_L05_001B1B1C * scale;
+    size = g_ship_reticle_size_scale * scale;
     gfx_draw_rotated_screen_sprite(x, y, size, size, angle, 0x3F, 0x3F, sprite, 0xFFFFF3, red, green, blue, alpha);
     angle = FastAddRotations(angle, 1.5707964f);
     gfx_draw_rotated_screen_sprite(x, y, size, size, angle, 0x3F, 0x3F, sprite, 0xFFFFF3, red, green, blue, alpha);

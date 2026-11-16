@@ -43,13 +43,13 @@ typedef struct {
     char pad13f0[0x1458 - 0x13F0]; float angle;
     char pad145c[0x1494 - 0x145C]; float field1494, field1498;
 } UpdateCamera;
-extern UpdateCamera D_L22_0025DE90;
-extern int D_L22_001A8FF0;
+extern UpdateCamera g_hero_tuning_block;
+extern int g_hero_flag_a;
 /* Retail reads this byte only inside the mode-2 path (002AAD00..002AAD08).
  * Preserve that conditional access rather than speculating it before the guard.
  * Its owning allocation's extent is unknown, so retain an incomplete declaration. */
-extern volatile unsigned char D_001A7A43[] MACRO_ADDR;
-extern float D_L22_001A7CF8 __attribute__((sda));
+extern volatile unsigned char g_state_flag_b[] MACRO_ADDR;
+extern float g_hero_update_rate __attribute__((sda));
 
 /* Runs the hero's per-frame update for the current vehicle or mode, calling the movement, camera and effect updates in order. */
 void hero_update(void) {
@@ -88,16 +88,16 @@ void hero_update(void) {
                 if (*(short *)(hero + 0x1454) && *(float *)(hero + 0x24B8) > 0.15f && !*(u8 *)(hero + 0x1456)) {
                     float angle;
                     {
-                        UpdateCamera *camera = &D_L22_0025DE90;
+                        UpdateCamera *camera = &g_hero_tuning_block;
                         camera->field1498 = 0.27f;
                         camera->field1494 = 0.037f;
                         camera->field1334 = 0.025f;
                         camera->field1338 = 0.27f;
                     }
-                    if (D_L22_001A8FF0) angle = hero_get_direction_angle_delta(hero + 0x1440, 0);
+                    if (g_hero_flag_a) angle = hero_get_direction_angle_delta(hero + 0x1440, 0);
                     else angle = fast_subtract_rotations(*(float *)(hero + 0x1458), *(float *)(hero + 0x98));
                     {
-                        UpdateCamera *camera = &D_L22_0025DE90;
+                        UpdateCamera *camera = &g_hero_tuning_block;
                         camera->angle = angle;
                         camera->negative_angle = -angle;
                     }
@@ -117,7 +117,7 @@ void hero_update(void) {
         gfx_fade_screen_effect();
         ApplyHeroAxisScales();
         if (*(u8 *)(hero + 0x22B4) == 1) {
-            D_L22_0025DE90.rate = D_L22_001A7CF8;
+            g_hero_tuning_block.rate = g_hero_update_rate;
             UpdateHeroGlowAndExtraManipulators();
             UpdateHeroJointEffect();
             hero_update_held_object();
@@ -134,7 +134,7 @@ void hero_update(void) {
         char *hero = pos - 0x80;
         coll_clear_map_bits_around_pos(pos);
         if (*(u8 *)(hero + 0x22B4) == 2) {
-            if (*D_001A7A43) D_L22_0025DE90.field13ec = D_L22_001A7CF8 * 1.4f;
+            if (*g_state_flag_b) g_hero_tuning_block.field13ec = g_hero_update_rate * 1.4f;
             if (*(short *)(hero + 0x1E2) < 10000) ++*(u16 *)(hero + 0x1E2);
             UpdateHeroGlowAndExtraManipulators();
             companion_update_carry_anim();

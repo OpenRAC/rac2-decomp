@@ -2,9 +2,9 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern int D_L03_001AEBF8;
-extern int D_L03_001B1B10 __attribute__((sda));
-extern float D_L03_001B1AF0[8] SDATA(D_L03_001B1AF0) __attribute__((sda)), D_L03_001B1AE8[2] SDATA(D_L03_001B1AE8) __attribute__((sda)), D_L03_001B1AE0[2] SDATA(D_L03_001B1AE0) __attribute__((sda));
+extern int g_arc_effect_count;
+extern int g_wall_arc_flag_bit __attribute__((sda));
+extern float g_wall_arc_piece_lifetimes[8] SDATA(D_L03_001B1AF0) __attribute__((sda)), g_wall_arc_piece_spin[2] SDATA(D_L03_001B1AE8) __attribute__((sda)), g_wall_arc_piece_speeds[2] SDATA(D_L03_001B1AE0) __attribute__((sda));
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern void moby_set_state(void *,int,int);
 extern void part_explode_object_into_pieces(void *,void *,void *,void *,int,int,int,int,int,u8,void *);
@@ -33,17 +33,17 @@ void wall_arc_effect_update(u8 *moby) {
             vec_local_offset_to_world(moby,&b,-12,-25,20);
             moby_create_configured(&a,&b,0x50285050,moby,5,*(int *)(vars+8)!=0);
         }
-        if(*(int *)vars) D_L03_001AEBF8--;
+        if(*(int *)vars) g_arc_effect_count--;
         moby_set_state(moby,1,-1);
         break;
     case 1:
         if(part_find_owned_effect_slot(moby,0x4010000,0) && !*(int *)vars) {
-            D_L03_001AEBF8--; moby_set_state(moby,2,-1);
+            g_arc_effect_count--; moby_set_state(moby,2,-1);
         }
         moby[0xa8]=255;
         break;
     case 2:
-        part_explode_object_into_pieces(moby,D_L03_001B1AF0,D_L03_001B1AE8,D_L03_001B1AE0,63,0,D_L03_001B1B10,0,65535,255,0);
+        part_explode_object_into_pieces(moby,g_wall_arc_piece_lifetimes,g_wall_arc_piece_spin,g_wall_arc_piece_speeds,63,0,g_wall_arc_flag_bit,0,65535,255,0);
         vec_local_offset_to_world(moby,&p,0,0,0);
         SpawnExplosion(moby+0x10,0,25,20,20,20,45,1,0.75f,20,1,1,0,0);
         PlayMobySound(0,0,moby);
@@ -61,8 +61,8 @@ void wall_arc_effect_update(u8 *moby) {
         SpawnParticleBurst(moby,&c,&d,&f,&g,15,0); c.f[0]=-12;
         d.f[0]=-12;
         SpawnParticleBurst(moby,&c,&d,&f,&g,15,0);
-        if(D_L03_001B1B10>=0) {
-            *(u16 *)(moby+0x7c)=(1<<D_L03_001B1B10)|0x8000;
+        if(g_wall_arc_flag_bit>=0) {
+            *(u16 *)(moby+0x7c)=(1<<g_wall_arc_flag_bit)|0x8000;
             moby_set_state(moby,3,-1);
         } else moby_mark_spawned(moby);
         break;

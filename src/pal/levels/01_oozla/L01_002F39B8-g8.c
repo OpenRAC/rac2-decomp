@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L01_001A79F0;
+extern int g_level_group_index;
 extern void *tv_screen_find_nearest(float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char D_L01_0027F810[];
-extern int D_001A9420 __attribute__((sda));
+extern char g_ship_trail_mesh[];
+extern int g_ship_trail_constants __attribute__((sda));
 typedef struct {
     char pad0[0x30];
     int mode;
@@ -16,10 +16,10 @@ typedef struct {
     char pad2[0x138];
     int *entries[4];
 } L01_002F2098_STATE;
-extern L01_002F2098_STATE D_L01_001BD1C0;
+extern L01_002F2098_STATE g_ship_trail_state;
 
 /* Builds the ship's four trail slices for the level's current colour. */
-void func_PAL_L01_002F39B8(void)
+void ship_build_trail_slices_pal(void)
 {
     int index;
     void *obj;
@@ -28,20 +28,20 @@ void func_PAL_L01_002F39B8(void)
     char *q;
     int i;
 
-    if (D_L01_001A79F0 != 1)
+    if (g_level_group_index != 1)
         return;
 
     index = -1;
     obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
-    if (D_L01_001BD1C0.mode == 3)
+    if (g_ship_trail_state.mode == 3)
         index = 1;
     if (index != -1 && obj != 0) {
-        if (D_L01_001BD1C0.entries[index] != 0) {
+        if (g_ship_trail_state.entries[index] != 0) {
             char *d = obj + 0x10;
             char *c = obj + 0xC0;
-            D_L01_001BD1C0.mesh = (int)D_L01_0027F810;
-            p = (char *)D_L01_0027F810 + 0x20;
-            q = (char *)&D_001A9420;
+            g_ship_trail_state.mesh = (int)g_ship_trail_mesh;
+            p = (char *)g_ship_trail_mesh + 0x20;
+            q = (char *)&g_ship_trail_constants;
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
@@ -51,9 +51,9 @@ void func_PAL_L01_002F39B8(void)
                 p += 0x10;
                 q += 0x10;
             }
-            *(int *)(D_L01_001BD1C0.mesh + 0x68) = D_L01_001BD1C0.entries[index];
+            *(int *)(g_ship_trail_state.mesh + 0x68) = g_ship_trail_state.entries[index];
         }
     }
-    if (D_L01_001BD1C0.count >= 0x4DE)
-        D_L01_001BD1C0.mesh = 0;
+    if (g_ship_trail_state.count >= 0x4DE)
+        g_ship_trail_state.mesh = 0;
 }

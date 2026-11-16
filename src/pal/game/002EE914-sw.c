@@ -6,15 +6,15 @@ extern int func_001163B0(void);
 extern float math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
 extern int follower_get_state(char *);
-extern void func_PAL_002EE5C0(char *), func_PAL_002EF630(char *), follower_move_toward_target(char *), follower_limit_speed(char *), UpdateBankedOrientation(char *);
+extern void follower_clamp_range_spawn_sparks_pal(char *), follower_check_hazard_contact_pal(char *), follower_move_toward_target(char *), follower_limit_speed(char *), UpdateBankedOrientation(char *);
 extern void follower_set_push_vector(char *, void *), follower_set_state(char *, int);
 extern int follower_has_reached_target(char *);
 extern s64 follower_try_place_at_saved_spot(char *);
-extern void moby_release_motion_slot(char *), func_PAL_002EF708(char *), func_PAL_002EF800(char *);
+extern void moby_release_motion_slot(char *), follower_start_random_push_pal(char *), follower_start_push_from_target_pal(char *);
 extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float), FastAddRotations(float, float);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern int math_fast_helper_a(void *, float), math_random_int_range(int, int);
-extern char *D_L05_001B9710;
+extern char *g_hero_l05_moby;
 typedef unsigned int U128_C160 __attribute__((mode(TI)));
 
 /* Update the movement state and target position of this object. */
@@ -33,12 +33,12 @@ void func_PAL_002EE914(char *obj)
     ((float *)&axes[1])[0] = 1.0f;
     qcopy(s + 0xB0, obj + 0x10);
     if (follower_get_state(obj) != 8) FastVecAdd(obj + 0x10, s + 0x90, obj + 0x10);
-    func_PAL_002EE5C0(obj);
-    func_PAL_002EF630(obj);
+    follower_clamp_range_spawn_sparks_pal(obj);
+    follower_check_hazard_contact_pal(obj);
     follower_move_toward_target(obj);
     follower_limit_speed(obj);
     UpdateBankedOrientation(obj);
-    player = D_L05_001B9710;
+    player = g_hero_l05_moby;
     switch (follower_get_state(obj)) {
     case 7:
         vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, -50.0f);
@@ -153,9 +153,9 @@ void func_PAL_002EE914(char *obj)
         FastVecAdd(v, p + 0x10, v);
         follower_set_push_vector(obj, v);
         break;
-    case 1: if (follower_has_reached_target(obj))func_PAL_002EF708(obj);
+    case 1: if (follower_has_reached_target(obj))follower_start_random_push_pal(obj);
         break;
-    case 13: if (follower_has_reached_target(obj))func_PAL_002EF800(obj);
+    case 13: if (follower_has_reached_target(obj))follower_start_push_from_target_pal(obj);
         break;
     }
 }

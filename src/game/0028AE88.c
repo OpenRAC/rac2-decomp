@@ -18,28 +18,28 @@ typedef struct {
     u32 x;
 } GroupEntry;
 
-extern GroupTable *D_001B1888[];
-extern GroupEntry *D_001B1894[];
-extern GroupEntry *D_001B1898[];
+extern GroupTable *g_hud_group_size_table[];
+extern GroupEntry *g_hud_group_entries_a[];
+extern GroupEntry *g_hud_group_entries_b[];
 
 void LinkHudBank(s32 group, s32 size) {
     s32 first;
     s32 index;
     s32 end;
-    if (D_001B1888[0]->c[group] == 0) {
+    if (g_hud_group_size_table[0]->c[group] == 0) {
         size = (size + 0xF) & 0xFFFFFFF0;
-        D_001B1888[0]->c[group] = size;
-        first = (group != 0) ? D_001B1888[0]->a[group - 1] : 0;
-        end = D_001B1888[0]->a[group];
+        g_hud_group_size_table[0]->c[group] = size;
+        first = (group != 0) ? g_hud_group_size_table[0]->a[group - 1] : 0;
+        end = g_hud_group_size_table[0]->a[group];
         for (index = first; index < end; index++) {
-            D_001B1898[0][index].w &= 0x7FFFFFFF;
-            D_001B1898[0][index].w += size;
+            g_hud_group_entries_b[0][index].w &= 0x7FFFFFFF;
+            g_hud_group_entries_b[0][index].w += size;
         }
-        first = (group != 0) ? D_001B1888[0]->b[group - 1] : 0;
-        end = D_001B1888[0]->b[group];
+        first = (group != 0) ? g_hud_group_size_table[0]->b[group - 1] : 0;
+        end = g_hud_group_size_table[0]->b[group];
         for (index = first; index < end; index++) {
-            D_001B1894[0][index].w &= 0x7FFFFFFF;
-            D_001B1894[0][index].w += size;
+            g_hud_group_entries_a[0][index].w &= 0x7FFFFFFF;
+            g_hud_group_entries_a[0][index].w += size;
         }
     }
 }

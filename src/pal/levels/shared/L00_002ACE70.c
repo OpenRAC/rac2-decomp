@@ -49,7 +49,7 @@ typedef struct {
 extern LedgeProbeHit g_collision_result;
 #define FL(p,o) (*(float *)((char *)(p)+(o)))
 #define IN(p,o) (*(int *)((char *)(p)+(o)))
-int func_PAL_L00_002ACE70(void *position, void *unused, char *out)
+int hero_find_ledge_grab_pal(void *position, void *unused, char *out)
 {
     float v0[4], v1[4], v2[4], v3[4], v4[4], v5[4], v6[4], v7[4], v8[4], v9[4], v10[4], v11[4], v12[4], v13[4], v14[4], v15[4], v16[4], v17[4], v18[4], v19[4];
     char *a, *b;

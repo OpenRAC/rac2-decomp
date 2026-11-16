@@ -1,11 +1,11 @@
 #include "common.h"
 
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B4A8[];
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 g_moby_nibble_table[];
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern int D_L12_001B1DA0 __attribute__((sda));
+extern int g_break_controller_duration __attribute__((sda));
 
 extern int linked_moby_is_finished(void *);
 extern void linked_moby_trigger_burst(void *);
@@ -32,10 +32,10 @@ void three_child_break_controller_update(u8 *self)
         self[0x20] = 1;
         *(float *)(state + 0x10) = *(float *)(self + 0x18);
         id = *(u16 *)(self + 0xB2);
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto Destroy0;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            int packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
@@ -66,7 +66,7 @@ Destroy0:
     case 4: {
         int i;
         int *child_ids;
-        u8 *base = D_L12_001B2E9C;
+        u8 *base = g_moby_list_start;
 
         *(float *)(state + 0xC) += 0.0013888889225199819f;
         *(float *)(self + 0x18) += *(float *)(state + 0xC);
@@ -81,7 +81,7 @@ Destroy0:
     }
     case 2:
         moby_set_state(self, 3, -1);
-        *(int *)(state + 0x14) = D_L12_001B1DA0;
+        *(int *)(state + 0x14) = g_break_controller_duration;
         break;
     case 3: {
         int i;
@@ -101,18 +101,18 @@ Destroy0:
                     linked_moby_trigger_burst(child);
                     SpawnExplosion(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
                                   1, 1, 0, 0, 2.0f, 20.0f);
-                    moby_mark_spawned(D_L12_001B2E9C + (*child_ids << 8));
+                    moby_mark_spawned(g_moby_list_start + (*child_ids << 8));
                 }
             }
             id = *(u16 *)(self + 0xB2);
             if (id & 1) {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                 u8 packed = *counter;
 
                 if (((packed >> 4) & 7) != 7)
                     *counter = packed + 16;
             } else {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                 u8 packed = *counter;
 
                 if ((packed & 7) != 7)
@@ -121,7 +121,7 @@ Destroy0:
             moby_mark_spawned(self);
             break;
         }
-        if (*(int *)(state + 0x14) == D_L12_001B1DA0 / 2) {
+        if (*(int *)(state + 0x14) == g_break_controller_duration / 2) {
             int *child_ids2 = (int *)state;
             int j;
 
@@ -148,13 +148,13 @@ Destroy0:
         }
         id = *(u16 *)(self + 0xB2);
         if (id & 1) {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
             u8 packed = *counter;
 
             if (((packed >> 4) & 7) != 7)
                 *counter = packed + 16;
         } else {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
             u8 packed = *counter;
 
             if ((packed & 7) != 7)

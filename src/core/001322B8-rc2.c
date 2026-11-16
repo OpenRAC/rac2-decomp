@@ -25,8 +25,8 @@
 #include "common.h"
 
 extern void kernel_process_request_b();
-extern s32 *D_001A7480 __attribute__((sda));
-extern s32 D_001A7484 __attribute__((sda));
+extern s32 *g_snd_rpc_reply_ptr __attribute__((sda));
+extern s32 g_snd_reply_count __attribute__((sda));
 
 /* Sets up a reply buffer for the next sound request and flushes it from the cache. */
 void snd_prepare_reply_buffer(s32 *buffer, s32 count) {
@@ -34,11 +34,11 @@ void snd_prepare_reply_buffer(s32 *buffer, s32 count) {
     s32 byte_offset;
     s32 end_addr;
 
-    D_001A7484 = count;
+    g_snd_reply_count = count;
     base = (s8 *)(buffer);
     byte_offset = count * 4;
     end_addr = byte_offset + base;
-    D_001A7480 = base;
+    g_snd_rpc_reply_ptr = base;
     (*(s32 *)((s8 *)(&((s32 *)base)[count]) + (4))) = 0;
     *(s32 *)base = 0;
     kernel_process_request_b(buffer, base + 3);

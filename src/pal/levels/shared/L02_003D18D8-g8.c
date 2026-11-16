@@ -10,19 +10,19 @@ typedef int Quad __attribute__((mode(TI)));
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
 
-extern char D_0018A0E0[], g_hero_position[];
+extern char g_hero_state_block[], g_hero_position[];
 extern int g_hero_moby __attribute__((nosda));
 extern int g_frame_l02_counter;
 
 /* The distance bound is read absolutely in state 3 and through GP in state 4.
  * Both symbols resolve to the same word in each of the three programs. */
-extern float D_L02_001B00F8[] __attribute__((sda));
+extern float g_chickenbot_wait_min[] __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
 
 extern void func_PAL_L02_003D24B8(void *);
-extern void func_PAL_L02_003D2A10(void *);
-extern void func_PAL_L02_003D28F0(void *);
-extern void func_PAL_L02_003D2E28(void *);
+extern void moby_l02_explode_and_remove_pal(void *);
+extern void moby_reset_turn_place_pal(void *);
+extern void chickenbot_update_group_pulse_color_pal(void *);
 extern void turret_clamp_aim_yaw_pitch(void *);
 extern void func_PAL_L02_003D31A0(void *);
 extern int flag_set_second_pending(void *);
@@ -31,7 +31,7 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern int FastDecTimer(void *);
 extern int moby_dispatch_action_by_kind(void *, void *);
-extern int func_PAL_L02_003D2898(void *, void *, int);
+extern int moby_run_entry_hook_by_mode_pal(void *, void *, int);
 extern int moby_count_group_side_from_object(void *, int, int);
 extern int func_PAL_002AF6C0(void *, float);
 extern float math_random_angle(void);
@@ -121,7 +121,7 @@ void func_PAL_L02_003D18D8(char *o)
         unsigned int flags;
         flags = moby_dispatch_action_by_kind(o, p + 0x50);
         if (flags & 1)
-            func_PAL_L02_003D2A10(o);
+            moby_l02_explode_and_remove_pal(o);
         else if (flags & 2) {
             if (S(p, 0x314) == 1)
                 moby_set_state(o, 9, 2);
@@ -146,7 +146,7 @@ void func_PAL_L02_003D18D8(char *o)
                 if (U8(o, 0x60) & 2)
                     func_PAL_002A7E68(o, 0, 0, 17);
             } else if (!S(p, 0x312) &&
-                       (!S(p, 0x338) || FastVecDot(p + 0x300, D_0018A0E0) > 0.8f))
+                       (!S(p, 0x338) || FastVecDot(p + 0x300, g_hero_state_block) > 0.8f))
                 moby_set_state(o, 2, -1);
         }
         break;
@@ -165,7 +165,7 @@ void func_PAL_L02_003D18D8(char *o)
                 path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
             }
         }
-        func_PAL_L02_003D2898(o, p + 0x2F0, 0);
+        moby_run_entry_hook_by_mode_pal(o, p + 0x2F0, 0);
         if (U16(o, 0x96) > 25 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 150))
             moby_set_state(o, 1, -1);
         break;
@@ -207,11 +207,11 @@ void func_PAL_L02_003D18D8(char *o)
             if (U8(o, 0x43) != 6)
                 func_PAL_002A7E68(o, 6, 0, 8);
             {
-                float upper = D_L02_001B00F8[1];
-                F(p, 0x334) = math_random_float_range(D_L02_001B00F8[0], upper) + 0.5f;
+                float upper = g_chickenbot_wait_min[1];
+                F(p, 0x334) = math_random_float_range(g_chickenbot_wait_min[0], upper) + 0.5f;
             }
         }
-        if ((func_PAL_L02_003D2898(o, p + 0x2E0, 0) & 0x80) ||
+        if ((moby_run_entry_hook_by_mode_pal(o, p + 0x2E0, 0) & 0x80) ||
             vec_distance_xy(o + 0x10, g_hero_position) > F(p, 0x334)) {
             if (math_random_int_below(2))
                 moby_set_state(o, 6, -1);
@@ -234,7 +234,7 @@ void func_PAL_L02_003D18D8(char *o)
                 path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
             }
         }
-        func_PAL_L02_003D2898(o, p + 0x2F0, 0);
+        moby_run_entry_hook_by_mode_pal(o, p + 0x2F0, 0);
         if (U16(o, 0x96) > 25 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 150))
             moby_set_state(o, 3, -1);
         break;
@@ -249,7 +249,7 @@ void func_PAL_L02_003D18D8(char *o)
             func_PAL_002A7E68(o, 6, 0, 4);
         if (!(U16(o, 0x96) & 3))
             F(p, 0x31C) = moby_count_group_side_from_object(o, g_hero_moby, -1) * 0.087266475f;
-        func_PAL_L02_003D2898(o, p + 0x1F0, 1);
+        moby_run_entry_hook_by_mode_pal(o, p + 0x1F0, 1);
         turret_clamp_aim_yaw_pitch(o);
         if (F(p, 0x1CC) <= 1.25f)
             moby_set_state(o, 10, -1);
@@ -274,7 +274,7 @@ void func_PAL_L02_003D18D8(char *o)
             I(p, 0x1BC) = g_frame_l02_counter;
         }
         vec_scale_to_length(&temp, p + 0x1A0, 1);
-        func_PAL_L02_003D2898(o, &temp, 0);
+        moby_run_entry_hook_by_mode_pal(o, &temp, 0);
         func_PAL_L02_003D31A0(o);
         coll_sweep_from_object(o, 0.6f, (float *)(o + 0x10), 0x4000000, 1, 1, 0, 1, 0);
         if (F(p, 0x190) >= F(o, 0x18)) {
@@ -286,10 +286,10 @@ void func_PAL_L02_003D18D8(char *o)
         }
         break;
     case 12:
-        func_PAL_L02_003D2A10(o);
+        moby_l02_explode_and_remove_pal(o);
         break;
     }
-    func_PAL_L02_003D28F0(o);
+    moby_reset_turn_place_pal(o);
     if (U8(o, 0x31))
-        func_PAL_L02_003D2E28(o);
+        chickenbot_update_group_pulse_color_pal(o);
 }

@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_00265290[];
+extern s8 g_tab_menu_values[];
 /* Returns the value of the selected entry of the current tab, or 0 when it is locked. */
 void *tab_menu_get_selected_value(s32 self) {
     s32 tab;
@@ -33,7 +33,7 @@ void *tab_menu_get_selected_value(s32 self) {
 
     tab = (*(s32 *)((s8 *)(self) + (0x2FC)));
     base = self + (tab * 4);
-    result = *(s32 *)(((s32)D_00265290) + (s32) (((*(s32 *)((s8 *)(base) + (0x1B8))) * 4) + (tab << 5)));
+    result = *(s32 *)(((s32)g_tab_menu_values) + (s32) (((*(s32 *)((s8 *)(base) + (0x1B8))) * 4) + (tab << 5)));
     if ((tab == 2) && (*(u8 *)0x1A7A0A == 0)) {
         result = ((*(s32 *)((s8 *)(self) + (0x1C0))) >= 3) ? 0 : result;
     }

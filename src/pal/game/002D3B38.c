@@ -9,7 +9,7 @@ extern void func_0029C610(void);
 void SetupGifPaging(long);
 void DoGifPaging(void);
 
-int func_PAL_002D3B38(void) {
+int menu_draw_screen_via_helper_b_pal(void) {
     SetupGifPaging(0);
     func_0029C610();
     DoGifPaging();

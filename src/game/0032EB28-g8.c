@@ -5,23 +5,23 @@
    (`addiu $v0,$gp,-0x16C8`). A file named *-g8.c is built with -G8 (config/cflags.txt),
    which is what makes the compiler emit that form. */
 
-extern int D_001AD928 __attribute__((sda));
-extern int D_001AD908 __attribute__((sda));
+extern int g_meter_vtable_a __attribute__((sda));
+extern int g_meter_vtable_b __attribute__((sda));
 extern void F7242f0a4_FUN_00335AE0(void *);
 
 /* Sets up an object with the first shared table of actions. */
 void object_init_action_table_a(void *object) {
-    *(void **)object = &D_001AD928;
+    *(void **)object = &g_meter_vtable_a;
     F7242f0a4_FUN_00335AE0(object);
 }
 
 /* Sets up an object with the second shared table of actions. */
 void object_init_action_table_b(void *object) {
-    *(void **)object = &D_001AD908;
+    *(void **)object = &g_meter_vtable_b;
     F7242f0a4_FUN_00335AE0(object);
 }
 
-extern float D_L00_001B2708 __attribute__((sda));
+extern float g_screen_element_scale_y __attribute__((sda));
 extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
 
 /* Draws a screen element at its stored place and size, unless it is switched off. */
@@ -36,7 +36,7 @@ void gfx_draw_screen_element_stored(char *object)
     first = *(float **)object;
     second = *(float **)(object + 4);
     gfx_draw_scaled_object_two_axes(*(int *)(object + 0x40), **(int **)(object + 0xC), first[0], first[1],
-                 second[0], second[1] * D_L00_001B2708, **(float **)(object + 0x38));
+                 second[0], second[1] * g_screen_element_scale_y, **(float **)(object + 0x38));
 }
 
 extern void gfx_append_vu1_preset_c(void);
@@ -56,7 +56,7 @@ void part_draw_ring_effect_and_trail(char *owner)
 }
 
 extern int g_game_time;
-extern char *D_001B1B68;
+extern char *g_moby_list_head;
 extern float ref_L00_00330BC0_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int pickup_start_fly_if_idle(void *, void *);
@@ -66,7 +66,7 @@ void moby_push_nearby_away(char *object)
 {
     char *cursor;
     if (g_game_time & 1) {
-        cursor = D_001B1B68;
+        cursor = g_moby_list_head;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
             if (kind == 0xfe) return;
@@ -85,9 +85,9 @@ extern float g_stick_length;
 /* The retail reaches 0x1B284C twice: through lui/lwc1 (D_001B284C) and through
    $gp+0x385C (ref_L00_0032FEA8_00).  The compiler picks one form per symbol. */
 extern float ref_L00_0032FEA8_00 __attribute__((sda));
-extern int D_001B2850;
-extern float D_001B2854;
-extern float D_001B09A0 __attribute__((sda));
+extern int g_vehicle_steer_active_flag;
+extern float g_vehicle_steer_damping;
+extern float g_vehicle_max_speed __attribute__((sda));
 extern float math_fabs(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -103,20 +103,20 @@ void vehicle_update_speed_and_move(char *object)
     int flag;
     char buffer[16];
 
-    if (g_stick_length != 0.0f && D_001B2850 != 0) {
+    if (g_stick_length != 0.0f && g_vehicle_steer_active_flag != 0) {
         value = *(float *)(data + 0x58) + g_stick_length * (1.0f / 120.0f);
         *(float *)(data + 0x58) = value;
-        if (math_fabs(value) > D_001B09A0 * (1.0f / 60.0f))
-            *(float *)(data + 0x58) = D_001B09A0 * ref_L00_0032FEA8_00 * (1.0f / 60.0f);
+        if (math_fabs(value) > g_vehicle_max_speed * (1.0f / 60.0f))
+            *(float *)(data + 0x58) = g_vehicle_max_speed * ref_L00_0032FEA8_00 * (1.0f / 60.0f);
     } else {
         *(float *)(data + 0x58) = *(float *)(data + 0x58) * 0.85f;
     }
 
-    flag = D_001B2850;
+    flag = g_vehicle_steer_active_flag;
     value = *(float *)(data + 0x58) * 25.0f;
     *(float *)(object + 0x48) = value;
     if (flag == 0)
-        *(float *)(object + 0x48) = value + (D_001B2854 + D_001B2854);
+        *(float *)(object + 0x48) = value + (g_vehicle_steer_damping + g_vehicle_steer_damping);
 
     vec_scale_to_length(buffer, object + 0xC0, *(float *)(data + 0x58));
     FastVecAdd(object + 0x10, object + 0x10, buffer);

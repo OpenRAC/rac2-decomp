@@ -29,7 +29,7 @@ extern int weapon_add_ammo(int, int);
 extern int g_item_ammo_counts[];
 extern unsigned char g_item_slot_to_record[];
 extern L00PickupSoundEntry g_weapon_l00_table[];
-extern void func_US2_L00_00327478(int, int, int);
+extern void part_reset_effects_us2(int, int, int);
 extern void vec_clear_128(void *);
 extern int subtract_integer_with_clamp(int);
 extern int g_frame_l00_counter[] __attribute__((sda));
@@ -42,7 +42,7 @@ extern int PlayMobySound(int index, int value, void *object);
 /* Checks whether a pickup object has just added to the stock counter of its item kind: plays the
    single or multiple pickup sound, and when the amount exceeds the limit marks the object as
    used up. Returns 1 if the counter grew. */
-int func_US2_L00_003D2FA0(L00PickupObject *object)
+int pickup_check_stock_increase_us2(L00PickupObject *object)
 {
     L00PickupState *state = object->state;
     int old_count;
@@ -65,7 +65,7 @@ int func_US2_L00_003D2FA0(L00PickupObject *object)
             sound = ((L00PickupSoundEntry *)(g_item_slot_to_record[math_l00_return_argument_2(state->item)] * 224 +
                                              (unsigned int)g_weapon_l00_table))->multiple_sound;
         }
-        func_US2_L00_00327478(sound, delta, -1);
+        part_reset_effects_us2(sound, delta, -1);
         if (overflow < state->limit) {
             int elapsed;
 

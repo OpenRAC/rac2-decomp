@@ -14,9 +14,9 @@ typedef struct {
     short count;                 /* 0x24F2 */
 } StateDF3F8;
 extern StateDF3F8 g_hero_state;
-extern unsigned char D_00211A10[], D_00210DA0[];
+extern unsigned char g_checkpoint_state_buffer_a[], g_checkpoint_state_buffer_b[];
 extern int g_current_map_index MACRO_ADDR;
-extern unsigned char D_0019B2E8[], D_0019B4A8[];
+extern unsigned char g_moby_group_flags[], g_moby_nibble_table[];
 typedef struct {
     int active;
     char pad[12];
@@ -31,12 +31,12 @@ typedef struct {
     char pad3[0xC04];
     int other_count, other_word;  /* 0xC64 */
 } SnapshotDF3F8;
-extern SnapshotDF3F8 D_002119B0;
+extern SnapshotDF3F8 g_bolt_collection_checkpoint;
 extern struct { char pad[0x64]; int word; unsigned char bytes[3]; } g_sound_state;
 extern struct { char pad[0x48]; short count; } g_music_state;
-extern int D_001C4F40;
-extern unsigned char D_001B1640 MACRO_ADDR, D_001B1641 MACRO_ADDR, D_001B1642 MACRO_ADDR;
-extern float D_001B1644 MACRO_ADDR, D_001B1648 MACRO_ADDR, D_001B164C MACRO_ADDR, D_001B1650 MACRO_ADDR;
+extern int g_map_mode;
+extern unsigned char g_fog_color MACRO_ADDR, g_fog_color_green MACRO_ADDR, g_fog_color_blue MACRO_ADDR;
+extern float g_checkpoint_float_a MACRO_ADDR, g_checkpoint_float_b MACRO_ADDR, g_checkpoint_float_c MACRO_ADDR, g_checkpoint_float_d MACRO_ADDR;
 extern void mem_copy_aligned(void *, void *, int);
 
 /* Takes a snapshot of the map progress, two positions and several game values so they can be restored later. */
@@ -48,53 +48,53 @@ void level_capture_checkpoint_state(void *vec_a, void *vec_b) {
     int offset;
     if (g_hero_state.mode == 4)
         return;
-    mem_copy_aligned(D_00211A10, D_00210DA0, 0x404);
+    mem_copy_aligned(g_checkpoint_state_buffer_a, g_checkpoint_state_buffer_b, 0x404);
     level = g_current_map_index;
     offset = level * 16 - 2;
-    dst = D_00211A10 + 0x404;
-    src = D_00210DA0 + 0x404;
+    dst = g_checkpoint_state_buffer_a + 0x404;
+    src = g_checkpoint_state_buffer_b + 0x404;
     for (i = 0; i < 0x7FF; i++, src++) {
         unsigned int value = *src;
         if ((unsigned char)value &&
             ((unsigned char)value == 1 ||
-             (D_0019B2E8[(unsigned char)value + offset] & 0x80))) {
+             (g_moby_group_flags[(unsigned char)value + offset] & 0x80))) {
             unsigned char *p;
             *(unsigned char *)(i + (unsigned int)dst) = value;
 
             if (i & 1) {
-                p = D_0019B4A8 + ((i >> 1) + level * 1024);
+                p = g_moby_nibble_table + ((i >> 1) + level * 1024);
                 if (((*p >> 4) & 7) != 7)
                     *p += 16;
             } else {
-                p = D_0019B4A8 + ((i >> 1) + level * 1024);
+                p = g_moby_nibble_table + ((i >> 1) + level * 1024);
                 if ((*p & 7) != 7)
                     *p += 1;
             }
         }
     }
-    D_002119B0.active = 1;
-    qcopy_nc(D_002119B0.a, vec_a);
-    qcopy_nc(D_002119B0.b, vec_b);
+    g_bolt_collection_checkpoint.active = 1;
+    qcopy_nc(g_bolt_collection_checkpoint.a, vec_a);
+    qcopy_nc(g_bolt_collection_checkpoint.b, vec_b);
     {
         ObjectDF3F8 *obj = g_hero_state.object;
-        D_002119B0.obj_a = obj->a;
-        D_002119B0.obj_b = obj->b;
-        D_002119B0.mode = g_hero_state.mode;
-        D_002119B0.object = obj;
-        D_002119B0.count = g_hero_state.count;
-        D_002119B0.word = g_sound_state.word;
-        D_002119B0.bytes[0] = g_sound_state.bytes[0];
-        D_002119B0.bytes[1] = g_sound_state.bytes[1];
-        D_002119B0.bytes[2] = g_sound_state.bytes[2];
-        D_002119B0.other_count = g_music_state.count;
-        D_002119B0.other_word = D_001C4F40;
-        D_002119B0.bytes[3] = D_001B1640;
-        D_002119B0.bytes[4] = D_001B1641;
-        D_002119B0.bytes[5] = D_001B1642;
-        D_002119B0.values[0] = D_001B1644;
-        D_002119B0.values[1] = D_001B1648;
-        D_002119B0.values[2] = D_001B164C;
-        D_002119B0.values[3] = D_001B1650;
+        g_bolt_collection_checkpoint.obj_a = obj->a;
+        g_bolt_collection_checkpoint.obj_b = obj->b;
+        g_bolt_collection_checkpoint.mode = g_hero_state.mode;
+        g_bolt_collection_checkpoint.object = obj;
+        g_bolt_collection_checkpoint.count = g_hero_state.count;
+        g_bolt_collection_checkpoint.word = g_sound_state.word;
+        g_bolt_collection_checkpoint.bytes[0] = g_sound_state.bytes[0];
+        g_bolt_collection_checkpoint.bytes[1] = g_sound_state.bytes[1];
+        g_bolt_collection_checkpoint.bytes[2] = g_sound_state.bytes[2];
+        g_bolt_collection_checkpoint.other_count = g_music_state.count;
+        g_bolt_collection_checkpoint.other_word = g_map_mode;
+        g_bolt_collection_checkpoint.bytes[3] = g_fog_color;
+        g_bolt_collection_checkpoint.bytes[4] = g_fog_color_green;
+        g_bolt_collection_checkpoint.bytes[5] = g_fog_color_blue;
+        g_bolt_collection_checkpoint.values[0] = g_checkpoint_float_a;
+        g_bolt_collection_checkpoint.values[1] = g_checkpoint_float_b;
+        g_bolt_collection_checkpoint.values[2] = g_checkpoint_float_c;
+        g_bolt_collection_checkpoint.values[3] = g_checkpoint_float_d;
     }
 }
 

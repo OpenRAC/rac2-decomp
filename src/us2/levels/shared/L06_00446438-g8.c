@@ -22,10 +22,10 @@ typedef struct {
 extern AimHero g_hero_state;
 typedef struct { char pad000[0x1A0]; u32 held; u32 pressed; } AimPad;
 extern AimPad g_pad_state;
-extern u8 D_0013958D[];
+extern u8 g_bouncer_weapon_index[];
 extern float ref_US2_L06_00446438_00 __attribute__((sda));
-extern int D_L00_001A8F00;
-extern int D_L00_001B2BE4;
+extern int g_game_l00_mode;
+extern int g_bouncer_timer;
 typedef struct { float f00[4]; float f10[4]; char pad20[4]; int result; int handle; int timer; } AimState;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
@@ -45,7 +45,7 @@ extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *
 extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void slot_reset_active(int);
 extern void ref_L00_003FDE48_00(void *, void *);
@@ -68,12 +68,12 @@ void func_US2_L06_00446438(unsigned char *object) {
 
     if (object[0x20] == 0) {
         object[0x20] = 1;
-        first = g_weapon_l00_table + D_0013958D[0];
+        first = g_weapon_l00_table + g_bouncer_weapon_index[0];
         rate = 1.0f / first->rate;
         if (rate < ref_US2_L06_00446438_00 || ref_US2_L06_00446438_00 < 0.0f) ref_US2_L06_00446438_00 = 0.0f;
         state->timer = 0;
         state->handle = -1;
-        D_L00_001B2BE4 = 20;
+        g_bouncer_timer = 20;
     }
     if (g_hero_state.level == 1) func_US2_L00_002C4560(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
@@ -96,9 +96,9 @@ void func_US2_L06_00446438(unsigned char *object) {
     if (state->timer != 0 && math_fast_float_d(&state->timer)) cancel_hero_item_animation();
     if ((g_pad_state.pressed & g_hero_state.buttons) && !get_ammo(-1)) {
         PlayMobySound(1, 0, object);
-        D_L00_001B2BE4 = 20;
+        g_bouncer_timer = 20;
     }
-    if (D_L00_001A8F00 == 0 && ref_US2_L06_00446438_00 == 0.0f && g_hero_state.busy == 0 &&
+    if (g_game_l00_mode == 0 && ref_US2_L06_00446438_00 == 0.0f && g_hero_state.busy == 0 &&
         (u8)object[0x42] <= 1 && (g_pad_state.held & g_hero_state.buttons) && g_hero_state.resource >= 23 && allowed) {
         if (get_ammo(-1)) {
             PlayMobySound(0, 0, object);
@@ -108,7 +108,7 @@ void func_US2_L06_00446438(unsigned char *object) {
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
             start_equipped_item_animation();
             state->timer = 16;
-            state->handle = slot_copy_records_to_free(&D_L00_0029F210);
+            state->handle = slot_copy_records_to_free(&g_bouncer_sound_record);
         }
         if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.f22B8 == 0) {
             handle = state->handle;
@@ -117,7 +117,7 @@ void func_US2_L06_00446438(unsigned char *object) {
                 state->handle = -1;
             }
         }
-        entry = g_weapon_l00_table + D_0013958D[0];
+        entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
         ref_US2_L06_00446438_00 = 1.0f / entry->rate;
     }
     ref_L00_003FDE48_00(moby_draw_attached_effect, object);

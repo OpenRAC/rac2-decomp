@@ -5,13 +5,13 @@ typedef int Q16_F398378 __attribute__((mode(TI)));
 extern float math_random_float_range(float low, float high);
 extern float math_random_signed_float_range(float low, float high);
 extern void vec_clear_128(void *p);
-extern char D_L05_00233560[];
+extern char g_effect_records[];
 
 /* Claims the first free record of the twenty-four 0xB0-byte records at D_L05_00233560 for the
    owner, starts it at the owner and fills it with eighteen drawn values. */
 void func_PAL_L05_0039B1F0(char *owner, char *vel, int life)
 {
-    char *base = D_L05_00233560;
+    char *base = g_effect_records;
     char *origin = owner + 0x10;
     char *slot;
     int i;

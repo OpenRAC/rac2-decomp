@@ -2,15 +2,15 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
-extern int D_L05_001B1364 __attribute__((sda));
-extern int D_L05_001B13F4 __attribute__((sda));
-extern int D_L05_001B13D8 __attribute__((sda));
-extern int D_L05_001B1350 __attribute__((sda));
-extern int D_L05_00221D10[];
-extern int D_L05_001B2048;
-extern char *D_L05_001B251C;
-extern char D_L05_001B1380[] SDATA(D_L05_001B1380);
-extern char D_L05_001B1370[] SDATA(D_L05_001B1370);
+extern int g_feltzin_challenge_active __attribute__((sda));
+extern int g_feltzin_no_challenge_flag __attribute__((sda));
+extern int g_feltzin_frame_counter __attribute__((sda));
+extern int g_feltzin_challenge_data __attribute__((sda));
+extern int g_feltzin_challenge_state[];
+extern int g_feltzin_mission_index;
+extern char *g_feltzin_target_mobys;
+extern char g_str_feltzin_transition_src[] SDATA(D_L05_001B1380);
+extern char g_str_feltzin_transition_dest[] SDATA(D_L05_001B1370);
 extern void music_Unpause(void);
 extern void entry_init_all_registered(void);
 extern void hero_set_state_value_a(int);
@@ -41,9 +41,9 @@ void feltzin_mission_one_update(char *actor)
     int count;
     int second_count;
 
-    if (D_L05_001B1364 == 0) {
-        D_L05_00221D10[11] = 0;
-        D_L05_001B1364 = 1;
+    if (g_feltzin_challenge_active == 0) {
+        g_feltzin_challenge_state[11] = 0;
+        g_feltzin_challenge_active = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -69,13 +69,13 @@ void feltzin_mission_one_update(char *actor)
             } while (--remaining != 0);
         }
     }
-    if (D_L05_00221D10[4] != 0 || D_L05_001B2048 < 6)
+    if (g_feltzin_challenge_state[4] != 0 || g_feltzin_mission_index < 6)
         return;
-    if (D_L05_00221D10[5] <= 0) {
+    if (g_feltzin_challenge_state[5] <= 0) {
         if (math_fast_float_d(state + 0x58) == 0)
             return;
         *(int *)(state + 0x58) = 120;
-        ship_start_transition(D_L05_001B1380, D_L05_001B1370, 200);
+        ship_start_transition(g_str_feltzin_transition_src, g_str_feltzin_transition_dest, 200);
         a.q = 0;
         b.q = 0;
         c.q = 0;
@@ -107,16 +107,16 @@ void feltzin_mission_one_update(char *actor)
                 objects++;
             } while (--remaining != 0);
         }
-    } else if (D_L05_001B13F4 != 0) {
+    } else if (g_feltzin_no_challenge_flag != 0) {
         if (math_fast_float_d(state + 0x58) != 0) {
             *(int *)(state + 0x58) = 25;
-            D_L05_001B1350++;
+            g_feltzin_challenge_data++;
             feltzin_mission_clamp_save_counts();
             MemcardSave(0, -1);
-            D_L05_001B1350--;
-            moby_set_flag_bit(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
-            D_L05_001B13D8 = 0;
-            D_L05_001B13F4 = 0;
+            g_feltzin_challenge_data--;
+            moby_set_flag_bit(g_feltzin_target_mobys + (*(int *)(state + 0x2C) << 8), 1);
+            g_feltzin_frame_counter = 0;
+            g_feltzin_no_challenge_flag = 0;
             hero_set_state_value_c(1);
             moby_mark_flag_and_append_to_list(6);
         }

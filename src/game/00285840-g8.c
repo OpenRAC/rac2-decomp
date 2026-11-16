@@ -24,9 +24,9 @@ typedef struct {
 } Limits_2858C0;
 
 extern Limits_2858C0 g_modal_state;
-extern s32 D_0013955C[];
+extern s32 g_modal_state_word[];
 extern s32 g_current_game_mode;
-extern s32 D_001A8A5C __attribute__((sda));
+extern s32 g_menu_mode __attribute__((sda));
 
 extern s32 mode_get_stack_top(void);
 extern void snd_send_cmd22(s32);
@@ -39,9 +39,9 @@ void menu_set_mode(s32 newMode, s32 modeArg)
 {
     s32 i;
 
-    D_001A8A5C = newMode;
+    g_menu_mode = newMode;
     if (newMode == 5) {
-        g_modal_state.field80 = D_0013955C[0];
+        g_modal_state.field80 = g_modal_state_word[0];
     } else {
         g_modal_state.field80 = 0;
     }

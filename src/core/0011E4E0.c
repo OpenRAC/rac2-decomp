@@ -179,36 +179,36 @@ s32 sceRead(s32 fd, void *buffer, s32 length)
 }
 
 
-extern int D_00134744;
-extern char D_00140140[];
-extern int D_00140180[];
-extern int D_001401C0[];
+extern int g_iop_remote_cmd_state;
+extern char g_iop_remote_rpc_client[];
+extern int g_iop_remote_rpc_result[];
+extern int g_iop_remote_rpc_args[];
 extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
 
 /* Sends a three-value command to the RPC server and returns its answer, or 0 if the server is not bound. */
 int iop_remote_cmd_send3(int first, int second, int third) {
-    if (D_00134744 < 0)
+    if (g_iop_remote_cmd_state < 0)
         return 0;
-    D_001401C0[0] = second;
-    D_001401C0[1] = first;
-    D_001401C0[2] = third;
-    if (sceSifCallRpc(D_00140140, 4, 0, D_001401C0, 12, D_00140180, 4, 0, 0) < 0)
+    g_iop_remote_rpc_args[0] = second;
+    g_iop_remote_rpc_args[1] = first;
+    g_iop_remote_rpc_args[2] = third;
+    if (sceSifCallRpc(g_iop_remote_rpc_client, 4, 0, g_iop_remote_rpc_args, 12, g_iop_remote_rpc_result, 4, 0, 0) < 0)
         return 0;
-    return D_00140180[0];
+    return g_iop_remote_rpc_result[0];
 }
 
-extern int D_00134744;
-extern char D_00140140[];
-extern int D_00140180[];
-extern int D_001401C0[];
+extern int g_iop_remote_cmd_state;
+extern char g_iop_remote_rpc_client[];
+extern int g_iop_remote_rpc_result[];
+extern int g_iop_remote_rpc_args[];
 extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
 
 /* Sends a one-value command to the RPC server and returns its answer, or 0 if the server is not bound. */
 int iop_remote_cmd_send1(int value) {
-    if (D_00134744 < 0)
+    if (g_iop_remote_cmd_state < 0)
         return 0;
-    D_001401C0[0] = value;
-    if (sceSifCallRpc(D_00140140, 2, 0, D_001401C0, 4, D_00140180, 4, 0, 0) < 0)
+    g_iop_remote_rpc_args[0] = value;
+    if (sceSifCallRpc(g_iop_remote_rpc_client, 2, 0, g_iop_remote_rpc_args, 4, g_iop_remote_rpc_result, 4, 0, 0) < 0)
         return -1;
-    return D_00140180[0];
+    return g_iop_remote_rpc_result[0];
 }

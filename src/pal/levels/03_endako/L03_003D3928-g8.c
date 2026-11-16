@@ -1,20 +1,20 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int func_PAL_00273A10(char *);
+extern int cam_moby_update_pal(char *);
 extern void moby_set_state(char *, int, int);
 extern int coll_process_hit(float, void *, int, void *, int);
 extern float vec_distance_xy(void *, void *);
 extern void moby_mark_spawned(void *);
 extern int g_frame_l03_counter;
-extern char *D_L03_001C3E40[];
-extern int D_L03_001B0580 __attribute__((sda));
+extern char *g_nearby_l03_moby_list[];
+extern int g_shared_trace_point __attribute__((sda));
 
-void func_PAL_L03_003D4480(char *a0)
+void trash_can_debris_update_pal(char *a0)
 {
     switch (*(u8 *)(a0 + 0x20)) {
     case 0:
-        if (func_PAL_00273A10(a0)) {
+        if (cam_moby_update_pal(a0)) {
             moby_set_state(a0, 1, -1);
             *(u16 *)(a0 + 0x34) |= 0x2000;
         }
@@ -24,7 +24,7 @@ void func_PAL_L03_003D4480(char *a0)
             int count = coll_process_hit(0.2f, a0 + 0x10, 0, a0, 0);
             if (count > 0) {
                 int remaining = count;
-                char **p = D_L03_001C3E40;
+                char **p = g_nearby_l03_moby_list;
                 do {
                     int type = *(s16 *)(*p + 0xAA);
                     if (type == 0xFF3 || type == 0xFFD)
@@ -34,7 +34,7 @@ void func_PAL_L03_003D4480(char *a0)
                 } while (remaining);
             }
         }
-        if (vec_distance_xy(a0 + 0x10, &D_L03_001B0580) < 0.3f)
+        if (vec_distance_xy(a0 + 0x10, &g_shared_trace_point) < 0.3f)
             moby_set_state(a0, 3, -1);
         {
             u32 timer = *(u16 *)(a0 + 0x96);

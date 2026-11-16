@@ -6,7 +6,7 @@ extern void func_32C700();
 extern s32 func_441868(s32 a0, s32 a1);
 extern s32 func_33C800(char *a0, s32 a1, s32 a2, s32 a3, float f12, float f13);
 
-void func_PAL_L11_0044E398(char *a0)
+void security_robot_play_idle_pal(char *a0)
 {
     if (*(s32 *)(*(char **)(a0 + 0x68) + 0x354) != 0) {
         func_32C9E0(a0, 4, 2);
@@ -34,7 +34,7 @@ extern char g_hero_position[];
 /* Picks the attack variant the actor plays against its target: the aim vector comes from the
    state's target record, or the shared default, and a close and well aimed target starts one
    of three attacks. */
-int func_PAL_L11_0044E538(char *object)
+int security_robot_try_start_attack_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float v[4];

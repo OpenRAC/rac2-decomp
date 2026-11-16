@@ -24,7 +24,7 @@ extern L02_003F5710_Hero g_hero_state;
 
    The flag is a plain extern int: the assembler decides each access at its use, a gp-relative one
    inside a delay slot and the absolute lui/lw pair elsewhere, as retail has them. */
-extern char *D_L02_001B1190[] __attribute__((sda));
+extern char *g_arena_challenge_table_2[] __attribute__((sda));
 
 /* Whether the pair of table entries the object names still agree with its own four words. */
 /* func_L02_003FCBF0 is defined in L02_003FCBF0-g8.c. */
@@ -36,7 +36,7 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 
-extern char *D_L02_001B1190[2] __attribute__((sda));
+extern char *g_arena_challenge_table_2[2] __attribute__((sda));
 extern s32 math_random_int_below(s32);
 /* Leaves the function when the group is 0xFF or empty; the braces it opens close in END_IDS. */
 /* One half: collect the entities of group OFF for which func_00312B58 holds (counting the
@@ -48,7 +48,7 @@ extern s32 math_random_int_below(s32);
    object names (+0x44) is walked: the first entity for which func_L02_003FD000 and
    func_L02_003D77B8 both return non-zero goes into the slot; if the slot is still empty, the
    first one with func_L02_003D77B8 non-zero that is more than 30.0 away from D_00189EA0. */
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
 /* D_001A7A0C, written as the second word of an 8-byte object: cc1 then counts the store as two
    instructions and keeps it out of func_L02_003FCDF8's delay slot, and the assembler gives the
@@ -76,14 +76,14 @@ extern s32 arena_start_announcer_message(char *, s32);
    entity's float at +0x20 is below its half-word at +0x24 scaled by D_L02_001B1534, unless the
    state's half-word at 0x1F4 (0x200) is set, and 0x13 (0x19) when that float is not above zero,
    unless the half-word at 0x1F6 (0x202) is set.  A positive pick is handed to func_L02_00400650. */
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 typedef struct {
     char pad0[4];
     u8 f4;
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 
-extern L02_003FF9A0_Rec D_L02_00264A70[];
+extern L02_003FF9A0_Rec g_material_l02_table[];
 
 extern s32 arena_get_challenge_save_index(s32);
 /* Calls func_L00_002C42E0(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test
@@ -94,12 +94,12 @@ extern s32 arena_get_challenge_save_index(s32);
    D_L02_00264A70 that D_00139568[0x1E] (0x2A) names.  The pick is kept in the state and in
    D_001395B8[0x3C].  Otherwise, when func_L00_0032EF10(0x10, 0x3C, 0) holds, func_L02_003FCA80
    runs; if neither test holds the callback func_L02_003FF6E8 is registered for the object. */
-extern const float D_L02_001B1520 __attribute__((sda));
-extern const s32 D_L02_001B1524 __attribute__((sda));
-extern float D_L02_001B1528 __attribute__((sda));
-extern float D_L02_001B152C __attribute__((sda));
-extern s32 D_L02_001B1530 __attribute__((sda));
-extern s32 D_001A7A00;
+extern const float g_actor_idle_message_time_limit __attribute__((sda));
+extern const s32 g_actor_idle_message_count_limit __attribute__((sda));
+extern float g_actor_message_threshold __attribute__((sda));
+extern float g_actor_message_hero_scale __attribute__((sda));
+extern s32 g_actor_message_delay_base __attribute__((sda));
+extern s32 g_player_stats;
 extern char g_music_state[];
 extern s32 math_fast_float_d(void *);
 
@@ -147,7 +147,7 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
     count = *(s32 *)(state + 0xEC) + a1;
     *(s32 *)(state + 0xEC) = count;
     *(float *)(state + 0xE8) = acc;
-    if (D_L02_001B1520 < acc || D_L02_001B1524 < count) {
+    if (g_actor_idle_message_time_limit < acc || g_actor_idle_message_count_limit < count) {
         lp = list;
         for (j = 0; j < 6; j++) {
             s32 id;
@@ -166,7 +166,7 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
         *(s32 *)(state + 0x100) = 250;
         *(s32 *)(state + 0xE8) = 0;
     }
-    if (D_L02_001B1528 < a3) {
+    if (g_actor_message_threshold < a3) {
         lp = list;
         for (k = 0; k < 3; k++) {
             s32 id = k + 0x1A;
@@ -176,7 +176,7 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
         }
     }
     hero = (char *)&g_hero_state;
-    if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * D_L02_001B152C) {
+    if ((float)*(s32 *)(hero + 0x24CC) < (float)g_player_stats * g_actor_message_hero_scale) {
         id23 = 0x23;
         if (*(s16 *)(state + 0x216) == 0)
             list[n++] = id23;
@@ -189,7 +189,7 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
     }
     if (n != 0) {
         arena_start_announcer_message(a0, list[math_random_int_below(n)]);
-        *(s32 *)(state + 0xE4) = (((int)(D_L02_001B1530 + math_random_int_below(D_L02_001B1530)) * 5 + 2) / 6);
+        *(s32 *)(state + 0xE4) = (((int)(g_actor_message_delay_base + math_random_int_below(g_actor_message_delay_base)) * 5 + 2) / 6);
     }
 }
 

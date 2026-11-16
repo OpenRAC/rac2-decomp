@@ -17,18 +17,18 @@ typedef struct {
     int mode;
 } GrelbinContext;
 extern char g_hero_state[];
-extern char D_L19_001A8F20[] MACRO_ADDR;
-extern char D_L19_001BFEA0[], D_L19_001B9900[];
-extern char D_L19_001FF5C0[];
+extern char g_particle_effect_template[] MACRO_ADDR;
+extern char g_hit_position_vec[], g_hero_l19_state_block[];
+extern char g_leviathan_data[];
 typedef struct { char pad[0x464]; u8 entries[1]; } ActorFlags;
-extern ActorFlags D_L19_0021EA30;
-extern char *D_L19_001FB5A0[];
+extern ActorFlags g_trigger_active_table;
+extern char *g_group_ptr_table[];
 extern char *g_moby_l19_array __attribute__((sda));
 extern void moby_fade_out_update(void *);
-extern int D_L19_001B1BF8 __attribute__((sda));
+extern int g_leviathan_particle_param __attribute__((sda));
 extern int g_active_yeti_count __attribute__((sda));
 extern int g_current_map_index MACRO_ADDR;
-extern unsigned char D_0019B4A8[];
+extern unsigned char g_moby_nibble_table[];
 extern int moby_is_in_selected_zone(void *);
 extern int FloatToInt(float);
 extern void cam_end_override(void *);
@@ -111,7 +111,7 @@ void leviathan_update(char *moby)
     {
         char *idleTarget;
         can_act=1;
-        if (B(moby,0x21)!=0xFF && D_L19_001FB5A0[B(moby,0x21)]) {
+        if (B(moby,0x21)!=0xFF && g_group_ptr_table[B(moby,0x21)]) {
             if (moby_count_group_not_in_state(W(vars,0x308),-1)) can_act=0;
         }
         if (W(vars,0x30C)!=-1) {
@@ -174,17 +174,17 @@ void leviathan_update(char *moby)
         if (B(moby,0x60)&2) {SetDeathBits(moby,0,3);moby_mark_spawned(moby);return;}
     {
     char *childState;
-    if (F(vars,0x20)<=0.0f && math_is_value_within_step(moby,45.0f) && !(D_L19_0021EA30.entries[(s16)(flags=H(moby,0xB2))])) {
-        int counts=D_0019B4A8[((s16)flags>>1)+(g_current_map_index<<10)];
+    if (F(vars,0x20)<=0.0f && math_is_value_within_step(moby,45.0f) && !(g_trigger_active_table.entries[(s16)(flags=H(moby,0xB2))])) {
+        int counts=g_moby_nibble_table[((s16)flags>>1)+(g_current_map_index<<10)];
         if (!((flags&1) ? (counts>>4)&7 : counts&7)) {
             spawnedActor=CreateMoby(0x1266 /* moby class 4710 */);
             if (spawnedActor) {
                 u16 id=H(moby,0xB2);
                 if (id&1) {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
+                    u8 *marks=g_moby_nibble_table+(((s16)id>>1)+(g_current_map_index<<10));
                     if (((*marks>>4)&7)!=7) *marks+=0x10;
                 } else {
-                    u8 *marks=D_0019B4A8+(((s16)id>>1)+(g_current_map_index<<10));
+                    u8 *marks=g_moby_nibble_table+(((s16)id>>1)+(g_current_map_index<<10));
                     if ((*marks&7)!=7) *marks+=1;
                 }
                 B(spawnedActor,0x23)=0x50;
@@ -208,7 +208,7 @@ void leviathan_update(char *moby)
     {
         char *newActor;
         if (moby_get_anim_value(moby)>=4.0f && !W(vars,0x304) && !B(moby,0x42)) {
-            char *shake=D_L19_001B9900;
+            char *shake=g_hero_l19_state_block;
             int j;
             F(shake,0x160)=0.25f;
             W(shake,0x168)=0x26;W(shake,0x16C)=0;
@@ -219,7 +219,7 @@ void leviathan_update(char *moby)
                 vec_random_direction(burst_vel,0.2833333611f,0.3500000238f);
                 burst_vel[2]=math_fabs(burst_vel[2])*6.5f;
                 if (burst_vel[2]>1.2500001192f) burst_vel[2]=1.2500001192f;
-                FastVecAdd(burst_vel,burst_vel,D_L19_001A8F20);
+                FastVecAdd(burst_vel,burst_vel,g_particle_effect_template);
                 src=P(vars,0x2F0);
                 effect=cam_moby_create(src,1,S(src,0xAA),j,src+0x10,src+0xF0,burst_vel,0xFF,180.0f,45.0f);
                 P(effect,0x64)=(char *)moby_fade_out_update;
@@ -281,22 +281,22 @@ void leviathan_update(char *moby)
     {
         char *particle;
         gfx_add_draw_callback_first(DrawGrelbinBeamEffect,moby);
-        qcopy(burst_vel,D_L19_001BFEA0);
+        qcopy(burst_vel,g_hit_position_vec);
         for (i=9;i>=0;i--) {
             part_spawn_random_direction_effect(particle_vel,0.2333333492f,0.2666666806f);
             if (particle_vel[2]<0.0f) particle_vel[2]=-particle_vel[2];
             count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
             size_scale=math_random_float_range(0.6f,1.0f);
-            part_spawn_fading_drift(vars+0x2C0,particle_vel,20,0x804020,count,127,127,210000.0f*size_scale,2100.0f,0.00405555591f,D_L19_001B1BF8);
+            part_spawn_fading_drift(vars+0x2C0,particle_vel,20,0x804020,count,127,127,210000.0f*size_scale,2100.0f,0.00405555591f,g_leviathan_particle_param);
             count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
             size_scale=math_random_float_range(0.6f,1.0f);
             particle=part_spawn_fading_drift(vars+0x2C0,particle_vel,20,0x804040,count,48,48,630000.0f*size_scale,4200.0f,0.00405555591f,0);
             if (particle) {
-                char *g=D_L19_001FF5C0;
+                char *g=g_leviathan_data;
                 B(particle,2)=B(P(g,0xD4),0);
             }
         }
-        make_hit_descriptor(hit_matrix,moby,0x10001,D_L19_001A8F20,(float)B(vars,0x34));
+        make_hit_descriptor(hit_matrix,moby,0x10001,g_particle_effect_template,(float)B(vars,0x34));
         moby_transform_joint_point(moby,0,body_matrix);
         qcopy(particle_vel,body_matrix+0x30);
         vec_scale_to_length(offset,body_matrix,0.25f);

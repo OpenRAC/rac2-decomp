@@ -10,7 +10,7 @@
 /* Dispatches an indexed polygon query through the already integrated helper. */
 typedef struct { s32 field00; u8 remainder[12]; } JobaPolygonHeaderView;
 
-extern JobaPolygonHeaderView *D_L11_001FF580[];
+extern JobaPolygonHeaderView *g_path_l11_table[];
 
 extern s32 point_in_path_xy(f32 *point, f32 *vertices, s32 count);
 
@@ -22,7 +22,7 @@ typedef struct {
 
 
 /* bumps the 0xFFFF-saturated counter, then starts the state's timer and reports the object */
-extern u8 D_L11_004465F8[];
+extern u8 g_moby_l11_script_data_2[];
 extern void func_300150(void *);
 extern void func_2F8AD0(void *, void *);
 extern void func_31F338(void);
@@ -35,7 +35,7 @@ void arena_end_frame(u8 *obj) {
         *counter = *counter + 1;
     }
     func_300150(state + 0x190);
-    func_2F8AD0(D_L11_004465F8, obj);
+    func_2F8AD0(g_moby_l11_script_data_2, obj);
     func_31F338();
 }
 
@@ -137,8 +137,8 @@ typedef struct {
     u8 pad0[0xC0];
     int group;
 } GroupVars440B28;
-extern char *D_001B359C __attribute__((sda));
-extern unsigned short *D_001FC420[];
+extern char *g_moby_group_entries __attribute__((sda));
+extern unsigned short *g_fighter_target_lists[];
 extern float mat_fast_helper_a(float, float);
 extern void euler_rotation_basis(void *, void *);
 extern void enemy_init_state(void *, int, int);
@@ -155,12 +155,12 @@ int arena_launch_fighter_toward_target(u8 *object, float *target)
     group = ((GroupVars440B28 *)*(u8 **)(object + 0x68))->group;
     if (group == 0xFF)
         return 0;
-    list = D_001FC420[group];
+    list = g_fighter_target_lists[group];
     if (list == 0)
         return 0;
     cursor = list;
     do {
-        member = (GroupMoby440B28 *)(D_001B359C + (*cursor & 0x7FFF) * 0x100);
+        member = (GroupMoby440B28 *)(g_moby_group_entries + (*cursor & 0x7FFF) * 0x100);
         if (member != 0 && member->state != 0xFE && member->state != 0xFD &&
             member->oclass == 0xD37 /* moby class 3383 */ && member->state == 1) {
             member->owner = object;
@@ -371,28 +371,28 @@ void arena_run_member_handlers(u8 *obj)
 /* arms the one-shot flag block when it is idle and the state agrees */
 typedef struct { u8 pad[0x284]; s32 field284; s32 field288; } JobaFlagBlockView;
 
-extern JobaFlagBlockView D_L11_001BA780;
+extern JobaFlagBlockView g_hero_l11_state_block;
 
 /* Remembers which boss is in charge of the arena music and its health bar. */
 void arena_set_boss_owner(u8 *object, s32 value) {
     u8 *state = *(u8 **)(object + 0x68);
-    if (D_L11_001BA780.field284 == *(s32 *)(state + 0x184)) {
-        D_L11_001BA780.field284 = 0;
+    if (g_hero_l11_state_block.field284 == *(s32 *)(state + 0x184)) {
+        g_hero_l11_state_block.field284 = 0;
     }
-    if (value != 0 && D_L11_001BA780.field284 == 0) {
-        D_L11_001BA780.field284 = value;
-        D_L11_001BA780.field288 = 0;
+    if (value != 0 && g_hero_l11_state_block.field284 == 0) {
+        g_hero_l11_state_block.field284 = value;
+        g_hero_l11_state_block.field288 = 0;
     }
     *(s32 *)(state + 0x184) = value;
 }
 
 /* returns the 128-byte entry selected by the state index, at its 0x30-byte payload */
-extern u8 *D_L11_001B368C __attribute__((sda));
+extern u8 *g_arena_camera_table __attribute__((sda));
 
 /* Returns the position of the arena's center point. */
 u8 *arena_get_center_point(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
-    return D_L11_001B368C + (*(s32 *)(state + 0x168) << 7) + 0x30;
+    return g_arena_camera_table + (*(s32 *)(state + 0x168) << 7) + 0x30;
 }
 
 /* returns zero for a missing state polygon index or dispatches its point query to the integrated crossing-parity helper */
@@ -405,7 +405,7 @@ s32 arena_is_point_in_polygon(u8 *object, f32 *point) {
     if (index == -1) {
         result = 0;
     } else {
-        header = D_L11_001FF580[index];
+        header = g_path_l11_table[index];
         result = point_in_path_xy(point, (f32 *)(header + 1), header->field00);
     }
     return result;
@@ -463,7 +463,7 @@ void arena_add_waiting_fighter(u8 *object, s32 class_id) {
    15 bits index the 256-byte records of D_L11_001B359C, the last one with its sign bit set. A
    walk stops when the group word (re-read after every callback) is 0xFF or above the limit
    kept at D_L11_001B35B8. */
-extern s32 D_L11_001B35B8[] __attribute__((sda));
+extern s32 g_tribe_group_limit[] __attribute__((sda));
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 #define FOR_EACH_ID(p, off) \
@@ -779,7 +779,7 @@ void arena_run_helper_on_spawn_groups(u8 *object) {
     first_entry = (u16 *)g_group_id_lists[GROUP(0x178)];
     if (first_entry == 0)
         return;
-    for (cursor = first_entry; (GROUP(0x178) & 0xFF) != 0xFF && GROUP(0x178) <= D_L11_001B35B8[0] && cursor != 0 &&
+    for (cursor = first_entry; (GROUP(0x178) & 0xFF) != 0xFF && GROUP(0x178) <= g_tribe_group_limit[0] && cursor != 0 &&
                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x178)]);
          cursor++) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
@@ -792,7 +792,7 @@ void arena_run_helper_on_spawn_groups(u8 *object) {
     first_entry = (u16 *)g_group_id_lists[GROUP(0x174)];
     if (first_entry == 0)
         return;
-    for (cursor = first_entry; (GROUP(0x174) & 0xFF) != 0xFF && GROUP(0x174) <= D_L11_001B35B8[0] && cursor != 0 &&
+    for (cursor = first_entry; (GROUP(0x174) & 0xFF) != 0xFF && GROUP(0x174) <= g_tribe_group_limit[0] && cursor != 0 &&
                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x174)]);
          cursor++) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
@@ -812,7 +812,7 @@ void arena_run_helper_on_spawn_groups(u8 *object) {
 /* func_L11_00443940 is in L11_00443940-g8.c. */
 
 /* maps the class index to its measured identifier */
-extern u32 D_L11_002BB0E0[];
+extern u32 g_level_l11_word_table[];
 
 /* The level's own jump table: the address of each case body. */
 extern void *jtbl_002BB0E0[13];

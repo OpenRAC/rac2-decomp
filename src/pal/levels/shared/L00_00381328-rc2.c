@@ -6,7 +6,7 @@ extern s32 ref_L00_0037E5F0_00;
 extern s32 g_001B26B4 __attribute__((sda));
 extern f32 g_001B26B0 __attribute__((sda));
 
-f32 func_PAL_L00_00381328(f32 fparg0) {
+f32 fade_reduce_value_pal(f32 fparg0) {
     f32 temp;
     f32 var_f1 = 0.0f;
 

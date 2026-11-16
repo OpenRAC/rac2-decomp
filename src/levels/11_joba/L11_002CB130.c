@@ -60,13 +60,13 @@ typedef struct {
 } ContactEntry;
 
 extern PlayerInputView g_hero_state;
-extern ContactEntry D_L11_001C4F80[];
+extern ContactEntry g_contact_table[];
 extern int g_current_map_index __attribute__((sda));
-extern int D_L11_001A9010 __attribute__((sda));
-extern int D_L11_001A8F00 __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern int g_arena_l11_active_flag __attribute__((sda));
+extern int g_arena_state __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
 extern int hero_l11_enter_state(int, int);
@@ -93,15 +93,15 @@ int hero_handle_contact_hit(long apply)
     if (g_hero_state.movement == 20 || g_hero_state.movement == 7) return 0;
     if (g_hero_state.state == 0x31) return 0;
     if (g_hero_state.timer) return 0;
-    if (D_L11_001A8F00) return 0;
+    if (g_arena_state) return 0;
     g_hero_state.contact = 0;
     object = g_hero_state.object;
     if (object[0xa8] == 0xff) return 0;
-    entry = &D_L11_001C4F80[object[0xa8]];
+    entry = &g_contact_table[object[0xa8]];
     if (entry->owner != object) return 0;
     if (!(entry->flags & 9)) return 0;
     if (entry->strength != 0.0f) {
-        D_001A7A33 = 0; g_bolt_multiplier = 1;
+        g_contact_hit_flag = 0; g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !g_hero_state.mode) {
         entry->strength = fade_reduce_value(entry->strength);

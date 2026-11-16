@@ -7,7 +7,7 @@ typedef struct HrugisEffectCamera {
     float position[4];
 } HrugisEffectCamera;
 
-extern HrugisEffectCamera D_L15_001B9680;
+extern HrugisEffectCamera g_hero_l15_state_floats;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -28,8 +28,8 @@ void func_PAL_L15_0043ABF0(char *object, int a1, int joint, float radius) {
     int one = 1;
 
     moby_transform_joint_to_world(object, a1, initial);
-    heading = mat_fast_helper_a(D_L15_001B9680.position[0] - *(float *)(object + 0x10),
-                            D_L15_001B9680.position[1] - *(float *)(object + 0x14));
+    heading = mat_fast_helper_a(g_hero_l15_state_floats.position[0] - *(float *)(object + 0x10),
+                            g_hero_l15_state_floats.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);

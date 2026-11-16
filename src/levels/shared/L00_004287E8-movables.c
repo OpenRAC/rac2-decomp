@@ -24,8 +24,8 @@ extern float FastVecLength(char *);
 extern float mat_fast_helper_a(float,float);
 extern int FastDecTimer(char *);
 extern int g_current_map_index MACRO_ADDR;
-extern short *D_L00_001FA920[];
-extern char *D_L00_001B1E9C MACRO_ADDR;
+extern short *g_turn_state_table[];
+extern char *g_moby_array_base MACRO_ADDR;
 /* Updates the swingshot camera each frame. It turns towards the nearest swingshot node the hero is facing, then places the camera behind the hero. */
 void cam_swingshot_update(char *camera)
 {
@@ -53,9 +53,9 @@ void cam_swingshot_update(char *camera)
   } else {
    turn=angle+4; best_node=0; closest=1000.0f;
    swing=D_00189E20_6.swing;
-   list=D_L00_001FA920[*(unsigned char *)(swing+0x21)];
+   list=g_turn_state_table[*(unsigned char *)(swing+0x21)];
    if(list) do {
-    node=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
+    node=g_moby_array_base+(*list&0x7FFF)*0x100;
     if(node!=swing && (*(short *)(node+0xAA)==MOBY_CLASS_SWINGSHOT_NODE_2 || *(short *)(node+0xAA)==MOBY_CLASS_SWINGSHOT_NODE)) {
      FastVecSub(diff,node+0x10,swing+0x10);
      vec_scale_to_length(unit,diff,1.0f);

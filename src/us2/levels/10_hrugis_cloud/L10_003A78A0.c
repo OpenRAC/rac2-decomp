@@ -36,7 +36,7 @@ extern void table_clear_entry_flag(int);
 extern void part_spawn_big_explosion(void *, void *, void *);
 extern void FastVecAdd(char *, char *, char *);
 
-void func_US2_L10_003A78A0(unsigned char *obj) {
+void bouncing_l04_shot_update_us2(unsigned char *obj) {
     struct {
         ProjectileVec old, velocity, normal;
         struct {

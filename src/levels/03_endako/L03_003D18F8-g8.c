@@ -4,7 +4,7 @@ extern char *func_3113F0(s32);
 extern void func_32AA20(char *, char *);
 extern f32 func_2EF670(f32, f32);
 extern f32 func_2EF110(f32 *);
-extern f32 D_L03_001B0648 __attribute__((sda));
+extern f32 g_trail_projectile_scale __attribute__((sda));
 
 /* Creates a moby of class 2562 at the given spot, pointing along the given direction, and returns it (or 0 if none was made). */
 char *trail_projectile_spawn(char *parent, char *position, f32 *direction, s32 lifetime)
@@ -21,7 +21,7 @@ char *trail_projectile_spawn(char *parent, char *position, f32 *direction, s32 l
         {
             f32 horizontal_length = func_2EF110(direction);
             f32 angle = -func_2EF670(horizontal_length, direction[2]);
-            f32 scale = D_L03_001B0648;
+            f32 scale = g_trail_projectile_scale;
 
             *(f32 *)(new_moby + 0xF4) = angle;
             *(s32 *)(vars + 0x30) = 0x78;

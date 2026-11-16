@@ -52,7 +52,7 @@ extern int math_fast_float_d(int *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *,void *);
-extern Vector4 D_001B8DC0;
+extern Vector4 g_camera_position_vec;
 typedef struct {
     Vector4 point[4];
     unsigned int color[4];
@@ -102,7 +102,7 @@ void gfx_l00_draw_twin_beam_ribbons_2(char *object)
         second.uv[4]=1;second.uv[5]=1;second.uv[6]=1;second.uv[7]=0;
     }
     FastVecSub(&basis[0],&end,&start);vec_scale_to_length(&basis[0],&basis[0],1);
-    FastVecSub(&basis[1],&D_001B8DC0,&start);FastVecCross(&basis[2],&basis[1],&basis[0]);
+    FastVecSub(&basis[1],&g_camera_position_vec,&start);FastVecCross(&basis[2],&basis[1],&basis[0]);
     vec_scale_to_length(&basis[2],&basis[2],1);FastVecCross(&basis[1],&basis[0],&basis[2]);
     basis[3].bits=start.bits;
     first.point[0].bits=nearSize.bits;second.point[0].bits=farSize.bits;

@@ -5,15 +5,15 @@ extern void moby_get_anim_entry_count(void *,int *,int *);
 extern int FloatToInt(float);
 extern float math_random_signed_float_range(float,float),math_random_float_range(float,float);
 extern float FastAddRotations(float,float),math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
-extern void *func_PAL_002735D0(void *,int,int,int,void *,void *,void *,int,float,float);
+extern void *cam_moby_create_pal(void *,int,int,int,void *,void *,void *,int,float,float);
 extern int snd_play_from_global_bank(int,int,int);
 extern struct {char pad[0x158];float angle;} g_active_camera __attribute__((nosda));
-extern float D_001AA030 __attribute__((sda));
-extern void func_PAL_003120C0(unsigned char *);
+extern float g_debris_param __attribute__((sda));
+extern void moby_fade_out_update_pal(unsigned char *);
 typedef struct { unsigned char threshold[16];float previous;} DamageThresholds;
 typedef struct {float current;short maximum;} DamageHealth;
 
-int func_PAL_002B3F18(char *obj,DamageThresholds *thresholds,DamageHealth *health)
+int part_spawn_damage_debris_pal(char *obj,DamageThresholds *thresholds,DamageHealth *health)
 {
     float v[4];
     int flags,unused;
@@ -49,8 +49,8 @@ int func_PAL_002B3F18(char *obj,DamageThresholds *thresholds,DamageHealth *healt
                 v[1]=math_fast_sin_or_cos_b(angle)*speed;
                 v[2]=0;
                 v[2]=math_random_float_range(5.0f,8.0f)*0.020000001f;
-                effect=func_PAL_002735D0(obj,1,*(short *)(obj+0xaa),i,obj+0x10,obj+0xf0,v,255,D_001AA030,15.0f);
-                if(effect) *(void (**)(unsigned char *))((char *)effect+0x64)=func_PAL_003120C0;
+                effect=cam_moby_create_pal(obj,1,*(short *)(obj+0xaa),i,obj+0x10,obj+0xf0,v,255,g_debris_param,15.0f);
+                if(effect) *(void (**)(unsigned char *))((char *)effect+0x64)=moby_fade_out_update_pal;
                 *(unsigned short *)(obj+0x7c)&=~bit;
                 if(!any)snd_play_from_global_bank(7,0,0);
                 any=1;

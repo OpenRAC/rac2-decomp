@@ -53,12 +53,12 @@ typedef struct {
     float matrix[12];
 } SceneCamera;
 
-extern Scene18 D_L18_001BD4C0;
+extern Scene18 g_scene_movables_state;
 extern int g_current_map_index __attribute__((sda));
 extern SceneMoby *g_moby_l18_table MACRO_ADDR;
-extern SceneMoby *D_L18_001B2820 MACRO_ADDR;
-extern SceneCamera D_L18_001B9680;
-extern ExplosionSpot D_L18_00287D10[];
+extern SceneMoby *g_moby_l18_table_end MACRO_ADDR;
+extern SceneCamera g_hero_l18_state_extra;
+extern ExplosionSpot g_explosion_spots[];
 
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(void *);
@@ -79,8 +79,8 @@ void func_US2_L18_00317D10(void)
 
     anim_start_startup_animations();
     i = 0;
-    if (i < D_L18_001BD4C0.count) do {
-        scene = &D_L18_001BD4C0;
+    if (i < g_scene_movables_state.count) do {
+        scene = &g_scene_movables_state;
         object = scene->objects[i];
         if (object && *(short *)(object + 0xAA) == 0xE29) {
             *(unsigned short *)(object + 0x34) |= 0x800;
@@ -96,35 +96,35 @@ void func_US2_L18_00317D10(void)
         }
         i++;
     } while (i < scene->count);
-    if (g_current_map_index != 18 || D_L18_001BD4C0.mode != 4) {
+    if (g_current_map_index != 18 || g_scene_movables_state.mode != 4) {
         return;
     }
-    if (D_L18_001BD4C0.timer == 1) {
-        for (k = 0; &g_moby_l18_table[k] < D_L18_001B2820; k++) {
+    if (g_scene_movables_state.timer == 1) {
+        for (k = 0; &g_moby_l18_table[k] < g_moby_l18_table_end; k++) {
             moby = &g_moby_l18_table[k];
             moby->flags |= 0x41;
         }
     }
     for (j = 0; j < 13; j++) {
-        timing = &D_L18_001BD4C0;
-        spots = D_L18_00287D10;
+        timing = &g_scene_movables_state;
+        spots = g_explosion_spots;
         timer = timing->timer;
         spot = &spots[j];
         if (timer == spot->time) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
-                FastVecAdd(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, g_hero_l18_state_extra.matrix);
+                FastVecAdd(position, position, g_hero_l18_state_extra.position);
             }
             SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
                 shakeTime = 55;
                 secondaryShakeTime = 70;
-                D_L18_001B9680.shakeTime = shakeTime;
-                D_L18_001B9680.secondaryShakeTime = secondaryShakeTime;
-                D_L18_001B9680.shakeTimer = 0;
-                D_L18_001B9680.shake = spot->shake * 0.08f;
-                D_L18_001B9680.secondaryShake = spot->shake * 0.07f;
+                g_hero_l18_state_extra.shakeTime = shakeTime;
+                g_hero_l18_state_extra.secondaryShakeTime = secondaryShakeTime;
+                g_hero_l18_state_extra.shakeTimer = 0;
+                g_hero_l18_state_extra.shake = spot->shake * 0.08f;
+                g_hero_l18_state_extra.secondaryShake = spot->shake * 0.07f;
             }
         }
     }

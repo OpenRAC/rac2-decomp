@@ -32,7 +32,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 
 /* Spawn class 0xB7F at a position, owned by a parent, with a random spin. */
-Moby_3280C8 *func_PAL_00329890(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 arg, f32 scale)
+Moby_3280C8 *part_spawn_spinning_effect_moby_pal(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 arg, f32 scale)
 {
     Moby_3280C8 *m = CreateMoby(0xB7F);
     if (m != 0) {

@@ -111,28 +111,28 @@ typedef struct {
     f32 high;               /* 0x38 */
 } GuardZone;
 
-extern GuardZone D_L12_001CA380;
-extern s32 D_L12_001A8F00 __attribute__((sda));
-extern s32 D_L12_001B1878 __attribute__((sda));
-extern f32 D_L12_001B1814 __attribute__((sda));
-extern f32 D_L12_001B1818 __attribute__((sda));
-extern s32 D_L12_001B181C __attribute__((sda));
-extern s32 D_L12_001B1820 __attribute__((sda));
-extern s32 D_L12_001B1824 __attribute__((sda));
-extern u16 D_L12_001B1828 __attribute__((sda));
-extern s32 D_L12_001B182C __attribute__((sda));
-extern s32 D_L12_001B1830 __attribute__((sda));
-extern s32 D_L12_001B183C __attribute__((sda));
-extern s32 D_L12_001B1840 __attribute__((sda));
-extern s32 D_L12_001B29C8 MACRO_ADDR;
-extern s32 D_L12_001B3D98 MACRO_ADDR;
-extern s32 D_L12_001B3D9C MACRO_ADDR;
-extern s32 D_L12_001B3DA0 MACRO_ADDR;
-extern char *D_L12_001FEAC0[];
+extern GuardZone g_guard_zone;
+extern s32 g_hero_l12_control_mode __attribute__((sda));
+extern s32 g_guard_low_timer_threshold __attribute__((sda));
+extern f32 g_guard_near_distance __attribute__((sda));
+extern f32 g_guard_close_distance __attribute__((sda));
+extern s32 g_guard_random_attack_chance __attribute__((sda));
+extern s32 g_guard_attack_timer_threshold __attribute__((sda));
+extern s32 g_guard_alert_timer_threshold __attribute__((sda));
+extern u16 g_guard_attack_sequence_value __attribute__((sda));
+extern s32 g_guard_wait_min __attribute__((sda));
+extern s32 g_guard_wait_max __attribute__((sda));
+extern s32 g_guard_cooldown_min __attribute__((sda));
+extern s32 g_guard_cooldown_max __attribute__((sda));
+extern s32 g_frame_l12_counter MACRO_ADDR;
+extern s32 g_guard_color_red MACRO_ADDR;
+extern s32 g_guard_color_green MACRO_ADDR;
+extern s32 g_guard_color_blue MACRO_ADDR;
+extern char *g_path_zone_table[];
 extern char g_hero_position[];
-extern char D_L12_001B1880[];
-extern char D_L12_001B1890[];
-extern char D_L12_001B18A8[];
+extern char g_str_guard_debug_a[];
+extern char g_str_guard_alarm_debug[];
+extern char g_str_guard_debug_b[];
 
 extern void STUB_printf(const char *, ...);
 extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
@@ -188,16 +188,16 @@ void todano_guard_update(GuardMoby *moby)
     s32 helper_count;
     s8 alarm;
 
-    if (D_L12_001CA380.kind != 0) {
+    if (g_guard_zone.kind != 0) {
         f32 z = moby->z;
-        if (z < D_L12_001CA380.low && D_L12_001CA380.mode == 1)
+        if (z < g_guard_zone.low && g_guard_zone.mode == 1)
             return;
-        if (D_L12_001CA380.low < z && D_L12_001CA380.mode == 0)
+        if (g_guard_zone.low < z && g_guard_zone.mode == 0)
             return;
-        if (D_L12_001CA380.kind == 2) {
-            if (D_L12_001CA380.high < z && D_L12_001CA380.mode == 1)
+        if (g_guard_zone.kind == 2) {
+            if (g_guard_zone.high < z && g_guard_zone.mode == 1)
                 return;
-            if (z < D_L12_001CA380.high && D_L12_001CA380.mode == 2)
+            if (z < g_guard_zone.high && g_guard_zone.mode == 2)
                 return;
         }
     }
@@ -213,7 +213,7 @@ void todano_guard_update(GuardMoby *moby)
         moby_mark_spawned(moby);
         return;
     }
-    if (D_L12_001A8F00 == 2)
+    if (g_hero_l12_control_mode == 2)
         return;
 
     if (vars->f31E != 0 && moby->f30 == 0xFF)
@@ -239,13 +239,13 @@ void todano_guard_update(GuardMoby *moby)
             moby->f96 = 0;
             return;
         }
-        if (moby->f96 < D_L12_001B1878) {
+        if (moby->f96 < g_guard_low_timer_threshold) {
             moby->f96 = moby->f96 + 1;
             return;
         }
         vars->f31C = 1;
         guard_handle_hit_handover(moby);
-        *(TI128 *)&moby->x = *(TI128 *)(D_L12_001FEAC0[vars->f2C0] + 0x10);
+        *(TI128 *)&moby->x = *(TI128 *)(g_path_zone_table[vars->f2C0] + 0x10);
         helper_count = 0;
         if (vars->f2F8 != 0) {
             list[0] = vars->f2F8;
@@ -264,9 +264,9 @@ void todano_guard_update(GuardMoby *moby)
         if (vars->f4A0->state == 0xFD) {
         release:
             get_moby_color(moby, &sx, &sy, &sz);
-        if (sx != D_L12_001B3D98 || sy != D_L12_001B3D9C || sz != D_L12_001B3DA0)
-            STUB_printf(D_L12_001B1880);
-        set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+        if (sx != g_guard_color_red || sy != g_guard_color_green || sz != g_guard_color_blue)
+            STUB_printf(g_str_guard_debug_a);
+        set_moby_color(moby, g_guard_color_red, g_guard_color_green, g_guard_color_blue);
         vars->f4A0 = 0;
         }
     }
@@ -303,11 +303,11 @@ void todano_guard_update(GuardMoby *moby)
             GuardMoby *head;
             int i;
 
-            STUB_printf(D_L12_001B1890, D_L12_001B29C8, moby->fB2, alarm);
+            STUB_printf(g_str_guard_alarm_debug, g_frame_l12_counter, moby->fB2, alarm);
             moby->f31 = 1;
             moby->f34 = moby->f34 & 0xFFFE;
             moby->f98 = moby->f24->f10;
-            set_moby_color(moby, D_L12_001B3D98, D_L12_001B3D9C, D_L12_001B3DA0);
+            set_moby_color(moby, g_guard_color_red, g_guard_color_green, g_guard_color_blue);
             head = vars->f2F8;
             if (head != 0 && head->fAA == 0x114B /* moby class 4427 */ && head->state != 0xFE && head->state != 0xFD) {
                 head->f34 = head->f34 & 0xFFFE;
@@ -336,14 +336,14 @@ void todano_guard_update(GuardMoby *moby)
 
     switch (moby->f95) {
     case 0:
-        STUB_printf(D_L12_001B18A8, moby->fB2, moby->fAA);
+        STUB_printf(g_str_guard_debug_b, moby->fB2, moby->fAA);
         break;
     case 1:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
             vars->f2D8 = vars->f2D4;
             if (!(vars->f302 & 1)) {
-                vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+                vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
                 moby_set_state(moby, moby->state, 2);
             } else {
                 guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
@@ -371,13 +371,13 @@ void todano_guard_update(GuardMoby *moby)
     case 3:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1)
-            vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+            vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
         break;
     case 4:
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
             enemy_select_path(moby, vars->f2B8, -1);
-            vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+            vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
             guard_switch_animation(moby, 2, 0, 0xA);
             moby_set_state(moby, 4, 3);
         }
@@ -388,7 +388,7 @@ void todano_guard_update(GuardMoby *moby)
             int side = func_001163B0() & 1;
             guard_switch_animation(moby, side, 0, math_random_int_range(0xA, 0x14));
             shared_counter_release(moby);
-            vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+            vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
             vars->f300 = 1;
             moby_set_state(moby, moby->state, 2);
         }
@@ -404,7 +404,7 @@ void todano_guard_update(GuardMoby *moby)
         vars->f2EC = moby->fF8;
         if (vars->f204 == 1 || vars->f2E0 != 0) {
             shared_counter_release(moby);
-            vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+            vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
             guard_switch_animation(moby, 3, 0, math_random_int_range(7, 0xC));
             moby_set_state(moby, 5, 5);
         } else if (vars->f2E8 == 0) {
@@ -421,7 +421,7 @@ void todano_guard_update(GuardMoby *moby)
         break;
     case 8:
         vars->f2EC = FastAddRotations(vars->f2EC,
-            (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L12_001B29C8) * 0.02f)) + 2.0f) * 0.023271061f);
+            (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_frame_l12_counter) * 0.02f)) + 2.0f) * 0.023271061f);
         break;
     case 9: {
         s32 hit;
@@ -437,7 +437,7 @@ void todano_guard_update(GuardMoby *moby)
             moby_set_state(moby, 0xF, -1);
         } else if (hit & 2) {
             shared_counter_release(moby);
-            vars->f2E0 = math_random_int_range(D_L12_001B183C, D_L12_001B1840);
+            vars->f2E0 = math_random_int_range(g_guard_cooldown_min, g_guard_cooldown_max);
             if (moby->f42 == 0xF || moby->f43 == 0xF) {
                 enemy_select_path(moby, vars->f2B0, -1);
                 moby_set_state(moby, 3, 3);
@@ -526,16 +526,16 @@ void todano_guard_update(GuardMoby *moby)
 
         near = 1;
         distance = vec_distance_xy(&moby->x, &vars->f200->x);
-        if (!(distance <= D_L12_001B1818))
+        if (!(distance <= g_guard_close_distance))
             near = 0;
         close = 1;
         ahead = *vars->f304 < vars->f2CC;
-        if (!(distance < D_L12_001B1814))
+        if (!(distance < g_guard_near_distance))
             close = 0;
         if (vars->f303 == 0) {
             picked = 0;
             tried = 0;
-            if (close == 0 && near != 0 && ahead != 0 && math_random_int_below(D_L12_001B181C - 1) == 0
+            if (close == 0 && near != 0 && ahead != 0 && math_random_int_below(g_guard_random_attack_chance - 1) == 0
                 && vars->f2E6 == 0) {
                 tried = 1;
                 picked = guard_is_line_of_sight_blocked(moby, 0, vars->f30C != 0, 0);
@@ -570,16 +570,16 @@ void todano_guard_update(GuardMoby *moby)
                 guard_switch_animation(moby, 0xA, 0, 1);
             else
                 guard_switch_animation(moby, 0x13, 0, 1);
-            vars->f2E4 = D_L12_001B1828;
+            vars->f2E4 = g_guard_attack_sequence_value;
             moby_set_state(moby, 0xB, -1);
         }
         break;
     case 11:
-        if (D_L12_001B1824 < moby->f96)
+        if (g_guard_alert_timer_threshold < moby->f96)
             guard_aim_hand_helper_at_target(moby);
-        if ((D_L12_001B1820 < moby->f96 && D_L12_001B1814 < vec_distance_xy(&moby->x, &vars->f200->x))
+        if ((g_guard_attack_timer_threshold < moby->f96 && g_guard_near_distance < vec_distance_xy(&moby->x, &vars->f200->x))
             || vars->f2F8 == 0) {
-            vars->f2E6 = math_random_int_range(D_L12_001B182C, D_L12_001B1830);
+            vars->f2E6 = math_random_int_range(g_guard_wait_min, g_guard_wait_max);
             shared_counter_release(moby);
             guard_switch_animation(moby, 0xC, 0, math_random_int_range(7, 0xC));
             moby_set_state(moby, 8, 5);

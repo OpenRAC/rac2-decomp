@@ -132,8 +132,8 @@ extern int coll_point_inside_region(void *, int);
    pointer, the last one with its sign bit set) and the base of those records; both are read
    bare (`lui`/`lw`), the table's first read of each list in a branch delay slot, where the
    assembler gives it the $gp form. */
-extern unsigned short **D_L00_001A9014 __attribute__((sda));
-extern unsigned char *D_L00_001B2514 __attribute__((sda));
+extern unsigned short **g_level_reloc_record __attribute__((sda));
+extern unsigned char *g_tie_table __attribute__((sda));
 
 /* Applies OP to the flag byte at +0x1E of every record of the 14 id lists named by the first 14
    words of the object's state (-1: no list). */

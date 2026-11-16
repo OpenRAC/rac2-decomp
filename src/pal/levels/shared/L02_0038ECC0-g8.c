@@ -16,23 +16,23 @@ typedef struct Ent {
 } Ent;
 extern unsigned int g_entity_group_lists[];
 extern char *g_moby_l02_pool;
-extern int D_L02_001B35B8 __attribute__((sda));
-extern int D_L02_001A9048;
-extern float D_L02_001AEF50 __attribute__((sda));
-extern float D_L02_001AEE50[2] __attribute__((sda));
-extern float D_L02_001AEE48[2] __attribute__((sda));
-extern float D_L02_001AEE40[2] __attribute__((sda));
-extern int D_L02_001AEE70 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
+extern int g_destroyed_target_count;
+extern float g_target_spin_rate __attribute__((sda));
+extern float g_explode_piece_params_a[2] __attribute__((sda));
+extern float g_explode_piece_params_b[2] __attribute__((sda));
+extern float g_explode_piece_params_c[2] __attribute__((sda));
+extern int g_explode_color __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float x);
 extern float FastAddRotations(float a, float b);
 extern float fast_subtract_rotations(float a, float b);
 extern void path_sample_position(int *path, int seg, void *pos, void *rot, int flags, float t);
 extern void *part_find_owned_effect_slot(void *e, int a1, int a2);
-extern void func_PAL_L00_0032C328(void *a0, void *a1, void *a2, void *a3, int t0, int t1, int t2, int t3,
+extern void part_explode_object_into_pieces_pal(void *a0, void *a1, void *a2, void *a3, int t0, int t1, int t2, int t3,
                               int s0, int s1, int s2);
 extern void moby_compute_local_point(char *a0, float *a1, float f12, float f13, float f14);
 extern int PlayMobySound(int a0, int a1, void *a2);
-extern void func_PAL_002AC718(void *a0, float f12, void *a1, float f13, void *a2, float f14, int a3,
+extern void SpawnExplosionEffects_pal(void *a0, float f12, void *a1, float f13, void *a2, float f14, int a3,
                           float f15, int t0, int t1, float f16, float f17, int t2, float f18,
                           int t3, int s0, int s1, int s2, int s3);
 extern float ApproachValue(float *p, float a, float b);
@@ -50,7 +50,7 @@ void func_PAL_L02_0038F970(unsigned char *arg0) {
     float range = (float)*path;
     float step = *(float *)(o + 0x14);
     int seg = *(short *)(o + 0x70);
-    float rate = D_L02_001AEF50 * 0.0003490659f;
+    float rate = g_target_spin_rate * 0.0003490659f;
     unsigned short *q;
     unsigned char *e;
     unsigned char *s1;
@@ -58,7 +58,7 @@ void func_PAL_L02_0038F970(unsigned char *arg0) {
     float h;
 
     q = (unsigned short *)g_entity_group_lists[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
+    while (arg0[0x21] != 0xFF && arg0[0x21] <= g_group_max_index && q != 0 &&
            ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[arg0[0x21]])) {
         e = (unsigned char *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
         if (e == 0)
@@ -85,9 +85,9 @@ void func_PAL_L02_0038F970(unsigned char *arg0) {
                 ((Ent *)e)->f31 = 0;
                 ((Ent *)e)->f34 |= 1;
                 ((Ent *)e)->f98 = 0;
-                D_L02_001A9048++;
-                func_PAL_L00_0032C328(e, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
-                                  D_L02_001AEE70, 0, 0xFFFF, 0xFF, 0);
+                g_destroyed_target_count++;
+                part_explode_object_into_pieces_pal(e, g_explode_piece_params_a, g_explode_piece_params_b, g_explode_piece_params_c, 0x3F, 2,
+                                  g_explode_color, 0, 0xFFFF, 0xFF, 0);
                 dir.q = 0;
                 dir.f[2] = 0.060000002f;
                 moby_compute_local_point((char *)e, pos, 0.0f, 0.0f, 0.0f);
@@ -99,7 +99,7 @@ void func_PAL_L02_0038F970(unsigned char *arg0) {
                     PlayMobySound(1, 0, e);
                 if (*(short *)(e + 0xAA) == 0xB13)
                     PlayMobySound(1, 0, e);
-                func_PAL_002AC718(e, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
+                SpawnExplosionEffects_pal(e, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
                               15.0f, 1, 10, -1, 0, 0x810001);
             }
         }

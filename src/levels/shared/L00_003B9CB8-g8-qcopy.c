@@ -16,7 +16,7 @@ extern void euler_rotation_basis(void *a0, void *a1);
 
 /* The counter the level keeps for these objects. The sda attribute and this unit's -G8
    make the reference to it $gp-relative, the way retail has it. */
-extern unsigned int D_L00_001AFDA0 __attribute__((sda));
+extern unsigned int g_effect_moby_count __attribute__((sda));
 
 /* Creates the level's own object, fills the header the object carries, copies the two
    16-byte records it is given into it, and lets the shared helpers set the rest up.
@@ -50,7 +50,7 @@ void *effect_spawn_moby(char *owner, char *param, char *position, char *vector)
         *(int *)(vars + 0x54) = 0;
         *(int *)(vars + 0x58) = 0;
         *(unsigned char *)(newMoby + 0x20) = 0;
-        D_L00_001AFDA0 = D_L00_001AFDA0 + 1;
+        g_effect_moby_count = g_effect_moby_count + 1;
         *(int *)(vars + 0x5C) = part_l00_alloc_effect_slot_2(posPtr, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
         *(float *)(newMoby + 0xF0) = math_random_angle();
         *(float *)(newMoby + 0xF4) = math_random_angle();

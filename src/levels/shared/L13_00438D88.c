@@ -23,15 +23,15 @@ typedef struct {
 extern PathHero g_hero_state;
 extern int g_current_map_index __attribute__((sda));
 
-extern float D_L13_001B9940[4];
-extern char *D_L13_001B22C4[] __attribute__((sda));
+extern float g_camera_axis_vector[4];
+extern char *g_cam_settings_table[] __attribute__((sda));
 typedef struct {
     char unknown00[0x10];
     CameraPath *path;
     char unknown14[0xC];
 } CameraRouteRecord;
-extern CameraRouteRecord *D_L13_001B2140 __attribute__((sda));
-extern CameraPath *D_L13_001FE580[];
+extern CameraRouteRecord *g_cam_route_table __attribute__((sda));
+extern CameraPath *g_guard_path_table[];
 extern int Spline_AdvanceByDistance(void *, void *, int *, float *, int, float);
 extern int find_nearest_path_point(void *, void *, void *, int *, float *, int, float, float, float);
 extern void FastVecSub(void *, void *, void *);
@@ -102,7 +102,7 @@ void UpdatePathCamera(char *settings) {
     TurnSpring *turn = (TurnSpring *)(private + 0x30);
     CameraMotion *motion = (CameraMotion *)(private + 0x80);
     CameraRun *run = (CameraRun *)(private + 0x150);
-    settings = *(char **)(D_L13_001B22C4[0] + *(short *)(camera + 0x84) * 32 + 0x1C);
+    settings = *(char **)(g_cam_settings_table[0] + *(short *)(camera + 0x84) * 32 + 0x1C);
     look_ahead = *(float *)settings;
     angular_rate = 0.01f;
     position_rate = 0.01f;
@@ -111,7 +111,7 @@ void UpdatePathCamera(char *settings) {
     if (mode == 0) {
         cursor_index = g_hero_state.cursor.index;
         cursor_distance = g_hero_state.cursor.distance;
-        path_slot = &D_L13_001FE580[path_index];
+        path_slot = &g_guard_path_table[path_index];
         run->cursor.distance = cursor_distance;
         run->cursor.index = cursor_index;
         Spline_AdvanceByDistance(*path_slot, &desired, &run->cursor.index, &run->cursor.distance, 0, 1.0f);
@@ -130,10 +130,10 @@ void UpdatePathCamera(char *settings) {
         CameraPath *path2;
         CameraPath *route;
         CameraPath *positions;
-        path2 = D_L13_001FE580[path_index];
-        route = D_L13_001B2140[*(int *)(settings + 0x24)].path;
-        positions = D_L13_001FE580[*(int *)(settings + 0x28)];
-        markers = D_L13_001FE580[*(int *)(settings + 0x2C)];
+        path2 = g_guard_path_table[path_index];
+        route = g_cam_route_table[*(int *)(settings + 0x24)].path;
+        positions = g_guard_path_table[*(int *)(settings + 0x28)];
+        markers = g_guard_path_table[*(int *)(settings + 0x2C)];
         previous = markers->count - 1;
         for (i = 0; i < markers->count; i++) {
             begin = FloatToInt(markers->point[previous].f[3]);
@@ -179,7 +179,7 @@ void UpdatePathCamera(char *settings) {
         *(float *)(camera + 0x34) = math_step_spring_damper_clamped((float *)(private + 4), *(float *)(camera + 0x34), point.f[1], *(float *)(private + 0x10), 0.175f, 0.0f);
         *(float *)(camera + 0x38) = math_step_spring_damper_clamped((float *)(private + 8), *(float *)(camera + 0x38), point.f[2], *(float *)(private + 0x10), 0.175f, 0.0f);
     } else {
-        other_path = D_L13_001FE580[path_index];
+        other_path = g_guard_path_table[path_index];
         if (*(int *)(settings + 0x24) < 0) {
             find_nearest_path_point(other_path, &g_hero_state.position, &sampled, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
             sample_distance = *(short *)(settings + 0x36) == 1 ? -(((CameraSettings *)settings)->sample_distance * 4.0f) : ((CameraSettings *)settings)->sample_distance;
@@ -196,7 +196,7 @@ void UpdatePathCamera(char *settings) {
         *(float *)(camera + 0x38) = math_step_spring_damper_clamped((float *)(private + 8), *(float *)(camera + 0x38), desired.f[2], position_rate, 0.175f, 0.0f);
     }
     if (*(int *)(settings + 0x24) < 0) {
-        look_path = D_L13_001FE580[*(int *)(settings + 0x20)];
+        look_path = g_guard_path_table[*(int *)(settings + 0x20)];
         find_nearest_path_point(look_path, &g_hero_state.position, &point, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
         if (g_current_map_index == 14 && *(int *)(settings + 0x30) == 0)
             Spline_AdvanceByDistance(look_path, &tangent, &cursor_index, &cursor_distance, 0, look_ahead);
@@ -209,7 +209,7 @@ void UpdatePathCamera(char *settings) {
         final_advance_distance = g_hero_state.cursor.distance;
         Spline_AdvanceByDistance(g_hero_state.path, &point, &final_advance_index, &final_advance_distance, 1, look_ahead);
     }
-    vec_scale_to_length(&eye_offset, D_L13_001B9940, motion->elevation);
+    vec_scale_to_length(&eye_offset, g_camera_axis_vector, motion->elevation);
     FastVecAdd(&sampled, &eye_offset, &point);
     FastVecSub(&direction, &sampled, camera + 0x30);
     {
@@ -232,7 +232,7 @@ void UpdatePathCamera(char *settings) {
     math_apply_axis_rotation_to_quat(camera, camera + 0x40, &tangent, smoothed_angle);
     vec_scale_to_length(camera + 0x40, camera, 1.0f);
     vec_scale_to_length(camera, camera, 1.0f);
-    FastVecCross(camera + 0x10, camera, D_L13_001B9940);
+    FastVecCross(camera + 0x10, camera, g_camera_axis_vector);
     vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
     FastVecCross(camera + 0x20, camera + 0x10, camera);
 }

@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern double D_L13_001AEC00 __attribute__((sda));
-extern double D_L13_001AEC08 __attribute__((sda));
-extern double D_L13_001AEC10 __attribute__((sda));
-extern double D_L13_001AEC40 __attribute__((sda));
-extern double D_L13_001AEC48 __attribute__((sda));
-extern double D_L13_001AEC50 __attribute__((sda));
+extern double g_fade_in_param_c __attribute__((sda));
+extern double g_fade_in_param_b __attribute__((sda));
+extern double g_fade_in_param_a __attribute__((sda));
+extern double g_fade_in_spark_param_c __attribute__((sda));
+extern double g_fade_in_spark_param_b __attribute__((sda));
+extern double g_fade_in_spark_param_a __attribute__((sda));
 
 extern void func_3248E0(unsigned char *, int, int);
 extern int func_326C70(unsigned char *, int, int);
@@ -28,7 +28,7 @@ void fade_in_update(unsigned char *a0) {
         a0[0xA8] = 0xFF;
         break;
     case 2:
-        func_333240(a0, &D_L13_001AEC10, &D_L13_001AEC08, &D_L13_001AEC00, 0xFFFF, 0, -1, 0,
+        func_333240(a0, &g_fade_in_param_a, &g_fade_in_param_b, &g_fade_in_param_c, 0xFFFF, 0, -1, 0,
                     0xFFFF, 0xFF, 0);
         func_31A718(a0);
         break;
@@ -49,7 +49,7 @@ void fade_in_spark_update(unsigned char *a0) {
         a0[0xA8] = 0xFF;
         break;
     case 2:
-        func_333240(a0, &D_L13_001AEC50, &D_L13_001AEC48, &D_L13_001AEC40, 0xFFFF, 0, -1, 0,
+        func_333240(a0, &g_fade_in_spark_param_a, &g_fade_in_spark_param_b, &g_fade_in_spark_param_c, 0xFFFF, 0, -1, 0,
                     0xFFFF, 0xFF, 0);
         func_3F8C68(a0 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.3f, 20.0f, 1, 1, 0, 0);
         func_31A718(a0);

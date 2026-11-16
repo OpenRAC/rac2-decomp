@@ -98,25 +98,25 @@ extern int hero_try_start_grab(void);
 extern void set_hero_animation(int, int, f32);
 extern void UpdateHeroAimTarget(f32, f32, f32);
 extern s32 hero_get_weapon_anim_id(int);
-extern u32 D_001A7390;
+extern u32 g_frame_counter;
 extern s32 g_is_pal_video;
-extern u8 D_001A7A40[8];
-extern u8 D_L01_001A7DE0[8] __attribute__((sda));
-extern u8 D_L01_001A7E00[8] __attribute__((sda));
-extern s32 D_L01_0025EC90[][11];
+extern u8 g_unlocked_item_flags[8];
+extern u8 g_hero_l01_animation_index_table[8] __attribute__((sda));
+extern u8 g_hero_l01_state_data_table[8] __attribute__((sda));
+extern s32 g_hero_anim_timing_table[][11];
 extern u8 g_hero_state[];
 extern u32 g_current_map_index;
 typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
-extern Statistics D_0018C360[];
+extern Statistics g_statistics_table[];
 extern Statistics g_progress_statistics[];
-extern s32 D_L01_001A8F40;
-extern s32 D_L01_001A9034 __attribute__((sda));
-extern f32 D_L01_001A7CD8 __attribute__((sda));
-extern f32 D_L01_001A7CDC __attribute__((sda));
-extern s32 D_L01_001A7DD8[2] __attribute__((sda));
-extern f32 D_L01_0025EE20[][25];
+extern s32 g_hero_l01_control_mode;
+extern s32 g_hero_input_lock_alt __attribute__((sda));
+extern f32 g_hero_l01_state_float_param_a __attribute__((sda));
+extern f32 g_hero_l01_state_float_param_b __attribute__((sda));
+extern s32 g_hero_l01_animation_table[2] __attribute__((sda));
+extern f32 g_hero_anim_float_curves[][25];
 typedef struct { u8 pad0[0x148]; f32 f148; u8 pad14C[0x400 - 0x14C]; s32 i400; } L19State_1B9900;
-extern L19State_1B9900 D_L01_001B9380;
+extern L19State_1B9900 g_drive_settings;
 
 /* All resident fields below are views of the single player-state object. */
 typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
@@ -152,7 +152,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
     f32 angle_53;
     f32 value_18, value_21, value_22, value_37;
     if (WORD(0x229C) == 0x14 && (action != 0x61 || animate != 2)) return 0;
-    if ((D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) && animate != 2) return 0;
+    if ((g_hero_l01_control_mode == 2 || g_hero_l01_control_mode == 6) && animate != 2) return 0;
     if (WORD(0x24CC) == 0 && (WORD(0x229C) == 2 || WORD(0x229C) == 7)) {
         if (action != 6 && action != 0x39 && action != 0x43 && action != 0x91 &&
             action != 0x5F && action != 0x74 && action != 0x78 && action != 0x79 &&
@@ -254,7 +254,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         if (WORD(0x22A0) == 0x13) selected_18 = 13;
         if (WORD(0x22AC) == 6 || WORD(0x22AC) == 0x2C) selected_18 = 18;
         if (WORD(0x22B0) == 4 && BYTE(0x49C) > 5) selected_18 = 13;
-        set_hero_animation(WORD(0x2298) + 3, D_L01_001A7DD8[WORD(0x2298)], (f32)selected_18); goto finish;
+        set_hero_animation(WORD(0x2298) + 3, g_hero_l01_animation_table[WORD(0x2298)], (f32)selected_18); goto finish;
     case 0x7B: {
         s32 n = -2;
         WORD(0x229C) = 28; WORD(0x1188) = 0x68; BITS(0x24A0) = 0;
@@ -269,7 +269,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         if (!animate) goto finish;
         if (BYTE(0x22B4) == 1) { set_hero_animation(2, 0, 8.0f); goto finish; }
         if (BYTE(0x22B4) != 0) goto finish;
-        set_hero_animation(WORD(0x2298) + 3, D_L01_001A7DD8[WORD(0x2298)], 8.0f); goto finish;
+        set_hero_animation(WORD(0x2298) + 3, g_hero_l01_animation_table[WORD(0x2298)], 8.0f); goto finish;
     case 0x30:
         WORD(0x229C) = 16; BITS(0x24A0) = 3; BYTE(0x22B7) = 1;
         mem_clear((unsigned int *)VEC(0xB40), 0, 0x20);
@@ -393,7 +393,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
             SetHeroMoveState(0x81, 1); return 0;
         }
         if (WORD(0x2294) != 0x6E && SHORT(0x348) == 1 && action != 0xE &&
-            action != 0x38 && !D_L01_001A9034) { SetHeroMoveState(0x6E, 1); return 0; }
+            action != 0x38 && !g_hero_input_lock_alt) { SetHeroMoveState(0x6E, 1); return 0; }
         if (WORD(0x22A0) == 0x11 && !BYTE(0x24DA)) BYTE(0x24DB)++;
         else BYTE(0x24DB) = 0;
         if (SHORT(0x1F2)) { SetHeroMoveState(0x82, 1); return 0; }
@@ -439,7 +439,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
 
         }
         else if (WORD(0x2294) == 0x81) {
-            SHORT(0x4AC) = 5; REAL(0x4B8) = 0.6f; REAL(0x4C8) = 18.0f; REAL(0x4CC) = 30.0f; REAL(0x4D0) = 12.0f; REAL(0x4A8) = D_L01_001A7CD8; REAL(0x50C) = D_L01_001A7CD8 + 0.5f; REAL(0x508) = D_L01_001A7CD8; HALF(0x518) = 15; HALF(0x51A) = 400; REAL(0x510) = 300.0f; REAL(0x520) = D_L01_001A7CDC * 0.0002777777845f; HALF(0x526) = 1200; HALF(0x52A) = 1200; REAL(0x4A4) = 0.11666667461395264f;
+            SHORT(0x4AC) = 5; REAL(0x4B8) = 0.6f; REAL(0x4C8) = 18.0f; REAL(0x4CC) = 30.0f; REAL(0x4D0) = 12.0f; REAL(0x4A8) = g_hero_l01_state_float_param_a; REAL(0x50C) = g_hero_l01_state_float_param_a + 0.5f; REAL(0x508) = g_hero_l01_state_float_param_a; HALF(0x518) = 15; HALF(0x51A) = 400; REAL(0x510) = 300.0f; REAL(0x520) = g_hero_l01_state_float_param_b * 0.0002777777845f; HALF(0x526) = 1200; HALF(0x52A) = 1200; REAL(0x4A4) = 0.11666667461395264f;
             if (g_current_map_index == 16) REAL(0x4A4) = 0.0f;
             level_init_pending_slot(PTR(0x2290), (char *)VEC(0x18E0));
             level_append_record_to_table((List_F66766f2b *)VEC(0x18E0), 70, 2, 0.0f);
@@ -526,7 +526,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
             REAL(0x4A4) = 0.055000003427267075f; HALF(0x526) = 85; HALF(0x1D0) = 70; BYTE(0x49D) = 1;
             if (g_is_pal_video) WORD(0x430) = 34; else WORD(0x430) = 35;
             WORD(0x434) = WORD(0x430) + 36; REAL(0x438) = 29.0f;
-            REAL(0x43C) = 50.0f; BITS(0x440) = 86; PTR(0x444) = (u8 *)D_L01_001A7E00;
+            REAL(0x43C) = 50.0f; BITS(0x440) = 86; PTR(0x444) = (u8 *)g_hero_l01_state_data_table;
             BYTE(0x52E) = 1;
 
         }
@@ -563,7 +563,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         else if (WORD(0x2294) == 0x66) { set_hero_animation(7, 0, 5.0f); goto finish; }
         else if (WORD(0x2294) == 9) {
             animation_41 = 8; index = FloatToInt(REAL(0xC38));
-            if (math_l00_return_argument(objectSnapshot[0x42]) == 4) animation_41 = D_L01_001A7DE0[index];
+            if (math_l00_return_argument(objectSnapshot[0x42]) == 4) animation_41 = g_hero_l01_animation_index_table[index];
             set_hero_animation(animation_41, 0, 5.0f); goto finish;
         }
         else if (WORD(0x2294) == 10) { set_hero_animation(18, 0, 5.0f); goto finish; }
@@ -580,7 +580,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         else if (WORD(0x2294) == 0xF) { set_hero_animation(21, 0, 5.0f); goto finish; }
         else if (WORD(0x2294) == 0xB) {
             s32 anim = WORD(0x4D4) + 28;
-            if (D_001A7A40[5]) { if (anim == 28) anim = 29; else if (anim == 29) anim = 28; }
+            if (g_unlocked_item_flags[5]) { if (anim == 28) anim = 29; else if (anim == 29) anim = 28; }
             if (WORD(0x22A4) == 4) { set_hero_animation(anim, 1, 4.0f); SHORT(0x4AC) = 1; goto finish; }
             set_hero_animation(anim, 0, 5.0f); goto finish;
         }
@@ -589,11 +589,11 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         WORD(0x229C) = 6;
         if (WORD(0x1500) && (u32)(WORD(0x2294) - 0x13) < 3) {
             if (g_progress_statistics[1].count < 0xFFFF) g_progress_statistics[1].count++;
-            if (D_001A7390 > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = D_001A7390;
+            if (g_frame_counter > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = g_frame_counter;
             g_progress_statistics[1].levels = (g_progress_statistics[1].levels | (1u << g_current_map_index)) | 0x80000000u;
-            if (D_0018C360[56].count < 0xFFFF) D_0018C360[56].count++;
-            if (D_001A7390 > D_0018C360[56].maximum) D_0018C360[56].maximum = D_001A7390;
-            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << g_current_map_index)) | 0x80000000u;
+            if (g_statistics_table[56].count < 0xFFFF) g_statistics_table[56].count++;
+            if (g_frame_counter > g_statistics_table[56].maximum) g_statistics_table[56].maximum = g_frame_counter;
+            g_statistics_table[56].levels = (g_statistics_table[56].levels | (1u << g_current_map_index)) | 0x80000000u;
             hero_setup_attached_object_transform(); WORD(0x2294) = WORD(0x22A0); WORD(0x229C) = WORD(0x22A4);
             goto finish;
         }
@@ -602,7 +602,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         switch (WORD(0x2294)) {
         case 0x14:
             if (g_progress_statistics[0].count < 0xFFFF) g_progress_statistics[0].count++;
-            if (D_001A7390 > g_progress_statistics[0].maximum) g_progress_statistics[0].maximum = D_001A7390;
+            if (g_frame_counter > g_progress_statistics[0].maximum) g_progress_statistics[0].maximum = g_frame_counter;
             g_progress_statistics[0].levels = (g_progress_statistics[0].levels | (1u << g_current_map_index)) | 0x80000000u;
             BITS(0x24A0) = 0x50; SHORT(0xBFC) = 4; WORD(0x2300) = 0;
             hero_l00_select_aim_target(8.0f, 1.047197699546814f, -1.0f); BITS(0xC00) = 0;
@@ -615,11 +615,11 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
             goto finish;
         case 0x15:
             if (g_progress_statistics[1].count < 0xFFFF) g_progress_statistics[1].count++;
-            if (D_001A7390 > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = D_001A7390;
+            if (g_frame_counter > g_progress_statistics[1].maximum) g_progress_statistics[1].maximum = g_frame_counter;
             g_progress_statistics[1].levels = (g_progress_statistics[1].levels | (1u << g_current_map_index)) | 0x80000000u;
-            if (D_0018C360[56].count < 0xFFFF) D_0018C360[56].count++;
-            if (D_001A7390 > D_0018C360[56].maximum) D_0018C360[56].maximum = D_001A7390;
-            D_0018C360[56].levels = (D_0018C360[56].levels | (1u << g_current_map_index)) | 0x80000000u;
+            if (g_statistics_table[56].count < 0xFFFF) g_statistics_table[56].count++;
+            if (g_frame_counter > g_statistics_table[56].maximum) g_statistics_table[56].maximum = g_frame_counter;
+            g_statistics_table[56].levels = (g_statistics_table[56].levels | (1u << g_current_map_index)) | 0x80000000u;
             SHORT(0xBFC) = 3; WORD(0x2300) = 0;
             hero_l00_select_aim_target(14.0f, 0.523598849773407f, -1.0f);
             BITS(0xC0C) = BITS(0xC0C) == 0;
@@ -649,11 +649,11 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
             }
             goto finish;
         case 0x13:
-        if (D_0018C360[10].count < 0xFFFF) D_0018C360[10].count++;
-        if (D_001A7390 > D_0018C360[10].maximum) D_0018C360[10].maximum = D_001A7390;
-        D_0018C360[10].levels = (D_0018C360[10].levels | (1u << g_current_map_index)) | 0x80000000u;
+        if (g_statistics_table[10].count < 0xFFFF) g_statistics_table[10].count++;
+        if (g_frame_counter > g_statistics_table[10].maximum) g_statistics_table[10].maximum = g_frame_counter;
+        g_statistics_table[10].levels = (g_statistics_table[10].levels | (1u << g_current_map_index)) | 0x80000000u;
         {
-        s32 *entry = D_L01_0025EC90[SHORT(0xBFC)];
+        s32 *entry = g_hero_anim_timing_table[SHORT(0xBFC)];
         mode = 0; WORD(0x2300) = 0;
         if ((WORD(0x22A0) == 0x13 && (f32)entry[2] > REAL(0xC38)) ||
             (WORD(0x22AC) == 0x13 && WORD(0x1B8) + WORD(0x22A8) < 27)) mode = (entry[1] + 1) % 3;
@@ -689,10 +689,10 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         goto finish;
     case 0x6D:
         WORD(0x229C) = 6; HALF(0xBFE) = 0;
-        if (WORD(0x22A0) == 0x6D) SHORT(0xBFC) = D_L01_0025EC90[SHORT(0xBFC)][1] == 0 ? 6 : 5;
+        if (WORD(0x22A0) == 0x6D) SHORT(0xBFC) = g_hero_anim_timing_table[SHORT(0xBFC)][1] == 0 ? 6 : 5;
         else SHORT(0xBFC) = 5;
         {
-            s32 kind = D_L01_0025EC90[SHORT(0xBFC)][1];
+            s32 kind = g_hero_anim_timing_table[SHORT(0xBFC)][1];
             s32 still;
             u32 object;
             if (!animate) goto finish;
@@ -718,7 +718,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         HALF(0x1DC) = 77;
         if (!animate) goto finish;
         set_hero_animation(0x10, 3, -3.0f);
-        *(f32 *)(PTR(0x2290) + 0x44) = D_L01_0025EE20[WORD(0xC30)][WORD(0xC34)++];
+        *(f32 *)(PTR(0x2290) + 0x44) = g_hero_anim_float_curves[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x8C:
         WORD(0x229C) = 7; BITS(0x24A0) = 0; hero_scale_saved_vectors(0.5f);
@@ -729,7 +729,7 @@ s32 SetHeroMoveState(s32 action, s32 animate) {
         HALF(0x1DC) = 77;
         if (!animate) goto finish;
         set_hero_animation(0x96, 1, -3.0f);
-        *(f32 *)(PTR(0x2290) + 0x44) = D_L01_0025EE20[WORD(0xC30)][WORD(0xC34)++];
+        *(f32 *)(PTR(0x2290) + 0x44) = g_hero_anim_float_curves[WORD(0xC30)][WORD(0xC34)++];
         goto finish;
     case 0x65:
         WORD(0x229C) = 25; BITS(0x24A0) = 0; WORD(0x18C0)++;
@@ -808,7 +808,7 @@ finish:
         WORD(0x1298) == 20 && WORD(0x2304)) BITS(0x2320) = 1;
     if (WORD(0x229C) == 20) { cancel_hero_item_animation(); BYTE(0x22BC) = 1; }
     if ((!hero_is_in_special_kind_or_mode() || WORD(0x229C) == 18) &&
-        (REAL(0x330) < D_L01_001B9380.f148 || WORD(0x229C) == 0)) D_L01_001B9380.i400 = 0;
+        (REAL(0x330) < g_drive_settings.f148 || WORD(0x229C) == 0)) g_drive_settings.i400 = 0;
     if (WORD(0x229C) != WORD(0x22A4)) hero_clear_tracked_slots();
     WORD(0x1B8) = 0;
     BITS(0x1C0) = 0;

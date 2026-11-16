@@ -2,8 +2,8 @@
 
 #include "common.h"
 extern char g_active_camera[];
-extern char D_0018B2F0[];
-extern unsigned char D_001A7A44[] __attribute__((sda));
+extern char g_camera_state_block[];
+extern unsigned char g_cheat_flags[] __attribute__((sda));
 extern void cam_update_scalar_transition(void);
 extern void cam_update_second_scalar_transition(void);
 extern void cam_select_coll_masks(void);
@@ -19,7 +19,7 @@ extern void cam_update_grounded(void);
 extern void gfx_blend_fog_from_cam_region(void *);
 extern void cam_update_fov_transition(void);
 
-void func_US2_00272378(void) {
+void cam_update_state_us2(void) {
     char *d = g_active_camera;
     char *obj;
     char *p;
@@ -45,9 +45,9 @@ void func_US2_00272378(void) {
     }
     if (stub_empty_22()) {
         p = g_active_camera + 0x140;
-        qcopy(p, D_0018B2F0);
-        qcopy(p + 0x230, D_0018B2F0 + 0x10);
-        FastVecCross(p + 0x240, p + 0x230, D_0018B2F0 - 0x14B0);
+        qcopy(p, g_camera_state_block);
+        qcopy(p + 0x230, g_camera_state_block + 0x10);
+        FastVecCross(p + 0x240, p + 0x230, g_camera_state_block - 0x14B0);
         vec_scale_to_length(p + 0x240, p + 0x240, 1.0f);
         FastVecCross(p + 0x250, p + 0x240, p + 0x230);
         vec_scale_to_length(p + 0x250, p + 0x250, 1.0f);
@@ -59,7 +59,7 @@ void func_US2_00272378(void) {
     cam_update_shake(q - 0x1F0, 2);
     cam_update_grounded();
     gfx_blend_fog_from_cam_region(q - 0x230);
-    if (D_001A7A44[0])
+    if (g_cheat_flags[0])
         FastVecCross(q + 0x10, q + 0x20, q);
     cam_update_fov_transition();
     qzero(q + 0x50);

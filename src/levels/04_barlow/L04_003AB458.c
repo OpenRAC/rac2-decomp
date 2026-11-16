@@ -9,7 +9,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void gfx_update_color_fade(void *, void *);
 extern void gfx_add_draw_callback_first(void *);
 extern void render_water_grids(void *, int);
-extern char D_L04_002AF6C0[];
+extern char g_water_l04_grid_data[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -42,7 +42,7 @@ typedef struct {
 extern void *memset(void *, int, int);
 extern void math_trap_always(void);
 extern int math_random_int_range(int, int);
-extern char *D_L04_001B25CC __attribute__((sda));
+extern char *g_linked_record_table __attribute__((sda));
 
 /* Draws the beam effect from the linked object's attachment point. */
 void object_draw_linked_beam(char *mobyArg)
@@ -96,7 +96,7 @@ void object_release_linked(char *moby)
 /* Runs the shared level routine on the standard list with a count of 10. */
 void group_run_shared_routine(void)
 {
-    render_water_grids(D_L04_002AF6C0, 10);
+    render_water_grids(g_water_l04_grid_data, 10);
 }
 
 typedef unsigned char u8;
@@ -192,7 +192,7 @@ void SelectRandomOtherLiveSlot(char *moby)
     if (count != 0) {
         int pick = math_random_int_range(0, count - 1);
         vars->current = (unsigned char)values[pick];
-        vars->position = ((Record2338 *)D_L04_001B25CC)[vars->slots[vars->current]].position;
+        vars->position = ((Record2338 *)g_linked_record_table)[vars->slots[vars->current]].position;
     }
 }
 

@@ -15,7 +15,7 @@ typedef struct {
 extern Vec4 *g_route_polygons[];
 extern u16 *g_entity_group_lists[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 extern void lerp_vector(Vec4 *, Vec4 *, Vec4 *, float);
 extern float fast_vec_dist(Vec4 *, Vec4 *);
@@ -60,7 +60,7 @@ void path_enemy_pick_patrol_point(char *self, char *unused_output) {
     if (*(int *)(state + 0x3C4) != 0)
         return;
     for (idPtr = g_entity_group_lists[*(int *)(state + 0x39C)], group = *(int *)(state + 0x39C);
-         (u8)group != 0xFF && group <= D_L02_001B35B8 && idPtr != 0 &&
+         (u8)group != 0xFF && group <= g_group_max_index && idPtr != 0 &&
          ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_entity_group_lists[group]);
          idPtr++) {
         entity = D_L02_001B359C_1[0] + ((*idPtr & 0x7FFF) << 8);

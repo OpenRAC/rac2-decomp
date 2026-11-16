@@ -9,8 +9,8 @@ extern void *puff_spawn_linked_child(void *);
 extern void STUB_printf(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
-extern int *D_L08_001FE7C0[];
-extern char D_L08_001B1BD0[];
+extern int *g_path_list_table[];
+extern char g_str_hover_init_debug[];
 
 /* Fills the 0x68 context with its timing and animation defaults, sets the record's height from
    the sweep below it when the context has none, and updates the shared counters at +0x1F8..+0x200. */
@@ -37,7 +37,7 @@ void hover_init_defaults(char *moby) {
     *(Quad *)probe = *(Quad *)(moby + 0x10);
     floor_height = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D8), *(int *)(vars + 0x1E0), *(int *)(vars + 0x1DC), -1);
     if (floor_height > 0.0f) *(u8 *)(vars + 0x20E) = FloatToInt(floor_height + 2.0f);
-    if (*(int *)(vars + 0x1E4) != -1) path_l01_compute_segment_lengths(D_L08_001FE7C0[*(int *)(vars + 0x1E4)]);
+    if (*(int *)(vars + 0x1E4) != -1) path_l01_compute_segment_lengths(g_path_list_table[*(int *)(vars + 0x1E4)]);
     *(u8 *)(vars + 0x60) = 5;
     *(int *)(vars + 0x98) = -1;
     *(u8 *)(vars + 0x61) = 8;
@@ -79,7 +79,7 @@ void hover_init_defaults(char *moby) {
     *(int *)(vars + 0x22C) = puff_spawn_linked_child(moby);
     *(s16 *)(vars + 0x1BE) = 0;
     if (*(u8 *)(vars + 0x20C) == 1 || *(u8 *)(vars + 0x20C) == 4) {
-        STUB_printf(D_L08_001B1BD0, *(s16 *)(moby + 0xB2), *(u8 *)(vars + 0x20C), *(u8 *)(vars + 0x20C) + 1);
+        STUB_printf(g_str_hover_init_debug, *(s16 *)(moby + 0xB2), *(u8 *)(vars + 0x20C), *(u8 *)(vars + 0x20C) + 1);
         *(u8 *)(vars + 0x20C) += 1;
     }
     qcopy(vars + 0x170, moby + 0x10);

@@ -11,9 +11,9 @@ typedef struct {
     float pos[4];
 } Hero;
 extern Hero g_hero_state;
-extern float D_L20_001B1FE4 __attribute__((sda));
-extern float D_L20_001B1FE8 __attribute__((sda));
-extern Vector D_L20_001B2010 SDATA(D_L20_001B2010);
+extern float g_yeedil_small_speed_b __attribute__((sda));
+extern float g_yeedil_small_accel_a __attribute__((sda));
+extern Vector g_yeedil_small_local_vec SDATA(D_L20_001B2010);
 extern void yeedil_small_enemy_init_damage(char *), moby_mark_spawned(char *);
 extern void moby_enter_state_six(char *), moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
@@ -22,16 +22,16 @@ extern void euler_rotation_basis(void *, void *);
 extern s32 cam_moby_update(char *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern f32 ApproachValue(void *, float, float);
-extern float D_L20_001B2BE8;
+extern float g_level_shared_float;
 extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern float func_PAL_002AA108(char *, char *);
+extern float moby_update_aim_target_strength_pal(char *, char *);
 extern void FastVecSub(void *, void *, void *);
 extern int func_PAL_002B1A50(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 
-void func_PAL_L20_00445668(char *arg0) {
+void yeedil_small_enemy_init_damage_pal(char *arg0) {
     char *st = *(char **)(arg0 + 0x68);
     Vector a;
     Vector b;
@@ -51,8 +51,8 @@ void func_PAL_L20_00445668(char *arg0) {
         *(float *)(st + 0x80) = 0.785398245f;
         {
             float angle = math_random_signed_float_range(18.0f, 22.0f) * 0.0174532942f;
-            float speed = D_L20_001B1FE4 * 0.020000001f;
-            float accel = D_L20_001B1FE8 * 0.00040000002f;
+            float speed = g_yeedil_small_speed_b * 0.020000001f;
+            float accel = g_yeedil_small_accel_a * 0.00040000002f;
 
             *(short *)(st + 0x132) = 0x64;
             *(short *)(st + 0x134) = 0x96;
@@ -77,7 +77,7 @@ void func_PAL_L20_00445668(char *arg0) {
         }
     }
 
-    *(float *)(st + 0x180) = D_L20_001B2BE8;
+    *(float *)(st + 0x180) = g_level_shared_float;
     if (*(unsigned char *)(arg0 + 0x20) == 6) {
         return;
     }
@@ -90,7 +90,7 @@ void func_PAL_L20_00445668(char *arg0) {
 
     if (*(unsigned char *)(arg0 + 0x20) == 7 && *(float *)(st + 0x20) > 0.0f) {
         char *hit = part_find_owned_effect_slot(arg0, 0x10000, 0);
-        float damage = func_PAL_002AA108(arg0, hit);
+        float damage = moby_update_aim_target_strength_pal(arg0, hit);
 
         ApproachValue(st + 0x20, 0.0f, damage);
         *(unsigned char *)(arg0 + 0xA8) = 0xFF;

@@ -1,25 +1,25 @@
 #include "common.h"
 
-extern char D_L25_00221850[] __attribute__((nosda));
-extern char D_L25_001B0D20[] __attribute__((nosda)), D_L25_001B0D58[] __attribute__((nosda));
-extern char *D_L25_001B0CE0 __attribute__((sda));
-extern char *D_L25_001B0CD0 __attribute__((sda)), *D_L25_001B0CD4 __attribute__((sda));
-extern char *D_L25_001B0CD8 __attribute__((sda));
-extern char *D_L25_001A904C MACRO_ADDR;
-extern float D_L25_001B2904 MACRO_ADDR;
+extern char g_hud_l25_state[] __attribute__((nosda));
+extern char g_str_hud_message_format[] __attribute__((nosda)), g_str_l25_hud_ammo_format[] __attribute__((nosda));
+extern char *g_mission_moby __attribute__((sda));
+extern char *g_hud_icon_a __attribute__((sda)), *g_hud_icon_b __attribute__((sda));
+extern char *g_hud_icon_c __attribute__((sda));
+extern char *g_hud_l25_resource_base MACRO_ADDR;
+extern float g_hud_screen_scale MACRO_ADDR;
 extern int math_fast_float_d(void *);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 
-extern char *D_L25_001B0CE4 __attribute__((sda)), *D_L25_001B0CE8 __attribute__((sda));
-extern char *D_L25_001B0CEC __attribute__((sda));
-extern int D_L25_001B0CF0 __attribute__((sda));
-extern int D_L25_001B0D10 __attribute__((sda)), D_L25_001B0D18 __attribute__((sda));
-extern int D_L25_001B0D14 MACRO_ADDR, D_L25_001B0D1C MACRO_ADDR;
-extern int D_L25_001B2900 MACRO_ADDR;
-extern float D_L25_001AC4E0 MACRO_ADDR, D_L25_001AC4E4 MACRO_ADDR;
+extern char *g_hud_fill_icon_a __attribute__((sda)), *g_hud_fill_icon_b __attribute__((sda));
+extern char *g_hud_fill_icon_c __attribute__((sda));
+extern int g_hud_selected_weapon __attribute__((sda));
+extern int g_hud_text_x_left __attribute__((sda)), g_hud_text_x_right __attribute__((sda));
+extern int g_hud_text_y_left MACRO_ADDR, g_hud_text_y_right MACRO_ADDR;
+extern int g_hud_l25_layout_mode MACRO_ADDR;
+extern float g_hud_sprite_origin_x MACRO_ADDR, g_hud_sprite_origin_y MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR;
 typedef struct { int active, pad1[2], capacity, maximum, count; short pad2[2], icon, pad3[5]; } InventoryEntry;
-extern InventoryEntry D_L25_0029C320[] __attribute__((nosda));
+extern InventoryEntry g_inventory_table[] __attribute__((nosda));
 typedef struct { u8 r, g, b, a; } Rgba;
 extern void hud_draw_fading_icon_pairs(int,int,int,int);
 extern char *GetLocalizedString(int);
@@ -50,7 +50,7 @@ typedef struct { char pad[0x10]; int count1, count2; char pad2[0x10]; int health
    allocation, as with scaled_coord in src/levels/02_maktar_nebula/L02_003FF6E8-g8.c. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L25_001B2900;
+    int mode = g_hud_l25_layout_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -69,7 +69,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
    (the same shape as scaled_screen_coord in src/game/002D3390.c). */
 static __inline__ int hud_coord(int mode, float value, float half, float offset, int active)
 {
-    float scaled = value * D_L25_001B2904 + half;
+    float scaled = value * g_hud_screen_scale + half;
     if (mode == active)
         return (int)(scaled + offset);
     return (int)scaled;
@@ -80,69 +80,69 @@ int DrawWupashCombatHud(void)
 {
     char text[128];
     int health_colors[2], ammo_colors[2];
-    char *state=*(char **)(D_L25_001B0CE0+0x68);
+    char *state=*(char **)(g_mission_moby+0x68);
     char *row;
     float icon_x,icon_y,fill_ratio,fill;
     int selection=1, color, result;
     char *message;
     float edge, ammoCount, ammoStart, ammoWidth;
     float half;
-    HudState *hud=(HudState *)D_L25_00221850;
+    HudState *hud=(HudState *)g_hud_l25_state;
     char *fmt;
     int textX, textX2;
     hud_draw_fading_icon_pairs(0,selection,selection,selection);
     half=0.5f;
     message=GetLocalizedString(0x31d1);
-    sprintf(text,fmt=D_L25_001B0D20,message,hud->count1);
-    textX=D_L25_001B0D10-60;
-    text_draw_medium(textX,label_y((void *)textX,D_L25_001B0D14-8,D_L25_001B2904,half,1),0x80808080,text,128);
+    sprintf(text,fmt=g_str_hud_message_format,message,hud->count1);
+    textX=g_hud_text_x_left-60;
+    text_draw_medium(textX,label_y((void *)textX,g_hud_text_y_left-8,g_hud_screen_scale,half,1),0x80808080,text,128);
     message=GetLocalizedString(0x31d2);
     sprintf(text,fmt,message,hud->count2+1);
-    textX2=D_L25_001B0D18-60;
-    text_draw_medium(textX2,label_y((void *)textX2,D_L25_001B0D1C-8,D_L25_001B2904,half,1),0x80808080,text,128);
-    if (D_L25_001A904C) {
-        D_L25_001B0CD0=table_find_by_id(D_L25_001A904C+0x8710,128);
-        D_L25_001B0CD4=table_find_by_id(D_L25_001A904C+0x8710,129);
-        D_L25_001B0CD8=table_find_by_id(D_L25_001A904C+0x8710,130);
-        D_L25_001B0CE4=table_find_by_id(D_L25_001A904C+0x8710,131);
-        D_L25_001B0CE8=table_find_by_id(D_L25_001A904C+0x8710,132);
-        D_L25_001B0CEC=table_find_by_id(D_L25_001A904C+0x8710,133);
+    textX2=g_hud_text_x_right-60;
+    text_draw_medium(textX2,label_y((void *)textX2,g_hud_text_y_right-8,g_hud_screen_scale,half,1),0x80808080,text,128);
+    if (g_hud_l25_resource_base) {
+        g_hud_icon_a=table_find_by_id(g_hud_l25_resource_base+0x8710,128);
+        g_hud_icon_b=table_find_by_id(g_hud_l25_resource_base+0x8710,129);
+        g_hud_icon_c=table_find_by_id(g_hud_l25_resource_base+0x8710,130);
+        g_hud_fill_icon_a=table_find_by_id(g_hud_l25_resource_base+0x8710,131);
+        g_hud_fill_icon_b=table_find_by_id(g_hud_l25_resource_base+0x8710,132);
+        g_hud_fill_icon_c=table_find_by_id(g_hud_l25_resource_base+0x8710,133);
         icon_x=IntToFloat(g_screen_width)*half;
-        icon_y=(float)hud_coord(D_L25_001B2900,200.0f,half,4.0f,selection);
-        gfx_draw_scaled_object(D_L25_001B0CD0,icon_x,icon_y,0x60442d00,1.0f,0.0f);
-        gfx_draw_scaled_object(D_L25_001B0CD4,icon_x,icon_y,0x55f0c070,1.0f,0.0f);
+        icon_y=(float)hud_coord(g_hud_l25_layout_mode,200.0f,half,4.0f,selection);
+        gfx_draw_scaled_object(g_hud_icon_a,icon_x,icon_y,0x60442d00,1.0f,0.0f);
+        gfx_draw_scaled_object(g_hud_icon_b,icon_x,icon_y,0x55f0c070,1.0f,0.0f);
         selection=table_find_last_used_entry(6);
-        fill_ratio=IntToFloat(D_L25_0029C320[selection].count);
-        fill_ratio/=IntToFloat(D_L25_0029C320[selection].capacity);
+        fill_ratio=IntToFloat(g_inventory_table[selection].count);
+        fill_ratio/=IntToFloat(g_inventory_table[selection].capacity);
         switch(selection) {
         case 6:
-            if(fill_ratio>0.0f) gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio),1.0f,0.0f);
+            if(fill_ratio>0.0f) gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio),1.0f,0.0f);
             break;
         case 12:
             if(fill_ratio>0.5f) {
                 fill_ratio-=0.5f;
-                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_b,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
             } else if(fill_ratio>0.0f) {
-                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
             }
             break;
         case 14:
             if(fill_ratio>0.666666687f) {
                 fill_ratio-=0.666666687f;
-                gfx_draw_scaled_object(D_L25_001B0CEC,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_c,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_b,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
             } else if(fill_ratio>0.333333343f) {
                 fill_ratio-=0.333333343f;
-                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_b,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
             } else if(fill_ratio>0.0f) {
-                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
+                gfx_draw_scaled_object(g_hud_fill_icon_a,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
             }
             break;
         }
-        fill=(float)((HudState *)D_L25_00221850)->health*0.01f;
+        fill=(float)((HudState *)g_hud_l25_state)->health*0.01f;
         if(fill>0.3f) {
             I(state,0x28)=1;
         } else if(math_fast_float_d(state+0x24)) {
@@ -153,8 +153,8 @@ int DrawWupashCombatHud(void)
         edge=fill*200.0f+156.0f;
         if(I(state,0x28)) gfx_draw_screen_rectangle(156,14,(int)edge,27,1,health_colors);
         selection=table_find_last_used_entry(7);
-        ammoCount=IntToFloat(D_L25_0029C320[selection].count);
-        fill=ammoCount/IntToFloat(D_L25_0029C320[selection].maximum);
+        ammoCount=IntToFloat(g_inventory_table[selection].count);
+        fill=ammoCount/IntToFloat(g_inventory_table[selection].maximum);
         color=FastTweenColor(0x800000ff,0x8000ff00,fill);
         ammoStart=IntToFloat(450);
         ammoWidth=IntToFloat(386);
@@ -169,22 +169,22 @@ int DrawWupashCombatHud(void)
         Rgba rect2[4]={{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80}};
         hud_draw_sprite_gradient(GetIconFrame(0xea97,1),21,7,30,30,rect1);
         hud_draw_sprite_gradient(GetIconFrame(0xea97,0),21,7,30,30,rect);
-        row=(char *)&D_L25_0029C320[table_find_last_used_entry(D_L25_001B0CF0)];
+        row=(char *)&g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)];
         hud_draw_sprite_gradient(GetIconFrame(0xea97,*(short *)(row+0x1c)),21,7,30,30,rect2);
         hud_draw_sprite_gradient(GetIconFrame(0xea97,1),462,9,30,30,rect1);
-        row=(char *)&D_L25_0029C320[table_find_last_used_entry(7)];
+        row=(char *)&g_inventory_table[table_find_last_used_entry(7)];
         hud_draw_sprite_gradient(GetIconFrame(0xea97,*(short *)(row+0x1c)),462,9,30,30,rect2);
         }
-        sprintf(text,D_L25_001B0D58,D_L25_0029C320[table_find_last_used_entry(D_L25_001B0CF0)].count,D_L25_0029C320[table_find_last_used_entry(D_L25_001B0CF0)].maximum);
+        sprintf(text,g_str_l25_hud_ammo_format,g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].count,g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].maximum);
         text_draw_small(67,5,0x80808080,text,128);
         level_set_counter_plus_one(2);
         result=level_lookup_step_table();
         if(result>=0) {
-            D_L25_0029C320[table_find_last_used_entry(D_L25_001B0CF0)].active=0;
-            D_L25_001B0CF0=result;
-            D_L25_0029C320[table_find_last_used_entry(result)].active=1;
+            g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].active=0;
+            g_hud_selected_weapon=result;
+            g_inventory_table[table_find_last_used_entry(result)].active=1;
         }
-        gfx_draw_scaled_object(D_L25_001B0CD8,icon_x,icon_y,0x80f0f0f0,1.0f,0.0f);
+        gfx_draw_scaled_object(g_hud_icon_c,icon_x,icon_y,0x80f0f0f0,1.0f,0.0f);
     }
     module_l00_call_handler_2();
     {
@@ -192,17 +192,17 @@ int DrawWupashCombatHud(void)
     char *dark_sprite, *light_sprite;
     int sprite_y;
     float sprite_x;
-    dark_sprite=table_find_by_id(D_L25_001A904C+0x8710,186);
-    state=table_find_by_id(D_L25_001A904C+0x8710,187);   /* the second texture reuses state */
-    light_sprite=table_find_by_id(D_L25_001A904C+0x8710,188);
-    sprite_x=D_L25_001AC4E0+four;
-    sprite_y=label_y(dark_sprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    dark_sprite=table_find_by_id(g_hud_l25_resource_base+0x8710,186);
+    state=table_find_by_id(g_hud_l25_resource_base+0x8710,187);   /* the second texture reuses state */
+    light_sprite=table_find_by_id(g_hud_l25_resource_base+0x8710,188);
+    sprite_x=g_hud_sprite_origin_x+four;
+    sprite_y=label_y(dark_sprite,g_hud_sprite_origin_y+four,g_hud_screen_scale,half2,1);
     gfx_draw_scaled_object(dark_sprite,sprite_x,(float)sprite_y,0x60442d00,0.8f,0.0f);
-    sprite_x=D_L25_001AC4E0+four;
-    sprite_y=label_y(state,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    sprite_x=g_hud_sprite_origin_x+four;
+    sprite_y=label_y(state,g_hud_sprite_origin_y+four,g_hud_screen_scale,half2,1);
     gfx_draw_scaled_object(state,sprite_x,(float)sprite_y,0x60241700,0.8f,0.0f);
-    sprite_x=D_L25_001AC4E0+four;
-    sprite_y=label_y(light_sprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    sprite_x=g_hud_sprite_origin_x+four;
+    sprite_y=label_y(light_sprite,g_hud_sprite_origin_y+four,g_hud_screen_scale,half2,1);
     gfx_draw_scaled_object(light_sprite,sprite_x,(float)sprite_y,0x55f0c070,0.8f,0.0f);
     }
     hud_draw_object_markers();

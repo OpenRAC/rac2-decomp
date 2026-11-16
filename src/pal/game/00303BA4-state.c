@@ -18,7 +18,7 @@ extern void moby_set_state(unsigned char *,unsigned char,int);
 extern int flag_set_first_pending(unsigned char *);
 extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 typedef struct { float x,y,a,b; float pad[4]; } Spark;
-extern Spark D_002222E0[];
+extern Spark g_surface_grid_noise_table[];
 void func_PAL_00303BA4(unsigned char *object)
 {
     char *work=FIELD(char *,object,0x68);
@@ -41,8 +41,8 @@ void func_PAL_00303BA4(unsigned char *object)
                 object[0x30]=alpha;
             }
             for(i=0;i<64;++i) {
-                D_002222E0[i].a=math_random_float_range(0.5f,2);
-                D_002222E0[i].b=math_random_float_range(0.002f,0.006f);
+                g_surface_grid_noise_table[i].a=math_random_float_range(0.5f,2);
+                g_surface_grid_noise_table[i].b=math_random_float_range(0.002f,0.006f);
             }
         }
         moby_set_state(object,1,-1);return;

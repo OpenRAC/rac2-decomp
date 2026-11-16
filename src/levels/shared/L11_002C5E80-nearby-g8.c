@@ -11,8 +11,8 @@ typedef struct {
 } Nearby_L11;
 
 typedef int Vec128_L11 __attribute__((mode(TI)));
-extern Nearby_L11 *D_L11_001B2DC0;
-extern int D_L11_001B2DC4;
+extern Nearby_L11 *g_nearby_entries;
+extern int g_nearby_entry_count;
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern float math_fabs(float);
@@ -30,17 +30,17 @@ int FindNearbyRecordContact(void *position, int **owner, float *target, int *con
 
     *(Vec128_L11 *)local = *(Vec128_L11 *)position;
     here = local;
-    for (i = 0; i < D_L11_001B2DC4; i++) {
-        if (excluded && D_L11_001B2DC0[i].owner == excluded) continue;
-        if (required && D_L11_001B2DC0[i].owner != required) continue;
-        if (!*D_L11_001B2DC0[i].owner) continue;
-        if (fast_vec_dist(&D_L11_001B2DC0[i], here) > D_L11_001B2DC0[i].radius) continue;
-        if (find_nearest_path_point(D_L11_001B2DC0[i].owner, here, target, &hit, &distance, D_L11_001B2DC0[i].kind, 12.0f, 10.0f, 0.0f)) {
+    for (i = 0; i < g_nearby_entry_count; i++) {
+        if (excluded && g_nearby_entries[i].owner == excluded) continue;
+        if (required && g_nearby_entries[i].owner != required) continue;
+        if (!*g_nearby_entries[i].owner) continue;
+        if (fast_vec_dist(&g_nearby_entries[i], here) > g_nearby_entries[i].radius) continue;
+        if (find_nearest_path_point(g_nearby_entries[i].owner, here, target, &hit, &distance, g_nearby_entries[i].kind, 12.0f, 10.0f, 0.0f)) {
             if (vec_distance_xy(here, target) < 1.7f && math_fabs(here[2] - target[2]) < 1.5f) {
-                *owner = D_L11_001B2DC0[i].owner;
+                *owner = g_nearby_entries[i].owner;
                 *contact = hit;
                 *height = distance;
-                *kind = D_L11_001B2DC0[i].kind;
+                *kind = g_nearby_entries[i].kind;
                 return 1;
             }
         }

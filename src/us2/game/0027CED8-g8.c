@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_0027CED8, the USA v2.00 copy of func_0027C878: the same C, where the entry has u8 width and
  * height at 0xC/0xD and an s16 format at 0xE, and the allocator stops past 0x3FF000. Measured notes:
  * - base is reused as the second upload pointer. That makes it global, so local-alloc serves height_bits
@@ -20,16 +21,16 @@ typedef struct {
 } TextureEntry;
 
 
-extern int D_001A72D0;
-extern int D_001A72DC;
-extern int D_001A72E0;
-extern int D_001A72D8 __attribute__((sda));
+extern int g_vram_cursor;
+extern int g_vram_display_address;
+extern int g_vram_zbuffer_address;
+extern int g_vram_fb_offset __attribute__((sda));
 extern TextureBits ref_0027C878_00 __attribute__((sda));
 extern TextureBits ref_0027C878_01 __attribute__((sda));
 extern int ref_0027C878_02 __attribute__((sda));
 extern char *ref_0027C878_03;
-extern char D_00138AD0[];
-extern char D_00138DC0[];
+extern char g_gfx_clear_packet_c[];
+extern char g_gfx_clear_packet_d[];
 extern TextureEntry ref_0027C878_04[];
 extern int ref_0027C878_05;
 extern char *ref_0027C878_06;
@@ -42,24 +43,24 @@ TextureBits func_US2_0027CED8(int id)
 {
     if (id < 0) {
         if (id == -5)
-            return (D_001A72E0 >> 8) | 0x27020000UL | (0xC800UL << 19);
+            return (g_vram_zbuffer_address >> 8) | 0x27020000UL | (0xC800UL << 19);
         if (id == -8) {
-            TextureBits frame = (D_001A72DC >> 8) | 0x25B20000UL;
+            TextureBits frame = (g_vram_display_address >> 8) | 0x25B20000UL;
             TextureBits palette = ((TextureBits)ref_0027C878_02 << 37) | (0xC800UL << 19);
             return frame | palette | (0x8000UL << 46);
         }
         if (id == -7)
-            return (D_001A72D8 >> 8) | 0x24020000UL | (0xC800UL << 19);
+            return (g_vram_fb_offset >> 8) | 0x24020000UL | (0xC800UL << 19);
         if (id == -6)
-            return (D_001A72DC >> 8) | 0x24020000UL | (0xC800UL << 19);
+            return (g_vram_display_address >> 8) | 0x24020000UL | (0xC800UL << 19);
         if ((unsigned int)(id + 2) < 2) {
             int base;
             TextureBits result;
             TextureBits frame;
             if (ref_0027C878_00 != 0)
                 return ref_0027C878_00;
-            base = (D_001A72D0 + 0x1FFF) & -0x2000;
-            D_001A72D0 = base + 0x20000;
+            base = (g_vram_cursor + 0x1FFF) & -0x2000;
+            g_vram_cursor = base + 0x20000;
             frame = (base >> 13) | 0x02040000;
             result = (base >> 8) | 0x20210000UL | (0xC000UL << 19);
             *(int *)(ref_0027C878_03 + 0) = 0x10000003;
@@ -74,11 +75,11 @@ TextureBits func_US2_0027CED8(int id)
             *(int *)(ref_0027C878_03 + 40) = 0x4D;
             *(int *)(ref_0027C878_03 + 44) = 0;
             *(TextureBits *)(ref_0027C878_03 + 48) =
-                (D_001A72DC >> 8) | 0x24020000UL | (0xC800UL << 19);
+                (g_vram_display_address >> 8) | 0x24020000UL | (0xC800UL << 19);
             *(int *)(ref_0027C878_03 + 56) = 7;
             *(int *)(ref_0027C878_03 + 60) = 0;
             *(int *)(ref_0027C878_03 + 64) = 0x3000002F;
-            *(char **)(ref_0027C878_03 + 68) = D_00138AD0;
+            *(char **)(ref_0027C878_03 + 68) = g_gfx_clear_packet_c;
             *(int *)(ref_0027C878_03 + 72) = 0;
             *(int *)(ref_0027C878_03 + 76) = 0x5000002F;
             ref_0027C878_00 = result;
@@ -91,8 +92,8 @@ TextureBits func_US2_0027CED8(int id)
             TextureBits frame;
             if (ref_0027C878_01 != 0)
                 return ref_0027C878_01;
-            base = (D_001A72D0 + 0x1FFF) & -0x2000;
-            D_001A72D0 = base + 0x2000;
+            base = (g_vram_cursor + 0x1FFF) & -0x2000;
+            g_vram_cursor = base + 0x2000;
             frame = (base >> 13) | 0x02010000;
             result = (base >> 8) | 0x18204000UL | (0xB000UL << 19);
             *(int *)(ref_0027C878_03 + 0) = 0x10000003;
@@ -107,11 +108,11 @@ TextureBits func_US2_0027CED8(int id)
             *(int *)(ref_0027C878_03 + 40) = 0x4D;
             *(int *)(ref_0027C878_03 + 44) = 0;
             *(TextureBits *)(ref_0027C878_03 + 48) =
-                (D_001A72DC >> 8) | 0x24020000UL | (0xC800UL << 19);
+                (g_vram_display_address >> 8) | 0x24020000UL | (0xC800UL << 19);
             *(int *)(ref_0027C878_03 + 56) = 7;
             *(int *)(ref_0027C878_03 + 60) = 0;
             *(int *)(ref_0027C878_03 + 64) = 0x3000002F;
-            *(char **)(ref_0027C878_03 + 68) = D_00138DC0;
+            *(char **)(ref_0027C878_03 + 68) = g_gfx_clear_packet_d;
             *(int *)(ref_0027C878_03 + 72) = 0;
             *(int *)(ref_0027C878_03 + 76) = 0x5000002F;
             ref_0027C878_01 = result;
@@ -123,7 +124,7 @@ TextureBits func_US2_0027CED8(int id)
         long alpha_bit = (TextureBits)1 << 34;
         long sign_bit = -9223372036854775807L - 1;
         if (entry->bits == 0) {
-            int base = D_001A72D0;
+            int base = g_vram_cursor;
             int shift = entry->width_shift - 6;
             int palette, texture, count, texel;
             long bits, final, width_bits, height_bits, palette_bits;
@@ -133,7 +134,7 @@ TextureBits func_US2_0027CED8(int id)
             texel = base + 0x400;
             texture = texel >> 8;
             texel += 1 << (unsigned short)(entry->width_shift + entry->height_shift);
-            D_001A72D0 = texel;
+            g_vram_cursor = texel;
             bits = ((TextureBits)(1 << shift) << 14);
             bits |= texture;
             bits |= (long)entry->format << 20;

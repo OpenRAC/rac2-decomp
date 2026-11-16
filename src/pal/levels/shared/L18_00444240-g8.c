@@ -4,22 +4,22 @@
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
-extern s32 D_L18_001B1254 __attribute__((sda));
-extern s32 D_L18_001B1258 __attribute__((sda));
-extern s32 D_L18_001B125C __attribute__((sda));
-extern f32 D_L18_001B12FC __attribute__((sda));
-extern f32 D_L18_001B12C0 __attribute__((sda));
-extern f32 D_L18_001B1C4C __attribute__((sda));
-extern f32 D_L18_001B1C48 __attribute__((sda));
-extern f32 D_L18_001B1C44 __attribute__((sda));
-extern f32 D_L18_001B1C40 __attribute__((sda));
+extern s32 g_enemy_timer_threshold __attribute__((sda));
+extern s32 g_enemy_timer_min __attribute__((sda));
+extern s32 g_enemy_timer_max __attribute__((sda));
+extern f32 g_enemy_smooth_time __attribute__((sda));
+extern f32 g_shot_hit_height __attribute__((sda));
+extern f32 g_probe_threshold __attribute__((sda));
+extern f32 g_probe_height_range __attribute__((sda));
+extern f32 g_probe_height_min __attribute__((sda));
+extern f32 g_probe_height_base __attribute__((sda));
 extern s32 math_random_int_range(s32, s32);
 extern s32 func_00337AD8(s32, s32, f32);
 extern s32 coll_cast_object_line(void *, void *, void *, s32, f32, f32, s32, s32, s32);
-extern f32 D_L18_001B1C50 __attribute__((sda));
-extern f32 D_L18_001B1C54[] __attribute__((sda));
-extern s32 D_L18_001B1C58 __attribute__((sda));
-extern f32 D_L18_001B1C5C __attribute__((sda));
+extern f32 g_fade_burst_intensity_start __attribute__((sda));
+extern f32 g_fade_burst_intensity_end[] __attribute__((sda));
+extern s32 g_fade_burst_particle_scale __attribute__((sda));
+extern f32 g_fade_burst_flare_size __attribute__((sda));
 extern f32 math_lerp_float(f32, f32, f32);
 extern s32 FloatToInt(f32);
 typedef float L18_EDE8f32;
@@ -31,13 +31,13 @@ extern void vec_random_direction(void *, L18_EDE8f32, L18_EDE8f32);
 extern int math_random_int_below(int);
 extern void matrix_mul_vec3(void *, const void *, const void *);
 extern void FastVecAdd(void *, void *, void *);
-extern unsigned char D_L18_002BD9B0[];
-extern L18_EDE8f32 D_L18_001B1C68 __attribute__((sda));
-extern L18_EDE8f32 D_L18_001B1C6C __attribute__((sda));
-extern L18_EDE8f32 D_L18_001B1C70 __attribute__((sda));
-extern L18_EDE8f32 D_L18_001B1C74 __attribute__((sda));
+extern unsigned char g_emitter_offset_vectors[];
+extern L18_EDE8f32 g_ribbon_emitter_angle_a_deg __attribute__((sda));
+extern L18_EDE8f32 g_ribbon_emitter_angle_b_deg __attribute__((sda));
+extern L18_EDE8f32 g_ribbon_emitter_spread_a __attribute__((sda));
+extern L18_EDE8f32 g_ribbon_emitter_spread_b __attribute__((sda));
 
-void func_PAL_L18_00444240(u8 *obj)
+void ribbon_init_emitters_pal(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     L18_EDE8f32 v[4] __attribute__((aligned(16)));
@@ -46,13 +46,13 @@ void func_PAL_L18_00444240(u8 *obj)
     for (i = 0; i < 2; i++) {
         u8 *s = state + i * 0xA0;
 
-        vec_random_direction(s + 0x60, D_L18_001B1C68 * 0.0003490659f, D_L18_001B1C6C * 0.0003490659f);
-        vec_random_direction(s + 0x70, D_L18_001B1C68 * 0.0003490659f, D_L18_001B1C6C * 0.0003490659f);
-        vec_random_direction(s + 0x80, D_L18_001B1C70, D_L18_001B1C74);
-        vec_random_direction(s + 0x90, D_L18_001B1C70, D_L18_001B1C74);
+        vec_random_direction(s + 0x60, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
+        vec_random_direction(s + 0x70, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
+        vec_random_direction(s + 0x80, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
+        vec_random_direction(s + 0x90, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
         qcopy(state, state + 0x140);
         qcopy(state + 0xA0, state + 0x140);
-        matrix_mul_vec3(v, D_L18_002BD9B0 + math_random_int_below(6) * 16, obj + 0xC0);
+        matrix_mul_vec3(v, g_emitter_offset_vectors + math_random_int_below(6) * 16, obj + 0xC0);
         FastVecAdd(v, obj + 0x10, v);
         qcopy(state + 0x10, v);
     }

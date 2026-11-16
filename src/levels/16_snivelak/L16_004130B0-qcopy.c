@@ -1,11 +1,11 @@
 #include "common.h"
 
 typedef int BossQuadword __attribute__((mode(TI)));
-extern u8 *D_L16_001B2C0C;
-extern float D_L16_001B9B00[4];
-extern float D_L16_001B18CC __attribute__((sda));
-extern float D_L16_001B18D0 __attribute__((sda));
-extern float D_L16_001B18D4 __attribute__((sda));
+extern u8 *g_beam_definition_table;
+extern float g_scene_origin_transform[4];
+extern float g_snivelak_rock_spawn_radius __attribute__((sda));
+extern float g_snivelak_rock_spawn_height __attribute__((sda));
+extern float g_snivelak_rock_flight_time __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern void FastVecScale(void *, void *, float);
@@ -37,18 +37,18 @@ u8 *snivelak_spawn_rock_projectile(u8 *moby, int aimed)
         moby_set_state(object, 0, -1);
         motion = *(u8 **)(object + 0x68);
         if (aimed) {
-            *(BossQuadword *)(object + 0x10) = *(BossQuadword *)D_L16_001B9B00;
+            *(BossQuadword *)(object + 0x10) = *(BossQuadword *)g_scene_origin_transform;
             *(float *)(object + 0x18) += 20.0f;
             angle = FastAddRotations(mat_fast_helper_a(*(float *)(*(u8 **)(state + 0x24c) + 0x10) - *(float *)(object + 0x10), *(float *)(*(u8 **)(state + 0x24c) + 0x14) - *(float *)(object + 0x14)), 1.5707964f);
-            position[0] = math_fast_sin_or_cos_a(angle) * D_L16_001B18CC;
-            position[1] = math_fast_sin_or_cos_b(angle) * D_L16_001B18CC;
+            position[0] = math_fast_sin_or_cos_a(angle) * g_snivelak_rock_spawn_radius;
+            position[1] = math_fast_sin_or_cos_b(angle) * g_snivelak_rock_spawn_radius;
             position[2] = 0.0f;
             FastVecAdd(position, position, moby + 0x10);
-            position[2] = *(float *)(state + 0x264) + D_L16_001B18D0;
+            position[2] = *(float *)(state + 0x264) + g_snivelak_rock_spawn_height;
             *(BossQuadword *)(motion + 0x10) = *(BossQuadword *)position;
             FastVecSub(target, position, object + 0x10);
-            FastVecScale(motion, target, 1.0f / D_L16_001B18D4);
-            *(int *)(motion + 0x30) = FloatToInt(D_L16_001B18D4 * 1.2f);
+            FastVecScale(motion, target, 1.0f / g_snivelak_rock_flight_time);
+            *(int *)(motion + 0x30) = FloatToInt(g_snivelak_rock_flight_time * 1.2f);
         } else {
             u8 *scatterState = *(u8 **)(moby + 0x68);
             vec_store_helper(position);
@@ -59,10 +59,10 @@ u8 *snivelak_spawn_rock_projectile(u8 *moby, int aimed)
             target[2] = math_random_float_range(-1.0f, 1.0f);
             position[1] = math_random_int_below(2) ? 1.0f : -1.0f;
             target[1] = -position[1];
-            transform_vector(position, position, D_L16_001B2C0C + *(int *)(scatterState + 0x19c) * 128);
+            transform_vector(position, position, g_beam_definition_table + *(int *)(scatterState + 0x19c) * 128);
             position[3] = 3.0f;
             if (math_fast_helper_a(position, 255.0f) != -1) { moby_mark_spawned(object); return 0; }
-            transform_vector(target, target, D_L16_001B2C0C + *(int *)(scatterState + 0x19c) * 128);
+            transform_vector(target, target, g_beam_definition_table + *(int *)(scatterState + 0x19c) * 128);
             *(BossQuadword *)(object + 0x10) = *(BossQuadword *)position;
             *(BossQuadword *)(motion + 0x10) = *(BossQuadword *)target;
             FastVecSub(motion, target, position);

@@ -51,9 +51,9 @@ typedef struct {
 
 extern L04Moby *g_moby_l04_pool;
 extern L04RacePath *g_route_path_table[];
-extern L04RaceDelay D_L04_002C63D4[];
+extern L04RaceDelay g_race_start_delays[];
 extern int g_current_race_index __attribute__((sda));
-extern float D_L04_001B0928 __attribute__((sda));
+extern float g_race_checkpoint_duration __attribute__((sda));
 extern L04Settings g_is_pal_video __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern unsigned int race_get_course_finish_count(int);
@@ -100,7 +100,7 @@ void InitRaceParticipants(unsigned char *controller)
                 j = math_random_int_range(0, 9);
             used[j]++;
             racer_vars->group = j + 1;
-            start_delay = D_L04_002C63D4[g_current_race_index].delay;
+            start_delay = g_race_start_delays[g_current_race_index].delay;
             racer_vars->f2d0 = 0;
             if (g_is_pal_video.f00) {
                 start_delay = (int)((float)start_delay * 0.8333334f + 0.01f);
@@ -114,7 +114,7 @@ void InitRaceParticipants(unsigned char *controller)
             }
             path = g_route_path_table[race_state->path];
             racer_vars->duration = path->duration * (float)path->count;
-            D_L04_001B0928 = racer_vars->duration;
+            g_race_checkpoint_duration = racer_vars->duration;
             racer_vars->f1d4 = -1.0f;
             racer_vars->f1b8 = 0;
             racer_vars->f1c4 = -1;

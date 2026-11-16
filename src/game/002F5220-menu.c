@@ -26,9 +26,9 @@ extern Menu6608Item g_weapon_table[];
 /* Through a pointer, so the slot index is evaluated before the table's address. */
 #define MENU_ITEMS ((Menu6608Item *)D_00239BA0)
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001A7B68[] MACRO_ADDR;
+extern unsigned char g_vendor_item_list[] MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern int D_00262E40[][5];
+extern int g_vendor_price_table[][5];
 extern int flag_is_byte_set(void);
 extern int help_store_id_in_slot_list(int);
 extern int menu_count_chain_entries_after_head(int);
@@ -82,14 +82,14 @@ void shop_build_vendor_weapon_list(int hideUnowned)
         }
     }
     for (list_len = 0; list_len < 32; list_len++) {
-        if (D_001A7B68[list_len] == 255) break;
+        if (g_vendor_item_list[list_len] == 255) break;
     }
     MENU_STATE->count = 0;
     if (!MENU_STATE->locked) {
         int i;
         for (i = 0; i < list_len; i++) {
-            if (D_001A7B68[i] == 255) continue;
-            id = D_001A7B68[i] & 63;
+            if (g_vendor_item_list[i] == 255) continue;
+            id = g_vendor_item_list[i] & 63;
             if (g_item_owned_flags[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[g_item_slot_to_record[id]].cost <= 0 && flag_is_byte_set()) {
                 int classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
@@ -100,7 +100,7 @@ void shop_build_vendor_weapon_list(int hideUnowned)
                 MENU_STATE->entries[MENU_STATE->count].upgrade = 1;
                 MENU_STATE->count++;
             }
-            if (D_001A7B68[i] & 64) {
+            if (g_vendor_item_list[i] & 64) {
                 if (MENU_ITEMS[g_item_slot_to_record[id]].ammo) {
                     int classId;
                     MENU_STATE->entries[MENU_STATE->count].id = id;
@@ -155,7 +155,7 @@ void shop_build_vendor_weapon_list(int hideUnowned)
                         if (MENU_STATE->entries[j].id == id) break;
                     if (j < MENU_STATE->count && !MENU_STATE->entries[j].upgrade) continue;
                     {
-                        int price = D_00262E40[id][0];
+                        int price = g_vendor_price_table[id][0];
                         int classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                         MENU_STATE->entries[MENU_STATE->count].id = id;
                         MENU_STATE->entries[MENU_STATE->count].kind = 1;
@@ -176,7 +176,7 @@ void shop_build_vendor_weapon_list(int hideUnowned)
                 int owned = g_item_owned_flags[id];
                 int price, classId;
                 if (owned && !MENU_ITEMS[g_item_slot_to_record[id]].ammo) continue;
-                price = D_00262E40[id][0];
+                price = g_vendor_price_table[id][0];
                 classId = MENU_ITEMS[g_item_slot_to_record[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;

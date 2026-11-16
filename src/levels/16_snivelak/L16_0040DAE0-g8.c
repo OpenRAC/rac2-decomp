@@ -9,10 +9,10 @@ extern void moby_init_child_from_parent(void *, void *);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 extern u8 *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
                           s32, s32, s32, void *);
-extern u8 D_L16_001A8F20[] __attribute__((sda));
-extern float D_L16_001B1648 __attribute__((sda));
-extern float D_L16_001B1658 __attribute__((sda));
-extern float D_L16_001B1668 __attribute__((sda));
+extern u8 g_particle_template[] __attribute__((sda));
+extern float g_snivelak_shot_angles __attribute__((sda));
+extern float g_snivelak_shot_times __attribute__((sda));
+extern float g_snivelak_shot_size_factor __attribute__((sda));
 
 /* Creates a small shot object owned by another object, starting at the given position and facing. */
 u8 *snivelak_spawn_shot_from_matrix(u8 *owner, SnivelakMatrix *matrix)
@@ -27,7 +27,7 @@ u8 *snivelak_spawn_shot_from_matrix(u8 *owner, SnivelakMatrix *matrix)
     obj = CreateMoby(0xF4E);
     if (obj) {
         scale = math_interpolate_between_limits(0, 15, 0.125f, 0.3f);
-        vec_store_transformed_entry(obj, 0, scale, 0.0f, D_L16_001A8F20);
+        vec_store_transformed_entry(obj, 0, scale, 0.0f, g_particle_template);
         state = *(u8 **)(obj + 0x68);
         *(s32 *)(state + 0x68) = -1;
         moby_init_child_from_parent(obj, owner);
@@ -39,10 +39,10 @@ u8 *snivelak_spawn_shot_from_matrix(u8 *owner, SnivelakMatrix *matrix)
         n = 3;
         do { qcopy(dst, src); src++; dst++; } while (--n >= 0);
         math_approach_target_with_braking(state + 0x50, 1.0f, 1.0f,
-                      D_L16_001B1648 * 0.00027777778f,
-                      D_L16_001B1658 * 0.016666668f);
+                      g_snivelak_shot_angles * 0.00027777778f,
+                      g_snivelak_shot_times * 0.016666668f);
         if (obj[0x43] != 1) anim_start_blended(obj, 1, 0, 1);
-        *(float *)(obj + 0x2C) = *(float *)(*(u8 **)(obj + 0x24) + 0x24) * D_L16_001B1668;
+        *(float *)(obj + 0x2C) = *(float *)(*(u8 **)(obj + 0x24) + 0x24) * g_snivelak_shot_size_factor;
     }
     return obj;
 }

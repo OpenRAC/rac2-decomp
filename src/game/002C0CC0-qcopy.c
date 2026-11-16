@@ -32,7 +32,7 @@ extern int gfx_pack_color_floats(float, float, float, float);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
-extern unsigned char *D_001F2570;
+extern unsigned char *g_part_tex_smoke_table;
 
 /* Spawns a grey smoke particle at position with velocity; kinds below 5 get a
    random size and a shorter random life. */
@@ -53,7 +53,7 @@ Particle_002C0CC0 *part_spawn_smoke(TI128 *position, TI128 *velocity, unsigned c
         turn = math_random_float_range(0.0f, 1.0f);
         m->unk10 = turn;
         p->unk08 = (int)(turn * 256.0f);
-        p->unk02 = D_001F2570[func_001163B0() & 7];
+        p->unk02 = g_part_tex_smoke_table[func_001163B0() & 7];
         m->kind = kind;
         m->unk14 = 0;
         m->unk16 = 0;

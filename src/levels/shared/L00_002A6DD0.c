@@ -33,7 +33,7 @@
 
 extern unsigned char g_hero_state[];
 extern unsigned char g_hero_position[];
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern void hero_l00_update_frame(void);
 extern void AdvanceHeroAnimation(void);
 extern void UpdateHeroInputAndHistory(void);
@@ -88,7 +88,7 @@ void hero_l00_update_frame_2(void) {
     FindGrindRail();
     hero_find_ledge_candidate();
     hero_l00_decide_state();
-    if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
+    if (g_game_l00_mode == 2 || g_game_l00_mode == 6) {
         if (player[0x22B5]) hero_set_objects_flag_bit();
         else hero_clear_objects_flag_bit();
         return;

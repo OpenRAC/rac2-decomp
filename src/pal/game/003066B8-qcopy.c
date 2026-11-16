@@ -13,7 +13,7 @@ extern void moby_transform_joint_to_world(void *a, int b, void *c);
 extern Slot00305438 ref_00305438_00[];
 
 /* Takes the first free entry of the table for the object and counts it. */
-void func_PAL_003066B8(void *obj, void *other)
+void part_add_trail_entry_pal(void *obj, void *other)
 {
     char *s0 = *(char **)((char *)obj + 0x68);
     TI128 local;

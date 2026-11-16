@@ -12,7 +12,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern s32 g_current_map_index __attribute__((sda));
 
-extern u8 D_0019B2E8[][16] __attribute__((nosda));
+extern u8 g_moby_group_flags[][16] __attribute__((nosda));
 
 extern u32 g_hero_position[] __attribute__((nosda));
 
@@ -37,7 +37,7 @@ void rising_l20_platform_update(char *moby) {
         qcopy(state + 0x60, moby + 0x10);
         qcopy(state + 0x70, moby + 0xF0);
         if ((*(u8 *)(moby + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
-             && (D_0019B2E8[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
+             && (g_moby_group_flags[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
             || (*(int *)(state + 0x88) != -1
                 && coll_point_inside_region(g_hero_position, *(int *)(state + 0x88)) != 0)) {
             float base = *(float *)(state + 0x68);
@@ -53,7 +53,7 @@ void rising_l20_platform_update(char *moby) {
     case 1:
         if (*(u8 *)(moby + 0xBC) != 0 || flag_is_third_pending_set(moby) != 0
             || (*(u8 *)(moby + 0xB0) != 0xFF && *(u32 *)(state + 0x8C) != 0
-                && (D_0019B2E8[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
+                && (g_moby_group_flags[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
             || (*(int *)(state + 0x88) != -1
                 && coll_point_inside_region(g_hero_position, *(int *)(state + 0x88)) != 0)) {
             moby_set_state(moby, 2, -1);

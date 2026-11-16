@@ -10,13 +10,13 @@ typedef float f32;
  * `[1]` an offset address, which stays the absolute macro load.  The colour pair
  * at 0x001AFF18 also reads its first word through $gp outside a delay slot:
  * common.h's SDATA view, spelled out (this unit does not include common.h). */
-extern float D_L22_001AFF08[] __attribute__((sda));
-extern float D_L22_001AFF10[] __attribute__((sda));
-extern int D_L22_001AFF18[] __attribute__((sda));
+extern float g_spark_rate_min[] __attribute__((sda));
+extern float g_spark_value_min[] __attribute__((sda));
+extern int g_spark_color_pair[] __attribute__((sda));
 extern int D_L22_001AFF18_gp[] __asm__("D_L22_001AFF18__gp") __attribute__((section(".sdata")));
-extern float D_L22_001AFF20[] __attribute__((sda));
-extern float D_L22_001A7CD8[] __attribute__((sda));
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern float g_spark_angle_scale[] __attribute__((sda));
+extern float g_hero_action_float_param[] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 
 /* The per-subtitle history src/game/00289178.c updates (12-byte rows). */
@@ -225,8 +225,8 @@ void spark_lane_update(u8 *obj)
             offset = (float *)(ctl + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
-                *rate++ = math_random_float_range(D_L22_001AFF08[0], D_L22_001AFF08[1]) * (1.0f / 60.0f);
-                *radius++ = math_random_float_range(D_L22_001AFF10[0], D_L22_001AFF10[1]);
+                *rate++ = math_random_float_range(g_spark_rate_min[0], g_spark_rate_min[1]) * (1.0f / 60.0f);
+                *radius++ = math_random_float_range(g_spark_value_min[0], g_spark_value_min[1]);
             }
         }
         break;
@@ -235,7 +235,7 @@ void spark_lane_update(u8 *obj)
         SubtitleHistory *history;
 
         if (fast_vec_dist(g_hero_state + 0x80, obj + 0x10) < 3.0f)
-            D_L22_001A7CD8[0] = *(float *)ctl;
+            g_hero_action_float_param[0] = *(float *)ctl;
         player = g_hero_state;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
             PlayMobySound(0, 0, (char *)obj);
@@ -253,14 +253,14 @@ void spark_lane_update(u8 *obj)
                      * reads into the branch's delay slot */
                     if ((unsigned short)count != 0) {
                         unsigned int last = history[31].time;
-                        if (D_001A7390[0] - last > 1080 || last == 0)
+                        if (g_frame_counter[0] - last > 1080 || last == 0)
                             subtitle_request_voice_line(2504, 31);
-                        else if (last < D_001A7390[0])
-                            history[31].time = D_001A7390[0];
+                        else if (last < g_frame_counter[0])
+                            history[31].time = g_frame_counter[0];
                     } else {
                         history[31].count = count + 1;
-                        if (history[31].time < D_001A7390[0])
-                            history[31].time = D_001A7390[0];
+                        if (history[31].time < g_frame_counter[0])
+                            history[31].time = g_frame_counter[0];
                         history[31].levels =
                             (history[31].levels | (1 << g_current_map_index[0])) | 0x80000000;
                     }
@@ -277,11 +277,11 @@ void spark_lane_update(u8 *obj)
     if (obj[0x31]) {
         float f;
         *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
-                                            D_L22_001AFF20[0] * 0.0002908882452175021f);
+                                            g_spark_angle_scale[0] * 0.0002908882452175021f);
         f = math_fast_sin_or_cos_b(*(float *)(ctl + 4));
         f = f * f;
         f = f * f;
-        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
+        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], g_spark_color_pair[1], f * f);
     }
 }
 

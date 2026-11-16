@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_PAL_0029CB00(int);
 extern unsigned int stub_empty_26(void);
 extern unsigned int stub_empty_26(void);
@@ -18,9 +18,9 @@ extern unsigned int stub_empty_24(void);
 extern unsigned int stub_empty_25(void);
 extern unsigned int stub_empty_27(void);
 
-int func_PAL_002CE0B0(void)
+int menu_handle_button_input_pal(void)
 {
-    unsigned int flags = D_00138344;
+    unsigned int flags = g_menu_input_flags;
     int res = 0;
 
     if (flags & 0x910) {
@@ -61,7 +61,7 @@ void DoGifPaging(void);
 extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 
-int func_PAL_002CE1E8(void)
+int menu_run_setup_calls_pal(void)
 {
   SetupGifPaging(0);
   func_0029C138();

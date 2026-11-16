@@ -7,13 +7,13 @@ typedef int PathQuad __attribute__((mode(TI)));
 typedef union { PathQuad q; float f[4]; } PathVector;
 typedef struct { int pointCount; int pad[3]; PathVector point[1]; } PathRoute;
 typedef struct { char pad[0x2C]; int reset; char gap[8]; int route; } PathPhase;
-extern PathPhase D_L15_00221E10 NOT_SDA;
-extern PathRoute *D_L15_001FE480[] NOT_SDA;
-extern int D_L15_001B3698 MACRO_ADDR;
-extern char *D_L15_001B261C MACRO_ADDR;
-extern PathVector D_L15_001B97C0 NOT_SDA;
+extern PathPhase g_gorn_challenge_vars NOT_SDA;
+extern PathRoute *g_path_l15_table[] NOT_SDA;
+extern int g_gorn_course_timer MACRO_ADDR;
+extern char *g_moby_base MACRO_ADDR;
+extern PathVector g_camera_l15_position NOT_SDA;
 extern int g_current_map_index;
-extern unsigned char D_0019B278[];
+extern unsigned char g_level_progress_flags[];
 extern void music_Unpause(void), moby_mark_spawned(void *), entry_init_all_registered(void), hero_set_state_value_b(int), hero_set_state_value_a(int), entry_spawn_list_objects_with_flag(char *, int);
 extern char **level_get_object_list(void);
 extern int level_get_saved_value(void), level_get_saved_value_b(void *), math_fast_float_d(int *);
@@ -26,16 +26,16 @@ extern void hero_add_clamped_stat(float), effect_set_enabled(void *, int), effec
 extern int level_l00_call_module_handler_with_arg_9(void *, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern char *pickup_spawn_if_not_taken(void *, int, int, int);
-extern int D_L15_001B1534 __attribute__((sda));
-extern char * D_L15_001B1584 __attribute__((sda));
-extern char * D_L15_001B1588 __attribute__((sda));
-extern char * D_L15_001B158C __attribute__((sda));
-extern float D_L15_001B1590 __attribute__((sda));
-extern float D_L15_001B1594 __attribute__((sda));
-extern int D_L15_001B1598 __attribute__((sda));
-extern int D_L15_001B159C __attribute__((sda));
-extern int D_L15_001B15A4 __attribute__((sda));
-extern int D_L15_001B15C0 __attribute__((sda));
+extern int g_cutscene_l15_started_flag __attribute__((sda));
+extern char * g_gorn_path_first_node __attribute__((sda));
+extern char * g_gorn_path_next_node __attribute__((sda));
+extern char * g_gorn_path_effect __attribute__((sda));
+extern float g_gorn_old_hero_value __attribute__((sda));
+extern float g_gorn_old_camera_value __attribute__((sda));
+extern int g_gorn_course_progress_flag __attribute__((sda));
+extern int g_gorn_course_marker_index __attribute__((sda));
+extern int g_gorn_course_miss_count __attribute__((sda));
+extern int g_gorn_path_waiting_flag __attribute__((sda));
 /* Retail reads this counter absolutely and writes the same address via $gp: D_L15_001B3698 through a second small-data declaration. */
 extern int D_L15_001B3698_1 __attribute__((sda));
 #define init D_L15_001B1534
@@ -65,17 +65,17 @@ void gorn_path_marker_course_update(char *moby)
         first = 0; next = 0;
         oldCamera = oldHero = -1;
         init = 1;
-        D_L15_001B1598 = 0; index = 0; misses = 0;
-        D_L15_001B3698 = 0; D_L15_00221E10.reset = 0;
+        g_gorn_course_progress_flag = 0; index = 0; misses = 0;
+        g_gorn_course_timer = 0; g_gorn_challenge_vars.reset = 0;
         music_Unpause();
         if (effect) moby_mark_spawned(effect);
         entry_init_all_registered(); effect = 0;
         hero_set_state_value_b(1);
-        D_L15_00221E10.route = *(int *)(vars + 0x30);
+        g_gorn_challenge_vars.route = *(int *)(vars + 0x30);
         hero_set_state_value_a(0);
         list = level_get_object_list(); object_count = level_get_saved_value();
         for (i = 0; i < object_count; i++) if (*(short *)(list[i] + 0xAA) == 0xF82 /* moby class 3970 */) entry_spawn_list_objects_with_flag(list[i], 1);
-        path = D_L15_001FE480[*(int *)(vars + 0x30)];
+        path = g_path_l15_table[*(int *)(vars + 0x30)];
         while ((!first || !next) && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {
             object = CreateMoby(0x114A /* moby class 4426 */);
@@ -114,10 +114,10 @@ void gorn_path_marker_course_update(char *moby)
         else { waiting = 0; *(int *)(vars + 0x64) = 240; ResetGornStageCounters(moby); entry_init_all_registered(); }
     }
     if (waiting) return;
-    count = D_L15_001B3698 + 1;
+    count = g_gorn_course_timer + 1;
     if (count < 2) return;
-    hero = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
-    qcopy(&camera, &D_L15_001B97C0);
+    hero = g_moby_base + (*(int *)(vars + 0x20) << 8);
+    qcopy(&camera, &g_camera_l15_position);
     FastVecSub(&fromCamera, &camera, first + 0x10);
     vec_scale_to_length(&fromCamera, &fromCamera, 1);
     FastVecSub(&fromHero, hero + 0x10, first + 0x10);
@@ -125,7 +125,7 @@ void gorn_path_marker_course_update(char *moby)
     heroDot = FastVecDot(first + 0xC0, &fromHero);
     cameraDot = FastVecDot(first + 0xC0, &fromCamera);
     if ((heroDot != oldHero && heroDot > 0) || (cameraDot != oldCamera && cameraDot > 0)) {
-        path = D_L15_001FE480[*(int *)(vars + 0x30)];
+        path = g_path_l15_table[*(int *)(vars + 0x30)];
         if (fast_vec_dist(&camera, first + 0x10) <= 1.25f || fast_vec_dist(hero + 0x10, first + 0x10) <= 1.25f) {
             snd_play_from_class_bank(15, 0, moby, 0xFBF); hero_add_clamped_stat(0.5f);
         } else { hero_add_clamped_stat(-0.75f); misses++; }
@@ -160,5 +160,5 @@ void gorn_path_marker_course_update(char *moby)
         else effect_set_color(first, 0x4000C6FF);
     }
     if (next) { effect_set_enabled(next, 1); effect_set_color(next, 0x40808000); }
-    else if (!misses && !effect && !D_0019B278[g_current_map_index * 4]) effect = pickup_spawn_if_not_taken(first + 0x10, 0, -1, -1);
+    else if (!misses && !effect && !g_level_progress_flags[g_current_map_index * 4]) effect = pickup_spawn_if_not_taken(first + 0x10, 0, -1, -1);
 }

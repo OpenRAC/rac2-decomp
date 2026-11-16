@@ -1,5 +1,5 @@
 #include "common.h"
-extern char g_active_camera[], D_001B5490[], g_hero_state[];
+extern char g_active_camera[], g_camera_mode_state[], g_hero_state[];
 extern void vec_scale_to_length(float *, float *, float);
 extern void cam_compute_aim_angles(float *, float *, float *, float *, float *, float *);
 extern void mat_transform_via_copy(void *, void *);
@@ -48,7 +48,7 @@ void cam_begin_mode_change(char *from)
             moby_restore_vectors();
         }
     }
-    *(short *)D_001B5490 = 3;
+    *(short *)g_camera_mode_state = 3;
     cam[2] = cam[3];
     if (cam[2] == 0) {
         unsigned char *fade = cam + 0x10;

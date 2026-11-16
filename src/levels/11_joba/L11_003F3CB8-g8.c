@@ -18,36 +18,36 @@ extern void moby_transform_joint_to_world(u8 *, s32, void *);
 /* Integer and FP arguments interleaved in the ABI's per-bank order (a0-a3/t0, f12/f13):
    retail sets the size before the life count. */
 extern void gfx_draw_aimed_effect_packet(void *, s32, f32, s32, f32, s32, s32);
-extern f32 D_L11_001B0610 __attribute__((sda));
-extern f32 D_L11_001B05E8 __attribute__((sda));
-extern s32 D_L11_001B060C __attribute__((sda));
-extern s32 D_L11_001B05E4 __attribute__((sda));
-extern f32 D_L11_001B0624 __attribute__((sda));
-extern f32 D_L11_001B0628 __attribute__((sda));
-extern f32 D_L11_001B05FC __attribute__((sda));
-extern f32 D_L11_001B0600 __attribute__((sda));
-extern f32 D_L11_001B062C __attribute__((sda));
-extern f32 D_L11_001B0630 __attribute__((sda));
-extern f32 D_L11_001B0604 __attribute__((sda));
-extern f32 D_L11_001B0608 __attribute__((sda));
-extern s32 D_L11_001B05B4 __attribute__((sda));
-extern s32 D_L11_001B05B8 __attribute__((sda));
-extern s32 D_L11_001B0634 __attribute__((sda));
-extern f32 D_L11_001B063C __attribute__((sda));
-extern f32 D_L11_001B0640 __attribute__((sda));
-extern f32 D_L11_001B0644 __attribute__((sda));
-extern f32 D_L11_001B0648 __attribute__((sda));
-extern f32 D_L11_001B064C __attribute__((sda));
-extern f32 D_L11_001B0650 __attribute__((sda));
-extern f32 D_L11_001B0638 __attribute__((sda));
-extern s32 D_L11_001B05BC __attribute__((sda));
-extern s32 D_L11_001B05C0 __attribute__((sda));
-extern f32 D_L11_001B05D8 __attribute__((sda));
-extern f32 D_L11_001B05D4 __attribute__((sda));
-extern s32 D_L11_001B05CC __attribute__((sda));
-extern f32 D_L11_001B05C8 __attribute__((sda));
-extern f32 D_L11_001B05C4 __attribute__((sda));
-extern s32 D_L11_001B05D0 __attribute__((sda));
+extern f32 g_joba_beam_group_amplitude __attribute__((sda));
+extern f32 g_joba_beam_amplitude __attribute__((sda));
+extern s32 g_joba_beam_group_point_count __attribute__((sda));
+extern s32 g_joba_beam_point_count __attribute__((sda));
+extern f32 g_joba_beam_small_width_min __attribute__((sda));
+extern f32 g_joba_beam_small_width_max __attribute__((sda));
+extern f32 g_joba_beam_width_min __attribute__((sda));
+extern f32 g_joba_beam_width_max __attribute__((sda));
+extern f32 g_joba_beam_small_scale_min __attribute__((sda));
+extern f32 g_joba_beam_small_scale_max __attribute__((sda));
+extern f32 g_joba_beam_scale_min __attribute__((sda));
+extern f32 g_joba_beam_scale_max __attribute__((sda));
+extern s32 g_joba_beam_strip_param_a __attribute__((sda));
+extern s32 g_joba_beam_strip_param_b __attribute__((sda));
+extern s32 g_joba_beam_extra_point_count __attribute__((sda));
+extern f32 g_joba_beam_frame_dir_min __attribute__((sda));
+extern f32 g_joba_beam_frame_dir_max __attribute__((sda));
+extern f32 g_joba_beam_alt_width_min __attribute__((sda));
+extern f32 g_joba_beam_alt_width_max __attribute__((sda));
+extern f32 g_joba_beam_alt_scale_min __attribute__((sda));
+extern f32 g_joba_beam_alt_scale_max __attribute__((sda));
+extern f32 g_joba_beam_extra_jitter __attribute__((sda));
+extern s32 g_joba_beam_extra_strip_param_a __attribute__((sda));
+extern s32 g_joba_beam_extra_strip_param_b __attribute__((sda));
+extern f32 g_joba_beam_spark_jitter __attribute__((sda));
+extern f32 g_joba_beam_spark_base_size __attribute__((sda));
+extern s32 g_joba_beam_effect_type_a __attribute__((sda));
+extern f32 g_joba_beam_glow_size_scale __attribute__((sda));
+extern f32 g_joba_beam_glow_base_size __attribute__((sda));
+extern s32 g_joba_beam_effect_type_b __attribute__((sda));
 
 /* Emits the two articulated effect paths and their joint effects. */
 /* Draws the two Joba beams as glowing strips along their points, with extra branches and spark flashes at the ends. */
@@ -61,39 +61,39 @@ void joba_beams_draw(u8 *object)
         if (*state != 0) {
             s32 group = (u16)(*(u16 *)state - 3) < 3;
             s32 small = (u16)(*(u16 *)state - 3) < 2;
-            f32 amplitude = group ? D_L11_001B0610 : D_L11_001B05E8;
-            s32 count = group ? D_L11_001B060C : D_L11_001B05E4;
+            f32 amplitude = group ? g_joba_beam_group_amplitude : g_joba_beam_amplitude;
+            s32 count = group ? g_joba_beam_group_point_count : g_joba_beam_point_count;
             f32 points[count][4];
             s32 duration = small ? math_random_int_range(0x30, 0x80) : math_random_int_range(0x30, 0x50);
-            f32 width = small ? math_random_float_range(D_L11_001B0624, D_L11_001B0628) : math_random_float_range(D_L11_001B05FC, D_L11_001B0600);
-            f32 scale = small ? math_random_float_range(D_L11_001B062C, D_L11_001B0630) : math_random_float_range(D_L11_001B0604, D_L11_001B0608);
+            f32 width = small ? math_random_float_range(g_joba_beam_small_width_min, g_joba_beam_small_width_max) : math_random_float_range(g_joba_beam_width_min, g_joba_beam_width_max);
+            f32 scale = small ? math_random_float_range(g_joba_beam_small_scale_min, g_joba_beam_small_scale_max) : math_random_float_range(g_joba_beam_scale_min, g_joba_beam_scale_max);
             u8 *path = data + 0xA0 + i * 0xA0;
             curve_build_jittered_points_alt(points, count, path, amplitude);
-            DrawDualQuadStrip(points, count, duration, D_L11_001B05B4, D_L11_001B05B8, width, scale);
+            DrawDualQuadStrip(points, count, duration, g_joba_beam_strip_param_a, g_joba_beam_strip_param_b, width, scale);
             if ((u16)(*(u16 *)state - 3) < 2) {
-                f32 extra[D_L11_001B0634][4];
+                f32 extra[g_joba_beam_extra_point_count][4];
                 s32 pick = math_random_int_range(count - 6, count - 3);
                 qcopy_nc(frame, points[pick]);
                 qcopy_nc(frame + 0x10, points[count - 2]);
                 vec_add_random_offset(frame + 0x10, 1.0f);
-                vec_random_direction(frame + 0x20, D_L11_001B063C, D_L11_001B0640);
-                vec_random_direction(frame + 0x30, D_L11_001B063C, D_L11_001B0640);
+                vec_random_direction(frame + 0x20, g_joba_beam_frame_dir_min, g_joba_beam_frame_dir_max);
+                vec_random_direction(frame + 0x30, g_joba_beam_frame_dir_min, g_joba_beam_frame_dir_max);
                 duration = math_random_int_range(0x30, 0x60);
-                width = math_random_float_range(D_L11_001B0644, D_L11_001B0648);
-                scale = math_random_float_range(D_L11_001B064C, D_L11_001B0650);
-                curve_build_jittered_points_alt(extra, D_L11_001B0634, frame, D_L11_001B0638);
-                DrawDualQuadStrip(extra, D_L11_001B0634, duration, D_L11_001B05BC, D_L11_001B05C0, width, scale);
+                width = math_random_float_range(g_joba_beam_alt_width_min, g_joba_beam_alt_width_max);
+                scale = math_random_float_range(g_joba_beam_alt_scale_min, g_joba_beam_alt_scale_max);
+                curve_build_jittered_points_alt(extra, g_joba_beam_extra_point_count, frame, g_joba_beam_extra_jitter);
+                DrawDualQuadStrip(extra, g_joba_beam_extra_point_count, duration, g_joba_beam_extra_strip_param_a, g_joba_beam_extra_strip_param_b, width, scale);
             }
             if (group) {
-                f32 jitter = math_random_float_range(-D_L11_001B05D8, D_L11_001B05D8);
-                f32 size = D_L11_001B05D4 + jitter;
+                f32 jitter = math_random_float_range(-g_joba_beam_spark_jitter, g_joba_beam_spark_jitter);
+                f32 size = g_joba_beam_spark_base_size + jitter;
                 s32 life = math_random_int_range(0x50, 0x60);
                 f32 angle = math_random_angle();
-                gfx_draw_aimed_effect_packet(path, D_L11_001B05CC, size, life, angle, 0x31, 2);
+                gfx_draw_aimed_effect_packet(path, g_joba_beam_effect_type_a, size, life, angle, 0x31, 2);
             }
         }
         {
-            f32 size = D_L11_001B05C4 + D_L11_001B05C8 * ((L11ArcData *)data)->unk260[i];
+            f32 size = g_joba_beam_glow_base_size + g_joba_beam_glow_size_scale * ((L11ArcData *)data)->unk260[i];
             f32 half;
             s32 life;
             f32 angle;
@@ -101,11 +101,11 @@ void joba_beams_draw(u8 *object)
             half = size * 0.5f;
             life = math_random_int_range(0x50, 0x60);
             angle = math_random_angle();
-            gfx_draw_aimed_effect_packet(frame, D_L11_001B05CC, half, life, angle, 0x31, 2);
+            gfx_draw_aimed_effect_packet(frame, g_joba_beam_effect_type_a, half, life, angle, 0x31, 2);
             size *= 0.7f;
             life = math_random_int_range(8, 0x16);
             angle = math_random_angle();
-            gfx_draw_aimed_effect_packet(frame, D_L11_001B05D0, size, life, angle, 0xB, 2);
+            gfx_draw_aimed_effect_packet(frame, g_joba_beam_effect_type_b, size, life, angle, 0xB, 2);
         }
     }
 }

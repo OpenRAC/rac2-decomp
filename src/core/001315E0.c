@@ -28,7 +28,7 @@ int console_is_tool(void) {
     return r1_D_001331D8[4] == 0x54;
 }
 
-extern unsigned char D_00138152 NOT_SDA;
+extern unsigned char g_console_region NOT_SDA;
 
 extern void GetOsdConfigParam(unsigned int *);
 
@@ -37,7 +37,7 @@ int console_get_region(void) {
     unsigned int local;
 
     if (console_is_tool() != 0) {
-        return D_00138152;
+        return g_console_region;
     }
     GetOsdConfigParam(&local);
     return (local >> 1) & 3;

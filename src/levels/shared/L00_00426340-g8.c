@@ -24,23 +24,23 @@ void moby_call_setup_c(char *object)
 {
     ref_L00_0042B688_00(object);
 }
-extern char D_L00_001ADC68[4] __attribute__((sda));
+extern char g_moby_init_table_a[4] __attribute__((sda));
 
-extern char D_L00_001ADC48[4] __attribute__((sda));
+extern char g_moby_init_table_b[4] __attribute__((sda));
 
 extern void func_L00_0042B408(char *);
 
 /* Stores the first shared data pointer in the object and then runs its common setup. */
 void moby_init_with_table_a(char *object)
 {
-    *(char **)object = D_L00_001ADC68;
+    *(char **)object = g_moby_init_table_a;
     func_L00_0042B408(object);
 }
 
 /* Stores the second shared data pointer in the object and then runs its common setup. */
 void moby_init_with_table_b(char *object)
 {
-    *(char **)object = D_L00_001ADC48;
+    *(char **)object = g_moby_init_table_b;
     func_L00_0042B408(object);
 }
 
@@ -55,33 +55,33 @@ void level_set_flag(void)
 }
 
 
-extern int D_L00_001B2700 __attribute__((sda));
+extern int g_hud_coord_active __attribute__((sda));
 
-extern int D_L00_001B15DC __attribute__((sda));
+extern int g_level_l00_saved_value __attribute__((sda));
 
 /* Returns a saved value from this level. */
 int level_get_saved_value(void)
 {
-    return D_L00_001B15DC;
+    return g_level_l00_saved_value;
 }
 
 /* Returns another saved value from this level. */
 int level_get_saved_value_b(void)
 {
-    return D_L00_001B2700;
+    return g_hud_coord_active;
 }
 
-extern float D_L00_001B15B8 __attribute__((sda));
+extern float g_hero_linked_object_values __attribute__((sda));
 
-extern char D_L00_001B9040[];
+extern char g_hero_linked_object_params[];
 
-extern char D_00189F70[];
+extern char g_hero_velocity[];
 
-extern int D_001A7BAC;
+extern int g_control_mode_option;
 
-extern float D_L00_001A8904;
+extern float g_cam_rotation_param;
 
-extern int D_L00_001A8FF0;
+extern int g_hero_locked_flag;
 
 extern void FastVecAdd(char *, char *, char *);
 
@@ -106,16 +106,16 @@ extern void weapon_reset_view_state(char *);
 void hero_refresh_linked_object(char *object)
 {
     char local[16];
-    char *hero = D_00189F70;
+    char *hero = g_hero_velocity;
     char *self = object;
-    char *parameters = D_L00_001B9040;
-    float value = (&D_L00_001B15B8)[D_001A7BAC];
+    char *parameters = g_hero_linked_object_params;
+    float value = (&g_hero_linked_object_values)[g_control_mode_option];
     float first;
 
-    D_L00_001A8904 = value;
+    g_cam_rotation_param = value;
     FastVecAdd(local, hero, parameters);
     first = *(float *)(hero + 12);
-    if (D_L00_001A8FF0 != 0) {
+    if (g_hero_locked_flag != 0) {
         first = 0.0f;
     }
     *(float *)(local + 12) = FastAddRotations(first, *(float *)(parameters + 12));
@@ -172,9 +172,9 @@ extern float FastVecDot(void *, void *);
 extern void lerp_vector(void *, void *, void *, float);
 extern void mat_build_rotation_toward_vector(void *, void *, void *, int, float);
 
-extern Rec_42A698 *D_L00_001B1844;
-extern float D_L00_001B1644 __attribute__((sda));
-extern float D_L00_001B1648 __attribute__((sda));
+extern Rec_42A698 *g_camera_def_table;
+extern float g_follow_position_param_a __attribute__((sda));
+extern float g_follow_position_param_b __attribute__((sda));
 
 /* Works out the object's position and facing from the hero and the model, then nudges its position gradually toward the new spot. */
 void moby_update_follow_position(Self_42A698 *self)
@@ -192,7 +192,7 @@ void moby_update_follow_position(Self_42A698 *self)
     float *position;
     float dot;
 
-    entity = D_L00_001B1844[self->idx].ent;
+    entity = g_camera_def_table[self->idx].ent;
     if (tracked_moby_get_flag(self) != 0 || global_object_get_flag() != 0) {
         qcopy(base_row, entity->model->mE0);
     } else {
@@ -200,8 +200,8 @@ void moby_update_follow_position(Self_42A698 *self)
     }
     position = self->m30;
     if (tracked_moby_is_active() != 0 || global_object_is_busy() != 0) {
-        entity->f28 = D_L00_001B1644;
-        entity->f2C = D_L00_001B1648;
+        entity->f28 = g_follow_position_param_a;
+        entity->f2C = g_follow_position_param_b;
     }
     vec_scale_to_length(l1, entity->model->mE0, 0.25f);
     FastVecAdd((char *)l1, (char *)entity->model + 0x10, (char *)l1);

@@ -15,21 +15,21 @@ typedef struct {
 } SkyMoby30D430;
 extern int g_current_map_index;
 extern int g_current_game_mode;
-extern SkyVars30D430 D_001C1490;
-extern SkyVars30D430 D_001C14E0;
-extern float D_001AEFFC __attribute__((sda));
-extern float D_001AF000 __attribute__((sda));
-extern int D_001AEFE4 __attribute__((sda));
-extern int D_001AEFEC __attribute__((sda));
-extern int D_001AF008 __attribute__((sda));
-extern int D_001AF00C __attribute__((sda));
-extern float D_001AF018 __attribute__((sda));
-extern float D_001AF01C __attribute__((sda));
-extern float D_001AF04C __attribute__((sda));
-extern float D_001AF028 __attribute__((sda));
-extern float D_001AF02C __attribute__((sda));
-extern float D_001AF050 __attribute__((sda));
-extern char D_00229710[];
+extern SkyVars30D430 g_beam_level_params_first;
+extern SkyVars30D430 g_beam_level_params_second;
+extern float g_ribbon_uv_scroll __attribute__((sda));
+extern float g_ribbon_scroll_step __attribute__((sda));
+extern int g_ribbon_top_alpha __attribute__((sda));
+extern int g_ribbon_bottom_alpha __attribute__((sda));
+extern int g_ribbon_halo_color __attribute__((sda));
+extern int g_ribbon_bottom_color __attribute__((sda));
+extern float g_ribbon_normal_scale __attribute__((sda));
+extern float g_ribbon_core_width __attribute__((sda));
+extern float g_ribbon_halo_width __attribute__((sda));
+extern float g_ribbon_outer_normal_scale __attribute__((sda));
+extern float g_ribbon_outer_core_width __attribute__((sda));
+extern float g_ribbon_outer_halo_width __attribute__((sda));
+extern char g_beam_ribbon_points[];
 extern void beam_draw_ribbon_with_halo(void *, int, int, int, float, float, float);
 extern void beam_draw_anchor_glow_level(SkyMoby30D430 *);
 
@@ -43,22 +43,22 @@ void func_PAL_0030E850(SkyMoby30D430 *moby)
     int colour1;
 
     if (g_current_map_index == 1 && g_current_game_mode == 2)
-        vars = &D_001C1490;
+        vars = &g_beam_level_params_first;
     if (g_current_map_index == 20 && g_current_game_mode == 2)
-        vars = &D_001C14E0;
-    offset = D_001AEFFC - ((D_001AF000) * 1.2f);
-    D_001AEFFC = offset;
+        vars = &g_beam_level_params_second;
+    offset = g_ribbon_uv_scroll - ((g_ribbon_scroll_step) * 1.2f);
+    g_ribbon_uv_scroll = offset;
     if (offset <= -8.0f)
-        D_001AEFFC = offset + 8.0f;
-    top = D_001AEFE4 << 24;
-    bottom = D_001AEFEC << 24;
-    colour0 = top | D_001AF008;
-    colour1 = bottom | D_001AF00C;
+        g_ribbon_uv_scroll = offset + 8.0f;
+    top = g_ribbon_top_alpha << 24;
+    bottom = g_ribbon_bottom_alpha << 24;
+    colour0 = top | g_ribbon_halo_color;
+    colour1 = bottom | g_ribbon_bottom_color;
     if (g_current_map_index == 20 && g_current_game_mode == 2) {
         colour0 = top | 0xEFCD12;
         colour1 = bottom | 0xEF3212;
     }
-    beam_draw_ribbon_with_halo(D_00229710, colour0, colour1, vars->tex, D_001AF018, D_001AF01C, D_001AF04C);
-    beam_draw_ribbon_with_halo(D_00229710 + 0x140, colour0, colour1, vars->tex, D_001AF028, D_001AF02C, D_001AF050);
+    beam_draw_ribbon_with_halo(g_beam_ribbon_points, colour0, colour1, vars->tex, g_ribbon_normal_scale, g_ribbon_core_width, g_ribbon_halo_width);
+    beam_draw_ribbon_with_halo(g_beam_ribbon_points + 0x140, colour0, colour1, vars->tex, g_ribbon_outer_normal_scale, g_ribbon_outer_core_width, g_ribbon_outer_halo_width);
     beam_draw_anchor_glow_level(moby);
 }

@@ -3,15 +3,15 @@
 
 extern char g_camera_eye_state[];
 extern int math_random_int_below(int);
-extern float D_001AF1A4 __attribute__((sda));
-extern float D_001AF1A8 __attribute__((sda));
-extern unsigned char D_001AF1AC __attribute__((sda));
-extern void *D_001AF1B0 __attribute__((sda));
-extern void *D_001AF1B4 __attribute__((sda));
-extern void *D_001AF1B8 __attribute__((sda));
-extern float D_001AF1BC __attribute__((sda));
-extern float D_001AF1C0 __attribute__((sda));
-extern char D_0018A0E0[];
+extern float g_sparkle_time_min __attribute__((sda));
+extern float g_sparkle_time_max __attribute__((sda));
+extern unsigned char g_sparkle_kind __attribute__((sda));
+extern void *g_sparkle_effect_default __attribute__((sda));
+extern void *g_sparkle_effect_third __attribute__((sda));
+extern void *g_sparkle_effect_alt __attribute__((sda));
+extern float g_sparkle_scale __attribute__((sda));
+extern float g_sparkle_scale_third __attribute__((sda));
+extern char g_hero_state_block[];
 extern void FastVecSub(void *, void *, void *);
 extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);
@@ -33,36 +33,36 @@ void part_spawn_sparkles(unsigned char *object)
 
     state = *(unsigned char **)(object + 0x68);
     FastVecSub(first, g_camera_eye_state, object + 0x10);
-    basis = D_0018A0E0;
+    basis = g_hero_state_block;
     FastVecScale(second, basis,
-                  math_random_float_range(D_001AF1A4 * 0.016666668f,
-                               D_001AF1A8 * 0.016666668f));
+                  math_random_float_range(g_sparkle_time_min * 0.016666668f,
+                               g_sparkle_time_max * 0.016666668f));
     math_apply_axis_rotation_to_quat(third, second, first, math_random_angle());
 
-    effect = state[0x57] != 0 ? D_001AF1B8 : D_001AF1B0;
-    kind = D_001AF1AC;
+    effect = state[0x57] != 0 ? g_sparkle_effect_alt : g_sparkle_effect_default;
+    kind = g_sparkle_kind;
     random = (unsigned char)math_random_int_below(255);
-    part_spawn_hero_relative(object + 0x10, third, effect, kind, random, 1, D_001AF1BC);
+    part_spawn_hero_relative(object + 0x10, third, effect, kind, random, 1, g_sparkle_scale);
 
-    kind = D_001AF1AC;
+    kind = g_sparkle_kind;
     random = (unsigned char)math_random_int_below(255);
-    part_spawn_hero_relative(object + 0x10, third, D_001AF1B4, kind, random, 1, D_001AF1C0);
+    part_spawn_hero_relative(object + 0x10, third, g_sparkle_effect_third, kind, random, 1, g_sparkle_scale_third);
 }
 
-extern char *D_001AF880 __attribute__((sda));
+extern char *g_linked_moby_private_data __attribute__((sda));
 
 /* Turns on a flag in the private data of the object stored in D_001AF880, if there is one. */
 void moby_set_linked_flag(void)
 {
-    char *p = D_001AF880;
+    char *p = g_linked_moby_private_data;
     if (p != 0) {
         char *q = *(char **)(p + 0x68);
         *(int *)(q + 0x28) = 1;
     }
 }
 
-extern float D_001AF57C __attribute__((sda));
-extern char D_001B2520[] __attribute__((sda));
+extern float g_lock_on_sprite_angle __attribute__((sda));
+extern char g_emitter_origin[] __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern int FastTweenColor(int, int, float);
@@ -73,7 +73,7 @@ extern void gfx_draw_billboard_quad(char *, int, unsigned int, int, float, float
    the three sprites. */
 void lock_on_draw_sprites(void *object)
 {
-    float angle = FastAddRotations(D_001AF57C, 0.125f);
+    float angle = FastAddRotations(g_lock_on_sprite_angle, 0.125f);
     float scale;
     float size_a;
     float size_b;
@@ -82,7 +82,7 @@ void lock_on_draw_sprites(void *object)
     int colour_b;
     int colour_c;
 
-    D_001AF57C = angle;
+    g_lock_on_sprite_angle = angle;
     scale = math_fast_sin_or_cos_a(angle);
     scale = (scale + 1.0f) * 0.5f;
     size_b = scale * 0.0625f + 0.0625f;
@@ -94,7 +94,7 @@ void lock_on_draw_sprites(void *object)
     colour_c = FastTweenColor(0x10003F00, 0x10003F00, scale);
 
     gfx_draw_owner_effect_slots(object);
-    gfx_draw_billboard_quad(D_001B2520, 0x31, colour_a, 1, size_a, 0.125f, 0.0f);
-    gfx_draw_billboard_quad(D_001B2520, 0x31, colour_b, 1, size_b, 0.124f, 0.0f);
-    gfx_draw_billboard_quad(D_001B2520, 0x0B, colour_c, 1, size_c, 0.123f, 0.0f);
+    gfx_draw_billboard_quad(g_emitter_origin, 0x31, colour_a, 1, size_a, 0.125f, 0.0f);
+    gfx_draw_billboard_quad(g_emitter_origin, 0x31, colour_b, 1, size_b, 0.124f, 0.0f);
+    gfx_draw_billboard_quad(g_emitter_origin, 0x0B, colour_c, 1, size_c, 0.123f, 0.0f);
 }

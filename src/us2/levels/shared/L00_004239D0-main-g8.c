@@ -104,7 +104,7 @@ typedef struct FollowCameraGlobal {
     char pad3b4[0x404-0x3b4];
     int state;
 } FollowCameraGlobal;
-extern FollowCameraGlobal D_L00_001B8C80;
+extern FollowCameraGlobal g_scalar_transition_state;
 typedef struct CameraInputSamples {
     char pad0[0xac];
     float samples[5];
@@ -113,14 +113,14 @@ typedef struct CameraInputSamples {
     char padc8[0x264-0xc8];
     int state;
 } CameraInputSamples;
-extern CameraInputSamples D_L00_001B8E20;
-extern int D_L00_001A8FF0;
+extern CameraInputSamples g_camera_move_state;
+extern int g_hero_locked_flag;
 extern char *g_area_hit_targets[];
-extern float D_L00_001B14A4 __attribute__((sda)), D_L00_001B1594 __attribute__((sda)), D_L00_001B1598 __attribute__((sda));
-extern float D_L00_001B159C __attribute__((sda)), D_L00_001B15A0 __attribute__((sda)), D_L00_001B15A4 __attribute__((sda));
-extern float D_L00_001B1578 __attribute__((sda)), D_L00_001B157C __attribute__((sda));
-extern int D_L00_001B1590 __attribute__((sda));
-extern float D_L00_001A8900;
+extern float g_camera_default_view_y __attribute__((sda)), g_cam_follow_aim_distance __attribute__((sda)), g_cam_follow_distance_target __attribute__((sda));
+extern float g_cam_follow_height_target __attribute__((sda)), g_cam_follow_rate_b __attribute__((sda)), g_cam_follow_rate_a __attribute__((sda));
+extern float g_cam_follow_timer_threshold __attribute__((sda)), g_cam_follow_speed_max __attribute__((sda));
+extern int g_cam_follow_mode_flag __attribute__((sda));
+extern float g_follow_cam_lerp_factor;
 extern int cam_update_overrides(void);
 extern int math_fast_float_d(int *);
 extern int FastDecTimer(short *);
@@ -154,7 +154,7 @@ void func_US2_L00_004239D0(CameraMoby *obj)
     if (!g_hero_state.i340 || q->ticks) {
         float a=q->fF0;
         if (a>2.0f) a=2.0f;
-        q->weight=(D_L00_001B14A4-0.002f)*(a*0.5f)+0.002f;
+        q->weight=(g_camera_default_view_y-0.002f)*(a*0.5f)+0.002f;
         if (g_hero_state.i340) math_fast_float_d(&q->ticks);
         else q->ticks=15;
     }
@@ -178,7 +178,7 @@ void func_US2_L00_004239D0(CameraMoby *obj)
         obj->vars->offsets.distance=0.25f;
         follow_camera_set_height(0.5f,0.003f);
     }
-    if (g_hero_state.moveState==5 && !D_L00_001A8FF0) {
+    if (g_hero_state.moveState==5 && !g_hero_locked_flag) {
         CameraOffsets *specialVars=&obj->vars->offsets; special=1;
         if (g_hero_state.b22b4==1 && mode==-1) {
             specialVars->distance=0.25f;
@@ -198,18 +198,18 @@ void func_US2_L00_004239D0(CameraMoby *obj)
         obj->vars->rates.f3c=0.6f;
     }
     if (g_hero_state.b22b4==2) {
-        CameraInputSamples *cam=&D_L00_001B8E20;
+        CameraInputSamples *cam=&g_camera_move_state;
         if (state[4]<2) {
-            cam_set_aim_offset_target(0,D_L00_001B1594,0.005f);
-            follow_camera_set_distance(1,D_L00_001B1598,0.003f);
-            follow_camera_set_height(D_L00_001B159C,0.003f);
+            cam_set_aim_offset_target(0,g_cam_follow_aim_distance,0.005f);
+            follow_camera_set_distance(1,g_cam_follow_distance_target,0.003f);
+            follow_camera_set_height(g_cam_follow_height_target,0.003f);
             if (cam->state<2) {
                 CameraVars *base=obj->vars;
                 FollowParameters *follow=&base->follow;
                 float *pos=obj->position,*dir=g_hero_state.position,*aim=q->vector50;
-                follow->distance=D_L00_001B1598;
-                follow->height=D_L00_001B159C;
-                q->distance=D_L00_001B1594;
+                follow->distance=g_cam_follow_distance_target;
+                follow->height=g_cam_follow_height_target;
+                q->distance=g_cam_follow_aim_distance;
                 cam_follow_update_orientation(1);
                 {
                 CameraRates *rates=&obj->vars->rates;
@@ -244,12 +244,12 @@ void func_US2_L00_004239D0(CameraMoby *obj)
         if (target) *(int *)(target+0x98)=0;
         {
             CameraRates *rates=&obj->vars->rates;
-            rates->f3c=D_L00_001B15A4;
-            rates->f44=D_L00_001B15A0;
+            rates->f3c=g_cam_follow_rate_a;
+            rates->f44=g_cam_follow_rate_b;
         }
     }
     {
-    CameraHooks *hooks=&D_L00_001B8C80.hooks;
+    CameraHooks *hooks=&g_scalar_transition_state.hooks;
     FollowCameraGlobal *camera;
     if (hooks->update) hooks->update();
     camera=(FollowCameraGlobal *)((char *)hooks-0x3a0);
@@ -260,27 +260,27 @@ void func_US2_L00_004239D0(CameraMoby *obj)
         else if (targetState==253) camera->target=0;
         else {
             if (math_fabs(g_pad_state.stickX)>=0.3f || math_fabs(g_pad_state.stickY)>=0.3f) camera->targetTicks=640;
-            if (D_L00_001B8C80.targetTicks>400) {
-                math_fast_float_d(&D_L00_001B8C80.targetTicks);
-                if (D_L00_001B8C80.targetTicks<401) D_L00_001B8C80.targetTicks=0;
+            if (g_scalar_transition_state.targetTicks>400) {
+                math_fast_float_d(&g_scalar_transition_state.targetTicks);
+                if (g_scalar_transition_state.targetTicks<401) g_scalar_transition_state.targetTicks=0;
             } else {
-                D_L00_001B8C80.targetTicks++;
-                if (D_L00_001B8C80.targetTicks>400) D_L00_001B8C80.targetTicks=400;
-                a=IntToFloat(D_L00_001B8C80.targetTicks);a/=IntToFloat(400);
-                cam_set_strength_and_steer_target(D_L00_001B8C80.target+0x10,a*1.5707964897155762f,0.0f);
+                g_scalar_transition_state.targetTicks++;
+                if (g_scalar_transition_state.targetTicks>400) g_scalar_transition_state.targetTicks=400;
+                a=IntToFloat(g_scalar_transition_state.targetTicks);a/=IntToFloat(400);
+                cam_set_strength_and_steer_target(g_scalar_transition_state.target+0x10,a*1.5707964897155762f,0.0f);
                 cam_set_lock_flag();cam_set_speeds_if_nonzero(0.03f,0.2f);
             }
         }
     }
     }
     if (g_hero_state.p1450 && *(signed char *)(g_hero_state.p1450+0x20)>=0) {
-        D_L00_001B8C80.targetTicks++;
-        if (D_L00_001B8C80.targetTicks>400) D_L00_001B8C80.targetTicks=400;
-        a=IntToFloat(D_L00_001B8C80.targetTicks);a/=IntToFloat(400);
+        g_scalar_transition_state.targetTicks++;
+        if (g_scalar_transition_state.targetTicks>400) g_scalar_transition_state.targetTicks=400;
+        a=IntToFloat(g_scalar_transition_state.targetTicks);a/=IntToFloat(400);
         cam_set_strength_and_steer_target(g_hero_state.p1450+0x10,a*1.5707964897155762f,0.0f);
         cam_set_lock_flag();cam_set_speeds_if_nonzero(0.03f,0.2f);
     }
-    if (!D_L00_001B8C80.target && !g_hero_state.p1450) D_L00_001B8C80.targetTicks=0;
+    if (!g_scalar_transition_state.target && !g_hero_state.p1450) g_scalar_transition_state.targetTicks=0;
     if (g_hero_state.state==129) {
         cam_set_lock_flag();cam_set_speeds_if_nonzero(1,1);
         ref_L00_004224D0_00(0.06f,0.2f);cam_set_snap_flag();
@@ -295,31 +295,31 @@ void func_US2_L00_004239D0(CameraMoby *obj)
         CameraVars *resetVars;
         set_follow_camera_orbit_clamp_mode(0);cam_set_lock_flag();cam_set_speeds_if_nonzero(0.04f,0.2f);
         resetVars=obj->vars;resetVars->timer16=0;resetVars->timer12=0;resetVars->timer14=0;
-    } else if (D_L00_001B1590) {
+    } else if (g_cam_follow_mode_flag) {
         CameraVars *timerVars=obj->vars;
-        CameraInputSamples *cam=&D_L00_001B8E20;
+        CameraInputSamples *cam=&g_camera_move_state;
         a=0;
         for(i=0;i<4;i++) { local[i]=FastDiffRots(cam->samples[i],cam->samples[i+1]);a+=local[i]; }
         b=5.0f;a*=0.25f;b=a*b;if(b>1)b=1;b=1-b;
-        if (b<D_L00_001B1578) timerVars->timer12=32;
+        if (b<g_cam_follow_timer_threshold) timerVars->timer12=32;
         if (timerVars->timer12) {
             if (FastDecTimer(&timerVars->timer12)) timerVars->timer14=45;
             cam_set_lock_flag();timerVars->timer16++;
             if (timerVars->timer16>30) timerVars->timer16=30;
             a=IntToFloat(timerVars->timer16);a/=IntToFloat(30);
-            cam_set_speeds_if_nonzero((D_L00_001B157C-0.015f)*a+0.015f,0.2f);
-            D_L00_001A8900=0;
+            cam_set_speeds_if_nonzero((g_cam_follow_speed_max-0.015f)*a+0.015f,0.2f);
+            g_follow_cam_lerp_factor=0;
         } else {
             if (timerVars->timer14) {
                 FastDecTimer(&timerVars->timer14);
                 a=IntToFloat(timerVars->timer14);a/=IntToFloat(45);
                 a*=-0.85f;
                 a+=0.85f;
-                D_L00_001A8900=a;
+                g_follow_cam_lerp_factor=a;
                 timerVars->timer16=0;
             } else {
                 timerVars->timer16=0;
-                D_L00_001A8900=0.85f;
+                g_follow_cam_lerp_factor=0.85f;
             }
         }
     }

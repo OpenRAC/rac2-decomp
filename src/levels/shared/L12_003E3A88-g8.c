@@ -7,7 +7,7 @@
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 
-extern char D_L12_001B9E00[];
+extern char g_hero_prev_position[];
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_mark_spawned(void *);
@@ -26,13 +26,13 @@ extern int flag_set_first_pending(void *);
 extern int flag_set_second_pending(void *);
 extern int flag_is_third_pending_set(void *);
 extern int CollLine(void *, void *, int, int, int);
-extern char *D_L12_001FEAC0[];
-extern char D_L12_001B0B70[];
-extern unsigned short D_L12_001B0B00 __attribute__((sda));
-extern float D_L12_001B0B68 __attribute__((sda));
-extern float D_L12_001B0B64 __attribute__((sda));
-extern int D_L12_001B29C8 __attribute__((sda));
-extern char *D_L12_001C0258 NOT_SDA;
+extern char *g_path_zone_table[];
+extern char g_str_debug_robot_guard_init[];
+extern unsigned short g_robot_guard_init_value __attribute__((sda));
+extern float g_robot_guard_spawn_height __attribute__((sda));
+extern float g_robot_guard_smooth_value __attribute__((sda));
+extern int g_frame_l12_counter __attribute__((sda));
+extern char *g_hit_l12_result NOT_SDA;
 extern char *g_hero_moby NOT_SDA;
 
 /* Sets up the robot guard on its first frame, then handles its hits, its colour pulse and its awareness of the hero. */
@@ -83,15 +83,15 @@ void robot_guard_init_update_state(char *obj) {
             anim_start_blended(obj, 0, 0, 0);
         W(vars, 0x154) = W(vars, 0x150);
         if (W(vars, 0x164) == -1)
-            qcopy(obj + 0x10, D_L12_001FEAC0[W(vars, 0x158)] + 0x10);
+            qcopy(obj + 0x10, g_path_zone_table[W(vars, 0x158)] + 0x10);
         else
-            qcopy(obj + 0x10, D_L12_001FEAC0[W(vars, 0x164)] + 0x10);
+            qcopy(obj + 0x10, g_path_zone_table[W(vars, 0x164)] + 0x10);
         if (W(vars, 0x164) != -1)
             moby_set_state(obj, 2, 7);
         if (P(vars, 0x294))
             W(P(vars, 0x294), 0) = -1;
     }
-    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, D_L12_001B9E00) < 24.0f) {
+    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, g_hero_prev_position) < 24.0f) {
         moby_update_ground_check(obj);
         B(obj, 0x6F) = 22;
     }
@@ -102,7 +102,7 @@ void robot_guard_init_update_state(char *obj) {
     hit_result = moby_apply_damage_to_object(obj, vars + 0x60, 0);
     if (hit_result) {
         if (hit_result == 4) {
-            STUB_printf(D_L12_001B0B70);
+            STUB_printf(g_str_debug_robot_guard_init);
             W(vars, 0x278) = 5;
         } else
             W(vars, 0x278) = 1;
@@ -110,7 +110,7 @@ void robot_guard_init_update_state(char *obj) {
         B(obj, 0x95) = old_anim;
         flag_set_first_pending(obj);
         flag_set_second_pending(obj);
-        H(vars, 0x26) = D_L12_001B0B00;
+        H(vars, 0x26) = g_robot_guard_init_value;
         H(vars, 0x274) = 150;
     }
     if (FastDecTimer(vars + 0x274)) {
@@ -123,16 +123,16 @@ void robot_guard_init_update_state(char *obj) {
     W(vars, 0x270) = W(vars, 0x140);
     if (P(vars, 0x140) && vec_distance_xy(P(vars, 0x140) + 0x10, obj + 0x10) < 16.0f) {
         qcopy(pos, obj + 0x10);
-        pos[2] += D_L12_001B0B68;
-        if (!CollLine(pos, vars + 0x130, 16, 0, 0) || D_L12_001C0258 == g_hero_moby) {
+        pos[2] += g_robot_guard_spawn_height;
+        if (!CollLine(pos, vars + 0x130, 16, 0, 0) || g_hit_l12_result == g_hero_moby) {
             if (H(vars, 0x276) != 1)
                 H(vars, 0x276) = 1;
         }
     }
     if (B(obj, 0x31)) {
-        angle = IntToFloat(D_L12_001B29C8 % 60);
+        angle = IntToFloat(g_frame_l12_counter % 60);
         angle = angle * 6.2831854820251465f / IntToFloat(60) - 3.1415927410125732f;
         W(obj, 0x78) = PulseColor(0x80808080, 0x80303030, angle);
     }
-    value_set_and_smooth(obj, vars + 0x2B0, 1, 1, D_L12_001B0B64);
+    value_set_and_smooth(obj, vars + 0x2B0, 1, 1, g_robot_guard_smooth_value);
 }

@@ -11,9 +11,9 @@ extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern char D_L04_001BFAE0[];
-extern char D_L04_001BFB00[];
-extern char D_L04_001A8F20[] __attribute__((sda));
+extern char g_spark_origin_quad[];
+extern char g_scratch_direction_quad[];
+extern char g_effect_default_params[] __attribute__((sda));
 extern void vec_fast_normalize(void *, void *, void *);
 extern float FastVecLength(void *);
 extern int math_random_int_range(int, int);
@@ -71,14 +71,14 @@ unsigned char *SpawnHomingShot(int owner, float *pos, float *velocity, int life)
         probe.kind = kind;
         start[2] = origin[2];
         if (CollLine(start, origin, 0, (void *)owner, &probe)) {
-            qcopy((shot + 0x10), D_L04_001BFAE0);
+            qcopy((shot + 0x10), g_spark_origin_quad);
             for (i = 4; i >= 0; i--) {
                 *(QuadWord *)random = 0;
                 random[0] = math_random_float_range(-1, 1);
                 random[1] = math_random_float_range(-1, 1);
                 random[2] = math_random_float_range(-1, 1);
                 *(QuadWord *)scratch = *(QuadWord *)random;
-                vec_fast_normalize(random, vars, D_L04_001BFB00);
+                vec_fast_normalize(random, vars, g_scratch_direction_quad);
                 vec_scale_to_length((char *)scratch, (char *)scratch, FastVecLength(random) * 0.5f);
                 FastVecAdd(random, random, scratch);
                 vec_scale_to_length((char *)random, (char *)random, math_random_float_range(0.050000004f, 0.10000001f));
@@ -90,7 +90,7 @@ unsigned char *SpawnHomingShot(int owner, float *pos, float *velocity, int life)
         }
         SpawnJointFollowParticle(shot, 0x2F4F7F7F, *(int *)(vars + 0x10), -1, 100000);
         for (trail_index = 0; trail_index < 17; trail_index++) {
-            particle = part_spawn_random_effect_record(shot + 0x10, D_L04_001A8F20, 1, 0);
+            particle = part_spawn_random_effect_record(shot + 0x10, g_effect_default_params, 1, 0);
             if (particle) {
                 *(float *)(particle + 0xC) = math_random_float_range(15000, 25000);
                 numerator = IntToFloat(trail_index);

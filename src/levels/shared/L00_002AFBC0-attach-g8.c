@@ -24,18 +24,18 @@ typedef struct {
 
 extern AttachmentRoot g_hero_state NOT_SDA;
 extern int g_hero_moby NOT_SDA;
-extern int D_L00_001A8F00[] __attribute__((sda));
+extern int g_game_l00_mode[] __attribute__((sda));
 extern u8 g_item_slot_to_record[];
 extern u8 g_weapon_l00_table[];
-extern int D_L00_001A7CEC __attribute__((sda));
-extern float D_L00_001A7CE4 __attribute__((sda));
-extern float D_L00_001A7CE0 __attribute__((sda));
+extern int g_hero_item_attach_enabled __attribute__((sda));
+extern float g_hero_item_step_scale __attribute__((sda));
+extern float g_hero_item_time_scale __attribute__((sda));
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern u8 D_L00_0025BDC0[], D_L00_001B2E00[];
-extern u8 D_L00_001A7D08[], D_L00_001B3000[];
-extern u8 D_L00_001A7D18[], D_L00_001B3200[];
-extern u8 D_L00_001A7D30[], D_L00_001B3300[];
-extern u8 D_L00_001B2D80[], D_L00_0025C0F0[];
+extern u8 g_hero_item_pose_buffer[], g_hero_pose_buffer_a[];
+extern u8 g_item_pose_template_a[], g_hero_pose_buffer_b[];
+extern u8 g_item_pose_template_b[], g_hero_pose_buffer_c[];
+extern u8 g_item_pose_template_c[], g_hero_pose_buffer_d[];
+extern u8 g_glow_records[], g_hero_item_saved_pose[];
 extern void mat_get_euler_angles(void *, void *);
 extern void func_002A05A8(void *), func_002A0F48(void *), func_002A10E8(void *);
 extern void FilterTransformHistory(void *, void *, int);
@@ -77,7 +77,7 @@ void update_hero_item_mobys(int value)
     if (!value)
         value = g_hero_moby;
     for (i = 0; i < 7; i++) {
-        if (D_L00_001A8F00[0] == 2 || D_L00_001A8F00[0] == 6) {
+        if (g_game_l00_mode[0] == 2 || g_game_l00_mode[0] == 6) {
             if (!(i == 2 && g_hero_state.item2 == 47) && i != 1 && i != 4)
                 continue;
         }
@@ -108,7 +108,7 @@ void update_hero_item_mobys(int value)
                         *(u16 *)(moby + 0x34) &= 0xFFFB;
                     } else {
                         qcopy(moby + 0x10, (u8 *)&g_hero_state + 0xC80 + joint * 64);
-                        if (!D_L00_001A7CEC || !*(int *)(def + 0x1C)) {
+                        if (!g_hero_item_attach_enabled || !*(int *)(def + 0x1C)) {
                             if (i == 0)
                                 FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 0);
                             first = hero_is_slot_item_wrench(i);
@@ -130,72 +130,72 @@ void update_hero_item_mobys(int value)
                             func_002A10E8(moby);
                             *(u16 *)(moby + 0x34) |= 6;
                             if (first) {
-                                PackPose(D_L00_0025BDC0, D_L00_001B2E00, *(int *)(moby + 0x24), 0, value);
+                                PackPose(g_hero_item_pose_buffer, g_hero_pose_buffer_a, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
-                                *(u8 **)(moby + 0x58) = D_L00_001B2E00;
-                                *(u8 **)(moby + 0x5C) = D_L00_001B2E00;
+                                *(u8 **)(moby + 0x58) = g_hero_pose_buffer_a;
+                                *(u8 **)(moby + 0x5C) = g_hero_pose_buffer_a;
                             } else if (second) {
-                                PackPose(D_L00_001A7D08, D_L00_001B3000, *(int *)(moby + 0x24), 0, value);
+                                PackPose(g_item_pose_template_a, g_hero_pose_buffer_b, *(int *)(moby + 0x24), 0, value);
                                 *(int *)(moby + 0x44) = 0;
                                 *(int *)(moby + 0x40) = 0;
-                                *(u8 **)(moby + 0x58) = D_L00_001B3000;
-                                *(u8 **)(moby + 0x5C) = D_L00_001B3000;
+                                *(u8 **)(moby + 0x58) = g_hero_pose_buffer_b;
+                                *(u8 **)(moby + 0x5C) = g_hero_pose_buffer_b;
                             } else if (third) {
                                 int k;
-                                if (D_L00_001A8F00[0] == 2 || D_L00_001A8F00[0] == 6) {
-                                    u8 *p = D_L00_001B2D80;
+                                if (g_game_l00_mode[0] == 2 || g_game_l00_mode[0] == 6) {
+                                    u8 *p = g_glow_records;
                                     for (k = 1; k >= 0; k--, p += 64) {
                                         *(float *)(p + 32) = 1;
                                         *(float *)(p + 36) = 1;
                                         *(float *)(p + 40) = 1;
                                     }
                                 } else {
-                                    u8 *saved_pose = D_L00_0025C0F0;
+                                    u8 *saved_pose = g_hero_item_saved_pose;
                                     scratch.saved[0] = *(ItemQuad *)saved_pose;
                                     scratch.saved[1] = *(ItemQuad *)(saved_pose + 0xB0);
-                                    D_L00_0025BE10.scale0[0] = 1;
-                                    D_L00_0025BE10.scale0[1] = 1;
-                                    D_L00_0025BE10.scale0[2] = 1;
-                                    D_L00_0025BE10.scale1[0] = 1;
-                                    D_L00_0025BE10.scale1[1] = 1;
-                                    D_L00_0025BE10.scale1[2] = 1;
+                                    g_hero_item_attach_records.scale0[0] = 1;
+                                    g_hero_item_attach_records.scale0[1] = 1;
+                                    g_hero_item_attach_records.scale0[2] = 1;
+                                    g_hero_item_attach_records.scale1[0] = 1;
+                                    g_hero_item_attach_records.scale1[1] = 1;
+                                    g_hero_item_attach_records.scale1[2] = 1;
                                 }
                                 if (!j) {
-                                    PackPose(D_L00_001A7D18, D_L00_001B3200, *(int *)(moby + 0x24), 0, value);
-                                    *(u8 **)(moby + 0x58) = D_L00_001B3200;
-                                    *(u8 **)(moby + 0x5C) = D_L00_001B3200;
+                                    PackPose(g_item_pose_template_b, g_hero_pose_buffer_c, *(int *)(moby + 0x24), 0, value);
+                                    *(u8 **)(moby + 0x58) = g_hero_pose_buffer_c;
+                                    *(u8 **)(moby + 0x5C) = g_hero_pose_buffer_c;
                                 } else {
-                                    PackPose(D_L00_001A7D30, D_L00_001B3300, *(int *)(moby + 0x24), 0, value);
-                                    *(u8 **)(moby + 0x58) = D_L00_001B3300;
-                                    *(u8 **)(moby + 0x5C) = D_L00_001B3300;
+                                    PackPose(g_item_pose_template_c, g_hero_pose_buffer_d, *(int *)(moby + 0x24), 0, value);
+                                    *(u8 **)(moby + 0x58) = g_hero_pose_buffer_d;
+                                    *(u8 **)(moby + 0x5C) = g_hero_pose_buffer_d;
                                 }
                                 *(int *)(moby + 0x40) = 0;
                                 *(int *)(moby + 0x44) = 0;
-                                if (D_L00_001A8F00[0] == 2 || D_L00_001A8F00[0] == 6) {
-                                    u8 *p = D_L00_001B2D80;
+                                if (g_game_l00_mode[0] == 2 || g_game_l00_mode[0] == 6) {
+                                    u8 *p = g_glow_records;
                                     for (k = 1; k >= 0; k--, p += 64) {
                                         *(float *)(p + 32) = 0.01f;
                                         *(float *)(p + 36) = 0.01f;
                                         *(float *)(p + 40) = 0.01f;
                                     }
                                 } else {
-                                    *(ItemQuad *)D_L00_0025C0F0 = scratch.saved[0];
-                                    *(ItemQuad *)(D_L00_0025C0F0 + 0xB0) = scratch.saved[1];
+                                    *(ItemQuad *)g_hero_item_saved_pose = scratch.saved[0];
+                                    *(ItemQuad *)(g_hero_item_saved_pose + 0xB0) = scratch.saved[1];
                                 }
                             }
                         } else {
                             u8 *p;
                             func_002A05A8(moby);
-                            if (!D_L00_001A7CEC || i != 0)
+                            if (!g_hero_item_attach_enabled || i != 0)
                                 mat_get_euler_angles((u8 *)(joint * 64 + (int)joint_mtx), moby + 0xF0);
                             else
                                 FilterTransformHistory(moby, (u8 *)(joint * 64 + (int)joint_mtx), 1);
                             p = (u8 *)&g_hero_state;
                             if (*(float *)(p + 0x14F8) > 0 && !*(int *)(p + 0x1500)) {
-                                float step = D_L00_001A7CE4 * 0.00027777778f;
+                                float step = g_hero_item_step_scale * 0.00027777778f;
                                 math_step_value_toward_target((float *)(p + 0x14F8), (float *)(p + 0x14FC), 0.0f, step, step,
-                                              D_L00_001A7CE0 * 0.016666668f);
+                                              g_hero_item_time_scale * 0.016666668f);
                                 matrix_mul_vec3(scratch.direction, p + 0x14A0, p);
                                 FastVecAdd(scratch.direction, scratch.direction, p + 0x80);
                                 lerp_vector(moby + 0x10, moby + 0x10, scratch.direction, *(float *)(p + 0x14F8));

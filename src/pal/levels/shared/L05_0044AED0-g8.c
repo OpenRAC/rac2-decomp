@@ -7,9 +7,9 @@ extern float IntToFloat(int),FastAddRotations(float,float);
 extern int FloatToInt(float);
 extern int ref_L05_00444B20_00(int,int,void *,int);
 extern void ref_L05_00444B20_01(int);
-extern int D_L05_002A1968[];
-extern int D_L05_001B1B04 __attribute__((sda)), D_L05_001B1B0C __attribute__((sda));
-extern int D_L05_001B1B00 __attribute__((sda)), D_L05_001B1B08 __attribute__((sda));
+extern int g_lock_on_reticle_enabled[];
+extern int g_ship_lock_threshold_alt __attribute__((sda)), g_ship_lock_duration_alt __attribute__((sda));
+extern int g_ship_lock_threshold_normal __attribute__((sda)), g_ship_lock_duration_normal __attribute__((sda));
 extern char g_sound_state[];
 void func_PAL_L05_0044AED0(char *object)
 {
@@ -18,8 +18,8 @@ void func_PAL_L05_0044AED0(char *object)
  if (*(char **)(state+0x14)) {
  int threshold, duration;
  gfx_convert_float_pair_bias_coords(*(char **)(state+0x14)+0x10,&point[0],&point[1],0);
- if (D_L05_002A1968[0]) {threshold=(D_L05_001B1B04*5+2)/6;duration=(D_L05_001B1B0C*5+2)/6;}
- else {threshold=(D_L05_001B1B00*5+2)/6;duration=(D_L05_001B1B08*5+2)/6;}
+ if (g_lock_on_reticle_enabled[0]) {threshold=(g_ship_lock_threshold_alt*5+2)/6;duration=(g_ship_lock_duration_alt*5+2)/6;}
+ else {threshold=(g_ship_lock_threshold_normal*5+2)/6;duration=(g_ship_lock_duration_normal*5+2)/6;}
  if (*(int *)(state+0x1c)>threshold) {
  float fraction=IntToFloat(*(int *)(state+0x1c)-threshold)/IntToFloat(duration);
  float fade=(1.0f-fraction)*2.0f;

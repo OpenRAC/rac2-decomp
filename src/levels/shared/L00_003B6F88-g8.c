@@ -1,7 +1,7 @@
 #include "names.h"
 typedef unsigned int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float v[4]; } Vector;
-extern float D_L00_001AFAE0 __attribute__((sda));
+extern float g_pair_game_collision_radius __attribute__((sda));
 extern void FastVecSub(void *,void *,void *);
 extern float FastVecLength(void *),FastVecDot(void *,void *);
 extern void FastVecScale(void *,void *,float),vec_fast_normalize(void *,void *,void *);
@@ -25,7 +25,7 @@ void pair_game_resolve_collisions(unsigned char *object)
     int i;
     if(context->phase==0) {
         FastVecSub(&difference,&context->positions[0],&context->positions[1]);
-        if(FastVecLength(&difference)<D_L00_001AFAE0+D_L00_001AFAE0) {
+        if(FastVecLength(&difference)<g_pair_game_collision_radius+g_pair_game_collision_radius) {
             FastVecScale(&opposite,&difference,-1.0f);
             if(FastVecDot(&difference,&context->velocities[1])>0.0f)
                 vec_fast_normalize(&context->velocities[1],&context->velocities[1],&opposite);
@@ -37,7 +37,7 @@ void pair_game_resolve_collisions(unsigned char *object)
         pair_game_wrap_coordinates(&context->positions[i].v[1],&context->positions[i].v[2]);
         if(*(unsigned short *)(context->actors[i]+0x34)&1) continue;
         if(context->positions[i].v[1]*context->positions[i].v[1]+
-            context->positions[i].v[2]*context->positions[i].v[2]<D_L00_001AFAE0 ||
+            context->positions[i].v[2]*context->positions[i].v[2]<g_pair_game_collision_radius ||
             part_find_owned_effect_slot(context->actors[i],0x10000,0)) {
             context->phase=i+1;
             *(unsigned short *)(context->actors[i]+0x34)|=1;

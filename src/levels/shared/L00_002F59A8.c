@@ -4,18 +4,18 @@
 
 
 extern int subtitle_request_voice_line(int, int);
-extern s16 D_L00_001B1B88[] MACRO_ADDR;
-extern s16 D_L00_001B1B98[];
-extern u8 D_L00_001B1BA6 __attribute__((section(".sdata")));
-extern u8 D_L00_001B1BA7 __attribute__((section(".sdata")));
+extern s16 g_voice_line_ids[] MACRO_ADDR;
+extern s16 g_voice_line_subtitle_ids[];
+extern u8 g_voice_line_delay_timer __attribute__((section(".sdata")));
+extern u8 g_voice_line_cursor __attribute__((section(".sdata")));
 
 void level_advance_checked_cursor(void)
 {
-    if (D_L00_001B1BA6 == 0)
+    if (g_voice_line_delay_timer == 0)
         return;
-    if (subtitle_request_voice_line(D_L00_001B1B88[D_L00_001B1BA7],
-                    D_L00_001B1B98[D_L00_001B1BA7]) == 0)
+    if (subtitle_request_voice_line(g_voice_line_ids[g_voice_line_cursor],
+                    g_voice_line_subtitle_ids[g_voice_line_cursor]) == 0)
         return;
-    D_L00_001B1BA7 = (D_L00_001B1BA7 + 1) % 7;
-    D_L00_001B1BA6 = D_L00_001B1BA6 - 1;
+    g_voice_line_cursor = (g_voice_line_cursor + 1) % 7;
+    g_voice_line_delay_timer = g_voice_line_delay_timer - 1;
 }

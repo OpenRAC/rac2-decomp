@@ -30,7 +30,7 @@ struct eh_context
   void *table_index;
 };
 
-extern char *(*D_00135D38)(void);
+extern char *(*g_eh_context_getter)(void);
 
 extern void call_terminate_handler(void);
 extern void *memcpy(void *, const void *, unsigned int);
@@ -49,7 +49,7 @@ extern void *eh_throw_helper(struct eh_context *, void *, frame_state *,
 /* Throws an exception: finds the handler up the call stack and jumps to it. */
 void __throw(void)
 {
-  struct eh_context *eh = (struct eh_context *)(*D_00135D38) ();
+  struct eh_context *eh = (struct eh_context *)(*g_eh_context_getter) ();
   void *pc, *handler;
   frame_state ustruct;
   frame_state *udata = &ustruct;

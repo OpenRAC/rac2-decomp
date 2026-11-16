@@ -17,7 +17,7 @@ extern void moby_update_empty_alt(void);
 extern void pulsing_light_draw_group_glows(u8 *arg0);
 extern s32 g_current_map_index[] __attribute__((sda));
 
-extern void func_PAL_L10_00423BE0(u8 *arg0);
+extern void pulsing_light_init_pal(u8 *arg0);
 void func_PAL_L10_00423AA0(u8 *arg0) {
     u8 *s1 = *(u8 **)(arg0 + 0x68);
     f32 f;
@@ -28,7 +28,7 @@ void func_PAL_L10_00423AA0(u8 *arg0) {
     case 0:
         arg0[0x30] = 0xFF;
         if (func_0037B670() != 0) {
-            func_PAL_L10_00423BE0(arg0);
+            pulsing_light_init_pal(arg0);
             if (*(s32 *)(s1 + 0x264) != 0) {
                 func_0037BC48(arg0, (s32)moby_update_empty_alt, (s32)pulsing_light_draw_group_glows, 0);
             }

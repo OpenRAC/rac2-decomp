@@ -22,10 +22,10 @@ typedef struct {
 extern PlayerView g_hero_state;
 typedef struct { char pad[0x74]; unsigned char active; char pad75[0x13]; void *owner; char pad8c[0x70-0x8c+0x70]; } SoundSlot;
 extern struct { char pad[0x70]; } g_sound_state[];
-extern unsigned char D_0019B2E8[], D_0019B4A8[];
+extern unsigned char g_moby_group_flags[], g_moby_nibble_table[];
 extern int g_current_map_index __attribute__((sda));
 typedef struct { char pad[0x464]; unsigned char locked[1]; } Entry;
-extern Entry D_L01_0021E4B0;
+extern Entry g_level_save_state_backup;
 extern int hero_is_current_selected_id(void *);
 extern float math_fabs(float);
 extern void FastVecSub(void *, void *, void *);
@@ -81,13 +81,13 @@ void lift_platform_update(unsigned char *obj)
             lift->active = 1;
             w = W(obj);
             if (w & 1) {
-                p = &D_0019B4A8[((short)w >> 1) + (g_current_map_index << 10)];
+                p = &g_moby_nibble_table[((short)w >> 1) + (g_current_map_index << 10)];
                 u = *p;
                 if (((u >> 4) & 7) != 7) {
                     *p = u + 0x10;
                 }
             } else {
-                p = &D_0019B4A8[((short)w >> 1) + (g_current_map_index << 10)];
+                p = &g_moby_nibble_table[((short)w >> 1) + (g_current_map_index << 10)];
                 u = *p;
                 if ((u & 7) != 7) {
                     *p = u + 1;
@@ -106,10 +106,10 @@ void lift_platform_update(unsigned char *obj)
             }
         }
         if (math_fabs(Z(obj) - g_hero_state.position[2]) > 3.0f && lift->down == 0 && Z(obj) > g_hero_state.position[2]) {
-            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+            if (lift->active != 1 && !(g_moby_group_flags[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
                 w2 = W(obj);
-                if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v = D_0019B4A8[((short)w2 >> 1) + (g_current_map_index << 10)];
+                if (g_level_save_state_backup.locked[(short)w2] == 0) {
+                    v = g_moby_nibble_table[((short)w2 >> 1) + (g_current_map_index << 10)];
                     if (w2 & 1) {
                         if (((v >> 4) & 7) != 0) goto play;
                         goto second;
@@ -126,10 +126,10 @@ play:
         }
 second:
         if (math_fabs(Z(obj) - g_hero_state.position[2]) > 3.0f && lift->down == 1 && g_hero_state.position[2] > Z(obj)) {
-            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+            if (lift->active != 1 && !(g_moby_group_flags[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
                 w2 = W(obj);
-                if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v2 = D_0019B4A8[((short)w2 >> 1) + (g_current_map_index << 10)];
+                if (g_level_save_state_backup.locked[(short)w2] == 0) {
+                    v2 = g_moby_nibble_table[((short)w2 >> 1) + (g_current_map_index << 10)];
                     if (w2 & 1) {
                         if (((v2 >> 4) & 7) != 0) goto play2;
                         break;

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned char D_001A7A47;
+extern unsigned char g_smooth_value_flag;
 extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 extern void moby_detach_manipulator(char *, char *);
 
@@ -10,7 +10,7 @@ extern void moby_detach_manipulator(char *, char *);
 void part_update_attached_scale(unsigned char *object, unsigned int index,
                        unsigned char *node, float value)
 {
-    if (D_001A7A47 != 0) {
+    if (g_smooth_value_flag != 0) {
         if (node[1] == 0)
             AttachManipulator(object, index, node);
         *(float *)(node + 0x20) = value;

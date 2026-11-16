@@ -3,11 +3,11 @@
 /* Buffered tty write: bytes are staged in a 128-byte buffer and written
    through func_0011B1E8 (the Deci2 tty write) whenever it fills, or at once
    when FLUSH is 1. */
-extern char D_0013C180[];
+extern char g_tty_write_buffer_b[];
 
-extern int D_00134670;
+extern int g_stderr_buffer_len;
 
-extern char *D_00134674;
+extern char *g_stderr_buffer_cursor;
 
 extern int tty_write_via_deci2(int fd, char *buf, int len);
 
@@ -17,19 +17,19 @@ int BufferedWrite128Secondary(int fd, char *src, unsigned int len, int flush) {
     int r;
 
     if (flush == 1) {
-        r = tty_write_via_deci2(fd, D_0013C180, D_00134670);
-        D_00134670 = 0;
-        D_00134674 = D_0013C180;
+        r = tty_write_via_deci2(fd, g_tty_write_buffer_b, g_stderr_buffer_len);
+        g_stderr_buffer_len = 0;
+        g_stderr_buffer_cursor = g_tty_write_buffer_b;
         return r;
     }
     for (i = 0; i < len; i++) {
-        *D_00134674 = src[i];
-        D_00134674++;
-        D_00134670++;
-        if (D_00134670 >= 0x80) {
-            r = tty_write_via_deci2(fd, D_0013C180, D_00134670);
-            D_00134674 = D_0013C180;
-            D_00134670 = 0;
+        *g_stderr_buffer_cursor = src[i];
+        g_stderr_buffer_cursor++;
+        g_stderr_buffer_len++;
+        if (g_stderr_buffer_len >= 0x80) {
+            r = tty_write_via_deci2(fd, g_tty_write_buffer_b, g_stderr_buffer_len);
+            g_stderr_buffer_cursor = g_tty_write_buffer_b;
+            g_stderr_buffer_len = 0;
             if (r == 0)
                 return 0;
         }

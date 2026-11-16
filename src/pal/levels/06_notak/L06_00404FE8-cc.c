@@ -29,7 +29,7 @@ extern char *func_PAL_002C23B8(void *, void *, int, int, int, int, float, float,
 typedef struct { char pad[0x140]; Vec position; char gap[0x10]; float scale; int unused; int duration, timer; char gap2[0x10]; float speed; int unused2, limit; } Effect;
 extern Effect g_camera_state;
 
-extern unsigned char *D_L06_001FF41C;
+extern unsigned char *g_particle_l06_byte_ptr;
 typedef struct { int timer; float speed, height; int handle; Vec velocity; } UpdateState;
 void func_PAL_L06_00404FE8(char *obj) {
     struct { Vec pos, direction, random; } frame;
@@ -110,7 +110,7 @@ void func_PAL_L06_00404FE8(char *obj) {
     FastVecAdd(&frame.pos,&frame.pos,position);
     particle=func_PAL_002C23B8(&frame.pos,&frame.direction,17,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
     if (particle) {
-        particle[2]=*D_L06_001FF41C;
+        particle[2]=*g_particle_l06_byte_ptr;
         particle[3]=0x44;
         if (math_random_int_range(0,1)) {
             particle[3]=0x48;

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void *D_L00_00232A60[24];
+extern void *g_sheep_board_tiles[24];
 
 extern void moby_mark_spawned(void *arg);
 
@@ -18,7 +18,7 @@ void sheep_board_destroy_objects(char *owner)
             moby_mark_spawned((void *)object);
         }
     } while (remaining >= 0);
-    slot = D_L00_00232A60;
+    slot = g_sheep_board_tiles;
     remaining = 23;
     do {
         int object = (int)*slot;

@@ -3,7 +3,7 @@
 #include "common.h"
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int,
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int,
                                int, int, int);
 extern void moby_compute_local_point(char *, float *, float, float, float);
 extern float FastAddRotations(float, float);
@@ -15,16 +15,16 @@ extern void func_PAL_L06_00401D78(char *);
 extern int coll_point_inside_region(void *, int);
 extern int math_fast_float_d(void *);
 extern int math_random_int_below(int);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void euler_rotation_basis(void *, void *);
-extern void func_PAL_L01_002E2968(float *, float *, int, int, int, float, float, float);
-extern int D_L06_001B2838 __attribute__((sda));
+extern void part_l01_spawn_spark_burst_pal(float *, float *, int, int, int, float, float, float);
+extern int g_moby_l06_group_count __attribute__((sda));
 extern char *D_L06_001B281C_abs[3] __attribute__((sda));
-extern unsigned short *D_L06_001FB3A0[];
-extern char D_L06_001B9840[];
-extern int D_L06_001AFC80 __attribute__((sda));
-extern int D_L06_001AFC70 __attribute__((sda));
-extern int D_L06_001AFC68 __attribute__((sda));
+extern unsigned short *g_group_l06_id_lists[];
+extern char g_hero_l06_position[];
+extern int g_switch_explode_param_a __attribute__((sda));
+extern int g_switch_explode_param_b __attribute__((sda));
+extern int g_switch_explode_param_c __attribute__((sda));
 typedef int TI128 __attribute__((mode(TI)));
 #define GROUP (*(unsigned char *)(s1 + 0x21))
 #define FOR_EACH_ID(p) \
@@ -58,7 +58,7 @@ c0:
     func_PAL_L06_00401AA0(*(unsigned char *)(s1 + 0x21));
     goto done;
 c1:
-    if (*(int *)(s2 + 0x64) != -1 && coll_point_inside_region(D_L06_001B9840, *(int *)(s2 + 0x64)) != 0) {
+    if (*(int *)(s2 + 0x64) != -1 && coll_point_inside_region(g_hero_l06_position, *(int *)(s2 + 0x64)) != 0) {
         FOR_EACH_ID(p) {
             e = D_L06_001B281C_abs[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
@@ -85,10 +85,10 @@ c1:
     }
     if (part_find_owned_effect_slot(s1, 0x4010000, 0)) {
         cls = *(short *)(s1 + 0xAA) == 0x86B ? 2 : 3;
-        func_PAL_L00_0032C328(s1, &D_L06_001AFC80, &D_L06_001AFC70, &D_L06_001AFC68, 0xFFFF, 1, cls, 0, 0xFFFF,
+        part_explode_object_into_pieces_pal(s1, &g_switch_explode_param_a, &g_switch_explode_param_b, &g_switch_explode_param_c, 0xFFFF, 1, cls, 0, 0xFFFF,
                           0xFF, 0);
         *(short *)(s1 + 0x7C) = (1 << cls) - 0x8000;
-        func_PAL_L00_003FB330(s1 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x14, 1, 1.0f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion_pal(s1 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x14, 1, 1.0f, 20.0f, 1, 0, 0, 0);
         moby_set_state(s1, 2, -1);
         *(int *)(s2 + 0x38) = 0;
         *(int *)(s2 + 0x14) = 0;
@@ -100,7 +100,7 @@ c1:
     euler_rotation_basis(s1 + 0xC0, s1 + 0xF0);
     goto done;
 c4:
-    if (coll_point_inside_region(D_L06_001B9840, *(int *)(s2 + 0x64)) == 0) {
+    if (coll_point_inside_region(g_hero_l06_position, *(int *)(s2 + 0x64)) == 0) {
         FOR_EACH_ID(p4) {
             q = D_L06_001B281C_abs[0] + ((*p4 & 0x7FFF) << 8);
             if (q == 0)
@@ -119,7 +119,7 @@ c2:
         *(TI128 *)vec = 0;
         vec[2] = 0.10000001f;
         moby_compute_local_point(s1, buf, -1.5f, 0.0f, 1.0f);
-        func_PAL_L01_002E2968(buf, vec, 1, 0x40F0E0D0, 0, 0.050000004f, 2.0f, 1.02f);
+        part_l01_spawn_spark_burst_pal(buf, vec, 1, 0x40F0E0D0, 0, 0.050000004f, 2.0f, 1.02f);
     }
     if (math_fast_float_d(s2 + 0x58)) {
         *(unsigned char *)(s1 + 0x31) = 0;

@@ -38,13 +38,13 @@ extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
 extern long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
-extern char D_L13_001B98C0[];
-extern int D_L13_001B163C __attribute__((sda));
-extern int D_L13_001B1640 __attribute__((sda));
-extern int D_L13_001B1644 __attribute__((sda));
-extern int D_L13_001B1648 __attribute__((sda));
-extern int D_L13_001B164C __attribute__((sda));
-extern float D_L13_001B1660[4][2] SDATA(D_L13_001B1660);
+extern char g_camera_l13_position[];
+extern int g_electric_beam_texture __attribute__((sda));
+extern int g_electric_beam_tex_flags_a __attribute__((sda));
+extern int g_electric_beam_tex_flags_b __attribute__((sda));
+extern int g_electric_beam_tex_flags_c __attribute__((sda));
+extern int g_electric_beam_tex_flags_d __attribute__((sda));
+extern float g_electric_beam_uv_table[4][2] SDATA(D_L13_001B1660);
 
 /* Draws the electric beam as a few glowing strips running through its points. */
 void gfx_draw_electric_beam(char *m) {
@@ -70,20 +70,20 @@ void gfx_draw_electric_beam(char *m) {
     euler_to_matrix(M1, (char *)d + 0x650);
     matrix_from_basis_rows(M2, M1);
     qcopy_nc(&M1[12], m + 0x10);
-    FastVecSub(v230, D_L13_001B98C0, m + 0x10);
+    FastVecSub(v230, g_camera_l13_position, m + 0x10);
     matrix_mul_vec3(v230, v230, M2);
-    tex = GetEffectTextureDescriptor(D_L13_001B163C);
-    flags = (long)D_L13_001B1640;
-    flags |= (long)D_L13_001B1644 << 2;
-    flags |= (long)D_L13_001B1648 << 4;
-    flags |= (long)D_L13_001B164C << 6;
+    tex = GetEffectTextureDescriptor(g_electric_beam_texture);
+    flags = (long)g_electric_beam_tex_flags_a;
+    flags |= (long)g_electric_beam_tex_flags_b << 2;
+    flags |= (long)g_electric_beam_tex_flags_c << 4;
+    flags |= (long)g_electric_beam_tex_flags_d << 6;
     flags |= 0x8000L << 24;
     P[0].state = P[1].state = P[2].state = 0xFF9000000260L;
     P[0].tex = P[1].tex = P[2].tex = tex;
     P[0].zero = P[1].zero = P[2].zero = 0;
     P[0].flags = P[1].flags = P[2].flags = flags;
     for (t = 0; t < corners; t++) {
-        float v = D_L13_001B1660[t][1];
+        float v = g_electric_beam_uv_table[t][1];
         int col;
         P[2].uv[t][1] = v;
         P[1].uv[t][1] = v;
@@ -131,7 +131,7 @@ void gfx_draw_electric_beam(char *m) {
                     else
                         FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                 }
-                P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(i - i / 4 * 4) * 0.25f;
+                P[0].uv[k][0] = g_electric_beam_uv_table[k][0] + IntToFloat(i - i / 4 * 4) * 0.25f;
             }
             draw_world_quad(&P[0], M1, mode);
         }
@@ -183,7 +183,7 @@ void gfx_draw_electric_beam(char *m) {
                         else
                             FastVecSub(P[0].corner[k], P[0].corner[k], v250);
                     }
-                    P[0].uv[k][0] = D_L13_001B1660[k][0] + IntToFloat(n - n / 4 * 4) * 0.25f;
+                    P[0].uv[k][0] = g_electric_beam_uv_table[k][0] + IntToFloat(n - n / 4 * 4) * 0.25f;
                 }
                 draw_world_quad(&P[0], M1, mode2);
             }

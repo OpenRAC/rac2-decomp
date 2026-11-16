@@ -18,7 +18,7 @@ typedef struct {
 extern Particle *part_alloc(int);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F25F0;
+extern unsigned char *g_part_tex_burst;
 
 /* Another func_002C2210-style effect record (kind 0x2C): the colour split into its bytes in
    the payload, a byte count from `count` and the remaining sizes as given. */
@@ -37,7 +37,7 @@ Particle *func_PAL_002C23B8(Quad *position, float *vector, int size, int alpha, 
         p->b1 = 0;
         p->b3 = 0x48;
         p->seed = math_random_int_below(255);
-        p->b2 = *D_001F25F0;
+        p->b2 = *g_part_tex_burst;
         p->size = size;
         ((float *)out)[0] = vector[0];
         ((float *)out)[1] = vector[1];

@@ -10,12 +10,12 @@ typedef struct {
     s16 index;
 } Entry_29DB28;
 
-extern Entry_29DB28 *D_001B1A58[] __attribute__((sda));
+extern Entry_29DB28 *g_menu_active_entries[] __attribute__((sda));
 
 /* List the live entries: their ids (or display names), a mask of the kind-2 ones and their values. */
 int menu_list_active_entries(int *ids, unsigned int *mask, int *values, int names)
 {
-    Entry_29DB28 *e = D_001B1A58[0];
+    Entry_29DB28 *e = g_menu_active_entries[0];
     int n = 0;
     int all = 1;
     *ids = 0;

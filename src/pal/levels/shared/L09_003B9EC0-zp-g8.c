@@ -9,13 +9,13 @@ extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern u8 *moby_l00_spawn_child(void *, int, int);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_PAL_L00_00328480(void *, void *, int, int, void *, unsigned int, void *, float, float, float, float);
 extern void moby_mark_spawned(void *);
-extern float D_L09_001AF9E0[] SDATA(D_L09_001AF9E0);
-extern float D_L09_001AF9D8[] SDATA(D_L09_001AF9D8);
-extern float D_L09_001AF9D0[] SDATA(D_L09_001AF9D0);
+extern float g_death_piece_params_a[] SDATA(D_L09_001AF9E0);
+extern float g_death_piece_params_b[] SDATA(D_L09_001AF9D8);
+extern float g_death_piece_params_c[] SDATA(D_L09_001AF9D0);
 
 /* Death of a three-state object: it picks its animation, waits for the hit, then spawns the
    closing effects and retires itself. */
@@ -41,9 +41,9 @@ void func_PAL_L09_003B9EC0(u8 *self)
     case 2:
         effect = moby_l00_spawn_child(self, 0x12A1, 0);
         if (effect)
-            func_PAL_L00_0032C328(effect, D_L09_001AF9E0, D_L09_001AF9D8, D_L09_001AF9D0, 0xFFFF, 0,
+            part_explode_object_into_pieces_pal(effect, g_death_piece_params_a, g_death_piece_params_b, g_death_piece_params_c, 0xFFFF, 0,
                               -1, 0x16, 0xFFFF, 0xFF, 0);
-        func_PAL_L00_003FB330(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        SpawnExplosion_pal(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         v.bits = 0;
         v.value[2] = 0.24000001f;
         func_PAL_L00_00328480(self, self + 0x10, 0x14, 0, &v, 0x80804040, 0, 6.0f, 3.0f, 1.5f, 7.0f);

@@ -4,7 +4,7 @@ typedef unsigned char u8;
 typedef short s16;
 extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
-extern char D_L03_00266DA0[];
+extern char g_item_l03_record_table[];
 extern int hero_slot_item_id(int);
 typedef struct {
     u8 pad[0x28];
@@ -21,7 +21,7 @@ int hero_get_gadget_value(char *object)
         return 0;
     if (object != 0 && *(u8 *)(hero + 0x22BA) != 0 && *(s16 *)(hero + 0x24EC) == 0) {
         int idx = hero_slot_item_id(0);
-        return ((WeaponEntry *)(D_L03_00266DA0 + g_item_slot_to_record[idx] * 224))->v;
+        return ((WeaponEntry *)(g_item_l03_record_table + g_item_slot_to_record[idx] * 224))->v;
     }
     {
         char *heroBlock = g_hero_state;

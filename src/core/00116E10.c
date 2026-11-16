@@ -29,10 +29,10 @@ extern int malloc_lock_acquire(struct _reent *);
 extern void malloc_lock_release(struct _reent *);
 extern int malloc_trim_reentrant(struct _reent *, u32);
 
-extern u64 D_001345F0;
-extern u64 D_001345F8;
+extern u64 g_malloc_trim_threshold;
+extern u64 g_malloc_top_pad;
 
-extern u32 D_001341E8[];
+extern u32 g_malloc_arena[];
 
 #define SIZE_SZ                (sizeof(INTERNAL_SIZE_T))
 #define MALLOC_ALIGNMENT       16

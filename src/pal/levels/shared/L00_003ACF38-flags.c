@@ -5,7 +5,7 @@ typedef int s32;
 typedef float f32;
 extern s32 coll_process_hit(f32, s32, s32, s32, s32);
 extern void vec_scale_to_length(void *, void *, float);
-extern int func_PAL_0032F0B8(int, int, int);
+extern int StartAttachedEffect_pal(int, int, int);
 extern int g_hero_moby;
 extern unsigned char g_item_slot_to_record[];
 extern unsigned char g_weapon_l00_table[];
@@ -26,7 +26,7 @@ typedef struct {
     unsigned char flag;
 } Entry262570;
 
-void func_PAL_L00_003ACF38(char *a0, char *a1, char *a2)
+void projectile_damage_nearby_on_hit_pal(char *a0, char *a1, char *a2)
 {
     Trail_3A9798 s;
     int count;
@@ -47,10 +47,10 @@ void func_PAL_L00_003ACF38(char *a0, char *a1, char *a2)
     if (((Entry262570 *)(g_weapon_l00_table + g_item_slot_to_record[0x19] * 224))->flag != 0) {
         p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            func_PAL_0032F0B8(g_area_hit_targets[i], 0x46, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x46, *(int *)(a0 + 0xB8));
     } else {
         p = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            func_PAL_0032F0B8(g_area_hit_targets[i], 0x19, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x19, *(int *)(a0 + 0xB8));
     }
 }

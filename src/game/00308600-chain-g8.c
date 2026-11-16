@@ -14,20 +14,20 @@ typedef struct { char pad[0x10]; float height; } ThingInfo;
 typedef struct { char pad[0x68]; BeamState *vars; } Actor;
 
 extern int g_current_map_index;
-extern int D_L00_001A8F00;
-extern BeamState D_L00_001C5890[], D_L00_001C58E0[];
+extern int g_game_l00_mode;
+extern BeamState g_beam_state_primary[], g_beam_state_secondary[];
 typedef union { u8 b[0x2600]; s32 i[0x980]; void *ptr[0x980]; } Hero;
 extern char g_hero_state[];
-extern float D_L00_001AF2E4 __attribute__((sda));
-extern float D_L00_001AF2F0 __attribute__((sda)), D_L00_001AF2F4 __attribute__((sda)), D_L00_001AF2F8 __attribute__((sda));
-extern float D_L00_001AF2FC __attribute__((sda)), D_L00_001AF300 __attribute__((sda)), D_L00_001AF304 __attribute__((sda));
-extern float D_L00_001AF308 __attribute__((sda)), D_L00_001AF30C __attribute__((sda)), D_L00_001AF310 __attribute__((sda));
-extern float D_L00_001AF314 __attribute__((sda)), D_L00_001AF318 __attribute__((sda)), D_L00_001AF31C __attribute__((sda));
-extern float D_L00_001AF320 __attribute__((sda)), D_L00_001AF334 __attribute__((sda)), D_L00_001AF338 __attribute__((sda));
-extern float D_L00_001AF384 __attribute__((sda));
-extern Vector D_L00_0023A210[2][20], D_L00_0023A340[], D_L00_0023A4E0[];
-extern float D_L00_0023A490[], D_L00_0023A620[];
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern float g_chain_beam_length_scale __attribute__((sda));
+extern float g_chain_wave_phase_step __attribute__((sda)), g_chain_amp_start __attribute__((sda)), g_chain_amp_end __attribute__((sda));
+extern float g_chain_wave_phase __attribute__((sda)), g_chain_wave_phase_speed __attribute__((sda)), g_chain_swirl_phase __attribute__((sda));
+extern float g_chain_swirl_phase_speed __attribute__((sda)), g_chain_swirl_phase_step __attribute__((sda)), g_chain_wave2_amp __attribute__((sda));
+extern float g_chain_radial_scale __attribute__((sda)), g_chain_wave2_phase __attribute__((sda)), g_chain_wave2_phase_speed __attribute__((sda));
+extern float g_chain_wave2_phase_step __attribute__((sda)), g_chain_jitter_min __attribute__((sda)), g_chain_jitter_max __attribute__((sda));
+extern float g_chain_tip_scale __attribute__((sda));
+extern Vector g_chain_beam_points[2][20], g_chain_beam_end[], g_chain_beam_deltas[];
+extern float g_chain_wave_offsets[], g_chain_wave_values[];
+extern char g_default_vector[] MACRO_ADDR;
 
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -77,14 +77,14 @@ void beam_update_chain_points(Actor *actor)
     ThingInfo *info;
     float segments_left;
 
-    if (g_current_map_index == 1 && D_L00_001A8F00 == 2)
-        beam = D_L00_001C5890;
-    if (g_current_map_index == 0x14 && D_L00_001A8F00 == 2)
-        beam = D_L00_001C58E0;
-    len = D_L00_001AF2E4 * 0.05f;
-    D_L00_001AF2FC = FastAddRotations(D_L00_001AF2FC, D_L00_001AF300);
-    D_L00_001AF304 = fast_subtract_rotations(D_L00_001AF304, D_L00_001AF308);
-    D_L00_001AF318 = FastAddRotations(D_L00_001AF318, D_L00_001AF31C);
+    if (g_current_map_index == 1 && g_game_l00_mode == 2)
+        beam = g_beam_state_primary;
+    if (g_current_map_index == 0x14 && g_game_l00_mode == 2)
+        beam = g_beam_state_secondary;
+    len = g_chain_beam_length_scale * 0.05f;
+    g_chain_wave_phase = FastAddRotations(g_chain_wave_phase, g_chain_wave_phase_speed);
+    g_chain_swirl_phase = fast_subtract_rotations(g_chain_swirl_phase, g_chain_swirl_phase_speed);
+    g_chain_wave2_phase = FastAddRotations(g_chain_wave2_phase, g_chain_wave2_phase_speed);
     hero_target = 0;
     if (beam->target == 0)
         hero_target = ((Hero *)g_hero_state)->ptr[0x5C0 / 4];
@@ -95,7 +95,7 @@ void beam_update_chain_points(Actor *actor)
     target = beam->target;
     if (target != 0) {
         info = 0;
-        if (D_L00_001A8F00 != 2)
+        if (g_game_l00_mode != 2)
             info = moby_get_private_value_0(target);
         qcopy(&goal, &((Thing *)beam->target)->pos);
         if (info != 0)
@@ -112,35 +112,35 @@ void beam_update_chain_points(Actor *actor)
         math_apply_axis_rotation_to_quat(&dir, &dir, &side, 0.17453295f);
     }
     FastVecScale(&last, &dir, len);
-    qcopy(D_L00_0023A210[0], beam);
-    qcopy(D_L00_0023A210[1], beam);
+    qcopy(g_chain_beam_points[0], beam);
+    qcopy(g_chain_beam_points[1], beam);
     i = 1;
     do {
         float fi = i;
         byte_offset = i * 4;
         weight = IntToFloat(i) * 0.05f;
-        wave = D_L00_001AF2F4 + (D_L00_001AF2F8 - D_L00_001AF2F4) * weight;
-        wave = wave * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L00_001AF2FC + fi * D_L00_001AF2F0));
-        wave = wave + math_random_signed_float_range(D_L00_001AF334, D_L00_001AF338);
-        wave_offset = (float *)(byte_offset + (char *)D_L00_0023A490);
+        wave = g_chain_amp_start + (g_chain_amp_end - g_chain_amp_start) * weight;
+        wave = wave * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(g_chain_wave_phase + fi * g_chain_wave_phase_step));
+        wave = wave + math_random_signed_float_range(g_chain_jitter_min, g_chain_jitter_max);
+        wave_offset = (float *)(byte_offset + (char *)g_chain_wave_offsets);
         previous_wave = *wave_offset;
         *wave_offset = wave;
-        D_L00_0023A210[0][i].f[2] -= previous_wave;
-        FastVecSub(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
+        g_chain_beam_points[0][i].f[2] -= previous_wave;
+        FastVecSub(&side, &g_chain_beam_points[0][i], &g_chain_beam_points[0][i - 1]);
         lerp_vector(&step, &side, &last, 0.85f);
         zero = 0.0f;
         step_length = FastVecLength(&step);
         if (step_length == zero) {
-            qcopy(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
+            qcopy(&g_chain_beam_points[0][i], &g_chain_beam_points[0][i - 1]);
         } else {
             FastVecScale(&step, &step, len / step_length);
-            FastVecAdd(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1], &step);
+            FastVecAdd(&g_chain_beam_points[0][i], &g_chain_beam_points[0][i - 1], &step);
             qcopy(&last, &step);
         }
-        D_L00_0023A210[0][i].f[2] += wave;
-        FastVecSub(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
+        g_chain_beam_points[0][i].f[2] += wave;
+        FastVecSub(&side, &g_chain_beam_points[0][i], &g_chain_beam_points[0][i - 1]);
         if (beam->target != 0) {
-            FastVecSub(&tip, &goal, &D_L00_0023A210[0][i]);
+            FastVecSub(&tip, &goal, &g_chain_beam_points[0][i]);
             dist = FastVecLength(&tip);
             if (dist != zero) {
                 if (i == 0x13) {
@@ -159,28 +159,28 @@ void beam_update_chain_points(Actor *actor)
                 lerp_vector(last_ptr, last_ptr, &tip, sway);
             }
         }
-        angle = math_wrap_angle_to_pi(D_L00_001AF304 + (float)i * D_L00_001AF30C);
-        wave = D_L00_001AF310 * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L00_001AF318 + (float)i * D_L00_001AF320));
-        qcopy(&D_L00_0023A210[1][i], &D_L00_0023A210[0][i]);
+        angle = math_wrap_angle_to_pi(g_chain_swirl_phase + (float)i * g_chain_swirl_phase_step);
+        wave = g_chain_wave2_amp * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(g_chain_wave2_phase + (float)i * g_chain_wave2_phase_step));
+        qcopy(&g_chain_beam_points[1][i], &g_chain_beam_points[0][i]);
         wave = wave * math_fast_sin_or_cos_b(angle);
-        D_L00_0023A620[i] = wave;
-        D_L00_0023A210[1][i].f[2] += wave;
+        g_chain_wave_values[i] = wave;
+        g_chain_beam_points[1][i].f[2] += wave;
         wave = FastAddRotations(mat_fast_helper_a(side.f[0], side.f[1]), 1.5707965f);
         {
-            float r2 = D_L00_001AF314 * math_fast_sin_or_cos_a(angle);
+            float r2 = g_chain_radial_scale * math_fast_sin_or_cos_a(angle);
             delta.f[0] = math_fast_sin_or_cos_a(wave) * r2;
             delta.f[1] = math_fast_sin_or_cos_b(wave) * r2;
         }
         delta.f[2] = 0.0f;
-        qcopy(&D_L00_0023A4E0[i], &delta);
-        FastVecAdd(&D_L00_0023A210[1][i], &D_L00_0023A210[1][i], &delta);
+        qcopy(&g_chain_beam_deltas[i], &delta);
+        FastVecAdd(&g_chain_beam_points[1][i], &g_chain_beam_points[1][i], &delta);
         i++;
     } while (i < 0x14);
-    qcopy(&beam->end, D_L00_0023A340);
+    qcopy(&beam->end, g_chain_beam_end);
     {
         float pitch = math_random_signed_float_range(0.52359885f, 1.0471977f);
         float yaw = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(&tip, &dir, D_L00_001AF384);
+        FastVecScale(&tip, &dir, g_chain_tip_scale);
         math_apply_axis_rotation_to_quat(&tip, &tip, g_hero_state + 0x740, yaw);
         math_apply_axis_rotation_to_quat(&tip, &tip, g_hero_state + 0x750, pitch);
     }
@@ -194,5 +194,5 @@ void beam_update_chain_points(Actor *actor)
     if (math_random_int_below(2))
         spin = -spin;
     wave = math_random_float_range(0.15f, 3.0f);
-    part_spawn_ground_effect(&beam->end, 0xC, wave * 0.1f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, D_L00_001A8F20, 0, 0.0f);
+    part_spawn_ground_effect(&beam->end, 0xC, wave * 0.1f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, g_default_vector, 0, 0.0f);
 }

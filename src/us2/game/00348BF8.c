@@ -4,7 +4,7 @@
 extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
 extern void func_US2_003377B0(void *, void *, void *);
-extern char D_001AE5A8[];
+extern char g_list_menu_attach_widget_defaults[];
 
 /* func_US2_00348BF8, the USA v2.00 copy of func_00347EC8: the same C, where the fields move 0x10 on
    and the new field at 0x54 is cleared too. */
@@ -19,7 +19,7 @@ void func_US2_00348BF8(char *object, void *data)
         *(int **)(object + 0x5C) = position;
         position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
     }
-    func_US2_003377B0(object, D_001AE5A8, data);
+    func_US2_003377B0(object, g_list_menu_attach_widget_defaults, data);
     *(int *)(object + 0xAC) = 0x70FFFEED;
     *(int *)(object + 0xB0) = 0x80F0F0F0;
     *(int *)(object + 0xB4) = 0x80808080;
@@ -37,7 +37,7 @@ typedef unsigned char u8;
 typedef float f32;
 extern void menu_set_entry_table(unsigned char *owner, float *records);
 extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
-extern u8 D_001A7A80[] __attribute__((section(".sdata")));
+extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 
 /* func_00347F80 is built from 00345358-wrap.c. */
 

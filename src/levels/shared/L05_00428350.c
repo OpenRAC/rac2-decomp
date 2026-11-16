@@ -10,7 +10,7 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern Vector D_0018A0E0;
+extern Vector g_hero_state_block;
 extern Vector ref_L05_0042F4E8_01[4];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -42,7 +42,7 @@ extern void func_00282CF0_9(char *local, char *first, char *second);
 
 extern void func_00282CC0_14(char *target, char *first, char *local);
 
-extern char *D_L05_001B9710;
+extern char *g_hero_l05_moby;
 
 extern int FastDecTimer(void *);
 
@@ -95,21 +95,21 @@ extern void func_2DCB60(int, int);
 
 extern void func_2EB6E8(void);
 
-extern int D_00221D94;
+extern int g_ship_encounter_flag;
 
 extern int g_current_map_index;
 
-extern char *D_001B1EC4;
+extern char *g_ship_encounter_table;
 
-extern char *D_001B251C;
+extern char *g_moby_pool_base;
 
 extern char g_hero_state[];
 
-extern char D_0019B2E8[];
+extern char g_moby_group_flags[];
 
-extern char D_001B3620[];
+extern char g_unused_byte_buffer[];
 
-extern char D_001BFB30[];
+extern char g_unused_data_block[];
 
 #ifndef RAC2_T_TI128_15C4FA
 #define RAC2_T_TI128_15C4FA
@@ -193,7 +193,7 @@ void gfx_l05_draw_jittered_billboard_quad(Vector *position, float size, float of
     qcopy(&frame.position, position);
     FastVecSub((char *)&frame.row[0], (char *)(ref_L05_0042F4E8_00 + 0x140), (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
@@ -346,7 +346,7 @@ void gfx_convert_float_pair_bias_coords(char *a0, int *a1, int *a2, int a3)
    the pointer at +0x70, offset +0xD8, is non-zero. */
 int hero_is_state_flag_set(void)
 {
-    char *base = D_L05_001B9710;
+    char *base = g_hero_l05_moby;
 
     if (*(short *)(base + 0x86) != 0x19)
         return 0;
@@ -356,9 +356,9 @@ int hero_is_state_flag_set(void)
 typedef struct { char pad[0x1C]; char *entry; } ModelSlot_4459B0;
 typedef struct { char data[256]; } ModelRecord_4459B0;
 typedef struct { char data[128]; } InstanceRecord_4459B0;
-extern ModelSlot_4459B0 *D_L05_001B1EC4 MACRO_ADDR;
-extern ModelRecord_4459B0 *D_L05_001B251C MACRO_ADDR;
-extern InstanceRecord_4459B0 *D_L05_001B260C MACRO_ADDR;
+extern ModelSlot_4459B0 *g_path_l05_entry_table MACRO_ADDR;
+extern ModelRecord_4459B0 *g_feltzin_target_mobys MACRO_ADDR;
+extern InstanceRecord_4459B0 *g_linked_point_table MACRO_ADDR;
 extern int IsPointInCuboid(void *, int);
 extern float FastVecDot(char *, char *);
 /* Tells whether the object is close enough to any of its twelve linked points to count as touching one. */
@@ -371,15 +371,15 @@ int path_is_touching_linked_point(void *arg)
     int count;
     float best = 0.0f;
 
-    entry = D_L05_001B1EC4[*(short *)(self + 0x84)].entry;
+    entry = g_path_l05_entry_table[*(short *)(self + 0x84)].entry;
     p = entry + 0x24;
-    tbl = D_L05_001B251C[*(int *)(entry + 0x20)].data;
+    tbl = g_feltzin_target_mobys[*(int *)(entry + 0x20)].data;
 
     for (count = 0; count < 12; count++, p += 4) {
         if (*(int *)p < 0)
             continue;
         if (IsPointInCuboid(self + 0x30, *(int *)p) || IsPointInCuboid(tbl + 0x10, *(int *)p)) {
-            if (FastVecDot(D_L05_001B260C[*(int *)p].data, self) > best)
+            if (FastVecDot(g_linked_point_table[*(int *)p].data, self) > best)
                 return 1;
         }
     }

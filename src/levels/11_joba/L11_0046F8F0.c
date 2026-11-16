@@ -2,8 +2,8 @@
 #include "common.h"
 typedef union { struct { float x,y,z,w; } v; unsigned int quad __attribute__((mode(TI))); } V1078;
 typedef struct { unsigned char b[8]; } P1078;
-extern const P1078 D_L11_001B2930, D_L11_001B2938;
-extern const V1078 D_L11_001B2940[2];
+extern const P1078 g_spark_orb_table_a, g_spark_orb_table_b;
+extern const V1078 g_spark_orb_bounds[2];
 extern void gfx_draw_orbiting_sparks(char *);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -38,14 +38,14 @@ extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void vec_random_direction(void *,float,float);
 /* Updates an orb with sparks circling it (moby classes 4330 and 4492): when it is hit it bursts with a sound and the sparks drift away and fade. */
 void spark_orb_update(char *moby) {
- P1078 table_a = D_L11_001B2930, table_b = D_L11_001B2938;
+ P1078 table_a = g_spark_orb_table_a, table_b = g_spark_orb_table_b;
  V1078 bounds[2], small, offset;
  V1078 temp, center, v, axis;
  char *vars=*(char **)(moby+0x68);
  int sound=0x10eb;
  float height=18;
  int none=-1;
- bounds[0].quad=D_L11_001B2940[0].quad; bounds[1].quad=D_L11_001B2940[1].quad;
+ bounds[0].quad=g_spark_orb_bounds[0].quad; bounds[1].quad=g_spark_orb_bounds[1].quad;
  small.quad=0;small.v.z=0.1166666746f;
  if(H(moby,0xaa)==0x118c /* moby class 4492 */) {height=21;sound=0x118d;}
  offset.quad=0;offset.v.z=height;

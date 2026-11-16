@@ -5,10 +5,10 @@
  * (20 bytes, hence the assembler's -G32) and the current slot right after it,
  * bounded by the count at 0x001B2AD4, read through the absolute macro form. */
 
-extern int D_L22_001AF3C4 __attribute__((sda));
-extern int D_L22_001AF3B0[5] __attribute__((sda));
-extern int D_L22_001B2AD4[] MACRO_ADDR;
-extern char *D_L22_001FE940[];
+extern int g_lane_check_index __attribute__((sda));
+extern int g_lane_slot_list[5] __attribute__((sda));
+extern int g_space_ship_lane_count[] MACRO_ADDR;
+extern char *g_ship_path_table[];
 extern void func_0032A1C8(void *, void *, int);
 extern void func_002F3D60(void *, void *, float);
 extern void func_002F3AB0(void *, void *, void *);
@@ -26,7 +26,7 @@ typedef struct ScanSub_003A4938 {
  * the top of the rotated while loop, so cse1 does not merge the loop's table
  * base with the pre-test's and retail's separate loop copy is kept. */
 static inline int SlotAt(int i) {
-    return D_L22_001AF3B0[i];
+    return g_lane_slot_list[i];
 }
 
 /* Advances the current slot round-robin to the next one not yet spent (-1),
@@ -37,13 +37,13 @@ static inline int SlotAt(int i) {
 void space_ship_pick_next_lane_to_check(char *obj) {
     float a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4], j[4];
     char *vars;
-    int old = D_L22_001AF3C4;
+    int old = g_lane_check_index;
     char *rec;
     vars = *(char **)(obj + 0x68);
-    while (SlotAt(D_L22_001AF3C4 = (D_L22_001AF3C4 + 1) % D_L22_001B2AD4[0]) == -1) {
-        if (old == D_L22_001AF3C4) return;
+    while (SlotAt(g_lane_check_index = (g_lane_check_index + 1) % g_space_ship_lane_count[0]) == -1) {
+        if (old == g_lane_check_index) return;
     }
-    rec = D_L22_001FE940[((ScanSub_003A4938 *)vars)->record_ids[D_L22_001AF3B0[D_L22_001AF3C4]]];
+    rec = g_ship_path_table[((ScanSub_003A4938 *)vars)->record_ids[g_lane_slot_list[g_lane_check_index]]];
     qcopy_nc(a, rec + 16);
     qcopy_nc(c, rec + *(int *)rec * 16);
     qcopy_nc(b, rec + 16);
@@ -69,5 +69,5 @@ void space_ship_pick_next_lane_to_check(char *obj) {
     func_002F3A80(j, j, e);
     func_002F3A80(d, d, j);
     if (WalkPathIsClear(obj, a, c) && WalkPathIsClear(obj, b, d))
-        D_L22_001AF3B0[D_L22_001AF3C4] = -1;
+        g_lane_slot_list[g_lane_check_index] = -1;
 }

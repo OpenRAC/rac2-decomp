@@ -14,7 +14,7 @@ typedef struct { float x, y, z, w; } Position;
 typedef struct { char pad[0x10]; Position position; } ActorPosition;
 typedef struct { char pad[0x80]; Vector position; } PlayerPosition;
 extern char g_hero_state[] NOT_SDA;
-extern int D_L02_001B0148 __attribute__((sda));
+extern int g_armed_enemy_attack_counter __attribute__((sda));
 extern void armed_enemy_update(char *), armed_enemy_return_to_idle(char *), moby_start_anim_fast(char *), moby_start_anim_slow(char *), armed_enemy_finish_frame(char *), armed_enemy_update_attack_variant(char *);
 extern void armed_enemy_pick_point_near_target(char *, float *), armed_enemy_release_held_object(char *, Quad *), enemy_release_effect_record(char *), moby_set_anim_type_three(void *, int, int);
 extern int AimAtGroupEntityInConeL02(char *), armed_enemy_try_close_attack(char *), flag_set_first_pending(u8 *), flag_set_second_pending(u8 *), math_random_int_below(int), arena_get_state_word(char *), coll_point_inside_record_volume(void *, int), cam_hook_return_minus_one(char *);
@@ -199,15 +199,15 @@ face_target:
         break;
     case 14:
         if (distance < 4) {
-            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 15, -1);
+            g_armed_enemy_attack_counter = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 15, -1);
             if ((u8)self[0x43] != 10) anim_start_blended(self, 10, 10, 10);
         } else {
             animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
             if (distance > 4) goto abandon_attack;
             if (!(previous & 2)) break;
-            previous = D_L02_001B0148++;
+            previous = g_armed_enemy_attack_counter++;
             if (previous < 3) break;
-            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1;
+            g_armed_enemy_attack_counter = 0; *(float *)(self + 0x48) = 1;
             armed_enemy_return_to_idle(self);
         }
         break;
@@ -224,7 +224,7 @@ face_target:
         break;
     case 17:
         if (distance < 4) {
-            D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 18, -1);
+            g_armed_enemy_attack_counter = 0; *(float *)(self + 0x48) = 1; moby_set_state((u8 *)self, 18, -1);
             if ((u8)self[0x43] != 13) anim_start_blended(self, 13, 10, 10);
         } else {
             animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
@@ -232,8 +232,8 @@ face_target:
 abandon_attack:
                 *(float *)(self + 0x48) = 1; armed_enemy_return_to_idle(self);
             } else if (previous & 2) {
-                previous = D_L02_001B0148++;
-                if (previous > 2) { D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; armed_enemy_return_to_idle(self); }
+                previous = g_armed_enemy_attack_counter++;
+                if (previous > 2) { g_armed_enemy_attack_counter = 0; *(float *)(self + 0x48) = 1; armed_enemy_return_to_idle(self); }
             }
         }
         break;

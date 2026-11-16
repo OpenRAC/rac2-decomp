@@ -8,7 +8,7 @@
 #include "common.h"
 
 typedef int OozlaQuad __attribute__((mode(TI)));
-extern int D_L01_001B2088;
+extern int g_oozla_intro_stage;
 extern float level_get_water_height(void);
 extern void *moby_spawn_scaled_effect(float *, float);
 extern void set_moby_color(void *, int, int, int);
@@ -20,7 +20,7 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern void *part_spawn_drifting(void *, void *, int, float, float);
 extern void *part_spawn_spark_2(void *, void *, int, int);
-extern float D_L01_001AFE18[];
+extern float g_water_l01_height[];
 
 /* Same body as func_L01_003B4200, with this function's own callees. */
 /* Same body as func_L01_003D8C00, with this function's own callees. */
@@ -32,7 +32,7 @@ void part_spawn_water_splash_bubbles(char *object, int bubbles, int drops, int s
     char *state = *(char **)(object + 0x68);
     void *effect;
     int i, j, type, lifetime;
-    if (D_L01_001B2088 - *(int *)(state + 0x40C) < 11)
+    if (g_oozla_intro_stage - *(int *)(state + 0x40C) < 11)
         return;
     height = level_get_water_height();
     if (splash) {
@@ -51,7 +51,7 @@ void part_spawn_water_splash_bubbles(char *object, int bubbles, int drops, int s
         velocity[2] = height;
         size = math_random_float_range(0.3f, 0.6f);
         type = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-        part_spawn_drifting(velocity, D_L01_001AFE18, type, size, 5250.0f);
+        part_spawn_drifting(velocity, g_water_l01_height, type, size, 5250.0f);
       } while (i != 0);
     }
     if (drops > 0) {
@@ -71,5 +71,5 @@ void part_spawn_water_splash_bubbles(char *object, int bubbles, int drops, int s
         part_spawn_spark_2(position, velocity, type, lifetime);
       } while (j != 0);
     }
-    *(int *)(state + 0x40C) = D_L01_001B2088;
+    *(int *)(state + 0x40C) = g_oozla_intro_stage;
 }

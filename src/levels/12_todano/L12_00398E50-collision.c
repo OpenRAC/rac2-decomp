@@ -8,7 +8,7 @@ extern void *func_001153D4(void *,void *,unsigned int);
 extern void matrix_from_basis_rows(void *,void *);
 extern void transform_vector(void *,void *,void *);
 extern void part_start_effect_default_table(void *,void *,int,void *,float);
-extern u8 *D_L12_001C42C0[];
+extern u8 *g_impact_l12_moby_list[];
 
 /* Tests nearby objects against a rectangle in the object's local frame. */
 void coll_push_out_of_rectangle(u8 *object,u8 *dimensions) {
@@ -22,7 +22,7 @@ void coll_push_out_of_rectangle(u8 *object,u8 *dimensions) {
     count=coll_process_hit(searchPosition,16,object,0,radius);
     if(count) {
         u8 *list[count];
-        func_001153D4(list,D_L12_001C42C0,count*sizeof(void *));
+        func_001153D4(list,g_impact_l12_moby_list,count*sizeof(void *));
         for(i=0;i<count;i++) {
             u8 *candidate=list[i];
             if(candidate && candidate[0x20]!=254 && candidate[0x20]!=253) {
@@ -38,7 +38,7 @@ void coll_push_out_of_rectangle(u8 *object,u8 *dimensions) {
                     int hits=coll_process_hit(contactPosition,16,object,0,0.7f);
                     int j;
                     for(j=0;j<hits;j++) {
-                        if(D_L12_001C42C0[j]==candidate) part_start_effect_default_table(candidate,object,0x10001,contactPosition,1.0f);
+                        if(g_impact_l12_moby_list[j]==candidate) part_start_effect_default_table(candidate,object,0x10001,contactPosition,1.0f);
                     }
                 }
             }

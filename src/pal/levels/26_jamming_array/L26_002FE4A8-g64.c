@@ -12,16 +12,16 @@ typedef struct {
     char gap54[0x18C-0x54];
     char *parts[4];
 } Hero;
-extern Hero D_L26_001BC880;
-extern char D_L26_0027E310[];
-extern float D_L26_001A93E0[4][4] __attribute__((sda));
+extern Hero g_hero_part_state;
+extern char g_level_scratch_buffer[];
+extern float g_hero_vertex_table[4][4] __attribute__((sda));
 extern void vec_fast_to_int_helper(void *, void *);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L26_002FE4A8(void) {
+void UpdateJammingArrayQuadVertices_pal(void) {
     float matrix[12];
     float rotation[12];
     char *child;
@@ -34,20 +34,20 @@ void func_PAL_L26_002FE4A8(void) {
     if (g_current_map_index[0] != 26) return;
     child = 0;
     index = -1;
-    switch (D_L26_001BC880.mode) {
+    switch (g_hero_part_state.mode) {
     case 0:
-        child = D_L26_001BC880.parts[2];
+        child = g_hero_part_state.parts[2];
         index = 1;
         break;
     case 1:
         index = 1;
-        child = D_L26_001BC880.parts[2];
+        child = g_hero_part_state.parts[2];
         break;
     }
-    if (index != -1 && child != 0 && D_L26_001BC880.parts[index] != 0) {
-        D_L26_001BC880.output = D_L26_0027E310;
-        out = (float *)(D_L26_0027E310 + 0x20);
-        vertex = D_L26_001A93E0[0];
+    if (index != -1 && child != 0 && g_hero_part_state.parts[index] != 0) {
+        g_hero_part_state.output = g_level_scratch_buffer;
+        out = (float *)(g_level_scratch_buffer + 0x20);
+        vertex = g_hero_vertex_table[0];
         vec_fast_to_int_helper(*(char **)(child + 0x58) + 0x10, rotation);
         quaternion_to_rotation_basis(rotation, matrix);
         scale = *(float *)(child + 0x2C) / *(float *)(*(char **)(child + 0x24) + 0x24);
@@ -59,7 +59,7 @@ void func_PAL_L26_002FE4A8(void) {
             FastVecAdd(out, out, child + 0x10);
             out += 4;
         } while (--count >= 0);
-        *(char **)(D_L26_001BC880.output + 0x68) = D_L26_001BC880.parts[index];
+        *(char **)(g_hero_part_state.output + 0x68) = g_hero_part_state.parts[index];
     }
-    if (D_L26_001BC880.timer >= 0x4A9) D_L26_001BC880.output = 0;
+    if (g_hero_part_state.timer >= 0x4A9) g_hero_part_state.output = 0;
 }

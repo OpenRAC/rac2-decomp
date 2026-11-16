@@ -1,15 +1,15 @@
 #include "common.h"
 
 typedef unsigned int Quad __attribute__((mode(TI)));
-extern char D_L06_001AF6A0[], D_L06_001AF6E0[];
+extern char g_str_ribbon_error_a[], g_str_ribbon_error_b[];
 typedef struct {
     char x[10];
 } Sequence;
-extern Sequence D_L06_001AF700;
+extern Sequence g_ribbon_sequence;
 extern int g_current_map_index;
-extern u8 D_0018C0D4 NOT_SDA;
-extern float D_L06_001AF620 __attribute__((sda));
-extern char D_L06_001B9840[];
+extern u8 g_screen_mode_flag NOT_SDA;
+extern float g_ribbon_duration __attribute__((sda));
+extern char g_hero_l06_position[];
 typedef struct {
     u8 pad[0x74];
     u8 active;
@@ -54,9 +54,9 @@ typedef struct {
     float angle;
 } Object;
 
-extern char D_L06_001AFFA0[], D_L06_001AFFE0[];
-extern Sequence D_L06_001B0000;
-extern float D_L06_001AFF20 __attribute__((sda));
+extern char g_str_ripple_error_a[], g_str_ripple_error_b[];
+extern Sequence g_ribbon_variant_sequence;
+extern float g_ripple_fade_duration __attribute__((sda));
 extern void gfx_draw_ripple_grid(void);
 
 /* Updates moby class 1067, a flowing ribbon of glowing strips. It picks a random order for the strips, plays a hum, and starts drawing the ribbon when the player is near. */
@@ -70,19 +70,19 @@ void ribbon_effect_update(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        STUB_printf(D_L06_001AF6A0);
-        STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
+        STUB_printf(g_str_ribbon_error_a);
+        STUB_printf(g_str_ribbon_error_b, *(short *)(obj + 0xB2));
         moby_mark_spawned(obj);
     }
     switch (moby->state) {
     case 0: {
         int i, j, k;
         float sphere_radius;
-        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+        if (g_current_map_index == 10 && g_screen_mode_flag == 1) {
             moby_mark_spawned(obj);
             break;
         }
-        buffer.seq = D_L06_001AF700;
+        buffer.seq = g_ribbon_sequence;
         for (i = 0; i < 10; i++) {
             for (j = 0; j < math_random_int_below(9); j++) {
                 u8 tmp = buffer.seq.x[j + 1];
@@ -97,7 +97,7 @@ void ribbon_effect_update(char *obj) {
         moby->state = 1;
         moby->angle = sphere_radius;
         data->effect = -1;
-        data->timer = FloatToInt(D_L06_001AF620 * 60.0f);
+        data->timer = FloatToInt(g_ribbon_duration * 60.0f);
         moby->flags |= 0x41;
         break;
     }
@@ -109,7 +109,7 @@ void ribbon_effect_update(char *obj) {
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += half_height;
         sphere[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
                 gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
         }
@@ -133,7 +133,7 @@ void ribbon_effect_update(char *obj) {
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += half_height;
         buffer.f[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
             gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
         break;
@@ -152,19 +152,19 @@ void ribbon_effect_update_variant(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        STUB_printf(D_L06_001AFFA0);
-        STUB_printf(D_L06_001AFFE0, *(short *)(obj + 0xB2));
+        STUB_printf(g_str_ripple_error_a);
+        STUB_printf(g_str_ripple_error_b, *(short *)(obj + 0xB2));
         moby_mark_spawned(obj);
     }
     switch (moby->state) {
     case 0: {
         int i, j, k;
         float sphere_radius;
-        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+        if (g_current_map_index == 10 && g_screen_mode_flag == 1) {
             moby_mark_spawned(obj);
             break;
         }
-        buffer.seq = D_L06_001B0000;
+        buffer.seq = g_ribbon_variant_sequence;
         for (i = 0; i < 10; i++) {
             for (j = 0; j < math_random_int_below(9); j++) {
                 u8 tmp = buffer.seq.x[j + 1];
@@ -179,7 +179,7 @@ void ribbon_effect_update_variant(char *obj) {
         moby->state = 1;
         moby->angle = sphere_radius;
         data->effect = -1;
-        data->timer = FloatToInt(D_L06_001AFF20 * 60.0f);
+        data->timer = FloatToInt(g_ripple_fade_duration * 60.0f);
         moby->flags |= 0x41;
         break;
     }
@@ -191,7 +191,7 @@ void ribbon_effect_update_variant(char *obj) {
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += half_height;
         sphere[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
                 gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);
         }
@@ -215,7 +215,7 @@ void ribbon_effect_update_variant(char *obj) {
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += half_height;
         buffer.f[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
             gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);
         break;

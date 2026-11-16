@@ -73,7 +73,7 @@ typedef struct {
     u8 padding_AC[0x14];
     StateVector forward;
 } TargetMoby;
-extern u32 D_001A7390;
+extern u32 g_frame_counter;
 extern int g_current_map_index;
 typedef struct {
     u8 padding_0[0x80];
@@ -88,16 +88,16 @@ typedef struct {
     int words[3];
     u16 near_player, active, near_940, near_93C, near_A59;
 } TargetCounters;
-extern TargetCounters D_L03_001B2750 __attribute__((sda));
-extern float D_L03_001AFEE0 __attribute__((sda));
-extern float D_L03_001AFEE4 __attribute__((sda));
-extern int D_L03_001AFEF8 __attribute__((sda));
-extern int D_L03_001AFEFC __attribute__((sda));
-extern u16 D_L03_001AFF00 __attribute__((sda));
-extern float D_L03_001B9980[];
-extern int D_L03_001B2A38[] __attribute__((sda));
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u16 *D_L03_001FB5A0[];
+extern TargetCounters g_target_counters __attribute__((sda));
+extern float g_bot_move_speed __attribute__((sda));
+extern float g_bot_chase_distance __attribute__((sda));
+extern int g_bot_last_frame __attribute__((sda));
+extern int g_bot_frame_threshold __attribute__((sda));
+extern u16 g_bot_child_value __attribute__((sda));
+extern float g_camera_pose_buffer[];
+extern int g_object_group_count[] __attribute__((sda));
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u16 *g_entity_id_lists[];
 extern int g_frame_l03_counter;
 extern void moby_compute_point_ahead(void *, void *);
 extern int math_random_int_below(int);
@@ -164,7 +164,7 @@ void func_PAL_L03_003C70B8(u8 *object)
             vars->child = CreateMoby(0xD75);
             if (vars->child) {
                 moby_init_child_from_parent(vars->child, object);
-                *(u16 *)(vars->child + 0x7C) = D_L03_001AFF00;
+                *(u16 *)(vars->child + 0x7C) = g_bot_child_value;
                 *(u16 *)(vars->child + 0x32) = 0x30;
                 if (mob->type == 0x93C) {
                     *(float *)(vars->child + 0x2C) = *(float *)(*(u8 **)(vars->child + 0x24) + 0x24) * 1.2f;
@@ -174,7 +174,7 @@ void func_PAL_L03_003C70B8(u8 *object)
         vars->movement_mode = 3;
         vars->movement_scale = 1.0f;
         vars->movement_enabled = 1;
-        vars->movement_speed = D_L03_001AFEE0;
+        vars->movement_speed = g_bot_move_speed;
         vars->collision_height = 0.3f;
         switch (mob->type) {
         case 0x93C:
@@ -210,11 +210,11 @@ void func_PAL_L03_003C70B8(u8 *object)
             for (i = 0; i < 8; i++) {
                 u16 *ids;
                 if (vars->groups[i] == -1) continue;
-                for (ids = D_L03_001FB5A0[vars->groups[i]];
-                     (vars->groups[i] & 255) != 255 && vars->groups[i] <= D_L03_001B2A38[0] && ids != 0 &&
-                     ((s16)ids[-1] >= 0 || ids == D_L03_001FB5A0[vars->groups[i]]);
+                for (ids = g_entity_id_lists[vars->groups[i]];
+                     (vars->groups[i] & 255) != 255 && vars->groups[i] <= g_object_group_count[0] && ids != 0 &&
+                     ((s16)ids[-1] >= 0 || ids == g_entity_id_lists[vars->groups[i]]);
                      ids++) {
-                    u8 *member = D_L03_001B2A1C[0] + ((*ids & 0x7FFF) << 8);
+                    u8 *member = g_moby_record_base[0] + ((*ids & 0x7FFF) << 8);
                     if (member == 0) break;
                     if (*(s16 *)(member + 0xAA) == 0x97A)
                         route_set_node_enabled_flag(vars->area_id, member + 0x10, 0);
@@ -224,7 +224,7 @@ void func_PAL_L03_003C70B8(u8 *object)
             anim_start_blended(object, 6, 0, 0);
         }
     }
-    if (mob->active && fast_vec_dist(mob->position, D_L03_001B9980) < 24.0f) {
+    if (mob->active && fast_vec_dist(mob->position, g_camera_pose_buffer) < 24.0f) {
         moby_update_ground_check(object);
         mob->event = 0x16;
     }
@@ -232,10 +232,10 @@ void func_PAL_L03_003C70B8(u8 *object)
     if (part_find_owned_effect_slot(object, 1, 0) ||
         (mob->position[2] < vars->initial_height - 10.0f &&
          mob->position[2] - 10.0f < vars->floor_height)) {
-        if (subtract_integer_with_clamp(D_L03_001AFEF8 - g_frame_l03_counter) > ((s32)(D_L03_001AFEFC) * 5 + 2) / 6) {
+        if (subtract_integer_with_clamp(g_bot_last_frame - g_frame_l03_counter) > ((s32)(g_bot_frame_threshold) * 5 + 2) / 6) {
             point.q = 0;
             point.f[2] = 0.5f;
-            D_L03_001AFEF8 = g_frame_l03_counter;
+            g_bot_last_frame = g_frame_l03_counter;
             FastVecAdd(&point, &point, mob->position);
             SpawnExplosion(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
             if (mob->type == 0x964)
@@ -248,46 +248,46 @@ void func_PAL_L03_003C70B8(u8 *object)
         }
         mob->flags_A8 = 255;
     }
-    if (mob->mode == 4) D_L03_001B2750.active++;
+    if (mob->mode == 4) g_target_counters.active++;
     if (g_subtitle_history[39].count < 65535 && mob->type == 0x940 && mob->state != 1 && moby_find_entity_nearby(object)) {
         if (g_subtitle_history[39].count != 0) {
-            if (((s32)D_001A7390 * 5 + 2) / 6 - g_subtitle_history[39].tick > 900 || g_subtitle_history[39].tick == 0)
+            if (((s32)g_frame_counter * 5 + 2) / 6 - g_subtitle_history[39].tick > 900 || g_subtitle_history[39].tick == 0)
                 subtitle_request_voice_line(0x9D0, 0x27);
-            else if (g_subtitle_history[39].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[39].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            else if (g_subtitle_history[39].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[39].tick = ((s32)g_frame_counter * 5 + 2) / 6;
         } else {
             g_subtitle_history[39].count++;
-            if (g_subtitle_history[39].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[39].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            if (g_subtitle_history[39].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[39].tick = ((s32)g_frame_counter * 5 + 2) / 6;
             g_subtitle_history[39].flags = (g_subtitle_history[39].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
     if (g_subtitle_history[128].count < 65535 && mob->type == 0x93C && mob->state != 1 && moby_find_nearest_entity_b(object)) {
         if (g_subtitle_history[128].count != 0) {
-            if (((s32)D_001A7390 * 5 + 2) / 6 - g_subtitle_history[128].tick > 900 || g_subtitle_history[128].tick == 0)
+            if (((s32)g_frame_counter * 5 + 2) / 6 - g_subtitle_history[128].tick > 900 || g_subtitle_history[128].tick == 0)
                 subtitle_request_voice_line(0xA29, 0x80);
-            else if (g_subtitle_history[128].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[128].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            else if (g_subtitle_history[128].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[128].tick = ((s32)g_frame_counter * 5 + 2) / 6;
         } else {
             g_subtitle_history[128].count++;
-            if (g_subtitle_history[128].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[128].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            if (g_subtitle_history[128].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[128].tick = ((s32)g_frame_counter * 5 + 2) / 6;
             g_subtitle_history[128].flags = (g_subtitle_history[128].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
     if (g_subtitle_history[97].count < 65535 && mob->type == 0xA59 && mob->state != 1 && moby_find_nearest_pickup_target(object)) {
         if (g_subtitle_history[97].count != 0) {
-            if (((s32)D_001A7390 * 5 + 2) / 6 - g_subtitle_history[97].tick > 900 || g_subtitle_history[97].tick == 0)
+            if (((s32)g_frame_counter * 5 + 2) / 6 - g_subtitle_history[97].tick > 900 || g_subtitle_history[97].tick == 0)
                 subtitle_request_voice_line(0xA0A, 0x61);
-            else if (g_subtitle_history[97].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[97].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            else if (g_subtitle_history[97].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[97].tick = ((s32)g_frame_counter * 5 + 2) / 6;
         } else {
             g_subtitle_history[97].count++;
-            if (g_subtitle_history[97].tick < ((s32)D_001A7390 * 5 + 2) / 6) g_subtitle_history[97].tick = ((s32)D_001A7390 * 5 + 2) / 6;
+            if (g_subtitle_history[97].tick < ((s32)g_frame_counter * 5 + 2) / 6) g_subtitle_history[97].tick = ((s32)g_frame_counter * 5 + 2) / 6;
             g_subtitle_history[97].flags = (g_subtitle_history[97].flags | (1U << g_current_map_index)) | 0x80000000U;
         }
     }
     if (mob->state != 1 && vec_distance_xy(mob->position, g_hero_state.position) < 16.0f) {
-        D_L03_001B2750.near_player++;
+        g_target_counters.near_player++;
         switch (mob->type) {
-        case 0x940: D_L03_001B2750.near_940++; break;
-        case 0x93C: D_L03_001B2750.near_93C++; break;
-        case 0xA59: D_L03_001B2750.near_A59++; break;
+        case 0x940: g_target_counters.near_940++; break;
+        case 0x93C: g_target_counters.near_93C++; break;
+        case 0xA59: g_target_counters.near_A59++; break;
         }
     }
     permitted = 1;
@@ -301,7 +301,7 @@ void func_PAL_L03_003C70B8(u8 *object)
     case 1:
         if (mob->mode == 1) return;
         distance = vec_distance_xy(mob->position, g_hero_state.position);
-        if (distance > D_L03_001AFEE4) {
+        if (distance > g_bot_chase_distance) {
             moby_set_state(object, 3, 1);
             if (mob->animation == 2) return;
             anim_start_blended(object, 2, math_random_int_below(ANIM_COUNT(object, 0x50)), 8);

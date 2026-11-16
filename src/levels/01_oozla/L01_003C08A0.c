@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern char g_hero_state[], D_L01_001AFF00[];
-extern int D_L01_001B2088[] __attribute__((sda));
+extern char g_hero_state[], g_str_swamp_monster_hold_debug[];
+extern int g_oozla_intro_stage[] __attribute__((sda));
 extern void set_hero_animation(int, int, float);
 extern s32 SetHeroMoveState(int, int);
 extern void STUB_printf(const char *, ...);
@@ -26,7 +26,7 @@ void swamp_monster_hold_hero(char *moby)
         *(int *)(moby + 0x98) = 0;
         SetHeroMoveState(0x6F, 1);
         set_hero_animation(10, 0, 10.0f);
-        STUB_printf(D_L01_001AFF00, D_L01_001B2088[0]);
+        STUB_printf(g_str_swamp_monster_hold_debug, g_oozla_intro_stage[0]);
         *(unsigned char *)(hero + 0x22B5) = saved_flag;
     }
     *(unsigned short *)(hero + 0x1F0) = 2;

@@ -26,13 +26,13 @@ typedef struct {
     int one;
 } HitRecord97B30;
 
-extern Record233560 D_L05_00233560[24];
-extern char D_L05_001BFB20[];
-extern char D_L05_001BFB30[];
-extern float D_L05_001AEBE8 __attribute__((sda));
-extern float D_L05_001AEBE4 __attribute__((sda));
-extern float D_L05_001AEBE0 __attribute__((sda));
-extern float D_L05_001AEBDC __attribute__((sda));
+extern Record233560 g_effect_records[24];
+extern char g_projectile_target_pos[];
+extern char g_projectile_pos_scratch[];
+extern float g_homing_hit_value_b __attribute__((sda));
+extern float g_homing_hit_value_a __attribute__((sda));
+extern float g_homing_speed_alt __attribute__((sda));
+extern float g_homing_speed_normal __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern float FastVecLength(void *);
@@ -57,7 +57,7 @@ extern char *func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, in
    runs out or it leaves the 2..1021 box it releases all twenty-four records, bursts and removes
    itself. Each time its second timer expires it throws a hit record towards a random point 21
    units away. On hitting the world it submits its hit record, bursts and removes itself. */
-void func_PAL_L05_0039A9A8(char *obj)
+void homing_l05_projectile_update_pal(char *obj)
 {
     float old[4];
     float target[4];
@@ -80,7 +80,7 @@ void func_PAL_L05_0039A9A8(char *obj)
 
     if (math_fast_float_d(state + 0x18)) {
         for (i = 0; i < 24; i++)
-            D_L05_00233560[i].owner = 0;
+            g_effect_records[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
         moby_mark_spawned(obj);
         return;
@@ -89,7 +89,7 @@ void func_PAL_L05_0039A9A8(char *obj)
         *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
         *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
         for (i = 0; i < 24; i++)
-            D_L05_00233560[i].owner = 0;
+            g_effect_records[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
         moby_mark_spawned(obj);
         return;
@@ -99,7 +99,7 @@ void func_PAL_L05_0039A9A8(char *obj)
         vec_build_spherical_offset(target, 21.0f, math_random_angle(), math_random_angle());
         FastVecAdd(target, target, obj + 0x10);
         if (CollLine(obj + 0x10, target, 0, obj, 0))
-            qcopy(target, D_L05_001BFB20);
+            qcopy(target, g_projectile_target_pos);
         func_PAL_L05_0039B1F0(obj, target, 1);
         record_animate_owned(obj);
         gfx_add_draw_callback_third(record_update_owned_effects, obj);
@@ -107,9 +107,9 @@ void func_PAL_L05_0039A9A8(char *obj)
         hit.owner = obj;
         hit.flags = 0x810000;
         if (*(int *)(state + 0x24))
-            hit.value = D_L05_001AEBE8;
+            hit.value = g_homing_hit_value_b;
         else
-            hit.value = D_L05_001AEBE4;
+            hit.value = g_homing_hit_value_a;
         hit.one = 1;
         qcopy(hit.v, state);
         vec_scale_to_length(hit.v, hit.v, 1.0f);
@@ -118,9 +118,9 @@ void func_PAL_L05_0039A9A8(char *obj)
         hit.mode = 2;
         hit.id = *(unsigned short *)(obj + 0xAA);
         if (*(int *)(state + 0x24))
-            speed = D_L05_001AEBE0;
+            speed = g_homing_speed_alt;
         else
-            speed = D_L05_001AEBDC;
+            speed = g_homing_speed_normal;
         coll_process_hit(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
     }
 
@@ -128,10 +128,10 @@ void func_PAL_L05_0039A9A8(char *obj)
         collided = 0;
         if (coll_test_point(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
             collided = 1;
-            qcopy(obj + 0x10, D_L05_001BFB30);
+            qcopy(obj + 0x10, g_projectile_pos_scratch);
         }
         if (collided || CollLine(old, obj + 0x10, 16, *(void **)(state + 0x20), 0)) {
-            qcopy(obj + 0x10, D_L05_001BFB20);
+            qcopy(obj + 0x10, g_projectile_target_pos);
             SubmitFlightStateHitRecord(obj, state, obj + 0x10);
             if (*(int *)(state + 0x24))
                 func_PAL_L05_0042A240(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);

@@ -24,17 +24,17 @@ typedef struct { char pad[0xAA]; short kind; } BeamChild;
 typedef struct { int first, alternate; char pad08[0x18]; float ribbonScale; char pad24[8]; float quadScale; } BeamState;
 typedef struct { char pad00[0x10]; Vector position; char pad20[0x48]; BeamState *state; char pad6C[0x54]; Vector rotation[3]; } BeamObject;
 typedef struct { float x, y, z; } BeamPoint;
-extern BeamChild *D_0018B130 NOT_SDA;
-extern JointPair D_L00_001AF0D0[], D_L00_001AF0D8[];
-extern float D_L00_001AF030[4][4] SDATA(D_L00_001AF030);
-extern float D_L00_001AF070[4][4] SDATA(D_L00_001AF070);
-extern BeamUV D_L00_001AF0B0[4] MACRO_ADDR;
+extern BeamChild *g_beam_child NOT_SDA;
+extern JointPair g_joint_beam_pairs_a[], g_joint_beam_pairs_b[];
+extern float g_joint_beam_corner_table_a[4][4] SDATA(D_L00_001AF030);
+extern float g_joint_beam_corner_table_b[4][4] SDATA(D_L00_001AF070);
+extern BeamUV g_joint_beam_uv_table[4] MACRO_ADDR;
 extern BeamUV beamUVGP[4] SDATA(D_L00_001AF0B0);
-extern Vector D_0018A0E0;
-extern Vector D_L00_00290E00[196];
-extern BeamPoint D_L00_00239020[196];
-extern float D_L00_00291A40[196][2];
-extern unsigned int D_L00_00292060[196];
+extern Vector g_hero_state_block;
+extern Vector g_joint_beam_ribbon_points[196];
+extern BeamPoint g_joint_beam_points[196];
+extern float g_joint_beam_scroll_uvs[196][2];
+extern unsigned int g_joint_beam_colors[196];
 extern void moby_transform_point_list(void *, int, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -56,18 +56,18 @@ void gfx_draw_joint_beam_effect(BeamObject *object)
     Vector up, matrix[4], adjustment[4], frame[4], point;
     BeamState *state = object->state;
     int i;
-    if (D_0018B130 == 0 ||
-        (D_0018B130->kind != 0x260 && D_0018B130->kind != 0x96C))
+    if (g_beam_child == 0 ||
+        (g_beam_child->kind != 0x260 && g_beam_child->kind != 0x96C))
         return;
     packet.texture = 0xFF9000000260ULL;
     packet.blend = 0x8000000048ULL;
     packet.tag = 0;
     if (state->alternate) {
-        jointIndices = D_L00_001AF0D0[0];
-        moby_transform_point_list(D_0018B130, 2, &jointIndices, joints);
+        jointIndices = g_joint_beam_pairs_a[0];
+        moby_transform_point_list(g_beam_child, 2, &jointIndices, joints);
     } else {
-        jointIndices = D_L00_001AF0D8[0];
-        moby_transform_point_list(D_0018B130, 2, &jointIndices, joints);
+        jointIndices = g_joint_beam_pairs_b[0];
+        moby_transform_point_list(g_beam_child, 2, &jointIndices, joints);
     }
     *(Quadword *)&up = 0;
     up.y = 1.0f;
@@ -95,22 +95,22 @@ void gfx_draw_joint_beam_effect(BeamObject *object)
     for (i = 0; i < 4; i++) {
         packet.color[i] = 0x80808080;
         if (i == 0 || i == 2)
-            FastVecScale(packet.position[i], D_L00_001AF030[i], state->quadScale);
+            FastVecScale(packet.position[i], g_joint_beam_corner_table_a[i], state->quadScale);
         else {
             float *v = packet.position[i];
-            FastVecScale(v, D_L00_001AF030[i], state->quadScale);
+            FastVecScale(v, g_joint_beam_corner_table_a[i], state->quadScale);
             v[2] -= math_random_float_range(0.0f, 0.1f);
         }
         packet.uv[i].u = beamUVGP[i].u;
-        packet.uv[i].v = D_L00_001AF0B0[i].v;
+        packet.uv[i].v = g_joint_beam_uv_table[i].v;
     }
     draw_world_quad(&packet, matrix, 0);
     for (i = 0; i < 4; i++) {
         if (i == 0 || i == 2)
-            FastVecScale(packet.position[i], D_L00_001AF070[i], state->quadScale);
+            FastVecScale(packet.position[i], g_joint_beam_corner_table_b[i], state->quadScale);
         else {
             float *v = packet.position[i];
-            FastVecScale(v, D_L00_001AF070[i], state->quadScale);
+            FastVecScale(v, g_joint_beam_corner_table_b[i], state->quadScale);
             v[2] -= math_random_float_range(0.0f, 0.1f);
         }
     }
@@ -120,14 +120,14 @@ void gfx_draw_joint_beam_effect(BeamObject *object)
     FastVecAdd(&frame[3], &frame[3], &basis[3]);
     FastVecSub(&frame[0], &g_camera_l00_position, &frame[3]);
     vec_scale_to_length(&frame[0], &frame[0], 1.0f);
-    FastVecCross(&frame[1], &frame[0], &D_0018A0E0);
+    FastVecCross(&frame[1], &frame[0], &g_hero_state_block);
     vec_scale_to_length(&frame[1], &frame[1], -1.0f);
     FastVecCross(&frame[2], &frame[1], &frame[0]);
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F2020FF;
     {
         int corner;
         for (corner = 0; corner < 4; corner++) {
-            FastVecScale(packet.position[corner], D_L00_001AF030[corner], 0.1f);
+            FastVecScale(packet.position[corner], g_joint_beam_corner_table_a[corner], 0.1f);
             transform_vector(packet.position[corner], packet.position[corner], frame);
         }
     }
@@ -139,15 +139,15 @@ void gfx_draw_joint_beam_effect(BeamObject *object)
     VU1_addGSregister(0x4A, 0);
     font_queue_vu_state();
     for (i = 0; i < 196; i++) {
-        FastVecScale(&point, &D_L00_00290E00[i], state->ribbonScale);
+        FastVecScale(&point, &g_joint_beam_ribbon_points[i], state->ribbonScale);
         transform_vector(&point, &point, basis);
-        D_L00_00239020[i].x = point.x;
-        D_L00_00239020[i].y = point.y;
-        D_L00_00239020[i].z = point.z;
-        D_L00_00291A40[i][1] -= 0.025f;
-        if (D_L00_00291A40[i][1] < -7.0f)
-            D_L00_00291A40[i][1] += 7.0f;
+        g_joint_beam_points[i].x = point.x;
+        g_joint_beam_points[i].y = point.y;
+        g_joint_beam_points[i].z = point.z;
+        g_joint_beam_scroll_uvs[i][1] -= 0.025f;
+        if (g_joint_beam_scroll_uvs[i][1] < -7.0f)
+            g_joint_beam_scroll_uvs[i][1] += 7.0f;
     }
-    part_draw_glint_effect(148, D_L00_00239020, D_L00_00292060, D_L00_00291A40, 1);
-    part_draw_glint_effect(50, D_L00_00239020 + 146, D_L00_00292060 + 146, D_L00_00291A40 + 146, 1);
+    part_draw_glint_effect(148, g_joint_beam_points, g_joint_beam_colors, g_joint_beam_scroll_uvs, 1);
+    part_draw_glint_effect(50, g_joint_beam_points + 146, g_joint_beam_colors + 146, g_joint_beam_scroll_uvs + 146, 1);
 }

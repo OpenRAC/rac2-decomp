@@ -39,7 +39,7 @@ extern void moby_update_movement_state(char *);
 extern int moby_process_collision_hit(char *, int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_check_player_in_view_and_range(char *, int, float);
-extern int D_L05_001B251C __attribute__((sda));
+extern int g_feltzin_target_mobys __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int math_random_int_below(int);
 extern void moby_spawn_effect_once(char *);
@@ -76,7 +76,7 @@ void func_L05_003CFF90(char *obj)
             if (s->target != -1) {
                 char *target;
                 p->hasTarget = 1;
-                target = (char *)(D_L05_001B251C + (s->target << 8));
+                target = (char *)(g_feltzin_target_mobys + (s->target << 8));
                 p->targetObject = target;
                 if (fast_vec_dist(target + 0x10, obj + 0x10) < 10.0f) {
                     SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(g_sound_state + s->nearSound * 0x70);

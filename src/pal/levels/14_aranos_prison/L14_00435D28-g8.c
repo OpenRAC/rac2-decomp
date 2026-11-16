@@ -11,9 +11,9 @@ extern float math_random_float_range(float, float);
 extern int flag_is_third_pending_set(void *);
 extern int flag_set_first_pending(void *);
 extern float math_fast_sin_or_cos_b(float);
-extern int D_L14_001B20C8;
+extern int g_frame_tick_counter;
 extern int D_L14_001B20C8_1 __attribute__((sda));
-extern float D_L14_00260270[32], D_L14_002602F0[32];
+extern float g_spark_quad_angles[32], g_spark_quad_progress[32];
 typedef struct {
     float w00;
     int w04;
@@ -94,8 +94,8 @@ void func_PAL_L14_00435D28(char *self)
         s->wa8=20; s->wac=s->w14=0.8f;
         s->wb0=70; s->wb4=s->w9c=2.0f;
         for(i=0;i<32;i++) {
-            D_L14_00260270[i]=math_random_float_range(-3.1415927f,3.1415927f);
-            D_L14_002602F0[i]=(float)i*0.03125f;
+            g_spark_quad_angles[i]=math_random_float_range(-3.1415927f,3.1415927f);
+            g_spark_quad_progress[i]=(float)i*0.03125f;
         }
         s->wb8=71; s->wbc=1.0f;
         s->wc0=0x80800000;
@@ -127,6 +127,6 @@ void func_PAL_L14_00435D28(char *self)
     }
     }
     s->currentScale=s->baseScale+s->pulseScale*
-        math_fast_sin_or_cos_b(math_wrap_angle_full_turn((float)D_L14_001B20C8*6.2831855f/(float)s->pulseFrames));
+        math_fast_sin_or_cos_b(math_wrap_angle_full_turn((float)g_frame_tick_counter*6.2831855f/(float)s->pulseFrames));
 }
 

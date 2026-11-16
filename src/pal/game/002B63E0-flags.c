@@ -46,7 +46,7 @@ typedef struct {
     unsigned char bE6, bE7, bE8, bE9, bEA;    
 } Ctl_002B5828;
 
-void func_PAL_002B63E0(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *newpos)
+void moby_update_ground_contact_pal(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *newpos)
 {
     int changed;
     float *position;

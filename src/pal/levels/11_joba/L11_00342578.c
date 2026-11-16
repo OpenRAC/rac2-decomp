@@ -2,14 +2,14 @@
 
 #include "common.h"
 extern void FastVecSub(void *, void *, void *);
-extern int func_PAL_L02_00335678(char *, char *, void *);
+extern int coll_update_controller_pal(char *, char *, void *);
 
-int func_PAL_L11_00342578(char *object, void *point)
+int coll_check_move_to_point_pal(char *object, void *point)
 {
     char *target = object + 0x10;
     float diff[4];
 
     FastVecSub(diff, point, target);
-    return func_PAL_L02_00335678(object, target, diff);
+    return coll_update_controller_pal(object, target, diff);
 }
 

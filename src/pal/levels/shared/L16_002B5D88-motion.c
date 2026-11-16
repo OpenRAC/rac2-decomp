@@ -35,7 +35,7 @@ char pad2298[4];
 int field229c;
 } Resident;
 extern Resident g_hero_state;
-extern void func_PAL_L00_002D4668(int,void *,void *);
+extern void UpdateHeroAttachment_pal(int,void *,void *);
 extern float cam_get_view_space_vector_length(char *);
 extern float cam_get_view_space_height(char *);
 extern void cam_set_view_space_vector_length(char *,char *,float);
@@ -51,16 +51,16 @@ extern float FastVecDot(void *,void *);
 extern void FastVecScale(void *,void *,float);
 extern void hero_resolve_collision_with_rewind(void);
 extern void hero_probe_ground(void);
-extern void func_PAL_L00_002B5178(void);
+extern void EaseHeroPositionToGoal_pal(void);
 extern void cam_project_vector_onto_view_plane(char *,char *);
 extern float hero_get_speed_along_forward(void *);
 
-void func_PAL_L16_002B5D88(void)
+void hero_apply_movement_pal(void)
 {
     float oldPosition[4],horizontal[4],vertical[4];
     float limit,saved;
     qcopy(oldPosition,V(0x80));
-    func_PAL_L00_002D4668(g_hero_state.field588,V(0x100),V(0x90));
+    UpdateHeroAttachment_pal(g_hero_state.field588,V(0x100),V(0x90));
     if (g_hero_state.field2294==0x14 || g_hero_state.field2294==0x5B || g_hero_state.field2294==0x58 || g_hero_state.field2294==0x81) {
         if (g_hero_state.field1f0==0 && cam_get_view_space_vector_length(V(0xF0))>g_hero_state.field264-0.02f)
             cam_set_view_space_vector_length(V(0xF0),V(0xF0),g_hero_state.field264-0.02f);
@@ -88,7 +88,7 @@ moved:
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
         FastVecSub(V(0x110),V(0x80),oldPosition);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     } else hero_probe_ground();
     FastVecSub(V(0x120),V(0x80),oldPosition);
     qcopy(V(0x140),V(0x120));
@@ -132,7 +132,7 @@ moved:
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
         FastVecSub(V(0x110),V(0x80),oldPosition);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     }
     FastVecSub(V(0x150),V(0x80),horizontal);
     g_hero_state.field184=FastVecLength(V(0x150));

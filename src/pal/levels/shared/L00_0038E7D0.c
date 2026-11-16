@@ -5,7 +5,7 @@ extern char g_hero_state[];
 extern void update_moby_animation_state(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 
-void func_PAL_L00_0038E7D0(unsigned char *target)
+void weapon_sync_anim_to_hero_pal(unsigned char *target)
 {
     char *globals = g_hero_state;
     int state;

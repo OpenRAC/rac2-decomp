@@ -1,12 +1,12 @@
 #include "common.h"
 typedef int Snapshot128 __attribute__((mode(TI)));
-extern u8 D_L01_002A4D50[],g_hero_position[];
-extern float D_L01_001B0420 __attribute__((sda));
-extern float D_L01_001B0424 __attribute__((sda));
-extern float D_L01_001B0428 __attribute__((sda));
-extern float D_L01_001B042C __attribute__((sda));
-extern float D_L01_001B0430 __attribute__((sda));
-extern float D_L01_001B0434 __attribute__((sda));
+extern u8 g_str_water_floater_debug[],g_hero_position[];
+extern float g_water_floater_scale __attribute__((sda));
+extern float g_water_floater_angle_a __attribute__((sda));
+extern float g_water_floater_angle_b __attribute__((sda));
+extern float g_water_floater_speed __attribute__((sda));
+extern float g_water_floater_limit __attribute__((sda));
+extern float g_water_floater_push_radius __attribute__((sda));
 extern void STUB_printf(void *,int,int);
 extern float level_get_water_height(void);
 extern float math_random_angle(void);
@@ -27,7 +27,7 @@ void water_floater_update(u8 *moby)
     float water_height, hero_distance, delta;
 
     if (!vars) {
-        STUB_printf(D_L01_002A4D50, *(s16 *)(moby + 0xAA), *(s16 *)(moby + 0xB2));
+        STUB_printf(g_str_water_floater_debug, *(s16 *)(moby + 0xAA), *(s16 *)(moby + 0xB2));
         return;
     }
     switch (moby[0x20]) {
@@ -45,19 +45,19 @@ void water_floater_update(u8 *moby)
         *(Snapshot128 *)snapshots[0] = *(Snapshot128 *)(moby + 0x10);
         *(Snapshot128 *)snapshots[1] = *(Snapshot128 *)snapshots[0];
         water_height = level_get_water_height();
-        moby_scale_owner_words_by_angles(moby, vars + 0x20, vars + 0x24, D_L01_001B0420,
-                      D_L01_001B0424 * 0.00029088825f,
-                      D_L01_001B0428 * 0.00029088825f);
+        moby_scale_owner_words_by_angles(moby, vars + 0x20, vars + 0x24, g_water_floater_scale,
+                      g_water_floater_angle_a * 0.00029088825f,
+                      g_water_floater_angle_b * 0.00029088825f);
         math_step_damped_spring((float *)(moby + 0x10), (float *)(vars + 0x10), *(float *)vars,
-                          D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
+                          g_water_floater_speed * 0.00027777778f, g_water_floater_limit, 3.0f);
         math_step_damped_spring((float *)(moby + 0x14), (float *)(vars + 0x14), *(float *)(vars + 4),
-                          D_L01_001B042C * 0.00027777778f, D_L01_001B0430, 3.0f);
+                          g_water_floater_speed * 0.00027777778f, g_water_floater_limit, 3.0f);
         hero_distance = vec_distance_xy(moby + 0x10, g_hero_position);
-        if (hero_distance < D_L01_001B0434 &&
+        if (hero_distance < g_water_floater_push_radius &&
             *(float *)(g_hero_position + 8) < *(float *)(moby + 0x18) + 0.8f) {
             FastVecSub(push_vec, moby + 0x10, g_hero_position);
             push_vec[2] = 0;
-            vec_scale_to_length(push_vec, push_vec, (D_L01_001B0434 - hero_distance) * 0.08f);
+            vec_scale_to_length(push_vec, push_vec, (g_water_floater_push_radius - hero_distance) * 0.08f);
             FastVecAdd(moby + 0x10, moby + 0x10, push_vec);
         }
         delta = water_height + *(float *)(vars + 0x28) - *(float *)(moby + 0x18);

@@ -115,7 +115,7 @@ void trigger_list_check_hero(Obj_38C1B8 *a0)
 
 /* Read at +0xC0: a symbol-plus-offset address stays one two-instruction macro load, which reorg
  * cannot move into a branch delay slot. */
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 extern int FloatToInt(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void moby_set_state(char *, int, int);
@@ -150,7 +150,7 @@ void levitator_l13_pad_update(char *obj)
         }
         hero = g_hero_state;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
-            if (D_001A7A40[0xC0] != 0) {
+            if (g_unlocked_item_flags[0xC0] != 0) {
                 ForceClaimNotice(0xC, 0x27F7, 1);
                 *(short *)(hero + 0x1F2) = 0xA;
                 turn = *(float *)(rig + 0xC);
@@ -175,7 +175,7 @@ void levitator_l13_pad_update(char *obj)
             glow = 0x80;
         else if (glow < 0x20)
             glow = 0x20;
-        if (D_001A7A40[0xC0] != 0)
+        if (g_unlocked_item_flags[0xC0] != 0)
             *(int *)(obj + 0x78) = (glow << 8) | 0x80000000;
         else
             *(int *)(obj + 0x78) = glow | 0x80000000;
@@ -239,7 +239,7 @@ void enemy_update_explode(unsigned char *m)
 
 
 /* The level's entity table: 0x100 bytes an entry. */
-extern char *D_L13_001B291C __attribute__((section(".sdata")));
+extern char *g_object_table_base __attribute__((section(".sdata")));
 
 /* Compares the choice (0, 1 or 2) at +0x2CC of the object's state with its opponent's:
  * the entity the state names at +0x2C8 decides the opponent by its kind at +0xAA (0xEA3
@@ -249,7 +249,7 @@ extern char *D_L13_001B291C __attribute__((section(".sdata")));
 int rps_judge(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    char *entity = D_L13_001B291C + (*(int *)(state + 0x2C8) << 8);
+    char *entity = g_object_table_base + (*(int *)(state + 0x2C8) << 8);
     int mine;
     int other;
 

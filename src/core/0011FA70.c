@@ -84,14 +84,14 @@ void kernel_install_entries_boot(void) {
    it - D_001417EC is set first, then the teardown is entered with a sibling
    `j`. Both bodies are void, and the `addiu $v0,$zero,1` left in the bnez
    delay slot is the store's constant, not a return value. */
-extern int D_001417EC;
+extern int g_shutdown_started;
 
 extern void func_0011FB98(void);
 
 /* Runs the program shutdown code only once. */
 void shutdown_run_callbacks_once(void) {
-    if (D_001417EC == 0) {
-        D_001417EC = 1;
+    if (g_shutdown_started == 0) {
+        g_shutdown_started = 1;
         func_0011FB98();
     }
 }

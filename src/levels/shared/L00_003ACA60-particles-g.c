@@ -13,9 +13,9 @@ extern int math_random_int_range(int,int);
 extern int func_1163B0(void);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 typedef struct {char pad[0x5C]; unsigned char *data;} ParticleGlobals;
-extern ParticleGlobals D_L00_001FE940;
+extern ParticleGlobals g_effect_definitions;
 extern char *part_spawn_burst(void *,void *,int,int,int,int,float,float,float,float,float);
 void part_emit_shot_trail(char *moby,void *previous)
 {
@@ -37,7 +37,7 @@ void part_emit_shot_trail(char *moby,void *previous)
  vec_scale_to_length(step,step,ratio);
  if(n>0) do {
  type=FloatToInt(math_random_signed_float_range(1.0f,3.0f));
- FastVecScale(-(math_random_float_range(0.2f,1.0f)*(1.0f/60.0f)),velocity,D_0018A0E0);
+ FastVecScale(-(math_random_float_range(0.2f,1.0f)*(1.0f/60.0f)),velocity,g_hero_state_block);
  time=math_random_int_range(30,45);
  speed=math_random_float_range(200.0f,1000.0f);
  if(func_1163B0()&2) {flags=32;color=0x404040;speed+=speed;}
@@ -45,7 +45,7 @@ void part_emit_shot_trail(char *moby,void *previous)
  vel=velocity;
  particle=part_spawn_burst(point,vel,time,flags,color,type,21000.0f,speed,1.0f,0,0);
  FastVecAdd(point,point,step);
- if(particle) {particle[2]=D_L00_001FE940.data[0];particle[3]=flags==64?0x48:0x44;}
+ if(particle) {particle[2]=g_effect_definitions.data[0];particle[3]=flags==64?0x48:0x44;}
  n--;
  } while(n);
 }

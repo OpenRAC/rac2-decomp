@@ -5,7 +5,7 @@ extern void part_kill(char *);
 extern int FloatToInt(float);
 extern int math_fast_float_d(char *);
 extern float FastAddRotations(float, float);
-extern int D_001AA304 __attribute__((sda));
+extern int g_particle_fade_lifetime __attribute__((sda));
 
 /* func_PAL_002BC6A0, the PAL copy of func_002BBA38: the same C, with the frame count scaled to 50 Hz. */
 void func_PAL_002BC6A0(char *particle)
@@ -19,10 +19,10 @@ void func_PAL_002BC6A0(char *particle)
     } else {
         *(float *)(state + 12) = FastAddRotations(*(float *)(state + 12), *(float *)(state + 8));
         particle[8] = FloatToInt(*(float *)(state + 12) * 40.7436637878418f) - 128;
-        if (*(int *)(particle + 32) > ((D_001AA304 * 5 + 2) / 6) * 3 / 4)
-            alpha = *(int *)(state + 16) * (((D_001AA304 * 5 + 2) / 6) - *(int *)(particle + 32)) / (((D_001AA304 * 5 + 2) / 6) / 4);
-        else if (*(int *)(particle + 32) < ((D_001AA304 * 5 + 2) / 6) / 4)
-            alpha = *(int *)(state + 16) * *(int *)(particle + 32) / (((D_001AA304 * 5 + 2) / 6) / 4);
+        if (*(int *)(particle + 32) > ((g_particle_fade_lifetime * 5 + 2) / 6) * 3 / 4)
+            alpha = *(int *)(state + 16) * (((g_particle_fade_lifetime * 5 + 2) / 6) - *(int *)(particle + 32)) / (((g_particle_fade_lifetime * 5 + 2) / 6) / 4);
+        else if (*(int *)(particle + 32) < ((g_particle_fade_lifetime * 5 + 2) / 6) / 4)
+            alpha = *(int *)(state + 16) * *(int *)(particle + 32) / (((g_particle_fade_lifetime * 5 + 2) / 6) / 4);
         else
             alpha = *(int *)(state + 16);
         shifted = (unsigned int)alpha << 24;

@@ -88,7 +88,7 @@ typedef struct {
 extern void moby_mark_spawned(NativeUpdate775View *object);
 typedef union { TI128 quad; float f[4]; } ParticleUpdateVector;
 typedef struct { int color[4]; } ParticleUpdateColors;
-extern ParticleUpdateColors D_L00_001AF010;
+extern ParticleUpdateColors g_spark_particle_colors;
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int gfx_swap_packed_color_channels(int, int);
@@ -110,7 +110,7 @@ void func_PAL_L00_00392718(char *object)
             enabled = 0;
     if ((*(unsigned char *)(object + 0xBC) & 1) && enabled) {
         int color;
-        colors = D_L00_001AF010;
+        colors = g_spark_particle_colors;
         random.quad = 0;
         random.f[0] = math_random_float_range(-1.0f, 1.0f);
         random.f[1] = math_random_float_range(-1.0f, 1.0f);
@@ -158,18 +158,18 @@ typedef struct {
     short platform; char pad24EE[0x46]; int cooldown; char pad2538[8];
 } TetherLaunchHero;
 extern TetherLaunchHero g_hero_state;
-extern LaunchStats D_0018C360;
-extern int D_L00_001A8F00[] __attribute__((sda)), D_L00_001A8F08[] __attribute__((sda));
+extern LaunchStats g_statistics_table;
+extern int g_game_l00_mode[] __attribute__((sda)), g_input_lock_state[] __attribute__((sda));
 typedef struct { char pad00[0x1A4]; unsigned int buttons; } LaunchInput;
 extern LaunchInput g_pad_state;
-extern unsigned int D_001A7390 __attribute__((section(".sdata")));
+extern unsigned int g_frame_counter __attribute__((section(".sdata")));
 extern unsigned int g_current_map_index[] __attribute__((sda));
 extern char *g_follow_camera_object;
 extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
 extern float vec_length_xy(void *), mat_fast_helper_a(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float), FastVecAdd(void *, void *, void *);
-extern void func_PAL_002A7E68(void *, int, int, int), func_PAL_L00_002F5D28(void);
-extern char *func_PAL_L00_00394148(char *, char *, float, float);
+extern void func_PAL_002A7E68(void *, int, int, int), level_start_timed_object_once_pal(void);
+extern char *visibomb_create_missile_pal(char *, char *, float, float);
 extern int PlayMobySound(int, int, char *);
 /* Starts the tether when the shared input and movement gates permit it. */
 void func_PAL_L00_003929E0(char *actor) {
@@ -183,7 +183,7 @@ void func_PAL_L00_003929E0(char *actor) {
     math_fast_float_d(state);
     if (g_hero_state.level == 29) { if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0; }
     else g_hero_state.cooldown = 33;
-    if (D_L00_001A8F00[0] || D_L00_001A8F08[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
+    if (g_game_l00_mode[0] || g_input_lock_state[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
     if (g_hero_state.state == 7 || g_hero_state.state == 2 || g_hero_state.state == 3 || g_hero_state.state == 4 || g_hero_state.state == 5 || g_hero_state.state == 6 || g_hero_state.state == 16 || g_hero_state.state == 14 || g_hero_state.state == 9 || g_hero_state.state == 10 || g_hero_state.state == 11 || g_hero_state.state >= 13 || g_hero_state.level == 111 || g_hero_state.level == 98) goto finish;
     if ((g_follow_camera_object && *(short *)(g_follow_camera_object + 0x86) == 5) || !g_hero_state.grounded || g_hero_state.resource < 19) goto finish;
     if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E || *(short *)(g_hero_state.support + 0xAA) == 0x46F) && ready) goto finish;
@@ -199,12 +199,12 @@ void func_PAL_L00_003929E0(char *actor) {
         FastVecAdd(point, point, actor + 0x10);
     }
     if (*(unsigned char *)(actor + 0x43) != 3) func_PAL_002A7E68(actor, 3, 0, 0);
-    func_PAL_L00_002F5D28();
-    *(char **)(state + 1) = func_PAL_L00_00394148(actor, (char *)point, heading, pitch);
-    if (D_0018C360.launches < 0xFFFF) D_0018C360.launches++;
-    if (D_0018C360.bestTime < (((int)(D_001A7390) * 5 + 2) / 6)) D_0018C360.bestTime = (((int)(D_001A7390) * 5 + 2) / 6);
-    D_0018C360.mask |= 1U << g_current_map_index[0];
-    D_0018C360.mask |= 0x80000000;
+    level_start_timed_object_once_pal();
+    *(char **)(state + 1) = visibomb_create_missile_pal(actor, (char *)point, heading, pitch);
+    if (g_statistics_table.launches < 0xFFFF) g_statistics_table.launches++;
+    if (g_statistics_table.bestTime < (((int)(g_frame_counter) * 5 + 2) / 6)) g_statistics_table.bestTime = (((int)(g_frame_counter) * 5 + 2) / 6);
+    g_statistics_table.mask |= 1U << g_current_map_index[0];
+    g_statistics_table.mask |= 0x80000000;
     state[0] = 50;
     goto finish;
 denied:

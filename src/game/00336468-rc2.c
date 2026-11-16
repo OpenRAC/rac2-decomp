@@ -26,10 +26,10 @@
 #include "common.h"
 
 extern void object_destroy_array();
-extern s8 D_001AD9F8[];
+extern s8 g_object_derived_table_b[];
 
 /* Sets the object type pointer and runs the shared base cleanup. */
 void object_reset_type_and_cleanup_b(void *obj) {
-    (*(s8 **)((char *)(obj) + (0x30))) = D_001AD9F8;
+    (*(s8 **)((char *)(obj) + (0x30))) = g_object_derived_table_b;
     object_destroy_array();
 }

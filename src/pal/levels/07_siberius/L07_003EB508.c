@@ -5,10 +5,10 @@ typedef int Quad128 __attribute__((mode(TI)));
 extern void matrix_mul_vec3(Quad128 *, Quad128 *, char *);
 typedef int TI128 __attribute__((mode(TI)));
 extern void group_destroy_attached_parts(char *, char *);
-extern void func_PAL_002A7650(char *, int, int);
+extern void SetDeathBits_pal(char *, int, int);
 extern void matrix_mul_vec3(TI128 *, TI128 *, char *);
 extern void FastVecAdd(TI128 *, TI128 *, char *);
-extern char *func_PAL_L00_003FB330(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
+extern char *SpawnExplosion_pal(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
                           int);
 extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
@@ -28,12 +28,12 @@ void func_PAL_L07_003EB508(char *arg)
     *(unsigned short *)(arg + 0x34) = (*(unsigned short *)(arg + 0x34) | 0x41) & 0xEFFF;
     *(int *)(arg + 0x98) = 0;
     group_destroy_attached_parts(arg, o + 0x330);
-    func_PAL_002A7650(arg, 0, 3);
+    SetDeathBits_pal(arg, 0, 3);
     v[0] = 0;
     ((float *)v)[2] = 0.75f;
     matrix_mul_vec3(v, v, arg + 0xC0);
     FastVecAdd(v, v, arg + 0x10);
-    func_PAL_L00_003FB330(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, *(int *)(o + 0x338));
+    SpawnExplosion_pal(v, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f, 1, 0, 0, *(int *)(o + 0x338));
     PlayMobySound(6, 0, arg);
     vec_scale_to_length(&w, o + 0x1C0, 0.060000002f);
     func_PAL_002B15D8(arg, 1016, &w, 3.0f, 6.0f, 3.0f, 6.0f, 255);

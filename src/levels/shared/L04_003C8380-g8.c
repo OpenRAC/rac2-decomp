@@ -50,7 +50,7 @@ extern unsigned char *ref_L04_003FBD80_00(int kind);
 extern int ref_L04_003FBD80_01(int a0, int a1, void *owner);
 extern float ref_L04_003FBD80_02(float low, float high);
 extern void moby_damage_in_firing_cone(unsigned char *object, L04_FBD80Vars *vars);
-extern int D_L04_001B0488 __attribute__((sda));
+extern int g_shield_dome_sound_handle __attribute__((sda));
 
 /* Spawns a kind-0xABE object for an entity of kind 0xBBC: it takes the entity's 8-byte
    word at +0x38, the given position raised by 0.2 and the entity's quadword at +0xF0 (with
@@ -80,7 +80,7 @@ unsigned char *shield_dome_spawn(unsigned char *owner, L04_FBD80Quad *pos_in)
         dome_vars = *(L04_FBD80Vars **)(dome + 0x68);
         handle = ref_L04_003FBD80_01(9, 0, owner);
         owner_word = *(long *)(owner + 0x38);
-        D_L04_001B0488 = handle;
+        g_shield_dome_sound_handle = handle;
         *(long *)(dome + 0x38) = owner_word;
         *(L04_FBD80Quad *)(dome + 0x10) = *(L04_FBD80Quad *)spawn_pos;
         *(float *)(dome + 0x18) += 0.2f;
@@ -103,11 +103,11 @@ unsigned char *shield_dome_spawn(unsigned char *owner, L04_FBD80Quad *pos_in)
 
 typedef int UpdateQuad __attribute__((mode(TI)));
 typedef float L04_EE090Vec[4] __attribute__((aligned(16)));
-extern int D_L04_001B2008 MACRO_ADDR;
-extern L04_EE090Vec D_L04_001B9680, g_hero_position;
-extern unsigned char D_L04_001A8F20[] MACRO_ADDR;
+extern int g_game_tick_counter MACRO_ADDR;
+extern L04_EE090Vec g_tether_zero_vec, g_hero_position;
+extern unsigned char g_effect_default_params[] MACRO_ADDR;
 /* Table of 0x80-byte target records; targets[] below holds indices into it. */
-extern unsigned char *D_L04_001B25CC __attribute__((sda));
+extern unsigned char *g_linked_record_table __attribute__((sda));
 extern unsigned char *g_route_path_table[];
 extern void moby_start_timed_effect(unsigned char *, unsigned char *);
 extern int moby_count_slot_objects_find_free(unsigned char *, unsigned char *);
@@ -179,7 +179,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
     float speed_scale, ground_z;
 
     moby_start_timed_effect(moby, (unsigned char *)vars);
-    if (moby[0x31] && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
+    if (moby[0x31] && fast_vec_dist(moby + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
@@ -188,7 +188,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
         vars->active = 1;
         vars->speed = 1.0f;
         vars->shots = 0;
-        if (D_L04_001B2008) {
+        if (g_game_tick_counter) {
             cursor_moby = 0;
             found_count = 0;
             while (!GetFirstMobyInGroup(&cursor_moby, vars->group, 0, 0)) {
@@ -248,7 +248,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
             for (i = 0; i < 4; i++) {
                 int id = ((int *)((unsigned char *)vars + 0x90))[i];
                 if (id != -1) {
-                    unsigned char *q = D_L04_001B25CC + id * 128;
+                    unsigned char *q = g_linked_record_table + id * 128;
                     distance = fast_vec_dist(g_hero_position, q + 0x30);
                     if (distance < best) {
                         chosen_target = q;
@@ -275,7 +275,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
             for (i = 0; i < 4; i++) {
                 int k = (i + start) % 4;
                 if (vars->targets[k] != -1) {
-                    chosen_target = D_L04_001B25CC + vars->targets[k] * 128;
+                    chosen_target = g_linked_record_table + vars->targets[k] * 128;
                     break;
                 }
             }
@@ -314,7 +314,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
         rotation[2] += 1.0f;
         *(UpdateQuad *)velocity = 0;
         velocity[2] = 3.0f;
-        level_build_spawn_record(shot, rotation, velocity, position, velocity, D_L04_001A8F20, 60, 0, 0);
+        level_build_spawn_record(shot, rotation, velocity, position, velocity, g_effect_default_params, 60, 0, 0);
         vars->fired++;
         vars->timer = vars->delay;
         if (++vars->shots >= 19)

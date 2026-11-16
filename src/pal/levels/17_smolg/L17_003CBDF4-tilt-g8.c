@@ -7,16 +7,16 @@
 /* The tuning value the first rate divides by is read-only here: as const its load carries no
    anti-dependences on the flag stores, so sched1 issues it after the 360.0f numerator, which
    lengthens that constant's life and leaves $f20 to the scale constant, as in retail. */
-extern const float D_L17_001B03B4 __attribute__((sda));
-extern float D_L17_001B03B8 __attribute__((sda));
-extern float D_L17_001B03BC __attribute__((sda));
-extern float D_L17_001B03C0 __attribute__((sda));
-extern float D_L17_001B03C4 __attribute__((sda));
-extern float D_L17_001B03C8 __attribute__((sda));
-extern float D_L17_001B03CC __attribute__((sda));
-extern float D_L17_001B03D0 __attribute__((sda));
-extern float D_L17_001B03D4 __attribute__((sda));
-extern float D_L17_001B03D8 __attribute__((sda));
+extern const float g_tilt_platform_period __attribute__((sda));
+extern float g_tilt_platform_amplitude __attribute__((sda));
+extern float g_tilt_platform_sway_amp __attribute__((sda));
+extern float g_tilt_platform_sway_period __attribute__((sda));
+extern float g_tilt_platform_tilt_period __attribute__((sda));
+extern float g_tilt_platform_hold_seconds __attribute__((sda));
+extern float g_tilt_platform_tilt_seconds __attribute__((sda));
+extern float g_tilt_platform_return_seconds __attribute__((sda));
+extern float g_tilt_platform_scale_a __attribute__((sda));
+extern float g_tilt_platform_drop_height __attribute__((sda));
 extern void math_update_wrapped_angle_offset(void *,void *,void *,float,float,float),moby_scale_owner_words_by_angles(void *,void *,void *,float,float,float);
 extern int hero_is_current_selected_id(void *),flag_set_first_pending(void *),math_fast_float_d(void *),FloatToInt(float);
 extern void moby_set_state(void *,int,int);
@@ -54,15 +54,15 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     UpdateState *s;
     float first_rate;
     float rate_scale = 0.0003490659f;
-    first_rate=360.0f/D_L17_001B03B4;
+    first_rate=360.0f/g_tilt_platform_period;
     *(Quad *)oldpos=o->position.q;
     *(Quad *)oldrot=o->rotation.q;
     s=o->state;
     s->flags8c|=1;
     s->flags3e|=8;
     o->flags34|=0x20;
-    math_update_wrapped_angle_offset(o,&s->a0,&s->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
-    moby_scale_owner_words_by_angles(o,&s->a8,&s->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
+    math_update_wrapped_angle_offset(o,&s->a0,&s->a4,g_tilt_platform_amplitude,first_rate*rate_scale,-1.0f);
+    moby_scale_owner_words_by_angles(o,&s->a8,&s->ac,g_tilt_platform_sway_amp,(360.0f/g_tilt_platform_sway_period)*rate_scale,(360.0f/g_tilt_platform_tilt_period)*rate_scale);
     switch(o->mode) {
     case 0:
         s->origin.q=*(Quad *)oldpos;
@@ -71,7 +71,7 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     case 1:
         if(hero_is_current_selected_id(o)) {
             moby_set_state(o,2,-1);
-            s->b0=FloatToInt((D_L17_001B03C8*300.0f+2.0f)*0.16666667f);
+            s->b0=FloatToInt((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f);
         }
         break;
     case 2: {
@@ -79,13 +79,13 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
         if(flag_set_first_pending(o))PlayMobySound(0,0,o);
         if(s->b0==50)PlayMobySound(0,0,o);
         if(math_fast_float_d(&s->b0)) {
-            s->b4=FloatToInt((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
+            s->b4=FloatToInt((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
             o->mode=3;
         } else {
             rot[0]=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.75f))*0.017453294f;
             rot[1]=math_fast_sin_or_cos_a(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.89f))*0.017453294f;
-            if((float)s->b4>(D_L17_001B03C8*300.0f+2.0f)*0.16666667f-25.0f) {
-                t=IntToFloat(s->b0)/((D_L17_001B03C8*300.0f+2.0f)*0.16666667f-25.333334f);
+            if((float)s->b4>(g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.0f) {
+                t=IntToFloat(s->b0)/((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.333334f);
                 o->rotation.f[0]=o->rotation.f[0]*t+rot[0]*(1.0f-t);
                 o->rotation.f[1]=o->rotation.f[1]*t+rot[1]*(1.0f-t);
             } else {
@@ -97,8 +97,8 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
     }
     case 3: {
         float t,f,b,ax,ay;
-        t=IntToFloat(s->b4)/((D_L17_001B03CC*300.0f+2.0f)*0.16666667f);
-        f=(1.0f-t)*D_L17_001B03D4;
+        t=IntToFloat(s->b4)/((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
+        f=(1.0f-t)*g_tilt_platform_scale_a;
         o->rotation.f[1]=0;
         o->rotation.f[0]=(1.0f-t)*1.57079649f;
         ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
@@ -115,22 +115,22 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
         o->position.f[1]=ay;
         f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
         o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=math_fast_sin_or_cos_a(t*1.57079649f)*D_L17_001B03D8;
+        o->position.f[2]-=math_fast_sin_or_cos_a(t*1.57079649f)*g_tilt_platform_drop_height;
         s->flags8c&=~1;
         s->flags3e&=~8;
         o->flags34&=~0x20;
         if(math_fast_float_d(&s->b4)) {
             o->mode=4;
-            s->b8=FloatToInt((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
+            s->b8=FloatToInt((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
         }
         break;
     }
     case 4: {
         float t,f,b,c,ax,ay;
-        t=IntToFloat(s->b8)/((D_L17_001B03D0*300.0f+2.0f)*0.16666667f);
+        t=IntToFloat(s->b8)/((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
         *(Quad *)rot=o->rotation.q;
         c=1.0f-t;
-        f=(1.0f-c)*D_L17_001B03D4;
+        f=(1.0f-c)*g_tilt_platform_scale_a;
         o->rotation.f[0]=math_fast_float_g((rot[0]*c+c*4.71238947f)+1.57079649f);
         o->rotation.f[1]=rot[1]*c;
         ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
@@ -147,7 +147,7 @@ void func_PAL_L17_003CBDF4(UpdateObject *o)
         o->position.f[1]=ay;
         f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
         o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*D_L17_001B03D8;
+        o->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*g_tilt_platform_drop_height;
         s->flags8c&=~1;
         s->flags3e&=~8;
         o->flags34&=~0x20;

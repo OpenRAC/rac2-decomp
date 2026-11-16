@@ -15,22 +15,22 @@ typedef int TI128 __attribute__((mode(TI)));
  * (`lui $v1,%hi; lw $a1,%lo($v1)`). */
 extern u32 g_hero_moby[];
 
-extern int D_L22_001AFA0C __attribute__((sda));
+extern int g_player_slot_flag_other __attribute__((sda));
 
-extern int D_L22_001AFA08 __attribute__((sda));
+extern int g_player_slot_flag_hero __attribute__((sda));
 
-extern float D_L22_001AF3EC __attribute__((sda));
+extern float g_space_ship_threshold __attribute__((sda));
 
-extern float D_L22_001AF5C8 __attribute__((sda));
+extern float g_ship_align_turn_threshold __attribute__((sda));
 
-extern s16 D_0018A16E[];
+extern s16 g_platform_mode[];
 
 extern f32 math_fabs(f32 f);
 
 /* Says whether the given player has an object in its slot. */
 s32 player_slot_has_object(u32 owner) {
     u32 currentOwner = g_hero_moby[0];
-    int *flag = (owner == currentOwner) ? &D_L22_001AFA08 : &D_L22_001AFA0C;
+    int *flag = (owner == currentOwner) ? &g_player_slot_flag_hero : &g_player_slot_flag_other;
     return *flag != 0;
 }
 
@@ -38,11 +38,11 @@ s32 player_slot_has_object(u32 owner) {
 s32 space_ship_is_aligned_with_target(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     f32 turn;
-    if (*(f32 *)(vars + 0x3DC) < D_L22_001AF3EC) return 1;
+    if (*(f32 *)(vars + 0x3DC) < g_space_ship_threshold) return 1;
     turn = math_fabs(*(f32 *)(vars + 0x414) - *(f32 *)(vars + 0x410));
-    if (D_0018A16E[0] < 0xB) return 0;
-    if (*(f32 *)(vars + 0x3E0) < D_L22_001AF3EC) {
-        if (turn < D_L22_001AF5C8) return 1;
+    if (g_platform_mode[0] < 0xB) return 0;
+    if (*(f32 *)(vars + 0x3E0) < g_space_ship_threshold) {
+        if (turn < g_ship_align_turn_threshold) return 1;
     }
     return 0;
 }
@@ -63,8 +63,8 @@ extern void gfx_free_point_light(int index);
 
 extern void func_0029F338_22(char *object);
 
-extern int D_L22_001A8AB0;
-extern int D_L22_001A8AC0;
+extern int g_charged_shot_active;
+extern int g_charged_shot_screen_effect;
 
 /* Drops the resident slot the argument's record selects: the slot word is released and stamped
  * -1, and the object the slot holds is torn down when its id is 0x5F3 and it has not started
@@ -103,8 +103,8 @@ void player_slot_clear_object(u32 owner)
         char *vars = *(char **)(object + 0x68);
         int index;
 
-        D_L22_001A8AB0 = 0;
-        D_L22_001A8AC0 = 0;
+        g_charged_shot_active = 0;
+        g_charged_shot_screen_effect = 0;
         index = *(short *)(vars + 0x2C);
         if (index != -1)
             gfx_free_point_light(index);
@@ -213,25 +213,25 @@ extern f32 math_lerp_float(f32, f32, f32);
    pairs, the four threshold words (read through $gp) and, for the two id lists, the table of
    lists and the base of the 32-byte records each one indexes (read bare: `lui`/`lw` in one
    register). */
-extern u8 D_L22_001B9C80[];
+extern u8 g_tether_origin[];
 
-extern int D_L22_001A8F00;
+extern int g_hero_l22_mode_state;
 
-extern f32 D_L22_001B0A08 __attribute__((sda));
+extern f32 g_linked_toggle_near_b __attribute__((sda));
 
-extern f32 D_L22_001B0A04 __attribute__((sda));
+extern f32 g_linked_toggle_far_b __attribute__((sda));
 
-extern f32 D_L22_001B0A00 __attribute__((sda));
+extern f32 g_linked_toggle_near_a __attribute__((sda));
 
-extern f32 D_L22_001B09FC __attribute__((sda));
+extern f32 g_linked_toggle_far_a __attribute__((sda));
 
-extern u16 **D_L22_001A9014;
+extern u16 **g_linked_moby_lists_by_state;
 
-extern u16 **D_L22_001A901C;
+extern u16 **g_linked_moby_lists_by_id;
 
-extern u8 *D_L22_001B2794;
+extern u8 *g_toggle_link_table_b;
 
-extern u8 *D_L22_001B2678;
+extern u8 *g_toggle_link_table_a;
 
 /* Switches the object on (+0xCC set) when its position (+0xE0) comes within a threshold of the
    point func_002AFFD8 derives from D_L22_001B9C80 (func_00282DB0 measures it), and off when it
@@ -250,33 +250,33 @@ void moby_toggle_linked_by_distance(u8 *self) {
     u16 *p;
     u8 *e;
 
-    cam_compute_view_direction(D_L22_001B9C80, v, 1);
+    cam_compute_view_direction(g_tether_origin, v, 1);
     dist = FastVecDot(self + 0xE0, v);
     f = IntToFloat(*(s16 *)(state + 0x14)) * 0.071428575f;
-    if (D_L22_001A8F00 == 4)
-        thr = math_lerp_float(D_L22_001B0A08, D_L22_001B0A04, f);
+    if (g_hero_l22_mode_state == 4)
+        thr = math_lerp_float(g_linked_toggle_near_b, g_linked_toggle_far_b, f);
     else
-        thr = math_lerp_float(D_L22_001B0A00, D_L22_001B09FC, f);
+        thr = math_lerp_float(g_linked_toggle_near_a, g_linked_toggle_far_a, f);
     if (*(int *)(state + 0xCC) != 0) {
         if (thr < dist)
             *(int *)(state + 0xCC) = 0;
         if (*(int *)(state + 0xCC) != 0)
             return;
         if (*(int *)(state + 0x10) >= 0) {
-            for (p = D_L22_001A9014[*(int *)(state + 0x10)];
-                 p != 0 && ((s16)p[-1] >= 0 || p == D_L22_001A9014[*(int *)(state + 0x10)]);
+            for (p = g_linked_moby_lists_by_state[*(int *)(state + 0x10)];
+                 p != 0 && ((s16)p[-1] >= 0 || p == g_linked_moby_lists_by_state[*(int *)(state + 0x10)]);
                  p++) {
-                e = D_L22_001B2794 + ((*p & 0x7FFF) << 5);
+                e = g_toggle_link_table_b + ((*p & 0x7FFF) << 5);
                 if (e == 0)
                     break;
                 e[0x1E] &= 0xFB;
             }
         }
         if (*(s16 *)(state + 0x16) >= 0) {
-            for (p = D_L22_001A901C[*(s16 *)(state + 0x16)];
-                 p != 0 && ((s16)p[-1] >= 0 || p == D_L22_001A901C[*(s16 *)(state + 0x16)]);
+            for (p = g_linked_moby_lists_by_id[*(s16 *)(state + 0x16)];
+                 p != 0 && ((s16)p[-1] >= 0 || p == g_linked_moby_lists_by_id[*(s16 *)(state + 0x16)]);
                  p++) {
-                e = D_L22_001B2678 + ((*p & 0x7FFF) << 5);
+                e = g_toggle_link_table_a + ((*p & 0x7FFF) << 5);
                 if (e == 0)
                     break;
                 e[0x16] &= 0xFE;
@@ -288,20 +288,20 @@ void moby_toggle_linked_by_distance(u8 *self) {
         if (*(int *)(state + 0xCC) == 0)
             return;
         if (*(int *)(state + 0x10) >= 0) {
-            for (p = D_L22_001A9014[*(int *)(state + 0x10)];
-                 p != 0 && ((s16)p[-1] >= 0 || p == D_L22_001A9014[*(int *)(state + 0x10)]);
+            for (p = g_linked_moby_lists_by_state[*(int *)(state + 0x10)];
+                 p != 0 && ((s16)p[-1] >= 0 || p == g_linked_moby_lists_by_state[*(int *)(state + 0x10)]);
                  p++) {
-                e = D_L22_001B2794 + ((*p & 0x7FFF) << 5);
+                e = g_toggle_link_table_b + ((*p & 0x7FFF) << 5);
                 if (e == 0)
                     break;
                 e[0x1E] |= 4;
             }
         }
         if (*(s16 *)(state + 0x16) >= 0) {
-            for (p = D_L22_001A901C[*(s16 *)(state + 0x16)];
-                 p != 0 && ((s16)p[-1] >= 0 || p == D_L22_001A901C[*(s16 *)(state + 0x16)]);
+            for (p = g_linked_moby_lists_by_id[*(s16 *)(state + 0x16)];
+                 p != 0 && ((s16)p[-1] >= 0 || p == g_linked_moby_lists_by_id[*(s16 *)(state + 0x16)]);
                  p++) {
-                e = D_L22_001B2678 + ((*p & 0x7FFF) << 5);
+                e = g_toggle_link_table_a + ((*p & 0x7FFF) << 5);
                 if (e == 0)
                     break;
                 e[0x16] |= 1;
@@ -315,25 +315,25 @@ void moby_toggle_linked_by_distance(u8 *self) {
  * written to the shared vertex buffer as three strips; then 32 quads are drawn
  * from the ring's index table, the outer two corners pushed out by a factor. */
 typedef struct { f32 x, y, z; } RingVertex;
-extern RingVertex D_L22_00255920[];
-extern f32 D_L22_002A1260[][4];
-extern f32 D_L22_002A2480[][2];
-extern f32 D_L22_002A2DA0[][4];
-extern s16 D_L22_002A33A0[][4];
-extern f32 D_L22_001B0CA0 __attribute__((sda));
-extern f32 D_L22_001B0CA4 __attribute__((sda));
-extern f32 D_L22_001B0C50 __attribute__((sda));
-extern int D_L22_001B0CDC __attribute__((sda));
-extern int D_L22_001B0CC8 __attribute__((sda));
-extern int D_L22_001B0CCC __attribute__((sda));
-extern int D_L22_001B0CD0 __attribute__((sda));
-extern int D_L22_001B0CD4 __attribute__((sda));
-extern int D_L22_001B0CD8 __attribute__((sda));
-extern int D_L22_001B0CE4 __attribute__((sda));
-extern int D_L22_001B0CF4 __attribute__((sda));
-extern f32 D_L22_001B0CE8 __attribute__((sda));
-extern f32 D_L22_001B0CEC __attribute__((sda));
-extern f32 D_L22_001B0D00 __attribute__((sda));
+extern RingVertex g_ring_vertices[];
+extern f32 g_ring_vertex_offsets[][4];
+extern f32 g_ring_glint_params[][2];
+extern f32 g_ring_packet_vertices[][4];
+extern s16 g_ring_index_table[][4];
+extern f32 g_ring_phase_step __attribute__((sda));
+extern f32 g_ring_pulse_amplitude __attribute__((sda));
+extern f32 g_ring_base_scale __attribute__((sda));
+extern int g_ring_l22_texture_id __attribute__((sda));
+extern int g_ring_gs_bits_a __attribute__((sda));
+extern int g_ring_gs_bits_b __attribute__((sda));
+extern int g_ring_gs_bits_c __attribute__((sda));
+extern int g_ring_gs_bits_d __attribute__((sda));
+extern int g_ring_gs_bits_e __attribute__((sda));
+extern int g_ring_l22_vertex_color __attribute__((sda));
+extern int g_ring_color_rgb __attribute__((sda));
+extern f32 g_ring_outer_scale __attribute__((sda));
+extern f32 g_ring_inner_scale __attribute__((sda));
+extern f32 g_ring_scale_factor __attribute__((sda));
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void VU1_addGSregister(int, unsigned long);
 extern void FastVecScale(void *, void *, f32);
@@ -377,14 +377,14 @@ void gfx_draw_pulsing_ring(RingObject *o) {
     f32 sine;
     unsigned long bits;
 
-    ctl->phase = FastAddRotations(ctl->phase, D_L22_001B0CA0);
+    ctl->phase = FastAddRotations(ctl->phase, g_ring_phase_step);
 
-    packet.state[1] = GetEffectTextureDescriptor(D_L22_001B0CDC);
+    packet.state[1] = GetEffectTextureDescriptor(g_ring_l22_texture_id);
     packet.state[2] = 0xFF9000000260UL;
-    bits = (unsigned long)D_L22_001B0CC8 | ((unsigned long)D_L22_001B0CCC << 2);
-    bits |= (unsigned long)D_L22_001B0CD0 << 4;
-    bits |= (unsigned long)D_L22_001B0CD4 << 6;
-    bits |= (unsigned long)D_L22_001B0CD8 << 32;
+    bits = (unsigned long)g_ring_gs_bits_a | ((unsigned long)g_ring_gs_bits_b << 2);
+    bits |= (unsigned long)g_ring_gs_bits_c << 4;
+    bits |= (unsigned long)g_ring_gs_bits_d << 6;
+    bits |= (unsigned long)g_ring_gs_bits_e << 32;
     packet.state[3] = bits;
     packet.state[0] = 0;
     VU1_addGSregister(0x47, 0x53001);
@@ -394,16 +394,16 @@ void gfx_draw_pulsing_ring(RingObject *o) {
     matrix[3][2] = o->z;
     matrix[3][3] = 1.0f;
     sine = math_fast_sin_or_cos_b(ctl->phase);
-    FastVecScale(offset, o->axis, D_L22_001B0C50 + D_L22_001B0CA4 * sine);
+    FastVecScale(offset, o->axis, g_ring_base_scale + g_ring_pulse_amplitude * sine);
     FastVecAdd((char *)matrix[3], (char *)matrix[3], (char *)offset);
-    FastVecSub(dir, D_L22_001B9C80, matrix[3]);
+    FastVecSub(dir, g_tether_origin, matrix[3]);
     vec_scale_to_length(matrix[0], dir, 1.0f);
     FastVecCross(matrix[1], matrix[0], o->axis);
     vec_scale_to_length(matrix[1], matrix[1], 1.0f);
     FastVecCross(matrix[2], matrix[1], matrix[0]);
 
-    packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = D_L22_001B0CE4;
-    VU1_addGSregister(6, GetEffectTextureDescriptor(D_L22_001B0CDC));
+    packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = g_ring_l22_vertex_color;
+    VU1_addGSregister(6, GetEffectTextureDescriptor(g_ring_l22_texture_id));
     VU1_addGSregister(0x42, 0x8000000044UL);
     VU1_addGSregister(8, 0);
     VU1_addGSregister(0x14, 0xFF9000000260UL);
@@ -411,21 +411,21 @@ void gfx_draw_pulsing_ring(RingObject *o) {
     font_queue_vu_state();
 
     for (i = 0; i < 290; i++) {
-        FastVecScale(scaled, D_L22_002A1260[i], D_L22_001B0CEC);
+        FastVecScale(scaled, g_ring_vertex_offsets[i], g_ring_inner_scale);
         transform_vector(v, scaled, matrix[0]);
-        D_L22_00255920[i].x = v[0];
-        D_L22_00255920[i].y = v[1];
-        D_L22_00255920[i].z = v[2];
+        g_ring_vertices[i].x = v[0];
+        g_ring_vertices[i].y = v[1];
+        g_ring_vertices[i].z = v[2];
         col[i] = packet.colors[0];
     }
-    part_draw_glint_effect(148, &D_L22_00255920[0], &col[0], D_L22_002A2480[0], 1);
-    part_draw_glint_effect(109, &D_L22_00255920[146], &col[146], D_L22_002A2480[146], 1);
-    part_draw_glint_effect(36, &D_L22_00255920[254], &col[254], D_L22_002A2480[254], 1);
+    part_draw_glint_effect(148, &g_ring_vertices[0], &col[0], g_ring_glint_params[0], 1);
+    part_draw_glint_effect(109, &g_ring_vertices[146], &col[146], g_ring_glint_params[146], 1);
+    part_draw_glint_effect(36, &g_ring_vertices[254], &col[254], g_ring_glint_params[254], 1);
 
     packet.state[1] = GetEffectTextureDescriptor(11);
     packet.state[3] = 0x8000000048UL;
     {
-        int color = (FloatToInt(alpha * 64.0f + 128.0f) << 24) | D_L22_001B0CF4;
+        int color = (FloatToInt(alpha * 64.0f + 128.0f) << 24) | g_ring_color_rgb;
         packet.colors[1] = color;
         packet.colors[0] = color;
         packet.colors[3] = 0;
@@ -436,12 +436,12 @@ void gfx_draw_pulsing_ring(RingObject *o) {
 
         for (ring = 0; ring < 32; ring++) {
             for (i = 0; i < 4; i++) {
-                int idx = D_L22_002A33A0[ring][i];
+                int idx = g_ring_index_table[ring][i];
 
                 if (i >= 2) {
-                    FastVecScale(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8 * D_L22_001B0D00);
+                    FastVecScale(packet.verts[i], g_ring_packet_vertices[idx], g_ring_outer_scale * g_ring_scale_factor);
                 } else {
-                    FastVecScale(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8);
+                    FastVecScale(packet.verts[i], g_ring_packet_vertices[idx], g_ring_outer_scale);
                 }
             }
             packet.uv[0] = 0.5f;

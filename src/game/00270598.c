@@ -46,8 +46,8 @@ typedef struct {
     int timer;
 } CameraSystem;
 extern CameraSystem g_active_camera;
-extern char D_001B79B0[];
-extern CameraDefinition *D_001B1504 __attribute__((sda));
+extern char g_camera_buffer[];
+extern CameraDefinition *g_camera_definition_table __attribute__((sda));
 extern int FloatToInt(float);
 extern void mem_fast_helper_c(void *, void *, int);
 extern void moby_call_handler_second(char *);
@@ -63,7 +63,7 @@ void cam_switch_active(char *camera)
     int state;
     CameraVector *pos;
     float *prevpos;
-    info = D_001B1504[next->index].info;
+    info = g_camera_definition_table[next->index].info;
     prev = g_active_camera.current;
     state = prev->state;
     if (info)
@@ -117,10 +117,10 @@ void cam_switch_active(char *camera)
     prev->handoff = 0;
     prev->cut = 0;
     g_active_camera.previous = prev;
-    mem_fast_helper_c(D_001B79B0, D_001B79B0 - 0x280, 0x280);
-    g_active_camera.previous->buffer = D_001B79B0;
+    mem_fast_helper_c(g_camera_buffer, g_camera_buffer - 0x280, 0x280);
+    g_active_camera.previous->buffer = g_camera_buffer;
     g_active_camera.current = next;
-    next->buffer = D_001B79B0 - 0x280;
+    next->buffer = g_camera_buffer - 0x280;
     prev = next;
     g_active_camera.timer = 0;
     moby_call_handler_second((char *)prev);

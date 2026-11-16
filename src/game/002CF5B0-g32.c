@@ -12,10 +12,10 @@ typedef struct { unsigned char f0; unsigned char f1; unsigned char item; unsigne
 
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
-extern int D_001AB9EC __attribute__((sda));
-extern ShopEntry D_001ABCD0[] MACRO_ADDR;
-extern unsigned char D_001A7A60[] MACRO_ADDR;
-extern unsigned char D_001A7A40[] MACRO_ADDR;
+extern int g_unlockable_options_cursor __attribute__((sda));
+extern ShopEntry g_unlockable_shop_table[] MACRO_ADDR;
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
+extern unsigned char g_unlocked_item_flags[] MACRO_ADDR;
 typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
 extern Settings_002F9198 g_player_bolts MACRO_ADDR;
 extern int save_count_nonzero_flags(void);
@@ -24,7 +24,7 @@ extern void tex_load_level_pack(void *);
 
 static __inline__ ShopEntry *shop_entry(int index)
 {
-    return &D_001ABCD0[index];
+    return &g_unlockable_shop_table[index];
 }
 
 static __inline__ int shop_cost(int index)
@@ -48,7 +48,7 @@ int menu_handle_unlockable_options_input(void)
 
     if (flags & 0x10) {
         int value, return_code;
-        D_001AB9EC = 0;
+        g_unlockable_options_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -61,44 +61,44 @@ finish:
         return return_code;
     }
     if (flags & 0x900) {
-        D_001AB9EC = 0;
+        g_unlockable_options_cursor = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
             snd_play_from_global_bank(3, 0, 0);
             do {
                 ShopEntry *table;
-                if (--D_001AB9EC < 0)
-                    D_001AB9EC = 11;
-                table = D_001ABCD0;
-                if (table[D_001AB9EC].cost != 100)
+                if (--g_unlockable_options_cursor < 0)
+                    g_unlockable_options_cursor = 11;
+                table = g_unlockable_shop_table;
+                if (table[g_unlockable_options_cursor].cost != 100)
                     break;
             } while (1);
         } else if (flags & 0x4000) {
             int next_index;
             ShopEntry *table;
             snd_play_from_global_bank(3, 0, 0);
-            next_index = D_001AB9EC;
-            table = D_001ABCD0;
+            next_index = g_unlockable_options_cursor;
+            table = g_unlockable_shop_table;
             do {
                 if (++next_index >= 12)
                     next_index = 0;
             } while (table[next_index].cost == 100);
-            D_001AB9EC = next_index;
+            g_unlockable_options_cursor = next_index;
         }
         if (g_pad_state.flags & 0x40) {
-            slot = (unsigned char *)D_001ABCD0;
-            entry_cost = ((ShopEntry *)slot)[D_001AB9EC].cost;
+            slot = (unsigned char *)g_unlockable_shop_table;
+            entry_cost = ((ShopEntry *)slot)[g_unlockable_options_cursor].cost;
             if ((entry_cost != 0x5A && entry_cost <= available)
-                || (shop_cost(D_001AB9EC) == 0x5A && D_001A7A60[0] != 0)) {
+                || (shop_cost(g_unlockable_options_cursor) == 0x5A && g_item_enabled_flags[0] != 0)) {
                 snd_play_from_global_bank(4, 0, 0);
-                slot = &D_001A7A40[shop_entry(D_001AB9EC)->item];
+                slot = &g_unlocked_item_flags[shop_entry(g_unlockable_options_cursor)->item];
                 if (*slot)
                     *slot = 0;
                 else
                     *slot = 1;
                 {
-                    flags = shop_item(D_001AB9EC);
+                    flags = shop_item(g_unlockable_options_cursor);
                     if (flags == 9 || flags == 10 || (unsigned char)flags == 2 || (unsigned char)flags == 11)
                         tex_load_level_pack((void *)(s32)g_player_bolts.level);
                 }

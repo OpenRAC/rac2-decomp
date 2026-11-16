@@ -46,10 +46,10 @@ typedef struct {
     unsigned char index;
 } EffectMaterialSelector;
 
-extern EffectAngles D_L00_001AFDA8;
+extern EffectAngles g_effect_angles;
 extern EffectMaterialSelector g_item_slot_to_record;
 extern EffectMaterialEntry g_weapon_l00_table[];
-extern int D_L00_001AFDA0 __attribute__((sda));
+extern int g_effect_moby_count __attribute__((sda));
 extern char *spark_move_projectile(EffectObject *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
@@ -99,7 +99,7 @@ void UpdateMovingEffectState(EffectObject *self)
     float scale;
     float ratio;
 
-    angles = D_L00_001AFDA8;
+    angles = g_effect_angles;
     switch (self->phase) {
     case 0:
     case 1:
@@ -153,7 +153,7 @@ void UpdateMovingEffectState(EffectObject *self)
             table_clear_entry_flag(state->f50);
             pair_clear_owner_key_entries(self);
             light_handle = state->light_index;
-            D_L00_001AFDA0--;
+            g_effect_moby_count--;
             if (light_handle != -1)
                 gfx_free_point_light(light_handle);
             moby_mark_spawned(self);

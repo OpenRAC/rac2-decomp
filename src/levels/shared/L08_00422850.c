@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern s32 CollLine(void *first, void *second, s32 mode, void *object, s32 flags);
-extern float D_L08_001BFF68;
+extern float g_ground_height_result;
 
 /* func_L01_003BD560 with a zero floor meaning the probe's own height. */
 /* Looks for solid ground below a point and returns its height, or the floor value if nothing is hit. */
@@ -17,7 +17,7 @@ float coll_find_ground_height(void *position, float first, float second, float f
     else
         endpoints[1][2] = first;
     if (CollLine(endpoints[1], endpoints[0], 2, 0, 0)) {
-        return D_L08_001BFF68 > floor ? D_L08_001BFF68 : floor;
+        return g_ground_height_result > floor ? g_ground_height_result : floor;
     }
     if (floor != 0.0f)
         return floor;

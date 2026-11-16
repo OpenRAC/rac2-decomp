@@ -2,12 +2,12 @@
 /* Advances the stage cursor by 0x10, mirrors the clock, builds the view matrix and restarts the two render packets. */
 extern void FlushCache(int);
 extern void gfx_append_vif_unpack_data(unsigned int, void *, unsigned int);
-extern int D_001A72D4 __attribute__((sda));
-extern int D_001A72D0 __attribute__((sda));
+extern int g_vram_frame_base __attribute__((sda));
+extern int g_vram_cursor __attribute__((sda));
 extern unsigned char *g_dma_packet_cursor __attribute__((sda));
-extern unsigned char *D_001B219C __attribute__((sda));
+extern unsigned char *g_render_frame_cursor __attribute__((sda));
 extern char g_camera_eye_state[];
-extern int D_00215E80[];
+extern int g_gfx_register_block_b[];
 extern void set_identity_matrix(float *);
 extern void FastVecScale(void *, void *, float);
 extern void multiply_matrix(char *, char *, char *);
@@ -20,10 +20,10 @@ void gfx_begin_render_frame(void)
     float viewMatrix[16];
     unsigned char *cursor = g_dma_packet_cursor;
 
-    D_001B219C = cursor;
+    g_render_frame_cursor = cursor;
     cursor += 0x10;
     g_dma_packet_cursor = cursor;
-    D_001A72D0 = D_001A72D4;
+    g_vram_cursor = g_vram_frame_base;
     set_identity_matrix(viewMatrix);
     FastVecScale(viewMatrix + 12, g_camera_eye_state, -1024.0f);
     viewMatrix[15] = 1.0f;
@@ -33,5 +33,5 @@ void gfx_begin_render_frame(void)
     FlushCache(0);
     func_002EF480();
     gfx_build_render_list_markers();
-    gfx_write_register_with_sync(D_00215E80, 0x3000, 0x40);
+    gfx_write_register_with_sync(g_gfx_register_block_b, 0x3000, 0x40);
 }

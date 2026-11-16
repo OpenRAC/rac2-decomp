@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_0026C550[];
+extern s8 g_cam_mode_table[];
 extern s8 coll_convert_packed_points_to_vectors(void *, s8 *, s32);
 extern int moby_get_joint_matrix(void *, s8 *, s8 *, s16);
 extern s32 target_seeker_update(void *);
@@ -51,7 +51,7 @@ s32 cam_moby_update(void *arg0) {
         goto done;
     }
     {
-        s8 *table = D_0026C550;
+        s8 *table = g_cam_mode_table;
 
         goto *(void *)*(s32 *)(table + cam_mode * 4);
     }

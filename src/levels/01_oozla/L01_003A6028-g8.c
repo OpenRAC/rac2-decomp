@@ -1,5 +1,5 @@
 #include "common.h"
-extern float D_L01_001B2F48 __attribute__((sda));
+extern float g_ground_probe_height __attribute__((sda));
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void *moby_spawn_scaled_effect(void *, float);
 extern float math_random_float_range(float, float);
@@ -19,13 +19,13 @@ void OozlaSpawnSplashParticles(char *object)
     int scale = 2;
 
     qcopy(center, (object + 0x10));
-    center[2] = D_L01_001B2F48 = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
+    center[2] = g_ground_probe_height = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
     moby_spawn_scaled_effect(center, 4.5f);
     for (i = 4; i >= 0; --i) {
         velocity[0] = *(float *)(object + 0x10) + scale * math_random_float_range(-0.3f, 0.3f);
         velocity[1] = *(float *)(object + 0x14) + scale * math_random_float_range(-0.3f, 0.3f);
-        velocity[2] = D_L01_001B2F48;
-        part_spawn_drifting(velocity, &D_L01_001B2F48, -1, scale * math_random_float_range(0.3f, 0.6f), 5250.0f);
+        velocity[2] = g_ground_probe_height;
+        part_spawn_drifting(velocity, &g_ground_probe_height, -1, scale * math_random_float_range(0.3f, 0.6f), 5250.0f);
     }
     for (j = 39; j >= 0; --j) {
         angle = math_random_angle();
@@ -35,7 +35,7 @@ void OozlaSpawnSplashParticles(char *object)
         velocity[2] = scale * math_random_float_range(0.033333335f, 0.083333336f);
         position[0] = *(float *)(object + 0x10) + velocity[0] * 8.0f;
         position[1] = *(float *)(object + 0x14) + velocity[0] * 8.0f;
-        position[2] = D_L01_001B2F48 - math_random_float_range(0.0f, 0.2f);
+        position[2] = g_ground_probe_height - math_random_float_range(0.0f, 0.2f);
         type = math_random_int_below(2);
         lifetime = math_random_int_range(90, 120);
         part_spawn_spark_2(position, velocity, type, scale * lifetime);

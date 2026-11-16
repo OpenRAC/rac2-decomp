@@ -4,7 +4,7 @@
 typedef struct {float amplitude, offset; int frames, longest;} CameraShake;
 typedef struct { char prefix[0x140]; float pos[4]; char pad[0x40]; char *current; char pad194[0x1dc]; float rows[12]; } CameraSystem;
 extern CameraSystem g_active_camera;
-extern float D_001A85B8 __attribute__((sda));
+extern float g_camera_shake_frequency __attribute__((sda));
 extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
 extern float math_fast_float_g(float);
@@ -16,7 +16,7 @@ extern void vec_set_direction_with_complement(void *, void *, float);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 
-void func_PAL_002717F8(CameraShake *s, int mode)
+void cam_update_shake_pal(CameraShake *s, int mode)
 {
     float buf[4], matrix[12];
     float ratio, cube, frequency, elapsed, ramp;
@@ -45,7 +45,7 @@ void func_PAL_002717F8(CameraShake *s, int mode)
         case 2: {
             float value;
             cube = ratio * ratio * ratio;
-            frequency = D_001A85B8 * 0.017453294f;
+            frequency = g_camera_shake_frequency * 0.017453294f;
             elapsed = IntToFloat(s->longest - s->frames) * (0.019867549f);
             ramp = elapsed * 6.0f;
             if (ramp > 1.0f) ramp = 1.0f;

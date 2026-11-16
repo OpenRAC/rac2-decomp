@@ -17,11 +17,11 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void func_PAL_L00_00424EF0(void *, int, int);
+extern void part_l00_spawn_impact_spark_burst_2_pal(void *, int, int);
 extern int func_PAL_00335DD0(void *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L00_004253C0(void *);
+extern void rocket_spawn_smoke_burst_pal(void *);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -36,13 +36,13 @@ extern BEE58Entry g_weapon_l00_table[];
 extern char *g_hero_moby NOT_SDA;
 typedef struct { char pad[0x18]; char *target; char pad1[4]; float position[4]; } BEE58Hit;
 extern BEE58Hit g_collision_result;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern unsigned char *D_L00_001FEA14;
-extern unsigned char *D_L00_001FE9F4;
+extern char g_default_vector[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b;
+extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter MACRO_ADDR;
 extern void shot_update_and_draw_trail(void *);
 
-void func_PAL_L00_00424128(char *obj)
+void homing_l00_shot_update_4_pal(char *obj)
 {
     float previous[4], scratch[4], delta[4], temp[4];
     unsigned char hit[48];
@@ -109,9 +109,9 @@ target_done:
         hit[0x19] = 1;
         if (CollLine(previous, obj + 0x10, 0, g_hero_moby, hit)) {
             qcopy(obj + 0x10, g_collision_result.position);
-            if (!g_collision_result.target) func_PAL_L00_00424EF0(g_collision_result.position, 15, 0);
+            if (!g_collision_result.target) part_l00_spawn_impact_spark_burst_2_pal(g_collision_result.position, 15, 0);
             else if (*(int *)(g_collision_result.target + 0x98)) {
-                func_PAL_L00_00424EF0(g_collision_result.position, 10, 1);
+                part_l00_spawn_impact_spark_burst_2_pal(g_collision_result.position, 10, 1);
                 func_PAL_00335DD0(g_collision_result.target, 0x3C, *(int *)(obj + 0xB8));
             }
             PlayMobySound(0, 0, obj);
@@ -120,20 +120,20 @@ target_done:
             *(unsigned short *)(obj + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 5;
         } else if (math_fast_float_d(state + 0x38)) {
-            func_PAL_L00_004253C0(obj + 0x10);
+            rocket_spawn_smoke_burst_pal(obj + 0x10);
             *(unsigned char *)(obj + 0x20) = 1;
             *(char **)(state + 0x1C) = 0;
             *(unsigned short *)(obj + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 5;
         }
         work = math_random_int_below(255);
-        p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
+        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (p) p[2] = *g_effect_param_pointer_b;
         work = (work + 128) % 255;
-        p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
-        p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
+        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (p) p[2] = *g_effect_param_pointer_b;
+        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
+        if (p) p[2] = *g_effect_param_pointer_b;
         work = (int)delta;
         FastVecSub((void *)work, obj + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.4f);
@@ -145,12 +145,12 @@ target_done:
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.1f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.1f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 12, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            part_spawn_gravity_fade(particle, g_default_vector, 12, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (p) p[2] = *D_L00_001FE9F4;
+            p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (p) p[2] = *g_effect_param_pointer_a;
         }
         ref_L00_0041EE58_00(shot_update_and_draw_trail, obj);
         break;

@@ -20,8 +20,8 @@ typedef struct {
     int expired;                /* 0x9C */
 } PoolEffect;
 
-extern PoolEffect D_0022AA10[3];
-extern char D_001B2520[] MACRO_ADDR;
+extern PoolEffect g_pool_effect_slots[3];
+extern char g_emitter_origin[] MACRO_ADDR;
 extern float math_random_float_range(float min, float max);
 extern float math_random_signed_float_range(float min, float max);
 extern void vec_clear_128(void *vector);
@@ -64,7 +64,7 @@ typedef struct {
 
 
 
-extern unsigned char D_0018C0DF;
+extern unsigned char g_swingshot_peer_flag;
 extern int D_L00_002A27F0[];
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_mark_spawned(void *);
@@ -87,7 +87,7 @@ void swingshot_hook_update(unsigned char *self)
     if (peer == 0 || *(short *)(peer + 0xAA) != MOBY_CLASS_SWINGSHOT || peer[0x20] == 0xFE ||
         peer[0x20] == 0xFD || *(unsigned char **)(*(unsigned char **)(peer + 0x68) + 0x14) != self)
         goto destroy;
-    if ((*(unsigned short *)(peer + 0x34) & 1) || D_0018C0DF != 0)
+    if ((*(unsigned short *)(peer + 0x34) & 1) || g_swingshot_peer_flag != 0)
         *(unsigned short *)(self + 0x34) |= 0x41;
     else
         *(unsigned short *)(self + 0x34) &= 0xFFBE;
@@ -158,8 +158,8 @@ finish:
     func_002A10E8(self);
 }
 
-extern char *D_001AD7EC __attribute__((sda));
-extern float D_001B1690[] __attribute__((sda));
+extern char *g_turret_target_moby __attribute__((sda));
+extern float g_tick_time_scale[] __attribute__((sda));
 extern void moby_carry_with_surface(char *, char *);
 extern int cam_moby_update(unsigned char *);
 extern int math_random_int_below(int);
@@ -169,12 +169,12 @@ extern void moby_mark_spawned(void *);
 /* Waits to be hit or set off at random, then fades out and removes itself. */
 void moby_fade_out_update(unsigned char *self)
 {
-    if (D_001AD7EC != 0)
-        moby_carry_with_surface((char *)self, D_001AD7EC);
+    if (g_turret_target_moby != 0)
+        moby_carry_with_surface((char *)self, g_turret_target_moby);
     switch (self[0x20]) {
     case 0:
         if (cam_moby_update(self) != 0 ||
-            (D_001B1690[0] > 0.949999988079071044921875f && math_random_int_below(10) == 0)) {
+            (g_tick_time_scale[0] > 0.949999988079071044921875f && math_random_int_below(10) == 0)) {
             moby_set_state(self, 1, -1);
             *(unsigned short *)(self + 0x34) |= 0x2800;
         }
@@ -269,7 +269,7 @@ typedef struct {
 } SupportHit;
 typedef struct { int pad[3], state; } SupportPathEntry;
 typedef struct { int count, pad[3]; SupportPathEntry entries[1]; } SupportPath;
-extern int D_001A73E0[] MACRO_ADDR;
+extern int g_slot_play_counters[] MACRO_ADDR;
 extern char g_collision_hit[];
 #define HIT (*(SupportHit *)D_001BAF80)
 extern SupportPath *g_path_table[];
@@ -303,7 +303,7 @@ void GroundAttachedUpdate(SupportMoby *moby) {
         if (moby->oclass == MOBY_CLASS_CRATE && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
             moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
         }
-        if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+        if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && g_slot_play_counters[moby->mission] < vars->death_count) {
             moby_mark_spawned(moby);
             return;
         }
@@ -344,7 +344,7 @@ void GroundAttachedUpdate(SupportMoby *moby) {
             if (moby->oclass == MOBY_CLASS_CRATE && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
                 moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
             }
-            if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+            if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && g_slot_play_counters[moby->mission] < vars->death_count) {
                 moby_mark_spawned(moby);
             } else {
                 member_flags = vars->flags;
@@ -495,7 +495,7 @@ int moby_is_state_one(unsigned char *p) { return p[0x20] == 1; }
 
 /* func_00313210 is in 0030F7B0-g16.c. */
 
-extern char D_L00_0023A670[][16];
+extern char g_nanotech_ball_axes[][16];
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -508,7 +508,7 @@ void emitter_get_slot_position(unsigned char *object, float *out, int index)
     char local[16];
     char *data = *(char **)(object + 0x68);
     char *entry;
-    math_apply_axis_rotation_to_quat(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
+    math_apply_axis_rotation_to_quat(local, g_nanotech_ball_axes[index], data + 0x20, *(float *)(data + 0x2C));
     entry = ((SolEmitterData *)data)->entries[index];
     if (entry && object[0x20] == 2)
         vec_scale_to_length(local, local, *(float *)(entry + 0x28));
@@ -540,9 +540,9 @@ void emitter_get_slot_position(unsigned char *object, float *out, int index)
  * of duration frames, and the object's position as the start (offset when it has a record). */
 void AllocEffectSlot(void *owner, char *object, int duration)
 {
-    PoolEffect *pool = D_0022AA10;
+    PoolEffect *pool = g_pool_effect_slots;
     int i = 0;
-    const char *origin = D_001B2520;
+    const char *origin = g_emitter_origin;
     PoolEffect *effect;
     float displacement[4] __attribute__((aligned(16)));
     char *info;
@@ -612,10 +612,10 @@ void UpdateEffectSlots(void *owner)
     char local[16] __attribute__((aligned(16)));
     float ratio;
     for (i = 0; i < 3; i++) {
-        slot = &D_0022AA10[i];
+        slot = &g_pool_effect_slots[i];
         if (slot->owner != owner) continue;
         p = slot;
-        qcopy(p->origin, D_001B2520);
+        qcopy(p->origin, g_emitter_origin);
         if (p->timer) {
             p->angle[0] = FastAddRotations(p->angle[0], p->speed[0] * 100.0f);
             p->angle[1] = FastAddRotations(p->angle[1], p->speed[1] * 100.0f);

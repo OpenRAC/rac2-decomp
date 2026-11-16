@@ -5,9 +5,9 @@ typedef struct HrugisEffectCamera {
     float position[4];
 } HrugisEffectCamera;
 
-extern HrugisEffectCamera D_L22_001B9B40;
-extern int D_L22_001AF374 __attribute__((sda));
-extern int D_L22_001AF378 __attribute__((sda));
+extern HrugisEffectCamera g_hero_l22_state_block;
+extern int g_scatter_particle_value_min __attribute__((sda));
+extern int g_scatter_particle_value_max __attribute__((sda));
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -35,8 +35,8 @@ void part_spawn_scatter(char *object, int socket_index, int override, float radi
         else
             qcopy(initial, object + 0x10);
     }
-    heading = mat_fast_helper_a(D_L22_001B9B40.position[0] - *(float *)(object + 0x10),
-                            D_L22_001B9B40.position[1] - *(float *)(object + 0x14));
+    heading = mat_fast_helper_a(g_hero_l22_state_block.position[0] - *(float *)(object + 0x10),
+                            g_hero_l22_state_block.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);
@@ -48,7 +48,7 @@ void part_spawn_scatter(char *object, int socket_index, int override, float radi
                              point, -1, velocity, 0x101010, 0);
     if (particle != 0) {
         particle[3] = 0x44;
-        *(short *)(particle + 0xA) = math_random_int_range(D_L22_001AF374, D_L22_001AF378);
+        *(short *)(particle + 0xA) = math_random_int_range(g_scatter_particle_value_min, g_scatter_particle_value_max);
         particle[9] = FloatToInt(4.0f) + 0x60;
         data = particle + 0x20;
         *(float *)(data + 0x1C) = IntToFloat(math_random_int_range(1, 10));

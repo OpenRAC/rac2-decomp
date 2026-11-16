@@ -38,7 +38,7 @@ typedef struct {
 } Collision;
 extern Hero g_hero_state;
 extern Collision g_collision_hit;
-extern Moby *D_001B1B68 __attribute__((sda));
+extern Moby *g_moby_list_head __attribute__((sda));
 extern float math_random_float_range(float min, float max);
 extern void FastVecAdd(void *out, void *a, void *b);
 extern void vec_scale_to_length(void *out, void *vector, float scale);
@@ -51,7 +51,7 @@ extern int CollLine(void *start, void *end, int, void *moby, int);
  * moby the hero stands on) and 120 frames of life, retires the oldest other moby of its class
  * when there are nine, and if the line from the hero hits something, starts at the hit point
  * with its velocity bounced off the surface. */
-void func_PAL_00316EC0(float *position, Moby *self, float *velocity)
+void thrown_item_launch_pal(float *position, Moby *self, float *velocity)
 {
     /* Quadword unions: the clear and the copies are single 128-bit register moves. */
     typedef unsigned int Quad __attribute__((mode(TI)));
@@ -82,7 +82,7 @@ void func_PAL_00316EC0(float *position, Moby *self, float *velocity)
     count = 0;
     oldest = 0;
     oldestFrame = 0;
-    for (moby = D_001B1B68; moby != 0; moby = moby->next) {
+    for (moby = g_moby_list_head; moby != 0; moby = moby->next) {
         /* Grouped to the right: left to right, the two state tests fold into a range check. */
         if (moby->state == 0xFE ||
             (moby->state == 0xFD || (moby->oClass != self->oClass || moby == self)))

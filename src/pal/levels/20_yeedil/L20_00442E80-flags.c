@@ -15,19 +15,19 @@ extern float FastAddRotations(float, float);
 extern int PlayMobySound(int, int, char *);
 extern void snd_stop_voice(int);
 extern int hero_is_current_selected_id(int);
-extern PoolRecord64 *func_PAL_L00_002D7850(int);
+extern PoolRecord64 *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(unsigned char *);
 extern void object_fill_settings_block(char *);
 extern void FastVecSub(void *, const void *, const void *);
 extern void mat_combine_and_store(void *, const void *, const void *, const void *);
-extern void func_PAL_L01_00322798(void *, float *, int);
+extern void glow_flicker_update_pal(void *, float *, int);
 extern void moby_mark_spawned(void *);
 extern void FastVecScale(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
 extern void func_002A0F48(void *);
-extern Vector D_L20_001B9FC0;
+extern Vector g_camera_l20_position;
 
-void func_PAL_L20_00442E80(unsigned char *object) {
+void rotating_object_update_pal(unsigned char *object) {
     Vector oldPosition, oldRotation, delta, offset;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *child;
@@ -96,7 +96,7 @@ clone_failed:
         break;
     }
     if (hero_is_current_selected_id((int)object) && !*(int *)(state + 0x80)) {
-        *(PoolRecord64 **)(state + 0x84) = func_PAL_L00_002D7850(5);
+        *(PoolRecord64 **)(state + 0x84) = cam_alloc_override_slot_pal(5);
         *(int *)(state + 0x80) = 1;
         object_fill_settings_block((char *)object);
     } else if (!hero_is_current_selected_id((int)object) && *(int *)(state + 0x80)) {
@@ -107,14 +107,14 @@ clone_failed:
     mat_combine_and_store(state + 0x20, &delta, &oldRotation, object + 0xF0);
     child = *(unsigned char **)(state + 0x88);
     if (child) {
-        func_PAL_L01_00322798(child, (float *)(state + 0x8C), object[0x20] == 2);
+        glow_flicker_update_pal(child, (float *)(state + 0x8C), object[0x20] == 2);
         child = *(unsigned char **)(state + 0x88);
         if (!child[0x23]) {
             moby_mark_spawned(child);
             *(unsigned char **)(state + 0x88) = 0;
         } else {
             *(Quadword *)(child + 0xF0) = *(Quadword *)(object + 0xF0);
-            FastVecSub(&offset, &D_L20_001B9FC0, object + 0x10);
+            FastVecSub(&offset, &g_camera_l20_position, object + 0x10);
             FastVecScale(&offset, &offset, 0.01f);
             FastVecAdd(*(unsigned char **)(state + 0x88) + 0x10, &offset, object + 0x10);
             func_002A0F48(*(unsigned char **)(state + 0x88));

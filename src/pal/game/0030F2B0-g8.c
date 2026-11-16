@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_0030F2B0, the PAL copy of func_0030DE88: the same C, where 15 becomes 12 (the 50 Hz scale of a
  * count), the spread is multiplied by 1.2 (6/5, per-frame speed at 50 Hz), and 0.3f is written in the product. */
 #include "common.h"
@@ -8,8 +9,8 @@ typedef union {
     float f[4];
 } Vec4_0030F2B0;
 
-extern float D_001AF044 __attribute__((sda));
-extern char D_0018A550[];
+extern float g_beam_particle_speed __attribute__((sda));
+extern char g_hero_matrix[];
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -35,9 +36,9 @@ void func_PAL_0030F2B0(u8 *obj, int count)
         int colour;
         float size;
         float life;
-        vec_random_direction(&w, 0.0f, D_001AF044 * 1.2f);
+        vec_random_direction(&w, 0.0f, g_beam_particle_speed * 1.2f);
         w.f[0] = math_fabs(w.f[0]);
-        matrix_mul_vec3(&w, &w, D_0018A550);
+        matrix_mul_vec3(&w, &w, g_hero_matrix);
         spin = math_random_int_range(-8, 8);
         size = math_random_float_range(0.2f, 0.6f);
         life = size * 0.3f;

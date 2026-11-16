@@ -2,11 +2,11 @@
 
 /* Update the four-mission selection menu and return a completed selection.
  * The four table entries are also read by func_0029B910's bounded loop. */
-extern int D_001A9A50 __attribute__((sda)), D_001A9A54 __attribute__((sda)), D_001A9A58 __attribute__((sda));
-extern int D_001A9AD8 __attribute__((sda));
-extern int D_001A9AC8[4] __attribute__((sda));
+extern int g_mission_menu_depth __attribute__((sda)), g_mission_select_enabled __attribute__((sda)), g_mission_menu_result __attribute__((sda));
+extern int g_mission_menu_flag __attribute__((sda));
+extern int g_mission_menu_ids[4] __attribute__((sda));
 extern int g_notice_owner MACRO_ADDR;
-extern char *D_001A8CFC MACRO_ADDR;
+extern char *g_resident_data_base MACRO_ADDR;
 extern char *D_001A8CFC_gp SDATA(D_001A8CFC);
 typedef struct { char pad[0x1C0]; int flags; int pad2[2]; int state; } MenuInput;
 extern MenuInput g_pad_state;
@@ -50,58 +50,58 @@ extern MissionMenuItem g_mission_menu_items[];
 void RefreshMissionMenuItems(void) {
     int i;
     int *ids;
-    if (D_001A8CFC != 0) {
-        ids = D_001A9AC8;
+    if (g_resident_data_base != 0) {
+        ids = g_mission_menu_ids;
         for (i = 0; i < 4; i++) {
             int idx = table_find_last_used_entry(ids[i]);
             if (idx >= 0) {
                 g_mission_menu_items[i].second = g_mission_records[idx].count;
                 g_mission_menu_items[i].id = g_mission_records[idx].level;
                 g_mission_menu_items[i].color = g_mission_records[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
-                circle_menu_set_entry_mode(D_001A8CFC + 0x3F138, i, 0);
+                circle_menu_set_entry_mode(g_resident_data_base + 0x3F138, i, 0);
             } else {
-                circle_menu_set_entry_mode(D_001A8CFC + 0x3F138, i, 2);
+                circle_menu_set_entry_mode(g_resident_data_base + 0x3F138, i, 2);
             }
         }
     }
 }
 int UpdateMissionSelectionMenu(void) {
  int result, changed;
- if (D_001A9A50 == 0) return -1;
+ if (g_mission_menu_depth == 0) return -1;
  if (g_notice_owner != 0) return -1;
  if (D_001A8CFC_gp != 0) {
   menu_update_mission_select_enable();
   {
    int enabled = 0;
-   switch (D_001A9A54) {
+   switch (g_mission_select_enabled) {
     case 0: return -1;
     case 1:
      changed = 0;
      RefreshMissionMenuItems();
      if (g_pad_state.flags & 0x10) {
-      D_001A9AD8 = 1;
+      g_mission_menu_flag = 1;
       g_pad_state.state = 2;
-     } else if (D_001A9AD8 != 0) {
-      D_001A9AD8 = 0;
+     } else if (g_mission_menu_flag != 0) {
+      g_mission_menu_flag = 0;
       changed = 1;
      }
-     circle_menu_position_label(D_001A8CFC + 0x3F138);
-     enabled = D_001A9AD8;
+     circle_menu_position_label(g_resident_data_base + 0x3F138);
+     enabled = g_mission_menu_flag;
      break;
     default: changed = 0; break;
    }
-   circle_menu_set_enabled(D_001A8CFC + 0x3F138, enabled);
+   circle_menu_set_enabled(g_resident_data_base + 0x3F138, enabled);
   }
-  result = UpdateDirectionSelection(D_001A8CFC + 0x3C950, &g_pad_state);
-  if (result >= 0 && table_find_last_used_entry(D_001A9AC8[result]) < 0) result = -1;
+  result = UpdateDirectionSelection(g_resident_data_base + 0x3C950, &g_pad_state);
+  if (result >= 0 && table_find_last_used_entry(g_mission_menu_ids[result]) < 0) result = -1;
   if (changed) {
    menu_clear_field_150(D_001A8CFC_gp + 0x3C950);
-   if (D_001A9A58 < 0) D_001A9A58 = result;
+   if (g_mission_menu_result < 0) g_mission_menu_result = result;
   }
-  circle_menu_set_selection(D_001A8CFC + 0x3F138, result);
+  circle_menu_set_selection(g_resident_data_base + 0x3F138, result);
   return changed ? result : -1;
  }
- D_001A9A50--;
- if (D_001A9A50 < 0) D_001A9A50 = 0;
+ g_mission_menu_depth--;
+ if (g_mission_menu_depth < 0) g_mission_menu_depth = 0;
  return 0;
 }

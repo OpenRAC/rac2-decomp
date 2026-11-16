@@ -19,12 +19,12 @@ extern HudResident g_subtitle_history;
 
 
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_L16_0027F078[];
-extern int D_L16_001A8FF0;
-extern u8 *D_L16_001B2B1C;
-extern float D_L16_001AF430 __attribute__((sda));
-extern float D_L16_001AF434 __attribute__((sda));
-extern float D_L16_001AF438 __attribute__((sda));
+extern u8 g_follow_state_words[];
+extern int g_hero_l16_block_flag;
+extern u8 *g_moby_instance_table;
+extern float g_follow_speed __attribute__((sda));
+extern float g_follow_speed_alt __attribute__((sda));
+extern float g_follow_ground_height __attribute__((sda));
 extern void cam_compute_view_direction(char *,char *,int);
 extern void vec_negate_and_forward(void *,void *,void *);
 extern void mat_get_euler_angles(float *,float *);
@@ -61,7 +61,7 @@ void follow_player_update(u8 *object)
     u8 mode;
     switch (object[0x20]) {
     case 0:
-        if (!D_L16_001A8FF0) return;
+        if (!g_hero_l16_block_flag) return;
         F(object,0x2C)=F(*(u8 **)(object+0x24),0x24);
         cam_compute_view_direction((char *)object+0x10,(char *)position,0);
         *(u16 *)(object+0x34)|=0x100;
@@ -69,17 +69,17 @@ void follow_player_update(u8 *object)
         vec_negate_and_forward(object+0xC0,position,0);
         qcopy(state+0x10,object+0x10);
         mat_get_euler_angles((float *)(object+0xC0),(float *)(state+0x20));
-        target=D_L16_001B2B1C+(I(state,4)<<8);
+        target=g_moby_instance_table+(I(state,4)<<8);
         I(state,0x58)=0;
         if (!target || target[0x20]==254 || target[0x20]==253) { F(state,0x34)=1.0f; moby_set_state(object,4,-1); }
         else { F(state,0x34)=0.0f; goto mode1; }
         return;
     case 1:
-        vec_scale_to_length(position,object+0xE0,D_L16_001AF430);
+        vec_scale_to_length(position,object+0xE0,g_follow_speed);
         FastVecAdd(object+0x10,position,state+0x10);
         if (math_fast_float_d((int *)(state+0x3C)) && fast_vec_dist(object+0x10,R+0x80)<1.75f) {
             if (g_hero_state.field123a || g_hero_state.field22b4) goto decay;
-            if (g_subtitle_history.sentinel<65535 && I(D_L16_0027F078,0)==0 && I(D_L16_0027F078,0x24)==-1) {
+            if (g_subtitle_history.sentinel<65535 && I(g_follow_state_words,0)==0 && I(g_follow_state_words,0x24)==-1) {
                 subtitle_request_voice_line(0x9C7,30);
                 g_subtitle_history.sentinel=-1;
             }
@@ -130,7 +130,7 @@ mode1:
         }
         return;
 active:
-            vec_scale_to_length(position,object+0xE0,D_L16_001AF434);
+            vec_scale_to_length(position,object+0xE0,g_follow_speed_alt);
             FastVecAdd(object+0x10,position,state+0x10);
             hero_switch_push_anim_state((char *)object);
             spinning_object_move_along_ground((char *)object);
@@ -138,10 +138,10 @@ active:
             BlendCameraPose((char *)object);
         return;
     case 4:
-        if (flag_set_first_pending(object)) F(state,0x44)=D_L16_001AF430;
+        if (flag_set_first_pending(object)) F(state,0x44)=g_follow_speed;
         velocity=F(state,0x48)-0.0027777778f;
         value=F(state,0x44)+velocity;
-        ground=D_L16_001AF438;
+        ground=g_follow_ground_height;
         F(state,0x48)=velocity;
         F(state,0x44)=value;
         if (value<=ground) {

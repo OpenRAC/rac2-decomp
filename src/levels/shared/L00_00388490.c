@@ -15,7 +15,7 @@ extern void euler_to_matrix(void *,void *);
 extern void draw_world_quad(void *,void *,int);
 typedef struct { unsigned char prefix[0x140]; Vector4 position; } CameraPositionView;
 /* A partial external view, not a complete camera allocation. */
-extern CameraPositionView D_001B8C80;
+extern CameraPositionView g_camera_target_view;
 extern void gfx_l00_init_default_block(char *);
 /* Draws three flash sprites that face the camera at the given position. */
 void part_l00_draw_camera_facing_flash(void *unused,Vector4 *position)
@@ -33,11 +33,11 @@ void part_l00_draw_camera_facing_flash(void *unused,Vector4 *position)
     FIELD(unsigned int,packet.bytes,0x40)=FIELD(unsigned int,packet.bytes,0x44)=
         FIELD(unsigned int,packet.bytes,0x48)=FIELD(unsigned int,packet.bytes,0x4C)=color;
     angles.f[3]=0;
-    angles.f[2]=mat_fast_helper_a(D_001B8C80.position.f[0]-position->f[0],D_001B8C80.position.f[1]-position->f[1]);
-    angles.f[1]=-mat_fast_helper_a(vec_distance_xy(position,&D_001B8C80.position),D_001B8C80.position.f[2]-position->f[2]);
+    angles.f[2]=mat_fast_helper_a(g_camera_target_view.position.f[0]-position->f[0],g_camera_target_view.position.f[1]-position->f[1]);
+    angles.f[1]=-mat_fast_helper_a(vec_distance_xy(position,&g_camera_target_view.position),g_camera_target_view.position.f[2]-position->f[2]);
     angles.f[0]=math_random_angle();
     euler_to_matrix(transform,&angles);
-    FastVecSub(&delta,&D_001B8C80.position,position);
+    FastVecSub(&delta,&g_camera_target_view.position,position);
     vec_scale_to_length(&delta,&delta,0.25f);
     transform[3].f[0]=position->f[0]+delta.f[0];
     transform[3].f[1]=position->f[1]+delta.f[1];

@@ -3,17 +3,17 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern void moby_set_state(u8 *a, s32 b, s32 c);
-extern f32 D_L07_001B17E0 __attribute__((sda));
-extern f32 D_L07_001B17F0 __attribute__((sda));
-extern f32 D_L07_001B1800 __attribute__((sda));
-extern f32 D_L07_001B1810 __attribute__((sda));
-extern f32 D_L07_001B1814;
-extern f32 D_L07_001B1818;
-extern f32 D_L07_001B1744 __attribute__((sda));
-extern f32 D_L07_001B1748 __attribute__((sda));
-extern u16 **D_L07_001A9014;
-extern u8 *D_L07_001B2954;
-extern s32 D_L07_001B1E90;
+extern f32 g_ship_second_phase_pos __attribute__((sda));
+extern f32 g_ship_second_phase_hero_pos __attribute__((sda));
+extern f32 g_ship_second_phase_hero_rot __attribute__((sda));
+extern f32 g_ship_second_phase_camera_origin __attribute__((sda));
+extern f32 g_ship_second_phase_camera_y;
+extern f32 g_ship_second_phase_camera_z;
+extern f32 g_ship_fade_seconds_param __attribute__((sda));
+extern f32 g_ship_approach_minutes_param __attribute__((sda));
+extern u16 **g_group_l07_id_lists;
+extern u8 *g_joint_record_table;
+extern s32 g_ship_phase_state;
 extern s32 g_music_state[];
 extern char g_hero_position[];
 extern f32 g_hero_state[];
@@ -38,34 +38,34 @@ void ship_start_second_phase(u8 *moby, s32 group)
     f32 *camera_origin;
 
     moby_set_state(moby, 5, -1);
-    qcopy(moby + 0x10, &D_L07_001B17E0);
-    qcopy(moby + 0xF0, &D_L07_001B17F0);
+    qcopy(moby + 0x10, &g_ship_second_phase_pos);
+    qcopy(moby + 0xF0, &g_ship_second_phase_hero_pos);
     *(u16 *)(moby + 0x34) &= 0xFFFD;
     func_002A0F48(moby);
     vars = *(u8 **)(moby + 0x68);
     g_music_state[9] = (*(s32 *)(vars + 0xD4) & 0x3FFF) + 3000;
     g_music_state[10] = 0;
-    math_approach_target_with_braking(vars + 0x11C, 400.0f - D_L07_001B17E0, 5.0f,
-                  D_L07_001B1748 * 0.00027777778f, D_L07_001B1744 * 0.016666668f);
+    math_approach_target_with_braking(vars + 0x11C, 400.0f - g_ship_second_phase_pos, 5.0f,
+                  g_ship_approach_minutes_param * 0.00027777778f, g_ship_fade_seconds_param * 0.016666668f);
     *(s32 *)(vars + 0x16B0) = 0;
     *(s32 *)(vars + 0xD0) = group;
     *(f32 *)(vars + 0x16B8) = 1.0f;
     *(s32 *)(vars + 0x16BC) = 0;
-    hero_reset_position_and_direction(&D_L07_001B1800, &D_L07_001B17F0, 0x6F, 1);
+    hero_reset_position_and_direction(&g_ship_second_phase_hero_rot, &g_ship_second_phase_hero_pos, 0x6F, 1);
     *(TI128 *)eye_pos = *(TI128 *)g_hero_position;
     eye_pos[2] = eye_pos[2] + 1.0f;
     qzero_nc(look_angles);
-    camera_origin = &D_L07_001B1810;
-    look_angles[2] = mat_fast_helper_a(g_hero_state[0x20] - D_L07_001B1810, g_hero_state[0x21] - D_L07_001B1814);
+    camera_origin = &g_ship_second_phase_camera_origin;
+    look_angles[2] = mat_fast_helper_a(g_hero_state[0x20] - g_ship_second_phase_camera_origin, g_hero_state[0x21] - g_ship_second_phase_camera_y);
     flat_dist = vec_distance_xy(eye_pos, camera_origin);
-    look_angles[1] = mat_fast_helper_a(flat_dist, D_L07_001B1818 - eye_pos[2]);
+    look_angles[1] = mat_fast_helper_a(flat_dist, g_ship_second_phase_camera_z - eye_pos[2]);
     SetCamera5Pose(camera_origin, look_angles, 1, 0, 0);
     moby_build_matrix(moby);
-    for (entry = D_L07_001A9014[group];
-         entry != 0 && ((s16)entry[-1] >= 0 || entry == D_L07_001A9014[group]) &&
-         (record = D_L07_001B2954 + ((*entry & 0x7FFF) << 5)) != 0;
+    for (entry = g_group_l07_id_lists[group];
+         entry != 0 && ((s16)entry[-1] >= 0 || entry == g_group_l07_id_lists[group]) &&
+         (record = g_joint_record_table + ((*entry & 0x7FFF) << 5)) != 0;
          entry++) {
         record[0x1E] |= 4;
     }
-    D_L07_001B1E90 = 0;
+    g_ship_phase_state = 0;
 }

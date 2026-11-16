@@ -5,8 +5,8 @@ extern int func_2E1C70(float, void *, int, void *, int);
 extern float func_2EF190(void *, void *);
 extern void func_311758(void *);
 extern int g_frame_l03_counter;
-extern char *D_L03_001C3E40[];
-extern int D_L03_001B0580 __attribute__((sda));
+extern char *g_nearby_l03_moby_list[];
+extern int g_shared_trace_point __attribute__((sda));
 /* Per-frame update of moby class 2516, a piece of debris thrown from a trash can: it flies, breaks when it hits a Megacorp bot or the hero, then fades away. */
 void trash_can_debris_update(char *moby)
 {
@@ -22,7 +22,7 @@ void trash_can_debris_update(char *moby)
             int count = func_2E1C70(0.2f, moby + 0x10, 0, moby, 0);
             if (count > 0) {
                 int remaining = count;
-                char **nearby_list = D_L03_001C3E40;
+                char **nearby_list = g_nearby_l03_moby_list;
                 do {
                     int type = *(s16 *)(*nearby_list + 0xAA);
                     if (type == MOBY_CLASS_MEGACORP_SWEEPER_BOT || type == MOBY_CLASS_MEGACORP_LASER_BOT)
@@ -32,7 +32,7 @@ void trash_can_debris_update(char *moby)
                 } while (remaining);
             }
         }
-        if (func_2EF190(moby + 0x10, &D_L03_001B0580) < 0.3f)
+        if (func_2EF190(moby + 0x10, &g_shared_trace_point) < 0.3f)
             func_31B920(moby, 3, -1);
         {
             u32 timer = *(u16 *)(moby + 0x96);

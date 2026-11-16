@@ -6,25 +6,25 @@
 typedef float f32_Fd368add8;
 #endif
 
-extern f32_Fd368add8 D_L01_001AE3F8 __attribute__((sda));
+extern f32_Fd368add8 g_tab_menu_first_x __attribute__((sda));
 
-extern f32_Fd368add8 D_L01_001AE408 __attribute__((sda));
+extern f32_Fd368add8 g_tab_menu_third_x __attribute__((sda));
 
-extern f32_Fd368add8 D_L01_001AE400 __attribute__((sda));
+extern f32_Fd368add8 g_tab_menu_second_x __attribute__((sda));
 
-extern f32_Fd368add8 D_L01_001AE410 __attribute__((sda));
+extern f32_Fd368add8 g_tab_menu_fourth_x __attribute__((sda));
 
-extern f32_Fd368add8 D_L01_001AE418 __attribute__((sda));
+extern f32_Fd368add8 g_tab_menu_fifth_x __attribute__((sda));
 
-extern f32_Fd368add8 D_L01_001AE3FC;
+extern f32_Fd368add8 g_tab_menu_first_y;
 
-extern f32_Fd368add8 D_L01_001AE40C;
+extern f32_Fd368add8 g_tab_menu_third_y;
 
-extern f32_Fd368add8 D_L01_001AE404;
+extern f32_Fd368add8 g_tab_menu_second_y;
 
-extern f32_Fd368add8 D_L01_001AE414;
+extern f32_Fd368add8 g_tab_menu_fourth_y;
 
-extern f32_Fd368add8 D_L01_001AE41C;
+extern f32_Fd368add8 g_tab_menu_fifth_y;
 
 extern void func_00335E38_1(void *a0, f32_Fd368add8 a1, f32_Fd368add8 a2, f32_Fd368add8 a3, f32_Fd368add8 a4);
 
@@ -45,15 +45,15 @@ int tab_menu_update(char *self, int arg1)
     f32_Fd368add8 *v;
 
     v = *(f32_Fd368add8 **)(self + 536);
-    func_00335E38_1(self, D_L01_001AE3F8 + v[0], D_L01_001AE3FC + v[1], 0.0f, 0.0f);
+    func_00335E38_1(self, g_tab_menu_first_x + v[0], g_tab_menu_first_y + v[1], 0.0f, 0.0f);
     v = *(f32_Fd368add8 **)(self + 536);
-    func_00335E38_1(self + 152, D_L01_001AE408 + v[0], D_L01_001AE40C + v[1], 0.0f, 0.0f);
+    func_00335E38_1(self + 152, g_tab_menu_third_x + v[0], g_tab_menu_third_y + v[1], 0.0f, 0.0f);
     v = *(f32_Fd368add8 **)(self + 536);
-    func_00335E38_1(self + 76, D_L01_001AE400 + v[0], D_L01_001AE404 + v[1], 0.0f, 0.0f);
+    func_00335E38_1(self + 76, g_tab_menu_second_x + v[0], g_tab_menu_second_y + v[1], 0.0f, 0.0f);
     v = *(f32_Fd368add8 **)(self + 536);
-    func_00335E38_1(self + 228, D_L01_001AE410 + v[0], D_L01_001AE414 + v[1], 0.0f, 0.0f);
+    func_00335E38_1(self + 228, g_tab_menu_fourth_x + v[0], g_tab_menu_fourth_y + v[1], 0.0f, 0.0f);
     v = *(f32_Fd368add8 **)(self + 536);
-    func_00335E38_1(self + 464, D_L01_001AE418 + v[0], D_L01_001AE41C + v[1], 0.0f, 0.0f);
+    func_00335E38_1(self + 464, g_tab_menu_fifth_x + v[0], g_tab_menu_fifth_y + v[1], 0.0f, 0.0f);
 
     *(int *)func_00335E20_1(self + 304) = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);
     tab_menu_update_list(self, arg1);

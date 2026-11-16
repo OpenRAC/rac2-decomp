@@ -1,11 +1,12 @@
+#include "names.h"
 /* Menu list draw: one text row per entry with selection colours, check boxes and an
    optional second line. Rows are reread through the list base each time; the
    check-box globals are macro-addressed. */
 #include "common.h"
 typedef struct { short fields[12]; } MenuTextRectangle;
-extern char *D_001F2854;
-extern char D_00263B50[], D_00264290[], D_00263EF0[];
-extern unsigned char D_001A7A60[] MACRO_ADDR, D_001A7BB4 MACRO_ADDR;
+extern char *g_active_menu_object;
+extern char g_font_glyphs_small[], g_font_glyphs_large[], g_font_glyphs_medium[];
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR, g_language MACRO_ADDR;
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void *memset(void *, int, int);
@@ -23,12 +24,12 @@ int menu_text_list_draw_checkboxes(char *object)
     short *row;
     int height = 12, texture = 1, lineHeight, spacing, top;
     int count, index, selected, enabled, text;
-    int active = *(char **)(D_001F2854 + 0xE8) == object;
-    char *font = D_00263B50;
+    int active = *(char **)(g_active_menu_object + 0xE8) == object;
+    char *font = g_font_glyphs_small;
     unsigned long textureWord;
     int colour;
-    if (*(int *)(object + 0x30) & 4) { height = 14; font = D_00264290; texture = 3; }
-    if (*(int *)(object + 0x30) & 8) { height = 11; font = D_00263EF0; texture = 2; }
+    if (*(int *)(object + 0x30) & 4) { height = 14; font = g_font_glyphs_large; texture = 3; }
+    if (*(int *)(object + 0x30) & 8) { height = 11; font = g_font_glyphs_medium; texture = 2; }
     VU1_addGSregister(66, 68);
     lineHeight = height + 2;
     VU1_addGSregister(71, 0x2004B);
@@ -65,9 +66,9 @@ int menu_text_list_draw_checkboxes(char *object)
         FontPrintWindow(rectangle.fields, colour, text, -1, textureWord, font);
         if (selected) gfx_enable_screen_flag();
         if (*(int *)(object + 0x30) & 0x200)
-            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7A60[index] != 0);
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_item_enabled_flags[index] != 0);
         if (*(int *)(object + 0x30) & 0x800)
-            DrawMenuCheckBox(15, rectangle.fields[5] + 9, D_001A7BB4 == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_language == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
         rectangle.fields[5] += rectangle.fields[7];
         if ((*(short **)(object + 0x34))[index * 6 + 4]) {
             text = GetLocalizedString((*(short **)(object + 0x34))[index * 6 + 4]);

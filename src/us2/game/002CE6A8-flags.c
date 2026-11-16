@@ -8,7 +8,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CC20(void);
 
-int func_US2_002CE6A8(void) {
+int menu_draw_page_style_b_us2(void) {
     SetupGifPaging(0);
     func_0029CC20();
     DoGifPaging();

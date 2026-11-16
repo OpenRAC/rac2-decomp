@@ -9,7 +9,7 @@ extern int moby_step_controller(void *, void *, float);
 extern float func_00282E80_4(void *, void *);
 
 /* Computes the x/y difference between one 16-byte record of the second handle and the record after the first handle's base, dispatches through three helpers and walks a short counter field up or down by one when the last helper's float result stays under a stored threshold. */
-int func_PAL_002B6CD8(char *s1, char *s2)
+int path_follow_nodes_pal(char *s1, char *s2)
 {
     char *s0;
     float r;

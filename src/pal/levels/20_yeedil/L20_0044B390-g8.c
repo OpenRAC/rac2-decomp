@@ -9,13 +9,13 @@ extern void moby_transform_joint_to_world(char *, int, char *);
 extern float vec_distance_xy(void *, void *);
 extern void moby_set_flag_bit(unsigned char *, int);
 extern void moby_mark_table_entry_flagged(unsigned int);
-extern void func_PAL_L20_002C59B0(int);
+extern void hero_exit_vehicle_mode_pal(int);
 typedef struct {
     char reserved00[0xBC];
     unsigned char enabled;
     char reservedBD[0x100 - 0xBD];
 } YeedilObject;
-extern YeedilObject *D_L20_001B2F9C;
+extern YeedilObject *g_group_l20_member_table;
 extern YeedilObject *yeedilObjectsGp SDATA(D_L20_001B2F9C);
 extern struct {
     char reserved00[0x80];
@@ -33,7 +33,7 @@ typedef struct {
     int callback;
 } YeedilActivation;
 
-void func_PAL_L20_0044B390(unsigned char *object)
+void floor_l20_switch_update_pal(unsigned char *object)
 {
     float point[4] __attribute__((aligned(16)));
     YeedilActivation *state = *(YeedilActivation **)(object + 0x68);
@@ -66,12 +66,12 @@ void func_PAL_L20_0044B390(unsigned char *object)
                     if (entry[4]) {
                         moby_set_flag_bit((unsigned char *)&yeedilObjectsGp[index], enabled);
                     } else {
-                        D_L20_001B2F9C[index].enabled = enabled;
+                        g_group_l20_member_table[index].enabled = enabled;
                     }
                 }
             }
             moby_mark_table_entry_flagged(state->event);
-            if (state->callback) func_PAL_L20_002C59B0(0);
+            if (state->callback) hero_exit_vehicle_mode_pal(0);
         }
         *(unsigned int *)(object + 0x78) = color | (0x80 << 24);
     } else if (object[0x20] == 2) {

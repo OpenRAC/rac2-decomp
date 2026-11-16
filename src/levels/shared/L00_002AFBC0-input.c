@@ -25,8 +25,8 @@ typedef struct {
 } PlayerInputState;
 extern PlayerInputState g_hero_state;
 typedef struct {char pad[0x158];float angle;char gap[0x370-0x15c];char matrix[64];} InputCamera;
-extern InputCamera D_L00_001B8C80;
-extern unsigned char D_001A7A44[] __attribute__((sda));
+extern InputCamera g_scalar_transition_state;
+extern unsigned char g_cheat_flags[] __attribute__((sda));
 extern float math_fabs(float);
 extern float vec_length_xy(void *);
 extern void divide_vector_xyz(void *,void *,float);
@@ -64,9 +64,9 @@ void hero_resolve_stick_direction(int mode,float scale) {
             g_hero_state.x1457=dir;
             if(dir==3 && g_hero_state.x24b8>0.15f) g_hero_state.x1456=1;else g_hero_state.x1456=0;
         }
-        g_hero_state.x1a0=FastAddRotations(g_hero_state.x1a0,D_L00_001B8C80.angle);
-        {float x=stick.x,y=stick.y;stick.y=-x;stick.x=-y;stick.z=stick.w=0.0f;if(D_001A7A44[0]) stick.y=x;}
-        matrix_mul_vec3((char *)&g_hero_state+0x190,&stick,D_L00_001B8C80.matrix);
+        g_hero_state.x1a0=FastAddRotations(g_hero_state.x1a0,g_scalar_transition_state.angle);
+        {float x=stick.x,y=stick.y;stick.y=-x;stick.x=-y;stick.z=stick.w=0.0f;if(g_cheat_flags[0]) stick.y=x;}
+        matrix_mul_vec3((char *)&g_hero_state+0x190,&stick,g_scalar_transition_state.matrix);
         g_hero_state.x1b0=scale*vec_length_xy(&stick);
     }
 }

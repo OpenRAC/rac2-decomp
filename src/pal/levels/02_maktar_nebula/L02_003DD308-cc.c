@@ -5,13 +5,13 @@
 extern int g_moby_l02_pool[] __attribute__((sda));
 /* Read-only view: these loads may pass the state stores, as in retail. */
 extern const int D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001FF6B8[];
+extern int g_boss_damage_totals[];
 extern int FloatToInt(float);
 extern void get_moby_color(char *, void *, void *, void *);
 extern void mem_clear(void *, int, int);
 extern void brawler_switch_off_actor(char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
-extern float func_PAL_002AA108(char *, void *);
+extern float moby_update_aim_target_strength_pal(char *, void *);
 extern void func_PAL_002AC290(int, char *);
 extern void moby_set_state(char *, int, int);
 extern void moby_copy_joint_transform_to_object(char *, char *, int, int);
@@ -74,7 +74,7 @@ void func_PAL_L02_003DD308(char *self) {
         return;
     }
     damage = part_find_owned_effect_slot(self, 0x10000, 0);
-    amount = func_PAL_002AA108(self, damage);
+    amount = moby_update_aim_target_strength_pal(self, damage);
     if (damage && *(char **)(damage + 0x20)) {
         source = *(char **)(damage + 0x20);
         if (*(short *)(source + 0xAA) == 0xC89 || *(short *)(source + 0xAA) == 0xBFE)
@@ -84,7 +84,7 @@ void func_PAL_L02_003DD308(char *self) {
         if (*(unsigned char *)(self + 0x20) >= 5 && *(unsigned char *)(self + 0x20) != 10 &&
             *(unsigned char *)(self + 0x20) != 11) {
             *(float *)(state + 0x20) -= amount;
-            { int at = *(unsigned char *)(state + 0x37) * 4 + 0xE0; *(int *)((char *)D_L02_001FF6B8 + at) += (int)(amount * 32.0f); }
+            { int at = *(unsigned char *)(state + 0x37) * 4 + 0xE0; *(int *)((char *)g_boss_damage_totals + at) += (int)(amount * 32.0f); }
             if (*(short *)(state + 0x140) == 0)
                 func_PAL_002AC290((int)self, state + 0x140);
             if (amount > 3.0f && *(unsigned char *)(self + 0x20) == 6 && *(unsigned char *)(self + 0x42) == 7) {

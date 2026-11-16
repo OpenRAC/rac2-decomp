@@ -1,7 +1,7 @@
 #include "common.h"
-extern int D_L00_001AA374 __attribute__((sda));
+extern int g_last_explode_frame __attribute__((sda));
 extern int g_frame_l00_counter;
-extern int D_L00_001B208C;
+extern int g_explode_piece_counter;
 /* Retail updates this counter through GP, but reads/resets its absolute view. */
 extern int ref_L00_0032A258_00 __attribute__((sda));
 extern void part_spawn_scaled_bolts(void *,int,float);
@@ -12,18 +12,18 @@ extern float math_random_signed_float_range(float,float);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void *cam_moby_create(void *,int,int,int,void *,void *,void *,int,float,float);
 extern void STUB_printf(void *);
-extern char D_L00_001AA380[];
+extern char g_str_explode_debug[];
 /* Breaks an object into flying pieces, one for each part, with random speed, size and lifetime. */
 void part_explode_object_into_pieces(unsigned char *object,float *range,float *scale,float *lifetime,int kinds,int sound,int skip,int flags,int mask,unsigned char alpha,void *callback)
 {
     float velocity[4], life, size;
     int first,count,i;
     unsigned char *particle;
-    if(D_L00_001AA374 != g_frame_l00_counter) {
-        D_L00_001AA374=g_frame_l00_counter;
-        D_L00_001B208C=0;
+    if(g_last_explode_frame != g_frame_l00_counter) {
+        g_last_explode_frame=g_frame_l00_counter;
+        g_explode_piece_counter=0;
     }
-    ref_L00_0032A258_00=D_L00_001B208C+1;
+    ref_L00_0032A258_00=g_explode_piece_counter+1;
     if(!object) return;
     *(short *)(object+0x7c)=0;
     *(int *)(object+0x98)=0;
@@ -46,6 +46,6 @@ void part_explode_object_into_pieces(unsigned char *object,float *range,float *s
             particle=cam_moby_create(object,2,*(short *)(object+0xaa),i,object+0x10,object+0xf0,velocity,alpha,size,life);
         else particle=cam_moby_create(object,1,*(short *)(object+0xaa),i,object+0x10,object+0xf0,velocity,alpha,size,life);
         if(particle) { if(callback) *(void **)(particle+0x64)=callback; }
-        else STUB_printf(D_L00_001AA380);
+        else STUB_printf(g_str_explode_debug);
     }
 }

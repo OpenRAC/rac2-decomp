@@ -2,9 +2,9 @@
 /* func_PAL_L18_003FF408, the PAL copy of func_L18_003FB308: the same C, where rename func_L18_003FB620 becomes func_PAL_L18_003FF768; scale D_L18_001B0580; scale D_L18_001B0580. */
 #include "common.h"
 
-extern int D_L18_001B0580 __attribute__((sda));
-extern float D_L18_001B0584 __attribute__((sda));
-extern int D_L18_001B0588 __attribute__((sda));
+extern int g_platform_move_frames __attribute__((sda));
+extern float g_platform_move_distance __attribute__((sda));
+extern int g_platform_wait_frames __attribute__((sda));
 extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -19,7 +19,7 @@ void func_PAL_L18_003FF408(u8 *a0) {
     switch (a0[0x20]) {
     case 0:
         qcopy_nc(s, a0 + 0x10);
-        vec_scale_to_length(s + 0x10, a0 + 0xC0, D_L18_001B0584 / (((int)(D_L18_001B0580) * 5 + 2) / 6));
+        vec_scale_to_length(s + 0x10, a0 + 0xC0, g_platform_move_distance / (((int)(g_platform_move_frames) * 5 + 2) / 6));
         moby_set_state(a0, 1, -1);
         *(int *)(s + 0x20) = 0;
         break;
@@ -41,7 +41,7 @@ void func_PAL_L18_003FF408(u8 *a0) {
     case 2:
         if (flag_set_first_pending(a0))
             snd_play_from_class_bank(0, 0, a0, 0x1152);
-        if (*(int *)(s + 0x20) < (((int)(D_L18_001B0580) * 5 + 2) / 6)) {
+        if (*(int *)(s + 0x20) < (((int)(g_platform_move_frames) * 5 + 2) / 6)) {
             FastVecAdd(a0 + 0x10, a0 + 0x10, s + 0x10);
             FastVecSub(g_moby_l18_table[0] + (*(int *)(s + 0x24) << 8) + 0x10,
                          g_moby_l18_table[0] + (*(int *)(s + 0x24) << 8) + 0x10,
@@ -50,7 +50,7 @@ void func_PAL_L18_003FF408(u8 *a0) {
         }
         if (*(int *)(s + 0x28))
             func_PAL_L18_003FF768(a0);
-        if (D_L18_001B0588 < *(u16 *)(a0 + 0x96))
+        if (g_platform_wait_frames < *(u16 *)(a0 + 0x96))
             moby_set_state(a0, 1, -1);
         break;
     }

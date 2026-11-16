@@ -48,7 +48,7 @@ extern int PlayMobySound(int, int, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
-extern AranosMoby *D_L00_00220DA0[];
+extern AranosMoby *g_launch_moby_list[];
 extern void moby_mark_spawned(void *);
 typedef struct {
     unsigned int flag;
@@ -127,8 +127,8 @@ typedef struct {
     char pad08[0x48];
     int f50;
 } AranosChildCtx;
-extern float D_L00_001B19CC __attribute__((sda));
-extern float D_L00_001B19D0 __attribute__((sda));
+extern float g_effect_fade_value_a __attribute__((sda));
+extern float g_effect_fade_value_b __attribute__((sda));
 extern void *part_find_owned_effect_slot(void *, unsigned int, int);
 extern int flag_set_first_pending(void *);
 extern void moby_set_state(void *, int, int);
@@ -136,8 +136,8 @@ extern void vec_random_direction(void *, float, float);
 extern int coll_scatter_points_in_shapes(void *, int, void *, int, float);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern char *moby_l00_spawn_child(void *, int, int);
-extern AranosMoby *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
-extern void func_PAL_L00_0039E608(void *);
+extern AranosMoby *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
+extern void glow_fade_update_pal(void *);
 extern void set_moby_color(void *, unsigned char, unsigned char, unsigned char);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
@@ -178,7 +178,7 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
         unsigned char alpha;
         int count = 5, n;
 
-        if (D_L00_001B19CC < 0.85f && D_L00_001B19D0 < 0.85f)
+        if (g_effect_fade_value_a < 0.85f && g_effect_fade_value_b < 0.85f)
             count = 14;
         for (n = 0; n < count; n++) {
             vec_random_direction(&frame.offset, 0.85f, 1.95f);
@@ -197,11 +197,11 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
                 frame.velocity.f[0] = math_random_float_range(2.0f, 4.0f) * 0.020000001f;
                 life = math_random_float_range(15.0f, 20.0f);
             }
-            child = func_PAL_002735D0(obj, type, 0x43E, math_random_int_below(4), &frame.offset, &obj->rotation, &frame.velocity,
+            child = cam_moby_create_pal(obj, type, 0x43E, math_random_int_below(4), &frame.offset, &obj->rotation, &frame.velocity,
                                   0xFF, 180.0f, life);
             ctx->sparks[n] = child;
             if (child) {
-                child->hook = func_PAL_L00_0039E608;
+                child->hook = glow_fade_update_pal;
                 life = math_random_float_range(0.75f, 5.0f);
                 ctx->sparks[n]->f2C = ctx->sparks[n]->model->f24 * life;
                 childctx = ctx->sparks[n]->ctx;

@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_L14_001B17B8 __attribute__((sda));
-extern float D_L14_001B17BC __attribute__((sda));
+extern float g_searchlight_effect_x __attribute__((sda));
+extern float g_searchlight_effect_y __attribute__((sda));
 extern char g_hero_position[];
-extern void *func_PAL_L00_002D7850(int size);
+extern void *cam_alloc_override_slot_pal(int size);
 extern void cam_end_override(void *block);
 extern int IsPointInCuboid(void *, int);
 typedef struct {
@@ -15,7 +15,7 @@ typedef struct {
 /* Scans the four slot words at state+0x20; at the first one that is set and passes func_002ACBC8,
    makes sure the pool record at state+0x14 exists and writes D_L14_001B17B8/BC into its first two
    floats. If none passes, frees the record. */
-void func_PAL_L14_0042C4E8(char *a0)
+void part_update_slot_triggered_record_pal(char *a0)
 {
     char *state = *(char **)(a0 + 0x68);
     int *slot = (int *)(state + 0x20);
@@ -24,10 +24,10 @@ void func_PAL_L14_0042C4E8(char *a0)
     for (i = 0; i < 4; i++, slot++) {
         if (*slot != -1 && IsPointInCuboid(g_hero_position, *slot) != 0) {
             if (*(EffectPair **)(state + 0x14) == 0) {
-                *(EffectPair **)(state + 0x14) = func_PAL_L00_002D7850(5);
+                *(EffectPair **)(state + 0x14) = cam_alloc_override_slot_pal(5);
             }
-            (*(EffectPair **)(state + 0x14))->x = D_L14_001B17B8;
-            (*(EffectPair **)(state + 0x14))->y = D_L14_001B17BC;
+            (*(EffectPair **)(state + 0x14))->x = g_searchlight_effect_x;
+            (*(EffectPair **)(state + 0x14))->y = g_searchlight_effect_y;
             return;
         }
     }

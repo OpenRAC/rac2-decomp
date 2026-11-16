@@ -32,7 +32,7 @@ extern void ref_L00_003E2180_22(void);
 extern void ref_L00_003E2180_23(char *);
 
 /* Creates a moving effect aimed at a target or along the player direction. */
-char *func_PAL_L00_003E6400(char *pos, char *parent, char *target, float scale)
+char *CreateTargetedMovingEffect_pal(char *pos, char *parent, char *target, float scale)
 {
     float point[4], offset[4];
     char *object = ref_L00_003E2180_00(0xbfe);

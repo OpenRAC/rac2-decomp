@@ -4,7 +4,7 @@ typedef struct { short count; short index[31]; } ProjectileList;
 extern char *g_hero_moby;
 extern unsigned char g_item_slot_to_record[];
 extern WeaponRecord g_weapon_l00_table[];
-extern ProjectileList D_L00_001B1FF0 MACRO_ADDR;
+extern ProjectileList g_decoy_moby_index_list MACRO_ADDR;
 extern s32 D_L00_001B1E9C_base __asm__("D_L00_001B1E9C") MACRO_ADDR;
 extern s16 D_L00_001B1FF0_list[] __asm__("D_L00_001B1FF0") MACRO_ADDR;
 extern char *CreateMoby(int);
@@ -84,11 +84,11 @@ char *decoy_create_projectile(char *position, char *direction) {
             }
             if (oldest) {
                 *(unsigned char *)(oldest + 0x20) = retired;
-                RemoveMobyFromIndexList((int)oldest, (unsigned short *)&D_L00_001B1FF0);
+                RemoveMobyFromIndexList((int)oldest, (unsigned short *)&g_decoy_moby_index_list);
                 *(int *)(*(char **)(oldest + 0x68) + 0x40) = 1;
             }
         }
-        AddMobyToIndexList((int)actor, (short *)&D_L00_001B1FF0, 31);
+        AddMobyToIndexList((int)actor, (short *)&g_decoy_moby_index_list, 31);
         func_002A0F48(actor);
     }
     return actor;

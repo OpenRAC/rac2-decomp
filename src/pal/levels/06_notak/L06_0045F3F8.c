@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *D_L06_001B281C MACRO_ADDR;
+extern u8 *g_moby_l06_table MACRO_ADDR;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void func_PAL_002A7E68(char *, int, int, int);
@@ -9,12 +9,12 @@ extern void FastVecScale(char *, char *, float);
 extern float moby_get_anim_value(char *);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern int coll_process_hit(void *, float, int, char *, void *);
-extern void *D_L06_001BFC98;
+extern void *g_hit_l06_result;
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void *D_L06_001BFC98;
+extern void *g_hit_l06_result;
 
 /* Runs the shared pickup test: when the object is in the given state and the draw is inside the window, aims at the target and, on a hit with the expected tag, hands over to the next state. */
-void func_PAL_L06_0045F3F8(char *obj, float lo, char *self, float hi, int kind, int sub, float scale, float reach, float range,
+void actor_try_pickup_transition_pal(char *obj, float lo, char *self, float hi, int kind, int sub, float scale, float reach, float range,
                        int anim, int link, int next, void *tag)
 {
     float dir[4] __attribute__((aligned(16)));
@@ -29,7 +29,7 @@ void func_PAL_L06_0045F3F8(char *obj, float lo, char *self, float hi, int kind, 
         dir[2] = 1.0f;
         make_hit_descriptor(aim, obj, 1, dir, reach);
         moby_transform_joint_to_world(obj, 0, probe);
-        if (coll_process_hit(probe, range, 0x21, obj, aim) != 0 && D_L06_001BFC98 == tag) {
+        if (coll_process_hit(probe, range, 0x21, obj, aim) != 0 && g_hit_l06_result == tag) {
             FastVecScale(vec, vec, -1.0f);
             *(float *)(self + 0xC8) = -0.060000002f;
             if (*(u8 *)(obj + 0x43) != anim)

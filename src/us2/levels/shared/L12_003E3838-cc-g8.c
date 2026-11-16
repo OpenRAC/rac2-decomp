@@ -32,29 +32,29 @@ typedef struct {
     float minimumHeight;
 } L12PathEnemyState;
 
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
 extern int D_L12_001A79F0_GP SDATA(D_L12_001A79F0);
-extern u8 D_L12_0019B4A8[];
-extern int D_L12_001A8F00[3] __attribute__((sda));
-extern int D_L12_001A79F0[] __attribute__((sda));
-extern u8 *D_L12_001FEAC0[];
-extern u8 D_L12_001B0A90[8] __attribute__((sda));
-extern float D_L12_001B0AA8 __attribute__((sda));
-extern float D_L12_001B0AAC __attribute__((sda));
-extern float D_L12_001B0AB0 __attribute__((sda));
-extern float D_L12_001B0B04 __attribute__((sda));
-extern float D_L12_001B0B08 __attribute__((sda));
-extern float D_L12_001B0B14 __attribute__((sda));
-extern float D_L12_001B0B34 __attribute__((sda));
-extern float D_L12_001B0A50 __attribute__((sda));
-extern float D_L12_001B0A54 __attribute__((sda));
-extern int D_L12_001B0A58 __attribute__((sda));
-extern float D_L12_001B0A80 __attribute__((sda));
-extern float D_L12_001B0A84 __attribute__((sda));
-extern float D_L12_001B0A88 __attribute__((sda));
-extern int D_L12_001B0A8C __attribute__((sda));
-extern char D_L12_001B0B18[], D_L12_001B0B38[], D_L12_001B0B50[];
-extern u8 D_L12_001A8F20[] __attribute__((sda));
+extern u8 g_robot_guard_entry_flags[];
+extern int g_hero_l12_control_mode[3] __attribute__((sda));
+extern int g_robot_kill_counter[] __attribute__((sda));
+extern u8 *g_path_zone_table[];
+extern u8 g_robot_guard_effect_offset[8] __attribute__((sda));
+extern float g_robot_guard_turn_speed __attribute__((sda));
+extern float g_robot_guard_move_speed __attribute__((sda));
+extern float g_robot_guard_state_value __attribute__((sda));
+extern float g_robot_guard_time_limit __attribute__((sda));
+extern float g_robot_guard_max_fall_speed __attribute__((sda));
+extern float g_enemy_height_limit __attribute__((sda));
+extern float g_robot_guard_height_offset __attribute__((sda));
+extern float g_robot_guard_step_limit __attribute__((sda));
+extern float g_robot_guard_climb_speed __attribute__((sda));
+extern int g_robot_guard_effect_id __attribute__((sda));
+extern float g_robot_guard_size_min __attribute__((sda));
+extern float g_robot_guard_size_max __attribute__((sda));
+extern float g_robot_guard_effect_type __attribute__((sda));
+extern int g_robot_guard_effect_count __attribute__((sda));
+extern char g_str_debug_ground_height[], g_str_debug_robot_guard[], g_str_debug_initial_distance[];
+extern u8 g_zero_l12_vec[] __attribute__((sda));
 
 extern void robot_guard_init_update_state(void *);
 extern void group_try_claim_attack_slot(void *);
@@ -91,14 +91,14 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern float fast_subtract_rotations(float, float);
 extern float math_fabs(float);
 extern void vec_scale_to_length(void *, void *, float);
-extern int func_US2_002AF9C8(void *, float);
+extern int math_is_value_within_step_us2(void *, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern void *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern u8 *blast_projectile_spawn(void *, void *, void *, int, float);
 
-void func_US2_L12_003E3838(u8 *obj) {
+void robot_guard_update_us2(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     L12Vector pos;
     u8 matrix[64] __attribute__((aligned(16)));
@@ -113,9 +113,9 @@ void func_US2_L12_003E3838(u8 *obj) {
     if (((L12PathEnemyState *)state)->persistent) {
         u16 id = *(u16 *)(obj + 0xB2);
         int value;
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto destroy;
-        value = D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)];
+        value = g_robot_guard_entry_flags[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)];
         if (id & 1)
             value = (value >> 4) & 7;
         else
@@ -123,7 +123,7 @@ void func_US2_L12_003E3838(u8 *obj) {
         if (value)
             goto destroy;
     }
-    if (D_L12_001A8F00[0] == 2) {
+    if (g_hero_l12_control_mode[0] == 2) {
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;
         return;
@@ -144,11 +144,11 @@ void func_US2_L12_003E3838(u8 *obj) {
         if (((L12PathEnemyState *)state)->persistent) {
             u16 id = *(u16 *)(obj + 0xB2);
             if (id & 1) {
-                if (((D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] >> 4) & 7) != 7)
-                    D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] += 0x10;
+                if (((g_robot_guard_entry_flags[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] >> 4) & 7) != 7)
+                    g_robot_guard_entry_flags[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] += 0x10;
             } else {
-                if ((D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0[0] << 10)] & 7) != 7)
-                    D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0[0] << 10)]++;
+                if ((g_robot_guard_entry_flags[((s16)id >> 1) + (g_robot_kill_counter[0] << 10)] & 7) != 7)
+                    g_robot_guard_entry_flags[((s16)id >> 1) + (g_robot_kill_counter[0] << 10)]++;
             }
         }
         goto deathFinish;
@@ -157,8 +157,8 @@ void func_US2_L12_003E3838(u8 *obj) {
         float oldAngle = *(float *)(obj + 0xF8);
         qcopy(&pos, (obj + 0x10));
         damage = moby_dispatch_action_by_kind(obj, state + 0x60);
-        if (*(float *)(state + 0x218) >= D_L12_001B0B04 * 0.01666666753590107f) {
-            STUB_printf(D_L12_001B0B38);
+        if (*(float *)(state + 0x218) >= g_robot_guard_time_limit * 0.01666666753590107f) {
+            STUB_printf(g_str_debug_robot_guard);
             *(float *)(state + 0x218) = 0;
         }
         if (damage & 1) {
@@ -167,11 +167,11 @@ void func_US2_L12_003E3838(u8 *obj) {
             if (((L12PathEnemyState *)state)->persistent) {
                 u16 id = *(u16 *)(obj + 0xB2);
                 if (id & 1) {
-                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0_GP << 10));
+                    u8 *entry = g_robot_guard_entry_flags + (((s16)id >> 1) + (D_L12_001A79F0_GP << 10));
                     if (((*entry >> 4) & 7) != 7)
                         *entry += 0x10;
                 } else {
-                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0[0] << 10));
+                    u8 *entry = g_robot_guard_entry_flags + (((s16)id >> 1) + (g_robot_kill_counter[0] << 10));
                     if ((*entry & 7) != 7)
                         ++*entry;
                 }
@@ -251,9 +251,9 @@ destroy:
         break;
     case 5:
         if (flag_set_second_pending(obj)) {
-            float turn = D_L12_001B0AA8 * 0.00027777778450399637f;
-            float speed = D_L12_001B0AAC * 0.01666666753590107f;
-            *(float *)(state + 0x198) = D_L12_001B0AB0;
+            float turn = g_robot_guard_turn_speed * 0.00027777778450399637f;
+            float speed = g_robot_guard_move_speed * 0.01666666753590107f;
+            *(float *)(state + 0x198) = g_robot_guard_state_value;
             moby_set_controller_speed_limits(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
             ((L12PathEnemyState *)state)->flags |= 0x10;
         }
@@ -267,7 +267,7 @@ destroy:
             break;
         }
         moby_transform_joint_point(obj, 2, matrix);
-        transform_vector(&pos, D_L12_001B0A90, matrix);
+        transform_vector(&pos, g_robot_guard_effect_offset, matrix);
         if (obj[0x95] != 15 && CollLine(&pos, state + 0x130, 2, obj, 0)) {
             moby_set_state(obj, obj[0x20], 6);
             flag_set_first_pending(obj);
@@ -295,17 +295,17 @@ destroy:
             u8 *initialPath;
             float initialDistance;
             ((L12PathEnemyState *)state)->destination = -1;
-            initialPath = D_L12_001FEAC0[*(int *)(state + 0x158)];
+            initialPath = g_path_zone_table[*(int *)(state + 0x158)];
             enemy_choose_nearest_visible_path_point(obj);
             initialDistance = fast_vec_dist((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
             if (initialDistance > 0.5f)
-                STUB_printf(D_L12_001B0B50, (double)initialDistance);
+                STUB_printf(g_str_debug_initial_distance, (double)initialDistance);
         }
         if (*(int *)(state + 0x16C)) {
             enemy_move_along_path_keep_height(obj);
             break;
         }
-        path = D_L12_001FEAC0[*(int *)(state + 0x158)];
+        path = g_path_zone_table[*(int *)(state + 0x158)];
         if (*(long long *)(state + 0x268) == -1) {
             ((L12PathEnemyState *)state)->nextPoint = -1;
             i = ((L12PathEnemyState *)state)->pathIndex - 1;
@@ -365,22 +365,22 @@ destroy:
         flags = moby_l01_turn_toward_target(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
         ground = coll_probe_ground_height_below((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
-            if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
+            if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > g_enemy_height_limit)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - coll_probe_ground_height_below((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(g_str_debug_ground_height, (double)(*(float *)(obj + 0x18) - coll_probe_ground_height_below((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
         }
         if (*(float *)(obj + 0x18) < *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) > 0.8f) {
-            *(float *)(obj + 0x18) += D_L12_001B0A54 * 0.01666666753590107f;
+            *(float *)(obj + 0x18) += g_robot_guard_climb_speed * 0.01666666753590107f;
             if (*(float *)(obj + 0x18) < ground)
                 *(float *)(obj + 0x18) = ground;
         }
         if (*(float *)(obj + 0x18) > *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) < -0.8f) {
-            *(float *)(obj + 0x18) -= D_L12_001B0A54 * 0.01666666753590107f;
+            *(float *)(obj + 0x18) -= g_robot_guard_climb_speed * 0.01666666753590107f;
             if (*(float *)(obj + 0x18) < ground)
                 *(float *)(obj + 0x18) = ground;
         }
@@ -412,7 +412,7 @@ destroy:
     case 5:
         if (flag_set_first_pending(obj)) {
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
-            *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.5f;
+            *(float *)(state + 0x198) = g_robot_guard_state_value * 0.5f;
             if (obj[0x43] != 0)
                 anim_start_blended(obj, 0, 0, 20);
             ((L12PathEnemyState *)state)->attackTimer = 150;
@@ -429,7 +429,7 @@ destroy:
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(int *)(state + 0x168) = 1;
         }
-        if (AdvanceAlongPath(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
+        if (AdvanceAlongPath(obj, g_path_zone_table[*(int *)(state + 0x164)])) {
             moby_set_state(obj, 5, 0);
             if (obj[0x43] != 0)
                 anim_start_blended(obj, 0, 0, 0);
@@ -440,7 +440,7 @@ destroy:
         u8 *path;
         int flags;
         float oldZ, ground, heightLimit;
-        path = D_L12_001FEAC0[*(int *)(state + 0x158)];
+        path = g_path_zone_table[*(int *)(state + 0x158)];
         if (flag_set_first_pending(obj)) {
             int nextIndex = ((L12PathEnemyState *)state)->pathIndex + 1;
             if (nextIndex == *(int *)path)
@@ -456,25 +456,25 @@ destroy:
         flags = moby_l01_turn_toward_target(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
         ground = coll_probe_ground_height_below((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
-            if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
+            if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > g_enemy_height_limit)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                STUB_printf(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - coll_probe_ground_height_below((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                STUB_printf(g_str_debug_ground_height, (double)(*(float *)(obj + 0x18) - coll_probe_ground_height_below((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
             heightLimit = *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) < oldZ ? *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) : oldZ;
             if (*(float *)(obj + 0x18) < heightLimit)
                 *(float *)(obj + 0x18) = heightLimit;
         }
         if (*(float *)(obj + 0x18) < *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) > 0.8f) {
-            *(float *)(obj + 0x18) += D_L12_001B0A54 * 0.01666666753590107f;
+            *(float *)(obj + 0x18) += g_robot_guard_climb_speed * 0.01666666753590107f;
             if (*(float *)(obj + 0x18) < ground)
                 *(float *)(obj + 0x18) = ground;
         }
         if (*(float *)(obj + 0x18) > *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) < -0.8f) {
-            *(float *)(obj + 0x18) -= D_L12_001B0A54 * 0.01666666753590107f;
+            *(float *)(obj + 0x18) -= g_robot_guard_climb_speed * 0.01666666753590107f;
             if (*(float *)(obj + 0x18) < ground)
                 *(float *)(obj + 0x18) = ground;
         }
@@ -492,15 +492,15 @@ destroy:
             ((L12PathEnemyState *)state)->attackTimer = 40;
             if (obj[0x43] != 8)
                 anim_start_blended(obj, 8, 0, 20);
-            moby_set_controller_speed_limits(obj, D_L12_001B0AA8 * 0.000034722223062999546f,
-                          D_L12_001B0AAC * 0.0020833334419876337f,
+            moby_set_controller_speed_limits(obj, g_robot_guard_turn_speed * 0.000034722223062999546f,
+                          g_robot_guard_move_speed * 0.0020833334419876337f,
                           0.10471977293491364f, 0.10471977293491364f);
-            *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.25f;
+            *(float *)(state + 0x198) = g_robot_guard_state_value * 0.25f;
         }
         if (FastDecTimer(state + 0x262) || (distance < 4.0f && ((L12PathEnemyState *)state)->attackTimer < 20)) {
-            float turn = D_L12_001B0AA8 * 0.00027777778450399637f;
-            float speed = D_L12_001B0AAC * 0.01666666753590107f;
-            *(float *)(state + 0x198) = D_L12_001B0AB0;
+            float turn = g_robot_guard_turn_speed * 0.00027777778450399637f;
+            float speed = g_robot_guard_move_speed * 0.01666666753590107f;
+            *(float *)(state + 0x198) = g_robot_guard_state_value;
             moby_set_controller_speed_limits(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
             if (obj[0x43] != 7)
                 anim_start_blended(obj, 7, 0, 20);
@@ -508,7 +508,7 @@ destroy:
             moby_set_state(obj, 16, -1);
         } else {
             moby_transform_joint_point(obj, 2, matrix);
-            transform_vector(&pos, D_L12_001B0A90, matrix);
+            transform_vector(&pos, g_robot_guard_effect_offset, matrix);
             goto smoke;
         }
         break;
@@ -516,7 +516,7 @@ destroy:
         if (flag_set_first_pending(obj))
             PlayMobySound(3, 0, obj);
         moby_transform_joint_point(obj, 2, matrix);
-        transform_vector(&pos, D_L12_001B0A90, matrix);
+        transform_vector(&pos, g_robot_guard_effect_offset, matrix);
         angle = mat_fast_helper_a(*(float *)(state + 0x130) - *(float *)(obj + 0x10),
                               *(float *)(state + 0x134) - *(float *)(obj + 0x14));
         if (math_fabs(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
@@ -524,25 +524,25 @@ destroy:
             vec_scale_to_length(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
             velocity.z = (*(float *)(state + 0x138) - pos.z) * 0.01666666753590107f;
         }
-        if (!func_US2_002AF9C8(obj, D_L12_001B0A50)) {
+        if (!math_is_value_within_step_us2(obj, g_robot_guard_step_limit)) {
 smoke:
-            limit = math_random_float_range(D_L12_001B0A80, D_L12_001B0A84);
-            i = math_random_int_below(D_L12_001B0A8C);
-            part_spawn_ground_effect(&pos, (int)D_L12_001B0A88, limit * 0.3f, limit,
-                         D_L12_001B0A58, 0, i, D_L12_001A8F20, 0, 0.0f);
+            limit = math_random_float_range(g_robot_guard_size_min, g_robot_guard_size_max);
+            i = math_random_int_below(g_robot_guard_effect_count);
+            part_spawn_ground_effect(&pos, (int)g_robot_guard_effect_type, limit * 0.3f, limit,
+                         g_robot_guard_effect_id, 0, i, g_zero_l12_vec, 0, 0.0f);
             break;
         }
         if (math_fabs(fast_subtract_rotations(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
             vec_scale_to_length(&velocity, obj + 0xC0, 0.5333333611488342f);
-            velocity.z = (*(float *)(state + 0x138) - pos.z + D_L12_001B0B34) * 0.01666666753590107f;
+            velocity.z = (*(float *)(state + 0x138) - pos.z + g_robot_guard_height_offset) * 0.01666666753590107f;
         } else {
             qcopy(&target, state + 0x130);
-            target.z += D_L12_001B0B34;
+            target.z += g_robot_guard_height_offset;
             FastVecSub(&velocity, &target, &pos);
             vec_scale_to_length(&velocity, &velocity, 0.5333333611488342f);
         }
-        if (velocity.z > D_L12_001B0B08 * 0.01666666753590107f)
-            velocity.z = D_L12_001B0B08 * 0.01666666753590107f;
+        if (velocity.z > g_robot_guard_max_fall_speed * 0.01666666753590107f)
+            velocity.z = g_robot_guard_max_fall_speed * 0.01666666753590107f;
         else if (velocity.z < -100.0f)
             velocity.z = -100.0f;
         blast_projectile_spawn(obj, &velocity, &pos, 0, (float)state[0x34]);
@@ -563,7 +563,7 @@ smoke:
     case 24:
         if (flag_set_first_pending(obj) && obj[0x43] != 9)
             anim_start_blended(obj, 9, 0, 20);
-        if (func_US2_002AF9C8(obj, 12.5f))
+        if (math_is_value_within_step_us2(obj, 12.5f))
             *(int *)(obj + 0x48) = 0;
         break;
     }

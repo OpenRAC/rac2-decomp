@@ -26,7 +26,7 @@ extern char g_hero_state[];
  * halves of thirty-two, and any other state does nothing.  D_00189EA0 is the pointer the
  * entry test hands to func_002ACBC8, and the map selection block D_00189E20 sits 0x80
  * before it. */
-void func_PAL_L13_0038EF88(Obj_38C1B8 *a0)
+void trigger_list_check_hero_pal(Obj_38C1B8 *a0)
 {
     Table_389848 *t = a0->table;
     int *e;

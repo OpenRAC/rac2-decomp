@@ -3,13 +3,13 @@
 /* -G32 (with the assembler's -G32): the 32-byte table D_L07_001B1020 and the 16-byte vector
    D_L07_001B1060 are addressed through $gp, and so is D_L07_001B24B0 where its load fills a
    delay slot. */
-extern u8 D_L07_001B1020[32] __attribute__((sda));
-extern u8 D_L07_001B1060[16] __attribute__((sda));
-extern u8 D_L07_001B9200[];
+extern u8 g_boss_move_tier_table[32] __attribute__((sda));
+extern u8 g_boss_move_vector[16] __attribute__((sda));
+extern u8 g_hero_position_block[];
 /* `sda` on an array of unknown size: cc1 emits the one-instruction access, which the assembler
    expands absolute outside a delay slot, as retail has it. */
-extern u8 *D_L07_001B24B0[] __attribute__((sda));
-extern u8 D_L07_001FE3B8[];
+extern u8 *g_boss_move_object_slots[] __attribute__((sda));
+extern u8 g_boss_hit_counters[];
 extern void moby_set_state(void *, s32, s32);
 extern void mem_clear(void *, s32, s32);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -47,16 +47,16 @@ void boss_start_move_tier(u8 *obj, void *target, s32 tier)
         tier_index = tier;
         if (tier >= 2) tier_index = 1;
         else if (tier < 0) tier_index = 0;
-        qcopy(state + 0x3E0, D_L07_001B1020 + tier_index * 16);
+        qcopy(state + 0x3E0, g_boss_move_tier_table + tier_index * 16);
         *(void **)(state + 0x418) = target;
         moby_set_state(obj, 3, 0);
     } else {
         *(void **)(state + 0x418) = 0;
         moby_set_state(obj, 3, 1);
     }
-    if (!D_L07_001B24B0[0]) {
-        D_L07_001B24B0[0] = obj;
-        mem_clear(D_L07_001FE3B8, 0, 0xE0);
+    if (!g_boss_move_object_slots[0]) {
+        g_boss_move_object_slots[0] = obj;
+        mem_clear(g_boss_hit_counters, 0, 0xE0);
     }
     start = (tier + 1) * 0.166944921f;
     duration = *(s16 *)(state + 0x24);
@@ -66,8 +66,8 @@ void boss_start_move_tier(u8 *obj, void *target, s32 tier)
     *(f32 *)(state + 0x20) = duration - duration * end;
     if (*(f32 *)(state + 0x430) < 0.0f) *(f32 *)(state + 0x430) = 0.0f;
     *(f32 *)(obj + 0xF4) = *(f32 *)(obj + 0xF0) = 0.0f;
-    matrix_mul_vec3(obj + 0x10, D_L07_001B1060, D_L07_001B9200 + 0x230);
-    FastVecAdd(obj + 0x10, obj + 0x10, D_L07_001B9200);
+    matrix_mul_vec3(obj + 0x10, g_boss_move_vector, g_hero_position_block + 0x230);
+    FastVecAdd(obj + 0x10, obj + 0x10, g_hero_position_block);
     func_002A0F48(obj);
     qzero(state + 0x3F0);
     if (tier >= 0) {

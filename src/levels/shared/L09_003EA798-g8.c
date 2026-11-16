@@ -10,7 +10,7 @@ extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern float path_get_entry_length(int);
 extern int path_start_moby_on_entry(char *, int, int);
-extern unsigned int D_L09_001FE6C0[];
+extern unsigned int g_path_l09_table[];
 extern float ref_L09_003EA798_00 __attribute__((sda));
 extern float ref_L09_003EA798_01 __attribute__((sda));
 extern float ref_L09_003EA798_02 __attribute__((sda));
@@ -130,7 +130,7 @@ void walker_init(char *object) {
     path_get_entry_length(state->f350);
     entry = state->f36C;
     if (entry != -1) {
-        qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
+        qcopy(pos, (char *)g_path_l09_table[entry] + 0x10);
         path_start_moby_on_entry(object, entry, -1);
         state->f380 = 0;
     } else {

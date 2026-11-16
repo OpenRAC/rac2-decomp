@@ -7,11 +7,11 @@
  * func_PAL_L13_004175B8's C with this level's colours. */
 
 typedef int Quad __attribute__((mode(TI)));
-extern float D_L00_001B13EC __attribute__((sda)), D_L00_001B13F0 __attribute__((sda));
-extern int D_L00_001B13F4 __attribute__((sda));
+extern float g_explosion_burst2_inner_scale __attribute__((sda)), g_explosion_burst2_outer_scale __attribute__((sda));
+extern int g_explosion_burst2_particle_texture __attribute__((sda));
 /* Keep the full vector size: sda selects symbolic address formation in cc1,
  * while the assembler keeps this 16 - byte object absolute under -G8. */
-extern float D_L00_001A8F20[4] __attribute__((sda));
+extern float g_default_vector[4] __attribute__((sda));
 typedef struct Cam_00435CE8 Cam_00435CE8;
 typedef struct CamMgr_00435CE8 {
     u8 pad000[0x140];
@@ -19,8 +19,8 @@ typedef struct CamMgr_00435CE8 {
     u8 pad150[0x40];
     Cam_00435CE8 *cam;
 } CamMgr_00435CE8;
-extern CamMgr_00435CE8 D_L00_001B8C80;
-extern u8 *D_L00_001FE940[] NOT_SDA;
+extern CamMgr_00435CE8 g_scalar_transition_state;
+extern u8 *g_effect_definitions[] NOT_SDA;
 /* Integer and FP arguments retain their respective EE ABI bank order. */
 extern u8 *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern float mat_fast_helper_a(float, float);
@@ -83,23 +83,23 @@ void func_PAL_L00_0041AE28(BurstObject *object)
         float inner, outer;
         int i;
         u8 *effect;
-        inner = D_L00_001B13EC * state->scale * 210000.0f;
-        outer = D_L00_001B13F0 * state->scale * 210000.0f;
-        effect = part_spawn_gravity_fade(object->position, D_L00_001A8F20, ((s32)(D_L00_001B13F4) * 5 + 2) / 6, 0x388EF7, 0, 100, 0, inner,
+        inner = g_explosion_burst2_inner_scale * state->scale * 210000.0f;
+        outer = g_explosion_burst2_outer_scale * state->scale * 210000.0f;
+        effect = part_spawn_gravity_fade(object->position, g_default_vector, ((s32)(g_explosion_burst2_particle_texture) * 5 + 2) / 6, 0x388EF7, 0, 100, 0, inner,
             outer, 0.0f, 0);
-        if (effect) effect[2] = D_L00_001FE940[92][0];
-        effect = part_spawn_gravity_fade(object->position, D_L00_001A8F20, ((s32)(D_L00_001B13F4) * 5 + 2) / 6, 0x63F7, 0, 100, 0, inner,
+        if (effect) effect[2] = g_effect_definitions[92][0];
+        effect = part_spawn_gravity_fade(object->position, g_default_vector, ((s32)(g_explosion_burst2_particle_texture) * 5 + 2) / 6, 0x63F7, 0, 100, 0, inner,
             outer, 0.0f, 0);
-        if (effect) effect[2] = D_L00_001FE940[92][0];
+        if (effect) effect[2] = g_effect_definitions[92][0];
         for (i = 0; i < 2; i++) {
-            effect = part_spawn_gravity_fade(object->position, D_L00_001A8F20, ((s32)(D_L00_001B13F4) * 5 + 2) / 6, 0x388EF7, 0, 127, 0,
+            effect = part_spawn_gravity_fade(object->position, g_default_vector, ((s32)(g_explosion_burst2_particle_texture) * 5 + 2) / 6, 0x388EF7, 0, 127, 0,
                 inner, outer, 0.0f, 0);
-            if (effect) effect[2] = D_L00_001FE940[92][5];
+            if (effect) effect[2] = g_effect_definitions[92][5];
         }
         for (i = 0; i < 2; i++) {
-            effect = part_spawn_gravity_fade(object->position, D_L00_001A8F20, ((s32)(D_L00_001B13F4) * 5 + 2) / 6, 0x388EF7, 0, 127, 0,
+            effect = part_spawn_gravity_fade(object->position, g_default_vector, ((s32)(g_explosion_burst2_particle_texture) * 5 + 2) / 6, 0x388EF7, 0, 127, 0,
                 inner, outer, 0.0f, 0);
-            if (effect) effect[2] = D_L00_001FE940[92][6];
+            if (effect) effect[2] = g_effect_definitions[92][6];
         }
     }
     {
@@ -110,8 +110,8 @@ void func_PAL_L00_0041AE28(BurstObject *object)
             float heading, angle, size, speed;
             int phase, lifetime;
             u8 *effect;
-            heading = mat_fast_helper_a(D_L00_001B8C80.f140[0] - object->position[0],
-                D_L00_001B8C80.f140[1] - object->position[1]);
+            heading = mat_fast_helper_a(g_scalar_transition_state.f140[0] - object->position[0],
+                g_scalar_transition_state.f140[1] - object->position[1]);
             phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             lifetime = math_random_int_range(30, 50);
             position[0] = object->position[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -130,7 +130,7 @@ void func_PAL_L00_0041AE28(BurstObject *object)
             phase *= 2;
             effect = part_spawn_fading_drift(position, velocity, ((s32)(lifetime) * 5 + 2) / 6, 0x20FF, -phase, 48, 48, size * 1260000.0f,
                 state->scale * 4200.0f, 0.00584f, 0);
-            if (effect) effect[2] = D_L00_001FE940[53][0];
+            if (effect) effect[2] = g_effect_definitions[53][0];
         }
     }
     {
@@ -138,8 +138,8 @@ void func_PAL_L00_0041AE28(BurstObject *object)
         for (i = 0; i < state->count24; i++) {
             float heading, angle, size, speed;
             int phase, lifetime;
-            heading = mat_fast_helper_a(D_L00_001B8C80.f140[0] - object->position[0],
-                D_L00_001B8C80.f140[1] - object->position[1]);
+            heading = mat_fast_helper_a(g_scalar_transition_state.f140[0] - object->position[0],
+                g_scalar_transition_state.f140[1] - object->position[1]);
             phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             lifetime = math_random_int_range(30, 50);
             position[0] = object->position[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -162,8 +162,8 @@ void func_PAL_L00_0041AE28(BurstObject *object)
         for (i = 0; i < state->count28; i++) {
             float heading, angle, size, speed;
             int phase, lifetime;
-            heading = mat_fast_helper_a(D_L00_001B8C80.f140[0] - object->position[0],
-                D_L00_001B8C80.f140[1] - object->position[1]);
+            heading = mat_fast_helper_a(g_scalar_transition_state.f140[0] - object->position[0],
+                g_scalar_transition_state.f140[1] - object->position[1]);
             phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             lifetime = math_random_int_range(30, 50);
             position[0] = object->position[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -204,13 +204,13 @@ void func_PAL_L00_0041AE28(BurstObject *object)
         *(Quad *)position = *(Quad *)velocity;
         part_spawn_shockwave_ring(object, object->position, position, (16 * 5 + 2) / 6, 255, 0, 0, 40, state->scale * 3.5f);
     }
-    SpawnExplosionEffects(object, D_L00_001A8F20, object->position, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1,
+    SpawnExplosionEffects(object, g_default_vector, object->position, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1,
         state->scale * 20.0f, 0, 0, -1, 0, 0x810001);
     {
         int sign = 1, i;
         float angle;
-        angle = mat_fast_helper_a(D_L00_001B8C80.f140[0] - object->position[0],
-            D_L00_001B8C80.f140[1] - object->position[1]);
+        angle = mat_fast_helper_a(g_scalar_transition_state.f140[0] - object->position[0],
+            g_scalar_transition_state.f140[1] - object->position[1]);
         for (i = 0; i < state->count2C; i++) {
             float radius, roll, turn;
             u8 *effect;

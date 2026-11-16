@@ -1,10 +1,10 @@
 #include "names.h"
-extern unsigned char *D_L05_001B2528;
+extern unsigned char *g_moby_l05_list_head;
 extern void moby_mark_spawned(void *);
 
 /* Retire each active object belonging to this effect family. */
 void effect_remove_family_mobys(void) {
-    unsigned char *object = D_L05_001B2528;
+    unsigned char *object = g_moby_l05_list_head;
     int kind;
     while (object) {
         kind = *(short *)(object + 0xAA);

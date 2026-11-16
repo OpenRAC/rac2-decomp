@@ -6,11 +6,11 @@ extern u8 *g_hero_moby;
 extern int text_measure_width_small_scaled(u8 *, int, float);
 extern u64 GetEffectTextureDescriptor(int);
 extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
-extern u8 D_L08_00296CD0[];
-extern u8 D_L08_001DB5E7;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 g_font_print_data[];
+extern u8 g_screen_update_index;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern u8 *g_hero_moby;
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
@@ -24,7 +24,7 @@ void func_PAL_00280218(int x, int y, u64 color, u8 *text, int length, float scal
     fx = x - (text_measure_width_small_scaled(text, length, scale) >> 1);
     fy = y;
     texture = GetEffectTextureDescriptor(1);
-    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
+    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, g_font_print_data);
 }
 
 
@@ -49,7 +49,7 @@ float func_PAL_00280358(u8 *text, int length, int maxWidth, float minScale) {
 }
 
 extern int func_PAL_0027F790(u8 *, int, float);
-extern u8 D_PAL_00263C70[];
+extern u8 g_font_glyph_table_small[];
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
  * the text is drawn with font texture 1. func_PAL_0027FB48 is declared with its
@@ -62,7 +62,7 @@ void func_PAL_002803E8(int x, int y, u64 color, u8 *text, int length, float scal
     fx = x - (func_PAL_0027F790(text, length, scale) >> 1);
     fy = y;
     texture = GetEffectTextureDescriptor(2);
-    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, D_PAL_00263C70);
+    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, g_font_glyph_table_small);
 }
 
 

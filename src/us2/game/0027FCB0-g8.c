@@ -5,9 +5,9 @@ typedef unsigned long u64;
 typedef int s32;
 /* func_US2_0027FCB0, the USA v2.00 copy of func_0027F640: the same C, with the func_002FC560 call func_0027F2A8 also makes. */
 struct Glyph_F6668 { u8 u,v; signed char top,adv; };
-extern int D_001B166C;
-extern int D_001B1668 __attribute__((sda));
-extern int D_001A89B0[8] __attribute__((sda));
+extern int g_text_flag_enabled;
+extern int g_screen_flag_enabled __attribute__((sda));
+extern int g_text_color_table[8] __attribute__((sda));
 extern void VU1_addGSregister(unsigned int,unsigned long);
 extern float IntToFloat(int);
 extern void EmitTexturedRectangle(float x, float y, float draw_width, float draw_height,
@@ -23,8 +23,8 @@ void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limi
     struct Glyph_F6668 *overlay_glyph;
     float height, offset, dx, dy;
 
-    if (D_001B166C == 0) {
-        D_001A89B0[0] = color;
+    if (g_text_flag_enabled == 0) {
+        g_text_color_table[0] = color;
     }
     VU1_addGSregister(0x47, 0x33001);
     character_count = 0;
@@ -35,9 +35,9 @@ void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limi
     cursor = text;
     do {
         if ((u8)(*cursor - 8) < 8) {
-            if (D_001B1668 != 0) {
+            if (g_screen_flag_enabled != 0) {
                 color &= 0xFF000000;
-                color |= D_001A89B0[*cursor - 8] & 0xFFFFFF;
+                color |= g_text_color_table[*cursor - 8] & 0xFFFFFF;
             }
         } else {
             if (glyphs[*cursor].adv != 0) {

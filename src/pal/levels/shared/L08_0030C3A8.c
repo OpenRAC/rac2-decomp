@@ -4,17 +4,17 @@
 extern void LoadPackSingleTexture();
 extern void gfx_send_gs_register_packet();
 extern void load_copy_header_relocate_pointers();
-extern u8 D_L08_001DB5E7;
-extern s32 D_L08_001DAC40[];
-extern s32 D_L08_001BFEF4;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 g_screen_update_index;
+extern s32 g_screen_update_headers[];
+extern s32 g_screen_update_param;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern u8 *g_hero_moby;
 
-void func_PAL_L08_0030C3A8(s32 x) {
+void gfx_run_screen_update_steps_pal(s32 x) {
     LoadPackSingleTexture(x);
     gfx_send_gs_register_packet(x);
-    load_copy_header_relocate_pointers(D_L08_001DAC40[D_L08_001DB5E7], D_L08_001BFEF4);
+    load_copy_header_relocate_pointers(g_screen_update_headers[g_screen_update_index], g_screen_update_param);
 }
 

@@ -26,15 +26,15 @@ typedef struct {
     u8 completed;
 } DobboProgress;
 
-extern u8 D_001A7BD3 MACRO_ADDR, D_001A7A40 MACRO_ADDR;
-extern DobboInput D_00139768 NOT_SDA;
-extern DobboProgress D_001395B8 NOT_SDA;
-extern char D_0019B2E8[] NOT_SDA;
+extern u8 g_npc_talk_flag MACRO_ADDR, g_unlocked_item_flags MACRO_ADDR;
+extern DobboInput g_request_flag_table NOT_SDA;
+extern DobboProgress g_game_flag_table NOT_SDA;
+extern char g_moby_group_flags[] NOT_SDA;
 extern char g_hero_state[] NOT_SDA;
-extern char D_L09_001BFC00[] NOT_SDA;
-extern int D_L09_001A8F00 MACRO_ADDR, D_L09_001B2388 MACRO_ADDR;
-extern int D_L09_001B25A0[] MACRO_ADDR;
-extern int D_L09_001B15A0 __attribute__((sda)), g_current_map_index __attribute__((sda));
+extern char g_request_l09_queue[] NOT_SDA;
+extern int g_game_l09_mode MACRO_ADDR, g_frame_l09_counter MACRO_ADDR;
+extern int g_dobbo_setting_flags[] MACRO_ADDR;
+extern int g_talking_npc_greeted __attribute__((sda)), g_current_map_index __attribute__((sda));
 
 extern void moby_reset_matching_effects(char *);
 extern void moby_set_state(char *, int, int);
@@ -86,80 +86,80 @@ void talking_npc_update(char *obj) {
     moby_reset_matching_effects(obj);
     switch (U8(obj, 0x20)) {
     case 0:
-        if (D_001A7BD3) {
+        if (g_npc_talk_flag) {
             U16(obj, 0x34) = (U16(obj, 0x34) | 0x41) & 0xEFFF;
             I32(obj, 0x98) = 0;
         }
-        status = D_00139768.status;
+        status = g_request_flag_table.status;
         if (status >> 7) {
             moby_set_state(obj, 6, -1);
-        } else if (D_001395B8.unlocked || (D_00139768.flags & 8)) {
+        } else if (g_game_flag_table.unlocked || (g_request_flag_table.flags & 8)) {
             moby_set_state(obj, 3, -1);
         } else {
             moby_set_state(obj, 1, -1);
         }
         if (U8(obj, 0x20) == 3) {
-            if (!IsPointInCuboid(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
-                D_L09_001B15A0 = 1;
+            if (!IsPointInCuboid(HERO_POS, I32(data, 0x118)) || !g_game_flag_table.unlocked) {
+                g_talking_npc_greeted = 1;
             }
         }
         moby_reset_vars_defaults(obj);
         break;
     case 1:
         if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
-            if (req_push_queue(D_L09_001BFC00, 99)) {
+            if (req_push_queue(g_request_l09_queue, 99)) {
                 level_apply_index_for_key(obj);
-                req_launch_queued(D_L09_001BFC00);
+                req_launch_queued(g_request_l09_queue);
                 moby_set_state(obj, 2, -1);
             }
         }
         break;
     case 2:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00 == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode == 2) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L09_001B25A0[2] = 0;
+            g_dobbo_setting_flags[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             moby_set_state(obj, 3, -1);
-            D_001395B8.unlocked = 1;
-            D_001395B8.started = 1;
+            g_game_flag_table.unlocked = 1;
+            g_game_flag_table.started = 1;
             data_set_small_value_and_refresh(22, 1);
         }
         break;
     case 3:
         if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
-            if (D_001395B8.completed) {
-                if (req_push_queue(D_L09_001BFC00, 103)) {
-                    req_push_queue(D_L09_001BFC00, 11);
+            if (g_game_flag_table.completed) {
+                if (req_push_queue(g_request_l09_queue, 103)) {
+                    req_push_queue(g_request_l09_queue, 11);
                     level_apply_index_for_key(obj);
-                    req_launch_queued(D_L09_001BFC00);
+                    req_launch_queued(g_request_l09_queue);
                     game_set_slowdown_factor();
-                    D_L09_001B15A0 = 1;
+                    g_talking_npc_greeted = 1;
                     moby_set_state(obj, 5, -1);
                 }
-            } else if (D_L09_001B2388 < 10 && D_001395B8.unlocked && !D_L09_001B15A0) {
-                if (req_push_queue(D_L09_001BFC00, 102)) {
-                    req_launch_queued(D_L09_001BFC00);
+            } else if (g_frame_l09_counter < 10 && g_game_flag_table.unlocked && !g_talking_npc_greeted) {
+                if (req_push_queue(g_request_l09_queue, 102)) {
+                    req_launch_queued(g_request_l09_queue);
                     game_set_slowdown_factor();
-                    D_L09_001B15A0 = 1;
+                    g_talking_npc_greeted = 1;
                     moby_set_state(obj, 4, -1);
                 }
             }
         }
         break;
     case 4:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00 == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode == 2) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
             level_capture_checkpoint_state(HERO_POS, HERO_ROT);
-            D_L09_001B25A0[2] = 0;
+            g_dobbo_setting_flags[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             MemcardSave(0, -1);
@@ -167,16 +167,16 @@ void talking_npc_update(char *obj) {
         }
         break;
     case 5:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00 == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode == 2) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L09_001B25A0[2] = 0;
+            g_dobbo_setting_flags[2] = 0;
             moby_mark_flag_and_append_to_list(11);
             snd_play_indexed(11);
-            if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (g_current_map_index << 4)) & 0x80)) {
+            if (U8(obj, 0xB0) != 255 && !(U8(g_moby_group_flags, U8(obj, 0xB0) + (g_current_map_index << 4)) & 0x80)) {
                 moby_mark_table_entry_flagged(U8(obj, 0xB0));
             }
             level_capture_checkpoint_state(HERO_POS, HERO_ROT);
@@ -188,26 +188,26 @@ void talking_npc_update(char *obj) {
         }
         break;
     case 6:
-        if (IsPointInCuboid(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
-            && !D_L09_001B15A0) {
-            if (req_push_queue(D_L09_001BFC00, 102)) {
-                req_launch_queued(D_L09_001BFC00);
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118)) && g_frame_l09_counter < 10 && g_game_flag_table.unlocked
+            && !g_talking_npc_greeted) {
+            if (req_push_queue(g_request_l09_queue, 102)) {
+                req_launch_queued(g_request_l09_queue);
                 game_set_slowdown_factor();
-                D_L09_001B15A0 = 1;
+                g_talking_npc_greeted = 1;
                 moby_set_state(obj, 7, -1);
             }
         }
         break;
     case 7:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00 == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode == 2) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            D_L09_001B25A0[2] = 0;
+            g_dobbo_setting_flags[2] = 0;
             moby_set_state(obj, 8, -1);
             level_capture_checkpoint_state(HERO_POS, HERO_ROT);
             MemcardSave(0, -1);
@@ -278,7 +278,7 @@ void talking_npc_update(char *obj) {
         F32(data, 0x68) = yaw * 0.6f;
         F32(data, 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40) {
+    if (g_unlocked_item_flags) {
         F32(data, 0x70) = 2.75f;
     }
     updateJoint(obj, data, 0, speed, 0.3f);

@@ -18,8 +18,8 @@ extern ThrowHero g_hero_state;
 extern ThrowPad g_pad_state;
 typedef struct { char pad0[0x18]; unsigned char *moby; char pad1C[4]; float point[4]; } ThrowCollision;
 extern ThrowCollision g_collision_hit;
-extern char g_active_camera[], g_camera_eye_state[], D_001F1AF8[], g_weapon_table[];
-extern unsigned char D_0013958A;
+extern char g_active_camera[], g_camera_eye_state[], g_throw_moby_list[], g_weapon_table[];
+extern unsigned char g_throw_weapon_index;
 typedef struct { char pad[0x54]; float speed; char tail[0x88]; } ThrowClass;
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
@@ -50,11 +50,11 @@ extern void *thrown_item_spawn(void *, void *, void *);
 #define THROW_FLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define THROW_INT(p,o) (*(int *)((char *)(p)+(o)))
 #define THROW_PTR(p,o) (*(unsigned char **)((char *)(p)+(o)))
-extern unsigned int func_US2_0026F750(int, int);
+extern unsigned int stub_empty_9_us2(int, int);
 extern void stub_empty_12();
 extern int stub_empty_7(int);
 
-void func_US2_00315DD0(unsigned char *self)
+void UpdateProjectileThrower_us2(unsigned char *self)
 {
     typedef unsigned int Quad __attribute__((mode(TI)));
     typedef union { Quad q; float f[4]; } Vec;
@@ -94,7 +94,7 @@ void func_US2_00315DD0(unsigned char *self)
     }
     if (!THROW_PTR(data,0x50) || THROW_PTR(data,0x50)[0x20]==0xFE || THROW_PTR(data,0x50)[0x20]==0xFD)
         THROW_PTR(data,0x50)=0;
-    if (g_hero_state.mode==1) func_US2_0026F750(0x1D,1);
+    if (g_hero_state.mode==1) stub_empty_9_us2(0x1D,1);
     if (THROW_PTR(data,0x50) && !g_hero_state.locked) {
         heldData=THROW_PTR(THROW_PTR(data,0x50),0x68);
         velocity.q=0;
@@ -165,7 +165,7 @@ void func_US2_00315DD0(unsigned char *self)
         if(self[0x60]&2) self[0x20]=2;
         /* Fall through. */
     case 2:
-        if(g_hero_state.mode==1) func_US2_0026F750(0x1D,1);
+        if(g_hero_state.mode==1) stub_empty_9_us2(0x1D,1);
         if(self[0x42]==self[0x43] && self[0x42]==3 && (self[0x60]&2)) anim_start_blended(self,1,0,2);
         if(THROW_FLOAT(data,0x58)==0 && !g_hero_state.locked && (g_pad_state.buttons&g_hero_state.fireMask)) {
             if(stub_empty_5(-1,1)) {
@@ -173,7 +173,7 @@ void func_US2_00315DD0(unsigned char *self)
                 if(self[0x43]!=3) anim_start_blended(self,3,0,2);
                 self[0x20]=3;
                 {
-                    ThrowClass *weapon = &((ThrowClass *)g_weapon_table)[D_0013958A];
+                    ThrowClass *weapon = &((ThrowClass *)g_weapon_table)[g_throw_weapon_index];
                     THROW_FLOAT(data,0x58) = 1.0f / weapon->speed;
                 }
             } else PlayMobySound(4,0,self);
@@ -186,7 +186,7 @@ void func_US2_00315DD0(unsigned char *self)
         if(self[0x42]==self[0x43] && self[0x42]==3 && moby_get_anim_value(self)>=2.0f) {
             if(THROW_PTR(data,0x50)) {
                 thrown_item_launch(&launch,THROW_PTR(data,0x50),THROW_PTR(THROW_PTR(data,0x50),0x68));
-                AddMobyToIndexList(THROW_PTR(data,0x50),D_001F1AF8,0x3F);
+                AddMobyToIndexList(THROW_PTR(data,0x50),g_throw_moby_list,0x3F);
                 THROW_PTR(data,0x50)=0;
                 THROW_INT(data,0x54)=10;
             }

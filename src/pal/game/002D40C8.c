@@ -9,13 +9,13 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
-extern int D_00138344;
+extern int g_menu_input_flags;
+extern int g_menu_input_flags;
 extern int func_PAL_0029D1D8(int);
 
 int func_PAL_002D40C8(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)

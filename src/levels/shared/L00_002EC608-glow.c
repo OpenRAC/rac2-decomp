@@ -9,7 +9,7 @@ typedef struct {
 } GlowQuad;
 typedef struct { float basis[3][4], position[4]; } GlowTransform;
 typedef struct { char pad[0x140]; float position[4]; } GlowCamera;
-extern GlowCamera D_L00_001B8C80[];
+extern GlowCamera g_scalar_transition_state[];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern int math_random_int_range(int, int);
 extern float mat_fast_helper_a(float, float);
@@ -50,8 +50,8 @@ void part_draw_glow_quad(float *position, int tint)
     quad.point[3][0] = 0;
     gfx_init_quad_packet_state(&quad, 44, 1, 128);
     color = (u32)math_random_int_range(48, 64) << 24;
-    delta_x = D_L00_001B8C80[0].position[0] - position[0];
-    delta_y = D_L00_001B8C80[0].position[1] - position[1];
+    delta_x = g_scalar_transition_state[0].position[0] - position[0];
+    delta_y = g_scalar_transition_state[0].position[1] - position[1];
     quad.uv[0][0] = 0;
     quad.uv[0][1] = 0;
     color |= (u32)(tint >> 17) << 16;
@@ -69,11 +69,11 @@ void part_draw_glow_quad(float *position, int tint)
     quad.uv[2][1] = 0;
     rotation[3] = 0;
     rotation[2] = mat_fast_helper_a(delta_x, delta_y);
-    rotation[1] = -mat_fast_helper_a(vec_distance_xy(position, D_L00_001B8C80[0].position),
-                                D_L00_001B8C80[0].position[2] - position[2]);
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(position, g_scalar_transition_state[0].position),
+                                g_scalar_transition_state[0].position[2] - position[2]);
     rotation[0] = math_random_angle();
     euler_to_matrix(&transform, rotation);
-    FastVecSub(offset, D_L00_001B8C80[0].position, position);
+    FastVecSub(offset, g_scalar_transition_state[0].position, position);
     vec_scale_to_length(offset, offset, 0.25f);
     transform.position[0] = position[0] + offset[0];
     transform.position[1] = position[1] + offset[1];

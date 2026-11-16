@@ -1,24 +1,24 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_001AE180 __attribute__((sda));
-extern float D_001AE17C;
-extern float D_001AE178 __attribute__((sda));
+extern float g_list_menu_cursor_y_step __attribute__((sda));
+extern float g_list_menu_cursor_y_base;
+extern float g_list_menu_cursor_x_offset __attribute__((sda));
 extern void object_set_first_float4(void *, float, float, float, float);
 /* Moves the cursor to the row of the selected entry. */
 void list_menu_position_cursor(char *self)
 {
     int index = *(int *)(self + 0x16C);
     float *v = *(float **)(self + 0x180);
-    object_set_first_float4(self + 0xE4, D_001AE178 + v[0],
-            (D_001AE17C + D_001AE180 * (float)index) + v[1],
+    object_set_first_float4(self + 0xE4, g_list_menu_cursor_x_offset + v[0],
+            (g_list_menu_cursor_y_base + g_list_menu_cursor_y_step * (float)index) + v[1],
             0.0f, 0.0f);
 }
 
-extern float D_001AE188 __attribute__((sda));
-extern float D_001AE18C;
-extern float D_001AE190 __attribute__((sda));
-extern float D_001AE194 __attribute__((sda));
+extern float g_list_menu_input_child_x_offset __attribute__((sda));
+extern float g_list_menu_input_child_y_offset;
+extern float g_list_menu_child_setting_first __attribute__((sda));
+extern float g_list_menu_child_setting_second __attribute__((sda));
 extern void menu_set_position(void *, float, float);
 extern void menu_set_settings(void *, int, int);
 extern void *UpdateMenuListSelection(void *, int);
@@ -28,16 +28,16 @@ void list_menu_update_from_input(char *self, int arg)
 {
     char *child = self + 0x188;
     float *position = *(float **)(self + 0x180);
-    menu_set_position(child, position[0] + D_001AE188, position[1] + D_001AE18C);
-    menu_set_settings(child, (int)D_001AE190, (int)D_001AE194);
+    menu_set_position(child, position[0] + g_list_menu_input_child_x_offset, position[1] + g_list_menu_input_child_y_offset);
+    menu_set_settings(child, (int)g_list_menu_child_setting_first, (int)g_list_menu_child_setting_second);
     UpdateMenuListSelection(child, arg);
     *(int *)(self + 0x16C) = menu_get_selected_index(child);
 }
-extern float D_001AE198 __attribute__((sda));
-extern float D_001AE19C;
-extern float D_001AE1A0 __attribute__((sda));
-extern float D_001AE1A4;
-extern float D_001AE1A8[2] __attribute__((sda));
+extern float g_list_menu_label_x_offset __attribute__((sda));
+extern float g_list_menu_label_y_offset;
+extern float g_list_menu_item_x_offset __attribute__((sda));
+extern float g_list_menu_item_y_offset;
+extern float g_list_menu_scales[2] __attribute__((sda));
 extern int menu_get_entry_count(void *);
 extern void object_set_value_float(void *, float);
 extern void list_menu_noop_hook(void *);
@@ -48,11 +48,11 @@ int list_menu_update(char *self, int arg)
     float *position = *(float **)(self + 0x180);
     float *scale;
     unsigned int index;
-    object_set_first_float4(self, D_001AE198 + position[0], D_001AE19C + position[1], 0.0f, 0.0f);
+    object_set_first_float4(self, g_list_menu_label_x_offset + position[0], g_list_menu_label_y_offset + position[1], 0.0f, 0.0f);
     position = *(float **)(self + 0x180);
-    object_set_first_float4(child, D_001AE1A0 + position[0], D_001AE1A4 + position[1], 0.0f, 0.0f);
+    object_set_first_float4(child, g_list_menu_item_x_offset + position[0], g_list_menu_item_y_offset + position[1], 0.0f, 0.0f);
     index = menu_get_entry_count(self + 0x188) - 1;
-    scale = (float *)((char *)D_001AE1A8 + (index << 2));
+    scale = (float *)((char *)g_list_menu_scales + (index << 2));
     object_set_value_float(self, *scale);
     object_set_value_float(child, *scale);
     list_menu_update_from_input(self, arg);
@@ -62,9 +62,9 @@ int list_menu_update(char *self, int arg)
 }
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern char D_001ADC10[], D_001ADC18[];
-extern char *D_001A8CFC[] __attribute__((sda));
-extern float D_001AE12C __attribute__((sda));
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[];
+extern char *g_resident_data_base[] __attribute__((sda));
+extern float g_small_list_value_float __attribute__((sda));
 extern void object_init_derived_arrays(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
@@ -89,20 +89,20 @@ void small_list_menu_init(char *object, void *argument)
     first = object + 0xDC;
     second = object + 0x128;
     widget = object + 0x10;
-    object_init_derived_arrays(first, D_001ADC10, argument);
-    object_init_derived_arrays(second, D_001ADC18, argument);
+    object_init_derived_arrays(first, g_menu_widget_desc_first, argument);
+    object_init_derived_arrays(second, g_menu_widget_desc_second, argument);
     *object_get_fourth_field(first) = 0x60442D00;
     *object_get_fourth_field(second) = 0x55F0C070;
-    object_set_helper_result(first, D_001A8CFC[0] + 0x8710, 0x73);
-    object_set_helper_result(second, D_001A8CFC[0] + 0x8710, 0x74);
-    object_set_value_float(first, D_001AE12C);
-    object_set_value_float(second, D_001AE12C);
+    object_set_helper_result(first, g_resident_data_base[0] + 0x8710, 0x73);
+    object_set_helper_result(second, g_resident_data_base[0] + 0x8710, 0x74);
+    object_set_value_float(first, g_small_list_value_float);
+    object_set_value_float(second, g_small_list_value_float);
     list_menu_reset_attach_items(widget, argument);
     menu_set_settings(widget, 11, 60);
     list_menu_set_selection(object, 0);
 }
-extern char D_001ADC20[], D_001ADFC0[], D_001AE0C0[];
-extern int D_001AE138 __attribute__((sda));
+extern char g_menu_widget_desc_third[], g_menu_frame_desc[], g_menu_small_icon_desc[];
+extern int g_small_list_menu_data __attribute__((sda));
 extern void object_init_derived_c(void *, void *, void *);
 extern void hud_set_widget_value_pair(void *, int, int);
 extern void *memset(void *, int, int);
@@ -127,10 +127,10 @@ void list_menu_init(char *object, void *arg)
     *(int *)(object + 0x170) = 1;
     (*(float **)(object + 0x180))[0] = 253.0f;
     (*(float **)(object + 0x180))[1] = 200.0f;
-    object_init_derived_arrays(object, D_001ADC10, arg);
-    object_init_derived_arrays(object + 0x4C, D_001ADC20, arg);
-    object_init_derived_arrays(object + 0xE4, D_001ADFC0, arg);
-    object_init_derived_c(object + 0x130, D_001AE0C0, arg);
+    object_init_derived_arrays(object, g_menu_widget_desc_first, arg);
+    object_init_derived_arrays(object + 0x4C, g_menu_widget_desc_third, arg);
+    object_init_derived_arrays(object + 0xE4, g_menu_frame_desc, arg);
+    object_init_derived_c(object + 0x130, g_menu_small_icon_desc, arg);
     list_menu_reset_attach_items(object + 0x188, arg);
     *object_get_fourth_field(object) = 0x60442D00;
     *object_get_fourth_field(object + 0x4C) = 0x55F0C070;
@@ -138,22 +138,22 @@ void list_menu_init(char *object, void *arg)
     *object_get_fourth_field(object + 0x130) = 0x60F0F0B0;
     object_set_value_float(object, 1.0f);
     object_set_value_float(object + 0x4C, 1.0f);
-    object_set_helper_result(object, D_001A8CFC[0] + 0x8710, 0xCD);
-    object_set_helper_result(object + 0x4C, D_001A8CFC[0] + 0x8710, 0xCE);
-    object_set_helper_result(object + 0xE4, D_001A8CFC[0] + 0x8710, 0x95);
+    object_set_helper_result(object, g_resident_data_base[0] + 0x8710, 0xCD);
+    object_set_helper_result(object + 0x4C, g_resident_data_base[0] + 0x8710, 0xCE);
+    object_set_helper_result(object + 0xE4, g_resident_data_base[0] + 0x8710, 0x95);
     object_set_second_float4(object + 0xE4, 1.0f, 1.05f, 0.0f, 0.0f);
     hud_set_widget_value_pair(object + 0x130, 0xEA9D, 0);
     memset(object + 0x16C, 0, 4);
     object_set_second_float4(object + 0x130, 32.0f, 32.0f, 0.0f, 0.0f);
     *(int *)(object + 0x174) = 0xEAA6;
-    *(void **)(object + 0x178) = &D_001AE138;
+    *(void **)(object + 0x178) = &g_small_list_menu_data;
     *(int *)(object + 0x17C) = 4;
     menu_set_selected_index(object + 0x188, *(int *)(object + 0x16C));
 }
 
-extern float D_001AE130 __attribute__((sda));
-extern float D_001AE134 __attribute__((sda));
-extern int D_00138344[];
+extern float g_small_list_row_spacing __attribute__((sda));
+extern float g_small_list_text_x_offset __attribute__((sda));
+extern int g_menu_input_flags[];
 extern int list_menu_get_selection(void *);
 extern int *object_get_fourth_field(void *);
 extern void gfx_draw_screen_element_stored(void *);
@@ -167,14 +167,14 @@ void small_list_menu_draw_rows(char *self)
     int i;
     int *slot;
 
-    if (D_00138344[0] & 0x5000)
+    if (g_menu_input_flags[0] & 0x5000)
         math_ping_pong_blend_values(0, 0, 1, 0, 1);
     for (i = 0; i < count; i++) {
         float step = (float)i;
-        object_set_first_float4(self + 0xDC, (*(float **)self)[0] + D_001AE134,
-                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
-        object_set_first_float4(self + 0x128, (*(float **)self)[0] + D_001AE134,
-                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
+        object_set_first_float4(self + 0xDC, (*(float **)self)[0] + g_small_list_text_x_offset,
+                      (*(float **)self)[1] + g_small_list_row_spacing * step, 0.0f, 0.0f);
+        object_set_first_float4(self + 0x128, (*(float **)self)[0] + g_small_list_text_x_offset,
+                      (*(float **)self)[1] + g_small_list_row_spacing * step, 0.0f, 0.0f);
         slot = object_get_fourth_field(self + 0x128);
         *slot = list_menu_get_selection(self) == i ? math_ping_pong_blend_values(0x20FFFEED, 0x70FFFEED, 0x14, 0, 0) : 0x55F0C070;
         gfx_draw_screen_element_stored(self + 0xDC);

@@ -24,12 +24,12 @@ extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
 extern char *moby_get_private_value_0(void *);
 extern void moby_forward_position_call(void *, void *, int);
-extern void func_PAL_L02_00405BE0(char *);
+extern void moby_update_effect_by_class_pal(char *);
 extern void func_PAL_L02_00405D00(void *);
 extern void part_spawn_trail_at_owner(void *);
-extern char *D_L02_001C0958;
+extern char *g_hit_l02_result;
 
-void func_PAL_L02_00405648(unsigned char *obj)
+void projectile_l02_update_pal(unsigned char *obj)
 {
     float old[4] __attribute__((aligned(16)));
     union {
@@ -86,7 +86,7 @@ void func_PAL_L02_00405648(unsigned char *obj)
             *(int *)(d + 0x7c) = PlayMobySound(0, 4, obj);
         }
         if (CollLine(&old, obj + 0x10, 0, *(int *)(obj + 0xb8), 0)) {
-            hit = D_L02_001C0958;
+            hit = g_hit_l02_result;
             if (hit) {
                 make_hit_descriptor(packet, obj, 0x10001, d, *(float *)(d + 0x6c));
                 packet[0x18] = 5;
@@ -103,7 +103,7 @@ void func_PAL_L02_00405648(unsigned char *obj)
             } else {
                 PlayMobySound(1, 0, obj);
             }
-            func_PAL_L02_00405BE0(obj);
+            moby_update_effect_by_class_pal(obj);
             obj[0x20] = 2;
             *(unsigned short *)(obj + 0x34) |= 0x41;
         }

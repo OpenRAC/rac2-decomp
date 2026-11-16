@@ -28,8 +28,8 @@ typedef struct {
 
 /* The moby table. Read as [0] of an incomplete sda array, for the absolute lui/lw
    load (docs/build/compiler-notes.md). */
-extern Moby *D_L10_001B251C[] __attribute__((sda));
-extern u8 D_L10_001B9680[];
+extern Moby *g_moby_base_table[] __attribute__((sda));
+extern u8 g_view_origin_vec[];
 
 extern s32 math_random_int_range(s32 min, s32 max);
 extern f32 math_random_float_range(f32 min, f32 max);
@@ -56,7 +56,7 @@ void DrawHrugisBeamEffect(Moby *moby)
     f32 view[4];
     f32 direction[4];
     f32 side[4];
-    Moby *mobies = D_L10_001B251C[0];
+    Moby *mobies = g_moby_base_table[0];
     BeamVars *vars = moby->vars;
     f32 *position;
     f32 *uv;
@@ -95,7 +95,7 @@ void DrawHrugisBeamEffect(Moby *moby)
     vars->scroll[0] += math_random_float_range(0.1f, 0.25f);
     if (vars->scroll[0] >= 8.0f)
         vars->scroll[0] -= 8.0f;
-    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(view, position, g_view_origin_vec);
     FastVecSub(direction, end, position);
     FastVecCross(side, view, direction);
     vec_scale_to_length(side, side, 2.0f);
@@ -128,7 +128,7 @@ void DrawHrugisBeamEffect(Moby *moby)
     vars->scroll[1] += math_random_float_range(0.08f, 0.1f);
     if (vars->scroll[1] >= 8.0f)
         vars->scroll[1] -= 8.0f;
-    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(view, position, g_view_origin_vec);
     FastVecSub(direction, end, position);
     FastVecCross(side, view, direction);
     vec_scale_to_length(side, side, 2.0f);

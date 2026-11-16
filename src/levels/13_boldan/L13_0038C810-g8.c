@@ -3,7 +3,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F38c810;
 
-extern float D_L13_001A8F20;
+extern float g_default_l13_effect_vector;
 
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, s32, s32);
@@ -47,7 +47,7 @@ void spinning_sprite_burst_update(char *obj)
             i--;
             *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 1.5707964f);
             euler_rotation_basis(pos, rot);
-            part_spawn_masked_debris(obj, 0xF, &D_L13_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            part_spawn_masked_debris(obj, 0xF, &g_default_l13_effect_vector, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             *(short *)(obj + 0x7C) = 0;
         } while (i >= 0);
         moby_mark_spawned(obj);

@@ -6,7 +6,7 @@ typedef struct { int timer, first, second; float phase, damage; char *object; in
 typedef struct { u32 color[2]; } EffectPalette;
 
 extern Slot g_health_l00_drain_slots[30];
-extern EffectPalette D_L00_001B0A48[];
+extern EffectPalette g_effect_palette_table[];
 extern void cam_compute_view_direction(char *, char *, int);
 extern void FastVecScale(void *, void *, float);
 extern void vec_clear_128(SpawnVectorWord *);
@@ -63,7 +63,7 @@ void SpawnHealthDrainSparks(char *object)
                 particle = SpawnSpinningSparkParticle(0.0f, 1.0f, 1.01f,
                                          math_random_float_range(0.25f, 1.0f) * 210000.0f,
                                          (char *)position, kind, (char *)direction, 0x5A182, 1);
-                palette = D_L00_001B0A48[0];
+                palette = g_effect_palette_table[0];
                 if (particle != 0) {
                     char *properties = particle + 0x20;
 

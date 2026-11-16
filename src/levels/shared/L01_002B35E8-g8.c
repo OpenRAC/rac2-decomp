@@ -12,11 +12,11 @@ extern void weapon_wheel_update_select(char *);
 
 extern int weapon_wheel_draw(char *);
 
-extern char D_L01_001B4B00[];
+extern char g_hero_buffer_a[];
 
-extern char D_L01_001B5100[];
+extern char g_hero_buffer_b[];
 
-extern int D_001A8F40;
+extern int g_area_start_mode;
 
 extern void attachment_reset_all(void);
 
@@ -61,14 +61,14 @@ void hero_reset_for_area_start(void) {
     hero_moby = *(char **)(hero + 0x2290);
     if (*(unsigned char *)((char *)hero_moby + 0x42) != 0xFF) {
         attached_item = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x42),
-                              *(unsigned char *)((char *)hero_moby + 0x40), D_L01_001B4B00);
+                              *(unsigned char *)((char *)hero_moby + 0x40), g_hero_buffer_a);
         *(int *)(*(char **)(hero + 0x2290) + 0x58) = attached_item;
     }
     hero_moby = *(char **)(hero + 0x2290);
     attached_item = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x43),
-                          *(unsigned char *)((char *)hero_moby + 0x41), D_L01_001B5100);
+                          *(unsigned char *)((char *)hero_moby + 0x41), g_hero_buffer_b);
     *(int *)(*(char **)(hero + 0x2290) + 0x5C) = attached_item;
     if (*(int *)(hero + 0x2294) != 0x61 ||
-        (D_001A8F40 != 2 && D_001A8F40 != 6))
+        (g_area_start_mode != 2 && g_area_start_mode != 6))
         SetHeroMoveState(0, 1);
 }

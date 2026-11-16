@@ -33,7 +33,7 @@ extern float math_step_value_toward_target(float *,float *,float,float,float,flo
 extern void hero_start_loader_state(int);
 extern void load_scene_chunk(int,int);
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 typedef struct {
     u8 reserved0[0x33C];
     u8 *selected;
@@ -43,12 +43,12 @@ typedef struct {
     u8 active;
 } Resident;
 extern Resident g_hero_state;
-extern u32 D_00138324 NOT_SDA;
-extern int D_L02_001A8FB4 __attribute__((sda));
+extern u32 g_pad_held_flags NOT_SDA;
+extern int g_teleporter_state __attribute__((sda));
 extern u8 *g_moby_l02_pool MACRO_ADDR;
-extern float D_L02_001B1A58 __attribute__((sda));
-extern float D_L02_001B1A5C __attribute__((sda));
-extern float D_L02_001B1A60 __attribute__((sda));
+extern float g_teleporter_orbit_speed __attribute__((sda));
+extern float g_teleporter_orbit_accel __attribute__((sda));
+extern float g_teleporter_orbit_rate_limit __attribute__((sda));
 
 /* Run the control's activation, orbit and captured-object transition states. */
 void teleporter_l02_update(u8 *object)
@@ -64,7 +64,7 @@ void teleporter_l02_update(u8 *object)
         teleporter_update_orbiting_children(object);
         break;
     case 1:
-        if(state->key>=0 && !(D_0019B2E8[state->key+g_current_map_index*16]&0x80)) {
+        if(state->key>=0 && !(g_moby_group_flags[state->key+g_current_map_index*16]&0x80)) {
             *(int *)(object+0x98)=0;
             *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)|0x41)&0xEFFF;
             slot=state->children;left=2;
@@ -88,7 +88,7 @@ void teleporter_l02_update(u8 *object)
         if(state->primary!=-1 && g_hero_state.selected==object) {
             if(g_hero_state.busy) goto propagate;
             hud_show_message_for_state(object);
-            if((D_00138324&0x10) && D_L02_001A8FB4==11) {
+            if((g_pad_held_flags&0x10) && g_teleporter_state==11) {
                 PlayMobySound(0,0,(char *)object);
                 object[0x20]=2;state->rateA=0;state->rateB=0;
                 hero_start_target_state((Quad *)(object+0x10),0,*(float *)(object+0xF8));
@@ -106,10 +106,10 @@ void teleporter_l02_update(u8 *object)
         } while(--left>=0);
         answer=hero_get_target_state_kind();
         if(state->orbitA<1.0f) {
-            math_step_value_toward_target(&state->orbitA,&state->rateA,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+            math_step_value_toward_target(&state->orbitA,&state->rateA,1.0f,g_teleporter_orbit_speed*0.00027777778f,g_teleporter_orbit_accel*0.00027777778f,g_teleporter_orbit_rate_limit*0.016666668f);
         } else if(state->orbitB<1.0f) {
-            math_step_value_toward_target(&state->orbitB,&state->rateB,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
-        } else if(D_L02_001A8FB4!=11 || !(state->orbitA>0.25f)) {
+            math_step_value_toward_target(&state->orbitB,&state->rateB,1.0f,g_teleporter_orbit_speed*0.00027777778f,g_teleporter_orbit_accel*0.00027777778f,g_teleporter_orbit_rate_limit*0.016666668f);
+        } else if(g_teleporter_state!=11 || !(state->orbitA>0.25f)) {
             if(answer==2) {hero_l00_set_action(0x6F,1);state->timer=1.95f;object[0x20]=3;}
             else if(answer==0) object[0x20]=4;
         }
@@ -134,7 +134,7 @@ void teleporter_l02_update(u8 *object)
             if(state->handle>=0) {moby_set_state(object,5,-1);break;}
             {
                 actor=g_moby_l02_pool+state->primary*0x100;
-                if(state->secondary!=-1 && (D_0019B2E8[state->secondaryKey+g_current_map_index*16]&0x80)) actor=g_moby_l02_pool+state->secondary*0x100;
+                if(state->secondary!=-1 && (g_moby_group_flags[state->secondaryKey+g_current_map_index*16]&0x80)) actor=g_moby_l02_pool+state->secondary*0x100;
                 data=*(u8 **)(actor+0x68);
                 qcopy(&position,actor+0x10);position.f[2]+=0.2f;
                 hero_reset_position_and_direction(&position,actor+0xF0,0,1);
@@ -161,9 +161,9 @@ void teleporter_l02_update(u8 *object)
             ApproachValue(&state->timer,1.95f,0.06666667f);
         } else {
             if(state->orbitB>0.0f) {
-                math_step_value_toward_target(&state->orbitB,&state->rateA,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+                math_step_value_toward_target(&state->orbitB,&state->rateA,0.0f,g_teleporter_orbit_speed*0.00027777778f,g_teleporter_orbit_accel*0.00027777778f,g_teleporter_orbit_rate_limit*0.016666668f);
             } else if(state->orbitA>0.0f) {
-                math_step_value_toward_target(&state->orbitA,&state->rateB,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+                math_step_value_toward_target(&state->orbitA,&state->rateB,0.0f,g_teleporter_orbit_speed*0.00027777778f,g_teleporter_orbit_accel*0.00027777778f,g_teleporter_orbit_rate_limit*0.016666668f);
             } else object[0x20]=1;
         }
         teleporter_update_orbiting_children(object);

@@ -8,7 +8,7 @@ extern unsigned int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
 extern char *GetLocalizedString(int);
-extern int func_US2_0033A368(void *, int);
+extern int mission_screen_place_parts_us2(void *, int);
 extern char *ref_L00_0042E9A8_00;
 extern char ref_L00_0042E9A8_01[];
 extern char ref_L00_0042E9A8_02[];
@@ -72,5 +72,5 @@ void func_US2_0033A0B8(char *object, void *parent)
     hud_set_widget_field_b(name, GetLocalizedString(0x2c5b));
     hud_set_widget_field_b(description, GetLocalizedString(0x2be5));
     hud_set_widget_field_b(details, object + 0x298);
-    func_US2_0033A368(object, 0);
+    mission_screen_place_parts_us2(object, 0);
 }

@@ -39,13 +39,13 @@ void math_add_wrapping_counter(void)
 
 /* Clears one byte of each of the 32 64-byte records that end at the level pool root plus
    0x7DD, walking down one record at a time; the stored -1 is the function's return value. */
-extern unsigned char D_L00_001BB9F0[];
-extern int D_L00_001B1884;
+extern unsigned char g_cam_l00_override_slots[];
+extern int g_cam_override_selected_slot;
 
 /* Switches off all 32 camera override slots and marks that none is selected. */
 int cam_clear_override_slots(void)
 {
-    unsigned char *slot = D_L00_001BB9F0;
+    unsigned char *slot = g_cam_l00_override_slots;
     int i;
     int no_selection = -1;
 
@@ -54,7 +54,7 @@ int cam_clear_override_slots(void)
         *slot = 0;
         slot -= 64;
     }
-    D_L00_001B1884 = no_selection;
+    g_cam_override_selected_slot = no_selection;
     return no_selection;
 }
 
@@ -81,12 +81,12 @@ typedef struct {
     int f60;
 } PoolRecord64;
 
-extern PoolRecord64 D_L16_001BC730[];
+extern PoolRecord64 g_cam_l16_override_slots[];
 
 /* Finds a free camera override slot, fills it with starting values and returns it, or returns 0 if all are used. */
 PoolRecord64 *cam_alloc_override_slot(int kind)
 {
-    PoolRecord64 *slot = D_L16_001BC730;
+    PoolRecord64 *slot = g_cam_l16_override_slots;
     int i;
 
     for (i = 0; i < 32; i++) {

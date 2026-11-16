@@ -2,10 +2,10 @@
 
 typedef int Vector __attribute__((mode(TI)));
 /* The trajectory table has at least the five observed entries; full extent unknown. */
-extern float D_L02_001B0190[] SDATA(D_L02_001B0190);
-extern float D_L02_001B01E4 __attribute__((sda));
-extern float D_L02_001B01E8 __attribute__((sda));
-extern float D_L02_001B01B8;
+extern float g_chainblade_throw_trajectory[] SDATA(D_L02_001B0190);
+extern float g_chainblade_chain_offset_a __attribute__((sda));
+extern float g_chainblade_chain_offset_b __attribute__((sda));
+extern float g_chainblade_ground_height;
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void moby_transform_joint_point(char *, int, char *);
 extern void copy_matrix3x4(void *, void *);
@@ -53,7 +53,7 @@ int chainblade_update_chain_throw(char *self, int joint) {
     copy_matrix3x4(rotation, matrix);
     mat_normalize_columns(rotation);
     qcopy(direction, rotation);
-    travel = (origin[2] - D_L02_001B01B8) / math_fast_sin_or_cos_a(1.15f);
+    travel = (origin[2] - g_chainblade_ground_height) / math_fast_sin_or_cos_a(1.15f);
     FastVecScale(impact, direction, travel);
     FastVecAdd(impact, impact, origin);
     travel -= 5.3f;
@@ -73,14 +73,14 @@ int chainblade_update_chain_throw(char *self, int joint) {
                 phase = outbound * ((float)i * 0.2916667f) - (time - (outbound + 5.0f)) * 1.5000001f;
                 if (phase < 0.0f) phase = 0.0f;
             }
-            vec_scale_to_length(delta, direction, phase + *(float *)((char *)D_L02_001B0190 + trajectoryOffset));
+            vec_scale_to_length(delta, direction, phase + *(float *)((char *)g_chainblade_throw_trajectory + trajectoryOffset));
             FastVecAdd(*slots + 0x10, origin, delta);
             func_002A10E8(*slots);
             if (*(char **)(state + 0x300)) chainblade_free_effect_trail(*(char **)(state + 0x300));
-            vec_scale_to_length(offset, rotation + 8, D_L02_001B01E8);
+            vec_scale_to_length(offset, rotation + 8, g_chainblade_chain_offset_b);
             FastVecAdd(origin, *(char **)(state + 0x2A0) + 0x10, offset);
             qcopy(end, *(char **)(state + 0x2B0) + 0x10);
-            vec_scale_to_length(offset, rotation + 4, D_L02_001B01E4);
+            vec_scale_to_length(offset, rotation + 4, g_chainblade_chain_offset_a);
             FastVecAdd(origin, origin, offset);
             *(char **)(state + 0x300) = chainblade_spawn_effect_trail(origin, end, 0.2f);
         }

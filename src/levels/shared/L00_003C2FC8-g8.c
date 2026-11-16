@@ -15,17 +15,17 @@ struct Rac2Native_5f824a0e369ccf7b_src_record {
     unsigned short s4,s6,s8,s10,s12;
     unsigned char e,f;
 };
-extern AimQueryConfig D_L00_001AFED0;
+extern AimQueryConfig g_nuke_l00_aim_query_config;
 extern AimTuning g_weapon_l00_table[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_00296020[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_mini_nuke_sound_records[];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
-extern unsigned char D_00139592[];
-extern float D_L00_001AFEC0 __attribute__((sda));
-extern float D_L00_001AFEC4 __attribute__((sda));
-extern float D_L00_001AFEC8 __attribute__((sda));
-extern float D_L00_001AFECC __attribute__((sda));
-extern int D_L00_001B28E8;
+extern unsigned char g_gravity_bomb_weapon_index[];
+extern float g_nuke_l00_launch_speed __attribute__((sda));
+extern float g_nuke_launch_angle __attribute__((sda));
+extern float g_nuke_move_speed __attribute__((sda));
+extern float g_nuke_fall_speed __attribute__((sda));
+extern int g_nuke_fire_held;
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern char *moby_get_private_value_0(unsigned char *);
@@ -70,15 +70,15 @@ void mini_l00_nuke_update(unsigned char *object) {
     } else {
         H->i[0x2534 / 4] = 0x28;
         if (!target) {
-            config = D_L00_001AFED0;
+            config = g_nuke_l00_aim_query_config;
             target = SelectBestTargetInCone(&position, &H->b[0x760], &scratch, 0.392699093f, 0.785398185f,
                                   0, 0, 0, 11.1f, 0.0f, 0.0f, 0, &config);
         }
     }
-    CalculateAimedLaunchVelocity(&config, &position, target, 0, D_L00_001AFEC4, D_L00_001AFEC0,
-                   D_L00_001AFECC * 0.016666668f, D_L00_001AFEC8 * 0.00027777778f);
+    CalculateAimedLaunchVelocity(&config, &position, target, 0, g_nuke_launch_angle, g_nuke_l00_launch_speed,
+                   g_nuke_fall_speed * 0.016666668f, g_nuke_move_speed * 0.00027777778f);
     *(int *)(state + 0x24) = coll_trace_projectile_to_impact(&position, &config, state, state + 0x10, object, 0, 0,
-                                          D_L00_001AFEC8 * 0.00027777778f);
+                                          g_nuke_move_speed * 0.00027777778f);
     switch (object[0x20]) {
     case 0:
         object[0x20] = 1;
@@ -90,19 +90,19 @@ void mini_l00_nuke_update(unsigned char *object) {
             cancel_hero_item_animation();
         if (allowed && *(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] >= 23) {
             if (weapon_spend_ammo(-1, 1)) {
-                D_L00_001B28E8 = 1;
+                g_nuke_fire_held = 1;
                 start_equipped_item_animation();
-                *(int *)(state + 0x2C) = slot_copy_records_to_free(D_L00_00296020);
+                *(int *)(state + 0x2C) = slot_copy_records_to_free(g_mini_nuke_sound_records);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 mini_nuke_projectile_spawn((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
                 {
-                AimTuning *tu = &g_weapon_l00_table[D_00139592[0]];
+                AimTuning *tu = &g_weapon_l00_table[g_gravity_bomb_weapon_index[0]];
                 *(float *)(state + 0x20) = 1.0f / tu->cooldown;
             }
-            } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B28E8 == 1) {
+            } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || g_nuke_fire_held == 1) {
                 PlayMobySound(1, 0, (char *)object);
-                D_L00_001B28E8 = 0;
+                g_nuke_fire_held = 0;
             }
             if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
                 if (*(int *)(state + 0x2C) >= 0) {

@@ -18,7 +18,7 @@ extern void FastVecSub(float *, const float *, const float *);
 extern void FastVecAdd(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 
-void func_PAL_L18_0043A158(char *pos, int count) {
+void part_spawn_small_spark_smoke_pal(char *pos, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));

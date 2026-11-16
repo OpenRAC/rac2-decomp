@@ -192,15 +192,15 @@ extern void mpeg_compute_dual_prime_vectors(MpegDecoderC *d, int DMV[][2], int *
    the only spelling that keeps the extra two live in $a1/$a2. */
 extern void func_00130250_msg(MpegDecoderC *d, char *fmt, int code) __asm__("func_00130250");
 
-extern char D_0013BA20[];
+extern char g_str_mpeg_ref_fetch_a[];
 
-extern char D_0013BA40[];
+extern char g_str_mpeg_ref_fetch_b[];
 
-extern char D_0013BA60[];
+extern char g_str_mpeg_ref_fetch_c[];
 
-extern MpegMcFuncC D_00137ED0[];
+extern MpegMcFuncC g_mpeg_mc_y_func_table[];
 
-extern MpegMcFuncC D_00137EF0[];
+extern MpegMcFuncC g_mpeg_mc_c_func_table[];
 
 /* Works out which reference pictures to copy from for one macroblock, going forward and backward, and queues the copy jobs. */
 void mpeg_queue_reference_fetches(MpegDecoderC *d, int bx, int by, int mb_type, int motion_type,
@@ -237,7 +237,7 @@ void mpeg_queue_reference_fetches(MpegDecoderC *d, int bx, int by, int mb_type, 
                 _getRef0(d, d->ref_images[0], 0, 1, 0, 8, bx, by, dmv[1][0],
                               dmv[1][1], same, one);
             } else {
-                func_00130250_msg(d, D_0013BA20, motion_type);
+                func_00130250_msg(d, g_str_mpeg_ref_fetch_a, motion_type);
             }
         } else {
             currentfield = d->picture_structure == 2;
@@ -269,7 +269,7 @@ void mpeg_queue_reference_fetches(MpegDecoderC *d, int bx, int by, int mb_type, 
                 _getRef0(d, refs[same][!currentfield], 0, 0, 0, 16, bx, by,
                               dmv[0][0], dmv[0][1], 0, 1);
             } else {
-                func_00130250_msg(d, D_0013BA40, motion_type);
+                func_00130250_msg(d, g_str_mpeg_ref_fetch_b, motion_type);
             }
         }
         avg = 1;
@@ -296,7 +296,7 @@ void mpeg_queue_reference_fetches(MpegDecoderC *d, int bx, int by, int mb_type, 
             _getRef0(d, mvfs[1][1] ? d->ref_images[9] : d->ref_images[5], 0, 0, 8,
                           8, bx, by, pmv[1][1][0], pmv[1][1][1], 0, avg);
         } else {
-            func_00130250_msg(d, D_0013BA60, motion_type);
+            func_00130250_msg(d, g_str_mpeg_ref_fetch_c, motion_type);
         }
     }
 }
@@ -409,10 +409,10 @@ void _getRef0(MpegDecoderC *d, MpegRefImageC *ref, int sfield, int dfield,
     ce->p0 = cbuf + (y * 8 + 0x100);
     ce->p1 = cbuf + (y * 8 + 0x400);
     ce->step = 8 << fieldpred;
-    d->mc[d->cur].yfunc[n] = D_00137ED0[yidx];
+    d->mc[d->cur].yfunc[n] = g_mpeg_mc_y_func_table[yidx];
     d->mc[d->cur].yref[n] = base + mb * 0x180;
     d->mc[d->cur].cref[n] = base + (mb + ref->width) * 0x180;
-    d->mc[d->cur].cfunc[n] = D_00137EF0[avg | xh << 1 | yh];
+    d->mc[d->cur].cfunc[n] = g_mpeg_mc_c_func_table[avg | xh << 1 | yh];
     d->mc[d->cur].n++;
 }
 

@@ -18,9 +18,9 @@ extern u8 *moby_create_effect_at_position(float *, int);
 extern void STUB_printf(const char *, ...);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void value_set_entry_by_index(int, int);
-extern char D_L02_001B09C8[];
+extern char g_str_slot_award[];
 extern int g_hovering_object_count __attribute__((sda));
-extern int D_L02_001A903C __attribute__((sda));
+extern int g_one_shot_flag __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
 extern void *D_L02_002A52D0[5];
 typedef struct {
@@ -31,8 +31,8 @@ typedef struct {
     char pad0[0x79];
     u8 once;
 } Global001A7A00;
-extern Global001A7A00 D_001A7A00 __attribute__((sda));
-extern u8 D_L02_00220730;
+extern Global001A7A00 g_player_stats __attribute__((sda));
+extern u8 g_actor_match_key;
 
 /* Re-arms the actor (func_002A7750 with 1), builds a random point near it (a, from
    func_L01_0031A278, plus the offset b from func_L02_0031E9E8) and acts on the mode at +0x5C of
@@ -43,7 +43,7 @@ extern u8 D_L02_00220730;
    one-shot (the flag at D_001A7A00 + 0x79, func_002E5E58, func_002B0A18 and D_L02_001A903C) and
    adds 300 to D_001A79F8. Modes 1, 3, 4 and 5 call func_002E5CF8 with 2 first, any other mode
    with 3. */
-void func_PAL_L02_003EBBD0(char *arg0) {
+void slot_machine_award_prize_pal(char *arg0) {
     static void *tab[] = { &&c1, &&c2, &&c3, &&c4, &&c5 };
     char *state = *(char **)(arg0 + 0x68);
     float a[4];
@@ -78,15 +78,15 @@ c3:
 c4:
     PlayMobySound(2, 0x20, arg0);
     moby_create_effect_at_position(a, 0);
-    STUB_printf(D_L02_001B09C8);
+    STUB_printf(g_str_slot_award);
     goto done;
 c5:
     PlayMobySound(2, 0x20, arg0);
-    if (D_001A7A00.once == 0) {
-        D_001A7A00.once = 1;
+    if (g_player_stats.once == 0) {
+        g_player_stats.once = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index(0x1233, -1);
-        D_L02_001A903C = 1;
+        g_one_shot_flag = 1;
     }
     g_player_bolts += 300;
     goto done;

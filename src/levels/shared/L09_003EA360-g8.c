@@ -9,22 +9,22 @@ extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern void vec_add_random_offset(void *,float),anim_start_blended(void *,int,int,int);
 extern void moby_update_eased_node(void *,void *,int,float,float);
 extern void *projectile_l09_spawn(void *,void *,void *,int,int,float,float,float,float);
-extern char D_00189F30[] MACRO_ADDR;
-extern int D_L09_001B2388 MACRO_ADDR;
+extern char g_hero_zero_vector[] MACRO_ADDR;
+extern int g_frame_l09_counter MACRO_ADDR;
 extern int D_L09_001B2388_gp SDATA(D_L09_001B2388);
-extern float D_L09_001B0BD4 __attribute__((sda));
-extern float D_L09_001B0C30 __attribute__((sda));
-extern float D_L09_001B0C2C __attribute__((sda));
-extern float D_L09_001B0C34 __attribute__((sda));
-extern float D_L09_001B0C24 __attribute__((sda));
-extern u8 D_L09_001B0BDC __attribute__((sda));
-extern int D_L09_001B0BD8 __attribute__((sda));
-extern u16 D_L09_001B0BE0 __attribute__((sda));
-extern float D_L09_001B0BE8 __attribute__((sda));
-extern u16 D_L09_001B0BE4 __attribute__((sda));
-extern float D_L09_001B0BEC __attribute__((sda));
-extern float D_L09_001B0C38 __attribute__((sda));
-extern float D_L09_001B0C3C __attribute__((sda));
+extern float g_enemy_sway_speed __attribute__((sda));
+extern float g_enemy_sway_random_max __attribute__((sda));
+extern float g_enemy_sway_random_min __attribute__((sda));
+extern float g_enemy_sway_random_offset __attribute__((sda));
+extern float g_enemy_sway_min_distance __attribute__((sda));
+extern u8 g_enemy_sway_byte __attribute__((sda));
+extern int g_enemy_sway_threshold __attribute__((sda));
+extern u16 g_enemy_sway_value_a __attribute__((sda));
+extern float g_enemy_sway_distance __attribute__((sda));
+extern u16 g_enemy_sway_value_b __attribute__((sda));
+extern float g_enemy_sway_blend_divisor __attribute__((sda));
+extern float g_enemy_sway_ease_rate __attribute__((sda));
+extern float g_enemy_sway_ease_limit __attribute__((sda));
 
 typedef union { u8 pad[0x318]; struct { u8 pad0[0x298]; float yaw; u8 pad1[0x314 - 0x29C]; float pitch; } aim; } AimState;
 
@@ -40,10 +40,10 @@ void enemy_face_hero_sway(u8 *object)
     if ((unsigned)(object[0x20] - 3) < 3) {
         moby_transform_joint_to_world(object, 0, frame.point);
         distance = fast_vec_dist(frame.point, state + 0x140) - 1.0f;
-        distance /= D_L09_001B0BD4 * 0.016666668f;
-        distance *= math_random_float_range(D_L09_001B0C2C, D_L09_001B0C30);
-        FastVecScale(frame.direction, D_00189F30, distance);
-        vec_add_random_offset(frame.direction, D_L09_001B0C34);
+        distance /= g_enemy_sway_speed * 0.016666668f;
+        distance *= math_random_float_range(g_enemy_sway_random_min, g_enemy_sway_random_max);
+        FastVecScale(frame.direction, g_hero_zero_vector, distance);
+        vec_add_random_offset(frame.direction, g_enemy_sway_random_offset);
         frame.direction[2] = 0.0f;
         FastVecAdd(frame.direction, frame.direction, state + 0x140);
         FastVecSub(frame.point, frame.direction, frame.point);
@@ -62,23 +62,23 @@ void enemy_face_hero_sway(u8 *object)
             if (object[0x42] != 1 && object[0x43] != 1)
                 anim_start_blended(object, 1, 0, 0);
             distance = *(float *)(state + 0x384);
-            if (distance < 1.0f) distance = D_L09_001B0C24;
+            if (distance < 1.0f) distance = g_enemy_sway_min_distance;
             moby_transform_joint_to_world(object, 2, frame.point);
             moby_transform_joint_point(object, 2, frame.joint);
-            vec_scale_to_length(frame.direction, frame.joint, D_L09_001B0BD4 * 0.016666668f);
+            vec_scale_to_length(frame.direction, frame.joint, g_enemy_sway_speed * 0.016666668f);
             projectile_l09_spawn(frame.point, object, frame.direction, 1, 1,
                               (float)state[0x34], distance, 1.0f, 1.0f);
             state[0x369]++;
-            state[0x368] = D_L09_001B0BDC;
-            if (D_L09_001B0BD8 < state[0x369]) {
+            state[0x368] = g_enemy_sway_byte;
+            if (g_enemy_sway_threshold < state[0x369]) {
                 state[0x369] = 0;
-                *(u16 *)(state + 0x36A) = D_L09_001B0BE0;
-                if (vec_distance_xy(object + 0x10, state + 0x140) < D_L09_001B0BE8)
-                    *(u16 *)(state + 0x36A) = D_L09_001B0BE4;
+                *(u16 *)(state + 0x36A) = g_enemy_sway_value_a;
+                if (vec_distance_xy(object + 0x10, state + 0x140) < g_enemy_sway_distance)
+                    *(u16 *)(state + 0x36A) = g_enemy_sway_value_b;
                 if (object[0x43] != 0) anim_start_blended(object, 0, 0, 0);
             }
         }
-        blend = IntToFloat(*(u16 *)(object + 0x96)) / D_L09_001B0BEC;
+        blend = IntToFloat(*(u16 *)(object + 0x96)) / g_enemy_sway_blend_divisor;
         if (blend > 1.0f) blend = 1.0f;
         else if (blend < 0.0f) blend = 0.0f;
     } else if (object[0x20] < 3) {
@@ -87,8 +87,8 @@ void enemy_face_hero_sway(u8 *object)
         ((AimState *)state)->aim.pitch = math_fast_sin_or_cos_b(math_wrap_angle_to_pi(
             IntToFloat(D_L09_001B2388_gp) * 0.016666668f)) * 0.2617994248867035f;
         ((AimState *)state)->aim.yaw = math_fast_sin_or_cos_b(math_wrap_angle_to_pi(
-            IntToFloat(D_L09_001B2388) * 0.014285714365541935f)) * 0.349065899848938f;
+            IntToFloat(g_frame_l09_counter) * 0.014285714365541935f)) * 0.349065899848938f;
     }
-    moby_update_eased_node(object, state + 0x230, 0, D_L09_001B0C38 * blend, D_L09_001B0C3C);
-    moby_update_eased_node(object, state + 0x2B0, 1, D_L09_001B0C38 * blend, D_L09_001B0C3C);
+    moby_update_eased_node(object, state + 0x230, 0, g_enemy_sway_ease_rate * blend, g_enemy_sway_ease_limit);
+    moby_update_eased_node(object, state + 0x2B0, 1, g_enemy_sway_ease_rate * blend, g_enemy_sway_ease_limit);
 }

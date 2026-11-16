@@ -20,7 +20,7 @@ extern float math_fast_sin_or_cos_b(float arg0);
  * goes through a second name for the block: the retail bytes keep the block's address in
  * $s1 and rebuild it (addiu $s0,$s1,-0x61E0) on every path that reaches the merge point,
  * and they build it a second time for the store, so both spellings are kept here. */
-void func_PAL_L00_002C39D8(void)
+void hero_update_landing_slide_pal(void)
 {
     char *p = g_hero_state;
     f32 v;

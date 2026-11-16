@@ -9,11 +9,11 @@ typedef struct {
     s16 platform; char pad24EE[0x46]; int cooldown; char pad2538[8];
 } TetherLaunchHero;
 extern TetherLaunchHero g_hero_state;
-extern LaunchStats D_0018C360;
-extern int D_L00_001A8F00[] __attribute__((sda)), D_L00_001A8F08[] __attribute__((sda));
+extern LaunchStats g_statistics_table;
+extern int g_game_l00_mode[] __attribute__((sda)), g_input_lock_state[] __attribute__((sda));
 typedef struct { char pad00[0x1A4]; u32 buttons; } LaunchInput;
 extern LaunchInput g_pad_state;
-extern u32 D_001A7390 MACRO_ADDR;
+extern u32 g_frame_counter MACRO_ADDR;
 extern u32 g_current_map_index[] __attribute__((sda));
 extern char *g_follow_camera_object;
 extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
@@ -36,7 +36,7 @@ void visibomb_gun_update(char *actor) {
     math_fast_float_d(state);
     if (g_hero_state.level == 29) { if (!math_fast_float_d(&g_hero_state.cooldown)) ready = 0; }
     else g_hero_state.cooldown = 40;
-    if (D_L00_001A8F00[0] || D_L00_001A8F08[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
+    if (g_game_l00_mode[0] || g_input_lock_state[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
     if (g_hero_state.state == 7 || g_hero_state.state == 2 || g_hero_state.state == 3 || g_hero_state.state == 4 || g_hero_state.state == 5 || g_hero_state.state == 6 || g_hero_state.state == 16 || g_hero_state.state == 14 || g_hero_state.state == 9 || g_hero_state.state == 10 || g_hero_state.state == 11 || g_hero_state.state >= 13 || g_hero_state.level == 111 || g_hero_state.level == 98) goto finish;
     if ((g_follow_camera_object && *(short *)(g_follow_camera_object + 0x86) == 5) || !g_hero_state.grounded || g_hero_state.resource < 23) goto finish;
     if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E /* moby class 318 */ || *(short *)(g_hero_state.support + 0xAA) == MOBY_CLASS_TELEPORTER) && ready) goto finish;
@@ -54,11 +54,11 @@ void visibomb_gun_update(char *actor) {
     if (*(u8 *)(actor + 0x43) != 3) anim_start_blended(actor, 3, 0, 0);
     level_start_timed_object_once();
     *(char **)(state + 1) = visibomb_create_missile(actor, (char *)point, heading, pitch);
-    if (D_0018C360.launches < 0xFFFF) D_0018C360.launches++;
-    now = D_001A7390;
-    if (D_0018C360.bestTime < now) D_0018C360.bestTime = now;
-    D_0018C360.mask |= 1U << g_current_map_index[0];
-    D_0018C360.mask |= 0x80000000;
+    if (g_statistics_table.launches < 0xFFFF) g_statistics_table.launches++;
+    now = g_frame_counter;
+    if (g_statistics_table.bestTime < now) g_statistics_table.bestTime = now;
+    g_statistics_table.mask |= 1U << g_current_map_index[0];
+    g_statistics_table.mask |= 0x80000000;
     state[0] = 60;
     goto finish;
 denied:

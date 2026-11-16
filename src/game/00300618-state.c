@@ -12,7 +12,7 @@ extern void surface_grid_update(void *);
 extern void surface_grid_spawn_effect(void *);
 extern void surface_grid_draw(void *);
 extern void gfx_register_early_draw_callback(void (*)(void *), void *);
-extern float D_002222E0[];
+extern float g_surface_grid_noise_table[];
 /* Runs the stages of a moby that rises, holds, falls and rests, then updates its effects each frame. */
 void moby_update_rise_hold_fall(unsigned char *object)
 {
@@ -31,8 +31,8 @@ void moby_update_rise_hold_fall(unsigned char *object)
         if(!FIELD(int,work,0x40)) {
             object[0x30]=255;
             for(i=0;i<64;++i) {
-                D_002222E0[i * 8 + 2]=math_random_float_range(0.5f,2);
-                D_002222E0[i * 8 + 3]=math_random_float_range(0.002f,0.006f);
+                g_surface_grid_noise_table[i * 8 + 2]=math_random_float_range(0.5f,2);
+                g_surface_grid_noise_table[i * 8 + 3]=math_random_float_range(0.002f,0.006f);
             }
         }
         moby_set_state(object,1,-1);return;

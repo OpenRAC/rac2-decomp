@@ -18,18 +18,18 @@ extern float IntToFloat(int);
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
-extern int D_L00_001B09C4 __attribute__((sda));
-extern int D_L00_001B09C8 __attribute__((sda));
-extern float D_L00_001B09CC __attribute__((sda));
-extern float D_L00_001B09D0 __attribute__((sda));
-extern float D_L00_001B09D4 __attribute__((sda));
-extern float D_L00_001B09D8 __attribute__((sda));
-extern float D_L00_001B09DC __attribute__((sda));
-extern float D_L00_001B09E0 __attribute__((sda));
-extern float D_L00_001B09F4 __attribute__((sda));
-extern float D_L00_001B09F8 __attribute__((sda));
-extern float D_L00_001B09FC __attribute__((sda));
-extern float D_L00_001B0A00 __attribute__((sda));
+extern int g_vaporizer_spark_lifetime_min __attribute__((sda));
+extern int g_vaporizer_spark_lifetime_max __attribute__((sda));
+extern float g_vaporizer_spark_spin_min __attribute__((sda));
+extern float g_vaporizer_spark_spin_max __attribute__((sda));
+extern float g_vaporizer_spark_u_min __attribute__((sda));
+extern float g_vaporizer_spark_u_max __attribute__((sda));
+extern float g_vaporizer_spark_v_min __attribute__((sda));
+extern float g_vaporizer_spark_v_max __attribute__((sda));
+extern float g_vaporizer_spark_angle_min __attribute__((sda));
+extern float g_vaporizer_spark_angle_max __attribute__((sda));
+extern float g_vaporizer_spark_scale_min __attribute__((sda));
+extern float g_vaporizer_spark_scale_max __attribute__((sda));
 
 void func_PAL_L00_003FAD60(char *object, EffectVector *position) {
     char *state = *(char **)(object + 0x68);
@@ -42,17 +42,17 @@ void func_PAL_L00_003FAD60(char *object, EffectVector *position) {
         if (record->active == 0) {
             record->active = 1;
             record->position.word = position->word;
-            record->lifetime = (((int)(math_random_int_range(D_L00_001B09C4, D_L00_001B09C8)) * 5 + 2) / 6);
+            record->lifetime = (((int)(math_random_int_range(g_vaporizer_spark_lifetime_min, g_vaporizer_spark_lifetime_max)) * 5 + 2) / 6);
             record->inverseLifetime = 1.0f / IntToFloat(record->lifetime);
             record->phase = math_random_angle();
-            record->angularSpeed = math_random_signed_float_range(D_L00_001B09CC, D_L00_001B09D0) * 0.017453294f;
-            record->u0 = math_random_float_range(D_L00_001B09D4, D_L00_001B09D8);
-            record->v0 = math_random_float_range(D_L00_001B09DC, D_L00_001B09E0);
-            record->u1 = math_random_float_range(D_L00_001B09D4, D_L00_001B09D8);
-            record->v1 = math_random_float_range(D_L00_001B09DC, D_L00_001B09E0);
+            record->angularSpeed = math_random_signed_float_range(g_vaporizer_spark_spin_min, g_vaporizer_spark_spin_max) * 0.017453294f;
+            record->u0 = math_random_float_range(g_vaporizer_spark_u_min, g_vaporizer_spark_u_max);
+            record->v0 = math_random_float_range(g_vaporizer_spark_v_min, g_vaporizer_spark_v_max);
+            record->u1 = math_random_float_range(g_vaporizer_spark_u_min, g_vaporizer_spark_u_max);
+            record->v1 = math_random_float_range(g_vaporizer_spark_v_min, g_vaporizer_spark_v_max);
             record->reserved = 0;
-            record->angle = math_random_float_range(D_L00_001B09F4, D_L00_001B09F8) * 0.017453294f;
-            record->scale = math_random_float_range(D_L00_001B09FC, D_L00_001B0A00);
+            record->angle = math_random_float_range(g_vaporizer_spark_angle_min, g_vaporizer_spark_angle_max) * 0.017453294f;
+            record->scale = math_random_float_range(g_vaporizer_spark_scale_min, g_vaporizer_spark_scale_max);
             break;
         }
     }

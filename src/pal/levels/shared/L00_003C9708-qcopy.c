@@ -9,7 +9,7 @@ extern void vec_build_spherical_offset(float *out, float a, float b, float c);
 extern unsigned char *part_spawn_ground_effect(float life, void *position, int size, float secondLife, int color, int mode, int flag, float *vector, float third, int counter);
 extern int FloatToInt(float value);
 
-void func_PAL_L00_003C9708(void *position, int color)
+void part_l00_spawn_spark_pairs_2_pal(void *position, int color)
 {
     float vector[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));

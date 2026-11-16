@@ -64,17 +64,17 @@ struct Actor {
 };
 typedef struct { u8 prefix[0x160]; float amount; int reserved164; int kind; int detail; } EffectTuning;
 extern u8 g_camera_l02_position[];
-extern u8 D_L02_001BA3C0[];
+extern u8 g_hero_effect_state[];
 #define EFFECT ((EffectTuning *)D_L02_001BA3C0)
-extern int D_L02_001A903C;
+extern int g_one_shot_flag;
 typedef struct { u8 prefix[0x229C]; int motion; u8 reserved22A0[0x1FC]; Actor *damage; } ResidentView;
 extern u8 g_hero_state[];
 #define RESIDENT ((ResidentView *)D_00189E20)
-extern u8 D_001A7A60[] MACRO_ADDR;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern Actor *g_moby_l02_pool;
-extern float D_L02_001B03F0[4] __attribute__((sda));
-extern float D_L02_001B0400[4] __attribute__((sda));
-extern float D_L02_001A8F20[4] MACRO_ADDR;
+extern float g_brawler_target_position[4] __attribute__((sda));
+extern float g_brawler_home_position[4] __attribute__((sda));
+extern float g_zero_l02_vector[4] MACRO_ADDR;
 extern u8 g_sound_state[];
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(void *, void *);
@@ -88,7 +88,7 @@ extern void arena_set_current_boss(Actor *, Actor *);
 extern float FastDiffRots(float, float);
 extern void moby_set_anim_type_three(void *, int, int);
 extern int snd_play_from_global_bank(int, int, void *);
-extern void func_US2_002B1880(int, int);
+extern void value_set_entry_by_index_us2(int, int);
 extern int FastDecTimer(short *);
 extern void vec_clear_128(Quadword *);
 extern void walker_boss_update_damage(Actor *);
@@ -123,7 +123,7 @@ extern void turret_update_linked_object(Actor *);
 #define PROXY (D_L02_001B359C + self->state->proxy)
 
 /* Drive this actor's emergence, movement, attacks and destruction. */
-void func_US2_L02_003D9188(Actor *self)
+void brawler_legs_update_us2(Actor *self)
 {
     SentryState *state;
     char *slot;
@@ -233,7 +233,7 @@ void func_US2_L02_003D9188(Actor *self)
     case 3:
         if (flag_set_first_pending(self)) {
             self->phase = 0;
-            qcopy(state->home, D_L02_001B0400);
+            qcopy(state->home, g_brawler_home_position);
             if (self->anim != 1) {
                 anim_start_blended(self, 1, 0, 10);
             }
@@ -255,7 +255,7 @@ void func_US2_L02_003D9188(Actor *self)
                     anim_start_blended(PROXY, 6, 0, 10);
                 }
                 vec_clear_128(&state->xF0);
-                moby_aim_move_record_at_target(self, D_L02_001B03F0, 0.33333334f, state->x7C);
+                moby_aim_move_record_at_target(self, g_brawler_target_position, 0.33333334f, state->x7C);
                 break;
             }
         }
@@ -270,7 +270,7 @@ void func_US2_L02_003D9188(Actor *self)
                 break;
             }
         } else if (self->phase == 2) {
-            value = fast_vec_dist(self->position, D_L02_001B03F0);
+            value = fast_vec_dist(self->position, g_brawler_target_position);
             if (!(value < 1.0f) && self->stateTime < 301) {
                 break;
             }
@@ -295,8 +295,8 @@ void func_US2_L02_003D9188(Actor *self)
                 anim_start_blended(PROXY, 0, 0, 10);
             }
         }
-        vec_step_toward_target_limited(self->position, D_L02_001B03F0, 0.16666667f);
-        if (state->x280 == 1 && vec_distance_xy(self->position, D_L02_001B03F0) < 0.001f) {
+        vec_step_toward_target_limited(self->position, g_brawler_target_position, 0.16666667f);
+        if (state->x280 == 1 && vec_distance_xy(self->position, g_brawler_target_position) < 0.001f) {
             moby_set_state(self, 2, 1);
         }
         break;
@@ -501,11 +501,11 @@ void func_US2_L02_003D9188(Actor *self)
         break;
     case 11:
         if (flag_set_first_pending(self)) {
-            if (!state->forced && !D_001A7A60[0x13]) {
-                D_001A7A60[0x13] = 1;
+            if (!state->forced && !g_item_enabled_flags[0x13]) {
+                g_item_enabled_flags[0x13] = 1;
                 snd_play_from_global_bank(1, 0, 0);
-                func_US2_002B1880(0x1233, -1);
-                D_L02_001A903C = 1;
+                value_set_entry_by_index_us2(0x1233, -1);
+                g_one_shot_flag = 1;
             }
             self->x48 = 0.0f;
             PROXY->x48 = 0.0f;
@@ -515,8 +515,8 @@ void func_US2_L02_003D9188(Actor *self)
             direction[2] += 0.06666667f;
             if (self->state->launcher) {
                 part_spawn_flying_fragment(self->state->launcher, 0xA4C, self->state->launcher->position, self->state->launcher->rot, 300, 0, direction,
-                        D_L02_001A8F20, D_L02_001A8F20, 0.0013888889f);
-                part_spawn_green_glitter(self, D_L02_001A8F20);
+                        g_zero_l02_vector, g_zero_l02_vector, 0.0013888889f);
+                part_spawn_green_glitter(self, g_zero_l02_vector);
                 moby_mark_spawned(self->state->launcher);
                 self->state->launcher = 0;
                 snd_play_from_class_bank(5, 0, self, 0xA44);

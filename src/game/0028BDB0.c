@@ -30,7 +30,7 @@ extern void hud_offset_element_for_slide(void *, int *, int *, int, int);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_sized_texture(int,int,int,int,int,int);
 extern void hud_draw_sprite(int,int,int,int,int,int);
-extern short D_0018B69A;
+extern short g_progress_panel_flag;
 /* Draws a progress bar panel whose fill width follows how far along the value is. */
 int menu_draw_progress_bar_panel(char *panel) {
  int x=*(int *)(panel+0x50), y=*(int *)(panel+0x54);
@@ -41,7 +41,7 @@ int menu_draw_progress_bar_panel(char *panel) {
  fillWidth=*(int *)(panel+0x74)*221 / *(int *)(panel+8)+27;
  hud_draw_sprite_sized_texture(GetIconFrame(0x7558,1),x,y,fillWidth,64,128);
  hud_draw_sprite(GetIconFrame(0x7558,0),x,y,256,64,128);
- hud_draw_sprite(GetIconFrame(0x7558,2),x,y,32,32,D_0018B69A?128:0);
+ hud_draw_sprite(GetIconFrame(0x7558,2),x,y,32,32,g_progress_panel_flag?128:0);
  return *(int *)(panel+0x58);
 }
 
@@ -60,7 +60,7 @@ int hud_return_zero(void) {
 extern char g_hud_elements[];
 
 /* The retail loads this one through a lui/lw pair of its own. */
-extern int D_001B1874 __attribute__((sda));
+extern int g_hud_record_timer_flag __attribute__((sda));
 
 extern void hud_finish_element_setup(char *);
 
@@ -81,7 +81,7 @@ int hud_update_record_timers(int runHandlers)
     do {
         int timer;
 
-        if ((*(int *)(record + 4) & 0x10) || D_001B1874) {
+        if ((*(int *)(record + 4) & 0x10) || g_hud_record_timer_flag) {
             timer = *(int *)(record + 0x7C);
             if (timer < 10) {
                 *(int *)(record + 0x7C) = 10;

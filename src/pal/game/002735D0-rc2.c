@@ -1,17 +1,17 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s8 D_0026C550[];
+extern s8 g_cam_mode_table[];
 extern s8 coll_convert_packed_points_to_vectors(void *, s8 *, s32);
 extern int moby_get_joint_matrix(void *, s8 *, s8 *, s16);
-extern s32 func_PAL_00273BB0(void *);
-extern s32 func_PAL_00273D38(void *);
+extern s32 target_seeker_update_pal(void *);
+extern s32 cam_moby_update_colliding_pal(void *);
 extern s32 stub_return_one_a(void *);
 extern s32 stub_return_one_b(void *);
 extern s32 FastDecTimer(void *);
 extern s32 g_game_time;
 
-s32 func_PAL_00273A10(void *arg0) {
+s32 cam_moby_update_pal(void *arg0) {
     s8 loc[0x210];
     s8 *s0;
     s32 s2;
@@ -27,7 +27,7 @@ s32 func_PAL_00273A10(void *arg0) {
         goto done;
     }
     {
-        s8 *tb = D_0026C550;
+        s8 *tb = g_cam_mode_table;
 
         goto *(void *)*(s32 *)(tb + sel * 4);
     }
@@ -39,7 +39,7 @@ case02:
         moby_get_joint_matrix(arg0, loc + 0x200, loc, (*(s16 *)((s8 *)(s0) + (0x36))));
     }
     (*(s8 **)((s8 *)(s0) + (0x30))) = loc;
-    s2 = func_PAL_00273BB0(arg0);
+    s2 = target_seeker_update_pal(arg0);
     if (!((*(u8 *)((s8 *)(s0) + (0x5C))) == 0 && (g_game_time & 3) != 0)) {
         s2 = (FastDecTimer(s0 + 0x34) != 0) ? 1 : s2;
     }
@@ -55,7 +55,7 @@ case5:
     goto done;
 
 case13:
-    s2 = func_PAL_00273D38(arg0);
+    s2 = cam_moby_update_colliding_pal(arg0);
     s2 = (FastDecTimer(s0 + 0x34) != 0) ? 1 : s2;
     goto done;
 

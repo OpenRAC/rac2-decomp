@@ -15,17 +15,17 @@ typedef float f32;
 
 typedef unsigned int u32;
 
-extern void D_00115E38(char *assertion, int line, char *file);
+extern void g_assert_fail(char *assertion, int line, char *file);
 
-extern char D_L00_001ADDD8[];
+extern char g_str_pool_cell_file[];
 
-extern char D_L00_001ADDF8[];
+extern char g_str_pool_init_message[];
 
 typedef struct { unsigned int f0, f4, f8, f12, f16, f20; } T;
 
 extern char D_L00_001ADDD8_1[];
 
-extern char D_L00_001ADE20[];
+extern char g_str_pool_alloc_message[];
 
 extern void D_00115E38_1(char *a0, int a1, char *a2);
 
@@ -54,8 +54,8 @@ typedef struct {
 } TextBox;
 
 extern int sprintf(char *, char *, ...); /* formats into a buffer */
-extern char D_001ADB58[], D_001ADB68[], D_001ADB78[], D_001ADB90[];
-extern char D_001ADBB0[], D_001ADBB8[], D_001ADBC8[];
+extern char g_str_framed_box_fmt_single_spaced[], g_str_framed_box_fmt_double_spaced[], g_str_framed_box_fmt_single_plain[], g_str_framed_box_fmt_double_plain[];
+extern char g_str_framed_box_fmt_single_short[], g_str_framed_box_fmt_double_short[], g_str_string_format[];
 extern int g_screen_width[] __attribute__((sda)); /* screen size: [1] = height */
 extern void text_draw_window_small(unsigned short *layout, unsigned long style, unsigned char *text, int length);
 extern void text_draw_window_medium(unsigned short *layout, unsigned long style, unsigned char *text, int length);
@@ -82,9 +82,9 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern void object_set_helper_result(void *, int, int);
 extern void object_set_value_float(void *, float);
 extern void *memset(void *, int, unsigned int); /* memset */
-extern char D_001ADB40[]; /* "aTxBrack" */
-extern char D_001ADB50[]; /* "aTxTop" */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char g_str_text_bracket_name[]; /* "aTxBrack" */
+extern char g_str_text_top_name[]; /* "aTxTop" */
+extern char *g_resident_data_base[] __attribute__((sda));
 
 
 
@@ -93,7 +93,7 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 extern void UpdateViewContext(void);
 extern int object_get_stored_counter(void);
 extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, float, float, float);

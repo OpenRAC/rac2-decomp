@@ -1,20 +1,20 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void *D_00133E74;
+extern void *g_libc_state_record;
 
-extern void *D_0013A308;
+extern void *g_libc_data_block;
 
 /* Returns the pointer to the record the C library uses to keep its own state. */
 void *libc_get_state_record(void)
 {
-    return D_00133E74;
+    return g_libc_state_record;
 }
 
 /* Returns the address of a fixed block of C library data. */
 void **libc_get_data_block(void)
 {
-    return &D_0013A308;
+    return &g_libc_data_block;
 }
 
 
@@ -51,7 +51,7 @@ ASM_FUNC("asm/core", func_00115AC0);
 
 extern void exit_ignoring_status(int status) __attribute__((noreturn));
 extern void func_00115CF0(void *stream, const char *format, ...);
-extern char D_0013A370[];
+extern char g_str_assert_fail[];
 
 /* Newlib abort and its separately entered assertion reporter. */
 void func_00115E28(void) __attribute__((noreturn));
@@ -65,17 +65,17 @@ void func_00115E28(void)
 /* Prints a failed-check message with the file, line and test text, then stops the program. */
 void assert_fail_abort(const char *file, int line, const char *expression)
 {
-    func_00115CF0(*(void **)((char *)D_00133E74 + 0xC),
-                  D_0013A370, expression, file, line);
+    func_00115CF0(*(void **)((char *)g_libc_state_record + 0xC),
+                  g_str_assert_fail, expression, file, line);
     func_00115E28();
 }
 
 
-extern int D_001341E0;
+extern int g_malloc_lock_owner;
 
-extern int D_001341E4;
+extern int g_malloc_lock_depth;
 
-extern int D_00134DB8;
+extern int g_malloc_lock_sema;
 
 extern int GetThreadId(void);
 
@@ -85,16 +85,16 @@ extern int WaitSema(int arg0);
 int malloc_lock_acquire(void) {
     int id = GetThreadId();
 
-    if (D_001341E0 != id) {
-        WaitSema(D_00134DB8);
-        D_001341E0 = id;
-        return ++D_001341E4;
+    if (g_malloc_lock_owner != id) {
+        WaitSema(g_malloc_lock_sema);
+        g_malloc_lock_owner = id;
+        return ++g_malloc_lock_depth;
     }
-    return ++D_001341E4;
+    return ++g_malloc_lock_depth;
 }
 
 /* Sets the starting number for the random number generator. */
 void func_001163A0(unsigned int value)
 {
-    *(unsigned int *)((unsigned char *)D_00133E74 + 0x58) = value;
+    *(unsigned int *)((unsigned char *)g_libc_state_record + 0x58) = value;
 }

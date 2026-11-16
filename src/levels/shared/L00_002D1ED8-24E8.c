@@ -30,9 +30,9 @@ typedef struct {
 #define HA ((HeroAnimation24E8 *)D_00189E20)
 
 extern u8 g_sound_state[];
-extern u8 D_L00_001B4400[];
-extern u8 D_L00_001B4A00[];
-extern float D_L00_0025DB20[][25];
+extern u8 g_hero_current_anim_buffer[];
+extern u8 g_hero_next_anim_buffer[];
+extern float g_hero_action_curve_table[][25];
 extern void hero_clear_anim_flags(void);
 extern void mem_copy_aligned(void *, void *, s32);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
@@ -75,7 +75,7 @@ void AdvanceHeroAnimation(void)
         obj->time = oldTime + HA->speed * HA->rate;
     } else if (HA->curve >= 0) {
         frame = HA->step;
-        obj->time = D_L00_0025DB20[HA->curve][frame];
+        obj->time = g_hero_action_curve_table[HA->curve][frame];
         HA->step = frame + 1;
     } else {
         obj->time = oldTime + HA->rate;
@@ -86,7 +86,7 @@ void AdvanceHeroAnimation(void)
         obj->time = 0.0f;
     delta = obj->time - oldTime;
     if (obj->time >= 1.0f) {
-        buffer = D_L00_001B4400;
+        buffer = g_hero_current_anim_buffer;
         do {
             if (obj->seq != obj->nextSeq) {
                 obj->seq = obj->nextSeq;
@@ -119,7 +119,7 @@ void AdvanceHeroAnimation(void)
                     obj->nextFrame = 0;
                     HA->flags |= 2;
                 }
-                obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+                obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)g_hero_next_anim_buffer);
                 obj->time -= 1.0f;
                 obj->time /= HA->rate;
                 HA->rate = *(float *)obj->current;

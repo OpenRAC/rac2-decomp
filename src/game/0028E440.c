@@ -16,12 +16,12 @@ typedef struct Task28E458 {
     u8 pad1C[0x90 - 0x1C];
 } Task28E458;
 
-extern s32 D_001B18A4[] __attribute__((sda));
-extern s32 D_001B15A8[] __attribute__((sda));
-extern s32 D_001B187C[] __attribute__((sda));
-extern s32 D_001B17B0[] __attribute__((sda));
-extern s32 D_001B17B4[] __attribute__((sda));
-extern s32 D_001B17B8[] __attribute__((sda));
+extern s32 g_weapon_wheel_slot_seven[] __attribute__((sda));
+extern s32 g_cutscene_active_flag[] __attribute__((sda));
+extern s32 g_hud_sprite_color_word[] __attribute__((sda));
+extern s32 g_hud_record_active_a[] __attribute__((sda));
+extern s32 g_hud_record_fade[] __attribute__((sda));
+extern s32 g_hud_record_timer[] __attribute__((sda));
 extern s32 g_current_game_mode[] __attribute__((sda));
 extern Task28E458 g_hud_elements[];
 
@@ -30,52 +30,52 @@ void hud_update_record_handlers(void) {
     Task28E458 *record;
     s32 i;
 
-    if (D_001B18A4[1] != 0 || D_001B15A8[0] != 0) {
-        D_001B18A4[1] = 0;
+    if (g_weapon_wheel_slot_seven[1] != 0 || g_cutscene_active_flag[0] != 0) {
+        g_weapon_wheel_slot_seven[1] = 0;
         return;
     }
     record = g_hud_elements;
-    D_001B187C[0] = 0xFFFFF0;
+    g_hud_sprite_color_word[0] = 0xFFFFF0;
     for (i = 12; i >= 0; i--) {
         if (record->update != 0) {
             record->update(record);
         }
         record++;
     }
-    if ((D_001B17B0[0] != 0 || D_001B17B4[0] != 0) && g_current_game_mode[0] == 0) {
-        if (D_001B17B0[0] != 0) {
-            D_001B17B4[0] += 0x10;
-            if (D_001B17B4[0] > 0x80) {
-                D_001B17B4[0] = 0x80;
+    if ((g_hud_record_active_a[0] != 0 || g_hud_record_fade[0] != 0) && g_current_game_mode[0] == 0) {
+        if (g_hud_record_active_a[0] != 0) {
+            g_hud_record_fade[0] += 0x10;
+            if (g_hud_record_fade[0] > 0x80) {
+                g_hud_record_fade[0] = 0x80;
             }
         } else {
-            D_001B17B4[0] -= 0x10;
-            if (D_001B17B4[0] < 0) {
-                D_001B17B4[0] = 0;
+            g_hud_record_fade[0] -= 0x10;
+            if (g_hud_record_fade[0] < 0) {
+                g_hud_record_fade[0] = 0;
             }
         }
-        if (D_001B17B0[0] != 0) {
-            D_001B17B0[0]--;
+        if (g_hud_record_active_a[0] != 0) {
+            g_hud_record_active_a[0]--;
         }
-        if (D_001B17B0[0] == 1000) {
-            D_001B17B0[0] = 0;
+        if (g_hud_record_active_a[0] == 1000) {
+            g_hud_record_active_a[0] = 0;
         }
     } else {
-        D_001B17B8[0] = 100;
+        g_hud_record_timer[0] = 100;
     }
 }
 
 extern int hud_find_entry_index(int);
-extern unsigned short *D_001B188C;
-extern short *D_001B1890;
-extern unsigned int *D_001B1898;
-extern unsigned int *D_001B1894;
+extern unsigned short *g_hud_element_table;
+extern short *g_hud_texture_pair_table;
+extern unsigned int *g_hud_group_entries_b;
+extern unsigned int *g_hud_group_entries_a;
 
 /* Looks up the picture number for an icon and frame, or gives zero when it is missing. */
 int GetIconFrame(int key, int index)
 {
     int number = hud_find_entry_index(key);
-    unsigned short *row = (unsigned short *)(number * 8 + (unsigned int)D_001B188C);
+    unsigned short *row = (unsigned short *)(number * 8 + (unsigned int)g_hud_element_table);
     if (row[0] == 65535)
         goto fail;
     if (index >= row[1])
@@ -83,10 +83,10 @@ int GetIconFrame(int key, int index)
     {
         unsigned int mask = 0x80000000u;
         int offset = row[2] + index;
-        short *pair = (short *)(offset * 4 + (unsigned int)*(short *volatile *)&D_001B1890);
-        if (D_001B1898[pair[0] * 2] & mask)
+        short *pair = (short *)(offset * 4 + (unsigned int)*(short *volatile *)&g_hud_texture_pair_table);
+        if (g_hud_group_entries_b[pair[0] * 2] & mask)
             goto fail;
-        return (D_001B1894[pair[1] * 2] & mask) ? 0 : offset;
+        return (g_hud_group_entries_a[pair[1] * 2] & mask) ? 0 : offset;
     }
 fail:
     return 0;
@@ -102,8 +102,8 @@ extern int GetFrameTexture(int);
 /* Draws a flat picture on the screen at a pixel position and size, with a see-through amount. */
 void hud_draw_sprite(int texture, int x, int y, int width, int height, int alpha)
 {
-    short *row = (short *)((texture << 2) + (unsigned int)D_001B1890);
-    unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
+    short *row = (short *)((texture << 2) + (unsigned int)g_hud_texture_pair_table);
+    unsigned char *entry = (unsigned char *)((unsigned int)g_hud_group_entries_a + (row[1] << 3));
     int mask6 = 1 << entry[6];
     int mask7 = 1 << entry[7];
     int *old_cursor;
@@ -164,8 +164,8 @@ void hud_draw_sprite_sized_texture(int texture, int x, int y, int width, int hei
 /* Draws a picture on the screen at a finer-than-pixel position and size, with a see-through amount. */
 void hud_draw_sprite_subpixel_no_color(int texture, int x, int y, int width, int height, int alpha)
 {
-    short *row = (short *)((texture << 2) + (unsigned int)D_001B1890);
-    unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
+    short *row = (short *)((texture << 2) + (unsigned int)g_hud_texture_pair_table);
+    unsigned char *entry = (unsigned char *)((unsigned int)g_hud_group_entries_a + (row[1] << 3));
     int mask6 = 1 << entry[6];
     int mask7 = 1 << entry[7];
     int *old_cursor;
@@ -196,8 +196,8 @@ void hud_draw_sprite_subpixel_no_color(int texture, int x, int y, int width, int
 /* Draws a picture on the screen at a finer-than-pixel position with a chosen colour and see-through amount. */
 void DrawHudSpriteSubpixel(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int color)
 {
-    short *row = (short *)((a0 << 2) + (unsigned int)D_001B1890);
-    unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
+    short *row = (short *)((a0 << 2) + (unsigned int)g_hud_texture_pair_table);
+    unsigned char *entry = (unsigned char *)((unsigned int)g_hud_group_entries_a + (row[1] << 3));
     int mask6 = 1 << entry[6];
     int mask7 = 1 << entry[7];
     int *p;

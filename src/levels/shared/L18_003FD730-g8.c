@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern f32 D_L18_001B06AC[] __attribute__((sda));
-extern f32 D_L18_001B0778 __attribute__((sda));
-extern f32 D_L18_001B077C[] NOT_SDA;
-extern s32 D_L18_001B0780 __attribute__((sda));
-extern f32 D_L18_001B0784 __attribute__((sda));
+extern f32 g_train_l18_value_mid[] __attribute__((sda));
+extern f32 g_burst_intensity_start __attribute__((sda));
+extern f32 g_burst_intensity_end[] NOT_SDA;
+extern s32 g_burst_particle_scale __attribute__((sda));
+extern f32 g_burst_quad_size __attribute__((sda));
 
 extern void gfx_set_gs_register_constant(void);
 extern f32 math_lerp_float(f32, f32, f32);
@@ -23,16 +23,16 @@ void part_emit_timer_burst(u8 *moby) {
 
     gfx_set_gs_register_constant();
     state = *(u8 **)(moby + 0x68);
-    ratio = *(f32 *)(state + 0xC0) / D_L18_001B06AC[0];
+    ratio = *(f32 *)(state + 0xC0) / g_train_l18_value_mid[0];
     if (ratio > 1.0f)
         ratio = 1.0f;
     else if (ratio < 0.0f)
         ratio = 0.0f;
-    intensity = math_lerp_float(D_L18_001B0778, D_L18_001B077C[0], ratio);
+    intensity = math_lerp_float(g_burst_intensity_start, g_burst_intensity_end[0], ratio);
     if (ratio < 0.1f) {
-        particle_count = FloatToInt((f32)D_L18_001B0780 * ratio * 10.0f);
+        particle_count = FloatToInt((f32)g_burst_particle_scale * ratio * 10.0f);
     } else {
-        particle_count = FloatToInt((f32)D_L18_001B0780 * (1.0f - ratio));
+        particle_count = FloatToInt((f32)g_burst_particle_scale * (1.0f - ratio));
     }
-    gfx_draw_billboard_quad_with_uv(state + 0x90, particle_count, 0, intensity, D_L18_001B0784, 0.08f);
+    gfx_draw_billboard_quad_with_uv(state + 0x90, particle_count, 0, intensity, g_burst_quad_size, 0.08f);
 }

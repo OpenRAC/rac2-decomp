@@ -4,8 +4,8 @@ typedef unsigned int DrawQuad __attribute__((mode(TI)));
 typedef union { DrawQuad q; float f[4]; } DrawVec;
 typedef struct { DrawVec v[9]; } DrawPacket;
 
-extern DrawVec D_L30_001B09B0[4] __attribute__((sda));
-extern DrawVec D_L30_001B9DC0;
+extern DrawVec g_facing_sprite_corners[4] __attribute__((sda));
+extern DrawVec g_camera_l30_position;
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -22,7 +22,7 @@ void gfx_l30_draw_facing_sprite(DrawVec *position, DrawPacket *source, float sca
     source = &f.packet;
     f.up.q = 0; f.up.f[2] = 1; f.up.f[3] = 1;
     qcopy(&f.point, position);
-    FastVecSub(&f.side, &D_L30_001B9DC0, &f.point);
+    FastVecSub(&f.side, &g_camera_l30_position, &f.point);
     vec_scale_to_length(&f.side, &f.side, 1.0f);
     FastVecCross(&f.forward, &f.side, &f.up);
     vec_scale_to_length(&f.forward, &f.forward, 1.0f);
@@ -30,7 +30,7 @@ void gfx_l30_draw_facing_sprite(DrawVec *position, DrawPacket *source, float sca
     FastVecScale(&f.temp, &f.side, offset);
     FastVecAdd(&f.point, &f.point, &f.temp);
     for (i = 0; i < 4; i++) {
-        FastVecScale(&f.packet.v[i], &D_L30_001B09B0[i], scale);
+        FastVecScale(&f.packet.v[i], &g_facing_sprite_corners[i], scale);
         transform_vector(&f.packet.v[i], &f.packet.v[i], &f.side);
     }
     draw_world_quad(source, 0, 0);

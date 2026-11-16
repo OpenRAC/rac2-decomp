@@ -2,9 +2,9 @@
 /* func_US2_0034EDB8, the USA v2.00 copy of func_0034E070: the same C, where rename func_00336B90 becomes func_US2_00337A38; rename func_0034B2C8 becomes func_US2_0034C008; rename func_00337C10 becomes func_US2_00338AB8; pad 0x1590 becomes 5552. */
 #include "common.h"
 
-extern char *D_001A8CFC __attribute__((sda));
-extern char D_001AE710[];
-extern char D_001AE720[];
+extern char *g_resident_data_base __attribute__((sda));
+extern char g_records_widget_data_a[];
+extern char g_records_widget_data_b[];
 
 extern void *table_find_by_id(int, int);
 extern void object_init_derived_b(void *, int, int, void *, void *);
@@ -33,18 +33,18 @@ typedef struct {
     int f2210;
 } RecordSet;
 
-void func_US2_0034EDB8(void *object, void *a1, void *a2)
+void records_screen_init_us2(void *object, void *a1, void *a2)
 {
     RecordSet *set = object;
     char *record = (char *)0x8710;
     char *end = set->records + 0x750;
     void *colour;
 
-    set->f220C = table_find_by_id((int)D_001A8CFC + (int)record, 0x57);
-    set->f2210 = table_find_by_id((int)D_001A8CFC + (int)record, 0x58);
+    set->f220C = table_find_by_id((int)g_resident_data_base + (int)record, 0x57);
+    set->f2210 = table_find_by_id((int)g_resident_data_base + (int)record, 0x58);
     record = set->records;
     do {
-        object_init_derived_b(record, 0x20, 1, D_001AE710, a2);
+        object_init_derived_b(record, 0x20, 1, g_records_widget_data_a, a2);
         widget_set_pos_y(record, 5);
         func_US2_00337A38(record, 0x64);
         meter_set_value(record, 0);
@@ -56,7 +56,7 @@ void func_US2_0034EDB8(void *object, void *a1, void *a2)
     } while (record < end);
     record = set->f1D30;
     func_US2_0034C008(set->f7A0, a1, a2);
-    object_init_derived_c(record, D_001AE720, a2);
+    object_init_derived_c(record, g_records_widget_data_b, a2);
     colour = object_get_fourth_field(record);
     *(float *)colour = 2155905152.0f;
     colour = object_get_field_b(record);

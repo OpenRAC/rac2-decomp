@@ -32,9 +32,9 @@ extern void snd_send_cmd50_with_settings();
 extern void snd_send_cmd79_with_settings();
 extern s32 FastDecTimer();
 
-extern s8 D_002B7DF8[];
-extern s8 D_002B7FF0[];
-extern s8 D_002B8048[];
+extern s8 g_music_cmd79_settings[];
+extern s8 g_music_cmd25_settings[];
+extern s8 g_music_cmd50_settings[];
 /* Updates one music stream channel each frame: starts, pauses, fades out or clears it depending on its state. */
 void snd_update_music_channel(s32 channel) {
     s16 state;
@@ -126,8 +126,8 @@ block_23:
     handle_copy = old_handle;
     (*(u32 *)((s8 *)(channel) + (0))) = 0xFFFFFFFF;
     channel_addr = (u64) ((s64) channel << 0x20) >> 0x20;
-    snd_send_cmd50_with_settings(handle_copy, ((s32)D_002B8048), channel_addr);
-    snd_send_cmd25_with_settings(old_handle, ((s32)D_002B7FF0), channel_addr);
+    snd_send_cmd50_with_settings(handle_copy, ((s32)g_music_cmd50_settings), channel_addr);
+    snd_send_cmd25_with_settings(old_handle, ((s32)g_music_cmd25_settings), channel_addr);
     goto block_32;
 block_25:
     if (handle_now == 0xFFFFFFFF) {
@@ -136,7 +136,7 @@ block_25:
     if (state_now != 2) {
         goto block_32;
     }
-    snd_send_cmd79_with_settings(handle_now, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
+    snd_send_cmd79_with_settings(handle_now, ((s32)g_music_cmd79_settings), (u64) ((s64) channel << 0x20) >> 0x20);
     goto block_32;
 block_28:
 block_29:

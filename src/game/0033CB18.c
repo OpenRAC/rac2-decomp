@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "names.h"
-extern unsigned char D_001A7B96 __attribute__((sda));
+extern unsigned char g_toggle_option_b __attribute__((sda));
 typedef struct { int ids[2]; } SolTextPair;
 
-extern SolTextPair D_L00_001AE1A8;
-extern char D_L00_001AE1B0[];
+extern SolTextPair g_audio_menu_text_pair;
+extern char g_str_audio_menu_format[];
 extern void hud_draw_progress_bar(void *);
 extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 
-extern char D_L00_001AE118[];
+extern char g_str_toggle_menu_format[];
 extern int DrawOptionText(int, int, unsigned long, char *, int) __asm__("func_0027FAA8");
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
@@ -116,8 +116,8 @@ void audio_menu_draw(char *object)
     int color;
     prompt_bar_draw(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE1A8;
-    format = D_L00_001AE1B0;
+    pair = g_audio_menu_text_pair;
+    format = g_str_audio_menu_format;
     first = GetLocalizedString(0x2F0F);
     sprintf(buffer, format, first);
     text_draw_right_aligned_medium(0x100, 0x91, color, buffer, -1);
@@ -128,7 +128,7 @@ void audio_menu_draw(char *object)
     text_draw_right_aligned_medium(0x100, 0xBE, color, buffer, -1);
     hud_draw_progress_bar(object + 0x2F4);
     color = *(int *)(object + 0x2A8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
-    format2 = D_L00_001AE118;
+    format2 = g_str_toggle_menu_format;
     last = GetLocalizedString(0x2F11);
     second = GetLocalizedString(pair.ids[*(int *)0x001A7B98 != 0]);
     sprintf(buffer, format2, last, second);
@@ -148,7 +148,7 @@ char *single_toggle_a_destroy(char *object)
 /* Handles input for a one-switch option menu: the confirm button flips the switch. */
 int single_toggle_a_update (char *object, int flags)
 {
-  unsigned char *setting = &D_001A7B96;
+  unsigned char *setting = &g_toggle_option_b;
   float *position;
   int discarded;
 
@@ -167,8 +167,8 @@ int single_toggle_a_update (char *object, int flags)
 }
 
 
-extern SolTextPair D_L00_001AE110;
-extern char D_L00_001AE118[];
+extern SolTextPair g_toggle_menu_text_pair;
+extern char g_str_toggle_menu_format[];
 /* Resident byte at 0x001A7BB2 is shared by all programs. */
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
@@ -186,8 +186,8 @@ void single_toggle_a_draw(char *object)
     int color;
     prompt_bar_draw(object + 8);
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x2D99);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7B96 != 0]);
     sprintf(buffer, format, first, second);
@@ -276,8 +276,8 @@ void single_toggle_c_draw(char *object)
     char *second;
     char *format;
     prompt_bar_draw(object + 8);
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x2D9A);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7BB2 != 0]);
     sprintf(buffer, format, first, second);

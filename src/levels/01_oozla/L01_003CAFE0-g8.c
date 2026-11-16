@@ -2,13 +2,13 @@
 
 extern u8 *g_moby_l01_table;
 
-extern u32 D_L01_001FB020[];
+extern u32 g_group_list_table[];
 
 extern u8 *func_00305EE8(int);
 extern s32 func_355780(u32 a0, u32 a1, void *a2);
 extern void func_00308938(void *);
 extern void func_00314D00(void *);
-extern float D_L01_001B0540 __attribute__((sda));
+extern float g_l01_moby_scale_factor __attribute__((sda));
 
 /* The spawned moby's vars (+0x68). Struct stores let the fixed scalar scale
    load be scheduled ahead of the model-pointer load, as in retail. */
@@ -36,7 +36,7 @@ u8 *moby_l01_spawn_child(u8 *owner, void *pos, void *vel, int cls, int index)
         child[0xBC] = 0;
         state->owner = owner;
         state->index = index;
-        *(float *)(child + 0x2C) = *(float *)(*(u8 **)(child + 0x24) + 0x24) * D_L01_001B0540;
+        *(float *)(child + 0x2C) = *(float *)(*(u8 **)(child + 0x24) + 0x24) * g_l01_moby_scale_factor;
         qcopy(child + 0x10, pos);
         qcopy(child + 0xF0, vel);
         qcopy(state->pos, pos);
@@ -66,7 +66,7 @@ void muckdweller_flag_group(s32 index)
 
     if (index == -1)
         return;
-    slot = D_L01_001FB020[index];
+    slot = g_group_list_table[index];
     if (slot == 0)
         return;
     id_ptr = (u16 *)slot;
@@ -79,14 +79,14 @@ void muckdweller_flag_group(s32 index)
 }
 
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_nibble_table[];
+extern u8 g_moby_group_flags[];
 /* Level save state: collected[] is indexed by a moby's save id (s16 at +0xB2). */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
-extern LevelSaveState D_L01_0021D840;
-extern LevelSaveState D_L01_0021E4B0;
+extern LevelSaveState g_level_l01_save_state;
+extern LevelSaveState g_level_save_state_backup;
 typedef struct { u8 flags[256]; } MissionFlags;
-extern MissionFlags D_L01_001B23A0 __attribute__((sda));
+extern MissionFlags g_mission_flags __attribute__((sda));
 
 /* Records a moby (mission byte +0xB0, save id +0xB2) in the current and checkpoint
    collected[] tables; same shape as RAC1's helga_update tail. */
@@ -98,30 +98,30 @@ void level_record_moby_collected(u8 *moby)
 
     if (moby[0xB0] != 0xFF && *(short *)(moby + 0xB2) >= 0 && !(moby[0xB1] & 0x80)) {
         if (*(u16 *)(moby + 0xB2) & 1) {
-            counter = D_0019B4A8 + ((*(short *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
+            counter = g_moby_nibble_table + ((*(short *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
             if (((*counter >> 4) & 7) != 7) *counter += 0x10;
         } else {
-            counter = D_0019B4A8 + ((*(short *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
+            counter = g_moby_nibble_table + ((*(short *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
             if ((*counter & 7) != 7) ++*counter;
         }
-        D_L01_0021D840.collected[*(short *)(moby + 0xB2)] = moby[0xB0] + 2;
+        g_level_l01_save_state.collected[*(short *)(moby + 0xB2)] = moby[0xB0] + 2;
         if (moby[0xB0] == 0xFF) goto record;
         group = moby[0xB0];
-        if (!(D_L01_001B23A0.flags[group] & 0x80) && (D_0019B2E8[group + (g_current_map_index << 4)] & 0x80)) {
+        if (!(g_mission_flags.flags[group] & 0x80) && (g_moby_group_flags[group + (g_current_map_index << 4)] & 0x80)) {
         record:
-            D_L01_0021E4B0.collected[*(short *)(moby + 0xB2)] = moby[0xB0] + 2;
+            g_level_save_state_backup.collected[*(short *)(moby + 0xB2)] = moby[0xB0] + 2;
         }
     }
 }
 
 extern u8 g_sound_state[], g_hero_position[];
-extern u8 D_L01_001AFE18[] MACRO_ADDR;
+extern u8 g_water_l01_height[] MACRO_ADDR;
 /* The tails read the level number $gp-relative, case 0 through D_001A79F0's absolute address. */
 extern int D_001A79F0_gp SDATA(D_001A79F0);
-extern float D_L01_001B0794 __attribute__((sda));
-extern float D_L01_001B0798 __attribute__((sda));
-extern float D_L01_001B079C __attribute__((sda));
-extern float D_L01_001B07A0 __attribute__((sda));
+extern float g_pod_scale_factor_a __attribute__((sda));
+extern float g_pod_scale_factor_b __attribute__((sda));
+extern float g_pod_scale_factor_c __attribute__((sda));
+extern float g_pod_scale_factor_d __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern void anim_start_immediate(void *, int, int);
 extern int moby_count_group_not_in_state(int, int);
@@ -172,8 +172,8 @@ void bursting_pod_update(u8 *moby)
         if (state->persistent && moby[0xB0] != 255) {
             u16 id = *(u16 *)(moby + 0xB2);
             int bits;
-            if (D_L01_0021E4B0.collected[(short)id] ||
-                (bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)],
+            if (g_level_save_state_backup.collected[(short)id] ||
+                (bits = g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)],
                  (id & 1) ? ((bits >> 4) & 7) : (bits & 7))) {
                 if (state->childIndex != -1)
                     moby_mark_spawned(g_moby_l01_table + (state->childIndex << 8));
@@ -196,21 +196,21 @@ void bursting_pod_update(u8 *moby)
                         anim_start_immediate(moby, 9, 0);
                 }
             }
-            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B0794;
+            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * g_pod_scale_factor_a;
             break;
         case 1:
-            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B0798;
+            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * g_pod_scale_factor_b;
             anim_start_immediate(moby, 2, 0);
             break;
         case 2:
-            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B079C;
+            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * g_pod_scale_factor_c;
             anim_start_immediate(moby, 4, 0);
             if (state->linkIndex != -1)
                 state->linkCount = moby_count_group_not_in_state(state->linkIndex, -1);
             break;
         case 3:
             *(int *)(moby + 0x98) = 0;
-            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B07A0;
+            *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * g_pod_scale_factor_d;
             anim_start_immediate(moby, 10, 0);
             break;
         }
@@ -243,7 +243,7 @@ void bursting_pod_update(u8 *moby)
                 position[2] = level_get_water_height();
                 size = math_random_float_range(0.2f, 2.0f);
                 color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-                part_spawn_drifting(position, size, D_L01_001AFE18, 10000.0f, color);
+                part_spawn_drifting(position, size, g_water_l01_height, 10000.0f, color);
             }
             hit = 0;
             if (part_find_owned_effect_slot(moby, 0x10001, 0))
@@ -336,7 +336,7 @@ void bursting_pod_update(u8 *moby)
             position[2] = level_get_water_height();
             size = math_random_float_range(0.2f, 2.0f);
             color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-            part_spawn_drifting(position, size, D_L01_001AFE18, 10000.0f, color);
+            part_spawn_drifting(position, size, g_water_l01_height, 10000.0f, color);
         }
         if (moby[0x60] & 2) {
             if (state->persistent) {
@@ -345,7 +345,7 @@ void bursting_pod_update(u8 *moby)
                         u8 *counter;
                         u32 value;
 persist_high:
-                        counter = D_0019B4A8 + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
+                        counter = g_moby_nibble_table + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
                         value = *counter;
                         if (((value >> 4) & 7) != 7)
                             *counter = value + 16;
@@ -353,7 +353,7 @@ persist_high:
                         u8 *counter;
                         u32 value;
 persist_low:
-                        counter = D_0019B4A8 + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
+                        counter = g_moby_nibble_table + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
                         value = *counter;
                         if ((value & 7) != 7)
                             *counter = value + 1;
@@ -386,12 +386,12 @@ delete_current:
         if (state->persistent) {
             if (moby[0xB0] != 255) {
                 if (*(u16 *)(moby + 0xB2) & 1) {
-                    u8 *counter = D_0019B4A8 + ((*(short *)(moby + 0xB2) >> 1) + (D_001A79F0_gp << 10));
+                    u8 *counter = g_moby_nibble_table + ((*(short *)(moby + 0xB2) >> 1) + (D_001A79F0_gp << 10));
                     u32 value = *counter;
                     if (((value >> 4) & 7) != 7)
                         *counter = value + 16;
                 } else {
-                    u8 *counter = D_0019B4A8 + ((*(short *)(moby + 0xB2) >> 1) + (D_001A79F0_gp << 10));
+                    u8 *counter = g_moby_nibble_table + ((*(short *)(moby + 0xB2) >> 1) + (D_001A79F0_gp << 10));
                     u32 value = *counter;
                     if ((value & 7) != 7)
                         *counter = value + 1;

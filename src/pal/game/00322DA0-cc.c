@@ -24,20 +24,20 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern int moby_count_group_not_in_state(int, int);
 extern int weapon_select_aim_target(char *, int, float, float, int, int);
-extern void func_PAL_002AD288(char *, void *, int, float, float);
-extern void func_PAL_002A7650(char *, int, int);
+extern void part_spawn_explosion_with_sparks_pal(char *, void *, int, float, float);
+extern void SetDeathBits_pal(char *, int, int);
 extern void moby_update_ground_check(char *);
 extern void moby_transform_joint_point(char *, int, float *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(float *, float *, float *);
 extern int func_PAL_002B1A50(char *, void *, int);
 extern float fast_vec_dist(void *, void *);
-extern float D_001BAFA0[];
-extern char *D_001B1C4C MACRO_ADDR;
+extern float g_coll_hit_position[];
+extern char *g_vec_record_table MACRO_ADDR;
 extern char g_camera_eye_state[];
-extern int D_001B1B78 MACRO_ADDR;
-extern short *D_001EE5A0[];
-extern char *D_001B1B5C MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern char *g_moby_pool_start MACRO_ADDR;
 #define F(p,o) (*(float *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
 #define U(p,o) (*(unsigned char *)((p)+(o)))
@@ -95,7 +95,7 @@ int func_PAL_00322DA0(char *object)
         moby_transform_joint_to_world(object,0,data+0x380);
         F(data,0x388)+=20.0f;
         moby_transform_joint_to_world(object,0,data+0x390);
-        if(CollLine(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,D_001BAFA0);
+        if(CollLine(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,g_coll_hit_position);
         if(!I(data,0x27c) && I(data,0x288)==-1) {
             F(object,0x18)=coll_probe_ground_height_below(object+0x10,0,0.5f);
             moby_set_state((unsigned char *)object,1,0);
@@ -117,7 +117,7 @@ int func_PAL_00322DA0(char *object)
         }
         if(I(data,0x288)!=-1) {
             moby_set_state((unsigned char *)object,2,0);
-            qcopy(data+0x380,D_001B1C4C+(I(data,0x288)<<7)+0x30);
+            qcopy(data+0x380,g_vec_record_table+(I(data,0x288)<<7)+0x30);
             U(object,0x30)=0x80;
         }
     }
@@ -139,10 +139,10 @@ int func_PAL_00322DA0(char *object)
         F(data,0x30)=0.5f;
         if(status==5) {I(data,0xf0)=0;F(data,0xf4)=1.0053098f;}
         group_alert_peers_type_a(object);
-        if((status==4 || status==5 || special) && D_001B1B78>=U(object,0x21) && moby_count_group_not_in_state(U(object,0x21),-1)>=2) {
-            list=D_001EE5A0[U(object,0x21)];
+        if((status==4 || status==5 || special) && g_moby_group_count>=U(object,0x21) && moby_count_group_not_in_state(U(object,0x21),-1)>=2) {
+            list=g_moby_group_lists[U(object,0x21)];
             for (;;) {
-                other=(char *)(D_001B1B5C+((*list & 0x7fff)<<8));
+                other=(char *)(g_moby_pool_start+((*list & 0x7fff)<<8));
                 if (*(short *)(other+0xaa)==0xb0a) {
                     char *d=*(char **)(other+0x68);
                     if (!I(d,0x294)) {I(d,0x294)=1;break;}
@@ -160,8 +160,8 @@ int func_PAL_00322DA0(char *object)
     I(data,0x258)=weapon_select_aim_target(object,I(data,0x250),F(data,0x268),10.0f,0,0);
         I(data,0x25c)=weapon_select_aim_target(object,I(data,0x254),F(data,0x26c),10.0f,0,0);
         if(F(object,0x18)<90.0f) {
-            func_PAL_002AD288(object,object+0x10,-1,0.5f,13.0f);
-            func_PAL_002A7650(object,0,3);return 1;
+            part_spawn_explosion_with_sparks_pal(object,object+0x10,-1,0.5f,13.0f);
+            SetDeathBits_pal(object,0,3);return 1;
         }
     if(special) {robot_destroy_child_cleanup(object);return 1;}
     return 0;

@@ -1,18 +1,19 @@
+#include "names.h"
 /* func_PAL_00332038, the PAL copy of func_003304D8: the same C. */
 #include "common.h"
 
 /* func_PAL_00332038 needs -g (the division keeps its line label, retail's nop
    pair) on top of the -G8 small data, so it has a unit of its own. */
 
-extern float D_00237700[8][4];
-extern float D_00237780[8][4];
-extern float D_001B2830[4] __attribute__((sda));
-extern float D_001BAFA0[4];
-extern float D_001BAFC0[4] __attribute__((sda));
-extern int D_001B2844;
-extern float D_001B096C __attribute__((sda));
-extern float D_001B09CC __attribute__((sda));
-extern float D_001B09C8 __attribute__((sda));
+extern float g_vehicle_probe_vectors_b[8][4];
+extern float g_vehicle_ground_points_b[8][4];
+extern float g_vehicle_gravity_direction[4] __attribute__((sda));
+extern float g_coll_hit_position[4];
+extern float g_coll_hit_normal[4] __attribute__((sda));
+extern int g_vehicle_align_override;
+extern float g_ridden_vehicle_probe_lift __attribute__((sda));
+extern float g_ridden_vehicle_ground_angle_scale __attribute__((sda));
+extern float g_ridden_vehicle_ground_lerp_rate __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -39,7 +40,7 @@ extern void multiply_matrix3x3(void *, void *, void *);
    hit it sets state 4 and a velocity along the first row. */
 void func_PAL_00332038(char *object)
 {
-    float (*probes)[4] = D_00237700;
+    float (*probes)[4] = g_vehicle_probe_vectors_b;
     float edges[8][4];
     float offset[4], center[4], normal[4];
     char *state = *(char **)(object + 0x68);
@@ -55,8 +56,8 @@ void func_PAL_00332038(char *object)
     vec_clear_128(center);
     hit = 0;
     vec_clear_128(normal);
-    vec_scale_to_length(offset, D_001B2830, D_001B096C + D_001B096C);
-    points = D_00237780;
+    vec_scale_to_length(offset, g_vehicle_gravity_direction, g_ridden_vehicle_probe_lift + g_ridden_vehicle_probe_lift);
+    points = g_vehicle_ground_points_b;
     out = points;
     count = 0;
     for (i = 0; i < 8; i++) {
@@ -69,13 +70,13 @@ void func_PAL_00332038(char *object)
                 *(int *)(state + 0x60) = 8;
                 continue;
             }
-            FastVecScale(b, D_001BAFC0, 0.0009765625f);
+            FastVecScale(b, g_coll_hit_normal, 0.0009765625f);
             vec_scale_to_length(b, b, 1.0f);
-            vec_scale_to_length(c, D_001B2830, -1.0f);
-            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || D_001B2844) {
-                qcopy(out, D_001BAFA0);
+            vec_scale_to_length(c, g_vehicle_gravity_direction, -1.0f);
+            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || g_vehicle_align_override) {
+                qcopy(out, g_coll_hit_position);
                 ++out;
-                FastVecAdd(center, center, D_001BAFA0);
+                FastVecAdd(center, center, g_coll_hit_position);
                 ++count;
             }
         }
@@ -108,16 +109,16 @@ void func_PAL_00332038(char *object)
             vec_scale_to_length(c, moby + 0xE0, 1.0f);
             vec_scale_to_length(b, a, 1.0f);
             FastVecCross(axis, c, b);
-            angle = FastVecDot(c, b) * (D_001B09CC * 0.5f);
+            angle = FastVecDot(c, b) * (g_ridden_vehicle_ground_angle_scale * 0.5f);
             FastVecScale(b, axis, math_fast_sin_or_cos_b(angle));
             b[3] = math_fast_sin_or_cos_a(angle);
             quaternion_to_rotation_basis(b, matrix);
             multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
             FastVecScale(center, center, inv);
             FastVecSub(target, center, moby + 0x10);
-            FastVecScale(target, D_001B2830, FastVecDot(target, D_001B2830));
+            FastVecScale(target, g_vehicle_gravity_direction, FastVecDot(target, g_vehicle_gravity_direction));
             FastVecAdd(target, target, moby + 0x10);
-            lerp_vector(moby + 0x10, moby + 0x10, target, D_001B09C8);
+            lerp_vector(moby + 0x10, moby + 0x10, target, g_ridden_vehicle_ground_lerp_rate);
         }
         vec_scale_to_length(a, moby + 0xE0, 0.15f);
         FastVecAdd(a, moby + 0x10, a);

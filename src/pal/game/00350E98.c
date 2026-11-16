@@ -34,7 +34,7 @@ extern void func_PAL_002A0F68(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
 
-void func_PAL_00350E98(char *obj)
+void menu_attach_slot_packets_pal(char *obj)
 {
     char *sub = obj + 0xC00;
     SlotObject *s = (SlotObject *)sub;

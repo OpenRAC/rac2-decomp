@@ -30,25 +30,25 @@ typedef struct { u8 b[0x10]; } TargetRecord;
 extern char g_hero_state[];
 extern char g_pad_state[];
 extern SoundSlot g_sound_state[];
-extern u16 D_0018CCD0[];
-extern u8 D_0013957F[];
+extern u16 g_trigger_id_word[];
+extern u8 g_beam_weapon_index[];
 
-extern s32 D_L00_001AA0F8;
+extern s32 g_render_state_word;
 extern s32 g_frame_l00_counter;
-extern f32 D_L00_001AF614 __attribute__((sda));
-extern f32 D_L00_001AF618 __attribute__((sda));
-extern f32 D_L00_001AF61C __attribute__((sda));
-extern f32 D_L00_001AF620 __attribute__((sda));
-extern f32 D_L00_001B15CC;
-extern f32 D_L00_001B15D0;
-extern f32 D_L00_001B15D4;
-extern f32 D_L00_001B15D8;
-extern f32 D_L00_001BD370[];
+extern f32 g_zoom_saved_param_a __attribute__((sda));
+extern f32 g_zoom_saved_param_b __attribute__((sda));
+extern f32 g_zoom_saved_param_c __attribute__((sda));
+extern f32 g_zoom_saved_param_d __attribute__((sda));
+extern f32 g_zoom_fov_value_a;
+extern f32 g_zoom_fov_value_b;
+extern f32 g_zoom_fov_value_c;
+extern f32 g_zoom_fov_value_d;
+extern f32 g_fast_math_ratio[];
 extern char g_camera_l00_position[];
-extern char *D_L00_001BF218[];
-extern MuzzleLight D_L00_001C6F40[];
+extern char *g_hit_l00_result[];
+extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_l00_table[];
-extern TargetRecord D_L00_00294800[];
+extern TargetRecord g_target_hud_records[];
 
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
@@ -100,15 +100,15 @@ void UpdateScopedWeapon(u8 *moby)
     if (HERO->i[0x1244 / 4] == 3) {
         if (moby[0x20] == 0)
             return;
-        D_L00_001B15D0 = D_L00_001AF614;
-        D_L00_001B15D4 = D_L00_001AF618;
-        D_L00_001B15D8 = D_L00_001AF61C;
-        D_L00_001B15CC = D_L00_001AF620;
+        g_zoom_fov_value_b = g_zoom_saved_param_a;
+        g_zoom_fov_value_c = g_zoom_saved_param_b;
+        g_zoom_fov_value_d = g_zoom_saved_param_c;
+        g_zoom_fov_value_a = g_zoom_saved_param_d;
         cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
         if (st->light >= 0)
             gfx_free_point_light(st->light);
         st->light = -1;
-        D_L00_001AA0F8 = 0xE0;
+        g_render_state_word = 0xE0;
         gfx_update_frame_time_scales(1);
         return;
     }
@@ -119,10 +119,10 @@ void UpdateScopedWeapon(u8 *moby)
         if (st->light >= 0)
             gfx_free_point_light(st->light);
         st->light = -1;
-        D_L00_001B15D0 = D_L00_001AF614;
-        D_L00_001B15D4 = D_L00_001AF618;
-        D_L00_001B15D8 = D_L00_001AF61C;
-        D_L00_001B15CC = D_L00_001AF620;
+        g_zoom_fov_value_b = g_zoom_saved_param_a;
+        g_zoom_fov_value_c = g_zoom_saved_param_b;
+        g_zoom_fov_value_d = g_zoom_saved_param_c;
+        g_zoom_fov_value_a = g_zoom_saved_param_d;
         cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
         gfx_update_frame_time_scales(1);
         return;
@@ -139,7 +139,7 @@ void UpdateScopedWeapon(u8 *moby)
             vec_scale_to_length(muzzle, g_camera_l00_position + 0x230, 128.0f);
             FastVecAdd(muzzle, muzzle, g_camera_l00_position);
             if (CollLine(g_camera_l00_position, muzzle, 0x10, HERO->i[0x2290 / 4], 0) != 0) {
-                u8 *hit = (u8 *)D_L00_001BF218[0];
+                u8 *hit = (u8 *)g_hit_l00_result[0];
                 if (hit != 0 && hit[0x31] != 0) {
                     float *health = moby_get_private_value_0(hit);
                     if (moby_is_in_special_class_range(hit) != 0
@@ -169,13 +169,13 @@ void UpdateScopedWeapon(u8 *moby)
         st->zoomed = 0;
         st->reload = 0.36666667f;
         moby[0x20] = 3;
-        max = mat_fast_helper_a(1.0f, D_L00_001BD370[0]) * 2.0f;
+        max = mat_fast_helper_a(1.0f, g_fast_math_ratio[0]) * 2.0f;
         st->zoom_max = max;
         st->zoom = max + (0.17453295f - max) * 0.25f;
-        D_L00_001AF614 = D_L00_001B15D0;
-        D_L00_001AF618 = D_L00_001B15D4;
-        D_L00_001AF61C = D_L00_001B15D8;
-        D_L00_001AF620 = D_L00_001B15CC;
+        g_zoom_saved_param_a = g_zoom_fov_value_b;
+        g_zoom_saved_param_b = g_zoom_fov_value_c;
+        g_zoom_saved_param_c = g_zoom_fov_value_d;
+        g_zoom_saved_param_d = g_zoom_fov_value_a;
         st->flash = 0;
         st->locked = 0;
         st->blink = 0;
@@ -204,7 +204,7 @@ void UpdateScopedWeapon(u8 *moby)
             if (math_fast_float_d(&HERO->i[0x2534 / 4]) != 0)
                 fire = 1;
             if (st->zoomed == 0)
-                D_L00_001AA0F8 = 0;
+                g_render_state_word = 0;
             st->zoomed = 1;
         } else {
             HERO->i[0x2534 / 4] = 0x28;
@@ -216,13 +216,13 @@ void UpdateScopedWeapon(u8 *moby)
                 SoundSlot *slot = &g_sound_state[st->sound];
                 if ((u8 *)slot->p[0x88 / 4] != moby || slot->b[0x74] == 0)
                     st->sound = PlayMobySound(2, 4, moby);
-                D_0018CCD0[0] = 0xFFFF;
+                g_trigger_id_word[0] = 0xFFFF;
                 st->zoom -= 0.01f;
             } else if ((GAME->i[0x1A0 / 4] & 2) && st->zoom < st->zoom_max) {
                 SoundSlot *slot = &g_sound_state[st->sound];
                 if ((u8 *)slot->p[0x88 / 4] != moby || slot->b[0x74] == 0)
                     st->sound = PlayMobySound(3, 4, moby);
-                D_0018CCD0[0] = 0xFFFF;
+                g_trigger_id_word[0] = 0xFFFF;
                 st->zoom += 0.01f;
             } else {
                 int h = st->sound;
@@ -252,18 +252,18 @@ void UpdateScopedWeapon(u8 *moby)
                 st->zoom = max + (0.17453295f - max) * 0.25f;
                 cam_set_value_target(0, 3, max, 0.005f, 0.2f, 0.0f);
                 st->zoomed = 0;
-                D_L00_001AA0F8 = 0xE0;
+                g_render_state_word = 0xE0;
                 gfx_update_frame_time_scales(1);
             }
         }
         zoom_blend = (st->zoom - 0.17453295f) / (st->zoom_max - 0.17453295f);
-        D_L00_001B15D0 = (D_L00_001AF614 - 0.03f) * zoom_blend + 0.03f;
-        D_L00_001B15D4 = (D_L00_001AF618 - 0.4f) * zoom_blend + 0.4f;
-        D_L00_001B15CC = (D_L00_001AF620 - 0.010471977f) * zoom_blend + 0.010471977f;
+        g_zoom_fov_value_b = (g_zoom_saved_param_a - 0.03f) * zoom_blend + 0.03f;
+        g_zoom_fov_value_c = (g_zoom_saved_param_b - 0.4f) * zoom_blend + 0.4f;
+        g_zoom_fov_value_a = (g_zoom_saved_param_d - 0.010471977f) * zoom_blend + 0.010471977f;
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
                 start_equipped_item_animation();
-                st->hud = slot_copy_records_to_free(D_L00_00294800);
+                st->hud = slot_copy_records_to_free(g_target_hud_records);
                 st->fire_timer = 2;
                 moby[0x20] = 2;
                 anim_start_blended(moby, 2, 0, 0);
@@ -293,7 +293,7 @@ void UpdateScopedWeapon(u8 *moby)
             PlayMobySound(0, 0, moby);
             beam_fire_with_muzzle_flash(moby);
             {
-                WeaponEntry *weapon = &g_weapon_l00_table[D_0013957F[0]];
+                WeaponEntry *weapon = &g_weapon_l00_table[g_beam_weapon_index[0]];
                 st->reload = 1.0f / weapon->rate;
             }
             moby[0x20] = 3;
@@ -324,7 +324,7 @@ void UpdateScopedWeapon(u8 *moby)
                     vec_scale_to_length(offset, &HERO->f[0x760 / 4], 1.5f);
                 }
                 {
-                    float (*positions)[8] = (float (*)[8])D_L00_001C6F40[0].position;
+                    float (*positions)[8] = (float (*)[8])g_light_table[0].position;
                     MuzzleLight *lights;
                     FastVecAdd(positions[st->light], muzzle, offset);
                     lights = (MuzzleLight *)((char *)positions - 0x10);

@@ -11,11 +11,11 @@ extern void object_set_helper_result(void *, void *, int);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern int list_screen_layout(void *, int);
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADC30[];
-extern char D_001ADC38[], D_001ADC40[], D_001ADC50[];
-extern char D_001ADCA8[], D_001ADCB8[], D_001ADCC0[], D_001ADCC8[], D_001ADCD0[];
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char D_001ADCA0[8] __attribute__((sda));
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[], g_menu_hud_label_desc[];
+extern char g_list_screen_hud_desc_first[], g_list_screen_hud_desc_second[], g_list_screen_hud_desc_third[];
+extern char g_list_screen_hud_desc_a[], g_list_screen_hud_desc_b[], g_list_screen_hud_desc_c[], g_list_screen_hud_desc_d[], g_list_screen_hud_desc_e[];
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char g_list_screen_flag_bytes[8] __attribute__((sda));
 
 /* Binds the screen to its owner: allocates the 16-byte position block, initialises the four
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
@@ -35,19 +35,19 @@ void list_screen_init(char *obj, void *arg)
     }
     (*(float **)(obj + 4))[0] = 256.0f;
     (*(float **)(obj + 4))[1] = 198.0f;
-    object_init_derived_arrays(obj + 0x8, D_001ADC10, arg);
-    object_init_derived_arrays(obj + 0x54, D_001ADC18, arg);
-    object_init_derived_arrays(obj + 0xA0, D_001ADC20, arg);
-    object_init_derived_arrays(obj + 0xEC, D_001ADC28, arg);
-    hud_init_widget_defaults(obj + 0x138, D_001ADC30, arg);
-    hud_init_widget_defaults(obj + 0x180, D_001ADCA8, arg);
-    hud_init_widget_defaults(obj + 0x1C8, D_001ADCB8, arg);
-    hud_init_widget_defaults(obj + 0x210, D_001ADCC0, arg);
-    hud_init_widget_defaults(obj + 0x258, D_001ADCC8, arg);
-    hud_init_widget_defaults(obj + 0x2A0, D_001ADCD0, arg);
-    hud_init_widget_defaults(obj + 0x2E8, D_001ADC38, arg);
-    hud_init_widget_defaults(obj + 0x330, D_001ADC40, arg);
-    hud_init_widget_defaults(obj + 0x378, D_001ADC50, arg);
+    object_init_derived_arrays(obj + 0x8, g_menu_widget_desc_first, arg);
+    object_init_derived_arrays(obj + 0x54, g_menu_widget_desc_second, arg);
+    object_init_derived_arrays(obj + 0xA0, g_menu_widget_desc_third, arg);
+    object_init_derived_arrays(obj + 0xEC, g_menu_widget_desc_fourth, arg);
+    hud_init_widget_defaults(obj + 0x138, g_menu_hud_label_desc, arg);
+    hud_init_widget_defaults(obj + 0x180, g_list_screen_hud_desc_a, arg);
+    hud_init_widget_defaults(obj + 0x1C8, g_list_screen_hud_desc_b, arg);
+    hud_init_widget_defaults(obj + 0x210, g_list_screen_hud_desc_c, arg);
+    hud_init_widget_defaults(obj + 0x258, g_list_screen_hud_desc_d, arg);
+    hud_init_widget_defaults(obj + 0x2A0, g_list_screen_hud_desc_e, arg);
+    hud_init_widget_defaults(obj + 0x2E8, g_list_screen_hud_desc_first, arg);
+    hud_init_widget_defaults(obj + 0x330, g_list_screen_hud_desc_second, arg);
+    hud_init_widget_defaults(obj + 0x378, g_list_screen_hud_desc_third, arg);
     hud_set_widget_field_a(obj + 0x180, 0);
     hud_set_widget_field_a(obj + 0x1C8, 0);
     hud_set_widget_field_a(obj + 0x210, 0);
@@ -69,11 +69,11 @@ void list_screen_init(char *obj, void *arg)
     *object_get_fourth_field(obj + 0x2E8) = 0x80F0F0F0;
     *object_get_fourth_field(obj + 0x330) = 0x80F0F0F0;
     *object_get_fourth_field(obj + 0x378) = 0x80F0F0F0;
-    object_set_helper_result(obj + 0x8, D_001A8CFC[0] + 0x8710, 0x5F);
-    object_set_helper_result(obj + 0x54, D_001A8CFC[0] + 0x8710, 0x60);
-    object_set_helper_result(obj + 0xA0, D_001A8CFC[0] + 0x8710, 0x61);
-    object_set_helper_result(obj + 0xEC, D_001A8CFC[0] + 0x8710, 0x62);
-    D_001ADCA0[0] = 0x12;
+    object_set_helper_result(obj + 0x8, g_resident_data_base[0] + 0x8710, 0x5F);
+    object_set_helper_result(obj + 0x54, g_resident_data_base[0] + 0x8710, 0x60);
+    object_set_helper_result(obj + 0xA0, g_resident_data_base[0] + 0x8710, 0x61);
+    object_set_helper_result(obj + 0xEC, g_resident_data_base[0] + 0x8710, 0x62);
+    g_list_screen_flag_bytes[0] = 0x12;
     hud_set_widget_field_b(obj + 0x138, GetLocalizedString(0x2D65));
     hud_set_widget_field_b(obj + 0x180, GetLocalizedString(0x2D5D));
     hud_set_widget_field_b(obj + 0x1C8, GetLocalizedString(0x3293));
@@ -87,7 +87,7 @@ void list_screen_init(char *obj, void *arg)
 
 /* The X bias lives in small data, so this file is built with -G8. */
 extern float ref_L00_0033A688_00 __attribute__((sda));
-extern float D_001ADD0C;
+extern float g_circle_menu_label_offset_y;
 extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
@@ -99,22 +99,22 @@ void circle_menu_position_label(char *menu)
         float *position = *(float **)(menu + 0x1FC);
 
         object_set_first_float4(menu + 0x170, position[0] + ref_L00_0033A688_00,
-                      position[1] + D_001ADD0C, 0.0f, 0.0f);
+                      position[1] + g_circle_menu_label_offset_y, 0.0f, 0.0f);
     }
 }
 
 /* The table of four resident ints is reached through $gp and the resident
    pointer through the small-data unit, so this body needs -G8. */
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char D_001ADC88[];
-extern int D_001ADD30 __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
+extern int g_circle_menu_icon_colors __attribute__((sda));
 extern void object_set_flag_value(char *, int);
 
 /* Sets up the four button icons of the circle menu and counts how many entries its table has. */
 void circle_menu_init_entries(char *obj, int *iconIds, char *table)
 {
     char *icon = obj + 4;
-    int *iconColor = (int *)&D_001ADD30;
+    int *iconColor = (int *)&g_circle_menu_icon_colors;
     int i;
     int entryCount;
     int *entryMode;
@@ -122,11 +122,11 @@ void circle_menu_init_entries(char *obj, int *iconIds, char *table)
 
     for (i = 3; i >= 0; i--) {
         if (*iconIds != 0) {
-            object_init_derived_arrays(icon, D_001ADC88, *(int *)(obj + 0x200));
+            object_init_derived_arrays(icon, g_circle_menu_icon_data, *(int *)(obj + 0x200));
             *(int *)object_get_fourth_field(icon) = *iconColor;
-            object_set_helper_result(icon, D_001A8CFC[0] + 0x8710, *iconIds);
+            object_set_helper_result(icon, g_resident_data_base[0] + 0x8710, *iconIds);
         } else {
-            object_set_helper_result(icon, D_001A8CFC[0] + 0x8710, 0);
+            object_set_helper_result(icon, g_resident_data_base[0] + 0x8710, 0);
             object_set_flag_value(icon, 0);
         }
         icon += 76;
@@ -161,13 +161,13 @@ extern void hud_draw_colored_quad_widget(char *);
 extern void hud_set_widget_value_pair(char *, int, int);
 extern char *GetLocalizedString(int);
 extern void text_label_draw(char *);
-extern float D_001ADD20 __attribute__((sda));
-extern float D_001ADD24;
-extern int D_001ADD10 __attribute__((sda));
-extern int D_001ADD14;
-extern float D_001ADD18 __attribute__((sda));
-extern float D_001ADD28 __attribute__((sda));
-extern float D_001ADD2C;
+extern float g_circle_menu_second_value_x __attribute__((sda));
+extern float g_circle_menu_second_value_y;
+extern int g_circle_menu_icon_offset_x __attribute__((sda));
+extern int g_circle_menu_icon_offset_y;
+extern float g_circle_menu_sin_scale __attribute__((sda));
+extern float g_circle_menu_self_offset_x __attribute__((sda));
+extern float g_circle_menu_self_offset_y;
 
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
 typedef struct { char pad[8]; short n; void (*fn)(char *); } Vtable_0033A6D8;
@@ -192,11 +192,11 @@ void circle_menu_draw(char *self)
         int i;
 
         object_set_first_float4(rec0, position[0], position[1], 0.0f, 0.0f);
-        object_set_second_float4(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_second_float4(rec0, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0x80))->fn(rec0 + (*(Vtable_0033A6D8 **)(self + 0x80))->n);
         position = *(float **)(self + 0x1FC);
         object_set_first_float4(rec1, position[0], position[1], 0.0f, 0.0f);
-        object_set_second_float4(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_second_float4(rec1, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0xCC))->fn(rec1 + (*(Vtable_0033A6D8 **)(self + 0xCC))->n);
         for (i = 0; i < *(int *)(self + 0x1F8); i++) {
             char *rec = self + 0x134;
@@ -208,8 +208,8 @@ void circle_menu_draw(char *self)
             sn = *(float *)(self + 0x204) * math_fast_sin_or_cos_b(ENTRY_0033A6D8.angle);
             hud_set_widget_value_pair(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
             position = *(float **)(self + 0x1FC);
-            object_set_first_float4(rec, position[0] + (float)D_001ADD10 + cs,
-                          position[1] + (float)D_001ADD14 + D_001ADD18 * sn, 0.0f, 0.0f);
+            object_set_first_float4(rec, position[0] + (float)g_circle_menu_icon_offset_x + cs,
+                          position[1] + (float)g_circle_menu_icon_offset_y + g_circle_menu_sin_scale * sn, 0.0f, 0.0f);
             mode = (int *)(self + 0x1B8) + i;
             *object_get_fourth_field(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
             object_set_flag_value(rec, *mode != 2);
@@ -217,11 +217,11 @@ void circle_menu_draw(char *self)
             if (i == *(int *)(self + 0x208)) {
                 char *cursor;
 
-                object_set_second_float4(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+                object_set_second_float4(self + 4, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
                 if (*mode != 2) {
                     position = *(float **)(self + 0x1FC);
-                    object_set_first_float4(self + 4, position[0] + D_001ADD28 + cs,
-                                  position[1] + D_001ADD2C + D_001ADD18 * sn, 0.0f, 0.0f);
+                    object_set_first_float4(self + 4, position[0] + g_circle_menu_self_offset_x + cs,
+                                  position[1] + g_circle_menu_self_offset_y + g_circle_menu_sin_scale * sn, 0.0f, 0.0f);
                     {
                         int text = ENTRY_0033A6D8.text;
 
@@ -249,8 +249,8 @@ extern void hud_init_widget_defaults(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void *memset(void *, int, int);
-extern char D_001ADC80[], D_001ADC88[];
-extern int D_001ADD40[2] __attribute__((sda));
+extern char g_circle_menu_header_data[], g_circle_menu_icon_data[];
+extern int g_prompt_bar_slot_colors[2] __attribute__((sda));
 
 /* Constructor of a gadget made of five sprite slots (76 bytes each from +0xC, switched on by the
    five shorts of LIST, which are also kept at +0x188) and three 72-byte sprites at +0x198, +0x1E0
@@ -279,15 +279,15 @@ void prompt_bar_init(char *object, char *owner, short *list)
     rec228 = object + 0x228;
     slotFlags = (short *)(object + 0x188);
     rec1E0 = object + 0x1E0;
-    slotColor = D_001ADD40;
+    slotColor = g_prompt_bar_slot_colors;
     slotRecord = object + 0xC;
     vel280 = object + 0x280;
     slotIds = list;
     for (i = 4; i >= 0; i--) {
         if (*slotIds != 0) {
-            object_init_derived_arrays(slotRecord, D_001ADC80 + 8, owner);
+            object_init_derived_arrays(slotRecord, g_circle_menu_header_data + 8, owner);
             *object_get_fourth_field(slotRecord) = *slotColor;
-            object_set_helper_result(slotRecord, D_001A8CFC[0] + 0x8710, *slotIds);
+            object_set_helper_result(slotRecord, g_resident_data_base[0] + 0x8710, *slotIds);
         }
         *slotFlags = *slotIds;
         slotColor++;
@@ -295,7 +295,7 @@ void prompt_bar_init(char *object, char *owner, short *list)
         slotIds++;
         slotFlags++;
     }
-    slotIds = (short *)D_001ADC88;
+    slotIds = (short *)g_circle_menu_icon_data;
     hud_init_widget_defaults(rec198, slotIds, owner);
     memset(vel278, 0, 8);
     object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);

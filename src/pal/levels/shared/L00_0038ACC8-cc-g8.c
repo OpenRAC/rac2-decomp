@@ -24,8 +24,8 @@ extern int slot_alloc_for_object(unsigned char *, unsigned int);
 extern int part_alloc_effect_slot(void *, void *, float, float, float);
 
 extern char *g_hero_moby[];
-extern unsigned char D_00139591[];
-extern int D_L00_001AEF48 __attribute__((sda));
+extern unsigned char g_miniturret_weapon_index[];
+extern int g_miniturret_shot_value __attribute__((sda));
 
 typedef struct {
     char pad00[0x58];
@@ -92,12 +92,12 @@ char *func_PAL_L00_0038ACC8(Vector4 *position, Vector4 *velocity)
         quaternion_to_rotation_basis(&quaternion, rotation);
         multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         work->owner = 0;
-        work->f60 = (g_weapon_l00_table + D_00139591[0])->f58;
+        work->f60 = (g_weapon_l00_table + g_miniturret_weapon_index[0])->f58;
         work->f64 = 0;
         work->f50 = 0;
         work->f44 = 0;
         work->f4C = 1;
-        work->f40 = (((int)(D_L00_001AEF48) * 5 + 2) / 6);
+        work->f40 = (((int)(g_miniturret_shot_value) * 5 + 2) / 6);
         vec_clear_128(&work->basis[0]);
         *(float *)&work->basis[0] = 1;
         work->basis[2] = work->basis[0];
@@ -117,7 +117,7 @@ char *func_PAL_L00_0038ACC8(Vector4 *position, Vector4 *velocity)
 }
 
 /* Fields of objects whose layouts are not identified yet. */
-extern Vector4 D_L00_001AEDC0 SDATA(D_L00_001AEDC0);
+extern Vector4 g_twin_guns_source_vector SDATA(D_L00_001AEDC0);
 /* Measured input fields; other fields are not yet identified. */
 typedef struct {
     char pad[0x10C];
@@ -127,7 +127,7 @@ typedef struct {
     char pad120[0x80];
     int buttons;
 } PlayerControl;
-extern PlayerControl D_00138500, g_pad_state;
+extern PlayerControl g_pad_device_state, g_pad_state;
 
 /* The two returns give per-arm loads that jump2 cross-jumps into one lw. */
 

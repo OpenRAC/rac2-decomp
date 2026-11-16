@@ -12,7 +12,7 @@ struct RotorPath {
    and the path it follows. Only the fields these functions use are named. */
 /* A basis vector whose fourth word is cleared as an integer. */
 /* A rotor moby, and each 256-byte record of the level's table has the same layout. */
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern char g_sound_state[];
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, char *);
@@ -31,7 +31,7 @@ extern float fast_vec_dist(void *, void *);
 /* Spawns a class 0xD1B moby: its position is the first vector of its own state, which then
    takes the vectors at a (at +0x00) and b (at +0x20) and the float f (at +0x3C). */
 /* Hands two reads of the state's quadword to the two measured stage helpers. */
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -103,7 +103,7 @@ extern void vec_random_direction(float *, float, float);
 /* Emits a projectile from the next enabled record, with a fifteen-frame delay. */
 /* Chooses the state-dependent path, then finds its nearest point. */
 /* Follows the current path, steers toward its next point and releases the sound at the end. */
-int func_PAL_L11_0043E660(char *object)
+int chain_creature_follow_path_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float target[4], direction[4], aim[4], old[4];
@@ -169,7 +169,7 @@ int func_PAL_L11_0043E660(char *object)
 
 extern void snd_stop_voice(int a);
 
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern char g_sound_state[];
 
 /* Releases the object's measured slot and clears the six flags of its record. */
@@ -179,7 +179,7 @@ extern char g_sound_state[];
 extern int FloatToInt(float);
 extern void drone_kill_with_effects(char *);
 extern float fast_vec_dist(void *, void *);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 
 extern void func_32E480(char *p, char *q, int a, float b, float c, float d, int e, int f, int g);
 

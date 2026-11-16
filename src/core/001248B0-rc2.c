@@ -28,18 +28,18 @@
 #define NULL 0
 #endif
 
-extern void *D_00141844;
-extern s32 D_00141848;
-extern s32 D_001363A4;
+extern void *g_cd_saved_callback;
+extern s32 g_cd_saved_callback_arg;
+extern s32 g_cd_callback_saved;
 
 /* Calls the saved callback function with its saved argument, if one is set and the system is not busy. */
 void cd_call_saved_callback(void) {
     void (*callback)(s32);
 
-    callback = (void (*)(s32))D_00141844;
+    callback = (void (*)(s32))g_cd_saved_callback;
     if (callback != NULL) {
-        if (D_001363A4 == 0) {
-            callback(D_00141848);
+        if (g_cd_callback_saved == 0) {
+            callback(g_cd_saved_callback_arg);
         }
     }
 }

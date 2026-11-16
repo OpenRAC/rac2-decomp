@@ -5,9 +5,9 @@
 #define H(p, o) (*(s16 *)((u8 *)(p) + (o)))
 
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[] NOT_SDA;
-extern u8 D_0019B4A8[] NOT_SDA;
-extern struct { u8 header[0x464]; u8 collected[0]; } D_L01_0021E4B0;
+extern u8 g_moby_group_flags[] NOT_SDA;
+extern u8 g_moby_nibble_table[] NOT_SDA;
+extern struct { u8 header[0x464]; u8 collected[0]; } g_level_save_state_backup;
 extern u8 g_hero_position[] NOT_SDA;
 extern s32 IsPointInCuboid(void *, s32);
 extern void moby_set_state(void *, s32, s32);
@@ -48,9 +48,9 @@ void UpdateTriggeredTransformMover(u8 *moby)
         level = g_current_map_index[0];
         I(vars, 0xAC) = 0;
         I(vars, 0xB8) = 0;
-        if ((D_0019B2E8[moby[0xB0] + (level << 4)] & 0x80) ||
-            (uid = *(u16 *)(moby + 0xB2), D_L01_0021E4B0.collected[(s16)uid]) ||
-            (entry = D_0019B4A8 + (((s16)uid >> 1) + (level << 10)),
+        if ((g_moby_group_flags[moby[0xB0] + (level << 4)] & 0x80) ||
+            (uid = *(u16 *)(moby + 0xB2), g_level_save_state_backup.collected[(s16)uid]) ||
+            (entry = g_moby_nibble_table + (((s16)uid >> 1) + (level << 10)),
             (bits = *entry, (uid & 1) ? (bits >> 4) & 7 : bits & 7))) {
             vars[0xA8] = 1;
             moby_set_state(moby, 2, -1);
@@ -66,11 +66,11 @@ void UpdateTriggeredTransformMover(u8 *moby)
         if (I(vars, 0xA0) != -1 && IsPointInCuboid(g_hero_position, I(vars, 0xA0))) {
             uid = *(u16 *)(moby + 0xB2);
             if (uid & 1) {
-                u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+                u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
                 if (((*entry >> 4) & 7) != 7)
                     *entry += 0x10;
             } else {
-                u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+                u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
                 if ((*entry & 7) != 7)
                     ++*entry;
             }
@@ -108,11 +108,11 @@ void UpdateTriggeredTransformMover(u8 *moby)
         if (I(vars, 0xA0) != -1 && IsPointInCuboid(g_hero_position, I(vars, 0xA0))) {
             uid = *(u16 *)(moby + 0xB2);
             if (uid & 1) {
-                u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+                u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
                 if (((*entry >> 4) & 7) != 7)
                     *entry += 0x10;
             } else {
-                u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+                u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
                 if ((*entry & 7) != 7)
                     ++*entry;
             }

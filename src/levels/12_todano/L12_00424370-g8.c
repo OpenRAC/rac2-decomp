@@ -8,21 +8,21 @@ typedef struct { u8 pad0[0x20]; f32 f20; u16 f24; u8 pad26[0xA]; f32 f30;
 #define SI(p,o) (*(s32 *)((u8 *)(p)+(o)))
 #define SF(p,o) (*(f32 *)((u8 *)(p)+(o)))
 #define SH(p,o) (*(u16 *)((u8 *)(p)+(o)))
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0, D_L12_0021E180;
-extern u8 D_0019B4A8[], D_0019B2E8[], D_L12_001B9E00[], D_L12_001C0270[];
-extern u8 D_L12_001B2CE0[] __attribute__((sda));
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags, g_wanderer_flag_table;
+extern u8 g_moby_nibble_table[], g_moby_group_flags[], g_hero_prev_position[], g_wanderer_ground_hit[];
+extern u8 g_collected_item_flags[] __attribute__((sda));
 typedef struct { u8 pad[0x80]; f32 pos[4]; u8 pad90[0x530]; u8 *target; } PlayerState;
 extern PlayerState g_hero_state;
 extern s32 g_current_map_index MACRO_ADDR;
 extern s32 D_001A79F0_gp SDATA(D_001A79F0);
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern s32 *D_L12_001FEAC0[];
-extern s32 D_L12_001B29C8 MACRO_ADDR;
+extern s32 *g_path_zone_table[];
+extern s32 g_frame_l12_counter MACRO_ADDR;
 extern s32 D_L12_001B29C8_gp SDATA(D_L12_001B29C8);
-extern f32 D_L12_001B20A0 __attribute__((sda)), D_L12_001B20A4 __attribute__((sda)), D_L12_001B20A8 __attribute__((sda)), D_L12_001B20AC __attribute__((sda));
-extern f32 D_L12_001B20B0 __attribute__((sda)), D_L12_001B20C8 __attribute__((sda));
-extern s32 D_L12_001B20B8[] __attribute__((sda));
+extern f32 g_wanderer_speed_scale __attribute__((sda)), g_wanderer_timer_rate __attribute__((sda)), g_wanderer_slow_move_rate __attribute__((sda)), g_wanderer_fast_move_rate __attribute__((sda));
+extern f32 g_wanderer_spin_rate __attribute__((sda)), g_wanderer_smooth_target __attribute__((sda));
+extern s32 g_wanderer_pulse_colors[] __attribute__((sda));
 extern void moby_mark_spawned(void *), helper_clear_states(void *), beam_restore_child_collision(void *);
 extern s32 helper_has_live_object(void *);
 extern f32 fast_vec_dist(void *, void *), vec_distance_xy(void *, void *);
@@ -55,18 +55,18 @@ void path_wandering_enemy_update(u8 *self)
     s32 *path;
     s32 was0=0, was1=0;
     u16 id=SH(self,0xb2);
-    if (D_L12_0021EDF0.flags[(s16)id]) { moby_mark_spawned(self); return; }
-    { s32 flags=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+    if (g_object_flags.flags[(s16)id]) { moby_mark_spawned(self); return; }
+    { s32 flags=g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
     flags = ((id & 1) ? flags >> 4 : flags) & 7;
     if(flags) { moby_mark_spawned(self); return; } }
-    path=D_L12_001FEAC0[SI(st,0x298)];
-    if (helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
-    if (helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
-    if (SI(st,0x2c4)!=-1) beam_restore_child_collision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
+    path=g_path_zone_table[SI(st,0x298)];
+    if (helper_has_live_object(g_moby_list_start+(SI(st,0x2c4)<<8))) was0=1;
+    if (helper_has_live_object(g_moby_list_start+(SI(st,0x2c8)<<8))) was1=1;
+    if (SI(st,0x2c4)!=-1) beam_restore_child_collision(g_moby_list_start+(SI(st,0x2c4)<<8));
     if (SI(st,0x2c8)!=-1) beam_restore_child_collision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
-    SF(self,0x2c)=SF(*(u8 **)(self+0x24),0x24)*D_L12_001B20A0;
+    SF(self,0x2c)=SF(*(u8 **)(self+0x24),0x24)*g_wanderer_speed_scale;
     qcopy(oldpos,self+0x10);
-    if (self[0x31] && fast_vec_dist(self+0x10,D_L12_001B9E00)<24.0f) {
+    if (self[0x31] && fast_vec_dist(self+0x10,g_hero_prev_position)<24.0f) {
         moby_update_ground_check(self); self[0x6f]=22;
     }
     if (!self[0x95]) {
@@ -102,7 +102,7 @@ void path_wandering_enemy_update(u8 *self)
         if(flag_set_first_pending(self)) {
             if(self[0x43]!=5) anim_start_blended(self,5,0,20);
             math_step_int_toward_target((s32 *)(st+0x2b0),SI(st,0x2b4),1);
-            { f32 speed=D_L12_001B20AC;
+            { f32 speed=g_wanderer_fast_move_rate;
               moby_set_controller_speed_limits(self,0.0022222223f,speed*0.016666668f,0.0034906589426100254f,0.20943955f); }
         }
         if(SI(st,0x2b0)<SI(st,0x2b4)) {
@@ -117,7 +117,7 @@ void path_wandering_enemy_update(u8 *self)
         if(flag_set_first_pending(self)) {
             if(self[0x43]!=4) anim_start_blended(self,4,0,20);
             { s32 next=path_pick_random_visible_point(self,1);
-            f32 rate=D_L12_001B20A8*0.016666668f; SI(st,0x2b0)=next;
+            f32 rate=g_wanderer_slow_move_rate*0.016666668f; SI(st,0x2b0)=next;
             moby_set_controller_speed_limits(self,0.0011111111380159855f,rate,0.0008726647356525064f,0.10471977f); }
             SI(st,0x2b8)=vec_distance_xy(self+0x10,(SI(st,0x2b4)*16+0x10)+(u8 *)path)>24.0f?900:300;
         }
@@ -127,7 +127,7 @@ void path_wandering_enemy_update(u8 *self)
         if(flag_set_first_pending(self)) {
             if(self[0x43]!=5) anim_start_blended(self,5,0,20);
             { s32 next=path_pick_random_visible_point(self,0);
-            f32 rate=D_L12_001B20AC*0.016666668f; SI(st,0x2b0)=next;
+            f32 rate=g_wanderer_fast_move_rate*0.016666668f; SI(st,0x2b0)=next;
             moby_set_controller_speed_limits(self,0.003888889f,rate,0.0034906589426100254f,0.4188791f); }
         }
         if(moby_l01_turn_toward_target(self,(SI(st,0x2b0)*16+0x10)+(u8 *)path)&128) SI(st,0x2b0)=path_pick_random_visible_point(self,1);
@@ -144,9 +144,9 @@ void path_wandering_enemy_update(u8 *self)
         else if(dot>0.033333335f) { if(self[0x43]!=9) anim_start_blended(self,9,0,10); }
         else { if(self[0x43]!=7) anim_start_blended(self,7,0,10); }
         moby_start_effect_from_entry(self,mat_fast_helper_a(g_hero_state.pos[0]-SF(self,0x10),g_hero_state.pos[1]-SF(self,0x14)));
-        if(helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c4)<<8))) was0=1;
-        if(helper_has_live_object(D_L12_001B2E9C+(SI(st,0x2c8)<<8))) was1=1;
-        if(SI(st,0x2c4)!=-1) beam_restore_child_collision(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
+        if(helper_has_live_object(g_moby_list_start+(SI(st,0x2c4)<<8))) was0=1;
+        if(helper_has_live_object(g_moby_list_start+(SI(st,0x2c8)<<8))) was1=1;
+        if(SI(st,0x2c4)!=-1) beam_restore_child_collision(g_moby_list_start+(SI(st,0x2c4)<<8));
         if(SI(st,0x2c8)!=-1) beam_restore_child_collision(D_L12_001B2E9C_gp+(SI(st,0x2c8)<<8));
         pushable_moby_update(self,st+0x140,0.7f,0.5f,0.1f,SI(st,0x360));
         spark_timer_restart_sound(self);
@@ -172,16 +172,16 @@ void path_wandering_enemy_update(u8 *self)
         }
         SI(self,0x98)=0; SH(self,0x34)=(SH(self,0x34)|0x41)&0xefff;
         if(SH(self,0x96)>60) {
-            D_L12_0021E180.flags[*(s16 *)(self+0xb2)]=self[0xb0]+2;
+            g_wanderer_flag_table.flags[*(s16 *)(self+0xb2)]=self[0xb0]+2;
             { s32 saveid=self[0xb0];
-            if(saveid==255 || (!(D_L12_001B2CE0[(u8)saveid]&128) && (D_0019B2E8[(u8)saveid+(D_001A79F0_gp<<4)]&128)))
-                D_L12_0021EDF0.flags[*(s16 *)(self+0xb2)]=saveid+2; }
+            if(saveid==255 || (!(g_collected_item_flags[(u8)saveid]&128) && (g_moby_group_flags[(u8)saveid+(D_001A79F0_gp<<4)]&128)))
+                g_object_flags.flags[*(s16 *)(self+0xb2)]=saveid+2; }
             moby_mark_spawned(self); return;
         }
         break;
     case 7:
         FastVecAdd(self+0x10,self+0x10,st+0x2a0);
-        SF(st,0x2a8)-=D_L12_001B20A4*0.00027777778f;
+        SF(st,0x2a8)-=g_wanderer_timer_rate*0.00027777778f;
         spark_timer_restart_sound(self);
         if(IsPointInCuboid(self+0x10,SI(st,0x29c))) {
             f32 len=vec_length_xy(st+0x2a0);
@@ -190,13 +190,13 @@ void path_wandering_enemy_update(u8 *self)
         }
         qcopy(from,self+0x10); from[2]+=0.5f;
         if(coll_test_point(from,0,self,0.5f)) {
-            qcopy(self+0x10,D_L12_001C0270); SF(self,0x18)-=0.5f;
-            vec_scale_to_length(D_L12_001C0270+0x10,D_L12_001C0270+0x10,1.0f);
-            if(FastVecDot(D_L12_001C0270+0x10,st+0x2a0)<0.0f) {
-                vec_fast_normalize(st+0x2a0,st+0x2a0,D_L12_001C0270+0x10);
+            qcopy(self+0x10,g_wanderer_ground_hit); SF(self,0x18)-=0.5f;
+            vec_scale_to_length(g_wanderer_ground_hit+0x10,g_wanderer_ground_hit+0x10,1.0f);
+            if(FastVecDot(g_wanderer_ground_hit+0x10,st+0x2a0)<0.0f) {
+                vec_fast_normalize(st+0x2a0,st+0x2a0,g_wanderer_ground_hit+0x10);
                 FastVecScale(st+0x2a0,st+0x2a0,0.5f);
             }
-            if(SF(D_L12_001C0270,0x18)>=0.95f) {
+            if(SF(g_wanderer_ground_hit,0x18)>=0.95f) {
                 SH(self,0x34)|=0x1000; moby_set_state(self,1,0);
                 qcopy(st+0x150,self+0x10); vec_clear_128(st+0x140);
             choose_path:
@@ -205,14 +205,14 @@ void path_wandering_enemy_update(u8 *self)
         }
         break;
     }
-    if(SI(st,0x2c4)!=-1 && !was0) helper_clear_states(D_L12_001B2E9C+(SI(st,0x2c4)<<8));
-    if(SI(st,0x2c8)!=-1 && !was1) helper_clear_states(D_L12_001B2E9C+(SI(st,0x2c8)<<8));
-    if(!(D_L12_001B29C8&15)) path_find_nearby_point_at_hero_height(self);
+    if(SI(st,0x2c4)!=-1 && !was0) helper_clear_states(g_moby_list_start+(SI(st,0x2c4)<<8));
+    if(SI(st,0x2c8)!=-1 && !was1) helper_clear_states(g_moby_list_start+(SI(st,0x2c8)<<8));
+    if(!(g_frame_l12_counter&15)) path_find_nearby_point_at_hero_height(self);
     if(self[0x31]) {
-        SF(st,0x2bc)=FastAddRotations(SF(st,0x2bc),D_L12_001B20B0*0.00029088825f);
-        SI(self,0x78)=PulseColor(D_L12_001B20B8[0],D_L12_001B20B8[1],SF(st,0x2bc));
+        SF(st,0x2bc)=FastAddRotations(SF(st,0x2bc),g_wanderer_spin_rate*0.00029088825f);
+        SI(self,0x78)=PulseColor(g_wanderer_pulse_colors[0],g_wanderer_pulse_colors[1],SF(st,0x2bc));
     }
     SH(self,0x96)++;
     qcopy(st+0x2d0,self+0x10);
-    value_set_and_smooth(self,(f32 *)(st+0x2e0),D_L12_001B20C8,2,1);
+    value_set_and_smooth(self,(f32 *)(st+0x2e0),g_wanderer_smooth_target,2,1);
 }

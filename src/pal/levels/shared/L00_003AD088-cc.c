@@ -52,9 +52,9 @@ extern void func_002A0F48(void *);
 extern char *g_hero_moby;
 extern int CollLine(void *, void *, int, void *, int);
 extern void vec_fast_normalize(void *, void *, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float,
                           float, int, float, int, int, int, int, int);
-extern void func_PAL_L00_003ACF38(void *, void *, void *, int);
+extern void projectile_damage_nearby_on_hit_pal(void *, void *, void *, int);
 extern void moby_mark_spawned(void *);
 extern int part_alloc_effect_slot(void *, void *, float, float, float);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -123,9 +123,9 @@ char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float s
                 qcopy(moby + 0x10, &ref_L00_003A98E8_0.point);
                 vec_fast_normalize(step, from, &ref_L00_003A98E8_0.normal);
                 vec_scale_to_length(step, step, 0.040000003f);
-                func_PAL_002AC718(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
+                SpawnExplosionEffects_pal(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
                               0x810001);
-                func_PAL_L00_003ACF38(moby, vars, moby + 0x10, 0);
+                projectile_damage_nearby_on_hit_pal(moby, vars, moby + 0x10, 0);
                 moby_mark_spawned(moby);
                 return 0;
             }
@@ -194,7 +194,7 @@ typedef struct {
     ArcVector normal;
 } ArcCollision;
 extern ArcHero g_hero_state;
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern ArcCollision g_collision_result;
 extern void FastVecAdd(void *, void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
@@ -213,7 +213,7 @@ typedef struct {
     unsigned char next[8];
 } PathNode;
 
-extern PathNode D_L00_0023BB78[];
+extern PathNode g_effect_path_node_table[];
 /* func_L00_003B1270 is defined in L00_003A8E28-g8.c. */
 
 /* func_L00_003B14D0 is defined in L00_003A8E28-por.c. */

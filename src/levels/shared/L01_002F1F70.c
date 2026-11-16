@@ -10,7 +10,7 @@ extern void VU1_addGSregister(unsigned int reg, unsigned long value);
 extern int ref_L01_002F1F70_00 __attribute__((sda));
 extern char ref_L01_002F1F70_01[];
 
-extern int D_001A72E0 __attribute__((sda));
+extern int g_vram_zbuffer_address __attribute__((sda));
 
 /* Sets up the drawing state for effects by running three setup routines and writing two graphics chip registers. */
 void gfx_init_effect_draw_state(void)
@@ -20,5 +20,5 @@ void gfx_init_effect_draw_state(void)
     gfx_update_all_view_transforms();
     gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
-    VU1_addGSregister(0x4E, 0x01000000 | (D_001A72E0 >> 13));
+    VU1_addGSregister(0x4E, 0x01000000 | (g_vram_zbuffer_address >> 13));
 }

@@ -13,10 +13,10 @@ typedef struct {
     int activity;
 } PlayerView;
 extern unsigned char g_hero_state[];
-extern int D_L24_001AEBB8 __attribute__((sda));
-extern int D_L24_001AEBBC __attribute__((sda));
-extern int D_L24_001A8F00;
-extern unsigned int D_00138324 __attribute__((nosda));
+extern int g_prompt_angle_a __attribute__((sda));
+extern int g_prompt_angle_b __attribute__((sda));
+extern int g_prompt_hidden_flag;
+extern unsigned int g_pad_held_flags __attribute__((nosda));
 extern void moby_set_state(unsigned char *, unsigned char, int);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern float vec_distance_xy(void *, void *);
@@ -26,7 +26,7 @@ extern float FastDiffRots(float, float);
 extern int TryClaimNotice(int, int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 
-void func_US2_L24_0037AE10(unsigned char *object)
+void interact_prompt_update_us2(unsigned char *object)
 {
     unsigned int permitted;
     int selected;
@@ -39,7 +39,7 @@ void func_US2_L24_0037AE10(unsigned char *object)
         permitted = 1;
         selected = 0;
         math_store_angle_update_result((char *)object, animation,
-                          D_L24_001AEBB8, D_L24_001AEBBC, 0.043633237f);
+                          g_prompt_angle_a, g_prompt_angle_b, 0.043633237f);
         if (((PlayerView *)g_hero_state)->activity && ((PlayerView *)g_hero_state)->mode != 3) {
             if (((PlayerView *)g_hero_state)->activity != 1) permitted = 0;
         }
@@ -52,13 +52,13 @@ void func_US2_L24_0037AE10(unsigned char *object)
             permitted = 0;
         if (((PlayerView *)g_hero_state)->mode == 0x1c || ((PlayerView *)g_hero_state)->mode == 0x31) permitted = 0;
         if (permitted) selected = TryClaimNotice(1, 0x12EB, 1) != 0;
-        if ((D_00138324 & 0x10) && selected) {
+        if ((g_pad_held_flags & 0x10) && selected) {
             request_begin_slot(5, 1, (int)object, 0, 0);
             object[0x20] = 2;
         }
         break;
     case 2:
-        if (!D_L24_001A8F00) object[0x20] = 1;
+        if (!g_prompt_hidden_flag) object[0x20] = 1;
         break;
     }
 }

@@ -7,8 +7,8 @@
 
 typedef unsigned int u128 __attribute__((mode(TI)));
 
-extern f32 D_L01_001AF86C __attribute__((sda));
-extern u8 *D_L01_001B9510 __attribute__((nosda));
+extern f32 g_vehicle_beam_offset_length __attribute__((sda));
+extern u8 *g_vehicle_beam_object __attribute__((nosda));
 extern void vec_scale_to_length(u8 *, u8 *, f32);
 extern void FastVecAdd(u8 *, u8 *, u8 *);
 extern void FastVecSub(u8 *, u8 *, u8 *);
@@ -24,11 +24,11 @@ void gfx_draw_vehicle_beam(u8 *object)
     u128 offset[1];
 
     qcopy(start, object + 0x10);
-    vec_scale_to_length((u8 *)offset, object + 0xE0, D_L01_001AF86C);
+    vec_scale_to_length((u8 *)offset, object + 0xE0, g_vehicle_beam_offset_length);
     FastVecAdd((u8 *)start, (u8 *)start, (u8 *)offset);
     FastVecSub((u8 *)start, (u8 *)start, object + 0xC0);
     qcopy(end, object + 0xF0);
-    if (*(s16 *)(D_L01_001B9510 + 0x86) != 5) {
+    if (*(s16 *)(g_vehicle_beam_object + 0x86) != 5) {
         SetCamera5Pose((u8 *)start, (u8 *)end, 0, 0, 0);
     } else {
         object_copy_vector_to_selected((u8 *)start);

@@ -1,33 +1,33 @@
 #include "include_asm.h"
 #include "names.h"
-extern unsigned char D_001A7B9E __attribute__((sda));
-extern unsigned char D_001A7BBA __attribute__((sda));
+extern unsigned char g_option_flag_a __attribute__((sda));
+extern unsigned char g_option_flag_b __attribute__((sda));
 
 extern int prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_00432D98(char *object)
+char *menu_init_page_record_a_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_004331D8(char *object)
+char *menu_init_page_record_b_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_00433490(char *object)
+char *menu_init_page_record_c_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_00433A18(char *object)
+char *menu_init_page_record_d_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
@@ -36,11 +36,11 @@ char *func_US2_L00_00433A18(char *object)
 extern void func_0033AE28_2(char *p);
 extern void func_L00_00430948_3(char *p, float a, float b);
 extern int func_002E5E58_3(int a, int b, int c);
-extern volatile unsigned char D_001A7B95 __attribute__((sda));
-extern volatile unsigned char D_001A7B94 __attribute__((sda));
+extern volatile unsigned char g_toggle_option_a __attribute__((sda));
+extern volatile unsigned char g_subtitles_option __attribute__((sda));
 
 /* makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word */
-int func_US2_L00_00433B78(char *a0, int a1)
+int menu_handle_page_input_a_us2(char *a0, int a1)
 {
     char *p = a0 + 8;
     float *q;
@@ -61,10 +61,10 @@ int func_US2_L00_00433B78(char *a0, int a1)
         func_002E5E58_3(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_001A7B95 = D_001A7B95 == 0;
+            g_toggle_option_a = g_toggle_option_a == 0;
             break;
         case 1:
-            D_001A7B94 = D_001A7B94 == 0;
+            g_subtitles_option = g_subtitles_option == 0;
             break;
         }
     }
@@ -72,24 +72,24 @@ int func_US2_L00_00433B78(char *a0, int a1)
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_004344A0(char *object)
+char *menu_init_page_record_e_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
 }
 
-extern void func_US2_0033BE70 (char *object);
+extern void prompt_bar_update_us2 (char *object);
 extern void mem_store_two_floats_through_cell (char *object, float x, float y);
 extern int snd_play_from_global_bank (int a, int b, int c);
 
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
-int func_US2_L00_00434600 (char *object, int flags)
+int menu_handle_page_input_b_us2 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7B9E;
+  unsigned char *g = &g_option_flag_a;
   float *vec;
   int discarded;
 
-  func_US2_0033BE70 (object + 8);
+  prompt_bar_update_us2 (object + 8);
   vec = *(float **) (object + 732);
   mem_store_two_floats_through_cell (object + 8, vec[0], vec[1]);
 
@@ -105,7 +105,7 @@ int func_US2_L00_00434600 (char *object, int flags)
 
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_US2_L00_00434768(char *object)
+char *menu_init_page_record_f_us2(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
@@ -168,7 +168,7 @@ extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 int func_US2_L00_00434C98 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -200,7 +200,7 @@ char *func_US2_L00_00434DE8(char *object)
 
 int func_US2_L00_00434F48 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -232,7 +232,7 @@ char *func_US2_L00_00434FE0(char *object)
 
 int func_US2_L00_00435140 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -251,11 +251,11 @@ int func_US2_L00_00435140 (char *object, int flags)
 }
 
 
-extern void *func_US2_0033BB98(void *);
+extern void *prompt_bar_destroy_us2(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_US2_L00_004351D8(char *object) {
-    func_US2_0033BB98(object + 0x8);
+    prompt_bar_destroy_us2(object + 0x8);
     menu_pass_through_handle(object + 0x2E0);
     return object;
 }
@@ -264,7 +264,7 @@ void *func_US2_L00_004351D8(char *object) {
 extern void *cam_init_object_table_d(void *);
 
 void *func_US2_L00_004354E8(char *object) {
-    func_US2_0033BB98(object + 0x8);
+    prompt_bar_destroy_us2(object + 0x8);
     cam_init_object_table_d(object + 0x2E0);
     return object;
 }
@@ -272,7 +272,7 @@ void *func_US2_L00_004354E8(char *object) {
 
 extern void prompt_bar_draw(char *p);
 
-void func_US2_L00_00435688(char *p)
+void menu_get_sub_object_value_us2(char *p)
 {
     prompt_bar_draw(p + 8);
 }

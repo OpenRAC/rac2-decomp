@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern float D_L05_001AFCB8 __attribute__((sda));
-extern char *D_L05_001B3018[] MACRO_ADDR;
-extern int D_L05_001B3030[] MACRO_ADDR;
-extern int D_L05_001B2FA0[] MACRO_ADDR;
-extern int D_L05_001B2048 MACRO_ADDR;
+extern float g_effect_slot_state __attribute__((sda));
+extern char *g_spawned_effect_mobys[] MACRO_ADDR;
+extern int g_spawned_effect_times[] MACRO_ADDR;
+extern int g_glow_effect_blends[] MACRO_ADDR;
+extern int g_feltzin_mission_index MACRO_ADDR;
 extern void moby_mark_spawned(void *object);
 extern unsigned char *CreateMoby(int type);
 
@@ -24,28 +24,28 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
     unsigned char *object;
     char *state;
 
-    if (D_L05_001AFCB8 == -1.0f) {
+    if (g_effect_slot_state == -1.0f) {
         for (i = 4; i >= 0; i--)
-            D_L05_001B3018[i] = 0;
-        D_L05_001AFCB8 = 0.0f;
+            g_spawned_effect_mobys[i] = 0;
+        g_effect_slot_state = 0.0f;
     }
-    if (D_L05_001AFCB8 >= 5.0f) {
+    if (g_effect_slot_state >= 5.0f) {
         if (evict) {
-            now = D_L05_001B2048;
+            now = g_feltzin_mission_index;
             oldest = 0;
             selected = -1;
             for (i = 0; i < 5; i++) {
-                age = now - D_L05_001B3030[i];
+                age = now - g_spawned_effect_times[i];
                 if (age > oldest) {
                     oldest = age;
                     selected = i;
                 }
             }
             if (selected >= 0) {
-                moby_mark_spawned(D_L05_001B3018[selected]);
-                D_L05_001B3018[selected] = 0;
-                D_L05_001B2FA0[selected] = 0;
-                D_L05_001AFCB8 -= 1.0f;
+                moby_mark_spawned(g_spawned_effect_mobys[selected]);
+                g_spawned_effect_mobys[selected] = 0;
+                g_glow_effect_blends[selected] = 0;
+                g_effect_slot_state -= 1.0f;
             } else {
                 return 0;
             }
@@ -53,7 +53,7 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
             return 0;
         }
     }
-    for (i = 0; i < 5 && D_L05_001B3018[i] != 0; i++) {}
+    for (i = 0; i < 5 && g_spawned_effect_mobys[i] != 0; i++) {}
     object = CreateMoby(0x986);
     if (object) {
         state = *(char **)(object + 0x68);
@@ -62,9 +62,9 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
         *(int *)(state + 8) = value;
         *(int *)state = i;
         qcopy(object + 0x10, position);
-        D_L05_001B3018[i] = (char *)object;
-        D_L05_001B3030[i] = D_L05_001B2048;
-        D_L05_001AFCB8 += 1.0f;
+        g_spawned_effect_mobys[i] = (char *)object;
+        g_spawned_effect_times[i] = g_feltzin_mission_index;
+        g_effect_slot_state += 1.0f;
     }
     return object;
 }

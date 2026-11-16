@@ -22,7 +22,7 @@ extern void moby_scale_owner_words_by_angles(float, float, char *, char *, float
 extern void func_PAL_002AC3C0(char *, char *);
 extern int FastDecTimer(void *);
 
-void func_PAL_00319768(char *object)
+void flyer_tick_timers_pal(char *object)
 {
     char *data = *(char **)(object + 0x68);
     func_PAL_002AC3C0(object, data + 0x50);

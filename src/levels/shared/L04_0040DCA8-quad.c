@@ -18,7 +18,7 @@ extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern void transform_vector(void *, void *, void *);
 extern void VU1_addGSregister(int, unsigned long long);
 extern void draw_world_quad(void *, int, int);
-extern char D_L04_001B9680[], D_0018A0E0[];
+extern char g_tether_zero_vec[], g_hero_state_block[];
 /* Draws a flat glowing sprite that faces the camera at a position. It can be turned by an angle and squashed. */
 void gfx_l04_draw_billboard_sprite(B781AimQuad *position, int texture, int color, int flags, float scale, float size, float angle, float skew)
 {
@@ -52,9 +52,9 @@ void gfx_l04_draw_billboard_sprite(B781AimQuad *position, int texture, int color
         }
     }
     qcopy(transform[3], position);
-    FastVecSub(transform[0], D_L04_001B9680, transform[3]);
+    FastVecSub(transform[0], g_tether_zero_vec, transform[3]);
     vec_scale_to_length(transform[0], transform[0], 1.0f);
-    FastVecCross(transform[1], transform[0], D_0018A0E0);
+    FastVecCross(transform[1], transform[0], g_hero_state_block);
     vec_scale_to_length(transform[1], transform[1], 1.0f);
     FastVecCross(transform[2], transform[1], transform[0]);
     FastVecScale(scratch.angles, transform[0], size);

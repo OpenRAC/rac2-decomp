@@ -10,7 +10,7 @@ extern double dpmul(double, double) __asm__("func_00122B00");
 extern double dpdiv(double, double) __asm__("func_00122DA8");
 extern unsigned long __fixunsdfdi(double);
 extern int printf_double_to_digits(unsigned long);
-extern void (*D_00134698)(int);
+extern void (*g_printf_putc_callback)(int);
 extern void printf_formatted(const char *, ...);
 
 /* Prints a decimal number in the form 0.123e+4. */
@@ -20,7 +20,7 @@ void printf_float_exponent(double value)
     int digits;
     if (value < 0.0) {
         value = -value;
-        D_00134698('-');
+        g_printf_putc_callback('-');
     }
     if (value < 0.1) {
         while (value < 0.1) {

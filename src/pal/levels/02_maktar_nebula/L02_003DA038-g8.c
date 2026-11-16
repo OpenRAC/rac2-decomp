@@ -5,20 +5,20 @@ extern void transform_vector(void *, void *, void *);
 extern void moby_transform_joint_point(char *, int, void *);
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern int math_random_int_below(int);
-extern float D_L02_001B02C0[4] SDATA(D_L02_001B02C0);
-extern float D_L02_001B0200[4] SDATA(D_L02_001B0200);
-extern float D_L02_001B02D0 __attribute__((sda));
-extern float D_L02_001B02D4 __attribute__((sda));
-extern float D_L02_001B02A8 __attribute__((sda));
-extern float D_L02_001B02AC __attribute__((sda));
-extern int D_L02_001B02B0 __attribute__((sda));
-extern char D_L02_001B0290[] SDATA(D_L02_001B0290);
-extern float D_L02_001B01EC __attribute__((sda));
-extern float D_L02_001B01F0 __attribute__((sda));
-extern int D_L02_001B01F4 __attribute__((sda));
-extern float D_L02_001B0214 __attribute__((sda));
-extern char D_L02_001B0230[] SDATA(D_L02_001B0230);
-extern char D_L02_001B0260[] SDATA(D_L02_001B0260);
+extern float g_chainblade_debris_offset_a[4] SDATA(D_L02_001B02C0);
+extern float g_chainblade_debris_offset_b[4] SDATA(D_L02_001B0200);
+extern float g_chainblade_debris_delta_length __attribute__((sda));
+extern float g_chainblade_debris_jitter_b __attribute__((sda));
+extern float g_chainblade_burst_speed_base __attribute__((sda));
+extern float g_chainblade_burst_speed_range __attribute__((sda));
+extern int g_chainblade_burst_particle_count __attribute__((sda));
+extern char g_chainblade_spawn_record_c[] SDATA(D_L02_001B0290);
+extern float g_chainblade_debris_speed_base __attribute__((sda));
+extern float g_chainblade_debris_speed_range __attribute__((sda));
+extern int g_chainblade_debris_count_scale __attribute__((sda));
+extern float g_chainblade_debris_jitter_a __attribute__((sda));
+extern char g_chainblade_spawn_record_a[] SDATA(D_L02_001B0230);
+extern char g_chainblade_spawn_record_b[] SDATA(D_L02_001B0260);
 extern char g_camera_l02_position[];
 extern float FastVecLength(void *);
 extern float math_random_float_range(float, float);
@@ -35,7 +35,7 @@ extern void *enemy_spawn_record(void *, void *, void *, int, int);
  * strength-scaled number of particle pairs. The random term is an argument of each velocity
  * call, as in retail: hoisted into its own statement, the second loop's preheader copies swap
  * places. */
-void func_PAL_L02_003DA038(char *self, int joint, int mirror) {
+void SpawnJointParticleBursts_pal(char *self, int joint, int mirror) {
     float origin[4] __attribute__((aligned(16)));
     float matrix[16] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -53,8 +53,8 @@ void func_PAL_L02_003DA038(char *self, int joint, int mirror) {
                math_random_float_range(0.0f, 0.1f);
     if (strength > 1.0f) strength = 1.0f;
     else if (strength < 0.0f) strength = 0.0f;
-    qcopy(offset_a, D_L02_001B02C0);
-    qcopy(offset_b, D_L02_001B0200);
+    qcopy(offset_a, g_chainblade_debris_offset_a);
+    qcopy(offset_b, g_chainblade_debris_offset_b);
     if (mirror) {
         offset_a[1] = -offset_a[1];
         offset_b[1] = -offset_b[1];
@@ -63,27 +63,27 @@ void func_PAL_L02_003DA038(char *self, int joint, int mirror) {
     FastVecAdd(position, position, origin);
     FastVecSub(delta, g_camera_l02_position, position);
     delta[2] = 0.0f;
-    vec_scale_to_length(delta, delta, D_L02_001B02D0);
+    vec_scale_to_length(delta, delta, g_chainblade_debris_delta_length);
     FastVecAdd(position, position, delta);
-    for (i = 0; i < D_L02_001B02B0; i++) {
+    for (i = 0; i < g_chainblade_burst_particle_count; i++) {
         vec_scale_to_length(velocity, direction,
-                      -((D_L02_001B02A8 + math_random_float_range(0.0f, strength * D_L02_001B02AC)) *
+                      -((g_chainblade_burst_speed_base + math_random_float_range(0.0f, strength * g_chainblade_burst_speed_range)) *
                         0.020000001f));
-        vec_add_random_offset(position, D_L02_001B02D4);
-        enemy_spawn_record(position, velocity, D_L02_001B0290, math_random_int_below(2), 1);
+        vec_add_random_offset(position, g_chainblade_debris_jitter_b);
+        enemy_spawn_record(position, velocity, g_chainblade_spawn_record_c, math_random_int_below(2), 1);
     }
     transform_vector(position, offset_b, matrix);
     FastVecAdd(position, position, origin);
-    for (i = 0; (float)i < strength * (float)D_L02_001B01F4 + 2.0f; i++) {
+    for (i = 0; (float)i < strength * (float)g_chainblade_debris_count_scale + 2.0f; i++) {
         vec_scale_to_length(velocity, direction,
-                      -((D_L02_001B01EC + math_random_float_range(0.0f, strength * D_L02_001B01F0)) *
+                      -((g_chainblade_debris_speed_base + math_random_float_range(0.0f, strength * g_chainblade_debris_speed_range)) *
                         0.020000001f));
-        vec_add_random_offset(position, D_L02_001B0214);
-        enemy_spawn_record(position, velocity, D_L02_001B0230, math_random_int_below(2), 1);
+        vec_add_random_offset(position, g_chainblade_debris_jitter_a);
+        enemy_spawn_record(position, velocity, g_chainblade_spawn_record_a, math_random_int_below(2), 1);
         vec_scale_to_length(velocity, direction,
-                      -((D_L02_001B01EC + math_random_float_range(0.0f, strength * D_L02_001B01F0)) *
+                      -((g_chainblade_debris_speed_base + math_random_float_range(0.0f, strength * g_chainblade_debris_speed_range)) *
                         0.020000001f));
-        vec_add_random_offset(position, D_L02_001B0214);
-        enemy_spawn_record(position, velocity, D_L02_001B0260, math_random_int_below(2), 1);
+        vec_add_random_offset(position, g_chainblade_debris_jitter_a);
+        enemy_spawn_record(position, velocity, g_chainblade_spawn_record_b, math_random_int_below(2), 1);
     }
 }

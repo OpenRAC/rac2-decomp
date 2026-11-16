@@ -22,7 +22,7 @@ extern int moby_turn_toward_target_and_step(char *, float *, float);
 extern void moby_set_state(unsigned char *, int, int);
 extern float func_L00_002EE290(void *);
 extern void vec_fast_normalize(void *, void *, void *);
-extern Vector128 D_L18_001BFC40;
+extern Vector128 g_normalize_scratch_vec;
 
 /* Moves an enemy depending on its current move type, such as walking, turning or being knocked back. */
 void enemy_update_move_by_type(char *object)
@@ -108,7 +108,7 @@ void enemy_update_move_by_type(char *object)
             (*(short *)(state + 0x294))++;
             position = object + 0x10;
             FastVecAdd(position, position, state + 0x170);
-            vec_fast_normalize(velocity, local, &D_L18_001BFC40);
+            vec_fast_normalize(velocity, local, &g_normalize_scratch_vec);
             FastVecScale(velocity, velocity, 0.8f);
             FastVecAdd(position, position, velocity);
         }

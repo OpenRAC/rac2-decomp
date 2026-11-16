@@ -50,7 +50,7 @@ extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_a(float);
 extern void FastVecAdd(void *, void *, void *);
 extern u8 g_sound_state[];
-extern MoverTarget *D_L01_001B264C __attribute__((sda));
+extern MoverTarget *g_swamp_patrol_positions __attribute__((sda));
 extern void moby_set_state(void *, int, int);
 extern void snd_stop_voice(int);
 extern int snd_play_from_class_bank(int, int, void *, int);
@@ -59,7 +59,7 @@ extern float math_move_angle_toward_target(float, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void func_PAL_L01_00322798(void *, void *, int);
+extern void glow_flicker_update_pal(void *, void *, int);
 
 #define CLEAR_SOUND() { \
     int id = state->sound; \
@@ -185,5 +185,5 @@ void func_PAL_L01_003B5970(MoverObject *object)
         FastVecSub(delta, object->pos, oldpos);
         mat_combine_and_store(state->motion, delta, oldrot, object->rot);
     }
-    func_PAL_L01_00322798(object, state->tailAC, object->mode >= 2);
+    glow_flicker_update_pal(object, state->tailAC, object->mode >= 2);
 }

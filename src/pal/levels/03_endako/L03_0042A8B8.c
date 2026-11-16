@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_L03_001B2A38[] __attribute__((sda));
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u16 *D_L03_001FB5A0[];
+extern s32 g_object_group_count[] __attribute__((sda));
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u16 *g_entity_id_lists[];
 extern void moby_mark_spawned(void *);
 extern float math_fast_float_g(float);
 extern float FastAddRotations(float, float);
@@ -29,17 +29,17 @@ void func_PAL_L03_0042A8B8(u8 *a0)
 
     switch (a0[0x20]) {
     case 0:
-        if (GROUP >= D_L03_001B2A38[0] || D_L03_001FB5A0[GROUP] == 0 || GROUP == -1) {
+        if (GROUP >= g_object_group_count[0] || g_entity_id_lists[GROUP] == 0 || GROUP == -1) {
             moby_mark_spawned(a0);
         } else {
             *(f32 *)(state + 4) = -0.062831864f;
             *(f32 *)(state + 8) = *(f32 *)(state + 8) * 0.017453294f;
             a0[0x30] = 0xFF;
-            for (p = D_L03_001FB5A0[GROUP];
-                 (GROUP & 0xFF) != 0xFF && GROUP <= D_L03_001B2A38[0] && p != 0 &&
-                 ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[GROUP]);
+            for (p = g_entity_id_lists[GROUP];
+                 (GROUP & 0xFF) != 0xFF && GROUP <= g_object_group_count[0] && p != 0 &&
+                 ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[GROUP]);
                  p++) {
-                e = D_L03_001B2A1C[0] + ((*p & 0x7FFF) << 8);
+                e = g_moby_record_base[0] + ((*p & 0x7FFF) << 8);
                 if (e == 0)
                     break;
                 *(u16 *)(e + 0x34) |= 0x10;
@@ -54,11 +54,11 @@ void func_PAL_L03_0042A8B8(u8 *a0)
         }
         break;
     case 1:
-        for (p = D_L03_001FB5A0[GROUP];
-             (GROUP & 0xFF) != 0xFF && GROUP <= D_L03_001B2A38[0] && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[GROUP]);
+        for (p = g_entity_id_lists[GROUP];
+             (GROUP & 0xFF) != 0xFF && GROUP <= g_object_group_count[0] && p != 0 &&
+             ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[GROUP]);
              p++) {
-            e = D_L03_001B2A1C[0] + ((*p & 0x7FFF) << 8);
+            e = g_moby_record_base[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
                 break;
             s0 = *(u8 **)(e + 0x68);

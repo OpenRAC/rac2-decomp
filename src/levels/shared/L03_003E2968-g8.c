@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern int D_0024A7B0[14][6];
-extern int D_L03_001B0B50 __attribute__((sda));
+extern int g_path_puzzle_adjacency[14][6];
+extern int g_path_puzzle_step_count __attribute__((sda));
 extern int math_random_int_below(int);
 
 typedef struct {
@@ -34,7 +34,7 @@ void path_puzzle_generate_route(u8 *moby) {
         break;
     }
 
-    while (count < D_L03_001B0B50) {
+    while (count < g_path_puzzle_step_count) {
         start = math_random_int_below(count);
         old = count;
         inserted = 0;
@@ -42,7 +42,7 @@ void path_puzzle_generate_route(u8 *moby) {
             a = (start + i) % count;
             b = (start + i + 1) % count;
             for (j = 0; j < 6; j++) {
-                n = D_0024A7B0[state->path[a]][j];
+                n = g_path_puzzle_adjacency[state->path[a]][j];
                 if (n == -1)
                     break;
                 found = 0;
@@ -52,7 +52,7 @@ void path_puzzle_generate_route(u8 *moby) {
                 if (found)
                     continue;
                 for (k = 0; k < 6; k++) {
-                    if (D_0024A7B0[n][k] == state->path[b]) {
+                    if (g_path_puzzle_adjacency[n][k] == state->path[b]) {
                         for (shift = count - 1; shift > a; shift--)
                             state->path[shift + 1] = state->path[shift];
                         state->path[a + 1] = n;
@@ -68,7 +68,7 @@ void path_puzzle_generate_route(u8 *moby) {
                 break;
         }
         if (old == count) {
-            D_L03_001B0B50 = count;
+            g_path_puzzle_step_count = count;
             break;
         }
     }

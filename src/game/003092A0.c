@@ -44,7 +44,7 @@ typedef struct {
     V_4198 *v;
 } O_4198;
 extern G_4198 g_hero_state;
-extern s32 D_00138320;
+extern s32 g_pad_pressed_flags;
 extern s32 stub_empty_29(s32), math_fast_float_d(void *);
 extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
 extern void draw_joint_aligned_beam_effect(void), beam_spawn_trail_particles(void *);
@@ -64,7 +64,7 @@ void beam_effect_update(void *p) {
                     && (&g_hero_state)->fC38 >= 6.0f && (&g_hero_state)->fC38 <= 16.0f)) {
                 if (!(&g_hero_state)->i49E) want_active = 1;
             }
-            if ((&g_hero_state)->i2294 == 0x82 && (D_00138320 & 0x40)) want_active = 1;
+            if ((&g_hero_state)->i2294 == 0x82 && (g_pad_pressed_flags & 0x40)) want_active = 1;
             if ((&g_hero_state)->i2294 == 0x10) {
                 if ((&g_hero_state)->i1B8 < 44) {
                     want_active = 1;

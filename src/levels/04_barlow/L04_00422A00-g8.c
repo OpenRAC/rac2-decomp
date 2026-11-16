@@ -19,8 +19,8 @@ extern void coll_world_pos_to_grid_cell(void *input, int *out_x, int *out_y);
 extern int part_l00_alloc_effect_slot(s32 a0, u16 a1, u16 a2, s32 a3, s32 a4, s32 a5, f32 *a6);
 extern s32 g_screen_width __attribute__((sda));
 extern s32 g_screen_height;
-extern f32 D_L04_001B31EC __attribute__((sda));
-extern char D_L04_001B9680[];
+extern f32 g_race_float_extra __attribute__((sda));
+extern char g_tether_zero_vec[];
 
 /* Projects the object into the screen, and while its position is inside the
    view asks the level's cursor helper to follow it. */
@@ -86,12 +86,12 @@ void tribesman_flag_group(u8 *object) {
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern u16 **D_L04_001A9014;
-extern u8 *D_L04_001B2B54;
-extern u8 D_L04_001B17E0[8] __attribute__((sda));
-extern u8 D_L04_001B17D8[8] __attribute__((sda));
-extern u8 D_L04_001B17D0[8] __attribute__((sda));
-extern s32 D_L04_001B1800 __attribute__((sda));
+extern u16 **g_light_id_lists;
+extern u8 *g_light_record_table;
+extern u8 g_barlow_burst_scatter_a[8] __attribute__((sda));
+extern u8 g_barlow_burst_scatter_b[8] __attribute__((sda));
+extern u8 g_barlow_burst_scatter_c[8] __attribute__((sda));
+extern s32 g_barlow_burst_scatter_param __attribute__((sda));
 
 extern void moby_set_state(void *a0, s32 a1, s32 a2);
 extern void *part_find_owned_effect_slot(void *a0, s32 a1, s32 a2);
@@ -106,13 +106,13 @@ extern void SpawnExplosionEffects(void *o, void *a, void *b, f32 f0, f32 f1, s32
                           s32 i7, s32 i8);
 extern void moby_mark_spawned(void *a0);
 
-extern s32 D_L04_001A8F00;
-extern u8 D_001A7A40;
-extern u8 D_L04_001B1DE0;
-extern u8 D_L04_001B1DE1;
-extern f32 D_L04_001B1E00;
-extern f32 D_L04_001B1E04;
-extern f32 D_L04_001B1E08;
+extern s32 g_game_l04_mode;
+extern u8 g_unlocked_item_flags;
+extern u8 g_effect_reset_byte_a;
+extern u8 g_effect_reset_byte_b;
+extern f32 g_effect_scale_x;
+extern f32 g_effect_scale_y;
+extern f32 g_effect_scale_z;
 extern void func_3325E0(void *a0, void *a1, void *a2);
 
 /* func_L04_004389C0 reads D_001A79F0 through $gp; it is in
@@ -126,7 +126,7 @@ typedef struct {
     u32 *entries[16];
 } L04Base004;
 
-extern L04Base004 D_L04_001BD380;
+extern L04Base004 g_conversation_entry_list;
 
 /* Walks the level's list of objects and, for the one with the object's own id, asks the
    level's helper to clear it and sets the level's three timers. */
@@ -134,16 +134,16 @@ void conversation_clear_target_on_talk(u8 *object) {
     u32 *entry;
     s32 i;
 
-    if (D_L04_001A8F00 == 2) {
-        if (D_001A7A40 != 0) {
-            for (i = 0; i < D_L04_001BD380.count; i++) {
-                entry = D_L04_001BD380.entries[i];
+    if (g_game_l04_mode == 2) {
+        if (g_unlocked_item_flags != 0) {
+            for (i = 0; i < g_conversation_entry_list.count; i++) {
+                entry = g_conversation_entry_list.entries[i];
                 if (*(s16 *)((u8 *)entry + 0xAA) == *(s16 *)(object + 0xAA)) {
-                    if (D_L04_001B1DE1 == 0) {
-                        func_3325E0(entry, 0, &D_L04_001B1DE0);
-                        D_L04_001B1E00 = 2.75f;
-                        D_L04_001B1E04 = 2.75f;
-                        D_L04_001B1E08 = 2.75f;
+                    if (g_effect_reset_byte_b == 0) {
+                        func_3325E0(entry, 0, &g_effect_reset_byte_a);
+                        g_effect_scale_x = 2.75f;
+                        g_effect_scale_y = 2.75f;
+                        g_effect_scale_z = 2.75f;
                     }
                 }
             }
@@ -176,8 +176,8 @@ void barlow_effect_burst_update(u8 *object)
         object[0xA8] = 0xFF;
         break;
     case 2:
-        ScatterObjectPieces(object, D_L04_001B17E0, D_L04_001B17D8, D_L04_001B17D0, 0x7F, 0,
-                          D_L04_001B1800, 1, 0xFFFF, 0xFF, 0);
+        ScatterObjectPieces(object, g_barlow_burst_scatter_a, g_barlow_burst_scatter_b, g_barlow_burst_scatter_c, 0x7F, 0,
+                          g_barlow_burst_scatter_param, 1, 0xFFFF, 0xFF, 0);
         part_spawn_scaled_bolts(object, 5, 0.0f);
         *(TI128 *)A = 0;
         A[2] = 0.16666667f;
@@ -189,11 +189,11 @@ void barlow_effect_burst_update(u8 *object)
         SpawnExplosionEffects(object, A, B, 0.0f, 0.0f, 5, 1, 1, 0.0f, 0.0f, 9.0f, 2.25f, -1, 0.0f, 0, 0, -1,
                       2, 0x810001);
         if (*(s32 *)(state + 4) != 0) {
-            for (idPtr = D_L04_001A9014[*(s32 *)(state + 4)];
+            for (idPtr = g_light_id_lists[*(s32 *)(state + 4)];
                  idPtr != 0 &&
-                 ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == D_L04_001A9014[*(s32 *)(state + 4)]);
+                 ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_light_id_lists[*(s32 *)(state + 4)]);
                  idPtr++) {
-                entity = D_L04_001B2B54 + ((*idPtr & 0x7FFF) << 5);
+                entity = g_light_record_table + ((*idPtr & 0x7FFF) << 5);
                 if (entity == 0)
                     break;
                 entity[0x1E] |= 4;

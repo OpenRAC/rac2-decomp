@@ -2,10 +2,10 @@
 
 /* func_PAL_0029C2A8, PAL's func_0029B910: the same C, where the menu offset
  * 0x3F138 becomes 0x3F860 and the store of the item id is gone. */
-extern int D_001A9AC8[4] __attribute__((sda));
-extern char *D_001A8CFC MACRO_ADDR;
+extern int g_mission_menu_ids[4] __attribute__((sda));
+extern char *g_resident_data_base MACRO_ADDR;
 extern int table_find_last_used_entry(int);
-extern void func_PAL_0033C8F8(char *, int, int);
+extern void circle_menu_set_entry_mode_pal(char *, int, int);
 
 /* Mission record table entry (0x28 bytes). */
 typedef struct {
@@ -34,19 +34,19 @@ typedef struct {
 extern MissionRecord g_mission_records[];
 extern MissionMenuItem g_mission_menu_items[];
 
-void func_PAL_0029C2A8(void) {
+void RefreshMissionMenuItems_pal(void) {
     int i;
     int *ids;
-    if (D_001A8CFC != 0) {
-        ids = D_001A9AC8;
+    if (g_resident_data_base != 0) {
+        ids = g_mission_menu_ids;
         for (i = 0; i < 4; i++) {
             int idx = table_find_last_used_entry(ids[i]);
             if (idx >= 0) {
                 g_mission_menu_items[i].second = g_mission_records[idx].count;
                 g_mission_menu_items[i].color = g_mission_records[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
-                func_PAL_0033C8F8(D_001A8CFC + 0x3F860, i, 0);
+                circle_menu_set_entry_mode_pal(g_resident_data_base + 0x3F860, i, 0);
             } else {
-                func_PAL_0033C8F8(D_001A8CFC + 0x3F860, i, 2);
+                circle_menu_set_entry_mode_pal(g_resident_data_base + 0x3F860, i, 2);
             }
         }
     }

@@ -11,9 +11,9 @@ typedef union { Quad q; float f[4]; int i[4]; } Vec;
 extern char ref_L04_00400EE0_00[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_race_time_ticks __attribute__((sda));
-extern u8 D_001A7A40[] __attribute__((sda));
-extern float D_L04_001BFB00[];
-extern char D_L04_001A8F20[] __attribute__((sda));
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
+extern float g_scratch_direction_quad[];
+extern char g_effect_default_params[] __attribute__((sda));
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int GetCollHitMaterial(void);
 extern void set_identity_matrix(float *);
@@ -57,7 +57,7 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern u8 *func_PAL_L04_0040B520(u8 *, int, Vec *, u8 *, int, int, float, Vec *, char *, float, char *);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 /* Struct views for the rider lookup: retail schedules these loads as struct-field accesses
  * (no alias with the stack slot of `flag`), unlike plain pointer casts. */
 typedef struct { u8 pad[0x68]; u8 *rider; } TrackTarget;
@@ -247,7 +247,7 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
             *(Quad *)(bike + 0xD0) = delta.q;
         }
     }
-    if (D_001A7A40[7] != 0) F(0x2C0) = 2.5f;
+    if (g_unlocked_item_flags[7] != 0) F(0x2C0) = 2.5f;
     else F(0x2C0) = 1.0f;
     if (P(0x8C) != 0) moby_update_eased_node(P(0x8C), bike + 0x250, 0, 0.115200005f, 0.72f);
     if (!math_fast_float_d(bike + 0x178)) {
@@ -325,7 +325,7 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
             math_fast_float_d(bike + 0x148);
             if (I(0x148) == 0) bike[0xA4] = 0;
         } else if (bike[0xA5] == 0) {
-            vec_scale_to_length(v40.f, D_L04_001BFB00, 1.0f);
+            vec_scale_to_length(v40.f, g_scratch_direction_quad, 1.0f);
             mat_aim_with_spring(object + 0xC0, object + 0xF0, bike + 0x12C, &v40, 0.03f, 0.3f, 0.0f);
         } else {
             vec_build_spherical_offset(v40.f, 1.0f, FastAddRotations(OF(0xF8), 3.14159274f), 0.87266469f);
@@ -401,21 +401,21 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
         FastVecScale(v60.f, v60.f, math_random_float_range(0.7f, 1.0f));
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3D, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        func_PAL_L04_0040B520(object, 0xB3D, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3E, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        func_PAL_L04_0040B520(object, 0xB3E, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3F, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], D_L04_001A8F20, 0.0f, D_L04_001A8F20);
+        func_PAL_L04_0040B520(object, 0xB3F, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.0f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
-        func_PAL_L00_003FB330(&m[0], 0, 4, 4, 4, 8, 4, 0, 0.42f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion_pal(&m[0], 0, 4, 4, 4, 8, 4, 0, 0.42f, 20.0f, 1, 0, 0, 0);
         if (P(0x8C) != 0) *(u16 *)(P(0x8C) + 0x34) |= 0x41;
         break;
     }

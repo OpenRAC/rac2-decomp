@@ -9,9 +9,9 @@ typedef struct {
 
 /* Header offsets use the shared byte packet cursor. */
 extern unsigned char *g_dma_packet_cursor MACRO_ADDR;
-extern char D_001390B0[];
-extern void *D_001B2080;
-extern int D_001A72DC[] __attribute__((sda));
+extern char g_gfx_shadow_packet[];
+extern void *g_shadow_outline_batch;
+extern int g_vram_display_address[] __attribute__((sda));
 extern void gfx_shadow_buffer_init_strips_draw(void);
 extern void gfx_shadow_build_projection_basis(float *, float);
 extern RenderDFBB0 *gfx_shadow_process_record(RenderDFBB0 *);
@@ -30,7 +30,7 @@ void gfx_shadow_list_draw(RenderDFBB0 *data) {
     gfx_shadow_buffer_init_strips_draw();
     current = next;
     *(int *)g_dma_packet_cursor = 0x30000007;
-    *(int *)(g_dma_packet_cursor + 4) = (int)D_001390B0;
+    *(int *)(g_dma_packet_cursor + 4) = (int)g_gfx_shadow_packet;
     *(int *)(g_dma_packet_cursor + 8) = 0x13000000;
     *(int *)(g_dma_packet_cursor + 12) = 0x50000007;
     g_dma_packet_cursor = g_dma_packet_cursor + 16;
@@ -48,13 +48,13 @@ void gfx_shadow_list_draw(RenderDFBB0 *data) {
         for (i = 0; i < current->count; i++) {
             next = gfx_shadow_process_record(next);
             shadow_set_volume_bounds(a, b);
-            shadow_draw_outline_batch(0x70000000, D_001B2080, current->flags);
+            shadow_draw_outline_batch(0x70000000, g_shadow_outline_batch, current->flags);
             gfx_shadow_submit_packet(2, 1, 2);
             gfx_shadow_submit_packet(1, 0, 2);
         }
         current = next;
     }
-    VU1_addGSregister(0x4C, (D_001A72DC[0] >> 13) | 0x80000);
+    VU1_addGSregister(0x4C, (g_vram_display_address[0] >> 13) | 0x80000);
     VU1_addGSregister(0x42, 0x2000000064L);
     gfx_shadow_buffer_color_fill_draw(0);
     VU1_addGSregister(0x47, 0x5360B);

@@ -1,16 +1,16 @@
 #include "common.h"
-extern char *D_L01_001FE180[];
+extern char *g_path_l01_table[];
 extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
 extern void anim_start_blended(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
-extern int D_L01_001B2088;
+extern int g_oozla_intro_stage;
 typedef struct {
     char pad[0x2C];
     float radius;
 } L01RadiusRecord;
-extern L01RadiusRecord *D_L01_001B21C0;
-extern char D_L01_001AFE38[] SDATA(D_L01_001AFE38);
+extern L01RadiusRecord *g_firefly_radius_record;
+extern char g_str_firefly_default[] SDATA(D_L01_001AFE38);
 extern void moby_update_floor_and_ceiling_heights(void *);
 extern int FloatToInt(float);
 extern float path_l01_compute_segment_lengths(void *);
@@ -23,7 +23,7 @@ void mutant_firefly_init(char *moby)
     float radius_value;
     L01RadiusRecord *record;
 
-    if (!D_L01_001B2088) **(int **)(vars + 0x250) = 0;
+    if (!g_oozla_intro_stage) **(int **)(vars + 0x250) = 0;
     qcopy(vars + 0x1D0, moby + 0x10);
     moby_update_floor_and_ceiling_heights(moby);
     radius_value = 0.0f;
@@ -31,20 +31,20 @@ void mutant_firefly_init(char *moby)
     *(unsigned char *)(vars + 0x4A) = FloatToInt(4.0f);
     *(unsigned char *)(vars + 0x200) = *(unsigned char *)(moby + 0x30);
     if (*(int *)(vars + 0x294) != -1) {
-        record = D_L01_001B21C0;
+        record = g_firefly_radius_record;
         record += *(int *)(vars + 0x294);
         radius_value = record->radius;
     }
     if (radius_value > 0.0f) *(unsigned char *)(moby + 0x30) = FloatToInt(radius_value + 2.0f);
     *(unsigned char *)(vars + 0x200) = *(unsigned char *)(vars + 0x201) = *(unsigned char *)(moby + 0x30);
     if (*(int *)(vars + 0x298) != -1) {
-        record = D_L01_001B21C0;
+        record = g_firefly_radius_record;
         record += *(int *)(vars + 0x298);
         radius_value = record->radius;
     }
     if (radius_value > 0.0f) *(unsigned char *)(vars + 0x200) = FloatToInt(radius_value + 2.0f);
-    if (*(int *)(vars + 0x210) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(vars + 0x210)]);
-    if (*(int *)(vars + 0x214) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(vars + 0x214)]);
+    if (*(int *)(vars + 0x210) != -1) path_l01_compute_segment_lengths(g_path_l01_table[*(int *)(vars + 0x210)]);
+    if (*(int *)(vars + 0x214) != -1) path_l01_compute_segment_lengths(g_path_l01_table[*(int *)(vars + 0x214)]);
     *(char **)(vars + 0x10) = vars + 0x50;
     *(unsigned char *)(vars + 0x60) = 9;
     *(float *)(vars + 0x80) = 0.3f;
@@ -67,7 +67,7 @@ void mutant_firefly_init(char *moby)
     *(float *)(vars + 0x260) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0002908882452175021f;
     *(float *)(vars + 0x264) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0002908882452175021f;
     *(float *)(vars + 0x268) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0002908882452175021f;
-    *(void **)(vars + 0x190) = D_L01_001AFE38;
+    *(void **)(vars + 0x190) = g_str_firefly_default;
     *(float *)(vars + 0x1C0) = *(float *)(*(char **)(moby + 0x24) + 0x24);
     *(float *)(vars + 0x1B0) = *(float *)(vars + 0x30);
     *(short *)(vars + 0x202) = -1;

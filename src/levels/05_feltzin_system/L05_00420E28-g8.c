@@ -19,12 +19,12 @@ extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
 extern void UpdateFeltzinMissionReward(u8 *a0, s32 a1);
 extern void feltzin_mission_handle_failure(u8 *a0, s32 a1);
 
-extern s32 D_L05_001B1364 __attribute__((sda));
-extern s32 D_L05_001B2048 __attribute__((sda));
+extern s32 g_feltzin_challenge_active __attribute__((sda));
+extern s32 g_feltzin_mission_index __attribute__((sda));
 typedef struct { s32 count; u8 pad04[12]; s32 active; u8 pad14[24]; s32 reset; } FeltzinState;
-extern u8 D_L05_00221D10[];
-extern u8 D_L05_001B3550[] __attribute__((section(".sdata")));
-extern u8 *D_L05_001B2614;
+extern u8 g_feltzin_challenge_state[];
+extern u8 g_feltzin_timer[] __attribute__((section(".sdata")));
+extern u8 *g_feltzin_enemy_table;
 
 /* Controls the second Feltzin mission: sets up the scene once, then starts the reward when the
    timer is done or reports a failure when the time runs out. */
@@ -36,12 +36,12 @@ void feltzin_mission_two_update(u8 *moby)
     s32 index;
     s32 objectCount;
 
-    math_fast_float_d(D_L05_001B3550);
-    if (D_L05_001B1364 == 0) {
-        ((FeltzinState *)D_L05_00221D10)->reset = 0;
-        *(s32 *)D_L05_001B3550 = 0x1C20;
+    math_fast_float_d(g_feltzin_timer);
+    if (g_feltzin_challenge_active == 0) {
+        ((FeltzinState *)g_feltzin_challenge_state)->reset = 0;
+        *(s32 *)g_feltzin_timer = 0x1C20;
         *(s32 *)(vars + 0x44) = 0x1C20;
-        D_L05_001B1364 = 1;
+        g_feltzin_challenge_active = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -56,17 +56,17 @@ void feltzin_mission_two_update(u8 *moby)
                     f32 scale = 64.0f;
 
                     entry_spawn_list_objects_with_flag(object, 1);
-                    index = ((FeltzinState *)D_L05_00221D10)->count;
-                    func_L05_0037CEE0(*objects, (u8 *)D_L05_001B2614 + (index << 7) + 0x30, scale);
-                    index = ((FeltzinState *)D_L05_00221D10)->count;
-                    func_L05_0037D608(*objects, (u8 *)D_L05_001B2614 + (index << 7) + 0x30, scale);
+                    index = ((FeltzinState *)g_feltzin_challenge_state)->count;
+                    func_L05_0037CEE0(*objects, (u8 *)g_feltzin_enemy_table + (index << 7) + 0x30, scale);
+                    index = ((FeltzinState *)g_feltzin_challenge_state)->count;
+                    func_L05_0037D608(*objects, (u8 *)g_feltzin_enemy_table + (index << 7) + 0x30, scale);
                 }
                 count--;
                 objects++;
             } while (count != 0);
         }
     }
-    if (((FeltzinState *)D_L05_00221D10)->active == 0 && D_L05_001B2048 >= 6) {
+    if (((FeltzinState *)g_feltzin_challenge_state)->active == 0 && g_feltzin_mission_index >= 6) {
         UpdateFeltzinMissionReward(moby, 1);
         return;
     }

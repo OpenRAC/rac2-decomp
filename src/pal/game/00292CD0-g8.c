@@ -18,23 +18,23 @@ typedef struct {
 } SelectTable;
 extern SelectState g_hero_moby_default;
 extern SelectTable g_copy_setup_data;
-extern s32 D_001BAF30[];
-extern unsigned long D_001C4DC0[3];
-extern s32 D_001A91E0 __attribute__((sda));
+extern s32 g_disc_table_handles[];
+extern unsigned long g_tex_draw_packets[3];
+extern s32 g_tex_block_reloc_state __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(s32);
-extern s32 func_PAL_002B8838(s32, s32, s32);
+extern s32 load_read_disc_with_pause_pal(s32, s32, s32);
 extern void tex_relocate_block(s32, s32, void *, s32);
 
-void func_PAL_00292F00(s32 n) {
+void load_disc_table_entry_for_draw_pal(s32 n) {
     SelectTable *b;
     s32 h;
     g_hero_moby_default.f18 = n;
     gfx_wait_for_dma_status_bits(1);
     b = &g_copy_setup_data;
-    h = D_001BAF30[0];
-    func_PAL_002B8838(h, b->e[n].a + b->base, b->e[n].b);
-    D_001C4DC0[0] = g_hero_moby_default.f38;
-    D_001C4DC0[1] = 0xFFA0000000E0;
-    D_001C4DC0[2] = 0x40000400004000;
-    tex_relocate_block(h, 0, &D_001A91E0, -1);
+    h = g_disc_table_handles[0];
+    load_read_disc_with_pause_pal(h, b->e[n].a + b->base, b->e[n].b);
+    g_tex_draw_packets[0] = g_hero_moby_default.f38;
+    g_tex_draw_packets[1] = 0xFFA0000000E0;
+    g_tex_draw_packets[2] = 0x40000400004000;
+    tex_relocate_block(h, 0, &g_tex_block_reloc_state, -1);
 }

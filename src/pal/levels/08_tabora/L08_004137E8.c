@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void moby_mark_spawned(void *);
-extern u8 D_L08_001B9B00[];
+extern u8 g_hero_position_vec[];
 extern f32 fast_vec_dist(void *, void *);
 extern f32 IntToFloat(int);
 extern f32 math_fabs(f32);
@@ -39,25 +39,25 @@ extern s32 func_3357E8(Ent *, void *, s32);
 extern f32 func_3278F0(f32, f32);
 extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
-extern f32 D_L08_001BFF68;
-extern f32 D_00189EA8;
+extern f32 g_ground_height_result;
+extern f32 g_hero_height_limit;
 extern char g_hero_position[];
 extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
 extern float math_fabs(float);
 extern void moby_set_state(void *, s32, s32);
-extern u8 D_001A7B00[] __attribute__((sda));
-extern u8 D_L08_001BFD00[];
-extern s32 D_L08_001A8F00[] __attribute__((sda));
-extern s32 D_L08_001B2700[] __attribute__((sda));
-extern u8 *D_L08_001B2ACC[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
+extern u8 g_request_l08_queue[];
+extern s32 g_cutscene_l08_active_flag[] __attribute__((sda));
+extern s32 g_glider_flag_table[] __attribute__((sda));
+extern u8 *g_collision_box_table[] __attribute__((sda));
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 req_push_queue(void *, s32);
 extern s32 req_launch_queued(void *);
 extern void func_PAL_L01_003D2C38(u8 *);
 extern s32 game_is_either_mode_two(void);
-extern void func_PAL_L00_002B9CD8(u8 *, u8 *, s32, s32);
+extern void hero_reset_position_and_direction_pal(u8 *, u8 *, s32, s32);
 extern void help_unlock_entry(s32);
-extern void func_PAL_002B1588(s32, s32);
+extern void value_set_entry_by_index_pal(s32, s32);
 extern int MemcardSave(s32, s32);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -72,7 +72,7 @@ void func_PAL_L08_004137E8(u8 *self) {
 
     switch (self[0x20]) {
     case 0:
-        if (D_001A7B00[13] != 0) {
+        if (g_inventory_have_flags[13] != 0) {
             moby_mark_spawned(self);
             break;
         }
@@ -83,8 +83,8 @@ void func_PAL_L08_004137E8(u8 *self) {
     case 1:
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), 0.094247796f);
         if (IsPointInCuboid(g_hero_position, *(s32 *)(st + 4)) != 0) {
-            if (req_push_queue(D_L08_001BFD00, 0x5B) != 0) {
-                req_launch_queued(D_L08_001BFD00);
+            if (req_push_queue(g_request_l08_queue, 0x5B) != 0) {
+                req_launch_queued(g_request_l08_queue);
                 self[0x20] = 2;
             }
         }
@@ -92,21 +92,21 @@ void func_PAL_L08_004137E8(u8 *self) {
             func_PAL_L01_003D2C38(self);
         break;
     case 2:
-        D_L08_001B2700[10] = 1;
-        if (D_L08_001A8F00[0] == 2) {
+        g_glider_flag_table[10] = 1;
+        if (g_cutscene_l08_active_flag[0] == 2) {
             self[0x31] = 0;
             *(u16 *)(self + 0x34) |= 1;
         }
         if (game_is_either_mode_two() != 0)
             break;
-        D_L08_001B2700[10] = 0;
+        g_glider_flag_table[10] = 0;
         self[0x31] = 1;
-        ent = D_L08_001B2ACC[0];
+        ent = g_collision_box_table[0];
         *(u16 *)(self + 0x34) &= 0xFFFE;
         ent += *(s32 *)(st + 8) * 0x80;
-        func_PAL_L00_002B9CD8(ent + 0x30, ent + 0x70, 0, 1);
+        hero_reset_position_and_direction_pal(ent + 0x30, ent + 0x70, 0, 1);
         help_unlock_entry(0x15);
-        func_PAL_002B1588(0x122B, -1);
+        value_set_entry_by_index_pal(0x122B, -1);
         MemcardSave(0, -1);
         moby_mark_spawned(self);
         break;

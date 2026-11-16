@@ -35,9 +35,9 @@ extern float math_spring_float_to_goal(float *, float, float *, float, float, fl
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
-extern void func_PAL_L00_003AEB58(char *, char *, void *);
+extern void seeker_apply_projectile_hit_pal(char *, char *, void *);
 extern void vec_steer_toward_target(void *, char *, char *, void *, int, float, float, float);
-extern void func_PAL_L00_003AEEC0(char *, void *);
+extern void seeker_spawn_impact_sparks_pal(char *, void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float math_cosine_blend(float, float, float);
@@ -138,7 +138,7 @@ acquired:
             I(state, 0x5C) = PlayMobySound(0, 4, moby);
         if (FastDecTimer(state + 0x18)) {
             g_collision_result.moby = 0;
-            func_PAL_L00_003AEB58(moby, state, moby + 0x10);
+            seeker_apply_projectile_hit_pal(moby, state, moby + 0x10);
             table_clear_entry_flag(I(state, 0x70));
             moby_mark_spawned(moby);
             return;
@@ -149,7 +149,7 @@ acquired:
         char *target;
         if (FastDecTimer(state + 0x54)) {
             g_collision_result.moby = 0;
-            func_PAL_L00_003AEB58(moby, state, moby + 0x10);
+            seeker_apply_projectile_hit_pal(moby, state, moby + 0x10);
             table_clear_entry_flag(I(state, 0x70));
             moby_mark_spawned(moby);
             return;
@@ -247,7 +247,7 @@ acquired:
         length = FastVecLength(work.phase.flight.c);
         if (length < 0.0001f) {
             g_collision_result.moby = 0;
-            func_PAL_L00_003AEB58(moby, state, moby + 0x10);
+            seeker_apply_projectile_hit_pal(moby, state, moby + 0x10);
             table_clear_entry_flag(I(state, 0x70));
             moby_mark_spawned(moby);
             return;
@@ -306,7 +306,7 @@ acquired:
         qcopy(moby + 0x10, g_collision_result.normal);
     }
     if (moved || work.hitPlayer) {
-        func_PAL_L00_003AEB58(moby, state, moby + 0x10);
+        seeker_apply_projectile_hit_pal(moby, state, moby + 0x10);
         table_clear_entry_flag(I(state, 0x70));
         moby_mark_spawned(moby);
         return;
@@ -319,5 +319,5 @@ acquired:
     }
     FastVecScale(work.phase.flight.c, moby + 0xC0, -0.25f);
     FastVecAdd(work.phase.flight.c, work.phase.flight.c, moby + 0x10);
-    func_PAL_L00_003AEEC0(moby, work.phase.flight.c);
+    seeker_spawn_impact_sparks_pal(moby, work.phase.flight.c);
 }

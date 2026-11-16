@@ -3,23 +3,23 @@
 #include "common.h"
 typedef int Quad004475A0 __attribute__((mode(TI)));
 extern void security_robot_deactivate(char *);
-extern int D_L11_001A8FF4;
+extern int g_hero_l11_input_blocked;
 extern char g_hero_position[];
 extern char *g_active_attacker_robot NOT_SDA;
-extern void func_PAL_L11_0044DF38(char *);
-extern void func_PAL_L11_0044E398(char *);
+extern void turret_enemy_update_pal(char *);
+extern void security_robot_play_idle_pal(char *);
 extern void security_robot_finish_frame(char *);
 extern void security_robot_damage_along_arm_swing(char *);
-extern void func_PAL_L02_003D55D8(char *);
-extern void func_PAL_L02_003D5660(char *);
-extern int func_PAL_L11_0044E538(char *);
-extern int func_PAL_L11_0044F730(char *);
+extern void moby_start_anim_fast_pal(char *);
+extern void moby_start_anim_slow_pal(char *);
+extern int security_robot_try_start_attack_pal(char *);
+extern int AimAtGroupEntityInCone_pal(char *);
 extern void security_robot_pick_wander_point(char *,char *);
 extern void func_PAL_L11_0044EDC0(char *,void *);
 extern float vec_normalized_direction_dot(char *,void *);
 extern char *arena_get_center_point(int);
 extern int arena_is_point_in_polygon(int,void *);
-extern void func_PAL_L02_004009A0(char *,int,int);
+extern void moby_set_anim_type_three_pal(char *,int,int);
 extern void part_queue_moby_for_glow(char *,int,void *);
 extern void FastVecSub(void *,void *,void *);
 extern float vec_get_heading_angle(char *,void *,void *);
@@ -32,11 +32,11 @@ extern int flag_set_first_pending(char *);
 extern void func_PAL_002A7E68(char *,int,int,int);
 extern void moby_set_state(char *,int,int);
 extern int math_random_int_below(int);
-extern void func_PAL_L02_00335630(char *,void *);
-extern int func_PAL_L01_00323068(char *,void *);
-extern int func_PAL_002B5BA8(char *,void *,float);
-extern int func_PAL_L11_00342578(char *,void *);
-extern int func_PAL_002B5E30(char *,float);
+extern void moby_aim_at_target_offset_pal(char *,void *);
+extern int moby_l01_turn_toward_target_pal(char *,void *);
+extern int moby_turn_toward_target_and_step_pal(char *,void *,float);
+extern int coll_check_move_to_point_pal(char *,void *);
+extern int moby_step_at_own_position_factor_pal(char *,float);
 extern int moby_dispatch_action_by_kind(char *,void *);
 extern void mem_clear(void *,int,int);
 extern void AttachManipulator(char *,int,void *);
@@ -44,8 +44,8 @@ extern void vec_random_direction(void *,float,float);
 extern void func_PAL_002B15D8(char *,int,void *,float,float,float,float,int);
 extern void moby_set_controller_speed_limits(char *,float,float,float,float);
 extern float moby_get_anim_value(char *);
-extern int func_PAL_L11_00342558(char *);
-extern int func_PAL_002B5E10(char *);
+extern int moby_call_helper_with_blocks_pal(char *);
+extern int moby_step_at_own_position_pal(char *);
 extern float math_random_float_range(float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void mat_get_euler_angles(void *,void *);
@@ -54,7 +54,7 @@ extern void FastVecScale(void *,void *,float);
 extern void moby_rotate_about_point(char *,void *,float,float,float);
 extern void euler_rotation_basis(void *,void *);
 
-void func_PAL_L11_0044D030(char *self)
+void security_robot_update_pal(char *self)
 {
     float target[4], temp[4], matrix[16];
     char *state;
@@ -63,15 +63,15 @@ void func_PAL_L11_0044D030(char *self)
     int flags = 0, i;
     state=*(char **)(self+0x68);
     if (*(u8 *)(self+0x20)==1) return;
-    if (*(short *)(state+0x36E) && !D_L11_001A8FF4 &&
+    if (*(short *)(state+0x36E) && !g_hero_l11_input_blocked &&
         *(u8 *)(self+0x20)!=18 && *(u8 *)(self+0x20)!=17) return;
-    func_PAL_L11_0044DF38(self);
+    turret_enemy_update_pal(self);
     if (*(u8 *)(self+0x20)==1) return;
     if (*(short *)(state+0x366)==0) {
         unsigned char phase;
         *(int *)(state+0x350)=0;
         phase=*(u8 *)(self+0x95);
-        if (phase!=0 && phase!=2 && phase!=1 && phase!=7 && phase!=8) func_PAL_L11_0044E398(self);
+        if (phase!=0 && phase!=2 && phase!=1 && phase!=7 && phase!=8) security_robot_play_idle_pal(self);
     }
     if (*(char **)(state+0x350)) *(Quad004475A0 *)target=*(Quad004475A0 *)(*(char **)(state+0x350)+0x10);
     else *(Quad004475A0 *)target=*(Quad004475A0 *)g_hero_position;
@@ -106,39 +106,39 @@ void func_PAL_L11_0044D030(char *self)
             }
             *(u16 *)(self+0x96)=math_random_int_below(83);
         }
-        if (*(short *)(state+0x366)) func_PAL_L02_003D55D8(self);
+        if (*(short *)(state+0x366)) moby_start_anim_fast_pal(self);
         if (*(u8 *)(self+0xBC)==0) {
             p=state+0x330;
             if (vec_distance_squared_xy(point,p)<4.0f) *(u8 *)(self+0xBC)=1;
-            if (*(short *)(state+0x36E)) func_PAL_L02_00335630(self,p);
-            else func_PAL_L01_00323068(self,p);
+            if (*(short *)(state+0x36E)) moby_aim_at_target_offset_pal(self,p);
+            else moby_l01_turn_toward_target_pal(self,p);
         } else {
-            if (*(short *)(state+0x36E)) func_PAL_L02_00335630(self,point);
-            else func_PAL_L01_00323068(self,point);
+            if (*(short *)(state+0x36E)) moby_aim_at_target_offset_pal(self,point);
+            else moby_l01_turn_toward_target_pal(self,point);
         }
         break;
     case 5:
-        if (*(u8 *)(self+0x60)&2) func_PAL_L02_003D5660(self);
+        if (*(u8 *)(self+0x60)&2) moby_start_anim_slow_pal(self);
         break;
     case 3:
-        if (*(short *)(state+0x36E)) func_PAL_L02_00335630(self,target);
-        else if (!func_PAL_L11_0044F730(self)) {
+        if (*(short *)(state+0x36E)) moby_aim_at_target_offset_pal(self,target);
+        else if (!AimAtGroupEntityInCone_pal(self)) {
             switch(*(u8 *)(self+0x42)) {
-            case 2: func_PAL_L01_00323068(self,target); break;
-            case 3: func_PAL_002B5BA8(self,target,*(float *)(state+0x358)); break;
+            case 2: moby_l01_turn_toward_target_pal(self,target); break;
+            case 3: moby_turn_toward_target_and_step_pal(self,target,*(float *)(state+0x358)); break;
             }
         }
         break;
     case 4:
-        if (distance>14.0f) func_PAL_L02_003D55D8(self);
-        else if (!func_PAL_L11_0044E538(self)) {
+        if (distance>14.0f) moby_start_anim_fast_pal(self);
+        else if (!security_robot_try_start_attack_pal(self)) {
             if (distance<4.0f && difference<0.2617994248867035f) moby_set_state(self,11,-1);
             else if (*(u8 *)(self+0x20)==11 && distance>5.0f) moby_set_state(self,10,-1);
         }
         break;
     case 6:
-        if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);
-        else func_PAL_002B5E30(self,angle);
+        if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
+        else moby_step_at_own_position_factor_pal(self,angle);
         break;
     case 7:
         flags=moby_dispatch_action_by_kind(self,state+0x50);
@@ -163,7 +163,7 @@ void func_PAL_L11_0044D030(char *self)
 
         if ((flags&1) || (*(float *)(state+0x20)<=0.0f && *(u16 *)(self+0x96)>50)) {
             *(int *)(self+0x98)=0;
-            func_PAL_L02_004009A0(self,0,-1);
+            moby_set_anim_type_three_pal(self,0,-1);
             part_queue_moby_for_glow(self,0,security_robot_deactivate);
         }
         break;
@@ -184,19 +184,19 @@ void func_PAL_L11_0044D030(char *self)
         }
         if (*(u8 *)(self+0xBC)==1) {
             if (arena_is_point_in_polygon(*(int *)(self+0xB8),point)) moby_set_state(self,4,2);
-            func_PAL_L01_00323068(self,arena_get_center_point(*(int *)(self+0xB8)));
+            moby_l01_turn_toward_target_pal(self,arena_get_center_point(*(int *)(self+0xB8)));
         }
         break;
     case 7:
         if (flag_set_first_pending(self)) *(u16 *)(self+0x96)=0;
-        if (distance<4.0f || *(u16 *)(self+0x96)>375 || *(int *)(state+0x180)>=26) func_PAL_L02_003D55D8(self);
+        if (distance<4.0f || *(u16 *)(self+0x96)>375 || *(int *)(state+0x180)>=26) moby_start_anim_fast_pal(self);
         break;
     case 6:
         if (distance>14.0f) {
             moby_set_controller_speed_limits(self,0.008f,0.124000005f,0.005026549f,0.5026549f);
             moby_set_state(self,7,3);
             if (*(u8 *)(self+0x43)!=3) func_PAL_002A7E68(self,3,0,8);
-        } else if (distance<4.0f || *(int *)(state+0x180)>=26) func_PAL_L02_003D5660(self);
+        } else if (distance<4.0f || *(int *)(state+0x180)>=26) moby_start_anim_slow_pal(self);
         break;
     case 10:
         time=moby_get_anim_value(self);
@@ -204,37 +204,37 @@ void func_PAL_L11_0044D030(char *self)
         if (turn>0.01f) {
             moby_set_state(self,9,-1);
             if (*(u8 *)(self+0x43)!=5) func_PAL_002A7E68(self,5,0,8);
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);
-            else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
+            else moby_step_at_own_position_factor_pal(self,angle);
         } else if (turn< -0.01f) {
             moby_set_state(self,8,-1);
             if (*(u8 *)(self+0x43)!=4) func_PAL_002A7E68(self,4,0,8);
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);
-            else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
+            else moby_step_at_own_position_factor_pal(self,angle);
         } else if (distance<4.0f) {moby_set_state(self,11,-1);}
         else if (time<2.0f) {
             moby_set_controller_speed_limits(self,0.008f,0.040000003f,0.005026549f,0.5026549f);
-            if (*(short *)(state+0x36E)) func_PAL_L02_00335630(self,target);
-            else func_PAL_L01_00323068(self,target);
+            if (*(short *)(state+0x36E)) moby_aim_at_target_offset_pal(self,target);
+            else moby_l01_turn_toward_target_pal(self,target);
         } else if (time>10.0f && moby_get_anim_value(self)<17.0f) {
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);
-            else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
+            else moby_step_at_own_position_factor_pal(self,angle);
         } else if (time<20.0f) {
-            if (*(short *)(state+0x36E)) func_PAL_L02_00335630(self,target);
-            else func_PAL_L01_00323068(self,target);
+            if (*(short *)(state+0x36E)) moby_aim_at_target_offset_pal(self,target);
+            else moby_l01_turn_toward_target_pal(self,target);
         } else {
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);
-            else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
+            else moby_step_at_own_position_factor_pal(self,angle);
         }
         break;
     case 8:
         if (vec_normalized_direction_dot(self,target)> -0.01f) {
             moby_set_state(self,10,-1);
             if (*(u8 *)(self+0x43)!=6) func_PAL_002A7E68(self,6,0,8);
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342558(self);else func_PAL_002B5E10(self);
+            if (*(short *)(state+0x36E)) moby_call_helper_with_blocks_pal(self);else moby_step_at_own_position_pal(self);
         } else if (moby_get_anim_value(self)>5.0f) {
             old=*(float *)(state+0x130);*(float *)(state+0x130)=0.01745329424738884f;
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);else moby_step_at_own_position_factor_pal(self,angle);
             *(float *)(state+0x130)=old;
         }
         break;
@@ -242,18 +242,18 @@ void func_PAL_L11_0044D030(char *self)
         if (vec_normalized_direction_dot(self,target)<0.01f) {
             moby_set_state(self,10,-1);
             if (*(u8 *)(self+0x43)!=6) func_PAL_002A7E68(self,6,0,8);
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342558(self);else func_PAL_002B5E10(self);
+            if (*(short *)(state+0x36E)) moby_call_helper_with_blocks_pal(self);else moby_step_at_own_position_pal(self);
         } else if (moby_get_anim_value(self)>5.0f) {
             old=*(float *)(state+0x130);*(float *)(state+0x130)=0.01745329424738884f;
-            if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);else func_PAL_002B5E30(self,angle);
+            if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);else moby_step_at_own_position_factor_pal(self,angle);
             *(float *)(state+0x130)=old;
         }
         break;
     case 11:
         if (flag_set_first_pending(self) && *(u8 *)(self+0x43)!=1) func_PAL_002A7E68(self,1,0,8);
-        if (*(short *)(state+0x36E)) func_PAL_L11_00342578(self,target);else func_PAL_002B5E30(self,angle);
+        if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);else moby_step_at_own_position_factor_pal(self,angle);
     case 15: case 16:
-        if (flags&2) func_PAL_L11_0044E398(self);
+        if (flags&2) security_robot_play_idle_pal(self);
         break;
     case 13: case 14:
         if (*(u8 *)(self+0x60)&2) {
@@ -261,7 +261,7 @@ void func_PAL_L11_0044D030(char *self)
             if (g_active_attacker_robot==self) {
                 moby_set_state(self,12,5);
                 if (*(u8 *)(self+0x43)!=7) func_PAL_002A7E68(self,7,0,8);
-            } else func_PAL_L11_0044E398(self);
+            } else security_robot_play_idle_pal(self);
         }
         security_robot_damage_along_arm_swing(self);
         break;
@@ -292,7 +292,7 @@ void func_PAL_L11_0044D030(char *self)
         p=arena_get_center_point(*(int *)(self+0xB8));
         if (*(float *)(self+0x18)<*(float *)(p+8)+5.0f || !math_random_int_below(450) || *(u16 *)(self+0x96)>300) {
             *(int *)(self+0x98)=0;
-            func_PAL_L02_004009A0(self,0,-1);
+            moby_set_anim_type_three_pal(self,0,-1);
             part_queue_moby_for_glow(self,0,security_robot_deactivate);
         }
         break;

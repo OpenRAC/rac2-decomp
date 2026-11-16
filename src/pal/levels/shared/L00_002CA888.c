@@ -26,9 +26,9 @@ typedef struct {
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
 extern HeroActionState g_hero_state;
-extern unsigned int D_00138320[];
+extern unsigned int g_pad_pressed_flags[];
 extern int ref_L00_002CAB08_00(int, int);
-extern int func_PAL_L00_002C3BE0(void);
+extern int hero_get_step_offset_from_direction_pal(void);
 extern int pad_presses_within_frames(int, int, int, int);
 extern int PadPressedWithin(int, int, int *);
 extern int hero_slot_item_id(int);
@@ -38,8 +38,8 @@ int func_PAL_L00_002CAEB0(void)
 {
     int offset;
     if (g_hero_state.mode == 14) return 0;
-    offset = func_PAL_L00_002C3BE0();
-    if ((D_00138320[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 4, offset)) {
+    offset = hero_get_step_offset_from_direction_pal();
+    if ((g_pad_pressed_flags[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 4, offset)) {
         ref_L00_002CAB08_00(11, 1);
         return 1;
     }

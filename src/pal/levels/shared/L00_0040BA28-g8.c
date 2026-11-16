@@ -3,17 +3,17 @@
 /* func_PAL_L00_0040BA28, the PAL copy of func_L00_00406FB0: the same C, where each scroll speed
  * is scaled by 1.2f for 50 Hz. */
 
-extern float D_L00_001B0E6C __attribute__((sda)), D_L00_001B0E70 __attribute__((sda));
-extern float D_L00_001B0E74 __attribute__((sda)), D_L00_001B0E78 __attribute__((sda));
-extern float D_L00_001B0E7C __attribute__((sda)), D_L00_001B0E80 __attribute__((sda));
-extern float D_L00_001B0E84 __attribute__((sda));
-extern int D_L00_001B0EDC __attribute__((sda)), D_L00_001B0EE0 __attribute__((sda));
-extern float D_L00_001B0EE4 __attribute__((sda)), D_L00_001B0EE8 __attribute__((sda)), D_L00_001B0EEC __attribute__((sda));
-extern int D_L00_001B0EF4 __attribute__((sda)), D_L00_001B0EF8 __attribute__((sda));
-extern float D_L00_001B0EFC __attribute__((sda)), D_L00_001B0F00 __attribute__((sda));
-extern int D_L00_001B0F04 __attribute__((sda)), D_L00_001B0F08 __attribute__((sda)), D_L00_001B0F0C __attribute__((sda));
-extern char D_L00_00254B20[], D_L00_00254BE0[];
-extern float D_L00_00254CA0[][20][4], D_L00_00254B60[][20][4];
+extern float g_sheepinator_beam_uv_x_step __attribute__((sda)), g_sheepinator_beam_uv_y_step __attribute__((sda));
+extern float g_sheepinator_beam_scroll_x __attribute__((sda)), g_sheepinator_beam_scroll_x_rate __attribute__((sda));
+extern float g_sheepinator_beam_scroll_y __attribute__((sda)), g_sheepinator_beam_scroll_z __attribute__((sda));
+extern float g_sheepinator_beam_scroll_rate __attribute__((sda));
+extern int g_beam_ribbon_param_a __attribute__((sda)), g_beam_ribbon_param_b __attribute__((sda));
+extern float g_beam_ribbon_width_scale __attribute__((sda)), g_beam_ribbon_halo_scale __attribute__((sda)), g_beam_ribbon_scroll_speed __attribute__((sda));
+extern int g_beam_ribbon_halo_color_idle __attribute__((sda)), g_beam_ribbon_halo_color_active __attribute__((sda));
+extern float g_beam_ribbon_uv_offset __attribute__((sda)), g_beam_ribbon_uv_rate __attribute__((sda));
+extern int g_beam_packet_color_idle __attribute__((sda)), g_beam_packet_color_active __attribute__((sda)), g_beam_packet_texture_id __attribute__((sda));
+extern char g_sheepinator_ribbon_inner_points[], g_sheepinator_ribbon_outer_points[];
+extern float g_sheepinator_ribbon_surface_a[][20][4], g_sheepinator_ribbon_surface_b[][20][4];
 
 typedef struct {
     int word;
@@ -21,7 +21,7 @@ typedef struct {
     char pad[219];
 } StripState;
 
-extern char D_001395B0[], g_camera_l00_position[];
+extern char g_weapon_active_index[], g_camera_l00_position[];
 extern StripState g_weapon_l00_table[];
 
 extern void DrawScrollingRibbonWithHalo(void *, int, int, int, float, float, float, int);
@@ -54,62 +54,62 @@ void func_PAL_L00_0040BA28(char *arg)
     float x, y, z;
     int color, i, j;
 
-    D_L00_001B0EFC -= D_L00_001B0F00 * 1.2f;
-    if (D_L00_001B0EFC <= -8.0f) D_L00_001B0EFC += 8.0f;
-    DrawScrollingRibbonWithHalo(D_L00_00254B20, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF4);
-    DrawScrollingRibbonWithHalo(D_L00_00254BE0, D_L00_001B0EDC, D_L00_001B0EE0, 12, D_L00_001B0EE4, D_L00_001B0EE8, D_L00_001B0EEC, D_L00_001B0EF8);
+    g_beam_ribbon_uv_offset -= g_beam_ribbon_uv_rate * 1.2f;
+    if (g_beam_ribbon_uv_offset <= -8.0f) g_beam_ribbon_uv_offset += 8.0f;
+    DrawScrollingRibbonWithHalo(g_sheepinator_ribbon_inner_points, g_beam_ribbon_param_a, g_beam_ribbon_param_b, 12, g_beam_ribbon_width_scale, g_beam_ribbon_halo_scale, g_beam_ribbon_scroll_speed, g_beam_ribbon_halo_color_idle);
+    DrawScrollingRibbonWithHalo(g_sheepinator_ribbon_outer_points, g_beam_ribbon_param_a, g_beam_ribbon_param_b, 12, g_beam_ribbon_width_scale, g_beam_ribbon_halo_scale, g_beam_ribbon_scroll_speed, g_beam_ribbon_halo_color_active);
     DrawLightningArcSparks(arg);
     DrawTwoPassCameraQuad(arg);
-    color = g_weapon_l00_table[(unsigned char)D_001395B0[0]].state ? D_L00_001B0F08 : D_L00_001B0F04;
-    packet.tags[1] = GetEffectTextureDescriptor(D_L00_001B0F0C);
+    color = g_weapon_l00_table[(unsigned char)g_weapon_active_index[0]].state ? g_beam_packet_color_active : g_beam_packet_color_idle;
+    packet.tags[1] = GetEffectTextureDescriptor(g_beam_packet_texture_id);
     packet.tags[2] = 0xff9000000260ULL;
     packet.tags[3] = 0x8000000048ULL;
     packet.tags[0] = 0;
-    x = D_L00_001B0E74;
+    x = g_sheepinator_beam_scroll_x;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = color;
-    D_L00_001B0E74 -= D_L00_001B0E78 * 1.2f;
-    if (D_L00_001B0E74 <= -8.0f) D_L00_001B0E74 += 8.0f;
-    D_L00_001B0E7C -= D_L00_001B0E84 * 1.2f;
-    if (D_L00_001B0E7C <= -7.0f) D_L00_001B0E7C += 7.0f;
-    D_L00_001B0E80 += D_L00_001B0E84 * 1.2f;
-    if (D_L00_001B0E80 >= 5.0f) D_L00_001B0E80 -= 5.0f;
+    g_sheepinator_beam_scroll_x -= g_sheepinator_beam_scroll_x_rate * 1.2f;
+    if (g_sheepinator_beam_scroll_x <= -8.0f) g_sheepinator_beam_scroll_x += 8.0f;
+    g_sheepinator_beam_scroll_y -= g_sheepinator_beam_scroll_rate * 1.2f;
+    if (g_sheepinator_beam_scroll_y <= -7.0f) g_sheepinator_beam_scroll_y += 7.0f;
+    g_sheepinator_beam_scroll_z += g_sheepinator_beam_scroll_rate * 1.2f;
+    if (g_sheepinator_beam_scroll_z >= 5.0f) g_sheepinator_beam_scroll_z -= 5.0f;
     for (i = 2; i < 12; i++) {
-        y = D_L00_001B0E7C;
-        z = D_L00_001B0E80;
+        y = g_sheepinator_beam_scroll_y;
+        z = g_sheepinator_beam_scroll_z;
         for (j = 0; j < 20; j++) {
-            qcopy(&packet.q[0], D_L00_00254CA0[i][j]);
-            qcopy(&packet.q[1], D_L00_00254CA0[i][(j + 1) % 20]);
-            qcopy(&packet.q[2], D_L00_00254B60[i][j]);
-            qcopy(&packet.q[3], D_L00_00254B60[i][(j + 1) % 20]);
+            qcopy(&packet.q[0], g_sheepinator_ribbon_surface_a[i][j]);
+            qcopy(&packet.q[1], g_sheepinator_ribbon_surface_a[i][(j + 1) % 20]);
+            qcopy(&packet.q[2], g_sheepinator_ribbon_surface_b[i][j]);
+            qcopy(&packet.q[3], g_sheepinator_ribbon_surface_b[i][(j + 1) % 20]);
             FastVecSub(e, &packet.q[0], &packet.q[1]);
             FastVecSub(f, &packet.q[2], &packet.q[1]);
             FastVecCross(g, f, e);
             FastVecSub(h, &packet.q[1], g_camera_l00_position);
             if (FastVecDot(g, h) >= 0.0f) {
-                y += D_L00_001B0E70;
-                z += D_L00_001B0E70;
+                y += g_sheepinator_beam_uv_y_step;
+                z += g_sheepinator_beam_uv_y_step;
                 continue;
             }
             if (i == 11) {
-                packet.colors[0] = packet.colors[1] = D_L00_001B0F04 & 0xffffff;
+                packet.colors[0] = packet.colors[1] = g_beam_packet_color_idle & 0xffffff;
             }
             packet.uv.x1 = packet.uv.x0 = x;
             packet.uv.y0 = packet.uv.y2 = y;
-            packet.uv.y1 = y + D_L00_001B0E70;
-            packet.uv.x2 = x - D_L00_001B0E6C;
-            packet.uv.x3 = x - D_L00_001B0E6C;
-            packet.uv.y3 = y + D_L00_001B0E70;
-            y += D_L00_001B0E70;
+            packet.uv.y1 = y + g_sheepinator_beam_uv_y_step;
+            packet.uv.x2 = x - g_sheepinator_beam_uv_x_step;
+            packet.uv.x3 = x - g_sheepinator_beam_uv_x_step;
+            packet.uv.y3 = y + g_sheepinator_beam_uv_y_step;
+            y += g_sheepinator_beam_uv_y_step;
             draw_world_quad(&packet.q[0], 0, 0);
             packet.uv.x1 = packet.uv.x0 = x;
             packet.uv.y0 = packet.uv.y2 = z;
-            packet.uv.y1 = z + D_L00_001B0E70;
-            packet.uv.x2 = x - D_L00_001B0E6C;
-            packet.uv.x3 = x - D_L00_001B0E6C;
-            packet.uv.y3 = z + D_L00_001B0E70;
-            z += D_L00_001B0E70;
+            packet.uv.y1 = z + g_sheepinator_beam_uv_y_step;
+            packet.uv.x2 = x - g_sheepinator_beam_uv_x_step;
+            packet.uv.x3 = x - g_sheepinator_beam_uv_x_step;
+            packet.uv.y3 = z + g_sheepinator_beam_uv_y_step;
+            z += g_sheepinator_beam_uv_y_step;
             draw_world_quad(&packet.q[0], 0, 0);
         }
-        x += D_L00_001B0E6C;
+        x += g_sheepinator_beam_uv_x_step;
     }
 }

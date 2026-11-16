@@ -4,9 +4,9 @@ typedef int TrailVector128 __attribute__((mode(TI)));
 typedef struct { int values[5]; } TrailParticleTypes;
 typedef struct { float values[10]; } TrailParticleSizes;
 
-extern TrailParticleTypes D_L04_001B0AD8;
-extern TrailParticleSizes D_L04_001B0AF0;
-extern int D_L04_001B0B18 __attribute__((sda));
+extern TrailParticleTypes g_trail_particle_types;
+extern TrailParticleSizes g_trail_particle_sizes;
+extern int g_trail_size_index __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -34,8 +34,8 @@ void EmitTrailEffects(char *owner, void *pos, void *dir, float length)
     int count, type, i;
 
     *(TrailVector128 *)origin = *(TrailVector128 *)pos;
-    frame.types = D_L04_001B0AD8;
-    frame.sizes = D_L04_001B0AF0;
+    frame.types = g_trail_particle_types;
+    frame.sizes = g_trail_particle_sizes;
     chance = math_random_float_range(0.0f, 1.0f);
     FastVecScale(frame.bias, owner + 0xC0, 0.05f);
     FastVecScale(frame.step, dir, 1.0f / length);
@@ -60,7 +60,7 @@ void EmitTrailEffects(char *owner, void *pos, void *dir, float length)
         frame.offset[2] = 0.3f;
         magnitude = FastVecDot(frame.offset, frame.step);
         FastVecScale(frame.point, frame.offset,
-            (length * 0.1f + frame.sizes.values[D_L04_001B0B18] * 1.05f) * 0.016666668f);
+            (length * 0.1f + frame.sizes.values[g_trail_size_index] * 1.05f) * 0.016666668f);
         FastVecScale(frame.offset, frame.offset, 0.15f);
         FastVecAdd(frame.offset, frame.offset, origin);
         FastVecAdd(frame.offset, frame.offset, frame.bias);
@@ -72,7 +72,7 @@ void EmitTrailEffects(char *owner, void *pos, void *dir, float length)
         } else {
             racer_start_trail(owner, frame.point, dir, owner + 0x10);
         }
-        if (++D_L04_001B0B18 >= 10)
-            D_L04_001B0B18 = 0;
+        if (++g_trail_size_index >= 10)
+            g_trail_size_index = 0;
     }
 }

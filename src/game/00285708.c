@@ -12,7 +12,7 @@ extern void FlushCache(s32);
 
 extern s32 func_00126730(u8 *, u8 *);
 
-extern s32 D_001A72E0[] __attribute__((sda));
+extern s32 g_vram_zbuffer_address[] __attribute__((sda));
 
 extern s32 g_screen_width[] __attribute__((sda));
 
@@ -25,7 +25,7 @@ extern void SetupFS_AA_buffer(int, int, int, int, int, int);
 /* Copies a rectangle of the screen picture into the given buffer. */
 void gfx_capture_screen_rect(s32 left, s32 top, s32 width, s32 height, u8 *destination) {
     u8 image[112];
-    func_00126470(image, (D_001A72E0[0]<<8)>>16, (g_screen_width[0]<<10)>>16,
+    func_00126470(image, (g_vram_zbuffer_address[0]<<8)>>16, (g_screen_width[0]<<10)>>16,
                 0x30,(short)left,(short)top,(short)width,(short)height);
     FlushCache(0);
     func_00126730(image,destination);
@@ -47,9 +47,9 @@ void menu_set_size_limits(int first, int second) {
     g_modal_state.second = second_limit;
 }
 
-extern int D_001A8A5C __attribute__((sda));
+extern int g_menu_mode __attribute__((sda));
 
 /* Returns the current menu mode. */
 int menu_get_mode(void) {
-    return D_001A8A5C;
+    return g_menu_mode;
 }

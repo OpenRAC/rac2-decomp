@@ -92,13 +92,13 @@ typedef struct {
     char pad1[0x1190 - 0x20];
 } Record2FCFC8;
 
-extern int D_001B22D8;
-extern Box2FCFC8 *D_001B22D4;
+extern int g_surface_box_count;
+extern Box2FCFC8 *g_surface_box_table;
 extern Record2FCFC8 *g_surface_height_tiles;
-extern float D_001AD5C8;
-extern float D_001AD5CC;
-extern float D_001AD5D0;
-extern float D_001AD5D4;
+extern float g_disturb_grid_params;
+extern float g_surface_box_origin_y;
+extern float g_surface_box_cell_x;
+extern float g_surface_box_cell_y;
 extern int FloatToInt(float value);
 
 /* The three coordinates arrive scaled by 1024 and are truncated to the grid
@@ -111,16 +111,16 @@ int coll_find_surface_box_at_point(float x, float y, float z) {
     int px = FloatToInt(x * 1024.0f);
     int py = FloatToInt(y * 1024.0f);
     int pz = FloatToInt(z * 1024.0f);
-    Box2FCFC8 *box = (Box2FCFC8 *)D_001B22D4;
+    Box2FCFC8 *box = (Box2FCFC8 *)g_surface_box_table;
     int i;
 
-    for (i = 0; i < D_001B22D8; i++, box++) {
+    for (i = 0; i < g_surface_box_count; i++, box++) {
         if (px >= box->x && py >= box->y && pz >= box->z &&
             px < box->x + box->halfwidth && py < box->y + box->halfheight &&
             pz < box->z + 0x800) {
             Record2FCFC8 *record = g_surface_height_tiles + i;
-            int r1 = FloatToInt((x - (record->x + D_001AD5C8)) / D_001AD5D0);
-            int r2 = FloatToInt((y - (record->y + D_001AD5CC)) / D_001AD5D4);
+            int r1 = FloatToInt((x - (record->x + g_disturb_grid_params)) / g_surface_box_cell_x);
+            int r2 = FloatToInt((y - (record->y + g_surface_box_origin_y)) / g_surface_box_cell_y);
             unsigned int mask = 1 << (((r1 >> 2) & 3) | (r2 & 0xC));
             if (record->flags & mask) {
                 return i;

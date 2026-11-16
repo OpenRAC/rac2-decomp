@@ -1,9 +1,9 @@
 #include "common.h"
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 extern void moby_increment_saved_switch_counter(char *), moby_hide_with_linked_parts(char *);
 extern void moby_set_state_in_list(int,int);
-extern struct { char pad[0x464]; unsigned char disabled[0]; } D_L01_0021E4B0;
+extern struct { char pad[0x464]; unsigned char disabled[0]; } g_level_save_state_backup;
 extern char g_hero_position[];
 typedef struct {
  char pad0[0x33C];
@@ -17,17 +17,17 @@ typedef struct {
  unsigned char mode;
 } CarryHero;
 extern CarryHero g_hero_state;
-extern unsigned char D_0019B2E8[];
-extern u8 D_001A7A00[] __attribute__((sda));
+extern unsigned char g_moby_group_flags[];
+extern u8 g_player_stats[] __attribute__((sda));
 extern int CarryLevelIndex SDATA(D_001A79F0);
-extern int D_L01_001A8FF4 MACRO_ADDR;
+extern int g_teleporter_timer MACRO_ADDR;
 extern int CarryMode SDATA(D_L01_001A8FF4) __attribute__((sda));
-extern int D_L01_001A8FF0 SDATA(D_L01_001A8FF0);
-extern int D_00138324;
+extern int g_teleporter_mode SDATA(D_L01_001A8FF0);
+extern int g_pad_held_flags;
 extern char *g_moby_l01_table MACRO_ADDR;
-extern float D_L01_001AF588 SDATA(D_L01_001AF588);
-extern float D_L01_001AF58C SDATA(D_L01_001AF58C);
-extern float D_L01_001AF590 SDATA(D_L01_001AF590);
+extern float g_teleporter_step_rate_a SDATA(D_L01_001AF588);
+extern float g_teleporter_step_rate_b SDATA(D_L01_001AF58C);
+extern float g_teleporter_step_rate_c SDATA(D_L01_001AF590);
 extern void DrawShrinkingMobyRings(char *);
 extern int IsPointInCuboid(void *, int);
 extern void moby_show_with_linked_parts(char *), level_apply_table_entry(char *), moby_position_carried_objects(char *);
@@ -55,16 +55,16 @@ typedef struct {
  float x34;
  int x38, x3C, x40, x44, x48, x4C, x50;
 } CarryData;
-void func_PAL_L01_0039B4F0(char *m)
+void teleporter_l01_update_pal(char *m)
 {
  CarryData *d = *(CarryData **)(m+0x68);
  int done=0, i, result;
  char **p;
  float v[4];
  unsigned short flags = *(u16 *)(m+0xB2);
- if (D_L01_0021E4B0.disabled[(short)flags]) goto completed;
+ if (g_level_save_state_backup.disabled[(short)flags]) goto completed;
  {
-  int c = (u8)D_0019B4A8[((short)flags>>1)+(g_current_map_index<<10)];
+  int c = (u8)g_moby_nibble_table[((short)flags>>1)+(g_current_map_index<<10)];
   if (flags&1) { if ((c>>4)&7) goto completed; }
   else if(c&7) goto completed;
   goto flags_checked;
@@ -78,7 +78,7 @@ flags_checked:
   if (*(u8 *)(m+0x20)==5) moby_set_state(m,1,-1);
  }
  if (d->x3C) {
-  if (!D_001A7A00[0xA]) {
+  if (!g_player_stats[0xA]) {
    *(u16 *)(m+0x34)|=0x41;
    *(int *)(m+0x98)=0;
    return;
@@ -118,13 +118,13 @@ flags_checked:
   moby_set_state(m,1,-1);
   
  case 1:
-  if(d->unlock>=0 && !(D_0019B2E8[d->unlock+(CarryLevelIndex<<4)]&0x80)) break;
+  if(d->unlock>=0 && !(g_moby_group_flags[d->unlock+(CarryLevelIndex<<4)]&0x80)) break;
   if(d->target==-1 || g_hero_state.mode==2 || g_hero_state.linked!=m || g_hero_state.control) break;
   if(d->x50) {
    d->x50=!g_hero_state.busy;
-   D_L01_001A8FF4=4; D_L01_001A8FF0=2;
+   g_teleporter_timer=4; g_teleporter_mode=2;
   } else level_apply_table_entry(m);
-  if(!(D_00138324&0x10)) break;
+  if(!(g_pad_held_flags&0x10)) break;
   PlayMobySound(0,0,m); moby_set_state(m,2,-1);
   d->x2C=0; d->x30=-1; d->x28=0;
   hero_start_target_state(m+0x10,0,*(float *)(m+0xF8));
@@ -132,9 +132,9 @@ flags_checked:
   break;
  case 7:
   if(d->x20<1.0f) {
-   math_step_value_toward_target(&d->x20,&d->x28,1.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x20,&d->x28,1.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else if(d->x24<1.0f) {
-   math_step_value_toward_target(&d->x24,&d->x2C,1.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x24,&d->x2C,1.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else {
    PlayMobySound(1,0,m); moby_set_state(m,8,-1); d->x34=0;
   }
@@ -145,11 +145,11 @@ flags_checked:
  case 2:
   result=hero_get_target_state_kind();
   if(d->x20<1.0f) {
-   math_step_value_toward_target(&d->x20,&d->x28,1.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x20,&d->x28,1.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else {
    int mode = CarryMode;
    if(d->x24<1.0f) {
-   math_step_value_toward_target(&d->x24,&d->x2C,1.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x24,&d->x2C,1.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else if(!(mode==4 && d->x20>0.25f)) {
    if(result==2) { d->x34=1.95f; moby_set_state(m,3,-1); }
    else if(!result) moby_set_state(m,4,-1);
@@ -185,9 +185,9 @@ flags_checked:
   if(d->x34<1.95f) {
    gfx_add_draw_callback_first(DrawShrinkingMobyRings,m); ApproachValue(&d->x34,1.95f,0.0800000057f);
   } else if(d->x24>0) {
-   math_step_value_toward_target(&d->x24,&d->x28,0.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x24,&d->x28,0.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else if(d->x20>0) {
-   math_step_value_toward_target(&d->x20,&d->x2C,0.0f,D_L01_001AF588*0.000400000019f,D_L01_001AF58C*0.000400000019f,D_L01_001AF590*0.0200000014f);
+   math_step_value_toward_target(&d->x20,&d->x2C,0.0f,g_teleporter_step_rate_a*0.000400000019f,g_teleporter_step_rate_b*0.000400000019f,g_teleporter_step_rate_c*0.0200000014f);
   } else moby_set_state(m,1,-1);
   moby_position_carried_objects(m);
  }

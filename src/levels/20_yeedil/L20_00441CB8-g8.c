@@ -19,9 +19,9 @@ extern void group_activate_waiting_members(int,float);
 /* EE keeps integer and floating arguments in independent register banks. */
 extern int weapon_select_aim_target(char *,int,float,float,int,int);
 extern void euler_rotation_basis(char *,char *);
-extern const float D_L20_001B2030 __attribute__((sda));
-extern const float D_L20_001B2034 __attribute__((sda));
-extern char D_L20_001C01C0[];
+extern const float g_yeedil_boss_scale __attribute__((sda));
+extern const float g_yeedil_boss_init_value __attribute__((sda));
+extern char g_request_l20_queue[];
 /* Sets up the big enemy when it first appears and handles its health. It reacts to hits, switches phase at low health and starts the death sequence. */
 void yeedil_boss_init_damage(char *obj) {
  char *st=*(char **)(obj+0x68), *p;
@@ -50,8 +50,8 @@ void yeedil_boss_init_damage(char *obj) {
   qcopy(st+0x17E0,obj+0x10);
  }
  if (*(u8 *)(obj+0x95)==6) return;
- *(float *)(obj+0x2C)=*(float *)(*(char **)(obj+0x24)+0x24)*D_L20_001B2030;
- *(float *)(st+0x30)=D_L20_001B2034;
+ *(float *)(obj+0x2C)=*(float *)(*(char **)(obj+0x24)+0x24)*g_yeedil_boss_scale;
+ *(float *)(st+0x30)=g_yeedil_boss_init_value;
  p=part_find_owned_effect_slot(obj,0x10000,0);
  if(p && (p=*(char **)(p+0x20))) {
   switch (*(short *)(p+0xAA)) { case 0x5DE: case 0x3A6: case MOBY_CLASS_MEGACORP_TROOPER_LEGS: *(u8 *)(obj+0xA8)=255; }
@@ -61,9 +61,9 @@ void yeedil_boss_init_damage(char *obj) {
  f=*(float *)(st+0x20);
  if(f<=0.0f || *(u8 *)(st+0x2E)==2) {
   *(float *)(st+0x20)=0.0f;
-  if(!req_push_queue(D_L20_001C01C0,0xA1)) goto done;
+  if(!req_push_queue(g_request_l20_queue,0xA1)) goto done;
   if(*(u8 *)(st+0x2E)!=2) SetDeathBits(obj,0,3);
-  req_push_queue(D_L20_001C01C0,0xA0); req_launch_queued(D_L20_001C01C0);
+  req_push_queue(g_request_l20_queue,0xA0); req_launch_queued(g_request_l20_queue);
   moby_set_state(obj,17,6); game_set_stored_value_pair(moby_start_screen_effect_state,obj);
  } else if(f<=*(float *)(st+0x1828)) {
   moby_set_state(obj,15,5); ++*(int *)(st+0x182C);

@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
-extern Quad D_L05_001BFB30;
+extern Quad g_projectile_pos_scratch;
 /* Retail holds this table base and reads its texture pointer at+0x184. */
-extern unsigned char D_L05_001FF240[];
+extern unsigned char g_particle_params_table[];
 extern void FastVecAdd(char *, char *, char *);
 extern int math_fast_float_d(int *);
 extern int GetCollHitMaterial(void);
@@ -42,7 +42,7 @@ void trailing_projectile_update(char *object) {
             contact = 0;
             if (coll_test_point(object + 16, 16, 1.0f, *(char **)(state + 0x20))) {
                 contact = 1;
-                *(Quad *)(object + 16) = D_L05_001BFB30;
+                *(Quad *)(object + 16) = g_projectile_pos_scratch;
             }
             if (!contact && !CollLine(&local.previous, object + 16, 16, *(char **)(state + 0x20), 0)) goto trail;
 
@@ -55,7 +55,7 @@ trail:
     local.point = local.previous;
     FastVecSub((char *)&local.step, object + 16, (char *)&local.previous);
     FastVecScale((char *)&local.step, (char *)&local.step, 0.333f);
-    textures = D_L05_001FF240;
+    textures = g_particle_params_table;
     i = 3;
     do {
         FastVecAdd((char *)&local.point, (char *)&local.point, (char *)&local.step);

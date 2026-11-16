@@ -4,13 +4,13 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* The list of ids each object holds, and the table of live objects the ids index. */
-extern unsigned short *D_L05_001FB220[];
+extern unsigned short *g_spawn_list_table[];
 
 /* The table of live objects, in the address the game keeps it at. */
-extern int D_L05_001B251C;
+extern int g_feltzin_target_mobys;
 
 /* The game's counters, of which the third counts the objects in flight. */
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
 extern char *moby_get_motion_data(char *);
 extern void follower_set_state(char *, int);
@@ -30,25 +30,25 @@ void group_free_members_and_self(char *obj)
     int off;
     short t;
 
-    if (D_L05_001FB220[*(unsigned char *)(obj + 0x21)] == 0)
+    if (g_spawn_list_table[*(unsigned char *)(obj + 0x21)] == 0)
         return;
     parent = (int *)moby_get_motion_data(obj);
-    p = D_L05_001FB220[*(unsigned char *)(obj + 0x21)];
+    p = g_spawn_list_table[*(unsigned char *)(obj + 0x21)];
     do {
         off = (*p & 0x7FFF) << 8;
-        child = (int *)moby_get_motion_data((char *)(D_L05_001B251C + off));
-        if (moby_is_in_use((char *)(D_L05_001B251C + off)) != 0
-            && moby_get_link_value((char *)(D_L05_001B251C + off)) == 0
+        child = (int *)moby_get_motion_data((char *)(g_feltzin_target_mobys + off));
+        if (moby_is_in_use((char *)(g_feltzin_target_mobys + off)) != 0
+            && moby_get_link_value((char *)(g_feltzin_target_mobys + off)) == 0
             && child[7] == parent[7]) {
-            moby_clear_links((char *)(D_L05_001B251C + off));
-            follower_set_state((char *)(D_L05_001B251C + off), 1);
+            moby_clear_links((char *)(g_feltzin_target_mobys + off));
+            follower_set_state((char *)(g_feltzin_target_mobys + off), 1);
         }
         t = *(short *)p;
         p++;
     } while (t >= 0);
     moby_clear_links(obj);
     follower_set_state(obj, 1);
-    D_L05_00221D10[2]--;
+    g_feltzin_challenge_state[2]--;
 }
 
 /* Finds the object the list of ids names, and hands the object its place: the two objects
@@ -64,18 +64,18 @@ void group_swap_with_free_member(char *obj)
     short t;
 
     addr = 0;
-    if (D_L05_001FB220[*(unsigned char *)(obj + 0x21)] == 0)
+    if (g_spawn_list_table[*(unsigned char *)(obj + 0x21)] == 0)
         return;
     parent = (int *)moby_get_motion_data(obj);
-    p = D_L05_001FB220[*(unsigned char *)(obj + 0x21)];
+    p = g_spawn_list_table[*(unsigned char *)(obj + 0x21)];
     do {
         off = (*p & 0x7FFF) << 8;
-        child = (int *)moby_get_motion_data((char *)(D_L05_001B251C + off));
-        if (moby_is_in_use((char *)(D_L05_001B251C + off)) != 0
-            && moby_get_link_value((char *)(D_L05_001B251C + off)) == 0
+        child = (int *)moby_get_motion_data((char *)(g_feltzin_target_mobys + off));
+        if (moby_is_in_use((char *)(g_feltzin_target_mobys + off)) != 0
+            && moby_get_link_value((char *)(g_feltzin_target_mobys + off)) == 0
             && child[7] == parent[7]
             && child[8] == 1) {
-            addr = D_L05_001B251C + off;
+            addr = g_feltzin_target_mobys + off;
             break;
         }
         t = *(short *)p;

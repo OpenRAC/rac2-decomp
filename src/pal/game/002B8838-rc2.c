@@ -7,7 +7,7 @@ extern int snd_Pump(void);
 extern void snd_set_current_buffer_flag(void);
 extern void mem_fast_helper_a(s32);
 
-s16 func_PAL_002B8898(s32 arg0) {
+s16 snd_pump_music_and_disc_read_pal(s32 arg0) {
     s16 *q;
 
     if (arg0 != 0) {

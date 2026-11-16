@@ -31,17 +31,17 @@ typedef struct PurchaseMoby {
     f32 yaw;
 } PurchaseMoby;
 
-extern u8 D_001A7B26[] MACRO_ADDR;
-extern u8 D_001A7A40[] MACRO_ADDR;
+extern u8 g_removal_trigger_flag[] MACRO_ADDR;
+extern u8 g_unlocked_item_flags[] MACRO_ADDR;
 extern s32 g_player_bolts[] MACRO_ADDR;
-extern u8 D_0013978C;
+extern u8 g_level_flag_byte;
 extern u8 g_item_slot_to_record[];
-extern s32 D_00138324;
-extern u8 g_hero_position[], D_00189F00[];
-extern u8 D_L01_002637A0[];
-extern u8 D_L01_001BF6C0[];
-extern u8 *D_L01_001B264C[] MACRO_ADDR;
-extern s32 D_L01_001A8F40 MACRO_ADDR;
+extern s32 g_pad_held_flags;
+extern u8 g_hero_position[], g_hero_target_point[];
+extern u8 g_action_table[];
+extern u8 g_cutscene_vars[];
+extern u8 *g_swamp_patrol_positions[] MACRO_ADDR;
+extern s32 g_hero_l01_control_mode MACRO_ADDR;
 
 /* The word at 0x001B22A8 follows the halfwords this level reads at 0x001B22A0/2/4. Retail keeps
    its store out of every delay slot: only a symbol-plus-offset operand does that, because the
@@ -118,9 +118,9 @@ void UpdateItemVendorMoby(PurchaseMoby *moby)
     part_spawn_effect_on_matching_things(moby, 0, 0xB1A, 2.5f);
     switch (moby->state) {
     case 0:
-        if (D_001A7B26[0])
+        if (g_removal_trigger_flag[0])
             goto remove_self;
-        flag = D_0013978C;
+        flag = g_level_flag_byte;
         if (flag >> 7) {
             if (g_player_bolts[0] < ITEM_COST)
                 moby_set_state(moby, 3, -1);
@@ -141,25 +141,25 @@ void UpdateItemVendorMoby(PurchaseMoby *moby)
         }
         break;
     case 1:
-        if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 0x120)) && req_push_queue(D_L01_001BF6C0, 0x27)) {
+        if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 0x120)) && req_push_queue(g_cutscene_vars, 0x27)) {
             level_apply_index_for_key(moby);
-            req_launch_queued(D_L01_001BF6C0);
+            req_launch_queued(g_cutscene_vars);
             moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        D_L01_001B22A0.busy = 1;
-        if (D_L01_001A8F40 == 2) {
+        g_cutscene_trigger_state.busy = 1;
+        if (g_hero_l01_control_mode == 2) {
             moby->enabled = 0;
             moby->flags |= 1;
-            if (D_L01_001A8F40 == 2) {
+            if (g_hero_l01_control_mode == 2) {
                 *(u16 *)(STATE_CHILD + 0x34) |= 1;
                 STATE_CHILD[0x31] = 0;
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L01_001B22A0.busy = 0;
-            record = D_L01_001B264C[0] + (*(s32 *)(state + 0x120) << 7);
+            g_cutscene_trigger_state.busy = 0;
+            record = g_swamp_patrol_positions[0] + (*(s32 *)(state + 0x120) << 7);
             hero_reset_position_and_direction(record + 0x30, record + 0x70, 0, 1);
             moby->enabled = 1;
             moby->flags &= 0xFFFE;
@@ -188,30 +188,30 @@ void UpdateItemVendorMoby(PurchaseMoby *moby)
             func_L00_0030C710(180);
             text_print_localized_formatted(0x27AC, ITEM_COST, -1);
             level_apply_index_for_key(moby);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L01_001BF6C0, 40)) {
-                req_launch_queued(D_L01_001BF6C0);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_cutscene_vars, 40)) {
+                req_launch_queued(g_cutscene_vars);
                 moby_set_state(moby, 5, -1);
             }
         }
         break;
     case 5:
-        D_L01_001B22A0.busy = 1;
-        if (D_L01_001A8F40 == 2) {
+        g_cutscene_trigger_state.busy = 1;
+        if (g_hero_l01_control_mode == 2) {
             moby->enabled = 0;
             moby->flags |= 1;
-            if (D_L01_001A8F40 == 2) {
+            if (g_hero_l01_control_mode == 2) {
                 *(u16 *)(STATE_CHILD + 0x34) |= 1;
                 STATE_CHILD[0x31] = 0;
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L01_001B22A0.busy = 0;
+            g_cutscene_trigger_state.busy = 0;
             moby->enabled = 1;
             moby->flags &= 0xFFFE;
             *(u16 *)(STATE_CHILD + 0x34) &= 0xFFFE;
             STATE_CHILD[0x31] = 1;
             moby_set_byte_on_group(moby->group, 1);
-            if (!D_001A7B26[0]) {
+            if (!g_removal_trigger_flag[0]) {
                 g_player_bolts[0] = g_player_bolts[0] - ITEM_COST;
                 func_L00_0030C710(180);
                 help_unlock_entry(46);
@@ -252,7 +252,7 @@ remove_self:
                 math_fast_float_d(state + 0x114);
         } else if (*(s32 *)(state + 0x114)) {
             *(s32 *)(state + 0x114) = 0;
-            qcopy(state + 0x100, D_00189F00);
+            qcopy(state + 0x100, g_hero_target_point);
         }
         if (math_fast_float_d(state + 0x118)) {
             *(s32 *)(state + 0x118) = FloatToInt(math_random_float_range(180.0f, 300.0f));
@@ -261,7 +261,7 @@ remove_self:
             FastVecAdd(state + 0x100, state + 0x100, moby->position);
         }
         if (*(s32 *)(state + 0x114)) {
-            qcopy(target, D_00189F00);
+            qcopy(target, g_hero_target_point);
             turnRate = 0.04f;
         } else {
             qcopy(target, state + 0x100);
@@ -285,7 +285,7 @@ remove_self:
         *(f32 *)(state + 0x68) = yaw * 0.6f;
         *(f32 *)(state + 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40[0])
+    if (g_unlocked_item_flags[0])
         *(f32 *)(state + 0x70) = 2.75f;
     TurnJoint(moby, state, 0, turnRate);
     TurnJoint(moby, state + 0x80, 1, turnRate);

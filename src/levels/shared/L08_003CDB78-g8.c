@@ -3,14 +3,14 @@ typedef int ContactQuad __attribute__((mode(TI)));
 typedef union { ContactQuad q; float f[4]; } ContactVector;
 typedef struct { char pad[0x2290]; void *collision; char gap[0x24CC-0x2294]; int contact; } ContactHero;
 extern ContactHero g_hero_state;
-extern char D_L08_001BFF60[], D_L08_001A8F20[] MACRO_ADDR;
+extern char g_collision_l08_hit_point[], g_str_effect_name[] MACRO_ADDR;
 typedef struct { char pad[0x10]; ContactQuad position; char tail[0xE0]; } ContactEntry;
-extern ContactEntry *D_L08_001B29DC __attribute__((sda));
-extern float D_L08_001AFFF4 __attribute__((sda)), D_L08_001AFFF0 __attribute__((sda));
-extern float D_L08_001AFFEC __attribute__((sda));
-extern float D_L08_001B0118 __attribute__((sda)), D_L08_001B0120 __attribute__((sda));
-extern float D_L08_001B3410 MACRO_ADDR, D_L08_001B3414 MACRO_ADDR;
-extern float D_L08_001B2094 MACRO_ADDR, D_L08_001B2098 MACRO_ADDR;
+extern ContactEntry *g_moby_array __attribute__((sda));
+extern float g_vehicle_bounce_scale_b __attribute__((sda)), g_vehicle_bounce_scale_a __attribute__((sda));
+extern float g_vehicle_collision_probe_z __attribute__((sda));
+extern float g_vehicle_collision_velocity_scale __attribute__((sda)), g_vehicle_fall_speed __attribute__((sda));
+extern float g_vehicle_saved_x MACRO_ADDR, g_vehicle_saved_y MACRO_ADDR;
+extern float g_vehicle_collision_x MACRO_ADDR, g_vehicle_collision_y MACRO_ADDR;
 extern int g_current_map_index;
 extern void vec_scale_to_length(void *,void *,float),FastVecAdd(void *,void *,void *);
 extern int coll_test_point(void *,int,float,void *);
@@ -36,11 +36,11 @@ int vehicle_handle_collision(char *object, void *prev_pos)
     float full_dist,part_dist,fall_speed;
     ContactHero *hero=&g_hero_state;
 
-    vec_scale_to_length(&temp_vec,object+0xC0,D_L08_001AFFF4);
+    vec_scale_to_length(&temp_vec,object+0xC0,g_vehicle_bounce_scale_b);
     FastVecAdd(&hit_point,&temp_vec,object+0x10);
-    vec_scale_to_length(&temp_vec,object+0xE0,D_L08_001AFFF0);
+    vec_scale_to_length(&temp_vec,object+0xE0,g_vehicle_bounce_scale_a);
     FastVecAdd(&hit_point,&hit_point,&temp_vec);
-    hit=coll_test_point(&hit_point,0,D_L08_001AFFEC,hero->collision);
+    hit=coll_test_point(&hit_point,0,g_vehicle_collision_probe_z,hero->collision);
     if (!hit) {
         moby_transform_joint_to_world(object,1,&temp_vec);
         hit=CollLine(&hit_point,&temp_vec,0x10,hero->collision,0);
@@ -55,38 +55,38 @@ int vehicle_handle_collision(char *object, void *prev_pos)
         }
         if (hit) {
             full_dist=fast_vec_dist(&hit_point,&temp_vec);
-            part_dist=fast_vec_dist(&hit_point,D_L08_001BFF60);
-            FastVecSub(D_L08_001BFF60+0x10,&hit_point,&temp_vec);
-            vec_scale_to_length(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,full_dist-part_dist);
-            FastVecAdd(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&hit_point);
+            part_dist=fast_vec_dist(&hit_point,g_collision_l08_hit_point);
+            FastVecSub(g_collision_l08_hit_point+0x10,&hit_point,&temp_vec);
+            vec_scale_to_length(g_collision_l08_hit_point+0x10,g_collision_l08_hit_point+0x10,full_dist-part_dist);
+            FastVecAdd(g_collision_l08_hit_point+0x10,g_collision_l08_hit_point+0x10,&hit_point);
         }
     }
     if (hit) {
-        SpawnExplosionEffects(object,D_L08_001A8F20,D_L08_001BFF60,0.0f,0.0f,3,3,3,0.0f,0.0f,9.0f,0.8f,-1,0.0f,0,3,-1,7,0x810001);
+        SpawnExplosionEffects(object,g_str_effect_name,g_collision_l08_hit_point,0.0f,0.0f,3,3,3,0.0f,0.0f,9.0f,0.8f,-1,0.0f,0,3,-1,7,0x810001);
         if (!*(int *)(vars+0xB0)) {
             snd_play_from_class_bank(4,0,object,0x988);
             *(int *)(vars+0xB0)=15;
         }
         FastVecSub(&hit_point,vars,&hit_point);
-        FastVecAdd(D_L08_001BFF60+0x10,D_L08_001BFF60+0x10,&hit_point);
+        FastVecAdd(g_collision_l08_hit_point+0x10,g_collision_l08_hit_point+0x10,&hit_point);
         if (g_current_map_index!=9 && (result=GetCollHitMaterial())==1) {
-            D_L08_001B2094=D_L08_001B3410;
-            D_L08_001B2098=D_L08_001B3414;
+            g_vehicle_collision_x=g_vehicle_saved_x;
+            g_vehicle_collision_y=g_vehicle_saved_y;
             *(int *)(vars+0x50)=0;
             hero_l08_enter_state(0,1);
             if (*(unsigned char *)(object+0x43)) anim_start_blended(object,0,0,10);
             checkpoint_index=*(int *)(vars+0x6C);
             if (checkpoint_index>0) {
-                qcopy(vars,&D_L08_001B29DC[checkpoint_index].position);
+                qcopy(vars,&g_moby_array[checkpoint_index].position);
                 moby_place_at_stored_transform(object);
             }
             moby_set_state(object,1,-1);
             g_hero_state.contact=result;
         } else {
-            qcopy(vars,D_L08_001BFF60+0x10);
-            vec_fast_normalize(vars+0x20,vars+0x20,D_L08_001BFF60+0x20);
-            FastVecScale(vars+0x20,vars+0x20,D_L08_001B0118);
-            fall_speed=D_L08_001B0120*0.00027777778450399637f;
+            qcopy(vars,g_collision_l08_hit_point+0x10);
+            vec_fast_normalize(vars+0x20,vars+0x20,g_collision_l08_hit_point+0x20);
+            FastVecScale(vars+0x20,vars+0x20,g_vehicle_collision_velocity_scale);
+            fall_speed=g_vehicle_fall_speed*0.00027777778450399637f;
             *(float *)(vars+0x28)-=fall_speed;
             if (*(unsigned char *)(object+0x20)!=9) {
                 if (*(float *)(vars+0x28)>0.0f) *(float *)(vars+0x28)=-fall_speed;

@@ -7,7 +7,7 @@ extern u8 D_001A63A8_4[];
 extern u8 g_hero_state[];
 
 /* shared native body of family cbc1388ebe801e68 */
-void func_PAL_L22_003A9808(u8 *a0, int a1) {
+void anim_start_slot_pal(u8 *a0, int a1) {
     u8 *g = D_001A63A8_4;
     u8 *p = *(u8 **)(a0 + 104);
     int bit;
@@ -33,7 +33,7 @@ extern int math_random_int_below(int a0);
  *
  * The mask lives in the controller at +0x4E0 of the object at +0x68.
  */
-void func_PAL_L22_003A9880(u8 *a0, int a1, int a2) {
+void anim_start_free_slot_in_range_pal(u8 *a0, int a1, int a2) {
     u8 *ctl = *(u8 **)(a0 + 0x68);
     int count;
     int rem;

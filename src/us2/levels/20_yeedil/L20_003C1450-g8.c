@@ -7,13 +7,13 @@ extern void moby_mark_table_entry_flagged(u8);
 extern float IntToFloat(int);
 extern int math_fast_float_d(void *);
 extern void group_raise_from_saved_heights(void *);
-extern void func_US2_L20_002C5B50(void *);
+extern void hero_exit_vehicle_mode_us2(void *);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void group_lower_save_heights(void *);
 extern void cam_lock_entry(s32);
-extern char *D_L20_001B2F9C;
-extern u8 D_0019B4A8[] NOT_SDA;
-extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
+extern char *g_group_l20_member_table;
+extern u8 g_moby_nibble_table[] NOT_SDA;
+extern struct { u8 header[0x464]; u8 collected[0]; } g_collected_l20_flags_2;
 extern char g_hero_state[];
 extern s32 g_current_map_index[] __attribute__((sda));
 typedef struct {
@@ -32,7 +32,7 @@ typedef struct {
     u16 uid;
 } ScriptMoby;
 
-void func_US2_L20_003C1450(ScriptMoby *self) {
+void scripted_pickup_update_us2(ScriptMoby *self) {
     ScriptState *state = self->script;
 
     switch (self->mode) {
@@ -45,11 +45,11 @@ void func_US2_L20_003C1450(ScriptMoby *self) {
             break;
         }
         uid = self->uid;
-        if (D_L20_0021EFB0.collected[(s16)uid]) {
+        if (g_collected_l20_flags_2.collected[(s16)uid]) {
             self->mode = 3;
             break;
         }
-        bits = D_0019B4A8[((s16)uid >> 1) + (g_current_map_index[0] << 10)];
+        bits = g_moby_nibble_table[((s16)uid >> 1) + (g_current_map_index[0] << 10)];
         if ((uid & 1) ? (bits >> 4) & 7 : bits & 7) {
             self->mode = 3;
             break;
@@ -61,7 +61,7 @@ void func_US2_L20_003C1450(ScriptMoby *self) {
     case 1: {
         u16 uid;
 
-        if (*(u8 *)((state->target << 8) + (s32)D_L20_001B2F9C + 0x20) == state->expectedState) {
+        if (*(u8 *)((state->target << 8) + (s32)g_group_l20_member_table + 0x20) == state->expectedState) {
             uid = self->uid;
         } else {
             if (!state->flag15 || !flag_is_third_pending_set(self))
@@ -69,12 +69,12 @@ void func_US2_L20_003C1450(ScriptMoby *self) {
             uid = self->uid;
         }
         if (uid & 1) {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+            u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if (((*entry >> 4) & 7) != 7)
                 *entry += 0x10;
         } else {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+            u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if ((*entry & 7) != 7)
                 ++*entry;
@@ -99,7 +99,7 @@ void func_US2_L20_003C1450(ScriptMoby *self) {
             if (*(s32 *)(hero + 0x2294) == 0x6F)
                 break;
             if (state->exitVehicle)
-                func_US2_L20_002C5B50(0);
+                hero_exit_vehicle_mode_us2(0);
             if (state->flag17)
                 level_capture_checkpoint_state(hero + 0x80, hero + 0x90);
             self->mode = 3;

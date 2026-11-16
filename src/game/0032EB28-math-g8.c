@@ -17,7 +17,7 @@ typedef struct {
     int back;
 } Bar_336548;
 
-extern int D_001AD9E8;
+extern int g_progress_bar_context;
 
 extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
 
@@ -29,7 +29,7 @@ void hud_draw_progress_bar(Bar_336548 *bar) {
     if (*bar->scale == 0.0f) return;
     x = bar->position[0];
     y = bar->position[1];
-    context = D_001AD9E8;
+    context = g_progress_bar_context;
     bar->size[0] = bar->size[0] > (float)bar->limit ? (float)bar->limit : bar->size[0];
     y0 = (int)y;
     x0 = (int)x;

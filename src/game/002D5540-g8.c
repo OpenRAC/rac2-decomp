@@ -3,7 +3,7 @@
 
 /* The two compared keys live in small data, so this file is built with -G8.
    Their addresses differ from program to program, so they carry no level. */
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 
 extern int ref_L00_002D5570_00 __attribute__((sda));
 extern int ref_L00_002D5570_01 __attribute__((sda));
@@ -14,11 +14,11 @@ extern void popup_init_texts_shown(char *);
 /* Starts one of two menu actions, depending on which of two known keys is passed in. */
 int menu_start_key_action(char *key)
 {
-    if (D_001A8CFC != 0) {
+    if (g_resident_data_base != 0) {
         if (key == (char *)&ref_L00_002D5570_00)
-            popup_init_texts_hidden(D_001A8CFC + 0x3CAA8);
+            popup_init_texts_hidden(g_resident_data_base + 0x3CAA8);
         else if (key == (char *)&ref_L00_002D5570_01)
-            popup_init_texts_shown(D_001A8CFC + 0x3CAA8);
+            popup_init_texts_shown(g_resident_data_base + 0x3CAA8);
     }
     return 0;
 }

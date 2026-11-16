@@ -19,17 +19,17 @@ extern void object_set_first_pair(void *, unsigned int, unsigned int);
 extern void object_set_second_pair(void *, unsigned int, unsigned int);
 extern void text_set_alignment(void *, unsigned int);
 extern void widget_store_field(void *, int);
-extern char D_001ADFA0[], D_001ADFC0[], D_001ADFC8[], D_001AE030[], D_001ADFD8[], D_001AE040[];
-extern char *D_001A8CFC[] __attribute__((sda));
-int func_PAL_003430B0(char *, unsigned int, void *);
+extern char g_menu_backdrop_desc[], g_menu_frame_desc[], g_menu_panel_desc[], g_menu_hud_label_desc_alt[], g_menu_icon_desc[], g_menu_bar_desc[];
+extern char *g_resident_data_base[] __attribute__((sda));
+int grid_menu_update_selection_pal(char *, unsigned int, void *);
 
-void func_PAL_00342DE8(char *self, void *parent)
+void grid_menu_init_pal(char *self, void *parent)
 {
     char *a=self+0xF0, *b, *c, *d, *e;
     int *v;
-    object_init_derived_arrays(a,D_001ADFA0,parent);
+    object_init_derived_arrays(a,g_menu_backdrop_desc,parent);
     *object_get_fourth_field(a)=0x60241700;
-    object_set_helper_result(a,D_001A8CFC[0]+0x8710,0x29);
+    object_set_helper_result(a,g_resident_data_base[0]+0x8710,0x29);
     *(void **)(self+0x1C4)=parent;
     if(parent) {
     v=ui_return_second_arg(16,pool_alloc_cell(parent));
@@ -40,17 +40,17 @@ void func_PAL_00342DE8(char *self, void *parent)
     **(float **)(self+0x1C0)=0.0f;
     (*(float **)(self+0x1C0))[1]=0.0f;
     b=self+0x4C; c=self+0x98; d=self+0x184; e=self+0x13C;
-    object_init_derived_arrays(self,D_001ADFC0,parent);
-    object_init_derived_arrays(b,D_001ADFC8,parent);
-    func_PAL_00338688(c,D_001AE030,parent);
+    object_init_derived_arrays(self,g_menu_frame_desc,parent);
+    object_init_derived_arrays(b,g_menu_panel_desc,parent);
+    func_PAL_00338688(c,g_menu_hud_label_desc_alt,parent);
     *object_get_fourth_field(self)=0x55F0C070;
     *object_get_fourth_field(b)=0x70FFFEED;
-    object_set_helper_result(self,D_001A8CFC[0]+0x8710,0x5D);
-    object_set_helper_result(b,D_001A8CFC[0]+0x8710,0x5E);
+    object_set_helper_result(self,g_resident_data_base[0]+0x8710,0x5D);
+    object_set_helper_result(b,g_resident_data_base[0]+0x8710,0x5E);
     object_set_flag_value(b,0);
     *(int *)(self+0x214)=0;
     *(int *)(self+0x218)=0;
-    object_init_derived_c(d,D_001ADFD8,parent);
+    object_init_derived_c(d,g_menu_icon_desc,parent);
     *object_get_fourth_field(d)=0x60F0F0B0;
     object_set_second_float4(d,32.0f,32.0f,0.0f,0.0f);
     *object_get_fourth_field(c)=0x80F0F0F0;
@@ -59,7 +59,7 @@ void func_PAL_00342DE8(char *self, void *parent)
     *(float *)(self+0x1C8)=0.0f;
     *(float *)(self+0x1CC)=0.0f;
     *(int *)(self+0x224)=0;
-    object_init_derived_b(e,32,0,D_001AE040,parent);
+    object_init_derived_b(e,32,0,g_menu_bar_desc,parent);
     widget_set_pos_y(e,5);
     func_PAL_003388E8(e,100);
     meter_set_value(e,0);
@@ -69,5 +69,5 @@ void func_PAL_00342DE8(char *self, void *parent)
     widget_store_field(e,0);
     *(int *)(self+0x21C)=4;
     *(int *)(self+0x220)=6;
-    func_PAL_003430B0(self,0,0);
+    grid_menu_update_selection_pal(self,0,0);
 }

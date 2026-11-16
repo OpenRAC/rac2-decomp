@@ -25,10 +25,10 @@
 #include "common.h"
 
 extern s8 *g_dma_packet_cursor;
-extern s8 *D_001B20E4;
-extern s8 *D_001B20E0;
-extern s32 D_001A72D4;
-extern s32 D_001A72D0;
+extern s8 *g_packet_chain_last_tag;
+extern s8 *g_packet_chain_first_tag;
+extern s32 g_vram_frame_base;
+extern s32 g_vram_cursor;
 extern void func_0029D0E0(s8 *);
 extern s32 gfx_append_vu1_preset_a(void);
 
@@ -37,24 +37,24 @@ void gfx_link_packet_chain(void) {
     s32 tag_word;
     s8 *first_tag;
 
-    D_001B20E4 = g_dma_packet_cursor;
+    g_packet_chain_last_tag = g_dma_packet_cursor;
     tag_word = 0x20000000;
     g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E0) + (0))) = tag_word;
-    first_tag = D_001B20E0;
+    (*(s32 *)((s8 *)(g_packet_chain_first_tag) + (0))) = tag_word;
+    first_tag = g_packet_chain_first_tag;
     (*(s8 **)((s8 *)(first_tag) + (4))) = g_dma_packet_cursor;
-    (*(s32 *)((s8 *)(D_001B20E0) + (8))) = 0;
-    (*(s32 *)((s8 *)(D_001B20E0) + (0xC))) = 0;
+    (*(s32 *)((s8 *)(g_packet_chain_first_tag) + (8))) = 0;
+    (*(s32 *)((s8 *)(g_packet_chain_first_tag) + (0xC))) = 0;
     func_0029D0E0(first_tag);
     (void) gfx_append_vu1_preset_a();
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0))) = tag_word;
-    (*(s8 **)((s8 *)(g_dma_packet_cursor) + (4))) = D_001B20E0 + 0x10;
+    (*(s8 **)((s8 *)(g_dma_packet_cursor) + (4))) = g_packet_chain_first_tag + 0x10;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (8))) = 0;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0xC))) = 0;
     g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E4) + (0))) = tag_word;
-    (*(s8 **)((s8 *)(D_001B20E4) + (4))) = g_dma_packet_cursor;
-    (*(s32 *)((s8 *)(D_001B20E4) + (8))) = 0;
-    (*(s32 *)((s8 *)(D_001B20E4) + (0xC))) = 0;
-    D_001A72D0 = D_001A72D4;
+    (*(s32 *)((s8 *)(g_packet_chain_last_tag) + (0))) = tag_word;
+    (*(s8 **)((s8 *)(g_packet_chain_last_tag) + (4))) = g_dma_packet_cursor;
+    (*(s32 *)((s8 *)(g_packet_chain_last_tag) + (8))) = 0;
+    (*(s32 *)((s8 *)(g_packet_chain_last_tag) + (0xC))) = 0;
+    g_vram_cursor = g_vram_frame_base;
 }

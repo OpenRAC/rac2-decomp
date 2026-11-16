@@ -30,9 +30,9 @@ typedef struct {
 } HeroAnimation24E8;
 
 extern u8 g_sound_state[];
-extern u8 D_L00_001B4400[];
-extern u8 D_L00_001B4A00[];
-extern float D_L00_0025DB20[][25];
+extern u8 g_hero_current_anim_buffer[];
+extern u8 g_hero_next_anim_buffer[];
+extern float g_hero_action_curve_table[][25];
 extern void hero_clear_anim_flags(void);
 extern void mem_copy_aligned(void *, void *, s32);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
@@ -75,7 +75,7 @@ void func_PAL_L00_002D29E8(void)
         obj->time = oldTime + ((((HeroAnimation24E8 *)g_hero_state)->speed) * 1.2f) * ((HeroAnimation24E8 *)g_hero_state)->rate;
     } else if (((HeroAnimation24E8 *)g_hero_state)->curve >= 0) {
         frame = ((HeroAnimation24E8 *)g_hero_state)->step;
-        obj->time = D_L00_0025DB20[((HeroAnimation24E8 *)g_hero_state)->curve][frame];
+        obj->time = g_hero_action_curve_table[((HeroAnimation24E8 *)g_hero_state)->curve][frame];
         ((HeroAnimation24E8 *)g_hero_state)->step = frame + 1;
     } else {
         obj->time = oldTime + ((((HeroAnimation24E8 *)g_hero_state)->rate) * 1.2f);
@@ -86,7 +86,7 @@ void func_PAL_L00_002D29E8(void)
         obj->time = 0.0f;
     delta = obj->time - oldTime;
     if (obj->time >= 1.0f) {
-        buffer = D_L00_001B4400;
+        buffer = g_hero_current_anim_buffer;
         do {
             if (obj->seq != obj->nextSeq) {
                 obj->seq = obj->nextSeq;
@@ -119,7 +119,7 @@ void func_PAL_L00_002D29E8(void)
                     obj->nextFrame = 0;
                     ((HeroAnimation24E8 *)g_hero_state)->flags |= 2;
                 }
-                obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
+                obj->next = anim_copy_entry_data((char *)obj, obj->nextSeq, obj->nextFrame, (s32)g_hero_next_anim_buffer);
                 obj->time -= 1.0f;
                 obj->time /= ((HeroAnimation24E8 *)g_hero_state)->rate;
                 ((HeroAnimation24E8 *)g_hero_state)->rate = *(float *)obj->current;

@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int QuadEDA __attribute__((mode(TI)));
 typedef union VecEDA { QuadEDA q; float f[4]; } VecEDA;
-extern unsigned char *D_001B5390;
+extern unsigned char *g_camera_state_ptr;
 extern char *moby_get_motion_data(unsigned char *);
 extern int follower_get_state(unsigned char *);
 extern void follower_clamp_range_spawn_sparks(unsigned char *);
@@ -51,7 +51,7 @@ void follower_update(unsigned char *owner)
     follower_move_toward_target(owner);
     follower_limit_speed(owner);
     UpdateBankedOrientation(owner);
-    cam = D_001B5390;
+    cam = g_camera_state_ptr;
     switch(follower_get_state(owner)) {
     case 7:
         vec_scale_to_length(&move_vec,PEDA(vars,0x120)+0xC0,-50.0f);

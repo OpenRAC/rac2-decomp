@@ -3,9 +3,9 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; s32 w[4]; } V4_F419348;
-extern s32 D_L10_001B0FB0 __attribute__((sda));
-extern s32 D_L10_001B0FC0 __attribute__((sda));
-extern s32 D_L10_001B0FD0 __attribute__((sda));
+extern s32 g_tail_marks_particle_first __attribute__((sda));
+extern s32 g_tail_marks_particle_second __attribute__((sda));
+extern s32 g_tail_marks_particle_third __attribute__((sda));
 extern void matrix_mul_vec3(void *, void *, char *);
 extern void FastVecAdd(void *, void *, char *);
 extern void vec_add_random_offset(void *, float);
@@ -42,9 +42,9 @@ void func_PAL_L10_0041E0F8(char *obj)
     vec_add_random_offset(&mark2, 0.1f);
     vec_add_random_offset(&mark3, 0.1f);
     drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
-    part_spawn_object_relative_particle(obj, &mark1, &drift, &D_L10_001B0FB0, 1);
+    part_spawn_object_relative_particle(obj, &mark1, &drift, &g_tail_marks_particle_first, 1);
     drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
-    part_spawn_object_relative_particle(obj, &mark2, &drift, &D_L10_001B0FC0, 1);
+    part_spawn_object_relative_particle(obj, &mark2, &drift, &g_tail_marks_particle_second, 1);
     drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
-    part_spawn_object_relative_particle(obj, &mark3, &drift, &D_L10_001B0FD0, 1);
+    part_spawn_object_relative_particle(obj, &mark3, &drift, &g_tail_marks_particle_third, 1);
 }

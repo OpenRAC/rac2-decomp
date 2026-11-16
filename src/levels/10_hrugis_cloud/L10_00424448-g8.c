@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern int g_mission_initialized __attribute__((sda));
-extern int D_L10_00221CFC __attribute__((section(".data")));
+extern int g_mission_progress_flag __attribute__((section(".data")));
 extern void music_Unpause(void);
 extern void entry_init_all_registered(void);
 extern void hero_set_state_value_a(int);
@@ -22,7 +22,7 @@ void mission_third_update(void *object)
     int i, count;
 
     if (!g_mission_initialized) {
-        D_L10_00221CFC = 0;
+        g_mission_progress_flag = 0;
         g_mission_initialized = 1;
         music_Unpause();
         entry_init_all_registered();

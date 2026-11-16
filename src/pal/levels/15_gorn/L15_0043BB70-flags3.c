@@ -5,7 +5,7 @@ extern char *moby_get_motion_data(char *);
 extern void follower_set_push_vector(char *, char *);
 extern void FastVecSub(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
-extern int D_001FE480[];
+extern int g_path_pointer_table[];
 
 /* Starts the entity the object's record names: places the object at the
    record's pose, builds the entity's matrix from it and sets its timer. */
@@ -20,7 +20,7 @@ void func_PAL_L15_0043C978(char *arg)
     rec = *(char **)(arg + 0x68);
     ent = moby_get_motion_data(arg);
     *(int *)(rec + 0x26C) = 0;
-    src = (char *)D_001FE480[*(int *)(rec + 0x268)];
+    src = (char *)g_path_pointer_table[*(int *)(rec + 0x268)];
     *(int *)(rec + 0x26C) = 1;
     qcopy(pos, src + 0x10);
     follower_set_push_vector(arg, src + 0x20);

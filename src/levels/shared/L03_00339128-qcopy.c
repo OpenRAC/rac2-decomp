@@ -2,7 +2,7 @@
 typedef int Quad __attribute__((mode(TI)));
 extern char *part_alloc(int);
 extern int FloatToInt(float);
-extern unsigned char *D_L03_001FF664;
+extern unsigned char *g_effect_type_table;
 
 /* Creates a timed effect entry at a position and fills in its owner, color, lifetime and size. */
 unsigned char *effect_create_timed(void *position, void *data, int type, int owner,
@@ -25,7 +25,7 @@ unsigned char *effect_create_timed(void *position, void *data, int type, int own
             effect[3] = marker;
         }
         effect[1] = 0;
-        effect[2] = D_L03_001FF664[type];
+        effect[2] = g_effect_type_table[type];
         *(float *)(effect + 0xC) = scale * 210000.0f;
         *(short *)(effect + 0xA) = timer;
         effect[8] = 0xA0;

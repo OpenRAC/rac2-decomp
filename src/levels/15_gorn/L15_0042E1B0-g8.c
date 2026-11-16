@@ -36,30 +36,30 @@ typedef struct {
     s32 blinkOn;
 } HudBlinkVars;
 
-extern u8 *D_L15_001B1580 __attribute__((sda));
-extern s32 D_L15_001B1530 __attribute__((sda));
-extern s32 D_L15_001B1638 __attribute__((sda));
-extern s32 D_L15_001B1620 __attribute__((sda));
-extern s32 D_L15_001B15B0 __attribute__((sda));
-extern s32 D_L15_001B15A4 __attribute__((sda));
-extern void *D_L15_001B1560 __attribute__((sda));
-extern void *D_L15_001B1564 __attribute__((sda));
-extern void *D_L15_001B1568 __attribute__((sda));
-extern void *D_L15_001B156C __attribute__((sda));
-extern void *D_L15_001B1570 __attribute__((sda));
-extern void *D_L15_001B1574 __attribute__((sda));
-extern u8 *D_L15_001A904C MACRO_ADDR;
-extern s32 D_L15_001B163C MACRO_ADDR;
-extern s32 D_L15_001B1624 MACRO_ADDR;
-extern f32 D_L15_001B2E84;
-extern s32 D_L15_001B2E80 MACRO_ADDR;
+extern u8 *g_gorn_hud_moby __attribute__((sda));
+extern s32 g_challenge_menu_choice __attribute__((sda));
+extern s32 g_gorn_hud_text_x __attribute__((sda));
+extern s32 g_gorn_hud_icon_x __attribute__((sda));
+extern s32 g_gorn_weapon_slot_index __attribute__((sda));
+extern s32 g_gorn_course_miss_count __attribute__((sda));
+extern void *g_label_sprite_a __attribute__((sda));
+extern void *g_label_sprite_b __attribute__((sda));
+extern void *g_label_sprite_c __attribute__((sda));
+extern void *g_label_sprite_d __attribute__((sda));
+extern void *g_label_sprite_e __attribute__((sda));
+extern void *g_label_sprite_f __attribute__((sda));
+extern u8 *g_challenge_menu_data MACRO_ADDR;
+extern s32 g_gorn_hud_text_y MACRO_ADDR;
+extern s32 g_gorn_hud_icon_y MACRO_ADDR;
+extern f32 g_screen_l15_scale;
+extern s32 g_screen_l15_mode MACRO_ADDR;
 extern s32 g_screen_width MACRO_ADDR;
-extern s32 D_L15_001B3698 MACRO_ADDR;
-extern HudMissionState D_L15_00221E10;
-extern f32 D_L15_001AC560, D_L15_001AC564;
-extern char D_L15_001B1640[], D_L15_001B1648[], D_L15_001B1690[];
-extern Block D_L15_001B1660, D_L15_001B1670, D_L15_001B1680;
-extern HudWeapon D_L15_0029FD80[];
+extern s32 g_gorn_course_timer MACRO_ADDR;
+extern HudMissionState g_gorn_challenge_vars;
+extern f32 g_label_offset_x, g_label_offset_y;
+extern char g_str_gorn_label_count[], g_str_gorn_label_time[], g_str_gorn_label_value[];
+extern Block g_gorn_hud_color_a, g_gorn_hud_color_b, g_gorn_hud_color_c;
+extern HudWeapon g_weapon_l15_table[];
 
 extern void gorn_hud_draw_sprites(s32, s32, s32, s32);
 extern void *level_find_object_by_class_id(s32);
@@ -88,7 +88,7 @@ extern void module_l00_call_handler_2(void), hud_draw_object_markers(void);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L15_001B2E84 + 0.5f;
+    f32 scaled = value * g_screen_l15_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -101,7 +101,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
    which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L15_001B2E80;
+    int mode = g_screen_l15_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -123,19 +123,19 @@ s32 DrawGornStageHud(void) {
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
     s32 hours, minutes, seconds, weapon_index, new_weapon_index, color, textX;
-    HudBlinkVars *data = *(HudBlinkVars **)(D_L15_001B1580 + 0x68);
+    HudBlinkVars *data = *(HudBlinkVars **)(g_gorn_hud_moby + 0x68);
     f32 x, y, ratio, tmp, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
 
-    switch (D_L15_001B1530) {
+    switch (g_challenge_menu_choice) {
     case 0: {
         s32 textX2;
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x31d1);
-        sprintf(text, D_L15_001B1640, label, group_count_alive(level_find_object_by_class_id(0x1211 /* moby class 4625 */)));
-        textX2 = D_L15_001B1638 - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L15_001B163C - 8, D_L15_001B2E84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_gorn_label_count, label, group_count_alive(level_find_object_by_class_id(0x1211 /* moby class 4625 */)));
+        textX2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 1: {
@@ -143,9 +143,9 @@ s32 DrawGornStageHud(void) {
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x31d1);
-        sprintf(text, D_L15_001B1640, label, D_L15_00221E10.count);
-        textX2 = D_L15_001B1638 - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L15_001B163C - 8, D_L15_001B2E84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_gorn_label_count, label, g_gorn_challenge_vars.count);
+        textX2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 2: {
@@ -153,9 +153,9 @@ s32 DrawGornStageHud(void) {
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x31d1);
-        sprintf(text, D_L15_001B1640, label, CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211 /* moby class 4625 */)));
-        textX2 = D_L15_001B1638 - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L15_001B163C - 8, D_L15_001B2E84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_gorn_label_count, label, CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211 /* moby class 4625 */)));
+        textX2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
@@ -164,72 +164,72 @@ s32 DrawGornStageHud(void) {
 
         gorn_hud_draw_sprites(1, 1, 0, 1);
         label = GetLocalizedString(0x31d7);
-        sprintf(text, D_L15_001B1640, label, D_L15_001B15A4);
-        textX = D_L15_001B1638 - 60;
-        text_draw_medium(textX, label_y((void *)textX, D_L15_001B163C - 8, D_L15_001B2E84, half, 1), 0x80808080, text, 128);
-        math_split_time_into_parts(D_L15_001B3698, &hours, &minutes, &seconds);
+        sprintf(text, g_str_gorn_label_count, label, g_gorn_course_miss_count);
+        textX = g_gorn_hud_text_x - 60;
+        text_draw_medium(textX, label_y((void *)textX, g_gorn_hud_text_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
+        math_split_time_into_parts(g_gorn_course_timer, &hours, &minutes, &seconds);
         label = GetLocalizedString(0x2f83);
-        sprintf(text, D_L15_001B1648, label, hours, minutes, seconds);
-        textX2 = D_L15_001B1620 - 80;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L15_001B1624 - 8, D_L15_001B2E84, half, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_gorn_label_time, label, hours, minutes, seconds);
+        textX2 = g_gorn_hud_icon_x - 80;
+        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_icon_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     }
 
-    if (D_L15_001A904C) {
-        D_L15_001B1560 = table_find_by_id(D_L15_001A904C + 0x8710, 128);
-        D_L15_001B1564 = table_find_by_id(D_L15_001A904C + 0x8710, 129);
-        D_L15_001B1568 = table_find_by_id(D_L15_001A904C + 0x8710, 130);
-        D_L15_001B156C = table_find_by_id(D_L15_001A904C + 0x8710, 131);
-        D_L15_001B1570 = table_find_by_id(D_L15_001A904C + 0x8710, 132);
-        D_L15_001B1574 = table_find_by_id(D_L15_001A904C + 0x8710, 133);
+    if (g_challenge_menu_data) {
+        g_label_sprite_a = table_find_by_id(g_challenge_menu_data + 0x8710, 128);
+        g_label_sprite_b = table_find_by_id(g_challenge_menu_data + 0x8710, 129);
+        g_label_sprite_c = table_find_by_id(g_challenge_menu_data + 0x8710, 130);
+        g_label_sprite_d = table_find_by_id(g_challenge_menu_data + 0x8710, 131);
+        g_label_sprite_e = table_find_by_id(g_challenge_menu_data + 0x8710, 132);
+        g_label_sprite_f = table_find_by_id(g_challenge_menu_data + 0x8710, 133);
         x = IntToFloat(g_screen_width) * 0.5f;
-        y = screen_coord(D_L15_001B2E80, 200.0f, 4.0f);
-        gfx_draw_scaled_object(D_L15_001B1560, x, y, 0x60442d00, 1.0f, 0.0f);
-        gfx_draw_scaled_object(D_L15_001B1564, x, y, 0x55f0c070, 1.0f, 0.0f);
+        y = screen_coord(g_screen_l15_mode, 200.0f, 4.0f);
+        gfx_draw_scaled_object(g_label_sprite_a, x, y, 0x60442d00, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_label_sprite_b, x, y, 0x55f0c070, 1.0f, 0.0f);
 
         /* The weapon's level gauge, red to green in one, two or three segments. */
         weapon_index = table_find_last_used_entry(6);
-        ratio = IntToFloat(D_L15_0029FD80[weapon_index].value) / IntToFloat(D_L15_0029FD80[weapon_index].maxLevel);
+        ratio = IntToFloat(g_weapon_l15_table[weapon_index].value) / IntToFloat(g_weapon_l15_table[weapon_index].maxLevel);
         switch (weapon_index) {
         case 6:
             if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L15_001B1570, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L15_001B1574, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L15_001B1570, x, y, 0x8000ff00, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_f, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_e, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L15_001B1570, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L15_001B156C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         }
 
         /* Health bar: blinks below 30%. */
-        fill = D_L15_00221E10.health * 0.01f;
+        fill = g_gorn_challenge_vars.health * 0.01f;
         if (fill > 0.3f) {
             data->blinkOn = 1;
         } else if (math_fast_float_d(&data->blinkTimer)) {
@@ -244,8 +244,8 @@ s32 DrawGornStageHud(void) {
 
         /* Ammo bar. */
         weapon_index = table_find_last_used_entry(7);
-        ratio = IntToFloat(D_L15_0029FD80[weapon_index].value);
-        fill = ratio / IntToFloat(D_L15_0029FD80[weapon_index].maxAmmo);
+        ratio = IntToFloat(g_weapon_l15_table[weapon_index].value);
+        fill = ratio / IntToFloat(g_weapon_l15_table[weapon_index].maxAmmo);
         color = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         base = IntToFloat(450);
         end = IntToFloat(386);
@@ -258,37 +258,37 @@ s32 DrawGornStageHud(void) {
             gfx_draw_screen_rectangle(450, 8, (s32)tmp, 19, 1, colors2);
 
         /* Weapon icons and the fill count. */
-        b0 = D_L15_001B1660;
-        b1 = D_L15_001B1670;
-        b2 = D_L15_001B1680;
+        b0 = g_gorn_hud_color_a;
+        b1 = g_gorn_hud_color_b;
+        b2 = g_gorn_hud_color_c;
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &b1);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &b0);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L15_0029FD80[table_find_last_used_entry(D_L15_001B15B0)].icon), 21, 7, 30, 30, &b2);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].icon), 21, 7, 30, 30, &b2);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &b1);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L15_0029FD80[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
-        sprintf(text, D_L15_001B1690, D_L15_0029FD80[table_find_last_used_entry(D_L15_001B15B0)].value,
-                      D_L15_0029FD80[table_find_last_used_entry(D_L15_001B15B0)].maxAmmo);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
+        sprintf(text, g_str_gorn_label_value, g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].value,
+                      g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].maxAmmo);
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         /* Weapon switch. */
         level_set_counter_plus_one(2);
         new_weapon_index = level_lookup_step_table();
         if (new_weapon_index >= 0) {
-            D_L15_0029FD80[table_find_last_used_entry(D_L15_001B15B0)].active = 0;
-            D_L15_001B15B0 = new_weapon_index;
-            D_L15_0029FD80[table_find_last_used_entry(new_weapon_index)].active = 1;
+            g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].active = 0;
+            g_gorn_weapon_slot_index = new_weapon_index;
+            g_weapon_l15_table[table_find_last_used_entry(new_weapon_index)].active = 1;
         }
-        gfx_draw_scaled_object(D_L15_001B1568, x, y, 0x80f0f0f0, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_label_sprite_c, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
     module_l00_call_handler_2();
-    sprite0 = table_find_by_id(D_L15_001A904C + 0x8710, 186);
+    sprite0 = table_find_by_id(g_challenge_menu_data + 0x8710, 186);
     /* data, done with, holds the second sprite. */
-    data = table_find_by_id(D_L15_001A904C + 0x8710, 187);
-    sprite2 = table_find_by_id(D_L15_001A904C + 0x8710, 188);
-    gfx_draw_scaled_object(sprite0, D_L15_001AC560 + 4.0f, label_y(sprite0, D_L15_001AC564 + 4.0f, D_L15_001B2E84, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
-    gfx_draw_scaled_object(data, D_L15_001AC560 + 4.0f, label_y(data, D_L15_001AC564 + 4.0f, D_L15_001B2E84, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
-    gfx_draw_scaled_object(sprite2, D_L15_001AC560 + 4.0f, label_y(sprite2, D_L15_001AC564 + 4.0f, D_L15_001B2E84, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
+    data = table_find_by_id(g_challenge_menu_data + 0x8710, 187);
+    sprite2 = table_find_by_id(g_challenge_menu_data + 0x8710, 188);
+    gfx_draw_scaled_object(sprite0, g_label_offset_x + 4.0f, label_y(sprite0, g_label_offset_y + 4.0f, g_screen_l15_scale, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
+    gfx_draw_scaled_object(data, g_label_offset_x + 4.0f, label_y(data, g_label_offset_y + 4.0f, g_screen_l15_scale, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
+    gfx_draw_scaled_object(sprite2, g_label_offset_x + 4.0f, label_y(sprite2, g_label_offset_y + 4.0f, g_screen_l15_scale, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
     hud_draw_object_markers();
     return 1;
 }

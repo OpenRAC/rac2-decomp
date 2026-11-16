@@ -17,7 +17,7 @@ extern int g_game_time;
    every program, so it is named after the address; the incomplete array keeps it
    out of the small-data pool, which is what makes the compiler split the address
    into the retail's `lui`/`sw` pair. */
-extern int D_10000000[];
+extern int g_ee_timer_registers[];
 
 extern void vec_decode_byte_color(char *dst, char *src);
 
@@ -49,7 +49,7 @@ void part_update_fading_effect(char *self)
         *(unsigned char *)(effect + 8) = *(unsigned char *)(effect + 8) + 1;
     }
     if (*(short *)(anim + 0x10) != 0) {
-        D_10000000[0] = 0;
+        g_ee_timer_registers[0] = 0;
         vec_decode_byte_color((char *)&step, anim);
         FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
         progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x10));
@@ -126,18 +126,18 @@ typedef struct {
    reads the moby and state fields of the same block.  Being one aggregate (not
    three scalars) is what keeps retail's stores ahead of the following node loads. */
 typedef struct { int unk0; char *moby; void *data; int unkC; int message; } DialogTalk_002B8108;
-extern DialogTalk_002B8108 D_001B178C MACRO_ADDR;
-extern int D_001AA2B8 __attribute__((sda));
-extern Separators_002B8108 D_001AA250;
-extern char D_001AA278[];
-extern char D_001AA288[];
+extern DialogTalk_002B8108 g_dialogue_talk_state MACRO_ADDR;
+extern int g_dialogue_hud_key __attribute__((sda));
+extern Separators_002B8108 g_price_separators;
+extern char g_str_price_format[];
+extern char g_str_dialogue_marker[];
 extern int g_player_bolts;
-extern short D_001A7A1A;
-extern unsigned char D_001A7BB4;
+extern short g_orb_counter;
+extern unsigned char g_language;
 extern unsigned char g_item_slot_to_record[];
 extern ClassRecord_002B8108 g_weapon_table[];
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern unsigned char D_001A7B30[] MACRO_ADDR;
+extern unsigned char g_help_unlocked_flags[] MACRO_ADDR;
 
 extern int request_begin_slot(int, int, int, int, int);
 extern int save_count_items_above_baseline(void);
@@ -175,8 +175,8 @@ void cutscene_run_dialogue_node(char *owner, DialogState_002B8108 *st, int enter
             st->skippable = node->flags & 1;
             if (flags & 4) {
                 unsigned short sound;
-                D_001B178C.moby = owner;
-                D_001B178C.data = st;
+                g_dialogue_talk_state.moby = owner;
+                g_dialogue_talk_state.data = st;
                 sound = node->sound;
                 if (sound & 0x4000) {
                     request_begin_slot(1, 1, 0, (short)(sound ^ 0x4000), 0);
@@ -189,30 +189,30 @@ void cutscene_run_dialogue_node(char *owner, DialogState_002B8108 *st, int enter
     if (st->cur == -1) {
         return;
     }
-    D_001B178C.message = node->message;
+    g_dialogue_talk_state.message = node->message;
     kind = node->kind;
     if (kind == 6) {
-        seps = D_001AA250;
+        seps = g_price_separators;
         strcpy((char *)0x70000000, GetLocalizedString(node->message));
         {
-            char *p = strstr((char *)0x70000000, D_001AA288);
+            char *p = strstr((char *)0x70000000, g_str_dialogue_marker);
             if (p != 0) {
                 p[1] = 's';
             }
         }
         {
             int price = (node->arg[g_item_slot_to_record])[g_weapon_table].price;
-            sprintf(number, D_001AA278, price / 1000, seps.s[D_001A7BB4 % 6], price % 1000);
+            sprintf(number, g_str_price_format, price / 1000, seps.s[g_language % 6], price % 1000);
         }
         sprintf(text, (char *)0x70000000, number);
     } else {
         sprintf(text, GetLocalizedString(node->message));
     }
-    if (D_001B178C.message != 0) {
+    if (g_dialogue_talk_state.message != 0) {
         hud_play_sound_effect(text);
-    } else if (D_001AA2B8 != -1) {
-        hud_close_element_by_key(D_001AA2B8);
-        D_001AA2B8 = -1;
+    } else if (g_dialogue_hud_key != -1) {
+        hud_close_element_by_key(g_dialogue_hud_key);
+        g_dialogue_hud_key = -1;
     }
     if (node->kind == 0) {
         return;
@@ -225,7 +225,7 @@ void cutscene_run_dialogue_node(char *owner, DialogState_002B8108 *st, int enter
         cond = g_item_owned_flags[node->arg] != 0;
         break;
     case 3:
-        cond = g_item_owned_flags[node->arg] != 0 && D_001A7B30[node->arg] == 0;
+        cond = g_item_owned_flags[node->arg] != 0 && g_help_unlocked_flags[node->arg] == 0;
         break;
     case 5:
         cond = save_count_items_above_baseline() >= node->arg;
@@ -234,7 +234,7 @@ void cutscene_run_dialogue_node(char *owner, DialogState_002B8108 *st, int enter
         cond = g_player_bolts >= (node->arg[g_item_slot_to_record])[g_weapon_table].price && save_count_items_above_baseline() >= 4;
         break;
     case 7:
-        cond = D_001A7A1A >= node->arg;
+        cond = g_orb_counter >= node->arg;
         break;
     default:
         cond = 0;
@@ -267,7 +267,7 @@ extern int func_00128A50(int socket, void *data);
 extern int sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
 extern void ClearPadInput(void *pad);
 extern void pad_decode_reading(void *pad, void *data, int size);
-extern int D_001A7428;
+extern int g_pad_device_idle_flag;
 
 typedef struct {
     unsigned char pad0[0x180];
@@ -358,5 +358,5 @@ void poll_pad_device_state(void *pad_arg)
     }
     p->vibration0 = 0;
     p->vibration1 = 0;
-    D_001A7428 = g_pad_state.device_state == 0;
+    g_pad_device_idle_flag = g_pad_state.device_state == 0;
 }

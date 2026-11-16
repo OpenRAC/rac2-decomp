@@ -19,10 +19,10 @@ extern int snd_play_from_class_bank(int, int, void *, int);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
 extern void part_l05_spawn_tail_trail_marks(void *);
-extern int D_L05_001B0F50 __attribute__((sda));
-extern int D_L05_00221D48 NOT_SDA;
-extern char *D_L05_001FE380[];
-extern char *D_L05_001B251C MACRO_ADDR;
+extern int g_route_l05_flag __attribute__((sda));
+extern int g_gate_l05_path_index NOT_SDA;
+extern char *g_gate_l05_path_table[];
+extern char *g_feltzin_target_mobys MACRO_ADDR;
 extern u8 g_sound_state[];
 
 typedef struct { u8 pad[0x11C]; int mode; } Movement;
@@ -42,13 +42,13 @@ void func_L05_004170C8(u8 *actor)
         moby_init_effect_from_table(actor);
         if (*(int *)(state + 0x1B4) != 0)
             level_append_object((int)actor, (int)func_L05_00417730, 0, 0);
-        D_L05_001B0F50 = 0;
+        g_route_l05_flag = 0;
         return;
     }
     movement = (u8 *)moby_get_motion_data(actor);
     if (*(int *)(movement + 0x110) == 0)
         return;
-    path = D_L05_001FE380[D_L05_00221D48];
+    path = g_gate_l05_path_table[g_gate_l05_path_index];
     one = 1;
     follower_set_state(actor, 11);
     if (*(int *)(state + 0x1B8) == 0) {
@@ -63,14 +63,14 @@ void func_L05_004170C8(u8 *actor)
     } else if (follower_has_reached_target(actor) != 0) {
         int next = *(int *)(state + 0x1BC);
         if (next >= *(int *)path)
-            D_L05_001B0F50 = one;
+            g_route_l05_flag = one;
         else {
             *(int *)(state + 0x1BC) = next + 1;
             follower_set_push_vector(actor, path + (next * 16 + 16));
             *(int *)(movement + 0x130) = 2000000;
         }
     }
-    if (D_L05_001B0F50 == 0) {
+    if (g_route_l05_flag == 0) {
         moby_update_movement_state(actor);
         moby_check_player_in_view_and_range(actor, 1, 32.0f);
     }
@@ -79,7 +79,7 @@ void func_L05_004170C8(u8 *actor)
         if (*(int *)(state + 0x1B0) != -1) {
             u8 *other;
             ((Movement *)movement)->mode = mode;
-            other = (u8 *)D_L05_001B251C + (*(int *)(state + 0x1B0) << 8);
+            other = (u8 *)g_feltzin_target_mobys + (*(int *)(state + 0x1B0) << 8);
             *(u8 **)(movement + 0x120) = other;
             if (fast_vec_dist(other + 0x10, actor + 0x10) < 15.0f) {
                 float alignment;

@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_0026F598(void)
+void stub_empty_5_pal(void)
 {
 }
 

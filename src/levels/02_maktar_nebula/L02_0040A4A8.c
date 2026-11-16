@@ -9,7 +9,7 @@ typedef signed int s32;
 
 extern void object_reset_type_and_free(void);
 extern void moby_set_state();
-extern char D_L02_001BE200[];
+extern char g_mob_list[];
 extern void boss_draw_joint_glow_facing_cam(void *, int);
 extern void boss_draw_joint_glow(void *, int);
 extern void boss_draw_joint_four_glow(void *);
@@ -26,7 +26,7 @@ extern float mat_fast_helper_a(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void func_31E6A0(void *, int, int);
-extern char D_L02_00188660[];
+extern char g_sound_l02_record_table[];
 extern void func_41F230(void *, int, int, int, int, int, int, int, int, int,
                         int, int, float, float);
 extern void func_366BD8(int, int, void *, int);
@@ -332,7 +332,7 @@ void blade_ball_explode(u8 *moby) {
     s32 slot = *(s32 *)(vars + 0x19C);
 
     if (slot != -1) {
-        u8 *soundRecord = (u8 *)D_L02_00188660 + slot * 0x70;
+        u8 *soundRecord = (u8 *)g_sound_l02_record_table + slot * 0x70;
 
         if (*(u8 **)(soundRecord + 0x88) == moby && soundRecord[0x74] != 0)
             snd_stop_voice(slot);
@@ -358,9 +358,9 @@ void blade_ball_explode(u8 *moby) {
 
 /* sda in this -G0 unit gives retail's bare-symbol load (`lui $r` / `lbu $r,%lo($r)`, one register);
    a plain declaration splits it into two registers. */
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
 extern char g_hero_position[];
 extern int IsPointInCuboid(void *, int);
 extern s32 req_push_queue(u8 *, s32);
@@ -388,13 +388,13 @@ void message_sequence_update(u8 *moby) {
             moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (D_001A7BCB == 0 && D_L02_001395B8[4] == 0 &&
+        if (g_unlock_flag_c == 0 && g_message_sequence_flags[4] == 0 &&
             IsPointInCuboid(g_hero_position, *(s32 *)(state + 0xC)) != 0 &&
-            req_push_queue(D_L02_001C0700, 0x2D) != 0) {
-            req_push_queue(D_L02_001C0700, 3);
-            req_push_queue(D_L02_001C0700, 0x2E);
-            req_launch_queued(D_L02_001C0700);
-            D_L02_001395B8[4] = 1;
+            req_push_queue(g_message_queue, 0x2D) != 0) {
+            req_push_queue(g_message_queue, 3);
+            req_push_queue(g_message_queue, 0x2E);
+            req_launch_queued(g_message_queue);
+            g_message_sequence_flags[4] = 1;
             moby_set_state(moby, 2, -1);
         }
         break;
@@ -413,8 +413,8 @@ void message_sequence_update(u8 *moby) {
 /* func_L02_00411D18 is defined in L02_00411D18.c. */
 
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
-extern u16 D_0018CFDC;
+extern u8 g_moby_group_flags[];
+extern u16 g_beam_emitter_id;
 extern int math_random_int_below(int);
 extern float math_random_angle(void);
 extern float ApproachValue(float *, float, float);
@@ -449,7 +449,7 @@ void beam_emitter_update(u8 *moby) {
 
     switch (moby[0x20]) {
     case 0:
-        if (D_0019B2E8[moby[0xB0] + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80) {
             moby_mark_spawned(moby);
             return;
         }
@@ -467,7 +467,7 @@ void beam_emitter_update(u8 *moby) {
         if (moby[0x31] != 0)
             part_throw_front_sparks(moby);
         {
-            u8 *soundRecord = (u8 *)D_L02_00188660 + *(s32 *)(vars + 0x18) * 0x70;
+            u8 *soundRecord = (u8 *)g_sound_l02_record_table + *(s32 *)(vars + 0x18) * 0x70;
 
             if (*(u8 **)(soundRecord + 0x88) != moby || soundRecord[0x74] == 0)
                 *(s32 *)(vars + 0x18) = PlayMobySound(0, 4, moby);
@@ -484,13 +484,13 @@ void beam_emitter_update(u8 *moby) {
             hitOwner = *(u8 **)(hitRecord + 0x20);
             if (hitOwner != 0 && *(s16 *)(hitOwner + 0xAA) == 0x9C8 /* moby class 2504 */ &&
                 fast_vec_dist(moby + 0x10, hitOwner + 0x10) < 5.0f) {
-                D_0018CFDC = 0xFFFF;
+                g_beam_emitter_id = 0xFFFF;
                 moby_set_state(moby, 2, -1);
                 *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
                 *(u32 *)(moby + 0x98) = 0;
                 slot = *(s32 *)(vars + 0x18);
                 if (slot != -1) {
-                    u8 *heldRecord = (u8 *)D_L02_00188660 + slot * 0x70;
+                    u8 *heldRecord = (u8 *)g_sound_l02_record_table + slot * 0x70;
 
                     if (*(u8 **)(heldRecord + 0x88) == moby && heldRecord[0x74] != 0)
                         snd_stop_voice(slot);
@@ -520,10 +520,10 @@ typedef struct { float f[4]; } SparkRange;
 typedef struct { float f[2]; } SparkSizes;
 typedef struct { int i[2]; } SparkColours;
 typedef struct { u8 b[4]; } SparkKinds;
-extern SparkRange D_L02_001B1C10;
-extern SparkSizes D_L02_001B1C20;
-extern SparkColours D_L02_001B1C28;
-extern SparkKinds D_L02_001B1C30;
+extern SparkRange g_spark_l02_range_2;
+extern SparkSizes g_spark_sizes;
+extern SparkColours g_spark_colours;
+extern SparkKinds g_spark_kinds;
 extern void matrix_mul_vec3(void *, void *, void *);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
@@ -536,10 +536,10 @@ extern void vec_clear_128(void *);
    of the first, falling at a speed drawn between the last two. */
 /* Throws two small sparks from a point in front of the object. */
 void part_throw_front_sparks(u8 *moby) {
-    SparkRange range = D_L02_001B1C10;
-    SparkSizes sizes = D_L02_001B1C20;
-    SparkColours colours = D_L02_001B1C28;
-    SparkKinds kinds = D_L02_001B1C30;
+    SparkRange range = g_spark_l02_range_2;
+    SparkSizes sizes = g_spark_sizes;
+    SparkColours colours = g_spark_colours;
+    SparkKinds kinds = g_spark_kinds;
     float velocity[4];
     float front[4];
     float spot[4];
@@ -572,8 +572,8 @@ extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int FastTweenColor(int, int, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
-extern int D_L02_001B2050[2] __attribute__((sda));
-extern int D_L02_001B2058[2] __attribute__((sda));
+extern int g_spark_burst_colors_a[2] __attribute__((sda));
+extern int g_spark_burst_colors_b[2] __attribute__((sda));
 
 /* Throws twenty sparks from a point built from the actor's transform (+0x10) and its vectors at
    +0xC0 and +0xE0. Each one flies along a random mix of the vectors at +0xC0, +0xD0 and +0xE0 at
@@ -614,8 +614,8 @@ void part_throw_spark_burst(u8 *moby, float lo, float hi) {
         pull[2] = -k * (float)(partA + partB + partC);
         FastVecAdd(pull, pull, velocity);
         pull[3] = 0.01f;
-        colorA = FastTweenColor(D_L02_001B2050[0], D_L02_001B2050[1], math_random_float_range(0.0f, 1.0f));
-        colorB = FastTweenColor(D_L02_001B2058[0], D_L02_001B2058[1], math_random_float_range(0.0f, 1.0f));
+        colorA = FastTweenColor(g_spark_burst_colors_a[0], g_spark_burst_colors_a[1], math_random_float_range(0.0f, 1.0f));
+        colorB = FastTweenColor(g_spark_burst_colors_b[0], g_spark_burst_colors_b[1], math_random_float_range(0.0f, 1.0f));
         part_spawn_trail(origin, velocity, pull, colorA, colorB, partA, partB, partC, 0x1003C);
     } while (--i >= 0);
 }
@@ -625,9 +625,9 @@ struct Pair42E2F8 {
     float b;
 };
 
-extern const struct Pair42E2F8 D_L02_001B23E0;
-extern const struct Pair42E2F8 D_L02_001B23E8;
-extern const TI128 D_L02_001B23F0[2];
+extern const struct Pair42E2F8 g_spark_pod_sizes_a;
+extern const struct Pair42E2F8 g_spark_pod_sizes_b;
+extern const TI128 g_spark_pod_colors[2];
 extern s32 g_hovering_object_count __attribute__((sda));
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, unsigned char, s32);
 extern void *part_spawn_object_following_effect(void *, void *, int, int, int, int, int, int, float, float);
@@ -639,15 +639,15 @@ extern void part_throw_spark_fan(u8 *, float, float);
 /* A small object that waits to be hit. When it is hit it bursts with a flash and sparks, and then goes away. */
 void spark_pod_update(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
-    struct Pair42E2F8 sizesA = D_L02_001B23E0;
-    struct Pair42E2F8 sizesB = D_L02_001B23E8;
+    struct Pair42E2F8 sizesA = g_spark_pod_sizes_a;
+    struct Pair42E2F8 sizesB = g_spark_pod_sizes_b;
     TI128 colors[2];
     float localOffset[4] __attribute__((aligned(16)));
     float flashPoint[4] __attribute__((aligned(16)));
     float flashStep[4] __attribute__((aligned(16)));
 
-    colors[0] = D_L02_001B23F0[0];
-    colors[1] = D_L02_001B23F0[1];
+    colors[0] = g_spark_pod_colors[0];
+    colors[1] = g_spark_pod_colors[1];
     switch (moby[0x20]) {
     case 0:
         *(TI128 *)localOffset = 0;
@@ -697,7 +697,7 @@ void spark_pod_update(u8 *moby) {
 /* restarts the shared effect object the level keeps at 0x1BE200 */
 /* Resets and re-arms the level's shared effect object so its effect starts again. */
 void level_reset_effect_object(void) {
-    char *p = D_L02_001BE200;
+    char *p = g_mob_list;
 
     boss_draw_joint_glow_facing_cam(*(void **)(p + 0x198), 0);
     boss_draw_joint_glow_facing_cam(*(void **)(p + 0x198), 1);
@@ -709,10 +709,10 @@ void level_reset_effect_object(void) {
 
 extern void path_draw_nearest_record_quad(u8 *);
 extern void DrawRadialQuadEffect(u8 *);
-extern int D_L02_001A8F00 __attribute__((sda));
+extern int g_arena_state_words __attribute__((sda));
 extern char *g_moby_l02_pool __attribute__((sda));
-extern char D_L02_004004D8[];
-extern int D_L02_00258800[];
+extern char g_stage_draw_callback[];
+extern int g_stage_controller_data[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void gfx_add_draw_callback_first(void *, void *);
 
@@ -761,7 +761,7 @@ void stage_controller_update(u8 *moby) {
         vars->armed = 0;
         break;
     case 1:
-        if (D_L02_001A8F00 != 2) {
+        if (g_arena_state_words != 2) {
             if (vars->armed != 0) {
                 target = (L02_Ent *)(g_moby_l02_pool + (vars->ent << 8));
                 vars->armed = 0;
@@ -773,10 +773,10 @@ void stage_controller_update(u8 *moby) {
                 FastVecAdd(target->pos, target->pos, push);
             }
         } else {
-            level = (L02_Level *)D_L02_001BE200;
+            level = (L02_Level *)g_mob_list;
             if (level->mode == 0) {
                 gfx_add_draw_callback_first(DrawRadialQuadEffect, g_moby_l02_pool + (vars->ent2 << 8));
-                gfx_add_draw_callback_first(D_L02_004004D8, g_moby_l02_pool + (vars->ent2 << 8));
+                gfx_add_draw_callback_first(g_stage_draw_callback, g_moby_l02_pool + (vars->ent2 << 8));
                 gfx_add_draw_callback_first(path_draw_nearest_record_quad, moby);
                 if (vars->armed == 0) {
                     target = (L02_Ent *)(g_moby_l02_pool + (vars->ent << 8));
@@ -790,17 +790,17 @@ void stage_controller_update(u8 *moby) {
                 }
             } else if (level->mode == 1) {
                 gfx_add_draw_callback_first(DrawRadialQuadEffect, g_moby_l02_pool + (vars->ent2 << 8));
-                gfx_add_draw_callback_first(D_L02_004004D8, g_moby_l02_pool + (vars->ent2 << 8));
+                gfx_add_draw_callback_first(g_stage_draw_callback, g_moby_l02_pool + (vars->ent2 << 8));
             } else if (level->mode == 6) {
                 color = 0x40FF00EA;
                 gfx_add_draw_callback_first(DrawRadialQuadEffect, g_moby_l02_pool + (vars->ent2 << 8));
-                gfx_add_draw_callback_first(D_L02_004004D8, g_moby_l02_pool + (vars->ent2 << 8));
+                gfx_add_draw_callback_first(g_stage_draw_callback, g_moby_l02_pool + (vars->ent2 << 8));
                 /* indexed, not `base + (n << 8)`: retail adds the shifted index first */
                 ((L02_Ent *)g_moby_l02_pool)[vars->ent2].vars->f6C = 100.0f;
                 ((L02_Ent *)g_moby_l02_pool)[vars->ent2].flags |= 2;
-                D_L02_00258800[0x250 / 4] = color;
-                D_L02_00258800[0x258 / 4] = color;
-                D_L02_00258800[0x254 / 4] = color;
+                g_stage_controller_data[0x250 / 4] = color;
+                g_stage_controller_data[0x258 / 4] = color;
+                g_stage_controller_data[0x254 / 4] = color;
                 level->part->wB8 = level->w19C;
                 gfx_add_draw_callback_first(level_reset_effect_object, moby);
                 level->part->w78 = color;
@@ -814,12 +814,12 @@ void stage_controller_update(u8 *moby) {
 
 
 typedef struct { u8 pad[0x464]; u8 spent[1]; } L02_CellFlags;
-extern L02_CellFlags D_L02_0021F4F0;
-extern u8 D_0019B4A8[];
+extern L02_CellFlags g_cell_flags;
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index __attribute__((sda));
 /* sda in this -G0 unit keeps the address of the ring table one `la`, retail's adjacent `lui`/`addiu`
    in the last call's setup (a plain declaration splits it and the scheduler lifts the `lui`). */
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 extern void *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, u8 *);
 extern int PlayMobySound(int, int, void *);
@@ -842,8 +842,8 @@ void breakable_l02_update(u8 *moby) {
     switch (moby[0x20]) {
     case 0:
         id = *(u16 *)(moby + 0xB2);
-        if (D_L02_0021F4F0.spent[(s16)id] == 0) {
-            count = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+        if (g_cell_flags.spent[(s16)id] == 0) {
+            count = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if (id & 1)
                 count = (count >> 4) & 7;
             else
@@ -861,15 +861,15 @@ void breakable_l02_update(u8 *moby) {
             breakEffect = CreateMoby(0xE43 /* moby class 3651 */);
             if (breakEffect != 0)
                 moby_init_child_from_parent(breakEffect, moby);
-            part_spawn_masked_debris(moby, 0x3FFF, D_L02_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            part_spawn_masked_debris(moby, 0x3FFF, g_zero_l02_vector, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             PlayMobySound(0, 0, moby);
             id2 = *(u16 *)(moby + 0xB2);
             if (id2 & 1) {
-                if (((D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] >> 4) & 7) != 7)
-                    D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] += 0x10;
+                if (((g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] >> 4) & 7) != 7)
+                    g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] += 0x10;
             } else {
-                if ((D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] & 7) != 7)
-                    D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] += 1;
+                if ((g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] & 7) != 7)
+                    g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] += 1;
             }
             moby_mark_spawned(moby);
         } else {

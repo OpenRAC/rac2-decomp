@@ -1,25 +1,25 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L23_001B13C8 __attribute__((sda));
-extern float D_L23_001B13CC __attribute__((sda));
+extern float g_mothership_hit_damage_scale __attribute__((sda));
+extern float g_mothership_hit_damage_floor __attribute__((sda));
 extern char *g_mothership_boss_moby __attribute__((sda));
-extern char D_L23_001BA500[];
+extern char g_hero_l23_state_block[];
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern int FastDecTimer(char *);
 extern int mothership_is_held(void);
 extern void func_PAL_L23_00423838(void);
 extern void func_PAL_002AC290(char *, char *);
 extern void func_PAL_002AC3C0(char *, char *);
-extern void func_PAL_L23_004217B0(char *);
+extern void part_l23_spawn_hit_sparks_pal(char *);
 extern void mothership_attach_hit_effect(char *);
 extern float math_random_signed_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern char *func_PAL_002735D0(char *, int, int, int, char *, char *, float *, float, float, int);
-extern void func_PAL_003120C0(void);
+extern char *cam_moby_create_pal(char *, int, int, int, char *, char *, float *, float, float, int);
+extern void moby_fade_out_update_pal(void);
 
 /* Updates the hit state of the object, and when its mask word still has bits set, spawns one
    particle per set bit (at most ten, fewer the fuller the value at +0x20 is), each launched at
@@ -44,23 +44,23 @@ void func_PAL_L23_0041B078(char *arg0) {
     if (hit != 0) {
         *(unsigned char *)(state + 0x147) = 0xFF;
         func_PAL_002AC290(arg0, state + 0x140);
-        func_PAL_L23_004217B0(*(char **)(hit + 0x20));
-        if (*(float *)(state + 0x20) <= D_L23_001B13CC) {
+        part_l23_spawn_hit_sparks_pal(*(char **)(hit + 0x20));
+        if (*(float *)(state + 0x20) <= g_mothership_hit_damage_floor) {
             mothership_attach_hit_effect(hit);
-            *(float *)(state + 0x20) = D_L23_001B13CC;
+            *(float *)(state + 0x20) = g_mothership_hit_damage_floor;
         } else {
             *(float *)(state + 0x20) = *(float *)(state + 0x20) - *(float *)(hit + 0x2C);
         }
-        if (*(float *)(state + 0x20) <= D_L23_001B13CC)
-            *(float *)(state + 0x20) = D_L23_001B13CC;
+        if (*(float *)(state + 0x20) <= g_mothership_hit_damage_floor)
+            *(float *)(state + 0x20) = g_mothership_hit_damage_floor;
         if (*(short *)(*(char **)(hit + 0x20) + 0xAA) != 0x118F)
             *(short *)(state + 0x26) = 0x11;
         if (*(unsigned short *)(arg0 + 0x7C) != 0) {
             float f;
 
-            f = *(float *)(state + 0x20) / D_L23_001B13C8;
+            f = *(float *)(state + 0x20) / g_mothership_hit_damage_scale;
             n = 10 - (int)(f * 10.0f);
-            if (*(float *)(state + 0x20) <= D_L23_001B13CC)
+            if (*(float *)(state + 0x20) <= g_mothership_hit_damage_floor)
                 n = 10;
             for (i = 0; i < n; i++) {
                 int mask = *(unsigned short *)(arg0 + 0x7C);
@@ -68,7 +68,7 @@ void func_PAL_L23_0041B078(char *arg0) {
                 if ((mask >> i) & 1) {
                     float angle, speed;
                     char *p;
-                    char *base = D_L23_001BA500;
+                    char *base = g_hero_l23_state_block;
                     float spread = 90.0f;
                     float per_tick = 0.020000001f;
                     float to_rad = 0.017453294f;
@@ -81,10 +81,10 @@ void func_PAL_L23_0041B078(char *arg0) {
                     vec[1] = math_fast_sin_or_cos_b(angle) * speed;
                     vec[2] = 0.0f;
                     vec[2] = math_random_float_range(5.0f, 8.0f) * per_tick;
-                    p = func_PAL_002735D0(arg0, 1, *(short *)(arg0 + 0xAA), i, arg0 + 0x10, arg0 + 0xF0,
+                    p = cam_moby_create_pal(arg0, 1, *(short *)(arg0 + 0xAA), i, arg0 + 0x10, arg0 + 0xF0,
                                       vec, spread, 15.0f, 0xFF);
                     if (p != 0)
-                        *(void (**)(void))(p + 0x64) = func_PAL_003120C0;
+                        *(void (**)(void))(p + 0x64) = moby_fade_out_update_pal;
                 }
             }
         }

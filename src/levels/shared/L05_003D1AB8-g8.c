@@ -7,9 +7,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
-extern float D_L05_001AFC60[] SDATA(D_L05_001AFC60);
-extern float D_L05_001AFC70[] SDATA(D_L05_001AFC70);
-extern float D_L05_001AFC80[] SDATA(D_L05_001AFC80);
+extern float g_particle_params_first[] SDATA(D_L05_001AFC60);
+extern float g_particle_params_second[] SDATA(D_L05_001AFC70);
+extern float g_particle_params_third[] SDATA(D_L05_001AFC80);
 
 /* For each of two points in the object's frame, either side of it in Y, makes three copies of the
    point and passes each to func_L00_0033C0D0 with a random speed. */
@@ -44,11 +44,11 @@ void func_L05_003D1AB8(char *obj)
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    part_spawn_object_relative_particle(obj, p1, speed, g_particle_params_first, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    part_spawn_object_relative_particle(obj, p2, speed, g_particle_params_second, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
+    part_spawn_object_relative_particle(obj, p3, speed, g_particle_params_third, 1);
     y = -0.061f;
     *(TI128 *)b = 0;
     b[0] = -0.21f;
@@ -66,9 +66,9 @@ void func_L05_003D1AB8(char *obj)
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    part_spawn_object_relative_particle(obj, p1, speed, g_particle_params_first, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    part_spawn_object_relative_particle(obj, p2, speed, g_particle_params_second, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
+    part_spawn_object_relative_particle(obj, p3, speed, g_particle_params_third, 1);
 }

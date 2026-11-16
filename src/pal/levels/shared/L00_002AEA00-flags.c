@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_PAL_L00_002D2668(void *a, void *b, float f);
+extern void set_hero_animation_pal(void *a, void *b, float f);
 typedef int HeldQuad __attribute__((mode(TI)));
 typedef union {
     HeldQuad q;
@@ -67,7 +67,7 @@ typedef struct {
 extern HeldAnimationHero g_hero_state;
 extern unsigned char g_item_slot_to_record[];
 extern HeldAnimationItem g_weapon_l00_table[];
-extern HeldMatrixBuffers D_L00_001B7400[];
+extern HeldMatrixBuffers g_item_matrix_buffers[];
 extern int D_L00_001A7D00[2] __asm__("D_L00_001A7D00__gp") __attribute__((section(".sdata")));
 extern int hero_slot_item_id(int);
 extern void hero_clear_slot_records(void);
@@ -113,7 +113,7 @@ void func_PAL_L00_002AF458(void)
     g_hero_state.idleTimer = math_random_int_range(75, 100);
     if (g_hero_state.controlMode == 0 && g_hero_state.suppressed == 0) {
         g_hero_state.animation = primary;
-        func_PAL_L00_002D2668((void *)primary, 0, (float)duration);
+        set_hero_animation_pal((void *)primary, 0, (float)duration);
         return;
     }
     if (held == -1)
@@ -121,14 +121,14 @@ void func_PAL_L00_002AF458(void)
     for (i = 0; i < 2 && (i != 1 || g_hero_state.dual == 2); i++) {
         if (g_hero_state.slots[i])
             release_moby_animation_slot(g_hero_state.moby, &g_hero_state.slots[i]);
-        slot = allocate_moby_animation_slot(g_hero_state.moby, D_L00_001A7D00[i]);
+        slot = allocate_moby_animation_slot(g_hero_state.moby, g_hero_item_anim_ids[i]);
         g_hero_state.slots[i] = slot;
         if (slot) {
             g_hero_state.animation = held;
             g_hero_state.cancel = 0;
             slot->weight = 1.0f;
-            slot->firstMatrices = D_L00_001B7400[i].first;
-            slot->secondMatrices = D_L00_001B7400[i].second;
+            slot->firstMatrices = g_item_matrix_buffers[i].first;
+            slot->secondMatrices = g_item_matrix_buffers[i].second;
             initialize_moby_animation_blend(g_hero_state.moby, slot, g_hero_state.animation, 0, blendDuration, 1);
         }
     }

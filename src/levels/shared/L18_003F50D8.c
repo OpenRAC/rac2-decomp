@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L18_001A79F0;
-extern int D_L18_001A8F00;
+extern int g_level_l18_mode_word;
+extern int g_game_l18_mode_state;
 extern void protopet_init(void *);
 extern void protopet_check_hit_target(void *);
 extern void protopet_run_state_machine(void *);
@@ -15,8 +15,8 @@ void protopet_update(char *moby)
     char *mobyAlias = moby;
     unsigned char stateId;
 
-    if (D_L18_001A79F0 == 0x13) {
-        if (D_L18_001A8F00 == 2) {
+    if (g_level_l18_mode_word == 0x13) {
+        if (g_game_l18_mode_state == 2) {
             *(int *)(mobyAlias + 0x98) = 0;
             *(unsigned short *)(mobyAlias + 0x34) = (*(unsigned short *)(mobyAlias + 0x34) | 0x41) & 0xEFFF;
         } else {

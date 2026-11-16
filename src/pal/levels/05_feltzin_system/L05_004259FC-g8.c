@@ -1,27 +1,27 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *D_L05_001B251C;
+extern u8 *g_feltzin_target_mobys;
 extern u8 g_sound_state[];
-extern int D_L05_001A8F00;
-extern int D_L05_001A904C __attribute__((sda));
-extern int D_L05_001B13F0 __attribute__((sda));
-extern int D_L05_001B1350[] MACRO_ADDR;
+extern int g_game_mode_a;
+extern int g_feltzin_mission_data __attribute__((sda));
+extern int g_feltzin_menu_started __attribute__((sda));
+extern int g_feltzin_challenge_data[] MACRO_ADDR;
 extern int D_L05_001B1350_gp[] SDATA(D_L05_001B1350);
-extern int D_L05_001B13F8[][3];
+extern int g_feltzin_reward_table[][3];
 extern int D_L05_001B13F8_gp[][3] SDATA(D_L05_001B13F8);
-extern int D_L05_001B13AC __attribute__((sda));
-extern int D_L05_001B13A8 __attribute__((sda));
-extern int D_L05_001B13EC __attribute__((sda));
-extern int D_L05_001B3578;
-extern u8 D_001A7A0A;
+extern int g_feltzin_menu_opened __attribute__((sda));
+extern int g_feltzin_intro_done __attribute__((sda));
+extern int g_feltzin_selected_entry __attribute__((sda));
+extern int g_feltzin_mission;
+extern u8 g_extras_unlocked_flag;
 extern int g_player_bolts;
 extern int D_001A79F8_gp SDATA(D_001A79F8);
-extern unsigned int D_00138324;
+extern unsigned int g_pad_held_flags;
 extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void FadeToBlack(int);
-extern void func_PAL_0029C0F0(int, int);
+extern void level_store_value_pair_pal(int, int);
 extern int hud_draw_feltzin_mission_reward(void);
 extern void feltzin_mission_clamp_save_counts(void);
 extern int MemcardSave(int, int);
@@ -35,7 +35,7 @@ typedef struct { u8 pad[0x270]; int id; } MissionState;
 void func_PAL_L05_00425FB0(u8 *actor, int mission)
 {
     u8 *state = *(u8 **)(actor + 0x68);
-    u8 *owner = D_L05_001B251C + (*(int *)(state + 0x24) << 8);
+    u8 *owner = g_feltzin_target_mobys + (*(int *)(state + 0x24) << 8);
     MissionState *ownerState = *(MissionState **)(owner + 0x68);
     int sound = ownerState->id;
     if (sound != -1) {
@@ -44,26 +44,26 @@ void func_PAL_L05_00425FB0(u8 *actor, int mission)
             snd_stop_voice(sound);
     }
     ownerState->id = -1;
-    if (D_L05_001A8F00 == 2)
+    if (g_game_mode_a == 2)
         return;
     if (math_fast_float_d(state + 0x58) == 0)
         return;
-    if (D_L05_001A904C != 0 && D_L05_001B13F0 == 0) {
+    if (g_feltzin_mission_data != 0 && g_feltzin_menu_started == 0) {
         int *count;
         int previous;
         int rank;
         int reward;
         FadeToBlack(25);
-        func_PAL_0029C0F0(0, (int)hud_draw_feltzin_mission_reward);
+        level_store_value_pair_pal(0, (int)hud_draw_feltzin_mission_reward);
         count = &D_L05_001B1350_gp[mission];
         previous = *count;
         rank = previous < 3 ? previous : 2;
-        D_L05_001B13F0 = 1;
-        D_L05_001B3578 = mission;
-        D_L05_001B13AC = 0;
-        D_L05_001B13A8 = 0;
+        g_feltzin_menu_started = 1;
+        g_feltzin_mission = mission;
+        g_feltzin_menu_opened = 0;
+        g_feltzin_intro_done = 0;
         reward = D_L05_001B13F8_gp[mission][rank];
-        if (D_001A7A0A != 0)
+        if (g_extras_unlocked_flag != 0)
             reward *= 10;
         D_001A79F8_gp = g_player_bolts + reward;
         *count = previous + 1;
@@ -72,24 +72,24 @@ void func_PAL_L05_00425FB0(u8 *actor, int mission)
     }
     hero_set_state_value_c(1);
     if (math_fast_float_d(state + 0x40) == 0) {
-        unsigned int buttons = D_00138324;
+        unsigned int buttons = g_pad_held_flags;
         int completed = buttons & 0x40;
         if (completed) {
-            D_L05_001B13F0 = 0;
+            g_feltzin_menu_started = 0;
             *(int *)(state + 0x40) = 4500;
             FadeToBlack(25);
             hero_set_state_value_c(0);
             *(int *)(state + 0x58) = 100;
             *(int *)(state + 0x44) = 6000;
             if (D_L05_001B1350_gp[0] != 0) {
-                completed = D_L05_001B1350[1];
-                if (completed != 0 && D_L05_001B1350[2] != 0)
-                    D_L05_001B13EC = 3;
+                completed = g_feltzin_challenge_data[1];
+                if (completed != 0 && g_feltzin_challenge_data[2] != 0)
+                    g_feltzin_selected_entry = 3;
                 else if (D_L05_001B1350_gp[0] != 0) {
                     if (completed != 0)
-                        D_L05_001B13EC = 2;
+                        g_feltzin_selected_entry = 2;
                     else
-                        D_L05_001B13EC = 1;
+                        g_feltzin_selected_entry = 1;
                 }
             }
             feltzin_challenge_reset(actor);

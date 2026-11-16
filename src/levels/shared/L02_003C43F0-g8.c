@@ -3,15 +3,15 @@
 
 extern void gfx_l00_draw_billboard_quad(void *, void *, float, float);
 
-extern void *D_L02_001B17E8 __attribute__((sda));
+extern void *g_billboard_quad_texture __attribute__((sda));
 
-extern float D_L02_001B17E4 __attribute__((sda));
+extern float g_billboard_quad_size_a __attribute__((sda));
 
-extern float D_L02_001B17E0 __attribute__((sda));
+extern float g_billboard_quad_param_c __attribute__((sda));
 
-extern float D_L02_001B17EC __attribute__((sda));
+extern float g_billboard_quad_size_b __attribute__((sda));
 
-extern char *D_L02_001B1190[1] __attribute__((sda));
+extern char *g_arena_challenge_table_2[1] __attribute__((sda));
 
 extern float IntToFloat(int);
 
@@ -21,15 +21,15 @@ extern int arena_get_challenge_save_index(int);
 
 extern int flag_is_byte_set(void);
 
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
 /* Runs the kind's placement helper with the kind's own angles. */
 /* Places an object using its state: states 2 and 3 pick different angle values. */
 void moby_place_by_state(char *object) {
     if (*(unsigned char *)(object + 0x20) == 3)
-        gfx_l00_draw_billboard_quad(object + 0x10, D_L02_001B17E8, D_L02_001B17E4, D_L02_001B17E0);
+        gfx_l00_draw_billboard_quad(object + 0x10, g_billboard_quad_texture, g_billboard_quad_size_a, g_billboard_quad_param_c);
     else if (*(unsigned char *)(object + 0x20) == 2)
-        gfx_l00_draw_billboard_quad(object + 0x10, D_L02_001B17E8, D_L02_001B17EC, D_L02_001B17E0);
+        gfx_l00_draw_billboard_quad(object + 0x10, g_billboard_quad_texture, g_billboard_quad_size_b, g_billboard_quad_param_c);
 }
 
 #ifndef RAC2_T_TI128_L02
@@ -37,15 +37,15 @@ void moby_place_by_state(char *object) {
 typedef int TI128 __attribute__((mode(TI)));
 #endif
 
-extern float D_L02_001B0180 __attribute__((sda));
+extern float g_spark_direction_scale __attribute__((sda));
 
-extern float D_L02_001B0188 __attribute__((sda));
+extern float g_spark_facing_threshold __attribute__((sda));
 
-extern int D_L02_001B0184 __attribute__((sda));
+extern int g_spark_color_word __attribute__((sda));
 
-extern float D_L02_001B0178 __attribute__((sda));
+extern float g_spark_fade_param_a __attribute__((sda));
 
-extern float D_L02_001B017C __attribute__((sda));
+extern float g_spark_fade_param_b __attribute__((sda));
 
 extern char g_camera_l02_position[];
 
@@ -76,17 +76,17 @@ void part_spawn_fading_spark(void *owner)
     int color_word;
     int alpha;
 
-    FastVecScale(&spawn_point, direction, D_L02_001B0180);
+    FastVecScale(&spawn_point, direction, g_spark_direction_scale);
     FastVecAdd(&spawn_point, &spawn_point, (char *)object + 0x10);
     FastVecSub(&to_camera, g_camera_l02_position, (char *)object + 0x10);
     vec_scale_to_length(&to_camera, &to_camera, 1.0f);
     dot = FastVecDot(&to_camera, direction);
-    if (D_L02_001B0188 < dot) {
-        color_word = D_L02_001B0184;
+    if (g_spark_facing_threshold < dot) {
+        color_word = g_spark_color_word;
         dot = dot * dot;
         alpha = (int)(dot * (float)(color_word >> 24));
-        func_L00_00325AE8_1(&spawn_point, (color_word & 0xFFFFFF) | (alpha << 24), D_L02_001B0178,
-                            D_L02_001B017C);
+        func_L00_00325AE8_1(&spawn_point, (color_word & 0xFFFFFF) | (alpha << 24), g_spark_fade_param_a,
+                            g_spark_fade_param_b);
     }
 }
 
@@ -103,13 +103,13 @@ int moby_compute_scaled_entry_value(int entry) {
     float value;
     int i = 0;
 
-    value = IntToFloat(*(int *)(D_L02_001B1190[entry] + 0xC));
-    while (i < D_001395B8[arena_get_challenge_save_index(entry)]) {
+    value = IntToFloat(*(int *)(g_arena_challenge_table_2[entry] + 0xC));
+    while (i < g_game_flag_table[arena_get_challenge_save_index(entry)]) {
         value *= 0.3f;
         i++;
     }
     {
-        float limit = (float)*(int *)(D_L02_001B1190[entry] + 0xC);
+        float limit = (float)*(int *)(g_arena_challenge_table_2[entry] + 0xC);
 
         if (limit < value)
             value = limit;
@@ -127,13 +127,13 @@ int moby_compute_scaled_entry_value_shifted(int entry) {
     float value;
     int i = 0;
 
-    value = IntToFloat(*(int *)(D_L02_001B1190[entry] + 0x10));
-    while (i < D_001395B8[arena_get_challenge_save_index(entry)]) {
+    value = IntToFloat(*(int *)(g_arena_challenge_table_2[entry] + 0x10));
+    while (i < g_game_flag_table[arena_get_challenge_save_index(entry)]) {
         value *= 0.33333f;
         i++;
     }
     {
-        float limit = (float)*(int *)(D_L02_001B1190[entry] + 0x10);
+        float limit = (float)*(int *)(g_arena_challenge_table_2[entry] + 0x10);
 
         if (limit < value)
             value = limit;
@@ -150,7 +150,7 @@ extern void vec_fast_normalize_helper(void *, void *, float);
 extern void path_clamp_move_to_area(void *, char *, char *, int, float);
 
 /* The level's 0x80-byte placement records, whose direction sits at +0x30. */
-extern char *D_L02_001B368C;
+extern char *g_matrix_l02_record_table;
 
 /* Aligns the actor with the record its state names: the -1 case builds a direction from the
    +0x1F0 axis and the +0x340 vector and picks the 1.5-scaled or negated one by the sign of the
@@ -178,11 +178,11 @@ int moby_compute_aligned_direction(char *object, char *output)
         }
     } else {
         FastVecSub((float *)&a, (float *)(vars + 0x1F0),
-                      (float *)(D_L02_001B368C + (*(int *)(vars + 0x334) << 7) + 0x30));
+                      (float *)(g_matrix_l02_record_table + (*(int *)(vars + 0x334) << 7) + 0x30));
         result = 1;
         vec_fast_normalize_helper((char *)&a, (char *)&a,
-                      FastVecLength(D_L02_001B368C + (*(int *)(vars + 0x334) << 7)));
-        FastVecAdd(output, &a, D_L02_001B368C + (*(int *)(vars + 0x334) << 7) + 0x30);
+                      FastVecLength(g_matrix_l02_record_table + (*(int *)(vars + 0x334) << 7)));
+        FastVecAdd(output, &a, g_matrix_l02_record_table + (*(int *)(vars + 0x334) << 7) + 0x30);
         FastVecSub((float *)&b, output, object + 0x10);
         if (!(0.0f <= FastVecDot(&b, object + 0xD0)))
             result = 0;
@@ -196,8 +196,8 @@ int moby_compute_aligned_direction(char *object, char *output)
 extern char *g_moby_l02_pool __attribute__((sda));
 
 extern int g_current_map_index[] __attribute__((sda));
-extern unsigned char D_0019B2E8[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_moby_group_flags[];
+extern unsigned char g_game_flag_table[];
 struct PortalPlayer {
     char pad0[0x80];
     float pos[4];
@@ -211,9 +211,9 @@ struct PortalPlayer {
 };
 extern struct PortalPlayer g_hero_state;
 extern unsigned char g_hero_position[];
-extern unsigned char D_001A7BC8[] __attribute__((sda));
-extern unsigned int D_00138324 __attribute__((nosda));
-extern unsigned char D_L02_001C0700[];
+extern unsigned char g_map_visited_flags[] __attribute__((sda));
+extern unsigned int g_pad_held_flags __attribute__((nosda));
+extern unsigned char g_message_queue[];
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void moby_set_flag_bit(void *, int);
@@ -246,17 +246,17 @@ void portal_update(char *obj) {
         qcopy(vars + 0x20, obj + 0x10);
         qcopy(vars + 0x30, obj + 0xf0);
         level_row = g_current_map_index[0] << 4;
-        *(short *)(vars + 0x1e) = D_0019B2E8[*(unsigned char *)(obj + 0xb0) + level_row] >> 7;
-        if (D_0019B2E8[*(unsigned char *)(obj + 0xb0) + level_row] & 0x80) {
+        *(short *)(vars + 0x1e) = g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + level_row] >> 7;
+        if (g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + level_row] & 0x80) {
             if (*(int *)(vars + 4)) moby_set_flag_bit(g_moby_l02_pool + (*(int *)(vars + 4) << 8), 1);
         }
-        if (g_current_map_index[0] == 2 && D_001395B8[0x71] == 26) {
+        if (g_current_map_index[0] == 2 && g_game_flag_table[0x71] == 26) {
             state_set_flag_one();
-            D_001395B8[0x71] = 1;
+            g_game_flag_table[0x71] = 1;
             part_start_record_effect_by_index(*(int *)(vars + 0x14), *(int *)(vars + 0x10));
             level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
-            if (D_001A7BC8[4] && !D_001395B8[0xa5]) {
-                D_001395B8[0xa5] = 1;
+            if (g_map_visited_flags[4] && !g_game_flag_table[0xa5]) {
+                g_game_flag_table[0xa5] = 1;
                 snd_play_indexed(4);
             }
         }
@@ -273,22 +273,22 @@ void portal_update(char *obj) {
                 if (currentLevel == 26) {
                     TryClaimNotice(8, 0x27b1, 1);
                 } else {
-                    TryClaimNotice(8, D_0019B2E8[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x27cd : 0x27b0, 1);
+                    TryClaimNotice(8, g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x27cd : 0x27b0, 1);
                     dest_level = 26;
                 }
-                if (D_00138324 & 0x10) {
+                if (g_pad_held_flags & 0x10) {
                     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
                     data_set_small_value_and_refresh(dest_level, 1);
-                    if (dest_level == 26) D_001395B8[1] = 1;
+                    if (dest_level == 26) g_game_flag_table[1] = 1;
                 }
             }
         }
-        if (g_current_map_index[0] == 26 && (D_0019B2E8[0x1a0 + *(unsigned char *)(obj + 0xb0)] & 0x80)) {
-            if (D_001A7BC8[4]) return;
-            if (req_push_queue(D_L02_001C0700, 0xa7)) {
-                req_push_queue(D_L02_001C0700, 4);
-                req_push_queue(D_L02_001C0700, 0xa8);
-                req_launch_queued(D_L02_001C0700);
+        if (g_current_map_index[0] == 26 && (g_moby_group_flags[0x1a0 + *(unsigned char *)(obj + 0xb0)] & 0x80)) {
+            if (g_map_visited_flags[4]) return;
+            if (req_push_queue(g_message_queue, 0xa7)) {
+                req_push_queue(g_message_queue, 4);
+                req_push_queue(g_message_queue, 0xa8);
+                req_launch_queued(g_message_queue);
                 game_set_stored_value_pair(moby_call_helper_two_one, obj);
                 g_hero_state.flag = 0;
                 moby_mark_flag_and_append_to_list(4);

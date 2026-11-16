@@ -4,7 +4,7 @@
 
 /* Small-data unit: the bodies whose state lives at $gp-relative offsets. */
 
-extern float D_L11_001B12C8 __attribute__((sda));
+extern float g_rotor_timer_step __attribute__((sda));
 
 /* Bleeds the ten rotation timers the level keeps beside its state: each armed
    entry loses a sixtieth of the shared rate and clamps at zero, disarming. */
@@ -17,7 +17,7 @@ void rotor_tick_timers(char *obj)
         u8 *armed = (u8 *)(state + 0x380 + i);
         f32 *timer = (f32 *)(state + 0x2F0 + 4 * i);
         if (*armed == 1) {
-            f32 left = *timer - D_L11_001B12C8 * 0.016666667f;
+            f32 left = *timer - g_rotor_timer_step * 0.016666667f;
             *timer = left;
             if (left < 0.0f) {
                 *timer = 0.0f;
@@ -27,7 +27,7 @@ void rotor_tick_timers(char *obj)
     }
 }
 
-extern float D_L11_001B1338 __attribute__((sda));
+extern float g_rotor_random_spin_rate __attribute__((sda));
 
 extern void anim_start_blended(void *, int, int, int);
 extern float math_random_float_range(float, float);
@@ -59,9 +59,9 @@ void rotor_reaim_random_spin(char *obj)
         spin_angle = -spin_angle;
     *(float *)(state + 0x2D4) = spin_angle;
     if (math_random_int_below(2) != 0)
-        spin_rate = -D_L11_001B1338;
+        spin_rate = -g_rotor_random_spin_rate;
     else
-        spin_rate = D_L11_001B1338;
+        spin_rate = g_rotor_random_spin_rate;
     *(short *)(state + 0x2EE) = 0;
     *(float *)(state + 0x2DC) = spin_rate;
     mem_clear((unsigned int *)(state + 0x220), 0, 0x40);
@@ -70,7 +70,7 @@ void rotor_reaim_random_spin(char *obj)
     AttachManipulator((unsigned char *)obj, 3, (unsigned char *)(state + 0x260));
 }
 
-extern float D_L11_001B12C4 __attribute__((sda));
+extern float g_rotor_aim_motion_speed __attribute__((sda));
 
 extern int g_moby_l11_table;
 
@@ -123,7 +123,7 @@ void rotor_aim_at_entry(char *obj, int index, int flag)
         falloff = 0.0f;
 
     base2 = g_moby_l11_table;
-    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aim_vec, D_L11_001B12C4 * (1.0f / 3600.0f), falloff);
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aim_vec, g_rotor_aim_motion_speed * (1.0f / 3600.0f), falloff);
 
     base3 = g_moby_l11_table;
     /* The record's field at 0xB8 takes the object's own handle. */
@@ -163,12 +163,12 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
-extern char D_L11_001BA8C0[];
-extern int D_L11_001B11FC __attribute__((sda));
-extern int D_L11_001B1204 __attribute__((sda));
+extern char g_hero_l11_position[];
+extern int g_joba_beam_first_stage_registers __attribute__((sda));
+extern int g_joba_beam_first_stage_color __attribute__((sda));
 /* The two uv columns: macro-addressed tables, so each base is one la. */
-extern float D_L11_001B1210[] __attribute__((sda));
-extern float D_L11_001B1214[] __attribute__((sda));
+extern float g_joba_beam_stage_uv_u[] __attribute__((sda));
+extern float g_joba_beam_stage_uv_v[] __attribute__((sda));
 
 /* Draws the first stage of the beam between the state's two end points: each
    side is pulled a tenth of the way toward the level's anchor, then the four
@@ -182,20 +182,20 @@ void joba_draw_beam_first_stage(char *obj, void *q)
     quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
     FastVecSub(quad_frame.c, vars, vars + 0x10);
-    FastVecSub(quad_frame.a, vars, D_L11_001BA8C0);
-    FastVecSub(quad_frame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecSub(quad_frame.a, vars, g_hero_l11_position);
+    FastVecSub(quad_frame.b, vars + 0x10, g_hero_l11_position);
     FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
     vec_scale_to_length(quad_frame.a, quad_frame.a, 0.1f);
     FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
     vec_scale_to_length(quad_frame.b, quad_frame.b, 0.1f);
     quad_frame.quad.texture = GetEffectTextureDescriptor(7);
     quad_frame.quad.mode = 0x0000ff9000000260UL;
-    quad_frame.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
+    quad_frame.quad.registers = ((unsigned long)g_joba_beam_first_stage_registers << 32) | 0x48;
     quad_frame.quad.primitive = 0;
-    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = D_L11_001B1204;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = g_joba_beam_first_stage_color;
     for (i = 0; i < 4; i++) {
-        quad_frame.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        quad_frame.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quad_frame.quad.uv[i][0] = g_joba_beam_stage_uv_u[i * 2];
+        quad_frame.quad.uv[i][1] = g_joba_beam_stage_uv_v[i * 2];
     }
     FastVecSub(&quad_frame.corner, vars, quad_frame.a);
     quad_frame.quad.position[0] = quad_frame.corner;
@@ -208,8 +208,8 @@ void joba_draw_beam_first_stage(char *obj, void *q)
     draw_world_quad(&quad_frame.quad, 0, 0);
 }
 
-extern int D_L11_001B1200 __attribute__((sda));
-extern int D_L11_001B1208 __attribute__((sda));
+extern int g_joba_beam_second_stage_registers __attribute__((sda));
+extern int g_joba_beam_second_stage_color __attribute__((sda));
 
 /* The second stage: the same quad pulled a twentieth of the way in, drawn
    once with its own texture and then again with the additive overlay. */
@@ -222,20 +222,20 @@ void joba_draw_beam_second_stage(char *obj, void *q)
     quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
     FastVecSub(quad_frame.c, vars, vars + 0x10);
-    FastVecSub(quad_frame.a, vars, D_L11_001BA8C0);
-    FastVecSub(quad_frame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecSub(quad_frame.a, vars, g_hero_l11_position);
+    FastVecSub(quad_frame.b, vars + 0x10, g_hero_l11_position);
     FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
     vec_scale_to_length(quad_frame.a, quad_frame.a, 0.05f);
     FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
     vec_scale_to_length(quad_frame.b, quad_frame.b, 0.05f);
     quad_frame.quad.texture = GetEffectTextureDescriptor(0x13);
     quad_frame.quad.mode = 0x0000ff9000000260UL;
-    quad_frame.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
+    quad_frame.quad.registers = ((unsigned long)g_joba_beam_second_stage_registers << 32) | 0x48;
     quad_frame.quad.primitive = 0;
-    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = D_L11_001B1208;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = g_joba_beam_second_stage_color;
     for (i = 0; i < 4; i++) {
-        quad_frame.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        quad_frame.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quad_frame.quad.uv[i][0] = g_joba_beam_stage_uv_u[i * 2];
+        quad_frame.quad.uv[i][1] = g_joba_beam_stage_uv_v[i * 2];
     }
     FastVecSub(&quad_frame.corner, vars, quad_frame.a);
     quad_frame.quad.position[0] = quad_frame.corner;

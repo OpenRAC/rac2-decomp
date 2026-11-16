@@ -12,9 +12,9 @@ typedef struct {
     int flags, mask, response, surface, gravity;
     float maxTurn;
 } CollisionQuery;
-extern int D_L00_001A8FF4 MACRO_ADDR;
-extern Vector D_L00_001BF240;
-extern u16 D_L00_001B1FF0[] MACRO_ADDR;
+extern int g_hero_action_blocked_flag MACRO_ADDR;
+extern Vector g_hero_l00_velocity;
+extern u16 g_decoy_moby_index_list[] MACRO_ADDR;
 extern void func_PAL_002A7E68(char *, int, int, int), moby_get_facing_direction(void *, float *);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
@@ -23,10 +23,10 @@ extern void FastVecAdd(void *, void *, void *), part_steer_effect_direction(int,
 extern void vec_transform_or_copy(void *, void *), shop_trigger_current_state_effect(int, int);
 extern int CollideSweptSphere(CollisionQuery *), weapon_get_group(int);
 extern void vec_add_random_offset(float *, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern float math_random_float_range(float, float);
-extern void moby_spring_away_from_player(char *), func_PAL_L00_0039BE70(char *), table_clear_entry_flag(int), RemoveMobyFromIndexList(int, u16 *), moby_mark_spawned(void *);
+extern void moby_spring_away_from_player(char *), moby_apply_hit_damage_pal(char *), table_clear_entry_flag(int), RemoveMobyFromIndexList(int, u16 *), moby_mark_spawned(void *);
 extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(float *, float *), euler_rotation_basis(void *, void *);
 extern int moby_transform_point_and_rotation_by_parent(int, int, void *, void *, void *, void *);
 
@@ -81,9 +81,9 @@ void func_PAL_L00_0039B4C8(char *actor) {
         collision = CollideSweptSphere(&scratch.phase.query);
         qcopy((actor + 0x10), &scratch.phase.query.position);
         qcopy((state + 0x10), &scratch.phase.query.velocity);
-        if (D_L00_001A8FF4 && *(float *)(actor + 0x18) < 462.43f) {
+        if (g_hero_action_blocked_flag && *(float *)(actor + 0x18) < 462.43f) {
             vec_add_random_offset(scratch.scatter.f, 0.6f);
-            func_PAL_002AC718(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects_pal(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
         }
@@ -95,7 +95,7 @@ void func_PAL_L00_0039B4C8(char *actor) {
             *(char **)(state + 0x38) = hit;
         }
         {
-            FastVecScale(&scratch.desired, &D_L00_001BF240, 0.0009765625f);
+            FastVecScale(&scratch.desired, &g_hero_l00_velocity, 0.0009765625f);
             vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
             vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
             FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
@@ -114,7 +114,7 @@ accelerate:
 response_done:
         if (weapon_get_group(scratch.phase.query.surface)) {
             vec_add_random_offset(scratch.scatter.f, 0.6f);
-            func_PAL_002AC718(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects_pal(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             actor[0x20] = 6;
         }
@@ -126,7 +126,7 @@ response_done:
             if (((u8 *)actor)[0x43] != 2) func_PAL_002A7E68(actor, 2, 0, 8);
             *(float *)(actor + 0x48) = math_random_float_range(0.7f, 1.05f);
         }
-        moby_spring_away_from_player(actor); func_PAL_L00_0039BE70(actor);
+        moby_spring_away_from_player(actor); moby_apply_hit_damage_pal(actor);
         break;
     case 5: actor[0x20] = 4; break;
     case 4:
@@ -135,7 +135,7 @@ response_done:
         break;
     case 6:
         table_clear_entry_flag(*(int *)(state + 0x20));
-        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, D_L00_001B1FF0);
+        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, g_decoy_moby_index_list);
         moby_mark_spawned(actor);
         return;
     }

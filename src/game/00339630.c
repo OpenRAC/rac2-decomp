@@ -27,11 +27,11 @@ extern void object_set_helper_result (s32_Fee27d7bc, const void *, s32_Fee27d7bc
 
 extern void popup_init_texts_hidden (s32_Fee27d7bc);
 
-extern char D_L04_001ADF08[];
+extern char g_popup_derived_arrays[];
 
-extern s32_Fee27d7bc D_L04_001A904C;
+extern s32_Fee27d7bc g_popup_resource_table;
 
-extern s32_Fee27d7bc D_L04_001ADEF8 __attribute__ ((sda));
+extern s32_Fee27d7bc g_popup_layout_data __attribute__ ((sda));
 
 /* Sets up a small pop-up message box at the lower middle of the screen with its title text. */
 void popup_init (s32_Fee27d7bc popup, s32_Fee27d7bc parent)
@@ -50,12 +50,12 @@ void popup_init (s32_Fee27d7bc popup, s32_Fee27d7bc parent)
   ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (popup + 756))[0] = 256.0f;
   ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (popup + 756))[1] = 212.0f;
   *(s32_Fee27d7bc *) (popup + 760) = 0;
-  func_0033ABD8_2 (popup + 8, parent, &D_L04_001ADEF8);
+  func_0033ABD8_2 (popup + 8, parent, &g_popup_layout_data);
   func_0033B030_2 (popup + 8, 64.0f, -164.0f, 10.0f, 136.0f, 10.0f, 99.0f);
-  object_init_derived_arrays (popup + 680, D_L04_001ADF08, parent);
+  object_init_derived_arrays (popup + 680, g_popup_derived_arrays, parent);
   cell = func_00335E20_2 (popup + 680);
   *(s32_Fee27d7bc *) cell = 0x70FFFEED;
-  object_set_helper_result (popup + 680, D_L04_001A904C + 0x8710, 214);
+  object_set_helper_result (popup + 680, g_popup_resource_table + 0x8710, 214);
   popup_init_texts_hidden (popup);
   *(s32_Fee27d7bc *) (popup + 768) = 0;
 }

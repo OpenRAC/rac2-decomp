@@ -22,19 +22,19 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern int FastTweenColor(int, int, float);
 extern void draw_world_quad(void *, void *, int);
-extern StripColor D_L00_001B0958;
+extern StripColor g_vaporizer_strip_inner_color_a;
 extern unsigned int D_L00_001B0958_word SDATA(D_L00_001B0958);
-extern StripColor D_L00_001B095C;
+extern StripColor g_vaporizer_strip_outer_color_a;
 extern unsigned int D_L00_001B095C_word SDATA(D_L00_001B095C);
-extern StripColor D_L00_001B0960;
+extern StripColor g_vaporizer_strip_inner_color_b;
 extern unsigned int D_L00_001B0960_word SDATA(D_L00_001B0960);
-extern StripColor D_L00_001B0964;
+extern StripColor g_vaporizer_strip_outer_color_b;
 extern unsigned int D_L00_001B0964_word SDATA(D_L00_001B0964);
-extern float D_L00_001B0968 __attribute__((sda));
-extern float D_L00_001B096C __attribute__((sda));
-extern int D_L00_001B0974 __attribute__((sda));
-extern int D_L00_001B0978 __attribute__((sda));
-extern int D_0018C0B4 __attribute__((nosda));
+extern float g_vaporizer_strip_offset_scale __attribute__((sda));
+extern float g_vaporizer_chain_phase __attribute__((sda));
+extern int g_vaporizer_strip_inner_texture __attribute__((sda));
+extern int g_vaporizer_strip_outer_texture __attribute__((sda));
+extern int g_game_mode __attribute__((nosda));
 extern StripVector g_camera_l00_position __attribute__((nosda));
 
 /* Draws inner and outer strips along the effect's 0x30-byte point records.
@@ -53,8 +53,8 @@ void RenderTwoLayerEffectStrip(char *object)
     if (*(short *)(state + 0x20) <= 1 || *(short *)(state + 0x22) == 0)
         return;
     base = *(char **)(level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A)) + *(short *)(state + 0x18) * 4);
-    gfx_init_quad_packet_state((QuadPacket *)&inner, D_L00_001B0974, 1, 0x80);
-    scroll = D_L00_001B096C;
+    gfx_init_quad_packet_state((QuadPacket *)&inner, g_vaporizer_strip_inner_texture, 1, 0x80);
+    scroll = g_vaporizer_chain_phase;
     inner.tex.uv[0] = 0.0f;
     inner.tex.uv_bits[1] = 0;
     inner.tex.uv[3] = 1.0f;
@@ -62,24 +62,24 @@ void RenderTwoLayerEffectStrip(char *object)
     zero = inner.tex.uv[0];
     inner.tex.uv[2] = scroll;
     inner.tex.uv[0] = scroll;
-    inner.tex.uv[4] = inner.tex.uv[6] = D_L00_001B096C + 1.0f;
+    inner.tex.uv[4] = inner.tex.uv[6] = g_vaporizer_chain_phase + 1.0f;
     /* The packet also exposes coordinates as raw words for zero initialization. */
     inner.tex.uv_bits[5] = 0;
     inner.tex.uv[7] = 1.0f;
-    gfx_init_quad_packet_state((QuadPacket *)&outer, D_L00_001B0978, 1, 0x80);
+    gfx_init_quad_packet_state((QuadPacket *)&outer, g_vaporizer_strip_outer_texture, 1, 0x80);
     outer.tex.uv[3] = 1.0f;
     outer.tex.uv[7] = 1.0f;
     outer.tex.uv[1] = zero;
-    outer.tex.uv[0] = outer.tex.uv[2] = D_L00_001B096C;
+    outer.tex.uv[0] = outer.tex.uv[2] = g_vaporizer_chain_phase;
     outer.tex.uv[5] = zero;
-    outer.tex.uv[4] = outer.tex.uv[6] = D_L00_001B096C + 1.0f;
+    outer.tex.uv[4] = outer.tex.uv[6] = g_vaporizer_chain_phase + 1.0f;
     fade = (float)*(short *)(state + 0x22) * *(float *)(state + 0x24);
-    if (D_0018C0B4 == 0x1D)
+    if (g_game_mode == 0x1D)
         fade *= 0.5f;
-    innerA = (unsigned int)FloatToInt(IntToFloat(D_L00_001B0958.bytes[3]) * fade) << 24 | (D_L00_001B0958_word & 0xFFFFFF);
-    innerB = (unsigned int)FloatToInt(IntToFloat(D_L00_001B0960.bytes[3]) * fade) << 24 | (D_L00_001B0960_word & 0xFFFFFF);
-    outerA = (unsigned int)FloatToInt(IntToFloat(D_L00_001B095C.bytes[3]) * fade) << 24 | (D_L00_001B095C_word & 0xFFFFFF);
-    outerB = (unsigned int)FloatToInt(IntToFloat(D_L00_001B0964.bytes[3]) * fade) << 24 | (D_L00_001B0964_word & 0xFFFFFF);
+    innerA = (unsigned int)FloatToInt(IntToFloat(g_vaporizer_strip_inner_color_a.bytes[3]) * fade) << 24 | (D_L00_001B0958_word & 0xFFFFFF);
+    innerB = (unsigned int)FloatToInt(IntToFloat(g_vaporizer_strip_inner_color_b.bytes[3]) * fade) << 24 | (D_L00_001B0960_word & 0xFFFFFF);
+    outerA = (unsigned int)FloatToInt(IntToFloat(g_vaporizer_strip_outer_color_a.bytes[3]) * fade) << 24 | (D_L00_001B095C_word & 0xFFFFFF);
+    outerB = (unsigned int)FloatToInt(IntToFloat(g_vaporizer_strip_outer_color_b.bytes[3]) * fade) << 24 | (D_L00_001B0964_word & 0xFFFFFF);
     inner.colors[0] = inner.colors[1] = innerA;
     outer.colors[0] = outer.colors[1] = outerA;
     FastVecSub(&view, base, &g_camera_l00_position);
@@ -88,7 +88,7 @@ void RenderTwoLayerEffectStrip(char *object)
     vec_scale_to_length(&offset, &normal, *(float *)(base + 0xC));
     FastVecAdd(&inner.vertices[0], base, &offset);
     FastVecSub(&inner.vertices[1], base, &offset);
-    FastVecScale(&offset, &offset, D_L00_001B0968);
+    FastVecScale(&offset, &offset, g_vaporizer_strip_offset_scale);
     FastVecAdd(&outer.vertices[0], base, &offset);
     FastVecSub(&outer.vertices[1], base, &offset);
     step = 1.0f / IntToFloat(*(short *)(state + 0x20));
@@ -100,7 +100,7 @@ void RenderTwoLayerEffectStrip(char *object)
         vec_scale_to_length(&offset, &normal, *(float *)(point + 0xC));
         FastVecAdd(&inner.vertices[2], point, &offset);
         FastVecSub(&inner.vertices[3], point, &offset);
-        FastVecScale(&offset, &offset, D_L00_001B0968);
+        FastVecScale(&offset, &offset, g_vaporizer_strip_offset_scale);
         FastVecAdd(&outer.vertices[2], point, &offset);
         FastVecSub(&outer.vertices[3], point, &offset);
         strip_ratio = IntToFloat(i) * step;

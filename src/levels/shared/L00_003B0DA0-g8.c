@@ -6,8 +6,8 @@
    division, and -frac2-gcse-unsplit-edges lets PRE set the node table's %hi once, at the
    end of the entry block, so both later uses rematerialize it. */
 
-extern unsigned char D_L00_001AF810 __attribute__((sda));
-extern unsigned char D_L00_001AF811 __attribute__((sda));
+extern unsigned char g_trail_slot_head __attribute__((sda));
+extern unsigned char g_trail_slot_tail __attribute__((sda));
 extern int g_frame_l00_counter MACRO_ADDR;
 /* The hero record: its position at 0x80, the pad buttons word at 0x1230 and the hero moby at 0x2290. */
 typedef struct {
@@ -21,13 +21,13 @@ typedef struct {
 extern HeroL00 g_hero_state;
 extern void node_free_slot(int);
 typedef struct { float xyz[3]; int used; int particle; u8 links[8]; } TrailNode;
-extern TrailNode D_L00_0023BB78[];
-extern u8 D_L00_0023BA78[];
-extern u8 D_L00_001AF818 __attribute__((sda));
-extern float D_L00_001AF81C __attribute__((sda));
-extern float D_L00_001AF820 __attribute__((sda));
-extern int D_L00_001AF824 __attribute__((sda));
-extern float D_L00_001AF828 __attribute__((sda));
+extern TrailNode g_effect_path_node_table[];
+extern u8 g_effect_path_node_buffer[];
+extern u8 g_chain_link_count __attribute__((sda));
+extern float g_chain_min_gap __attribute__((sda));
+extern float g_chain_limit_distance __attribute__((sda));
+extern int g_chain_max_count __attribute__((sda));
+extern float g_chain_range __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern void node_free_effect_object(int);
 extern int path_find_between_nodes(unsigned char, unsigned char, unsigned char *);
@@ -43,16 +43,16 @@ char *RecordHeroTrailNode(void *unused)
     int i, j, k, n;
     float x, y, z, divisor;
 
-    if (D_L00_001AF811 != D_L00_001AF810) {
-        TrailNode *last = &D_L00_0023BB78[D_L00_001AF810 - 1];
+    if (g_trail_slot_tail != g_trail_slot_head) {
+        TrailNode *last = &g_effect_path_node_table[g_trail_slot_head - 1];
         float gap;
         previous[0] = last->xyz[0];
         previous[1] = last->xyz[1];
         previous[2] = last->xyz[2];
         gap = fast_vec_dist(g_hero_state.position, previous);
-        if (gap < D_L00_001AF81C) return 0;
+        if (gap < g_chain_min_gap) return 0;
     }
-    node = &D_L00_0023BB78[D_L00_001AF810];
+    node = &g_effect_path_node_table[g_trail_slot_head];
     node->used = g_frame_l00_counter;
     node->xyz[0] = g_hero_state.position[0];
     node->xyz[1] = g_hero_state.position[1];
@@ -60,24 +60,24 @@ char *RecordHeroTrailNode(void *unused)
     {
         int l;
         u8 *link = &node->links[7];
-        for (l = 7; l >= 0; --l) *link-- = D_L00_001AF810;
+        for (l = 7; l >= 0; --l) *link-- = g_trail_slot_head;
     }
-    for (cursor = D_L00_001AF810 - 1; cursor != (u8)(D_L00_001AF811 - 1); --cursor) {
+    for (cursor = g_trail_slot_head - 1; cursor != (u8)(g_trail_slot_tail - 1); --cursor) {
         float dx, dy, dz, distance;
         u8 entry;
         int a, already;
-        if (!D_L00_0023BB78[cursor].used) continue;
-        dx = node->xyz[0] - D_L00_0023BB78[cursor].xyz[0];
-        dy = node->xyz[1] - D_L00_0023BB78[cursor].xyz[1];
-        dz = node->xyz[2] - D_L00_0023BB78[cursor].xyz[2];
+        if (!g_effect_path_node_table[cursor].used) continue;
+        dx = node->xyz[0] - g_effect_path_node_table[cursor].xyz[0];
+        dy = node->xyz[1] - g_effect_path_node_table[cursor].xyz[1];
+        dz = node->xyz[2] - g_effect_path_node_table[cursor].xyz[2];
         distance = dx * dx + dy * dy + dz * dz;
-        if (distance < D_L00_001AF828 * D_L00_001AF828) {
-            for (entry = D_L00_001AF811; entry != D_L00_001AF810; ++entry) {
+        if (distance < g_chain_range * g_chain_range) {
+            for (entry = g_trail_slot_tail; entry != g_trail_slot_head; ++entry) {
                 int b;
                 if (entry == cursor) continue;
                 for (b = 0; b < 8; ++b)
-                    if (D_L00_0023BB78[entry].links[b] == cursor)
-                        D_L00_0023BB78[entry].links[b] = D_L00_001AF810;
+                    if (g_effect_path_node_table[entry].links[b] == cursor)
+                        g_effect_path_node_table[entry].links[b] = g_trail_slot_head;
             }
             node_free_effect_object(cursor);
             node_free_slot(cursor);
@@ -85,22 +85,22 @@ char *RecordHeroTrailNode(void *unused)
             float limit;
             /* cse1 ends its block at this group's loop-end note, so row's multiply below
                survives until cse2 makes it the copy of the loop-top product. */
-            do { limit = D_L00_001AF820; } while (0);
+            do { limit = g_chain_limit_distance; } while (0);
             if (distance < limit) {
                 int row = cursor * sizeof(TrailNode);
                 already = 0;
                 for (a = 0; a < 8; ++a) {
-                    u8 linked = D_L00_0023BB78[0].links[a + row];
+                    u8 linked = g_effect_path_node_table[0].links[a + row];
                     int b;
                     if (linked == cursor) continue;
                     for (b = 0; b < 8; ++b)
-                        if (D_L00_0023BB78[linked].links[b] == D_L00_001AF810) already = 1;
+                        if (g_effect_path_node_table[linked].links[b] == g_trail_slot_head) already = 1;
                 }
                 if (!already) {
-                    u8 *p = D_L00_0023BB78[cursor].links;
+                    u8 *p = g_effect_path_node_table[cursor].links;
                     u8 head;
                     int free = 0;
-                    head = D_L00_001AF810;
+                    head = g_trail_slot_head;
                     for (; free < 8; free++, p++) {
                         if (*p == cursor) {
                             *p = head;
@@ -112,25 +112,25 @@ char *RecordHeroTrailNode(void *unused)
             }
         }
     }
-    if (++D_L00_001AF810 == D_L00_001AF811) node_free_slot(D_L00_001AF811);
+    if (++g_trail_slot_head == g_trail_slot_tail) node_free_slot(g_trail_slot_tail);
     for (i = 0; i < count; ++i) {
         for (j = i + 1; j < count; ++j) {
-            n = path_find_between_nodes(joined[j], joined[i], D_L00_0023BA78);
-            D_L00_0023BA78[n++] = D_L00_001AF810 - 1;
-            if (n > D_L00_001AF824) {
-                D_L00_001AF818 = n;
+            n = path_find_between_nodes(joined[j], joined[i], g_effect_path_node_buffer);
+            g_effect_path_node_buffer[n++] = g_trail_slot_head - 1;
+            if (n > g_chain_max_count) {
+                g_chain_link_count = n;
                 z = x = y = 0.0f;
                 divisor = n;
                 for (k = 0; k < n; ++k) {
-                    node_free_effect_object(D_L00_0023BA78[k]);
-                    x += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[0];
-                    y += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[1];
-                    z += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[2];
-                    node_free_slot(D_L00_0023BA78[k]);
+                    node_free_effect_object(g_effect_path_node_buffer[k]);
+                    x += g_effect_path_node_table[g_effect_path_node_buffer[k]].xyz[0];
+                    y += g_effect_path_node_table[g_effect_path_node_buffer[k]].xyz[1];
+                    z += g_effect_path_node_table[g_effect_path_node_buffer[k]].xyz[2];
+                    node_free_slot(g_effect_path_node_buffer[k]);
                 }
                 trail_spawn_group_burst(x / divisor, y / divisor, z / divisor);
             }
         }
     }
-    return (char *)&D_L00_0023BB78[D_L00_001AF810 - 1];
+    return (char *)&g_effect_path_node_table[g_trail_slot_head - 1];
 }

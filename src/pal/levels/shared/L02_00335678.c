@@ -12,12 +12,12 @@ extern void vec_negate_and_forward(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void moby_start_attachment(char *, char *);
 extern void coll_probe_ground_ahead(char *, char *);
-extern void func_PAL_L02_00334C78(char *, char *, void *, void *, void *, void *, void *);
+extern void moby_l02_steer_toward_target_pal(char *, char *, void *, void *, void *, void *, void *);
 extern void coll_move_resolve_collisions(char *, char *, void *, void *, void *);
 extern void coll_update_ground_contact(char *, char *, void *, void *, void *);
 extern int g_frame_l02_counter __attribute__((sda));
 
-int func_PAL_L02_00335678(char *object, void *target, void *input) {
+int coll_update_controller_pal(char *object, void *target, void *input) {
     float inverse[16], direction[4], rotated[12];
     float previous[4], output0[4], output1[4];
     float *m;
@@ -45,7 +45,7 @@ int func_PAL_L02_00335678(char *object, void *target, void *input) {
         qzero_nc(data + 0xA0);
     }
     *(int *)(data + 0xBC) = g_frame_l02_counter;
-    func_PAL_L02_00334C78(object, data, target, input, &output0, &output1, m);
+    moby_l02_steer_toward_target_pal(object, data, target, input, &output0, &output1, m);
     coll_move_resolve_collisions(object, data, &previous, &output1, m);
     coll_update_ground_contact(object, data, target, &previous, m);
     return *(int *)(data + 0x94);

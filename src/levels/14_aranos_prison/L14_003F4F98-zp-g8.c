@@ -4,9 +4,9 @@
 extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 
 typedef int TI128 __attribute__((mode(TI)));
-extern char D_L14_001B1870[8] __attribute__((sda));
-extern char D_L14_001B1878[8] __attribute__((sda));
-extern int D_L14_001B18A0 __attribute__((sda));
+extern char g_beam_piece_data_a[8] __attribute__((sda));
+extern char g_beam_piece_data_b[8] __attribute__((sda));
+extern int g_beam_piece_param __attribute__((sda));
 extern void func_002A7750_3(char *a0, int a1, int a2);
 extern void vec_scale_to_length(void *out, void *in, float scale);
 extern void FastVecSub(void *out, void *in1, void *in2);
@@ -36,7 +36,7 @@ void beam_to_target_update(char *self) {
             vec_scale_to_length(beamPoints[1], target + 0x10, 18.0f);
             FastVecSub(beamPoints[0], beamPoints[0], beamOffset);
             FastVecAdd(beamPoints[1], beamPoints[1], beamOffset);
-            part_explode_object_into_pieces(self, beamPoints, D_L14_001B1878, D_L14_001B1870, 0xFFFF, 0, D_L14_001B18A0, 8, 0xFFFF, 0xFF, 0);
+            part_explode_object_into_pieces(self, beamPoints, g_beam_piece_data_b, g_beam_piece_data_a, 0xFFFF, 0, g_beam_piece_param, 8, 0xFFFF, 0xFF, 0);
             PlayMobySound(0, 0, self);
             func_002A7750_3(self, 2, -1);
         }

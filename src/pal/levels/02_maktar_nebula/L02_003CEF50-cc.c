@@ -5,7 +5,7 @@ typedef unsigned int u32;
 typedef short s16;
 
 extern int D_L02_gp10B0 __attribute__((sda));
-extern unsigned int D_001B00A4 __attribute__((nosda));
+extern unsigned int g_path_enemy_refresh_range __attribute__((nosda));
 
 extern int FastDecTimer(void *);
 extern s16 math_random_int_range(int, unsigned int);
@@ -15,7 +15,7 @@ void func_PAL_L02_003CEF50(char *a0) {
     char *s0 = *(char **)(a0 + 0x68);
 
     if (FastDecTimer(s0 + 0x3B4) != 0) {
-        *(s16 *)(s0 + 0x3B4) = (((int)(math_random_int_range(D_L02_gp10B0, D_001B00A4)) * 5 + 2) / 6);
+        *(s16 *)(s0 + 0x3B4) = (((int)(math_random_int_range(D_L02_gp10B0, g_path_enemy_refresh_range)) * 5 + 2) / 6);
         PlayMobySound(1, 0, a0);
     }
 }

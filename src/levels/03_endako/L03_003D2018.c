@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
+extern u8 *g_moby_record_base[] __attribute__((sda));
 extern f32  FastAddRotations(f32 moby, f32 a1);
 extern void hero_reset_position_and_direction(char *moby, char *a1, s32 a2, s32 a3);
 extern void SetHeroMode(s32 moby, s32 a1, char *a2);
 extern void cam_reset_entry(s32 moby);
 extern void script_queue_keyed_request(s32 moby, s32 a1);
 extern char g_hero_state[];
-extern u8   D_001395BF;
+extern u8   g_clank_scene_done_flag;
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -16,7 +16,7 @@ typedef int TI128 __attribute__((mode(TI)));
 void clank_scene_finish(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    char *entry = D_L03_001B2A1C[0] + *(s32 *)vars * 0x100;
+    char *entry = g_moby_record_base[0] + *(s32 *)vars * 0x100;
     u16 flags = *(u16 *)(entry + 0x34);
     char *record_ptr = entry + 0xF0;
     s32 class_data = *(s32 *)(entry + 0x24);
@@ -36,5 +36,5 @@ void clank_scene_finish(char *moby)
     *(f32 *)(base + 0x98) = FastAddRotations(*(f32 *)(base + 0x98), 1.0471977f);
     cam_reset_entry(*(s32 *)(vars + 0x28));
     script_queue_keyed_request(*(s32 *)(vars + 0x20), -1);
-    D_001395BF = 1;
+    g_clank_scene_done_flag = 1;
 }

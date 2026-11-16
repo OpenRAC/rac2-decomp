@@ -9,13 +9,13 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { int i; float f; } Word;
 #define R(p,o) (((Word *)((u8 *)(p)+(o)))->f)
 extern int g_current_map_index;
-extern u8 D_0019B2E8[], g_hero_position[];
+extern u8 g_moby_group_flags[], g_hero_position[];
 typedef struct { u8 prefix[0x464]; u8 flags[0]; } FlagTable;
-extern FlagTable D_L18_0021E7B0;
+extern FlagTable g_trigger_l18_flags;
 typedef struct { u8 prefix[0x30]; float position[4]; u8 middle[0x30]; float rotation[4]; } Transform;
 extern Transform *g_waypoint_table MACRO_ADDR;
 extern u8 *g_moby_l18_table;
-extern int D_L18_001B9A80 NOT_SDA;
+extern int g_hero_l18_attached_flag NOT_SDA;
 extern void moby_set_state(void *,int,int);
 extern int coll_point_inside_region(void *,int);
 extern void moby_mark_spawned(void *);
@@ -28,7 +28,7 @@ extern void SpawnExplosionEffects(void *,void *,void *,float,float,float,float,f
 extern void part_spawn_masked_debris(void *,int,float,float,float,float,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern float math_fast_sin_or_cos_a(float),math_move_angle_toward_target(float,float,float);
-extern void func_US2_L18_002D0050(int),mat_combine_and_store(void *,void *,void *,void *);
+extern void hero_detach_from_object_us2(int),mat_combine_and_store(void *,void *,void *,void *);
 
 void func_US2_L18_0043AE50(u8 *obj)
 {
@@ -51,8 +51,8 @@ void func_US2_L18_0043AE50(u8 *obj)
         I(state,0x5C)|=1;
         *(TI128 *)(state+0x60) = *(TI128 *)(obj+0x10);
         *(TI128 *)(state+0x70) = *(TI128 *)(obj+0xF0);
-        if (D_L18_0021E7B0.flags[I(state,0x8C)] ||
-            (B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) ||
+        if (g_trigger_l18_flags.flags[I(state,0x8C)] ||
+            (B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) ||
             (I(state,0x98)!=-1 && coll_point_inside_region(g_hero_position,I(state,0x98)))) {
             qcopy_nc(obj+0x10,g_waypoint_table[I(state,0x80)].position);
             qcopy_nc(obj+0xF0,g_waypoint_table[I(state,0x80)].rotation);
@@ -65,7 +65,7 @@ void func_US2_L18_0043AE50(u8 *obj)
         if (!B(obj,0xBC) && !flag_is_third_pending_set(obj) && I(state,0x8C)!=-1 &&
             B(g_moby_l18_table+I(state,0x8C)*256,0x20)!=254 &&
             B(g_moby_l18_table+I(state,0x8C)*256,0x20)!=253 &&
-            !(B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) &&
+            !(B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) &&
             (I(state,0x98)==-1 || !coll_point_inside_region(g_hero_position,I(state,0x98)))) goto effects;
         if (I(state,0x94)!=-1) B(g_moby_l18_table+I(state,0x94)*256,0xBC)=1;
         if (B(state,0x93)) moby_mark_table_entry_flagged(B(obj,0xB0));
@@ -103,7 +103,7 @@ void func_US2_L18_0043AE50(u8 *obj)
         break;
     case 3:
         if (I(state,0x94)!=-1 && B(g_moby_l18_table+I(state,0x94)*256,0xBC)) break;
-        if (B(state,0x90)) { D_L18_001B9A80=0; func_US2_L18_002D0050(0); }
+        if (B(state,0x90)) { g_hero_l18_attached_flag=0; hero_detach_from_object_us2(0); }
         H(obj,0x34)|=2;
         break;
     }

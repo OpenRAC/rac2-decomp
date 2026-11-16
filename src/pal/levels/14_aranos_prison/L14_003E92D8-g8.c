@@ -17,10 +17,10 @@ typedef unsigned int u32;
 typedef signed short s16;
 typedef int s32;
 
-extern float D_L14_001B05C8 __attribute__((sda));
-extern float D_L14_001B05CC __attribute__((sda));
-extern float D_L14_001B05C0 __attribute__((sda));
-extern float D_L14_001B05C4 __attribute__((sda));
+extern float g_keyframe_blend_bias_a __attribute__((sda));
+extern float g_keyframe_blend_bias_b __attribute__((sda));
+extern float g_keyframe_blend_scale_a __attribute__((sda));
+extern float g_keyframe_blend_scale_b __attribute__((sda));
 extern float math_fabs(float);
 
 void func_PAL_L14_003E92D8(char *self)
@@ -67,11 +67,11 @@ void func_PAL_L14_003E92D8(char *self)
     key = (raw * 5 + 2) / 6;
     start = (float)key;
     span = (float)(end - key);
-    r1 = math_fabs((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)pos - start) / span);
-    u = D_L14_001B05C8 - r1;
-    r2 = math_fabs((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - start) / span);
-    out0 = u * D_L14_001B05C0;
-    out1 = (D_L14_001B05CC - r2) * D_L14_001B05C4;
+    r1 = math_fabs((g_keyframe_blend_bias_a - 1.0f) - (g_keyframe_blend_bias_a + g_keyframe_blend_bias_a - 2.0f) * ((float)(s16)pos - start) / span);
+    u = g_keyframe_blend_bias_a - r1;
+    r2 = math_fabs((g_keyframe_blend_bias_b - 1.0f) - (g_keyframe_blend_bias_b + g_keyframe_blend_bias_b - 2.0f) * ((float)*(s16 *)(state + 0x14) - start) / span);
+    out0 = u * g_keyframe_blend_scale_a;
+    out1 = (g_keyframe_blend_bias_b - r2) * g_keyframe_blend_scale_b;
     *(float *)(out + 0x40) = out0;
     *(float *)(out + 0x44) = out1;
 }

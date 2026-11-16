@@ -7,33 +7,33 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L02_001B0BA4 __attribute__((sda));
+extern int g_tether_strands_dirty __attribute__((sda));
 
-extern int D_L02_001B0CA8 __attribute__((sda));
+extern int g_tether_reset_value __attribute__((sda));
 
-extern float D_L02_001B0BA8 __attribute__((sda));
+extern float g_tether_strand_length __attribute__((sda));
 
-extern int D_L02_001B4208;
+extern int g_tether_l02_state_word;
 
-extern int D_L02_001B420C;
+extern int g_tether_state_flag;
 
-extern float D_L02_00249090[20][4];
+extern float g_tether_strand_points[20][4];
 
-extern int D_L02_00249310[20];
+extern int g_tether_strand_prev_heights[20];
 
-extern float D_L02_00249360[20][4];
+extern float g_tether_strand_sideways[20][4];
 
-extern int D_L02_002494A0[20];
+extern int g_tether_strand_heights[20];
 
-extern short D_L02_001B41E8[4];
+extern short g_tether_strand_ids[4];
 
-extern short D_L02_001B41F8[8] __attribute__((sda));
+extern short g_tether_strand_lengths[8] __attribute__((sda));
 
-extern int D_L02_001B0C28 __attribute__((sda));
+extern int g_tether_l02_height_phase __attribute__((sda));
 
-extern int D_L02_001B0C30 __attribute__((sda));
+extern int g_tether_lateral_phase __attribute__((sda));
 
-extern int D_L02_001B0C44 __attribute__((sda));
+extern int g_tether_l02_wave_phase_2 __attribute__((sda));
 
 extern void FastVecSub(void *, void *, void *);
 
@@ -54,32 +54,32 @@ void tether_reset_strands(char *actor) {
     short minusOne;
 
     state = *(char **)(actor + 0x68);
-    if (D_L02_001B0BA4 != 0) {
-        D_L02_001B4208 = D_L02_001B0CA8;
-        D_L02_001B0BA4 = 0;
-        D_L02_001B420C = 0;
+    if (g_tether_strands_dirty != 0) {
+        g_tether_l02_state_word = g_tether_reset_value;
+        g_tether_strands_dirty = 0;
+        g_tether_state_flag = 0;
         FastVecSub(span, state + 0x30, state + 0x20);
-        vec_scale_to_length(stepVec, span, D_L02_001B0BA8 * 0.05f);
-        *(TI128 *)D_L02_00249090[0] = *(TI128 *)(state + 0x20);
+        vec_scale_to_length(stepVec, span, g_tether_strand_length * 0.05f);
+        *(TI128 *)g_tether_strand_points[0] = *(TI128 *)(state + 0x20);
         for (i = 1; i < 20; i++) {
-            FastVecAdd(D_L02_00249090[i], D_L02_00249090[i - 1], stepVec);
-            D_L02_00249310[i] = 0;
-            vec_clear_128(D_L02_00249360[i]);
-            D_L02_002494A0[i] = 0;
+            FastVecAdd(g_tether_strand_points[i], g_tether_strand_points[i - 1], stepVec);
+            g_tether_strand_prev_heights[i] = 0;
+            vec_clear_128(g_tether_strand_sideways[i]);
+            g_tether_strand_heights[i] = 0;
         }
         minusOne = -1;
         for (j = 3; j >= 0; j--)
-            D_L02_001B41E8[j] = minusOne;
-        D_L02_001B41F8[0] = 8;
-        D_L02_001B41F8[4] = 4;
-        D_L02_001B41F8[1] = 4;
-        D_L02_001B41F8[2] = 8;
-        D_L02_001B41F8[5] = 2;
-        D_L02_001B41F8[6] = 4;
-        D_L02_001B41F8[3] = 4;
-        D_L02_001B41F8[7] = 2;
-        D_L02_001B0C28 = 0;
-        D_L02_001B0C30 = 0;
-        D_L02_001B0C44 = 0;
+            g_tether_strand_ids[j] = minusOne;
+        g_tether_strand_lengths[0] = 8;
+        g_tether_strand_lengths[4] = 4;
+        g_tether_strand_lengths[1] = 4;
+        g_tether_strand_lengths[2] = 8;
+        g_tether_strand_lengths[5] = 2;
+        g_tether_strand_lengths[6] = 4;
+        g_tether_strand_lengths[3] = 4;
+        g_tether_strand_lengths[7] = 2;
+        g_tether_l02_height_phase = 0;
+        g_tether_lateral_phase = 0;
+        g_tether_l02_wave_phase_2 = 0;
     }
 }

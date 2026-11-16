@@ -10,12 +10,12 @@ extern void set_moby_color(void *, void *, void *, void *);
 extern void anim_start_blended(void *, int, int, int);
 extern float math_random_float_range(float, float);
 extern void anim_start_blended(void *, int, int, int);
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
 
 /* resets the actor's aim: three records and the two shared limits */
-void func_PAL_L02_00411CB0(u8 *a0, int a1) {
+void blade_ball_wake_pal(u8 *a0, int a1) {
     u8 *s0 = *(u8 **)(a0 + 0x68);
 
     *(u16 *)(s0 + 0x1B8) = 0;
@@ -41,7 +41,7 @@ void func_PAL_L02_00411CB0(u8 *a0, int a1) {
 }
 
 typedef signed int s32;
-extern char D_L02_00188660[];
+extern char g_sound_l02_record_table[];
 extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
@@ -54,12 +54,12 @@ extern s32 req_launch_queued(u8 *);
 /* Lets go of the slot the actor holds (+0x19C) when that slot's record still names it and is live,
    ends the state at +0x1B8 when it is 1 (func_L02_003FC1B0), starts the effect pair when the actor
    is shown (+0x31), then clears the state and the shared fields as func_L02_0040B980 does. */
-void func_PAL_L02_00411DB0(u8 *a0) {
+void blade_ball_explode_pal(u8 *a0) {
     u8 *s1 = *(u8 **)(a0 + 0x68);
     s32 slot = *(s32 *)(s1 + 0x19C);
 
     if (slot != -1) {
-        u8 *rec = (u8 *)D_L02_00188660 + slot * 0x70;
+        u8 *rec = (u8 *)g_sound_l02_record_table + slot * 0x70;
 
         if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
             snd_stop_voice(slot);
@@ -96,7 +96,7 @@ extern void moby_mark_spawned(u8 *);
    record, then queues the messages 0x2D, 3 and 0x2E on D_L02_001C0700, sets the byte and calls
    func_002A7750 with 2. Kind 2 runs func_002AD7B8 and func_002AF0A8 with 3 and calls
    func_002A7750 with 3, unless func_002F5D10 answers yes. */
-void func_PAL_L02_004147E8(u8 *a0) {
+void message_sequence_update_pal(u8 *a0) {
     u8 *state = *(u8 **)(a0 + 0x68);
 
     switch (a0[0x20]) {
@@ -107,13 +107,13 @@ void func_PAL_L02_004147E8(u8 *a0) {
             moby_set_state(a0, 1, -1);
         break;
     case 1:
-        if (D_001A7BCB == 0 && D_L02_001395B8[4] == 0 &&
+        if (g_unlock_flag_c == 0 && g_message_sequence_flags[4] == 0 &&
             IsPointInCuboid(g_hero_position, *(s32 *)(state + 0xC)) != 0 &&
-            req_push_queue(D_L02_001C0700, 0x2D) != 0) {
-            req_push_queue(D_L02_001C0700, 3);
-            req_push_queue(D_L02_001C0700, 0x2E);
-            req_launch_queued(D_L02_001C0700);
-            D_L02_001395B8[4] = 1;
+            req_push_queue(g_message_queue, 0x2D) != 0) {
+            req_push_queue(g_message_queue, 3);
+            req_push_queue(g_message_queue, 0x2E);
+            req_launch_queued(g_message_queue);
+            g_message_sequence_flags[4] = 1;
             moby_set_state(a0, 2, -1);
         }
         break;

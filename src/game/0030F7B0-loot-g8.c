@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern int math_random_int_below(int);
-extern int D_001AF0FC __attribute__((sda));
+extern int g_nanotech_cooldown __attribute__((sda));
 extern void SetDeathBits(void *, int, int);
 extern int PickAmmoDropItem(void *, int *);
 extern char *SpawnWeaponAmmoPickup(void *, int, int, int);
@@ -17,9 +17,9 @@ void crate_drop_loot(unsigned char *self)
     if (*(short *)(self + 0xAA) == MOBY_CLASS_NANOTECH_CRATE || *(short *)(self + 0xAA) == MOBY_CLASS_PURPLE_NANOTECH_CRATE)
         item = 0;
     if (item) {
-        if (D_001AF0FC >= 21)
+        if (g_nanotech_cooldown >= 21)
             i = 0;
-        else if (D_001AF0FC >= 11)
+        else if (g_nanotech_cooldown >= 11)
             i = 1;
         else
             i = 2;

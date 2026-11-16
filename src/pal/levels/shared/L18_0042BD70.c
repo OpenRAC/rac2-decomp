@@ -4,13 +4,13 @@
 typedef struct { u8 reserved00[0x34]; u16 flags; } ObjectFlagsPrefix;
 typedef struct { u8 reserved00[0x68]; u8 *state; } LinkEntityPrefix;
 extern u8 *g_moby_l18_table MACRO_ADDR;
-extern void func_PAL_L18_0042BA90(u8 *, s32, s32, float);
+extern void moby_start_or_forward_anim_pal(u8 *, s32, s32, float);
 extern s32 moby_set_anim(u8 *, s32, s32);
 extern s32 vec_fast_helper_a(void *);
 extern s32 moby_fuse_linked_objects(u8 *, void *, void *, s32, s32);
 extern void moby_set_state(u8 *, s32, s32);
 
-void func_PAL_L18_0042BD70(u8 *object)
+void moby_wake_linked_enemy_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     u8 *source;
@@ -25,7 +25,7 @@ void func_PAL_L18_0042BD70(u8 *object)
     *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
     *(s32 *)(state + 0x94) = 0;
     object[0xA8] = 255;
-    func_PAL_L18_0042BA90(object, 7, 0, 1.0f);
+    moby_start_or_forward_anim_pal(object, 7, 0, 1.0f);
     *(float *)(object + 0x48) = 0.1f;
     *(s32 *)(state + 0x13C) = *(s32 *)(state + 0x380);
     moby_set_anim(object, *(s32 *)(state + 0x36C), -1);

@@ -20,12 +20,12 @@ typedef struct {
     Beam *vars;
 } BeamMoby;
 extern int g_current_map_index;
-extern int D_L16_001AF884 __attribute__((sda)), D_L16_001AF888 __attribute__((sda));
-extern float D_L16_001AF908 __attribute__((sda)), D_L16_001AF90C __attribute__((sda)), D_L16_001AF920 __attribute__((sda));
-extern int D_L16_001AF914 __attribute__((sda)), D_L16_001AF918 __attribute__((sda));
-extern int D_L16_001AF928 __attribute__((sda)), D_L16_001AF92C __attribute__((sda));
-extern char *D_L16_001B2C0C __attribute__((sda));
-extern float D_L16_001B9B00[4];
+extern int g_beam_lifetime_min __attribute__((sda)), g_vendor_beam_lifetime_max __attribute__((sda));
+extern float g_beam_spark_spread_angle __attribute__((sda)), g_beam_velocity_spread __attribute__((sda)), g_beam_jitter_w __attribute__((sda));
+extern int g_beam_trail_param_a __attribute__((sda)), g_beam_trail_param_b __attribute__((sda));
+extern int g_beam_color_a __attribute__((sda)), g_beam_l16_color_b __attribute__((sda));
+extern char *g_beam_definition_table __attribute__((sda));
+extern float g_scene_origin_transform[4];
 extern int math_random_int_range(int,int);
 extern float math_random_float_range(float,float);
 extern float IntToFloat(int);
@@ -65,7 +65,7 @@ void start_vendor_beam_pulse(BeamMoby *object)
     int i, smoothIndex, branchIndex, particleIndex, j, k;
     int selected;
     object->position.w = 1.0f;
-    beam->lifetime = math_random_int_range(D_L16_001AF884, D_L16_001AF888);
+    beam->lifetime = math_random_int_range(g_beam_lifetime_min, g_vendor_beam_lifetime_max);
     beam->duration = beam->lifetime;
     if (g_current_map_index == 0xd5 || g_current_map_index == 16)
         spread = math_random_float_range(40.0f, 45.0f);
@@ -82,10 +82,10 @@ void start_vendor_beam_pulse(BeamMoby *object)
             vec_clear_128(&positions[i]);
             vec_clear_128(&velocities[i]);
         } else {
-            vec_random_direction(&positions[i], 0.0f, D_L16_001AF908);
+            vec_random_direction(&positions[i], 0.0f, g_beam_spark_spread_angle);
             if (g_current_map_index == 16 || g_current_map_index == 0xd5)
                 vec_random_direction(&velocities[i], 0.0f, 0.20000001788139343f);
-            else vec_random_direction(&velocities[i], 0.0f, D_L16_001AF90C * timeStep);
+            else vec_random_direction(&velocities[i], 0.0f, g_beam_velocity_spread * timeStep);
         }
         {
             float y = positions[i].y;
@@ -109,7 +109,7 @@ void start_vendor_beam_pulse(BeamMoby *object)
     for (branchIndex = 0; branchIndex < 4; branchIndex++) {
         if (g_current_map_index == 0xd5 || g_current_map_index == 16)
             vec_random_direction(&scratch, 1.0f, 1.0f);
-        else vec_random_direction(&scratch, D_L16_001AF908, D_L16_001AF908);
+        else vec_random_direction(&scratch, g_beam_spark_spread_angle, g_beam_spark_spread_angle);
         selected = FloatToInt(math_random_float_range((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
         beam->selected[branchIndex] = selected;
         qcopy(&beam->branches[0][branchIndex], &beam->positions[selected]);
@@ -123,14 +123,14 @@ void start_vendor_beam_pulse(BeamMoby *object)
                 vec_random_direction(&jitter, 0.1f, 0.1f);
                 if (g_current_map_index == 0xd5 || g_current_map_index == 16)
                     vec_random_direction(((Row *)((char *)beam + velOffset))[j], 0.0f, 0.20000001788139343f);
-                else vec_random_direction(((Row *)((char *)beam + velOffset))[j], 0.0f, D_L16_001AF90C * frameTime);
+                else vec_random_direction(((Row *)((char *)beam + velOffset))[j], 0.0f, g_beam_velocity_spread * frameTime);
                 FastVecAdd(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
                 FastVecAdd(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
             }
         }
     }
-    if (vec_distance_xy(&object->position, D_L16_001B9B00) >= 4.0f) {
-        char *definition = (char *)(beam->index * 128 + (int)D_L16_001B2C0C);
+    if (vec_distance_xy(&object->position, g_scene_origin_transform) >= 4.0f) {
+        char *definition = (char *)(beam->index * 128 + (int)g_beam_definition_table);
         beam->rotation[2] = *(float *)(definition + 0x78);
         beam->rotation[1] = *(float *)(definition + 0x74);
         beam->rotation[0] = math_random_angle();
@@ -140,19 +140,19 @@ void start_vendor_beam_pulse(BeamMoby *object)
             int color, duration;
             transform_vector(&scratch, &beam->positions[particleIndex], transform);
             qcopy(&jitter, &beam->velocities[particleIndex]);
-            jitter.w = D_L16_001AF920;
-            color = math_random_int_below(2) ? D_L16_001AF928 : D_L16_001AF92C;
+            jitter.w = g_beam_jitter_w;
+            color = math_random_int_below(2) ? g_beam_color_a : g_beam_l16_color_b;
             duration = math_random_int_below(10);
-            part_spawn_trail(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, particleIndex >> 1, 15, duration + 20, color);
+            part_spawn_trail(&scratch, &jitter, &jitter, g_beam_trail_param_a, g_beam_trail_param_b, particleIndex >> 1, 15, duration + 20, color);
         }
         for (k = 0; k < 2; k++) {
             int duration, heads;
             transform_vector(&scratch, &beam->branches[3][k], transform);
             qcopy(&jitter, &beam->branchVelocities[3][k]);
-            jitter.w = D_L16_001AF920;
+            jitter.w = g_beam_jitter_w;
             flipCoin(&heads);
             duration = math_random_int_below(10);
-            part_spawn_trail(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, beam->selected[k] >> 1, 15, duration + 20, D_L16_001AF92C);
+            part_spawn_trail(&scratch, &jitter, &jitter, g_beam_trail_param_a, g_beam_trail_param_b, beam->selected[k] >> 1, 15, duration + 20, g_beam_l16_color_b);
         }
     }
 }

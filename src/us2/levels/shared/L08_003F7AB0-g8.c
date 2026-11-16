@@ -12,12 +12,12 @@ extern void FastVecAdd(void *,void *,void *);
 extern void destructible_update(void *,void *);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *);
-extern int D_L08_001B2508;
-extern u8 D_L08_001B9B00[];
-extern u8 *D_L08_001FE7C0[];
-extern u8 *D_L08_001B2ACC __attribute__((sda));
-extern float D_L08_001B0B5C __attribute__((sda));
-extern u8 D_L08_001AC5E0[] MACRO_ADDR;
+extern int g_frame_l08_counter;
+extern u8 g_hero_position_vec[];
+extern u8 *g_path_list_table[];
+extern u8 *g_collision_box_table __attribute__((sda));
+extern float g_spawner_speed_divisor __attribute__((sda));
+extern u8 g_normalize_length_vec[] MACRO_ADDR;
 extern void moby_mark_spawned(void *);
 extern int GetFirstMobyInGroup(void **,int,int,int);
 extern int FastDecTimer(void *);
@@ -50,12 +50,12 @@ void func_US2_L08_003F7AB0(u8 *m)
     void *a2,*t0;
     int a3,t1;
     destructible_update(m,p);
-    if(m[0x31] && fast_vec_dist(m+0x10,D_L08_001B9B00)<24.0f) {
+    if(m[0x31] && fast_vec_dist(m+0x10,g_hero_position_vec)<24.0f) {
         moby_update_ground_check(m);m[0x6f]=0x16;
     }
     switch(m[0x20]) {
     case 0:
-        if(D_L08_001B2508) {
+        if(g_frame_l08_counter) {
             int i;
             found=0;
             for(i=0;i<2;i++) {
@@ -70,7 +70,7 @@ void func_US2_L08_003F7AB0(u8 *m)
         if(!math_random_int_below(7)) {
             a2=0;a3=0;t0=0;t1=0;
             if(E_I(p,0x124)!=-1) {a2=p+0x124;a3=1;}
-            if(E_I(p,0x128)!=-1) {u8 *obj=D_L08_001FE7C0[E_I(p,0x128)];t1=E_I(obj,0);t0=obj+0x10;}
+            if(E_I(p,0x128)!=-1) {u8 *obj=g_path_list_table[E_I(p,0x128)];t1=E_I(obj,0);t0=obj+0x10;}
             FindHeroOrMobyTarget(m,p+0xc0,a2,a3,t0,t1,E_F(p,0x120));
         } else {
             u8 *obj=*(u8 **)(p+0x100);
@@ -100,7 +100,7 @@ void func_US2_L08_003F7AB0(u8 *m)
             best=100000.0f;
             for(i=0;i<4;i++) {
                 if(((FVars *)p)->targets[i]!=-1) {
-                    u8 *obj=D_L08_001B2ACC+((FVars *)p)->targets[i]*128;
+                    u8 *obj=g_collision_box_table+((FVars *)p)->targets[i]*128;
                     d=fast_vec_dist(g_hero_position,obj+0x30);
                     if(d<best) {chosen=obj;best=d;}
                 }
@@ -118,7 +118,7 @@ void func_US2_L08_003F7AB0(u8 *m)
             for(i=0;i<4;i++) {
                 int slot=(i+k)%4;
                 if(((FVars *)p)->targets[slot]!=-1) {
-                    chosen=D_L08_001B2ACC+((FVars *)p)->targets[slot]*128;
+                    chosen=g_collision_box_table+((FVars *)p)->targets[slot]*128;
                     break;
                 }
             }
@@ -137,7 +137,7 @@ void func_US2_L08_003F7AB0(u8 *m)
         {float height=coll_probe_ground_height_below(&frame.target,0,0.5f);
         if(height!=0.0f) E_F(&frame.target,8)=height;}
         FastVecSub(&frame.direction,&frame.target,(m+0x10));
-        f=FastVecLength(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? FastVecLength(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
+        f=FastVecLength(&frame.direction)/g_spawner_speed_divisor<0.08000000566f ? FastVecLength(&frame.direction)/g_spawner_speed_divisor : 0.08000000566f;
         vec_scale_to_length(&frame.direction,&frame.direction,f);
         moby_transform_joint_to_world(m,0,&frame.velocity);
         vec_scale_to_length(&frame.step,&frame.direction,0.05f);
@@ -158,7 +158,7 @@ void func_US2_L08_003F7AB0(u8 *m)
         break;
     case 4:
         if(mine_fall(m,p+0x60)&0x40) {
-            vec_scale_to_length(&frame.target,D_L08_001AC5E0,0.1666666716f);
+            vec_scale_to_length(&frame.target,g_normalize_length_vec,0.1666666716f);
             SpawnExplosionEffects(m,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
             moby_mark_spawned(m);
         }

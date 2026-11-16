@@ -7,7 +7,7 @@ extern void vec_clear_128(f32 *v);
 extern f32 FastVecLength(f32 *v);
 extern s8 g_hero_state[];
 extern f32 g_stick_length;
-extern u8 D_PAL_001A7ACC;
+extern u8 g_pal_enable_flag;
 
 void func_PAL_00331948(s8 *a0) {
     s8 *base;
@@ -16,7 +16,7 @@ void func_PAL_00331948(s8 *a0) {
     f32 vec[2];
 
     obj = *(s8 **)(a0 + 0x68);
-    if (D_PAL_001A7ACC != 0) {
+    if (g_pal_enable_flag != 0) {
         base = g_hero_state;
         (*(f32 *)((s8 *)(obj) + (0x54))) = (*(f32 *)((s8 *)(base) + (0x1FB0)));
     } else {

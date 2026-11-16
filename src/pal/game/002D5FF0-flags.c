@@ -18,7 +18,7 @@ typedef struct { char pad[0xDB]; unsigned char active; char padDC[0x118 - 0xDC];
 extern Mode2D6E78 g_music_state;
 extern Map2D6E78 g_map_overlay_state;
 extern State2D6E78 g_pause_menu_state;
-extern unsigned char D_001F291B;
+extern unsigned char g_map_selection_flag;
 extern void load_request_disc_read_break(void);
 extern void load_request_disc_read_break(void);
 
@@ -28,7 +28,7 @@ int func_PAL_002D7AA8(void)
         Map2D6E78 *map = &g_map_overlay_state;
         int index = map->selected;
         if (index != -1) {
-            D_001F291B = 0;
+            g_map_selection_flag = 0;
             map->flags[index] ^= 0x1000;
             map->selected = -1;
         }
@@ -49,10 +49,10 @@ int func_PAL_002D7AA8(void)
 
 extern int menu_update_entry_states(int *);
 extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
-extern int D_001C51D0;
+extern int g_selected_map_index;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
-extern Base2D75E8 D_0025A6E0;
-extern int D_0025A620[];
+extern Base2D75E8 g_page_preview;
+extern int g_level_page_entry_value[];
 
 int func_PAL_002D8228(int *arg0)
 {
@@ -60,12 +60,12 @@ int func_PAL_002D8228(int *arg0)
     *(int *)((char *)arg0 + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
     {
         char *base = (char *)arg0 + 0x30;
-        int index = D_001C51D0;
+        int index = g_selected_map_index;
 
         if (*(int *)(base + (index << 2)) != -1) {
-            D_0025A6E0.f3C = -0x240;
-            D_0025A6E0.f34 = *(int *)(0x70000000 + 4 * *(int *)(base + (index << 2)));
-            *(int *)D_0025A620 = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
+            g_page_preview.f3C = -0x240;
+            g_page_preview.f34 = *(int *)(0x70000000 + 4 * *(int *)(base + (index << 2)));
+            *(int *)g_level_page_entry_value = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
         }
     }
     *(int *)((char *)arg0 + 0xA4) = 0;
@@ -82,12 +82,12 @@ unsigned int func_PAL_002D6540(void)
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_PAL_0029CD38(int);
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_PAL_0029CD38(int);
 
-int func_PAL_002D64D0(void) {
-    func_PAL_0029CD38(D_00138344);
+int menu_handle_buttons_alt_pal(void) {
+    func_PAL_0029CD38(g_menu_input_flags);
     return 0;
 }

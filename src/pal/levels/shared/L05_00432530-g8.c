@@ -1,6 +1,7 @@
 /* func_PAL_L05_00432530, the PAL copy of func_L05_0042C928: the same C, where 0.00029088825f
    becomes 0.0003490659f; func_L01_00397950 becomes func_PAL_L01_0039AD60. */
 #include "include_asm.h"
+#include "names.h"
 #include "common.h"
 
 typedef struct ListMoby_0042C928 {
@@ -9,25 +10,25 @@ typedef struct ListMoby_0042C928 {
     char pad2C[0x7E];
     short oclass;
 } ListMoby_0042C928;
-extern u8 D_0019B278[] MACRO_ADDR;
+extern u8 g_level_progress_flags[] MACRO_ADDR;
 extern int D_001A79F0_1;
 extern char *g_hero_moby NOT_SDA;
-extern float D_L05_001B1748 __attribute__((sda));
-extern float D_L05_001B174C __attribute__((sda));
-extern float D_L05_001B1750 __attribute__((sda));
-extern ListMoby_0042C928 *D_L05_001B1780 __attribute__((sda));
-extern ListMoby_0042C928 *D_L05_001B2528;
+extern float g_collectible_spin_x __attribute__((sda));
+extern float g_collectible_spin_y __attribute__((sda));
+extern float g_collectible_spin_z __attribute__((sda));
+extern ListMoby_0042C928 *g_pickup_first_moby __attribute__((sda));
+extern ListMoby_0042C928 *g_moby_l05_list_head;
 extern char *CreateMoby(s32 a0);
 extern float math_random_angle(void);
 extern void func_PAL_L01_0039AD60(char *a0);
 extern void set_moby_color(char *a0, s32 a1, s32 a2, s32 a3);
 
-char *func_PAL_L05_00432530(float *pos, u32 kind, s32 a2, s32 a3)
+char *pickup_spawn_if_not_taken_pal(float *pos, u32 kind, s32 a2, s32 a3)
 {
     char *moby;
     char *vars;
     ListMoby_0042C928 *p;
-    u8 *collected = D_0019B278;
+    u8 *collected = g_level_progress_flags;
 
     if (kind >= 4 || collected[kind + (D_001A79F0_1 << 2)] != 0)
         return 0;
@@ -48,9 +49,9 @@ char *func_PAL_L05_00432530(float *pos, u32 kind, s32 a2, s32 a3)
         *(float *)(moby + 0xF4) = math_random_angle();
         *(float *)(moby + 0xF8) = math_random_angle();
         r = math_random_angle();
-        x = D_L05_001B1748;
-        y = D_L05_001B174C;
-        z = D_L05_001B1750;
+        x = g_collectible_spin_x;
+        y = g_collectible_spin_y;
+        z = g_collectible_spin_z;
         *(float *)(moby + 0xFC) = r;
         *(s32 *)(vars + 8) = a3;
         *(s32 *)(vars + 4) = a2;
@@ -63,10 +64,10 @@ char *func_PAL_L05_00432530(float *pos, u32 kind, s32 a2, s32 a3)
         *(u8 *)(moby + 0x20) = 1;
         func_PAL_L01_0039AD60(moby);
         set_moby_color(moby, 0x82, 0x82, 0x82);
-        if (D_L05_001B1780 == 0) {
-            for (p = D_L05_001B2528; p != 0; p = p->next) {
+        if (g_pickup_first_moby == 0) {
+            for (p = g_moby_l05_list_head; p != 0; p = p->next) {
                 if (p->oclass == 0xFBF)
-                    D_L05_001B1780 = p;
+                    g_pickup_first_moby = p;
             }
         }
     }

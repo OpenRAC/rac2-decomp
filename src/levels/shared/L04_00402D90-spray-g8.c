@@ -1,9 +1,9 @@
 #include "common.h"
 
 typedef unsigned int EffectQuad __attribute__((mode(TI)));
-extern const EffectQuad D_L04_001B0980[3];
-extern unsigned char D_L04_002BDAC0[], D_L04_002BDB20[];
-extern int D_L04_001B097C __attribute__((sda));
+extern const EffectQuad g_exhaust_effect_offsets[3];
+extern unsigned char g_exhaust_effect_params_a[], g_exhaust_effect_params_b[];
+extern int g_exhaust_fade_timer __attribute__((sda));
 extern unsigned char g_sound_state[];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -29,14 +29,14 @@ void racer_spawn_exhaust_effects(unsigned char *self)
     int i, handle;
 
     *(EffectQuad *)velocity = 0;
-    offsets[0] = D_L04_001B0980[0];
-    offsets[1] = D_L04_001B0980[1];
-    offsets[2] = D_L04_001B0980[2];
+    offsets[0] = g_exhaust_effect_offsets[0];
+    offsets[1] = g_exhaust_effect_offsets[1];
+    offsets[2] = g_exhaust_effect_offsets[2];
     {
         unsigned char *object = self;
 
         vars = *(unsigned char **)(object + 0x68);
-        if (object[0xbc] == 3 || object[0xbc] == 4) D_L04_001B097C = 0;
+        if (object[0xbc] == 3 || object[0xbc] == 4) g_exhaust_fade_timer = 0;
         strength = *(float *)(vars + 0x27c) * 9.999999f;
         if (strength > 1.0f) strength = 1.0f;
         else if (strength < 0.0f) strength = 0.0f;
@@ -47,8 +47,8 @@ void racer_spawn_exhaust_effects(unsigned char *self)
             unsigned char *m = object;
 
             for (i = 0; i < 3; i++) {
-                if (i == 1) effect_params = D_L04_002BDB20;
-                else effect_params = D_L04_002BDAC0;
+                if (i == 1) effect_params = g_exhaust_effect_params_b;
+                else effect_params = g_exhaust_effect_params_a;
                 matrix_mul_vec3(point, &offsets[i], m + 0xc0);
                 FastVecAdd(point, point, m + 0x10);
                 point[3] = 0.0f;
@@ -60,13 +60,13 @@ void racer_spawn_exhaust_effects(unsigned char *self)
                 vec_add_random_offset(first, spread);
                 vec_add_random_offset(second, spread);
                 vec_add_random_offset(third, strength * 0.009f + 0.005f);
-                if (strength > 0.0f || D_L04_001B097C > 0 || *(int *)(vars + 0x278) > 0) {
+                if (strength > 0.0f || g_exhaust_fade_timer > 0 || *(int *)(vars + 0x278) > 0) {
                     if (strength == 0.0f && *(int *)(vars + 0x278) == 0) {
-                        fade = (float)D_L04_001B097C * 0.033333335f;
-                        D_L04_001B097C--;
+                        fade = (float)g_exhaust_fade_timer * 0.033333335f;
+                        g_exhaust_fade_timer--;
                     } else {
                         fade = 1.0f;
-                        D_L04_001B097C = 30;
+                        g_exhaust_fade_timer = 30;
                     }
                     spread = strength * 0.01f;
                     spread += 0.01f;

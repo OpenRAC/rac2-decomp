@@ -25,7 +25,7 @@ extern int IsPointInCuboid(u8 *, int);
 extern u8 g_hero_position[];
 extern float moby_get_anim_value(u8 *);
 extern int flag_set_first_pending(u8 *);
-extern int *D_L18_001FE480[];
+extern int *g_path_l18_table[];
 extern int path_measure_moby_against_entry(void *, int, float);
 
 typedef struct {
@@ -177,7 +177,7 @@ void leader_update(u8 *moby) {
         } else {
             int id = vars->paths[vars->group];
             float speed = 5.0f;
-            if (vars->waypoint == D_L18_001FE480[id][0] - 1)
+            if (vars->waypoint == g_path_l18_table[id][0] - 1)
                 speed = 0.3f;
             if (!path_step_along_point(moby, vars->movement, id, &vars->waypoint, 0, speed)) {
                 if (vars->group <= 0 && vars->paths[1] != -1)

@@ -11,12 +11,12 @@ typedef struct {
     f32 a;
     f32 b;
 } L02Pair_C4ED8;
-extern L02Range_C4ED8 D_L02_001AFE90 NOT_SDA;
-extern L02Pair_C4ED8 D_L02_001AFE98 NOT_SDA;
-extern f32 D_L02_001AFE60[] SDATA(D_L02_001AFE60);
+extern L02Range_C4ED8 g_spark_l02_range NOT_SDA;
+extern L02Pair_C4ED8 g_spark_speed_pair NOT_SDA;
+extern f32 g_spark_origin_vector[] SDATA(D_L02_001AFE60);
 extern f32 D_L02_001AFE70_gp[] SDATA(D_L02_001AFE70);
-extern f32 D_L02_001AFE70[] __attribute__((sda));
-extern f32 D_L02_001AFE80[] __attribute__((sda));
+extern f32 g_spark_dir_a[] __attribute__((sda));
+extern f32 g_spark_dir_b[] __attribute__((sda));
 extern int math_fast_float_d(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_PAL_L02_002F1100(void *, void *, void *, int, int, int, int, float);
@@ -25,8 +25,8 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 
 void func_PAL_L02_003C8C70(u8 *self)
 {
-    L02Range_C4ED8 range = D_L02_001AFE90;
-    L02Pair_C4ED8 speed = D_L02_001AFE98;
+    L02Range_C4ED8 range = g_spark_l02_range;
+    L02Pair_C4ED8 speed = g_spark_speed_pair;
     f32 origin[4] __attribute__((aligned(16)));
     f32 dir0[4] __attribute__((aligned(16)));
     f32 dir1[4] __attribute__((aligned(16)));
@@ -37,15 +37,15 @@ void func_PAL_L02_003C8C70(u8 *self)
     if (*(s32 *)(state + 0x18) != 0) {
         qcopy(origin, self + 0x10);
     } else {
-        matrix_mul_vec3(origin, D_L02_001AFE60, self + 0xC0);
+        matrix_mul_vec3(origin, g_spark_origin_vector, self + 0xC0);
         FastVecAdd(origin, origin, self + 0x10);
     }
     matrix_mul_vec3(dir0, D_L02_001AFE70_gp, self + 0xC0);
     vec_scale_to_length(dir0, dir0, speed.a * 0.020000001f);
-    matrix_mul_vec3(dir1, D_L02_001AFE80, self + 0xC0);
+    matrix_mul_vec3(dir1, g_spark_dir_b, self + 0xC0);
     vec_scale_to_length(dir1, dir1, speed.b * 0.020000001f);
-    D_L02_001AFE70[1] = -D_L02_001AFE70[1];
-    D_L02_001AFE80[1] = -D_L02_001AFE80[1];
+    g_spark_dir_a[1] = -g_spark_dir_a[1];
+    g_spark_dir_b[1] = -g_spark_dir_b[1];
     func_PAL_L02_002F1100(origin, dir0, dir1, 12, 0, 0, 0, 15.0f);
     *(s32 *)(state + 0x124) = ((s32)(math_random_int_range(range.lo, range.hi)) * 5 + 2) / 6;
     snd_play_from_class_bank(4, 0, (char *)self, 0x896);

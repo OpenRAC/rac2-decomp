@@ -10,12 +10,12 @@ typedef struct {
 extern u8 g_sound_state[];
 typedef union { u8 b[0x2600]; f32 f[0x980]; } Hero;
 extern Hero g_hero_state;
-extern float D_L16_001B9B00[4] NOT_SDA;
-extern int D_L16_001A8F00;
-extern u8 *D_L16_001BFF58 NOT_SDA;
-extern float D_L16_001B1648[3] __attribute__((sda));
-extern float D_L16_001B1658[3] __attribute__((sda));
-extern float D_L16_001B1664 __attribute__((sda));
+extern float g_scene_origin_transform[4] NOT_SDA;
+extern int g_snivelak_state;
+extern u8 *g_aim_target_moby NOT_SDA;
+extern float g_snivelak_shot_angles[3] __attribute__((sda));
+extern float g_snivelak_shot_times[3] __attribute__((sda));
+extern float g_snivelak_missile_progress_limit __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int), func_PAL_002A7E68(void *, int, int, int);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
@@ -25,8 +25,8 @@ extern float mat_fast_helper_a(float, float), math_random_signed_float_range(flo
 extern void func_PAL_L16_00412C28(u8 *);
 extern void StepAngleTowardTarget(float *, int, float, float);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
+extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern void moby_mark_spawned(void *), moby_set_state(void *, int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
@@ -56,12 +56,12 @@ void func_PAL_L16_004124A0(u8 *moby)
         rate = state->timing.rate;
         segmentEnd = &state->point[1];
         for (i = 0; i < 3; i++) {
-            if (i == 0 || timing->progress[i-1] > D_L16_001B1664) {
+            if (i == 0 || timing->progress[i-1] > g_snivelak_missile_progress_limit) {
                 math_step_value_toward_target(&timing->progress[i],
                     &rate[i], 1.0f,
-                    D_L16_001B1648[i] * 0.00040000002f,
-                    D_L16_001B1648[i] * 0.00040000002f,
-                    D_L16_001B1658[i] * 0.020000001f);
+                    g_snivelak_shot_angles[i] * 0.00040000002f,
+                    g_snivelak_shot_angles[i] * 0.00040000002f,
+                    g_snivelak_shot_times[i] * 0.020000001f);
                 if (i == 2 && state->timing.progress[1] > 0.95f && moby[0x43])
                     func_PAL_002A7E68(moby, 0, 0, 17);
             }
@@ -73,7 +73,7 @@ void func_PAL_L16_004124A0(u8 *moby)
             mat_fast_helper_a(g_hero_state.f[0x80 / 4] - *(float *)(moby + 0x10),
                 g_hero_state.f[0x84 / 4] - *(float *)(moby + 0x14)), 0.25132746f);
         func_PAL_L16_00412C28(moby);
-        if (part_find_owned_effect_slot(moby, 0x10000, 0) || D_L16_001A8F00 == 2) {
+        if (part_find_owned_effect_slot(moby, 0x10000, 0) || g_snivelak_state == 2) {
             PlayMobySound(2, 0, moby);
             handle = state->sound;
             if (handle != -1) {
@@ -88,18 +88,18 @@ void func_PAL_L16_004124A0(u8 *moby)
                 case 2: FastVecScale(velocity, moby + 0xe0, 0.120000005f); break;
                 default: qzero(velocity); break;
                 }
-                func_PAL_002735D0(moby, 1, *(short *)(moby + 0xaa), i,
+                cam_moby_create_pal(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, velocity, 255, math_random_signed_float_range(90.0f, 180.0f), math_random_float_range(5.0f, 15.0f));
             }
-            func_PAL_L00_003FB330(moby + 0x10, 0, 0, 0, 0, 20, 45, 1,
+            SpawnExplosion_pal(moby + 0x10, 0, 0, 0, 0, 20, 45, 1,
                 1.0f, 20.0f, 1, 0, 0, 0);
             moby_mark_spawned(moby);
         } else {
             if (state->timing.progress[2] >= 1.0f) moby_set_state(moby, 1, -1);
             if (CollLine(oldPosition, moby + 0x10, 0, moby, 0)) {
-                if (D_L16_001BFF58 &&
-                    (*(short *)(D_L16_001BFF58 + 0xaa) == 0xf78 ||
-                     *(short *)(D_L16_001BFF58 + 0xaa) == 0x7e8)) return;
+                if (g_aim_target_moby &&
+                    (*(short *)(g_aim_target_moby + 0xaa) == 0xf78 ||
+                     *(short *)(g_aim_target_moby + 0xaa) == 0x7e8)) return;
             } else {
                 if (!(state->timing.progress[1] >= 0.9f)) return;
                 if (!coll_test_point(moby + 0x10, 0, moby, 1.5f)) return;
@@ -117,7 +117,7 @@ void func_PAL_L16_004124A0(u8 *moby)
         }
         state->sound = -1;
         PlayMobySound(1, 0, moby);
-        FastVecSub(oldPosition, D_L16_001B9B00, moby + 0x10);
+        FastVecSub(oldPosition, g_scene_origin_transform, moby + 0x10);
         vec_scale_to_length(oldPosition, oldPosition, 1.0f);
         func_PAL_0032F3B8(moby, moby + 0x10, oldPosition, 0.0f);
         coll_sweep_from_object(moby, moby + 0x10, 2.0f, 0x10001, 0, 5.0f, 1.0f, 1, 0);

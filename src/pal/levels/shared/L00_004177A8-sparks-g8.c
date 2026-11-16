@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_PAL_L00_004177A8, the PAL copy of func_L00_00412928: the same C, where the 60 Hz step 1/60 becomes 0.020000001f, the lifetimes 60 and 40 become 50 and 33, and the last particle argument gains a * 1.44f. */
 #include "common.h"
-extern char D_L00_001B8C80[]; extern char D_00189ED0[];
-extern int D_L00_001A8FF0;
-extern float D_L00_001B1344 __attribute__((sda));
-extern float D_L00_001B1348 __attribute__((sda));
-extern float D_L00_001B134C __attribute__((sda));
-extern float D_L00_001B1350 __attribute__((sda));
-extern float D_L00_001B1354 __attribute__((sda));
-extern float D_L00_001B1358 __attribute__((sda));
-extern float D_L00_001B135C __attribute__((sda));
+extern char g_scalar_transition_state[]; extern char g_camera_position[];
+extern int g_hero_locked_flag;
+extern float g_spark_l00_speed_min_3 __attribute__((sda));
+extern float g_spark_l00_speed_max_3 __attribute__((sda));
+extern float g_spark_velocity_z_min __attribute__((sda));
+extern float g_spark_velocity_z_max __attribute__((sda));
+extern float g_spark_ground_effect_param __attribute__((sda));
+extern float g_spark_l00_size_min_3 __attribute__((sda));
+extern float g_spark_l00_size_max_3 __attribute__((sda));
 extern void FastVecSub(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
@@ -31,26 +32,26 @@ void func_PAL_L00_004177A8(char *pos, int count, int mode) {
     float size, angle, speed;
     u8 *particle;
 
-    FastVecSub(direction, D_L00_001B8C80+0x140, (float *)pos);
-    if (D_L00_001A8FF0 == 0) {
+    FastVecSub(direction, g_scalar_transition_state+0x140, (float *)pos);
+    if (g_hero_locked_flag == 0) {
         direction[2] = 0.0f;
         axis[0] = 0.0f; axis[1] = 0.0f; axis[2] = 1.0f; axis[3] = 1.0f;
     } else {
-        FastVecSub(extra, pos, D_00189ED0);
+        FastVecSub(extra, pos, g_camera_position);
         vec_scale_to_length(axis, extra, 1.0f);
         FastVecScale(extra, axis, FastVecDot(axis, direction));
         FastVecSub(direction, direction, extra);
     }
     for (i = 0; i < count; i++) {
-        size = math_random_float_range(D_L00_001B1358, D_L00_001B135C);
+        size = math_random_float_range(g_spark_l00_size_min_3, g_spark_l00_size_max_3);
         sign = math_random_int_below(2);
         if (sign == 0)
             sign--;
         angle = math_random_float_range(-1.0471977f, 1.0471977f);
         math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
-        speed = math_random_float_range(D_L00_001B1344, D_L00_001B1348) * 0.020000001f;
+        speed = math_random_float_range(g_spark_l00_speed_min_3, g_spark_l00_speed_max_3) * 0.020000001f;
         vec_scale_to_length((char *)velocity, (char *)velocity, speed);
-        velocity[2] = math_random_float_range(D_L00_001B134C, D_L00_001B1350) * 0.020000001f;
+        velocity[2] = math_random_float_range(g_spark_velocity_z_min, g_spark_velocity_z_max) * 0.020000001f;
         qcopy(point, pos);
         point[0] += math_random_signed_float_range(0.0f, 0.15f);
         point[1] += math_random_signed_float_range(0.0f, 0.15f);
@@ -58,34 +59,34 @@ void func_PAL_L00_004177A8(char *pos, int count, int mode) {
         if (mode == 0) {
             if (!(func_001163B0() & 1)) {
                 FastVecScale(velocity, velocity, 1.5f);
-                particle = part_spawn_ground_effect(point, 50, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
                 if (particle)
                     particle[9] = FloatToInt(4.0f) + 0x70;
-                particle = part_spawn_ground_effect(point, 50, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
             } else {
-                FastVecSub(extra, D_L00_001B8C80+0x140, point);
+                FastVecSub(extra, g_scalar_transition_state+0x140, point);
                 vec_scale_to_length((char *)extra, (char *)extra, speed);
                 FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
-                particle = part_spawn_ground_effect(point, 33, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 33, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
                 if (particle)
                     particle[9] = FloatToInt(4.0f) + 0x70;
-                particle = part_spawn_ground_effect(point, 33, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 33, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
             }
         } else {
             if (!(func_001163B0() & 1)) {
                 FastVecScale(velocity, velocity, 1.5f);
-                particle = part_spawn_ground_effect(point, 50, size * 0.3f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.3f, size, 0x7F800000, 0, sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
                 if (particle)
                     particle[9] = FloatToInt(4.0f) + 0x70;
-                particle = part_spawn_ground_effect(point, 50, size * 0.21000000834465027f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 50, size * 0.21000000834465027f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
             } else {
-                FastVecSub(extra, D_L00_001B8C80+0x140, point);
+                FastVecSub(extra, g_scalar_transition_state+0x140, point);
                 vec_scale_to_length((char *)extra, (char *)extra, speed);
                 FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
-                particle = part_spawn_ground_effect(point, 33, size * 0.25f, size, 0x7F800000, 0, sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 33, size * 0.25f, size, 0x7F800000, 0, sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
                 if (particle)
                     particle[9] = FloatToInt(4.0f) + 0x70;
-                particle = part_spawn_ground_effect(point, 33, size * 0.175f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L00_001B1354 * 1.44f);
+                particle = part_spawn_ground_effect(point, 33, size * 0.175f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_spark_ground_effect_param * 1.44f);
             }
         }
         if (particle)

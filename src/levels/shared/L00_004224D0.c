@@ -26,7 +26,7 @@ extern void func_00282CF0_7(char *local, char *data);
 
 extern float func_00282DB0_1(char *local, char *p);
 
-extern float D_L00_001A8900 __attribute__((sda));
+extern float g_follow_cam_lerp_factor __attribute__((sda));
 
 extern void func_00282CF0_4(float *out, char *a, char *b);
 
@@ -36,7 +36,7 @@ extern float FastVecLength(void *v);
 
 extern void func_00282F20_3(float *out, float *in, float k);
 
-extern char *D_L00_001BB040;
+extern char *g_weapon_view_state;
 
 extern void func_00282CF0_8(char *dst, char *a, char *b);
 
@@ -55,9 +55,9 @@ typedef struct {
 } CameraScratch;
 extern char *g_follow_camera_object;
 extern char g_hero_state[];
-extern int D_L00_001B184C MACRO_ADDR;
-extern Vector D_L00_001BF220;
-extern Vector D_L00_001B8E50;
+extern int g_cam_collision_line_mask MACRO_ADDR;
+extern Vector g_hero_l00_position;
+extern Vector g_camera_up_vector;
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -89,8 +89,8 @@ void cam_follow_update_orientation(int reposition)
         FastVecAdd(target, transform, &scratch.transformed);
         FastVecScale(&scratch.scaled, *(char **)(transform + 0xC0) + 0xE0, *(float *)(transform + 0xB0));
         FastVecAdd(&scratch.endpoint, transform, &scratch.scaled);
-        if (CollLine(&scratch.endpoint, target, D_L00_001B184C, *(char **)(g_hero_state + 0x2290), 0)) {
-            FastVecSub(&scratch.difference, &D_L00_001BF220, &scratch.endpoint);
+        if (CollLine(&scratch.endpoint, target, g_cam_collision_line_mask, *(char **)(g_hero_state + 0x2290), 0)) {
+            FastVecSub(&scratch.difference, &g_hero_l00_position, &scratch.endpoint);
             length = FastVecLength(&scratch.difference);
             if (length == 0.0f) {
                 qcopy(target, &scratch.endpoint);
@@ -107,7 +107,7 @@ void cam_follow_update_orientation(int reposition)
         previous[1] = *(float *)(position + 4);
         previous[2] = *(float *)(position + 8);
     }
-    qcopy(&scratch.up, &D_L00_001B8E50);
+    qcopy(&scratch.up, &g_camera_up_vector);
     vec_scale_to_length(&scratch.scaled, &scratch.up, *(float *)(transform + 0xB0));
     FastVecAdd(&scratch.endpoint, &scratch.scaled, transform);
     FastVecSub(&scratch.delta, &scratch.endpoint, position);
@@ -244,7 +244,7 @@ void cam_set_aim_offset_target(int add_base, float offset, float speed)
         *(short *)(block + 0xDA) = 1;
         *(float *)(block + 0xB8) = speed;
         if (add_base) {
-            *(float *)(block + 0xB4) = *(float *)(D_L00_001BB040 + 0x110) + offset;
+            *(float *)(block + 0xB4) = *(float *)(g_weapon_view_state + 0x110) + offset;
         } else {
             *(float *)(block + 0xB4) = offset;
         }
@@ -359,7 +359,7 @@ void cam_set_input_flags(void)
     }
 }
 
-extern char D_L00_001B8E20[];
+extern char g_camera_move_state[];
 extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
@@ -379,7 +379,7 @@ float cam_steer_toward_direction(char *object, char *vector, float threshold)
     char *state = *(char **)(object + 0x70);
     char *output = state + 0x1C0;
     char *direction = state + 0x160;
-    char *camera = D_L00_001B8E20;
+    char *camera = g_camera_move_state;
     char *up = camera + 0x20;
     float dot;
     float length;
@@ -457,7 +457,7 @@ void cam_follow_update_reach(char *camera)
 
     if (*(short *)(state + 16) <= 0) return;
     func_00282CF0_4(offset, state, state + 176);
-    lerp_vector((float *)movement, movement, (char *)offset, D_L00_001A8900);
+    lerp_vector((float *)movement, movement, (char *)offset, g_follow_cam_lerp_factor);
     reach = FastVecLength((float *)movement);
     max_reach = *(float *)(movement + 44);
     if (max_reach < reach) {
@@ -492,8 +492,8 @@ typedef struct GridCellEntry {
 } GridCellEntry;
 
 /* The grid base pointer uses the measured absolute macro-address form. */
-extern char *D_L00_001B1880[] __attribute__((sda));
-extern char *D_L00_001B1F94[] __attribute__((sda));
+extern char *g_collision_grid_data[] __attribute__((sda));
+extern char *g_collision_sphere_table[] __attribute__((sda));
 
 /* Visits every cell of the 64x64 collision grid and passes each type-5 entry's record to func_00282DF0. */
 void coll_visit_grid_entries(void)
@@ -503,7 +503,7 @@ void coll_visit_grid_entries(void)
     for (y = 0; y < 64; y++) {
         for (x = 0; x < 64; x++) {
             int idx = y * 64 + x;
-            char *base = D_L00_001B1880[0];
+            char *base = g_collision_grid_data[0];
             int cell = ((int *)base)[idx];
 
             if (cell == 0) {
@@ -514,7 +514,7 @@ void coll_visit_grid_entries(void)
                 GridCellEntry *entry = (GridCellEntry *)((char *)cell + 16) + k;
 
                 if (entry->type == 5) {
-                    FastVecLength(D_L00_001B1F94[0] + (entry->index << 7));
+                    FastVecLength(g_collision_sphere_table[0] + (entry->index << 7));
                 }
             }
         }

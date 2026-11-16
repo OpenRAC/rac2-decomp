@@ -39,15 +39,15 @@ typedef struct {
 typedef struct { char reserved00[0x1C4]; int flags; } MenuGameState;
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern unsigned char D_001A7BB4;
-extern int D_0025E0B0 __attribute__((nosda));
+extern unsigned char g_language;
+extern int g_menu_selection_input_state __attribute__((nosda));
 /* PAL only: indexed by D_001A7BB4, which USA stores directly. Its extent is not established, so it
    stays incomplete behind the GP view retail uses. */
-extern int D_PAL_001ABB58[] SDATA(D_PAL_001ABB58);
+extern int g_ui_value_table[] SDATA(D_PAL_001ABB58);
 int func_PAL_002D5C20(int selection)
 {
     CallbackState *state = &g_pause_menu_state;
-    D_0025E0B0 = D_PAL_001ABB58[D_001A7BB4];
+    g_menu_selection_input_state = g_ui_value_table[g_language];
     if (*(int *)(state->source + 0xE8) != selection)
         return 0;
     if ((g_pad_state.flags & 0x900) && state->fallback == 0)

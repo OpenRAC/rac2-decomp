@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 extern int TryClaimNotice(int, int, int);
 
-void func_US2_L02_00412BE8(u8 *a0) {
+void hud_show_message_for_state_us2(u8 *a0) {
     int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);
     int msg;
 

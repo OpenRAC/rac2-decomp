@@ -15,7 +15,7 @@ extern void ref_L11_00447360_10(void *);
 extern void ref_L11_00447360_11(void *);
 extern void ref_L11_00447360_12(void *);
 
-void func_PAL_L11_0044CDF0(s32 arg0) {
+void moby_update_class_specials_pal(s32 arg0) {
     s8 *temp_s0;
     s16 var_v1;
 

@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern float D_L16_001B16D0[4] __attribute__((sda));
-extern float D_L16_001B16E0 __attribute__((sda));
-extern u8 D_L16_00189EF0[] __attribute__((nosda));
+extern float g_snivelak_muzzle_offset[4] __attribute__((sda));
+extern float g_snivelak_shot_speed __attribute__((sda));
+extern u8 g_snivelak_shot_origin[] __attribute__((nosda));
 extern void moby_transform_joint_point(void *, s32, void *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -28,20 +28,20 @@ void snivelak_fire_body_shots(u8 *moby)
     float scale = 0.016666668f;
     state = *(u8 **)(moby + 0x68);
     moby_transform_joint_point(*(void **)(state + 0x1F0), 2, matrix);
-    transform_vector(origin, D_L16_001B16D0, matrix);
-    FastVecSub(direction, D_L16_00189EF0, origin);
-    vec_scale_to_length(direction, direction, D_L16_001B16E0 * scale);
+    transform_vector(origin, g_snivelak_muzzle_offset, matrix);
+    FastVecSub(direction, g_snivelak_shot_origin, origin);
+    vec_scale_to_length(direction, direction, g_snivelak_shot_speed * scale);
     SpawnEA7Moby(moby, direction, origin, 0, (float)state[0x34]);
     angle = math_random_angle();
     radius = math_random_float_range(zero, 4.0f);
-    FastVecSub(direction, D_L16_00189EF0, moby + 0x10);
+    FastVecSub(direction, g_snivelak_shot_origin, moby + 0x10);
     vec_scale_to_length(direction, direction, -4.0f);
-    FastVecAdd(direction, direction, D_L16_00189EF0);
+    FastVecAdd(direction, direction, g_snivelak_shot_origin);
     offset[0] = math_fast_sin_or_cos_a(angle) * radius;
     offset[1] = math_fast_sin_or_cos_b(angle) * radius;
     offset[2] = zero;
     FastVecAdd(direction, direction, offset);
     FastVecSub(direction, direction, origin);
-    vec_scale_to_length(direction, direction, D_L16_001B16E0 * scale);
+    vec_scale_to_length(direction, direction, g_snivelak_shot_speed * scale);
     SpawnEA7Moby(moby, direction, origin, 0, (float)state[0x34]);
 }

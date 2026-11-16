@@ -8,8 +8,8 @@ extern void moby_mark_spawned(void *);
 extern int math_random_int_below(int);
 extern void *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 extern void ref_L00_003FC228_00(void (*)(void *), void *);
-extern char D_L00_001A8F20[] MACRO_ADDR;
-extern unsigned char *D_L00_001FEA14;
+extern char g_default_vector[] MACRO_ADDR;
+extern unsigned char *g_effect_param_pointer_b;
 extern void spark_trail_draw_ribbon(char *);
 extern void large_spark_trail_draw_ribbon(char *);
 
@@ -35,12 +35,12 @@ void spark_trail_update(char *object) {
             return;
         }
         phase = math_random_int_below(255);
-        particle = part_spawn_gravity_fade(position, D_L00_001A8F20, 2, 0x00202080,
+        particle = part_spawn_gravity_fade(position, g_default_vector, 2, 0x00202080,
                                phase, 64, 16, 420000.0f, 420000.0f, 0.0f, 0);
-        if (particle != 0) particle[2] = *D_L00_001FEA14;
-        particle = part_spawn_gravity_fade(position, D_L00_001A8F20, 2, 0x00202080,
+        if (particle != 0) particle[2] = *g_effect_param_pointer_b;
+        particle = part_spawn_gravity_fade(position, g_default_vector, 2, 0x00202080,
                                (phase + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 0);
-        if (particle != 0) particle[2] = *D_L00_001FEA14;
+        if (particle != 0) particle[2] = *g_effect_param_pointer_b;
         ref_L00_003FC228_00((void (*)(void *))spark_trail_draw_ribbon, object);
     }
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f ||

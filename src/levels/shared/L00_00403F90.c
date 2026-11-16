@@ -24,8 +24,8 @@ struct Globals {
 };
 
 extern struct Globals g_collision_result;
-extern char *D_L00_0018C0B0;
-extern u8 D_L00_00139588;
+extern char *g_collision_hero_owner;
+extern u8 g_selected_weapon_index;
 extern struct Ent g_weapon_l00_table[];
 
 extern int CollLine(void *, void *, int, void *, int);
@@ -50,11 +50,11 @@ void sheep_shot_resolve_hit(char *arg, void *p) {
     if (CollLine(p, pos, 0, arg, 0) == 0) {
         return;
     }
-    if (g_collision_result.hero != 0 && g_collision_result.hero != D_L00_0018C0B0 &&
+    if (g_collision_result.hero != 0 && g_collision_result.hero != g_collision_hero_owner &&
         (*(short *)(*(char **)(g_collision_result.hero + 0x24) + 0x46) == 5 ||
          (*(u16 *)(g_collision_result.hero + 0x34) & 0x4000) != 0)) {
         vec_scale_to_length(vec, st, 1.0f);
-        e = &g_weapon_l00_table[D_L00_00139588];
+        e = &g_weapon_l00_table[g_selected_weapon_index];
         scale = 1.0f;
         is2 = e->used != 0 && e->mode == 2;
         if (is2) {

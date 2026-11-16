@@ -30,10 +30,10 @@
 extern void *D_0026DBE0[];
 
 extern void shop_set_message_text(s8 *a);
-extern s8 D_001AD468[];
-extern s8 D_001AD498[];
-extern s8 D_001AD4C0[];
-extern s8 D_001AD4E8[];
+extern s8 g_str_shop_message_a[];
+extern s8 g_str_shop_message_b[];
+extern s8 g_str_shop_message_c[];
+extern s8 g_str_shop_message_d[];
 extern void shop_mark_bought_special_items_owned(void);
 
 struct A { s8 pad[0x38]; s32 st; };
@@ -51,7 +51,7 @@ struct B {
 
 extern struct A g_vendor_menu_state;
 extern struct B g_memcard_state;
-extern s32 D_001A7A20;
+extern s32 g_special_items_bought_flags;
 
 /* Steps through the shop's buy and message states: shows the right line of text for the item
    and moves on to the next step. */
@@ -81,16 +81,16 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_1:
     rc2_case_3:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.f1C == 1) {
-                    shop_set_message_text(D_001AD468);
+                    shop_set_message_text(g_str_shop_message_a);
                 } else if (g_memcard_state.f1C >= 3) {
-                    shop_set_message_text(D_001AD498);
+                    shop_set_message_text(g_str_shop_message_b);
                 } else {
-                    shop_set_message_text(D_001AD4C0);
+                    shop_set_message_text(g_str_shop_message_c);
                 }
             } else {
-                shop_set_message_text(D_001AD4E8);
+                shop_set_message_text(g_str_shop_message_d);
             }
             shop_mark_bought_special_items_owned();
             if (g_vendor_menu_state.st != 0) {
@@ -111,16 +111,16 @@ goto *D_0026DBE0[rc2_selector];
         goto rc2_switch_end;
     rc2_case_5:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.fBC == 1) {
-                    shop_set_message_text(D_001AD468);
+                    shop_set_message_text(g_str_shop_message_a);
                 } else if (g_memcard_state.fBC >= 3) {
-                    shop_set_message_text(D_001AD498);
+                    shop_set_message_text(g_str_shop_message_b);
                 } else {
-                    shop_set_message_text(D_001AD4C0);
+                    shop_set_message_text(g_str_shop_message_c);
                 }
             } else {
-                shop_set_message_text(D_001AD4E8);
+                shop_set_message_text(g_str_shop_message_d);
             }
             shop_mark_bought_special_items_owned();
             g_vendor_menu_state.st = 6;

@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern float D_001A790C;
-extern float D_001A7910;
-extern float D_001A7914;
-extern float D_001A7918;
-extern float D_001A791C;
-extern float D_001A7920;
-extern int D_001A7924;
-extern float D_001A7928;
+extern float g_frame_rate_scale;
+extern float g_frame_scale_square;
+extern float g_frame_scale_inverse;
+extern float g_frame_delta;
+extern float g_frame_delta_square;
+extern float g_frame_delta_cube;
+extern int g_frame_tick_count;
+extern float g_frame_delta_scale;
 extern int g_is_pal_video;
 extern float D_001A7918_gp SDATA(D_001A7918);
 extern float D_001A7928_gp SDATA(D_001A7928);
@@ -19,14 +19,14 @@ void SetFrameTimingMode(int mode) {
         float frame = 1.0f/60.0f;
         float square = 1.0f/3600.0f;
         float cube = 1.0f/216000.0f;
-        D_001A7914 = one;
-        D_001A791C = square;
-        D_001A7920 = cube;
-        D_001A7924 = 5;
-        D_001A7928 = frame;
+        g_frame_scale_inverse = one;
+        g_frame_delta_square = square;
+        g_frame_delta_cube = cube;
+        g_frame_tick_count = 5;
+        g_frame_delta_scale = frame;
         g_is_pal_video = 0;
-        D_001A790C = one;
-        D_001A7910 = one;
+        g_frame_rate_scale = one;
+        g_frame_scale_square = one;
         D_001A7918_gp = frame;
     } else {
         float inverse, frame, frame2, frame3, square, baseline, rate;
@@ -42,13 +42,13 @@ void SetFrameTimingMode(int mode) {
         frame3 = 0.000008f;
         baseline = 0.02f;
         g_is_pal_video = enabled;
-        D_001A790C = rate;
-        D_001A7910 = square;
-        D_001A7914 = inverse;
-        D_001A7918 = frame;
-        D_001A791C = frame2;
-        D_001A7920 = frame3;
-        D_001A7924 = ticks;
+        g_frame_rate_scale = rate;
+        g_frame_scale_square = square;
+        g_frame_scale_inverse = inverse;
+        g_frame_delta = frame;
+        g_frame_delta_square = frame2;
+        g_frame_delta_cube = frame3;
+        g_frame_tick_count = ticks;
         D_001A7928_gp = baseline;
     }
 }

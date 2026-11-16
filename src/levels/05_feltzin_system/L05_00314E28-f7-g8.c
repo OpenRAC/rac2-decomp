@@ -30,7 +30,7 @@ extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 typedef struct {
     char pad0[0x80]; char body[0x2294 - 0x80];
     int mode; char pad2298[0x24CC - 0x2298];
@@ -38,16 +38,16 @@ typedef struct {
 } HeroView;
 extern HeroView g_hero_state;
 extern char g_hero_position[];
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index;
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern int D_L05_001A8F00;
-extern char D_L05_001B0EB0[];
-extern int D_L05_001B2048;
-extern char *D_L05_001B260C;
-extern char D_L05_001BF8C0[];
-extern short **D_L05_002B82C0[];
-extern char D_L05_002BB6B0[];
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern int g_game_mode_a;
+extern char g_str_l05_item_trigger_debug[];
+extern int g_feltzin_mission_index;
+extern char *g_linked_point_table;
+extern char g_request_l05_queue[];
+extern short **g_trigger_link_tables[];
+extern char g_str_l05_trigger_debug[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -68,8 +68,8 @@ void item_l05_trigger_update(Thing *moby)
 
     switch (moby->state) {
     case 0:
-        if ((vars->item != -1 && D_001A7BC8[vars->item] != 0)
-            || (moby->group != 0xFF && (D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80))) {
+        if ((vars->item != -1 && g_map_visited_flags[vars->item] != 0)
+            || (moby->group != 0xFF && (g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80))) {
             moby_mark_spawned(moby);
             break;
         }
@@ -88,24 +88,24 @@ void item_l05_trigger_update(Thing *moby)
             break;
         if (g_hero_state.health <= 0)
             break;
-        if (D_L05_001A8F00 != 0)
+        if (g_game_mode_a != 0)
             break;
         if (vars->msg != -1 && IsPointInCuboid(g_hero_state.body, vars->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L05_002B82C0[g_current_map_index] != 0 && D_L05_002B82C0[g_current_map_index][vars->idx] != 0) {
-            for (i = 0; D_L05_002B82C0[g_current_map_index][vars->idx][i] != -1; i++) {
-                int entry = D_L05_002B82C0[g_current_map_index][vars->idx][i];
+        if (g_trigger_link_tables[g_current_map_index] != 0 && g_trigger_link_tables[g_current_map_index][vars->idx] != 0) {
+            for (i = 0; g_trigger_link_tables[g_current_map_index][vars->idx][i] != -1; i++) {
+                int entry = g_trigger_link_tables[g_current_map_index][vars->idx][i];
 
                 missing = 0;
                 if (vars->tail.b.quiet == 0) {
                     int bit = 1 << (entry & 0x1F);
-                    if (D_00139768[(unsigned int)entry >> 2] & bit)
+                    if (g_request_flag_table[(unsigned int)entry >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L05_001BF8C0, entry) == 0 && i == 0) {
-                    STUB_printf(D_L05_002BB6B0, moby->id, moby->oclass, g_current_map_index, vars->idx, entry);
+                if (req_push_queue(g_request_l05_queue, entry) == 0 && i == 0) {
+                    STUB_printf(g_str_l05_trigger_debug, moby->id, moby->oclass, g_current_map_index, vars->idx, entry);
                     return;
                 }
                 fail = 0;
@@ -117,7 +117,7 @@ void item_l05_trigger_update(Thing *moby)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(D_L05_001B0EB0, g_current_map_index, vars->idx);
+                STUB_printf(g_str_l05_item_trigger_debug, g_current_map_index, vars->idx);
         } while (0);
         if (fail != 0) {
             vars->tail.b.had = 0;
@@ -125,15 +125,15 @@ void item_l05_trigger_update(Thing *moby)
             break;
         }
         vars->tail.b.had = 1;
-        req_launch_queued(D_L05_001BF8C0);
-        if (D_L05_001B2048 < 5 || (g_current_map_index == 6 && vars->idx == 0))
+        req_launch_queued(g_request_l05_queue);
+        if (g_feltzin_mission_index < 5 || (g_current_map_index == 6 && vars->idx == 0))
             game_set_slowdown_factor();
         moby_set_state(moby, 3, -1);
         break;
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
-                char *linked = D_L05_001B260C + (vars->link << 7);
+                char *linked = g_linked_point_table + (vars->link << 7);
                 hero_reset_position_and_direction(linked + 0x30, linked + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
@@ -151,13 +151,13 @@ void item_l05_trigger_update(Thing *moby)
                 snd_play_indexed(vars->item);
             notify = 1;
         }
-        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80)) {
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(moby->group);
             notify = 1;
         }
         if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linked = D_L05_001B260C + (vars->link << 7);
+                char *linked = g_linked_point_table + (vars->link << 7);
                 level_capture_checkpoint_state(linked + 0x30, linked + 0x70);
             } else
                 level_capture_checkpoint_state(moby->pos, moby->dir);
@@ -175,13 +175,13 @@ void item_l05_trigger_update(Thing *moby)
                 snd_play_indexed(vars->item);
             played = 1;
         }
-        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80)) {
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(moby->group);
             played = 1;
         }
         if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linked = D_L05_001B260C + (vars->link << 7);
+                char *linked = g_linked_point_table + (vars->link << 7);
                 level_capture_checkpoint_state(linked + 0x30, linked + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);

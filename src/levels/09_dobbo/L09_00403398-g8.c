@@ -1,16 +1,16 @@
 #include "common.h"
 
-extern s32 D_L09_001B2878 __attribute__((sda));
-extern u8 *D_L09_001B285C MACRO_ADDR;
-extern u16 *D_L09_001FB560[];
+extern s32 g_max_l09_group_id __attribute__((sda));
+extern u8 *g_moby_record_table MACRO_ADDR;
+extern u16 *g_track_entry_table[];
 
 
-extern f32 D_L09_001B13B8 __attribute__((sda));
-extern f32 D_L09_001B13BC __attribute__((sda));
-extern f32 D_L09_001B13C4 __attribute__((sda));
-extern f32 D_L09_001B13C8 __attribute__((sda));
-extern f32 D_L09_001B13CC __attribute__((sda));
-extern f32 D_L09_001B13D0 __attribute__((sda));
+extern f32 g_dobbo_height_limit_offset __attribute__((sda));
+extern f32 g_dobbo_height_base_offset __attribute__((sda));
+extern f32 g_dobbo_height_top_offset __attribute__((sda));
+extern f32 g_dobbo_height_blend_up __attribute__((sda));
+extern f32 g_dobbo_height_blend_down __attribute__((sda));
+extern f32 g_dobbo_separation_range __attribute__((sda));
 extern u8 *g_hero_moby NOT_SDA;
 
 extern void FastVecSub(void *, void *, void *);
@@ -39,42 +39,42 @@ void dobbo_update_height_separation(u8 *obj)
         height = *(f32 *)(state + 0x294) - 0.033333335f;
         *(f32 *)(state + 0x294) = height;
         qcopy(origin, obj + 0x10);
-        origin[2] = height + (D_L09_001B13C4 - D_L09_001B13BC);
+        origin[2] = height + (g_dobbo_height_top_offset - g_dobbo_height_base_offset);
         ground = *(u8 **)(state + 0x188);
         if (ground == 0 || (ground != g_hero_moby && *(s16 *)(ground + 0xAA) != 0xD57 /* moby class 3415 */ &&
                        *(s16 *)(*(u8 **)(ground + 0x24) + 0x46) >= 11)) {
-            limit = *(f32 *)(state + 0x288) + D_L09_001B13BC;
+            limit = *(f32 *)(state + 0x288) + g_dobbo_height_base_offset;
             current = *(f32 *)(state + 0x294);
             if (current < limit)
-                *(f32 *)(state + 0x294) = current + (limit - current) * D_L09_001B13C8;
+                *(f32 *)(state + 0x294) = current + (limit - current) * g_dobbo_height_blend_up;
         }
-        limit = *(f32 *)(state + 0x264) + D_L09_001B13BC;
+        limit = *(f32 *)(state + 0x264) + g_dobbo_height_base_offset;
         current = *(f32 *)(state + 0x294);
         if (current < limit)
-            *(f32 *)(state + 0x294) = current + (limit - current) * D_L09_001B13C8;
+            *(f32 *)(state + 0x294) = current + (limit - current) * g_dobbo_height_blend_up;
         if (obj[0x20] >= 6 && obj[0x20] <= 8) {
-            limit = *(f32 *)(*(u8 **)(state + 0x230) + 0x18) + D_L09_001B13B8;
+            limit = *(f32 *)(*(u8 **)(state + 0x230) + 0x18) + g_dobbo_height_limit_offset;
             current = *(f32 *)(state + 0x294);
             if (current < limit)
-                *(f32 *)(state + 0x294) = current + (limit - current) * D_L09_001B13CC;
+                *(f32 *)(state + 0x294) = current + (limit - current) * g_dobbo_height_blend_down;
         }
         *(f32 *)(obj + 0x18) = *(f32 *)(state + 0x294);
         qzero_nc(push_sum);
-        group_list = D_L09_001FB560[obj[0x21]];
+        group_list = g_track_entry_table[obj[0x21]];
         for (;
-             obj[0x21] != 0xFF && obj[0x21] <= D_L09_001B2878 && group_list != 0 &&
-             ((group_list != 0 && (s16)group_list[-1] >= 0) || group_list == D_L09_001FB560[obj[0x21]]);
+             obj[0x21] != 0xFF && obj[0x21] <= g_max_l09_group_id && group_list != 0 &&
+             ((group_list != 0 && (s16)group_list[-1] >= 0) || group_list == g_track_entry_table[obj[0x21]]);
              group_list++) {
-            neighbor = D_L09_001B285C + ((*group_list & 0x7FFF) << 8);
+            neighbor = g_moby_record_table + ((*group_list & 0x7FFF) << 8);
             if (neighbor == 0)
                 break;
             FastVecSub(offset, obj + 0x10, neighbor + 0x10);
             len = FastVecLength(offset);
-            if (len > D_L09_001B13D0)
-                len = D_L09_001B13D0;
+            if (len > g_dobbo_separation_range)
+                len = g_dobbo_separation_range;
             else if (len < 0.0f)
                 len = 0.0f;
-            weight = 1.0f - len / D_L09_001B13D0;
+            weight = 1.0f - len / g_dobbo_separation_range;
             math_square(weight);
             vec_scale_to_length(offset, offset, len * weight);
             FastVecAdd(push_sum, push_sum, offset);

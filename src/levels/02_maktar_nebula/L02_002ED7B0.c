@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_spawn_spark_puff(void *);
@@ -15,10 +15,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L02_001AC850 __attribute__((sda));
-extern int D_L02_001B3D30 __attribute__((sda)), D_L02_001B3D38 __attribute__((sda));
-extern Collision D_L02_001C0940;
-extern Material D_L02_00264A70[];
+extern int g_debris_l02_model_id __attribute__((sda));
+extern int g_ripple_l02_x __attribute__((sda)), g_ripple_l02_y __attribute__((sda));
+extern Collision g_collision_l02_result;
+extern Material g_material_l02_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -223,13 +223,13 @@ typedef struct {
 
 /* sda in this -G0 unit gives retail's macro load (`lui $r,%hi ; lw $r,%lo($r)`, one register); a plain
    declaration splits it into two registers and interleaves the loads. */
-extern L02_Record20 *D_L02_001B3C14 __attribute__((sda));
+extern L02_Record20 *g_sky_records __attribute__((sda));
 
-extern L02_Record20 *D_L02_001B3C18 __attribute__((sda));
+extern L02_Record20 *g_sky_records_end __attribute__((sda));
 
-extern L02_Record40 *D_L02_001B3BD0 __attribute__((sda));
+extern L02_Record40 *g_sky_wide_records __attribute__((sda));
 
-extern int D_L02_001B3BD4 __attribute__((sda));
+extern int g_sky_wide_record_count __attribute__((sda));
 
 /* Walks the two record tables and shifts each record's x by one period (2000, and 2048000 for the
    second table, whose limit is scaled by 1024): down while x > 0 for the records on the flagged side
@@ -239,7 +239,7 @@ void sky_shift_records_by_period(int flag, float limit) {
     L02_Record20 *record;
     int i;
 
-    for (record = D_L02_001B3C14; record != D_L02_001B3C18; record++) {
+    for (record = g_sky_records; record != g_sky_records_end; record++) {
         int flagged = record->z < limit ? flag : !flag;
 
         if (flagged) {
@@ -251,8 +251,8 @@ void sky_shift_records_by_period(int flag, float limit) {
         }
     }
     limit *= 1024.0f;
-    for (i = 0; i < D_L02_001B3BD4; i++) {
-        L02_Record40 *wide_record = &D_L02_001B3BD0[i];
+    for (i = 0; i < g_sky_wide_record_count; i++) {
+        L02_Record40 *wide_record = &g_sky_wide_records[i];
         int flagged = wide_record->z < limit ? flag : !flag;
 
         if (flagged) {
@@ -288,7 +288,7 @@ typedef struct {
     L02_Mob *mobs[1];
 } L02_MobList;
 
-extern L02_MobList D_L02_001BE200;
+extern L02_MobList g_mob_list;
 
 /* sda in this -G0 unit gives the bare-symbol load: retail has it as `lui`/`lw` after the loop and,
    as the filler of the first branch's delay slot, as the one-instruction `$gp` form gas makes of
@@ -315,8 +315,8 @@ void level_update_moby_list_effects(void) {
     int i;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L02_001BE200.count; i++) {
-        L02_Mob *mob = D_L02_001BE200.mobs[i];
+    for (i = 0; i < g_mob_list.count; i++) {
+        L02_Mob *mob = g_mob_list.mobs[i];
 
         if (mob != 0 && mob->type == 0xE29 /* moby class 3625 */)
             mob->flags |= 0x800;
@@ -325,7 +325,7 @@ void level_update_moby_list_effects(void) {
         if (mob != 0 && mob->type == 0xFA0 /* moby class 4000 */ && mob->p68 != 0)
             math_store_angle_update_result(mob, (u8 *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
-    if (g_current_map_index == 2 && D_L02_001BE200.mode == 2)
+    if (g_current_map_index == 2 && g_mob_list.mode == 2)
         gfx_add_draw_callback_first(cutscene_draw_intro_overlays, 0);
 }
 
@@ -378,7 +378,7 @@ void debris_update_with_sparks(unsigned char *moby) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L02_00264A70 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_material_l02_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -390,14 +390,14 @@ void debris_update_with_sparks(unsigned char *moby) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L02_001B3D30, D_L02_001B3D38, 1,
+            RippleDisturb(g_ripple_l02_x, g_ripple_l02_y, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(moby + 0x10);
             frame.position.f[1] = *(float *)(moby + 0x14);
-            frame.position.f[2] = D_L02_001C0940.point.f[2];
+            frame.position.f[2] = g_collision_l02_result.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -417,16 +417,16 @@ void debris_update_with_sparks(unsigned char *moby) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L02_001C0940;
+            Collision *collision = &g_collision_l02_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* moby class 192 */) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L02_001C0940;
+                reread = &g_collision_l02_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L02_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_debris_l02_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
@@ -489,7 +489,7 @@ void debris_l02_update(char *moby) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L02_00264A70)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_material_l02_table)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -499,16 +499,16 @@ void debris_l02_update(char *moby) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
-        collision = &D_L02_001C0940;
+        collision = &g_collision_l02_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* moby class 192 */) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L02_001C0940;
+            reread = &g_collision_l02_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L02_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_debris_l02_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             moby[0xBC] = 1;
             {
@@ -520,7 +520,7 @@ void debris_l02_update(char *moby) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L02_001C0940;
+            collision = &g_collision_l02_result;
             if (collision->count <= 0)
                 goto finish;
             moby[0xBC] = 1;
@@ -557,7 +557,7 @@ extern u16 *g_entity_group_lists[];
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
 extern u8 *g_moby_l02_pool[] __attribute__((sda));
-extern int D_L02_001B35B8[] __attribute__((sda));
+extern int g_group_max_index[] __attribute__((sda));
 
 /* Returns the first entity of the group's id list whose state byte is 0x17, or 0. */
 u8 *group_find_entity_in_state(int group) {
@@ -565,7 +565,7 @@ u8 *group_find_entity_in_state(int group) {
     u8 *entity;
 
     for (entry = g_entity_group_lists[group];
-         (u8)group != 0xFF && group <= D_L02_001B35B8[0] && entry != 0 &&
+         (u8)group != 0xFF && group <= g_group_max_index[0] && entry != 0 &&
          ((s16)entry[-1] >= 0 || entry == g_entity_group_lists[group]);
          entry++) {
         entity = g_moby_l02_pool[0] + ((*entry & 0x7FFF) << 8);
@@ -693,7 +693,7 @@ extern void func_003144D8(char *);
 
 /* `sda` on an array of unknown size: each use is a fresh absolute `lui`/`addiu`, as retail has
    it, where a plain declaration is kept in a saved register across the calls. */
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 
 /* When the actor is drawn and still holds its sub-object, builds a vector from 0.1 and 1/6,
    offsets it by the vector at D_L02_001A8F20 and passes both to func_0032B468 with the
@@ -708,9 +708,9 @@ void armed_enemy_release_held_object(char *self, TI128 *pos) {
     *(TI128 *)copy = *pos;
     if (*(unsigned char *)(self + 0x31) != 0 && *(char **)(state + 0x2E4) != 0) {
         func_31EA58((char *)vec, 0.10000000894069672f, 0.16666667163372040f);
-        func_002F1F70(vec, vec, D_L02_001A8F20);
+        func_002F1F70(vec, vec, g_zero_l02_vector);
         func_0032B468(self, 0x9D8, *(char **)(state + 0x2E4) + 0x10, *(char **)(state + 0x2E4) + 0xF0,
-                    0, 0, vec, D_L02_001A8F20, D_L02_001A8F20, 0.0027777778450399637f);
+                    0, 0, vec, g_zero_l02_vector, g_zero_l02_vector, 0.0027777778450399637f);
     }
     func_003144D8(*(char **)(state + 0x2E4));
     *(char **)(state + 0x2E4) = 0;

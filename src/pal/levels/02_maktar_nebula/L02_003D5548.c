@@ -4,7 +4,7 @@
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
 
-void func_PAL_L02_003D5548(char *self) {
+void armed_enemy_return_to_idle_pal(char *self) {
     char *p = *(char **)(self + 0x68);
     if (*(int *)(p + 0x2E4) != 0) {
         moby_set_state(self, 4, 2);

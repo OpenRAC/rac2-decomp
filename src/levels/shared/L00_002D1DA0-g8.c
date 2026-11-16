@@ -1,6 +1,7 @@
 /* func_L00_002D1DA0 in its own unit (flags in config/cflags.txt: -O2 -G8 -ffunction-sections). */
 #include "include_asm.h"
 #include "names.h"
+#include "names.h"
 
 typedef struct {
     short key;
@@ -8,9 +9,9 @@ typedef struct {
     unsigned char b;
 } Elem;
 
-extern Elem D_L00_001A7D60 __attribute__((sda));
-extern Elem D_L00_001A7D48 __attribute__((sda));
-extern Elem D_L00_001A7D78 __attribute__((sda));
+extern Elem g_linked_anim_pair_table_b __attribute__((sda));
+extern Elem g_linked_anim_pair_table_a __attribute__((sda));
+extern Elem g_linked_anim_pair_table_c __attribute__((sda));
 
 extern int math_l00_return_argument(int);
 extern int hero_slot_item_id(int);
@@ -27,13 +28,13 @@ int hero_pick_linked_anim_pair(int seq, int *outA, int *outB)
 
     key = math_l00_return_argument(seq);
     if (hero_slot_item_id(3) == 2) {
-        table = &D_L00_001A7D60;
+        table = &g_linked_anim_pair_table_b;
     } else if (hero_slot_item_id(3) == 3) {
-        table = &D_L00_001A7D48;
+        table = &g_linked_anim_pair_table_a;
     } else if ((hero_slot_item_id(3) ^ 4) != 0) {
         table = 0;
     } else {
-        table = &D_L00_001A7D78;
+        table = &g_linked_anim_pair_table_c;
     }
     if (table != 0) {
         for (idx = 0; table[idx].key != -1; idx++) {

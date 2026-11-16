@@ -4,7 +4,7 @@
    the -mastra-quad-saves profile. D_00133E74 is the runtime record (the
    allocator's `struct _reent *`); it is re-read after the calls, since a
    callee may store to it, which is what retail does. */
-extern void *D_00133E74;
+extern void *g_libc_state_record;
 
 /* The exit thunk (src/core/00131780.c): a tail call to exit that drops the
    status it is given. Retail calls it with the status in $a0, and it never
@@ -34,7 +34,7 @@ void exit_run_atexit(int status) {
     struct ExitProc *proc;
     int count;
 
-    proc = ((struct ExitReent *)D_00133E74)->exitprocs;
+    proc = ((struct ExitReent *)g_libc_state_record)->exitprocs;
     while (proc != 0) {
         count = proc->count;
         while (--count >= 0) {
@@ -43,7 +43,7 @@ void exit_run_atexit(int status) {
         proc = proc->next;
     }
 
-    reent = (struct ExitReent *)D_00133E74;
+    reent = (struct ExitReent *)g_libc_state_record;
     if (reent->unk3C != 0) {
         reent->unk3C(reent);
     }

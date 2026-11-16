@@ -1,17 +1,18 @@
+#include "names.h"
 /* func_PAL_L05_00449FF0, the PAL copy of func_L05_00443D08: the same C, where the five weapon
    timers are scaled to 50 Hz as they are stored, the 1/60 step becomes 0.02, the frame counts
    5, 7, 8 and 10 become 4, 6, 7 and 8, and the first three timer globals are read as ints. */
 #include "common.h"
 typedef unsigned int ShotQuad __attribute__((mode(TI)));
 typedef union { ShotQuad q; float f[4]; } ShotVector;
-extern int D_L05_001B2048, D_00138320[], D_L05_002A1940[];
+extern int g_feltzin_mission_index, g_pad_pressed_flags[], g_ship_mode_words[];
 typedef struct { int upgrade; char pad[12]; int maximum, ammo; char tail[16]; } WeaponSlot;
-extern WeaponSlot D_L05_002A1800[];
-extern char g_sound_state[],D_L05_002B8770[];
-extern float D_L05_001B1A9C __attribute__((sda)), D_L05_001B1B70 __attribute__((sda));
-extern int D_L05_001B1AA0 __attribute__((sda)),D_L05_001B1AA4 __attribute__((sda)),D_L05_001B1AA8 __attribute__((sda));
-extern int D_L05_001B1AAC __attribute__((sda)),D_L05_001B1AB0 __attribute__((sda)),D_L05_001B1AFC __attribute__((sda));
-extern float D_L05_001B1B30 __attribute__((sda)),D_L05_001B1B40 __attribute__((sda)),D_L05_001B1B50 __attribute__((sda)),D_L05_001B1B60 __attribute__((sda));
+extern WeaponSlot g_spawn_entry_table[];
+extern char g_sound_state[],g_slot_record_source[];
+extern float g_ship_aim_length __attribute__((sda)), g_ship_muzzle_speed __attribute__((sda));
+extern int g_ship_shot_var_half_a __attribute__((sda)),g_ship_shot_var_half_b __attribute__((sda)),g_ship_shot_var_half_c __attribute__((sda));
+extern int g_ship_shot_var_word_a __attribute__((sda)),g_ship_shot_var_word_b __attribute__((sda)),g_ship_shot_voice_id __attribute__((sda));
+extern float g_ship_muzzle_left_offset __attribute__((sda)),g_ship_muzzle_right_offset __attribute__((sda)),g_ship_muzzle_left_alt_offset __attribute__((sda)),g_ship_muzzle_right_alt_offset __attribute__((sda));
 extern int FastDecTimer(void *),math_fast_float_d(void *),slot_find_active_in_chain(int);
 extern void FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float),matrix_mul_vec3(void *,void *,void *),FastVecScale(void *,void *,float);
 /* The sound call and the four spawners below return a value this function ignores. Declaring them
@@ -39,19 +40,19 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
     char *shot;
     int mode, index;
 
-    if (H(driverState, 0xd8) && (D_L05_001B2048 & 1))
+    if (H(driverState, 0xd8) && (g_feltzin_mission_index & 1))
         return;
 
-    if (FastDecTimer(s + 8) && (D_00138320[0] & 0x40)) {
-        H(s, 8) = ((s32)(D_L05_001B1AA0) * 5 + 2) / 6;
+    if (FastDecTimer(s + 8) && (g_pad_pressed_flags[0] & 0x40)) {
+        H(s, 8) = ((s32)(g_ship_shot_var_half_a) * 5 + 2) / 6;
         FastVecSub(&a, s + 0x20, driver + 0x30);
-        vec_scale_to_length(&a, &a, D_L05_001B1A9C);
+        vec_scale_to_length(&a, &a, g_ship_aim_length);
         FastVecAdd(&b, &a, driver + 0x30);
-        mode = D_L05_002A1940[0];
+        mode = g_ship_mode_words[0];
         if (mode)
-            matrix_mul_vec3(&c, &D_L05_001B1B50, m + 0xc0);
+            matrix_mul_vec3(&c, &g_ship_muzzle_left_alt_offset, m + 0xc0);
         else
-            matrix_mul_vec3(&c, &D_L05_001B1B30, m + 0xc0);
+            matrix_mul_vec3(&c, &g_ship_muzzle_left_offset, m + 0xc0);
         FastVecAdd(&c, &c, m + 0x10);
         FastVecSub(&d, &b, &c);
         PlayMobySound(3, 0, m);
@@ -63,14 +64,14 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             F(v, 0x14) += F(driverState, 0x34);
             F(v, 0x18) += F(driverState, 0x38);
             if (mode) {
-                FastVecScale(&e, m + 0xd0, D_L05_001B1B70 * 0.020000001f);
+                FastVecScale(&e, m + 0xd0, g_ship_muzzle_speed * 0.020000001f);
                 FastVecAdd(v + 0x10, v + 0x10, &e);
             }
         }
         if (mode)
-            matrix_mul_vec3(&e, &D_L05_001B1B60, m + 0xc0);
+            matrix_mul_vec3(&e, &g_ship_muzzle_right_alt_offset, m + 0xc0);
         else
-            matrix_mul_vec3(&e, &D_L05_001B1B40, m + 0xc0);
+            matrix_mul_vec3(&e, &g_ship_muzzle_right_offset, m + 0xc0);
         FastVecAdd(&e, &e, m + 0x10);
         FastVecSub(&d, &b, &e);
         shot = func_PAL_L05_0041EA08(m, &e, 1.0f, &d, 0x2020ff, 0x20207f, 0, mode, 0);
@@ -81,7 +82,7 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             F(v, 0x14) += F(driverState, 0x34);
             F(v, 0x18) += F(driverState, 0x38);
             if (mode) {
-                FastVecScale(&f, m + 0xd0, -(D_L05_001B1B70 * 0.020000001f));
+                FastVecScale(&f, m + 0xd0, -(g_ship_muzzle_speed * 0.020000001f));
                 FastVecAdd(v + 0x10, v + 0x10, &f);
             }
         }
@@ -89,8 +90,8 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
 
     {
         int slot = slot_find_active_in_chain(1);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(s + 0xa)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && FastDecTimer(s + 0xa)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(1, 1);
             a.q = 0;
             a.f[2] = -0.1f;
@@ -98,16 +99,16 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             matrix_mul_vec3(&b, &a, m + 0xc0);
             FastVecAdd(&b, &b, m + 0x10);
             PlayMobySound(2, 0, m);
-            func_PAL_L05_003D46A8(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[9].upgrade);
-            H(s, 0xa) = ((s32)(D_L05_001B1AA4) * 5 + 2) / 6;
+            func_PAL_L05_003D46A8(&b, m + 0xc0, I(s, 0x18), m, g_spawn_entry_table[9].upgrade);
+            H(s, 0xa) = ((s32)(g_ship_shot_var_half_b) * 5 + 2) / 6;
             I(s, 0x218) = 4;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(3);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(s + 0xa8)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && FastDecTimer(s + 0xa8)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(3, 1);
             a.q = 0;
             a.f[2] = -0.1f;
@@ -115,16 +116,16 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             matrix_mul_vec3(&b, &a, m + 0xc0);
             FastVecAdd(&b, &b, m + 0x10);
             PlayMobySound(2, 0, m);
-            func_PAL_L05_0039A808(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[11].upgrade);
-            H(s, 0xa8) = ((s32)(D_L05_001B1AA8) * 5 + 2) / 6;
+            func_PAL_L05_0039A808(&b, m + 0xc0, I(s, 0x18), m, g_spawn_entry_table[11].upgrade);
+            H(s, 0xa8) = ((s32)(g_ship_shot_var_half_c) * 5 + 2) / 6;
             I(s, 0x218) = 4;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(2);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && math_fast_float_d(s + 0x20c)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && math_fast_float_d(s + 0x20c)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(2, 1);
             a.q = 0;
             a.f[2] = -0.2f;
@@ -132,30 +133,30 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             matrix_mul_vec3(&b, &a, m + 0xc0);
             FastVecAdd(&b, &b, m + 0x10);
             PlayMobySound(2, 0, m);
-            func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 1);
-            if (D_L05_002A1800[10].upgrade) {
+            func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, g_spawn_entry_table[10].upgrade, 1);
+            if (g_spawn_entry_table[10].upgrade) {
                 c.q = 0;
                 c.f[1] = -0.275f;
                 c.f[3] = 1.0f;
                 matrix_mul_vec3(&b, &c, m + 0xc0);
                 FastVecAdd(&b, &b, m + 0x10);
-                func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
+                func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, g_spawn_entry_table[10].upgrade, 0);
                 d.q = 0;
                 d.f[1] = 0.275f;
                 d.f[3] = 1.0f;
                 matrix_mul_vec3(&b, &d, m + 0xc0);
                 FastVecAdd(&b, &b, m + 0x10);
-                func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
+                func_PAL_L05_0042CAA0(&b, m + 0xc0, I(s, 0x18), m, g_spawn_entry_table[10].upgrade, 0);
             }
-            I(s, 0x20c) = ((s32)(D_L05_001B1AAC) * 5 + 2) / 6;
+            I(s, 0x20c) = ((s32)(g_ship_shot_var_word_a) * 5 + 2) / 6;
             I(s, 0x218) = 6;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(4);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && math_fast_float_d(s + 0x210)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && math_fast_float_d(s + 0x210)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(4, 1);
             a.q = 0;
             a.f[2] = -0.1f;
@@ -164,35 +165,35 @@ void func_PAL_L05_00449FF0(char *m, char *driver)
             FastVecAdd(&b, &b, m + 0x10);
             PlayMobySound(2, 0, m);
             func_PAL_L05_0042D3B8(&b, m + 0xc0, I(s, 0x18), m, 0);
-            I(s, 0x210) = ((s32)(D_L05_001B1AB0) * 5 + 2) / 6;
+            I(s, 0x210) = ((s32)(g_ship_shot_var_word_b) * 5 + 2) / 6;
             I(s, 0x218) = 8;
         }
     }
 
     index = slot_find_active_in_chain(7);
-    if (index >= 0 && D_L05_002A1800[index].ammo != 0 && (D_00138320[0] & 0x80)) {
-        char *v = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+    if (index >= 0 && g_spawn_entry_table[index].ammo != 0 && (g_pad_pressed_flags[0] & 0x80)) {
+        char *v = (char *)(g_ship_shot_voice_id * 112 + (int)g_sound_state);
         if (P(v, 0x88) != m || !B(v, 0x74))
-            D_L05_001B1AFC = snd_play_from_class_bank(0x11, 4, m, 0xfbf);
+            g_ship_shot_voice_id = snd_play_from_class_bank(0x11, 4, m, 0xfbf);
         if (++I(s, 0x34) >= 7) {
             I(s, 0x34) = 7;
-            math_fast_float_d(&D_L05_002A1800[index].ammo);
+            math_fast_float_d(&g_spawn_entry_table[index].ammo);
         }
     } else {
-        if (D_L05_001B1AFC != -1) {
-            char *v = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+        if (g_ship_shot_voice_id != -1) {
+            char *v = (char *)(g_ship_shot_voice_id * 112 + (int)g_sound_state);
             if (P(v, 0x88) == m && B(v, 0x74))
-                snd_stop_voice(D_L05_001B1AFC);
+                snd_stop_voice(g_ship_shot_voice_id);
         }
-        D_L05_001B1AFC = -1;
+        g_ship_shot_voice_id = -1;
         math_fast_float_d(s + 0x34);
-        if (I(s, 0x34) == 0 && D_L05_001B2048 % 3 == 0 && !(D_00138320[0] & 0x80)) {
-            ++D_L05_002A1800[index].ammo;
-            if (D_L05_002A1800[index].ammo > D_L05_002A1800[index].maximum)
-                D_L05_002A1800[index].ammo = D_L05_002A1800[index].maximum;
+        if (I(s, 0x34) == 0 && g_feltzin_mission_index % 3 == 0 && !(g_pad_pressed_flags[0] & 0x80)) {
+            ++g_spawn_entry_table[index].ammo;
+            if (g_spawn_entry_table[index].ammo > g_spawn_entry_table[index].maximum)
+                g_spawn_entry_table[index].ammo = g_spawn_entry_table[index].maximum;
         }
     }
 
     if (!math_fast_float_d(s + 0x218))
-        I(s, 0x214) = slot_copy_records_to_free(D_L05_002B8770);
+        I(s, 0x214) = slot_copy_records_to_free(g_slot_record_source);
 }

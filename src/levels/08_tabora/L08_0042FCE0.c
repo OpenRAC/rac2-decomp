@@ -16,7 +16,7 @@ extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,i
 extern void moby_mark_spawned(void *);
 extern int g_active_emitter_count __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern int D_L08_002B35C0[];
+extern int g_breakable_effect_ids[];
 /* A breakable object with a few hit points: flashes when hit, and when destroyed it bursts into effects. */
 void breakable_l08_update(char *moby) {
     char *vars=*(char **)(moby+0x68);
@@ -49,7 +49,7 @@ void breakable_l08_update(char *moby) {
     case 2:
         set_moby_color(moby,*(u8 *)(vars+0x54),*(u8 *)(vars+0x55),*(u8 *)(vars+0x56));
         if(moby_count_group_not_in_state(*(u8 *)(moby+0x21),-1)==1) {
-            effect_id=*(int *)((g_current_map_index << 2)+(char *)D_L08_002B35C0)*35-1;
+            effect_id=*(int *)((g_current_map_index << 2)+(char *)g_breakable_effect_ids)*35-1;
             part_spawn_bolt_pickups(moby,effect_id,effect_id,3,-1,math_random_int_range(1,3),0.0f);
         }
         *(u128 *)offset=0;

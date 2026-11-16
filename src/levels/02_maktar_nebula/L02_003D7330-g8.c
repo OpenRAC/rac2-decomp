@@ -1,7 +1,7 @@
 #include "common.h"
 
 typedef int Vector __attribute__((mode(TI)));
-extern float D_L02_001B03E0[4] __attribute__((sda));
+extern float g_sliding_platform_local_offset[4] __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 extern void anim_start_blended(char *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -46,7 +46,7 @@ void sliding_l02_platform_update(char *moby) {
         *(unsigned char *)(*(char **)(vars + 0x1C) + 0x30) = *(unsigned char *)(moby + 0x30);
         *(short *)(*(char **)(vars + 0x1C) + 0x32) = 0;
         moby_transform_joint_to_world(moby, 0, (char *)joint_pos);
-        matrix_mul_vec3(rotated_offset, D_L02_001B03E0, moby + 0xC0);
+        matrix_mul_vec3(rotated_offset, g_sliding_platform_local_offset, moby + 0xC0);
         FastVecAdd(joint_pos, rotated_offset, joint_pos);
         {
             char *child = *(char **)(vars + 0x1C);
@@ -122,7 +122,7 @@ void sliding_l02_platform_update(char *moby) {
     }
     if (*(char **)(vars + 0x1C) && *(float *)(moby + 0x48) != 0.0f) {
         moby_transform_joint_to_world(moby, 0, (char *)move_delta);
-        matrix_mul_vec3(joint_pos, D_L02_001B03E0, moby + 0xC0);
+        matrix_mul_vec3(joint_pos, g_sliding_platform_local_offset, moby + 0xC0);
         FastVecAdd(move_delta, joint_pos, move_delta);
         {
             char *child = *(char **)(vars + 0x1C);

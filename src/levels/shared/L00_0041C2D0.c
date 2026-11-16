@@ -64,11 +64,11 @@ extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 typedef struct { char pad[0x16]; u8 x16; char pad2[0x100]; } Gs;
 extern Gs g_item_slot_to_record;
-extern int D_L00_001A8FF0 MACRO_ADDR;
-extern int D_L00_001ADB2C MACRO_ADDR;
-extern unsigned int D_L00_001B2D5C MACRO_ADDR;
-extern char D_L00_001B8C80[];
-extern char D_L00_001B8FF0[];
+extern int g_hero_locked_flag MACRO_ADDR;
+extern int g_active_tether_object MACRO_ADDR;
+extern unsigned int g_guided_rocket_slot MACRO_ADDR;
+extern char g_scalar_transition_state[];
+extern char g_cam_follow_matrix[];
 extern Hit g_collision_result;
 extern Kind g_weapon_l00_table[];
 #define HERO ((Hero *)D_00189E20)
@@ -180,13 +180,13 @@ char *guided_rocket_create(char *owner, void *pos, int mode, int id, char *hint,
         vars->h36 = 0;
     } else {
         if (mode) {
-            FastVecScale(vars->aim, D_L00_001B8FF0, 64.0f);
-            FastVecAdd(vars->aim, vars->aim, D_L00_001B8FF0 - 0x230);
+            FastVecScale(vars->aim, g_cam_follow_matrix, 64.0f);
+            FastVecAdd(vars->aim, vars->aim, g_cam_follow_matrix - 0x230);
         } else {
             FastVecScale(n, HERO->p[0x2290 / 4] + 0xC0, 64.0f);
             FastVecAdd(vars->aim, rocket + 0x10, n);
         }
-        if (D_L00_001A8FF0 != 0)
+        if (g_hero_locked_flag != 0)
             vars->h36 = 0;
         else {
             if ((HERO->i[0x1500 / 4] == 0 && HERO->i[0x2294 / 4] != 0x1D && HERO->i[0x2294 / 4] != 1)
@@ -197,9 +197,9 @@ char *guided_rocket_create(char *owner, void *pos, int mode, int id, char *hint,
             vars->h36 = 1;
         }
     }
-    if (D_L00_001B2D5C >= 0x19)
-        D_L00_001B2D5C = 0;
-    vars->slot = D_L00_001B2D5C;
+    if (g_guided_rocket_slot >= 0x19)
+        g_guided_rocket_slot = 0;
+    vars->slot = g_guided_rocket_slot;
     base = level_get_slot_body(vars->owner, vars->id);
     if (base == 0) {
         moby_mark_spawned(rocket);
@@ -210,12 +210,12 @@ char *guided_rocket_create(char *owner, void *pos, int mode, int id, char *hint,
     if (used[vars->slot])
         vars->slot = -1;
     else {
-        D_L00_001B2D5C = (int)(D_L00_001B2D5C + 1) % 25;
+        g_guided_rocket_slot = (int)(g_guided_rocket_slot + 1) % 25;
         used[vars->slot] = 1;
         vars->i54 = 0;
         base += table[0];
         level_init_pending_slot(rocket, base + vars->slot * 0x150);
-        if (D_L00_001ADB2C != 0)
+        if (g_active_tether_object != 0)
             level_append_record_to_table(vars->slot * 0x150 + base, 0x30, 1, 0.0f);
         else {
             level_append_record_to_table(vars->slot * 0x150 + base, 0x30, 2, 0.0f);
@@ -227,7 +227,7 @@ char *guided_rocket_create(char *owner, void *pos, int mode, int id, char *hint,
     vec_rotate_by_quaternion(rocket + 0xE0, rocket + 0xE0, n);
     vars->handle = part_alloc_effect_slot(rocket, 1.0f, 1.0f, 1.0f, 0);
     qcopy(vars->start, rocket + 0x10);
-    if (D_L00_001A8FF0 != 0) {
+    if (g_hero_locked_flag != 0) {
         cam_compute_view_direction(rocket + 0x10, t, 1);
         fr = FastVecDot(t, vars);
         FastVecScale(u, t, fr);

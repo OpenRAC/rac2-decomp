@@ -32,15 +32,15 @@ typedef struct {
 } Hero_L13_0041B670;
 extern Hero_L13_0041B670 g_hero_state;
 extern int g_current_map_index;
-extern unsigned char D_0019B2E8[];
-extern unsigned int D_00138324[];
-extern int D_L13_001A8FB4;
-extern Ring_L13 *D_L13_001B291C;
-extern unsigned char D_0018C0D5[];
-extern MotionSettings_L13 D_L13_001B16D8 __attribute__((sda));
-extern int D_001A7904;
-extern int D_US2_001A7908 __attribute__((sda));
-extern int D_L13_001B1688 __attribute__((sda));
+extern unsigned char g_moby_group_flags[];
+extern unsigned int g_pad_held_flags[];
+extern int g_warp_ring_state;
+extern Ring_L13 *g_object_table_base;
+extern unsigned char g_grab_flag[];
+extern MotionSettings_L13 g_warp_ring_motion_settings __attribute__((sda));
+extern int g_arena_state_flag;
+extern int g_saved_map_index __attribute__((sda));
+extern int g_level_l13_once_flag __attribute__((sda));
 extern void func_US2_L13_0041CF28(Ring_L13 *);
 extern int PlayMobySound(int, int, Ring_L13 *);
 extern void hero_start_target_state(float *, int, float);
@@ -66,23 +66,23 @@ void func_US2_L13_0041CAFC(Ring_L13 *object)
     switch (object->mode) {
     case 0:
         object->mode = 1;
-        D_L13_001B1688 = 0;
-        if (D_001A7904 == 1) {
-            D_L13_001B1688 = 1;
-            D_001A7904 = 0;
+        g_level_l13_once_flag = 0;
+        if (g_arena_state_flag == 1) {
+            g_level_l13_once_flag = 1;
+            g_arena_state_flag = 0;
         }
         return;
     case 1:
-        if (state->flagA >= 0 && !(D_0019B2E8[state->flagA + g_current_map_index * 16] & 0x80))
+        if (state->flagA >= 0 && !(g_moby_group_flags[state->flagA + g_current_map_index * 16] & 0x80))
             return;
         if (state->primary == -1 && state->locked == 0 && state->busy == 0)
             return;
         if (g_hero_state.target != object || g_hero_state.busy != 0)
             return;
         func_US2_L13_0041CF28(object);
-        if (!(D_00138324[0] & 0x10))
+        if (!(g_pad_held_flags[0] & 0x10))
             return;
-        if (D_L13_001A8FB4 == 11) {
+        if (g_warp_ring_state == 11) {
             PlayMobySound(0, 0, object);
             object->mode = 2;
             state->i28 = 0;
@@ -103,14 +103,14 @@ void func_US2_L13_0041CAFC(Ring_L13 *object)
     case 3:
         if (state->timer == 0.0f) {
             if (state->busy == 0 && state->locked == 0) {
-                destination = &D_L13_001B291C[state->primary];
-                if (state->secondary != -1 && (D_0019B2E8[state->flagB + g_current_map_index * 16] & 0x80))
-                    destination = &D_L13_001B291C[state->secondary];
+                destination = &g_object_table_base[state->primary];
+                if (state->secondary != -1 && (g_moby_group_flags[state->flagB + g_current_map_index * 16] & 0x80))
+                    destination = &g_object_table_base[state->secondary];
                 target_state = destination->state;
                 qcopy(position, destination->position);
                 position[2] += 0.2f;
                 hero_reset_position_and_direction(position, destination->fF0, 0, 1);
-                D_0018C0D5[0] = 1;
+                g_grab_flag[0] = 1;
                 destination->mode = 4;
                 target_state->timer = 0.0f;
                 target_state->i28 = 0;
@@ -126,8 +126,8 @@ void func_US2_L13_0041CAFC(Ring_L13 *object)
                 state->f20 = 0;
             } else {
                 if (state->locked) {
-                    if (D_L13_001B1688)
-                        data_set_small_value_and_refresh(D_US2_001A7908, 1);
+                    if (g_level_l13_once_flag)
+                        data_set_small_value_and_refresh(g_saved_map_index, 1);
                     else
                         data_set_small_value_and_refresh(13, 1);
                 } else {
@@ -147,16 +147,16 @@ void func_US2_L13_0041CAFC(Ring_L13 *object)
         }
         if (state->f24 > 0.0f) {
             math_step_value_toward_target(&state->f24, (float *)&state->i28, 0.0f,
-                D_L13_001B16D8.acceleration * 0.00027777778f,
-                D_L13_001B16D8.deceleration * 0.00027777778f,
-                D_L13_001B16D8.speed * 0.016666668f);
+                g_warp_ring_motion_settings.acceleration * 0.00027777778f,
+                g_warp_ring_motion_settings.deceleration * 0.00027777778f,
+                g_warp_ring_motion_settings.speed * 0.016666668f);
             return;
         }
         if (state->f20 > 0.0f) {
             math_step_value_toward_target(&state->f20, (float *)&state->i2C, 0.0f,
-                D_L13_001B16D8.acceleration * 0.00027777778f,
-                D_L13_001B16D8.deceleration * 0.00027777778f,
-                D_L13_001B16D8.speed * 0.016666668f);
+                g_warp_ring_motion_settings.acceleration * 0.00027777778f,
+                g_warp_ring_motion_settings.deceleration * 0.00027777778f,
+                g_warp_ring_motion_settings.speed * 0.016666668f);
             return;
         }
         object->mode = 1;

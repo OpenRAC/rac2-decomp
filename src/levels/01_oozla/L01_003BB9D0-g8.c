@@ -15,13 +15,13 @@ extern void gfx_update_color_fade(void *, void *);
 extern void value_set_and_smooth(void *, void *, int, int, float);
 
 /* Small data reached through $gp: these are only one instruction at -G8. */
-extern unsigned short D_L01_001AFED4 __attribute__((sda));
+extern unsigned short g_swamp_monster_attack_b_value __attribute__((sda));
 
-extern unsigned short D_L01_001AFED8 __attribute__((sda));
+extern unsigned short g_swamp_monster_attack_c_value __attribute__((sda));
 
-extern unsigned short D_L01_001AFEDC __attribute__((sda));
+extern unsigned short g_swamp_monster_grab_value __attribute__((sda));
 
-extern float D_L01_001AFEFC __attribute__((sda));
+extern float g_swamp_monster_smooth_target __attribute__((sda));
 
 typedef struct L01_003C0760_OWNED {
     char pad0[0x2DC];
@@ -42,7 +42,7 @@ void swamp_monster_start_attack_b(L01_003C0760_OBJ *moby)
 
     moby_set_animation_and_speed(obj, 8, 0, blend_frames);
     moby_set_state(obj, 3, 3);
-    vars->f2DC = D_L01_001AFED4;
+    vars->f2DC = g_swamp_monster_attack_b_value;
 }
 
 typedef struct L01_003C07C8_OWNED {
@@ -64,7 +64,7 @@ void swamp_monster_start_attack_c(L01_003C07C8_OBJ *moby)
 
     moby_set_animation_and_speed(obj, 13, 0, blend_frames);
     moby_set_state(obj, 2, 3);
-    vars->f2DA = D_L01_001AFED8;
+    vars->f2DA = g_swamp_monster_attack_c_value;
 }
 
 typedef struct L01_003C0830_OWNED {
@@ -89,7 +89,7 @@ void swamp_monster_start_grab_attack(L01_003C0830_OBJ *moby)
     moby_set_animation_and_speed(obj, 14, 0, blend_frames);
     moby_set_state(obj, 4, 3);
     obj->f9C = obj->f9C | 0x30;
-    vars->f2DE = D_L01_001AFEDC;
+    vars->f2DE = g_swamp_monster_grab_value;
 }
 
 typedef struct L01_003C06E8_OWNED {
@@ -112,7 +112,7 @@ void swamp_monster_start_claw_attack(L01_003C06E8_OBJ *moby)
 
     moby_set_animation_and_speed(obj, anim_index, 0, blend_frames);
     moby_set_state(obj, 1, 3);
-    vars->f2DC = D_L01_001AFED4;
+    vars->f2DC = g_swamp_monster_attack_b_value;
 }
 
 typedef struct L01_003C0140_OWNED {
@@ -140,7 +140,7 @@ void swamp_monster_update_timers(L01_003C0140_OBJ *moby)
     FastDecTimer((char *)vars + 0x2DE);
     FastDecTimer((char *)vars + 0x2DA);
     FastDecTimer((char *)vars + 0x2DC);
-    value_set_and_smooth(obj, (char *)vars + 0x220, 10, 1, D_L01_001AFEFC);
+    value_set_and_smooth(obj, (char *)vars + 0x220, 10, 1, g_swamp_monster_smooth_target);
 }
 
 /* Oozla debris update. */
@@ -153,7 +153,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
-extern float D_L01_001AFE30 __attribute__((sda));
+extern float g_debris_drift_scale __attribute__((sda));
 extern char g_coll_line_hit_point[];
 
 /* Updates a falling debris piece. It drifts, tilts, bounces off walls, fades out near the end of its life and is then removed. */
@@ -191,7 +191,7 @@ void debris_l01_piece_update(char *moby)
     *(float *)(moby + 0xF0) += (*(float *)(vars + 0x44) - *(float *)(moby + 0xF0)) * 0.02f;
     if (*(unsigned char *)(moby + 0x20) != 2) {
         tilt = math_fast_sin_or_cos_a(*(float *)(vars + 0x40)) * 0.17453295f;
-        drift_scale = D_L01_001AFE30;
+        drift_scale = g_debris_drift_scale;
         *(float *)(moby + 0xF4) = tilt;
         saved_height = *(float *)(vars + 8);
         *(float *)(vars + 8) = 0.0f;

@@ -27,7 +27,7 @@ extern void prompt_bar_set_spacing (s32_F09f721e0, f32_F09f721e0);
 
 extern int screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
 
-extern s32_F09f721e0 D_L04_001AE040 __attribute__ ((sda));
+extern s32_F09f721e0 g_screen_adjust_prompt_data __attribute__ ((sda));
 
 /* Sets up the screen-adjust menu: its button prompt bar, labels and position. */
 void screen_adjust_menu_init (s32_F09f721e0 self, s32_F09f721e0 arg)
@@ -48,7 +48,7 @@ void screen_adjust_menu_init (s32_F09f721e0 self, s32_F09f721e0 arg)
   prompt = self + 8;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[0] = 255.0f;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[1] = 195.0f;
-  prompt_bar_init (prompt, arg, &D_L04_001AE040);
+  prompt_bar_init (prompt, arg, &g_screen_adjust_prompt_data);
   textA = GetLocalizedString (12773);
   textB = GetLocalizedString (11598);
   prompt_bar_set_texts (prompt, textA, textB, GetLocalizedString (11599));

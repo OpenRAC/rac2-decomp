@@ -45,8 +45,8 @@ extern int hero_set_control_motion_and_step(void *, void *);
 extern void part_start_record_effect_by_index(s32, s32);
 
 extern void script_queue_keyed_request(s32, s32);
-extern u8 *D_L16_001B2C0C[] __attribute__((sda));
-extern u8 D_0013963B;
+extern u8 *g_beam_definition_table[] __attribute__((sda));
+extern u8 g_snivelak_boss_state;
 
 extern void moby_set_flag_bit(void *, s32);
 
@@ -90,7 +90,7 @@ extern void QueueMobyImpact(s32, void *);
 /* func_L16_00404A60 is in the sibling file L16_00403900-g8.c: its body
    reaches the level's small-data floats through $gp. */
 
-extern u8 *D_L16_001FE7C0[];
+extern u8 *g_path_l16_table[];
 
 /* Steers the object toward the next point of its path (the state's table and cursor at
    0x294/0x2A4); advances the cursor once within half a unit, and returns 1 when the path is done. */
@@ -100,7 +100,7 @@ s32 path_follow_points(u8 *moby)
     float point[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
-    u8 *path = D_L16_001FE7C0[*(s32 *)(state + 0x294)];
+    u8 *path = g_path_l16_table[*(s32 *)(state + 0x294)];
 
     if (*(s32 *)(state + 0x2A4) >= *(s32 *)path)
         return 1;
@@ -129,7 +129,7 @@ s32 path_follow_points(u8 *moby)
 
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern s32 FloatToInt(float);
-extern s32 D_L16_001B2648 MACRO_ADDR;
+extern s32 g_frame_l16_counter MACRO_ADDR;
 extern float math_fast_sin_or_cos_b(float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void snivelak_emit_fire_burst(u8 *);
@@ -137,7 +137,7 @@ extern void moby_update_ground_check(void *);
 extern s32 moby_apply_damage_to_object(void *, void *, s32);
 extern void group_wake_members(u8 *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
-extern float D_L16_001B9B00[];
+extern float g_scene_origin_transform[];
 
 /* Object update: on the first frame (+0x20 still zero) sets the state's defaults and
    rates; then, with +0x31 set and the object within 32 units of D_L16_001B9B00, runs
@@ -175,7 +175,7 @@ void small_enemy_part_update(u8 *moby)
         state[0x4A] = FloatToInt(16.0f);
         *(float *)(state + 0x358) = *(float *)(moby + 0x18);
     }
-    if (moby[0x31] && fast_vec_dist(moby + 0x10, D_L16_001B9B00) < 32.0f) {
+    if (moby[0x31] && fast_vec_dist(moby + 0x10, g_scene_origin_transform) < 32.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 30;
     }
@@ -188,12 +188,12 @@ void small_enemy_part_update(u8 *moby)
 
 /* func_L16_0040CF98 is defined in L16_00403900-g8.c. */
 
-extern u16 *D_L16_001FB660[];
+extern u16 *g_group_l16_id_lists[];
 
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern s32 D_L16_001B2B38[] __attribute__((sda));
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern s32 g_group_id_limit[] __attribute__((sda));
 
 /* Sets a flag word in the state record (+0x68) of every entity of the object's group, stopping
    at the first id with no entity: +0x244 for class 0xF35, +0x24C for class 0xEA3. */
@@ -205,10 +205,10 @@ void group_wake_members(u8 *moby)
 
     if (moby[0x21] == 0xFF)
         return;
-    group_ids = D_L16_001FB660[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L16_001B2B38[0] && group_ids != 0 &&
-           ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == D_L16_001FB660[moby[0x21]])) {
-        other = D_L16_001B2B1C[0] + ((*group_ids & 0x7FFF) << 8);
+    group_ids = g_group_l16_id_lists[moby[0x21]];
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_group_id_limit[0] && group_ids != 0 &&
+           ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == g_group_l16_id_lists[moby[0x21]])) {
+        other = g_moby_instance_table[0] + ((*group_ids & 0x7FFF) << 8);
         if (other == 0)
             break;
         if (*(s16 *)(other + 0xAA) == 0xF35)
@@ -267,7 +267,7 @@ void path_pick_new_slot(u8 *moby)
     f32 bestf;
     f32 f;
 
-    base = D_L16_001FE7C0;
+    base = g_path_l16_table;
     i = 0;
     best = -1;
     state = *(u8 **)(moby + 0x68);
@@ -324,7 +324,7 @@ void moby_bob_along_sine_wave(u8 *moby)
     wave = 10.0f;
     if (moby2[0x20] == 0xD || moby2[0x20] == 0xF || moby2[0x20] == 0xE || moby2[0x20] == 0x11)
         wave = 25.0f;
-    wave = wave + math_fast_sin_or_cos_b((float)(D_L16_001B2648 % FloatToInt(120.0f)) / period * 6.2831855f - 3.1415927f);
+    wave = wave + math_fast_sin_or_cos_b((float)(g_frame_l16_counter % FloatToInt(120.0f)) / period * 6.2831855f - 3.1415927f);
     math_step_value_toward_target(moby2 + 0x18, vars + 0x268, *(float *)(vars + 0x264) + wave,
                   0.0083333338f, 0.0027777778f, 0.16666667f);
     snivelak_emit_fire_burst(moby2);
@@ -381,7 +381,7 @@ typedef struct {
 } L16VoiceState;
 
 extern L16VoiceState g_music_state;
-extern int D_L16_001B1888[];
+extern int g_snivelak_anim_params[];
 extern void func_002A6170(void *);
 
 /* Asks the engine to load voice line idx, from the first table below 20 and the second from 20 up,
@@ -405,7 +405,7 @@ void RequestVoiceLine(u8 *moby, s32 idx)
                 voice->selection = 0;
                 voice->key = (line_key & 0x3FFF) + 0x7D0;
             }
-            func_002A6170(D_L16_001B1888);
+            func_002A6170(g_snivelak_anim_params);
             *(u8 *)(vars + idx + 0x310) = 1;
             *(s32 *)(vars + 0x350) = 0x384;
             *(s32 *)(vars + 0x354) = idx;
@@ -459,19 +459,19 @@ void snivelak_finish_boss_intro_state(u8 *moby)
         *(s32 *)(vars + 0x1BC) = 0;
         part_start_record_effect_by_index(h, m);
         slot = *(s32 *)(vars + 0x1B8) << 7;
-        table = D_L16_001B2C0C[0];
+        table = g_beam_definition_table[0];
         qcopy(moby + 0x10, table + 0x30 + slot);
         qcopy(moby + 0xF0, table + 0x70 + slot);
         script_queue_keyed_request(*(s32 *)(vars + 0x1A4), -1);
     } else {
         script_queue_keyed_request(*(s32 *)(vars + 0x1A4), *(s32 *)(vars + 0x1AC));
     }
-    D_0013963B = 1;
+    g_snivelak_boss_state = 1;
     snivelak_clean_up_arena_mobys(moby);
     SetMobyAndGroupsEnabled(moby, 1);
-    moby_set_flag_bit(D_L16_001B2B1C[0] + (*(s32 *)(vars + 0x190) << 8), 1);
-    level_capture_checkpoint_state(D_L16_001B2C0C[0] + (*(s32 *)(vars + 0x198) << 7) + 0x30,
-                  D_L16_001B2C0C[0] + (*(s32 *)(vars + 0x198) << 7) + 0x70);
+    moby_set_flag_bit(g_moby_instance_table[0] + (*(s32 *)(vars + 0x190) << 8), 1);
+    level_capture_checkpoint_state(g_beam_definition_table[0] + (*(s32 *)(vars + 0x198) << 7) + 0x30,
+                  g_beam_definition_table[0] + (*(s32 *)(vars + 0x198) << 7) + 0x70);
     snd_play_unplayed_voice_line(moby, 0, 2);
     MemcardSave(0, -1);
     moby_set_state(moby, 2, 1);
@@ -484,8 +484,8 @@ extern char g_hero_position[];
 void snivelak_clean_up_boss_and_free(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
-    D_0013963B = 2;
-    moby_spin_group_entities(D_L16_001B2B1C[0] + (*(s32 *)(vars + 0x190) << 8), 0.0f);
+    g_snivelak_boss_state = 2;
+    moby_spin_group_entities(g_moby_instance_table[0] + (*(s32 *)(vars + 0x190) << 8), 0.0f);
     part_start_record_effect_by_index(*(s32 *)(vars + 0x188), *(s32 *)(vars + 0x18C));
     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
     moby_mark_flag_and_append_to_list(0x11);
@@ -560,7 +560,7 @@ void debris_l16_piece_update(u8 *moby)
         if (old > 90 && coll_test_point(moby + 0x10, 0, moby, 1.0f))
             hit = 1;
         if (hit) {
-            FastVecSub(toward, D_L16_001B9B00, moby + 0x10);
+            FastVecSub(toward, g_scene_origin_transform, moby + 0x10);
             angles = moby + 0xF0;
             vec_scale_to_length(toward, toward, 1.0f);
             part_spawn_blast_effect_moby(moby, moby + 0x10, toward, 0.0f);

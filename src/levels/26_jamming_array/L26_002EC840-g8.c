@@ -4,22 +4,22 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern u8 *D_L26_001B1C1C __attribute__((sda));
+extern u8 *g_entity_base __attribute__((sda));
 
-extern u16 *D_L26_001FA6E0[];
+extern u16 *g_trail_group_id_lists[];
 
 /* The walk below reads the group count and one word through $gp; the group table of id lists is
    absolute, and the entity base (D_L26_001B1C1C above, through $gp) is the bare `lui`/`lw` pair
    here, a second name sized over 8 bytes with `sda` in this -G8 unit. */
-extern int D_L26_001B1C38 __attribute__((sda));
+extern int g_trail_group_count __attribute__((sda));
 
 extern u8 *D_L26_001B1C1C_1[3] __attribute__((sda));
 
-extern char D_L26_002967A0[];
+extern char g_trail_ribbon_template[];
 
-extern int D_L26_001B0478 __attribute__((sda));
+extern int g_trail_effect_word_a __attribute__((sda));
 
-extern int D_L26_001B047C;
+extern int g_trail_effect_word_b;
 
 extern void part_draw_trail_ribbon(void *, int, void *, void *, int, int, int, int, float);
 
@@ -32,16 +32,16 @@ void part_submit_group_trail_effects(u8 *object) {
     u8 *entity;
     u8 *state;
 
-    for (groupIds = D_L26_001FA6E0[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L26_001B1C38 && groupIds != 0 &&
-         ((groupIds != 0 && (short)groupIds[-1] >= 0) || groupIds == D_L26_001FA6E0[object[0x21]]);
+    for (groupIds = g_trail_group_id_lists[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_trail_group_count && groupIds != 0 &&
+         ((groupIds != 0 && (short)groupIds[-1] >= 0) || groupIds == g_trail_group_id_lists[object[0x21]]);
          groupIds++) {
         entity = D_L26_001B1C1C_1[0] + ((*groupIds & 0x7FFF) << 8);
         if (entity == 0)
             break;
         state = *(u8 **)(entity + 0x68);
-        part_draw_trail_ribbon(D_L26_002967A0, 6, state + 0x80, state + 0x100, *(int *)(state + 0x194),
-                      *(int *)(state + 0x190), D_L26_001B0478, D_L26_001B047C, *(float *)(state + 0x198));
+        part_draw_trail_ribbon(g_trail_ribbon_template, 6, state + 0x80, state + 0x100, *(int *)(state + 0x194),
+                      *(int *)(state + 0x190), g_trail_effect_word_a, g_trail_effect_word_b, *(float *)(state + 0x198));
     }
 }
 
@@ -53,10 +53,10 @@ void part_submit_group_trail_effects(u8 *object) {
    random sign); then, when func_00282E48(position, D_L26_001B8B80) is below 24, it calls
    func_002A93B0 and sets object[0x6F] to 0x16, runs its per-frame helpers and returns 1 once the
    private byte +0x2E is 2. */
-extern float D_L26_001B05D8 __attribute__((sda));
-extern unsigned short D_L26_001B05E0 __attribute__((sda));
-extern unsigned short D_L26_001B05E4;
-extern float D_L26_001B8B80[4];
+extern float g_flying_creature_turn_degrees __attribute__((sda));
+extern unsigned short g_flying_creature_value_a __attribute__((sda));
+extern unsigned short g_flying_creature_value_b;
+extern float g_hero_l26_origin[4];
 extern float gravity_get_center_distance(char *);
 extern int math_random_int_below(int);
 extern void enemy_spawn_child_parts(char *, char **, int, int);
@@ -84,7 +84,7 @@ int flying_creature_update_state(unsigned char *object) {
         *(float *)(private + 0x84) = 0.8f;
         *(float *)(private + 0x8C) = 0.15f;
         height = gravity_get_center_distance((char *)object + 0x10) - 1.5f;
-        turn = D_L26_001B05D8;
+        turn = g_flying_creature_turn_degrees;
         *(float *)(private + 0x100) = 1.0f;
         turn *= 0.017453294f;
         *(float *)(private + 0x90) = height;
@@ -95,8 +95,8 @@ int flying_creature_update_state(unsigned char *object) {
             if (flip) angle = -angle;
             *(float *)(private + 0x1DC) = angle;
         }
-        *(unsigned short *)(private + 0x1E2) = D_L26_001B05E0;
-        *(unsigned short *)(private + 0x1E4) = D_L26_001B05E4;
+        *(unsigned short *)(private + 0x1E2) = g_flying_creature_value_a;
+        *(unsigned short *)(private + 0x1E4) = g_flying_creature_value_b;
         private[0x2E] = 1;
         *(unsigned short *)(object + 0x34) |= 0x100;
         if (*(float *)(private + 0x20) == 0.0f) {
@@ -107,7 +107,7 @@ int flying_creature_update_state(unsigned char *object) {
         moby_set_state(object, 1, 0);
         if (object[0x43]) anim_start_blended(object, 0, 0, 0);
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L26_001B8B80) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_l26_origin) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 0x16;
     }

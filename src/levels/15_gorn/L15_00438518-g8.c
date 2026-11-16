@@ -2,9 +2,9 @@
 typedef int GornQuad __attribute__((mode(TI)));
 typedef union { GornQuad q; float f[4]; } GornVector;
 typedef struct { GornVector position[4]; unsigned int color[4]; float uv[8]; char draw[32]; } GornLayer;
-extern char *D_L15_001B261C;
-extern GornVector D_L15_001B99F0[];
-extern int D_L15_001B1874;
+extern char *g_moby_base;
+extern GornVector g_backdrop_basis_vectors[];
+extern int g_backdrop_fade_layers_enabled;
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void vec_scale_to_length(float, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -17,16 +17,16 @@ void backdrop_draw_fade_layers(char *object)
     GornLayer a, b, c, d;
     GornVector center, up, side, corner;
     char *state = *(char **)(object + 0x68);
-    char *record = D_L15_001B261C + (*(int *)state << 8);
+    char *record = g_moby_base + (*(int *)state << 8);
     int alpha, fade;
     unsigned int color;
     gfx_init_quad_packet_state(&a, 0x48, 0, 0x80);
-    qcopy(&center, &D_L15_001B99F0[0]);
+    qcopy(&center, &g_backdrop_basis_vectors[0]);
     vec_scale_to_length(0.5f, &center, &center);
-    FastVecAdd(&center, (char *)D_L15_001B99F0 - 0x230, &center);
-    qcopy(&up, &D_L15_001B99F0[1]);
+    FastVecAdd(&center, (char *)g_backdrop_basis_vectors - 0x230, &center);
+    qcopy(&up, &g_backdrop_basis_vectors[1]);
     vec_scale_to_length(0.35f, &up, &up);
-    qcopy(&side, &D_L15_001B99F0[2]);
+    qcopy(&side, &g_backdrop_basis_vectors[2]);
     vec_scale_to_length(0.35f, &side, &side);
     FastVecSub(&corner, &center, &up);
     FastVecAdd(&corner, &corner, &side);
@@ -72,7 +72,7 @@ void backdrop_draw_fade_layers(char *object)
     color = ((unsigned int)(90 - alpha) << 24) | 0x808080;
     b.color[0] = b.color[1] = b.color[2] = b.color[3] = color;
     draw_world_quad(&b, 0, 0);
-    if (*(float *)(record + 0x18) < 465.0f && D_L15_001B1874) {
+    if (*(float *)(record + 0x18) < 465.0f && g_backdrop_fade_layers_enabled) {
     gfx_init_quad_packet_state(&c, 0x48, 0, 0x80);
     *(float *)(state + 0x14) -= 0.0025f;
     if (*(float *)(state + 0x14) <= -8.0f) *(float *)(state + 0x14) += 8.0f;

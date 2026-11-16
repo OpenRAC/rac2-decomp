@@ -89,13 +89,13 @@ typedef struct {
 extern int coll_process_hit(int, int, void *, int, float);
 extern void part_queue_impact_effect(void *, void *, int, float, float *, float *);
 extern PlayerBlock g_hero_state;
-extern JobaObject *D_L11_001C4D80[];
+extern JobaObject *g_damage_target_list[];
 extern int FloatToInt(float);
 extern HitRecord *part_find_owned_effect_slot(void *, int, int);
 extern int moby_apply_damage_to_object(void *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float fast_subtract_rotations(float, float);
@@ -154,25 +154,25 @@ extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
 extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, int);
 extern char g_hero_position[];
-extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
+extern int g_l11_companion_record_index[] NOT_SDA __attribute__((sda));
 /* 64-byte records indexed by D_L11_001B089C[0]. */
 typedef struct { int unused; int flags; char pad[56]; } Entry61308;
-extern Entry61308 D_L11_002B6D40[];
+extern Entry61308 g_carrier_entry_table[];
 extern char *g_moby_l11_table[] NOT_SDA __attribute__((sda));
-extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
+extern char *g_arena_camera_table[] NOT_SDA __attribute__((sda));
 /* Lower and upper bound of a random value. */
-extern float D_L11_001B2388[] NOT_SDA __attribute__((sda));
-extern char D_L11_001B2378[] NOT_SDA __attribute__((sda));
-extern char D_L11_001B2368[] NOT_SDA __attribute__((sda));
-extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
+extern float g_carrier_float_params[] NOT_SDA __attribute__((sda));
+extern char g_carrier_particle_c[] NOT_SDA __attribute__((sda));
+extern char g_carrier_particle_b[] NOT_SDA __attribute__((sda));
+extern char g_carrier_particle_a[] SDATA(D_L11_001B2358);
 
 extern void gfx_draw_spinning_glow_sprites(char *p);
 
-extern int D_L11_001CAE40;
+extern int g_enemy_freeze_flag;
 
-extern int D_L11_001B46D4;
+extern int g_pulse_last_value;
 
-extern int D_L11_001B30C8;
+extern int g_arena_progress_level;
 
 extern void part_draw_billboard_sprite(char *a0, void *a1, void *a2, int a3, int t0, float f12,
                               float f13);
@@ -185,7 +185,7 @@ typedef struct {
     float z_148;
 } L11AimVector;
 
-extern L11AimVector D_L11_001BA780;
+extern L11AimVector g_hero_l11_state_block;
 
 extern void part_reset_quad_record_c(char *pkt);
 
@@ -393,7 +393,7 @@ void fighter_update_contacts(JobaObject *obj)
                 state->fE4 = 0.837758183f;
             }
         }
-        if (obj->active && fast_vec_dist(obj->position, D_L11_001BA8C0) < 24.0f) {
+        if (obj->active && fast_vec_dist(obj->position, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(obj);
             obj->f6F = 22;
         }
@@ -505,7 +505,7 @@ void joba_damage_objects_in_radius(JobaObject *source, int kind, float radius, f
         if (count > 0) {
             impulse = impulseStorage;
             resident = &g_hero_state;
-            entry = D_L11_001C4D80;
+            entry = g_damage_target_list;
             remaining = count;
             do {
                 target = *entry;
@@ -596,72 +596,72 @@ void joba_ring_effect_update(JobaObject *obj)
 /* func_L11_00456EA0 lives in L11_00456EA0-g8.c. */
 
 extern void path_measure_segments(int, void *, void *, void *, void *, void *);
-extern char D_L11_001B1E50[] __attribute__((sda));
-extern char D_L11_001B1E70[] __attribute__((sda));
-extern char D_L11_001B1E80[] __attribute__((sda));
-extern char D_L11_001B1EA0[] __attribute__((sda));
-extern char D_L11_001B1EB0[] __attribute__((sda));
-extern char D_L11_001B1EE0[] __attribute__((sda));
-extern char D_L11_001B1F20[] __attribute__((sda));
-extern char D_L11_001B1F30[] __attribute__((sda));
-extern char D_L11_001B1F50[] __attribute__((sda));
-extern char D_L11_001B1F70[] __attribute__((sda));
-extern char D_L11_001B43F0[] __attribute__((sda));
-extern char D_L11_001B4430[] __attribute__((sda));
-extern char D_L11_001B4450[] __attribute__((sda));
-extern char D_L11_001B4490[] __attribute__((sda));
-extern char D_L11_001B44B0[] __attribute__((sda));
-extern char D_L11_001B44D0[] __attribute__((sda));
-extern char D_L11_001B4510[] __attribute__((sda));
-extern char D_L11_001B4550[] __attribute__((sda));
-extern char D_L11_001B4570[] __attribute__((sda));
-extern char D_L11_001B4580[] __attribute__((sda));
-extern char D_L11_001B4588[] __attribute__((sda));
-extern char D_L11_001B4598[] __attribute__((sda));
-extern char D_L11_001B45A0[] __attribute__((sda));
-extern char D_L11_001B45B8[] __attribute__((sda));
-extern char D_L11_001B45D8[] __attribute__((sda));
-extern char D_L11_001B45E0[] __attribute__((sda));
-extern char D_L11_001B45F0[] __attribute__((sda));
-extern char D_L11_001B4600[] __attribute__((sda));
-extern char D_L11_001B4608[] __attribute__((sda));
-extern char D_L11_001B4618[] __attribute__((sda));
-extern char D_L11_001B4620[] __attribute__((sda));
-extern char D_L11_001B4630[] __attribute__((sda));
-extern char D_L11_001B4638[] __attribute__((sda));
-extern char D_L11_001B4650[] __attribute__((sda));
-extern char D_L11_001B4670[] __attribute__((sda));
-extern char D_L11_001B4678[] __attribute__((sda));
-extern char D_L11_001B4688[] __attribute__((sda));
-extern char D_L11_001B4698[] __attribute__((sda));
-extern char D_L11_001B46A0[] __attribute__((sda));
-extern char D_L11_001B46A4[] __attribute__((sda));
-extern char D_L11_001B46A8[] __attribute__((sda));
-extern char D_L11_001B46AC[] __attribute__((sda));
-extern char D_L11_001B46B0[] __attribute__((sda));
-extern char D_L11_001B46B4[] __attribute__((sda));
-extern char D_L11_001B46B8[] __attribute__((sda));
-extern char D_L11_001B46BC[] __attribute__((sda));
-extern char D_L11_001B46C0[] __attribute__((sda));
-extern char D_L11_001B46C4[] __attribute__((sda));
-extern char D_L11_002626B0[];
-extern char D_L11_00262710[];
+extern char g_effect_path_origins_a[] __attribute__((sda));
+extern char g_effect_path_origins_b[] __attribute__((sda));
+extern char g_effect_path_origins_c[] __attribute__((sda));
+extern char g_effect_path_origins_d[] __attribute__((sda));
+extern char g_effect_path_origins_e[] __attribute__((sda));
+extern char g_effect_path_origins_f[] __attribute__((sda));
+extern char g_effect_path_origins_g[] __attribute__((sda));
+extern char g_effect_path_origins_h[] __attribute__((sda));
+extern char g_effect_path_origins_i[] __attribute__((sda));
+extern char g_effect_path_origins_j[] __attribute__((sda));
+extern char g_effect_path_velocities_a[] __attribute__((sda));
+extern char g_effect_path_velocities_b[] __attribute__((sda));
+extern char g_effect_path_velocities_c[] __attribute__((sda));
+extern char g_effect_path_velocities_d[] __attribute__((sda));
+extern char g_effect_path_velocities_e[] __attribute__((sda));
+extern char g_effect_path_velocities_f[] __attribute__((sda));
+extern char g_effect_path_velocities_g[] __attribute__((sda));
+extern char g_effect_path_velocities_h[] __attribute__((sda));
+extern char g_effect_path_durations_a[] __attribute__((sda));
+extern char g_effect_path_durations_b[] __attribute__((sda));
+extern char g_effect_path_durations_c[] __attribute__((sda));
+extern char g_effect_path_durations_d[] __attribute__((sda));
+extern char g_effect_path_durations_e[] __attribute__((sda));
+extern char g_effect_path_durations_f[] __attribute__((sda));
+extern char g_effect_path_durations_g[] __attribute__((sda));
+extern char g_effect_path_durations_h[] __attribute__((sda));
+extern char g_effect_path_durations_i[] __attribute__((sda));
+extern char g_effect_path_durations_j[] __attribute__((sda));
+extern char g_effect_path_starts_a[] __attribute__((sda));
+extern char g_effect_path_starts_b[] __attribute__((sda));
+extern char g_effect_path_starts_c[] __attribute__((sda));
+extern char g_effect_path_starts_d[] __attribute__((sda));
+extern char g_effect_path_starts_e[] __attribute__((sda));
+extern char g_effect_path_starts_f[] __attribute__((sda));
+extern char g_effect_path_starts_g[] __attribute__((sda));
+extern char g_effect_path_starts_h[] __attribute__((sda));
+extern char g_effect_path_starts_i[] __attribute__((sda));
+extern char g_effect_path_starts_j[] __attribute__((sda));
+extern char g_effect_path_total_a[] __attribute__((sda));
+extern char g_effect_path_total_b[] __attribute__((sda));
+extern char g_effect_path_total_c[] __attribute__((sda));
+extern char g_effect_path_total_d[] __attribute__((sda));
+extern char g_effect_path_total_e[] __attribute__((sda));
+extern char g_effect_path_total_f[] __attribute__((sda));
+extern char g_effect_path_total_g[] __attribute__((sda));
+extern char g_effect_path_total_h[] __attribute__((sda));
+extern char g_effect_path_total_i[] __attribute__((sda));
+extern char g_effect_path_total_j[] __attribute__((sda));
+extern char g_path_l11_segment_velocities[];
+extern char g_path_l11_segment_velocities_2[];
 
 /* Registers the ten groups of effect tables for this level with one shared helper. */
 void joba_register_effect_tables(void) {
-    path_measure_segments(4, D_L11_001B1E50, D_L11_001B43F0, D_L11_001B4570, D_L11_001B4608, D_L11_001B46A0);
-    path_measure_segments(2, D_L11_001B1E70, D_L11_001B4430, D_L11_001B4580, D_L11_001B4618, D_L11_001B46A4);
-    path_measure_segments(4, D_L11_001B1E80, D_L11_001B4450, D_L11_001B4588, D_L11_001B4620, D_L11_001B46A8);
+    path_measure_segments(4, g_effect_path_origins_a, g_effect_path_velocities_a, g_effect_path_durations_a, g_effect_path_starts_a, g_effect_path_total_a);
+    path_measure_segments(2, g_effect_path_origins_b, g_effect_path_velocities_b, g_effect_path_durations_b, g_effect_path_starts_b, g_effect_path_total_b);
+    path_measure_segments(4, g_effect_path_origins_c, g_effect_path_velocities_c, g_effect_path_durations_c, g_effect_path_starts_c, g_effect_path_total_c);
     {
-        char *data = D_L11_001B4490;
-        path_measure_segments(2, D_L11_001B1EA0, data, D_L11_001B4598, D_L11_001B4630, D_L11_001B46AC);
+        char *data = g_effect_path_velocities_d;
+        path_measure_segments(2, g_effect_path_origins_d, data, g_effect_path_durations_d, g_effect_path_starts_d, g_effect_path_total_d);
     }
-    path_measure_segments(6, D_L11_001B1EB0, D_L11_002626B0, D_L11_001B45A0, D_L11_001B4638, D_L11_001B46B0);
-    path_measure_segments(8, D_L11_001B1EE0, D_L11_00262710, D_L11_001B45B8, D_L11_001B4650, D_L11_001B46B4);
-    path_measure_segments(2, D_L11_001B1F20, D_L11_001B44B0, D_L11_001B45D8, D_L11_001B4670, D_L11_001B46B8);
-    path_measure_segments(4, D_L11_001B1F30, D_L11_001B44D0, D_L11_001B45E0, D_L11_001B4678, D_L11_001B46BC);
-    path_measure_segments(4, D_L11_001B1F50, D_L11_001B4510, D_L11_001B45F0, D_L11_001B4688, D_L11_001B46C0);
-    path_measure_segments(2, D_L11_001B1F70, D_L11_001B4550, D_L11_001B4600, D_L11_001B4698, D_L11_001B46C4);
+    path_measure_segments(6, g_effect_path_origins_e, g_path_l11_segment_velocities, g_effect_path_durations_e, g_effect_path_starts_e, g_effect_path_total_e);
+    path_measure_segments(8, g_effect_path_origins_f, g_path_l11_segment_velocities_2, g_effect_path_durations_f, g_effect_path_starts_f, g_effect_path_total_f);
+    path_measure_segments(2, g_effect_path_origins_g, g_effect_path_velocities_e, g_effect_path_durations_g, g_effect_path_starts_g, g_effect_path_total_g);
+    path_measure_segments(4, g_effect_path_origins_h, g_effect_path_velocities_f, g_effect_path_durations_h, g_effect_path_starts_h, g_effect_path_total_h);
+    path_measure_segments(4, g_effect_path_origins_i, g_effect_path_velocities_g, g_effect_path_durations_i, g_effect_path_starts_i, g_effect_path_total_i);
+    path_measure_segments(2, g_effect_path_origins_j, g_effect_path_velocities_h, g_effect_path_durations_j, g_effect_path_starts_j, g_effect_path_total_j);
 }
 
 
@@ -787,14 +787,14 @@ void gfx_draw_aimed_packet(char *pos, int color_base, int alpha, char *texture, 
     *(long long *)(pkt + 120) = r;
 
     quat[3] = 0.0f;
-    quat[2] = mat_fast_helper_a(D_L11_001BA780.x_140 - *(float *)(pos + 0),
-                           D_L11_001BA780.y_144 - *(float *)(pos + 4));
-    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L11_001BA780.x_140),
-                             D_L11_001BA780.z_148 - *(float *)(pos + 8));
+    quat[2] = mat_fast_helper_a(g_hero_l11_state_block.x_140 - *(float *)(pos + 0),
+                           g_hero_l11_state_block.y_144 - *(float *)(pos + 4));
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_hero_l11_state_block.x_140),
+                             g_hero_l11_state_block.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     euler_to_matrix(m, quat);
-    FastVecSub(off, &D_L11_001BA780.x_140, pos);
+    FastVecSub(off, &g_hero_l11_state_block.x_140, pos);
     vec_scale_to_length(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];

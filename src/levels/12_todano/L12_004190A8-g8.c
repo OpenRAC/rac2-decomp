@@ -36,19 +36,19 @@ typedef struct {
     DriverObject *owner;
 } DriverSound;
 extern u8 g_sound_state[];
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern u8 *D_L12_001FEAC0[];
-extern float D_L12_001B1C00[2] __attribute__((sda));
-extern float D_L12_001B1C10[2] __attribute__((sda));
-extern float D_L12_001B1C24 __attribute__((sda));
-extern float D_L12_001B1C28 __attribute__((sda));
-extern float D_L12_001B1C2C __attribute__((sda));
-extern float D_L12_001B1C30 __attribute__((sda));
-extern float D_L12_001B1C34 __attribute__((sda));
-extern float D_L12_001B1C38 __attribute__((sda));
-extern float D_L12_001B1C3C __attribute__((sda));
-extern float D_L12_001B1C40 __attribute__((sda));
+extern u8 *g_path_zone_table[];
+extern float g_driver_sight_start_local[2] __attribute__((sda));
+extern float g_driver_sight_end_local[2] __attribute__((sda));
+extern float g_driver_bob_amplitude __attribute__((sda));
+extern float g_driver_bob_speed __attribute__((sda));
+extern float g_driver_tilt_y_amplitude __attribute__((sda));
+extern float g_driver_tilt_y_speed __attribute__((sda));
+extern float g_driver_tilt_x_amplitude __attribute__((sda));
+extern float g_driver_tilt_x_speed __attribute__((sda));
+extern float g_driver_turn_speed __attribute__((sda));
+extern float g_driver_move_speed __attribute__((sda));
 extern void moby_set_state(void *,int,int);
 extern void anim_start_blended(void *,int,void *,int);
 extern float math_random_angle(void);
@@ -105,7 +105,7 @@ void UpdateTodanoPathDriver(DriverObject *self)
             moby_set_state(self,7,-1);
             break;
         }
-        initialPath = D_L12_001FEAC0[state->path0];
+        initialPath = g_path_zone_table[state->path0];
         state->length = fast_vec_dist(initialPath+0x10,initialPath+0x20);
         moby_set_state(self,3,-1);
         self->f30 = 0xff;
@@ -120,12 +120,12 @@ void UpdateTodanoPathDriver(DriverObject *self)
     }
     case 1:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
-        if (moby_is_first_state(D_L12_001B2E9C + (state->child << 8)))
+        if (moby_is_first_state(g_moby_list_start + (state->child << 8)))
             moby_set_state(self,2,-1);
         break;
     case 2:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
-        path = D_L12_001FEAC0[state->path0];
+        path = g_path_zone_table[state->path0];
         math_step_value_toward_target(&state->progress,&state->velocity,(float)(*(int *)path-1),
                      0.013888889f,0.0013888889225199819f,0.33333334f);
         path_sample_position(path,0,state->position,state->rotation,0,state->progress);
@@ -144,14 +144,14 @@ void UpdateTodanoPathDriver(DriverObject *self)
     case 3:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
         if (math_fast_float_d(&state->timer)) {
-            matrix_mul_vec3(sight_start,D_L12_001B1C00,(u8 *)self+0xC0);
+            matrix_mul_vec3(sight_start,g_driver_sight_start_local,(u8 *)self+0xC0);
             FastVecAdd(sight_start,sight_start,self->position);
-            matrix_mul_vec3(sight_end,D_L12_001B1C10,(u8 *)self+0xC0);
+            matrix_mul_vec3(sight_end,g_driver_sight_end_local,(u8 *)self+0xC0);
             FastVecAdd(sight_end,sight_end,self->position);
             sight_end[2] += 2.0f;
             sight_end[2] = coll_probe_ground_height_below(0.5f,sight_end,0);
             if (!space_tourist_launch(state->trigger,sight_start,sight_end)) {
-                moby_reset_to_saved_position(D_L12_001B2E9C + (state->child << 8));
+                moby_reset_to_saved_position(g_moby_list_start + (state->child << 8));
                 moby_set_state(self,4,-1);
                 if (self->nextAnimation != 0) anim_start_blended(self,0,0,30);
                 CLEAR_SOUND();
@@ -168,7 +168,7 @@ void UpdateTodanoPathDriver(DriverObject *self)
         break;
     case 4:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
-        path = D_L12_001FEAC0[state->path1];
+        path = g_path_zone_table[state->path1];
         math_step_value_toward_target(&state->progress,&state->velocity,(float)(*(int *)path-1),
                      0.0013888889225199819f,0.0013888889225199819f,0.33333334f);
         path_sample_position(path,0,state->position,state->rotation,0,state->progress);
@@ -205,11 +205,11 @@ void UpdateTodanoPathDriver(DriverObject *self)
         break;
     case 6:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
-        path = D_L12_001FEAC0[state->path2];
+        path = g_path_zone_table[state->path2];
         math_step_value_toward_target(&state->progress,&state->velocity,(float)(*(int *)path-1),
-                     D_L12_001B1C3C*0.00027777778f,
-                     D_L12_001B1C3C*0.00027777778f,
-                     D_L12_001B1C40*0.016666668f);
+                     g_driver_turn_speed*0.00027777778f,
+                     g_driver_turn_speed*0.00027777778f,
+                     g_driver_move_speed*0.016666668f);
         path_sample_position(path,0,state->position,state->rotation,0,state->progress);
         part_spawn_driver_spark_bursts(self);
         state->rotation[1] *= -0.333f;
@@ -239,11 +239,11 @@ void UpdateTodanoPathDriver(DriverObject *self)
     if (self->state != 7) {
         qcopy(self->position,state->position);
         qcopy(self->rotation,state->rotation);
-        state->phase0 = FastAddRotations(state->phase0,D_L12_001B1C38*0.00029088825f);
-        self->rotation[0] = FastAddRotations(D_L12_001B1C34*(math_fast_sin_or_cos_b(state->phase0)*0.017453294f),state->rotation[0]);
-        state->phase1 = FastAddRotations(state->phase1,D_L12_001B1C30*0.00029088825f);
-        self->rotation[1] = FastAddRotations(D_L12_001B1C2C*(math_fast_sin_or_cos_b(state->phase1)*0.017453294f),state->rotation[1]);
-        state->phase2 = FastAddRotations(state->phase2,D_L12_001B1C28*0.00029088825f);
-        self->position[2] += D_L12_001B1C24*math_fast_sin_or_cos_b(state->phase2);
+        state->phase0 = FastAddRotations(state->phase0,g_driver_tilt_x_speed*0.00029088825f);
+        self->rotation[0] = FastAddRotations(g_driver_tilt_x_amplitude*(math_fast_sin_or_cos_b(state->phase0)*0.017453294f),state->rotation[0]);
+        state->phase1 = FastAddRotations(state->phase1,g_driver_tilt_y_speed*0.00029088825f);
+        self->rotation[1] = FastAddRotations(g_driver_tilt_y_amplitude*(math_fast_sin_or_cos_b(state->phase1)*0.017453294f),state->rotation[1]);
+        state->phase2 = FastAddRotations(state->phase2,g_driver_bob_speed*0.00029088825f);
+        self->position[2] += g_driver_bob_amplitude*math_fast_sin_or_cos_b(state->phase2);
     }
 }

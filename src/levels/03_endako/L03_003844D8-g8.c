@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int ParticleQuad __attribute__((mode(TI)));
 typedef struct { int id[16]; } ParticleIds;
-extern char *D_L03_001B2B0C MACRO_ADDR;
-extern float D_L03_001AEC40 __attribute__((sda)), D_L03_001AEC48 __attribute__((sda));
-extern float D_L03_001AEC4C __attribute__((nosda)), D_L03_001AEC50 __attribute__((nosda)), D_L03_001AEC54 __attribute__((nosda));
-extern float D_L03_001AEC58 __attribute__((sda)), D_L03_001AEC5C __attribute__((nosda)), D_L03_001AEC60 __attribute__((nosda)), D_L03_001AEC64 __attribute__((nosda));
-extern unsigned int D_L03_001AEC68 __attribute__((sda)), D_L03_001AEC6C __attribute__((nosda)), D_L03_001AEC70 __attribute__((sda)), D_L03_001AEC74 __attribute__((nosda)), D_L03_001AEC78 __attribute__((nosda));
+extern char *g_linked_effect_records MACRO_ADDR;
+extern float g_effect_count_scale __attribute__((sda)), g_effect_lower_bound __attribute__((sda));
+extern float g_effect_upper_bound __attribute__((nosda)), g_effect_param_min __attribute__((nosda)), g_effect_param_max __attribute__((nosda));
+extern float g_effect_velocity_min __attribute__((sda)), g_effect_velocity_max __attribute__((nosda)), g_effect_spread_min __attribute__((nosda)), g_effect_spread_max __attribute__((nosda));
+extern unsigned int g_effect_color_start __attribute__((sda)), g_effect_color_end __attribute__((nosda)), g_effect_flags __attribute__((sda)), g_effect_start_value __attribute__((nosda)), g_effect_end_value __attribute__((nosda));
 extern int math_fast_helper_a(void *, float);
 extern float math_random_float_range(float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -20,10 +20,10 @@ void linked_effect_spawn_particles(char *moby)
     ParticleIds *ids = *(ParticleIds **)(moby + 0x68);
     for (i = 0; i < 16; i++) {
         int index = ids->id[i];
-        char *base = D_L03_001B2B0C;
+        char *base = g_linked_effect_records;
         if (index != -1) {
             char *entry = (char *)(index * 128 + (unsigned int)base);
-            float count = D_L03_001AEC40 * *(float *)(entry + 0x7C);
+            float count = g_effect_count_scale * *(float *)(entry + 0x7C);
             qcopy(point, entry + 0x30);
             point[3] = *(float *)(entry + 0x3C);
             if (math_fast_helper_a(point, 64) == -1) count *= 0.5f;
@@ -34,26 +34,26 @@ void linked_effect_spawn_particles(char *moby)
                     velocity[0] = math_random_float_range(-0.9f, 0.9f);
                     velocity[1] = math_random_float_range(-0.9f, 0.9f);
                     *(ParticleQuad *)position = *(ParticleQuad *)velocity;
-                    matrix_mul_vec3(position, position, D_L03_001B2B0C + ids->id[i] * 128);
-                    FastVecAdd(position, position, D_L03_001B2B0C + ids->id[i] * 128 + 0x30);
+                    matrix_mul_vec3(position, position, g_linked_effect_records + ids->id[i] * 128);
+                    FastVecAdd(position, position, g_linked_effect_records + ids->id[i] * 128 + 0x30);
                     qzero_nc(velocity);
                     {
-                        float upper = D_L03_001AEC4C;
-                        float lower = D_L03_001AEC48;
+                        float upper = g_effect_upper_bound;
+                        float lower = g_effect_lower_bound;
                         velocity[2] = math_random_float_range(lower, upper) * (1.0f/60.0f);
                     }
                     qzero_nc(params);
-                    params[2] = math_random_float_range(D_L03_001AEC50, D_L03_001AEC54) * (1.0f/60.0f);
-                    velocity[3] = math_random_float_range(D_L03_001AEC58, D_L03_001AEC5C);
-                    params[3] = math_random_float_range(D_L03_001AEC60, D_L03_001AEC64);
+                    params[2] = math_random_float_range(g_effect_param_min, g_effect_param_max) * (1.0f/60.0f);
+                    velocity[3] = math_random_float_range(g_effect_velocity_min, g_effect_velocity_max);
+                    params[3] = math_random_float_range(g_effect_spread_min, g_effect_spread_max);
                     {
                         float blend = math_random_float_range(0, 1);
-                        color = FastTweenColor(D_L03_001AEC68, D_L03_001AEC6C, blend);
+                        color = FastTweenColor(g_effect_color_start, g_effect_color_end, blend);
                     }
                     {
-                        unsigned int flags = D_L03_001AEC70;
-                        unsigned int start = D_L03_001AEC74;
-                        unsigned int end = D_L03_001AEC78;
+                        unsigned int flags = g_effect_flags;
+                        unsigned int start = g_effect_start_value;
+                        unsigned int end = g_effect_end_value;
                         part_spawn_trail(position, velocity, params, color, color & 0xFFFFFF, flags, start, end, -1);
                     }
                 }

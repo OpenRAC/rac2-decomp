@@ -1,13 +1,14 @@
+#include "names.h"
 /* func_002BCF18 in its own unit: small data at -G8 and lq/sq quadword copies (-frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
 #include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_001B168C;
+extern float g_frame_time_scale;
 /* Read through lui/lw with a separate address register: not small data, so an
    incomplete array indexed [0]. */
-extern unsigned char *D_001F2580[];
+extern unsigned char *g_part_tex_falling_drop_table[];
 extern int math_random_int_below(int);
 extern char *part_alloc(int);
 extern int FloatToInt(float);
@@ -20,11 +21,11 @@ char *part_spawn_falling_drop(char *position, char *velocity, int color, int end
 
     if (life == 0)
         return 0;
-    if (D_001B168C > 0.9f && math_random_int_below(3) == 0)
+    if (g_frame_time_scale > 0.9f && math_random_int_below(3) == 0)
         return 0;
-    if (D_001B168C > 0.95f && math_random_int_below(2) == 0)
+    if (g_frame_time_scale > 0.95f && math_random_int_below(2) == 0)
         return 0;
-    if (D_001B168C > 1.0f && math_random_int_below(1) == 0)
+    if (g_frame_time_scale > 1.0f && math_random_int_below(1) == 0)
         return 0;
     particle = part_alloc(0x10);
     if (particle != 0) {
@@ -41,7 +42,7 @@ char *part_spawn_falling_drop(char *position, char *velocity, int color, int end
         particle[9] = alphaRand;
         particle[8] = func_001163B0();
         motion = particle + 0x20;
-        textureTable = D_001F2580[0];
+        textureTable = g_part_tex_falling_drop_table[0];
         particle[2] = *((type != 3) ? textureTable + type : textureTable);
         *(short *)(particle + 0xA) = life;
         *(short *)(motion + 0x18) = life;

@@ -8,11 +8,11 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
-extern int D_001F2880[];
+extern int g_selection_grid_cursor[];
 extern int g_selected_item_material __attribute__((sda));
-extern SelectionEntry D_00259CE0[];
+extern SelectionEntry g_menu_item_table_second[];
 
-void func_US2_00346878(SelectionOwner *owner, int buttons)
+void selection_grid_handle_input_us2(SelectionOwner *owner, int buttons)
 {
     if (buttons & 0x1000) {
         int row;
@@ -51,16 +51,16 @@ void func_US2_00346878(SelectionOwner *owner, int buttons)
         else
             owner->column = owner->column > 2 ? 1 : owner->column;
     } else if (buttons & 0x40) {
-        int id = D_00259CE0[owner->column + owner->row * 3].v[3];
+        int id = g_menu_item_table_second[owner->column + owner->row * 3].v[3];
         if (id && g_item_owned_flags[id]) {
             snd_play_from_global_bank(4, 0, 0);
-            D_001F2880[0] = id;
+            g_selection_grid_cursor[0] = id;
             owner->selected = id;
         } else
             snd_play_from_global_bank(5, 0, 0);
     }
     {
-        int id = D_00259CE0[owner->column + owner->row * 3].v[3];
+        int id = g_menu_item_table_second[owner->column + owner->row * 3].v[3];
         owner->selected = id;
         if (id && g_item_owned_flags[id])
             g_selected_item_material = ((SelectionMaterial *)(g_weapon_table + g_item_slot_to_record[id] * 0xE0))->material;

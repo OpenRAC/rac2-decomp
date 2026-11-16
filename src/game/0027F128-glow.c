@@ -1,10 +1,10 @@
 #include "common.h"
 typedef struct { float position[4]; short life,alpha; int unused; float angle,size; } Glow;
-extern Glow D_001BAA40[];
-extern char g_camera_eye_state[], D_001AC8B0[];
-extern char D_001B91C0[];
+extern Glow g_glow_table[];
+extern char g_camera_eye_state[], g_glow_packet_template[];
+extern char g_clip_matrix[];
 typedef struct { char pad[0x1a8]; float depth; char gap[0x64]; float scale; } GlowView;
-extern GlowView D_001B9040;
+extern GlowView g_view_params;
 /* The packet cursor: retail rereads it after every store through it, as for an array element. */
 extern int *g_dma_packet_cursor[] __attribute__((section(".sdata")));
 extern void VU1_addGSregister(unsigned int,unsigned long);
@@ -32,7 +32,7 @@ void DrawGlowSprites(void) {
     unsigned long *packet;
     VU1_addGSregister(0x42,0x8000000048UL);
     for(i=0;i<16;i++) {
-        table=D_001BAA40;
+        table=g_glow_table;
         g=&table[i];
         if(g->life<=0) continue;
         FastVecSub(v,g,g_camera_eye_state);
@@ -40,13 +40,13 @@ void DrawGlowSprites(void) {
         distance=FastVecLength(v);
         FastVecScale(v,v,1024.0f);
         transform_vector(v,v,g_camera_eye_state-0x100);
-        multiply_vector_components(clip,v,D_001B91C0);
+        multiply_vector_components(clip,v,g_clip_matrix);
         if(is_vector_outside_clip(clip)) { mem_clear(g,0,32); continue; }
-        FastVecScale(v,v,D_001B9040.scale/v[3]);
+        FastVecScale(v,v,g_view_params.scale/v[3]);
         color=(g->alpha<<24)|0x808080;
         x=FloatToInt(v[0]*16.0f)+0x8000;
         y=FloatToInt(v[1]*16.0f)+0x8000;
-        center=((unsigned long)FloatToInt(v[2]*0.9997f+D_001B9040.depth)<<32)|((unsigned long)y<<16)|(unsigned long)x;
+        center=((unsigned long)FloatToInt(v[2]*0.9997f+g_view_params.depth)<<32)|((unsigned long)y<<16)|(unsigned long)x;
         if(distance>18.0f) distance=18.0f;
         else if(distance<2.0f) distance=2.0f;
         radius=g->size*0.015625f*IntToFloat(g->alpha+16);
@@ -56,7 +56,7 @@ void DrawGlowSprites(void) {
         g_dma_packet_cursor[0][0]=0x10000009; g_dma_packet_cursor[0][1]=0; g_dma_packet_cursor[0][2]=0; g_dma_packet_cursor[0][3]=0x50000009;
         base=g_dma_packet_cursor[0];
         g_dma_packet_cursor[0]=base+4;
-        qcopy(base+4,D_001AC8B0);
+        qcopy(base+4,g_glow_packet_template);
         packet=(unsigned long *)(base+8);
         g_dma_packet_cursor[0]=(int *)packet;
         packet[0]=5;

@@ -7,7 +7,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L02_001B01B0 __attribute__((sda));
+extern int g_chainblade_landing_point __attribute__((sda));
 
 extern float vec_distance_xy(char *, void *);
 
@@ -23,8 +23,8 @@ void chainblade_pick_wander_goal(char *self) {
     vec[2] += 1.0f;
     *(TI128 *)(state + 0x2C0) = *(TI128 *)(self + 0x10);
     PlacePointWithPolarJitter(state + 0x2C0, vec, 13.0f, 45.0f, 0.2f, 0.2f);
-    if (vec_distance_xy(state + 0x2C0, &D_L02_001B01B0) > 10.0f) {
-        *(TI128 *)(state + 0x2C0) = *(TI128 *)&D_L02_001B01B0;
+    if (vec_distance_xy(state + 0x2C0, &g_chainblade_landing_point) > 10.0f) {
+        *(TI128 *)(state + 0x2C0) = *(TI128 *)&g_chainblade_landing_point;
         *(float *)(state + 0x2C8) += 1.0f;
     }
 }

@@ -11,7 +11,7 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern Vector D_0018A0E0;
+extern Vector g_hero_state_block;
 extern Vector ref_L04_00459408_00[4];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void multiply_matrix3x3(void *, void *, void *);
@@ -20,7 +20,7 @@ extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void gfx_world_to_screen_unit(int, float *, float *);
 extern void FastVecCross(char *, char *, char *);
 extern void draw_world_quad(char *, int, int);
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void FastVecSub(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -61,9 +61,9 @@ void gfx_draw_billboard_quad_jitter(Vector *position, float size, float offset, 
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    FastVecSub((char *)&frame.row[0], (char *)D_L04_001B9680, (char *)&frame.position);
+    FastVecSub((char *)&frame.row[0], (char *)g_tether_zero_vec, (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {

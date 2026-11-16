@@ -2,7 +2,7 @@
 #include "common.h"
 
 typedef int Quadword __attribute__((mode(TI)));
-extern u8 *D_L04_001FF26C;
+extern u8 *g_velocity_particle_color;
 extern u8 *part_alloc(int);
 extern int func_001163B0(void);
 extern int FloatToInt(float);
@@ -20,7 +20,7 @@ u8 *part_spawn_velocity_particle(u8 *position, u8 *velocity, int color, int time
         *(int *)(particle+4)=color;
         particle[9]=FloatToInt(4.0f)+0x40;
         particle[3]=0x48;*(float *)(particle+0xc)=size;particle[1]=0;
-        particle[2]=D_L04_001FF26C[0];
+        particle[2]=g_velocity_particle_color[0];
         *(int *)(state+0x18)=(s8)particle[7];
         qcopy(state, velocity);
         *(int *)(state+0x10)=time;

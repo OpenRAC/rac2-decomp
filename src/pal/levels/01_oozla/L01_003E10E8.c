@@ -3,7 +3,7 @@
 #include "common.h"
 typedef struct { u8 data[256]; } AttachObject;
 extern AttachObject *g_moby_l01_table __attribute__((sda));
-extern u8 *D_L01_001FE180[] NOT_SDA;
+extern u8 *g_path_l01_table[] NOT_SDA;
 extern f32 vec_distance_xy(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -30,18 +30,18 @@ extern s32 func_310528(s32 a, s32 b);
 extern f32 func_2E3A48(f32 x);
 extern f32 func_2E3A60(f32 x);
 extern s32 coll_process_hit(f32 radius, void *pos, s32 flag, void *obj, s32 arg);
-extern u32 D_L01_001C3980[];
+extern u32 g_contact_moby_list[];
 extern s32 math_fast_float_d(void *);
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern s32 FloatToInt(f32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B4A8[];
-extern u8 *D_L01_001B1F04 __attribute__((sda));
+extern u8 g_moby_nibble_table[];
+extern u8 *g_camera_path_configs __attribute__((sda));
 extern s32 cam_is_hero_in_trigger(void *);
 
-void func_PAL_L01_003E10E8(void *arg, void *fallback) {
+void moby_follow_attached_pal(void *arg, void *fallback) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     f32 matrix[16] __attribute__((aligned(16)));
@@ -80,7 +80,7 @@ void func_PAL_L01_003E10E8(void *arg, void *fallback) {
     } else {
         s32 pathIndex=*(s32 *)(state+0x1FC);
         if(pathIndex!=-1) {
-            path=D_L01_001FE180[pathIndex];
+            path=g_path_l01_table[pathIndex];
             if(path && !point_in_path_xy(obj+0x10,path+0x10,*(s32 *)path)) qcopy(obj+0x10,fallback);
         }
         {

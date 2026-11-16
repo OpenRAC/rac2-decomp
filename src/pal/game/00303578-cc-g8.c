@@ -12,7 +12,7 @@ extern float ref_00302470_08 SDATA(ref_00302470_08);
 extern float ref_00302470_09 SDATA(ref_00302470_09);
 extern int ref_00302470_01 SDATA(ref_00302470_01);
 extern ParticleVector ref_00302470_02 __attribute__((nosda));
-extern int D_001A7A10[] MACRO_ADDR;
+extern int g_player_state_shorts[] MACRO_ADDR;
 extern char *g_hero_moby __attribute__((nosda));
 extern float fast_vec_dist(void *, void *);
 extern char *CreateMoby(int);
@@ -29,7 +29,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_build_axis_angle_quat(void *, int, float);
-extern int func_PAL_003033A8(char *, char *, float, float);
+extern int pickup_start_fly_to_target_pal(char *, char *, float, float);
 extern void func_002A0F48(void *);
 
 typedef struct BoltVars {
@@ -76,7 +76,7 @@ BoltSpawnObject *func_PAL_00303578(BoltSpawnObject *source, void *position, void
     u32 red, green, blue;
     float scale, spin, angle;
     if (fast_vec_dist(position,&ref_00302470_02)>=64.0f) {
-        D_001A7A10[1]+=value;
+        g_player_state_shorts[1]+=value;
         return 0;
     }
     switch (value) {
@@ -122,7 +122,7 @@ BoltSpawnObject *func_PAL_00303578(BoltSpawnObject *source, void *position, void
     if (flags&2) {
         angle=0.0f;
         if (flags&0x10) angle=math_random_float_range(-30.0f,30.0f)*0.017453294f;
-        func_PAL_003033A8((char *)object,g_hero_moby,angle,0.0f);
+        pickup_start_fly_to_target_pal((char *)object,g_hero_moby,angle,0.0f);
     }
     func_002A0F48(object);
     }

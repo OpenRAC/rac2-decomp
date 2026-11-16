@@ -4,7 +4,7 @@
 /* Dispatches an indexed polygon query through the already integrated helper. */
 typedef struct { s32 field00; u8 remainder[12]; } JobaPolygonHeaderView;
 
-extern JobaPolygonHeaderView *D_L11_001FF580[];
+extern JobaPolygonHeaderView *g_path_l11_table[];
 
 /* Consumes one positive counter selected by the measured class identifier. */
 /* bumps the 0xFFFF-saturated counter, then starts the state's timer and reports the object */
@@ -52,7 +52,7 @@ extern u8 *g_moby_l11_table;
 /* arms the one-shot flag block when it is idle and the state agrees */
 typedef struct { u8 pad[0x284]; s32 field284; s32 field288; } JobaFlagBlockView;
 
-extern JobaFlagBlockView D_L11_001BA780;
+extern JobaFlagBlockView g_hero_l11_state_block;
 
 /* returns the 128-byte entry selected by the state index, at its 0x30-byte payload */
 /* returns zero for a missing state polygon index or dispatches its point query to the integrated crossing-parity helper */

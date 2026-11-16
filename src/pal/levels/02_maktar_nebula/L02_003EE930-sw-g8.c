@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L02_001B0D50 __attribute__((sda));
-extern int D_L02_001B0D54 __attribute__((sda));
-extern float D_L02_001B0D58 __attribute__((sda));
-extern float D_L02_001B0D5C __attribute__((sda));
+extern int g_swing_platform_initialized __attribute__((sda));
+extern int g_swing_platform_direction __attribute__((sda));
+extern float g_swing_platform_speed __attribute__((sda));
+extern float g_swing_platform_angle_step __attribute__((sda));
 extern int g_frame_l02_counter;
 typedef struct { unsigned char pad[3]; unsigned char active; } OwnerFlagView;
-extern OwnerFlagView D_001395B8 __attribute__((nosda));
-extern char g_sound_state[], D_00189F10[];
+extern OwnerFlagView g_game_flag_table __attribute__((nosda));
+extern char g_sound_state[], g_drive_velocity_view[];
 extern void swing_platform_init_group(void *);
 extern int flag_is_third_pending_set(void *);
 extern int MemcardSave(int, int);
@@ -47,7 +47,7 @@ void func_PAL_L02_003EE930(char *actor) {
     swing_platform_init_group(actor);
     return;
     case 2:
-    if (D_L02_001B0D50 == 0) {
+    if (g_swing_platform_initialized == 0) {
         unsigned int timer, next;
         if (!flag_is_third_pending_set(actor)) return;
         next = *(unsigned short *)(actor + 0x96);
@@ -56,7 +56,7 @@ void func_PAL_L02_003EE930(char *actor) {
         *(unsigned short *)(actor + 0x96) = next;
         if (timer < 6) return;
     }
-    if (*(int *)(state + 4)) { D_001395B8.active = 1; MemcardSave(0, -1); }
+    if (*(int *)(state + 4)) { g_game_flag_table.active = 1; MemcardSave(0, -1); }
     *(int *)(state + 0x2C) = PlayMobySound(0, 4, actor);
     group_set_moby_states_from_mode(actor);
     return;
@@ -115,18 +115,18 @@ void func_PAL_L02_003EE930(char *actor) {
     }
     return;
     case 8:
-    target = (float)D_L02_001B0D54 * 0.080000006f;
-    ApproachValue(&D_L02_001B0D58, target, 0.0064000003f);
-    vec_scale_to_length(angles, actor + 0xD0, D_L02_001B0D58);
+    target = (float)g_swing_platform_direction * 0.080000006f;
+    ApproachValue(&g_swing_platform_speed, target, 0.0064000003f);
+    vec_scale_to_length(angles, actor + 0xD0, g_swing_platform_speed);
     if (group_update_effect_mobys(actor, angles)) {
-        if (D_L02_001B0D58 == target) {
-            if (FastVecDot(D_00189F10, angles) < -0.001f) {
-                if (++((PlatState *)state)->i[8] > 25) D_L02_001B0D54 = -D_L02_001B0D54;
+        if (g_swing_platform_speed == target) {
+            if (FastVecDot(g_drive_velocity_view, angles) < -0.001f) {
+                if (++((PlatState *)state)->i[8] > 25) g_swing_platform_direction = -g_swing_platform_direction;
             } else ((PlatState *)state)->i[8] = 0;
         } else ((PlatState *)state)->i[8] = 0;
     }
-    ((PlatState *)state)->f[5] = FastAddRotations(((PlatState *)state)->f[5], D_L02_001B0D5C * 0.0003490659f);
-    ((PlatState *)state)->f[6] += D_L02_001B0D58 * 0.5f;
+    ((PlatState *)state)->f[5] = FastAddRotations(((PlatState *)state)->f[5], g_swing_platform_angle_step * 0.0003490659f);
+    ((PlatState *)state)->f[6] += g_swing_platform_speed * 0.5f;
     if (((PlatState *)state)->f[6] > 1.0f) ((PlatState *)state)->f[6] -= 1.0f;
     else if (((PlatState *)state)->f[6] < -1.0f) ((PlatState *)state)->f[6] += 1.0f;
     ApproachValue(&((PlatState *)state)->f[7], 1.0f, 0.020000001f);

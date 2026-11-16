@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern int g_moby_l11_table __attribute__((sda));
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
@@ -11,7 +11,7 @@ extern void moby_set_state(void *, int, int);
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern float moby_update_aim_target_strength(char *, char *);
 extern void gfx_start_color_fade(char *, char *);
-extern int D_L11_001FFA78[];
+extern int g_enemy_damage_accum[];
 extern void part_spawn_blast_burst(char *, char *);
 extern void rotor_aim_at_entry(char *, int, int);
 extern void chain_creature_clear_sound_flags(char *);
@@ -118,7 +118,7 @@ void UpdateRotorGroupState(char *obj)
             if (*(unsigned char *)(obj+0x43)!=4) anim_start_blended(obj,4,0,10);
         }
         if (*(unsigned short *)(obj+0x96)>10) {
-            FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+            FastVecSub(direction,(float *)g_hero_l11_position,(float *)(obj+0x10));
             vec_scale_to_length((char *)direction,(char *)direction,0.5f);
             qcopy(pos,vars+0x100);
             part_spawn_blast_burst(obj,(char *)pos);

@@ -1,19 +1,20 @@
+#include "names.h"
 /* func_PAL_L01_0039C7E8, the PAL copy of func_L01_003993C8: the same C, where the rate constant
    becomes 0.020000001f and both swing bounds take the 50 Hz scale, the 10.0f bound through a local. */
 #include "common.h"
 
 /* Sets the random swing band and derives its duration from the resulting speed. */
-extern float D_L01_001AF638 SDATA(D_L01_001AF638);
+extern float g_wind_min_count SDATA(D_L01_001AF638);
 
-extern float D_L01_001AF63C SDATA(D_L01_001AF63C);
+extern float g_wind_max_count SDATA(D_L01_001AF63C);
 
-extern float D_L01_001B2EF0 SDATA(D_L01_001B2EF0);
+extern float g_wind_x SDATA(D_L01_001B2EF0);
 
-extern float D_L01_001B2F00 SDATA(D_L01_001B2F00);
+extern float g_wind_change_delay SDATA(D_L01_001B2F00);
 
-extern float D_L01_001B2EF4[] NOT_SDA;
+extern float g_wind_y[] NOT_SDA;
 
-extern int D_L01_001B2F04 MACRO_ADDR;
+extern int g_wind_particle_count MACRO_ADDR;
 
 extern float func_00310580(float, float);
 
@@ -40,22 +41,22 @@ void func_PAL_L01_0039C7E8(int a0)
         lo = 2.0f;
     }
 
-    if (D_L01_001AF638 >= 0.0f)
-        lo = D_L01_001AF638;
-    if (D_L01_001AF63C >= 0.0f)
-        hi = D_L01_001AF63C;
+    if (g_wind_min_count >= 0.0f)
+        lo = g_wind_min_count;
+    if (g_wind_max_count >= 0.0f)
+        hi = g_wind_max_count;
 
     {
         float k = s * 0.020000001f;
         float v[4];
 
-        D_L01_001B2EF0 = func_00310580(-k, k);
-        D_L01_001B2EF4[0] = func_00310580(-k, k);
-        D_L01_001B2F00 = func_00310580((x * 5.0f + 2.0f) * 0.16666667f,
+        g_wind_x = func_00310580(-k, k);
+        g_wind_y[0] = func_00310580(-k, k);
+        g_wind_change_delay = func_00310580((x * 5.0f + 2.0f) * 0.16666667f,
                                        (y * 5.0f + 2.0f) * 0.16666667f);
         v[0] = k;
         v[1] = k;
-        D_L01_001B2F04 = (int)((func_002E35D0((char *)&swing_vector) /
+        g_wind_particle_count = (int)((func_002E35D0((char *)&swing_vector) /
                             func_002E35A0(v)) *
                                (hi - lo) +
                            lo);

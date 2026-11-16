@@ -47,7 +47,7 @@ typedef struct {
     s32   control_mode;
 } Hero;
 extern Hero g_hero_state;
-extern void func_PAL_L00_002D4668(int, void *, void *);
+extern void UpdateHeroAttachment_pal(int, void *, void *);
 extern float cam_get_view_space_vector_length(void *);
 extern float cam_get_view_space_height(void *);
 extern void cam_set_view_space_vector_length(void *, void *, float);
@@ -56,18 +56,18 @@ extern void cam_project_vector_onto_view_plane(void *, void *);
 extern void vec_clear_128(void *);
 extern void hero_resolve_collision_with_rewind(void);
 extern void Hero_ProbeGround(void);
-extern void func_PAL_L00_002B5178(void);
+extern void EaseHeroPositionToGoal_pal(void);
 extern float hero_get_speed_along_forward(void *);
 
 /* Moves the hero by its velocity, impulse and surface motion, then measures the
    resolved displacement and the speeds derived from it. */
-void func_PAL_L04_002DBE18(void) {
+void ApplyHeroVelocityAndResolveDisplacement_pal(void) {
     float old[4];
     float horizontal[4];
     float flat[4];
 
     qcopy(old, g_hero_state.position);
-    func_PAL_L00_002D4668(g_hero_state.collision_mode, g_hero_state.surface_motion,
+    UpdateHeroAttachment_pal(g_hero_state.collision_mode, g_hero_state.surface_motion,
                       g_hero_state.rotation);
     if (g_hero_state.state == 0x14 || g_hero_state.state == 0x5B ||
         g_hero_state.state == 0x58 || g_hero_state.state == 0x81) {
@@ -103,7 +103,7 @@ void func_PAL_L04_002DBE18(void) {
         hero_resolve_collision_with_rewind();
         Hero_ProbeGround();
         FastVecSub(g_hero_state.displacement, g_hero_state.position, old);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     } else {
         Hero_ProbeGround();
     }
@@ -164,7 +164,7 @@ void func_PAL_L04_002DBE18(void) {
         hero_resolve_collision_with_rewind();
         Hero_ProbeGround();
         FastVecSub(g_hero_state.displacement, g_hero_state.position, old);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     }
     FastVecSub(g_hero_state.surface_displacement, g_hero_state.position, horizontal);
     g_hero_state.surface_speed = FastVecLength(g_hero_state.surface_displacement);

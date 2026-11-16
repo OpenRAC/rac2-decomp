@@ -13,7 +13,7 @@ extern void func_002A05A8(char *);
 extern void moby_set_state(void *, int, int);
 
 /* Retires the measured stage-46 record: clears the guard, drops the effect and re-tags the object. */
-void func_PAL_L11_0043BFF8(char *obj)
+void enemy_reset_to_idle_pal(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
 

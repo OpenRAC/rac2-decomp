@@ -26,16 +26,16 @@ typedef struct {
 } L11Moby;
 extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
 extern void set_moby_color(void *, int, int, int);
-extern int func_PAL_002B3F18(char *, char *, char *);
+extern int part_spawn_damage_debris_pal(char *, char *, char *);
 extern f32 math_fast_sin_or_cos_a(f32 a0);
 extern f32 math_fast_sin_or_cos_b(f32 a0);
 extern f32 FastAddRotations(f32 a0, f32 a1);
 extern void euler_rotation_basis(void *a0, void *a1);
 extern f32 *arena_get_center_point(s32 a0);
-extern f32 D_L11_001B0558 __attribute__((sda));
-extern f32 D_L11_001B0540 __attribute__((sda));
+extern f32 g_joba_orbit_radius __attribute__((sda));
+extern f32 g_orbit_enemy_start_z __attribute__((sda));
 
-void func_PAL_L11_003F72D0(u8 *arg0) {
+void joba_rail_reset_pal(u8 *arg0) {
     L11Moby *m = (L11Moby *)arg0;
     u8 *s1 = *(u8 **)(arg0 + 0x68);
     f32 *p;
@@ -52,7 +52,7 @@ void func_PAL_L11_003F72D0(u8 *arg0) {
     m->b7F = 0;
     m->flags = (m->flags & 0xFFB9) | 0x1000;
     *(s32 *)(s1 + 0x60) = 0;
-    func_PAL_002B3F18((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
+    part_spawn_damage_debris_pal((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
     if (*(s16 *)(s1 + 0x70) != 0) {
         *(s16 *)(s1 + 0x70) = 0;
         set_moby_color(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
@@ -63,11 +63,11 @@ void func_PAL_L11_003F72D0(u8 *arg0) {
     *(s32 *)(s1 + 0x250) = 0;
     f20 = math_fast_sin_or_cos_a(*(f32 *)(s1 + 0x250));
     p = arena_get_center_point(m->slot);
-    m->x = D_L11_001B0558 * f20 + p[0];
+    m->x = g_joba_orbit_radius * f20 + p[0];
     f20 = math_fast_sin_or_cos_b(*(f32 *)(s1 + 0x250));
     p = arena_get_center_point(m->slot);
-    y = D_L11_001B0558 * f20 + p[1];
-    m->z = D_L11_001B0540;
+    y = g_joba_orbit_radius * f20 + p[1];
+    m->z = g_orbit_enemy_start_z;
     m->rotX = -1.5707965f;
     m->rotW = 0;
     m->y = y;

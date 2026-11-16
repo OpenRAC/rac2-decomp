@@ -2,10 +2,10 @@
 
 typedef float V4_F411d00[4] __attribute__((aligned(16)));
 
-extern float D_L16_001B17A0 __attribute__((sda));
-extern float D_L16_001B17B0 __attribute__((sda));
-extern float D_L16_001B17B8 __attribute__((sda));
-extern float D_L16_001B17BC[];
+extern float g_snivelak_lobbed_shot_offset __attribute__((sda));
+extern float g_snivelak_lobbed_launch_rate __attribute__((sda));
+extern float g_snivelak_lobbed_angle_min __attribute__((sda));
+extern float g_snivelak_lobbed_angle_max[];
 
 extern void vec_random_direction(void *, float, float);
 extern void matrix_mul_vec3(void *, void *, char *);
@@ -26,18 +26,18 @@ void snivelak_fire_lobbed_shot(char *moby)
     float rate, angle;
 
     vec_random_direction(offset, 0.0f, 1.0f);
-    matrix_mul_vec3(start, &D_L16_001B17A0, moby + 0xC0);
+    matrix_mul_vec3(start, &g_snivelak_lobbed_shot_offset, moby + 0xC0);
     FastVecAdd(start, start, moby + 0x10);
     FastVecAdd(start, start, offset);
     FastVecScale(goal, offset, 3.0f);
     goal[2] = 0.0f;
     FastVecAdd(goal, goal, *(char **)(vars + 0x24C) + 0x10);
-    rate = D_L16_001B17B0 * 0.016666668f;
-    angle = math_random_float_range(D_L16_001B17B8, D_L16_001B17BC[0]) * 0.00027777778f;
+    rate = g_snivelak_lobbed_launch_rate * 0.016666668f;
+    angle = math_random_float_range(g_snivelak_lobbed_angle_min, g_snivelak_lobbed_angle_max[0]) * 0.00027777778f;
     FastVecSub(velocity, goal, start);
     velocity[2] = 0.0f;
     vec_scale_to_length(velocity, velocity, rate);
-    velocity[2] = weapon_compute_shot_launch_speed(start, goal, 0, D_L16_001B17B0 * 0.016666668f, -angle);
+    velocity[2] = weapon_compute_shot_launch_speed(start, goal, 0, g_snivelak_lobbed_launch_rate * 0.016666668f, -angle);
     SpawnExplosion(start, 0, 0x19, 0x14, 1.0f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0);
     part_spawn_spinning_fragment(*(s32 *)(vars + 0x1F0), start, velocity, 0, angle, (float)*(u8 *)(vars + 0x36));
 }

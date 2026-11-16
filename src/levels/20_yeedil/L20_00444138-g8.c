@@ -7,7 +7,7 @@ typedef unsigned int u32;
 typedef signed short s16;
 
 /* The bound of the object bank, read through $gp in the third test's delay slot. */
-extern u32 D_L20_001B2FA0 __attribute__((sda));
+extern u32 g_moby_l20_list_end __attribute__((sda));
 
 /* The same bound, read absolutely (the retail materialises it with lui/lw). */
 extern u32 D_L20_001B2FA0_abs __attribute__((nosda));
@@ -36,7 +36,7 @@ void yeedil_boss_disable_hazards(void) {
             goto store;
         }
         if ((s16)id != 0x1232 /* moby class 4658 */) {
-            bound = D_L20_001B2FA0;
+            bound = g_moby_l20_list_end;
             goto next;
         }
     store:

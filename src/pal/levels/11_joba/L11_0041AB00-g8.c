@@ -3,27 +3,27 @@
 #include "common.h"
 extern s32 math_random_int_below(s32 arg0);
 extern s32 arena_get_fighter_count(s32 arg0);
-extern s32 D_L11_001B056C __attribute__((sda));
-extern s32 D_L11_001B058C __attribute__((sda));
-extern f32 D_L11_001B0670;
+extern s32 g_joba_max_fighter_count __attribute__((sda));
+extern s32 g_joba_attack_random_range __attribute__((sda));
+extern f32 g_l11_unused_float;
 extern u8 *part_find_owned_effect_slot(s32 arg0, s32 arg1, s32 arg2);
 extern f32 moby_update_aim_target_strength(u8 *arg0, u8 *arg1);
 extern s32 part_spawn_damage_debris(u8 *arg0, u8 *arg1, u8 *arg2);
 extern s32 weapon_select_aim_target(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4, f32 arg5);
-extern f32 D_L11_001B0570 __attribute__((sda));
-extern s32 D_L11_001FFA78[];
+extern f32 g_joba_damage_threshold __attribute__((sda));
+extern s32 g_enemy_damage_accum[];
 extern void matrix_mul_vec3(void *out, void *in, void *matrix);
 extern void FastVecAdd(void *out, void *in, void *matrix);
 extern f32 mat_fast_helper_a(f32 a0, f32 a1);
 extern void euler_rotation_basis(void *a0, void *a1);
 extern s32 FloatToInt(f32 a0);
-extern void func_PAL_L11_0043BE90(u8 *a0, s32 a1, s32 a2);
+extern void enemy_init_state_pal(u8 *a0, s32 a1, s32 a2);
 extern void func_PAL_L11_0044F150(u8 *a0, s32 a1, s32 a2);
-extern void func_PAL_L11_00451E08(u8 *a0, s32 a1, s32 a2);
-extern void func_PAL_L11_00458828(u8 *a0, s32 a1, s32 a2);
-extern void func_PAL_L11_0045A848(u8 *a0, s32 a1, s32 a2);
-extern void func_PAL_L11_0045C028(u8 *a0, s32 a1);
-extern u32 D_L11_001B0D9C __attribute__((sda));
+extern void smasher_robot_init_pal(u8 *a0, s32 a1, s32 a2);
+extern void flamethrower_robot_init_pal(u8 *a0, s32 a1, s32 a2);
+extern void drone_init_state_pal(u8 *a0, s32 a1, s32 a2);
+extern void path_mover_reset_pal(u8 *a0, s32 a1);
+extern u32 g_joba_child_offset_step __attribute__((sda));
 extern u8 g_hero_state[];
 
 /* Places the measured point on the state's three vertices, then walks them: each one gets
@@ -87,23 +87,23 @@ void func_PAL_L11_0041C088(u8 *arg0) {
             func_PAL_L11_0044F150(p, total, 0);
             break;
         case 0xDCF:
-            func_PAL_L11_00451E08(p, total, 0);
+            smasher_robot_init_pal(p, total, 0);
             break;
         case 0xDF4:
-            func_PAL_L11_00458828(p, total, 0);
+            flamethrower_robot_init_pal(p, total, 0);
             break;
         case 0xDF7:
             *(f32 *)(p + 0x18) += 0.5f;
-            func_PAL_L11_0045A848(p, FloatToInt((f32)total * 0.16666667f), 0);
+            drone_init_state_pal(p, FloatToInt((f32)total * 0.16666667f), 0);
             break;
         case 0xDF9:
-            func_PAL_L11_0045C028(p, total);
+            path_mover_reset_pal(p, total);
             break;
         case 0xD37:
-            func_PAL_L11_0043BE90(p, total, 0);
+            enemy_init_state_pal(p, total, 0);
             break;
         }
-        total += ((s32)(D_L11_001B0D9C) * 5 + 2) / 6;
+        total += ((s32)(g_joba_child_offset_step) * 5 + 2) / 6;
     }
 
     *(u8 **)(s1 + 0x10) = 0;

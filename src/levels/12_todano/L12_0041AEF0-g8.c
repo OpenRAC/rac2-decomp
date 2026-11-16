@@ -13,14 +13,14 @@ extern int FloatToInt(float);
 extern u64 GetEffectTextureDescriptor(int);
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(unsigned int, unsigned int, float);
-extern float D_L12_001B1C80 __attribute__((sda));
-extern unsigned int D_L12_001B1C90 __attribute__((sda)), D_L12_001B1C8C __attribute__((sda));
-extern int D_L12_001B1CB8 __attribute__((sda));
-extern int D_L12_001B1CBC __attribute__((sda)), D_L12_001B1CC0 __attribute__((sda));
-extern float D_L12_001B1CC4 __attribute__((sda));
-extern float D_L12_001B1CD0[][2] SDATA(D_L12_001B1CD0);
+extern float g_ring_blast_max_radius __attribute__((sda));
+extern unsigned int g_ring_blast_color_a __attribute__((sda)), g_ring_blast_color_b __attribute__((sda));
+extern int g_ring_l12_texture_id __attribute__((sda));
+extern int g_ring_gs_state_a __attribute__((sda)), g_ring_gs_state_b __attribute__((sda));
+extern float g_ring_z_scale __attribute__((sda));
+extern float g_ring_uv_u_table[][2] SDATA(D_L12_001B1CD0);
 /* Retail walks X through $gp and Y through an absolute cursor. */
-extern float D_L12_001B1CD4[] NOT_SDA;
+extern float g_ring_l12_uv_v_table[] NOT_SDA;
 void DrawAnimatedRings(unsigned char *self)
 {
     RingPacket packets[3];
@@ -37,14 +37,14 @@ void DrawAnimatedRings(unsigned char *self)
     matrix.column[3].value[3] = 1.0f;
     euler_to_matrix(&rotation, &angles);
     fraction = *(float *)(data + 0x70) - (float)FloatToInt(*(float *)(data + 0x70));
-    alpha = (D_L12_001B1C80 - *(float *)(data + 0x6c)) * 0.5f;
+    alpha = (g_ring_blast_max_radius - *(float *)(data + 0x6c)) * 0.5f;
     if (alpha > 1.0f) alpha = 1.0f;
     else if (alpha < 0.0f) alpha = 0.0f;
     for (i = 0; i < 3; i++) {
-        packets[i].tag[1] = GetEffectTextureDescriptor(D_L12_001B1CB8);
+        packets[i].tag[1] = GetEffectTextureDescriptor(g_ring_l12_texture_id);
         packets[i].tag[2] = 0xff9000000260UL;
         packets[i].tag[0] = 5;
-        packets[i].tag[3] = ((u64)D_L12_001B1CBC << 2) | ((u64)D_L12_001B1CC0 << 6) | 0x8000000000UL;
+        packets[i].tag[3] = ((u64)g_ring_gs_state_a << 2) | ((u64)g_ring_gs_state_b << 6) | 0x8000000000UL;
         radius = *(float *)(data + 0x6c) - (float)i * 0.05f;
         angle = (float)i * 0.17453295f;
         nextAngle = FastAddRotations(angle, 0.52359885f);
@@ -54,7 +54,7 @@ void DrawAnimatedRings(unsigned char *self)
         second.value[0] = math_fast_sin_or_cos_a(nextAngle) * radius;
         second.value[1] = math_fast_sin_or_cos_b(nextAngle) * radius;
         second.value[2] = 0.0f; second.value[3] = 1.0f;
-        z = fraction * D_L12_001B1CC4;
+        z = fraction * g_ring_z_scale;
         qcopy(&packets[i].vertex[0], &first);
         packets[i].vertex[0].value[2] = z;
         qcopy(&packets[i].vertex[1], &first);
@@ -63,11 +63,11 @@ void DrawAnimatedRings(unsigned char *self)
         packets[i].vertex[2].value[2] = z;
         qcopy(&packets[i].vertex[3], &second);
         packets[i].vertex[3].value[2] = -z;
-        color = FastTweenColor(D_L12_001B1C90, D_L12_001B1C8C, (1.0f - fraction) * alpha);
+        color = FastTweenColor(g_ring_blast_color_a, g_ring_blast_color_b, (1.0f - fraction) * alpha);
         for (j = 0; j < 4; j++) {
             packets[i].color[j] = color;
-            packets[i].uv[j][0] = D_L12_001B1CD0[j][0];
-            packets[i].uv[j][1] = D_L12_001B1CD4[j * 2];
+            packets[i].uv[j][0] = g_ring_uv_u_table[j][0];
+            packets[i].uv[j][1] = g_ring_l12_uv_v_table[j * 2];
         }
         fraction = fraction >= 0.666f ? fraction + -0.666f : fraction + 0.333f;
     }

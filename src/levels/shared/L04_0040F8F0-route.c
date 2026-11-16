@@ -26,10 +26,10 @@ typedef struct {
 } RouteState;
 
 extern Route *g_route_path_table[];
-extern char D_L04_001B3190[] __attribute__((sda));
-extern char D_L04_001B31A0[] __attribute__((sda));
-extern char D_L04_001B31B0[] __attribute__((sda));
-extern char D_L04_001B31C0[] __attribute__((sda));
+extern char g_route_frame_origin[] __attribute__((sda));
+extern char g_route_frame_delta[] __attribute__((sda));
+extern char g_route_frame_forward[] __attribute__((sda));
+extern char g_route_frame_side[] __attribute__((sda));
 
 extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
@@ -74,8 +74,8 @@ float ProjectLinkedRouteDistance(RouteObject *object, RouteState *state, int lin
     int next, previous;
     float distance, value;
 
-    qcopy_nc(saved, D_L04_001B31A0);
-    if (update && orient) set_identity_rotation_rows(D_L04_001B31A0);
+    qcopy_nc(saved, g_route_frame_delta);
+    if (update && orient) set_identity_rotation_rows(g_route_frame_delta);
 
     if (link == -1) {
         int before = base->count - 1, after = base->count + 1;

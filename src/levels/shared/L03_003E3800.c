@@ -1,7 +1,7 @@
 #include "common.h"
 extern struct { u8 pad[0x148]; f32 x, y; } g_pad_state;
-extern f32 D_L03_0029BBF0[][4];
-extern f32 D_L03_001B9BC0[][4];
+extern f32 g_puzzle_node_directions[][4];
+extern f32 g_path_puzzle_stick_axes[][4];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern f32 FastVecDot(void *, void *);
 extern f32 mat_fast_helper_a(f32, f32);
@@ -20,18 +20,18 @@ int path_puzzle_select_node_from_stick(u8 *moby) {
     selected = -1;
     for (i = 0; i < 8 && vars[0x40+i] != 255; i++) {
         index = vars[0x40+i];
-        matrix_mul_vec3(node_dir, D_L03_0029BBF0[index], moby + 0xc0);
-        dot_x = FastVecDot(node_dir, D_L03_001B9BC0[0]);
-        dot_y = FastVecDot(node_dir, D_L03_001B9BC0[1]);
+        matrix_mul_vec3(node_dir, g_puzzle_node_directions[index], moby + 0xc0);
+        dot_x = FastVecDot(node_dir, g_path_puzzle_stick_axes[0]);
+        dot_y = FastVecDot(node_dir, g_path_puzzle_stick_axes[1]);
         node_angle = mat_fast_helper_a(dot_x, dot_y);
         angle_diff = FastDiffRots(node_angle, angle);
         if (angle_diff < best) { selected = index; best = angle_diff; }
     }
     index = *(short *)(vars+0x5c);
     if (index != *(short *)(vars+0x50)) {
-        matrix_mul_vec3(node_dir, D_L03_0029BBF0[index], moby + 0xc0);
-        dot_x = FastVecDot(node_dir, D_L03_001B9BC0[0]);
-        dot_y = FastVecDot(node_dir, D_L03_001B9BC0[1]);
+        matrix_mul_vec3(node_dir, g_puzzle_node_directions[index], moby + 0xc0);
+        dot_x = FastVecDot(node_dir, g_path_puzzle_stick_axes[0]);
+        dot_y = FastVecDot(node_dir, g_path_puzzle_stick_axes[1]);
         node_angle = mat_fast_helper_a(dot_x, dot_y);
         angle_diff = FastDiffRots(node_angle, angle);
         if (angle_diff < best) selected = index;

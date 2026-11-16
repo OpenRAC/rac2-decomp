@@ -6,10 +6,10 @@ typedef struct DrawPacket5070 {
     float uv[4][2];
     u64 state[4];
 } DrawPacket5070;
-extern int D_L07_001B0A80[] __attribute__((sda));
+extern int g_glow_disc_color_pair[] __attribute__((sda));
 extern int D_L07_001B0A80_gp[] SDATA(D_L07_001B0A80);
-extern float D_L07_001B0A60[][2] SDATA(D_L07_001B0A60);
-extern float D_L07_0029F5B0[][4];
+extern float g_glow_disc_quad_uvs[][2] SDATA(D_L07_001B0A60);
+extern float g_glow_disc_quad_points[][4];
 extern void copy_matrix_rotation(void *, void *);
 extern void euler_rotation_basis(void *, void *);
 extern int PulseColor(float, int, int);
@@ -33,9 +33,9 @@ void entity_draw_glow_disc(char *actor)
     *(Quad5070 *)angle = 0;
     angle[2] = 0.19634955f;
     euler_rotation_basis(rotation, angle);
-    colour = PulseColor(*(float *)(state + 0x1c), D_L07_001B0A80_gp[0], D_L07_001B0A80[1]);
+    colour = PulseColor(*(float *)(state + 0x1c), D_L07_001B0A80_gp[0], g_glow_disc_color_pair[1]);
     colour = FastTweenColor(*(float *)(state + 0x18), colour & 0xffffff, colour);
-    FillQuadPacket(&packets[0], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[0], 1);
-    FillQuadPacket(&packets[1], 5, colour, D_L07_001B0A60, D_L07_0029F5B0[4], 1);
+    FillQuadPacket(&packets[0], 5, colour, g_glow_disc_quad_uvs, g_glow_disc_quad_points[0], 1);
+    FillQuadPacket(&packets[1], 5, colour, g_glow_disc_quad_uvs, g_glow_disc_quad_points[4], 1);
     gfx_transform_and_draw_entries(packets, 2, rotation, 32, world);
 }

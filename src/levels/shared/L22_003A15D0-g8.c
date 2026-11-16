@@ -158,20 +158,20 @@ typedef struct Vars_15D0 {
     char pad4E8[0x4];
     int f4EC;
 } Vars_15D0;
-extern int D_L22_001AF2E8 __attribute__((sda)), D_L22_001AF2F0 __attribute__((sda)), D_L22_001AF2EC __attribute__((sda));
-extern int D_L22_001AF304 __attribute__((sda)), D_L22_001AF394 __attribute__((sda)), D_L22_001AF3C4 __attribute__((sda));
+extern int g_space_ship_difficulty __attribute__((sda)), g_space_ship_difficulty_threshold_b __attribute__((sda)), g_space_ship_difficulty_threshold_a __attribute__((sda));
+extern int g_space_ship_timer __attribute__((sda)), g_space_ship_active_flag __attribute__((sda)), g_lane_check_index __attribute__((sda));
 extern struct Obj_15D0 *ref_L22_003A15D0_00 __attribute__((sda)); /* D_L22_001AF314 in level 22 */
-extern struct Obj_15D0 *D_L22_001AF2E0 __attribute__((sda));
-extern float D_L22_001AF39C __attribute__((sda)), D_L22_001AF330 __attribute__((sda));
-extern int D_L22_001AF3B0[5] __attribute__((sda));
-extern int D_L22_001B2AA8, D_L22_001B2A8C, D_L22_001B2A90;
-extern int D_L22_001B2AD4, D_L22_001B2AC8, D_L22_001B2AD0;
-extern short D_L22_001B2A88;
-extern char *D_L22_001B2AB4;
-extern float D_L22_001B2AA4;
-extern char D_L22_001B1910[], D_L22_001B9C80[];
-extern char D_L22_001AF5D0[] MACRO_ADDR;
-extern char *D_L22_001B211C, *D_L22_001B2120;
+extern struct Obj_15D0 *g_space_ship_target_moby __attribute__((sda));
+extern float g_space_ship_part_scale_b __attribute__((sda)), g_space_ship_part_scale_a __attribute__((sda));
+extern int g_lane_slot_list[5] __attribute__((sda));
+extern int g_space_ship_max_health, g_flying_enemy_spawn_count, g_flying_enemy_spawn_blocked;
+extern int g_space_ship_lane_count, g_pickup_message_kind, g_pickup_message_timer;
+extern short g_space_ship_mode;
+extern char *g_space_ship_pickup_slots;
+extern float g_planet_radius;
+extern char g_ship_pickup_table[], g_tether_origin[];
+extern char g_ship_init_params_template[] MACRO_ADDR;
+extern char *g_ship_slot_array_start, *g_ship_slot_array_end;
 extern void anim_choose_next(void *);
 extern void cam_reset_entry(void *);
 extern void func_001163A0(unsigned int);
@@ -209,31 +209,31 @@ void space_ship_init_and_update(Obj_15D0 *obj) {
         float factor, health, damageScale, rangeScale;
         short x380;
         int eight, alpha;
-        int difficulty=D_L22_001AF2E8;
-        if (D_L22_001AF2F0 < difficulty) factor = 0.6f;
-        else if (D_L22_001AF2EC < difficulty) factor = 0.9f;
+        int difficulty=g_space_ship_difficulty;
+        if (g_space_ship_difficulty_threshold_b < difficulty) factor = 0.6f;
+        else if (g_space_ship_difficulty_threshold_a < difficulty) factor = 0.9f;
         else goto full_health;
-        D_L22_001B2AA8 = (int)(p->f326*factor);
+        g_space_ship_max_health = (int)(p->f326*factor);
         goto health_done;
 full_health:
-        D_L22_001B2AA8 = p->f326;
+        g_space_ship_max_health = p->f326;
 health_done:
         cam_reset_entry(p->f46C);
-        D_L22_001AF304 = 1;
+        g_space_ship_timer = 1;
         func_001163A0(T1_COUNT);
         p->f4EC=1;
-        D_L22_001B2A8C=0; D_L22_001B2AB4=D_L22_001B1910;
-        D_L22_001B2A90=0;
+        g_flying_enemy_spawn_count=0; g_space_ship_pickup_slots=g_ship_pickup_table;
+        g_flying_enemy_spawn_blocked=0;
         p->f460=0; p->f41E=0;
-        D_L22_001AF394=1; D_L22_001B2A88=0;
+        g_space_ship_active_flag=1; g_space_ship_mode=0;
         p->f46A=0; p->f468=0;
         p->f464=0; p->f344=0;
-        D_L22_001B2AD4=5;
-        { int *d=D_L22_001AF3B0; int *s=(int *)D_L22_001AF5D0; int n; for(n=5;n!=0;n--) *d++=*s++; }
-        D_L22_001B2AC8=-1; D_L22_001AF3C4=0; D_L22_001B2AD0=0;
+        g_space_ship_lane_count=5;
+        { int *d=g_lane_slot_list; int *s=(int *)g_ship_init_params_template; int n; for(n=5;n!=0;n--) *d++=*s++; }
+        g_pickup_message_kind=-1; g_lane_check_index=0; g_pickup_message_timer=0;
         p->f34E=0; p->f34C=0;
-        i=0; base=D_L22_001B211C;
-        if(base<D_L22_001B2120) do {
+        i=0; base=g_ship_slot_array_start;
+        if(base<g_ship_slot_array_end) do {
             int id;
             Obj_15D0 *it;
             it=(Obj_15D0 *)(base+i*256);
@@ -243,25 +243,25 @@ health_done:
             if(id==0x133A /* moby class 4922 */) it->f34|=0x41;
             if(it->fAA==0xF6E /* moby class 3950 */) {
                 Sub_15D0 *sub;
-                D_L22_001AF2E0=it; it->f30=255;
-                sub=(Sub_15D0 *)D_L22_001AF2E0->f68;
+                g_space_ship_target_moby=it; it->f30=255;
+                sub=(Sub_15D0 *)g_space_ship_target_moby->f68;
                 sub->f8=0; sub->fA=0; sub->fC=-1;
             }
             i++;
-            base=D_L22_001B211C;
-        } while(base+i*256<D_L22_001B2120);
+            base=g_ship_slot_array_start;
+        } while(base+i*256<g_ship_slot_array_end);
         vec.q=0; vec.f[0]=0.00161f; vec.f[1]=0.29459f; vec.f[2]=1.57105f;
         qcopy(&g_hero_state.rotation,&vec); qcopy(&g_hero_state.position,(char *)found+0x10);
         g_hero_state.health=p->f324;
         FastVecSub(&vec,(char *)obj+0x10,(char *)&g_hero_state.rotation+0x20);
-        D_L22_001B2AA4=FastVecLength(&vec);
+        g_planet_radius=FastVecLength(&vec);
         obj->f34|=0x100;
         x380=math_random_int_below(30);
         eight=8;
         p->fD7=1; p->f70=37; p->f71=4;
         p->f77=eight; p->f72=eight; p->f76=eight;
         p->fCC=9; p->fCD=18; p->fCE=9; p->fCF=18; p->fD2=-1; p->fD3=-1;
-        health=(float)D_L22_001B2AA8;
+        health=(float)g_space_ship_max_health;
         rangeScale=900.0f/health; damageScale=9.0f/health;
         p->f7C=0.5833333730697632f; p->f80=1.0f/15;
         p->f84=1.0f/24; p->f88=1.0f/12;
@@ -272,7 +272,7 @@ health_done:
         p->f138=0.20000002f; p->f110=2.5f; p->f114=0.75f;
         p->f120=2; p->f118=2.75f; p->f144=0; p->f380=x380;
         p->f11C=2.75f; p->f1F8=12; p->f1F9=11;
-        { float health=(float)D_L22_001B2AA8;
+        { float health=(float)g_space_ship_max_health;
         p->f148|=1; p->f140=0.7853982448577881f;
         p->f28=3; p->f26=60;
         p->f20=health;
@@ -284,7 +284,7 @@ health_done:
         p->f378=0; p->f37C=0; p->f37A=0;
         p->f35E=0; p->f350=0;
         obj->f34|=0x4000;
-        obj->f2C=obj->f24->f24*D_L22_001AF39C;
+        obj->f2C=obj->f24->f24*g_space_ship_part_scale_b;
         lane_build_connection_masks(obj); pickup_spawn_initial((char *)obj);
         p->f440=CreateMoby(0xE0A /* moby class 3594 */); set_identity_rotation_rows((char *)p->f440+0xC0);
         p->f444=CreateMoby(0xE0C /* moby class 3596 */); p->f448=CreateMoby(0xF8F /* moby class 3983 */);
@@ -296,9 +296,9 @@ health_done:
         p->f440->f38=obj->f38;
         p->f440->f78=obj->f78;
         p->f440->f31=1;
-        it=p->f440; it->f2C=it->f24->f24*D_L22_001AF39C;
+        it=p->f440; it->f2C=it->f24->f24*g_space_ship_part_scale_b;
         it=p->f440;
-        if(it->f31 && fast_vec_dist((char *)it+0x10,D_L22_001B9C80)<24.0f) {
+        if(it->f31 && fast_vec_dist((char *)it+0x10,g_tether_origin)<24.0f) {
             moby_update_ground_check(p->f440); p->f440->f6F=22;
         }
     }
@@ -307,27 +307,27 @@ health_done:
         p->f444->f38=obj->f38;
         p->f444->f78=obj->f78;
         p->f444->f31=1;
-        it=p->f444; it->f2C=it->f24->f24*D_L22_001AF39C;
+        it=p->f444; it->f2C=it->f24->f24*g_space_ship_part_scale_b;
     }
     if(p->f448) {
         p->f448->f32=80; p->f448->f30=obj->f30;
         p->f448->f38=obj->f38;
         p->f448->f78=obj->f78;
         p->f448->f31=1;
-        it=p->f448; it->f2C=it->f24->f24*D_L22_001AF330;
+        it=p->f448; it->f2C=it->f24->f24*g_space_ship_part_scale_a;
         func_002A0F48(p->f448);
     }
     cam_compute_view_direction((char *)obj+0x10,(char *)p+0x200,0); vec_negate_and_forward((char *)obj+0xC0,(char *)p+0x200,0); moby_apply_damage_to_object(obj,(char *)p+0x60,0);
-    obj->f2C=obj->f24->f24*D_L22_001AF39C;
-    if(D_L22_001AF304) {
-        if(++D_L22_001AF304>32000) D_L22_001AF304=1;
+    obj->f2C=obj->f24->f24*g_space_ship_part_scale_b;
+    if(g_space_ship_timer) {
+        if(++g_space_ship_timer>32000) g_space_ship_timer=1;
         g_hero_state.mode=10;
         if(obj->f95!=1) {
             p->f350=0; p->f3E4=p->f3E8=0.0f; moby_set_state(obj,1,1);
         }
         if(g_pad_state.buttons&0x50) {
-            D_L22_001AF304=0; moby_set_state(obj,5,0); g_pad_state.buttons=0; g_hero_state.mode=20;
-        } else if(D_L22_001AF304<30) {
+            g_space_ship_timer=0; moby_set_state(obj,5,0); g_pad_state.buttons=0; g_hero_state.mode=20;
+        } else if(g_space_ship_timer<30) {
             g_hero_state.field2294=0; cancel_hero_item_animation();
             release_moby_animation_slot(g_hero_state.field2290,&g_hero_state.field1870);
             g_hero_state.field187C=0; hero_l22_set_action(0,1);
@@ -336,7 +336,7 @@ health_done:
         p->f350=0; p->f3E4=p->f3E8=0.0f;
         moby_set_state(obj,2,1); p->f384=30;
     }
-    if(obj->f31 && fast_vec_dist((char *)obj+0x10,D_L22_001B9C80)<24.0f) {
+    if(obj->f31 && fast_vec_dist((char *)obj+0x10,g_tether_origin)<24.0f) {
         moby_update_ground_check(obj); obj->f6F=22;
     }
 }

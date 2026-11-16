@@ -6,7 +6,7 @@
 typedef unsigned int B40Quad __attribute__((mode(TI)));
 extern int ref_L00_00327B40_00 __attribute__((sda));
 extern float ref_L00_00327B40_01 __attribute__((sda));
-extern int D_001BF000[];
+extern int g_nearby_mobys[];
 typedef struct { unsigned char pad[0x20]; unsigned char selection; } SettingsB40;
 extern SettingsB40 g_item_slot_to_record;
 typedef struct { char pad[0x70]; float damage; char tail[0x6C]; } B40Class;
@@ -56,7 +56,7 @@ void DamageNearbyMobys(ObjectB40 *self)
     radius = *(float *)(state + 0x24) < ref_L00_00327B40_01 ? *(float *)(state + 0x24) : ref_L00_00327B40_01;
     count = coll_process_hit(self->pos, 0, self, 0, radius);
     if (count > 0) {
-        list = D_001BF000;
+        list = g_nearby_mobys;
         remaining = count;
         do {
             obj = (char *)*list;

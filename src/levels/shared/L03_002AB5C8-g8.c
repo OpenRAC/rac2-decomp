@@ -3,14 +3,14 @@
 #include "names.h"
 
 /* Big level-side array: keep the absolute materialisation (`lui+addiu`), never $gp. */
-extern unsigned char D_L03_00189E20[] __attribute__((nosda));
+extern unsigned char g_hero_l03_state_block[] __attribute__((nosda));
 
-extern float D_L03_001AEF64 __attribute__((sda));
+extern float g_point_ahead_distance __attribute__((sda));
 
 extern int g_frame_l03_counter;
-extern int D_L03_001A9028;
-extern int D_L03_001A9024;
-extern int D_L03_001C63A8[] __attribute__((nosda));
+extern int g_frame_moby_id_frame;
+extern int g_frame_moby_id_count;
+extern int g_moby_frame_id_list[] __attribute__((nosda));
 
 extern void func_2EF020(unsigned char *, unsigned char *, float);
 
@@ -21,13 +21,13 @@ void moby_compute_point_ahead(unsigned char *object, unsigned char *outPoint) {
     unsigned char *point = outPoint;
     unsigned char *self = object;
 
-    func_2EF020(point, self + 0xC0, D_L03_001AEF64);
+    func_2EF020(point, self + 0xC0, g_point_ahead_distance);
     func_2EEFB0(point, point, self + 0x10);
 }
 
-extern int D_L03_001AEF60 __attribute__((sda));
+extern int g_random_vector_frame __attribute__((sda));
 
-extern float D_L03_00237F40[] __attribute__((nosda));
+extern float g_random_vector_table[] __attribute__((nosda));
 
 extern float func_31BAE8(float, float);
 
@@ -36,9 +36,9 @@ void math_refresh_random_vector_table(void) {
     float *vectors;
     int i;
 
-    if (D_L03_001AEF60 >= g_frame_l03_counter)
+    if (g_random_vector_frame >= g_frame_l03_counter)
         return;
-    vectors = D_L03_00237F40;
+    vectors = g_random_vector_table;
     for (i = 15; i >= 0; i--) {
         vectors[0] = func_31BAE8(0.0f, 1.0f);
         vectors[1] = func_31BAE8(0.0f, 1.0f);
@@ -46,18 +46,18 @@ void math_refresh_random_vector_table(void) {
         vectors[3] = 1.0f;
         vectors += 4;
     }
-    D_L03_001AEF60 = g_frame_l03_counter;
+    g_random_vector_frame = g_frame_l03_counter;
 }
 
 /* Remembers an id in a list of up to 32 entries. The list starts over when the frame number changes. */
 void moby_add_id_to_frame_list(int value) {
-    if (g_frame_l03_counter != D_L03_001A9028) {
-        D_L03_001A9028 = g_frame_l03_counter;
-        D_L03_001A9024 = 0;
+    if (g_frame_l03_counter != g_frame_moby_id_frame) {
+        g_frame_moby_id_frame = g_frame_l03_counter;
+        g_frame_moby_id_count = 0;
     }
-    if (D_L03_001A9024 < 0x20) {
-        D_L03_001C63A8[D_L03_001A9024] = value;
-        D_L03_001A9024 = D_L03_001A9024 + 1;
+    if (g_frame_moby_id_count < 0x20) {
+        g_moby_frame_id_list[g_frame_moby_id_count] = value;
+        g_frame_moby_id_count = g_frame_moby_id_count + 1;
     }
 }
 
@@ -75,10 +75,10 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float vec_length_xy(void *);
 
-extern float D_L03_001B0040 __attribute__((sda));
-extern float D_L03_001B0044 __attribute__((sda));
-extern float D_L03_001B0048 __attribute__((sda));
-extern float D_L03_001B004C __attribute__((sda));
+extern float g_aim_height_offset_a __attribute__((sda));
+extern float g_aim_height_offset_b __attribute__((sda));
+extern float g_aim_height_offset_c __attribute__((sda));
+extern float g_aim_height_offset_d __attribute__((sda));
 
 /* Builds a vector with the engine's VU0 helpers, trims its z by the constant the state at
    0xAA names, and stores the two clamped, halved angles in the moby at 0x68. */
@@ -102,16 +102,16 @@ void moby_aim_body_toward_point(unsigned char *object, void *target) {
 
     switch (*(short *)(object + 0xAA)) {
     case MOBY_CLASS_GADGEBOT:
-        toTarget.z -= D_L03_001B0040;
+        toTarget.z -= g_aim_height_offset_a;
         break;
     case 0x93C /* moby class 2364 */:
-        toTarget.z -= D_L03_001B0044;
+        toTarget.z -= g_aim_height_offset_b;
         break;
     case MOBY_CLASS_BRIDGEBOT:
-        toTarget.z -= D_L03_001B0048;
+        toTarget.z -= g_aim_height_offset_c;
         break;
     case 0xA59 /* moby class 2649 */:
-        toTarget.z -= D_L03_001B004C;
+        toTarget.z -= g_aim_height_offset_d;
         break;
     }
 
@@ -138,11 +138,11 @@ void moby_aim_body_toward_point(unsigned char *object, void *target) {
 
 /* The group count is read through $gp here; the group table is absolute and the entity base is
    the bare `lui`/`lw` pair (`sda` sized over 8 bytes in a -G8 unit). */
-extern int D_L03_001B2A38 __attribute__((sda));
+extern int g_object_group_count __attribute__((sda));
 
-extern unsigned char *D_L03_001B2A1C[3] __attribute__((sda));
+extern unsigned char *g_moby_record_base[3] __attribute__((sda));
 
-extern unsigned short *D_L03_001FB5A0[];
+extern unsigned short *g_entity_id_lists[];
 
 extern void vec_clear_128(void *);
 
@@ -166,11 +166,11 @@ int moby_count_teammates_by_side(unsigned char *object, float *point) {
     angles[2] = mat_fast_helper_a(point[0] - *(float *)(object + 0x10), point[1] - *(float *)(object + 0x14));
     euler_to_matrix(frame, angles);
     matrix_from_basis_rows(frame, frame);
-    for (entryList = D_L03_001FB5A0[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && entryList != 0 &&
-         ((entryList != 0 && (short)entryList[-1] >= 0) || entryList == D_L03_001FB5A0[object[0x21]]);
+    for (entryList = g_entity_id_lists[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_object_group_count && entryList != 0 &&
+         ((entryList != 0 && (short)entryList[-1] >= 0) || entryList == g_entity_id_lists[object[0x21]]);
          entryList++) {
-        other = D_L03_001B2A1C[0] + ((*entryList & 0x7FFF) << 8);
+        other = g_moby_record_base[0] + ((*entryList & 0x7FFF) << 8);
         if (other == 0)
             break;
         if (other[0x20] == 0xFE)

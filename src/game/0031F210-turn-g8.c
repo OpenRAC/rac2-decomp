@@ -38,7 +38,7 @@ extern void value_set_and_smooth(void *, void *, int, int, float);
 extern float FastAddRotations(float, float);
 extern void enemy_attach_turn_child_parts(void *, float, void *, int, void *);
 /* The incomplete sda array retains the retail absolute address macro. */
-extern char D_001A8BD0[] __attribute__((sda));
+extern char g_default_effect_vector[] __attribute__((sda));
 extern void gfx_draw_beam_quad_between_points_2(void);
 extern void gfx_register_overlay_draw_callback(void (*)(void), void *);
 extern void group_sync_counter(void *, void *);
@@ -50,9 +50,9 @@ void group_enemy_update_turn_joints(TurnObject *object)
 
     if (object->f95 != 0 && object->state != 3 && object->f95 != 5 && data->f2C4 == 0) {
         data->turnAngle = FastAddRotations(data->turnAngle, data->turnRate * 0.017453294f);
-        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 1, D_001A8BD0);
+        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 1, g_default_effect_vector);
     } else {
-        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 0, D_001A8BD0);
+        enemy_attach_turn_child_parts(object, data->turnAngle, data->f2A0, 0, g_default_effect_vector);
     }
     gfx_update_color_fade(object, data->f50);
     FastDecTimer(data->f270);

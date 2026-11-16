@@ -19,8 +19,8 @@ extern float FastAddRotations(float,float);
 extern int coll_sweep_from_object(char *,void *,float,float,float,int,int,int,int);
 extern void part_spawn_masked_debris(char *,int,void *,int,float,float,float,float);
 extern void part_spawn_crash_debris(char *);
-extern int D_0018C0B4 __attribute__((nosda));
-extern float D_L06_001B1D70 __attribute__((sda));
+extern int g_game_mode __attribute__((nosda));
+extern float g_breakable_local_point __attribute__((sda));
 extern float D_L06_001B1D70_4[] MACRO_ADDR;
 extern struct { char pad[0x160]; float f160; int pad164, n168, n16c; char pad170[16]; float f180; int pad184,n188; } g_camera_state __attribute__((nosda));
 /* The two height tests read their own values: with -frac2-gcse-unsplit-edges gcse leaves both
@@ -56,14 +56,14 @@ void breakable_machine_update(char *moby) {
  gfx_update_color_fade(moby,vars+0x50);
  *(float *)(vars+0x68)+=0.000290888245f;
  *(float *)(moby+0xF4)=FastAddRotations(*(float *)(moby+0xF4),*(float *)(vars+0x68));
- if(*(float *)(moby+0xF4)>0.628318548f && D_0018C0B4!=140) {
+ if(*(float *)(moby+0xF4)>0.628318548f && g_game_mode!=140) {
  *(int *)(moby+0x98)=0;
  for(i=0;i<6;i++) {
  frac=i*0.2f;
  moby_compute_local_point(moby,frac*1.5f+(-0.5f),0,frac*7+2,pos);
  coll_sweep_from_object(moby,pos,0.8f,4,1,0x30009,0,1,0);
  }
- moby_compute_local_point(moby,D_L06_001B1D70,D_L06_001B1D70_4[1],D_L06_001B1D70_4[2],pos);
+ moby_compute_local_point(moby,g_breakable_local_point,D_L06_001B1D70_4[1],D_L06_001B1D70_4[2],pos);
  coll_sweep_from_object(moby,pos,2.5f,4,1,0x4030000,0,1,0);
  }
  if(*(float *)(moby+0xF4)>1.2566371f) moby_set_state(moby,3,-1);
@@ -80,7 +80,7 @@ void breakable_machine_update(char *moby) {
  g_camera_state.n168=60;
  g_camera_state.n16c=0;
  *(unsigned short *)(moby+0x7C)=0x8100;
- matrix_mul_vec3(vel,&D_L06_001B1D70,moby+0xC0);
+ matrix_mul_vec3(vel,&g_breakable_local_point,moby+0xC0);
  FastVecAdd(moby+0x10,moby+0x10,vel);
  }
  coll_sweep_from_object(moby,moby+0x10,2.5f,4,1,0x4030000,0,1,0);

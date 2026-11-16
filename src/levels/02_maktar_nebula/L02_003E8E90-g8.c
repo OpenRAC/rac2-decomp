@@ -13,9 +13,9 @@ extern char g_hero_state[];
 
 /* Two plain words, tilts in degrees. Read as one array with `[1]` in the first arm, they keep the
    two arms apart (as two scalars the else load is hoisted above the test, 8 bytes shorter). */
-extern float D_L02_001B0C10[2];
+extern float g_tether_swing_tilts[2];
 
-extern float D_L02_001B0C18 __attribute__((sda));
+extern float g_tether_swing_velocity_limit __attribute__((sda));
 
 extern float mat_fast_helper_a(float, float);
 
@@ -52,9 +52,9 @@ int tether_swing_entity(char *actor) {
     char *hero;
 
     if (*(short *)(entity + 0xAA) == 0x9C8 /* moby class 2504 */)
-        tilt = D_L02_001B0C10[1];
+        tilt = g_tether_swing_tilts[1];
     else
-        tilt = D_L02_001B0C10[0];
+        tilt = g_tether_swing_tilts[0];
     heading = *(float *)(actor + 0xF8);
     hero = g_hero_state;
     if (FastDiffRots(*(float *)(actor + 0xF8),
@@ -65,7 +65,7 @@ int tether_swing_entity(char *actor) {
     vec_build_spherical_offset(wantedVel, *(float *)(state + 0x44), heading, tilt * 0.01745329424738884f);
     entityPos = entity + 0x10;
     FastVecSub(velDelta, wantedVel, point);
-    vec_clamp_length(velDelta, D_L02_001B0C18 * 0.00027777778450399637f);
+    vec_clamp_length(velDelta, g_tether_swing_velocity_limit * 0.00027777778450399637f);
     FastVecAdd(point, point, velDelta);
     FastVecAdd(entityPos, entityPos, point);
     FastVecSub(flatOffset, entityPos, actor + 0x10);

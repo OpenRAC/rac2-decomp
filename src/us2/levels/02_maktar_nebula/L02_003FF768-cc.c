@@ -82,7 +82,7 @@ extern void blade_ball_explode(char *);
 
 /* Walks the 16-bit stream the object's table entry points at and calls the handler of the
    entity type each word names; a negative word ends the stream. */
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern void IncrementMaktarTypeCounter(char *, s32);
 
 /* The test of the entity walks below: the group word at +0x40 is read again for every condition,
@@ -96,7 +96,7 @@ extern void IncrementMaktarTypeCounter(char *, s32);
 void IncrementMaktarTypeCounter(char *a0, s32 a1);
 
 extern char *g_moby_l02_pool __attribute__((section(".sdata")));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 /* Counts the entities of the object's group (state word 0x48) for which func_L02_004024A0 holds, then
    sets (func_L02_004024B0) or clears (func_L02_004024C0) entities until the count equals A1. */
 /* Counts the entities of the object's group (state word 0x4C) for which func_L02_003D7300 holds, then

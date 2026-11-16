@@ -16,7 +16,7 @@ typedef struct {
     int mode;
 } SearchHero;
 extern SearchHero g_hero_state;
-extern short D_L04_001B2630[] MACRO_ADDR __attribute__((sda));
+extern short g_moby_search_results[] MACRO_ADDR __attribute__((sda));
 extern char *g_moby_l04_pool;
 extern int IsPointInCuboid(void *, int);
 extern int point_in_path_xy(void *, void *, int);
@@ -68,8 +68,8 @@ int FindHeroOrMobyTarget(char *source, SearchOutput *out, int *areas, int count,
             result = 2;
         }
     }
-    for (j = 1; j <= D_L04_001B2630[0]; j++) {
-        m = g_moby_l04_pool + (D_L04_001B2630[j] << 8);
+    for (j = 1; j <= g_moby_search_results[0]; j++) {
+        m = g_moby_l04_pool + (g_moby_search_results[j] << 8);
         if (m && (WSHORT(m, 0xAA) == MOBY_CLASS_DECOY || WSHORT(m, 0xAA) == 0x76C /* moby class 1900 */) && WBYTE(m, 0x20) != 0xFE
             && WBYTE(m, 0x20) != 0xFD && WBYTE(m, 0x20) == 3) {
             valid = 1;

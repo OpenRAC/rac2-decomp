@@ -11,7 +11,7 @@ extern s32 func_2F4BE0(f32);
 extern void *func_332F58(s32);
 
 /* A halfword read through $gp. */
-extern u16 D_L22_001AA5EC __attribute__((sda));
+extern u16 g_homing_trail_value __attribute__((sda));
 
 /* func_L22_0039CDC0 reads $gp data (the scale and facing-limit floats), hence -G8. */
 
@@ -72,12 +72,12 @@ extern f32 ref_L22_0039CDC0_10(void *, void *);
    final flags update off $v0. */
 extern s32 ref_L22_0039CDC0_11(s32, s32, void *);
 
-extern f32 D_L22_001AF2B0 __attribute__((sda));
-extern f32 D_L22_001AF2C8 __attribute__((sda));
+extern f32 g_homing_projectile_scale __attribute__((sda));
+extern f32 g_homing_dot_threshold __attribute__((sda));
 /* Incomplete: read here with retail's absolute lui/lw, not through $gp. */
 extern ProjectileObject *ref_L22_0039CDC0_12[] __attribute__((sda));
 extern Hero g_hero_state;
-extern Quad D_L22_001B1930 __attribute__((sda));
+extern Quad g_homing_projectile_aim __attribute__((sda));
 
 /* Allocates a kind-0x1F record for a handle. Three vector helpers combine the given point
    with the handle's vector at +0x10, one step scaled by 0.25; the record takes the result,
@@ -105,7 +105,7 @@ void part_spawn_homing_trail(u32 colour, Vector point, u8 *handle)
     record[0x9] = func_2F4BE0(4.0f) + 0x70;
     record[0x3] = 0x44;
     record[0x1] = 2;
-    *(u16 *)(record + 0xA) = D_L22_001AA5EC;
+    *(u16 *)(record + 0xA) = g_homing_trail_value;
     *(u8 **)(record + 0x30) = handle;
 }
 
@@ -125,7 +125,7 @@ ProjectileObject *homing_projectile_spawn(ProjectileObject *owner, Quad *positio
     if (obj) {
         data = obj->data;
         ref_L22_0039CDC0_1(obj, owner);
-        obj->scale *= D_L22_001AF2B0;
+        obj->scale *= g_homing_projectile_scale;
         obj->flags |= 0x100;
         data->turn = 1.0f / 3.0f;
         obj->basis[0] = owner->basis[0];
@@ -175,16 +175,16 @@ ProjectileObject *homing_projectile_spawn(ProjectileObject *owner, Quad *positio
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);
             if ((owner == g_hero_state.moby && !data->target->targetable)
-                || dot < D_L22_001AF2C8 || distance > 50.0f || reject)
+                || dot < g_homing_dot_threshold || distance > 50.0f || reject)
                 data->target = 0;
             if (owner == g_hero_state.moby) {
                 if (data->target) {
                     g_hero_state.aim = &data->direction;
                 } else if (g_hero_state.state == 0x5b) {
-                    qcopy(&D_L22_001B1930, &owner->basis[2]);
-                    ref_L22_0039CDC0_2(&D_L22_001B1930, &D_L22_001B1930, -1.0f);
-                    g_hero_state.aim = &D_L22_001B1930;
-                    qcopy(&data->direction, &D_L22_001B1930);
+                    qcopy(&g_homing_projectile_aim, &owner->basis[2]);
+                    ref_L22_0039CDC0_2(&g_homing_projectile_aim, &g_homing_projectile_aim, -1.0f);
+                    g_hero_state.aim = &g_homing_projectile_aim;
+                    qcopy(&data->direction, &g_homing_projectile_aim);
                     data->mode = 0;
                     data->target = (ProjectileObject *)1;
                     data->player = 0;

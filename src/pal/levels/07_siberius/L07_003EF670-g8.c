@@ -19,12 +19,12 @@ extern int weapon_select_aim_target(void *,int,float,float,int,int);
 extern void moby_mark_spawned(void *);
 extern void entity_set_group_alert_c(void *);
 extern void func_PAL_L07_003EFEA0(void *);
-extern float D_L07_001B0BA8 __attribute__((sda));
-extern int D_L07_001B0BB0 __attribute__((sda));
-extern int D_L07_001B0BB4[] __attribute__((sda));
-extern int D_L07_001C9780 NOT_SDA;
-extern char *D_L07_001B1F40[] __attribute__((sda));
-extern char D_L07_001B9200[];
+extern float g_shooter_alt_turn_rate __attribute__((sda));
+extern int g_shooter_alt_timer_init __attribute__((sda));
+extern int g_shooter_alt_timer_table[] __attribute__((sda));
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern char *g_shooter_path_table[] __attribute__((sda));
+extern char g_hero_position_block[];
 
 /* Initialize the entity, handle nearby collision targets, and update its animation. */
 void func_PAL_L07_003EF670(unsigned char *o)
@@ -45,7 +45,7 @@ void func_PAL_L07_003EF670(unsigned char *o)
         FLOAT_AT(p,0x17C)=0.15f;
         FLOAT_AT(p,0x170)=1.0f;
         FLOAT_AT(p,0x174)=1.0f;
-        turn=D_L07_001B0BA8;
+        turn=g_shooter_alt_turn_rate;
         turn*=0.017453294f;
         FLOAT_AT(p,0x180)=FLOAT_AT(o,0x18)-3.0f;
         INT_AT(p,0x88)|=0x201;
@@ -54,23 +54,23 @@ void func_PAL_L07_003EF670(unsigned char *o)
         FLOAT_AT(p,0x60)=3.1415927f;
         if (math_random_int_below(2)) turn=-turn;
         FLOAT_AT(p,0x12C)=turn;
-        U16_AT(p,0x132)=((s32)(D_L07_001B0BB0)*5+2)/6;
-        U16_AT(p,0x134)=((s32)(D_L07_001B0BB4[0])*5+2)/6;
+        U16_AT(p,0x132)=((s32)(g_shooter_alt_timer_init)*5+2)/6;
+        U16_AT(p,0x134)=((s32)(g_shooter_alt_timer_table[0])*5+2)/6;
         FLOAT_AT(p,0x7C)=0.008f;
         if (INT_AT(p,0x2B0)!=-1) {
-            char *entry=D_L07_001B1F40[0]+INT_AT(p,0x2B0)*0x30;
+            char *entry=g_shooter_path_table[0]+INT_AT(p,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(p,0x8C)=**(int **)(entry+0x3C);
             else INT_AT(p,0x8C)=-1;
         }
         qcopy(p+0x2E0,o+0x10);
-        if (FLOAT_AT(o,0x18)>FLOAT_AT((char *)&D_L07_001C9780,0x28)) {
+        if (FLOAT_AT(o,0x18)>FLOAT_AT((char *)&g_cutscene_l07_active_flag,0x28)) {
             o[0x30]=255;
             INT_AT(p,0x320)=1;
         }
         FLOAT_AT(o,0x18)+=0.5f;
         coll_get_ground_distance_below(o+0x10,o,o+0x10);
         if (INT_AT(p,0x2B0)!=-1) {
-            char *entry=D_L07_001B1F40[0]+INT_AT(p,0x2B0)*0x30;
+            char *entry=g_shooter_path_table[0]+INT_AT(p,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(p,0x8C)=**(int **)(entry+0x3C);
             else INT_AT(p,0x8C)=-1;
         }
@@ -87,7 +87,7 @@ void func_PAL_L07_003EF670(unsigned char *o)
             if (o[0x43]) func_PAL_002A7E68(o,0,0,0);
         }
     }
-    if (o[0x31] && fast_vec_dist(o+0x10,D_L07_001B9200)<24.0f) {
+    if (o[0x31] && fast_vec_dist(o+0x10,g_hero_position_block)<24.0f) {
         moby_update_ground_check(o);
         o[0x6F]=22;
     }

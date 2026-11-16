@@ -9,7 +9,7 @@ extern void SpawnJointParticleBursts(char *, int, int);
 extern void chainblade_draw_glows(char *);
 extern char *g_active_attacker_robot;
 
-void func_PAL_L02_003D8738(char *arg0) {
+void chainblade_update_effects_timers_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
 
     if (*(unsigned char *)(arg0 + 0x95) == 2 ||

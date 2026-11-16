@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L05_001AFC58 __attribute__((sda));
-extern float D_L05_001AFC54 __attribute__((sda));
-extern char D_L05_001BFB00[];
+extern float g_hit_damage_b __attribute__((sda));
+extern float g_hit_damage_a __attribute__((sda));
+extern char g_collision_l05_result[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void QueueMobyImpact(void *, void *);
 extern char *func_L05_003D1E60(void *, int, int);
@@ -34,13 +34,13 @@ void func_PAL_L05_003D50B0(char *obj, char *input, float *output)
     hit.flags = 0x810000;
     hit.obj = obj;
     if (*(int *)(input + 0x24))
-        hit.damage = D_L05_001AFC58;
+        hit.damage = g_hit_damage_b;
     else
-        hit.damage = D_L05_001AFC54;
+        hit.damage = g_hit_damage_a;
     hit.one = 1;
     qcopy(hit.pos, input);
     vec_scale_to_length(&hit, &hit, 1.0f);
-    table = D_L05_001BFB00;
+    table = g_collision_l05_result;
     hit.pos[3] = 5627.9248046875f;
     hit.type = 3;
     hit.subtype = 2;
@@ -80,9 +80,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
-extern float D_L05_001AFC60[] SDATA(D_L05_001AFC60);
-extern float D_L05_001AFC70[] SDATA(D_L05_001AFC70);
-extern float D_L05_001AFC80[] SDATA(D_L05_001AFC80);
+extern float g_particle_params_first[] SDATA(D_L05_001AFC60);
+extern float g_particle_params_second[] SDATA(D_L05_001AFC70);
+extern float g_particle_params_third[] SDATA(D_L05_001AFC80);
 
 /* For each of two points in the object's frame, either side of it in Y, makes three copies of the
    point and passes each to func_L00_0033C0D0 with a random speed. */
@@ -116,11 +116,11 @@ void func_PAL_L05_003D5800(char *obj)
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    part_spawn_object_relative_particle(obj, p1, speed, g_particle_params_first, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    part_spawn_object_relative_particle(obj, p2, speed, g_particle_params_second, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
+    part_spawn_object_relative_particle(obj, p3, speed, g_particle_params_third, 1);
     y = -0.061f;
     *(TI128 *)b = 0;
     b[0] = -0.21f;
@@ -138,9 +138,9 @@ void func_PAL_L05_003D5800(char *obj)
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p1, speed, D_L05_001AFC60, 1);
+    part_spawn_object_relative_particle(obj, p1, speed, g_particle_params_first, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p2, speed, D_L05_001AFC70, 1);
+    part_spawn_object_relative_particle(obj, p2, speed, g_particle_params_second, 1);
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
-    part_spawn_object_relative_particle(obj, p3, speed, D_L05_001AFC80, 1);
+    part_spawn_object_relative_particle(obj, p3, speed, g_particle_params_third, 1);
 }

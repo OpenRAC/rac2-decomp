@@ -1,8 +1,8 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_001B168C;
-extern float D_001B1690 __attribute__((sda));
-extern unsigned char *D_001F256C[];
+extern float g_frame_time_scale;
+extern float g_tick_time_scale __attribute__((sda));
+extern unsigned char *g_firework_spark_textures[];
 typedef struct { float v[4]; int color,endcolor; unsigned char a,c,b,life; float size; } MotionBCB0;
 extern int math_random_int_below(int);
 extern char *part_alloc(int);
@@ -19,9 +19,9 @@ char *part_spawn_firework_spark(void *pos,void *velocity,int color,int endcolor,
     float random_dir[4] __attribute__((aligned(16)));
     if(!life) return 0;
     {
-        if ((D_001B168C>0.85f || D_001B1690>0.85f) && !math_random_int_below(3)) return 0;
-        if ((D_001B168C>0.9f || D_001B1690>0.9f) && !math_random_int_below(2)) return 0;
-        if ((D_001B168C>1.0f || D_001B1690>1.0f) && !math_random_int_below(1)) return 0;
+        if ((g_frame_time_scale>0.85f || g_tick_time_scale>0.85f) && !math_random_int_below(3)) return 0;
+        if ((g_frame_time_scale>0.9f || g_tick_time_scale>0.9f) && !math_random_int_below(2)) return 0;
+        if ((g_frame_time_scale>1.0f || g_tick_time_scale>1.0f) && !math_random_int_below(1)) return 0;
     }
     particle=part_alloc(11);
     if(particle) {
@@ -33,7 +33,7 @@ char *part_spawn_firework_spark(void *pos,void *velocity,int color,int endcolor,
         *(float *)(particle+12)=0;
         motion=(MotionBCB0 *)(particle+32);
         particle[8]=func_001163B0();
-        particle[2]=D_001F256C[0][0];
+        particle[2]=g_firework_spark_textures[0][0];
         *(TI128 *)random_dir=0;
         random_dir[0]=math_random_float_range(-1.0f,1.0f);
         random_dir[1]=math_random_float_range(-1.0f,1.0f);

@@ -15,12 +15,12 @@ extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
 extern int flag_is_third_pending_set(void *);
 extern int PlayMobySound(int, int, void *);
-extern int func_PAL_002B5C98(void *, void *, float);
+extern int moby_step_controller_pal(void *, void *, float);
 extern float MobySpringTurn(void *, float, float, float, float, void *);
-extern int func_PAL_L01_00323068(void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int path_set_follower_nodes(void *, void *, int, int);
 extern void moby_set_flag_bit(void *, int);
-extern void func_PAL_L04_003F00D8(void *);
+extern void hovering_object_update_motion_pal(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -38,7 +38,7 @@ typedef struct Motion {
 } Motion;
 typedef struct State { char pad[0x50]; Motion motion; } State;
 
-void func_PAL_L04_003EF870(char *obj)
+void flying_vehicle_update_pal(char *obj)
 {
  char *state = *(char **)(obj + 0x68);
  float oldpos[4], delta[4], oldrot[4], temp[4], temp2[4], velocity[4], pos[4];
@@ -78,7 +78,7 @@ void func_PAL_L04_003EF870(char *obj)
  }
  case 2:
   if (flag_is_third_pending_set(entry)) {PlayMobySound(1, 0, obj); moby_set_state(obj, 6, -1);}
-  else {float heading = mat_fast_helper_a(*(float *)(g_route_path_table[*(int *)(state + 0x184)] + 0x20) - *(float *)(obj + 0x10), *(float *)(g_route_path_table[*(int *)(state + 0x184)] + 0x24) - *(float *)(obj + 0x14)); func_PAL_002B5C98(obj, obj + 0x10, heading);}
+  else {float heading = mat_fast_helper_a(*(float *)(g_route_path_table[*(int *)(state + 0x184)] + 0x20) - *(float *)(obj + 0x10), *(float *)(g_route_path_table[*(int *)(state + 0x184)] + 0x24) - *(float *)(obj + 0x14)); moby_step_controller_pal(obj, obj + 0x10, heading);}
   break;
  case 4:
   if (flag_is_third_pending_set(entry)) {PlayMobySound(1, 0, obj); moby_set_state(obj, 5, -1);}
@@ -94,7 +94,7 @@ void func_PAL_L04_003EF870(char *obj)
   qcopy(temp, entry + 0x10);
   if (vec_distance_xy(entry + 0x10, g_hero_position) < 2.0f && *(char **)(g_hero_position + 0x2BC) != obj) break;
   qcopy(obj + 0x10, state + 0x1B0);
-  func_PAL_L01_00323068(obj, g_route_path_table[*(int *)(state + 0x184)] + 0x20);
+  moby_l01_turn_toward_target_pal(obj, g_route_path_table[*(int *)(state + 0x184)] + 0x20);
   qcopy(state + 0x1B0, obj + 0x10);
   if (vec_distance_xy(obj + 0x10, g_route_path_table[*(int *)(state + 0x184)] + 0x20) <= 0.5f) {
    moby_set_state(obj, 4, -1);
@@ -105,7 +105,7 @@ void func_PAL_L04_003EF870(char *obj)
   qcopy(temp, entry + 0x10);
   if (vec_distance_xy(entry + 0x10, g_hero_position) < 2.0f && *(char **)(g_hero_position + 0x2BC) != obj) break;
   qcopy(obj + 0x10, state + 0x1B0);
-  func_PAL_L01_00323068(obj, g_route_path_table[*(int *)(state + 0x184)] + 0x10);
+  moby_l01_turn_toward_target_pal(obj, g_route_path_table[*(int *)(state + 0x184)] + 0x10);
   qcopy(state + 0x1B0, obj + 0x10);
   if (vec_distance_xy(obj + 0x10, g_route_path_table[*(int *)(state + 0x184)] + 0x10) <= 0.5f) {
    moby_set_state(obj, 3, -1);
@@ -115,7 +115,7 @@ void func_PAL_L04_003EF870(char *obj)
   }
   break;
  }
- func_PAL_L04_003F00D8(obj);
+ hovering_object_update_motion_pal(obj);
  {
   char *sound = (char *)g_sound_state + *(int *)(state + 0x1DC) * 112;
   if (*(char **)(sound + 0x88) != obj || !*(unsigned char *)(sound + 0x74)) *(int *)(state + 0x1DC) = PlayMobySound(0, 4, obj);

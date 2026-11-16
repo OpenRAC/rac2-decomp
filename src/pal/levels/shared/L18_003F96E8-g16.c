@@ -12,17 +12,17 @@ typedef int TI128 __attribute__((mode(TI)));
 extern char g_hero_state[];
 extern char g_hero_position[];
 extern u8 *g_active_attacker_robot[];
-extern s32 D_0018C0B4[];
-extern s32 D_001A7A00[] __attribute__((section(".sdata")));
-extern u8 *D_L18_001BFC18[];
+extern s32 g_game_mode[];
+extern s32 g_player_stats[] __attribute__((section(".sdata")));
+extern u8 *g_tether_l18_hit_result[];
 extern u8 *g_nearby_hit_targets[];
-extern u32 D_L18_001B2348[] __attribute__((section(".sdata")));
+extern u32 g_frame_l18_counter[] __attribute__((section(".sdata")));
 /* The 16-byte offset vector (0, 0, 0.5, 0); its size keeps it $gp-relative at -G16. */
-extern float D_L18_001B0420[4] __attribute__((sda));
-extern u16 *D_L18_001FB320[];
-extern s32 D_L18_001B2838[] __attribute__((section(".sdata")));
+extern float g_protopet_offset_vec[4] __attribute__((sda));
+extern u16 *g_condition_target_lists[];
+extern s32 g_max_l18_group_index[] __attribute__((section(".sdata")));
 extern u8 *g_moby_l18_table[] __attribute__((section(".sdata")));
-extern s32 *D_L18_001FE480[];
+extern s32 *g_path_l18_table[];
 
 extern int coll_test_point(void *, int, void *, float);
 extern int coll_process_hit(void *, int, void *, int, float);
@@ -38,7 +38,7 @@ extern float vec_distance_xy(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float IntToFloat(int);
 extern void func_PAL_002A0F68(void *);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
@@ -48,7 +48,7 @@ extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, flo
 extern void part_queue_impact_effect(void *, void *, int, void *, void *, float);
 extern void vec_add_random_offset(void *, float);
 extern int IsPointInCuboid(void *, int);
-extern int func_PAL_002B1EE8(void *, void *, void *, int);
+extern int moby_start_hit_reaction_pal(void *, void *, void *, int);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -56,10 +56,10 @@ extern int path_measure_moby_against_entry(void *, int, float);
 extern int path_advance(void *, void *, int, s16 *, int, float);
 extern int moby_set_table_entry_byte(void *, int, int);
 extern void protopet_start_turn_toward_target(void *, void *);
-extern int func_PAL_L18_003FB3D8(void *);
+extern int protopet_is_action_finished_pal(void *);
 extern int protopet_is_near_pickup_ready(void *, void *);
 extern int protopet_is_target_close_front(void *, void *);
-extern int func_PAL_L18_003FB528(void *);
+extern int protopet_find_for_group_pal(void *);
 extern void protopet_end_action(void *, int);
 extern u8 *protopet_count_group(void *, s32 *);
 extern void protopet_launch_shot(void *, void *, void *);
@@ -94,7 +94,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
             if (*(float *)(a0 + 0x2C) < *(float *)(st + 0x268)) {
                 *(float *)(a0 + 0x2C) += *(float *)(st + 0x268) * 0.1f;
             }
-            if (func_PAL_L18_003FB3D8(a0) != 0) {
+            if (protopet_is_action_finished_pal(a0) != 0) {
                 *(float *)(a0 + 0x2C) = *(float *)(st + 0x268);
                 moby_set_state(a0, 6, 2);
                 moby_set_state(a0, 7, -1);
@@ -180,7 +180,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
             moby_set_state(a0, 0xB, -1);
         } else if (*(s32 *)(st + 0x278) != -1) {
             moby_set_state(a0, 0xD, -1);
-        } else if (*(s32 *)(st + 0x248) == 1 && D_0018C0B4[0] != 0x6F) {
+        } else if (*(s32 *)(st + 0x248) == 1 && g_game_mode[0] != 0x6F) {
             moby_set_state(a0, 0xC, -1);
         }
         if (a0[0x60] & 2) {
@@ -228,7 +228,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
                 spawn = protopet_count_group(*(u8 **)(st + 0x25C), &n);
                 if (spawn != 0) {
                     float d;
-                    FastVecAdd(p, a0 + 0x10, D_L18_001B0420);
+                    FastVecAdd(p, a0 + 0x10, g_protopet_offset_vec);
                     vec_clear_128(q);
                     q[2] = 0.16000001f;
                     d = math_random_float_range(2.0f, 3.0f) * 0.020000001f;
@@ -347,13 +347,13 @@ void func_PAL_L18_003F96E8(u8 *a0)
         if (phase == 0) {
             qcopy(st + 0x230, st + 0x1F0);
             grp = *(s32 *)(st + 0x27C);
-            if (grp != -1 && (D_L18_001B2348[0] & 7) == (((s32)a0 >> 8) & 7)) {
+            if (grp != -1 && (g_frame_l18_counter[0] & 7) == (((s32)a0 >> 8) & 7)) {
                 u16 *g;
                 float best = 1000.0f;
                 s32 lost = 1;
-                for (g = D_L18_001FB320[grp];
-                     (u8)grp != 0xFF && grp <= D_L18_001B2838[0] && g != 0
-                     && ((g != 0 && (s16)g[-1] >= 0) || g == D_L18_001FB320[grp]);
+                for (g = g_condition_target_lists[grp];
+                     (u8)grp != 0xFF && grp <= g_max_l18_group_index[0] && g != 0
+                     && ((g != 0 && (s16)g[-1] >= 0) || g == g_condition_target_lists[grp]);
                      grp = *(s32 *)(st + 0x27C), g++) {
                     u8 *e = g_moby_l18_table[0] + ((*g & 0x7FFF) << 8);
                     if (e == 0) {
@@ -389,7 +389,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
                 moby_set_state(a0, 0xC, -1);
             }
         }
-        if (func_PAL_L18_003FB528(a0) != 0) {
+        if (protopet_find_for_group_pal(a0) != 0) {
             moby_set_state(a0, 9, 2);
         }
         if (*(s32 *)(st + 0x248) != 1) {
@@ -416,13 +416,13 @@ void func_PAL_L18_003F96E8(u8 *a0)
         if (grp == -1) {
             break;
         }
-        if ((D_L18_001B2348[0] & 0x3F) != (((s32)a0 >> 8) & 0x3F)) {
+        if ((g_frame_l18_counter[0] & 0x3F) != (((s32)a0 >> 8) & 0x3F)) {
             break;
         }
         lost = 1;
-        for (g = D_L18_001FB320[grp];
-             (*(s32 *)(st + 0x27C) & 0xFF) != 0xFF && *(s32 *)(st + 0x27C) <= D_L18_001B2838[0] && g != 0
-             && ((g != 0 && (s16)g[-1] >= 0) || g == D_L18_001FB320[*(s32 *)(st + 0x27C)]);
+        for (g = g_condition_target_lists[grp];
+             (*(s32 *)(st + 0x27C) & 0xFF) != 0xFF && *(s32 *)(st + 0x27C) <= g_max_l18_group_index[0] && g != 0
+             && ((g != 0 && (s16)g[-1] >= 0) || g == g_condition_target_lists[*(s32 *)(st + 0x27C)]);
              g++) {
             u8 *e = g_moby_l18_table[0] + ((*g & 0x7FFF) << 8);
             if (e == 0) {
@@ -452,17 +452,17 @@ void func_PAL_L18_003F96E8(u8 *a0)
             *(s16 *)(st + 0x29A) = path_measure_moby_against_entry(a0 + 0x10, *(s32 *)(st + 0x26C), 0.0f);
             if (*(s16 *)(st + 0x29C) != 0) {
                 if (*(s16 *)(st + 0x29A) == 0) {
-                    next = *D_L18_001FE480[*(s32 *)(st + 0x26C)] - 1;
+                    next = *g_path_l18_table[*(s32 *)(st + 0x26C)] - 1;
                 } else {
                     next = *(s16 *)(st + 0x29A) - 1;
                 }
             } else {
-                next = (*(s16 *)(st + 0x29A) == *D_L18_001FE480[*(s32 *)(st + 0x26C)] - 1) ? 0
+                next = (*(s16 *)(st + 0x29A) == *g_path_l18_table[*(s32 *)(st + 0x26C)] - 1) ? 0
                                                                                            : *(s16 *)(st + 0x29A) + 1;
             }
-            path = D_L18_001FE480[*(s32 *)(st + 0x26C)];
+            path = g_path_l18_table[*(s32 *)(st + 0x26C)];
             FastVecSub(p, path + (next * 4 + 4), path + (*(s16 *)(st + 0x29A) * 4 + 4));
-            FastVecSub(q, D_L18_001FE480[*(s32 *)(st + 0x26C)] + (*(s16 *)(st + 0x29A) * 4 + 4), a0 + 0x10);
+            FastVecSub(q, g_path_l18_table[*(s32 *)(st + 0x26C)] + (*(s16 *)(st + 0x29A) * 4 + 4), a0 + 0x10);
             if (FastVecDot(q, p) < 0.0f) {
                 *(s16 *)(st + 0x29A) = next;
             }
@@ -500,14 +500,14 @@ void func_PAL_L18_003F96E8(u8 *a0)
                     qcopy(p, pos);
                     p[2] = p[2] + (*(float *)(st + 0x104) + *(float *)(st + 0x100));
                     reach = *(float *)(st + 0x100) + 0.2f;
-                    coll_sweep_from_object(a0, p, 1, 0, 1, 0, reach, IntToFloat(D_001A7A00[0]) * 0.25f, 1.0f);
+                    coll_sweep_from_object(a0, p, 1, 0, 1, 0, reach, IntToFloat(g_player_stats[0]) * 0.25f, 1.0f);
                     if (coll_test_point(p, 1, a0, *(float *)(st + 0x100) + 0.2f) != 0) {
-                        hit = D_L18_001BFC18[0];
+                        hit = g_tether_l18_hit_result[0];
                         if (hit != 0 && *(s16 *)(hit + 0xAA) != 0xB69) {
                             *(s32 *)(st + 0x20) = 0;
                             vec_scale_to_length(q, a0 + 0xC0, -1.0f);
                             vec_add_random_offset(q, 0.3f);
-                            func_PAL_002B1EE8(a0, st + 0x50, q, 2);
+                            moby_start_hit_reaction_pal(a0, st + 0x50, q, 2);
                             moby_set_state(a0, 0x11, 3);
                         }
                     }
@@ -523,7 +523,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
                 func_PAL_002A7E68(a0, 0xD, 0, 0x8);
             }
         } else if (*(u16 *)(a0 + 0x96) >= 0xFB) {
-            func_PAL_002A7650(a0, 0, 1);
+            SetDeathBits_pal(a0, 0, 1);
             protopet_end_action(a0, 0);
         }
         break;
@@ -547,7 +547,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
         }
         f = moby_get_anim_value(a0);
         if ((flags & 1) || (a0[0x42] == 0xC && 15.0f < f && math_random_int_below(0xF) == 0)) {
-            func_PAL_002A7650(a0, 0, 1);
+            SetDeathBits_pal(a0, 0, 1);
             protopet_end_action(a0, 0);
             break;
         }
@@ -574,7 +574,7 @@ void func_PAL_L18_003F96E8(u8 *a0)
         }
         if ((a0[0x60] & 2) || *(u16 *)(a0 + 0x96) >= 0x33) {
             *(s32 *)(st + 0x20) = 0;
-            func_PAL_002A7650(a0, 0, 1);
+            SetDeathBits_pal(a0, 0, 1);
             protopet_end_action(a0, 0);
         }
         break;

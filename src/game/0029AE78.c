@@ -25,7 +25,7 @@ extern int F2d5993bb_FUN_0029AEB0(char *p, int a1);
 
 typedef int BatchA_A08_s32;
 
-extern BatchA_A08_s32 D_L00_001A904C[] __attribute__((sda));
+extern BatchA_A08_s32 g_bolt_counter_base[] __attribute__((sda));
 
 extern int D_L00_001A904C_6 __attribute__((sda));
 
@@ -41,14 +41,14 @@ s32 memcard_GetDataSize(s32 *records) {
  return size+8;
 }
 
-extern int D_00256138[];
+extern int g_save_record_layout_main[];
 
 /* Makes a 16-bit checksum of a block of save data. Returns 0 if the block is too long. */
 int save_compute_checksum(char *data, int length)
 {
     char *end;
     unsigned int crc;
-    if (memcard_GetDataSize(D_00256138) < length)
+    if (memcard_GetDataSize(g_save_record_layout_main) < length)
         return 0;
     end = data + length;
     crc = 0xEDB88320;
@@ -139,21 +139,21 @@ void FillSaveSlotInfo(char *src, int slot, int entry)
 
 /* The existing implementation is in 0029B658-rc2.c. */
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_set_screen_value_restart_four_fades(void *, int);
 
 /* Passes a value on to the level object, if one is loaded. */
 void level_forward_value(int value) {
-    if (D_001A8CFC[0] != 0)
-        menu_set_screen_value_restart_four_fades(D_001A8CFC[0] + 0x376C8, value);
+    if (g_resident_data_base[0] != 0)
+        menu_set_screen_value_restart_four_fades(g_resident_data_base[0] + 0x376C8, value);
 }
 
 extern void menu_set_screen_value_restart_fades(void *, int, int);
 
 /* Passes two values on to the level object, if one is loaded. */
 void level_forward_pair(int first, int second) {
-    if (D_001A8CFC[0] != 0)
-        menu_set_screen_value_restart_fades(D_001A8CFC[0] + 0x376C8, first, second);
+    if (g_resident_data_base[0] != 0)
+        menu_set_screen_value_restart_fades(g_resident_data_base[0] + 0x376C8, first, second);
 }
 
 
@@ -161,14 +161,14 @@ extern void menu_set_flag_restart_fades(void *, int);
 
 /* Passes a value on to another part of the level object, if one is loaded. */
 void level_forward_value_b(int value) {
-    if (D_001A8CFC[0] != 0)
-        menu_set_flag_restart_fades(D_001A8CFC[0] + 0x37EB0, value);
+    if (g_resident_data_base[0] != 0)
+        menu_set_flag_restart_fades(g_resident_data_base[0] + 0x37EB0, value);
 }
 
 /* A08-sda-offset-40 freshly exact-verified under family reservation */
 /* Stores two values in the level object, if one is loaded. */
 void level_store_value_pair(BatchA_A08_s32 first, BatchA_A08_s32 second) {
-    BatchA_A08_s32 base = D_L00_001A904C[0];
+    BatchA_A08_s32 base = g_bolt_counter_base[0];
     BatchA_A08_s32 *values;
     if (base == 0) return;
     values = (BatchA_A08_s32 *)(base + 0x38000);
@@ -178,7 +178,7 @@ void level_store_value_pair(BatchA_A08_s32 first, BatchA_A08_s32 second) {
 
 /* Returns 1 if either of the two stored level values is non-zero. */
 int level_has_value_pair(void) {
-    int base = D_L00_001A904C[0];
+    int base = g_bolt_counter_base[0];
     if (base != 0) {
         int *state = (int *)(base + 0x38000);
         if (state[0x7368 / 4] != 0 || state[0x736C / 4] != 0)
@@ -193,8 +193,8 @@ extern void hud_update_subobject_primary(void *);
 
 /* Runs the level object update routine, if a level object is loaded. */
 void level_run_update(void) {
-    if (D_001A8CFC[0] != 0)
-        hud_update_subobject_primary(D_001A8CFC[0] + 0x36F28);
+    if (g_resident_data_base[0] != 0)
+        hud_update_subobject_primary(g_resident_data_base[0] + 0x36F28);
 }
 
 /* Loads a 32-bit global pointer from a fixed data address; if non-null, tail-forwards it (offset by 0x36F28) plus ten incoming arguments to an overlay-local callee. */

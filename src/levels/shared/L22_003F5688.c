@@ -9,12 +9,12 @@ typedef union { EmissionQuad q; float f[4]; } EmissionVector;
 /* The level's emitter settings.  The first word of each pair is read through $gp,
  * the other words are absolute; `[1]` keeps a word out of a delay slot, as retail. */
 extern float D_L22_001B0A20_gp[] SDATA(D_L22_001B0A20);
-extern int D_L22_001B0A28[] __attribute__((sda));
+extern int g_column_color_table[] __attribute__((sda));
 extern int D_L22_001B0A28_gp[] SDATA(D_L22_001B0A28);
 extern float D_L22_001B0A38_gp[] SDATA(D_L22_001B0A38);
 extern int D_L22_001B0A44_gp[] SDATA(D_L22_001B0A44);
 extern int D_L22_001B0A48_gp[] SDATA(D_L22_001B0A48);
-extern int D_L22_001B0A4C[] __attribute__((sda));
+extern int g_column_duration_range[] __attribute__((sda));
 
 extern float IntToFloat(int);
 extern float math_random_signed_float_range(float, float);
@@ -61,9 +61,9 @@ void part_emit_column(u8 *object, int fullDensity)
             position.q = scratch.q;
             matrix_mul_vec3(position.f, position.f, object + 0xC0);
             FastVecAdd(position.f, position.f, object + 0x10);
-            firstColor = FastTweenColor(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
+            firstColor = FastTweenColor(D_L22_001B0A28_gp[0], g_column_color_table[1],
                                        math_random_float_range(zero, 1.0f));
-            secondColor = FastTweenColor(D_L22_001B0A28[2], D_L22_001B0A28[3],
+            secondColor = FastTweenColor(g_column_color_table[2], g_column_color_table[3],
                                         math_random_float_range(zero, 1.0f));
             size = D_L22_001B0A38_gp[math_random_int_below(2)];
             vec_clear_128(scratch.f);
@@ -71,7 +71,7 @@ void part_emit_column(u8 *object, int fullDensity)
             vec_clear_128(to.f);
             to.f[3] = size;
             kind = math_random_int_range(1, D_L22_001B0A48_gp[0]);
-            duration = math_random_int_range(D_L22_001B0A4C[0], D_L22_001B0A4C[1]);
+            duration = math_random_int_range(g_column_duration_range[0], g_column_duration_range[1]);
             part_spawn_trail(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
                           60, D_L22_001B0A44_gp[0]);
             ++i;

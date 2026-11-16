@@ -20,32 +20,32 @@
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L01_001B2088;
+extern s32 g_oozla_intro_stage;
 extern u8 *g_moby_l01_table;
-extern u8 *D_L01_001B264C;
-extern s32 D_L01_001A8F40;
+extern u8 *g_swamp_patrol_positions;
+extern s32 g_hero_l01_control_mode;
 extern s32 g_current_map_index;
-extern f32 D_L01_001B0390 __attribute__((sda));
-extern s32 D_L01_001B0398 __attribute__((sda));
-extern s32 D_L01_001B039C __attribute__((sda));
-extern f32 D_L01_001B03A0 __attribute__((sda));
-extern f32 D_L01_001B03A4 __attribute__((sda));
-extern f32 D_L01_001B03A8 __attribute__((sda));
-extern f32 D_L01_001B03AC __attribute__((sda));
-extern f32 D_L01_001B03B0 __attribute__((sda));
-extern f32 D_L01_001B03B4 __attribute__((sda));
-extern f32 D_L01_001B03B8 __attribute__((sda));
-extern f32 D_L01_001B03BC __attribute__((sda));
-extern f32 D_L01_001B03C0 __attribute__((sda));
-extern f32 D_L01_001B03C4 __attribute__((sda));
-extern f32 D_L01_001B03C8 __attribute__((sda));
-extern s32 D_L01_001B03CC __attribute__((sda));
-extern s32 D_L01_001B03D0 __attribute__((sda));
-extern s32 D_L01_001B03D8[4] __attribute__((sda));
-extern u8 *D_L01_001FE180[];
+extern f32 g_swamp_arm_hero_offset_scale __attribute__((sda));
+extern s32 g_swamp_arm_particle_type_a __attribute__((sda));
+extern s32 g_swamp_arm_particle_type_b __attribute__((sda));
+extern f32 g_swamp_arm_random_min_a __attribute__((sda));
+extern f32 g_swamp_arm_random_max_a __attribute__((sda));
+extern f32 g_swamp_arm_random_min_b __attribute__((sda));
+extern f32 g_swamp_arm_random_max_b __attribute__((sda));
+extern f32 g_swamp_arm_random_min_c __attribute__((sda));
+extern f32 g_swamp_arm_random_max_c __attribute__((sda));
+extern f32 g_swamp_arm_vec_e_w __attribute__((sda));
+extern f32 g_swamp_arm_vec_h_w __attribute__((sda));
+extern f32 g_swamp_arm_rise_speed __attribute__((sda));
+extern f32 g_swamp_arm_spin_x_speed __attribute__((sda));
+extern f32 g_swamp_arm_spin_y_speed __attribute__((sda));
+extern s32 g_swamp_arm_particle_count __attribute__((sda));
+extern s32 g_swamp_arm_anim_frame_limit __attribute__((sda));
+extern s32 g_swamp_arm_frame_limit_table[4] __attribute__((sda));
+extern u8 *g_path_l01_table[];
 typedef struct { u8 pad[0x160]; f32 f160; s32 pad164; s32 i168; s32 i16C; } L01Fx;
-extern L01Fx D_L01_001B9380;
-extern u8 D_0019B2E8[];
+extern L01Fx g_drive_settings;
+extern u8 g_moby_group_flags[];
 
 extern s32 func_001163B0(void);
 extern s32 func_002D77E8(void);
@@ -158,7 +158,7 @@ void swamp_monster_arm_update(u8 *moby)
     UpdateOozlaLinkedGroupDamage(moby);
     switch (moby[0x95]) {
     case 0:
-        if (D_L01_001B2088 < 2)
+        if (g_oozla_intro_stage < 2)
             return;
         swamp_monster_arm_init(moby);
         break;
@@ -272,7 +272,7 @@ void swamp_monster_arm_update(u8 *moby)
         break;
     case 5:
         if (*(s32 *)(vars + 0x74) == 1) {
-            func_00337A60(vars + 0x90, vars + 0x60, D_L01_001FE180[*(s32 *)(vars + 0xB8)] + 0x10, *(s32 *)D_L01_001FE180[*(s32 *)(vars + 0xB8)]);
+            func_00337A60(vars + 0x90, vars + 0x60, g_path_l01_table[*(s32 *)(vars + 0xB8)] + 0x10, *(s32 *)g_path_l01_table[*(s32 *)(vars + 0xB8)]);
             *(s32 *)(vars + 0xC0) = 0xF0;
             tgt5 = vars + 0x90;
         } else {
@@ -281,7 +281,7 @@ void swamp_monster_arm_update(u8 *moby)
         }
         hero_target = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
         if (*(u8 **)(vars + 0x70) == hero_target) {
-            func_002E34E0(vec_a, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
+            func_002E34E0(vec_a, &((Hero *)g_hero_state)->b[0x110], g_swamp_arm_hero_offset_scale);
             func_002E3470(vec_a, vec_a, *(u8 **)(vars + 0x70) + 0x10);
         } else {
             qcopy(vec_a, *(u8 **)(vars + 0x70) + 0x10);
@@ -301,7 +301,7 @@ void swamp_monster_arm_update(u8 *moby)
         func_00310D28(moby, vars + 0xCC, f5, 0.002327106f, 0.1f, 0.13962637f);
         if (moby[0x60] & 2)
             *(f32 *)(moby + 0x48) = func_00310580(0.8f, 1.2f);
-        if (D_L01_001A8F40 != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
+        if (g_hero_l01_control_mode != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
             (moby[0x21] == 0xFF || **(s32 **)(vars + 0xD8) <= 0) && func_002E3650(pos5, vars + 0x60) < 35.0f &&
             (f5 = func_002E3B10(vec_a[0] - *(f32 *)(moby + 0x10), vec_a[1] - *(f32 *)(moby + 0x14)),
              func_002E4548(*(f32 *)(moby + 0xF8), f5) < 0.034906588f)) {
@@ -359,8 +359,8 @@ void swamp_monster_arm_update(u8 *moby)
             vars[0xDE] = 1;
         }
         level = func_002D9308(moby[0xB0]);
-        D_L01_001B03D0 = D_L01_001B03D8[level - 1];
-        if (anim_frame < (f32)D_L01_001B03D0 &&
+        g_swamp_arm_anim_frame_limit = g_swamp_arm_frame_limit_table[level - 1];
+        if (anim_frame < (f32)g_swamp_arm_anim_frame_limit &&
             (anim_frame < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
                            ((Hero *)g_hero_state)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
@@ -385,9 +385,9 @@ void swamp_monster_arm_update(u8 *moby)
         }
         if (anim_frame > 55.0f && anim_frame < 58.0f) {
             if (anim_frame <= 56.0f) {
-                D_L01_001B9380.f160 = 0.2f;
-                D_L01_001B9380.i168 = 0x14;
-                D_L01_001B9380.i16C = 0;
+                g_drive_settings.f160 = 0.2f;
+                g_drive_settings.i168 = 0x14;
+                g_drive_settings.i16C = 0;
             }
             f6 = *(f32 *)(moby + 0x18);
             for (i2 = 1; i2 < 8; i2++) {
@@ -402,27 +402,27 @@ void swamp_monster_arm_update(u8 *moby)
             vec_c[2] = f6;
             func_002E34A0(vec_c, vec_c, vec_b);
             qzero(vec_h);
-            vec_h[3] = D_L01_001B03BC;
-            for (j = 0; j < D_L01_001B03CC; j++) {
+            vec_h[3] = g_swamp_arm_vec_h_w;
+            for (j = 0; j < g_swamp_arm_particle_count; j++) {
                 rnd = func_00310580(0.0f, 1.0f);
                 func_002E34E0(vec_d, vec_c, rnd);
                 func_00316348(vec_d, 0.1f);
                 func_002E3470(vec_d, vec_d, vec_b);
-                spinx = func_00310580(-(D_L01_001B03C4 * 0.016666668f), D_L01_001B03C4 * 0.016666668f);
+                spinx = func_00310580(-(g_swamp_arm_spin_x_speed * 0.016666668f), g_swamp_arm_spin_x_speed * 0.016666668f);
                 func_002E3738(vec_f, moby + 0xD0, spinx);
-                spiny = func_00310580(-(D_L01_001B03C8 * 0.016666668f), D_L01_001B03C8 * 0.016666668f);
+                spiny = func_00310580(-(g_swamp_arm_spin_y_speed * 0.016666668f), g_swamp_arm_spin_y_speed * 0.016666668f);
                 func_002E3738(vec_g, moby + 0xC0, spiny);
                 func_002E3470(vec_e, vec_f, vec_g);
-                rise = func_00310580(0.0f, D_L01_001B03C0 * 0.016666668f);
+                rise = func_00310580(0.0f, g_swamp_arm_rise_speed * 0.016666668f);
                 vec_e[2] = rise;
-                vec_e[3] = D_L01_001B03B8;
-                ra = func_00310580(D_L01_001B03A0, D_L01_001B03A4);
+                vec_e[3] = g_swamp_arm_vec_e_w;
+                ra = func_00310580(g_swamp_arm_random_min_a, g_swamp_arm_random_max_a);
                 a = func_002E45B8(ra);
-                rb = func_00310580(D_L01_001B03A8, D_L01_001B03AC);
+                rb = func_00310580(g_swamp_arm_random_min_b, g_swamp_arm_random_max_b);
                 b = func_002E45B8(rb);
-                rc = func_00310580(D_L01_001B03B0, D_L01_001B03B4);
+                rc = func_00310580(g_swamp_arm_random_min_c, g_swamp_arm_random_max_c);
                 c = func_002E45B8(rc);
-                particle = func_00327360(vec_d, vec_e, vec_h, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
+                particle = func_00327360(vec_d, vec_e, vec_h, g_swamp_arm_particle_type_a, g_swamp_arm_particle_type_b, a, b, c, -1);
                 if (particle != 0 && (func_001163B0() & 1))
                     particle[3] = 0x48;
             }
@@ -441,12 +441,12 @@ void swamp_monster_arm_update(u8 *moby)
         moby[0xA8] = 0xFF;
         pos7 = moby + 0x10;
         func_002E3470(vec_a, pos7, vars + 0xA0);
-        tbl7a = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
+        tbl7a = g_path_l01_table[*(s32 *)(vars + 0xB8)];
         hit7 = func_00311B48(vec_a, tbl7a + 0x10, *(s32 *)tbl7a);
         if (hit7 != 0) {
             qcopy(pos7, vec_a);
         } else {
-            tbl7b = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
+            tbl7b = g_path_l01_table[*(s32 *)(vars + 0xB8)];
             func_00337A60(pos7, vec_a, tbl7b + 0x10, *(s32 *)tbl7b);
             func_002E34A0(vec_b, vars + 0x80, pos7);
             func_002E3738(vec_b, vec_b, 0.033333335f);
@@ -486,9 +486,9 @@ void swamp_monster_arm_update(u8 *moby)
             break;
     case 9:
         func_0030F920(moby, 0x200, 3);
-        if (*(s32 *)(vars + 0xE4) != -1 && !(D_0019B2E8[moby[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+        if (*(s32 *)(vars + 0xE4) != -1 && !(g_moby_group_flags[moby[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             func_00307E70(moby[0xB0]);
-            e9 = D_L01_001B264C + (*(s32 *)(vars + 0xE4) << 7);
+            e9 = g_swamp_patrol_positions + (*(s32 *)(vars + 0xE4) << 7);
             func_0034ECD0(e9 + 0x30, e9 + 0x70);
         }
     done:

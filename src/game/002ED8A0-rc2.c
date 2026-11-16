@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_00262958[];
+extern s8 g_used_entry_table[];
 
 /* Follows a chain of 0x28-byte table entries starting at the given index and returns the last used entry, or -1 if there is none. */
 s32 table_find_last_used_entry(s32 index) {
@@ -37,7 +37,7 @@ s32 table_find_last_used_entry(s32 index) {
 
     cur = index;
     last = -1;
-    table = (s32)D_00262958;
+    table = (s32)g_used_entry_table;
     stride = 0x28;
     next_base = (s8 *)(table - 0x14);
     for (;;) {

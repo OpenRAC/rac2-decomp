@@ -7,17 +7,17 @@ extern s32 mothership_is_value_not_in_slots(s32 arg0);
 extern s32 math_get_mask_bit(u64, s32);
 extern float math_fabs(float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
-extern s32 D_L23_001B3744 __attribute__((sda));
-extern s32 D_L23_001B3738[3] __attribute__((sda));
+extern s32 g_effect_pool_total __attribute__((sda));
+extern s32 g_effect_pool_counts[3] __attribute__((sda));
 extern s32 g_effect_pools[3][60];
-extern s32 D_L23_001B3744 __attribute__((sda));
-extern s32 D_L23_001B3738[3] __attribute__((sda));
-extern s32 D_L23_001B1FA0[4];
+extern s32 g_effect_pool_total __attribute__((sda));
+extern s32 g_effect_pool_counts[3] __attribute__((sda));
+extern s32 g_effect_pool_limits[4];
 extern s32 g_effect_pools[3][60];
 
 /* Springs the second measure toward its target, doubles the word at +0x74, and latches the
  * measure once it is within a tenth of the target. */
-void func_PAL_L23_004206A8(char *arg0) {
+void mothership_spring_second_measure_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
 
     if (*(s32 *)(state + 0x5D8) != 0)

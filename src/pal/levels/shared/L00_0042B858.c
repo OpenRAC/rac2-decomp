@@ -10,7 +10,7 @@ extern void cam_follow_move_eye(int);
 extern void follow_camera_build_view(int);
 
 /* runs a fixed sequence of seven callees on one object handle, passing the address of two stack floats to the third callee and then their values to the fourth */
-void func_PAL_L00_0042B858(int object)
+void cam_follow_run_frame_pal(int object)
 {
     float x;
     float y;

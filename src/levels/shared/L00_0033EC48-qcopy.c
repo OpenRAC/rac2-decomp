@@ -19,8 +19,8 @@ extern int math_random_int_below(int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern unsigned char *D_L00_001FEAB0;
-extern float D_001B8DC0[];
+extern unsigned char *g_pulled_particle_bytes;
+extern float g_camera_position_vec[];
 
 /* func_002C2210's effect record with a per-call palette index, two more payload words and
    a pull of 0.9 towards the 0x1B8DC0 point. The floats lead the parameter list, as in
@@ -39,7 +39,7 @@ Particle *part_spawn_pulled_particle(float life, float secondLife, Quad *positio
         p->b3 = 0x48;
         p->alpha = FloatToInt(0.4f) + 32;
         p->b1 = 0;
-        p->b2 = D_L00_001FEAB0[index];
+        p->b2 = g_pulled_particle_bytes[index];
         p->size = size;
         p->life = life * 210000.0f;
         if (mode == 0) p->seed = 0x40;
@@ -53,7 +53,7 @@ Particle *part_spawn_pulled_particle(float life, float secondLife, Quad *positio
         *(int *)(out + 6) = word;
         *(short *)((char *)out + 0x1E) = tag;
         { float *dst = out + 3; dst[0] = vector[0]; dst[1] = vector[1]; dst[2] = vector[2]; }
-        FastVecSub(pull, D_001B8DC0, &p->position);
+        FastVecSub(pull, g_camera_position_vec, &p->position);
         vec_scale_to_length(pull, pull, 0.9f);
         FastVecAdd(&p->position, &p->position, pull);
     }

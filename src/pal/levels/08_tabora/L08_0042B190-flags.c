@@ -11,12 +11,12 @@ extern void *puff_spawn_linked_child(void *);
 extern void STUB_printf(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int *D_L08_001FE7C0[];
-extern char D_L08_001B1BD0[];
+extern int *g_path_list_table[];
+extern char g_str_hover_init_debug[];
 
 /* Fills the 0x68 context with its timing and animation defaults, sets the record's height from
    the sweep below it when the context has none, and updates the shared counters at +0x1F8..+0x200. */
-void func_PAL_L08_0042B190(char *a) {
+void hover_init_defaults_pal(char *a) {
     float v[4];
     char *p = *(char **)(a + 0x68);
     float f;
@@ -39,7 +39,7 @@ void func_PAL_L08_0042B190(char *a) {
     *(Quad *)v = *(Quad *)(a + 0x10);
     f = coll_point_depth_in_volumes(v, *(int *)(p + 0x1D8), *(int *)(p + 0x1E0), *(int *)(p + 0x1DC), -1);
     if (f > 0.0f) *(u8 *)(p + 0x20E) = FloatToInt(f + 2.0f);
-    if (*(int *)(p + 0x1E4) != -1) path_l01_compute_segment_lengths(D_L08_001FE7C0[*(int *)(p + 0x1E4)]);
+    if (*(int *)(p + 0x1E4) != -1) path_l01_compute_segment_lengths(g_path_list_table[*(int *)(p + 0x1E4)]);
     *(u8 *)(p + 0x60) = 5;
     *(int *)(p + 0x98) = -1;
     *(u8 *)(p + 0x61) = 8;
@@ -81,7 +81,7 @@ void func_PAL_L08_0042B190(char *a) {
     *(int *)(p + 0x22C) = puff_spawn_linked_child(a);
     *(s16 *)(p + 0x1BE) = 0;
     if (*(u8 *)(p + 0x20C) == 1 || *(u8 *)(p + 0x20C) == 4) {
-        STUB_printf(D_L08_001B1BD0, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
+        STUB_printf(g_str_hover_init_debug, *(s16 *)(a + 0xB2), *(u8 *)(p + 0x20C), *(u8 *)(p + 0x20C) + 1);
         *(u8 *)(p + 0x20C) += 1;
     }
     qcopy(p + 0x170, a + 0x10);

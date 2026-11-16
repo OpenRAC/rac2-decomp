@@ -4,7 +4,7 @@
 
 
 #include "common.h"
-extern u8 D_L08_001B9B00[];
+extern u8 g_hero_position_vec[];
 extern f32 fast_vec_dist(void *, void *);
 extern f32 IntToFloat(int);
 extern f32 math_fabs(f32);
@@ -92,17 +92,17 @@ extern s32 func_PAL_002B1A50(Ent *, void *, s32);
 extern f32 func_3278F0(f32, f32);
 extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
-extern f32 D_L08_001BFF68;
-extern f32 D_00189EA8;
+extern f32 g_ground_height_result;
+extern f32 g_hero_height_limit;
 extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
 extern void vehicle_compute_height_limits(Ent *);
 extern void sandfly_release_sounds(Ent *);
 extern float math_fabs(float);
-extern u8 D_001A7B00[] __attribute__((sda));
-extern u8 D_L08_001BFD00[];
-extern s32 D_L08_001A8F00[] __attribute__((sda));
-extern s32 D_L08_001B2700[] __attribute__((sda));
-extern u8 *D_L08_001B2ACC[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
+extern u8 g_request_l08_queue[];
+extern s32 g_cutscene_l08_active_flag[] __attribute__((sda));
+extern s32 g_glider_flag_table[] __attribute__((sda));
+extern u8 *g_collision_box_table[] __attribute__((sda));
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 req_push_queue(void *, s32);
 extern s32 req_launch_queued(void *);

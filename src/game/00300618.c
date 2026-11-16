@@ -128,7 +128,7 @@ extern void F9e2cd219_FUN_00307AD0(void *owner, void *out);
 
     extern int coll_test_point(void *, int, void *, float);
 
-    extern int D_001BAF9C;
+    extern int g_hit_break_count;
 
 extern void FastVecSub(void *out, void *a, void *b);
 
@@ -139,13 +139,13 @@ typedef union { ParticleWord word; float f[4]; } ParticleVector;
 typedef struct { char pad00[0x14]; u32 selector; } SurfaceControlSettings;
 typedef struct { char pad00[0x50]; float x[4], y[4], z; } SurfaceGridControl;
 extern void FastVecScale(void *, void *, float);
-extern unsigned short *D_001EE5A0[];
-extern int D_001B1B78 __attribute__((sda));
-extern char *D_001B1B5C __attribute__((sda));
+extern unsigned short *g_moby_group_lists[];
+extern int g_moby_group_count __attribute__((sda));
+extern char *g_moby_pool_start __attribute__((sda));
 extern V4_F213135aa ref_00303210_00[];
 extern int moby_count_group_not_in_state(int, int);
 
-extern char D_00227DA0[];
+extern char g_projectile_cleanup_table[];
 
 extern void moby_sort_entries_by_distance(void *);
 
@@ -167,9 +167,9 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 
 extern int coll_test_point(void *, int, void *, float);
 
-extern int D_001BAF9C;
+extern int g_hit_break_count;
 
-extern char D_00228610[];
+extern char g_projectile_cleanup_table_b[];
 
 extern void moby_sort_entries_by_distance(void *);
 
@@ -185,7 +185,7 @@ typedef struct {
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
 extern SurfacePlayer g_hero_state;
-extern char D_001A8BD0[] __attribute__((sda));
+extern char g_default_effect_vector[] __attribute__((sda));
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
@@ -414,7 +414,7 @@ void surface_grid_update(char *object)
             (player->state!=0x39 || *(int *)(*(char **)(player->field2290+0x24)+0x1f0)) &&
             player->state!=0x7a) {
             if (player->state==0x31) {
-                SpawnExplosionEffects(player->field1830, D_001A8BD0, 0, 0.0f, 0.0f, 10, 3, 16,
+                SpawnExplosionEffects(player->field1830, g_default_effect_vector, 0, 0.0f, 0.0f, 10, 3, 16,
                     4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x00810001);
                 ref_00302DA0_00(0x88,0,0.0f);
                 player->field1830=0;
@@ -521,9 +521,9 @@ void surface_grid_build_control(char *object)
     float columnWeight;
     int column, row, surface;
     if (moby_count_group_not_in_state((u8)object[0x21],-1)==5) {
-        entry=D_001EE5A0[(u8)object[0x21]];
-        while ((u8)object[0x21]!=255 && (u8)object[0x21]<=D_001B1B78 && entry && ((entry && (short)entry[-1]>=0) || entry==D_001EE5A0[(u8)object[0x21]])) {
-            control=D_001B1B5C+(*entry&0x7fff)*256;
+        entry=g_moby_group_lists[(u8)object[0x21]];
+        while ((u8)object[0x21]!=255 && (u8)object[0x21]<=g_moby_group_count && entry && ((entry && (short)entry[-1]>=0) || entry==g_moby_group_lists[(u8)object[0x21]])) {
+            control=g_moby_pool_start+(*entry&0x7fff)*256;
             if (!control) break;
             if (*(short *)(control+0xaa)==0x1130 /* moby class 4400 */) {
                 settings=*(SurfaceControlSettings **)(control+0x68);
@@ -601,7 +601,7 @@ void projectile_apply_random_push(char *object)
 void projectile_check_hit_break(void *object) {
     char local[16];
     moby_transform_joint_to_world(object, 0, local);
-    if (coll_test_point(local, 2, object, 0.2f) && D_001BAF9C > 0)
+    if (coll_test_point(local, 2, object, 0.2f) && g_hit_break_count > 0)
         *((unsigned char *)object + 0x20) = 8;
 }
 
@@ -662,7 +662,7 @@ void part_advance_grow_effect(Owner_F9e2cd219 *self)
 
 /* Runs the shared cleanup routine for the thrown-object table. */
 void projectile_cleanup_table(void) {
-    moby_sort_entries_by_distance(D_00227DA0);
+    moby_sort_entries_by_distance(g_projectile_cleanup_table);
 }
 
 /* The table of hundred objects and the three helpers it uses sit at another
@@ -877,7 +877,7 @@ void projectile_check_hit_break_2(void *owner)
 {
     char local[16];
     moby_transform_joint_to_world(owner, 0, local);
-    if (coll_test_point(local, 2, owner, 0.25f) && D_001BAF9C > 0)
+    if (coll_test_point(local, 2, owner, 0.25f) && g_hit_break_count > 0)
         *((unsigned char *)owner + 0x20) = 8;
 }
 
@@ -935,7 +935,7 @@ void part_advance_grow_effect_2(Owner_F9e2cd219 *self)
 
 /* Runs the shared cleanup routine for the thrown-object table. */
 void projectile_cleanup_table_2(void) {
-    moby_sort_entries_by_distance(D_00228610);
+    moby_sort_entries_by_distance(g_projectile_cleanup_table_b);
 }
 
 /* Draws the thrown object trail effects unless the object is hidden. */

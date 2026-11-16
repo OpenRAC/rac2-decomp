@@ -23,14 +23,14 @@ typedef struct {
     char pad24[12];
 } HitInfo;
 
-extern unsigned char D_00139585 __attribute__((nosda));
+extern unsigned char g_hit_scale_weapon_index __attribute__((nosda));
 extern char g_weapon_l00_table[];
 extern CollisionResult g_collision_result;
-extern struct { Vec position; Vec unk; Vec normal; } D_L00_001BF220;
-extern Vec D_L00_001BF240;
+extern struct { Vec position; Vec unk; Vec normal; } g_hero_l00_position;
+extern Vec g_hero_l00_velocity;
 extern char *g_hero_moby __attribute__((nosda));
-extern float D_L00_001B03E4 __attribute__((sda));
-extern float D_L00_001A8F20;
+extern float g_direction_step_scale __attribute__((sda));
+extern float g_default_vector;
 
 extern void vec_transform_or_copy(void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
@@ -108,7 +108,7 @@ void UpdateCollidingTrailProjectile(char *self)
         timer = pv + 0x60;
         part_steer_effect_direction(*(int *)(pv + 0x78), pv, 0);
         FastVecAdd(self + 0x10, self + 0x10, pv);
-        vec_add_object_direction_scaled(self + 0x10, pv, D_L00_001B03E4 * 0.00027777778f);
+        vec_add_object_direction_scaled(self + 0x10, pv, g_direction_step_scale * 0.00027777778f);
         for (i = 3; i > 0; i--) {
             lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
         }
@@ -155,7 +155,7 @@ void UpdateCollidingTrailProjectile(char *self)
                     FastVecSub(a30, obj + 0x10, hero + 0x10);
                     vec_scale_to_length(a30, a30, 1.0f);
                     vec_scale_to_length(&hit, &hit, 0.116666675f);
-                    make_hit_descriptor(&hit, self, 0x910000, a30, ((TableEntry *)g_weapon_l00_table)[D_00139585].scale);
+                    make_hit_descriptor(&hit, self, 0x910000, a30, ((TableEntry *)g_weapon_l00_table)[g_hit_scale_weapon_index].scale);
                     {
                     Quad hitPosition = *(Quad *)a30;
                     hit.kind = 5;
@@ -177,7 +177,7 @@ void UpdateCollidingTrailProjectile(char *self)
                     *(Quad *)(pv + 0x50) = col->normal.q;
                     *(int *)(pv + 0x7C) = 1;
                     for (i = 0; i < 3; i++) {
-                        vec_scale_to_length(spark, &D_L00_001BF240, math_random_float_range(0.16666667f, 0.33333334f));
+                        vec_scale_to_length(spark, &g_hero_l00_velocity, math_random_float_range(0.16666667f, 0.33333334f));
                         spark[0] += math_random_float_range(-0.15f, 0.15f);
                         spark[1] += math_random_float_range(-0.15f, 0.15f);
                         spark[2] += math_random_float_range(-0.15f, 0.15f);
@@ -185,12 +185,12 @@ void UpdateCollidingTrailProjectile(char *self)
                         part_spawn_white_flash(self + 0x10, spark, 0, -1.0f);
                     }
                 } else {
-                    *(Quad *)(self + 0x10) = D_L00_001BF220.position.q;
+                    *(Quad *)(self + 0x10) = g_hero_l00_position.position.q;
                     *(unsigned char *)(self + 0x20) = 2;
                     *(unsigned short *)(self + 0x34) |= 0x41;
-                    *(Quad *)(pv + 0x50) = D_L00_001BF220.normal.q;
+                    *(Quad *)(pv + 0x50) = g_hero_l00_position.normal.q;
                     for (i = 0; i < 6; i++) {
-                        vec_scale_to_length(a30, &D_L00_001BF240, math_random_float_range(0.16666667f, 0.33333334f));
+                        vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.16666667f, 0.33333334f));
                         a30[0] += math_random_float_range(-0.15f, 0.15f);
                         a30[1] += math_random_float_range(-0.15f, 0.15f);
                         a30[2] += math_random_float_range(-0.15f, 0.15f);
@@ -204,7 +204,7 @@ void UpdateCollidingTrailProjectile(char *self)
                 *(unsigned short *)(self + 0x34) |= 0x41;
                 *(Quad *)(pv + 0x50) = col->normal.q;
                 for (i = 0; i < 6; i++) {
-                    vec_scale_to_length(a30, &D_L00_001BF240, math_random_float_range(0.16666667f, 0.33333334f));
+                    vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.16666667f, 0.33333334f));
                     a30[0] += math_random_float_range(-0.15f, 0.15f);
                     a30[1] += math_random_float_range(-0.15f, 0.15f);
                     a30[2] += math_random_float_range(-0.15f, 0.15f);
@@ -213,7 +213,7 @@ void UpdateCollidingTrailProjectile(char *self)
                 }
             }
             *(int *)(pv + 0x60) = 15;
-            EmitRingAndDirectionalParticles(self, 15, self + 0x10, &D_L00_001BF240, 0.083333336f);
+            EmitRingAndDirectionalParticles(self, 15, self + 0x10, &g_hero_l00_velocity, 0.083333336f);
         }
         }
         }
@@ -252,7 +252,7 @@ void UpdateCollidingTrailProjectile(char *self)
     if (*(unsigned char *)(self + 0x20) == 1) {
         for (i = 0; i < 4; i++) {
             int n = math_random_int_below(5);
-            p = SpawnSpinningSparkParticle(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 210000.0f, 0x7F204080, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 210000.0f, 0x7F204080, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 5;
@@ -264,7 +264,7 @@ void UpdateCollidingTrailProjectile(char *self)
         }
         for (i = 0; i < 3; i++) {
             int n = math_random_int_below(3);
-            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 157500.0f, 0x7F4080FF, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 157500.0f, 0x7F4080FF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
@@ -276,7 +276,7 @@ void UpdateCollidingTrailProjectile(char *self)
         }
         for (i = 0; i < 2; i++) {
             int n = math_random_int_below(3);
-            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 105000.0f, 0x7FFFFFFF, 1);
+            p = SpawnSpinningSparkParticle(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 105000.0f, 0x7FFFFFFF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;

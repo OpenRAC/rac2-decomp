@@ -85,13 +85,13 @@ extern float path_l01_compute_segment_lengths(void *);
 extern void *moby_spawn_linked_helper(void *, void *, int, float, float);
 extern void moby_set_state(void *, int, int);
 extern void moby_set_animation_and_speed(void *, int, int, int);
-extern char *D_L01_001FE180[];
-extern float D_L01_001AFE50 __attribute__((sda));
-extern float D_L01_001AFE5C __attribute__((sda));
-extern float D_L01_001AFE74 __attribute__((sda));
-extern float D_L01_001AFE78 __attribute__((sda));
-extern float D_L01_001AFE7C __attribute__((sda));
-extern float D_L01_001AFE80 __attribute__((sda));
+extern char *g_path_l01_table[];
+extern float g_swamp_monster_init_param __attribute__((sda));
+extern float g_swamp_monster_range_near __attribute__((sda));
+extern float g_swamp_monster_limit_speed_a __attribute__((sda));
+extern float g_swamp_monster_limit_angular_a __attribute__((sda));
+extern float g_swamp_monster_limit_turn_a __attribute__((sda));
+extern float g_swamp_monster_limit_step_a __attribute__((sda));
 
 /* Sets up a Swamp Monster II when it first appears: its speeds, health and sizes, and its starting animation. */
 void swamp_monster_init(L01_003BFE48_OBJ *moby)
@@ -137,28 +137,28 @@ void swamp_monster_init(L01_003BFE48_OBJ *moby)
     vars->f13c = 0.1f;
     vars->f140 = 0.3490659f;
     vars->f160 = 0.52359885f;
-    vars->f15c = D_L01_001AFE50 * 0.00027777778f;
-    moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f,
-                 D_L01_001AFE80 * 0.016666668f,
-                 D_L01_001AFE78 * 0.0000048481375f,
-                 D_L01_001AFE7C * 0.00029088825f);
+    vars->f15c = g_swamp_monster_init_param * 0.00027777778f;
+    moby_set_controller_speed_limits(moby, g_swamp_monster_limit_speed_a * 0.00027777778f,
+                 g_swamp_monster_limit_step_a * 0.016666668f,
+                 g_swamp_monster_limit_angular_a * 0.0000048481375f,
+                 g_swamp_monster_limit_turn_a * 0.00029088825f);
     vars->f28 = 3;
     moby->fbc = 0;
     if (vars->f2c8 != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c8]);
+        path_l01_compute_segment_lengths(g_path_l01_table[vars->f2c8]);
     }
     if (vars->f2c4 != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c4]);
+        path_l01_compute_segment_lengths(g_path_l01_table[vars->f2c4]);
     }
     if (vars->f2c0 != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[vars->f2c0]);
+        path_l01_compute_segment_lengths(g_path_l01_table[vars->f2c0]);
     }
     moby_spawn_linked_helper(moby, (char *)moby + 0x10, 11, 1.2f, 2.0f);
     vars->f2e1 = 1;
     vars->f2e0 = 0;
     vars->f2e2 = 0;
     vars->f2e8 = moby->f18;
-    vars->f2ec = D_L01_001AFE5C;
+    vars->f2ec = g_swamp_monster_range_near;
     moby_set_state(moby, 0, 1);
     moby_set_animation_and_speed(moby, 0, 0, 2);
 }

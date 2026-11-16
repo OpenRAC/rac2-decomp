@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_0029CA88, the USA v2.00 copy of func_0029BCC8: the same C. */
 
 extern int ref_L00_0030CDA0_00;
@@ -18,7 +19,7 @@ void func_US2_0029CA88(void)
 /* Original assembly: RAC1 game/render/miscproc.c, func_0020C230. */
 
 typedef struct { int first, second, third, fourth; } ProgressBand;
-extern ProgressBand D_00139A28[];
+extern ProgressBand g_map_marker_table[];
 
 /* Progress-condition dispatcher. The retail dispatch reads the code-address table it
    already has at D_0026CA90 (twelve entries, one per condition) and jumps through it;

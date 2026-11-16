@@ -44,32 +44,32 @@ typedef struct {
     s32 time;
 } HudBlinkVars;
 
-extern u8 *D_L05_001B13B0 __attribute__((sda));
-extern s32 D_L05_001B1360 __attribute__((sda));
-extern s32 D_L05_001B1438 __attribute__((sda));
-extern s32 D_L05_001B1440 __attribute__((sda));
-extern s32 D_L05_001B1428 __attribute__((sda));
-extern s32 D_L05_001B13DC __attribute__((sda));
-extern s32 D_L05_001B13D0 __attribute__((sda));
-extern void *D_L05_001B1390 __attribute__((sda));
-extern void *D_L05_001B1394 __attribute__((sda));
-extern void *D_L05_001B1398 __attribute__((sda));
-extern void *D_L05_001B139C __attribute__((sda));
-extern void *D_L05_001B13A0 __attribute__((sda));
-extern void *D_L05_001B13A4 __attribute__((sda));
-extern u8 *D_L05_001A904C MACRO_ADDR;
-extern s32 D_L05_001B143C MACRO_ADDR;
-extern s32 D_L05_001B1444 MACRO_ADDR;
-extern s32 D_L05_001B142C MACRO_ADDR;
-extern f32 D_L05_001B2D84;
-extern s32 D_L05_001B2D80 MACRO_ADDR;
+extern u8 *g_feltzin_controller_moby __attribute__((sda));
+extern s32 g_feltzin_menu_mode __attribute__((sda));
+extern s32 g_feltzin_hud_label_x __attribute__((sda));
+extern s32 g_feltzin_hud_label_alt_x __attribute__((sda));
+extern s32 g_feltzin_hud_icon_x __attribute__((sda));
+extern s32 g_feltzin_active_slot_index __attribute__((sda));
+extern s32 g_feltzin_countdown_timer __attribute__((sda));
+extern void *g_feltzin_hud_sprite_a __attribute__((sda));
+extern void *g_feltzin_hud_sprite_b __attribute__((sda));
+extern void *g_feltzin_hud_sprite_c __attribute__((sda));
+extern void *g_feltzin_hud_sprite_d __attribute__((sda));
+extern void *g_feltzin_hud_sprite_e __attribute__((sda));
+extern void *g_feltzin_hud_sprite_f __attribute__((sda));
+extern u8 *g_feltzin_mission_data MACRO_ADDR;
+extern s32 g_feltzin_hud_label_y MACRO_ADDR;
+extern s32 g_feltzin_hud_label_alt_y MACRO_ADDR;
+extern s32 g_feltzin_hud_icon_y MACRO_ADDR;
+extern f32 g_screen_l05_scale;
+extern s32 g_label_mode MACRO_ADDR;
 extern s32 g_screen_width MACRO_ADDR;
-extern s32 D_L05_001B3550 MACRO_ADDR;
-extern HudMissionState D_L05_00221D10;
-extern f32 D_L05_001AC4E0, D_L05_001AC4E4;
-extern char D_L05_001B1448[], D_L05_001B1450[], D_L05_001B1498[];
-extern Block D_L05_001B1468, D_L05_001B1478, D_L05_001B1488;
-extern HudWeapon D_L05_002A1800[];
+extern s32 g_feltzin_timer MACRO_ADDR;
+extern HudMissionState g_feltzin_challenge_state;
+extern f32 g_hud_marker_x, g_hud_marker_y;
+extern char g_str_feltzin_label_count[], g_str_feltzin_label_time[], g_str_feltzin_slot_value[];
+extern Block g_feltzin_color_block_a, g_feltzin_color_block_b, g_feltzin_color_block_c;
+extern HudWeapon g_spawn_entry_table[];
 
 extern void hud_draw_feltzin_mission_sprites(s32, s32, s32, s32);
 extern char *GetLocalizedString(s32);
@@ -92,7 +92,7 @@ extern void func_PAL_0029C7F0(void), hud_draw_object_markers(void);
 
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L05_001B2D84 + 0.5f;
+    f32 scaled = value * g_screen_l05_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -101,7 +101,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L05_001B2D80;
+    int mode = g_label_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -122,21 +122,21 @@ s32 func_PAL_L05_00422CA8(void) {
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
     s32 a, b, c, idx, newidx, color, textX;
-    HudBlinkVars *data = *(HudBlinkVars **)(D_L05_001B13B0 + 0x68);
+    HudBlinkVars *data = *(HudBlinkVars **)(g_feltzin_controller_moby + 0x68);
     f32 x, y, ratio, tmp, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
 
-    switch (D_L05_001B1360) {
+    switch (g_feltzin_menu_mode) {
     case 0:
         hud_draw_feltzin_mission_sprites(0, 1, 1, 1);
         label = GetLocalizedString(0x10E9);
-        sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
-        textX = D_L05_001B1438 - 60;
-        text_draw_medium(textX, label_y((void *)textX, D_L05_001B143C - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_feltzin_label_count, label, g_feltzin_challenge_state.objectives);
+        textX = g_feltzin_hud_label_x - 60;
+        text_draw_medium(textX, label_y((void *)textX, g_feltzin_hud_label_y - 8, g_screen_l05_scale, 0.5f, 1), 0x80808080, text, 128);
         label = GetLocalizedString(0x10EA);
-        sprintf(text, D_L05_001B1448, label, D_L05_00221D10.wave + 1);
-        textX = D_L05_001B1440 - 60;
-        text_draw_medium(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_feltzin_label_count, label, g_feltzin_challenge_state.wave + 1);
+        textX = g_feltzin_hud_label_alt_x - 60;
+        text_draw_medium(textX, label_y((void *)textX, g_feltzin_hud_label_alt_y - 8, g_screen_l05_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     case 1: {
         f32 half = 0.5f;
@@ -144,15 +144,15 @@ s32 func_PAL_L05_00422CA8(void) {
 
         hud_draw_feltzin_mission_sprites(1, 1, 0, 1);
         label = GetLocalizedString(0x10EC);
-        sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
-        textX = D_L05_001B1440 - 60;
-        text_draw_medium(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_feltzin_label_count, label, g_feltzin_challenge_state.objectives);
+        textX = g_feltzin_hud_label_alt_x - 60;
+        text_draw_medium(textX, label_y((void *)textX, g_feltzin_hud_label_alt_y - 8, g_screen_l05_scale, half, 1), 0x80808080, text, 128);
         math_split_time_into_parts(data->time, &a, &b, &c);
         label = GetLocalizedString(0xEA8);
-        sprintf(text, D_L05_001B1450, label, a, b, c);
-        textX2 = D_L05_001B1428 - 80;
+        sprintf(text, g_str_feltzin_label_time, label, a, b, c);
+        textX2 = g_feltzin_hud_icon_x - 80;
         /* active is the switch value, 1 in this case (allowed by owner ruling, 2026-11-09). */
-        text_draw_medium(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, D_L05_001B1360), 0x80808080, text, 128);
+        text_draw_medium(textX2, label_y((void *)textX2, g_feltzin_hud_icon_y - 8, g_screen_l05_scale, half, g_feltzin_menu_mode), 0x80808080, text, 128);
         break;
     }
     case 2: {
@@ -160,9 +160,9 @@ s32 func_PAL_L05_00422CA8(void) {
 
         hud_draw_feltzin_mission_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x10E9);
-        sprintf(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
-        textX2 = D_L05_001B1440 - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_feltzin_label_count, label, g_feltzin_challenge_state.objectives);
+        textX2 = g_feltzin_hud_label_alt_x - 60;
+        text_draw_medium(textX2, label_y((void *)textX2, g_feltzin_hud_label_alt_y - 8, g_screen_l05_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
@@ -171,70 +171,70 @@ s32 func_PAL_L05_00422CA8(void) {
 
         hud_draw_feltzin_mission_sprites(1, 1, 0, 1);
         label = GetLocalizedString(0x10EF);
-        sprintf(text, D_L05_001B1448, label, D_L05_001B13D0);
-        textX = D_L05_001B1440 - 60;
-        text_draw_medium(textX, label_y((void *)textX, D_L05_001B1444 - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
-        math_split_time_into_parts(D_L05_001B3550, &a, &b, &c);
+        sprintf(text, g_str_feltzin_label_count, label, g_feltzin_countdown_timer);
+        textX = g_feltzin_hud_label_alt_x - 60;
+        text_draw_medium(textX, label_y((void *)textX, g_feltzin_hud_label_alt_y - 8, g_screen_l05_scale, half, 1), 0x80808080, text, 128);
+        math_split_time_into_parts(g_feltzin_timer, &a, &b, &c);
         label = GetLocalizedString(0xEA8);
-        sprintf(text, D_L05_001B1450, label, a, b, c);
-        textX2 = D_L05_001B1428 - 80;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_feltzin_label_time, label, a, b, c);
+        textX2 = g_feltzin_hud_icon_x - 80;
+        text_draw_medium(textX2, label_y((void *)textX2, g_feltzin_hud_icon_y - 8, g_screen_l05_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     }
 
-    if (D_L05_001A904C) {
-        D_L05_001B1390 = table_find_by_id(D_L05_001A904C + 0x8710, 128);
-        D_L05_001B1394 = table_find_by_id(D_L05_001A904C + 0x8710, 129);
-        D_L05_001B1398 = table_find_by_id(D_L05_001A904C + 0x8710, 130);
-        D_L05_001B139C = table_find_by_id(D_L05_001A904C + 0x8710, 131);
-        D_L05_001B13A0 = table_find_by_id(D_L05_001A904C + 0x8710, 132);
-        D_L05_001B13A4 = table_find_by_id(D_L05_001A904C + 0x8710, 133);
+    if (g_feltzin_mission_data) {
+        g_feltzin_hud_sprite_a = table_find_by_id(g_feltzin_mission_data + 0x8710, 128);
+        g_feltzin_hud_sprite_b = table_find_by_id(g_feltzin_mission_data + 0x8710, 129);
+        g_feltzin_hud_sprite_c = table_find_by_id(g_feltzin_mission_data + 0x8710, 130);
+        g_feltzin_hud_sprite_d = table_find_by_id(g_feltzin_mission_data + 0x8710, 131);
+        g_feltzin_hud_sprite_e = table_find_by_id(g_feltzin_mission_data + 0x8710, 132);
+        g_feltzin_hud_sprite_f = table_find_by_id(g_feltzin_mission_data + 0x8710, 133);
         x = IntToFloat(g_screen_width) * 0.5f;
-        y = screen_coord(D_L05_001B2D80, 200.0f, 4.0f);
-        gfx_draw_scaled_object(D_L05_001B1390, x, y, 0x60442d00, 1.0f, 0.0f);
-        gfx_draw_scaled_object(D_L05_001B1394, x, y, 0x55f0c070, 1.0f, 0.0f);
+        y = screen_coord(g_label_mode, 200.0f, 4.0f);
+        gfx_draw_scaled_object(g_feltzin_hud_sprite_a, x, y, 0x60442d00, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_feltzin_hud_sprite_b, x, y, 0x55f0c070, 1.0f, 0.0f);
 
         idx = table_find_last_used_entry(6);
-        ratio = IntToFloat(D_L05_002A1800[idx].value) / IntToFloat(D_L05_002A1800[idx].maxLevel);
+        ratio = IntToFloat(g_spawn_entry_table[idx].value) / IntToFloat(g_spawn_entry_table[idx].maxLevel);
         switch (idx) {
         case 6:
             if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L05_001B13A4, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L05_001B13A0, x, y, 0x8000ff00, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_f, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_e, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L05_001B13A0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L05_001B139C, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_feltzin_hud_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         }
 
-        fill = D_L05_00221D10.health * 0.01f;
+        fill = g_feltzin_challenge_state.health * 0.01f;
         if (fill > 0.3f) {
             data->blinkOn = 1;
         } else if (math_fast_float_d(&data->blinkTimer)) {
@@ -248,8 +248,8 @@ s32 func_PAL_L05_00422CA8(void) {
             gfx_draw_screen_rectangle(156, 14, (s32)tmp, 27, 1, colors);
 
         idx = table_find_last_used_entry(7);
-        ratio = IntToFloat(D_L05_002A1800[idx].value);
-        fill = ratio / IntToFloat(D_L05_002A1800[idx].maxAmmo);
+        ratio = IntToFloat(g_spawn_entry_table[idx].value);
+        fill = ratio / IntToFloat(g_spawn_entry_table[idx].maxAmmo);
         color = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         base = IntToFloat(450);
         end = IntToFloat(386);
@@ -261,35 +261,35 @@ s32 func_PAL_L05_00422CA8(void) {
         if (fill > 0.0f)
             gfx_draw_screen_rectangle(450, 8, (s32)tmp, 19, 1, colors2);
 
-        b0 = D_L05_001B1468;
-        b1 = D_L05_001B1478;
-        b2 = D_L05_001B1488;
+        b0 = g_feltzin_color_block_a;
+        b1 = g_feltzin_color_block_b;
+        b2 = g_feltzin_color_block_c;
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &b1);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &b0);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L05_002A1800[table_find_last_used_entry(D_L05_001B13DC)].icon), 21, 7, 30, 30, &b2);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_spawn_entry_table[table_find_last_used_entry(g_feltzin_active_slot_index)].icon), 21, 7, 30, 30, &b2);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &b1);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L05_002A1800[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
-        sprintf(text, D_L05_001B1498, D_L05_002A1800[table_find_last_used_entry(D_L05_001B13DC)].value,
-                      D_L05_002A1800[table_find_last_used_entry(D_L05_001B13DC)].maxAmmo);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_spawn_entry_table[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
+        sprintf(text, g_str_feltzin_slot_value, g_spawn_entry_table[table_find_last_used_entry(g_feltzin_active_slot_index)].value,
+                      g_spawn_entry_table[table_find_last_used_entry(g_feltzin_active_slot_index)].maxAmmo);
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         func_PAL_L05_00328198(2);
         newidx = level_lookup_step_table();
         if (newidx >= 0) {
-            D_L05_002A1800[table_find_last_used_entry(D_L05_001B13DC)].active = 0;
-            D_L05_001B13DC = newidx;
-            D_L05_002A1800[table_find_last_used_entry(newidx)].active = 1;
+            g_spawn_entry_table[table_find_last_used_entry(g_feltzin_active_slot_index)].active = 0;
+            g_feltzin_active_slot_index = newidx;
+            g_spawn_entry_table[table_find_last_used_entry(newidx)].active = 1;
         }
-        gfx_draw_scaled_object(D_L05_001B1398, x, y, 0x80f0f0f0, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_feltzin_hud_sprite_c, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
     func_PAL_0029C7F0();
-    sprite0 = table_find_by_id(D_L05_001A904C + 0x8710, 186);
-    data = table_find_by_id(D_L05_001A904C + 0x8710, 187);
-    sprite2 = table_find_by_id(D_L05_001A904C + 0x8710, 188);
-    gfx_draw_scaled_object(sprite0, D_L05_001AC4E0 + 4.0f, label_y(sprite0, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
-    gfx_draw_scaled_object(data, D_L05_001AC4E0 + 4.0f, label_y(data, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
-    gfx_draw_scaled_object(sprite2, D_L05_001AC4E0 + 4.0f, label_y(sprite2, D_L05_001AC4E4 + 4.0f, D_L05_001B2D84, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
+    sprite0 = table_find_by_id(g_feltzin_mission_data + 0x8710, 186);
+    data = table_find_by_id(g_feltzin_mission_data + 0x8710, 187);
+    sprite2 = table_find_by_id(g_feltzin_mission_data + 0x8710, 188);
+    gfx_draw_scaled_object(sprite0, g_hud_marker_x + 4.0f, label_y(sprite0, g_hud_marker_y + 4.0f, g_screen_l05_scale, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
+    gfx_draw_scaled_object(data, g_hud_marker_x + 4.0f, label_y(data, g_hud_marker_y + 4.0f, g_screen_l05_scale, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
+    gfx_draw_scaled_object(sprite2, g_hud_marker_x + 4.0f, label_y(sprite2, g_hud_marker_y + 4.0f, g_screen_l05_scale, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
     hud_draw_object_markers();
     return 1;
 }

@@ -59,7 +59,7 @@ extern float SplitFloatFraction(float *buffer, float value);
 typedef int V4_Fbfdc087a __attribute__((mode(TI)));
 #endif
 
-extern char D_00189EB0[];
+extern char g_hero_turn_rotation[];
 
 extern void func_00283410_9(float *m, char *p);
 
@@ -77,7 +77,7 @@ extern void func_00282C88_2(void *);
 
 extern void func_L00_002A9FE8_1(void *, float, float, float);
 
-extern unsigned char D_0018C0D4[];
+extern unsigned char g_screen_mode_flag[];
 
 #ifndef RAC2_T_S36_F39E097FB
 #define RAC2_T_S36_F39E097FB
@@ -86,9 +86,9 @@ typedef struct { int w[9]; } S36_F39e097fb;
 
 extern int D_0018C0B0_1;
 
-extern char D_0018AA70[];
+extern char g_effect_record_buffer[];
 
-extern S36_F39e097fb D_L00_001A7F68;
+extern S36_F39e097fb g_effect_l00_record_buffer;
 
 extern void func_L00_003116A8_1(int, int, S36_F39e097fb *, char *);
 
@@ -112,7 +112,7 @@ extern int moby_is_in_special_class_range(void *object);
 
 extern int hero_slot_item_id(int index);
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 #ifndef RAC2_T_HEROBLOCK_2AB1D8
 #define RAC2_T_HEROBLOCK_2AB1D8
@@ -126,7 +126,7 @@ extern HeroBlock_2ab1d8 g_hero_position;
 
 extern short D_L00_001BF220_2[];
 
-extern float D_0018A084;
+extern float g_hero_reach_offset;
 
 
 typedef int s32;
@@ -326,7 +326,7 @@ float math_blend_table_entries_by_clock(float *table, int count)
 /* Copies a 16-byte block pointed to by the first argument into a stack buffer, stores the three float arguments into a 16-byte stack vector, fills two 64-byte matrices through helper routines, applies copies of the buffer through them into two more 16-byte stack vectors, and finishes by passing the destination, the source and a composed vector to a closing routine. */
 void hero_offset_pose_by_vector(V4_Fbfdc087a *src, float x, float y, float z)
 {
-    char *p = D_00189EB0;
+    char *p = g_hero_turn_rotation;
     float q[4];
     float a[4];
     float b[4];
@@ -356,7 +356,7 @@ void hero_start_pose_offset(float a, float b, float c)
 
     func_00282C88_2(buf);
 
-    if (D_0018C0D4[0] == 1)
+    if (g_screen_mode_flag[0] == 1)
         buf[2] = 0.35f;
     else
         buf[2] = 0.6f;
@@ -371,8 +371,8 @@ void part_spawn_effect_from_record(int id)
 
     if (id == 0)
         id = D_0018C0B0_1;
-    buf = D_L00_001A7F68;
-    func_L00_003116A8_1(id, 9, &buf, D_0018AA70);
+    buf = g_effect_l00_record_buffer;
+    func_L00_003116A8_1(id, 9, &buf, g_effect_record_buffer);
 }
 
 /* func_L00_002AA200 is defined in L00_002AA200-pose.c. */
@@ -416,7 +416,7 @@ typedef struct {
     float second;
     int reservedAC;
 } FloatPairRow;
-extern FloatPairRow D_L00_0025BE10[4];
+extern FloatPairRow g_hero_item_attach_records[4];
 
 #ifndef RAC2_T_FLOATBLOCK_2AB1D8
 #define RAC2_T_FLOATBLOCK_2AB1D8
@@ -440,26 +440,26 @@ extern FloatBlock_2ab1d8 D_L00_0025BE10_1;
 
 /* Stores two values in the first entry of a small table. */
 void cam_set_limits_first(float first, float second) {
-    D_L00_0025BE10[0].first = first;
-    D_L00_0025BE10[0].second = second;
+    g_hero_item_attach_records[0].first = first;
+    g_hero_item_attach_records[0].second = second;
 }
 
 /* Stores two values in the second entry of a small table. */
 void cam_set_limits_second(float first, float second) {
-    D_L00_0025BE10[1].first = first;
-    D_L00_0025BE10[1].second = second;
+    g_hero_item_attach_records[1].first = first;
+    g_hero_item_attach_records[1].second = second;
 }
 
 /* Stores two values in the third entry of a small table. */
 void cam_set_limits_third(float first, float second) {
-    D_L00_0025BE10[2].first = first;
-    D_L00_0025BE10[2].second = second;
+    g_hero_item_attach_records[2].first = first;
+    g_hero_item_attach_records[2].second = second;
 }
 
 /* Stores two values in the fourth entry of a small table. */
 void cam_set_limits_fourth(float first, float second) {
-    D_L00_0025BE10[3].first = first;
-    D_L00_0025BE10[3].second = second;
+    g_hero_item_attach_records[3].first = first;
+    g_hero_item_attach_records[3].second = second;
 }
 
 /* scales and blends two 16-byte samples through a helper, and on a successful comparison writes a table-derived value to the caller's output */
@@ -467,7 +467,7 @@ int hero_test_reach_blend(float *out, float scale, float amount)
 {
     char buffer[32];
 
-    hero_build_relative_offset(buffer, 1, D_0018A084 - 0.02f, 0.0f, scale);
+    hero_build_relative_offset(buffer, 1, g_hero_reach_offset - 0.02f, 0.0f, scale);
     hero_build_relative_offset(buffer + 16, 1, amount, 0.0f, scale);
     if (func_002761F8_2(buffer, buffer + 16, 2, 0, 0)) {
         if (out)
@@ -502,8 +502,8 @@ void cam_update_blend_angles(void)
     if (hero_test_reach_blend(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
         return;
 
-    if (D_00189E20_16.b22B8 != 0 && D_L00_001BF218 != 0) {
-        if (moby_is_in_special_class_range(D_L00_001BF218) != 0)
+    if (D_00189E20_16.b22B8 != 0 && g_hit_l00_result != 0) {
+        if (moby_is_in_special_class_range(g_hit_l00_result) != 0)
             return;
     }
 

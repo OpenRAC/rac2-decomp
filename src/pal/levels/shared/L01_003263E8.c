@@ -3,7 +3,7 @@
 
 extern char *strncpy(char *dst, char *src, int len);
 extern void text_format_number_separators(char *dst, int x, int idx);
-extern unsigned char D_PAL_001A7C3C MACRO_ADDR;
+extern unsigned char g_pal_region_mode MACRO_ADDR;
 
 /* func_PAL_L01_003263E8, the PAL copy of func_L01_00324410: the same C, where the
  * separator index 0 becomes the byte D_PAL_001A7C3C. */
@@ -48,7 +48,7 @@ void func_PAL_L01_003263E8(char *out, char *src, int *nums)
                 v = s[1] - '0';
                 s += 3;
             }
-            text_format_number_separators((char *)buf, tab[v], D_PAL_001A7C3C);
+            text_format_number_separators((char *)buf, tab[v], g_pal_region_mode);
             n = 0;
             if (*buf != 0) {
                 while (buf[n] != 0 && n < 32) {

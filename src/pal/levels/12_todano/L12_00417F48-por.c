@@ -9,7 +9,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F413108;
 
-extern s32 D_L12_001B29C8[];
+extern s32 g_frame_l12_counter[];
 
 extern float math_random_float_range(char *, float, float);
 extern s32 math_random_int_range(s32, s32);
@@ -35,7 +35,7 @@ void func_PAL_L12_00417F48(char *obj)
                 FastVecAdd(&org, &org, rec + 0x1A0);
                 moby_transform_joint_to_world(*(char **)(rec + 0x2F8), 5, &a);
                 moby_transform_joint_to_world(*(char **)(rec + 0x2F8), 6, &b);
-                if (D_L12_001B29C8[0] & 1) {
+                if (g_frame_l12_counter[0] & 1) {
                     part_spawn_scaling(&a, &org, 0xCF0000FF, 0xCF, ((s32)math_random_int_range(0x12, 0x16) * 5 + 2) / 6, 0x28, -10, 1);
                     part_spawn_scaling(&b, &org, 0xCF0000FF, 0xCF, ((s32)math_random_int_range(0x12, 0x16) * 5 + 2) / 6, 0x28, -10, 1);
                 } else {

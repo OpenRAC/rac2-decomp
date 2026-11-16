@@ -4,16 +4,16 @@
 
 
 typedef unsigned char u8;
-extern u8 D_00139648;
+extern u8 g_save_baseline_count;
 extern int F9a90bcc4_FUN_002A77E0(int count);
-extern u8 D_001A7A47 __attribute__((sda));
+extern u8 g_smooth_value_flag __attribute__((sda));
 extern u8 g_item_slot_to_record[];
 extern u8 g_weapon_table[];
-extern u8 D_001A7A60[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] __attribute__((sda));
 
 /* func_002B1350 is defined in 002B00B0-reaction-g8.c. */
 
-int func_PAL_002B2618(u8 *owner, int b, int *outIndex,
+int moby_pick_random_matching_pal(u8 *owner, int b, int *outIndex,
                                        float *o0, float *o1, float *o2, float *o3,
                                        float *o4, float *o5, float *o6)
 {

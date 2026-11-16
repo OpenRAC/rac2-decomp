@@ -8,9 +8,9 @@ extern void func_3F8A98(s32);
 extern void func_3F8C08(s32);
 extern s32 func_001163B0(void);
 extern s32 FloatToInt(float);
-extern u8 *D_L18_001FF4D4;
+extern u8 *g_orbiting_effect_type_table;
 
-void func_PAL_L18_003FBD28(s32 a0)
+void robot_l18_update_pal(s32 a0)
 {
     u8 v = *(u8 *)(a0 + 0x20);
 
@@ -26,9 +26,9 @@ void func_PAL_L18_003FBD28(s32 a0)
     func_3F8C08(a0);
 }
 
-extern u16 D_0018CF40;
-extern u8 D_001A7AFD[] __attribute__((sda));
-extern u8 D_001A7A60[] MACRO_ADDR;
+extern u16 g_two_step_trigger_flag;
+extern u8 g_map_overlay_flag[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern u8 g_hero_position[];
 extern u8 g_hero_state[];
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
@@ -38,7 +38,7 @@ extern int path_build_route_nodes(u8 *, int, u8 *, int);
 extern void protopet_reset_to_start_anim(u8 *);
 extern void moby_set_state(u8 *, int, int);
 
-void func_PAL_L18_003FBD90(u8 *object) {
+void robot_init_pal(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     float rate, spin;
 
@@ -90,14 +90,14 @@ void func_PAL_L18_003FBD90(u8 *object) {
 typedef int u128 __attribute__((mode(TI)));
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern int func_PAL_002B1A50(char *, char *, int);
-extern void func_PAL_002A7650(char *, int, int);
+extern void SetDeathBits_pal(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void FastVecAdd(void *, void *, void *);
 extern int coll_sweep_from_object(char *, void *, float, float, float, int, int, int, int);
 extern void gfx_add_draw_callback_third(void *, char *);
-extern char D_L18_003F9018[];
+extern char g_robot_draw_callback[];
 
-void func_PAL_L18_003FBFB0(char *p)
+void robot_handle_hits_pal(char *p)
 {
     char *data = *(char **)(p + 0x68);
     char *hit = part_find_owned_effect_slot(p, 0x10000, 1);
@@ -118,7 +118,7 @@ void func_PAL_L18_003FBFB0(char *p)
         (*(unsigned char *)(p + 0x94) == 9 || *(unsigned char *)(p + 0x94) == 4 || *(unsigned char *)(p + 0x94) == 3))
         *(unsigned char *)(p + 0x94) = old;
     if (*(float *)(p + 0x18) < 90.0f) {
-        func_PAL_002A7650(p, 0, 3);
+        SetDeathBits_pal(p, 0, 3);
         moby_mark_spawned(p);
         return;
     }
@@ -127,5 +127,5 @@ void func_PAL_L18_003FBFB0(char *p)
     *(u128 *)temp = *(u128 *)zero;
     FastVecAdd(v, p + 0x10, temp);
     coll_sweep_from_object(p, v, *(float *)(data + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
-    if (*(unsigned char *)(p + 0x20) >= 2) gfx_add_draw_callback_third(D_L18_003F9018, p);
+    if (*(unsigned char *)(p + 0x20) >= 2) gfx_add_draw_callback_third(g_robot_draw_callback, p);
 }

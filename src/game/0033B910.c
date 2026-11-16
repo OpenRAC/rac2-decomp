@@ -23,8 +23,8 @@ extern int *object_get_fourth_field(char *);
 extern float *object_get_first_field(char *);
 extern void gfx_draw_screen_line(int, int, int, int, unsigned long long, int);
 extern Row_0033B910 g_map_spot_table[];
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern unsigned char D_001A7BE8[] MACRO_ADDR;
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern unsigned char g_map_unlocked_flags[] MACRO_ADDR;
 extern char g_map_overlay_state[];
 
 static __inline__ void SetColor_0033B910(char *w, int c)
@@ -50,11 +50,11 @@ void map_screen_draw(char *screen)
                       (float)g_map_spot_table[i].y + (*(float **)(screen + 0x1C8))[1], 0.0f, 0.0f);
         hud_set_widget_value_pair(screen + 0x2EC, 0xE99E, g_map_spot_table[i].text);
         object_set_second_float4(screen + 0x2EC, g_map_spot_table[i].scale, g_map_spot_table[i].scale, 0.0f, 0.0f);
-        if (D_001A7BE8[i] == 0)
+        if (g_map_unlocked_flags[i] == 0)
             SetColor_0033B910(screen + 0x2EC, 0x70A0C0C0);
         else
             SetColor_0033B910(screen + 0x2EC, 0x7029A1FF);
-        if (D_001A7BC8[i] != 0)
+        if (g_map_visited_flags[i] != 0)
             hud_draw_colored_quad_widget(screen + 0x2EC);
     }
     game = g_map_overlay_state;

@@ -13,7 +13,7 @@ extern void moby_release_motion_slot(char *), follower_start_random_push(char *)
 extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float), FastAddRotations(float, float);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern int math_fast_helper_a(void *, float), math_random_int_range(int, int);
-extern char *D_L05_001B9710;
+extern char *g_hero_l05_moby;
 
 typedef unsigned int U128_C160 __attribute__((mode(TI)));
 
@@ -38,7 +38,7 @@ void moby_update_movement_state(char *obj)
     follower_move_toward_target(obj);
     follower_limit_speed(obj);
     UpdateBankedOrientation(obj);
-    player = D_L05_001B9710;
+    player = g_hero_l05_moby;
     switch (follower_get_state(obj)) {
     case 7:
         vec_scale_to_length(v, *(char **)(s + 0x120) + 0xC0, -50.0f);

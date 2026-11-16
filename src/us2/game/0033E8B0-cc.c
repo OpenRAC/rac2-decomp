@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_0033E8B0, the USA v2.00 copy of func_0033D868: the same C, where template sibling func_US2_L00_004348C8; rename-macro func_0033AE28 becomes func_US2_0033BE70; rename Fc558ca70_D_001A7B95 becomes D_US2_001A7BBA; rename Fc558ca70_D_001A7B94 becomes D_US2_001A7BBB. */
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
@@ -10,7 +11,7 @@
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
-extern unsigned char D_US2_001A7BB8[] __attribute__((sda));
+extern unsigned char g_option_toggles[] __attribute__((sda));
 
 int func_US2_0033E8B0(char *a0, int a1)
 {
@@ -33,10 +34,10 @@ int func_US2_0033E8B0(char *a0, int a1)
         Fc558ca70_FUN_002E5E58(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_US2_001A7BB8[2] = D_US2_001A7BB8[2] == 0;
+            g_option_toggles[2] = g_option_toggles[2] == 0;
             break;
         case 1:
-            D_US2_001A7BB8[3] = D_US2_001A7BB8[3] == 0;
+            g_option_toggles[3] = g_option_toggles[3] == 0;
             break;
         }
     }

@@ -3,8 +3,8 @@
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern int math_fast_float_d(void *);
-extern char D_L10_002BAC40[];
-extern char D_L10_001B1790[16] __attribute__((sda));
+extern char g_cloud_path_points[];
+extern char g_cloud_target_pos[16] __attribute__((sda));
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_set_state(void *, int, int);
@@ -38,16 +38,16 @@ void cloud_object_update(char *object)
         break;
     case 1: {
         float speed = math_random_float_range(2.0f, 4.0f) * 0.016666668f;
-        vec_spring_to_target(object + 0x10, D_L10_002BAC40 + *(int *)(work + 0x28) * 16, work + 0x18,
+        vec_spring_to_target(object + 0x10, g_cloud_path_points + *(int *)(work + 0x28) * 16, work + 0x18,
                       0.00083333335f, 0.027777778f, speed);
-        if (fast_vec_dist(object + 0x10, D_L10_002BAC40 + *(int *)(work + 0x28) * 16) < 2.0f)
+        if (fast_vec_dist(object + 0x10, g_cloud_path_points + *(int *)(work + 0x28) * 16) < 2.0f)
             moby_set_state(object, 2, -1);
         break;
     }
     case 2:
-        vec_spring_to_target(object + 0x10, D_L10_001B1790, work + 0x18, 0.0033333334f, 0.0033333334f,
+        vec_spring_to_target(object + 0x10, g_cloud_target_pos, work + 0x18, 0.0033333334f, 0.0033333334f,
                       0.13333334f);
-        if (fast_vec_dist(object + 0x10, D_L10_001B1790) < 0.5f) {
+        if (fast_vec_dist(object + 0x10, g_cloud_target_pos) < 0.5f) {
             if (*(short *)(object + 0xAA) == 0x1315 /* moby class 4885 */)
                 func_L05_00398F18(object + 0x10, 0, 0, 0, 0, 15, 0, 1, 0.7f);
             else

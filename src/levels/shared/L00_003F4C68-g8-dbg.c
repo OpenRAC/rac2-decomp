@@ -18,11 +18,11 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int vaporizer_bolt_test_hit(char *,char *);
-extern unsigned char D_0013957F[];
+extern unsigned char g_beam_weapon_index[];
 typedef struct { char prefix[0x50]; float speed; char gap[0x1c]; float distance; char rest[0x6c]; } Tuning;
 extern Tuning g_weapon_l00_table[];
-extern unsigned short D_L00_001B0938 __attribute__((sda));
-extern unsigned int D_L00_001B0934 __attribute__((sda));
+extern unsigned short g_vaporizer_bolt_fade_frames __attribute__((sda));
+extern unsigned int g_vaporizer_bolt_slot_counter __attribute__((sda));
 extern char g_camera_l00_position[];
 /* Only the measured header fields are viewed; this is not a whole-object size. */
 typedef struct { char prefix[0x30]; unsigned char stamp,enabled; short tag; } HeaderView;
@@ -61,7 +61,7 @@ char *vaporizer_bolt_spawn(char *position,char *velocity,int id,int mode)
         qcopy(location,position);
         object[0x20]=0;
         vec_add_transformed_or_copy(state,velocity,position);
-        frames=0.016666668f * (g_weapon_l00_table + D_0013957F[0])->speed;
+        frames=0.016666668f * (g_weapon_l00_table + g_beam_weapon_index[0])->speed;
         state->frames=FloatToInt(128.0f / frames);
         /* Call and division in one statement: retail has no line label between them,
            so no division padding (docs/build/compiler-notes.md). */
@@ -69,15 +69,15 @@ char *vaporizer_bolt_spawn(char *position,char *velocity,int id,int mode)
         state->id=id;
         state->target=level_get_slot_body(MOBY_CLASS_VAPORIZER,id);
         state->age=0;
-        state->fadeFrames=D_L00_001B0938;
+        state->fadeFrames=g_vaporizer_bolt_fade_frames;
         state->fadeRate=1.0f/IntToFloat(state->fadeFrames);
         state->mode=mode;
         cam_compute_view_direction(location,&direction,1);
         FastVecScale(&direction,&direction,-1.0f);
         moby_build_axes(object,(char *)&direction);
-        if (D_L00_001B0934 > 3) D_L00_001B0934=0;
-        state->slot=D_L00_001B0934;
-        D_L00_001B0934=((int)(D_L00_001B0934+1))%3;
+        if (g_vaporizer_bolt_slot_counter > 3) g_vaporizer_bolt_slot_counter=0;
+        state->slot=g_vaporizer_bolt_slot_counter;
+        g_vaporizer_bolt_slot_counter=((int)(g_vaporizer_bolt_slot_counter+1))%3;
         vaporizer_bolt_start_trail_sample(object);
         if (mode == 1) {
             qcopy(&state->origin,g_camera_l00_position);

@@ -23,8 +23,8 @@ extern s32 FloatToInt(f32);
 extern float path_l01_compute_segment_lengths(u32);
 extern void anim_start_immediate(u8 *, s32, s32);
 extern void moby_set_state(u8 *, s32, s32);
-extern int D_L01_001B2088[] __attribute__((sda));
-extern u32 D_L01_001FE180[];
+extern int g_oozla_intro_stage[] __attribute__((sda));
+extern u32 g_path_l01_table[];
 extern u8 *g_moby_l01_table MACRO_ADDR;
 
 /* Sets up the swamp monster arm when it appears, then starts its idle or attack animation. */
@@ -37,7 +37,7 @@ void swamp_monster_arm_init(u8 *moby)
     vars->field29 = 1;
     *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 2.5f;
     qcopy(vars->field80, moby + 0x10);
-    if (!D_L01_001B2088[0] && moby[0x21] != 255)
+    if (!g_oozla_intro_stage[0] && moby[0x21] != 255)
         *vars->fieldd8 = 0;
     vars->field30 = 2.0f;
     vars->field2a = 8;
@@ -45,7 +45,7 @@ void swamp_monster_arm_init(u8 *moby)
     vars->field2e = 3;
     vars->fieldbc = 0;
     if (vars->fieldb8 != -1)
-        path_l01_compute_segment_lengths(D_L01_001FE180[vars->fieldb8]);
+        path_l01_compute_segment_lengths(g_path_l01_table[vars->fieldb8]);
     vars->fieldf0 = vars->fielde8;
     if (vars->fielddd)
         *(u16 *)(moby + 0x34) |= 0x8000;

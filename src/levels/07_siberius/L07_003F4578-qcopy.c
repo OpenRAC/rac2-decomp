@@ -22,7 +22,7 @@ extern int PlayMobySound(s32 a, s32 b, u8 *c);
 
 extern void moby_transform_joint_to_world(u8 *a, s32 b, void *c);
 
-extern TI128 D_L07_001BF660;
+extern TI128 g_hit_position;
 
 /* The tool's own spin: the shared vector, the two sampled ones, then the shared pass. */
 /* Fires a beam from the boss toward its target: works out the line, stops it at the first thing in the way, and spawns the beam object. */
@@ -41,7 +41,7 @@ void boss_fire_beam_attack(u8 *moby)
     vec_scale_to_length(&beam_points[1], &beam_points[1], distance + 2.0f);
     FastVecAdd(&beam_points[1], &beam_points[1], &beam_points[0]);
     if (CollLine(&beam_points[0], &beam_points[1], 2, moby, 0) != 0) {
-        beam_points[1] = D_L07_001BF660;
+        beam_points[1] = g_hit_position;
     }
     beam_spawn(moby, *(s32 *)(vars + 0x418), &beam_points[0], &beam_points[1], (f32)*(u8 *)(vars + 0x34));
 }

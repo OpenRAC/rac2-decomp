@@ -13,7 +13,7 @@ extern void func_00338830(void *, u32, int, int);
 extern void func_0032F2D0(void *, int, int, int);
 extern f32 vec_distance_xy(void *, void *);
 
-int func_PAL_L20_003A0E60(char *arg0, int arg1) {
+int trooper_spawn_parts_pal(char *arg0, int arg1) {
     char *s0;
     char *s1;
     char *s2 = arg0;

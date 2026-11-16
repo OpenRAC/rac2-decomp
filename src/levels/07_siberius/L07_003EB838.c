@@ -17,10 +17,10 @@ extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
 
 /* The last collision probe's result; +0x18 is the object it hit. */
 typedef struct { char pad[24]; char *object; } Collision;
-extern Collision D_L07_001BF640;
+extern Collision g_collision_l07_result;
 extern int g_hero_moby;
 /* `sda` on an incomplete array: the one-instruction address the assembler expands absolute. */
-extern char D_L07_001A8F20[] __attribute__((sda));
+extern char g_default_hit_direction[] __attribute__((sda));
 
 /* With no platform recorded at +0x314, probe from 2 above to 3 below the object and record a hit
    object whose flags have bit 1; otherwise carry the object along with its platform (states 7 and
@@ -42,9 +42,9 @@ void entity_ride_platform_snap_height(char *moby)
         *(Quad *)probe_end = *(Quad *)pos;
         probe_start[2] += 2.0f;
         probe_end[2] -= 3.0f;
-        if (CollLine(probe_start, probe_end, 0, moby, 0) && D_L07_001BF640.object != 0) {
-            if (*(int *)(moby_get_private_value_2(D_L07_001BF640.object) + 0x3C) & 2) {
-                *(char **)(vars + 0x314) = D_L07_001BF640.object;
+        if (CollLine(probe_start, probe_end, 0, moby, 0) && g_collision_l07_result.object != 0) {
+            if (*(int *)(moby_get_private_value_2(g_collision_l07_result.object) + 0x3C) & 2) {
+                *(char **)(vars + 0x314) = g_collision_l07_result.object;
                 FastVecSub(local_offset, pos, *(char **)(vars + 0x314) + 0x10);
                 vec_transform_by_object_or_given(*(char **)(vars + 0x314), local_offset, local_offset, 0);
                 *(float *)(vars + 0x318) = local_offset[2] - 1.0f;
@@ -68,7 +68,7 @@ void entity_ride_platform_snap_height(char *moby)
             matrix_mul_vec3(probe_start, probe_start, *(char **)(vars + 0x314) + 0xC0);
             *(float *)(vars + 0x180) = probe_start[2] + *(float *)(*(char **)(vars + 0x314) + 0x18);
             if (*(float *)(moby + 0x18) < *(float *)(vars + 0x180))
-                part_queue_impact_effect(moby, g_hero_moby, 0x10000, moby + 0x10, D_L07_001A8F20, 7.0f);
+                part_queue_impact_effect(moby, g_hero_moby, 0x10000, moby + 0x10, g_default_hit_direction, 7.0f);
         }
     }
 }

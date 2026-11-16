@@ -48,7 +48,7 @@ extern void gravity_offset_object_position(char *, void *, void *, float);
 extern char *moby_get_private_value_2(char *);
 extern void mat_combine_and_store(char *, void *, void *, void *);
 
-void func_PAL_002B5050(char *self, Sway_2B44C0 *sway, float *target)
+void moby_update_sway_pal(char *self, Sway_2B44C0 *sway, float *target)
 {
     float old_position[4];
     float old_rotation[4];

@@ -50,31 +50,31 @@ typedef struct {
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define U(p,o) (*(unsigned short *)((char *)(p)+(o)))
-extern int D_L23_001B1424,D_L23_001B36F0;
-extern u8 *D_L23_001B36B0;
+extern int g_boss_part_age_counter,g_enemy_effect_param;
+extern u8 *g_selected_moby;
 typedef struct { u8 pad00[0x80]; float position[4] __attribute__((aligned(16))); u8 pad90[0x2200]; u8 *object; } DispatchHero;
 extern DispatchHero g_hero_state;
 extern u8 *g_hero_moby __attribute__((nosda));
-extern float D_L23_001B36A4,D_L23_001B36F4,D_L23_001B36F8;
-extern float D_L23_001B36D0[4] __attribute__((aligned(16))) MACRO_ADDR;
-extern float D_L23_001C0AA0[] __attribute__((aligned(16)));
-extern u8 D_00189F00[];
-extern float D_L23_001B3708;
-extern float D_L23_001AFA14 __attribute__((sda));
-extern int D_L23_001AFA38 __attribute__((sda));
-extern float D_L23_001AFA4C __attribute__((sda));
-extern float D_L23_001AFA58 __attribute__((sda));
-extern float D_L23_001AFA5C __attribute__((sda));
-extern float D_L23_001AFA60 __attribute__((sda));
-extern float D_L23_001AFA6C __attribute__((sda));
-extern float D_L23_001AFA78 __attribute__((sda));
-extern float D_L23_001AFA80 __attribute__((sda));
-extern float D_L23_001AFA88 __attribute__((sda));
-extern float D_L23_001AFA8C __attribute__((sda));
-extern float D_L23_001AFA90 __attribute__((sda));
-extern int D_L23_001AFA94 __attribute__((sda));
-extern int D_L23_001AFA98 __attribute__((sda));
-extern int D_L23_001AFA9C __attribute__((sda));
+extern float g_mothership_surface_radius,g_mothership_effect_radius,g_mothership_impact_param;
+extern float g_boss_hit_point[4] __attribute__((aligned(16))) MACRO_ADDR;
+extern float g_coll_line_hit_point_2[] __attribute__((aligned(16)));
+extern u8 g_hero_target_point[];
+extern float g_mothership_state_param_b;
+extern float g_enemy_state_anim_blend __attribute__((sda));
+extern int g_beam_level_limit __attribute__((sda));
+extern float g_enemy_arrive_distance __attribute__((sda));
+extern float g_enemy_timer_float_base __attribute__((sda));
+extern float g_enemy_timer_float_alt __attribute__((sda));
+extern float g_enemy_timer_float_idle __attribute__((sda));
+extern float g_enemy_range __attribute__((sda));
+extern float g_enemy_facing_limit __attribute__((sda));
+extern float g_enemy_attack_time_limit __attribute__((sda));
+extern float g_enemy_chase_time_limit __attribute__((sda));
+extern float g_enemy_min_state_time __attribute__((sda));
+extern float g_enemy_retreat_time_limit __attribute__((sda));
+extern int g_enemy_high_health_threshold __attribute__((sda));
+extern int g_enemy_low_health_threshold __attribute__((sda));
+extern int g_enemy_flee_health_threshold __attribute__((sda));
 extern void flying_enemy_init_and_update(Moby_003BF9B0 *);
 extern int boss_is_fight_state_four(void),boss_pick_random_ready_attack(void);
 extern void part_start_effect_default_table(int,int,int,int,float);
@@ -124,10 +124,10 @@ void enemy_update_state_machine(u8 *object)
     unsigned long flags;
     float distance,range;
     flying_enemy_init_and_update((Moby_003BF9B0 *)object);
-    if (D_L23_001B1424>200) return;
+    if (g_boss_part_age_counter>200) return;
     if (boss_is_fight_state_four())
-        part_start_effect_default_table((int)object,(int)object,0x10000,(int)(object+0x10),(float)D_L23_001B36F0);
-    selected=D_L23_001B36B0==object;
+        part_start_effect_default_table((int)object,(int)object,0x10000,(int)(object+0x10),(float)g_enemy_effect_param);
+    selected=g_selected_moby==object;
     facing=0;
     ((DispatchState *)state)->f326=0;
     if (selected && (unsigned int)(object[0x20]-9)>2)
@@ -137,7 +137,7 @@ void enemy_update_state_machine(u8 *object)
         FastVecSub(difference,g_hero_state.position,object+0x10);
         if (moby_measure_step_angle((char *)object,(Quad *)difference,0)<=0.7853982f) facing=1;
         distance=fast_vec_dist(g_hero_state.position,object+0x10);
-        range=D_L23_001AFA6C;
+        range=g_enemy_range;
         ((DispatchState *)state)->f27C=distance;
         ((DispatchState *)state)->f324=0;
         if (distance<range)
@@ -151,7 +151,7 @@ void enemy_update_state_machine(u8 *object)
             snd_stop_voice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1;
         }
         if (object[0x43]==8 && FastVecLength(state+0x1C0)>0.0f) {
-            if (((DispatchState *)state)->f270<D_L23_001B36A4) mothership_project_point_onto_surface((char *)object+0x10,0.0f);
+            if (((DispatchState *)state)->f270<g_mothership_surface_radius) mothership_project_point_onto_surface((char *)object+0x10,0.0f);
             *(Quad *)local=0; local[2]=((DispatchState *)state)->f174;
             *(Quad *)point=*(Quad *)local;
             matrix_mul_vec3(point,point,object+0xC0);
@@ -171,7 +171,7 @@ void enemy_update_state_machine(u8 *object)
                 if (index!=-1) stored_object_forward((int)g_hero_state.position,index);
             }
             qcopy((object+0x10), g_hero_state.position);
-            mothership_project_point_onto_surface((char *)object+0x10,(-D_L23_001B36A4)*2.0f);
+            mothership_project_point_onto_surface((char *)object+0x10,(-g_mothership_surface_radius)*2.0f);
         }
         if ((flags & 1UL) == 1UL) moby_reset_idle_clear_links((char *)object);
         else if (flag_set_first_pending(object) && object[0x43]==8) {
@@ -207,7 +207,7 @@ void enemy_update_state_machine(u8 *object)
             moby_play_anim_and_link((char *)object,9,0,0,1,1.0f);
             moby_play_anim_and_link((char *)object,1,0,0,2,1.0f);
             enemy_snap_to_ground((char *)object,1);
-            ((DispatchState *)state)->f3BC=1; ((DispatchState *)state)->f3B8=(float)D_L23_001AFA38;
+            ((DispatchState *)state)->f3BC=1; ((DispatchState *)state)->f3B8=(float)g_beam_level_limit;
         }
         gfx_add_draw_callback_first(gfx_draw_pulsing_beam,object);
         break;
@@ -225,7 +225,7 @@ void enemy_update_state_machine(u8 *object)
             FastVecAdd(point,point,object+0x10);
             FastVecScale(difference,object+0xE0,0.2f);
             FastVecAdd(difference,difference,object+0x10);
-            if (CollLine(difference,point,18,0,0) && fast_vec_dist(D_L23_001C0AA0,object+0x10)<4.0f)
+            if (CollLine(difference,point,18,0,0) && fast_vec_dist(g_coll_line_hit_point_2,object+0x10)<4.0f)
                 moby_set_state(object,4,0);
         }
         break;
@@ -241,75 +241,75 @@ void enemy_update_state_machine(u8 *object)
     case 7:
         if (flag_set_second_pending(object)) {
             ((DispatchState *)state)->f250=200;
-            ((DispatchState *)state)->f2A8=D_L23_001AFA58+math_random_float_range(0.0f,D_L23_001AFA58*0.5f);
+            ((DispatchState *)state)->f2A8=g_enemy_timer_float_base+math_random_float_range(0.0f,g_enemy_timer_float_base*0.5f);
             ((DispatchState *)state)->f320=(char *)g_hero_state.position;
         }
-        if (!object[0x31]) ((DispatchState *)state)->f2A8=D_L23_001AFA60;
-        else if (((DispatchState *)state)->f2A8==D_L23_001AFA60)
-            ((DispatchState *)state)->f2A8=D_L23_001AFA58+math_random_float_range(0.0f,D_L23_001AFA58*0.5f);
+        if (!object[0x31]) ((DispatchState *)state)->f2A8=g_enemy_timer_float_idle;
+        else if (((DispatchState *)state)->f2A8==g_enemy_timer_float_idle)
+            ((DispatchState *)state)->f2A8=g_enemy_timer_float_base+math_random_float_range(0.0f,g_enemy_timer_float_base*0.5f);
         if (((DispatchState *)state)->f250==0) moby_set_state(object,5,0);
-        else if (((DispatchState *)state)->f324 && facing && ((DispatchState *)state)->f27C<D_L23_001AFA78)
+        else if (((DispatchState *)state)->f324 && facing && ((DispatchState *)state)->f27C<g_enemy_facing_limit)
             moby_set_state(object,8,2);
         else UpdatePathFollowing(object);
         break;
     case 8:
-        if (flag_set_first_pending(object)) ((DispatchState *)state)->f2A8=D_L23_001AFA58+math_random_float_range(0.0f,D_L23_001AFA58*0.5f);
+        if (flag_set_first_pending(object)) ((DispatchState *)state)->f2A8=g_enemy_timer_float_base+math_random_float_range(0.0f,g_enemy_timer_float_base*0.5f);
         if (((u8 *)((DispatchState *)state)->f2A0)[0x43]!=4) {
             moby_play_anim_and_link((char *)object,4,0,10,2,1.0f);
-            F(((DispatchState *)state)->f2A0,0x48)=D_L23_001B3708;
+            F(((DispatchState *)state)->f2A0,0x48)=g_mothership_state_param_b;
         }
-        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA80) {
+        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>g_enemy_attack_time_limit) {
             moby_set_state(object,5,0); ((DispatchState *)state)->f250=0;
-        } else if (((DispatchState *)state)->f27C>D_L23_001AFA88 ||
-                   ((unsigned int)(object[0x43]-5)<2 && ((DispatchState *)state)->f27C>D_L23_001AFA88-2.0f)) {
+        } else if (((DispatchState *)state)->f27C>g_enemy_chase_time_limit ||
+                   ((unsigned int)(object[0x43]-5)<2 && ((DispatchState *)state)->f27C>g_enemy_chase_time_limit-2.0f)) {
             ((DispatchState *)state)->f320=(char *)g_hero_state.position; UpdatePathFollowing(object);
         } else {
             moby_play_anim_and_link((char *)object,3,0,10,1,1.0f); moby_call_helper_with_blocks((char *)object);
         }
-        if (math_is_value_within_step(((DispatchState *)state)->f2A0,28.0f)) hero_launch_hit_effect((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,0);
-        else if (math_is_value_within_step(((DispatchState *)state)->f2A0,14.0f)) hero_launch_hit_effect((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,1);
+        if (math_is_value_within_step(((DispatchState *)state)->f2A0,28.0f)) hero_launch_hit_effect((char *)object,g_mothership_effect_radius+g_mothership_effect_radius,(int)g_hero_target_point,0);
+        else if (math_is_value_within_step(((DispatchState *)state)->f2A0,14.0f)) hero_launch_hit_effect((char *)object,g_mothership_effect_radius+g_mothership_effect_radius,(int)g_hero_target_point,1);
         break;
     case 9:
         if (flag_set_first_pending(object)) {
-            moby_play_anim_and_link((char *)object,6,0,12,1,D_L23_001AFA14);
+            moby_play_anim_and_link((char *)object,6,0,12,1,g_enemy_state_anim_blend);
             moby_play_anim_and_link((char *)object,8,0,12,2,4.0f);
             moby_stop_effects((char *)object);
             ((DispatchState *)state)->f328=ribbon_trail_create((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,0.7f,0.85f,0.5f,1.2f,30,5,0x7F7F7F,0x7F7F7F,0,-1,0);
             ((DispatchState *)state)->f32C=ribbon_trail_create((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,1.9f,2.05f,0.5f,1.2f,10,2,0x3F00000,0x3F0000,0,-1,0);
-            ((DispatchState *)state)->f2A8=D_L23_001AFA5C;
+            ((DispatchState *)state)->f2A8=g_enemy_timer_float_alt;
             ((DispatchState *)state)->f3B4=snd_play_from_class_bank(4,4,(char *)object,0x7E5);
         }
-        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA80) {
+        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>g_enemy_attack_time_limit) {
             moby_set_state(object,5,0); ((DispatchState *)state)->f250=0; break;
         }
         moby_transform_joint_to_world(((DispatchState *)state)->f2A0,1,state+0x330);
         moby_transform_joint_to_world(((DispatchState *)state)->f2A0,0,state+0x340);
-        if ((int)U(object,0x96)>D_L23_001AFA94) {
+        if ((int)U(object,0x96)>g_enemy_high_health_threshold) {
             ((DispatchState *)state)->f320=(char *)g_hero_state.position;
-            if (((DispatchState *)state)->f27C<D_L23_001AFA8C) moby_set_state(object,10,2);
+            if (((DispatchState *)state)->f27C<g_enemy_min_state_time) moby_set_state(object,10,2);
             UpdatePathFollowing(object);
         }
         break;
     case 10:
-        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA90) { moby_set_state(object,5,0); break; }
+        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>g_enemy_retreat_time_limit) { moby_set_state(object,5,0); break; }
         moby_transform_joint_to_world(((DispatchState *)state)->f2A0,1,state+0x330);
         moby_transform_joint_to_world(((DispatchState *)state)->f2A0,0,state+0x340);
         if (flag_set_first_pending(object)) {
             moby_stop_effects((char *)object);
-            ((DispatchState *)state)->f328=ribbon_trail_create((u8 *)state+0x330,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
-            ((DispatchState *)state)->f32C=ribbon_trail_create((u8 *)state+0x340,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
+            ((DispatchState *)state)->f328=ribbon_trail_create((u8 *)state+0x330,object,(u8 *)g_boss_hit_point,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
+            ((DispatchState *)state)->f32C=ribbon_trail_create((u8 *)state+0x340,object,(u8 *)g_boss_hit_point,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
             break;
         }
-        if ((int)U(object,0x96)<=D_L23_001AFA98) break;
+        if ((int)U(object,0x96)<=g_enemy_low_health_threshold) break;
         FastVecAdd(difference,state+0x330,state+0x340);
         FastVecScale(difference,difference,0.5f);
-        if (fast_vec_dist(difference,D_L23_001B36D0)<D_L23_001AFA4C) {
+        if (fast_vec_dist(difference,g_boss_hit_point)<g_enemy_arrive_distance) {
             vec_scale_to_length(point,((DispatchState *)state)->f2A0+0xE0,0.25f);
             FastVecAdd(point,point,((DispatchState *)state)->f2A0+0xC0);
             FastVecScale(point,point,15.0f); point[3]=5627.9248f;
-            part_queue_impact_effect((int)g_hero_moby,(int)object,0x10007,(int)(object+0x10),(int)point,D_L23_001B36F8);
+            part_queue_impact_effect((int)g_hero_moby,(int)object,0x10007,(int)(object+0x10),(int)point,g_mothership_impact_param);
             queue_copy_record_by_index(43);
-            SpawnExplosion(D_L23_001B36D0,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
+            SpawnExplosion(g_boss_hit_point,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
             ((DispatchState *)state)->f3BE=1;
         }
         moby_set_state(object,11,2);
@@ -317,8 +317,8 @@ void enemy_update_state_machine(u8 *object)
     case 11:
         if (flag_set_first_pending(object)) {
             if (((DispatchState *)state)->f3B4!=-1) { snd_stop_voice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
-        } else if ((int)U(object,0x96)>D_L23_001AFA9C) { moby_clear_selected((char *)object); moby_set_state(object,5,0); } else {
-            if ((int)U(object,0x96)>=D_L23_001AFA9C-5 && ((DispatchState *)state)->f3BE) {
+        } else if ((int)U(object,0x96)>g_enemy_flee_health_threshold) { moby_clear_selected((char *)object); moby_set_state(object,5,0); } else {
+            if ((int)U(object,0x96)>=g_enemy_flee_health_threshold-5 && ((DispatchState *)state)->f3BE) {
                 snd_start_in_slot(29,0,0); ((DispatchState *)state)->f3BE=0; queue_copy_record_by_index(43);
             }
         }

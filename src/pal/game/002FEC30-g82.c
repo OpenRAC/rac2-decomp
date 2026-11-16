@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int ref_L00_002FE5A0_00[] __attribute__((sda));
 typedef struct { char pad[0x1C]; int count; float point[4]; char rest[0x20]; } CollisionE5;
 extern CollisionE5 ref_L00_002FE5A0_01;
@@ -20,7 +20,7 @@ extern void FastVecScale(float *, float *, float);
 extern void vec_scale_to_length(float *, float *, float);
 extern void table_clear_entry_flag(int);
 
-int func_PAL_002FF5F8(float *start, float *motion, float *destination, float *normal,
+int coll_trace_projectile_to_impact_pal(float *start, float *motion, float *destination, float *normal,
                  void *owner, int *object_out, int *type_out, float scale)
 {
     float current[4] __attribute__((aligned(16)));
@@ -31,7 +31,7 @@ int func_PAL_002FF5F8(float *start, float *motion, float *destination, float *no
     int count;
     int result = 0;
     int slot, i, type;
-    if (D_0018C0B4 == 111 || ref_L00_002FE5A0_00[0]) return 0;
+    if (g_game_mode == 111 || ref_L00_002FE5A0_00[0]) return 0;
     qcopy(effect.last, start);
     slot = part_alloc_effect_slot(&effect, 0, 1.0f, 1.0f, 1.0f);
     qcopy(previous, start);

@@ -2,19 +2,19 @@
 /* func_PAL_L18_0042C210, the PAL copy of func_L18_00427688: the same C, where rename func_L18_00426F78 becomes func_PAL_L18_0042BAE0; rename func_L18_00426F28 becomes func_PAL_L18_0042BA90. */
 #include "common.h"
 typedef struct { float f0,f4,f8,fC,f10,f14,f18; } MotionDefaults;
-extern MotionDefaults D_L18_001B1218 __attribute__((sda));
+extern MotionDefaults g_shooter_motion_defaults __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_0019B2E8[];
-extern unsigned char D_L18_0021E7B0[][0x464];
+extern unsigned char g_moby_group_flags[];
+extern unsigned char g_trigger_l18_flags[][0x464];
 extern float math_random_float_range(float,float);
 extern void moby_set_controller_speed_limits(unsigned char *,float,float,float,float);
 extern int math_random_int_range(int,int);
 extern float path_get_entry_length(int);
 extern int moby_set_anim(unsigned char *,int,int);
-extern void func_PAL_L18_0042BAE0(unsigned char *);
+extern void moby_rebuild_scale_matrix_pal(unsigned char *);
 extern void moby_release_shared_resource(unsigned char *);
 extern int func_001163B0(void);
-extern void func_PAL_L18_0042BA90(unsigned char *,int,int,float);
+extern void moby_start_or_forward_anim_pal(unsigned char *,int,int,float);
 extern void moby_set_state(unsigned char *,int,int);
 int func_PAL_L18_0042C210(unsigned char *object)
 {
@@ -22,8 +22,8 @@ int func_PAL_L18_0042C210(unsigned char *object)
     float randomAngle;
     unsigned int ownerClass;
     if(object[0xb0]!=0xff) {
-        if((D_0019B2E8[object[0xb0]+g_current_map_index*16]&0x80)!=0) {
-            if(D_L18_0021E7B0[1][*(short *)(object+0xb2)]!=0) return 1;
+        if((g_moby_group_flags[object[0xb0]+g_current_map_index*16]&0x80)!=0) {
+            if(g_trigger_l18_flags[1][*(short *)(object+0xb2)]!=0) return 1;
         }
     }
     state=*(unsigned char **)(object+0x68);
@@ -56,7 +56,7 @@ int func_PAL_L18_0042C210(unsigned char *object)
     *(float *)(state+0x10c)=0.5f;
     *(float *)(state+0x110)=1.22173059f;
     randomAngle=math_random_float_range(20.0f,25.0f);
-    { float speed=D_L18_001B1218.f18;
+    { float speed=g_shooter_motion_defaults.f18;
     *(float *)(state+0x134)=0.5f;
     state[0x1e8]=0; state[0x1e9]=0;
     *(float *)(state+0x130)=randomAngle*0.017453294f;
@@ -64,9 +64,9 @@ int func_PAL_L18_0042C210(unsigned char *object)
     if(*(short *)(object+0xaa)==0xed4) *(float *)(state+0x100)=1.0f;
     if(*(short *)(object+0xaa)==0xee1) *(float *)(state+0x100)=1.1f;
     if(*(float *)(state+0x3c4)==0.0f && *(float *)(state+0x3c0)==0.0f && *(float *)(state+0x3cc)==0.0f && *(float *)(state+0x3c8)==0.0f) {
-        float a=D_L18_001B1218.f0,b=D_L18_001B1218.f4;
-        float c=D_L18_001B1218.f8,d=D_L18_001B1218.fC;
-        float e=D_L18_001B1218.f10,f=D_L18_001B1218.f14;
+        float a=g_shooter_motion_defaults.f0,b=g_shooter_motion_defaults.f4;
+        float c=g_shooter_motion_defaults.f8,d=g_shooter_motion_defaults.fC;
+        float e=g_shooter_motion_defaults.f10,f=g_shooter_motion_defaults.f14;
         *(float *)(state+0x3c4)=a;
         *(float *)(state+0x3c0)=b;
         *(float *)(state+0x3cc)=c;
@@ -98,14 +98,14 @@ int func_PAL_L18_0042C210(unsigned char *object)
     *(int *)(state+0x13c)=*(int *)(state+0x380);
     moby_set_anim(object,*(int *)(state+0x36c),-1);
     if(state[0x399]!=0) state[0x399]=1;
-    func_PAL_L18_0042BAE0(object);
+    moby_rebuild_scale_matrix_pal(object);
     moby_release_shared_resource(object);
     switch(*(short *)(object+0xaa)) {
     case 0xec0: state[0x39b]=0; *(int *)(state+0x1c)=0; break;
     case 0xed4:
     case 0xee1: state[0x39b]=2; break;
     }
-    func_PAL_L18_0042BA90(object,func_001163B0()&1,0,1.0f);
+    moby_start_or_forward_anim_pal(object,func_001163B0()&1,0,1.0f);
     if(state[0x3e8]!=0) {
         moby_set_state(object,0,1);
         *(int *)(object+0x48)=0;

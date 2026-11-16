@@ -9,7 +9,7 @@ extern struct {
     char pad1248[0x104C];
     int planet;
 } D_00189E20;
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 
 /* Both differ per level. The colours are one block: element 0 is the one-instruction
  * load the delay slot can take, while +4/+8/+12 are the backend's two-instruction form. */
@@ -130,7 +130,7 @@ void thermanator_l24_update(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+        if ((g_pad_pressed_flags & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
             start_equipped_item_animation();
             obj->state = 3;
             if (!v->reverse) {
@@ -147,7 +147,7 @@ void thermanator_l24_update(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+        if (!(g_pad_pressed_flags & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
             cancel_hero_item_animation();
             obj->state = 2;
         } else if (math_fast_float_d(&v->countdown)) {

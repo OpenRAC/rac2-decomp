@@ -12,7 +12,7 @@ extern void shot_handle_impact(void *,void *),part_spawn_spark_trail_between_poi
 extern char *explosion_spawn(void *,float,int,int,int,int,int,int,int,int,int);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern char *g_area_hit_targets[];
-extern char g_item_slot_to_record[],g_weapon_l00_table[],D_L00_001C6F40[];
+extern char g_item_slot_to_record[],g_weapon_l00_table[],g_light_table[];
 extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(void *,void *,float,int,void *),QueueMobyImpact(void *,void *);
 extern void gfx_free_point_light(int);
@@ -97,7 +97,7 @@ void UpdateExplodingTrailProjectile(char *arg)
     if (*(int *)(ctx+24)==-1)
         *(int *)(ctx+24)=part_l00_alloc_effect_slot_2(arg+16,5.0f,0.0f,1.0f,0.8f,0.25f);
     else {
-        entry=D_L00_001C6F40+32**(int *)(ctx+24);
+        entry=g_light_table+32**(int *)(ctx+24);
         qcopy(entry+16,arg+16);
         *(float *)(entry+24)+=1.0f;
         *(float *)(entry+28)=5.0f;

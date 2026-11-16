@@ -5,7 +5,7 @@
  * -G8 supplies the timestamp store; -g retains the division's label padding.
  */
 typedef float VecE[4] __attribute__((aligned(16)));
-extern VecE D_001BAFB0, D_001BAFA0;
+extern VecE g_coll_hit_point, g_coll_hit_position;
 
 typedef struct {
     u8 pad00[0x80]; VecE position; u8 pad90[0x50]; VecE pickup_target;
@@ -23,7 +23,7 @@ extern u8 g_item_slot_to_record[];
 extern s32 g_item_ammo_counts[];
 extern void *g_hero_moby NOT_SDA;
 extern s32 g_game_time[] __attribute__((sda));
-extern s32 D_001B24A8[] __attribute__((sda));
+extern s32 g_ammo_pickup_time[] __attribute__((sda));
 /* The sound timestamp is read absolutely and written through the SDA alias.
  * Both declarations bind to the same word in each program.
  */
@@ -64,7 +64,7 @@ void ammo_pickup_update(u8 *object)
             qcopy(start, object+0x10);
             start[2] += 0.5f;
             if (coll_test_point(start,2,0,0.4f)) {
-                qcopy(object+0x10,D_001BAFB0);
+                qcopy(object+0x10,g_coll_hit_point);
                 EF(object,0x18) -= 0.5f;
             }
         }
@@ -75,7 +75,7 @@ void ammo_pickup_update(u8 *object)
         start[2] += 0.1f;
         if (CollLine(start,next,2,0,0)) {
             vec_clear_128(vars+0x10);
-            qcopy(object+0x10,D_001BAFA0);
+            qcopy(object+0x10,g_coll_hit_position);
         } else qcopy(object+0x10,next);
     }
     switch (object[0x20]) {
@@ -118,7 +118,7 @@ void ammo_pickup_update(u8 *object)
             object[0x20]=2;
             EF(object,0x2C)*=1.2f;
             vec_clear_128(vars+0x10);
-            elapsed=g_game_time[0]-D_001B24A8[0];
+            elapsed=g_game_time[0]-g_ammo_pickup_time[0];
             EF(vars,0x24)=0.13333334f;
             if (subtract_integer_with_clamp(elapsed)>=11) {
                 snd_play_from_class_bank(0,0,object,0xD5);

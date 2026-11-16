@@ -26,9 +26,9 @@ extern void snd_stop_voice(int);
 extern int coll_sweep_from_object(void *,void *,int,int,int,int,float,float,float);
 extern void make_hit_descriptor(void *,void *,int,void *,float);
 extern int CollLine(void *,void *,int,void *,void *);
-extern void func_PAL_L18_00439B10(char *,int);
-extern struct { u8 pad[24];u8 *object;u8 pad1[4];float position[4] __attribute__((aligned(16))); } D_L18_001BFC00;
-extern int D_L18_001B2348 __attribute__((sda));
+extern void part_spawn_large_spark_smoke_pal(char *,int);
+extern struct { u8 pad[24];u8 *object;u8 pad1[4];float position[4] __attribute__((aligned(16))); } g_hero_ground_hit;
+extern int g_frame_l18_counter __attribute__((sda));
 typedef struct {
  u8 pad[0x7e4]; u8 *attached; u8 gap[0x1c]; s16 timer, mode;
 } DamoselBeamState;
@@ -38,7 +38,7 @@ extern char g_sound_state[];
 extern char g_hero_position[];
 extern void snd_stop_voice(int);
 
-void func_PAL_L18_004384D8(u8 *obj) {
+void extermibot_beam_update_pal(u8 *obj) {
  float a[4] __attribute__((aligned(16))),b[4] __attribute__((aligned(16))),v[4] __attribute__((aligned(16)));
  struct { float direction[4] __attribute__((aligned(16))); int owner,mode; u8 type,flags;u16 id; float distance;int enabled; } hit;
  u8 *s=P(obj,0x68),*other;float t;
@@ -82,22 +82,22 @@ void func_PAL_L18_004384D8(u8 *obj) {
    make_hit_descriptor(&hit,obj,0x210001,v,(float)s[0x34]);
    hit.type=5;hit.flags=3;hit.id=*(u16 *)(obj+0xaa);
    if(CollLine(s+0x610,s+0x620,0,obj,&hit)) {
-    func_PAL_L18_00439B10(s+0x620,15);qcopy(s+0x760,s+0x620);H(s,0x804)=0;
-    if(D_L18_001BFC00.object) {
-     float *point=D_L18_001BFC00.position;
+    part_spawn_large_spark_smoke_pal(s+0x620,15);qcopy(s+0x760,s+0x620);H(s,0x804)=0;
+    if(g_hero_ground_hit.object) {
+     float *point=g_hero_ground_hit.position;
      u8 *attached;
-     H(s,0x806)=3;attached=D_L18_001BFC00.object;P(s,0x7e4)=attached;
+     H(s,0x806)=3;attached=g_hero_ground_hit.object;P(s,0x7e4)=attached;
      qcopy(s+0x620,point);qcopy(s+0x770,attached+0x10);
     } else H(s,0x806)=4;
    }
-  } else {H(s,0x806)=4;func_PAL_L18_00439B10(s+0x620,10);}
+  } else {H(s,0x806)=4;part_spawn_large_spark_smoke_pal(s+0x620,10);}
   break;
  case 3:
   qcopy(s+0x610,a);qcopy(s+0x6b0,b);
   if(H(s,0x804)<43 && (other=P(s,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
    FastVecSub(v,other+0x10,s+0x770);FastVecAdd(s+0x620,s+0x620,v);
    qcopy(s+0x6c0,s+0x620);qcopy(s+0x770,P(s,0x7e4)+0x10);
-   if((D_L18_001B2348&15)==(((int)obj>>8)&15))func_PAL_L18_00439B10(s+0x620,1);
+   if((g_frame_l18_counter&15)==(((int)obj>>8)&15))part_spawn_large_spark_smoke_pal(s+0x620,1);
   } else {
    DamoselBeamState *state=(DamoselBeamState *)s;
    state->attached=0;state->mode=4;state->timer=0;

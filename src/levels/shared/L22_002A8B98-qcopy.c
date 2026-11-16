@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern char g_hero_state[];
-extern s32 D_001A8F00[] __attribute__((sda));
+extern s32 g_hero_mode_state[] __attribute__((sda));
 
 extern void moby_mark_spawned(s32);
 extern void set_animation_parameter(s32, s32);
@@ -12,11 +12,11 @@ extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, char *);
 extern int hero_l22_set_action(s32, s32);
-extern char D_00302FD0[];
-extern char D_00302F80[];
-extern char D_003026B0[];
-extern char D_001B46C0[];
-extern char D_001B4CC0[];
+extern char g_str_hud_slot_text_c[];
+extern char g_str_hud_slot_text_b[];
+extern char g_str_hud_slot_text_a[];
+extern char g_hero_anim_buffer_upper[];
+extern char g_hero_anim_buffer_lower[];
 
 /* Resets the hero for a restart: drops the held objects, replays the entry sequence and rebinds the player's moby. */
 void hero_reset_for_restart(void)
@@ -48,7 +48,7 @@ void hero_reset_for_restart(void)
     attachment_reset_all();
     hero3 = g_hero_state;
     *(unsigned char *)(hero3 + 0x22B4) = 0;
-    hud_set_slot_contents(0x23, 0, D_00302FD0, D_00302F80, D_003026B0, 0, 0);
+    hud_set_slot_contents(0x23, 0, g_str_hud_slot_text_c, g_str_hud_slot_text_b, g_str_hud_slot_text_a, 0, 0);
     level_run_slot_callback(3);
     if (*(char **)(hero3 + 0xC14) != 0)
         *(unsigned short *)(*(char **)(hero3 + 0xC14) + 0x34) &= 0xFFF9;
@@ -62,8 +62,8 @@ void hero_reset_for_restart(void)
     *(float *)(hero3 + 0xC24) = 1.0f;
     hero_clear_queued_anim();
     if (*(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x42) != 0xFF)
-        *(s32 *)(*(char **)(hero3 + 0x2290) + 0x58) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x42), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x40), D_001B46C0);
-    *(s32 *)(*(char **)(hero3 + 0x2290) + 0x5C) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x43), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x41), D_001B4CC0);
-    if (*(s32 *)(hero3 + 0x2294) != 0x61 || ((mode = D_001A8F00[0]) != 2 && mode != 6))
+        *(s32 *)(*(char **)(hero3 + 0x2290) + 0x58) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x42), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x40), g_hero_anim_buffer_upper);
+    *(s32 *)(*(char **)(hero3 + 0x2290) + 0x5C) = anim_copy_entry_data(*(char **)(hero3 + 0x2290), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x43), *(unsigned char *)(*(char **)(hero3 + 0x2290) + 0x41), g_hero_anim_buffer_lower);
+    if (*(s32 *)(hero3 + 0x2294) != 0x61 || ((mode = g_hero_mode_state[0]) != 2 && mode != 6))
         hero_l22_set_action(0, 1);
 }

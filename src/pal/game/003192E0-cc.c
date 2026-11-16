@@ -14,9 +14,9 @@ typedef struct {
 #endif
 
 extern State_001b5200 g_active_camera;
-extern short *D_001EE5A0[];
-extern u8 *D_001B1B5C MACRO_ADDR;
-extern int D_001B1B78 MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern u8 *g_moby_pool_start MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
 extern int FloatToInt(float);
 extern float math_random_signed_float_range(float, float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -94,10 +94,10 @@ int func_PAL_003192E0(char *self)
     if (result || dead) {
         flyer_alert_group(self);
         if (result == 4 || result == 5 || dead) {
-            if ((unsigned char)self[0x21] <= D_001B1B78 && moby_count_group_not_in_state((unsigned char)self[0x21], -1) >= 2) {
-                p = D_001EE5A0[(unsigned char)self[0x21]];
+            if ((unsigned char)self[0x21] <= g_moby_group_count && moby_count_group_not_in_state((unsigned char)self[0x21], -1) >= 2) {
+                p = g_moby_group_lists[(unsigned char)self[0x21]];
                 do {
-                    other = D_001B1B5C + ((*p & 0x7FFF) << 8);
+                    other = g_moby_pool_start + ((*p & 0x7FFF) << 8);
                     if (*(short *)(other + 0xAA) == 0x99C) {
                         char *otherData = *(char **)(other + 0x68);
                         if (!*(int *)(otherData + 0x2AC)) {

@@ -8,12 +8,12 @@ extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_L00_0032C328(void *,void *,void *,void *,int,int,int,int,int,unsigned char,int);
+extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,int,int,int,int,int,unsigned char,int);
 extern void moby_mark_spawned(void *);
-extern int D_L18_001B1BB0 __attribute__((sda));
-extern int D_L18_001B1B88 __attribute__((sda));
-extern int D_L18_001B1B80 __attribute__((sda));
-extern int D_L18_001B1B90 __attribute__((sda));
+extern int g_debris_piece_lifetime __attribute__((sda));
+extern int g_debris_piece_spread_range __attribute__((sda));
+extern int g_debris_piece_speed_range __attribute__((sda));
+extern int g_debris_piece_offset __attribute__((sda));
 extern int math_random_int_below(int);
 extern void moby_compute_local_point(void *, void *, float, float, float);
 extern void matrix_mul_vec3(void *,void *,void *);
@@ -37,13 +37,13 @@ void func_PAL_L18_00441F00(u8 *o) {
             qcopy(b,a);
             FastVecSub(a,a,spread);
             FastVecAdd(b,b,spread);
-            func_PAL_L00_0032C328(o,a,&D_L18_001B1B88,&D_L18_001B1B80,65535,-1,D_L18_001B1BB0,9,2,255,0);
+            part_explode_object_into_pieces_pal(o,a,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,-1,g_debris_piece_lifetime,9,2,255,0);
             moby_set_state(o,2,-1);
         }
         o[0xA8]=255;
         break;
     case 2:
-        func_PAL_L00_0032C328(o,&D_L18_001B1B90,&D_L18_001B1B88,&D_L18_001B1B80,65535,0,D_L18_001B1BB0,6,61,255,0);
+        part_explode_object_into_pieces_pal(o,&g_debris_piece_offset,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,0,g_debris_piece_lifetime,6,61,255,0);
         n=math_random_int_below(5);
         moby_compute_local_point(o,a,0.35f,0.0f,1.8f);
         for(i=0;i<n;i++) {

@@ -9,7 +9,7 @@ extern void moby_update_eased_node(void *, void *, int, float, float);
 extern float vec_distance_xy(const void *, const void *);
 extern void func_PAL_L20_003A1940(unsigned char *);
 
-void func_PAL_L20_003A16B8(unsigned char *object) {
+void trooper_aim_at_target_pal(unsigned char *object) {
     Vector position;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     if (*(unsigned short *)(object + 0x96) < 65000)

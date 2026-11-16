@@ -3,28 +3,28 @@
 
 
 #include "common.h"
-extern int D_001B2758 MACRO_ADDR;
+extern int g_spark_slot_pool MACRO_ADDR;
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern void vec_clear_128(void *), gravity_get_dir_at_object(void *, void *, int);
 extern char *moby_get_private_value_0(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern u8 g_hero_state[];
 extern u8 g_sound_state[];
-extern char D_001A8BD0[16] MACRO_ADDR;
+extern char g_default_effect_vector[16] MACRO_ADDR;
 extern unsigned char g_sound_state[];
 extern unsigned char g_hero_state[];
 extern void FastVecScale(void *dst, void *src, float scale);
 extern u8 g_hero_state[];
-extern u8 *D_001B1B5C MACRO_ADDR;
+extern u8 *g_moby_pool_start MACRO_ADDR;
 
 /* func_0031D3E0 is in 0031D3E0.c. */
 
 /* func_0031D588 is in 0031D588-g8.c. */
 
 
-void func_PAL_0031F230(char *self, char *target, int count)
+void spark_spawn_targeted_pal(char *self, char *target, int count)
 {
-    int pool = D_001B2758;
+    int pool = g_spark_slot_pool;
     char *position = self + 0x10;
     char *target_position = target + 0x10;
     char *data = *(char **)(self + 0x68);
@@ -114,7 +114,7 @@ extern void lerp_vector(void *out, void *from, void *to, float t);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
 extern void func_PAL_00320D00(void *pos, int count, int mode);
-extern int func_PAL_0032F0B8(char *target, int kind, int value);
+extern int StartAttachedEffect_pal(char *target, int kind, int value);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecSub(void *dst, void *a, void *b);
@@ -130,7 +130,7 @@ static inline Class31DEE8 *Class31DEE8At(int index)
    position towards it. When the approach timer expires and the target is still live, it
    sends one hit packet (func_002A8C00/func_002A8E20) and marks the record; when the life
    timer expires the record is released and the owner's count drops. */
-void func_PAL_0031F500(char *owner)
+void spark_update_targeted_pal(char *owner)
 {
     float v[4];
     struct {
@@ -149,9 +149,9 @@ void func_PAL_0031F500(char *owner)
     int i;
 
     for (i = 0; i < 12; i++) {
-        if (((Slot31DEE8 *)D_001B2758)[i].owner != owner)
+        if (((Slot31DEE8 *)g_spark_slot_pool)[i].owner != owner)
             continue;
-        slot = &((Slot31DEE8 *)D_001B2758)[i];
+        slot = &((Slot31DEE8 *)g_spark_slot_pool)[i];
         qcopy(slot->start, owner + 0x10);
         if (slot->time) {
             slot->ang0[0] = FastAddRotations(slot->ang0[0], slot->rate0[0] * boost);
@@ -200,7 +200,7 @@ void func_PAL_0031F500(char *owner)
             QueueMobyImpact(slot->target, &packet);
             slot->hit = 1;
             func_PAL_00320D00(slot->pos, 10, 1);
-            func_PAL_0032F0B8(slot->target, 28, *(int *)(owner + 0xB8));
+            StartAttachedEffect_pal(slot->target, 28, *(int *)(owner + 0xB8));
         }
         if (math_fast_float_d(&slot->life)) {
             slot->owner = 0;

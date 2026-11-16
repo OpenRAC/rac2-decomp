@@ -1,6 +1,6 @@
 #include "common.h"
-extern int D_L15_001B187C __attribute__((sda));
-extern char *D_L15_001B261C __attribute__((sda));
+extern int g_backdrop_grid_enabled __attribute__((sda));
+extern char *g_moby_base __attribute__((sda));
 extern void DrawScrollingGridLayers(void *,int);
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float,float);
@@ -19,10 +19,10 @@ void backdrop_update_effects(char *self) {
  char *obj,*basis,*pos,*axis;
  float a[4],b[4],c[4];
  float distance;
- if(!D_L15_001B187C) return;
+ if(!g_backdrop_grid_enabled) return;
  DrawScrollingGridLayers(self,0);
  if(!math_fast_float_d(state+0xC)) return;
- obj=D_L15_001B261C+(*(int *)state<<8);
+ obj=g_moby_base+(*(int *)state<<8);
  basis=obj+0xC0;
  qcopy(a,basis);
  axis=obj+0xE0;

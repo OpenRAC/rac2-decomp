@@ -3,45 +3,45 @@ typedef unsigned char u8;
 typedef float f32;
 struct BarlowAnimation { int frames; u8 unused[24]; f32 dustartn; };
 extern struct BarlowAnimation *g_route_path_table[];
-extern u8 D_L04_001B1280[];
+extern u8 g_str_path_debug[];
 extern void STUB_printf(const char *, ...);
 extern void FastVecScale(f32, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern int D_L04_001B12B0[][2] __attribute__((sda));
-extern f32 D_L04_0026D370[][4];
-extern f32 D_L04_001B3300[] __attribute__((sda));
-extern f32 D_L04_001B33B8[] __attribute__((sda));
-extern f32 D_L04_001B3470 __attribute__((sda));
-extern int D_L04_001B12E8[][2] __attribute__((sda));
-extern f32 D_L04_001B3280[][4] __attribute__((sda));
-extern f32 D_L04_001B3320[] __attribute__((sda));
-extern f32 D_L04_001B33D8[] __attribute__((sda));
-extern f32 D_L04_001B3474 __attribute__((sda));
-extern int D_L04_002CA3E0[][2];
-extern f32 D_L04_0026D3E0[][4];
-extern f32 D_L04_001B3330[] __attribute__((sda));
-extern f32 D_L04_001B33E8[] __attribute__((sda));
-extern f32 D_L04_001B3478 __attribute__((sda));
-extern int D_L04_001B1300[][2] __attribute__((sda));
-extern f32 D_L04_0026D490[][4];
-extern f32 D_L04_001B3360[] __attribute__((sda));
-extern f32 D_L04_001B3418[] __attribute__((sda));
-extern f32 D_L04_001B347C __attribute__((sda));
-extern int D_L04_002CA438[][2];
-extern f32 D_L04_0026D4F0[][4];
-extern f32 D_L04_001B3378[] __attribute__((sda));
-extern f32 D_L04_001B3430[] __attribute__((sda));
-extern f32 D_L04_001B3480 __attribute__((sda));
-extern int D_L04_001B1330[][2] __attribute__((sda));
-extern f32 D_L04_001B32B0[][4] __attribute__((sda));
-extern f32 D_L04_001B33A0[] __attribute__((sda));
-extern f32 D_L04_001B3458[] __attribute__((sda));
-extern f32 D_L04_001B3484 __attribute__((sda));
-extern int D_L04_001B1348[][2] __attribute__((sda));
-extern f32 D_L04_001B32E0[][4] __attribute__((sda));
-extern f32 D_L04_001B33B0[] __attribute__((sda));
-extern f32 D_L04_001B3468[] __attribute__((sda));
-extern f32 D_L04_001B3488 __attribute__((sda));
+extern int g_barlow_l04_path_points_a[][2] __attribute__((sda));
+extern f32 g_barlow_path_vectors_a[][4];
+extern f32 g_barlow_path_lengths_a[] __attribute__((sda));
+extern f32 g_barlow_path_starts_a[] __attribute__((sda));
+extern f32 g_barlow_path_total_a __attribute__((sda));
+extern int g_barlow_l04_path_points_b[][2] __attribute__((sda));
+extern f32 g_barlow_l04_path_vectors_b[][4] __attribute__((sda));
+extern f32 g_barlow_path_lengths_b[] __attribute__((sda));
+extern f32 g_barlow_path_starts_b[] __attribute__((sda));
+extern f32 g_barlow_path_total_b __attribute__((sda));
+extern int g_barlow_l04_path_points_a_2[][2];
+extern f32 g_barlow_l04_path_vectors_b_2[][4];
+extern f32 g_barlow_path_lengths_c[] __attribute__((sda));
+extern f32 g_barlow_path_starts_c[] __attribute__((sda));
+extern f32 g_barlow_path_total_c __attribute__((sda));
+extern int g_barlow_path_points_c[][2] __attribute__((sda));
+extern f32 g_barlow_path_vectors_c[][4];
+extern f32 g_barlow_path_lengths_d[] __attribute__((sda));
+extern f32 g_barlow_path_starts_d[] __attribute__((sda));
+extern f32 g_barlow_path_total_d __attribute__((sda));
+extern int g_barlow_l04_path_points_b_2[][2];
+extern f32 g_barlow_l04_path_vectors_d_2[][4];
+extern f32 g_barlow_path_lengths_e[] __attribute__((sda));
+extern f32 g_barlow_path_starts_e[] __attribute__((sda));
+extern f32 g_barlow_path_total_e __attribute__((sda));
+extern int g_barlow_path_points_d[][2] __attribute__((sda));
+extern f32 g_barlow_l04_path_vectors_d[][4] __attribute__((sda));
+extern f32 g_barlow_path_lengths_f[] __attribute__((sda));
+extern f32 g_barlow_path_starts_f[] __attribute__((sda));
+extern f32 g_barlow_path_total_f __attribute__((sda));
+extern int g_barlow_path_points_e[][2] __attribute__((sda));
+extern f32 g_barlow_path_vectors_e[][4] __attribute__((sda));
+extern f32 g_barlow_path_lengths_g[] __attribute__((sda));
+extern f32 g_barlow_path_starts_g[] __attribute__((sda));
+extern f32 g_barlow_path_total_g __attribute__((sda));
 
 /* Finds where on the screen the Barlow walk path is for the current animation and frame, and remembers which path piece it is on. */
 void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *currentPath, int *currentSegment, u8 *data) {
@@ -56,11 +56,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)(frame - 0)) / (timing->dustartn * 151.0f);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3470;
-        points = D_L04_001B12B0;
-        vectors = D_L04_0026D370;
-        lengths = D_L04_001B3300;
-        starts = D_L04_001B33B8;
+        progress = start * g_barlow_path_total_a;
+        points = g_barlow_l04_path_points_a;
+        vectors = g_barlow_path_vectors_a;
+        lengths = g_barlow_path_lengths_a;
+        starts = g_barlow_path_starts_a;
         count = 7;
         path = 1;
     } else if (animation == -1 && frame >= 151 && frame <= 174) {
@@ -68,11 +68,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)(frame - 151)) / (timing->dustartn * 23.0f);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3474;
-        points = D_L04_001B12E8;
-        vectors = D_L04_001B3280;
-        lengths = D_L04_001B3320;
-        starts = D_L04_001B33D8;
+        progress = start * g_barlow_path_total_b;
+        points = g_barlow_l04_path_points_b;
+        vectors = g_barlow_l04_path_vectors_b;
+        lengths = g_barlow_path_lengths_b;
+        starts = g_barlow_path_starts_b;
         count = 3;
         path = 2;
     } else if (animation == -1 && frame >= 174 && frame <= 312) {
@@ -80,11 +80,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)(frame - 174)) / (timing->dustartn * 138.0f);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3478;
-        points = D_L04_002CA3E0;
-        vectors = D_L04_0026D3E0;
-        lengths = D_L04_001B3330;
-        starts = D_L04_001B33E8;
+        progress = start * g_barlow_path_total_c;
+        points = g_barlow_l04_path_points_a_2;
+        vectors = g_barlow_l04_path_vectors_b_2;
+        lengths = g_barlow_path_lengths_c;
+        starts = g_barlow_path_starts_c;
         count = 11;
         path = 3;
     } else if (animation == -1 && frame >= 312 && frame <= 500) {
@@ -92,11 +92,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)(frame - 312)) / (timing->dustartn * 186.0f);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B347C;
-        points = D_L04_001B1300;
-        vectors = D_L04_0026D490;
-        lengths = D_L04_001B3360;
-        starts = D_L04_001B3418;
+        progress = start * g_barlow_path_total_d;
+        points = g_barlow_path_points_c;
+        vectors = g_barlow_path_vectors_c;
+        lengths = g_barlow_path_lengths_d;
+        starts = g_barlow_path_starts_d;
         count = 6;
         path = 4;
     } else if (animation == 0) {
@@ -104,11 +104,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3480;
-        points = D_L04_002CA438;
-        vectors = D_L04_0026D4F0;
-        lengths = D_L04_001B3378;
-        starts = D_L04_001B3430;
+        progress = start * g_barlow_path_total_e;
+        points = g_barlow_l04_path_points_b_2;
+        vectors = g_barlow_l04_path_vectors_d_2;
+        lengths = g_barlow_path_lengths_e;
+        starts = g_barlow_path_starts_e;
         count = 9;
         path = 5;
     } else if (animation == 2) {
@@ -116,11 +116,11 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3484;
-        points = D_L04_001B1330;
-        vectors = D_L04_001B32B0;
-        lengths = D_L04_001B33A0;
-        starts = D_L04_001B3458;
+        progress = start * g_barlow_path_total_f;
+        points = g_barlow_path_points_d;
+        vectors = g_barlow_l04_path_vectors_d;
+        lengths = g_barlow_path_lengths_f;
+        starts = g_barlow_path_starts_f;
         count = 3;
         path = 6;
     } else if (animation == 1) {
@@ -128,15 +128,15 @@ void GetAnimationPathPoint(int *outX, int *outY, int animation, int frame, int *
         start = (timing->dustartn * (f32)frame) / (timing->dustartn * (f32)timing->frames);
         if (start > 1.0f)
             start = 1.0f;
-        progress = start * D_L04_001B3488;
-        points = D_L04_001B1348;
-        vectors = D_L04_001B32E0;
-        lengths = D_L04_001B33B0;
-        starts = D_L04_001B3468;
+        progress = start * g_barlow_path_total_g;
+        points = g_barlow_path_points_e;
+        vectors = g_barlow_path_vectors_e;
+        lengths = g_barlow_path_lengths_g;
+        starts = g_barlow_path_starts_g;
         count = 2;
         path = 7;
     } else {
-        STUB_printf(D_L04_001B1280);
+        STUB_printf(g_str_path_debug);
         *currentPath = -1;
         *currentSegment = 0;
         *outX = 0;

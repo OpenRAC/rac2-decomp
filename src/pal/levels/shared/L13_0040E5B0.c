@@ -10,7 +10,7 @@ extern float gravity_get_center_distance(void *);
 extern void vec_clear_128(void *);
 extern void FastVecAdd(char *, char *, char *);
 typedef union { Vector128 q; float f[4]; } MotionVector;
-extern float func_PAL_L13_0040ED20(char *, char *, char *, int);
+extern float creature_turn_toward_target_pal(char *, char *, char *, int);
 extern float moby_measure_step_angle(char *, Vector128 *, char *);
 extern void moby_build_forward_vector(char *, float *, float);
 extern void vec_transform_and_set_height(char *, char *, char *, float, char *);
@@ -19,14 +19,14 @@ extern float vec_get_horizontal_offset_length(char *, char *, char *);
 extern void moby_mix_on_inner_data(u8 *, float *, float *, float);
 extern float vec_get_vertical_offset(char *, char *, char *);
 extern void math_approach_target_with_braking(float *, float, float, float, float);
-extern u8 *D_L13_001B291C __attribute__((section(".sdata")));
+extern u8 *g_object_table_base __attribute__((section(".sdata")));
 
-void func_PAL_L13_0040E5B0(char *object, char *data, void *target, Vector128 *input, void *unused0, void *unused1, char *transform) {
+void creature_compute_motion_pal(char *object, char *data, void *target, Vector128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;
     float heading, distance, speed, height, drop;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
-        func_PAL_L13_0040ED20(object, data, (char *)input, (int)transform);
+        creature_turn_toward_target_pal(object, data, (char *)input, (int)transform);
     heading = 0.0f;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
         heading = moby_measure_step_angle(object, input, transform);

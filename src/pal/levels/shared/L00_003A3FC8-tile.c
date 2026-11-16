@@ -1,13 +1,13 @@
 #include "common.h"
 extern int g_screen_width[] MACRO_ADDR;
-extern int D_L00_001AF5A8[];
+extern int g_tile_int_table[];
 extern float IntToFloat(s32);
 extern u64 GetEffectTextureDescriptor(s32);
 extern int FloatToInt(float);
 extern s32 math_random_int_below(s32);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, s64, u64);
 /* Tiles an alpha-blended texture over the current viewport. */
-void func_PAL_L00_003A3FC8(void *actor) {
+void DrawTiledScreenOverlay_pal(void *actor) {
     char *state = *(char **)((char *)actor + 0x68);
     u64 texture;
     int color;
@@ -24,7 +24,7 @@ void func_PAL_L00_003A3FC8(void *actor) {
     rows = g_screen_width[0] / 32 + 1;
     columns = g_screen_width[1] / 32 + 1;
     for (row = 0; row < rows; row++) {
-        int *p = D_L00_001AF5A8;
+        int *p = g_tile_int_table;
         for (column = 0; column < columns; column++) {
             pos[0] = (float)(row << 5);
             pos[1] = (float)(column << 5);

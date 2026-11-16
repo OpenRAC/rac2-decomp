@@ -27,11 +27,11 @@ char pad24b4[128];
 int field2534;
 } HeroView;
 extern HeroView g_hero_state;
-extern unsigned int D_00138320;
-extern unsigned char D_0013957E;
+extern unsigned int g_pad_pressed_flags;
+extern unsigned char g_chopper_weapon_index;
 typedef struct { char pad[0x54]; float rate; char rest[0x88]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
-extern void func_PAL_L00_003B9C00(void *), weapon_release_shot_slots(void);
+extern void weapon_update_target_lock_pal(void *), weapon_release_shot_slots(void);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *,float,unsigned int,void *,int,float,int,float,int);
 extern int AcquireEntitySlot(void *,void (*)(void),int *);
@@ -45,7 +45,7 @@ extern void func_PAL_L00_002AF458(void),initialize_moby_animation_blend(void *,v
 extern int weapon_spend_ammo(int,int);
 extern int PlayMobySound(int,int,void *);
 extern char *func_PAL_L00_00421578(void *,void *,int,void *,int,int);
-void func_PAL_L00_003B96A0(unsigned char *object)
+void chopper_update_pal(unsigned char *object)
 {
     int existing;
     WeaponContext *state=*(WeaponContext **)(object+0x68);
@@ -54,7 +54,7 @@ void func_PAL_L00_003B96A0(unsigned char *object)
     int offset;
     void **table;
     int triggered,secondary,finished,allowed;
-    func_PAL_L00_003B9C00(object);
+    weapon_update_target_lock_pal(object);
     if(g_hero_state.field1500 || g_hero_state.field2294==29 || g_hero_state.field2294==1) {
         unsigned int color;
         if(F(ctx,0xC)>0.0f && get_ammo(-1)) color=0x600000FF;
@@ -95,16 +95,16 @@ void func_PAL_L00_003B96A0(unsigned char *object)
         } else g_hero_state.field2534=33;
         if(object[0x20]==1) {
             if(vec_fast_helper_b((float *)(ctx+0xC)) && allowed &&
-               (D_00138320 & g_hero_state.field1230) && g_hero_state.field1240>=19 &&
+               (g_pad_pressed_flags & g_hero_state.field1230) && g_hero_state.field1240>=19 &&
                (g_hero_state.field1500 || g_hero_state.field2294==1 || g_hero_state.field2294==29) && get_ammo(22)) {
-                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
+                { WeaponEntry *w=&g_weapon_l00_table[g_chopper_weapon_index];
                 F(ctx,0xC)=1.0f/w->rate; }
                 triggered=1;
             }
             secondary=0;
             if(g_hero_state.field2294==0x83 && !g_hero_state.fieldc2c && math_is_below_plane_within_depth(33.0f)) secondary=get_ammo(22)!=0;
             if(g_hero_state.field229c==4 && allowed && !g_hero_state.field49c &&
-               F(ctx,0xC)==0.0f && (D_00138320&0x20) && g_hero_state.field1240>=19 && get_ammo(22)) {
+               F(ctx,0xC)==0.0f && (g_pad_pressed_flags&0x20) && g_hero_state.field1240>=19 && get_ammo(22)) {
                 func_PAL_L00_002AF458();
                 other=*(char **)((char *)&g_hero_state+0xE98);
                 if(other) {
@@ -112,7 +112,7 @@ void func_PAL_L00_003B96A0(unsigned char *object)
                     initialize_moby_animation_blend(g_hero_state.field2290,other,g_hero_state.field24b0,1,1,1);
                 }
                 object[0x20]=2;
-                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
+                { WeaponEntry *w=&g_weapon_l00_table[g_chopper_weapon_index];
                 F(ctx,0xC)=1.0f/w->rate; }
                 I(ctx,0x10)=7;
             }

@@ -5,21 +5,21 @@
 
 
 
-extern short D_00152C20;
-extern int D_001B1594 __attribute__((sda));
+extern short g_transition_mode;
+extern int g_render_layer_flags __attribute__((sda));
 extern void gfx_render_frame_all_layers(void);
 extern void RenderFrame(void);
 extern void transition_render_scene(void);
 
-void func_PAL_002EB800(void)
+void transition_draw_background_pal(void)
 {
-    switch (D_00152C20) {
+    switch (g_transition_mode) {
     case 0:
     case 3:
         gfx_render_frame_all_layers();
         break;
     case 1:
-        D_001B1594 = 127;
+        g_render_layer_flags = 127;
         RenderFrame();
         break;
     case 2:

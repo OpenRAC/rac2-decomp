@@ -3,9 +3,9 @@
 
 typedef float V4_2EE238[4] __attribute__((aligned(16)));
 
-extern float D_001AC240 __attribute__((sda));
-extern float D_001AC244 __attribute__((sda));
-extern float D_001AC248 __attribute__((sda));
+extern float g_follower_pull_speed __attribute__((sda));
+extern float g_follower_max_scale __attribute__((sda));
+extern float g_follower_height_scale __attribute__((sda));
 
 extern char *moby_get_motion_data(char *);
 extern void follower_load_tuning_for_state(char *);
@@ -36,21 +36,21 @@ void follower_move_toward_target(char *owner)
     pos = vars + 0x90;
     vec_clear_128(vel);
     FastVecSub(pull, vars + 0x60, owner + 0x10);
-    vec_scale_to_length(temp, pull, D_001AC240);
+    vec_scale_to_length(temp, pull, g_follower_pull_speed);
     FastVecAdd(vel, temp, vel);
     qcopy(temp, pos);
-    height_err = (*(float *)(vars + 0x124) - D_001AC248 * 0.5f) / D_001AC248;
+    height_err = (*(float *)(vars + 0x124) - g_follower_height_scale * 0.5f) / g_follower_height_scale;
     scale = math_fabs(height_err);
-    if (scale < D_001AC240)
-        scale = D_001AC240;
-    if (D_001AC244 < scale)
-        scale = D_001AC244;
+    if (scale < g_follower_pull_speed)
+        scale = g_follower_pull_speed;
+    if (g_follower_max_scale < scale)
+        scale = g_follower_max_scale;
     if (0.0f < height_err)
         scale = -scale;
     vec_scale_to_length(temp, temp, scale);
     FastVecAdd(vel, temp, vel);
     speed = FastVecLength(vel);
-    scale = D_001AC240 * D_001AC248;
+    scale = g_follower_pull_speed * g_follower_height_scale;
     if (scale < speed)
         vec_scale_to_length(vel, vel, scale);
     qcopy(vars + 0xA0, pos);

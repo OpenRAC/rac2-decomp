@@ -56,10 +56,10 @@ extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
 extern u8 g_sound_state[];
 extern LevelClass g_weapon_l00_table[];
-extern CamMode D_L00_0025D990[];
+extern CamMode g_hero_l00_action_table[];
 extern CollResult g_collision_result __attribute__((aligned(16)));
 extern char *g_area_hit_targets __attribute__((nosda));
-extern int D_001A72C0;
+extern int g_current_weapon_channel;
 
 extern void hud_add_moby_marker(void *, int, int, int, int, int, float, float, float);
 /* The binder: func_L00_002E6EF8 in 23 programs, its twin func_L08_002F2D10 in levels 08, 09,
@@ -157,7 +157,7 @@ void wrench_update(char *moby)
         if (vars != 0 && *(f32 *)(vars + 0x70) != 0.0f) {
             ref_L00_0038BF18_00(UpdateTrailStrips, moby);
         }
-        if (D_001A72C0 == 0) {
+        if (g_current_weapon_channel == 0) {
             *(u16 *)(moby + 0x34) &= ~0x10;
         } else {
             *(u32 *)(moby + 0x78) = 0x80909090;
@@ -198,7 +198,7 @@ void wrench_update(char *moby)
             *(u16 *)(vars + 0x74) += 1;
         }
         *(f32 *)(moby + 0x48) = ((Hero *)g_hero_state)->f[0xC20 / 4];
-        cam_mode = &D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]];
+        cam_mode = &g_hero_l00_action_table[((Hero *)g_hero_state)->h[0xBFC / 2]];
         if (((Hero *)g_hero_state)->i[0x229C / 4] != 6 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A) {
             return;
         }
@@ -245,7 +245,7 @@ void wrench_update(char *moby)
         moby_transform_joint_to_world(((Hero *)g_hero_state)->ptr[0x2290 / 4], 0, &((Hero *)g_hero_state)->b[0xB60]);
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x13 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6D || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2A) {
             yaw = mat_fast_helper_a(((Hero *)g_hero_state)->f[0xB70 / 4] - ((Hero *)g_hero_state)->f[0x80 / 4], ((Hero *)g_hero_state)->f[0xB74 / 4] - ((Hero *)g_hero_state)->f[0x84 / 4]);
-            if (D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]].i4 == 1) {
+            if (g_hero_l00_action_table[((Hero *)g_hero_state)->h[0xBFC / 2]].i4 == 1) {
                 yaw = FastAddRotations(yaw, -1.57079649f);
             } else {
                 yaw = FastAddRotations(yaw, 1.57079649f);

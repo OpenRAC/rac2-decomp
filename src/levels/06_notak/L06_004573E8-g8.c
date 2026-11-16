@@ -15,13 +15,13 @@ extern void value_set_entry_by_index(int, int);
 extern char *part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
 extern void part_spawn_scaled_bolts(char *, int, float);
 extern void moby_mark_spawned(char *);
-extern int D_L06_001B375C;
-extern int D_L06_001B3758[] __attribute__((sda));
+extern int g_machine_hit_counter;
+extern int g_machine_hit_flag[] __attribute__((sda));
 /* This word is written through GP in state 0 and absolutely in state 4. */
 extern int D_L06_001B3758_gp SDATA(D_L06_001B3758);
-extern int D_L06_001A903C;
+extern int g_machine_destroyed_flag;
 /* 32-byte flag table, also scanned by func_002B0E90. */
-extern unsigned char D_001A7A60[32] __attribute__((sda));
+extern unsigned char g_item_enabled_flags[32] __attribute__((sda));
 typedef struct {
     char pad[0x160];
     float scale;
@@ -42,7 +42,7 @@ void destructible_machine_update(unsigned char *obj)
     switch (obj[0x20]) {
     case 0:
         part_spawn_radial_emitters((char *)obj);
-        D_L06_001B375C = 10;
+        g_machine_hit_counter = 10;
         D_L06_001B3758_gp = 0;
         moby_set_state((char *)obj, 1, -1);
         break;
@@ -70,21 +70,21 @@ void destructible_machine_update(unsigned char *obj)
             PlayMobySound(0, 0, (char *)obj);
         }
         object_ring_spin_update((char *)obj);
-        if (D_L06_001B375C < 127) ++D_L06_001B375C;
+        if (g_machine_hit_counter < 127) ++g_machine_hit_counter;
         if (math_fast_float_d(vars + 0x130)) moby_set_state((char *)obj, 4, -1);
         break;
     case 4:
         if (flag_set_first_pending((char *)obj)) {
             PlayMobySound(1, 0, (char *)obj);
-            if (!D_001A7A60[17]) {
-                D_001A7A60[17] = 1;
+            if (!g_item_enabled_flags[17]) {
+                g_item_enabled_flags[17] = 1;
                 snd_play_from_global_bank(1, 0, 0);
                 value_set_entry_by_index(0x1233, -1);
-                D_L06_001A903C = 1;
+                g_machine_destroyed_flag = 1;
             }
             part_spawn_shockwave_burst((char *)obj + 0x10, 1, 25, 20, 20, 20, 45, 1, 1, 1, 1, 7);
             part_spawn_scaled_bolts((char *)obj, 20, 0);
-            D_L06_001B3758[0] = 1;
+            g_machine_hit_flag[0] = 1;
             g_camera_state.speed = .05f;
             g_camera_state.limit = 180;
             g_camera_state.scale = .05f;

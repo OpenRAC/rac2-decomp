@@ -12,10 +12,10 @@ extern int moby_apply_damage_to_object(void *,void *,int),CollLine(void *,void *
 extern int GetCollHitMaterial(void);
 extern int group_pass_lead_token(void *);
 extern char g_camera_eye_state[];
-extern char D_001A8BD0[16] MACRO_ADDR;
-extern int D_001B1B78 MACRO_ADDR;
-extern short *D_001EE5A0[];
-extern char *D_001B1B5C MACRO_ADDR;
+extern char g_default_effect_vector[16] MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern char *g_moby_pool_start MACRO_ADDR;
 extern char *g_hero_moby NOT_SDA;
 /* Handles the enemy's body each frame: ground checks, damage, waking its group mates and picking a target. */
 void hover_enemy_update_body_group(char *self)
@@ -49,7 +49,7 @@ void hover_enemy_update_body_group(char *self)
                 mat_get_euler_angles(self+0xC0,self+0xF0);
                 H(self,0x34)&=~0x100;
             }
-            qcopy(a,D_001A8BD0);
+            qcopy(a,g_default_effect_vector);
             a[2]+=0.5f;
             moby_rotate_about_point(self,a,0.05f,0.05f,0.0f);
         }
@@ -73,10 +73,10 @@ void hover_enemy_update_body_group(char *self)
         }
         hover_enemy_alert_group(self);
         group_pass_lead_token(self);
-        if((result==4 || result==5) && D_001B1B78>=B(self,0x21) && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+        if((result==4 || result==5) && g_moby_group_count>=B(self,0x21) && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
+            list=g_moby_group_lists[B(self,0x21)];
             do {
-                moby=D_001B1B5C+((*list&0x7FFF)<<8);
+                moby=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if(*(short *)(moby+0xAA)==0x9B4 /* moby class 2484 */ && I(P(moby,0x68),0x2A4)==0) {
                     I(P(moby,0x68),0x2A4)=1;
                     goto done_list;

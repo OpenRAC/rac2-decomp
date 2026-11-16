@@ -8,14 +8,14 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 quad; float f[4]; s32 i[4]; } ControllerScratch;
 extern u8 *g_moby_l02_pool;
-extern u8 *D_L02_001B368C;
+extern u8 *g_matrix_l02_record_table;
 extern u8 g_camera_l02_position[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern s32 g_current_map_index __attribute__((sda));
 typedef union { u8 b[0x2400]; u8 *ptr[0x900]; void *v[0x900]; TI128 q[0x240]; } Hero;
 extern Hero g_hero_state;
-extern TI128 D_L02_001C0960;
-extern float D_L02_001A8F20[] __attribute__((sda));
+extern TI128 g_scratch_vec;
+extern float g_zero_l02_vector[] __attribute__((sda));
 extern void moby_set_group_enabled(s32, s32);
 extern float math_random_angle(void);
 extern float vec_distance_xy(void *, void *);
@@ -48,7 +48,7 @@ void func_PAL_L02_004163B8(u8 *object)
     case 0:
         {
         s32 i;
-        if (D_0019B2E8[object[0xB0] + (g_current_map_index << 4)] & 0x80) {
+        if (g_moby_group_flags[object[0xB0] + (g_current_map_index << 4)] & 0x80) {
             moby_set_group_enabled(*(s32 *)(state + 0x10), 1);
             moby_mark_spawned(object);
             return;
@@ -95,7 +95,7 @@ void func_PAL_L02_004163B8(u8 *object)
             moby_set_group_enabled(*(s32 *)(state + 0x10), 1);
             moby_mark_table_entry_flagged(object[0xB0]);
             {
-                u8 *record = D_L02_001B368C + (*(s32 *)(state + 0x14) << 7);
+                u8 *record = g_matrix_l02_record_table + (*(s32 *)(state + 0x14) << 7);
                 level_capture_checkpoint_state(record + 0x30, record + 0x70);
             }
             moby_mark_spawned(object);
@@ -110,11 +110,11 @@ void func_PAL_L02_004163B8(u8 *object)
             if (CollLine(&g_hero_state.q[0xE0 / 16], scratch[0].f, 2, g_hero_state.v[0x2290 / 4], 0)) {
                 s32 lifetime;
                 s32 shade;
-                scratch[1].quad = D_L02_001C0960;
+                scratch[1].quad = g_scratch_vec;
                 scratch[1].f[2] += math_random_float_range(-0.5f, 0.5f);
                 lifetime = (u8)(((int)(math_random_int_range(30, 60)) * 5 + 2) / 6);
                 shade = (u8)math_random_int_below(255);
-                part_spawn_hero_relative(scratch[1].f, D_L02_001A8F20, 0x60106070, lifetime, shade, 0, 1.0f);
+                part_spawn_hero_relative(scratch[1].f, g_zero_l02_vector, 0x60106070, lifetime, shade, 0, 1.0f);
             }
         }
         scale_vector(scratch[0].f, object, 0.0009765625f);

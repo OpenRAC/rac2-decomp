@@ -17,9 +17,9 @@ extern int FloatToInt(float);
 
 extern int func_001163B0(void);
 
-extern char D_L01_001B94C0[];
+extern char g_level_origin_vec[];
 
-extern char *D_L01_001FF19C;
+extern char *g_trail_flag_byte;
 
 typedef struct {
     /* Retail stores and then reloads this pointer before querying the joint. */
@@ -48,11 +48,11 @@ typedef struct {
     unsigned short group;
 } L01_00333FA8_PARENT;
 
-extern int D_L01_001A79F0 __attribute__((sda));
+extern int g_level_group_index __attribute__((sda));
 
-extern int D_L01_001BD1F4;
+extern int g_ship_trail_index;
 
-extern char D_L01_001BD1C0[];
+extern char g_ship_trail_state[];
 
 extern void func_2E3738(void *, void *, float);
 
@@ -70,19 +70,19 @@ void ship_build_trail_mesh(char *trail_source) {
     char *dest;
     char *state;
 
-    if (D_L01_001A79F0 != 1)
+    if (g_level_group_index != 1)
         return;
     kind = -1;
-    if ((unsigned)(D_L01_001BD1F4 - 0x2A0) < 0xB5)
+    if ((unsigned)(g_ship_trail_index - 0x2A0) < 0xB5)
         kind = 0x44;
-    else if ((unsigned)(D_L01_001BD1F4 - 0x355) <= 0xBC)
+    else if ((unsigned)(g_ship_trail_index - 0x355) <= 0xBC)
         kind = 0x43;
     if (kind == -1)
         return;
     func_2E3738(end, trail_source + 0xC0, 0.05000000074505806f);
     offset = 0x30;
     dest = buffer;
-    state = D_L01_001BD1C0;
+    state = g_ship_trail_state;
     for (i = 3; i >= 0; i--) {
         qcopy(dest, (void *)(offset + *(int *)(state + 0x50) + 0x20));
         func_2E3470(dest, dest, end);
@@ -116,7 +116,7 @@ void *CreateAttachedType57Effect(L01_00333FA8_PARENT *parent, void *owner, int j
             qcopy(&obj->f10, (char *)parent + 0x10);
         } else {
             moby_transform_joint_to_world(obj->tail.f20, (short)joint_index, buf0);
-            FastVecSub(buf1, D_L01_001B94C0, buf0);
+            FastVecSub(buf1, g_level_origin_vec, buf0);
             vec_scale_to_length(buf1, buf1, 0.4f);
             FastVecAdd(&obj->f10, buf0, buf1);
         }
@@ -128,7 +128,7 @@ void *CreateAttachedType57Effect(L01_00333FA8_PARENT *parent, void *owner, int j
         obj->f01 = 0;
         *(float *)((char *)obj + 0xC) = size;
         obj->f09 = (char)(group_bits + random_value);
-        obj->f02 = *D_L01_001FF19C;
+        obj->f02 = *g_trail_flag_byte;
     }
     return obj;
 }

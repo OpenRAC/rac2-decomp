@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003F6308 (1,524 bytes, 27 level places): draws a beam of quad rings in strips. Twin of
  * func_L00_003A91A0. Own unit: -O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-117 -frac2-giv-pair-init -frac2-cse2-skip-temp-sum
  * (config/cflags.txt; docs/build/compiler-notes.md). `ring` is declared first in the function,
@@ -9,25 +10,25 @@
 typedef float BeamVector[4] __attribute__((aligned(16)));
 typedef struct { BeamVector point[4]; u32 color[4]; float uv[4][2]; long a,b,c,d; } BeamQuad;
 typedef struct { BeamVector origin[3], basis[2]; short enabled, timer; float phase, phase2, rate; } BeamRing;
-extern float D_L00_001B0984 __attribute__((sda));
-extern float D_L00_001B097C __attribute__((sda));
-extern float D_L00_001B0980 __attribute__((sda));
+extern float g_vaporizer_ring_vec_scale __attribute__((sda));
+extern float g_vaporizer_ring_side_u_offset __attribute__((sda));
+extern float g_vaporizer_ring_u_step __attribute__((sda));
 
-extern float D_L00_001B09A0 __attribute__((sda));
-extern float D_L00_001B09B0 __attribute__((sda));
-extern u32 D_L00_001B09B4 __attribute__((sda));
-extern int D_L00_001B09BC __attribute__((sda));
-extern float D_L00_001B09C0 __attribute__((sda));
-extern float D_L00_001B09CC __attribute__((sda));
-extern int D_L00_001B0994 __attribute__((sda));
-extern int D_L00_001B09AC __attribute__((sda));
+extern float g_vaporizer_ring_b_width __attribute__((sda));
+extern float g_vaporizer_ring_c_width __attribute__((sda));
+extern u32 g_vaporizer_ring_c_color_front __attribute__((sda));
+extern int g_vaporizer_ring_c_alpha __attribute__((sda));
+extern float g_vaporizer_trail_scale_step __attribute__((sda));
+extern float g_vaporizer_spark_spin_min __attribute__((sda));
+extern int g_vaporizer_ring_a_alpha __attribute__((sda));
+extern int g_vaporizer_ring_b_alpha __attribute__((sda));
 
-extern u32 D_L00_001B098C __attribute__((sda));
-extern u32 D_L00_001B0990 __attribute__((sda));
-extern u32 D_L00_001B09A8 __attribute__((sda));
-extern u32 D_L00_001B09A4 __attribute__((sda));
-extern u32 D_L00_001B09B8 __attribute__((sda));
-extern BeamVector D_L00_0029F0D0[];
+extern u32 g_vaporizer_ring_a_color_front __attribute__((sda));
+extern u32 g_vaporizer_ring_a_color_back __attribute__((sda));
+extern u32 g_vaporizer_ring_b_color_back __attribute__((sda));
+extern u32 g_vaporizer_ring_b_color_front __attribute__((sda));
+extern u32 g_vaporizer_ring_c_color_back __attribute__((sda));
+extern BeamVector g_vaporizer_beam_ring_vertices[];
 extern BeamVector g_camera_l00_position;
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
@@ -65,19 +66,19 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
         qcopy(matrix[2], rings[ring].basis[1]);
         FastVecCross(matrix[1], matrix[0], matrix[2]);
         fade = (float)rings[ring].timer * rings[ring].rate;
-        alpha = FloatToInt(fade * (float)D_L00_001B0994) << 24;
-        col = D_L00_001B098C;
+        alpha = FloatToInt(fade * (float)g_vaporizer_ring_a_alpha) << 24;
+        col = g_vaporizer_ring_a_color_front;
         primary = alpha | col;
         quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
         for (row = 0; row < 3; row++) {
             qcopy(matrix[3], rings[ring].origin[row]);
             for (j = 0; j < 20; j++) {
-                FastVecScale(temp, D_L00_0029F0D0[j], D_L00_001B0984);
+                FastVecScale(temp, g_vaporizer_beam_ring_vertices[j], g_vaporizer_ring_vec_scale);
                 transform_vector(vertices[row][j], temp, matrix);
             }
         }
         phase = rings[ring].phase;
-        col = D_L00_001B0990;
+        col = g_vaporizer_ring_a_color_back;
         for (j = 1; j < 3; j++) {
             u = 0;
             for (row = 0; row < 20; row++) {
@@ -85,8 +86,8 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
                 qcopy(quad.point[1], vertices[j][(row + 1) % 20]);
                 qcopy(quad.point[2], vertices[j - 1][row]);
                 qcopy(quad.point[3], vertices[j - 1][(row + 1) % 20]);
-                next = u + D_L00_001B0980;
-                side_u = phase + D_L00_001B097C;
+                next = u + g_vaporizer_ring_u_step;
+                side_u = phase + g_vaporizer_ring_side_u_offset;
                 quad.color[3] = quad.color[2] = col;
                 quad.uv[0][0] = phase;
                 quad.uv[0][1] = u;
@@ -102,8 +103,8 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
             col = primary;
         }
         gfx_init_quad_packet_state(&quad, 14, 1, 128);
-        alpha = FloatToInt(fade * (float)D_L00_001B09AC) << 24;
-        col = D_L00_001B09A8;
+        alpha = FloatToInt(fade * (float)g_vaporizer_ring_b_alpha) << 24;
+        col = g_vaporizer_ring_b_color_back;
         quad.uv[0][0] = 0;
         quad.uv[0][1] = 0;
         quad.uv[1][0] = 0;
@@ -114,10 +115,10 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
         quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
         quad.uv[3][0] = 0.5f;
         quad.uv[2][0] = 0.5f;
-        col = D_L00_001B09A4;
+        col = g_vaporizer_ring_b_color_front;
         FastVecSub(temp, &g_camera_l00_position, rings[ring].origin[0]);
         FastVecCross(matrix[1], matrix[0], temp);
-        vec_scale_to_length(side, matrix[1], D_L00_001B09A0);
+        vec_scale_to_length(side, matrix[1], g_vaporizer_ring_b_width);
         for (j = 0; j < 2; j++) {
             FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
             FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);
@@ -130,8 +131,8 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
             quad.uv[2][0] = quad.uv[3][0] = 3.0f;
         }
         gfx_init_quad_packet_state(&quad, 23, 1, 128);
-        alpha = FloatToInt(fade * (float)D_L00_001B09BC) << 24;
-        col = D_L00_001B09B8;
+        alpha = FloatToInt(fade * (float)g_vaporizer_ring_c_alpha) << 24;
+        col = g_vaporizer_ring_c_color_back;
         primary = alpha | col;
         quad.uv[2][0] = 1;
         quad.uv[3][0] = 1;
@@ -144,8 +145,8 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
         quad.uv[3][1] = 1;
         phase2 = rings[ring].phase2;
         quad.uv[2][0] = quad.uv[3][0] = phase2 + 0.5f;
-        col = D_L00_001B09B4;
-        vec_scale_to_length(side, matrix[1], D_L00_001B09B0);
+        col = g_vaporizer_ring_c_color_front;
+        vec_scale_to_length(side, matrix[1], g_vaporizer_ring_c_width);
         for (j = 0; j < 2; j++) {
             FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
             FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);

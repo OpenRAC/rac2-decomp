@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern char D_00189E20_9[];
-extern unsigned char D_PAL_001A7ACC MACRO_ADDR;
+extern unsigned char g_pal_enable_flag MACRO_ADDR;
 extern void func_00282C88_1(float *buf);
 extern float FastVecLength(float *buf);
 
@@ -15,7 +15,7 @@ void func_PAL_00328438(char *obj)
     char *h;
     char *e = *(char **)(obj + 104);
 
-    if (D_PAL_001A7ACC != 0) {
+    if (g_pal_enable_flag != 0) {
         d = D_00189E20_9;
         *(float *)(e + 20) = *(float *)(d + 8112);
     } else {

@@ -18,11 +18,11 @@ extern void FastVecAdd(void *, void *, void *);
 extern char *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, int, int);
 extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
 extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
-extern float D_L00_001B0168 __attribute__((sda));
-extern float D_L00_001B016C __attribute__((sda));
-extern float D_L00_001B0170 __attribute__((sda));
-extern float D_L00_001B0174 __attribute__((sda));
-extern float D_L00_001B0178 __attribute__((sda));
+extern float g_exhaust_angle_a __attribute__((sda));
+extern float g_exhaust_angle_b __attribute__((sda));
+extern float g_exhaust_rate_a __attribute__((sda));
+extern float g_exhaust_rate_b __attribute__((sda));
+extern float g_exhaust_angle_degrees __attribute__((sda));
 
 /* Spawns glowing exhaust particles behind the object while it is active. */
 void UpdatePairedSparkEmitter(unsigned char *obj) {
@@ -126,11 +126,11 @@ void UpdatePairedSparkEmitter(unsigned char *obj) {
         }
     }
     if ((unsigned char)obj[0x20] == 2) {
-        math_update_wrapped_angle_offset(obj, ctx + 0xC, ctx, D_L00_001B0168,
-            D_L00_001B016C * 0.00029088825f, *(float *)(ctx + 0x28));
+        math_update_wrapped_angle_offset(obj, ctx + 0xC, ctx, g_exhaust_angle_a,
+            g_exhaust_angle_b * 0.00029088825f, *(float *)(ctx + 0x28));
         moby_scale_owner_words_by_angles(obj, ctx + 4, ctx + 8,
-            D_L00_001B0178 * 0.017453294f, D_L00_001B0170 * 0.00029088825f,
-            D_L00_001B0174 * 0.00029088825f);
+            g_exhaust_angle_degrees * 0.017453294f, g_exhaust_rate_a * 0.00029088825f,
+            g_exhaust_rate_b * 0.00029088825f);
         {
             int angle;
             vec_scale_to_length(&frame.velocity, obj + 0xC0, -0.15f);

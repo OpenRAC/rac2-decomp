@@ -11,7 +11,7 @@ typedef unsigned char BatchA_A09_u8;
 
 typedef int BatchA_A09_s32;
 
-extern BatchA_A18_u8 D_0018C0D4;
+extern BatchA_A18_u8 g_screen_mode_flag;
 
 /* func_L18_002D0C00 */
 /* Partial input record: only the observed axes and button words are modeled. */
@@ -27,7 +27,7 @@ extern InputRecordPrefix g_pad_state;
 /* func_L18_002D1998 */
 /* Partial probe-collision record: only the hit object, hit count and surface normal are modeled. */
 typedef struct { u8 prefix[0x18]; s32 object; s32 count; u8 gap[0x20]; float normal[4]; } MotionCollision;
-extern MotionCollision D_L18_001BFC00;
+extern MotionCollision g_hero_ground_hit;
 /* func_L00_002D36E0(float *out, s32 flag, float x, float y, float z) elsewhere: this typed
    interleaving keeps both EE argument banks unchanged and gives retail's argument setup order. */
 extern void vec_scale_to_length(void *, void *, float);
@@ -47,10 +47,10 @@ extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 /* func_L18_002F1098 is matched in its own unit, L18_002F1098-g8.c. */
 
 extern int text_measure_width_scaled(void *a0, void *a1, const char *a2);
-extern char D_L18_00296510[];
+extern char g_str_font_texture[];
 
 void func_US2_L18_00304470(void *a0, void *a1) {
-    text_measure_width_scaled(a0, a1, D_L18_00296510);
+    text_measure_width_scaled(a0, a1, g_str_font_texture);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
@@ -60,7 +60,7 @@ void func_US2_L18_00304470(void *a0, void *a1) {
 BatchA_A18_s32 moby_set_table_entry_byte(BatchA_A18_u8 *s, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 
 extern BatchA_A18_s32 point_in_path_xy(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
-extern BatchA_A18_s32 D_001FE480[];
+extern BatchA_A18_s32 g_path_pointer_table[];
 
 /* hands the slot's payload to its handler; the slot table entry holds count then payload */
 BatchA_A18_s32 moby_run_slot_handler(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
@@ -68,7 +68,7 @@ BatchA_A18_s32 moby_run_slot_handler(BatchA_A18_s32 a0, BatchA_A18_s32 a1, Batch
 /* func_L18_0035D238 is defined in L18_0035D238.c. */
 
 extern float path_find_best_point(void *a0, void *a1, void *a2, char *a3, float f12);
-extern BatchA_A18_s32 D_001FE480[];
+extern BatchA_A18_s32 g_path_pointer_table[];
 
 /* GCC 2.9's zero-length trailing array describes the variable point payload. */
 /* Finds the best projected point on the path, breaking near ties by distance. */
@@ -111,9 +111,9 @@ void protopet_reset_to_idle(BatchA_A18_u8 *a0);
 /* The group id lists, the entity bank base and the resident group count. The two scalars are
    `sda` arrays of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui`/`lw`) as retail has it in this -G0 unit. */
-extern unsigned short *D_L18_001FB320[];
+extern unsigned short *g_condition_target_lists[];
 extern char *g_moby_l18_table[] __attribute__((sda));
-extern int D_L18_001B2838[] __attribute__((sda));
+extern int g_max_l18_group_index[] __attribute__((sda));
 
 /* Counts the entities of kind 0xB69 in state 1 that the group's id list names, stores the count
    through a1 and returns the last of them (0 when there is none). Retail compares the state with

@@ -16,24 +16,24 @@ typedef struct { char p00[0x12C]; int f12c; } SaveScreen;
 extern MenuRoot g_pause_menu_state;
 extern PadState g_pad_state;
 extern SaveState g_memcard_state;
-extern SaveScreen D_00261108;
-extern SaveScreen D_002613B8;
-extern int D_0025E9E0[];
-extern char *D_001A8CFC;
-extern int D_001B1A3C;
+extern SaveScreen g_save_confirm_screen_a;
+extern SaveScreen g_save_confirm_screen_b;
+extern int g_save_menu_cursor[];
+extern char *g_resident_data_base;
+extern int g_map_state_flag;
 extern int g_save_menu_flags;
 extern int g_save_menu_screen;
-extern int D_001A8C88;
-extern int D_001A8C8C;
+extern int g_menu_panel_active;
+extern int g_menu_panel_flag;
 extern int g_current_map_index;
 extern int g_player_bolts;
-extern int D_001A7BC0;
-extern unsigned char D_001A7A0A;
-extern Stamp D_001A7360;
-extern int D_001A7C08;
-extern char D_00261238[];
-extern char D_00260EE8[];
-extern char D_0025DA38[];
+extern int g_frame_counter_2;
+extern unsigned char g_extras_unlocked_flag;
+extern Stamp g_cd_clock_buffer;
+extern int g_save_slot_cursor;
+extern char g_pause_page_f[];
+extern char g_save_slot_screen_alt[];
+extern char g_save_slot_screen[];
 extern void popup_set_row(char *, int);
 extern void level_restart_keep_progress(int);
 extern void save_clear_slot_and_start(int, int);
@@ -54,11 +54,11 @@ int save_slot_menu_update_with_confirm(SaveMenu *menu)
     if (*(SaveMenu **)(g_pause_menu_state.owner + 0xE8) != menu)
         return 0;
     oldCursor = menu->cursor;
-    if (D_001A8CFC != 0)
-        popup_set_row(D_001A8CFC + 0x3CAA8, oldCursor);
-    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&D_00261108 && ((SaveScreen *)g_pause_menu_state.screen)->f12c != 0)
+    if (g_resident_data_base != 0)
+        popup_set_row(g_resident_data_base + 0x3CAA8, oldCursor);
+    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&g_save_confirm_screen_a && ((SaveScreen *)g_pause_menu_state.screen)->f12c != 0)
         menu->stage = 1;
-    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&D_002613B8 && ((SaveScreen *)g_pause_menu_state.screen)->f12c != 0)
+    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&g_save_confirm_screen_b && ((SaveScreen *)g_pause_menu_state.screen)->f12c != 0)
         menu->stage = 1;
     if (menu->stage == 1) {
         if (menu->flags & 0x2000)
@@ -67,7 +67,7 @@ int save_slot_menu_update_with_confirm(SaveMenu *menu)
             save_clear_slot_and_start(menu->f48, menu->cursor);
         g_memcard_state.f17c = 1;
         g_pause_menu_state.busy = 1;
-        D_001B1A3C = 0;
+        g_map_state_flag = 0;
         g_pause_menu_state.ready = 0;
         g_pause_menu_state.delay = 0x2DFC;
     }
@@ -81,8 +81,8 @@ int save_slot_menu_update_with_confirm(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (save->f16c != 0 || save->f10 != 0 || D_001B1A3C != 0) {
-            if (D_001A8C8C != 0) {
+        if (save->f16c != 0 || save->f10 != 0 || g_map_state_flag != 0) {
+            if (g_menu_panel_flag != 0) {
                 g_save_menu_flags |= 0x80;
                 request_begin_slot(4, 1, 5, (int)g_pause_menu_state.owner, 0);
                 g_memcard_state.f17c = 0;
@@ -96,20 +96,20 @@ int save_slot_menu_update_with_confirm(SaveMenu *menu)
         save->f17c = 1;
         g_memcard_state.slots[g_memcard_state.slot].balance = g_player_bolts;
         g_memcard_state.slots[g_memcard_state.slot].status = g_current_map_index;
-        g_memcard_state.slots[g_memcard_state.slot].ticks = D_001A7BC0;
+        g_memcard_state.slots[g_memcard_state.slot].ticks = g_frame_counter_2;
         {
             Stamp *stamp = &g_memcard_state.slots[g_memcard_state.slot].stamp;
-            *stamp = D_001A7360;
+            *stamp = g_cd_clock_buffer;
         }
-        g_memcard_state.slots[g_memcard_state.slot].level = D_001A7A0A;
+        g_memcard_state.slots[g_memcard_state.slot].level = g_extras_unlocked_flag;
         load_data_and_setup_callback();
         save->f17c = 1;
-        D_001A8C88 = 0;
+        g_menu_panel_active = 0;
         return 0;
     }
-    if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0 && D_001A8C8C == 0)
+    if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0 && g_menu_panel_flag == 0)
         return 1;
-    if ((g_pad_state.flags & 0x10) && D_001A8C8C == 0) {
+    if ((g_pad_state.flags & 0x10) && g_menu_panel_flag == 0) {
         int parentScreen = *(int *)(g_pause_menu_state.owner + 0xE0);
         int result;
         if (parentScreen != 0)
@@ -125,18 +125,18 @@ finish:
     if (g_save_menu_screen == 9)
     {
         char *screen;
-        if (D_001A8C8C != 0)
-            screen = D_00261238;
-        else if (D_001A8C88 != 0)
-            screen = D_00260EE8;
+        if (g_menu_panel_flag != 0)
+            screen = g_pause_page_f;
+        else if (g_menu_panel_active != 0)
+            screen = g_save_slot_screen_alt;
         else
-            screen = D_0025DA38;
+            screen = g_save_slot_screen;
         menu_send_request(4, screen);
     }
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)
             request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);
-        else if (D_001A8C8C == 0) {
+        else if (g_menu_panel_flag == 0) {
             int parentScreen = *(int *)(g_pause_menu_state.owner + 0xE0);
             int result;
             if (parentScreen != 0)
@@ -162,12 +162,12 @@ done:
         buttons = g_pad_state.alt;
     else
         buttons = g_pad_state.flags;
-    menu->cursor = D_001A7C08;
-    if ((buttons & 0x1000) && D_001A7C08 != 0)
-        menu->cursor = D_001A7C08 - 1;
+    menu->cursor = g_save_slot_cursor;
+    if ((buttons & 0x1000) && g_save_slot_cursor != 0)
+        menu->cursor = g_save_slot_cursor - 1;
     if ((buttons & 0x4000) && menu->cursor < 3)
         menu->cursor = menu->cursor + 1;
-    D_001A7C08 = menu->cursor;
+    g_save_slot_cursor = menu->cursor;
     if ((buttons & 0x20) && g_memcard_state.mode == 2) {
         if (menu->flags & 0x2000) {
             g_memcard_state.f17c = 0;
@@ -186,9 +186,9 @@ done:
     }
     if (buttons & 0x40) {
         if (g_memcard_state.slots[menu->cursor].status != -1) {
-            g_pause_menu_state.value = (menu->flags & 0x2000) ? (int)&D_002613B8 : (int)&D_00261108;
+            g_pause_menu_state.value = (menu->flags & 0x2000) ? (int)&g_save_confirm_screen_b : (int)&g_save_confirm_screen_a;
             g_pause_menu_state.fe4 = (menu->flags & 0x2000) ? 2 : 1;
-            D_0025E9E0[0] = menu->cursor;
+            g_save_menu_cursor[0] = menu->cursor;
         } else {
             if (menu->flags & 0x2000) {
                 menu->stage = 1;

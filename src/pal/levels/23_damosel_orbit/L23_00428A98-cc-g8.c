@@ -17,19 +17,19 @@ typedef struct { char pad[0x98]; float angle; char gap[0x21F4]; int owner; char 
 extern Player413 g_hero_state;
 extern int g_hero_charged_shot_moby __attribute__((sda)), g_enemy_charged_shot_moby __attribute__((sda));
 extern int g_hero_charge_sound_handle __attribute__((sda)), g_enemy_charge_sound_handle __attribute__((sda));
-extern float D_L23_001B1934 __attribute__((sda)), D_L23_001B1938 __attribute__((sda));
-extern int D_L23_001A8FF0 MACRO_ADDR;
+extern float g_effect_factor_default __attribute__((sda)), g_effect_factor_alt __attribute__((sda));
+extern int g_hero_special_mode MACRO_ADDR;
 typedef struct { int enabled; unsigned int color; unsigned long long counter; } ChargeFx413;
-extern ChargeFx413 D_L23_001A8AC0[] __attribute__((sda));
-extern int D_L23_001A8AB0;
-extern int D_L23_001B22C8;
-extern float D_L23_001B3704;
-extern char D_L23_001C4B00[];
+extern ChargeFx413 g_screen_effect[] __attribute__((sda));
+extern int g_charged_shot_flag;
+extern int g_frame_l23_counter;
+extern float g_mothership_knockback_scale;
+extern char g_hit_l23_moby_list[];
 /* sda: one la macro per use, so its address is not kept across the loop. */
-extern char D_L23_001A8F20[] __attribute__((sda));
+extern char g_zero_l23_vec[] __attribute__((sda));
 /* Unsized view: read through a separate lui rather than the small-data lw macro. */
-extern unsigned char *D_L23_002001EC[];
-extern Light413 D_L23_001C87C0[];
+extern unsigned char *g_spark_color_ptr[];
+extern Light413 g_light_effect_table[];
 extern float IntToFloat(int), math_random_float_range(float,float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float), math_random_int_range(int,int), math_random_int_below(int);
 extern void vec_scale_to_length(void*,void*,float), add_vectors(void*,void*,void*);
@@ -43,7 +43,7 @@ extern void FastVecCross(void*,void*,void*),quaternion_to_rotation_basis(void*,v
 extern float FastVecLength(void*),square_root(float);
 extern int coll_process_hit(void*,int,void*,int,float);
 extern void moby_queue_knockback_for_nodes(void*,void*,void*,int,int,int,int,int,float,float,float);
-extern char *func_PAL_L00_003FB330(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern char *SpawnExplosion_pal(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
 extern void part_spawn_random_direction_effect(void*,float,float);
 extern void *SpawnJointFollowParticle(void*,int,int,int,float);
 extern void *func_PAL_002BD790(void*,void*,int,int,int,int,int,int,int,float);
@@ -64,8 +64,8 @@ void func_PAL_L23_00428A98(unsigned char *obj)
         float charge;
         if (state->triggered && (g_hero_state.mode==2 || !state->kind)) {
             if (!state->charge && handle==&g_enemy_charged_shot_moby) {
-                D_L23_001A8AC0[0].enabled=1;
-                D_L23_001A8AC0[0].color=0xFFFF00;
+                g_screen_effect[0].enabled=1;
+                g_screen_effect[0].color=0xFFFF00;
             }
             charge=IntToFloat(++state->charge)*0.039473683f;
             if (charge>1.0f) charge=1.0f;
@@ -91,37 +91,37 @@ void func_PAL_L23_00428A98(unsigned char *obj)
                 }
             }
             if (state->charge<50) {
-                int alpha=D_L23_001A8AC0[0].color>>24;
-                if (!D_L23_001A8AC0[0].counter && alpha==255) alpha=37;
+                int alpha=g_screen_effect[0].color>>24;
+                if (!g_screen_effect[0].counter && alpha==255) alpha=37;
                 if (alpha<36) alpha++; else alpha=37;
-                D_L23_001A8AC0[0].counter=0x1F00000042ULL;
-                D_L23_001A8AC0[0].color=(D_L23_001A8AC0[0].color&0xFFFF00)|(alpha<<24);
-            } else D_L23_001A8AC0[0].color |= 0xFF000000;
+                g_screen_effect[0].counter=0x1F00000042ULL;
+                g_screen_effect[0].color=(g_screen_effect[0].color&0xFFFF00)|(alpha<<24);
+            } else g_screen_effect[0].color |= 0xFF000000;
             if (state->light != -1) {
                 float light_charge;
                 float inner, outer;
-                D_L23_001C87C0[state->light].position.f.x=*(float *)(obj+0x10);
-                D_L23_001C87C0[state->light].position.f.y=*(float *)(obj+0x14);
-                D_L23_001C87C0[state->light].position.f.z=*(float *)(obj+0x18);
+                g_light_effect_table[state->light].position.f.x=*(float *)(obj+0x10);
+                g_light_effect_table[state->light].position.f.y=*(float *)(obj+0x14);
+                g_light_effect_table[state->light].position.f.z=*(float *)(obj+0x18);
                 { int n=state->charge;
                 if (n>50) n=50;
                 if (n<0) n=0;
-                D_L23_001C87C0[state->light].position.f.w=IntToFloat(n)*0.14f; }
+                g_light_effect_table[state->light].position.f.w=IntToFloat(n)*0.14f; }
                 light_charge=IntToFloat(state->charge)*0.039473683f;
                 if (light_charge>1) light_charge=1;
-                part_spawn_glow_record(&D_L23_001C87C0[state->light].position,
+                part_spawn_glow_record(&g_light_effect_table[state->light].position,
                     math_random_int_range(15,47)&255,math_random_int_range(47,63)&255,math_random_int_range(63,127)&255,17,light_charge*840000.0f,0.0f);
-                D_L23_001C87C0[state->light].inner=math_random_float_range(D_L23_001C87C0[state->light].inner*0.8f,
-                    (D_L23_001C87C0[state->light].position.f.w+D_L23_001C87C0[state->light].position.f.w)*0.14285715f);
-                outer=D_L23_001C87C0[state->light].outer*0.8f;
-                inner=D_L23_001C87C0[state->light].inner;
-                D_L23_001C87C0[state->light].outer=math_random_float_range(inner < outer ? inner : outer,inner);
-            } else if (!(D_L23_001B22C8&3)) {
+                g_light_effect_table[state->light].inner=math_random_float_range(g_light_effect_table[state->light].inner*0.8f,
+                    (g_light_effect_table[state->light].position.f.w+g_light_effect_table[state->light].position.f.w)*0.14285715f);
+                outer=g_light_effect_table[state->light].outer*0.8f;
+                inner=g_light_effect_table[state->light].inner;
+                g_light_effect_table[state->light].outer=math_random_float_range(inner < outer ? inner : outer,inner);
+            } else if (!(g_frame_l23_counter&3)) {
                 state->light=gfx_add_point_light(obj+0x10,0,0.0f,0.0f);
             }
         } else {
-            D_L23_001A8AB0=0;
-            D_L23_001A8AC0[0].enabled=0;
+            g_charged_shot_flag=0;
+            g_screen_effect[0].enabled=0;
             state->charge=0;
             snd_start_in_slot(22,0,0);
             if (state->kind) {
@@ -133,7 +133,7 @@ void func_PAL_L23_00428A98(unsigned char *obj)
                 snd_stop_voice(g_enemy_charge_sound_handle);
                 g_enemy_charge_sound_handle=snd_start_in_slot(21,0,0);
             }
-            if (!D_L23_001A8FF0) {
+            if (!g_hero_special_mode) {
                 state->velocity.f.x=math_fast_sin_or_cos_a(g_hero_state.angle)*0.8000001f;
                 state->velocity.f.y=math_fast_sin_or_cos_b(g_hero_state.angle)*0.8000001f;
                 state->velocity.f.z=0;
@@ -157,7 +157,7 @@ void func_PAL_L23_00428A98(unsigned char *obj)
         else vec_scale_to_length(&frame.scaled,obj+0xC0,extra);
         vec_scale_to_length(&frame.normalized,&frame.position,1.0f);
         FastVecCross(&frame.rotation,obj+0xE0,&frame.normalized);
-        if (state->kind) factor=D_L23_001B1938; else factor=D_L23_001B1934;
+        if (state->kind) factor=g_effect_factor_alt; else factor=g_effect_factor_default;
         FastVecScale(&frame.rotation,&frame.rotation,factor);
         fade=FastVecLength(&frame.rotation);
         frame.rotation.f.w=-square_root(1.0f-fade*fade);
@@ -171,7 +171,7 @@ void func_PAL_L23_00428A98(unsigned char *obj)
         }
         state->velocity.q=frame.scaled.q;
         if (state->light!=-1) {
-            Light413 *lights = D_L23_001C87C0;
+            Light413 *lights = g_light_effect_table;
             lights[state->light].position.f.w *= 0.27999997f;
             if (lights[state->light].position.f.w<0.0001f) {
                 gfx_free_point_light(state->light);
@@ -199,8 +199,8 @@ void func_PAL_L23_00428A98(unsigned char *obj)
             } else if (state->kind) {
                 hit=coll_process_hit(obj+0x10,16,obj,0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
-                moby_queue_knockback_for_nodes(obj,&frame.position,D_L23_001C4B00,hit,0,0x8B0000,2,1,D_L23_001B3704,1.0f,1.0f);
-                if (hit) func_PAL_L00_003FB330(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1.0f,20.0f);
+                moby_queue_knockback_for_nodes(obj,&frame.position,g_hit_l23_moby_list,hit,0,0x8B0000,2,1,g_mothership_knockback_scale,1.0f,1.0f);
+                if (hit) SpawnExplosion_pal(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1.0f,20.0f);
                 {
                 /* Block scopes keep these local to one basic block, as retail allocates them. */
                 float effect=spread*105000.0f, diameter;
@@ -220,7 +220,7 @@ void func_PAL_L23_00428A98(unsigned char *obj)
                 int g=math_random_int_range(47,63);
                 int r=math_random_int_range(15,47);
                 int high=(g<<8)|0x7F000000;
-                func_PAL_002BD790(obj+0x10,&frame.velocity,(b<<16)|high|r,0x4F7F4F2F,37,1,*D_L23_002001EC[0],-1,0,210000.0f);
+                func_PAL_002BD790(obj+0x10,&frame.velocity,(b<<16)|high|r,0x4F7F4F2F,37,1,*g_spark_color_ptr[0],-1,0,210000.0f);
                 }
                 }
                 i=5;
@@ -236,7 +236,7 @@ void func_PAL_L23_00428A98(unsigned char *obj)
                     } else --i;
                 } while(i>=0);
                 for(i=0;i<8;i++) {
-                    particle=func_PAL_L08_0034C4A8(obj+0x10,D_L23_001A8F20,127,obj);
+                    particle=func_PAL_L08_0034C4A8(obj+0x10,g_zero_l23_vec,127,obj);
                     if(particle) {
                         sub=particle+0x20;
                         if(i==2 && !math_random_int_below(8)) *(float *)(particle+12)=180000;
@@ -253,8 +253,8 @@ void func_PAL_L23_00428A98(unsigned char *obj)
             } else {
                 hit=coll_process_hit(obj+0x10,16,*(void **)(obj+0xB8),0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
-                moby_queue_knockback_for_nodes(obj,&frame.position,D_L23_001C4B00,hit,0,0x8B0007,2,1,D_L23_001B3704,1,1);
-                if(hit) func_PAL_L00_003FB330(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1,20);
+                moby_queue_knockback_for_nodes(obj,&frame.position,g_hit_l23_moby_list,hit,0,0x8B0007,2,1,g_mothership_knockback_scale,1,1);
+                if(hit) SpawnExplosion_pal(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1,20);
                 {
                 float effect=spread*105000.0f;
                 int count=42-state->age;
@@ -273,13 +273,13 @@ void func_PAL_L23_00428A98(unsigned char *obj)
                 int g=math_random_int_range(31,47);
                 int b=math_random_int_range(63,127);
                 int high=(g<<8)|0x7F000000;
-                func_PAL_002BD790(obj+0x10,&frame.velocity,(r<<16)|high|b,0x4F1F1F7F,37,1,*D_L23_002001EC[0],-1,0,210000);
+                func_PAL_002BD790(obj+0x10,&frame.velocity,(r<<16)|high|b,0x4F1F1F7F,37,1,*g_spark_color_ptr[0],-1,0,210000);
                 }
             }
         }
     }
     }
-    if(D_L23_001A8FF0) {
+    if(g_hero_special_mode) {
         cam_compute_view_direction(obj+0x10,&state->orientation,0);
         vec_negate_and_forward(obj+0xC0,&state->orientation,0);
     }

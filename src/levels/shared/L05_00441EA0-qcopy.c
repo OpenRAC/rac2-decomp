@@ -9,7 +9,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char *D_L05_001B1EC4 MACRO_ADDR;
+extern char *g_path_l05_entry_table MACRO_ADDR;
 extern void euler_rotation_basis(void *, void *);
 
 typedef struct {
@@ -22,7 +22,7 @@ typedef struct {
 void cam_load_entry_vectors(char *object)
 {
     char buf[16];
-    int table = (int)D_L05_001B1EC4;
+    int table = (int)g_path_l05_entry_table;
     char *record = *(char **)(object + 0x70);
     V4 *dst = (V4 *)(record + 0x20);
     V4 *src = (V4 *)(*(short *)(object + 0x84) * 32 + table);

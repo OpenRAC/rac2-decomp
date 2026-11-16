@@ -8,21 +8,21 @@ typedef signed short s16;
 typedef signed int s32;
 extern void moby_set_state();
 extern float math_fast_sin_or_cos_b(float);
-extern char D_L02_00188660[];
+extern char g_sound_l02_record_table[];
 extern void snd_stop_voice(int);
 extern int math_random_int_below(int);
 extern float fast_vec_dist(void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern char g_camera_l02_position[];
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
 extern s32 req_push_queue(u8 *, s32);
 extern s32 req_launch_queued(u8 *);
 extern void moby_mark_spawned(u8 *);
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
-extern u16 D_0018CFDC;
+extern u8 g_moby_group_flags[];
+extern u16 g_beam_emitter_id;
 extern int math_random_int_below(int);
 extern float math_random_angle(void);
 extern float ApproachValue(float *, float, float);
@@ -37,7 +37,7 @@ extern void func_PAL_L02_004176A8(u8 *);
 extern int math_random_int_below(int);
 extern s32 g_hovering_object_count __attribute__((sda));
 extern void gfx_add_draw_callback_first(void *, void *);
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
 
@@ -53,7 +53,7 @@ extern int PlayMobySound(int, int, void *);
    0.5 * sin(phase) + the base at +8 into the actor's float at +0x18 and runs the counter at +0x10
    down by 1/15, wrapping it into [-1, 1]. The first slot lookup is a separate block-local pointer
    from the one in the state-2 arm (retail keeps them in different registers). */
-void func_PAL_L02_00417128(u8 *a0) {
+void beam_emitter_update_pal(u8 *a0) {
     u8 *s1 = *(u8 **)(a0 + 0x68);
     u8 *p;
     u8 *q;
@@ -62,7 +62,7 @@ void func_PAL_L02_00417128(u8 *a0) {
 
     switch (a0[0x20]) {
     case 0:
-        if (D_0019B2E8[a0[0xB0] + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[a0[0xB0] + g_current_map_index * 16] & 0x80) {
             moby_mark_spawned(a0);
             return;
         }
@@ -80,7 +80,7 @@ void func_PAL_L02_00417128(u8 *a0) {
         if (a0[0x31] != 0)
             func_PAL_L02_00417490(a0);
         {
-            u8 *r = (u8 *)D_L02_00188660 + *(s32 *)(s1 + 0x18) * 0x70;
+            u8 *r = (u8 *)g_sound_l02_record_table + *(s32 *)(s1 + 0x18) * 0x70;
 
             if (*(u8 **)(r + 0x88) != a0 || r[0x74] == 0)
                 *(s32 *)(s1 + 0x18) = PlayMobySound(0, 4, a0);
@@ -97,13 +97,13 @@ void func_PAL_L02_00417128(u8 *a0) {
             q = *(u8 **)(p + 0x20);
             if (q != 0 && *(s16 *)(q + 0xAA) == 0x9C8 &&
                 fast_vec_dist(a0 + 0x10, q + 0x10) < 5.0f) {
-                D_0018CFDC = 0xFFFF;
+                g_beam_emitter_id = 0xFFFF;
                 moby_set_state(a0, 2, -1);
                 *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
                 *(u32 *)(a0 + 0x98) = 0;
                 slot = *(s32 *)(s1 + 0x18);
                 if (slot != -1) {
-                    u8 *rec = (u8 *)D_L02_00188660 + slot * 0x70;
+                    u8 *rec = (u8 *)g_sound_l02_record_table + slot * 0x70;
 
                     if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
                         snd_stop_voice(slot);

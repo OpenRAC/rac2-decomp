@@ -7,7 +7,7 @@
    with their predecessor counts, the exits, the callees, the $gp accesses,
    and the -G8 unit it needs). */
 
-extern unsigned char D_L20_0018C0D4;
+extern unsigned char g_hero_load_mode_switch;
 
 extern int hero_l20_set_state(int a0, int a1);
 
@@ -16,7 +16,7 @@ void hero_load_state_by_game_mode(int flag)
 {
     int a1 = (flag != 0) ? 2 : 1;
 
-    switch (D_L20_0018C0D4) {
+    switch (g_hero_load_mode_switch) {
     case 0:
         hero_l20_set_state(0, a1);
         break;

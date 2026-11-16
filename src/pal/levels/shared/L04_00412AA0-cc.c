@@ -11,9 +11,9 @@ extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern int D_L04_001B2008[] __attribute__((sda));
-extern int D_00138320;
-extern float D_L04_001BDC30;
+extern int g_game_tick_counter[] __attribute__((sda));
+extern int g_pad_pressed_flags;
+extern float g_projection_scale_float;
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float ApproachValue(void *, float, float);
@@ -40,7 +40,7 @@ typedef unsigned int BatchA_A04_u32;
 
 extern BatchA_A04_u32 g_current_map_index[] __attribute__((sda));
 
-extern BatchA_A04_u8 D_001395B8[];
+extern BatchA_A04_u8 g_game_flag_table[];
 
 /* Steps the record's phase at +0x1FC down by 0.1 (wrapping up by 8 once it reaches -8) and
    draws the effect with it. */
@@ -68,7 +68,7 @@ BatchA_A04_u32 race_get_course_win_count(BatchA_A04_u8 *a0);
 /* A04-table-select family, incrementing form: bumps the state-selected byte */
 /* shared native body of family A04-table-select: reads the state-selected byte */
 /* A04-table-select family, incrementing form (second slot pair) */
-extern BatchA_A04_u8 *D_001B26F0 __attribute__((sda));
+extern BatchA_A04_u8 *g_particle_record_pool __attribute__((sda));
 
 /* Sweeps the 0x800 packed 64-byte records, redrawing the four live kinds */
 /* func_L04_0040A628 is in L04_00402D90-racers-g8.c. */
@@ -125,7 +125,7 @@ static inline void CallL00_00322AC0(void *state, float rate, int level, int slot
     level_append_record_to_table(state, rate, level, slot);
 }
 
-void func_PAL_L04_00412AA0(unsigned char *m)
+void racer_update_boost_pal(unsigned char *m)
 {
     float delta[4], rotation[16];
     unsigned char *item, *other;
@@ -138,7 +138,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
     float wave, active, angle, sine, radius;
     unsigned int color;
     angle = IntToFloat(period);
-    red = D_L04_001B2008[0] % period;
+    red = g_game_tick_counter[0] % period;
     {
         float phase = (float)red;
         wave = math_fast_sin_or_cos_b(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
@@ -154,7 +154,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
         moby_update_transform_history_followers(p + 0x4e0, 1);
         state = p + 0x4e0;
     } else {
-        if ((m[0x20] == 3 || (D_00138320 & 10)) && *(int *)(p + 0x338) < 25 && *(int *)(p + 0x33c) > 0) {
+        if ((m[0x20] == 3 || (g_pad_pressed_flags & 10)) && *(int *)(p + 0x338) < 25 && *(int *)(p + 0x33c) > 0) {
             *(int *)(p + 0x338) = 200;
             --*(int *)(p + 0x33c);
             if (m[0x20] != 3) snd_play_from_class_bank(0, 0, m, 0x474);
@@ -198,7 +198,7 @@ void func_PAL_L04_00412AA0(unsigned char *m)
         viewAngle *= 0.008726647f;
         sine = math_fast_sin_or_cos_b(viewAngle);
         sine /= math_fast_sin_or_cos_a(viewAngle);
-        D_L04_001BDC30 = sine;
+        g_projection_scale_float = sine;
         UpdateViewContext();
     }
     if (*(int *)(p + 0x25c) != -1) {

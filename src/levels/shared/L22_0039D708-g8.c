@@ -4,9 +4,9 @@
 /* Small-data file: these bodies reach their globals through $gp / the
  * one-instruction model, so they only reproduce at -G8. */
 
-extern unsigned char D_L22_001B2A90[] __attribute__((sda));
-extern int *D_L22_001B2AB4[4] __attribute__((sda));
-extern int D_L22_001AF314 __attribute__((sda));
+extern unsigned char g_flying_enemy_spawn_blocked[] __attribute__((sda));
+extern int *g_space_ship_pickup_slots[4] __attribute__((sda));
+extern int g_space_ship_owner_moby __attribute__((sda));
 
 extern void ref_L22_003A1E50_00(char *, char *);
 extern void ref_L22_003A1E50_01(void *);
@@ -20,18 +20,18 @@ void moby_update_timed(char *moby) {
     if (*ageCounter <= 0xFFFE) (*ageCounter)++;
     if (*(int *)(vars + 0x37C) != 0) *(int *)(vars + 0x37C) = *(int *)(vars + 0x37C) - 1;
     ref_L22_003A1E50_01(vars + 0x464);
-    ref_L22_003A1E50_01(D_L22_001B2A90);
+    ref_L22_003A1E50_01(g_flying_enemy_spawn_blocked);
 }
 
 /* Counts down a timer in the first entry of a small table until it reaches zero. */
 void table_decrement_timer(void) {
-    int *p = D_L22_001B2AB4[0];
+    int *p = g_space_ship_pickup_slots[0];
     if (p[3] > 0) p[3] = p[3] - 1;
 }
 
 /* Forwards two values, with a fixed zero, to a helper on the stored object. */
 void stored_object_forward(int a0, int a1) {
-    ref_L22_003A3C70_00(D_L22_001AF314, a0, a1, 0);
+    ref_L22_003A3C70_00(g_space_ship_owner_moby, a0, a1, 0);
 }
 
 /* ---- 0x003A48F8 / 0x003A4C68: the same scan of the small-data table at
@@ -40,14 +40,14 @@ void stored_object_forward(int a0, int a1) {
  * test, which is what splits the count between $v0 (the load) and $a2 (the
  * loop's bound copy). ---- */
 
-extern int D_L22_001B2AD4 __attribute__((nosda));
-extern int D_L22_001AF3B0[1] __attribute__((sda));
+extern int g_space_ship_lane_count __attribute__((nosda));
+extern int g_lane_slot_list[1] __attribute__((sda));
 
 /* Returns 0 when the key is in the list, 1 when it is not. */
 int list_is_key_missing(int key) {
     int i;
-    for (i = 0; i < D_L22_001B2AD4; i++) {
-        if (D_L22_001AF3B0[i] == key) return 0;
+    for (i = 0; i < g_space_ship_lane_count; i++) {
+        if (g_lane_slot_list[i] == key) return 0;
     }
     return 1;
 }
@@ -56,8 +56,8 @@ int list_is_key_missing(int key) {
  * way. */
 int list_has_key(int unused, int key) {
     int i;
-    for (i = 0; i < D_L22_001B2AD4; i++) {
-        if (D_L22_001AF3B0[i] == key) return 1;
+    for (i = 0; i < g_space_ship_lane_count; i++) {
+        if (g_lane_slot_list[i] == key) return 1;
     }
     return 0;
 }
@@ -66,12 +66,12 @@ int list_has_key(int unused, int key) {
 
 /* The six level words the update reads: the same addresses in every program
  * that carries the function, so they keep their level-22 names. */
-extern float D_L22_001AF3C8 __attribute__((sda));
-extern float D_L22_001AF3CC __attribute__((sda));
-extern float D_L22_001AF3D0 __attribute__((sda));
-extern float D_L22_001AF3D4 __attribute__((sda));
-extern float D_L22_001AF3D8 __attribute__((sda));
-extern float D_L22_001AF3DC __attribute__((sda));
+extern float g_orbit_param_a __attribute__((sda));
+extern float g_orbit_param_b __attribute__((sda));
+extern float g_orbit_param_c __attribute__((sda));
+extern float g_orbit_param_d __attribute__((sda));
+extern float g_orbit_param_e __attribute__((sda));
+extern float g_orbit_param_f __attribute__((sda));
 
 /* The two boot helpers the update calls; each sits at its own address in
  * every program that carries the function. */
@@ -96,18 +96,18 @@ void orbit_update(char *moby, int newState, int stateArg1, int stateArg2, int fl
         if (*(short *)(vars + 0x34E) == 0) {
             *(int *)(vars + 0x3EC) = *(unsigned char *)(obj + 0x43);
             if (newState == 11) {
-                p0 = D_L22_001AF3D0 * 0.00027777778f;
-                p1 = D_L22_001AF3D4 * 0.016666668f;
-                p2 = D_L22_001AF3D8 * 4.8481374e-06f;
-                p3 = D_L22_001AF3DC * 0.00029088825f;
+                p0 = g_orbit_param_c * 0.00027777778f;
+                p1 = g_orbit_param_d * 0.016666668f;
+                p2 = g_orbit_param_e * 4.8481374e-06f;
+                p3 = g_orbit_param_f * 0.00029088825f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.5f;
                 *(float *)(vars + 0x138) = 0.5f;
             } else {
-                p0 = D_L22_001AF3C8 * 0.00027777778f;
-                p1 = D_L22_001AF3CC * 0.016666668f;
-                p2 = D_L22_001AF3D8 * 4.8481374e-06f;
-                p3 = D_L22_001AF3DC * 0.00029088825f;
+                p0 = g_orbit_param_a * 0.00027777778f;
+                p1 = g_orbit_param_b * 0.016666668f;
+                p2 = g_orbit_param_e * 4.8481374e-06f;
+                p3 = g_orbit_param_f * 0.00029088825f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.3f;
                 *(float *)(vars + 0x138) = 0.33333334f;
@@ -149,7 +149,7 @@ typedef struct Hero3B50 {
 
 /* In .data, so that -G8 keeps the split lui/lw the entry block allocates around. */
 extern Hero3B50 *g_hero_moby __attribute__((section(".data")));
-extern int D_L22_0023B530[3][60];
+extern int g_pickup_slot_table[3][60];
 /* The target object: the same $gp slot in both levels, under a name each level binds itself. */
 extern int ref_L22_003A3B50_00 __attribute__((sda));
 extern int math_random_int_below(int);
@@ -176,7 +176,7 @@ void SpawnRandomKindAt(char *pos, int arg) {
         mode = 0;
         break;
     }
-    row = D_L22_0023B530[mode];
+    row = g_pickup_slot_table[mode];
     i = 0;
     if (*row != 0) {
         int *slot = row;

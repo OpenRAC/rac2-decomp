@@ -1,28 +1,28 @@
 #include "common.h"
 
 /* The spawn ranges of the dust puffs, read through $gp. */
-extern int D_L09_001B17A8 __attribute__((sda));
-extern int D_L09_001B17AC __attribute__((sda));
-extern float D_L09_001B17B0 __attribute__((sda));
-extern float D_L09_001B17B4 __attribute__((sda));
-extern float D_L09_001B17B8 __attribute__((sda));
-extern float D_L09_001B17BC __attribute__((sda));
-extern float D_L09_001B17C0 __attribute__((sda));
-extern float D_L09_001B17C4 __attribute__((sda));
-extern float D_L09_001B17C8 __attribute__((sda));
-extern float D_L09_001B17CC __attribute__((sda));
-extern float D_L09_001B17D0 __attribute__((sda));
-extern float D_L09_001B17D4 __attribute__((sda));
-extern int D_L09_001B17D8 __attribute__((sda));
-extern int D_L09_001B17DC __attribute__((sda));
-extern int D_L09_001B17E0 __attribute__((sda));
-extern int D_L09_001B17E4 __attribute__((sda));
-extern float D_L09_001B17E8 __attribute__((sda));
-extern int D_L00_001A8FB4 __attribute__((sda));
+extern int g_dust_life_min __attribute__((sda));
+extern int g_dust_life_max __attribute__((sda));
+extern float g_dust_radius_min __attribute__((sda));
+extern float g_dust_radius_max __attribute__((sda));
+extern float g_dust_rise_speed_min __attribute__((sda));
+extern float g_dust_rise_speed_max __attribute__((sda));
+extern float g_dust_drag_min __attribute__((sda));
+extern float g_dust_drag_max __attribute__((sda));
+extern float g_dust_spin_min __attribute__((sda));
+extern float g_dust_spin_max __attribute__((sda));
+extern float g_dust_size_min __attribute__((sda));
+extern float g_dust_size_max __attribute__((sda));
+extern int g_dust_color_start __attribute__((sda));
+extern int g_dust_color_end __attribute__((sda));
+extern int g_dust_count_min __attribute__((sda));
+extern int g_dust_count_max __attribute__((sda));
+extern float g_dust_height_offset __attribute__((sda));
+extern int g_input_block_flag __attribute__((sda));
 extern int g_current_map_index __attribute__((section(".sdata")));
 /* Volatile: retail keeps its store out of the branch delay slot. */
-extern volatile int D_L09_001B25A8 __attribute__((section(".sdata")));
-extern int D_00138324 __attribute__((nosda));
+extern volatile int g_giant_clank_pad_busy __attribute__((section(".sdata")));
+extern int g_pad_held_flags __attribute__((nosda));
 extern char g_sound_state[];
 typedef struct {
     char pad0[0x33C];
@@ -34,8 +34,8 @@ typedef struct {
 } Player10200;
 
 extern Player10200 g_hero_state;
-extern u8 D_001395B8[];
-extern char D_L09_001BFC00[];
+extern u8 g_game_flag_table[];
+extern char g_request_l09_queue[];
 
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
@@ -75,22 +75,22 @@ void giant_clank_pad_update(u8 *obj)
     int dir;
     char *sound_slot;
 
-    r = math_random_float_range(D_L09_001B17B0, D_L09_001B17B4);
+    r = math_random_float_range(g_dust_radius_min, g_dust_radius_max);
     pos[0] = math_fast_sin_or_cos_a(math_random_angle()) * r;
     pos[1] = math_fast_sin_or_cos_b(math_random_angle()) * r;
     pos[2] = 0.0f;
     add_vectors(tmp, pos, obj + 0x10);
-    pos[2] -= D_L09_001B17E8;
+    pos[2] -= g_dust_height_offset;
     qzero_nc(vel);
-    vel[2] = math_random_float_range(D_L09_001B17B8, D_L09_001B17BC) * (1.0f / 60.0f);
-    life = math_random_int_range(D_L09_001B17A8, D_L09_001B17AC);
-    spin = math_random_float_range(D_L09_001B17C8, D_L09_001B17CC);
-    size = math_random_float_range(D_L09_001B17D0, D_L09_001B17D4);
-    tex = FastTweenColor(D_L09_001B17D8, D_L09_001B17DC, math_random_float_range(0.0f, 1.0f));
-    n = math_random_int_range(D_L09_001B17E0, D_L09_001B17E4);
+    vel[2] = math_random_float_range(g_dust_rise_speed_min, g_dust_rise_speed_max) * (1.0f / 60.0f);
+    life = math_random_int_range(g_dust_life_min, g_dust_life_max);
+    spin = math_random_float_range(g_dust_spin_min, g_dust_spin_max);
+    size = math_random_float_range(g_dust_size_min, g_dust_size_max);
+    tex = FastTweenColor(g_dust_color_start, g_dust_color_end, math_random_float_range(0.0f, 1.0f));
+    n = math_random_int_range(g_dust_count_min, g_dust_count_max);
     dir = (func_001163B0() & 1) ? -n : n;
     part_spawn_ground_effect(pos, life, spin, size, tex, 2, dir, vel, 0,
-                  -(math_random_float_range(D_L09_001B17C0, D_L09_001B17C4) * (1.0f / 3600.0f)));
+                  -(math_random_float_range(g_dust_drag_min, g_dust_drag_max) * (1.0f / 3600.0f)));
 
     switch (obj[0x20]) {
     case 0:
@@ -111,7 +111,7 @@ void giant_clank_pad_update(u8 *obj)
         } else if (g_hero_state.help == 2) {
             TryClaimNotice(4, 0x27B4, 1);
         }
-        if (!(D_00138324 & 0x10) || D_L00_001A8FB4 != 4)
+        if (!(g_pad_held_flags & 0x10) || g_input_block_flag != 4)
             break;
         if (g_current_map_index == 9 || g_current_map_index == 18)
             moby_set_state(obj, 2, -1);
@@ -120,35 +120,35 @@ void giant_clank_pad_update(u8 *obj)
         break;
     case 2:
         if (g_current_map_index == 9) {
-            if (req_push_queue(D_L09_001BFC00, 100)) {
-                req_launch_queued(D_L09_001BFC00);
+            if (req_push_queue(g_request_l09_queue, 100)) {
+                req_launch_queued(g_request_l09_queue);
                 moby_set_state(obj, 3, -1);
             }
         } else if (g_current_map_index == 18) {
-            if (req_push_queue(D_L09_001BFC00, 0x92)) {
-                req_launch_queued(D_L09_001BFC00);
+            if (req_push_queue(g_request_l09_queue, 0x92)) {
+                req_launch_queued(g_request_l09_queue);
                 moby_set_state(obj, 3, -1);
             }
         }
         break;
     case 3:
         if (game_is_either_mode_two()) {
-            D_L09_001B25A8 = 1;
+            g_giant_clank_pad_busy = 1;
             break;
         }
     case 4: {
         int lvl;
 
-        D_L09_001B25A8 = 0;
+        g_giant_clank_pad_busy = 0;
         obj[0x31] = 1;
         lvl = g_current_map_index;
         *(u16 *)(obj + 0x34) &= ~1;
         if (lvl == 9) {
-            D_001395B8[0x1D] = 1;
-            D_001395B8[0x2D] = 1;
+            g_game_flag_table[0x1D] = 1;
+            g_game_flag_table[0x2D] = 1;
         } else if (lvl == 18) {
-            D_001395B8[0x87] = 1;
-            D_001395B8[0x9F] = 1;
+            g_game_flag_table[0x87] = 1;
+            g_game_flag_table[0x9F] = 1;
         }
         data_set_small_value_and_refresh(vars[0], 1);
         break;

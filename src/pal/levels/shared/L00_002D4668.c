@@ -71,7 +71,7 @@ extern void vec_fast_normalize_helper(char *a, int b, float f);
  * rotation and the displacement retained while the hero leaves the platform.
  * Counterpart: RAC1 update_hero_attachment in hero_mapped_animations.c.
  */
-void func_PAL_L00_002D4668(void)
+void UpdateHeroAttachment_pal(void)
 {
     float local_pos[4], local_rot[4], delta[4], next[4];
     float hero_pos[4], hero_rot[4], anchor_pos[4], anchor_rot[4], anchor2_pos[4], anchor2_rot[4];

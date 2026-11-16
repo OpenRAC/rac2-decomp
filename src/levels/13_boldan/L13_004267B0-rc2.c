@@ -26,7 +26,7 @@
 
 extern s32 g_current_map_index;
 extern s32 ref_L13_004267B0_00;
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern void ref_L13_004267B0_01();
 
 /* If this object's switch is set for the current level, it runs two setup steps for the object. */
@@ -34,7 +34,7 @@ void switch_setup_update(s8 *moby) {
     s32 *vars;
 
     vars = (*(s32 **)((s8 *)(moby) + (0x68)));
-    if (D_0019B2E8[(*(u8 *)((s8 *)(moby) + (0xB0))) + (g_current_map_index << 4)] & 0x80) {
+    if (g_moby_group_flags[(*(u8 *)((s8 *)(moby) + (0xB0))) + (g_current_map_index << 4)] & 0x80) {
         ref_L13_004267B0_01(ref_L13_004267B0_00 + (*vars << 8), vars);
         ref_L13_004267B0_01(moby);
     }

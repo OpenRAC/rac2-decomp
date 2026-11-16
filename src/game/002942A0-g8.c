@@ -28,9 +28,9 @@ typedef struct {
 } LoadOwners;
 
 extern LoadTable g_copy_setup_data;
-extern LoadOwners D_00152CD0;
-extern s32 D_001A9330 __attribute__((sda));
-extern s32 D_001A9334[] __attribute__((sda));
+extern LoadOwners g_load_slots;
+extern s32 g_load_slot_index __attribute__((sda));
+extern s32 g_load_slot_record[] __attribute__((sda));
 extern s32 load_start_disc_read_with_callback();
 extern void load_release_class_cache_slot();
 extern void load_continue_stream();
@@ -38,18 +38,18 @@ extern void load_continue_stream();
 s32 load_start_disc_entry(s32 entry_index, s32 owner, s32 dest, s32 first_part_only) {
     s32 old_slot;
     if (g_copy_setup_data.el[entry_index].f8 != 0) {
-        old_slot = D_001A9330;
+        old_slot = g_load_slot_index;
         if (old_slot == -1) {
-            D_001A9330 = entry_index;
-            D_001A9334[0] = owner;
-            D_001A9334[1] = dest;
+            g_load_slot_index = entry_index;
+            g_load_slot_record[0] = owner;
+            g_load_slot_record[1] = dest;
             if (owner >= 0) {
-                D_00152CD0.f34[owner] = old_slot;
+                g_load_slots.f34[owner] = old_slot;
             }
             if (g_copy_setup_data.el[entry_index].f10 != 0 && first_part_only == 0) {
-                return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].fC + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f10, load_continue_stream, &D_001A9330);
+                return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].fC + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f10, load_continue_stream, &g_load_slot_index);
             }
-            return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].f4 + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f8, load_release_class_cache_slot, &D_001A9330);
+            return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].f4 + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f8, load_release_class_cache_slot, &g_load_slot_index);
         }
         return 0;
     }

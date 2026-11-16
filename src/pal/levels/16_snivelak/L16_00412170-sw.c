@@ -59,35 +59,35 @@ typedef struct {
 typedef int HeroTI __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; HeroTI q[0x260]; } Hero;
 extern char g_hero_state[];
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 extern u8 g_sound_state[];
-extern BarlowUtilityQueueView D_L16_001BFD00;
-extern int D_L16_001A8F00;
-extern u8 *D_L16_001B16C0 __attribute__((sda));
-extern float D_L16_001B16E4 __attribute__((sda));
-extern float D_L16_001B16E8 __attribute__((sda));
-extern float D_L16_001B16EC __attribute__((sda));
-extern float D_L16_001B16F0 __attribute__((sda));
-extern float D_L16_001B16F4 __attribute__((sda));
-extern float D_L16_001B16F8 __attribute__((sda));
-extern unsigned int D_L16_001B2648;
-extern float D_L16_001B2564;
-extern float D_L16_001B9B00[4];
-extern void func_PAL_L16_00415760(u8 *);
+extern BarlowUtilityQueueView g_request_l16_queue;
+extern int g_snivelak_state;
+extern u8 *g_snivelak_target __attribute__((sda));
+extern float g_snivelak_path_speed_a __attribute__((sda));
+extern float g_snivelak_path_speed_b __attribute__((sda));
+extern float g_snivelak_path_slot_arg_a __attribute__((sda));
+extern float g_snivelak_path_slot_arg_b __attribute__((sda));
+extern float g_snivelak_aim_time __attribute__((sda));
+extern float g_snivelak_aim_decay_rate __attribute__((sda));
+extern unsigned int g_frame_l16_counter;
+extern float g_snivelak_room_fade;
+extern float g_scene_origin_transform[4];
+extern void UpdateSnivelakBossDamage_pal(u8 *);
 extern int IsPointInCuboid(void *, int);
 extern int req_push_queue(u8 *, int);
 extern int req_launch_queued(BarlowUtilityQueueView *);
 extern void game_set_stored_value_pair(int, int);
 extern int game_is_either_mode_two(void);
-extern void func_PAL_L16_00417EB0(u8 *);
-extern void func_PAL_L16_00417FD8(u8 *);
+extern void snivelak_finish_boss_intro_state_pal(u8 *);
+extern void snivelak_clean_up_boss_and_free_pal(u8 *);
 extern void moby_set_state(u8 *, s32, s32);
 extern int flag_set_first_pending(u8 *);
 extern void anim_play_on_self_or_child(u8 *, int, int, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float vec_distance_squared_xy(void *, void *);
-extern void func_PAL_L16_00417DC0(u8 *, int, int);
+extern void snd_play_unplayed_voice_line_pal(u8 *, int, int);
 extern void snivelak_find_closest_path_point(u8 *, void *);
 extern void func_PAL_L16_00416218(u8 *, float);
 extern float vec_distance_xy(void *, void *);
@@ -96,32 +96,32 @@ extern float math_fabs(float);
 extern int PlayMobySound(int, int, char *);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void snd_stop_voice(int);
-extern void func_PAL_L16_00417D10(u8 *, int);
-extern void func_PAL_L16_00416C90(u8 *);
+extern void RequestVoiceLine_pal(u8 *, int);
+extern void snivelak_fire_body_shots_pal(u8 *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float math_approach_target_with_direction_mode(float *, float, float, float, float, float *, int);
 extern int math_fast_float_d(int *);
-extern void func_PAL_L16_00417020(u8 *);
+extern void snivelak_drop_falling_shot_pal(u8 *);
 extern int snd_start_in_slot(int, int, int);
-extern void func_PAL_L16_00416A50(u8 *);
+extern void snivelak_fire_arm_shot_pal(u8 *);
 extern void path_pick_new_slot(u8 *, float, float);
-extern void func_PAL_L16_00415CD0(u8 *);
+extern void snivelak_switch_fly_hover_state_pal(u8 *);
 extern void func_PAL_002A7E68(u8 *, int, int, int);
 extern float ApproachValue(float *, float, float);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern void func_PAL_L16_004176B0(void *);
 extern int coll_sweep_from_object(u8 *, void *, int, int, int, int, float, float, float);
 extern u8 *func_PAL_L16_00418260(u8 *, int);
-extern void func_PAL_L16_00416E50(u8 *);
+extern void snivelak_fire_lobbed_shot_pal(u8 *);
 extern void moby_transform_joint_point(char *, int, char *);
 extern int coll_is_behind_surface(u8 *);
 extern void snivelak_attach_child_to_parent_pose(u8 *, u8 *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float weapon_compute_shot_launch_speed(void *, void *, float *, float, float);
-extern void func_PAL_L16_004188D0(u8 *, void *, float);
+extern void snivelak_launch_projectile_pal(u8 *, void *, float);
 extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern char *func_PAL_0032F3B8(u8 *, void *, void *, float);
@@ -141,23 +141,23 @@ void func_PAL_L16_00413DE8(u8 *moby)
     u8 *flags;
     float *heading0, *heading1, *heading2, *heading3, *heading6, *heading7, *heading8;
     int next, sound1, sound2, sound3, sound4;
-    func_PAL_L16_00415760(moby);
+    UpdateSnivelakBossDamage_pal(moby);
     if (!moby || moby[0x20] == 254 || moby[0x20] == 253) return;
 
     switch (moby[0x95]) {
     case 0:
         if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->entryArea) ||
-            (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->exitArea) && D_001395B8[0x83] == 1)) {
-            flags = D_001395B8;
+            (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->exitArea) && g_game_flag_table[0x83] == 1)) {
+            flags = g_game_flag_table;
             if (!flags[0x83]) {
-                if (req_push_queue((u8 *)&D_L16_001BFD00, 132)) {
-                    req_launch_queued(&D_L16_001BFD00);
-                    game_set_stored_value_pair((int)func_PAL_L16_00417EB0, (int)moby);
+                if (req_push_queue((u8 *)&g_request_l16_queue, 132)) {
+                    req_launch_queued(&g_request_l16_queue);
+                    game_set_stored_value_pair((int)snivelak_finish_boss_intro_state_pal, (int)moby);
                     flags[0x83] = 1;
                     state->introStarted = 1;
                 }
             } else if (!game_is_either_mode_two()) {
-                func_PAL_L16_00417EB0(moby);
+                snivelak_finish_boss_intro_state_pal(moby);
             }
         } else if ((*(unsigned short *)(moby + 0x34) & 1) && ((Hero *)g_hero_state)->f[0x20] >= 610.0f) {
             *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xffbe) | 0x1000;
@@ -180,16 +180,16 @@ void func_PAL_L16_00413DE8(u8 *moby)
         }
         break;
     case 1:
-        if (D_L16_001B16C0) {
-            state->target = D_L16_001B16C0;
+        if (g_snivelak_target) {
+            state->target = g_snivelak_target;
             moby_set_state(moby, 7, 2);
         }
         break;
     case 2:
-        if (!D_L16_001B16C0) moby_set_state(moby, 2, 1);
+        if (!g_snivelak_target) moby_set_state(moby, 2, 1);
         break;
     }
-    if (D_L16_001A8F00 == 2) return;
+    if (g_snivelak_state == 2) return;
 
     switch (moby[0x20]) {
     case 1:
@@ -199,12 +199,12 @@ void func_PAL_L16_00413DE8(u8 *moby)
             anim_play_on_self_or_child(moby, 10, 12, 3.0f);
             if (!math_random_int_below(1)) {
                 if (vec_distance_squared_xy(moby + 0x10, &((Hero *)g_hero_state)->f[0x20]) > 1600.0f)
-                    func_PAL_L16_00417DC0(moby, 3, 6);
-                else func_PAL_L16_00417DC0(moby, 7, 11);
+                    snd_play_unplayed_voice_line_pal(moby, 3, 6);
+                else snd_play_unplayed_voice_line_pal(moby, 7, 11);
             }
         }
         snivelak_find_closest_path_point(moby, &((Hero *)g_hero_state)->f[0x20]);
-        func_PAL_L16_00416218(moby, D_L16_001B16E4 * 0.020000001f);
+        func_PAL_L16_00416218(moby, g_snivelak_path_speed_a * 0.020000001f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 32.0f) {
             frame = moby_get_anim_value((char *)moby);
             if (math_fabs(frame - 5.0f) < 1.0f || math_fabs(frame - 21.0f) < 1.0f) {
@@ -212,7 +212,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
                 moby_set_state(moby, 3, -1);
             }
         }
-        func_PAL_L16_00415CD0(moby);
+        snivelak_switch_fly_hover_state_pal(moby);
         break;
     case 16:
         if (flag_set_first_pending(moby)) state->verticalSpeed = 0.0f;
@@ -228,15 +228,15 @@ void func_PAL_L16_00413DE8(u8 *moby)
         if (flag_set_first_pending(moby)) {
             PlayMobySound(9, 0, (char *)moby);
             anim_play_on_self_or_child(moby, 3, 12, 6.0f);
-            if (!math_random_int_below(1)) func_PAL_L16_00417DC0(moby, 12, 15);
+            if (!math_random_int_below(1)) snd_play_unplayed_voice_line_pal(moby, 12, 15);
         }
         if (!state->taunted && !state->suppressSpeech && !math_random_int_below(2) &&
             ((Hero *)g_hero_state)->i[0x8A5] == 22 && ((Hero *)g_hero_state)->i[0x6E] == 1 && ((u8 *)((Hero *)g_hero_state)->ptr[0x927]) &&
             *(short *)(((u8 *)((Hero *)g_hero_state)->ptr[0x927]) + 0xaa) == 0xea7) {
             state->taunted = 1;
-            func_PAL_L16_00417D10(moby, 16);
+            RequestVoiceLine_pal(moby, 16);
         }
-        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) func_PAL_L16_00416C90(moby);
+        if ((g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) snivelak_fire_body_shots_pal(moby);
         snivelak_find_closest_path_point(moby, &((Hero *)g_hero_state)->f[0x20]);
         if (((Hero *)g_hero_state)->i[0x8A5] == 129) moby_set_state(moby, 6, -1);
         else if (vec_distance_xy(moby + 0x10, state->destination) > 48.0f) moby_set_state(moby, 2, -1);
@@ -251,7 +251,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
                 qcopy(state->lastPlayer, &((Hero *)g_hero_state)->f[0x34]);
             }
         }
-        func_PAL_L16_00415CD0(moby);
+        snivelak_switch_fly_hover_state_pal(moby);
         break;
     case 4:
         if (flag_set_first_pending(moby)) {
@@ -278,7 +278,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(moby + 0x14));
         math_approach_target_with_direction_mode(heading1, angle, 0.0012566373f, 0.0012566373f, 0.12566373f, &state->turnVelocity, 0);
         if (math_fast_float_d(&state->fireTimer)) {
-            func_PAL_L16_00417020(moby);
+            snivelak_drop_falling_shot_pal(moby);
             snd_start_in_slot(17, 0, (int)moby);
             state->fireTimer = ((s32)(math_random_int_range(45, 75)) * 5 + 2) / 6;
         }
@@ -294,7 +294,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
     case 8:
         if (flag_set_first_pending(moby)) {
             anim_play_on_self_or_child(moby, state->activeArm + 11, 17, 0.0f);
-            if (!state->suppressSpeech) func_PAL_L16_00417DC0(moby, 17, 23);
+            if (!state->suppressSpeech) snd_play_unplayed_voice_line_pal(moby, 17, 23);
             state->fired = 0;
             *(float *)(moby + 0x48) = 1.0f;
         }
@@ -303,7 +303,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         math_approach_target_with_direction_mode(heading2, angle, 0.005026549f, 0.005026549f, 0.25132746f, &state->turnVelocity, 0);
         if (!state->fired && state->body[0x42] == state->body[0x43] && moby_get_anim_value((char *)state->body) >= 13.0f) {
             if (state->body[0x42] == 11) PlayMobySound(7, 0, (char *)moby);
-            func_PAL_L16_00416A50(moby);
+            snivelak_fire_arm_shot_pal(moby);
             state->fired = 1;
         } else if (moby_get_anim_value((char *)state->body) > 20.0f) {
             anim_play_on_self_or_child(moby, state->activeArm + 11, 17, 0.0f);
@@ -314,11 +314,11 @@ void func_PAL_L16_00413DE8(u8 *moby)
     case 7:
         if (flag_set_first_pending(moby)) {
             anim_play_on_self_or_child(moby, 10, 25, 6.0f);
-            path_pick_new_slot(moby, D_L16_001B16EC, D_L16_001B16F0);
+            path_pick_new_slot(moby, g_snivelak_path_slot_arg_a, g_snivelak_path_slot_arg_b);
         }
-        func_PAL_L16_00416218(moby, D_L16_001B16E8 * 0.020000001f);
+        func_PAL_L16_00416218(moby, g_snivelak_path_speed_b * 0.020000001f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) moby_set_state(moby, 8, -1);
-        func_PAL_L16_00415CD0(moby);
+        snivelak_switch_fly_hover_state_pal(moby);
         break;
     case 9:
         if (flag_set_first_pending(moby)) anim_play_on_self_or_child(moby, 16, 25, 6.0f);
@@ -336,7 +336,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
             anim_play_on_self_or_child(moby, 10, 25, 6.0f);
             snivelak_find_closest_path_point(moby, state->target + 0x10);
         }
-        func_PAL_L16_00416218(moby, D_L16_001B16E8 * 0.020000001f);
+        func_PAL_L16_00416218(moby, g_snivelak_path_speed_b * 0.020000001f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) {
             if (math_fabs(*(float *)(state->target + 0x18) - 120.0f) < 1.0f) moby_set_state(moby, 12, -1);
             else moby_set_state(moby, 11, -1);
@@ -347,7 +347,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
             if (moby[0x43] != 22) func_PAL_002A7E68(moby, 22, 0, 17);
             func_PAL_002A7E68(state->body, 3, 0, 25);
             state->aimTimeout = 100;
-            state->aimTime = D_L16_001B16F4;
+            state->aimTime = g_snivelak_aim_time;
             state->aimBlend = 0.0f;
             state->verticalSpeed = 0.0f;
         }
@@ -358,7 +358,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         }
         math_approach_target_with_direction_mode((float *)(moby + 0xf8), angle, 0.005026549f, 0.005026549f, 0.25132746f, &state->turnVelocity, 0);
         if (FastDiffRots(angle, *(float *)(moby + 0xf8)) < 0.087266475f) {
-            ApproachValue(&state->aimTime, 0.0f, D_L16_001B16F8 * 0.020000001f);
+            ApproachValue(&state->aimTime, 0.0f, g_snivelak_aim_decay_rate * 0.020000001f);
             ApproachValue(&state->aimBlend, 1.0f, 0.080000006f);
             slot1 = g_sound_state + state->attackSound * 112;
             if (*(u8 **)(slot1 + 0x88) != state->body || !slot1[0x74])
@@ -386,7 +386,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         if (frame2 > 30.0f) ApproachValue((float *)(moby + 0x48), 1.0f, 0.16000001f);
         if (frame2 > 40.0f && frame2 < 42.0f) coll_sweep_from_object(moby, state->target + 0x10, 0x10001, 0, 1, 0, 4.0f, (float)state->power, 1.0f);
         if (moby[0x60] & 2) moby_set_state(moby, 2, 1);
-        else if (((Hero *)g_hero_state)->i[0x8A5] == 22 && ((Hero *)g_hero_state)->i[0x6E] == 1 && ((u8 *)((Hero *)g_hero_state)->ptr[0x927]) == moby) func_PAL_L16_00417DC0(moby, 24, 27);
+        else if (((Hero *)g_hero_state)->i[0x8A5] == 22 && ((Hero *)g_hero_state)->i[0x6E] == 1 && ((u8 *)((Hero *)g_hero_state)->ptr[0x927]) == moby) snd_play_unplayed_voice_line_pal(moby, 24, 27);
         break;
     case 13:
         if (flag_set_first_pending(moby)) {
@@ -413,7 +413,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         heading7 = (float *)(moby + 0xf8);
         angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(moby + 0x14));
         math_approach_target_with_direction_mode(heading7, angle, 0.005026549f, 0.005026549f, 0.25132746f, &state->turnVelocity, 0);
-        if (state->body[0x42] == state->body[0x43] && (D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) func_PAL_L16_00416E50(moby);
+        if (state->body[0x42] == state->body[0x43] && (g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) snivelak_fire_lobbed_shot_pal(moby);
         if (*(unsigned short *)(moby + 0x96) > 150) moby_set_state(moby, 2, 1);
         break;
     case 14:
@@ -440,7 +440,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
                     velocity[2] = 0.0f;
                     vec_scale_to_length(velocity, velocity, distance);
                     velocity[2] = weapon_compute_shot_launch_speed(state->projectile + 0x10, state->target + 0x10, 0, distance, -gravity);
-                    func_PAL_L16_004188D0(state->projectile, velocity, gravity);
+                    snivelak_launch_projectile_pal(state->projectile, velocity, gravity);
                     state->projectile = 0;
                 }
             }
@@ -470,7 +470,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
         heading8 = (float *)(moby + 0xf8);
         angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(moby + 0x14));
         math_approach_target_with_direction_mode(heading8, angle, 0.0025132746f, 0.0025132746f, 0.12566373f, &state->turnVelocity, 0);
-        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) {
+        if ((g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) {
             *(BossQuadword *)work.vectors.offset = 0;
             work.vectors.offset[0] = math_random_signed_float_range(0.0f, 6.0f);
             work.vectors.offset[1] = math_random_signed_float_range(0.0f, 6.0f);
@@ -480,13 +480,13 @@ void func_PAL_L16_00413DE8(u8 *moby)
                 *(BossQuadword *)work.vectors.position = q;
             }
             FastVecAdd(work.vectors.position, work.vectors.position, moby + 0x10);
-            FastVecSub(work.vectors.offset, D_L16_001B9B00, work.vectors.position);
+            FastVecSub(work.vectors.offset, g_scene_origin_transform, work.vectors.position);
             vec_scale_to_length(work.vectors.offset, work.vectors.offset, 1.0f);
             func_PAL_0032F3B8(moby, work.vectors.position, work.vectors.offset, 0.0f);
             snd_play_from_class_bank(6, 0, (char *)moby, 0xf78);
         }
         if (state->body[0x42] == state->body[0x43] && state->body[0x41] > 29) transition_arm_shared(5, 5.0f, 15.0f);
-        if (D_L16_001B2564 >= 1.0f) {
+        if (g_snivelak_room_fade >= 1.0f) {
             moby_set_state(moby, 18, -1);
             moby[0x31] = 0;
             *(unsigned short *)(moby + 0x34) |= 1;
@@ -499,12 +499,12 @@ void func_PAL_L16_00413DE8(u8 *moby)
         state->bodyMode = 0;
         state->verticalSpeed -= 0.008f;
         *(float *)(moby + 0x18) += state->verticalSpeed;
-        if (*(unsigned short *)(moby + 0x96) > 75 && D_001395B8[0x83] != 2 && req_push_queue((u8 *)&D_L16_001BFD00, 133)) {
+        if (*(unsigned short *)(moby + 0x96) > 75 && g_game_flag_table[0x83] != 2 && req_push_queue((u8 *)&g_request_l16_queue, 133)) {
             moby_set_state(moby, 19, -1);
-            req_push_queue((u8 *)&D_L16_001BFD00, 17);
-            req_push_queue((u8 *)&D_L16_001BFD00, 134);
-            req_launch_queued(&D_L16_001BFD00);
-            game_set_stored_value_pair((int)func_PAL_L16_00417FD8, (int)moby);
+            req_push_queue((u8 *)&g_request_l16_queue, 17);
+            req_push_queue((u8 *)&g_request_l16_queue, 134);
+            req_launch_queued(&g_request_l16_queue);
+            game_set_stored_value_pair((int)snivelak_clean_up_boss_and_free_pal, (int)moby);
         }
         break;
     case 19:
@@ -521,7 +521,7 @@ void func_PAL_L16_00413DE8(u8 *moby)
             *(unsigned short *)(state->arms[1] + 0x34) &= 0xefff;
             *(int *)(state->arms[1] + 0x98) = 0;
         }
-        if (D_L16_001A8F00 == 2) SetMobyAndGroupsEnabled(moby, 0);
+        if (g_snivelak_state == 2) SetMobyAndGroupsEnabled(moby, 0);
         break;
     }
     snivelak_part_update(moby);

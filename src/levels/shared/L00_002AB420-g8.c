@@ -45,11 +45,11 @@ typedef struct {
     unsigned char padc60[0xAC];
     float fd0c;
 } HeroRotationBlends;
-extern HeroRotationBlends D_L00_0025BE10;
+extern HeroRotationBlends g_hero_item_attach_records;
 
-extern unsigned char D_001A7A43,  D_001A7A41;
-extern float D_L00_001A7CF4 __attribute__((sda));
-extern float D_L00_001A7CF8 __attribute__((sda));
+extern unsigned char g_state_flag_b,  g_state_flag_a;
+extern float g_glow_angle_a __attribute__((sda));
+extern float g_glow_scale __attribute__((sda));
 extern float ApproachValue(float *, float, float);
 extern int math_random_int_range(int, int);
 extern int math_fast_float_d(int *);
@@ -68,13 +68,13 @@ void UpdateHeroPitchAndYawEasingTargets(void)
     int applyBlend, status;
     int kind;
 
-    if (D_001A7A43 && D_00189E20_2.f1314)
-        D_L00_0025BE10.fd0c = D_L00_001A7CF8;
-    D_L00_0025BE10.fc5c = D_L00_001A7CF4;
-    if (D_001A7A41)
-        ApproachValue(&D_L00_001A7CF4, 1.57f, 0.05f);
+    if (g_state_flag_b && D_00189E20_2.f1314)
+        g_hero_item_attach_records.fd0c = g_glow_scale;
+    g_hero_item_attach_records.fc5c = g_glow_angle_a;
+    if (g_state_flag_a)
+        ApproachValue(&g_glow_angle_a, 1.57f, 0.05f);
     else
-        ApproachValue(&D_L00_001A7CF4, 0.875f, 0.05f);
+        ApproachValue(&g_glow_angle_a, 0.875f, 0.05f);
 
     if (D_00189E20_2.f1e8 < 20)
         return;
@@ -97,9 +97,9 @@ void UpdateHeroPitchAndYawEasingTargets(void)
             if (ratio < lookAngle)
                 lookAngle = ratio;
         }
-        D_L00_0025BE10.f274 = lookAngle;
+        g_hero_item_attach_records.f274 = lookAngle;
         cam_set_limits_second(0.008f, 0.3f);
-        D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.7f;
+        g_hero_item_attach_records.f114 = g_hero_item_attach_records.f274 * 0.7f;
         return;
     }
 
@@ -144,11 +144,11 @@ void UpdateHeroPitchAndYawEasingTargets(void)
             D_00189E20_2.f1194 = 0.0f;
     }
     cam_set_limits_fourth(D_00189E20_2.f11a4, D_00189E20_2.f11a8);
-    D_L00_0025BE10.f278 = D_00189E20_2.f1198;
-    D_L00_0025BE10.f274 = D_00189E20_2.f1194;
+    g_hero_item_attach_records.f278 = D_00189E20_2.f1198;
+    g_hero_item_attach_records.f274 = D_00189E20_2.f1194;
     if (applyBlend) {
         cam_set_limits_second(0.008f, 0.3f);
-        D_L00_0025BE10.f118 = D_L00_0025BE10.f278 * 0.52f;
-        D_L00_0025BE10.f114 = D_L00_0025BE10.f274 * 0.55f;
+        g_hero_item_attach_records.f118 = g_hero_item_attach_records.f278 * 0.52f;
+        g_hero_item_attach_records.f114 = g_hero_item_attach_records.f274 * 0.55f;
     }
 }

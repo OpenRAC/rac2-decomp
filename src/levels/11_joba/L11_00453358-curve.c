@@ -1,60 +1,60 @@
 #include "common.h"
 
-extern char D_L11_001B1E50[] __attribute__((sda));
-extern char D_L11_001B1E70[] __attribute__((sda));
-extern char D_L11_001B1E80[] __attribute__((sda));
-extern char D_L11_001B1EA0[] __attribute__((sda));
-extern char D_L11_001B1EB0[] __attribute__((sda));
-extern char D_L11_001B1EE0[] __attribute__((sda));
-extern char D_L11_001B1F20[] __attribute__((sda));
-extern char D_L11_001B1F30[] __attribute__((sda));
-extern char D_L11_001B1F50[] __attribute__((sda));
-extern char D_L11_001B1F70[] __attribute__((sda));
-extern char D_L11_001B43F0[] __attribute__((sda));
-extern char D_L11_001B4430[] __attribute__((sda));
-extern char D_L11_001B4450[] __attribute__((sda));
-extern char D_L11_001B4490[] __attribute__((sda));
-extern char D_L11_001B44B0[] __attribute__((sda));
-extern char D_L11_001B44D0[] __attribute__((sda));
-extern char D_L11_001B4510[] __attribute__((sda));
-extern char D_L11_001B4550[] __attribute__((sda));
-extern char D_L11_001B4570[] __attribute__((sda));
-extern char D_L11_001B4580[] __attribute__((sda));
-extern char D_L11_001B4588[] __attribute__((sda));
-extern char D_L11_001B4598[] __attribute__((sda));
-extern char D_L11_001B45A0[] __attribute__((sda));
-extern char D_L11_001B45B8[] __attribute__((sda));
-extern char D_L11_001B45D8[] __attribute__((sda));
-extern char D_L11_001B45E0[] __attribute__((sda));
-extern char D_L11_001B45F0[] __attribute__((sda));
-extern char D_L11_001B4600[] __attribute__((sda));
-extern char D_L11_001B4608[] __attribute__((sda));
-extern char D_L11_001B4618[] __attribute__((sda));
-extern char D_L11_001B4620[] __attribute__((sda));
-extern char D_L11_001B4630[] __attribute__((sda));
-extern char D_L11_001B4638[] __attribute__((sda));
-extern char D_L11_001B4650[] __attribute__((sda));
-extern char D_L11_001B4670[] __attribute__((sda));
-extern char D_L11_001B4678[] __attribute__((sda));
-extern char D_L11_001B4688[] __attribute__((sda));
-extern char D_L11_001B4698[] __attribute__((sda));
-extern char D_L11_001B46A0[] __attribute__((sda));
-extern char D_L11_001B46A4[] __attribute__((sda));
-extern char D_L11_001B46A8[] __attribute__((sda));
-extern char D_L11_001B46AC[] __attribute__((sda));
-extern char D_L11_001B46B0[] __attribute__((sda));
-extern char D_L11_001B46B4[] __attribute__((sda));
-extern char D_L11_001B46B8[] __attribute__((sda));
-extern char D_L11_001B46BC[] __attribute__((sda));
-extern char D_L11_001B46C0[] __attribute__((sda));
-extern char D_L11_001B46C4[] __attribute__((sda));
-extern char D_L11_002626B0[];
-extern char D_L11_00262710[];
+extern char g_effect_path_origins_a[] __attribute__((sda));
+extern char g_effect_path_origins_b[] __attribute__((sda));
+extern char g_effect_path_origins_c[] __attribute__((sda));
+extern char g_effect_path_origins_d[] __attribute__((sda));
+extern char g_effect_path_origins_e[] __attribute__((sda));
+extern char g_effect_path_origins_f[] __attribute__((sda));
+extern char g_effect_path_origins_g[] __attribute__((sda));
+extern char g_effect_path_origins_h[] __attribute__((sda));
+extern char g_effect_path_origins_i[] __attribute__((sda));
+extern char g_effect_path_origins_j[] __attribute__((sda));
+extern char g_effect_path_velocities_a[] __attribute__((sda));
+extern char g_effect_path_velocities_b[] __attribute__((sda));
+extern char g_effect_path_velocities_c[] __attribute__((sda));
+extern char g_effect_path_velocities_d[] __attribute__((sda));
+extern char g_effect_path_velocities_e[] __attribute__((sda));
+extern char g_effect_path_velocities_f[] __attribute__((sda));
+extern char g_effect_path_velocities_g[] __attribute__((sda));
+extern char g_effect_path_velocities_h[] __attribute__((sda));
+extern char g_effect_path_durations_a[] __attribute__((sda));
+extern char g_effect_path_durations_b[] __attribute__((sda));
+extern char g_effect_path_durations_c[] __attribute__((sda));
+extern char g_effect_path_durations_d[] __attribute__((sda));
+extern char g_effect_path_durations_e[] __attribute__((sda));
+extern char g_effect_path_durations_f[] __attribute__((sda));
+extern char g_effect_path_durations_g[] __attribute__((sda));
+extern char g_effect_path_durations_h[] __attribute__((sda));
+extern char g_effect_path_durations_i[] __attribute__((sda));
+extern char g_effect_path_durations_j[] __attribute__((sda));
+extern char g_effect_path_starts_a[] __attribute__((sda));
+extern char g_effect_path_starts_b[] __attribute__((sda));
+extern char g_effect_path_starts_c[] __attribute__((sda));
+extern char g_effect_path_starts_d[] __attribute__((sda));
+extern char g_effect_path_starts_e[] __attribute__((sda));
+extern char g_effect_path_starts_f[] __attribute__((sda));
+extern char g_effect_path_starts_g[] __attribute__((sda));
+extern char g_effect_path_starts_h[] __attribute__((sda));
+extern char g_effect_path_starts_i[] __attribute__((sda));
+extern char g_effect_path_starts_j[] __attribute__((sda));
+extern char g_effect_path_total_a[] __attribute__((sda));
+extern char g_effect_path_total_b[] __attribute__((sda));
+extern char g_effect_path_total_c[] __attribute__((sda));
+extern char g_effect_path_total_d[] __attribute__((sda));
+extern char g_effect_path_total_e[] __attribute__((sda));
+extern char g_effect_path_total_f[] __attribute__((sda));
+extern char g_effect_path_total_g[] __attribute__((sda));
+extern char g_effect_path_total_h[] __attribute__((sda));
+extern char g_effect_path_total_i[] __attribute__((sda));
+extern char g_effect_path_total_j[] __attribute__((sda));
+extern char g_path_l11_segment_velocities[];
+extern char g_path_l11_segment_velocities_2[];
 extern void func_00282D30_2(char *, char *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-extern char *D_L11_001FF580[];
-extern char D_L11_001B1DD0[], D_L11_001B1E00[], D_L11_001B1E28[];
+extern char *g_path_l11_table[];
+extern char g_str_curve_stub_a[], g_str_curve_stub_b[], g_str_curve_stub_c[];
 extern void STUB_printf(char *, ...);
 
 /* Works out where something moving along a path made of curve pieces is at a given frame, and gives back its x and y. */
@@ -69,127 +69,127 @@ void InterpolateSegmentedPath(int *outX, int *outY, int selector, int frame,
     float time, start;
 
     if (selector == -1 && frame >= 0 && frame <= 54) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)frame) /
                    (*(float *)(path + 0x1C) * 54.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46A0;
-        origins = (int *)D_L11_001B1E50;
-        velocities = (float *)D_L11_001B43F0;
-        durations = (float *)D_L11_001B4570;
-        starts = (float *)D_L11_001B4608;
+        time = start * *(float *)g_effect_path_total_a;
+        origins = (int *)g_effect_path_origins_a;
+        velocities = (float *)g_effect_path_velocities_a;
+        durations = (float *)g_effect_path_durations_a;
+        starts = (float *)g_effect_path_starts_a;
         count = 4;
         curve = 1;
     } else if (selector == -1 && frame >= 54 && frame <= 110) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 54)) /
                    (*(float *)(path + 0x1C) * 56.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46A4;
-        origins = (int *)D_L11_001B1E70;
-        velocities = (float *)D_L11_001B4430;
-        durations = (float *)D_L11_001B4580;
-        starts = (float *)D_L11_001B4618;
+        time = start * *(float *)g_effect_path_total_b;
+        origins = (int *)g_effect_path_origins_b;
+        velocities = (float *)g_effect_path_velocities_b;
+        durations = (float *)g_effect_path_durations_b;
+        starts = (float *)g_effect_path_starts_b;
         count = 2;
         curve = 2;
     } else if (selector == 0) {
-        path = D_L11_001FF580[*(int *)(object + 0x1AC)];
+        path = g_path_l11_table[*(int *)(object + 0x1AC)];
         start = (*(float *)(path + 0x1C) * (float)frame) /
                    (*(float *)(path + 0x1C) * (float)*(int *)path);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46A8;
-        origins = (int *)D_L11_001B1E80;
-        velocities = (float *)D_L11_001B4450;
-        durations = (float *)D_L11_001B4588;
-        starts = (float *)D_L11_001B4620;
+        time = start * *(float *)g_effect_path_total_c;
+        origins = (int *)g_effect_path_origins_c;
+        velocities = (float *)g_effect_path_velocities_c;
+        durations = (float *)g_effect_path_durations_c;
+        starts = (float *)g_effect_path_starts_c;
         count = 4;
         curve = 3;
     } else if (selector == -1 && frame >= 110 && frame <= 118) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 110)) /
                    (*(float *)(path + 0x1C) * 8.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46AC;
-        origins = (int *)D_L11_001B1EA0;
-        velocities = (float *)D_L11_001B4490;
-        durations = (float *)D_L11_001B4598;
-        starts = (float *)D_L11_001B4630;
+        time = start * *(float *)g_effect_path_total_d;
+        origins = (int *)g_effect_path_origins_d;
+        velocities = (float *)g_effect_path_velocities_d;
+        durations = (float *)g_effect_path_durations_d;
+        starts = (float *)g_effect_path_starts_d;
         count = 2;
         curve = 4;
     } else if (selector == -1 && frame >= 118 && frame <= 313) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 118)) /
                    (*(float *)(path + 0x1C) * 195.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46B0;
-        origins = (int *)D_L11_001B1EB0;
-        velocities = (float *)D_L11_002626B0;
-        durations = (float *)D_L11_001B45A0;
-        starts = (float *)D_L11_001B4638;
+        time = start * *(float *)g_effect_path_total_e;
+        origins = (int *)g_effect_path_origins_e;
+        velocities = (float *)g_path_l11_segment_velocities;
+        durations = (float *)g_effect_path_durations_e;
+        starts = (float *)g_effect_path_starts_e;
         count = 6;
         curve = 5;
     } else if (selector == 1) {
-        path = D_L11_001FF580[*(int *)(object + 0x1B0)];
+        path = g_path_l11_table[*(int *)(object + 0x1B0)];
         start = (*(float *)(path + 0x1C) * (float)frame) /
                    (*(float *)(path + 0x1C) * (float)*(int *)path);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46B4;
-        origins = (int *)D_L11_001B1EE0;
-        velocities = (float *)D_L11_00262710;
-        durations = (float *)D_L11_001B45B8;
-        starts = (float *)D_L11_001B4650;
+        time = start * *(float *)g_effect_path_total_f;
+        origins = (int *)g_effect_path_origins_f;
+        velocities = (float *)g_path_l11_segment_velocities_2;
+        durations = (float *)g_effect_path_durations_f;
+        starts = (float *)g_effect_path_starts_f;
         count = 8;
         curve = 6;
     } else if (selector == -1 && frame >= 313 && frame <= 321) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 313)) /
                    (*(float *)(path + 0x1C) * 8.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46B8;
-        origins = (int *)D_L11_001B1F20;
-        velocities = (float *)D_L11_001B44B0;
-        durations = (float *)D_L11_001B45D8;
-        starts = (float *)D_L11_001B4670;
+        time = start * *(float *)g_effect_path_total_g;
+        origins = (int *)g_effect_path_origins_g;
+        velocities = (float *)g_effect_path_velocities_e;
+        durations = (float *)g_effect_path_durations_g;
+        starts = (float *)g_effect_path_starts_g;
         count = 2;
         curve = 7;
     } else if (selector == -1 && frame >= 321 && frame <= 468) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 321)) /
                    (*(float *)(path + 0x1C) * 147.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46BC;
-        origins = (int *)D_L11_001B1F30;
-        velocities = (float *)D_L11_001B44D0;
-        durations = (float *)D_L11_001B45E0;
-        starts = (float *)D_L11_001B4678;
+        time = start * *(float *)g_effect_path_total_h;
+        origins = (int *)g_effect_path_origins_h;
+        velocities = (float *)g_effect_path_velocities_f;
+        durations = (float *)g_effect_path_durations_h;
+        starts = (float *)g_effect_path_starts_h;
         count = 4;
         curve = 8;
     } else if (selector == 2) {
-        path = D_L11_001FF580[*(int *)(object + 0x1B4)];
+        path = g_path_l11_table[*(int *)(object + 0x1B4)];
         start = (*(float *)(path + 0x1C) * (float)frame) /
                    (*(float *)(path + 0x1C) * (float)*(int *)path);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46C0;
-        origins = (int *)D_L11_001B1F50;
-        velocities = (float *)D_L11_001B4510;
-        durations = (float *)D_L11_001B45F0;
-        starts = (float *)D_L11_001B4688;
+        time = start * *(float *)g_effect_path_total_i;
+        origins = (int *)g_effect_path_origins_i;
+        velocities = (float *)g_effect_path_velocities_g;
+        durations = (float *)g_effect_path_durations_i;
+        starts = (float *)g_effect_path_starts_i;
         count = 4;
         curve = 9;
     } else if (selector == -1 && frame >= 468 && frame <= 500) {
-        path = D_L11_001FF580[*(int *)(object + 0x1A8)];
+        path = g_path_l11_table[*(int *)(object + 0x1A8)];
         start = (*(float *)(path + 0x1C) * (float)(frame - 468)) /
                    (*(float *)(path + 0x1C) * 32.0f);
         if (start > 1.0f) start = 1.0f;
-        time = start * *(float *)D_L11_001B46C4;
-        origins = (int *)D_L11_001B1F70;
-        velocities = (float *)D_L11_001B4550;
-        durations = (float *)D_L11_001B4600;
-        starts = (float *)D_L11_001B4698;
+        time = start * *(float *)g_effect_path_total_j;
+        origins = (int *)g_effect_path_origins_j;
+        velocities = (float *)g_effect_path_velocities_h;
+        durations = (float *)g_effect_path_durations_j;
+        starts = (float *)g_effect_path_starts_j;
         count = 2;
         curve = 10;
     } else {
-        STUB_printf(D_L11_001B1DD0);
+        STUB_printf(g_str_curve_stub_a);
         *previousCurve = -1;
         *segment = 0;
         *outX = 0;
@@ -216,7 +216,7 @@ void InterpolateSegmentedPath(int *outX, int *outY, int selector, int frame,
                 i--;
                 if (i < 0) {
                     i = count;
-                    STUB_printf(D_L11_001B1E00);
+                    STUB_printf(g_str_curve_stub_b);
                 }
                 start -= durations[i];
             }
@@ -226,7 +226,7 @@ void InterpolateSegmentedPath(int *outX, int *outY, int selector, int frame,
                 if (start < time) {
                     i++;
                     if (i >= count) {
-                        STUB_printf(D_L11_001B1E28);
+                        STUB_printf(g_str_curve_stub_c);
                         i = 0;
                     }
                 }

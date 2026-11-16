@@ -1,23 +1,23 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 pad[0x74]; u8 active; u8 pad75[0x13]; s32 owner; } SoundAnchor;
 extern u8 g_sound_state[];
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
 extern s32 g_current_map_index;
-extern s32 D_L12_001B3DA8 MACRO_ADDR;
-extern s32 D_L12_001B3DAC MACRO_ADDR;
-extern s32 D_L12_001B29C8;
+extern s32 g_debris_sound_handle MACRO_ADDR;
+extern s32 g_debris_sound_owner MACRO_ADDR;
+extern s32 g_frame_l12_counter;
 typedef struct { u8 pad[0x30]; f32 position[4]; u8 pad40[0x40]; } PathNode;
-extern PathNode *D_L12_001B2F8C MACRO_ADDR;
+extern PathNode *g_path_waypoint_table MACRO_ADDR;
 extern s32 D_L12_001B29C8_gp SDATA(D_L12_001B29C8);
 extern s32 D_L12_001B1E00_gp SDATA(D_L12_001B1E00);
 extern s32 D_L12_001B1E08_gp SDATA(D_L12_001B1E08);
 extern s32 D_L12_001B1E10_gp SDATA(D_L12_001B1E10);
-extern s32 D_L12_001B1E00, D_L12_001B1E04, D_L12_001B1E08, D_L12_001B1E0C, D_L12_001B1E10, D_L12_001B1E14;
+extern s32 g_pulse_color_a0, g_pulse_color_a1, g_pulse_color_b0, g_pulse_color_b1, g_pulse_color_c0, g_pulse_color_c1;
 extern void moby_mark_spawned(void *);
-extern void func_PAL_L01_0031C9C0(void *, void *, f32, f32, f32, s32);
+extern void pushable_moby_update_pal(void *, void *, f32, f32, f32, s32);
 extern f32 vec_distance_xy(void *, void *), FastVecLength(void *), IntToFloat(s32);
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *), vec_scale_to_length(void *, void *, f32);
 extern void math_approach_target_with_braking(f32, f32, f32, f32, void *);
@@ -26,13 +26,13 @@ extern s32 flag_set_first_pending(void *), snd_play_from_class_bank(s32, s32, vo
 extern u32 PulseColor(u32, u32, f32);
 typedef struct { u8 pad[0x78]; u32 color; } ColorActor;
 
-void func_PAL_L12_00423740(u8 *self) {
+void UpdateTodanoPathMover_pal(u8 *self) {
     f32 oldpos[4], oldrot[4], temp[4], delta[4];
     u8 *st = *(u8 **)(self + 0x68);
     u16 flag = *(u16 *)(self + 0xb2);
     s32 c;
-    if (D_L12_0021EDF0.flags[(s16)flag] ||
-        ((c = D_0019B4A8[((s16)flag >> 1) + (g_current_map_index << 10)]),
+    if (g_object_flags.flags[(s16)flag] ||
+        ((c = g_moby_nibble_table[((s16)flag >> 1) + (g_current_map_index << 10)]),
          (flag & 1) ? ((c >> 4) & 7) : (c & 7))) {
         moby_mark_spawned(self);
         return;
@@ -44,12 +44,12 @@ void func_PAL_L12_00423740(u8 *self) {
         *(u16 *)(self + 0x34) |= 0x1000;
         *(s32 *)(st + 0xdc) |= 1;
         self[0x20] = 1;
-        D_L12_001B3DA8 = 0;
+        g_debris_sound_handle = 0;
         break;
     case 1:
-        func_PAL_L01_0031C9C0(self, st + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(st + 0xec));
+        pushable_moby_update_pal(self, st + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(st + 0xec));
         if (*(s32 *)(st + 0xe0) != -1) {
-            qcopy(temp, D_L12_001B2F8C[*(s32 *)(st + 0xe0)].position);
+            qcopy(temp, g_path_waypoint_table[*(s32 *)(st + 0xe0)].position);
             if (vec_distance_xy(self + 0x10, temp) < 1.0f) {
                 *(u16 *)(self + 0x34) &= 0xefff;
                 *(f32 *)(st + 0xF0) = FastVecLength(st + 0x50);
@@ -59,7 +59,7 @@ void func_PAL_L12_00423740(u8 *self) {
         break;
     case 2: {
         f32 angle;
-        FastVecSub(delta, D_L12_001B2F8C[*(s32 *)(st + 0xe0)].position, self + 0x10);
+        FastVecSub(delta, g_path_waypoint_table[*(s32 *)(st + 0xe0)].position, self + 0x10);
         angle = FastVecLength(delta);
         math_approach_target_with_braking(angle, 0.008f, 0.008f, 0.080000006f, st + 0xF0);
         vec_scale_to_length(temp, delta, *(f32 *)(st + 0xF0));
@@ -76,26 +76,26 @@ void func_PAL_L12_00423740(u8 *self) {
         f32 period = IntToFloat(50);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E00_gp, D_L12_001B1E04, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E00_gp, g_pulse_color_a1, phase - 3.14159274f);
     }
     if (self[0x31] && self[0x20] == 3) {
-        f32 phase = IntToFloat(D_L12_001B29C8 % 50);
+        f32 phase = IntToFloat(g_frame_l12_counter % 50);
         f32 period = IntToFloat(50);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E08_gp, D_L12_001B1E0C, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E08_gp, g_pulse_color_b1, phase - 3.14159274f);
     }
     if (self[0x31] && self[0x20] == 4) {
-        f32 phase = IntToFloat(D_L12_001B29C8 % 50);
+        f32 phase = IntToFloat(g_frame_l12_counter % 50);
         f32 period = IntToFloat(50);
         phase *= 6.28318548f;
         phase /= period;
-        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E10_gp, D_L12_001B1E14, phase - 3.14159274f);
+        ((ColorActor *)self)->color = PulseColor(D_L12_001B1E10_gp, g_pulse_color_c1, phase - 3.14159274f);
         {
-        SoundAnchor *sound = (SoundAnchor *)(D_L12_001B3DA8 * 112 + (s32)g_sound_state);
-        if (sound->owner != D_L12_001B3DAC || !sound->active) {
-            D_L12_001B3DA8 = snd_play_from_class_bank(2, 0, self, 0x10e9);
-            D_L12_001B3DAC = (s32)self;
+        SoundAnchor *sound = (SoundAnchor *)(g_debris_sound_handle * 112 + (s32)g_sound_state);
+        if (sound->owner != g_debris_sound_owner || !sound->active) {
+            g_debris_sound_handle = snd_play_from_class_bank(2, 0, self, 0x10e9);
+            g_debris_sound_owner = (s32)self;
         }
         }
     }

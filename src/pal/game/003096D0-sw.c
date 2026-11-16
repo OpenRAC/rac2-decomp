@@ -46,14 +46,14 @@ typedef struct {
     V_4198 *v;
 } O_4198;
 extern G_4198 g_hero_state;
-extern s32 D_00138320;
+extern s32 g_pad_pressed_flags;
 extern s32 stub_empty_30(s32), math_fast_float_d(void *);
 extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
-extern void func_PAL_00309A30(void), func_PAL_0030A078(void *);
+extern void func_PAL_00309A30(void), beam_spawn_trail_particles_pal(void *);
 extern s32 ref_PAL_0030A560_00(s32), math_fast_float_d(void *);
 
 /* Adapted from RAC1 update_beam_effect_lifecycle (OpenRAC, GPL-3.0). */
-void func_PAL_0030A560(void *p) {
+void beam_effect_update_pal(void *p) {
     O_4198 *o = (O_4198 *)p;
     V_4198 *v = o->v;
     s32 flag = 0;
@@ -67,7 +67,7 @@ void func_PAL_0030A560(void *p) {
                     && (&g_hero_state)->fC38 >= 6.0f && (&g_hero_state)->fC38 <= 16.0f)) {
                 if (!(&g_hero_state)->i49E) flag = 1;
             }
-            if ((&g_hero_state)->i2294 == 0x82 && (D_00138320 & 0x40)) flag = 1;
+            if ((&g_hero_state)->i2294 == 0x82 && (g_pad_pressed_flags & 0x40)) flag = 1;
             if ((&g_hero_state)->i2294 == 0x10) {
                 if ((&g_hero_state)->i1B8 < 37) {
                     flag = 1;
@@ -134,7 +134,7 @@ void func_PAL_0030A560(void *p) {
             v->f3C = 0.0035714288f;
         } else {
             v->f20 = 0.0125f;
-            func_PAL_0030A078(o);
+            beam_spawn_trail_particles_pal(o);
         }
         break;
     case 4:

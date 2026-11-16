@@ -11,21 +11,21 @@ typedef struct { char p00[0x30]; int flags; char p34[0xC]; int cursor; } SaveMen
 extern MenuRoot g_pause_menu_state;
 extern PadState g_pad_state;
 extern SaveState g_memcard_state;
-extern char *D_001A8CFC;
-extern int D_001A8C8C;
+extern char *g_resident_data_base;
+extern int g_menu_panel_flag;
 extern int g_save_menu_flags;
 extern int g_save_menu_screen;
-extern int D_001A8C88;
-extern int D_001A7B98;
+extern int g_menu_panel_active;
+extern int g_audio_mode_option;
 extern int g_current_map_index;
-extern unsigned char D_001A7BE8;
-extern int D_001A7C08;
-extern short D_00152C28[];
-extern int D_001C4FB0[];
-extern char D_001F2A40[];
-extern char D_00260DB8[];
-extern char D_0025DB68[];
-extern void func_US2_0033A7D8(char *, int);
+extern unsigned char g_map_unlocked_flags;
+extern int g_save_slot_cursor;
+extern short g_load_slot_flags[];
+extern int g_load_slot_menu_state[];
+extern char g_save_packet_scratch[];
+extern char g_load_slot_screen_alt[];
+extern char g_load_slot_screen[];
+extern void popup_set_row_us2(char *, int);
 extern int func_US2_00299960(void);
 extern int func_US2_00299968(void);
 extern void snd_set_default_group_volumes(void);
@@ -45,8 +45,8 @@ int func_US2_002DDD30(SaveMenu *menu)
     int old = menu->cursor;
     int buttons;
 
-    if (D_001A8CFC != 0)
-        func_US2_0033A7D8(D_001A8CFC + 0x3CEA0, old);
+    if (g_resident_data_base != 0)
+        popup_set_row_us2(g_resident_data_base + 0x3CEA0, old);
     if (g_pause_menu_state.busy != 0) {
         if (g_memcard_state.f15c >= 3)
             return 0;
@@ -64,16 +64,16 @@ int func_US2_002DDD30(SaveMenu *menu)
             g_memcard_state.f17c = 1;
             snd_set_default_group_volumes();
             snd_pump_music_and_disc_read(1);
-            snd_send_cmd11_one_value(D_001A7B98 == 0);
-            if (g_current_map_index <= 0 && D_001A7BE8 == 0)
+            snd_send_cmd11_one_value(g_audio_mode_option == 0);
+            if (g_current_map_index <= 0 && g_map_unlocked_flags == 0)
                 load_data_and_setup_callback();
             else
                 request_begin_slot(6, 2, 5, g_current_map_index, 0);
-            D_00152C28[0] = 0;
+            g_load_slot_flags[0] = 0;
             return 0;
         }
     }
-    if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0 && D_001A8C8C == 0)
+    if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0 && g_menu_panel_flag == 0)
         return 1;
     if (g_pad_state.flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.owner + 0xE0);
@@ -89,7 +89,7 @@ finish:
         return status;
     }
     if (g_save_menu_screen == 9)
-        menu_send_request(5, D_001A8C88 ? D_00260DB8 : D_0025DB68);
+        menu_send_request(5, g_menu_panel_active ? g_load_slot_screen_alt : g_load_slot_screen);
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)
             request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);
@@ -119,19 +119,19 @@ done:
         buttons = g_pad_state.alt;
     else
         buttons = g_pad_state.flags;
-    menu->cursor = D_001A7C08;
-    if ((buttons & 0x1000) && D_001A7C08 != 0)
-        menu->cursor = D_001A7C08 - 1;
+    menu->cursor = g_save_slot_cursor;
+    if ((buttons & 0x1000) && g_save_slot_cursor != 0)
+        menu->cursor = g_save_slot_cursor - 1;
     if ((buttons & 0x4000) && menu->cursor < 3)
         menu->cursor = menu->cursor + 1;
-    D_001A7C08 = menu->cursor;
+    g_save_slot_cursor = menu->cursor;
     if (buttons & 0x40) {
         SaveState *save = &g_memcard_state;
-        if (save->mode == 2 && save->slots[D_001A7C08].status >= 0) {
+        if (save->mode == 2 && save->slots[g_save_slot_cursor].status >= 0) {
             snd_play_from_global_bank(4, 0, 0);
             save->f148 = 0;
             save->slot = menu->cursor;
-            save_build_packet(D_001F2A40);
+            save_build_packet(g_save_packet_scratch);
             menu_init_block_fields();
             if (save->f164 < 0) {
                 save->f168 = 0;
@@ -140,7 +140,7 @@ done:
             g_pause_menu_state.busy = 1;
             func_US2_00299968();
             g_pause_menu_state.delay = 0x2C93;
-            D_001C4FB0[0] = 0;
+            g_load_slot_menu_state[0] = 0;
         } else
             snd_play_from_global_bank(5, 0, 0);
     }

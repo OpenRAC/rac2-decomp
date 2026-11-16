@@ -5,8 +5,8 @@
    do when the pointer load is known not to alias the int store to the record before it.
    `one` is measured: retail keeps 1 in $s0 across the func_0037D390 call. */
 
-extern u8 *D_001B251C __attribute__((sda));
-extern u8 D_L10_00188660[];
+extern u8 *g_moby_pool_base __attribute__((sda));
+extern u8 g_effect_l10_record_table[];
 
 extern u8 *func_0037B670(u8 *arg0);
 extern void hrugis_init_flying_piece(u8 *arg0);
@@ -53,7 +53,7 @@ void mission_target_ship_update(u8 *moby) {
     if (func_0037D390(moby, 0, 0, 0) == one) {
         effect_id = *(s32 *)(vars + 0x26C);
         if (effect_id != -1) {
-            record = D_L10_00188660 + effect_id * 0x70;
+            record = g_effect_l10_record_table + effect_id * 0x70;
             if (*(u8 **)(record + 0x88) == moby && record[0x74] != 0)
                 func_00373410(effect_id);
         }
@@ -64,7 +64,7 @@ void mission_target_ship_update(u8 *moby) {
     if (*(s32 *)(actor + 0x110) == 1) {
         if (*(s32 *)(vars + 0x260) != -1) {
             *(s32 *)(actor + 0x11C) = *(s32 *)(actor + 0x110);
-            *(u8 **)(actor + 0x120) = D_001B251C + (*(s32 *)(vars + 0x260) << 8);
+            *(u8 **)(actor + 0x120) = g_moby_pool_base + (*(s32 *)(vars + 0x260) << 8);
         }
         if (*(s32 *)(actor + 0x104) != 0)
             hrugis_start_timed_effect(moby);
@@ -73,7 +73,7 @@ void mission_target_ship_update(u8 *moby) {
         func_003087A0(vars + 0x268);
         part_spawn_small_tail_trail(moby);
     }
-    record = D_L10_00188660 + *(s32 *)(vars + 0x26C) * 0x70;
+    record = g_effect_l10_record_table + *(s32 *)(vars + 0x26C) * 0x70;
     if (*(u8 **)(record + 0x88) != moby || record[0x74] == 0)
         *(s32 *)(vars + 0x26C) = func_003737B8(0, 6, moby, 0xF8E);
 }

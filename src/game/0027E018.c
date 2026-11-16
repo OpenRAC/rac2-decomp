@@ -4,7 +4,7 @@ typedef struct { unsigned int tag, addr, vif0, vif1; } QuadDmaTag;
 union QuadCursor { QuadDmaTag *tag; int *words; unsigned char *bytes; int addr; };
 extern union QuadCursor g_dma_packet_cursor __attribute__((sda));
 extern int g_screen_width[] __attribute__((sda));
-extern char D_001AC800[];
+extern char g_dma_packet_template_a[];
 
 /* DrawTexturedQuad, adapted from OpenRAC/rac1-decomp src/game/draw.c (GPL-3.0).
  * RAC2 reads the y extent first and adjusts y into variables of their own: sched1 ranks an
@@ -31,7 +31,7 @@ void DrawTexturedQuad(int x, int y, int w, int h, int u, int v, int uw, int vh,
     g_dma_packet_cursor.words[3] = 0x50000007;
     base = g_dma_packet_cursor.words;
     g_dma_packet_cursor.words = base + 4;
-    qcopy(base + 4, D_001AC800);
+    qcopy(base + 4, g_dma_packet_template_a);
     p = (long *)(base + 8);
     g_dma_packet_cursor.words = base + 8;
     p[0] = tex;

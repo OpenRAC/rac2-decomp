@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
-extern unsigned char D_001A7B9E __attribute__((sda));
-extern unsigned char D_001A7BBA __attribute__((sda));
+extern unsigned char g_option_flag_a __attribute__((sda));
+extern unsigned char g_option_flag_b __attribute__((sda));
 
 
 extern int Ffb202470_FUN_0033AB50(char *p);
 
-char *func_US2_0033CD80(char *object)
+char *map_screen_destroy_prompt_bar_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -18,7 +18,7 @@ extern int Fe524d931_FUN_002E5E58(int a, int b, int c);
 extern void Fe524d931_FUN_00284E40(void);
 extern short Fe524d931_D_001A6480[];
 
-int func_US2_0033CEE0(char *object, int mask)
+int screen_adjust_menu_update_us2(char *object, int mask)
 {
     char *sub = object + 8;
     short oldx;
@@ -68,14 +68,14 @@ int func_US2_0033CEE0(char *object, int mask)
 }
 
 
-char *func_US2_0033D1C0(char *object)
+char *screen_adjust_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
 }
 
 
-char *func_US2_0033D478(char *object)
+char *onoff_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -83,7 +83,7 @@ char *func_US2_0033D478(char *object)
 
 
 
-char *func_US2_0033DA00(char *object)
+char *four_option_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -95,7 +95,7 @@ extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
-int func_US2_0033DB60(char *a0, int a1)
+int two_toggle_a_update_us2(char *a0, int a1)
 {
     char *p = a0 + 8;
     float *q;
@@ -129,7 +129,7 @@ int func_US2_0033DB60(char *a0, int a1)
 
 extern int prompt_bar_destroy(int);
 
-char *func_US2_0033DDC8(char *object)
+char *two_toggle_a_destroy_us2(char *object)
 {
     extern void *object_construct_derived_b(void *);
     prompt_bar_destroy((int)(object + 8));
@@ -140,34 +140,34 @@ char *func_US2_0033DDC8(char *object)
 
 
 typedef struct { int ids[2]; } SolTextPair;
-extern SolTextPair D_L00_001AE1A8;
-extern char D_L00_001AE1B0[];
+extern SolTextPair g_audio_menu_text_pair;
+extern char g_str_audio_menu_format[];
 extern void hud_draw_progress_bar(void *);
 extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
-extern char D_L00_001AE118[];
-extern void func_US2_0033BF90(void *);
+extern char g_str_toggle_menu_format[];
+extern void prompt_bar_draw_us2(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
-extern SolTextPair D_L00_001AE110;
-extern char D_L00_001AE118[];
-extern void func_US2_0033BF90(void *);
+extern SolTextPair g_toggle_menu_text_pair;
+extern char g_str_toggle_menu_format[];
+extern void prompt_bar_draw_us2(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
-void func_US2_0033E308(char *object)
+void audio_menu_draw_us2(char *object)
 {
     char buffer[128];
     SolTextPair pair;
     char *format, *first, *second;
     char *format2, *middle, *last;
     int color;
-    func_US2_0033BF90(object + 8);
+    prompt_bar_draw_us2(object + 8);
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE1A8;
-    format = D_L00_001AE1B0;
+    pair = g_audio_menu_text_pair;
+    format = g_str_audio_menu_format;
     first = GetLocalizedString(0x2DA5);
     sprintf(buffer, format, first);
     text_draw_right_aligned_medium(0x100, 0x91, color, buffer, -1);
@@ -178,7 +178,7 @@ void func_US2_0033E308(char *object)
     text_draw_right_aligned_medium(0x100, 0xBE, color, buffer, -1);
     hud_draw_progress_bar(object + 0x324);
     color = *(int *)(object + 0x2D8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
-    format2 = D_L00_001AE118;
+    format2 = g_str_toggle_menu_format;
     last = GetLocalizedString(0x2DA7);
     second = GetLocalizedString(pair.ids[*(int *)0x1A7BA0 != 0]);
     sprintf(buffer, format2, last, second);
@@ -186,7 +186,7 @@ void func_US2_0033E308(char *object)
 }
 
 
-char *func_US2_0033E488(char *object)
+char *single_toggle_a_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -196,9 +196,9 @@ extern void F5979c03f_FUN_0033AE28 (char *object);
 extern void F5979c03f_FUN_0033B018 (char *object, float x, float y);
 extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
-int func_US2_0033E5E8 (char *object, int flags)
+int single_toggle_a_update_us2 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7B9E;
+  unsigned char *g = &g_option_flag_a;
   float *vec;
   int discarded;
 
@@ -219,7 +219,7 @@ int func_US2_0033E5E8 (char *object, int flags)
 
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
-void func_US2_0033E680(char *object)
+void single_toggle_a_draw_us2(char *object)
 {
     char buffer[128];
     SolTextPair pair;
@@ -227,10 +227,10 @@ void func_US2_0033E680(char *object)
     char *second;
     char *format;
     int color;
-    func_US2_0033BF90(object + 8);
+    prompt_bar_draw_us2(object + 8);
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x2C2F);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x1A7B9E != 0]);
     sprintf(buffer, format, first, second);
@@ -238,7 +238,7 @@ void func_US2_0033E680(char *object)
 }
 
 
-char *func_US2_0033E750(char *object)
+char *single_toggle_b_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -259,7 +259,7 @@ char *func_US2_0033EB20(char *object)
 
 int func_US2_0033EC80 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -292,7 +292,7 @@ char *func_US2_0033EDD0(char *object)
 
 int func_US2_0033EF30 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -324,7 +324,7 @@ char *func_US2_0033EFC8(char *object)
 
 int func_US2_0033F128 (char *object, int flags)
 {
-  unsigned char *g = &D_001A7BBA;
+  unsigned char *g = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -364,11 +364,11 @@ void func_US2_0033F3B8(unsigned char *owner, float *records)
 }
 
 
-extern void func_US2_0033BE70(char *);
+extern void prompt_bar_update_us2(char *);
 extern void menu_set_anchor_pos(char *, float, float);
 extern int func_US2_00348CB8(char *, int);
 extern void func_US2_00348E28(char *, float, float);
-extern void func_US2_0033BE70(char *p);
+extern void prompt_bar_update_us2(char *p);
 extern void menu_set_anchor_pos(char *p, float x, float y);
 
 int func_US2_0033F3F0(char *object, int flags)
@@ -376,7 +376,7 @@ int func_US2_0033F3F0(char *object, int flags)
     char *first = object + 8;
     char *second;
     float *position;
-    func_US2_0033BE70(first);
+    prompt_bar_update_us2(first);
     second = object + 0x2E0;
     position = *(float **)(object + 0x3BC);
     menu_set_anchor_pos(first, position[0], position[1]);
@@ -393,7 +393,7 @@ int func_US2_0033F610(char *object, int flags)
 {
     char *p = object + 8;
     float *v;
-    func_US2_0033BE70(p);
+    prompt_bar_update_us2(p);
     v = *(float **)(object + 0x2D8);
     menu_set_anchor_pos(p, v[0], v[1]);
     return (flags >> 6) & 1;
@@ -402,7 +402,7 @@ int func_US2_0033F610(char *object, int flags)
 
 void prompt_bar_draw(int);
 
-void func_US2_0033F670(int param_1) {
+void menu_draw_frame_us2(int param_1) {
   prompt_bar_draw(param_1 + 8);
 }
 
@@ -412,7 +412,7 @@ extern char *cam_init_object_table_d(void *);
 extern char *cam_init_object_table_a(void *);
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
-char *func_US2_0033F690(char *object)
+char *frame_text_page_destroy_us2(char *object)
 {
     func_0033AB50_1(object + 8);
     cam_init_object_table_c(object + 732);

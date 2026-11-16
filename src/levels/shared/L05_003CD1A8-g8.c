@@ -22,9 +22,9 @@ typedef struct Moby_L05_003CD1A8 {
 } Moby_L05_003CD1A8;
 
 /* The moby of class 0xFBF, found once. */
-extern Moby_L05_003CD1A8 *D_L05_001AFAA0 __attribute__((sda));
+extern Moby_L05_003CD1A8 *g_active_effect_moby __attribute__((sda));
 /* The head of the moby list. */
-extern Moby_L05_003CD1A8 *D_L05_001B2528;
+extern Moby_L05_003CD1A8 *g_moby_l05_list_head;
 
 extern Moby_L05_003CD1A8 *CreateMoby(int);
 extern void vec_clear_128(float *);
@@ -48,10 +48,10 @@ Moby_L05_003CD1A8 *func_L05_003CD1A8(Moby_L05_003CD1A8 *object)
         qcopy(moby->position, object->position);
         vec_clear_128(moby->rot);
         moby->rot[2] = math_random_angle();
-        if (D_L05_001AFAA0 == 0) {
-            for (m = D_L05_001B2528; m != 0; m = m->pChain) {
+        if (g_active_effect_moby == 0) {
+            for (m = g_moby_l05_list_head; m != 0; m = m->pChain) {
                 if (m->oClass == 0xFBF)
-                    D_L05_001AFAA0 = m;
+                    g_active_effect_moby = m;
             }
         }
         moby_init_private_vars(moby);

@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned char D_00137E00;
+extern unsigned char g_gfx_data_block;
 
 /* Returns the address of a fixed data block. */
 void *gfx_get_data_block_address(void)
 {
-    return &D_00137E00;
+    return &g_gfx_data_block;
 }
 

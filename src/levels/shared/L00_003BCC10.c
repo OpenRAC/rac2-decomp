@@ -35,7 +35,7 @@ typedef struct {
     f32 mtx[16];
 } Moby3BCC10;
 
-extern Orbit3BCC10 D_L00_0023F060[16];
+extern Orbit3BCC10 g_orbit_spark_records[16];
 
 extern int math_fast_float_d(void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -49,7 +49,7 @@ void spark_update_orbit(Moby3BCC10 *self) {
     f32 tmp[4] __attribute__((aligned(16)));
     Vars3BCC10 *vars = self->vars;
     f32 *pos = self->pos;
-    Orbit3BCC10 *table = D_L00_0023F060;
+    Orbit3BCC10 *table = g_orbit_spark_records;
     Orbit3BCC10 *entry;
     s32 i;
 

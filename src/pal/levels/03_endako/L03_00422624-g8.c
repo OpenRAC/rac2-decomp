@@ -6,9 +6,9 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern s32 D_L03_001B108C __attribute__((sda));
-extern u32 D_L03_001B1058 __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
+extern s32 g_endako_boss_forced_behaviour __attribute__((sda));
+extern u32 g_endako_boss_initial_timer __attribute__((sda));
 extern int math_random_int_below(int id);
 extern int math_fast_float_d(void *target);
 extern int FastDecTimer(void *target);
@@ -19,9 +19,9 @@ extern u8 *func_PAL_002BE9A8(void *p, float f0, float f1, float f2, int z, void 
                          float f3, int v, int t);
 extern int FloatToInt(float f);
 extern void func_PAL_002B14F8(void *entity, float *target, float f, int a, int b);
-extern float D_L03_001B1BF0 __attribute__((sda));
-extern f32 D_L03_001B1C00 __attribute__((sda));
-extern f32 D_L03_001B1C04 __attribute__((sda));
+extern float g_particle_fire_blend_scale __attribute__((sda));
+extern f32 g_robot_speed_scale __attribute__((sda));
+extern f32 g_robot_turn_scale __attribute__((sda));
 extern s32 flag_is_third_pending_set();
 typedef struct {
     s32 a;
@@ -29,8 +29,8 @@ typedef struct {
     f32 c;
     f32 d;
 } ParticleSetup;
-extern u8 *D_L03_001FB5A0[];
-extern s32 D_L03_001A8F00 __attribute__((sda));
+extern u8 *g_entity_id_lists[];
+extern s32 g_hero_l03_mode __attribute__((sda));
 extern s32 func_3240F0(u8 *a0);
 
 /* Sets the entity's two blend channels up, then fires two particles: the engine builds
@@ -60,7 +60,7 @@ void func_PAL_L03_004233F0(u8 *entity) {
     if (timer <= 0xFFFE)
         *(u16 *)(entity + 0x96) = timer + 1;
     vec_transform_by_object_or_given(entity, buf, state + 0x1A0, 0);
-    f = buf[1] * D_L03_001B1BF0;
+    f = buf[1] * g_particle_fire_blend_scale;
     *(float *)(entity + 0xF0) = f;
     /* The four words the engine reads the particle's setup from, in the order the
      * original stores them. */
@@ -112,11 +112,11 @@ void func_PAL_L03_00423688(u8 *entity) {
     *(short *)(state + 0x330) = 0xC8;
     if (entity[0x21] == 0xFF)
         return;
-    list = D_L03_001FB5A0[entity[0x21]];
+    list = g_entity_id_lists[entity[0x21]];
     if (list == 0)
         return;
     p = list;
-    base = D_L03_001B2A1C;
+    base = g_moby_record_base;
     for (;;) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 

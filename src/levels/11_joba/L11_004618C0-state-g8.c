@@ -1,12 +1,12 @@
 #include "common.h"
 
-extern int D_L11_001CAE40[];
-extern unsigned int D_00138324 __attribute__((nosda));
+extern int g_enemy_freeze_flag[];
+extern unsigned int g_pad_held_flags __attribute__((nosda));
 extern u8 g_hero_position[];
-extern int *D_L11_001FF580[];
-extern float D_L11_001B2978 __attribute__((sda));
-extern float D_L11_001B297C __attribute__((sda));
-extern int D_L11_001AED08;
+extern int *g_path_l11_table[];
+extern float g_wander_angle_param __attribute__((sda));
+extern float g_wander_angle_speed __attribute__((sda));
+extern int g_creature_burst_count;
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void math_random_planar_offset(float *, float);
 extern void FastVecAdd(float *, float *, float *);
@@ -42,7 +42,7 @@ void wandering_l11_creature_update(u8 *object) {
     float angle, distance;
     int first, second;
     u16 timer;
-    if (D_L11_001CAE40[0]) return;
+    if (g_enemy_freeze_flag[0]) return;
     vars = *(u8 **)(object + 0x68);
     switch (object[0x20]) {
     case 0:
@@ -79,7 +79,7 @@ void wandering_l11_creature_update(u8 *object) {
             moby_set_state(object, 4, -1);
             break;
         }
-        if (*(int *)(g_hero_position + 0x11C8) != 10 && *(int *)(g_hero_position + 0x11C8) != 13 && (D_00138324 & 0x20)) {
+        if (*(int *)(g_hero_position + 0x11C8) != 10 && *(int *)(g_hero_position + 0x11C8) != 13 && (g_pad_held_flags & 0x20)) {
             if (!(vec_distance_xy(object + 0x10, g_hero_position) < 64.0f) || VI(0x150)) break;
             VF(0x134) = (float)math_random_int_range(170, 190);
             if (object[0x43] != 4) anim_start_blended(object, 4, 0, 10);
@@ -110,7 +110,7 @@ void wandering_l11_creature_update(u8 *object) {
             moby_mark_spawned(object);
             return;
         }
-        math_update_wrapped_angle_offset((float *)object, (float *)(vars + 0x148), (float *)(vars + 0x14C), D_L11_001B2978, D_L11_001B297C * 0.00029088825f, -1.0f);
+        math_update_wrapped_angle_offset((float *)object, (float *)(vars + 0x148), (float *)(vars + 0x14C), g_wander_angle_param, g_wander_angle_speed * 0.00029088825f, -1.0f);
         break;
     case 6:
         VF(0x138) += 0.008333334f;
@@ -124,7 +124,7 @@ void wandering_l11_creature_update(u8 *object) {
         }
         break;
     case 7:
-        path = D_L11_001FF580[VI(0x140)];
+        path = g_path_l11_table[VI(0x140)];
         distance = vec_distance_xy(object + 0x10, path + 4 + VI(0x144) * 4);
         point = (float *)((u8 *)path + VI(0x144) * 16);
         angle = mat_fast_helper_a(distance, point[6] - *(float *)(object + 0x18));
@@ -138,7 +138,7 @@ void wandering_l11_creature_update(u8 *object) {
             ++VI(0x144);
             if (VI(0x144) >= *path - 1) VI(0x144) = *path - 1;
         }
-        math_update_wrapped_angle_offset((float *)object, (float *)(vars + 0x148), (float *)(vars + 0x14C), D_L11_001B2978, D_L11_001B297C * 0.00029088825f, -1.0f);
+        math_update_wrapped_angle_offset((float *)object, (float *)(vars + 0x148), (float *)(vars + 0x14C), g_wander_angle_param, g_wander_angle_speed * 0.00029088825f, -1.0f);
         break;
     case 8:
         if (object[0x43] != 2) anim_start_blended(object, 2, 0, 10);
@@ -183,7 +183,7 @@ void wandering_l11_creature_update(u8 *object) {
             particle = debris_l11_spawn_piece(object, (float *)(object + 0x10), motion);
             particle[0x30] = *(u16 *)(particle + 0x32) = 255;
         }
-        ++D_L11_001AED08;
+        ++g_creature_burst_count;
         moby_mark_spawned(object);
     } else {
         value_set_and_smooth(object, (float *)(vars + 0x160), 2.5f, 0, 1);

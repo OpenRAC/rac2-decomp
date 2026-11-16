@@ -8,9 +8,9 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { Quad v[3]; } __attribute__((aligned(16))) Axes4045E0;
 
-extern char D_L04_001B9680[];
-extern Quad D_L04_001BFAF0;
-extern const Axes4045E0 D_001B0630;
+extern char g_tether_zero_vec[];
+extern Quad g_collision_quad;
+extern const Axes4045E0 g_hoverbike_axes;
 
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
@@ -21,8 +21,8 @@ extern float math_random_float_range(float, float);
 extern void func_PAL_L04_00407940(u8 *, u8 *);
 extern void func_PAL_L04_00406B68(u8 *, u8 *);
 extern void func_PAL_L04_00405268(u8 *, u8 *);
-extern void func_PAL_L04_00408930(u8 *, u8 *);
-extern void func_PAL_L04_00408578(u8 *, u8 *);
+extern void racer_update_checkpoint_progress_pal(u8 *, u8 *);
+extern void racer_update_bike_lean_pal(u8 *, u8 *);
 extern s32 FindNearestRoutePointIndex(void *, void *, s32);
 extern float IntToFloat(int);
 extern void anim_sample_key_track(float, float, void *, void *, void *, void *);
@@ -35,7 +35,7 @@ extern void FindNearestRoutePoint(u8 *, u8 *, void *, void *, void *, void *);
    phases; state 2 runs its behaviours while the leader is not waiting; state 3 walks to the
    nearest path node and, after 300 frames, leaves for the leader once it is 5 units away and
    out of sight; state 4 drops both targets. The leader's own state can hold it entirely. */
-void func_PAL_L04_00408A58(u8 *obj)
+void enemy_hoverbike_update_pal(u8 *obj)
 {
     u8 *st = *(u8 **)(obj + 0x68);
     u8 *e;
@@ -59,7 +59,7 @@ void func_PAL_L04_00408A58(u8 *obj)
     *(f32 *)(obj + 0x2C) = *(f32 *)(*(u8 **)(obj + 0x24) + 0x24) * 0.25f;
     obj[0x30] = 0xFF;
     *(s16 *)(obj + 0x32) = 0x7F;
-    if (obj[0x31] != 0 && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 9.0f) {
+    if (obj[0x31] != 0 && fast_vec_dist(obj + 0x10, g_tether_zero_vec) < 9.0f) {
         moby_update_ground_check(obj);
         obj[0x6F] = 8;
     }
@@ -72,7 +72,7 @@ void func_PAL_L04_00408A58(u8 *obj)
     switch (obj[0x20]) {
     case 0:
         if (coll_test_point(obj + 0x10, 4, obj, *(f32 *)(st + 0x90)))
-            *(Quad *)(obj + 0x10) = D_L04_001BFAF0;
+            *(Quad *)(obj + 0x10) = g_collision_quad;
         *(Quad *)(st + 0xB0) = *(Quad *)(obj + 0x10);
         *(Quad *)(st + 0xC0) = *(Quad *)(obj + 0xF0);
         dst = st + 0x200;
@@ -80,9 +80,9 @@ void func_PAL_L04_00408A58(u8 *obj)
         racer_compute_route_lengths(obj);
         obj[0x20] = 1;
         *(s32 *)(st + 0x30) = 0;
-        t0 = D_001B0630.v[0];
-        t1 = D_001B0630.v[1];
-        t2 = D_001B0630.v[2];
+        t0 = g_hoverbike_axes.v[0];
+        t1 = g_hoverbike_axes.v[1];
+        t2 = g_hoverbike_axes.v[2];
         *(u16 *)(obj + 0x34) |= 0x41;
         obj[0x62] = 1;
         u.axes.v[0] = t0;
@@ -107,8 +107,8 @@ void func_PAL_L04_00408A58(u8 *obj)
         func_PAL_L04_00407940(obj, st);
         func_PAL_L04_00406B68(obj, st);
         func_PAL_L04_00405268(obj, st);
-        func_PAL_L04_00408930(obj, st);
-        func_PAL_L04_00408578(obj, st);
+        racer_update_checkpoint_progress_pal(obj, st);
+        racer_update_bike_lean_pal(obj, st);
         return;
     case 3:
         if (*(u16 *)(obj + 0x96) == 0) {

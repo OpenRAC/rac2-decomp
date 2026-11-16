@@ -7,11 +7,11 @@
    Built -O2 -G8 in its own unit. The flag takes the state value (1) only once the count
    reaches 0x79, which gives retail's movn; the effect table is the sda incomplete array
    most callers declare, so its address is one macro load beside the argument moves. */
-extern f32 D_L11_001B0170 __attribute__((sda));
-extern f32 D_L11_001B016C __attribute__((sda));
-extern f32 D_L11_001B0174 __attribute__((sda));
-extern u8 D_L11_001C0D20[];
-extern u8 D_L11_001A8F20[] __attribute__((sda));
+extern f32 g_bomb_fall_rate __attribute__((sda));
+extern f32 g_bomb_velocity_scale __attribute__((sda));
+extern f32 g_bomb_explosion_size __attribute__((sda));
+extern u8 g_aim_position[];
+extern u8 g_identity_l11_matrix[] __attribute__((sda));
 extern s32 CollLine(void *, void *, s32, void *, s32);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int PlayMobySound(s32, s32, u8 *);
@@ -33,8 +33,8 @@ void hoverbike_bomb_update(u8 *moby) {
         FastVecAdd(vec, moby + 0x10, vars);
         *(f32 *)(vars + 8) = *(f32 *)(vars + 8) - *(f32 *)(vars + 0xC);
         if (CollLine(moby + 0x10, vec, 2, 0, 0) != 0) {
-            qcopy(moby + 0x10, D_L11_001C0D20);
-            *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + D_L11_001B0170 * D_L11_001B016C;
+            qcopy(moby + 0x10, g_aim_position);
+            *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + g_bomb_fall_rate * g_bomb_velocity_scale;
             moby_set_state(moby, 1, -1);
         } else {
             qcopy(moby + 0x10, vec);
@@ -46,7 +46,7 @@ void hoverbike_bomb_update(u8 *moby) {
         break;
     }
     if (part_find_owned_effect_slot(moby, -1, 0) != 0 || expired != 0) {
-        SpawnExplosionEffects(moby, D_L11_001A8F20, moby + 0x10, D_L11_001B0174, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
+        SpawnExplosionEffects(moby, g_identity_l11_matrix, moby + 0x10, g_bomb_explosion_size, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         PlayMobySound(0, 0, moby);
         moby_mark_spawned(moby);
     }

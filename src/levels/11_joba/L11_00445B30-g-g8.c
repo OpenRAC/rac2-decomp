@@ -6,13 +6,13 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef short s16;
 typedef int s32;
-extern u16 D_L11_001B1850 __attribute__((sda));
-extern s32 D_L11_001B1848 __attribute__((sda));
-extern s32 D_L11_001B184C __attribute__((sda));
-extern s32 D_L11_001B1844 __attribute__((sda));
-extern s32 D_L11_001B1858 __attribute__((sda));
-extern s32 D_L11_001B185C __attribute__((sda));
-extern s32 D_L11_001B1860 __attribute__((sda));
+extern u16 g_fade_bar_height_step __attribute__((sda));
+extern s32 g_fade_bar_color_a __attribute__((sda));
+extern s32 g_fade_bar_count __attribute__((sda));
+extern s32 g_fade_bar_packet_arg __attribute__((sda));
+extern s32 g_fade_bar_max_height __attribute__((sda));
+extern s32 g_fade_bar_color_b __attribute__((sda));
+extern s32 g_fade_bar_margin __attribute__((sda));
 extern short g_screen_adjust_offsets[];
 extern float IntToFloat(short);
 extern void VU1_addGSregister(int, long long);
@@ -34,8 +34,8 @@ void hud_draw_fade_bar(char *moby) {
     s32 margin;
     short *screen;
 
-    color = D_L11_001B1848;
-    *(u16 *)(state + 0x1F4) -= D_L11_001B1850;
+    color = g_fade_bar_color_a;
+    *(u16 *)(state + 0x1F4) -= g_fade_bar_height_step;
     fadeAmount = IntToFloat(*(u16 *)(state + 0x1F4));
     screenHeight = (float)g_screen_adjust_offsets[0xA9];
     fadeAmount = fadeAmount / screenHeight;
@@ -47,13 +47,13 @@ void hud_draw_fade_bar(char *moby) {
         color |= (s32)(fadeAmount * scale) << 24;
     }
     VU1_addGSregister(0x42, 0x8000000049LL);
-    for (i = 0; i < D_L11_001B184C; i++)
+    for (i = 0; i < g_fade_bar_count; i++)
         AppendScreenRectPacket(0, 0, g_screen_adjust_offsets[0xA8], g_screen_adjust_offsets[0xA9], color, 0);
     VU1_addGSregister(0x42, 0x8000000044LL);
     screen = g_screen_adjust_offsets;
-    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x1F4), D_L11_001B1844, 0);
+    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x1F4), g_fade_bar_packet_arg, 0);
     texId = GetEffectTextureDescriptor(0x10);
-    color = D_L11_001B185C;
+    color = g_fade_bar_color_b;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
@@ -63,8 +63,8 @@ void hud_draw_fade_bar(char *moby) {
     VU1_addGSregister(0x42, 0x8000000048LL);
     barY = *(s16 *)(state + 0x1F4);
     barHeight = screen[0xA9] - barY;
-    if (D_L11_001B1858 < barHeight)
-        barHeight = D_L11_001B1858;
-    margin = D_L11_001B1860;
+    if (g_fade_bar_max_height < barHeight)
+        barHeight = g_fade_bar_max_height;
+    margin = g_fade_bar_margin;
     DrawTexturedQuad(-margin, barY - (barHeight >> 1), screen[0xA8] + margin * 2, barHeight, 0, 0, 0x20, 0x20, color, texId);
 }

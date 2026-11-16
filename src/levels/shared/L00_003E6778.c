@@ -1,5 +1,5 @@
 #include "common.h"
-extern char *D_L00_001B2B54 __attribute__((sda));
+extern char *g_blast_l00_pool __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -14,7 +14,7 @@ char *AllocateOwnedEffectParticle(char *rec, int mode, float amount, char *pos)
     char offset_a[16] __attribute__((aligned(16)));
     char offset_b[16] __attribute__((aligned(16)));
     char *piece;
-    char *base = D_L00_001B2B54;
+    char *base = g_blast_l00_pool;
     int i;
     int zero_int = 0;
     float zero = (float)zero_int;
@@ -34,7 +34,7 @@ char *AllocateOwnedEffectParticle(char *rec, int mode, float amount, char *pos)
             }
             break;
         }
-        piece = D_L00_001B2B54 + i * 128;
+        piece = g_blast_l00_pool + i * 128;
         *(char **)(piece + 124) = rec;
         ++*(int *)(rec + 56);
         {

@@ -13,11 +13,11 @@ typedef struct Scene {
 } Scene;
 
 extern s32 g_current_map_index;
-extern Scene D_L10_001BD380;
-extern u8 D_L10_00296E90[];
-extern u8 D_L10_00296EB0[];
-extern u8 D_L10_001A93E0[64] __attribute__((sda));
-extern u8 D_L10_001B9680[];
+extern Scene g_scene_marker_state;
+extern u8 g_scene_target_data[];
+extern u8 g_scene_marker_dest[];
+extern u8 g_scene_marker_data[64] __attribute__((sda));
+extern u8 g_view_origin_vec[];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -37,11 +37,11 @@ void hrugis_update_scene_markers(void) {
     low = -1;
     high = 9999;
     slot = 0;
-    if (D_L10_001BD380.mode == 1) {
+    if (g_scene_marker_state.mode == 1) {
         low = 1;
         high = 1240;
         slot = 3;
-    } else if (D_L10_001BD380.mode == 2) {
+    } else if (g_scene_marker_state.mode == 2) {
         low = 1;
         high = 400;
         slot = 3;
@@ -49,30 +49,30 @@ void hrugis_update_scene_markers(void) {
     if (low == -1) {
         return;
     }
-    if (D_L10_001BD380.frame >= low && D_L10_001BD380.frame <= high) {
-        D_L10_001BD380.target = D_L10_00296E90;
+    if (g_scene_marker_state.frame >= low && g_scene_marker_state.frame <= high) {
+        g_scene_marker_state.target = g_scene_target_data;
         target = 0;
-        for (i = 0; i < D_L10_001BD380.count; i++) {
-            u8 *candidate = D_L10_001BD380.objects[i];
+        for (i = 0; i < g_scene_marker_state.count; i++) {
+            u8 *candidate = g_scene_marker_state.objects[i];
             if (*(s16 *)(candidate + 0xAA) == 0xD54 /* moby class 3412 */) {
                 target = candidate;
                 break;
             }
         }
         if (target) {
-            dst = D_L10_00296EB0;
-            src = D_L10_001A93E0;
+            dst = g_scene_marker_dest;
+            src = g_scene_marker_data;
             for (j = 0; j < 4; j++) {
                 u8 *point = dst + j * 16;
                 matrix_mul_vec3(point, src + j * 16, target + 0xC0);
                 FastVecAdd(point, point, target + 0x10);
-                FastVecSub(tmp, D_L10_001B9680, point);
+                FastVecSub(tmp, g_view_origin_vec, point);
                 vec_scale_to_length(tmp, tmp, 0.15f);
                 FastVecAdd(point, point, tmp);
             }
         }
-        *(u8 **)(D_L10_001BD380.target + 0x68) = D_L10_001BD380.objects[slot];
+        *(u8 **)(g_scene_marker_state.target + 0x68) = g_scene_marker_state.objects[slot];
     } else {
-        D_L10_001BD380.target = 0;
+        g_scene_marker_state.target = 0;
     }
 }

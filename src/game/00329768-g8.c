@@ -5,7 +5,7 @@ typedef struct { char pad[0x10]; EffectVector position; } EffectObject;
 typedef struct { char pad[0x24]; int kind; char *object; char pad2[0x3C]; int active; } EffectWorld;
 
 extern EffectWorld g_music_state;
-extern float D_001B0228 SDATA(D_001B0228);
+extern float g_falling_chunk_random_range SDATA(D_001B0228);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(float *, float *, float);
@@ -59,9 +59,9 @@ void falling_chunk_update(char *moby)
         coll_get_ground_height_at_position(moby + 0x10, hit);
         vec_clear_128(zero);
         for (i=7;i>=0;i--) {
-            random[0]=math_random_signed_float_range(0, D_001B0228);
-            random[1]=math_random_signed_float_range(0, D_001B0228);
-            random[2]=math_random_signed_float_range(0, D_001B0228);
+            random[0]=math_random_signed_float_range(0, g_falling_chunk_random_range);
+            random[1]=math_random_signed_float_range(0, g_falling_chunk_random_range);
+            random[2]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             FastVecAdd(random, random, moby + 0x10);
             part_spawn_drifting_2(random, state, math_random_int_range(20, 40));
         }

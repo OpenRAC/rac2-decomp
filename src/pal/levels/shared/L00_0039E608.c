@@ -17,7 +17,7 @@ extern void func_002FDBD8_1(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisCon
                                     float *vector, int mode);
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_PAL_L00_003A06F8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void decoy_glove_draw_projectile_pal(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -30,7 +30,7 @@ extern void anim_start_blended(char *object, int mode, int a2, int a3);
 
 /* The mode word at 0x18C0B4 must be 8 and the object's byte 0x43 must not be 6; the
  * helper then takes the object with mode 6, zero and ten. */
-void func_PAL_L00_003A0730(char *object)
+void helipack_update_pal(char *object)
 {
     if (D_18C0B4 == 8) {
         if (*(unsigned char *)(object + 0x43) != 6)
@@ -57,8 +57,8 @@ typedef struct {
     u8 delay[4];
 } LightState;
 /* Incomplete sda array read as [0]: retail's tied absolute macro load of the moby table base. */
-extern char *D_L00_001B1E9C[] __attribute__((sda));
-extern Vector D_L00_001C6F40[8][2];
+extern char *g_moby_array_base[] __attribute__((sda));
+extern Vector g_light_table[8][2];
 extern float IntToFloat(int), math_random_float_range(float, float);
 extern int FloatToInt(float), math_fast_float_d(int *), FastDecTimer(u16 *), vec_fast_helper_a(u8 *), math_fast_helper_a(void *, float);
 extern void gfx_free_point_light(int), moby_mark_spawned(void *), FastVecScale(void *, void *, float), matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
@@ -130,7 +130,7 @@ void func_PAL_L00_003A0950(u8 *actor) {
         s->rgb[2] = IntToFloat(s->color[2].initial) * 0.01f;
         index = s->parentIndex;
         s->radius = s->initialRadius;
-        if (index != -1) s->parent = D_L00_001B1E9C[0] + index * 0x100;
+        if (index != -1) s->parent = g_moby_array_base[0] + index * 0x100;
         if (s->radiusRise < 0) s->radiusRise = -s->radiusRise;
         if (s->radiusFall < 0) s->radiusFall = -s->radiusFall;
         actor[0x20] = 1;
@@ -195,7 +195,7 @@ void func_PAL_L00_003A0950(u8 *actor) {
     if (s->light == -1) {
         s->light = part_l00_alloc_effect_slot_2(actor + 0x10, s->radius * 0.8f, IntToFloat(s->intensity) * 0.01f, s->rgb[0], s->rgb[1], s->rgb[2]);
     } else {
-        Vector *entry = D_L00_001C6F40[s->light];
+        Vector *entry = g_light_table[s->light];
         qcopy(&entry[1], (actor + 0x10));
         entry[1].f[3] = s->radius * 0.8f;
         entry[0].f[0] = s->rgb[0]; entry[0].f[1] = s->rgb[1]; entry[0].f[2] = s->rgb[2];

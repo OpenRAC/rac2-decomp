@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern float D_L09_001B13F4 __attribute__((sda));
+extern float g_dobbo_slow_move_speed __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
 extern float math_random_signed_float_range(float, float);
@@ -94,7 +94,7 @@ void dobbo_wandering_init_vars(char *obj)
     rec->f_1E4 = 0xB4;
     rec->f_13C = rec->f_234;
     rec->f_1D4 = 1.75f;
-    rec->f_1D0 = D_L09_001B13F4 * 0.016666668f;
+    rec->f_1D0 = g_dobbo_slow_move_speed * 0.016666668f;
     rec->f_348 = math_random_angle();
     moby_set_state(obj, 1, 0);
     if (*(u8 *)(obj + 0x43) != 0)

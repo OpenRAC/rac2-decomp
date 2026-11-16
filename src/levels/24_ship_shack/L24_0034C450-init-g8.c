@@ -1,3 +1,4 @@
+#include "names.h"
 /* Build the menu rows in level order and select the current owner entry.
  * The +4 row field holds the level menu-data descriptor.
  * The list-pointer word is reloaded on every search step, as in retail.
@@ -6,31 +7,31 @@
 #include "names.h"
 
 typedef struct { unsigned short id, kind; void *payload; unsigned short value, pad; } InitEntry12;
-extern int D_00139948[];
+extern int g_menu_entry_ids[];
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry12;
-extern SourceEntry12 D_L24_0028AE20[];
-extern char D_L24_002868E0[];
-extern InitEntry12 D_L24_0021C7F0[];
+extern SourceEntry12 g_menu_l24_source_entries[];
+extern char g_menu_entry_payload[];
+extern InitEntry12 g_menu_l24_init_entries[];
 /* Reloaded at each search step in retail. */
-extern int * volatile D_L24_001AA770 __attribute__((sda));
-extern struct { char pad[0x230]; int selected; } D_L24_001C8CA0;
+extern int * volatile g_owner_entry_list __attribute__((sda));
+extern struct { char pad[0x230]; int selected; } g_menu_l24_state;
 
 /* Fills the menu rows from the level list and selects the entry that matches the current owner. */
 int menu_build_owner_rows(char *menu) {
     int i, current_entry;
     int *owner_list;
-    for (i = 0; i < 28 && D_00139948[i]; i++) {
-        D_L24_0021C7F0[i].kind = 3;
-        D_L24_0021C7F0[i].payload = D_L24_002868E0;
-        D_L24_0021C7F0[i].id = D_L24_0028AE20[D_00139948[i]].id;
-        D_L24_0021C7F0[i].value = D_L24_0028AE20[D_00139948[i]].value;
+    for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {
+        g_menu_l24_init_entries[i].kind = 3;
+        g_menu_l24_init_entries[i].payload = g_menu_entry_payload;
+        g_menu_l24_init_entries[i].id = g_menu_l24_source_entries[g_menu_entry_ids[i]].id;
+        g_menu_l24_init_entries[i].value = g_menu_l24_source_entries[g_menu_entry_ids[i]].value;
     }
-    owner_list = D_L24_001AA770;
-    D_L24_0021C7F0[i].id = 0;
+    owner_list = g_owner_entry_list;
+    g_menu_l24_init_entries[i].id = 0;
     *(int *)(menu + 0x40) = 0;
     *(unsigned int *)(menu + 0x30) |= 0x8000;
-    for (i = 0, current_entry = owner_list[0]; current_entry; current_entry = D_L24_001AA770[++i]) {
-        if (D_L24_001C8CA0.selected == current_entry) {
+    for (i = 0, current_entry = owner_list[0]; current_entry; current_entry = g_owner_entry_list[++i]) {
+        if (g_menu_l24_state.selected == current_entry) {
             *(int *)(menu + 0x40) = i;
             break;
         }

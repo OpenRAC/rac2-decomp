@@ -30,42 +30,42 @@ typedef struct {
     f32 fF8;
     f32 fFC;
 } Obj_397870;
-extern void func_PAL_L01_0041C560(Obj_397870 *a0);
-extern float D_L01_001AF50C __attribute__((sda));
-extern float D_L01_001AF510 __attribute__((sda));
-extern float D_L01_001AF514 __attribute__((sda));
-extern float D_L01_001AF528 __attribute__((sda));
-extern int D_L01_001AF54C __attribute__((sda));
+extern void part_spawn_sparkle_drift_pal(Obj_397870 *a0);
+extern float g_collectible_height_scale __attribute__((sda));
+extern float g_bob_base_height __attribute__((sda));
+extern float g_bob_l01_amplitude __attribute__((sda));
+extern float g_bolt_bob_spin_speed __attribute__((sda));
+extern int g_sparkle_chance __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
 extern void func_PAL_L01_0041C0D8(Obj_397870 *);
 
-extern float D_PAL_001B1A48 __attribute__((sda));
-extern float D_PAL_001B1A4C __attribute__((sda));
-extern float D_PAL_001B1A50 __attribute__((sda));
-extern float D_PAL_001B1A64 __attribute__((sda));
-extern int D_PAL_001B1A88 __attribute__((sda));
+extern float g_class_float_scale __attribute__((sda));
+extern float g_class_float_base __attribute__((sda));
+extern float g_class_float_random_scale __attribute__((sda));
+extern float g_class_rotation_scale __attribute__((sda));
+extern int g_class_random_range __attribute__((sda));
 
 void func_PAL_L01_0041BF10(Obj_397870 *a0)
 {
     State_397870 *s1 = a0->st;
     float f;
 
-    a0->f2C = a0->cls->f24 * D_PAL_001B1A48;
+    a0->f2C = a0->cls->f24 * g_class_float_scale;
 
     if (a0->b20 == 1) {
         f = math_fast_sin_or_cos_b(a0->fFC);
-        a0->f18 = s1->f18 + D_PAL_001B1A4C + D_PAL_001B1A50 * f;
+        a0->f18 = s1->f18 + g_class_float_base + g_class_float_random_scale * f;
         a0->fF0 = FastAddRotations(a0->fF0, s1->f68);
         a0->fF4 = FastAddRotations(a0->fF4, s1->f64);
         a0->fF8 = FastAddRotations(a0->fF8, s1->f60);
-        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * D_PAL_001B1A64);
+        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * g_class_rotation_scale);
     }
 
     func_PAL_L01_0041C0D8(a0);
-    if (math_random_int_below(D_PAL_001B1A88) == 0)
-        func_PAL_L01_0041C560(a0);
+    if (math_random_int_below(g_class_random_range) == 0)
+        part_spawn_sparkle_drift_pal(a0);
 }
 
 

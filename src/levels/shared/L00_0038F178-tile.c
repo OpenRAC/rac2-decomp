@@ -2,7 +2,7 @@
 
 /* The viewport is one array, so its reads stay two-word macros out of delay slots. The phase pointer is set outside the inner loop: loop hoists it, it gets no register, and reload builds the address beside the load. */
 extern int g_screen_width[] MACRO_ADDR;
-extern int D_L00_001AF5A8[];
+extern int g_tile_int_table[];
 extern float IntToFloat(s32);
 extern u64 GetEffectTextureDescriptor(s32);
 extern int FloatToInt(float);
@@ -26,7 +26,7 @@ void DrawTiledScreenOverlay(void *actor) {
     rows = g_screen_width[0] / 32 + 1;
     columns = g_screen_width[1] / 32 + 1;
     for (row = 0; row < rows; row++) {
-        int *p = D_L00_001AF5A8;
+        int *p = g_tile_int_table;
         for (column = 0; column < columns; column++) {
             pos[0] = (float)(row << 5);
             pos[1] = (float)(column << 5);

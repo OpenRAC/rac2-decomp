@@ -24,10 +24,10 @@ extern float FastVecLength(char *);
 extern float mat_fast_helper_a(float,float);
 extern int FastDecTimer(char *);
 extern int g_current_map_index MACRO_ADDR;
-extern short *D_L00_001FA920[];
-extern char *D_L00_001B1E9C MACRO_ADDR;
+extern short *g_turn_state_table[];
+extern char *g_moby_array_base MACRO_ADDR;
 
-void func_PAL_L00_0042DCD8(char *a)
+void cam_swingshot_update_pal(char *a)
 {
  char out[16] __attribute__((aligned(16)));
  char diff[16] __attribute__((aligned(16)));
@@ -53,9 +53,9 @@ void func_PAL_L00_0042DCD8(char *a)
   } else {
    turn=angle+4; best=0; closest=1000.0f;
    p=D_00189E20_6.swing;
-   list=D_L00_001FA920[*(unsigned char *)(p+0x21)];
+   list=g_turn_state_table[*(unsigned char *)(p+0x21)];
    if(list) do {
-    obj=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
+    obj=g_moby_array_base+(*list&0x7FFF)*0x100;
     if(obj!=p && (*(short *)(obj+0xAA)==0x323 || *(short *)(obj+0xAA)==0x2F6)) {
      FastVecSub(diff,obj+0x10,p+0x10);
      vec_scale_to_length(unit,diff,1.0f);

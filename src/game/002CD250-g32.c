@@ -8,11 +8,11 @@ typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int 
 
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
-extern char *D_001A8CFC;
-extern short D_001A63AC[];
-extern char D_00259328[];
-extern MenuFields D_00259E70;
-extern FlagTarget *D_00259E54[];
+extern char *g_resident_data_base;
+extern short g_sequence_active_flag[];
+extern char g_menu_page_options[];
+extern MenuFields g_menu_cursor_fields;
+extern FlagTarget *g_menu_flag_target_list[];
 extern int menu_get_setting_value(void);
 extern void tex_upload_queued_blocks(void *);
 extern int func_0029C208(int);
@@ -25,23 +25,23 @@ int menu_handle_selection_input(void)
     int flags = g_pad_state.flags;
 
     if (flags & 0x10) {
-        g_pause_menu_state.value = (int)D_00259328;
-        if (D_001A8CFC != 0 && *(void **)(D_001A8CFC + 0x3F364) != 0)
-            tex_upload_queued_blocks(*(void **)(D_001A8CFC + 0x3F364));
+        g_pause_menu_state.value = (int)g_menu_page_options;
+        if (g_resident_data_base != 0 && *(void **)(g_resident_data_base + 0x3F364) != 0)
+            tex_upload_queued_blocks(*(void **)(g_resident_data_base + 0x3F364));
     } else if (flags & 0x900) {
-        if (D_001A8CFC != 0 && *(void **)(D_001A8CFC + 0x3F364) != 0)
-            tex_upload_queued_blocks(*(void **)(D_001A8CFC + 0x3F364));
+        if (g_resident_data_base != 0 && *(void **)(g_resident_data_base + 0x3F364) != 0)
+            tex_upload_queued_blocks(*(void **)(g_resident_data_base + 0x3F364));
         result = 1;
     } else
         func_0029C208(flags);
-    if (D_001A8CFC != 0) {
+    if (g_resident_data_base != 0) {
         int cur = menu_get_setting_value();
-        if (old == cur && D_001A63AC[0] == 0
-            && ((D_00259E70.f50 == cur && D_00259E70.f44 == 2) || (D_00259E70.f54 == cur && D_00259E70.f44 == 4)))
-            D_00259E54[0]->flags &= -5;
+        if (old == cur && g_sequence_active_flag[0] == 0
+            && ((g_menu_cursor_fields.f50 == cur && g_menu_cursor_fields.f44 == 2) || (g_menu_cursor_fields.f54 == cur && g_menu_cursor_fields.f44 == 4)))
+            g_menu_flag_target_list[0]->flags &= -5;
         else
-            D_00259E54[0]->flags |= 4;
-        D_00259E70.f58 = cur;
+            g_menu_flag_target_list[0]->flags |= 4;
+        g_menu_cursor_fields.f58 = cur;
     }
     return result;
 }

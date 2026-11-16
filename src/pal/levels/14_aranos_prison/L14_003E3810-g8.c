@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
-extern char *D_L14_001B268C __attribute__((sda));
+extern char *g_platform_projection_table __attribute__((sda));
 extern char g_sound_state[];
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
@@ -11,13 +11,13 @@ extern float math_fabs(float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 
-void func_PAL_L14_003E3810(char *self) {
+void elevator_platform_move_to_target_pal(char *self) {
     struct { Vector argument, rotation; } work;
     char *state = *(char **)(self + 0x68);
     float target;
     int index;
     if (*(int *)(state + 0x7C))
-        target = *(float *)(((char (*)[0x80])D_L14_001B268C)[*(int *)(state + 0x60)] + 0x38);
+        target = *(float *)(((char (*)[0x80])g_platform_projection_table)[*(int *)(state + 0x60)] + 0x38);
     else
         target = *(float *)(state + 0x70);
     math_step_value_toward_target(self + 0x18, state + 0x74, target,

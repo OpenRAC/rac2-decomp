@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L20_003A1940, the PAL copy of func_L20_0039E9F8: the same C, where 0.00027777778f
    becomes 0.00040000002f; 0.016666668f becomes 0.020000001f; 0.00087266474f becomes 0.0012566373f;
    0.052359886f becomes 0.062831864f. */
@@ -5,9 +6,9 @@
 
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 
-extern float D_L20_001AED10 __attribute__((sda));
-extern float D_L20_001AED0C __attribute__((sda));
-extern char *D_L20_001B308C __attribute__((nosda));
+extern float g_swing_turn_speed __attribute__((sda));
+extern float g_swing_spin_speed __attribute__((sda));
+extern char *g_linked_moby_table __attribute__((nosda));
 
 extern float FastAddRotations(float, float);
 extern float FastDiffRots(float, float);
@@ -26,9 +27,9 @@ void func_PAL_L20_003A1940(char *obj) {
     float target;
     float r;
 
-    entry = (char *)((FLD(state, int, 0x84) << 7) + (unsigned int)D_L20_001B308C);
-    turn = D_L20_001AED10 * 0.00040000002f;
-    spin = D_L20_001AED0C * 0.020000001f;
+    entry = (char *)((FLD(state, int, 0x84) << 7) + (unsigned int)g_linked_moby_table);
+    turn = g_swing_turn_speed * 0.00040000002f;
+    spin = g_swing_spin_speed * 0.020000001f;
     target = FLD(entry, float, 0x78);
     if (FLD(state, int, 0x190) < 0) {
         target = FastAddRotations(target, 3.1415927f);
@@ -50,5 +51,5 @@ void func_PAL_L20_003A1940(char *obj) {
     }
     vec_store_helper(obj + 0x10);
     FLD(obj, float, 0x10) = FLD(state, float, 0x194);
-    transform_vector(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
+    transform_vector(obj + 0x10, obj + 0x10, g_linked_moby_table + (FLD(state, int, 0x84) << 7));
 }

@@ -62,18 +62,18 @@ typedef struct TaboraShake {
     int pad184;
     int duration2;
 } TaboraShake;
-extern TaboraScene D_L08_001BD800;
-extern TaboraShake D_L08_001B99C0;
-extern float D_L08_001B9B00[];
-extern TaboraEffectEntry D_L08_00288D10[];
-extern float D_L08_001A9430[4] __attribute__((sda));
-extern float D_L08_001A9450[4][4] __attribute__((sda));
+extern TaboraScene g_tabora_scene;
+extern TaboraShake g_hero_l08_extra_state;
+extern float g_hero_position_vec[];
+extern TaboraEffectEntry g_tabora_effect_entries[];
+extern float g_cutscene_effect_offset[4] __attribute__((sda));
+extern float g_cutscene_effect_directions[4][4] __attribute__((sda));
 extern int g_current_map_index MACRO_ADDR;
-extern int D_L08_001A9420 __attribute__((sda));
-extern int D_L08_001B2508 MACRO_ADDR;
-extern float D_L08_001B2820[4] MACRO_ADDR;
-extern float D_L08_001A9490 __attribute__((sda));
-extern float D_L08_001A9494, D_L08_001A9498, D_L08_001A949C;
+extern int g_cutscene_effect_frame __attribute__((sda));
+extern int g_frame_l08_counter MACRO_ADDR;
+extern float g_tabora_rotation_angles[4] MACRO_ADDR;
+extern float g_cutscene_rotation_speed_x __attribute__((sda));
+extern float g_cutscene_rotation_speed_y, g_cutscene_rotation_speed_z, g_cutscene_rotation_speed_w;
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
@@ -117,8 +117,8 @@ void tabora_cutscene_update_effects(void) {
     {
         int j = 0;
         TaboraObject *moby;
-        for (; j < D_L08_001BD800.count; ++j) {
-            moby = D_L08_001BD800.objects[j];
+        for (; j < g_tabora_scene.count; ++j) {
+            moby = g_tabora_scene.objects[j];
             if (moby && moby->classId==0xE29 /* moby class 3625 */) moby->flags |= 0x800;
             if (moby->classId==0xD54 /* moby class 3412 */) UpdateEquipmentPieces(moby);
             if (moby && moby->classId==MOBY_CLASS_TV_SCREENS && moby->vars)
@@ -127,28 +127,28 @@ void tabora_cutscene_update_effects(void) {
     }
     if (g_current_map_index != 8) return;
     {
-        if (D_L08_001BD800.phase==0) {
+        if (g_tabora_scene.phase==0) {
             int j;
             moby_copy_group_word_to_members();
             for (j=0;j<4;++j) {
-                TaboraEffectEntry *entry=&D_L08_00288D10[j];
-                if (D_L08_001BD800.frame==entry->frame) {
+                TaboraEffectEntry *entry=&g_tabora_effect_entries[j];
+                if (g_tabora_scene.frame==entry->frame) {
                     *(u128 *)vec_a=*(u128 *)entry->position;
-                    FastVecAdd(vec_a,vec_a,D_L08_001A9430);
+                    FastVecAdd(vec_a,vec_a,g_cutscene_effect_offset);
                     SpawnExplosion(vec_a,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
                     if (entry->shake>0.0f) {
-                        D_L08_001B99C0.duration0=55;
-                        D_L08_001B99C0.duration2=70;
-                        D_L08_001B99C0.delay=0;
-                        D_L08_001B99C0.amount2=D_L08_001B99C0.amount0=entry->shake*0.08f;
+                        g_hero_l08_extra_state.duration0=55;
+                        g_hero_l08_extra_state.duration2=70;
+                        g_hero_l08_extra_state.delay=0;
+                        g_hero_l08_extra_state.amount2=g_hero_l08_extra_state.amount0=entry->shake*0.08f;
                     }
                 }
             }
         }
     }
     {
-        if (D_L08_001BD800.phase==1) moby_copy_group_word_to_members();
-        if (D_L08_001BD800.phase==2) {
+        if (g_tabora_scene.phase==1) moby_copy_group_word_to_members();
+        if (g_tabora_scene.phase==2) {
             TaboraObject *moby;
             int burst_count;
             int i;
@@ -159,8 +159,8 @@ void tabora_cutscene_update_effects(void) {
             moby_copy_group_word_to_members();
             burst_count=0;
             scale=1.0f;
-            if (D_L08_001BD800.frame==53) {moby=D_L08_001BD800.objects[1];scale=0.7f;burst_count=30;}
-            else if (D_L08_001BD800.frame==58) {moby=D_L08_001BD800.objects[0];burst_count=50;}
+            if (g_tabora_scene.frame==53) {moby=g_tabora_scene.objects[1];scale=0.7f;burst_count=30;}
+            else if (g_tabora_scene.frame==58) {moby=g_tabora_scene.objects[0];burst_count=50;}
             if (moby) {
                 *(u128 *)vec_a = 0;
                 vec_a[2]=0.01f;
@@ -199,52 +199,52 @@ void tabora_cutscene_update_effects(void) {
             }
         }
     }
-    if (D_L08_001BD800.phase==3 && D_L08_001BD800.frame==D_L08_001A9420) {
-        TaboraObject *first=D_L08_001BD800.objects[1];
-        TaboraObject *second=D_L08_001BD800.objects[2];
+    if (g_tabora_scene.phase==3 && g_tabora_scene.frame==g_cutscene_effect_frame) {
+        TaboraObject *first=g_tabora_scene.objects[1];
+        TaboraObject *second=g_tabora_scene.objects[2];
         qcopy(vec_a,second->position);
         vec_a[2]+=0.8f;
         FastVecSub(vec_b,first->position,second->position);
         vec_scale_to_length(vec_b,vec_b,0.035f);
         vec_b[2]=0.041666668f;
         SpawnTintedEffects(0,vec_a,40,0,vec_b,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
-        D_L08_001B99C0.amount2=0.047f;
-        D_L08_001B99C0.duration2=35;
-        D_L08_001B99C0.amount0=0.037f;
-        D_L08_001B99C0.duration0=30;
-        D_L08_001B99C0.amount1=0.04f;
-        D_L08_001B99C0.duration1=20;
-        D_L08_001B99C0.delay=0;
+        g_hero_l08_extra_state.amount2=0.047f;
+        g_hero_l08_extra_state.duration2=35;
+        g_hero_l08_extra_state.amount0=0.037f;
+        g_hero_l08_extra_state.duration0=30;
+        g_hero_l08_extra_state.amount1=0.04f;
+        g_hero_l08_extra_state.duration1=20;
+        g_hero_l08_extra_state.delay=0;
     }
-    if (D_L08_001BD800.phase==5) {
-        D_L08_001BD800.objects[2]->flags&=0xFBFF;
-        D_L08_001BD800.objects[3]->flags&=0xFBFF;
+    if (g_tabora_scene.phase==5) {
+        g_tabora_scene.objects[2]->flags&=0xFBFF;
+        g_tabora_scene.objects[3]->flags&=0xFBFF;
     }
-    if (D_L08_001BD800.phase!=7) return;
-    if (D_L08_001BD800.frame==0) {
-        D_L08_001B2820[0]=0;
-        D_L08_001B2820[1]=0;
-        D_L08_001B2820[2]=0;
+    if (g_tabora_scene.phase!=7) return;
+    if (g_tabora_scene.frame==0) {
+        g_tabora_rotation_angles[0]=0;
+        g_tabora_rotation_angles[1]=0;
+        g_tabora_rotation_angles[2]=0;
     }
-    if ((unsigned)(D_L08_001BD800.frame-421)>=177) return;
-    *(u128 *)vec_a=*(u128 *)D_L08_001BD800.objects[3]->position;
+    if ((unsigned)(g_tabora_scene.frame-421)>=177) return;
+    *(u128 *)vec_a=*(u128 *)g_tabora_scene.objects[3]->position;
     vec_a[2]+=0.5f;
-    if (D_L08_001BD800.frame<568) {
+    if (g_tabora_scene.frame<568) {
         int j;
         int spin;
         float size;
-        D_L08_001B2820[0]=FastAddRotations(D_L08_001B2820[0],D_L08_001A9490*0.00029088824f);
-        D_L08_001B2820[1]=FastAddRotations(D_L08_001B2820[1],D_L08_001A9494*0.00029088824f);
-        D_L08_001B2820[2]=FastAddRotations(D_L08_001B2820[2],D_L08_001A9498*0.00029088824f);
-        D_L08_001B2820[3]=FastAddRotations(D_L08_001B2820[3],D_L08_001A949C*0.00029088824f);
-        euler_rotation_basis(matrix,D_L08_001B2820);
+        g_tabora_rotation_angles[0]=FastAddRotations(g_tabora_rotation_angles[0],g_cutscene_rotation_speed_x*0.00029088824f);
+        g_tabora_rotation_angles[1]=FastAddRotations(g_tabora_rotation_angles[1],g_cutscene_rotation_speed_y*0.00029088824f);
+        g_tabora_rotation_angles[2]=FastAddRotations(g_tabora_rotation_angles[2],g_cutscene_rotation_speed_z*0.00029088824f);
+        g_tabora_rotation_angles[3]=FastAddRotations(g_tabora_rotation_angles[3],g_cutscene_rotation_speed_w*0.00029088824f);
+        euler_rotation_basis(matrix,g_tabora_rotation_angles);
         for(j=0;j<4;++j) {
-            FastVecSub(start,D_L08_001B9B00,vec_a);
+            FastVecSub(start,g_hero_position_vec,vec_a);
             vec_scale_to_length(start,start,5.0f);
             FastVecAdd(end,start,vec_a);
             end[2]+=0.5f;
             spin=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
-            matrix_mul_vec3(direction,D_L08_001A9450[j],matrix);
+            matrix_mul_vec3(direction,g_cutscene_effect_directions[j],matrix);
             vec_scale_to_length(direction,direction,3.5f);
             FastVecAdd(direction,direction,end);
             FastVecSub(vec_b,end,direction);
@@ -253,7 +253,7 @@ void tabora_cutscene_update_effects(void) {
             part_spawn_fading_drift(direction,vec_b,60,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
         }
     }
-    if (D_L08_001BD800.frame<=480) return;
+    if (g_tabora_scene.frame<=480) return;
     {
         float amount=6.0f;
         float rate=0.0f;
@@ -265,13 +265,13 @@ void tabora_cutscene_update_effects(void) {
         *(u128 *)vec_b=*(u128 *)vec_a;
         vec_b[2]+=1.0f;
         if (math_random_int_below(4)==0) {
-            FastVecSub(forward,D_L08_001B9B00,vec_b);
+            FastVecSub(forward,g_hero_position_vec,vec_b);
             timeScale=0.016666668f;
             frameStep=0.008333334f;
             vec_scale_to_length(forward,forward,5.0f);
             FastVecAdd(vec_b,forward,vec_b);
             vec_random_direction(matrix,rate,rate);
-            size=(D_L08_001BD800.frame-480);
+            size=(g_tabora_scene.frame-480);
             size*=0.06666667f;
             alpha=math_random_int_below(255)&255;
             duration=60;
@@ -282,7 +282,7 @@ void tabora_cutscene_update_effects(void) {
                 vec_random_direction(offset,t,t);
                 FastVecAdd(matrix,matrix,offset);
                 t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
-                scale=amount*frameStep*(D_L08_001BD800.frame-480);
+                scale=amount*frameStep*(g_tabora_scene.frame-480);
                 alpha=math_random_int_below(255)&255;
                 part_spawn_hero_relative(vec_b,matrix,0x40804080,duration,alpha,0,scale);
                 duration+=lifeStep;
@@ -296,15 +296,15 @@ void tabora_cutscene_update_effects(void) {
         j=0;
         full=255;
         for (;j<=0;++j) {
-            size=IntToFloat(full-((D_L08_001B2508+j*20)&255));
+            size=IntToFloat(full-((g_frame_l08_counter+j*20)&255));
             size=math_fabs(0.5f-size*0.003921569f);
             colour=FastTweenColor(0x40FF40FF,0x10FF40FF,size);
-            alpha=(unsigned char)D_L08_001B2508;
+            alpha=(unsigned char)g_frame_l08_counter;
             if(j&2) alpha<<=1;
             if(j&1) alpha=full-alpha;
             value=alpha&255;
             size=(IntToFloat(j)+5.0f)*0.008333334f;
-            size*=(D_L08_001BD800.frame-480);
+            size*=(g_tabora_scene.frame-480);
             part_spawn_fading(forward,colour,value,53,1,2,0,size);
             FastVecAdd(forward,forward,direction);
         }

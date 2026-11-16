@@ -12,7 +12,7 @@ typedef struct {
 
 extern Cam_271E88 g_active_camera;
 extern s32 g_current_game_mode __attribute__((sda));
-extern f32 D_001BAFA0[4];
+extern f32 g_coll_hit_position[4];
 extern s32 CollLine(void *, void *, s32, void *, s32);
 extern int GetCollHitMaterial(void);
 extern float coll_get_ground_height_at_position(float *, void *);
@@ -34,7 +34,7 @@ void cam_update_grounded(void)
     bottom[2] -= 0.75f;
     for (i = 0; i < 6 && CollLine(top, bottom, 0x12, 0, 0); i++) {
         if (GetCollHitMaterial() == 0) {
-            f32 floor_height = coll_get_ground_height_at_position(D_001BAFA0, 0) + 0.04f;
+            f32 floor_height = coll_get_ground_height_at_position(g_coll_hit_position, 0) + 0.04f;
             if (g_active_camera.pos[2] < floor_height) {
                 g_active_camera.grounded = 1;
             } else {
@@ -42,7 +42,7 @@ void cam_update_grounded(void)
             }
             return;
         }
-        qcopy(top, D_001BAFA0);
+        qcopy(top, g_coll_hit_position);
         top[2] -= 0.01f;
     }
 }

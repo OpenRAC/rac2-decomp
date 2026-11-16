@@ -3,18 +3,18 @@
 
 extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 typedef int TI128 __attribute__((mode(TI)));
-extern char D_L14_001B1870[8] __attribute__((sda));
-extern char D_L14_001B1878[8] __attribute__((sda));
-extern int D_L14_001B18A0 __attribute__((sda));
+extern char g_beam_piece_data_a[8] __attribute__((sda));
+extern char g_beam_piece_data_b[8] __attribute__((sda));
+extern int g_beam_piece_param __attribute__((sda));
 extern void moby_set_state(char *a0, int a1, int a2);
 extern void vec_scale_to_length(void *out, void *in, float scale);
 extern void FastVecSub(void *out, void *in1, void *in2);
 extern void FastVecAdd(void *out, void *in1, void *in2);
-extern void func_PAL_L00_0032C328(char *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(char *, void *, void *, void *, int, int, int, int, int, int, int);
 extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(char *a0);
 
-void func_PAL_L14_0042CB20(char *a0) {
+void beam_to_target_update_pal(char *a0) {
     float pts[2][4] __attribute__((aligned(16)));
     char *state = *(char **)(a0 + 0x68);
     char *obj;
@@ -34,7 +34,7 @@ void func_PAL_L14_0042CB20(char *a0) {
             vec_scale_to_length(pts[1], obj + 0x10, 18.0f);
             FastVecSub(pts[0], pts[0], off);
             FastVecAdd(pts[1], pts[1], off);
-            func_PAL_L00_0032C328(a0, pts, D_L14_001B1878, D_L14_001B1870, 0xFFFF, 0, D_L14_001B18A0, 8, 0xFFFF, 0xFF, 0);
+            part_explode_object_into_pieces_pal(a0, pts, g_beam_piece_data_b, g_beam_piece_data_a, 0xFFFF, 0, g_beam_piece_param, 8, 0xFFFF, 0xFF, 0);
             PlayMobySound(0, 0, a0);
             moby_set_state(a0, 2, -1);
         }

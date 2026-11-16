@@ -13,9 +13,9 @@ typedef unsigned short u16;
 typedef short s16;
 typedef int s32;
 
-extern u16 *D_L18_001FB320[];
+extern u16 *g_condition_target_lists[];
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
 
 extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
@@ -117,9 +117,9 @@ void extermibot_update_hits(u8 *object)
     }
     if (*(s16 *)(state + 0x7F4) != -1) {
         *(u16 *)(state + 0x7F6) = 0;
-        for (idList = D_L18_001FB320[object[0x21]];
-             object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838[0] && idList != 0 &&
-             ((idList != 0 && (s16)idList[-1] >= 0) || idList == D_L18_001FB320[object[0x21]]);
+        for (idList = g_condition_target_lists[object[0x21]];
+             object[0x21] != 0xFF && object[0x21] <= g_max_l18_group_index[0] && idList != 0 &&
+             ((idList != 0 && (s16)idList[-1] >= 0) || idList == g_condition_target_lists[object[0x21]]);
              idList++) {
             otherMoby = g_moby_l18_table[0] + ((*idList & 0x7FFF) << 8);
             if (otherMoby == 0)

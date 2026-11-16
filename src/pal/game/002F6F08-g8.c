@@ -30,7 +30,7 @@ extern int ref_L00_002F5FB8_13 __attribute__((sda));
 extern int ref_L00_002F5FB8_14 __attribute__((sda));
 extern int ref_L00_002F5FB8_16[];
 extern int g_memcard_state[];
-extern char D_001339B0[];
+extern char g_str_movie_name[];
 extern void func_PAL_0029D630(int, int);
 extern void req_flush_queue(void *);
 extern int request_end_slot(int,int);
@@ -42,9 +42,9 @@ extern int gfx_wait_paths_idle(int,int);
 extern void snd_clear_all_voices(void);
 extern void snd_wait_for_music_idle(void);
 extern int snd_CheckLoadInProgress(int);
-extern void func_PAL_00299898(void);
-extern int func_PAL_002B8838(char *,int,int);
-extern int func_PAL_00351140(void *,void *,char *,char *,int,int);
+extern void mc_update_state_pal(void);
+extern int load_read_disc_with_pause_pal(char *,int,int);
+extern int mpeg_play_movie_2_pal(void *,void *,char *,char *,int,int);
 extern int req_pop_queue(void *,int *,int *);
 extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
@@ -97,7 +97,7 @@ void func_PAL_002F6F08(void)
     snd_wait_for_music_idle();
     snd_CheckLoadInProgress(0);
     g_music_state.pendingVoice = -1;
-    while (g_memcard_state[0x15C/4] >= 3 || g_memcard_state[0x164/4] >= 0) func_PAL_00299898();
+    while (g_memcard_state[0x15C/4] >= 3 || g_memcard_state[0x164/4] >= 0) mc_update_state_pal();
     frame = 0;
     status = -1;
     done = 0;
@@ -105,7 +105,7 @@ void func_PAL_002F6F08(void)
         int *descriptor;
         descriptor = ref_L00_002F5FB8_10;
         if (descriptor != 0 && descriptor[0] != 0) {
-            func_PAL_002B8838(destination,descriptor[0] + ((Toc_002F5D40 *)g_copy_setup_data)->base,(descriptor[1] + 2047)/2048);
+            load_read_disc_with_pause_pal(destination,descriptor[0] + ((Toc_002F5D40 *)g_copy_setup_data)->base,(descriptor[1] + 2047)/2048);
             ref_L00_002F5FB8_16[0x4C/4] = (int)destination;
             ref_L00_002F5FB8_16[0x34/4] = 0;
         } else {
@@ -113,7 +113,7 @@ void func_PAL_002F6F08(void)
             ref_L00_002F5FB8_16[0x34/4] = 0;
         }
         stream = (Stream_5FB8 *)ref_L00_002F5FB8_05;
-        result = func_PAL_00351140((void *)ref_L00_002F5FB8_01,(void *)ref_L00_002F5FB8_00,(char *)((first + 63) & -64),(char *)((second + 63) & -64),ref_L00_002F5FB8_13,ref_L00_002F5FB8_12 != 0);
+        result = mpeg_play_movie_2_pal((void *)ref_L00_002F5FB8_01,(void *)ref_L00_002F5FB8_00,(char *)((first + 63) & -64),(char *)((second + 63) & -64),ref_L00_002F5FB8_13,ref_L00_002F5FB8_12 != 0);
         stream->mode = (result ^ 1) == 0 ? 1 : stream->mode;
         if (result != 0) { stream->mode = 1; req_flush_queue(stream); }
         if (ref_L00_002F5FB8_05[0] != 0) {
@@ -137,7 +137,7 @@ void func_PAL_002F6F08(void)
         if (done) break;
     }
     snd_CheckLoadInProgress(0);
-    func_00126DC0(D_001339B0);
+    func_00126DC0(g_str_movie_name);
     gfx_wait_paths_idle(0,0);
     slot = &ref_L00_002F5FB8_07[textureIndex];
     sceGsExecLoadImage(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);

@@ -25,8 +25,8 @@
  */
 #include "common.h"
 
-extern s32 D_001A7000[];
-extern s32 D_001A0000[];
+extern s32 g_shutdown_callback_table[];
+extern s32 g_shutdown_callback_base[];
 
 /* Runs every shutdown function in a list, last one first. */
 void shutdown_run_callbacks(void) {
@@ -35,18 +35,18 @@ void shutdown_run_callbacks(void) {
     s32 *entry;
     s32 callback;
 
-    count = D_001A7000[0];
+    count = g_shutdown_callback_table[0];
     if (count == -1) {
         count = 0;
-        if (D_001A7000[1] != 0) {
+        if (g_shutdown_callback_table[1] != 0) {
             do {
                 count = count + 1;
-            } while (D_001A7000[count + 1] != 0);
+            } while (g_shutdown_callback_table[count + 1] != 0);
         }
     }
     remaining = count;
     if (remaining != 0) {
-        entry = (s32 *) ((s8 *) D_001A0000 + 0x7000) + remaining;
+        entry = (s32 *) ((s8 *) g_shutdown_callback_base + 0x7000) + remaining;
         callback = *entry;
         do {
             remaining -= 1;

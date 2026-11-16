@@ -55,19 +55,19 @@ typedef struct {
     char pad2298[0x234];
     int count;
 } AranosLaunchHero;
-extern AranosLaunchPose *D_L00_001B1F8C __attribute__((sda));
-extern AranosLaunchPath *D_L00_001FDA80[];
-extern LaunchMoby *D_L00_00220DA0[];
-extern int D_L00_001B1A50 __attribute__((sda));
+extern AranosLaunchPose *g_aranos_launch_poses __attribute__((sda));
+extern AranosLaunchPath *g_launch_path_table[];
+extern LaunchMoby *g_launch_moby_list[];
+extern int g_aranos_launch_state __attribute__((sda));
 extern int g_frame_l00_counter __attribute__((sda));
-extern int D_L00_001A8F00 __attribute__((sda));
-extern int D_L00_001BF154;
-extern unsigned int D_00139788[];
+extern int g_game_l00_mode __attribute__((sda));
+extern int g_effect_table_base;
+extern unsigned int g_progress_flags_c[];
 extern unsigned int g_save_menu_flags __attribute__((sda));
-extern float D_L00_001B18E0 __attribute__((sda));
-extern float D_L00_001B24B0[4] __attribute__((sda));
-extern char D_L00_001BEFC0[];
-extern char D_L00_001AED10[];
+extern float g_hero_scalar_transition_value __attribute__((sda));
+extern float g_scene_vector[4] __attribute__((sda));
+extern char g_request_l00_queue[];
+extern char g_str_aranos_launch_message[];
 extern AranosLaunchHero g_hero_state;
 extern int game_is_either_mode_two(void);
 extern int flag_is_byte_set(void);
@@ -76,7 +76,7 @@ extern int cam_is_trigger_ready(int);
 extern int hero_get_target_state_kind(void);
 extern int MemcardSave(int, int);
 extern int IsPointInCuboid(char *, unsigned int);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void SpawnEquipmentPieces(void *);
 extern void cam_lock_entry(int);
 extern void moby_set_state(void *, int, int);
@@ -95,7 +95,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float vec_distance_xy(void *, void *);
 extern void euler_rotation_basis(char *, char *);
-extern void func_PAL_002F6C18(void);
+extern void game_set_slowdown_factor_pal(void);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern void gfx_draw_object_multi_pass(void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -106,7 +106,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void SnapMobyListToParent(void *);
 
 /* State machine for the launch object: drives its child along a path, then hands off to the next state. */
-void func_PAL_L00_00386100(LaunchMoby *obj) {
+void aranos_launch_update_pal(LaunchMoby *obj) {
     LaunchVec offset;
     AranosLaunchCtx *ctx = obj->ctx;
     AranosLaunchPath *path;
@@ -122,9 +122,9 @@ void func_PAL_L00_00386100(LaunchMoby *obj) {
             moby_mark_flag_and_append_to_list(0x18);
         state_set_flag_one();
         if (ctx->pose != -1)
-            func_PAL_L00_002B9CD8(&D_L00_001B1F8C[ctx->pose].position, &D_L00_001B1F8C[ctx->pose].rotation, 0, 1);
+            hero_reset_position_and_direction_pal(&g_aranos_launch_poses[ctx->pose].position, &g_aranos_launch_poses[ctx->pose].rotation, 0, 1);
         moby_init_child_from_parent(ctx->child = CreateMoby(0xD54), obj);
-        initialPath = D_L00_001FDA80[ctx->pathIndex];
+        initialPath = g_launch_path_table[ctx->pathIndex];
         /* The copies write only the child position, so the no-clobber form is enough. */
         qcopy_nc(&ctx->child->position, &initialPath->points[0]);
         SpawnEquipmentPieces(ctx->child);
@@ -136,12 +136,12 @@ void func_PAL_L00_00386100(LaunchMoby *obj) {
         euler_rotation_basis(ctx->child->matrix, (char *)&ctx->child->rotation);
         ctx->pointIndex = 0;
         obj->f30 = 0xFF;
-        if (!(D_00139788[0] & 2) && g_hero_state.state != 0x1C && g_hero_state.count > 0 && !D_L00_001A8F00 &&
+        if (!(g_progress_flags_c[0] & 2) && g_hero_state.state != 0x1C && g_hero_state.count > 0 && !g_game_l00_mode &&
             (ctx->flag == -1 || IsPointInCuboid(g_hero_state.flagBits, ctx->flag))) {
-            req_push_queue(D_L00_001BEFC0, 0x21);
-            req_launch_queued(D_L00_001BEFC0);
+            req_push_queue(g_request_l00_queue, 0x21);
+            req_launch_queued(g_request_l00_queue);
             if (g_frame_l00_counter < 5)
-                func_PAL_002F6C18();
+                game_set_slowdown_factor_pal();
             moby_set_state(obj, 1, -1);
         } else {
             moby_set_state(obj, 4, -1);
@@ -151,47 +151,47 @@ void func_PAL_L00_00386100(LaunchMoby *obj) {
     case 1:
         if (!game_is_either_mode_two()) {
             if (ctx->pose != -1)
-                func_PAL_L00_002B9CD8(&D_L00_001B1F8C[ctx->pose].position, &D_L00_001B1F8C[ctx->pose].rotation, 0, 1);
+                hero_reset_position_and_direction_pal(&g_aranos_launch_poses[ctx->pose].position, &g_aranos_launch_poses[ctx->pose].rotation, 0, 1);
             SpawnEquipmentPieces(ctx->child);
             cam_lock_entry(ctx->cue);
-            D_L00_001B1A50 = 0;
-            D_L00_001B18E0 = 1.5f;
+            g_aranos_launch_state = 0;
+            g_hero_scalar_transition_value = 1.5f;
             moby_set_state(obj, 2, -1);
-            part_init_effect_table(D_L00_001BF154 + 0xF0000);
+            part_init_effect_table(g_effect_table_base + 0xF0000);
         }
         break;
     case 2:
         if (flag_set_first_pending(obj)) {
             snd_start_in_slot(0x17, 0, 0);
-            D_L00_001B1A50 = 0;
+            g_aranos_launch_state = 0;
         }
         angle = FastAddRotations(ctx->child->rotation.f[2], 3.1415927f);
-        D_L00_001B24B0[0] = math_fast_sin_or_cos_a(angle) * 0.6f;
-        D_L00_001B24B0[1] = math_fast_sin_or_cos_b(angle) * 0.6f;
-        D_L00_001B24B0[2] = 0.0f;
+        g_scene_vector[0] = math_fast_sin_or_cos_a(angle) * 0.6f;
+        g_scene_vector[1] = math_fast_sin_or_cos_b(angle) * 0.6f;
+        g_scene_vector[2] = 0.0f;
         ctx->child->f95 = 0xFF;
         gfx_add_draw_callback_first(gfx_draw_object_multi_pass, ctx->child);
         ++obj->timer;
         if (obj->timer > 10 && cam_is_trigger_ready(ctx->cue)) {
             AranosLaunchPose *poses;
 
-            STUB_printf(D_L00_001AED10);
-            poses = D_L00_001B1F8C;
+            STUB_printf(g_str_aranos_launch_message);
+            poses = g_aranos_launch_poses;
             ctx->child->flags |= 0x41;
             ctx->child->flags &= 0xEFFF;
             ctx->child->f98 = 0;
             offset.f[0] = math_fast_sin_or_cos_a(poses[ctx->pose].rotation.f[2]);
             offset.f[0] += offset.f[0];
-            offset.f[1] = math_fast_sin_or_cos_b(D_L00_001B1F8C[ctx->pose].rotation.f[2]);
+            offset.f[1] = math_fast_sin_or_cos_b(g_aranos_launch_poses[ctx->pose].rotation.f[2]);
             offset.f[1] += offset.f[1];
             offset.f[2] = 0;
-            FastVecAdd(&offset, &offset, &D_L00_001B1F8C[ctx->pose].position);
-            hero_start_target_state(&offset, 1, D_L00_001B1F8C[ctx->pose].rotation.f[2]);
+            FastVecAdd(&offset, &offset, &g_aranos_launch_poses[ctx->pose].position);
+            hero_start_target_state(&offset, 1, g_aranos_launch_poses[ctx->pose].rotation.f[2]);
             cam_reset_entry(ctx->target);
-            D_L00_001B1A50 = 2;
+            g_aranos_launch_state = 2;
             moby_set_state(obj, 4, -1);
         }
-        path = D_L00_001FDA80[ctx->pathIndex];
+        path = g_launch_path_table[ctx->pathIndex];
         if (vec_distance_xy(&ctx->child->position, &path->points[ctx->pointIndex]) < 0.75f)
             ++ctx->pointIndex;
         if (path->count - 1 < ctx->pointIndex)
@@ -204,7 +204,7 @@ void func_PAL_L00_00386100(LaunchMoby *obj) {
         if (flag_set_first_pending(obj)) {
             int target = ctx->target;
 
-            D_L00_001B1A50 = 2;
+            g_aranos_launch_state = 2;
             cam_reset_entry(target);
         }
         if (!hero_get_target_state_kind()) {
@@ -216,17 +216,17 @@ void func_PAL_L00_00386100(LaunchMoby *obj) {
     }
 
     if (obj->state != 4 && obj->state != 5) {
-        path = D_L00_001FDA80[ctx->pathIndex];
+        path = g_launch_path_table[ctx->pathIndex];
         SnapMobyListToParent(ctx->child);
         ctx->child->rotation.f[2] = mat_fast_helper_a(path->points[1].f[0] - ctx->child->position.f[0],
                                                   path->points[1].f[1] - ctx->child->position.f[1]);
         euler_rotation_basis(ctx->child->matrix, (char *)&ctx->child->rotation);
     } else {
         i = 0;
-        while (D_L00_00220DA0[i]) {
-            D_L00_00220DA0[i]->flags |= 0x41;
-            D_L00_00220DA0[i]->flags &= 0xEFFF;
-            D_L00_00220DA0[i]->f98 = 0;
+        while (g_launch_moby_list[i]) {
+            g_launch_moby_list[i]->flags |= 0x41;
+            g_launch_moby_list[i]->flags &= 0xEFFF;
+            g_launch_moby_list[i]->f98 = 0;
             ++i;
         }
     }

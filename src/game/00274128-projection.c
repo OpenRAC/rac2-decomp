@@ -14,18 +14,18 @@ struct ViewP {
     s32 fog_r, fog_g, fog_b;
 };
 
-extern struct ViewP D_001B9040;
+extern struct ViewP g_view_params;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_current_game_mode MACRO_ADDR;
-extern unsigned char D_001A7BB1 MACRO_ADDR;
-extern Vec4 D_001B9300[4], D_002633E0[3], D_002636D0[2];
-extern float D_001AC6E0[4];
-extern float D_001ACBD0 MACRO_ADDR;
-extern float D_00264DB0, D_002650B0;
+extern unsigned char g_display_mode_flag MACRO_ADDR;
+extern Vec4 g_clip_view_vectors[4], g_projection_view_vectors[3], g_projection_view_vectors_alt[2];
+extern float g_projection_params[4];
+extern float g_fog_multiplier MACRO_ADDR;
+extern float g_fog_multiplier_a, g_fog_multiplier_b;
 struct FogRegs2P { char pad[0x28]; int mul, max, far_int, near_int; };
-extern struct FogRegs2P D_00263640, D_00263690;
+extern struct FogRegs2P g_fog_regs_a, g_fog_regs_b;
 struct FogPacketP { char pad[0x10]; int mul, far_int, near_int; char pad1c[0x44]; Vec4 constants[3]; char pad90[0x10]; int x, y; };
-extern struct FogPacketP D_00263440;
+extern struct FogPacketP g_fog_packet;
 extern float math_fast_sin_or_cos_a(float), mat_fast_helper_a(float, float);
 extern void SetTfragDists(void), mem_copy_aligned(void *, const void *, int);
 
@@ -56,14 +56,14 @@ void UpdateViewContext(void) {
     depth_scale = -8388080.0f;
     depth_bias = 8388112.0f;
     if (g_is_pal_video != 0) {
-        D_001B9040.fov.f[1] = D_001B9040.fov.f[0] * 0.756f;
+        g_view_params.fov.f[1] = g_view_params.fov.f[0] * 0.756f;
     } else {
-        D_001B9040.fov.f[1] = D_001B9040.fov.f[0] * 0.775f;
+        g_view_params.fov.f[1] = g_view_params.fov.f[0] * 0.775f;
     }
-    if (D_001A7BB1) {
-        D_001B9040.fov.f[1] *= 0.7500000596046448f;
+    if (g_display_mode_flag) {
+        g_view_params.fov.f[1] *= 0.7500000596046448f;
     }
-    view = &D_001B9040;
+    view = &g_view_params;
     view->aspect_x = view->scr_x / view->half_width;
     view->aspect_y = view->scr_y / view->half_height;
     view->fov.f[2] = 1.0f / math_fast_sin_or_cos_a(mat_fast_helper_a(1.0f, view->fov.f[0]));
@@ -76,7 +76,7 @@ void UpdateViewContext(void) {
     horizontal_clip_scale *= 0.5f;
     if (g_current_game_mode == 2 && view->fov.f[0] < 0.62f)
         horizontal_clip_scale *= 1.15f;
-    clip_view = &D_001B9040;
+    clip_view = &g_view_params;
     clip_view->aspect_scale.f[2] = 1.0f / clip_view->aspect_x;
     clip_view->aspect_scale.f[3] = 1.0f / clip_view->aspect_y;
     clip_view->clip_scale.f[0] = clip_view->fov.f[2];
@@ -86,10 +86,10 @@ void UpdateViewContext(void) {
     clip_view->clip_distances.f[1] = clip_view->near_clip;
     clip_view->aspect_scale.f[0] = clip_view->aspect_x;
     clip_view->aspect_scale.f[1] = clip_view->aspect_y;
-    qcopy(&D_001B9300[0], &clip_view->fov);
-    qcopy(&D_001B9300[1], &clip_view->aspect_scale);
-    qcopy(&D_001B9300[2], &clip_view->clip_scale);
-    qcopy(&D_001B9300[3], &clip_view->clip_distances);
+    qcopy(&g_clip_view_vectors[0], &clip_view->fov);
+    qcopy(&g_clip_view_vectors[1], &clip_view->aspect_scale);
+    qcopy(&g_clip_view_vectors[2], &clip_view->clip_scale);
+    qcopy(&g_clip_view_vectors[3], &clip_view->clip_distances);
 
     if (clip_view->fog_far_dist < clip_view->fog_near_dist + 1024.0f)
         clip_view->fog_far_dist = clip_view->fog_near_dist + 1024.0f;
@@ -107,21 +107,21 @@ void UpdateViewContext(void) {
     clip_view->fog_slope = fog_distance_slope;
     clip_view->fog_base = clip_view->fog_near_int - clip_view->fog_near_dist * (fog_distance_slope * (1.0f / 1024.0f));
     clip_view->fog_mul = fog_multiplier;
-    D_001ACBD0 = fog_multiplier;
-    D_00264DB0 = fog_multiplier;
-    D_002650B0 = fog_multiplier;
+    g_fog_multiplier = fog_multiplier;
+    g_fog_multiplier_a = fog_multiplier;
+    g_fog_multiplier_b = fog_multiplier;
     mul_bits = *(s32 *)&clip_view->fog_mul;
-    D_00263440.mul = mul_bits;
-    D_00263440.far_int = far_bits;
-    D_00263440.near_int = near_bits;
-    D_00263640.mul = mul_bits;
-    D_00263690.mul = mul_bits;
-    D_00263640.far_int = far_bits;
-    D_00263640.near_int = near_bits;
-    D_00263690.far_int = far_bits;
-    D_00263690.near_int = near_bits;
-    D_00263640.max = 0x437EFFFF;
-    D_00263690.max = 0x437EFFFF;
+    g_fog_packet.mul = mul_bits;
+    g_fog_packet.far_int = far_bits;
+    g_fog_packet.near_int = near_bits;
+    g_fog_regs_a.mul = mul_bits;
+    g_fog_regs_b.mul = mul_bits;
+    g_fog_regs_a.far_int = far_bits;
+    g_fog_regs_a.near_int = near_bits;
+    g_fog_regs_b.far_int = far_bits;
+    g_fog_regs_b.near_int = near_bits;
+    g_fog_regs_a.max = 0x437EFFFF;
+    g_fog_regs_b.max = 0x437EFFFF;
     SetTfragDists();
 
     projection_near_clip = clip_view->near_clip;
@@ -131,10 +131,10 @@ void UpdateViewContext(void) {
     viewport_width = clip_view->half_width;
     viewport_height = clip_view->half_height;
     projection_fog_multiplier = clip_view->fog_mul;
-    D_001AC6E0[0] = 0.5f / 210000.0f;
-    D_001AC6E0[1] = -0.5f / 210000.0f;
-    D_001AC6E0[2] = 0.5f;
-    D_001AC6E0[3] = viewport_width / (horizontal_fov * 210000.0f);
+    g_projection_params[0] = 0.5f / 210000.0f;
+    g_projection_params[1] = -0.5f / 210000.0f;
+    g_projection_params[2] = 0.5f;
+    g_projection_params[3] = viewport_width / (horizontal_fov * 210000.0f);
     clip_view->proj[0] = viewport_width / (horizontal_fov * projection_near_clip);
     clip_view->proj[1] = 0.0f;
     clip_view->proj[2] = 0.0f;
@@ -187,7 +187,7 @@ void UpdateViewContext(void) {
     /* Clear the first register quadword before the packet is rebuilt below. */
     qzero_nc(&clip_view->regs[0]);
 
-    packet_view = &D_001B9040;
+    packet_view = &g_view_params;
     packet_view->gif[0].i[0] = *(s32 *)&packet_view->fog_mul;
     packet_view->gif[0].i[1] = 0x303E4000;
     packet_view->gif[0].i[2] = 0x412;
@@ -209,14 +209,14 @@ void UpdateViewContext(void) {
     qcopy(&packet_view->regs[2], &packet_view->inverse_screen_scale);
     qcopy(&packet_view->regs[3], &packet_view->screen_scale);
     qcopy(&packet_view->regs[4], &packet_view->screen_bias);
-    qcopy(&D_002633E0[0], &packet_view->screen_bias);
-    qcopy(&D_002633E0[1], &packet_view->screen_scale);
-    qcopy(&D_002633E0[2], &packet_view->viewport_aspect);
-    qcopy(&D_00263440.constants[0], &packet_view->screen_bias);
-    qcopy(&D_00263440.constants[1], &packet_view->inverse_screen_scale);
-    qcopy(&D_00263440.constants[2], &packet_view->screen_scale);
-    D_00263440.x = packet_view->viewport_aspect.i[0];
-    D_00263440.y = packet_view->viewport_aspect.i[1];
-    qcopy(&D_002636D0[0], &packet_view->screen_scale);
-    qcopy(&D_002636D0[1], &packet_view->screen_bias);
+    qcopy(&g_projection_view_vectors[0], &packet_view->screen_bias);
+    qcopy(&g_projection_view_vectors[1], &packet_view->screen_scale);
+    qcopy(&g_projection_view_vectors[2], &packet_view->viewport_aspect);
+    qcopy(&g_fog_packet.constants[0], &packet_view->screen_bias);
+    qcopy(&g_fog_packet.constants[1], &packet_view->inverse_screen_scale);
+    qcopy(&g_fog_packet.constants[2], &packet_view->screen_scale);
+    g_fog_packet.x = packet_view->viewport_aspect.i[0];
+    g_fog_packet.y = packet_view->viewport_aspect.i[1];
+    qcopy(&g_projection_view_vectors_alt[0], &packet_view->screen_scale);
+    qcopy(&g_projection_view_vectors_alt[1], &packet_view->screen_bias);
 }

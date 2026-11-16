@@ -6,17 +6,17 @@
 
 typedef int InitQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0xB0]; float scale; } PathView;
-extern PathView D_L00_001BD2C0;
-extern u8 *D_L00_001FDA80[];
+extern PathView g_hud_float_params;
+extern u8 *g_launch_path_table[];
 typedef struct { u8 pad[0x194]; InitQuad *transform; } PathCamera;
-extern PathCamera D_L00_001B8C80;
+extern PathCamera g_scalar_transition_state;
 extern float mat_fast_helper_a(float x, float y);
 extern void vec_clear_128(InitQuad *v);
 extern int hero_l00_set_action(int event, int value);
 extern float fast_vec_dist(char *a, char *b);
 extern float IntToFloat(int);
 #define SDA_OBJ __attribute__((section(".sdata")))
-extern char *D_L00_001B1844 SDA_OBJ;
+extern char *g_camera_def_table SDA_OBJ;
 
 typedef struct {
     u8 unknown00[0x20];
@@ -46,7 +46,7 @@ typedef struct {
 
 void func_PAL_L00_0042E68C(u8 *object)
 {
-    PathConfig *data = *(PathConfig **)(D_L00_001B1844 + *(short *)(object + 0x84) * 32 + 0x1c);
+    PathConfig *data = *(PathConfig **)(g_camera_def_table + *(short *)(object + 0x84) * 32 + 0x1c);
     MotionPrefix *motion;
     u8 *pathState;
     float *weights = data->weights;
@@ -73,10 +73,10 @@ void func_PAL_L00_0042E68C(u8 *object)
     }
     accepted = 0;
     position = object + 0x30;
-    *(float *)(pathState + 0x30) = mat_fast_helper_a(1.0f, D_L00_001BD2C0.scale) * 2.0f;
+    *(float *)(pathState + 0x30) = mat_fast_helper_a(1.0f, g_hud_float_params.scale) * 2.0f;
     if (data->initialized == 0 && data->pathIndex >= 0) {
         int i;
-        u8 *path = D_L00_001FDA80[data->pathIndex];
+        u8 *path = g_launch_path_table[data->pathIndex];
         for (i = 0; i < *(int *)path; i++) {
             float weight = *(float *)(path + (i << 4) + 0x1C);
             if (weight > 0.0f) {
@@ -96,7 +96,7 @@ void func_PAL_L00_0042E68C(u8 *object)
         data->speed = (motion->distance / IntToFloat(((s32)data->duration * 5 + 2) / 6)) * 60.0f;
     if (data->secondPathIndex >= 0) {
         int i;
-        u8 *path = D_L00_001FDA80[data->secondPathIndex];
+        u8 *path = g_launch_path_table[data->secondPathIndex];
         for (i = 0; i < *(int *)path; i++) {
             int byteOffset = i * 16;
             distance = fast_vec_dist((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
@@ -115,7 +115,7 @@ void func_PAL_L00_0042E68C(u8 *object)
     *(float *)(saved + 0x24) = 0.2f;
     vec_clear_128((InitQuad *)(saved + 0x30));
     }
-    transform = D_L00_001B8C80.transform;
+    transform = g_scalar_transition_state.transform;
     qcopy(position, transform + 3);
     qcopy(object, transform);
     qcopy(object + 0x10, transform + 1);

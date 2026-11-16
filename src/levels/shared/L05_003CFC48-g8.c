@@ -1,8 +1,8 @@
 #include "common.h"
 
 typedef struct { char pad[16]; int limit,value; char tail[16]; } RewardSlot;
-extern RewardSlot D_L05_002A1800[];
-extern int D_L05_00221D10[];
+extern RewardSlot g_spawn_entry_table[];
+extern int g_feltzin_challenge_state[];
 extern int table_find_last_used_entry(int);
 extern char *pickup_spawn_homing(char *);
 extern char *pickup_spawn_homing_variant(char *);
@@ -11,13 +11,13 @@ extern char *pickup_spawn_homing_variant(char *);
 void func_L05_003CFC48(char *object)
 {
     int slot=table_find_last_used_entry(1);
-    if(slot<0 || D_L05_002A1800[slot].value==D_L05_002A1800[slot].limit) {
+    if(slot<0 || g_spawn_entry_table[slot].value==g_spawn_entry_table[slot].limit) {
         pickup_spawn_homing(object);
-        D_L05_00221D10[23]++;
-        D_L05_00221D10[28]++;
+        g_feltzin_challenge_state[23]++;
+        g_feltzin_challenge_state[28]++;
     } else {
         pickup_spawn_homing_variant(object);
-        D_L05_00221D10[25]++;
-        D_L05_00221D10[28]++;
+        g_feltzin_challenge_state[25]++;
+        g_feltzin_challenge_state[28]++;
     }
 }

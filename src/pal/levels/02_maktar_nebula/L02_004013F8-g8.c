@@ -11,12 +11,12 @@ typedef struct {
 } L02_003F5710_Hero;
 extern L02_003F5710_Hero g_hero_state;
 typedef int s32;
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern s32 moby_is_state_six(char *);
 extern s32 moby_is_state_one_cleared_vars(char *);
 extern s32 math_random_int_below(s32);
-extern unsigned char D_001395B8[0x100];
-extern int D_001A7A08[2];
+extern unsigned char g_game_flag_table[0x100];
+extern int g_challenge_score_words[2];
 extern int g_player_bolts;
 extern int arena_get_challenge_save_index(int);
 extern int arena_start_announcer_message(char *, int);
@@ -33,13 +33,13 @@ extern int MemcardSave(int, int);
    -frac2-gcse-unsplit-edges and -frac2-keep-block-order (config/cflags.txt): the high half of
    D_001395B8 is computed in the entry block, and the switch keeps its `b default` with the
    default body last, as in retail. `+= 1` keeps the counter's address out of the call. */
-void func_PAL_L02_004013F8(char *a0, int a1) {
+void scene_start_count_views_pal(char *a0, int a1) {
     char *state = *(char **)(a0 + 0x68);
     int saved;
     char *hero;
     int v;
 
-    if (a1 == 0 && D_001395B8[arena_get_challenge_save_index(0)] == 0) {
+    if (a1 == 0 && g_game_flag_table[arena_get_challenge_save_index(0)] == 0) {
         hero = (char *)&g_hero_state;
         saved = *(int *)(hero + 0x22C8);
         arena_start_announcer_message(a0, 7);
@@ -58,12 +58,12 @@ void func_PAL_L02_004013F8(char *a0, int a1) {
             arena_start_announcer_message(a0, math_random_int_below(5) + 2);
             break;
         }
-        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(a1);
+        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(a1);
         v = moby_compute_scaled_entry_value(a1);
         *(int *)(state + 0x110) = v;
         g_player_bolts = g_player_bolts + v;
         module_l00_call_handler_with_arg_4(0x12C);
     }
-    D_001395B8[arena_get_challenge_save_index(a1)] += 1;
+    g_game_flag_table[arena_get_challenge_save_index(a1)] += 1;
     MemcardSave(0, -1);
 }

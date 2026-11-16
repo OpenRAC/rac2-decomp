@@ -2,29 +2,29 @@
 
 #include "common.h"
 extern void moby_mark_spawned(void *a0);
-extern u32 D_L01_001BF918[];
+extern u32 g_hit_l01_result[];
 extern u32 g_pHeroMoby[];
 extern s32 func_3120A8(void *a0, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5,
                       u32 a6, f32 f12, f32 f13);
 extern s32 func_355780(u32 a0, u32 a1, void *a2);
 extern void moby_set_state(void *a0, s32 a1, s32 a2);
 extern u8 *D_L01_001B255C_sda[] __attribute__((sda));
-extern u8 *D_L01_001FE180[];
+extern u8 *g_path_l01_table[];
 extern u8 *g_moby_l01_table __attribute__((sda));
-extern u32 D_L01_001FFE80[];
-extern u8 D_001A7B1C __attribute__((sda));
+extern u32 g_level_l01_word_table[];
+extern u8 g_swamp_cutscene_flag __attribute__((sda));
 extern u8 g_subtitle_history[];
-extern u8 D_L01_001BF6C0[];
-extern u8 *D_L01_001B264C __attribute__((sda));
-extern u32 D_001A7390 __attribute__((sda));
+extern u8 g_cutscene_vars[];
+extern u8 *g_swamp_patrol_positions __attribute__((sda));
+extern u32 g_frame_counter __attribute__((sda));
 extern void func_PAL_002A7E68(void *a0, s32 a1, s32 a2, s32 a3);
 extern s32 math_closest_point_on_polygon_edge(void *a0, void *a1, void *a2, s32 a3);
 extern s32 FloatToInt(f32 a0);
-extern s32 D_L01_001B2578[] __attribute__((sda));
-extern u16 *D_L01_001FB020[];
+extern s32 g_swamp_monster_thresholds[] __attribute__((sda));
+extern u16 *g_group_list_table[];
 extern u8 g_hero_position[];
 extern void *part_find_owned_effect_slot(void *, s32, s32);
-extern f32 func_PAL_002AA108(void *, void *);
+extern f32 moby_update_aim_target_strength_pal(void *, void *);
 extern u8 *moby_get_private_value_0(u8 *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
@@ -59,14 +59,14 @@ void func_PAL_L01_003D1FD0(u8 *a0)
         s0 = ent;
         if (*(short *)(state + 0x26) >= 1)
             s0 = 0;
-        f20 = func_PAL_002AA108(a0, s0);
+        f20 = moby_update_aim_target_strength_pal(a0, s0);
         if (s0 != 0 && 0.0f < f20) {
             if (a0[0x21] != 0xFF && *(s32 *)(state + 0xA0) != -1) {
                 cls = *(u16 *)(*(u8 **)(s0 + 0x20) + 0xAA);
                 s4 = (cls == 0xCE4 || cls == 0xCE5) ? 50 : 0;
-                for (p = D_L01_001FB020[a0[0x21]];
-                     a0[0x21] != 0xFF && a0[0x21] <= D_L01_001B2578[0] && p != 0 &&
-                     ((p != 0 && (short)p[-1] >= 0) || p == D_L01_001FB020[a0[0x21]]);
+                for (p = g_group_list_table[a0[0x21]];
+                     a0[0x21] != 0xFF && a0[0x21] <= g_swamp_monster_thresholds[0] && p != 0 &&
+                     ((p != 0 && (short)p[-1] >= 0) || p == g_group_list_table[a0[0x21]]);
                      p++) {
                     e = D_L01_001B255C_sda[0] + ((*p & 0x7FFF) << 8);
                     if (e == 0)

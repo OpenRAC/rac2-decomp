@@ -6,24 +6,24 @@ typedef union {
     Q q;
     float f[4];
 } Vector;
-extern int D_L20_001A8F00, D_L20_001B2AC8;
-extern int D_L20_001BDCF0[];
+extern int g_hero_vehicle_mode, g_frame_l20_counter;
+extern int g_level_l20_progress_stage[];
 typedef struct {
     char pad[0x80];
     float pos[4];
 } Hero;
 extern Hero g_hero_state;
 extern char g_hero_position[];
-extern float D_L20_001B1FE0 __attribute__((sda));
-extern float D_L20_001B1FE4 __attribute__((sda));
-extern float D_L20_001B1FE8 __attribute__((sda));
-extern float D_L20_001B1FF0 __attribute__((sda));
-extern float D_L20_001B1FF8 __attribute__((sda));
-extern float D_L20_001B1FFC __attribute__((sda));
-extern float D_L20_001B2000 __attribute__((sda));
-extern float D_L20_001B2004 __attribute__((sda));
-extern float D_L20_001B1FF4;
-extern Vector D_L20_001B2010 SDATA(D_L20_001B2010);
+extern float g_yeedil_small_speed_a __attribute__((sda));
+extern float g_yeedil_small_speed_b __attribute__((sda));
+extern float g_yeedil_small_accel_a __attribute__((sda));
+extern float g_yeedil_small_near_distance __attribute__((sda));
+extern float g_yeedil_small_leave_distance __attribute__((sda));
+extern float g_yeedil_small_blend_frames __attribute__((sda));
+extern float g_yeedil_small_speed_c __attribute__((sda));
+extern float g_yeedil_small_accel_b __attribute__((sda));
+extern float g_yeedil_small_far_distance;
+extern Vector g_yeedil_small_local_vec SDATA(D_L20_001B2010);
 extern void func_US2_L20_00441208(char *), moby_mark_spawned(char *);
 extern int flag_set_second_pending(char *), math_random_int_below(int), moby_dispatch_action_by_kind(char *, void *);
 extern void func_US2_002A7AA8(char *, int, int), part_queue_moby_for_glow(char *, int, void (*)(char *));
@@ -37,7 +37,7 @@ extern float moby_get_anim_value(char *);
 extern int moby_l01_turn_toward_target(char *, void *);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(char *, float);
-extern int func_US2_002AF9C8(char *, float);
+extern int math_is_value_within_step_us2(char *, float);
 extern void matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern int coll_sweep_from_object(void *, void *, int, int, float, float, float, int, int);
 extern void euler_rotation_basis(void *, void *);
@@ -48,7 +48,7 @@ extern f32 ApproachValue(void *, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void moby_advance_frame_counter(char *);
 
-void func_US2_L20_00440B08(char *obj) {
+void yeedil_small_enemy_update_us2(char *obj) {
     Vector v;
     Q matrix[3];
     float length;
@@ -56,8 +56,8 @@ void func_US2_L20_00440B08(char *obj) {
     int hit;
 
     func_US2_L20_00441208(obj);
-    if (D_L20_001A8F00 == 2) {
-        if (D_L20_001BDCF0[0] >= 5) moby_mark_spawned(obj);
+    if (g_hero_vehicle_mode == 2) {
+        if (g_level_l20_progress_stage[0] >= 5) moby_mark_spawned(obj);
         return;
     }
     switch (*(u8 *)(obj + 0x95)) {
@@ -80,18 +80,18 @@ void func_US2_L20_00440B08(char *obj) {
         float distance;
         if (flag_set_first_pending(obj)) {
             if (*(u8 *)(obj + 0x43) != 2) anim_start_blended(obj, 2, 0, 20);
-            *(float *)(st + 0x78) = D_L20_001B1FE0 * 0.0166666675f;
+            *(float *)(st + 0x78) = g_yeedil_small_speed_a * 0.0166666675f;
             *(float *)(st + 0x288) = 1.0471977f;
         }
         distance = vec_distance_xy(obj + 0x10, g_hero_position);
-        if (distance < D_L20_001B1FF0) *(float *)(st + 0x288) = 2.0943954f;
-        else if (D_L20_001B1FF4 < distance) *(float *)(st + 0x288) = 1.0471977f;
+        if (distance < g_yeedil_small_near_distance) *(float *)(st + 0x288) = 2.0943954f;
+        else if (g_yeedil_small_far_distance < distance) *(float *)(st + 0x288) = 1.0471977f;
         if (*(int *)(st + 0xD0) == 60) {
             *(int *)(st + 0xD0) = 0;
             *(int *)(st + 0x284) = (*(int *)(st + 0x284) + 1) & 1;
         }
         moby_turn_toward_target_and_step(obj, g_hero_position, *(int *)(st + 0x284) ? *(float *)(st + 0x288) : - *(float *)(st + 0x288));
-        if ((D_L20_001B2AC8 & 15) == (((int)obj >> 8) & 15) && yeedil_small_enemy_can_attack(obj)) {
+        if ((g_frame_l20_counter & 15) == (((int)obj >> 8) & 15) && yeedil_small_enemy_can_attack(obj)) {
             *(int *)(st + 0x280) = 1;
             moby_set_state(obj, 3, -1);
         }
@@ -100,20 +100,20 @@ void func_US2_L20_00440B08(char *obj) {
     case 3:
         if (flag_set_first_pending(obj)) {
             if (*(u8 *)(obj + 0x43) != 2) anim_start_blended(obj, 2, 0, 10);
-            *(float *)(st + 0x78) = D_L20_001B1FE4 * 0.0166666675f;
+            *(float *)(st + 0x78) = g_yeedil_small_speed_b * 0.0166666675f;
         }
         moby_turn_toward_target_and_step(obj, g_hero_position, 0.0f);
-        if (*(float *)(st + 0x11C) < D_L20_001B1FF8) moby_set_state(obj, 4, -1);
+        if (*(float *)(st + 0x11C) < g_yeedil_small_leave_distance) moby_set_state(obj, 4, -1);
         break;
     case 4: {
         float distance;
         if (flag_set_first_pending(obj)) {
-            if (*(u8 *)(obj + 0x43) != 4) anim_start_blended(obj, 4, (int)D_L20_001B1FFC, 10);
+            if (*(u8 *)(obj + 0x43) != 4) anim_start_blended(obj, 4, (int)g_yeedil_small_blend_frames, 10);
         }
         distance = moby_get_anim_value(obj);
         if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && distance >= 9.0f && distance <= 17.0f) {
-            float accel = D_L20_001B2004 * 0.00027777778f;
-            float speed = D_L20_001B2000 * 0.0166666675f;
+            float accel = g_yeedil_small_accel_b * 0.00027777778f;
+            float speed = g_yeedil_small_speed_c * 0.0166666675f;
             *(float *)(st + 0x74) = accel;
             *(float *)(st + 0x78) = speed;
             *(float *)(st + 0x70) = accel;
@@ -124,18 +124,18 @@ void func_US2_L20_00440B08(char *obj) {
                 g_hero_state.pos[1] - *(float *)(obj + 0x14)));
         }
         {
-            float accel = D_L20_001B1FE8 * 0.00027777778f;
-            float speed = D_L20_001B1FE4 * 0.0166666675f;
+            float accel = g_yeedil_small_accel_a * 0.00027777778f;
+            float speed = g_yeedil_small_speed_b * 0.0166666675f;
             *(float *)(st + 0x74) = accel;
             *(float *)(st + 0x78) = speed;
             *(float *)(st + 0x70) = accel;
         }
-        if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && func_US2_002AF9C8(obj, 14.0f)) {
-            matrix_mul_vec3(&v, &D_L20_001B2010, obj + 0xC0);
+        if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && math_is_value_within_step_us2(obj, 14.0f)) {
+            matrix_mul_vec3(&v, &g_yeedil_small_local_vec, obj + 0xC0);
             FastVecAdd(&v, &v, obj + 0x10);
             coll_sweep_from_object(obj, &v, 0x04000001, 0, 0.333f, 2.0f, 1.0f, 1, 0);
         }
-        if ((*(u8 *)(obj + 0x60) & 2) && vec_distance_xy(obj + 0x10, g_hero_position) > D_L20_001B1FF8) moby_set_state(obj, 3, -1);
+        if ((*(u8 *)(obj + 0x60) & 2) && vec_distance_xy(obj + 0x10, g_hero_position) > g_yeedil_small_leave_distance) moby_set_state(obj, 3, -1);
         break;
     }
     case 7:

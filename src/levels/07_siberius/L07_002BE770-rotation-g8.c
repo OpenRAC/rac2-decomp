@@ -7,10 +7,10 @@ extern void euler_rotation_basis(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void gfx_setup_scale_record(int, int);
 
-extern int D_L07_001C9780 __attribute__((nosda));
-extern unsigned short **D_L07_001A9014;
-extern unsigned char *D_L07_001B295C;
-extern float D_L07_001AEBF8[] SDATA(D_L07_001AEBF8);
+extern int g_cutscene_l07_active_flag __attribute__((nosda));
+extern unsigned short **g_group_l07_id_lists;
+extern unsigned char *g_matrix_l07_record_table;
+extern float g_group_rotation_speeds[] SDATA(D_L07_001AEBF8);
 
 typedef struct {
     int groups[3];
@@ -38,7 +38,7 @@ void UpdateRotatingTransformGroups(unsigned char *moby)
         moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (D_L07_001C9780 != 0)
+        if (g_cutscene_l07_active_flag != 0)
             return;
         for (i = 0; i < 3; i++) {
             if (group_state->groups[i] == -1) {
@@ -46,13 +46,13 @@ void UpdateRotatingTransformGroups(unsigned char *moby)
             }
             /* The transfer helper also preserves the original address recomputation. */
             qzero_nc(rotation);
-            new_angle = FastAddRotations(group_state->angles[i], D_L07_001AEBF8[i] * 0.00029088824f);
+            new_angle = FastAddRotations(group_state->angles[i], g_group_rotation_speeds[i] * 0.00029088824f);
             group_state->angles[i] = new_angle;
             rotation[2] = new_angle;
-            for (matrix_index_ptr = D_L07_001A9014[group_state->groups[i]];
-                 matrix_index_ptr != 0 && ((short)matrix_index_ptr[-1] >= 0 || matrix_index_ptr == D_L07_001A9014[group_state->groups[i]]);
+            for (matrix_index_ptr = g_group_l07_id_lists[group_state->groups[i]];
+                 matrix_index_ptr != 0 && ((short)matrix_index_ptr[-1] >= 0 || matrix_index_ptr == g_group_l07_id_lists[group_state->groups[i]]);
                  matrix_index_ptr++) {
-                matrix_entry = D_L07_001B295C + ((*matrix_index_ptr & 0x7FFF) << 6);
+                matrix_entry = g_matrix_l07_record_table + ((*matrix_index_ptr & 0x7FFF) << 6);
                 if (matrix_entry == 0)
                     break;
                 saved_pos = loc;

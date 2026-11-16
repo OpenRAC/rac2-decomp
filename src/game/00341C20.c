@@ -133,9 +133,9 @@ void list_menu_draw_cursor(char *object)
     extern int math_ping_pong_blend_values(unsigned int, unsigned int, int, int, int);
     extern int *object_get_fourth_field(char *);
     extern void gfx_draw_screen_element_stored(char *);
-    extern int D_00138344;
+    extern int g_menu_input_flags;
     int *slot;
-    if (D_00138344 & 0x5000)
+    if (g_menu_input_flags & 0x5000)
         math_ping_pong_blend_values(0, 0, 1, 0, 1);
     object += 0xE4;
     slot = object_get_fourth_field(object);

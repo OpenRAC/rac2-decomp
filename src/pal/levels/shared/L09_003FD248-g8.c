@@ -2,10 +2,10 @@
 
 /* func_PAL_L09_003FD248, the PAL copy of func_L09_003F8898: the same C, where the spawn counters
    are scaled to 50 Hz. */
-extern int D_L09_001B0F50 __attribute__((sda));
-extern int D_L09_001B0F54 __attribute__((sda));
-extern int D_L09_001B0F58 __attribute__((sda));
-extern int D_L09_001B0F4C __attribute__((sda));
+extern int g_trooper_rearm_threshold __attribute__((sda));
+extern int g_trooper_spawn_delay_min __attribute__((sda));
+extern int g_trooper_spawn_delay_max __attribute__((sda));
+extern int g_trooper_rearm_timer_init __attribute__((sda));
 
 extern int math_random_int_range(int a0, int a1);
 extern int FastDecTimer(char *a0);
@@ -17,12 +17,12 @@ void func_PAL_L09_003FD248(char *object) {
 
     if (*(unsigned char *)(frame + 0x2EA) != 0) {
         *(unsigned char *)(frame + 0x2EA) = 0;
-        if (*(short *)(frame + 0x2E0) < ((s32)(D_L09_001B0F50) * 5 + 2) / 6)
+        if (*(short *)(frame + 0x2E0) < ((s32)(g_trooper_rearm_threshold) * 5 + 2) / 6)
             *(short *)(frame + 0x2E0) =
-                ((s32)(math_random_int_range(D_L09_001B0F54, D_L09_001B0F58)) * 5 + 2) / 6;
+                ((s32)(math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max)) * 5 + 2) / 6;
     }
     if (FastDecTimer(frame + 0x2E0) == 0)
-        *(unsigned short *)(frame + 0x2E8) = ((s32)(D_L09_001B0F4C) * 5 + 2) / 6;
+        *(unsigned short *)(frame + 0x2E8) = ((s32)(g_trooper_rearm_timer_init) * 5 + 2) / 6;
     FastDecTimer(frame + 0x2E2);
     FastDecTimer(frame + 0x2E6);
     FastDecTimer(frame + 0x2E8);

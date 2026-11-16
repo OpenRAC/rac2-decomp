@@ -8,8 +8,8 @@ extern void FastVecSub(void *, void *, void *);
 extern int coll_test_point(void *, float, int, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
-extern float D_001BAFA0[];
-extern float D_001BAFB0[];
+extern float g_coll_hit_position[];
+extern float g_coll_hit_point[];
 extern char g_collision_hit[];
 
 /* Moves an object by a step, pushing it out of walls and down onto the floor, and reports what it touched. */
@@ -36,7 +36,7 @@ int moby_move_and_collide(char *object, float *movement, int flags,
         FastVecAdd(to, scaled, position);
         to[2] += height;
         if (CollLine(from, to, mask, object, 0)) {
-            FastVecSub(position, D_001BAFA0, scaled);
+            FastVecSub(position, g_coll_hit_position, scaled);
             result = 1;
             *(float *)(object + 0x18) -= height;
         }
@@ -49,7 +49,7 @@ int moby_move_and_collide(char *object, float *movement, int flags,
         from[2] += height;
         if (!coll_test_point(from, radius, mask | 4, object))
             break;
-        qcopy(position, D_001BAFB0);
+        qcopy(position, g_coll_hit_point);
         ++retries;
         result |= 1;
         *(float *)(object + 0x18) -= height;

@@ -15,7 +15,7 @@ typedef struct {
     s32 field44;
 } BarlowUtilityQueueView;
 
-extern s32 D_L04_001A8F00 __attribute__((sda));
+extern s32 g_game_l04_mode __attribute__((sda));
 extern s32 req_pop_queue(BarlowUtilityQueueView *, s32 *, s32 *);
 extern s32 request_begin_slot(s32, s32, u32, u32, u8 *);
 extern void level_init_owner_object(BarlowUtilityQueueView *);
@@ -33,7 +33,7 @@ s32 req_launch_queued(BarlowUtilityQueueView *queue) {
         req_pop_queue(queue, &request[0], &request[1]);
         status = 0;
         mode = 1;
-        if ((u32)(D_L04_001A8F00 - 1) < 2) mode = 2;
+        if ((u32)(g_game_l04_mode - 1) < 2) mode = 2;
         queue->field40 = mode;
         if (request[1] == 0)
             status = request_begin_slot(1, mode, 0, request[0], 0);
@@ -57,8 +57,8 @@ typedef struct {
 } BootData001393E0;
 
 extern BootData001393E0 g_memcard_state;
-extern s32 D_001A8B84 __attribute__((sda));
-extern s32 D_001B1680 __attribute__((sda));
+extern s32 g_frontend_done_flag __attribute__((sda));
+extern s32 g_small_data_value __attribute__((sda));
 extern s32 g_save_menu_flags;
 extern s32 D_001B1680_1;
 extern void flag_clear_word(void);
@@ -67,8 +67,8 @@ extern int MemcardSave(s32, s32);
 /* Stores a new value in the small data words and, when asked, resets the related state. */
 void data_set_small_value_and_refresh(int newValue, int refresh)
 {
-    D_001A8B84 = 1;
-    D_001B1680 = newValue;
+    g_frontend_done_flag = 1;
+    g_small_data_value = newValue;
     if (newValue == -1) {
         if (g_memcard_state.field17C != 0) {
             g_memcard_state.field17C = 0;

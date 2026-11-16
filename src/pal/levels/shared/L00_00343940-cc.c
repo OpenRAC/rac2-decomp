@@ -15,7 +15,7 @@ extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
-extern unsigned char *D_L00_001FEAF8;
+extern unsigned char *g_forward_particle_byte;
 extern void vec_clear_128(Quadword *);
 extern void matrix_mul_vec3(void *, const void *, const void *);
 extern void FastVecAdd(void *, const void *, const void *);
@@ -35,7 +35,7 @@ unsigned char *func_PAL_L00_00343940(ParticleOwner *owner, Quadword *position,
         particle[3] = flags;
         particle[1] = 0;
         particle[8] = math_random_int_below(255);
-        particle[2] = *D_L00_001FEAF8;
+        particle[2] = *g_forward_particle_byte;
         *(short *)(particle + 0xA) = (((int)(math_random_int_range(minimum, maximum)) * 5 + 2) / 6);
         *(int *)(motion + 0x18) = *(short *)(particle + 0xA);
         *(float *)(particle + 0xC) = scale * 630000.0f;

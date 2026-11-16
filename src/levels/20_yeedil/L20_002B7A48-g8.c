@@ -15,30 +15,30 @@ typedef signed long long s64;
 typedef float f32;
 
 /* 0x1AEFF0 + 0xF10 : the level word func_L20_002B93E0 reads through $gp. */
-extern s32 D_L20_001AFF00 __attribute__((sda));
+extern s32 g_hero_hazard_flag __attribute__((sda));
 
 /* 0x1AEFF0 - 0x7C60 : the word the retail reads both absolutely and through
    $gp, so it needs two names: the sda one is the $gp form, the plain one the
    absolute form.  A plain extern is the absolute form here: marking it nosda
    makes cc1 keep the address in a register of its own and the load does not
    match the retail any more (see nonmatching/levels/func_L20_002B93E0.c). */
-extern s32 D_001A7390 __attribute__((sda));
+extern s32 g_frame_counter __attribute__((sda));
 extern s32 D_001A7390_1;
 
 /* 0x1AEFF0 - 0x72F8 : the float the retail copies through $gp. */
-extern float D_001A7CF8 __attribute__((sda));
+extern float g_hero_float_param __attribute__((sda));
 
 /* 0x1AEFF0 - 0x7660 : the word the retail reads absolutely (plain extern, see
    the note on D_001A7390_1 above). */
 extern s32 g_current_map_index;
 
 /* 0x140000 - 0x69A2 : the byte the retail reads absolutely. */
-extern u8 D_0013965E __attribute__((nosda));
+extern u8 g_hero_frame_flag __attribute__((nosda));
 
 extern char g_hero_state[];
 extern char g_hero_position[];
 extern char g_subtitle_history[];
-extern float D_002683EC __attribute__((nosda));
+extern float g_hero_frame_time __attribute__((nosda));
 
 /* The calls func_L20_002B93E0 makes. */
 extern void AdvanceHeroAnimation(void);
@@ -88,7 +88,7 @@ void hero_l20_update_frame(void)
         UpdateHeroMotionResponseParameters();
     }
     if (*(u8 *)(base + 0x22B4) == 4) {
-        if (D_L20_001AFF00 == 0) {
+        if (g_hero_hazard_flag == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
@@ -96,11 +96,11 @@ void hero_l20_update_frame(void)
                         hero_l20_set_state(0x91, 1);
                     }
                     if (g_current_map_index == 0x14) {
-                        if (D_0013965E == 0) {
+                        if (g_hero_frame_flag == 0) {
                             blk = g_subtitle_history;
                             if (D_001A7390_1 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
                                 if (subtitle_request_voice_line(0xA15, 0x6C) != 0) {
-                                    now = D_001A7390;
+                                    now = g_frame_counter;
                                     then = *(unsigned int *)(blk + 0x7900);
                                     if (then < now) {
                                         *(unsigned int *)(blk + 0x7900) = now;
@@ -128,7 +128,7 @@ void hero_l20_update_frame(void)
     gfx_fade_screen_effect();
     ApplyHeroAxisScales();
     if (*(u8 *)(base + 0x22B4) == 1) {
-        D_002683EC = D_001A7CF8;
+        g_hero_frame_time = g_hero_float_param;
         UpdateHeroGlowAndExtraManipulators();
         UpdateHeroJointEffect();
         hero_update_held_object();
@@ -146,7 +146,7 @@ void hero_l20_update_frame(void)
 
         coll_clear_map_bits_around_pos(pos);
         g = pos - 0x80;
-        if (*(u8 *)(g + 0x22B4) == 4 && D_L20_001AFF00 == 0 && *(s16 *)(g + 0x1E0) == 0 &&
+        if (*(u8 *)(g + 0x22B4) == 4 && g_hero_hazard_flag == 0 && *(s16 *)(g + 0x1E0) == 0 &&
             *(int *)(g + 0x2294) != 0x6F)
             receiver_bot_start_sequence(*(int *)(g + 0x2290));
     }

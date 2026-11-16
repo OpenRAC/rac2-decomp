@@ -2,14 +2,14 @@
 #include "names.h"
 typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; int fallback; } SelectionCallback;
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
 extern int func_0029C4F0(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
-int func_PAL_002CE8F0(void)
+int menu_handle_input_send_selection_pal(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
     CallbackMenuState *state = &g_pad_state;
@@ -32,8 +32,8 @@ int func_PAL_002CE8F0(void)
         result = 1;
     } else {
         func_0029C4F0(flags);
-        if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3C210);
+        if ((state->flags & 0x40) && g_resident_data_base != 0) {
+            char *data = tab_menu_get_selected_entry(g_resident_data_base + 0x3C210);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
             menu_start_action((int)&message);

@@ -19,16 +19,16 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_ground_effect(void *, int, int, float, float, float, int, int, void *, int);
 extern void *part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
-extern char D_L11_001BA8C0[];
-extern float D_L11_001B1FE0 __attribute__((sda));
-extern float D_L11_001B1FE4 __attribute__((sda));
-extern float D_L11_001B1FE8 __attribute__((sda));
-extern float D_L11_001B1FEC __attribute__((sda));
-extern float D_L11_001B1FF0 __attribute__((sda));
-extern float D_L11_001B1FF4 __attribute__((sda));
-extern float D_L11_001B1FF8 __attribute__((sda));
-extern int D_L11_001B2000 __attribute__((sda));
-extern int D_L11_001B2004 __attribute__((sda));
+extern char g_hero_l11_position[];
+extern float g_smoke_spray_speed_min __attribute__((sda));
+extern float g_smoke_spray_speed_max __attribute__((sda));
+extern float g_smoke_spray_rise_min __attribute__((sda));
+extern float g_smoke_spray_rise_max __attribute__((sda));
+extern float g_ground_effect_param __attribute__((sda));
+extern float g_effect_size_min __attribute__((sda));
+extern float g_effect_size_max __attribute__((sda));
+extern int g_ground_effect_kind_a __attribute__((sda));
+extern int g_ground_effect_kind_b __attribute__((sda));
 
 void func_PAL_L11_0045F298(float *p, int count, int mode)
 {
@@ -37,22 +37,22 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
     char *effect;
     float size, speed, angle, r;
 
-    FastVecSub(axis, D_L11_001BA8C0, p);
+    FastVecSub(axis, g_hero_l11_position, p);
     axis[2] = 0;
     up[0] = 0;
     up[1] = 0;
     up[2] = 1;
     up[3] = 1;
     for (i = 0; i < count; i++) {
-        size = math_random_float_range(D_L11_001B1FF4, D_L11_001B1FF8);
+        size = math_random_float_range(g_effect_size_min, g_effect_size_max);
         sign = math_random_int_below(2);
         if (!sign)
             --sign;
         angle = math_random_float_range(-1.0471977f, 1.0471977f);
         math_apply_axis_rotation_to_quat(vel, axis, up, angle);
-        speed = math_random_float_range(D_L11_001B1FE0, D_L11_001B1FE4) * 0.020000001f;
+        speed = math_random_float_range(g_smoke_spray_speed_min, g_smoke_spray_speed_max) * 0.020000001f;
         vec_scale_to_length((char *)vel, vel, speed);
-        vel[2] = math_random_float_range(D_L11_001B1FE8, D_L11_001B1FEC) * 0.020000001f;
+        vel[2] = math_random_float_range(g_smoke_spray_rise_min, g_smoke_spray_rise_max) * 0.020000001f;
         qcopy(pos, p);
         pos[0] += math_random_signed_float_range(0, 0.15f);
         pos[1] += math_random_signed_float_range(0, 0.15f);
@@ -60,34 +60,34 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
         if (!mode) {
             if (!(func_001163B0() & 1)) {
                 FastVecScale((char *)vel, vel, 1.5f);
-                effect = part_spawn_ground_effect(pos, 50, D_L11_001B2000, size * 0.35f, size, D_L11_001B1FF0 * 1.44f, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_a, size * 0.35f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 50, D_L11_001B2004, size * 0.245f, size * 0.7f, D_L11_001B1FF0 * 1.44f, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_b, size * 0.245f, size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, D_L11_001BA8C0, pos);
+                FastVecSub(a, g_hero_l11_position, pos);
                 vec_scale_to_length((char *)a, a, speed);
                 FastVecAdd(vel, vel, a);
-                effect = part_spawn_ground_effect(pos, 33, D_L11_001B2000, size * 2.05f, size, D_L11_001B1FF0 * 1.44f, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_a, size * 2.05f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 33, D_L11_001B2004, size * 1.4350000619888306f, size * 0.7f, D_L11_001B1FF0 * 1.44f, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_b, size * 1.4350000619888306f, size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             }
         } else {
             if (!(func_001163B0() & 1)) {
                 FastVecScale((char *)vel, vel, 1.5f);
-                effect = part_spawn_ground_effect(pos, 50, D_L11_001B2000, size * 0.3f, size, D_L11_001B1FF0 * 1.44f, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_a, size * 0.3f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 50, D_L11_001B2004, size * (0.3f * 0.7f), size * 0.7f, D_L11_001B1FF0 * 1.44f, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_b, size * (0.3f * 0.7f), size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, D_L11_001BA8C0, pos);
+                FastVecSub(a, g_hero_l11_position, pos);
                 vec_scale_to_length((char *)a, a, speed);
                 FastVecAdd(vel, vel, a);
-                effect = part_spawn_ground_effect(pos, 33, D_L11_001B2000, size * 0.25f, size, D_L11_001B1FF0 * 1.44f, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_a, size * 0.25f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 33, D_L11_001B2004, size * 0.175f, size * 0.7f, D_L11_001B1FF0 * 1.44f, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_b, size * 0.175f, size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             }
         }
         if (effect)
@@ -97,7 +97,7 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
         angle = math_random_float_range(-0.9599312f, -1.3962636f);
         r = math_random_angle();
         vec_build_spherical_offset(a, math_random_float_range(0, 0.5f) * 0.020000001f, r, angle);
-        FastVecSub(b, D_L11_001BA8C0, p);
+        FastVecSub(b, g_hero_l11_position, p);
         vec_scale_to_length((char *)b, b, 0.15f);
         FastVecAdd(p, p, b);
         size = math_random_float_range(30000, 60000);

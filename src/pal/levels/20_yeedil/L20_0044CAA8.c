@@ -24,9 +24,9 @@ extern int moby_is_hit_by_player_or_aim(char *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 typedef struct { char pad[0x74]; unsigned char active; char pad2[0x13]; char *owner; } SoundSlot;
 extern SoundSlot g_sound_state[];
-extern float D_00189EA4;
+extern float g_elevator_reference_height;
 
-void func_PAL_L20_0044CAA8(char *arg0) {
+void elevator_l20_update_pal(char *arg0) {
     Vec4 pos, rot, delta;
     char *state = *(char **)(arg0 + 0x68);
     qcopy(&pos, arg0+0x10);
@@ -47,7 +47,7 @@ void func_PAL_L20_0044CAA8(char *arg0) {
         break;
     case 1:
         if (flag_is_third_pending_set(arg0)) {
-            if (hero_is_current_selected_id(arg0) || (*(float *)(arg0+0x14)-*(float *)(state+0x70))*(D_00189EA4-*(float *)(state+0x70)) < 0.0f) {
+            if (hero_is_current_selected_id(arg0) || (*(float *)(arg0+0x14)-*(float *)(state+0x70))*(g_elevator_reference_height-*(float *)(state+0x70)) < 0.0f) {
                 if (*(int *)(state+0x74)==0) moby_set_state(arg0,2,-1);
                 else moby_set_state(arg0,3,-1);
                 if (!snd_is_voice_playing_for_owner(arg0,*(int *)(state+0x7C))) *(int *)(state+0x7C)=PlayMobySound(0,4,arg0);
@@ -94,7 +94,7 @@ void func_PAL_L20_0044CAA8(char *arg0) {
 
 extern int math_fast_float_d(void *);
 extern void moby_set_flag_bit(char *, int);
-extern void func_PAL_L20_0044D1C8(char *);
+extern void yeedil_destroy_group_protopets_pal(char *);
 
 /* func_PAL_L20_0044CEB0, the PAL copy of func_L20_004473B0: the same C, with the four timers at
    0x74-0x80 scaled to 50 Hz when the object starts (case 0). */
@@ -170,7 +170,7 @@ void func_PAL_L20_0044CEB0(char *arg0) {
     }
     if (flag_is_third_pending_set(arg0) == 0) {
         if (0.0f < *(float *)(state + 0x8C)) {
-            func_PAL_L20_0044D1C8(arg0);
+            yeedil_destroy_group_protopets_pal(arg0);
             *(float *)(state + 0x8C) = -1000.0f;
         }
     }

@@ -13,7 +13,7 @@ extern unsigned char g_item_slot_to_record[];
 extern WeaponDamageClass ref_L00_003AB388_0[];
 extern char *ref_L00_003AB388_1;
 extern char *ref_L00_003AB388_2[];
-extern void *D_L00_001ADB2C MACRO_ADDR;
+extern void *g_active_tether_object MACRO_ADDR;
 extern void QueueMobyImpact(void *,void *);
 extern int weapon_start_health_drain(void *,int,void *);
 extern int coll_process_hit(void *,int,void *,void *,float);
@@ -74,5 +74,5 @@ void seeker_apply_projectile_hit(char *moby, void *direction, void *position)
     func_2EE178(forward, forward, -1.0f);
     PlayMobySound(2, 0, moby);
     SpawnExplosion(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
-                  1, 0, 1, 0, D_L00_001ADB2C);
+                  1, 0, 1, 0, g_active_tether_object);
 }

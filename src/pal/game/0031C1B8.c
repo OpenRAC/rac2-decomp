@@ -8,8 +8,8 @@ extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_random_int_below(int);
-extern int D_001AFAFC SDATA(D_001AFAFC);
-extern void func_PAL_0031E690(void *, int);
+extern int g_turret_random_range SDATA(D_001AFAFC);
+extern void part_spawn_spark_pairs_pal(void *, int);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
@@ -17,7 +17,7 @@ extern void func_PAL_002AC3C0(void *, void *);
 extern int FastDecTimer(void *);
 extern char g_sound_state[];
 
-void func_PAL_0031DAB8(char *object)
+void three_part_turret_update_parts_pal(char *object)
 {
     float axis[4];
     char *state = *(char **)(object + 0x68);
@@ -49,17 +49,17 @@ void func_PAL_0031DAB8(char *object)
         }
         /* Each snapshot is consumed by the immediately following opaque call;
          * no C memory access crosses the non-clobbering transfer. */
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x270) + 0x10);
-            func_PAL_0031E690(axis, 1);
+            part_spawn_spark_pairs_pal(axis, 1);
         }
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x274) + 0x10);
-            func_PAL_0031E690(axis, 1);
+            part_spawn_spark_pairs_pal(axis, 1);
         }
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x278) + 0x10);
-            func_PAL_0031E690(axis, 1);
+            part_spawn_spark_pairs_pal(axis, 1);
         }
         if (!snd_is_voice_playing_for_owner(*(void **)(state + 0x278), *(int *)(state + 0x290)))
             *(int *)(state + 0x290) = PlayMobySound(0, 4, *(void **)(state + 0x278));

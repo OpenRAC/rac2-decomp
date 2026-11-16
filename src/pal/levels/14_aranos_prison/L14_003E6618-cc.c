@@ -6,8 +6,8 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern Collision D_L14_001BF940;
-extern Material D_L14_002686F0[];
+extern Collision g_projectile_l14_collision;
+extern Material g_item_l14_materials[];
 extern float math_random_float_range(float, float);
 extern void FastVecAdd(void *dst, void *a, void *b);
 /* func_L14_00304190 is defined in L14_00304190-zp.c (it clears a stack vector with por, which needs -frac2-zero-ti-por). */
@@ -65,7 +65,7 @@ extern unsigned short *g_group_entity_lists[];
 
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 
 /* The twin of func_L14_003DF200 for the group word at +0x64: the same pass over the entities
    of the owner's group (not the states 0xFE and 0xFD, not the class 0xA59, accepted by
@@ -119,7 +119,7 @@ extern unsigned short *g_group_entity_lists[];
 
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 
 /* For every entity of the owner's group (state word 0x68), other than the two states 0xFE and
    0xFD, that func_L14_003C9548 accepts: takes its offset from the owner in the owner's frame;

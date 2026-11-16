@@ -1,7 +1,7 @@
 #include "common.h"
 
 typedef int GornQuad __attribute__((mode(TI)));
-extern char *D_L15_001FE480[];
+extern char *g_path_l15_table[];
 extern char *moby_get_motion_data(unsigned char *);
 extern int math_fast_float_d(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -13,7 +13,7 @@ extern int FloatToInt(float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecCross(void *, void *, void *);
 extern int PlayMobySound(int, int, void *);
-extern char *D_L15_001B261C __attribute__((sda));
+extern char *g_moby_base __attribute__((sda));
 typedef struct GornOwner {
     char pad00[0x11C];
     int flag11C;
@@ -21,9 +21,9 @@ typedef struct GornOwner {
     char pad124[0xC];
     int timer;
 } GornOwner;
-extern char D_L15_002B6CF0[];
-extern char *D_L15_001BFC18[];
-extern int D_L15_001B17B0[] SDATA(D_L15_001B17B0);
+extern char g_ship_route_points[];
+extern char *g_line_hit_result[];
+extern int g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
 extern u8 g_sound_state[];
 extern char *SpawnFreeLevelObjectById(int, int);
 extern int moby_process_collision_hit(void *, int, int, int);
@@ -54,11 +54,11 @@ void gorn_ship_update_flight(char *object, int flag) {
     up[2] = 1.0f;
     owner = (GornOwner *)moby_get_motion_data((unsigned char *)object);
     owner->flag11C = 1;
-    owner->target = D_L15_001B261C + (*(int *)(vars + 0x260) << 8);
+    owner->target = g_moby_base + (*(int *)(vars + 0x260) << 8);
     if (math_fast_float_d(vars + 0x444)) {
         *(int *)(vars + 0x444) = 300;
         for (i = *(int *)(vars + 0x440) * 3; i < *(int *)(vars + 0x440) * 3 + 3; i++) {
-            qcopy_nc(point, D_L15_002B6CF0 + i * 16);
+            qcopy_nc(point, g_ship_route_points + i * 16);
             matrix_mul_vec3(point, point, object + 0xC0);
             FastVecAdd(point, point, object + 0x10);
             shot = SpawnFreeLevelObjectById(0x957 /* moby class 2391 */, 1);
@@ -79,13 +79,13 @@ void gorn_ship_update_flight(char *object, int flag) {
     }
     if (*(int *)(vars + 0x264)) {
         for (j = 0; j < 6; j++) {
-            qcopy_nc(point, D_L15_002B6CF0 + j * 16);
+            qcopy_nc(point, g_ship_route_points + j * 16);
             matrix_mul_vec3(point, point, object + 0xC0);
             FastVecAdd(point, point, object + 0x10);
         }
     }
     gorn_ship_aim_parts(object);
-    route = D_L15_001FE480[*(int *)(vars + 0x448)];
+    route = g_path_l15_table[*(int *)(vars + 0x448)];
     if (follower_has_reached_target(object)) {
         route_index = *(int *)(vars + 0x44C);
         *(int *)(vars + 0x44C) = route_index + 1;
@@ -99,7 +99,7 @@ void gorn_ship_update_flight(char *object, int flag) {
     point[3] = *(float *)(object + 0xC) * 0.0009765599970705807f;
     if (math_fast_helper_a(point, 100.0f) != -1 &&
         CollLine(object + 0x10, owner->target + 0x10, 0, object, 0) &&
-        D_L15_001BFC18[0] && *(short *)(D_L15_001BFC18[0] + 0xAA) == *(short *)(owner->target + 0xAA))
+        g_line_hit_result[0] && *(short *)(g_line_hit_result[0] + 0xAA) == *(short *)(owner->target + 0xAA))
         gorn_path_mover_fire_shots(object);
     if (math_fast_helper_a(point, 192.0f) != -1 && (unsigned char)object[0x20] != 2)
         part_l15_spawn_exhaust(object);
@@ -127,7 +127,7 @@ void gorn_ship_update_flight(char *object, int flag) {
             parts_left = FloatToInt(*(float *)(vars + 0x180) * 0.02f);
             if (parts_left < 7 && parts_left != *(int *)(vars + 0x26C)) {
                 part_spawn_shockwave_burst(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-parts_left], matrix);
+                moby_transform_joint_to_world(object, g_gorn_ship_part_joints[7-parts_left], matrix);
                 part_spawn_shockwave_burst(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 SpawnLinkedPart(object, parts_left-1);
             }
@@ -147,7 +147,7 @@ void gorn_ship_update_flight(char *object, int flag) {
             parts_left = FloatToInt(*(float *)(vars + 0x180) * 0.08f);
             if (parts_left < 7 && parts_left != *(int *)(vars + 0x26C)) {
                 part_spawn_shockwave_burst(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-parts_left], matrix);
+                moby_transform_joint_to_world(object, g_gorn_ship_part_joints[7-parts_left], matrix);
                 part_spawn_shockwave_burst(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 SpawnLinkedPart(object, parts_left-1);
             }

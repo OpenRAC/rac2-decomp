@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern float math_random_float_range(float, float);
-extern u8 D_L19_001A8F20[] MACRO_ADDR;
+extern u8 g_particle_effect_template[] MACRO_ADDR;
 extern void moby_pick_random_point_around(void *, void *);
 extern int math_random_int_range(int, int);
 extern int FastTweenColor(int, int, float);
@@ -18,7 +18,7 @@ void part_spawn_dust_puffs(char *moby)
 
     while (*(float *)(vars + 0x24) > 1.0f) {
         *(float *)(vars + 0x24) -= 1.0f;
-        qcopy(vel, D_L19_001A8F20);
+        qcopy(vel, g_particle_effect_template);
         moby_pick_random_point_around(moby, pos);
         if (*(u8 *)(moby + 0x20) == 3 && math_random_int_range(0, 1))
             pos[2] = *(float *)(vars + 4);

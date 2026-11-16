@@ -176,7 +176,7 @@ int hero_classify_input_direction(void)
 /* func_L00_002C40C0 is built in its dedicated G8 unit, L00_002C2DE8-select-g8.c. */
 
 
-extern unsigned char D_0018C0D4[];
+extern unsigned char g_screen_mode_flag[];
 
 extern s32 hero_l00_set_action(int a0, int a1);
 
@@ -185,7 +185,7 @@ void hero_start_loader_state(int useAlternate)
 {
     int variant = (useAlternate != 0) ? 2 : 1;
 
-    switch (D_0018C0D4[0]) {
+    switch (g_screen_mode_flag[0]) {
     case 0:
         hero_l00_set_action(0, variant);
         break;
@@ -281,7 +281,7 @@ extern int hero_get_step_offset_from_direction(void);
 
 extern int pad_presses_within_frames(int, int, int, int);
 
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 
 /* Looks the object up in the shared table and stops when the lookup fails; otherwise the state
  * machine's offset advances the object and a second lookup asks for a transition when it
@@ -296,7 +296,7 @@ int hero_try_start_move_from_buffer(int slot, int allowFallback)
     if (PadPressedWithin(0x40, slot, &lookupIndex) == 0)
         return 0;
     offset = hero_get_step_offset_from_direction();
-    if ((D_00138320[0] & 8) && offset > 0) {
+    if ((g_pad_pressed_flags[0] & 8) && offset > 0) {
         if (pad_presses_within_frames(0x40, 0x1F000, slot + offset, offset) != 0) {
             hero_l00_set_action(0xB, 1);
             return 1;

@@ -2,13 +2,13 @@
 
 typedef struct { float x, y, z, w; } RingVertex;
 typedef struct { RingVertex vertex[4]; unsigned int color[4]; float uv[4][2]; unsigned long long state[4]; } RingPacket __attribute__((aligned(16)));
-extern int D_L13_001B16E8[4] __attribute__((sda));
-extern int D_L13_001B16F8 __attribute__((sda));
-extern unsigned int D_L13_001B16FC __attribute__((sda));
-extern float D_L13_001B1700[4][2] __attribute__((sda));
-extern float D_L13_001B1704[] __attribute__((sda));
-extern float D_L13_001B1720 __attribute__((sda));
-extern unsigned char D_0018C0D5[];
+extern int g_ring_tex_flags_table[4] __attribute__((sda));
+extern int g_ring_texture __attribute__((sda));
+extern unsigned int g_ring_l13_vertex_color __attribute__((sda));
+extern float g_ring_uv_table[4][2] __attribute__((sda));
+extern float g_ring_l13_uv_v_table[] __attribute__((sda));
+extern float g_ring_vertex_z __attribute__((sda));
+extern unsigned char g_grab_flag[];
 extern void copy_matrix_rotation(void *, void *);
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern float math_fast_sin_or_cos_a(float);
@@ -32,20 +32,20 @@ void DrawMobyRadiusRing(void *opaque) {
     RingVertex *vertex;
     copy_matrix_rotation(matrix, object + 0xC0);
     qcopy(matrix + 12, object + 0x10);
-    packet.state[1] = GetEffectTextureDescriptor(D_L13_001B16F8);
+    packet.state[1] = GetEffectTextureDescriptor(g_ring_texture);
     {
-        long long state = D_L13_001B16E8[0];
-        state |= (long long)D_L13_001B16E8[1] << 2;
-        state |= (long long)D_L13_001B16E8[2] << 4;
-        state |= (long long)D_L13_001B16E8[3] << 6;
+        long long state = g_ring_tex_flags_table[0];
+        state |= (long long)g_ring_tex_flags_table[1] << 2;
+        state |= (long long)g_ring_tex_flags_table[2] << 4;
+        state |= (long long)g_ring_tex_flags_table[3] << 6;
         packet.state[3] = state | 0x8000000000ULL;
     }
     packet.state[2] = 0xFF9000000260ULL;
     packet.state[0] = 0;
     for (uvIndex = 0; uvIndex < 4; uvIndex++) {
-        packet.uv[uvIndex][0] = D_L13_001B1700[uvIndex][0];
-        packet.uv[uvIndex][1] = D_L13_001B1704[uvIndex * 2];
-        packet.color[uvIndex] = D_L13_001B16FC;
+        packet.uv[uvIndex][0] = g_ring_uv_table[uvIndex][0];
+        packet.uv[uvIndex][1] = g_ring_l13_uv_v_table[uvIndex * 2];
+        packet.color[uvIndex] = g_ring_l13_vertex_color;
     }
     thickness = 0.1f;
     {
@@ -59,8 +59,8 @@ void DrawMobyRadiusRing(void *opaque) {
             if (fade > maximum) fade = maximum;
             else if (fade < 0.0f) fade = 0.0f;
             thickness = fade + 0.1f;
-            if (radius < 0.65f) D_0018C0D5[0] = 1;
-            else D_0018C0D5[0] = 0;
+            if (radius < 0.65f) g_grab_flag[0] = 1;
+            else g_grab_flag[0] = 0;
         }
     }
     for (i = 0; i < 32; i = next) {
@@ -72,7 +72,7 @@ void DrawMobyRadiusRing(void *opaque) {
             vertex->x = math_fast_sin_or_cos_a(angle) * *(float *)(private + 0x34);
             vertex->y = math_fast_sin_or_cos_b(angle) * *(float *)(private + 0x34);
             vertex->z = 0.0f;
-            vertex->z = (j & 1) ? D_L13_001B1720 + thickness : D_L13_001B1720 - thickness;
+            vertex->z = (j & 1) ? g_ring_vertex_z + thickness : g_ring_vertex_z - thickness;
             vertex->w = 1.0f;
         }
         draw_world_quad(&packet, matrix, 0);

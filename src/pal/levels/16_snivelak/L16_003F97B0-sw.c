@@ -17,7 +17,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 typedef struct { char *child; float velocity; } ChildMotion;
 
-void func_PAL_L16_003F97B0(char *object)
+void swinging_l16_arm_update_pal(char *object)
 {
     ChildMotion *vars = *(ChildMotion **)(object + 0x68);
     union { Quadword q; float f[4]; } offset;

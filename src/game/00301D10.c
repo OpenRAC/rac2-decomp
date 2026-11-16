@@ -8,9 +8,9 @@ typedef float f32;
 
 extern s32 g_player_bolts;
 extern s32 g_current_map_index __attribute__((sda));
-extern s32 D_001A8C70;
-extern u32 D_001B1B60 __attribute__((sda));
-extern s32 D_0018D208[];
+extern s32 g_bolt_pickup_enabled;
+extern u32 g_moby_pool_end __attribute__((sda));
+extern s32 g_level_bolt_scores[];
 
 extern void level_forward_value(s32);
 extern void vec_random_direction(f32 *, f32, f32);
@@ -57,8 +57,8 @@ void CollectBolts(u8 *obj) {
         break;
     }
     g_player_bolts = g_player_bolts + score;
-    if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (D_001A8C70 != 0 && (u32)obj < D_001B1B60))
-        D_0018D208[g_current_map_index] += score;
+    if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (g_bolt_pickup_enabled != 0 && (u32)obj < g_moby_pool_end))
+        g_level_bolt_scores[g_current_map_index] += score;
     level_forward_value(0xB4);
     vec_random_direction(sparkDir, 0.011666666716337204f, 0.016666668f);
     FastVecScale(sparkPos, sparkDir, 10.0f);

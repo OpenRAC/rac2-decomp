@@ -42,7 +42,7 @@ extern float math_spring_float_to_goal(float *, float, float *, float, float, fl
  * difference below the step from +0xF0 plus 0.01) it snaps there instead when easing is
  * off (+0x287 clear) or the anchor at +0x240 is more than half of +0x264 away; with the
  * lock held or the goal passed, the easing rate at +0x344 is cleared. */
-void func_PAL_L00_002B5178(void)
+void EaseHeroPositionToGoal_pal(void)
 {
     Hero5250 *hero = &g_hero_state;
     float d;

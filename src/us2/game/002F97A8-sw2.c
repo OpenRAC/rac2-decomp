@@ -14,10 +14,10 @@ extern PurchaseItem g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern int g_item_ammo_counts[];
 extern int g_player_bolts __attribute__((sda));
-extern int D_001B2248 __attribute__((sda));
-extern int D_001B223C __attribute__((sda));
-extern int D_001B2240 __attribute__((sda));
-extern int D_001B2244 __attribute__((sda));
+extern int g_shop_max_purchase_count __attribute__((sda));
+extern int g_shop_left_hold_timer __attribute__((sda));
+extern int g_shop_right_hold_timer __attribute__((sda));
+extern int g_shop_prev_buttons __attribute__((sda));
 typedef struct { char pad[0x1C4]; int buttons; } PurchaseInput;
 extern volatile PurchaseInput g_pad_state;
 extern int GetSelectedShopItemPrice(void);
@@ -39,21 +39,21 @@ extern void func_US2_002FC008(void);
 #define BUTTONS (D_00138180.buttons)
 extern int ref_US2_002F97A8_00(int, int);
 
-void func_US2_002F97A8(int *cancel, int *confirm)
+void VendorPurchaseDialogUpdate_us2(int *cancel, int *confirm)
 {
     PurchaseItem result;
     int item, special, used;
     if (g_vendor_menu_state.state == 1) {
         {
             PurchaseItem *record = &ITEM;
-            if (record->price) D_001B2248 = g_player_bolts / record->price;
-            else D_001B2248 = 0;
+            if (record->price) g_shop_max_purchase_count = g_player_bolts / record->price;
+            else g_shop_max_purchase_count = 0;
         }
         {
             int *ammo = &g_item_ammo_counts[ROW.item];
             PurchaseItem *record = &ITEM;
             int room = record->capacity - *ammo;
-            if (D_001B2248 > room) D_001B2248 = room;
+            if (g_shop_max_purchase_count > room) g_shop_max_purchase_count = room;
         }
         *cancel = 0;
         *confirm = 0;
@@ -69,31 +69,31 @@ void func_US2_002F97A8(int *cancel, int *confirm)
         g_vendor_menu_state.state = 2;
     } else if (g_vendor_menu_state.state == 2) {
         if (*confirm == 1) {
-            if ((BUTTONS & 0x8000) || (D_001B223C >= 16 && !(D_001B223C & 7)) || D_001B223C >= 48) {
-                if (D_001B2248 >= 2) {
-                    --D_001B2248;
-                    if (!(D_001B223C & 3) || D_001B223C < 16)
+            if ((BUTTONS & 0x8000) || (g_shop_left_hold_timer >= 16 && !(g_shop_left_hold_timer & 7)) || g_shop_left_hold_timer >= 48) {
+                if (g_shop_max_purchase_count >= 2) {
+                    --g_shop_max_purchase_count;
+                    if (!(g_shop_left_hold_timer & 3) || g_shop_left_hold_timer < 16)
                         PlayMobySound(1, 17, g_vendor_menu_state.moby);
                 }
             }
-            if ((BUTTONS & 0x2000) || (D_001B2240 >= 16 && !(D_001B2240 & 7)) || D_001B2240 >= 48) {
+            if ((BUTTONS & 0x2000) || (g_shop_right_hold_timer >= 16 && !(g_shop_right_hold_timer & 7)) || g_shop_right_hold_timer >= 48) {
                 PurchaseItem *record = &ITEM;
                 if (record->price) {
                     int max = g_player_bolts / record->price;
                     int left = record->capacity - g_item_ammo_counts[ROW.item];
                     if (left < max) max = left;
-                    if (D_001B2248 < max) {
-                        ++D_001B2248;
-                        if (!(D_001B2240 & 3) || D_001B2240 < 16)
+                    if (g_shop_max_purchase_count < max) {
+                        ++g_shop_max_purchase_count;
+                        if (!(g_shop_right_hold_timer & 3) || g_shop_right_hold_timer < 16)
                             PlayMobySound(1, 17, g_vendor_menu_state.moby);
                     }
                 }
             }
         }
-        if ((BUTTONS & 16) && !(D_001B2244 & 16)) {
+        if ((BUTTONS & 16) && !(g_shop_prev_buttons & 16)) {
             *cancel = 0;
             g_vendor_menu_state.state = 4;
-        } else if ((BUTTONS & 64) && !(D_001B2244 & 64)) {
+        } else if ((BUTTONS & 64) && !(g_shop_prev_buttons & 64)) {
             *cancel = 1;
             g_vendor_menu_state.state = 4;
         }
@@ -103,7 +103,7 @@ void func_US2_002F97A8(int *cancel, int *confirm)
             PurchaseItem *gate;
             if (ROW.kind == 1) {
                 PurchaseItem *record = &ITEM;
-                cost = record->price * D_001B2248;
+                cost = record->price * g_shop_max_purchase_count;
             } else cost = GetSelectedShopItemPrice();
             if (g_player_bolts < cost && g_item_ammo_counts[ROW.item] >= (gate = &ITEM)->capacity) {
                 PlayMobySound(0, 17, g_vendor_menu_state.moby);
@@ -112,10 +112,10 @@ void func_US2_002F97A8(int *cancel, int *confirm)
                 PurchaseItem *record = &ITEM;
                 int total;
                 if (*ammo < record->capacity) {
-                    total = record->price * D_001B2248;
+                    total = record->price * g_shop_max_purchase_count;
                     if (g_player_bolts >= total) {
                         if (*ammo > record->capacity) *ammo = record->capacity;
-                        used = D_001B2248;
+                        used = g_shop_max_purchase_count;
                         used -= ref_US2_002F97A8_00(ROW.item, used);
                         {
                             PurchaseItem *record = &ITEM;

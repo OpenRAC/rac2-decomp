@@ -29,9 +29,9 @@ typedef struct {
     Source *source;     /* 0x68 */
 } Actor;
 
-extern int D_0018C0B4 __attribute__((nosda));
-extern int D_L00_001A8FF0 MACRO_ADDR;
-extern short D_L00_001B0998 __attribute__((sda));
+extern int g_game_mode __attribute__((nosda));
+extern int g_hero_locked_flag MACRO_ADDR;
+extern short g_vaporizer_trail_sample_count __attribute__((sda));
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -49,14 +49,14 @@ void vaporizer_bolt_start_trail_sample(Actor *self)
     char *base;
 
     source = self->source;
-    if (D_0018C0B4 == 0x1D) return;
+    if (g_game_mode == 0x1D) return;
     base = level_get_slot_body(MOBY_CLASS_VAPORIZER, source->id);
     slots = (Slot *)(base + *level_get_slot_header(MOBY_CLASS_VAPORIZER, source->id));
     vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) cam_compute_view_direction(&self->pos, &dir, 1);
+    if (g_hero_locked_flag) cam_compute_view_direction(&self->pos, &dir, 1);
     FastVecCross(&tmp, &m, &dir);
     vec_scale_to_length(&tmp, &tmp, 1.0f);
     FastVecCross(&slots[source->index].d, &tmp, &m);
@@ -64,7 +64,7 @@ void vaporizer_bolt_start_trail_sample(Actor *self)
     qcopy_nc(&slots[source->index].pos, &self->pos);
     FastVecAdd(&slots[source->index].a, &self->pos, source);
     qcopy_nc(&slots[source->index].b, &slots[source->index].a);
-    slots[source->index].count = D_L00_001B0998;
+    slots[source->index].count = g_vaporizer_trail_sample_count;
     slots[source->index].rate = 1.0f / slots[source->index].count;
     slots[source->index].t = 0;
     slots[source->index].u = 0;

@@ -8,20 +8,20 @@ typedef struct {
     int mode;
 } L04DispatchGlobals;
 extern L04DispatchGlobals g_hero_state;
-extern int D_L04_001AFFA0[8] __attribute__((sda));
-extern short D_L04_001AFFC0[10] __attribute__((sda));
-extern int D_L04_001AFFD4 __attribute__((sda));
-extern int D_L04_001AFFD8 __attribute__((sda));
-extern char D_L04_002AF6C0[], D_L04_002405C0[], D_L04_00240660[], D_L04_002BA660[];
+extern int g_grouped_object_slot_counts[8] __attribute__((sda));
+extern short g_grouped_object_short_table[10] __attribute__((sda));
+extern int g_grouped_object_out_value_a __attribute__((sda));
+extern int g_grouped_object_out_value_b __attribute__((sda));
+extern char g_water_l04_grid_data[], g_grouped_object_call_arg_b[], g_grouped_object_call_arg_c[], g_grouped_object_call_arg_d[];
 extern void group_run_shared_routine(void);
 extern void gfx_add_draw_callback_third(void);
-extern void func_PAL_L04_003A47C0(void *);
-extern void func_PAL_L04_003A49E0(void *);
+extern void water_init_object_pal(void *);
+extern void water_update_controller_pal(void *);
 extern void water_advance_controller_state(void *);
 extern void water_update_ripple_patches(void *);
 extern void water_add_splash_entry(void *, float);
 
-void func_PAL_L04_003EBDA0(char *object)
+void grouped_object_update_by_state_pal(char *object)
 {
     char *state;
     L04DispatchGlobals *globals = &g_hero_state;
@@ -33,30 +33,30 @@ void func_PAL_L04_003EBDA0(char *object)
     if (state) {
         int index = *(int *)(state + 0x18);
         int increment = 1;
-        if (index != -1) increment = D_L04_001AFFA0[index];
+        if (index != -1) increment = g_grouped_object_slot_counts[index];
         {
             int args[13];
             increment += *(int *)(state + 0x10);
             args[0] = 10;
             args[1] = increment;
-            args[8] = (int)&D_L04_001AFFD4;
-            args[9] = (int)&D_L04_001AFFD8;
-            args[2] = (int)D_L04_002AF6C0;
-            args[3] = (int)D_L04_002405C0;
-            args[4] = (int)D_L04_001AFFC0;
-            args[5] = (int)D_L04_001AFFA0;
-            args[6] = (int)D_L04_00240660;
-            args[7] = (int)D_L04_002BA660;
+            args[8] = (int)&g_grouped_object_out_value_a;
+            args[9] = (int)&g_grouped_object_out_value_b;
+            args[2] = (int)g_water_l04_grid_data;
+            args[3] = (int)g_grouped_object_call_arg_b;
+            args[4] = (int)g_grouped_object_short_table;
+            args[5] = (int)g_grouped_object_slot_counts;
+            args[6] = (int)g_grouped_object_call_arg_c;
+            args[7] = (int)g_grouped_object_call_arg_d;
             args[11] = (int)group_run_shared_routine;
             args[12] = (int)gfx_add_draw_callback_third;
             args[10] = (int)object;
             switch ((unsigned char)object[0x20]) {
             case 0:
-                func_PAL_L04_003A47C0(args);
+                water_init_object_pal(args);
                 water_add_splash_entry(object, *(float *)(state + 0x28));
                 /* Fall through. */
             case 1:
-                func_PAL_L04_003A49E0(args);
+                water_update_controller_pal(args);
                 break;
             case 2:
                 water_advance_controller_state(args);

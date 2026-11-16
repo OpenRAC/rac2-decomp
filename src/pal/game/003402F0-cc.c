@@ -3,12 +3,12 @@
 
 extern int func_PAL_003402F0(int);
 
-extern int func_PAL_0034A2F0(unsigned char *);
+extern int menu_get_selected_index_pal(unsigned char *);
 
 /* Qwen draft (branch qwen/autonomy, 4419d477), checked by tools/check.py */
 int func_PAL_003402F0(int owner)
 {
-    return func_PAL_0034A2F0((unsigned char *)(owner + 0x2e0));
+    return menu_get_selected_index_pal((unsigned char *)(owner + 0x2e0));
 }
 
 extern void prompt_bar_update(char *);

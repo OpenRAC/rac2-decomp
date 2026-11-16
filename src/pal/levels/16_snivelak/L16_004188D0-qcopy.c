@@ -7,7 +7,7 @@ extern void vec_set_direction_with_complement(float *, float *, float);
 extern void moby_set_state(u8 *, int, int);
 
 /* Starts a projectile with its velocity, gravity and perpendicular turn vector. */
-void func_PAL_L16_004188D0(u8 *moby, float *velocity, float gravity)
+void snivelak_launch_projectile_pal(u8 *moby, float *velocity, float gravity)
 {
     float up[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);

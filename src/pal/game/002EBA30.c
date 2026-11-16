@@ -8,7 +8,7 @@ extern char g_copy_setup_data[];
 extern int load_start_disc_read(int, int, int);
 extern short snd_pump_music_and_disc_read(int);
 
-int func_PAL_002EC070(int index)
+int scene_load_chunk_data_pal(int index)
 {
     char *table = g_copy_setup_data;
     int row = g_scene_playback_state.selected * 0x14C;

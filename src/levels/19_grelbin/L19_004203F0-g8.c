@@ -1,9 +1,9 @@
 #include "common.h"
-extern unsigned char D_0019B4A8[];
-extern struct { char pad[0x464]; u8 state[0]; } D_L19_0021EA30;
+extern unsigned char g_moby_nibble_table[];
+extern struct { char pad[0x464]; u8 state[0]; } g_trigger_active_table;
 extern int g_current_map_index SDATA(D_001A79F0);
-extern int D_L19_001B1DE0 __attribute__((sda));
-extern char D_L19_001BFEC0[];
+extern int g_moby_default_word __attribute__((sda));
+extern char g_hit_matrix_buf[];
 extern void moby_mark_spawned(void *);
 extern int moby_is_in_selected_zone(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
@@ -30,17 +30,17 @@ void UpdateBreakablePickupSpawner(char *moby)
  if (*(u8 *)(moby+0xb0)!=255) {
   unsigned short id=*(unsigned short *)(moby+0xb2);
   int saved_count;
-  if (D_L19_0021EA30.state[(short)id] || (saved_count=D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)], (id&1) ? ((saved_count>>4)&7) : (saved_count&7))) {moby_mark_spawned(moby);return;}
+  if (g_trigger_active_table.state[(short)id] || (saved_count=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)], (id&1) ? ((saved_count>>4)&7) : (saved_count&7))) {moby_mark_spawned(moby);return;}
  }
  if (!moby_is_in_selected_zone(moby+0x10)) return;
  vars=*(char **)(moby+0x68);
  if (!*(u8 *)(moby+0x20)) {
-  *(int *)(moby+0x78)=D_L19_001B1DE0;
+  *(int *)(moby+0x78)=g_moby_default_word;
   *(float *)(moby+0x18)=coll_probe_ground_height_below(moby+0x10,0,0.5f)-0.1f;
   *(u8 *)(moby+0x31)=1; *(u16 *)(moby+0x34)|=0x100; *(int *)(moby+0x48)=0;
   qcopy(scratch_a,moby+0x10); qcopy(scratch_b,moby+0x10); scratch_a[2]+=1; scratch_b[2]-=10;
   CollLine(scratch_a,scratch_b,2,moby,0);
-  mat_align_to_dir(moby+0xc0,D_L19_001BFEC0,0); moby_set_state(moby,1,0);
+  mat_align_to_dir(moby+0xc0,g_hit_matrix_buf,0); moby_set_state(moby,1,0);
  }
  if (*(u8 *)(moby+0x31)) EmitGrelbinGlowSprites(moby);
  if (*(u8 *)(moby+0x20)!=1) return;

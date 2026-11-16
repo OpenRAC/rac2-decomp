@@ -6,8 +6,8 @@ extern float math_random_float_range(float, float);
 extern void part_l11_spawn_spark_ring(void *, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 
-extern float D_L11_001B22C4 __attribute__((sda));
-extern int D_L11_001B22CC __attribute__((sda));
+extern float g_swirl_effect_scale __attribute__((sda));
+extern int g_swirl_effect_arg __attribute__((sda));
 
 typedef struct {
     float velocity[4];
@@ -66,8 +66,8 @@ char *joba_swirl_effect_create(char *owner, void *velocity, void *position, floa
 
         obj->kind = 255;
         obj->flags = 8;
-        arg = D_L11_001B22CC;
-        obj->scale = D_L11_001B22C4 * scale;
+        arg = g_swirl_effect_arg;
+        obj->scale = g_swirl_effect_scale * scale;
         obj->flags = 0x1008;
         part_l11_spawn_spark_ring(obj->position, arg);
         snd_play_from_class_bank(0, 0, (char *)obj, 0xE7B);

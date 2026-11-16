@@ -13,8 +13,8 @@ typedef struct {
     int value;
 } Word_29DD30;
 
-extern char D_001395B8[];
-extern char D_00139768[];
+extern char g_game_flag_table[];
+extern char g_request_flag_table[];
 extern unsigned short ref_L00_0030EDB0_00;
 
 #define FLAG (((Flag_29DD30 *)D_001395B8)->value)

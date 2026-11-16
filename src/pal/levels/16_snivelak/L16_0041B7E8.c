@@ -13,9 +13,9 @@ extern int PlayMobySound(s32, s32, char *);
 extern f32 math_fabs(f32);
 extern f32 math_random_signed_float_range(f32, f32);
 extern f32 math_random_float_range(f32, f32);
-extern char *func_PAL_002735D0(char *, s32, s32, s32, char *, char *, char *, s32, f32, f32);
+extern char *cam_moby_create_pal(char *, s32, s32, s32, char *, char *, char *, s32, f32, f32);
 extern void vec_random_direction(char *, f32, f32);
-extern char D_001B9B00[];
+extern char g_turret_debris_vectors[];
 extern f32 FastAddRotations(f32, f32);
 extern f32 fast_subtract_rotations(f32, f32);
 extern s32 vec_fast_helper_b(char *);
@@ -34,7 +34,7 @@ void func_PAL_L16_0041BF40(char *arg0) {
     s16 h;
     s32 i;
 
-    FastVecSub(buf0, D_001B9B00, arg0 + 0x10);
+    FastVecSub(buf0, g_turret_debris_vectors, arg0 + 0x10);
     vec_scale_to_length(buf0, buf0, 1.0f);
     func_PAL_0032F3B8(arg0, arg0 + 0x10, buf0, 0.0f);
     PlayMobySound(0, 0, arg0);
@@ -44,7 +44,7 @@ void func_PAL_L16_0041BF40(char *arg0) {
         h = *(s16 *)(arg0 + 0xAA);
         f20 = math_random_signed_float_range(90.0f, 180.0f);
         f30 = math_random_float_range(10.0f, 20.0f);
-        func_PAL_002735D0(arg0, 2, h, i, arg0 + 0x10, arg0 + 0xF0, buf1, 0xFF, f20, f30);
+        cam_moby_create_pal(arg0, 2, h, i, arg0 + 0x10, arg0 + 0xF0, buf1, 0xFF, f20, f30);
     }
 }
 

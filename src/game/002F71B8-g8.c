@@ -20,23 +20,23 @@ typedef struct {
     int count;
 } Func002F71B8List;
 
-extern int D_001AD1C0 __attribute__((sda));
-extern int D_001AD1B8 __attribute__((sda));
-extern Func002F71B8Table D_001AD268;
-extern unsigned char D_001395B8[];
+extern int g_shop_saved_bolts_level __attribute__((sda));
+extern int g_shop_bolts_level_override __attribute__((sda));
+extern Func002F71B8Table g_shop_slot_value_table;
+extern unsigned char g_game_flag_table[];
 extern Func002F71B8List g_vendor_menu_state;
 extern int flag_is_byte_set(void);
 
 void shop_rebuild_unlocked_slot_list(void)
 {
-    Func002F71B8Table values = D_001AD268;
+    Func002F71B8Table values = g_shop_slot_value_table;
     int i;
 
     g_vendor_menu_state.count = 0;
-    D_001AD1B8 = 0;
-    for (i = D_001AD1C0 != 0 ? D_001AD1C0 + 1 : 1; i < 5; i++) {
+    g_shop_bolts_level_override = 0;
+    for (i = g_shop_saved_bolts_level != 0 ? g_shop_saved_bolts_level + 1 : 1; i < 5; i++) {
         if ((unsigned int)i >= 8 ||
-            ((D_001395B8[0x8D] >> i) & 1) == 0) {
+            ((g_game_flag_table[0x8D] >> i) & 1) == 0) {
             if (flag_is_byte_set() == 0)
                 continue;
         }

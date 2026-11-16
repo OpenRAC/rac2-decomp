@@ -12,8 +12,8 @@ typedef int Quad00321BC0 __attribute__((mode(TI)));
 
 extern int g_current_game_mode MACRO_ADDR;
 extern u8 g_sound_state[];
-extern char D_001A8BD0[] __attribute__((sda));
-extern char D_001AFFD8[];
+extern char g_default_effect_vector[] __attribute__((sda));
+extern char g_str_hovering_robot_debug[];
 
 extern int func_PAL_00322DA0(char *);
 extern void moby_mark_spawned(void *);
@@ -25,14 +25,14 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 extern int math_random_int_range(int, int);
 extern float vec_distance_xy(void *, void *);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
-extern int func_PAL_002B27B8(char *, char *);
+extern int moby_dispatch_action_by_kind_pal(char *, char *);
 extern int PlayMobySound(int, int, char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void *func_PAL_0032DF28(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_PAL_003240E8(void *);
-extern void func_PAL_002A7650(char *, int, int);
-extern int func_PAL_002B5E10(char *);
+extern void SetDeathBits_pal(char *, int, int);
+extern int moby_step_at_own_position_pal(char *);
 extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, float, float);
 extern float moby_turn_toward_position(char *, char *, char *, float, float, float);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
@@ -47,12 +47,12 @@ extern float vec_length_xy(void *);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastDiffRots(float, float);
-extern int func_PAL_002B5BA8(char *, void *, float);
-extern int func_PAL_002B5C98(char *, void *, float);
+extern int moby_turn_toward_target_and_step_pal(char *, void *, float);
+extern int moby_step_controller_pal(char *, void *, float);
 extern void func_PAL_00323D48(float, char *, void *, int);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 extern void robot_draw_joint_flash(char *);
-extern void func_PAL_00323538(char *);
+extern void robot_update_timers_limbs_pal(char *);
 extern void robot_draw_glow_effects(char *);
 
 void func_PAL_00321BC0(char *self)
@@ -157,7 +157,7 @@ void func_PAL_00321BC0(char *self)
         }
         break;
     case 5: {
-        int flags = func_PAL_002B27B8(self, vars + 0x60);
+        int flags = moby_dispatch_action_by_kind_pal(self, vars + 0x60);
         int index = *(int *)(vars + 0x2C0);
         if (index != -1) {
             u8 *slot = g_sound_state + index * 0x70;
@@ -180,7 +180,7 @@ void func_PAL_00321BC0(char *self)
             FastVecAdd(v, v, self + 0x10);
             func_PAL_0032DF28(v, 0, 5, 5, 5, 0, 0, 0, 0.5f, 20.0f, 1, 0, 0, 0);
             func_PAL_003240E8(self);
-            func_PAL_002A7650(self, 0, 3);
+            SetDeathBits_pal(self, 0, 3);
             moby_mark_spawned(self);
             return;
         }
@@ -203,7 +203,7 @@ void func_PAL_00321BC0(char *self)
     switch (*(u8 *)(self + 0x20)) {
     case 1:
         if (*(int *)(vars + 0x2BC) == 0)
-            func_PAL_002B5E10(self);
+            moby_step_at_own_position_pal(self);
         break;
     case 3:
         moby_scale_owner_words_by_angles(self, vars + 0x2A4, vars + 0x2A8, 0.06981318f, 0.062831864f, 0.015707966f);
@@ -256,7 +256,7 @@ void func_PAL_00321BC0(char *self)
         } else {
             int index;
             char *child;
-            STUB_printf(D_001AFFD8, *(int *)(vars + 0x2A0));
+            STUB_printf(g_str_hovering_robot_debug, *(int *)(vars + 0x2A0));
             index = *(int *)(vars + 0x2C0);
             if (index != -1) {
                 u8 *slot = g_sound_state + index * 0x70;
@@ -324,7 +324,7 @@ void func_PAL_00321BC0(char *self)
         }
         break;
     case 11:
-        func_PAL_002B5E10(self);
+        moby_step_at_own_position_pal(self);
         if (*(u8 *)(self + 0x60) & 2) {
             moby_set_controller_speed_limits(self, 0.0016000001f, 0.040000003f, 0.0016755164f, 0.12566373f);
             moby_set_state(self, 0xC, -1);
@@ -339,22 +339,22 @@ void func_PAL_00321BC0(char *self)
                              mat_fast_helper_a(*(float *)(vars + 0x230) - *(float *)(self + 0x10),
                                            *(float *)(vars + 0x234) - *(float *)(self + 0x14))) < 0.38397247f) {
         } else if (vec_distance_xy(self + 0x10, *(char **)(vars + 0x240) + 0x10) > 2.8f) {
-            func_PAL_002B5BA8(self, vars + 0x230, *(float *)(vars + 0x284));
+            moby_turn_toward_target_and_step_pal(self, vars + 0x230, *(float *)(vars + 0x284));
         } else {
             char *target = *(char **)(vars + 0x240);
-            func_PAL_002B5C98(self, self + 0x10,
+            moby_step_controller_pal(self, self + 0x10,
                           mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(self + 0x10),
                                         *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         }
         if (*(u8 *)(self + 0x42) == 0x1C)
-            func_PAL_00323D48(*(float *)(vars + 0x298), self, D_001A8BD0, 4);
+            func_PAL_00323D48(*(float *)(vars + 0x298), self, g_default_effect_vector, 4);
         break;
     case 13: {
         char *target;
         if (*(u8 *)(self + 0x42) == 0xF)
             gfx_register_overlay_draw_callback(robot_draw_joint_flash, self);
         target = *(char **)(vars + 0x240);
-        func_PAL_002B5C98(self, self + 0x10,
+        moby_step_controller_pal(self, self + 0x10,
                       mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(self + 0x10),
                                     *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         break;
@@ -375,7 +375,7 @@ void func_PAL_00321BC0(char *self)
         }
         break;
     }
-    func_PAL_00323538(self);
+    robot_update_timers_limbs_pal(self);
     gfx_register_overlay_draw_callback(robot_draw_glow_effects, self);
 }
 

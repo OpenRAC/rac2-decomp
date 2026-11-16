@@ -9,7 +9,7 @@ extern char *part_find_owned_effect_slot(void *,int,int);
 extern int FastDecTimer(void *);
 extern float moby_update_aim_target_strength(void *,void *);
 extern int part_spawn_damage_debris(void *,void *,void *);
-extern char *D_001B1B5C;
+extern char *g_moby_pool_start;
 typedef struct { int frame; } DamageClock;
 extern DamageClock g_game_time;
 extern int D_001B1688_1;
@@ -53,7 +53,7 @@ int moby_apply_damage_to_object(char *object,char *state,int special)
     if (callback) part_spawn_damage_debris(object,callback,health);
     if (damage==0.0f) return 0;
     H(state,0x70)=-1;
-    if (hit && P(hit,0x20)) H(state,0x70)=(P(hit,0x20)-D_001B1B5C)>>8;
+    if (hit && P(hit,0x20)) H(state,0x70)=(P(hit,0x20)-g_moby_pool_start)>>8;
     kind=U(health,0x17);
     if (damage*((DamageClass *)(g_item_slot_to_record[kind]*224+(char *)g_weapon_table))->scale>=H(health,4)*F(state,0x58)) timeout=90;
     else timeout=300;

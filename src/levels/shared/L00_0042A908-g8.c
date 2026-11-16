@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern char *D_L00_001B1844;
-extern float D_L00_001B1650 __attribute__((sda));
-extern float D_L00_001B1654 __attribute__((sda));
-extern int D_L00_001B1658 __attribute__((sda));
-extern char D_L00_001BF220[];
+extern char *g_camera_def_table;
+extern float g_cam_clamp_segment_low __attribute__((sda));
+extern float g_cam_clamp_segment_high __attribute__((sda));
+extern int g_cam_clamp_segment_steps __attribute__((sda));
+extern char g_hero_l00_position[];
 extern float FastVecLength(void *), IntToFloat(int);
 extern float coll_project_point_on_segment(void *, void *, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
@@ -18,9 +18,9 @@ extern void vec_scale_to_length(void *, void *, float);
 void cam_clamp_segment_by_collision(char *camera, char *out, char *start, char *end)
 {
     float a[4], b[4], c[4], d[4], e[4], f[4];
-    char *entry = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 32 + 0x1c);
-    float lo = D_L00_001B1650, hi = D_L00_001B1654;
-    int count = D_L00_001B1658;
+    char *entry = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 32 + 0x1c);
+    float lo = g_cam_clamp_segment_low, hi = g_cam_clamp_segment_high;
+    int count = g_cam_clamp_segment_steps;
     float length;
     int i;
     qcopy(out, end);
@@ -40,12 +40,12 @@ void cam_clamp_segment_by_collision(char *camera, char *out, char *start, char *
         }
         if (hit) {
             float t, radius;
-            t = coll_project_point_on_segment(e, start, end, D_L00_001BF220);
-            FastVecSub(f, e, D_L00_001BF220);
+            t = coll_project_point_on_segment(e, start, end, g_hero_l00_position);
+            FastVecSub(f, e, g_hero_l00_position);
             radius = lo + (hi - lo) * t;
             if (FastVecLength(f) <= radius) {
                 vec_scale_to_length(f, f, radius);
-                FastVecAdd(f, D_L00_001BF220, f);
+                FastVecAdd(f, g_hero_l00_position, f);
                 FastVecSub(c, f, start);
                 vec_scale_to_length(d, c, length);
                 FastVecAdd(end, start, d);

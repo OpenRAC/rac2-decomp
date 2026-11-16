@@ -28,7 +28,7 @@ typedef struct {
 } SoundSlot003CFF90;
 extern ObjCommon003CFF90 *moby_get_motion_data(char *);
 extern void *state_get_stored_pointer_value(void);
-extern void func_PAL_L05_003D4068(char *);
+extern void moby_init_reach_and_position_pal(char *);
 extern void vec_clear_128(void *);
 extern void level_append_object(char *, void *, int, int);
 extern void func_L05_003D02C8(void);
@@ -36,10 +36,10 @@ extern void func_PAL_L05_0037E8E0(char *);
 extern int moby_process_collision_hit(char *, int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_check_player_in_view_and_range(char *, int, float);
-extern int D_L05_001B251C __attribute__((sda));
+extern int g_feltzin_target_mobys __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int math_random_int_below(int);
-extern void func_PAL_L05_003D4168(char *);
+extern void moby_spawn_effect_once_pal(char *);
 extern int moby_can_take_next_step(char *);
 extern void func_PAL_L05_0037DE20(char *);
 extern int math_fast_float_d(void *);
@@ -59,7 +59,7 @@ void func_PAL_L05_003D3CD8(char *obj)
     case 0:
         *(unsigned char *)(obj + 0x30) = 255;
         if (!state_get_stored_pointer_value()) return;
-        func_PAL_L05_003D4068(obj);
+        moby_init_reach_and_position_pal(obj);
         vec_clear_128(a);
         if (s->hasCallback) level_append_object(obj, func_L05_003D02C8, 0, 0);
         return;
@@ -71,7 +71,7 @@ void func_PAL_L05_003D3CD8(char *obj)
             if (s->target != -1) {
                 char *target;
                 p->hasTarget = 1;
-                target = (char *)(D_L05_001B251C + (s->target << 8));
+                target = (char *)(g_feltzin_target_mobys + (s->target << 8));
                 p->targetObject = target;
                 if (fast_vec_dist(target + 0x10, obj + 0x10) < 10.0f) {
                     SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(g_sound_state + s->nearSound * 0x70);
@@ -79,7 +79,7 @@ void func_PAL_L05_003D3CD8(char *obj)
                         s->nearSound = snd_play_from_class_bank(14, 0, obj, 0xFBF);
                 }
             }
-            if (p->flag108 && p->flag104) func_PAL_L05_003D4168(obj);
+            if (p->flag108 && p->flag104) moby_spawn_effect_once_pal(obj);
             if (moby_can_take_next_step(obj)) func_PAL_L05_0037DE20(obj);
             math_fast_float_d(s->block1B8);
             qcopy(b, obj + 0x10);
@@ -92,7 +92,7 @@ void func_PAL_L05_003D3CD8(char *obj)
         if (moby_process_collision_hit(obj, 0, 0, 0) == 1) snd_play_from_class_bank(1, 0, obj, 0x957);
         moby_check_player_in_view_and_range(obj, 0, 176.0f);
         if (p->state110 == 1) {
-            if (p->flag104) func_PAL_L05_003D4168(obj);
+            if (p->flag104) moby_spawn_effect_once_pal(obj);
             if (moby_can_take_next_step(obj)) func_PAL_L05_0037DE20(obj);
             math_fast_float_d(s->block1B8);
             func_PAL_L05_003D4280(obj);

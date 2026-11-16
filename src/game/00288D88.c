@@ -9,7 +9,7 @@ extern void hud_load_element_from_table(char *, int);
 /* Update the measured fields of the first matching key among13records. */
 typedef struct { unsigned int fields[25]; int key; unsigned int busy; unsigned int tail[9]; } UpdateRecord;
 
-extern UpdateRecord D_L00_0027DD00[13];
+extern UpdateRecord g_update_record_table[13];
 
 typedef struct {
     char pad0[0x8];
@@ -147,7 +147,7 @@ void subtitle_empty_b(void)
 
 /* func_00289AA8 is in 00288D88-render.c. */
 
-extern short D_00254EC8[][2];
+extern short g_text_pair_table[][2];
 
 /* Looks a number up in the table of 170 pairs and returns its position, or -1 if missing. It can also hand back the other number of the pair. */
 int text_find_pair_in_table(short key, int field, unsigned short *out)
@@ -155,18 +155,18 @@ int text_find_pair_in_table(short key, int field, unsigned short *out)
     int i;
 
     for (i = 0; i < 170; i++) {
-        if (D_00254EC8[i][field] == key) {
+        if (g_text_pair_table[i][field] == key) {
             if (out != 0)
-                *out = (unsigned short)D_00254EC8[i][field ? 0 : 1];
+                *out = (unsigned short)g_text_pair_table[i][field ? 0 : 1];
             return i;
         }
     }
     return -1;
 }
 
-extern unsigned char D_0018D0E8[];
+extern unsigned char g_recent_text_entries[];
 extern int D_001A7C04_sda __attribute__((sda));
-extern int D_001A7C04[] __attribute__((sda));
+extern int g_recent_text_count[] __attribute__((sda));
 
 /* Moves a text entry to the end of the recently-used list, adding it if it was missing. */
 void text_mark_entry_recent(short id)
@@ -176,16 +176,16 @@ void text_mark_entry_recent(short id)
 
     if (tableIndex == -1)
         return;
-    for (i = 0; D_0018D0E8[i] != tableIndex && i < D_001A7C04_sda; i++) {
+    for (i = 0; g_recent_text_entries[i] != tableIndex && i < D_001A7C04_sda; i++) {
     }
     if (i < D_001A7C04_sda) {
         for (; i < D_001A7C04_sda - 1; i++)
-            D_0018D0E8[i] = D_0018D0E8[i + 1];
-        D_0018D0E8[i] = 0;
-        D_001A7C04[0]--;
+            g_recent_text_entries[i] = g_recent_text_entries[i + 1];
+        g_recent_text_entries[i] = 0;
+        g_recent_text_count[0]--;
     }
-    D_0018D0E8[D_001A7C04[0]] = tableIndex;
-    D_001A7C04[0]++;
+    g_recent_text_entries[g_recent_text_count[0]] = tableIndex;
+    g_recent_text_count[0]++;
 }
 
 /* Queues a pop-up hint when event 0x17 or 0x19 happens. */
@@ -202,10 +202,10 @@ func_0028A130(int eventId)
 /* A seven-entry ring of key/value pairs: D_001B1866 counts the entries, D_001B1867 is the
  * first one's slot. The incomplete sda arrays give retail's absolute macro forms (`la`,
  * `lui $at` stores) at -G0. */
-extern unsigned char D_001B1866[] __attribute__((sda));
-extern unsigned char D_001B1867[] __attribute__((sda));
-extern short D_001B1848[] __attribute__((sda));
-extern short D_001B1858[] __attribute__((sda));
+extern unsigned char g_hint_message_count[] __attribute__((sda));
+extern unsigned char g_hint_message_head[] __attribute__((sda));
+extern short g_hint_message_keys[] __attribute__((sda));
+extern short g_hint_message_values[] __attribute__((sda));
 
 /* Appends key with its value unless the ring is full or already holds key. Every access
  * reads the globals directly: local copies of the count and first slot lose the register
@@ -214,14 +214,14 @@ void hud_queue_hint_message(int key, int value)
 {
     int i;
 
-    if (D_001B1866[0] < 7) {
-        for (i = D_001B1866[0] - 1; i >= 0; i--) {
-            if (D_001B1848[(D_001B1867[0] + i) % 7] == key)
+    if (g_hint_message_count[0] < 7) {
+        for (i = g_hint_message_count[0] - 1; i >= 0; i--) {
+            if (g_hint_message_keys[(g_hint_message_head[0] + i) % 7] == key)
                 return;
         }
-        D_001B1848[(D_001B1867[0] + D_001B1866[0]) % 7] = key;
-        D_001B1858[(D_001B1867[0] + D_001B1866[0]) % 7] = value;
-        D_001B1866[0]++;
+        g_hint_message_keys[(g_hint_message_head[0] + g_hint_message_count[0]) % 7] = key;
+        g_hint_message_values[(g_hint_message_head[0] + g_hint_message_count[0]) % 7] = value;
+        g_hint_message_count[0]++;
     }
 }
 
@@ -347,10 +347,10 @@ void UpdateBoltCounter(void)
  * standard of 12 November 2026; forced on everywhere they change 266 functions. The hud_coord
  * dead-test helper is allowed by owner ruling (7 November 2026). */
 typedef struct { float value[7]; } CounterWidths;
-extern float D_001A8DE0[];
-extern char D_001A8E00[];
-extern unsigned char *D_001A8CFC __attribute__((sda));
-extern float D_001B23A4 __attribute__((sda));
+extern float g_bolt_counter_widths[];
+extern char g_str_bolt_counter_format[];
+extern unsigned char *g_resident_data_base __attribute__((sda));
+extern float g_hud_scale __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
@@ -359,7 +359,7 @@ extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, fl
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
 /* The display mode word beside the HUD scale. */
-extern int D_001B23A0 __attribute__((sda));
+extern int g_hud_mode __attribute__((sda));
 
 /* A HUD coordinate scaled for the display and rounded to a whole pixel; the display-mode test
    has no effect on the result (as func_00326A10). */
@@ -368,7 +368,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     float scaled = value * scale + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_001B23A0 == active)
+    if (result != 0 && g_hud_mode == active)
         scaled = 1.0f;
     return result;
 }
@@ -394,7 +394,7 @@ void DrawBoltCounterDeltas(void)
     secondY = 0;
     x = 0;
     firstY = 0;
-    widths = *(CounterWidths *)D_001A8DE0;
+    widths = *(CounterWidths *)g_bolt_counter_widths;
     scale = 0.0f;
     first = 0;
     second = 0;
@@ -459,18 +459,18 @@ void DrawBoltCounterDeltas(void)
             break;
         }
         if (firstX) {
-            sprintf(text, D_001A8E00, g_bolt_counter_state.rows[i].value);
+            sprintf(text, g_str_bolt_counter_format, g_bolt_counter_state.rows[i].value);
             len = func_001157AC(text);
             if (len > 0) {
                 width = widths.value[len - 1];
                 active = one;
-                id = table_find_by_id(D_001A8CFC + 0x8710, 178);
+                id = table_find_by_id(g_resident_data_base + 0x8710, 178);
                 gfx_draw_scaled_object_two_axes((char *)id, first,
-                    (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, active), scale, scale, width);
-                id = table_find_by_id(D_001A8CFC + 0x8710, 179);
+                    (float)firstX, (float)hud_coord((float)firstY, g_hud_scale, 0.5f, active), scale, scale, width);
+                id = table_find_by_id(g_resident_data_base + 0x8710, 179);
                 gfx_draw_scaled_object_two_axes((char *)id, second,
-                    (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, active), scale, scale, width);
-                text_draw_right_aligned_small(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
+                    (float)secondX, (float)hud_coord((float)secondY, g_hud_scale, 0.5f, active), scale, scale, width);
+                text_draw_right_aligned_small(x, hud_coord((float)y, g_hud_scale, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }
     }
@@ -535,10 +535,10 @@ extern struct HudState g_hud_state __attribute__((sda));
 extern void LinkHudBank(int, int);
 typedef struct { char pad[0x20]; int dest; char gap[0xf0]; int offset; } LoadGroupRoot;
 extern LoadGroupRoot g_pause_menu_state;
-extern int D_001B18B0;
-extern int D_001B18B8;
-extern int D_001B18BC;
-extern int D_001B18C0;
+extern int g_hud_bank_buffer_size_a;
+extern int g_hud_bank_buffer_size_b;
+extern int g_hud_bank_buffer_size_c;
+extern int g_hud_bank_buffer_size_d;
 extern int gfx_upload_records_to_buffer_slot(int, int, int, int, int);
 extern int fast_decompress(int, int);
 /* Fetches the bank's stashed texture groups (handles at +0x94 on, sizes at +0x54 on) to dest at
@@ -553,7 +553,7 @@ void LoadStashedHudBanks(int mode)
         size = g_hud_state.header.bank->has54;
         offset = g_pause_menu_state.offset;
         if (size) {
-            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk94, 0, D_001B18B0/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk94, 0, g_hud_bank_buffer_size_a/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(0, offset);
             offset += size;
@@ -562,7 +562,7 @@ void LoadStashedHudBanks(int mode)
     {
         int size = g_hud_state.header.bank->has5C;
         if (size) {
-            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk9C, 0, D_001B18B8/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unk9C, 0, g_hud_bank_buffer_size_b/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(2, offset);
             offset += size;
@@ -571,7 +571,7 @@ void LoadStashedHudBanks(int mode)
     if (mode == 0 || mode == 2) {
         int size = g_hud_state.header.bank->has60;
         if (size) {
-            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA0, 0, D_001B18BC/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA0, 0, g_hud_bank_buffer_size_c/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(3, offset);
             offset += size;
@@ -579,7 +579,7 @@ void LoadStashedHudBanks(int mode)
     }
     if (mode == 1 || mode == 2) {
         if (g_hud_state.header.bank->has64) {
-            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA4, 0, D_001B18C0/16, 0);
+            gfx_upload_records_to_buffer_slot(dest, g_hud_state.header.bank->unkA4, 0, g_hud_bank_buffer_size_d/16, 0);
             fast_decompress(dest, offset);
             LinkHudBank(4, offset);
         }
@@ -588,7 +588,7 @@ void LoadStashedHudBanks(int mode)
 
 
 
-extern int D_001A7308 __attribute__((section(".sdata")));
+extern int g_hud_address __attribute__((section(".sdata")));
 extern void gfx_upload_image_to_vram(unsigned int, int, int, int, int, int);
 
 /* Uploads the texture pages of a HUD bank to video memory, linking the first group if it is not loaded yet. */
@@ -607,9 +607,9 @@ void Hud_SendResidentBank(int bank, int base, int immediate)
 
     if (g_hud_state.header.counts->loaded[bank] == 0) {
         LinkHudBank(0, base);
-        address = D_001A7308;
+        address = g_hud_address;
     } else {
-        address = D_001A7308;
+        address = g_hud_address;
     }
     counts = g_hud_state.header.counts;
     bank_offset = bank << 2;
@@ -630,16 +630,16 @@ void Hud_SendResidentBank(int bank, int base, int immediate)
     } while (0);
 }
 
-extern char *D_001BAF3C;
-extern char * volatile D_001B1880 __attribute__((sda));
-extern char * volatile D_001B1884 __attribute__((sda));
+extern char *g_hud_pool_start_2;
+extern char * volatile g_hud_pool_start __attribute__((sda));
+extern char * volatile g_hud_pool_end __attribute__((sda));
 
 /* Sets up the HUD memory pool as one 400 KB block. */
 void hud_init_mem_pool(void)
 {
-    char *poolStart = D_001BAF3C;
-    D_001B1880 = poolStart;
-    D_001B1884 = poolStart + 0x64000;
+    char *poolStart = g_hud_pool_start_2;
+    g_hud_pool_start = poolStart;
+    g_hud_pool_end = poolStart + 0x64000;
 }
 
 /* Hands out a piece of the HUD memory pool, rounded up to 16 bytes. Returns 0 if there is not enough room. */
@@ -648,14 +648,14 @@ char *hud_alloc_mem(int size)
     char *end;
     char *cursor;
 
-    if (D_001B1880 == 0)
+    if (g_hud_pool_start == 0)
         hud_init_mem_pool();
-    end = D_001B1884;
-    cursor = D_001B1880;
+    end = g_hud_pool_end;
+    cursor = g_hud_pool_start;
     if (end - cursor < size)
         return 0;
     size = (size + 15) & 0xFFFFFFF0u;
-    D_001B1880 = cursor + size;
+    g_hud_pool_start = cursor + size;
     return cursor;
 }
 
@@ -726,12 +726,12 @@ void set_animation_parameter(int key, unsigned int value)
 {
     int i;
     for (i = 0; i < 13; i++) {
-        if (D_L00_0027DD00[i].key == key) break;
+        if (g_update_record_table[i].key == key) break;
     }
     if (i < 13) {
-        D_L00_0027DD00[i].fields[9] = value;
-        if (D_L00_0027DD00[i].busy == 0)
-            D_L00_0027DD00[i].fields[1] = value;
+        g_update_record_table[i].fields[9] = value;
+        if (g_update_record_table[i].busy == 0)
+            g_update_record_table[i].fields[1] = value;
     }
 }
 

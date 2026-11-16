@@ -15,7 +15,7 @@ extern float ref_L02_0043F4C8_3 __attribute__((sda));
 extern float ref_L02_0043F4C8_4 __attribute__((sda));
 extern float ref_L02_0043F4C8_5 __attribute__((sda));
 extern u8 g_hero_state[];
-extern u8 D_L02_001A8F20[] MACRO_ADDR;
+extern u8 g_zero_l02_vector[] MACRO_ADDR;
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float,float);
 extern int math_random_int_below(int);
@@ -132,7 +132,7 @@ void hovering_object_update(u8 *object)
         break;
     case 3:
         if(*(short *)(effect+0x3C)) vec_clear_128(effect+0x20);
-        SpawnExplosionEffects(object,D_L02_001A8F20,object+0x10,0.0f,0.0f,10,5,15,0.0f,0.0f,9.0f,*(float *)(object+0x2C)*10.0f,-1,0.0f,0,0,-1,0,0x810001);
+        SpawnExplosionEffects(object,g_zero_l02_vector,object+0x10,0.0f,0.0f,10,5,15,0.0f,0.0f,9.0f,*(float *)(object+0x2C)*10.0f,-1,0.0f,0,0,-1,0,0x810001);
         part_spawn_masked_debris((char *)object,0x3FFF,(float *)(effect+0x20),255,3.0f,6.0f,3.0f,6.0f);
         part_spawn_scaled_bolts(object,3,0.0f);
         PlayMobySound(1,0,object);

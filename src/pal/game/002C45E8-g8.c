@@ -6,7 +6,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void part_kill(void *);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
-extern int D_001AA39C __attribute__((sda));
+extern int g_bounce_split_chance __attribute__((sda));
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
@@ -23,7 +23,7 @@ void func_PAL_002C45E8(char *self)
     FastVecAdd(position, position, motion);
     *(unsigned char *)(self + 8) += 2;
     if (*(float *)(self + 0x18) < *(float *)(motion + 0x10)) {
-        if (math_random_int_below(D_001AA39C - 1) == 0) {
+        if (math_random_int_below(g_bounce_split_chance - 1) == 0) {
             *(float *)(self + 0x18) = *(float *)(motion + 0x10);
             *(float *)(self + 0x20) *= math_random_float_range(1.0f, 3.5f);
             *(float *)(motion + 4) *= math_random_float_range(1.0f, 3.5f);

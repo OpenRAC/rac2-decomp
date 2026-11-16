@@ -2,20 +2,20 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern void moby_set_state(void *, int, int);
 extern s32 PlayMobySound(s32, s32, s32);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern int IsPointInCuboid(void *, int);
 extern char g_hero_position[];
-extern char D_L12_001B9E00[];
+extern char g_hero_prev_position[];
 extern float vec_distance_xy(void *, void *);
 extern int math_fast_float_d(void *);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void FastVecScale(float, void *, void *);
 
-void func_PAL_L12_00424110(u8 *a0)
+void secret_door_update_pal(u8 *a0)
 {
     s32 *s = *(s32 **)(a0 + 0x68);
     int state = a0[0x20];
@@ -28,11 +28,11 @@ void func_PAL_L12_00424110(u8 *a0)
         a0[0x30] = 0x7F;
         break;
     case 1:
-        if (vec_distance_xy(a0 + 0x10, D_L12_001B2E9C + (s[0] << 8) + 0x10) < 5.0f) {
+        if (vec_distance_xy(a0 + 0x10, g_moby_list_start + (s[0] << 8) + 0x10) < 5.0f) {
             s[0xB] = state;
             s[8] = 0x32;
         } else if ((IsPointInCuboid(g_hero_position, s[1]) && s[0xB] != 0) ||
-                   (IsPointInCuboid(D_L12_001B9E00, s[1]) && s[0xB] != 0)) {
+                   (IsPointInCuboid(g_hero_prev_position, s[1]) && s[0xB] != 0)) {
             s[8] = 0x32;
         }
         if (math_fast_float_d((u8 *)s + 0x20))

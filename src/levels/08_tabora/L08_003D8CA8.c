@@ -7,7 +7,7 @@ extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern char g_hero_position[];
-extern char *D_L08_001B29DC[] __attribute__((sda));
+extern char *g_moby_array[] __attribute__((sda));
 extern int math_random_int_below(int);
 extern int GetFirstMobyInGroup(void *, int, int, int);
 extern int GetNextMobyInGroup(void *, void *, int, int);
@@ -53,11 +53,11 @@ void crawler_choose_goal(char *object) {
         GetNextMobyInGroup(&other, other, 0, 0);
     }
     if (*(int *)(state + 0x468) != -1) {
-        char *mount = D_L08_001B29DC[0] + (*(int *)(state + 0x468) << 8);
+        char *mount = g_moby_array[0] + (*(int *)(state + 0x468) << 8);
         if (mount && (unsigned char)mount[0x20] != 0xFE && (unsigned char)mount[0x20] != 0xFD &&
             (vec_distance_xy(object + 0x10, mount + 0x10) < 3.6f ||
-             vec_distance_xy(state + 0x3F0, D_L08_001B29DC[0] + (*(int *)(state + 0x468) << 8) + 0x10) < 3.6f)) {
-            FastVecSub(delta, object + 0x10, D_L08_001B29DC[0] + (*(int *)(state + 0x468) << 8) + 0x10);
+             vec_distance_xy(state + 0x3F0, g_moby_array[0] + (*(int *)(state + 0x468) << 8) + 0x10) < 3.6f)) {
+            FastVecSub(delta, object + 0x10, g_moby_array[0] + (*(int *)(state + 0x468) << 8) + 0x10);
             delta[2] = 0;
             vec_scale_to_length(delta, delta, 5.0f);
             FastVecAdd(state + 0x3F0, delta, object + 0x10);

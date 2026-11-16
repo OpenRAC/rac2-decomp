@@ -12,8 +12,8 @@ typedef struct {
     int pad18[4];
 } L05Slot40_00421860;
 
-extern L05Slot40_00421860 D_L05_002A1800[];
-extern int D_L05_00221D10[] MACRO_ADDR;
+extern L05Slot40_00421860 g_spawn_entry_table[];
+extern int g_feltzin_challenge_state[] MACRO_ADDR;
 extern int table_find_last_used_entry(int);
 extern char *pickup_spawn_homing(char *);
 extern char *pickup_spawn_homing_variant(char *);
@@ -24,18 +24,18 @@ void moby_spawn_and_count(char *object)
 {
     int slot = table_find_last_used_entry(1);
 
-    if (slot < 0 || D_L05_002A1800[slot].value == D_L05_002A1800[slot].limit) {
+    if (slot < 0 || g_spawn_entry_table[slot].value == g_spawn_entry_table[slot].limit) {
         int *counts;
 
         pickup_spawn_homing(object);
-        counts = D_L05_00221D10;
+        counts = g_feltzin_challenge_state;
         counts[0x5C / 4]++;
         counts[0x70 / 4]++;
     } else {
         int *counts;
 
         pickup_spawn_homing_variant(object);
-        counts = D_L05_00221D10;
+        counts = g_feltzin_challenge_state;
         counts[0x64 / 4]++;
         counts[0x70 / 4]++;
     }

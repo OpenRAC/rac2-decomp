@@ -7,7 +7,7 @@ extern void func_L00_00430948_1(char *p, float x, float y);
 
 extern int func_002E5E58_1(int a, int b, int c);
 
-extern volatile unsigned char D_001A7BB2 __attribute__((sda));
+extern volatile unsigned char g_option_toggle_b __attribute__((sda));
 
 extern int prompt_bar_destroy(char *p);
 
@@ -39,7 +39,7 @@ int menu_update_two_part_flags_a(char *object, int flags)
     if ((flags & 0x40) && *(int *)(object + 680) == 0) {
         int discarded = func_002E5E58_1(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
@@ -65,7 +65,7 @@ int menu_update_two_part_flags_b(char *object, int flags)
     if ((flags & 0x40) && *(int *)(object + 680) == 0) {
         int discarded = func_002E5E58_1(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
@@ -91,7 +91,7 @@ int menu_update_two_part_flags_c(char *object, int flags)
     if ((flags & 0x40) && *(int *)(object + 680) == 0) {
         int discarded = func_002E5E58_1(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
@@ -296,14 +296,14 @@ unsigned long stub_l00_return_arg_3(unsigned long param_1)
 }
 
 /* The fixed resident address func_L00_004450C0 forwards. */
-extern char D_L00_001AEB60[];
+extern char g_str_forward_resident_name[];
 
 extern void func_2A48F0(void *a0, void *a1);
 
 /* Passes a fixed resident address, and the argument, on to the callee. */
 void load_forward_resident_address(void *arg)
 {
-    func_2A48F0(D_L00_001AEB60, arg);
+    func_2A48F0(g_str_forward_resident_name, arg);
 }
 
 

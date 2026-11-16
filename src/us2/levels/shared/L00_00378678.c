@@ -15,10 +15,10 @@ typedef struct {
 typedef struct { char prefix[0x88]; unsigned short price; char rest[0x56]; } ShopClass;
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_l00_table[];
-extern int D_L00_001B25A8 __attribute__((sda));
+extern int g_menu_call_number __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
-extern char D_L00_001AD798[7];
-extern char D_L00_001AD6C8[3];
+extern char g_str_menu_value_format[7];
+extern char g_str_number_plain_format[3];
 extern void *memset(void *, int, unsigned int);
 extern void text_draw_window_medium(TextLayout *, unsigned long long, unsigned char *, int);
 extern int sprintf(char *, char *, ...);
@@ -26,7 +26,7 @@ extern int GetSelectedShopItemPrice(void);
 typedef struct { int price; int pad[3]; unsigned char *name; int pad2[2]; } ShopItem;
 typedef struct { char prefix[0x144]; ShopItem items[0]; } ShopModel;
 extern ShopModel g_purchase_menu_model;
-extern float D_L00_001B25E0 __attribute__((sda));
+extern float g_menu_slide_scale __attribute__((sda));
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern char *GetLocalizedString(int);
@@ -34,10 +34,10 @@ extern void text_draw_right_aligned_medium(int, int, unsigned long long, unsigne
 
 /* Layouts measured from the selected-item panel. */
 typedef struct { unsigned int word[4]; } PanelColors;
-extern PanelColors D_L00_001AD768;
-extern int D_L00_001B1BB8[] __attribute__((sda));
+extern PanelColors g_menu_panel_colors;
+extern int g_menu_call_state_words[] __attribute__((sda));
 extern int g_screen_width __attribute__((sda));
-extern int D_001A79FC __attribute__((sda));
+extern int g_bolt_count __attribute__((sda));
 /* The top counter's mode word and scale: the shared D_L00_001B2700 is another variable in some levels. */
 extern int ref_US2_L00_00378C38_00 __attribute__((sda));
 extern float ref_US2_L00_00378C38_01 __attribute__((sda));
@@ -63,7 +63,7 @@ typedef struct {
 extern void *D_0026DBE0[];
 extern CardPrompt g_vendor_menu_state;
 extern CardStatus g_memcard_state;
-extern int D_001A7A20 __attribute__((sda));
+extern int g_special_items_bought_flags __attribute__((sda));
 extern void shop_set_message_text(char *);
 extern void shop_mark_bought_special_items_owned(void);
 
@@ -76,35 +76,35 @@ void func_US2_L00_00378C38(void) {
     int index = *(int *)(model + 0x80);
     float y;
     int icon;
-    colors = D_L00_001AD768;
-    D_L00_001B1BB8[1] = 0;
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
-                  192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
-                  -192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
-                  192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
-                  -192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    text_draw_right_aligned_medium(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL,
+    colors = g_menu_panel_colors;
+    g_menu_call_state_words[1] = 0;
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(g_menu_slide_scale * 51.0f + 0.5f),
+                  192, (int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(g_menu_slide_scale * 51.0f + 0.5f),
+                  -192, (int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(g_menu_slide_scale * 243.0f + 0.5f),
+                  192, -(int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(g_menu_slide_scale * 243.0f + 0.5f),
+                  -192, -(int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    text_draw_right_aligned_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)GetLocalizedString(0x3022), -1);
     text_format_number_with_separators(text, g_purchase_menu_model.items[index].price);
-    text_draw_medium(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
-    text_draw_centered_medium(g_screen_width >> 1, (int)(D_L00_001B25E0 * 277.0f + 0.5f), 0x80F0F0F0ULL,
+    text_draw_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+    text_draw_centered_medium(g_screen_width >> 1, (int)(g_menu_slide_scale * 277.0f + 0.5f), 0x80F0F0F0ULL,
                   g_purchase_menu_model.items[index].name, -1);
     colors.word[3] = 0x60F0F0B0;
     colors.word[2] = 0x60F0F0B0;
     colors.word[1] = 0x60F0F0B0;
     colors.word[0] = 0x60F0F0B0;
-    text_format_number_with_separators(text, D_001A79FC);
+    text_format_number_with_separators(text, g_bolt_count);
     y = ref_US2_L00_00378C38_01 * 17.0f + 0.5f;
     text_draw_right_aligned_small(444, ref_US2_L00_00378C38_00 == 1 ? (int)(y + -4.0f) : (int)y, 0x80FFFFFFULL,
                   (unsigned char *)text, -1);
     icon = GetIconFrame(0xEAA2, 3);
     hud_draw_sprite_gradient(icon, 458,
-                  g_is_pal_video ? (int)(D_L00_001B25E0 * 15.0f + 0.5f) - 3 : (int)(D_L00_001B25E0 * 15.0f + 0.5f),
+                  g_is_pal_video ? (int)(g_menu_slide_scale * 15.0f + 0.5f) - 3 : (int)(g_menu_slide_scale * 15.0f + 0.5f),
                   32,
-                  g_is_pal_video ? (int)(D_L00_001B25E0 * 32.0f + 0.5f) - 2 : (int)(D_L00_001B25E0 * 32.0f + 0.5f),
+                  g_is_pal_video ? (int)(g_menu_slide_scale * 32.0f + 0.5f) - 2 : (int)(g_menu_slide_scale * 32.0f + 0.5f),
                   colors.word);
 }
 
@@ -130,34 +130,34 @@ void func_US2_L00_00379928(void) {
     int mode;
     int y;
     if (model->state != 0) {
-        if (model->cells[index].price <= D_001A79FC) {
-            func_US2_00280440(444, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+        if (model->cells[index].price <= g_bolt_count) {
+            func_US2_00280440(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31C7), -1, 82, 0.7f);
-            func_US2_00280440(444, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+            func_US2_00280440(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31C4), -1, 82, 0.7f);
         } else {
             int top;
             mode = g_is_pal_video;
-            y = (int)(D_L00_001B25E0 * 214.0f + 0.5f);
+            y = (int)(g_menu_slide_scale * 214.0f + 0.5f);
             top = mode ? y - 11 : y;
             func_US2_00280440(444, top, 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31B0), -1, 82, 0.7f);
         }
     } else {
-        func_US2_00280440(444, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+        func_US2_00280440(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x31B1), -1, 82, 0.7f);
-        func_US2_00280440(444, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+        func_US2_00280440(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x2BE5), -1, 82, 0.7f);
     }
     {
         int icon = GetIconFrame(0xEAA8, 1);
         mode = g_is_pal_video;
-        y = (int)(D_L00_001B25E0 * 64.0f + 0.5f);
-        hud_draw_sprite(icon, 402, mode ? y - 3 : y, 89, (int)(D_L00_001B25E0 * 115.0f + 0.5f), 64);
+        y = (int)(g_menu_slide_scale * 64.0f + 0.5f);
+        hud_draw_sprite(icon, 402, mode ? y - 3 : y, 89, (int)(g_menu_slide_scale * 115.0f + 0.5f), 64);
     }
-    text_draw_centered_medium(445, (int)(D_L00_001B25E0 * 130.0f + 0.5f), 0x80F0F0F0ULL,
+    text_draw_centered_medium(445, (int)(g_menu_slide_scale * 130.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)GetLocalizedString(0x30A8), -1);
-    text_draw_centered_medium(445, (int)(D_L00_001B25E0 * 148.0f + 0.5f), 0x80F0F0F0ULL,
+    text_draw_centered_medium(445, (int)(g_menu_slide_scale * 148.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)GetLocalizedString(0x30A9), -1);
 }
 
@@ -181,13 +181,13 @@ void func_US2_L00_00379C50(void) {
     if (model->active == 0) return;
     memset(&seed.layout, 0, 24);
     seed.layout.field[0] = 120;
-    seed.layout.field[1] = (short)(D_L00_001B25E0 * 200.0f + 0.5f);
+    seed.layout.field[1] = (short)(g_menu_slide_scale * 200.0f + 0.5f);
     seed.layout.field[2] = 160;
     seed.layout.field[3] = 352;
     seed.layout.field[4] = 256;
-    seed.layout.field[5] = (short)(D_L00_001B25E0 * 160.0f + 0.5f);
+    seed.layout.field[5] = (short)(g_menu_slide_scale * 160.0f + 0.5f);
     seed.layout.field[6] = 184;
-    seed.layout.field[7] = (short)(D_L00_001B25E0 * 72.0f + 0.5f);
+    seed.layout.field[7] = (short)(g_menu_slide_scale * 72.0f + 0.5f);
     seed.layout.field[8] = 16;
     seed.layout.field[9] = 3;
     copy = seed.layout;
@@ -197,27 +197,27 @@ void func_US2_L00_00379C50(void) {
         unit_price = ((ShopClass *)g_weapon_l00_table)[g_item_slot_to_record[selected_id]].price;
         if ((int)unit_price <= g_player_bolts) {
             copy.field[9] = 1;
-            copy.field[5] = (short)((float)(copy.field[0] + 12) * D_L00_001B25E0 + 0.5f);
+            copy.field[5] = (short)((float)(copy.field[0] + 12) * g_menu_slide_scale + 0.5f);
             text_draw_window_medium(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x31B3), -1);
-            sprintf(text, D_L00_001AD798, D_L00_001B25A8);
-            copy.field[5] = (short)((float)(copy.field[0] + 40) * D_L00_001B25E0 + 0.5f);
+            sprintf(text, g_str_menu_value_format, g_menu_call_number);
+            copy.field[5] = (short)((float)(copy.field[0] + 40) * g_menu_slide_scale + 0.5f);
             text_draw_window_medium(&copy, 0x80F0F0F0ULL, (unsigned char *)text, -1);
-            sprintf(text, D_L00_001AD6C8, (unsigned int)D_L00_001B25A8 *
+            sprintf(text, g_str_number_plain_format, (unsigned int)g_menu_call_number *
                 ((ShopClass *)g_weapon_l00_table)[g_item_slot_to_record[model->entries[model->index].id]].price);
-            text_draw_right_aligned_medium(256, (int)(D_L00_001B25E0 * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+            text_draw_right_aligned_medium(256, (int)(g_menu_slide_scale * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
             seed.colors[0] = 0x60F0F0B0;
             seed.colors[1] = 0x60F0F0B0;
             seed.colors[2] = 0x60F0F0B0;
             seed.colors[3] = 0x60F0F0B0;
-            hud_draw_sprite_gradient(GetIconFrame(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
-                          16, (int)(D_L00_001B25E0 * 16.0f + 0.5f), seed.colors);
+            hud_draw_sprite_gradient(GetIconFrame(0x7567, 0), 260, (int)(g_menu_slide_scale * 180.0f + 0.5f),
+                          16, (int)(g_menu_slide_scale * 16.0f + 0.5f), seed.colors);
             return;
         }
         message = 0x31B4;
     } else {
         if (g_player_bolts >= GetSelectedShopItemPrice()) {
             copy.field[9] = 1;
-            copy.field[5] = (short)((float)(copy.field[0] + 6) * D_L00_001B25E0 + 0.5f);
+            copy.field[5] = (short)((float)(copy.field[0] + 6) * g_menu_slide_scale + 0.5f);
             message = 0x31B5;
         } else goto no_money;
     }
@@ -248,7 +248,7 @@ void func_US2_L00_0037A050(void) {
     if (model->active == 0) return;
     memset(&layout, 0, sizeof(layout));
     top = 314;
-    scale = D_L00_001B25E0;
+    scale = g_menu_slide_scale;
     layout.field[0] = (short)(scale * 120.0f + 0.5f);
     layout.field[1] = (short)(scale * top + 0.5f);
     layout.field[2] = top;
@@ -300,7 +300,7 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_1:
     rc2_case_3:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.f1C == 1) {
                     shop_set_message_text((char *)GetLocalizedString(0x313A));
                 } else if (g_memcard_state.f1C >= 3) {
@@ -330,7 +330,7 @@ goto *D_0026DBE0[rc2_selector];
         goto rc2_switch_end;
     rc2_case_5:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.fBC == 1) {
                     shop_set_message_text((char *)GetLocalizedString(0x313A));
                 } else if (g_memcard_state.fBC >= 3) {

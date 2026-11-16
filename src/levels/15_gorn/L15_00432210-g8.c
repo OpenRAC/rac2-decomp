@@ -1,9 +1,9 @@
 #include "common.h"
 typedef int GornQuad __attribute__((mode(TI)));
 typedef union { GornQuad q; float f[4]; } GornVector;
-extern short D_L15_001B36A8[] MACRO_ADDR, D_L15_001B36B0[] MACRO_ADDR, D_L15_001B36B8[] MACRO_ADDR;
-extern GornVector D_L15_00269FE0[4][10] NOT_SDA;
-extern float D_L15_001B16B4 __attribute__((sda)), D_L15_001B16B8 __attribute__((sda)), D_L15_001B16C0 __attribute__((sda));
+extern short g_part_channel_timers[] MACRO_ADDR, g_part_channel_counters[] MACRO_ADDR, g_part_channel_reload_values[] MACRO_ADDR;
+extern GornVector g_part_channel_points[4][10] NOT_SDA;
+extern float g_gorn_effect_jitter_small __attribute__((sda)), g_gorn_effect_jitter_large __attribute__((sda)), g_gorn_effect_tangent_length __attribute__((sda));
 extern int FastDecTimer(short *);
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *), vec_scale_to_length(void *, void *, float);
@@ -15,10 +15,10 @@ void RebuildExpiredChannelCurves(void *moby)
     char *vars = *(char **)((char *)moby + 0x68);
     int channel;
     for (channel = 0; channel < 4; channel++) {
-        if (!FastDecTimer(&D_L15_001B36A8[channel]))
+        if (!FastDecTimer(&g_part_channel_timers[channel]))
             continue;
-        D_L15_001B36B0[channel] = 0;
-        D_L15_001B36A8[channel] = D_L15_001B36B8[channel];
+        g_part_channel_counters[channel] = 0;
+        g_part_channel_timers[channel] = g_part_channel_reload_values[channel];
         qcopy(&origin, vars + 0x10);
         origin.f[0] += math_random_float_range(-30, 30);
         origin.f[1] += math_random_float_range(-30, 30);
@@ -39,7 +39,7 @@ void RebuildExpiredChannelCurves(void *moby)
             *(float *)(vars + 0x48) += math_random_float_range(negative, positive);
         }
         FastVecSub(&tangent, &origin, vars);
-        vec_scale_to_length(&tangent, &tangent, D_L15_001B16C0);
+        vec_scale_to_length(&tangent, &tangent, g_gorn_effect_tangent_length);
         FastVecAdd(&tangent, &origin, &tangent);
         {
             int i;
@@ -48,29 +48,29 @@ void RebuildExpiredChannelCurves(void *moby)
                 float t = i * 0.1f;
                 if (i == 9) t = 1.0f;
                 math_l00_interpolate_cubic_vector(&point, vars, &origin, &tangent, &tangent, t);
-                qcopy(&D_L15_00269FE0[channel][i], &point);
+                qcopy(&g_part_channel_points[channel][i], &point);
             }
         }
         {
             int i;
 
             for (i = 1; i < 9; i++) {
-                qcopy(&point, &D_L15_00269FE0[0][i]);
-                point.f[0] += math_random_signed_float_range(0, D_L15_001B16B4);
-                point.f[1] += math_random_signed_float_range(0, D_L15_001B16B4);
-                point.f[2] += math_random_signed_float_range(0, D_L15_001B16B4);
-                qcopy(&D_L15_00269FE0[0][i], &point);
+                qcopy(&point, &g_part_channel_points[0][i]);
+                point.f[0] += math_random_signed_float_range(0, g_gorn_effect_jitter_small);
+                point.f[1] += math_random_signed_float_range(0, g_gorn_effect_jitter_small);
+                point.f[2] += math_random_signed_float_range(0, g_gorn_effect_jitter_small);
+                qcopy(&g_part_channel_points[0][i], &point);
             }
         }
         {
             int i;
 
             for (i = 1; i < 9; i++) {
-                qcopy(&point, &D_L15_00269FE0[0][i]);
-                point.f[0] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[1] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[2] += math_random_signed_float_range(0, D_L15_001B16B8);
-                qcopy(&D_L15_00269FE0[1][i], &point);
+                qcopy(&point, &g_part_channel_points[0][i]);
+                point.f[0] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[1] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[2] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                qcopy(&g_part_channel_points[1][i], &point);
             }
         }
         {
@@ -80,18 +80,18 @@ void RebuildExpiredChannelCurves(void *moby)
                 float t = i * 0.1f;
                 if (i == 9) t = 1.0f;
                 math_l00_interpolate_cubic_vector(&point, vars, vars + 0x20, &tangent, &tangent, t);
-                qcopy(&D_L15_00269FE0[channel][i], &point);
+                qcopy(&g_part_channel_points[channel][i], &point);
             }
         }
         {
             int i;
 
             for (i = 1; i < 9; i++) {
-                qcopy(&point, &D_L15_00269FE0[0][i]);
-                point.f[0] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[1] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[2] += math_random_signed_float_range(0, D_L15_001B16B8);
-                qcopy(&D_L15_00269FE0[2][i], &point);
+                qcopy(&point, &g_part_channel_points[0][i]);
+                point.f[0] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[1] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[2] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                qcopy(&g_part_channel_points[2][i], &point);
             }
         }
         {
@@ -101,18 +101,18 @@ void RebuildExpiredChannelCurves(void *moby)
                 float t = i * 0.1f;
                 if (i == 9) t = 1.0f;
                 math_l00_interpolate_cubic_vector(&point, vars, vars + 0x30, &tangent, &tangent, t);
-                qcopy(&D_L15_00269FE0[channel][i], &point);
+                qcopy(&g_part_channel_points[channel][i], &point);
             }
         }
         {
             int i;
 
             for (i = 1; i < 9; i++) {
-                qcopy(&point, &D_L15_00269FE0[0][i]);
-                point.f[0] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[1] += math_random_signed_float_range(0, D_L15_001B16B8);
-                point.f[2] += math_random_signed_float_range(0, D_L15_001B16B8);
-                qcopy(&D_L15_00269FE0[3][i], &point);
+                qcopy(&point, &g_part_channel_points[0][i]);
+                point.f[0] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[1] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                point.f[2] += math_random_signed_float_range(0, g_gorn_effect_jitter_large);
+                qcopy(&g_part_channel_points[3][i], &point);
             }
         }
         {
@@ -122,7 +122,7 @@ void RebuildExpiredChannelCurves(void *moby)
                 float t = i * 0.1f;
                 if (i == 9) t = 1.0f;
                 math_l00_interpolate_cubic_vector(&point, vars, vars + 0x40, &tangent, &tangent, t);
-                qcopy(&D_L15_00269FE0[channel][i], &point);
+                qcopy(&g_part_channel_points[channel][i], &point);
             }
         }
     }

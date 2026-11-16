@@ -55,9 +55,9 @@ typedef struct {
     unsigned char pad0[0x1924];
     float pitch, yaw;
 } AimAlternateAngles;
-extern AimAngles D_L00_0023DB20;
-extern AimAlternateAngles D_L00_0025BE10;
-extern AimVector g_camera_l00_position, D_L00_001B8FF0;
+extern AimAngles g_target_lock_aim_angles;
+extern AimAlternateAngles g_hero_item_attach_records;
+extern AimVector g_camera_l00_position, g_cam_follow_matrix;
 typedef struct { unsigned char pad0[0x18]; unsigned char *hit; } AimCollision;
 extern AimCollision g_collision_result;
 typedef struct {
@@ -71,11 +71,11 @@ typedef struct {
     union { int bits; float value; } charge;
     int charge2, held, handle;
 } AimState;
-extern AimState *D_L00_001AFD78 __attribute__((sda));
-extern int D_L00_001AFCE8 __attribute__((sda));
-extern int D_L00_001AFCE0 __attribute__((sda));
-extern int D_L00_001AFCE4 __attribute__((sda));
-extern float D_L00_001B28E4 MACRO_ADDR, D_L00_001B28E0 MACRO_ADDR;
+extern AimState *g_target_lock_aim_state __attribute__((sda));
+extern int g_target_lock_timer __attribute__((sda));
+extern int g_target_lock_disabled __attribute__((sda));
+extern int g_target_lock_delay __attribute__((sda));
+extern float g_target_lock_range MACRO_ADDR, g_target_lock_cone MACRO_ADDR;
 extern float ref_L00_003B9310_02 __attribute__((sda));
 extern float ref_L00_003B9310_03 __attribute__((sda));
 extern void mem_clear(void *,int,int);
@@ -94,8 +94,8 @@ extern void matrix_from_basis_rows(void *,void *),transform_vector(void *,void *
 extern float mat_fast_helper_a(float,float),FastAddRotations(float,float),vec_length_xy(void *);
 extern void moby_update_eased_node(void *,void *,int,float,float);
 extern s32 func_PAL_L00_002C4480(int,int);
-extern void func_PAL_L00_002AF458(void),func_PAL_L00_002AF6C0(void),gfx_add_draw_callback_first(void (*)(void),void *);
-extern void func_PAL_L00_003BC098(void);
+extern void func_PAL_L00_002AF458(void),cancel_hero_item_animation_pal(void),gfx_add_draw_callback_first(void (*)(void),void *);
+extern void target_tether_draw_beam_pal(void);
 extern int PlayMobySound(int,int,void *);
 
 void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
@@ -105,23 +105,23 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
     unsigned char *candidate, *old, *entry;
     float range, cone, angle;
     int initialized=state->mode;
-    D_L00_001AFD78=state;
+    g_target_lock_aim_state=state;
     if (!initialized) {
         state->targetId=-1;
         state->charge.bits=0; state->charge2=0; state->target=0;
         state->delay=0; state->height.bits=0; state->special=0;
-        state->timer=(D_L00_001AFCE8 * 5 + 2) / 6;
-        D_L00_001AFCE0=0; state->handle=-1;
-        mem_clear(&D_L00_0023DB20,0,128);
+        state->timer=(g_target_lock_timer * 5 + 2) / 6;
+        g_target_lock_disabled=0; state->handle=-1;
+        mem_clear(&g_target_lock_aim_angles,0,128);
         state->mode=1;
         moby_collect_special_into_table();
     }
     moby_save_and_clear_values();
-    range=D_L00_001B28E4; cone=D_L00_001B28E0;
-    D_L00_001B28E4=35.0f;
+    range=g_target_lock_range; cone=g_target_lock_cone;
+    g_target_lock_range=35.0f;
     if (g_hero_state.f2294==29 && (U(g_hero_state.f2290,0x34)&1)) {
         qcopy(&state->origin,&g_camera_l00_position); qcopy(&origin,&g_camera_l00_position);
-        D_L00_001B28E0=0.10471976548433304f; angle=0.0872664749622345f;
+        g_target_lock_cone=0.10471976548433304f; angle=0.0872664749622345f;
         if (!state->special) state->target=0;
         state->special=1;
     } else {
@@ -129,7 +129,7 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
         FastVecAdd(&origin,(char *)&g_hero_state+0x80,&origin);
         if (g_hero_state.f22b4!=4) moby_transform_joint_to_world(object,1,&state->origin);
         else moby_transform_joint_to_world(g_hero_state.f2290,5,&state->origin);
-        angle=0.2617994248867035f; D_L00_001B28E0=angle; state->special=0;
+        angle=0.2617994248867035f; g_target_lock_cone=angle; state->special=0;
     }
     FastDecTimer(&state->delay); old=state->target;
     if (old) {
@@ -145,13 +145,13 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
             state->target=0; state->targetId=-1; state->height.bits=0;
         } else g_hero_state.fbf8=old;
     }
-    if (state->mode==1 && !g_hero_state.f24ec && !state->delay && !D_L00_001AFCE0 && !g_hero_state.f1e0) {
-        qcopy(&direction,&D_L00_001B8FF0);
+    if (state->mode==1 && !g_hero_state.f24ec && !state->delay && !g_target_lock_disabled && !g_hero_state.f1e0) {
+        qcopy(&direction,&g_cam_follow_matrix);
         if (g_hero_state.f2294==29) direction.v[2]=0;
         FastVecScale(&state->direction,&direction,1.0f);
         candidate=SelectCurrentOrPreferredTarget(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
         if (!candidate) {
-            vec_scale_to_length(&temp,&direction,D_L00_001B28E4);
+            vec_scale_to_length(&temp,&direction,g_target_lock_range);
             FastVecAdd(&temp,&temp,&origin);
             if (CollLine(&origin,&temp,0,g_hero_state.f2290,0)) {
                 unsigned char *hit=g_collision_result.hit;
@@ -172,7 +172,7 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
                         if (P(sound,0x88)==object && B(sound,0x74)) snd_stop_voice(handle);
                     }
                     state->target=candidate; state->handle=-1;
-                    state->targetId=U(candidate,0xaa); state->height.bits=0; state->delay=(D_L00_001AFCE4 * 5 + 2) / 6;
+                    state->targetId=U(candidate,0xaa); state->height.bits=0; state->delay=(g_target_lock_delay * 5 + 2) / 6;
                     newDescriptor=moby_get_private_value_0(candidate);
                     if (newDescriptor) {
                         state->height.value=F(newDescriptor,0x10);
@@ -180,9 +180,9 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
                         FastVecAdd(&target,state->target+0x10,&temp);
                     } else qcopy(&target,state->target+0x10);
                 }
-            } else state->timer=(D_L00_001AFCE8 * 5 + 2) / 6;
+            } else state->timer=(g_target_lock_timer * 5 + 2) / 6;
         } else {
-            state->targetId=-1; state->target=0; state->height.bits=0; state->timer=(D_L00_001AFCE8 * 5 + 2) / 6;
+            state->targetId=-1; state->target=0; state->height.bits=0; state->timer=(g_target_lock_timer * 5 + 2) / 6;
         }
         state->candidate=candidate;
     }
@@ -197,17 +197,17 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
         matrix_from_basis_rows(matrix,object+0xc0);
         transform_vector(&direction,&state->direction,matrix);
         if (g_hero_state.f22b4!=4) {
-            D_L00_0023DB20.yaw=FastAddRotations(1.5707964f,mat_fast_helper_a(direction.v[0],direction.v[1]));
-            D_L00_0023DB20.pitch=-mat_fast_helper_a(vec_length_xy(&direction),direction.v[2]);
+            g_target_lock_aim_angles.yaw=FastAddRotations(1.5707964f,mat_fast_helper_a(direction.v[0],direction.v[1]));
+            g_target_lock_aim_angles.pitch=-mat_fast_helper_a(vec_length_xy(&direction),direction.v[2]);
         } else {
-            D_L00_0025BE10.yaw=mat_fast_helper_a(direction.v[0],direction.v[1]);
-            D_L00_0025BE10.pitch=mat_fast_helper_a(vec_length_xy(&direction),direction.v[2]);
+            g_hero_item_attach_records.yaw=mat_fast_helper_a(direction.v[0],direction.v[1]);
+            g_hero_item_attach_records.pitch=mat_fast_helper_a(vec_length_xy(&direction),direction.v[2]);
         }
     }
     if (state->mode==1 && g_hero_state.f2294!=28 && g_hero_state.f2294!=49) {
         if (g_hero_state.f2294==1) func_PAL_L00_002C4480(29,1);
-        if (g_hero_state.f22b4!=4) moby_update_eased_node(object,&D_L00_0023DB20,g_hero_state.f22b4==4?5:0,ref_L00_003B9310_02*1.44f,ref_L00_003B9310_03*1.44f);
-        if (g_hero_state.f340 && !g_hero_state.f34e && !D_L00_001AFCE0 && !g_hero_state.f22bc && (g_pad_state.held&g_hero_state.f1230) && (g_hero_state.f1240>=13 || g_hero_state.f22b4==4)) {
+        if (g_hero_state.f22b4!=4) moby_update_eased_node(object,&g_target_lock_aim_angles,g_hero_state.f22b4==4?5:0,ref_L00_003B9310_02*1.44f,ref_L00_003B9310_03*1.44f);
+        if (g_hero_state.f340 && !g_hero_state.f34e && !g_target_lock_disabled && !g_hero_state.f22bc && (g_pad_state.held&g_hero_state.f1230) && (g_hero_state.f1240>=13 || g_hero_state.f22b4==4)) {
             if (!state->held) {
                 if (g_hero_state.f22b4!=4) {
                     unsigned char *sound;
@@ -224,7 +224,7 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
             }
         }
         if (state->charge.value>0.0f || (g_pad_state.held&g_hero_state.f1230) || !g_hero_state.f340 || g_hero_state.f34e)
-            gfx_add_draw_callback_first(func_PAL_L00_003BC098,object);
+            gfx_add_draw_callback_first(target_tether_draw_beam_pal,object);
         if (!(g_pad_state.held&g_hero_state.f1230) && (g_hero_state.f1d8>=8 || !g_hero_state.f22b8 || !g_hero_state.f340 || g_hero_state.f34e)) {
             if (state->handle!=-1) {
                 int handle=state->handle;
@@ -232,7 +232,7 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
                 if (P(sound,0x88)==object && B(sound,0x74)) snd_stop_voice(handle);
             }
             state->handle=-1;
-            if (g_hero_state.f22b4!=4) func_PAL_L00_002AF6C0();
+            if (g_hero_state.f22b4!=4) cancel_hero_item_animation_pal();
             state->held=0;
         }
     }

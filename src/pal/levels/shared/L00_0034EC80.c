@@ -9,14 +9,14 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
-extern int D_00138344;
+extern int g_menu_input_flags;
+extern int g_menu_input_flags;
 extern int func_PAL_L00_0030F768(int);
 extern void ref_PAL_L00_0034EC80_00(int);
 
 int func_PAL_L00_0034EC80(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -39,13 +39,13 @@ return_value:
 
 #include "common.h"
 extern void SetupGifPaging(long);
-extern void func_PAL_L00_0030F7A8(void);
+extern void level_l00_call_module_handler_pal(void);
 extern void DoGifPaging(void);
 
 int func_PAL_L00_0034ED08(void)
 {
   SetupGifPaging(0);
-  func_PAL_L00_0030F7A8();
+  level_l00_call_module_handler_pal();
   DoGifPaging();
   return 0;
 }

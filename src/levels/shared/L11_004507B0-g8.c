@@ -1,14 +1,14 @@
 #include "common.h"
 struct EffectQuad { float position[4][4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
-extern float D_L11_001BA780[];
-extern int D_L11_001B1CE4 __attribute__((sda));
-extern u32 D_L11_001B1CE8 __attribute__((sda));
-extern u32 D_L11_001B1CEC __attribute__((sda));
-extern float D_L11_001B1CF0 __attribute__((sda));
-extern float D_L11_001B1CF4 __attribute__((sda));
-extern int D_L11_001B1CF8 __attribute__((sda));
-extern int D_L11_001B1CFC __attribute__((sda));
-extern float D_L11_001B1D00 __attribute__((sda));
+extern float g_hero_l11_state_block[];
+extern int g_glow_flare_disabled __attribute__((sda));
+extern u32 g_glow_flare_sprite_a __attribute__((sda));
+extern u32 g_glow_flare_sprite_b __attribute__((sda));
+extern float g_glow_flare_size_a __attribute__((sda));
+extern float g_glow_flare_size_b __attribute__((sda));
+extern int g_glow_flare_color_a __attribute__((sda));
+extern int g_glow_flare_color_b __attribute__((sda));
+extern float g_glow_flare_distance __attribute__((sda));
 extern void ref_L11_004507B0_00(char *);
 extern long long GetEffectTextureDescriptor(int);
 extern float mat_fast_helper_a(float, float);
@@ -42,11 +42,11 @@ void part_draw_glow_sprite_flares(void *position, u32 color, float size, int alp
     quad.clear = 0;
     
     rotation[3] = 0.0f;
-    rotation[2] = mat_fast_helper_a(D_L11_001BA780[0x50] - point[0], D_L11_001BA780[0x51] - point[1]);
-    rotation[1] = -mat_fast_helper_a(vec_distance_xy(position, D_L11_001BA780 + 0x50), D_L11_001BA780[0x52] - point[2]);
+    rotation[2] = mat_fast_helper_a(g_hero_l11_state_block[0x50] - point[0], g_hero_l11_state_block[0x51] - point[1]);
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(position, g_hero_l11_state_block + 0x50), g_hero_l11_state_block[0x52] - point[2]);
     rotation[0] = roll;
     euler_to_matrix(matrix, rotation);
-    FastVecSub(toward, D_L11_001BA780 + 0x50, position);
+    FastVecSub(toward, g_hero_l11_state_block + 0x50, position);
     vec_scale_to_length(toward, toward, offset);
     matrix[12] = point[0] + toward[0];
     matrix[13] = point[1] + toward[1];
@@ -54,12 +54,12 @@ void part_draw_glow_sprite_flares(void *position, u32 color, float size, int alp
     matrix[15] = 1.0f;
     vec_l11_scale_four((char *)&quad, size);
     draw_world_quad(&quad, matrix, 0);
-    if (D_L11_001B1CE4 == 0) {
-        vec_scale_to_length(light, vars, D_L11_001B1D00);
+    if (g_glow_flare_disabled == 0) {
+        vec_scale_to_length(light, vars, g_glow_flare_distance);
         FastVecAdd(light, object + 0x10, light);
-        gfx_draw_billboard_quad(light, D_L11_001B1CE8, D_L11_001B1CF8, 1, D_L11_001B1CF0, 0.08f, 0.0f);
+        gfx_draw_billboard_quad(light, g_glow_flare_sprite_a, g_glow_flare_color_a, 1, g_glow_flare_size_a, 0.08f, 0.0f);
         vec_scale_to_length(light, vars, -0.03f);
         FastVecAdd(light, object + 0x10, light);
-        gfx_draw_billboard_quad(light, D_L11_001B1CEC, D_L11_001B1CFC, 1, D_L11_001B1CF4, 0.08f, 0.0f);
+        gfx_draw_billboard_quad(light, g_glow_flare_sprite_b, g_glow_flare_color_b, 1, g_glow_flare_size_b, 0.08f, 0.0f);
     }
 }

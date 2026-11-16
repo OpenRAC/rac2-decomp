@@ -9,7 +9,7 @@ typedef struct UIFadeState {
     int repeats;
     float spacing;
 } UIFadeState;
-extern UIFadeState D_L00_001BC200;
+extern UIFadeState g_fading_text_style;
 typedef struct UIFadeEntry {
     int key, textBase;
     char pad08[12];
@@ -18,7 +18,7 @@ typedef struct UIFadeEntry {
     int stride;
     int tail;
 } UIFadeEntry;
-extern UIFadeEntry D_L00_001BC588[];
+extern UIFadeEntry g_fading_text_layouts[];
 extern int AdvanceGroupedTableOffset(int, int *, int *);
 extern int text_find_level_by_key(int);
 extern void DrawSlidingTextLine(char *text, float t, int mode, int color, int y, int pass);
@@ -32,20 +32,20 @@ void text_draw_fading_line(float progress, int item)
     float alpha;
     if (!AdvanceGroupedTableOffset(item, &bank, &index))
         return;
-    text = text_find_level_by_key(D_L00_001BC588[bank].textBase + index);
+    text = text_find_level_by_key(g_fading_text_layouts[bank].textBase + index);
     if (!text)
         return;
-    position = D_L00_001BC588[D_L00_001BC200.selected].position + item * D_L00_001BC588[D_L00_001BC200.selected].stride;
-    if (progress > 1.0f - D_L00_001BC200.fade) {
-        fade = (progress - 1.0f + D_L00_001BC200.fade) / D_L00_001BC200.fade;
+    position = g_fading_text_layouts[g_fading_text_style.selected].position + item * g_fading_text_layouts[g_fading_text_style.selected].stride;
+    if (progress > 1.0f - g_fading_text_style.fade) {
+        fade = (progress - 1.0f + g_fading_text_style.fade) / g_fading_text_style.fade;
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
         DrawSlidingTextLine((char *)text, fade, 3, -1, position, 1);
-        for (i = D_L00_001BC200.repeats; i >= 0; i--) {
+        for (i = g_fading_text_style.repeats; i >= 0; i--) {
             int grey, lo, hi;
-            offset = i * D_L00_001BC200.spacing;
-            ratio = (float)(D_L00_001BC200.repeats - i) / (float)D_L00_001BC200.repeats;
-            alpha = (progress - 1.0f + D_L00_001BC200.fade) / D_L00_001BC200.fade + offset;
+            offset = i * g_fading_text_style.spacing;
+            ratio = (float)(g_fading_text_style.repeats - i) / (float)g_fading_text_style.repeats;
+            alpha = (progress - 1.0f + g_fading_text_style.fade) / g_fading_text_style.fade + offset;
             grey = (int)(ratio * 255.0f);
             lo = (grey << 8) | 0x80000000;
             hi = (grey << 16) | lo;
@@ -54,15 +54,15 @@ void text_draw_fading_line(float progress, int item)
             else if (alpha < 0.0f) alpha = 0.0f;
             DrawSlidingTextLine((char *)text, alpha, 3, colour, position, 0);
         }
-    } else if (progress < D_L00_001BC200.fade) {
-        fade = progress / D_L00_001BC200.fade;
+    } else if (progress < g_fading_text_style.fade) {
+        fade = progress / g_fading_text_style.fade;
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
         DrawSlidingTextLine((char *)text, fade, 2, -1, position, 1);
-        for (i = D_L00_001BC200.repeats; i >= 0; i--) {
+        for (i = g_fading_text_style.repeats; i >= 0; i--) {
             int grey, lo, hi;
-            alpha = progress / D_L00_001BC200.fade - i * D_L00_001BC200.spacing;
-            ratio = (float)(D_L00_001BC200.repeats - i) / (float)D_L00_001BC200.repeats;
+            alpha = progress / g_fading_text_style.fade - i * g_fading_text_style.spacing;
+            ratio = (float)(g_fading_text_style.repeats - i) / (float)g_fading_text_style.repeats;
             grey = (int)(ratio * 255.0f);
             lo = (grey << 8) | 0x80000000;
             hi = (grey << 16) | lo;

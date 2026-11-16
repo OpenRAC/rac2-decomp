@@ -11,7 +11,7 @@ typedef struct {
     SeqRow278fc0 rows[32];
     int count;
 } SeqTable278fc0;
-extern SeqTable278fc0 D_001B8308;
+extern SeqTable278fc0 g_disc_player_seq_table;
 
 /* State block at 0x1B7F80: disc buffers, the current row and frame, and the timing
    parameters case 0 sets. */
@@ -26,7 +26,7 @@ typedef struct {
     float speed;
     int limit;
 } SeqState278fc0;
-extern SeqState278fc0 D_001B7F80;
+extern SeqState278fc0 g_disc_player_seq_state;
 
 /* Part of the disc table of contents at 0x14B540: a base sector and sector/size pairs. */
 typedef struct { int offset, size; } TocFile278fc0;
@@ -39,8 +39,8 @@ typedef struct {
 } Toc278fc0;
 extern Toc278fc0 g_copy_setup_data;
 
-extern int D_00138324;
-extern short D_001A63AC;
+extern int g_pad_held_flags;
+extern short g_sequence_active_flag;
 extern int g_screen_width __attribute__((sda));
 extern float g_screen_fade __attribute__((sda));
 /* The level's state word, a per-level external (see func_002799A8 in 00274128.c). */
@@ -58,16 +58,16 @@ extern int UpdateSoundVoices(void);
 /* Runs the disc-streamed picture sequence: loads rows and frames from disc step by step and times each one. */
 void seq_update_disc_player(void)
 {
-    if (D_00138324 & 2) {
+    if (g_pad_held_flags & 2) {
         if (ref_L00_002E38F0_00 == 0) {
-            D_001B7F80.row = 1;
+            g_disc_player_seq_state.row = 1;
             ref_L00_002E38F0_00 = 1;
         }
         request_end_slot(0, 0);
     }
-    switch (D_001B7F80.state) {
+    switch (g_disc_player_seq_state.state) {
     case 0:
-        if (D_001A63AC)
+        if (g_sequence_active_flag)
             break;
         table_set_slot_values(0x33C0, 0x33C1, 0x33EA, 1, 40, 120, 1, 9, 32, 100, 0);
         table_set_slot_values(0x33C0, 0x33EB, 0x340D, 2, 40, 120, 1, 9, 32, 100, 1);
@@ -90,34 +90,34 @@ void seq_update_disc_player(void)
         table_set_slot_values(0x349D, 0x349E, 0x34B5, 18, 60, 120, 1, 8, 32, 100, 18);
         table_set_slot_values(0x349D, 0x34B6, 0x34B6, 19, 60, 120, 0, 1, 128, 350, 19);
         table_set_slot_values(0x34D0, 0x34D0, 0x34D0, 0, 200, 512, 0, 1, 128, 350, 20);
-        D_001B8308.count = 21;
-        D_001B7F80.frame = 0;
-        D_001B7F80.buffer_index = 0;
-        D_001B7F80.ready = 0;
-        D_001B7F80.row = -1;
-        D_001B7F80.subrow = -1;
-        D_001B7F80.timer = 90;
-        D_001B7F80.step = 10;
-        D_001B7F80.base = 310;
-        D_001B7F80.duration = (float)g_screen_width * 2.2f;
-        D_001B7F80.rate = 0.16129032f;
-        D_001B7F80.repeats = 5;
-        D_001B7F80.speed = 0.03f;
-        D_001B7F80.limit = 18;
-        load_start_disc_read(D_001B7F80.buffers[2], g_copy_setup_data.intro.offset + g_copy_setup_data.base,
+        g_disc_player_seq_table.count = 21;
+        g_disc_player_seq_state.frame = 0;
+        g_disc_player_seq_state.buffer_index = 0;
+        g_disc_player_seq_state.ready = 0;
+        g_disc_player_seq_state.row = -1;
+        g_disc_player_seq_state.subrow = -1;
+        g_disc_player_seq_state.timer = 90;
+        g_disc_player_seq_state.step = 10;
+        g_disc_player_seq_state.base = 310;
+        g_disc_player_seq_state.duration = (float)g_screen_width * 2.2f;
+        g_disc_player_seq_state.rate = 0.16129032f;
+        g_disc_player_seq_state.repeats = 5;
+        g_disc_player_seq_state.speed = 0.03f;
+        g_disc_player_seq_state.limit = 18;
+        load_start_disc_read(g_disc_player_seq_state.buffers[2], g_copy_setup_data.intro.offset + g_copy_setup_data.base,
                       g_copy_setup_data.intro.size);
-        D_001B7F80.state = 1;
+        g_disc_player_seq_state.state = 1;
         break;
     case 1:
-        if (D_001A63AC)
+        if (g_sequence_active_flag)
             break;
-        if (math_fast_float_d(&D_001B7F80.timer)) {
+        if (math_fast_float_d(&g_disc_player_seq_state.timer)) {
             load_relocate_data_table_offsets();
-            D_001B7F80.state = 2;
+            g_disc_player_seq_state.state = 2;
         }
         break;
     case 2: {
-        SeqState278fc0 *s = &D_001B7F80;
+        SeqState278fc0 *s = &g_disc_player_seq_state;
         if (s->frame >= 20)
             s->frame %= 20;
         load_start_disc_read(s->buffers[s->buffer_index],
@@ -128,20 +128,20 @@ void seq_update_disc_player(void)
     }
     case 3: {
         SeqState278fc0 *s;
-        if (D_001A63AC)
+        if (g_sequence_active_flag)
             break;
-        s = &D_001B7F80;
+        s = &g_disc_player_seq_state;
         s->ready = 1;
         s->buffer_index ^= 1;
         if (data_advance_to_next_item_group()) {
             s->state = 4;
-            switch (D_001B8308.rows[s->row].kind) {
+            switch (g_disc_player_seq_table.rows[s->row].kind) {
             case 0:
-                s->timer = D_001B8308.rows[s->row].delay;
+                s->timer = g_disc_player_seq_table.rows[s->row].delay;
                 break;
             case 1:
             case 2:
-                s->timer = s->base + s->step * (D_001B8308.rows[s->row].count - 1);
+                s->timer = s->base + s->step * (g_disc_player_seq_table.rows[s->row].count - 1);
                 break;
             }
         } else {
@@ -153,9 +153,9 @@ void seq_update_disc_player(void)
         SeqState278fc0 *s;
         ApproachValue(&g_screen_fade, 0.0f, 0.06666667f);
         if (data_query_shared_block()) {
-            s = &D_001B7F80;
+            s = &g_disc_player_seq_state;
             s->state = 2;
-            s->frame = D_001B8308.rows[s->row].frame;
+            s->frame = g_disc_player_seq_table.rows[s->row].frame;
         }
         break;
     }

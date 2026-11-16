@@ -7,7 +7,7 @@ extern UiCoordinates *object_get_first_field(char *);
 extern void meter_set_max(char *,int),meter_set_value(char *,int);
 extern void object_set_first_pair(char *,unsigned,unsigned),object_set_second_pair(char *,unsigned,unsigned);
 extern void stub_empty_31(int *,int *,int *);
-extern int D_001A7A00 MACRO_ADDR, D_001A7A0C MACRO_ADDR;
+extern int g_player_stats MACRO_ADDR, g_experience_points MACRO_ADDR;
 typedef struct { char pad[0x22b4]; unsigned char mode; char gap[0x277]; int end, start; } StatusGlobals;
 extern StatusGlobals g_hero_state;
 extern float ref_L00_0034AA30_00 MACRO_ADDR,ref_L00_0034AA30_02 MACRO_ADDR;
@@ -16,7 +16,7 @@ extern int ref_L00_0034AA30_03 MACRO_ADDR;
 void hud_meter_bar_update(char *hud)
 {
  UiCoordinates *out=object_get_first_field(hud+0xf4);
- if(D_001A7A00<80) {
+ if(g_player_stats<80) {
   struct { int a,b,c; } range;
   float y, scale, offsetY;
   int iy;
@@ -25,7 +25,7 @@ void hud_meter_bar_update(char *hud)
   range.c=0;range.a=g_hero_state.start;range.b=g_hero_state.end;
   if(!range.a)stub_empty_31(&range.a,&range.b,&range.c);
   meter_set_max(hud+0xf4,range.b-range.a);
-  meter_set_value(hud+0xf4,(D_001A7A0C>>5)-range.a);
+  meter_set_value(hud+0xf4,(g_experience_points>>5)-range.a);
   out->x=ref_L00_0034AA30_00+(*(UiCoordinates **)(hud+8))->x;
   scale=ref_L00_0034AA30_02;
   mode=ref_L00_0034AA30_03;

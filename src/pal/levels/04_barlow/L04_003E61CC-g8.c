@@ -9,18 +9,18 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L04_001C9C00[];
-extern s32 D_L04_001A8F00;
+extern s32 g_barlow_state_flags[];
+extern s32 g_game_l04_mode;
 extern s32 *g_route_path_table[];
-extern u8 *D_L04_001B25CC[] __attribute__((sda));
-extern char D_L04_001A8F20[] __attribute__((sda));
-extern u8 D_L04_001C7800[];
-extern TI128 D_L04_001BFAE0;
+extern u8 *g_linked_record_table[] __attribute__((sda));
+extern char g_effect_default_params[] __attribute__((sda));
+extern u8 g_creature_light_table[];
+extern TI128 g_spark_origin_quad;
 
 extern s32 func_PAL_L04_003E8A70(u8 *);
 extern void object_update_age_timer(u8 *);
 extern void object_draw_linked_beam(u8 *);
-extern void func_PAL_L04_003E99C0(u8 *, void *);
+extern void object_move_along_anim_sparks_pal(u8 *, void *);
 extern void SelectRandomOtherLiveSlot(u8 *);
 extern s32 flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
@@ -30,21 +30,21 @@ extern s32 math_random_int_range(s32, s32);
 extern s32 math_random_int_below(s32);
 extern s32 point_in_path_xy(void *, void *, s32);
 extern s32 moby_dispatch_action_by_kind(u8 *, void *);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern void part_queue_moby_for_glow(u8 *, s32, void *);
 extern void moby_mark_spawned(void *);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_fast_float_d(void *);
 extern s32 FastDecTimer(void *);
 extern f32 ApproachValue(f32 *, f32, f32);
-extern void func_PAL_002AF420(u8 *, void *, f32, f32);
-extern s32 func_PAL_002B6CD8(u8 *, void *);
+extern void moby_wander_around_home_point_pal(u8 *, void *, f32, f32);
+extern s32 path_follow_nodes_pal(u8 *, void *);
 extern s32 path_set_follower_nodes(u8 *, void *, s32, s32);
 extern f32 moby_turn_toward_position(u8 *, void *, void *, f32, f32, f32);
 extern f32 vec_distance_xy(void *, void *);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
-extern s32 func_PAL_L01_00323068(u8 *, void *);
+extern s32 moby_l01_turn_toward_target_pal(u8 *, void *);
 extern void moby_transform_joint_to_world(u32 a0, s32 a1, f32 *a2);
 extern f32 math_fast_sin_or_cos_a(f32 a0);
 extern f32 math_fast_sin_or_cos_b(f32 a0);
@@ -55,7 +55,7 @@ extern s32 coll_process_hit(void *, f32, s32, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern s32 func_PAL_L02_00333638(u8 *, void *, f32, s32, f32, f32);
+extern s32 moby_move_to_target_temp_limits_pal(u8 *, void *, f32, s32, f32, f32);
 extern f32 moby_get_anim_value(u8 *);
 extern void *part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
 extern s32 coll_test_hit_at_bone(void *, f32, f32, s32, s32, f32, s32, s32, s32);
@@ -63,18 +63,18 @@ extern void moby_set_flag_bit(u8 *, s32);
 extern s32 part_l00_alloc_effect_slot_2(void *, f32, f32, f32, f32, f32);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 flag_is_third_pending_set(u8 *);
-extern void func_PAL_L04_003E96E0(void *, s32);
+extern void part_l04_spawn_paired_sparks_pal(void *, s32);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void gfx_free_point_light(s32);
-extern s32 func_PAL_002B5C98(u8 *, void *, f32);
+extern s32 moby_step_controller_pal(u8 *, void *, f32);
 extern void object_set_linked_states(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 
 void func_PAL_L04_003E61CC(u8 *arg0) {
     u8 *data;
 
     data = *(u8 **)(arg0 + 0x68);
-    if (D_L04_001C9C00[0] == 1) {
-        if (D_L04_001A8F00 == 2) {
+    if (g_barlow_state_flags[0] == 1) {
+        if (g_game_l04_mode == 2) {
             *(s32 *)(arg0 + 0x98) = 0;
             *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
         } else {
@@ -168,7 +168,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 object_set_linked_states(arg0, 3, 1, 0, 0xA);
                 moby_set_state(arg0, 8, 1);
                 if (*(s32 *)(data + 0x2D4) != -1) {
-                    qcopy(data + 0x110, D_L04_001B25CC[0] + (*(s32 *)(data + 0x2D4) << 7) + 0x30);
+                    qcopy(data + 0x110, g_linked_record_table[0] + (*(s32 *)(data + 0x2D4) << 7) + 0x30);
                     if (*(f32 *)(data + 0x12C) == 0.0f)
                         *(f32 *)(data + 0x12C) = 4.0f;
                 }
@@ -182,7 +182,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
 
         r = moby_dispatch_action_by_kind(arg0, data + 0x60);
         if (r & 1) {
-            func_PAL_002A7650(arg0, 0, 3);
+            SetDeathBits_pal(arg0, 0, 3);
             part_queue_moby_for_glow(arg0, 0, 0);
             return;
         }
@@ -223,7 +223,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                     if (math_random_int_below(2) == 1)
                         object_set_linked_states(arg0, 0, 0, 0, 0xA);
                 }
-                func_PAL_002AF420(arg0, data + 0x110, 0.35f, 0.25f);
+                moby_wander_around_home_point_pal(arg0, data + 0x110, 0.35f, 0.25f);
             } else if (arg0[0x43] < 2 && (arg0[0x60] & 2)) {
                 *(s32 *)(data + 0x2BC) = math_random_int_range(0x64, 0x247);
                 object_set_linked_states(arg0, 5, 4, 0, 0xA);
@@ -233,7 +233,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
         }
         break;
     case 2:
-        if (func_PAL_002B6CD8(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]) != 0) {
             moby_set_state(arg0, 4, -1);
             object_set_linked_states(arg0, 4, 3, 0, 8);
             path_set_follower_nodes(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)], 0, 1);
@@ -241,7 +241,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
         }
         break;
     case 3:
-        if (func_PAL_002B6CD8(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]) != 0) {
             moby_set_state(arg0, 4, -1);
             object_set_linked_states(arg0, 4, 3, 0, 8);
             path_set_follower_nodes(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)], 1, 0);
@@ -267,7 +267,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
 
         *(TI128 *)v = *(TI128 *)(data + 0x280);
         moby_set_controller_speed_limits(arg0, 0.00064000004f, 0.032f, 0.0016755164f, 0.12566373f);
-        func_PAL_L01_00323068(arg0, v);
+        moby_l01_turn_toward_target_pal(arg0, v);
         if (vec_distance_xy(arg0 + 0x10, v) < 1.0f) {
             object_set_linked_states(arg0, 1, 1, 0, 8);
             *(s16 *)(data + 0x300) = ((s32)math_random_int_range(0x4B0, 0xBB8) * 5 + 2) / 6;
@@ -283,7 +283,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
 
         *(TI128 *)v = *(TI128 *)(data + 0x280);
         moby_set_controller_speed_limits(arg0, 0.0009600001f, 0.048000004f, 0.0016755164f, 0.12566373f);
-        func_PAL_L04_003E99C0(arg0, v);
+        object_move_along_anim_sparks_pal(arg0, v);
         m = (*(f32 *)(data + 0x16C) * 150.0f + 2.0f) * 0.16666667f;
         if (m < *(f32 *)(data + 0x1E8))
             *(f32 *)(data + 0x1E8) = m;
@@ -307,7 +307,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 if (math_random_int_below(2) == 1)
                     object_set_linked_states(arg0, 4, 3, 0, 0xA);
             }
-            func_PAL_002AF420(arg0, data + 0x110, 0.35f, 0.25f);
+            moby_wander_around_home_point_pal(arg0, data + 0x110, 0.35f, 0.25f);
         } else if ((u8)(arg0[0x43] - 3) < 2 && (arg0[0x60] & 2)) {
             *(s32 *)(data + 0x2BC) = math_random_int_range(0x64, 0x247);
             object_set_linked_states(arg0, 6, 5, 0, 0xA);
@@ -333,7 +333,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
         }
         break;
     case 11:
-        func_PAL_L04_003E99C0(arg0, data + 0x230);
+        object_move_along_anim_sparks_pal(arg0, data + 0x230);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
         if (*(u8 **)(data + 0x2AC) != 0) {
             if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 20.0f &&
@@ -358,7 +358,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
     case 15: {
         *(f32 *)(data + 0x164) = 0.010000001f;
         moby_set_controller_speed_limits(arg0, 0.0096f, 0.24000001f, 0.0016755164f, 0.12566373f);
-        func_PAL_L01_00323068(arg0, data + 0x230);
+        moby_l01_turn_toward_target_pal(arg0, data + 0x230);
         moby_turn_toward_position(arg0, *(void **)(data + 0x240), data + 0x2B4, 0.001f, 0.01f, 0.1f);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
         if (vec_distance_xy(arg0 + 0x10, *(u8 **)(data + 0x240) + 0x10) < 3.5f) {
@@ -402,7 +402,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
         off[1] = math_fast_sin_or_cos_b(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[2] = 0.0f;
         FastVecAdd(off, p, off);
-        func_PAL_L01_00323068(arg0, data + 0x230);
+        moby_l01_turn_toward_target_pal(arg0, data + 0x230);
         *(s32 *)(data + 0x2B0) = *(s32 *)(data + 0x2B0) + 1;
         if (arg0[0x60] & 2) {
             object_set_linked_states(arg0, 2, 2, 0, 8);
@@ -443,7 +443,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
 
         vec_scale_to_length(v, arg0 + 0xC0, -5.5f);
         FastVecAdd(v, v, arg0 + 0x10);
-        func_PAL_L02_00333638(arg0, v, mat_fast_helper_a(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
+        moby_move_to_target_temp_limits_pal(arg0, v, mat_fast_helper_a(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x65) {
             *(f32 *)(data + 0x164) = 0.0012f;
@@ -475,7 +475,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
         break;
     case 13:
         moby_set_controller_speed_limits(arg0, 0.0048f, 0.120000005f, 0.0016755164f, 0.12566373f);
-        if (func_PAL_002B6CD8(arg0, g_route_path_table[*(s32 *)(data + 0x2C4)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_route_path_table[*(s32 *)(data + 0x2C4)]) != 0) {
             moby_set_state(arg0, 0x14, -1);
             object_set_linked_states(arg0, 0x10, 4, 0, 8);
             moby_set_controller_speed_limits(arg0, 0.0048f, 0.120000005f, 0.0016755164f, 0.12566373f);
@@ -502,8 +502,8 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
             n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
             *(f32 *)(data + 0x2B8) = g;
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x2E) {
@@ -585,7 +585,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2E0) = k;
                 if (k >= 0) {
-                    l = D_L04_001C7800 + (k << 5);
+                    l = g_creature_light_table + (k << 5);
                     qcopy(l + 0x10, data + 0x260);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -615,7 +615,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2E0) = k;
                 if (k >= 0) {
-                    l = D_L04_001C7800 + (k << 5);
+                    l = g_creature_light_table + (k << 5);
                     qcopy(l + 0x10, data + 0x260);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -644,8 +644,8 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L04_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_effect_default_params, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
                 *(f32 *)(data + 0x2B8) = *(f32 *)(data + 0x2B8) + 1.0f;
             }
         }
@@ -665,9 +665,9 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
             *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
             FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
             if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
-                *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
+                *(TI128 *)(data + 0x270) = g_spark_origin_quad;
                 if (flag_is_third_pending_set(arg0) == 0) {
-                    func_PAL_L04_003E96E0(&D_L04_001BFAE0, 0x1E);
+                    part_l04_spawn_paired_sparks_pal(&g_spark_origin_quad, 0x1E);
                     moby_set_flag_bit(arg0, 1);
                 }
             }
@@ -678,17 +678,17 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
             qcopy(v30, data + 0x270);
             v30[2] -= 0.1f;
             f3 = f * 0.3f;
-            part_spawn_ground_effect(v30, 0x15, f3, f, 0xFF000080, 0, n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x15, f3, f, 0xFF000080, 0, n, g_effect_default_params, 0.0f, 0);
             n = -n;
             f04 = f * 0.04f;
             f4 = f * 0.4f;
-            part_spawn_ground_effect(v30, 4, f04, f4, 0x7F6F6FFF, 1, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v30, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x260, 8, f3, f, 0x80CA00CB, 0, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x260, 8, f04, f4, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 4, f04, f4, 0x7F6F6FFF, 1, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x260, 8, f3, f, 0x80CA00CB, 0, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x260, 8, f04, f4, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
             gfx_add_draw_callback_third(object_draw_linked_beam, arg0);
             if (*(s32 *)(data + 0x2E0) >= 0) {
-                l = D_L04_001C7800 + (*(s32 *)(data + 0x2E0) << 5);
+                l = g_creature_light_table + (*(s32 *)(data + 0x2E0) << 5);
                 qcopy(l + 0x10, data + 0x270);
                 *(f32 *)(l + 0x1C) = 5.0f;
                 *(f32 *)(l + 0) = 1.0f;
@@ -716,9 +716,9 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                 *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
                 FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
                 if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
-                    *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
+                    *(TI128 *)(data + 0x270) = g_spark_origin_quad;
                     if (flag_is_third_pending_set(arg0) == 0) {
-                        func_PAL_L04_003E96E0(&D_L04_001BFAE0, 0x1E);
+                        part_l04_spawn_paired_sparks_pal(&g_spark_origin_quad, 0x1E);
                         moby_set_flag_bit(arg0, 1);
                     }
                 }
@@ -730,14 +730,14 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
                     n = n - 1;
                 qcopy(v40, data + 0x270);
                 v40[2] -= 0.1f;
-                part_spawn_ground_effect(v40, 0x15, f * 0.3f, f, 0xFF000080, 0, n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x15, f * 0.3f, f, 0xFF000080, 0, n, g_effect_default_params, 0.0f, 0);
                 n = -n;
                 f4 = f * 0.4f;
-                part_spawn_ground_effect(v40, 4, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L04_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v40, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 4, f * 0.04f, f4, 0x7F6F6FFF, 1, n, g_effect_default_params, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, g_effect_default_params, 0.0f, 0);
                 gfx_add_draw_callback_third(object_draw_linked_beam, arg0);
                 if (*(s32 *)(data + 0x2E0) >= 0) {
-                    l = D_L04_001C7800 + (*(s32 *)(data + 0x2E0) << 5);
+                    l = g_creature_light_table + (*(s32 *)(data + 0x2E0) << 5);
                     qcopy(l + 0x10, data + 0x270);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -781,7 +781,7 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
             object_set_linked_states(arg0, 9, 6, 0, 8);
             moby_set_state(arg0, 0xE, -1);
         } else {
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)(*(u8 **)(data + 0x240) + 0x10) - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)(*(u8 **)(data + 0x240) + 0x10) - *(f32 *)(arg0 + 0x10),
                                                            *(f32 *)(*(u8 **)(data + 0x240) + 0x14) - *(f32 *)(arg0 + 0x14)));
         }
         break;
@@ -796,13 +796,13 @@ void func_PAL_L04_003E61CC(u8 *arg0) {
             }
         } else if (arg0[0x43] == 0xF) {
             moby_set_controller_speed_limits(arg0, 0.16000001f, 0.080000006f, 0.013962637f, 0.8377582f);
-            func_PAL_002B6CD8(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]);
+            path_follow_nodes_pal(arg0, g_route_path_table[*(s32 *)(data + 0x2CC)]);
         }
         break;
     }
     object_update_age_timer(arg0);
     if (*(f32 *)(arg0 + 0x18) < 40.0f) {
-        func_PAL_002A7650(arg0, 0, 3);
+        SetDeathBits_pal(arg0, 0, 3);
         moby_mark_spawned(arg0);
     }
 }

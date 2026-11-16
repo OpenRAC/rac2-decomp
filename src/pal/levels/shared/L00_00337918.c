@@ -9,13 +9,13 @@ extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern int FloatToInt(float);
-extern char *D_L00_001FE9B0;
+extern char *g_spark_effect_byte;
 #define FI(p, o) (*(int *)((char *)(p) + (o)))
 #define FF(p, o) (*(float *)((char *)(p) + (o)))
 #define FS(p, o) (*(short *)((char *)(p) + (o)))
 #define FB(p, o) (*(unsigned char *)((char *)(p) + (o)))
 
-void func_PAL_L00_00337918(char *position, char *matrix, float speed)
+void part_spawn_spark_effect_pal(char *position, char *matrix, float speed)
 {
     float local[4], offset[4], velocity[4], inverse[16];
 
@@ -39,7 +39,7 @@ void func_PAL_L00_00337918(char *position, char *matrix, float speed)
         FI(p,4)=(r+143)|((g+143)<<8)|((b+111)<<16);
         FB(p,9)=FloatToInt(4.0f)+64;
         FB(p,3)=72; FB(p,1)=0; FB(p,8)=0;
-        FB(p,2)=FB(D_L00_001FE9B0,0);
+        FB(p,2)=FB(g_spark_effect_byte,0);
         FF(q,4)=math_random_float_range(0.0f,0.02234560064971447f)+0.00001f;
         FF(p,12)=math_random_float_range(10080.0f,19950.0f);
         FF(q,8)=0.0f; FS(p,10)=210; FF(q,12)=1.0f;

@@ -2,13 +2,13 @@
 
 typedef int CloudQuad __attribute__((mode(TI)));
 typedef union { struct { float x,y,z,w; } v; CloudQuad q; } CloudVec;
-extern int D_L10_001A9018[] MACRO_ADDR;
-extern unsigned short **D_L10_001A9014 MACRO_ADDR;
-extern char *D_L10_001B2B94 MACRO_ADDR;
-extern char *D_L10_001B2B9C MACRO_ADDR;
-extern char D_L10_001B9680[];
-extern CloudVec D_L10_0026CEA0[];
-extern short D_L10_002273C0[];
+extern int g_cloud_sparkle_list_count[] MACRO_ADDR;
+extern unsigned short **g_cloud_sparkle_lists MACRO_ADDR;
+extern char *g_cloud_sparkle_prims MACRO_ADDR;
+extern char *g_cloud_sparkle_transforms MACRO_ADDR;
+extern char g_view_origin_vec[];
+extern CloudVec g_cloud_sparkle_points[];
+extern short g_sparkle_class_table[];
 extern void func_0032AF78(void *);
 extern void func_00309390(void *, void *);
 extern void func_00308FF0(void *, void *, void *);
@@ -49,7 +49,7 @@ void cloud_sparkle_field_update(char *moby) {
     case 0: {
         int i = 0;
         int index = *(int *)vars;
-        if (index >= D_L10_001A9018[0] || !D_L10_001A9014[index] || index == -1) {
+        if (index >= g_cloud_sparkle_list_count[0] || !g_cloud_sparkle_lists[index] || index == -1) {
             func_0032AF78(moby);
             return;
         }
@@ -91,19 +91,19 @@ void cloud_sparkle_field_update(char *moby) {
         points[15].v.x=30; points[15].v.y=15; points[15].v.z=2.5f;
         points[16].v.x=60; points[16].v.y=-15; points[16].v.z=8;
         points[17].v.x=60; points[17].v.y=-30; points[17].v.z=10;
-        entry=D_L10_001A9014[*(int *)vars];
+        entry=g_cloud_sparkle_lists[*(int *)vars];
         while(entry) {
-            if ((short)entry[-1]<0 && entry!=D_L10_001A9014[*(int *)vars]) break;
-            transform=D_L10_001B2B9C+(*entry&0x7fff)*64;
+            if ((short)entry[-1]<0 && entry!=g_cloud_sparkle_lists[*(int *)vars]) break;
+            transform=g_cloud_sparkle_transforms+(*entry&0x7fff)*64;
             if(!transform) break;
-            prim=D_L10_001B2B94+(*entry&0x7fff)*32;
+            prim=g_cloud_sparkle_prims+(*entry&0x7fff)*32;
             {
             unsigned short *next = entry + 1;
             for(i=0;i<6;i++) {
-                k=D_L10_002273C0[(unsigned char)prim[0x1d]];
+                k=g_sparkle_class_table[(unsigned char)prim[0x1d]];
                 k=k==0xdf6 ? 0 : k==0xdf7 ? 6 : 12;
                 func_00308FF0(&temp,points+(i+k),transform);
-                func_00308B30(D_L10_0026CEA0+point_count,transform+0x30,&temp);
+                func_00308B30(g_cloud_sparkle_points+point_count,transform+0x30,&temp);
                 point_count++;
             }
             entry = next;
@@ -116,9 +116,9 @@ void cloud_sparkle_field_update(char *moby) {
         int i;
         *(float *)(vars+4)+=*(float *)(vars+8);
         for(i=0;i<1056;i++) {
-            qcopy(&scratch.update.temp,D_L10_0026CEA0+i);
-            func_00308B78(&scratch.update.visible,&scratch.update.temp,D_L10_001B9680);
-            if(func_00308C38(D_L10_001B9680+0x230,&scratch.update.visible)<=0.0f) continue;
+            qcopy(&scratch.update.temp,g_cloud_sparkle_points+i);
+            func_00308B78(&scratch.update.visible,&scratch.update.temp,g_view_origin_vec);
+            if(func_00308C38(g_view_origin_vec+0x230,&scratch.update.visible)<=0.0f) continue;
             {
             float one=1.0f, lower=1.396263599395752f, lowEnd, highStart, upper;
             weight=0.0f;
@@ -144,7 +144,7 @@ void cloud_sparkle_field_update(char *moby) {
                 if(weight!=1) color=(int)(weight*color);
                 color <<= 24;
                 color |= 0x33aa00;
-                func_00308B60(&scratch.update.offset,D_L10_001B9680,&scratch.update.temp);
+                func_00308B60(&scratch.update.offset,g_view_origin_vec,&scratch.update.temp);
                 func_00308E10(&scratch.update.offset,&scratch.update.offset,4.0f);
                 func_00308B30(&scratch.update.temp,&scratch.update.temp,&scratch.update.offset);
                 func_003546B0(&scratch.update.temp,color,2100000.0f);

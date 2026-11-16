@@ -56,10 +56,10 @@ typedef struct {
 } Entry_002B7550;
 
 extern Player_002B7550 g_hero_state;
-extern Entry_002B7550 D_L22_001C4340[];
-extern s32 D_L22_001A8F00 __attribute__((sda));
+extern Entry_002B7550 g_hazard_l22_contact_table[];
+extern s32 g_hero_l22_mode_state __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
@@ -96,7 +96,7 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
     if (g_hero_state.f1DC != 0) {
         return 0;
     }
-    if (D_L22_001A8F00 != 0) {
+    if (g_hero_l22_mode_state != 0) {
         return 0;
     }
     g_hero_state.f249C = 0;
@@ -104,7 +104,7 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
-    entry = &D_L22_001C4340[moby[0xA8]];
+    entry = &g_hazard_l22_contact_table[moby[0xA8]];
     if (entry->f38 != moby) {
         return 0;
     }
@@ -112,7 +112,7 @@ s32 hero_l22_apply_hazard_contact(s32 apply_push) {
         return 0;
     }
     if (entry->f2C != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {

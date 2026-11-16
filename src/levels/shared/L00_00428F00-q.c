@@ -19,7 +19,7 @@ typedef struct {
 } Ctl_428F00;
 
 extern Hero_428F00 g_hero_state;
-extern Ctl_428F00 D_L00_001B8C80;
+extern Ctl_428F00 g_scalar_transition_state;
 extern void cam_swingshot_init(char *);
 extern void ref_L00_00428F00_00(char *); /* func_L00_00428EB0 in most levels */
 extern void ResolveCameraMovementCollisions(char *, float);
@@ -44,13 +44,13 @@ void cam_swingshot_update_node_switch(char *camera)
         heroTargetId = g_hero_state.fAA4;
     }
     if (trackedId != heroTargetId) {
-        char *cameraDst = D_L00_001B8C80.dst;
+        char *cameraDst = g_scalar_transition_state.dst;
         *(Q128 *)(cameraDst + 0x30) = *(Q128 *)pos;
         *(Q128 *)cameraDst = *(Q128 *)camera;
         *(Q128 *)(cameraDst + 0x10) = *(Q128 *)(camera + 0x10);
         *(Q128 *)(cameraDst + 0x20) = *(Q128 *)(camera + 0x20);
         cam_swingshot_init(camera);
-        D_L00_001B8C80.f314 = 0x2D;
+        g_scalar_transition_state.f314 = 0x2D;
     }
 done:
     ref_L00_00428F00_00(camera);

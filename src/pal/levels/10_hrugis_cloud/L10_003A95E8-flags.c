@@ -10,8 +10,8 @@ typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
+extern int g_projectile_model_ref __attribute__((sda));
+extern int g_ripple_object __attribute__((sda)), g_ripple_param __attribute__((sda));
 extern Collision g_collision_result;
 extern Material g_weapon_l00_table[];
 extern void part_steer_effect_direction(int, void *, int);
@@ -87,7 +87,7 @@ void func_PAL_L10_003A95E8(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(g_ripple_object, g_ripple_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -123,7 +123,7 @@ void func_PAL_L10_003A95E8(unsigned char *obj) {
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -151,7 +151,7 @@ finish:
     }
 }
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void func_PAL_L00_00391958(void *, void *, void *);
@@ -189,7 +189,7 @@ void func_PAL_L10_003A9A00(char *obj) {
     if (*(int *)(ctx + 0x18) < 0xF2)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -208,7 +208,7 @@ void func_PAL_L10_003A9A00(char *obj) {
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {

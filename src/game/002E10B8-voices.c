@@ -78,16 +78,16 @@ typedef struct {
 } VoiceRuntimeState_DD68;
 
 extern VoiceRuntimeState_DD68 g_sound_state;
-extern f32 D_0018A150[];
-extern s32 D_001B5600[] NOT_SDA;
+extern f32 g_water_height[];
+extern s32 g_underwater_flag[] NOT_SDA;
 extern u8 g_camera_l00_position[];
 
 extern s32 g_current_game_mode MACRO_ADDR;
-extern s32 D_001A8C88 MACRO_ADDR;
+extern s32 g_menu_panel_active MACRO_ADDR;
 extern s32 g_game_time MACRO_ADDR;
-extern char D_00189F70[];
-extern short D_00152C20;
-extern int D_001A8B80 MACRO_ADDR;
+extern char g_hero_velocity[];
+extern short g_transition_mode;
+extern int g_sound_fade_mode MACRO_ADDR;
 
 extern s32 FastCountChars(u8 *, s32);
 extern int snd_get_doppler_pitch_mod(int);
@@ -157,10 +157,10 @@ s32 UpdateSoundVoices(void) {
     s32 handle;
     s32 command_flags;
 
-    underwater = D_001B5600[0];
+    underwater = g_underwater_flag[0];
     water_height = 0.0f;
     if (underwater != 0) {
-        water_height = D_0018A150[0];
+        water_height = g_water_height[0];
     }
     snd_Pump();
 
@@ -174,7 +174,7 @@ s32 UpdateSoundVoices(void) {
     }
     g_sound_state.reverb_commands = 0;
 
-    if ((g_current_game_mode == 0 || g_current_game_mode == 2) && D_001A8C88 == 0) {
+    if ((g_current_game_mode == 0 || g_current_game_mode == 2) && g_menu_panel_active == 0) {
         snd_probe_listener_occlusion_point(&listener_occlusion_position);
     }
 
@@ -184,7 +184,7 @@ s32 UpdateSoundVoices(void) {
     g_sound_state.listener_history_position = history_index;
     qcopy(&g_sound_state.listener_history[history_index], g_camera_l00_position);
 
-    listener_speed = FastVecLength(D_00189F70);
+    listener_speed = FastVecLength(g_hero_velocity);
     listener_sample_count = 0;
     divisor = 18;
     current_index = g_sound_state.listener_history_position;
@@ -207,16 +207,16 @@ s32 UpdateSoundVoices(void) {
                           1.0f / IntToFloat(listener_sample_count));
     }
 
-    if (D_001A8B80 != 0 || g_sound_state.fade_state > 0) {
+    if (g_sound_fade_mode != 0 || g_sound_state.fade_state > 0) {
         float scale = 1.0f;
         float volume = g_sound_state.group_0_volume;
-        if (!D_001A8B80) {
+        if (!g_sound_fade_mode) {
             if (g_sound_state.fade_state == 2) {
                 g_sound_state.fade_state = 3;
                 g_sound_state.fade_timer = 30;
             }
         } else if (!g_sound_state.fade_state) {
-            if (D_001A8B80 == 2) {
+            if (g_sound_fade_mode == 2) {
                 g_sound_state.fade_state = 2;
             } else {
                 g_sound_state.fade_state = 1;
@@ -241,7 +241,7 @@ s32 UpdateSoundVoices(void) {
             snd_send_cmd9(0, faded_volume);
             snd_send_cmd9(3, faded_volume);
         }
-    } else if (g_current_game_mode == 2 || (g_current_game_mode == 6 && (D_00152C20 == 3 || D_00152C20 == 0))) {
+    } else if (g_current_game_mode == 2 || (g_current_game_mode == 6 && (g_transition_mode == 3 || g_transition_mode == 0))) {
         snd_send_cmd9(1, 0);
         snd_send_cmd9(0, g_sound_state.group_0_volume / 2);
         snd_send_cmd9(3, g_sound_state.group_3_volume / 2);
@@ -383,7 +383,7 @@ s32 UpdateSoundVoices(void) {
         }
         {
             if (g_sound_state.voices[slot_index].state == 7) {
-                if ((g_current_game_mode != 0 && g_current_game_mode != 2) || D_001A8C88 != 0) {
+                if ((g_current_game_mode != 0 && g_current_game_mode != 2) || g_menu_panel_active != 0) {
                     continue;
                 }
                 occluded_samples = 0;
@@ -421,7 +421,7 @@ s32 UpdateSoundVoices(void) {
                     voice_volumes[slot_index] = (36 - occluded_samples) * voice_volumes[slot_index] / divisor;
                 }
             } else {
-                if ((g_current_game_mode == 0 || g_current_game_mode == 2) && D_001A8C88 == 0) {
+                if ((g_current_game_mode == 0 || g_current_game_mode == 2) && g_menu_panel_active == 0) {
                     g_sound_state.voices[slot_index].occlusion_history_position =
                         (g_sound_state.voices[slot_index].occlusion_history_position + 1) % 36;
                     /* Active sources test every other frame; other voices every fourth. */

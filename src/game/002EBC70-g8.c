@@ -11,13 +11,13 @@ typedef struct {
     char pad0[0x44]; short count; char pad46[0x146]; SceneEntry *entries[17];
     char pad1D0[0x1A0]; int mode; char pad374[4]; int next_mode;
 } SceneFrame;
-extern SceneEntry *D_001B1B5C MACRO_ADDR;
+extern SceneEntry *g_moby_pool_start MACRO_ADDR;
 extern SceneFrame g_scene_playback_state;
 extern int g_current_game_mode;
 extern int g_requested_game_mode;
-extern int D_001B169C __attribute__((sda));
-extern int D_001B1594 __attribute__((sda));
-extern int D_001B1598;
+extern int g_gfx_pass_mode __attribute__((sda));
+extern int g_render_layer_flags __attribute__((sda));
+extern int g_frame_counter_3;
 extern int D_001B1598_GP SDATA(D_001B1598);
 extern int D_001A8BB0_GP SDATA(D_001A8BB0);
 
@@ -47,7 +47,7 @@ int PlayBonusReelWithGameLoop(int unused)
     int value;
 
     cutscene_start_scripted();
-    prev = D_001B1B5C;
+    prev = g_moby_pool_start;
     i = 0;
     if (i < g_scene_playback_state.count) {
         do {
@@ -72,11 +72,11 @@ int PlayBonusReelWithGameLoop(int unused)
         gfx_build_view_matrices();
         moby_update_watched_objects();
         gfx_write_clear_color_packets();
-        D_001B169C = -1;
+        g_gfx_pass_mode = -1;
         pad_poll_ports();
         value = cutscene_update_scripted_actors();
         gfx_append_draw_list_buffer_tag(0);
-        D_001B1594 = 0x131;
+        g_render_layer_flags = 0x131;
         RenderFrame();
         if (g_requested_game_mode != -2) {
             g_current_game_mode = g_requested_game_mode;
@@ -84,7 +84,7 @@ int PlayBonusReelWithGameLoop(int unused)
         }
         gfx_wait_for_dma_status_bits(1);
         sceGsSyncV(0);
-        D_001B1598_GP = D_001B1598 + 1;
+        D_001B1598_GP = g_frame_counter_3 + 1;
     } while (g_current_game_mode == 2);
     D_001A8BB0_GP = 0;
     cutscene_end_scripted();

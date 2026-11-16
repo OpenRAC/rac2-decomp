@@ -2,16 +2,16 @@
 #include "moby_classes.h"
 #include "names.h"
 
-extern unsigned char *D_L00_001B0CA0 __attribute__((sda));
+extern unsigned char *g_global_object_data __attribute__((sda));
 
-extern int D_L00_001B2C14 __attribute__((sda));
+extern int g_global_object_flag __attribute__((sda));
 
-extern int *D_L00_001B0DB0 __attribute__((sda));
+extern int *g_placement_object_current __attribute__((sda));
 
 /* Tells whether the global object exists and is in one of its three busy states. */
 int global_object_is_busy(char *arg)
 {
-    unsigned char *p = D_L00_001B0CA0;
+    unsigned char *p = g_global_object_data;
     if (!p) {
         return 0;
     }
@@ -21,16 +21,16 @@ int global_object_is_busy(char *arg)
 /* Returns the stored flag value if the global object exists, otherwise zero. */
 int global_object_get_flag(void)
 {
-    if (!D_L00_001B0CA0) {
+    if (!g_global_object_data) {
         return 0;
     }
-    return D_L00_001B2C14;
+    return g_global_object_flag;
 }
 
 /* Marks the linked object's private data as active. */
 void linked_object_activate_data(char *arg)
 {
-    int *p = D_L00_001B0DB0;
+    int *p = g_placement_object_current;
     if (p) {
         int *q = (int *)p[26];
         q[10] = 1;
@@ -42,7 +42,7 @@ extern void linked_object_activate_data(char *arg);
 /* Puts the global object into its start state and stores a countdown value (10 by default). */
 void global_object_start(char *arg, int value)
 {
-    unsigned char *p = D_L00_001B0CA0;
+    unsigned char *p = g_global_object_data;
     int *o;
 
     if (!p) {
@@ -60,7 +60,7 @@ void global_object_start(char *arg, int value)
 
 extern int D_L00_001B19C8_1[] __attribute__((sda));
 extern char *D_L00_001B1EA8_1[] __attribute__((sda));
-extern float D_L00_001B0C90 __attribute__((sda));
+extern float g_nearby_object_notify_range __attribute__((sda));
 
 extern float func_002EE2B0(char *a, char *b);
 extern void func_00381F80(char *a, char *b);
@@ -83,16 +83,16 @@ void nearby_typed_objects_notify(char *arg)
             return;
         if (o == 0 || *(int *)(o + 36) == 0 || *(short *)(*(int *)(o + 36) + 70) != 0x13)
             continue;
-        if (func_002EE2B0(o + 16, arg + 16) < D_L00_001B0C90)
+        if (func_002EE2B0(o + 16, arg + 16) < g_nearby_object_notify_range)
             func_00381F80(o, arg);
     }
 }
 
 extern char g_hero_state[];
-extern int D_00138324 __attribute__((nosda));
-extern int D_L00_001A8F00;
-extern int D_L00_001A8F08;
-extern int D_L00_001A8FF4;
+extern int g_pad_held_flags __attribute__((nosda));
+extern int g_game_l00_mode;
+extern int g_input_lock_state;
+extern int g_hero_action_blocked_flag;
 extern void moby_transform_joint_to_world(void *obj, int a, void *out);
 extern void CalculateAimedLaunchVelocity(void *out, void *pos, int a, int b, float c, float d, float e, float f);
 extern int coll_trace_projectile_to_impact(void *a, void *b, void *c, void *d, void *e, void *f, void *g, float h);
@@ -126,7 +126,7 @@ void placement_object_update(char *obj)
         char *player = g_hero_state;
 
         if (*(int *)(player + 0x1244) == 3)
-            D_L00_001B0DB0 = 0;
+            g_placement_object_current = 0;
         moby_transform_joint_to_world(obj, 0, pos);
         *(int *)(ctx + 44) = 0;
         CalculateAimedLaunchVelocity(offset, pos, 0, 0, 1.6f, *(int *)(player + 0x2294) == 29 ? 11.0f : 4.5f,
@@ -134,9 +134,9 @@ void placement_object_update(char *obj)
     }
     *(int *)(ctx + 36) = coll_trace_projectile_to_impact(pos, offset, ctx, ctx + 16, obj, &hit, &surface, 0.0030555557f);
     blocked = weapon_get_group(surface);
-    if (D_L00_001A8F00 != 0 || D_L00_001A8F08 != -2)
+    if (g_game_l00_mode != 0 || g_input_lock_state != -2)
         *(int *)(ctx + 44) = 1;
-    if (D_L00_001A8FF4 != 0 && *(float *)(ctx + 8) < 462.43f)
+    if (g_hero_action_blocked_flag != 0 && *(float *)(ctx + 8) < 462.43f)
         *(int *)(ctx + 44) = 1;
     if (blocked || *(int *)(ctx + 36) == 0 || *(int *)(ctx + 40) == 0) {
         *(int *)(ctx + 44) = 1;
@@ -171,14 +171,14 @@ void placement_object_update(char *obj)
     }
     switch (*(unsigned char *)(obj + 32)) {
     case 0:
-        D_L00_001B0DB0 = (int *)obj;
+        g_placement_object_current = (int *)obj;
         obj[32] = 1;
         *(int *)(ctx + 40) = 1;
         *(int *)(ctx + 36) = 0;
     case 1: {
         char *player = g_hero_state;
 
-        if ((D_00138324 & *(int *)(player + 0x1230)) && ready && !*(unsigned char *)(player + 0x22BC)
+        if ((g_pad_held_flags & *(int *)(player + 0x1230)) && ready && !*(unsigned char *)(player + 0x22BC)
             && !*(int *)(ctx + 44)) {
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(player + 0x1E0) = 120;

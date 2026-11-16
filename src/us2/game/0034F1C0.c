@@ -6,7 +6,7 @@ extern void hud_update_subobject_primary(int);
 extern void text_panel_update_mode(int);
 extern void func_0029CB58(void);
 
-void func_US2_0034F1C0(char *p)
+void hud_update_subsystems_us2(char *p)
 {
     UpdateItemStatusHud(p + 0x7A0);
     hud_update_subobject_primary((int)p);
@@ -16,14 +16,14 @@ void func_US2_0034F1C0(char *p)
 
 void text_panel_update_mode(int);
 
-void func_US2_0034F200(int param_1)
+void hud_update_subobject_primary_us2(int param_1)
 {
   text_panel_update_mode(param_1 + 0x1D8C);
 }
 
 void text_panel_draw_scaled(int);
 
-void func_US2_0034F220(int param_1)
+void hud_update_subobject_alt_us2(int param_1)
 {
   text_panel_draw_scaled(param_1 + 0x1D8C);
   return;

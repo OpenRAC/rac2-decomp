@@ -7,21 +7,21 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B15B4 __attribute__((sda));
+extern float g_gun_direction_scale __attribute__((sda));
 
-extern TI128 D_L23_001B3800 __attribute__((sda));
+extern TI128 g_gun_joint_position __attribute__((sda));
 
-extern char D_L23_001B3810[16] __attribute__((sda));
+extern char g_gun_aim_offset[16] __attribute__((sda));
 
-extern volatile int D_L23_001B37F0;
+extern volatile int g_gun_trail_effect_a;
 
-extern volatile int D_L23_001B37F4;
+extern volatile int g_gun_trail_effect_b;
 
-extern volatile int D_L23_001B36AC;
+extern volatile int g_enemy_relocate_count;
 
-extern volatile int D_L23_001B36B0;
+extern volatile int g_selected_moby;
 
-extern char *D_L23_00259560[];
+extern char *g_mothership_crowd_mobys[];
 
 extern void moby_transform_joint_to_world(char *, int, char *);
 
@@ -59,9 +59,9 @@ void mothership_update_gun_pick_target(char *moby) {
 
     if (*(int *)(state + 0x59C) != 0) {
         moby_transform_joint_to_world(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointPos);
-        D_L23_001B3800 = *(TI128 *)jointPos;
-        FastVecScale(D_L23_001B3810, moby + 0xE0, D_L23_001B15B4);
-        FastVecAdd(D_L23_001B3810, D_L23_001B3810, *(char **)(state + 0x59C) + 0x10);
+        g_gun_joint_position = *(TI128 *)jointPos;
+        FastVecScale(g_gun_aim_offset, moby + 0xE0, g_gun_direction_scale);
+        FastVecAdd(g_gun_aim_offset, g_gun_aim_offset, *(char **)(state + 0x59C) + 0x10);
         moby_transform_joint_point(moby, *(int *)(state + 0x594) + 0x1E, (char *)jointMatrix);
         FastVecScale((char *)backOffset, (char *)(jointMatrix + 8), -16.0f);
         FastVecAdd((char *)jointPos, (char *)jointPos, (char *)backOffset);
@@ -69,32 +69,32 @@ void mothership_update_gun_pick_target(char *moby) {
         if (*(int *)(state + 0x598) == 0) {
             *(int *)(state + 0x59C) = 0;
             *(int *)(state + 0x594) = (*(int *)(state + 0x594) + 1) % 4;
-            effectA = D_L23_001B37F0;
+            effectA = g_gun_trail_effect_a;
             if (effectA != 0) {
                 moby_mark_spawned(effectA);
-                D_L23_001B37F0 = 0;
+                g_gun_trail_effect_a = 0;
             }
-            effectB = D_L23_001B37F4;
+            effectB = g_gun_trail_effect_b;
             if (effectB != 0) {
                 moby_mark_spawned(effectB);
-                D_L23_001B37F4 = 0;
+                g_gun_trail_effect_b = 0;
             }
         }
     }
-    D_L23_001B36AC = 0;
-    objPtr = D_L23_00259560;
+    g_enemy_relocate_count = 0;
+    objPtr = g_mothership_crowd_mobys;
     i = 24;
     do {
         i--;
         if (!(*(unsigned short *)(*objPtr + 0x34) & 1))
-            D_L23_001B36AC = D_L23_001B36AC + 1;
+            g_enemy_relocate_count = g_enemy_relocate_count + 1;
         objPtr++;
     } while (i >= 0);
     best = 0;
     bestDist = 3000.0f;
-    if (D_L23_001B36B0 == 0) {
+    if (g_selected_moby == 0) {
         for (j = 0; j < 25; j++) {
-            char *obj = D_L23_00259560[j];
+            char *obj = g_mothership_crowd_mobys[j];
 
             visible = !(*(unsigned short *)(obj + 0x34) & 1);
             if (visible && weapon_get_targetable_point(obj, &dist) != 0) {

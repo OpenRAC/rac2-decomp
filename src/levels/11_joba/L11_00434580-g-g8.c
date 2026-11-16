@@ -46,12 +46,12 @@ extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern void *part_spawn_ground_effect(void *,int,float,float,unsigned int,int,int,void *,float,int);
 extern void gfx_add_draw_callback_third(void *,void *);
-extern char D_L11_001C0D20[];
-extern char D_L11_001A8F20[16] MACRO_ADDR;
-extern unsigned int D_L11_001B11E0 __attribute__((sda));
-extern unsigned int D_L11_001B11E8 __attribute__((sda));
-extern unsigned int D_L11_001B11F0 __attribute__((sda));
-extern unsigned int D_L11_001B11F8 __attribute__((sda));
+extern char g_aim_position[];
+extern char g_identity_l11_matrix[16] MACRO_ADDR;
+extern unsigned int g_thrown_projectile_spark_color_a __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_b __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_c __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_d __attribute__((sda));
 extern void projectile_run_trail_steps(char *);
 /* Moves a thrown projectile each frame, spawns its trail, and bursts into pieces when it hits something or runs out of time. */
 void thrown_l11_projectile_update(char *obj) {
@@ -69,7 +69,7 @@ void thrown_l11_projectile_update(char *obj) {
         *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
         FastVecAdd(vars+0x10,vars,vars+0x10);
         if(CollLine(vars,vars+0x10,0,obj,collision)) {
-            impact=(float *)D_L11_001C0D20;
+            impact=(float *)g_aim_position;
             *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
             if(!flag_is_third_pending_set(obj)) {
                 part_l11_spawn_impact_burst(impact,6);
@@ -80,10 +80,10 @@ void thrown_l11_projectile_update(char *obj) {
         size=math_random_float_range(1,4);
         sign=math_random_int_range(25,35); if(!sign) sign--;
         qcopy(pos,vars+0x10); pos[2]-=0.1f;
-        part_spawn_ground_effect(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(pos,15,size*0.3f,size,g_thrown_projectile_spark_color_a,0,sign,g_identity_l11_matrix,0.0f,0);
         sign = -sign;
-        part_spawn_ground_effect(vars,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
-        part_spawn_ground_effect(vars,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(vars,10,size*0.3f,size,g_thrown_projectile_spark_color_b,0,sign,g_identity_l11_matrix,0.0f,0);
+        part_spawn_ground_effect(vars,10,size*0.04f,size*0.4f,g_thrown_projectile_spark_color_c,1,-sign,g_identity_l11_matrix,0.0f,0);
         gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
         return;
     } else if (*(float *)(vars+0x38)>=25 && *(float *)(vars+0x38)<34) {
@@ -96,7 +96,7 @@ void thrown_l11_projectile_update(char *obj) {
             *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
             FastVecAdd(vars+0x10,vars,vars+0x10);
             if(CollLine(vars,vars+0x10,0,obj,collision)) {
-                impact=(float *)D_L11_001C0D20;
+                impact=(float *)g_aim_position;
             *(Quad34580 *)(vars+0x10)=*(Quad34580 *)impact;
                 if(!flag_is_third_pending_set(obj)) {
                     part_l11_spawn_impact_burst(impact,3);
@@ -109,8 +109,8 @@ void thrown_l11_projectile_update(char *obj) {
             size=math_random_float_range(1,4);
             sign=math_random_int_range(25,35); if(!sign) sign--;
             qcopy(pos2,vars+0x10); pos2[2]-=0.1f;
-            part_spawn_ground_effect(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
-            part_spawn_ground_effect(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
+            part_spawn_ground_effect(pos2,15,size*0.3f,size,g_thrown_projectile_spark_color_a,0,sign,g_identity_l11_matrix,0.0f,0);
+            part_spawn_ground_effect(pos2,20,size*0.4f,size*0.2f,g_thrown_projectile_spark_color_d,1,-sign,g_identity_l11_matrix,0.0f,0);
             gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
             return;
 

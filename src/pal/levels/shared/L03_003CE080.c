@@ -5,7 +5,7 @@ extern void moby_set_state(u8 *, s32, s32);
 extern s32 flag_is_third_pending_set(u8 *);
 extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 
-void func_PAL_L03_003CE080(u8 *object)
+void rising_moby_update_pal(u8 *object)
 {
     u8 *vars = *(u8 **)(object + 0x68);
     switch (object[0x20]) {

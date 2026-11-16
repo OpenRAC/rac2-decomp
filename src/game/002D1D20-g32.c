@@ -10,10 +10,10 @@ typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int D_001ABA58 __attribute__((sda));
-extern int D_0025C960[];
-extern int D_0025C8E4[];
-extern short D_001ABD40[] MACRO_ADDR;
+extern int g_page_viewer_long_cursor __attribute__((sda));
+extern int g_page_viewer_long_index[];
+extern int g_page_viewer_long_item[];
+extern short g_page_viewer_icon_table[] MACRO_ADDR;
 
 /* Handles left and right on the 18-page viewer and shows the page for the current index. */
 int page_viewer_handle_input_long(void)
@@ -24,7 +24,7 @@ int page_viewer_handle_input_long(void)
     if (flags & 0x10) {
         int value;
         int return_code;
-        D_001ABA58 = 0;
+        g_page_viewer_long_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -37,24 +37,24 @@ finish:
         return return_code;
     }
     if (flags & 0x900) {
-        D_001ABA58 = 0;
+        g_page_viewer_long_cursor = 0;
         result = 1;
     } else if (flags & 0x8000) {
-        if (D_001ABA58 > 0)
+        if (g_page_viewer_long_cursor > 0)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (--D_001ABA58 < 0)
-            D_001ABA58 = 0;
+        if (--g_page_viewer_long_cursor < 0)
+            g_page_viewer_long_cursor = 0;
     } else if (flags & 0x2000) {
-        if (D_001ABA58 < 17)
+        if (g_page_viewer_long_cursor < 17)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (++D_001ABA58 > 17)
-            D_001ABA58 = 17;
+        if (++g_page_viewer_long_cursor > 17)
+            g_page_viewer_long_cursor = 17;
     }
-    D_0025C960[0] = D_001ABA58;
-    D_0025C8E4[0] = D_001ABD40[D_001ABA58];
+    g_page_viewer_long_index[0] = g_page_viewer_long_cursor;
+    g_page_viewer_long_item[0] = g_page_viewer_icon_table[g_page_viewer_long_cursor];
     return result;
 }

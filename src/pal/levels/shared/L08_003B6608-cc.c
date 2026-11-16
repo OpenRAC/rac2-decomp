@@ -67,14 +67,14 @@ extern DrawCallback_r002F2D10 r1_D_0018DC40_002F2D10[];
  * the text is drawn with font texture 1. func_0027F640 is declared with its
  * integer and float parameters interleaved; each register bank keeps its
  * order, and the interleaving sets the order of the argument moves. */
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 /* Counts the 0x100-byte records between the two pointers whose halfword at +0xAA equals A0
    and whose byte at +0x20 is neither 0xFE nor 0xFD. */
 /* Switches three flags of one record; -1 leaves a group alone, 0 clears it and anything
    else sets it. */
 void moby_set_visibility_flags(void *a0v, s32 a1, s32 a2, s32 a3);
 
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern void moby_set_visibility_flags(void *, s32, s32, s32);
 
 /* Runs func_L08_00328B80 on every object named by entry a0 of the 0x1FB660 table: a u16
@@ -110,9 +110,9 @@ extern int FastDecTimer(short *);
 extern void moby_mark_spawned(void *);
 extern float FastVecLength(void *);
 extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int coll_process_hit(void *, float, int, void *, void *);
-void func_PAL_L08_003B6608(char *obj) {
+void bolt_effect_update_pal(char *obj) {
     struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;
     CollisionInput *input;
     Bolt_L08_003B2DB0 *state = *(Bolt_L08_003B2DB0 **)(obj + 0x68);
@@ -170,7 +170,7 @@ destroy:
             part_spawn_velocity_particle(obj + 0x10, &frame.velocity, 0x7F2F4F6F, math_random_int_range(8, 12), 60000.0f);
         }
     }
-    func_PAL_002AC718(obj, state, 0, 0.0f, 0.0f, 4, 3, 6, 1.1f, 0.6f, 1.0f, 0.9f, -1, 0.0f,
+    SpawnExplosionEffects_pal(obj, state, 0, 0.0f, 0.0f, 4, 3, 6, 1.1f, 0.6f, 1.0f, 0.9f, -1, 0.0f,
         0, 1, -1, 0, 0x810001);
     coll_process_hit(obj + 0x10, 1.1f, 16, obj, input);
     moby_mark_spawned(obj);

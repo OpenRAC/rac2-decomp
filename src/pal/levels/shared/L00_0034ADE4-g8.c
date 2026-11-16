@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern void SetupGifPaging(int);
-extern void func_PAL_L00_0030F458(void);
+extern void module_l00_call_handler_13_pal(void);
 extern char *GetLocalizedString(s32);
 extern void text_draw_right_aligned_small(int, int, u64, u8 *, int);
 extern void DoGifPaging(void);
@@ -16,7 +16,7 @@ extern int ref_PAL_L00_0034ADE4_01[] __attribute__((sda));
 int func_PAL_L00_0034ADE4(void)
 {
     SetupGifPaging(0);
-    func_PAL_L00_0030F458();
+    module_l00_call_handler_13_pal();
     text_draw_right_aligned_small(ref_PAL_L00_0034ADE4_00, ref_PAL_L00_0034ADE4_01[0], 0x80F0F0F0ULL,
                   (u8 *)GetLocalizedString(0xB60), -1);
     DoGifPaging();

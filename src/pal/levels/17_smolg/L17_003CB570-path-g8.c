@@ -2,8 +2,8 @@
 /* func_PAL_L17_003CB570, the PAL copy of func_L17_003C7498: the same C, where the 60 Hz duration becomes (d * 300 + 2) / 6. */
 #include "common.h"
 extern char g_hero_position[];
-extern char *D_L17_001B2D0C;
-extern float D_L17_001B03B0 __attribute__((sda));
+extern char *g_linked_moby_base;
+extern float g_platform_path_reach_dist __attribute__((sda));
 extern int func_003221C8(void *, int);
 extern float func_002EF0B0(void *, void *);
 extern float func_002EF4C8(float);
@@ -20,7 +20,7 @@ void func_PAL_L17_003CB570(char *self, int *path, float duration) {
     if (*(int *)(data + 0xCC) != -1 && *(int *)(data + 0xAC) == 1 &&
         func_003221C8(g_hero_position, *(int *)(data + 0xCC)) &&
         *(float *)(g_hero_position + 8) <= *(float *)(self + 0x18) + 0.05f &&
-        func_002EF0B0(self + 0x10, D_L17_001B2D0C + *(int *)(data + 0xCC) * 128 + 0x30) <= D_L17_001B03B0) {
+        func_002EF0B0(self + 0x10, g_linked_moby_base + *(int *)(data + 0xCC) * 128 + 0x30) <= g_platform_path_reach_dist) {
         *(float *)(data + 0x9C) -= 1.0f;
         goto done;
     }

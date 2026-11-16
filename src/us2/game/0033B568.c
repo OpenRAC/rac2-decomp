@@ -8,12 +8,12 @@ extern void func_US2_003377B0(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
 extern void object_set_second_float4(void *, float, float, float, float);
-extern float D_001B23A4 __attribute__((sda));
-extern char D_001ADC88[];
+extern float g_hud_scale __attribute__((sda));
+extern char g_circle_menu_icon_data[];
 
 /* func_US2_0033B568, the USA v2.00 copy of func_0033A520: the same C, with the object's
  * fields 0x10 further on. */
-void func_US2_0033B568(unsigned char *obj, void *arg)
+void title_screen_init_labels_us2(unsigned char *obj, void *arg)
 {
     float v;
     TitlePosition *p;
@@ -35,10 +35,10 @@ void func_US2_0033B568(unsigned char *obj, void *arg)
         p = *(TitlePosition **)(obj + 0x20C);
         p->x = 70.0f;
         position = 300.0f;
-        y = (int)(D_001B23A4 * position + 0.5f);
+        y = (int)(g_hud_scale * position + 0.5f);
         v = y;
     } while (0);
-    text = D_001ADC88;
+    text = g_circle_menu_icon_data;
     p = *(TitlePosition **)(obj + 0x20C);
     p->y = v;
     object_init_derived_c(obj + 0x134, text, *(void **)(obj + 0x210));

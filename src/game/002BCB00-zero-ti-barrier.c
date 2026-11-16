@@ -13,7 +13,7 @@ extern Particle *part_alloc(int);
 extern int FloatToInt(float);
 extern int func_001163B0(void);
 extern float IntToFloat(int);
-extern unsigned char *D_001F257C;
+extern unsigned char *g_part_tex_spark;
 
 /* The effect-record initialiser of func_L00_0033E888, without the rotation argument. */
 /* Creates a spark particle at a point that flies off with the given velocity. */
@@ -32,7 +32,7 @@ Particle *part_spawn_spark(float life,Quad *position,Quad *velocity,int color,in
         particle->b1=0;
         particle->life=life;
         particle->seed=func_001163B0();
-        if(texture==-1) particle->b2=*D_001F257C; else particle->b2=texture;
+        if(texture==-1) particle->b2=*g_part_tex_spark; else particle->b2=texture;
         motion=particle->payload;
         particle->size=lifeFrames;
         *(short *)((char*)motion+0x18)=lifeFrames;

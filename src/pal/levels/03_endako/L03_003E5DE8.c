@@ -6,16 +6,16 @@ extern s32  func_360A80(s32 a0, s32 a1, char *a2);
 extern f32  func_31BAE8(f32 a0, f32 a1);
 extern f32  func_2F0000(f32 a0, f32 a1);
 extern s32  func_312898(s32 a0, s32 a1, void *a2);
-extern u8  *D_L03_001B2A1C;
+extern u8  *g_moby_record_base;
 extern f32  D_00189E20_19;
-extern u8   D_001395BF;
-extern u8   D_001395C0;
-extern u8   D_001A7AFA;
-extern u8   D_001A7B32;
-extern u8   D_001A7AFB;
-extern u8   D_001A7B33;
-extern u8   D_001A7AFC;
-extern u8   D_001A7B34;
+extern u8   g_clank_scene_done_flag;
+extern u8   g_remote_view_done_flag;
+extern u8   g_barlow_hint_inside_flag;
+extern u8   g_unused_byte_c;
+extern u8   g_unused_byte_a;
+extern u8   g_unused_byte_d;
+extern u8   g_unused_byte_b;
+extern u8   g_unused_byte_e;
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 extern void *CreateMoby(int);
 extern void func_002A0F48(void *);
@@ -23,7 +23,7 @@ extern void func_002A0F48(void *);
 /* Spawns a kind-0xB1B object owned by OWNER at POSITION: opaque, a 0.015 rate, its state
    taking the two vectors, the three floats (in reverse order), a 0x10E word and the
    three bytes (the last twice). Returns the object, or 0. */
-u8 *func_PAL_L03_003E5DE8(char *owner, void *position, void *first, void *second,
+u8 *object_spawn_and_init_pal(char *owner, void *position, void *first, void *second,
                         u8 a, u8 b, u8 c, f32 x, f32 y, f32 z)
 {
     u8 *object;

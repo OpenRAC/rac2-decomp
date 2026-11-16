@@ -3,20 +3,20 @@
 
 typedef struct { int ids[2]; } OptionPair;
 typedef struct { int ids[3]; } OptionTriple;
-extern OptionPair D_001ADE20 __attribute__((section(".data")));
-extern OptionPair D_001ADDD0 __attribute__((section(".data")));
-extern OptionTriple D_001ADE28 __attribute__((section(".data")));
-extern char D_001ADDD8[];
-extern int D_001ADE00 __attribute__((sda));
-extern int D_001ADE04[] __attribute__((sda));
-extern int D_001ADE08 __attribute__((sda));
-extern int D_001ADE0C[] __attribute__((sda));
-extern int D_001ADE10 __attribute__((sda));
-extern int D_001ADE14[] __attribute__((sda));
-extern int D_001ADE18 __attribute__((sda));
-extern int D_001ADE1C[] __attribute__((sda));
-extern int D_001A7BA4, D_001A7BA8, D_001A7BAC;
-extern unsigned char D_001A7BB1;
+extern OptionPair g_on_off_option_text __attribute__((section(".data")));
+extern OptionPair g_on_off_text_ids __attribute__((section(".data")));
+extern OptionTriple g_mode_option_text __attribute__((section(".data")));
+extern char g_str_menu_option_format[];
+extern int g_four_option_label_x_first __attribute__((sda));
+extern int g_four_option_label_y_first[] __attribute__((sda));
+extern int g_four_option_label_x_second __attribute__((sda));
+extern int g_four_option_label_y_second[] __attribute__((sda));
+extern int g_four_option_label_x_third __attribute__((sda));
+extern int g_four_option_label_y_third[] __attribute__((sda));
+extern int g_four_option_label_x_fourth __attribute__((sda));
+extern int g_four_option_label_y_fourth[] __attribute__((sda));
+extern int g_invert_aim_option, g_ship_steer_option, g_control_mode_option;
+extern unsigned char g_display_mode_flag;
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
@@ -39,7 +39,7 @@ typedef float f32_Ff4eb83c9;
 #endif
 
 /* Resident shared table reached through $gp (small-data symbol). */
-extern f32_Ff4eb83c9 D_L04_001AE070[2] __attribute__((sda));
+extern f32_Ff4eb83c9 g_four_option_prompt_data[2] __attribute__((sda));
 
 extern void *func_00336E40_3(void *);
 
@@ -78,7 +78,7 @@ void four_option_menu_init(u8_Ff4eb83c9 *self, void *arg) {
     prompt = self + 8;
     ((f32_Ff4eb83c9 *)*(void **)(self + 684))[0] = 255.0f;
     ((f32_Ff4eb83c9 *)*(void **)(self + 684))[1] = 195.0f;
-    func_0033ABD8_3(prompt, arg, D_L04_001AE070);
+    func_0033ABD8_3(prompt, arg, g_four_option_prompt_data);
     textA = func_00288FB8_2(11672);
     textB = func_00288FB8_2(11598);
     textC = func_00288FB8_2(11599);
@@ -141,31 +141,31 @@ void four_option_menu_draw(char *object)
     char *label2, *label3, *label4;
     int color;
     prompt_bar_draw(object + 8);
-    onOffText = D_001ADE20;
-    modeText = D_001ADE28;
-    toggleText = D_001ADDD0;
-    format = D_001ADDD8;
+    onOffText = g_on_off_option_text;
+    modeText = g_mode_option_text;
+    toggleText = g_on_off_text_ids;
+    format = g_str_menu_option_format;
     color = *(int *)(object + 0x2A8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
     first = GetLocalizedString(0x2DE2);
-    second = GetLocalizedString(onOffText.ids[D_001A7BA4 != 0]);
+    second = GetLocalizedString(onOffText.ids[g_invert_aim_option != 0]);
     sprintf(buffer, format, first, second);
-    text_draw_centered_medium(D_001ADE00, D_001ADE04[0], color, buffer, -1);
+    text_draw_centered_medium(g_four_option_label_x_first, g_four_option_label_y_first[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
     label2 = GetLocalizedString(0x2DE1);
-    second = GetLocalizedString(onOffText.ids[D_001A7BA8 != 0]);
+    second = GetLocalizedString(onOffText.ids[g_ship_steer_option != 0]);
     sprintf(buffer, format, label2, second);
-    text_draw_centered_medium(D_001ADE08, D_001ADE0C[0], color, buffer, -1);
+    text_draw_centered_medium(g_four_option_label_x_second, g_four_option_label_y_second[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 2 ? (int)0x80D0D0D0 : 0x70808080;
     {
-        int mode = D_001A7BAC;
+        int mode = g_control_mode_option;
         label3 = GetLocalizedString(0x2F18);
         second = GetLocalizedString(modeText.ids[mode]);
     }
     sprintf(buffer, format, label3, second);
-    text_draw_centered_medium(D_001ADE10, D_001ADE14[0], color, buffer, -1);
+    text_draw_centered_medium(g_four_option_label_x_third, g_four_option_label_y_third[0], color, buffer, -1);
     color = *(int *)(object + 0x2A8) == 3 ? (int)0x80D0D0D0 : 0x70808080;
     label4 = GetLocalizedString(0x31E4);
-    second = GetLocalizedString(toggleText.ids[D_001A7BB1 != 0]);
+    second = GetLocalizedString(toggleText.ids[g_display_mode_flag != 0]);
     sprintf(buffer, format, label4, second);
-    text_draw_centered_medium(D_001ADE18, D_001ADE1C[0], color, buffer, -1);
+    text_draw_centered_medium(g_four_option_label_x_fourth, g_four_option_label_y_fourth[0], color, buffer, -1);
 }

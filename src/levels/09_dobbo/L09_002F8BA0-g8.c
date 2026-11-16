@@ -8,7 +8,7 @@
    emitting lui/addiu for them. */
 
 /* The level's per-frame step coefficient, reached as 0x1EF8($gp). */
-extern f32 D_L09_001B0EE8 __attribute__((sda));
+extern f32 g_rescale_vector_factor __attribute__((sda));
 
 extern void FastVecSub(f32 *, const f32 *, const f32 *);
 extern void FastVecScale(char *, char *, f32);
@@ -24,15 +24,15 @@ void moby_rescale_vector(unsigned char *moby) {
     unsigned char *point_b = point_a + 0x10;
     char buf[16];
     FastVecSub((f32 *)buf, (const f32 *)point_a, (const f32 *)point_b);
-    FastVecScale(buf, buf, D_L09_001B0EE8);
+    FastVecScale(buf, buf, g_rescale_vector_factor);
     FastVecAdd((char *)point_b, (char *)point_b, buf);
     FastVecAdd((char *)(self + 0x10), (char *)(self + 0x10), (char *)point_b);
 }
 
 /* The pulse table's entry count, reached as 0x21E8($gp). */
-extern int D_L09_001B11D8 __attribute__((sda));
-extern int D_L09_002A2658[];
-extern int D_L09_002A27A0[];
+extern int g_light_ring_point_count __attribute__((sda));
+extern int g_color_pulse_colors[];
+extern int g_color_pulse_phases[];
 extern int FloatToInt(float);
 
 /* Advances the object's pulse timer by half a step (wrapping it to zero at 1.0) and adds its integer
@@ -49,16 +49,16 @@ void gfx_update_color_pulse_table(unsigned char *moby) {
     step = FloatToInt(t);
     if (*timer >= 1.0f)
         *timer = 0.0f;
-    for (i = 0; i < D_L09_001B11D8; i++) {
-        int phase = D_L09_002A27A0[i];
+    for (i = 0; i < g_light_ring_point_count; i++) {
+        int phase = g_color_pulse_phases[i];
         if (phase != 0) {
             phase += step;
             if (phase >= 0x91)
                 phase -= 0x80;
-            D_L09_002A27A0[i] = phase;
+            g_color_pulse_phases[i] = phase;
             if (phase >= 0x51)
                 phase = 0xA0 - phase;
-            D_L09_002A2658[i] = (D_L09_002A2658[i] & 0xFFFFFF) | (phase << 24);
+            g_color_pulse_colors[i] = (g_color_pulse_colors[i] & 0xFFFFFF) | (phase << 24);
         }
     }
 }
@@ -66,11 +66,11 @@ void gfx_update_color_pulse_table(unsigned char *moby) {
 /* The walk below reads the group count through $gp; the group table of id lists is absolute and
    the entity base (the level's record table, D_L09_001B285C) is the bare `lui`/`lw` pair here, a
    second name sized over 8 bytes with `sda` in this -G8 unit. */
-extern int D_L09_001B2878 __attribute__((sda));
+extern int g_max_l09_group_id __attribute__((sda));
 
 extern unsigned char *D_L09_001B285C_1[3] __attribute__((sda));
 
-extern unsigned short *D_L09_001FB560[];
+extern unsigned short *g_track_entry_table[];
 
 /* Flags the peers of the object: sets the byte at +0x440 of the private state of every entity of
    the object's group whose own word at +0x310 equals the object's. Nothing happens when the
@@ -87,9 +87,9 @@ void group_flag_peers(unsigned char *moby) {
         return;
     if (*(int *)(state + 0x310) == 0xFF)
         return;
-    for (track_entry = D_L09_001FB560[moby[0x21]];
-         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && track_entry != 0 &&
-         ((track_entry != 0 && (short)track_entry[-1] >= 0) || track_entry == D_L09_001FB560[moby[0x21]]);
+    for (track_entry = g_track_entry_table[moby[0x21]];
+         moby[0x21] != 0xFF && moby[0x21] <= g_max_l09_group_id && track_entry != 0 &&
+         ((track_entry != 0 && (short)track_entry[-1] >= 0) || track_entry == g_track_entry_table[moby[0x21]]);
          track_entry++) {
         peer = D_L09_001B285C_1[0] + ((*track_entry & 0x7FFF) << 8);
         if (peer == 0)
@@ -103,7 +103,7 @@ void group_flag_peers(unsigned char *moby) {
 }
 
 /* The level's other per-frame coefficient, reached as 0x1F14($gp). */
-extern f32 D_L09_001B0F04 __attribute__((sda));
+extern f32 g_blend_target_height_offset __attribute__((sda));
 
 extern void matrix_from_basis_rows(f32 *, f32 *);
 extern void transform_vector(f32 *, f32 *, f32 *);
@@ -130,5 +130,5 @@ void moby_blend_pos_toward_target(unsigned char *moby, f32 blend) {
     matrix_mul_vec3(v, v, (f32 *)(*(int *)(vars + 0x20) + 0xC0));
     FastVecAdd((char *)(self + 0x10), (char *)v, (char *)(*(int *)(vars + 0x20) + 0x10));
     *(f32 *)(self + 0x18) = *(f32 *)(self + 0x18) +
-        (*(f32 *)(*(int *)(vars + 0x20) + 0x18) + D_L09_001B0F04 - *(f32 *)(self + 0x18)) * blend;
+        (*(f32 *)(*(int *)(vars + 0x20) + 0x18) + g_blend_target_height_offset - *(f32 *)(self + 0x18)) * blend;
 }

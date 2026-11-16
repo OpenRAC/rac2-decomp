@@ -34,7 +34,7 @@ extern HeroState g_hero_state;
 extern InputState g_pad_state;
 extern Selection3EA540 g_item_slot_to_record;
 extern Entry g_weapon_l00_table[];
-extern char D_L00_001B2B90[] __attribute__((sda));
+extern char g_meteor_gun_muzzle[] __attribute__((sda));
 extern void meteor_gun_draw_glow(void);
 extern int math_fast_float_d(void *), vec_fast_helper_b(void *);
 extern int weapon_spend_ammo(int, int), get_ammo(int);
@@ -45,10 +45,10 @@ extern int AcquireEntitySlot(char *, int, void *);
 extern unsigned char *level_get_slot_body(int, int);
 extern void vec_clear_128(void *), matrix_mul_vec3(void *, void *, void *);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern char *func_PAL_L00_003E0120(char *, int, void *, void *);
+extern char *projectile_spawn_small_pal(char *, int, void *, void *);
 extern void ref_L00_003EA540_00(void *, char *);
 
-void func_PAL_L00_003EE818(char *self)
+void meteor_gun_update_pal(char *self)
 {
     float v[4];
     int tmp[4];
@@ -83,8 +83,8 @@ void func_PAL_L00_003EE818(char *self)
             vec_clear_128(v);
             v[1] = -1.0f;
             matrix_mul_vec3(v, v, self + 0xC0);
-            moby_transform_joint_to_world(self, 0, D_L00_001B2B90);
-            shot = func_PAL_L00_003E0120(self, *(int *)(st + 4), D_L00_001B2B90, v);
+            moby_transform_joint_to_world(self, 0, g_meteor_gun_muzzle);
+            shot = projectile_spawn_small_pal(self, *(int *)(st + 4), g_meteor_gun_muzzle, v);
             PlayMobySound(0, 0, self);
             if (*(unsigned char *)(self + 0x43) != 2)
                 func_PAL_002A7E68(self, 2, 0, 0);

@@ -15,14 +15,14 @@ extern float math_random_float_range(float, float);
 extern s32 math_random_int_below(s32);
 extern s32 math_random_int_range(s32, s32);
 extern void *enemy_spawn_record(void *, void *, void *, s32, s32);
-extern s32 D_L11_001B1950 __attribute__((sda));
-extern s32 D_L11_001B1954 __attribute__((sda));
-extern s32 D_L11_001B1958 __attribute__((sda));
-extern float D_L11_001B195C __attribute__((sda));
-extern float D_L11_001B1960 __attribute__((sda));
-extern float D_L11_001B1964 __attribute__((sda));
-extern float D_L11_001B1968 __attribute__((sda));
-extern char D_L11_001B1990[8] __attribute__((sda));
+extern s32 g_object_spark_chance __attribute__((sda));
+extern s32 g_object_spark_type_min __attribute__((sda));
+extern s32 g_object_spark_type_max __attribute__((sda));
+extern float g_object_spark_speed_min __attribute__((sda));
+extern float g_object_spark_speed_max __attribute__((sda));
+extern float g_object_spark_pos_jitter __attribute__((sda));
+extern float g_object_spark_height_offset __attribute__((sda));
+extern char g_object_spark_record_name[8] __attribute__((sda));
 
 /* Emits count sparks at the object, then one more unless the chance roll says no. */
 void func_PAL_L11_0044CA88(char *obj, s32 count)
@@ -32,28 +32,28 @@ void func_PAL_L11_0044CA88(char *obj, s32 count)
 
     for (i = 0; i < count; i++) {
         qcopy(s.pos, arena_get_center_point(obj));
-        vec_add_random_offset(s.pos, D_L11_001B1964);
-        s.pos[2] += D_L11_001B1968;
+        vec_add_random_offset(s.pos, g_object_spark_pos_jitter);
+        s.pos[2] += g_object_spark_height_offset;
         vec_clear_128(&s);
-        vec_add_random_offset(&s, math_random_float_range(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
+        vec_add_random_offset(&s, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
         s.flag = 0;
-        enemy_spawn_record(s.pos, &s, D_L11_001B1990, math_random_int_below(2), math_random_int_range(D_L11_001B1954, D_L11_001B1958));
+        enemy_spawn_record(s.pos, &s, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
     }
-    if (math_random_int_below(D_L11_001B1950) == 0) {
+    if (math_random_int_below(g_object_spark_chance) == 0) {
         qcopy(s.pos, arena_get_center_point(obj));
-        vec_add_random_offset(s.pos, D_L11_001B1964);
-        s.pos[2] += D_L11_001B1968;
+        vec_add_random_offset(s.pos, g_object_spark_pos_jitter);
+        s.pos[2] += g_object_spark_height_offset;
         vec_clear_128(&s);
-        vec_add_random_offset(&s, math_random_float_range(D_L11_001B195C, D_L11_001B1960) * 0.020000001f);
+        vec_add_random_offset(&s, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
         s.flag = 0;
-        enemy_spawn_record(s.pos, &s, D_L11_001B1990, math_random_int_below(2), math_random_int_range(D_L11_001B1954, D_L11_001B1958));
+        enemy_spawn_record(s.pos, &s, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
     }
 }
 
 extern s32 FastDecTimer(void *);
-extern u16 D_L11_001B19A8 __attribute__((sda));
-extern s32 D_L11_001B19AC __attribute__((sda));
-extern s32 D_L11_005A0000 __attribute__((sda));
+extern u16 g_timed_effect_duration __attribute__((sda));
+extern s32 g_timed_effect_chance __attribute__((sda));
+extern s32 g_level_global_word __attribute__((sda));
 extern s32 func_32CAB0(s32 a0);
 extern s32 func_301700(float f12);
 extern s32 func_3006B8(char *a0, s32 a1);
@@ -62,9 +62,9 @@ extern s32 func_4461C0(s32 a0, char *a1);
 extern s32 func_448CE0(char *a0);
 extern u8 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((sda));
-extern s32 D_L11_001B1C50 __attribute__((sda));
-extern u8 D_L11_001B1C10 __attribute__((sda));
-extern s32 D_L11_001B1C54;
+extern s32 g_scene_effect_param_a __attribute__((sda));
+extern u8 g_scene_effect_param_bytes __attribute__((sda));
+extern s32 g_scene_effect_param_b;
 typedef struct JobObject JobObject;
 typedef struct {
     u8 pad00[0x18];
@@ -150,8 +150,8 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, void *);
 extern void moby_set_state(void *, s32, s32);
-extern char D_L11_001BA8C0[];
-extern s32 D_001A8FF4;
+extern char g_hero_l11_position[];
+extern s32 g_enemy_ai_frozen;
 extern void security_robot_deactivate(void *);
 extern void security_robot_update_pairing(void *);
 extern s32 security_robot_is_holding_item_attacking(void *, void *);
@@ -162,7 +162,7 @@ extern void func_PAL_L11_0044F420(void *, s32, s32);
    (including a random-sign turn rate of 10 to 30 degrees), then handles hits, firing, damage
    and the death sequence. The turn rate's sign is chosen in the store's own expression so the
    stored value does not cross the coin-flip call. */
-void func_PAL_L11_0044DF38(JobObject *object)
+void turret_enemy_update_pal(JobObject *object)
 {
     JobState *state = object->state;
     void *hit;
@@ -201,9 +201,9 @@ void func_PAL_L11_0044DF38(JobObject *object)
         state->turret = 0;
         security_robot_deactivate(object);
     }
-    if (state->f36E == 0 && object->stage != 18 && !D_001A8FF4) {
+    if (state->f36E == 0 && object->stage != 18 && !g_enemy_ai_frozen) {
         object->flags |= 0x400;
-        if (object->f31 && fast_vec_dist(object->position, D_L11_001BA8C0) < 24.0f) {
+        if (object->f31 && fast_vec_dist(object->position, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(object);
             object->f6F = 22;
         }

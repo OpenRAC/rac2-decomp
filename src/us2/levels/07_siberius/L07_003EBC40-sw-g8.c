@@ -5,9 +5,9 @@
 #define INT_AT(p, offset) (*(int *)((char *)(p) + (offset)))
 #define PTR_AT(p, offset) (*(char **)((char *)(p) + (offset)))
 #define BYTE_AT(p, offset) (*(unsigned char *)((char *)(p) + (offset)))
-extern int D_L07_001B1E08[] __attribute__((sda));
-extern int D_L07_001C9780 NOT_SDA;
-extern float D_L07_001B0BA0 __attribute__((sda)), D_L07_001B0BA4 __attribute__((sda));
+extern int g_frame_l07_counter[] __attribute__((sda));
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern float g_shooter_cam_distance __attribute__((sda)), g_shooter_cam_height __attribute__((sda));
 typedef struct {
     char pad00[0x80];
     float position[4];
@@ -17,8 +17,8 @@ typedef struct {
     char *targetObject;
 } SiberiusPlayerView;
 extern SiberiusPlayerView g_hero_state;
-extern char *D_L07_001B23CC[] __attribute__((sda));
-extern float D_L07_001A8F20[] __attribute__((sda));
+extern char *g_shooter_mount_table[] __attribute__((sda));
+extern float g_default_hit_direction[] __attribute__((sda));
 extern void shooter_entity_base_update_b(void *);
 extern void entity_spawn_death_effects_b(void *);
 extern void entity_tick_timers_ride_platform(void *);
@@ -44,7 +44,7 @@ extern int moby_l01_turn_toward_target(void *, void *);
 extern int math_random_int_range(int, int);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
-extern int func_US2_002AF9C8(void *, float);
+extern int math_is_value_within_step_us2(void *, float);
 extern int math_random_int_below(int);
 extern int moby_count_group_not_in_state(int, int);
 extern int IsPointInCuboid(void *, int);
@@ -57,7 +57,7 @@ extern float FastAddRotations(float, float);
 extern float math_random_float_range(float, float);
 
 /* Update the phase and behavior state, then run the common update pass. */
-void func_US2_L07_003EBC40(unsigned char *object)
+void shooter_entity_update_us2(unsigned char *object)
 {
     char *state = PTR_AT(object, 0x68);
     char *targetObject;
@@ -70,7 +70,7 @@ void func_US2_L07_003EBC40(unsigned char *object)
     float angle;
     int hitFlags;
 
-    if (D_L07_001B1E08[0] >= 2 && D_L07_001C9780 != INT_AT(state, 0x320)) return;
+    if (g_frame_l07_counter[0] >= 2 && g_cutscene_l07_active_flag != INT_AT(state, 0x320)) return;
     shooter_entity_base_update_b(object);
     switch (object[0x95]) {
     case 0:
@@ -86,8 +86,8 @@ void func_US2_L07_003EBC40(unsigned char *object)
         else if (INT_AT(state, 0x2D4) == 0) moby_set_state(object, 1, 0);
         break;
     case 2:
-        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
-        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, g_shooter_cam_distance, 0.003000000026077032f);
+        follow_camera_set_height(g_shooter_cam_height, 0.003000000026077032f);
         if (INT_AT(state, 0x2DC) != 1) {
             moby_set_state(object, 2, 1);
             INT_AT(state, 0x2D4) = math_random_int_range(580, 600);
@@ -117,7 +117,7 @@ void func_US2_L07_003EBC40(unsigned char *object)
         break;
     case 3:
         if (flag_set_first_pending(object) && object[0x43] != 20) anim_start_blended(object, 20, 0, 20);
-        if (func_US2_002AF9C8(object, 17.0f)) {
+        if (math_is_value_within_step_us2(object, 17.0f)) {
             moby_transform_joint_to_world(object, 4, origin);
             targetObject = PTR_AT(state, 0x220);
             if (targetObject == g_hero_state.targetObject) {
@@ -161,7 +161,7 @@ void func_US2_L07_003EBC40(unsigned char *object)
                                   g_hero_state.position[1] - FLOAT_AT(object, 0x14));
             FLOAT_AT(state, 0x324) = FastAddRotations(angle, math_random_signed_float_range(45.0f, 100.0f) * 0.01745329424738884f);
         }
-        moby_move_to_target_temp_limits(object, D_L07_001A8F20, INT_AT(state, 0x88) | 0x10,
+        moby_move_to_target_temp_limits(object, g_default_hit_direction, INT_AT(state, 0x88) | 0x10,
                          FLOAT_AT(state, 0x324), -1.0f, -1.0f);
         moby_start_effect_from_entry(object,
             mat_fast_helper_a(FLOAT_AT(state, 0x210) - FLOAT_AT(object, 0x10),
@@ -182,20 +182,20 @@ void func_US2_L07_003EBC40(unsigned char *object)
         break;
     case 9:
         if (flag_set_first_pending(object) && object[0x43] != 10) anim_start_blended(object, 10, 0, 2);
-        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
-        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
-        FastVecSub(origin, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+        follow_camera_set_distance(0, g_shooter_cam_distance, 0.003000000026077032f);
+        follow_camera_set_height(g_shooter_cam_height, 0.003000000026077032f);
+        FastVecSub(origin, object + 0x10, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
         origin[0] = 0.5f;
-        matrix_mul_vec3(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7));
-        FastVecAdd(origin, origin, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+        matrix_mul_vec3(origin, origin, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7));
+        FastVecAdd(origin, origin, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
         moby_l01_turn_toward_target(object, origin);
         if (IsPointInCuboid(object + 0x10, INT_AT(state, 0x2C0))) {
-            FastVecSub(targetPosition, object + 0x10, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+            FastVecSub(targetPosition, object + 0x10, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+            matrix_mul_vec3(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
             targetPosition[0] = math_random_float_range(0.0f, 1.0f);
-            matrix_mul_vec3(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7));
-            FastVecAdd(targetPosition, targetPosition, D_L07_001B23CC[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
+            matrix_mul_vec3(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7));
+            FastVecAdd(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
             moby_aim_move_record_at_target(object, targetPosition, 0.10000000894069672f, 0.0055555556900799274f);
             moby_set_state(object, 10, -1);
         }
@@ -203,8 +203,8 @@ void func_US2_L07_003EBC40(unsigned char *object)
     case 10:
         if (flag_set_first_pending(object) && object[0x43] != 4) anim_start_blended(object, 4, 0, 2);
         hero_adjust_jump_speed_to_target(object, 1.0f, 8.0f, 12.5f);
-        follow_camera_set_distance(0, D_L07_001B0BA0, 0.003000000026077032f);
-        follow_camera_set_height(D_L07_001B0BA4, 0.003000000026077032f);
+        follow_camera_set_distance(0, g_shooter_cam_distance, 0.003000000026077032f);
+        follow_camera_set_height(g_shooter_cam_height, 0.003000000026077032f);
         FLOAT_AT(state, 0x180) = FLOAT_AT(object, 0x18)-3.0f;
         if (object[0x60] & 2) {
             angle = FastDiffRots(FLOAT_AT(object, 0xF8),

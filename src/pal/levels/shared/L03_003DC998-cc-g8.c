@@ -57,16 +57,16 @@ typedef float Vec[4] __attribute__((aligned(16)));
 extern u8 g_hero_state[];
 extern u32 g_pad_state[];
 extern u8 g_item_slot_to_record[];
-extern int D_L00_001A8F00;
-extern int D_L00_001B2AD0;
-extern AimConfig D_L00_001B00F0;
+extern int g_game_l00_mode;
+extern int g_charge_weapon_fire_held;
+extern AimConfig g_charge_aim_config;
 extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_l00_table[];
-extern Light D_L00_001C6F40[];
-extern u8 D_L00_002960A0[];
-extern u8 D_L00_001A8F20[] __attribute__((sda));
+extern Light g_light_table[];
+extern u8 g_charge_sound_records[];
+extern u8 g_default_vector[] __attribute__((sda));
 
 extern int vec_fast_helper_b(void *);
 extern int func_PAL_L03_002C7068(int, int);
@@ -94,7 +94,7 @@ extern void KeyOwnerTableInsert(void *, void *, int);
 extern Moby *func_PAL_L00_0040E9F0(void *, void *, void *, void *, float, float, float, float);
 extern int weapon_spend_ammo(int, int);
 extern void slot_reset_active(int);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern float IntToFloat(int);
 extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 extern int FastDecTimer(void *);
@@ -152,7 +152,7 @@ void func_PAL_L03_003DC998(Moby *moby)
     /* Two scopes: config shares its slot with the vectors declared further down. */
     {
     {
-        AimConfig config = D_L00_001B00F0;
+        AimConfig config = g_charge_aim_config;
 
         SelectBestTargetInCone(&moby->position, &direction, 0.436332345f, 0.436332345f, &count, list, 0x20, 0, 48.0f, 0.785398245f, 0.785398245f, 1, &config);
     }
@@ -177,7 +177,7 @@ void func_PAL_L03_003DC998(Moby *moby)
         } while (i < count);
     }
     target = 0;
-    if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 &&
+    if (g_game_l00_mode == 0 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 &&
         (g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 0x13 && ready != 0) {
         if (((Hero *)g_hero_state)->i[0x1450 / 4] != 0)
             ((Hero *)g_hero_state)->i[0xBF8 / 4] = ((Hero *)g_hero_state)->i[0x1450 / 4];
@@ -214,7 +214,7 @@ void func_PAL_L03_003DC998(Moby *moby)
             func_PAL_L00_003CD388(moby);
             anim_start_blended_with_flags(moby, 2, 0, 1, 0);
             moby->scale = 0.9f;
-            vars->sound = slot_copy_records_to_free(D_L00_002960A0);
+            vars->sound = slot_copy_records_to_free(g_charge_sound_records);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;
@@ -236,22 +236,22 @@ void func_PAL_L03_003DC998(Moby *moby)
                 strength = info[4];
         fire:
             if (((Hero *)g_hero_state)->ptr[0xBF8 / 4] != 0)
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
+                shot = func_PAL_L00_0040E9F0(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             else
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, target, D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
+                shot = func_PAL_L00_0040E9F0(moby, muzzle, target, g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             if (shot != 0)
                 shot->owner = moby;
             weapon_spend_ammo(-1, 1);
-            D_L00_001B2AD0 = 1;
-        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || D_L00_001B2AD0 == 1) {
+            g_charge_weapon_fire_held = 1;
+        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || g_charge_weapon_fire_held == 1) {
             PlayMobySound(2, 0, moby);
-            D_L00_001B2AD0 = 0;
+            g_charge_weapon_fire_held = 0;
         }
         if (!(g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
             if (vars->sound >= 0) {
                 slot_reset_active(vars->sound);
                 vars->sound = -1;
-                func_PAL_L00_002AF6C0();
+                cancel_hero_item_animation_pal();
             }
         }
         {
@@ -313,7 +313,7 @@ void func_PAL_L03_003DC998(Moby *moby)
         if (vars->light == -1) {
             vars->light = part_l00_alloc_effect_slot_2(spot, 8.0f, 0.0f, red, green, blue);
         } else {
-            Light *light = &D_L00_001C6F40[vars->light];
+            Light *light = &g_light_table[vars->light];
 
             qcopy(&light->pos, spot);
             light->pos.f[3] = 8.0f;

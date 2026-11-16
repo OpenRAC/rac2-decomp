@@ -6,11 +6,11 @@
  * reload the cursor, and the packet stores stay ordered ahead of its final read. */
 extern void set_scale_matrix(float *, float);
 extern void FastVecScale(void *, void *, float);
-extern int D_001B169C;
-extern unsigned short D_0010ED20 __attribute__((section(".data")));
-extern char D_0010ED30[], g_camera_eye_state[], D_001B9040[];
+extern int g_gfx_pass_mode;
+extern unsigned short g_font_vu_state_size __attribute__((section(".data")));
+extern char g_font_vu_program[], g_camera_eye_state[], g_view_params[];
 extern int *g_dma_packet_cursor;
-extern float D_001A86F0 __attribute__((sda));
+extern float g_font_vu_offset __attribute__((sda));
 extern void VU1_addDataRef(void *, int);
 extern void multiply_matrix(void *, void *, void *);
 extern void gfx_append_fixed_dma_block_tags(void);
@@ -27,9 +27,9 @@ void font_queue_vu_state(void) {
     cam = g_camera_eye_state;
     FastVecScale(&m[12], cam, -1024.0f);
     m[15] = 1.0f;
-    if (D_001B169C != 8) {
-        VU1_addDataRef(D_0010ED30, D_0010ED20);
-        D_001B169C = 8;
+    if (g_gfx_pass_mode != 8) {
+        VU1_addDataRef(g_font_vu_program, g_font_vu_state_size);
+        g_gfx_pass_mode = 8;
     }
     *(int *)((char *)g_dma_packet_cursor + 0) = 0x10000000;
     *(int *)((char *)g_dma_packet_cursor + 4) = 0;
@@ -42,11 +42,11 @@ void font_queue_vu_state(void) {
     *(int *)(base + 0x1C) = 0x6C0C43A4;
     p = (int *)(base + 0x20);
     multiply_matrix(p, cam - 0x100, m);
-    *(float *)(p + 14) += D_001A86F0;
+    *(float *)(p + 14) += g_font_vu_offset;
     p = (int *)(base + 0x60);
     multiply_matrix(p, cam - 0x80, m);
-    *(float *)(p + 14) += D_001A86F0;
-    g = D_001B9040;
+    *(float *)(p + 14) += g_font_vu_offset;
+    g = g_view_params;
     *(int *)(base + 0xA0) = 0x8000;
     *(int *)(base + 0xA4) = 0x303EC000;
     *(int *)(base + 0xA8) = 0x412;

@@ -75,15 +75,15 @@ typedef struct {
     float field_24B8;
 } HopPlayer;
 #define HOP_PLAYER (*(HopPlayer *)D_L03_00189E20)
-extern int D_L03_001A8FF0[] __attribute__((sda));
-extern float D_L03_001A7DC0[] __attribute__((sda));
+extern int g_hero_l03_block_flag[] __attribute__((sda));
+extern float g_hero_camera_speed_params[] __attribute__((sda));
 typedef struct {
     unsigned char pad_0[0x158];
     float angle;
     unsigned char pad_15C[0x214];
     HopVector basis;
 } HopSavedState;
-extern unsigned char D_L03_001B9840[];
+extern unsigned char g_hero_l03_state_alias[];
 #define HOP_SAVED (*(HopSavedState *)D_L03_001B9840)
 extern void hero_build_move_impulse(float, float);
 extern void hero_approach_speed(float, float);
@@ -103,7 +103,7 @@ extern void hero_start_pose_offset(float, float, float);
 extern float cam_get_view_space_vector_length(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern unsigned char D_L03_00189E20[];
+extern unsigned char g_hero_l03_state_block[];
 extern float ApproachValue(float *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 
@@ -224,7 +224,7 @@ void func_PAL_L03_002BC3A0(void) {
         return;
     }
 
-    if (HOP_PLAYER.state == 0x81 && !D_L03_001A8FF0[0]) {
+    if (HOP_PLAYER.state == 0x81 && !g_hero_l03_block_flag[0]) {
         hero_steer_heading(0.057600003f, 0.28800002f, HOP_PLAYER.field_494, 0);
         HOP_PLAYER.field_1B4 = 0.0f;
         return;
@@ -259,7 +259,7 @@ void func_PAL_L03_002BC3A0(void) {
     qcopy(&HOP_PLAYER.field_160, &HOP_PLAYER.field_A60);
 
     step = 0.008f;
-    if (HOP_PLAYER.field_1B0 < D_L03_001A7DC0[0] * 0.004f) {
+    if (HOP_PLAYER.field_1B0 < g_hero_camera_speed_params[0] * 0.004f) {
         if (HOP_PLAYER.field_229C == 2) {
             float brake = HOP_PLAYER.field_A84;
             float angle = cam_get_view_space_vector_length(&HOP_PLAYER.vel_x);

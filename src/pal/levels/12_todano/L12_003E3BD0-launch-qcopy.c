@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u16 *D_L12_001FB960[];
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u16 *g_moby_l12_group_lists[];
+extern u8 *g_moby_list_start MACRO_ADDR;
 typedef unsigned int u128 __attribute__((mode(TI)));
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 math_random_float_range(f32, f32);
@@ -15,13 +15,13 @@ s32 func_PAL_L12_003E4AC8(s32 id, void *pos, void *target)
     f32 *pp = p, *tp = t;
     u16 *list;
     s32 result = 0;
-    list = D_L12_001FB960[id];
+    list = g_moby_l12_group_lists[id];
     *(u128 *)p = *(u128 *)pos;
     *(u128 *)t = *(u128 *)target;
     if (!list) return 0;
     do {
         u16 packed = *list;
-        u8 *object = D_L12_001B2E9C + ((packed & 0x7FFF) << 8);
+        u8 *object = g_moby_list_start + ((packed & 0x7FFF) << 8);
         if (*(s16 *)(object + 0xAA) == 0xBB8 && object[0x20] == 1) {
             u8 *state = *(u8 **)(object + 0x68);
             result = 1;

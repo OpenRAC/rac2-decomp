@@ -13,7 +13,7 @@ extern float math_spring_float_to_goal(unsigned char *, unsigned char *, float, 
    folds a 2.0943954 radian turn into its 0xF8 angle -- sign drawn from the
    resident two-way draw -- before the shared four-float ramp body runs on the
    block at 0x3D8. */
-void func_PAL_L09_00402A88(unsigned char *a0) {
+void sub_object_update_turn_ramps_pal(unsigned char *a0) {
     unsigned char *s1 = a0;
     unsigned char *s0 = *(unsigned char **)(s1 + 0x68);
     math_update_wrapped_angle_offset(a0, s0 + 0x3C0, s0 + 0x3C4, 0.25f, 0.06f, -1.0f);

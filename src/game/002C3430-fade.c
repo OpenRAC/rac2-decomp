@@ -7,7 +7,7 @@ extern float g_camera_eye_state[];
 extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern unsigned char *D_001F2634;
+extern unsigned char *g_part_tex_following_glow_table;
 /* Follows an animated source joint, easing size and alpha toward their limits.
  * Corresponds to RAC1's update_animated_source_attached_fade_in_out_effect_particle. */
 /* Updates a glow that sticks to a joint of another object, grows and shrinks, and fades. */
@@ -37,7 +37,7 @@ void part_update_joint_following_glow(char *particle)
     }
     *(float *)(motion + 8) += 0.001f;
     particle[8] = FloatToInt(*(float *)(motion + 8) * 255.0f);
-    particle[2] = D_001F2634[*(short *)(motion + 12)];
+    particle[2] = g_part_tex_following_glow_table[*(short *)(motion + 12)];
     if (*(float *)(particle + 12) <= 159600.0f || *(float *)(motion + 16) > 0.0f)
         *(float *)(motion + 4) += *(float *)(motion + 16);
     {

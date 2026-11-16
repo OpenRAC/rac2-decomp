@@ -4,7 +4,7 @@ extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void 
 extern int FloatToInt(float);
 typedef union { int address; unsigned long *words; } SpriteCursor;
 /* The incomplete array keeps absolute cursor accesses in the macro address model. */
-extern SpriteCursor D_L05_001B2C88[] __attribute__((sda));
+extern SpriteCursor g_dma_packet_cursor_2[] __attribute__((sda));
 extern int g_screen_offset_x, g_screen_offset_y;
 /* Counterpart: RAC1 append_rotated_textured_screen_quad. Emits one rotated sprite packet. */
 /* Draws one flat sprite on the screen, turned by the given angle, by writing a packet for the graphics hardware. */
@@ -56,11 +56,11 @@ void gfx_draw_rotated_screen_sprite(float center_x, float center_y, float width,
     FastVecSub(lower_left, center, horizontal);
     qcopy(lower_right, center);
 
-    *(int *)(D_L05_001B2C88[0].address + 0) = 0x10000007;
+    *(int *)(g_dma_packet_cursor_2[0].address + 0) = 0x10000007;
     color = color | (green_bits << 8);
     vif_tag = 0x50000007;
     register_list = 0x53535353106;
-    *(int *)(D_L05_001B2C88[0].address + 4) = 0;
+    *(int *)(g_dma_packet_cursor_2[0].address + 4) = 0;
     blue_bits = blue_bits << 16;
     color = color | blue_bits;
     alpha_bits = alpha_bits << 24;
@@ -68,15 +68,15 @@ void gfx_draw_rotated_screen_sprite(float center_x, float center_y, float width,
     initial_uv = 0x100010;
     gif_tag = 0xB400000000008001;
     color = color | alpha_bits;
-    *(int *)(D_L05_001B2C88[0].address + 8) = 0;
+    *(int *)(g_dma_packet_cursor_2[0].address + 8) = 0;
     subpixel_scale = 16.0f;
     texture_u = texture_width << 4;
     texture_v = texture_height << 20;
     depth_bits = (unsigned long)z_value << 32;
-    *(int *)(D_L05_001B2C88[0].address + 12) = vif_tag;
-    tag = (char *)D_L05_001B2C88[0].address;
+    *(int *)(g_dma_packet_cursor_2[0].address + 12) = vif_tag;
+    tag = (char *)g_dma_packet_cursor_2[0].address;
     packet = (unsigned long *)(tag + 0x10);
-    D_L05_001B2C88[0].address = (int)packet;
+    g_dma_packet_cursor_2[0].address = (int)packet;
     *(unsigned long *)(tag + 0x10) = gif_tag;
     packet[1] = register_list;
     packet[2] = texture_word;
@@ -111,5 +111,5 @@ void gfx_draw_rotated_screen_sprite(float center_x, float center_y, float width,
         packet[12] = (unsigned long)(pixel_x + g_screen_offset_x - 8) | ((unsigned long)(pixel_y + g_screen_offset_y - 8) << 16) | depth_bits;
     }
 
-    D_L05_001B2C88[0].address += 0x70;
+    g_dma_packet_cursor_2[0].address += 0x70;
 }

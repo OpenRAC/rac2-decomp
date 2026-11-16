@@ -16,7 +16,7 @@ typedef struct { char pad00[4]; unsigned char color; char pad05[0x37]; unsigned 
 extern ListState g_vendor_menu_state;
 extern unsigned char g_item_slot_to_record[];
 extern IconInfo g_weapon_table[];
-extern float D_001B2280[] MACRO_ADDR;
+extern float g_pal_aspect_scale[] MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR, g_screen_height MACRO_ADDR;
 extern void gfx_set_scissor_clamped(int,int,int,int);
@@ -37,7 +37,7 @@ void func_PAL_002FACD0(void)
     int i, index, y, icon, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
     double distance;
-    gfx_set_scissor_clamped(58,456,(int)(D_001B2280[0]*320.0f+0.5f),screen_y(382));
+    gfx_set_scissor_clamped(58,456,(int)(g_pal_aspect_scale[0]*320.0f+0.5f),screen_y(382));
     if (g_vendor_menu_state.scroll < 0) g_vendor_menu_state.scroll += 4;
     else if (g_vendor_menu_state.scroll > 0) g_vendor_menu_state.scroll -= 4;
     i = -5;
@@ -72,7 +72,7 @@ void func_PAL_002FACD0(void)
             alpha1 <<= 24;
             colors[2] = colors[0] = alpha0 | color;
             colors[3] = colors[1] = alpha1 | color;
-            hud_draw_sprite_gradient(icon,y+4,screen_y(329),40,(int)(D_001B2280[0]*40.0f+0.5f),colors);
+            hud_draw_sprite_gradient(icon,y+4,screen_y(329),40,(int)(g_pal_aspect_scale[0]*40.0f+0.5f),colors);
             if (g_vendor_menu_state.rows[index].owned) {
                 char *text = GetLocalizedString(0x1b2d);
                 int tx = (text_measure_width_small_scaled(text,-1,0.75f) >> 1) - 25;

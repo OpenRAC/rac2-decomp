@@ -16,7 +16,7 @@ typedef struct {
     float f228, f22C;
     int color[3];
 } ScreenState;
-extern ScreenState D_001B9040;
+extern ScreenState g_view_params;
 extern void UpdateViewContext(void);
 
 extern void F4778f810_FUN_002B00D8(char *a, char *b, char *c, f32 d);
@@ -100,7 +100,7 @@ struct Rac2Native_00169805055547ed_Rec31cd0302 {
     int v[10];
 };
 
-extern struct Rac2Native_00169805055547ed_Rec31cd0302 D_L04_001BCE48[];
+extern struct Rac2Native_00169805055547ed_Rec31cd0302 g_slot_l04_value_table[];
 
 extern char Fd8e166aa_D_001B7F80[];
 
@@ -132,7 +132,7 @@ extern int coll_test_segment_hit(float *a, float *b, int c, int d);
 
 extern int coll_test_point(float *out, int mode, float scale, char *data);
 
-extern float D_001BAFA0[];
+extern float g_coll_hit_position[];
 
 /* Collision-hit nudge subject: geometry plane at 0x20, scale 0x2C, data pointer 0x54. */
 typedef struct {
@@ -143,7 +143,7 @@ typedef struct {
     char *p054;
 } HitNudge_002746C8;
 
-extern float D_001BAFB0[];
+extern float g_coll_hit_point[];
 
 extern void vec_set_direction_with_complement(float *, float *, float);
 
@@ -153,11 +153,11 @@ extern void gfx_wait_for_dma_status_bits(int);
 extern void gfx_select_packet_buffer_setup(void);
 extern void gfx_reset_packet_buffer(void);
 extern void FadeToBlack(int);
-extern int D_001B7F98;
-extern int D_001A72D4 __attribute__((sda));
+extern int g_saved_draw_position;
+extern int g_vram_frame_base __attribute__((sda));
 
 extern int math_fast_float_d(void *);
-extern char D_001B7FA8[];
+extern char g_shared_data_block[];
 
 /* Index holder at 0x1B7F80: the current item index and the key that goes with it. */
 typedef struct {
@@ -179,7 +179,7 @@ typedef struct {
     int count;
 } OozlaTable_001B8308;
 
-extern OozlaTable_001B8308 D_001B8308;
+extern OozlaTable_001B8308 g_disc_player_seq_table;
 extern int AdvanceGroupedTableOffset(int, int *, int *);
 
 /* The index holder itself, named through the symbol the file already uses for it. */
@@ -195,8 +195,8 @@ extern int AdvanceGroupedTableOffset(int, int *, int *);
    gp-relative instead. */
 extern int ref_L00_002E38F0_00 __attribute__((sda));
 
-extern int D_001B1710 __attribute__((sda));
-extern char D_001BADC0[];
+extern int g_vis_update_mode __attribute__((sda));
+extern char g_visibility_bitmap[];
 extern void mem_clear(void *, int, int);
 extern void UpdateVisibilityBitmap(void);
 
@@ -206,12 +206,12 @@ extern void UpdateVisibilityBitmap(void);
 typedef struct { float origin[4]; char visibility[0][128]; } OcclDirectional;
 typedef struct { char pad[0x140]; float position[3]; } OcclCamera;
 extern OcclCamera g_active_camera;
-extern char D_001BAE40[128];
-extern float *D_001B1704 __attribute__((sda));
-extern float *D_001B1708 __attribute__((sda));
-extern int D_001B170C __attribute__((sda));
-extern int D_001B1714 __attribute__((sda));
-extern unsigned char *D_001B1718 __attribute__((sda));
+extern char g_visibility_work_bitmap[128];
+extern float *g_vis_cell_cursor __attribute__((sda));
+extern float *g_vis_directional_data __attribute__((sda));
+extern int g_vis_fallback_mode __attribute__((sda));
+extern int g_vis_cell_found_flag __attribute__((sda));
+extern unsigned char *g_vis_previous_bitmap __attribute__((sda));
 extern int FloatToInt(float);
 extern void mem_fast_helper_c(void *, const void *, int);
 extern void mem_fast_helper_b(void *, int);
@@ -335,7 +335,7 @@ int moby_push_out_of_hit_point(Obj_F4778f810 *obj)
             matrix_mul_vec3(tmp1, vars->points030[i], (float *)((char *)obj + 0xC0));
             F4778f810_FUN_00282CC0((char *)tmp1, (char *)tmp1, (char *)obj + 0x10);
             if (coll_test_segment_hit(tmp0, tmp1, hit, 0) != 0) {
-                hit_info = D_001BAFA0;
+                hit_info = g_coll_hit_position;
                 F4778f810_FUN_00282CF0((char *)tmp2, (char *)tmp1, (char *)hit_info);
                 func_00282F20_16(hit_info + 8, hit_info + 8, 1.0f);
                 scale = func_00282DB0_3(tmp2, hit_info + 8);
@@ -359,7 +359,7 @@ int moby_push_away_from_hit(Obj_F4778f810 *obj)
     matrix_mul_vec3((char *)&tmp[0], (char *)vars + 0x20, (char *)obj + 0xC0);
     FastVecAdd((char *)&tmp[0], (char *)&tmp[0], (char *)obj + 0x10);
     if (coll_test_point((float *)&tmp[0], 2, vars->f02C, vars->p054) != 0) {
-        FastVecSub((char *)&tmp[1], (char *)D_001BAFB0, (char *)&tmp[0]);
+        FastVecSub((char *)&tmp[1], (char *)g_coll_hit_point, (char *)&tmp[0]);
         FastVecAdd((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[1]);
         return 1;
     }
@@ -469,7 +469,7 @@ void gfx_restore_draw_position(void) {
     gfx_wait_for_dma_status_bits(1);
     gfx_select_packet_buffer_setup();
     gfx_reset_packet_buffer();
-    D_001A72D4 = D_001B7F98;
+    g_vram_frame_base = g_saved_draw_position;
     FadeToBlack(30);
 }
 
@@ -480,16 +480,16 @@ void table_set_slot_values(int p0, int p1, int p2, int p3, int p4, int p5,
 {
     if (idx >= 32u)
         return;
-    D_L04_001BCE48[idx].v[0] = p0;
-    D_L04_001BCE48[idx].v[1] = p1;
-    D_L04_001BCE48[idx].v[2] = p2;
-    D_L04_001BCE48[idx].v[3] = p3;
-    D_L04_001BCE48[idx].v[4] = p4;
-    D_L04_001BCE48[idx].v[5] = p5;
-    D_L04_001BCE48[idx].v[6] = p6;
-    D_L04_001BCE48[idx].v[7] = p7;
-    D_L04_001BCE48[idx].v[8] = p8;
-    D_L04_001BCE48[idx].v[9] = p9;
+    g_slot_l04_value_table[idx].v[0] = p0;
+    g_slot_l04_value_table[idx].v[1] = p1;
+    g_slot_l04_value_table[idx].v[2] = p2;
+    g_slot_l04_value_table[idx].v[3] = p3;
+    g_slot_l04_value_table[idx].v[4] = p4;
+    g_slot_l04_value_table[idx].v[5] = p5;
+    g_slot_l04_value_table[idx].v[6] = p6;
+    g_slot_l04_value_table[idx].v[7] = p7;
+    g_slot_l04_value_table[idx].v[8] = p8;
+    g_slot_l04_value_table[idx].v[9] = p9;
 }
 
 /* Walk the item table from the current index, carrying the offset across entries of one group; return 1 when it lands inside an entry. */
@@ -502,10 +502,10 @@ int AdvanceGroupedTableOffset(int value, int *out_index, int *out_offset)
     *out_index = (short)OozlaHolder->idx;
     *out_offset = (short)OozlaHolder->idx2 + value;
 
-    while (*out_index >= 0 && *out_index < D_001B8308.count) {
+    while (*out_index >= 0 && *out_index < g_disc_player_seq_table.count) {
         int row, start, end, offset, next_offset;
 
-        table = &D_001B8308;
+        table = &g_disc_player_seq_table;
         start_field = (char *)table + 4;
         end_field = (char *)table + 8;
         row = *out_index * sizeof(OozlaEntry_001B8308);
@@ -530,7 +530,7 @@ int AdvanceGroupedTableOffset(int value, int *out_index, int *out_offset)
 
 /* Asks a helper about the shared data block and returns the answer. */
 int data_query_shared_block(void) {
-    return math_fast_float_d(D_001B7FA8);
+    return math_fast_float_d(g_shared_data_block);
 }
 
 /* Moves the current item index to the next group of items in the table. Returns whether it moved on. */
@@ -550,24 +550,24 @@ int data_advance_to_next_item_group(void)
         }
         return 1;
     }
-    if (AdvanceGroupedTableOffset(D_001B8308.e[(short)g->idx].ptr, &t1, &t2)) {
-        if (D_001B8308.e[(short)g->idx].ptr != 0) {
+    if (AdvanceGroupedTableOffset(g_disc_player_seq_table.e[(short)g->idx].ptr, &t1, &t2)) {
+        if (g_disc_player_seq_table.e[(short)g->idx].ptr != 0) {
             g->idx = (unsigned short)t1;
             g->idx2 = (unsigned short)t2;
             return 1;
         }
     }
     {
-        OozlaEntry_001B8308 *e = &D_001B8308.e[(short)OozlaHolder->idx];
+        OozlaEntry_001B8308 *e = &g_disc_player_seq_table.e[(short)OozlaHolder->idx];
 
         found = 1;
-        count = D_001B8308.count;
+        count = g_disc_player_seq_table.count;
         key = e->key;
         OozlaHolder->idx2 = 0;
         OozlaHolder->idx = OozlaHolder->idx + 1;
         if ((short)OozlaHolder->idx < count) {
             do {
-                if (D_001B8308.e[(short)OozlaHolder->idx].key != key) {
+                if (g_disc_player_seq_table.e[(short)OozlaHolder->idx].key != key) {
                     found = 0;
                 } else {
                     OozlaHolder->idx = OozlaHolder->idx + 1;
@@ -623,12 +623,12 @@ void UpdateVisibilityBitmap(void)
     z = FloatToInt(g_active_camera.position[2] * scale);
     vis = (unsigned char *)Fcdb4d905_FUN_0027A0F8(x, y, z);
     if (vis) {
-        D_001B1714 = 0;
-        mem_fast_helper_c(D_001BADC0, vis, 128);
-        D_001B1718 = vis;
+        g_vis_cell_found_flag = 0;
+        mem_fast_helper_c(g_visibility_bitmap, vis, 128);
+        g_vis_previous_bitmap = vis;
     } else {
-        D_001B1714 = 1;
-        if (D_001B170C == 0) {
+        g_vis_cell_found_flag = 1;
+        if (g_vis_fallback_mode == 0) {
             xm = x - 1;
             xp = x + 1;
             fraction = IntToFloat(x);
@@ -642,41 +642,41 @@ void UpdateVisibilityBitmap(void)
             fraction = IntToFloat(z);
             gz = (unsigned char *)vis_find_nearer_cell(g_active_camera.position[2] * scale - fraction, x, y, zm, x, y, zp);
             if (gx || gy || gz) {
-                mem_fast_helper_b(D_001BAE40, 128);
-                if (gx) mem_fast_helper_d(D_001BAE40, D_001BAE40, gx, 128);
-                if (gy) mem_fast_helper_d(D_001BAE40, D_001BAE40, gy, 128);
-                if (gz) mem_fast_helper_d(D_001BAE40, D_001BAE40, gz, 128);
-                vis = D_001BAE40;
-                D_001B1718 = vis;
-                mem_fast_helper_c(D_001BADC0, vis, 128);
+                mem_fast_helper_b(g_visibility_work_bitmap, 128);
+                if (gx) mem_fast_helper_d(g_visibility_work_bitmap, g_visibility_work_bitmap, gx, 128);
+                if (gy) mem_fast_helper_d(g_visibility_work_bitmap, g_visibility_work_bitmap, gy, 128);
+                if (gz) mem_fast_helper_d(g_visibility_work_bitmap, g_visibility_work_bitmap, gz, 128);
+                vis = g_visibility_work_bitmap;
+                g_vis_previous_bitmap = vis;
+                mem_fast_helper_c(g_visibility_bitmap, vis, 128);
             }
         }
         if (!vis) {
-            switch (D_001B170C) {
+            switch (g_vis_fallback_mode) {
             case 0:
-                previous = D_001B1718;
-                if (previous) mem_fast_helper_c(D_001BADC0, previous, 128);
-                else mem_clear(D_001BADC0, -1, 128);
+                previous = g_vis_previous_bitmap;
+                if (previous) mem_fast_helper_c(g_visibility_bitmap, previous, 128);
+                else mem_clear(g_visibility_bitmap, -1, 128);
                 break;
             case 2:
-                p = D_001B1704;
+                p = g_vis_cell_cursor;
                 if (p) {
                     bx = 0.0f < g_active_camera.position[0] - p[0];
                     by = 0.0f < g_active_camera.position[1] - p[1];
                     bz = 0.0f < g_active_camera.position[2] - p[2];
-                    mem_fast_helper_c(D_001BADC0, (char *)p + ((bz + by * 2 + bx * 4) * 128 + 16), 128);
+                    mem_fast_helper_c(g_visibility_bitmap, (char *)p + ((bz + by * 2 + bx * 4) * 128 + 16), 128);
                     break;
                 }
-                if (D_001B1718) {
-                    mem_fast_helper_c(D_001BADC0, D_001B1718, 128);
+                if (g_vis_previous_bitmap) {
+                    mem_fast_helper_c(g_visibility_bitmap, g_vis_previous_bitmap, 128);
                     break;
                 }
                 /* fall through */
             case 1:
-                mem_clear(D_001BADC0, -1, 128);
+                mem_clear(g_visibility_bitmap, -1, 128);
                 break;
             case 3: {
-                float *directional = D_001B1708;
+                float *directional = g_vis_directional_data;
                 if (directional) {
                     origin[0] = directional[0];
                     origin[1] = directional[1];
@@ -722,13 +722,13 @@ void UpdateVisibilityBitmap(void)
                         index += 48;
                         if (delta[2] != 0) index += FloatToInt(mat_fast_helper_a(-delta[0], delta[2]) * 10.185916f);
                     }
-                    mem_fast_helper_c(D_001BADC0, ((OcclDirectional *)D_001B1708)->visibility[index], 128);
+                    mem_fast_helper_c(g_visibility_bitmap, ((OcclDirectional *)g_vis_directional_data)->visibility[index], 128);
                 } else {
-                    previous = D_001B1718;
+                    previous = g_vis_previous_bitmap;
                     if (previous) {
-                        mem_fast_helper_c(D_001BADC0, previous, 128);
+                        mem_fast_helper_c(g_visibility_bitmap, previous, 128);
                     } else {
-                        mem_clear(D_001BADC0, -1, 128);
+                        mem_clear(g_visibility_bitmap, -1, 128);
                     }
                 }
                 break;
@@ -736,16 +736,16 @@ void UpdateVisibilityBitmap(void)
             }
         }
     }
-    D_001BADC0[127] |= 128;
+    g_visibility_bitmap[127] |= 128;
 }
 
 
 /* Updates the visibility data depending on the visibility mode setting. */
 void vis_update_by_mode(void)
 {
-    if (D_001B1710 == 0)
-        mem_clear(D_001BADC0, -1, 0x80);
-    else if (D_001B1710 == 2)
+    if (g_vis_update_mode == 0)
+        mem_clear(g_visibility_bitmap, -1, 0x80);
+    else if (g_vis_update_mode == 2)
         UpdateVisibilityBitmap();
 }
 
@@ -754,7 +754,7 @@ void vis_update_by_mode(void)
 void gfx_init_view_context(void)
 {
     ScreenDimensions *dimensions = &g_screen_adjust_offsets;
-    ScreenState *view = &D_001B9040;
+    ScreenState *view = &g_view_params;
     short width = dimensions->width;
     short height = dimensions->height;
     int half_width = width >> 1;
@@ -789,7 +789,7 @@ void gfx_init_view_context(void)
 /* Sets up the screen size and view limits from the given values, then applies them. */
 void gfx_configure_projection(int width, int height, float scale, float a, float b, float c, float d)
 {
-    ScreenState *context = &D_001B9040;
+    ScreenState *context = &g_view_params;
     int halfW = width >> 1;
     int halfH = height >> 1;
     float halfHeight;
@@ -853,21 +853,21 @@ typedef struct {
     char b[0x60];
 } GsLoadImage;
 
-extern GsDrawEnvRegs D_00139120;
-extern u64 D_00139310;
-extern u64 D_00139380;
-extern unsigned char D_001BB000[];
+extern GsDrawEnvRegs g_gs_draw_env_regs;
+extern u64 g_gs_zbuf_reg;
+extern u64 g_gs_zbuf_reg_masked;
+extern unsigned char g_gs_transfer_buffer[];
 extern int g_is_pal_video __attribute__((sda));
 extern int g_widescreen_flag __attribute__((sda));
-extern int D_001A72D0 __attribute__((sda));
-extern int D_001A72D8 __attribute__((sda));
-extern int D_001A72DC __attribute__((sda));
-extern int D_001A72E0 __attribute__((sda));
-extern int D_001A72E4 __attribute__((sda));
-extern int D_001A72E8 __attribute__((sda));
-extern int D_001A72EC __attribute__((sda));
-extern int D_001A72F0 __attribute__((sda));
-extern int D_001A72F4 __attribute__((sda));
+extern int g_vram_cursor __attribute__((sda));
+extern int g_vram_fb_offset __attribute__((sda));
+extern int g_vram_display_address __attribute__((sda));
+extern int g_vram_zbuffer_address __attribute__((sda));
+extern int g_vram_texture_base __attribute__((sda));
+extern int g_vram_texture_base_copy __attribute__((sda));
+extern int g_vram_clut_first __attribute__((sda));
+extern int g_vram_clut_second __attribute__((sda));
+extern int g_vram_clut_third __attribute__((sda));
 extern void FlushCache(int);
 extern int gfx_wait_paths_idle(int, int);
 extern void SetupFS_AA_buffer(int, int, int, int, int, int);
@@ -891,28 +891,28 @@ void SetPalMode(int clear) {
 
     FlushCache(0);
     if (g_is_pal_video != 0) {
-        D_001A72E0 = 0x100000;
-        D_001A72DC = 0x1E0000;
-        D_001A72D8 = 0;
-        D_001A72E4 = 0x2C0000;
+        g_vram_zbuffer_address = 0x100000;
+        g_vram_display_address = 0x1E0000;
+        g_vram_fb_offset = 0;
+        g_vram_texture_base = 0x2C0000;
         SetupFS_AA_buffer(0x200, 0x1C0, 0x200, 0x200, 4, 0);
     } else if (g_widescreen_flag != 0) {
-        D_001A72E0 = 0x118000;
-        D_001A72DC = 0x1E8000;
-        D_001A72D8 = 0;
-        D_001A72E4 = 0x2C0000;
+        g_vram_zbuffer_address = 0x118000;
+        g_vram_display_address = 0x1E8000;
+        g_vram_fb_offset = 0;
+        g_vram_texture_base = 0x2C0000;
         SetupFS_AA_buffer(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
     } else {
-        D_001A72E0 = 0x118000;
-        D_001A72DC = 0x1E8000;
-        D_001A72D8 = 0;
-        D_001A72E4 = 0x2C0000;
+        g_vram_zbuffer_address = 0x118000;
+        g_vram_display_address = 0x1E8000;
+        g_vram_fb_offset = 0;
+        g_vram_texture_base = 0x2C0000;
         SetupFS_AA_buffer(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
     }
-    D_001A72E8 = D_001A72E4;
-    D_001A72EC = D_001A72E4 + 0x1000;
-    D_001A72F0 = D_001A72E4 + 0x1400;
-    D_001A72F4 = D_001A72E4 + 0x1800;
+    g_vram_texture_base_copy = g_vram_texture_base;
+    g_vram_clut_first = g_vram_texture_base + 0x1000;
+    g_vram_clut_second = g_vram_texture_base + 0x1400;
+    g_vram_clut_third = g_vram_texture_base + 0x1800;
     w = FsAaBuffer.display_width;
     g_screen_width.width = w;
     g_screen_width.height = FsAaBuffer.display_height;
@@ -922,22 +922,22 @@ void SetPalMode(int clear) {
     g_screen_width.top = (0x800 - g_screen_width.half_height) << 4;
     g_screen_width.right = (g_screen_width.half_width + 0x800) << 4;
     g_screen_width.bottom = (g_screen_width.half_height + 0x800) << 4;
-    frame = (D_001A72DC >> 13) | ((u64)(g_screen_width.width >> 6) << 16);
-    D_00139120.frame1 = frame;
-    zbuf = (D_001A72E0 >> 13) | 0x1000000;
-    D_00139120.frame2 = frame;
-    D_00139120.xyoffset1 = g_screen_width.left | ((u64)g_screen_width.top << 32);
-    D_00139120.zbuf1 = zbuf;
-    D_00139120.zbuf2 = zbuf;
-    D_00139120.xyoffset2 = g_screen_width.left | ((u64)g_screen_width.top << 32);
+    frame = (g_vram_display_address >> 13) | ((u64)(g_screen_width.width >> 6) << 16);
+    g_gs_draw_env_regs.frame1 = frame;
+    zbuf = (g_vram_zbuffer_address >> 13) | 0x1000000;
+    g_gs_draw_env_regs.frame2 = frame;
+    g_gs_draw_env_regs.xyoffset1 = g_screen_width.left | ((u64)g_screen_width.top << 32);
+    g_gs_draw_env_regs.zbuf1 = zbuf;
+    g_gs_draw_env_regs.zbuf2 = zbuf;
+    g_gs_draw_env_regs.xyoffset2 = g_screen_width.left | ((u64)g_screen_width.top << 32);
     scissor = ((u64)(g_screen_width.width - 1) << 16) | ((u64)(g_screen_width.height - 1) << 48);
-    D_00139310 = zbuf;
-    D_00139120.scissor1 = scissor;
-    D_00139120.scissor2 = scissor;
-    D_00139380 = zbuf | ((u64)0x8000 << 17);
+    g_gs_zbuf_reg = zbuf;
+    g_gs_draw_env_regs.scissor1 = scissor;
+    g_gs_draw_env_regs.scissor2 = scissor;
+    g_gs_zbuf_reg_masked = zbuf | ((u64)0x8000 << 17);
     if (clear) {
-        D_001A72D0 = D_001A72E4;
-        D_001A72D4 = D_001A72E4;
+        g_vram_cursor = g_vram_texture_base;
+        g_vram_frame_base = g_vram_texture_base;
         FlushCache(0);
         gfx_wait_paths_idle(0, 0);
         FlushCache(0);
@@ -946,12 +946,12 @@ void SetPalMode(int clear) {
         FlushCache(0);
         gfx_wait_paths_idle(0, 0);
         gfx_query_display_buffer();
-        mem_clear(D_001BB000, 0, 0x1000);
+        mem_clear(g_gs_transfer_buffer, 0, 0x1000);
         n = (FsAaBuffer.storage_width * FsAaBuffer.storage_height) >> 10;
         for (i = 0; i < n; i++) {
             func_00126288(&image, i << 4, 1, 0, 0, 0, 32, 32);
             FlushCache(0);
-            sceGsExecLoadImage(&image, D_001BB000);
+            sceGsExecLoadImage(&image, g_gs_transfer_buffer);
             gfx_wait_paths_idle(0, 0);
         }
     }

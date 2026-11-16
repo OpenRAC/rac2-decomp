@@ -20,7 +20,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern void moby_mark_spawned(void *);
-extern char *D_L00_001B0838 __attribute__((sda));
+extern char *g_blast_moby __attribute__((sda));
 extern char g_hero_moby[];
 
 /* Creates a blast moby (class 3301) at the given spot, stores its direction, turns it to match
@@ -56,9 +56,9 @@ char *blast_spawn(TI128 *position, TI128 *direction)
         *(float *)((char *)&local.v0 + 12) = math_fast_sin_or_cos_a(half);
         quaternion_to_rotation_basis(&local.v0, local.matrix);
         multiply_matrix3x3(basis, local.matrix, basis);
-        if (D_L00_001B0838 != 0)
-            moby_mark_spawned(D_L00_001B0838);
-        D_L00_001B0838 = p;
+        if (g_blast_moby != 0)
+            moby_mark_spawned(g_blast_moby);
+        g_blast_moby = p;
     }
     return p;
 }

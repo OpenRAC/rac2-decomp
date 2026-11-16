@@ -30,21 +30,21 @@ typedef struct MuseumInput {
 extern MuseumInput g_pad_state;
 typedef struct MuseumGameState { char pad[0x33]; unsigned char mode; } MuseumGameState;
 extern MuseumGameState g_item_slot_to_record;
-extern unsigned char D_0019B4A8[];
+extern unsigned char g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
-extern unsigned char D_001A7B2B;
+extern unsigned char g_focus_lock_flag;
 typedef struct MuseumCompletion { char pad[0x464]; unsigned char complete[0]; } MuseumCompletion;
-extern char D_L03_0021EA30[];
+extern char g_trigger_l03_flags[];
 typedef struct MuseumSound { char pad[0x14]; int handle; char rest[0xC8]; } MuseumSound;
-extern char D_L03_00266DA0[];
-extern int D_L03_001B2940;
-extern char *D_L03_001B2A1C;
+extern char g_item_l03_record_table[];
+extern int g_infiltrator_lock_timer;
+extern char *g_moby_record_base;
 extern char D_L03_001B0C70_gp[] SDATA(D_L03_001B0C70), D_L03_001B0C80_gp[] SDATA(D_L03_001B0C80), D_L03_001B0C90_gp[] SDATA(D_L03_001B0C90);
-extern char D_L03_001B9980[], D_L03_001B9BB0[];
-extern float D_L03_001B9C14 NOT_SDA, D_L03_001B2464 MACRO_ADDR;
-extern int D_L03_001A8F00;
-extern int D_L03_001B0B50 MACRO_ADDR, D_L03_001B0B58 MACRO_ADDR, D_L03_001B0B5C MACRO_ADDR, D_L03_001B0B60 MACRO_ADDR;
-extern int D_L03_0029BCD0[][4];
+extern char g_camera_pose_buffer[], g_moby_basis_matrix[];
+extern float g_infiltrator_lock_angle NOT_SDA, g_infiltrator_lock_fade MACRO_ADDR;
+extern int g_hero_l03_mode;
+extern int g_path_puzzle_step_count MACRO_ADDR, g_path_puzzle_timer_max MACRO_ADDR, g_path_puzzle_duration MACRO_ADDR, g_path_puzzle_limit MACRO_ADDR;
+extern int g_path_entries[][4];
 extern void moby_set_state(char *,int,int), moby_set_flag_bit(char *,int);
 extern int flag_set_first_pending(char *);
 extern void infiltrator_ball_spawn_for_moby(char *),moby_update_attached_child(char *),gadget_reset_state(char *);
@@ -56,7 +56,7 @@ extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void 
 extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
 extern void hero_start_target_state(void *,int,float);
 extern int hero_get_target_state_kind(void);
-extern void func_PAL_L00_002D2668(int,int,float),cam_set_value_target(int,int,float,float,float,float);
+extern void set_hero_animation_pal(int,int,float),cam_set_value_target(int,int,float,float,float,float);
 extern void SetCamera5Pose(void *,void *,int,int,int),object_copy_vector_to_selected(void *),cam_set_state_rotation(void *);
 extern void vec_clamp_length(void *,float);
 extern void StepAngleTowardTarget(void *,int,float,float);
@@ -95,7 +95,7 @@ typedef struct MuseumExhibit {
     float fade;
     int resume;
 } MuseumExhibit;
-void func_PAL_L03_003E8C80(char *obj) {
+void infiltrator_lock_update_pal(char *obj) {
     MuseumExhibit *st = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
@@ -106,11 +106,11 @@ void func_PAL_L03_003E8C80(char *obj) {
         int j, state;
         unsigned short id = U(obj,0xB2);
         char *o;
-        if (((MuseumCompletion *)D_L03_0021EA30)->complete[(short)id]
-            || (state = D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
+        if (((MuseumCompletion *)g_trigger_l03_flags)->complete[(short)id]
+            || (state = g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
             moby_set_state(obj,8,-1);
             moby_set_flag_bit(obj,1);
-            for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(st->childIds[j]<<8),1);
+            for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(g_moby_record_base+(st->childIds[j]<<8),1);
         } else {
             moby_set_state(obj,1,-1);
             infiltrator_ball_spawn_for_moby(obj);
@@ -123,10 +123,10 @@ void func_PAL_L03_003E8C80(char *obj) {
         break;
     }
     case 1:
-        if (g_hero_state.focus!=obj || D_L03_001B2940<16 || !D_001A7B2B) break;
+        if (g_hero_state.focus!=obj || g_infiltrator_lock_timer<16 || !g_focus_lock_flag) break;
         ForceClaimNotice(12,0x1342,1);
-        if (!load_is_class_cached(((MuseumSound *)D_L03_00266DA0)[g_item_slot_to_record.mode].handle)) {
-            LoadClassIntoFreeCacheSlot(((MuseumSound *)D_L03_00266DA0)[g_item_slot_to_record.mode].handle);
+        if (!load_is_class_cached(((MuseumSound *)g_item_l03_record_table)[g_item_slot_to_record.mode].handle)) {
+            LoadClassIntoFreeCacheSlot(((MuseumSound *)g_item_l03_record_table)[g_item_slot_to_record.mode].handle);
             break;
         }
         if (g_pad_state.buttons.words.high&0x10) {
@@ -151,10 +151,10 @@ void func_PAL_L03_003E8C80(char *obj) {
     case 3:
         if (flag_set_first_pending(obj)) {
             PlayMobySound(0,0,obj);
-            func_PAL_L03_002C7068(0x6F,0);func_PAL_L00_002D2668(0x54,0,17.0f);
-            FastVecSub(vec,D_L03_001B9980,g_hero_state.position);
+            func_PAL_L03_002C7068(0x6F,0);set_hero_animation_pal(0x54,0,17.0f);
+            FastVecSub(vec,g_camera_pose_buffer,g_hero_state.position);
             matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
-            SetCamera5Pose(D_L03_001B9980,D_L03_001B9980,3,100,0);
+            SetCamera5Pose(g_camera_pose_buffer,g_camera_pose_buffer,3,100,0);
             st->fade=0;
         }
         matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
@@ -164,7 +164,7 @@ void func_PAL_L03_003E8C80(char *obj) {
         vec_clamp_length(g_hero_state.velocity,0.015000001f);
         StepAngleTowardTarget(g_hero_state.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.020943955f);
         g_hero_state.mode=3;
-        if ((g_hero_state.flags&2) && B(g_hero_state.animation,0x43)==0x54) func_PAL_L00_002D2668(0x55,0,6.0f);
+        if ((g_hero_state.flags&2) && B(g_hero_state.animation,0x43)==0x54) set_hero_animation_pal(0x55,0,6.0f);
         if (g_hero_state.animationId!=0x6F) {gadget_reset_state(obj);moby_set_state(obj,1,-1);}
         matrix_mul_vec3(pos,D_L03_001B0C80_gp,&g_hero_state);
         FastVecAdd(pos,pos,g_hero_state.position);
@@ -184,7 +184,7 @@ void func_PAL_L03_003E8C80(char *obj) {
         unsigned int elapsed;
         if (flag_set_first_pending(obj)) {
             PlayMobySound(0,0,obj);
-            D_L03_001B9C14=0.017453294f;
+            g_infiltrator_lock_angle=0.017453294f;
             cam_set_value_target(25,1,0.017453294f,0.005f,0.2f,0.0f);
         }
         g_hero_state.mode=3;
@@ -192,33 +192,33 @@ void func_PAL_L03_003E8C80(char *obj) {
         if ((AdvanceMuseumTimer(obj)<18)) break;
         ApproachValue(&st->fade,1.0f,0.14000002f);
         elapsed=U(obj,0x96);
-        D_L03_001B2464=st->fade;
+        g_infiltrator_lock_fade=st->fade;
         if (elapsed<26) break;
-        D_L03_001B9C14=1.1243411f;
+        g_infiltrator_lock_angle=1.1243411f;
         cam_set_value_target(1,0,1.1243411f,0.005f,0.2f,0.0f);
         if (!request_begin_slot(7,1,obj,0,0)) moby_set_state(obj,5,-1);
         break;
     }
     case 5:
-        if (D_L03_001A8F00==7) {
+        if (g_hero_l03_mode==7) {
             int i;
-            qzero_nc(D_L03_001B9980);
+            qzero_nc(g_camera_pose_buffer);
             infiltrator_ball_spawn_for_moby(obj);
-            D_L03_001B0B50=0;
+            g_path_puzzle_step_count=0;
             /* Pointer arithmetic, not trackIds[i]: an array field of a BLKmode struct would form st+0xC in its own
              * register ahead of the loop's duplicated exit test. The scalar globals leave the loop through load_mems. */
             for (i=0;i<14&&*(st->trackIds+i)>=0;i++) {
-                D_L03_0029BCD0[i][0]=*(st->trackIds+i);
-                D_L03_001B0B50++;
-                D_L03_001B0B5C=st->duration;
-                D_L03_001B0B58=st->duration+100;
-                D_L03_001B0B60=st->limit;
+                g_path_entries[i][0]=*(st->trackIds+i);
+                g_path_puzzle_step_count++;
+                g_path_puzzle_duration=st->duration;
+                g_path_puzzle_timer_max=st->duration+100;
+                g_path_puzzle_limit=st->limit;
                 st->display->vars->settings=st->settings;
             }
             U(st->display,0x34)&=~1;
             B(st->display,0x31)=1;
             U(st->display,0x34)&=~0x80;
-            set_identity_rotation_rows(D_L03_001B9BB0);
+            set_identity_rotation_rows(g_moby_basis_matrix);
             vec_clear_128((char *)st->display+0xF0);
             F(st->display,0xF4)=-1.5707964f;
             euler_rotation_basis((char *)st->display+0xC0,(char *)st->display+0xF0);
@@ -230,7 +230,7 @@ void func_PAL_L03_003E8C80(char *obj) {
         }
         break;
     case 6:
-        if (D_L03_001A8F00==7) {set_identity_rotation_rows(D_L03_001B9BB0);moby_update_attached_child(obj);break;}
+        if (g_hero_l03_mode==7) {set_identity_rotation_rows(g_moby_basis_matrix);moby_update_attached_child(obj);break;}
         gadget_reset_state(obj);
         script_queue_keyed_request(st->resume,st->volume);
         if (st->cleanupId!=-1) cam_reset_entry(st->cleanupId);
@@ -240,19 +240,19 @@ void func_PAL_L03_003E8C80(char *obj) {
                 unsigned short id;
                 unsigned char *p;
                 id=U(obj,0xB2);
-                if (id&1) {p=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if (((*p>>4)&7)!=7) *p+=16;}
-                else {p=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if ((*p&7)!=7) ++*p;}
+                if (id&1) {p=g_moby_nibble_table+(((short)id>>1)+(g_current_map_index<<10));if (((*p>>4)&7)!=7) *p+=16;}
+                else {p=g_moby_nibble_table+(((short)id>>1)+(g_current_map_index<<10));if ((*p&7)!=7) ++*p;}
             }
             if (g_current_map_index==19) {
                 int j;
-                for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(st->childIds[j]<<8),1);
+                for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(g_moby_record_base+(st->childIds[j]<<8),1);
             }
         } else {hero_start_loader_state(0);moby_set_state(obj,1,-1);}
         break;
     case 7: {
         int j;
         moby_set_flag_bit(obj,1);
-        for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(st->childIds[j]<<8),1);
+        for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(g_moby_record_base+(st->childIds[j]<<8),1);
         hero_start_loader_state(0);moby_set_state(obj,8,-1);
         break;
     }

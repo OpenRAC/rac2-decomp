@@ -27,7 +27,7 @@ typedef struct JobaGroupMoby {
 extern char *g_moby_l11_table MACRO_ADDR;
 extern short *g_group_id_lists[];
 extern int g_current_map_index;
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern unsigned char g_sound_state[];
 extern int hero_is_current_selected_id(void *moby);
 extern int flag_is_third_pending_set(void *moby);
@@ -37,7 +37,7 @@ extern float *moby_get_private_value_0(void *moby);
 extern char *part_find_owned_effect_slot(void *moby, int mask, int arg);
 extern void vec_scale_to_length(void *out, void *in, float length);
 extern void func_PAL_002B15D8(void *moby, int a1, float f12, float f13, float f14, float f15, void *vec, int a3);
-extern void func_PAL_002AD288(void *moby, float f12, float f13, void *position, int a2);
+extern void part_spawn_explosion_with_sparks_pal(void *moby, float f12, float f13, void *position, int a2);
 extern void moby_mark_spawned(void *moby);
 #define GROUP_MEMBER(entry) ((JobaGroupMoby *)(D_L11_001B359C + (((entry) & 0x7FFF) << 8)))
 #define HIDE_MEMBER(m) { (m)->flags = ((m)->flags & 0xEFFF) | 0x43; (m)->update = 0; }
@@ -65,7 +65,7 @@ extern void moby_mark_spawned(void *moby);
 #define MEMBER_ALIVE(m) ((m) && (m)->state != 254 && (m)->state != 253 && health > 0.0f)
 static __inline__ void FinishGroupMoby(float *vec, JobaGroupMoby *self) {
     func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
-    func_PAL_002AD288(self, 1.0f, 13.0f, self->position, -1);
+    part_spawn_explosion_with_sparks_pal(self, 1.0f, 13.0f, self->position, -1);
     moby_mark_spawned(self);
 }
 
@@ -87,7 +87,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
     }
     if (self->state == 1) {
         if (hero_is_current_selected_id(parent) || flag_is_third_pending_set(parent) ||
-            (D_0019B2E8[self->index + (g_current_map_index << 4)] & 0x80)) {
+            (g_moby_group_flags[self->index + (g_current_map_index << 4)] & 0x80)) {
             self->timer = 0;
             self->state = 2;
             PlayMobySound(1, 0, self);
@@ -156,7 +156,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
                         else if (m->type == 0xCF5) { ACTIVATE_MEMBER(m); m->active = 1; }
                     }
                 } while (*list++ >= 0);
-                func_PAL_002AD288(self, 1.0f, 13.0f, self->position, -1);
+                part_spawn_explosion_with_sparks_pal(self, 1.0f, 13.0f, self->position, -1);
                 func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
                 moby_mark_spawned(self);
                 return;

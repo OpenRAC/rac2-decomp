@@ -2,16 +2,16 @@
 #include "names.h"
 
 typedef float f32_F7036ef03;
-extern f32_F7036ef03 D_L04_001AE4A8 __attribute__((sda));
-extern f32_F7036ef03 D_L04_001AE4B0 __attribute__((sda));
-extern f32_F7036ef03 D_L04_001AE4B8 __attribute__((sda));
-extern f32_F7036ef03 D_L04_001AE4C0 __attribute__((sda));
-extern f32_F7036ef03 D_L04_001AE4C8 __attribute__((sda));
-extern f32_F7036ef03 D_L04_001AE4AC;
-extern f32_F7036ef03 D_L04_001AE4B4;
-extern f32_F7036ef03 D_L04_001AE4BC;
-extern f32_F7036ef03 D_L04_001AE4C4;
-extern f32_F7036ef03 D_L04_001AE4CC;
+extern f32_F7036ef03 g_item_menu_first_offset_x __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_second_offset_x __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_third_offset_x __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_fourth_offset_x __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_list_offset_x __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_first_offset_y;
+extern f32_F7036ef03 g_item_menu_second_offset_y;
+extern f32_F7036ef03 g_item_menu_third_offset_y;
+extern f32_F7036ef03 g_item_menu_fourth_offset_y;
+extern f32_F7036ef03 g_item_menu_list_offset_y;
 extern void object_set_first_float4(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
 extern void menu_list_set_position(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2);
 extern void func_PAL_003456B0(void *a0);
@@ -24,15 +24,15 @@ int func_PAL_003457F0(char *self, int arg)
     char *sub = self + 712;
 
     v = *(f32_F7036ef03 **)(self + 696);
-    object_set_first_float4(self, D_L04_001AE4A8 + v[0], D_L04_001AE4AC + v[1], 0.0f, 0.0f);
+    object_set_first_float4(self, g_item_menu_first_offset_x + v[0], g_item_menu_first_offset_y + v[1], 0.0f, 0.0f);
     v = *(f32_F7036ef03 **)(self + 696);
-    object_set_first_float4(self + 76, D_L04_001AE4B0 + v[0], D_L04_001AE4B4 + v[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 76, g_item_menu_second_offset_x + v[0], g_item_menu_second_offset_y + v[1], 0.0f, 0.0f);
     v = *(f32_F7036ef03 **)(self + 696);
-    object_set_first_float4(self + 152, D_L04_001AE4B8 + v[0], D_L04_001AE4BC + v[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 152, g_item_menu_third_offset_x + v[0], g_item_menu_third_offset_y + v[1], 0.0f, 0.0f);
     v = *(f32_F7036ef03 **)(self + 696);
-    object_set_first_float4(self + 608, D_L04_001AE4C0 + v[0], D_L04_001AE4C4 + v[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 608, g_item_menu_fourth_offset_x + v[0], g_item_menu_fourth_offset_y + v[1], 0.0f, 0.0f);
     v = *(f32_F7036ef03 **)(self + 696);
-    menu_list_set_position(sub, D_L04_001AE4C8 + v[0], D_L04_001AE4CC + v[1]);
+    menu_list_set_position(sub, g_item_menu_list_offset_x + v[0], g_item_menu_list_offset_y + v[1]);
     func_PAL_003456B0(self);
     func_PAL_00345640(self);
     return *(int *)(self + 416) = UpdateListSelection(sub, arg);

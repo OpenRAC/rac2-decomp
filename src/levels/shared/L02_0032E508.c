@@ -3,7 +3,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern char *g_route_polygons[];
 extern void mem_fast_helper_b(void *, int);
-extern int D_L02_001B36A4 __attribute__((sda));
+extern int g_route_node_count __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int path_find_touching_polygon_corners(int, int, int *, int *);
@@ -44,10 +44,10 @@ int path_build_route_nodes(void *unused, int start, L02RegionLink *regions, int 
     vis = visited;
     for (;;) {
         changed = 0;
-        for (i = 0; i < D_L02_001B36A4; ++i) {
+        for (i = 0; i < g_route_node_count; ++i) {
             if (vis[i] == depth && count < capacity) {
                 regions[count++].index = i;
-                for (j = 0; j < D_L02_001B36A4; ++j) {
+                for (j = 0; j < g_route_node_count; ++j) {
                     if (i != j && vis[j] == 0) {
                         char *candidate = g_route_polygons[j];
                         if (*(int *)candidate <= 64 && !(0.2f < fast_vec_dist(candidate + 0x10, candidate + (*(int *)candidate << 4)))) {

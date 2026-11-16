@@ -10,12 +10,12 @@ extern void moby_init_child_from_parent(void *, void *);
 extern void anim_start_immediate(signed char *, int, int);
 extern void moby_set_light_color(void *, int);
 
-extern Vector4 D_L00_001AED70[2] __attribute__((sda));
-extern Vector4 D_L00_001AED90 __attribute__((sda));
-extern float D_L00_001AEDA0[2] __attribute__((sda));
-extern int D_L00_001AEDA8[2] __attribute__((sda));
-extern Vector4 D_L00_001AED50 __attribute__((sda));
-extern char *D_L00_00232A60[24];
+extern Vector4 g_sheep_board_work_vectors[2] __attribute__((sda));
+extern Vector4 g_sheep_board_slot_vector __attribute__((sda));
+extern float g_shot_scale_table[2] __attribute__((sda));
+extern int g_shot_light_colors[2] __attribute__((sda));
+extern Vector4 g_sheep_board_basis __attribute__((sda));
+extern char *g_sheep_board_tiles[24];
 
 /* Create the two attached objects and the twenty-four optional table entries. */
 int sheep_board_create_objects(char *owner)
@@ -33,18 +33,18 @@ int sheep_board_create_objects(char *owner)
         anim_start_immediate((signed char *)*slot, 1, 0);
         FIELD(unsigned short, *slot, 0x34) |= 0x4002;
         FIELD(unsigned char, *slot, 0xBC) = i;
-        qcopy(*slot + 0xF0, &D_L00_001AED90);
-        qcopy(work + i * 16, &D_L00_001AED70[i]);
+        qcopy(*slot + 0xF0, &g_sheep_board_slot_vector);
+        qcopy(work + i * 16, &g_sheep_board_work_vectors[i]);
         qzero(work + 0x20 + i * 16);
         FIELD(float, *slot, 0x2C) =
-            FIELD(float, FIELD(char *, *slot, 0x24), 0x24) * D_L00_001AEDA0[i];
-        moby_set_light_color(*slot, D_L00_001AEDA8[i]);
+            FIELD(float, FIELD(char *, *slot, 0x24), 0x24) * g_shot_scale_table[i];
+        moby_set_light_color(*slot, g_shot_light_colors[i]);
         ++i;
         ++slot;
     } while (i < 2);
     FIELD(float, work, 0x74) = 0.5f;
-    slot = D_L00_00232A60;
-    basis = &D_L00_001AED50;
+    slot = g_sheep_board_tiles;
+    basis = &g_sheep_board_basis;
     j = 23;
     do {
         *slot = CreateMoby(MOBY_CLASS_SHEEP);

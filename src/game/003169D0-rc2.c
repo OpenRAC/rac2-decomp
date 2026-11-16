@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_0022AA10[];
+extern s8 g_pool_effect_slots[];
 extern void gfx_draw_lightning_bolt(s32 a, s32 b);
 extern void gfx_draw_billboard_quad(void *o, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13, f32 f14);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -36,7 +36,7 @@ void gfx_draw_owner_effect_slots(s32 owner) {
     s8 *slot;
     s8 *pool;
 
-    pool = D_0022AA10;
+    pool = g_pool_effect_slots;
     slot = pool + 0x30;
     state = (s32) pool;
     for (i = 0; i < 3; i++) {

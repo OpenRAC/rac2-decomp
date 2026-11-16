@@ -17,10 +17,10 @@ extern char *func_PAL_002BE9A8(char *p, float fa, float fb, float fc, float fd, 
                             unsigned int color, int flag);
 extern void *func_PAL_002C23B8(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
-extern char D_L20_001B9FC0[];
-extern char D_0018A0E0[];
+extern char g_camera_l20_position[];
+extern char g_hero_state_block[];
 
-void func_PAL_L20_0039F810(float *p)
+void part_l20_spawn_spark_burst_pal(float *p)
 {
     float v[4];
     float dir[4];
@@ -35,12 +35,12 @@ void func_PAL_L20_0039F810(float *p)
     char *r;
     char *q;
 
-    FastVecSub((char *)v, D_L20_001B9FC0, (char *)p);
+    FastVecSub((char *)v, g_camera_l20_position, (char *)p);
     ang = mat_fast_helper_a(v[0], v[1]);
 
     for (i = 19; i >= 0; i--) {
         f = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)dir, D_0018A0E0, -(f * 0.020000001f));
+        FastVecScale((char *)dir, g_hero_state_block, -(f * 0.020000001f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         f = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         out[0] = p[0] + math_random_signed_float_range(0.0f, 0.2f);

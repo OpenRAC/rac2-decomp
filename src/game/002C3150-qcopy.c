@@ -32,7 +32,7 @@ typedef struct {
 } HeroView_002C3150;
 
 extern char g_hero_state[];
-extern unsigned char *D_001F2614;
+extern unsigned char *g_part_tex_ground_effect;
 
 /* Creates a particle with a starting speed. In mode 1 it keeps its distance from the hero. */
 Particle_002C3150 *part_spawn_hero_relative(TI128 *position, TI128 *velocity, int colour,
@@ -57,7 +57,7 @@ Particle_002C3150 *part_spawn_hero_relative(TI128 *position, TI128 *velocity, in
         p->unk08 = seed;
         p->unk01 = 0;
         p->unk0C = scale * 210000.0f;
-        p->unk02 = *D_001F2614;
+        p->unk02 = *g_part_tex_ground_effect;
         p->unk0A = life;
     }
     return p;

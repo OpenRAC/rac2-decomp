@@ -30,7 +30,7 @@ extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern s32 g_screen_offset_x;
 extern s32 g_screen_offset_y;
-extern s32 D_001B187C;
+extern s32 g_hud_sprite_color_word;
 extern s8 *volatile g_dma_packet_cursor;
 
 /* Draws a picture on the screen, turned by an angle around its centre. */
@@ -85,16 +85,16 @@ void DrawRotatedSprite(s32 tex_width, s32 tex_height, s64 texture_word, f32 cent
     (*(s64 *)((s8 *)(packet) + (8))) = ra1;
     (*(s64 *)((s8 *)(packet) + (0x18))) = r154;
     (*(s64 *)((s8 *)(packet) + (0x20))) = rt0;
-    c1 = ((s64)((s32)*(f32 *)(vec + 0x30) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x34) + g_screen_offset_y - 8) << 16) | ((s64)D_001B187C << 32);
+    c1 = ((s64)((s32)*(f32 *)(vec + 0x30) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x34) + g_screen_offset_y - 8) << 16) | ((s64)g_hud_sprite_color_word << 32);
     (*(s64 *)((s8 *)(packet) + (0x38))) = t2;
     (*(s64 *)((s8 *)(packet) + (0x30))) = c1;
-    c2 = ((s64)((s32)*(f32 *)(vec + 0x40) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x44) + g_screen_offset_y - 8) << 16) | ((s64)D_001B187C << 32);
+    c2 = ((s64)((s32)*(f32 *)(vec + 0x40) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x44) + g_screen_offset_y - 8) << 16) | ((s64)g_hud_sprite_color_word << 32);
     (*(s64 *)((s8 *)(packet) + (0x48))) = 0;
     (*(s64 *)((s8 *)(packet) + (0x40))) = c2;
-    c3 = ((s64)((s32)*(f32 *)(vec + 0x50) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x54) + g_screen_offset_y - 8) << 16) | ((s64)D_001B187C << 32);
+    c3 = ((s64)((s32)*(f32 *)(vec + 0x50) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x54) + g_screen_offset_y - 8) << 16) | ((s64)g_hud_sprite_color_word << 32);
     (*(s64 *)((s8 *)(packet) + (0x50))) = c3;
     (*(s64 *)((s8 *)(packet) + (0x58))) = s4;
-    c4 = ((s64)((s32)*(f32 *)(vec + 0x60) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x64) + g_screen_offset_y - 8) << 16) | ((s64)D_001B187C << 32);
+    c4 = ((s64)((s32)*(f32 *)(vec + 0x60) + g_screen_offset_x - 8)) | ((s64)((s32)*(f32 *)(vec + 0x64) + g_screen_offset_y - 8) << 16) | ((s64)g_hud_sprite_color_word << 32);
     (*(s64 *)((s8 *)(packet) + (0x68))) = 0;
     (*(s64 *)((s8 *)(packet) + (0x60))) = c4;
     g_dma_packet_cursor = (s8 *)g_dma_packet_cursor + 0x70;

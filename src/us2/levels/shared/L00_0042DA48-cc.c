@@ -3,9 +3,9 @@
 
 typedef int InitQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0xB0]; float scale; } PathView;
-extern PathView D_L00_001BD2C0;
+extern PathView g_hud_float_params;
 typedef struct { u8 pad[0x194]; InitQuad *transform; } PathCamera;
-extern PathCamera D_L00_001B8C80;
+extern PathCamera g_scalar_transition_state;
 /* Partial records follow only the fields used by the two path walks.
  * Retail reserves eight weight/index slots and assumes at most eight accepted
  * entries; it does not add a bounds check to the path scan. */
@@ -17,15 +17,15 @@ extern void cam_reset_mode_state(char *);
 
 #define SDA_OBJ __attribute__((section(".sdata")))
 
-extern char *D_L00_001B1844 SDA_OBJ;
+extern char *g_camera_def_table SDA_OBJ;
 
-extern char D_L00_001ADD98[] SDA_OBJ;
+extern char g_cam_object_table_a[] SDA_OBJ;
 
-extern char D_L00_001ADD38[] SDA_OBJ;
+extern char g_cam_object_table_b[] SDA_OBJ;
 
-extern char D_L00_001ADD78[] SDA_OBJ;
+extern char g_cam_object_table_c[] SDA_OBJ;
 
-extern char D_L00_001ADD58[] SDA_OBJ;
+extern char g_cam_object_table_d[] SDA_OBJ;
 
 typedef struct Rac2Native_6af85cabb56d3b41_SmallConditional52Global {
     unsigned char unknown_00[0x2290];

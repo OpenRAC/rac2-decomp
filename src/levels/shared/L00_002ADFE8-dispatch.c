@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 extern void *D_L00_0029FF70[76];
-extern float D_0018AA58;
+extern float g_item_aim_angle;
 /* Uses the level's existing kind table to choose a vertical adjustment. */
 /* Says whether an item kind needs an aim tweak, and gives the up or down angle for it. */
 int hero_get_item_aim_adjustment(int kind, float *out)
@@ -17,7 +17,7 @@ constant:
 yes:
     return 1;
 threshold:
-    if (D_0018AA58 > 25.0f) *out = -1.3089970350265503f;
+    if (g_item_aim_angle > 25.0f) *out = -1.3089970350265503f;
     goto yes;
 no:
     return 0;

@@ -4,22 +4,22 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Tuning words read by func_L08_003CC4B8. */
-extern float D_L08_001AFEEC __attribute__((sda));
-extern float D_L08_001AFEF0 __attribute__((sda));
-extern float D_L08_001AFEF4 __attribute__((sda));
-extern float D_L08_001AFEF8 __attribute__((sda));
-extern unsigned char D_L08_001AFEFC __attribute__((sda));
-extern int D_L08_001AFF00 __attribute__((sda));
-extern int D_L08_001AFF04 __attribute__((sda));
-extern float D_L08_001AFF08 __attribute__((sda));
-extern float D_L08_001AFF0C __attribute__((sda));
-extern int D_L08_001AFF10 __attribute__((sda));
-extern int D_L08_001AFF14 __attribute__((sda));
-extern int D_L08_001AFF1C __attribute__((sda));
-extern int D_L08_001AFF20 __attribute__((sda));
+extern float g_spark_velocity_min __attribute__((sda));
+extern float g_spark_velocity_max __attribute__((sda));
+extern float g_spark_step_min __attribute__((sda));
+extern float g_spark_step_max __attribute__((sda));
+extern unsigned char g_spark_angle_byte __attribute__((sda));
+extern int g_spark_hero_type_a __attribute__((sda));
+extern int g_spark_hero_type_b __attribute__((sda));
+extern float g_spark_hero_scale_a __attribute__((sda));
+extern float g_spark_hero_scale_b __attribute__((sda));
+extern int g_spark_ring_color_a __attribute__((sda));
+extern int g_spark_ring_color_b __attribute__((sda));
+extern int g_spark_fade_param __attribute__((sda));
+extern int g_spark_ring_particle_param __attribute__((sda));
 /* The frame counter: absolute loads, $gp in a delay slot. */
-extern int D_L08_001B2508 MACRO_ADDR;
-extern char D_L08_001B9B00[];
+extern int g_frame_l08_counter MACRO_ADDR;
+extern char g_hero_position_vec[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int math_random_int_below(int);
@@ -51,10 +51,10 @@ typedef struct {
 } L08SpawnBlock;
 
 extern char g_hero_state[];
-extern int D_L08_001B01B8[2] __attribute__((sda));
+extern int g_water_spawn_counts[2] __attribute__((sda));
 /* Kind 7 consumes seven halfwords; the full owner extent remains unknown. */
-extern int D_L08_001B01D8 __attribute__((sda));
-extern int D_L08_001B01DC __attribute__((sda));
+extern int g_water_small_spawn_value_a __attribute__((sda));
+extern int g_water_small_spawn_value_b __attribute__((sda));
 extern void water_init_object(L08SpawnBlock *);
 
 /* Runs the shared spawn routines for the object, unless the level's player (the entity at
@@ -80,17 +80,17 @@ void gfx_draw_glowing_spark_rings(char *moby)
 
     moby_transform_joint_to_world(moby, 0, &joint);
     if (math_random_int_below(4) == 0) {
-        vec_random_direction(&velocity, D_L08_001AFEEC * 0.016666668f, D_L08_001AFEF0 * 0.016666668f);
-        angle_byte = D_L08_001AFEFC;
-        part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF00, angle_byte, math_random_int_below(255), 0, D_L08_001AFF08);
+        vec_random_direction(&velocity, g_spark_velocity_min * 0.016666668f, g_spark_velocity_max * 0.016666668f);
+        angle_byte = g_spark_angle_byte;
+        part_spawn_hero_relative(&joint, &velocity, g_spark_hero_type_a, angle_byte, math_random_int_below(255), 0, g_spark_hero_scale_a);
         for (spark_index = 2; spark_index >= 0; spark_index--) {
-            vec_random_direction(&step, D_L08_001AFEF4 * 0.016666668f, D_L08_001AFEF8 * 0.016666668f);
+            vec_random_direction(&step, g_spark_step_min * 0.016666668f, g_spark_step_max * 0.016666668f);
             FastVecAdd(&velocity, &velocity, &step);
-            angle_byte = D_L08_001AFEFC;
-            part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF04, angle_byte, math_random_int_below(255), 0, D_L08_001AFF0C);
+            angle_byte = g_spark_angle_byte;
+            part_spawn_hero_relative(&joint, &velocity, g_spark_hero_type_b, angle_byte, math_random_int_below(255), 0, g_spark_hero_scale_b);
         }
     }
-    FastVecSub(&ring, D_L08_001B9B00, &joint);
+    FastVecSub(&ring, g_hero_position_vec, &joint);
     vec_scale_to_length(&ring, &ring, -0.3f);
     vec_scale_to_length(&ring_step, &ring, 0.1f);
     FastVecAdd(&ring, &ring, &joint);
@@ -98,14 +98,14 @@ void gfx_draw_glowing_spark_rings(char *moby)
     half = 0.5f;
     base_size = 3.0f;
     for (ring_index = 0; ring_index < 4; ring_index++) {
-        ring_age = IntToFloat(0xFF - ((D_L08_001B2508 + ring_index * 20) & 0xFF));
-        ring_color = FastTweenColor(D_L08_001AFF10, D_L08_001AFF14, math_fabs(half - ring_age * inverse255));
-        angle_byte = D_L08_001B2508 & 0xFF;
+        ring_age = IntToFloat(0xFF - ((g_frame_l08_counter + ring_index * 20) & 0xFF));
+        ring_color = FastTweenColor(g_spark_ring_color_a, g_spark_ring_color_b, math_fabs(half - ring_age * inverse255));
+        angle_byte = g_frame_l08_counter & 0xFF;
         if (ring_index & 2)
             angle_byte = angle_byte * 2;
         if (ring_index & 1)
             angle_byte = 0xFF - angle_byte;
-        part_spawn_fading(&ring, ring_color, angle_byte, D_L08_001AFF20, D_L08_001AFF1C, 2, 0,
+        part_spawn_fading(&ring, ring_color, angle_byte, g_spark_ring_particle_param, g_spark_fade_param, 2, 0,
                       (IntToFloat(ring_index) + base_size)
                           * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(&ring, &ring, &ring_step);

@@ -1,19 +1,19 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern float D_L02_001B0BA8 __attribute__((sda));
-extern float D_L02_001B0C1C __attribute__((sda)), D_L02_001B0C20 __attribute__((sda)), D_L02_001B0C24 __attribute__((sda));
-extern float D_L02_001B0C28 __attribute__((sda)), D_L02_001B0C2C __attribute__((sda));
-extern float D_L02_001B0C30 __attribute__((sda)), D_L02_001B0C34 __attribute__((sda));
-extern float D_L02_001B0C38 __attribute__((sda)), D_L02_001B0C3C __attribute__((sda)), D_L02_001B0C40 __attribute__((sda));
-extern float D_L02_001B0C44 __attribute__((sda)), D_L02_001B0C48 __attribute__((sda)), D_L02_001B0C4C __attribute__((sda));
-extern float D_L02_001B0C60 __attribute__((sda)), D_L02_001B0C64 __attribute__((sda));
-extern float D_L02_001B0CAC __attribute__((sda));
-extern int D_L02_001B0C7C __attribute__((sda));
-extern float D_L02_00249090[2][20][4];
-extern float D_L02_00249310[20], D_L02_00249360[20][4], D_L02_002494A0[20];
+extern float g_tether_strand_length __attribute__((sda));
+extern float g_tether_height_phase_spacing __attribute__((sda)), g_tether_height_min __attribute__((sda)), g_tether_height_max __attribute__((sda));
+extern float g_tether_l02_height_phase __attribute__((sda)), g_tether_l02_height_phase_speed __attribute__((sda));
+extern float g_tether_lateral_phase __attribute__((sda)), g_tether_lateral_phase_speed __attribute__((sda));
+extern float g_tether_lateral_phase_spacing __attribute__((sda)), g_tether_height_amplitude __attribute__((sda)), g_tether_lateral_amplitude __attribute__((sda));
+extern float g_tether_l02_wave_phase_2 __attribute__((sda)), g_tether_l02_wave_phase_speed __attribute__((sda)), g_tether_wave_phase_spacing __attribute__((sda));
+extern float g_tether_height_noise_min __attribute__((sda)), g_tether_height_noise_max __attribute__((sda));
+extern float g_tether_toward_scale __attribute__((sda));
+extern int g_tether_l02_ground_effect_color __attribute__((sda));
+extern float g_tether_strand_points[2][20][4];
+extern float g_tether_strand_prev_heights[20], g_tether_strand_sideways[20][4], g_tether_strand_heights[20];
 typedef union { char b[0x2600]; float f[0x980]; Quad q[0x260]; } Hero;
 extern char g_hero_state[];
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
 extern char *moby_get_private_value_0(void *);
 extern float fast_vec_dist(void *, void *);
@@ -41,12 +41,12 @@ typedef struct {
 void tether_animate_strands(char *actor) {
     TetherState *state = *(TetherState **)(actor + 0x68);
     float endpoint[4], direction[4], delta[4], blended[4], tangent[4], sideways[4], toward[4];
-    float length = D_L02_001B0BA8 * 0.05f;
+    float length = g_tether_strand_length * 0.05f;
     float phase, span, distance, oscillation, lateral, radius;
     int spin;
-    D_L02_001B0C28 = FastAddRotations(D_L02_001B0C28, D_L02_001B0C2C);
-    D_L02_001B0C30 = fast_subtract_rotations(D_L02_001B0C30, D_L02_001B0C34);
-    D_L02_001B0C44 = FastAddRotations(D_L02_001B0C44, D_L02_001B0C48);
+    g_tether_l02_height_phase = FastAddRotations(g_tether_l02_height_phase, g_tether_l02_height_phase_speed);
+    g_tether_lateral_phase = fast_subtract_rotations(g_tether_lateral_phase, g_tether_lateral_phase_speed);
+    g_tether_l02_wave_phase_2 = FastAddRotations(g_tether_l02_wave_phase_2, g_tether_l02_wave_phase_speed);
     if (state->target) {
         char *settings = (char *)moby_get_private_value_0(state->target);
         qcopy(endpoint, state->target + 0x10);
@@ -61,8 +61,8 @@ void tether_animate_strands(char *actor) {
         math_apply_axis_rotation_to_quat(direction, direction, delta, 0.17453295f);
     }
     FastVecScale(tangent, direction, length);
-    qcopy(D_L02_00249090[0][0], state->start);
-    qcopy(D_L02_00249090[1][0], state->start);
+    qcopy(g_tether_strand_points[0][0], state->start);
+    qcopy(g_tether_strand_points[1][0], state->start);
     {
     /* i is declared here, after the setup code: its later pseudo number sets the gcse order of the spilled state->start/state->end/i*4 copies. */
     int i;
@@ -70,25 +70,25 @@ void tether_animate_strands(char *actor) {
         float value, height, zero;
         float *point;
         height = IntToFloat(i);
-        height = D_L02_001B0C20 + (D_L02_001B0C24 - D_L02_001B0C20) * (height * 0.05f);
-        height *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L02_001B0C28 + (float)i * D_L02_001B0C1C));
-        height += math_random_signed_float_range(D_L02_001B0C60, D_L02_001B0C64);
-        D_L02_00249090[0][i][2] -= D_L02_00249310[i];
-        D_L02_00249310[i] = height;
-        FastVecSub(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
+        height = g_tether_height_min + (g_tether_height_max - g_tether_height_min) * (height * 0.05f);
+        height *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(g_tether_l02_height_phase + (float)i * g_tether_height_phase_spacing));
+        height += math_random_signed_float_range(g_tether_height_noise_min, g_tether_height_noise_max);
+        g_tether_strand_points[0][i][2] -= g_tether_strand_prev_heights[i];
+        g_tether_strand_prev_heights[i] = height;
+        FastVecSub(delta, g_tether_strand_points[0][i], g_tether_strand_points[0][i - 1]);
         lerp_vector(blended, delta, tangent, 0.85f);
         span = FastVecLength(blended);
         zero = 0.0f;
-        if (span == zero) qcopy(D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
+        if (span == zero) qcopy(g_tether_strand_points[0][i], g_tether_strand_points[0][i - 1]);
         else {
             FastVecScale(blended, blended, length / span);
-            FastVecAdd(D_L02_00249090[0][i], D_L02_00249090[0][i - 1], blended);
+            FastVecAdd(g_tether_strand_points[0][i], g_tether_strand_points[0][i - 1], blended);
             qcopy(tangent, blended);
         }
-        D_L02_00249090[0][i][2] += height;
-        FastVecSub(delta, D_L02_00249090[0][i], D_L02_00249090[0][i - 1]);
+        g_tether_strand_points[0][i][2] += height;
+        FastVecSub(delta, g_tether_strand_points[0][i], g_tether_strand_points[0][i - 1]);
         if (state->target) {
-            FastVecSub(toward, endpoint, D_L02_00249090[0][i]);
+            FastVecSub(toward, endpoint, g_tether_strand_points[0][i]);
             distance = FastVecLength(toward);
             if (distance != zero) {
                 if (i == 19) { length = distance; height = 0.5f; }
@@ -102,36 +102,36 @@ void tether_animate_strands(char *actor) {
                 lerp_vector(tangent, tangent, toward, height);
             }
         }
-        value = math_wrap_angle_to_pi(D_L02_001B0C30 + (float)i * D_L02_001B0C38);
-        oscillation = math_wrap_angle_to_pi(D_L02_001B0C44 + (float)i * D_L02_001B0C4C);
-        height = D_L02_001B0C3C * math_fast_sin_or_cos_b(oscillation);
-        qcopy(D_L02_00249090[1][i], D_L02_00249090[0][i]);
+        value = math_wrap_angle_to_pi(g_tether_lateral_phase + (float)i * g_tether_lateral_phase_spacing);
+        oscillation = math_wrap_angle_to_pi(g_tether_l02_wave_phase_2 + (float)i * g_tether_wave_phase_spacing);
+        height = g_tether_height_amplitude * math_fast_sin_or_cos_b(oscillation);
+        qcopy(g_tether_strand_points[1][i], g_tether_strand_points[0][i]);
         height *= math_fast_sin_or_cos_b(value);
-        D_L02_002494A0[i] = height;
-        point = D_L02_00249090[0][i];
+        g_tether_strand_heights[i] = height;
+        point = g_tether_strand_points[0][i];
         point[82] += height;
         height = FastAddRotations(mat_fast_helper_a(delta[0], delta[1]), 1.5707965f);
-        lateral = D_L02_001B0C40 * math_fast_sin_or_cos_a(value);
+        lateral = g_tether_lateral_amplitude * math_fast_sin_or_cos_a(value);
         sideways[0] = math_fast_sin_or_cos_a(height) * lateral;
         sideways[1] = math_fast_sin_or_cos_b(height) * lateral;
         sideways[2] = 0;
-        qcopy(D_L02_00249360[i], sideways);
-        FastVecAdd(D_L02_00249090[1][i], D_L02_00249090[1][i], sideways);
+        qcopy(g_tether_strand_sideways[i], sideways);
+        FastVecAdd(g_tether_strand_points[1][i], g_tether_strand_points[1][i], sideways);
     }
     }
-    qcopy(state->end, D_L02_00249090[0][19]);
+    qcopy(state->end, g_tether_strand_points[0][19]);
     oscillation = math_random_signed_float_range(0.52359885f, 1.0471977f);
     phase = math_random_float_range(-0.52359885f, 1.0471977f);
-    FastVecScale(toward, direction, D_L02_001B0CAC);
+    FastVecScale(toward, direction, g_tether_toward_scale);
     math_apply_axis_rotation_to_quat(toward, toward, &((Hero *)g_hero_state)->q[0x740 / 16], phase);
     math_apply_axis_rotation_to_quat(toward, toward, &((Hero *)g_hero_state)->q[0x750 / 16], oscillation);
     spin = math_random_int_range(1, 8);
     if (math_random_int_below(2)) spin = -spin;
     radius = math_random_float_range(0.2f, 0.6f);
-    part_spawn_ground_effect(state->start, 15, radius * 0.3f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, toward, 0, 0.0f);
+    part_spawn_ground_effect(state->start, 15, radius * 0.3f, radius, g_tether_l02_ground_effect_color | 0x7F000000, 0, spin, toward, 0, 0.0f);
     part_spawn_ground_effect(state->start, 15, radius * 0.15f, radius * 0.5f, 0x307F7F7F, 0, -spin, toward, 0, 0.0f);
     spin = math_random_int_range(1, 8);
     if (math_random_int_below(2)) spin = -spin;
     radius = math_random_float_range(0.15f, 3.0f);
-    part_spawn_ground_effect(state->end, 12, radius * 0.1f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, D_L02_001A8F20, 0, 0.0f);
+    part_spawn_ground_effect(state->end, 12, radius * 0.1f, radius, g_tether_l02_ground_effect_color | 0x7F000000, 0, spin, g_zero_l02_vector, 0, 0.0f);
 }

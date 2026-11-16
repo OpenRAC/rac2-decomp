@@ -17,18 +17,18 @@ extern unsigned char g_item_slot_to_record[];
 extern WeaponDamageClass ref_L00_003AB388_0[];
 extern char *ref_L00_003AB388_1;
 extern char *ref_L00_003AB388_2[];
-extern void *D_L00_001ADB2C MACRO_ADDR;
+extern void *g_active_tether_object MACRO_ADDR;
 extern void QueueMobyImpact(void *,void *);
 extern int func_PAL_00335DD0(void *,int,void *);
 extern int coll_process_hit(void *,int,void *,void *,float);
 extern int PlayMobySound(int,int,void *);
-extern char *func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, void *);
+extern char *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, void *);
 extern void cam_compute_view_direction();
 extern void FastVecScale(void *,void *,float);
 extern void vec_scale_to_length(void *,void *,float);
 
 /* Applies direct and area hits, then emits the weapon impact effects. */
-void func_PAL_L00_003AEB58(char *moby, void *direction, void *position)
+void seeker_apply_projectile_hit_pal(char *moby, void *direction, void *position)
 {
     struct {
         HitVector dir;
@@ -77,7 +77,7 @@ void func_PAL_L00_003AEB58(char *moby, void *direction, void *position)
     cam_compute_view_direction(moby + 0x10, forward, 1);
     FastVecScale(forward, forward, -1.0f);
     PlayMobySound(2, 0, moby);
-    func_PAL_L00_003FB330(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
-                  1, 0, 1, 0, D_L00_001ADB2C);
+    SpawnExplosion_pal(moby + 0x10, 0.75f, 20.0f, 1, 0, 1, 0, 0x14, 0x2D,
+                  1, 0, 1, 0, g_active_tether_object);
 }
 

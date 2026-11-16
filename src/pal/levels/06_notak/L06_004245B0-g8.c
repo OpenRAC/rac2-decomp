@@ -6,7 +6,7 @@ extern void func_PAL_002A7E68(char *, int, int, int);
 extern int math_random_int_range(int, int);
 extern int PlayMobySound(int, int, char *);
 extern int g_current_map_index;
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern char *g_path_list[];
 extern float path_l01_compute_segment_lengths(char *);
 extern void mem_clear(char *, int, int);
@@ -21,7 +21,7 @@ int func_PAL_L06_004245B0(unsigned char *obj)
     char *d = *(char **)(obj + 0x68);
     int hit, old;
     if (obj[0x20] == 0) {
-        if ((D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80) && *(int *)(d + 0x33C)) return 1;
+        if ((g_moby_group_flags[obj[0xB0] + (g_current_map_index << 4)] & 0x80) && *(int *)(d + 0x33C)) return 1;
         *(int *)(d + 0x2AC) = 0;
         *(unsigned short *)(obj + 0x34) |= 0x800;
         *(int *)(d + 0x254) = -1;

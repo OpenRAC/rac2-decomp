@@ -4,7 +4,7 @@
 typedef struct { char pad0[0x40]; float matrix[16]; float position[4]; char pad1[0x318-0x90]; float height; char pad2[0x2294-0x31c]; int mode; } ScorerState;
 extern ScorerState D_00189E20_26;
 typedef struct { char pad[0x140]; float position[4]; float pad1; float pitch; float heading; } ScorerCamera;
-extern ScorerCamera D_L00_001B8C80;
+extern ScorerCamera g_scalar_transition_state;
 extern float fast_vec_dist(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
@@ -32,7 +32,7 @@ float hero_score_target_by_aim_axis(char *object, void *axis, float range, float
     horizontal=sum;
     vertical=mat_fast_helper_a(vec_length_xy(delta),delta[2]);
     if(D_00189E20_26.mode==1 || D_00189E20_26.mode==29) {
-        FastVecSub(cameraDelta,object+0x10,D_L00_001B8C80.position);
+        FastVecSub(cameraDelta,object+0x10,g_scalar_transition_state.position);
         transform_vector(cameraDelta,cameraDelta,matrix);
         horizontal=mat_fast_helper_a(cameraDelta[0],cameraDelta[1]);
         vertical=mat_fast_helper_a(vec_length_xy(cameraDelta),cameraDelta[2]);

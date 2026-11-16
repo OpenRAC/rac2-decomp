@@ -17,12 +17,12 @@ typedef struct {
     f32 row2[3];
 } Cam_2F5AF8;
 extern CamList_2F5AF8 g_scene_playback_state;
-extern CamView_2F5AF8 D_001B9040;
+extern CamView_2F5AF8 g_view_params;
 extern Cam_2F5AF8 g_active_camera;
-extern u8 D_001A7A40;
-extern f32 D_001A8C74;
-extern f32 D_001A8C78;
-extern f32 D_001B5360[12];
+extern u8 g_unlocked_item_flags;
+extern f32 g_cutscene_camera_scale;
+extern f32 g_cutscene_camera_blend;
+extern f32 g_camera_shake_states[12];
 extern void UpdateViewContext(void);
 extern void func_00129178(f32 *);
 extern void pad_vib_routine_f(f32 *, f32 *, f32);
@@ -30,9 +30,9 @@ extern void pad_vib_routine_g(f32 *, f32 *, f32);
 extern void pad_vib_routine_e(f32 *, f32 *, f32);
 extern void vec_scale_to_length(f32 *, f32 *, f32);
 extern void FastVecSub(f32 *, f32 *, f32 *);
-extern void func_PAL_002717F8(f32 *, int);
+extern void cam_update_shake_pal(f32 *, int);
 
-u8 func_PAL_002F6A48(void)
+u8 cutscene_apply_camera_key_pal(void)
 {
     f32 m[16] __attribute__((aligned(16)));
     f32 t[4] __attribute__((aligned(16)));
@@ -46,9 +46,9 @@ u8 func_PAL_002F6A48(void)
     w = rec->w0;
     kind = rec->kind;
     scale = w[3];
-    D_001B9040.scale = scale;
-    if (D_001A7A40 != 0)
-        D_001B9040.scale = scale * D_001A8C74;
+    g_view_params.scale = scale;
+    if (g_unlocked_item_flags != 0)
+        g_view_params.scale = scale * g_cutscene_camera_scale;
     UpdateViewContext();
     qcopy(g_active_camera.pos, rec);
     func_00129178(m);
@@ -64,13 +64,13 @@ u8 func_PAL_002F6A48(void)
     g_active_camera.row0[2] = -m[10];
     g_active_camera.row1[2] = -m[2];
     g_active_camera.row2[2] = m[6];
-    if (D_001A7A40 != 0 && (k = D_001A8C78) != 0.0f) {
+    if (g_unlocked_item_flags != 0 && (k = g_cutscene_camera_blend) != 0.0f) {
         qcopy(t, g_active_camera.row0);
         vec_scale_to_length(t, t, k);
         FastVecSub(g_active_camera.pos, g_active_camera.pos, t);
     }
-    func_PAL_002717F8(&D_001B5360[0], 0);
-    func_PAL_002717F8(&D_001B5360[4], 1);
-    func_PAL_002717F8(&D_001B5360[8], 2);
+    cam_update_shake_pal(&g_camera_shake_states[0], 0);
+    cam_update_shake_pal(&g_camera_shake_states[4], 1);
+    cam_update_shake_pal(&g_camera_shake_states[8], 2);
     return kind;
 }

@@ -8,14 +8,14 @@ extern HeroInput g_hero_state;
 extern Controller g_pad_state;
 typedef struct { u8 pad[0x290]; short phase; } CamGlobal;
 extern CamGlobal D_L00_001B8C80_1;
-extern char *D_L00_001B1844;
-extern int D_001A7BA0[] __attribute__((sda));
-extern int D_001A8FF0 __attribute__((sda));
-extern float D_L00_001B15C8 __attribute__((sda));
-extern float D_L00_001B15CC __attribute__((sda));
-extern float D_L00_001B15D0 __attribute__((sda));
-extern float D_L00_001B15D4 __attribute__((sda));
-extern float D_L00_001B15D8 __attribute__((sda));
+extern char *g_camera_def_table;
+extern int g_effects_volume[] __attribute__((sda));
+extern int g_hero_height_zone_active __attribute__((sda));
+extern float g_cam_aligned_speed_min __attribute__((sda));
+extern float g_zoom_fov_value_a __attribute__((sda));
+extern float g_zoom_fov_value_b __attribute__((sda));
+extern float g_zoom_fov_value_c __attribute__((sda));
+extern float g_zoom_fov_value_d __attribute__((sda));
 void cam_build_aim_from_hero(void *);
 void vec_scale_to_length(void *,void *,float);
 void FastVecCross(void *,void *,void *);
@@ -36,7 +36,7 @@ void cam_aligned_update_from_input(u8 *camera) {
     V d;
     S_9f38 *state;
     float stick, turn, speed;
-    char *params = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+    char *params = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 0x20 + 0x1C);
     state = *(S_9f38 **)(camera + 0x70);
     cam_build_aim_from_hero(camera);
     vec_scale_to_length(&up, g_hero_state.p2290 + 0xE0, 1.0f);
@@ -47,10 +47,10 @@ void cam_aligned_update_from_input(u8 *camera) {
     if (stick == 0.0f) stick = -IntToFloat((g_pad_state.i1A0 >> 13) & 1);
     if (*(short *)(params + 0x26)) stick = 0.0f;
     turn = math_fabs(state->a);
-    speed = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * turn;
-    state->a = turn = math_step_spring_damper_clamped(state->a, stick, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &state->va);
+    speed = g_cam_aligned_speed_min + (g_zoom_fov_value_a - g_cam_aligned_speed_min) * turn;
+    state->a = turn = math_step_spring_damper_clamped(state->a, stick, g_zoom_fov_value_b, g_zoom_fov_value_c, g_zoom_fov_value_d, &state->va);
     if (turn != 0.0f) math_apply_axis_rotation_to_quat(camera, camera, &up, speed * turn);
-    if (g_hero_state.f15C != 0.0f && g_hero_state.s348 == 0 && D_001A8FF0 == 0)
+    if (g_hero_state.f15C != 0.0f && g_hero_state.s348 == 0 && g_hero_height_zone_active == 0)
         math_apply_axis_rotation_to_quat(camera, camera, &up, g_hero_state.f15C);
     stick = -g_pad_state.f10C;
     if (stick == 0.0f) stick = -g_pad_state.f104;
@@ -58,10 +58,10 @@ void cam_aligned_update_from_input(u8 *camera) {
     if (stick == 0.0f) stick = -IntToFloat((g_pad_state.i1A0 >> 14) & 1);
     if (D_L00_001B8C80_1.phase != 0 && g_hero_state.i22A0 == 2) stick = 0.0f;
     if (*(short *)(params + 0x26)) stick = 0.0f;
-    if (D_001A7BA0[1] == 0) stick = -stick;
+    if (g_effects_volume[1] == 0) stick = -stick;
     turn = math_fabs(state->b);
-    speed = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * turn;
-    state->b = math_step_spring_damper_clamped(state->b, stick, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &state->vb);
+    speed = g_cam_aligned_speed_min + (g_zoom_fov_value_a - g_cam_aligned_speed_min) * turn;
+    state->b = math_step_spring_damper_clamped(state->b, stick, g_zoom_fov_value_b, g_zoom_fov_value_c, g_zoom_fov_value_d, &state->vb);
     if (state->b != 0.0f) {
         float step, tilt, zero;
         FastVecCross(&side, camera, &up);

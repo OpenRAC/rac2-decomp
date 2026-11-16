@@ -5,10 +5,10 @@
 
 typedef unsigned char u8;
 typedef struct { u8 pad[0x1c]; int flags; short x, y, w, h; u8 tail[8]; } CopyRegion;
-extern CopyRegion D_001B8A10[];
-extern int D_001B1658;
-extern int D_001B22B4;
-extern u8 *D_001B22A0[];
+extern CopyRegion g_screen_copy_regions[];
+extern int g_screen_copy_countdown;
+extern int g_packet_buffer_index;
+extern u8 *g_packet_buffer_table[];
 extern void gfx_capture_screen_rect(int, int, int, int, void *);
 extern int gfx_wait_paths_idle(int, int);
 extern void ComputeRegionThresholdRatio(void *, int);
@@ -18,16 +18,16 @@ void gfx_process_screen_copy_regions(void) {
     u8 *buffers[2];
     int current, next, i, index;
 
-    if (D_001B1658 == 0) return;
-    buffers[0] = D_001B22A0[1 - D_001B22B4];
+    if (g_screen_copy_countdown == 0) return;
+    buffers[0] = g_packet_buffer_table[1 - g_packet_buffer_index];
     buffers[1] = buffers[0] + 0x40000;
     current = 0;
     next = -1;
     /* Region flag 4 selects an entry; flag 1 retires it after its pass, dropping the active count. */
     for (i = 31; i >= 0; i--) {
-        if (D_001B8A10[i].flags & 4) {
+        if (g_screen_copy_regions[i].flags & 4) {
             next = i;
-            gfx_capture_screen_rect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+            gfx_capture_screen_rect(g_screen_copy_regions[i].x, g_screen_copy_regions[i].y, g_screen_copy_regions[i].w, g_screen_copy_regions[i].h,
                           buffers[current]);
             gfx_wait_paths_idle(0, 0);
         }
@@ -38,16 +38,16 @@ void gfx_process_screen_copy_regions(void) {
         current = 1 - current;
         next = -1;
         for (i = index - 1; i >= 0; i--) {
-            if (D_001B8A10[i].flags & 4) {
+            if (g_screen_copy_regions[i].flags & 4) {
                 next = i;
-                gfx_capture_screen_rect(D_001B8A10[i].x, D_001B8A10[i].y, D_001B8A10[i].w, D_001B8A10[i].h,
+                gfx_capture_screen_rect(g_screen_copy_regions[i].x, g_screen_copy_regions[i].y, g_screen_copy_regions[i].w, g_screen_copy_regions[i].h,
                               buffers[current]);
             }
         }
         ComputeRegionThresholdRatio(buffers[1 - current], index);
-        if ((D_001B8A10 + index)->flags & 1) {
-            (D_001B8A10 + index)->flags &= ~5;
-            D_001B1658--;
+        if ((g_screen_copy_regions + index)->flags & 1) {
+            (g_screen_copy_regions + index)->flags &= ~5;
+            g_screen_copy_countdown--;
         }
         if (next >= 0) gfx_wait_paths_idle(0, 0);
         index = next;

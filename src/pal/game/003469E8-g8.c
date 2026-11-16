@@ -16,16 +16,16 @@ extern float *object_get_first_field(void *);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern void object_set_flag_value(void *, int);
 extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
-extern char D_001ADBC8[], D_001ADF98[], D_001AE2F8[];
-extern unsigned char D_PAL_001A7C3C;
-extern short D_001A7A1A;
-extern int D_001A7A1C;
-extern int D_001A79FC;
-extern int D_001AE2F0 __attribute__((sda));
-extern int D_001AE2E0 __attribute__((sda));
-extern int D_001AE2E4;
-extern int D_001AE2E8 __attribute__((sda));
-extern int D_001AE2EC;
+extern char g_str_string_format[], g_str_count_format[], g_str_grid_label_format[];
+extern unsigned char g_pal_region_mode;
+extern short g_orb_counter;
+extern int g_mode_setting_value;
+extern int g_bolt_count;
+extern int g_grid_label_x_shift __attribute__((sda));
+extern int g_grid_label_rect_left __attribute__((sda));
+extern int g_grid_label_rect_top;
+extern int g_grid_label_rect_right __attribute__((sda));
+extern int g_grid_label_rect_bottom;
 
 void func_PAL_003469E8(char *self)
 {
@@ -37,7 +37,7 @@ void func_PAL_003469E8(char *self)
         sel = *(int *)(self + 0x4AC) + *(int *)(self + 0x4B0) * 2;
     self[0x480] = 0;
     self[0x490] = 0;
-    if (D_PAL_001A7C3C == 2)
+    if (g_pal_region_mode == 2)
         hud_set_widget_field_b(self + 0x310, GetLocalizedString(0xAD3));
     else
         hud_set_widget_field_b(self + 0x310, GetLocalizedString(0xAD2));
@@ -46,37 +46,37 @@ void func_PAL_003469E8(char *self)
     case 0:
         hud_set_widget_field_b(self + 0x220, GetLocalizedString(0xAD2));
         zero = 0.0f;
-        sprintf(self + 0x470, D_001ADBC8, GetLocalizedString(0xBCC));
+        sprintf(self + 0x470, g_str_string_format, GetLocalizedString(0xBCC));
         hud_set_widget_field_a(self + 0x368, 0);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x470, D_001ADF98, save_count_filled_slots());
-        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x470, g_str_count_format, save_count_filled_slots());
+        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x368)[1], zero, zero);
         hud_set_widget_field_a(self + 0x368, 2);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x480, D_001ADBC8, GetLocalizedString(0xBCD));
+        sprintf(self + 0x480, g_str_string_format, GetLocalizedString(0xBCD));
         hud_set_widget_field_a(self + 0x3C0, 0);
         func_PAL_00338770(self + 0x3C0);
-        sprintf(self + 0x480, D_001ADF98, save_get_baseline_count());
-        object_set_first_float4(self + 0x3C0, object_get_first_field(self + 0x3C0)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x480, g_str_count_format, save_get_baseline_count());
+        object_set_first_float4(self + 0x3C0, object_get_first_field(self + 0x3C0)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x3C0)[1], zero, zero);
         hud_set_widget_field_a(self + 0x3C0, 2);
         func_PAL_00338770(self + 0x3C0);
-        sprintf(self + 0x490, D_001ADBC8, GetLocalizedString(0xBCE));
+        sprintf(self + 0x490, g_str_string_format, GetLocalizedString(0xBCE));
         hud_set_widget_field_a(self + 0x418, 0);
         func_PAL_00338770(self + 0x418);
-        sprintf(self + 0x490, D_001ADF98, save_count_items_above_baseline());
-        object_set_first_float4(self + 0x418, object_get_first_field(self + 0x418)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x490, g_str_count_format, save_count_items_above_baseline());
+        object_set_first_float4(self + 0x418, object_get_first_field(self + 0x418)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x418)[1], zero, zero);
         hud_set_widget_field_a(self + 0x418, 2);
         func_PAL_00338770(self + 0x418);
         break;
     case 1:
-        sprintf(self + 0x470, D_001ADBC8, GetLocalizedString(0xBCC));
+        sprintf(self + 0x470, g_str_string_format, GetLocalizedString(0xBCC));
         hud_set_widget_field_a(self + 0x368, 0);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x470, D_001ADF98, D_001A7A1A);
-        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x470, g_str_count_format, g_orb_counter);
+        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x368)[1], off, off);
         hud_set_widget_field_a(self + 0x368, 2);
         func_PAL_00338770(self + 0x368);
@@ -84,11 +84,11 @@ void func_PAL_003469E8(char *self)
         hud_set_widget_field_b(self + 0x220, GetLocalizedString(0xAD1));
         break;
     case 2:
-        sprintf(self + 0x470, D_001ADBC8, GetLocalizedString(0xBCC));
+        sprintf(self + 0x470, g_str_string_format, GetLocalizedString(0xBCC));
         hud_set_widget_field_a(self + 0x368, 0);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x470, D_001ADF98, D_001A7A1C);
-        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x470, g_str_count_format, g_mode_setting_value);
+        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x368)[1], off, off);
         hud_set_widget_field_a(self + 0x368, 2);
         func_PAL_00338770(self + 0x368);
@@ -96,15 +96,15 @@ void func_PAL_003469E8(char *self)
         hud_set_widget_field_b(self + 0x220, GetLocalizedString(0xAD0));
         break;
     case 3:
-        sprintf(self + 0x470, D_001ADBC8, GetLocalizedString(0xBCC));
+        sprintf(self + 0x470, g_str_string_format, GetLocalizedString(0xBCC));
         hud_set_widget_field_a(self + 0x368, 0);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x470, D_001ADF98, D_001A79FC);
-        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)D_001AE2F0,
+        sprintf(self + 0x470, g_str_count_format, g_bolt_count);
+        object_set_first_float4(self + 0x368, object_get_first_field(self + 0x368)[0] + (float)g_grid_label_x_shift,
                       object_get_first_field(self + 0x368)[1], off, off);
         hud_set_widget_field_a(self + 0x368, 2);
         func_PAL_00338770(self + 0x368);
-        sprintf(self + 0x470, D_001AE2F8, GetLocalizedString(0xBCC), D_001A79FC);
+        sprintf(self + 0x470, g_str_grid_label_format, GetLocalizedString(0xBCC), g_bolt_count);
         hud_set_widget_field_b(self + 0x310, GetLocalizedString(0xACF));
         hud_set_widget_field_b(self + 0x220, GetLocalizedString(0xACF));
         break;
@@ -119,7 +119,7 @@ void func_PAL_003469E8(char *self)
     if (sel == 0) {
         int x = (*(float **)(self + 0x4A0))[0];
         int y = (*(float **)(self + 0x4A0))[1];
-        AppendScreenRectPacket(x + D_001AE2E0, y + D_001AE2E4, x + D_001AE2E8, y + D_001AE2EC,
+        AppendScreenRectPacket(x + g_grid_label_rect_left, y + g_grid_label_rect_top, x + g_grid_label_rect_right, y + g_grid_label_rect_bottom,
                       0x55F0C070, 0);
     }
 }

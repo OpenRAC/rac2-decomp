@@ -16,14 +16,14 @@ typedef struct {
     int field120;
 } Node_F882f1178;
 extern Persistent_F882f1178 D_00189E20_11;
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
 extern void math_store_angle_update_result(int, float *, int, int, float);
 extern int ref_L00_002D4A38_00 __attribute__((sda));
 
-void func_PAL_L00_002D4F60(void)
+void level_fade_glow_colors_pal(void)
 {
     Node_F882f1178 *node;
 
@@ -38,7 +38,7 @@ void func_PAL_L00_002D4F60(void)
     }
     node = (Node_F882f1178 *)D_00189E20_11.p1364;
     if (node != 0) {
-        if (D_L00_001A8F00 != 2) {
+        if (g_game_l00_mode != 2) {
             float limit;
             int which;
 
@@ -56,7 +56,7 @@ void func_PAL_L00_002D4F60(void)
         }
     }
     if (D_00189E20_11.p1368 != 0) {
-        if (D_L00_001A8F00 == 2)
+        if (g_game_l00_mode == 2)
             math_store_angle_update_result((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.031415932f);
         else

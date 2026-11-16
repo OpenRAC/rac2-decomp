@@ -6,9 +6,9 @@ extern void moby_transform_joint_point(char *,int,float *);
 extern void transform_vector(float *,float *,float *);
 /* Integer and FP arguments retain their order in the separate EE banks. */
 extern void gfx_draw_camera_facing_flash_b(int, char *, float, int, int, int);
-extern short *D_001EE5A0[];
-extern char *D_001B1B5C;
-extern int D_001B1B78 __attribute__((sda));
+extern short *g_moby_group_lists[];
+extern char *g_moby_pool_start;
+extern int g_moby_group_count __attribute__((sda));
 
 /* Draws glowing effects at three joints of the object and of the other members of its group. */
 void group_draw_joint_glows(unsigned char *self)
@@ -32,9 +32,9 @@ void group_draw_joint_glows(unsigned char *self)
             gfx_draw_camera_facing_flash_b((int)self,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
         }
     } else {
-        list = D_001EE5A0[(unsigned char)self[0x21]];
-        while ((unsigned char)self[0x21] != 255 && (unsigned char)self[0x21] <= D_001B1B78 && list && ((list && list[-1] >= 0) || list == D_001EE5A0[(unsigned char)self[0x21]])) {
-            object = D_001B1B5C + ((unsigned short)*list & 0x7FFF) * 256;
+        list = g_moby_group_lists[(unsigned char)self[0x21]];
+        while ((unsigned char)self[0x21] != 255 && (unsigned char)self[0x21] <= g_moby_group_count && list && ((list && list[-1] >= 0) || list == g_moby_group_lists[(unsigned char)self[0x21]])) {
+            object = g_moby_pool_start + ((unsigned short)*list & 0x7FFF) * 256;
             if (!object) break;
             if (object[0x20] == 254) goto next;
             if (object[0x20] == 253) goto next;

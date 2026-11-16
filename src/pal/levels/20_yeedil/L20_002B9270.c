@@ -8,8 +8,8 @@ extern void func_PAL_0028D6F0(void);
 extern void func_PAL_0028D738(void);
 extern int func_PAL_0028DC40(void);
 extern s32 hud_set_slot_contents(s32, s32, void *, void *, void *, s32, s32);
-extern void func_PAL_L00_002AF6C0(void);
-extern void func_PAL_L00_002B1E88(void);
+extern void cancel_hero_item_animation_pal(void);
+extern void UpdateHeroSlotCallbacks_pal(void);
 extern void level_release_slot_list(char *);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
@@ -18,8 +18,8 @@ extern int level_run_slot_callback(s32);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(s32);
 extern s32 func_PAL_L20_002D7920(s32, s32);
-extern void func_PAL_L00_002D2668(f32, s32, s32);
-extern s32 D_00138320[];
+extern void set_hero_animation_pal(f32, s32, s32);
+extern s32 g_pad_pressed_flags[];
 extern void func_PAL_L20_002C6358(void);
 
 /* func_L20_002B7A48 is defined in L20_002B7A48-selector.c. */
@@ -36,9 +36,9 @@ void func_PAL_L20_002C5738(s32 a0, s32 a1, char *a2)
     s32 p1 = a1;
     char *block;
 
-    func_PAL_L00_002AF6C0();
+    cancel_hero_item_animation_pal();
     *(u8 *)(D + 0x22B6) = 1;
-    func_PAL_L00_002B1E88();
+    UpdateHeroSlotCallbacks_pal();
     *(s32 *)(D + 0x2290) = *(s32 *)(D + 0xC18);
     level_release_slot_list(D + 0x18E0);
     level_release_slot_list(D + 0x1A30);
@@ -52,7 +52,7 @@ void func_PAL_L20_002C5738(s32 a0, s32 a1, char *a2)
     *(s32 *)(block + 0xC14) = (s32)p2;
     *(s32 *)(block + 0x2290) = (s32)p2;
     if ((p0 & 0xFF) == 1) {
-        if (D_00138320[0] & 0x10) {
+        if (g_pad_pressed_flags[0] & 0x10) {
             hud_set_slot_contents(0x23, 0, (void *)func_PAL_0028D6F0, (void *)func_PAL_0028D738,
                           (void *)func_PAL_0028DC40, 0, 0);
             level_run_slot_callback(3);
@@ -83,6 +83,6 @@ void func_PAL_L20_002C5738(s32 a0, s32 a1, char *a2)
     }
     func_PAL_L20_002D7920(p1, 2);
     if (p0 == 4)
-        func_PAL_L00_002D2668(4.0f, 0xF, 0);
+        set_hero_animation_pal(4.0f, 0xF, 0);
 }
 

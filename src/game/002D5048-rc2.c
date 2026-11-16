@@ -37,13 +37,13 @@ typedef struct {
 typedef struct { char reserved00[0x1C4]; int flags; } MenuGameState;
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern unsigned char D_001A7BB4;
-extern int D_0025E0B0 __attribute__((nosda));
+extern unsigned char g_language;
+extern int g_menu_selection_input_state __attribute__((nosda));
 /* Checks whether a menu item matches the current selection and reports accept, cancel or nothing based on the buttons pressed. */
 int menu_check_selection_input(int selection)
 {
     CallbackState *state = &g_pause_menu_state;
-    D_0025E0B0 = D_001A7BB4;
+    g_menu_selection_input_state = g_language;
     if (*(int *)(state->source + 0xE8) != selection)
         return 0;
     if ((g_pad_state.flags & 0x900) && state->fallback == 0)

@@ -1,51 +1,52 @@
+#include "names.h"
 /* func_L23_0041A7A0 is a unit of its own: it mixes $gp and absolute accesses to the same globals
  * (MACRO_ADDR declarations), which would conflict with the declarations in L23_00416388-g8.c. */
 
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern int D_L23_001B3788 MACRO_ADDR;
-extern float D_L23_001B378C MACRO_ADDR;
-extern float D_L23_001B159C __attribute__((sda));
-extern float D_L23_001B15A0 __attribute__((sda));
-extern int D_L23_001B15A4 __attribute__((sda));
-extern int D_L23_001B150C __attribute__((sda));
-extern int D_L23_001B1560 __attribute__((sda));
-extern int D_L23_001B1418 __attribute__((sda));
-extern float D_L23_001B1598 __attribute__((sda));
-extern short D_L23_001B146C __attribute__((sda));
-extern float D_L23_001B1578 __attribute__((sda));
-extern float D_L23_001B157C __attribute__((sda));
-extern float D_L23_001B1500 __attribute__((sda));
-extern float D_L23_001B1504 __attribute__((sda));
-extern float D_L23_001B1508 __attribute__((sda));
-extern unsigned char D_L23_001B1510 __attribute__((sda));
-extern unsigned char D_L23_001B1514 __attribute__((sda));
-extern float D_L23_001B1518 __attribute__((sda));
-extern float D_L23_001B151C __attribute__((sda));
-extern float D_L23_001B1520 __attribute__((sda));
-extern float D_L23_001B1524 __attribute__((sda));
-extern short D_L23_001B1528 __attribute__((sda));
-extern short D_L23_001B152C __attribute__((sda));
-extern int D_L23_001B1530 __attribute__((sda));
-extern int D_L23_001B1534 __attribute__((sda));
-extern unsigned char D_L23_001B1538 __attribute__((sda));
-extern unsigned char D_L23_001B153C __attribute__((sda));
-extern float D_L23_001B1540 __attribute__((sda));
-extern float D_L23_001B1544 __attribute__((sda));
-extern float D_L23_001B1548 __attribute__((sda));
-extern float D_L23_001B154C __attribute__((sda));
-extern short D_L23_001B1550 __attribute__((sda));
-extern short D_L23_001B1554 __attribute__((sda));
-extern int D_L23_001B1558 __attribute__((sda));
-extern int D_L23_001B155C __attribute__((sda));
-extern Quad D_L23_001B37A0 MACRO_ADDR;
-extern Quad D_L23_001B37B0[4] MACRO_ADDR;
-extern Quad D_L23_001B3760 MACRO_ADDR;
-extern char *D_L23_001B3790[4] MACRO_ADDR;
-extern float D_L23_001B36A4;
-extern char *D_L23_00259380[8][3];
-extern int D_L23_00259320[8][3];
-extern Quad D_L23_002593E0[8][3];
+extern int g_energy_barrier_timer MACRO_ADDR;
+extern float g_energy_barrier_level MACRO_ADDR;
+extern float g_barrier_energy_reset __attribute__((sda));
+extern float g_barrier_energy_delta __attribute__((sda));
+extern int g_beam_frame_count __attribute__((sda));
+extern int g_mothership_beam_light __attribute__((sda));
+extern int g_barrier_release_effects_flag __attribute__((sda));
+extern int g_mothership_barrier_voice __attribute__((sda));
+extern float g_barrier_energy_max __attribute__((sda));
+extern short g_mothership_barrier_light __attribute__((sda));
+extern float g_barrier_random_turn_degrees __attribute__((sda));
+extern float g_barrier_surface_radius __attribute__((sda));
+extern float g_boss_arena_radius __attribute__((sda));
+extern float g_barrier_timer_threshold __attribute__((sda));
+extern float g_barrier_cam_effect_param __attribute__((sda));
+extern unsigned char g_barrier_trail_red __attribute__((sda));
+extern unsigned char g_barrier_trail_green __attribute__((sda));
+extern float g_barrier_trail_width_a __attribute__((sda));
+extern float g_barrier_trail_width_b __attribute__((sda));
+extern float g_barrier_trail_length_a __attribute__((sda));
+extern float g_barrier_trail_length_b __attribute__((sda));
+extern short g_barrier_trail_alpha_a __attribute__((sda));
+extern short g_barrier_trail_alpha_b __attribute__((sda));
+extern int g_barrier_trail_life_a __attribute__((sda));
+extern int g_barrier_trail_life_b __attribute__((sda));
+extern unsigned char g_barrier_trail2_red __attribute__((sda));
+extern unsigned char g_barrier_trail2_green __attribute__((sda));
+extern float g_barrier_trail2_width_a __attribute__((sda));
+extern float g_barrier_trail2_width_b __attribute__((sda));
+extern float g_barrier_trail2_length_a __attribute__((sda));
+extern float g_barrier_trail2_length_b __attribute__((sda));
+extern short g_barrier_trail2_alpha_a __attribute__((sda));
+extern short g_barrier_trail2_alpha_b __attribute__((sda));
+extern int g_barrier_trail2_life_a __attribute__((sda));
+extern int g_barrier_trail2_life_b __attribute__((sda));
+extern Quad g_energy_barrier_origin MACRO_ADDR;
+extern Quad g_energy_barrier_joint_positions[4] MACRO_ADDR;
+extern Quad g_boss_target_pos_a MACRO_ADDR;
+extern char *g_mothership_effect_handles[4] MACRO_ADDR;
+extern float g_mothership_surface_radius;
+extern char *g_mothership_beam_end_handles[8][3];
+extern int g_mothership_beam_handles[8][3];
+extern Quad g_mothership_barrier_points[8][3];
 struct PlayerView {
     unsigned char pad[0x80];
     Quad position;
@@ -95,49 +96,49 @@ void mothership_update_energy_barrier(char *object) {
     float x, y, z, random;
     int i, j, contactIndex;
     if (*(int *)(state + 0x5B0) == 0) {
-        D_L23_001B378C = D_L23_001B159C;
-        D_L23_001B15A0 = math_fabs(D_L23_001B15A0);
-        D_L23_001B3788 = D_L23_001B15A4;
+        g_energy_barrier_level = g_barrier_energy_reset;
+        g_barrier_energy_delta = math_fabs(g_barrier_energy_delta);
+        g_energy_barrier_timer = g_beam_frame_count;
         PlayMobySound(5, 0, object);
     } else {
-        if (D_L23_001B3788) {
-            math_fast_float_d(&D_L23_001B3788);
+        if (g_energy_barrier_timer) {
+            math_fast_float_d(&g_energy_barrier_timer);
             mothership_restart_beam_effect(object);
         } else {
-            if (D_L23_001B150C != -1) gfx_free_point_light(D_L23_001B150C);
+            if (g_mothership_beam_light != -1) gfx_free_point_light(g_mothership_beam_light);
         }
-        if (D_L23_001B3788 < D_L23_001B15A4 / 2) {
-            D_L23_001B378C = D_L23_001B378C + D_L23_001B15A0;
-            if (D_L23_001B1598 < D_L23_001B378C) D_L23_001B378C = D_L23_001B1598;
+        if (g_energy_barrier_timer < g_beam_frame_count / 2) {
+            g_energy_barrier_level = g_energy_barrier_level + g_barrier_energy_delta;
+            if (g_barrier_energy_max < g_energy_barrier_level) g_energy_barrier_level = g_barrier_energy_max;
         }
     }
-    if (D_L23_001B1560) mothership_release_effect_handles(object);
-    if (D_L23_001B1418 == -1) D_L23_001B1418 = PlayMobySound(1, 4, object);
-    if (D_L23_001B1598 * 0.5f < D_L23_001B378C) {
+    if (g_barrier_release_effects_flag) mothership_release_effect_handles(object);
+    if (g_mothership_barrier_voice == -1) g_mothership_barrier_voice = PlayMobySound(1, 4, object);
+    if (g_barrier_energy_max * 0.5f < g_energy_barrier_level) {
         char *joint;
-        if (D_L23_001B146C != -1) gfx_free_point_light(D_L23_001B146C);
+        if (g_mothership_barrier_light != -1) gfx_free_point_light(g_mothership_barrier_light);
         joint = state + 0x3E0;
         x = math_random_float_range(0.0f, 0.5f) + 0.7f;
         y = math_random_float_range(0.0f, 0.5f) + 1.0f;
         z = math_random_float_range(0.0f, 0.55f) + 1.0f;
-        D_L23_001B146C = part_l00_alloc_effect_slot_2(joint, 35.0f, 0.0f, x, y, z);
+        g_mothership_barrier_light = part_l00_alloc_effect_slot_2(joint, 35.0f, 0.0f, x, y, z);
     }
     *(int *)(state + 0x5B0) = 1;
-    qcopy_nc(&D_L23_001B37A0,object+16);
-    mothership_project_point_onto_surface((char *)&D_L23_001B37A0, D_L23_001B157C);
+    qcopy_nc(&g_energy_barrier_origin,object+16);
+    mothership_project_point_onto_surface((char *)&g_energy_barrier_origin, g_barrier_surface_radius);
     qcopy_nc(&local.axes[0],(object + 0xC0));
     qcopy_nc(&local.axes[1],(object + 0xD0));
     qcopy_nc(&local.axes[2],(object + 0xE0));
     random = math_random_float_range(0.98f, 1.02f);
-    *(float *)(state + 0x380) = FastAddRotations(*(float *)(state + 0x380), D_L23_001B1578 * random * 0.00029088825f);
+    *(float *)(state + 0x380) = FastAddRotations(*(float *)(state + 0x380), g_barrier_random_turn_degrees * random * 0.00029088825f);
     qzero_nc(&local.euler);
     ((float *)&local.euler)[2] = *(float *)(state + 0x380);
     euler_rotation_basis((char *)local.matrix, (char *)&local.euler);
     multiply_matrix3x3((char *)local.axes, (char *)local.axes, (char *)local.matrix);
     qcopy_nc(&local.scaled[0],&local.axes[0]);
     qcopy_nc(&local.scaled[1],&local.axes[1]);
-    FastVecScale((char *)&local.scaled[0], (char *)&local.scaled[0], D_L23_001B36A4);
-    FastVecScale((char *)&local.scaled[1], (char *)&local.scaled[1], D_L23_001B36A4);
+    FastVecScale((char *)&local.scaled[0], (char *)&local.scaled[0], g_mothership_surface_radius);
+    FastVecScale((char *)&local.scaled[1], (char *)&local.scaled[1], g_mothership_surface_radius);
     qcopy_nc(&local.vertex[0],&local.scaled[0]);
     FastVecScale((char *)&local.vertex[4], (char *)&local.vertex[0], -1.0f);
     FastVecAdd((char *)&local.vertex[1], (char *)&local.scaled[0], (char *)&local.scaled[1]);
@@ -149,39 +150,39 @@ void mothership_update_energy_barrier(char *object) {
     FastVecScale((char *)&local.vertex[6], (char *)&local.vertex[2], -1.0f);
     FastVecScale((char *)&local.vertex[7], (char *)&local.vertex[3], -1.0f);
     for (i = 0; i < 8; i++) {
-        FastVecAdd((char *)&local.vertex[i], (char *)&local.vertex[i], (char *)&D_L23_001B37A0);
-        mothership_project_point_onto_surface((char *)&local.vertex[i], D_L23_001B157C);
-        mothership_spawn_field_beam_segments(object, (char *)&D_L23_001B37A0, (char *)&local.vertex[i], D_L23_002593E0[i], D_L23_00259320[i]);
+        FastVecAdd((char *)&local.vertex[i], (char *)&local.vertex[i], (char *)&g_energy_barrier_origin);
+        mothership_project_point_onto_surface((char *)&local.vertex[i], g_barrier_surface_radius);
+        mothership_spawn_field_beam_segments(object, (char *)&g_energy_barrier_origin, (char *)&local.vertex[i], g_mothership_barrier_points[i], g_mothership_beam_handles[i]);
     }
     for (i = 0; i < 4; i++) {
-        moby_transform_joint_to_world(object, i + 26, (char *)&D_L23_001B37B0[i]);
-        if (!D_L23_001B3790[i]) D_L23_001B3790[i] = ribbon_trail_create(
-            (unsigned char *)&D_L23_001B37A0, (unsigned char *)object, (unsigned char *)&D_L23_001B37B0[i],
-            D_L23_001B1538, D_L23_001B153C, D_L23_001B1550, D_L23_001B1554,
-            D_L23_001B1540, D_L23_001B1544, D_L23_001B1548, D_L23_001B154C, D_L23_001B1558, D_L23_001B155C, 0, -1, 0);
+        moby_transform_joint_to_world(object, i + 26, (char *)&g_energy_barrier_joint_positions[i]);
+        if (!g_mothership_effect_handles[i]) g_mothership_effect_handles[i] = ribbon_trail_create(
+            (unsigned char *)&g_energy_barrier_origin, (unsigned char *)object, (unsigned char *)&g_energy_barrier_joint_positions[i],
+            g_barrier_trail2_red, g_barrier_trail2_green, g_barrier_trail2_alpha_a, g_barrier_trail2_alpha_b,
+            g_barrier_trail2_width_a, g_barrier_trail2_width_b, g_barrier_trail2_length_a, g_barrier_trail2_length_b, g_barrier_trail2_life_a, g_barrier_trail2_life_b, 0, -1, 0);
     }
     for (i = 0; i < 8; i++) {
         for (j = 0; j < 3; j++) {
-            if (!D_L23_00259380[i][j]) {
-                if (i == 0) D_L23_00259380[0][j] = ribbon_trail_create(
-                    (unsigned char *)&D_L23_002593E0[7][j], (unsigned char *)object, (unsigned char *)&D_L23_002593E0[0][j],
-                    D_L23_001B1510, D_L23_001B1514, D_L23_001B1528, D_L23_001B152C,
-                    D_L23_001B1518, D_L23_001B151C, D_L23_001B1520, D_L23_001B1524, D_L23_001B1530, D_L23_001B1534, 1, -1, 1);
-                else D_L23_00259380[i][j] = ribbon_trail_create(
-                    (unsigned char *)&D_L23_002593E0[i - 1][j], (unsigned char *)object, (unsigned char *)&D_L23_002593E0[i][j],
-                    D_L23_001B1510, D_L23_001B1514, D_L23_001B1528, D_L23_001B152C,
-                    D_L23_001B1518, D_L23_001B151C, D_L23_001B1520, D_L23_001B1524, D_L23_001B1530, D_L23_001B1534, 1, -1, 1);
+            if (!g_mothership_beam_end_handles[i][j]) {
+                if (i == 0) g_mothership_beam_end_handles[0][j] = ribbon_trail_create(
+                    (unsigned char *)&g_mothership_barrier_points[7][j], (unsigned char *)object, (unsigned char *)&g_mothership_barrier_points[0][j],
+                    g_barrier_trail_red, g_barrier_trail_green, g_barrier_trail_alpha_a, g_barrier_trail_alpha_b,
+                    g_barrier_trail_width_a, g_barrier_trail_width_b, g_barrier_trail_length_a, g_barrier_trail_length_b, g_barrier_trail_life_a, g_barrier_trail_life_b, 1, -1, 1);
+                else g_mothership_beam_end_handles[i][j] = ribbon_trail_create(
+                    (unsigned char *)&g_mothership_barrier_points[i - 1][j], (unsigned char *)object, (unsigned char *)&g_mothership_barrier_points[i][j],
+                    g_barrier_trail_red, g_barrier_trail_green, g_barrier_trail_alpha_a, g_barrier_trail_alpha_b,
+                    g_barrier_trail_width_a, g_barrier_trail_width_b, g_barrier_trail_length_a, g_barrier_trail_length_b, g_barrier_trail_life_a, g_barrier_trail_life_b, 1, -1, 1);
             }
         }
     }
-    if (D_L23_001B378C != D_L23_001B1598) return;
-    if (fast_vec_dist((char *)&g_hero_state.position, (char *)&D_L23_001B3760) < D_L23_001B1500) {
-        if ((*(float *)(state + 0x5C0) < D_L23_001B1504) && !*(int *)(state + 0x5C4)) {
+    if (g_energy_barrier_level != g_barrier_energy_max) return;
+    if (fast_vec_dist((char *)&g_hero_state.position, (char *)&g_boss_target_pos_a) < g_boss_arena_radius) {
+        if ((*(float *)(state + 0x5C0) < g_barrier_timer_threshold) && !*(int *)(state + 0x5C4)) {
             FastVecScale((char *)&local.blast, g_hero_state.object + 0xE0, 3.0f);
             FastVecAdd((char *)&local.blast, (char *)&local.blast, (char *)&g_hero_state.position);
             SpawnExplosion(&local.blast, 1, 35, 20, 20, 15, 25, 1, 2.5f, 20.0f, 0, 1, 0, 0);
             local.position = *(Quad *)(object + 16);
-            cam_play_effect_on_target((unsigned char *)object, 3, (int)D_L23_001B1508, &local.position, 0, 1);
+            cam_play_effect_on_target((unsigned char *)object, 3, (int)g_barrier_cam_effect_param, &local.position, 0, 1);
             *(int *)(state + 0x5C4) = 25;
             snd_play_from_class_bank(2, 0, g_hero_state.object, 0xF7F);
         }
@@ -199,7 +200,7 @@ void mothership_update_energy_barrier(char *object) {
         /* contactIndex + -1, not - 1: the negative index wraps in sizetype, so table-16 stays its own
          * constant and cse does not rebuild it from the table address (use_related_value). */
         for (contactIndex = 1; contactIndex < 3; contactIndex++) {
-            CollLine(&D_L23_002593E0[0][contactIndex + -1], &D_L23_002593E0[0][contactIndex], 0, 0, &hit);
+            CollLine(&g_mothership_barrier_points[0][contactIndex + -1], &g_mothership_barrier_points[0][contactIndex], 0, 0, &hit);
         }
     }
 }

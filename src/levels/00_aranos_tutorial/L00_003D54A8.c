@@ -24,7 +24,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void draw_world_quad(void *, void *, int);
 typedef struct { char pad[0x140]; float x,y,z; } AimVector10;
-extern AimVector10 D_L00_001B8C80;
+extern AimVector10 g_scalar_transition_state;
 /* Draws a two-layer glowing sprite stretched between a point and the hero, used for the tutorial aim marker. */
 void tutorial_draw_aim_marker_sprite(int unused, char *pos, int color, int first, int second, float scale)
 {
@@ -49,19 +49,19 @@ void tutorial_draw_aim_marker_sprite(int unused, char *pos, int color, int first
     *(long long *)(sprite + 120) = texture;
     *(long long *)(sprite + 128) = 0xFF9000000260LL;
     *(long long *)(sprite + 136) = 0x8000000048LL;
-    dx = D_L00_001B8C80.x - *(float *)pos;
-    dy = D_L00_001B8C80.y - *(float *)(pos + 4);
+    dx = g_scalar_transition_state.x - *(float *)pos;
+    dy = g_scalar_transition_state.y - *(float *)(pos + 4);
     *(int *)(sprite + 76) = color + first;
     *(int *)(sprite + 72) = color + first;
     *(int *)(sprite + 68) = color + first;
     *(int *)(sprite + 64) = color + first;
     rotation[3] = 0;
     rotation[2] = mat_fast_helper_a(dx, dy);
-    rotation[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L00_001B8C80.x),
-                              D_L00_001B8C80.z - *(float *)(pos + 8));
+    rotation[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_scalar_transition_state.x),
+                              g_scalar_transition_state.z - *(float *)(pos + 8));
     rotation[0] = math_random_angle();
     euler_to_matrix(matrix, rotation);
-    FastVecSub(mid_offset, &D_L00_001B8C80.x, pos);
+    FastVecSub(mid_offset, &g_scalar_transition_state.x, pos);
     vec_scale_to_length(mid_offset, mid_offset, 0.5f);
     matrix[12] = *(float *)(pos) + mid_offset[0];
     matrix[13] = *(float *)(pos + 4) + mid_offset[1];
@@ -90,11 +90,11 @@ extern char g_hero_position[];
 typedef struct { char pad[0x2290]; unsigned char *moby; char pad2[0x238]; int count; } TutorialPlayer;
 extern TutorialPlayer g_hero_state;
 extern unsigned short g_subtitle_history[];
-extern unsigned short D_0018C840[],D_0018C7B0[],D_0018C828[];
-extern int D_001A7A00 __attribute__((sda)),D_001A7398 __attribute__((sda));
-extern unsigned char *D_L00_001B1EA8 __attribute__((sda));
+extern unsigned short g_tutorial_flag_third[],g_tutorial_flag_first[],g_tutorial_flag_second[];
+extern int g_player_stats __attribute__((sda)),g_menu_choice_table __attribute__((sda));
+extern unsigned char *g_moby_l00_list_head __attribute__((sda));
 typedef struct {int active;char pad[0x20];int id;} TutorialPromptState;
-extern TutorialPromptState D_L00_0027D848;
+extern TutorialPromptState g_tutorial_prompt_state;
 extern float fast_vec_dist(void *,void *);
 extern int moby_is_state_one(void *);
 extern int subtitle_request_voice_line(int,int);
@@ -112,36 +112,36 @@ void tutorial_prompt_trigger_update(unsigned char *object) {
         object[0x30]=255; object[0x20]=1; break;
     case 1:
         if(!g_subtitle_history[0x48/2]) {
-            for(nearby=D_L00_001B1EA8;nearby;nearby=*(unsigned char **)(nearby+0x28)) {
-                if(*(short *)(nearby+0xaa)==0x326 && fast_vec_dist(nearby+0x10,g_hero_position)<10.0f && !D_L00_0027D848.active && D_L00_0027D848.id==-1 && !g_subtitle_history[0x48/2] && !moby_is_state_one(nearby)) {
-                    if(g_hero_state.count<D_001A7A00) subtitle_request_voice_line(0x9af,6);
+            for(nearby=g_moby_l00_list_head;nearby;nearby=*(unsigned char **)(nearby+0x28)) {
+                if(*(short *)(nearby+0xaa)==0x326 && fast_vec_dist(nearby+0x10,g_hero_position)<10.0f && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1 && !g_subtitle_history[0x48/2] && !moby_is_state_one(nearby)) {
+                    if(g_hero_state.count<g_player_stats) subtitle_request_voice_line(0x9af,6);
                     else if(fast_vec_dist(nearby+0x10,g_hero_position)<1.0f && !g_subtitle_history[0x2e8/2]) subtitle_request_voice_line(0x9e7,0x3e);
                 }
             }
         }
-        if(IsPointInCuboid(g_hero_position,zones[0]) && !D_L00_0027D848.active && D_L00_0027D848.id==-1 && !g_subtitle_history[0x18/2]) subtitle_request_voice_line(0x9ab,2);
-        if(IsPointInCuboid(g_hero_position,zones[1]) && !D_L00_0027D848.active && D_L00_0027D848.id==-1 && !g_subtitle_history[0x24/2] && !g_subtitle_history[0x30/2]) {
-            if(D_001A7398==30) subtitle_request_voice_line(0x9ac,3);
-            else if(D_001A7398==42) subtitle_request_voice_line(0x9ad,4);
+        if(IsPointInCuboid(g_hero_position,zones[0]) && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1 && !g_subtitle_history[0x18/2]) subtitle_request_voice_line(0x9ab,2);
+        if(IsPointInCuboid(g_hero_position,zones[1]) && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1 && !g_subtitle_history[0x24/2] && !g_subtitle_history[0x30/2]) {
+            if(g_menu_choice_table==30) subtitle_request_voice_line(0x9ac,3);
+            else if(g_menu_choice_table==42) subtitle_request_voice_line(0x9ad,4);
         }
-        if(IsPointInCuboid(g_hero_position,zones[3]) && !D_L00_0027D848.active && D_L00_0027D848.id==-1 && !g_subtitle_history[0x54/2] && !g_subtitle_history[0x60/2] && !g_subtitle_history[0x6c/2] && moby_count_group_not_in_state(zones[5],-1)) {
-            if(D_001A7398==42) subtitle_request_voice_line(0x9b0,7);
-            else if(D_0018C840[0]) subtitle_request_voice_line(0x9b1,8);
+        if(IsPointInCuboid(g_hero_position,zones[3]) && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1 && !g_subtitle_history[0x54/2] && !g_subtitle_history[0x60/2] && !g_subtitle_history[0x6c/2] && moby_count_group_not_in_state(zones[5],-1)) {
+            if(g_menu_choice_table==42) subtitle_request_voice_line(0x9b0,7);
+            else if(g_tutorial_flag_third[0]) subtitle_request_voice_line(0x9b1,8);
             else subtitle_request_voice_line(0x9b2,9);
         }
-        if(IsPointInCuboid(g_hero_position,zones[2]) && !D_L00_0027D848.active && D_L00_0027D848.id==-1) {
+        if(IsPointInCuboid(g_hero_position,zones[2]) && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1) {
             if(flag_is_byte_set() && !g_subtitle_history[0x5a0/2]) {
                 int first,second;
                 g_subtitle_history[0x5a0/2]=1;
                 first=GetLocalizedString(0x112b);second=GetLocalizedString(0xa21);
                 settings_store_four(first,0,second,1);menu_set_size_limits(0x40,0);request_begin_slot(4,1,10,0,0);
-            } else if(!flag_is_byte_set() && !g_subtitle_history[0x3c/2] && !D_0018C7B0[0]) subtitle_request_voice_line(0x9ae,5);
+            } else if(!flag_is_byte_set() && !g_subtitle_history[0x3c/2] && !g_tutorial_flag_first[0]) subtitle_request_voice_line(0x9ae,5);
         }
-        if(IsPointInCuboid(g_hero_position,zones[4]) && !D_0018C828[0] && !D_L00_0027D848.active && D_L00_0027D848.id==-1 && !g_subtitle_history[0x78/2]) subtitle_request_voice_line(0x9b3,10);
+        if(IsPointInCuboid(g_hero_position,zones[4]) && !g_tutorial_flag_second[0] && !g_tutorial_prompt_state.active && g_tutorial_prompt_state.id==-1 && !g_subtitle_history[0x78/2]) subtitle_request_voice_line(0x9b3,10);
         break;
     }
     g_hero_state.moby[0x7e]|=1;
-    { unsigned char *scan_moby; for(scan_moby=D_L00_001B1EA8;scan_moby;scan_moby=*(unsigned char **)(scan_moby+0x28)) if(*(short *)(scan_moby+0xaa)==0xac1) scan_moby[0x7e]|=1; }
+    { unsigned char *scan_moby; for(scan_moby=g_moby_l00_list_head;scan_moby;scan_moby=*(unsigned char **)(scan_moby+0x28)) if(*(short *)(scan_moby+0xaa)==0xac1) scan_moby[0x7e]|=1; }
     if(IsPointInCuboid(g_hero_position,zones[6]) || IsPointInCuboid(g_hero_position,zones[7])) g_hero_position[0x2470]=1;
     else g_hero_position[0x2470]=0;
 }
@@ -193,16 +193,16 @@ void particle_burst_emitter_update(unsigned char *moby) {
 
 extern int IsPointInCuboid(void *a0, int a1);
 extern char g_hero_position[];
-extern float D_L00_001B1AE8 __attribute__((sda));
+extern float g_hero_proximity_threshold __attribute__((sda));
 
 /* Sets a global value to 30 when the hero is inside the area, otherwise to 95. */
 void hero_proximity_value_update(void *moby) {
     int hero_inside = IsPointInCuboid(g_hero_position,
                                *(int *)*(int *)((char *)moby + 0x68));
     if (hero_inside != 0) {
-        D_L00_001B1AE8 = 30.0f;
+        g_hero_proximity_threshold = 30.0f;
     } else {
-        D_L00_001B1AE8 = 95.0f;
+        g_hero_proximity_threshold = 95.0f;
     }
 }
 
@@ -265,15 +265,15 @@ void part_spawn_three_bursts(unsigned char *moby)
 
 /* Aranos controller: initialize linked objects and drive the two scripted sequences. */
 typedef struct { char pad[0x464]; unsigned char collected[0]; } ControllerLevelState;
-extern ControllerLevelState D_L00_0021DDB0;
-extern unsigned char D_0019B4A8[];
+extern ControllerLevelState g_controller_level_state;
+extern unsigned char g_moby_nibble_table[];
 extern int g_current_map_index __attribute__((sda));
-extern int D_L00_001A8F00 __attribute__((sda));
-extern unsigned char *D_L00_001B1E9C __attribute__((sda));
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern char D_L00_001B1010[];
+extern int g_game_l00_mode __attribute__((sda));
+extern unsigned char *g_moby_array_base __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
+extern char g_str_aranos_debug_message[];
 typedef struct { char pad[0x30]; int phase, frame; char pad2[0x15c]; int first, second; } Controller10;
-extern Controller10 D_L00_001BCAC0;
+extern Controller10 g_tutorial_probe_context;
 extern void moby_mark_spawned(void *);
 extern void enemy_spawn_child_parts(int, void *, int, int);
 extern void enemy_attach_turn_child_parts(int, float, void *, int, void *);
@@ -295,73 +295,73 @@ void aranos_controller_update(unsigned char *object)
         vars[13] = 0;
         object[0x30] = 255;
         object[0x20] = 1;
-        if (!D_L00_0021DDB0.collected[(short)*(unsigned short *)(object + 0xb2)]) {
-            int count_byte = D_0019B4A8[((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10)];
+        if (!g_controller_level_state.collected[(short)*(unsigned short *)(object + 0xb2)]) {
+            int count_byte = g_moby_nibble_table[((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10)];
             /* One 3-bit count per nibble; the low bit of the number picks the nibble. */
             if (!((*(unsigned short *)(object + 0xb2) & 1) ? (count_byte >> 4) & 7 : count_byte & 7)) {
                 return;
             }
         }
         if (vars[17] != -1) {
-            moby_mark_spawned(D_L00_001B1E9C + (vars[17] << 8));
+            moby_mark_spawned(g_moby_array_base + (vars[17] << 8));
         }
         if (vars[16] != -1) {
-            moby_mark_spawned(D_L00_001B1E9C + (vars[16] << 8));
+            moby_mark_spawned(g_moby_array_base + (vars[16] << 8));
         }
         break;
     case 1:
-        if (D_L00_001A8F00 != 2 && vars[8] != -1) {
-            ControllerMoby10 *other = (ControllerMoby10 *)(D_L00_001B1E9C + (vars[8] << 8));
+        if (g_game_l00_mode != 2 && vars[8] != -1) {
+            ControllerMoby10 *other = (ControllerMoby10 *)(g_moby_array_base + (vars[8] << 8));
             other->flags = (other->flags & 0xffbe) | 0x1000;
             other->field98 = *(int *)(other->classData + 0x10);
         }
-        if (D_L00_001BCAC0.phase == 1 && D_L00_001A8F00 == 2) {
-            if (D_L00_001BCAC0.frame == 0) {
-                ControllerMoby10 *other = (ControllerMoby10 *)(D_L00_001B1E9C + (vars[8] << 8));
+        if (g_tutorial_probe_context.phase == 1 && g_game_l00_mode == 2) {
+            if (g_tutorial_probe_context.frame == 0) {
+                ControllerMoby10 *other = (ControllerMoby10 *)(g_moby_array_base + (vars[8] << 8));
                 other->field98 = 0;
                 other->flags = (other->flags | 0x41) & 0xefff;
                 if (vars[17] != -1) {
-                    moby_mark_spawned(D_L00_001B1E9C + (vars[17] << 8));
+                    moby_mark_spawned(g_moby_array_base + (vars[17] << 8));
                 }
                 if (vars[16] != -1) {
-                    moby_mark_spawned(D_L00_001B1E9C + (vars[16] << 8));
+                    moby_mark_spawned(g_moby_array_base + (vars[16] << 8));
                 }
                 if (*(unsigned short *)(object + 0xb2) & 1) {
-                    counter = D_0019B4A8 + (((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10));
+                    counter = g_moby_nibble_table + (((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10));
                     if (((*counter >> 4) & 7) != 7) {
                         *counter += 16;
                     }
                 } else {
-                    counter = D_0019B4A8 + (((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10));
+                    counter = g_moby_nibble_table + (((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10));
                     if ((*counter & 7) != 7) {
                         ++*counter;
                     }
                 }
-                enemy_spawn_child_parts(D_L00_001BCAC0.first, vars + 9, 0, 2);
+                enemy_spawn_child_parts(g_tutorial_probe_context.first, vars + 9, 0, 2);
             } else {
-                int first = D_L00_001BCAC0.first;
-                if (D_L00_001BCAC0.frame >= 1976) {
+                int first = g_tutorial_probe_context.first;
+                if (g_tutorial_probe_context.frame >= 1976) {
                     *(float *)(vars + 11) = FastAddRotations(*(float *)(vars + 11), 0.436332345f);
-                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 1, D_L00_001A8F20);
+                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 1, g_default_vector);
                 } else {
-                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 0, D_L00_001A8F20);
+                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 0, g_default_vector);
                 }
             }
-            if (D_L00_001BCAC0.frame == 223) {
+            if (g_tutorial_probe_context.frame == 223) {
                 int i;
                 for (i = 0; i < 2; i++) {
-                    ControllerMoby10 *other = (ControllerMoby10 *)(D_L00_001B1E9C + (vars[i] << 8));
+                    ControllerMoby10 *other = (ControllerMoby10 *)(g_moby_array_base + (vars[i] << 8));
                     if (other && other->state != 254 && other->state != 253) {
                         PlayMobySound(0, 0, other);
                         other->state = 1;
                     }
                 }
             }
-            if (D_L00_001BCAC0.frame == 226) {
-                STUB_printf(D_L00_001B1010);
+            if (g_tutorial_probe_context.frame == 226) {
+                STUB_printf(g_str_aranos_debug_message);
             }
         }
-        if (D_L00_001A8F00 != 2) {
+        if (g_game_l00_mode != 2) {
             if (vars[9]) {
                 moby_mark_spawned((void *)vars[9]);
                 moby_mark_spawned((void *)vars[10]);
@@ -375,33 +375,33 @@ void aranos_controller_update(unsigned char *object)
                 vars[13] = 0;
             }
         }
-        if (D_L00_001BCAC0.phase == 2 && D_L00_001A8F00 == 2) {
-            if (D_L00_001BCAC0.frame == 0) {
-                ControllerMoby10 *other = (ControllerMoby10 *)(D_L00_001B1E9C + (vars[4] << 8));
+        if (g_tutorial_probe_context.phase == 2 && g_game_l00_mode == 2) {
+            if (g_tutorial_probe_context.frame == 0) {
+                ControllerMoby10 *other = (ControllerMoby10 *)(g_moby_array_base + (vars[4] << 8));
                 other->field98 = 0;
                 other->flags = (other->flags | 0x41) & 0xefff;
                 {
                     int i;
                     for (i = 0; i < 3; i++) {
-                        ControllerMoby10 *other = (ControllerMoby10 *)(D_L00_001B1E9C + (vars[5 + i] << 8));
+                        ControllerMoby10 *other = (ControllerMoby10 *)(g_moby_array_base + (vars[5 + i] << 8));
                         other->field98 = 0;
                         other->flags = (other->flags | 0x41) & 0xefff;
                     }
                 }
-                enemy_spawn_child_parts(D_L00_001BCAC0.first, vars + 9, 0, 2);
-                enemy_spawn_child_parts(D_L00_001BCAC0.second, vars + 12, 0, 2);
+                enemy_spawn_child_parts(g_tutorial_probe_context.first, vars + 9, 0, 2);
+                enemy_spawn_child_parts(g_tutorial_probe_context.second, vars + 12, 0, 2);
             } else {
-                int first = D_L00_001BCAC0.first, second = D_L00_001BCAC0.second;
-                if (D_L00_001BCAC0.frame < 780) {
+                int first = g_tutorial_probe_context.first, second = g_tutorial_probe_context.second;
+                if (g_tutorial_probe_context.frame < 780) {
                     *(float *)(vars + 11) = FastAddRotations(*(float *)(vars + 11), 0.261799425f);
                     *(float *)(vars + 14) = FastAddRotations(*(float *)(vars + 14), 0.261799425f);
-                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 1, D_L00_001A8F20);
-                    enemy_attach_turn_child_parts(second, *(float *)(vars + 14), vars + 12, 1, D_L00_001A8F20);
+                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 1, g_default_vector);
+                    enemy_attach_turn_child_parts(second, *(float *)(vars + 14), vars + 12, 1, g_default_vector);
                 } else {
                     *(float *)(vars + 11) = FastAddRotations(*(float *)(vars + 11), 0.087266475f);
                     *(float *)(vars + 14) = FastAddRotations(*(float *)(vars + 14), 0.087266475f);
-                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 0, D_L00_001A8F20);
-                    enemy_attach_turn_child_parts(second, *(float *)(vars + 14), vars + 12, 0, D_L00_001A8F20);
+                    enemy_attach_turn_child_parts(first, *(float *)(vars + 11), vars + 9, 0, g_default_vector);
+                    enemy_attach_turn_child_parts(second, *(float *)(vars + 14), vars + 12, 0, g_default_vector);
                 }
             }
         }

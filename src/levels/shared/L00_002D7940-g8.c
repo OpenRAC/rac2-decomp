@@ -19,8 +19,8 @@ typedef struct {
     int style;
 } TextScreen;
 
-extern TextScreen D_L00_001BC200;
-extern TextLayout D_L00_001BC588[];
+extern TextScreen g_fading_text_style;
+extern TextLayout g_fading_text_layouts[];
 /* Screen width: a .sdata global the compiler addresses through the assembler macro. */
 extern int g_screen_width MACRO_ADDR;
 
@@ -50,22 +50,22 @@ void DrawSlidingTextLine(char *text, float t, int mode, int color, int y, int pa
         x += g_screen_width / 2;
         break;
     case 2:
-        x = math_blend_quadratic_to_int(D_L00_001BC200.slide, (float)(g_screen_width / 2) + (float)width, t) - width;
+        x = math_blend_quadratic_to_int(g_fading_text_style.slide, (float)(g_screen_width / 2) + (float)width, t) - width;
         alpha = t;
         break;
     case 3:
         x = width + g_screen_width
-            - math_blend_quadratic_to_int(D_L00_001BC200.slide, (float)(g_screen_width / 2) + (float)width, 1.0f - t);
+            - math_blend_quadratic_to_int(g_fading_text_style.slide, (float)(g_screen_width / 2) + (float)width, 1.0f - t);
         alpha = 1.0f - t;
         break;
     }
     if (pass == 0) {
-        FontSetWindow(box, y, y + D_L00_001BC588[D_L00_001BC200.layout].height, -g_screen_width, g_screen_width * 2,
-                      x, y + D_L00_001BC588[D_L00_001BC200.layout].height / 2, D_L00_001BC200.style, 3);
+        FontSetWindow(box, y, y + g_fading_text_layouts[g_fading_text_style.layout].height, -g_screen_width, g_screen_width * 2,
+                      x, y + g_fading_text_layouts[g_fading_text_style.layout].height / 2, g_fading_text_style.style, 3);
         text_draw_window_small(box, color, text, -1);
     } else if (pass == 1) {
         int shade = (int)(alpha * 96.0f) << 24;
-        gfx_draw_colored_rectangle(y + 2, y + D_L00_001BC588[D_L00_001BC200.layout].height - 2, -g_screen_width,
+        gfx_draw_colored_rectangle(y + 2, y + g_fading_text_layouts[g_fading_text_style.layout].height - 2, -g_screen_width,
                       g_screen_width * 2, shade);
     }
 }

@@ -17,9 +17,9 @@ typedef struct {
 extern World2E71B8 ref_L00_00360ED0_03;
 extern State2E71B8 ref_L00_00360ED0_04;
 extern void gfx_select_packet_buffer_setup(void);
-extern void func_US2_002E7BE0(int);
+extern void level_transition_scene_start_us2(int);
 
-void func_US2_002E8010(void)
+void scene_init_playback_state_us2(void)
 {
     int base;
 
@@ -32,6 +32,6 @@ void func_US2_002E8010(void)
     ref_L00_00360ED0_04.unk6C = ref_L00_00360ED0_03.unk0C + base;
     ref_L00_00360ED0_04.unk70 = ref_L00_00360ED0_03.unk10 + base;
     ref_L00_00360ED0_02 = base;
-    func_US2_002E7BE0(3);
+    level_transition_scene_start_us2(3);
     ref_L00_00360ED0_04.unk34 = 1;
 }

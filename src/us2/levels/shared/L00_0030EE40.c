@@ -3,7 +3,7 @@
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
-void func_US2_L00_0030EE40(void)
+void level_l00_call_module_handler_7_us2(void)
 {
     int value = D_L00_001A904C_2;
 

@@ -8,7 +8,7 @@
 
 typedef unsigned int u32;
 
-extern u32 D_L09_001FE6C0[];
+extern u32 g_path_l09_table[];
 
 extern int func_L09_0033E8B0_2(char *object, int index, void *out, int a, int b, float f);
 
@@ -43,7 +43,7 @@ int enemy_walk_to_next_path_point(char *object, int index)
     }
     step = idx + 1;
     if (path_get_entry_id(index) < step) {
-        float *rec = (float *)(D_L09_001FE6C0[index] + step * 16);
+        float *rec = (float *)(g_path_l09_table[index] + step * 16);
 
         dist = mat_fast_helper_a(rec[4] - *(float *)(object + 0x10),
                              rec[5] - *(float *)(object + 0x14));

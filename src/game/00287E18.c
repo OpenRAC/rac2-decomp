@@ -12,24 +12,24 @@ typedef struct {
     s32 state;
 } StateTransitionView;
 
-extern StateTransitionView D_L00_001BEF00;
+extern StateTransitionView g_menu_transition_state;
 
 /* Owner-reviewed Qwen backlog: observed operations, not recovered original object boundaries. */
 
 /* func_00285840: owner ABI/declaration review retained. */
 /* extern declaration for global variable referenced in func_00285840 */
-extern unsigned int D_001BACC0;
+extern unsigned int g_menu_saved_state;
 
 /* Change resident state word from1 to2 only when the mode word equals7 */
 /* Moves the menu state from 1 to 2, but only while the menu mode is 7. */
 void menu_advance_state_in_mode_seven(void) {
-    if (D_L00_001BEF00.mode == 7 && D_L00_001BEF00.state == 1) {
-        D_L00_001BEF00.state = 2;
+    if (g_menu_transition_state.mode == 7 && g_menu_transition_state.state == 1) {
+        g_menu_transition_state.state = 2;
     }
 }
 
 /* Returns true while the saved menu state is 7. */
 int menu_is_state_seven(void)
 {
-    return D_001BACC0 == 7;
+    return g_menu_saved_state == 7;
 }

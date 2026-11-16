@@ -3,11 +3,11 @@
 #include "common.h"
 typedef int QuadEDA __attribute__((mode(TI)));
 typedef union VecEDA { QuadEDA q; float f[4]; } VecEDA;
-extern unsigned char *D_001B5390;
+extern unsigned char *g_camera_state_ptr;
 extern char *moby_get_motion_data(unsigned char *);
 extern int follower_get_state(unsigned char *);
-extern void func_PAL_002EE5C0(unsigned char *);
-extern void func_PAL_002EF630(unsigned char *);
+extern void follower_clamp_range_spawn_sparks_pal(unsigned char *);
+extern void follower_check_hazard_contact_pal(unsigned char *);
 extern void follower_move_toward_target(unsigned char *);
 extern void follower_limit_speed(unsigned char *);
 extern void UpdateBankedOrientation(unsigned char *);
@@ -27,8 +27,8 @@ extern float FastAddRotations(float,float);
 extern int math_fast_helper_a(void *,float);
 extern int math_random_int_range(int,int);
 extern void moby_release_motion_slot(unsigned char *);
-extern void func_PAL_002EF708(unsigned char *);
-extern void func_PAL_002EF800(unsigned char *);
+extern void follower_start_random_push_pal(unsigned char *);
+extern void follower_start_push_from_target_pal(unsigned char *);
 #define IEDA(p,o) (*(int *)((p)+(o)))
 #define FEDA(p,o) (*(float *)((p)+(o)))
 #define PEDA(p,o) (*(unsigned char **)((p)+(o)))
@@ -48,12 +48,12 @@ void func_PAL_L05_0037E8E0(unsigned char *owner)
     qcopy(d+0xB0,owner+0x10);
     if (follower_get_state(owner) != 8)
         FastVecAdd(owner+0x10,d+0x90,owner+0x10);
-    func_PAL_002EE5C0(owner);
-    func_PAL_002EF630(owner);
+    follower_clamp_range_spawn_sparks_pal(owner);
+    follower_check_hazard_contact_pal(owner);
     follower_move_toward_target(owner);
     follower_limit_speed(owner);
     UpdateBankedOrientation(owner);
-    cam = D_001B5390;
+    cam = g_camera_state_ptr;
     switch(follower_get_state(owner)) {
     case 7:
         vec_scale_to_length(&v,PEDA(d,0x120)+0xC0,-50.0f);
@@ -147,10 +147,10 @@ void func_PAL_L05_0037E8E0(unsigned char *owner)
         follower_set_push_vector(owner,&v);
         break;
     case 1:
-        if(follower_has_reached_target(owner)) func_PAL_002EF708(owner);
+        if(follower_has_reached_target(owner)) follower_start_random_push_pal(owner);
         break;
     case 13:
-        if(follower_has_reached_target(owner)) func_PAL_002EF800(owner);
+        if(follower_has_reached_target(owner)) follower_start_push_from_target_pal(owner);
         break;
     }
 }

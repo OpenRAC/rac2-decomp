@@ -7,22 +7,22 @@ extern int PlayMobySound(int, int, u8 *);
 extern void moby_mark_spawned(u8 *object);
 
 /* the steering constants of the homing shot */
-extern float D_L23_001B1914 __attribute__((sda));
+extern float g_homing_shot_param_a __attribute__((sda));
 
-extern float D_L23_001B1918 __attribute__((sda));
+extern float g_homing_shot_param_b __attribute__((sda));
 
-extern float D_L23_001B191C __attribute__((sda));
+extern float g_homing_shot_param_c __attribute__((sda));
 
-extern float D_L23_001B1920 __attribute__((sda));
+extern float g_homing_shot_param_d __attribute__((sda));
 
-extern float D_L23_001B192C __attribute__((sda));
+extern float g_homing_l23_shot_quat_scale __attribute__((sda));
 
-extern float D_L23_001B1930 __attribute__((sda));
+extern float g_homing_shot_vec_scale __attribute__((sda));
 
 /* Absolute scalar view; the surrounding object extent is unqualified. */
-extern float D_L23_001B3700[] __attribute__((sda));
+extern float g_mothership_state_param_a[] __attribute__((sda));
 
-extern u8 D_L23_001A8F20[] __attribute__((sda));
+extern u8 g_zero_l23_vec[] __attribute__((sda));
 
 /* the last hit reported by the collision query */
 typedef struct {
@@ -118,17 +118,17 @@ void homing_l23_shot_update(u8 *obj) {
     vec_scale_to_length(vel, obj + 0xC0, *(float *)(vars + 0x1C));
     vec_scale_to_length(axis, up, 1.0f);
     FastVecCross(quat, obj + 0xE0, axis);
-    FastVecScale(quat, quat, D_L23_001B192C * 0.5f);
+    FastVecScale(quat, quat, g_homing_l23_shot_quat_scale * 0.5f);
     quat_len = FastVecLength(quat);
     quat[3] = -square_root(1.0f - quat_len * quat_len);
     quaternion_to_rotation_basis(quat, mtx);
     multiply_matrix3x3(obj + 0xC0, mtx, obj + 0xC0);
     if (*(u8 **)(vars + 0x18) != 0) {
         if (vars[0x28] != 0) {
-            FastVecScale(vec_c, *(u8 **)(vars + 0x18) + 0xE0, D_L23_001B1930);
+            FastVecScale(vec_c, *(u8 **)(vars + 0x18) + 0xE0, g_homing_shot_vec_scale);
             FastVecAdd(vec_b, *(u8 **)(vars + 0x18) + 0x10, vec_c);
             vec_turn_toward_target(obj + 0x10, obj + 0xC0, vec_b, vars + 0x20, up, vec_a,
-                              D_L23_001B1914, D_L23_001B1918, 0.0f, D_L23_001B1920);
+                              g_homing_shot_param_a, g_homing_shot_param_b, 0.0f, g_homing_shot_param_d);
             vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
             FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
         } else if (vars[0x29] != 0) {
@@ -136,7 +136,7 @@ void homing_l23_shot_update(u8 *obj) {
                 FastVecSub(vec_a, obj + 0x10, *(u8 **)(vars + 0x2C));
                 if (FastVecDot(vec_a, vel) < 0.0f) {
                     vec_turn_toward_target(obj + 0x10, obj + 0xC0, *(u8 **)(vars + 0x2C), vars + 0x20, up, vec_b,
-                                      D_L23_001B1914, D_L23_001B1918, 0.0f, D_L23_001B191C);
+                                      g_homing_shot_param_a, g_homing_shot_param_b, 0.0f, g_homing_shot_param_c);
                     vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
                     FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
                 }
@@ -153,7 +153,7 @@ void homing_l23_shot_update(u8 *obj) {
     color_rand = math_random_int_below(0xFF);
     vec_random_direction(vec_a, 0.0f, 0.1f);
     FastVecAdd(vec_a, vec_a, vec_b);
-    part_spawn_gravity_fade(vec_a, D_L23_001A8F20, 0xF, 0x808080, color_rand, 0x20, 0, spark_size * 210000.0f, spark_size * 42000.0f, 0.0f, 0);
+    part_spawn_gravity_fade(vec_a, g_zero_l23_vec, 0xF, 0x808080, color_rand, 0x20, 0, spark_size * 210000.0f, spark_size * 42000.0f, 0.0f, 0);
     FastVecAdd(vec_b, vec_b, vec_c);
     qcopy(vec_a, obj + 0x10);
     FastVecAdd(obj + 0x10, obj + 0x10, vel);
@@ -163,7 +163,7 @@ void homing_l23_shot_update(u8 *obj) {
     }
     rec.obj = obj;
     rec.flags = 0x8B0003;
-    rec.f1C = D_L23_001B3700[0];
+    rec.f1C = g_mothership_state_param_a[0];
     rec.f20 = 0;
     rec.b18 = 3;
     rec.b19 = 3;
@@ -196,7 +196,7 @@ void homing_l23_shot_update(u8 *obj) {
         return;
     }
     if (obj[0xBC] != 0) {
-        SpawnExplosionEffects(obj, D_L23_001A8F20, 0, 2, 1, 4, -1, 0, 0, -1, 0, 0x810001,
+        SpawnExplosionEffects(obj, g_zero_l23_vec, 0, 2, 1, 4, -1, 0, 0, -1, 0, 0x810001,
                       0.0f, 0.0f, 1.5f, 1.0f, 9.0f, 1.0f, 15.0f);
         coll_process_hit(obj + 0x10, 0, *(s32 *)(vars + 0x10), &rec, 2.0f);
         moby_mark_spawned(obj);

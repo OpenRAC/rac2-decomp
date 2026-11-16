@@ -4,16 +4,16 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern void moby_set_state(u8 *,s32,s32);
-extern u8 *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float,
+extern u8 *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float,
                            int, int, int, void *);
 struct Pair43E150 {
     float a;
     float b;
 };
-extern const struct Pair43E150 D_L02_001B29B0;
-extern const struct Pair43E150 D_L02_001B29B8;
-extern const TI128 D_L02_001B29C0[2];
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, s32, s32, s32, s32, s32, unsigned char, s32);
+extern const struct Pair43E150 g_debris_burst_params_a;
+extern const struct Pair43E150 g_debris_burst_params_b;
+extern const TI128 g_debris_burst_colors[2];
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, s32, s32, s32, s32, s32, unsigned char, s32);
 extern void vec_local_offset_to_world(char *, char *, float, float, float);
 extern int math_fast_float_d(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -23,22 +23,22 @@ extern void func_PAL_L00_002ED7E8(void *,void *,float,void *,float,int,unsigned 
 void func_PAL_L02_00443B98(u8 *a0) {
     u8 *state = *(u8 **)(a0 + 0x68);
     int kind = a0[0x20];
-    struct Pair43E150 a = D_L02_001B29B0;
-    struct Pair43E150 b = D_L02_001B29B8;
+    struct Pair43E150 a = g_debris_burst_params_a;
+    struct Pair43E150 b = g_debris_burst_params_b;
     TI128 c[2];
     float d[4] __attribute__((aligned(16)));
     float e[4] __attribute__((aligned(16)));
 
-    c[0] = D_L02_001B29C0[0];
-    c[1] = D_L02_001B29C0[1];
+    c[0] = g_debris_burst_colors[0];
+    c[1] = g_debris_burst_colors[1];
     *(TI128 *)d = 0;
     switch (kind) {
     case 0:
-        func_PAL_L00_0032C328(a0, c, &b, &a, 0xFFFF, 0, -1, 0x10, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces_pal(a0, c, &b, &a, 0xFFFF, 0, -1, 0x10, 0xFFFF, 0xFF, 0);
         *(u32 *)(a0 + 0x98) = *(u32 *)(*(u8 **)(a0 + 0x24) + 0x10);
         *(u16 *)(a0 + 0x7C) = 0;
         vec_local_offset_to_world((char *)a0, (char *)e, d[0], d[1], d[2]);
-        func_PAL_L00_003FB330(e, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(float *)(a0 + 0x2C) * 7.0f,
+        SpawnExplosion_pal(e, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(float *)(a0 + 0x2C) * 7.0f,
                       20.0f, 1, 1, 1, 0);
         *(s32 *)state = 0x11;
         moby_set_state(a0, 1, -1);
@@ -46,7 +46,7 @@ void func_PAL_L02_00443B98(u8 *a0) {
     case 1:
         if (math_fast_float_d(state) != 0) {
             vec_local_offset_to_world((char *)a0, (char *)e, d[0], d[1], d[2]);
-            func_PAL_L00_003FB330(e, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0,
+            SpawnExplosion_pal(e, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0,
                           *(float *)(a0 + 0x2C) * 3.5f, 20.0f, 0, 0, 0, 0);
             *(s32 *)(state + 4) = 0x64;
             moby_set_state(a0, 2, -1);

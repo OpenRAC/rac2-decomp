@@ -10,23 +10,23 @@ extern void entry_init_all_registered(void);
 extern void hero_set_state_value_a(s32 a0);
 extern u8 **level_get_object_list(void);
 extern s32 level_get_saved_value(void);
-extern void func_PAL_L05_0037D9D0(u8 *a0, s32 a1);
+extern void entry_spawn_list_objects_with_flag_pal(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
 extern void func_PAL_L05_00425FB0(u8 *a0, s32 a1);
-extern s32 D_L05_001B1364 __attribute__((sda));
-extern s32 D_L05_00221D10[];
-extern s32 D_L05_001B2048;
-extern u8 *D_L05_001B2614;
+extern s32 g_feltzin_challenge_active __attribute__((sda));
+extern s32 g_feltzin_challenge_state[];
+extern s32 g_feltzin_mission_index;
+extern u8 *g_feltzin_enemy_table;
 
-void func_PAL_L05_004267E0(u8 *arg0) {
+void feltzin_mission_three_update_pal(u8 *arg0) {
     s32 n;
     s32 count;
     u8 **p;
 
-    if (D_L05_001B1364 == 0) {
-        D_L05_00221D10[11] = 0;
-        D_L05_001B1364 = 1;
+    if (g_feltzin_challenge_active == 0) {
+        g_feltzin_challenge_state[11] = 0;
+        g_feltzin_challenge_active = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -36,15 +36,15 @@ void func_PAL_L05_004267E0(u8 *arg0) {
             n = count;
             do {
                 if (*(s16 *)(*p + 0xAA) == 0xF73) {
-                    func_PAL_L05_0037D9D0(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
+                    entry_spawn_list_objects_with_flag_pal(*p, 1);
+                    func_L05_0037CEE0(*p, (u8 *)g_feltzin_enemy_table + (g_feltzin_challenge_state[0] << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*p, (u8 *)g_feltzin_enemy_table + (g_feltzin_challenge_state[0] << 7) + 0x30, 64.0f);
                 }
                 n--;
                 p++;
             } while (n);
         }
     }
-    if (D_L05_00221D10[4] == 0 && D_L05_001B2048 >= 6)
+    if (g_feltzin_challenge_state[4] == 0 && g_feltzin_mission_index >= 6)
         func_PAL_L05_00425FB0(arg0, 2);
 }

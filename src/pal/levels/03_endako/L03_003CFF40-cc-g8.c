@@ -35,7 +35,7 @@ typedef struct {
 /* The object pointer is small data (the retail reaches it through $gp in
    ordinary flow, not only in a delay slot), the state word is not: the retail
    reads it with an absolute lui/%lo pair and clears it from a delay slot. */
-extern L03_003D21F8_Obj *D_L03_001B0670 __attribute__((sda));
+extern L03_003D21F8_Obj *g_camera_override_slot __attribute__((sda));
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(char *a0, char *a1, char *a2);
@@ -44,10 +44,10 @@ extern s32  flag_is_third_pending_set(char *a0);
 extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
 extern void snd_stop_voice(s32 a0);
 extern void moby_set_state_in_list(int a0, int a1);
-extern u8  *D_L03_001B2A1C;
+extern u8  *g_moby_record_base;
 extern u8   g_sound_state[];
-extern s32  D_L03_001B0438 __attribute__((sda));
-extern f32  D_L03_001B043C __attribute__((sda));
+extern s32  g_ant_bridge_divisor __attribute__((sda));
+extern f32  g_ant_bridge_angle_limit __attribute__((sda));
 
 /* The actor's per-frame update: state 0 spawns it and aims, state 2 looks the
    target up, states 3 and 4 turn it by a rate that decays; every other state
@@ -64,7 +64,7 @@ void func_PAL_L03_003CFF40(char *a0)
         if (*(s32 *)(s1 + 0x70) != -1) {
             moby_set_state(s2, 2, -1);
             s0 = s1 + 0x60;
-            FastVecSub(s0, D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
+            FastVecSub(s0, g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
             *(s32 *)(s1 + 0x7C) = -1;
             *(s32 *)(s1 + 0x78) = 0;
             matrix_from_basis_rows(buf, s2 + 0xC0);
@@ -76,7 +76,7 @@ void func_PAL_L03_003CFF40(char *a0)
     case 2: {
         char *p;
 
-        if (flag_is_third_pending_set(D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100) == 0) {
+        if (flag_is_third_pending_set(g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100) == 0) {
             break;
         }
         p = g_sound_state + *(s32 *)(s1 + 0x7C) * 0x70;
@@ -94,7 +94,7 @@ void func_PAL_L03_003CFF40(char *a0)
         f32 v;
 
         *(f32 *)(s1 + 0x74) = *(f32 *)(s1 + 0x74)
-            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(D_L03_001B0438) * 5 + 2) / 6) + 0.00013962637f);
+            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
         t = *(f32 *)(s2 + 0xF4) + *(f32 *)(s1 + 0x74);
         *(f32 *)(s2 + 0xF4) = t;
         if (1.69646013f < t) {
@@ -118,7 +118,7 @@ void func_PAL_L03_003CFF40(char *a0)
                 moby_set_state(s2, 5, -1);
             }
         }
-        q = D_L03_001B2A1C + *(s32 *)(s1 + 0x70) * 0x100 + 0x10;
+        q = g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100 + 0x10;
         matrix_mul_vec3(q, s1 + 0x60, s2 + 0xC0);
         FastVecAdd(q, q, s2 + 0x10);
         break;
@@ -128,9 +128,9 @@ void func_PAL_L03_003CFF40(char *a0)
         f32 t;
         f32 v;
 
-        f3 = D_L03_001B043C * 3.14159274f;
+        f3 = g_ant_bridge_angle_limit * 3.14159274f;
         *(f32 *)(s1 + 0x74) = *(f32 *)(s1 + 0x74)
-            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(D_L03_001B0438) * 5 + 2) / 6) + 0.00013962637f);
+            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
         t = *(f32 *)(s2 + 0xF4) + *(f32 *)(s1 + 0x74);
         *(f32 *)(s2 + 0xF4) = t;
         if (f3 < t) {
@@ -155,7 +155,7 @@ typedef struct {
     u8 pad04[0xC];
 } L03_22C8Entry;
 
-extern L03_22C8Entry *D_L03_001FE700[];
+extern L03_22C8Entry *g_path_l03_entry_table[];
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

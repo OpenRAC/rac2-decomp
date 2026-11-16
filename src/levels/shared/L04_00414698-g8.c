@@ -23,17 +23,17 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; int i[4]; } Vec;
 extern u8 g_sound_state[];
 extern u8 g_hero_state[];
-extern float D_00189FC0 NOT_SDA;
-extern u8 D_001B9540[];
+extern float g_hoverboard_rotation NOT_SDA;
+extern u8 g_hover_config[];
 extern u8 g_hero_position[];
-extern u8 D_001BFAC0[];
-extern Quad D_001B9900;
-extern int D_00138320 NOT_SDA;
-extern int D_001A7CC0 __attribute__((sda));
-extern int D_L04_001B08F0 __attribute__((sda));
+extern u8 g_hover_target_buffer[];
+extern Quad g_hover_debug_quad;
+extern int g_pad_pressed_flags NOT_SDA;
+extern int g_hoverboard_debug_flag __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
 extern u8 *g_moby_l04_pool;
-extern float D_001BFB00[];
-extern char D_L04_001A8F20[] MACRO_ADDR;
+extern float g_hover_direction_vec[];
+extern char g_effect_default_params[] MACRO_ADDR;
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int GetCollHitMaterial(void);
 extern int snd_is_voice_playing_for_owner(void *, int);
@@ -119,7 +119,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
     if (object[0xBC] == 5) {
         if (object[0x20] != 3) {
             pad_clamp_stick_to_unit_range(&v20, st + 0x2C0, 0.12f);
-            D_00189FC0 = FastAddRotations(CFG->f158,
+            g_hoverboard_rotation = FastAddRotations(CFG->f158,
                                        mat_fast_helper_a(math_fabs(v20.f[1]), v20.f[0]));
         } else {
             float t = mat_fast_helper_a(F(0x6A0) - OF(0x10), F(0x6A4) - OF(0x14));
@@ -189,20 +189,20 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
             }
         }
         if (GetCollHitMaterial() == 7 && S(0x274) == 0) {
-            if (D_L04_001B08F0 == 0) PlayMobySound(0x11, 0, object);
+            if (g_race_bike_mode == 0) PlayMobySound(0x11, 0, object);
             if (snd_is_voice_playing_for_owner(object, I(0x748)) == 0) I(0x748) = PlayMobySound(0x12, 4, object);
             if (snd_is_voice_playing_for_owner(object, I(0x74C)) == 0) I(0x74C) = PlayMobySound(0x13, 4, object);
-            D_L04_001B08F0 = 1;
+            g_race_bike_mode = 1;
         } else {
             SND_STOP(0x748)
             SND_STOP(0x74C)
-            D_L04_001B08F0 = 0;
+            g_race_bike_mode = 0;
         }
         if (idle) {
-            if ((D_00138320 & 0x40) || object[0x20] == 3) {
+            if ((g_pad_pressed_flags & 0x40) || object[0x20] == 3) {
                 math_spring_float_to_goal((float *)(st + 0x30C), (float *)(st + 0x288), 0.33333334f,
-                              D_L04_001B08F0 != 0 ? 0.011f : 0.022f, 0.5f,
-                              D_L04_001B08F0 != 0 ? 0.013888889f : 0.027777778f);
+                              g_race_bike_mode != 0 ? 0.011f : 0.022f, 0.5f,
+                              g_race_bike_mode != 0 ? 0.013888889f : 0.027777778f);
             } else {
                 ApproachValue((float *)(st + 0x30C), 0.050000004f, 0.0027777778f);
             }
@@ -217,7 +217,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
     limit = math_lerp_float(0.05817765f, I(0x338) != 0 ? 0.01658063f : 0.021816619f, grip);
     factor = (1.0f - grip) + 1.0f;
     if (factor > 1.9f) factor = 1.9f;
-    if (D_L04_001B08F0 != 0) {
+    if (g_race_bike_mode != 0) {
         factor = 2.75f;
         limit = limit * 1.25f;
     }
@@ -231,7 +231,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
         if (limit < 0.000029088826f) limit = 0.000029088826f;
         math_approach_with_velocity((float *)(object + 0xF8), HEAD, (float *)(st + 0x308), damping, 0.3f, limit, 0);
     }
-    if (D_L04_001B08F0 != 0) {
+    if (g_race_bike_mode != 0) {
         if (I(0x64C) != 0 && I(0x71C) != 0) {
             FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
             FastVecSub((st + 0x290), (st + 0x290), &v20);
@@ -249,15 +249,15 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
         FastVecAdd((st + 0x290), (st + 0x290), &v20);
     }
     if (math_fast_float_d(st + 0x64C) == 0) {
-        extern int D_001A7CC0;
+        extern int g_hoverboard_debug_flag;
         FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.025f);
         FastVecAdd((st + 0x290), (st + 0x290), &v20);
         I(0x71C) = 1;
-        dbg = D_001A7CC0;
+        dbg = g_hoverboard_debug_flag;
     } else {
-        dbg = D_001A7CC0;
+        dbg = g_hoverboard_debug_flag;
     }
-    if (dbg != 0) qcopy(&D_001B9900, &v20);
+    if (dbg != 0) qcopy(&g_hover_debug_quad, &v20);
     bike_compute_target_height(object, st, height, 0.2f, 0.23f, 12.0f, 0.1f);
     if (height > 0.44f) {
         S(0x274) = 1;
@@ -303,7 +303,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
         math_fast_float_d(st + 0x34C);
         if (I(0x34C) == 0) st[0x349] = 0;
     } else if (S(0x274) == 0) {
-        vec_scale_to_length((float *)(st + 0x2B0), D_001BFB00, 1.0f);
+        vec_scale_to_length((float *)(st + 0x2B0), g_hover_direction_vec, 1.0f);
         mat_aim_with_spring(object + 0xC0, object + 0xF0, st + 0x304, (st + 0x2B0), 0.03f, 0.3f, 0.0f);
     } else {
         vec_build_spherical_offset((float *)(st + 0x2B0), 1.0f, FastAddRotations(OF(0xF8), 3.1415927f), 0.99483776f);
@@ -317,7 +317,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
     int result = ResolveVehicleMovementCollisions(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
                                    F(0x30C) + F(0x27C), F(0x280), 0.16666667f, F(0x24), F(0x20));
     if (result != 0) {
-        if (D_L04_001B08F0 != 0) FastVecScale((st + 0x290), (st + 0x290), 0.85f);
+        if (g_race_bike_mode != 0) FastVecScale((st + 0x290), (st + 0x290), 0.85f);
         if (flag2 != 0)
             I(0x70C) = I(0x70C) + 1;
         else
@@ -387,7 +387,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
                     CFG->f168 = 0x3C;
                     CFG->f160 = 0.2f;
                     CFG->f180 = 0.1f;
-                    tag = D_L04_001A8F20;
+                    tag = g_effect_default_params;
                     CFG->f16C = 0;
                     queue_copy_record_by_index(0x1C);
                     SpawnExplosion((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
@@ -412,7 +412,7 @@ void hoverboard_update_rider_physics(u8 *object, u8 *st)
                         add_vectors(&vA0, &v80, &v90);
                         if (CollLine(&v90, &v80, 2, 0, 0) != 0) {
                             if (GetCollHitMaterial() != result) {
-                                L04_HoverTarget *hit = (L04_HoverTarget *)D_001BFAC0;
+                                L04_HoverTarget *hit = (L04_HoverTarget *)g_hover_target_buffer;
                                 float f20;
                                 x = mat_fast_helper_a(hit->v[2], vec_length_xy(hit->v));
                                 f20 = FastAddRotations(mat_fast_helper_a(hit->v[0], hit->v[1]), 3.1415927f);

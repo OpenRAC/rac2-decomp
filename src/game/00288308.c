@@ -52,11 +52,11 @@ extern unsigned char g_item_slot_to_record[];
 
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
 
-extern unsigned char D_001A7B30[] __attribute__((sda));
+extern unsigned char g_help_unlocked_flags[] __attribute__((sda));
 
 extern int g_item_ammo_counts[];
 
-extern int D_001398A8;
+extern int g_help_unlock_word;
 
 extern int menu_seek_chain_entry(int, int);
 
@@ -74,7 +74,7 @@ void help_unlock_entry(int helpId)
     if (g_item_owned_flags[helpId] != 0)
         return;
     g_item_owned_flags[helpId] = 1;
-    D_001A7B30[helpId] = 1;
+    g_help_unlocked_flags[helpId] = 1;
     record = &g_weapon_table[g_item_slot_to_record[helpId]];
     if (record->half88 != 0 && g_item_ammo_counts[helpId] == 0)
         g_item_ammo_counts[helpId] = record->half92;
@@ -83,7 +83,7 @@ void help_unlock_entry(int helpId)
     if (helpId == 0x10) {
         if (flag_is_byte_set() != 0) {
             menu_seek_chain_entry(0x10, 2);
-            D_001398A8 = 0;
+            g_help_unlock_word = 0;
         }
     }
 }

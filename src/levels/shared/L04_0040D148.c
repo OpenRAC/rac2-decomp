@@ -12,7 +12,7 @@ typedef struct {
     unsigned long long primitive, texture, mode, flags;
 } B1202Packet;
 
-extern int D_L04_001B2008[] __attribute__((sda));
+extern int g_game_tick_counter[] __attribute__((sda));
 extern float IntToFloat(int);
 extern float fast_fmod(float, float);
 extern float math_fast_sin_or_cos_b(float);
@@ -46,7 +46,7 @@ void DrawPulsingGlowSphere(unsigned char *moby, int alpha)
     int i, j;
     int rows = 10, cols = 10;
 
-    t = math_fast_sin_or_cos_b(fast_fmod(IntToFloat(D_L04_001B2008[0]), 180.0f) * 0.0055555557f * 6.283186f);
+    t = math_fast_sin_or_cos_b(fast_fmod(IntToFloat(g_game_tick_counter[0]), 180.0f) * 0.0055555557f * 6.283186f);
     t = (t + 1.0f) * 0.5f;
     if (alpha == -1) {
         color = FastTweenColor(0x1fb43264, 0x1f502800, t);
@@ -56,7 +56,7 @@ void DrawPulsingGlowSphere(unsigned char *moby, int alpha)
         }
         color = FastTweenColor(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
     }
-    offset = fast_fmod(IntToFloat(D_L04_001B2008[0]), 30.0f) * 0.033333335f;
+    offset = fast_fmod(IntToFloat(g_game_tick_counter[0]), 30.0f) * 0.033333335f;
     euler_to_matrix(matrix, moby + 0xf0);
     *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(moby + 0x10);
     vec_scale_to_length(matrix[0], matrix[0], 0.4f);

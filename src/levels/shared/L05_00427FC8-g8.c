@@ -3,9 +3,9 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* number of live effects of this kind, and the five slots they occupy */
-extern float D_L05_001B157C __attribute__((sda));
-extern s32 D_L05_001B35B0[5] MACRO_ADDR;
-extern u8 D_L05_001B9580[];
+extern float g_limited_blast_count __attribute__((sda));
+extern s32 g_blast_slot_used[5] MACRO_ADDR;
+extern u8 g_hero_l05_state[];
 
 extern void *CreateMoby(s32);
 extern float math_random_signed_float_range(float, float);
@@ -29,22 +29,22 @@ void *part_spawn_limited_blast(u8 *pos, u8 *parent, s32 flag, float scale, s32 a
     u8 *vars;
     float angle;
 
-    if (D_L05_001B157C == -1.0f) {
+    if (g_limited_blast_count == -1.0f) {
         for (i = 0; i < 5; i++) {
-            D_L05_001B35B0[i] = 0;
+            g_blast_slot_used[i] = 0;
         }
-        D_L05_001B157C = 0.0f;
+        g_limited_blast_count = 0.0f;
     }
-    if (D_L05_001B157C >= 5.0f) {
+    if (g_limited_blast_count >= 5.0f) {
         return 0;
     }
     for (i = 0; i < 5; i++) {
-        if (D_L05_001B35B0[i] == 0) {
+        if (g_blast_slot_used[i] == 0) {
             break;
         }
     }
-    D_L05_001B157C += 1.0f;
-    D_L05_001B35B0[i] = 1;
+    g_limited_blast_count += 1.0f;
+    g_blast_slot_used[i] = 1;
     obj = CreateMoby(0x1193);
     if (obj != 0) {
         vars = *(u8 **)(obj + 0x68);
@@ -79,16 +79,16 @@ void *part_spawn_limited_blast(u8 *pos, u8 *parent, s32 flag, float scale, s32 a
         if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
-            if (fast_vec_dist(pos, D_L05_001B9580 + 0x140) < 48.0f && flag != 0) {
-                u8 *ref = D_L05_001B9580;
+            if (fast_vec_dist(pos, g_hero_l05_state + 0x140) < 48.0f && flag != 0) {
+                u8 *ref = g_hero_l05_state;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x28;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                FastVecSub(&dir, obj + 0x10, D_L05_001B9580 + 0x140);
+                FastVecSub(&dir, obj + 0x10, g_hero_l05_state + 0x140);
                 vec_scale_to_length(&dir, &dir, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(&dir, D_L05_001B9580 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(&dir, g_hero_l05_state + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {

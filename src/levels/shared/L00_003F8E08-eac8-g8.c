@@ -14,9 +14,9 @@ typedef struct {
 } SpawnSlots_L00_003FEAC8;
 
 /* The boot's resident byte that picks the table row. */
-extern u8 D_00139581[];
+extern u8 g_hoverbomb_weapon_index[];
 extern TableEntry_L00_003FEAC8 g_weapon_l00_table[];
-extern float D_L00_001B0C14 __attribute__((sda));
+extern float g_linked_effect_scale __attribute__((sda));
 
 /* Call targets that sit at another address in each level (level 00: 0x3FEBA0 is
    func_L00_003FEBA0, then 0x2EE238, 0x31A768 and 0x3A98E8). */
@@ -37,11 +37,11 @@ void part_spawn_linked_effect_with_sparks(char *obj, char *pos, void *direction,
     char *spawned;
 
     qcopy(dir, direction);
-    entry = g_weapon_l00_table + D_00139581[0];
+    entry = g_weapon_l00_table + g_hoverbomb_weapon_index[0];
     scale = entry->scale;
     ref_L00_003FEAC8_00(obj, pos, direction);
     length = ref_L00_003FEAC8_01(dir);
-    spawned = ref_L00_003FEAC8_03(pos, dir, obj, length, scale, ref_L00_003FEAC8_02(1, 30), D_L00_001B0C14);
+    spawned = ref_L00_003FEAC8_03(pos, dir, obj, length, scale, ref_L00_003FEAC8_02(1, 30), g_linked_effect_scale);
     slots->spawned[slot] = spawned;
     if (spawned != 0) {
         *(char **)(spawned + 0xB8) = obj;

@@ -10,7 +10,7 @@ extern float FastVecLength(void *);
 extern void FastVecScale(void *,void *,float);
 extern int math_fast_float_d(int *);
 extern void moby_mark_spawned(void *);
-extern Vector128 D_L16_001BFF70[2];
+extern Vector128 g_debris_hit_state[2];
 /* Moves a bouncing object (moby class 2688) by its velocity, bounces it off walls and fades it out when it stops or gets old. */
 void bouncing_l16_debris_update(char *object)
 {
@@ -23,11 +23,11 @@ void bouncing_l16_debris_update(char *object)
     *(float *)(object+0xf4)=FastAddRotations(*(float *)(object+0xf4),*(float *)(state+0x14));
     *(float *)(object+0xf8)=FastAddRotations(*(float *)(object+0xf8),*(float *)(state+0x18));
     if (coll_test_point(object+0x10,0,object,1.5f)!=0) {
-        *(Vector128 *)(object+0x10)=D_L16_001BFF70[0];
-        if (FastVecDot(state,&D_L16_001BFF70[1])<0.0f) {
-            vec_scale_to_length(&D_L16_001BFF70[1],&D_L16_001BFF70[1],1.0f);
+        *(Vector128 *)(object+0x10)=g_debris_hit_state[0];
+        if (FastVecDot(state,&g_debris_hit_state[1])<0.0f) {
+            vec_scale_to_length(&g_debris_hit_state[1],&g_debris_hit_state[1],1.0f);
             speed=FastVecLength(state);
-            FastVecScale(correction,&D_L16_001BFF70[1],-FastVecDot(state,&D_L16_001BFF70[1])*1.25f);
+            FastVecScale(correction,&g_debris_hit_state[1],-FastVecDot(state,&g_debris_hit_state[1])*1.25f);
             FastVecAdd(state,state,correction);
             vec_scale_to_length(state,state,speed*0.5f);
         }

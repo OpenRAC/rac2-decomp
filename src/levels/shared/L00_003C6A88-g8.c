@@ -1,3 +1,4 @@
+#include "names.h"
 /* Beam-chain and pulse reset, following the corresponding
  * reset_beam_chain_and_pulse_state in OpenRAC/rac1-decomp (GPL-3.0).
  * Incomplete small-data arrays retain the measured absolute macro accesses;
@@ -6,18 +7,18 @@
 #include "common.h"
 typedef int Q128 __attribute__((mode(TI)));
 
-extern int D_L00_001B2A00[] MACRO_ADDR;
-extern float D_L00_001AFFA4 __attribute__((sda));
-extern float D_L00_001B2A10 __attribute__((sda));
-extern float D_L00_001AFFF4 __attribute__((sda));
-extern float D_L00_001AFFFC __attribute__((sda));
-extern float D_L00_001B0000 __attribute__((sda));
-extern int D_L00_001B2A14[] MACRO_ADDR;
-extern int D_L00_001B2ACC[] MACRO_ADDR;
-extern int D_L00_001B2AC0[] MACRO_ADDR;
-extern Q128 D_L00_001B2A50[] MACRO_ADDR;
-extern Q128 D_L00_002403C0[];
-extern Q128 D_L00_002403B0[];
+extern int g_sheepinator_l00_beam_reset[] MACRO_ADDR;
+extern float g_aim_target_range __attribute__((sda));
+extern float g_lightning_l00_segment_length_2 __attribute__((sda));
+extern float g_ribbon_scroll_u __attribute__((sda));
+extern float g_ribbon_scroll_v __attribute__((sda));
+extern float g_ribbon_scroll_w __attribute__((sda));
+extern int g_lightning_spin_angle[] MACRO_ADDR;
+extern int g_lightning_spark_cooldown[] MACRO_ADDR;
+extern int g_lightning_spark_active[] MACRO_ADDR;
+extern Q128 g_lightning_spark_directions[] MACRO_ADDR;
+extern Q128 g_lightning_beam_points[];
+extern Q128 g_lightning_beam_offsets[];
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -32,23 +33,23 @@ void ResetBeamChainAndPulseState(char *owner)
     int slot;
 
     vars = *(char **)(owner + 0x68);
-    if (D_L00_001B2A00[0] == 0)
+    if (g_sheepinator_l00_beam_reset[0] == 0)
         return;
-    D_L00_001B2A00[0] = 0;
-    step = D_L00_001AFFA4 / IntToFloat(12);
-    D_L00_001B2A10 = step;
+    g_sheepinator_l00_beam_reset[0] = 0;
+    step = g_aim_target_range / IntToFloat(12);
+    g_lightning_l00_segment_length_2 = step;
     FastVecScale(&shift, owner + 0xC0, -step);
-    qcopy(&D_L00_002403C0[0], vars);
+    qcopy(&g_lightning_beam_points[0], vars);
     for (i = 10; i >= 0; i--) {
-        FastVecAdd(&D_L00_002403C0[11 - i], &D_L00_002403B0[11 - i], &shift);
+        FastVecAdd(&g_lightning_beam_points[11 - i], &g_lightning_beam_offsets[11 - i], &shift);
     }
-    *(int *)&D_L00_001AFFF4 = 0;
-    *(int *)&D_L00_001AFFFC = 0;
-    *(int *)&D_L00_001B0000 = 0;
-    D_L00_001B2A14[0] = 0;
-    D_L00_001B2ACC[0] = 0;
+    *(int *)&g_ribbon_scroll_u = 0;
+    *(int *)&g_ribbon_scroll_v = 0;
+    *(int *)&g_ribbon_scroll_w = 0;
+    g_lightning_spin_angle[0] = 0;
+    g_lightning_spark_cooldown[0] = 0;
     for (slot = 0; slot < 3; slot++) {
-        D_L00_001B2AC0[slot] = 0;
-        qcopy(&D_L00_001B2A50[slot], shift);
+        g_lightning_spark_active[slot] = 0;
+        qcopy(&g_lightning_spark_directions[slot], shift);
     }
 }

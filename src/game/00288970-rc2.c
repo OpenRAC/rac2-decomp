@@ -25,15 +25,15 @@
  */
 #include "common.h"
 
-extern s32  D_001B22B0[] __attribute__((sda));
+extern s32  g_packet_buffer_size[] __attribute__((sda));
 
-extern s8 D_001BAECC[];
+extern s8 g_memory_offset_base[];
 /* Works out a value from a size, or fails with -1 when the size is above 0x40000. */
 s32 mem_compute_sized_offset(u32 size, s32 *out_value) {
     if (size > 0x40000U) {
         *out_value = 0;
         return -1;
     }
-    *out_value = (*(s32 *)((s32)D_001BAECC) + D_001B22B0[0]) - size;
+    *out_value = (*(s32 *)((s32)g_memory_offset_base) + g_packet_buffer_size[0]) - size;
     return 0;
 }

@@ -7,7 +7,7 @@ extern PlayerStatBlock g_player_bolts __attribute__((sda));
 
 extern int g_homing_pickup_target __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern unsigned short D_0018D030 __attribute__((nosda));
+extern unsigned short g_map_flag_word __attribute__((nosda));
 extern float fast_vec_dist(void *, void *);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern float FastAddRotations(float, float);
@@ -48,7 +48,7 @@ void UpdateHomingPickup(char *object)
         }
         if (distance < 0.5f) {
             if (g_player_bolts.counter == 0) {
-                if (D_0018D030 == 0 && g_current_map_index[0] == 0x19)
+                if (g_map_flag_word == 0 && g_current_map_index[0] == 0x19)
                     subtitle_request_voice_line(0xA3B, 0x92);
             } else {
                 level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x1282), -1);

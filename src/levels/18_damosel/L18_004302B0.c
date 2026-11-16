@@ -16,7 +16,7 @@ extern void moby_set_state(u8 *, int, int);
 
 /* Sixteen floats copied as a block with unaligned doubleword moves. */
 typedef struct { float value[16]; } __attribute__((packed)) InitValues;
-extern InitValues D_L18_001B1570;
+extern InitValues g_extermibot_part_init_values;
 
 #define W(p, o) (*(int *)((p) + (o)))
 #define H(p, o) (*(short *)((p) + (o)))
@@ -64,7 +64,7 @@ void extermibot_init_parts(u8 *moby) {
     moby_transform_joint_to_world((int)moby, 0, pos);
     qcopy_nc(CHILD(0x7C0) + 0x10, pos);
     qcopy_nc(CHILD(0x7C0) + 0xF0, moby + 0xF0);
-    values = D_L18_001B1570;
+    values = g_extermibot_part_init_values;
     {
         float *v;
         i = 0;

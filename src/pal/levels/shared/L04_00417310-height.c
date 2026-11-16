@@ -21,7 +21,7 @@ typedef struct {
 } HeightState;
 
 /* Computes the target height offset from the base height, scaled by how far height is above or below base. */
-void func_PAL_L04_00417310(void *object, HeightState *state, float height, float base,
+void bike_compute_target_height_pal(void *object, HeightState *state, float height, float base,
                        float factor, float speed, float margin)
 {
     float t, extra;

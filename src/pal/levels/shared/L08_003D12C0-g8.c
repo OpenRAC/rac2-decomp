@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "common.h"
-extern s32 D_L08_001A9050 __attribute__((sda));
-extern f32 D_L08_001A9054 __attribute__((sda));
-extern f32 D_L08_001BE0B0 __attribute__((nosda));
-extern f32 D_L08_001B00E0 __attribute__((sda));
-extern f32 D_L08_001B00E4 __attribute__((sda));
-extern f32 D_L08_001B00E8 __attribute__((sda));
-extern f32 D_L08_001B00F0 __attribute__((sda));
-extern s32 D_L08_001B00F4 __attribute__((sda));
-extern f32 D_L08_001B00F8 __attribute__((sda));
-extern u8 *D_L08_001B9B50 __attribute__((nosda));
+extern s32 g_saved_float_hold_active __attribute__((sda));
+extern f32 g_saved_float_hold_value __attribute__((sda));
+extern f32 g_saved_hold_float __attribute__((nosda));
+extern f32 g_aim_camera_distance_far __attribute__((sda));
+extern f32 g_aim_camera_distance_near __attribute__((sda));
+extern f32 g_aim_camera_height __attribute__((sda));
+extern f32 g_aim_camera_offset_x __attribute__((sda));
+extern s32 g_aim_camera_offset_y __attribute__((sda));
+extern f32 g_aim_camera_offset_z __attribute__((sda));
+extern u8 *g_camera_l08_state_ptr __attribute__((nosda));
 extern char g_hero_position[] __attribute__((nosda));
 extern void follow_camera_set_distance(s32, f32, f32);
 extern void follow_camera_set_height(f32, f32);
@@ -26,24 +26,24 @@ extern s32 g_current_map_index;
 
 /* Flags the level's object, feeds the camera its aim values and advances the
    counter the aim is scaled by. */
-void func_PAL_L08_003D12C0(s32 *counter, u8 *arg) {
+void cam_update_aim_values_pal(s32 *counter, u8 *arg) {
     u8 *owner;
     f32 t, a, b, c;
 
     owner = *(u8 **)((u8 *)arg + 0x68);
-    if (*(s16 *)((u8 *)D_L08_001B9B50 + 0x86) == 0) {
-        *(s32 *)((u8 *)*(u8 **)((u8 *)D_L08_001B9B50 + 0x70) + 0x250) = 2;
+    if (*(s16 *)((u8 *)g_camera_l08_state_ptr + 0x86) == 0) {
+        *(s32 *)((u8 *)*(u8 **)((u8 *)g_camera_l08_state_ptr + 0x70) + 0x250) = 2;
     }
 
-    cam_set_aim_offset_target(D_L08_001B00F0, D_L08_001B00F4, D_L08_001B00F8);
-    follow_camera_set_distance(0, D_L08_001B00E4, D_L08_001B00E0);
+    cam_set_aim_offset_target(g_aim_camera_offset_x, g_aim_camera_offset_y, g_aim_camera_offset_z);
+    follow_camera_set_distance(0, g_aim_camera_distance_near, g_aim_camera_distance_far);
 
     if (*(s32 *)((u8 *)owner + 0xC8) >= 0 &&
         IsPointInCuboid(g_hero_position, *(s32 *)((u8 *)owner + 0xC8)) != 0) {
         cam_set_tuning_value(0.52359885f);
     }
 
-    follow_camera_set_height(D_L08_001B00E8, 0.003f);
+    follow_camera_set_height(g_aim_camera_height, 0.003f);
     cam_set_lock_flag();
 
     t = IntToFloat(*counter) / IntToFloat(0x4B);

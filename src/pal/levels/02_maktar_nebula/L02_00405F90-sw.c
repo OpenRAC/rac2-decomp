@@ -6,7 +6,7 @@ extern void moby_set_state(char *,int,int);
 extern float ApproachValue(float *,float,float);
 extern int math_fast_float_d(void *);
 extern char *g_route_polygons[];
-extern char D_L02_001A8F20[] MACRO_ADDR, g_camera_l02_position[];
+extern char g_zero_l02_vector[] MACRO_ADDR, g_camera_l02_position[];
 extern float fast_vec_dist(void *, void *);
 extern int FloatToInt(float);
 extern float mat_fast_helper_a(float,float), FastDiffRots(float,float);
@@ -22,7 +22,7 @@ extern void moby_mark_spawned(char *);
 extern void func_PAL_L02_00406558(char *),func_PAL_L02_00406698(char *,void *);
 extern void FastVecSub(void *,void *,void *);
 extern void *part_find_owned_effect_slot(void *,u32,s32);
-extern float func_PAL_002AA108(void *,void *);
+extern float moby_update_aim_target_strength_pal(void *,void *);
 extern void func_PAL_002B15D8(char *,int,void *,u8,float,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern char *func_PAL_0032F3B8(void *,void *,void *,float);
@@ -107,8 +107,8 @@ void func_PAL_L02_00405F90(char *e) {
         if(*(u8 *)(e+0x20)<5){FastVecSub(&temp,e+0x10,&old);func_PAL_L02_00406698(e,&temp);}
     }
     if(*(u8 *)(e+0x20)>=2){
-        void *hit=part_find_owned_effect_slot(e,0x10000,0); x=func_PAL_002AA108(e,hit);
+        void *hit=part_find_owned_effect_slot(e,0x10000,0); x=moby_update_aim_target_strength_pal(e,hit);
         ApproachValue((float *)(s+0x20),0.0f,x); *(u8 *)(e+0xa8)=255;
-        if(*(float *)(s+0x20)==0.0f){PlayMobySound(2,0,e);func_PAL_002B15D8(e,0x7f7,D_L02_001A8F20,255,5.0f,10.0f,5.0f,10.0f);FastVecSub(&temp,g_camera_l02_position,e+0x10);vec_scale_to_length(&temp,&temp,1.0f);func_PAL_0032F3B8(e,e+0x10,&temp,0.0f);moby_mark_spawned(e);}
+        if(*(float *)(s+0x20)==0.0f){PlayMobySound(2,0,e);func_PAL_002B15D8(e,0x7f7,g_zero_l02_vector,255,5.0f,10.0f,5.0f,10.0f);FastVecSub(&temp,g_camera_l02_position,e+0x10);vec_scale_to_length(&temp,&temp,1.0f);func_PAL_0032F3B8(e,e+0x10,&temp,0.0f);moby_mark_spawned(e);}
     }
 }

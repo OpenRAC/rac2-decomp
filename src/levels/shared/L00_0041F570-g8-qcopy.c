@@ -11,7 +11,7 @@ extern void vec_transform_or_copy(void *,void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void DrawFadingDualRibbon(Quad128 *,int,int,int,unsigned int,unsigned int,float,float,float);
-extern float D_L00_001B1494 __attribute__((sda));
+extern float g_shot_trail_scroll_offset __attribute__((sda));
 /* Updates and draws the glowing ribbon trail of a shot, fading it out when the shot has ended. */
 void shot_update_and_draw_trail(void *self)
 {
@@ -30,8 +30,8 @@ void shot_update_and_draw_trail(void *self)
         if(n>0) { Quad128 *h=table[bank]; for(;n>0;n--) h[n]=h[n-1]; }
         history=table[bank]; *history=*(Quad128 *)(object+0x10); ((float *)history)[3]=0.05f;
     }
-    D_L00_001B1494-=0.1f;
-    if(D_L00_001B1494<=-7.0f) D_L00_001B1494+=7.0f;
+    g_shot_trail_scroll_offset-=0.1f;
+    if(g_shot_trail_scroll_offset<=-7.0f) g_shot_trail_scroll_offset+=7.0f;
     count=*(int *)(state+0x10); if(count<2) return;
     firstCount=20; if(count<=19) firstCount=count;
     alpha=255; glow=64;
@@ -41,6 +41,6 @@ void shot_update_and_draw_trail(void *self)
         glow=FloatToInt(IntToFloat(64)*fraction);
     }
     color=((unsigned int)alpha<<24)|0xffffff; edge=((unsigned int)glow<<24)|0x2020ff;
-    DrawFadingDualRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B1494);
-    if(*(int *)(state+0x10)>20) DrawFadingDualRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B1494);
+    DrawFadingDualRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,g_shot_trail_scroll_offset);
+    if(*(int *)(state+0x10)>20) DrawFadingDualRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,g_shot_trail_scroll_offset);
 }

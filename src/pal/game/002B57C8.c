@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_001A8A5C __attribute__((sda));
-extern int D_PAL_001A8C64 __attribute__((sda));
+extern int g_menu_mode __attribute__((sda));
+extern int g_pal_return_value_a __attribute__((sda));
 
 int func_PAL_002B57C8(void) {
-    return D_PAL_001A8C64;
+    return g_pal_return_value_a;
 }
 
 
@@ -18,7 +18,7 @@ extern int math_random_int_range(int, int);
 extern int moby_step_controller(void *, void *, float);
 extern int moby_step_controller(void *, void *, float);
 
-int func_PAL_002B5BA8(char *self, float *target, float amount)
+int moby_turn_toward_target_and_step_pal(char *self, float *target, float amount)
 {
     char *data = moby_get_controller(self);
     float angle;
@@ -38,7 +38,7 @@ int func_PAL_002B5BA8(char *self, float *target, float amount)
 }
 
 
-int func_PAL_002B5E10(char *m) {
+int moby_step_at_own_position_pal(char *m) {
     return moby_step_controller(m, m + 0x10, *(float *)(m + 0xF8));
 }
 

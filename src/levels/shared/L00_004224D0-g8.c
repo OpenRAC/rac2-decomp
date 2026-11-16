@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "common.h"
-extern char D_L00_001B8E20[], D_L00_001BF220[], D_L00_001BF230[];
+extern char g_camera_move_state[], g_hero_l00_position[], g_collision_position[];
 extern int g_current_map_index;
 extern char *g_hero_moby NOT_SDA;
-extern float D_L00_001B14E8 __attribute__((sda)), D_L00_001B14EC __attribute__((sda));
-extern float D_L00_001B14F0 __attribute__((sda)), D_L00_001B14F4 __attribute__((sda));
+extern float g_cam_eye_spring_stiffness __attribute__((sda)), g_cam_eye_spring_damping __attribute__((sda));
+extern float g_cam_eye_turn_spring_stiffness __attribute__((sda)), g_cam_eye_turn_spring_damping __attribute__((sda));
 extern void FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *);
 extern void FastVecScale(void *,void *,float),FastVecCross(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float),math_apply_axis_rotation_to_quat(void *,void *,void *,float);
@@ -17,7 +17,7 @@ extern void cam_follow_get_ease_speeds(char *,float *,float *);
 /* Moves the camera eye toward its wanted spot and pushes it out of walls so it never clips into the level. */
 void cam_follow_move_eye(char *obj)
 {
-    char *base=P(obj,112), *move=base+352, *pos=base+96, *camera=D_L00_001B8E20;
+    char *base=P(obj,112), *move=base+352, *pos=base+96, *camera=g_camera_move_state;
     char a[16],b[16],c[16],d[16],e[16],v[16],g[16],h[16],saved[16],delta[16];
     float out1,out2;
     float len1,len2,vert1,angle1,angle2,dot2,len,angle,turn;
@@ -45,7 +45,7 @@ void cam_follow_move_eye(char *obj)
         else if(ratio< -1.0f) ratio= -1.0f;
         angle2=math_fast_angle_helper(ratio);
     }
-    turn=math_step_spring_damper_stored(move+36,angle2,angle1,D_L00_001B14F0,D_L00_001B14F4,0.0f);
+    turn=math_step_spring_damper_stored(move+36,angle2,angle1,g_cam_eye_turn_spring_stiffness,g_cam_eye_turn_spring_damping,0.0f);
     FastVecScale(a,camera+32,vert1);
     FastVecSub(b,move,a);
     FastVecScale(c,camera+32,len1);
@@ -57,7 +57,7 @@ void cam_follow_move_eye(char *obj)
         float raw;
         if(len<0.0001f) raw=0.0f;
         else raw=1.5707963705062866f-math_fast_angle_helper(vert1/len);
-        angle=math_step_spring_damper_stored(move+32,0.0f,raw,D_L00_001B14E8,D_L00_001B14EC,0.0f);
+        angle=math_step_spring_damper_stored(move+32,0.0f,raw,g_cam_eye_spring_stiffness,g_cam_eye_spring_damping,0.0f);
     }
     FastVecCross(e,d,camera+32);
     dot2=FastVecDot(e,b);
@@ -77,7 +77,7 @@ void cam_follow_move_eye(char *obj)
         while(j<3) {
             if(coll_test_point(obj+48,54,0,0.3f)) {
                 changed=1;
-                qcopy(obj+48,D_L00_001BF230);
+                qcopy(obj+48,g_collision_position);
                 j++;
             } else break;
         }
@@ -85,11 +85,11 @@ void cam_follow_move_eye(char *obj)
         i=0;
         do {
             if(!coll_test_point(obj+48,54,0,0.25f)) break;
-            FastVecSub(delta,D_L00_001BF220,obj+48);
+            FastVecSub(delta,g_hero_l00_position,obj+48);
             vec_scale_to_length(delta,delta,1.0f);
             if(math_fabs(FastVecDot(obj+32,delta))<=0.5f) break;
             changed=1;
-            qcopy(obj+48,D_L00_001BF230);
+            qcopy(obj+48,g_collision_position);
         } while(++i<3);
     }
     if(changed) {

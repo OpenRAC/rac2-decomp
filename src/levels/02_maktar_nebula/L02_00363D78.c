@@ -37,8 +37,8 @@ typedef struct {
     SkyEffect *effects;
 } SkyEffectData;
 
-extern SkyEffectData *D_L02_001B3B20[] __attribute__((sda));
-extern float D_L02_001B3B50[] MACRO_ADDR;
+extern SkyEffectData *g_sky_effect_data[] __attribute__((sda));
+extern float g_sky_effect_matrix[] MACRO_ADDR;
 
 extern void set_identity_matrix(float *);
 extern void cam_update_view_rotation(int);
@@ -70,20 +70,20 @@ void sky_update_effects(void)
     SkyAngles *orbit;
     short *angles;
 
-    D_L02_001B3B20[0]->relocation_state = 0;
-    set_identity_matrix(D_L02_001B3B50);
+    g_sky_effect_data[0]->relocation_state = 0;
+    set_identity_matrix(g_sky_effect_matrix);
     cam_update_view_rotation(0);
     gfx_process_view_entry(0);
     cam_update_view_rotation(1);
     gfx_process_view_entry(1);
-    if (D_L02_001B3B20[0]->effect_count == 0) {
-        D_L02_001B3B20[0]->effect_count = 0x100;
+    if (g_sky_effect_data[0]->effect_count == 0) {
+        g_sky_effect_data[0]->effect_count = 0x100;
         i = 0;
         do {
             radius = 50.0f;
             effect_flags = 0x48;
             base_color = 0x30505050;
-            effect = &D_L02_001B3B20[0]->effects[i];
+            effect = &g_sky_effect_data[0]->effects[i];
             if (i >= 0xF6) {
                 effect->randomize_color = 0;
                 angles = &effect->state.angles.azimuth;
@@ -121,10 +121,10 @@ void sky_update_effects(void)
                 else
                     effect->state.base_color = (alpha_delta + ((color_delta << 8) + base_color)) | color_delta;
             }
-        } while (++i < D_L02_001B3B20[0]->effect_count);
+        } while (++i < g_sky_effect_data[0]->effect_count);
     }
-    for (effect_index = 0; effect_index < D_L02_001B3B20[0]->effect_count; effect_index++) {
-        effect = &D_L02_001B3B20[0]->effects[effect_index];
+    for (effect_index = 0; effect_index < g_sky_effect_data[0]->effect_count; effect_index++) {
+        effect = &g_sky_effect_data[0]->effects[effect_index];
         if (effect->randomize_color == 0) {
             orbit = &effect->state.angles;
             angles = &effect->state.angles.azimuth;

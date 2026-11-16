@@ -10,7 +10,7 @@ extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));
 
-void func_US2_003527C8(unsigned char *object)
+void mpeg_dec_start_us2(unsigned char *object)
 {
     char *base;
     mpeg_vibuf_reset(object + 0x48);

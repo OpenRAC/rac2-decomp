@@ -1,7 +1,7 @@
 #include "names.h"
 
 
-extern int D_L00_001A8FF0 __attribute__((sda));
+extern int g_hero_locked_flag __attribute__((sda));
 
 extern int D_L00_001A8FF4_1 __attribute__((sda));
 
@@ -25,7 +25,7 @@ void cam_compute_view_direction(char *origin, char *outDir, int flag)
     char *table;
     float sign;
 
-    if (D_L00_001A8FF0 == 0) {
+    if (g_hero_locked_flag == 0) {
         vec_copy_helper_a(outDir);
     } else if (D_L00_001A8FF4_1 != 0) {
         vec_compute_flat_direction_from_point(origin, outDir, 1);

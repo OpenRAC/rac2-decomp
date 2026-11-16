@@ -59,11 +59,11 @@ typedef struct {
     char pad_90[0x10];
 } L00PoolTrail;
 
-extern L00PoolSlot D_L00_002472C0[];
-extern unsigned int D_L00_001B0138 __attribute__((sda));
-extern int D_L00_001B013C __attribute__((sda));
-extern L00PoolParticle *D_L00_001B2AD4 MACRO_ADDR;
-extern L00PoolTrail *D_L00_001B2AD8 MACRO_ADDR;
+extern L00PoolSlot g_sheepinator_slot_table[];
+extern unsigned int g_sheepinator_record_count __attribute__((sda));
+extern int g_sheepinator_pool_initialized __attribute__((sda));
+extern L00PoolParticle *g_pool_particles MACRO_ADDR;
+extern L00PoolTrail *g_pool_trails MACRO_ADDR;
 extern char g_hero_position[];
 extern int sheepinator_is_mode_four(void);
 extern L00PoolMoby *CreateMoby(int);
@@ -90,7 +90,7 @@ L00PoolMoby *func_PAL_L00_003CF868(L00PoolMoby *owner, int value, void *position
     if (sheepinator_is_mode_four())
         return 0;
 
-    for (i = 0; i < 5 && D_L00_002472C0[i].word_00 != 0; i++)
+    for (i = 0; i < 5 && g_sheepinator_slot_table[i].word_00 != 0; i++)
         ;
     object = CreateMoby(0xA9B);
     if (object != 0) {
@@ -108,8 +108,8 @@ L00PoolMoby *func_PAL_L00_003CF868(L00PoolMoby *owner, int value, void *position
         state->lifetime = 133;
         state->timer = 17;
         state->slot = i;
-        D_L00_002472C0[i].word_00 = (unsigned int)object;
-        D_L00_001B0138++;
+        g_sheepinator_slot_table[i].word_00 = (unsigned int)object;
+        g_sheepinator_record_count++;
 
         state->scale = 2.5f;
         state->value = value;
@@ -119,16 +119,16 @@ L00PoolMoby *func_PAL_L00_003CF868(L00PoolMoby *owner, int value, void *position
         state->owner_field_AA = owner->field_AA;
 
         p = owner->pvars;
-        if (!D_L00_001B013C) {
-            D_L00_001B2AD4 = *(L00PoolParticle **)(p + 8);
-            p = mem_round_up_to_16((char *)D_L00_001B2AD4 + 0xC00);
-            D_L00_001B2AD8 = (L00PoolTrail *)p;
+        if (!g_sheepinator_pool_initialized) {
+            g_pool_particles = *(L00PoolParticle **)(p + 8);
+            p = mem_round_up_to_16((char *)g_pool_particles + 0xC00);
+            g_pool_trails = (L00PoolTrail *)p;
             mem_round_up_to_16(p + 0x780);
-            D_L00_001B013C = 1;
+            g_sheepinator_pool_initialized = 1;
             for (i = 63; i >= 0; i--)
-                D_L00_001B2AD4[i].owner = 0;
+                g_pool_particles[i].owner = 0;
             for (i = 0; i < 12; i++)
-                D_L00_001B2AD8[i].field_8C = 0;
+                g_pool_trails[i].field_8C = 0;
         }
 
         for (i = 0; i < 20; i++)

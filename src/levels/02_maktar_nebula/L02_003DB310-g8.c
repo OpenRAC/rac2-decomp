@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L02_001B04DC __attribute__((sda));
+extern int g_boss_rising_particle_count __attribute__((sda));
 
 extern void part_spawn_rising();
 
 extern void moby_transform_joint_to_world(char *arg0, int arg1, char *arg2);
 
-extern char D_L02_001B0F60[4] __attribute__((sda));
+extern char g_widget_effect_params[4] __attribute__((sda));
 
-extern int D_L02_001B0FA0 __attribute__((sda));
+extern int g_widget_effect_arg_a __attribute__((sda));
 
-extern int D_L02_001B0FA4;
+extern int g_widget_effect_arg_b;
 
 extern void func_2EEFB0(char *, int, char *, char *, int, int, int, int, float);
 
@@ -19,9 +19,9 @@ extern void func_2EEFB0(char *, int, char *, char *, int, int, int, int, float);
 void widget_submit_effects(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
-    func_2EEFB0(D_L02_001B0F60, 4, vars + 0x2A0, vars + 0x3A0,
-                *(int *)(vars + 0x4D4), *(int *)(vars + 0x4D0), D_L02_001B0FA0,
-                D_L02_001B0FA4, *(float *)(vars + 0x4D8));
+    func_2EEFB0(g_widget_effect_params, 4, vars + 0x2A0, vars + 0x3A0,
+                *(int *)(vars + 0x4D4), *(int *)(vars + 0x4D0), g_widget_effect_arg_a,
+                g_widget_effect_arg_b, *(float *)(vars + 0x4D8));
 }
 
 /* Rebuild the four widget descriptions from the resident template. */
@@ -29,20 +29,20 @@ void boss_rebuild_joint_widgets(char *moby) {
     char buffer[16];
 
     moby_transform_joint_to_world(moby, 2, buffer);
-    part_spawn_rising(buffer, D_L02_001B04DC);
+    part_spawn_rising(buffer, g_boss_rising_particle_count);
     moby_transform_joint_to_world(moby, 4, buffer);
-    part_spawn_rising(buffer, D_L02_001B04DC);
+    part_spawn_rising(buffer, g_boss_rising_particle_count);
     moby_transform_joint_to_world(moby, 8, buffer);
-    part_spawn_rising(buffer, D_L02_001B04DC);
+    part_spawn_rising(buffer, g_boss_rising_particle_count);
     moby_transform_joint_to_world(moby, 6, buffer);
-    part_spawn_rising(buffer, D_L02_001B04DC);
+    part_spawn_rising(buffer, g_boss_rising_particle_count);
 }
 
 /* The entity array's base: `sda` with a size over 8 bytes gives the bare-symbol load, which the
    assembler expands to retail's one-register `lui`/`lw` pair instead of a $gp access. */
 extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 extern unsigned short *g_entity_group_lists[];
 
@@ -55,7 +55,7 @@ void group_set_moby_states_from_mode(unsigned char *moby) {
     if (moby[0x21] == 0xFF)
         return;
     groupEntry = g_entity_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_group_max_index && groupEntry != 0 &&
            ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]])) {
         entity = g_moby_l02_pool[0] + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
@@ -78,7 +78,7 @@ int group_are_mobys_settled(unsigned char *moby) {
     if (moby[0x21] == 0xFF)
         return 1;
     groupEntry = g_entity_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_group_max_index && groupEntry != 0 &&
            ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]])) {
         entity = g_moby_l02_pool[0] + ((*groupEntry & 0x7FFF) << 8);
         if (entity == 0)
@@ -90,7 +90,7 @@ int group_are_mobys_settled(unsigned char *moby) {
     return 1;
 }
 
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 /* The word D_L02_001B359C, read here through $gp; the walks above reach it as a bare symbol. */
 extern char *D_L02_001B359C_gp;
@@ -110,7 +110,7 @@ void group_reset_moby_hit_points(unsigned char *moby) {
     char *entity;
 
     for (groupEntry = g_entity_group_lists[moby[0x21]];
-         moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
+         moby[0x21] != 0xFF && moby[0x21] <= g_group_max_index && groupEntry != 0 &&
          ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]]);
          groupEntry++) {
         entity = D_L02_001B359C_gp + ((*groupEntry & 0x7FFF) << 8);
@@ -139,7 +139,7 @@ int group_update_effect_mobys(unsigned char *moby, void *effectArg) {
     char *entity;
 
     for (groupEntry = g_entity_group_lists[moby[0x21]];
-         moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && groupEntry != 0 &&
+         moby[0x21] != 0xFF && moby[0x21] <= g_group_max_index && groupEntry != 0 &&
          ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_entity_group_lists[moby[0x21]]);
          groupEntry++) {
         entity = D_L02_001B359C_gp + ((*groupEntry & 0x7FFF) << 8);
@@ -161,18 +161,18 @@ int group_update_effect_mobys(unsigned char *moby, void *effectArg) {
     return result;
 }
 
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
-extern int D_0018C2EC __attribute__((nosda));
+extern int g_request_enabled_flag __attribute__((nosda));
 
-extern int D_001A7A00;
+extern int g_player_stats;
 
 /* The six weights, read through $gp: `sda` with a size of at most 8 bytes, indexed past it. */
-extern int D_L02_001B0938[2] __attribute__((sda));
+extern int g_slot_machine_prize_weights[2] __attribute__((sda));
 
-extern char D_L02_001B09E0[];
+extern char g_str_slot_roll[];
 
-extern char D_L02_001B09F0[];
+extern char g_str_slot_mode[];
 
 extern void STUB_printf(const char *, ...);
 
@@ -193,26 +193,26 @@ void slot_machine_roll_result(char *moby) {
     int mode;
 
     roll = math_random_int_below(1000);
-    STUB_printf(D_L02_001B09E0, roll);
+    STUB_printf(g_str_slot_roll, roll);
     *(int *)(vars + 0x5C) = 0;
     for (i = 0; i < 6; i++) {
-        roll -= D_L02_001B0938[i];
+        roll -= g_slot_machine_prize_weights[i];
         if (roll < 0) {
             *(int *)(vars + 0x5C) = i;
             break;
         }
     }
     if (*(int *)(vars + 0x5C) == 4) {
-        if (D_0018C2EC == D_001A7A00)
+        if (g_request_enabled_flag == g_player_stats)
             *(int *)(vars + 0x5C) = 1;
     }
-    if (D_001395B8[0x8F] < 4) {
+    if (g_game_flag_table[0x8F] < 4) {
         if (*(int *)(vars + 0x5C) == 5)
             *(int *)(vars + 0x5C) = 1;
     }
     mode = *(int *)(vars + 0x5C);
     *(int *)(vars + 0x90) = *(int *)(vars + 0x94) = *(int *)(vars + 0x98) = mode;
-    STUB_printf(D_L02_001B09F0, mode);
+    STUB_printf(g_str_slot_mode, mode);
     if (*(int *)(vars + 0x5C) == 0) {
         int thirdRoll;
 
@@ -226,9 +226,9 @@ void slot_machine_roll_result(char *moby) {
     }
 }
 
-extern unsigned char D_001A7AFA;
+extern unsigned char g_barlow_hint_inside_flag;
 extern char g_hero_position[];
-extern unsigned short D_0018C31C[];
+extern unsigned short g_hud_offset_flag[];
 extern int IsPointInCuboid(void *, int);
 extern void hero_trigger_spawn_effect(void);
 extern void moby_set_state(char *, int, int);
@@ -240,8 +240,8 @@ void trigger_l02_update(char *moby) {
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(unsigned char *)(moby + 0x30) = 0xFF;
-        if (D_001A7AFA == 0)
-            D_0018C31C[0] = 1;
+        if (g_barlow_hint_inside_flag == 0)
+            g_hud_offset_flag[0] = 1;
         moby_set_state(moby, 1, -1);
         break;
     case 1:
@@ -255,21 +255,21 @@ void trigger_l02_update(char *moby) {
 /* D_L02_001CAA80 is read as the first word of a larger object: cc1 then splits the address and
    retail's `lui $v0` / `lw $v1,%lo($v0)` come out in two registers, where a one-word extern is a bare
    symbol that gas expands in one. */
-extern int D_L02_001CAA80[3];
+extern int g_arena_l02_active_flag[3];
 
 extern int g_hovering_object_count;
 
-extern int D_L02_001B41DC;
+extern int g_effect_spawner_last_frame;
 
 extern int g_frame_l02_counter;
 
-extern int D_L02_001B0A60 __attribute__((sda));
+extern int g_spawner_explode_param __attribute__((sda));
 
-extern float D_L02_001B0A20 __attribute__((sda));
+extern float g_piece_explode_param_c __attribute__((sda));
 
-extern float D_L02_001B0A28 __attribute__((sda));
+extern float g_piece_explode_param_b __attribute__((sda));
 
-extern float D_L02_001B0A30 __attribute__((sda));
+extern float g_piece_explode_param_a __attribute__((sda));
 
 extern void moby_set_state();
 
@@ -303,9 +303,9 @@ void effect_l02_spawner_update(unsigned char *moby) {
             g_hovering_object_count--;
         break;
     case 1:
-        if (D_L02_001CAA80[0] != 1) {
-            if (D_L02_001B41DC != g_frame_l02_counter) {
-                D_L02_001B41DC = g_frame_l02_counter;
+        if (g_arena_l02_active_flag[0] != 1) {
+            if (g_effect_spawner_last_frame != g_frame_l02_counter) {
+                g_effect_spawner_last_frame = g_frame_l02_counter;
                 gfx_add_draw_callback_first(DrawRotatingObjectGroupEffects, moby);
             }
             if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *vars == 0) {
@@ -316,8 +316,8 @@ void effect_l02_spawner_update(unsigned char *moby) {
         }
         break;
     case 2:
-        part_explode_object_into_pieces(moby, &D_L02_001B0A30, &D_L02_001B0A28, &D_L02_001B0A20, 0xFFFF, 0,
-                          D_L02_001B0A60, 1, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(moby, &g_piece_explode_param_a, &g_piece_explode_param_b, &g_piece_explode_param_c, 0xFFFF, 0,
+                          g_spawner_explode_param, 1, 0xFFFF, 0xFF, 0);
         part_spawn_scaled_bolts(moby, 5, 0.5f);
         SpawnExplosion(moby + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         moby_set_state(moby, 3, -1);
@@ -340,9 +340,9 @@ extern float math_random_float_range(float, float);
 
 extern void *part_spawn_puff(void *, int, float, float);
 
-extern float D_L02_001B0530 __attribute__((sda));
+extern float g_hero_puff_scale_min __attribute__((sda));
 
-extern float D_L02_001B0534;
+extern float g_hero_puff_scale_max;
 
 /* Looks for a trigger in the hero block (D_00189E20): its half-word at +0x1490 is 10, its word at
    +0x340 is set, and either its words at +0x1B8 and +0x2294 are 1 and 2 (the selector then comes
@@ -400,6 +400,6 @@ void hero_trigger_spawn_effect(void) {
         v[0] += math_fast_sin_or_cos_a(*(float *)(k + 0x98)) * 0.15f;
         v[1] += math_fast_sin_or_cos_b(*(float *)(k + 0x98)) * 0.15f;
         v[2] = coll_probe_ground_height_below(v, 0, 0.5f) + 0.04f;
-        part_spawn_puff(v, -1, math_random_float_range(D_L02_001B0530, D_L02_001B0534), 5250.0f);
+        part_spawn_puff(v, -1, math_random_float_range(g_hero_puff_scale_min, g_hero_puff_scale_max), 5250.0f);
     }
 }

@@ -37,10 +37,10 @@ typedef struct GornSlot {
     char pad44[0x1C];
 } GornSlot;
 
-extern GornSlot D_L15_0026C3E0[];
-extern u16 *D_L15_001FB320[];
-extern int D_L15_001FE480[];
-extern GornMoby *D_L15_001B261C[] __attribute__((sda));
+extern GornSlot g_gorn_slot_table[];
+extern u16 *g_moby_list_address_table[];
+extern int g_path_l15_table[];
+extern GornMoby *g_moby_base[] __attribute__((sda));
 extern u8 *moby_get_motion_data(void *);
 extern void set_identity_rotation_rows(void *);
 extern void vec_clear_128(void *);
@@ -63,34 +63,34 @@ void ResetGroupToPathStart(u8 *self) {
     GornPath *path;
     u8 *velocity;
 
-    slots = D_L15_0026C3E0;
+    slots = g_gorn_slot_table;
     for (i = 0; i < 128; i++) {
         slots[i].active = 0;
     }
-    list = D_L15_001FB320[self[0x21]];
+    list = g_moby_list_address_table[self[0x21]];
     if (list == 0)
         return;
     entry = list;
     do {
         id = *entry & 0x7FFF;
-        state = D_L15_001B261C[0][id].vars;
-        owner = moby_get_motion_data(&D_L15_001B261C[0][id]);
-        D_L15_001B261C[0][id].x7C = 0x3F;
-        GornCopyQuad((char *)&D_L15_001B261C[0][id] + 0x10, state + 0x430);
-        set_identity_rotation_rows(D_L15_001B261C[0][id].rotation);
+        state = g_moby_base[0][id].vars;
+        owner = moby_get_motion_data(&g_moby_base[0][id]);
+        g_moby_base[0][id].x7C = 0x3F;
+        GornCopyQuad((char *)&g_moby_base[0][id] + 0x10, state + 0x430);
+        set_identity_rotation_rows(g_moby_base[0][id].rotation);
         *(int *)(state + 0x27C) = 0;
         vec_clear_128(state + 0x400);
         self[0x23] = 0x7F;
         *(u16 *)(self + 0x34) &= 0xFFF7;
-        D_L15_001B261C[0][id].state = 1;
-        path = (GornPath *)D_L15_001FE480[*(int *)(state + 0x448)];
+        g_moby_base[0][id].state = 1;
+        path = (GornPath *)g_path_l15_table[*(int *)(state + 0x448)];
         *(int *)(state + 0x44C) = 1;
-        GornCopyQuad((char *)&D_L15_001B261C[0][id] + 0x10, &path->points[0]);
-        *(int *)&D_L15_001B261C[0][id].position[3] = 0;
-        follower_set_state(&D_L15_001B261C[0][id], 2);
+        GornCopyQuad((char *)&g_moby_base[0][id] + 0x10, &path->points[0]);
+        *(int *)&g_moby_base[0][id].position[3] = 0;
+        follower_set_state(&g_moby_base[0][id], 2);
         velocity = owner + 0x90;
-        follower_set_push_vector(&D_L15_001B261C[0][id], &path->points[(*(int *)(state + 0x44C))++]);
-        FastVecSub(velocity, owner + 0x60, (char *)&D_L15_001B261C[0][id] + 0x10);
+        follower_set_push_vector(&g_moby_base[0][id], &path->points[(*(int *)(state + 0x44C))++]);
+        FastVecSub(velocity, owner + 0x60, (char *)&g_moby_base[0][id] + 0x10);
         vec_scale_to_length(velocity, velocity, 0.016666668f);
         *(int *)(owner + 0x130) = 2000000;
         *(int *)(state + 0x450) = 0;

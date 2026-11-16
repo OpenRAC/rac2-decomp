@@ -4,7 +4,7 @@ extern Resident g_hero_state;
 typedef struct { u8 pad[0x6c]; short time; u8 pad2[4]; short mode; } Animation;
 extern Animation D_001A63A8_4;
 extern int ref_L22_003A6230_00 __attribute__((sda));
-extern int D_L22_001B1C48;
+extern int g_frame_l22_counter;
 extern void anim_start_free_slot_in_range(void *,int,int), anim_start_slot(void *,int);
 extern int math_fast_float_d(void *),math_random_int_below(int);
 extern float vec_fast_helper_c(void *,void *);
@@ -15,7 +15,7 @@ void anim_choose_next(u8 *obj) {
     float health_ratio = *(float *)(ctl + 0x20) / *(short *)(ctl + 0x24);
     float seconds = g_hero_state.clock * 0.00083333335f;
     if (ref_L22_003A6230_00) return;
-    if (D_L22_001B1C48 && !(*(int *)(ctl + 0x4E0) & 0x1000000)) {
+    if (g_frame_l22_counter && !(*(int *)(ctl + 0x4E0) & 0x1000000)) {
         *(int *)(ctl + 0x4E0) |= 0x1000000;
         anim_start_free_slot_in_range(obj,0,2);
     }

@@ -12,8 +12,8 @@ extern void *pool_alloc_cell(void *argument);
 extern int menu_update_two_part_flags_b(char *object, int flags);
 extern int menu_update_two_part_flags_c(char *object, int flags);
 
-extern int D_L00_001AE1E8[2] __attribute__((sda));
-extern int D_L00_001AE1F8[2] __attribute__((sda));
+extern int g_prompt_bar_params_b[2] __attribute__((sda));
+extern int g_prompt_bar_params_c[2] __attribute__((sda));
 
 /* Builds the labelled sub-view on the object: allocation record, two size floats, then the
    three localized strings, the box and the scale, finally the next layer down. */
@@ -34,7 +34,7 @@ void menu_build_page_b(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_L00_001AE1E8);
+    prompt_bar_init(child, argument, g_prompt_bar_params_b);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));
@@ -63,7 +63,7 @@ void menu_build_page_c(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_L00_001AE1F8);
+    prompt_bar_init(child, argument, g_prompt_bar_params_c);
     text = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2D4F));

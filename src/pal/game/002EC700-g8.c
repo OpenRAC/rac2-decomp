@@ -12,7 +12,7 @@ typedef struct {
     unsigned int fac;
     unsigned int fb0;
 } SelectionFlags;
-extern SelectionFlags D_00139768;
+extern SelectionFlags g_request_flag_table;
 extern char D_001A63A8_3[];
 extern int PlayBonusReelWithGameLoop(int);
 extern int mpeg_play_movie_by_id(int);
@@ -22,30 +22,30 @@ extern int mpeg_play_movie_by_id(int);
    take it (each one stops the rest when it answers that it is busy). The
    selector's pending byte is cleared on the way in and set on the way out,
    and the program is told the selection ended in state 6. */
-void func_PAL_002ED0D8(void)
+void scene_start_sequence_for_state_pal(void)
 {
     int v = ref_L00_00365F50_00;
 
     D_001A63A8_3[7] = 0;
 
     if (v == 0xA9) {
-        D_00139768.f00 |= 2;
-        D_00139768.fa8 |= 0x600;
+        g_request_flag_table.f00 |= 2;
+        g_request_flag_table.fa8 |= 0x600;
         if (PlayBonusReelWithGameLoop(0xA9)) goto done;
         if (mpeg_play_movie_by_id(1)) goto done;
         PlayBonusReelWithGameLoop(0xAA);
     } else if (v == 0x17) {
         mpeg_play_movie_by_id(0x17);
     } else if (v == 0xAB) {
-        D_00139768.fa8 |= 0x800;
-        D_00139768.f18 = (D_00139768.f18 & 0xFEFFFFFF) | 0x1000000;
-        D_00139768.fac |= 0x1000;
+        g_request_flag_table.fa8 |= 0x800;
+        g_request_flag_table.f18 = (g_request_flag_table.f18 & 0xFEFFFFFF) | 0x1000000;
+        g_request_flag_table.fac |= 0x1000;
         if (PlayBonusReelWithGameLoop(0xAB)) goto done;
         if (mpeg_play_movie_by_id(0x18)) goto done;
         PlayBonusReelWithGameLoop(0xAC);
     } else if (v == 0xAD) {
-        D_00139768.f18 = (D_00139768.f18 & 0xFDFFFFFF) | 0x2000000;
-        D_00139768.fac |= 0x6000;
+        g_request_flag_table.f18 = (g_request_flag_table.f18 & 0xFDFFFFFF) | 0x2000000;
+        g_request_flag_table.fac |= 0x6000;
         if (PlayBonusReelWithGameLoop(0xAD)) goto done;
         if (mpeg_play_movie_by_id(0x19)) goto done;
         PlayBonusReelWithGameLoop(0xAE);
@@ -54,9 +54,9 @@ void func_PAL_002ED0D8(void)
     } else if (v == 0x1B) {
         mpeg_play_movie_by_id(0x1B);
     } else if (v == 0xAF) {
-        D_00139768.fac |= 0x8000;
-        D_00139768.f1c = (D_00139768.f1c & 0xEFFFFFFF) | 0x10000000;
-        D_00139768.fb0 = (D_00139768.fb0 & 0xFFFEFFFF) | 0x10000;
+        g_request_flag_table.fac |= 0x8000;
+        g_request_flag_table.f1c = (g_request_flag_table.f1c & 0xEFFFFFFF) | 0x10000000;
+        g_request_flag_table.fb0 = (g_request_flag_table.fb0 & 0xFFFEFFFF) | 0x10000;
         if (PlayBonusReelWithGameLoop(0xAF)) goto done;
         if (mpeg_play_movie_by_id(0x1C)) goto done;
         PlayBonusReelWithGameLoop(0xB0);

@@ -1,9 +1,9 @@
 #include "common.h"
 #define FIELD(p,t,o) (*(t *)((char *)(p)+(o)))
-extern int D_L09_001B0C4C __attribute__((sda));
-extern float D_L09_001B0C00 __attribute__((sda)), D_L09_001B0C04 __attribute__((sda)), D_L09_001B0C08 __attribute__((sda)), D_L09_001B0C0C __attribute__((sda));
-extern float D_L09_001B0C10 __attribute__((sda)), D_L09_001B0C14 __attribute__((sda)), D_L09_001B0C18 __attribute__((sda)), D_L09_001B0C1C __attribute__((sda));
-extern char D_L09_001B0C50[];
+extern int g_hover_tank_disabled __attribute__((sda));
+extern float g_hover_tank_limit_turn_a __attribute__((sda)), g_hover_tank_limit_turn_b __attribute__((sda)), g_hover_tank_limit_turn_c __attribute__((sda)), g_hover_tank_limit_turn_d __attribute__((sda));
+extern float g_hover_tank_limit_move_a __attribute__((sda)), g_hover_tank_limit_move_b __attribute__((sda)), g_hover_tank_limit_move_c __attribute__((sda)), g_hover_tank_limit_move_d __attribute__((sda));
+extern char g_str_hover_tank_debug[];
 extern int moby_is_in_selected_zone(void *);
 extern void enemy_step_animation(void *);
 extern void STUB_printf(void *,int,int);
@@ -27,14 +27,14 @@ void hover_tank_update(char *moby)
     char *state;
     char *position;
     int ready;
-    if (D_L09_001B0C4C) return;
+    if (g_hover_tank_disabled) return;
     position=moby+0x10;
     if (!moby_is_in_selected_zone(position)) return;
     state=FIELD(moby,char *,0x68);
     enemy_step_animation(moby);
     qcopy(position,state+0x330);
     switch (FIELD(moby,unsigned char,0x95)) {
-    case 0: STUB_printf(D_L09_001B0C50,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
+    case 0: STUB_printf(g_str_hover_tank_debug,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
     case 1:
         if (FIELD(state,int,0x154)==1 || flag_is_third_pending_set(moby)) {
             FIELD(state,int,0x354)=FIELD(state,int,0x378);
@@ -43,7 +43,7 @@ void hover_tank_update(char *moby)
         break;
     case 3:
         if (FIELD(state,int,0x154)==1) {
-            moby_set_controller_speed_limits(moby,D_L09_001B0C10*0.00027777778f,D_L09_001B0C14*0.016666668f,D_L09_001B0C18*4.84813745061e-06f,D_L09_001B0C1C*0.000290888245218f);
+            moby_set_controller_speed_limits(moby,g_hover_tank_limit_move_a*0.00027777778f,g_hover_tank_limit_move_b*0.016666668f,g_hover_tank_limit_move_c*4.84813745061e-06f,g_hover_tank_limit_move_d*0.000290888245218f);
             moby_set_state(moby,4,4);
         }
         break;
@@ -51,19 +51,19 @@ void hover_tank_update(char *moby)
     case 4:
         if (FIELD(state,int,0x154)!=1 && !FIELD(state,unsigned char,0x369)) {
             if (FIELD(moby,unsigned char,0x43)) anim_start_blended(moby,0,0,0);
-            moby_set_controller_speed_limits(moby,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
+            moby_set_controller_speed_limits(moby,g_hover_tank_limit_turn_a*0.00027777778f,g_hover_tank_limit_turn_b*0.016666668f,g_hover_tank_limit_turn_c*4.84813745061e-06f,g_hover_tank_limit_turn_d*0.000290888245218f);
             moby_set_state(moby,3,3);
         }
         break;
     }
     switch (FIELD(moby,unsigned char,0x20)) {
-    case 0: STUB_printf(D_L09_001B0C50,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
+    case 0: STUB_printf(g_str_hover_tank_debug,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
     case 1: break;
     case 2:
         ready = 1;
         if (FIELD(state,int,0x36C)!=-1) ready = path_advance_index_and_move(moby,FIELD(state,int,0x36C)) != 0;
         if (ready) {
-            moby_set_controller_speed_limits(moby,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
+            moby_set_controller_speed_limits(moby,g_hover_tank_limit_turn_a*0.00027777778f,g_hover_tank_limit_turn_b*0.016666668f,g_hover_tank_limit_turn_c*4.84813745061e-06f,g_hover_tank_limit_turn_d*0.000290888245218f);
             path_start_moby_on_entry(moby,FIELD(state,int,0x350),-1);
             FIELD(state,int,0x380)=1;
             moby_set_state(moby,3,3);

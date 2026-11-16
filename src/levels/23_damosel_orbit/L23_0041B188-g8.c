@@ -7,12 +7,12 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B14E4 __attribute__((sda));
-extern float D_L23_001B14E8 __attribute__((sda));
-extern float D_L23_001B1680 __attribute__((sda));
-extern float D_L23_001B14DC __attribute__((sda));
-extern float D_L23_001B1410 __attribute__((sda));
-extern TI128 D_L23_001B38D0;
+extern float g_boss_timer_value __attribute__((sda));
+extern float g_boss_path_half_width __attribute__((sda));
+extern float g_boss_path_target_distance __attribute__((sda));
+extern float g_boss_path_max_deviation __attribute__((sda));
+extern float g_boss_drift_active_flag __attribute__((sda));
+extern TI128 g_boss_drift_vector;
 extern char g_path_end_masks[];
 extern int *g_path_lists[];
 
@@ -34,11 +34,11 @@ void boss_drift_along_path(char *obj) {
     int side, flip, step, slot;
 
     mothership_project_point_onto_surface(state + 0x3A0, *(float *)(state + 0x588));
-    mid = D_L23_001B14E4;
+    mid = g_boss_timer_value;
     x = *(float *)(state + 0x5B8);
-    if (mid + D_L23_001B14E8 <= x || x <= mid - D_L23_001B14E8) {
+    if (mid + g_boss_path_half_width <= x || x <= mid - g_boss_path_half_width) {
         flip = 0;
-        if (mid - D_L23_001B14E8 < x) {
+        if (mid - g_boss_path_half_width < x) {
             side = 3;
             dev = math_fabs(x - mid);
             if (*(u32 *)(state + 0x5F0) >= 2) {
@@ -55,7 +55,7 @@ void boss_drift_along_path(char *obj) {
             }
             *(int *)(state + 0x5F0) = 2;
         }
-        if (flip != 0 || fast_vec_dist(obj + 0x10, state + 0x3A0) < D_L23_001B1680) {
+        if (flip != 0 || fast_vec_dist(obj + 0x10, state + 0x3A0) < g_boss_path_target_distance) {
             step = *(short *)(state + 0x396) + *(short *)(state + 0x392);
             if (step < 0) {
                 char *ids = state + 0x230;
@@ -80,14 +80,14 @@ void boss_drift_along_path(char *obj) {
         }
         FastVecSub((char *)&vec, state + 0x3A0, obj + 0x10);
         dev = dev * 0.0625f;
-        if (D_L23_001B14DC < dev)
-            dev = D_L23_001B14DC;
-        else if (dev < D_L23_001B14DC * 0.05f)
-            dev = D_L23_001B14DC * 0.05f;
+        if (g_boss_path_max_deviation < dev)
+            dev = g_boss_path_max_deviation;
+        else if (dev < g_boss_path_max_deviation * 0.05f)
+            dev = g_boss_path_max_deviation * 0.05f;
         vec_scale_to_length((char *)&vec, (char *)&vec, dev);
-        qcopy(&D_L23_001B38D0, &vec);
+        qcopy(&g_boss_drift_vector, &vec);
         FastVecAdd(obj + 0x10, obj + 0x10, (char *)&vec);
         mothership_project_point_onto_surface(obj + 0x10, *(float *)(state + 0x588));
     }
-    D_L23_001B1410 = 1.0f;
+    g_boss_drift_active_flag = 1.0f;
 }

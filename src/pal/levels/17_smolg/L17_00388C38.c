@@ -10,8 +10,8 @@ typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
+extern int g_projectile_model_ref __attribute__((sda));
+extern int g_ripple_object __attribute__((sda)), g_ripple_param __attribute__((sda));
 extern Collision g_collision_result;
 extern Material g_weapon_l00_table[];
 extern void part_steer_effect_direction(int, void *, int);
@@ -43,14 +43,14 @@ extern void vec_scale_to_length(void *, void *, float);
 /* func_PAL_L17_00388C38, the PAL copy of func_L17_00385DE8: the same C, where the sparks' life of
    16 frames becomes 13 and the second spark's spin stays a literal 16. */
 /* Read once as a GP macro load in a delay slot and otherwise as lui/lw, as at -G0 in retail. */
-extern int D_L17_001A8F00 __attribute__((sda));
+extern int g_spark_effect_state __attribute__((sda));
 typedef struct { char pad[0x30]; int phase, frame; char gap[0x15C]; char *actor; } CutsceneState;
-extern CutsceneState D_L17_001BD8C0;
+extern CutsceneState g_cutscene_l17_state;
 typedef struct EffectMoby {
     char pad0[0x28]; struct EffectMoby *next; char pad1[8]; unsigned short flags;
     char pad2[0x62]; int unknown; char pad3[0xE]; short classId;
 } EffectMoby;
-extern EffectMoby *D_L17_001B2C28 __attribute__((sda));
+extern EffectMoby *g_effect_moby_list __attribute__((sda));
 extern void moby_transform_joint_to_world(void *, int, void *);
 typedef struct { char pad0[4]; int state; char pad1[2]; unsigned char opacity, age; } EffectTail;
 typedef struct { char pad0[8]; unsigned char color, size; short life; char pad1[0x14]; EffectTail tail; } CutsceneParticle;
@@ -61,7 +61,7 @@ extern int FloatToInt(float);
 
 /* Activates the scene's effect mobys during phase 6 and emits paired sparks from the
    scene actor during two frame windows of phases 4 and 5. */
-void func_PAL_L17_00388C38(unsigned char *self) {
+void cutscene_update_spark_effects_pal(unsigned char *self) {
     Vec velocity, point;
     char *obj;
     CutsceneParticle *first, *second;
@@ -74,22 +74,22 @@ void func_PAL_L17_00388C38(unsigned char *self) {
         self[0x20] = 1;
         break;
     case 1:
-        if (D_L17_001A8F00 != 2)
+        if (g_spark_effect_state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 6) {
+        if (g_cutscene_l17_state.phase == 6) {
             EffectMoby *m;
-            for (m = D_L17_001B2C28; m; m = m->next) {
+            for (m = g_effect_moby_list; m; m = m->next) {
                 if (m->classId == 0xB88 || m->classId == 0x1249) {
                     m->unknown = 0;
                     m->flags = (m->flags | 0x43) & 0xEFFF;
                 }
             }
         }
-        state = D_L17_001A8F00;
+        state = g_spark_effect_state;
         if (state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 4 && (unsigned)(D_L17_001BD8C0.frame - 301) < 59) {
-            obj = D_L17_001BD8C0.actor;
+        if (g_cutscene_l17_state.phase == 4 && (unsigned)(g_cutscene_l17_state.frame - 301) < 59) {
+            obj = g_cutscene_l17_state.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
@@ -116,13 +116,13 @@ void func_PAL_L17_00388C38(unsigned char *self) {
                     detail->opacity = 127;
                     detail->age = (unsigned char)first->life;
                 }
-                state = D_L17_001A8F00;
+                state = g_spark_effect_state;
             }
         }
         if (state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 5 && D_L17_001BD8C0.frame >= 531) {
-            obj = D_L17_001BD8C0.actor;
+        if (g_cutscene_l17_state.phase == 5 && g_cutscene_l17_state.frame >= 531) {
+            obj = g_cutscene_l17_state.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
@@ -201,7 +201,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(g_ripple_object, g_ripple_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -237,7 +237,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -266,7 +266,7 @@ finish:
 }
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void func_PAL_L00_00391958(void *, void *, void *);
@@ -304,7 +304,7 @@ void func_PAL_L17_00394220(char *obj) {
     if (*(int *)(ctx + 0x18) < 0xF2)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -323,7 +323,7 @@ void func_PAL_L17_00394220(char *obj) {
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -365,7 +365,7 @@ finish:
  * becomes 75. */
 
 extern int g_screen_width[] MACRO_ADDR;
-extern int D_L17_001AF52C[];
+extern int g_tile_grid_scroll[];
 extern float IntToFloat(int);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
@@ -387,7 +387,7 @@ void func_PAL_L17_003A7DB0(char *self) {
     ny = g_screen_width[1] / 32 + 1;
 
     for (i = 0; i < nx; i++) {
-        int *p = D_L17_001AF52C;
+        int *p = g_tile_grid_scroll;
         for (j = 0; j < ny; j++) {
             pv[0] = (float)(i * 32);
             pv[1] = (float)(j * 32);

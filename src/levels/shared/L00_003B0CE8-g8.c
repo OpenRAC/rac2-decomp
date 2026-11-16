@@ -5,9 +5,9 @@
 #include "common.h"
 
 typedef struct { u8 pad0[0xC]; int used; u8 pad10[4]; u8 id[8]; } Slot;
-extern Slot D_L00_0023BB78[];
-extern u8 D_L00_001AF810 __attribute__((sda));
-extern u8 D_L00_001AF811 __attribute__((sda));
+extern Slot g_effect_path_node_table[];
+extern u8 g_trail_slot_head __attribute__((sda));
+extern u8 g_trail_slot_tail __attribute__((sda));
 
 extern void AdvanceNodeRingCursor();
 
@@ -17,15 +17,15 @@ void node_free_slot(int idx)
     u8 cur;
     int i;
 
-    D_L00_0023BB78[c].used = 0;
-    for (cur = D_L00_001AF811; cur != D_L00_001AF810; cur++) {
-        if (D_L00_0023BB78[cur].used != 0) {
+    g_effect_path_node_table[c].used = 0;
+    for (cur = g_trail_slot_tail; cur != g_trail_slot_head; cur++) {
+        if (g_effect_path_node_table[cur].used != 0) {
             for (i = 0; i < 8; i++) {
-                if (D_L00_0023BB78[cur].id[i] == c)
-                    D_L00_0023BB78[cur].id[i] = cur;
+                if (g_effect_path_node_table[cur].id[i] == c)
+                    g_effect_path_node_table[cur].id[i] = cur;
             }
         }
     }
-    if (c == D_L00_001AF811)
+    if (c == g_trail_slot_tail)
         AdvanceNodeRingCursor();
 }

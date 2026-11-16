@@ -22,7 +22,7 @@ typedef struct {
 /* the list of mobs: every level has it at its own address */
 extern MobListStruct ref_L04_0031D630_00;
 
-extern int D_PAL_001A7A78 MACRO_ADDR;
+extern int g_current_level MACRO_ADDR;
 
 extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *mob);
@@ -45,7 +45,7 @@ void func_PAL_L04_0031F198(void) {
         if (mob->type == 0xD54) {
             func_PAL_002E7270(mob);
         }
-        if (mob != 0 && mob->type == 0xFA0 && D_PAL_001A7A78 != 0x33 && mob->p68 != 0) {
+        if (mob != 0 && mob->type == 0xFA0 && g_current_level != 0x33 && mob->p68 != 0) {
             math_store_angle_update_result(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }

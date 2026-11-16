@@ -13,22 +13,22 @@ extern int moby_l08_is_linked_running(int),moby_l08_is_linked_gone_2(int),moby_l
 extern void STUB_printf(void *,int,int),func_PAL_002A7E68(void *,int,int,int),moby_set_state(void *,int,int);
 extern int SelectNearestListedMoby(void *,void *,float,float,int,int,int,int);
 extern int math_fast_float_d(void *);
-extern int func_PAL_002B5E10(void *);
+extern int moby_step_at_own_position_pal(void *);
 extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(void *);
 extern void func_PAL_L01_003C0D50(void *,void *,int,float,float,float,float,float,float);
 extern int func_PAL_L08_003DD170(void *,float,float,float,float,float,float,float);
 extern int coll_check_object_inside_polygon(void *),moby_dispatch_action_by_kind(void *,void *);
-extern int func_PAL_L01_00323068(void *,void *);
-extern int func_PAL_002B5E30(void *,float);
+extern int moby_l01_turn_toward_target_pal(void *,void *);
+extern int moby_step_at_own_position_factor_pal(void *,float);
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern int CollLine(void *,void *,int,void *,int),coll_test_point(void *,int,void *,float);
 extern void vec_fast_normalize(void *,void *,void *),FastVecScale(void *,void *,float);
 extern float vec_distance_xy(void *,void *),mat_fast_helper_a(float,float),FastDiffRots(float,float);
 extern s32 math_closest_point_on_polygon_edge(void *,void *,void *,int);
-extern u8 D_L08_002B5270[];
+extern u8 g_str_debug_object_ids[];
 typedef struct { u8 pad[0x18]; u8 *moby; u32 pad1C; float point[4], adjusted[4], normal[4]; } Collision;
-extern Collision D_L08_001BFF40;
+extern Collision g_collision_l08_result;
 typedef struct {
     u8 pad00[0x24];
     u8 *anim;
@@ -38,17 +38,17 @@ typedef struct {
     u8 pad36[0x62];
     int animation;
 } GroundMoby;
-extern u8 *D_L08_001FE7C0[];
+extern u8 *g_path_list_table[];
 extern u8 g_hero_position[];
-extern int D_0018C0B4[];
+extern int g_game_mode[];
 extern void part_spawn_sparks_around(void *),func_PAL_L08_003DC0D0(void *,void *);
-extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-extern void func_PAL_002A7650(void *,int,int);
-extern u8 D_L08_001A8F20[] MACRO_ADDR;
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void SetDeathBits_pal(void *,int,int);
+extern u8 g_str_effect_name[] MACRO_ADDR;
 typedef struct { u8 pad[0x464]; u8 flags[0]; } MobyFlags;
-extern MobyFlags D_L08_0021DE80, D_L08_0021EAF0;
-extern u8 D_L08_001B2840[] MACRO_ADDR;
-extern u8 D_0019B2E8[],D_0019B4A8[];
+extern MobyFlags g_moby_spawn_state_flags_a, g_moby_spawn_state_flags_b;
+extern u8 g_moby_state_flags[] MACRO_ADDR;
+extern u8 g_moby_group_flags[],g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
 void func_PAL_L08_003DE160(u8 *object)
 {
@@ -71,7 +71,7 @@ void func_PAL_L08_003DE160(u8 *object)
             break;
         case 1:
             if(I(state,0x400)!=-1) ready=moby_l08_is_linked_running(I(state,0x400))!=0;
-            else {STUB_printf(D_L08_002B5270,S(object,0xAA),S(object,0xB2)); B(state,0x40D)=0;}
+            else {STUB_printf(g_str_debug_object_ids,S(object,0xAA),S(object,0xB2)); B(state,0x40D)=0;}
             break;
         case 2: trigger=B(object,0xBC);goto trigger_test;
         case 3: ready=moby_l08_is_linked_gone_2(I(state,0x468))!=0;break;
@@ -118,16 +118,16 @@ void func_PAL_L08_003DE160(u8 *object)
         qcopy_nc(old,object+0x10);FastVecAdd(object+0x10,object+0x10,state+0xD0);
         F(state,0xD8)-=0.00392f;F(object,0x18)+=1.5f;
         if(CollLine(old,object+0x10,0,object,0)) {
-            u8 *hitMoby=D_L08_001BFF40.moby;
+            u8 *hitMoby=g_collision_l08_result.moby;
             if(hitMoby) {
                 if(S(hitMoby,0xAA)==0x945 || S(hitMoby,0xAA)==0x9C6) goto no_ray_response;
             }
-            FastVecSub(delta,old,D_L08_001BFF40.point);
+            FastVecSub(delta,old,g_collision_l08_result.point);
             vec_scale_to_length(delta,delta,1.5f);FastVecAdd(object+0x10,object+0x10,delta);
         }
         no_ray_response:
         if(coll_test_point(object+0x10,0,object,1.5f)) {
-            collisionMoby=D_L08_001BFF40.moby;
+            collisionMoby=g_collision_l08_result.moby;
             if(collisionMoby) {
                 if(S(collisionMoby,0xAA)==0x945 || S(collisionMoby,0xAA)==0x9C6) goto no_overlap_response;
             } else {
@@ -140,8 +140,8 @@ void func_PAL_L08_003DE160(u8 *object)
                     goto no_overlap_response;
                 }
             }
-            qcopy_nc(object+0x10,D_L08_001BFF40.adjusted);
-            vec_fast_normalize(state+0xD0,state+0xD0,D_L08_001BFF40.normal);
+            qcopy_nc(object+0x10,g_collision_l08_result.adjusted);
+            vec_fast_normalize(state+0xD0,state+0xD0,g_collision_l08_result.normal);
             FastVecScale(state+0xD0,state+0xD0,0.8f);
         }
         no_overlap_response:
@@ -150,7 +150,7 @@ void func_PAL_L08_003DE160(u8 *object)
         break;
     }
     case 5:
-        func_PAL_002B5E10(object);
+        moby_step_at_own_position_pal(object);
         if(B(object,0x60)&2) {
             if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,2);
             moby_set_state(object,6,1);
@@ -159,7 +159,7 @@ void func_PAL_L08_003DE160(u8 *object)
     case 6:
         switch(B(object,0x95)) {
         case 0:
-            func_PAL_002B5E10(object);
+            moby_step_at_own_position_pal(object);
             if(B(object,0x60)&2) {
                 if(!I(state,0x440)) {
                     I(state,0x440)=((s32)(math_random_int_range(180,360)) * 5 + 2) / 6;crawler_choose_goal(object);
@@ -185,7 +185,7 @@ void func_PAL_L08_003DE160(u8 *object)
         }
         if(math_random_int_below(7)) break;
         if(I(state,0x448) || SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)!=2) {
-            if(I(state,0x428)!=-1) {u8 *e=D_L08_001FE7C0[I(state,0x428)];math_closest_point_on_polygon_edge(state+0x210,state+0x210,e+0x10,I(e,0));}
+            if(I(state,0x428)!=-1) {u8 *e=g_path_list_table[I(state,0x428)];math_closest_point_on_polygon_edge(state+0x210,state+0x210,e+0x10,I(e,0));}
             if(B(state,0x40C)==3) {
                 I(state,0x48C)=500;I(state,0x15C)=I(state,0x428);B(state,0x40C)=1;
                 qcopy_nc(state+0x3F0,state+0x230);
@@ -205,7 +205,7 @@ void func_PAL_L08_003DE160(u8 *object)
         break;
     case 7:
         switch(B(object,0x95)) { case 0: {
-            func_PAL_002B5E10(object);
+            moby_step_at_own_position_pal(object);
             if((B(object,0x60)&2) && (unsigned)(B(object,0x42)-2)<2)I(state,0x440)=0;
             if(!I(state,0x440)) {
                 I(state,0x440)=((s32)(math_random_int_range(180,360)) * 5 + 2) / 6;
@@ -226,7 +226,7 @@ void func_PAL_L08_003DE160(u8 *object)
         if(math_random_int_below(7))break;
         if(!I(state,0x48C)) {
             result=SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1);
-            if(result==2 || D_0018C0B4[0]==49) {
+            if(result==2 || g_game_mode[0]==49) {
                 I(state,0x254)=2;
                 if(!math_random_int_below(4)) {
                     if(B(object,0x43)!=6)func_PAL_002A7E68(object,6,0,math_random_int_range(3,6));
@@ -280,7 +280,7 @@ void func_PAL_L08_003DE160(u8 *object)
             if(I(state,0x48C)>0) {qcopy_nc(state+0x210,g_hero_position);qcopy_nc(state+0x230,g_hero_position);F(state,0x238)+=0.4f;}
             break;
         case 1:
-            func_PAL_002B5E10(object);
+            moby_step_at_own_position_pal(object);
             if(B(object,0x42)==6 && (B(object,0x60)&2)) {
                 if(B(object,0x43)!=7)func_PAL_002A7E68(object,7,0,5);
                 moby_set_state(object,8,2);
@@ -288,8 +288,8 @@ void func_PAL_L08_003DE160(u8 *object)
             break;
         case 2:
             {u8 *hit=P(state,0x250);
-            if(hit)func_PAL_002B5E30(object,mat_fast_helper_a(F(hit,0x10)-F(object,0x10),F(hit,0x14)-F(object,0x14)));
-            else func_PAL_002B5E30(object,mat_fast_helper_a(F(state,0x210)-F(object,0x10),F(state,0x214)-F(object,0x14)));}
+            if(hit)moby_step_at_own_position_factor_pal(object,mat_fast_helper_a(F(hit,0x10)-F(object,0x10),F(hit,0x14)-F(object,0x14)));
+            else moby_step_at_own_position_factor_pal(object,mat_fast_helper_a(F(state,0x210)-F(object,0x10),F(state,0x214)-F(object,0x14)));}
             if(B(object,0x42)==7 && moby_get_anim_value(object)>24) {
                 func_PAL_L08_003DD918(object);
                 if(B(object,0x60)&2) {
@@ -299,7 +299,7 @@ void func_PAL_L08_003DE160(u8 *object)
             }
             break;
         case 3:
-            func_PAL_002B5E10(object);
+            moby_step_at_own_position_pal(object);
             if(B(object,0x60)&2) {
                 I(state,0x48C)=0;I(state,0x440)=0;I(state,0x448)=0;I(state,0x480)=0;
                 I(state,0x44C)=((s32)(math_random_int_range(90,180)) * 5 + 2) / 6;moby_set_state(object,7,0);crawler_choose_goal(object);
@@ -324,24 +324,24 @@ void func_PAL_L08_003DE160(u8 *object)
         }
         break;
     case 10:
-        F(state,0x154)=0.1f;func_PAL_L01_00323068(object,state+0x3E0);
+        F(state,0x154)=0.1f;moby_l01_turn_toward_target_pal(object,state+0x3E0);
         if(!(I(state,0x1B4)&0x100))moby_set_state(object,7,0);
         break;
     case 11: {
         int index;
         u8 idx;
-        part_spawn_sparks_around(object);func_PAL_L08_003DC0D0(object,D_L08_001A8F20);
-        func_PAL_002AC718(object,D_L08_001A8F20,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,1,0x810001);
-        func_PAL_002A7650(object,0,3);
-        D_L08_0021DE80.flags[S(object,0xB2)]=B(object,0xB0)+2;
+        part_spawn_sparks_around(object);func_PAL_L08_003DC0D0(object,g_str_effect_name);
+        SpawnExplosionEffects_pal(object,g_str_effect_name,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,1,0x810001);
+        SetDeathBits_pal(object,0,3);
+        g_moby_spawn_state_flags_a.flags[S(object,0xB2)]=B(object,0xB0)+2;
         index=B(object,0xB0);
-        if(index==0xFF || (idx=index, !(D_L08_001B2840[idx]&0x80) && (D_0019B2E8[idx+(g_current_map_index<<4)]&0x80)))
-            D_L08_0021EAF0.flags[S(object,0xB2)]=B(object,0xB0)+2;
+        if(index==0xFF || (idx=index, !(g_moby_state_flags[idx]&0x80) && (g_moby_group_flags[idx+(g_current_map_index<<4)]&0x80)))
+            g_moby_spawn_state_flags_b.flags[S(object,0xB2)]=B(object,0xB0)+2;
         if(H(object,0xB2)&1) {
-            u8 *flag=D_0019B4A8+((S(object,0xB2)>>1)+(g_current_map_index<<10));
+            u8 *flag=g_moby_nibble_table+((S(object,0xB2)>>1)+(g_current_map_index<<10));
             if(((*flag>>4)&7)!=7)*flag+=0x10;
         } else {
-            u8 *flag=D_0019B4A8+((S(object,0xB2)>>1)+(g_current_map_index<<10));
+            u8 *flag=g_moby_nibble_table+((S(object,0xB2)>>1)+(g_current_map_index<<10));
             if((*flag&7)!=7)++*flag;
         }
         moby_mark_spawned(object);

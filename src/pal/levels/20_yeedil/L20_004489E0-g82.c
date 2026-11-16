@@ -3,25 +3,25 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 quad; float component[4]; } Vector431E0;
-extern u16 *D_L20_001FBB20[];
-extern char *D_L20_001B2F9C;
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern u16 *g_group_l20_id_lists[];
+extern char *g_group_l20_member_table;
+extern int g_group_count __attribute__((sda));
 extern int moby_is_state_six(char *);
 extern void nanotech_crate_init(char *);
 extern int moby_fuse_linked_objects(char *, char *, char *, char **, int);
 extern char *glow_effect_create(char *, char *, int, int);
 
-char *func_PAL_L20_00448C40(char *arg0, TI128 *arg1) {
+char *yeedil_boss_place_group_member_pal(char *arg0, TI128 *arg1) {
     char *state = *(char **)(arg0 + 0x68);
     u16 *rec;
     char *found = 0;
     Vector431E0 buf;
 
-    for (rec = D_L20_001FBB20[*(int *)(state + 0x218)];
-         (*(int *)(state + 0x218) & 0xFF) != 0xFF && *(int *)(state + 0x218) <= D_L20_001B2FB8 && rec != 0 &&
-         ((rec != 0 && (s16)rec[-1] >= 0) || rec == D_L20_001FBB20[*(int *)(state + 0x218)]);
+    for (rec = g_group_l20_id_lists[*(int *)(state + 0x218)];
+         (*(int *)(state + 0x218) & 0xFF) != 0xFF && *(int *)(state + 0x218) <= g_group_count && rec != 0 &&
+         ((rec != 0 && (s16)rec[-1] >= 0) || rec == g_group_l20_id_lists[*(int *)(state + 0x218)]);
          rec++) {
-        char *e = D_L20_001B2F9C + ((*rec & 0x7FFF) << 8);
+        char *e = g_group_l20_member_table + ((*rec & 0x7FFF) << 8);
 
         if (e != 0 && moby_is_state_six(e) != 0)
             found = e;

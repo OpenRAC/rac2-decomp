@@ -13,7 +13,7 @@ extern void text_draw_window_small(FontWindow *,unsigned long,char *,int);
 extern void text_draw_small(int,int,unsigned long,char *,int);
 extern void text_draw_right_aligned_small(int,int,unsigned long,char *,int);
 
-int func_US2_002DC0F0(struct CheatsMenu *menu) {
+int DrawCheatsMenu_us2(struct CheatsMenu *menu) {
     FontWindow text_window;
     short window_fields[12];
     struct CheatMenuEntry *entry;

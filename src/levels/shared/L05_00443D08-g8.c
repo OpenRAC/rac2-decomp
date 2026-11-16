@@ -1,14 +1,14 @@
 #include "common.h"
 typedef unsigned int ShotQuad __attribute__((mode(TI)));
 typedef union { ShotQuad q; float f[4]; } ShotVector;
-extern int D_L05_001B2048, D_00138320[], D_L05_002A1940[];
+extern int g_feltzin_mission_index, g_pad_pressed_flags[], g_ship_mode_words[];
 typedef struct { int upgrade; char pad[12]; int maximum, ammo; char tail[16]; } WeaponSlot;
-extern WeaponSlot D_L05_002A1800[];
-extern char g_sound_state[],D_L05_002B8770[];
-extern float D_L05_001B1A9C __attribute__((sda)), D_L05_001B1B70 __attribute__((sda));
-extern unsigned short D_L05_001B1AA0 __attribute__((sda)),D_L05_001B1AA4 __attribute__((sda)),D_L05_001B1AA8 __attribute__((sda));
-extern int D_L05_001B1AAC __attribute__((sda)),D_L05_001B1AB0 __attribute__((sda)),D_L05_001B1AFC __attribute__((sda));
-extern float D_L05_001B1B30 __attribute__((sda)),D_L05_001B1B40 __attribute__((sda)),D_L05_001B1B50 __attribute__((sda)),D_L05_001B1B60 __attribute__((sda));
+extern WeaponSlot g_spawn_entry_table[];
+extern char g_sound_state[],g_slot_record_source[];
+extern float g_ship_aim_length __attribute__((sda)), g_ship_muzzle_speed __attribute__((sda));
+extern unsigned short g_ship_shot_var_half_a __attribute__((sda)),g_ship_shot_var_half_b __attribute__((sda)),g_ship_shot_var_half_c __attribute__((sda));
+extern int g_ship_shot_var_word_a __attribute__((sda)),g_ship_shot_var_word_b __attribute__((sda)),g_ship_shot_voice_id __attribute__((sda));
+extern float g_ship_muzzle_left_offset __attribute__((sda)),g_ship_muzzle_right_offset __attribute__((sda)),g_ship_muzzle_left_alt_offset __attribute__((sda)),g_ship_muzzle_right_alt_offset __attribute__((sda));
 extern int FastDecTimer(void *),math_fast_float_d(void *),slot_find_active_in_chain(int);
 extern void FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float),matrix_mul_vec3(void *,void *,void *),FastVecScale(void *,void *,float);
 /* The sound call and the four spawners below return a value this function ignores. Declaring them
@@ -37,19 +37,19 @@ void UpdateShipWeapons(char *moby, char *driver)
     char *shot;
     int mode, index;
 
-    if (H(driverState, 0xd8) && (D_L05_001B2048 & 1))
+    if (H(driverState, 0xd8) && (g_feltzin_mission_index & 1))
         return;
 
-    if (FastDecTimer(vars + 8) && (D_00138320[0] & 0x40)) {
-        H(vars, 8) = D_L05_001B1AA0;
+    if (FastDecTimer(vars + 8) && (g_pad_pressed_flags[0] & 0x40)) {
+        H(vars, 8) = g_ship_shot_var_half_a;
         FastVecSub(&aim, vars + 0x20, driver + 0x30);
-        vec_scale_to_length(&aim, &aim, D_L05_001B1A9C);
+        vec_scale_to_length(&aim, &aim, g_ship_aim_length);
         FastVecAdd(&base, &aim, driver + 0x30);
-        mode = D_L05_002A1940[0];
+        mode = g_ship_mode_words[0];
         if (mode)
-            matrix_mul_vec3(&muzzle_left, &D_L05_001B1B50, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_left, &g_ship_muzzle_left_alt_offset, moby + 0xc0);
         else
-            matrix_mul_vec3(&muzzle_left, &D_L05_001B1B30, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_left, &g_ship_muzzle_left_offset, moby + 0xc0);
         FastVecAdd(&muzzle_left, &muzzle_left, moby + 0x10);
         FastVecSub(&shot_dir, &base, &muzzle_left);
         PlayMobySound(3, 0, moby);
@@ -61,14 +61,14 @@ void UpdateShipWeapons(char *moby, char *driver)
             F(shot_vars, 0x14) += F(driverState, 0x34);
             F(shot_vars, 0x18) += F(driverState, 0x38);
             if (mode) {
-                FastVecScale(&muzzle_right, moby + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
+                FastVecScale(&muzzle_right, moby + 0xd0, g_ship_muzzle_speed * 0.01666666753590107f);
                 FastVecAdd(shot_vars + 0x10, shot_vars + 0x10, &muzzle_right);
             }
         }
         if (mode)
-            matrix_mul_vec3(&muzzle_right, &D_L05_001B1B60, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_right, &g_ship_muzzle_right_alt_offset, moby + 0xc0);
         else
-            matrix_mul_vec3(&muzzle_right, &D_L05_001B1B40, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_right, &g_ship_muzzle_right_offset, moby + 0xc0);
         FastVecAdd(&muzzle_right, &muzzle_right, moby + 0x10);
         FastVecSub(&shot_dir, &base, &muzzle_right);
         shot = moby_spawn_shot_effect(moby, &muzzle_right, 1.0f, &shot_dir, 0x2020ff, 0x20207f, 0, mode, 0);
@@ -79,7 +79,7 @@ void UpdateShipWeapons(char *moby, char *driver)
             F(shot_vars, 0x14) += F(driverState, 0x34);
             F(shot_vars, 0x18) += F(driverState, 0x38);
             if (mode) {
-                FastVecScale(&kick, moby + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
+                FastVecScale(&kick, moby + 0xd0, -(g_ship_muzzle_speed * 0.01666666753590107f));
                 FastVecAdd(shot_vars + 0x10, shot_vars + 0x10, &kick);
             }
         }
@@ -87,8 +87,8 @@ void UpdateShipWeapons(char *moby, char *driver)
 
     {
         int slot = slot_find_active_in_chain(1);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(vars + 0xa)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && FastDecTimer(vars + 0xa)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(1, 1);
             aim.q = 0;
             aim.f[2] = -0.1f;
@@ -96,16 +96,16 @@ void UpdateShipWeapons(char *moby, char *driver)
             matrix_mul_vec3(&base, &aim, moby + 0xc0);
             FastVecAdd(&base, &base, moby + 0x10);
             PlayMobySound(2, 0, moby);
-            func_L05_003D0960(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[9].upgrade);
-            H(vars, 0xa) = D_L05_001B1AA4;
+            func_L05_003D0960(&base, moby + 0xc0, I(vars, 0x18), moby, g_spawn_entry_table[9].upgrade);
+            H(vars, 0xa) = g_ship_shot_var_half_b;
             I(vars, 0x218) = 5;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(3);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(vars + 0xa8)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && FastDecTimer(vars + 0xa8)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(3, 1);
             aim.q = 0;
             aim.f[2] = -0.1f;
@@ -113,16 +113,16 @@ void UpdateShipWeapons(char *moby, char *driver)
             matrix_mul_vec3(&base, &aim, moby + 0xc0);
             FastVecAdd(&base, &base, moby + 0x10);
             PlayMobySound(2, 0, moby);
-            func_L05_003979B0(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[11].upgrade);
-            H(vars, 0xa8) = D_L05_001B1AA8;
+            func_L05_003979B0(&base, moby + 0xc0, I(vars, 0x18), moby, g_spawn_entry_table[11].upgrade);
+            H(vars, 0xa8) = g_ship_shot_var_half_c;
             I(vars, 0x218) = 5;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(2);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && math_fast_float_d(vars + 0x20c)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && math_fast_float_d(vars + 0x20c)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(2, 1);
             aim.q = 0;
             aim.f[2] = -0.2f;
@@ -130,30 +130,30 @@ void UpdateShipWeapons(char *moby, char *driver)
             matrix_mul_vec3(&base, &aim, moby + 0xc0);
             FastVecAdd(&base, &base, moby + 0x10);
             PlayMobySound(2, 0, moby);
-            projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 1);
-            if (D_L05_002A1800[10].upgrade) {
+            projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, g_spawn_entry_table[10].upgrade, 1);
+            if (g_spawn_entry_table[10].upgrade) {
                 muzzle_left.q = 0;
                 muzzle_left.f[1] = -0.275f;
                 muzzle_left.f[3] = 1.0f;
                 matrix_mul_vec3(&base, &muzzle_left, moby + 0xc0);
                 FastVecAdd(&base, &base, moby + 0x10);
-                projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
+                projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, g_spawn_entry_table[10].upgrade, 0);
                 shot_dir.q = 0;
                 shot_dir.f[1] = 0.275f;
                 shot_dir.f[3] = 1.0f;
                 matrix_mul_vec3(&base, &shot_dir, moby + 0xc0);
                 FastVecAdd(&base, &base, moby + 0x10);
-                projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
+                projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, g_spawn_entry_table[10].upgrade, 0);
             }
-            I(vars, 0x20c) = D_L05_001B1AAC;
+            I(vars, 0x20c) = g_ship_shot_var_word_a;
             I(vars, 0x218) = 7;
         }
     }
 
     {
         int slot = slot_find_active_in_chain(4);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && math_fast_float_d(vars + 0x210)
-            && (D_00138320[0] & 0x20)) {
+        if (slot >= 0 && g_spawn_entry_table[slot].ammo != 0 && math_fast_float_d(vars + 0x210)
+            && (g_pad_pressed_flags[0] & 0x20)) {
             slot_subtract_value_clamped(4, 1);
             aim.q = 0;
             aim.f[2] = -0.1f;
@@ -162,35 +162,35 @@ void UpdateShipWeapons(char *moby, char *driver)
             FastVecAdd(&base, &base, moby + 0x10);
             PlayMobySound(2, 0, moby);
             projectile_l05_spawn(&base, moby + 0xc0, I(vars, 0x18), moby, 0);
-            I(vars, 0x210) = D_L05_001B1AB0;
+            I(vars, 0x210) = g_ship_shot_var_word_b;
             I(vars, 0x218) = 10;
         }
     }
 
     index = slot_find_active_in_chain(7);
-    if (index >= 0 && D_L05_002A1800[index].ammo != 0 && (D_00138320[0] & 0x80)) {
-        char *shot_vars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+    if (index >= 0 && g_spawn_entry_table[index].ammo != 0 && (g_pad_pressed_flags[0] & 0x80)) {
+        char *shot_vars = (char *)(g_ship_shot_voice_id * 112 + (int)g_sound_state);
         if (P(shot_vars, 0x88) != moby || !B(shot_vars, 0x74))
-            D_L05_001B1AFC = snd_play_from_class_bank(0x11, 4, moby, 0xfbf);
+            g_ship_shot_voice_id = snd_play_from_class_bank(0x11, 4, moby, 0xfbf);
         if (++I(vars, 0x34) >= 8) {
             I(vars, 0x34) = 8;
-            math_fast_float_d(&D_L05_002A1800[index].ammo);
+            math_fast_float_d(&g_spawn_entry_table[index].ammo);
         }
     } else {
-        if (D_L05_001B1AFC != -1) {
-            char *shot_vars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+        if (g_ship_shot_voice_id != -1) {
+            char *shot_vars = (char *)(g_ship_shot_voice_id * 112 + (int)g_sound_state);
             if (P(shot_vars, 0x88) == moby && B(shot_vars, 0x74))
-                snd_stop_voice(D_L05_001B1AFC);
+                snd_stop_voice(g_ship_shot_voice_id);
         }
-        D_L05_001B1AFC = -1;
+        g_ship_shot_voice_id = -1;
         math_fast_float_d(vars + 0x34);
-        if (I(vars, 0x34) == 0 && D_L05_001B2048 % 3 == 0 && !(D_00138320[0] & 0x80)) {
-            ++D_L05_002A1800[index].ammo;
-            if (D_L05_002A1800[index].ammo > D_L05_002A1800[index].maximum)
-                D_L05_002A1800[index].ammo = D_L05_002A1800[index].maximum;
+        if (I(vars, 0x34) == 0 && g_feltzin_mission_index % 3 == 0 && !(g_pad_pressed_flags[0] & 0x80)) {
+            ++g_spawn_entry_table[index].ammo;
+            if (g_spawn_entry_table[index].ammo > g_spawn_entry_table[index].maximum)
+                g_spawn_entry_table[index].ammo = g_spawn_entry_table[index].maximum;
         }
     }
 
     if (!math_fast_float_d(vars + 0x218))
-        I(vars, 0x214) = slot_copy_records_to_free(D_L05_002B8770);
+        I(vars, 0x214) = slot_copy_records_to_free(g_slot_record_source);
 }

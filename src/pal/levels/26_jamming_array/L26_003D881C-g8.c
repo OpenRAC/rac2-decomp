@@ -9,15 +9,15 @@
 
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
-extern int D_L26_001A8FF0;
-extern Vector D_L26_002967A0[6];
-extern Vector D_L26_001B1890 MACRO_ADDR;
+extern int g_hero_tether_enabled;
+extern Vector g_trail_ribbon_template[6];
+extern Vector g_orbit_center_offset MACRO_ADDR;
 /* Random ranges, { lower, upper }. */
-extern float D_L26_001B0460[] __attribute__((sda));
-extern float D_L26_001B0458[] __attribute__((sda));
-extern int D_L26_001B0468[2] __attribute__((sda));
-extern int D_L26_001B0470[2] __attribute__((sda));
-extern int D_L26_001B1748;
+extern float g_orbit_tilt_min[] __attribute__((sda));
+extern float g_orbit_spin_min[] __attribute__((sda));
+extern int g_orbit_object_values[2] __attribute__((sda));
+extern int g_orbit_private_values[2] __attribute__((sda));
+extern int g_frame_l26_counter;
 extern void euler_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -49,7 +49,7 @@ void func_PAL_L26_003D881C(unsigned char *object) {
     float radius;
     float angle;
     unsigned int selection;
-    if (!D_L26_001A8FF0 && object[0x20]) {
+    if (!g_hero_tether_enabled && object[0x20]) {
         object[0x31] = 0;
         *(unsigned short *)(object + 0x34) |= 1;
         return;
@@ -59,29 +59,29 @@ void func_PAL_L26_003D881C(unsigned char *object) {
     private = *(char **)(object + 0x68);
     switch (object[0x20]) {
     case 0:
-        if (D_L26_002967A0[0].f[3] == 0.0f) {
+        if (g_trail_ribbon_template[0].f[3] == 0.0f) {
             position.q = 0;
             position.f[2] = 2.0943954f;
             euler_rotation_basis(workspace.init_matrix, &position);
-            D_L26_002967A0[0].f[3] = 1.0f;
-            D_L26_002967A0[1].f[3] = 1.0f;
-            matrix_mul_vec3(D_L26_002967A0 + 2, D_L26_002967A0, workspace.init_matrix);
-            matrix_mul_vec3(D_L26_002967A0 + 3, D_L26_002967A0 + 1, workspace.init_matrix);
-            matrix_mul_vec3(D_L26_002967A0 + 4, D_L26_002967A0 + 2, workspace.init_matrix);
-            matrix_mul_vec3(D_L26_002967A0 + 5, D_L26_002967A0 + 3, workspace.init_matrix);
+            g_trail_ribbon_template[0].f[3] = 1.0f;
+            g_trail_ribbon_template[1].f[3] = 1.0f;
+            matrix_mul_vec3(g_trail_ribbon_template + 2, g_trail_ribbon_template, workspace.init_matrix);
+            matrix_mul_vec3(g_trail_ribbon_template + 3, g_trail_ribbon_template + 1, workspace.init_matrix);
+            matrix_mul_vec3(g_trail_ribbon_template + 4, g_trail_ribbon_template + 2, workspace.init_matrix);
+            matrix_mul_vec3(g_trail_ribbon_template + 5, g_trail_ribbon_template + 3, workspace.init_matrix);
         }
         object[0x30] = 0xFF;
         *(unsigned short *)(object + 0x32) = 0x200;
         *(unsigned short *)(object + 0x34) |= 0x110;
-        FastVecSub(private + 0x50, object + 0x10, &D_L26_001B1890);
+        FastVecSub(private + 0x50, object + 0x10, &g_orbit_center_offset);
         radius = FastVecLength(private + 0x50);
         vec_scale_to_length(private + 0x60, object + 0xC0, radius);
         FastVecCross(private + 0x70, private + 0x60, private + 0x50);
         vec_scale_to_length(private + 0x70, private + 0x70, radius);
         FastVecCross(private + 0x60, private + 0x50, private + 0x70);
         vec_scale_to_length(private + 0x60, private + 0x60, radius);
-        *(float *)(private + 0x188) = math_random_signed_float_range(D_L26_001B0460[0], D_L26_001B0460[1]) * 0.0003490659f;
-        *(float *)(private + 0x180) = math_random_float_range(D_L26_001B0458[0], D_L26_001B0458[1]) * 0.0003490659f;
+        *(float *)(private + 0x188) = math_random_signed_float_range(g_orbit_tilt_min[0], g_orbit_tilt_min[1]) * 0.0003490659f;
+        *(float *)(private + 0x180) = math_random_float_range(g_orbit_spin_min[0], g_orbit_spin_min[1]) * 0.0003490659f;
         *(float *)(private + 0x184) = math_random_angle();
         moby_set_state(object, 1, -1);
         break;
@@ -91,7 +91,7 @@ void func_PAL_L26_003D881C(unsigned char *object) {
         position.f[1] = math_fast_sin_or_cos_b(*(float *)(private + 0x184));
         position.f[2] = 0.0f;
         matrix_mul_vec3(object + 0x10, &position, private + 0x50);
-        FastVecAdd(object + 0x10, object + 0x10, &D_L26_001B1890);
+        FastVecAdd(object + 0x10, object + 0x10, &g_orbit_center_offset);
         angle = FastAddRotations(*(float *)(private + 0x184), 1.5707965f);
         workspace.motion.tangent.f[0] = math_fast_sin_or_cos_a(angle);
         workspace.motion.tangent.f[1] = math_fast_sin_or_cos_b(angle);
@@ -103,12 +103,12 @@ void func_PAL_L26_003D881C(unsigned char *object) {
         workspace.motion.rotation.q = workspace.motion.rotation_seed.q;
         euler_rotation_basis(matrix, &workspace.motion.rotation);
         multiply_matrix3x3(object + 0xC0, object + 0xC0, matrix);
-        if ((D_L26_001B1748 & 0xFF) == 0) vec_scale_triangle_vertices(object + 0xC0, 0);
+        if ((g_frame_l26_counter & 0xFF) == 0) vec_scale_triangle_vertices(object + 0xC0, 0);
         if (math_fast_float_d((int *)(private + 0x18C))) {
             selection = (object[0xBC] + 1) & 1;
             object[0xBC] = selection;
-            *(int *)(object + 0x78) = D_L26_001B0468[object[0xBC]];
-            *(int *)(private + 0x18C) = (D_L26_001B0470[object[0xBC]] * 5 + 2) / 6;
+            *(int *)(object + 0x78) = g_orbit_object_values[object[0xBC]];
+            *(int *)(private + 0x18C) = (g_orbit_private_values[object[0xBC]] * 5 + 2) / 6;
         }
         trail_advance_samples(object);
         break;

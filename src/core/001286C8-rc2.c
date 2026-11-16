@@ -27,9 +27,9 @@
 extern s32 sceSifCallRpc(s8 *a0, s32 a1, s32 a2, s8 *a3, s32 t0, s32 *t1, s32 t2, s32 t3, s32 s9);
 extern s32 sif_rpc_is_handle_valid(s8 *a0, s32 a1);
 extern void debug_print_stub(s8 *a0);
-extern s8 D_00143130[];
-extern s8 D_00143180[];
-extern s8 D_0013B990[];
+extern s8 g_vibration_rpc_client[];
+extern s8 g_vibration_packet[];
+extern s8 g_str_vibration_debug[];
 
 /* Sends a command with extra data to the vibration (rumble) server. Returns 1 on success. */
 s32 dbc_send_vibration_command(s32 port, s32 command, s32 *size_ptr, u8 *data) {
@@ -37,8 +37,8 @@ s32 dbc_send_vibration_command(s32 port, s32 command, s32 *size_ptr, u8 *data) {
     s32 result;
     s8 *packet;
 
-    packet = D_00143180;
-    *(s32 *)D_00143180 = port;
+    packet = g_vibration_packet;
+    *(s32 *)g_vibration_packet = port;
     *(s32 *)(packet + 4) = command;
     *(s32 *)(packet + 8) = *size_ptr;
     i = 0;
@@ -49,12 +49,12 @@ s32 dbc_send_vibration_command(s32 port, s32 command, s32 *size_ptr, u8 *data) {
             i += 1;
         } while (i < *size_ptr);
     }
-    if (sif_rpc_is_handle_valid(D_00143130, i) == 1) {
+    if (sif_rpc_is_handle_valid(g_vibration_rpc_client, i) == 1) {
         return 0;
     }
-    result = sceSifCallRpc(D_00143130, 0x8000091B, 1, D_00143180, 0x400, D_00143180, 0x400, 0, 0);
+    result = sceSifCallRpc(g_vibration_rpc_client, 0x8000091B, 1, g_vibration_packet, 0x400, g_vibration_packet, 0x400, 0, 0);
     if (result < 0) {
-        debug_print_stub(D_0013B990);
+        debug_print_stub(g_str_vibration_debug);
         return 0;
     }
     return 1;

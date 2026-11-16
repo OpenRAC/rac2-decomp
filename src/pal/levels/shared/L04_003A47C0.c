@@ -18,7 +18,7 @@ extern void water_select_table_slot(u32 a0, u32 a1, u32 a2);
 extern void water_start_ripple_patch(u32 a0, u32 a1, f32 f12, f32 f13, f32 f14,
                               f32 f15);
 
-void func_PAL_L04_003A47C0(u8 *p) {
+void water_init_object_pal(u8 *p) {
     u8 *s1 = *(u8 **)(*(u32 *)(p + 0x28) + 0x68);
     f32 x;
     f32 y;

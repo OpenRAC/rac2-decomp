@@ -13,42 +13,42 @@ typedef struct {
     u16 imageAddress;
 } Upload;
 
-extern short *D_001B1890;
-extern TextureEntry *D_001B1898, *D_001B1894;
-extern int D_001B15FC;
-extern Upload D_001B9340[];
+extern short *g_hud_texture_pair_table;
+extern TextureEntry *g_hud_group_entries_b, *g_hud_group_entries_a;
+extern int g_palette_upload_count;
+extern Upload g_upload_slots[];
 /* Retail reads the allocation cursor absolutely, then updates the same word
    through small data, as in RAC1's GetFrameTex. */
-extern int D_001A72D0;
+extern int g_vram_cursor;
 extern int D_001A72D0_gp SDATA(D_001A72D0);
-extern int D_001A72DC;
+extern int g_vram_display_address;
 
 /* Finds a picture in video memory, sending it there first if it is not loaded yet, and gives the drawing setting for it. */
 u64 GetFrameTexture(int index)
 {
-    short *pair = (short *)((index << 2) + (u32)D_001B1890);
-    TextureEntry *palette = D_001B1898 + pair[0];
-    TextureEntry *image = D_001B1894 + pair[1];
+    short *pair = (short *)((index << 2) + (u32)g_hud_texture_pair_table);
+    TextureEntry *palette = g_hud_group_entries_b + pair[0];
+    TextureEntry *image = g_hud_group_entries_a + pair[1];
     int queued = 0;
     int shift, format;
     u64 result;
     u64 paletteWord;
 
     if (!palette->address || !image->address) {
-        Upload *slot = D_001B9340 + D_001B15FC;
+        Upload *slot = g_upload_slots + g_palette_upload_count;
         slot->palette = palette->data;
         slot->zero = 0;
         slot->paletteAddress = 0x3ff0;
-        D_001B9340[D_001B15FC].image = palette->data;
+        g_upload_slots[g_palette_upload_count].image = palette->data;
         slot->width = 5;
         slot->height = 5;
         slot->imageAddress = 0x3ff0;
     }
     if (!palette->address) {
-        palette->address = D_001A72D0 >> 8;
-        D_001A72D0_gp = D_001A72D0 + 0x400;
-        if (D_001B15FC < 64) {
-            Upload *slot = D_001B9340 + D_001B15FC;
+        palette->address = g_vram_cursor >> 8;
+        D_001A72D0_gp = g_vram_cursor + 0x400;
+        if (g_palette_upload_count < 64) {
+            Upload *slot = g_upload_slots + g_palette_upload_count;
             queued = 1;
             slot->palette = palette->data;
             slot->zero = 0;
@@ -64,22 +64,22 @@ u64 GetFrameTexture(int index)
             ih += iw - ih;
         }
         D_001A72D0_gp = base + (1 << (ih * 2));
-        if (D_001B15FC < 64) {
-            Upload *slot = D_001B9340 + D_001B15FC;
+        if (g_palette_upload_count < 64) {
+            Upload *slot = g_upload_slots + g_palette_upload_count;
             queued = 1;
-            *(u32 *)((u8 *)D_001B9340 + D_001B15FC * 16 + 8) = image->data;
+            *(u32 *)((u8 *)g_upload_slots + g_palette_upload_count * 16 + 8) = image->data;
             slot->width = image->width;
             slot->height = image->height;
             slot->imageAddress = image->address;
         }
     }
     if (queued)
-        D_001B15FC++;
+        g_palette_upload_count++;
     shift = image->width - 6;
     if (shift < 0)
         shift = 0;
     format = 0x13;
-    if (image->address < (D_001A72DC >> 8))
+    if (image->address < (g_vram_display_address >> 8))
         format = 0x1b;
     shift = 1 << shift;
     result = image->address | ((u64)shift << 14);

@@ -54,13 +54,13 @@ extern u32 g_pad_state[];
 extern int g_item_ammo_counts[];
 extern u16 g_subtitle_history[];
 extern SoundSlot g_sound_state[];
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern Vector D_L00_001B1270 __attribute__((sda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern Vector g_megarocket_nozzle_offset __attribute__((sda));
 extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
-extern WeaponEntry D_00262570[];
-extern u8 D_0029FCC8[];
+extern WeaponEntry g_weapon_table_2[];
+extern u8 g_megarocket_sound_records[];
 extern s32 func_PAL_L00_002C4480(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -88,17 +88,17 @@ extern void *func_PAL_002C23B8(void *, void *, int, int, unsigned int, int, floa
 extern int func_PAL_L00_00415648(Moby *);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern void func_PAL_L00_00415690(Moby *, int);
-extern void func_PAL_L00_00415238(Moby *, Vector *, int);
+extern void charge_shot_start_effect_pal(Moby *, Vector *, int);
 extern void func_PAL_L00_002AF458(void);
 extern int slot_copy_records_to_free(void *);
 extern int func_PAL_00289730(int, int);
 extern void slot_reset_active(int);
-extern void func_PAL_L00_00415310(Moby *, Vector *);
-extern void func_PAL_L00_00414F80(Moby *, Vector *);
+extern void sequenced_child_spawn_pal(Moby *, Vector *);
+extern void light_flash_update_pal(Moby *, Vector *);
 #define HERO ((Hero *)D_00189E20)
 
 /* Charges and fires the blaster: target acquisition, charge sparks and release. */
-void func_PAL_L00_004144A8(Moby *moby)
+void megarocket_cannon_update_pal(Moby *moby)
 {
     BlasterVars *vars = moby->vars;
     Vector nozzle, direction, origin, aim, work, spark;
@@ -123,7 +123,7 @@ void func_PAL_L00_004144A8(Moby *moby)
     }
     if (HERO->i[0x2294 / 4] == 1)
         func_PAL_L00_002C4480(0x1D, 1);
-    matrix_mul_vec3(&nozzle, &D_L00_001B1270, &moby->right);
+    matrix_mul_vec3(&nozzle, &g_megarocket_nozzle_offset, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
         HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
@@ -246,7 +246,7 @@ void func_PAL_L00_004144A8(Moby *moby)
         vars->unknown20 = 0;
     }
 
-    if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
+    if (g_game_l00_mode == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 && ready && released &&
         HERO->i[0x1240 / 4] >= 19) {
         if (get_ammo(-1)) {
             if (candidate == 0) {
@@ -288,10 +288,10 @@ void func_PAL_L00_004144A8(Moby *moby)
             }
             vars->flash = 12;
             func_PAL_L00_00415690(moby, charged);
-            func_PAL_L00_00415238(moby, &nozzle, charged);
+            charge_shot_start_effect_pal(moby, &nozzle, charged);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
             func_PAL_L00_002AF458();
-            vars->sound = slot_copy_records_to_free(D_0029FCC8);
+            vars->sound = slot_copy_records_to_free(g_megarocket_sound_records);
             if (charged)
                 g_subtitle_history[0x3A8 / 2] = 0xFFFF;
             else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
@@ -303,12 +303,12 @@ void func_PAL_L00_004144A8(Moby *moby)
             vars->sound = -1;
         }
         {
-            WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
+            WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
             vars->cooldown = 1.0f / weapon->rate;
         }
     }
 
     if (vars->beam >= 0 && math_fast_float_d(&vars->beamTimer))
-        func_PAL_L00_00415310(moby, &nozzle);
-    func_PAL_L00_00414F80(moby, &nozzle);
+        sequenced_child_spawn_pal(moby, &nozzle);
+    light_flash_update_pal(moby, &nozzle);
 }

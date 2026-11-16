@@ -95,25 +95,25 @@ typedef struct {
 } MenuState;
 
 extern MenuState g_modal_state;
-extern MenuBox D_001A8A88;
-extern MenuBox D_001A8AB8;
-extern char D_001A8AA0[];
-extern char D_001A8AA8[];
-extern char D_001A8AD0[];
-extern char D_00263B50[];
-extern char *D_001A8A4C __attribute__((sda));
-extern char *D_001A8A50 __attribute__((sda));
-extern char *D_001A8A54 __attribute__((sda));
-extern char *D_001A8A58 __attribute__((sda));
-extern int D_001A8A70 __attribute__((sda));
-extern int D_001A8A74 __attribute__((sda));
-extern int D_001A8C88;
-extern int D_001A8C8C;
-extern int D_001F29A0[];
+extern MenuBox g_message_box_primary;
+extern MenuBox g_message_box_secondary;
+extern char g_str_message_text[];
+extern char g_str_message_format[];
+extern char g_str_message_format_two[];
+extern char g_font_glyphs_small[];
+extern char *g_message_panel_icon_a __attribute__((sda));
+extern char *g_message_panel_icon_b __attribute__((sda));
+extern char *g_message_panel_text __attribute__((sda));
+extern char *g_message_panel_extra __attribute__((sda));
+extern int g_message_text_color_a __attribute__((sda));
+extern int g_message_text_color_b __attribute__((sda));
+extern int g_menu_panel_active;
+extern int g_menu_panel_flag;
+extern int g_message_panel_flags[];
 extern int g_save_menu_screen;
 extern unsigned short g_screen_height;
-extern int D_001B1598;
-extern float D_001B23A4;
+extern int g_frame_counter_3;
+extern float g_hud_scale;
 
 extern void gfx_set_clear_color_packet(int, int, int, int);
 extern void SetupGifPaging(int);
@@ -163,7 +163,7 @@ void menu_draw_message_panel(void)
         unsigned char *p;
         int h, len, i, x, y;
 
-        box = D_001A8A88;
+        box = g_message_box_primary;
         spr = SPR;
         strncpy(spr, GetLocalizedString(0x9B4), 0x400);
         p = spr;
@@ -187,7 +187,7 @@ void menu_draw_message_panel(void)
         y = x + 8;
         hud_draw_sprite(GetIconFrame(0x755D, 0), 0xE0, y, 0x40, 0x40, 0x80);
         DrawRotatedSprite(4096.0f, (x + 40) * 16, 272.0f, 272.0f,
-                      (D_001B1598 % 55) * -0.11423973f, 0x40, 0x40,
+                      (g_frame_counter_3 % 55) * -0.11423973f, 0x40, 0x40,
                       GetFrameTexture(GetIconFrame(0x755D, 1)));
         break;
     }
@@ -242,7 +242,7 @@ void menu_draw_message_panel(void)
 
         show = 1;
         if (g_modal_state.elapsed > 0) {
-            text = D_001A8AA0;
+            text = g_str_message_text;
             id1 = 0;
             id2 = 0;
             if (flag_get_word()) {
@@ -256,7 +256,7 @@ void menu_draw_message_panel(void)
                     text = GetLocalizedString(0x2DF4);
                     break;
                 case 12:
-                    if (D_001F29A0[0]) {
+                    if (g_message_panel_flags[0]) {
                         id1 = 0x2DE8;
                         text = GetLocalizedString(0x2DE6);
                         break;
@@ -291,26 +291,26 @@ void menu_draw_message_panel(void)
                     id1 = g_modal_state.countdown ? 0 : 0x1137;
                     break;
                 case 19:
-                    if (D_001F29A0[0]) {
+                    if (g_message_panel_flags[0]) {
                         id1 = 0x2DE8;
                         text = GetLocalizedString(0x2DE6);
-                    } else if (D_001A8C88) {
+                    } else if (g_menu_panel_active) {
                         id1 = 0x113B;
                         id2 = 0x1138;
-                        sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                        sprintf(buf, g_str_message_format, GetLocalizedString(0x2DE9), 1, 1,
                                       GetLocalizedString(0x2DEB));
                         text = buf;
                     } else {
                         id1 = 0x113B;
-                        sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DE9), 1, 1,
+                        sprintf(buf, g_str_message_format, GetLocalizedString(0x2DE9), 1, 1,
                                       GetLocalizedString(0x2DEB));
                         text = buf;
-                        if (D_001A8C8C)
+                        if (g_menu_panel_flag)
                             id1 = 0x113C;
                     }
                     break;
                 case 21:
-                    text = GetLocalizedString((!D_001A8C88 && menu_is_confirm_pending()) ? 0x2E04 : 0x2E03);
+                    text = GetLocalizedString((!g_menu_panel_active && menu_is_confirm_pending()) ? 0x2E04 : 0x2E03);
                     id1 = 0x1137;
                     break;
                 case 20:
@@ -320,7 +320,7 @@ void menu_draw_message_panel(void)
                 case 24:
                     id1 = 0x113B;
                     id2 = 0x1138;
-                    sprintf(buf, D_001A8AA8, GetLocalizedString(0x2DF2), 1, 1,
+                    sprintf(buf, g_str_message_format, GetLocalizedString(0x2DF2), 1, 1,
                                   GetLocalizedString(0x2DEB));
                     text = buf;
                     break;
@@ -331,14 +331,14 @@ void menu_draw_message_panel(void)
                     break;
                 case 3:
                 case 4:
-                    if (D_001A8C88 && !D_001F29A0[0]) {
+                    if (g_menu_panel_active && !g_message_panel_flags[0]) {
                         id1 = 0x113B;
                         id2 = 0x1138;
                         text = GetLocalizedString(0x2DEC);
-                    } else if (D_001A8C8C) {
+                    } else if (g_menu_panel_flag) {
                         id1 = 0x113B;
                         text = GetLocalizedString(0x2DEC);
-                    } else if (D_001F29A0[0]) {
+                    } else if (g_message_panel_flags[0]) {
                         id1 = 0x2DE8;
                         text = GetLocalizedString(0x2DE6);
                     } else {
@@ -376,9 +376,9 @@ void menu_draw_message_panel(void)
         int textColor, promptColor, id;
 
         fade = 1.0f - g_modal_state.countdown * 0.033333335f;
-        box = D_001A8AB8;
+        box = g_message_box_secondary;
         gfx_draw_rounded_box(0x64, 0x12C, 0x60, 0x1A0, (int)(fade * 80.0f), 0x40404);
-        textColor = FastTweenColor(D_001A8A70, D_001A8A74, fade);
+        textColor = FastTweenColor(g_message_text_color_a, g_message_text_color_b, fade);
         promptColor = FastTweenColor(0x20FFFF, 0x8020FFFF, fade);
         switch (g_modal_state.phase) {
         case 0:
@@ -401,38 +401,38 @@ void menu_draw_message_panel(void)
             break;
         }
         if (id)
-            FontPrintWindow(&box, textColor, GetLocalizedString(id), -1, GetEffectTextureDescriptor(1), D_00263B50);
+            FontPrintWindow(&box, textColor, GetLocalizedString(id), -1, GetEffectTextureDescriptor(1), g_font_glyphs_small);
         break;
     }
     case 9: {
         char *icon1, *icon2, *message;
 
         FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
-                      (int)(D_001B23A4 * 100.0f + 0.5f), 0x10, 3);
-        icon1 = D_001A8A4C;
+                      (int)(g_hud_scale * 100.0f + 0.5f), 0x10, 3);
+        icon1 = g_message_panel_icon_a;
         if (!icon1)
             icon1 = GetLocalizedString(0x113B);
-        icon2 = D_001A8A50;
+        icon2 = g_message_panel_icon_b;
         if (!icon2)
             icon2 = GetLocalizedString(0x1138);
-        message = D_001A8A54;
+        message = g_message_panel_text;
         if (!message)
             message = GetLocalizedString(0x2DCD);
-        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, icon2, D_001A8A58);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, icon2, g_message_panel_extra);
         break;
     }
     case 10: {
         char *icon1, *message;
 
         FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
-                      (int)(D_001B23A4 * 100.0f + 0.5f), 0x10, 3);
-        icon1 = D_001A8A4C;
+                      (int)(g_hud_scale * 100.0f + 0.5f), 0x10, 3);
+        icon1 = g_message_panel_icon_a;
         if (!icon1)
             icon1 = GetLocalizedString(0x113B);
-        message = D_001A8A54;
+        message = g_message_panel_text;
         if (!message)
             message = GetLocalizedString(0x2DCD);
-        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, 0, D_001A8A58);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, icon1, 0, g_message_panel_extra);
         break;
     }
     case 11: {
@@ -442,7 +442,7 @@ void menu_draw_message_panel(void)
         int n;
         MenuBox *pb;
 
-        do { k = 100.0f; sc = D_001B23A4; h = 0.5f; } while (0);
+        do { k = 100.0f; sc = g_hud_scale; h = 0.5f; } while (0);
         pb = &box;
         n = 3;
         enabled = 1;
@@ -464,7 +464,7 @@ void menu_draw_message_panel(void)
             break;
         case 3:
             g_modal_state.inputDelay = g_modal_state.elapsed / 60 + 1;
-            sprintf(buf2, D_001A8AD0, GetLocalizedString(0x31ED), GetLocalizedString(0x31EE),
+            sprintf(buf2, g_str_message_format_two, GetLocalizedString(0x31ED), GetLocalizedString(0x31EE),
                           g_modal_state.inputDelay, GetLocalizedString(0x31EF));
             icon1 = GetLocalizedString(0x113B);
             level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, icon1,

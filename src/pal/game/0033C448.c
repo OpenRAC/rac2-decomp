@@ -11,9 +11,9 @@ extern int *object_get_fourth_field(void *);
 extern void func_PAL_00338688(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
-extern char D_001ADC88[];
-extern float D_001B23A4 __attribute__((sda));
-void func_PAL_0033C448(unsigned char *obj, void *arg)
+extern char g_circle_menu_icon_data[];
+extern float g_hud_scale __attribute__((sda));
+void title_screen_init_labels_pal(unsigned char *obj, void *arg)
 {
     float v;
     TitlePosition *p;
@@ -35,10 +35,10 @@ void func_PAL_0033C448(unsigned char *obj, void *arg)
         p = *(TitlePosition **)(obj + 0x20C);
         p->x = 70.0f;
         position = 300.0f;
-        y = (int)(D_001B23A4 * position + 0.5f);
+        y = (int)(g_hud_scale * position + 0.5f);
         v = y;
     } while (0);
-    text = D_001ADC88;
+    text = g_circle_menu_icon_data;
     p = *(TitlePosition **)(obj + 0x20C);
     p->y = v;
     object_init_derived_c(obj + 0x134, text, *(void **)(obj + 0x210));

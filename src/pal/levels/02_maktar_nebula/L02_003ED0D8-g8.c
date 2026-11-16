@@ -15,10 +15,10 @@ typedef struct {
 } Player003ED0D8;
 
 extern char *g_moby_l02_pool[3] __attribute__((sda));
-extern float D_L02_001B0C00 __attribute__((sda));
-extern float D_L02_001B0C04 __attribute__((sda));
-extern float D_L02_001B0C08 __attribute__((sda));
-extern float D_L02_001B0C0C __attribute__((sda));
+extern float g_tether_pull_height __attribute__((sda));
+extern float g_tether_pull_step_limit __attribute__((sda));
+extern float g_tether_spring_stiffness __attribute__((sda));
+extern float g_tether_pull_damping __attribute__((sda));
 extern Player003ED0D8 g_hero_state;
 
 extern void FastVecSub(void *, void *, void *);
@@ -41,11 +41,11 @@ void func_PAL_L02_003ED0D8(char *arg0) {
     float b;
 
     *(TI128 *)pos = *(TI128 *)(arg0 + 0x10);
-    pos[2] += D_L02_001B0C00;
+    pos[2] += g_tether_pull_height;
     if (g_hero_state.target5C0 == target) {
         FastVecSub(vec, g_hero_state.vecE0, pos);
         step = FastVecLength(vec);
-        ApproachValue(&step, 0.1f, D_L02_001B0C04);
+        ApproachValue(&step, 0.1f, g_tether_pull_step_limit);
         vec_scale_to_length(vec, vec, step);
         FastVecAdd(vec, vec, pos);
     } else {
@@ -56,8 +56,8 @@ void func_PAL_L02_003ED0D8(char *arg0) {
     a = FastVecLength(diff);
     b = FastVecLength(state + 0x10);
     a = a * 0.00040000002f;
-    b = b / ((D_L02_001B0C0C * 5.0f + 2.0f) * 0.16666667f);
-    vec_scale_to_length(spring, diff, -(D_L02_001B0C08 * a));
+    b = b / ((g_tether_pull_damping * 5.0f + 2.0f) * 0.16666667f);
+    vec_scale_to_length(spring, diff, -(g_tether_spring_stiffness * a));
     vec_scale_to_length(damp, state + 0x10, -b);
     FastVecAdd(state + 0x10, state + 0x10, spring);
     FastVecAdd(state + 0x10, state + 0x10, damp);

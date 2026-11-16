@@ -2,8 +2,8 @@
 
 #include "common.h"
 typedef int qword __attribute__((mode(TI)));
-extern float D_L12_001B0B10 __attribute__((sda));
-extern u8 D_L12_001FEAC0[];
+extern float g_enemy_path_speed __attribute__((sda));
+extern u8 g_path_zone_table[];
 extern void FastVecSub(float *, const float *, const float *);
 extern float FastVecLength(float *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -11,9 +11,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 
-int func_PAL_L12_003E6198(u8 *a0, u8 *a1) {
+int AdvanceAlongPath_pal(u8 *a0, u8 *a1) {
     u8 *st = *(u8 **)(a0 + 0x68);
-    u8 *e = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(st + 0x158) << 2));
+    u8 *e = *(u8 **)(g_path_zone_table + (*(s32 *)(st + 0x158) << 2));
     float entry[4];
     float dir[4];
     float rot[4];
@@ -33,15 +33,15 @@ int func_PAL_L12_003E6198(u8 *a0, u8 *a1) {
                       a1 + (*(s32 *)(st + 0x168) << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
-        if (D_L12_001B0B10 * 0.020000001f < len)
-            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.020000001f);
+        if (g_enemy_path_speed * 0.020000001f < len)
+            vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.020000001f);
         FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
     } else {
         FastVecSub(rot, e + 0x10, a1 + (*(s32 *)a1 << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
-        if (D_L12_001B0B10 * 0.020000001f < len)
-            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.020000001f);
+        if (g_enemy_path_speed * 0.020000001f < len)
+            vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.020000001f);
         FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
     }
     if (fast_vec_dist(a0 + 0x10, entry) <= 0.5f) {

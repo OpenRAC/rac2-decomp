@@ -56,10 +56,10 @@ typedef struct {
 extern HeroGround g_hero_state;
 typedef struct { u8 pad[24]; int i18, i1C; Vec4 v20; u8 pad30[16]; float f40, f44; } Hit;
 extern Hit g_collision_result;
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 extern int g_current_map_index;
-extern int D_001A8FF0 MACRO_ADDR;
-extern int D_001A8FF4;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern int g_enemy_ai_frozen;
 extern int hero_is_in_special_kind_or_mode(void);
 extern void vec_clear_128(void *);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
@@ -127,7 +127,7 @@ void hero_l00_update_ground_contact(void) {
     if (g_current_map_index == 7 && g_collision_result.i18 != 0) g_hero_state.xB12ed = 1;
     g_hero_state.xH12e0 = GetCollHitMaterial();
     if (g_hero_state.xH12e0 == 0) {
-        g_hero_state.xF2f0 = coll_get_ground_height_at_position(D_L00_001BF220, (u8 *)&g_hero_state + 0x2B0);
+        g_hero_state.xF2f0 = coll_get_ground_height_at_position(g_hero_l00_position, (u8 *)&g_hero_state + 0x2B0);
         if (g_hero_state.xF88 < g_hero_state.xF2f0 && g_hero_state.xI2f8 <= 0) {
             g_hero_state.xI2f8 = 1;
         }
@@ -172,7 +172,7 @@ void hero_l00_update_ground_contact(void) {
     if (g_collision_result.i1C > 0) {
         qcopy((u8 *)&g_hero_state + 0x2D0, &g_collision_result.v20);
         g_hero_state.u2d8.F = g_collision_result.v20.f[2];
-        if (D_001A8FF0) g_hero_state.u2d8.F = gravity_get_center_distance(&g_collision_result.v20);
+        if (g_hero_height_zone_active) g_hero_state.u2d8.F = gravity_get_center_distance(&g_collision_result.v20);
         g_hero_state.xF2dc = fast_vec_dist((u8 *)&g_hero_state + 0x80, ((u8 *)&g_hero_state + 0x2D0));
         g_hero_state.xI2fc = g_collision_result.i18;
         func_001290E0((u8 *)&g_hero_state + 0x2A0, (u8 *)&g_collision_result.f40);
@@ -206,7 +206,7 @@ tail:
         hero->xF298 = -1.0f;
         break;
     case 1:
-        if (D_001A8FF4) vec_compute_flat_direction_from_point((u8 *)normal - 0x240, normal, 0);
+        if (g_enemy_ai_frozen) vec_compute_flat_direction_from_point((u8 *)normal - 0x240, normal, 0);
         else if (*(float *)((u8 *)hero + 0x2fc) != 0.0f) {
             ApproachValue((float *)((u8 *)normal + 0x3c), 0.0f, 1.0f);
             qcopy(normal, (u8 *)normal + 0x30);
@@ -251,7 +251,7 @@ tail:
         hero_build_relative_offset(&side_start, 0.2f, angle, 0.45f, 1);
         hero_build_relative_offset(&side_end, 0.2f, angle, -0.45f, 1);
         if (CollLine(&side_start, &side_end, 0x22, g_hero_state.xI2080, 0)) {
-            if (D_001A8FF0) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&g_collision_result.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
+            if (g_hero_height_zone_active) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&g_collision_result.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
             else g_hero_state.a2c0.f[i] = g_collision_result.v20.f[2] - g_hero_state.u2d8.F;
             if (0.4f < math_fabs(g_hero_state.a2c0.f[i])) {
                 g_hero_state.a2c0.f[i] = 0.0f;

@@ -31,10 +31,10 @@ typedef struct {
     s16 sound;
 } PuzzlePath;
 
-extern PuzzleNode D_L03_0029BBF0[14];
-extern int D_0024A7B0[14][6];
-extern int D_L03_001B0B5C __attribute__((sda));
-extern f32 D_L03_001B36B0[4] __attribute__((sda));
+extern PuzzleNode g_puzzle_node_directions[14];
+extern int g_path_puzzle_adjacency[14][6];
+extern int g_path_puzzle_duration __attribute__((sda));
+extern f32 g_puzzle_rotation_quat[4] __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, f32);
 extern f32 FastVecDot(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
@@ -59,7 +59,7 @@ void func_PAL_L03_003E6CA8(u8 *p) {
     f32 d, t;
 
     for (k = 0; k < 14; k++) {
-        vec_scale_to_length(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
+        vec_scale_to_length(&g_puzzle_node_directions[k], &g_puzzle_node_directions[k], 1.0f);
         q->facing[k] = 255;
     }
     q->facing[14] = 255;
@@ -68,25 +68,25 @@ void func_PAL_L03_003E6CA8(u8 *p) {
 
     for (row = 0; row < 14; row++)
         for (col = 0; col < 6; col++)
-            D_0024A7B0[row][col] = -1;
+            g_path_puzzle_adjacency[row][col] = -1;
 
     for (i = 0; i < 14; i++) {
         n = 0;
         for (j = 0; j < 14; j++) {
             if (i != j) {
-                node = &D_L03_0029BBF0[i];
-                d = FastVecDot(node, &D_L03_0029BBF0[j]);
+                node = &g_puzzle_node_directions[i];
+                d = FastVecDot(node, &g_puzzle_node_directions[j]);
                 t = 0.5f;
                 if (node->x != 0.0f && node->y != 0.0f && node->z != 0.0f)
                     t = -0.1f;
                 if (d > t)
-                    D_0024A7B0[i][n++] = j;
+                    g_path_puzzle_adjacency[i][n++] = j;
             }
         }
     }
 
     mat_get_euler_angles(rotation, position);
-    mat_build_rotation_from_angles(D_L03_001B36B0, position);
+    mat_build_rotation_from_angles(g_puzzle_rotation_quat, position);
     func_001163A0(q->sound);
     path_puzzle_generate_route(p);
     SelectPathStepNodes(p);
@@ -106,5 +106,5 @@ void func_PAL_L03_003E6CA8(u8 *p) {
     q->next = 0;
     q->cursor = 0;
     q->depth = 0;
-    q->timer = ((s32)(D_L03_001B0B5C) * 5 + 2) / 6;
+    q->timer = ((s32)(g_path_puzzle_duration) * 5 + 2) / 6;
 }

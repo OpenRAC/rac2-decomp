@@ -7,7 +7,7 @@ extern float IntToFloat(int);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_001F259C;
+extern unsigned char *g_part_tex_trail;
 
 /* Spawns a spinning spark near position (jittered by up to jitter on each axis)
    turning about axis at a random speed between lo and hi, in either direction. */
@@ -25,7 +25,7 @@ char *SpawnSpinningSparkParticle(TI128 *position, int spin, TI128 *axis, int col
         *(float *)(p + 0xC) = size;
         p[1] = 0;
         p[8] = 0;
-        p[2] = *D_001F259C;
+        p[2] = *g_part_tex_trail;
         *(float *)(p + 0x10) += math_random_signed_float_range(0.0f, jitter);
         *(float *)(p + 0x14) += math_random_signed_float_range(0.0f, jitter);
         *(float *)(p + 0x18) += math_random_signed_float_range(0.0f, jitter);

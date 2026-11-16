@@ -5,12 +5,12 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void moby_set_state(char *,s32,s32);
 extern void FastVecSub(char *,char *,char *);
 extern s32 g_current_map_index MACRO_ADDR;
-extern unsigned char D_0019B4A8[];
-extern struct { char pad[0x464]; u8 flags[1]; } D_L03_0021EA30;
+extern unsigned char g_moby_nibble_table[];
+extern struct { char pad[0x464]; u8 flags[1]; } g_trigger_l03_flags;
 typedef struct {
     char pad00[0x30]; f32 position[4]; char pad40[0x40];
 } Node7E20;
-extern Node7E20 *D_L03_001B2B0C MACRO_ADDR;
+extern Node7E20 *g_linked_effect_records MACRO_ADDR;
 extern s32 g_frame_l03_counter MACRO_ADDR;
 typedef struct {
     char pad[0x26C]; char *object26C; char *object270;
@@ -18,13 +18,13 @@ typedef struct {
     char pad340[0x248]; char *object588;
 } HeroContacts7E20;
 extern HeroContacts7E20 g_hero_state;
-extern s32 D_0018C0B4[];
-extern char D_L03_001B9980[];
+extern s32 g_game_mode[];
+extern char g_camera_pose_buffer[];
 typedef struct {
     char pad[0x160]; f32 f160; char pad164[4]; s32 i168, i16C;
     char pad170[0x10]; f32 f180; char pad184[4]; s32 i188;
 } EffectState7E20;
-extern EffectState7E20 D_L03_001B9840;
+extern EffectState7E20 g_hero_l03_state_alias;
 extern f32 coll_probe_ground_height_below(char *,s32,f32);
 extern s32 IsPointInCuboid(char *,s32);
 extern f32 FastVecLength(char *);
@@ -83,9 +83,9 @@ void explosive_crate_update(char *moby)
         vars->flags|=1;
         if (actor->type==0xB85 /* moby class 2949 */) {
             id=(u16)actor->uid;
-            if (D_L03_0021EA30.flags[(s16)id] ||
-                ((D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)] >> ((id&1)?4:0))&7)) {
-                qcopy((char *)actor->position,D_L03_001B2B0C[vars->index].position);
+            if (g_trigger_l03_flags.flags[(s16)id] ||
+                ((g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)] >> ((id&1)?4:0))&7)) {
+                qcopy((char *)actor->position,g_linked_effect_records[vars->index].position);
             }
         }
         moby_set_state(moby,1,-1);
@@ -108,16 +108,16 @@ void explosive_crate_update(char *moby)
             if (g_hero_state.object26C==moby || g_hero_state.object33C==moby ||
                 g_hero_state.object270==moby || g_hero_state.object588==moby)
                 moby_set_state(moby,4,-1);
-        } else if (vars->pending && D_0018C0B4[0]!=0x31) {
+        } else if (vars->pending && g_game_mode[0]!=0x31) {
             vars->pending=0;
             if (IsPointInCuboid((char *)actor->position,vars->index)) {
-                qcopy((char *)actor->position,D_L03_001B2B0C[vars->index].position);
+                qcopy((char *)actor->position,g_linked_effect_records[vars->index].position);
                 id=(u16)actor->uid;
                 if (id&1) {
-                    u8 *packed_byte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+                    u8 *packed_byte=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
                     if (((*packed_byte>>4)&7)!=7) *packed_byte+=16;
                 } else {
-                    u8 *packed_byte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+                    u8 *packed_byte=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
                     if ((*packed_byte&7)!=7) *packed_byte+=1;
                 }
             } else path_push_point_away(vars->effect,(char *)actor->position,(char *)actor->position,2.5f);
@@ -172,7 +172,7 @@ void explosive_crate_update(char *moby)
         qcopy(temp_pos,position);
         *(f32 *)(temp_pos+8)+=1.0f;
         snd_play_from_class_bank(1,0,moby,0xCFC);
-        FastVecSub(direction,D_L03_001B9980,temp_pos);
+        FastVecSub(direction,g_camera_pose_buffer,temp_pos);
         vec_scale_to_length(direction,direction,1.0f);
         *(TI128 *)(hit)=0;
         *(f32 *)(hit+8)=1.0f;
@@ -203,10 +203,10 @@ void explosive_crate_update(char *moby)
         break;
     }
     if (math_fast_float_d((char *)&vars->effectTimer)==2) {
-        D_L03_001B9840.f180=0.1f;
-        D_L03_001B9840.i188=60;
-        D_L03_001B9840.f160=0.1f;
-        D_L03_001B9840.i168=30;
-        D_L03_001B9840.i16C=0;
+        g_hero_l03_state_alias.f180=0.1f;
+        g_hero_l03_state_alias.i188=60;
+        g_hero_l03_state_alias.f160=0.1f;
+        g_hero_l03_state_alias.i168=30;
+        g_hero_l03_state_alias.i16C=0;
     }
 }

@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "common.h"
-extern s8 D_0022AA10[];
+extern s8 g_pool_effect_slots[];
 extern void gfx_draw_lightning_bolt(s32 a, s32 b);
 extern void gfx_draw_billboard_quad(void *o, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13, f32 f14);
 extern f32 math_random_float_range(f32 a, f32 b);
 
-void func_PAL_00317EF8(s32 arg0) {
+void gfx_draw_owner_effect_slots_pal(s32 arg0) {
     s32 i;
     s32 q;
     s8 *p;
     s8 *base;
 
-    base = D_0022AA10;
+    base = g_pool_effect_slots;
     p = base + 0x30;
     q = (s32) base;
     for (i = 0; i < 3; i++) {

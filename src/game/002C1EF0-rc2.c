@@ -26,7 +26,7 @@
 
 struct V4 { f32 x; f32 y; f32 z; s32 w; };
 typedef int TI __attribute__((mode(TI)));
-extern TI D_001BAFA0;
+extern TI g_coll_hit_position;
 extern s32 CollLine(s8 *a0, s8 *a1, s32 a2, s32 a3, s32 a4);
 extern s32 FastDecTimer(s8 *p);
 extern void FastVecAdd(s8 *a0, s8 *a1, struct V4 *saved);
@@ -54,7 +54,7 @@ void part_update_streak_collision(s8 *particle) {
         return;
     }
     if (CollLine(trail, position, 0x10, *(s32 *)(motion + 0xC), 0) != 0) {
-        TI saved = D_001BAFA0;
+        TI saved = g_coll_hit_position;
         *(s16 *)(particle + 0xA) = 0;
         *(volatile TI *)(particle + 0x10) = saved;
     }

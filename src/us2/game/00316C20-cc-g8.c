@@ -27,24 +27,24 @@ typedef struct {
 /* The launcher's state. */
 typedef struct { char pad0[0x18]; char *target; } State_00315E20;
 
-extern PoolEffect_00315E20 D_0022AA10[3];
+extern PoolEffect_00315E20 g_pool_effect_slots[3];
 extern char g_hero_state[];
-extern Statistics D_0018C360[];
-extern char D_001B2510[] __attribute__((sda));
-extern char D_001B2520[] __attribute__((sda));
+extern Statistics g_statistics_table[];
+extern char g_dynamo_joint_position[] __attribute__((sda));
+extern char g_emitter_origin[] __attribute__((sda));
 extern char g_camera_eye_state[];
-extern int D_001AF548 __attribute__((sda));
-extern int D_00138324 __attribute__((nosda));
-extern u32 D_001A7390;
+extern int g_dynamo_launch_mode __attribute__((sda));
+extern int g_pad_held_flags __attribute__((nosda));
+extern u32 g_frame_counter;
 extern u32 g_current_map_index;
-extern u8 D_0013958C __attribute__((nosda));
+extern u8 g_dynamo_weapon_index __attribute__((nosda));
 /* One 0xE0-byte entry per weapon level. */
 typedef struct { char pad0[0x70]; float range; char pad74[0x6C]; } Level_00315E20;
 
 extern Level_00315E20 g_weapon_table[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern unsigned int func_US2_0026F750(int, int);
+extern unsigned int stub_empty_9_us2(int, int);
 extern char *FindNearestEligibleTarget(void *);
 extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
@@ -62,7 +62,7 @@ extern void lock_on_draw_sprites(void *);
 /* Update of the lock-on launcher: 0 clears the effect slots, 1 aims at the nearest target and
    waits for the fire button, 2 launches at it and starts three effects, 3 and 4 time the
    cool-down. */
-void func_US2_00316C20(u8 *obj)
+void dynamo_update_us2(u8 *obj)
 {
     float dir[4];
     float aim[4];
@@ -77,14 +77,14 @@ void func_US2_00316C20(u8 *obj)
     *(Quad *)dir = 0;
     if (obj[0x20] == 0) {
         for (i = 2; i >= 0; i--)
-            D_0022AA10[i].owner = 0;
+            g_pool_effect_slots[i].owner = 0;
         obj[0x20] = 1;
     }
-    moby_transform_joint_to_world(obj, 1, D_001B2510);
-    moby_transform_joint_to_world(obj, 0, D_001B2520);
+    moby_transform_joint_to_world(obj, 1, g_dynamo_joint_position);
+    moby_transform_joint_to_world(obj, 0, g_emitter_origin);
     q = g_hero_state;
     if (*(int *)(q + 0x2294) == 1)
-        func_US2_0026F750(0x1D, 1);
+        stub_empty_9_us2(0x1D, 1);
     moby_transform_joint_to_world(obj, 0, aim);
 
     switch (obj[0x20]) {
@@ -103,14 +103,14 @@ void func_US2_00316C20(u8 *obj)
                           -1, 4);
             FastVecSub(dir, st->target + 0x10, aim);
         }
-        if (!(D_00138324 & *(int *)(p + 0x1230)))
+        if (!(g_pad_held_flags & *(int *)(p + 0x1230)))
             break;
         if (st->target == 0)
             break;
         if (*(int *)(p + 0x340) != 0)
-            D_001AF548 = 12;
+            g_dynamo_launch_mode = 12;
         else
-            D_001AF548 = 4;
+            g_dynamo_launch_mode = 4;
         obj[0x20] = 2;
         stub_empty_11();
         break;
@@ -118,17 +118,17 @@ void func_US2_00316C20(u8 *obj)
         char *player;
         Level_00315E20 *level;
 
-        if (!math_fast_float_d(&D_001AF548))
+        if (!math_fast_float_d(&g_dynamo_launch_mode))
             break;
         player = g_hero_state;
         *(int *)(player + 0xC20) = 0;
-        if (D_0018C360[36].count < 0xFFFF)
-            D_0018C360[36].count++;
-        if (D_001A7390 > D_0018C360[36].maximum)
-            D_0018C360[36].maximum = D_001A7390;
-        level = &g_weapon_table[D_0013958C];
+        if (g_statistics_table[36].count < 0xFFFF)
+            g_statistics_table[36].count++;
+        if (g_frame_counter > g_statistics_table[36].maximum)
+            g_statistics_table[36].maximum = g_frame_counter;
+        level = &g_weapon_table[g_dynamo_weapon_index];
         launch.flags = 0x10000;
-        D_0018C360[36].levels = D_0018C360[36].levels | (1 << g_current_map_index) | 0x80000000;
+        g_statistics_table[36].levels = g_statistics_table[36].levels | (1 << g_current_map_index) | 0x80000000;
         launch.range = level->range;
         launch.count = 1;
         launch.owner = obj;
@@ -142,12 +142,12 @@ void func_US2_00316C20(u8 *obj)
         QueueMobyImpact(st->target, &launch);
         obj[0x20] = 3;
         if (*(int *)(player + 0x340)) {
-            D_001AF548 = 15;
+            g_dynamo_launch_mode = 15;
             AllocEffectSlot(obj, st->target, 7);
             AllocEffectSlot(obj, st->target, 7);
             AllocEffectSlot(obj, st->target, 7);
         } else {
-            D_001AF548 = 3;
+            g_dynamo_launch_mode = 3;
             AllocEffectSlot(obj, st->target, 3);
             AllocEffectSlot(obj, st->target, 3);
             AllocEffectSlot(obj, st->target, 3);
@@ -158,16 +158,16 @@ void func_US2_00316C20(u8 *obj)
     case 3: {
         char *player;
 
-        if (!math_fast_float_d(&D_001AF548))
+        if (!math_fast_float_d(&g_dynamo_launch_mode))
             break;
         player = g_hero_state;
         *(float *)(player + 0xC20) = 1.0f;
-        D_001AF548 = 7;
+        g_dynamo_launch_mode = 7;
         obj[0x20] = 4;
         break;
     }
     case 4:
-        if (math_fast_float_d(&D_001AF548))
+        if (math_fast_float_d(&g_dynamo_launch_mode))
             obj[0x20] = 1;
         break;
     }

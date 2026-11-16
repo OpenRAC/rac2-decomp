@@ -8,7 +8,7 @@ typedef struct { char pad[4]; unsigned char enabled; char body[111]; float scale
 extern EffectConfig g_weapon_l00_table[];
 extern void *g_hero_moby;
 extern void cam_compute_view_direction(void *, void *, int);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern int coll_process_hit(void *, int, float, void *, void *);
 extern int math_random_int_range(int, int);
@@ -17,7 +17,7 @@ extern float math_random_signed_float_range(float, float);
 extern void *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, float, int);
 
 /* Emits impact effects using the current selection's effect configuration. */
-void func_PAL_L00_003AB990(char *object, void *point)
+void SpawnConfiguredImpactEffects_pal(char *object, void *point)
 {
     float position[4];
     float normal[4];
@@ -27,7 +27,7 @@ void func_PAL_L00_003AB990(char *object, void *point)
     *(Quadword *)position = *(Quadword *)point;
     if (g_weapon_l00_table[g_item_slot_to_record.selected].enabled) {
         cam_compute_view_direction(position, normal, 1);
-        func_PAL_002AC718(object, normal, position, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
+        SpawnExplosionEffects_pal(object, normal, position, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         *(int *)(query + 20) = 0x810000;
         *(int *)(query + 32) = 1;
         *(char **)(query + 16) = object;

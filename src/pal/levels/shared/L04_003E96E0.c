@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern int math_random_int_below(int a0);
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void vec_scale_to_length(char *, char *, float);
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
 extern float math_random_signed_float_range(float, float);
@@ -15,13 +15,13 @@ extern int FloatToInt(float);
 extern void FastVecSub(void *, void *, void *);
 
 /* Emits paired particles with opposite spin and randomized velocities. */
-void func_PAL_L04_003E96E0(float *pos, int count) {
+void part_l04_spawn_paired_sparks_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    FastVecSub(direction, (float *)g_tether_zero_vec, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;

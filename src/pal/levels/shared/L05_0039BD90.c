@@ -21,12 +21,12 @@ typedef struct {
     char pad[0x140];
     float pos[4];
 } ParticleCamera99268;
-extern ParticleCamera99268 D_L05_001B9580;
-extern unsigned char *D_L05_001FF240[];
+extern ParticleCamera99268 g_hero_l05_state;
+extern unsigned char *g_particle_params_table[];
 typedef struct {
     int v[2];
 } __attribute__((packed)) ParticleColors99268;
-extern ParticleColors99268 D_L05_001AEC00;
+extern ParticleColors99268 g_record_particle_colors;
 
 void func_PAL_L05_0039C0D8(char *obj)
 {
@@ -66,7 +66,7 @@ void func_PAL_L05_0039C0D8(char *obj)
         func_352B28(pos, vel, (life * 5 + 2) / 6, 0x8FFF, type, 127, 127, 5, scale * 210000.0f, *(float *)(s + 0x14) * 2100.0f, 0.00584f);
     }
 
-    angle = func_306CD0(D_L05_001B9580.pos[0] - *(float *)(obj + 0x10), D_L05_001B9580.pos[1] - *(float *)(obj + 0x14));
+    angle = func_306CD0(g_hero_l05_state.pos[0] - *(float *)(obj + 0x10), g_hero_l05_state.pos[1] - *(float *)(obj + 0x14));
     sign = 1;
     for (k = 0; (float)k < (float)*(int *)(s + 0x2C) * 3.0f + (float)(*(int *)(s + 0x3C) * 10); k++) {
         float scale, a, b;
@@ -80,7 +80,7 @@ void func_PAL_L05_0039C0D8(char *obj)
         b = func_332BB0(0.0f, 1.5707964897155762f);
         func_33B330(vel, scale, func_307620(angle, b), a);
         p = func_347040(pos, sign, vel, *(int *)(s + 0x3C) ? 0xD10572 : 0x5A182, 0.0f, 1.0f, 1.01f, *(float *)(s + 0x14) * 31500.001953125f, 0);
-        colors = D_L05_001AEC00;
+        colors = g_record_particle_colors;
         if (p) {
             d = p + 0x20;
             {
@@ -97,9 +97,9 @@ void func_PAL_L05_0039C0D8(char *obj)
             d[0xA] = func_332AF8(64, 128);
             d[0xB] = p[0xA];
             if (func_332AB8(4) != 0)
-                p[2] = D_L05_001FF240[34][0];
+                p[2] = g_particle_params_table[34][0];
             else
-                p[2] = D_L05_001FF240[105][0];
+                p[2] = g_particle_params_table[105][0];
         }
     }
 }

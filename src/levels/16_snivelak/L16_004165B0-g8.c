@@ -7,7 +7,7 @@ typedef signed int s32;
 typedef unsigned int u32;
 typedef float f32;
 
-extern char *D_L16_001B2B1C __attribute__((sda));
+extern char *g_moby_instance_table __attribute__((sda));
 extern char *D_L16_001B2B1C_2;
 extern char g_hero_position[];
 extern s32 func_00319BE8(char *, s32);
@@ -34,40 +34,40 @@ void moby_activate_linked(char *moby) {
     if (func_00319BE8(g_hero_position, *(s32 *)(vars + 4)) == 0)
         return;
     if (*(s32 *)(vars + 0x10) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x10) << 8) + 0xBC) = 1;
+        *(u8 *)(g_moby_instance_table + (*(s32 *)(vars + 0x10) << 8) + 0xBC) = 1;
     if (*(s32 *)(vars + 0x14) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x14) << 8) + 0xBC) = 1;
+        *(u8 *)(g_moby_instance_table + (*(s32 *)(vars + 0x14) << 8) + 0xBC) = 1;
     if (*(s32 *)(vars + 0x18) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x18) << 8) + 0xBC) = 1;
+        *(u8 *)(g_moby_instance_table + (*(s32 *)(vars + 0x18) << 8) + 0xBC) = 1;
     if (*(s32 *)(vars + 0x1C) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x1C) << 8) + 0xBC) = 1;
+        *(u8 *)(g_moby_instance_table + (*(s32 *)(vars + 0x1C) << 8) + 0xBC) = 1;
     *(u8 *)(moby + 0x20) = 2;
 }
 
-extern s32 D_L16_001B1FCC __attribute__((sda));
-extern s32 D_L16_001B1FC4 __attribute__((sda));
-extern s32 D_L16_001B1FC8 __attribute__((sda));
-extern s32 D_L16_001B1FD0 __attribute__((sda));
-extern s32 D_001B3AAC __attribute__((nosda));
-extern f32 D_L16_001B3AAC __attribute__((sda));
+extern s32 g_level_l16_word_c __attribute__((sda));
+extern s32 g_level_l16_word_a __attribute__((sda));
+extern s32 g_level_l16_word_b __attribute__((sda));
+extern s32 g_level_word_d __attribute__((sda));
+extern s32 g_unused_word_2 __attribute__((nosda));
+extern f32 g_level_l16_float_param __attribute__((sda));
 extern s32 func_003219A0(char *);
 extern void func_00313DD0(char *, s32, s32);
 extern f32 func_002E73F8(f32);
 extern void func_0041ECF8(char *, f32);
 
-extern f32 D_L16_001B1C60 __attribute__((sda));
-extern f32 D_001B1C64 __attribute__((nosda));
-extern f32 D_001B1C68 __attribute__((nosda));
-extern f32 D_001B1C6C __attribute__((nosda));
-extern f32 D_L16_001B1C70 __attribute__((sda));
-extern f32 D_001B1C74 __attribute__((nosda));
-extern s32 D_L16_001B1C78 __attribute__((sda));
-extern s32 D_001B1C7C __attribute__((nosda));
-extern s32 D_L16_001B1C80 __attribute__((sda));
-extern s32 D_001B1C84 __attribute__((nosda));
-extern s32 D_001B1C88 __attribute__((nosda));
-extern s32 D_001B1C8C __attribute__((nosda));
-extern s32 D_L16_001B1C90 __attribute__((sda));
+extern f32 g_spark_dir_speed_min __attribute__((sda));
+extern f32 g_float_data_unused_a __attribute__((nosda));
+extern f32 g_float_data_unused_b __attribute__((nosda));
+extern f32 g_float_data_unused_c __attribute__((nosda));
+extern f32 g_spark_first_scale __attribute__((sda));
+extern f32 g_float_data_unused_d __attribute__((nosda));
+extern s32 g_spark_first_part_id __attribute__((sda));
+extern s32 g_word_data_unused_a __attribute__((nosda));
+extern s32 g_spark_first_kind_min __attribute__((sda));
+extern s32 g_word_data_unused_b __attribute__((nosda));
+extern s32 g_word_data_unused_c __attribute__((nosda));
+extern s32 g_unused_word __attribute__((nosda));
+extern s32 g_spark_count __attribute__((sda));
 extern void func_003140C0(char *, f32, f32);
 extern s32 func_00313EE0(s32, s32);
 extern s32 func_00313EA0(s32);
@@ -76,21 +76,21 @@ extern f32 func_00313F38(f32, f32);
 extern void func_002E7450(char *);
 extern void func_002E7488(char *, char *, char *);
 
-extern s32 D_0018B650 __attribute__((nosda));
-extern s32 D_L16_001B16C0 __attribute__((sda));
+extern s32 g_held_object_ptr __attribute__((nosda));
+extern s32 g_snivelak_target __attribute__((sda));
 extern void func_002C4368(s32);
 extern void func_00433698(s32);
 
 /* clears the level state word and reseeds the two engine subsystems */
 void turret_reset_camera_state(void) {
-    D_0018B650 = 0;
-    D_L16_001B16C0 = 0;
+    g_held_object_ptr = 0;
+    g_snivelak_target = 0;
     func_002C4368(0);
     func_00433698(3);
 }
 
-extern f32 D_L16_001B1E90 __attribute__((sda));
-extern f32 D_L16_001B1E94 __attribute__((sda));
+extern f32 g_subobject_spin_param __attribute__((sda));
+extern f32 g_subobject_angle_scale __attribute__((sda));
 extern void func_0031C698(char *, char *, char *, f32, f32, f32);
 
 /* submits the sub-object at 0x68 with the level's angle scale */
@@ -98,11 +98,11 @@ void gfx_submit_subobject_angle_scale(char *moby) {
     char *self = moby;
     char *st = *(char **)(self + 0x68);
 
-    func_0031C698(self, st + 4, st, D_L16_001B1E90, D_L16_001B1E94 * 0.000290888245f, -1.0f);
+    func_0031C698(self, st + 4, st, g_subobject_spin_param, g_subobject_angle_scale * 0.000290888245f, -1.0f);
 }
 
 extern char g_hero_position[];
-extern s32 D_L16_001B1A80 __attribute__((sda));
+extern s32 g_turret_local_offset __attribute__((sda));
 extern void func_002E7968(char *, s32 *, char *);
 extern void func_002E7488(char *, char *, char *);
 
@@ -110,22 +110,22 @@ extern void func_002E7488(char *, char *, char *);
 void turret_set_camera_matrices(char *moby) {
     char *obj = g_hero_position;
 
-    func_002E7968(obj, &D_L16_001B1A80, moby + 0xC0);
+    func_002E7968(obj, &g_turret_local_offset, moby + 0xC0);
     func_002E7488(obj, obj, moby + 0x10);
     *(f32 *)(obj + 0x18) = *(f32 *)(moby + 0xF8);
 }
 
-extern f32 D_L16_001B1C28 __attribute__((sda));
-extern f32 D_L16_001B1C2C __attribute__((sda));
-extern f32 D_L16_001B1C30 __attribute__((sda));
-extern f32 D_L16_001B1C34 __attribute__((sda));
+extern f32 g_quad_packet_value_first __attribute__((sda));
+extern f32 g_quad_packet_value_second __attribute__((sda));
+extern f32 g_quad_packet_value_third __attribute__((sda));
+extern f32 g_quad_packet_value_fourth __attribute__((sda));
 
 /* initialises the level object's scale/limit table */
 void gfx_init_quad_packet_table(char *table) {
-    f32 first = D_L16_001B1C28;
-    f32 second = D_L16_001B1C2C;
-    f32 third = D_L16_001B1C30;
-    f32 fourth = D_L16_001B1C34;
+    f32 first = g_quad_packet_value_first;
+    f32 second = g_quad_packet_value_second;
+    f32 third = g_quad_packet_value_third;
+    f32 fourth = g_quad_packet_value_fourth;
 
     *(long long *)(table + 112) = 0LL;
     *(int *)(table + 80) = 0;
@@ -160,9 +160,9 @@ void gfx_init_quad_packet_table(char *table) {
    while D_L16_001B2B38 is a plain int: its `.extern` comes last in the file, which leaves a load
    in a branch delay slot on $gp and every other load on `lui`/`lw`. */
 extern unsigned char *D_L16_001B2B1C_base[3] __asm__("D_L16_001B2B1C") __attribute__((sda));
-extern s32 D_L16_001B2B38;
-extern unsigned short *D_L16_001FB660[];
-extern s32 D_L16_001B1FE0 __attribute__((sda));
+extern s32 g_group_id_limit;
+extern unsigned short *g_group_l16_id_lists[];
+extern s32 g_moby_spin_offset_vec __attribute__((sda));
 extern void matrix_mul_vec3(char *, char *, char *);
 extern void FastVecAdd(char *, char *, char *);
 extern void FastVecSub(char *, char *, char *);
@@ -182,11 +182,11 @@ void moby_spin_group_entities(char *self, f32 spin) {
     char *entity;
     f32 spinValue;
 
-    matrix_mul_vec3(buf0, (char *)&D_L16_001B1FE0, self + 0xC0);
+    matrix_mul_vec3(buf0, (char *)&g_moby_spin_offset_vec, self + 0xC0);
     FastVecAdd(buf0, buf0, self + 0x10);
-    for (idList = D_L16_001FB660[*(u8 *)(self + 0x21)];
-         *(u8 *)(self + 0x21) != 0xFF && *(u8 *)(self + 0x21) <= D_L16_001B2B38 && idList != 0 &&
-         ((idList != 0 && (short)idList[-1] >= 0) || idList == D_L16_001FB660[*(u8 *)(self + 0x21)]);
+    for (idList = g_group_l16_id_lists[*(u8 *)(self + 0x21)];
+         *(u8 *)(self + 0x21) != 0xFF && *(u8 *)(self + 0x21) <= g_group_id_limit && idList != 0 &&
+         ((idList != 0 && (short)idList[-1] >= 0) || idList == g_group_l16_id_lists[*(u8 *)(self + 0x21)]);
          idList++) {
         entity = (char *)D_L16_001B2B1C_base[0] + ((*idList & 0x7FFF) << 8);
         if (entity == 0)
@@ -204,7 +204,7 @@ void moby_spin_group_entities(char *self, f32 spin) {
     }
 }
 
-extern s32 D_001A7A00;
+extern s32 g_player_stats;
 extern void func_002E7788(char *, char *, f32);
 extern char g_hero_state[];
 extern void func_00315728(char *, char *, s32, char *, f32);
@@ -235,7 +235,7 @@ void trigger_box_update(char *moby) {
     *(s32 *)(extent + 8) = 0;
     *(f32 *)(extent + 0xC) = 1.0f;
     func_002E7788(extent, extent, 10.0f);
-    func_00315728(buf, moby, 1, extent, (f32)(D_001A7A00 * 200));
+    func_00315728(buf, moby, 1, extent, (f32)(g_player_stats * 200));
     *(u16 *)(buf + 0x1A) = *(u16 *)(moby + 0xAA);
     func_00315948(*(char **)(hero + 0x2290), buf);
 }

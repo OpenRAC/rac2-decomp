@@ -35,7 +35,7 @@ extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
-extern unsigned char *D_001F25C8;
+extern unsigned char *g_part_tex_bubble;
 extern char g_hero_state[];
 
 /* Spawns a bubble particle at position with velocity; a floor of -1 follows
@@ -53,7 +53,7 @@ Particle_002BF728 *func_PAL_002C0428(TI128 *position, float *velocity, float sca
         m->scale = math_random_float_range(0.75f, 1.25f) * scale;
         p->size = 5.25e+03f;
         p->unk08 = math_random_int_range(-10, 10) - 0x80;
-        p->unk02 = *D_001F25C8;
+        p->unk02 = *g_part_tex_bubble;
         p->life = math_random_int_range(0x3A, 0x75);
         if (floor == -1.0f) {
             HeroView_002BF728 *hero = (HeroView_002BF728 *)g_hero_state;

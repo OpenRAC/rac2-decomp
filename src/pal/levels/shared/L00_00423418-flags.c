@@ -21,7 +21,7 @@ extern void FastVecAdd(void *,void *,void *);
 extern void draw_world_quad(void *,void *,int);
 
 /* Draws the trail strip along the owner table path, fading the alpha near the end of its life. */
-void func_PAL_L00_00423918(void *self,int color,int alpha)
+void rocket_draw_ribbon_strip_pal(void *self,int color,int alpha)
 {
     StripPacket packet;
     Quad128 direction,side;

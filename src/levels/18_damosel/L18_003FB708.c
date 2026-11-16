@@ -55,42 +55,42 @@ typedef struct {
 
 extern char g_hero_state[];
 extern u8 g_sound_state[];
-extern int D_001A7A00[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
 extern char g_camera_l18_position[];
-extern char *D_L18_001FE480[];
+extern char *g_path_l18_table[];
 extern ClassRec *g_moby_l18_table[] __attribute__((sda));
 extern char *g_nearby_hit_targets[];
-extern f32 D_L18_001B06AC[] __attribute__((sda));
-extern f32 D_L18_001B06B0[] __attribute__((sda));
-extern f32 D_L18_001B05E0 __attribute__((sda));
-extern f32 D_L18_001B05E4 __attribute__((sda));
-extern f32 D_L18_001B05F0[4] __attribute__((sda));
-extern f32 D_L18_001B0600 __attribute__((sda));
-extern f32 D_L18_001B0604 __attribute__((sda));
-extern f32 D_L18_001B0608 __attribute__((sda));
-extern int D_L18_001B060C __attribute__((sda));
-extern f32 D_L18_001B0620[4] __attribute__((sda));
-extern int D_L18_001B0630 __attribute__((sda));
-extern f32 D_L18_001B0634 __attribute__((sda));
-extern f32 D_L18_001B0638 __attribute__((sda));
-extern f32 D_L18_001B063C __attribute__((sda));
-extern f32 D_L18_001B0640 __attribute__((sda));
-extern f32 D_L18_001B0644 __attribute__((sda));
-extern f32 D_L18_001B0648 __attribute__((sda));
-extern f32 D_L18_001B0650[2] __attribute__((sda));
-extern f32 D_L18_001B0658[2] __attribute__((sda));
-extern f32 D_L18_001B0660 __attribute__((sda));
-extern f32 D_L18_001B0668[2] __attribute__((sda));
-extern f32 D_L18_001B0670 __attribute__((sda));
-extern f32 D_L18_001B0680[4] __attribute__((sda));
-extern f32 D_L18_001B0690[4] __attribute__((sda));
-extern f32 D_L18_001B06A8 __attribute__((sda));
-extern int D_L18_001B06B8[] __attribute__((sda));
-extern int D_L18_001B2348 __attribute__((sda));
-extern char D_L18_003FD630[];
-extern char D_L18_003FCA38[];
-extern char D_L18_003FD730[];
+extern f32 g_train_l18_value_mid[] __attribute__((sda));
+extern f32 g_train_l18_value_high[] __attribute__((sda));
+extern f32 g_train_sink_rate __attribute__((sda));
+extern f32 g_train_turn_angle __attribute__((sda));
+extern f32 g_train_offset_vector_a[4] __attribute__((sda));
+extern f32 g_train_l18_hit_radius __attribute__((sda));
+extern f32 g_train_push_speed_forward __attribute__((sda));
+extern f32 g_train_push_speed_back __attribute__((sda));
+extern int g_train_timer_start __attribute__((sda));
+extern f32 g_train_offset_vector_b[4] __attribute__((sda));
+extern int g_train_flash_count __attribute__((sda));
+extern f32 g_train_flash_scale_min __attribute__((sda));
+extern f32 g_train_flash_scale_max __attribute__((sda));
+extern f32 g_train_l18_speed_min __attribute__((sda));
+extern f32 g_train_l18_speed_max __attribute__((sda));
+extern f32 g_train_speed_a __attribute__((sda));
+extern f32 g_train_speed_b __attribute__((sda));
+extern f32 g_train_speed_by_video[2] __attribute__((sda));
+extern f32 g_train_l18_accel_by_video[2] __attribute__((sda));
+extern f32 g_train_phase_one_frames __attribute__((sda));
+extern f32 g_train_l18_drag_by_video[2] __attribute__((sda));
+extern f32 g_train_phase_two_frames __attribute__((sda));
+extern f32 g_train_offset_vector_c[4] __attribute__((sda));
+extern f32 g_train_offset_vector_d[4] __attribute__((sda));
+extern f32 g_train_l18_value_low __attribute__((sda));
+extern int g_train_color_table[] __attribute__((sda));
+extern int g_frame_l18_counter __attribute__((sda));
+extern char g_train_draw_callback_b[];
+extern char g_train_draw_callback_a[];
+extern char g_train_draw_callback_first[];
 
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern int math_fast_float_d(void *);
@@ -169,7 +169,7 @@ void train_l18_update(char *moby)
         qcopy(vars->v70, moby + 0xF0);
         if (vars->iB0 != -1) {
             vars->fD8 = 0.0f;
-            path = D_L18_001FE480[vars->iB0];
+            path = g_path_l18_table[vars->iB0];
             r = 1.0f / fast_vec_dist(path + 0x10, path + 0x20);
             vars->fDC = r * (0.016666668f * vars->fD0);
             qcopy(moby + 0x10, path + 0x10);
@@ -209,7 +209,7 @@ void train_l18_update(char *moby)
             vec_scale_to_length(vars->v80, moby + 0xC0, vars->fD0 * 0.016666668f);
         }
         if (vars->iB0 != -1) {
-            path_sample_position(D_L18_001FE480[vars->iB0], 0, moby + 0x10, moby + 0xF0, 0, vars->fD8);
+            path_sample_position(g_path_l18_table[vars->iB0], 0, moby + 0x10, moby + 0xF0, 0, vars->fD8);
             vars->fD8 = vars->fD8 + vars->fDC;
         } else {
             if (vars->iC8 != -1) {
@@ -249,47 +249,47 @@ void train_l18_update(char *moby)
             }
         }
         if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN) {
-            matrix_mul_vec3(vm[0], D_L18_001B05F0, moby + 0xC0);
+            matrix_mul_vec3(vm[0], g_train_offset_vector_a, moby + 0xC0);
             FastVecAdd(vm[0], vm[0], moby + 0x10);
-            hit_count = coll_process_hit(D_L18_001B0600, vm[0], 0, moby, 0);
+            hit_count = coll_process_hit(g_train_l18_hit_radius, vm[0], 0, moby, 0);
             if (hit_count != 0) {
                 for (j = 0; j < hit_count; j++) {
                     target = g_nearby_hit_targets[j];
                     if (target == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
-                        FastVecScale(vm[1], moby + 0xC0, -D_L18_001B0608);
-                        vm[1][2] = D_L18_001B0608 * 4.0f;
+                        FastVecScale(vm[1], moby + 0xC0, -g_train_push_speed_back);
+                        vm[1][2] = g_train_push_speed_back * 4.0f;
                         vm[1][3] = 5627.9248f;
                         hero_l18_set_action(0, 1);
-                        g = (f32)D_001A7A00[0] * 30.0f;
+                        g = (f32)g_player_stats[0] * 30.0f;
                         part_queue_impact_effect(target, moby, 0x10001, g_hero_state + 0x80, vm[1], g > 100.0f ? g : 100.0f);
-                        vars->iE0 = D_L18_001B060C;
+                        vars->iE0 = g_train_timer_start;
                         SpawnExplosion(g_hero_state + 0x80, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
                     } else {
-                        FastVecScale(vm[1], moby + 0xC0, D_L18_001B0604);
+                        FastVecScale(vm[1], moby + 0xC0, g_train_push_speed_forward);
                         vm[1][3] = 5627.9248f;
-                        vm[1][2] = D_L18_001B0604 * 4.0f;
+                        vm[1][2] = g_train_push_speed_forward * 4.0f;
                         part_queue_impact_effect(target, moby, 0x10001, target + 0x10, vm[1], 50.0f);
                     }
                 }
             }
             part_spawn_upward(moby);
-            if (*(u8 *)(moby + 0x31) != 0 && (D_L18_001B2348 & 0xF) == (((int)moby >> 8) & 0xF)) {
-                for (i = 0; i < D_L18_001B0630; i++) {
-                    matrix_mul_vec3(vm[1], D_L18_001B0620, moby + 0xC0);
+            if (*(u8 *)(moby + 0x31) != 0 && (g_frame_l18_counter & 0xF) == (((int)moby >> 8) & 0xF)) {
+                for (i = 0; i < g_train_flash_count; i++) {
+                    matrix_mul_vec3(vm[1], g_train_offset_vector_b, moby + 0xC0);
                     FastVecAdd(vm[1], vm[1], moby + 0x10);
-                    f = math_random_float_range(D_L18_001B063C, D_L18_001B0640) * 0.016666668f;
+                    f = math_random_float_range(g_train_l18_speed_min, g_train_l18_speed_max) * 0.016666668f;
                     vec_scale_to_length(vm[2], moby + 0xD0, math_random_int_below(2) != 0 ? -f : f);
                     vm[2][2] = math_random_float_range(-0.083333336f, 0.016666668f);
                     vm[2][3] = -0.008333334f;
-                    part_spawn_white_flash(vm[1], vm[2], 0, math_random_float_range(D_L18_001B0634, D_L18_001B0638));
+                    part_spawn_white_flash(vm[1], vm[2], 0, math_random_float_range(g_train_flash_scale_min, g_train_flash_scale_max));
                 }
             }
         }
         break;
     case 5:
         flag_set_first_pending(moby);
-        r = D_L18_001B05E4 * 0.00029088825f;
-        vars->v80[2] = vars->v80[2] - D_L18_001B05E0 * 0.00027777778f;
+        r = g_train_turn_angle * 0.00029088825f;
+        vars->v80[2] = vars->v80[2] - g_train_sink_rate * 0.00027777778f;
         *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), r);
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;
@@ -298,30 +298,30 @@ void train_l18_update(char *moby)
             *(u8 *)(moby + 0xBC) = 0;
             *(u16 *)(moby + 0x96) = 0;
             *(u16 *)(moby + 0x34) |= 0x100;
-            vars->fC0 = D_L18_001B06A8;
-            matrix_mul_vec3(vars->v90, D_L18_001B0680, moby + 0xC0);
+            vars->fC0 = g_train_l18_value_low;
+            matrix_mul_vec3(vars->v90, g_train_offset_vector_c, moby + 0xC0);
             FastVecAdd(vars->v90, moby + 0x10, vars->v90);
-            vec_scale_to_length(vars->v80, moby + 0xC0, D_L18_001B0644 * 0.016666668f);
+            vec_scale_to_length(vars->v80, moby + 0xC0, g_train_speed_a * 0.016666668f);
             *(u16 *)(moby + 0x34) |= 8;
             snd_play_from_class_bank(1, 0, moby, 0xD5C);
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
         } else if (*(u8 *)(moby + 0xBC) == 0) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, D_L18_001B0658[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f);
-            vars->fC0 = D_L18_001B06A8 + (D_L18_001B06AC[0] - D_L18_001B06A8) * (IntToFloat(moby_timer(moby)) / D_L18_001B0660);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L18_001B0660, D_L18_001B06B8[0], D_L18_001B06B8[1]);
-            if (D_L18_001B0660 < (f32)moby_timer(moby)) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, g_train_l18_accel_by_video[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f);
+            vars->fC0 = g_train_l18_value_low + (g_train_l18_value_mid[0] - g_train_l18_value_low) * (IntToFloat(moby_timer(moby)) / g_train_phase_one_frames);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_phase_one_frames, g_train_color_table[0], g_train_color_table[1]);
+            if (g_train_phase_one_frames < (f32)moby_timer(moby)) {
                 *(u8 *)(moby + 0xBC) = 1;
-                vec_scale_to_length(vars->v80, moby + 0xC0, D_L18_001B0648 * 0.016666668f);
+                vec_scale_to_length(vars->v80, moby + 0xC0, g_train_speed_b * 0.016666668f);
                 *(u16 *)(moby + 0x96) = 0;
             }
         } else if (*(u8 *)(moby + 0xBC) == 1) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f - D_L18_001B0668[g_is_pal_video[0] != 0] * 0.016666668f);
-            vars->fC0 = D_L18_001B06AC[0] + (D_L18_001B06B0[0] - D_L18_001B06AC[0]) * (IntToFloat(moby_timer(moby)) / D_L18_001B0670);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L18_001B0670, D_L18_001B06B8[1], D_L18_001B06B8[2]);
-            *(u8 *)(moby + 0x23) = FloatToInt((1.0f - IntToFloat(moby_timer(moby)) / D_L18_001B0670) * 128.0f);
-            if (D_L18_001B0670 < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f - g_train_l18_drag_by_video[g_is_pal_video[0] != 0] * 0.016666668f);
+            vars->fC0 = g_train_l18_value_mid[0] + (g_train_l18_value_high[0] - g_train_l18_value_mid[0]) * (IntToFloat(moby_timer(moby)) / g_train_phase_two_frames);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_phase_two_frames, g_train_color_table[1], g_train_color_table[2]);
+            *(u8 *)(moby + 0x23) = FloatToInt((1.0f - IntToFloat(moby_timer(moby)) / g_train_phase_two_frames) * 128.0f);
+            if (g_train_phase_two_frames < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
                 if (vars->iBC != 0) {
                     vars->fD8 = 0.0f;
                     qcopy(moby + 0x10, vars->v60);
@@ -334,9 +334,9 @@ void train_l18_update(char *moby)
             }
         }
         if (*(u8 *)(moby + 0x31) != 0) {
-            gfx_queue_draw_callback(D_L18_003FD630, moby);
-            gfx_queue_draw_callback(D_L18_003FCA38, moby);
-            gfx_add_draw_callback_first(D_L18_003FD730, moby);
+            gfx_queue_draw_callback(g_train_draw_callback_b, moby);
+            gfx_queue_draw_callback(g_train_draw_callback_a, moby);
+            gfx_add_draw_callback_first(g_train_draw_callback_first, moby);
         }
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;
@@ -345,26 +345,26 @@ void train_l18_update(char *moby)
             *(u8 *)(moby + 0xBC) = 1;
             *(u16 *)(moby + 0x96) = 0;
             *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & ~1) | 0x100;
-            vars->fC0 = D_L18_001B06A8;
+            vars->fC0 = g_train_l18_value_low;
             *(u8 *)(moby + 0x23) = 0;
             for (i = 0; i < 3; i++) {
                 vec_scale_to_length(vm[i], moby + 0xC0 + i * 0x10, 1.0f);
             }
-            matrix_mul_vec3(vars->v90, D_L18_001B0690, vm[0]);
+            matrix_mul_vec3(vars->v90, g_train_offset_vector_d, vm[0]);
             FastVecScale(vars->v90, vars->v90, IntToFloat(vars->iCC) + 1.0f);
             FastVecAdd(vars->v90, moby + 0x10, vars->v90);
-            vec_scale_to_length(vars->v80, moby + 0xC0, (IntToFloat(vars->iCC) + 1.0f) * (0.016666668f * D_L18_001B0650[g_is_pal_video[0] != 0]));
+            vec_scale_to_length(vars->v80, moby + 0xC0, (IntToFloat(vars->iCC) + 1.0f) * (0.016666668f * g_train_speed_by_video[g_is_pal_video[0] != 0]));
             *(u16 *)(moby + 0x34) |= 8;
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
             snd_play_from_class_bank(1, 0, moby, 0xD5C);
         } else if (*(u8 *)(moby + 0xBC) == 1) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (1.0f - D_L18_001B0668[g_is_pal_video[0] != 0] * 0.016666668f));
-            vars->fC0 = D_L18_001B06B0[0] + (D_L18_001B06AC[0] - D_L18_001B06B0[0]) * (IntToFloat(moby_timer(moby)) / D_L18_001B0670);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L18_001B0670, D_L18_001B06B8[2], D_L18_001B06B8[1]);
-            *(u8 *)(moby + 0x23) = FloatToInt(IntToFloat(moby_timer(moby)) * 128.0f / D_L18_001B0670);
-            if (D_L18_001B0670 < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (1.0f - g_train_l18_drag_by_video[g_is_pal_video[0] != 0] * 0.016666668f));
+            vars->fC0 = g_train_l18_value_high[0] + (g_train_l18_value_mid[0] - g_train_l18_value_high[0]) * (IntToFloat(moby_timer(moby)) / g_train_phase_two_frames);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_phase_two_frames, g_train_color_table[2], g_train_color_table[1]);
+            *(u8 *)(moby + 0x23) = FloatToInt(IntToFloat(moby_timer(moby)) * 128.0f / g_train_phase_two_frames);
+            if (g_train_phase_two_frames < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
                 *(u8 *)(moby + 0x23) = 0x80;
                 *(u8 *)(moby + 0xBC) = 0;
                 *(u16 *)(moby + 0x34) &= ~8;
@@ -372,10 +372,10 @@ void train_l18_update(char *moby)
                 *(u16 *)(moby + 0x96) = 0;
             }
         } else if (*(u8 *)(moby + 0xBC) == 0) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (D_L18_001B0658[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f));
-            vars->fC0 = D_L18_001B06AC[0] + (D_L18_001B06A8 - D_L18_001B06AC[0]) * (IntToFloat(moby_timer(moby)) / D_L18_001B0660);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L18_001B0660, D_L18_001B06B8[1], D_L18_001B06B8[0]);
-            if (D_L18_001B0660 < (f32)moby_timer(moby)) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (g_train_l18_accel_by_video[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f));
+            vars->fC0 = g_train_l18_value_mid[0] + (g_train_l18_value_low - g_train_l18_value_mid[0]) * (IntToFloat(moby_timer(moby)) / g_train_phase_one_frames);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_phase_one_frames, g_train_color_table[1], g_train_color_table[0]);
+            if (g_train_phase_one_frames < (f32)moby_timer(moby)) {
                 *(u16 *)(moby + 0x34) &= ~0x100;
                 moby_set_state(moby, 1, -1);
             }
@@ -386,9 +386,9 @@ void train_l18_update(char *moby)
             vars->iE4 = snd_play_from_class_bank(0, 4, moby, 0xD5C);
         }
         if (*(u8 *)(moby + 0x31) != 0) {
-            gfx_queue_draw_callback(D_L18_003FD630, moby);
-            gfx_queue_draw_callback(D_L18_003FCA38, moby);
-            gfx_add_draw_callback_first(D_L18_003FD730, moby);
+            gfx_queue_draw_callback(g_train_draw_callback_b, moby);
+            gfx_queue_draw_callback(g_train_draw_callback_a, moby);
+            gfx_add_draw_callback_first(g_train_draw_callback_first, moby);
         }
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;

@@ -16,7 +16,7 @@ extern void moby_transform_joint_point(void *, int, void *);
 extern void func_002A0F48(void *);
 extern void func_002A10E8(void *);
 extern void scene_start_sequence_for_state(void);
-extern char D_00240450[];
+extern char g_effect_record_table_2[];
 extern void part_init_effect_table(void *);
 extern s32 func_00132AC8(void);
 extern int func_001163B0(void);
@@ -57,34 +57,34 @@ extern TransitionMenu g_hero_moby_default;        /* mode block: +0x64 index, +0
 extern int D_001B2130_first SDATA(D_001B2130);
 
 
-extern int D_001B2130[] MACRO_ADDR __attribute__((sda));         /* [0] +0, [1] +4, [3] +0xC */
-extern int D_001B2148[] __attribute__((sda));
+extern int g_scene_sound_block_a[] MACRO_ADDR __attribute__((sda));         /* [0] +0, [1] +4, [3] +0xC */
+extern int g_transition_effect_list[] __attribute__((sda));
 extern int D_001B2148_first[] __asm__("D_001B2148") __attribute__((sda));         /* null-terminated entity list */
 typedef struct { char pad[0x24]; float scale; } ScaleClass;
 typedef struct { char pad[0x24]; ScaleClass *definition; int pad28; float scale; } ScaleEntity;
 extern ScaleEntity *g_equipment_pieces[];         /* null-terminated entity list */
-extern int D_001ABEB0 __attribute__((sda));
-extern int D_001A7280;
+extern int g_transition_pending_sound __attribute__((sda));
+extern int g_loader_archives;
 extern int D_001A7280_block[] __asm__("D_001A7280") MACRO_ADDR __attribute__((sda));
-extern int D_001B22B0;
+extern int g_packet_buffer_size;
 typedef struct { int pad, data_offset; char gap[0x48]; int scenes[5]; } TransitionHeader;
 typedef struct { int offset, size; } TransitionChunk;
 typedef struct { char pad[12]; int start, end, pad14; TransitionHeader *data; } TransitionArchive;
-extern TransitionArchive D_001BAEC0;
-extern int D_001886D0[];
-extern char D_00261F30[];        /* 16-byte entries */
+extern TransitionArchive g_loader_memory;
+extern int g_transition_sound_table[];
+extern char g_transition_vec_table[];        /* 16-byte entries */
 typedef struct { float x, y, z, w; } TransitionVector;
 typedef struct { char pad[0xc0]; TransitionVector basis[3]; } MatrixEntity;
-extern TransitionVector D_001B20D0 MACRO_ADDR;
-extern char D_001AC0C0[] SDATA(D_001AC0C0);
-extern char D_001AC0D0[] SDATA(D_001AC0D0);
-extern char D_001AC120[] SDATA(D_001AC120);
-extern float D_001AC150[] SDATA(D_001AC150);
-extern float D_001AC168[] SDATA(D_001AC168);
-extern float D_001ABDD4 MACRO_ADDR;
-extern float D_001ABF10 __attribute__((sda));
+extern TransitionVector g_transition_vector MACRO_ADDR;
+extern char g_transition_vec_a[] SDATA(D_001AC0C0);
+extern char g_transition_vec_b[] SDATA(D_001AC0D0);
+extern char g_transition_fade_vec[] SDATA(D_001AC120);
+extern float g_transition_fov_table[] SDATA(D_001AC150);
+extern float g_transition_min_fov_table[] SDATA(D_001AC168);
+extern float g_transition_fov_scale MACRO_ADDR;
+extern float g_transition_scale_factor __attribute__((sda));
 typedef struct { char pad[0xb0]; float fov; } TransitionView;
-extern TransitionView D_001B9040;        /* view: +0xB0 float */
+extern TransitionView g_view_params;        /* view: +0xB0 float */
 
 /* Runs one frame of the transition scene: moves each object along its path and starts the next scene part when one ends. */
 int transition_update_scene(void)
@@ -106,7 +106,7 @@ int transition_update_scene(void)
         int sound_index;
         snd_set_current_buffer_flag();
         sound_index = g_hero_moby_default.index;
-        func_00132A10(D_001B2130[sound_index], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + sound_index * 0x70);
+        func_00132A10(g_scene_sound_block_a[sound_index], 0, 0x400, 0, 0, 0, 0, (int)g_transition_sound_table + sound_index * 0x70);
         snd_clear_flag_and_update();
         snd_Pump();
     }
@@ -122,12 +122,12 @@ int transition_update_scene(void)
             moby_mark_spawned(anim_object);
         }
     }
-    if (D_001ABEB0 != 0) {
+    if (g_transition_pending_sound != 0) {
         scene_start_sequence_for_state();
-        D_001ABEB0 = 0;
+        g_transition_pending_sound = 0;
     }
-    part_init_effect_table(D_00240450);
-    if (D_001A7280 < 2)
+    part_init_effect_table(g_effect_record_table_2);
+    if (g_loader_archives < 2)
         g_hero_moby_default.phase = 0;
     if (g_hero_moby_default.phase < 2) {
         if (g_hero_moby_default.index != 2) {
@@ -142,8 +142,8 @@ int transition_update_scene(void)
             g_hero_moby_default.index = 4;
             snd_set_current_buffer_flag();
             snd_send_cmd6(D_001B2130_first);
-            snd_send_cmd6(D_001B2130[1]);
-            snd_send_cmd6(D_001B2130[3]);
+            snd_send_cmd6(g_scene_sound_block_a[1]);
+            snd_send_cmd6(g_scene_sound_block_a[3]);
             snd_clear_flag_and_update();
             while (snd_Pump() != 0)
                 ;
@@ -152,17 +152,17 @@ int transition_update_scene(void)
             scene_load_texture_block();
         }
         g_hero_moby_default.phase = g_hero_moby_default.phase + 1;
-        qcopy(D_001AC0D0, D_001AC0C0);
+        qcopy(g_transition_vec_b, g_transition_vec_a);
         mem_clear(&g_scene_playback_state, 0, 0x1D0);
         {
-            int workspace_offset = D_001B22B0;
+            int workspace_offset = g_packet_buffer_size;
             TransitionHeader *header;
             TransitionChunk *chunk;
             int data_base;
             int k;
-            g_scene_playback_state.start = D_001BAEC0.start + workspace_offset;
-            g_scene_playback_state.end = D_001BAEC0.end + workspace_offset;
-            header = D_001BAEC0.data;
+            g_scene_playback_state.start = g_loader_memory.start + workspace_offset;
+            g_scene_playback_state.end = g_loader_memory.end + workspace_offset;
+            header = g_loader_memory.data;
             data_base = (int)header + header->data_offset;
             chunk = (TransitionChunk *)(data_base + header->scenes[g_hero_moby_default.index]);
             for (k = 0; k < 70 && chunk->size != 0; k++) {
@@ -188,20 +188,20 @@ running:
 after:
     cam_set_from_selected_record();
     {
-        float current = D_001B9040.fov;
-        float min_fov = D_001AC168[g_hero_moby_default.index];
+        float current = g_view_params.fov;
+        float min_fov = g_transition_min_fov_table[g_hero_moby_default.index];
         if (current < min_fov)
-            D_001B9040.fov = min_fov;
+            g_view_params.fov = min_fov;
     }
     UpdateViewContext();
     fade_scale = 1.0f;
     if (g_hero_moby_default.index == 4) {
         fade_scale = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
-        FastVecScale(scratch_a, D_001AC120, fade_scale);
-        FastVecAdd(D_001AC0D0, D_001AC0D0, scratch_a);
+        FastVecScale(scratch_a, g_transition_fade_vec, fade_scale);
+        FastVecAdd(g_transition_vec_b, g_transition_vec_b, scratch_a);
     }
-    FastVecScale(&D_001B20D0, D_00261F30 + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (fade_scale * 20.0f));
-    D_001ABDD4 = D_001AC150[g_hero_moby_default.index];
+    FastVecScale(&g_transition_vector, g_transition_vec_table + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (fade_scale * 20.0f));
+    g_transition_fov_scale = g_transition_fov_table[g_hero_moby_default.index];
     for (i = 0; i < g_scene_playback_state.count; i = next_index) {
         TransitionActor *actor;
         int key_index, next_key_index;
@@ -236,17 +236,17 @@ after:
                     if (D_001B2148_first[0] != 0) {
                         do {
                             int k;
-                            B((char *)D_001B2148[list_index], 0x63) = 0;
-                            H((char *)D_001B2148[list_index], 0x32) = 0x1FF;
-                            qcopy((char *)D_001B2148[list_index] + 0x10, actor->position);
+                            B((char *)g_transition_effect_list[list_index], 0x63) = 0;
+                            H((char *)g_transition_effect_list[list_index], 0x32) = 0x1FF;
+                            qcopy((char *)g_transition_effect_list[list_index] + 0x10, actor->position);
                             for (k = 0; k < 3; k++) {
-                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].x = moby_matrix[k * 4];
-                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].y = moby_matrix[k * 4 + 1];
-                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].z = moby_matrix[k * 4 + 2];
+                                ((MatrixEntity *)g_transition_effect_list[list_index])->basis[k].x = moby_matrix[k * 4];
+                                ((MatrixEntity *)g_transition_effect_list[list_index])->basis[k].y = moby_matrix[k * 4 + 1];
+                                ((MatrixEntity *)g_transition_effect_list[list_index])->basis[k].z = moby_matrix[k * 4 + 2];
                             }
-                            func_002A10E8((void *)D_001B2148[list_index]);
+                            func_002A10E8((void *)g_transition_effect_list[list_index]);
                             list_index = list_index + 1;
-                        } while (D_001B2148[list_index] != 0);
+                        } while (g_transition_effect_list[list_index] != 0);
                     }
                 }
             } else {
@@ -273,7 +273,7 @@ after:
                     if (scale_factor < 0.0f)
                         scale_factor = 0.0f;
                     actor->scale = F(definition, 0x24) * scale_factor;
-                    D_001ABF10 = scale_factor;
+                    g_transition_scale_factor = scale_factor;
                     if (D_001B2148_first[0] != 0) {
                         char *entity = (char *)D_001B2148_first[0];
                         F(entity, 0x2C) = F((char *)W(entity, 0x24), 0x24) * scale_factor;

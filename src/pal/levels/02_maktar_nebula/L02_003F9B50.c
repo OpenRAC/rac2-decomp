@@ -10,16 +10,16 @@ extern s32 moby_is_state_two_no_children(char *);
 extern s32 arena_start_announcer_message(char *, s32);
 typedef int TI128 __attribute__((mode(TI)));
 extern int g_frame_l02_counter __attribute__((sda));
-extern float D_L02_001B1040[2] __attribute__((sda));
-extern char *D_L02_001B3B00 __attribute__((sda));
+extern float g_sway_angle_range[2] __attribute__((sda));
+extern char *g_sway_piece_table __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float ApproachValue(float *, float, float);
 extern void euler_rotation_basis(float *, float *);
 extern void mat_multiply_rotation(char *, char *, float *);
 extern s32 arena_register_spawned_enemy(char *, char *);
-extern s32 D_L02_001B35B8[] __attribute__((sda));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern s16 moby_get_vars_counter(char *);
 extern s32 moby_get_busy_flag(char *);
 
@@ -47,10 +47,10 @@ void func_PAL_L02_003F9B50(char *a0) {
             *(s32 *)(state + 0x90) = ((s32)(math_random_int_range(0x1E, 0x5A)) * 5 + 2) / 6;
             if (0.0f < *(float *)(state + 0x8C))
                 *(float *)(state + 0x8C) =
-                    -(math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 0.0003490659f);
+                    -(math_random_float_range(g_sway_angle_range[0], g_sway_angle_range[1]) * 0.0003490659f);
             else
                 *(float *)(state + 0x8C) =
-                    math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 0.0003490659f;
+                    math_random_float_range(g_sway_angle_range[0], g_sway_angle_range[1]) * 0.0003490659f;
         }
     } else {
         ApproachValue((float *)(state + 0x88), 0.0f, 0.0012566373f);
@@ -67,7 +67,7 @@ void func_PAL_L02_003F9B50(char *a0) {
         skip = ((*(s32 *)(state + 0x84) >> i) & 1) == 0;
         if (skip)
             continue;
-        rec = D_L02_001B3B00 + *s2 * 64;
+        rec = g_sway_piece_table + *s2 * 64;
         mat_multiply_rotation(rec, rec, m);
     }
 }

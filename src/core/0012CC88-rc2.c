@@ -26,7 +26,7 @@
 #include "common.h"
 
 struct T44 { s32 f[11]; };
-extern s8 D_0013BBC8[];
+extern s8 g_mpeg_extension_table[];
 extern s32 mpeg_peek_bits(s64,s32);
 extern void mpeg_skip_bits(s64,s32);
 extern u32 mpeg_read_bits(s64,s32);
@@ -37,7 +37,7 @@ void mpeg_read_extension_data(s64 decoder_addr) {
     struct T44 tab;
     s32 start_code;
     u32 idx;
-    tab=*(struct T44 *)D_0013BBC8;
+    tab=*(struct T44 *)g_mpeg_extension_table;
     mpeg_skip_to_start_code(decoder_addr);
     while ((start_code=mpeg_peek_bits(decoder_addr,0x20))==0x1B5 || start_code==0x1B2) {
         if (start_code==0x1B5) {

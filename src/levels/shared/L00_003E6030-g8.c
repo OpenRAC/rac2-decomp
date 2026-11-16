@@ -6,20 +6,20 @@ typedef struct {
     float uv[4][2];
     unsigned long gs[4];
 } Quad6030;
-extern int D_L00_001B0620 __attribute__((sda));
-extern int D_L00_001B0624 __attribute__((sda));
-extern int D_L00_001B0628 __attribute__((sda));
-extern int D_L00_001B062C __attribute__((sda));
-extern int D_L00_001B0630 __attribute__((sda));
-extern int D_L00_001B0634 __attribute__((sda));
-extern int D_L00_001B0638 __attribute__((sda));
-extern float D_L00_001B063C __attribute__((sda));
-extern float D_L00_001B05D8 __attribute__((sda));
-extern char *D_L00_001B2B50 __attribute__((sda));
-extern int *D_L00_001B2B58 MACRO_ADDR;
-extern short D_L00_0029A090[][4][2];
-extern RenderVec6030 D_L00_00299830[];
-extern float D_L00_0029A990[][2];
+extern int g_blast_ripple_alpha_a __attribute__((sda));
+extern int g_blast_ripple_alpha_b __attribute__((sda));
+extern int g_blast_ripple_alpha_c __attribute__((sda));
+extern int g_blast_ripple_alpha_d __attribute__((sda));
+extern int g_blast_ripple_alpha_fix __attribute__((sda));
+extern int g_blast_ripple_texture_index __attribute__((sda));
+extern int g_blast_ripple_base_color __attribute__((sda));
+extern float g_blast_ripple_scale __attribute__((sda));
+extern float g_blast_uv_scroll_v __attribute__((sda));
+extern char *g_blast_effect_records __attribute__((sda));
+extern int *g_blast_l00_ripple_particles MACRO_ADDR;
+extern short g_blast_ripple_quad_indices[][4][2];
+extern RenderVec6030 g_blast_ripple_vertices[];
+extern float g_blast_ripple_uvs[][2];
 extern RenderVec6030 g_camera_l00_position;
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void vec_clear_128(void *);
@@ -60,14 +60,14 @@ void blast_draw_ripple_mesh(char *object)
     char *self = object;
     int index = 0;
     char *data = *(char **)(object + 0x68);
-    tex_index = D_L00_001B0634;
+    tex_index = g_blast_ripple_texture_index;
     tex_reg = GetEffectTextureDescriptor(tex_index);
     q.gs[1] = tex_reg;
-    alpha_a = D_L00_001B0620;
-    alpha_b = D_L00_001B0624;
-    alpha_c = D_L00_001B0628;
-    alpha_d = D_L00_001B062C;
-    alpha_fix = D_L00_001B0630;
+    alpha_a = g_blast_ripple_alpha_a;
+    alpha_b = g_blast_ripple_alpha_b;
+    alpha_c = g_blast_ripple_alpha_c;
+    alpha_d = g_blast_ripple_alpha_d;
+    alpha_fix = g_blast_ripple_alpha_fix;
     alpha = alpha_a | (alpha_b << 2);
     alpha |= alpha_c << 4;
     alpha |= alpha_d << 6;
@@ -85,19 +85,19 @@ void blast_draw_ripple_mesh(char *object)
     matrix[1][1] = scale_y;
     matrix[2][2] = 1.0f;
     brightness = *(int *)(data + 28) << 24;
-    base_colour = D_L00_001B0638;
+    base_colour = g_blast_ripple_base_color;
     colour = base_colour + brightness;
     q.colors[0] = q.colors[1] = q.colors[2] = q.colors[3] = colour;
     do {
         char *moby = self;
         for (i = 0; i < 4; i++) {
-            vertex_index = D_L00_0029A090[index][i][0];
-            uv_index = D_L00_0029A090[index][i][1];
-            FastVecScale(q.vertices[i], D_L00_00299830[vertex_index], D_L00_001B063C);
-            u = D_L00_0029A990[uv_index][0];
+            vertex_index = g_blast_ripple_quad_indices[index][i][0];
+            uv_index = g_blast_ripple_quad_indices[index][i][1];
+            FastVecScale(q.vertices[i], g_blast_ripple_vertices[vertex_index], g_blast_ripple_scale);
+            u = g_blast_ripple_uvs[uv_index][0];
             q.uv[i][0] = u;
-            base_v = D_L00_0029A990[uv_index][1];
-            scroll = D_L00_001B05D8;
+            base_v = g_blast_ripple_uvs[uv_index][1];
+            scroll = g_blast_uv_scroll_v;
             v = base_v - scroll;
             q.uv[i][1] = v;
         }
@@ -134,17 +134,17 @@ void blast_draw_ripple_mesh(char *object)
         vec_scale_to_length(center, center, 1.0f);
         facing = FastVecDot(normal, center);
         if (facing > 0.0f) {
-            if (D_L00_001B2B58[index] == 0) {
+            if (g_blast_l00_ripple_particles[index] == 0) {
                 if (*(unsigned char *)(moby + 32) != 6)
-                    D_L00_001B2B58[index] = AllocateOwnedEffectParticle(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
-            } else if (*(int *)(D_L00_001B2B58[index] + 124) == 0) {
+                    g_blast_l00_ripple_particles[index] = AllocateOwnedEffectParticle(g_blast_effect_records, 1, 0.0f, 0.0f, saved_center);
+            } else if (*(int *)(g_blast_l00_ripple_particles[index] + 124) == 0) {
                 if (*(unsigned char *)(moby + 32) != 6)
-                    D_L00_001B2B58[index] = AllocateOwnedEffectParticle(D_L00_001B2B50, 1, 0.0f, 0.0f, saved_center);
+                    g_blast_l00_ripple_particles[index] = AllocateOwnedEffectParticle(g_blast_effect_records, 1, 0.0f, 0.0f, saved_center);
                 else
-                    D_L00_001B2B58[index] = 0;
+                    g_blast_l00_ripple_particles[index] = 0;
             }
-            if (D_L00_001B2B58[index])
-                qcopy((void *)D_L00_001B2B58[index], saved_center);
+            if (g_blast_l00_ripple_particles[index])
+                qcopy((void *)g_blast_l00_ripple_particles[index], saved_center);
             draw_world_quad(&q, 0, 0);
         }
     } while (++index < 143);

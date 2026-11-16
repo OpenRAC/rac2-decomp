@@ -1,13 +1,14 @@
+#include "names.h"
 /*
  * func_PAL_L13_0041F0C0, the PAL copy of func_L13_0041A398: the same C, with the
  * 50 Hz scale on the two timers stored at state + 0x10, and 4 where v1.01 has 5.
  */
 #include "common.h"
 
-extern s32 D_L13_001B1618 __attribute__((sda));
-extern s32 D_L13_001B1630 __attribute__((sda));
-extern s32 D_L13_001B1628 __attribute__((sda));
-extern s32 D_L13_001B1634 __attribute__((sda));
+extern s32 g_lightning_beam_countdown __attribute__((sda));
+extern s32 g_lightning_beam_machine_flag __attribute__((sda));
+extern s32 g_streak_fade_end __attribute__((sda));
+extern s32 g_lightning_beam_machine_blocked __attribute__((sda));
 extern s32 math_fast_helper_a(void *a0, f32 f12);
 extern s32 FastDecTimer(void *a0);
 extern void func_PAL_L13_0041F2B8(u8 *a0);
@@ -45,8 +46,8 @@ void func_PAL_L13_0041F0C0(u8 *self)
         *(s16 *)(state + 0xA) = one;
         break;
     case 1:
-        if (D_L13_001B1618 != 0 && *(s16 *)(state + 0x12) == 0) {
-            D_L13_001B1618 = D_L13_001B1618 - 1;
+        if (g_lightning_beam_countdown != 0 && *(s16 *)(state + 0x12) == 0) {
+            g_lightning_beam_countdown = g_lightning_beam_countdown - 1;
             func_PAL_L13_0041F2B8(self);
         }
         break;
@@ -68,9 +69,9 @@ void func_PAL_L13_0041F0C0(u8 *self)
         break;
     }
     if (*(s16 *)(state + 0x12) != 0) {
-        if (D_L13_001B1630 == 0)
+        if (g_lightning_beam_machine_flag == 0)
             streak_effect_update(self);
-        if (D_L13_001B1628 < *(s16 *)(state + 0x12) && D_L13_001B1634 == 0)
+        if (g_streak_fade_end < *(s16 *)(state + 0x12) && g_lightning_beam_machine_blocked == 0)
             gfx_add_draw_callback_third(gfx_draw_electric_beam, self);
     }
 }

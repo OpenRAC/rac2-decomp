@@ -3,7 +3,7 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern char *part_alloc(int);
 extern int math_random_int_range(int, int);
-extern unsigned char *D_001F26C8;
+extern unsigned char *g_part_tex_size_changing_table;
 void part_update_size_changing(char *);
 /* Creates a particle that fades and changes size over its life, pulled down by gravity. Returns the new particle, or null if none are free. */
 char *part_spawn_size_changing(char *pos, char *vel, int life, int color, int speed, int alpha, int endAlpha, float size, float endSize, float gravity, int kind)
@@ -19,7 +19,7 @@ char *part_spawn_size_changing(char *pos, char *vel, int life, int color, int sp
         *(float *)(particle+12) = size;
         particle[3] = 72;
         particle[8] = math_random_int_range(0, speed*100)%255;
-        particle[2] = D_001F26C8[kind];
+        particle[2] = g_part_tex_size_changing_table[kind];
         *(short *)(particle+10) = life;
         *(float *)(particle+32) = *(float *)vel;
         *(float *)(motion+4) = *(float *)(vel+4);

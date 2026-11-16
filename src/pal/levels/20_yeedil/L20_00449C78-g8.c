@@ -12,28 +12,28 @@
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 
-extern unsigned short **D_L20_001A9014 __attribute__((section(".sdata")));
-extern unsigned short *D_L20_001FBB20[] __attribute__((nosda));
-extern char *D_L20_001B3614 __attribute__((section(".sdata")));
-extern char *D_L20_001B2F9C __attribute__((section(".sdata")));
-extern char *D_L20_001B308C __attribute__((section(".sdata")));
-extern char *D_L20_001B2FA0 __attribute__((section(".sdata")));
+extern unsigned short **g_yeedil_death_lists __attribute__((section(".sdata")));
+extern unsigned short *g_group_l20_id_lists[] __attribute__((nosda));
+extern char *g_part_info_table __attribute__((section(".sdata")));
+extern char *g_group_l20_member_table __attribute__((section(".sdata")));
+extern char *g_linked_moby_table __attribute__((section(".sdata")));
+extern char *g_moby_l20_list_end __attribute__((section(".sdata")));
 extern char *g_hero_moby __attribute__((nosda));
-extern char D_L20_001A8F20[] __attribute__((section(".sdata")));
-extern int D_L20_001B2FB8 __attribute__((sda));
-extern int D_L20_001B220C __attribute__((sda));
-extern int D_L20_001B2210[] MACRO_ADDR;
+extern char g_effect_color_table[] __attribute__((section(".sdata")));
+extern int g_group_count __attribute__((sda));
+extern int g_yeedil_death_blast_count __attribute__((sda));
+extern int g_yeedil_death_color_table[] MACRO_ADDR;
 extern int D_L20_001B2210_gp SDATA(D_L20_001B2210);
-extern float D_L20_001B2220[2] __attribute__((sda));
-extern int D_L20_001B222C __attribute__((sda));
-extern int D_L20_001B2230[] MACRO_ADDR;
+extern float g_yeedil_death_scales[2] __attribute__((sda));
+extern int g_yeedil_death_trail_param __attribute__((sda));
+extern int g_yeedil_death_range_table[] MACRO_ADDR;
 extern int D_L20_001B2230_gp SDATA(D_L20_001B2230);
-extern float D_L20_001B2240[] MACRO_ADDR;
+extern float g_yeedil_death_accel_range[] MACRO_ADDR;
 extern float D_L20_001B2240_gp[] SDATA(D_L20_001B2240);
-extern int D_L20_001B2248 __attribute__((sda));
-extern float D_L20_001B2250[] MACRO_ADDR;
+extern int g_yeedil_death_trail_count __attribute__((sda));
+extern float g_yeedil_death_accel_range_b[] MACRO_ADDR;
 extern float D_L20_001B2250_gp SDATA(D_L20_001B2250);
-extern float D_L20_001B2BE8 __attribute__((sda));
+extern float g_level_shared_float __attribute__((sda));
 
 extern int PlayMobySound(int, int, void *);
 extern void moby_mark_spawned(void *);
@@ -86,11 +86,11 @@ void func_PAL_L20_00449C78(char *self) {
 
     PlayMobySound(17, 0, self);
     {
-        unsigned short *list = D_L20_001A9014[s->groups[s->groupIndex]];
+        unsigned short *list = g_yeedil_death_lists[s->groups[s->groupIndex]];
 
         if (list != 0) {
             do {
-                char *info = D_L20_001B3614 + ((*list & 0x7FFF) << 5);
+                char *info = g_part_info_table + ((*list & 0x7FFF) << 5);
 
                 if (info == 0) {
                     break;
@@ -100,13 +100,13 @@ void func_PAL_L20_00449C78(char *self) {
                 if (list == 0) {
                     break;
                 }
-            } while (*(short *)(list - 1) >= 0 || list == D_L20_001A9014[s->groups[s->groupIndex]]);
+            } while (*(short *)(list - 1) >= 0 || list == g_yeedil_death_lists[s->groups[s->groupIndex]]);
         }
     }
     s->groupIndex++;
     selfPos = self + 0x10;
-    obj = D_L20_001B2F9C;
-    if (obj <= D_L20_001B2FA0 && (unsigned char)obj[0x20] != 255) {
+    obj = g_group_l20_member_table;
+    if (obj <= g_moby_l20_list_end && (unsigned char)obj[0x20] != 255) {
         char *bound;
 
         for (;;) {
@@ -122,16 +122,16 @@ void func_PAL_L20_00449C78(char *self) {
                 goto hit;
             }
             if ((short)type != 0x1357) {
-                bound = D_L20_001B2FA0;
+                bound = g_moby_l20_list_end;
                 goto nextObject;
             }
         hit:
             if (!(math_fabs(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
-                bound = D_L20_001B2FA0;
+                bound = g_moby_l20_list_end;
                 goto nextObject;
             }
             moby_mark_spawned(obj);
-            bound = D_L20_001B2FA0;
+            bound = g_moby_l20_list_end;
         nextObject:
             obj += 256;
             if (bound < obj) {
@@ -148,11 +148,11 @@ objectsDone:
         unsigned short *list;
         float damage = 0.0f;
 
-        for (list = D_L20_001FBB20[s->damageGroup0];
-             (s->damageGroup0 & 0xFF) != 0xFF && s->damageGroup0 <= D_L20_001B2FB8 && list != 0 &&
-             ((list != 0 && (short)list[-1] >= 0) || list == D_L20_001FBB20[s->damageGroup0]);
+        for (list = g_group_l20_id_lists[s->damageGroup0];
+             (s->damageGroup0 & 0xFF) != 0xFF && s->damageGroup0 <= g_group_count && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damageGroup0]);
              list++) {
-            char *e = D_L20_001B2F9C + ((*list & 0x7FFF) << 8);
+            char *e = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
 
             if (e == 0) {
                 break;
@@ -166,7 +166,7 @@ objectsDone:
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, g_effect_color_table);
             }
         }
     }
@@ -174,11 +174,11 @@ objectsDone:
         unsigned short *list;
         float damage = 0.0f;
 
-        for (list = D_L20_001FBB20[s->damageGroup1];
-             (s->damageGroup1 & 0xFF) != 0xFF && s->damageGroup1 <= D_L20_001B2FB8 && list != 0 &&
-             ((list != 0 && (short)list[-1] >= 0) || list == D_L20_001FBB20[s->damageGroup1]);
+        for (list = g_group_l20_id_lists[s->damageGroup1];
+             (s->damageGroup1 & 0xFF) != 0xFF && s->damageGroup1 <= g_group_count && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damageGroup1]);
              list++) {
-            char *e = D_L20_001B2F9C + ((*list & 0x7FFF) << 8);
+            char *e = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
 
             if (e == 0) {
                 break;
@@ -192,50 +192,50 @@ objectsDone:
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, D_L20_001A8F20);
+                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, g_effect_color_table);
             }
         }
     }
     sample = coll_probe_ground_height_below(selfPos, 0, 0.5f) - 2.0f;
     height = F(self, 0x18) - 0.5f;
-    D_L20_001B2BE8 = sample;
+    g_level_shared_float = sample;
     {
         int i;
 
-        for (i = 0; i < D_L20_001B220C; i++) {
+        for (i = 0; i < g_yeedil_death_blast_count; i++) {
             vec_store_helper(&pos);
             pos.f[0] = math_random_float_range(-1.0f, 1.0f);
             pos.f[1] = math_random_float_range(-1.0f, 1.0f);
-            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, g_linked_moby_table + s->matrixIndex * 128);
             pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
             sample = math_random_float_range(0.0f, 1.0f);
-            a = FastTweenColor(D_L20_001B2210_gp, D_L20_001B2210[1], sample);
+            a = FastTweenColor(D_L20_001B2210_gp, g_yeedil_death_color_table[1], sample);
             sample = math_random_float_range(0.0f, 1.0f);
-            b = FastTweenColor(D_L20_001B2210[2], D_L20_001B2210[3], sample);
-            scale = D_L20_001B2220[math_random_int_below(2)];
+            b = FastTweenColor(g_yeedil_death_color_table[2], g_yeedil_death_color_table[3], sample);
+            scale = g_yeedil_death_scales[math_random_int_below(2)];
             vec_clear_128(&vel);
             vel.f[3] = scale;
             vec_clear_128(&acc);
             acc.f[3] = scale;
-            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[0], D_L20_001B2240[1]) * 0.020000001f;
+            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[0], g_yeedil_death_accel_range[1]) * 0.020000001f;
             c = (math_random_int_range(1, D_L20_001B2230_gp) * 5 + 2) / 6;
-            d = (math_random_int_range(D_L20_001B2230[1], D_L20_001B2230[2]) * 5 + 2) / 6;
-            part_spawn_trail(&pos, &vel, &acc, a, b, c, d, 50, D_L20_001B222C);
+            d = (math_random_int_range(g_yeedil_death_range_table[1], g_yeedil_death_range_table[2]) * 5 + 2) / 6;
+            part_spawn_trail(&pos, &vel, &acc, a, b, c, d, 50, g_yeedil_death_trail_param);
         }
     }
     {
         int i;
 
-        for (i = 0; i < D_L20_001B2248; i++) {
+        for (i = 0; i < g_yeedil_death_trail_count; i++) {
             vec_store_helper(&pos);
             pos.f[0] = math_random_float_range(-1.0f, 1.0f);
             pos.f[1] = math_random_float_range(-1.0f, 1.0f);
-            transform_vector(&pos, &pos, D_L20_001B308C + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, g_linked_moby_table + s->matrixIndex * 128);
             pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
             qzero_nc(&vel);
             vel.f[2] = math_random_angle();
             qzero_nc(&acc);
-            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[4], D_L20_001B2250[1]) * 0.020000001f;
+            acc.f[2] = math_random_float_range(D_L20_001B2240_gp[4], g_yeedil_death_accel_range_b[1]) * 0.020000001f;
             func_PAL_L20_0044E630(self, (char *)&pos, (char *)&vel, (char *)&acc);
         }
     }

@@ -2,8 +2,8 @@
 extern int FastDecTimer(short *);
 extern void FastVecAdd(char *, char *, char *);
 extern void part_kill(void *);
-extern unsigned char *D_001F26D0[];
-extern float D_001AA384 __attribute__((sda));
+extern unsigned char *g_part_tex_falling_drift_table[];
+extern float g_falling_spin_param __attribute__((sda));
 
 /* Updates a drifting particle that falls once its timer runs out, and removes it when it is too small. */
 void part_update_falling_drift(char *self)
@@ -17,8 +17,8 @@ void part_update_falling_drift(char *self)
     FastVecAdd(pos, pos, state);
     FastVecAdd(pos, pos, *(char **)(state + 28));
     self[8] = (unsigned char)self[8] + *(unsigned char *)(state + 20);
-    if ((unsigned char)self[2] == D_001F26D0[0][0])
-        *(float *)(self + 12) += D_001AA384 * 3500.000244140625f;
+    if ((unsigned char)self[2] == g_part_tex_falling_drift_table[0][0])
+        *(float *)(self + 12) += g_falling_spin_param * 3500.000244140625f;
     if (*(float *)(self + 24) < *(float *)(state + 16))
         part_kill(self);
 }
@@ -26,7 +26,7 @@ void part_update_falling_drift(char *self)
 extern void FastVecScale(char *, char *, float);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern float D_001AA3D8 __attribute__((sda));
+extern float g_slow_fade_scale __attribute__((sda));
 
 /* Updates a slowing particle that fades out and is removed when its timer ends. */
 void part_update_slowing_fade_2(char *self)
@@ -35,7 +35,7 @@ void part_update_slowing_fade_2(char *self)
     float ratio;
     int colour;
 
-    FastVecScale(state, state, D_001AA3D8);
+    FastVecScale(state, state, g_slow_fade_scale);
     *(float *)(state + 8) -= *(float *)(state + 0x1C);
     FastVecAdd(self + 16, self + 16, state);
     if (*(short *)(self + 10) < *(int *)(state + 16)) {
@@ -57,10 +57,10 @@ void part_update_slowing_fade_2(char *self)
 
 /* The three handler slots and the string table are read through $gp, so this
  * function needs the -G8 profile of the sibling file. */
-extern void (*D_001AA420)(int) __attribute__((sda));
-extern void (*D_001AA428)(int) __attribute__((sda));
-extern void (*D_001AA42C)(int) __attribute__((sda));
-extern char D_0025BA90[];
+extern void (*g_menu_action_callback_a)(int) __attribute__((sda));
+extern void (*g_menu_action_callback_b)(int) __attribute__((sda));
+extern void (*g_menu_action_callback_c)(int) __attribute__((sda));
+extern char g_menu_request_screen_data[];
 extern int menu_send_request(int, char *);
 
 #include "include_asm.h"
@@ -80,13 +80,13 @@ typedef struct {
 extern GameState_189E20 g_hero_state;
 
 /* The menu entries the seven cases hand to func_002D5E70, in the small data area. */
-extern int D_001AA6B8 __attribute__((sda));
-extern int D_001AA6D0 __attribute__((sda));
-extern int D_001AA6E8 __attribute__((sda));
-extern int D_001AA700 __attribute__((sda));
-extern int D_001AA718 __attribute__((sda));
-extern int D_001AA730 __attribute__((sda));
-extern int D_001AA748 __attribute__((sda));
+extern int g_menu_action_target_0 __attribute__((sda));
+extern int g_menu_action_target_1 __attribute__((sda));
+extern int g_menu_action_target_2 __attribute__((sda));
+extern int g_menu_action_target_3 __attribute__((sda));
+extern int g_menu_action_target_4 __attribute__((sda));
+extern int g_menu_action_target_5 __attribute__((sda));
+extern int g_menu_action_target_6 __attribute__((sda));
 
 extern int menu_process_entry_request(char *object, int *result);
 
@@ -101,21 +101,21 @@ int menu_handle_mode_action(int mode)
         result = 1;
         break;
     case 1:
-        if (D_001AA420)
-            D_001AA420(0);
+        if (g_menu_action_callback_a)
+            g_menu_action_callback_a(0);
         result = 1;
         break;
     case 2:
-        if (D_001AA428)
-            D_001AA428(0);
+        if (g_menu_action_callback_b)
+            g_menu_action_callback_b(0);
         result = 1;
         break;
     case 3:
-        result = menu_send_request(3, D_0025BA90);
+        result = menu_send_request(3, g_menu_request_screen_data);
         break;
     case 4:
-        if (D_001AA42C)
-            D_001AA42C(0);
+        if (g_menu_action_callback_c)
+            g_menu_action_callback_c(0);
         result = 1;
         break;
     }
@@ -135,14 +135,14 @@ typedef struct {
 typedef struct { char pad[0x1C4]; int flags; } InputState_2CBAE0;
 extern MenuState_2CBAE0 g_pause_menu_state;
 extern InputState_2CBAE0 g_pad_state;
-extern char D_00259018[];
-extern char D_0025A738[];
-extern char D_0025A498[];
-extern char D_0025A190[];
-extern char D_0025A058[];
-extern char D_00259B48[];
-extern volatile int D_001AB910 __attribute__((sda));
-extern int (*D_00210ACC[])(int);
+extern char g_menu_page_pause[];
+extern char g_pause_page_d[];
+extern char g_pause_page_c[];
+extern char g_pause_page_b[];
+extern char g_pause_page_a[];
+extern char g_menu_page_source_alt[];
+extern volatile int g_pause_menu_busy_flag __attribute__((sda));
+extern int (*g_menu_page_input_handlers[])(int);
 extern void func_0029CE38(void);
 extern int func_0029C290(int);
 extern int DrawMapScreen(int);
@@ -153,24 +153,24 @@ int menu_update_page_input(void)
 {
     int result = 0;
 
-    if (g_pause_menu_state.source == D_00259018) {
+    if (g_pause_menu_state.source == g_menu_page_pause) {
         if (g_pad_state.flags & 0x910) {
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
             result = 1;
-        } else if (D_00210ACC[0](g_pad_state.flags) >= 0) {
+        } else if (g_menu_page_input_handlers[0](g_pad_state.flags) >= 0) {
             result = 1;
         }
-    } else if (g_pause_menu_state.source == D_0025A738) {
+    } else if (g_pause_menu_state.source == g_pause_page_d) {
         func_0029CE38();
-    } else if (g_pause_menu_state.source == D_0025A498 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == g_pause_page_c && !g_pause_menu_busy_flag) {
         func_0029C290(0);
-    } else if (g_pause_menu_state.source == D_0025A190 && !D_001AB910) {
+    } else if (g_pause_menu_state.source == g_pause_page_b && !g_pause_menu_busy_flag) {
         if (DrawMapScreen(0))
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
         func_0029C300(g_pad_state.flags);
-        result = g_pause_menu_state.destination != D_0025A498;
-    } else if ((g_pause_menu_state.source == D_0025A058 && !D_001AB910)
-               || (g_pause_menu_state.source == D_00259B48 && !D_001AB910)) {
+        result = g_pause_menu_state.destination != g_pause_page_c;
+    } else if ((g_pause_menu_state.source == g_pause_page_a && !g_pause_menu_busy_flag)
+               || (g_pause_menu_state.source == g_menu_page_source_alt && !g_pause_menu_busy_flag)) {
         /* nothing: only the tests remain */
     }
     return result;
@@ -204,9 +204,9 @@ typedef struct {
 } GroupTable_2CA5D0;
 
 extern char g_collision_hit[];
-extern int D_001A7398[] __attribute__((sda));
-extern GroupTable_2CA5D0 *D_001B1888;
-extern int D_001A72D4 __attribute__((sda));
+extern int g_menu_choice_table[] __attribute__((sda));
+extern GroupTable_2CA5D0 *g_hud_group_size_table;
+extern int g_vram_frame_base __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(int);
 extern void gfx_reset_packet_buffer(void);
 extern void Hud_SendResidentBank(int, int, int);
@@ -233,17 +233,17 @@ void menu_close_and_save_choices(void)
         ((MenuState_2CA5D0 *)&g_pause_menu_state)->object = 0;
     }
     for (j = 0; j < 4; j++) {
-        int old = D_001A7398[j];
+        int old = g_menu_choice_table[j];
         int selected = ((MenuState_2CA5D0 *)&g_pause_menu_state)->choices[j];
         if (old != selected)
             ((SavedChoices_2CA5D0 *)&g_hero_state)->choices[j] = selected ? selected : 0x77;
     }
-    D_001A72D4 = ((MenuState_2CA5D0 *)&g_pause_menu_state)->value;
-    Hud_SendResidentBank(0, D_001B1888->c[0], 0);
+    g_vram_frame_base = ((MenuState_2CA5D0 *)&g_pause_menu_state)->value;
+    Hud_SendResidentBank(0, g_hud_group_size_table->c[0], 0);
     hud_unlink_bank_group(2);
-    if (D_001B1888->c[3])
+    if (g_hud_group_size_table->c[3])
         hud_unlink_bank_group(3);
-    if (D_001B1888->c[4])
+    if (g_hud_group_size_table->c[4])
         hud_unlink_bank_group(4);
     level_forward_value_b(360);
     level_forward_value(180);

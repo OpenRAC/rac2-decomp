@@ -13,8 +13,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_range(int, int);
 extern float vec_distance_xy(char *, void *);
 
-extern s32 D_L08_001A8F00[] __attribute__((sda));
-extern u8 D_001A7A40[] __attribute__((sda));
+extern s32 g_cutscene_l08_active_flag[] __attribute__((sda));
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
 
 typedef struct L08Thing {
     u8 pad[0xAA];
@@ -60,19 +60,19 @@ typedef struct {
     u8 xBC;
     u8 padBD[0x100 - 0xBD];
 } L08Moby;
-extern L08Moby *D_L08_001B29DC MACRO_ADDR;
+extern L08Moby *g_moby_array MACRO_ADDR;
 
-extern u8 D_001A7A00[] __attribute__((sda));
-extern u8 D_L08_001A7C80[] __attribute__((sda));
-extern int D_L08_001B2724[] __attribute__((sda));
-extern int D_L08_001B2508 MACRO_ADDR;
-extern int D_L08_001B1FA8 MACRO_ADDR;
+extern u8 g_player_stats[] __attribute__((sda));
+extern u8 g_mystic_state[] __attribute__((sda));
+extern int g_mystic_flag_table[] __attribute__((sda));
+extern int g_frame_l08_counter MACRO_ADDR;
+extern int g_saved_entity_count MACRO_ADDR;
 extern int g_player_bolts MACRO_ADDR;
-extern u8 D_001395B8[];
-extern int D_00138324;
-extern int D_L08_00295E50[];
-extern u8 D_L08_001BFD00[];
-extern char D_L08_001B1FB0[];
+extern u8 g_game_flag_table[];
+extern int g_pad_held_flags;
+extern int g_mystic_prices[];
+extern u8 g_request_l08_queue[];
+extern char g_str_mystic_debug[];
 
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
 #define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
@@ -92,7 +92,7 @@ void func_US2_L08_004370E0(u8 *self)
     float blend = 0.3f;
 
     mystic_handle_entity_list((L08Thing *)self);
-    if (D_L08_001A8F00[0] == 6) {
+    if (g_cutscene_l08_active_flag[0] == 6) {
         self[0x31] = 0;
         H(self, 0x34) |= 1;
         F(self, 0xF4) = -3.14159274f;
@@ -101,25 +101,25 @@ void func_US2_L08_004370E0(u8 *self)
         F(self, 0xF4) = 0;
         H(self, 0x34) &= 0xFFFE;
     }
-    if (D_L08_001B2508 == 5)
+    if (g_frame_l08_counter == 5)
         level_get_saved_count();
     switch (self[0x20]) {
     case 0:
-        if (!D_001395B8[0x1C])
+        if (!g_game_flag_table[0x1C])
             moby_disable_object_list_flags();
         else if (I(data, 0x124) != -1) {
-            moby_mark_spawned(&D_L08_001B29DC[I(data, 0x124)]);
+            moby_mark_spawned(&g_moby_array[I(data, 0x124)]);
             I(data, 0x124) = -1;
         }
         level_get_saved_count();
         moby_reset_vars_defaults(self);
-        if (D_001395B8[0x1C]) {
-            if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
+        if (g_game_flag_table[0x1C]) {
+            if ((*(s16 *)(g_player_stats + 0x1A)) <= 0)
                 moby_set_state(self, 6, -1);
             else
                 moby_set_state(self, 7, -1);
-        } else if (D_001395B8[0x1B]) {
-            if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
+        } else if (g_game_flag_table[0x1B]) {
+            if ((*(s16 *)(g_player_stats + 0x1A)) < (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]))
                 moby_set_state(self, 3, -1);
             else
                 moby_set_state(self, 4, -1);
@@ -129,97 +129,97 @@ void func_US2_L08_004370E0(u8 *self)
     case 1:
         if (hero_is_reachable_for_count(self, 10, 2.5f)) {
             level_apply_index_for_key(self);
-            if (req_push_queue(D_L08_001BFD00, 0x59)) {
-                D_001395B8[0x1B] = 1;
-                req_launch_queued(D_L08_001BFD00);
+            if (req_push_queue(g_request_l08_queue, 0x59)) {
+                g_game_flag_table[0x1B] = 1;
+                req_launch_queued(g_request_l08_queue);
                 moby_set_state(self, 2, -1);
             }
         }
         break;
     case 2:
-        if (D_L08_001A8F00[0] == 2) {
+        if (g_cutscene_l08_active_flag[0] == 2) {
             self[0x31] = 0;
             H(self, 0x34) |= 1;
         }
-        if (I(data, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
-            D_L08_001B29DC[I(data, 0x124)].x34 |= 1;
-            D_L08_001B29DC[I(data, 0x124)].x31 = 0;
+        if (I(data, 0x124) != -1 && g_cutscene_l08_active_flag[0] == 2) {
+            g_moby_array[I(data, 0x124)].x34 |= 1;
+            g_moby_array[I(data, 0x124)].x31 = 0;
         }
-        D_L08_001B2724[1] = 1;
+        g_mystic_flag_table[1] = 1;
         if (!game_is_either_mode_two()) {
-            D_L08_001B2724[1] = 0;
+            g_mystic_flag_table[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
             if (I(data, 0x124) != -1) {
-                D_L08_001B29DC[I(data, 0x124)].x34 &= 0xFFFE;
-                D_L08_001B29DC[I(data, 0x124)].x31 = 1;
+                g_moby_array[I(data, 0x124)].x34 &= 0xFFFE;
+                g_moby_array[I(data, 0x124)].x31 = 1;
             }
-            if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
+            if ((*(s16 *)(g_player_stats + 0x1A)) < (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]))
                 moby_set_state(self, 3, -1);
             else
                 moby_set_state(self, 4, -1);
         }
         break;
     case 3:
-        if ((*(s16 *)(D_001A7A00 + 0x1A)) >= (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
+        if ((*(s16 *)(g_player_stats + 0x1A)) >= (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]))
             moby_set_state(self, 4, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x12F6, (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]), -1);
+            text_print_localized_formatted(0x12F6, (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]), -1);
             level_apply_index_for_key(self);
         }
         break;
     case 4:
-        if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
+        if ((*(s16 *)(g_player_stats + 0x1A)) < (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]))
             moby_set_state(self, 3, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x12E8, (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]), -1);
+            text_print_localized_formatted(0x12E8, (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]), -1);
             level_apply_index_for_key(self);
-            if (D_00138324 & 0x10) {
-                req_push_queue(D_L08_001BFD00, 0x5A);
-                (*(s16 *)(D_001A7A00 + 0x1A)) -= (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]);
-                D_001395B8[0x1C] = 1;
-                req_launch_queued(D_L08_001BFD00);
+            if (g_pad_held_flags & 0x10) {
+                req_push_queue(g_request_l08_queue, 0x5A);
+                (*(s16 *)(g_player_stats + 0x1A)) -= (g_mystic_state[0xF] ? g_mystic_prices[3] : g_mystic_prices[2]);
+                g_game_flag_table[0x1C] = 1;
+                req_launch_queued(g_request_l08_queue);
                 moby_set_state(self, 5, -1);
             }
         }
         break;
     case 5:
-        if (D_L08_001A8F00[0] == 2) {
+        if (g_cutscene_l08_active_flag[0] == 2) {
             self[0x31] = 0;
             H(self, 0x34) |= 1;
         }
-        if (I(data, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
-            moby_mark_spawned(&D_L08_001B29DC[I(data, 0x124)]);
+        if (I(data, 0x124) != -1 && g_cutscene_l08_active_flag[0] == 2) {
+            moby_mark_spawned(&g_moby_array[I(data, 0x124)]);
             I(data, 0x124) = -1;
         }
-        D_L08_001B2724[1] = 1;
+        g_mystic_flag_table[1] = 1;
         if (!game_is_either_mode_two()) {
-            D_L08_001B2724[1] = 0;
+            g_mystic_flag_table[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
             if (self[0x21] != 0xFF)
                 moby_set_byte_on_group(self[0x21], 1);
-            D_001395B8[0x1C] = 1;
+            g_game_flag_table[0x1C] = 1;
             moby_restore_object_list_flags();
-            STUB_printf(D_L08_001B1FB0);
+            STUB_printf(g_str_mystic_debug);
             if (I(data, 0x124) != -1) {
-                moby_mark_spawned(&D_L08_001B29DC[I(data, 0x124)]);
+                moby_mark_spawned(&g_moby_array[I(data, 0x124)]);
                 I(data, 0x124) = -1;
             }
             if (I(data, 0x120) != -1)
-                D_L08_001B29DC[I(data, 0x120)].xBC = 1;
+                g_moby_array[I(data, 0x120)].xBC = 1;
             MemcardSave(0, -1);
-            if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
+            if ((*(s16 *)(g_player_stats + 0x1A)) <= 0)
                 moby_set_state(self, 6, -1);
             else
                 moby_set_state(self, 7, -1);
         }
         break;
     case 6:
-        if ((*(s16 *)(D_001A7A00 + 0x1A)) > 0)
+        if ((*(s16 *)(g_player_stats + 0x1A)) > 0)
             moby_set_state(self, 7, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            if (!D_L08_001B1FA8)
+            if (!g_saved_entity_count)
                 text_print_localized_formatted(0x1322, 0, -1);
             else
                 text_print_localized_formatted(0x12F9, -1);
@@ -227,19 +227,19 @@ void func_US2_L08_004370E0(u8 *self)
         }
         break;
     case 7:
-        if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
+        if ((*(s16 *)(g_player_stats + 0x1A)) <= 0)
             moby_set_state(self, 6, -1);
         else {
-            n = D_001A7A00[0xA] ? 10 : 1;
+            n = g_player_stats[0xA] ? 10 : 1;
             if (hero_is_reachable_for_count(self, 10, 2.5f)) {
                 n *= 1000;
-                text_print_localized_formatted(0x12E9, (*(s16 *)(D_001A7A00 + 0x1A)), (*(s16 *)(D_001A7A00 + 0x1A)) * n, -1);
+                text_print_localized_formatted(0x12E9, (*(s16 *)(g_player_stats + 0x1A)), (*(s16 *)(g_player_stats + 0x1A)) * n, -1);
                 level_apply_index_for_key(self);
-                if (D_00138324 & 0x10) {
+                if (g_pad_held_flags & 0x10) {
                     level_get_saved_count();
-                    g_player_bolts += (*(s16 *)(D_001A7A00 + 0x1A)) * n;
+                    g_player_bolts += (*(s16 *)(g_player_stats + 0x1A)) * n;
                     snd_play_from_class_bank(0, 0, self, math_random_int_range(13, 17));
-                    (*(s16 *)(D_001A7A00 + 0x1A)) = 0;
+                    (*(s16 *)(g_player_stats + 0x1A)) = 0;
                     func_L00_0030C710(180);
                     moby_set_state(self, 8, -1);
                 }
@@ -253,7 +253,7 @@ void func_US2_L08_004370E0(u8 *self)
         if (H(self, 0x96) > 40 && H(self, 0x96) < 90 && H(self, 0x96) % 4 == 0)
             snd_play_from_class_bank(0, 0, self, math_random_int_range(13, 17));
         if (hero_is_reachable_for_count(self, 10, 2.5f))
-            text_print_localized_formatted(0x1322, D_L08_001B1FA8, -1);
+            text_print_localized_formatted(0x1322, g_saved_entity_count, -1);
         else
             moby_set_state(self, 6, -1);
         break;
@@ -312,7 +312,7 @@ void func_US2_L08_004370E0(u8 *self)
         F(data, 0x68) = yaw * 0.6f;
         F(data, 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40[0])
+    if (g_unlocked_item_flags[0])
         F(data, 0x70) = 2.75f;
     moby_update_eased_node(self, data, 0, speed, blend);
     moby_update_eased_node(self, data + 0x80, 1, speed, blend);

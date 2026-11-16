@@ -16,7 +16,7 @@ typedef struct {
 } FollowVars;
 
 extern char g_hero_state[];
-extern u32 D_00138320;
+extern u32 g_pad_pressed_flags;
 
 extern unsigned int stub_empty(int);
 extern unsigned int stub_empty_8(int, int);
@@ -177,7 +177,7 @@ have:
             if (vars->f20 < 0.16800001f) {
                 ((Hero *)g_hero_state)->i[0x684 / 4] = 0;
                 if (vars->target != 0 && fast_vec_dist(vars->target + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) > 3.5f) {
-                    if ((D_00138320 & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
+                    if ((g_pad_pressed_flags & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
                         ((Hero *)g_hero_state)->i[0xAC8 / 4] = 1;
                         stub_empty_8(0, 0);
                         stub_empty_12(stub_empty(0), 0, 14.0f);

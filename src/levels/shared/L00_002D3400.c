@@ -14,9 +14,9 @@ typedef struct {
 
 extern NativeModeResident D_00189E20_8;
 
-extern s32 D_L00_001A8FF0 __attribute__((sda));
+extern s32 g_hero_locked_flag __attribute__((sda));
 
-extern volatile u8 D_001A7B08[4] __attribute__((sda));
+extern volatile u8 g_status_flag_b[4] __attribute__((sda));
 
 extern s32 D_L00_001A8FF4_1 __attribute__((sda));
 
@@ -50,7 +50,7 @@ typedef struct {
 
 extern FamilyC94396F4State_Fc94396f4 D_00189E20_15;
 
-extern u8 D_0018A0E0[];
+extern u8 g_hero_state_block[];
 
 extern void func_00282F20_6(u8 *buffer, u8 *table, f32 parameter);
 
@@ -78,11 +78,11 @@ typedef float Rac2Native_5fc519c90e0e763a_f32;
 /* resident mode predicate: returns 0, 1 or 2 from the resident state words */
 s32 hero_get_movement_mode(void) {
     s32 result = D_00189E20_8.field348;
-    if (D_L00_001A8FF0 != 0 && D_L00_001A8FF4_1 == 0) result = 2;
+    if (g_hero_locked_flag != 0 && D_L00_001A8FF4_1 == 0) result = 2;
     if (D_L00_001A8FF4_1 != 0 || D_00189E20_8.field2294 == 59 ||
         (D_00189E20_8.field2294 == 110 && D_00189E20_8.field149A == 0) ||
         D_00189E20_8.field2294 == 109 || D_00189E20_8.field218 != 0 ||
-        (D_00189E20_8.field1497 != 0 && D_001A7B08[3] != 0 &&
+        (D_00189E20_8.field1497 != 0 && g_status_flag_b[3] != 0 &&
          D_00189E20_8.field2294 == 0 && D_00189E20_8.field34E < 4)) result = 1;
     if (result == 1 && D_00189E20_8.field149A != 0) result = 0;
     return result;
@@ -111,7 +111,7 @@ void hero_apply_mode_transform(FamilyC94396F4Vector_Fc94396f4 *destination,
         if (D_00189E20_15.state == 58 && D_00189E20_15.gate == 0) {
             func_00282F20_6(first, (u8 *)&D_00189E20_15 + 672, -parameter);
         } else {
-            func_00282F20_6(first, D_0018A0E0, parameter);
+            func_00282F20_6(first, g_hero_state_block, parameter);
         }
         cam_set_view_space_vector_length(second, source, 0.0f);
         cam_set_view_space_height(destination, destination, 0.0f);

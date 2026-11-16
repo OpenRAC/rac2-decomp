@@ -11,11 +11,11 @@ typedef union {
 } PurchaseModel;
 extern PurchaseModel g_purchase_menu_model;
 extern char g_pad_state[];
-extern unsigned char D_001A7A80[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
 extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x98]; int flag[3]; char tail[0x3C]; } Metadata;
 extern char g_weapon_l00_table[];
-extern int D_L00_001AD4F0[] SDATA(D_L00_001AD4F0);
+extern int g_spawn_second_mode_table[] SDATA(D_L00_001AD4F0);
 extern void ref_L00_00373F48_00(void);
 extern int save_count_items_above_baseline(void);
 extern int PlayMobySound(int, int, char *);
@@ -26,7 +26,7 @@ extern void level_spawn_on_second_mode(int);
 extern void BuildShopChannelList(void);
 extern void func_PAL_002FC1D0(void);
 
-void func_PAL_L00_00376A18(int *answer) {
+void UpdateItemPurchaseConfirmation_pal(int *answer) {
     PurchaseModel *model = &g_purchase_menu_model;
     int cost = model->cost.rows[model->head.index].value;
     int state = model->head.state;
@@ -52,7 +52,7 @@ void func_PAL_L00_00376A18(int *answer) {
         } else {
             int g = g_purchase_menu_model.group.rows[model->head.index].value;
             int c = g_purchase_menu_model.category.rows[model->head.index].value;
-            if ((unsigned long)D_001A7A80[g] & ((1U << (c * 2)) & 255UL)) *answer = 0;
+            if ((unsigned long)g_movie_seen_flags[g] & ((1U << (c * 2)) & 255UL)) *answer = 0;
             else *answer = 1;
             g_purchase_menu_model.head.state = 4;
         }
@@ -62,7 +62,7 @@ void func_PAL_L00_00376A18(int *answer) {
             shop_set_message_text((void *)GetLocalizedString(0xBDC));
             PlayMobySound(7, 17, *(char **)((char *)model + 0x28));
             level_try_spend_counter(cost);
-            level_spawn_on_second_mode(D_L00_001AD4F0[model->head.index]);
+            level_spawn_on_second_mode(g_spawn_second_mode_table[model->head.index]);
             category = g_purchase_menu_model.category.rows[g_purchase_menu_model.head.index].value;
             group = g_purchase_menu_model.group.rows[g_purchase_menu_model.head.index].value;
             switch (category) {
@@ -71,7 +71,7 @@ void func_PAL_L00_00376A18(int *answer) {
             case 2: enabled = ((Metadata *)(g_weapon_l00_table + g_item_slot_to_record[group] * 0xE0))->flag[2]; break;
             default: enabled = 0; break;
             }
-            if (enabled) { int t = (1 << (category * 2)) | D_001A7A80[group]; D_001A7A80[group] = t; }
+            if (enabled) { int t = (1 << (category * 2)) | g_movie_seen_flags[group]; g_movie_seen_flags[group] = t; }
             {
             int category2 = g_purchase_menu_model.category.rows[g_purchase_menu_model.head.index].value;
             int group2 = g_purchase_menu_model.group.rows[g_purchase_menu_model.head.index].value;
@@ -84,9 +84,9 @@ void func_PAL_L00_00376A18(int *answer) {
             }
             if (enabled2) {
                 unsigned long m = (1U << (category2 * 2)) & 255UL;
-                if ((unsigned long)D_001A7A80[group2] & m) {
-                    int t = (1 << (category2 * 2 + 1)) | D_001A7A80[group2];
-                    D_001A7A80[group2] = t;
+                if ((unsigned long)g_movie_seen_flags[group2] & m) {
+                    int t = (1 << (category2 * 2 + 1)) | g_movie_seen_flags[group2];
+                    g_movie_seen_flags[group2] = t;
                 }
             }
             }

@@ -19,14 +19,14 @@ extern float math_fast_sin_or_cos_a(float);
 extern int FastTweenColor(int, int, float);
 extern void set_moby_color(void *, int, int, int);
 extern void ref_L00_003F87B0_00(void (*)(char *), char *);
-extern void func_PAL_L00_003FD600(char *);
+extern void SpawnHealthDrainSparks_pal(char *);
 
 /* Per frame, for each occupied slot: advances the pulse phase, drains the attached moby's health
    and, when it runs out, sends a kill impact pointing back along the moby's facing. A slot whose
    moby is dead, gone or finished is released; otherwise the moby is tinted with the colour
    between the slot's two colours at the current pulse, unless the slot is on hold. Then it
    schedules func_PAL_L00_003FD600 for the object. */
-void func_PAL_L00_003FCD70(char *object)
+void UpdateHealthDrainSlots_pal(char *object)
 {
     Vec direction;
     Impact impact;
@@ -80,6 +80,6 @@ void func_PAL_L00_003FCD70(char *object)
             }
         }
     }
-    ref_L00_003F87B0_00(func_PAL_L00_003FD600, object);
+    ref_L00_003F87B0_00(SpawnHealthDrainSparks_pal, object);
 }
 

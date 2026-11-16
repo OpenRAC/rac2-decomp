@@ -7,10 +7,10 @@
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(s32);
-extern int D_US2_001AB9D8 __attribute__((sda));
-extern int D_US2_001AB9DC[] __attribute__((sda));
+extern int g_centered_text_x __attribute__((sda));
+extern int g_centered_text_y[] __attribute__((sda));
 extern void func_US2_0029CFE0(void);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 extern int text_draw_centered_small(int v, int p7, unsigned long long k, char *r, int m1);
 
@@ -28,7 +28,7 @@ extern void hud_init_lighting_colors(void *);
 
 extern void hud_reset_render_state(void *);
 
-extern void func_US2_0034F9F8(char *);
+extern void menu_attach_slot_packets_us2(char *);
 
 extern void gfx_draw_shadowed_sprite(void *, char *);
 
@@ -40,18 +40,18 @@ int func_US2_002CE3A0(void)
 {
     SetupGifPaging(0);
     func_US2_0029CFE0();
-    text_draw_centered_small(D_US2_001AB9D8, D_US2_001AB9DC[0], 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2BE5), -1);
+    text_draw_centered_small(g_centered_text_x, g_centered_text_y[0], 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2BE5), -1);
     DoGifPaging();
-    if (D_001A8CFC[0] != 0) {
-        if (*(int *)((char *)D_001A8CFC[0] + 0x38000 + 0x79EC) != 0) {
+    if (g_resident_data_base[0] != 0) {
+        if (*(int *)((char *)g_resident_data_base[0] + 0x38000 + 0x79EC) != 0) {
             char *owner;
             DrawMobysSetup();
             mem_fill_scratch_area();
             mem_save_scratch_area();
-            owner = *(char **)(D_001A8CFC[0] + 0x38000 + 0x79EC);
+            owner = *(char **)(g_resident_data_base[0] + 0x38000 + 0x79EC);
             hud_init_lighting_colors(owner);
             hud_reset_render_state(owner);
-            func_US2_0034F9F8(owner);
+            menu_attach_slot_packets_us2(owner);
             gfx_draw_shadowed_sprite(owner, owner + 0xC00);
             mem_restore_scratch_area();
             tex_run_upload_and_setup();

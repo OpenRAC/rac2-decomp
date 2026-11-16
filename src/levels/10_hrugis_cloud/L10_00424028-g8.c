@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern int D_L10_001B1648 __attribute__((sda));
+extern int g_cloud_puff_index __attribute__((sda));
 
-extern u8 D_L10_0042BEE0[];
+extern u8 g_cloud_puff_data[];
 
 extern int func_003179F0(void *a0, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
 extern f32 func_00309B38(f32 f12, f32 f13);
@@ -12,7 +12,7 @@ extern void func_00307C68(char *a0, int a1, int a2, int a3, f32 f12, f32 f13, f3
 
 /* Three func_00307C68(p + 0x10, 11, colour, 1, ...) calls, each colour with a random
    alpha byte; the first alpha also sets +0x1C of this level's D_L10_001C7800 record. */
-extern int D_L10_00221CFC __attribute__((section(".data")));
+extern int g_mission_progress_flag __attribute__((section(".data")));
 extern int g_mission_initialized __attribute__((sda));
 extern void music_Unpause(void);
 extern void entry_init_all_registered(void);
@@ -22,12 +22,12 @@ extern int level_get_saved_value(void);
 extern void cloud_destroy_leftover_objects(void);
 extern void cloud_spawn_objects(int, int);
 extern void hero_set_state_value_c(int);
-extern int D_L10_001B13F8 __attribute__((sda));
-extern int D_L10_001B13FC __attribute__((sda));
-extern int D_L10_001B1444 __attribute__((sda));
+extern int g_hud_blink_timer_first __attribute__((sda));
+extern int g_hud_blink_timer_second __attribute__((sda));
+extern int g_no_first_completion_flag __attribute__((sda));
 extern int g_mission_completion_counts __attribute__((sda));
-extern int D_L10_001B1424 __attribute__((sda));
-extern char *D_L10_001B251C;
+extern int g_state_frame_count __attribute__((sda));
+extern char *g_moby_base_table;
 extern void *CreateEnergyStrip(void *, void *, int, int, int, int, int, int, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern void mission_store_completion_counts(void);
@@ -36,8 +36,8 @@ extern void moby_set_flag_bit(void *, int);
 extern void moby_mark_flag_and_append_to_list(int);
 
 typedef struct { int idx; u8 pad[0x28]; int f2C; } G221CD0;
-extern G221CD0 D_L10_00221CD0;
-extern u8 *D_001B2614;
+extern G221CD0 g_mission_state;
+extern u8 *g_spot_record_table;
 extern void entry_spawn_list_objects_with_flag(void *, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
@@ -55,7 +55,7 @@ extern f32 math_random_angle(void);
 extern void gfx_draw_billboard_quad(void *at, int kind, unsigned int colour, int count, f32 size,
                           f32 rate, f32 spin);
 extern f32 IntToFloat(int);
-extern u8 D_L10_001C7800[];
+extern u8 g_cloud_puff_table[];
 
 /* First call: resets the D_L10_001B13A4 block, marks every class-0xF85 moby, spawns 75
    objects and the effect box. Then, until the 0xF85 moby reports done, each timer expiry
@@ -71,10 +71,10 @@ void mission_first_update(char *object)
     if (!g_mission_initialized) {
         typedef int Quad __attribute__((mode(TI)));
         union { Quad q; float f[4]; } av, bv;
-        D_L10_00221CFC = 0;
+        g_mission_progress_flag = 0;
         g_mission_initialized = 1;
-        D_L10_001B13F8 = 0;
-        D_L10_001B13FC = 0;
+        g_hud_blink_timer_first = 0;
+        g_hud_blink_timer_second = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -94,23 +94,23 @@ void mission_first_update(char *object)
     result = target_moby ? group_count_alive(target_moby) : 0;
     if (!result) {
         entry_init_all_registered();
-        if (D_L10_001B1444) {
+        if (g_no_first_completion_flag) {
             if (math_fast_float_d(vars + 0x58)) {
                 *(int *)(vars + 0x58) = 10;
                 g_mission_completion_counts++;
                 mission_store_completion_counts();
                 MemcardSave(0,-1);
                 g_mission_completion_counts--;
-                moby_set_flag_bit(D_L10_001B251C + *(int *)(vars + 0x2C) * 256,1);
-                D_L10_001B1424 = 0;
-                D_L10_001B1444 = 0;
+                moby_set_flag_bit(g_moby_base_table + *(int *)(vars + 0x2C) * 256,1);
+                g_state_frame_count = 0;
+                g_no_first_completion_flag = 0;
                 hero_set_state_value_c(1);
                 moby_mark_flag_and_append_to_list(12);
             }
         } else if (math_fast_float_d(vars + 0x58)) {
             hrugis_finish_mission_reward(object,0);
-            D_L10_001B13F8 = 0;
-            D_L10_001B13FC = 0;
+            g_hud_blink_timer_first = 0;
+            g_hud_blink_timer_second = 0;
         }
     }
 }
@@ -127,7 +127,7 @@ void mission_second_update(u8 *moby) {
 
     if (g_mission_initialized == 0) {
         g_mission_initialized = 1;
-        D_L10_00221CD0.f2C = 0;
+        g_mission_state.f2C = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -141,8 +141,8 @@ void mission_second_update(u8 *moby) {
                 break;
             case 0xF93 /* moby class 3987 */:
                 entry_spawn_list_objects_with_flag(current, 1);
-                func_L05_0037CEE0(moby_list[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
-                func_L05_0037D608(moby_list[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
+                func_L05_0037CEE0(moby_list[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                func_L05_0037D608(moby_list[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
                 hrugis_set_group_states(moby_list[i]);
                 break;
             }
@@ -180,7 +180,7 @@ void cloud_puff_startup_update(u8 *moby) {
         *(f32 *)(puff + 0x10) = 512.0f;
         *(f32 *)(puff + 0x14) = 512.0f;
         *(f32 *)(puff + 0x18) = 512.0f;
-        D_L10_001B1648 = func_003179F0(puff + 0x10, 40.0f, zero, zero, zero, 1.0f);
+        g_cloud_puff_index = func_003179F0(puff + 0x10, 40.0f, zero, zero, zero, 1.0f);
     case 1:
         *(f32 *)(puff + 0xF8) =
             func_00309B38(*(f32 *)(puff + 0xF8), 0.00981747824699f);
@@ -188,7 +188,7 @@ void cloud_puff_startup_update(u8 *moby) {
     default:
         break;
     }
-    func_00301B98(D_L10_0042BEE0, puff);
+    func_00301B98(g_cloud_puff_data, puff);
 }
 
 /* The cloud puff's burst: three layers of particles at the object's position, coloured
@@ -207,6 +207,6 @@ void part_spawn_cloud_puff_burst(u8 *object)
                   math_random_angle());
     gfx_draw_billboard_quad(object, 0xB, (math_random_int_range(0, 0x80) << 24) | 0x804040, 1,
                   math_random_float_range(8.0f, 17.0f), 0.05f, math_random_angle());
-    entry = D_L10_001C7800 + (D_L10_001B1648 << 5);
+    entry = g_cloud_puff_table + (g_cloud_puff_index << 5);
     *(f32 *)(entry + 0x1C) = IntToFloat(alpha >> 24) * 0.5f;
 }

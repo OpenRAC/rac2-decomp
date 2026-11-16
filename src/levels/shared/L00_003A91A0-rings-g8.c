@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L00_003A91A0 (1,524 bytes, 27 level places): draws a beam of quad rings in strips. Twin of
  * func_L00_003F6308. Own unit: -O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-117 -frac2-giv-pair-init -frac2-cse2-skip-temp-sum
  * (config/cflags.txt; docs/build/compiler-notes.md). `ring` is declared first in the function,
@@ -9,25 +10,25 @@
 typedef float BeamVector[4] __attribute__((aligned(16)));
 typedef struct { BeamVector point[4]; u32 color[4]; float uv[4][2]; long a,b,c,d; } BeamQuad;
 typedef struct { BeamVector origin[3], basis[2]; short enabled, timer; float phase, phase2, rate; } BeamRing;
-extern float D_L00_001AF75C __attribute__((sda));
-extern float D_L00_001AF754 __attribute__((sda));
-extern float D_L00_001AF758 __attribute__((sda));
+extern float g_beam_ring_temp_scale __attribute__((sda));
+extern float g_beam_ring_side_u_offset __attribute__((sda));
+extern float g_beam_ring_u_step __attribute__((sda));
 
-extern float D_L00_001AF778 __attribute__((sda));
-extern float D_L00_001AF788 __attribute__((sda));
-extern u32 D_L00_001AF78C __attribute__((sda));
-extern int D_L00_001AF794 __attribute__((sda));
-extern float D_L00_001AF798 __attribute__((sda));
-extern float D_L00_001AF7A4 __attribute__((sda));
-extern int D_L00_001AF76C __attribute__((sda));
-extern int D_L00_001AF784 __attribute__((sda));
+extern float g_beam_ring_side_length_a __attribute__((sda));
+extern float g_beam_ring_side_length_b __attribute__((sda));
+extern u32 g_beam_ring_color_e __attribute__((sda));
+extern int g_beam_l00_ring_alpha_scale_2 __attribute__((sda));
+extern float g_trail_u_scroll_step __attribute__((sda));
+extern float g_moby_offset_x __attribute__((sda));
+extern int g_beam_ring_alpha_max_a __attribute__((sda));
+extern int g_beam_ring_alpha_max_b __attribute__((sda));
 
-extern u32 D_L00_001AF764 __attribute__((sda));
-extern u32 D_L00_001AF768 __attribute__((sda));
-extern u32 D_L00_001AF780 __attribute__((sda));
-extern u32 D_L00_001AF77C __attribute__((sda));
-extern u32 D_L00_001AF790 __attribute__((sda));
-extern BeamVector D_L00_00294B60[];
+extern u32 g_beam_ring_color_a __attribute__((sda));
+extern u32 g_beam_ring_color_b __attribute__((sda));
+extern u32 g_beam_ring_color_d __attribute__((sda));
+extern u32 g_beam_ring_color_c __attribute__((sda));
+extern u32 g_beam_ring_color_f __attribute__((sda));
+extern BeamVector g_beam_ring_vertices[];
 extern BeamVector g_camera_l00_position;
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
@@ -64,19 +65,19 @@ void beam_draw_rings(unsigned char *object)
         qcopy(matrix[2], rings[ring].basis[1]);
         FastVecCross(matrix[1], matrix[0], matrix[2]);
         fade = (float)rings[ring].timer * rings[ring].rate;
-        alpha = FloatToInt(fade * (float)D_L00_001AF76C) << 24;
-        col = D_L00_001AF764;
+        alpha = FloatToInt(fade * (float)g_beam_ring_alpha_max_a) << 24;
+        col = g_beam_ring_color_a;
         primary = alpha | col;
         quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
         for (row = 0; row < 3; row++) {
             qcopy(matrix[3], rings[ring].origin[row]);
             for (j = 0; j < 20; j++) {
-                FastVecScale(temp, D_L00_00294B60[j], D_L00_001AF75C);
+                FastVecScale(temp, g_beam_ring_vertices[j], g_beam_ring_temp_scale);
                 transform_vector(vertices[row][j], temp, matrix);
             }
         }
         phase = rings[ring].phase;
-        col = D_L00_001AF768;
+        col = g_beam_ring_color_b;
         for (j = 1; j < 3; j++) {
             u = 0;
             for (row = 0; row < 20; row++) {
@@ -84,8 +85,8 @@ void beam_draw_rings(unsigned char *object)
                 qcopy(quad.point[1], vertices[j][(row + 1) % 20]);
                 qcopy(quad.point[2], vertices[j - 1][row]);
                 qcopy(quad.point[3], vertices[j - 1][(row + 1) % 20]);
-                next = u + D_L00_001AF758;
-                side_u = phase + D_L00_001AF754;
+                next = u + g_beam_ring_u_step;
+                side_u = phase + g_beam_ring_side_u_offset;
                 quad.color[3] = quad.color[2] = col;
                 quad.uv[0][0] = phase;
                 quad.uv[0][1] = u;
@@ -101,8 +102,8 @@ void beam_draw_rings(unsigned char *object)
             col = primary;
         }
         gfx_init_quad_packet_state(&quad, 14, 1, 128);
-        alpha = FloatToInt(fade * (float)D_L00_001AF784) << 24;
-        col = D_L00_001AF780;
+        alpha = FloatToInt(fade * (float)g_beam_ring_alpha_max_b) << 24;
+        col = g_beam_ring_color_d;
         quad.uv[0][0] = 0;
         quad.uv[0][1] = 0;
         quad.uv[1][0] = 0;
@@ -113,10 +114,10 @@ void beam_draw_rings(unsigned char *object)
         quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
         quad.uv[3][0] = 0.5f;
         quad.uv[2][0] = 0.5f;
-        col = D_L00_001AF77C;
+        col = g_beam_ring_color_c;
         FastVecSub(temp, &g_camera_l00_position, rings[ring].origin[0]);
         FastVecCross(matrix[1], matrix[0], temp);
-        vec_scale_to_length(side, matrix[1], D_L00_001AF778);
+        vec_scale_to_length(side, matrix[1], g_beam_ring_side_length_a);
         for (j = 0; j < 2; j++) {
             FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
             FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);
@@ -129,8 +130,8 @@ void beam_draw_rings(unsigned char *object)
             quad.uv[2][0] = quad.uv[3][0] = 3.0f;
         }
         gfx_init_quad_packet_state(&quad, 23, 1, 128);
-        alpha = FloatToInt(fade * (float)D_L00_001AF794) << 24;
-        col = D_L00_001AF790;
+        alpha = FloatToInt(fade * (float)g_beam_l00_ring_alpha_scale_2) << 24;
+        col = g_beam_ring_color_f;
         primary = alpha | col;
         quad.uv[2][0] = 1;
         quad.uv[3][0] = 1;
@@ -143,8 +144,8 @@ void beam_draw_rings(unsigned char *object)
         quad.uv[3][1] = 1;
         phase2 = rings[ring].phase2;
         quad.uv[2][0] = quad.uv[3][0] = phase2 + 0.5f;
-        col = D_L00_001AF78C;
-        vec_scale_to_length(side, matrix[1], D_L00_001AF788);
+        col = g_beam_ring_color_e;
+        vec_scale_to_length(side, matrix[1], g_beam_ring_side_length_b);
         for (j = 0; j < 2; j++) {
             FastVecAdd(quad.point[0], rings[ring].origin[j + 1], side);
             FastVecSub(quad.point[1], rings[ring].origin[j + 1], side);

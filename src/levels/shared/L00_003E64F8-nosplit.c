@@ -2,7 +2,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct { TI128 pos; TI128 dir; float target[4]; int owner, kind, busy; float scale; int state, count, pad[2]; } EffectRecord;
-extern EffectRecord *D_L00_001B2B50;
+extern EffectRecord *g_blast_effect_records;
 
 extern void vec_scale_to_length(char *a, char *b, float c);
 
@@ -17,7 +17,7 @@ extern float FastAddRotations(float a, float b);
 /* Takes a free blast record for the owner and fills it, then adds 48 pieces around it. */
 void blast_init_effect_record(char *owner, int kind, void *target_pos, void *start_vec, float scale)
 {
-    EffectRecord *base = D_L00_001B2B50;
+    EffectRecord *base = g_blast_effect_records;
     EffectRecord *rec;
     TI128 local;
     float v;

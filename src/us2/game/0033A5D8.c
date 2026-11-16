@@ -5,7 +5,7 @@ extern void func_00336320_1(char *a);
 extern void func_00336A78_1(char *a);
 
 /* early-returns when a 32-bit field is zero, otherwise calls one helper four times and another three times with fixed byte offsets off the argument pointer. */
-void func_US2_0033A5D8(char *a0)
+void mission_screen_draw_parts_us2(char *a0)
 {
     if (*(int *)(a0 + 728) == 0)
         return;
@@ -18,7 +18,7 @@ void func_US2_0033A5D8(char *a0)
     func_00336A78_1(a0 + 488);
 }
 
-char *func_US2_0033A640(char *object)
+char *mission_screen_shutdown_us2(char *object)
 {
     extern int prompt_bar_destroy(void *);
     extern void *object_construct_derived_a(void *);
@@ -30,24 +30,24 @@ char *func_US2_0033A640(char *object)
 typedef int s32;
 typedef unsigned char u8;
 
-void func_US2_0033A7A8(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
+void popup_set_flag_on_us2(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
-void func_US2_0033A7B8(unsigned char *owner, int value)
+void popup_set_box_value_us2(unsigned char *owner, int value)
 {
     prompt_bar_set_texts_enabled(owner + 8, value);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_US2_0033A7D8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
+void popup_set_row_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
 
 extern char *func_00288FB8_3(int);
 extern void prompt_bar_set_texts(char *, int, int, int);
 extern void prompt_bar_set_spacing(char *, float);
 
 /* Calls a one-argument helper three times with three fixed small integers, passes the three results and a pointer plus 8 to a four-argument helper, calls a two-argument helper with the same address and 0.0f, then clears the word at offset 764. */
-void func_US2_0033A7E0(char *p)
+void popup_init_texts_hidden_us2(char *p)
 {
     int first = func_00288FB8_3(11316);
     int second = func_00288FB8_3(11314);
@@ -58,11 +58,11 @@ void func_US2_0033A7E0(char *p)
 }
 
 extern char *GetLocalizedString(int);
-extern void func_US2_0033C098(void *, void *, void *, void *);
-extern void func_US2_0033C0F0(void *, float);
+extern void prompt_bar_set_texts_us2(void *, void *, void *, void *);
+extern void prompt_bar_set_spacing_us2(void *, float);
 
 /* looks up three objects by numeric id, runs a four-argument routine and a (pointer,float) routine on a sub-object at self+8, then stores 1 at self+764 */
-void func_US2_0033A860(int *self)
+void popup_init_texts_shown_us2(int *self)
 {
     void *a;
     void *b;
@@ -73,27 +73,27 @@ void func_US2_0033A860(int *self)
     b = GetLocalizedString(11314);
     c = GetLocalizedString(11237);
 
-    func_US2_0033C098(sub, a, b, c);
-    func_US2_0033C0F0(sub, 0.0f);
+    prompt_bar_set_texts_us2(sub, a, b, c);
+    prompt_bar_set_spacing_us2(sub, 0.0f);
 
     self[203] = 1;
 }
 
 
-extern int D_L00_001A8FD8 __attribute__((sda));
-extern int D_L00_001A8FDC __attribute__((sda));
-extern void func_US2_0033BE68(int *p, int flag);
-extern void func_US2_0033BF90(int *p);
+extern int g_menu_prompt_flag_a __attribute__((sda));
+extern int g_menu_prompt_flag_b __attribute__((sda));
+extern void prompt_bar_set_extras_enabled_us2(int *p, int flag);
+extern void prompt_bar_draw_us2(int *p);
 extern void gfx_draw_screen_element_stored(int *p);
 
 /* Lazily initialises a sub-object of the argument behind two global flags and a field, runs one guarded setup step on it, then hands it to two callees. */
-void func_US2_0033A9F8(int *obj)
+void menu_draw_with_prompts_us2(int *obj)
 {
-    if (D_L00_001A8FD8 != 0 || D_L00_001A8FDC != 0 || obj[204] != 0)
-        func_US2_0033BE68(obj + 2, 0);
+    if (g_menu_prompt_flag_a != 0 || g_menu_prompt_flag_b != 0 || obj[204] != 0)
+        prompt_bar_set_extras_enabled_us2(obj + 2, 0);
     if (obj[203] == 1)
-        func_US2_0033BE68(obj + 2, 1);
-    func_US2_0033BF90(obj + 2);
+        prompt_bar_set_extras_enabled_us2(obj + 2, 1);
+    prompt_bar_draw_us2(obj + 2);
     gfx_draw_screen_element_stored(obj + 182);
 }
 
@@ -102,7 +102,7 @@ extern char *func_L00_0042BAD0_1(char *object);
 extern char *func_L00_0042C290_1(char *object);
 
 /* calls two one-argument functions on a sequence of sub-objects of the argument (four at 8..236 stride 76, nine at 312..888 stride 72) and returns the argument */
-char *func_US2_0033AA80(char *object)
+char *list_screen_destroy_us2(char *object)
 {
     func_L00_0042BAD0_1(object + 8);
     func_L00_0042BAD0_1(object + 84);
@@ -132,15 +132,15 @@ extern void object_set_second_float4(void *, float, float, float, float);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern char *text_format_location_name(void *, int);
 extern void hud_set_widget_field_b(void *, int);
-extern Point2_0033AF70 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
-extern Point2_0033AF70 D_001ADD00 __attribute__((sda));
+extern Point2_0033AF70 g_list_screen_title_pos, g_list_screen_list_pos, g_list_screen_prev_pos, g_list_screen_next_pos;
+extern Point2_0033AF70 g_list_screen_scale __attribute__((sda));
 /* Two views of one object: retail reads .x through $gp and .y through its absolute macro form. */
 extern Point2_0033AF70 D_001ADD00_gp __asm__("D_001ADD00__gp") __attribute__((section(".sdata")));
 extern char g_map_overlay_state[];
-extern int D_00258D70[];
-extern char D_001ADC88[];
+extern int g_menu_text_id_table[];
+extern char g_circle_menu_icon_data[];
 
-int func_US2_0033AF70(char *obj, int unused)
+int list_screen_layout_us2(char *obj, int unused)
 {
     Point2_0033AF70 z0, z1, z2, z3;
     Point2_0033AF70 title, list, prev, next;
@@ -151,16 +151,16 @@ int func_US2_0033AF70(char *obj, int unused)
     memset(&z1, 0, 8);
     memset(&z2, 0, 8);
     memset(&z3, 0, 8);
-    title = D_001ADCE0;
-    list = D_001ADCE8;
-    prev = D_001ADCF0;
-    next = D_001ADCF8;
-    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    title = g_list_screen_title_pos;
+    list = g_list_screen_list_pos;
+    prev = g_list_screen_prev_pos;
+    next = g_list_screen_next_pos;
+    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
     object_set_first_float4(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
                   z0.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
@@ -189,11 +189,11 @@ int func_US2_0033AF70(char *obj, int unused)
                   next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
     base = g_map_overlay_state;
     text_format_location_name(obj + 0x450, *(int *)(base + 0x230));
-    index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
+    index = g_menu_text_id_table[*(int *)(base + 0x230) * 2 + 1];
     if (index >= 0)
         hud_set_widget_field_b(obj + 0x3F8, (int)GetLocalizedString(index));
     else
-        hud_set_widget_field_b(obj + 0x3F8, (int)D_001ADC88);
+        hud_set_widget_field_b(obj + 0x3F8, (int)g_circle_menu_icon_data);
     return 0;
 }
 
@@ -203,7 +203,7 @@ extern void F8ad956d6_FUN_00295F60(int first, int second);
 extern int F8ad956d6_FUN_002DAF68(char *target);
 extern void F8ad956d6_FUN_00336A78(char *target);
 
-void func_US2_0033B428(char *object)
+void list_screen_draw_us2(char *object)
 {
     char *s0 = object;
 

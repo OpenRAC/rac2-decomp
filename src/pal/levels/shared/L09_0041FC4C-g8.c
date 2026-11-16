@@ -18,12 +18,12 @@ typedef struct {
 extern TriggerPlayer g_hero_state;
 extern int g_current_map_index __attribute__((sda));
 /* Flag bytes indexed by level * 16 + owner; 3-bit counters indexed by level * 1024, two per byte. */
-extern u8 D_0019B2E8[];
-extern u8 D_0019B4A8[];
+extern u8 g_moby_group_flags[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 pad[0x464]; u8 spent[0]; } TriggerCellFlags;
-extern TriggerCellFlags D_L09_0021E9F0;
-extern char *D_L09_001B0834;
-extern char *D_L09_001B1648;
+extern TriggerCellFlags g_dobbo_flags;
+extern char *g_floor_l09_switch_player;
+extern char *g_floor_l09_switch_player_2;
 
 typedef struct TriggerState { float angle; int enabled; } TriggerState;
 typedef struct {
@@ -68,12 +68,12 @@ void func_PAL_L09_0041FC4C(TriggerObject *obj)
         if (g_hero_state.standing != (char *)obj || g_hero_state.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
             level = g_current_map_index;
-            if (!(D_0019B2E8[obj->owner + level * 16] & 0x80) || s->enabled) {
+            if (!(g_moby_group_flags[obj->owner + level * 16] & 0x80) || s->enabled) {
                 int id;
                 if (!s->enabled) return;
                 id = obj->id;
-                if (!D_L09_0021E9F0.spent[(short)id]) {
-                    int count = D_0019B4A8[((short)id >> 1) + (level << 10)];
+                if (!g_dobbo_flags.spent[(short)id]) {
+                    int count = g_moby_nibble_table[((short)id >> 1) + (level << 10)];
                     if (id & 1) {
                         if (((count >> 4) & 7) != 0) goto activate;
                         goto proximity;
@@ -90,18 +90,18 @@ activate:
             PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
             } else {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                 if ((*counts & 7) != 7) ++*counts;
             }
         }
 proximity:
         if (s->enabled) {
-            player = D_L09_001B0834;
+            player = g_floor_l09_switch_player;
             if (!player) {
-                player = D_L09_001B1648;
+                player = g_floor_l09_switch_player_2;
                 if (!player) return;
             }
             /* Retail fills this raised copy but measures from the position itself. */
@@ -110,10 +110,10 @@ proximity:
             if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                    u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
                 } else {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                    u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
                 obj->status = 2;

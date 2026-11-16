@@ -24,7 +24,7 @@ extern unsigned char g_sound_state[];
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 /* The second read of the same pointer uses absolute addressing. */
 extern unsigned char *D_L14_001B259C_1[] __attribute__((sda));
-extern unsigned char D_001395E3 NOT_SDA;
+extern unsigned char g_glow_marker_flag NOT_SDA;
 
 /* Pulses a glowing marker with a looping sound. When the player reaches it, the sound stops and the linked objects are triggered. */
 void glow_marker_update(unsigned char *object)
@@ -65,7 +65,7 @@ void glow_marker_update(unsigned char *object)
             *(int *)(state + 0x14) = -1;
             PlayMobySound(0, 0, object);
             PlayMobySound(2, 0, object);
-            D_001395E3 = 1;
+            g_glow_marker_flag = 1;
             if (*(int *)state != -1) {
                 moby_set_flag_bit(g_moby_l14_pool + (*(int *)state << 8), 1);
                 {

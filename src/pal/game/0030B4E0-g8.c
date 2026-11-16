@@ -3,60 +3,60 @@
 /* func_PAL_0030B4E0, the PAL copy of func_0030A188: the same C, where D_001B2408 takes D_001AEE84 at the 50 Hz scale. */
 /* Adapted from RAC1 initialize_electric_water_bolt_effect (OpenRAC, GPL-3.0). */
 typedef struct { float f[4]; } __attribute__((aligned(16))) Vec;
-extern short D_001B23FC[] MACRO_ADDR;
-extern short D_001B23FE[] MACRO_ADDR;
-extern short D_001B2406[] MACRO_ADDR;
-extern short D_001B23F8[] MACRO_ADDR;
-extern short D_001B2400[] MACRO_ADDR;
-extern short D_001B23FA[] MACRO_ADDR;
-extern short D_001B2402[] MACRO_ADDR;
-extern short D_001B2404[] MACRO_ADDR;
+extern short g_tether_param_b[] MACRO_ADDR;
+extern short g_tether_param_c[] MACRO_ADDR;
+extern short g_tether_param_f[] MACRO_ADDR;
+extern short g_tether_reset_times[] MACRO_ADDR;
+extern short g_tether_x_offsets[] MACRO_ADDR;
+extern short g_tether_param_a[] MACRO_ADDR;
+extern short g_tether_param_d[] MACRO_ADDR;
+extern short g_tether_param_e[] MACRO_ADDR;
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float), vec_clear_128(void *);
-extern int D_001AEDF0 __attribute__((sda));
-extern float D_001AEDF4 __attribute__((sda));
-extern int D_001AEE84 __attribute__((sda));
-extern int D_001AEE58 __attribute__((sda));
-extern int D_001AEE0C __attribute__((sda));
-extern int D_001AEE14 __attribute__((sda));
-extern int D_001AEE28 __attribute__((sda));
-extern int D_001B2408 __attribute__((sda));
-extern int D_001B240C;
-extern short D_001B23E8[4];
-extern Vec D_00229160[];
-extern Vec D_00229170[];
-extern Vec D_00229440[];
-extern int D_002293F0[];
-extern int D_00229580[];
+extern int g_tether_reset_flag __attribute__((sda));
+extern float g_tether_reach __attribute__((sda));
+extern int g_tether_copy_value __attribute__((sda));
+extern int g_beam_halo_color __attribute__((sda));
+extern int g_tether_height_phase __attribute__((sda));
+extern int g_tether_angle_phase __attribute__((sda));
+extern int g_tether_wave_phase __attribute__((sda));
+extern int g_tether_state_word __attribute__((sda));
+extern int g_tether_flag;
+extern short g_tether_slot_timers[4];
+extern Vec g_tether_chain_steps[];
+extern Vec g_tether_chain_positions[];
+extern Vec g_tether_chain_offsets[];
+extern int g_tether_chain_heights[];
+extern int g_tether_chain_mirror_heights[];
 void func_PAL_0030B4E0(char *obj) {
     Vec delta, step;
     Vec *state = *(Vec **)(obj + 0x68);
     int i;
-    if (D_001AEDF0) {
-        D_001AEDF0 = 0;
-        D_001B240C = 0;
-        D_001B2408 = ((s32)D_001AEE84 * 5 + 2) / 6;
-        D_001AEE58 = 0x7F2020;
+    if (g_tether_reset_flag) {
+        g_tether_reset_flag = 0;
+        g_tether_flag = 0;
+        g_tether_state_word = ((s32)g_tether_copy_value * 5 + 2) / 6;
+        g_beam_halo_color = 0x7F2020;
         FastVecSub(&delta, state + 1, state);
-        vec_scale_to_length(&step, &delta, D_001AEDF4 * 0.05f);
-        qcopy(&D_00229170[0], state);
+        vec_scale_to_length(&step, &delta, g_tether_reach * 0.05f);
+        qcopy(&g_tether_chain_positions[0], state);
         for (i = 1; i < 20; i++) {
-            FastVecAdd(&D_00229170[i], &D_00229160[i], &step);
-            D_002293F0[i] = 0;
-            vec_clear_128(&D_00229440[i]);
-            D_00229580[i] = 0;
+            FastVecAdd(&g_tether_chain_positions[i], &g_tether_chain_steps[i], &step);
+            g_tether_chain_heights[i] = 0;
+            vec_clear_128(&g_tether_chain_offsets[i]);
+            g_tether_chain_mirror_heights[i] = 0;
         }
-        { int j; for (j = 0; j < 4; j++) D_001B23E8[j] = -1; }
-        D_001B23F8[0] = 8;
-        D_001B2400[0] = 4;
-        D_001B23FA[0] = 4;
-        D_001B2402[0] = 2;
-        D_001B2404[0] = 4;
-        D_001B23FC[0] = 8;
-        D_001B23FE[0] = 4;
-        D_001B2406[0] = 2;
-        D_001AEE0C = 0;
-        D_001AEE14 = 0;
-        D_001AEE28 = 0;
+        { int j; for (j = 0; j < 4; j++) g_tether_slot_timers[j] = -1; }
+        g_tether_reset_times[0] = 8;
+        g_tether_x_offsets[0] = 4;
+        g_tether_param_a[0] = 4;
+        g_tether_param_d[0] = 2;
+        g_tether_param_e[0] = 4;
+        g_tether_param_b[0] = 8;
+        g_tether_param_c[0] = 4;
+        g_tether_param_f[0] = 2;
+        g_tether_height_phase = 0;
+        g_tether_angle_phase = 0;
+        g_tether_wave_phase = 0;
     }
 }

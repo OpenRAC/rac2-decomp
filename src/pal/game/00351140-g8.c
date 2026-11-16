@@ -10,7 +10,7 @@ extern void ChangeThreadPriority(int, int);
 extern int mpeg_start_player(void *, void *, int);
 extern int read_mpeg(void *, void *, void *);
 
-int func_PAL_00351140(void *first, void *second, char *pool, char *state, int mode, int volume)
+int mpeg_play_movie_2_pal(void *first, void *second, char *pool, char *state, int mode, int volume)
 {
     int result = 0;
     ref_L00_0034EF58_01[0] = pool;

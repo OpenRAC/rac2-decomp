@@ -36,8 +36,8 @@ extern float math_random_float_range(float, float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern int part_alloc_effect_slot(void *, void *, float, float, float);
 extern void func_002A0F48(void *);
-extern float D_L00_001B0C38 __attribute__((sda));
-extern float D_L00_001B0C2C __attribute__((sda));
+extern float g_bouncer_l00_debris_scale_2 __attribute__((sda));
+extern float g_bouncer_l00_debris_scale __attribute__((sda));
 
 /* Spawns a piece of debris at the position with the given velocity, a random spin and a
    scale that depends on the flag. */
@@ -63,8 +63,8 @@ DebrisObject_F3FED60 *bouncer_spawn_debris_object(SpawnVector_F3FED60 *position,
         euler_rotation_basis(object->rotation, object->angle);
         spin = math_random_float_range(0.052359886f, 0.10471977f);
         math_build_axis_angle_quat(&state->spin, object->matrix, spin);
-        if (flag) object->scale *= D_L00_001B0C38;
-        else object->scale *= D_L00_001B0C2C;
+        if (flag) object->scale *= g_bouncer_l00_debris_scale_2;
+        else object->scale *= g_bouncer_l00_debris_scale;
         state->shadow = part_alloc_effect_slot(object, 0, 1.0f, 1.0f, 1.0f);
         func_002A0F48(object);
     }

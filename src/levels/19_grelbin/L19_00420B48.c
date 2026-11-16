@@ -9,9 +9,9 @@ extern void FastVecCross(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *,void *,int);
-extern char D_L19_001B9A40[];
-extern float D_L19_001B1DE8[] __attribute__((sda));
-extern float D_L19_001B1DEC[] __attribute__((sda));
+extern char g_hero_origin_vec[];
+extern float g_beam_l19_uv_u_table[] __attribute__((sda));
+extern float g_beam_l19_uv_v_table[] __attribute__((sda));
 
 /* Draws the object's 25-unit beam along its heading: a wide tinted quad, then a narrow white core. */
 void gfx_draw_beam_along_heading(char *moby)
@@ -20,8 +20,8 @@ void gfx_draw_beam_along_heading(char *moby)
     int i, j;
     vec_scale_to_length(&beam.direction,moby+0xe0,*(float *)(*(char **)(moby+0x68)+0xc));
     FastVecAdd(&beam.end,moby+0x10,&beam.direction);
-    FastVecSub(&beam.firstSide,moby+0x10,D_L19_001B9A40);
-    FastVecSub(&beam.secondSide,&beam.end,D_L19_001B9A40);
+    FastVecSub(&beam.firstSide,moby+0x10,g_hero_origin_vec);
+    FastVecSub(&beam.secondSide,&beam.end,g_hero_origin_vec);
     FastVecCross(&beam.firstSide,&beam.firstSide,&beam.direction);
     vec_scale_to_length(&beam.firstSide,&beam.firstSide,0.15f);
     FastVecCross(&beam.secondSide,&beam.secondSide,&beam.direction);
@@ -32,8 +32,8 @@ void gfx_draw_beam_along_heading(char *moby)
     beam.packet.header[0]=0;
     beam.packet.colors[0] = beam.packet.colors[1] = beam.packet.colors[2] = beam.packet.colors[3] = 0x80243278u;
     for (i = 0; i < 4; i++) {
-        beam.packet.uv[i][0] = D_L19_001B1DE8[i * 2];
-        beam.packet.uv[i][1] = D_L19_001B1DEC[i * 2];
+        beam.packet.uv[i][0] = g_beam_l19_uv_u_table[i * 2];
+        beam.packet.uv[i][1] = g_beam_l19_uv_v_table[i * 2];
     }
     FastVecSub(&beam.scratch,moby+0x10,&beam.firstSide);
     beam.packet.vertices[0]=beam.scratch;
@@ -44,8 +44,8 @@ void gfx_draw_beam_along_heading(char *moby)
     FastVecAdd(&beam.scratch,&beam.end,&beam.secondSide);
     beam.packet.vertices[3]=beam.scratch;
     draw_world_quad(&beam.packet,0,0);
-    FastVecSub(&beam.firstSide,moby+0x10,D_L19_001B9A40);
-    FastVecSub(&beam.secondSide,&beam.end,D_L19_001B9A40);
+    FastVecSub(&beam.firstSide,moby+0x10,g_hero_origin_vec);
+    FastVecSub(&beam.secondSide,&beam.end,g_hero_origin_vec);
     FastVecCross(&beam.firstSide,&beam.firstSide,&beam.direction);
     vec_scale_to_length(&beam.firstSide,&beam.firstSide,0.05f);
     FastVecCross(&beam.secondSide,&beam.secondSide,&beam.direction);
@@ -56,8 +56,8 @@ void gfx_draw_beam_along_heading(char *moby)
     beam.packet.header[0]=0;
     beam.packet.colors[0] = beam.packet.colors[1] = beam.packet.colors[2] = beam.packet.colors[3] = 0x80808080u;
     for (j = 0; j < 4; j++) {
-        beam.packet.uv[j][0] = D_L19_001B1DE8[j * 2];
-        beam.packet.uv[j][1] = D_L19_001B1DEC[j * 2];
+        beam.packet.uv[j][0] = g_beam_l19_uv_u_table[j * 2];
+        beam.packet.uv[j][1] = g_beam_l19_uv_v_table[j * 2];
     }
     FastVecSub(&beam.scratch,moby+0x10,&beam.firstSide);
     beam.packet.vertices[0]=beam.scratch;

@@ -30,7 +30,7 @@ typedef struct {
 extern ResidentState_F41eb487e D_00189E20_5;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
-void func_PAL_L00_002B9130(void)
+void hero_update_lean_reference_pal(void)
 {
     u8 scratch[64];
     Vec4_F41eb487e A, B, C;

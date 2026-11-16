@@ -7,18 +7,18 @@ extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float,float);
 extern float fast_subtract_rotations(float,float);
 extern float math_random_float_range(float,float);
-extern u8 D_L12_001B9E00[];
+extern u8 g_hero_prev_position[];
 extern int math_random_int_below(int);
 extern void anim_start_blended(void *, s32, s32, s32);
-extern u8 D_L12_00188660[];
+extern u8 g_hero_l12_state_records[];
 extern s32 func_315148();
 extern s32 func_32D988();
 extern s32 func_2F15C8(void *arg0);
 extern s32 func_3205F8(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_364DF8(s32 arg0, s32 arg1, void *arg2);
-extern s32 D_L12_001B2E9C __attribute__((sda));
+extern s32 g_moby_list_start __attribute__((sda));
 extern s32 D_L12_001B2E9C_2;
-extern u16 *D_L12_001FB960[];
+extern u16 *g_moby_l12_group_lists[];
 extern s32 g_current_map_index __attribute__((sda));
 extern s32 GetFirstMobyInGroup(u8 **out, s32 kind, s32 arg2, s32 arg3);
 extern s32 GetNextMobyInGroup(u8 **out, u32 value, s32 arg2, s32 arg3);
@@ -32,11 +32,11 @@ typedef struct UpdateVars {
     u8 *partner;
 } UpdateVars;
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern u8 D_001A7A40 MACRO_ADDR;
-extern u32 D_001397DC, D_00138324;
-extern int D_L12_001A8EFC[] __attribute__((sda));
-extern int D_L12_001B2BE4[] __attribute__((sda));
-extern u8 D_L12_001C0000[];
+extern u8 g_unlocked_item_flags MACRO_ADDR;
+extern u32 g_object_state_flags_f, g_pad_held_flags;
+extern int g_partner_mode_words[] __attribute__((sda));
+extern int g_glow_resize_flags[] __attribute__((sda));
+extern u8 g_requirement_queue[];
 typedef struct HeroUpdateView {
     u8 pad[0x80];
     float pos[4];
@@ -56,13 +56,13 @@ extern void level_apply_index_for_key(u8 *);
 extern int req_push_queue(void *, int);
 extern s32 req_launch_queued(void *);
 extern char *GetLocalizedString(int);
-extern int func_US2_L00_0030EFB8(void *,int);
+extern int level_l00_call_module_handler_with_arg_9_us2(void *,int);
 extern void text_print_localized_formatted(int,int);
 extern int game_is_either_mode_two(void);
 extern void moby_mark_spawned(u8 *);
 extern void moby_set_byte_on_group(int,int);
 extern void help_unlock_entry(int);
-extern void func_US2_002B1880(int,int);
+extern void value_set_entry_by_index_us2(int,int);
 extern int MemcardSave(int,int);
 extern int math_fast_float_d(int *);
 extern int FloatToInt(float);
@@ -78,12 +78,12 @@ extern void moby_copy_joint_transform_to_object(u8 *,u8 *,int,int);
 static __inline__ void TurnJoint(void *self, void *joint, int index, float rate) {
     moby_update_eased_node(self,joint,index,rate,0.3f);
 }
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 
-void func_US2_L12_003B6518(u8 *self) {
+void UpdateTodanoItemTradeNpc_us2(u8 *self) {
     UpdateVars *v = *(UpdateVars **)(self + 0x68);
     float target[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -105,7 +105,7 @@ void func_US2_L12_003B6518(u8 *self) {
                 *(u32 *)(v->partner+0x78) = *(u32 *)(self+0x78);
                 v->partner[0x31] = 1;
                 func_002A0F48(v->partner);
-                if (D_001397DC & 0x200000) moby_set_state(self,2,-1);
+                if (g_object_state_flags_f & 0x200000) moby_set_state(self,2,-1);
                 else moby_set_state(self,1,-1);
             }
             moby_reset_vars_defaults(self);
@@ -117,19 +117,19 @@ void func_US2_L12_003B6518(u8 *self) {
     case 1:
         if (hero_is_reachable_for_count(self,10,2.5f)) {
             level_apply_index_for_key(self);
-            if (req_push_queue(D_L12_001C0000,0x75)) {
-                req_launch_queued(D_L12_001C0000);
+            if (req_push_queue(g_requirement_queue,0x75)) {
+                req_launch_queued(g_requirement_queue);
                 moby_set_state(self,2,-1);
             }
         }
         break;
     case 2:
-        D_L12_001B2BE4[1] = 1;
-        if (D_L12_001A8EFC[1] == 2) {
+        g_glow_resize_flags[1] = 1;
+        if (g_partner_mode_words[1] == 2) {
             self[0x31] = 0;
             {
                 u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = D_L12_001A8EFC[1];
+                int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
                     *(u16 *)(v->partner+0x34) |= 1;
@@ -138,7 +138,7 @@ void func_US2_L12_003B6518(u8 *self) {
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L12_001B2BE4[1] = 0;
+            g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
             *(u16 *)(v->partner+0x34) &= ~1;
@@ -150,7 +150,7 @@ void func_US2_L12_003B6518(u8 *self) {
     case 3:
         if (g_item_owned_flags[0x31]) moby_set_state(self,4,-1);
         else if (hero_is_reachable_for_count(self,10,2.5f)) {
-            func_US2_L00_0030EFB8(GetLocalizedString(0x1325),2);
+            level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x1325),2);
             level_apply_index_for_key(self);
         }
         break;
@@ -159,19 +159,19 @@ void func_US2_L12_003B6518(u8 *self) {
         else if (hero_is_reachable_for_count(self,10,2.5f)) {
             text_print_localized_formatted(0x1326,-1);
             level_apply_index_for_key(self);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L12_001C0000,0x76)) {
-                req_launch_queued(D_L12_001C0000);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_requirement_queue,0x76)) {
+                req_launch_queued(g_requirement_queue);
                 moby_set_state(self,5,-1);
             }
         }
         break;
     case 5:
-        D_L12_001B2BE4[1] = 1;
-        if (D_L12_001A8EFC[1] == 2) {
+        g_glow_resize_flags[1] = 1;
+        if (g_partner_mode_words[1] == 2) {
             self[0x31] = 0;
             {
                 u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = D_L12_001A8EFC[1];
+                int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
                     *(u16 *)(v->partner+0x34) |= 1;
@@ -180,7 +180,7 @@ void func_US2_L12_003B6518(u8 *self) {
             }
         }
         if (!game_is_either_mode_two()) {
-            D_L12_001B2BE4[1] = 0;
+            g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
             moby_mark_spawned(v->partner);
@@ -190,7 +190,7 @@ void func_US2_L12_003B6518(u8 *self) {
                 g_item_owned_flags[0x31] = 0;
                 g_item_owned_flags[0x69] = 0;
                 help_unlock_entry(7);
-                func_US2_002B1880(0x1245,-1);
+                value_set_entry_by_index_us2(0x1245,-1);
                 MemcardSave(0,-1);
                 moby_mark_spawned(self);
                 return;
@@ -245,7 +245,7 @@ void func_US2_L12_003B6518(u8 *self) {
         *(float *)((u8 *)v+0x68) = turn*0.6f;
         *(float *)((u8 *)v+0xE8) = turn*0.4f;
     }
-    if (D_001A7A40) *(float *)((u8 *)v+0x70) = 2.75f;
+    if (g_unlocked_item_flags) *(float *)((u8 *)v+0x70) = 2.75f;
     TurnJoint(self,v,0,rate);
     TurnJoint(self,(u8 *)v+0x80,1,rate);
     if (v->partner) moby_copy_joint_transform_to_object(self,v->partner,2,0);

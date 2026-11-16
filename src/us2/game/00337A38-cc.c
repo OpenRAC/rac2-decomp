@@ -43,7 +43,7 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 /* Draws a frame when the level object exists: with the view scale at +0xB0 of D_001B9040
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
    ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed

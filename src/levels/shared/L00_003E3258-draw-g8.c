@@ -7,21 +7,21 @@ typedef struct {
     float uv[4][2];
     unsigned long gs[4];
 } Quad5BD8;
-extern int D_L00_001B0600 __attribute__((sda));
-extern int D_L00_001B0604 __attribute__((sda));
-extern int D_L00_001B0608 __attribute__((sda));
-extern int D_L00_001B060C __attribute__((sda));
-extern int D_L00_001B0610 __attribute__((sda));
-extern int D_L00_001B0614 __attribute__((sda));
-extern int D_L00_001B0618 __attribute__((sda));
-extern float D_L00_001B061C __attribute__((sda));
-extern float D_L00_001B05D4 __attribute__((sda));
-extern float D_L00_001B05D8 __attribute__((sda));
-extern char *D_L00_001B2B50 __attribute__((sda));
-extern int *D_L00_001B2B58 MACRO_ADDR;
-extern short D_L00_002983B0[][4][2];
-extern RenderVec5BD8 D_L00_002976D0[];
-extern float D_L00_00299130[][2];
+extern int g_blast_shell_gs_flag_a __attribute__((sda));
+extern int g_blast_shell_gs_flag_b __attribute__((sda));
+extern int g_blast_shell_gs_flag_c __attribute__((sda));
+extern int g_blast_shell_gs_flag_d __attribute__((sda));
+extern int g_blast_shell_gs_flag_e __attribute__((sda));
+extern int g_blast_shell_texture_id __attribute__((sda));
+extern int g_blast_shell_color __attribute__((sda));
+extern float g_blast_shell_scale __attribute__((sda));
+extern float g_blast_uv_scroll_u __attribute__((sda));
+extern float g_blast_uv_scroll_v __attribute__((sda));
+extern char *g_blast_effect_records __attribute__((sda));
+extern int *g_blast_l00_ripple_particles MACRO_ADDR;
+extern short g_blast_shell_quad_indices[][4][2];
+extern RenderVec5BD8 g_blast_shell_vertices[];
+extern float g_blast_shell_uvs[][2];
 extern RenderVec5BD8 g_camera_l00_position;
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void vec_clear_128(void *);
@@ -47,14 +47,14 @@ void blast_draw_shell_mesh(char *object_)
     char *object = object_;
     int index;
     char *data = *(char **)(object + 0x68);
-    quad.gs[1] = GetEffectTextureDescriptor(D_L00_001B0614);
-    quad.gs[3] = (unsigned long)D_L00_001B0600 | ((unsigned long)D_L00_001B0604 << 2);
-    quad.gs[3] |= (unsigned long)D_L00_001B0608 << 4;
-    quad.gs[3] |= (unsigned long)D_L00_001B060C << 6;
-    quad.gs[3] |= (unsigned long)D_L00_001B0610 << 32;
+    quad.gs[1] = GetEffectTextureDescriptor(g_blast_shell_texture_id);
+    quad.gs[3] = (unsigned long)g_blast_shell_gs_flag_a | ((unsigned long)g_blast_shell_gs_flag_b << 2);
+    quad.gs[3] |= (unsigned long)g_blast_shell_gs_flag_c << 4;
+    quad.gs[3] |= (unsigned long)g_blast_shell_gs_flag_d << 6;
+    quad.gs[3] |= (unsigned long)g_blast_shell_gs_flag_e << 32;
     quad.gs[2] = 0xFF9000000260UL;
     quad.gs[0] = 0;
-    quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3] = D_L00_001B0618 + (*(int *)(data+28) << 24);
+    quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3] = g_blast_shell_color + (*(int *)(data+28) << 24);
     vec_clear_128(matrix[0]);
     vec_clear_128(matrix[1]);
     vec_clear_128(matrix[2]);
@@ -65,15 +65,15 @@ void blast_draw_shell_mesh(char *object_)
     do {
         int i;
         for (i=0;i<4;i++) {
-            int vertex_index = D_L00_002983B0[index][i][0];
-            int uv_index = D_L00_002983B0[index][i][1];
-            FastVecScale(quad.vertices[i],D_L00_002976D0[vertex_index],D_L00_001B061C);
-            quad.uv[i][0] = D_L00_00299130[uv_index][0] + D_L00_001B05D4;
-            quad.uv[i][1] = D_L00_00299130[uv_index][1] + D_L00_001B05D8;
-            if (D_L00_002976D0[vertex_index][2] == -0.001052f)
-                quad.colors[i] = D_L00_001B0618;
+            int vertex_index = g_blast_shell_quad_indices[index][i][0];
+            int uv_index = g_blast_shell_quad_indices[index][i][1];
+            FastVecScale(quad.vertices[i],g_blast_shell_vertices[vertex_index],g_blast_shell_scale);
+            quad.uv[i][0] = g_blast_shell_uvs[uv_index][0] + g_blast_uv_scroll_u;
+            quad.uv[i][1] = g_blast_shell_uvs[uv_index][1] + g_blast_uv_scroll_v;
+            if (g_blast_shell_vertices[vertex_index][2] == -0.001052f)
+                quad.colors[i] = g_blast_shell_color;
             else
-                quad.colors[i] = D_L00_001B0618 | (*(int *)(data+28)<<24);
+                quad.colors[i] = g_blast_shell_color | (*(int *)(data+28)<<24);
         }
         matrix_mul_vec3(quad.vertices[0],quad.vertices[0],matrix);
         matrix_mul_vec3(quad.vertices[1],quad.vertices[1],matrix);

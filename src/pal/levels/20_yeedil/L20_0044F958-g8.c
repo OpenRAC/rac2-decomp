@@ -3,7 +3,7 @@
 
 typedef unsigned char u8;
 typedef unsigned short u16;
-extern float D_L20_001B23F8 __attribute__((sda));
+extern float g_yeedil_projectile_radius __attribute__((sda));
 extern void *CreateMoby(int);
 extern void moby_init_child_from_parent(u8 *, u8 *);
 extern float math_random_angle(void);
@@ -30,7 +30,7 @@ typedef struct {
     char *pVars;      
 } Moby449FD0;
 
-char *func_PAL_L20_0044FC48(char *arg0, char *arg1, char *arg2, float arg3, int arg4,
+char *yeedil_projectile_spawn_pal(char *arg0, char *arg1, char *arg2, float arg3, int arg4,
                         float arg5) {
     char *obj;
     char *state;
@@ -45,7 +45,7 @@ char *func_PAL_L20_0044FC48(char *arg0, char *arg1, char *arg2, float arg3, int 
         ((Moby449FD0 *)obj)->state = 1;
         ((Moby449FD0 *)obj)->flags |= 0x100;
         ((Moby449FD0 *)obj)->scale =
-            *(float *)(((Moby449FD0 *)obj)->pClass + 0x24) * D_L20_001B23F8;
+            *(float *)(((Moby449FD0 *)obj)->pClass + 0x24) * g_yeedil_projectile_radius;
         state = ((Moby449FD0 *)obj)->pVars;
         qcopy(state, arg2);
         *(float *)(state + 0x14) = arg3 * 0.019867549f;
@@ -57,20 +57,20 @@ char *func_PAL_L20_0044FC48(char *arg0, char *arg1, char *arg2, float arg3, int 
     return obj;
 }
 
-extern float D_L20_001B2450 __attribute__((sda));
-extern float D_L20_001B2454 __attribute__((sda));
+extern float g_turret_small_turn_step __attribute__((sda));
+extern float g_turret_turn_step __attribute__((sda));
 extern float mat_fast_helper_a(float, float);
 extern float math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f,
                             float g);
 extern float ApproachValue(float *, float, float);
 
-void func_PAL_L20_00450700(char *arg0) {
+void turret_turn_toward_target_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     char *p = arg0 + 0xF8;
     float a = *(float *)(state + 0x140) - *(float *)(arg0 + 0x10);
     float b = *(float *)(state + 0x144) - *(float *)(arg0 + 0x14);
-    float c = D_L20_001B2450 * 6.981318e-06f;
-    float d = D_L20_001B2454 * 0.0003490659f;
+    float c = g_turret_small_turn_step * 6.981318e-06f;
+    float d = g_turret_turn_step * 0.0003490659f;
     float r;
 
     r = mat_fast_helper_a(a, b);

@@ -2,7 +2,7 @@
 #include "names.h"
 typedef int Position __attribute__((mode(TI)));
 extern char g_hero_state[];
-extern float D_L00_001BF228;
+extern float g_hero_ground_height;
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -25,7 +25,7 @@ int hero_check_step_ahead(void)
     first[2] += 0.47f;
     second[2] -= 1.0f;
     if (!CollLine(first, second, 2, *(void **)(base + 0x2290), 0)) return 0;
-    t = D_L00_001BF228 - *(float *)(base + 0x88);
+    t = g_hero_ground_height - *(float *)(base + 0x88);
     if (t < 0.37f) {
         if (-1.0f < t) return 1;
         else return 0;

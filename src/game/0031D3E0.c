@@ -1,7 +1,7 @@
 #include "names.h"
 typedef int Quad_0031D3E0 __attribute__((mode(TI)));
 
-extern int D_L00_001B1DC0 __attribute__((sda));
+extern int g_shot_moby_count __attribute__((sda));
 extern void vec_scale_to_length(void *dst, void *src, float scale);
 extern char *CreateMoby(int kind);
 extern int part_alloc_effect_slot(void *object, void *position, float x, float y, float z);
@@ -18,7 +18,7 @@ char *shot_moby_create(void *position, void *direction,
     char *data;
     unsigned int initial;
 
-    if (D_L00_001B1DC0 < 17)
+    if (g_shot_moby_count < 17)
         return 0;
     object = CreateMoby(0xA82);
     if (object != 0) {

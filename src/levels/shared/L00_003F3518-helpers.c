@@ -14,7 +14,7 @@ typedef struct {
     float w_14C;
 } Aimvec_F0b10;
 
-extern Aimvec_F0b10 D_L00_001B8C80;
+extern Aimvec_F0b10 g_scalar_transition_state;
 
 extern int math_fast_helper_a(char *local, float value);
 extern void matrix_mul_vec3(char *, char *, char *);
@@ -26,9 +26,9 @@ extern int math_lerp_int_fraction(int, int, float);
 extern void gfx_append_point_and_color(char *, int *, char *, int *, int *);
 extern void DrawOffsetBillboardBatch(int, void *, void *, float, float);
 
-extern unsigned short **D_L00_001A9014 __attribute__((sda));
-extern unsigned char *D_L00_001B2514 __attribute__((sda));
-extern unsigned char *D_L00_001B251C __attribute__((sda));
+extern unsigned short **g_level_reloc_record __attribute__((sda));
+extern unsigned char *g_tie_table __attribute__((sda));
+extern unsigned char *g_tie_matrix_table __attribute__((sda));
 
 /* Goes through a list of lit points near the object, keeps the ones in view, and works out
    each colour from how much the point faces the camera. Then it sends them all to be drawn. */
@@ -52,11 +52,11 @@ void gfx_draw_lit_group_points(char *obj)
 
     idx = *(int *)vars;
     count = 0;
-    index_list = D_L00_001A9014[idx];
-    for (; index_list != 0 && ((short)index_list[-1] >= 0 || index_list == D_L00_001A9014[*(int *)vars]) &&
-           (entry = D_L00_001B251C + ((*index_list & 0x7FFF) << 6)) != 0;
+    index_list = g_level_reloc_record[idx];
+    for (; index_list != 0 && ((short)index_list[-1] >= 0 || index_list == g_level_reloc_record[*(int *)vars]) &&
+           (entry = g_tie_matrix_table + ((*index_list & 0x7FFF) << 6)) != 0;
          index_list++) {
-        qcopy(pos, D_L00_001B2514 + ((*index_list & 0x7FFF) << 5));
+        qcopy(pos, g_tie_table + ((*index_list & 0x7FFF) << 5));
         *(float *)(pos + 12) += *(float *)(vars + 0x4C);
         if (math_fast_helper_a(pos, *(float *)(vars + 0x60)) < 0)
             continue;
@@ -72,7 +72,7 @@ void gfx_draw_lit_group_points(char *obj)
             gfx_append_point_and_color(group_point, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
             continue;
         }
-        FastVecSub(scratch, (char *)&D_L00_001B8C80.x_140, group_point);
+        FastVecSub(scratch, (char *)&g_scalar_transition_state.x_140, group_point);
         vec_scale_to_length(scratch, scratch, 1.0f);
         *(TI128 *)facing_base = 0;
         *(float *)(facing_base + 0) = *(float *)(vars + 0x40);

@@ -17,11 +17,11 @@ typedef struct {
     u8 padAC[0xD0 - 0xAC];
     f32 dir[4];
 } Moby43FB08;
-extern s32 D_L18_001B1CB0[2] __attribute__((sda));
-extern s32 D_L18_001B1CB8[2] __attribute__((sda));
-extern s32 D_L18_001B1CE0 __attribute__((sda));
-extern s32 D_L18_001B1CE4 __attribute__((sda));
-extern s32 D_L18_001B1CE8 __attribute__((sda));
+extern s32 g_debris2_piece_speed_range[2] __attribute__((sda));
+extern s32 g_debris2_piece_spread_range[2] __attribute__((sda));
+extern s32 g_debris2_piece_lifetime_a __attribute__((sda));
+extern s32 g_debris2_piece_flags __attribute__((sda));
+extern s32 g_debris2_piece_lifetime_b __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -30,9 +30,9 @@ extern void moby_set_state(void *, int, int);
 extern float math_random_float_range(float, float);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern int snd_play_from_class_bank(int, int, void *, int);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
 
-void func_PAL_L18_00444F60(Moby43FB08 *self) {
+void breakable_l18_debris_update_2_pal(Moby43FB08 *self) {
     f32 lo[4] __attribute__((aligned(16)));
     f32 hi[4] __attribute__((aligned(16)));
     f32 ext[4] __attribute__((aligned(16)));
@@ -51,8 +51,8 @@ void func_PAL_L18_00444F60(Moby43FB08 *self) {
             qcopy(hi, lo);
             FastVecSub(lo, lo, ext);
             FastVecAdd(hi, hi, ext);
-            func_PAL_L00_0032C328(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
-                              D_L18_001B1CE0, 9, D_L18_001B1CE8, 0xFF, 0);
+            part_explode_object_into_pieces_pal(self, lo, g_debris2_piece_spread_range, g_debris2_piece_speed_range, g_debris2_piece_flags, -1,
+                              g_debris2_piece_lifetime_a, 9, g_debris2_piece_lifetime_b, 0xFF, 0);
             snd_play_from_class_bank(0, 0, self, self->uid);
             moby_mark_spawned(self);
         } else {

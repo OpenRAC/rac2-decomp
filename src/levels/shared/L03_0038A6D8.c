@@ -16,7 +16,7 @@ extern void ref_L03_0038A6D8_00(void *);
 extern int flag_is_third_pending_set(u8 *);
 extern void FastVecAdd(void *, void *, void *);
 extern u8 *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);
-extern unsigned short D_0018CDE4;
+extern unsigned short g_timed_effect_id;
 extern unsigned char g_sound_state[];
 /* Only the accessed prefix is described. Indexing still uses the measured
  * 0x70-byte stride, not sizeof this partial view. */
@@ -79,7 +79,7 @@ void timed_state_effect_update(unsigned char *object) {
         SpawnExplosion(&position,0,0,0,0,0x14,0x2D,1,1.0f,20.0f,1,0,0,0);
         if (*(int *)(state + 0x10) != -1 && *(int *)(state + 0x14))
             route_set_node_enabled_flag(*(int *)(state + 0x10), object + 0x10, 1);
-        D_0018CDE4 = 0xFFFF;
+        g_timed_effect_id = 0xFFFF;
         handle = *(int *)(state + 0xD8);
         if (handle != -1) {
             if (((SoundSlotPrefix *)(g_sound_state + handle * 0x70))->owner == object && ((SoundSlotPrefix *)(g_sound_state + handle * 0x70))->active)

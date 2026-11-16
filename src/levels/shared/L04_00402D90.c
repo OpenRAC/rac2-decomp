@@ -2,7 +2,7 @@
 
 extern void anim_start_immediate(void *, int, int);
 extern char g_hero_position[];
-extern unsigned char *D_L04_001B24E8 __attribute__((sda));
+extern unsigned char *g_racer_moby_list __attribute__((sda));
 
 extern signed char *g_moby_l04_pool __attribute__((sda));
 extern void racer_release_sound_handles(int, unsigned char *);
@@ -20,9 +20,9 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern unsigned char *g_route_path_table[];
 extern float fast_vec_dist(void *, void *);
-extern int D_L04_001B2008[] __attribute__((sda));
-extern int D_00138320;
-extern float D_L04_001BDC30;
+extern int g_game_tick_counter[] __attribute__((sda));
+extern int g_pad_pressed_flags;
+extern float g_projection_scale_float;
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float ApproachValue(void *, float, float);
@@ -58,7 +58,7 @@ typedef unsigned int BatchA_A04_u32;
 
 extern BatchA_A04_u32 g_current_map_index[] __attribute__((sda));
 
-extern BatchA_A04_u8 D_001395B8[];
+extern BatchA_A04_u8 g_game_flag_table[];
 
 extern void DrawOrientedQuadsAtPoints(void *a0, void *a1, int a2, unsigned int a3,
                               float f12, float f13, float f14, int t0, int t1);
@@ -173,7 +173,7 @@ extern int coll_test_point(void *, int, float, void *);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void mat_from_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
-extern float D_L04_001BFB00[];
+extern float g_scratch_direction_quad[];
 extern void racer_draw_trail(void *);
 
 /* Moves a flying debris piece, bounces it off the ground and removes it when its timer runs out. */
@@ -228,15 +228,15 @@ void debris_l04_piece_update(unsigned char *moby)
     matrix_mul_vec3(probe, vars + 0x20, moby + 0xc0);
     FastVecAdd(probe, probe, moby + 0x10);
     if (coll_test_point(probe, 0, radius, moby)) {
-        vec_scale_to_length(D_L04_001BFB00, D_L04_001BFB00, 1.0f);
+        vec_scale_to_length(g_scratch_direction_quad, g_scratch_direction_quad, 1.0f);
         speed = FastVecLength(vars);
-        dot = FastVecDot(vars, D_L04_001BFB00);
+        dot = FastVecDot(vars, g_scratch_direction_quad);
         if (dot < 0.0f) {
-            vec_fast_normalize(vars, vars, D_L04_001BFB00);
-            vec_scale_to_length(bounce, D_L04_001BFB00, dot * 0.5f);
+            vec_fast_normalize(vars, vars, g_scratch_direction_quad);
+            vec_scale_to_length(bounce, g_scratch_direction_quad, dot * 0.5f);
             FastVecAdd(vars, vars, bounce);
             vec_scale_to_length(vars, vars, speed);
-            FastVecCross(axis, D_L04_001BFB00, vars);
+            FastVecCross(axis, g_scratch_direction_quad, vars);
             vec_scale_to_length(axis, axis, 1.0f);
             math_build_axis_angle_quat(axis, axis, FastVecLength(vars + 0x10));
             mat_from_rotation(axis, matrix);
@@ -254,8 +254,8 @@ void debris_l04_piece_update(unsigned char *moby)
 BatchA_A04_u32 race_get_course_win_count(BatchA_A04_u8 *course_index) {
     BatchA_A04_u32 level = g_current_map_index[0];
     BatchA_A04_u32 count = 0;
-    if (level == 4) count = D_001395B8[(BatchA_A04_u32)course_index + 0x4D];
-    else if (level == 0xB) count = D_001395B8[(BatchA_A04_u32)course_index + 0x57];
+    if (level == 4) count = g_game_flag_table[(BatchA_A04_u32)course_index + 0x4D];
+    else if (level == 0xB) count = g_game_flag_table[(BatchA_A04_u32)course_index + 0x57];
     return count;
 }
 
@@ -265,8 +265,8 @@ void race_increment_course_win_count(BatchA_A04_u8 *course_index)
 {
     BatchA_A04_u32 level = g_current_map_index[0];
 
-    if (level == 4) D_001395B8[(BatchA_A04_u32)course_index + 0x4D]++;
-    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)course_index + 0x57]++;
+    if (level == 4) g_game_flag_table[(BatchA_A04_u32)course_index + 0x4D]++;
+    else if (level == 0xB) g_game_flag_table[(BatchA_A04_u32)course_index + 0x57]++;
 }
 
 /* shared native body of family A04-table-select: reads the state-selected byte */
@@ -276,8 +276,8 @@ unsigned int race_get_course_finish_count(unsigned char *course_index)
     unsigned int level = g_current_map_index[0];
     unsigned int count = 0;
 
-    if (level == 4) count = D_001395B8[(unsigned int)course_index + 0x52];
-    else if (level == 0xB) count = D_001395B8[(unsigned int)course_index + 0x5C];
+    if (level == 4) count = g_game_flag_table[(unsigned int)course_index + 0x52];
+    else if (level == 0xB) count = g_game_flag_table[(unsigned int)course_index + 0x5C];
     return count;
 }
 
@@ -287,11 +287,11 @@ void race_increment_course_finish_count(BatchA_A04_u8 *course_index)
 {
     BatchA_A04_u32 level = g_current_map_index[0];
 
-    if (level == 4) D_001395B8[(BatchA_A04_u32)course_index + 0x52]++;
-    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)course_index + 0x5C]++;
+    if (level == 4) g_game_flag_table[(BatchA_A04_u32)course_index + 0x52]++;
+    else if (level == 0xB) g_game_flag_table[(BatchA_A04_u32)course_index + 0x5C]++;
 }
 
-extern BatchA_A04_u8 *D_001B26F0 __attribute__((sda));
+extern BatchA_A04_u8 *g_particle_record_pool __attribute__((sda));
 
 extern void part_kill(void *);
 
@@ -302,10 +302,10 @@ void part_refresh_active_records(void)
     int i;
 
     for (i = 0; i < 0x800; i++) {
-        BatchA_A04_u8 kind = *(BatchA_A04_u8 *)((i << 6) + (BatchA_A04_u32)D_001B26F0);
+        BatchA_A04_u8 kind = *(BatchA_A04_u8 *)((i << 6) + (BatchA_A04_u32)g_particle_record_pool);
 
         if (kind == 0x4A || kind == 8 || kind == 0xB || kind == 0xF) {
-            part_kill(D_001B26F0 + (i << 6));
+            part_kill(g_particle_record_pool + (i << 6));
         }
     }
 }
@@ -378,7 +378,7 @@ void racer_reset_state(unsigned char *moby, int keep)
         *(int *)(vars + 0x310) = 0;
         *(int *)(vars + 0x318) = 0;
     }
-    for (other_moby = D_L04_001B24E8; other_moby; other_moby = *(unsigned char **)(other_moby + 0x28)) {
+    for (other_moby = g_racer_moby_list; other_moby; other_moby = *(unsigned char **)(other_moby + 0x28)) {
         unsigned short type = *(unsigned short *)(other_moby + 0xaa);
         if ((unsigned int)(type - 0xb3d /* moby classes 2877-2880 */) < 4 || (short)type == 0x27f /* moby class 639 */ ||
             (short)type == 0x70 /* moby class 112 */ || (short)type == 0x7a /* moby class 122 */) {
@@ -693,7 +693,7 @@ void racer_update_boost(unsigned char *moby)
     float wave, active, angle, sine, radius;
     unsigned int color;
     angle = IntToFloat(period);
-    red = D_L04_001B2008[0] % period;
+    red = g_game_tick_counter[0] % period;
     {
         float phase = (float)red;
         wave = math_fast_sin_or_cos_b(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
@@ -709,7 +709,7 @@ void racer_update_boost(unsigned char *moby)
         moby_update_transform_history_followers(vars + 0x4e0, 1);
         state = vars + 0x4e0;
     } else {
-        if ((moby[0x20] == 3 || (D_00138320 & 10)) && *(int *)(vars + 0x338) < 30 && *(int *)(vars + 0x33c) > 0) {
+        if ((moby[0x20] == 3 || (g_pad_pressed_flags & 10)) && *(int *)(vars + 0x338) < 30 && *(int *)(vars + 0x33c) > 0) {
             *(int *)(vars + 0x338) = 240;
             --*(int *)(vars + 0x33c);
             if (moby[0x20] != 3) snd_play_from_class_bank(0, 0, moby, 0x474);
@@ -753,7 +753,7 @@ void racer_update_boost(unsigned char *moby)
         viewAngle *= 0.008726647f;
         sine = math_fast_sin_or_cos_b(viewAngle);
         sine /= math_fast_sin_or_cos_a(viewAngle);
-        D_L04_001BDC30 = sine;
+        g_projection_scale_float = sine;
         UpdateViewContext();
     }
     if (*(int *)(vars + 0x25c) != -1) {

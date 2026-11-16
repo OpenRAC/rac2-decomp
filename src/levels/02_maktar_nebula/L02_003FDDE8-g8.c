@@ -18,13 +18,13 @@ typedef struct {
     u8 rest[0xdb];
 } HelpEntry;
 
-extern u8 *D_L02_001A904C;
-extern float D_L02_001B3E04;
+extern u8 *g_arena_menu_base;
+extern float g_hud_label_scale;
 extern int g_frame_l02_counter;
 extern HelpInput g_pad_state;
-extern u8 g_item_slot_to_record[], D_001395B8[];
-extern HelpEntry D_L02_00264A70[];
-extern u8 *D_L02_001B1190[] SDATA(D_L02_001B1190);
+extern u8 g_item_slot_to_record[], g_game_flag_table[];
+extern HelpEntry g_material_l02_table[];
+extern u8 *g_arena_challenge_table_2[] SDATA(D_L02_001B1190);
 
 extern void gfx_append_draw_list_packet_c(void);
 extern void *table_find_by_id(u8 *, int);
@@ -34,25 +34,25 @@ extern int arena_get_challenge_save_index(int);
 extern int flag_is_byte_set(void);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 
-extern float D_L02_001B1260 __attribute__((sda));
-extern int D_L02_001B1264 __attribute__((sda));
-extern int D_L02_001B1268 __attribute__((sda));
-extern int D_L02_001B126C __attribute__((sda));
-extern int D_L02_001B1270 __attribute__((sda));
-extern int D_L02_001B1274 __attribute__((sda));
-extern int D_L02_001B1278 __attribute__((sda));
-extern unsigned int D_L02_001B127C __attribute__((sda));
-extern unsigned int D_L02_001B1280 __attribute__((sda));
-extern unsigned int D_L02_001B1288 __attribute__((sda));
-extern unsigned int D_L02_001B128C __attribute__((sda));
+extern float g_help_prompt_scale __attribute__((sda));
+extern int g_help_prompt_x __attribute__((sda));
+extern int g_help_prompt_y __attribute__((sda));
+extern int g_help_prompt_button_x __attribute__((sda));
+extern int g_help_prompt_button_y __attribute__((sda));
+extern int g_help_l02_prompt_next_x __attribute__((sda));
+extern int g_help_l02_prompt_next_y __attribute__((sda));
+extern unsigned int g_help_l02_prompt_color_a __attribute__((sda));
+extern unsigned int g_help_l02_prompt_color_b __attribute__((sda));
+extern unsigned int g_help_prompt_pressed_color __attribute__((sda));
+extern unsigned int g_help_prompt_alt_color __attribute__((sda));
 
-extern int D_L02_001B3E00;
+extern int g_hud_l02_mode;
 
 /* label_y: dead-test HUD helper allowed by owner ruling (7 November 2026; precedent
    src/levels/15_gorn/L15_00431590-g8.c); `one` as active per the func_L01_002F1588 ruling. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L02_001B3E00;
+    int mode = g_hud_l02_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -77,52 +77,52 @@ void arena_draw_menu_help_prompts(u8 *object, int enabled)
     float x3, next_x, x, fy, pulse, half, sc, z;
     HelpEntry *entry_record;
 
-    if (D_L02_001A904C == 0) return;
+    if (g_arena_menu_base == 0) return;
     gfx_append_draw_list_packet_c();
     entry = 0x8710;
     state = *(u8 **)(object + 0x68);
     half = 0.5f;
-    label = (char *)table_find_by_id(D_L02_001A904C + entry, 0x49);
-    x = (float)D_L02_001B1264;
+    label = (char *)table_find_by_id(g_arena_menu_base + entry, 0x49);
+    x = (float)g_help_prompt_x;
     one = 1;
-    fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, one);
+    fy = (float)label_y(label, (float)g_help_prompt_y, g_hud_label_scale, half, one);
     sc = 1.0f;
     z = 0.0f;
-    gfx_draw_scaled_object_two_axes(label, x, D_L02_001B1280, fy, D_L02_001B1260, sc, z);
-    label = (char *)table_find_by_id(D_L02_001A904C + entry, 0x48);
-    x = (float)D_L02_001B1264;
-    fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, 1);
-    gfx_draw_scaled_object_two_axes(label, x, D_L02_001B127C, fy, D_L02_001B1260, sc, z);
+    gfx_draw_scaled_object_two_axes(label, x, g_help_l02_prompt_color_b, fy, g_help_prompt_scale, sc, z);
+    label = (char *)table_find_by_id(g_arena_menu_base + entry, 0x48);
+    x = (float)g_help_prompt_x;
+    fy = (float)label_y(label, (float)g_help_prompt_y, g_hud_label_scale, half, 1);
+    gfx_draw_scaled_object_two_axes(label, x, g_help_l02_prompt_color_a, fy, g_help_prompt_scale, sc, z);
     phase = g_frame_l02_counter % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
-    color = FastTweenColor(D_L02_001B127C, D_L02_001B1280, pulse);
+    color = FastTweenColor(g_help_l02_prompt_color_a, g_help_l02_prompt_color_b, pulse);
     if (enabled) {
         if (*(short *)(state + 0x118) != 0) {
-            label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4b);
+            label = (char *)table_find_by_id(g_arena_menu_base + 0x8710, 0x4b);
             k3 = 1;
-            x3 = (float)D_L02_001B126C;
-            if (g_pad_state.buttons & 0x8000) button_color = D_L02_001B1288; else button_color = color;
-            fy = (float)label_y(label, (float)D_L02_001B1270, D_L02_001B3E04, 0.5f, k3);
-            gfx_draw_scaled_object_two_axes(label, x3, button_color, fy, D_L02_001B1260, 1.0f, 0.0f);
+            x3 = (float)g_help_prompt_button_x;
+            if (g_pad_state.buttons & 0x8000) button_color = g_help_prompt_pressed_color; else button_color = color;
+            fy = (float)label_y(label, (float)g_help_prompt_button_y, g_hud_label_scale, 0.5f, k3);
+            gfx_draw_scaled_object_two_axes(label, x3, button_color, fy, g_help_prompt_scale, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
-            if (D_001395B8[arena_get_challenge_save_index(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
+            if (g_game_flag_table[arena_get_challenge_save_index(*(int *)(g_arena_challenge_table_2[i] + 8))] == 0) continue;
             if (i >= 12 && !flag_is_byte_set()) continue;
             if (i == 7) {
-                entry_record = &D_L02_00264A70[g_item_slot_to_record[0x1e]];
+                entry_record = &g_material_l02_table[g_item_slot_to_record[0x1e]];
                 if (entry_record->available == 0) continue;
             }
             if (i == 8) {
-                entry_record = &D_L02_00264A70[g_item_slot_to_record[0x2a]];
+                entry_record = &g_material_l02_table[g_item_slot_to_record[0x2a]];
                 if (entry_record->available == 0) continue;
             }
-            label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4a);
+            label = (char *)table_find_by_id(g_arena_menu_base + 0x8710, 0x4a);
             one = 1;
-            button_color = (g_pad_state.buttons & 0x2000) ? D_L02_001B128C : color;
-            next_x = (float)D_L02_001B1274;
-            fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
-            gfx_draw_scaled_object_two_axes(label, next_x, button_color, fy, D_L02_001B1260, 1.0f, 0.0f);
+            button_color = (g_pad_state.buttons & 0x2000) ? g_help_prompt_alt_color : color;
+            next_x = (float)g_help_l02_prompt_next_x;
+            fy = (float)label_y(label, (float)g_help_l02_prompt_next_y, g_hud_label_scale, 0.5f, one);
+            gfx_draw_scaled_object_two_axes(label, next_x, button_color, fy, g_help_prompt_scale, 1.0f, 0.0f);
             break;
         }
     }

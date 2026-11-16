@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
-extern float D_L00_0023B510[4][32];
-extern float D_L00_002947B0[5][4];
-extern float D_L00_001B2850[4] MACRO_ADDR;
-extern float D_L00_001AF5F0 __attribute__((sda));
-extern float D_L00_001AF5F4 __attribute__((sda));
-extern float D_L00_001AF5D8 __attribute__((sda));
+extern float g_beam_oscillator_table[4][32];
+extern float g_beam_network_attachment_points[5][4];
+extern float g_beam_network_anchor[4] MACRO_ADDR;
+extern float g_beam_network_phase_a __attribute__((sda));
+extern float g_beam_network_phase_b __attribute__((sda));
+extern float g_charge_minimum __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void beam_update_wobble_points(int, float *, int);
 extern void get_moby_joint_matrices(void *, int, int *, void *);
@@ -35,33 +35,33 @@ void weapon_draw_beam_network(void *object)
     int attachment_count = 5, inner = 0x40, outer = 0x78, channel = 0x47, spark_count = 1;
     VU1_addGSregister(channel, 0x53001ULL);
     state = *(char **)(moby + 0x68);
-    beam_update_wobble_points((int)moby, D_L00_0023B510[0], 4);
+    beam_update_wobble_points((int)moby, g_beam_oscillator_table[0], 4);
     lookup = 0;
     get_moby_joint_matrices(moby, 1, &lookup, matrix);
     matrix[3][0] = 0.0f;
     matrix[3][1] = 0.0f;
     matrix[3][2] = 0.0f;
     matrix[3][3] = 1.0f;
-    D_L00_002947B0[1][0] = math_fast_sin_or_cos_b(D_L00_001AF5F0) * 0.015f + 0.4f;
-    D_L00_002947B0[1][2] = math_fast_sin_or_cos_a(D_L00_001AF5F0) * 0.0149f;
-    D_L00_002947B0[1][1] = -math_fast_sin_or_cos_a(D_L00_001AF5F4) * 0.0151f;
-    D_L00_001AF5F0 = FastAddRotations(D_L00_001AF5F0, 0.4188790917f);
-    D_L00_001AF5F4 = FastAddRotations(D_L00_001AF5F4, 0.4130613208f);
+    g_beam_network_attachment_points[1][0] = math_fast_sin_or_cos_b(g_beam_network_phase_a) * 0.015f + 0.4f;
+    g_beam_network_attachment_points[1][2] = math_fast_sin_or_cos_a(g_beam_network_phase_a) * 0.0149f;
+    g_beam_network_attachment_points[1][1] = -math_fast_sin_or_cos_a(g_beam_network_phase_b) * 0.0151f;
+    g_beam_network_phase_a = FastAddRotations(g_beam_network_phase_a, 0.4188790917f);
+    g_beam_network_phase_b = FastAddRotations(g_beam_network_phase_b, 0.4130613208f);
     for (i = 0; i < attachment_count; i++)
-        transform_vector(attachments[i], D_L00_002947B0[i], matrix);
+        transform_vector(attachments[i], g_beam_network_attachment_points[i], matrix);
     weapon_get_attachment_world_pos(moby, 0, (char *)points[0], (char *)attachments[0]);
     beam_spawn_flare((int)moby, (int)points[0], 0x7F7F2020, inner, 0.11f);
     beam_spawn_flare((int)moby, (int)points[0], 0x7FFF4040, outer, 0.05f);
     weapon_get_attachment_world_pos(moby, 0, (char *)points[1], (char *)attachments[1]);
-    if (D_L00_001B2850[3] == -1.0f) {
-        qcopy(D_L00_001B2850, points[1]);
-        D_L00_001B2850[3] = 0.0f;
+    if (g_beam_network_anchor[3] == -1.0f) {
+        qcopy(g_beam_network_anchor, points[1]);
+        g_beam_network_anchor[3] = 0.0f;
     } else {
         int changed = 0;
-        vec_spring_to_target(D_L00_001B2850, points[1], &changed, 0.25f, 0.2000000179f, 0.5f);
+        vec_spring_to_target(g_beam_network_anchor, points[1], &changed, 0.25f, 0.2000000179f, 0.5f);
     }
-    beam_spawn_flare((int)moby, (int)D_L00_001B2850, 0x7F00397F, inner, *(float *)(state + 0xC) * 0.1856249869f);
-    beam_spawn_flare((int)moby, (int)D_L00_001B2850, 0x7F0072FF, outer, *(float *)(state + 0xC) * 0.08437500149f);
+    beam_spawn_flare((int)moby, (int)g_beam_network_anchor, 0x7F00397F, inner, *(float *)(state + 0xC) * 0.1856249869f);
+    beam_spawn_flare((int)moby, (int)g_beam_network_anchor, 0x7F0072FF, outer, *(float *)(state + 0xC) * 0.08437500149f);
     weapon_get_attachment_world_pos(moby, 1, (char *)points[2], (char *)attachments[2]);
     beam_spawn_flare((int)moby, (int)points[2], 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)points[2], 0x7FFF4040, outer, 0.025f);
@@ -71,54 +71,54 @@ void weapon_draw_beam_network(void *object)
     weapon_get_attachment_world_pos(moby, 3, (char *)points[4], (char *)attachments[4]);
     beam_spawn_flare((int)moby, (int)points[4], 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)points[4], 0x7FFF4040, outer, 0.025f);
-    beam_draw_jittered_curve(moby, points[0], D_L00_001B2850, D_L00_0023B510[0]);
-    vec_compute_ring_normal(moby, D_L00_001B2850, normal, *(float *)(state + 0xC) * 0.35f);
-    FastVecSub(side, D_L00_001B2850, points[2]);
+    beam_draw_jittered_curve(moby, points[0], g_beam_network_anchor, g_beam_oscillator_table[0]);
+    vec_compute_ring_normal(moby, g_beam_network_anchor, normal, *(float *)(state + 0xC) * 0.35f);
+    FastVecSub(side, g_beam_network_anchor, points[2]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2850);
-    beam_draw_jittered_curve(moby, points[2], endpoint, D_L00_0023B510[1]);
+    FastVecAdd(endpoint, side, g_beam_network_anchor);
+    beam_draw_jittered_curve(moby, points[2], endpoint, g_beam_oscillator_table[1]);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > D_L00_001AF5D8)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
         part_l00_spawn_spark_spray(endpoint, spark_count, 0.0f);
-    FastVecSub(side, D_L00_001B2850, points[3]);
+    FastVecSub(side, g_beam_network_anchor, points[3]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2850);
-    beam_draw_jittered_curve(moby, points[3], endpoint, D_L00_0023B510[2]);
+    FastVecAdd(endpoint, side, g_beam_network_anchor);
+    beam_draw_jittered_curve(moby, points[3], endpoint, g_beam_oscillator_table[2]);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > D_L00_001AF5D8)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
         part_l00_spawn_spark_spray(endpoint, spark_count, 0.0f);
-    FastVecSub(side, D_L00_001B2850, points[4]);
+    FastVecSub(side, g_beam_network_anchor, points[4]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0xC) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2850);
-    beam_draw_jittered_curve(moby, points[4], endpoint, D_L00_0023B510[3]);
+    FastVecAdd(endpoint, side, g_beam_network_anchor);
+    beam_draw_jittered_curve(moby, points[4], endpoint, g_beam_oscillator_table[3]);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > D_L00_001AF5D8)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
         part_l00_spawn_spark_spray(endpoint, spark_count, 0.0f);
     moby_transform_joint_to_world(moby, 1, (char *)muzzle);
-    beam_draw_jittered_curve(moby, muzzle, points[2], D_L00_0023B510[3]);
+    beam_draw_jittered_curve(moby, muzzle, points[2], g_beam_oscillator_table[3]);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7FFF4040, outer, 0.025f);
     moby_transform_joint_to_world(moby, 2, (char *)muzzle);
-    beam_draw_jittered_curve(moby, muzzle, points[3], D_L00_0023B510[2]);
+    beam_draw_jittered_curve(moby, muzzle, points[3], g_beam_oscillator_table[2]);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7FFF4040, outer, 0.025f);
     moby_transform_joint_to_world(moby, 3, (char *)muzzle);
-    beam_draw_jittered_curve(moby, muzzle, points[4], D_L00_0023B510[1]);
+    beam_draw_jittered_curve(moby, muzzle, points[4], g_beam_oscillator_table[1]);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0) {

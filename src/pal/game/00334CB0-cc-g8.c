@@ -33,11 +33,11 @@ typedef struct {
 extern unsigned char g_item_slot_to_record[];
 extern ClassRecord333048 g_weapon_table[];
 extern char g_active_camera[];
-extern short D_001B1CF0[] __attribute__((sda));
-extern int D_001AD7EC;
-extern char *D_001BF000[];
-extern float D_001B0C30 __attribute__((sda));
-extern float D_001B0C34 __attribute__((sda));
+extern short g_explosion_moby_index_list[] __attribute__((sda));
+extern int g_turret_target_moby;
+extern char *g_nearby_mobys[];
+extern float g_explode_hurt_distance_a __attribute__((sda));
+extern float g_explode_hurt_distance_b __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
@@ -103,19 +103,19 @@ void func_PAL_00334CB0(char *object)
         direction[0] = *(float *)(object + 0x10) + math_random_signed_float_range(0.0f, 0.15f);
         direction[1] = *(float *)(object + 0x14) + math_random_signed_float_range(0.0f, 0.15f);
         direction[2] = *(float *)(object + 0x18) + math_random_signed_float_range(0.0f, 0.15f);
-        distance = D_001B0C30;
+        distance = g_explode_hurt_distance_a;
         angle = FastAddRotations(angle, math_random_signed_float_range(0.0f, -1.5707965f));
         spark[0] = math_fast_sin_or_cos_a(angle) * 0.020000001f * distance;
         spark[1] = math_fast_sin_or_cos_b(angle) * 0.020000001f * distance;
-        distance = D_001B0C34;
+        distance = g_explode_hurt_distance_b;
         spark[2] = distance * 0.020000001f;
         func_PAL_002C8BD0(direction, spark, 0x10b);
     }
-    RemoveMobyFromIndexList(object, D_001B1CF0);
-    func_PAL_0032DF28(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
+    RemoveMobyFromIndexList(object, g_explosion_moby_index_list);
+    func_PAL_0032DF28(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, g_turret_target_moby);
     count = coll_process_hit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
-        char **list = D_001BF000;
+        char **list = g_nearby_mobys;
         k = count;
         do {
             char *moby = *list;

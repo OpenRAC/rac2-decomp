@@ -23,10 +23,10 @@ extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 extern s32 math_random_int_range(s32, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
-extern u8 *D_L01_001FE180[] NOT_SDA;
-extern u8 D_L01_001B0900[] SDATA(D_L01_001B0900);
+extern u8 *g_path_l01_table[] NOT_SDA;
+extern u8 g_muckdweller_init_data[] SDATA(D_L01_001B0900);
 
-void func_PAL_L01_003E1648(u8 *obj) {
+void muckdweller_init_pal(u8 *obj) {
     u8 *p = *(u8 **)(obj + 0x68);
     s32 idx;
 
@@ -60,11 +60,11 @@ void func_PAL_L01_003E1648(u8 *obj) {
     *(TI128 *)(p + 0x3A0) = *(TI128 *)(obj + 0x10);
     *(s16 *)(p + 0x3D8) = 0;
     if (*(s32 *)(p + 0x3C0) != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[*(s32 *)(p + 0x3C0)]);
+        path_l01_compute_segment_lengths(g_path_l01_table[*(s32 *)(p + 0x3C0)]);
     }
     idx = *(s32 *)(p + 0x3BC);
     if (idx != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[idx]);
+        path_l01_compute_segment_lengths(g_path_l01_table[idx]);
     }
     qcopy(p + 0x2B0, obj + 0x10);
     *(f32 *)(p + 0x2C0) = 0.3f;
@@ -84,7 +84,7 @@ void func_PAL_L01_003E1648(u8 *obj) {
     moby_set_controller_speed_limits(obj, 0.0032000002f, 0.080000006f, 0.00307178f, 0.2303835f);
     *(f32 *)(p + 0xF0) = *(f32 *)(obj + 0x2C);
     *(f32 *)(p + 0xE0) = *(f32 *)(p + 0x30);
-    *(void **)(p + 0xC0) = D_L01_001B0900;
+    *(void **)(p + 0xC0) = g_muckdweller_init_data;
     *(s32 *)(obj + 0xF4) = 0;
     *(s32 *)(obj + 0xF0) = 0;
     qzero_nc(p + 0x210);

@@ -5,7 +5,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern u8 g_hero_state[];
-extern float D_L12_001B1844 __attribute__((sda));
+extern float g_guard_aim_distance __attribute__((sda));
 
 /* Picks the point the guard aims at. It uses a spot above the object the guard is holding, or
    the hero, or the guard's current target. */
@@ -27,7 +27,7 @@ void guard_update_aim_point(u8 *moby) {
     }
     hero = g_hero_state;
     if (*(int *)(vars + 0x200) == *(int *)(hero + 0x2290)) {
-        if (D_L12_001B1844 < vec_distance_xy(moby + 0x10, hero + 0x80)) {
+        if (g_guard_aim_distance < vec_distance_xy(moby + 0x10, hero + 0x80)) {
             qcopy(vars + 0x1F0, hero + 0xD0);
         } else {
             qcopy(vars + 0x1F0, hero + 0xE0);

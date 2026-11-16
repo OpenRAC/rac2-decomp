@@ -5,9 +5,9 @@ typedef unsigned int u32;
 
 typedef int s32;
 
-extern s32 D_L24_001B1B70[] __attribute__((sda));
+extern s32 g_menu_stream_chunk_keys[] __attribute__((sda));
 
-extern u32 D_L24_001B1B74[] __attribute__((sda));
+extern u32 g_menu_stream_chunk_flags[] __attribute__((sda));
 
 typedef unsigned char u8;
 
@@ -21,7 +21,7 @@ typedef struct {
     u32 flags;
 } Chunk;
 
-extern int D_001B1F50[] __attribute__((sda));
+extern int g_menu_chunk_table[] __attribute__((sda));
 extern s32 g_pause_menu_state[];
 
 /* Fills the chunk table at D_001B1F50 with (key, flags) pairs: the keys step
@@ -52,35 +52,35 @@ void menu_stream_chunk_table_init(s32 param)
     idx = 0;
     lim = n1;
     while (idx < lim) {
-        ((Chunk *)D_001B1F50)[idx].key = key1;
-        ((Chunk *)D_001B1F50)[idx].flags = 0;
+        ((Chunk *)g_menu_chunk_table)[idx].key = key1;
+        ((Chunk *)g_menu_chunk_table)[idx].flags = 0;
         key1 += 0x11800;
         idx++;
     }
     lim += n2;
     while (idx < lim) {
-        ((Chunk *)D_001B1F50)[idx].key = key2;
-        ((Chunk *)D_001B1F50)[idx].flags = 0;
+        ((Chunk *)g_menu_chunk_table)[idx].key = key2;
+        ((Chunk *)g_menu_chunk_table)[idx].flags = 0;
         key2 += 0x11800;
         idx++;
     }
     lim += n3;
     while (idx < lim) {
-        ((Chunk *)D_001B1F50)[idx].key = key1;
-        ((Chunk *)D_001B1F50)[idx].flags = 1;
+        ((Chunk *)g_menu_chunk_table)[idx].key = key1;
+        ((Chunk *)g_menu_chunk_table)[idx].flags = 1;
         key1 += 0x4F000;
         idx++;
     }
     lim += n4;
     while (idx < lim) {
-        ((Chunk *)D_001B1F50)[idx].key = key2;
-        ((Chunk *)D_001B1F50)[idx].flags = 1;
+        ((Chunk *)g_menu_chunk_table)[idx].key = key2;
+        ((Chunk *)g_menu_chunk_table)[idx].flags = 1;
         key2 += 0x4F000;
         idx++;
     }
     while (idx < 5) {
-        ((Chunk *)D_001B1F50)[idx].flags = 0;
-        ((Chunk *)D_001B1F50)[idx].key = 0;
+        ((Chunk *)g_menu_chunk_table)[idx].flags = 0;
+        ((Chunk *)g_menu_chunk_table)[idx].key = 0;
         idx++;
     }
 }
@@ -124,16 +124,16 @@ int release_menu_stream_buffer(int key)
     return 0;
 }
 
-extern int D_001B1F50[] __attribute__((sda));
-extern int D_001B1F54[] __attribute__((sda));
+extern int g_menu_chunk_table[] __attribute__((sda));
+extern int g_menu_chunk_flags[] __attribute__((sda));
 
 /* Finds the stream chunk with this key and returns its size (large or small), or -1 if there is none. */
 int menu_stream_chunk_get_size(int key)
 {
     int count = 0;
     unsigned int large = 0x4F000;
-    int *flags = D_001B1F54;
-    int *keys = D_001B1F50;
+    int *flags = g_menu_chunk_flags;
+    int *keys = g_menu_chunk_table;
     do {
         count++;
         if (*keys == key)
@@ -148,8 +148,8 @@ int menu_stream_chunk_get_size(int key)
 /* Marks the stream chunk with this key as holding the latch. Returns 0 if found, 1 if not. */
 s32 menu_stream_chunk_set_latch(s32 key) {
  s32 count=0;
- u32 *flags=D_L24_001B1B74;
- s32 *keys=D_L24_001B1B70;
+ u32 *flags=g_menu_stream_chunk_flags;
+ s32 *keys=g_menu_stream_chunk_keys;
  do {
   count++;
   if(*keys!=key) {flags+=2;keys+=2;continue;}
@@ -163,8 +163,8 @@ int menu_stream_chunk_clear_latch(int key)
 {
     int count = 0;
     int mask = -5;
-    int *flags = D_001B1F54;
-    int *keys = D_001B1F50;
+    int *flags = g_menu_chunk_flags;
+    int *keys = g_menu_chunk_table;
     do {
         count++;
         if (*keys != key) {
@@ -199,8 +199,8 @@ extern void clock_to_local_time(unsigned char *);
 extern void map_copy_band_colours(void);
 extern void map_fill_buffer(void *);
 extern void save_build_packet(int);
-extern unsigned char D_001A7360[8] __attribute__((sda));
-extern unsigned char D_0018D278[];
+extern unsigned char g_cd_clock_buffer[8] __attribute__((sda));
+extern unsigned char g_map_occlusion_data[];
 extern int g_current_map_index __attribute__((sda));
 extern unsigned char g_memcard_state[];
 extern void save_load_game_data_reset_menu(int, int);
@@ -209,10 +209,10 @@ extern void save_load_game_data_reset_menu(int, int);
 void save_start_to_slot(int saveName, int slotIndex)
 {
     unsigned char *state = g_memcard_state;
-    sceCdReadClock((CdClock *)D_001A7360);
-    clock_to_local_time(D_001A7360);
+    sceCdReadClock((CdClock *)g_cd_clock_buffer);
+    clock_to_local_time(g_cd_clock_buffer);
     map_copy_band_colours();
-    map_fill_buffer(D_0018D278 + (g_current_map_index << 11));
+    map_fill_buffer(g_map_occlusion_data + (g_current_map_index << 11));
     save_build_packet(saveName);
     *(int *)(state + 0x174) = saveName;
     *(short *)(state + 0x18) = slotIndex;
@@ -228,8 +228,8 @@ void save_clear_slot_and_start(int saveName, int slotIndex)
 {
     unsigned char *state;
     save_load_game_data_reset_menu(saveName, slotIndex);
-    sceCdReadClock((CdClock *)D_001A7360);
-    clock_to_local_time(D_001A7360);
+    sceCdReadClock((CdClock *)g_cd_clock_buffer);
+    clock_to_local_time(g_cd_clock_buffer);
     save_build_packet(saveName);
     state = g_memcard_state;
     *(int *)(state + 0x148) = 0;

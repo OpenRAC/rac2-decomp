@@ -16,13 +16,13 @@ typedef struct {
     int row;        /* 0x38 */
 } BoltState;
 
-extern int D_L11_001B25A0 __attribute__((sda));
-extern int D_L11_001B25A4 __attribute__((sda));
-extern float D_L11_001B25A8 __attribute__((sda));
-extern float D_L11_001B25C0 __attribute__((sda));
-extern float D_L11_001B25C8 __attribute__((sda));
-extern float D_L11_001B25DC __attribute__((sda));
-extern BoltBuffer D_L11_00264760[];
+extern int g_lightning_point_count __attribute__((sda));
+extern int g_lightning_rebuild_flag __attribute__((sda));
+extern float g_lightning_bolt_length __attribute__((sda));
+extern float g_lightning_start_angle __attribute__((sda));
+extern float g_lightning_l11_horizontal_phase __attribute__((sda));
+extern float g_lightning_vertical_angle __attribute__((sda));
+extern BoltBuffer g_ribbon_row_table[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -36,18 +36,18 @@ void ResetBoltPointsToLine(char *object)
     Vector *prev;
     int i;
 
-    if (D_L11_001B25A4) {
-        D_L11_001B25A4 = 0;
+    if (g_lightning_rebuild_flag) {
+        g_lightning_rebuild_flag = 0;
         FastVecSub(&delta, &state->end, &state->start);
-        vec_scale_to_length(&step, &delta, D_L11_001B25A8 / (float)D_L11_001B25A0);
-        qcopy_nc(&D_L11_00264760[state->row].core[0], &state->start);
-        for (i = 1; i < D_L11_001B25A0; i++) {
+        vec_scale_to_length(&step, &delta, g_lightning_bolt_length / (float)g_lightning_point_count);
+        qcopy_nc(&g_ribbon_row_table[state->row].core[0], &state->start);
+        for (i = 1; i < g_lightning_point_count; i++) {
             /* Previous point: the row's points from index -1. */
-            prev = &D_L11_00264760[state->row].core[-1];
-            FastVecAdd(&D_L11_00264760[state->row].core[i], &prev[i], &step);
+            prev = &g_ribbon_row_table[state->row].core[-1];
+            FastVecAdd(&g_ribbon_row_table[state->row].core[i], &prev[i], &step);
         }
-        D_L11_001B25C0 = 0.0f;
-        D_L11_001B25C8 = 0.0f;
-        D_L11_001B25DC = 0.0f;
+        g_lightning_start_angle = 0.0f;
+        g_lightning_l11_horizontal_phase = 0.0f;
+        g_lightning_vertical_angle = 0.0f;
     }
 }

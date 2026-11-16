@@ -22,7 +22,7 @@ typedef struct {
     s32 field44;
 } BarlowUtilityQueueView;
 
-extern s32 D_L04_001A8F00 __attribute__((sda));
+extern s32 g_game_l04_mode __attribute__((sda));
 
 extern s32 req_pop_queue(BarlowUtilityQueueView *, s32 *, s32 *);
 

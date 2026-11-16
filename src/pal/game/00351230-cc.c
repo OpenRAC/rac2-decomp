@@ -5,8 +5,8 @@
 #include "common.h"
 
 extern char *g_movie_player_state[] __attribute__((sda));
-extern int D_001A7478[] __attribute__((sda));
-extern int D_001A7A00[] __attribute__((sda));
+extern int g_loader_state_word[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 typedef struct { char pad[0x1a0]; union { unsigned long long held; int words[2]; } buttons; } MoviePad;
 extern MoviePad g_pad_state;
@@ -14,7 +14,7 @@ typedef struct { char pad[0x5c]; int f5C; } MovieVoice;
 extern MovieVoice g_sound_state;
 extern void FlushCache(s32);
 extern int sceGsSyncV(int);
-extern void func_PAL_002B9BB8(void);
+extern void pad_poll_ports_pal(void);
 extern void mpeg_dec_set_state_running(char *);
 extern s32 readBufBeginPut(u8 *, u8 **);
 extern int mpeg_read_disc_sectors(int *, u8 *, int, int);
@@ -37,7 +37,7 @@ extern int snd_Pump(void);
 extern int mpeg_is_audio_buffer_full(void);
 extern int mpeg_vobuf_is_empty(char *);
 
-int func_PAL_00351230(char *vd, char *rb, int *file) {
+int read_mpeg_pal(char *vd, char *rb, int *file) {
     int armed = 0;
     int aborted = 0;
     int started = 0;
@@ -58,13 +58,13 @@ int func_PAL_00351230(char *vd, char *rb, int *file) {
     while (left >= 5 && videoDecGetState(vd) != 3) {
         int hit = 0;
 
-        func_PAL_002B9BB8();
+        pad_poll_ports_pal();
         if (g_pad_state.buttons.words[0] == 0) armed = 1;
-        if (armed && (n = D_001A7478[0]) != 3) {
+        if (armed && (n = g_loader_state_word[0]) != 3) {
             if (n == 2 && g_pad_state.buttons.words[0] != 0 &&
                 g_pad_state.buttons.words[1] == 0) {
                 hit = 1;
-            } else if (((D_001A7A00[2] & 0xffff0000) || D_001A7478[0] != 0 ||
+            } else if (((g_player_stats[2] & 0xffff0000) || g_loader_state_word[0] != 0 ||
                         g_current_map_index[0] <= 0) && (g_pad_state.buttons.words[1] & 0x800)) {
                 hit = 1;
             } else if ((g_pad_state.buttons.held & 0x8000000000FULL) == 0x8000000000FULL) {

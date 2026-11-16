@@ -14,7 +14,7 @@ extern void ref_L05_004247C8_08(float *, int, int, int, float, float, float);
 extern float ref_L05_004247C8_09(float, float);
 extern float ref_L05_004247C8_10(float);
 
-void func_PAL_L05_0042A078(char *obj) {
+void part_spawn_ring_sparkles_pal(char *obj) {
     float v[4];
     char *state;
     int color;

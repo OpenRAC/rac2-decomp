@@ -11,11 +11,11 @@ extern f32 math_random_float_range(f32 a, f32 b);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
-extern int D_L15_001A9018[] __attribute__((sda));
-extern unsigned short **D_L15_001A9014[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C9C[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C94[] __attribute__((sda));
-extern short D_L15_00227500[];
+extern int g_gorn_group_count[] __attribute__((sda));
+extern unsigned short **g_gorn_group_paths[] __attribute__((sda));
+extern unsigned char *g_gorn_group_record_base[] __attribute__((sda));
+extern unsigned char *g_gorn_aim_record_base[] __attribute__((sda));
+extern short g_gorn_group_class_table[];
 extern float vec_distance_xy(void *, void *);
 extern float math_random_angle(void);
 extern float math_fast_sin_or_cos_b(float);
@@ -41,7 +41,7 @@ extern void euler_rotation_basis(void *, void *);
    (two more saved registers); written at their use after the walk, as below, they stay in the
    loop.  The sign test is a store followed by a conditional store, which gives retail's
    `bc1f` with the first store in its slot and lets the constant 1 be shared by both stores. */
-void func_PAL_L15_0043EDE0(unsigned char *a0)
+void gorn_group_aim_update_pal(unsigned char *a0)
 {
     unsigned char *state = *(unsigned char **)(a0 + 0x68);
     unsigned short *p;
@@ -58,11 +58,11 @@ void func_PAL_L15_0043EDE0(unsigned char *a0)
     case 0:
         best = -1;
         bestd = 9999.0f;
-        for (i = 0; i < D_L15_001A9018[0]; i++) {
-            for (p = D_L15_001A9014[0][i];
-                 p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L15_001A9014[0][i]);
+        for (i = 0; i < g_gorn_group_count[0]; i++) {
+            for (p = g_gorn_group_paths[0][i];
+                 p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_gorn_group_paths[0][i]);
                  p++) {
-                e = D_L15_001B2C9C[0] + ((*p & 0x7FFF) << 6);
+                e = g_gorn_group_record_base[0] + ((*p & 0x7FFF) << 6);
                 if (e == 0)
                     break;
                 d = vec_distance_xy(e + 0x30, a0 + 0x10);
@@ -88,13 +88,13 @@ void func_PAL_L15_0043EDE0(unsigned char *a0)
             moby_mark_spawned(a0);
             return;
         }
-        for (q = D_L15_001A9014[0][*(int *)state];
-             q != 0 && ((q != 0 && (short)q[-1] >= 0) || q == D_L15_001A9014[0][*(int *)state]);
+        for (q = g_gorn_group_paths[0][*(int *)state];
+             q != 0 && ((q != 0 && (short)q[-1] >= 0) || q == g_gorn_group_paths[0][*(int *)state]);
              q++) {
-            e = D_L15_001B2C94[0] + ((*q & 0x7FFF) << 5);
+            e = g_gorn_aim_record_base[0] + ((*q & 0x7FFF) << 5);
             if (e == 0)
                 break;
-            cls = D_L15_00227500[e[0x1D]];
+            cls = g_gorn_group_class_table[e[0x1D]];
             if (cls == 0xD34)
                 level_set_record_payload_by_key(state + 0x40, 1, (short)*q, state + 0x680);
             if (cls == 0xD33)

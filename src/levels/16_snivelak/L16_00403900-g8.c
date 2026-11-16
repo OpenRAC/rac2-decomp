@@ -18,27 +18,27 @@ extern void multiply_matrix3x3(void *, void *, void *);
 
 extern void transform_vector(void *, void *, void *);
 
-extern s32 D_L16_001B18F0 __attribute__((sda));
+extern s32 g_snivelak_attach_rotation __attribute__((sda));
 
-extern s32 D_L16_001B18E0 __attribute__((sda));
+extern s32 g_snivelak_attach_offset __attribute__((sda));
 
-extern s32 D_L16_001B1704 __attribute__((sda));
+extern s32 g_snivelak_voice_cue_count __attribute__((sda));
 
-extern char D_L16_00189E20[] __attribute__((nosda));
+extern char g_hero_l16_moby[] __attribute__((nosda));
 
-extern float D_L16_001B1708 __attribute__((sda));
+extern float g_snivelak_hover_height_offset __attribute__((sda));
 
-extern float D_L16_00189EF8 __attribute__((nosda));
+extern float g_snivelak_hover_limit __attribute__((nosda));
 
 extern void anim_start_blended(void *, s32, s32, void *);
 
 extern u32 g_current_map_index[1];
 
-extern float D_L16_001B1444 __attribute__((sda));
+extern float g_snivelak_angle_limit __attribute__((sda));
 
-extern float D_L16_001B1448 __attribute__((sda));
+extern float g_snivelak_angle_rate __attribute__((sda));
 
-extern char D_L16_001B9B00[];
+extern char g_scene_origin_transform[];
 
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 
@@ -77,11 +77,11 @@ extern void math_approach_target_with_braking(void *, float, float, float, float
 extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
                           s32, s32, s32, s32);
 
-extern char D_L16_001A63A8[] __attribute__((nosda));
+extern char g_snivelak_voice_cues[] __attribute__((nosda));
 
-extern char D_L16_001B1850[] __attribute__((nosda));
+extern char g_str_snivelak_voice_debug_a[] __attribute__((nosda));
 
-extern char D_L16_001B1870[] __attribute__((nosda));
+extern char g_str_snivelak_voice_debug_b[] __attribute__((nosda));
 
 extern void STUB_printf(void *);
 
@@ -106,9 +106,9 @@ void snivelak_attach_child_to_parent_pose(u8 *child, u8 *parent)
 
     moby_set_state(child, 1, -1);
     *(u16 *)(child + 0x34) |= 0x100;
-    euler_rotation_basis(basis, &D_L16_001B18F0);
+    euler_rotation_basis(basis, &g_snivelak_attach_rotation);
     multiply_matrix3x3(child + 0xC0, parent, basis);
-    transform_vector(child + 0x10, &D_L16_001B18E0, parent);
+    transform_vector(child + 0x10, &g_snivelak_attach_offset, parent);
 }
 
 /* Raises the level's one-shot flag while the counter is low, then hands the sub-object
@@ -121,17 +121,17 @@ void snivelak_play_voice_cues(u8 *moby)
     u8 *voice;
 
     vars = *(u8 **)(moby + 0x68);
-    hero = D_L16_00189E20;
+    hero = g_hero_l16_moby;
     if (*(s32 *)(hero + 0x2294) == 0x39) {
         if (*(s32 *)(hero + 0x1B8) == 0) {
-            STUB_printf(D_L16_001B1850);
+            STUB_printf(g_str_snivelak_voice_debug_a);
             snd_play_unplayed_voice_line(moby, 0x1C, 0x20);
-            D_L16_001B1704++;
+            g_snivelak_voice_cue_count++;
         }
     }
-    voice = D_L16_001A63A8;
+    voice = g_snivelak_voice_cues;
     if (*(s16 *)(voice + 0x72) == 3 && *(s16 *)(voice + 0x6C) < 0x1770) {
-        STUB_printf(D_L16_001B1870);
+        STUB_printf(g_str_snivelak_voice_debug_b);
         snd_resume_music_stream();
     }
     math_fast_float_d(vars + 0x350);
@@ -149,16 +149,16 @@ void snivelak_switch_fly_hover_state(u8 *moby)
 
     vars = *(u8 **)(moby + 0x68);
     if (*(s32 *)(vars + 0x26C) != 0) {
-        if (*(float *)(vars + 0x264) + D_L16_001B1708 > D_L16_00189EF8) {
+        if (*(float *)(vars + 0x264) + g_snivelak_hover_height_offset > g_snivelak_hover_limit) {
             *(s32 *)(vars + 0x26C) = 0;
             *(s32 *)(vars + 0x270) = *(u8 *)(moby + 0x20);
             *(s32 *)(vars + 0x274) = *(u8 *)(moby + 0x95);
             moby_set_state(moby, 0x10, 4);
         }
     } else {
-        hero = D_L16_00189E20;
+        hero = g_hero_l16_moby;
         if (*(s32 *)(hero + 0x2294) != 0x81
-            && *(float *)(vars + 0x264) + D_L16_001B1708 < *(float *)(hero + 0xD8)) {
+            && *(float *)(vars + 0x264) + g_snivelak_hover_height_offset < *(float *)(hero + 0xD8)) {
             *(s32 *)(vars + 0x268) = 0;
             *(s32 *)(vars + 0x26C) = 1;
             if (*(u8 *)(moby + 0x43) != 0x16)
@@ -220,13 +220,13 @@ s32 snivelak_boss_update(u8 *moby)
         *(u8 *)(vars + 0x4A) = FloatToInt(32.0f);
     }
     if (*(u8 *)(moby + 0x31) != 0) {
-        if (fast_vec_dist(moby + 0x10, D_L16_001B9B00) < 24.0f) {
+        if (fast_vec_dist(moby + 0x10, g_scene_origin_transform) < 24.0f) {
             moby_update_ground_check(moby);
             *(u8 *)(moby + 0x6F) = 0x16;
         }
     }
-    math_update_wrapped_angle_offset(moby, vars + 0x284, vars + 0x278, D_L16_001B1444,
-                  D_L16_001B1448 * 0.00029088825f, -1.0f);
+    math_update_wrapped_angle_offset(moby, vars + 0x284, vars + 0x278, g_snivelak_angle_limit,
+                  g_snivelak_angle_rate * 0.00029088825f, -1.0f);
     gfx_update_color_fade(moby, vars + 0x140);
     hit = part_find_owned_effect_slot(moby, 0x10000, 0);
     if (FastDecTimer(vars + 0x26) == 0)
@@ -260,15 +260,15 @@ s32 snivelak_boss_update(u8 *moby)
 }
 
 extern void moby_bob_along_sine_wave(void *);
-extern float D_L16_00189EA8 __attribute__((nosda));
-extern u8 *D_L16_001B9B50 __attribute__((nosda));
-extern float D_L16_001B16FC __attribute__((sda));
-extern float D_L16_001B1700 __attribute__((sda));
+extern float g_snivelak_part_threshold __attribute__((nosda));
+extern u8 *g_linked_node_state_ptr __attribute__((nosda));
+extern float g_snivelak_camera_distance __attribute__((sda));
+extern float g_snivelak_camera_height __attribute__((sda));
 extern void follow_camera_set_distance(s32, float, float);
 extern void follow_camera_set_height(float, float);
 extern float IntToFloat(s32);
 extern void hud_start_overlay(s32, s32, float);
-extern s32 D_L16_001B2648[] __attribute__((sda));
+extern s32 g_frame_l16_counter[] __attribute__((sda));
 extern u8 *snivelak_spawn_rock_projectile(void *, s32);
 extern s32 moby_pack_handle(void *);
 extern void moby_set_light_color(void *, s32);
@@ -281,8 +281,8 @@ extern char *SpawnEA7Moby(void *, void *, void *, s32, float);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern float D_L16_001B16E0 __attribute__((sda));
-extern u8 D_L16_00189EF0[] __attribute__((nosda));
+extern float g_snivelak_shot_speed __attribute__((sda));
+extern u8 g_snivelak_shot_origin[] __attribute__((nosda));
 extern void FastVecScale(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, s32, void *);
 extern float vec_length_xy(void *);
@@ -290,9 +290,9 @@ extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float FastAddRotations(float, float);
 extern void moby_update_eased_node(void *, void *, s32, float, float);
-extern u8 D_L16_00189F30[] __attribute__((nosda));
-extern float D_L16_001B1640 __attribute__((sda));
-extern float D_L16_001B1644 __attribute__((sda));
+extern u8 g_turret_aim_vector[] __attribute__((nosda));
+extern float g_turret_ease_rate_a __attribute__((sda));
+extern float g_turret_ease_rate_b __attribute__((sda));
 
 /* Updates a boss part each frame: follows the parent, makes sounds and moves the children. */
 void snivelak_part_update(u8 *moby)
@@ -304,13 +304,13 @@ void snivelak_part_update(u8 *moby)
     if (*(s32 *)(state + 0x26C) != 0)
         moby_bob_along_sine_wave(moby);
     if (moby[0x95] != 0) {
-        if (D_L16_00189EA8 > 118.0f && *(s16 *)(D_L16_001B9B50 + 0x86) == 0) {
+        if (g_snivelak_part_threshold > 118.0f && *(s16 *)(g_linked_node_state_ptr + 0x86) == 0) {
             rate = 0.003f;
-            follow_camera_set_distance(0, D_L16_001B16FC, rate);
-            follow_camera_set_height(D_L16_001B1700, rate);
+            follow_camera_set_distance(0, g_snivelak_camera_distance, rate);
+            follow_camera_set_height(g_snivelak_camera_height, rate);
         }
         hud_start_overlay(11, 0, *(float *)(state + 0x20) / IntToFloat(*(s16 *)(state + 0x24)));
-        if ((D_L16_001B2648[0] & 31) == (((s32)moby >> 8) & 31))
+        if ((g_frame_l16_counter[0] & 31) == (((s32)moby >> 8) & 31))
             snivelak_spawn_rock_projectile(moby, 0);
         moby_update_ground_check(moby);
     }
@@ -342,7 +342,7 @@ void turret_l16_aim_at_hero(u8 *moby)
     if (moby[0x20] != 4) {
         aimPoint = state + 0x1F0;
         value = fast_vec_dist(partPos, aimPoint) - 1.0f;
-        FastVecScale(target, D_L16_00189F30, value + value);
+        FastVecScale(target, g_turret_aim_vector, value + value);
         target[2] = 0.0f;
         FastVecAdd(target, target, aimPoint);
         FastVecSub(partPos, target, partPos);
@@ -358,6 +358,6 @@ void turret_l16_aim_at_hero(u8 *moby)
         scale = 0.085f;
         *(float *)(state + 0x2B8) = FastAddRotations(*(float *)(state + 0x298), 0.523598849773407f);
     }
-    moby_update_eased_node(moby, state + 0x250, 0, D_L16_001B1640 * scale, D_L16_001B1644 * scale);
-    moby_update_eased_node(moby, state + 0x2D0, 1, D_L16_001B1640 * scale, D_L16_001B1644 * scale);
+    moby_update_eased_node(moby, state + 0x250, 0, g_turret_ease_rate_a * scale, g_turret_ease_rate_b * scale);
+    moby_update_eased_node(moby, state + 0x2D0, 1, g_turret_ease_rate_a * scale, g_turret_ease_rate_b * scale);
 }

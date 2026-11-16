@@ -1,9 +1,9 @@
 #include "common.h"
 
 extern void STUB_printf(const char *, ...);
-extern const char D_L06_001AA660[];
+extern const char g_str_l06_debug_message[];
 extern char *g_path_list[];
-extern float D_L06_001B9A90[];
+extern float g_aim_direction[];
 extern void vec_scale_to_length(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
 extern unsigned char *effect_create_timed(void *, void *, int, int, float, unsigned char, short, unsigned char);
@@ -20,7 +20,7 @@ void DrawPath(void *data, int path, int owner, int flags, int stride, float scal
     int one;
 
     if (path == -1) {
-        STUB_printf(D_L06_001AA660);
+        STUB_printf(g_str_l06_debug_message);
         return;
     }
     polygon = g_path_list[path];
@@ -35,7 +35,7 @@ void DrawPath(void *data, int path, int owner, int flags, int stride, float scal
         while (index < (polygon ? *(int *)polygon : 0)) {
             /* cse reuses this 1 for the case-1 compare, kept in $s1 across the call. */
             one = 1;
-            vec_scale_to_length(advance, D_L06_001B9A90, scale * 1.2f);
+            vec_scale_to_length(advance, g_aim_direction, scale * 1.2f);
             qcopy(point, polygon + (index * 16 + 0x10));
             switch (flags & 7) {
             case 1:

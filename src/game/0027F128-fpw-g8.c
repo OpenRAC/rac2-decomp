@@ -3,13 +3,13 @@
 
 typedef unsigned char u8;
 typedef unsigned long u64;
-extern int D_001B1668 __attribute__((nosda));
-extern int D_001A89B0[8] __attribute__((sda));
+extern int g_screen_flag_enabled __attribute__((nosda));
+extern int g_text_color_table[8] __attribute__((sda));
 extern int measure_text_width(u8 *, int, u8 *);
 extern void FontPrintScaled(u64, u8 *, int, u64, u8 *, float, float, float);
 extern void text_draw_line(int, int, u64, u8 *, int, u64, u8 *);
 extern int g_current_game_mode __attribute__((section(".sdata")));
-extern int D_001B166C __attribute__((sda));
+extern int g_text_flag_enabled __attribute__((sda));
 extern int g_screen_width __attribute__((nosda));
 extern int g_screen_height __attribute__((nosda));
 extern void gfx_set_scissor_clamped(int, int, int, int);
@@ -35,7 +35,7 @@ void FontPrintWindow(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4,
 
     if (g_current_game_mode != 1)
         gfx_set_scissor_clamped(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
-    D_001B166C = 1;
+    g_text_flag_enabled = 1;
     if ((win->flags ^ 1) & 1) {
         W = win->x_max - win->x_anchor;
     } else {
@@ -63,7 +63,7 @@ void FontPrintWindow(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4,
             while (width < W) {
                 if (text[i] == 0x20 || text[i] < 0x10)
                     brk = i;
-                if (D_001B1668 != 0 && (unsigned char)(text[i] - 8) < 8)
+                if (g_screen_flag_enabled != 0 && (unsigned char)(text[i] - 8) < 8)
                     colr = text[i] - 8;
                 if (text[i] < 2)
                     break;
@@ -121,20 +121,20 @@ void FontPrintWindow(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4,
             if (dw->out_w < w)
                 dw->out_w = w;
             if (!(dw->flags & 4)) {
-                D_001A89B0[0] = a1;
+                g_text_color_table[0] = a1;
                 if (dw->flags & 8) {
                     float fx;
                     if (dw->flags & 1)
                         fx = (dw->x_anchor - (w >> 1)) + dw->x_sub * 0.0625f;
                     else
                         fx = dw->x_anchor + dw->x_sub * 0.0625f;
-                    FontPrintScaled((long)D_001A89B0[colr_arr[k]], text + start[k], cnt, a4, glyphs,
+                    FontPrintScaled((long)g_text_color_table[colr_arr[k]], text + start[k], cnt, a4, glyphs,
                                   fx, y + dw->y_sub * 0.0625f, 1.0f);
                 } else if (dw->flags & 1) {
-                    text_draw_line(dw->x_anchor - (w >> 1), y, (long)D_001A89B0[colr_arr[k]],
+                    text_draw_line(dw->x_anchor - (w >> 1), y, (long)g_text_color_table[colr_arr[k]],
                                   text + start[k], cnt, a4, glyphs);
                 } else {
-                    text_draw_line(dw->x_anchor, y, (long)D_001A89B0[colr_arr[k]],
+                    text_draw_line(dw->x_anchor, y, (long)g_text_color_table[colr_arr[k]],
                                   text + start[k], cnt, a4, glyphs);
                 }
             }
@@ -145,7 +145,7 @@ void FontPrintWindow(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4,
             }
         }
     }
-    D_001B166C = 0;
+    g_text_flag_enabled = 0;
     if (g_current_game_mode != 1)
         gfx_set_scissor_clamped(0, g_screen_width - 1, 0, g_screen_height - 1);
 }

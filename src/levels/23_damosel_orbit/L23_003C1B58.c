@@ -17,11 +17,11 @@ extern char g_hero_state[];
 
 extern char *g_hero_moby;
 
-extern int D_L23_001B1644 __attribute__((sda));
+extern int g_enemy_relocate_slot_count __attribute__((sda));
 
-extern int D_L23_001B164C __attribute__((sda));
+extern int g_boss_part_index __attribute__((sda));
 
-extern int D_L23_001B36AC __attribute__((sda));
+extern int g_enemy_relocate_count __attribute__((sda));
 
 extern void *D_L23_002AB170[];
 
@@ -111,6 +111,6 @@ tail:
     enemy_reset_calm(moby);
     moby_set_state(moby, 5, 0);
     moby_play_anim_and_link(moby, 3, 0, 0x14, 3, 1.0f);
-    D_L23_001B164C = (D_L23_001B164C + 1) % D_L23_001B1644;
-    D_L23_001B36AC = D_L23_001B36AC + 1;
+    g_boss_part_index = (g_boss_part_index + 1) % g_enemy_relocate_slot_count;
+    g_enemy_relocate_count = g_enemy_relocate_count + 1;
 }

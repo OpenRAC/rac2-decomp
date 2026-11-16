@@ -24,7 +24,7 @@ typedef struct {
 
 extern char g_pause_menu_state[];
 extern char g_camera_eye_state[];
-extern float D_001B90F0[];
+extern float g_fov_tangent[];
 
 extern void gfx_select_packet_buffer_setup(void);
 extern void select_moby_context(int);
@@ -52,7 +52,7 @@ void RestoreMenuDisplayState(void)
     qcopy(dst, src);
     src = (TI128 *)((char *)pause_state + 0x60);
     qcopy(dst + 1, src);
-    *(float *)D_001B90F0 = pause_state->field_0F8;
+    *(float *)g_fov_tangent = pause_state->field_0F8;
     select_moby_context(0);
     gfx_apply_display_config();
     mode = pause_state->field_01C;

@@ -6,7 +6,7 @@ extern void ref_L00_00417700_00(void *, void *);
 extern float math_random_float_range(float, float);
 extern void gfx_draw_billboard_quad(void *, int, int, int, float, float, float);
 
-void func_PAL_L00_0041C878(char *object)
+void beam_glow_sprites_update_owned_pal(char *object)
 {
     int address = (int)g_spark_l00_records;
     char *pos = (char *)(address + 0x30);

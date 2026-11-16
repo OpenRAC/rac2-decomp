@@ -14,7 +14,7 @@ extern void func_002FDBD8_2(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisCon
                                     float *vector, int mode);
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_PAL_L00_003C7128(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void moby_apply_active_effect_pal(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {
@@ -27,7 +27,7 @@ extern void BuildObjectAttachmentTransforms();
 extern void moby_update_attached_transforms(unsigned char *, unsigned char *);
 extern float FastAddRotations(float, float);
 
-void func_PAL_L00_003C6C58(unsigned char *a0) {
+void tracked_state_update_pal(unsigned char *a0) {
     unsigned char *s0 = a0;
     unsigned char *s1 = *(unsigned char **)(s0 + 0x68);
     switch (s0[0x20]) {

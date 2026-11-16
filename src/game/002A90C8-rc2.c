@@ -25,9 +25,9 @@
 #include "common.h"
 
 extern void part_queue_impact_effect(s32 a, s32 b, s32 c, s32 d, s32 e, float duration);
-extern s8 D_001A8BD0[];
+extern s8 g_default_effect_vector[];
 
 /* Calls the general effect starter with a fixed default table and the given duration. */
 void part_start_effect_default_table(s32 a, s32 b, s32 c, s32 d, float duration) {
-    part_queue_impact_effect(a, b, c, d, (s32)D_001A8BD0, duration);
+    part_queue_impact_effect(a, b, c, d, (s32)g_default_effect_vector, duration);
 }

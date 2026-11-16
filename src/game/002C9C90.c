@@ -18,16 +18,16 @@ typedef struct {
 } CameraBlock;
 
 extern CameraBlock g_active_camera;
-extern s32 D_001B5580;
-extern s32 D_001B5590;
+extern s32 g_sway_vector;
+extern s32 g_camera_reset_word;
 
 void cam_reset_active_position(void) {
     g_active_camera.pos[0] = 256.0f;
     g_active_camera.pos[2] = 64.0f;
     g_active_camera.pos[1] = 256.0f;
     qzero_nc(&g_active_camera.matrix[0].f[0]);
-    qzero_nc(&D_001B5580);
-    qzero_nc(&D_001B5590);
+    qzero_nc(&g_sway_vector);
+    qzero_nc(&g_camera_reset_word);
     g_active_camera.matrix[0].f[0] = 1.0f;
     g_active_camera.matrix[1].f[1] = 1.0f;
     g_active_camera.matrix[2].f[2] = 1.0f;

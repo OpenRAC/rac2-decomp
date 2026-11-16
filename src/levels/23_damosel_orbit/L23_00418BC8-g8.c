@@ -8,7 +8,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B16B8 __attribute__((sda));
+extern float g_clear_path_check_length __attribute__((sda));
 
 extern float fast_vec_dist(float *, float *);
 extern void FastVecAdd(float *, float *, float *);
@@ -28,7 +28,7 @@ int mothership_check_clear_path(char *obj, TI128 *startPos, TI128 *endPos) {
     points[0] = *endPos;
     mothership_project_point_onto_surface((char *)&points[0], *(float *)(state + 0x54) + *(float *)(state + 0x50));
     FastVecSub((float *)&points[1], (float *)&points[0], (float *)startPos);
-    vec_scale_to_length((float *)&points[1], (float *)&points[1], D_L23_001B16B8);
+    vec_scale_to_length((float *)&points[1], (float *)&points[1], g_clear_path_check_length);
     points[4] = *startPos;
     points[2] = *startPos;
     mothership_project_point_onto_surface((char *)&points[2], *(float *)(state + 0x54) + *(float *)(state + 0x50));
@@ -36,7 +36,7 @@ int mothership_check_clear_path(char *obj, TI128 *startPos, TI128 *endPos) {
     do {
         float d = fast_vec_dist((float *)&points[4], (float *)&points[0]);
 
-        if (d < D_L23_001B16B8) {
+        if (d < g_clear_path_check_length) {
             if (d < 0.0f)
                 return 1;
             vec_scale_to_length((float *)&points[5], (float *)&points[1], d);

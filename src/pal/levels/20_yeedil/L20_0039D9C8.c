@@ -10,9 +10,9 @@ typedef struct YeedilEffectState {
     int unused190;
     char *second;
 } YeedilEffectState;
-extern YeedilEffectState D_L20_001BDCC0;
-extern int D_L20_001A8F00[] __attribute__((sda));
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
+extern YeedilEffectState g_yeedil_state_prefix;
+extern int g_hero_vehicle_mode[] __attribute__((sda));
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float math_random_float_range(float, float);
@@ -21,7 +21,7 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 extern int math_random_int_below(int);
 extern void func_PAL_002BEF58(void *, void *, int, float);
 
-void func_PAL_L20_0039D9C8(unsigned char *object)
+void spark_l20_burst_update_pal(unsigned char *object)
 {
     float position[4], velocity[4];
     float speed, heading, tilt;
@@ -33,13 +33,13 @@ void func_PAL_L20_0039D9C8(unsigned char *object)
         object[0x20] = 1;
         break;
     case 1:
-        if (D_L20_001A8F00[0] != 2)
+        if (g_hero_vehicle_mode[0] != 2)
             break;
-        state = &D_L20_001BDCC0;
+        state = &g_yeedil_state_prefix;
         if (state->mode != 7)
             break;
         if (state->frame == 131)
-            func_PAL_L00_003FB330(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
+            SpawnExplosion_pal(state->second + 0x10, 1, 40, 20, 30, 40, 50, 1,
                           1, 1, 0, 0, 1.5f, 20.0f);
         if ((unsigned int)(state->frame - 143) < 124) {
             moby_transform_joint_to_world(state->first, 0, position);

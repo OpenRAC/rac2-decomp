@@ -8,7 +8,7 @@ extern float fast_vec_dist(char *, void *);
 extern void moby_update_ground_check(char *);
 extern float FastAddRotations(float, float);
 extern void enemy_spawn_child_parts(char *, char *, s32, s32);
-extern void func_PAL_003273B8(char *, char *, s32, void *, float);
+extern void enemy_attach_turn_child_parts_pal(char *, char *, s32, void *, float);
 extern void group_sync_counter(char *, char *);
 extern char *part_find_owned_effect_slot(char *, s32, s32);
 extern s32 func_PAL_002B1A50(char *, char *, s32);
@@ -16,14 +16,14 @@ extern void matrix_from_basis_rows(char *, char *);
 extern void cam_compute_view_direction(char *, char *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, char *);
 extern void moby_set_state(char *, s32, s32);
-extern char D_L11_001BA8C0[];
-extern char D_L11_001A8F20[] __attribute__((sda));
-extern s32 D_001A8FF4;
-extern void func_PAL_L11_00451FD0(char *);
+extern char g_hero_l11_position[];
+extern char g_identity_l11_matrix[] __attribute__((sda));
+extern s32 g_enemy_ai_frozen;
+extern void smasher_robot_deactivate_pal(char *);
 extern void smasher_robot_update_pairing(char *);
 
 /* Initializes the object and its child rig, then updates aim, damage and activation. */
-void func_PAL_L11_00451848(char *object)
+void smasher_robot_update_aim_and_init_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *hit, *other;
@@ -59,18 +59,18 @@ void func_PAL_L11_00451848(char *object)
         *(int *)(state + 0x49C) = 0;
         enemy_spawn_child_parts(object, state + 0x4A0, 0, 1);
         *(short *)(state + 0x4CA) = 0;
-        func_PAL_L11_00451FD0(object);
+        smasher_robot_deactivate_pal(object);
     }
-    if (*(short *)(state + 0x4D2) == 0 && *(u8 *)(object + 0x20) != 11 && !D_001A8FF4) {
+    if (*(short *)(state + 0x4D2) == 0 && *(u8 *)(object + 0x20) != 11 && !g_enemy_ai_frozen) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        if (*(u8 *)(object + 0x31) && fast_vec_dist(object + 0x10, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(object);
             *(u8 *)(object + 0x6F) = 22;
         }
     } else *(u16 *)(object + 0x34) &= 0xFBFF;
     angle = FastAddRotations(*(float *)(state + 0x49C), *(float *)(state + 0x4AC) * 0.01745329424738884f);
     *(float *)(state + 0x49C) = angle;
-    func_PAL_003273B8(object, state + 0x4A0, 1, D_L11_001A8F20, angle);
+    enemy_attach_turn_child_parts_pal(object, state + 0x4A0, 1, g_identity_l11_matrix, angle);
     group_sync_counter(object, state + 0x4BC);
     if (*(u8 *)(object + 0x20) >= 3) {
         hit = part_find_owned_effect_slot(object, 0x10000, 1);
@@ -93,5 +93,5 @@ void func_PAL_L11_00451848(char *object)
         }
     }
     if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
-        func_PAL_L11_00451FD0(object);
+        smasher_robot_deactivate_pal(object);
 }

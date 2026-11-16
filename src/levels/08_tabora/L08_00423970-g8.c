@@ -31,14 +31,14 @@ extern void part_l08_spawn_spark_shower(void *, void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void SetDeathBits(void *, int, int);
-extern char *D_L08_001BFF58 NOT_SDA;
-extern int D_L08_001B2508 MACRO_ADDR;
+extern char *g_hero_moby_target NOT_SDA;
+extern int g_frame_l08_counter MACRO_ADDR;
 extern struct { char pad[0x2294]; int state; int pad2298; int secondaryState; } g_hero_state;
-extern char D_L08_001A8F20[] __attribute__((sda));
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80;
-extern unsigned char D_L08_001B2840[] __attribute__((sda));
-extern unsigned char D_0019B2E8[];
-extern s32 D_L08_001B29DC __attribute__((sda));
+extern char g_str_effect_name[] __attribute__((sda));
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_a;
+extern unsigned char g_moby_state_flags[] __attribute__((sda));
+extern unsigned char g_moby_group_flags[];
+extern s32 g_moby_array __attribute__((sda));
 typedef struct {
     int state;
     char pad04[8];
@@ -48,9 +48,9 @@ typedef struct {
     char pad2C[0xC];
     float secondHeight;
 } HeightGate;
-extern HeightGate D_L08_001CA080;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
-extern unsigned char D_0019B4A8[];
+extern HeightGate g_init_context;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_b;
+extern unsigned char g_moby_nibble_table[];
 
 extern int g_current_map_index MACRO_ADDR;
 extern void sandfly_check_hit(char *);
@@ -64,7 +64,7 @@ extern int moby_l08_is_linked_gone_4(int);
 extern int moby_l08_is_linked_gone_3(int);
 extern int moby_l08_is_linked_running_or_gone_2(int);
 extern void STUB_printf(char *, int, int);
-extern char D_L08_002B5600[];
+extern char g_str_sandfly_debug[];
 extern int FastDecTimer(short *);
 extern void anim_start_blended(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
@@ -78,14 +78,14 @@ void sandfly_update(char *actor) {
     int condition;
     float local[4];
     float z;
-    int mode = D_L08_001CA080.mode;
+    int mode = g_init_context.mode;
     if (mode != 0) {
         float height = *(float *)(actor + 0x18);
-        if (height < D_L08_001CA080.height && D_L08_001CA080.state == 1) return;
-        if (D_L08_001CA080.height < height && D_L08_001CA080.state == 0) return;
+        if (height < g_init_context.height && g_init_context.state == 1) return;
+        if (g_init_context.height < height && g_init_context.state == 0) return;
         if (mode == 2) {
-            if (D_L08_001CA080.secondHeight < height && D_L08_001CA080.state == 1) return;
-            if (height < D_L08_001CA080.secondHeight && D_L08_001CA080.state == mode) return;
+            if (g_init_context.secondHeight < height && g_init_context.state == 1) return;
+            if (height < g_init_context.secondHeight && g_init_context.state == mode) return;
         }
     }
     vars = *(char **)(actor + 0x68);
@@ -94,13 +94,13 @@ void sandfly_update(char *actor) {
     case 0: {
         int id = *(int *)(vars + 0x184);
         if (id != -1) {
-            char *other = (char *)D_L08_001B29DC + (id << 8);
+            char *other = (char *)g_moby_array + (id << 8);
             if (*(unsigned char *)(other + 0xB0) != 255) {
                 unsigned short tag = *(unsigned short *)(other + 0xB2);
-                if (D_L08_0021EAF0.flags[(short)tag] ||
-                    ((D_0019B4A8[((short)tag >> 1) + (g_current_map_index << 10)] >> ((tag & 1) ? 4 : 0)) & 7)) {
+                if (g_moby_spawn_state_flags_b.flags[(short)tag] ||
+                    ((g_moby_nibble_table[((short)tag >> 1) + (g_current_map_index << 10)] >> ((tag & 1) ? 4 : 0)) & 7)) {
                     unsigned short ownTag = *(unsigned short *)(actor + 0xB2);
-                    if ((D_0019B4A8[((short)ownTag >> 1) + (g_current_map_index << 10)] >> ((ownTag & 1) ? 4 : 0)) & 7) goto destroy;
+                    if ((g_moby_nibble_table[((short)ownTag >> 1) + (g_current_map_index << 10)] >> ((ownTag & 1) ? 4 : 0)) & 7) goto destroy;
                 }
             }
         }
@@ -123,7 +123,7 @@ void sandfly_update(char *actor) {
         case 1:
             if (*(int *)(vars + 0x180) != -1) ready = moby_l08_is_linked_running_2(*(int *)(vars + 0x180)) != 0;
             else {
-                STUB_printf(D_L08_002B5600, *(short *)(actor + 0xAA), *(short *)(actor + 0xB2));
+                STUB_printf(g_str_sandfly_debug, *(short *)(actor + 0xAA), *(short *)(actor + 0xB2));
                 *(unsigned char *)(vars + 0x18B) = 0;
             }
             break;
@@ -190,7 +190,7 @@ normalize:
         FIELD(vars, float, 0x178) -= 0.0027222223579883575f;
         FIELD(actor, float, 0x18) += 0.75f;
         if (coll_test_point(actor + 0x10, 0.75f, 0, actor)) {
-            if (D_L08_001BFF58 == 0 || FIELD(D_L08_001BFF58, s16, 0xAA) != 0x945 /* moby class 2373 */) {
+            if (g_hero_moby_target == 0 || FIELD(g_hero_moby_target, s16, 0xAA) != 0x945 /* moby class 2373 */) {
                 if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
                 FIELD(vars, s16, 0x1B8) = math_random_int_range(180, 360);
                 moby_set_state(actor, 5, -1);
@@ -209,7 +209,7 @@ normalize:
     case 5: {
         float angle = FIELD(vars, float, 0x16C);
         float phase;
-        if (FIELD(actor, u16, 0x96) == 0 || D_L08_001B2508 % 50 == FIELD(actor, s16, 0xB2) % 50) {
+        if (FIELD(actor, u16, 0x96) == 0 || g_frame_l08_counter % 50 == FIELD(actor, s16, 0xB2) % 50) {
             if (angle > 0.0f) angle = math_random_float_range(0.2f, 0.5f) * -1.5707963705062866f;
             else angle = math_random_float_range(0.2f, 0.5f) * 1.5707963705062866f;
         }
@@ -217,7 +217,7 @@ normalize:
         FIELD(vars, float, 0x164) = math_fast_sin_or_cos_b(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
         FIELD(vars, s32, 0x168) = 0;
         FastVecAdd(vars + 0x160, vars + 0x160, actor + 0x10);
-        phase = math_wrap_angle_to_pi(IntToFloat(D_L08_001B2508) * 0.025f);
+        phase = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.025f);
         sandfly_pick_flight_target(actor);
         if (sandfly_move_toward_target(actor, 360.0f, 180.0f, 560.0f, 20.0f, 0.0f, 16.0f,
                               FIELD(vars, float, 0x15C) + 1.7f + 1.0f + math_fast_sin_or_cos_b(phase), -2.0f))
@@ -395,26 +395,26 @@ normalize:
         u32 bits;
         if (flag_set_first_pending(actor)) PlayMobySound(1, 0, actor);
         part_spawn_ground_sparkles(actor);
-        part_l08_spawn_spark_shower(actor, D_L08_001A8F20);
+        part_l08_spawn_spark_shower(actor, g_str_effect_name);
         SpawnExplosionEffects(actor, vars + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 1, 0x810001);
         snd_stop_queued(actor);
         SetDeathBits(actor, 0, 3);
-        D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = FIELD(actor, u8, 0xB0) + 2;
+        g_moby_spawn_state_flags_a.flags[FIELD(actor, s16, 0xB2)] = FIELD(actor, u8, 0xB0) + 2;
         kind = FIELD(actor, u8, 0xB0);
-        if (kind == 255 || (!(D_L08_001B2840[(u8)kind] & 0x80) &&
-                            (D_0019B2E8[(u8)kind + (g_current_map_index << 4)] & 0x80))) {
-            D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = kind + 2;
+        if (kind == 255 || (!(g_moby_state_flags[(u8)kind] & 0x80) &&
+                            (g_moby_group_flags[(u8)kind + (g_current_map_index << 4)] & 0x80))) {
+            g_moby_spawn_state_flags_b.flags[FIELD(actor, s16, 0xB2)] = kind + 2;
         }
         tag = FIELD(actor, u16, 0xB2);
         if (tag & 1) {
-            bits = D_0019B4A8[((s16)tag >> 1) + (g_current_map_index << 10)];
+            bits = g_moby_nibble_table[((s16)tag >> 1) + (g_current_map_index << 10)];
             if (((bits >> 4) & 7) != 7)
-                D_0019B4A8[((s16)tag >> 1) + (g_current_map_index << 10)] = bits + 0x10;
+                g_moby_nibble_table[((s16)tag >> 1) + (g_current_map_index << 10)] = bits + 0x10;
         } else {
-            bits = D_0019B4A8[((s16)tag >> 1) + (g_current_map_index << 10)];
+            bits = g_moby_nibble_table[((s16)tag >> 1) + (g_current_map_index << 10)];
             if ((bits & 7) != 7)
-                D_0019B4A8[((s16)tag >> 1) + (g_current_map_index << 10)] = bits + 1;
+                g_moby_nibble_table[((s16)tag >> 1) + (g_current_map_index << 10)] = bits + 1;
         }
 destroy:
         moby_mark_spawned(actor);

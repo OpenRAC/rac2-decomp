@@ -8,16 +8,16 @@ extern int request_begin_slot(int, int, int, int, int);
 
 extern void SetBackgroundColor(int, int, int);
 
-extern int D_001ABD80 __attribute__((sda));
-extern int D_001ABD84 __attribute__((sda));
+extern int g_moby_hide_mode_a __attribute__((sda));
+extern int g_moby_hide_mode_b __attribute__((sda));
 
-extern int D_001B1608[] __attribute__((sda));
-extern char *D_001B1B5C;
-extern char *D_001B1B64;
+extern int g_world_draw_callback_count[] __attribute__((sda));
+extern char *g_moby_pool_start;
+extern char *g_moby_context_aux;
 
 extern char *g_dma_packet_cursor;
-extern int D_001ABD88[2] __attribute__((sda));
-extern char D_00261D10[];
+extern int g_shadow_pass_table[2] __attribute__((sda));
+extern char g_shadow_packet_records[];
 extern void shadow_draw_pass(int, int);
 
 /* func_002DF380 is here for the compiler, not for $gp: the SDK compiler of
@@ -52,11 +52,11 @@ void moby_show_all(void)
 void gfx_shadow_submit_packet(int pass, int tableIndex, int recordIndex)
 {
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 0x0) = 0x30000003;
-    *(int *)(*(char *volatile *)&g_dma_packet_cursor + 0x4) = (int)(D_00261D10 + recordIndex * 0x30);
+    *(int *)(*(char *volatile *)&g_dma_packet_cursor + 0x4) = (int)(g_shadow_packet_records + recordIndex * 0x30);
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 0x8) = 0x13000000;
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 0xC) = 0x50000003;
     g_dma_packet_cursor = *(char *volatile *)&g_dma_packet_cursor + 0x10;
-    shadow_draw_pass(pass, D_001ABD88[tableIndex]);
+    shadow_draw_pass(pass, g_shadow_pass_table[tableIndex]);
 }
 
 /* Hides every game object by setting a hidden mark on each one, and remembers the two arguments. */
@@ -67,21 +67,21 @@ void moby_hide_all(int firstArg, int secondArg)
     char *p;
 
     request_begin_slot(7, 1, 0, 0, 0);
-    D_001ABD84 = secondArg;
-    D_001ABD80 = firstArg;
-    D_001B1608[0] = 0;
+    g_moby_hide_mode_b = secondArg;
+    g_moby_hide_mode_a = firstArg;
+    g_world_draw_callback_count[0] = 0;
     SetBackgroundColor(0, 0, 0);
-    start = D_001B1B5C;
-    end = D_001B1B64;
+    start = g_moby_pool_start;
+    end = g_moby_context_aux;
     for (p = start; p < end; p += 0x100) {
         *(unsigned short *)(p + 0x34) |= 0x80;
     }
 }
 
-extern char *D_001B20B4;
-extern int D_001B20BC __attribute__((section(".sdata")));
-extern void *D_001A72D0 __attribute__((sda));
-extern char D_001ABD90[];
+extern char *g_dma_list_tail;
+extern int g_dma_list_max_size __attribute__((section(".sdata")));
+extern void *g_vram_cursor __attribute__((sda));
+extern char g_str_display_list_size[];
 extern int BuildShrubTextureDma(void *);
 extern void gfx_append_vu1_preset_a(void);
 extern void STUB_printf(const char *, ...);
@@ -89,23 +89,23 @@ extern void STUB_printf(const char *, ...);
 /* Links the two graphics packet lists together, checks how big the frame got, warns if it is too large and keeps the biggest size seen. */
 void gfx_link_display_lists_track_size(void)
 {
-    char *other = *(char *volatile *)&D_001B20B4;
+    char *other = *(char *volatile *)&g_dma_list_tail;
     char *saved = *(char *volatile *)&g_dma_packet_cursor;
     char *next;
     int size;
     g_dma_packet_cursor = saved + 16;
     *(unsigned int *)other = 0x20000000;
-    *(int *)(*(char *volatile *)&D_001B20B4 + 4) = (int)*(char *volatile *)&g_dma_packet_cursor;
-    *(int *)(*(char *volatile *)&D_001B20B4 + 8) = 0;
-    *(int *)(*(char *volatile *)&D_001B20B4 + 12) = 0;
-    size = BuildShrubTextureDma(D_001A72D0);
+    *(int *)(*(char *volatile *)&g_dma_list_tail + 4) = (int)*(char *volatile *)&g_dma_packet_cursor;
+    *(int *)(*(char *volatile *)&g_dma_list_tail + 8) = 0;
+    *(int *)(*(char *volatile *)&g_dma_list_tail + 12) = 0;
+    size = BuildShrubTextureDma(g_vram_cursor);
     gfx_append_vu1_preset_a();
     if (size > 0x400000)
-        STUB_printf(D_001ABD90);
-    if (*(volatile int *)&D_001B20BC < size)
-        D_001B20BC = size;
+        STUB_printf(g_str_display_list_size);
+    if (*(volatile int *)&g_dma_list_max_size < size)
+        g_dma_list_max_size = size;
     *(unsigned int *)(*(char *volatile *)&g_dma_packet_cursor) = 0x20000000;
-    next = *(char *volatile *)&D_001B20B4 + 16;
+    next = *(char *volatile *)&g_dma_list_tail + 16;
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 4) = (int)next;
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 8) = 0;
     *(int *)(*(char *volatile *)&g_dma_packet_cursor + 12) = 0;
@@ -118,9 +118,9 @@ void gfx_link_display_lists_track_size(void)
 
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
-extern const char D_001AB998[];
-extern const char D_001AB9F8[];
-extern struct { int text; int pad; } D_00258D70[];
+extern const char g_str_two_string_fmt[];
+extern const char g_str_localized_text_fmt[];
+extern struct { int text; int pad; } g_menu_text_id_table[];
 
 /* Builds the text for a location name into the buffer. Most locations get a prefix word first. */
 char *text_format_location_name(char *buf, int kind) {
@@ -141,9 +141,9 @@ char *text_format_location_name(char *buf, int kind) {
         break;
     }
     if (flag) {
-        sprintf(buf, D_001AB998, GetLocalizedString(0xB44), GetLocalizedString(D_00258D70[kind].text));
+        sprintf(buf, g_str_two_string_fmt, GetLocalizedString(0xB44), GetLocalizedString(g_menu_text_id_table[kind].text));
     } else {
-        sprintf(buf, D_001AB9F8, GetLocalizedString(D_00258D70[kind].text));
+        sprintf(buf, g_str_localized_text_fmt, GetLocalizedString(g_menu_text_id_table[kind].text));
     }
     return buf;
 }

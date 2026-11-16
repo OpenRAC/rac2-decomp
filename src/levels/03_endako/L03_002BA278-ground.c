@@ -6,7 +6,7 @@
 
 extern float FastVecDot(void *, void *);
 extern float ApproachValue(float *, float, float);
-extern int D_L03_001A8FF0 MACRO_ADDR;
+extern int g_hero_l03_block_flag MACRO_ADDR;
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_clear_128(void *);
 extern int GetCollHitMaterial(void);
@@ -15,8 +15,8 @@ extern void FastVecScale(void *, void *, float);
 typedef int GroundQuad __attribute__((mode(TI)));
 typedef struct { char prefix[0x18]; unsigned char *object; int count; float position[4]; char gap[16]; float normal[4]; } GroundCollision;
 extern int g_current_map_index __attribute__((sda));
-extern int D_L03_001A8FF4 __attribute__((sda));
-extern GroundCollision D_L03_001BFDC0;
+extern int g_hero_l03_lock_flag __attribute__((sda));
+extern GroundCollision g_hero_ground_collision;
 extern int hero_is_in_special_kind_or_mode(void);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int func_L00_002E2048(void);
@@ -150,13 +150,13 @@ void UpdateEndakoHeroGroundContacts(void)
     BuildOffsetVectorPair(start, end, 1, reach, -48.0f);
     if (CollLine(start, end, 2, g_hero_state.moby, 0)) {
         g_hero_state.groundSoundClass = func_L00_002E2048();
-        if (D_L03_001BFDC0.object)
+        if (g_hero_ground_collision.object)
             g_hero_state.groundSoundClass = 0;
-        if (g_current_map_index == 7 && D_L03_001BFDC0.object)
+        if (g_current_map_index == 7 && g_hero_ground_collision.object)
             g_hero_state.groundSoundClass = 1;
         g_hero_state.groundType = GetCollHitMaterial();
         if (!g_hero_state.groundType) {
-            g_hero_state.waterSurfaceZ = coll_get_ground_height_at_position(D_L03_001BFDC0.position, &g_hero_state.waterSurfaceNormal);
+            g_hero_state.waterSurfaceZ = coll_get_ground_height_at_position(g_hero_ground_collision.position, &g_hero_state.waterSurfaceNormal);
             if (g_hero_state.position.z < g_hero_state.waterSurfaceZ && g_hero_state.inWaterFrames < 1)
                 g_hero_state.inWaterFrames = 1;
             if (!CollLine(start, end, 0x24, g_hero_state.moby, 0))
@@ -164,27 +164,27 @@ void UpdateEndakoHeroGroundContacts(void)
             g_hero_state.groundSoundClass = func_L00_002E2048();
         }
         if (g_hero_state.groundType != 1 || (unsigned int)(g_hero_state.field_2294 - 0x79) > 1) {
-            if (D_L03_001BFDC0.object) {
+            if (g_hero_ground_collision.object) {
                 unsigned char *record;
-                if (moby_is_in_special_class_range((char *)D_L03_001BFDC0.object))
+                if (moby_is_in_special_class_range((char *)g_hero_ground_collision.object))
                     g_hero_state.onFlaggedGroundMoby = 1;
-                record = (unsigned char *)moby_get_private_value_0(D_L03_001BFDC0.object);
+                record = (unsigned char *)moby_get_private_value_0(g_hero_ground_collision.object);
                 if (record && (*(unsigned short *)(record + 0x1e) & 8))
                     g_hero_state.onFlaggedGroundMoby = 1;
-                record = (unsigned char *)moby_get_private_value_2(D_L03_001BFDC0.object);
+                record = (unsigned char *)moby_get_private_value_2(g_hero_ground_collision.object);
                 if (record && (*(unsigned int *)(record + 0x3c) & 8))
                     g_hero_state.onFlaggedGroundMoby = 1;
             }
-            if (D_L03_001BFDC0.count > 0) {
-                qcopy(&g_hero_state.groundPoint, D_L03_001BFDC0.position);
-                g_hero_state.groundZ = D_L03_001BFDC0.position[2];
-                if (D_L03_001A8FF0)
-                    g_hero_state.groundZ = gravity_get_center_distance((char *)D_L03_001BFDC0.position);
+            if (g_hero_ground_collision.count > 0) {
+                qcopy(&g_hero_state.groundPoint, g_hero_ground_collision.position);
+                g_hero_state.groundZ = g_hero_ground_collision.position[2];
+                if (g_hero_l03_block_flag)
+                    g_hero_state.groundZ = gravity_get_center_distance((char *)g_hero_ground_collision.position);
                 g_hero_state.groundDistance = fast_vec_dist(&g_hero_state.position, &g_hero_state.groundPoint);
-                g_hero_state.groundMoby = (int)D_L03_001BFDC0.object;
-                func_001290E0(&g_hero_state.groundNormal, D_L03_001BFDC0.normal);
-                g_hero_state.groundSlope = cam_get_view_space_angle(D_L03_001BFDC0.normal);
-                g_hero_state.downhillYaw = mat_fast_helper_a(D_L03_001BFDC0.normal[0], D_L03_001BFDC0.normal[1]);
+                g_hero_state.groundMoby = (int)g_hero_ground_collision.object;
+                func_001290E0(&g_hero_state.groundNormal, g_hero_ground_collision.normal);
+                g_hero_state.groundSlope = cam_get_view_space_angle(g_hero_ground_collision.normal);
+                g_hero_state.downhillYaw = mat_fast_helper_a(g_hero_ground_collision.normal[0], g_hero_ground_collision.normal[1]);
                 FastVecSub(difference, &g_hero_state.groundPoint, &g_hero_state.position);
                 if (FastVecDot(difference, &g_hero_state.groundNormal) > 0.0f)
                     g_hero_state.groundDistance = -g_hero_state.groundDistance;
@@ -192,7 +192,7 @@ void UpdateEndakoHeroGroundContacts(void)
                     g_hero_state.framesOffGround = 0;
                     if (g_hero_state.groundSlope <= 0.8726646900177002f || g_hero_state.gravityMode) {
                         g_hero_state.airFrames = 0;
-                        g_hero_state.lastLandedMoby = (int)D_L03_001BFDC0.object;
+                        g_hero_state.lastLandedMoby = (int)g_hero_ground_collision.object;
                     }
                 }
             }
@@ -213,7 +213,7 @@ contacts_done:
         g_hero_state.gravityDir.z = -1.0f;
         break;
     case 1:
-        if (D_L03_001A8FF4) {
+        if (g_hero_l03_lock_flag) {
             vec_compute_flat_direction_from_point((char *)&g_hero_state.position, (char *)&g_hero_state.gravityDir, 0);
         } else {
             if (g_hero_state.f2f0.w != 0.0f) {
@@ -258,15 +258,15 @@ contacts_done:
             hero_build_relative_offset(left, 0.2f, angle, 1, 0.44999998807907104f);
             hero_build_relative_offset(right, 0.2f, angle, 1, -0.44999998807907104f);
             if (CollLine(left, right, 0x22, g_hero_state.moby, 0)) {
-                if (D_L03_001A8FF0) {
-                    float firstHeight = gravity_get_center_distance((char *)D_L03_001BFDC0.position);
+                if (g_hero_l03_block_flag) {
+                    float firstHeight = gravity_get_center_distance((char *)g_hero_ground_collision.position);
                     g_hero_state.sideHeight[side] = firstHeight - gravity_get_center_distance((char *)&g_hero_state.groundPoint);
                 } else {
-                    g_hero_state.sideHeight[side] = D_L03_001BFDC0.position[2] - g_hero_state.groundZ;
+                    g_hero_state.sideHeight[side] = g_hero_ground_collision.position[2] - g_hero_state.groundZ;
                 }
                 if (math_fabs(g_hero_state.sideHeight[side]) > 0.4f)
                     g_hero_state.sideHeight[side] = 0.0f;
-                func_001290E0(normal, D_L03_001BFDC0.normal);
+                func_001290E0(normal, g_hero_ground_collision.normal);
                 hero_compute_angles_to_local_dir(normal, angles);
                 if (angles[1] > -0.7853982448577881f && angles[1] < 0.7853982448577881f)
                     g_hero_state.sidePitch[side] = angles[1];

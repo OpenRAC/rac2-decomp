@@ -13,13 +13,13 @@ typedef struct {
     u8 header[0x464];
     u8 entries[0];
 } TriggerTable;
-extern TriggerTable D_L03_0021EA30;
-extern u8 D_0019B4A8[];
-extern char D_L03_001A8F20[] __attribute__((sda));
-extern float D_L03_001B0460 __attribute__((sda));
-extern float D_L03_001B0464 __attribute__((sda));
-extern float D_L03_001B0468 __attribute__((sda));
-extern char D_L03_001B0470[] SDATA(D_L03_001B0470);
+extern TriggerTable g_trigger_l03_flags;
+extern u8 g_moby_nibble_table[];
+extern char g_effect_descriptor_default[] __attribute__((sda));
+extern float g_target_approach_speed __attribute__((sda));
+extern float g_target_height_speed __attribute__((sda));
+extern float g_target_l03_angle_degrees __attribute__((sda));
+extern char g_vec4_offset_table[] SDATA(D_L03_001B0470);
 extern int g_current_map_index MACRO_ADDR;
 extern int g_frame_l03_counter;
 extern char *part_find_owned_effect_slot(char *, int, int);
@@ -67,19 +67,19 @@ void UpdateCollisionTriggeredSpawner(char *obj)
         dialogue = *(int *)(vars + 0x84);
         if (dialogue >= 0) {
             u16 id = *(u16 *)(obj + 0xB2);
-            if (!D_L03_0021EA30.entries[(s16)id]) {
-                int count = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            if (!g_trigger_l03_flags.entries[(s16)id]) {
+                int count = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
                 if (!((id & 1) ? ((count >> 4) & 7) : (count & 7)))
                     value_set_entry_by_index(dialogue + 0x2F52, 0xB4);
             }
         }
         if (*(u16 *)(obj + 0xB2) & 1) {
-            u8 *cell = D_0019B4A8 +
+            u8 *cell = g_moby_nibble_table +
                 (((short)*(u16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 16;
         } else {
-            u8 *cell = D_0019B4A8 +
+            u8 *cell = g_moby_nibble_table +
                 (((short)*(u16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 ++*cell;
@@ -87,12 +87,12 @@ void UpdateCollisionTriggeredSpawner(char *obj)
         PlayMobySound(0, 0, obj);
         vec_copy_helper_a(velocity);
         if (collision)
-            vec_fast_normalize_helper(target, collision + 0x10, D_L03_001B0460 * 0.0166666675f);
+            vec_fast_normalize_helper(target, collision + 0x10, g_target_approach_speed * 0.0166666675f);
         else
-            vec_fast_normalize_helper(target, g_hero_state.position, D_L03_001B0460 * 0.0166666675f);
-        target[2] = D_L03_001B0464 * 0.0166666675f;
+            vec_fast_normalize_helper(target, g_hero_state.position, g_target_approach_speed * 0.0166666675f);
+        target[2] = g_target_height_speed * 0.0166666675f;
         FastVecCross(position, velocity, target);
-        value = math_fast_sin_or_cos_b(D_L03_001B0468 * 0.000290888245f);
+        value = math_fast_sin_or_cos_b(g_target_l03_angle_degrees * 0.000290888245f);
         vec_set_direction_with_complement(position, position, value * 0.5f);
         cam_moby_init_tracking(obj, 0, -1, target, position, 255, 15.0f);
         *(int *)(obj + 0x98) = *(int *)(*(char **)(obj + 0x24) + 0x10);
@@ -106,7 +106,7 @@ void UpdateCollisionTriggeredSpawner(char *obj)
             char *child;
 
             i = math_random_int_below(4);
-            matrix_mul_vec3(position, D_L03_001B0470 + (i << 4), obj + 0xC0);
+            matrix_mul_vec3(position, g_vec4_offset_table + (i << 4), obj + 0xC0);
             FastVecAdd(position, position, obj + 0x10);
             kind = 0x9D7;
             if (math_random_int_below(2))
@@ -144,7 +144,7 @@ void UpdateCollisionTriggeredSpawner(char *obj)
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & ~0x1000;
         mat_get_euler_angles(obj + 0xC0, obj + 0xF0);
-        part_spawn_masked_debris(obj, 0x1FF, D_L03_001A8F20, 255, 3.0f, 5.0f, 5.0f, 10.0f);
+        part_spawn_masked_debris(obj, 0x1FF, g_effect_descriptor_default, 255, 3.0f, 5.0f, 5.0f, 10.0f);
         *(Quad *)target = 0;
         target[2] = 0.5f;
         matrix_mul_vec3(target, target, obj + 0xC0);

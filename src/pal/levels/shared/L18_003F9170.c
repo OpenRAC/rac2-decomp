@@ -31,7 +31,7 @@ typedef struct {
     s32 configuration;
 } InitializationFields;
 
-void func_PAL_L18_003F9230(u8 *object)
+void protopet_init_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     s16 mode;
@@ -82,13 +82,13 @@ extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
 extern void group_update_members(u8 *);
 extern void protopet_end_action(u8 *, s32);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern s32 moby_run_slot_handler(s32, s32, s32);
 extern s32 weapon_select_aim_target(u8 *, s32, void *, s32, float, float);
 extern void protopet_set_ready_flag(u8 *);
-extern s32 D_0018C0B4;
+extern s32 g_game_mode;
 
-void func_PAL_L18_003F9470(u8 *object)
+void protopet_check_hit_target_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     u8 *contact;
@@ -113,7 +113,7 @@ void func_PAL_L18_003F9470(u8 *object)
     }
     contact = *(u8 **)(state + 0x188);
     if (contact && *(s16 *)(contact + 0xAA) == 0xF59) {
-        func_PAL_002A7650(object, 0, 1);
+        SetDeathBits_pal(object, 0, 1);
         goto stop;
     }
     mode = object[0x20];
@@ -125,7 +125,7 @@ stop:
     }
     *(s32 *)(state + 0x248) = weapon_select_aim_target(object, *(s32 *)(state + 0x240), 0, 0, *(float *)(state + 0x244), 0.0f);
     if (*(u8 **)(state + 0x258)) protopet_set_ready_flag(*(u8 **)(state + 0x258));
-    if (D_0018C0B4 == 0x6F && (u32)(object[0x20] - 9) < 4) moby_set_state(object, 6, -1);
+    if (g_game_mode == 0x6F && (u32)(object[0x20] - 9) < 4) moby_set_state(object, 6, -1);
 }
 
 

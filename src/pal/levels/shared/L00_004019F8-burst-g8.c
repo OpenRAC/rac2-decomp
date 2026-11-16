@@ -17,7 +17,7 @@ extern void *part_spawn_ground_effect(float, void *, int, float, u32, int, int, 
 
 /* Fifteen particles thrown from the point, as in func_L00_003FC820, then five pairs of trail
    effects around it, differently coloured and with opposite random signs. */
-void func_PAL_L00_004019F8(float *point)
+void SpawnParticleTrailBurst_pal(float *point)
 {
     float delta[4];
     float direction[4];

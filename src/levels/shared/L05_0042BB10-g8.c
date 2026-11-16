@@ -11,11 +11,11 @@ typedef struct {
 } DrawPacket;
 typedef struct { DrawVector row[3], position; } DrawFrame;
 
-extern float D_L05_001B1734 __attribute__((sda));
-extern float D_L05_001B1730 __attribute__((sda));
-extern int D_L05_001B172C __attribute__((sda));
-extern DrawVector D_L05_001AA250[4];
-extern char D_L05_001B96C0[];
+extern float g_ground_quad_offset_scale __attribute__((sda));
+extern float g_ground_quad_vertex_scale __attribute__((sda));
+extern int g_ground_quad_texture __attribute__((sda));
+extern DrawVector g_ground_quad_vertices[4];
+extern char g_origin_vec[];
 extern void VU1_addGSregister(int, unsigned long);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -42,9 +42,9 @@ void gfx_draw_tiled_ground_quad(char *object)
         position.v[1] = y;
     }
     position.v[3] = 1.0f;
-    FastVecScale(&offset, object + 0xC0, D_L05_001B1734);
+    FastVecScale(&offset, object + 0xC0, g_ground_quad_offset_scale);
     FastVecAdd(&position, &position, &offset);
-    gfx_init_quad_packet_state(&packet, D_L05_001B172C, 2, 0x80);
+    gfx_init_quad_packet_state(&packet, g_ground_quad_texture, 2, 0x80);
     packet.extra.q = 0;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -61,13 +61,13 @@ void gfx_draw_tiled_ground_quad(char *object)
     packet.extra.v[2] = 1.0f;
     packet.extra.v[3] = 1.0f;
     qcopy(&frame.position, &position);
-    FastVecSub(&frame.row[0], D_L05_001B96C0, &frame.position);
+    FastVecSub(&frame.row[0], g_origin_vec, &frame.position);
     vec_scale_to_length(&frame.row[0], &frame.row[0], 1.0f);
     FastVecCross(&frame.row[1], &frame.row[0], &packet.extra);
     vec_scale_to_length(&frame.row[1], &frame.row[1], 1.0f);
     FastVecCross(&frame.row[2], &frame.row[1], &frame.row[0]);
     for (i = 0; i < 4; i++) {
-        FastVecScale(&packet.vertex[i], &D_L05_001AA250[i], D_L05_001B1730);
+        FastVecScale(&packet.vertex[i], &g_ground_quad_vertices[i], g_ground_quad_vertex_scale);
         transform_vector(&packet.vertex[i], &packet.vertex[i], &frame);
     }
     draw_world_quad(&packet, 0, 0);

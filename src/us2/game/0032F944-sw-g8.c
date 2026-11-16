@@ -25,29 +25,29 @@ typedef struct {
     int count;
     UpdateVec point, extra, normal;
 } UpdateCollision;
-extern char D_001B2830[] MACRO_ADDR;
+extern char g_vehicle_gravity_direction[] MACRO_ADDR;
 extern UpdateCollision g_collision_hit;
-extern char D_001BAFC0[];
+extern char g_coll_hit_normal[];
 extern char g_hero_state[];
-extern char *D_001B5390 __attribute__((nosda));
-extern int D_001A8CFC[] MACRO_ADDR;
-extern int D_0018C0B4 __attribute__((nosda));
-extern int D_00138324 __attribute__((nosda));
+extern char *g_camera_state_ptr __attribute__((nosda));
+extern int g_resident_data_base[] MACRO_ADDR;
+extern int g_game_mode __attribute__((nosda));
+extern int g_pad_held_flags __attribute__((nosda));
 extern int g_current_game_mode __attribute__((sda));
-extern float D_001B0958 __attribute__((sda));
-extern char *D_001B0960 __attribute__((sda));
-extern int D_001B0964 __attribute__((sda));
-extern float D_001B096C __attribute__((sda));
-extern float D_001B0970 __attribute__((sda));
-extern int D_001B2840[] MACRO_ADDR;
+extern float g_ridden_vehicle_rate __attribute__((sda));
+extern char *g_hud_timer_b_state __attribute__((sda));
+extern int g_ridden_vehicle_value __attribute__((sda));
+extern float g_ridden_vehicle_probe_lift __attribute__((sda));
+extern float g_ridden_vehicle_probe_radius __attribute__((sda));
+extern int g_hud_timer_b[] MACRO_ADDR;
 extern int update_timer SDATA(D_001B2840);
-extern int D_001B2844[] MACRO_ADDR;
+extern int g_vehicle_align_override[] MACRO_ADDR;
 extern int update_collision SDATA(D_001B2844);
-extern int D_001B2848[] MACRO_ADDR;
+extern int g_vehicle_probe_skip[] MACRO_ADDR;
 extern int update_water SDATA(D_001B2848);
-extern int D_001B2858[] MACRO_ADDR;
+extern int g_vehicle_part_steer_effects[] MACRO_ADDR;
 extern int update_handle SDATA(D_001B2858);
-extern char *D_001AD7EC[] MACRO_ADDR;
+extern char *g_turret_target_moby[] MACRO_ADDR;
 extern float g_ring_angle_table[][2];
 extern void gravity_get_dir_at_object(void *, void *, int);
 extern void moby_get_facing_direction(void *, void *);
@@ -59,7 +59,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int ForceClaimNotice(int, int, int);
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float, float);
-extern void func_US2_0029C548(int, void (*)(void *));
+extern void level_store_value_pair_us2(int, void (*)(void *));
 extern int hud_draw_timer_b(void *);
 extern void cam_call_helper(void);
 extern void object_set_root_data_active(void);
@@ -67,7 +67,7 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern unsigned int func_US2_0026F750(int, int);
+extern unsigned int stub_empty_9_us2(int, int);
 extern void part_setup_object_effect_entry(void *, void *, void *);
 extern void anim_start_blended(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
@@ -107,19 +107,19 @@ void func_US2_0032F944(char *obj)
     char *hero;
 
     if (STATE(obj) >= 2)
-    gravity_get_dir_at_object(obj, D_001B2830, 1);
+    gravity_get_dir_at_object(obj, g_vehicle_gravity_direction, 1);
     else
-    moby_get_facing_direction(obj + 0x10, D_001B2830);
-    FastVecScale(D_001B2830, D_001B2830, -1.0f);
-    FastVecScale(&scratch.ahead, obj + 0xE0, D_001B096C);
+    moby_get_facing_direction(obj + 0x10, g_vehicle_gravity_direction);
+    FastVecScale(g_vehicle_gravity_direction, g_vehicle_gravity_direction, -1.0f);
+    FastVecScale(&scratch.ahead, obj + 0xE0, g_ridden_vehicle_probe_lift);
     FastVecAdd(&scratch.ahead, obj + 0x10, &scratch.ahead);
     FastVecScale(&scratch.behind, obj + 0xE0, -1.0f);
     FastVecAdd(&scratch.behind, obj + 0x10, &scratch.behind);
     if (CollLine(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
         if (GetCollHitMaterial() == 2) {
-            FastVecScale(D_001B2830, D_001BAFC0, 0.0009765625f);
-            vec_scale_to_length(D_001B2830, D_001B2830, -1.0f);
-            D_001B2844[0] = 1;
+            FastVecScale(g_vehicle_gravity_direction, g_coll_hit_normal, 0.0009765625f);
+            vec_scale_to_length(g_vehicle_gravity_direction, g_vehicle_gravity_direction, -1.0f);
+            g_vehicle_align_override[0] = 1;
         } else {
             update_collision = 0;
         }
@@ -129,7 +129,7 @@ void func_US2_0032F944(char *obj)
         update_water = 0;
     } else {
         update_collision = 0;
-        D_001B2848[0] = 0;
+        g_vehicle_probe_skip[0] = 0;
     }
     ForceClaimNotice(6, 0, 1);
     switch (STATE(obj)) {
@@ -145,8 +145,8 @@ void func_US2_0032F944(char *obj)
             particles++;
         }
         update_timer = 1800;
-        if (D_001A8CFC[0])
-            func_US2_0029C548(0, hud_draw_timer_b);
+        if (g_resident_data_base[0])
+            level_store_value_pair_us2(0, hud_draw_timer_b);
         /* fall through */
     case 1:
         hero = g_hero_state;
@@ -164,7 +164,7 @@ void func_US2_0032F944(char *obj)
             F(obj, 0x2C) = 0.023f;
         qcopy(&scratch.previous, obj + 0x10);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
-        part_steer_effect_direction(D_001B2858[0], vars, 0);
+        part_steer_effect_direction(g_vehicle_part_steer_effects[0], vars, 0);
         vec_transform_or_copy(obj + 0x10, obj + 0x10);
         shop_trigger_current_state_effect(vars, vars);
         vec_add_object_direction_scaled(obj + 0x10, vars, 0.0030555557f);
@@ -175,7 +175,7 @@ void func_US2_0032F944(char *obj)
                 break;
             qcopy(obj + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);
-            func_US2_0026F750(28, 1);
+            stub_empty_9_us2(28, 1);
             part_setup_object_effect_entry(obj + 0x10, obj + 0xF0, obj);
             STATE(obj) = 2;
             anim_start_blended(obj, 1, 0, 10);
@@ -185,7 +185,7 @@ void func_US2_0032F944(char *obj)
     case 2:
         STATE(obj) = 3;
         PlayMobySound(2, 0, obj);
-        if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+        if (g_game_mode != 28 || g_current_game_mode == 2) {
             cam_call_helper();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
@@ -197,15 +197,15 @@ void func_US2_0032F944(char *obj)
         vehicle_update_speed_and_move(obj);
         moby_push_nearby_away(obj);
         snd_play_on_threshold_crossing();
-        if (math_fast_float_d(D_001B2840)) {
+        if (math_fast_float_d(g_hud_timer_b)) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
-        if (D_00138324 & 32) {
+        if (g_pad_held_flags & 32) {
             STATE(obj) = 9;
             I(vars, 0x60) = 10;
         }
-        if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+        if (g_game_mode != 28 || g_current_game_mode == 2) {
             cam_call_helper();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
@@ -257,17 +257,17 @@ void func_US2_0032F944(char *obj)
             part_spawn_blast_effect_moby(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
-            if (D_0018C0B4 != 28 || g_current_game_mode == 2) {
+            if (g_game_mode != 28 || g_current_game_mode == 2) {
                 cam_call_helper();
                 I(vars, 0x60) = 0;
             } else
-                I(vars, 0x60) = D_001B0964;
+                I(vars, 0x60) = g_ridden_vehicle_value;
             I(vars, 0x64) = 0;
         }
         break;
     case 6:
         QueueRadialMobyImpacts(obj);
-        F(vars, 0x64) += D_001B0958 * 0.016666668f;
+        F(vars, 0x64) += g_ridden_vehicle_rate * 0.016666668f;
         if (math_fast_float_d(vars + 0x60) && !I(vars, 0x68))
             STATE(obj) = 8;
         break;
@@ -276,23 +276,23 @@ void func_US2_0032F944(char *obj)
             STATE(obj) = 8;
         break;
     case 8:
-        if (D_0018C0B4 == 28)
-            func_US2_0026F750(0, 1);
-        if (*(short *)(D_001B5390 + 0x86) == 27)
+        if (g_game_mode == 28)
+            stub_empty_9_us2(0, 1);
+        if (*(short *)(g_camera_state_ptr + 0x86) == 27)
             cam_call_helper();
         table_clear_entry_flag(update_handle);
         slot_free(I(vars, 0x6C));
         slot_free(I(vars, 0x70));
         slot_free(I(vars, 0x74));
-        D_001B0960 = 0;
-        func_US2_0029C548(0, 0);
+        g_hud_timer_b_state = 0;
+        level_store_value_pair_us2(0, 0);
         moby_mark_spawned(obj);
         return;
     }
-    if (STATE(obj) >= 2 && D_001AD7EC[0]) {
+    if (STATE(obj) >= 2 && g_turret_target_moby[0]) {
         copy_matrix_rotation(scratch.workspace.attachment.transform, obj + 0xC0);
         mat_get_euler_angles(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
-        moby_transform_point_and_rotation_by_parent(obj, D_001AD7EC[0], obj + 0x10,
+        moby_transform_point_and_rotation_by_parent(obj, g_turret_target_moby[0], obj + 0x10,
                      &scratch.workspace.attachment.angles, obj + 0x10,
                      &scratch.workspace.attachment.adjusted);
         euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
@@ -300,5 +300,5 @@ void func_US2_0032F944(char *obj)
     if ((unsigned int)(STATE(obj) - 2) < 2)
         func_US2_003303C0(obj);
     gfx_register_final_draw_callback(part_draw_ring_effect_and_trail, obj);
-    part_queue_ground_shadow(obj, D_001B0970);
+    part_queue_ground_shadow(obj, g_ridden_vehicle_probe_radius);
 }

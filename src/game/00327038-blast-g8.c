@@ -48,12 +48,12 @@ typedef struct {
 } Light;
 
 extern Context g_hero_state;
-extern char D_0018A0C0[];
-extern UVPair D_00235D00[];
-extern char D_001BAFA0[], g_camera_eye_state[];
-extern Light D_001C2B40[];
-extern int D_001BF000[];
-extern int D_001B0590 __attribute__((sda));
+extern char g_blast_direction[];
+extern UVPair g_blast_uv_angles[];
+extern char g_coll_hit_position[], g_camera_eye_state[];
+extern Light g_dynamic_lights[];
+extern int g_nearby_mobys[];
+extern int g_blast_state_flag __attribute__((sda));
 extern float math_random_angle(void), IntToFloat(int), math_square(float);
 extern float math_fast_sin_or_cos_a(float), FastAddRotations(float,float), fast_subtract_rotations(float,float);
 extern int FloatToInt(float), math_fast_float_d(void *);
@@ -94,8 +94,8 @@ void blast_update(Blast *self)
         state->timer = 60;
         state->radius = 0;
         for (i = 0; i < 137; i++) {
-            D_00235D00[i].u = math_random_angle();
-            D_00235D00[i].v = math_random_angle();
+            g_blast_uv_angles[i].u = math_random_angle();
+            g_blast_uv_angles[i].v = math_random_angle();
         }
     case 1:
         self->mode = 2;
@@ -109,7 +109,7 @@ void blast_update(Blast *self)
             vec_build_spherical_offset(v, state->radius, a, b);
             FastVecAdd(v, v, &g_hero_state.pos);
             if (CollLine(&g_hero_state.pos, v, 0, g_hero_state.object, 0))
-                qcopy(v, D_001BAFA0);
+                qcopy(v, g_coll_hit_position);
             part_claim_ring_piece(self, v, 10);
         }
         if (state->timer < 10 && !(state->timer & 7))
@@ -120,7 +120,7 @@ void blast_update(Blast *self)
             count = coll_process_hit(&g_hero_state.pos, 0, self, 0, 15.0f);
             i = 0;
             if (i < count) {
-                list = D_001BF000;
+                list = g_nearby_mobys;
                 info = &hit;
                 for (; i < count; i++) {
                     if ((*(unsigned long long *)((char *)list[i] + 0x30) & 0x500000000000ULL) &&
@@ -159,7 +159,7 @@ void blast_update(Blast *self)
                 moby_mark_spawned(state->second);
             if (state->light != -1)
                 gfx_free_point_light(state->light);
-            D_001B0590 = 0;
+            g_blast_state_flag = 0;
             moby_mark_spawned(self);
             return;
         }
@@ -189,9 +189,9 @@ void blast_update(Blast *self)
         qcopy(state->second + 0x10, g_hero_state.object + 0x10);
     }
     if (state->light != -1) {
-        light = &D_001C2B40[state->light];
-        vec_scale_to_length(v, D_0018A0C0, 0.5f);
-        FastVecAdd(&light->pos, *(char **)(D_0018A0C0 + 0x1FF0) + 16, v);
+        light = &g_dynamic_lights[state->light];
+        vec_scale_to_length(v, g_blast_direction, 0.5f);
+        FastVecAdd(&light->pos, *(char **)(g_blast_direction + 0x1FF0) + 16, v);
         FastVecSub(v, g_camera_eye_state, &light->pos);
         vec_scale_to_length(v, v, 0.15f);
         FastVecAdd(&light->pos, &light->pos, v);

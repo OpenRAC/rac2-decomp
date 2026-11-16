@@ -9,7 +9,7 @@ typedef struct { char prefix[0x50]; float speed; char tail[0x8C]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern unsigned char g_item_slot_to_record[];
 
-extern int D_L00_001ADB2C;
+extern int g_active_tether_object;
 
 extern char *g_collision_result[];
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -50,7 +50,7 @@ void beam_fire_with_muzzle_flash(char *moby)
     } else if (H->ptr[766]) {
         vec_compute_object_to_target(H->ptr[766], (char *)origin, (char *)velocity, speed);
     }
-    if (D_L00_001ADB2C) {
+    if (g_active_tether_object) {
         char *target = *(char **)(state + 0x30);
         if ((target && H->i[1344]) || (H->ptr[766] && !H->i[1344])) {
             if (target)

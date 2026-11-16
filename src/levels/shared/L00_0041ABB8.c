@@ -90,11 +90,11 @@ typedef struct {
 
 extern HeroMove g_hero_state;
 
-extern int D_L00_001A8FF0[] __attribute__((sda));
+extern int g_hero_locked_flag[] __attribute__((sda));
 
-extern CamMove D_L00_001B8E20;
+extern CamMove g_camera_move_state;
 
-extern int D_L00_001B9084;
+extern int g_coll_grid_limit;
 
 extern void FastVecAdd(void *dst, void *a, void *b);
 
@@ -112,7 +112,7 @@ typedef struct {
 } CameraPosition;
 #endif
 
-extern CameraPosition D_L00_001B8C80;
+extern CameraPosition g_scalar_transition_state;
 
 #ifndef RAC2_T_BLOCK_F043C77A5
 #define RAC2_T_BLOCK_F043C77A5
@@ -229,12 +229,12 @@ void lava_gun_draw_glow_sprite(void *unused, float *a, int k, float f)
     local.k0 = k;
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = mat_fast_helper_a(D_L00_001B8C80.f140 - a[0], D_L00_001B8C80.f144 - a[1]);
-    x = vec_distance_xy(a, &D_L00_001B8C80.f140);
-    local.f212 = -mat_fast_helper_a(x, D_L00_001B8C80.f148 - a[2]);
+    local.f216 = mat_fast_helper_a(g_scalar_transition_state.f140 - a[0], g_scalar_transition_state.f144 - a[1]);
+    x = vec_distance_xy(a, &g_scalar_transition_state.f140);
+    local.f212 = -mat_fast_helper_a(x, g_scalar_transition_state.f148 - a[2]);
     local.v208 = math_random_angle();
     euler_to_matrix(&local.m00, &local.v208);
-    FastVecSub(v, &D_L00_001B8C80.f140, a);
+    FastVecSub(v, &g_scalar_transition_state.f140, a);
     vec_scale_to_length(v, v, 0.25f);
     local.v192 = a[0] + v[0];
     local.v196 = a[1] + v[1];
@@ -469,7 +469,7 @@ void TranslateObjectAndView(MoveObject *object, TI128 *input)
 {
     TI128 delta, projected, correction, remainder;
     TI128 *step = &delta;
-    CamMove *cam = &D_L00_001B8E20;
+    CamMove *cam = &g_camera_move_state;
     MoveState *state = object->state;
     MoveView *view = &state->view;
     GroundMoby *ground;
@@ -478,7 +478,7 @@ void TranslateObjectAndView(MoveObject *object, TI128 *input)
     delta = *input;
     ground = g_hero_state.ground;
     if (ground != 0) {
-        if (D_L00_001A8FF0[0] == 0) {
+        if (g_hero_locked_flag[0] == 0) {
             if (g_hero_state.flag348 == 0) {
                 if (ground == view->ground) {
                     height = ground->height - view->groundHeight;
@@ -507,7 +507,7 @@ void TranslateObjectAndView(MoveObject *object, TI128 *input)
     FastVecAdd(&view->v10, &view->v10, &projected);
     if (g_hero_state.flag348 == 0 &&
         !(g_hero_state.ground != 0 && g_hero_state.ground->type == 0x22D &&
-          D_L00_001B9084 < 31))
+          g_coll_grid_limit < 31))
         object->state->f1E0 = ((float *)step)[3];
     if ((unsigned int)(g_hero_state.state - 11) < 2) {
         MoveState *next = object->state;

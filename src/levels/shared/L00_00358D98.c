@@ -14,10 +14,10 @@ typedef struct {
 typedef struct { char prefix[0x88]; unsigned short price; char rest[0x56]; } ShopClass;
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_l00_table[];
-extern int D_L00_001B25A8 __attribute__((sda));
+extern int g_menu_call_number __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
-extern char D_L00_001AD798[7];
-extern char D_L00_001AD6C8[3];
+extern char g_str_menu_value_format[7];
+extern char g_str_number_plain_format[3];
 extern void *memset(void *, int, unsigned int);
 extern void text_draw_window_medium(TextLayout *, unsigned long long, unsigned char *, int);
 extern int sprintf(char *, char *, ...);
@@ -26,13 +26,13 @@ extern int GetSelectedShopItemPrice(void);
 /* Layouts measured from the selected-item panel. */
 typedef struct { unsigned int word[4]; } PanelColors;
 typedef struct { int price; int pad[3]; unsigned char *name; int pad2[2]; } ShopItem;
-extern PanelColors D_L00_001AD768;
+extern PanelColors g_menu_panel_colors;
 typedef struct { char prefix[0x144]; ShopItem items[0]; } ShopModel;
 extern ShopModel g_purchase_menu_model;
-extern float D_L00_001B25E0 __attribute__((sda));
-extern int D_L00_001B1BB8[] __attribute__((sda));
+extern float g_menu_slide_scale __attribute__((sda));
+extern int g_menu_call_state_words[] __attribute__((sda));
 extern int g_screen_width __attribute__((sda));
-extern int D_001A79FC __attribute__((sda));
+extern int g_bolt_count __attribute__((sda));
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern char *GetLocalizedString(int);
@@ -58,7 +58,7 @@ typedef struct {
     int value;
 } Entry32fd6f60;
 
-extern Entry32fd6f60 D_L07_002A4100[];
+extern Entry32fd6f60 g_level_entry_table[];
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_acdcf1600d770d3b_ScalarConfigure116State {
@@ -101,21 +101,21 @@ void level_copy_data_blocks_to_objects(char *table)
     }
 }
 
-extern char D_L00_0021DE10[];
+extern char g_level_data_blocks[];
 
 /* Applies the level data blocks from the standard table. */
 void level_apply_data_blocks(void)
 {
-    level_copy_data_blocks_to_objects(D_L00_0021DE10);
+    level_copy_data_blocks_to_objects(g_level_data_blocks);
 }
 
 
 
-extern int D_001B19E8 __attribute__((sda));
+extern int g_sound_table_count __attribute__((sda));
 
-extern int D_001B19EC __attribute__((sda));
+extern int g_sound_table __attribute__((sda));
 
-extern int D_001B8F0C __attribute__((sda));
+extern int g_sound_index_base __attribute__((sda));
 
 extern char D_00188660_3[];
 
@@ -129,12 +129,12 @@ int snd_start_in_slot(int index, int a1, int a2)
     int slot;
     char *record;
 
-    if (D_001B19EC == 0)
+    if (g_sound_table == 0)
         return -1;
-    index = index + D_001B8F0C;
-    if (index >= D_001B19E8)
+    index = index + g_sound_index_base;
+    if (index >= g_sound_table_count)
         return -1;
-    slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, a2, 0, 1024);
+    slot = AllocateSoundVoice((char *)(g_sound_table + index * 32), a1, a2, 0, 1024);
     if (slot >= 0) {
         record = D_00188660_3 + slot * 112;
         *(int *)(record + 136) = a2;
@@ -152,12 +152,12 @@ int snd_start_from_table_entry(int index, int a1, int a2, int a3)
     int slot;
     char *record;
 
-    if (index >= D_001B19E8)
+    if (index >= g_sound_table_count)
         return -1;
     if (index == 0xFFFFFFFFU) {
         return -1;
     } else {
-        slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a1, 0, a2 + 0x40, a3);
+        slot = AllocateSoundVoice((char *)(g_sound_table + index * 32), a1, 0, a2 + 0x40, a3);
         if (slot >= 0) {
             record = D_00188660_3 + slot * 112;
             *(int *)(record + 140) = a2;
@@ -181,10 +181,10 @@ int snd_start_from_weights(int a0, int a1, int a2, int a3, int a4, int a5)
         return -1;
     sum = a0 * 4 + a1 * 2;
     sum += a2;
-    index = sum + D_001B8F0C;
-    if (index >= D_001B19E8)
+    index = sum + g_sound_index_base;
+    if (index >= g_sound_table_count)
         return -1;
-    slot = AllocateSoundVoice((char *)(D_001B19EC + index * 32), a3, a4, 0, a5);
+    slot = AllocateSoundVoice((char *)(g_sound_table + index * 32), a3, a4, 0, a5);
     if (slot >= 0) {
         record = D_00188660_3 + slot * 112;
         *(int *)(record + 136) = a4;
@@ -193,7 +193,7 @@ int snd_start_from_weights(int a0, int a1, int a2, int a3, int a4, int a5)
     return slot;
 }
 
-extern Entry32fd6f60 D_L00_002A3B00[];
+extern Entry32fd6f60 g_sound_lookup_table[];
 
 /* Table search: walks the 8-byte records of D_L00_002A3B00 until the key is
  * found or the -1 terminator is met, and stores the record's index and value. */
@@ -201,13 +201,13 @@ void resolve_lookup_record(Query *q)
 {
     int i = 0;
 
-    if (D_L00_002A3B00[0].key != -1 && D_L00_002A3B00[0].key != q->key) {
+    if (g_sound_lookup_table[0].key != -1 && g_sound_lookup_table[0].key != q->key) {
         do {
             i++;
-        } while (D_L00_002A3B00[i].key != -1 && D_L00_002A3B00[i].key != q->key);
+        } while (g_sound_lookup_table[i].key != -1 && g_sound_lookup_table[i].key != q->key);
     }
     q->index = i;
-    q->value = D_L00_002A3B00[i].value;
+    q->value = g_sound_lookup_table[i].value;
 }
 
 /* Sets the screen effect values and marks which parts changed so they get updated. */
@@ -241,16 +241,16 @@ void mem_store_int_if_not_null(int value, long address) {
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 typedef void (*DrawCallback)(void *);
-extern int D_L00_001A8F00 __attribute__((sda));
-extern char *D_L00_00220DA0[];
-extern short D_L00_001A8F80[2] MACRO_ADDR;
+extern int g_game_l00_mode __attribute__((sda));
+extern char *g_launch_moby_list[];
+extern short g_pickup_key_ids[2] MACRO_ADDR;
 extern unsigned int g_equipment_bits __attribute__((sda));
 extern Vector g_camera_l00_position;
 extern char g_hero_position[];
 
-extern unsigned int D_00138324;
+extern unsigned int g_pad_held_flags;
 extern char g_hero_moby_default[];
-extern int D_L00_001B1AE0 __attribute__((sda));
+extern int g_pickup_request_pending __attribute__((sda));
 extern void UpdateEquipmentPieces(void *);
 /* func_L00_002E6EF8 in level 0; its address differs in levels 8, 9, 19 and 30. */
 extern void ref_L00_003603C0_00(DrawCallback, void *);
@@ -288,13 +288,13 @@ void pickup_update_interactive(unsigned char *object) {
     char *spawn;
     unsigned int shade;
     int available;
-    if (!D_L00_001A8F00) UpdateEquipmentPieces(object);
+    if (!g_game_l00_mode) UpdateEquipmentPieces(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
-        key = D_L00_001A8F80[(g_equipment_bits >> 4) & 1];
-        for (index = 0; D_L00_00220DA0[index]; index++) {
-            slot = D_L00_00220DA0 + index;
-            if (*(short *)(D_L00_00220DA0[index] + 0xAA) == key) {
+        key = g_pickup_key_ids[(g_equipment_bits >> 4) & 1];
+        for (index = 0; g_launch_moby_list[index]; index++) {
+            slot = g_launch_moby_list + index;
+            if (*(short *)(g_launch_moby_list[index] + 0xAA) == key) {
                 shade = (int)(math_fast_sin_or_cos_a(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;
@@ -317,7 +317,7 @@ void pickup_update_interactive(unsigned char *object) {
     if (*(unsigned short *)(object + 0x34) & 1) *(short *)(private + 0xC) = 0;
     if (*(short *)(private + 0xC)) {
         available = TryClaimNotice(2, 0x2798, 1) != 0;
-        if ((D_00138324 & 0x10) && available) {
+        if ((g_pad_held_flags & 0x10) && available) {
             offset.q = 0;
             angles.q = 0;
             offset.f[0] = 1.48f;
@@ -334,7 +334,7 @@ void pickup_update_interactive(unsigned char *object) {
             qcopy(spawn + 0x10, &angles);
             level_release_matching_resource(2);
             *(short *)(spawn - 0x4A) = 0;
-            D_L00_001B1AE0 = 1;
+            g_pickup_request_pending = 1;
         }
     }
 }
@@ -344,7 +344,7 @@ extern int load_start_disc_read(int value, char *target);
 
 extern s16 snd_pump_music_and_disc_read(int value);
 
-extern int D_L00_001BCAC0[];
+extern int g_tutorial_probe_context[];
 
 extern int g_copy_setup_data[];
 
@@ -354,7 +354,7 @@ extern int g_copy_setup_data[];
 int cutscene_start_next_chunk(int index)
 {
     int next_index = index + 1;
-    int *sequence = D_L00_001BCAC0;
+    int *sequence = g_tutorial_probe_context;
     int *base = g_copy_setup_data;
     int *table = (int *)((char *)base + 16040);
     int row_offset = sequence[12] * 332;
@@ -371,11 +371,11 @@ int cutscene_start_next_chunk(int index)
     return 1;
 }
 
-extern unsigned short D_00152C26;
+extern unsigned short g_state_flag_one;
 
 /* Sets a flag to 1. */
 void state_set_flag_one(void) {
-    D_00152C26 = 1;
+    g_state_flag_one = 1;
 }
 
 /* func_L00_00367308 is defined in L00_00358D98-g8.c. */
@@ -491,13 +491,13 @@ void stub_l00_nop(void)
 
 /* func_L00_00374348 is defined in L00_00374348.c. */
 
-extern int D_0022F810;
+extern int g_menu_dispatch_mode;
 
 /* Dispatch on a mode word: mode 1 goes through the recording wrapper, the other modes replay. */
 /* Picks what to do for the current mode of the menu. */
 void menu_dispatch_by_mode(void)
 {
-    switch (D_0022F810) {
+    switch (g_menu_dispatch_mode) {
     case 0:
         UpdateShopMenuInput();
         break;
@@ -534,30 +534,30 @@ void DrawSelectedItemInfoPanel(void) {
     char text[256];
     char *model = (char *)&g_purchase_menu_model;
     int index = *(int *)(model + 0x80);
-    colors = D_L00_001AD768;
-    D_L00_001B1BB8[1] = 0;
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
-                  192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 51.0f + 0.5f),
-                  -192, (int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
-                  192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(D_L00_001B25E0 * 243.0f + 0.5f),
-                  -192, -(int)(D_L00_001B25E0 * 96.0f + 0.5f), colors.word);
-    text_draw_right_aligned_medium(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL,
+    colors = g_menu_panel_colors;
+    g_menu_call_state_words[1] = 0;
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(g_menu_slide_scale * 51.0f + 0.5f),
+                  192, (int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(g_menu_slide_scale * 51.0f + 0.5f),
+                  -192, (int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 16, (int)(g_menu_slide_scale * 243.0f + 0.5f),
+                  192, -(int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA8, 0), 400, (int)(g_menu_slide_scale * 243.0f + 0.5f),
+                  -192, -(int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
+    text_draw_right_aligned_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)GetLocalizedString(0x318C), -1);
     text_format_number_with_separators(text, g_purchase_menu_model.items[index].price);
-    text_draw_medium(270, (int)(D_L00_001B25E0 * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
-    text_draw_centered_medium(g_screen_width >> 1, (int)(D_L00_001B25E0 * 277.0f + 0.5f), 0x80F0F0F0ULL,
+    text_draw_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+    text_draw_centered_medium(g_screen_width >> 1, (int)(g_menu_slide_scale * 277.0f + 0.5f), 0x80F0F0F0ULL,
                   g_purchase_menu_model.items[index].name, -1);
     colors.word[3] = 0x60F0F0B0;
     colors.word[2] = 0x60F0F0B0;
     colors.word[1] = 0x60F0F0B0;
     colors.word[0] = 0x60F0F0B0;
-    text_format_number_with_separators(text, D_001A79FC);
+    text_format_number_with_separators(text, g_bolt_count);
     text_draw_right_aligned_small(444, 17, 0x80FFFFFFULL, (unsigned char *)text, -1);
-    hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), 458, (int)(D_L00_001B25E0 * 15.0f + 0.5f),
-                  32, (int)(D_L00_001B25E0 * 32.0f + 0.5f), colors.word);
+    hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), 458, (int)(g_menu_slide_scale * 15.0f + 0.5f),
+                  32, (int)(g_menu_slide_scale * 32.0f + 0.5f), colors.word);
 }
 
 
@@ -581,13 +581,13 @@ void DrawVendorPurchasePanel(void) {
     if (model->active == 0) return;
     memset(&seed.layout, 0, 24);
     seed.layout.field[0] = 120;
-    seed.layout.field[1] = (short)(D_L00_001B25E0 * 200.0f + 0.5f);
+    seed.layout.field[1] = (short)(g_menu_slide_scale * 200.0f + 0.5f);
     seed.layout.field[2] = 160;
     seed.layout.field[3] = 352;
     seed.layout.field[4] = 256;
-    seed.layout.field[5] = (short)(D_L00_001B25E0 * 160.0f + 0.5f);
+    seed.layout.field[5] = (short)(g_menu_slide_scale * 160.0f + 0.5f);
     seed.layout.field[6] = 184;
-    seed.layout.field[7] = (short)(D_L00_001B25E0 * 72.0f + 0.5f);
+    seed.layout.field[7] = (short)(g_menu_slide_scale * 72.0f + 0.5f);
     seed.layout.field[8] = 16;
     seed.layout.field[9] = 3;
     copy = seed.layout;
@@ -597,27 +597,27 @@ void DrawVendorPurchasePanel(void) {
         unit_price = ((ShopClass *)g_weapon_l00_table)[g_item_slot_to_record[selected_id]].price;
         if ((int)unit_price <= g_player_bolts) {
             copy.field[9] = 1;
-            copy.field[5] = (short)((float)(copy.field[0] + 12) * D_L00_001B25E0 + 0.5f);
+            copy.field[5] = (short)((float)(copy.field[0] + 12) * g_menu_slide_scale + 0.5f);
             text_draw_window_medium(&copy, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0x1127), -1);
-            sprintf(text, D_L00_001AD798, D_L00_001B25A8);
-            copy.field[5] = (short)((float)(copy.field[0] + 40) * D_L00_001B25E0 + 0.5f);
+            sprintf(text, g_str_menu_value_format, g_menu_call_number);
+            copy.field[5] = (short)((float)(copy.field[0] + 40) * g_menu_slide_scale + 0.5f);
             text_draw_window_medium(&copy, 0x80F0F0F0ULL, (unsigned char *)text, -1);
-            sprintf(text, D_L00_001AD6C8, (unsigned int)D_L00_001B25A8 *
+            sprintf(text, g_str_number_plain_format, (unsigned int)g_menu_call_number *
                 ((ShopClass *)g_weapon_l00_table)[g_item_slot_to_record[model->entries[model->index].id]].price);
-            text_draw_right_aligned_medium(256, (int)(D_L00_001B25E0 * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
+            text_draw_right_aligned_medium(256, (int)(g_menu_slide_scale * 180.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
             seed.colors[0] = 0x60F0F0B0;
             seed.colors[1] = 0x60F0F0B0;
             seed.colors[2] = 0x60F0F0B0;
             seed.colors[3] = 0x60F0F0B0;
-            hud_draw_sprite_gradient(GetIconFrame(0x7567, 0), 260, (int)(D_L00_001B25E0 * 180.0f + 0.5f),
-                          16, (int)(D_L00_001B25E0 * 16.0f + 0.5f), seed.colors);
+            hud_draw_sprite_gradient(GetIconFrame(0x7567, 0), 260, (int)(g_menu_slide_scale * 180.0f + 0.5f),
+                          16, (int)(g_menu_slide_scale * 16.0f + 0.5f), seed.colors);
             return;
         }
         message = 0x1128;
     } else {
         if (g_player_bolts >= GetSelectedShopItemPrice()) {
             copy.field[9] = 1;
-            copy.field[5] = (short)((float)(copy.field[0] + 6) * D_L00_001B25E0 + 0.5f);
+            copy.field[5] = (short)((float)(copy.field[0] + 6) * g_menu_slide_scale + 0.5f);
             message = 0x1129;
         } else goto no_money;
     }
@@ -649,7 +649,7 @@ void DrawPurchaseAffordabilityPrompt(void) {
     if (model->active == 0) return;
     memset(&layout, 0, sizeof(layout));
     top = 314;
-    scale = D_L00_001B25E0;
+    scale = g_menu_slide_scale;
     layout.field[0] = (short)(scale * 120.0f + 0.5f);
     layout.field[1] = (short)(scale * top + 0.5f);
     layout.field[2] = top;

@@ -9,14 +9,14 @@ typedef struct { char head[0x10]; Vec position; char tail[0xD0]; Vec rotation; }
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; char *owner; } LiftSound;
 extern unsigned char g_sound_state[];
 typedef struct { char pad[0x140]; Vec from, to; char gap[0x30]; char *camera; } LiftCamera;
-extern LiftCamera D_L00_001B8C80;
-extern const int D_001A7908;
+extern LiftCamera g_scalar_transition_state;
+extern const int g_menu_toggle_option;
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float), math_fabs(float), math_random_angle(void);
 extern float vec_distance_xy(void *, void *), fast_vec_dist(void *, void *);
 extern int FloatToInt(float), hero_is_current_selected_id(int), snd_is_voice_playing_for_owner(void *, int), PlayMobySound(int, int, void *);
 extern int IsPointInCuboid(void *, int);
 extern void moby_set_state(void *, int, int), snd_stop_voice(int), moby_mark_spawned(void *), func_002A0F48(void *);
-extern char *CreateMoby(int), *func_PAL_L00_002D7850(int);
+extern char *CreateMoby(int), *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(void *), SetCamera5Pose(void *, void *, int, int, int), cam_set_state_rotation(void *);
 extern void object_copy_vector_to_selected(void *), cam_set_mode_state(int);
 extern void FastVecSub(void *, void *, void *), mat_combine_and_store(void *, void *, void *, void *);
@@ -62,7 +62,7 @@ typedef struct {
     I(ctx->child, 0x78) = 0x808C8C8C;                                                   \
     I(ctx->child, 0x98) = I(P(ctx->child, 0x24), 0x10)
 
-void func_PAL_L00_003D1828(LiftMoby *moby) {
+void UpdateAranosVerticalLift_pal(LiftMoby *moby) {
     char *obj = (char *)moby;
     struct { Vec old, rotation, delta, camera; } frame;
     LiftContext *ctx = *(LiftContext **)(obj + 0x68);
@@ -125,8 +125,8 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
             moby_set_state(obj, 2, -1);
             ctx->velocity = 0.0f;
             I(ctx->child, 0x78) = 0x8000DF2A;
-            if (!D_001A7908) {
-                SetCamera5Pose(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 100, 0);
+            if (!g_menu_toggle_option) {
+                SetCamera5Pose(&g_scalar_transition_state.from, &g_scalar_transition_state.to, 2, 100, 0);
                 frame.camera.f[0] = 246.85f;
                 frame.camera.f[1] = 198.19f;
                 frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
@@ -139,7 +139,7 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
             snd_play_from_class_bank(0, 0, obj, 0x8A1);
             I(ctx->child, 0x98) = 0;
             START_SOUND(0);
-            ctx->camera = func_PAL_L00_002D7850(5);
+            ctx->camera = cam_alloc_override_slot_pal(5);
             F(ctx->camera, 0) = 2.0f;
             F(ctx->camera, 4) = 1.5f;
             ctx->release = 1;
@@ -212,12 +212,12 @@ void func_PAL_L00_003D1828(LiftMoby *moby) {
         qcopy(child + 0x10, &moby->position);
         F(child, 0x18) += 0.25f;
     }
-    if (*(short *)(D_L00_001B8C80.camera + 0x86) == 5) {
+    if (*(short *)(g_scalar_transition_state.camera + 0x86) == 5) {
         frame.camera.f[0] = 246.85f;
         frame.camera.f[1] = 198.19f;
         frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
         object_copy_vector_to_selected(&frame.camera);
-        if (vec_distance_xy(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
+        if (vec_distance_xy(g_scalar_transition_state.camera + 0x30, &frame.camera) < 0.5f)
             cam_set_mode_state(1);
     }
 }

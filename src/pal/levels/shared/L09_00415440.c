@@ -9,7 +9,7 @@ extern u8 *func_PAL_002BE9A8(void *, f32, f32, f32, s32, void *, f32, u32, s32);
 extern s32 FloatToInt(f32);
 
 /* Spawn two colored particles and one white particle below the object. */
-void func_PAL_L09_00415E28(u8 *arg)
+void part_spawn_below_object_pal(u8 *arg)
 {
     f32 vel[4] __attribute__((aligned(16)));
     f32 pos[4] __attribute__((aligned(16)));

@@ -26,8 +26,8 @@ typedef struct {
     char pad74[0x6C];
 } DamageData;
 
-extern float D_001B0954 __attribute__((sda));
-extern char *D_001BF000[];
+extern float g_shockwave_ring_duration __attribute__((sda));
+extern char *g_nearby_mobys[];
 extern char g_hero_state[];
 extern unsigned char g_item_slot_to_record[];
 extern DamageData g_weapon_table[];
@@ -50,9 +50,9 @@ void QueueRadialMobyImpacts(char *object)
     char *target;
     float radius = *(float *)(*(char **)(object + 0x68) + 0x64);
 
-    count = coll_process_hit(radius < D_001B0954 ? radius : D_001B0954, object + 0x10, 0, object, 0);
+    count = coll_process_hit(radius < g_shockwave_ring_duration ? radius : g_shockwave_ring_duration, object + 0x10, 0, object, 0);
     for (i = 0; i < count; i++) {
-        target = D_001BF000[i];
+        target = g_nearby_mobys[i];
         if ((moby_get_private_value_0(target) || (*(unsigned short *)(target + 0x34) & 0x4000))
             && target != ((DamageHero *)g_hero_state)->owner) {
             FastVecSub(&delta, target + 0x10, object + 0x10);

@@ -55,13 +55,13 @@ void gfx_add_draw_callback_first(DrawCallback_r002E6CF0 fn, void *arg) {
 
 /* Runs every callback in the first list with its argument. */
 typedef void (*Callback_r002E6D40)(void *);
-extern volatile int D_L00_001B1948 __attribute__((sda));
-extern Callback_r002E6D40 D_L00_001BE0C0[];
-extern void *D_L00_001BE1C0[];
+extern volatile int g_draw_callback_count_first __attribute__((sda));
+extern Callback_r002E6D40 g_draw_callbacks_first[];
+extern void *g_draw_callback_args_first[];
 void gfx_run_draw_callbacks_first(void) {
     int i;
-    for (i = 0; i < D_L00_001B1948; i++)
-        D_L00_001BE0C0[i](D_L00_001BE1C0[i]);
+    for (i = 0; i < g_draw_callback_count_first; i++)
+        g_draw_callbacks_first[i](g_draw_callback_args_first[i]);
 }
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
@@ -95,24 +95,24 @@ void gfx_add_draw_callback_second(DrawCallback_r002E6DB8 fn, void *arg) {
 
 /* Runs every callback in the second list with its argument. */
 typedef void (*Callback_r002E6E08)(void *);
-extern volatile int D_L00_001B1950 __attribute__((sda));
-extern Callback_r002E6E08 D_L00_001BE4C0[];
-extern void *D_L00_001BE5C0[];
+extern volatile int g_draw_callback_count_second __attribute__((sda));
+extern Callback_r002E6E08 g_draw_callbacks_second[];
+extern void *g_draw_callback_args_second[];
 void gfx_run_draw_callbacks_second(void) {
     int i;
-    for (i = 0; i < D_L00_001B1950; i++)
-        D_L00_001BE4C0[i](D_L00_001BE5C0[i]);
+    for (i = 0; i < g_draw_callback_count_second; i++)
+        g_draw_callbacks_second[i](g_draw_callback_args_second[i]);
 }
 
 /* Runs every callback in the fourth list with its argument. */
 typedef void (*Callback_r002E6E80)(void *);
-extern volatile int D_L00_001B1954 __attribute__((sda));
-extern Callback_r002E6E80 D_L00_001BE6C0[];
-extern void *D_L00_001BE7C0[];
+extern volatile int g_draw_callback_count_fourth __attribute__((sda));
+extern Callback_r002E6E80 g_draw_callbacks_fourth[];
+extern void *g_draw_callback_args_fourth[];
 void gfx_run_draw_callbacks_fourth(void) {
     int i;
-    for (i = 0; i < D_L00_001B1954; i++)
-        D_L00_001BE6C0[i](D_L00_001BE7C0[i]);
+    for (i = 0; i < g_draw_callback_count_fourth; i++)
+        g_draw_callbacks_fourth[i](g_draw_callback_args_fourth[i]);
 }
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
@@ -146,13 +146,13 @@ void gfx_add_draw_callback_third(DrawCallback_r002E6EF8 fn, void *arg) {
 
 /* Runs every callback in the third list with its argument. */
 typedef void (*Callback_r002E6F48)(void *);
-extern volatile int D_L00_001B194C __attribute__((sda));
-extern Callback_r002E6F48 D_L00_001BE2C0[];
-extern void *D_L00_001BE3C0[];
+extern volatile int g_draw_callback_count_third __attribute__((sda));
+extern Callback_r002E6F48 g_draw_callbacks_third[];
+extern void *g_draw_callback_args_third[];
 void gfx_run_draw_callbacks_third(void) {
     int i;
-    for (i = 0; i < D_L00_001B194C; i++)
-        D_L00_001BE2C0[i](D_L00_001BE3C0[i]);
+    for (i = 0; i < g_draw_callback_count_third; i++)
+        g_draw_callbacks_third[i](g_draw_callback_args_third[i]);
 }
 
 
@@ -160,33 +160,33 @@ void gfx_run_draw_callbacks_third(void) {
 
 
 extern int measure_text_width(char *text, int length, char *charset);
-extern char D_L00_0028C590[];
+extern char g_text_font_first_set[];
 
 /* Measures the width of text using the first character set. */
 int text_measure_width_first_set(char *text, int length) {
- return measure_text_width(text, length, D_L00_0028C590);
+ return measure_text_width(text, length, g_text_font_first_set);
 }
 
-extern char D_L00_0028C930[];
+extern char g_text_font_second_set[];
 
 /* Measures the width of text using the second character set. */
 int text_measure_width_second_set(char *text, int length) {
- return measure_text_width(text, length, D_L00_0028C930);
+ return measure_text_width(text, length, g_text_font_second_set);
 }
 
-extern char D_L00_0028CCD0[];
+extern char g_text_font_third_set[];
 
 /* Measures the width of text using the third character set. */
 int text_measure_width_third_set(char *text, int length) {
- return measure_text_width(text, length, D_L00_0028CCD0);
+ return measure_text_width(text, length, g_text_font_third_set);
 }
 
 extern int text_measure_width_scaled(void *a0, void *a1, void *a2);
-extern char D_L00_0028C590[];
+extern char g_text_font_first_set[];
 
 /* Runs a text helper on two buffers with the first character set. */
 int text_run_helper_first_set(void *first, void *second) {
- return text_measure_width_scaled(first, second, D_L00_0028C590);
+ return text_measure_width_scaled(first, second, g_text_font_first_set);
 }
 
 
@@ -197,7 +197,7 @@ extern void text_draw_line(int, int, unsigned long, char *, int, unsigned long, 
 /* Draws coloured text at a screen position using the third character set. */
 void text_draw_coloured(int x, int y, unsigned long colour, char *text, int length) {
  unsigned long texture = GetEffectTextureDescriptor(3);
- text_draw_line(x, y, colour, text, length, texture, D_L00_0028CCD0);
+ text_draw_line(x, y, colour, text, length, texture, g_text_font_third_set);
 }
 
 
@@ -304,7 +304,7 @@ typedef struct {
     char pad_1c[4];
 } Entry_r002ED808;
 
-extern Entry_r002ED808 D_L00_001BECC0[];
+extern Entry_r002ED808 g_particle_l00_effect_slots[];
 
 extern float ref_L00_002ED808_00(float, float);
 
@@ -313,7 +313,7 @@ extern void ref_L00_002ED808_01(void *, int, int);
 /* Steps the sixteen slots: eases the angle down by five degrees a tick and drops a slot
    when its countdown reaches zero. 0.087266475f is 0x3DB2B8C4 as retail materialises it. */
 void part_l00_update_effect_slots(void) {
-    Entry_r002ED808 *entry = D_L00_001BECC0;
+    Entry_r002ED808 *entry = g_particle_l00_effect_slots;
     int i = 15;
 
     do {

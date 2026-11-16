@@ -13,16 +13,16 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *p
 
 extern char g_hero_state[];
 extern u8 *const g_moby_l11_table[] __attribute__((sda));
-extern u8 *D_L11_001B368C[] __attribute__((sda));
+extern u8 *g_arena_camera_table[] __attribute__((sda));
 extern void *g_group_id_lists[];
-extern s32 *D_L11_001FF580[];
-extern s32 D_L11_001CAE40[];
-extern s32 D_L11_001AED04[] __attribute__((sda));
-extern s32 D_L11_001B35B8 __attribute__((sda));
-extern s32 D_L11_001B0FEC __attribute__((sda));
-extern s32 D_L11_001B0FF8 __attribute__((sda));
-extern f32 D_L11_001B0FFC __attribute__((sda));
-extern char D_L11_001A8F20[] __attribute__((sda));
+extern s32 *g_path_l11_table[];
+extern s32 g_enemy_freeze_flag[];
+extern s32 g_active_rider_count[] __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
+extern s32 g_tribe_fighter_spark_color_a __attribute__((sda));
+extern s32 g_tribe_fighter_spark_color_b __attribute__((sda));
+extern f32 g_tribe_fighter_spark_frame_scale __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
 
 extern void anim_start_blended(u8 *a0, u32 a1, u32 a2, u32 a3);
 extern void moby_transform_joint_to_world(u32 a0, s32 a1, f32 *a2);
@@ -140,7 +140,7 @@ void tribe_fighter_update(u8 *moby) {
     f32 anim_frame3;
     s32 spark_sign2;
 
-    if (D_L11_001CAE40[0] != 0)
+    if (g_enemy_freeze_flag[0] != 0)
         return;
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F && moby[0x95] != 4)
         return;
@@ -248,15 +248,15 @@ void tribe_fighter_update(u8 *moby) {
                 moby_set_state(moby, 0x1A, 2);
                 node_idx = 0;
                 nearest_node = 0;
-                for (; node_idx < *D_L11_001FF580[*(s32 *)(vars + 0x284)]; ) {
-                    node_distance = vec_distance_xy(moby + 0x10, (u8 *)D_L11_001FF580[*(s32 *)(vars + 0x284)] + 0x10 + node_idx * 0x10);
+                for (; node_idx < *g_path_l11_table[*(s32 *)(vars + 0x284)]; ) {
+                    node_distance = vec_distance_xy(moby + 0x10, (u8 *)g_path_l11_table[*(s32 *)(vars + 0x284)] + 0x10 + node_idx * 0x10);
                     if (node_distance < best_distance) {
                         best_distance = node_distance;
                         nearest_node = node_idx;
                     }
                     node_idx++;
                 }
-                path_set_follower_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x284)], -1, nearest_node);
+                path_set_follower_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x284)], -1, nearest_node);
             }
             if (*(s32 *)(vars + 0x548) != -1) {
                 if (moby[0x43] != 3)
@@ -312,7 +312,7 @@ void tribe_fighter_update(u8 *moby) {
         hit_flags = moby_dispatch_action_by_kind(moby, vars + 0x60);
         if (hit_flags & 1) {
             moby_mark_spawned(*(u8 **)(vars + 0x278));
-            D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
+            g_active_rider_count[0] = g_active_rider_count[0] - 1;
             SetDeathBits(moby, 0, 3);
             part_queue_moby_for_glow(moby, 0, 0);
             return;
@@ -543,7 +543,7 @@ void tribe_fighter_update(u8 *moby) {
         }
         break;
     case 7:
-        if (path_follow_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x558)]) != 0) {
+        if (path_follow_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x558)]) != 0) {
             moby_set_state(moby, 8, -1);
             if (moby[0x43] != 9)
                 anim_start_blended(moby, 9, 0, 0x14);
@@ -575,7 +575,7 @@ void tribe_fighter_update(u8 *moby) {
         break;
     case 11:
         moby_set_controller_speed_limits(moby, 0.0015277779f, 0.045833334f, 0.003781547f, 0.29670602f);
-        if (path_follow_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x54C)]) != 0) {
+        if (path_follow_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x54C)]) != 0) {
             moby_set_state(moby, 0xC, -1);
             if (moby[0x43] != 1)
                 anim_start_blended(moby, 1, 0, 0x14);
@@ -583,12 +583,12 @@ void tribe_fighter_update(u8 *moby) {
         break;
     case 12:
         if (moby[0x60] & 2) {
-            path_a = D_L11_001FF580[*(s32 *)(vars + 0x54C)];
+            path_a = g_path_l11_table[*(s32 *)(vars + 0x54C)];
             dist_to_start_a = vec_distance_xy(moby + 0x10, path_a + 4);
             if (vec_distance_xy(moby + 0x10, (u8 *)path_a + *path_a * 0x10) < dist_to_start_a)
-                path_set_follower_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x54C)], 0, *path_a - 1);
+                path_set_follower_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x54C)], 0, *path_a - 1);
             else
-                path_set_follower_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x54C)], *path_a - 1, 0);
+                path_set_follower_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x54C)], *path_a - 1, 0);
             moby_set_state(moby, 0xB, -1);
             if (moby[0x43] != 4)
                 anim_start_blended(moby, 4, 0, 0x14);
@@ -613,7 +613,7 @@ void tribe_fighter_update(u8 *moby) {
         break;
     case 17:
         moby_set_controller_speed_limits(moby, 0.0015277779f, 0.045833334f, 0.003781547f, 0.29670602f);
-        if (path_follow_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x56C)]) != 0) {
+        if (path_follow_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x56C)]) != 0) {
             moby_set_state(moby, 0x12, -1);
             if (moby[0x43] != 9)
                 anim_start_blended(moby, 9, 0, 0x14);
@@ -621,12 +621,12 @@ void tribe_fighter_update(u8 *moby) {
         break;
     case 18:
         if (moby[0x60] & 2) {
-            path_b = D_L11_001FF580[*(s32 *)(vars + 0x56C)];
+            path_b = g_path_l11_table[*(s32 *)(vars + 0x56C)];
             dist_to_start_b = vec_distance_xy(moby + 0x10, path_b + 4);
             if (vec_distance_xy(moby + 0x10, (u8 *)path_b + *path_b * 0x10) < dist_to_start_b)
-                path_set_follower_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x56C)], 0, *path_b - 1);
+                path_set_follower_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x56C)], 0, *path_b - 1);
             else
-                path_set_follower_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x56C)], *path_b - 1, 0);
+                path_set_follower_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x56C)], *path_b - 1, 0);
             moby_set_state(moby, 0x11, -1);
             if (moby[0x43] != 4)
                 anim_start_blended(moby, 4, 0, 0x14);
@@ -648,7 +648,7 @@ void tribe_fighter_update(u8 *moby) {
         } else if (*(s32 *)(vars + 0x528) != 0) {
             if (saur_beast_walk_to_target(moby, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(moby + 0xF8), 7.0f, 0.25f, *(f32 *)(vars + 0x298)) != 0) {
                 group_id = moby[0x21];
-                if (D_L11_001B35B8 >= group_id && moby_count_group_not_in_state(group_id, -1) >= 2) {
+                if (g_tribe_group_limit >= group_id && moby_count_group_not_in_state(group_id, -1) >= 2) {
                     moby_table = g_moby_l11_table[0];
                     group_cursor = g_group_id_lists[moby[0x21]];
                     do {
@@ -675,7 +675,7 @@ void tribe_fighter_update(u8 *moby) {
     case 24:
         *(s32 *)(vars + 0x290) = 0;
         moby_set_controller_speed_limits(moby, 0.003888889f, 0.116666675f, 0.0033936962f, 0.27925274f);
-        *(TI128 *)work_vec = *(TI128 *)&D_L11_001B368C[0][(*(s32 *)(vars + 0x57C) << 7) + 0x30];
+        *(TI128 *)work_vec = *(TI128 *)&g_arena_camera_table[0][(*(s32 *)(vars + 0x57C) << 7) + 0x30];
         moby_l01_turn_toward_target(moby, work_vec);
         if (vec_distance_xy(moby + 0x10, work_vec) < 1.5f) {
             if (moby[0x43] != 0x12)
@@ -758,7 +758,7 @@ void tribe_fighter_update(u8 *moby) {
         break;
     case 34:
         if (*(s32 *)(vars + 0x564) != -1) {
-            patrol_point = (s32 *)((u8 *)D_L11_001FF580[*(s32 *)(vars + 0x564)] + *(s32 *)(vars + 0x568) * 0x10);
+            patrol_point = (s32 *)((u8 *)g_path_l11_table[*(s32 *)(vars + 0x564)] + *(s32 *)(vars + 0x568) * 0x10);
             linked_moby3 = g_moby_l11_table[0] + (*(s32 *)(vars + 0x548) << 8);
             moby_step_controller(moby, moby + 0x10, mat_fast_helper_a(*(f32 *)((u8 *)patrol_point + 0x10) - *(f32 *)(moby + 0x10),
                                                            *(f32 *)((u8 *)patrol_point + 0x14) - *(f32 *)(moby + 0x14)));
@@ -766,7 +766,7 @@ void tribe_fighter_update(u8 *moby) {
             *(f32 *)(moby + 0x14) = *(f32 *)(linked_moby3 + 0x14);
             *(f32 *)(moby + 0x18) = *(f32 *)(linked_moby3 + 0x18) + 1.5f;
             euler_rotation_basis(linked_moby3 + 0xC0, moby + 0xF0);
-            patrol_point2 = (s32 *)((u8 *)D_L11_001FF580[*(s32 *)(vars + 0x564)] + *(s32 *)(vars + 0x568) * 0x10);
+            patrol_point2 = (s32 *)((u8 *)g_path_l11_table[*(s32 *)(vars + 0x564)] + *(s32 *)(vars + 0x568) * 0x10);
             if (mat_fast_helper_a(*(f32 *)((u8 *)patrol_point2 + 0x10) - *(f32 *)(moby + 0x10),
                               *(f32 *)((u8 *)patrol_point2 + 0x14) - *(f32 *)(moby + 0x14)) <= 0.6108653f) {
                 if (++*(s32 *)(vars + 0x568) >= 2)
@@ -857,7 +857,7 @@ void tribe_fighter_update(u8 *moby) {
             *(f32 *)(vars + 0x164) = 0.00083333335f;
         } else {
             *(f32 *)(vars + 0x164) = 0.004166667f;
-            if (path_follow_nodes(moby, D_L11_001FF580[*(s32 *)(vars + 0x284)]) != 0) {
+            if (path_follow_nodes(moby, g_path_l11_table[*(s32 *)(vars + 0x284)]) != 0) {
                 if (*(s32 *)(vars + 0x294) == 1) {
                     if (moby[0x43] != 3)
                         anim_start_blended(moby, 3, 0, 0xA);
@@ -895,11 +895,11 @@ void tribe_fighter_update(u8 *moby) {
             offset_vec[2] = 0.0f;
             FastVecAdd(work_vec, work_vec, offset_vec);
             work_vec[2] = work_vec[2] - 0.05f;
-            spark_size = math_random_float_range(0.2f, 0.9f) * (anim_frame / D_L11_001B0FFC);
+            spark_size = math_random_float_range(0.2f, 0.9f) * (anim_frame / g_tribe_fighter_spark_frame_scale);
             spark_sign = math_random_int_below(2);
             if (spark_sign == 0) spark_sign = spark_sign - 1;
-            part_spawn_ground_effect(work_vec, 2, D_L11_001B0FEC, 0, spark_sign, D_L11_001A8F20, spark_size * 0.3f, spark_size, 0.0f, 0);
-            part_spawn_ground_effect(work_vec, 2, D_L11_001B0FF8, 1, -spark_sign, D_L11_001A8F20, spark_size * 0.04f, spark_size * 0.4f, 0.0f, 0);
+            part_spawn_ground_effect(work_vec, 2, g_tribe_fighter_spark_color_a, 0, spark_sign, g_identity_l11_matrix, spark_size * 0.3f, spark_size, 0.0f, 0);
+            part_spawn_ground_effect(work_vec, 2, g_tribe_fighter_spark_color_b, 1, -spark_sign, g_identity_l11_matrix, spark_size * 0.04f, spark_size * 0.4f, 0.0f, 0);
             *(f32 *)(vars + 0x574) = *(f32 *)(vars + 0x574) + 1.0f;
         }
         if (vec_distance_xy(moby + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 3.5f) {
@@ -977,11 +977,11 @@ void tribe_fighter_update(u8 *moby) {
             offset_vec[2] = 0.0f;
             FastVecAdd(work_vec, work_vec, offset_vec);
             work_vec[2] = work_vec[2] - 0.05f;
-            spark_size2 = math_random_float_range(0.2f, 0.9f) * (anim_frame3 / D_L11_001B0FFC);
+            spark_size2 = math_random_float_range(0.2f, 0.9f) * (anim_frame3 / g_tribe_fighter_spark_frame_scale);
             spark_sign2 = math_random_int_below(2);
             if (spark_sign2 == 0) spark_sign2 = spark_sign2 - 1;
-            part_spawn_ground_effect(work_vec, 2, D_L11_001B0FEC, 0, spark_sign2, D_L11_001A8F20, spark_size2 * 0.3f, spark_size2, 0.0f, 0);
-            part_spawn_ground_effect(work_vec, 2, D_L11_001B0FF8, 1, -spark_sign2, D_L11_001A8F20, spark_size2 * 0.04f, spark_size2 * 0.4f, 0.0f, 0);
+            part_spawn_ground_effect(work_vec, 2, g_tribe_fighter_spark_color_a, 0, spark_sign2, g_identity_l11_matrix, spark_size2 * 0.3f, spark_size2, 0.0f, 0);
+            part_spawn_ground_effect(work_vec, 2, g_tribe_fighter_spark_color_b, 1, -spark_sign2, g_identity_l11_matrix, spark_size2 * 0.04f, spark_size2 * 0.4f, 0.0f, 0);
             *(f32 *)(vars + 0x574) = *(f32 *)(vars + 0x574) + 1.0f;
         }
         if (math_is_value_within_step(moby, 11.0f) != 0) {
@@ -1050,7 +1050,7 @@ void tribe_fighter_update(u8 *moby) {
                     anim_start_blended(moby, 3, 0, 0xA);
                 moby_set_state(moby, 0x17, -1);
             }
-            *(TI128 *)work_vec = *(TI128 *)&D_L11_001B368C[0][(*(s32 *)(vars + 0x57C) << 7) + 0x30];
+            *(TI128 *)work_vec = *(TI128 *)&g_arena_camera_table[0][(*(s32 *)(vars + 0x57C) << 7) + 0x30];
             moby_l01_turn_toward_target(moby, work_vec);
             if (vec_distance_xy(moby + 0x10, work_vec) < 1.5f) {
                 if (*(s32 *)(vars + 0x5B4) != 0) {

@@ -3,16 +3,16 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct { u8 reserved_00[0x34]; int timer; } L02_State;
-extern L02_State D_L02_001BE200;
+extern L02_State g_mob_list;
 extern void FastVecAdd(void *, void *, void *);
-extern unsigned short **D_L02_001A9014 __attribute__((sda));
-extern u8 *D_L02_001B3C1C __attribute__((sda));
-extern float D_L02_001B2640[] MACRO_ADDR;
+extern unsigned short **g_record_lists __attribute__((sda));
+extern u8 *g_record_table __attribute__((sda));
+extern float g_path_quad_vectors[] MACRO_ADDR;
 extern float vec_distance_xy(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 
-void func_PAL_L02_0043E0D8(u8 *a0) {
+void path_draw_nearest_record_quad_pal(u8 *a0) {
     u8 *st = *(u8 **)(a0 + 0x68);
     float pt[4] __attribute__((aligned(16)));
     float tmp[4] __attribute__((aligned(16)));
@@ -30,8 +30,8 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
     for (i = 0; i < 2; i++) {
         idx = -1;
         if (i == 0) {
-            if (D_L02_001BE200.timer >= 0x318) {
-                if (D_L02_001BE200.timer < 0x466) {
+            if (g_mob_list.timer >= 0x318) {
+                if (g_mob_list.timer < 0x466) {
                     *(TI128 *)tmp = 0;
                     tmp[0] = 495.0f;
                     tmp[1] = 587.0f;
@@ -42,8 +42,8 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
             }
         }
         if (i == 1) {
-            if (D_L02_001BE200.timer >= 0x3E8) {
-                if (D_L02_001BE200.timer < 0x4E3) {
+            if (g_mob_list.timer >= 0x3E8) {
+                if (g_mob_list.timer < 0x4E3) {
                     *(TI128 *)tmp = 0;
                     tmp[0] = 515.0f;
                     tmp[1] = 596.0f;
@@ -56,9 +56,9 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
         if (idx != -1) {
             bestid = -1;
             best = 99999.0f;
-            for (q = D_L02_001A9014[*(int *)st];
-                 q != 0 && ((short)q[-1] >= 0 || q == D_L02_001A9014[*(int *)st]) &&
-                 (e = D_L02_001B3C1C + ((*q & 0x7FFF) << 6)) != 0;
+            for (q = g_record_lists[*(int *)st];
+                 q != 0 && ((short)q[-1] >= 0 || q == g_record_lists[*(int *)st]) &&
+                 (e = g_record_table + ((*q & 0x7FFF) << 6)) != 0;
                  q++) {
                 d = vec_distance_xy(e + 0x30, pt);
                 if (d < best) {
@@ -67,9 +67,9 @@ void func_PAL_L02_0043E0D8(u8 *a0) {
                 }
             }
             if (bestid != -1) {
-                rec = D_L02_001B3C1C + (bestid << 6);
+                rec = g_record_table + (bestid << 6);
                 for (k = 0; k < 4; k++) {
-                    matrix_mul_vec3(m + k * 4, D_L02_001B2640 + k * 4, rec);
+                    matrix_mul_vec3(m + k * 4, g_path_quad_vectors + k * 4, rec);
                     FastVecAdd(m + k * 4, m + k * 4, rec + 0x30);
                 }
                 DrawQuadWithRotatedUVs(m, idx, 2, 0xFF808080, 0);

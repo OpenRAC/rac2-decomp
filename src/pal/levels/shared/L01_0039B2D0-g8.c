@@ -9,7 +9,7 @@ extern void vec_random_direction(void *, float, float);
 extern int math_random_int_below(int);
 extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 extern void FastVecAdd(void *, void *, void *);
-extern float D_00189F08 __attribute__((nosda));
+extern float g_ground_height __attribute__((nosda));
 extern float ref_L01_00397EB0_00 __attribute__((sda));
 extern float ref_L01_00397EB0_01 __attribute__((sda));
 extern unsigned char ref_L01_00397EB0_02 __attribute__((sda));
@@ -22,7 +22,7 @@ extern float ref_L01_00397EB0_08 __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 
-void func_PAL_L01_0039B2D0(char *a0)
+void part_spawn_sparkle_trail_above_ground_pal(char *a0)
 {
     TI128 m, v1, v2;
     int i;
@@ -32,7 +32,7 @@ void func_PAL_L01_0039B2D0(char *a0)
         FastVecScale(&m, a0, 0.0009765625f);
     } else {
         moby_transform_joint_to_world(a0, 0, &m);
-        if (((float *)&m)[2] < D_00189F08) return;
+        if (((float *)&m)[2] < g_ground_height) return;
     }
     i = 2;
     vec_random_direction(&v1, ref_L01_00397EB0_00 * 0.020000001f, ref_L01_00397EB0_01 * 0.020000001f);

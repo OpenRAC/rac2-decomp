@@ -44,7 +44,7 @@ extern void part_l00_spawn_spark_pairs(Vector4 *,int);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void euler_to_matrix(void *,void *);
 extern void draw_world_quad(void *,void *,int);
-extern unsigned char D_001B8C80[];
+extern unsigned char g_camera_target_view[];
 extern void gfx_l00_init_default_block(char *);
 extern void gfx_l00_init_default_block_2(char *);
 typedef struct { char pad[0x20]; Vector4 position; } CollisionResult;

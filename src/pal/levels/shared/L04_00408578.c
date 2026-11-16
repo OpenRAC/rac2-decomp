@@ -20,7 +20,7 @@ extern void func_PAL_L04_0041AB08(void *, void *, void *, float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void FastVecSub(void *, void *, void *);
 
-void func_PAL_L04_00408578(unsigned char *m, unsigned char *p)
+void racer_update_bike_lean_pal(unsigned char *m, unsigned char *p)
 {
     float point[4];
     float end[4];

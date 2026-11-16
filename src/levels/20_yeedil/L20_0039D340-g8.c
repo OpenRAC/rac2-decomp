@@ -3,10 +3,10 @@
 /* This unit is built with -G8: func_L20_0039D340 reads four settings floats through $gp,
    declared as separate sda scalars like the sibling units' D_L20_001AED00..0C. */
 
-extern float D_L20_001AECF0 __attribute__((sda));
-extern float D_L20_001AECF4 __attribute__((sda));
-extern float D_L20_001AECF8 __attribute__((sda));
-extern float D_L20_001AECFC __attribute__((sda));
+extern float g_trooper_speed_scale __attribute__((sda));
+extern float g_trooper_turn_limit __attribute__((sda));
+extern float g_trooper_turn_accel __attribute__((sda));
+extern float g_trooper_spin_speed __attribute__((sda));
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_change_class_from_tables(void *, int);
 extern void moby_set_state(void *, int, int);
@@ -112,10 +112,10 @@ void trooper_setup_stats_target(Object0039D340 *object) {
         st->f80 = 0.52359884977340698f;
         st->f84 = 0.10000000149011612f;
         object->h7C = 15;
-        moby_set_controller_speed_limits(object, D_L20_001AECF4 * 0.00027777778f,
-                     D_L20_001AECF0 * 0.016666668f,
-                     D_L20_001AECFC * 4.8481375e-06f,
-                     D_L20_001AECF8 * 0.00029088825f);
+        moby_set_controller_speed_limits(object, g_trooper_turn_limit * 0.00027777778f,
+                     g_trooper_speed_scale * 0.016666668f,
+                     g_trooper_spin_speed * 4.8481375e-06f,
+                     g_trooper_turn_accel * 0.00029088825f);
         if (st->s24 == 0) {
             st->s24 = 10;
             st->f20 = 10.0f;

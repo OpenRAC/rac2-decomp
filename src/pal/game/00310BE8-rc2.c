@@ -7,7 +7,7 @@ extern void func_002A0F48();
 extern void anim_start_blended();
 typedef int TI __attribute__((mode(TI)));
 
-s32 func_PAL_00311D98(s32 arg0, f32 fparg0) {
+s32 swingshot_hook_spawn_pal(s32 arg0, f32 fparg0) {
     s32 temp;
     s32 t2;
 

@@ -11,12 +11,12 @@ extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x2290]; char *target; } Hero4BF0;
 extern Hero4BF0 g_hero_state;
 typedef struct { char pad[0x160]; float amount; int unused, timer, state; } Camera4BF0;
-extern Camera4BF0 D_L00_001B8C80;
-extern char *D_L00_001B2B50 __attribute__((sda));
-extern char *D_L00_001B2B54;
-extern int *D_L00_001B2B58[] MACRO_ADDR;
-extern float D_L00_001B05D4 __attribute__((sda));
-extern float D_L00_001B05D8 __attribute__((sda));
+extern Camera4BF0 g_scalar_transition_state;
+extern char *g_blast_effect_records __attribute__((sda));
+extern char *g_blast_l00_pool;
+extern int *g_blast_l00_ripple_particles[] MACRO_ADDR;
+extern float g_blast_uv_scroll_u __attribute__((sda));
+extern float g_blast_uv_scroll_v __attribute__((sda));
 extern char *D_L00_001B2B50_1 MACRO_ADDR;
 extern char *g_area_hit_targets[];
 extern int save_is_record_value(short,int);
@@ -26,9 +26,9 @@ extern char *level_get_slot_body(short,int);
 extern int mem_align_size_16(int);
 extern void cam_compute_view_direction(void *,void *,int);
 extern void FastVecAdd(void *,void *,void *);
-extern void func_PAL_002AD288(void *,void *,int,float,float);
+extern void part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
 extern void blast_init_effect_record(void *,int,void *,void *,float);
-extern void func_PAL_L00_003E95C0(void *,void *);
+extern void part_spawn_blast_sparks_pal(void *,void *);
 extern int math_fast_helper_a(void *,float);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
@@ -38,7 +38,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(float,void *,void *,int,void *);
 extern void QueueMobyImpact(void *,void *);
-extern int func_PAL_0032F0B8(void *,int,int);
+extern int StartAttachedEffect_pal(void *,int,int);
 extern int math_fast_float_d(void *);
 extern void blast_clear_state(void);
 extern void moby_mark_spawned(void *);
@@ -47,7 +47,7 @@ extern void ref_L00_003E4BF0_00(void (*)(void *),void *);
 extern void mini_nuke_blast_draw(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
 
-void func_PAL_L00_003E8E70(char *object)
+void mini_nuke_blast_update_pal(char *object)
 {
     Vec4BF0 center, offset, query, direction;
     struct { Vec4BF0 point; char pad[8]; unsigned char type, flags; short id; int unused; int active; } hit;
@@ -69,26 +69,26 @@ void func_PAL_L00_003E8E70(char *object)
         data->count=111;
         data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=level_get_slot_body(*(short *)(object+0xAA),data->handle);
-        D_L00_001B2B50=mem;
-        D_L00_001B2B54=(char *)mem_align_size_16((int)(mem+0x50));
-        D_L00_001B2B58[0]=(int *)mem_align_size_16((int)(D_L00_001B2B54+0xA000));
+        g_blast_effect_records=mem;
+        g_blast_l00_pool=(char *)mem_align_size_16((int)(mem+0x50));
+        g_blast_l00_ripple_particles[0]=(int *)mem_align_size_16((int)(g_blast_l00_pool+0xA000));
         i=0;
-        do { D_L00_001B2B58[0][i]=0; i++; } while(i<144);
-        { char *p = D_L00_001B2B54+319*128+124;
+        do { g_blast_l00_ripple_particles[0][i]=0; i++; } while(i<144);
+        { char *p = g_blast_l00_pool+319*128+124;
         for(i=319;i>=0;i--,p-=128) *(int *)p=0; }
         *(int *)(D_L00_001B2B50_1+0x30)=0;
         qcopy(center,object+0x10);
         cam_compute_view_direction(object+0x10,offset,1);
         FastVecAdd(center,object+0x10,offset);
-        func_PAL_002AD288(object,center,-1,2.0f,20.0f);
+        part_spawn_explosion_with_sparks_pal(object,center,-1,2.0f,20.0f);
         blast_init_effect_record(object,17,object+0x10,data,0.20000002f);
-        func_PAL_L00_003E95C0(object,object+0x10);
+        part_spawn_blast_sparks_pal(object,object+0x10);
         qcopy(query,center);
         query[3]=2.0f;
         if(math_fast_helper_a(query,100.0f)!=-1) {
-            D_L00_001B8C80.amount=0.45f;
-            D_L00_001B8C80.timer=33;
-            D_L00_001B8C80.state=0;
+            g_scalar_transition_state.amount=0.45f;
+            g_scalar_transition_state.timer=33;
+            g_scalar_transition_state.state=0;
         }
     }
     case 1: {
@@ -112,7 +112,7 @@ void func_PAL_L00_003E8E70(char *object)
                 hit.point[3]=5627.925f;
                 hit.id=*(short *)(g_area_hit_targets[i]+0xAA);
                 QueueMobyImpact(g_area_hit_targets[i],&hit);
-                func_PAL_0032F0B8(g_area_hit_targets[i],71,*(int *)(object+0xB8));
+                StartAttachedEffect_pal(g_area_hit_targets[i],71,*(int *)(object+0xB8));
             }
         }
         if(math_fast_float_d(timer)) {
@@ -124,7 +124,7 @@ void func_PAL_L00_003E8E70(char *object)
     case 2:
         data->phase+=data->rate;
         scale=IntToFloat(data->timer)*0.025f;
-        if(data->timer==20) func_PAL_L00_003E95C0(object,object+0x10);
+        if(data->timer==20) part_spawn_blast_sparks_pal(object,object+0x10);
         if(math_fast_float_d(&data->timer)) {
             if(data->alpha) --data->alpha;
             else { data->alpha=0; *(unsigned char *)(object+0x20)=6; }
@@ -141,9 +141,9 @@ destroy:
         }
         break;
     }
-    D_L00_001B05D8-=0.04f;
-    if(D_L00_001B05D4 < -8.0f) D_L00_001B05D4+=8.0f;
-    if(D_L00_001B05D8 < -8.0f) D_L00_001B05D8+=8.0f;
+    g_blast_uv_scroll_v-=0.04f;
+    if(g_blast_uv_scroll_u < -8.0f) g_blast_uv_scroll_u+=8.0f;
+    if(g_blast_uv_scroll_v < -8.0f) g_blast_uv_scroll_v+=8.0f;
     blast_update_effect_records(object);
     ref_L00_003E4BF0_00(mini_nuke_blast_draw,object);
 }

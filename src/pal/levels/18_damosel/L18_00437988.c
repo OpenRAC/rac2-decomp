@@ -6,16 +6,16 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int s32;
-extern u8 D_001C97C0[];
+extern u8 g_beam_target_vec[];
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern s32 IsPointInCuboid(u8 *, s32);
 extern s32 CollLine(void *arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4);
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
-extern u8 D_00190000[];
+extern s32 g_max_l18_group_index[] __attribute__((sda));
+extern u8 g_data_block_base[];
 extern void snd_stop_voice(s32 arg0);
 extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_mark_spawned(void *arg0);
@@ -23,13 +23,13 @@ extern char *SpawnExplosion(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, 
                            s32 arg6, s32 arg7, float arg8, float arg9, s32 arg10, s32 arg11,
                            s32 arg12, s32 arg13);
 
-void func_PAL_L18_00437A28(u8 *a0) {
+void extermibot_destroy_piece_and_parts_pal(u8 *a0) {
     u8 *s0;
     s32 a1;
     s0 = *(u8 **)(a0 + 0x68);
     a1 = *(s32 *)(s0 + 0x7F0);
     if (a1 != -1) {
-        u8 *p = D_00190000 - 0x79A0 + a1 * 0x70;
+        u8 *p = g_data_block_base - 0x79A0 + a1 * 0x70;
         if (*(u32 *)(p + 0x88) != (u32)a0) goto end;
         if (p[0x74] == 0) goto end;
         snd_stop_voice(a1);

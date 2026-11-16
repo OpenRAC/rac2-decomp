@@ -21,7 +21,7 @@ extern void RequestVoiceLine(u8 *, s32);
 /* func_L16_0040C840 is in L16_0040C840-g8.c. */
 
 extern s32 FloatToInt(float);
-extern s32 D_L16_001B2648 MACRO_ADDR;
+extern s32 g_frame_l16_counter MACRO_ADDR;
 extern float math_fast_sin_or_cos_b(float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void func_PAL_L16_004180B0(u8 *);
@@ -66,7 +66,7 @@ void func_PAL_L16_004164B8(u8 *arg)
     f20 = 10.0f;
     if (s0[0x20] == 0xD || s0[0x20] == 0xF || s0[0x20] == 0xE || s0[0x20] == 0x11)
         f20 = 25.0f;
-    f20 = f20 + math_fast_sin_or_cos_b((float)(D_L16_001B2648 % FloatToInt(1e+02f)) / period * 6.2831855f - 3.1415927f);
+    f20 = f20 + math_fast_sin_or_cos_b((float)(g_frame_l16_counter % FloatToInt(1e+02f)) / period * 6.2831855f - 3.1415927f);
     math_step_value_toward_target(s0 + 0x18, s1 + 0x268, *(float *)(s1 + 0x264) + f20,
                   0.012f, 0.004f, 0.20000002f);
     func_PAL_L16_004180B0(s0);

@@ -4,7 +4,7 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { Vector vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } RibbonPacket;
-extern char D_L10_001B9680[];
+extern char g_view_origin_vec[];
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
@@ -37,7 +37,7 @@ void DrawHrugisRibbon(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth
     halo.uv[4] = 1; halo.uv[5] = 0; halo.uv[6] = 1; halo.uv[7] = 1;
     core.uv[0] = 0; core.uv[1] = 0; core.uv[2] = 0; core.uv[3] = 1;
     core.uv[4] = 1; core.uv[5] = 0; core.uv[6] = 1; core.uv[7] = 1;
-    FastVecSub(&eye, points, D_L10_001B9680);
+    FastVecSub(&eye, points, g_view_origin_vec);
     FastVecSub(&tangent, points + 1, points);
     FastVecCross(&normal, &tangent, &eye);
     initialLength = FastVecLength(&normal);
@@ -49,7 +49,7 @@ void DrawHrugisRibbon(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth
         /* The core loop declares its own zero constant, as in func_L00_003D37E8. */
         float coreZero = 0.0f;
 
-        FastVecSub(&eye, points + i, D_L10_001B9680);
+        FastVecSub(&eye, points + i, g_view_origin_vec);
         FastVecSub(&tangent, points + i + 1, points + i);
         FastVecCross(&normal, &tangent, &eye);
         length = FastVecLength(&normal);
@@ -65,8 +65,8 @@ void DrawHrugisRibbon(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth
         qcopy(&core.vertex[0], &core.vertex[2]); qcopy(&core.vertex[1], &core.vertex[3]);
     }
     for (i = 0; i < count - 1; i++) {
-        FastVecSub(&firstRay, points + i, D_L10_001B9680);
-        FastVecSub(&lastRay, points + i + 1, D_L10_001B9680);
+        FastVecSub(&firstRay, points + i, g_view_origin_vec);
+        FastVecSub(&lastRay, points + i + 1, g_view_origin_vec);
         firstLength = FastVecLength(&firstRay);
         lastLength = FastVecLength(&lastRay);
         if (lastLength < firstLength) {
@@ -74,13 +74,13 @@ void DrawHrugisRibbon(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth
             else FastVecScale(&lastRay, &lastRay, firstLength / lastLength);
         } else if (firstLength == 0) { qcopy(&firstRay, &lastRay); }
         else FastVecScale(&firstRay, &firstRay, lastLength / firstLength);
-        FastVecAdd(&first, D_L10_001B9680, &firstRay);
-        FastVecAdd(&last, D_L10_001B9680, &lastRay);
+        FastVecAdd(&first, g_view_origin_vec, &firstRay);
+        FastVecAdd(&last, g_view_origin_vec, &lastRay);
         FastVecSub(&tangent, &last, &first);
         FastVecScale(&extension, &tangent, extend);
         FastVecSub(&first, &first, &extension);
         FastVecAdd(&last, &last, &extension);
-        FastVecSub(&toEye, D_L10_001B9680, &first);
+        FastVecSub(&toEye, g_view_origin_vec, &first);
         FastVecCross(&normal, &toEye, &tangent);
         haloLength = FastVecLength(&normal);
         if (haloLength != 0) haloLength = 1.0f / haloLength;

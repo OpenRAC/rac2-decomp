@@ -2,8 +2,8 @@
 typedef union { int q __attribute__((mode(TI))); float f[4]; } SpawnVec;
 typedef struct __attribute__((packed, aligned(4))) { u64 a; u32 b; } SpawnParams;
 typedef struct { char pad[0x10]; SpawnVec previous, velocity, direction; char pad40[0xC]; short trigger; char pad4e[6]; int state; char pad58[4]; float timer; char pad60[0x8]; int target; } SpawnRecord;
-extern float D_001AEC04 __attribute__((sda));
-extern SpawnParams D_001AEC10;
+extern float g_projectile_target_range __attribute__((sda));
+extern SpawnParams g_projectile_spawn_params;
 extern void moby_get_facing_direction(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern char *SelectBestTargetInCone(void *, void *, float, float, void *, int, int, int, float, float, float, int, void *);
@@ -27,8 +27,8 @@ void projectile_launch_at_target(char *obj)
     moby_get_facing_direction(obj + 0x10, &origin);
     moby_transform_joint_to_world(obj, 0, &pos);
     if (rec->target == 0) {
-        params = D_001AEC10;
-        rec->target = SelectBestTargetInCone(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, D_001AEC04, 0.0f, 0.0f, 0, &params);
+        params = g_projectile_spawn_params;
+        rec->target = SelectBestTargetInCone(&pos, obj + 0xC0, 6.2831855f, 6.2831855f, &output, 0, 0, 0, g_projectile_target_range, 0.0f, 0.0f, 0, &params);
         if (rec->target) {
             obj[0x20] = 4;
             rec->timer = 0.0f;

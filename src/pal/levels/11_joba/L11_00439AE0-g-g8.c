@@ -12,19 +12,19 @@ extern float vec_distance_xy(void *,void *);
 extern void make_hit_descriptor(void *,void *,int,void *,float);
 extern int CollLine(void *,void *,int,void *,void *);
 extern int flag_is_third_pending_set(void *);
-extern void func_PAL_L11_0043A4C8(float *,int);
+extern void part_l11_spawn_impact_burst_pal(float *,int);
 extern void moby_set_flag_bit(void *,int);
 extern void moby_mark_spawned(void *);
 extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern void *part_spawn_ground_effect(void *,int,float,float,unsigned int,int,int,void *,float,int);
 extern void gfx_add_draw_callback_third(void *,void *);
-extern char D_L11_001C0D20[];
-extern char D_L11_001A8F20[16] MACRO_ADDR;
-extern unsigned int D_L11_001B11E0 __attribute__((sda));
-extern unsigned int D_L11_001B11E8 __attribute__((sda));
-extern unsigned int D_L11_001B11F0 __attribute__((sda));
-extern unsigned int D_L11_001B11F8 __attribute__((sda));
+extern char g_aim_position[];
+extern char g_identity_l11_matrix[16] MACRO_ADDR;
+extern unsigned int g_thrown_projectile_spark_color_a __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_b __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_c __attribute__((sda));
+extern unsigned int g_thrown_projectile_spark_color_d __attribute__((sda));
 extern void projectile_run_trail_steps(char *);
 void func_PAL_L11_00439ADC(char *obj) {
     float vel[4]; char collision[48]; float pos[4],pos2[4];
@@ -41,10 +41,10 @@ void func_PAL_L11_00439ADC(char *obj) {
         *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
         FastVecAdd(st+0x10,st,st+0x10);
         if(CollLine(st,st+0x10,0,obj,collision)) {
-            impact=(float *)D_L11_001C0D20;
+            impact=(float *)g_aim_position;
             *(QuadPAL439ADC *)(st+0x10)=*(QuadPAL439ADC *)impact;
             if(!flag_is_third_pending_set(obj)) {
-                func_PAL_L11_0043A4C8(impact,6);
+                part_l11_spawn_impact_burst_pal(impact,6);
                 moby_set_flag_bit(obj,1);
             }
             moby_mark_spawned(obj); return;
@@ -52,10 +52,10 @@ void func_PAL_L11_00439ADC(char *obj) {
         size=math_random_float_range(1,4);
         sign=math_random_int_range(25,35); if(!sign) sign--;
         qcopy(pos,st+0x10); pos[2]-=0.1f;
-        part_spawn_ground_effect(pos,12,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(pos,12,size*0.3f,size,g_thrown_projectile_spark_color_a,0,sign,g_identity_l11_matrix,0.0f,0);
         sign = -sign;
-        part_spawn_ground_effect(st,8,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
-        part_spawn_ground_effect(st,8,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
+        part_spawn_ground_effect(st,8,size*0.3f,size,g_thrown_projectile_spark_color_b,0,sign,g_identity_l11_matrix,0.0f,0);
+        part_spawn_ground_effect(st,8,size*0.04f,size*0.4f,g_thrown_projectile_spark_color_c,1,-sign,g_identity_l11_matrix,0.0f,0);
         gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
         return;
     } else if (*(float *)(st+0x38)>=25 && *(float *)(st+0x38)<34) {
@@ -68,10 +68,10 @@ void func_PAL_L11_00439ADC(char *obj) {
             *(unsigned short *)(collision+0x1A)=*(unsigned short *)(obj+0xAA);
             FastVecAdd(st+0x10,st,st+0x10);
             if(CollLine(st,st+0x10,0,obj,collision)) {
-                impact=(float *)D_L11_001C0D20;
+                impact=(float *)g_aim_position;
             *(QuadPAL439ADC *)(st+0x10)=*(QuadPAL439ADC *)impact;
                 if(!flag_is_third_pending_set(obj)) {
-                    func_PAL_L11_0043A4C8(impact,3);
+                    part_l11_spawn_impact_burst_pal(impact,3);
                     moby_set_flag_bit(obj,1);
                 }
                 moby_mark_spawned(obj); return;
@@ -81,8 +81,8 @@ void func_PAL_L11_00439ADC(char *obj) {
             size=math_random_float_range(1,4);
             sign=math_random_int_range(25,35); if(!sign) sign--;
             qcopy(pos2,st+0x10); pos2[2]-=0.1f;
-            part_spawn_ground_effect(pos2,12,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
-            part_spawn_ground_effect(pos2,17,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
+            part_spawn_ground_effect(pos2,12,size*0.3f,size,g_thrown_projectile_spark_color_a,0,sign,g_identity_l11_matrix,0.0f,0);
+            part_spawn_ground_effect(pos2,17,size*0.4f,size*0.2f,g_thrown_projectile_spark_color_d,1,-sign,g_identity_l11_matrix,0.0f,0);
             gfx_add_draw_callback_third(projectile_run_trail_steps,obj);
             return;
 

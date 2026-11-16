@@ -16,11 +16,11 @@ typedef struct { TI128 q; } Vec;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L11_001A8FF4 __attribute__((sda));
-extern f32 D_L11_001B1D40 __attribute__((sda));
-extern f32 D_L11_001B1D44;
-extern f32 D_L11_001B1D48;
-extern u8 *D_L11_001FF580[];
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
+extern f32 g_drone_target_angle_a __attribute__((sda));
+extern f32 g_drone_target_angle_b;
+extern f32 g_drone_target_angle_c;
+extern u8 *g_path_l11_table[];
 
 extern int CollLine(void *, void *, int, void *, void *);
 extern s32 coll_test_point(void *, s32, void *, float);
@@ -90,7 +90,7 @@ void drone_update(u8 *self)
     pv = *(u8 **)(self + 0x68);
     if (self[0x20] == 1)
         return;
-    if (*(s16 *)(pv + 0x1FC) != 0 && D_L11_001A8FF4 == 0 && self[0x20] != 0xE && self[0x20] != 0xD)
+    if (*(s16 *)(pv + 0x1FC) != 0 && g_hero_l11_input_blocked == 0 && self[0x20] != 0xE && self[0x20] != 0xD)
         return;
     drone_launcher_update_state(self);
     if (*(u8 **)(pv + 0x1C4) != 0) {
@@ -105,7 +105,7 @@ void drone_update(u8 *self)
     dist = fast_vec_dist((self + 0x10), v00);
     if (self[0x20] == 1)
         return;
-    if (*(s16 *)(pv + 0x1FC) != 0 && D_L11_001A8FF4 == 0)
+    if (*(s16 *)(pv + 0x1FC) != 0 && g_hero_l11_input_blocked == 0)
         return;
     target = 0;
     if (*(s32 *)(self + 0xB8) != 0)
@@ -146,9 +146,9 @@ void drone_update(u8 *self)
         f32 lim;
 
         if (*(s16 *)(pv + 0x1FC) != 0)
-            path = D_L11_001FF580[*(s32 *)(pv + 0x1E0)];
+            path = g_path_l11_table[*(s32 *)(pv + 0x1E0)];
         else
-            path = D_L11_001FF580[*(s32 *)(pv + 0x1C0)];
+            path = g_path_l11_table[*(s32 *)(pv + 0x1C0)];
         if (flag_set_first_pending(self) != 0) {
             p = path + 0x10;
             best = 0;
@@ -364,9 +364,9 @@ void drone_update(u8 *self)
         *(f32 *)(self + 0x18) = z;
     }
     if (self[0x20] != 0xE) {
-        *(f32 *)(pv + 0x1B0) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B0), D_L11_001B1D40 * 0.00029088825f, 0.0625f);
-        *(f32 *)(pv + 0x1B4) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B4), D_L11_001B1D44 * 0.00029088825f, 0.0625f);
-        *(f32 *)(pv + 0x1B8) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B8), D_L11_001B1D48 * 0.00029088825f, 0.0625f);
+        *(f32 *)(pv + 0x1B0) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B0), g_drone_target_angle_a * 0.00029088825f, 0.0625f);
+        *(f32 *)(pv + 0x1B4) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B4), g_drone_target_angle_b * 0.00029088825f, 0.0625f);
+        *(f32 *)(pv + 0x1B8) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B8), g_drone_target_angle_c * 0.00029088825f, 0.0625f);
         *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), *(f32 *)(pv + 0x1B0));
         *(f32 *)(self + 0xF4) = FastAddRotations(*(f32 *)(self + 0xF4), *(f32 *)(pv + 0x1B4));
         *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), *(f32 *)(pv + 0x1B8));

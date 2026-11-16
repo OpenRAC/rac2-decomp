@@ -13,15 +13,15 @@ typedef union { QuadWord word; float v[4]; } Vector;
 #define POINTER(p, o) (*(char **)((char *)(p) + (o)))
 #define QUAD(p, o) (*(QuadWord *)((char *)(p) + (o)))
 
-extern int D_L11_001AED04;
-extern int D_US2_001A9050;
-extern int D_L11_001AED00 __attribute__((sda));
-extern int D_L11_001B30C8 __attribute__((sda));
+extern int g_active_rider_count;
+extern int g_level_event_state;
+extern int g_enemy_spawn_enabled __attribute__((sda));
+extern int g_arena_progress_level __attribute__((sda));
 extern char *g_moby_l11_table;
-extern int D_L11_001B35B8;
+extern int g_tribe_group_limit;
 extern unsigned short *g_group_id_lists[];
-extern Vector D_L11_001BA8C0;
-extern char D_L11_001B0FD8[], D_L11_002BACF0[];
+extern Vector g_hero_l11_position;
+extern char g_str_rider_debug_index[], g_str_debug_rider[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int FloatToInt(float);
 extern int path_build_route_nodes(void *, int, void *, int);
@@ -90,7 +90,7 @@ int func_US2_L11_00426260(unsigned char *object)
 
     if (BYTE(object, 0x20) == 0) {
         BYTE(object, 0x30) = 0x80;
-        if (D_US2_001A9050 == 0) ++D_L11_001AED04;
+        if (g_level_event_state == 0) ++g_active_rider_count;
         POINTER(state, 0x18) = state + 0x140;
         REAL(object, 0x18) = coll_probe_ground_height_below(((char *)object + 0x10), 0, 0.5f);
         WORD(state, 0x554) = 0;
@@ -101,7 +101,7 @@ int func_US2_L11_00426260(unsigned char *object)
         if (WORD(state, 0x528) != 0) {
             index = path_build_route_nodes(object, WORD(state, 0x524), state + 0x320, 16);
             WORD(state, 0x520) = index;
-            STUB_printf(D_L11_001B0FD8, index);
+            STUB_printf(g_str_rider_debug_index, index);
         }
         angle = REAL(state, 0x298);
         if (angle == 0.0f) {
@@ -183,8 +183,8 @@ int func_US2_L11_00426260(unsigned char *object)
                 moby_copy_joint_transform_to_object(object, POINTER(state, 0x278), 1, 0);
                 WORD(state, 0x290) = 0;
             } else {
-                STUB_printf(D_L11_002BACF0);
-                --D_L11_001AED04;
+                STUB_printf(g_str_debug_rider);
+                --g_active_rider_count;
                 WORD(state, 0x26c) = 0;
                 moby_set_state(object, 4, 0);
                 return 1;
@@ -248,7 +248,7 @@ int func_US2_L11_00426260(unsigned char *object)
         REAL(state, 0x12c) = 8.0f;
         REAL(state, 0x130) = 10.0f;
     }
-    if (BYTE(object, 0x31) != 0 && fast_vec_dist(((char *)object + 0x10), &D_L11_001BA8C0) < 24.0f) {
+    if (BYTE(object, 0x31) != 0 && fast_vec_dist(((char *)object + 0x10), &g_hero_l11_position) < 24.0f) {
         moby_update_ground_check(object);
         BYTE(object, 0x6f) = 0x16;
     }
@@ -292,7 +292,7 @@ int func_US2_L11_00426260(unsigned char *object)
         if (attacker != 0) {
             kind = HALF(attacker, 0xaa);
             if (kind != 0xed8 && kind != 0x47 && kind != 0xdd9 && kind != 0xd1b && kind != 0xce7 && kind != 0xd07 && kind != 0)
-                D_L11_001AED00 = 0;
+                g_enemy_spawn_enabled = 0;
         }
         if (BYTE(object, 0xbc) == 1 && result != 1) {
             char *damaged = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
@@ -322,7 +322,7 @@ int func_US2_L11_00426260(unsigned char *object)
         BYTE(state, 0x57) = 0xd2;
         gfx_start_color_fade((int)object, state + 0x50);
         if (BYTE(object, 0x95) != 2) tribesman_alert_group(object);
-        if ((unsigned int)(result - 4) < 2 && D_L11_001B35B8 >= BYTE(object, 0x21) &&
+        if ((unsigned int)(result - 4) < 2 && g_tribe_group_limit >= BYTE(object, 0x21) &&
             moby_count_group_not_in_state(BYTE(object, 0x21), -1) >= 2) {
             unsigned short *ids;
             unsigned short id;
@@ -355,9 +355,9 @@ int func_US2_L11_00426260(unsigned char *object)
         moby_set_state(object, 0x25, 9);
         if (BYTE(object, 0x43) != 0x23) anim_start_blended(object, 0x23, 0, 10);
     }
-    if (REAL(object, 0x18) < 75.0f && D_L11_001B30C8 >= 6) {
+    if (REAL(object, 0x18) < 75.0f && g_arena_progress_level >= 6) {
         SetDeathBits(object, 0, 3);
-        if (D_L11_001B35B8 >= BYTE(object, 0x21) && moby_count_group_not_in_state(BYTE(object, 0x21), -1) >= 2) {
+        if (g_tribe_group_limit >= BYTE(object, 0x21) && moby_count_group_not_in_state(BYTE(object, 0x21), -1) >= 2) {
             unsigned short *ids;
             unsigned short id;
             ids = g_group_id_lists[BYTE(object, 0x21)];
@@ -378,7 +378,7 @@ int func_US2_L11_00426260(unsigned char *object)
             moby_mark_spawned(POINTER(state, 0x29c));
             POINTER(state, 0x29c) = 0;
         }
-        --D_L11_001AED04;
+        --g_active_rider_count;
         return 1;
     }
     return 0;

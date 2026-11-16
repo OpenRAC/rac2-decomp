@@ -10,21 +10,21 @@ extern s32 FloatToInt(f32);
 extern void gfx_free_point_light(s32);
 extern void offset_moby_class_point_pairs(void *, s32, s32);
 
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 extern u8 g_sound_state[];
-extern u8 D_001395DA[];
+extern u8 g_level_event_flag_b[];
 
 typedef struct {
     u8 pad[0x464];
     u8 flags[0];
 } TodanoObjectFlags;
 
-extern TodanoObjectFlags D_L12_0021EDF0;
+extern TodanoObjectFlags g_object_flags;
 extern s32 g_current_map_index MACRO_ADDR;
-extern u8 *D_L12_001B2E9C __attribute__((sda));
-extern f32 D_L12_001B17C0 __attribute__((sda));
-extern s32 D_L12_001B17E0 __attribute__((sda));
-extern s32 D_L12_001B29C8 MACRO_ADDR;
+extern u8 *g_moby_list_start __attribute__((sda));
+extern f32 g_guard_state_decrement __attribute__((sda));
+extern s32 g_guard_alarm_bit_shift __attribute__((sda));
+extern s32 g_frame_l12_counter MACRO_ADDR;
 
 /* Each object has a three-bit counter in one half of a packed byte. */
 #define OBJECT_COUNTERS(o) \
@@ -48,9 +48,9 @@ void UpdateLinkedMobyFade(u8 *object) {
 
     if (flag_is_third_pending_set()) goto kill;
     index = *(u16 *)(object + 0xB2);
-    record = &D_L12_0021EDF0;
+    record = &g_object_flags;
     if (record->flags[(s16)index]) goto kill;
-    bits = (u8)D_0019B4A8[((s16)index >> 1) + (g_current_map_index << 10)];
+    bits = (u8)g_moby_nibble_table[((s16)index >> 1) + (g_current_map_index << 10)];
     if (index & 1) {
         if ((bits >> 4) & 7) goto kill;
     } else if (bits & 7) {
@@ -62,7 +62,7 @@ kill: {
         s32 id;
         u8 *effect;
 
-        D_001395DA[0] = 1;
+        g_level_event_flag_b[0] = 1;
         INCREMENT_OBJECT_COUNTER(object);
         id = *(s32 *)(state + 0x10);
         if (id != -1) {
@@ -98,11 +98,11 @@ dispatch:
             u8 *linked;
 
             if (id != -1) {
-                linked = D_L12_001B2E9C + (id << 8);
+                linked = g_moby_list_start + (id << 8);
                 if (!linked || linked[0x20] == 0xFE || linked[0x20] == 0xFD)
                     goto activate;
                 index = *(u16 *)(linked + 0xB2);
-                bits = (u8)D_0019B4A8[((s16)index >> 1) + (g_current_map_index << 10)];
+                bits = (u8)g_moby_nibble_table[((s16)index >> 1) + (g_current_map_index << 10)];
                 if (index & 1) {
                     if ((bits >> 4) & 7) goto activate;
                     else goto update;
@@ -121,7 +121,7 @@ update:
         break;
     }
     case 2:
-        *(f32 *)(state + 4) -= D_L12_001B17C0;
+        *(f32 *)(state + 4) -= g_guard_state_decrement;
         if (*(f32 *)(state + 4) < 0.0f)
             object[0x20] = 3;
         else
@@ -155,6 +155,6 @@ update:
         *(s16 *)(state + 0xC) += 0x1000;
         delta = 0x10C0;
     }
-    if (!(D_L12_001B29C8 << D_L12_001B17E0))
+    if (!(g_frame_l12_counter << g_guard_alarm_bit_shift))
         offset_moby_class_point_pairs(*(void **)(object + 0x24), delta, 0);
 }

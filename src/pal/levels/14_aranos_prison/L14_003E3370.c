@@ -10,13 +10,13 @@ extern void FastVecAdd(void *dst, void *a, void *b);
 extern void entity_apply_corrected_pos(char *e, void *v);
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 
 /* For every entity of the owner's group (state word 0x68), other than the two states 0xFE and
    0xFD, that func_L14_003C9548 accepts: takes its offset from the owner in the owner's frame;
    when that is beyond 1.0 on the first axis or 1.5 on the second it is pulled back to +-0.5 or
    +-1.25, and the entity is handed the corrected world position (func_L14_003C9658). */
-void func_PAL_L14_003E3370(char *self) {
+void lift_clamp_group_riders_pal(char *self) {
     float mtx[16];
     float off[4];
     char *state = *(char **)(self + 0x68);
@@ -26,7 +26,7 @@ void func_PAL_L14_003E3370(char *self) {
 
     matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = g_group_entity_lists[*(int *)(state + 0x68)];
-         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
+         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         e = g_moby_l14_pool + ((*p & 0x7FFF) << 8);

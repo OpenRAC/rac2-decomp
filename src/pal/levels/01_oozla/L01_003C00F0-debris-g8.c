@@ -13,18 +13,18 @@ extern void vec_scale_to_length(void *, void *, float), FastVecAdd(void *, void 
 extern void *breakable_spawn_copy(void *, void *);
 extern int PlayMobySound(int, int, void *);
 extern char *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern char *func_PAL_L01_003C05E8(char *, int, void *, void *, int, int, void *, void *, void *, float);
 
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
-extern LevelSaveState D_L01_0021E4B0;
+extern LevelSaveState g_level_save_state_backup;
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
-extern float D_L01_001A8F60[] MACRO_ADDR;
+extern u8 g_moby_nibble_table[];
+extern float g_zero_l01_vector[] MACRO_ADDR;
 
-void func_PAL_L01_003C00F0(char *obj)
+void breakable_l01_debris_update_pal(char *obj)
 {
     float delta[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -37,8 +37,8 @@ void func_PAL_L01_003C00F0(char *obj)
     if(*(unsigned char *)(obj+0x20)==0) {
         *(float *)(obj+0x2C)*=math_random_float_range(0.8f,1.1f);
         if(*(unsigned char *)(obj+0xB0)!=255) {
-            if(D_L01_0021E4B0.collected[*(short *)(obj+0xB2)]) goto remove_initial;
-            byte=D_0019B4A8[(*(short *)(obj+0xB2)>>1)+(g_current_map_index<<10)];
+            if(g_level_save_state_backup.collected[*(short *)(obj+0xB2)]) goto remove_initial;
+            byte=g_moby_nibble_table[(*(short *)(obj+0xB2)>>1)+(g_current_map_index<<10)];
             if(*(short *)(obj+0xB2)&1) {
                 if((byte>>4)&7) goto remove_initial;
                 goto initial_path;
@@ -75,7 +75,7 @@ initial_path:
             moby_transform_joint_to_world(obj,i,delta);
             position[2]=math_random_angle();
             for(j=2;j>=0;j--) {
-                piece=func_PAL_L01_003C05E8(obj,0xA28,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
+                piece=func_PAL_L01_003C05E8(obj,0xA28,delta,position,0,1,g_zero_l01_vector,g_zero_l01_vector,rotation,0.0f);
                 *(float *)(piece+0x2C)*=scale;
                 position[2]=FastAddRotations(position[2],2.0943954f);
             }
@@ -86,18 +86,18 @@ initial_path:
         moby_transform_joint_to_world(obj,4,delta);
         qcopy(position,obj+0xF0);
         for(j=2;j>=0;j--) {
-            piece=func_PAL_L01_003C05E8(obj,0xA27,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
+            piece=func_PAL_L01_003C05E8(obj,0xA27,delta,position,0,1,g_zero_l01_vector,g_zero_l01_vector,dimensions,0.0f);
             *(float *)(piece+0x2C)*=size;
             position[2]=FastAddRotations(position[2],2.0943954f);
         }
         moby_l00_spawn_child(obj,0xA29,0);
-        func_PAL_002A7650(obj,0,3);
+        SetDeathBits_pal(obj,0,3);
         if(*(short *)(obj+0xB2)&1) {
             idx=(*(short *)(obj+0xB2)>>1)+(g_current_map_index<<10);
-            if(((D_0019B4A8[idx]>>4)&7)!=7) D_0019B4A8[idx]+=16;
+            if(((g_moby_nibble_table[idx]>>4)&7)!=7) g_moby_nibble_table[idx]+=16;
         } else {
             idx=(*(short *)(obj+0xB2)>>1)+(g_current_map_index<<10);
-            if((D_0019B4A8[idx]&7)!=7) D_0019B4A8[idx]++;
+            if((g_moby_nibble_table[idx]&7)!=7) g_moby_nibble_table[idx]++;
         }
         moby_mark_spawned(obj);
     }

@@ -7,15 +7,15 @@
 #define FLOAT(p,o) (*(float *)((u8 *)(p)+(o)))
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; struct { float x,y,z,w; } v; } VecE2D8;
-extern VecE2D8 D_L03_001B1C30 SDATA(D_L03_001B1C30);
-extern float D_L03_001B1C08 __attribute__((sda));
-extern u8 D_L03_001B9980[], g_hero_position[];
+extern VecE2D8 g_laser_bot_beam_point SDATA(D_L03_001B1C30);
+extern float g_laser_bot_turn_rate __attribute__((sda));
+extern u8 g_camera_pose_buffer[], g_hero_position[];
 typedef struct { u8 pad[0x80]; float x,y; u8 gap[0x222C]; u8 flag; } HeroE2D8;
 extern HeroE2D8 g_hero_state;
-extern u8 D_L03_001A8F20[] __attribute__((sda));
-extern u8 *D_L03_001B2B0C;
-extern u8 *D_L03_001FE700[];
-extern void func_US2_L03_004201B8(u8 *);
+extern u8 g_effect_descriptor_default[] __attribute__((sda));
+extern u8 *g_linked_effect_records;
+extern u8 *g_path_l03_entry_table[];
+extern void laser_bot_init_check_hit_us2(u8 *);
 extern void robot_update_timers(u8 *);
 extern void laser_bot_trace_beam(u8 *);
 extern void DrawBeamQuadsAndRingTrail(u8 *);
@@ -50,17 +50,17 @@ extern int moby_step_at_own_position_factor(void *,float);
 extern int coll_sweep_from_object(void *,void *,int,float,float,float,int,int,int);
 extern int moby_fuse_linked_objects(void *,void *,void *,void *,int);
 
-void func_US2_L03_0041F9B0(u8 *entity) {
+void laser_bot_update_us2(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     int flags;
     u8 *path;
     VecE2D8 point, delta;
     float angle;
-    func_US2_L03_004201B8(entity);
+    laser_bot_init_check_hit_us2(entity);
     switch (entity[0x95]) {
     case 0:
         if (WORD(state,0x294) != -1) {
-            if (!IsPointInCuboid(D_L03_001B9980,WORD(state,0x294))) {
+            if (!IsPointInCuboid(g_camera_pose_buffer,WORD(state,0x294))) {
                 if (WORD(state,0x340) != -1) {
                     snd_stop_voice(WORD(state,0x340));
                     WORD(state,0x340) = -1;
@@ -82,7 +82,7 @@ void func_US2_L03_0041F9B0(u8 *entity) {
             }
         }
         if ((flags & 1) || math_fabs(FLOAT(entity,0xF4)) > 0.1f) {
-            matrix_mul_vec3(&point,&D_L03_001B1C30,entity+0xC0);
+            matrix_mul_vec3(&point,&g_laser_bot_beam_point,entity+0xC0);
             FastVecAdd(&point,&point,entity+0x10);
             SpawnExplosion(&point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
             FastVecSub(&delta,entity+0x10,g_hero_position);
@@ -107,7 +107,7 @@ void func_US2_L03_0041F9B0(u8 *entity) {
     }
     switch (entity[0x20]) {
     case 3:
-        path = D_L03_001FE700[WORD(state,0x280)];
+        path = g_path_l03_entry_table[WORD(state,0x280)];
         if (flag_set_first_pending(entity)) {
             UHALF(state,0x334)=0;
             UHALF(state,0x336)=0;
@@ -119,7 +119,7 @@ void func_US2_L03_0041F9B0(u8 *entity) {
         }
         ApproachValue(state+0x33C,6.0f,0.050000004f);
         laser_bot_trace_beam(entity);
-        FLOAT(entity,0xF8)=FastAddRotations(FLOAT(entity,0xF8),D_L03_001B1C08*0.0002908882452175021f);
+        FLOAT(entity,0xF8)=FastAddRotations(FLOAT(entity,0xF8),g_laser_bot_turn_rate*0.0002908882452175021f);
         if (moby_l01_turn_toward_target(entity,path+(HALF(state,0x32C)*16+16))&0x80)
             HALF(state,0x32C)=(HALF(state,0x32C)+1)%WORD(path,0);
         if (UHALF(entity,0x96)>=6) gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
@@ -130,7 +130,7 @@ void func_US2_L03_0041F9B0(u8 *entity) {
             WORD(state,0x290)=1;
         }
         point.q=0; point.v.x=6.0f; point.v.w=1.0f;
-        transform_vector(&point,&point,D_L03_001B2B0C+WORD(state,0x284)*128);
+        transform_vector(&point,&point,g_linked_effect_records+WORD(state,0x284)*128);
         if (moby_l01_turn_toward_target(entity,&point)&0x80) moby_set_state(entity,3,-1);
         break;
     case 6:
@@ -154,10 +154,10 @@ void func_US2_L03_0041F9B0(u8 *entity) {
         laser_bot_trace_beam(entity);
         gfx_add_draw_callback_first(DrawBeamQuadsAndRingTrail,entity);
         if (coll_test_point(&point,0.5f,0,entity)) {
-            matrix_mul_vec3(&delta,&D_L03_001B1C30,entity+0xC0);
+            matrix_mul_vec3(&delta,&g_laser_bot_beam_point,entity+0xC0);
             FastVecAdd(&delta,&delta,entity+0x10);
             SpawnExplosion(&delta,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-            part_spawn_masked_debris(entity,3.0f,6.0f,31,D_L03_001A8F20,3.0f,6.0f,255);
+            part_spawn_masked_debris(entity,3.0f,6.0f,31,g_effect_descriptor_default,3.0f,6.0f,255);
             moby_mark_spawned(entity);
             return;
         }
@@ -186,7 +186,7 @@ void func_US2_L03_0041F9B0(u8 *entity) {
             UHALF(entity,0x34)=(UHALF(entity,0x34)&0xFFBE)|0x1000;
             WORD(entity,0x98)=WORD(*(u8 **)(entity+0x24),0x10);
             coll_sweep_from_object(entity,entity+0x10,0x10001,0.5f,2.0f,1.0f,0,1,0);
-            { u8 *transform=D_L03_001B2B0C+WORD(state,0x284)*128;
+            { u8 *transform=g_linked_effect_records+WORD(state,0x284)*128;
             moby_fuse_linked_objects(entity,transform+0x30,transform+0x70,0,0); }
             entity[0x7F]=0;
         }

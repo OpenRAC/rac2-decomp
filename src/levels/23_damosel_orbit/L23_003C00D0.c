@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L23_001B36F0 __attribute__((sda));
+extern int g_enemy_effect_param __attribute__((sda));
 extern void moby_play_anim_and_link(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
 extern void func_367150(int);
 
@@ -22,8 +22,8 @@ void enemy_reset_calm(char *moby) {
     *(float *)(vars + 0x20) = (float)*(short *)(vars + 0x24);
     moby_play_anim_and_link(moby, 1, 0, 0, 3, 1.0f);
     {
-        unsigned short d = D_L23_001B36F0;
-        float f = (float)D_L23_001B36F0;
+        unsigned short d = g_enemy_effect_param;
+        float f = (float)g_enemy_effect_param;
 
         *(short *)(vars + 0x24) = d;
         *(float *)(vars + 0x20) = f;

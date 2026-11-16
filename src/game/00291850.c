@@ -9,7 +9,7 @@ extern int func_00126288(GsLoadImage *, short, short, short, short, short, short
 extern void FlushCache(int);
 extern int sceGsExecLoadImage(GsLoadImage *, void *);
 extern int gfx_wait_paths_idle(int, unsigned short);
-extern int D_001A72D0 __attribute__((sda));
+extern int g_vram_cursor __attribute__((sda));
 extern void mem_clear(unsigned int *, unsigned int, int);
 typedef struct {
     u8 pad0[8];
@@ -91,12 +91,12 @@ s32 UploadMipTexture(MipTexture *tex, unsigned long *regs)
         break;
     }
     if (tex->psm == 0x13 || tex->psm == 0x14) {
-        upload.palette_block = D_001A72D0 >> 8;
+        upload.palette_block = g_vram_cursor >> 8;
         if (tex->psm == 0x14) {
-            D_001A72D0 += 0x100;
+            g_vram_cursor += 0x100;
             func_00126288(&load_image, upload.palette_block, 1, tex->palette_psm, 0, 0, 8, 2);
         } else {
-            D_001A72D0 += upload.palette_size;
+            g_vram_cursor += upload.palette_size;
             func_00126288(&load_image, upload.palette_block, 1, tex->palette_psm, 0, 0, 16, 16);
         }
         FlushCache(0);
@@ -113,7 +113,7 @@ s32 UploadMipTexture(MipTexture *tex, unsigned long *regs)
         if (*width <= 0) {
             *width = 1;
         }
-        upload.blocks[i] = D_001A72D0 >> 8;
+        upload.blocks[i] = g_vram_cursor >> 8;
         func_00126288(&load_image, upload.blocks[i], *width, tex->psm, 0, 0,
                       tex->width >> i, tex->height >> i);
         FlushCache(0);
@@ -123,7 +123,7 @@ s32 UploadMipTexture(MipTexture *tex, unsigned long *regs)
         if (bytes <= 0xFF) {
             bytes = 0x100;
         }
-        D_001A72D0 += bytes;
+        g_vram_cursor += bytes;
     }
     tex0 = (unsigned long)upload.blocks[0];
     tex0 |= (unsigned long)upload.buffer_widths[0] << 14;

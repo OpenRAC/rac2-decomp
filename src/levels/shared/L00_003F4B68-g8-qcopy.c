@@ -7,8 +7,8 @@ extern char *CreateMoby(int);
 extern void vec_add_transformed_or_copy(char *,char *,char *);
 extern float mat_fast_helper_a(float,float);
 extern void func_002A0F48(char *);
-extern unsigned short D_L00_001B0904 __attribute__((sda));
-extern float D_L00_001B0910 __attribute__((sda));
+extern unsigned short g_bouncing_explosive_timer __attribute__((sda));
+extern float g_bouncing_explosive_speed_scale __attribute__((sda));
 
 /* Creates a bouncing explosive moby (class 3315) at the given position, with its throw
    velocity, owner and timer. */
@@ -28,7 +28,7 @@ char *bouncing_explosive_spawn(int owner, char *position, char *velocity, int va
         *(TI128 *)(object + 0x10) = *(TI128 *)position;
         *(TI128 *)(state + 0x10) = *(TI128 *)velocity;
         vec_add_transformed_or_copy(state + 0x10, state + 0x10, position);
-        timer = D_L00_001B0904;
+        timer = g_bouncing_explosive_timer;
         *(float *)(state + 0x1c) = scale;
         *(int *)(state + 0x20) = value;
         *(short *)(state + 0x28) = timer;
@@ -36,7 +36,7 @@ char *bouncing_explosive_spawn(int owner, char *position, char *velocity, int va
         *(int *)(object + 0xf0) = 0;
         *(int *)(object + 0xf4) = 0;
         angle = mat_fast_helper_a(*(float *)velocity, *(float *)(velocity+4));
-        *(float *)(object + 0x2c) *= D_L00_001B0910;
+        *(float *)(object + 0x2c) *= g_bouncing_explosive_speed_scale;
         *(float *)(object + 0xf8) = angle;
         func_002A0F48(object);
     }

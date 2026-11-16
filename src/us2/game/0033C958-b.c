@@ -8,9 +8,9 @@ extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
 extern int onoff_menu_update(void *, int);
-extern int D_001ADDE0[2] __attribute__((sda));
+extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
-void func_US2_0033D1F8(char *object, void *argument)
+void onoff_menu_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -27,7 +27,7 @@ void func_US2_0033D1F8(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADDE0);
+    prompt_bar_init(child, argument, g_onoff_menu_prompt_ids);
     text = GetLocalizedString(0x307A);
     second = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2BE5));

@@ -10,15 +10,15 @@ extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern int FloatToInt(float);
 extern int math_lerp_int_fraction(int, int, float);
 extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
-extern int D_L02_001B1330 __attribute__((sda));
-extern int D_L02_001B1338[] __attribute__((sda));
-extern int D_L02_001B1334[] __attribute__((sda));
-extern int D_L02_001B133C[] __attribute__((sda));
-extern int D_L02_001B1340 __attribute__((sda));
-extern int D_L02_001B1348 __attribute__((sda));
-extern int D_L02_001B134C[] __attribute__((sda));
-extern int D_L02_001B1350[] __attribute__((sda));
-extern float D_L02_001B3E04[] __attribute__((sda));
+extern int g_boss_bar_left __attribute__((sda));
+extern int g_boss_bar_right[] __attribute__((sda));
+extern int g_boss_bar_top[] __attribute__((sda));
+extern int g_boss_bar_bottom[] __attribute__((sda));
+extern int g_boss_bar_height_offset __attribute__((sda));
+extern int g_boss_bar_low_color __attribute__((sda));
+extern int g_boss_bar_mid_color[] __attribute__((sda));
+extern int g_boss_bar_high_color[] __attribute__((sda));
+extern float g_hud_label_scale[] __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
 
 /* Draws the boss health bar. The bar gets shorter as health drops and changes colour from green toward red. */
@@ -34,24 +34,24 @@ void hud_draw_boss_health_bar(float fraction)
     VU1_addGSregister(0x42, 0x8000000044ULL);
     if (fraction < 0.0f)
         fraction = 0.0f;
-    width = FloatToInt((float)(D_L02_001B1338[0] - D_L02_001B1330) * fraction);
+    width = FloatToInt((float)(g_boss_bar_right[0] - g_boss_bar_left) * fraction);
     if (fraction > 0.5f)
-        color = math_lerp_int_fraction(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
+        color = math_lerp_int_fraction(g_boss_bar_mid_color[0], g_boss_bar_low_color, fraction + fraction - 1.0f);
     else
-        color = math_lerp_int_fraction(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
-    t = (float)D_L02_001B1334[0] * D_L02_001B3E04[0] + 0.5f;
+        color = math_lerp_int_fraction(g_boss_bar_high_color[0], g_boss_bar_mid_color[0], fraction + fraction);
+    t = (float)g_boss_bar_top[0] * g_hud_label_scale[0] + 0.5f;
     do {
         top = t;
     } while (0);
     if (g_is_pal_video[0])
-        top -= D_L02_001B1340;
-    left = D_L02_001B1330;
+        top -= g_boss_bar_height_offset;
+    left = g_boss_bar_left;
     right = left + width;
-    t = (float)D_L02_001B133C[0] * D_L02_001B3E04[0] + 0.5f;
+    t = (float)g_boss_bar_bottom[0] * g_hud_label_scale[0] + 0.5f;
     do {
         bottom = t;
     } while (0);
     if (g_is_pal_video[0])
-        bottom -= D_L02_001B1340;
+        bottom -= g_boss_bar_height_offset;
     AppendScreenRectPacket(left, top, right, bottom, color, 0);
 }

@@ -18,13 +18,13 @@ typedef struct {
     s16 length;
 } PuzzlePath;
 
-extern Vec4 D_L03_0029BBF0[14];
-extern int D_0024A7B0[14][6];
-extern Vec4 D_L03_001B9BB0[3];
+extern Vec4 g_puzzle_node_directions[14];
+extern int g_path_puzzle_adjacency[14][6];
+extern Vec4 g_moby_basis_matrix[3];
 /* Both quaternions are read through the bare-symbol `la` macro (the adjacent lui/addiu
    pairs), which cc1 emits for an sda symbol. */
-extern Vec4 D_L03_001B36B0 __attribute__((sda));
-extern Vec4 D_L03_001B36C0 __attribute__((sda));
+extern Vec4 g_puzzle_rotation_quat __attribute__((sda));
+extern Vec4 g_puzzle_target_quat __attribute__((sda));
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecScale(void *, void *, f32);
 extern void FastVecCross(void *, void *, void *);
@@ -52,8 +52,8 @@ void ComputePathPuzzleTurn(u8 *moby) {
     f32 best, x, y;
     int i, n;
 
-    matrix_mul_vec3(&v, &D_L03_0029BBF0[path_state->current], moby + 0xC0);
-    FastVecScale(&neg, &D_L03_001B9BB0[0], angle);
+    matrix_mul_vec3(&v, &g_puzzle_node_directions[path_state->current], moby + 0xC0);
+    FastVecScale(&neg, &g_moby_basis_matrix[0], angle);
     best = angle;
     FastVecCross(&axis, &v, &neg);
     axis.w = FastVecDot(&v, &neg);
@@ -66,11 +66,11 @@ void ComputePathPuzzleTurn(u8 *moby) {
     if (path_state->facing[path_state->length] == 255) {
         i = 0;
         do {
-            n = D_0024A7B0[path_state->current][i];
+            n = g_path_puzzle_adjacency[path_state->current][i];
             if (n != -1) {
-                matrix_mul_vec3(&test, &D_L03_0029BBF0[n], moby + 0xC0);
-                x = FastVecDot(&test, &D_L03_001B9BB0[2]);
-                y = FastVecDot(&test, &D_L03_001B9BB0[1]);
+                matrix_mul_vec3(&test, &g_puzzle_node_directions[n], moby + 0xC0);
+                x = FastVecDot(&test, &g_moby_basis_matrix[2]);
+                y = FastVecDot(&test, &g_moby_basis_matrix[1]);
                 if (x > best) {
                     mat_fast_helper_a(x, y);
                     best = x;
@@ -80,13 +80,13 @@ void ComputePathPuzzleTurn(u8 *moby) {
         } while (++i < 6);
     }
 
-    matrix_mul_vec3(&test, &D_L03_0029BBF0[path_state->facing[path_state->length]], moby + 0xC0);
-    x = FastVecDot(&test, &D_L03_001B9BB0[2]);
-    y = FastVecDot(&test, &D_L03_001B9BB0[1]);
+    matrix_mul_vec3(&test, &g_puzzle_node_directions[path_state->facing[path_state->length]], moby + 0xC0);
+    x = FastVecDot(&test, &g_moby_basis_matrix[2]);
+    y = FastVecDot(&test, &g_moby_basis_matrix[1]);
     angle = mat_fast_helper_a(x, y) * 0.5f;
     vec_scale_to_length(&turn, &neg, math_fast_sin_or_cos_b(angle));
     turn.w = math_fast_sin_or_cos_a(angle);
-    multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36B0, &axis);
-    multiply_quaternions(&D_L03_001B36C0, &D_L03_001B36C0, &turn);
-    quaternion_to_rotation_basis(&D_L03_001B36B0, moby + 0xC0);
+    multiply_quaternions(&g_puzzle_target_quat, &g_puzzle_rotation_quat, &axis);
+    multiply_quaternions(&g_puzzle_target_quat, &g_puzzle_target_quat, &turn);
+    quaternion_to_rotation_basis(&g_puzzle_rotation_quat, moby + 0xC0);
 }

@@ -22,8 +22,8 @@ extern void func_002A0F48(void *);
 extern void AddMobyToIndexList(void *, void *, int);
 extern int part_alloc_effect_slot(void *, int, float, float, float);
 
-extern int D_L00_001B0FD8 __attribute__((sda));
-extern unsigned char D_00139583 __attribute__((nosda));
+extern int g_shot_record_next_index __attribute__((sda));
+extern unsigned char g_targeted_weapon_index __attribute__((nosda));
 
 typedef struct ScaleRecord {
     char pad00[0x50];
@@ -83,11 +83,11 @@ typedef struct PlayerState {
 } PlayerState;
 extern PlayerState g_hero_state;
 
-extern Vector D_L00_001B8FF0[3];   /* camera basis rows */
+extern Vector g_cam_follow_matrix[3];   /* camera basis rows */
 extern float g_camera_l00_position[4];    /* camera position */
-extern float D_L00_001BF220[4];    /* collision hit point */
-extern char D_L00_00255BA0[];
-extern char D_L00_001B1FB0[] MACRO_ADDR;
+extern float g_hero_l00_position[4];    /* collision hit point */
+extern char g_shot_history_points[];
+extern char g_homing_moby_index_list[] MACRO_ADDR;
 
 /* Spawns a projectile (moby 0xED7) from owner at position, aimed at target or along the view. */
 char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *color, float height)
@@ -106,11 +106,11 @@ char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *col
         m->flags |= 0x100;
         s = m->state;
         s->sound = -1;
-        if ((unsigned)D_L00_001B0FD8 > 32)
-            D_L00_001B0FD8 = 0;
-        s->index = D_L00_001B0FD8;
-        D_L00_001B0FD8 = (D_L00_001B0FD8 + 1) % 32;
-        scale = (g_weapon_l00_table + D_00139583)->value * (0.020000001f);
+        if ((unsigned)g_shot_record_next_index > 32)
+            g_shot_record_next_index = 0;
+        s->index = g_shot_record_next_index;
+        g_shot_record_next_index = (g_shot_record_next_index + 1) % 32;
+        scale = (g_weapon_l00_table + g_targeted_weapon_index)->value * (0.020000001f);
         qcopy(m->position, position);
         if (target) {
             FastVecScale(offset, target + 0xe0, height);
@@ -120,15 +120,15 @@ char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *col
         }
 
         if (g_hero_state.mode == 29) {
-            qcopy(m->forward, D_L00_001B8FF0[0]);
-            qcopy(m->right, D_L00_001B8FF0[1]);
-            qcopy(m->up, D_L00_001B8FF0[2]);
+            qcopy(m->forward, g_cam_follow_matrix[0]);
+            qcopy(m->right, g_cam_follow_matrix[1]);
+            qcopy(m->up, g_cam_follow_matrix[2]);
             qcopy(m->position, g_camera_l00_position);
-            FastVecScale(offset, D_L00_001B8FF0[2], -0.2f);
+            FastVecScale(offset, g_cam_follow_matrix[2], -0.2f);
             FastVecAdd(m->position, m->position, offset);
-            FastVecScale(tmp1, D_L00_001B8FF0[1], -0.25f);
+            FastVecScale(tmp1, g_cam_follow_matrix[1], -0.25f);
             FastVecAdd(m->position, m->position, tmp1);
-            FastVecScale(tmp2, D_L00_001B8FF0[0], 0.0f);
+            FastVecScale(tmp2, g_cam_follow_matrix[0], 0.0f);
             FastVecAdd(m->position, m->position, tmp2);
             if (target) {
                 FastVecSub(m->forward, aim, m->position);
@@ -137,10 +137,10 @@ char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *col
                 vec_scale_to_length(m->right, m->right, 1.0f);
                 FastVecCross(m->up, m->right, m->forward);
             } else {
-                FastVecScale(tmp3, D_L00_001B8FF0[0], 30.0f);
+                FastVecScale(tmp3, g_cam_follow_matrix[0], 30.0f);
                 FastVecAdd(tmp3, g_camera_l00_position, tmp3);
                 if (CollLine(g_camera_l00_position, tmp3, 0, g_hero_state.object, 0))
-                    qcopy(tmp3, D_L00_001BF220);
+                    qcopy(tmp3, g_hero_l00_position);
                 FastVecSub(tmp4, tmp3, m->position);
                 vec_scale_to_length(m->forward, tmp4, 1.0f);
                 FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
@@ -200,11 +200,11 @@ char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *col
         offset[2] = ((float *)position)[2];
         if (CollLine(offset, position, 0, g_hero_state.object, 0)) {
             m->hit = 1;
-            qcopy(m->position, D_L00_001BF220);
+            qcopy(m->position, g_hero_l00_position);
         }
-        moby_get_offset_point(m, D_L00_00255BA0 + s->index * 64);
+        moby_get_offset_point(m, g_shot_history_points + s->index * 64);
         func_002A0F48(m);
-        AddMobyToIndexList(m, D_L00_001B1FB0, 31);
+        AddMobyToIndexList(m, g_homing_moby_index_list, 31);
         s->handle = part_alloc_effect_slot(m, 0, 1.0f, 1.0f, 1.0f);
         m->radius *= 2.5f;
     }

@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_PAL_L00_003BFBD8, the PAL copy of func_L00_003BBF48: the same C with the callee is PAL's
    func_PAL_L00_003BFEB8. */
 #include "include_asm.h"
 #include "names.h"
 #include "common.h"
 
-extern char D_L00_0023DDA0[] __attribute__((nosda));
+extern char g_spark_slot_records[] __attribute__((nosda));
 
-extern void func_PAL_L00_003BFEB8(char *a0, char *a1);
+extern void lightning_draw_curve_pal(char *a0, char *a1);
 
 extern int math_random_int_range(int a, int b);
 
@@ -19,11 +20,11 @@ extern void gfx_draw_billboard_quad(char *a, int b, unsigned int c, int d, float
    after it says whether it is free. Without interblock scheduling the two skips stay likely
    branches. Each sprite's colour is its own local: one shared variable dies twice, becomes a
    global pseudo, and the shifted alpha no longer ties to its saved register. */
-void func_PAL_L00_003BFBD8(char *a0)
+void effect_draw_slot_sprites_pal(char *a0)
 {
     unsigned int firstRGB = 0x103080;
     unsigned int secondRGB = 0xFFFFFF;
-    char *base = D_L00_0023DDA0;
+    char *base = g_spark_slot_records;
     char *p = base + 0x30;
     char *q = base;
     int i;
@@ -33,7 +34,7 @@ void func_PAL_L00_003BFBD8(char *a0)
 
     for (i = 29; i >= 0; p += 0xA0, i--, q += 0xA0) {
         if (*(int *)(p + 0x5C) == (int)a0) {
-            func_PAL_L00_003BFEB8(a0, q);
+            lightning_draw_curve_pal(a0, q);
             if (*(int *)(p + 0x64) == 0) {
                 color = math_random_int_range(0x50, 0x60);
                 color = (int)(color << 24) | firstRGB;

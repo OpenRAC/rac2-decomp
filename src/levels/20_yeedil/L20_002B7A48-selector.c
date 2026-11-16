@@ -2,7 +2,7 @@
 
 extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
-extern char D_L20_0026D970[];
+extern char g_item_l20_record_table[];
 extern s32 hero_slot_item_id(s32 index);
 
 typedef struct {
@@ -27,7 +27,7 @@ s32 SelectHeroStateAnimation(s32 allow_weapon)
         if (*(u8 *)(hero + 0x22BA) != 0 && *(s16 *)(hero + 0x24EC) == 0) {
             int idx = hero_slot_item_id(0);
 
-            return ((AnimationEntry *)(D_L20_0026D970 + g_item_slot_to_record[idx] * 224))->animation;
+            return ((AnimationEntry *)(g_item_l20_record_table + g_item_slot_to_record[idx] * 224))->animation;
         }
     }
     hero = g_hero_state;

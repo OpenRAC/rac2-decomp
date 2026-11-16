@@ -13,12 +13,12 @@ extern struct {
     u8 pad149e[0x23EC - 0x149E];
     DelayedSlot_9CA8 slots[8];
 } D_00189E20_9CA8;
-extern void func_PAL_L00_002A6058(int, int, int, int);
+extern void hero_play_footstep_sound_dust_pal(int, int, int, int);
 
 /* Ticks the timer of each of the eight entries; one whose timer reports 2 is cleared and
    fires: id 0x16 calls func_PAL_L00_002A6058 with the resident byte at +0x149D, any other id
    goes to func_L00_002B9B88 with the entry's argument. */
-void func_PAL_L00_002B9C20(void)
+void UpdateDelayedSounds_pal(void)
 {
     int i;
     short id;
@@ -28,7 +28,7 @@ void func_PAL_L00_002B9C20(void)
             id = D_00189E20_9CA8.slots[i].id;
             D_00189E20_9CA8.slots[i].pending = 0;
             if (id == 0x16)
-                func_PAL_L00_002A6058(D_00189E20_9CA8.b149D, 1, 1, 0x32);
+                hero_play_footstep_sound_dust_pal(D_00189E20_9CA8.b149D, 1, 1, 0x32);
             else
                 hero_play_sound(id, D_00189E20_9CA8.slots[i].arg);
         }
@@ -37,12 +37,12 @@ void func_PAL_L00_002B9C20(void)
 
 
 extern char g_hero_position[];
-extern int D_L00_001B9080;
+extern int g_hero_ledge_move_flag;
 extern void euler_to_matrix(void *a, void *b);
 extern void euler_rotation_basis(void *a, void *b);
 extern void hero_reset_speeds_and_vectors(void);
 extern void level_release_slot_list(void *p);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern void attachment_reset_all(void);
 extern s32 func_PAL_L00_002C4480(int a0, int a1);
 extern void anim_start_object_at_frame(int a0, int a1);
@@ -67,7 +67,7 @@ typedef struct {
 } ResidentState_9D60;
 
 /* Reset the hero position and direction, the resident movement state and the related level objects. */
-void func_PAL_L00_002B9CD8(void *position, void *direction, int sound, int refresh)
+void hero_reset_position_and_direction_pal(void *position, void *direction, int sound, int refresh)
 {
     ResidentState_9D60 *res;
     char *hero = g_hero_position;
@@ -89,7 +89,7 @@ void func_PAL_L00_002B9CD8(void *position, void *direction, int sound, int refre
     res->i3A0 = 0;
     res->b24EF = 0;
 
-    func_PAL_L00_002AF6C0();
+    cancel_hero_item_animation_pal();
     attachment_reset_all();
 
     if (sound != -1)
@@ -98,9 +98,9 @@ void func_PAL_L00_002B9CD8(void *position, void *direction, int sound, int refre
     anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
     if (res->i229C == 0x11)
-        D_L00_001B9080 = 1;
+        g_hero_ledge_move_flag = 1;
     else
-        D_L00_001B9080 = 0;
+        g_hero_ledge_move_flag = 0;
 
     hero_l00_update_ground_contact();
 

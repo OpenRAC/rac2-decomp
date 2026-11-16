@@ -10,7 +10,7 @@ extern float math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
 extern float coll_get_ground_height_with_limit(void *,float,float,float,float);
 extern float g_hero_position[];
 /* Scalar view of D_00189EA0[2] (its z): retail addresses it on its own. */
-extern float D_00189EA8;
+extern float g_hero_height_limit;
 extern void vec_build_spherical_offset(float *,float,float,float);
 extern int moby_move_and_collide(void *,void *,int,float,float,float);
 extern float math_turn_angle_toward_target(float *,float,float,float,float,float);
@@ -49,7 +49,7 @@ int moby_l01_steer_toward_target(u8 *moby,float turn,float turn2,float rate,floa
     proposed[2]=0.0f;
     FastVecAdd(proposed,proposed,moby+0x10);
     height=F32(state,0x27c);
-    if(moby[0x20]==8) height = height > D_00189EA8 ? height : D_00189EA8;
+    if(moby[0x20]==8) height = height > g_hero_height_limit ? height : g_hero_height_limit;
     proposed[2]=coll_get_ground_height_with_limit(proposed,F32(state,0x1d8)+2.0f,F32(state,0x1d8)-3.0f,height,F32(state,0x288));
     if(vec_distance_xy(moby+0x10,g_hero_position)<5.0f && g_hero_position[2]<proposed[2]) proposed[2]=g_hero_position[2];
     proposed[2]+=altitude;

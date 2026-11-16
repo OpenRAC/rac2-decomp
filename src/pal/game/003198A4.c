@@ -2,25 +2,25 @@
 
 #include "common.h"
 
-extern int D_001B2758 MACRO_ADDR;
+extern int g_spark_slot_pool MACRO_ADDR;
 extern int FloatToInt(float), math_random_int_range(int, int);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_set_state(void *, int, int), func_PAL_002A7E68(void *, int, int, int);
-extern float D_001BAFA8;
+extern float g_coll_ground_height;
 extern u8 g_hero_state[];
 extern u8 g_sound_state[];
-extern char D_001A8BD0[16] MACRO_ADDR;
+extern char g_default_effect_vector[16] MACRO_ADDR;
 extern unsigned char g_sound_state[];
 extern unsigned char g_hero_state[];
 extern u8 g_hero_state[];
-extern u8 *D_001B1B5C MACRO_ADDR;
+extern u8 *g_moby_pool_start MACRO_ADDR;
 
 typedef int TI128_00318340 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128_00318340 q[0x260]; } Hero_00318340;
 extern char g_hero_position[];
-extern char D_001AFA80[];
+extern char g_str_hover_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -31,13 +31,13 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void euler_rotation_basis(void *, void *);
 extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(void *);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern int math_random_int_below(int);
 extern float moby_turn_toward_position(void *, void *, void *, float, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern int IsPointInCuboid(void *, int);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern int func_PAL_002AF6C0(void *, float);
@@ -55,7 +55,7 @@ extern int group_pass_lead_token(char *);
 extern int group_is_moby_member(unsigned char *);
 extern int moby_is_target_outside_turn_limit(char *, float);
 extern void moby_turn_toward_target(char *);
-extern void *func_PAL_00329890(char *, void *, void *, int, int, float);
+extern void *part_spawn_spinning_effect_moby_pal(char *, void *, void *, int, int, float);
 extern float vec_distance_xy(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -63,7 +63,7 @@ extern void moby_scale_owner_words_by_angles(float, float, char *, char *, float
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern char *g_path_table[];
 extern int flag_set_second_pending(char *);
-extern int func_PAL_002B27B8(char *, char *);
+extern int moby_dispatch_action_by_kind_pal(char *, char *);
 
 /* func_PAL_003198A4, the PAL copy of func_00318340: the same C, with the 50 Hz values and scales. */
 void func_PAL_003198A4(char *obj)
@@ -154,10 +154,10 @@ void func_PAL_003198A4(char *obj)
     case 4:
         if (flag_set_first_pending(obj) != 0)
             *(s16 *)(pv + 0x46) = 0x32;
-        flags = func_PAL_002B27B8(obj, pv + 0x80);
+        flags = moby_dispatch_action_by_kind_pal(obj, pv + 0x80);
         if ((flags & 1) || *(f32 *)(pv + 0x40) <= 0.0f) {
-            func_PAL_002AD288(obj, obj + 0x10, -1, 1.0f, 13.0f);
-            func_PAL_002A7650(obj, 0, 3);
+            part_spawn_explosion_with_sparks_pal(obj, obj + 0x10, -1, 1.0f, 13.0f);
+            SetDeathBits_pal(obj, 0, 3);
             moby_mark_spawned(obj);
             return;
         }
@@ -236,7 +236,7 @@ void func_PAL_003198A4(char *obj)
         } else if (diff12 > 0.05f) {
             math_step_value_toward_target(obj + 0x18, pv + 0x290, h12, 0.020000001f, 0.19600002f, 0.20000002f);
         } else {
-            STUB_printf(D_001AFA80, *(s32 *)(pv + 0x2C0));
+            STUB_printf(g_str_hover_enemy_debug, *(s32 *)(pv + 0x2C0));
             moby_set_state(obj, 6, -1);
             if (*(u8 *)(obj + 0x43) != 0xE)
                 func_PAL_002A7E68(obj, 0xE, 0, 2);
@@ -326,7 +326,7 @@ void func_PAL_003198A4(char *obj)
             }
             if (moby_is_target_outside_turn_limit(obj, 10.0f) != 0) {
                 FastVecSub(v40, pos, v0);
-                qcopy(v20, D_001A8BD0);
+                qcopy(v20, g_default_effect_vector);
                 v20[0] = 1.0f;
                 matrix_mul_vec3(v20, v20, obj + 0xC0);
                 FastVecCross(v30, v20, v40);
@@ -339,7 +339,7 @@ void func_PAL_003198A4(char *obj)
                 FastVecSub(v20, pos, v0);
             }
             vec_scale_to_length(v20, v20, 0.40000004f);
-            func_PAL_00329890(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
+            part_spawn_spinning_effect_moby_pal(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist10 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
             moby_transform_joint_to_world(obj, 4, v0);
         }
@@ -413,13 +413,13 @@ void func_PAL_003198A4(char *obj)
             FastVecSub(v20, pos, v0);
             vec_scale_to_length(v20, v20, 0.40000004f);
             PlayMobySound(0xB, 0, obj);
-            func_PAL_00329890(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
+            part_spawn_spinning_effect_moby_pal(obj, v20, v0, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist16 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
             moby_transform_joint_to_world(obj, 4, v0);
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(v0, D_001A8BD0, 3, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(v0, g_default_effect_vector, 3, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }
@@ -501,7 +501,7 @@ void func_PAL_0031B110(char *self)
     qcopy(d+0x300,d+0x2F0);
     *(float *)(d+0x2F8)+=20.0f;
     if (CollLine(d+0x300,d+0x2F0,0,self,0))
-        *(float *)(d+0x2F8)=D_001BAFA8;
+        *(float *)(d+0x2F8)=g_coll_ground_height;
     *(int *)(d+0x168)|=4;
     *(u16 *)(self+0x34)|=0x100;
     *(float *)(d+0x140)=12.56637191772461f;

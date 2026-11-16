@@ -7,13 +7,13 @@ typedef unsigned int u32;
 
 typedef struct { u32 items[5]; } NativeTable20;
 
-extern const NativeTable20 D_L00_001A8EB0;
+extern const NativeTable20 g_level_native_table;
 
 extern void req_reset_queue(unsigned char *);
 
 /* indexed copy of overlay-owned five-entry table */
 u32 level_get_native_table_entry(s32 index) {
-    NativeTable20 values=D_L00_001A8EB0;
+    NativeTable20 values=g_level_native_table;
     return values.items[index];
 }
 

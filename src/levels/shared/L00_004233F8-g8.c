@@ -6,15 +6,15 @@
 #include "common.h"
 typedef unsigned int CameraQuad __attribute__((mode(TI)));
 extern unsigned char g_hero_state[];
-extern CameraQuad D_0018A0E0;
-extern int D_L00_001B1580 SDATA(D_L00_001B1580), D_L00_001B1584 SDATA(D_L00_001B1584);
-extern unsigned short D_L00_001B1514 SDATA(D_L00_001B1514), D_L00_001B1518 SDATA(D_L00_001B1518);
-extern float D_L00_001B14A0 SDATA(D_L00_001B14A0), D_L00_001B14A4 SDATA(D_L00_001B14A4);
-extern float D_L00_001B1510 SDATA(D_L00_001B1510), D_L00_001B14D4 SDATA(D_L00_001B14D4), D_L00_001B14D8 SDATA(D_L00_001B14D8), D_L00_001B14DC SDATA(D_L00_001B14DC);
-extern float D_L00_001A8900, D_L00_001A8904;
-extern int D_L00_001B1854;
+extern CameraQuad g_hero_state_block;
+extern int g_camera_setup_state_a SDATA(D_L00_001B1580), g_camera_setup_state_b SDATA(D_L00_001B1584);
+extern unsigned short g_camera_default_angle_short SDATA(D_L00_001B1514), g_camera_default_frame_count SDATA(D_L00_001B1518);
+extern float g_camera_default_view_x SDATA(D_L00_001B14A0), g_camera_default_view_y SDATA(D_L00_001B14A4);
+extern float g_camera_default_plane_param SDATA(D_L00_001B1510), g_camera_default_aim_a SDATA(D_L00_001B14D4), g_camera_default_aim_b SDATA(D_L00_001B14D8), g_camera_default_aim_c SDATA(D_L00_001B14DC);
+extern float g_follow_cam_lerp_factor, g_cam_rotation_param;
+extern int g_camera_default_tracker_word;
 typedef struct { unsigned char pad0[0x86]; short mode; } CameraControl;
-extern CameraControl *D_L00_001B8E14[];
+extern CameraControl *g_camera_control_ptr[];
 
 extern void vec_clear_128(void *);
 extern void cam_follow_init_from_hero(unsigned char *);
@@ -83,8 +83,8 @@ void follow_camera_setup(CameraOwner *owner)
     float distance;
     unsigned char *initialPosition = g_hero_state + 0x80;
     unsigned char *hero;
-    D_L00_001B1580 = 0;
-    D_L00_001B1584 = 0;
+    g_camera_setup_state_a = 0;
+    g_camera_setup_state_b = 0;
     qcopy(camera, initialPosition);
     hero = initialPosition - 0x80;
     camera->fB0 = 1.5f;
@@ -92,9 +92,9 @@ void follow_camera_setup(CameraOwner *owner)
     camera->bC4 = 0;
     camera->bD6 = 0;
     camera->fE0 = 0.2f;
-    camera->hEC = D_L00_001B1514;
-    camera->fDC = D_L00_001B14A0;
-    camera->fE4 = D_L00_001B14A4;
+    camera->hEC = g_camera_default_angle_short;
+    camera->fDC = g_camera_default_view_x;
+    camera->fE4 = g_camera_default_view_y;
     camera->fE8 = 0.2f;
     camera->fB8 = 0.005f;
     camera->hC6 = 0;
@@ -127,7 +127,7 @@ void follow_camera_setup(CameraOwner *owner)
     root->h12 = 0;
     root->h14 = 0;
     root->h16 = 0;
-    D_L00_001A8900 = 0.85f;
+    g_follow_cam_lerp_factor = 0.85f;
     orientation = &owner->state->orientation;
     orientation->h0 = 0;
     orientation->f20 = 0.2f;
@@ -144,7 +144,7 @@ void follow_camera_setup(CameraOwner *owner)
     orientation->i30 = 0;
     rotation = (RotationState *)((char *)owner->state + 0x1C0);
     rotation->i0 = 0;
-    rotation->f14 = D_L00_001A8904;
+    rotation->f14 = g_cam_rotation_param;
     rotation->i8 = 0;
     rotation->i4 = 0;
     rotation->iC = 0;
@@ -159,7 +159,7 @@ void follow_camera_setup(CameraOwner *owner)
     plane->h4 = 0;
     plane->h6 = 0;
     plane->f8 = movement->f2C;
-    plane->fC = D_L00_001B1510;
+    plane->fC = g_camera_default_plane_param;
     tracker = (TrackerState *)((char *)owner->state + 0x1F0);
     tracker->f30 = 0.0f;
     tracker->h3A = 0;
@@ -168,19 +168,19 @@ void follow_camera_setup(CameraOwner *owner)
     tracker->h4C = 0;
     tracker->h4E = 0;
     tracker->h34 = 2000;
-    tracker->f44 = D_L00_001B14D4;
-    tracker->f3C = D_L00_001B14DC;
-    tracker->f40 = D_L00_001B14D8;
-    tracker->i48 = D_L00_001B1854;
+    tracker->f44 = g_camera_default_aim_a;
+    tracker->f3C = g_camera_default_aim_c;
+    tracker->f40 = g_camera_default_aim_b;
+    tracker->i48 = g_camera_default_tracker_word;
     vec_clear_128(tracker->direction);
     if (owner->handoff == 2) {
         cam_follow_init_from_hero((unsigned char *)owner);
         *(CameraQuad *)(owner->previous) = *(CameraQuad *)owner;
-        if (D_L00_001B8E14[0]->mode == 7 && CS(hero, 0x34C) == 0)
+        if (g_camera_control_ptr[0]->mode == 7 && CS(hero, 0x34C) == 0)
             orientation->h0 = 0;
         else {
-            orientation->h0 = D_L00_001B1518;
-            orientation->f24 = 1.0f / IntToFloat((short)D_L00_001B1518);
+            orientation->h0 = g_camera_default_frame_count;
+            orientation->f24 = 1.0f / IntToFloat((short)g_camera_default_frame_count);
         }
     } else {
         cam_init_state_vectors((char *)owner);
@@ -190,8 +190,8 @@ void follow_camera_setup(CameraOwner *owner)
     *(CameraQuad *)(movement->previous) = *(CameraQuad *)movement;
     *(CameraQuad *)root = *(CameraQuad *)(owner->pos);
     *(CameraQuad *)(tracker->previous) = *(CameraQuad *)(owner->pos);
-    distance = FastVecDot(movement, &D_0018A0E0);
-    FastVecScale(&projected, &D_0018A0E0, distance);
+    distance = FastVecDot(movement, &g_hero_state_block);
+    FastVecScale(&projected, &g_hero_state_block, distance);
     FastVecSub(&difference, movement, &projected);
     distance = movement->f2C - FastVecLength(&difference);
     tracker->f30 = distance;

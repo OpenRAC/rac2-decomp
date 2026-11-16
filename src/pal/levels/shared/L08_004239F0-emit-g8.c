@@ -10,13 +10,13 @@
 
 typedef int ParticleQuad __attribute__((mode(TI)));
 typedef union { ParticleQuad q; float f[4]; } ParticleVector;
-extern int D_L08_001B1ADC __attribute__((sda)), D_L08_001B1AE0 __attribute__((sda));
-extern int D_L08_001B1B74 __attribute__((sda)), D_L08_001B1B78 __attribute__((sda));
-extern float D_L08_001B1AE4 __attribute__((sda)), D_L08_001B1AE8 __attribute__((sda));
-extern float D_L08_001B1AEC __attribute__((sda)), D_L08_001B1AF0 __attribute__((sda));
-extern float D_L08_001B1AF4 __attribute__((sda)), D_L08_001B1AF8 __attribute__((sda));
-extern float D_L08_001B1B14 __attribute__((sda)), D_L08_001B1B18 __attribute__((sda));
-extern float D_L08_001B1B68 __attribute__((sda)), D_L08_001B1B6C __attribute__((sda));
+extern int g_ring_l08_color_start __attribute__((sda)), g_ring_l08_color_end __attribute__((sda));
+extern int g_ring_l08_color_start_2 __attribute__((sda)), g_ring_l08_color_end_2 __attribute__((sda));
+extern float g_ring_red_min __attribute__((sda)), g_ring_red_max __attribute__((sda));
+extern float g_ring_green_min __attribute__((sda)), g_ring_green_max __attribute__((sda));
+extern float g_ring_blue_min __attribute__((sda)), g_ring_blue_max __attribute__((sda));
+extern float g_ring_speed_min_divisor __attribute__((sda)), g_ring_rise_min_divisor __attribute__((sda));
+extern float g_ring_boost_scale __attribute__((sda)), g_ring_height_offset __attribute__((sda));
 extern int GetCollHitMaterial(void), func_001163B0(void);
 extern float math_random_float_range(float, float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern float FastVecLength(void *);
@@ -32,8 +32,8 @@ void func_PAL_L08_004239F0(char *object, void *position, int count,
 {
     struct { ParticleVector offset, velocity, acceleration, inherited; } frame;
     char *state = *(char **)(object + 0x68);
-    int startColor = D_L08_001B1ADC;
-    int endColor = D_L08_001B1AE0;
+    int startColor = g_ring_l08_color_start;
+    int endColor = g_ring_l08_color_end;
     int n;
     float component, length, magnitude;
     int kind, duration, size;
@@ -41,8 +41,8 @@ void func_PAL_L08_004239F0(char *object, void *position, int count,
     ParticleVector *acceleration;
 
     if (!GetCollHitMaterial()) {
-        startColor = D_L08_001B1B74;
-        endColor = D_L08_001B1B78;
+        startColor = g_ring_l08_color_start_2;
+        endColor = g_ring_l08_color_end_2;
     }
     if (count > 0) {
         n = count;
@@ -57,20 +57,20 @@ void func_PAL_L08_004239F0(char *object, void *position, int count,
         length = FastVecLength(&frame.offset);
         magnitude = speed * ((outerRadius - length) * 0.020000001f) / outerRadius;
         vec_scale_to_length(&frame.velocity, &frame.offset,
-                     math_random_float_range(magnitude / D_L08_001B1B14, magnitude));
+                     math_random_float_range(magnitude / g_ring_speed_min_divisor, magnitude));
         frame.inherited.q = *(ParticleQuad *)state;
-        frame.inherited.f[2] *= D_L08_001B1B68;
+        frame.inherited.f[2] *= g_ring_boost_scale;
         FastVecAdd(&frame.velocity, &frame.velocity, &frame.inherited);
         acceleration = &frame.acceleration;
-        frame.velocity.f[2] += math_random_float_range(rise / D_L08_001B1B18, rise) * 0.020000001f;
+        frame.velocity.f[2] += math_random_float_range(rise / g_ring_rise_min_divisor, rise) * 0.020000001f;
         qzero_nc(acceleration);
         FastVecAdd(&frame.offset, &frame.offset, position);
-        frame.offset.f[2] += D_L08_001B1B6C;
+        frame.offset.f[2] += g_ring_height_offset;
         frame.velocity.f[3] = startScale;
         frame.acceleration.f[3] = endScale;
-        kind = FloatToInt((math_random_float_range(D_L08_001B1AE4, D_L08_001B1AE8) * 5.0f + 2.0f) * 0.16666667f);
-        duration = FloatToInt((math_random_float_range(D_L08_001B1AEC, D_L08_001B1AF0) * 5.0f + 2.0f) * 0.16666667f);
-        size = FloatToInt((math_random_float_range(D_L08_001B1AF4, D_L08_001B1AF8) * 5.0f + 2.0f) * 0.16666667f);
+        kind = FloatToInt((math_random_float_range(g_ring_red_min, g_ring_red_max) * 5.0f + 2.0f) * 0.16666667f);
+        duration = FloatToInt((math_random_float_range(g_ring_green_min, g_ring_green_max) * 5.0f + 2.0f) * 0.16666667f);
+        size = FloatToInt((math_random_float_range(g_ring_blue_min, g_ring_blue_max) * 5.0f + 2.0f) * 0.16666667f);
         particle = part_spawn_trail(&frame.offset, &frame.velocity, &frame.acceleration, startColor, endColor,
                                kind, duration, size, -1);
         if (particle && (func_001163B0() & 1))

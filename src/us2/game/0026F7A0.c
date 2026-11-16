@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_US2_0026F7A0(void)
+void stub_empty_19_us2(void)
 {
 }
 
-void func_US2_0026F7B8(void)
+void stub_empty_21_us2(void)
 {
 }
 

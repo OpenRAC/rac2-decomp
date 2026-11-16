@@ -43,9 +43,9 @@ typedef struct {
 typedef struct { unsigned char data[256]; } AttachObject;
 
 extern AttachObject *g_moby_l01_table __attribute__((sda));
-extern PoseRecord *D_L01_001B264C MACRO_ADDR;
-extern unsigned char D_001A7B0B[];
-extern unsigned char D_001A7B2A[];
+extern PoseRecord *g_swamp_patrol_positions MACRO_ADDR;
+extern unsigned char g_hero_input_enabled[];
+extern unsigned char g_hero_override_flag[];
 extern float math_fast_sin_or_cos_a(float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -78,7 +78,7 @@ void move_to_pose_update(PoseMoby *moby)
         if (moby->command || p->link == -1 ||
             g_moby_l01_table[p->link].data[0x20] == 0xfe ||
             g_moby_l01_table[p->link].data[0x20] == 0xfd ||
-            !D_001A7B0B[0] || D_001A7B2A[0])
+            !g_hero_input_enabled[0] || g_hero_override_flag[0])
             moby_set_state(moby, 2, -1);
         moby->hit_slot = 255;
         break;
@@ -86,12 +86,12 @@ void move_to_pose_update(PoseMoby *moby)
         p->t += 1.0f / p->duration;
         if (p->t > 1.0f) p->t = 1.0f;
         blend = (1.0f - math_fast_sin_or_cos_a(p->t * 3.1415927f)) * 0.5f;
-        FastVecSub(delta, D_L01_001B264C[p->index].position, p->start_position);
+        FastVecSub(delta, g_swamp_patrol_positions[p->index].position, p->start_position);
         FastVecScale(delta, delta, blend);
         FastVecAdd(moby->position, p->start_position, delta);
-        moby->rotation[2] = math_move_angle_toward_target(p->start_rotation[2], D_L01_001B264C[p->index].rotation[2], blend);
-        moby->rotation[1] = math_move_angle_toward_target(p->start_rotation[1], D_L01_001B264C[p->index].rotation[1], blend);
-        moby->rotation[0] = math_move_angle_toward_target(p->start_rotation[0], D_L01_001B264C[p->index].rotation[0], blend);
+        moby->rotation[2] = math_move_angle_toward_target(p->start_rotation[2], g_swamp_patrol_positions[p->index].rotation[2], blend);
+        moby->rotation[1] = math_move_angle_toward_target(p->start_rotation[1], g_swamp_patrol_positions[p->index].rotation[1], blend);
+        moby->rotation[0] = math_move_angle_toward_target(p->start_rotation[0], g_swamp_patrol_positions[p->index].rotation[0], blend);
         if (p->t >= 1.0f) moby_set_state(moby, 3, -1);
         break;
     case 3:

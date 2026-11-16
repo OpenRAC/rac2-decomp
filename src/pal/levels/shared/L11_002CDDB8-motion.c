@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern void func_PAL_L00_002D4668(u32, void *, void *);
+extern void UpdateHeroAttachment_pal(u32, void *, void *);
 extern float cam_get_view_space_vector_length(char *);
 extern void cam_set_view_space_vector_length(char *, int, float);
 extern float cam_get_view_space_height(char *);
@@ -14,7 +14,7 @@ extern void vec_clear_128(TI128 *);
 extern void hero_resolve_collision_with_rewind(void);
 extern void hero_probe_ground(void);
 extern void FastVecSub(void *, void *, void *);
-extern void func_PAL_L00_002B5178(void);
+extern void EaseHeroPositionToGoal_pal(void);
 extern float FastVecDot(void *, void *);
 extern void cam_project_vector_onto_view_plane(char *, char *);
 extern float hero_get_speed_along_forward(void *);
@@ -52,7 +52,7 @@ typedef struct HeroMotionPrefix {
 extern HeroMotionPrefix g_hero_state;
 
 /* Integrate hero motion, resolve contacts, and measure the resulting displacement. */
-void func_PAL_L11_002CDDB8(void)
+void HeroApplyMotionCollision_pal(void)
 {
     MotionVector initial, planar, vertical;
     MotionVector *resolved;
@@ -60,7 +60,7 @@ void func_PAL_L11_002CDDB8(void)
     int state;
 
     qcopy(initial.f, (char *)&g_hero_state.position);
-    func_PAL_L00_002D4668(g_hero_state.attachment, (char *)&g_hero_state.impulse, (u8 *)&g_hero_state + 0x90);
+    UpdateHeroAttachment_pal(g_hero_state.attachment, (char *)&g_hero_state.impulse, (u8 *)&g_hero_state + 0x90);
     state = g_hero_state.state;
     if (state == 0x14 || state == 0x5B || state == 0x58 || state == 0x81) {
         if (g_hero_state.collisionOffFrames == 0) {
@@ -95,7 +95,7 @@ void func_PAL_L11_002CDDB8(void)
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
         FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     } else {
         hero_probe_ground();
     }
@@ -142,7 +142,7 @@ void func_PAL_L11_002CDDB8(void)
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
         FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     }
     FastVecSub((char *)&g_hero_state.impulseMove, (char *)&g_hero_state.position, planar.f);
     g_hero_state.impulseSpeed = FastVecLength((char *)&g_hero_state.impulseMove);

@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern u8 *D_L03_001B2A1C __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 extern void moby_set_state(u8 *, s32, s32);
 extern void moby_set_flag_bit(u8 *, s32);
 extern void moby_draw_marker_sprite(u8 *);
@@ -28,13 +28,13 @@ void linked_l03_door_update(u8 *object)
     case 1:
         index = *(s32 *)(vars + 8);
         if (index != -1) {
-            other = D_L03_001B2A1C + (index << 8);
+            other = g_moby_record_base + (index << 8);
             if (other != 0 && other[0x20] != 0xFE && other[0x20] != 0xFD)
                 break;
         }
         index = *(s32 *)(vars + 0xC);
         if (index != -1) {
-            other = D_L03_001B2A1C + (index << 8);
+            other = g_moby_record_base + (index << 8);
             if (other != 0 && other[0x20] != 0xFE && other[0x20] != 0xFD)
                 break;
         }
@@ -51,14 +51,14 @@ void linked_l03_door_update(u8 *object)
 owner_finished:
         index = *(s32 *)(vars + 0);
         if (index != -1)
-            moby_set_flag_bit(D_L03_001B2A1C + (index << 8), 1);
+            moby_set_flag_bit(g_moby_record_base + (index << 8), 1);
         index = *(s32 *)(vars + 4);
         if (index != -1)
-            moby_set_flag_bit(D_L03_001B2A1C + (index << 8), 1);
+            moby_set_flag_bit(g_moby_record_base + (index << 8), 1);
         if (g_current_map_index[0] == state)
-            D_001395B8[0x78] |= 1;
+            g_game_flag_table[0x78] |= 1;
         if (g_current_map_index[0] == 0xE)
-            D_001395B8[0x78] |= 2;
+            g_game_flag_table[0x78] |= 2;
         moby_set_state(object, 4, -1);
         break;
     }

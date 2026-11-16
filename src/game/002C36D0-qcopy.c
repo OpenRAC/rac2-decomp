@@ -24,7 +24,7 @@ extern Particle_002C36D0 *part_alloc(int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F2638;
+extern unsigned char *g_part_tex_bluish_fade_table;
 
 /* Creates a bluish particle that fades out over the given life. */
 Particle_002C36D0 *part_spawn_bluish_fade(TI128 *position, int life, int kind, int extra)
@@ -46,7 +46,7 @@ Particle_002C36D0 *part_spawn_bluish_fade(TI128 *position, int life, int kind, i
         if (kind >= 2) {
             kind = 0;
         }
-        p->unk02 = D_001F2638[kind];
+        p->unk02 = g_part_tex_bluish_fade_table[kind];
         m->fade = FloatToInt(127.0f / IntToFloat(life));
         p->life = life;
     }

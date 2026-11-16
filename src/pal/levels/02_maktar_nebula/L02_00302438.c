@@ -19,7 +19,7 @@ typedef struct {
     L02_Mob *mobs[1];
 } L02_MobList;
 
-extern L02_MobList D_L02_001BE200;
+extern L02_MobList g_mob_list;
 
 /* sda in this -G0 unit gives the bare-symbol load: retail has it as `lui`/`lw` after the loop and,
    as the filler of the first branch's delay slot, as the one-instruction `$gp` form gas makes of
@@ -34,7 +34,7 @@ extern void math_store_angle_update_result(void *, void *, int, int, float);
 
 extern void gfx_add_draw_callback_first(void *, void *);
 
-extern void func_PAL_L02_00302438(void *);
+extern void cutscene_draw_intro_overlays_pal(void *);
 
 /* func_PAL_L02_00302948, the PAL copy of func_L02_00300CE8: the same C, where the 0xFA0 mobs' call
    is skipped in game state 0x33 and its float argument scales by 6/5. The mob pointer is read as
@@ -45,8 +45,8 @@ void func_PAL_L02_00302948(void) {
     int i;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L02_001BE200.count; i++) {
-        L02_Mob *mob = ((L02_MobList *)((u8 *)&D_L02_001BE200 + i * 4))->mobs[0];
+    for (i = 0; i < g_mob_list.count; i++) {
+        L02_Mob *mob = ((L02_MobList *)((u8 *)&g_mob_list + i * 4))->mobs[0];
 
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
@@ -55,6 +55,6 @@ void func_PAL_L02_00302948(void) {
         if (mob != 0 && mob->type == 0xFA0 && g_current_map_index != 0x33 && mob->p68 != 0)
             math_store_angle_update_result(mob, (u8 *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
     }
-    if (g_current_map_index == 2 && D_L02_001BE200.mode == 2)
-        gfx_add_draw_callback_first(func_PAL_L02_00302438, 0);
+    if (g_current_map_index == 2 && g_mob_list.mode == 2)
+        gfx_add_draw_callback_first(cutscene_draw_intro_overlays_pal, 0);
 }

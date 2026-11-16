@@ -1,16 +1,16 @@
 #include "common.h"
 
 typedef struct { int time; short counter,delay,active,pad; } Event;
-extern Event D_L00_0023D960[];
-extern int D_L00_001AF8F0 __attribute__((sda));
-extern int D_L00_001AF8F4 __attribute__((sda));
-extern float D_L00_001AF8F8 __attribute__((sda));
-extern float D_L00_001AF934 __attribute__((sda));
-extern short D_L00_001AF938 __attribute__((sda));
-extern int D_L00_001B28A0 MACRO_ADDR;
-extern int D_L00_001B28A4;
-extern int D_L00_001B28A8;
-extern float D_L00_001B28AC;
+extern Event g_ring_table[];
+extern int g_orb_burst_pending __attribute__((sda));
+extern int g_orb_delay_time __attribute__((sda));
+extern float g_orb_speed_param __attribute__((sda));
+extern float g_orb_rate_scale __attribute__((sda));
+extern short g_ring_start_alpha __attribute__((sda));
+extern int g_ring_timer MACRO_ADDR;
+extern int g_ring_blocked;
+extern int g_ring_growth_frames;
+extern float g_ring_growth_rate;
 
 extern int FloatToInt(float);
 extern float IntToFloat(int);
@@ -19,21 +19,21 @@ extern int FastDecTimer(void *);
 
 void UpdateTimedEvents(void)
 {
-    if(D_L00_001AF8F0) {
+    if(g_orb_burst_pending) {
         int i;
-        for(i=9;i>=0;i--) D_L00_0023D960[i].active=0;
-        D_L00_001AF8F0=0;
-        D_L00_001B28A0=0;
-        D_L00_001B28A8=FloatToInt(D_L00_001AF8F8/(D_L00_001AF934*(1.0f/60.0f)));
-        D_L00_001B28AC=1.0f/IntToFloat(D_L00_001B28A8);
+        for(i=9;i>=0;i--) g_ring_table[i].active=0;
+        g_orb_burst_pending=0;
+        g_ring_timer=0;
+        g_ring_growth_frames=FloatToInt(g_orb_speed_param/(g_orb_rate_scale*(1.0f/60.0f)));
+        g_ring_growth_rate=1.0f/IntToFloat(g_ring_growth_frames);
     }
-    if(!D_L00_001B28A4 && math_fast_float_d(&D_L00_001B28A0)) {
-        int time=D_L00_001AF8F4;
-        unsigned short counter=*(unsigned short *)&D_L00_001B28A8;
-        unsigned short delay=D_L00_001AF938;
-        int next=D_L00_001B28A0;
+    if(!g_ring_blocked && math_fast_float_d(&g_ring_timer)) {
+        int time=g_orb_delay_time;
+        unsigned short counter=*(unsigned short *)&g_ring_growth_frames;
+        unsigned short delay=g_ring_start_alpha;
+        int next=g_ring_timer;
         {
-        Event *scan=D_L00_0023D960;
+        Event *scan=g_ring_table;
         do {
             if(!scan->active) {
                 scan->active=1;
@@ -43,14 +43,14 @@ void UpdateTimedEvents(void)
                 break;
             }
             scan++;
-        } while ((int)scan<(int)(D_L00_0023D960+10));
+        } while ((int)scan<(int)(g_ring_table+10));
         }
-        D_L00_001B28A0=next;
+        g_ring_timer=next;
     }
     {
     int i;
     for(i=0;i<10;i++) {
-        if(D_L00_0023D960[i].active && FastDecTimer(&D_L00_0023D960[i].counter)) D_L00_0023D960[i].active=0;
+        if(g_ring_table[i].active && FastDecTimer(&g_ring_table[i].counter)) g_ring_table[i].active=0;
     }
     }
 }

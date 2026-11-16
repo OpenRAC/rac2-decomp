@@ -3,13 +3,13 @@
 #include "common.h"
 extern int g_ship_state __attribute__((sda));
 extern int g_ship_transition_timer __attribute__((sda));
-extern char D_L05_001B3610[] __attribute__((aligned(16))) MACRO_ADDR;
-extern char D_L05_001B3620[] __attribute__((aligned(16))) MACRO_ADDR;
+extern char g_ship_saved_euler[] __attribute__((aligned(16))) MACRO_ADDR;
+extern char g_ship_record_position[] __attribute__((aligned(16))) MACRO_ADDR;
 
 void func_PAL_L05_00448A58(char *a0, char *a1, int a2)
 {
     g_ship_state = 1;
     g_ship_transition_timer = (((int)(a2) * 5 + 2) / 6);
-    qcopy(D_L05_001B3610, a1);
-    qcopy(D_L05_001B3620, a0);
+    qcopy(g_ship_saved_euler, a1);
+    qcopy(g_ship_record_position, a0);
 }

@@ -17,11 +17,11 @@ typedef struct L05Slot40 {
     int value;
     int pad18[4];
 } L05Slot40;
-extern L05Slot40 D_002A1800[];
+extern L05Slot40 g_slot_value_table[];
 extern void func_0029CC50(int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
-extern int D_L05_001AFAA0 __attribute__((sda));
+extern int g_active_effect_moby __attribute__((sda));
 
 extern void func_L05_003CD598(char *);
 
@@ -32,11 +32,11 @@ void func_L05_003CD280(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001AFAA0 != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001AFAA0 + 0x10), object + 0x10);
+    if (g_active_effect_moby != 0) {
+        scale = fast_vec_dist((void *)(g_active_effect_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_active_effect_moby + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -51,13 +51,13 @@ void func_L05_003CD280(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_active_effect_moby + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
     check_scale:
         if (scale < 0.5f) {
             int slot = func_L05_0037AAC8(6);
-            int add = D_002A1800[slot].limit;
+            int add = g_slot_value_table[slot].limit;
 
             if (math_random_int_below(4) != 0) {
                 thrown_object_update(func_0030CBA8(0x1283), -1);
@@ -66,9 +66,9 @@ void func_L05_003CD280(char *object)
                 thrown_object_update(func_0030CBA8(0x1284), -1);
             }
             snd_play_from_class_bank(0xC, 0, object, 0xFBF);
-            D_002A1800[slot].value += add;
-            if (D_002A1800[slot].limit < D_002A1800[slot].value)
-                D_002A1800[slot].value = D_002A1800[slot].limit;
+            g_slot_value_table[slot].value += add;
+            if (g_slot_value_table[slot].limit < g_slot_value_table[slot].value)
+                g_slot_value_table[slot].value = g_slot_value_table[slot].limit;
             moby_mark_spawned(object);
             return;
         }

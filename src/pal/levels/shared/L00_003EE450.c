@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 extern void gfx_set_clamped_view_distance(float value);
 extern float math_fabs(float value);
 
@@ -22,7 +22,7 @@ void func_PAL_L00_003EE6E0(char *p)
     }
     if (*(unsigned char *)(p + 0x20) != 1)
         return;
-    if (D_L00_001A8F00 == 2)
+    if (g_game_l00_mode == 2)
         return;
 
     v = *(float *)(p + 0x14);

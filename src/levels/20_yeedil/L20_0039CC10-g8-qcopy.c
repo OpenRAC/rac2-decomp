@@ -27,7 +27,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void draw_world_quad(void *, void *, int);
-extern char D_L20_001B9FC0[];
+extern char g_camera_l20_position[];
 
 typedef struct {
     u8 pad[0x10];
@@ -59,7 +59,7 @@ void gfx_draw_projectile_trail(char *object) {
     state->scroll += 0.1f;
     if (state->scroll >= 4.0f) state->scroll -= 4.0f;
     position = object + 0x10;
-    FastVecSub(&camera_delta, position, D_L20_001B9FC0);
+    FastVecSub(&camera_delta, position, g_camera_l20_position);
     vec_scale_to_length(&segment, &state->axis, -2.0f);
     FastVecAdd(&midpoint, position, &segment);
     FastVecCross(&normal, &camera_delta, &segment);

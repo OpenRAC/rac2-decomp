@@ -15,10 +15,10 @@ extern char g_sound_state[], g_hero_position[];
 extern PlayerLinkA4A8 g_hero_state;
 extern unsigned char g_item_slot_to_record[];
 extern TuningA4A8 g_weapon_l00_table[];
-extern char D_L00_00255BA0[];
-extern unsigned short D_L00_001B1FB0[] MACRO_ADDR;
+extern char g_shot_history_points[];
+extern unsigned short g_homing_moby_index_list[] MACRO_ADDR;
 extern CollisionResultA4A8 g_collision_result;
-extern void *D_L00_001ADB2C MACRO_ADDR;
+extern void *g_active_tether_object MACRO_ADDR;
 extern float *moby_get_private_value_0(void *);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
@@ -196,11 +196,11 @@ void homing_l00_shot_update_3(ProjectileObjectA4A8 *object)
         if (object->position[0] < 2.0f || object->position[0] > 1021.0f ||
             object->position[1] < 2.0f || object->position[1] > 1021.0f ||
             object->position[2] < 2.0f || object->position[2] > 1021.0f) {
-            RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+            RemoveMobyFromIndexList(object, g_homing_moby_index_list);
             moby_mark_spawned(object);
         } else {
             moby_get_offset_point(object, delta);
-            history = D_L00_00255BA0 + state->history_index * 0x40;
+            history = g_shot_history_points + state->history_index * 0x40;
             for (i = 3; i > 0; i--) qcopy(history + i * 16, history + (i - 1) * 16);
             qcopy(history, delta);
             if (++state->age >= 4)
@@ -263,10 +263,10 @@ void homing_l00_shot_update_3(ProjectileObjectA4A8 *object)
                 if (explode) coll_probe_ground_height_below(object->position, 0, 0.5f);
                 {
                     int draw_effect = math_random_int_below(5) == 0;
-                    parented_explosion_spawn(object->position, 0.5f, 1, 15, 0, 0, 8, 15, 0, 1, 0, draw_effect, D_L00_001ADB2C);
+                    parented_explosion_spawn(object->position, 0.5f, 1, 15, 0, 0, 8, 15, 0, 1, 0, draw_effect, g_active_tether_object);
                 }
                 shot_draw_impact_beam(object, axis, hit_object);
-                RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+                RemoveMobyFromIndexList(object, g_homing_moby_index_list);
                 table_clear_entry_flag(state->handle);
                 moby_mark_spawned(object);
             } else if (FastDecTimer(&state->life) || vec_distance_xy(object->position, g_hero_position) > 60.0f) {
@@ -278,7 +278,7 @@ void homing_l00_shot_update_3(ProjectileObjectA4A8 *object)
                     }
                 }
                 state->sound = -1;
-                RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+                RemoveMobyFromIndexList(object, g_homing_moby_index_list);
                 table_clear_entry_flag(state->handle);
                 moby_mark_spawned(object);
             }

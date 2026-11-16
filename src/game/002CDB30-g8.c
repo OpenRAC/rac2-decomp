@@ -27,23 +27,23 @@ typedef struct {
     int motion;
 } MenuSelection;
 
-extern int D_00138344 NOT_SDA;
+extern int g_menu_input_flags NOT_SDA;
 extern CallbackState g_pause_menu_state;
-extern int D_001AB9B0 __attribute__((sda));
-extern int D_001AB9B4 __attribute__((sda));
-extern int D_001AB9B8 __attribute__((sda));
+extern int g_item_list_cursor __attribute__((sda));
+extern int g_item_list_prev_row __attribute__((sda));
+extern int g_item_list_next_row __attribute__((sda));
 /* Two halfword counts per row (see func_002A6AE0). */
-extern unsigned short D_00188510[][2];
-extern TableRow D_00264630[];
-extern MenuCounter D_0025ABC0;
-extern MenuSelection D_0025AC28;
+extern unsigned short g_kill_event_counts[][2];
+extern TableRow g_item_menu_table[];
+extern MenuCounter g_menu_counter_2;
+extern MenuSelection g_menu_selection;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 /* Handles the left and right buttons on the item list menu and picks the nearest rows that have items. */
 int menu_handle_item_list_input(void)
 {
-    int flags = D_00138344;
-    int previous_row = D_001AB9B0;
+    int flags = g_menu_input_flags;
+    int previous_row = g_item_list_cursor;
     int result = 0;
 
     if (flags & 0x10) {
@@ -61,55 +61,55 @@ return_value:
     if (flags & 0x900) {
         result = 1;
     } else if (flags & 0x8000) {
-        if (previous_row != D_001AB9B4)
+        if (previous_row != g_item_list_prev_row)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        D_001AB9B0 = D_001AB9B4;
-        if (D_001AB9B0 <= 0)
-            D_001AB9B0 = 1;
+        g_item_list_cursor = g_item_list_prev_row;
+        if (g_item_list_cursor <= 0)
+            g_item_list_cursor = 1;
     } else if (flags & 0x2000) {
-        if (previous_row != D_001AB9B8)
+        if (previous_row != g_item_list_next_row)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        D_001AB9B0 = D_001AB9B8;
-        if (D_001AB9B0 >= 64)
-            D_001AB9B0 = 63;
+        g_item_list_cursor = g_item_list_next_row;
+        if (g_item_list_cursor >= 64)
+            g_item_list_cursor = 63;
     }
 
     /* The nearest rows below and above the current one with a nonzero count;
        row 1 and the current row when there is none. */
-    D_001AB9B8 = D_001AB9B0 + 1;
-    D_001AB9B4 = D_001AB9B0 - 1;
+    g_item_list_next_row = g_item_list_cursor + 1;
+    g_item_list_prev_row = g_item_list_cursor - 1;
     for (;;) {
-        if (D_00188510[D_001AB9B4][0] != 0 || D_00188510[D_001AB9B4][1] != 0)
+        if (g_kill_event_counts[g_item_list_prev_row][0] != 0 || g_kill_event_counts[g_item_list_prev_row][1] != 0)
             break;
-        if (--D_001AB9B4 <= 0) {
-            D_001AB9B4 = 1;
+        if (--g_item_list_prev_row <= 0) {
+            g_item_list_prev_row = 1;
             break;
         }
     }
     {
-        int current_row = D_001AB9B0;
+        int current_row = g_item_list_cursor;
         for (;;) {
-            if (D_00188510[D_001AB9B8][0] != 0 || D_00188510[D_001AB9B8][1] != 0)
+            if (g_kill_event_counts[g_item_list_next_row][0] != 0 || g_kill_event_counts[g_item_list_next_row][1] != 0)
                 break;
-            if (++D_001AB9B8 >= 64) {
-                D_001AB9B8 = current_row;
+            if (++g_item_list_next_row >= 64) {
+                g_item_list_next_row = current_row;
                 break;
             }
         }
     }
 
-    if (D_00188510[D_001AB9B0][0] == 0 && D_00188510[D_001AB9B0][1] == 0) {
-        D_0025ABC0.value = 63;
-        D_0025AC28.value = 0;
+    if (g_kill_event_counts[g_item_list_cursor][0] == 0 && g_kill_event_counts[g_item_list_cursor][1] == 0) {
+        g_menu_counter_2.value = 63;
+        g_menu_selection.value = 0;
     } else {
-        D_0025ABC0.value = D_001AB9B0 - 1;
-        D_0025AC28.value = D_00264630[D_001AB9B0].value;
+        g_menu_counter_2.value = g_item_list_cursor - 1;
+        g_menu_selection.value = g_item_menu_table[g_item_list_cursor].value;
     }
-    if (D_001AB9B0 != previous_row)
-        D_0025AC28.motion = -576;
+    if (g_item_list_cursor != previous_row)
+        g_menu_selection.motion = -576;
     return result;
 }

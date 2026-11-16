@@ -4,11 +4,11 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* 0x1AEFF0 + 0x2E18 : the three floats the retail reads through $gp here. */
-extern float D_L20_001B1E08 __attribute__((sda));
+extern float g_tethered_body_param_a __attribute__((sda));
 
-extern float D_L20_001B1E0C __attribute__((sda));
+extern float g_tethered_body_param_b __attribute__((sda));
 
-extern float D_L20_001B1E10 __attribute__((sda));
+extern float g_tethered_body_param_c __attribute__((sda));
 
 extern void FastVecSub(void *, void *, void *);
 
@@ -42,8 +42,8 @@ void tethered_body_update(char *moby) {
         moby_set_state(moby, 1, -1);
         break;
     case 1:
-        pushable_moby_update(moby, state + 0x50, D_L20_001B1E08, D_L20_001B1E0C,
-                          D_L20_001B1E10, *(s32 *)(state + 0xE0));
+        pushable_moby_update(moby, state + 0x50, g_tethered_body_param_a, g_tethered_body_param_b,
+                          g_tethered_body_param_c, *(s32 *)(state + 0xE0));
         break;
     }
     FastVecSub(&out, moby + 0x10, &pos);

@@ -15,11 +15,11 @@ extern void moby_compute_local_point(char *,void *,float,float,float);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void SpawnTintedEffects(char *,void *,int,float,int,void *,float,unsigned int,float,float,int);
-extern char D_L06_001B1C08[] SDATA(D_L06_001B1C08);
-extern char D_L06_001B1C00[] SDATA(D_L06_001B1C00);
-extern char D_L06_001B1C10[] SDATA(D_L06_001B1C10);
-extern char D_L06_001A8F20[] MACRO_ADDR;
-extern int D_L06_001B1C30 __attribute__((sda));
+extern char g_debris_param_b[] SDATA(D_L06_001B1C08);
+extern char g_debris_param_c[] SDATA(D_L06_001B1C00);
+extern char g_debris_param_a[] SDATA(D_L06_001B1C10);
+extern char g_effect_vector[] MACRO_ADDR;
+extern int g_debris_piece_color __attribute__((sda));
 
 /* Updates a breakable object: once hit it throws out debris and sparks, then removes itself. */
 void breakable_l06_debris_update(char *obj)
@@ -49,18 +49,18 @@ void breakable_l06_debris_update(char *obj)
             qcopy(vec_c, vec_b);
             FastVecSub(vec_b, vec_b, vec_a);
             FastVecAdd(vec_c, vec_c, vec_a);
-            part_explode_object_into_pieces(obj, vec_b, D_L06_001B1C08, D_L06_001B1C00,
-                             65535, -1, D_L06_001B1C30, 9, state, 255, 0);
+            part_explode_object_into_pieces(obj, vec_b, g_debris_param_b, g_debris_param_c,
+                             65535, -1, g_debris_piece_color, 9, state, 255, 0);
             moby_set_state(obj, 2, -1);
         }
         ((unsigned char *)obj)[0xA8] = 255;
         break;
     case 2:
-        part_explode_object_into_pieces(obj, D_L06_001B1C10, D_L06_001B1C08, D_L06_001B1C00,
-                         65535, 0, D_L06_001B1C30, 7, 62, 255, 0);
+        part_explode_object_into_pieces(obj, g_debris_param_a, g_debris_param_b, g_debris_param_c,
+                         65535, 0, g_debris_piece_color, 7, 62, 255, 0);
         part_spawn_scaled_bolts(obj, 1, pos[2] * 0.33333334f);
         moby_compute_local_point(obj, vec_a, pos[0], pos[1], pos[2]);
-        SpawnExplosionEffects(obj, D_L06_001A8F20, vec_a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
+        SpawnExplosionEffects(obj, g_effect_vector, vec_a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
                       -1, 0, 0, 0, -1, 0, 0x810001);
         for (i = 0; i < 4; i++) {
             vec_b[0] = (i / 2 * 2 - 1) * 0.0166666675f;

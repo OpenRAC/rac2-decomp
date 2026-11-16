@@ -1,8 +1,8 @@
 #include "common.h"
-extern int D_L30_001AEC90 __attribute__((sda));
+extern int g_museum_selector_flag __attribute__((sda));
 extern char g_hero_position[];
 extern struct { char pad[0x24]; int pending; char gap[0x40]; int busy; short timer; char gap2[4]; unsigned short mode; } g_music_state;
-extern int D_00138324 NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
 extern void moby_set_state(void *,int,int);
 extern s32 snd_resume_music_stream(void);
 extern int ForceClaimNotice(int,int,int);
@@ -13,13 +13,13 @@ void museum_exhibit_selector_update(unsigned char *obj) {
     char *st=*(char **)(obj+0x68);
     switch(obj[0x20]) {
     case 0:
-        obj[0x30]=255; D_L30_001AEC90=0;
+        obj[0x30]=255; g_museum_selector_flag=0;
         *(int *)(st+0x140)=-1; *(int *)(st+0x144)=0;
         moby_set_state(obj,1,-1); break;
     case 1: if(museum_find_active_exhibit_entry(obj)!=-1) moby_set_state(obj,2,-1); break;
     case 2:
         if(!IsPointInCuboid(g_hero_position,*(int *)(st+0x140))) moby_set_state(obj,1,-1);
-        else if(D_00138324&0x10) moby_set_state(obj,3,-1);
+        else if(g_pad_held_flags&0x10) moby_set_state(obj,3,-1);
         else ForceClaimNotice(12,0x2801,1);
         break;
     case 3: if(museum_schedule_next_exhibit_entry(obj)) moby_set_state(obj,4,-1);
@@ -39,7 +39,7 @@ void museum_exhibit_selector_update(unsigned char *obj) {
     }
     if(obj[0x20]>=3) {
         ForceClaimNotice(1,0,1);
-        if((D_00138324&0x10) && (g_music_state.busy!=0 || g_music_state.pending!=-1)) {
+        if((g_pad_held_flags&0x10) && (g_music_state.busy!=0 || g_music_state.pending!=-1)) {
             if((unsigned)(g_music_state.mode-6)>=2) g_music_state.mode=5;
             moby_set_state(obj,2,-1);
         }

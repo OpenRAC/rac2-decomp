@@ -8,14 +8,14 @@ typedef struct {
     float uv[4][2];
     u64 reserved, texture, setup, state;
 } L11Packet;
-extern int D_L11_001B30C8[] __attribute__((sda));
-extern int D_L11_001B2060 __attribute__((sda));
-extern int D_L11_001B2090 __attribute__((sda));
-extern int D_L11_001B2064[] __attribute__((sda));
-extern int D_L11_001B2098[] __attribute__((sda));
-extern float D_L11_001B2070[4][2] __attribute__((sda));
-extern L11RenderQuad D_L11_001B20A0[4] __attribute__((sda));
-extern L11RenderQuad D_L11_001B20E0[4] __attribute__((sda));
+extern int g_arena_progress_level[] __attribute__((sda));
+extern int g_glow_quad_param_a __attribute__((sda));
+extern int g_glow_quad_param_c __attribute__((sda));
+extern int g_glow_quad_params_b[] __attribute__((sda));
+extern int g_glow_quad_params_d[] __attribute__((sda));
+extern float g_glow_l11_quad_uvs[4][2] __attribute__((sda));
+extern L11RenderQuad g_glow_render_quads_a[4] __attribute__((sda));
+extern L11RenderQuad g_glow_render_quads_b[4] __attribute__((sda));
 extern float IntToFloat(int);
 extern void euler_to_matrix(void *, void *);
 extern void transform_vector(void *, void *, void *);
@@ -42,7 +42,7 @@ void func_PAL_L11_004613D0(char *p)
     vector[0] = 30.0f;
     vector[3] = 1.0f;
     *(L11RenderQuad *)temp = 0;
-    temp[0] = IntToFloat(D_L11_001B30C8[0] % 500) *
+    temp[0] = IntToFloat(g_arena_progress_level[0] % 500) *
         (1.0f / 600.0f) * 2.0f * 3.14159274f - 3.14159274f;
     *(L11RenderQuad *)angles = *(L11RenderQuad *)temp;
     euler_to_matrix(rotation, angles);
@@ -53,10 +53,10 @@ void func_PAL_L11_004613D0(char *p)
     temp[3] = 30.0f;
     if (math_fast_helper_a(temp, 512.0f) != -1)
         multiply_matrix(matrix, matrix, rotation);
-    FillQuadPacket(&packets[0], D_L11_001B2060, D_L11_001B2090,
-                      D_L11_001B2070, D_L11_001B20A0, 1);
-    FillQuadPacket(&packets[1], D_L11_001B2064[0], D_L11_001B2098[0],
-                      D_L11_001B2070, D_L11_001B20E0, 1);
+    FillQuadPacket(&packets[0], g_glow_quad_param_a, g_glow_quad_param_c,
+                      g_glow_l11_quad_uvs, g_glow_render_quads_a, 1);
+    FillQuadPacket(&packets[1], g_glow_quad_params_b[0], g_glow_quad_params_d[0],
+                      g_glow_l11_quad_uvs, g_glow_render_quads_b, 1);
     for (i = 0; i < 4; i++) {
         packets[0].color[i] += *(int *)q;
         packets[1].color[i] += *(int *)q;

@@ -7,7 +7,7 @@ extern int route_check_points(int, char *, char *);
 
 /* hands an active entity a corrected world position: when its state check passes, switches it
    to state 7 and copies the position into its state block */
-void func_PAL_L14_003CD430(char *entity, char *position)
+void entity_apply_corrected_pos_pal(char *entity, char *position)
 {
     char *state;
 

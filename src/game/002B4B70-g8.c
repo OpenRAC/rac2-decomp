@@ -15,18 +15,18 @@
  * expands to an adjacent lui + addiu; with `D_001B1D50[]` cc1 splits the pair itself and the
  * scheduler moves the lui away from its addiu.
  */
-extern int D_001AA100 __attribute__((sda));
-extern int D_001AA0F8 __attribute__((sda));
-extern int D_001AA0FC __attribute__((sda));
-extern int D_001AA104 __attribute__((sda));
-extern int D_0018C2EC __attribute__((nosda));
+extern int g_mode_stack_depth __attribute__((sda));
+extern int g_pending_mode_arg_a __attribute__((sda));
+extern int g_pending_mode_arg_b __attribute__((sda));
+extern int g_pending_mode_done_flag __attribute__((sda));
+extern int g_request_enabled_flag __attribute__((nosda));
 extern int g_requested_game_mode;
-extern int D_001B1D50[2];
+extern int g_game_mode_stack[2];
 
 /* Finishes the current request and brings back the one that was waiting on the stack, if any. */
 int request_end_slot(int value, int index)
 {
-    int count = D_001AA100;
+    int count = g_mode_stack_depth;
     int status;
 
     if (g_requested_game_mode != -2)
@@ -35,13 +35,13 @@ int request_end_slot(int value, int index)
         status = 0;
     if (count == 0)
         status = 1;
-    if (D_0018C2EC == 0)
+    if (g_request_enabled_flag == 0)
         status = -1;
     if (status == 0) {
-        D_001AA0F8 = value;
-        D_001AA0FC = index;
-        g_requested_game_mode = D_001B1D50[--D_001AA100];
-        D_001AA104 = 0;
+        g_pending_mode_arg_a = value;
+        g_pending_mode_arg_b = index;
+        g_requested_game_mode = g_game_mode_stack[--g_mode_stack_depth];
+        g_pending_mode_done_flag = 0;
     }
     return status;
 }

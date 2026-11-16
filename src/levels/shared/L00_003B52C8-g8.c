@@ -8,8 +8,8 @@ extern void draw_world_quad(void *, void *, int), VU1_addGSregister(int, u64);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float FastVecLength(void *);
-extern int D_L00_001AFA20 __attribute__((sda)), D_L00_001AFA24 __attribute__((sda));
-extern u32 D_L00_001AF9F0 __attribute__((sda)), D_L00_001AF9F4 __attribute__((sda));
+extern int g_ribbon_l00_core_texture __attribute__((sda)), g_ribbon_l00_halo_texture __attribute__((sda));
+extern u32 g_ribbon_l00_core_color_2 __attribute__((sda)), g_ribbon_l00_halo_color_2 __attribute__((sda));
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The EE ABI orders the integer and FP banks independently: count is a3,
  * and coreWidth, width and extend are f12, f13 and f14. */
@@ -21,16 +21,16 @@ void gfx_l00_draw_ribbon_with_halo_2(Vector *points, u32 alpha, u32 outerAlpha, 
     u32 coreColor, haloColor;
     /* Initialization and the two loops have separate zero-value lifetimes. */
     const float zero = 0.0f;
-    core.texture = GetEffectTextureDescriptor(D_L00_001AFA20);
-    coreColor = D_L00_001AF9F0 | (alpha << 24);
+    core.texture = GetEffectTextureDescriptor(g_ribbon_l00_core_texture);
+    coreColor = g_ribbon_l00_core_color_2 | (alpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
     core.primitive = 0;
     core.color[3] = coreColor; core.color[2] = coreColor;
     core.color[1] = coreColor; core.color[0] = coreColor;
-    halo.texture = GetEffectTextureDescriptor(D_L00_001AFA24);
+    halo.texture = GetEffectTextureDescriptor(g_ribbon_l00_halo_texture);
     halo.flags = core.flags; halo.mode = core.mode; halo.primitive = core.primitive;
-    haloColor = D_L00_001AF9F4 | (outerAlpha << 24);
+    haloColor = g_ribbon_l00_halo_color_2 | (outerAlpha << 24);
     halo.color[3] = haloColor; halo.color[2] = haloColor;
     halo.color[1] = haloColor; halo.color[0] = haloColor;
     halo.uv[0] = zero; halo.uv[1] = zero; halo.uv[2] = zero; halo.uv[3] = 1;
@@ -55,8 +55,8 @@ void gfx_l00_draw_ribbon_with_halo_2(Vector *points, u32 alpha, u32 outerAlpha, 
         FastVecScale(&normal, &normal, coreWidth * length);
         FastVecAdd(&core.vertex[2], points + i, &normal);
         FastVecSub(&core.vertex[3], points + i, &normal);
-        if (i == 1) { core.color[1] = D_L00_001AF9F0; core.color[0] = D_L00_001AF9F0; }
-        else if (i == count - 2) { core.color[3] = D_L00_001AF9F0; core.color[2] = D_L00_001AF9F0; }
+        if (i == 1) { core.color[1] = g_ribbon_l00_core_color_2; core.color[0] = g_ribbon_l00_core_color_2; }
+        else if (i == count - 2) { core.color[3] = g_ribbon_l00_core_color_2; core.color[2] = g_ribbon_l00_core_color_2; }
         else if (i == 2) { core.color[1] = coreColor; core.color[0] = coreColor; }
         draw_world_quad(&core, 0, 0);
         qcopy(&core.vertex[0], &core.vertex[2]); qcopy(&core.vertex[1], &core.vertex[3]);
@@ -87,8 +87,8 @@ void gfx_l00_draw_ribbon_with_halo_2(Vector *points, u32 alpha, u32 outerAlpha, 
         FastVecSub(&halo.vertex[1], &first, &widthVector);
         FastVecAdd(&halo.vertex[2], &last, &widthVector);
         FastVecSub(&halo.vertex[3], &last, &widthVector);
-        if (i == 0) { halo.color[1] = D_L00_001AF9F4; halo.color[0] = D_L00_001AF9F4; }
-        else if (i == count - 2) { halo.color[3] = D_L00_001AF9F4; halo.color[2] = D_L00_001AF9F4; }
+        if (i == 0) { halo.color[1] = g_ribbon_l00_halo_color_2; halo.color[0] = g_ribbon_l00_halo_color_2; }
+        else if (i == count - 2) { halo.color[3] = g_ribbon_l00_halo_color_2; halo.color[2] = g_ribbon_l00_halo_color_2; }
         else if (i == 1) { halo.color[1] = haloColor; halo.color[0] = haloColor; }
         draw_world_quad(&halo, 0, 0);
     }

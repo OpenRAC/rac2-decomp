@@ -31,11 +31,11 @@ typedef struct Rac2Native_abf21065e887d7a9_FallbackPredicate112Layout {
     Rac2Native_abf21065e887d7a9_FallbackU32 flags_98;
 } Rac2Native_abf21065e887d7a9_FallbackPredicate112Layout;
 
-extern Rac2Native_abf21065e887d7a9_FallbackPredicate112Layout D_00139768;
+extern Rac2Native_abf21065e887d7a9_FallbackPredicate112Layout g_request_flag_table;
 
 typedef unsigned char u8;
 
-extern u8 D_L03_001D2540[];
+extern u8 g_moby_animation_state_pool[];
 
 extern float func_00283CE0_4(int a);
 
@@ -59,9 +59,9 @@ typedef unsigned int u32;
 
 extern void func_00282A60_1 (char *node, int zero, int size);
 
-extern void *D_L00_001B1E00[16];
+extern void *g_moby_object_slots[16];
 
-extern u32 D_L00_001B1E40[16];
+extern u32 g_moby_object_slot_flags[16];
 
 extern void func_002A3F10_1(char *, int, int *, char *);
 
@@ -105,22 +105,22 @@ typedef struct {
     short second;
 } Pairb52b2850;
 
-extern int D_L03_001DE1C0[];
+extern int g_selected_object_table[];
 
-extern ListObjectb52b2850 *D_L03_001DAB80[];
+extern ListObjectb52b2850 *g_object_l03_pointer_table[];
 
-extern Pairb52b2850 D_L03_001DDA00[];
+extern Pairb52b2850 g_point_list_pair_table[];
 
 void mem_clear(unsigned int *dst, unsigned int val, int size);
 
 /* Return whether both flag bit 0x10000 at data offset 0x90 and flag bit 0x04000000 at offset 0x98 are set, retaining the measured early rejection path. */
 int menu_are_both_status_flags_set(void)
 {
-    if ((D_00139768.flags_90 & 0x10000u) == 0 &&
-        (D_00139768.flags_98 & 0x04000000u) != 0)
+    if ((g_request_flag_table.flags_90 & 0x10000u) == 0 &&
+        (g_request_flag_table.flags_98 & 0x04000000u) != 0)
         return 0;
-    if ((D_00139768.flags_90 & 0x10000u) != 0 &&
-        (D_00139768.flags_98 & 0x04000000u) != 0)
+    if ((g_request_flag_table.flags_90 & 0x10000u) != 0 &&
+        (g_request_flag_table.flags_98 & 0x04000000u) != 0)
         return 1;
     return 0;
 }
@@ -149,7 +149,7 @@ char *CreateMoby(int classId)
 
 /* func_0029F0C8 is defined in 0029F0C8.c. */
 
-extern char *D_001B1B60 __attribute__((sda));
+extern char *g_moby_pool_end __attribute__((sda));
 extern int g_game_time __attribute__((sda));
 extern void func_002A0C68(char *, unsigned int);
 
@@ -157,7 +157,7 @@ extern void func_002A0C68(char *, unsigned int);
 void moby_mark_spawned(void *object)
 {
     char *moby = (char *)object;
-    if ((unsigned int)moby < (unsigned int)D_001B1B60)
+    if ((unsigned int)moby < (unsigned int)g_moby_pool_end)
         ((unsigned char *)moby)[0x20] = 0xFD;
     else
         ((unsigned char *)moby)[0x20] = 0xFE;
@@ -177,7 +177,7 @@ void update_moby_animation_state(u8 *moby)
     } else {
         moby[108] = 255;
         moby[110] = 0;
-        *(int *)(moby + 88) = (int)(D_L03_001D2540 + (moby[64] << 11));
+        *(int *)(moby + 88) = (int)(g_moby_animation_state_pool + (moby[64] << 11));
     }
 
     *(int *)(moby + 92) = *(int *)(*(int *)(*(volatile int *)(moby + 36) + (moby[67] << 2) + 72) + (moby[65] << 2) + 28);
@@ -338,10 +338,10 @@ int moby_alloc_object_slot(void *object)
 {
     int index;
     for (index = 0; index < 16; ++index) {
-        if (D_L00_001B1E00[index] == 0 ||
-            D_L00_001B1E00[index] == object) {
-            D_L00_001B1E00[index] = object;
-            D_L00_001B1E40[index] = 0;
+        if (g_moby_object_slots[index] == 0 ||
+            g_moby_object_slots[index] == object) {
+            g_moby_object_slots[index] = object;
+            g_moby_object_slot_flags[index] = 0;
             return index;
         }
     }
@@ -353,8 +353,8 @@ void moby_clear_object_slots(void)
 {
     int i;
     for (i = 0; i < 16; i++) {
-        D_L00_001B1E00[i] = 0;
-        D_L00_001B1E40[i] = 0;
+        g_moby_object_slots[i] = 0;
+        g_moby_object_slot_flags[i] = 0;
     }
 }
 
@@ -420,17 +420,17 @@ void PatchMobyGifs(void)
     Pairb52b2850 *pair;
     int *next;
 
-    selected = D_L03_001DE1C0;
+    selected = g_selected_object_table;
     while (*selected >= 0) {
         next = selected + 1;
-        object = D_L03_001DAB80[*selected];
+        object = g_object_l03_pointer_table[*selected];
         row = object->rows;
         for (;;) {
             keys = (unsigned char *)row;
             dst = (unsigned int *)(row->target & 0x7FFFFFFF);
             if (*keys != 255) {
                 do {
-                    pair = &D_L03_001DDA00[*keys];
+                    pair = &g_point_list_pair_table[*keys];
                     if (pair->first != 0) {
                         dst[12] = (dst[12] & 0xFFFFC000u) | pair->first;
                     }
@@ -453,7 +453,7 @@ out:
 }
 
 extern int g_hero_moby;
-extern float D_001B1B90[];
+extern float g_light_direction[];
 extern void func_002A04E8(int, float *);
 extern float mat_fast_helper_a(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -467,25 +467,25 @@ void gfx_compute_light_direction(void)
 
     func_002A04E8(g_hero_moby, v);
     a = mat_fast_helper_a(v[0], v[1]);
-    D_001B1B90[0] = math_fast_sin_or_cos_a(a) * 0.14f;
-    D_001B1B90[1] = math_fast_sin_or_cos_b(a) * 0.14f;
-    D_001B1B90[2] = -0.99f;
+    g_light_direction[0] = math_fast_sin_or_cos_a(a) * 0.14f;
+    g_light_direction[1] = math_fast_sin_or_cos_b(a) * 0.14f;
+    g_light_direction[2] = -0.99f;
 }
 
 /* func_002A0048 is in 0029DE38-dma.c. */
 
 extern void FlushCache(int);
-extern char D_00238F00[];
-extern void *D_001B16B0 __attribute__((sda));
-extern int D_001B16B4 __attribute__((sda));
+extern char g_tex_upload_scratch[];
+extern void *g_scratch_upload_ptr __attribute__((sda));
+extern int g_scratch_upload_arg __attribute__((sda));
 extern void MobyAnimProc(void *, int);
 
 /* Copies a block of data to the graphics scratch area and starts the next upload. */
 void tex_upload_scratch_data(void)
 {
     FlushCache(0);
-    mem_fast_helper_c((void *)0x70003800, D_00238F00, 0x800);
-    MobyAnimProc(D_001B16B0, D_001B16B4);
+    mem_fast_helper_c((void *)0x70003800, g_tex_upload_scratch, 0x800);
+    MobyAnimProc(g_scratch_upload_ptr, g_scratch_upload_arg);
 }
 
 /* Fills a small scratch area with a fixed pattern. */
@@ -499,14 +499,14 @@ extern void mem_fast_helper_c(void *, void *, int);
 /* Saves the scratch area to a backup buffer. */
 void mem_save_scratch_area(void)
 {
-    mem_fast_helper_c((void *)((char *)D_L03_001DAB80 - 0x3C0), (void *)0x70003A00, 0x3C0);
+    mem_fast_helper_c((void *)((char *)g_object_l03_pointer_table - 0x3C0), (void *)0x70003A00, 0x3C0);
 }
 
 
 /* Restores the scratch area from the backup buffer. */
 void mem_restore_scratch_area(void)
 {
-    mem_fast_helper_c((void *)0x70003A00, (void *)((char *)D_L03_001DAB80 - 0x3C0), 0x3C0);
+    mem_fast_helper_c((void *)0x70003A00, (void *)((char *)g_object_l03_pointer_table - 0x3C0), 0x3C0);
 }
 
 
@@ -517,7 +517,7 @@ void mem_restore_scratch_area(void)
 extern void DmaMobyTextures(void);
 extern void tex_upload_scratch_data(void);
 extern int ConfigureGraphicsSetupDmaChain(void);
-extern int D_001B1B80;
+extern int g_tex_upload_result;
 
 /* Runs the texture upload, and then the graphics setup if it is switched on. */
 int tex_run_upload_and_setup(void)
@@ -525,7 +525,7 @@ int tex_run_upload_and_setup(void)
     int result;
     DmaMobyTextures();
     tex_upload_scratch_data();
-    result = D_001B1B80;
+    result = g_tex_upload_result;
     if (result != 0)
         result = ConfigureGraphicsSetupDmaChain();
     return result;

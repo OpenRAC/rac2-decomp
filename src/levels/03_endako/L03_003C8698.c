@@ -34,7 +34,7 @@ extern int coll_sweep_from_object(void *moby, void *a1, s32 a2, f32 a3, f32 a4, 
 extern void copy_matrix_rotation(void *moby, void *a1);
 extern void transform_vector(void *moby, void *a1, void *a2);
 extern s32 CollLine(void *moby, void *a1, void *a2, void *a3, void *a4);
-extern L03_V4 D_L03_0029A8D0[];
+extern L03_V4 g_effect_track_vectors[];
 
 /* Seeds the actor's effect: the state, the aim, the effect track and then the
    four corners of the level's table. */
@@ -51,8 +51,8 @@ void moby_init_effect_track(char *moby)
     copy_matrix_rotation(&b.v[0], moby + 0xC0);
     qcopy(&b.q80, aim);
     *(f32 *)((u8 *)&b.q80 + 12) = one;
-    transform_vector(&b.q30, &D_L03_0029A8D0[0], &b.v[0]);
-    p = &D_L03_0029A8D0[1];
+    transform_vector(&b.q30, &g_effect_track_vectors[0], &b.v[0]);
+    p = &g_effect_track_vectors[1];
     for (i = 3; i >= 0; i--) {
         transform_vector(&b.q40, p, &b.v[0]);
         CollLine(&b.q30, &b.q40, 0, moby, &b.st);

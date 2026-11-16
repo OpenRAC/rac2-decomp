@@ -17,7 +17,7 @@ extern int FloatToInt(float);
 extern int part_alloc_effect_slot(void *, float, float, float, void *);
 extern void math_compute_aim_direction(void *, void *, float, float, float);
 extern void ref_L00_0041EB38_00(void (*)(void *), void *);
-extern void func_PAL_L00_00424840(void *);
+extern void shot_update_and_draw_trail_pal(void *);
 typedef struct {
     char pad0[0x50];
     float speed;                   
@@ -39,15 +39,15 @@ typedef struct {
     float fade;                    
 } ShotState;
 extern ShotKind g_weapon_l00_table[];
-extern char D_00139570[];
+extern char g_projectile_weapon_info[];
 extern Quad128 g_hero_position __attribute__((nosda));
 extern char g_hero_state[];
-extern float D_L00_001B1498 __attribute__((sda));
-extern float D_L00_001B1494 __attribute__((sda));
-extern unsigned int D_L00_001B1490 __attribute__((sda));
+extern float g_shot_l00_speed_scale __attribute__((sda));
+extern float g_shot_trail_scroll_offset __attribute__((sda));
+extern unsigned int g_shot_trail_slot_index __attribute__((sda));
 
 /* Spawn object 0xC89 at origin, aimed along the owner, at target or along the hero. */
-char *func_PAL_L00_00423E08(Quad128 *origin, char *owner, char *target)
+char *SpawnAimedShot_pal(Quad128 *origin, char *owner, char *target)
 {
     Quad128 normal, position;
     char *object, *collision, *hero;
@@ -64,7 +64,7 @@ char *func_PAL_L00_00423E08(Quad128 *origin, char *owner, char *target)
         *(char **)(object + 0xB8) = owner;
         object[0x20] = 0;
         state = *(ShotState **)(object + 0x68);
-        speed = (g_weapon_l00_table + ((unsigned char *)D_00139570)[0x16])->speed * 0.020000001f;
+        speed = (g_weapon_l00_table + ((unsigned char *)g_projectile_weapon_info)[0x16])->speed * 0.020000001f;
         hero = g_hero_state;
         if (*(short *)(hero + 0x24EC) == 1) {
             vec_scale_to_length(state->velocity, owner + 0xD0, -speed);
@@ -93,7 +93,7 @@ char *func_PAL_L00_00423E08(Quad128 *origin, char *owner, char *target)
         count = FloatToInt(30.0f / speed) + 1;
         state->count = count;
         state->step = 1.0f / IntToFloat(count);
-        *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * D_L00_001B1498;
+        *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * g_shot_l00_speed_scale;
         object[0x20] = 0;
         state->target = target;
         if (target) {
@@ -111,18 +111,18 @@ char *func_PAL_L00_00423E08(Quad128 *origin, char *owner, char *target)
             return 0;
         }
         state->frame = 0;
-        D_L00_001B1494 = 0;
-        if (D_L00_001B1490 > 15)
-            D_L00_001B1490 = 0;
-        state->slot = D_L00_001B1490;
-        D_L00_001B1490++;
-        if ((int)D_L00_001B1490 > 15)
-            D_L00_001B1490 = 0;
+        g_shot_trail_scroll_offset = 0;
+        if (g_shot_trail_slot_index > 15)
+            g_shot_trail_slot_index = 0;
+        state->slot = g_shot_trail_slot_index;
+        g_shot_trail_slot_index++;
+        if ((int)g_shot_trail_slot_index > 15)
+            g_shot_trail_slot_index = 0;
         position = *(Quad128 *)(object + 0x10);
         *(Quad128 *)(object + 0x10) = g_hero_position;
         state->handle = part_alloc_effect_slot(object, 1.0f, 1.0f, 1.0f, 0);
         *(Quad128 *)(object + 0x10) = position;
-        ref_L00_0041EB38_00(func_PAL_L00_00424840, object);
+        ref_L00_0041EB38_00(shot_update_and_draw_trail_pal, object);
         func_002A0F48(object);
     }
     return object;

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 typedef struct {
     char reserved00[0x14];
     char *source;
@@ -9,19 +9,19 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackStateL001FEC40;
-extern CallbackStateL001FEC40 D_L00_001FEC40;
+extern CallbackStateL001FEC40 g_pause_input_state;
 extern int level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
-int func_US2_L00_0034D8A0(void)
+int pad_l00_update_input_callback_5_us2(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -41,7 +41,7 @@ extern void DoGifPaging(void);
 extern void level_l00_call_module_handler_4(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_US2_L00_0034D928(void)
+int level_l00_run_setup_return_zero_7_us2(void)
 {
     SetupGifPaging(0);
     level_l00_call_module_handler_4();
@@ -52,7 +52,7 @@ int func_US2_L00_0034D928(void)
 extern void level_l00_call_module_handler(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_US2_L00_0034D9F8(void)
+int level_l00_run_setup_return_zero_8_us2(void)
 {
     SetupGifPaging(0);
     level_l00_call_module_handler();
@@ -63,15 +63,15 @@ int func_US2_L00_0034D9F8(void)
 extern int level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
-int func_US2_L00_0034DA28(void)
+int pad_l00_update_input_callback_6_us2(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -92,7 +92,7 @@ extern void level_l00_call_module_handler_2(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Implementation matching decompiled output */
-long func_US2_L00_0034DAB0(void)
+long setup_l00_run_three_return_zero_us2(void)
 {
   func_0027C540_5(0);
   level_l00_call_module_handler_2();

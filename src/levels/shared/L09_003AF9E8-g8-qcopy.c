@@ -21,7 +21,7 @@ extern int func_001163B0(void);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern void sprite_reset_large_record(void *);
-extern Vector4 D_L09_001B9A00;
+extern Vector4 g_camera_l09_position;
 
 /* A spark: the func_L00_0038ADD0 twin strips from the start to a random point within
    0.25..0.65 of it, sized by the owner's scale at +0x50, with a random texture page. */
@@ -74,7 +74,7 @@ void part_spawn_spark_strips(char *object, Vector4 *start)
         second.uv[4] = 1; second.uv[5] = 1; second.uv[6] = 1; second.uv[7] = 0;
     }
     FastVecSub(&basis[0], &end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], &D_L09_001B9A00, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], &g_camera_l09_position, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     first.point[0].bits = nearSize.bits; second.point[0].bits = farSize.bits;

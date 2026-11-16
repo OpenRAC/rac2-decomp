@@ -15,13 +15,13 @@ extern float ref_L22_003F5580_00 __attribute__((sda));
 extern f32 FastVecDot(void *, void *);
 extern f32 IntToFloat(int);
 extern f32 math_lerp_float(f32, f32, f32);
-extern u8 D_L22_001B9C80[];
-extern f32 D_L22_001B0A08 __attribute__((sda));
-extern f32 D_L22_001B0A04 __attribute__((sda));
-extern f32 D_L22_001B0A00 __attribute__((sda));
-extern f32 D_L22_001B09FC __attribute__((sda));
-extern u8 *D_L22_001B2794;
-extern u8 *D_L22_001B2678;
+extern u8 g_tether_origin[];
+extern f32 g_linked_toggle_near_b __attribute__((sda));
+extern f32 g_linked_toggle_far_b __attribute__((sda));
+extern f32 g_linked_toggle_near_a __attribute__((sda));
+extern f32 g_linked_toggle_far_a __attribute__((sda));
+extern u8 *g_toggle_link_table_b;
+extern u8 *g_toggle_link_table_a;
 
 /* Scales the controller of the object: when the controller is idle its position is copied to
  * the object, otherwise the controller's values are scaled and written back.

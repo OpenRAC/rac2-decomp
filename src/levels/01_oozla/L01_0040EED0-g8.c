@@ -1,13 +1,13 @@
 #include "common.h"
 
 
-extern int D_L01_001AEC38 SDATA(D_L01_001AEC38);
+extern int g_oozla_intro_timer SDATA(D_L01_001AEC38);
 extern int counter_abs __asm__("D_L01_001AEC38");
 extern int active_abs __asm__("D_L01_001B3468");
-extern float D_L01_001B208C __attribute__((sda));
-extern float D_L01_001B2090 __attribute__((sda));
-extern int D_L01_001B15E0 __attribute__((nosda));
-extern int D_L01_001B3468 SDATA(D_L01_001B3468);
+extern float g_breakable_alpha_check_b __attribute__((sda));
+extern float g_breakable_alpha_check_a __attribute__((sda));
+extern int g_breakable_active_limit __attribute__((nosda));
+extern int g_breakable_count SDATA(D_L01_001B3468);
 extern void moby_set_state(char *, int, int);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern void FastVecScale(char *, char *, float);
@@ -28,20 +28,20 @@ void breakable_object_update_timed(char *moby_arg)
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        D_L01_001AEC38 = D_L01_001AEC38 + 1;
+        g_oozla_intro_timer = g_oozla_intro_timer + 1;
         moby_set_state(moby, 1, -1);
         return;
     case 1:
         if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *(int *)vars == 0) {
-            D_L01_001AEC38 = counter_abs - 1;
+            g_oozla_intro_timer = counter_abs - 1;
             moby_set_state(moby, 2, -1);
         }
         *(u8 *)(moby + 0xA8) = 0xFF;
         return;
     case 2:
         FastVecScale((char *)offset, moby + 0xD0, -0.10000001f);
-        if (*(u8 *)(moby + 0x31) != 0 && D_L01_001B2090 < 0.9f &&
-            D_L01_001B208C < 0.9f && (active_count = D_L01_001B3468, active_count < D_L01_001B15E0)) {
+        if (*(u8 *)(moby + 0x31) != 0 && g_breakable_alpha_check_a < 0.9f &&
+            g_breakable_alpha_check_b < 0.9f && (active_count = g_breakable_count, active_count < g_breakable_active_limit)) {
             part_spawn_masked_debris(moby, 0x3FF, offset, 1.0f, 3.0f, 2.0f, 4.0f, 0xFF);
         } else {
             part_spawn_masked_debris(moby, 0xF, offset, 1.0f, 3.0f, 2.0f, 4.0f, 0xFF);
@@ -63,7 +63,7 @@ void breakable_object_update_timed(char *moby_arg)
             active_abs = count + 1;
         }
         if (math_fast_float_d(vars + 4) != 0) {
-            D_L01_001B3468 = D_L01_001B3468 - 1;
+            g_breakable_count = g_breakable_count - 1;
             moby_mark_spawned(moby);
         }
         return;

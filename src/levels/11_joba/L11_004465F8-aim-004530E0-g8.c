@@ -34,12 +34,12 @@ typedef struct {
 /* Encoded id lists, the entity pool pointer (read absolutely) and the group count. */
 extern u16 *g_group_id_lists[];
 extern u8 *g_moby_l11_table[] __attribute__((sda));
-extern s32 D_L11_001B35B8 __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
 
 /* the three float tuning words of this variant (range, cone and turn angles in degrees) */
-extern float D_L11_001B1D28 __attribute__((sda));
-extern float D_L11_001B1D2C __attribute__((sda));
-extern float D_L11_001B1D30 __attribute__((sda));
+extern float g_enemy_aim_range_c __attribute__((sda));
+extern float g_enemy_aim_cone_deg_c __attribute__((sda));
+extern float g_enemy_aim_turn_deg_c __attribute__((sda));
 
 extern int math_fast_helper_a(void *v, float r);
 extern float vec_distance_xy(void *, void *);
@@ -75,7 +75,7 @@ s32 enemy_aim_at_group_entity_in_cone_c(AimObject *obj)
     if (state->group == -1)
         return 0;
     for (id_ptr = g_group_id_lists[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && id_ptr != 0 &&
+         (state->group & 0xFF) != 0xFF && state->group <= g_tribe_group_limit && id_ptr != 0 &&
          ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_group_id_lists[state->group]);
          id_ptr++) {
         entity = (EntityPositionPrefix *)(g_moby_l11_table[0] + ((*id_ptr & 0x7FFF) << 8));
@@ -83,15 +83,15 @@ s32 enemy_aim_at_group_entity_in_cone_c(AimObject *obj)
             return 0;
         if (!moby_get_busy_flag(entity))
             continue;
-        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1D28))
+        if (!(vec_distance_xy(obj->position, entity->position) < g_enemy_aim_range_c))
             continue;
         angle_to_entity = mat_fast_helper_a(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
-        if (!(FastDiffRots(obj->heading, angle_to_entity) < D_L11_001B1D2C * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, angle_to_entity) < g_enemy_aim_cone_deg_c * 0.017453294f))
             continue;
         if (id_ptr == 0)
             return 0;
         FastVecSub(aim_point, obj->position, entity->position);
-        turn_angle = D_L11_001B1D30 * 0.017453294f;
+        turn_angle = g_enemy_aim_turn_deg_c * 0.017453294f;
         angle_to_entity = mat_fast_helper_a(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
         math_apply_axis_rotation_to_quat(aim_point, aim_point, obj->orientation,
                       fast_subtract_rotations(obj->heading, angle_to_entity) >= 0.0f ? -turn_angle : turn_angle);

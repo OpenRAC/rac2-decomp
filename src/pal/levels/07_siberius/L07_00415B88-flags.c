@@ -16,7 +16,7 @@ extern int PlayMobySound(int, int, void *);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L07_00415B88(unsigned char *object)
+void siberius_debris_update_pal(unsigned char *object)
 {
     char *state = *(char **)(object + 0x68);
     TI128 effect;

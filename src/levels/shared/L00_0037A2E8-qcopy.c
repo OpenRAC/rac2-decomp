@@ -19,8 +19,8 @@ extern PreviewModel g_purchase_menu_model;
 extern unsigned char g_item_slot_to_record[];
 typedef struct { unsigned char pad[4]; unsigned char alternate; unsigned char tail[219]; } PreviewInfo;
 extern PreviewInfo g_weapon_l00_table[];
-extern PreviewPose D_L00_0028D900[];
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern PreviewPose g_preview_pose_table[];
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern int menu_try_start_toc_entry(int, int);
 extern void moby_init_instance(unsigned char *, int);
 extern void gfx_pack_render_command_fields(void *, int, int, int, int);
@@ -57,13 +57,13 @@ void BindVendorPreviewModel(void) {
         }
         selection = *(int *)(model + 0x140 + *(int *)(model + 0x70) * 24);
         if (!((PreviewInfo *)((char *)g_weapon_l00_table + g_item_slot_to_record[selection] * 224))->alternate) {
-            *(float *)(model + 0x98) = D_L00_0028D900[selection].position.f[3];
-            *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].position.q;
-            *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].rotation.q;
+            *(float *)(model + 0x98) = g_preview_pose_table[selection].position.f[3];
+            *(Quad *)(model + 0xC0) = g_preview_pose_table[selection].position.q;
+            *(Quad *)(object + 0xF0) = g_preview_pose_table[selection].rotation.q;
         } else {
-            *(float *)(model + 0x98) = D_L00_0028D900[selection].alternate_position.f[3];
-            *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].alternate_position.q;
-            *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].alternate_rotation.q;
+            *(float *)(model + 0x98) = g_preview_pose_table[selection].alternate_position.f[3];
+            *(Quad *)(model + 0xC0) = g_preview_pose_table[selection].alternate_position.q;
+            *(Quad *)(object + 0xF0) = g_preview_pose_table[selection].alternate_rotation.q;
         }
 
     } else {
@@ -92,17 +92,17 @@ void BindVendorPreviewModel(void) {
         }
         selection = g_purchase_menu_model.choices1.rows[*(int *)(model + 0x70)].resource;
         if (!((PreviewInfo *)((char *)g_weapon_l00_table + g_item_slot_to_record[selection] * 224))->alternate) {
-            *(float *)(model + 0x98) = D_L00_0028D900[selection].position.f[3];
-            *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].position.q;
-            *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].rotation.q;
+            *(float *)(model + 0x98) = g_preview_pose_table[selection].position.f[3];
+            *(Quad *)(model + 0xC0) = g_preview_pose_table[selection].position.q;
+            *(Quad *)(object + 0xF0) = g_preview_pose_table[selection].rotation.q;
         } else {
-            *(float *)(model + 0x98) = D_L00_0028D900[selection].alternate_position.f[3];
-            *(Quad *)(model + 0xC0) = D_L00_0028D900[selection].alternate_position.q;
-            *(Quad *)(object + 0xF0) = D_L00_0028D900[selection].alternate_rotation.q;
+            *(float *)(model + 0x98) = g_preview_pose_table[selection].alternate_position.f[3];
+            *(Quad *)(model + 0xC0) = g_preview_pose_table[selection].alternate_position.q;
+            *(Quad *)(object + 0xF0) = g_preview_pose_table[selection].alternate_rotation.q;
         }
 
     }
-    if (D_001A7BB0[1]) g_purchase_menu_model.state.position.f[2] -= 0.55f;
+    if (g_language_settings[1]) g_purchase_menu_model.state.position.f[2] -= 0.55f;
     g_purchase_menu_model.state.dirty = 1;
     func_002A0F48(object);
     if (g_purchase_menu_model.state.state == 0 && g_purchase_menu_model.state.loading == g_purchase_menu_model.state.selected)

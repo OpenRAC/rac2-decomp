@@ -12,35 +12,35 @@ typedef int ActorVectorQuad __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; ActorVectorQuad q[0x260]; } Hero;
 extern char g_hero_state[];
 extern char *g_active_attacker_robot;
-extern void func_PAL_L02_003F5860(char *);
+extern void swaying_actor_update_pal(char *);
 extern void actor_update_hit_timer(char *);
 extern void actor_record_position_history(char *);
-extern void func_PAL_L02_003F5EB0(char *);
+extern void actor_tear_down_pal(char *);
 extern void actor_pick_approach_point(char *, char *);
 extern void actor_save_state_and_switch(char *);
-extern int func_PAL_L02_003F6170(char *);
+extern int moby_turn_toward_nearby_enemy_pal(char *);
 extern char *arena_get_camera_point(char *);
 extern s32 arena_get_state_word(char *);
-extern void func_PAL_L02_004009A0(char *, int, int);
+extern void moby_set_anim_type_three_pal(char *, int, int);
 extern int coll_point_inside_record_volume(void *, int);
 extern int cam_hook_return_minus_one(char *);
-extern int func_PAL_L01_00323068(char *, char *);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern void widget_submit_effects(char *);
 extern float vec_distance_xy(void *, void *);
 extern float FastDiffRots(float, float);
 extern int flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
-extern int func_PAL_002B5E30(u8 *, float);
-extern int func_PAL_002B5BA8(char *, float *, float);
-extern int func_PAL_002B5C98(void *, void *, float);
+extern int moby_step_at_own_position_factor_pal(u8 *, float);
+extern int moby_turn_toward_target_and_step_pal(char *, float *, float);
+extern int moby_step_controller_pal(void *, void *, float);
 extern float moby_get_anim_value(char *);
 extern int coll_test_hit_at_bone(void *, int, float, float, int, float, int, int, int);
 
 extern int moby_dispatch_action_by_kind(void *, void *);
 
 /* Update the combat actor's animation, steering and attack-state transitions. */
-void func_PAL_L02_003F4D60(char *object) {
+void combat_actor_update_pal(char *object) {
     float target[4] __attribute__((aligned(16)));
     char *state;
     char *target_object;
@@ -57,7 +57,7 @@ void func_PAL_L02_003F4D60(char *object) {
     if (phase == 0xFE) return;
     if (phase == 0xFD) return;
     state = *(char **)(object + 0x68);
-    func_PAL_L02_003F5860(object);
+    swaying_actor_update_pal(object);
     phase = *(u8 *)(object + 0x20);
     if (phase == 1 || phase == 0xFE || phase == 0xFD) return;
     if (*(s16 *)(state + 0x4EA) == 0) {
@@ -113,13 +113,13 @@ void func_PAL_L02_003F4D60(char *object) {
         if (*(u8 *)(object + 0xBC) == 0 && vec_distance_xy(object + 0x10, state + 0x4A0) < 0.5f)
             *(u8 *)(object + 0xBC) = 1;
         else
-            func_PAL_L01_00323068(object, state + 0x4A0);
+            moby_l01_turn_toward_target_pal(object, state + 0x4A0);
         break;
     case 5:
         flags = moby_dispatch_action_by_kind(object, state + 0x60);
         if ((*(u8 *)(object + 0x42) == 16 && math_random_int_below(30) == 0) || (flags & 1)) {
-            func_PAL_L02_004009A0(object, 0, -1);
-            func_PAL_L02_003F5EB0(object);
+            moby_set_anim_type_three_pal(object, 0, -1);
+            actor_tear_down_pal(object);
         } else if (flags & 2)
             moby_set_state((u8 *)object, 7, 4);
         break;
@@ -140,7 +140,7 @@ void func_PAL_L02_003F4D60(char *object) {
                 moby_set_state((u8 *)object, 4, 2);
                 *(int *)(state + 0x14C) = cam_hook_return_minus_one(*(char **)(object + 0xB8));
             }
-            func_PAL_L01_00323068(object, arena_get_camera_point(*(char **)(object + 0xB8)));
+            moby_l01_turn_toward_target_pal(object, arena_get_camera_point(*(char **)(object + 0xB8)));
         }
         break;
     case 5:
@@ -152,7 +152,7 @@ void func_PAL_L02_003F4D60(char *object) {
             moby_set_controller_speed_limits((u8 *)object, 0.0064000003f, 0.16000001f,
                          0.010053098f, 1.0053098f);
         }
-        func_PAL_002B5E30((u8 *)object, heading);
+        moby_step_at_own_position_factor_pal((u8 *)object, heading);
         if (*(u8 *)(object + 0x60) & 2)
             moby_set_state((u8 *)object, *(s16 *)(state + 0x4EC), *(s16 *)(state + 0x4EE));
         break;
@@ -176,10 +176,10 @@ void func_PAL_L02_003F4D60(char *object) {
             if (*(u8 *)(object + 0x43) != 12) func_PAL_002A7E68(object, 12, 4, 2);
             *(int *)(state + 0x4D0) = 0;
         } else if (distance > 2.8f) {
-            if (!func_PAL_L02_003F6170(object))
-                func_PAL_002B5BA8(object, target, *(float *)(state + 0x4B4));
+            if (!moby_turn_toward_nearby_enemy_pal(object))
+                moby_turn_toward_target_and_step_pal(object, target, *(float *)(state + 0x4B4));
         } else
-            func_PAL_002B5C98(object, object + 0x10, heading);
+            moby_step_controller_pal(object, object + 0x10, heading);
         angle = mat_fast_helper_a(target[0] - *(float *)(object + 0x10),
                              target[1] - *(float *)(object + 0x14));
         angle = FastDiffRots(*(float *)(object + 0xF8), angle);
@@ -206,7 +206,7 @@ void func_PAL_L02_003F4D60(char *object) {
                 *(float *)(state + 0x4CC) = 25.0f;
             }
         }
-        func_PAL_002B5C98(object, object + 0x10, heading);
+        moby_step_controller_pal(object, object + 0x10, heading);
         break;
     case 9:
         if (*(u8 *)(object + 0x60) & 2) moby_set_state((u8 *)object, 7, -1);

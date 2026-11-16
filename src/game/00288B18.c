@@ -23,7 +23,7 @@ typedef struct {
     s32 field34;
 } BarlowUtilityQueueRing;
 
-extern u32 D_00139768[];
+extern u32 g_request_flag_table[];
 
 /* Resets the request queue of the given owner. */
 void req_reset_owner_queue(void *owner)
@@ -41,7 +41,7 @@ void req_mark_queued_in_flag_table(BarlowUtilityQueueRing *ring)
         u32 value = ring->slots[i].value;
 
         if (value < 0xB1) {
-            D_00139768[value >> 2] |= 1u << (value & 0x1F);
+            g_request_flag_table[value >> 2] |= 1u << (value & 0x1F);
         }
 
         i = (i + 1 == 5) ? 0 : i + 1;

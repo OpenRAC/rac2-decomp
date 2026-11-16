@@ -2,9 +2,9 @@
 typedef struct { float v[4]; } TriggerPoint __attribute__((aligned(16)));
 typedef u8 TriggerActor[0x100];
 extern TriggerActor *g_moby_l18_table __attribute__((sda));
-extern u8 g_hero_state[], g_hero_position[], D_0019B4A8[], D_0019B2E8[];
+extern u8 g_hero_state[], g_hero_position[], g_moby_nibble_table[], g_moby_group_flags[];
 typedef struct { u8 p[0x464]; u8 x[1]; } Hist;
-extern u8 D_L18_0021E7B0[];
+extern u8 g_trigger_l18_flags[];
 extern int g_current_map_index;
 extern float FastAddRotations(float, float), vec_distance_xy(void *, void *), math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float);
@@ -15,7 +15,7 @@ extern void level_capture_checkpoint_state(void *, void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 
 /* Activate the tagged linkage when the hero touches this rotating trigger. */
-void func_US2_L18_0042C4F8(u8 *object)
+void rotating_trigger_update_us2(u8 *object)
 {
     TriggerPoint point;
     u8 *state = *(u8 **)(object + 0x68);
@@ -37,10 +37,10 @@ void func_US2_L18_0042C4F8(u8 *object)
             if (!state[0x10]) {
                 unsigned short id2 = *(u16 *)(object + 0xB2);
                 if (id2 & 1) {
-                    u8 *h = &D_0019B4A8[((short)id2 >> 1) + (g_current_map_index << 10)];
+                    u8 *h = &g_moby_nibble_table[((short)id2 >> 1) + (g_current_map_index << 10)];
                     if (((*h >> 4) & 7) != 7) *h += 16;
                 } else {
-                    u8 *h = &D_0019B4A8[((short)id2 >> 1) + (g_current_map_index << 10)];
+                    u8 *h = &g_moby_nibble_table[((short)id2 >> 1) + (g_current_map_index << 10)];
                     if ((*h & 7) != 7) (*h)++;
                 }
             }
@@ -48,12 +48,12 @@ void func_US2_L18_0042C4F8(u8 *object)
         }
         if (object[0xB0] != 255 && !state[0x11]) {
             id = *(u16 *)(object + 0xB2);
-            if (((Hist *)D_L18_0021E7B0)->x[(short)id]) goto activate;
-            { int n = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+            if (((Hist *)g_trigger_l18_flags)->x[(short)id]) goto activate;
+            { int n = g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
             if (id & 1) { if ((n >> 4) & 7) goto activate; }
             else if (n & 7) goto activate; }
         }
-        if ((state[0x13] && (D_0019B2E8[object[0xB0] + (g_current_map_index << 4)] & 0x80)) || touched) {
+        if ((state[0x13] && (g_moby_group_flags[object[0xB0] + (g_current_map_index << 4)] & 0x80)) || touched) {
 activate:
             object[0x20] = 1;
             object[0xBC] = 1;

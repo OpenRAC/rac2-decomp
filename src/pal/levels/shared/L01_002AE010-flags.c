@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern char D_L01_002637A0[];
+extern char g_action_table[];
 extern float FastAddRotations(float f12, float f13);
 typedef int HeroQuad __attribute__((mode(TI)));
 extern char g_hero_state[];
 extern unsigned char g_item_slot_to_record[];
-extern char D_L01_001B7B00[];
+extern char g_hero_attached_moby_buffers[];
 extern int get_ammo(int);
 extern int hero_slot_item_id(int);
 extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
@@ -81,7 +81,7 @@ typedef struct HeroState {
     int animation;               
     int weaponId;                
 } HeroState;
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern char g_hero_state[];
 
 /* For the hero's two attached mobys: point them at their buffers, start the animation the
@@ -98,17 +98,17 @@ void func_PAL_L01_002B0208(void)
 
     hero = (HeroState *)g_hero_state;
     if (hero->f22B8 && hero->f22BA && !get_ammo(-1))
-        func_PAL_L00_002AF6C0();
+        cancel_hero_item_animation_pal();
     for (i = 0; i < 2; i++) {
         HeroState *player = (HeroState *)g_hero_state;
         Moby **slot = &player->attached[i];
 
         if (*slot) {
-            (*slot)->buffer0 = D_L01_001B7B00 + i * 0xC00;
-            (*slot)->buffer1 = D_L01_001B7B00 + 0x600 + i * 0xC00;
+            (*slot)->buffer0 = g_hero_attached_moby_buffers + i * 0xC00;
+            (*slot)->buffer1 = g_hero_attached_moby_buffers + 0x600 + i * 0xC00;
             weaponId = hero_slot_item_id(0);
             if (weaponId == player->weaponId) {
-                weapon = &((WeaponInfo *)D_L01_002637A0)[g_item_slot_to_record[weaponId]];
+                weapon = &((WeaponInfo *)g_action_table)[g_item_slot_to_record[weaponId]];
                 animation = weapon->animation;
                 if (player->state == 12)
                     animation = weapon->altAnimation;

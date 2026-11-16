@@ -11,18 +11,18 @@ extern void gfx_reset_record_list();
 extern void func_002F0468();
 extern void level_relocate_header_blocks();
 extern void initialize_tfrag_render_data();
-extern int func_PAL_0029DE68();
+extern int fast_decompress_pal();
 extern void FlushCache();
-extern int func_PAL_002B8838(char *, int, int);
+extern int load_read_disc_with_pause_pal(char *, int, int);
 extern void level_flush_table_entry_offsets();
 extern void gfx_wait_for_dma_status_bits();
 extern void snd_wait_for_music_idle();
 extern void snd_clear_all_voices();
 extern void gfx_configure_screen_effect();
-extern int D_L00_001C9340[];
-extern int D_L00_001B2600[];
-extern int D_L00_001B2614 __attribute__((section(".sdata")));
-extern int D_L00_001B24D4 __attribute__((section(".sdata")));
+extern int g_tutorial_points[];
+extern int g_scene_block_table[];
+extern int g_scene_block_index __attribute__((section(".sdata")));
+extern int g_tfrag_count __attribute__((section(".sdata")));
 typedef struct {
     unsigned char pad00[0x529C];
     int base;
@@ -30,13 +30,13 @@ typedef struct {
     struct { int sector, size; } entries[0];
 } ChunkDiscTable;
 extern ChunkDiscTable g_copy_setup_data;
-extern int D_L00_001B2608 __attribute__((section(".sdata")));
-extern unsigned char *D_L00_001B24D0 __attribute__((section(".sdata")));
+extern int g_render_list_tail __attribute__((section(".sdata")));
+extern unsigned char *g_tfrag_render_data __attribute__((section(".sdata")));
 
 /* Loads a scene chunk, initializes its geometry and batches tfrag lighting. */
-void func_PAL_L00_00305110(int index, int argument)
+void load_scene_chunk_pal(int index, int argument)
 {
-    int *root = D_L00_001C9340;
+    int *root = g_tutorial_points;
     int *block, *first, *second;
     int i;
     if (root[0] == index)
@@ -46,22 +46,22 @@ void func_PAL_L00_00305110(int index, int argument)
     snd_wait_for_music_idle();
     gfx_wait_for_dma_status_bits(1);
     root[0] = index;
-    block = (int *)D_L00_001B2600[0];
-    D_L00_001B2608 = D_L00_001B2600[D_L00_001B2614];
+    block = (int *)g_scene_block_table[0];
+    g_render_list_tail = g_scene_block_table[g_scene_block_index];
     level_flush_table_entry_offsets();
-    func_PAL_002B8838((char *)block, g_copy_setup_data.entries[index].sector + g_copy_setup_data.base, g_copy_setup_data.entries[index].size);
+    load_read_disc_with_pause_pal((char *)block, g_copy_setup_data.entries[index].sector + g_copy_setup_data.base, g_copy_setup_data.entries[index].size);
     first = (int *)((char *)block + block[0]);
     second = (int *)((char *)block + block[1]);
     FlushCache(0);
-    func_PAL_0029DE68(first, root[2]);
-    func_PAL_0029DE68(second, root[1]);
+    fast_decompress_pal(first, root[2]);
+    fast_decompress_pal(second, root[1]);
     FlushCache(0);
     initialize_tfrag_render_data(root[2], root[4]);
     level_relocate_header_blocks(root[1]);
     {
-        int count = D_L00_001B24D4;
+        int count = g_tfrag_count;
         if (count > 0) {
-            unsigned short *p = (unsigned short *)(D_L00_001B24D0 + 0x36);
+            unsigned short *p = (unsigned short *)(g_tfrag_render_data + 0x36);
             do {
                 *p = 0xffff;
                 p += 32;
@@ -69,10 +69,10 @@ void func_PAL_L00_00305110(int index, int argument)
         }
     }
     i = 0;
-    while (i < D_L00_001B24D4) {
+    while (i < g_tfrag_count) {
         unsigned short *p = (unsigned short *)0x70003000;
         int n = 0;
-        while (n < 1023 && i < D_L00_001B24D4) {
+        while (n < 1023 && i < g_tfrag_count) {
             *p++ = i;
             n++;
             i++;

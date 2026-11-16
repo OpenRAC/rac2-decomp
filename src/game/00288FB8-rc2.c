@@ -25,8 +25,8 @@
 #include "common.h"
 
 extern s32 Help_FindIndex(s32 a);
-extern s32 D_001A8D18;
-extern s32 D_001A8D28 __attribute__((sda));
+extern s32 g_misc_return_word;
+extern s32 g_misc_data_block __attribute__((sda));
 extern s32 g_subtitle_entries;
 
 char *GetLocalizedString(s32 string_id) {
@@ -37,7 +37,7 @@ char *GetLocalizedString(s32 string_id) {
         return *(s32 *)(g_subtitle_entries + index * 0x10);
     }
     if (string_id == 0x9C40) {
-        return D_001A8D18;
+        return g_misc_return_word;
     }
-    return (s32)&D_001A8D28;
+    return (s32)&g_misc_data_block;
 }

@@ -1,14 +1,14 @@
 #include "common.h"
 
-extern int D_001AEBB8 __attribute__((sda));
-extern int D_001AEBBC __attribute__((sda));
+extern int g_copy_source_index __attribute__((sda));
+extern int g_copy_dest_index __attribute__((sda));
 extern float g_museum_water_heights[];
 
 /* Advance the interior of the 24-by-24 height field, then exchange its banks. */
 void StepMuseumHeightField(void)
 {
-    int source = D_001AEBB8 * 0x900;
-    int destination = D_001AEBBC * 0x900;
+    int source = g_copy_source_index * 0x900;
+    int destination = g_copy_dest_index * 0x900;
     int sourceCenter = source + 4;
     int row, column;
 
@@ -40,9 +40,9 @@ void StepMuseumHeightField(void)
         row = nextRow;
     } while (row < 23);
     {
-        int old = D_001AEBB8;
-        int other = D_001AEBBC;
-        D_001AEBBC = old;
-        D_001AEBB8 = other;
+        int old = g_copy_source_index;
+        int other = g_copy_dest_index;
+        g_copy_dest_index = old;
+        g_copy_source_index = other;
     }
 }

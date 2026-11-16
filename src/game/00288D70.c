@@ -4,15 +4,15 @@
    /* current buffer */
 extern short r1_D_0015EDC4;
 extern void flag_set_word(void);
-extern int D_001A7B8C __attribute__((sda));
+extern int g_flag_word __attribute__((sda));
 
 /* Sets a flag word. */
 void flag_set_word(void) {
-    D_001A7B8C = 1;
+    g_flag_word = 1;
 }
 
 
 /* Returns the flag word. */
 int flag_get_word(void) {
-    return D_001A7B8C;
+    return g_flag_word;
 }

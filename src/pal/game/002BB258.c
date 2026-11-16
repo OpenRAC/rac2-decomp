@@ -6,7 +6,7 @@ extern void FastVecAdd(char *, char *, char *);
 typedef int TI __attribute__((mode(TI)));
 extern float coll_get_heightmap_height(TI *pos);
 extern int g_current_map_index MACRO_ADDR;
-extern float D_001B1DC0[] MACRO_ADDR;
+extern float g_particle_ground_vector[] MACRO_ADDR;
 
 void func_PAL_002BB258(char *p)
 {
@@ -29,17 +29,17 @@ void func_PAL_002BB258(char *p)
     }
     x = (int)f[8];
     y = (int)f[9];
-    FastVecAdd((char *)tmp, (char *)s, (char *)D_001B1DC0);
+    FastVecAdd((char *)tmp, (char *)s, (char *)g_particle_ground_vector);
     FastVecAdd((char *)(f + 8), (char *)(f + 8), (char *)tmp);
     FastVecAdd((char *)(f + 4), (char *)(f + 4), (char *)tmp);
     if (*(short *)(p + 0xA) != 2 && (x != (int)f[8] || y != (int)f[9])) {
         c1 = *(TI *)(f + 8);
         h = coll_get_heightmap_height(&c1);
-        if (h >= D_001B1DC0[4]) {
+        if (h >= g_particle_ground_vector[4]) {
             c2 = *(TI *)(f + 8);
             lim = coll_get_heightmap_height(&c2);
         } else {
-            lim = D_001B1DC0[4];
+            lim = g_particle_ground_vector[4];
         }
         if (f[10] < lim) {
             part_kill(p);
@@ -47,7 +47,7 @@ void func_PAL_002BB258(char *p)
         }
     }
     s[2] -= 0.00392f;
-    s[3] = lim + D_001B1DC0[2];
+    s[3] = lim + g_particle_ground_vector[2];
 }
 
 
@@ -82,7 +82,7 @@ void func_PAL_002BB458(void *a0, int a1)
 
 
 extern int FastDecTimer(char *);
-extern unsigned char *D_001F2544;
+extern unsigned char *g_fading_texture_indices;
 
 /* func_PAL_002BB530, the PAL copy of func_002BA978: the same C, with a lifetime of 22 frames for
  * 27, and the table index scaled to span the same ten entries: (22 - t) * 9 / 22 for (27 - t) / 3. */
@@ -93,6 +93,6 @@ void func_PAL_002BB530(char *self)
     if (FastDecTimer(self + 0xA)) {
         part_kill(self);
     } else {
-        self[2] = D_001F2544[(22 - *(short *)(self + 0xA)) * 9 / 22];
+        self[2] = g_fading_texture_indices[(22 - *(short *)(self + 0xA)) * 9 / 22];
     }
 }

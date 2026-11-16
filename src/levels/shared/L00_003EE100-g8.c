@@ -6,7 +6,7 @@
    pinned profile does at -G8 (see docs/build/compiler-notes.md). */
 extern unsigned char *CreateMoby(int size);
 
-extern unsigned char *D_L00_001B0A20 __attribute__((sda));
+extern unsigned char *g_health_drain_moby __attribute__((sda));
 
 /* Creates the health drain slots object and remembers it in a level global. */
 unsigned char *health_drain_slots_create(int unused)
@@ -16,7 +16,7 @@ unsigned char *health_drain_slots_create(int unused)
     if (moby != 0) {
         unsigned int init_value = 0xFF;
 
-        D_L00_001B0A20 = moby;
+        g_health_drain_moby = moby;
         *(unsigned short *)(moby + 0x32) = init_value;
         moby[0x20] = 1;
         moby[0x30] = init_value;
@@ -28,9 +28,9 @@ unsigned char *health_drain_slots_create(int unused)
    entry, scales each record's pair of floats and asks the slot manager to refresh
    them, then folds the two level globals into the table's offset. */
 
-extern float D_L00_001B096C __attribute__((sda));
+extern float g_vaporizer_chain_phase __attribute__((sda));
 
-extern float D_L00_001B0970 __attribute__((sda));
+extern float g_vaporizer_chain_phase_step __attribute__((sda));
 
 extern char *level_get_slot_body(int a0, int a1);
 
@@ -66,15 +66,15 @@ int vaporizer_update_joint_chain(char *moby)
             i++;
         } while (i < count);
     }
-    value = D_L00_001B096C;
+    value = g_vaporizer_chain_phase;
     if (value > 7.0f) {
-        D_L00_001B096C = 0.0f;
+        g_vaporizer_chain_phase = 0.0f;
     } else if (value < -7.0f) {
-        D_L00_001B096C = 0.0f;
+        g_vaporizer_chain_phase = 0.0f;
     }
-    D_L00_001B096C = D_L00_001B096C - D_L00_001B0970;
-    if (D_L00_001B096C <= -4.0f) {
-        D_L00_001B096C = D_L00_001B096C + 4.0f;
+    g_vaporizer_chain_phase = g_vaporizer_chain_phase - g_vaporizer_chain_phase_step;
+    if (g_vaporizer_chain_phase <= -4.0f) {
+        g_vaporizer_chain_phase = g_vaporizer_chain_phase + 4.0f;
     }
     return FastDecTimer(state + 0x22) == 0;
 }
@@ -93,17 +93,17 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern int D_L00_001B0870 __attribute__((sda));
-extern int D_L00_001B0874 __attribute__((sda));
-extern int D_L00_001B0878 __attribute__((sda));
-extern int D_L00_001B087C __attribute__((sda));
-extern int D_L00_001B0880 __attribute__((sda));
-extern int D_L00_001B0884 __attribute__((sda));
-extern int D_L00_001B0888 __attribute__((sda));
-extern float D_L00_001B088C __attribute__((sda));
-extern Vector D_L00_0029AF40[];
-extern short D_L00_0029B440[][4][2];
-extern float D_L00_0029B840[][2];
+extern int g_sphere_quad_flag_base __attribute__((sda));
+extern int g_sphere_quad_flag_field_a __attribute__((sda));
+extern int g_sphere_quad_flag_field_b __attribute__((sda));
+extern int g_sphere_quad_flag_field_c __attribute__((sda));
+extern int g_sphere_quad_flag_field_high __attribute__((sda));
+extern int g_sphere_quad_texture_id __attribute__((sda));
+extern int g_sphere_quad_base_color __attribute__((sda));
+extern float g_sphere_quad_corner_scale __attribute__((sda));
+extern Vector g_quad_sphere_vertices[];
+extern short g_quad_sphere_quad_indices[][4][2];
+extern float g_quad_sphere_uvs[][2];
 extern long long GetEffectTextureDescriptor(int id);
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -126,12 +126,12 @@ void gfx_draw_quad_sphere_large(char *object)
     long flags;
     float quarter;
 
-    packet.f78 = GetEffectTextureDescriptor(D_L00_001B0884);
-    flags = (long)D_L00_001B0870;
-    flags |= (long)D_L00_001B0874 << 2;
-    flags |= (long)D_L00_001B0878 << 4;
-    flags |= (long)D_L00_001B087C << 6;
-    flags |= (long)D_L00_001B0880 << 32;
+    packet.f78 = GetEffectTextureDescriptor(g_sphere_quad_texture_id);
+    flags = (long)g_sphere_quad_flag_base;
+    flags |= (long)g_sphere_quad_flag_field_a << 2;
+    flags |= (long)g_sphere_quad_flag_field_b << 4;
+    flags |= (long)g_sphere_quad_flag_field_c << 6;
+    flags |= (long)g_sphere_quad_flag_field_high << 32;
     packet.f80 = 0xFF9000000260L;
     packet.flags = flags;
     packet.f70 = 0;
@@ -142,7 +142,7 @@ void gfx_draw_quad_sphere_large(char *object)
     matrix[0].v[0] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * quarter;
-    color = D_L00_001B0888 + (*(unsigned int *)(state + 0x24) << 24);
+    color = g_sphere_quad_base_color + (*(unsigned int *)(state + 0x24) << 24);
     packet.color[3] = color;
     packet.color[2] = color;
     packet.color[1] = color;
@@ -154,12 +154,12 @@ void gfx_draw_quad_sphere_large(char *object)
     for (face = 0; face < 64; face++) {
         origin = (Vector *)(object + 0x10);
         for (corner = 0; corner < 4; corner++) {
-            Vector *position = &D_L00_0029AF40[D_L00_0029B440[face][corner][0]];
-            int uv = D_L00_0029B440[face][corner][1];
+            Vector *position = &g_quad_sphere_vertices[g_quad_sphere_quad_indices[face][corner][0]];
+            int uv = g_quad_sphere_quad_indices[face][corner][1];
 
-            FastVecScale(&packet.vertex[corner], position, D_L00_001B088C);
-            u_base[corner * 2] = D_L00_0029B840[uv][0];
-            v_base[corner * 2] = D_L00_0029B840[uv][1];
+            FastVecScale(&packet.vertex[corner], position, g_sphere_quad_corner_scale);
+            u_base[corner * 2] = g_quad_sphere_uvs[uv][0];
+            v_base[corner * 2] = g_quad_sphere_uvs[uv][1];
             matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], matrix);
             matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
             FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], origin);
@@ -182,12 +182,12 @@ void gfx_draw_quad_sphere_small(char *object)
     unsigned int color;
     long flags;
 
-    packet.f78 = GetEffectTextureDescriptor(D_L00_001B0884);
-    flags = (long)D_L00_001B0870;
-    flags |= (long)D_L00_001B0874 << 2;
-    flags |= (long)D_L00_001B0878 << 4;
-    flags |= (long)D_L00_001B087C << 6;
-    flags |= (long)D_L00_001B0880 << 32;
+    packet.f78 = GetEffectTextureDescriptor(g_sphere_quad_texture_id);
+    flags = (long)g_sphere_quad_flag_base;
+    flags |= (long)g_sphere_quad_flag_field_a << 2;
+    flags |= (long)g_sphere_quad_flag_field_b << 4;
+    flags |= (long)g_sphere_quad_flag_field_c << 6;
+    flags |= (long)g_sphere_quad_flag_field_high << 32;
     packet.f80 = 0xFF9000000260L;
     packet.flags = flags;
     packet.f70 = 0;
@@ -197,7 +197,7 @@ void gfx_draw_quad_sphere_small(char *object)
     matrix[0].v[0] = *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * 0.125f;
-    color = D_L00_001B0888 + (*(unsigned int *)(state + 0x24) << 24);
+    color = g_sphere_quad_base_color + (*(unsigned int *)(state + 0x24) << 24);
     packet.color[3] = color;
     packet.color[2] = color;
     packet.color[1] = color;
@@ -209,12 +209,12 @@ void gfx_draw_quad_sphere_small(char *object)
     for (face = 0; face < 64; face++) {
         origin = (Vector *)(object + 0x10);
         for (corner = 0; corner < 4; corner++) {
-            Vector *position = &D_L00_0029AF40[D_L00_0029B440[face][corner][0]];
-            int uv = D_L00_0029B440[face][corner][1];
+            Vector *position = &g_quad_sphere_vertices[g_quad_sphere_quad_indices[face][corner][0]];
+            int uv = g_quad_sphere_quad_indices[face][corner][1];
 
-            FastVecScale(&packet.vertex[corner], position, D_L00_001B088C);
-            u_base[corner * 2] = D_L00_0029B840[uv][0];
-            v_base[corner * 2] = D_L00_0029B840[uv][1];
+            FastVecScale(&packet.vertex[corner], position, g_sphere_quad_corner_scale);
+            u_base[corner * 2] = g_quad_sphere_uvs[uv][0];
+            v_base[corner * 2] = g_quad_sphere_uvs[uv][1];
             matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], matrix);
             matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
             FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], origin);
@@ -228,12 +228,12 @@ extern float IntToFloat(int);
 extern float math_wrap_angle_to_pi(float);
 extern float math_random_float_range(float,float);
 extern float math_random_signed_float_range(float,float);
-extern float D_L00_001B0940 __attribute__((sda));
-extern float D_L00_001B0944 __attribute__((sda));
-extern float D_L00_001B0948 __attribute__((sda));
-extern float D_L00_001B094C __attribute__((sda));
-extern float D_L00_001B0950 __attribute__((sda));
-extern float D_L00_001B0954 __attribute__((sda));
+extern float g_vaporizer_joint_angle_min __attribute__((sda));
+extern float g_vaporizer_joint_angle_max __attribute__((sda));
+extern float g_vaporizer_joint_angle_step __attribute__((sda));
+extern float g_vaporizer_joint_length __attribute__((sda));
+extern float g_vaporizer_joint_spin_min __attribute__((sda));
+extern float g_vaporizer_joint_spin_max __attribute__((sda));
 
 /* One 0x30-byte joint of the chain func_L00_003F5870 lays out. */
 typedef struct {
@@ -259,10 +259,10 @@ void vaporizer_add_chain_joint(char *object, char *position)
     int offset = index * 0x30;
     entry = (char **)((*(short *)(state + 0x18) << 2) + (int)table);
     qcopy(((L00Joint *)(offset + (int)*entry))->position, position);
-    ((L00Joint *)(offset + (int)*entry))->angle = math_wrap_angle_to_pi(IntToFloat(index) * 0.017453294f * D_L00_001B0948);
-    ((L00Joint *)(offset + (int)*entry))->f28 = math_random_float_range(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
-    ((L00Joint *)(offset + (int)*entry))->length = D_L00_001B094C;
-    ((L00Joint *)(offset + (int)*entry))->f2c = math_random_signed_float_range(D_L00_001B0950, D_L00_001B0954) * 0.016666668f;
+    ((L00Joint *)(offset + (int)*entry))->angle = math_wrap_angle_to_pi(IntToFloat(index) * 0.017453294f * g_vaporizer_joint_angle_step);
+    ((L00Joint *)(offset + (int)*entry))->f28 = math_random_float_range(g_vaporizer_joint_angle_min, g_vaporizer_joint_angle_max) * 0.017453294f;
+    ((L00Joint *)(offset + (int)*entry))->length = g_vaporizer_joint_length;
+    ((L00Joint *)(offset + (int)*entry))->f2c = math_random_signed_float_range(g_vaporizer_joint_spin_min, g_vaporizer_joint_spin_max) * 0.016666668f;
     vaporizer_set_chain_joint_offset(*entry, index);
     (*(unsigned short *)(state + 0x20))++;
 }
@@ -293,11 +293,11 @@ typedef struct {
 } Light;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; QuadWord q[0x260]; } Hero;
 extern u8 g_hero_state[];
-extern Vector g_camera_l00_position, D_L00_001BF220;
-extern float D_L00_00252F60[137][2];
+extern Vector g_camera_l00_position, g_hero_l00_position;
+extern float g_lightning_burst_angles[137][2];
 extern char *g_area_hit_targets[];
-extern Light D_L00_001C6F40[];
-extern int D_L00_001B08D0 __attribute__((sda));
+extern Light g_light_table[];
+extern int g_lightning_burst_object __attribute__((sda));
 extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern float math_square(float);
@@ -349,8 +349,8 @@ void hero_lightning_burst_update(char *object)
         state->timer = 60;
         state->radius = 0.0f;
         for (i = 0; i < 137; i++) {
-            D_L00_00252F60[i][0] = math_random_angle();
-            D_L00_00252F60[i][1] = math_random_angle();
+            g_lightning_burst_angles[i][0] = math_random_angle();
+            g_lightning_burst_angles[i][1] = math_random_angle();
         }
     case 1:
         *(unsigned char *)(object + 0x20) = 2;
@@ -364,7 +364,7 @@ void hero_lightning_burst_update(char *object)
             vec_build_spherical_offset(point.v, state->radius, first_angle, second_angle);
             FastVecAdd(&point, &point, (Vector *)&((Hero *)g_hero_state)->b[0xE0]);
             if (CollLine((Vector *)&((Hero *)g_hero_state)->b[0xE0], &point, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0) != 0)
-                qcopy(&point, &D_L00_001BF220);
+                qcopy(&point, &g_hero_l00_position);
             part_claim_ring_piece(object, &point, 10);
         }
         if (state->timer < 10 && (state->timer & 7) == 0)
@@ -411,7 +411,7 @@ void hero_lightning_burst_update(char *object)
             if (state->first != 0) moby_mark_spawned(state->first);
             if (state->second != 0) moby_mark_spawned(state->second);
             if (state->light != -1) gfx_free_point_light(state->light);
-            D_L00_001B08D0 = 0;
+            g_lightning_burst_object = 0;
             moby_mark_spawned(object);
             return;
         }
@@ -442,7 +442,7 @@ void hero_lightning_burst_update(char *object)
         qcopy(state->second + 0x10, ((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->light != -1) {
-        light = &D_L00_001C6F40[state->light];
+        light = &g_light_table[state->light];
         vec_scale_to_length(&point, (Vector *)&((Hero *)g_hero_state)->b[0x2A0], 0.5f);
         FastVecAdd(&light->position, (Vector *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x10), &point);
         FastVecSub(&point, &g_camera_l00_position, &light->position);

@@ -6,7 +6,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
 extern char g_hero_position[];
-extern char D_L14_001A8F20[] __attribute__((sda));
+extern char g_identity_l14_matrix[] __attribute__((sda));
 extern char *D_L14_001B259C_gp SDATA(D_L14_001B259C);
 extern char *D_L14_001B259C_direct __asm__("D_L14_001B259C") __attribute__((sda));
 extern int moby_count_group_not_in_state(int, int);
@@ -15,16 +15,16 @@ extern int flag_is_third_pending_set(void *);
 extern int IsPointInCuboid(void *, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int coll_test_point(void *, float, int, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void moby_mark_spawned(void *);
 extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern char g_hero_position[];
 extern u8 g_hero_state[];
-extern u8 D_001395E1;
+extern u8 g_lift_scene_flag;
 extern int IsPointInCuboid(void *, int);
 extern void moby_mark_spawned(void *);
 extern float math_fast_sin_or_cos_b(float);
@@ -129,7 +129,7 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
                         qcopy(temp, self->pos);
                         temp[2] += 1.0f;
                         prisonStartSound(2, 0, self);
-                        func_PAL_002AC718(self, D_L14_001A8F20, temp, 0.0f, 0.0f, 10, 3, 16,
+                        SpawnExplosionEffects_pal(self, g_identity_l14_matrix, temp, 0.0f, 0.0f, 10, 3, 16,
                             4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
                         return;
                     }
@@ -170,7 +170,7 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
         FastVecAdd(right, right, offset2);
         if (coll_test_point(front, 0.6f, 0, self) || coll_test_point(left, 0.68f, 0, self) || coll_test_point(right, 0.68f, 0, self)) {
             prisonStartSound(2, 0, self);
-            func_PAL_002AC718(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
+            SpawnExplosionEffects_pal(self, g_identity_l14_matrix, front, 0.0f, 0.0f, 10, 3, 16,
                 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
             moby_mark_spawned(self);
             return;

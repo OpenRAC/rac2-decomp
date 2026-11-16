@@ -12,12 +12,12 @@ extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void vec_random_direction(void *, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern int func_PAL_002B5E30(void *, float);
+extern int moby_step_at_own_position_factor_pal(void *, float);
 extern char *func_PAL_002BE9A8(void *, int, float, float, void *, float, int, int, float);
-extern int func_PAL_L01_00323068(void *, void *);
-extern float D_L04_002AF630[];
+extern int moby_l01_turn_toward_target_pal(void *, void *);
+extern float g_object_anim_sparks_table[];
 
-void func_PAL_L04_003E99C0(char *o, float *dest)
+void object_move_along_anim_sparks_pal(char *o, float *dest)
 {
     float v[4], pos[4], vel[4], random[4], spawn[4];
     float frame, t, color;
@@ -26,7 +26,7 @@ void func_PAL_L04_003E99C0(char *o, float *dest)
     char *particle, *data;
 
     if ((unsigned char)o[0x42] != (unsigned char)o[0x43]) {
-        func_PAL_L01_00323068(o, dest);
+        moby_l01_turn_toward_target_pal(o, dest);
         return;
     }
     frame = moby_get_anim_value(o);
@@ -36,10 +36,10 @@ void func_PAL_L04_003E99C0(char *o, float *dest)
         t = IntToFloat(index);
         frame -= t;
         FastVecScale(v, o + 0xc0,
-                      D_L04_002AF630[index] + (D_L04_002AF630[nextIndex] - D_L04_002AF630[index]) * frame);
+                      g_object_anim_sparks_table[index] + (g_object_anim_sparks_table[nextIndex] - g_object_anim_sparks_table[index]) * frame);
     }
     FastVecAdd(o + 0x10, v, o + 0x10);
-    func_PAL_002B5E30(o, mat_fast_helper_a(dest[0] - *(float *)(o + 0x10), dest[1] - *(float *)(o + 0x14)));
+    moby_step_at_own_position_factor_pal(o, mat_fast_helper_a(dest[0] - *(float *)(o + 0x10), dest[1] - *(float *)(o + 0x14)));
     *(float *)(o + 0x18) = coll_probe_ground_height_below(o + 0x10, 0, 0.5f);
     if (index != 5 && index != 15) {
         return;

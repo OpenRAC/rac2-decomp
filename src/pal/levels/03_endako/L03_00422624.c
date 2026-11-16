@@ -16,24 +16,24 @@ extern float fast_vec_dist(void *, void *);
 extern float ApproachValue(void *, float, float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
-extern int func_PAL_L01_00323068(void *, void *);
-extern u8 D_L03_00188660[];
+extern int moby_l01_turn_toward_target_pal(void *, void *);
+extern u8 g_sound_l03_slot_table[];
 extern u32 func_31CFF8(void *a, void *b, u32 c);
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_moby_record_base __attribute__((sda));
+extern u8 *g_entity_id_lists[];
 typedef struct {
     u32 field00;
     u8 pad04[0x0C];
     u8 field10[1];
 } Entry41D1D8;
-extern Entry41D1D8 *D_L03_001FE700[];
-extern u8 D_001A7B08[0x40] __attribute__((sda));
+extern Entry41D1D8 *g_path_l03_entry_table[];
+extern u8 g_status_flag_b[0x40] __attribute__((sda));
 
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */
 void func_PAL_L03_00423128(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
-    u8 *entry = (u8 *)D_L03_001FE700[*(int *)(state + 0x210)];
+    u8 *entry = (u8 *)g_path_l03_entry_table[*(int *)(state + 0x210)];
     float delta[4], along[4], across[4], axis[4], point[4], scaled[4];
     float distance;
     float side;
@@ -59,18 +59,18 @@ void func_PAL_L03_00423128(u8 *entity) {
         ApproachValue(state + 0x340, target, 0.020000001f);
     }
     if (fast_vec_dist(entity + 0x10, point) >= 0.5f) {
-        u8 *sound = D_L03_00188660 + *(int *)(state + 0x350) * 0x70;
+        u8 *sound = g_sound_l03_slot_table + *(int *)(state + 0x350) * 0x70;
         if (*(u8 **)(sound + 0x88) != entity || !sound[0x74])
             *(int *)(state + 0x350) = PlayMobySound(0, 4, entity);
     } else {
         int slot = *(int *)(state + 0x350);
         if (slot != -1) {
-            u8 *sound = D_L03_00188660 + slot * 0x70;
+            u8 *sound = g_sound_l03_slot_table + slot * 0x70;
             if (*(u8 **)(sound + 0x88) == entity && sound[0x74]) snd_stop_voice(slot);
         }
         *(int *)(state + 0x350) = -1;
     }
-    func_PAL_L01_00323068(entity, point);
+    moby_l01_turn_toward_target_pal(entity, point);
     *(int *)(state + 0x1A8) = 0;
 }
 

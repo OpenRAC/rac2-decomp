@@ -12,7 +12,7 @@ extern void ref_L02_004012A0_05(void *, void *, void *, float);
 
 /* The kind at +0xAA decides the work: the second kind reports itself and leaves, every
    other kind turns the object's own basis, scales it and hands it on. */
-void func_PAL_L02_00405BE0(char *a0) {
+void moby_update_effect_by_class_pal(char *a0) {
     char *s1 = a0;
     char *s2 = *(char **)(a0 + 0x68);
     float v[4];

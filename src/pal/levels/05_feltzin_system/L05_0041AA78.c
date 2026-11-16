@@ -8,10 +8,10 @@ extern float func_332C18(void);
 extern void func_33B330(char *dst, float a, float b, float c);
 extern char *func_379CA0(char *object);
 extern void func_37AEC0(char *object, int flag);
-extern int D_L05_00221D10[];
-extern char *D_L05_001B2614 __attribute__((sda));
+extern int g_feltzin_challenge_state[];
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
-void func_PAL_L05_0041AA78(char *obj)
+void feltzin_enemy_init_with_helpers_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *r;
@@ -23,7 +23,7 @@ void func_PAL_L05_0041AA78(char *obj)
     r = func_379CA0(obj);
     *(int *)(r + 0x148) = 5;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x274) = -1;
     *(float *)(sub + 0x180) = 5.0f;
     *(int *)(sub + 0x268) = 0;

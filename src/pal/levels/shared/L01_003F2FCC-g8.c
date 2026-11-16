@@ -5,8 +5,8 @@ extern void moby_release_and_reset_impact_slot(char *);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void anim_start_immediate(char *, int, int);
 extern int math_fast_float_d(char *);
-extern const int D_L01_001B0D10 __attribute__((sda));
-extern const int D_L01_001B0D14 __attribute__((sda));
+extern const int g_flashing_ring_color_a __attribute__((sda));
+extern const int g_flashing_ring_color_b __attribute__((sda));
 extern int math_fast_float_d(char *);
 
 /* brings the ring out of the ground, then lets it spin and hand itself over */
@@ -42,17 +42,17 @@ void func_PAL_L01_003F2FCC(char *a0)
             *(int *)(s1 + 0xC) = ((s32)(*(int *)(s1 + 0x4)) * 5 + 2) / 6;
         } else {
             *(unsigned char *)(a0 + 0x20) = 2;
-            *(int *)(a0 + 0x78) = D_L01_001B0D14;
+            *(int *)(a0 + 0x78) = g_flashing_ring_color_b;
             *(int *)(s1 + 0xC) = 0;
         }
         break;
     case 2:
         if (*(int *)(s1 + 0x0) != 0) {
             if (math_fast_float_d(s1 + 0x10) != 0) {
-                if (*(int *)(a0 + 0x78) == D_L01_001B0D10)
-                    *(int *)(a0 + 0x78) = D_L01_001B0D14;
+                if (*(int *)(a0 + 0x78) == g_flashing_ring_color_a)
+                    *(int *)(a0 + 0x78) = g_flashing_ring_color_b;
                 else
-                    *(int *)(a0 + 0x78) = D_L01_001B0D10;
+                    *(int *)(a0 + 0x78) = g_flashing_ring_color_a;
                 *(int *)(s1 + 0x10) = 8;
             }
             if (math_fast_float_d(s1 + 0xC) != 0)
@@ -68,7 +68,7 @@ void func_PAL_L01_003F2FCC(char *a0)
             *(unsigned short *)(a0 + 0x34) |= 0x1000;
             anim_start_immediate(a0, 3, 0);
             *(unsigned char *)(a0 + 0x20) = 1;
-            *(int *)(a0 + 0x78) = D_L01_001B0D10;
+            *(int *)(a0 + 0x78) = g_flashing_ring_color_a;
         }
         break;
     }

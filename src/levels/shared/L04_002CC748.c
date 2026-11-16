@@ -8,16 +8,16 @@ extern void draw_world_quad(void *, int, int);
 extern void FastVecCross(void *, void *, void *);
 
 extern void FastVecScale(void *, void *, float);
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern char D_L04_001B9680[];
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern char g_tether_zero_vec[];
 extern void transform_vector(void *, void *, void *);
 extern int is_vector_outside_clip(void *);
 extern void ripple_emit_sub_block(int, int);
 
-extern int D_001A8F00[] __attribute__((sda));
-extern unsigned char D_001A7A33 MACRO_ADDR;
+extern int g_hero_mode_state[] __attribute__((sda));
+extern unsigned char g_contact_hit_flag MACRO_ADDR;
 extern unsigned char g_bolt_multiplier MACRO_ADDR;
-extern char D_L04_001C3D40[];
+extern char g_surface_table[];
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
@@ -57,7 +57,7 @@ extern void func_002FD1B8_ripple(void *, int, int, float, float, float, float) _
 extern int point_in_path_xy(void *, void *, int);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
-extern char D_L04_001ADA00[];
+extern char g_str_water_controller_fmt[];
 extern char *g_route_path_table[];
 #define WBYTE(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define WSHORT(p,o) (*(short *)((char *)(p)+(o)))
@@ -93,9 +93,9 @@ extern void hero_start_pose_offset(float, float, float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int GetCollHitMaterial(void);
 extern void hero_resolve_stick_direction(int, float);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
-extern unsigned char D_L04_001B9540[];
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
+extern unsigned char g_hero_l04_state[];
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -236,15 +236,15 @@ int hero_check_surface_contact(int update) {
     if (GROUND_HERO.i[0x229C / 4] == 7) return 0;
     if (GROUND_HERO.i[0x2294 / 4] == 0x31) return 0;
     if (GROUND_HERO.h[0x1DC / 2]) return 0;
-    if (D_001A8F00[0]) return 0;
+    if (g_hero_mode_state[0]) return 0;
     GROUND_HERO.i[0x249C / 4] = 0;
     surface_moby = GROUND_HERO.p[0x2290 / 4];
     if (AB(surface_moby, 0xA8) == 255) return 0;
-    surface_entry = D_L04_001C3D40 + AB(surface_moby, 0xA8) * 64;
+    surface_entry = g_surface_table + AB(surface_moby, 0xA8) * 64;
     if (AP(surface_entry, 0x38) != surface_moby) return 0;
     if (!(AI(surface_entry, 0x24) & 9)) return 0;
     if (AF(surface_entry, 0x2C) != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !GROUND_HERO.b[0x22B4]) {
@@ -396,7 +396,7 @@ void hero_steer_airborne_by_state(void) {
             }
         }
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
-    } else if (HOP_PLAYER.state == 0x81 && !D_001A8FF0) {
+    } else if (HOP_PLAYER.state == 0x81 && !g_hero_height_zone_active) {
         hero_steer_heading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
         HOP_PLAYER.ground_speed = 0.0f;
     } else {
@@ -428,7 +428,7 @@ void hero_steer_airborne_by_state(void) {
         hero_build_move_impulse(0.7f, 0.0f);
         qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
         rate = 0.0055555556900799274f;
-        if (HOP_PLAYER.target_speed < D_001A7DC0 * 0.0033333336468786f) {
+        if (HOP_PLAYER.target_speed < g_hero_airborne_speed_limit * 0.0033333336468786f) {
             if (HOP_PLAYER.control_mode == 2) {
                 float decel = HOP_PLAYER.fieldA84;
 
@@ -567,7 +567,7 @@ void DrawCameraFacingRibbon(RibbonPoint *line, int first_texture, int middle_tex
     int changed;
 
     changed = 0;
-    qcopy(camera, D_L04_001B9680);
+    qcopy(camera, g_tether_zero_vec);
     points = line;
     line = 0;
     gfx_init_quad_packet_state(&q, first_texture, 0, 0x80);
@@ -859,7 +859,7 @@ L04Effect1A *SpawnJointFollowParticle(void *target, s32 color, u32 duration, u32
             f32 pos[4], dir[4];
 
             moby_transform_joint_to_world(f->target, (s16)joint, pos);
-            FastVecSub(dir, (f32 *)D_L04_001B9680, pos);
+            FastVecSub(dir, (f32 *)g_tether_zero_vec, pos);
             vec_scale_to_length(dir, dir, 0.4f);
             FastVecAdd(p->position, pos, dir);
         }
@@ -1078,9 +1078,9 @@ typedef struct {
     f32 field3C;
     f32 field40;
 } D002A00E8Self;
-extern f32 D_002A7A40[];
-extern f32 D_002A7BC0[];
-extern s32 D_002A7D90[];
+extern f32 g_water_texture_coords[];
+extern f32 g_water_base_texture_coords[];
+extern s32 g_water_scroll_flags[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
@@ -1106,12 +1106,12 @@ void water_scroll_texture_coords(D002A00E8Self *water_patch) {
     scroll_xb = water_patch->field20 + func_30F3A0(water_patch->field34) * water_patch->field40;
     scroll_yb = water_patch->field24 + func_30F3B8(water_patch->field34) * water_patch->field40;
     for (i = 0; i < 0x5C; i += 2) {
-        if (D_002A7D90[i >> 1] == 0) {
-            D_002A7A40[i] = D_002A7BC0[i] + scroll_xa;
-            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scroll_ya;
+        if (g_water_scroll_flags[i >> 1] == 0) {
+            g_water_texture_coords[i] = g_water_base_texture_coords[i] + scroll_xa;
+            g_water_texture_coords[i + 1] = g_water_base_texture_coords[i + 1] + scroll_ya;
         } else {
-            D_002A7A40[i] = D_002A7BC0[i] + scroll_xb;
-            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scroll_yb;
+            g_water_texture_coords[i] = g_water_base_texture_coords[i] + scroll_xb;
+            g_water_texture_coords[i + 1] = g_water_base_texture_coords[i + 1] + scroll_yb;
         }
     }
 }
@@ -1140,8 +1140,8 @@ void water_cull_and_submit_tile(f32 *pos, s32 index, s32 mode) {
     if (mode != 0) {
         row = index >> 2;
         column = index & 3;
-        half_x = 0.5f * -D_L04_001AD848;
-        half_y = 0.5f * -D_L04_001AD84C;
+        half_x = 0.5f * -g_water_tile_half_x;
+        half_y = 0.5f * -g_water_tile_half_y;
         x_offset = half_x * (f32)column;
         y_offset = half_y * (f32)row;
         y_end = y_offset + half_y;
@@ -1154,8 +1154,8 @@ void water_cull_and_submit_tile(f32 *pos, s32 index, s32 mode) {
         offsets[2][1] = y_end;
         offsets[3][0] = x_end;
         offsets[3][1] = y_end;
-        x = pos[0] + D_L04_001AD848;
-        y = pos[1] + D_L04_001AD84C;
+        x = pos[0] + g_water_tile_half_x;
+        y = pos[1] + g_water_tile_half_y;
         corners[0][0] = x + offsets[2][0];
         corners[0][1] = y + offsets[0][1];
         corners[0][2] = pos[2];
@@ -1175,11 +1175,11 @@ void water_cull_and_submit_tile(f32 *pos, s32 index, s32 mode) {
         near_bits = 0;
         far_bits = 0;
         for (i = 0; i < 4; i++) {
-            FastVecSub(near_clip, corners[i], (float *)D_L04_001B9680);
+            FastVecSub(near_clip, corners[i], (float *)g_tether_zero_vec);
             FastVecScale(far_clip, near_clip, 1024.0f);
             FastVecScale(near_clip, near_clip, 1024.0f);
-            transform_vector(far_clip, far_clip, D_L04_001B9680 - 0x80);
-            transform_vector(near_clip, near_clip, D_L04_001B9680 - 0x40);
+            transform_vector(far_clip, far_clip, g_tether_zero_vec - 0x80);
+            transform_vector(near_clip, near_clip, g_tether_zero_vec - 0x40);
             far_bits = (far_bits << 8) | is_vector_outside_clip(far_clip);
             near_bits = (near_bits << 8) | is_vector_outside_clip(near_clip);
         }
@@ -1302,7 +1302,7 @@ void water_update_controller(char *self) {
     float x, y, half, r;
 
     if (WBYTE(WPTR(self, 0x28), 0xBC) >= WBYTE(state, 0x15)) {
-        STUB_printf(D_L04_001ADA00, WSHORT(WPTR(self, 0x28), 0xB2),
+        STUB_printf(g_str_water_controller_fmt, WSHORT(WPTR(self, 0x28), 0xB2),
                       WSHORT(WPTR(self, 0x28), 0xAA), WBYTE(WPTR(self, 0x28), 0xBC),
                       WBYTE(state, 0x15));
         WBYTE(WPTR(self, 0x28), 0x20) = 2;
@@ -1369,15 +1369,15 @@ typedef struct {
     TblEntry entries[64];
     u32 count;
 } Tbl;
-extern Tbl D_L04_00231E00;
+extern Tbl g_water_splash_table;
 /* Adds one entry to the water splash table. */
 void water_add_splash_entry(u32 value, float factor) {
-    D_L04_00231E00.entries[D_L04_00231E00.count].value = value;
-    D_L04_00231E00.entries[D_L04_00231E00.count].factor = factor;
-    D_L04_00231E00.count++;
+    g_water_splash_table.entries[g_water_splash_table.count].value = value;
+    g_water_splash_table.entries[g_water_splash_table.count].factor = factor;
+    g_water_splash_table.count++;
 }
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -1387,9 +1387,9 @@ typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern char *g_hero_moby NOT_SDA;
-extern int D_L04_001AC790 __attribute__((sda));
-extern Collision D_L04_001BFAC0;
-extern Material D_L04_0027B470[];
+extern int g_debris_l04_model_id __attribute__((sda));
+extern Collision g_probe_hit;
+extern Material g_item_l04_record_table[];
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
@@ -1430,7 +1430,7 @@ void falling_l04_debris_update(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L04_0027B470)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l04_record_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -1440,16 +1440,16 @@ void falling_l04_debris_update(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L04_001BFAC0;
+        collision = &g_probe_hit;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L04_001BFAC0;
+            reread = &g_probe_hit;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L04_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_debris_l04_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -1461,7 +1461,7 @@ void falling_l04_debris_update(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L04_001BFAC0;
+            collision = &g_probe_hit;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
@@ -1510,20 +1510,20 @@ typedef struct {
     f32 w;
 } L04SpawnRecord;
 
-extern L04SpawnRecord D_L04_0023BDD0[];
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern L04SpawnRecord g_particle_positions[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #ifndef MACRO_ADDR
 #define MACRO_ADDR __attribute__((section(".sdata")))
 #endif
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 
@@ -1534,33 +1534,33 @@ void part_init_from_ranges(void *emitter, s32 i)
     f32 v;
 
     v = math_random_signed_float_range(0.0f, 1.0f);
-    rec = &D_L04_0023BDD0[i];
+    rec = &g_particle_positions[i];
     rec->x = v;
     rec->y = math_random_signed_float_range(0.0f, 1.0f);
     rec->z = math_random_signed_float_range(0.0f, 1.0f);
-    D_L04_0023CA50[i] = math_random_float_range(ranges->speed_min, ranges->speed_max);
-    D_L04_0023CD70[i] = math_random_float_range(ranges->size_min, ranges->size_max);
-    D_L04_0023D220[i] = 0.0f;
-    D_L04_0023D540[i] = math_random_float_range(ranges->life_min, ranges->life_max);
-    D_L04_0023D860[i] = D_L04_001B2E74;
-    D_L04_0023D9F0[i] = 0;
-    D_L04_0023DB80[i] = (i - ranges->first + 1) * D_L04_001B2E70;
-    D_L04_0023D158[i] = 0;
+    g_particle_speeds[i] = math_random_float_range(ranges->speed_min, ranges->speed_max);
+    g_particle_sizes[i] = math_random_float_range(ranges->size_min, ranges->size_max);
+    g_particle_uv_offsets[i] = 0.0f;
+    g_particle_life_rates[i] = math_random_float_range(ranges->life_min, ranges->life_max);
+    g_particle_fade_in_timers[i] = g_particle_life_reload;
+    g_particle_fade_out_timers[i] = 0;
+    g_particle_delay_timers[i] = (i - ranges->first + 1) * g_particle_life_step;
+    g_particle_sprite_flags[i] = 0;
 }
 
 /* A sixteen-byte record per spawn slot (L04SpawnRecord, above). */
 
-extern L04SpawnRecord D_L04_0023BDD0[];
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern L04SpawnRecord g_particle_positions[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
@@ -1573,7 +1573,7 @@ void part_init_simple(void *particle_emitter, u32 a1) {
     f32 rand_x;
 
     rand_x = math_random_signed_float_range(0.0f, 1.0f);
-    rec = &D_L04_0023BDD0[a1];
+    rec = &g_particle_positions[a1];
     rec->x = rand_x;
     rec->y = math_random_signed_float_range(0.0f, 1.0f);
     rec->z = math_random_signed_float_range(0.0f, 1.0f);
@@ -1581,20 +1581,20 @@ void part_init_simple(void *particle_emitter, u32 a1) {
         f32 speedMin = params[0x11];
         f32 sizeMin = params[0x13];
 
-        D_L04_0023CA50[a1] = math_random_float_range(speedMin, speedMin + 2.0f);
-        D_L04_0023CD70[a1] = math_random_float_range(sizeMin, sizeMin + 4.0f);
+        g_particle_speeds[a1] = math_random_float_range(speedMin, speedMin + 2.0f);
+        g_particle_sizes[a1] = math_random_float_range(sizeMin, sizeMin + 4.0f);
     }
-    D_L04_0023D220[a1] = 0.0f;
-    D_L04_0023D540[a1] = math_random_float_range(0.003f, 0.005f);
-    D_L04_0023D158[a1] = 1;
+    g_particle_uv_offsets[a1] = 0.0f;
+    g_particle_life_rates[a1] = math_random_float_range(0.003f, 0.005f);
+    g_particle_sprite_flags[a1] = 1;
 }
 
 
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
 /* adds VALUE to the running total and returns the total as it was before */
 u32 math_add_to_running_total(u32 value) {
-    u32 old = D_L04_001B2E84;
-    D_L04_001B2E84 = old + value;
+    u32 old = g_running_total;
+    g_running_total = old + value;
     return old;
 }

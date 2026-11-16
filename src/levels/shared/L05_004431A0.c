@@ -7,11 +7,11 @@ extern int g_current_map_index MACRO_ADDR;
 
 extern int D_001A79F0_alt MACRO_ADDR;
 
-extern TI128 D_L05_001B35D0 MACRO_ADDR;
+extern TI128 g_ship_saved_matrix_row0 MACRO_ADDR;
 
-extern TI128 D_L05_001B35E0 MACRO_ADDR;
+extern TI128 g_ship_saved_matrix_row1 MACRO_ADDR;
 
-extern TI128 D_L05_001B35F0 MACRO_ADDR;
+extern TI128 g_ship_saved_matrix_row2 MACRO_ADDR;
 
 extern float ref_L05_004431A0_00(float);
 
@@ -44,7 +44,7 @@ void ship_apply_steering_rotation(void *obj, float *yaw_rate, float *pitch_rate)
         ref_L05_004431A0_02((char *)ship + 0x20, (char *)ship + 0x20, &scratch);
     }
 done:
-    qcopy(&D_L05_001B35D0, obj);
-    qcopy(&D_L05_001B35E0, (char *)ship + 0x10);
-    qcopy(&D_L05_001B35F0, (char *)ship + 0x20);
+    qcopy(&g_ship_saved_matrix_row0, obj);
+    qcopy(&g_ship_saved_matrix_row1, (char *)ship + 0x10);
+    qcopy(&g_ship_saved_matrix_row2, (char *)ship + 0x20);
 }

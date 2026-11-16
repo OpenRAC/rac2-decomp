@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 extern void FastVecSub(void *, void *, void *);
 extern char *g_moby_l02_pool __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern unsigned char D_0019B2E8[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_moby_group_flags[];
+extern unsigned char g_game_flag_table[];
 struct PortalPlayer {
     char pad0[0x80];
     float pos[4];
@@ -20,16 +20,16 @@ struct PortalPlayer {
 };
 extern struct PortalPlayer g_hero_state;
 extern unsigned char g_hero_position[];
-extern unsigned char D_001A7BC8[] __attribute__((sda));
-extern unsigned int D_00138324 __attribute__((nosda));
-extern unsigned char D_L02_001C0700[];
+extern unsigned char g_map_visited_flags[] __attribute__((sda));
+extern unsigned int g_pad_held_flags __attribute__((nosda));
+extern unsigned char g_message_queue[];
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void moby_set_flag_bit(void *, int);
 extern void state_set_flag_one(void);
 extern void part_start_record_effect_by_index(int, int);
 extern void level_capture_checkpoint_state(void *, void *);
-extern void func_US2_002AFF10(int);
+extern void snd_play_indexed_us2(int);
 extern void vec_transform_by_object_or_given(void *, void *, void *, int);
 extern int TryClaimNotice(int, int, int);
 extern void data_set_small_value_and_refresh(int, int);
@@ -39,7 +39,7 @@ extern void moby_call_helper_two_one(void);
 extern void game_set_stored_value_pair(void (*)(void), void *);
 extern void moby_mark_flag_and_append_to_list(int);
 
-void func_US2_L02_00405B58(char *obj) {
+void portal_update_us2(char *obj) {
     char *d = *(char **)(obj + 0x68);
     float v[4];
     int dest;
@@ -54,18 +54,18 @@ void func_US2_L02_00405B58(char *obj) {
         qcopy(d + 0x20, obj + 0x10);
         qcopy(d + 0x30, obj + 0xf0);
         zone = g_current_map_index[0] << 4;
-        *(short *)(d + 0x1e) = D_0019B2E8[*(unsigned char *)(obj + 0xb0) + zone] >> 7;
-        if (D_0019B2E8[*(unsigned char *)(obj + 0xb0) + zone] & 0x80) {
+        *(short *)(d + 0x1e) = g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + zone] >> 7;
+        if (g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + zone] & 0x80) {
             if (*(int *)(d + 4)) moby_set_flag_bit(g_moby_l02_pool + (*(int *)(d + 4) << 8), 1);
         }
-        if (g_current_map_index[0] == 2 && D_001395B8[0x71] == 26) {
+        if (g_current_map_index[0] == 2 && g_game_flag_table[0x71] == 26) {
             state_set_flag_one();
-            D_001395B8[0x71] = 1;
+            g_game_flag_table[0x71] = 1;
             part_start_record_effect_by_index(*(int *)(d + 0x14), *(int *)(d + 0x10));
             level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
-            if (D_001A7BC8[4] && !D_001395B8[0xa5]) {
-                D_001395B8[0xa5] = 1;
-                func_US2_002AFF10(4);
+            if (g_map_visited_flags[4] && !g_game_flag_table[0xa5]) {
+                g_game_flag_table[0xa5] = 1;
+                snd_play_indexed_us2(4);
             }
         }
     }
@@ -81,22 +81,22 @@ void func_US2_L02_00405B58(char *obj) {
                 if (currentLevel == 26) {
                     TryClaimNotice(8, 0x1303, 1);
                 } else {
-                    TryClaimNotice(8, D_0019B2E8[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x131F : 0x1302, 1);
+                    TryClaimNotice(8, g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x131F : 0x1302, 1);
                     dest = 26;
                 }
-                if (D_00138324 & 0x10) {
+                if (g_pad_held_flags & 0x10) {
                     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
                     data_set_small_value_and_refresh(dest, 1);
-                    if (dest == 26) D_001395B8[1] = 1;
+                    if (dest == 26) g_game_flag_table[1] = 1;
                 }
             }
         }
-        if (g_current_map_index[0] == 26 && (D_0019B2E8[0x1a0 + *(unsigned char *)(obj + 0xb0)] & 0x80)) {
-            if (D_001A7BC8[4]) return;
-            if (req_push_queue(D_L02_001C0700, 0xa7)) {
-                req_push_queue(D_L02_001C0700, 4);
-                req_push_queue(D_L02_001C0700, 0xa8);
-                req_launch_queued(D_L02_001C0700);
+        if (g_current_map_index[0] == 26 && (g_moby_group_flags[0x1a0 + *(unsigned char *)(obj + 0xb0)] & 0x80)) {
+            if (g_map_visited_flags[4]) return;
+            if (req_push_queue(g_message_queue, 0xa7)) {
+                req_push_queue(g_message_queue, 4);
+                req_push_queue(g_message_queue, 0xa8);
+                req_launch_queued(g_message_queue);
                 game_set_stored_value_pair(moby_call_helper_two_one, obj);
                 g_hero_state.flag = 0;
                 moby_mark_flag_and_append_to_list(4);

@@ -39,10 +39,10 @@ u8 *menu_init_widgets(u8 *menu) {
 
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_hud_label_desc[], g_circle_menu_icon_data[], g_menu_small_icon_desc[];
 /* sda in this -G0 unit gives the one-instruction (macro) load of D_001A8CFC that retail has; a plain
    declaration splits it into lui/lw with two registers and shifts the register allocation */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern void object_init_derived_c(void *, void *, void *);
@@ -73,13 +73,13 @@ void item_menu_construct(char *self, void *argument)
     *(int *)(self + 0x290) = 1;
     **(float **)(self + 0x288) = 251.0f;
     (*(float **)(self + 0x288))[1] = 210.0f;
-    object_init_derived_arrays(self, D_001ADC10, argument);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, argument);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, argument);
-    hud_init_widget_defaults(self + 0x1B0, D_001ADC30, argument);
-    hud_init_widget_defaults(self + 0x1F8, D_001ADC88, argument);
-    hud_init_widget_defaults(self + 0x240, D_001ADC88, argument);
-    object_init_derived_c(self + 0xE4, D_001AE0C0, argument);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, argument);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, argument);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, argument);
+    hud_init_widget_defaults(self + 0x1B0, g_menu_hud_label_desc, argument);
+    hud_init_widget_defaults(self + 0x1F8, g_circle_menu_icon_data, argument);
+    hud_init_widget_defaults(self + 0x240, g_circle_menu_icon_data, argument);
+    object_init_derived_c(self + 0xE4, g_menu_small_icon_desc, argument);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -87,9 +87,9 @@ void item_menu_construct(char *self, void *argument)
     *object_get_fourth_field(self + 0x240) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x1F8) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0xE4) = 0x80F0F0F0;
-    object_set_helper_result(self, D_001A8CFC[0] + 0x8710, 0x99);
-    object_set_helper_result(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9A);
-    object_set_helper_result(self + 0x98, D_001A8CFC[0] + 0x8710, 0x9B);
+    object_set_helper_result(self, g_resident_data_base[0] + 0x8710, 0x99);
+    object_set_helper_result(self + 0x4C, g_resident_data_base[0] + 0x8710, 0x9A);
+    object_set_helper_result(self + 0x98, g_resident_data_base[0] + 0x8710, 0x9B);
     hud_set_widget_field_b(self + 0x1B0, self + 0x120);
     hud_set_widget_field_b(self + 0x1F8, self + 0x160);
     hud_set_widget_field_b(self + 0x240, (void *)GetLocalizedString(0x2D4F));

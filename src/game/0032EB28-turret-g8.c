@@ -7,13 +7,13 @@
    scheduler emits retail's store order. */
 typedef union { int q __attribute__((mode(TI))); float f[4]; } V598;
 typedef struct __attribute__((packed, aligned(4))) { u64 a; u32 b; } P598;
-extern P598 D_001B0988;
+extern P598 g_vehicle_gun_aim_params;
 typedef struct { char pad[0x1A0]; union { unsigned long long held; unsigned int flags[2]; } buttons; int pressed; } Input598;
 extern Input598 g_pad_state;
 extern char g_sound_state[];
-extern char D_001A8BD0[] MACRO_ADDR;
-extern int D_001B095C __attribute__((sda));
-extern float D_001B0994 __attribute__((sda)),D_001B0998 __attribute__((sda));
+extern char g_default_effect_vector[] MACRO_ADDR;
+extern int g_vehicle_gun_sound_voice __attribute__((sda));
+extern float g_vehicle_gun_aim_phase_a __attribute__((sda)),g_vehicle_gun_aim_phase_b __attribute__((sda));
 extern void moby_transform_joint_point(void *,int,void *);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern char *SelectBestTargetInCone(void *,void *,float,float,void *,int,int,int,float,float,float,int,void *);
@@ -38,7 +38,7 @@ void vehicle_update_gun_aiming(char *obj)
     char *target,*effect,*other;
     float a,b,old1,old2;
     moby_transform_joint_to_world(obj,0,&pts[3]);
-    params=D_001B0988;
+    params=g_vehicle_gun_aim_params;
     target=SelectBestTargetInCone(&pts[3],obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
     if (!(g_pad_state.buttons.flags[0]&0x40)) {
         if (target) {
@@ -86,15 +86,15 @@ void vehicle_update_gun_aiming(char *obj)
     F598(effect,0x20)=1.0f; F598(effect,0x24)=1.0f; F598(effect,0x28)=1.0f; I598(effect,0x2C)=0;
     F598(effect,0x3C)=1.0f;
     if (g_pad_state.buttons.flags[0]&0x80) {
-        a=1.0f-math_square((math_fast_sin_or_cos_a(D_001B0994)+1.0f)*0.5f)*0.5f;
-        b=1.0f-math_square((math_fast_sin_or_cos_a(D_001B0998)+1.0f)*0.5f)*0.5f;
+        a=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_a)+1.0f)*0.5f)*0.5f;
+        b=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_b)+1.0f)*0.5f)*0.5f;
         effect=slot_get_by_index(I598(rec,0x70));
         other=slot_get_by_index(I598(rec,0x74));
-        old1=D_001B0994; old2=D_001B0998;
+        old1=g_vehicle_gun_aim_phase_a; old2=g_vehicle_gun_aim_phase_b;
         F598(effect,0x20)=a; F598(other,0x20)=b;
-        D_001B0994=FastAddRotations(old1,0.36651918292045593f);
-        D_001B0998=FastAddRotations(D_001B0998,0.36651918292045593f);
-        if (old1<0.0f && D_001B0994>=0.0f) {
+        g_vehicle_gun_aim_phase_a=FastAddRotations(old1,0.36651918292045593f);
+        g_vehicle_gun_aim_phase_b=FastAddRotations(g_vehicle_gun_aim_phase_b,0.36651918292045593f);
+        if (old1<0.0f && g_vehicle_gun_aim_phase_a>=0.0f) {
             moby_transform_joint_to_world(obj,2,&work[0]);
             moby_transform_joint_point(obj,2,&work[4]);
             if (target) {
@@ -104,7 +104,7 @@ void vehicle_update_gun_aiming(char *obj)
             PlayMobySound(6,0,obj);
             SpawnRandomParticlePairs(&work[0],&work[1]);
             moby_spawn_directed(obj,&work[0],&work[1]);
-        } else if (old2<0.0f && D_001B0998>=0.0f) {
+        } else if (old2<0.0f && g_vehicle_gun_aim_phase_b>=0.0f) {
             moby_transform_joint_to_world(obj,1,&work[0]);
             moby_transform_joint_point(obj,1,&work[1]);
             if (target) {
@@ -127,20 +127,20 @@ void vehicle_update_gun_aiming(char *obj)
         charge=F598(rec,0x7C)+0.065f;
         charge = charge < 6.0f ? charge : 6.0f;
         F598(rec,0x7C)=charge;
-        part_spawn_flash_puffs(&work[2],D_001A8BD0,charge);
-        slot=g_sound_state+D_001B095C*0x70;
-        if (I598(slot,0x88)!=(int)obj || !B598(slot,0x74)) D_001B095C=PlayMobySound(4,4,obj);
+        part_spawn_flash_puffs(&work[2],g_default_effect_vector,charge);
+        slot=g_sound_state+g_vehicle_gun_sound_voice*0x70;
+        if (I598(slot,0x88)!=(int)obj || !B598(slot,0x74)) g_vehicle_gun_sound_voice=PlayMobySound(4,4,obj);
         vec_scale_to_length(rec+0x20,rec,1.0f);
         mat_fast_helper_c(&work[3],obj+0xC0);
         matrix_mul_vec3(rec+0x20,rec+0x20,&work[3]);
     }
 
     if (g_pad_state.pressed&0x40) {
-        if (D_001B095C!=-1) {
-            char *slot=g_sound_state+D_001B095C*0x70;
-            if (I598(slot,0x88)==(int)obj && B598(slot,0x74)) snd_stop_voice(D_001B095C);
+        if (g_vehicle_gun_sound_voice!=-1) {
+            char *slot=g_sound_state+g_vehicle_gun_sound_voice*0x70;
+            if (I598(slot,0x88)==(int)obj && B598(slot,0x74)) snd_stop_voice(g_vehicle_gun_sound_voice);
         }
-        D_001B095C=-1;
+        g_vehicle_gun_sound_voice=-1;
         PlayMobySound(8,0,obj);
         moby_transform_joint_to_world(obj,2,&work[0]);
         moby_transform_joint_to_world(obj,1,&work[1]);

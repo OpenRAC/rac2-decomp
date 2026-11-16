@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *D_L18_001FE480[];
+extern char *g_path_l18_table[];
 extern f32 fast_vec_dist(void *, void *);
 
 /* Path walker (the func_L14_00423CD0 body without the wrap): copies the current point, steps
    the index once the object is within the radius, and says whether the index is still on the
    path. */
 s32 path_step_along_point(char *self, char *point, s32 route, s16 *index, s32 reverse, f32 radius) {
-    char *path = D_L18_001FE480[route];
+    char *path = g_path_l18_table[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
         if (fast_vec_dist(self + 16, point) < radius) --*index;

@@ -35,7 +35,7 @@ extern void func_PAL_002BEF58(void *, void *, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
-extern int func_PAL_0032F0B8(void *, int, void *);
+extern int StartAttachedEffect_pal(void *, int, void *);
 extern int PlayMobySound(int, int, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
 extern void SpawnRandomTaperedQuadPair(void *, void *, void *, void *);
@@ -45,7 +45,7 @@ extern int coll_process_hit(void *, int, void *, int, float);
 extern int func_001163B0(void);
 extern float math_random_float_range(float, float);
 
-void func_PAL_L00_0041F868(char *object)
+void lava_gun_update_blobs_pal(char *object)
 {
     V next, temp, small, angles, rot[4], direction;
     struct {
@@ -110,7 +110,7 @@ void func_PAL_L00_0041F868(char *object)
                     hit.flag = 1;
                     hit.id = *(unsigned short *)(g_collision_result.target + 0xaa);
                     QueueMobyImpact(g_collision_result.target, &hit);
-                    func_PAL_0032F0B8(g_collision_result.target, 0x1d, object);
+                    StartAttachedEffect_pal(g_collision_result.target, 0x1d, object);
                     PlayMobySound(1, 0, object);
                     n = coll_process_hit(g_collision_result.target + 0x10, 0x10, object, 0, 1.5f);
                     for (j = 0; j < n; j++) {
@@ -129,7 +129,7 @@ void func_PAL_L00_0041F868(char *object)
                         hit.flag = 1;
                         hit.id = *(unsigned short *)(((char **)g_area_hit_targets)[j] + 0xaa);
                         QueueMobyImpact(((char **)g_area_hit_targets)[j], &hit);
-                        func_PAL_0032F0B8(((char **)g_area_hit_targets)[j], 0x1d, object);
+                        StartAttachedEffect_pal(((char **)g_area_hit_targets)[j], 0x1d, object);
                         PlayMobySound(1, 0, object);
                         /* The block must not end in the call: flow would pad it with a
                          * (use 0) insn, which lengthens the inner pointers' live ranges

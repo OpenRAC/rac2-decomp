@@ -72,7 +72,7 @@ static __inline__ float EffectTime(u8 *effect)
 }
 
 /* Assemble four animated strips in the object's coordinate frame. */
-void func_PAL_L02_00415BD0(u8 *object)
+void DrawAnimatedEffectQuads_pal(u8 *object)
 {
     EffectPacket packet[4];
     Vector frame[4];

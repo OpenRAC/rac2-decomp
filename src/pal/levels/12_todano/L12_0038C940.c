@@ -11,8 +11,8 @@ typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
+extern int g_projectile_model_ref __attribute__((sda));
+extern int g_ripple_object __attribute__((sda)), g_ripple_param __attribute__((sda));
 extern Collision g_collision_result;
 extern Material g_weapon_l00_table[];
 extern void part_steer_effect_direction(int, void *, int);
@@ -88,7 +88,7 @@ void func_PAL_L12_00396400(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(g_ripple_object, g_ripple_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -124,7 +124,7 @@ void func_PAL_L12_00396400(unsigned char *obj) {
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -153,7 +153,7 @@ finish:
 }
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void func_PAL_L00_00391958(void *, void *, void *);
@@ -191,7 +191,7 @@ void func_PAL_L12_00396818(char *obj) {
     if (*(int *)(ctx + 0x18) < 0xF2)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -210,7 +210,7 @@ void func_PAL_L12_00396818(char *obj) {
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -355,19 +355,19 @@ typedef struct {
 
 extern int g_game_time MACRO_ADDR;   /* the frame counter */
 extern char g_hero_state[];
-extern char D_001BF000[];
-extern int D_0018C0BC;
+extern char g_nearby_mobys[];
+extern int g_hero_mode;
 
 
-extern void func_PAL_00313A70(CrateMoby *);
+extern void UpdateCrateStackMotion_pal(CrateMoby *);
 extern CrateHit *part_find_owned_effect_slot(CrateMoby *, int, int);
 extern int moby_is_in_special_class_range(CrateMoby *);
 extern void vec_clear_128(void *);
 extern void GroundAttachedUpdate(CrateMoby *);
 extern void *moby_spawn_linked_child(CrateMoby *, int);
 extern int flag_set_first_pending(CrateMoby *);
-extern void func_PAL_00313538(CrateMoby *, int, CrateHit *);
-extern void func_PAL_003133E0(CrateMoby *);
+extern void DestroyCrate_pal(CrateMoby *, int, CrateHit *);
+extern void crate_drop_loot_pal(CrateMoby *);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
 extern void vec_scale_to_length(void *, void *, float);
@@ -399,7 +399,7 @@ void func_PAL_L12_003A44BC(CrateMoby *moby)
 
     if (vars->flags & 0xC) {
         if (vars->frame != g_game_time) {
-            func_PAL_00313A70(moby);
+            UpdateCrateStackMotion_pal(moby);
         }
     }
     if (vars->above == 0) {
@@ -449,8 +449,8 @@ void func_PAL_L12_003A44BC(CrateMoby *moby)
              (((CrateHero *)g_hero_state)->groundMoby == moby && ((CrateHero *)g_hero_state)->airFrames == 0) ||
              ((CrateHero *)g_hero_state)->ledgeMoby == moby || touched)) {
             if (((CrateHero *)g_hero_state)->f229C == 15) {
-                func_PAL_00313538(moby, 1, 0);
-                func_PAL_003133E0(moby);
+                DestroyCrate_pal(moby, 1, 0);
+                crate_drop_loot_pal(moby);
                 break;
             }
             moby->command = 0;
@@ -474,8 +474,8 @@ void func_PAL_L12_003A44BC(CrateMoby *moby)
                 doHit = 0;
             }
             if (doHit) {
-                func_PAL_00313538(moby, moby->oClass == 0x1F9, hit);
-                func_PAL_003133E0(moby);
+                DestroyCrate_pal(moby, moby->oClass == 0x1F9, hit);
+                crate_drop_loot_pal(moby);
             }
             moby->hitSlot = 255;
         }
@@ -503,7 +503,7 @@ void func_PAL_L12_003A44BC(CrateMoby *moby)
             burst.f14 = 0x30000;
             target = coll_process_hit(position, 16, ((CrateHero *)g_hero_state)->moby, 0, radius * 3.0f);
             if (target != 0) {
-                moby_queue_knockback_for_nodes(moby, position, D_001BF000, target, ((CrateHero *)g_hero_state)->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
+                moby_queue_knockback_for_nodes(moby, position, g_nearby_mobys, target, ((CrateHero *)g_hero_state)->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
             }
             vars->burstFrame++;
         } else if (vars->respawns != 0) {
@@ -585,10 +585,10 @@ void func_PAL_L12_003A44BC(CrateMoby *moby)
         } else {
             moby->color = vars->savedColor;
         }
-        if (moby->command == 1 || D_0018C0BC == 22) {
+        if (moby->command == 1 || g_hero_mode == 22) {
             moby->color = vars->savedColor;
-            func_PAL_00313538(moby, 1, 0);
-            func_PAL_003133E0(moby);
+            DestroyCrate_pal(moby, 1, 0);
+            crate_drop_loot_pal(moby);
         }
         moby->hitSlot = 255;
         moby->command--;

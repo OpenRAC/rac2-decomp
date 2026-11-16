@@ -2,7 +2,7 @@
 
 extern char *g_moby_l02_pool __attribute__((sda));
 extern u32 g_entity_group_lists[];
-extern u16 D_L02_001B1214 __attribute__((sda));
+extern u16 g_arena_tally_reload_time __attribute__((sda));
 extern char g_hero_state[];
 
 /* Accumulate the active group entries and reset their current report state. */
@@ -47,6 +47,6 @@ void arena_start_enemy_tally(char *object)
     *(float *)(state + 0x68) = (float)*(int *)(hero + 0x24CC);
     *(short *)(state + 0x11C) = 0;
     do {
-        *(u16 *)(state + 0x11E) = D_L02_001B1214;
+        *(u16 *)(state + 0x11E) = g_arena_tally_reload_time;
     } while (0);
 }

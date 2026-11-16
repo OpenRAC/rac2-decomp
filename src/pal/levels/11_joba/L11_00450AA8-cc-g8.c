@@ -1,11 +1,11 @@
 #include "names.h"
 /* func_PAL_L11_00450AA8, the PAL copy of func_L11_0044AFC8: the same C, where rename func_L11_0044BD68 becomes func_PAL_L11_00451848; rename func_002A7470 becomes func_PAL_002A7E68; rename func_L02_00333438 becomes func_PAL_L02_00335630; rename func_L01_00321178 becomes func_PAL_L01_00323068; rename func_002B5278 becomes func_PAL_002B5E30; rename func_L11_0044C850 becomes func_PAL_L11_00452330; rename func_002B4FF0 becomes func_PAL_002B5BA8; rename func_L02_00333480 becomes func_PAL_L02_00335678; rename func_002B50E0 becomes func_PAL_002B5C98; rename func_L11_00340500 becomes func_PAL_L11_00342578; rename func_L02_003FC248 becomes func_PAL_L02_004009A0; rename func_L11_0044C4F0 becomes func_PAL_L11_00451FD0. */
 #include "common.h"
-extern int D_001A8FF4;
+extern int g_enemy_ai_frozen;
 extern char g_hero_position[];
 extern char *g_active_attacker_robot __attribute__((section(".data")));
 typedef int TIAfc8 __attribute__((mode(TI)));
-extern void func_PAL_L11_00451848(char *);
+extern void smasher_robot_update_aim_and_init_pal(char *);
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern int math_random_int_below(int);
@@ -22,22 +22,22 @@ extern char *arena_get_center_point(int);
 extern int arena_is_point_in_polygon(int, void *);
 extern void smasher_robot_pick_wander_point(char *, void *);
 extern void smasher_robot_start_turn_around(char *);
-extern int func_PAL_L01_00323068(char *, void *);
-extern void func_PAL_L02_00335630(char *, void *);
-extern int func_PAL_002B5E30(char *, float);
-extern int func_PAL_002B5C98(char *, void *, float);
-extern int func_PAL_L11_00452330(char *);
-extern int func_PAL_002B5BA8(char *, void *, float);
-extern int func_PAL_L02_00335678(char *, void *, void *);
+extern int moby_l01_turn_toward_target_pal(char *, void *);
+extern void moby_aim_at_target_offset_pal(char *, void *);
+extern int moby_step_at_own_position_factor_pal(char *, float);
+extern int moby_step_controller_pal(char *, void *, float);
+extern int enemy_aim_at_group_entity_in_cone_b_pal(char *);
+extern int moby_turn_toward_target_and_step_pal(char *, void *, float);
+extern int coll_update_controller_pal(char *, void *, void *);
 extern float moby_get_anim_value(char *);
 extern int coll_test_hit_at_bone(char *, int, float, float, int, float, int, int, int);
 extern void gfx_add_draw_callback_first(void (*)(char *), char *);
 extern void joba_submit_scene_effect_params(char *);
 extern void smasher_robot_advance_arm_history(char *);
-extern int func_PAL_L11_00342578(char *, void *);
+extern int coll_check_move_to_point_pal(char *, void *);
 extern int moby_dispatch_action_by_kind(char *, void *);
-extern void func_PAL_L02_004009A0(char *, int, int);
-extern void func_PAL_L11_00451FD0(char *);
+extern void moby_set_anim_type_three_pal(char *, int, int);
+extern void smasher_robot_deactivate_pal(char *);
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);
@@ -48,7 +48,7 @@ extern void moby_rotate_about_point(char *, void *, float, float, float);
 extern void euler_rotation_basis(void *, void *);
 extern void smasher_robot_finish_frame(char *);
 
-void func_PAL_L11_00450AA8(char *object)
+void smasher_robot_update_pal(char *object)
 {
     float target[4], direction[4], matrix[16];
     int collision_flags;
@@ -58,11 +58,11 @@ void func_PAL_L11_00450AA8(char *object)
     int result, i;
     float *rotation;
     if (*(u8 *)(object + 0x20) == 1) return;
-    if (*(short *)(state + 0x4D2) && !D_001A8FF4 &&
+    if (*(short *)(state + 0x4D2) && !g_enemy_ai_frozen &&
         *(u8 *)(object + 0x20) != 11 && *(u8 *)(object + 0x20) != 10) return;
-    func_PAL_L11_00451848(object);
+    smasher_robot_update_aim_and_init_pal(object);
     if (*(u8 *)(object + 0x20) == 1) return;
-    if (*(short *)(state + 0x4D2) && !D_001A8FF4) return;
+    if (*(short *)(state + 0x4D2) && !g_enemy_ai_frozen) return;
     if (*(short *)(state + 0x4CA) == 0) {
         *(int *)(state + 0x490) = 0;
         if (*(u8 *)(object + 0x95) == 4) {
@@ -112,8 +112,8 @@ void func_PAL_L11_00450AA8(char *object)
         if (difference > 2.792527198791504f) smasher_robot_start_turn_around(object);
         waypoint = state + 0x470;
         if (*(u8 *)(object + 0xBC) == 0 && vec_distance_xy(position, waypoint) < 0.5f) *(u8 *)(object + 0xBC) = 1;
-        else if (*(short *)(state + 0x4D2)) func_PAL_L02_00335630(object,waypoint);
-        else func_PAL_L01_00323068(object,waypoint);
+        else if (*(short *)(state + 0x4D2)) moby_aim_at_target_offset_pal(object,waypoint);
+        else moby_l01_turn_toward_target_pal(object,waypoint);
     }
     switch (*(u8 *)(object + 0x20)) {
     case 3:
@@ -127,7 +127,7 @@ void func_PAL_L11_00450AA8(char *object)
             *(u8 *)(object + 0xBC) = 1;
         } else if (*(u8 *)(object + 0xBC) == 1) {
             if (arena_is_point_in_polygon(*(int *)(object+0xB8),position)) moby_set_state(object,4,2);
-            func_PAL_L01_00323068(object,arena_get_center_point(*(int *)(object+0xB8)));
+            moby_l01_turn_toward_target_pal(object,arena_get_center_point(*(int *)(object+0xB8)));
         }
         break;
     case 5:
@@ -138,7 +138,7 @@ void func_PAL_L11_00450AA8(char *object)
             if (*(u8 *)(object + 0x43) != 9) func_PAL_002A7E68(object,9,0,8);
             moby_set_controller_speed_limits(object,0.0064000003f,0.16000001f,0.010053098f,1.0053098f);
         }
-        func_PAL_002B5E30(object,angle);
+        moby_step_at_own_position_factor_pal(object,angle);
         if (*(u8 *)(object+0x60)&2) moby_set_state(object,*(short *)(state+0x4CC),*(short *)(state+0x4CE));
         break;
     case 7:
@@ -157,13 +157,13 @@ void func_PAL_L11_00450AA8(char *object)
             if (*(u8 *)(object+0x43)!=11) func_PAL_002A7E68(object,11,4,2);
             *(int *)(state+0x4B0)=0;
         } else if (distance>2.8f) {
-            if (*(short *)(state+0x4D2)) func_PAL_L02_00335630(object,target);
-            else if (!func_PAL_L11_00452330(object)) func_PAL_002B5BA8(object,target,*(float *)(state+0x494));
+            if (*(short *)(state+0x4D2)) moby_aim_at_target_offset_pal(object,target);
+            else if (!enemy_aim_at_group_entity_in_cone_b_pal(object)) moby_turn_toward_target_and_step_pal(object,target,*(float *)(state+0x494));
         } else {
             if (*(short *)(state+0x4D2)) {
                 FastVecSub(direction,target,position);
-                func_PAL_L02_00335678(object,position,direction);
-            } else func_PAL_002B5C98(object,position,angle);
+                coll_update_controller_pal(object,position,direction);
+            } else moby_step_controller_pal(object,position,angle);
         }
         if (difference>2.792527198791504f) smasher_robot_start_turn_around(object);
         break;
@@ -188,8 +188,8 @@ void func_PAL_L11_00450AA8(char *object)
             smasher_robot_advance_arm_history(object);
             *(float *)(state+0x4AC)=25.0f;
         }
-        if (*(short *)(state+0x4D2)) func_PAL_L11_00342578(object,target);
-        else func_PAL_002B5C98(object,position,angle);
+        if (*(short *)(state+0x4D2)) coll_check_move_to_point_pal(object,target);
+        else moby_step_controller_pal(object,position,angle);
         break;
     case 9:
         if (*(u8 *)(object+0x60)&2) moby_set_state(object,7,-1);
@@ -199,7 +199,7 @@ void func_PAL_L11_00450AA8(char *object)
         if (*(u8 *)(object+0x42)==15) {
             if (!math_random_int_below(30) || (result&1)) {
                 if (moby_get_anim_value(object)<15.0f && *(short *)(state+0x4D2) && !math_random_int_below(2)) moby_set_state(object,11,-1);
-                else {func_PAL_L02_004009A0(object,0,-1); func_PAL_L11_00451FD0(object);}
+                else {moby_set_anim_type_three_pal(object,0,-1); smasher_robot_deactivate_pal(object);}
             }
         } else if (result&2) moby_set_state(object,7,4);
         break;
@@ -230,7 +230,7 @@ void func_PAL_L11_00450AA8(char *object)
         euler_rotation_basis(object+0xC0,object+0xF0);
         if (*(float *)(object+0x18)<*(float *)(arena_get_center_point(*(int *)(object+0xB8))+8)+5.0f ||
             !math_random_int_below(450) || *(u16 *)(object+0x96)>300) {
-            func_PAL_L02_004009A0(object,0,-1); func_PAL_L11_00451FD0(object);
+            moby_set_anim_type_three_pal(object,0,-1); smasher_robot_deactivate_pal(object);
         }
         break;
     }

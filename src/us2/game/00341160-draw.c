@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344[];
-extern char *D_001A8CFC[] __attribute__((sda));
+extern int g_menu_input_flags[];
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern int *object_get_fourth_field(void *);
 extern float *object_get_second_field(void *);
@@ -10,7 +10,7 @@ extern void gfx_draw_screen_element_stored(void *);
 extern void func_US2_003378A0(void *);
 extern void object_set_flag_value(void *, int);
 extern void radial_menu_draw_info_second(void *);
-extern void func_US2_003413A8(void *);
+extern void radial_menu_draw_info_left_us2(void *);
 extern void radial_menu_layout_items(void *, int, int, int);
 typedef struct {
     char reserved00[8];
@@ -19,14 +19,14 @@ typedef struct {
     void (*draw)(void *);
 } DrawMethod;
 
-void func_US2_00341160(char *self)
+void radial_menu_draw_us2(char *self)
 {
     char *a, *b, *c, *d, *e, *f, *slot, *slot2;
     int i, j;
     float *v;
     int *color;
     if (*(int *)(self+0xAB8)) {
-        if (D_00138344[0]&0xF000) math_ping_pong_blend_values(0,0,1,1,1);
+        if (g_menu_input_flags[0]&0xF000) math_ping_pong_blend_values(0,0,1,1,1);
         a=self+0x214; b=self+0x2A8; c=self+0x2F4;
         color=object_get_fourth_field(a);
         f=self+0x5A0;
@@ -44,7 +44,7 @@ void func_US2_00341160(char *self)
         func_US2_003378A0(self+0x9E0);
         object_set_flag_value(self+0x880,0);
         radial_menu_draw_info_second(self);
-        func_US2_003413A8(self);
+        radial_menu_draw_info_left_us2(self);
         gfx_draw_screen_element_stored(a);gfx_draw_screen_element_stored(b);gfx_draw_screen_element_stored(c);
         v=object_get_second_field(b); *v=-*v;
         v=object_get_second_field(c); *v=-*v;
@@ -62,6 +62,6 @@ void func_US2_00341160(char *self)
         }
         gfx_draw_screen_element_stored(f);
         *object_get_fourth_field(f)=0x80FFDE8D;
-        radial_menu_layout_items(D_001A8CFC[0]+0x36F28,0xF3,0x2B,0x70);
+        radial_menu_layout_items(g_resident_data_base[0]+0x36F28,0xF3,0x2B,0x70);
     }
 }

@@ -36,9 +36,9 @@ typedef struct {
 typedef struct { char pad[0x2290]; u8 *moby; } TrailHero;
 
 extern TrailHero g_hero_state;
-extern TrailTemplate D_L00_00290C78[];
-extern int D_L00_001B2740;
-extern float D_L00_001AEFD8 __attribute__((sda));
+extern TrailTemplate g_trail_template_table[];
+extern int g_last_frame_stamp;
+extern float g_shape_uv_scale __attribute__((sda));
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 
@@ -90,7 +90,7 @@ void UpdateTrailStrips(char *object)
         primitive = 2;
     }
     phase = state->phase;
-    shape = &D_L00_00290C78[shapeIndex];
+    shape = &g_trail_template_table[shapeIndex];
     selected0 = shape->selected[0];
     selected1 = shape->selected[1];
     selected2 = shape->selected[2];
@@ -100,15 +100,15 @@ void UpdateTrailStrips(char *object)
         qcopy(&state->basis[0], moby + 0xC0);
         qcopy(&state->basis[1], moby + 0xD0);
         qcopy(&state->basis[2], moby + 0xE0);
-        D_L00_001B2740 = g_frame_l00_counter;
+        g_last_frame_stamp = g_frame_l00_counter;
     }
     frame = g_frame_l00_counter;
-    elapsed = frame - D_L00_001B2740;
+    elapsed = frame - g_last_frame_stamp;
     if (elapsed <= 0)
         elapsed = 1;
     advanced = phase + (float)elapsed * shape->rate;
     state->phase = advanced;
-    D_L00_001B2740 = frame;
+    g_last_frame_stamp = frame;
     if ((float)(shape->count * 2) <= advanced) {
         int current = g_hero_state.moby[0x42];
         if ((unsigned)(current - 23) >= 3 && current != 43)
@@ -139,8 +139,8 @@ void UpdateTrailStrips(char *object)
             FastVecScale(&packet.position[vertex], &shape->vertices[index], scale);
             uvIndex = shape->indices[segment][vertex * 2 + 1];
             scroll = 1.0f - state->phase * shape->scroll;
-            packet.uv[vertex][0] = (shape->uv[uvIndex][0] - 0.5f) * D_L00_001AEFD8 + 0.5f;
-            packet.uv[vertex][1] = (shape->uv[uvIndex][1] - 0.5f) * D_L00_001AEFD8 + 0.5f + scroll;
+            packet.uv[vertex][0] = (shape->uv[uvIndex][0] - 0.5f) * g_shape_uv_scale + 0.5f;
+            packet.uv[vertex][1] = (shape->uv[uvIndex][1] - 0.5f) * g_shape_uv_scale + 0.5f + scroll;
         }
         draw_world_quad(&packet, state, 0);
     }

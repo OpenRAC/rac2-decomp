@@ -17,7 +17,7 @@ typedef struct {
 
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) Vec4;
 extern Owner_002B4208 g_hero_state;
-extern V4 D_00189F10;
+extern V4 g_drive_velocity_view;
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void transform_vector(void *, void *, void *);
@@ -45,5 +45,5 @@ void hero_compute_push_direction(float angle)
     } else {
         vec_build_spherical_offset(&result, length, useAngle, hero->f324);
     }
-    D_00189F10 = *(V4 *)&result;
+    g_drive_velocity_view = *(V4 *)&result;
 }

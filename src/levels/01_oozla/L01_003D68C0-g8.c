@@ -20,10 +20,10 @@ typedef struct {
     u8 hit_slot;
 } OozlaStateMoby;
 
-extern int D_L01_001AEC38 MACRO_ADDR;
-extern float D_L01_001B2090, D_L01_001B208C;
-extern int D_L01_001B3468 MACRO_ADDR;
-extern int D_L01_001B15E0 MACRO_ADDR;
+extern int g_oozla_intro_timer MACRO_ADDR;
+extern float g_breakable_alpha_check_a, g_breakable_alpha_check_b;
+extern int g_breakable_count MACRO_ADDR;
+extern int g_breakable_active_limit MACRO_ADDR;
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern void moby_set_state(void *, int, int);
 extern void part_l01_spawn_ring_of_sparks(void *, int, float, float, float, float);
@@ -41,21 +41,21 @@ void breakable_l01_object_update(OozlaStateMoby *moby)
 
     switch (moby->state) {
     case 0: {
-        D_L01_001AEC38++;
+        g_oozla_intro_timer++;
         moby->flags |= 0x800;
         moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
         if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !vars->active) {
-            D_L01_001AEC38 = D_L01_001AEC38 - 1;
+            g_oozla_intro_timer = g_oozla_intro_timer - 1;
             moby_set_state(moby, 2, -1);
         }
         moby->hit_slot = 255;
         break;
     case 2:
-        if (moby->visible && D_L01_001B2090 < 0.9f && D_L01_001B208C < 0.9f &&
-            D_L01_001B3468 < D_L01_001B15E0)
+        if (moby->visible && g_breakable_alpha_check_a < 0.9f && g_breakable_alpha_check_b < 0.9f &&
+            g_breakable_count < g_breakable_active_limit)
             part_l01_spawn_ring_of_sparks(moby, 15, 1.5f, 6.5f, 1.5f, 0.06666667f);
         else
             part_l01_spawn_ring_of_sparks(moby, 6, 1.5f, 6.5f, 1.5f, 0.06666667f);
@@ -70,10 +70,10 @@ void breakable_l01_object_update(OozlaStateMoby *moby)
             moby->visible = 0;
             moby->collision_disable = 0;
             vars->timer = 120;
-            D_L01_001B3468++;
+            g_breakable_count++;
         }
         if (math_fast_float_d(&vars->timer)) {
-            D_L01_001B3468--;
+            g_breakable_count--;
             moby_mark_spawned(moby);
         }
         break;

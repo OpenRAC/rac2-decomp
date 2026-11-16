@@ -1,19 +1,19 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern int ref_L00_002D5570_00 __attribute__((sda));
 extern int ref_L00_002D5570_01 __attribute__((sda));
-extern void func_PAL_0033B6C0(char *);
-extern void func_PAL_0033B740(char *);
+extern void popup_init_texts_hidden_pal(char *);
+extern void popup_init_texts_shown_pal(char *);
 
 int func_PAL_002D6148(char *a0)
 {
-    if (D_001A8CFC != 0) {
+    if (g_resident_data_base != 0) {
         if (a0 == (char *)&ref_L00_002D5570_00)
-            func_PAL_0033B6C0(D_001A8CFC + 0x3CF50);
+            popup_init_texts_hidden_pal(g_resident_data_base + 0x3CF50);
         else if (a0 == (char *)&ref_L00_002D5570_01)
-            func_PAL_0033B740(D_001A8CFC + 0x3CF50);
+            popup_init_texts_shown_pal(g_resident_data_base + 0x3CF50);
     }
     return 0;
 }
@@ -70,20 +70,20 @@ finish:
 
 /* func_PAL_002D5FF0, the PAL copy of func_002D53F0: a centred text draw at y = 329 less a word
    reached through $gp (-G8), with text id 0xB60 where USA draws 0x2D4F at a scaled y. */
-extern int D_001ABB8C __attribute__((sda));
+extern int g_ui_y_offset __attribute__((sda));
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
 extern void func_PAL_0029CEC8(void);
 extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
-int func_PAL_002D5FF0(void)
+int menu_draw_centered_text_pal(void)
 {
     int y;
 
     SetupGifPaging(0);
     func_PAL_0029CEC8();
-    y = 329 - D_001ABB8C;
+    y = 329 - g_ui_y_offset;
     text_draw_right_aligned_small(0x1C7, y, 0x80F0F0F0ULL, (unsigned char *)GetLocalizedString(0xB60), -1);
     DoGifPaging();
     return 0;

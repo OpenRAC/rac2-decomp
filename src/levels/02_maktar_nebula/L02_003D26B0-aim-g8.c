@@ -8,10 +8,10 @@
 
 extern u16 *g_entity_group_lists[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
-extern float D_L02_001B016C __attribute__((sda));
-extern float D_L02_001B0170 __attribute__((sda));
-extern float D_L02_001B0174 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
+extern float g_enemy_aim_range __attribute__((sda));
+extern float g_enemy_l02_aim_cone_degrees __attribute__((sda));
+extern float g_enemy_turn_angle_degrees __attribute__((sda));
 
 extern void FastVecSub(float *, float *, float *);
 extern int moby_get_busy_flag(u8 *);
@@ -40,7 +40,7 @@ int AimAtGroupEntityInConeL02(char *self) {
     if (GROUP == -1)
         return 0;
     for (id_ptr = g_entity_group_lists[GROUP];
-         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && id_ptr != 0 &&
+         (GROUP & 0xFF) != 0xFF && GROUP <= g_group_max_index && id_ptr != 0 &&
          ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_entity_group_lists[GROUP]);
          id_ptr++) {
         entity = (char *)D_L02_001B359C_1[0] + ((*id_ptr & 0x7FFF) << 8);
@@ -48,16 +48,16 @@ int AimAtGroupEntityInConeL02(char *self) {
             return 0;
         if (moby_get_busy_flag(entity) == 0)
             continue;
-        if (!(vec_distance_xy(self + 0x10, entity + 0x10) < D_L02_001B016C))
+        if (!(vec_distance_xy(self + 0x10, entity + 0x10) < g_enemy_aim_range))
             continue;
-        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B0170 * 0.017453294f))
+        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < g_enemy_l02_aim_cone_degrees * 0.017453294f))
             continue;
         if (id_ptr == 0)
             return 0;
 
         FastVecSub(aim_point, (float *)(self + 0x10), (float *)(entity + 0x10));
         up_axis = self + 0xE0;
-        turn_angle = D_L02_001B0174 * 0.017453294f;
+        turn_angle = g_enemy_turn_angle_degrees * 0.017453294f;
         math_apply_axis_rotation_to_quat(aim_point, aim_point, up_axis,
                       0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turn_angle : turn_angle);
         FastVecAdd(aim_point, aim_point, entity + 0x10);

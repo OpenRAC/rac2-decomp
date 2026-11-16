@@ -1,12 +1,13 @@
+#include "names.h"
 /* func_L08_0042A980 needs -G64: the 64-byte corner template is addressed through $gp. */
 #include "common.h"
 
-extern f32 D_L08_00260410[][16];
-extern f32 D_L08_001B9B00[];
-extern f32 D_0018A0E0[];
+extern f32 g_slot_positions[][16];
+extern f32 g_hero_position_vec[];
+extern f32 g_hero_state_block[];
 /* sda on the incomplete array keeps its address one unsplit `la` (lui+addiu at the use). */
-extern f32 D_L08_001B3A70[][4] __attribute__((sda));
-extern f32 D_L08_001B1CE0[4][4] __attribute__((sda));
+extern f32 g_beam_end_positions[][4] __attribute__((sda));
+extern f32 g_beam_l08_corner_table[4][4] __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -32,11 +33,11 @@ void DrawGlowBillboardPair(s32 unused, s32 index)
     f32 basis[3][4], position[4], jitter[4];
     f32 size;
 
-    qcopy(position, D_L08_00260410[index]);
+    qcopy(position, g_slot_positions[index]);
     position[3] = 1.0f;
-    FastVecSub(basis[0], D_L08_001B9B00, position);
+    FastVecSub(basis[0], g_hero_position_vec, position);
     vec_scale_to_length(basis[0], basis[0], 1.0f);
-    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    FastVecCross(basis[1], basis[0], g_hero_state_block);
     vec_scale_to_length(basis[1], basis[1], -1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
 
@@ -67,7 +68,7 @@ void DrawGlowBillboardPair(s32 unused, s32 index)
         f32 (*out)[4];
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
-            p = &D_L08_001B1CE0[corner];
+            p = &g_beam_l08_corner_table[corner];
             FastVecScale(out, p, size);
             transform_vector(out, out, basis[0]);
             FastVecAdd(out, out, jitter);
@@ -83,17 +84,17 @@ void DrawGlowBillboardPair(s32 unused, s32 index)
         f32 (*out)[4];
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
-            p = &D_L08_001B1CE0[corner];
+            p = &g_beam_l08_corner_table[corner];
             FastVecScale(out, p, size * 3.0f);
             transform_vector(out, out, basis[0]);
         }
     }
     draw_world_quad(packet.vertices, 0, 0);
 
-    qcopy(position, D_L08_001B3A70[index]);
-    FastVecSub(basis[0], D_L08_001B9B00, position);
+    qcopy(position, g_beam_end_positions[index]);
+    FastVecSub(basis[0], g_hero_position_vec, position);
     vec_scale_to_length(basis[0], basis[0], 1.0f);
-    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    FastVecCross(basis[1], basis[0], g_hero_state_block);
     vec_scale_to_length(basis[1], basis[1], -1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
 
@@ -107,7 +108,7 @@ void DrawGlowBillboardPair(s32 unused, s32 index)
         f32 (*out)[4];
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
-            p = &D_L08_001B1CE0[corner];
+            p = &g_beam_l08_corner_table[corner];
             FastVecScale(out, p, size);
             transform_vector(out, out, basis[0]);
             FastVecAdd(out, out, jitter);
@@ -123,7 +124,7 @@ void DrawGlowBillboardPair(s32 unused, s32 index)
         f32 (*out)[4];
         for (corner = 0; corner < 4; corner++) {
             out = &packet.vertices[corner];
-            p = &D_L08_001B1CE0[corner];
+            p = &g_beam_l08_corner_table[corner];
             FastVecScale(out, p, size * 3.0f);
             transform_vector(out, out, basis[0]);
         }

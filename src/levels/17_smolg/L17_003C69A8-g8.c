@@ -2,14 +2,14 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 extern char *g_path_l17_table[];
-extern float D_L17_001B0344 __attribute__((sda));
-extern float D_L17_001B0348 __attribute__((sda));
-extern float D_L17_001B034C __attribute__((sda));
-extern float D_L17_001B0350 __attribute__((sda));
-extern float D_L17_001B0354 __attribute__((sda));
-extern float D_L17_001B0358 __attribute__((sda));
+extern float g_platform_move_speed __attribute__((sda));
+extern float g_platform_deceleration __attribute__((sda));
+extern float g_platform_stop_angle_rate __attribute__((sda));
+extern float g_platform_yaw_rate __attribute__((sda));
+extern float g_platform_turn_rate __attribute__((sda));
+extern float g_platform_turn_scale __attribute__((sda));
 /* Incomplete view, reading only the measured sound-bank byte at [0]. */
-extern unsigned char D_L17_001DBF82[];
+extern unsigned char g_platform_l17_sound_flag_2[];
 extern unsigned char g_sound_state[];
 extern void FastVecSub(void *,void *,void *);
 extern float FastVecLength(void *);
@@ -36,26 +36,26 @@ int ride_platform_move_along_path(char *object,int pathIndex,int *sound)
     float speedSquared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
     FastVecSub(&delta,&target,object+16);
-    if(FastVecLength(&delta)<(D_L17_001B0344*0.016666668f)*2.0f) {
+    if(FastVecLength(&delta)<(g_platform_move_speed*0.016666668f)*2.0f) {
         (*(int *)(state+0x94))++;
         complete=*(int *)(state+0x94)==*(int *)*path;
     }
     distance=fast_vec_dist(object+16,*path+*(int *)*path*16);
-    deceleration=D_L17_001B0348*0.0002777777845f;
+    deceleration=g_platform_deceleration*0.0002777777845f;
     speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
     if(distance<=speedSquared/(deceleration*2.0f))
         ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
-    else ApproachValue(state+0x90,D_L17_001B0344*0.016666668f,deceleration);
+    else ApproachValue(state+0x90,g_platform_move_speed*0.016666668f,deceleration);
     vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
     FastVecAdd(object+16,&delta,object+16);
     pitch=-mat_fast_helper_a(vec_length_xy(&delta),delta.f[2]);
     if(pitch>0.261799425f) pitch=0.261799425f;
     else if(pitch< -0.261799425f) pitch= -0.261799425f;
-    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,D_L17_001B034C*0.00000484813743f,D_L17_001B034C*0.00000484813743f,0.209439546f);
-    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,D_L17_001B0350*0.00000484813743f,D_L17_001B0350*0.00000484813743f,0.209439546f,0);
-    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*D_L17_001B0358,state+0xa0,0,D_L17_001B0354*0.00000484813743f,D_L17_001B0354*0.00000484813743f,0.209439546f);
+    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,g_platform_stop_angle_rate*0.00000484813743f,g_platform_stop_angle_rate*0.00000484813743f,0.209439546f);
+    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,g_platform_yaw_rate*0.00000484813743f,g_platform_yaw_rate*0.00000484813743f,0.209439546f,0);
+    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*g_platform_turn_scale,state+0xa0,0,g_platform_turn_rate*0.00000484813743f,g_platform_turn_rate*0.00000484813743f,0.209439546f);
     if(!complete) {
-        if(!snd_is_voice_playing_for_owner(object,*sound) && D_L17_001DBF82[0]!=255)
+        if(!snd_is_voice_playing_for_owner(object,*sound) && g_platform_l17_sound_flag_2[0]!=255)
             *sound=snd_play_from_class_bank(0,4,object,0x922);
     } else {
         if(*sound!=-1) {

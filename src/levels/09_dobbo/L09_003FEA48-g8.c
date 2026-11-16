@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern f32 D_L09_001B13F0 __attribute__((sda));
-extern f32 D_L09_001B13F4 __attribute__((sda));
+extern f32 g_dobbo_fast_move_speed __attribute__((sda));
+extern f32 g_dobbo_slow_move_speed __attribute__((sda));
 extern void func_L08_00316678(char *a, s32 b, s32 c, s32 d);
 
 typedef union {
@@ -9,13 +9,13 @@ typedef union {
     s32 w;
 } U16S32;
 
-extern U16S32 D_L09_001B13C0 __attribute__((sda));
+extern U16S32 g_dobbo_timer_value __attribute__((sda));
 extern void func_2EA110(char *p);
 
 /* Switches the creature to its fast-moving animation and sets its turn speed. */
 void dobbo_start_fast_move_anim(char *moby, s32 param) {
     char *self = moby;
-    f32 speed = D_L09_001B13F0 * 0.0166666675f;
+    f32 speed = g_dobbo_fast_move_speed * 0.0166666675f;
     char *vars = *(char **)(self + 0x68);
     *(f32 *)(vars + 0x1D4) = 3.0f;
     *(f32 *)(vars + 0x1D0) = speed;
@@ -28,7 +28,7 @@ void dobbo_start_fast_move_anim(char *moby, s32 param) {
 /* Switches the creature to its slow-moving animation and sets its turn speed. */
 void dobbo_start_slow_move_anim(char *moby, s32 param) {
     char *self = moby;
-    f32 speed = D_L09_001B13F4 * 0.0166666675f;
+    f32 speed = g_dobbo_slow_move_speed * 0.0166666675f;
     char *vars = *(char **)(self + 0x68);
     *(f32 *)(vars + 0x1D4) = 1.75f;
     *(f32 *)(vars + 0x1D0) = speed;
@@ -44,8 +44,8 @@ void dobbo_tick_timers_age(char *moby) {
     char *vars = *(char **)(self + 0x68);
     u16 age;
     if (*(s16 *)(vars + 0x270) != 0
-        || (*(s32 *)(vars + 0x234) == 1 && *(s16 *)(vars + 0x26C) < D_L09_001B13C0.w / 2)) {
-        *(u16 *)(vars + 0x26C) = D_L09_001B13C0.h;
+        || (*(s32 *)(vars + 0x234) == 1 && *(s16 *)(vars + 0x26C) < g_dobbo_timer_value.w / 2)) {
+        *(u16 *)(vars + 0x26C) = g_dobbo_timer_value.h;
         *(s16 *)(vars + 0x270) = 0;
     }
     func_2EA110(vars + 0x26C);
@@ -60,9 +60,9 @@ void dobbo_tick_timers_age(char *moby) {
 /* Small-data handles: the resident mode word (-0x7600 -> 0x001A79F0), the resident
    release word (-0x5FB0 -> 0x001A9040) and the level's record table (0x386C ->
    0x001B285C), all read with $gp pinned at 0x001AEFF0. */
-extern s32 D_L09_001A79F0 __attribute__((sda));
-extern s32 D_L09_001A9040 __attribute__((sda));
-extern char *D_L09_001B285C __attribute__((sda));
+extern s32 g_release_effect_state __attribute__((sda));
+extern s32 g_release_busy_flag __attribute__((sda));
+extern char *g_moby_record_table __attribute__((sda));
 
 extern s32 func_323340(char *a0, char *a1, s32 a2);
 extern int moby_is_hero_or_special(char *a0);
@@ -76,11 +76,11 @@ void record_release_rebuild_effect(char *moby) {
     s16 record_index;
 
     if (func_323340(moby, vars + 0x160, 0) != 0) {
-        if (D_L09_001A79F0 == 9) {
+        if (g_release_effect_state == 9) {
             record_index = *(s16 *)(vars + 0x1D0);
             if (record_index != -1) {
-                if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
-                    D_L09_001A9040 = 0;
+                if (moby_is_hero_or_special(g_moby_record_table + (record_index << 8)) == 0) {
+                    g_release_busy_flag = 0;
                 }
                 *(s16 *)(vars + 0x1D0) = -1;
             }
@@ -101,7 +101,7 @@ extern s32 moby_apply_damage_to_object(char *a0, char *a1, s32 a2);
 extern void dobbo_alert_wandering_group(char *a0);
 extern void dobbo_destroy_with_debris(char *a0);
 extern s32 weapon_select_aim_target(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
-extern char D_L09_001B9A00[];
+extern char g_camera_l09_position[];
 
 /* Releases the record the sub-object holds once the resident mode word says 9, then
    rebuilds the sub-object's effect. */
@@ -115,7 +115,7 @@ void dobbo_update_release_record(char *moby) {
         dobbo_wandering_init_vars();
     }
     if (*(u8 *)(self + 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, D_L09_001B9A00) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, g_camera_l09_position) < 24.0f) {
             moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x16;
         }
@@ -124,8 +124,8 @@ void dobbo_update_release_record(char *moby) {
     if (g_current_map_index == 9) {
         record_index = *(s16 *)(vars + 0xC0);
         if (record_index != -1) {
-            if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
-                D_L09_001A9040 = 0;
+            if (moby_is_hero_or_special(g_moby_record_table + (record_index << 8)) == 0) {
+                g_release_busy_flag = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
@@ -158,7 +158,7 @@ void dobbo_update_large_release_record(char *moby) {
         dobbo_init_enemy_vars();
     }
     if (*(u8 *)(self + 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, D_L09_001B9A00) < 48.0f) {
+        if (fast_vec_dist(self + 0x10, g_camera_l09_position) < 48.0f) {
             moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x2D;
         }
@@ -167,8 +167,8 @@ void dobbo_update_large_release_record(char *moby) {
     if (g_current_map_index == 9) {
         record_index = *(s16 *)(vars + 0xC0);
         if (record_index != -1) {
-            if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
-                D_L09_001A9040 = 0;
+            if (moby_is_hero_or_special(g_moby_record_table + (record_index << 8)) == 0) {
+                g_release_busy_flag = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
@@ -181,17 +181,17 @@ void dobbo_update_large_release_record(char *moby) {
    are plain externs here, which come out as bare `lui`/`lw` pairs in ordinary flow and as $gp
    loads in a branch delay slot; the base takes a second name because D_L09_001B285C above is the
    $gp form. */
-extern s32 D_L09_001B2878;
+extern s32 g_max_l09_group_id;
 
 extern u8 *D_L09_001B285C_1;
 
-extern u16 *D_L09_001FB560[];
+extern u16 *g_track_entry_table[];
 
 /* The vector the scaled copy starts from: small data, so its address is a $gp offset. */
-extern char D_L09_001B1410[1] __attribute__((sda));
+extern char g_dobbo_glow_offset[1] __attribute__((sda));
 
 /* The colour pair func_00283D38 blends. */
-extern s32 D_L09_001B1420[2];
+extern s32 g_dobbo_glow_colors[2];
 
 extern void FastVecScale(char *, char *, f32);
 
@@ -212,9 +212,9 @@ typedef struct {
     s32 colour;
 } TintedObject;
 
-extern ColorPair D_L09_001B1400[2];
+extern ColorPair g_dobbo_tint_colors[2];
 
-extern s32 D_L09_001B2388;
+extern s32 g_frame_l09_counter;
 
 extern f32 FastAddRotations(f32, f32);
 
@@ -234,7 +234,7 @@ void dobbo_draw_pulsing_glows(u8 *a0);
    and the same stamp; then func_L09_00405490 is registered as the object's callback. */
 void dobbo_update_pulsing_tint(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
-    ColorPair color = D_L09_001B1400[0];
+    ColorPair color = g_dobbo_tint_colors[0];
     u16 *id_ptr;
     u8 *entity;
     u8 *entity_vars;
@@ -246,10 +246,10 @@ void dobbo_update_pulsing_tint(u8 *moby) {
     wave = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     *(f32 *)(state + 0x34C) = wave;
     ((TintedObject *)moby)->colour = FastTweenColor(color.a, color.b, wave);
-    if (*(s32 *)(state + 0x350) != D_L09_001B2388) {
-        for (id_ptr = D_L09_001FB560[moby[0x21]];
-             moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
-             ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[moby[0x21]]);
+    if (*(s32 *)(state + 0x350) != g_frame_l09_counter) {
+        for (id_ptr = g_track_entry_table[moby[0x21]];
+             moby[0x21] != 0xFF && moby[0x21] <= g_max_l09_group_id && id_ptr != 0 &&
+             ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_track_entry_table[moby[0x21]]);
              id_ptr++) {
             entity = D_L09_001B285C_1 + ((*id_ptr & 0x7FFF) << 8);
             if (entity == 0)
@@ -259,7 +259,7 @@ void dobbo_update_pulsing_tint(u8 *moby) {
                     if (entity[0x20] != 0xFD) {
                         entity_vars = *(u8 **)(entity + 0x68);
                         moby_transform_joint_point(entity, 0, entity_vars + 0x240);
-                        *(s32 *)(entity_vars + 0x350) = D_L09_001B2388;
+                        *(s32 *)(entity_vars + 0x350) = g_frame_l09_counter;
                     }
                 }
             }
@@ -282,12 +282,12 @@ void dobbo_draw_pulsing_glows(u8 *moby) {
 
     if (moby[0x21] == 0xFF)
         return;
-    group_list = D_L09_001FB560[moby[0x21]];
+    group_list = g_track_entry_table[moby[0x21]];
     if (group_list == 0)
         return;
     for (id_ptr = group_list;
-         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
-         ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[moby[0x21]]);
+         moby[0x21] != 0xFF && moby[0x21] <= g_max_l09_group_id && id_ptr != 0 &&
+         ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_track_entry_table[moby[0x21]]);
          id_ptr++) {
         entity = D_L09_001B285C_1 + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
@@ -296,9 +296,9 @@ void dobbo_draw_pulsing_glows(u8 *moby) {
             if (entity[0x20] != 0xFE) {
                 if (entity[0x20] != 0xFD) {
                     entity_vars = *(u8 **)(entity + 0x68);
-                    FastVecScale((char *)point, D_L09_001B1410, *(f32 *)(entity_vars + 0x344));
+                    FastVecScale((char *)point, g_dobbo_glow_offset, *(f32 *)(entity_vars + 0x344));
                     transform_vector((char *)point, (char *)point, (char *)(entity_vars + 0x240));
-                    color = FastTweenColor(D_L09_001B1420[0], D_L09_001B1420[1],
+                    color = FastTweenColor(g_dobbo_glow_colors[0], g_dobbo_glow_colors[1],
                                       *(f32 *)(entity_vars + 0x34C));
                     gfx_l00_draw_billboard_quad((char *)point, color, *(f32 *)(entity_vars + 0x344) * 0.2f, 0.08f);
                 }
@@ -315,12 +315,12 @@ extern float func_2EAA60(float a);
 extern float func_2EAA78(float a);
 extern int func_2EB5D0(float a);
 extern void func_2EA750(float f12, void *a0, void *a1);
-extern int D_L09_001B15B8 __attribute__((sda));
+extern int g_dobbo_spin_anim_id __attribute__((sda));
 extern int D_L09_001B15B8_4[] MACRO_ADDR;
-extern float D_L09_001B15C4 __attribute__((sda));
-extern float D_L09_001B15C0 __attribute__((sda));
-extern int D_L09_001B15B4 __attribute__((sda));
-extern u8 D_L09_001B15B0 __attribute__((sda));
+extern float g_dobbo_spin_turn_rate __attribute__((sda));
+extern float g_dobbo_spin_radius __attribute__((sda));
+extern int g_dobbo_spin_scale __attribute__((sda));
+extern u8 g_dobbo_spin_angle_base __attribute__((sda));
 
 /* Spins a moving object around and sets its direction, facing and blend from its path values. */
 void dobbo_update_spin_direction(char *moby) {
@@ -331,21 +331,21 @@ void dobbo_update_spin_direction(char *moby) {
     float scale;
     int anim_id;
     if (func_316A28(7)) {
-        anim_id = D_L09_001B15B8;
+        anim_id = g_dobbo_spin_anim_id;
     } else {
         anim_id = D_L09_001B15B8_4[1];
     }
     func_31F4D0(moby, anim_id);
     velocity = moby + 0xC0;
-    *(float *)(vars + 0x10) = func_2EB478(*(float *)(vars + 0x10), D_L09_001B15C4 * 0.00029088825f);
-    dir[0] = func_2EAA60(*(float *)(vars + 0x10)) * D_L09_001B15C0;
-    dir[1] = func_2EAA78(*(float *)(vars + 0x10)) * D_L09_001B15C0;
+    *(float *)(vars + 0x10) = func_2EB478(*(float *)(vars + 0x10), g_dobbo_spin_turn_rate * 0.00029088825f);
+    dir[0] = func_2EAA60(*(float *)(vars + 0x10)) * g_dobbo_spin_radius;
+    dir[1] = func_2EAA78(*(float *)(vars + 0x10)) * g_dobbo_spin_radius;
     dir[2] = 0;
-    scale = (float)D_L09_001B15B4;
+    scale = (float)g_dobbo_spin_scale;
     *(float *)(moby + 0xF0) = dir[0];
     *(float *)(moby + 0xF4) = dir[1];
     frame_offset = func_2EB5D0(scale * (*(float *)vars + *(float *)(vars + 4)) * 0.5f);
-    *(u8 *)(moby + 0x23) = D_L09_001B15B0 + frame_offset + func_316A68(-9, 9);
+    *(u8 *)(moby + 0x23) = g_dobbo_spin_angle_base + frame_offset + func_316A68(-9, 9);
     *(u16 *)(moby + 0x34) |= 0x800;
     func_2EACD0(velocity, moby + 0xF0);
     func_2EA750(*(float *)vars, velocity, velocity);
@@ -353,9 +353,9 @@ void dobbo_update_spin_direction(char *moby) {
 }
 
 typedef struct { u8 pad[0x464]; u8 spent[1]; } L09_CellFlags;
-extern L09_CellFlags D_L09_0021E9F0;
-extern u8 D_0019B4A8[];
-extern char *D_L09_001B294C[] __attribute__((sda));
+extern L09_CellFlags g_dobbo_flags;
+extern u8 g_moby_nibble_table[];
+extern char *g_dobbo_point_table[] __attribute__((sda));
 extern void func_317B40(int a0, int a1, int a2, int a3);
 
 /* Updates the indicator on a linked object, lighting it up once the item it needs has been collected. */
@@ -369,7 +369,7 @@ void dobbo_update_item_indicator(char *moby) {
 
     if (linked_index == -1)
         return;
-    linked = (char *)((linked_index << 8) + (int)D_L09_001B285C);
+    linked = (char *)((linked_index << 8) + (int)g_moby_record_table);
     if (*(u8 *)(linked + 0x20) == 0xFE)
         return;
     if (*(u8 *)(linked + 0x20) == 0xFD)
@@ -378,21 +378,21 @@ void dobbo_update_item_indicator(char *moby) {
     if (*(s32 *)(linked_vars + 0x70) == -1)
         return;
     if (*(s32 *)(vars + 0x50) != -1
-        && (item_id = *(u16 *)((*(s32 *)(vars + 0x50) << 8) + (int)D_L09_001B285C + 0xB2),
-            D_L09_0021E9F0.spent[(s16)item_id] != 0
-            || (flags = D_0019B4A8[((s16)item_id >> 1) + (g_current_map_index << 10)],
+        && (item_id = *(u16 *)((*(s32 *)(vars + 0x50) << 8) + (int)g_moby_record_table + 0xB2),
+            g_dobbo_flags.spent[(s16)item_id] != 0
+            || (flags = g_moby_nibble_table[((s16)item_id >> 1) + (g_current_map_index << 10)],
                 (item_id & 1) ? (flags >> 4) & 7 : flags & 7) != 0)) {
-        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.25f;
+        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)g_dobbo_point_table[0] + 0x38) = 325.25f;
         func_317B40(*(s32 *)(vars + 0x4C), 1, 1, 1);
     } else {
-        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.0f;
+        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)g_dobbo_point_table[0] + 0x38) = 325.0f;
         func_317B40(*(s32 *)(vars + 0x4C), 0, 0, 0);
     }
 }
 
-extern s32 D_0018C0B4 __attribute__((nosda));
-extern u8 D_0019B278[];
-extern u8 D_001A7A28[] __attribute__((sda));
+extern s32 g_game_mode __attribute__((nosda));
+extern u8 g_level_progress_flags[];
+extern u8 g_collection_progress_flags[] __attribute__((sda));
 extern void func_30C790(char *a0);
 extern void dobbo_release_linked(char *a0);
 
@@ -403,31 +403,31 @@ s32 dobbo_release_linked_if_ready(char *moby) {
     s32 linked_index;
     s32 item_id;
 
-    if (D_0018C0B4 == 0x31)
+    if (g_game_mode == 0x31)
         return 0;
     if (*(s32 *)(vars + 0x2C) != -1) {
-        char *linked = (char *)((*(s32 *)(vars + 0x2C) << 8) + (s32)D_L09_001B285C);
+        char *linked = (char *)((*(s32 *)(vars + 0x2C) << 8) + (s32)g_moby_record_table);
         if (*(u8 *)(linked + 0x20) != 0xFE) {
             if (*(u8 *)(linked + 0x20) != 0xFD) {
-                if (D_0019B278[*(s32 *)*(char **)(linked + 0x68) + (g_current_map_index << 2)] == 0)
+                if (g_level_progress_flags[*(s32 *)*(char **)(linked + 0x68) + (g_current_map_index << 2)] == 0)
                     return 0;
             }
         }
     }
     if (*(s32 *)(vars + 0x7C) != -1) {
-        char *linked = (char *)((*(s32 *)(vars + 0x7C) << 8) + (s32)D_L09_001B285C);
+        char *linked = (char *)((*(s32 *)(vars + 0x7C) << 8) + (s32)g_moby_record_table);
         if (*(u8 *)(linked + 0x20) != 0xFE) {
             if (*(u8 *)(linked + 0x20) != 0xFD) {
-                if (*(u8 *)(*(s32 *)*(char **)(linked + 0x68) + (s32)D_001A7A28) == 0)
+                if (*(u8 *)(*(s32 *)*(char **)(linked + 0x68) + (s32)g_collection_progress_flags) == 0)
                     return 0;
             }
         }
     }
     linked_index = *(s32 *)(vars + 0x50);
     if (linked_index != -1) {
-        item_id = *(u16 *)((linked_index << 8) + (s32)D_L09_001B285C + 0xB2);
-        if (D_L09_0021E9F0.spent[(s16)item_id] == 0) {
-            s32 flags = D_0019B4A8[((s16)item_id >> 1) + (g_current_map_index << 10)];
+        item_id = *(u16 *)((linked_index << 8) + (s32)g_moby_record_table + 0xB2);
+        if (g_dobbo_flags.spent[(s16)item_id] == 0) {
+            s32 flags = g_moby_nibble_table[((s16)item_id >> 1) + (g_current_map_index << 10)];
             if (item_id & 1)
                 flags = (flags >> 4) & 7;
             else
@@ -439,12 +439,12 @@ s32 dobbo_release_linked_if_ready(char *moby) {
     none = -1;
     linked_index = *(s32 *)(vars + 0x64);
     if (linked_index != none) {
-        func_30C790((linked_index << 8) + D_L09_001B285C);
+        func_30C790((linked_index << 8) + g_moby_record_table);
         *(s32 *)(vars + 0x64) = none;
     }
     linked_index = *(s32 *)(vars + 0x68);
     if (linked_index != none) {
-        func_30C790((linked_index << 8) + D_L09_001B285C);
+        func_30C790((linked_index << 8) + g_moby_record_table);
         *(s32 *)(vars + 0x68) = none;
     }
     dobbo_release_linked(moby);

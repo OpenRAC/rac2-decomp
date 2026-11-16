@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int PickupQuad __attribute__((mode(TI)));
-extern u8 D_L08_0021EAF0[];
-extern u8 D_0019B4A8[];
+extern u8 g_moby_spawn_state_flags_b[];
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index[] __attribute__((sda));
 /* Partial resident view through the last state field read here. */
 typedef struct {
@@ -16,13 +16,13 @@ typedef struct {
 } ResidentPrefix;
 extern ResidentPrefix g_hero_state;
 typedef struct { int duration; int timer; float progress; } PickupState;
-extern int D_00138320[];
-extern float D_L08_001B031C __attribute__((sda));
-extern float D_L08_001B0324 __attribute__((sda));
-extern float D_L08_001B032C __attribute__((sda));
-extern float D_L08_001B0330 __attribute__((sda));
-extern float D_L08_001B0334 __attribute__((sda));
-extern int D_L08_001B0370 __attribute__((sda));
+extern int g_pad_pressed_flags[];
+extern float g_hud_l08_bar_threshold __attribute__((sda));
+extern float g_raritanium_pickup_blend __attribute__((sda));
+extern float g_raritanium_pickup_start_progress __attribute__((sda));
+extern float g_raritanium_pickup_drain_scale __attribute__((sda));
+extern float g_pickup_pull_scale __attribute__((sda));
+extern int g_raritanium_pickup_timer __attribute__((sda));
 extern void anim_start_blended(u8 *object, int bank, int anim, int frames);
 extern float coll_probe_ground_height_below(void *position, int flags, float distance);
 extern float vec_distance_xy(void *a, void *b);
@@ -51,9 +51,9 @@ void raritanium_pickup_update(u8 *object)
         pickup_id = *(unsigned short *)(object + 0xb2);
         {
         int saved_bits;
-        if (((Hist *)D_L08_0021EAF0)->x[(short)pickup_id])
+        if (((Hist *)g_moby_spawn_state_flags_b)->x[(short)pickup_id])
             goto kill;
-        saved_bits = D_0019B4A8[((short)pickup_id >> 1) + (g_current_map_index[0] << 10)];
+        saved_bits = g_moby_nibble_table[((short)pickup_id >> 1) + (g_current_map_index[0] << 10)];
         if (pickup_id & 1) { if ((saved_bits >> 4) & 7) goto kill; }
         else if (saved_bits & 7) goto kill;
         }
@@ -87,7 +87,7 @@ void raritanium_pickup_update(u8 *object)
             *(float *)(vehicle_vars + 0x68) = value;
             *(u8 **)(vehicle_vars + 0x6c) = object;
         }
-        if (!(value < D_L08_001B031C) || !(*D_00138320 & 0x80))
+        if (!(value < g_hud_l08_bar_threshold) || !(*g_pad_pressed_flags & 0x80))
             return;
         { u8 *activeVehicle = g_hero_state.vehicle;
         if (activeVehicle == 0 || (activeVehicle[0x42] != 2 && activeVehicle[0x43] != 2))
@@ -95,16 +95,16 @@ void raritanium_pickup_update(u8 *object)
         FastVecSub(pull, &g_hero_state.position, object + 0x10);
         FastVecScale(pull, pull, 0.1f);
         pull[2] = 0;
-        vec_fast_divide_helper(pull, pull, D_L08_001B0334 * 0.0166666675f);
+        vec_fast_divide_helper(pull, pull, g_pickup_pull_scale * 0.0166666675f);
         FastVecAdd(object + 0x10, object + 0x10, pull);
         if (!math_fast_float_d(&vars->timer))
             return;
         ((VData *)vehicle_vars)->lock = 180;
-        vars->timer = D_L08_001B0370;
+        vars->timer = g_raritanium_pickup_timer;
         qcopy(object + 0x10, &g_hero_state.position);
         ((OView *)object)->held = 1;
         ((OView *)object)->flags = (((OView *)object)->flags & 0xfffe) | 0x800;
-        vars->progress = D_L08_001B032C;
+        vars->progress = g_raritanium_pickup_start_progress;
         if (object[0x43] != 1)
             anim_start_blended(object, 1, 0, 30);
         ((OView *)object)->scale = vars->progress * 2.0f;
@@ -114,12 +114,12 @@ void raritanium_pickup_update(u8 *object)
     case 2: {
         float value;
         value = vars->progress;
-        value += (1.0f - value) * D_L08_001B0324;
+        value += (1.0f - value) * g_raritanium_pickup_blend;
         vars->progress = value;
         *(float *)(object + 0x48) = value * 2.0f;
         qcopy(object + 0x10, &g_hero_state.position);
         if (math_fast_float_d(&vars->timer) || *(float *)(object + 0x2c) <= 0.0f) {
-            drain_step = D_L08_001B0330 * *(float *)(*(u8 **)(object + 0x24) + 0x24);
+            drain_step = g_raritanium_pickup_drain_scale * *(float *)(*(u8 **)(object + 0x24) + 0x24);
             if (drain_step < *(float *)(object + 0x2c) || g_hero_state.world == 20 ||
                 g_hero_state.world == 25 ||
                 g_hero_state.mode == 0x39 ||
@@ -129,11 +129,11 @@ void raritanium_pickup_update(u8 *object)
                 g_current_map_index[3]++;
                 { unsigned short pickup_id2 = *(unsigned short *)(object + 0xb2);
                 if (pickup_id2 & 1) {
-                    u8 *saved_byte = &D_0019B4A8[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
+                    u8 *saved_byte = &g_moby_nibble_table[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
                     if (((*saved_byte >> 4) & 7) != 7)
                         *saved_byte += 16;
                 } else {
-                    u8 *saved_byte = &D_0019B4A8[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
+                    u8 *saved_byte = &g_moby_nibble_table[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
                     if ((*saved_byte & 7) != 7)
                         (*saved_byte)++;
                 } }

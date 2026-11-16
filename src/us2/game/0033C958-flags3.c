@@ -2,16 +2,16 @@
 #include "names.h"
 
 typedef struct { int ids[2]; } SolTextPair2;
-extern SolTextPair2 D_L00_001AE110;
-extern char D_L00_001AE118[];
-extern unsigned char D_001A7B94 __attribute__((sda));
-extern unsigned char D_001A7B95 __attribute__((sda));
-extern void func_US2_0033BF90(void *);
+extern SolTextPair2 g_toggle_menu_text_pair;
+extern char g_str_toggle_menu_format[];
+extern unsigned char g_subtitles_option __attribute__((sda));
+extern unsigned char g_toggle_option_a __attribute__((sda));
+extern void prompt_bar_draw_us2(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
-void func_US2_0033DC68(char *object)
+void two_toggle_a_draw_us2(char *object)
 {
     char buffer[128];
     SolTextPair2 pair;
@@ -21,24 +21,24 @@ void func_US2_0033DC68(char *object)
     char *format;
     int color;
 
-    func_US2_0033BF90(object + 8);
+    prompt_bar_draw_us2(object + 8);
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x2C75);
-    second = GetLocalizedString(pair.ids[D_001A7B95 != 0]);
+    second = GetLocalizedString(pair.ids[g_toggle_option_a != 0]);
     sprintf(buffer, format, first, second);
     text_draw_centered_small(0x100, 0x96, color, buffer, -1);
 
     color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
     label = GetLocalizedString(0x2C74);
-    second = GetLocalizedString(pair.ids[D_001A7B94 != 0]);
+    second = GetLocalizedString(pair.ids[g_subtitles_option != 0]);
     sprintf(buffer, format, label, second);
     text_draw_centered_small(0x100, 0xBE, color, buffer, -1);
 }
 
-extern unsigned char D_001A7BB3 __attribute__((sda));
-extern unsigned char D_001A7BB2 __attribute__((sda));
+extern unsigned char g_weapon_wheel_enabled __attribute__((sda));
+extern unsigned char g_option_toggle_b __attribute__((sda));
 extern void gfx_enable_screen_flag(void);
 extern void gfx_disable_screen_flag(void);
 
@@ -55,25 +55,25 @@ void func_US2_0033E9B8(char *object)
     char *format;
     int color;
 
-    func_US2_0033BF90(object + 8);
+    prompt_bar_draw_us2(object + 8);
     gfx_disable_screen_flag();
     color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x2C30);
-    second = GetLocalizedString(pair.ids[D_001A7BB2 != 0]);
+    second = GetLocalizedString(pair.ids[g_option_toggle_b != 0]);
     sprintf(buffer, format, first, second);
     text_draw_centered_small(0x100, 0x96, color, buffer, -1);
 
     color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
     label = GetLocalizedString(0x3079);
-    second = GetLocalizedString(pair.ids[D_001A7BB3 != 0]);
+    second = GetLocalizedString(pair.ids[g_weapon_wheel_enabled != 0]);
     sprintf(buffer, format, label, second);
     text_draw_centered_small(0x100, 0xBE, color, buffer, -1);
     gfx_enable_screen_flag();
 }
 
-extern void func_US2_0033BF90();
+extern void prompt_bar_draw_us2();
 extern int DrawMenuPreviewImage();
 extern void func_US2_003378A0();
 extern void hud_draw_colored_quad_widget();
@@ -83,7 +83,7 @@ extern void func_US2_0033FDD8();
 /* Forwards one object pointer, eight pointer-plus-constant arguments and a null to ten calls in a fixed order. */
 void func_US2_0033FEF8(char *p)
 {
-    func_US2_0033BF90(p + 8);
+    prompt_bar_draw_us2(p + 8);
     DrawMenuPreviewImage(0);
     func_US2_003378A0(p + 792);
     func_US2_003378A0(p + 880);

@@ -7,7 +7,7 @@
 extern void *part_alloc(int kind);
 extern int FloatToInt(float f);
 extern int func_001163B0(void);
-extern unsigned char *D_001F2594;
+extern unsigned char *g_part_tex_trailing_spark;
 
 
 /* Creates a spark particle that leaves a short trail of copies behind it. It returns the new particle, or 0 when there is no life to give it. */
@@ -30,7 +30,7 @@ void *part_spawn_trailing_spark(void *position, void *velocity, int color, int c
         *(unsigned char *)((char *)particle + 9) = (unsigned char)(variation - 0x60);
         *(unsigned char *)((char *)particle + 8) = (unsigned char)func_001163B0();
         motion = (char *)particle + 0x20;
-        *(unsigned char *)((char *)particle + 2) = *D_001F2594;
+        *(unsigned char *)((char *)particle + 2) = *g_part_tex_trailing_spark;
         *(short *)((char *)particle + 0xA) = life;
         *(short *)(motion + 0x18) = life;
         *(float *)(motion + 0x1C) = size;

@@ -43,7 +43,7 @@ typedef struct {
 
 extern Hero g_hero_state;
 extern Collision g_collision_hit;
-extern Moby *D_001B1B68 __attribute__((sda));   /* the first moby of the moby list */
+extern Moby *g_moby_list_head __attribute__((sda));   /* the first moby of the moby list */
 
 extern float math_random_float_range(float min, float max);
 extern void FastVecAdd(void *out, void *a, void *b);
@@ -88,7 +88,7 @@ void thrown_item_launch(float *position, Moby *self, float *velocity)
     count = 0;
     oldest = 0;
     oldestFrame = 0;
-    for (moby = D_001B1B68; moby != 0; moby = moby->next) {
+    for (moby = g_moby_list_head; moby != 0; moby = moby->next) {
         /* Grouped to the right: left to right, the two state tests fold into a range check. */
         if (moby->state == 0xFE ||
             (moby->state == 0xFD || (moby->oClass != self->oClass || moby == self)))

@@ -111,9 +111,9 @@ extern Src_F66766f2b *CreateMoby(short);
 
 extern void func_0029F338_3(void *object);
 
-extern u8 D_L00_00268E20;
+extern u8 g_level_slot_table;
 
-extern s32 D_L00_001A902C __attribute__((sda));
+extern s32 g_double_buffer_index __attribute__((sda));
 
 extern f32 func_00283198_4(f32);
 
@@ -149,7 +149,7 @@ extern void FastVecScale(void *, void *, float);
 
 extern void cam_compute_view_direction(char *, char *, int);
 
-extern int D_001A8FF0;
+extern int g_hero_height_zone_active;
 
 extern void vec_copy_helper_a(void *);
 
@@ -161,7 +161,7 @@ extern void mat_align_to_dir(void *, void *, void *);
 
 extern void func_0029CC50(void);
 
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 
 extern int func_L00_003269F0(void);
 
@@ -567,7 +567,7 @@ int level_try_spend_counter(int amount) {
 
     if (func_L00_003269F0() < amount)
         return 0;
-    counters = D_001395B8;
+    counters = g_game_flag_table;
     counters[0x90] = counters[0x90] + amount;
     return 1;
 }
@@ -593,10 +593,10 @@ void moby_set_flag_bit(unsigned char *object, int enable) {
 
 /* Clears every entry in a big table of slots so each one is empty. */
 void level_clear_slot_table(void) {
-    u8 *slot = &D_L00_00268E20;
+    u8 *slot = &g_level_slot_table;
     u8 *limit = slot + 0x14860;
 
-    D_L00_001A902C = 0;
+    g_double_buffer_index = 0;
     do {
         *(s32 *)(slot + 4) = -1;
         *(s32 *)slot = 0;

@@ -6,7 +6,7 @@ extern void Fc10c1216_FUN_002B9180(char *);
 extern int Fc10c1216_FUN_00283CF0(float);
 extern void Fc10c1216_FUN_00282CC0(char *, char *, char *);
 
-void func_PAL_002BF6A0(char *p)
+void part_update_glow_pulse_pal(char *p)
 {
     float *q = (float *)(p + 32);
 

@@ -10,7 +10,7 @@ extern unsigned int ref_L00_0036F480_00(void);
 extern void game_reset_frame_counters(void);
 extern int UpdateSoundVoices();
 extern L00_0037F7E8_u8 *func_002A08A0(void);
-extern L00_0037F7E8_u8 *D_L00_001B1EA8 __attribute__((sda));
+extern L00_0037F7E8_u8 *g_moby_l00_list_head __attribute__((sda));
 extern void func_002A05A8(char *);
 extern void func_002A0F48(void *);
 extern void hero_l00_update_frame_2(void);
@@ -34,7 +34,7 @@ typedef struct L00_0037F7E8_Object {
 extern int ref_L00_001A8F00_00 __attribute__((sda));
 extern L00_0037F7E8_u8 ref_L00_001B267C_00[] __attribute__((sda));
 
-void func_US2_L00_00380C50(void)
+void moby_update_level_objects_us2(void)
 {
     L00_0037F7E8_u8 *head;
     L00_0037F7E8_Object *object;
@@ -49,7 +49,7 @@ void func_US2_L00_00380C50(void)
         return;
     game_reset_frame_counters();
     UpdateSoundVoices();
-    D_L00_001B1EA8 = head = func_002A08A0();
+    g_moby_l00_list_head = head = func_002A08A0();
     object = (L00_0037F7E8_Object *)head;
     if (object != 0) {
         while (object != 0) {

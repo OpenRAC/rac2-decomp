@@ -68,8 +68,8 @@ extern int FloatToInt(f32);
 extern f32 func_3278F0(f32, f32);
 extern void func_2F9DF0(void *, void *, void *);
 extern void vehicle_compute_height_limits(Ent *);
-extern int D_L08_001B2508[] __attribute__((sda));
-extern void *D_L08_001FE7C0[];
+extern int g_frame_l08_counter[] __attribute__((sda));
+extern void *g_path_list_table[];
 extern float coll_point_depth_in_volumes(void *, int, int, int, int);
 extern float path_l01_compute_segment_lengths(void *);
 extern void anim_start_blended(void *, int, int, int);
@@ -84,7 +84,7 @@ void sandfly_init(u8 *object)
     state->f48 = FloatToInt(15.0f);
     state->f4A = FloatToInt(3.2f);
     state->f29 = 1;
-    if (!D_L08_001B2508[0]) **(int **)((char *)state+0x1CC)=0;
+    if (!g_frame_l08_counter[0]) **(int **)((char *)state+0x1CC)=0;
     qcopy((char *)state+0x150,object+0x10);
     vehicle_compute_height_limits((Ent *)object);
     *(float *)(object+0x18)=state->f1B0;
@@ -97,7 +97,7 @@ void sandfly_init(u8 *object)
     *(V4 *)position=*(V4 *)(object+0x10);
     radius=coll_point_depth_in_volumes(position,state->f19C,state->f1A4,state->f1A0,-1);
     if(radius>0) state->f188=FloatToInt(radius+2.0f);
-    if(state->f1A8!=-1) path_l01_compute_segment_lengths(D_L08_001FE7C0[state->f1A8]);
+    if(state->f1A8!=-1) path_l01_compute_segment_lengths(g_path_list_table[state->f1A8]);
     *(void **)((char *)state+0x10)=(char *)state+0x50;
     state->f60=9; state->f98=-1;
     state->f88=0; state->f6A=0;

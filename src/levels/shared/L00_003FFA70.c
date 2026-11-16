@@ -23,7 +23,7 @@ extern void func_0029F338_4(char *arg);
 
 extern char D_00189EA0_2[];
 
-extern unsigned char D_001A7B2E __attribute__((sda));
+extern unsigned char g_action_flag __attribute__((sda));
 
 /* two-state update on a record: state 0 marks a byte with 255 and either runs a shared two-call teardown when a global latch byte is set and a sub-object field is non-zero, or plays a mode/value pair plus a call; state 1 runs a setup call and two float queries against a stored table and, when both are below 2.0, plays three fixed calls and either tears down or writes 120 into a sub-object field */
 /* Updates the Charge Boots pickup (moby class 3696): when Ratchet walks up to it, the pickup sound plays and it is collected. */
@@ -35,7 +35,7 @@ void charge_boots_pickup_update(char *arg)
     switch (state) {
     case 0:
         *(unsigned char *)(arg + 48) = 255;
-        if (D_001A7B2E != 0 && object[17] != 0) {
+        if (g_action_flag != 0 && object[17] != 0) {
             func_0029F338_4((char *)object[17]);
             func_0029F338_4(arg);
             return;
@@ -83,7 +83,7 @@ void charge_boots_pickup_update(char *arg)
 
 extern void part_draw_spinning_billboard_pair(void *obj, float f, void *p, void *q);
 typedef struct __attribute__((packed)) { unsigned char b[8]; } Blob8;
-extern Blob8 D_L00_001B0DB8 __attribute__((nosda));
+extern Blob8 g_object_effect_blob __attribute__((nosda));
 
 /* Passes the object to a shared effect routine when it has been set up, with an extra value when a second field is set. */
 void object_run_effect_if_active(char *arg)
@@ -93,7 +93,7 @@ void object_run_effect_if_active(char *arg)
         if (o[11] == 0) {
             part_draw_spinning_billboard_pair(o, 1.0f, (char *)o + 16, 0);
         } else {
-            Blob8 tmp = D_L00_001B0DB8;
+            Blob8 tmp = g_object_effect_blob;
             part_draw_spinning_billboard_pair(o, 1.0f, (char *)o + 16, &tmp);
         }
     }
@@ -103,9 +103,9 @@ void object_run_effect_if_active(char *arg)
 
 /* func_L00_00403730 is defined in L00_00403730.c. */
 
-extern int D_L00_001B2C6C __attribute__((nosda));
+extern int g_sheep_active_list_last __attribute__((nosda));
 
-extern int D_L00_001B2C30[] __attribute__((sda));
+extern int g_sheep_active_list[] __attribute__((sda));
 
 /* clears the 16 words ending at D_L00_001B2C6C, from the top down */
 /* Empties the list of 16 active sheep. */
@@ -114,7 +114,7 @@ void sheep_clear_active_list(void)
     int i;
 
     for (i = 15; i >= 0; i--)
-        D_L00_001B2C30[i] = 0;
+        g_sheep_active_list[i] = 0;
 }
 
 /* true when none of the 16 words is zero */
@@ -124,7 +124,7 @@ int sheep_is_active_list_full(void)
     int i;
 
     for (i = 0; i < 16; i++) {
-        if (D_L00_001B2C30[i] == 0)
+        if (g_sheep_active_list[i] == 0)
             return 0;
     }
     return 1;
@@ -204,7 +204,7 @@ void sheep_shot_spawn_hit_sparks(float *pos, int unused, int mode)
 
 /* func_L00_00404B48 is defined in L00_00404B48-g8.c. */
 
-extern TI128 D_L00_001BF220;
+extern TI128 g_hero_l00_position;
 extern void func_00310440(char *arg);
 extern int func_002DE4B0(void *a, void *b, int c, void *d, int e);
 extern void func_0035F450(int a, int b, void *c, int d);

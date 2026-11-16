@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L02_001B01E0 __attribute__((sda));
-extern int D_L02_001FF6B8[];
+extern int g_chainblade_story_active __attribute__((sda));
+extern int g_boss_damage_totals[];
 extern float g_camera_l02_position[4];
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
@@ -21,7 +21,7 @@ void chainblade_handle_hits(char *self) {
     char *damage;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
-        D_L02_001B01E0 = 1;
+        g_chainblade_story_active = 1;
         *(unsigned char *)(state + 0x48) = FloatToInt(15.0f);
         *(unsigned char *)(state + 0x4A) = FloatToInt(24.0f);
         *(unsigned char *)(state + 0xD7) = 1;
@@ -66,7 +66,7 @@ void chainblade_handle_hits(char *self) {
                         *(float *)(damage + 0x2C) *= 0.3f;
                 }
             }
-            D_L02_001FF6B8[*(unsigned char *)(state + 0x37)] += (int)(*(float *)(damage + 0x2C) * 32.0f);
+            g_boss_damage_totals[*(unsigned char *)(state + 0x37)] += (int)(*(float *)(damage + 0x2C) * 32.0f);
         }
         if (moby_apply_damage_to_object(self, state + 0x60, 0)) {
             if (*(int *)(self + 0x98) == 0)
@@ -74,7 +74,7 @@ void chainblade_handle_hits(char *self) {
             {
                 char *source = *(char **)(state + 0x38);
                 if (source && *(short *)(source + 0xAA) != 0x47 /* moby class 71 */ && *(short *)(source + 0xAA) != 0)
-                    D_L02_001B01E0 = 0;
+                    g_chainblade_story_active = 0;
             }
             if (*(unsigned char *)(self + 0x95) == 4) {
                 if (*(unsigned char *)(self + 0x43) != 16)

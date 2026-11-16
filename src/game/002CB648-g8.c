@@ -1,9 +1,9 @@
 #include "names.h"
 typedef struct { int count, selection; int *strings; int enabled[25]; } MenuList_2CB648;
-extern MenuList_2CB648 D_00210A40;
-extern char D_001AB900[];
-extern int D_001AB8F4 __attribute__((sda));
-extern int D_001AB8F8 __attribute__((sda));
+extern MenuList_2CB648 g_pause_cinema_controller;
+extern char g_str_level_select_row_fmt[];
+extern int g_level_select_row_height __attribute__((sda));
+extern int g_level_select_list_top __attribute__((sda));
 extern void gfx_set_clear_color_packet(int, int, int, int);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
@@ -23,19 +23,19 @@ void menu_draw_level_select_list(void)
     int *item;
     text[255] = 0;
     gfx_set_clear_color_packet(0, 0, 0, 0x60);
-    for (; i <= D_00210A40.count * 2; i += 2, entry++) {
-        list = &D_00210A40;
+    for (; i <= g_pause_cinema_controller.count * 2; i += 2, entry++) {
+        list = &g_pause_cinema_controller;
         item = list->enabled + entry;
         if (*item) {
             row = entry == 24 ? 36 : i;
             first = GetLocalizedString(list->strings[i + 1]);
-            sprintf(text, D_001AB900, first, GetLocalizedString(list->strings[i]));
-            gfx_draw_rounded_box(D_001AB8F8 + row * D_001AB8F4,
-                         D_001AB8F8 + row * D_001AB8F4 + 15,
+            sprintf(text, g_str_level_select_row_fmt, first, GetLocalizedString(list->strings[i]));
+            gfx_draw_rounded_box(g_level_select_list_top + row * g_level_select_row_height,
+                         g_level_select_list_top + row * g_level_select_row_height + 15,
                          64, 448, 96, 0x442D00);
             colour = list->selection == entry ? 0x80FFDE8D : 0x80808080;
             if (*item == 0) colour = 0x80000000;
-            text_draw_centered_small(256, D_001AB8F8 + row * D_001AB8F4, (unsigned long)colour, text, -1);
+            text_draw_centered_small(256, g_level_select_list_top + row * g_level_select_row_height, (unsigned long)colour, text, -1);
         }
     }
 }

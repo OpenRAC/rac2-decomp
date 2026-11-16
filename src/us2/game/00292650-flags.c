@@ -16,27 +16,27 @@ typedef struct {
     short format;
 } Entry_001B9740;
 
-extern int D_001B1600 __attribute__((sda));
-extern Entry_001B9740 D_001B9740[];
+extern int g_gfx_entry_count __attribute__((sda));
+extern Entry_001B9740 g_texture_upload_params[];
 extern int log2dim(int);
 extern int subtract_integer_with_clamp(int);
 
 void func_US2_00292650(int *p, int count) {
-    for (D_001B1600 = 0; D_001B1600 < count; D_001B1600++) {
+    for (g_gfx_entry_count = 0; g_gfx_entry_count < count; g_gfx_entry_count++) {
         int w0 = *p++;
         int w1 = *p++;
         int w2 = *p++;
         int w3 = *p++;
-        D_001B9740[D_001B1600].palette = w0 >> 4;
-        D_001B9740[D_001B1600].image = w1 >> 4;
-        D_001B9740[D_001B1600].format = 0x13;
+        g_texture_upload_params[g_gfx_entry_count].palette = w0 >> 4;
+        g_texture_upload_params[g_gfx_entry_count].image = w1 >> 4;
+        g_texture_upload_params[g_gfx_entry_count].format = 0x13;
         if (w2 < 0) {
-            D_001B9740[D_001B1600].format = 0x14;
+            g_texture_upload_params[g_gfx_entry_count].format = 0x14;
             w2 = subtract_integer_with_clamp(w2);
             w3 = subtract_integer_with_clamp(w3);
         }
-        D_001B9740[D_001B1600].width = log2dim(w2);
-        D_001B9740[D_001B1600].height = log2dim(w3);
-        D_001B9740[D_001B1600].head.clear = 0;
+        g_texture_upload_params[g_gfx_entry_count].width = log2dim(w2);
+        g_texture_upload_params[g_gfx_entry_count].height = log2dim(w3);
+        g_texture_upload_params[g_gfx_entry_count].head.clear = 0;
     }
 }

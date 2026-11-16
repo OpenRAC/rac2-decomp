@@ -9,7 +9,7 @@ typedef struct {
 } ResidentState;
 extern ResidentState g_hero_state;
 extern u8 g_hero_position[];
-extern void *D_L00_001B8E14;
+extern void *g_camera_control_ptr;
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -33,7 +33,7 @@ void cam_build_basis_from_hero(u8 *owner)
     else
         FastVecScale(&scaled, &direction, 1.6f);
     FastVecAdd(owner + 0x30, g_hero_position, &scaled);
-    basis = D_L00_001B8E14;
+    basis = g_camera_control_ptr;
     qcopy(owner + 0x20, &direction);
     FastVecCross(owner + 0x10, basis, &direction);
     vec_scale_to_length(owner + 0x10, owner + 0x10, 1.0f);

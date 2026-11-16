@@ -19,7 +19,7 @@ extern f32 func_00313F98(f32, f32);
 extern f32 func_00313F38(f32, f32);
 extern void func_002D4CC8(char *, s32, s32, s32, char *, char *, char *, s32, f32, f32);
 extern void func_003140C0(char *, f32, f32);
-extern char D_001B9B00[];
+extern char g_turret_debris_vectors[];
 
 /* lays the object's ten measurement points out along a ring and asks the engine to arm them */
 void turret_explode_into_debris(char *moby) {
@@ -30,7 +30,7 @@ void turret_explode_into_debris(char *moby) {
     s16 classId;
     s32 i;
 
-    func_002E74B8(buf0, D_001B9B00, moby + 0x10);
+    func_002E74B8(buf0, g_turret_debris_vectors, moby + 0x10);
     func_002E7788(buf0, buf0, 1.0f);
     func_003E9FF0(moby, moby + 0x10, buf0, 0.0f);
     func_00357288(0, 0, moby);

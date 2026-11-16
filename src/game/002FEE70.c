@@ -21,10 +21,10 @@ typedef struct {
     char reserved34A[0x1F46];
     char *object;
 } SteeringHeroPrefix;
-extern SteeringEffectSlot D_002212E0[];
+extern SteeringEffectSlot g_effect_slot_table[];
 extern SteeringHeroPrefix g_hero_state;
-extern int D_001A8CA0 MACRO_ADDR;
-extern int D_001A8CA4 MACRO_ADDR;
+extern int g_ground_check_inhibit MACRO_ADDR;
+extern int g_hero_effect_inhibit MACRO_ADDR;
 /* The same mode word is read absolutely at the guards and through GP when
  * selecting the coefficient; this explicit view keeps the canonical storage. */
 extern int D_001A8CA4_gp SDATA(D_001A8CA4) __attribute__((sda));
@@ -53,10 +53,10 @@ void part_steer_effect_direction(int index, float *direction, void *position)
     int mode;
     if (index < 0)
         return;
-    mode = D_001A8CA0;
-    if (!mode && !D_001A8CA4 && !g_hero_state.attached)
+    mode = g_ground_check_inhibit;
+    if (!mode && !g_hero_effect_inhibit && !g_hero_state.attached)
         return;
-    effect = &D_002212E0[index];
+    effect = &g_effect_slot_table[index];
     weight = 1.0f;
     if (position) {
         qcopy(origin, position);
@@ -79,7 +79,7 @@ void part_steer_effect_direction(int index, float *direction, void *position)
     savedW = direction[3];
     direction[3] = 0.0f;
     length = FastVecLength(direction);
-    if (g_hero_state.attached && !D_001A8CA4)
+    if (g_hero_state.attached && !g_hero_effect_inhibit)
         qcopy(effect->basis, g_hero_state.object + 0xE0);
     else
         cam_compute_view_direction(origin, effect, 1);

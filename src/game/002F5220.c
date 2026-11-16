@@ -17,35 +17,35 @@ typedef struct { float x, y, z, w; } CameraVec_002F5AF8;
 typedef struct { char pad[0x370]; CameraVec_002F5AF8 rows[3]; } CameraBlock_002F5AF8;
 extern void UpdateViewContext(void);
 
-extern int D_L05_001B1FC8;
+extern int g_frame_counter_a;
 
-extern int D_L05_001B1FD0;
+extern int g_frame_counter_c;
 
-extern int D_L05_001B1FD4;
+extern int g_frame_counter_d;
 
-extern int D_L05_001B1FCC;
+extern int g_frame_counter_b;
 
-extern int D_L05_001B1FF8;
+extern int g_frame_counter_e;
 
-extern int D_L05_001B1FFC;
+extern int g_frame_counter_f;
 
-extern int D_L05_001A8F00;
+extern int g_game_mode_a;
 
-extern int D_L05_001A8F08;
+extern int g_game_mode_b;
 
-extern unsigned char D_0018C0D4[];
+extern unsigned char g_screen_mode_flag[];
 
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 
-extern short D_L05_001B225C;
+extern short g_frame_counter_short_a;
 
-extern short D_L05_001B225E;
+extern short g_frame_counter_short_b;
 
-extern short D_L05_001B2260;
+extern short g_frame_counter_short_c;
 
-extern short D_L05_001B2262;
+extern short g_frame_counter_short_d;
 
-extern short D_L05_001B2264;
+extern short g_collectible_flags;
 
 #ifndef RAC2_T_F32_F2144BF3D
 #define RAC2_T_F32_F2144BF3D
@@ -74,21 +74,21 @@ typedef struct {
 
 extern char g_pad_state[];
 
-extern s32_F2144bf3d D_0018D198[];
+extern s32_F2144bf3d g_level_idle_frame_counts[];
 
-extern s32_F2144bf3d D_L06_001AD3A0 __attribute__((sda));
+extern s32_F2144bf3d g_idle_frame_counter __attribute__((sda));
 
-extern s32_F2144bf3d D_001A7390;
+extern s32_F2144bf3d g_frame_counter;
 
 extern s32_F2144bf3d g_current_map_index;
 
-extern s32_F2144bf3d D_L06_001B2348;
+extern s32_F2144bf3d g_game_l06_frame_counter;
 
-extern s32_F2144bf3d D_L06_001A8FC0;
+extern s32_F2144bf3d g_idle_counter_check;
 
-extern s32_F2144bf3d D_L06_001B2900;
+extern s32_F2144bf3d g_idle_frame_marker;
 
-extern s32_F2144bf3d D_L06_001AA0F0;
+extern s32_F2144bf3d g_idle_counter_reset;
 
 /* Clears a group of counters and, in one game mode while nothing else is going on, also clears
    five saved values. */
@@ -96,25 +96,25 @@ void game_reset_frame_counters(void)
 {
     unsigned char mode;
 
-    D_L05_001B1FC8 = 0;
-    mode = D_0018C0D4[0];
-    D_L05_001B1FD0 = 0;
-    D_L05_001B1FD4 = 0;
-    D_L05_001B1FCC = 0;
-    D_L05_001B1FF8 = 0;
-    D_L05_001B1FFC = 0;
+    g_frame_counter_a = 0;
+    mode = g_screen_mode_flag[0];
+    g_frame_counter_c = 0;
+    g_frame_counter_d = 0;
+    g_frame_counter_b = 0;
+    g_frame_counter_e = 0;
+    g_frame_counter_f = 0;
 
     if (mode == 1)
     {
-        if ((D_00138320[0] & 0x10) == 0)
+        if ((g_pad_pressed_flags[0] & 0x10) == 0)
         {
-            if (D_L05_001A8F00 != 4 && D_L05_001A8F08 != 4)
+            if (g_game_mode_a != 4 && g_game_mode_b != 4)
             {
-                D_L05_001B225C = 0;
-                D_L05_001B225E = 0;
-                D_L05_001B2260 = 0;
-                D_L05_001B2262 = 0;
-                D_L05_001B2264 = 0;
+                g_frame_counter_short_a = 0;
+                g_frame_counter_short_b = 0;
+                g_frame_counter_short_c = 0;
+                g_frame_counter_short_d = 0;
+                g_collectible_flags = 0;
             }
         }
     }
@@ -132,22 +132,22 @@ void game_update_idle_frame_counters(void)
     if (pad->f100 != 0.0f) goto mismatch;
     if (pad->f104 == 0.0f) goto match;
 mismatch:
-    D_L06_001AD3A0 = 0;
+    g_idle_frame_counter = 0;
     goto gated;
 match:
-    D_L06_001AD3A0 = D_L06_001AD3A0 + 1;
+    g_idle_frame_counter = g_idle_frame_counter + 1;
 gated:
-    D_L06_001B2348 = D_L06_001B2348 + 1;
-    D_001A7390 = D_001A7390 + 1;
+    g_game_l06_frame_counter = g_game_l06_frame_counter + 1;
+    g_frame_counter = g_frame_counter + 1;
 
-    if (D_L06_001A8FC0 != 0) {
-        if (D_L06_001AD3A0 < 900) {
-            D_0018D198[g_current_map_index] = D_0018D198[g_current_map_index] + 1;
+    if (g_idle_counter_check != 0) {
+        if (g_idle_frame_counter < 900) {
+            g_level_idle_frame_counts[g_current_map_index] = g_level_idle_frame_counts[g_current_map_index] + 1;
         }
     }
 
-    if (D_L06_001B2900 != D_001A7390 - 1) {
-        D_L06_001AA0F0 = -1;
+    if (g_idle_frame_marker != g_frame_counter - 1) {
+        g_idle_counter_reset = -1;
     }
 }
 
@@ -170,12 +170,12 @@ typedef struct {
 } Cam_2F5AF8;
 
 extern CamList_2F5AF8 g_scene_playback_state;
-extern CamView_2F5AF8 D_001B9040;
+extern CamView_2F5AF8 g_view_params;
 extern Cam_2F5AF8 g_active_camera;
-extern u8 D_001A7A40;
-extern f32 D_001A8C74;
-extern f32 D_001A8C78;
-extern f32 D_001B5360[12];
+extern u8 g_unlocked_item_flags;
+extern f32 g_cutscene_camera_scale;
+extern f32 g_cutscene_camera_blend;
+extern f32 g_camera_shake_states[12];
 extern void UpdateViewContext(void);
 extern void func_00129178(f32 *);
 extern void pad_vib_routine_f(f32 *, f32 *, f32);
@@ -200,9 +200,9 @@ u8 cutscene_apply_camera_key(void)
     w = rec->w0;
     kind = rec->kind;
     scale = w[3];
-    D_001B9040.scale = scale;
-    if (D_001A7A40 != 0)
-        D_001B9040.scale = scale * D_001A8C74;
+    g_view_params.scale = scale;
+    if (g_unlocked_item_flags != 0)
+        g_view_params.scale = scale * g_cutscene_camera_scale;
     UpdateViewContext();
     qcopy(g_active_camera.pos, rec);
     func_00129178(m);
@@ -218,27 +218,27 @@ u8 cutscene_apply_camera_key(void)
     g_active_camera.row0[2] = -m[10];
     g_active_camera.row1[2] = -m[2];
     g_active_camera.row2[2] = m[6];
-    if (D_001A7A40 != 0 && (k = D_001A8C78) != 0.0f) {
+    if (g_unlocked_item_flags != 0 && (k = g_cutscene_camera_blend) != 0.0f) {
         qcopy(t, g_active_camera.row0);
         vec_scale_to_length(t, t, k);
         FastVecSub(g_active_camera.pos, g_active_camera.pos, t);
     }
-    cam_update_shake(&D_001B5360[0], 0);
-    cam_update_shake(&D_001B5360[4], 1);
-    cam_update_shake(&D_001B5360[8], 2);
+    cam_update_shake(&g_camera_shake_states[0], 0);
+    cam_update_shake(&g_camera_shake_states[4], 1);
+    cam_update_shake(&g_camera_shake_states[8], 2);
     return kind;
 }
 
-extern int D_001A8C80[] __attribute__((sda));
-extern int D_001A8C84 __attribute__((sda));
+extern int g_cutscene_end_callback[] __attribute__((sda));
+extern int g_cutscene_end_callback_arg __attribute__((sda));
 
 /* Stores two values for later use. */
 void game_set_stored_value_pair(int first, int second) {
-    D_001A8C80[0] = first;
-    D_001A8C84 = second;
+    g_cutscene_end_callback[0] = first;
+    g_cutscene_end_callback_arg = second;
 }
 
-extern float D_001A8C7C __attribute__((sda));
+extern float g_mode_fade_scale __attribute__((sda));
 extern float g_screen_fade;
 extern void FadeToBlack(int);
 
@@ -246,7 +246,7 @@ extern void FadeToBlack(int);
    for the six-frame path. */
 void game_set_slowdown_factor(void)
 {
-    D_001A8C7C = 1.2f;
+    g_mode_fade_scale = 1.2f;
     if (g_screen_fade < 1.0f)
         FadeToBlack(6);
 }
@@ -254,13 +254,13 @@ void game_set_slowdown_factor(void)
 /* Returns true when either of the two mode variables is 2. */
 int game_is_either_mode_two(void)
 {
-    return D_L05_001A8F08 == 2 || D_L05_001A8F00 == 2;
+    return g_game_mode_b == 2 || g_game_mode_a == 2;
 }
 
 extern void mpeg_begin_movie_playback(int sector, int size, int file, int mode, int flag);
-extern int D_001B220C;
-extern int D_001BAD40[];
-extern unsigned char D_001A7BB4[] __attribute__((sda));
+extern int g_movie_size;
+extern int g_loader_movie[];
+extern unsigned char g_language[] __attribute__((sda));
 /* The table of contents read into 0x14B540: a base sector, then sector/size pairs, two per
    entry. The extent of the pairs is not known, so the buffer stays incomplete. */
 typedef struct { int sector; int size; } TocFile_002F5D40;
@@ -276,7 +276,7 @@ extern char g_copy_setup_data[];
    Marks n in the shared flag table (bit n & 0x1F of the word at n >> 2, below 0xB1) and
    passes the entry's second file (sector relative to the base, size), the entry itself,
    D_001A7BB4 or 0 when D_001BAD40[0] is set, and whether n is 0xBF. */
-extern int D_00139768[];
+extern int g_request_flag_table[];
 extern int cutscene_map_id_to_index(int);
 extern void req_mark_queued_in_flag_table(void *);
 
@@ -286,7 +286,7 @@ void mpeg_start_movie_from_toc(int n)
     int flag;
 
     if (n < 0) {
-        D_001B220C = 0;
+        g_movie_size = 0;
         return;
     }
     index = cutscene_map_id_to_index(n);
@@ -295,21 +295,21 @@ void mpeg_start_movie_from_toc(int n)
         flag = 1;
     if ((unsigned)n < 0xB1) {
         int mask = 1 << (n & 31);
-        D_00139768[(unsigned)n >> 2] |= mask;
+        g_request_flag_table[(unsigned)n >> 2] |= mask;
     }
-    req_mark_queued_in_flag_table(D_001BAD40);
+    req_mark_queued_in_flag_table(g_loader_movie);
     mpeg_begin_movie_playback(TOC_002F5D40->files[index * 2 + 1].sector + TOC_002F5D40->base,
                   TOC_002F5D40->files[index * 2 + 1].size,
                   (int)&TOC_002F5D40->files[index * 2],
-                  D_001BAD40[0] ? 0 : D_001A7BB4[0], flag);
+                  g_loader_movie[0] ? 0 : g_language[0], flag);
 }
 #undef TOC_002F5D40
 
 
-extern int D_001A7478;
-extern int D_001B221C;
+extern int g_loader_state_word;
+extern int g_movie_music_stream;
 extern unsigned char g_sound_state[];
-extern int D_001BAD78[];
+extern int g_movie_state_flags[];
 extern int g_requested_game_mode;
 extern void (*ref_L00_002F5EF8_00)(int);
 extern int ref_L00_002F5EF8_01;
@@ -320,20 +320,20 @@ extern void gfx_reset_packet_buffer(void);
 /* Runs when a movie ends: brings back the music and screen, then calls the waiting callback. */
 void mpeg_resume_after_movie(void)
 {
-    if (D_001A7478 == 2)
-        *(volatile int *)&D_001A7478 = 0;
+    if (g_loader_state_word == 2)
+        *(volatile int *)&g_loader_state_word = 0;
     FadeToBlack(4);
-    snd_start_music_stream_no_loop(D_001B221C, 1, 0x400);
+    snd_start_music_stream_no_loop(g_movie_music_stream, 1, 0x400);
     music_Unpause();
     g_sound_state[0x6B] |= 0x10;
     gfx_reset_packet_buffer();
-    if (ref_L00_002F5EF8_00 != 0 && D_001BAD78[0] == 0) {
+    if (ref_L00_002F5EF8_00 != 0 && g_movie_state_flags[0] == 0) {
         if (g_requested_game_mode == 2)
             goto done;
         if (g_requested_game_mode == 1)
             goto done;
         {
-            ref_L00_002F5EF8_00(D_001A8C84);
+            ref_L00_002F5EF8_00(g_cutscene_end_callback_arg);
             *(void (*volatile *)(int))&ref_L00_002F5EF8_00 = 0;
             *(volatile int *)&ref_L00_002F5EF8_01 = 0;
         }
@@ -363,7 +363,7 @@ extern int ref_L00_002F5FB8_13 __attribute__((sda));
 extern int ref_L00_002F5FB8_14 __attribute__((sda));
 extern int ref_L00_002F5FB8_16[];
 extern int g_memcard_state[];
-extern char D_001339B0[];
+extern char g_str_movie_name[];
 extern void func_0029CC98(int, int);
 extern void req_flush_queue(void *);
 extern int request_end_slot(int,int);
@@ -469,7 +469,7 @@ void mpeg_play_movie(void)
         if (done) break;
     }
     snd_CheckLoadInProgress(0);
-    func_00126DC0(D_001339B0);
+    func_00126DC0(g_str_movie_name);
     gfx_wait_paths_idle(0,0);
     slot = &ref_L00_002F5FB8_07[textureIndex];
     sceGsExecLoadImage(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);
@@ -535,21 +535,21 @@ int GetSelectedShopItemPrice(void)
 }
 
 
-extern unsigned char D_001A7AB8[] MACRO_ADDR;
+extern unsigned char g_movie_channel_flags[] MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern unsigned char D_001A7A80[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
 typedef struct { int active; char pad4[0x10]; int info; char pad18[0x80]; int channels[3]; char padA4[0x3C]; } F73Record;
 extern F73Record g_weapon_table[];
 typedef struct { char pad[0x140]; int rows[96][4]; int count; } F73StateType;
 extern F73StateType D_0021F240_rows __asm__("D_0021F240");
 extern int shop_row_field_matches_value(int owner, int key, int channel);
 extern int flag_is_byte_set(void);
-extern int D_L00_0022FF00[];
+extern int g_movie_state_words[];
 
 /* Works out which weapon upgrades can be bought and adds a row to the shop list for each one. */
 void BuildShopChannelList(void)
 {
-    D_L00_0022FF00[0] = 0;
+    g_movie_state_words[0] = 0;
     {
         int key, channel, available;
         for (key = 0; key < 56; key++) {
@@ -567,7 +567,7 @@ void BuildShopChannelList(void)
                     if (!available) continue;
                     if (!flag_is_byte_set()) continue;
 mark_available:
-                    D_001A7AB8[key] |= 1 << channel;
+                    g_movie_channel_flags[key] |= 1 << channel;
                 }
             }
         }
@@ -582,7 +582,7 @@ mark_available:
             for (channel = 0; channel < 3; channel++) {
                 {
                     unsigned int mask = 1U << channel;
-                    if (!(D_001A7AB8[key] & mask)) continue;
+                    if (!(g_movie_channel_flags[key] & mask)) continue;
                 }
                 switch (channel) {
                 case 0: available = ((F73Record *)((char *)g_weapon_table + g_item_slot_to_record[key] * 224))->channels[0]; break;
@@ -593,7 +593,7 @@ mark_available:
                 if (!available) continue;
                 {
                     unsigned char mask = 1 << (channel * 2);
-                    if (D_001A7A80[key] & mask) continue;
+                    if (g_movie_seen_flags[key] & mask) continue;
                 }
                 D_0021F240_rows.rows[D_0021F240_rows.count][0] = channel;
                 {
@@ -617,10 +617,10 @@ mark_available:
 typedef struct { unsigned char pad0[0x3C]; char *destination; unsigned char pad1[0x24]; int clear; } Func_002F88D8State;
 extern Func_002F88D8State ref_L00_002F88D8_00;
 extern int sprintf(char *, const char *, ...);
-extern const char D_001AD2B8[];
+extern const char g_str_shop_message_format[];
 
 /* Puts a line of text into the shop's message box. */
-void shop_set_message_text(void *text) { sprintf(ref_L00_002F88D8_00.destination, D_001AD2B8, text); ref_L00_002F88D8_00.clear = 0; }
+void shop_set_message_text(void *text) { sprintf(ref_L00_002F88D8_00.destination, g_str_shop_message_format, text); ref_L00_002F88D8_00.clear = 0; }
 
 
 typedef unsigned int Quad_002F9198 __attribute__((mode(TI), aligned(16)));
@@ -629,23 +629,23 @@ typedef struct { int words[5]; } Five_002F9198;
 typedef struct { int state; char pad4[0x24]; char *moby; char pad2C[0x24]; int mode; char pad54[0xC]; int restore; char pad64[0x7C]; Quad_002F9198 saved; } Shop_002F9198;
 typedef struct { char *moby; char pad4[0x14]; int a; char pad1C[0x14]; int b; } HeroMenu_002F9198;
 extern Shop_002F9198 g_vendor_menu_state;
-extern char D_001B5350[];
+extern char g_shop_saved_state[];
 /* Its address is one `la` (assembler lui/addiu pair), not a split %hi/%lo: retail
    schedules the pair as one insn ahead of dst + 0x220. */
-extern Three_002F9198 D_001B2250 MACRO_ADDR;
-extern float D_001AD234 __attribute__((sda));
-extern float D_001AD238 __attribute__((sda));
-extern int D_001B2284, D_001B2288, D_001B228C, D_001B2290, D_001B2294, D_001B2298;
-extern int D_001AD230 __attribute__((sda));
-extern int D_001AD1B8 __attribute__((sda));
-extern unsigned short D_001AD1BC __attribute__((sda)), D_001AD1C0 __attribute__((sda));
+extern Three_002F9198 g_shop_preview_data MACRO_ADDR;
+extern float g_shop_zoom_a __attribute__((sda));
+extern float g_shop_zoom_b __attribute__((sda));
+extern int g_shop_color_r, g_shop_color_g, g_shop_color_b, g_shop_alt_color_r, g_shop_alt_color_g, g_shop_alt_color_b;
+extern int g_shop_sub_menu_flag __attribute__((sda));
+extern int g_shop_bolts_level_override __attribute__((sda));
+extern unsigned short g_shop_bolts_level_alt __attribute__((sda)), g_shop_saved_bolts_level __attribute__((sda));
 /* 0x40-byte block that func_002DE990 saves and restores whole. */
 typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
 extern Settings_002F9198 g_player_bolts MACRO_ADDR;
-extern Five_002F9198 D_001AD308;
+extern Five_002F9198 g_shop_close_table;
 extern HeroMenu_002F9198 g_hero_moby_default;
 extern int g_equipment_bits;
-extern unsigned short D_001A7AF2;
+extern unsigned short g_hero_texture_bits;
 extern void gfx_select_packet_buffer_setup(void);
 extern int PlayMobySound(int, int, void *);
 extern void tex_load_level_pack(int);
@@ -664,25 +664,25 @@ void shop_close_sub_menu(void)
     gfx_select_packet_buffer_setup();
     PlayMobySound(5, 17, s->moby);
     if (s->restore) {
-        qcopy(D_001B5350, &s->saved);
-        { Quad_002F9198 *dst = (Quad_002F9198 *)(D_001B5350 + 0x220);
-          Three_002F9198 *src = &D_001B2250;
+        qcopy(g_shop_saved_state, &s->saved);
+        { Quad_002F9198 *dst = (Quad_002F9198 *)(g_shop_saved_state + 0x220);
+          Three_002F9198 *src = &g_shop_preview_data;
           dst[0] = src->a; dst[1] = src->b; dst[2] = src->c; }
     }
     *(unsigned short *)(s->moby + 0x34) |= 0x100;
     g_vendor_menu_state.state = 2;
-    D_001AD234 = 1.0f;
-    D_001AD238 = 1.1f;
-    D_001AD230 = 0;
-    D_001B2290 = 0; D_001B2294 = 0; D_001B2298 = 0;
-    D_001B2284 = 96;
-    D_001B2288 = 96;
-    D_001B228C = 85;
+    g_shop_zoom_a = 1.0f;
+    g_shop_zoom_b = 1.1f;
+    g_shop_sub_menu_flag = 0;
+    g_shop_alt_color_r = 0; g_shop_alt_color_g = 0; g_shop_alt_color_b = 0;
+    g_shop_color_r = 96;
+    g_shop_color_g = 96;
+    g_shop_color_b = 85;
     if (g_vendor_menu_state.mode == 3) {
-        if (D_001AD1B8) g_player_bolts.level = D_001AD1BC; else g_player_bolts.level = D_001AD1C0;
+        if (g_shop_bolts_level_override) g_player_bolts.level = g_shop_bolts_level_alt; else g_player_bolts.level = g_shop_saved_bolts_level;
         tex_load_level_pack(g_player_bolts.level);
-        table = D_001AD308;
-        if (D_001AD1B8) func_0029CC98(GetLocalizedString(table.words[g_player_bolts.level]), -1);
+        table = g_shop_close_table;
+        if (g_shop_bolts_level_override) func_0029CC98(GetLocalizedString(table.words[g_player_bolts.level]), -1);
     }
     if (g_vendor_menu_state.mode == 2) {
         if (g_hero_moby_default.a != g_equipment_bits) {
@@ -691,14 +691,14 @@ void shop_close_sub_menu(void)
             m = g_hero_moby_default.moby;
             if (m && *(int *)(m + 0x98)) *(int *)(m + 0x98) = *(int *)(*(char **)(m + 0x24) + 0x10);
         }
-        if (g_hero_moby_default.b != (D_001A7AF2 & 31)) LoadDiscTableTexture(D_001A7AF2 & 31);
+        if (g_hero_moby_default.b != (g_hero_texture_bits & 31)) LoadDiscTableTexture(g_hero_texture_bits & 31);
         SpawnEquipmentPieces(0);
     }
 }
 
 
-extern int D_001B2240, D_001B223C;
-extern int D_001B2244 __attribute__((sda));
+extern int g_shop_right_hold_timer, g_shop_left_hold_timer;
+extern int g_shop_prev_buttons __attribute__((sda));
 extern int g_item_ammo_counts[];
 extern void set_animation_parameter(int, unsigned int);
 extern int GetSelectedShopItemPrice(void);
@@ -724,7 +724,7 @@ void UpdateShopMenuInput(void)
     {
         Input_93 *input = (Input_93 *)g_pad_state;
         if ((input->buttons & 0x2000) ||
-                (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
+                (g_shop_right_hold_timer >= 16 && g_shop_right_hold_timer % 10 == 1)) {
             if (state->scroll < 57) {
                 int moved = 0;
                 if (state->selected < state->count - 1) {
@@ -752,7 +752,7 @@ void UpdateShopMenuInput(void)
         Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
         if ((input->buttons & 0x8000) ||
-                (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
+                (g_shop_left_hold_timer >= 16 && g_shop_left_hold_timer % 10 == 1)) {
             state = &F93State;
             if (state->scroll >= -56) {
                 int moved = 0;
@@ -780,8 +780,8 @@ void UpdateShopMenuInput(void)
     {
         Input_93 *input = (Input_93 *)g_pad_state;
         ShopInput_93 *state;
-        if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
-            ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
+        if (((input->buttons & 0x40) && !(g_shop_prev_buttons & 0x40) && F93State.mode != 3) ||
+            ((input->buttons & 0x40) && !(g_shop_prev_buttons & 0x40) && F93State.mode == 3 &&
              *(int *)((char *)&F93State + 0x144 + F93State.selected * 12) != 0)) {
                 state = &F93State;
                 if (state->mode == 0) {
@@ -828,7 +828,7 @@ void shop_run_menu_input(void)
 /* One font glyph: its texture cell, its top offset and its advance. */
 typedef struct { u8 u, v; signed char top, adv; } Glyph_002F97A0;
 
-extern Glyph_002F97A0 D_00263EF0[];
+extern Glyph_002F97A0 g_font_glyphs_medium[];
 extern u64 GetEffectTextureDescriptor(int);
 extern float IntToFloat(int);
 extern void EmitTexturedRectangle(float, float, float, float, int, int, int, int, u32 *, u64);
@@ -860,7 +860,7 @@ void draw_large_text_edge_faded(u64 color, u8 *text, int limit, float x, float y
 
     texture = GetEffectTextureDescriptor(2);
     size = scale * 16.0f;
-    glyphs = D_00263EF0;
+    glyphs = g_font_glyphs_medium;
     color &= 0xFFFFFF;
     if (limit == 0 || *text == 0)
         return;

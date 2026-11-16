@@ -25,7 +25,7 @@ extern void math_approach_target_with_braking(float *, float, float, float, floa
 extern void FastVecAdd(void *a0, void *a1, void *a2);
 extern float gravity_get_center_distance(char *p);
 
-void func_PAL_L02_00334C78(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
+void moby_l02_steer_toward_target_pal(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;
     float heading, distance, speed, height, drop;

@@ -6,25 +6,25 @@
 typedef float f32_F7036ef03;
 #endif
 
-extern f32_F7036ef03 D_L04_001AE4A8 __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_first_offset_x __attribute__((sda));
 
-extern f32_F7036ef03 D_L04_001AE4B0 __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_second_offset_x __attribute__((sda));
 
-extern f32_F7036ef03 D_L04_001AE4B8 __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_third_offset_x __attribute__((sda));
 
-extern f32_F7036ef03 D_L04_001AE4C0 __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_fourth_offset_x __attribute__((sda));
 
-extern f32_F7036ef03 D_L04_001AE4C8 __attribute__((sda));
+extern f32_F7036ef03 g_item_menu_list_offset_x __attribute__((sda));
 
-extern f32_F7036ef03 D_L04_001AE4AC;
+extern f32_F7036ef03 g_item_menu_first_offset_y;
 
-extern f32_F7036ef03 D_L04_001AE4B4;
+extern f32_F7036ef03 g_item_menu_second_offset_y;
 
-extern f32_F7036ef03 D_L04_001AE4BC;
+extern f32_F7036ef03 g_item_menu_third_offset_y;
 
-extern f32_F7036ef03 D_L04_001AE4C4;
+extern f32_F7036ef03 g_item_menu_fourth_offset_y;
 
-extern f32_F7036ef03 D_L04_001AE4CC;
+extern f32_F7036ef03 g_item_menu_list_offset_y;
 
 extern void func_00335E38_2(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
 
@@ -43,15 +43,15 @@ int item_menu_update(char *self, int buttons)
     char *list = self + 664;
 
     position = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self, D_L04_001AE4A8 + position[0], D_L04_001AE4AC + position[1], 0.0f, 0.0f);
+    func_00335E38_2(self, g_item_menu_first_offset_x + position[0], g_item_menu_first_offset_y + position[1], 0.0f, 0.0f);
     position = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 76, D_L04_001AE4B0 + position[0], D_L04_001AE4B4 + position[1], 0.0f, 0.0f);
+    func_00335E38_2(self + 76, g_item_menu_second_offset_x + position[0], g_item_menu_second_offset_y + position[1], 0.0f, 0.0f);
     position = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 152, D_L04_001AE4B8 + position[0], D_L04_001AE4BC + position[1], 0.0f, 0.0f);
+    func_00335E38_2(self + 152, g_item_menu_third_offset_x + position[0], g_item_menu_third_offset_y + position[1], 0.0f, 0.0f);
     position = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 576, D_L04_001AE4C0 + position[0], D_L04_001AE4C4 + position[1], 0.0f, 0.0f);
+    func_00335E38_2(self + 576, g_item_menu_fourth_offset_x + position[0], g_item_menu_fourth_offset_y + position[1], 0.0f, 0.0f);
     position = *(f32_F7036ef03 **)(self + 648);
-    stub_store_two_floats(list, D_L04_001AE4C8 + position[0], D_L04_001AE4CC + position[1]);
+    stub_store_two_floats(list, g_item_menu_list_offset_x + position[0], g_item_menu_list_offset_y + position[1]);
     menu_update_title_text(self);
     menu_update_empty_label(self);
     return *(int *)(self + 416) = UpdateListSelection(list, buttons);

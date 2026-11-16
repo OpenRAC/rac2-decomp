@@ -13,8 +13,8 @@ extern char *SpawnSpinningSparkParticle(char *p, float fa, float fb, float fc, f
                             unsigned int color, int flag);
 extern void *part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
-extern char D_L20_001B9FC0[];
-extern char D_0018A0E0[];
+extern char g_camera_l20_position[];
+extern char g_hero_state_block[];
 
 /* Throws 20 bursts of sparks and smoke out from a point. */
 void part_l20_spawn_spark_burst(float *origin)
@@ -32,12 +32,12 @@ void part_l20_spawn_spark_burst(float *origin)
     char *smoke;
     char *smoke_ext;
 
-    FastVecSub((char *)to_camera, D_L20_001B9FC0, (char *)origin);
+    FastVecSub((char *)to_camera, g_camera_l20_position, (char *)origin);
     ang = mat_fast_helper_a(to_camera[0], to_camera[1]);
 
     for (i = 19; i >= 0; i--) {
         rnd = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)dir, D_0018A0E0, -(rnd * 0.01666666753590107f));
+        FastVecScale((char *)dir, g_hero_state_block, -(rnd * 0.01666666753590107f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         rnd = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         out[0] = origin[0] + math_random_signed_float_range(0.0f, 0.2f);

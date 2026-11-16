@@ -1,10 +1,10 @@
 #include "common.h"
 typedef int BurstQuad __attribute__((mode(TI)));
 typedef union { BurstQuad q; f32 f[4]; } BurstVec;
-extern s32 D_L01_001B19B0 __attribute__((sda));
-extern u8 D_L01_001B1990[8] __attribute__((sda));
-extern u8 D_L01_001B1988[8] __attribute__((sda));
-extern u8 D_L01_001B1980[8] __attribute__((sda));
+extern s32 g_spark_burst_flag_bit __attribute__((sda));
+extern u8 g_spark_piece_params_a[8] __attribute__((sda));
+extern u8 g_spark_piece_params_b[8] __attribute__((sda));
+extern u8 g_spark_piece_params_c[8] __attribute__((sda));
 extern void *part_spawn_object_following_effect(void *,void *,s32,s32,s32,s32,s32,s32,f32,f32);
 extern void moby_set_state(void *,s32,s32);
 extern void *part_find_owned_effect_slot(void *,s32,s32);
@@ -37,7 +37,7 @@ void spark_l01_burst_update(void *moby_arg) {
         obj[0xA8]=255;
         break;
     case 2:
-        part_explode_object_into_pieces(obj,D_L01_001B1990,D_L01_001B1988,D_L01_001B1980,65535,0,D_L01_001B19B0,1,0xC7F,255,0);
+        part_explode_object_into_pieces(obj,g_spark_piece_params_a,g_spark_piece_params_b,g_spark_piece_params_c,65535,0,g_spark_burst_flag_bit,1,0xC7F,255,0);
         part_spawn_scaled_bolts(obj,3,1.1f);
         up.q=0; up.f[2]=1.0f/6.0f;
         moby_compute_local_point(obj,&tmp,offset.f[0],offset.f[1],offset.f[2]);
@@ -50,8 +50,8 @@ void spark_l01_burst_update(void *moby_arg) {
             matrix_mul_vec3(direction,direction,obj+0xC0);
             SpawnTintedEffects(obj,&tmp,0.25f,3,1,direction,5.0f,0x4080FF00,0,0.75f,1.25f);
         }
-        if(D_L01_001B19B0>=0) {
-            *(u16 *)(obj+0x7C)=(1<<D_L01_001B19B0)|0x8000;
+        if(g_spark_burst_flag_bit>=0) {
+            *(u16 *)(obj+0x7C)=(1<<g_spark_burst_flag_bit)|0x8000;
             moby_set_state(obj,3,-1);
         } else moby_mark_spawned(obj);
         break;

@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s8 D_001BF200;
+extern s8 g_impact_queue;
 
 /* Finds the effect slot owned by this object. Returns it if it matches the flag mask, otherwise releases the slot when allowed. */
 void *part_find_owned_effect_slot(void *object, u32 flag_mask, s32 keep_slot) {
@@ -36,7 +36,7 @@ void *part_find_owned_effect_slot(void *object, u32 flag_mask, s32 keep_slot) {
     if (slot_index == 0xFF) {
         return 0;
     }
-    entry = (s8 *)&D_001BF200 + (slot_index << 6);
+    entry = (s8 *)&g_impact_queue + (slot_index << 6);
     owner = *(void **)(entry + 0x38);
     if (owner != object) {
         return 0;

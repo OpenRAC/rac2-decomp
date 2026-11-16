@@ -15,7 +15,7 @@ typedef union F32Bits {
     unsigned int u;
 } F32Bits;
 
-extern Rec_003A2D58 *D_L22_001FE940[];
+extern Rec_003A2D58 *g_ship_path_table[];
 
 
 
@@ -54,7 +54,7 @@ extern void WalkPathPickNext(char *, int, int, float);
 extern void func_00321298(void *, void *, void *, void *);
 extern void func_0032FEB8(void *, void *);
 extern float func_0032A758(void *, void *, int);
-void func_PAL_L22_003A54A0(char *obj) {
+void WalkPathUpdate_pal(char *obj) {
     char target[16], flat[16], point[16];
     float distances[2];
     State_2160 *st = *(State_2160 **)(obj + 0x68);
@@ -98,7 +98,7 @@ void func_PAL_L22_003A54A0(char *obj) {
     case 1: {
         Path_2160 *rec;
         lane_store_nearest_point_as_current(obj, 1);
-        rec = (Path_2160 *)D_L22_001FE940[st->paths[st->path]];
+        rec = (Path_2160 *)g_ship_path_table[st->paths[st->path]];
         qcopy_nc(point, rec + (st->point + 1));
         st->state = 2;
         distance = func_002F3C40(rec + (st->point + 1), st->target);
@@ -142,13 +142,13 @@ void func_PAL_L22_003A54A0(char *obj) {
             if (func_002F3C40((obj + 0x10), st->waypoint) < 2.0f) {
                 next = st->point + st->direction;
                 if (next < 0) {
-                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
+                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)g_ship_path_table[st->paths[st->path]])->points[0].f[3]);
                 } else {
-                    PathData_2160 *end = (PathData_2160 *)D_L22_001FE940[st->paths[st->path]];
+                    PathData_2160 *end = (PathData_2160 *)g_ship_path_table[st->paths[st->path]];
                     if (next >= end->count) WalkPathPickNext(obj, 1, 0, end->points[end->count - 1].f[3]);
                     else st->point = next;
                 }
-                qcopy(st->waypoint, (Path_2160 *)D_L22_001FE940[st->paths[st->path]] + (st->point + 1));
+                qcopy(st->waypoint, (Path_2160 *)g_ship_path_table[st->paths[st->path]] + (st->point + 1));
                 arena_push_point_out(st->waypoint, 0.0f);
             }
             qcopy(target, st->waypoint);
@@ -208,7 +208,7 @@ typedef struct PathRec_003A36A0 {
     int pad[3];
     Quad_003A2780 pts[1];
 } PathRec_003A36A0;
-extern Quad_003A2780 D_L22_001C00E0;
+extern Quad_003A2780 g_spawn_point;
 extern void pickup_reset_tables(char *);
 extern int math_random_int_below(int);
 extern void *memset(void *, int, unsigned int);
@@ -231,13 +231,13 @@ typedef struct Ctl_003A47E8 {
     int f8;
 } Ctl_003A47E8;
 
-extern Ctl_003A47E8 *D_L22_001B2AB4[1] __attribute__((sda));
+extern Ctl_003A47E8 *g_space_ship_pickup_slots[1] __attribute__((sda));
 extern void func_00316B30(void *, int, void *);
 extern void func_0039CDC0(void *, void *, int, int, int);
 
 /* func_L22_003A4938 is defined in L22_0039D708-scan.c. */
 
-extern float D_L22_001B2AA4 __attribute__((sda));
+extern float g_planet_radius __attribute__((sda));
 extern char *g_hero_moby;
 extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3D60(void *, void *, float);

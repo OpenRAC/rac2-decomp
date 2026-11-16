@@ -23,7 +23,7 @@ extern char *large_spark_trail_create(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
 extern int StartAttachedEffect(int, int, char *);
 extern int g_hero_moby;
-extern unsigned char D_00139582;
+extern unsigned char g_ray_weapon_index;
 extern L00AimState g_collision_result;
 extern L00AimEntry g_weapon_l00_table[];
 
@@ -44,7 +44,7 @@ int weapon_fire_damage_ray(char *source, char *origin, char *target, char *resul
         FastVecSub(offset, (char *)g_collision_result.vector_20, origin);
         large_spark_trail_create(origin, offset, (char *)g_collision_result.vector_20, 1);
         if (g_collision_result.object_18 != 0) {
-            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            saved = (g_weapon_l00_table + g_ray_weapon_index)->value_70;
             distance = fast_vec_dist((char *)g_collision_result.vector_20, origin);
             if (distance < 10.0f) {
                 *(float *)(result + 0x1C) = saved;

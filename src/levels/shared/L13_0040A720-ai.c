@@ -9,14 +9,14 @@ typedef struct { u8 pad0[0x30]; TI128 v; u8 pad40[0x40]; } L13Cam;
 extern char g_hero_state[];
 extern float g_hero_position[];
 extern u8 *g_hero_moby;
-extern u8 *D_L13_001B291C __attribute__((section(".sdata")));
-extern u8 *D_L13_001B2A0C __attribute__((section(".sdata")));
-extern char D_L13_001BFD00[];
-extern s32 *D_L13_001FE580[];
-extern char D_L13_001B11F8[];
-extern char D_L13_001B1200[];
-extern char D_L13_001B1208[];
-extern char D_L13_001B1218[];
+extern u8 *g_object_table_base __attribute__((section(".sdata")));
+extern u8 *g_moby_slot_table __attribute__((section(".sdata")));
+extern char g_collision_l13_result[];
+extern s32 *g_guard_path_table[];
+extern char g_str_guard_alt_msg_a[];
+extern char g_str_guard_alt_msg_b[];
+extern char g_str_guard_alt_msg_c[];
+extern char g_str_guard_alt_msg_d[];
 extern s32 g_current_map_index[] __attribute__((section(".sdata")));
 
 extern void STUB_printf(void *);
@@ -96,7 +96,7 @@ void guard_alt_update(u8 *guard)
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
                     *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = guard;
                 }
@@ -129,7 +129,7 @@ void guard_alt_update(u8 *guard)
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
                     *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = guard;
                 }
@@ -146,7 +146,7 @@ void guard_alt_update(u8 *guard)
         s32 i;
         u8 *e;
         if (*(s32 *)(st + 0x298) != 0 && (i = *(s32 *)(st + 0x29C)) != -1) {
-            e = D_L13_001B291C + (i << 8);
+            e = g_object_table_base + (i << 8);
             if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD) {
                 *(u16 *)(guard + 0x34) = (*(u16 *)(guard + 0x34) & 0xFFBE) | 0x1000;
                 *(s32 *)(guard + 0x98) = *(s32 *)(*(u8 **)(guard + 0x24) + 0x10);
@@ -217,7 +217,7 @@ void guard_alt_update(u8 *guard)
     }
     case 6: {
         u8 *e;
-        e = D_L13_001B291C + (*(s32 *)(st + 0x29C) << 8);
+        e = g_object_table_base + (*(s32 *)(st + 0x29C) << 8);
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD || *(s32 *)(st + 0x2B8) == 1) {
             *(s32 *)(st + 0x298) = 0;
             if (*(s32 *)(st + 0x2A0) != -1) {
@@ -277,7 +277,7 @@ void guard_alt_update(u8 *guard)
                 }
             }
             if (*(s32 *)(st + 0x2A8) != 0) {
-                u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                 e[0x20] = 3;
                 *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = guard;
             }
@@ -369,13 +369,13 @@ void guard_alt_update(u8 *guard)
             }
             if (guard[0x43] == 0x13) {
                 *(s32 *)(st + 0x2C4) = 0;
-                STUB_printf(D_L13_001B11F8);
+                STUB_printf(g_str_guard_alt_msg_a);
             } else if (guard[0x43] == 0x15) {
                 *(s32 *)(st + 0x2C4) = 1;
-                STUB_printf(D_L13_001B1200);
+                STUB_printf(g_str_guard_alt_msg_b);
             } else {
                 *(s32 *)(st + 0x2C4) = 2;
-                STUB_printf(D_L13_001B1208);
+                STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
@@ -387,13 +387,13 @@ void guard_alt_update(u8 *guard)
             }
             if (guard[0x43] == 0x13) {
                 *(s32 *)(st + 0x2C4) = 0;
-                STUB_printf(D_L13_001B11F8);
+                STUB_printf(g_str_guard_alt_msg_a);
             } else if (guard[0x43] == 0x15) {
                 *(s32 *)(st + 0x2C4) = 1;
-                STUB_printf(D_L13_001B1200);
+                STUB_printf(g_str_guard_alt_msg_b);
             } else {
                 *(s32 *)(st + 0x2C4) = 2;
-                STUB_printf(D_L13_001B1208);
+                STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
@@ -430,7 +430,7 @@ void guard_alt_update(u8 *guard)
         break;
     case 7:
         if (*(s32 *)(st + 0x2A4) != 0) {
-            if (AdvancePathWaypoint(guard, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
+            if (AdvancePathWaypoint(guard, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
                 moby_set_state(guard, 8, -1);
                 if (math_random_int_below(2) == 1) {
                     if (guard[0x43] != 1) {
@@ -448,7 +448,7 @@ void guard_alt_update(u8 *guard)
                 }
             }
         } else {
-            if (path_follow_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
+            if (path_follow_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
                 moby_set_state(guard, 8, -1);
                 if (math_random_int_below(2) == 1) {
                     if (guard[0x43] != 1) {
@@ -471,12 +471,12 @@ void guard_alt_update(u8 *guard)
         s32 *path;
         float d;
         if (guard[0x60] & 2) {
-            path = D_L13_001FE580[*(s32 *)(st + 0x2B0)];
+            path = g_guard_path_table[*(s32 *)(st + 0x2B0)];
             d = vec_distance_xy(guard + 0x10, path + 4);
             if (vec_distance_xy(guard + 0x10, path + *path * 4) < d) {
-                path_set_follower_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x2B0)], 0, *path - 1);
+                path_set_follower_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x2B0)], 0, *path - 1);
             } else {
-                path_set_follower_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x2B0)], *path - 1, 0);
+                path_set_follower_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x2B0)], *path - 1, 0);
             }
             moby_set_state(guard, 7, -1);
             if (guard[0x43] != 2) {
@@ -502,7 +502,7 @@ void guard_alt_update(u8 *guard)
         }
         break;
     case 6: {
-        u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x264) << 8);
+        u8 *e = g_object_table_base + (*(s32 *)(st + 0x264) << 8);
         moby_start_effect_from_entry(guard, mat_fast_helper_a(*(float *)(e + 0x10) - *(float *)(guard + 0x10),
                                              *(float *)(e + 0x14) - *(float *)(guard + 0x14)));
         break;
@@ -518,9 +518,9 @@ void guard_alt_update(u8 *guard)
     case 27: {
         s32 r;
         if (*(s32 *)(st + 0x2A4) != 0) {
-            r = AdvancePathWaypoint(guard, D_L13_001FE580[*(s32 *)(st + 0x2A0)]);
+            r = AdvancePathWaypoint(guard, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
         } else {
-            r = path_follow_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x2A0)]);
+            r = path_follow_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
         }
         if (r != 0 || vec_distance_xy(guard + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             if (guard[0x43] != 5) {
@@ -542,7 +542,7 @@ void guard_alt_update(u8 *guard)
         }
         break;
     case 16:
-        if (path_follow_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x278)]) != 0) {
+        if (path_follow_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x278)]) != 0) {
             *(s32 *)(st + 0x288) = 1;
             moby_set_state(guard, 0x11, -1);
             if (guard[0x43] != 0xD) {
@@ -551,7 +551,7 @@ void guard_alt_update(u8 *guard)
         }
         break;
     case 17:
-        STUB_printf(D_L13_001B1218);
+        STUB_printf(g_str_guard_alt_msg_d);
         moby_set_state(guard, 1, -1);
         break;
     case 18: {
@@ -562,7 +562,7 @@ void guard_alt_update(u8 *guard)
             if (i != -1) {
                 j = *(s32 *)(st + 0x354);
                 if (j != -1) {
-                    u8 *base = D_L13_001B291C;
+                    u8 *base = g_object_table_base;
                     (base + (i << 8))[0x20] = 4;
                     (base + (j << 8))[0x20] = 4;
                     *(s32 *)(st + 0x350) = -1;
@@ -570,7 +570,7 @@ void guard_alt_update(u8 *guard)
                 }
             }
         }
-        *(TI128 *)m = ((L13Cam *)D_L13_001B2A0C)[*(s32 *)(st + 0x268)].v;
+        *(TI128 *)m = ((L13Cam *)g_moby_slot_table)[*(s32 *)(st + 0x268)].v;
         if (*(s32 *)(st + 0x2A4) != 0) {
             creature_move_along_ground(guard, m);
         } else {
@@ -622,7 +622,7 @@ void guard_alt_update(u8 *guard)
         break;
     case 15:
         if (*(s32 *)(st + 0x2A4) != 0) {
-            if (AdvancePathWaypoint(guard, D_L13_001FE580[*(s32 *)(st + 0x294)]) != 0) {
+            if (AdvancePathWaypoint(guard, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0) {
                 moby_set_state(guard, 0x15, -1);
                 if (guard[0x43] != 5) {
                     anim_start_blended(guard, 5, 0, 0xA);
@@ -634,7 +634,7 @@ void guard_alt_update(u8 *guard)
                 }
                 *(s32 *)(st + 0x294) = -1;
             }
-        } else if (path_follow_nodes(guard, D_L13_001FE580[*(s32 *)(st + 0x294)]) != 0
+        } else if (path_follow_nodes(guard, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0
                    || vec_distance_xy(guard + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             moby_set_state(guard, 0x15, -1);
             if (guard[0x43] != 5) {
@@ -680,7 +680,7 @@ void guard_alt_update(u8 *guard)
                 }
                 moby_set_state(guard, 0x15, -1);
             } else {
-                hit = *(u8 **)(D_L13_001BFD00 + 0x18);
+                hit = *(u8 **)(g_collision_l13_result + 0x18);
                 if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(st + 0x200)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                  || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x200
@@ -734,7 +734,7 @@ void guard_alt_update(u8 *guard)
                     blast_projectile_spawn(guard, v, m, 0, st[0x34]);
                     (*(s32 *)(st + 0x26C))++;
                 } else {
-                    hit = *(u8 **)(D_L13_001BFD00 + 0x18);
+                    hit = *(u8 **)(g_collision_l13_result + 0x18);
                     if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(st + 0x200)
                                      || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                      || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x200
@@ -817,7 +817,7 @@ void guard_alt_update(u8 *guard)
                 blast_projectile_spawn(guard, v, m, 0, st[0x34]);
                 (*(s32 *)(st + 0x26C))++;
             } else {
-                hit = *(u8 **)(D_L13_001BFD00 + 0x18);
+                hit = *(u8 **)(g_collision_l13_result + 0x18);
                 if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(st + 0x200)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                  || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x200

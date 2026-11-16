@@ -25,11 +25,11 @@ typedef struct {
 #define SKY_VERTEX_RECORDS 0x70002000   /* scratchpad: the transformed vertex records */
 
 extern unsigned char *g_dma_packet_cursor;           /* the DMA packet cursor */
-extern char D_00139300[];
-extern char D_00139370[];
-extern int D_001ABDD8[2] __attribute__((sda));  /* the two scratchpad buffers */
-extern int D_001ABDE0 __attribute__((sda));     /* which buffer receives the next upload */
-extern int D_001A72E0;
+extern char g_gfx_sky_gouraud_packet[];
+extern char g_gfx_sky_textured_packet[];
+extern int g_sky_spr_buffers[2] __attribute__((sda));  /* the two scratchpad buffers */
+extern int g_sky_spr_buffer_index __attribute__((sda));     /* which buffer receives the next upload */
+extern int g_vram_zbuffer_address;
 
 extern void vec_transform_vectors_vu0_alt(void *, int, void *);
 extern int gfx_process_render_entry_a(int, int, int);
@@ -50,22 +50,22 @@ void gfx_sky_textured_pieces_draw(Sky *sky)
         return;
     vec_transform_vectors_vu0_alt((char *)sky + 0x10, count, visible);
     *(int *)(g_dma_packet_cursor + 0) = 0x30000007;
-    *(int *)(g_dma_packet_cursor + 4) = (int)D_00139370;
+    *(int *)(g_dma_packet_cursor + 4) = (int)g_gfx_sky_textured_packet;
     *(int *)(g_dma_packet_cursor + 8) = 0;
     *(int *)(g_dma_packet_cursor + 0xC) = 0x50000007;
     g_dma_packet_cursor = g_dma_packet_cursor + 16;
-    D_001ABDE0 = 1 - D_001ABDE0;
+    g_sky_spr_buffer_index = 1 - g_sky_spr_buffer_index;
     if (visible[0] == 1)
-        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, g_sky_spr_buffers[g_sky_spr_buffer_index]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
             DmaToSprSync();
-        D_001ABDE0 = 1 - D_001ABDE0;
+        g_sky_spr_buffer_index = 1 - g_sky_spr_buffer_index;
         if (i + 1 < sky->count && visible[i + 1] == 1)
             DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
-                          D_001ABDD8[D_001ABDE0]);
+                          g_sky_spr_buffers[g_sky_spr_buffer_index]);
         if (visible[i] == 1) {
-            int base = D_001ABDD8[1 - D_001ABDE0];
+            int base = g_sky_spr_buffers[1 - g_sky_spr_buffer_index];
             int faces, st, vertices, face_list, st_list;
 
             faces = PIECE(sky, i)->faces;
@@ -90,22 +90,22 @@ void gfx_sky_gouraud_pieces_draw(Sky *sky)
         return;
     vec_transform_vectors_vu0_alt((char *)sky + 0x10, count, visible);
     *(int *)(g_dma_packet_cursor + 0) = 0x30000007;
-    *(int *)(g_dma_packet_cursor + 4) = (int)D_00139300;
+    *(int *)(g_dma_packet_cursor + 4) = (int)g_gfx_sky_gouraud_packet;
     *(int *)(g_dma_packet_cursor + 8) = 0;
     *(int *)(g_dma_packet_cursor + 0xC) = 0x50000007;
     g_dma_packet_cursor = g_dma_packet_cursor + 16;
-    D_001ABDE0 = 1 - D_001ABDE0;
+    g_sky_spr_buffer_index = 1 - g_sky_spr_buffer_index;
     if (visible[0] == 1)
-        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, D_001ABDD8[D_001ABDE0]);
+        DmaToSpr(PIECE(sky, 0)->data, PIECE(sky, 0)->size >> 4, g_sky_spr_buffers[g_sky_spr_buffer_index]);
     for (i = 0; i < sky->count; i++) {
         if (visible[i] == 1)
             DmaToSprSync();
-        D_001ABDE0 = 1 - D_001ABDE0;
+        g_sky_spr_buffer_index = 1 - g_sky_spr_buffer_index;
         if (i + 1 < sky->count && visible[i + 1] == 1)
             DmaToSpr(PIECE(sky, i + 1)->data, PIECE(sky, i + 1)->size >> 4,
-                          D_001ABDD8[D_001ABDE0]);
+                          g_sky_spr_buffers[g_sky_spr_buffer_index]);
         if (visible[i] == 1) {
-            int base = D_001ABDD8[1 - D_001ABDE0];
+            int base = g_sky_spr_buffers[1 - g_sky_spr_buffer_index];
             int faces, colours, vertices, face_list, colour_list;
 
             faces = PIECE(sky, i)->faces;
@@ -118,5 +118,5 @@ void gfx_sky_gouraud_pieces_draw(Sky *sky)
         }
     }
     VU1_addGSregister(0x47, 0x3180B);
-    VU1_addGSregister(0x4E, (long)(D_001A72E0 >> 13) | 0x1000000 | 0x100000000L);
+    VU1_addGSregister(0x4E, (long)(g_vram_zbuffer_address >> 13) | 0x1000000 | 0x100000000L);
 }

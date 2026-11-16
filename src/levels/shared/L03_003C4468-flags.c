@@ -5,7 +5,7 @@ extern void gfx_update_color_fade(void *, unsigned char *);
 extern void moby_pulse_tint(unsigned char *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern int route_get_node_value(unsigned int, int);
-extern unsigned char D_001A7A43;
+extern unsigned char g_state_flag_b;
 
 /* Per-frame update for a bot: ticks its timers, refreshes its path and aim, and picks its next waypoint. */
 void bot_update_timers_and_path(unsigned char *object)
@@ -16,7 +16,7 @@ void bot_update_timers_and_path(unsigned char *object)
         ++*(unsigned short *)(object + 0x96);
     math_fast_float_d(state + 0x364);
     moby_pulse_tint(object);
-    if (D_001A7A43 != 0 && object[0x20] != 1)
+    if (g_state_flag_b != 0 && object[0x20] != 1)
         *(float *)(state + 0x2B0) = 1.75f;
     moby_update_eased_node(object, state + 0x240, 1, 0.03f, 0.3f);
     moby_update_eased_node(object, state + 0x2C0, 0, 0.03f, 0.3f);

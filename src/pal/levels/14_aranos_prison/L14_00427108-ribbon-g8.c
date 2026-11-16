@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L14_001B1680 __attribute__((sda));
-extern int D_L14_001B1684 __attribute__((sda));
+extern int g_ribbon_l14_core_color __attribute__((sda));
+extern int g_ribbon_l14_halo_color __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct {
@@ -26,16 +26,16 @@ extern void part_rebuild_lightning_bolt(void *self);
 extern void gfx_add_draw_callback_third(void (*callback)(char *), void *object);
 extern void func_PAL_L14_00427E08(char *object);
 extern int gfx_add_point_light(float *position, float range, float radius, int color);
-extern int D_L14_001B1618 __attribute__((sda));
-extern float D_L14_001B1688 __attribute__((sda));
-extern float D_L14_001B168C __attribute__((sda));
-extern char *D_L14_001FE1C0[];
-extern char D_L14_002594F0[][0x280];
+extern int g_ribbon_l14_segment_count __attribute__((sda));
+extern float g_ribbon_l14_core_width __attribute__((sda));
+extern float g_ribbon_l14_halo_width __attribute__((sda));
+extern char *g_effect_path_table[];
+extern char g_ribbon_buffers[][0x280];
 
 /* Moves the ribbon's head to the object's position, eases its height and adds it to the
    head; when the state is dirty, refreshes the newest four points of the ribbon's row from
    the shape table and queues the draw callback. On the first update it resets the state. */
-void func_PAL_L14_00427720(char *self)
+void ribbon_update_pal(char *self)
 {
     RibbonOwnerState *st = *(RibbonOwnerState **)(self + 0x68);
     float v[4] __attribute__((aligned(16)));
@@ -52,15 +52,15 @@ void func_PAL_L14_00427720(char *self)
     FastVecAdd(&st->next, &st->pos, v);
     /* The new head is copied back into v as well; v is not used again. */
     qcopy(v, &st->next);
-    D_L14_001B1618 = 20;
+    g_ribbon_l14_segment_count = 20;
     ResetBoltPointsToLine(self);
 
     if (st->dirty != 0) {
         part_rebuild_lightning_bolt(self);
-        count = D_L14_001B1618;
-        src = D_L14_001FE1C0[st->shape];
+        count = g_ribbon_l14_segment_count;
+        src = g_effect_path_table[st->shape];
         for (i = count - 4; i < count; i++) {
-            qcopy_nc(&D_L14_002594F0[st->row][i * 16], src + i * 16 + 0x10);
+            qcopy_nc(&g_ribbon_buffers[st->row][i * 16], src + i * 16 + 0x10);
         }
         gfx_add_draw_callback_third(func_PAL_L14_00427E08, self);
     }
@@ -69,11 +69,11 @@ void func_PAL_L14_00427720(char *self)
         st->dirty = 0;
         st->handle = gfx_add_point_light((float *)&st->pos, 0.0f, 0.0f, 0);
         *(unsigned char *)(self + 0x20) = 1;
-        st->count = D_L14_001B1618;
-        st->coreColor = D_L14_001B1680;
-        st->haloColor = D_L14_001B1684;
-        st->f40 = D_L14_001B1688;
-        st->f44 = D_L14_001B168C;
+        st->count = g_ribbon_l14_segment_count;
+        st->coreColor = g_ribbon_l14_core_color;
+        st->haloColor = g_ribbon_l14_halo_color;
+        st->f40 = g_ribbon_l14_core_width;
+        st->f44 = g_ribbon_l14_halo_width;
         st->mode = -1;
     }
 }

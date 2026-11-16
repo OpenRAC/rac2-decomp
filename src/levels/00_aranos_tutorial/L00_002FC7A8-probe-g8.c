@@ -13,11 +13,11 @@ typedef struct {
 } Context;
 
 extern int g_current_map_index[] __attribute__((sda));
-extern char D_L00_001A93E0[64] SDATA(D_L00_001A93E0);
+extern char g_tutorial_probe_points[64] SDATA(D_L00_001A93E0);
 extern char g_camera_l00_position[];
-extern Context D_L00_001BCAC0;
-extern char D_L00_0027E600[];
-extern char D_L00_0027E620[];
+extern Context g_tutorial_probe_context;
+extern char g_tutorial_probe_out_a[];
+extern char g_tutorial_probe_out_b[];
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -40,7 +40,7 @@ void tutorial_probe_points_update(void) {
     low = -1;
     high = 9999;
     which = 0;
-    if (D_L00_001BCAC0.state == 0) {
+    if (g_tutorial_probe_context.state == 0) {
         low = 220;
         high = 370;
         which = 1;
@@ -48,12 +48,12 @@ void tutorial_probe_points_update(void) {
     if (low == -1)
         return;
 
-    if (D_L00_001BCAC0.timer >= low && D_L00_001BCAC0.timer <= high) {
-        D_L00_001BCAC0.out = D_L00_0027E600;
+    if (g_tutorial_probe_context.timer >= low && g_tutorial_probe_context.timer <= high) {
+        g_tutorial_probe_context.out = g_tutorial_probe_out_a;
 
         found = 0;
-        for (i = 0; i < D_L00_001BCAC0.count; i++) {
-            char *obj = D_L00_001BCAC0.objects[i];
+        for (i = 0; i < g_tutorial_probe_context.count; i++) {
+            char *obj = g_tutorial_probe_context.objects[i];
 
             if (*(short *)(obj + 0xAA) == 0xD54 /* moby class 3412 */) {
                 found = obj;
@@ -64,10 +64,10 @@ void tutorial_probe_points_update(void) {
         if (found) {
             char *matrix;
 
-            out = D_L00_0027E620;
+            out = g_tutorial_probe_out_b;
             matrix = found + 0xC0;
             for (n = 0; n < 4; n++) {
-                matrix_mul_vec3(out, D_L00_001A93E0 + n * 16, matrix);
+                matrix_mul_vec3(out, g_tutorial_probe_points + n * 16, matrix);
                 FastVecAdd(out, out, found + 0x10);
                 FastVecSub(temp, g_camera_l00_position, out);
                 vec_scale_to_length(temp, temp, 0.15f);
@@ -75,8 +75,8 @@ void tutorial_probe_points_update(void) {
                 out += 16;
             }
         }
-        *(char **)(D_L00_001BCAC0.out + 0x68) = D_L00_001BCAC0.objects[which];
+        *(char **)(g_tutorial_probe_context.out + 0x68) = g_tutorial_probe_context.objects[which];
     } else {
-        D_L00_001BCAC0.out = 0;
+        g_tutorial_probe_context.out = 0;
     }
 }

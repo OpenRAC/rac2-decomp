@@ -20,8 +20,8 @@
 typedef unsigned char u8;
 typedef struct { int enabled[7]; } EnabledSet; /* at menu + 0x418, one per list row */
 
-extern float D_001AE5EC __attribute__((sda));
-extern const float D_001AE760[10] __attribute__((section(".sdata")));
+extern float g_list_menu_value_float __attribute__((sda));
+extern const float g_list_menu_positions[10] __attribute__((section(".sdata")));
 
 extern void object_set_flag_value(void *, int);
 extern void object_set_value_float(void *, float);
@@ -59,8 +59,8 @@ int func_US2_00349728(u8 *m, int pad)
     object_set_flag_value(w130, MODE == 0);
     object_set_flag_value(w17C, MODE == 1);
     object_set_flag_value(w1C8, MODE == 1);
-    object_set_value_float(w17C, D_001AE5EC);
-    object_set_value_float(w1C8, D_001AE5EC);
+    object_set_value_float(w17C, g_list_menu_value_float);
+    object_set_value_float(w1C8, g_list_menu_value_float);
 
     if (MODE == 0 && *(int *)(m + 0x4b8) != 0) {
         object_set_value_float(m, 1.0f);
@@ -83,20 +83,20 @@ int func_US2_00349728(u8 *m, int pad)
     }
 
     p = ((float *)object_get_first_field(m));
-    p[0] = D_001AE760[0] + ORG[0];
-    p[1] = D_001AE760[1] + ORG[1];
+    p[0] = g_list_menu_positions[0] + ORG[0];
+    p[1] = g_list_menu_positions[1] + ORG[1];
     p = ((float *)object_get_first_field(a));
-    p[0] = D_001AE760[2] + ORG[0];
-    p[1] = D_001AE760[3] + ORG[1];
+    p[0] = g_list_menu_positions[2] + ORG[0];
+    p[1] = g_list_menu_positions[3] + ORG[1];
     p = ((float *)object_get_first_field(b));
-    p[0] = D_001AE760[4] + ORG[0];
-    p[1] = D_001AE760[5] + ORG[1];
+    p[0] = g_list_menu_positions[4] + ORG[0];
+    p[1] = g_list_menu_positions[5] + ORG[1];
     p = ((float *)object_get_first_field(c));
-    p[0] = D_001AE760[6] + ORG[0];
-    p[1] = D_001AE760[7] + ORG[1];
+    p[0] = g_list_menu_positions[6] + ORG[0];
+    p[1] = g_list_menu_positions[7] + ORG[1];
     p = ((float *)object_get_first_field(m + 0xE4));
-    p[0] = D_001AE760[8] + ORG[0];
-    p[1] = D_001AE760[9] + ORG[1];
+    p[0] = g_list_menu_positions[8] + ORG[0];
+    p[1] = g_list_menu_positions[9] + ORG[1];
 
     for (i = 0; i < *(int *)(m + 0x4b4); i++) {
         u8 *row = m + 0x218 + i * 0x58;

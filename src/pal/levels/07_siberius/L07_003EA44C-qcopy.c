@@ -4,12 +4,12 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern int math_fast_float_d(char *);
 extern void func_PAL_002B14F8(char *, char *, int, int, float);
-extern int D_L07_001C9780;
+extern int g_cutscene_l07_active_flag;
 extern void RideMobyBelow(char *);
 extern void group_sync_counter(char *, char *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastAddRotations(float, float);
-extern void func_PAL_003273B8(char *, char *, int, void *, float);
+extern void enemy_attach_turn_child_parts_pal(char *, char *, int, void *, float);
 
 /* Clear the two resource slots, step the state counter, refresh the object's
    transform and hand the entity to the shared launcher. */
@@ -33,16 +33,16 @@ void func_PAL_L07_003EB0C8(char *arg)
     dst = o + 0x2E0;
     FastVecSub(&v, src, dst);
     *(TI128 *)dst = *(TI128 *)src;
-    if (D_L07_001C9780 != 0)
+    if (g_cutscene_l07_active_flag != 0)
         RideMobyBelow(arg);
     if (*(unsigned char *)(arg + 0x95) == 2) {
         f = FastAddRotations(*(float *)(o + 0x2DC), 0.25132746f);
         *(float *)(o + 0x2DC) = f;
-        func_PAL_003273B8(arg, o + 0x330, 1, &v, f);
+        enemy_attach_turn_child_parts_pal(arg, o + 0x330, 1, &v, f);
     } else {
         f = FastAddRotations(*(float *)(o + 0x2DC), 0.013962637f);
         *(float *)(o + 0x2DC) = f;
-        func_PAL_003273B8(arg, o + 0x330, 0, &v, f);
+        enemy_attach_turn_child_parts_pal(arg, o + 0x330, 0, &v, f);
     }
     func_PAL_002B14F8(arg, o + 0x230, 7, 1, 2.5f);
 }

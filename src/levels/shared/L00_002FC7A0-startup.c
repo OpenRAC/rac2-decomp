@@ -13,11 +13,11 @@ typedef struct {
     unsigned char *objects[0];
 } StartupContext;
 
-extern StartupTable D_L00_002A0E60;
-extern unsigned char D_001A7A40 __attribute__((section(".sdata")));
-extern StartupContext D_L00_001BCAC0;
-extern unsigned char D_L00_0022F600[];
-extern float D_L00_001A8FC8 __attribute__((section(".sdata")));
+extern StartupTable g_startup_table;
+extern unsigned char g_unlocked_item_flags __attribute__((section(".sdata")));
+extern StartupContext g_tutorial_probe_context;
+extern unsigned char g_startup_anim_slots[];
+extern float g_startup_anim_param __attribute__((section(".sdata")));
 extern int g_current_map_index __attribute__((section(".sdata")));
 extern void func_L00_00311238(void *, int, void *);
 
@@ -26,10 +26,10 @@ void anim_start_startup_animations(void)
 {
     StartupTable table;
     int i;
-    if (D_001A7A40) {
-        table = D_L00_002A0E60;
-        for (i = 0; i < D_L00_001BCAC0.count; i++) {
-            unsigned char *object = D_L00_001BCAC0.objects[i];
+    if (g_unlocked_item_flags) {
+        table = g_startup_table;
+        for (i = 0; i < g_tutorial_probe_context.count; i++) {
+            unsigned char *object = g_tutorial_probe_context.objects[i];
             int j;
             if (*(int *)(object + 0x54))
                 continue;
@@ -38,11 +38,11 @@ void anim_start_startup_animations(void)
                     float scale = table.entries[j].scale;
                     int k;
                     for (k = 0; k < 7; k++) {
-                        if (!D_L00_0022F600[k * 64 + 1])
+                        if (!g_startup_anim_slots[k * 64 + 1])
                             break;
                     }
                     if (k < 7) {
-                        unsigned char *slot = D_L00_0022F600 + k * 64;
+                        unsigned char *slot = g_startup_anim_slots + k * 64;
                         func_L00_00311238(object, table.entries[j].animation, slot);
                         *(float *)(slot + 0x20) = scale;
                         *(float *)(slot + 0x24) = scale;
@@ -51,7 +51,7 @@ void anim_start_startup_animations(void)
                 }
             }
         }
-        if (g_current_map_index == 6 && D_L00_001BCAC0.state == 1)
-            D_L00_001A8FC8 = -0.25f;
+        if (g_current_map_index == 6 && g_tutorial_probe_context.state == 1)
+            g_startup_anim_param = -0.25f;
     }
 }

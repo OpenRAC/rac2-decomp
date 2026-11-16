@@ -3,7 +3,7 @@
 extern char *moby_get_motion_data(unsigned char *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern float D_L00_001AC588 __attribute__((sda));
+extern float g_follower_speed_limit __attribute__((sda));
 
 typedef float Vec000[4] __attribute__((aligned(16)));
 typedef struct {
@@ -24,8 +24,8 @@ extern float FastDiffRots(float, float);
 extern void mat_build_rotation_from_angles(void *, void *);
 extern void vec_fast_normalize3(void *, void *, void *, float);
 extern void quaternion_to_rotation_basis(void *, void *);
-extern float D_001AC244 __attribute__((sda));
-extern char *D_001B5390 NOT_SDA;
+extern float g_follower_max_scale __attribute__((sda));
+extern char *g_camera_state_ptr NOT_SDA;
 
 /* Tilts an object to lean into its turns, based on how it is moving. */
 void UpdateBankedOrientation(unsigned char *owner)
@@ -50,7 +50,7 @@ void UpdateBankedOrientation(unsigned char *owner)
         turn_amount = FastDiffRots(old[2], obj->rot[2]);
         if (follower_get_state(owner) != 2 && follower_get_state(owner) != 12) {
             obj->rot[0] *= 0.98f;
-            obj->rot[0] += (turn_amount * -sign) * (D_001AC244 * 1.4137166738510132f) * 8.0f;
+            obj->rot[0] += (turn_amount * -sign) * (g_follower_max_scale * 1.4137166738510132f) * 8.0f;
             if (obj->rot[0] > 1.4137166738510132f)
                 obj->rot[0] = 1.4137166738510132f;
             else if (obj->rot[0] < -1.4137166738510132f)
@@ -63,7 +63,7 @@ void UpdateBankedOrientation(unsigned char *owner)
             quaternion_to_rotation_basis(obj->smooth_rot, owner + 0xC0);
         }
     } else {
-        char *p = D_001B5390;
+        char *p = g_camera_state_ptr;
 
         vec_scale_to_length(owner + 0xC0, p + 0x10, obj->axis_scale);
         vec_scale_to_length(owner + 0xE0, p, -1.0f);
@@ -78,11 +78,11 @@ void follower_limit_speed(unsigned char *owner)
     if (data) {
         char *vector = data + 0x90;
         float length = FastVecLength(vector);
-        float limit = D_L00_001AC588;
+        float limit = g_follower_speed_limit;
         *(float *)(data + 0x124) = length;
         if (limit < length) {
             vec_scale_to_length(vector, vector, limit);
-            *(float *)(data + 0x124) = D_L00_001AC588;
+            *(float *)(data + 0x124) = g_follower_speed_limit;
         }
     }
 }

@@ -9,9 +9,9 @@ extern void vec_transform_or_copy(void *,void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void DrawFadingTwoPassRibbon(Quad128 *,int,int,int,unsigned int,unsigned int,float,float,float);
-extern float D_L00_001B05B4 __attribute__((sda));
+extern float g_glowing_trail_scroll __attribute__((sda));
 
-void func_PAL_L00_003E6E50(void *self)
+void glowing_trail_update_pal(void *self)
 {
     char *object=self,*state=*(char **)(object+0x68);
     Quad128 **table,*history;
@@ -28,8 +28,8 @@ void func_PAL_L00_003E6E50(void *self)
         if(n>0) { Quad128 *h=table[bank]; for(;n>0;n--) h[n]=h[n-1]; }
         history=table[bank]; *history=*(Quad128 *)(object+0x10); ((float *)history)[3]=0.025f;
     }
-    D_L00_001B05B4-=0.1f;
-    if(D_L00_001B05B4<=-7.0f) D_L00_001B05B4+=7.0f;
+    g_glowing_trail_scroll-=0.1f;
+    if(g_glowing_trail_scroll<=-7.0f) g_glowing_trail_scroll+=7.0f;
     count=*(int *)(state+0x10); if(count<2) return;
     firstCount=20; if(count<=19) firstCount=count;
     alpha=255; glow=64;
@@ -39,6 +39,6 @@ void func_PAL_L00_003E6E50(void *self)
         glow=FloatToInt(IntToFloat(64)*fraction);
     }
     color=((unsigned int)alpha<<24)|0xffffff; edge=((unsigned int)glow<<24)|0x204080;
-    DrawFadingTwoPassRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B05B4);
-    if(*(int *)(state+0x10)>20) DrawFadingTwoPassRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B05B4);
+    DrawFadingTwoPassRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,g_glowing_trail_scroll);
+    if(*(int *)(state+0x10)>20) DrawFadingTwoPassRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,g_glowing_trail_scroll);
 }

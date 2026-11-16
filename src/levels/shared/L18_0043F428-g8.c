@@ -4,7 +4,7 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } RibbonVector;
 struct RibbonQuad { RibbonVector position[4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
 extern float g_camera_l18_position[];
-extern float D_L18_001B1CA0 __attribute__((sda));
+extern float g_ribbon_uv_step __attribute__((sda));
 extern long long GetEffectTextureDescriptor(int);
 extern void ref_L18_0043F428_00(char *);
 extern void FastVecSub(void *, void *, void *);
@@ -40,8 +40,8 @@ void ribbon_draw_along_points(RibbonVector *points, int count, int flags, u32 co
     ref_L18_0043F428_00((char *)&innerQuad);
     innerQuad.uv[0][0] = 0.0f; innerQuad.uv[0][1] = 0.0f;
     innerQuad.uv[1][0] = 0.0f; innerQuad.uv[1][1] = 1.0f;
-    innerQuad.uv[2][0] = D_L18_001B1CA0; innerQuad.uv[2][1] = 0.0f;
-    innerQuad.uv[3][0] = D_L18_001B1CA0; innerQuad.uv[3][1] = 1.0f;
+    innerQuad.uv[2][0] = g_ribbon_uv_step; innerQuad.uv[2][1] = 0.0f;
+    innerQuad.uv[3][0] = g_ribbon_uv_step; innerQuad.uv[3][1] = 1.0f;
     template0.q = 0;
     template1.q = 0;
     template0.f[3] = 1.0f;
@@ -85,8 +85,8 @@ void ribbon_draw_along_points(RibbonVector *points, int count, int flags, u32 co
         }
         draw_world_quad(&mainQuad, 0, 0);
         draw_world_quad(&innerQuad, 0, 0);
-        u = D_L18_001B1CA0 * IntToFloat(i);
-        nextU = u + D_L18_001B1CA0;
+        u = g_ribbon_uv_step * IntToFloat(i);
+        nextU = u + g_ribbon_uv_step;
         if (u >= 1.0f) {
             u -= 1.0f;
             nextU -= 1.0f;

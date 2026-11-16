@@ -6,11 +6,11 @@
 #define U(p, o) (*(u8 *)((char *)(p) + (o)))
 #define S(p, o) (*(s8 *)((char *)(p) + (o)))
 #define H(p, o) (*(u16 *)((char *)(p) + (o)))
-extern int func_PAL_002B2618(void *, int, int *, float *, float *, float *, float *,
+extern int moby_pick_random_matching_pal(void *, int, int *, float *, float *, float *, float *,
                          float *, float *, float *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002AC290(void *, void *);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern float vec_get_vertical_offset(void *, void *, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -49,9 +49,9 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         break;
     case 2:
         U(state, 7) = 255;
-        if (func_PAL_002B2618(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
             goto play;
-        if (func_PAL_002B2618(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
             break;
         if (U(state, 0x11) != 255) {
             horizontal *= 0.5f;
@@ -65,9 +65,9 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         break;
     case 3:
         U(state, 7) = 255;
-        if (func_PAL_002B2618(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
             goto play;
-        if (func_PAL_002B2618(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
             goto play;
         if (U(state, 0x12) != 255) {
             horizontal *= 0.75f;
@@ -81,7 +81,7 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         break;
     case 6:
         U(state, 7) = 255;
-        if (func_PAL_002B2618(object, 5, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
+        if (moby_pick_random_matching_pal(object, 5, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
             func_PAL_002A7E68(object, index, 0, 2);
         } else {
             valid = 0;
@@ -92,7 +92,7 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         H(state, 0x38) |= 1;
         I(object, 0x98) = 0;
         H(object, 0x34) &= 0xefff;
-        if (func_PAL_002B2618(object, 3, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
+        if (moby_pick_random_matching_pal(object, 3, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
 play:
             func_PAL_002A7E68(object, index, 0, 2);
             break;
@@ -110,7 +110,7 @@ play:
         H(state, 0x38) |= 2;
         I(object, 0x98) = 0;
         H(object, 0x34) &= 0xefff;
-        if (func_PAL_002B2618(object, 4, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
+        if (moby_pick_random_matching_pal(object, 4, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
             func_PAL_002A7E68(object, index, 0, 2);
         } else if (U(state, 0x17) != 255) {
             horizontal *= 1.5f;
@@ -131,7 +131,7 @@ update:
         goto done;
     if (!valid)
         goto done;
-    if (D_001A8CA0) {
+    if (g_ground_check_inhibit) {
         length = vec_get_vertical_offset(object, vector, 0);
         if (length < 1.0f)
             length = 1.0f;

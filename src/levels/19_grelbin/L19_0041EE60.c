@@ -1,14 +1,14 @@
 #include "common.h"
 
-extern u16 *D_L19_001FB5A0[];
+extern u16 *g_group_ptr_table[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern s32 D_L19_001B2A38[] __attribute__((sda));
+extern s32 g_max_l19_group_index[] __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 
 extern void moby_mark_spawned(u8 *);
 
-extern struct { u8 header[0x464]; u8 entries[0]; } D_L19_0021EA30;
+extern struct { u8 header[0x464]; u8 entries[0]; } g_trigger_active_table;
 extern s32 g_active_yeti_count __attribute__((sda));
 extern s32 g_max_active_yetis __attribute__((sda));
 
@@ -39,8 +39,8 @@ void yeti_group_spawner_update(u8 *moby)
     state = *(u8 **)(moby + 0x68);
     if (GROUP(0x120) == -1 ||
         (moby[0xB0] != 0xFF &&
-         (D_L19_0021EA30.entries[(s16)*(u16 *)(moby + 0xB2)] != 0 ||
-          ((saved_count = *(u8 *)(D_0019B4A8 + (((s16) * (u16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10)))),
+         (g_trigger_active_table.entries[(s16)*(u16 *)(moby + 0xB2)] != 0 ||
+          ((saved_count = *(u8 *)(g_moby_nibble_table + (((s16) * (u16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10)))),
            (*(u16 *)(moby + 0xB2) & 1) ? ((saved_count >> 4) & 7) != 0 : (saved_count & 7) != 0)))) {
         moby_mark_spawned(moby);
         return;

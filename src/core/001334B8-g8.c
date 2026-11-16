@@ -11,12 +11,12 @@
    first; the second then ranks behind the remaining load, having fewer dependents.
    Without volatile all four tie on priority and the loads, with more dependents, go
    first. */
-extern int D_001A748C __attribute__((sda));
-extern int D_001A7494 __attribute__((sda));
-extern int D_001A7498 __attribute__((sda));
-extern volatile unsigned int D_001A7100 NOT_SDA;
-extern volatile int D_001A7110 NOT_SDA;
-extern char D_001A713F NOT_SDA;
+extern int g_snd_cmd_result __attribute__((sda));
+extern int g_snd_stop_requested __attribute__((sda));
+extern int g_snd_load_ready __attribute__((sda));
+extern volatile unsigned int g_cd_read_count NOT_SDA;
+extern volatile int g_cd_read_error NOT_SDA;
+extern char g_cd_status_end NOT_SDA;
 
 extern void kernel_process_request_b(void *, void *);
 extern int sceCdRead(int, int, void *, unsigned char *);
@@ -27,20 +27,20 @@ extern void snd_queue_command(int, int, void *, int, long);
 int CdStartRead(int lba, int sectors, void *buf, unsigned char *mode) {
     int payload[4];
 
-    if (D_001A748C == 0) {
+    if (g_snd_cmd_result == 0) {
         return sceCdRead(lba, sectors, buf, mode);
     }
     if (snd_CheckLoadInProgress(1) == 1) {
         return 0;
     }
-    D_001A7100 = 1;
-    D_001A7110 = 0;
-    kernel_process_request_b((void *)&D_001A7100, &D_001A713F);
+    g_cd_read_count = 1;
+    g_cd_read_error = 0;
+    kernel_process_request_b((void *)&g_cd_read_count, &g_cd_status_end);
     payload[0] = lba;
     payload[1] = sectors;
     payload[2] = (int)buf;
-    D_001A7494 = 1;
-    D_001A7498 = 0;
+    g_snd_stop_requested = 1;
+    g_snd_load_ready = 0;
     snd_queue_command(0x38, 0xC, payload, 0, 0);
     return 1;
 }

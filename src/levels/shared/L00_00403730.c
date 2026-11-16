@@ -56,9 +56,9 @@ typedef struct {
     f32 rot[4];
 } Moby403730;
 
-extern s32 D_001A8FF4[] __attribute__((sda));
-extern s32 D_001A8FF0[] __attribute__((sda));
-extern u8 D_00139578[];
+extern s32 g_enemy_ai_frozen[] __attribute__((sda));
+extern s32 g_hero_height_zone_active[] __attribute__((sda));
+extern u8 g_sheepinator_weapon_index[];
 extern Weapon403730 g_weapon_l00_table[];
 
 extern void vec_clear_128(void *);
@@ -92,7 +92,7 @@ Moby403730 *sheep_spawn_from_object(Moby403730 *self) {
         vars = m->vars;
         m->scale = math_random_float_range(0.85f, 1.15f);
         qcopy(m->pos, self->pos);
-        if (D_001A8FF4[0] != 0 || D_001A8FF0[0] != 0) {
+        if (g_enemy_ai_frozen[0] != 0 || g_hero_height_zone_active[0] != 0) {
             copy_matrix_rotation(mtx, self->mtx);
             mat_get_euler_angles(mtx, m->rot);
         } else {
@@ -109,7 +109,7 @@ Moby403730 *sheep_spawn_from_object(Moby403730 *self) {
         m->state = 4;
         sheep_add_to_active_list(m);
         m->f98 = m->cls->f10;
-        w = &g_weapon_l00_table[D_00139578[0]];
+        w = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
         rate = 1.0f;
         if (w->f4 != 0) {
             rate = 4.0f;

@@ -14,7 +14,7 @@ typedef struct {
     Quad normal;
 } CollisionView;
 
-extern unsigned char D_L00_001BF210[];
+extern unsigned char g_collision_view[];
 
 /* Field names follow RAC1's hero collision step (hero_collision.c). */
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct {
 } PlayerView;
 
 extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record, as func_PAL_L00_002B5518 reads it */
-extern int D_L16_001A8FF0 __attribute__((sda));
+extern int g_hero_l16_block_flag __attribute__((sda));
 
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
@@ -118,7 +118,7 @@ typedef struct {
 extern PlayerInputView g_hero_state;
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 
-int func_PAL_L00_002B5518(int mode)
+int hero_push_out_of_collisions_pal(int mode)
 {
     Vec previous;
     Vec offset, displacement;
@@ -148,7 +148,7 @@ int func_PAL_L00_002B5518(int mode)
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if ((&D_00189E20_view)->gravity_mode == 1 || (&D_00189E20_view)->timer) {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_L16_001A8FF0) {
+            } else if (g_hero_l16_block_flag) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, (&D_00189E20_view)->capsule_bottom);
@@ -181,11 +181,11 @@ int func_PAL_L00_002B5518(int mode)
                 if (!hit) break;
             }
         }
-        qcopy(&(&D_00189E20_view)->position, &((CollisionView *)D_L00_001BF210)->position);
-        qcopy(&(&D_00189E20_view)->wall_contact_normal, &((CollisionView *)D_L00_001BF210)->normal);
-        qcopy(&(&D_00189E20_view)->wall_contact_point, &((CollisionView *)D_L00_001BF210)->point);
+        qcopy(&(&D_00189E20_view)->position, &((CollisionView *)g_collision_view)->position);
+        qcopy(&(&D_00189E20_view)->wall_contact_normal, &((CollisionView *)g_collision_view)->normal);
+        qcopy(&(&D_00189E20_view)->wall_contact_point, &((CollisionView *)g_collision_view)->point);
         (&D_00189E20_view)->wall_hit = 1;
-        (&D_00189E20_view)->coll_hit_moby = ((CollisionView *)D_L00_001BF210)->moby;
+        (&D_00189E20_view)->coll_hit_moby = ((CollisionView *)g_collision_view)->moby;
     }
     FastVecSub(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
     FastVecSub(&displacement, &(&D_00189E20_view)->position, &previous);

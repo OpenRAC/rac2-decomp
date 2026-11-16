@@ -21,7 +21,7 @@ extern void set_moby_color(void *owner, int a1, int a2, int a3);
 extern void hero_copy_color_to_slot_objects(void);
 extern void hero_empty_hook(int first, void *second);
 
-void func_PAL_L00_002A7390(void)
+void UpdateHeroBlinkAndItemTint_pal(void)
 {
     int r, g, b;
     int active = 0;

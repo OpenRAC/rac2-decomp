@@ -27,10 +27,10 @@
 #define NULL 0
 #endif
 
-extern s8 D_002359E0[];
+extern s8 g_trail_sparkle_points[];
 extern s8 g_hero_state[];
-extern f32 D_001B0594 __attribute__((sda));
-extern f32 D_001B0598 __attribute__((sda));
+extern f32 g_trail_sparkle_size __attribute__((sda));
+extern f32 g_trail_sparkle_red_size __attribute__((sda));
 extern void vec_clear_128(void *);
 extern s32 math_random_int_range(s32, s32);
 extern void *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, s32, f32, f32, f32);
@@ -54,12 +54,12 @@ void part_init_trail_sparkle_pairs(void) {
     vec_clear_128(zero_vec);
     do {
         alpha = math_random_int_range(0, 0x6F) << 24;
-        point = D_002359E0 + index * 16;
-        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0x7F2020, 0, 1, zero_vec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
+        point = g_trail_sparkle_points + index * 16;
+        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0x7F2020, 0, 1, zero_vec, 0, g_trail_sparkle_size * 0.5f, g_trail_sparkle_size, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        red_size = D_001B0598;
+        red_size = g_trail_sparkle_red_size;
         sprite = part_spawn_ground_effect(point, 0xC, alpha | 0xFF4040, 1, 1, zero_vec, 0, red_size * 0.5f, red_size, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);

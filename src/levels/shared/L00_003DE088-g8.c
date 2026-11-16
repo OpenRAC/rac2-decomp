@@ -3,7 +3,7 @@
 typedef int Quad __attribute__((mode(TI)));
 extern char g_hero_state[] __attribute__((nosda));
 extern char *g_spider_bot_moby __attribute__((sda));
-extern int D_L00_001B2B4C;
+extern int g_spider_bot_effect_slot;
 extern char *CreateMoby(int type);
 extern void euler_rotation_basis(void *out, void *vector);
 extern void func_002A0F48(void *object);
@@ -33,7 +33,7 @@ char *spider_bot_spawn(Quad *position, Quad *velocity)
         *(int *)(state + 0x1c) = 0x7f000000;
         g_spider_bot_moby = object;
         func_002A0F48(object);
-        D_L00_001B2B4C = part_alloc_effect_slot(object, 0, 1.0f, 1.0f, 1.0f);
+        g_spider_bot_effect_slot = part_alloc_effect_slot(object, 0, 1.0f, 1.0f, 1.0f);
     }
     return object;
 }

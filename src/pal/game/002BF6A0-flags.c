@@ -23,7 +23,7 @@ extern void ApproachValue(float *, float, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern float D_001B5358;
+extern float g_rotation_base_angle;
 extern int math_random_int_below(int);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -90,7 +90,7 @@ void func_PAL_002C05F0(char *self)
     *(float *)(s1 + 8) = vec[2];
     f0 = FastAddRotations(*(float *)(s1 + 0x14), *(float *)(s1 + 0x18));
     *(float *)(s1 + 0x14) = f0;
-    g = FastAddRotations(D_001B5358, 1.5707964897155761718750e+00f);
+    g = FastAddRotations(g_rotation_base_angle, 1.5707964897155761718750e+00f);
     f3 = math_fast_sin_or_cos_b(*(float *)(s1 + 0x14));
     f2 = f3 * *(float *)(s1 + 0x1C);
     f0 = math_fast_sin_or_cos_a(g);
@@ -120,7 +120,7 @@ typedef struct {
     f32 pos[4];
     Spark2BFB38 s;
 } Effect2BFB38;
-extern u8 *D_001F25CC[];
+extern u8 *g_part_tex_spark_table[];
 extern Effect2BFB38 *part_alloc(int);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
@@ -138,7 +138,7 @@ Effect2BFB38 *func_PAL_002C0838(void *pos, void *dir, s32 kind, s32 life) {
         e->f1 = 0;
         e->f3 = 0x44;
         e->fC = math_random_float_range(10500.0f, 16800.0f);
-        e->f2 = *D_001F25CC[0];
+        e->f2 = *g_part_tex_spark_table[0];
         qcopy(s->pos, dir);
         s->life = life;
         s->kind = kind;

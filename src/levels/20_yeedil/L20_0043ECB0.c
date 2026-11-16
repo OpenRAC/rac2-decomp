@@ -12,11 +12,11 @@
 
 /* func_L20_00440198 is defined in L20_00440198.c (its slot-table and func_002A7750 declarations conflict with this unit's). */
 
-extern char *D_L20_001FBB20[];
+extern char *g_group_l20_id_lists[];
 
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern int g_group_count __attribute__((sda));
 
-extern unsigned int D_L20_001B2F9C __attribute__((sda));
+extern unsigned int g_group_l20_member_table __attribute__((sda));
 
 /* Counts the objects of a group whose state byte (object + 0x20) is neither 6 nor negative.
    D_L20_001FBB20 holds a list of 16-bit object ids per group; the low 15 bits of an id index
@@ -26,20 +26,20 @@ extern unsigned int D_L20_001B2F9C __attribute__((sda));
    its repeated test into a register known to be zero, which the loop still tests (retail's
    `daddu $t0,$zero,$zero` and `bnez $t0`). */
 int group_count_active_members(int group) {
-    unsigned short *id_list = (unsigned short *)D_L20_001FBB20[group];
+    unsigned short *id_list = (unsigned short *)g_group_l20_id_lists[group];
     int count = 0;
 
     if ((group & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < group) {
+    if (g_group_count < group) {
         goto end;
     }
     if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        char *object = (char *)D_L20_001B2F9C + ((*id_list & 0x7FFF) << 8);
+        char *object = (char *)g_group_l20_member_table + ((*id_list & 0x7FFF) << 8);
 
         if (object == 0) {
             goto end;
@@ -51,7 +51,7 @@ int group_count_active_members(int group) {
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < group) {
+        if (g_group_count < group) {
             goto end;
         }
         if (id_list == 0) {
@@ -60,7 +60,7 @@ int group_count_active_members(int group) {
         if (*(short *)(id_list - 1) >= 0) {
             continue;
         }
-        if (id_list == (unsigned short *)D_L20_001FBB20[group]) {
+        if (id_list == (unsigned short *)g_group_l20_id_lists[group]) {
             continue;
         }
         break;
@@ -204,7 +204,7 @@ void moby_run_type_update(char *moby) {
 /* func_L20_004431E0 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004431E0.c and belongs in the -G8 sibling. */
 
-extern unsigned int D_L20_001B2F9C __attribute__((sda));
+extern unsigned int g_group_l20_member_table __attribute__((sda));
 extern int moby_is_first_state(char *);
 /* func_L20_004499E8 is defined in L20_004499E8-g8.c. */
 extern int func_L20_00449AC8(char *);
@@ -214,7 +214,7 @@ extern void func_0039BDF0(char *, char *, int, int);
 /* Sets up the linked child moby at the target and returns it, or returns nothing if it is busy. */
 char *moby_activate_linked_child(char *moby, char *target) {
     char *state = *(char **)(moby + 0x68);
-    unsigned int child_addr = D_L20_001B2F9C + (*(int *)(state + 0x238) << 8);
+    unsigned int child_addr = g_group_l20_member_table + (*(int *)(state + 0x238) << 8);
 
     if (func_L20_00449AC8((char *)child_addr) != 0) {
         moby_start_path_movement((char *)child_addr, moby, target);
@@ -397,7 +397,7 @@ extern float math_step_value_toward_target(char *, char *, float, float, float, 
 
 extern int PlayMobySound(int, int, char *);
 
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index MACRO_ADDR;
 
 /* The five behaviours the object's state byte selects; the table in the level's data
@@ -419,7 +419,7 @@ c0:
     moby_set_state(moby, 1, -1);
     goto out;
 c1:
-    if ((D_0019B2E8[((unsigned char *)moby)[0xB0] + g_current_map_index * 16] & 0x80) == 0) {
+    if ((g_moby_group_flags[((unsigned char *)moby)[0xB0] + g_current_map_index * 16] & 0x80) == 0) {
         goto end;
     }
     moby_set_state(moby, 2, -1);
@@ -465,7 +465,7 @@ extern int flag_is_third_pending_set(char *);
 
 extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
@@ -486,7 +486,7 @@ c0:
     moby_set_state(moby, 1, -1);
     goto out;
 c1:
-    if ((D_0019B2E8[((unsigned char *)moby)[0xB0] + *(int *)0x001A79F0 * 16] & 0x80) == 0) {
+    if ((g_moby_group_flags[((unsigned char *)moby)[0xB0] + *(int *)0x001A79F0 * 16] & 0x80) == 0) {
         goto end;
     }
     moby_set_state(moby, 2, -1);
@@ -528,7 +528,7 @@ extern int moby_is_hit_by_player_or_aim(char *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 typedef struct { char pad[0x74]; unsigned char active; char pad2[0x13]; char *owner; } SoundSlot;
 extern SoundSlot g_sound_state[];
-extern float D_00189EA4;
+extern float g_elevator_reference_height;
 
 /* Updates an elevator that slides between two heights with a sound, and carries anything standing on it. */
 void elevator_l20_update(char *moby) {
@@ -552,7 +552,7 @@ void elevator_l20_update(char *moby) {
         break;
     case 1:
         if (flag_is_third_pending_set(moby)) {
-            if (hero_is_current_selected_id(moby) || (*(float *)(moby+0x14)-*(float *)(state+0x70))*(D_00189EA4-*(float *)(state+0x70)) < 0.0f) {
+            if (hero_is_current_selected_id(moby) || (*(float *)(moby+0x14)-*(float *)(state+0x70))*(g_elevator_reference_height-*(float *)(state+0x70)) < 0.0f) {
                 if (*(int *)(state+0x74)==0) moby_set_state(moby,2,-1);
                 else moby_set_state(moby,3,-1);
                 if (!snd_is_voice_playing_for_owner(moby,*(int *)(state+0x7C))) *(int *)(state+0x7C)=PlayMobySound(0,4,moby);
@@ -680,13 +680,13 @@ void cycling_platform_update(char *moby) {
 
 /* func_L20_00447748 is defined in L20_00447748-g8.c. */
 
-extern char D_L20_002AB980[];
+extern char g_water_tile_grid[];
 
 extern void render_water_grids();
 
 /* Starts the level effect with a fixed setting. */
 void level_start_fixed_effect(void) {
-    render_water_grids(D_L20_002AB980, 6);
+    render_water_grids(g_water_tile_grid, 6);
 }
 
 /* func_L20_00447930 is defined in L20_00447930-g8.c (it reaches data through $gp). */
@@ -697,7 +697,7 @@ extern float FastVecDot(char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 extern float FastVecLength(char *);
 
-extern char D_L20_001C0430[];
+extern char g_debris_hit_info[];
 
 /* Moves, spins and bounces a piece of debris off walls, then fades it out and removes it. */
 void debris_l20_update(char *moby) {
@@ -714,7 +714,7 @@ void debris_l20_update(char *moby) {
     *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
 
     if (coll_test_point(moby + 0x10, 0, moby, 1.5f) != 0) {
-        char *hit_info = D_L20_001C0430;
+        char *hit_info = g_debris_hit_info;
 
         qcopy(moby + 0x10, hit_info);
         if (FastVecDot(state, hit_info + 0x10) < 0.0f) {

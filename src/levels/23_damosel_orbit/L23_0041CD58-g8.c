@@ -11,10 +11,10 @@ typedef int TI128 __attribute__((mode(TI)));
 extern char *g_mothership_boss_moby __attribute__((sda));
 extern char g_hero_state[];
 extern s32 g_effect_pools[3][60];
-extern s32 D_L23_001B3738[3] __attribute__((sda));
-extern s32 D_L23_001B3744 MACRO_ADDR;
-extern float D_L23_001B1414 __attribute__((sda));
-extern TI128 D_L23_001C0AA0;
+extern s32 g_effect_pool_counts[3] __attribute__((sda));
+extern s32 g_effect_pool_total MACRO_ADDR;
+extern float g_boss_effect_pool_scale __attribute__((sda));
+extern TI128 g_coll_line_hit_point_2;
 extern float fast_vec_dist(char *, char *);
 extern int boss_raise_stat_by_step(char *, int, int, int);
 extern void moby_set_state(unsigned char *, unsigned char, int);
@@ -47,7 +47,7 @@ void boss_update_effect_pools(char *object) {
     do {
         s32 (*rows)[60] = g_effect_pools;
 
-        count = &D_L23_001B3738[group];
+        count = &g_effect_pool_counts[group];
         slot = (char **)rows[group];
         next = group + 1;
         remaining = 49;
@@ -62,10 +62,10 @@ void boss_update_effect_pools(char *object) {
                             (*slot)[0x23] = 127;
                         }
                         oldCount = *count;
-                        oldTotal = D_L23_001B3744;
+                        oldTotal = g_effect_pool_total;
                         *slot = 0;
                         *count = oldCount - 1;
-                        D_L23_001B3744 = oldTotal - 1;
+                        g_effect_pool_total = oldTotal - 1;
                     } else {
                         alpha = moby_get_scale_by_class(*slot) * 0.083333336f;
                         if (alpha > 1.0f) alpha = 1.0f;
@@ -79,7 +79,7 @@ void boss_update_effect_pools(char *object) {
         } while (remaining >= 0);
         group = next;
     } while (group < 3);
-    if (!math_random_int_below(30) && D_L23_001B3744 < 12) {
+    if (!math_random_int_below(30) && g_effect_pool_total < 12) {
         boss_pick_random_spawn_point((char *)&loc[0], 1, 0.0f);
         offset = &loc[1];
         spawnGroup = 0;
@@ -90,8 +90,8 @@ void boss_update_effect_pools(char *object) {
             do {
                 if (*spawnSlot && fast_vec_dist(*spawnSlot + 16, (char *)&loc[0]) < 4.0f) {
                     axis = *spawnSlot + (math_random_int_below(2) * 16 + 0xC0);
-                    if (math_random_int_below(2)) scale = D_L23_001B1414;
-                    else scale = -D_L23_001B1414;
+                    if (math_random_int_below(2)) scale = g_boss_effect_pool_scale;
+                    else scale = -g_boss_effect_pool_scale;
                     FastVecScale((char *)offset, axis, scale);
                     FastVecAdd((char *)&loc[0], (char *)&loc[0], (char *)offset);
                     mothership_project_point_onto_surface((char *)&loc[0], 0.0f);
@@ -104,7 +104,7 @@ void boss_update_effect_pools(char *object) {
         *offset = loc[0];
         mothership_project_point_onto_surface((char *)offset, 3.0f);
         if (CollLine(offset, &loc[0], 18, 0, 0))
-            loc[0] = D_L23_001C0AA0;
+            loc[0] = g_coll_line_hit_point_2;
         part_spawn_random_row_effect(&loc[0], 0);
     }
 }

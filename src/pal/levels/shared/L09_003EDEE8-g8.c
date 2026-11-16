@@ -12,12 +12,12 @@ extern float math_random_float_range(float lo, float hi);
 extern char *part_spawn_scaling(void *pos, void *vel, unsigned int color, int a3, int size, int life,
                            int fade, int a7);
 extern char g_hero_position[];
-extern float D_L09_001B0C40 __attribute__((sda));
-extern float D_L09_001B0C44 __attribute__((sda));
-extern float D_L09_001B0C48 __attribute__((sda));
-extern float D_L09_001B2390 MACRO_ADDR;
-extern float D_L09_001B238C MACRO_ADDR;
-extern int D_L09_001B2388 MACRO_ADDR;
+extern float g_falling_part_hero_range __attribute__((sda));
+extern float g_falling_l09_part_gravity __attribute__((sda));
+extern float g_falling_part_sweep_radius __attribute__((sda));
+extern float g_hero_busy_amount_b MACRO_ADDR;
+extern float g_hero_busy_amount_a MACRO_ADDR;
+extern int g_frame_l09_counter MACRO_ADDR;
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -33,18 +33,18 @@ void func_PAL_L09_003EDFA8(char *object) {
 
     for (i = 5; i < 8; i++) {
         moby_transform_joint_to_world(object, i, &pos);
-        if (vec_distance_xy(&pos, g_hero_position) < D_L09_001B0C40) {
+        if (vec_distance_xy(&pos, g_hero_position) < g_falling_part_hero_range) {
             qcopy(&vel, &pos);
-            vel.f[2] -= D_L09_001B0C44;
-            coll_sweep_from_object(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
+            vel.f[2] -= g_falling_l09_part_gravity;
+            coll_sweep_from_object(object, &vel, 0x10001, 0, 1, 0, g_falling_part_sweep_radius,
                           (float)*(unsigned char *)(data + 0x35), 2.0f);
         }
-        if ((!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31))
+        if ((!(g_hero_busy_amount_b > 0.95f) && !(g_hero_busy_amount_a > 0.95f) && *(unsigned char *)(object + 0x31))
             || math_random_int_below(2)) {
             zero.q = 0;
             zero.f[2] = -(math_random_float_range(4.5f, 5.5f) * (0.020000001f));
             vel.q = zero.q;
-            if (D_L09_001B2388 & 1)
+            if (g_frame_l09_counter & 1)
                 part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, ((s32)(math_random_int_range(18, 22)) * 5 + 2) / 6, 180, -10, 1);
             else
                 part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, ((s32)(math_random_int_range(20, 24)) * 5 + 2) / 6, 350, -10, 1);
@@ -53,11 +53,11 @@ void func_PAL_L09_003EDFA8(char *object) {
             part_spawn_scaling(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
-    if (!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31)) {
+    if (!(g_hero_busy_amount_b > 0.95f) && !(g_hero_busy_amount_a > 0.95f) && *(unsigned char *)(object + 0x31)) {
         for (j = 3; j < 5; j++) {
             vec_scale_to_length(&vel, object + 0xC0, -(math_random_float_range(4.5f, 5.5f) * (0.020000001f)));
             moby_transform_joint_to_world(object, j, &pos);
-            if (D_L09_001B2388 & 1)
+            if (g_frame_l09_counter & 1)
                 part_spawn_scaling(&pos, &vel, 0xCF0000FF, 207, ((s32)(math_random_int_range(18, 22)) * 5 + 2) / 6, 50, -10, 1);
             else
                 part_spawn_scaling(&pos, &vel, 0x6000FFFF, 128, ((s32)(math_random_int_range(20, 24)) * 5 + 2) / 6, 100, -10, 1);

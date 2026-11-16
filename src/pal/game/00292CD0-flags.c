@@ -9,15 +9,15 @@ typedef struct {
     PackEntry packs[1];  
 } PackToc;
 extern PackToc g_copy_setup_data;
-extern char *D_001BAF34;
-extern int D_001A72EC[] __attribute__((sda));
-extern int D_001A72FC[] __attribute__((sda));
-extern long D_001A72A0[] __attribute__((sda));
+extern char *g_load_base_pointer;
+extern int g_vram_clut_first[] __attribute__((sda));
+extern int g_vram_image_address[] __attribute__((sda));
+extern long g_tex_fill_table[] __attribute__((sda));
 extern void FlushCache(int);
 extern int log2dim(int);
-extern short func_PAL_002B8898(int);
+extern short snd_pump_music_and_disc_read_pal(int);
 extern void gfx_wait_for_dma_status_bits(int);
-extern int func_PAL_002B8838(void *, int, int);
+extern int load_read_disc_with_pause_pal(void *, int, int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int sceGsExecLoadImage(void *, void *);
 extern int gfx_wait_paths_idle(int, unsigned short);
@@ -30,7 +30,7 @@ extern int gfx_wait_paths_idle(int, unsigned short);
    The store goes through the table so that its symbol+offset is the assembler
    macro form (two words, never a delay slot). The named words and the order
    they are built in give retail's registers. */
-void func_PAL_00292D18(int index)
+void LoadPackSingleTexture_pal(int index)
 {
     long packet[12] __attribute__((aligned(16)));
     char *base;
@@ -40,13 +40,13 @@ void func_PAL_00292D18(int index)
     char *clut;
 
     gfx_wait_for_dma_status_bits(1);
-    base = D_001BAF34;
-    func_PAL_002B8898(1);
+    base = g_load_base_pointer;
+    snd_pump_music_and_disc_read_pal(1);
     hdr = base + 0x10;
     clut = base + 0x30;
     table = &g_copy_setup_data;
-    func_PAL_002B8838(base, table->packs[index].c + table->base, table->packs[index].d);
-    func_00126288(packet, D_001A72EC[0] >> 8, 1, 0, 0, 0, 16, 16);
+    load_read_disc_with_pause_pal(base, table->packs[index].c + table->base, table->packs[index].d);
+    func_00126288(packet, g_vram_clut_first[0] >> 8, 1, 0, 0, 0, 16, 16);
     FlushCache(0);
     sceGsExecLoadImage(packet, clut);
     gfx_wait_paths_idle(0, 0);
@@ -54,22 +54,22 @@ void func_PAL_00292D18(int index)
     width = *(int *)(hdr + 8) >> 6;
     if (width < 1)
         width = 1;
-    func_00126288(packet, D_001A72FC[0] >> 8, width, 27, 0, 0, *(short *)(hdr + 8), *(short *)(hdr + 12));
+    func_00126288(packet, g_vram_image_address[0] >> 8, width, 27, 0, 0, *(short *)(hdr + 8), *(short *)(hdr + 12));
     FlushCache(0);
     sceGsExecLoadImage(packet, base + 0x430);
     gfx_wait_paths_idle(0, 0);
     {
         long image, tex, format, clut_base, word;
 
-        image = (long)D_001A72FC[0] >> 8;
+        image = (long)g_vram_image_address[0] >> 8;
         tex = image | ((long)width << 14);
         format = ((long)log << 26) | 0x1b00000L;
         tex |= format;
         tex |= (long)log << 30;
-        clut_base = (((long)D_001A72EC[0] >> 8) << 37) | 0x400000000L;
+        clut_base = (((long)g_vram_clut_first[0] >> 8) << 37) | 0x400000000L;
         word = tex | clut_base;
         word |= 0x8000000000000000UL;
-        D_001A72A0[5] = word;
+        g_tex_fill_table[5] = word;
     }
-    func_PAL_002B8838(base, table->packs[index].a + table->base, table->packs[index].b);
+    load_read_disc_with_pause_pal(base, table->packs[index].a + table->base, table->packs[index].b);
 }

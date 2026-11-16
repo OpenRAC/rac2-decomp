@@ -13,9 +13,9 @@ struct Pair43E150 {
     float b;
 };
 
-extern const struct Pair43E150 D_L02_001B29B0;
-extern const struct Pair43E150 D_L02_001B29B8;
-extern const TI128 D_L02_001B29C0[2];
+extern const struct Pair43E150 g_debris_burst_params_a;
+extern const struct Pair43E150 g_debris_burst_params_b;
+extern const TI128 g_debris_burst_colors[2];
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, unsigned char, s32);
 extern void vec_local_offset_to_world(char *, char *, float, float, float);
 extern int math_fast_float_d(void *);
@@ -26,14 +26,14 @@ extern void part_l00_spawn_spark_burst(void *,void *,float,void *,float,int,unsi
 void debris_burst_update(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
     int state_id = moby[0x20];
-    struct Pair43E150 params_a = D_L02_001B29B0;
-    struct Pair43E150 params_b = D_L02_001B29B8;
+    struct Pair43E150 params_a = g_debris_burst_params_a;
+    struct Pair43E150 params_b = g_debris_burst_params_b;
     TI128 table_copy[2];
     float zero_vec[4] __attribute__((aligned(16)));
     float effect_pos[4] __attribute__((aligned(16)));
 
-    table_copy[0] = D_L02_001B29C0[0];
-    table_copy[1] = D_L02_001B29C0[1];
+    table_copy[0] = g_debris_burst_colors[0];
+    table_copy[1] = g_debris_burst_colors[1];
     *(TI128 *)zero_vec = 0;
     switch (state_id) {
     case 0:

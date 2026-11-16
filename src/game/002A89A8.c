@@ -6,7 +6,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
-extern float D_001BAFA8;
+extern float g_coll_ground_height;
 extern int CollLine(void *, void *, int, void *, int);
 
 /* Checks for ground just below the object and returns the ground height offset, or 0 if none is found. */
@@ -20,6 +20,6 @@ float coll_probe_ground_height_below(char *object, int mode, float amount)
     qcopy(&query, object);
     query.f[2] += amount;
     if (CollLine(query.f, local.f, mode | 2, 0, 0))
-        return D_001BAFA8;
+        return g_coll_ground_height;
     return 0.0f;
 }

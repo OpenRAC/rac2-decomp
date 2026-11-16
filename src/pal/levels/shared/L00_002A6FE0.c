@@ -24,11 +24,11 @@ extern GlowResident g_hero_state;
 typedef struct { u8 pad0[0x30]; int state; int timer; } SceneGlow;
 extern int g_frame_l00_counter[] __attribute__((sda));
 extern int g_current_map_index MACRO_ADDR;
-extern SceneGlow D_L00_001BCAC0;
-extern GlowManipulator D_L00_001B1710 MACRO_ADDR;
-extern GlowManipulator D_L00_001B1750 MACRO_ADDR;
-extern unsigned char D_001A7A40[] __attribute__((sda));
-extern float D_L00_001A7CF8 __attribute__((sda));
+extern SceneGlow g_tutorial_probe_context;
+extern GlowManipulator g_pulsing_glow_record_default MACRO_ADDR;
+extern GlowManipulator g_pulsing_glow_record_alt MACRO_ADDR;
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
+extern float g_glow_scale __attribute__((sda));
 extern float D_L00_001A7CF8_gp SDATA(D_L00_001A7CF8);
 extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);
@@ -40,7 +40,7 @@ extern float FastAddRotations(float, float);
 extern void AttachManipulator(GlowMoby *, unsigned int, GlowManipulator *);
 
 /* Animate the object's glow and bind the appropriate auxiliary joint record. */
-void func_PAL_L00_002A6FE0(GlowMoby *object) {
+void update_moby_pulsing_glow_effects_pal(GlowMoby *object) {
     Vector position;
     GlowManipulator *record;
     int red, green, blue, alpha;
@@ -67,9 +67,9 @@ void func_PAL_L00_002A6FE0(GlowMoby *object) {
             hero_queue_glow_point(&position, 0x200000C0U, 0.25f, 0.15f);
     } else if (object->kind == 0x57) {
         emit = 1;
-        if (g_current_map_index == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x3B2)
+        if (g_current_map_index == 3 && g_tutorial_probe_context.state == 7 && g_tutorial_probe_context.timer > 0x3B2)
             emit = 0;
-        else if (g_current_map_index == 3 && D_L00_001BCAC0.state == 0)
+        else if (g_current_map_index == 3 && g_tutorial_probe_context.state == 0)
             emit = 0;
         if (emit) {
             moby_transform_joint_to_world((char *)object, 7, (char *)&position);
@@ -79,7 +79,7 @@ void func_PAL_L00_002A6FE0(GlowMoby *object) {
             alpha <<= 24;
             hero_queue_glow_point(&position, alpha | 0xC0U, 0.04f, 0.07f);
         } else object->color = 0x80505050U;
-    } else if (!(g_current_map_index == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x3B2)) {
+    } else if (!(g_current_map_index == 3 && g_tutorial_probe_context.state == 7 && g_tutorial_probe_context.timer > 0x3B2)) {
         moby_transform_joint_to_world((char *)object, 1, (char *)&position);
         g_hero_state.phase = FastAddRotations(g_hero_state.phase, 0.08028516f);
         pulse = math_fast_sin_or_cos_b(g_hero_state.phase);
@@ -88,14 +88,14 @@ void func_PAL_L00_002A6FE0(GlowMoby *object) {
         hero_queue_glow_point(&position, alpha | 0xC0U, 0.04f, 0.07f);
     }
     kind = object->kind;
-    record = &D_L00_001B1710;
-    if (kind == 0x27D) record = &D_L00_001B1750;
-    if (D_001A7A40[3] != 0) {
+    record = &g_pulsing_glow_record_default;
+    if (kind == 0x27D) record = &g_pulsing_glow_record_alt;
+    if (g_unlocked_item_flags[3] != 0) {
         if (record->initialized == 0) {
             float scale;
             if (kind == 0x27D) {
                 AttachManipulator(object, 1, record);
-                scale = D_L00_001A7CF8;
+                scale = g_glow_scale;
             } else {
                 AttachManipulator(object, kind == 0x57 ? 5 : 2, record);
                 scale = D_L00_001A7CF8_gp;

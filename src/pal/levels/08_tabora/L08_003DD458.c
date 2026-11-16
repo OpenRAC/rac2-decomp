@@ -4,7 +4,7 @@
    becomes 0.028800001f; 0.4f becomes 0.57600003f. */
 #include "common.h"
 
-extern u8 D_L08_001B9B00[];
+extern u8 g_hero_position_vec[];
 extern f32 fast_vec_dist(void *, void *);
 
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -52,8 +52,8 @@ typedef struct {
     int handle;
 } HeroTarget;
 extern HeroTarget g_hero_state;
-extern HeightGate D_L08_001CA080;
-extern char D_L08_001BFF80[];
+extern HeightGate g_init_context;
+extern char g_collision_aim_vector[];
 extern int GetCollHitMaterial(void);
 extern void moby_update_ground_check(void *);
 extern void moby_store_ground_height(void *);
@@ -76,15 +76,15 @@ void func_PAL_L08_003DD458(u8 *object)
     float *pitchAngle, *rollAngle;
     int hit;
 
-    if (D_L08_001CA080.active) {
-        if (*(float *)(object + 0x18) < D_L08_001CA080.lower && D_L08_001CA080.mode == 1) return;
-        if (D_L08_001CA080.lower < *(float *)(object + 0x18) && D_L08_001CA080.mode == 0) return;
-        if (D_L08_001CA080.active == 2) {
-            if (D_L08_001CA080.upper < *(float *)(object + 0x18) && D_L08_001CA080.mode == 1) return;
-            if (*(float *)(object + 0x18) < D_L08_001CA080.upper && D_L08_001CA080.mode == 2) return;
+    if (g_init_context.active) {
+        if (*(float *)(object + 0x18) < g_init_context.lower && g_init_context.mode == 1) return;
+        if (g_init_context.lower < *(float *)(object + 0x18) && g_init_context.mode == 0) return;
+        if (g_init_context.active == 2) {
+            if (g_init_context.upper < *(float *)(object + 0x18) && g_init_context.mode == 1) return;
+            if (*(float *)(object + 0x18) < g_init_context.upper && g_init_context.mode == 2) return;
         }
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L08_001B9B00) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_position_vec) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 22;
     }
@@ -114,7 +114,7 @@ void func_PAL_L08_003DD458(u8 *object)
         matrix_from_basis_rows(inverse, matrix);
         matrix_from_basis_rows(other, object + 0xC0);
         coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
-        func_2FA0B8(angles, D_L08_001BFF80, 1.0f);
+        func_2FA0B8(angles, g_collision_aim_vector, 1.0f);
         matrix_mul_vec3(angles, angles, inverse);
         target = mat_fast_helper_a(angles[2], angles[0]);
         math_approach_target_with_direction_mode(pitchAngle, state + 0x460, target, 0.0025132746f,

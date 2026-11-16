@@ -5,7 +5,7 @@ extern int math_fast_float_d(void *);
 extern void part_kill(void *);
 extern float FastAddRotations(float, float);
 extern int FloatToInt(float);
-extern int D_001AA304 __attribute__((sda));
+extern int g_particle_fade_lifetime __attribute__((sda));
 
 /* Fades a particle in at the start and out at the end of its life and tints it. Removes it when the time is up. */
 void part_update_fade_in_out(char *particle)
@@ -19,10 +19,10 @@ void part_update_fade_in_out(char *particle)
     } else {
         *(float *)(motion + 12) = FastAddRotations(*(float *)(motion + 12), *(float *)(motion + 8));
         particle[8] = FloatToInt(*(float *)(motion + 12) * 40.7436637878418f) - 128;
-        if (*(int *)(particle + 32) > D_001AA304 * 3 / 4)
-            alpha = *(int *)(motion + 16) * (D_001AA304 - *(int *)(particle + 32)) / (D_001AA304 / 4);
-        else if (*(int *)(particle + 32) < D_001AA304 / 4)
-            alpha = *(int *)(motion + 16) * *(int *)(particle + 32) / (D_001AA304 / 4);
+        if (*(int *)(particle + 32) > g_particle_fade_lifetime * 3 / 4)
+            alpha = *(int *)(motion + 16) * (g_particle_fade_lifetime - *(int *)(particle + 32)) / (g_particle_fade_lifetime / 4);
+        else if (*(int *)(particle + 32) < g_particle_fade_lifetime / 4)
+            alpha = *(int *)(motion + 16) * *(int *)(particle + 32) / (g_particle_fade_lifetime / 4);
         else
             alpha = *(int *)(motion + 16);
         alphaShifted = (unsigned int)alpha << 24;

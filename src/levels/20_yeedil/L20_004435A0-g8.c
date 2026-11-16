@@ -27,10 +27,10 @@ extern void moby_update_ground_check(void *);
 extern void value_set_and_smooth(void *, float *, float, int, int);
 
 
-extern float D_L20_001B20B0[] SDATA(D_L20_001B20B0);
+extern float g_local_to_world_vec[] SDATA(D_L20_001B20B0);
 
 
-extern float D_L20_001B2164 __attribute__((sda));
+extern float g_yeedil_smoothed_value __attribute__((sda));
 
 /* Does the upkeep shared by every state of the big enemy. It updates the health display, camera and spawning, applies its tilt, ages it and moves it. */
 void yeedil_boss_frame_upkeep(char *moby) {
@@ -80,9 +80,9 @@ copy:
     }
     *(float *)(moby + 0xF0) = tilt;
     *(float *)(moby + 0xF4) = *(float *)(vars + 0x1804);
-    matrix_mul_vec3(&before, D_L20_001B20B0, moby + 0xC0);
+    matrix_mul_vec3(&before, g_local_to_world_vec, moby + 0xC0);
     euler_rotation_basis(moby + 0xC0, moby + 0xF0);
-    matrix_mul_vec3(&after, D_L20_001B20B0, moby + 0xC0);
+    matrix_mul_vec3(&after, g_local_to_world_vec, moby + 0xC0);
     FastVecSub(&delta, &after, &before);
     FastVecSub(src, src, &delta);
 done:
@@ -92,5 +92,5 @@ done:
     if (frames <= 0xFFFE) {
         *(unsigned short *)(moby + 0x96) = frames + 1;
     }
-    value_set_and_smooth(moby, (float *)(vars + 0x250), D_L20_001B2164, 0, 1);
+    value_set_and_smooth(moby, (float *)(vars + 0x250), g_yeedil_smoothed_value, 0, 1);
 }

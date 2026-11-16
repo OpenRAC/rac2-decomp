@@ -57,34 +57,34 @@ extern int grulch_is_target_reachable(u8 *);
 extern void snapper_init_state_check_hits(void);
 extern u8 g_hero_state[];
 extern u8 *g_moby_l17_pool[] __attribute__((sda));
-extern int D_L17_001B3940[] __attribute__((sda));
-extern u8 *D_L17_001FB720[];
+extern int g_snapper_joint_index[] __attribute__((sda));
+extern u8 *g_group_l17_member_table[];
 extern u8 *g_path_l17_table[];
-extern Vec D_L17_001B9BC0;
-extern Vec D_L17_001C0020;
-extern char D_L17_001B0ED0[], D_L17_001B0EE8[], D_L17_001B0F10[], D_L17_001B0F20[];
-extern float D_L17_001B0E3C __attribute__((sda));
-extern float D_L17_001B0E58 __attribute__((sda));
-extern int D_L17_001B0E68 __attribute__((sda));
-extern int D_L17_001B0E6C __attribute__((sda));
-extern float D_L17_001B0E70 __attribute__((sda));
-extern float D_L17_001B0E74 __attribute__((sda));
-extern float D_L17_001B0E7C __attribute__((sda));
-extern float D_L17_001B0E80 __attribute__((sda));
-extern float D_L17_001B0E88 __attribute__((sda));
-extern int D_L17_001B0E8C __attribute__((sda));
-extern float D_L17_001B0E90 __attribute__((sda));
-extern int D_L17_001B0E94 __attribute__((sda));
-extern int D_L17_001B0E9C __attribute__((sda));
-extern float D_L17_001B0EA4 __attribute__((sda));
-extern int D_L17_001B0EA8 __attribute__((sda));
-extern float D_L17_001B0EAC __attribute__((sda));
-extern float D_L17_001B0EB0 __attribute__((sda));
-extern float D_L17_001B0EB4 __attribute__((sda));
-extern float D_L17_001B0EB8 __attribute__((sda));
-extern int D_L17_001B0EC0 __attribute__((sda));
-extern int D_L17_001B0EC4 __attribute__((sda));
-extern float D_L17_001B0EC8 __attribute__((sda));
+extern Vec g_tether_origin_pos;
+extern Vec g_aim_origin_vec;
+extern char g_str_snapper_debug_a[], g_str_snapper_state_change[], g_str_snapper_debug_b[], g_str_snapper_debug_c[];
+extern float g_snapper_min_value __attribute__((sda));
+extern float g_snapper_chase_distance __attribute__((sda));
+extern int g_snapper_turn_rate_a __attribute__((sda));
+extern int g_snapper_turn_rate_b __attribute__((sda));
+extern float g_snapper_speed_a __attribute__((sda));
+extern float g_snapper_speed_b __attribute__((sda));
+extern float g_snapper_attack_distance __attribute__((sda));
+extern float g_snapper_attack_margin __attribute__((sda));
+extern float g_snapper_turn_radius __attribute__((sda));
+extern int g_snapper_int_param_a __attribute__((sda));
+extern float g_snapper_side_point_dist __attribute__((sda));
+extern int g_snapper_int_param_b __attribute__((sda));
+extern int g_snapper_anim_blend_frames __attribute__((sda));
+extern float g_snapper_arrive_distance __attribute__((sda));
+extern int g_snapper_timer_limit __attribute__((sda));
+extern float g_snapper_bite_end_progress __attribute__((sda));
+extern float g_snapper_attack_hit_progress __attribute__((sda));
+extern float g_snapper_attack_end_progress __attribute__((sda));
+extern float g_snapper_chase_scale __attribute__((sda));
+extern int g_snapper_damage_type_move __attribute__((sda));
+extern int g_snapper_damage_type_bite __attribute__((sda));
+extern float g_snapper_hit_radius __attribute__((sda));
 
 /* Updates the two-headed Smolgian snapper (moby class 3019): it sets itself up, walks along
    its path, chases the player, bites when close, and is removed if it falls out of the
@@ -108,7 +108,7 @@ void snapper_update(u8 *self) {
     attached_index = *(int *)(vars + 0x6B8);
     if (attached_index != -1) {
         if (((Moby *)g_moby_l17_pool[0])[attached_index].oclass != 0x929 /* moby class 2345 */) {
-            STUB_printf(D_L17_001B0ED0);
+            STUB_printf(g_str_snapper_debug_a);
         } else {
             platform_set_path_index((u8 *)&((Moby *)g_moby_l17_pool[0])[attached_index], self);
         }
@@ -140,13 +140,13 @@ void snapper_update(u8 *self) {
     case 0:
     case0:
         if (*(s16 *)(vars + 0x69E) == 1) {
-            if (*(int *)(vars + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || ClaimNearestObjectSlot(self) != 0) {
+            if (*(int *)(vars + 0x730) == 0 || g_group_l17_member_table[self[0x21]] == 0 || ClaimNearestObjectSlot(self) != 0) {
                 moby_set_state(self, 0xF, 2);
             } else {
                 moby_set_state(self, 7, 6);
-                if (self[0x43] != 1) anim_start_blended(self, 1, 0, D_L17_001B0E9C);
+                if (self[0x43] != 1) anim_start_blended(self, 1, 0, g_snapper_anim_blend_frames);
             }
-            moby_set_controller_speed_limits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+            moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_a * 0.00027777778f, g_snapper_speed_a * 0.016666668f, 0.10471977f, 0.10471977f);
             *(s16 *)(vars + 0x69C) = 0xC8;
             *(int *)(vars + 0x148) = *(int *)(vars + 0x148) | 0x10;
         }
@@ -155,7 +155,7 @@ void snapper_update(u8 *self) {
         if (*(s16 *)(vars + 0x69E) == 1) *(s16 *)(vars + 0x69C) = 0xC8;
         if (FastDecTimer((short *)(vars + 0x69C)) != 0) {
             moby_set_state(self, 5, 4);
-            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != 3) anim_start_blended(self, 3, 0, 0x14);
             *(s16 *)(vars + 0x69C) = 0xDC;
         }
@@ -168,18 +168,18 @@ void snapper_update(u8 *self) {
             if ((self[0x42] != 1 && self[0x43] != 1) || (self[0x60] & 2)) {
 alert:
                 moby_set_state(self, 0xB, 2);
-                moby_set_controller_speed_limits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+                moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_a * 0.00027777778f, g_snapper_speed_a * 0.016666668f, 0.10471977f, 0.10471977f);
                 *(s16 *)(vars + 0x69C) = 0xC8;
                 *(int *)(vars + 0x148) = *(int *)(vars + 0x148) | 0x10;
             }
         } else {
             anim_progress = moby_get_anim_value(self);
             if (*(s16 *)(vars + 0x69E) == 1) *(s16 *)(vars + 0x69C) = 0xC8;
-            if ((self[0x60] & 2) && self[0x42] == 3 && self[0x43] != 0xE) anim_start_blended(self, 0xE, 0, D_L17_001B0E9C);
-            if (anim_progress >= 20.0f && self[0x42] == 0xE && self[0x43] != 3) anim_start_blended(self, 3, 0, D_L17_001B0E9C);
+            if ((self[0x60] & 2) && self[0x42] == 3 && self[0x43] != 0xE) anim_start_blended(self, 0xE, 0, g_snapper_anim_blend_frames);
+            if (anim_progress >= 20.0f && self[0x42] == 0xE && self[0x43] != 3) anim_start_blended(self, 3, 0, g_snapper_anim_blend_frames);
             if (self[0x60] & 2) {
                 if (self[0x42] == 1) {
-                    if (self[0x43] != 0xE) anim_start_blended(self, 0xE, 0, D_L17_001B0E9C);
+                    if (self[0x43] != 0xE) anim_start_blended(self, 0xE, 0, g_snapper_anim_blend_frames);
                     goto b60;
                 }
             } else {
@@ -190,7 +190,7 @@ b60:
             }
 b62:
             if (FastDecTimer((short *)(vars + 0x69C)) != 0) {
-                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 2) anim_start_blended(self, 2, 0, 0x14);
                 moby_set_state(self, 3, 0);
             }
@@ -200,12 +200,12 @@ b62:
         if (flag_set_second_pending(self) != 0) {
             anim_speed = ((UView *)(self))->f[0x12];
             if (anim_speed <= 0.0f || anim_speed > 1.0f) ((UView *)(self))->f[0x12] = 1.0f;
-            moby_set_controller_speed_limits(self, (float)(D_L17_001B0E68 * 8) * 0.00027777778f, D_L17_001B0E70 * 0.13333334f, 0.10471977f, 0.10471977f);
+            moby_set_controller_speed_limits(self, (float)(g_snapper_turn_rate_a * 8) * 0.00027777778f, g_snapper_speed_a * 0.13333334f, 0.10471977f, 0.10471977f);
         }
-        if (((UView *)(self))->f[0x6] < D_L17_001B0E3C) goto b262;
+        if (((UView *)(self))->f[0x6] < g_snapper_min_value) goto b262;
         if (*(float *)(vars + 0xE8) > 0.016666668f) {
             *(float *)(vars + 0xE8) = 0.016666668f;
-            STUB_printf(D_L17_001B0F10);
+            STUB_printf(g_str_snapper_debug_b);
         }
         hit_flags = moby_dispatch_action_by_kind(self, vars + 0x60);
         if (hit_flags & 1) {
@@ -215,7 +215,7 @@ b62:
         attack_progress = moby_get_anim_value(self);
         if (attack_progress >= 13.0f && attack_progress <= 14.0f && self[0x42] == self[0x43]
             && FastDiffRots(mat_fast_helper_a(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && fast_vec_dist(self + 0x10, vars + 0x240) < D_L17_001B0E58) {
+            && fast_vec_dist(self + 0x10, vars + 0x240) < g_snapper_chase_distance) {
             if (self[0x42] == 4) {
                 if (grulch_is_target_reachable(self) != 0) {
                     hit_info.obj = self;
@@ -228,16 +228,16 @@ b62:
                     hit_info.o = hit_info.k = 1;
                     hit_info.z = 0;
                     hit_info.id = ((UView *)(self))->uh[0x55];
-                    damage_type = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
-                    coll_test_hit_at_bone(D_L17_001B0EC8, *(float *)(vars + 0x700), 1.0f, self, damage_type, 0x10001, 0, 1, 0);
+                    damage_type = self[0x42] == 4 ? g_snapper_damage_type_bite : g_snapper_damage_type_move;
+                    coll_test_hit_at_bone(g_snapper_hit_radius, *(float *)(vars + 0x700), 1.0f, self, damage_type, 0x10001, 0, 1, 0);
                 }
             }
         }
         if ((self[0x42] == 4 || self[0x43] == 4) && !(attack_progress > 13.0f)) {
             moby_l01_turn_toward_target(self, vars + 0x240);
         }
-        if ((hit_flags & 2) && D_L17_001B0EB0 <= attack_progress) moby_set_state(self, 0xD, 2);
-        if (self[0x42] == 0xD && D_L17_001B0EB4 <= attack_progress) {
+        if ((hit_flags & 2) && g_snapper_attack_hit_progress <= attack_progress) moby_set_state(self, 0xD, 2);
+        if (self[0x42] == 0xD && g_snapper_attack_end_progress <= attack_progress) {
             if (self[0x43] != 4) anim_start_blended(self, 4, 0, 8);
             *(s16 *)(g_hero_state + 0x1DC) = 0;
         }
@@ -247,17 +247,17 @@ b62:
     case 3:
         if (flag_set_first_pending(self) != 0) {
             if (math_random_int_below(2) == 0) {
-                if (self[0x43] != 2) anim_start_blended(self, 2, 0, D_L17_001B0E9C);
+                if (self[0x43] != 2) anim_start_blended(self, 2, 0, g_snapper_anim_blend_frames);
             } else if (self[0x43] != 0xE) {
-                anim_start_blended(self, 0xE, 0, D_L17_001B0E9C);
+                anim_start_blended(self, 0xE, 0, g_snapper_anim_blend_frames);
             }
         }
         idle_progress = moby_get_anim_value(self);
         if ((self[0x42] == 2 && (self[0x60] & 2)) || (self[0x42] == 0xE && idle_progress >= 20.0f)) {
             if (math_random_int_below(2) == 0) {
-                if (self[0x43] != 2) anim_start_blended(self, 2, 0, D_L17_001B0E9C);
+                if (self[0x43] != 2) anim_start_blended(self, 2, 0, g_snapper_anim_blend_frames);
             } else if (self[0x43] != 0xE) {
-                anim_start_blended(self, 0xE, 0, D_L17_001B0E9C);
+                anim_start_blended(self, 0xE, 0, g_snapper_anim_blend_frames);
             }
         }
         break;
@@ -271,8 +271,8 @@ b62:
                 target_point.f[2] = target_point.f[2] + 1.0f;
                 probe_point.f[2] = target_point.f[2];
                 if (CollLine(&target_point, &probe_point, 0, self, 0) != 0) {
-                    if (!(vec_distance_xy(self + 0x10, &D_L17_001C0020) < 2.0f)) {
-                        qcopy(vars + 0x710, &D_L17_001C0020);
+                    if (!(vec_distance_xy(self + 0x10, &g_aim_origin_vec) < 2.0f)) {
+                        qcopy(vars + 0x710, &g_aim_origin_vec);
                         break;
                     }
                 } else {
@@ -282,7 +282,7 @@ b62:
                 attempts++;
             } while (attempts < 5);
             if (attempts != 5) {
-                if (self[0x43] != 0xC) anim_start_blended(self, 0xC, 0, D_L17_001B0E9C);
+                if (self[0x43] != 0xC) anim_start_blended(self, 0xC, 0, g_snapper_anim_blend_frames);
             } else {
                 moby_set_state(self, 3, -1);
                 break;
@@ -298,12 +298,12 @@ b62:
     case 6:
         if (flag_set_first_pending(self) != 0) {
             if (((Moby *)g_moby_l17_pool[0])[*(int *)(vars + 0x6B8)].oclass != 0x929 /* moby class 2345 */) {
-                if (self[0x43] != 1) anim_start_blended(self, 1, 0, D_L17_001B0E9C);
-                moby_set_controller_speed_limits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+                if (self[0x43] != 1) anim_start_blended(self, 1, 0, g_snapper_anim_blend_frames);
+                moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_a * 0.00027777778f, g_snapper_speed_a * 0.016666668f, 0.10471977f, 0.10471977f);
             } else {
                 ((UView *)(self))->f[0x12] = -1.0f;
-                if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, D_L17_001B0E9C);
-                moby_set_controller_speed_limits(self, (float)D_L17_001B0E68 * 0.00027777778f, D_L17_001B0E70 * 0.016666668f, 0.10471977f, 0.10471977f);
+                if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, g_snapper_anim_blend_frames);
+                moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_a * 0.00027777778f, g_snapper_speed_a * 0.016666668f, 0.10471977f, 0.10471977f);
             }
             ((UView *)(self))->f[0x6] = coll_probe_ground_height_below(self + 0x10, 0, 3.0f);
             qcopy(vars + 0x6C0, self + 0x10);
@@ -331,36 +331,36 @@ s6_159:
             ((UView *)(self))->f[0x6] = coll_probe_ground_height_below(self + 0x10, 0, 0.5f);
             moby_l01_turn_toward_target(self, &probe_point);
             if (!(vec_distance_xy(self + 0x10, vars + 0x6C0) > 4.9f)) {
-            } else if (*(int *)(vars + 0x730) == 0 || D_L17_001FB720[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, ClaimNearestObjectSlot(self) != 0)) {
+            } else if (*(int *)(vars + 0x730) == 0 || g_group_l17_member_table[self[0x21]] == 0 || (((UView *)(self))->f[0x12] = 1.0f, ClaimNearestObjectSlot(self) != 0)) {
                 moby_set_state(self, 0xB, 2);
             } else {
                 moby_set_state(self, 7, 6);
-                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 3) anim_start_blended(self, 3, 0, 0x14);
             }
         }
         break;
     case 11:
         if (flag_set_first_pending(self) != 0) {
-            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, D_L17_001B0E9C);
-            chase_scale = D_L17_001B0EB8;
+            if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, g_snapper_anim_blend_frames);
+            chase_scale = g_snapper_chase_scale;
             ((UView *)(self))->f[0x12] = -chase_scale;
-            moby_set_controller_speed_limits(self, (float)D_L17_001B0E68 * 0.00027777778f, chase_scale * D_L17_001B0E70 * 0.016666668f, 0.05817765f, 0.05817765f);
+            moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_a * 0.00027777778f, chase_scale * g_snapper_speed_a * 0.016666668f, 0.05817765f, 0.05817765f);
         }
         if (self[0x42] == 0xA) {
-            if (dist < D_L17_001B0E7C) {
-                qcopy((&target_point), &D_L17_001B9BC0);
-                if (vec_distance_xy((&target_point), self + 0x10) < D_L17_001B0EA4) {
-                    if (*(int *)(vars + 0x738) < D_L17_001B0EA8) {
+            if (dist < g_snapper_attack_distance) {
+                qcopy((&target_point), &g_tether_origin_pos);
+                if (vec_distance_xy((&target_point), self + 0x10) < g_snapper_arrive_distance) {
+                    if (*(int *)(vars + 0x738) < g_snapper_timer_limit) {
                         (&target_point)->f[2] = *(float *)(vars + 0x248);
                         FastVecSub((&target_point), vars + 0x240, (&target_point));
-                        vec_scale_to_length((&target_point), (&target_point), 2.0f * D_L17_001B0EA4);
-                        FastVecAdd((&target_point), &D_L17_001B9BC0, (&target_point));
+                        vec_scale_to_length((&target_point), (&target_point), 2.0f * g_snapper_arrive_distance);
+                        FastVecAdd((&target_point), &g_tether_origin_pos, (&target_point));
                         probe_point.q = *(Quad *)(self + 0x10);
                         path_clamp_move_to_area(&probe_point, (&target_point), (&target_point), *(int *)(vars + 0x684), 3.0f);
                         fallback_distance = vec_distance_xy(self + 0x10, (&target_point));
-                        if (D_L17_001B0EA4 + 0.3f < fallback_distance) {
+                        if (g_snapper_arrive_distance + 0.3f < fallback_distance) {
                             moby_l01_turn_toward_target(self, (&target_point));
                             *(int *)(vars + 0x738) = *(int *)(vars + 0x738) + 1;
                             break;
@@ -369,24 +369,24 @@ s6_159:
                         goto s11_184;
                     }
                 }
-                if (*(int *)(vars + 0x738) >= D_L17_001B0EA8) {
+                if (*(int *)(vars + 0x738) >= g_snapper_timer_limit) {
 s11_184:
-                    STUB_printf(D_L17_001B0F20);
+                    STUB_printf(g_str_snapper_debug_c);
                 }
                 *(int *)(vars + 0x738) = 0;
                 moby_set_state(self, 0xC, -1);
                 ((UView *)(self))->f[0x12] = 1.0f;
-                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != math_random_int_below(2) + 4) anim_start_blended(self, math_random_int_below(2) + 4, 2, 0x14);
             } else {
                 ComputeRegionRouteHeading(self + 0x10, vars + 0x240, &path_cost, vars + 0x280, *(int *)(vars + 0x750), vars + 0x758, vars + 0x754, 0.0f, 0.5f);
                 moby_step_controller(self, vars + 0x240, path_cost);
                 StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
                 if (*(int *)(vars + 0x190) >= 0x3D) {
-                    *(int *)(vars + 0x704) = D_L17_001B0E8C;
+                    *(int *)(vars + 0x704) = g_snapper_int_param_a;
                     moby_set_state(self, 4, -1);
                     ((UView *)(self))->f[0x12] = 1.0f;
-                    if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                    if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                     if (self[0x43] != 2) anim_start_blended(self, 2, 0, 0x14);
                 }
             }
@@ -402,7 +402,7 @@ s11_184:
         bite_progress = moby_get_anim_value(self);
         if (bite_progress >= 13.0f && bite_progress <= 14.0f && self[0x42] == self[0x43]
             && FastDiffRots(mat_fast_helper_a(*(float *)(vars + 0x240) - ((UView *)(self))->f[0x4], *(float *)(vars + 0x244) - ((UView *)(self))->f[0x5]), ((UView *)(self))->f[0x3E]) < 1.9198624f
-            && fast_vec_dist(self + 0x10, vars + 0x240) < D_L17_001B0E58
+            && fast_vec_dist(self + 0x10, vars + 0x240) < g_snapper_chase_distance
             && grulch_is_target_reachable(self) != 0) {
             hit_info.obj = self;
             hit_info.flags = 0x10001;
@@ -414,42 +414,42 @@ s11_184:
             hit_info.o = hit_info.k = 1;
             hit_info.z = 0;
             hit_info.id = ((UView *)(self))->uh[0x55];
-            damage_type = self[0x42] == 4 ? D_L17_001B0EC4 : D_L17_001B0EC0;
-            coll_test_hit_at_bone(D_L17_001B0EC8, *(float *)(vars + 0x700), 1.0f, self, damage_type, 0x10001, 0, 1, 0);
+            damage_type = self[0x42] == 4 ? g_snapper_damage_type_bite : g_snapper_damage_type_move;
+            coll_test_hit_at_bone(g_snapper_hit_radius, *(float *)(vars + 0x700), 1.0f, self, damage_type, 0x10001, 0, 1, 0);
         }
-        if ((u32)(self[0x42] - 4) < 2U && D_L17_001B0EAC <= bite_progress) moby_set_state(self, 0xD, -1);
+        if ((u32)(self[0x42] - 4) < 2U && g_snapper_bite_end_progress <= bite_progress) moby_set_state(self, 0xD, -1);
         break;
     case 4:
         if (math_fast_float_d(vars + 0x704) != 0) {
             moby_set_state(self, 0xC, -1);
-            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != math_random_int_below(2) + 4) anim_start_blended(self, math_random_int_below(2) + 4, 0, 0x14);
         }
         break;
     case 13:
         if (flag_set_first_pending(self) != 0) {
             turn_angle = FastAddRotations(((UView *)(self))->f[0x3E], 3.141593f);
-            (&target_point)->f[0] = math_fast_sin_or_cos_a(turn_angle) * D_L17_001B0E88;
-            (&target_point)->f[1] = math_fast_sin_or_cos_b(turn_angle) * D_L17_001B0E88;
+            (&target_point)->f[0] = math_fast_sin_or_cos_a(turn_angle) * g_snapper_turn_radius;
+            (&target_point)->f[1] = math_fast_sin_or_cos_b(turn_angle) * g_snapper_turn_radius;
             (&target_point)->f[2] = 0.0f;
             FastVecAdd((&target_point), (&target_point), self + 0x10);
             probe_point.q = *(Quad *)(self + 0x10);
             path_clamp_move_to_area(&probe_point, (&target_point), (&target_point), *(int *)(vars + 0x684), 3.0f);
-            if (fast_vec_dist(self + 0x10, (&target_point)) < D_L17_001B0E88 * 0.5f) {
-                coll_find_clear_side_point(self + 0x10, vars + 0x240, (&target_point), *(int *)(vars + 0x684), D_L17_001B0E90, 1.0f);
+            if (fast_vec_dist(self + 0x10, (&target_point)) < g_snapper_turn_radius * 0.5f) {
+                coll_find_clear_side_point(self + 0x10, vars + 0x240, (&target_point), *(int *)(vars + 0x684), g_snapper_side_point_dist, 1.0f);
             }
             qcopy(&probe_point, self + 0x10);
             probe_point.f[2] += 0.5f;
             qcopy(&probe_end, (&target_point));
             probe_end.f[2] += 0.5f;
-            if (CollLine(&probe_point, &probe_end, 2, 0, 0) != 0) qcopy((&target_point), &D_L17_001C0020);
+            if (CollLine(&probe_point, &probe_end, 2, 0, 0) != 0) qcopy((&target_point), &g_aim_origin_vec);
             qcopy(vars + 0x710, (&target_point));
-            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
-            if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, D_L17_001B0E9C);
-            moby_set_controller_speed_limits(self, (float)D_L17_001B0E6C * 0.00027777778f, D_L17_001B0E74 * 0.016666668f, 0.10471977f, 0.10471977f);
-            *(int *)(vars + 0x708) = D_L17_001B0E94;
+            if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != 0xA) anim_start_blended(self, 0xA, 0, g_snapper_anim_blend_frames);
+            moby_set_controller_speed_limits(self, (float)g_snapper_turn_rate_b * 0.00027777778f, g_snapper_speed_b * 0.016666668f, 0.10471977f, 0.10471977f);
+            *(int *)(vars + 0x708) = g_snapper_int_param_b;
             grulch_release_slot(self);
-            ((UView *)(self))->f[0x12] = D_L17_001B0EB8;
+            ((UView *)(self))->f[0x12] = g_snapper_chase_scale;
         }
         near_ground = 0;
         move_flags13 = moby_l01_turn_toward_target(self, vars + 0x710);
@@ -458,20 +458,20 @@ s11_184:
         if (!(move_flags13 & 0x80) && *(int *)(vars + 0x190) < 0xA && !(move_flags13 & 0xF) && near_ground != 1) {
         } else {
             ((UView *)(self))->f[0x12] = 1.0f;
-            if (dist < D_L17_001B0E7C + D_L17_001B0E80) {
+            if (dist < g_snapper_attack_distance + g_snapper_attack_margin) {
                 moby_set_state(self, 0xC, -1);
-                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != math_random_int_below(2) + 4) anim_start_blended(self, math_random_int_below(2) + 4, 0, 0x14);
             } else {
                 moby_set_state(self, 7, 6);
-                if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+                if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
                 if (self[0x43] != 3) anim_start_blended(self, 3, 0, 0x14);
             }
         }
-        if (math_fast_float_d(vars + 0x708) != 0 && dist < D_L17_001B0E7C) {
+        if (math_fast_float_d(vars + 0x708) != 0 && dist < g_snapper_attack_distance) {
             moby_set_state(self, 0xC, -1);
             ((UView *)(self))->f[0x12] = 1.0f;
-            if (self[0x43] != self[0x42]) STUB_printf(D_L17_001B0EE8, self[0x42], ((UView *)(self))->h[0x59]);
+            if (self[0x43] != self[0x42]) STUB_printf(g_str_snapper_state_change, self[0x42], ((UView *)(self))->h[0x59]);
             if (self[0x43] != math_random_int_below(2) + 4) anim_start_blended(self, math_random_int_below(2) + 4, 0, 0x14);
         }
         StepAngleTowardTarget(self + 0xF8, 0, ang, 0.05817765f);
@@ -490,7 +490,7 @@ b262:
         }
         break;
     }
-    moby_transform_joint_to_world(self, D_L17_001B3940[0], (&target_point));
+    moby_transform_joint_to_world(self, g_snapper_joint_index[0], (&target_point));
     if (coll_probe_ground_height_below((&target_point), 0, 1.0f) < 20.0f && self[0x95] != 3 && self[0x20] != 9) {
         if (self[0x20] == 0xD || self[0x20] == 0xB) moby_set_state(self, 9, 7);
     }

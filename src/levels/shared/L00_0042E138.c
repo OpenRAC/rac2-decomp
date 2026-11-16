@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
-extern unsigned char D_001A7B96 __attribute__((sda));
+extern unsigned char g_toggle_option_b __attribute__((sda));
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
@@ -12,9 +12,9 @@ extern void func_L00_00430948_3(char *p, float a, float b);
 
 extern int func_002E5E58_3(int a, int b, int c);
 
-extern volatile unsigned char D_001A7B95 __attribute__((sda));
+extern volatile unsigned char g_toggle_option_a __attribute__((sda));
 
-extern volatile unsigned char D_001A7B94 __attribute__((sda));
+extern volatile unsigned char g_subtitles_option __attribute__((sda));
 
 extern void prompt_bar_update (char *object);
 
@@ -30,7 +30,7 @@ extern int func_002E5E58_2(int a, int b, int c);
 
 extern volatile unsigned char D_001A7BB2_1 __attribute__((sda));
 
-extern volatile unsigned char D_001A7BB3 __attribute__((sda));
+extern volatile unsigned char g_weapon_wheel_enabled __attribute__((sda));
 
 /* Does nothing. */
 void menu_hook_noop_a(void)
@@ -122,10 +122,10 @@ int menu_handle_page_input_a(char *a0, int a1)
         func_002E5E58_3(4, 0, 0);
         switch (*(int *)(a0 + 680)) {
         case 0:
-            D_001A7B95 = D_001A7B95 == 0;
+            g_toggle_option_a = g_toggle_option_a == 0;
             break;
         case 1:
-            D_001A7B94 = D_001A7B94 == 0;
+            g_subtitles_option = g_subtitles_option == 0;
             break;
         }
     }
@@ -144,7 +144,7 @@ char *menu_init_page_record_e(char *object)
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
 int menu_handle_page_input_b (char *object, int flags)
 {
-  unsigned char *g = &D_001A7B96;
+  unsigned char *g = &g_toggle_option_b;
   float *vec;
   int discarded;
 
@@ -195,7 +195,7 @@ int menu_handle_page_input_c(char *a0, int a1)
             D_001A7BB2_1 = D_001A7BB2_1 == 0;
             break;
         case 1:
-            D_001A7BB3 = D_001A7BB3 == 0;
+            g_weapon_wheel_enabled = g_weapon_wheel_enabled == 0;
             break;
         }
     }

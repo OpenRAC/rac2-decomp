@@ -8,7 +8,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char g_hero_position[];
-extern int D_L02_001A8FF0 __attribute__((sda));
+extern int g_tether_lock_active __attribute__((sda));
 extern void SetDeathBits(char *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -39,7 +39,7 @@ void moby_l02_explode_and_remove(char *object)
     FastVecSub(&impulse, origin, g_hero_position);
     vec_transform_and_set_height(object, &impulse, &impulse, 0.0f, 0);
     vec_scale_to_length(&impulse, &impulse, 0.10000001f);
-    if (D_L02_001A8FF0)
+    if (g_tether_lock_active)
         colour = math_random_int_below(255);
     else
         colour = 255;

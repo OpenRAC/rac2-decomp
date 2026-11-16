@@ -15,9 +15,9 @@ extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
 
 extern f32 weapon_compute_shot_launch_speed(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
 
-extern f32 D_L11_001B016C __attribute__((sda));
+extern f32 g_bomb_velocity_scale __attribute__((sda));
 
-extern f32 D_L11_001B0168 __attribute__((sda));
+extern f32 g_bomb_speed __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -39,12 +39,12 @@ u8 *func_PAL_L11_003E0F10(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
         v1 = *(u8 **)(s1 + 0x24);
         dst = (TI128 *)(s1 + 0x10);
 
-        *(f32 *)(s1 + 0x2C) = *(f32 *)(v1 + 0x24) * D_L11_001B016C;
+        *(f32 *)(s1 + 0x2C) = *(f32 *)(v1 + 0x24) * g_bomb_velocity_scale;
         *(u16 *)(s1 + 0x34) |= 0x5000;
         *dst = *(TI128 *)s2;
         FastVecSub((f32 *)s0, (f32 *)s3, (f32 *)s2);
         *(s32 *)(s0 + 0x8) = 0;
-        f20 = FastVecLength((f32 *)s0) / ((D_L11_001B0168 * 5.0f + 2.0f) * 0.16666667f);
+        f20 = FastVecLength((f32 *)s0) / ((g_bomb_speed * 5.0f + 2.0f) * 0.16666667f);
         vec_scale_to_length((f32 *)s0, (f32 *)s0, f20);
         *(f32 *)(s0 + 0x8) = weapon_compute_shot_launch_speed((char *)s2, (char *)s3, 0, f20, -f21);
         *(f32 *)(s0 + 0xC) = f21;

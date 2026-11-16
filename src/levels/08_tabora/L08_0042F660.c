@@ -5,10 +5,10 @@
 #include "common.h"
 
 
-extern s32 D_L08_001B29DC __attribute__((sda));
-extern f32 D_L08_001B250C __attribute__((sda));
+extern s32 g_moby_array __attribute__((sda));
+extern f32 g_emitter_spawn_fraction __attribute__((sda));
 extern s32 g_active_emitter_count __attribute__((sda));
-extern char D_L08_001A8F20[] MACRO_ADDR;
+extern char g_str_effect_name[] MACRO_ADDR;
 extern char *part_find_owned_effect_slot(s32 a, s32 b, s32 c);
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void part_spawn_masked_debris(char *a0, f32 f12, f32 f13, s32 a1, char *a2,
@@ -44,7 +44,7 @@ void emitter_burst_update(char *spawner) {
         *(u8 *)(spawner + 0xA8) = 0xFF;
         child_index = *(s32 *)(vars + 4);
         if (child_index > 0) {
-            char *child = (char *)(D_L08_001B29DC + (child_index << 8));
+            char *child = (char *)(g_moby_array + (child_index << 8));
 
             if (child == 0) {
                 return;
@@ -58,13 +58,13 @@ void emitter_burst_update(char *spawner) {
     case 2:
         { float v[4];
         vec_local_offset_to_world(spawner,v,0.0f,0.0f,3.0f);
-        if (*(u8 *)(spawner + 0x31) != 0 && D_L08_001B250C < 0.9f &&
+        if (*(u8 *)(spawner + 0x31) != 0 && g_emitter_spawn_fraction < 0.9f &&
             g_active_emitter_count < 10) {
             SpawnExplosionEffects(spawner,0.0f,0.0f,1.0f,0.5f,9.0f,*(float *)(spawner+0x2C)*1.3f,15.0f,
-                         D_L08_001A8F20,v,10,3,16,-1,0,1,-1,0,0);
-            part_spawn_masked_debris(spawner, 3.0f, 6.0f, 15, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
+                         g_str_effect_name,v,10,3,16,-1,0,1,-1,0,0);
+            part_spawn_masked_debris(spawner, 3.0f, 6.0f, 15, g_str_effect_name, 3.0f, 6.0f, 0xFF);
         } else {
-            part_spawn_masked_debris(spawner, 3.0f, 6.0f, 1, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
+            part_spawn_masked_debris(spawner, 3.0f, 6.0f, 1, g_str_effect_name, 3.0f, 6.0f, 0xFF);
         }
         part_spawn_scaled_bolts(spawner, 1, 0.0f);
         PlayMobySound(0, 0, spawner);

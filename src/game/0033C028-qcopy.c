@@ -2,11 +2,11 @@
 struct SolIds {
     int ids[2];
 };
-extern struct SolIds D_001ADDD0;
-extern char D_001ADDD8[];
+extern struct SolIds g_on_off_text_ids;
+extern char g_str_menu_option_format[];
 extern int g_screen_width __attribute__((sda));
 extern int g_widescreen_flag __attribute__((sda));
-extern float D_001B23A4 __attribute__((sda));
+extern float g_hud_scale __attribute__((sda));
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
@@ -27,13 +27,13 @@ void onoff_menu_draw_with_help(char *object)
     int w, h;
 
     prompt_bar_draw(object + 8);
-    pair = D_001ADDD0;
-    format = D_001ADDD8;
+    pair = g_on_off_text_ids;
+    format = g_str_menu_option_format;
     first = GetLocalizedString(0x31E5);
     second = GetLocalizedString(pair.ids[g_widescreen_flag != 0]);
     sprintf(buffer, format, first, second);
     text_draw_centered_small(g_screen_width >> 1, 0x8C, 0x80F0F0F0UL, buffer, -1);
-    x = D_001B23A4;
+    x = g_hud_scale;
     w = (int)(x * 170.0f + 0.5f);
     if (w != 0)
         h = (int)(x * 379.0f + 0.5f);

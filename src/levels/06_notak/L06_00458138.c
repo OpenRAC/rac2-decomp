@@ -1,9 +1,9 @@
 #include "common.h"
-extern u8 *D_L06_001B281C MACRO_ADDR;
+extern u8 *g_moby_l06_table MACRO_ADDR;
 extern void cam_lock_entry(int);
-extern short D_L06_001B3790[] __attribute__((sda));
-extern short D_L06_001B37A0[] __attribute__((sda));
-extern char D_L06_0025FFC0[];
+extern short g_trail_active_timers[] __attribute__((sda));
+extern short g_trail_alpha_timers[] __attribute__((sda));
+extern char g_trail_vertex_buffer[];
 extern float IntToFloat(int);
 extern void DrawNotakRibbonWithHalo(char *, int, int, int, float, float, float);
 extern void gfx_l06_draw_facing_glow_sprite(char *);
@@ -27,7 +27,7 @@ typedef unsigned int NotakQuad __attribute__((mode(TI)));
 extern char g_sound_state[];
 extern char g_hero_position[];
 /* Keep this absolute address as one assembler macro under -G0. */
-extern char D_L06_001A8F20[] __attribute__((sda));
+extern char g_effect_vector[] __attribute__((sda));
 extern void moby_set_byte_on_group(int, int);
 extern void snd_stop_voice(int);
 extern int math_random_int_range(int, int);
@@ -37,7 +37,7 @@ extern void part_emit_facing(char *);
 extern void *SpawnExplosion(void *, int, int, int, int, int, int, int,
                             float, float, int, int, int, int);
 
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern int math_random_int_below(int);
@@ -47,7 +47,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 
 
-extern char *D_L06_001B9890[];
+extern char *g_camera_l06_state_ptr[];
 
 extern char *moby_find_record_by_handle_id(int);
 
@@ -102,9 +102,9 @@ extern int PlayMobySound(int, int, char *);
 
 extern void part_spawn_scaled_bolts(char *, int, float);
 
-extern float D_L06_001B234C __attribute__((sda));
+extern float g_spark_burst_threshold __attribute__((sda));
 
-extern float D_001B2350 __attribute__((sda));
+extern float g_level_float_param __attribute__((sda));
 
 extern int func_0035CBA0(char *, int, int);
 
@@ -117,13 +117,13 @@ extern void func_00350388(char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern double __extendsfdf2(float);
 extern void STUB_printf(char *, ...);
-extern char D_L06_001B18E0[];
+extern char g_str_spark_burst_debug[];
 extern void SpawnTintedEffects(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
 /* Throws a burst of sparks out from the object, then removes it. */
 void part_emit_spark_burst_remove(char *moby) {
     float pos[4], vel[4];
     int count = 13, i;
-    if (D_L06_001B234C < 0.9f && D_001B2350 < 0.9f) count = 40;
+    if (g_spark_burst_threshold < 0.9f && g_level_float_param < 0.9f) count = 40;
     for (i = 0; i < count; i++) {
         pos[0] = math_random_float_range(-8.045f, 8.045f);
         pos[1] = math_fabs(pos[0] * 0.1243008077f) * 1.745f;
@@ -134,7 +134,7 @@ void part_emit_spark_burst_remove(char *moby) {
         matrix_mul_vec3(pos, pos, moby + 0xC0);
         FastVecAdd(pos, pos, moby + 0x10);
         matrix_mul_vec3(vel, vel, moby + 0xC0);
-        STUB_printf(D_L06_001B18E0, __extendsfdf2(pos[0]), __extendsfdf2(pos[1]), __extendsfdf2(pos[2]), __extendsfdf2(vel[0]), __extendsfdf2(vel[1]), __extendsfdf2(vel[2]));
+        STUB_printf(g_str_spark_burst_debug, __extendsfdf2(pos[0]), __extendsfdf2(pos[1]), __extendsfdf2(pos[2]), __extendsfdf2(vel[0]), __extendsfdf2(vel[1]), __extendsfdf2(vel[2]));
         SpawnTintedEffects(moby, pos, 1, 0.0f, 1, vel, 3.0f, 0x50808040, 1.0f, 5.5f, 0);
         func_003A0948(0, 0, moby);
     }
@@ -200,9 +200,9 @@ char *chained_segment_spawn(char *moby)
 void projectile_draw_trails(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    char *trail = D_L06_0025FFC0;
-    short *alpha_timers = D_L06_001B37A0;
-    short *active_timers = D_L06_001B3790;
+    char *trail = g_trail_vertex_buffer;
+    short *alpha_timers = g_trail_alpha_timers;
+    short *active_timers = g_trail_active_timers;
     int i;
 
     for (i = 5; i >= 0; i--) {
@@ -230,7 +230,7 @@ void part_emit_paired_spin(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L06_001B9840, pos);
+    FastVecSub(direction, (float *)g_hero_l06_position, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -423,7 +423,7 @@ int actor_adjust_speed_facing(char *moby, char *vars, float p1, float p2, float 
 extern float moby_get_anim_value(char *);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern int coll_process_hit(void *, float, int, char *, void *);
-extern void *D_L06_001BFC98;
+extern void *g_hit_l06_result;
 
 /* Runs the shared pickup test: when the object is in the given state and the draw is inside the window, aims at the target and, on a hit with the expected tag, hands over to the next state. */
 void actor_try_pickup_transition(char *obj, float lo, char *self, float hi, int kind, int sub, float scale, float reach, float range,
@@ -441,7 +441,7 @@ void actor_try_pickup_transition(char *obj, float lo, char *self, float hi, int 
         dir[2] = 1.0f;
         make_hit_descriptor(aim, obj, 1, dir, reach);
         func_003514C8(obj, 0, probe);
-        if (coll_process_hit(probe, range, 0x21, obj, aim) != 0 && D_L06_001BFC98 == tag) {
+        if (coll_process_hit(probe, range, 0x21, obj, aim) != 0 && g_hit_l06_result == tag) {
             FastVecScale(vec, vec, -1.0f);
             *(float *)(self + 0xC8) = -0.05f;
             if (*(u8 *)(obj + 0x43) != anim)
@@ -455,7 +455,7 @@ extern void func_003514C8(void *, int, void *);
 
 extern int func_0031EBF8(f32, void *, int, void *);
 
-extern void *D_L06_001BFC98;
+extern void *g_hit_l06_result;
 
 /* Checks whether a short probe from the object hits the given thing; returns 1 if it does. */
 int actor_probe_hits_target(void *moby, void *expected, f32 reach) {
@@ -465,7 +465,7 @@ int actor_probe_hits_target(void *moby, void *expected, f32 reach) {
     func_003514C8(moby, 0, probe);
     hit_result = func_0031EBF8(reach, probe, 0x21, moby);
     if (hit_result != 0) {
-        if (D_L06_001BFC98 == expected) {
+        if (g_hit_l06_result == expected) {
             return 1;
         }
     }
@@ -511,7 +511,7 @@ void burst_on_hit_update(char *moby)
     hit = (char *)func_0035CBA0(moby, 0x4010000, 0);
     if (hit != 0 && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
         count = 3;
-        if (D_L06_001B234C < 0.8999999761581421f && D_001B2350 < 0.8999999761581421f)
+        if (g_spark_burst_threshold < 0.8999999761581421f && g_level_float_param < 0.8999999761581421f)
             count = 0xE;
 
         func_L06_0045BE30(moby, count, 0.0f, 3.263000011444092f, 1.9739999771118164f,
@@ -631,7 +631,7 @@ void particle_l06_emitter_update(char *moby)
         pos[2] = 1.0f;
         FastVecAdd(pos, pos, moby + 0x10);
         SpawnExplosion(pos, 1, 25, 20, 20, 20, 45, 1, 1.25f, 20.0f, 1, 1, 0, 0);
-        part_spawn_masked_debris(moby, 0x7F, D_L06_001A8F20, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_masked_debris(moby, 0x7F, g_effect_vector, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         part_spawn_scaled_bolts(moby, 1, 0.0f);
         func_00350388(moby);
     }
@@ -689,7 +689,7 @@ void linked_trigger_update(char *moby)
         break;
     case 1: {
         int i = *(int *)(vars + 4);
-        char *base = (char *)D_L06_001B281C;
+        char *base = (char *)g_moby_l06_table;
         char *p = (char *)(base + (i << 8));
         int t = *(unsigned char *)(p + 0x20);
         int j;
@@ -715,7 +715,7 @@ void linked_trigger_update(char *moby)
     }
     case 2: {
         int i = *(int *)(vars + 4);
-        char *p = (char *)(D_L06_001B281C + (i << 8));
+        char *p = (char *)(g_moby_l06_table + (i << 8));
 
         if (*(unsigned char *)(p + 0x20) != 2) {
             *(unsigned char *)(moby + 0x20) = 1;
@@ -733,7 +733,7 @@ void linked_trigger_update(char *moby)
 /* Stores two values in the settings block of the object of kind 5, finding that object first if needed. */
 void object_set_kind_five_settings(float value_a, float value_b)
 {
-    char *first = D_L06_001B9890[0];
+    char *first = g_camera_l06_state_ptr[0];
     char *target;
     char *settings;
 

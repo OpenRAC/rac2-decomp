@@ -48,20 +48,20 @@ typedef struct {
 
 extern ShipPad g_pad_state;
 extern int g_current_map_index;
-extern unsigned char D_001A7A44;
-extern float D_L05_001B1A68 __attribute__((sda));
-extern float D_L05_001B1A40 __attribute__((sda));
-extern float D_L05_001B1A44 __attribute__((sda));
-extern float D_L05_001B1A48 __attribute__((sda));
-extern float D_L05_001B1B74 __attribute__((sda));
-extern float D_L05_001B1B78 __attribute__((sda));
-extern float D_L05_001B1B7C __attribute__((sda));
-extern short D_L05_001B1AE8 __attribute__((sda));
-extern short D_L05_001B1AEC __attribute__((sda));
-extern short D_L05_001B1AF0 __attribute__((sda));
-extern short D_L05_001B1AF4 __attribute__((sda));
+extern unsigned char g_cheat_flags;
+extern float g_ship_stick_deadzone __attribute__((sda));
+extern float g_ship_roll_vec_x __attribute__((sda));
+extern float g_ship_roll_vec_y __attribute__((sda));
+extern float g_ship_roll_vec_z __attribute__((sda));
+extern float g_ship_horizontal_input_ramp __attribute__((sda));
+extern float g_ship_vertical_input_ramp __attribute__((sda));
+extern float g_ship_input_ramp_step __attribute__((sda));
+extern short g_ship_roll_timer_value __attribute__((sda));
+extern short g_ship_roll_delay_offset __attribute__((sda));
+extern short g_ship_roll_duration __attribute__((sda));
+extern short g_ship_combo_delay __attribute__((sda));
 extern int g_ship_state __attribute__((sda));
-extern int D_L05_002A18E0 __attribute__((nosda));
+extern int g_ship_combo_enabled __attribute__((nosda));
 extern void cam_load_parameter_set(char *);
 extern float math_fabs(float);
 extern int hero_get_state_value_b(void);
@@ -83,44 +83,44 @@ void UpdateSteeringInput(char *obj, float *yawRate, float *pitchRate)
     cam_load_parameter_set(obj);
     horizontal = -g_pad_state.stickX;
     vertical = g_pad_state.stickY;
-    if (math_fabs(vertical) < D_L05_001B1A68) {
+    if (math_fabs(vertical) < g_ship_stick_deadzone) {
         if (vertical == 0.0f) {
             if (g_pad_state.input.words.held & 0x1000) {
-                vertical = -D_L05_001B1B78;
-                D_L05_001B1B78 += D_L05_001B1B7C;
-                if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
+                vertical = -g_ship_vertical_input_ramp;
+                g_ship_vertical_input_ramp += g_ship_input_ramp_step;
+                if (g_ship_vertical_input_ramp > 1.0f) g_ship_vertical_input_ramp = 1.0f;
             } else if (g_pad_state.input.words.held & 0x4000) {
-                vertical = D_L05_001B1B78;
-                D_L05_001B1B78 += D_L05_001B1B7C;
-                if (D_L05_001B1B78 > 1.0f) D_L05_001B1B78 = 1.0f;
+                vertical = g_ship_vertical_input_ramp;
+                g_ship_vertical_input_ramp += g_ship_input_ramp_step;
+                if (g_ship_vertical_input_ramp > 1.0f) g_ship_vertical_input_ramp = 1.0f;
             } else {
-                D_L05_001B1B78 = 0.0f;
+                g_ship_vertical_input_ramp = 0.0f;
             }
         } else {
             vertical = 0.0f;
-            D_L05_001B1B78 = vertical;
+            g_ship_vertical_input_ramp = vertical;
         }
     } else {
-        D_L05_001B1B78 = 0.0f;
+        g_ship_vertical_input_ramp = 0.0f;
         if (vertical > 0.0f)
-            vertical = (vertical - D_L05_001B1A68) / (1.0f - D_L05_001B1A68);
+            vertical = (vertical - g_ship_stick_deadzone) / (1.0f - g_ship_stick_deadzone);
         else
-            vertical = (vertical + D_L05_001B1A68) / (1.0f - D_L05_001B1A68);
+            vertical = (vertical + g_ship_stick_deadzone) / (1.0f - g_ship_stick_deadzone);
     }
     if (horizontal == 0.0f) {
         if (g_pad_state.input.words.held & 0x8000) {
-            horizontal = D_L05_001B1B74;
-            D_L05_001B1B74 += D_L05_001B1B7C;
-            if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
+            horizontal = g_ship_horizontal_input_ramp;
+            g_ship_horizontal_input_ramp += g_ship_input_ramp_step;
+            if (g_ship_horizontal_input_ramp > 1.0f) g_ship_horizontal_input_ramp = 1.0f;
         } else if (g_pad_state.input.words.held & 0x2000) {
-            horizontal = -D_L05_001B1B74;
-            D_L05_001B1B74 += D_L05_001B1B7C;
-            if (D_L05_001B1B74 > 1.0f) D_L05_001B1B74 = 1.0f;
+            horizontal = -g_ship_horizontal_input_ramp;
+            g_ship_horizontal_input_ramp += g_ship_input_ramp_step;
+            if (g_ship_horizontal_input_ramp > 1.0f) g_ship_horizontal_input_ramp = 1.0f;
         } else {
-            D_L05_001B1B74 = 0.0f;
+            g_ship_horizontal_input_ramp = 0.0f;
         }
     } else {
-        D_L05_001B1B74 = 0.0f;
+        g_ship_horizontal_input_ramp = 0.0f;
     }
     if ((g_current_map_index != 5 && g_current_map_index != 10) || !hero_get_state_value_b()) {
         if (horizontal < 0.0f) horizontal = -(horizontal * horizontal);
@@ -152,7 +152,7 @@ void UpdateSteeringInput(char *obj, float *yawRate, float *pitchRate)
     {
         SteeringRecord *record = *(SteeringRecord **)(obj + 0x70);
         record->value = math_step_spring_damper_clamped(&record->velocity, record->value, vertical,
-                                      D_L05_001B1A40, D_L05_001B1A44, D_L05_001B1A48);
+                                      g_ship_roll_vec_x, g_ship_roll_vec_y, g_ship_roll_vec_z);
     }
     *pitchRate = state->pitch;
     *yawRate = state->yaw;
@@ -161,23 +161,23 @@ void UpdateSteeringInput(char *obj, float *yawRate, float *pitchRate)
         roll->rollDirection = 0;
     if (roll->rollDelay == 0) {
         if (g_pad_state.input.buttons & 0xC) {
-            roll->rollTimer = D_L05_001B1AE8;
+            roll->rollTimer = g_ship_roll_timer_value;
             {
                 float inverse = 1.0f / IntToFloat(roll->rollTimer);
-                roll->rollDelay = roll->rollTimer + D_L05_001B1AEC;
+                roll->rollDelay = roll->rollTimer + g_ship_roll_delay_offset;
                 roll->rollInverse = inverse;
             }
             if (g_pad_state.input.words.held & 4) roll->rollDirection = -1;
             else roll->rollDirection = 1;
-            if (D_001A7A44) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
+            if (g_cheat_flags) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
         }
     } else {
         FastDecTimer(&roll->rollDelay);
     }
-    if (FastDecTimer(&roll->comboDelay) && D_L05_002A18E0 && g_current_map_index != 20) {
+    if (FastDecTimer(&roll->comboDelay) && g_ship_combo_enabled && g_current_map_index != 20) {
         if ((g_pad_state.input.words.held & 3) == 3 || (g_pad_state.input.words.held & 0xC) == 0xC) {
-            unsigned short duration = D_L05_001B1AF0;
-            roll->comboDelay = D_L05_001B1AF4;
+            unsigned short duration = g_ship_roll_duration;
+            roll->comboDelay = g_ship_combo_delay;
             g_ship_state = 7;
             roll->comboTimer = duration;
             roll->comboInverse = 1.0f / IntToFloat((short)duration);

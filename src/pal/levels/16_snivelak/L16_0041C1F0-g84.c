@@ -6,18 +6,18 @@ extern void FastVecScale(void *,void *,float);
 extern char *part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
 extern void *part_find_owned_effect_slot(void *,unsigned int,int);
 extern void moby_set_state(unsigned char *,int,int);
-extern void func_PAL_L00_0032C328(void *,void *,void *,void *,int,int,int,int,int,int,int);
+extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,int,int,int,int,int,int,int);
 extern void func_PAL_L00_002ED7E8(void *,void *,float,void *,float,int,int,float,float,float);
 extern void vec_local_offset_to_world(char *,char *,float,float,float);
-extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,int,float,float,float,float,int,int,int,int,int);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,int,float,float,float,float,int,int,int,int,int);
 extern void part_kill(void *);
 extern char *moby_l00_spawn_child(char *,int,int);
 extern int math_fast_float_d(int *);
 extern int math_random_int_range(int,int);
-extern char D_L16_001B1BF0[] SDATA(D_L16_001B1BF0);
-extern char D_L16_001B1BE8[] SDATA(D_L16_001B1BE8);
-extern char D_L16_001B1BE0[] SDATA(D_L16_001B1BE0);
-extern int D_L16_001B1C10 __attribute__((sda));
+extern char g_destructible_smoke_params_c[] SDATA(D_L16_001B1BF0);
+extern char g_destructible_smoke_params_b[] SDATA(D_L16_001B1BE8);
+extern char g_destructible_smoke_params_a[] SDATA(D_L16_001B1BE0);
+extern int g_destructible_smoke_group_bit __attribute__((sda));
 
 void func_PAL_L16_0041CBF0(char *object)
 {
@@ -40,11 +40,11 @@ void func_PAL_L16_0041CBF0(char *object)
         *(unsigned char *)(object+0xa8)=0xff;
         break;
     case 2:
-        func_PAL_L00_0032C328(object,D_L16_001B1BF0,D_L16_001B1BE8,D_L16_001B1BE0,0xffff,0,D_L16_001B1C10,0,0xffff,0xff,0);
+        part_explode_object_into_pieces_pal(object,g_destructible_smoke_params_c,g_destructible_smoke_params_b,g_destructible_smoke_params_a,0xffff,0,g_destructible_smoke_group_bit,0,0xffff,0xff,0);
         func_PAL_L00_002ED7E8(object,position,0.2f,velocity,0.14000002f,40,1,1.0f,5.0f,1.0f);
         *(Vector128 *)zero=0;
         vec_local_offset_to_world(object,(char *)position,13.0f,0.0f,14.0f);
-        func_PAL_002AC718(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
+        SpawnExplosionEffects_pal(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
         if(state[1]!=0) part_kill((void *)state[1]);
         moby_l00_spawn_child(object,0x10f2,0);
         *(int *)(object+0x98)=0;

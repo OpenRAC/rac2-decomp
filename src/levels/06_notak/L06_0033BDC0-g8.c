@@ -17,12 +17,12 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern int PlayMobySound(int, int, char *);
 
-extern float D_L06_001B0020 __attribute__((sda));
-extern float D_L06_001B0028 __attribute__((sda));
-extern float D_L06_001B0030 __attribute__((sda));
-extern int D_L06_001B0050 __attribute__((sda));
-extern float D_L06_001AFE40 __attribute__((sda));
-extern char *D_L06_001B281C[] __attribute__((sda));
+extern float g_spark_explode_param_c __attribute__((sda));
+extern float g_spark_explode_param_b __attribute__((sda));
+extern float g_spark_explode_param_a __attribute__((sda));
+extern int g_spark_explode_color __attribute__((sda));
+extern float g_oscillation_speed __attribute__((sda));
+extern char *g_moby_l06_table[] __attribute__((sda));
 
 /* a moby's three states: idle, hit, and gone */
 /* Updates a one-shot effect object (moby class 2322): it waits, then bursts into sparks and rings when hit, and goes away. */
@@ -48,8 +48,8 @@ void spark_burst_on_hit_update(char *moby_in)
         *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     case 2:
-        part_explode_object_into_pieces(moby, &D_L06_001B0030, &D_L06_001B0028, &D_L06_001B0020,
-                          0xFFFF, 0, D_L06_001B0050, 6, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(moby, &g_spark_explode_param_a, &g_spark_explode_param_b, &g_spark_explode_param_c,
+                          0xFFFF, 0, g_spark_explode_color, 6, 0xFFFF, 0xFF, 0);
         moby_compute_local_point(moby, scratch, 1.0f, 1.0f, 3.0f);
         part_emit_rings(moby);
         moby_mark_spawned(moby);
@@ -96,7 +96,7 @@ void parent_linked_sound_update(char *moby_in)
         parent_index = *(int *)vars;
         if (parent_index == -1)
             break;
-        parent_moby = D_L06_001B281C[0] + (parent_index << 8);
+        parent_moby = g_moby_l06_table[0] + (parent_index << 8);
         if (parent_moby == 0)
             break;
         parent_vars = *(char **)(parent_moby + 0x68);
@@ -151,13 +151,13 @@ extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
 extern void euler_rotation_basis(void *, void *);
 extern void part_l01_spawn_spark_burst(float *, float *, int, int, int, float, float, float);
 
-extern int D_L06_001B2838 __attribute__((sda));
+extern int g_moby_l06_group_count __attribute__((sda));
 extern char *D_L06_001B281C_abs[3] __attribute__((sda));
-extern unsigned short *D_L06_001FB3A0[];
-extern char D_L06_001B9840[];
-extern int D_L06_001AFC80 __attribute__((sda));
-extern int D_L06_001AFC70 __attribute__((sda));
-extern int D_L06_001AFC68 __attribute__((sda));
+extern unsigned short *g_group_l06_id_lists[];
+extern char g_hero_l06_position[];
+extern int g_switch_explode_param_a __attribute__((sda));
+extern int g_switch_explode_param_b __attribute__((sda));
+extern int g_switch_explode_param_c __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -194,7 +194,7 @@ c0:
     InitializePathMobyGroup(*(unsigned char *)(s1 + 0x21));
     goto done;
 c1:
-    if (*(int *)(vars + 0x64) != -1 && coll_point_inside_region(D_L06_001B9840, *(int *)(vars + 0x64)) != 0) {
+    if (*(int *)(vars + 0x64) != -1 && coll_point_inside_region(g_hero_l06_position, *(int *)(vars + 0x64)) != 0) {
         FOR_EACH_ID(member_id) {
             member = D_L06_001B281C_abs[0] + ((*member_id & 0x7FFF) << 8);
             if (member == 0)
@@ -221,7 +221,7 @@ c1:
     }
     if (part_find_owned_effect_slot(s1, 0x4010000, 0)) {
         cls = *(short *)(s1 + 0xAA) == 0x86B /* moby class 2155 */ ? 2 : 3;
-        part_explode_object_into_pieces(s1, &D_L06_001AFC80, &D_L06_001AFC70, &D_L06_001AFC68, 0xFFFF, 1, cls, 0, 0xFFFF,
+        part_explode_object_into_pieces(s1, &g_switch_explode_param_a, &g_switch_explode_param_b, &g_switch_explode_param_c, 0xFFFF, 1, cls, 0, 0xFFFF,
                           0xFF, 0);
         *(short *)(s1 + 0x7C) = (1 << cls) - 0x8000;
         SpawnExplosion(s1 + 0x10, 0, 0x19, 0x14, 0x14, 0x14, 0x14, 1, 1.0f, 20.0f, 1, 0, 0, 0);
@@ -236,7 +236,7 @@ c1:
     euler_rotation_basis(s1 + 0xC0, s1 + 0xF0);
     goto done;
 c4:
-    if (coll_point_inside_region(D_L06_001B9840, *(int *)(vars + 0x64)) == 0) {
+    if (coll_point_inside_region(g_hero_l06_position, *(int *)(vars + 0x64)) == 0) {
         FOR_EACH_ID(member_id2) {
             member2 = D_L06_001B281C_abs[0] + ((*member_id2 & 0x7FFF) << 8);
             if (member2 == 0)

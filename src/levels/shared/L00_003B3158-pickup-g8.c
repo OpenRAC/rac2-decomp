@@ -23,11 +23,11 @@ typedef struct OBJ2 {
     struct OBJ2 *f68;
 } OBJ2;
 
-extern OBJ2 *D_L00_001AFBC0 __attribute__((sda));
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001A8F08 MACRO_ADDR;
-extern int D_L00_001A8FF4 MACRO_ADDR;
-extern int D_00138324 NOT_SDA;
+extern OBJ2 *g_active_pickup_object __attribute__((sda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern int g_input_lock_state MACRO_ADDR;
+extern int g_hero_action_blocked_flag MACRO_ADDR;
+extern int g_pad_held_flags NOT_SDA;
 
 /* Updates the Spiderbot Glove pickup. When the player presses the button near it and nothing blocks the way, the glove is picked up and the player's pickup action starts. */
 void spiderbot_glove_pickup_update(char *m) {
@@ -43,7 +43,7 @@ void spiderbot_glove_pickup_update(char *m) {
         char *g = g_hero_state;
 
         if (*(int *)(g + 0x1244) == 3)
-            D_L00_001AFBC0 = 0;
+            g_active_pickup_object = 0;
         moby_transform_joint_to_world(m, 0, pos);
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
@@ -52,9 +52,9 @@ void spiderbot_glove_pickup_update(char *m) {
     }
     *(int *)(d + 0x24) = coll_trace_projectile_to_impact(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.003055555745959282f);
     result = weapon_get_group(aux);
-    if (D_L00_001A8F00 || D_L00_001A8F08 != -2)
+    if (g_game_l00_mode || g_input_lock_state != -2)
         *(int *)(d + 0x2C) = 1;
-    if (D_L00_001A8FF4 && *(float *)(d + 8) < 462.42999267578125f)
+    if (g_hero_action_blocked_flag && *(float *)(d + 8) < 462.42999267578125f)
         *(int *)(d + 0x2C) = 1;
     if (result || !*(int *)(d + 0x24) || !*(int *)(d + 0x28))
         goto blocked;
@@ -89,7 +89,7 @@ timer:
     }
     switch (*(unsigned char *)(m + 0x20)) {
     case 0:
-        D_L00_001AFBC0 = (OBJ2 *)m;
+        g_active_pickup_object = (OBJ2 *)m;
         *(unsigned char *)(m + 0x20) = 1;
         *(int *)(d + 0x28) = 1;
         *(int *)(d + 0x24) = 0;
@@ -97,7 +97,7 @@ timer:
     case 1: {
         char *g = g_hero_state;
 
-        if ((D_00138324 & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
+        if ((g_pad_held_flags & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
             !*(int *)(d + 0x2C) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;

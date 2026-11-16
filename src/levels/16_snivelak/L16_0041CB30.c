@@ -4,11 +4,11 @@ typedef struct { int a,b,c,d; } __attribute__((aligned(16))) Quad16;
 typedef struct { Quad16 vector; int owner,flags; unsigned char enabled,kind; unsigned short id; float distance; int active; } CollisionRequest;
 typedef struct { Vector128 beam; CollisionRequest request; Vector128 closest; } LaserWorkspace;
 extern char g_sound_state[];
-extern char *D_L16_001BFF58;
+extern char *g_aim_target_moby;
 extern char *g_hero_moby;
-extern char *D_L16_001B0664 MACRO_ADDR;
-extern char *D_L16_001B0F80 MACRO_ADDR;
-extern Quad16 D_L16_001A8F20 MACRO_ADDR;
+extern char *g_sweeping_laser_target_a MACRO_ADDR;
+extern char *g_sweeping_laser_target_b MACRO_ADDR;
+extern Quad16 g_particle_template MACRO_ADDR;
 extern float FastAddRotations(float,float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -58,13 +58,13 @@ void sweeping_laser_update(char *object)
         break;
     }
     gfx_add_draw_callback_first(DrawBeamQuads,object);
-    make_hit_descriptor((char *)&local.request,(int)object,1,4.0f,&D_L16_001A8F20);
+    make_hit_descriptor((char *)&local.request,(int)object,1,4.0f,&g_particle_template);
     local.request.id=*(unsigned short *)(object+0xaa);
     ((float *)&local.beam)[0]=math_fast_sin_or_cos_a(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.beam)[1]=math_fast_sin_or_cos_b(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.beam)[2]=0.0f;
     FastVecAdd(((float *)&local.beam),object+0x10,((float *)&local.beam));
-    if(CollLine(object+0x10,((float *)&local.beam),0,object,&local.request)!=0 && D_L16_001BFF58==g_hero_moby) {
+    if(CollLine(object+0x10,((float *)&local.beam),0,object,&local.request)!=0 && g_aim_target_moby==g_hero_moby) {
         handle=*(int *)(state+0x28);
         if(handle!=-1) {
             sound=g_sound_state+handle*0x70;
@@ -73,8 +73,8 @@ void sweeping_laser_update(char *object)
         *(int *)(state+0x28)=snd_play_from_class_bank(1,0,object,0x113a);
     }
 sound_ready:
-    target=D_L16_001B0664;
-    if(target==0) target=D_L16_001B0F80;
+    target=g_sweeping_laser_target_a;
+    if(target==0) target=g_sweeping_laser_target_b;
     if(target!=0) {
         math_closest_point_on_segment(&local.closest,object+0x10,((float *)&local.beam),target+0x10);
         if(vec_distance_xy(&local.closest,target+0x10)<0.15f) {

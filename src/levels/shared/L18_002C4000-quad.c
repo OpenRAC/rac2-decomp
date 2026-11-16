@@ -13,8 +13,8 @@ typedef struct {
     s64 primitive, texture, mode, flags;
 } QuadPacket;
 
-extern float D_0018A0E0[4];
-extern float D_L18_001AA250[4][4];
+extern float g_hero_state_block[4];
+extern float g_quad_l18_corner_table[4][4];
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
@@ -36,14 +36,14 @@ void gfx_draw_lens_flare_quad(LensVector *position, LensVector *direction, s32 o
 
     basis[3].bits = position->bits;
     basis[0].bits = direction->bits;
-    FastVecCross(&basis[1], &basis[0], D_0018A0E0);
+    FastVecCross(&basis[1], &basis[0], g_hero_state_block);
     vec_scale_to_length(&basis[1], &basis[1], 1.0f);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     FastVecScale(&offset, &basis[0], distance);
     FastVecAdd(&basis[3], &basis[3], &offset);
     for (i = 3; i >= 0; i--) {
         int index = 3 - i;
-        FastVecScale(&packet.vertex[index], D_L18_001AA250[index], size);
+        FastVecScale(&packet.vertex[index], g_quad_l18_corner_table[index], size);
         transform_vector(&packet.vertex[index], &packet.vertex[index], basis);
     }
     gfx_init_quad_packet_state(&packet, 60, 5, 128);

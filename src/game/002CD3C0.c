@@ -3,9 +3,9 @@
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(s32);
-extern float D_001B23A4[] __attribute__((sda));
+extern float g_hud_scale[] __attribute__((sda));
 extern void func_0029C1A8(void);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 extern int text_draw_centered_small(int v, int p7, unsigned long long k, char *r, int m1);
 
@@ -40,18 +40,18 @@ int menu_draw_footer_and_panel(void)
     SetupGifPaging(0);
     func_0029C1A8();
     position = 367.0f;
-    y = (int)(D_001B23A4[0] * position + 0.5f);
+    y = (int)(g_hud_scale[0] * position + 0.5f);
     do {
         text_draw_centered_small(0x1B5, y, 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2D4F), -1);
     } while (0);
     DoGifPaging();
-    if (D_001A8CFC[0] != 0) {
-        if (*(int *)((char *)D_001A8CFC[0] + 0x38000 + 0x7364) != 0) {
+    if (g_resident_data_base[0] != 0) {
+        if (*(int *)((char *)g_resident_data_base[0] + 0x38000 + 0x7364) != 0) {
             char *owner;
             DrawMobysSetup();
             mem_fill_scratch_area();
             mem_save_scratch_area();
-            owner = *(char **)(D_001A8CFC[0] + 0x38000 + 0x7364);
+            owner = *(char **)(g_resident_data_base[0] + 0x38000 + 0x7364);
             hud_init_lighting_colors(owner);
             hud_reset_render_state(owner);
             menu_attach_slot_packets(owner);

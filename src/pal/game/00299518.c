@@ -1,16 +1,17 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_001A8A5C __attribute__((sda));
-extern int D_PAL_001B1A3C __attribute__((sda));
+extern int g_menu_mode __attribute__((sda));
+extern int g_pending_value __attribute__((sda));
 
 int func_PAL_00299518(void) {
-    return D_PAL_001B1A3C;
+    return g_pending_value;
 }
 
 
 int func_PAL_00299520(void) {
-    int value = D_PAL_001B1A3C;
-    D_PAL_001B1A3C = 0;
+    int value = g_pending_value;
+    g_pending_value = 0;
     return value != 0;
 }
 

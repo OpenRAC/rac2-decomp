@@ -103,11 +103,11 @@ void save_menu_return_if_not_busy_2(void) {
         g_save_menu_screen[0] = 3;
 }
 
-extern int D_001393F0[];
+extern int g_save_card_result[];
 
 /* Save menu screen step: goes to screen 3 when the first memory card reports a result. */
 void save_menu_return_on_card_result(void) {
-    if (D_001393F0[0] != 0)
+    if (g_save_card_result[0] != 0)
         g_save_menu_screen[0] = 3;
 }
 
@@ -202,12 +202,12 @@ void save_menu_choose_screen_on_button_b(void)
     }
 }
 
-extern unsigned char D_001A7930[];
-extern unsigned char D_001A7948[];
-extern unsigned char D_001A7960[];
-extern unsigned char D_001A7980[];
-extern unsigned char D_001A79A0[];
-extern unsigned char D_001A79D0[];
+extern unsigned char g_save_name_source[];
+extern unsigned char g_save_name_title[];
+extern unsigned char g_save_name_header[];
+extern unsigned char g_save_name_icon[];
+extern unsigned char g_save_name_data[];
+extern unsigned char g_save_name_format[];
 extern char *strncpy(void *, int, int);
 /* Builds the save file names from the game ID found in the source data and prepares the six name strings used for the memory card files. */
 void save_build_file_names(unsigned char *source)
@@ -215,56 +215,56 @@ void save_build_file_names(unsigned char *source)
     int i;
     int value = source[0x12];
     if (value == 0x45)
-        D_001A7930[2] = value;
+        g_save_name_source[2] = value;
     else if (value == 0x50)
-        D_001A7930[2] = 0x49;
+        g_save_name_source[2] = 0x49;
     for (i = 3; i < 7; i++)
-        D_001A7930[i] = source[i + 0xd];
+        g_save_name_source[i] = source[i + 0xd];
     for (i = 8; i < 11; i++)
-        D_001A7930[i] = source[i + 0xd];
+        g_save_name_source[i] = source[i + 0xd];
     for (i = 11; i < 13; i++)
-        D_001A7930[i] = source[i + 0xe];
-    strncpy(D_001A7948, (int)D_001A7930, 13);
-    strncpy(D_001A7960, (int)D_001A7930, 13);
-    strncpy(D_001A7980, (int)D_001A7930, 13);
-    strncpy(D_001A79A0, (int)D_001A7930, 13);
-    strncpy(D_001A79A0 + 0x14, (int)D_001A7930, 13);
-    strncpy(D_001A79D0, (int)D_001A7930, 13);
+        g_save_name_source[i] = source[i + 0xe];
+    strncpy(g_save_name_title, (int)g_save_name_source, 13);
+    strncpy(g_save_name_header, (int)g_save_name_source, 13);
+    strncpy(g_save_name_icon, (int)g_save_name_source, 13);
+    strncpy(g_save_name_data, (int)g_save_name_source, 13);
+    strncpy(g_save_name_data + 0x14, (int)g_save_name_source, 13);
+    strncpy(g_save_name_format, (int)g_save_name_source, 13);
 }
 
-extern char D_001A9970[];
+extern char g_str_save_load_packet[];
 extern int MemcardRestoreData(char *, int, int *);
 extern void save_reset_slot_ids(void);
 extern void STUB_printf(void *);
-extern int D_00256138[];
-extern char D_00256368[];
+extern int g_save_record_layout_main[];
+extern char g_save_record_layout_slot[];
 extern int memcard_GetDataSize(int *);
 
 /* Checks that a loaded save packet has the expected sizes, then restores the global block and the 28 slot blocks from it. Shows an error if the sizes do not match. */
 void save_load_packet(int *packet)
 {
-    int len1 = memcard_GetDataSize(D_00256138);
-    int len2 = memcard_GetDataSize((int *)D_00256368);
+    int len1 = memcard_GetDataSize(g_save_record_layout_main);
+    int len2 = memcard_GetDataSize((int *)g_save_record_layout_slot);
     int size = packet[0];
     int i;
 
     if (size != len1 || packet[1] != len2) {
-        STUB_printf(D_001A9970);
+        STUB_printf(g_str_save_load_packet);
         return;
     }
     packet = (int *)((char *)packet + 8);
-    MemcardRestoreData((char *)packet, 0, D_00256138);
+    MemcardRestoreData((char *)packet, 0, g_save_record_layout_main);
     packet = (int *)((char *)packet + size);
     for (i = 0; i < 0x1C; i++) {
-        MemcardRestoreData((char *)packet, i, (int *)D_00256368);
+        MemcardRestoreData((char *)packet, i, (int *)g_save_record_layout_slot);
         packet = (int *)((char *)packet + len2);
     }
     save_reset_slot_ids();
 }
 
 
-extern int D_00256138[];
-extern char D_00256368[];
+extern int g_save_record_layout_main[];
+extern char g_save_record_layout_slot[];
 extern int memcard_GetDataSize(int *);
 extern int save_pack_records(char *, int, int *);
 
@@ -274,21 +274,21 @@ void save_build_packet(char *packet)
     char *out = packet;
     int i = 0;
 
-    *(int *)(out + 0) = memcard_GetDataSize(D_00256138);
-    *(int *)(out + 4) = memcard_GetDataSize((int *)D_00256368);
+    *(int *)(out + 0) = memcard_GetDataSize(g_save_record_layout_main);
+    *(int *)(out + 4) = memcard_GetDataSize((int *)g_save_record_layout_slot);
     out += 8;
-    out += save_pack_records(out, 0, D_00256138);
+    out += save_pack_records(out, 0, g_save_record_layout_main);
     for (i = 0; i < 0x1C; i++) {
-        out += save_pack_records(out, i, (int *)D_00256368);
+        out += save_pack_records(out, i, (int *)g_save_record_layout_slot);
     }
 }
 
 extern int func_00127348(void);
-extern char D_001A9A28[];
+extern char g_str_memcard_problem_message[];
 extern void STUB_printf(void *);
 
 /* Shows a memory card message when the card check reports a problem. */
 void mc_show_message_on_problem(void) {
     if (func_00127348() != 0)
-        STUB_printf(D_001A9A28);
+        STUB_printf(g_str_memcard_problem_message);
 }

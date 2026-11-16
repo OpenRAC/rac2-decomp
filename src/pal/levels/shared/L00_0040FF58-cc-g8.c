@@ -17,8 +17,8 @@ typedef struct {
 
 typedef struct { SettingRow rows[238]; } SettingsBank;
 
-extern SettingSlot D_L00_00256620[30];
-extern SettingsBank D_L00_002592C0;
+extern SettingSlot g_setting_slot_table[30];
+extern SettingsBank g_shot_settings_bank;
 
 typedef float Vector[4] __attribute__((aligned(16)));
 
@@ -46,19 +46,19 @@ typedef struct PlayerState {
 } PlayerState;
 extern PlayerState g_hero_state;
 
-extern Vector D_L00_001B8FF0[3];   /* camera basis rows */
+extern Vector g_cam_follow_matrix[3];   /* camera basis rows */
     /* camera position */
     /* collision hit point */
 /* Spawns a projectile (moby 0xED7) from owner at position, aimed at target or along the view. */
 extern int FastDecTimer(void *);
 extern void math_l00_interpolate_cubic_vector(void *, void *, void *, void *, void *, float);
-extern short D_L00_001B2D40[] __attribute__((sda));
-extern short D_L00_001B2D48[] __attribute__((sda));
-extern short D_L00_001B2D50[] __attribute__((sda));
-extern float D_0018BE30[4];
-extern float D_L00_001B100C __attribute__((sda));
-extern float D_L00_001B1004 __attribute__((sda));
-extern Vector D_L00_002563A0[][10];
+extern short g_strand_timers[] __attribute__((sda));
+extern short g_strand_alphas[] __attribute__((sda));
+extern short g_strand_periods[] __attribute__((sda));
+extern float g_hero_aim_vector[4];
+extern float g_lightning_strand_step_length __attribute__((sda));
+extern float g_lightning_strand_jitter __attribute__((sda));
+extern Vector g_lightning_strand_points[][10];
 
 void func_PAL_L00_0040FF58(char *object)
 {
@@ -67,54 +67,54 @@ void func_PAL_L00_0040FF58(char *object)
     int g, i, j, k, l, n;
 
     for (g = 0; g < 4; g++) {
-        if (FastDecTimer(&D_L00_001B2D40[g])) {
-            D_L00_001B2D48[g] = 0;
-            D_L00_001B2D40[g] = (((int)(D_L00_001B2D50[g]) * 5 + 2) / 6);
+        if (FastDecTimer(&g_strand_timers[g])) {
+            g_strand_alphas[g] = 0;
+            g_strand_timers[g] = (((int)(g_strand_periods[g]) * 5 + 2) / 6);
             qcopy(p, state + 0x30);
             p[0] += math_random_float_range(-0.5f, 0.5f);
             p[1] += math_random_float_range(-0.5f, 0.5f);
             p[2] += math_random_float_range(-0.5f, 0.5f);
-            FastVecSub(delta, p, D_0018BE30);
-            vec_scale_to_length(delta, delta, D_L00_001B100C);
+            FastVecSub(delta, p, g_hero_aim_vector);
+            vec_scale_to_length(delta, delta, g_lightning_strand_step_length);
             FastVecAdd(delta, p, delta);
             for (i = 0; i < 10; i++) {
                 float t = i * 0.1f;
                 if (i == 9)
                     t = 1.0f;
-                math_l00_interpolate_cubic_vector(out, D_0018BE30, p, state + 0x40, delta, t);
-                qcopy(D_L00_002563A0[g][i], out);
+                math_l00_interpolate_cubic_vector(out, g_hero_aim_vector, p, state + 0x40, delta, t);
+                qcopy(g_lightning_strand_points[g][i], out);
             }
         } else {
             for (j = 1; j < 10; j++) {
-                FastVecSub(diffs[j], D_L00_002563A0[g][j], (&((Vector *)D_L00_002563A0)[g * 10 + j])[-1]);
+                FastVecSub(diffs[j], g_lightning_strand_points[g][j], (&((Vector *)g_lightning_strand_points)[g * 10 + j])[-1]);
                 diffs[j][0] += math_random_signed_float_range(0.0f, 0.05f);
                 diffs[j][1] += math_random_signed_float_range(0.0f, 0.05f);
                 diffs[j][2] += math_random_signed_float_range(0.0f, 0.05f);
             }
-            qcopy(D_L00_002563A0[g][0], D_0018BE30);
+            qcopy(g_lightning_strand_points[g][0], g_hero_aim_vector);
             for (k = 1; k < 10; k++)
-                FastVecAdd(D_L00_002563A0[g][k], (&((Vector *)D_L00_002563A0)[g * 10 + k])[-1], diffs[k]);
+                FastVecAdd(g_lightning_strand_points[g][k], (&((Vector *)g_lightning_strand_points)[g * 10 + k])[-1], diffs[k]);
         }
         for (l = 2; l < 9; l++) {
-            qcopy(p, D_L00_002563A0[0][l]);
-            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            qcopy(D_L00_002563A0[1][l], p);
+            qcopy(p, g_lightning_strand_points[0][l]);
+            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[1][l], p);
         }
         for (n = 2; n < 9; n++) {
-            qcopy(p, D_L00_002563A0[0][n]);
-            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            qcopy(D_L00_002563A0[2][n], p);
+            qcopy(p, g_lightning_strand_points[0][n]);
+            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[2][n], p);
         }
         for (i = 2; i < 9; i++) {
-            qcopy(p, D_L00_002563A0[0][i]);
-            p[0] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[1] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            p[2] += math_random_signed_float_range(0.0f, D_L00_001B1004);
-            qcopy(D_L00_002563A0[3][i], p);
+            qcopy(p, g_lightning_strand_points[0][i]);
+            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[3][i], p);
         }
     }
 }

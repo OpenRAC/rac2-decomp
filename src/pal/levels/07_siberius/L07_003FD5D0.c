@@ -8,7 +8,7 @@ extern void *level_build_spawn_record(void *, void *, void *, void *, void *, vo
 extern void turret_start_swinging(char *);
 extern char *group_pick_random_active_entity(int);
 
-void func_PAL_L07_003FD5D0(char *obj)
+void group_launch_members_pal(char *obj)
 {
     char *s2 = *(char **)(obj + 0x68);
     float v10[4];
@@ -31,16 +31,16 @@ void func_PAL_L07_003FD5D0(char *obj)
 
 
 #include "common.h"
-extern u8 D_L07_001B31AF __attribute__((sda));
+extern u8 g_flag_block __attribute__((sda));
 extern u8 *g_moby_l07_array[] __attribute__((sda));
-extern s32 D_L07_001B22F8[] __attribute__((sda));
+extern s32 g_entity_group_count[] __attribute__((sda));
 extern s32 math_random_int_below(s32 n);
 extern s32 math_fast_float_d(s32 *counter);
 extern u8 *moby_find_active_in_group(u8 *a);
 extern void anim_start_blended(u8 *a0, s32 a1, s32 a2, s32 a3);
-extern u8 D_001A7BD0 __attribute__((sda));
+extern u8 g_moby_update_inhibit_flag __attribute__((sda));
 
-void func_PAL_L07_003FD928(u8 *a0)
+void boss_select_idle_anim_pal(u8 *a0)
 {
     u8 *p = *(u8 **)(a0 + 0x68);
 
@@ -55,7 +55,7 @@ void func_PAL_L07_003FD928(u8 *a0)
     }
 }
 
-void func_PAL_L07_003FD988(u8 *a0)
+void boss_select_attack_anim_pal(u8 *a0)
 {
     u8 *p = *(u8 **)(a0 + 0x68);
 

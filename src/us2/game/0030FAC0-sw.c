@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef float VecE[4] __attribute__((aligned(16)));
-extern VecE D_001BAFB0, D_001BAFA0;
+extern VecE g_coll_hit_point, g_coll_hit_position;
 typedef struct {
     u8 pad00[0x80]; VecE position; u8 pad90[0x50]; VecE pickup_target;
     u8 padF0[0x2290-0xF0]; void *moby;
@@ -19,7 +19,7 @@ extern u8 g_item_slot_to_record[];
 extern s32 g_item_ammo_counts[];
 extern void *g_hero_moby NOT_SDA;
 extern s32 g_game_time[] __attribute__((sda));
-extern s32 D_001B24A8[] __attribute__((sda));
+extern s32 g_ammo_pickup_time[] __attribute__((sda));
 extern s32 D_001B24A8_gp SDATA(D_001B24A8);
 extern s32 math_fast_float_d(s32 *);
 extern u32 stub_empty_8(s32, s32);
@@ -29,7 +29,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern void func_US2_002B18B0(s32, s32, s32);
+extern void value_forward_three_args_us2(s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern f32 FastVecLength(void *);
 extern f32 math_fabs(f32);

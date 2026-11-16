@@ -17,22 +17,22 @@ extern char g_hero_state[];
 extern int g_pad_state[];
 extern u8 g_item_slot_to_record[];
 extern Statistics g_progress_statistics[];
-extern u32 D_001A7390;
+extern u32 g_frame_counter;
 extern u32 g_current_map_index;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_00294980[], D_L00_00294A00[];
-extern int D_L00_001A8F00;
-extern float D_L00_001B2868;
-extern float D_L00_001B286C;
-extern float D_L00_001B2870;
-extern int D_L00_001B2874;
-extern int D_L00_001AF6C0 __attribute__((sda));
-extern int D_L00_001AF6C4 __attribute__((sda));
-extern int D_L00_001AF6C8 __attribute__((sda));
-extern int D_L00_001AF6CC __attribute__((sda));
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_lancer_sound_records_a[], g_lancer_sound_records_b[];
+extern int g_game_l00_mode;
+extern float g_lancer_horizontal_arc;
+extern float g_lancer_range;
+extern float g_lancer_vertical_arc;
+extern int g_lancer_fire_held;
+extern int g_lancer_state_short __attribute__((sda));
+extern int g_lancer_state_int __attribute__((sda));
+extern int g_other_weapon_state_short __attribute__((sda));
+extern int g_other_weapon_state_int __attribute__((sda));
 extern float g_camera_l00_position[4];
 extern char *g_area_hit_targets[];
 extern WeaponEntry g_weapon_l00_table[];
-extern MuzzleLight D_L00_001C6F40[];
+extern MuzzleLight g_light_table[];
 
 extern void func_PAL_L00_003AB208(char *);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -57,20 +57,20 @@ extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern s32 func_PAL_L00_002C4480(int, int);
 extern void func_PAL_L00_003AAFC8(char *);
-extern void func_PAL_L00_003E8BE8(char *);
+extern void part_spawn_line_at_moby_pal(char *);
 extern void func_PAL_L00_002AF458(void);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern int gfx_add_point_light(void *, int, float, float);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int PlayMobySound(int, int, char *);
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern int slot_is_entry_nonzero(int);
-extern char *func_PAL_L00_003E6400(void *, char *, char *, float);
-extern char *func_PAL_L00_00423E08(void *, char *, char *);
+extern char *CreateTargetedMovingEffect_pal(void *, char *, char *, float);
+extern char *SpawnAimedShot_pal(void *, char *, char *);
 extern int coll_process_hit(float, void *, int, void *, int);
 extern void QueueMobyImpact(void *, void *);
 extern void cam_compute_view_direction(void *, void *, int);
-extern void func_PAL_L00_003E74D8(void *, int, int);
+extern void part_l00_spawn_spark_burst_3_pal(void *, int, int);
 extern void slot_reset_active(int);
 extern void gfx_free_point_light(int);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -87,18 +87,18 @@ void func_PAL_L00_003AA2D8(char *moby)
     float previousRange, horizontal, vertical;
     int specialMode = ((Hero *)g_hero_state)->i[0x1244 / 4] == 3;
 
-    if (D_L00_001A8F00 == 8)
+    if (g_game_l00_mode == 8)
         return;
     if (*(u8 *)(moby + 0x20) == 0) {
         *(u8 *)(moby + 0x20) = 2;
         func_PAL_L00_003AB208(moby);
     }
-    horizontal = D_L00_001B2868;
-    previousRange = D_L00_001B286C;
+    horizontal = g_lancer_horizontal_arc;
+    previousRange = g_lancer_range;
     if (TYPE(moby) == 0x5D2)
-        D_L00_001B286C = 20.0f;
+        g_lancer_range = 20.0f;
     else
-        D_L00_001B286C = 30.0f;
+        g_lancer_range = 30.0f;
     if (TYPE(moby) == 0x5D2)
         moby_transform_joint_to_world(moby, 0, muzzle);
     else {
@@ -113,8 +113,8 @@ void func_PAL_L00_003AA2D8(char *moby)
     }
     FastVecScale(playerPoint, (char *)((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0xE0, 0.75f);
     FastVecAdd(playerPoint, &((Hero *)g_hero_state)->f[0x80 / 4], playerPoint);
-    vertical = D_L00_001B2870;
-    D_L00_001B2868 = D_L00_001B2870 = 0.1047197655f;
+    vertical = g_lancer_vertical_arc;
+    g_lancer_horizontal_arc = g_lancer_vertical_arc = 0.1047197655f;
     *(int *)(state + 0x2C) = 0;
     FastDecTimer(state + 6);
     {
@@ -153,7 +153,7 @@ void func_PAL_L00_003AA2D8(char *moby)
                     *(char **)state = target;
                     *(short *)(state + 4) = *(short *)(target + 0xAA);
                     *(int *)(state + 8) = 0;
-                    *(short *)(state + 6) = ((s32)(TYPE(moby) == 0x5D2 ? D_L00_001AF6C0 : D_L00_001AF6C8) * 5 + 2) / 6;
+                    *(short *)(state + 6) = ((s32)(TYPE(moby) == 0x5D2 ? g_lancer_state_short : g_other_weapon_state_short) * 5 + 2) / 6;
                     component = moby_get_private_value_0(candidate);
                     if (component) {
                         *(float *)(state + 8) = component[4];
@@ -164,7 +164,7 @@ void func_PAL_L00_003AA2D8(char *moby)
                     }
                 }
             } else {
-                *(int *)(state + 0x34) = ((s32)(TYPE(moby) == 0x5D2 ? D_L00_001AF6C4 : D_L00_001AF6CC) * 5 + 2) / 6;
+                *(int *)(state + 0x34) = ((s32)(TYPE(moby) == 0x5D2 ? g_lancer_state_int : g_other_weapon_state_int) * 5 + 2) / 6;
             }
         } else {
             *(int *)state = 0;
@@ -172,9 +172,9 @@ void func_PAL_L00_003AA2D8(char *moby)
             *(int *)(state + 8) = 0;
             target = 0;
             if (TYPE(moby) == 0x5D2)
-                *(int *)(state + 0x34) = ((s32)D_L00_001AF6C4 * 5 + 2) / 6;
+                *(int *)(state + 0x34) = ((s32)g_lancer_state_int * 5 + 2) / 6;
             else
-                *(int *)(state + 0x34) = ((s32)D_L00_001AF6CC * 5 + 2) / 6;
+                *(int *)(state + 0x34) = ((s32)g_other_weapon_state_int * 5 + 2) / 6;
         }
         *(char **)(state + 0x30) = candidate;
     } else if (((Hero *)g_hero_state)->i[0x1500 / 4]) {
@@ -209,16 +209,16 @@ void func_PAL_L00_003AA2D8(char *moby)
         if (vec_fast_helper_b(state + 0xC) && !((Hero *)g_hero_state)->b[0x22BC] && (g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
                 int count, i;
-                D_L00_001B2874 = 1;
+                g_lancer_fire_held = 1;
                 if (g_progress_statistics[33].count < 0xFFFF)
                     g_progress_statistics[33].count++;
-                if (((s32)D_001A7390 * 5 + 2) / 6 > g_progress_statistics[33].maximum)
-                    g_progress_statistics[33].maximum = ((s32)D_001A7390 * 5 + 2) / 6;
+                if (((s32)g_frame_counter * 5 + 2) / 6 > g_progress_statistics[33].maximum)
+                    g_progress_statistics[33].maximum = ((s32)g_frame_counter * 5 + 2) / 6;
                 g_progress_statistics[33].levels = (g_progress_statistics[33].levels | (1u << g_current_map_index)) | 0x80000000u;
                 if (TYPE(moby) == 0x5D2)
                     func_PAL_L00_003AAFC8(moby);
                 else
-                    func_PAL_L00_003E8BE8(moby);
+                    part_spawn_line_at_moby_pal(moby);
                 if (*(short *)(state + 0x10) == 0) {
                     func_PAL_L00_002AF458();
                     *(short *)(state + 0x10) = 1;
@@ -230,13 +230,13 @@ void func_PAL_L00_003AA2D8(char *moby)
                 *(int *)(state + 0x28) = 8;
                 snd_play_from_class_bank(0, 0, moby, TYPE(moby));
                 if (TYPE(moby) == 0x5D2)
-                    slot_copy_records_to_free(D_L00_00294980);
+                    slot_copy_records_to_free(g_lancer_sound_records_a);
                 else if (*(int *)(state + 0x3C) < 0)
-                    *(int *)(state + 0x3C) = slot_copy_records_to_free(D_L00_00294A00);
+                    *(int *)(state + 0x3C) = slot_copy_records_to_free(g_lancer_sound_records_b);
                 if (TYPE(moby) == 0x5D2)
-                    func_PAL_L00_003E6400(muzzle, moby, target, previousRange);
+                    CreateTargetedMovingEffect_pal(muzzle, moby, target, previousRange);
                 else
-                    func_PAL_L00_00423E08(muzzle, moby, target);
+                    SpawnAimedShot_pal(muzzle, moby, target);
                 {
                     WeaponEntry *entry = g_item_slot_to_record[0x1E] + g_weapon_l00_table;
                     *(float *)(state + 0xC) = 1.0f / entry->rate;
@@ -265,12 +265,12 @@ void func_PAL_L00_003AA2D8(char *moby)
                     cam_compute_view_direction(g_area_hit_targets[i] + 0x10, direction, 1);
                     FastVecScale(direction, direction, component[4]);
                     FastVecAdd(center, direction, g_area_hit_targets[i] + 0x10);
-                    func_PAL_L00_003E74D8(center, 0x19, 1);
+                    part_l00_spawn_spark_burst_3_pal(center, 0x19, 1);
                 }
             } else {
-                if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || D_L00_001B2874 == 1) {
+                if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || g_lancer_fire_held == 1) {
                     PlayMobySound(1, 0, moby);
-                    D_L00_001B2874 = 0;
+                    g_lancer_fire_held = 0;
                 }
                 {
                     WeaponEntry *entry = g_item_slot_to_record[0x1E] + g_weapon_l00_table;
@@ -288,13 +288,13 @@ void func_PAL_L00_003AA2D8(char *moby)
             *(int *)(state + 0x3C) = -1;
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && get_ammo(-1))
             && !(((Hero *)g_hero_state)->i[0x1D8 / 4] < 8 && ((Hero *)g_hero_state)->b[0x22B8])) {
-            func_PAL_L00_002AF6C0();
+            cancel_hero_item_animation_pal();
             *(short *)(state + 0x10) = 0;
         }
         break;
     }
     case 2:
-        func_PAL_L00_002AF6C0();
+        cancel_hero_item_animation_pal();
         if (vec_fast_helper_b(state + 0xC))
             *(u8 *)(moby + 0x20) = 1;
         break;
@@ -309,10 +309,10 @@ void func_PAL_L00_003AA2D8(char *moby)
             offset[0] = 2.0f;
             offset[2] = 2.0f;
             matrix_mul_vec3(offset, offset, &((Hero *)g_hero_state)->f[0x730 / 4]);
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[0] = ((Hero *)g_hero_state)->f[0x80 / 4] + offset[0];
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[1] = ((Hero *)g_hero_state)->f[0x84 / 4] + offset[1];
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[2] = ((Hero *)g_hero_state)->f[0x88 / 4] + offset[2];
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[3] = 4.0f;
+            (*(int *)(state + 0x24) + g_light_table)->position[0] = ((Hero *)g_hero_state)->f[0x80 / 4] + offset[0];
+            (*(int *)(state + 0x24) + g_light_table)->position[1] = ((Hero *)g_hero_state)->f[0x84 / 4] + offset[1];
+            (*(int *)(state + 0x24) + g_light_table)->position[2] = ((Hero *)g_hero_state)->f[0x88 / 4] + offset[2];
+            (*(int *)(state + 0x24) + g_light_table)->position[3] = 4.0f;
             {
                 float b;
                 ratio = IntToFloat(*(int *)(state + 0x28));
@@ -320,13 +320,13 @@ void func_PAL_L00_003AA2D8(char *moby)
                 ratio /= b;
                 /* Both weapons light the muzzle the same way. */
                 if (TYPE(moby) == 0x5D2) {
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->radius = ratio;
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->spread = ratio * 0.5f;
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->power = (*(int *)(state + 0x24) + D_L00_001C6F40)->spread;
+                    (*(int *)(state + 0x24) + g_light_table)->radius = ratio;
+                    (*(int *)(state + 0x24) + g_light_table)->spread = ratio * 0.5f;
+                    (*(int *)(state + 0x24) + g_light_table)->power = (*(int *)(state + 0x24) + g_light_table)->spread;
                 } else {
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->radius = ratio;
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->spread = ratio * 0.5f;
-                    (*(int *)(state + 0x24) + D_L00_001C6F40)->power = (*(int *)(state + 0x24) + D_L00_001C6F40)->spread;
+                    (*(int *)(state + 0x24) + g_light_table)->radius = ratio;
+                    (*(int *)(state + 0x24) + g_light_table)->spread = ratio * 0.5f;
+                    (*(int *)(state + 0x24) + g_light_table)->power = (*(int *)(state + 0x24) + g_light_table)->spread;
                 }
             }
         }

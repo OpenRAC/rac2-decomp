@@ -7,7 +7,7 @@ extern u8 *g_moby_l02_pool;
 extern int g_frame_l02_counter;
 extern int moby_is_state_at_least_2(u8 *);
 extern int math_fast_helper_a(float *, float);
-extern void func_PAL_L02_00434290(u8 *);
+extern void moby_start_idle_anim_variant_pal(u8 *);
 extern int flag_set_first_pending(u8 *);
 extern int math_random_int_below(int);
 extern void func_PAL_002A7E68(u8 *, int, int, int);
@@ -40,7 +40,7 @@ void func_PAL_L02_00433ED0(u8 *object) {
         return;
     }
     *(unsigned short *)(object + 0x32) = 255;
-    func_PAL_L02_00434290(object);
+    moby_start_idle_anim_variant_pal(object);
     target = (u8 *)(*state * 0x100 + (int)g_moby_l02_pool);
     level = *(float *)(*(u8 **)(target + 0x68) + 0x6C);
     switch (object[0x20]) {

@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern char D_001B9380[];
+extern char g_camera_script_state[];
 
 extern char g_hero_position[];
 
@@ -10,7 +10,7 @@ extern int cam_compute_direction_angles(void *, void *, void *);
    mode 3 restarts the transition from D_00189EA0, modes 2 and 3 set its duration. */
 void SetCamera5Mode(int mode, int duration)
 {
-    char *g = D_001B9380;
+    char *g = g_camera_script_state;
     char *camera = *(char **)(g + 0x190);
     char *state = *(char **)(camera + 0x70);
     char *transition = state + 0xE0;

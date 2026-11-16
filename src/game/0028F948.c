@@ -19,9 +19,9 @@
    `move` to keep the incoming `$a1` alive across that register - 344
    bytes against the 368 of the reference. */
 
-extern int *D_L03_001B3188 __attribute__((sda));
+extern int *g_gif_dma_packet_ptr __attribute__((sda));
 
-extern void D_00126288(void *, short, short, int, int, int, short, short);
+extern void g_gfx_gs_image_packet_build(void *, short, short, int, int, int, short, short);
 
 extern void FlushCache(int);
 
@@ -58,7 +58,7 @@ extern int g_screen_offset_y __attribute__((sda));
    The four header words are written through the global expression, so each one
    carries its own reload of D_L02_001B3D08 before its store. */
 
-extern int *D_L02_001B3D08 __attribute__((sda));
+extern int *g_gfx_l02_packet_cursor __attribute__((sda));
 
 /* shared native body of family 435a49e62f53b8db (default profile) */
 /* Copies an image into video memory, either straight into the draw list or through a temporary buffer. */
@@ -75,25 +75,25 @@ void gfx_upload_image_to_vram(int source, int vramBase, int format, int widthLog
         bufferWidth = 1;
 
     if (immediate == 0) {
-        *(int *)D_L03_001B3188 = 0x10000006;
-        *(int *)((char *)D_L03_001B3188 + 4) = 0;
-        *(int *)((char *)D_L03_001B3188 + 8) = 0;
-        *(int *)((char *)D_L03_001B3188 + 12) = 0x50000006;
-        work = (char *)D_L03_001B3188 + 16;
-        D_L03_001B3188 = (int *)((char *)D_L03_001B3188 + 112);
+        *(int *)g_gif_dma_packet_ptr = 0x10000006;
+        *(int *)((char *)g_gif_dma_packet_ptr + 4) = 0;
+        *(int *)((char *)g_gif_dma_packet_ptr + 8) = 0;
+        *(int *)((char *)g_gif_dma_packet_ptr + 12) = 0x50000006;
+        work = (char *)g_gif_dma_packet_ptr + 16;
+        g_gif_dma_packet_ptr = (int *)((char *)g_gif_dma_packet_ptr + 112);
     } else {
         work = buf;
     }
 
-    D_00126288(work, (short)vramBase, (short)bufferWidth, (short)format, 0, 0,
+    g_gfx_gs_image_packet_build(work, (short)vramBase, (short)bufferWidth, (short)format, 0, 0,
             (short)(1 << widthLog2), (short)(1 << heightLog2));
 
     if (immediate == 0) {
-        *(int *)D_L03_001B3188 = 0x30000000 | quadCount;
-        *(int *)((char *)D_L03_001B3188 + 4) = source;
-        *(int *)((char *)D_L03_001B3188 + 8) = 0;
-        *(int *)((char *)D_L03_001B3188 + 12) = 0x50000000 | quadCount;
-        D_L03_001B3188 = (int *)((char *)D_L03_001B3188 + 16);
+        *(int *)g_gif_dma_packet_ptr = 0x30000000 | quadCount;
+        *(int *)((char *)g_gif_dma_packet_ptr + 4) = source;
+        *(int *)((char *)g_gif_dma_packet_ptr + 8) = 0;
+        *(int *)((char *)g_gif_dma_packet_ptr + 12) = 0x50000000 | quadCount;
+        g_gif_dma_packet_ptr = (int *)((char *)g_gif_dma_packet_ptr + 16);
     } else {
         FlushCache(0);
         sceGsExecLoadImage(work, source);
@@ -180,12 +180,12 @@ void gfx_draw_screen_rect_with_depth(int x0, int y0, int x1, int y1, long long c
 {
     int *packet;
 
-    *(int *)D_L02_001B3D08 = 0x10000003;
-    *(int *)((char *)D_L02_001B3D08 + 4) = 0;
-    *(int *)((char *)D_L02_001B3D08 + 8) = 0;
-    *(int *)((char *)D_L02_001B3D08 + 12) = 0x50000003;
-    packet = D_L02_001B3D08;
-    D_L02_001B3D08 = packet + 4;
+    *(int *)g_gfx_l02_packet_cursor = 0x10000003;
+    *(int *)((char *)g_gfx_l02_packet_cursor + 4) = 0;
+    *(int *)((char *)g_gfx_l02_packet_cursor + 8) = 0;
+    *(int *)((char *)g_gfx_l02_packet_cursor + 12) = 0x50000003;
+    packet = g_gfx_l02_packet_cursor;
+    g_gfx_l02_packet_cursor = packet + 4;
     *(long long *)(packet + 4) = 0x4400000000008001LL;
     *(long long *)(packet + 6) = 17424;
     *(long long *)(packet + 8) = 70;
@@ -205,7 +205,7 @@ void gfx_draw_screen_rect_with_depth(int x0, int y0, int x1, int y1, long long c
                                | ((long long)((y1 << 4) + g_screen_offset_y - 16) << 16)
                                | ((long long)depth << 32);
     }
-    D_L02_001B3D08 = (int *)((char *)D_L02_001B3D08 + 48);
+    g_gfx_l02_packet_cursor = (int *)((char *)g_gfx_l02_packet_cursor + 48);
 }
 
 

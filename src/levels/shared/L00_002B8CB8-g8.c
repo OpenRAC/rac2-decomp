@@ -26,13 +26,13 @@ typedef struct Rac2Native_002B8CB8_Record {
     float f_D08;
 } Rac2Native_002B8CB8_Record;
 
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 
 /* The level frame-time value is reached through $gp. */
-extern float D_L00_001A7CF8 __attribute__((sda));
+extern float g_glow_scale __attribute__((sda));
 
-extern char D_L00_0025BE10[];
-extern float D_L00_0025CB1C[];
+extern char g_hero_item_attach_records[];
+extern float g_hero_l00_float_param[];
 
 extern float math_fabs(float f);
 
@@ -49,8 +49,8 @@ void UpdateHeroLeanAndSwayParameters(void)
 
     if (st->item == 0)
         return;
-    if (D_001A7A40[3] != 0)
-        D_L00_0025CB1C[0] = D_L00_001A7CF8;
+    if (g_unlocked_item_flags[3] != 0)
+        g_hero_l00_float_param[0] = g_glow_scale;
     live = st->item;
     scale = 1024.0f / live->scale;
     if (st->mode != 2)
@@ -58,8 +58,8 @@ void UpdateHeroLeanAndSwayParameters(void)
 
     x = st->yaw_error;
     y = 0.02f;
-    ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_D04 = y;
-    ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_D08 = 0.35f;
+    ((Rac2Native_002B8CB8_Record *)g_hero_item_attach_records)->f_D04 = y;
+    ((Rac2Native_002B8CB8_Record *)g_hero_item_attach_records)->f_D08 = 0.35f;
     if (1.4f < x)
         x = 1.4f;
     else if (x < -1.4f)
@@ -69,12 +69,12 @@ void UpdateHeroLeanAndSwayParameters(void)
         y = 75.0f * 3.14159274f / 180.0f;
     else if (y < -(75.0f * 3.14159274f / 180.0f))
         y = -(75.0f * 3.14159274f / 180.0f);
-    ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_CC8 = y;
+    ((Rac2Native_002B8CB8_Record *)g_hero_item_attach_records)->f_CC8 = y;
 
     share = 0.1f;
     len = math_fabs(x) * share;
     share = len + share;
     if (0.07f < share)
         share = 0.07f;
-    ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_CF8 = share * scale;
+    ((Rac2Native_002B8CB8_Record *)g_hero_item_attach_records)->f_CF8 = share * scale;
 }

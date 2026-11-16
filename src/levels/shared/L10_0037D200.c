@@ -3,9 +3,9 @@
 #include "common.h"
 
 extern void *CreateMoby(s32);
-extern short D_L10_001B2DB8[4];
-extern short D_L10_001B2DC0[4];
-extern char D_L10_00234600[];
+extern short g_lightning_strip_timers[4];
+extern short g_lightning_strip_states[4];
+extern char g_lightning_l10_strip_points[];
 extern int FastDecTimer(short *);
 extern f32 math_random_float_range(f32, f32);
 extern f32 math_random_signed_float_range(f32, f32);
@@ -16,23 +16,23 @@ extern void math_l00_interpolate_cubic_vector(void *, void *, void *, void *, vo
 
 typedef struct { int status; u8 reserved[36]; } GornStatusRecord156;
 
-extern GornStatusRecord156 D_L10_002A3C70[];
+extern GornStatusRecord156 g_reward_slot_table[];
 
 
 /* Report whether any configured status in the selected eleven records is nonzero */
 int status_any_record_nonzero(void)
 {
-    if (D_L10_002A3C70[2].status != 0 ||
-        D_L10_002A3C70[3].status != 0 ||
-        D_L10_002A3C70[4].status != 0 ||
-        D_L10_002A3C70[5].status != 0 ||
-        D_L10_002A3C70[8].status != 0 ||
-        D_L10_002A3C70[9].status != 0 ||
-        D_L10_002A3C70[10].status != 0 ||
-        D_L10_002A3C70[11].status != 0 ||
-        D_L10_002A3C70[12].status != 0 ||
-        D_L10_002A3C70[13].status != 0 ||
-        D_L10_002A3C70[14].status != 0)
+    if (g_reward_slot_table[2].status != 0 ||
+        g_reward_slot_table[3].status != 0 ||
+        g_reward_slot_table[4].status != 0 ||
+        g_reward_slot_table[5].status != 0 ||
+        g_reward_slot_table[8].status != 0 ||
+        g_reward_slot_table[9].status != 0 ||
+        g_reward_slot_table[10].status != 0 ||
+        g_reward_slot_table[11].status != 0 ||
+        g_reward_slot_table[12].status != 0 ||
+        g_reward_slot_table[13].status != 0 ||
+        g_reward_slot_table[14].status != 0)
         return 1;
     return 0;
 }
@@ -62,19 +62,19 @@ void *CreateEnergyStrip(void *position, void *direction, s32 duration, s32 kind,
         *(float *)(state + 0x34) = jitter;
         qcopy(state, direction);
         qcopy((object + 0x10), position);
-        for (i = 2; i >= 0; i--) D_L10_001B2DB8[i] = -1;
+        for (i = 2; i >= 0; i--) g_lightning_strip_timers[i] = -1;
     }
     return object;
 }
 
 extern void RebuildTimedLightningStripPoints(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern u8 D_L10_0039D9C0[];
+extern u8 g_lightning_draw_callback_data[];
 
 /* Refreshes and then hands the constructor at 0x0039D9C0 to the callback list. */
 void lightning_strip_refresh_call_ctor(void *moby) {
     RebuildTimedLightningStripPoints(moby);
-    gfx_add_draw_callback_third(D_L10_0039D9C0, moby);
+    gfx_add_draw_callback_third(g_lightning_draw_callback_data, moby);
 }
 
 /* Rebuilds each expired lightning strip and jitters its interior control points. */
@@ -87,9 +87,9 @@ void RebuildTimedLightningStripPoints(void *object) {
     f32 t;
     int strip, i, j;
     for (strip = 0; strip < 4; strip++) {
-        if (FastDecTimer(&D_L10_001B2DB8[strip])) {
-            D_L10_001B2DB8[strip] = 2;
-            D_L10_001B2DC0[strip] = 0;
+        if (FastDecTimer(&g_lightning_strip_timers[strip])) {
+            g_lightning_strip_timers[strip] = 2;
+            g_lightning_strip_states[strip] = 0;
             qcopy(point, state);
             point[0] += math_random_float_range(0.0f, 0.0f);
             point[1] += math_random_float_range(0.0f, 0.0f);
@@ -101,26 +101,26 @@ void RebuildTimedLightningStripPoints(void *object) {
                 t = (f32)i * 0.1f;
                 if (i == 7) t = 1.0f;
                 math_l00_interpolate_cubic_vector(result, self + 0x10, point, direction, direction, t);
-                qcopy(((f32 (*)[8][4])D_L10_00234600)[strip][i], result);
+                qcopy(((f32 (*)[8][4])g_lightning_l10_strip_points)[strip][i], result);
             }
             for (j = 1; j < 7; j++) {
-                qcopy(result, ((f32 (*)[8][4])D_L10_00234600)[0][j]);
+                qcopy(result, ((f32 (*)[8][4])g_lightning_l10_strip_points)[0][j]);
                 result[0] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
                 result[1] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
                 result[2] += math_random_signed_float_range(0.0f, *(f32 *)(state + 0x34));
-                qcopy(((f32 (*)[8][4])D_L10_00234600)[0][j], result);
+                qcopy(((f32 (*)[8][4])g_lightning_l10_strip_points)[0][j], result);
             }
         }
     }
 }
 
-extern int D_L10_001AEEC0 __attribute__((sda));
+extern int g_lightning_strip_counter __attribute__((sda));
 
 extern int math_fast_float_d(void *);
 
 extern void moby_mark_spawned(void *);
 
-extern char D_L10_00234600[];
+extern char g_lightning_l10_strip_points[];
 
 extern void DrawHrugisRibbon(void *, int, int, int, float, float, float, int, int);
 
@@ -130,13 +130,13 @@ void lightning_build_strip_from_records(void *moby) {
     char *vars = *(char **)((char *)moby + 0x68);
 
     if (math_fast_float_d(vars + 0x10) == 0) {
-        DrawHrugisRibbon(D_L10_00234600, *(int *)(vars + 0x1C), *(int *)(vars + 0x30), 8,
+        DrawHrugisRibbon(g_lightning_l10_strip_points, *(int *)(vars + 0x1C), *(int *)(vars + 0x30), 8,
                           *(float *)(vars + 0x24), *(float *)(vars + 0x28),
                           *(float *)(vars + 0x20), *(int *)(vars + 0x14), *(int *)(vars + 0x18));
     } else {
-        D_L10_001AEEC0 = D_L10_001AEEC0 - 1;
-        if (D_L10_001AEEC0 < 0)
-            D_L10_001AEEC0 = 0;
+        g_lightning_strip_counter = g_lightning_strip_counter - 1;
+        if (g_lightning_strip_counter < 0)
+            g_lightning_strip_counter = 0;
         moby_mark_spawned(moby);
     }
 }

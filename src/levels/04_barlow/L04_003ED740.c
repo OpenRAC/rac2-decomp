@@ -7,10 +7,10 @@ typedef struct {
 } HeroD740;
 
 extern char *g_moby_l04_pool __attribute__((sda));
-extern char *D_L04_001B25CC[] __attribute__((sda));
+extern char *g_linked_record_table[] __attribute__((sda));
 extern char g_hero_position[], g_sound_state[];
-extern HeroD740 D_L04_001B9540;
-extern u8 D_0019B2E8[];
+extern HeroD740 g_hero_l04_state;
+extern u8 g_moby_group_flags[];
 extern char *g_hero_moby;
 extern int g_current_map_index __attribute__((sda));
 extern int moby_count_group_not_in_state(int, int);
@@ -52,7 +52,7 @@ void linked_sequence_controller_update(char *moby)
                 *(u8 *)(part_a + 0x20) = 2;
                 *(u8 *)(part_b + 0x20) = 2;
                 if (IsPointInCuboid(g_hero_position, *(int *)(vars + 0x70)) &&
-                    !(D_0019B2E8[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
+                    !(g_moby_group_flags[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
                     cam_lock_entry(*(int *)(vars + 0x10));
                     *(u8 *)(moby + 0x20) = 2;
                     *(u8 *)(part_a + 0x20) = 3;
@@ -61,7 +61,7 @@ void linked_sequence_controller_update(char *moby)
             } else if (*(int *)(vars + 0x18) == 1) {
                 char *part_a, *part_b;
 
-                if (!(D_0019B2E8[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
+                if (!(g_moby_group_flags[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
                     cam_lock_entry(*(int *)(vars + 0x10));
                     *(u8 *)(moby + 0x20) = 4;
                     part_a = g_moby_l04_pool + (*(int *)(vars + 0x74) << 8);
@@ -69,7 +69,7 @@ void linked_sequence_controller_update(char *moby)
                     snd_play_from_class_bank(0, 0, part_a, 0xCE6);
                     *(u8 *)(part_a + 0x20) = 2;
                     *(u8 *)(part_b + 0x20) = 2;
-                    if (!(D_0019B2E8[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
+                    if (!(g_moby_group_flags[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
                         moby_mark_table_entry_flagged(*(u8 *)(moby + 0xB0));
                         level_capture_checkpoint_state(moby + 0x10, moby + 0xF0);
                     }
@@ -77,7 +77,7 @@ void linked_sequence_controller_update(char *moby)
             }
         } else if (*(int *)(vars + 0x18) == 0 &&
                    IsPointInCuboid(g_hero_position, *(int *)(vars + 0x70)) &&
-                   !(D_0019B2E8[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
+                   !(g_moby_group_flags[*(u8 *)(moby + 0xB0) + g_current_map_index * 16] & 128)) {
             cam_lock_entry(*(int *)(vars + 0x10));
             *(u8 *)(moby + 0x20) = 2;
         }
@@ -107,7 +107,7 @@ void linked_sequence_controller_update(char *moby)
                 }
             }
             {
-                char *part_a = D_L04_001B25CC[0] + (*(int *)(vars + 0x14) << 7);
+                char *part_a = g_linked_record_table[0] + (*(int *)(vars + 0x14) << 7);
 
                 qcopy(g_hero_position, part_a + 0x30);
                 qcopy(g_hero_position + 0x10, part_a + 0x70);
@@ -123,7 +123,7 @@ void linked_sequence_controller_update(char *moby)
 
         if (cam_is_trigger_ready(*(int *)(vars + 0x10))) {
             {
-                char *spot = D_L04_001B25CC[0] + (*(int *)(vars + 0x14) << 7);
+                char *spot = g_linked_record_table[0] + (*(int *)(vars + 0x14) << 7);
 
                 qcopy(g_hero_position, spot + 0x30);
                 spot += 0x70;
@@ -133,9 +133,9 @@ void linked_sequence_controller_update(char *moby)
             part_b = g_moby_l04_pool + (*(int *)(vars + 0x24) << 8);
             *(u8 *)(part_a + 0x95) = 4;
             *(u8 *)(part_a + 0x20) = 17;
-            if (!D_L04_001B9540.target) {
-                D_L04_001B9540.target = part_b;
-                D_L04_001B9540.timer = 0;
+            if (!g_hero_l04_state.target) {
+                g_hero_l04_state.target = part_b;
+                g_hero_l04_state.timer = 0;
             }
             *(int *)(part_a + 0x98) = *(int *)(*(char **)(part_a + 0x24) + 0x10);
             {
@@ -154,7 +154,7 @@ void linked_sequence_controller_update(char *moby)
         char *part_a;
 
         if (cam_is_trigger_ready(*(int *)(vars + 0x10))) {
-            part_a = D_L04_001B25CC[0] + (*(int *)(vars + 0x14) << 7);
+            part_a = g_linked_record_table[0] + (*(int *)(vars + 0x14) << 7);
             hero_reset_position_and_direction(part_a + 0x30, part_a + 0x70, 111, 1);
             *(u8 *)(moby + 0x20) = 5;
             moby_set_flag_bit(moby, 1);

@@ -21,7 +21,7 @@ extern void two_toggle_b_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F5A8(void)
+void module_l00_call_handler_16_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -60,7 +60,7 @@ extern void four_option_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F658(void)
+void module_l00_call_handler_17_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -85,7 +85,7 @@ extern void two_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F6C8(void)
+void module_l00_call_handler_18_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -110,7 +110,7 @@ extern void single_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F738(void)
+void module_l00_call_handler_19_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -135,7 +135,7 @@ extern void onoff_menu_draw_with_help(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F7A8(void)
+void level_l00_call_module_handler_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -160,7 +160,7 @@ extern void onoff_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F818(void)
+void level_l00_call_module_handler_2_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -181,7 +181,7 @@ int func_PAL_L00_0030F848(int argument)
     return 0;
 }
 
-void func_PAL_L00_0030F888(void)
+void level_l00_call_module_handler_3_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -202,7 +202,7 @@ int func_PAL_L00_0030F8B8(int argument)
     return 0;
 }
 
-void func_PAL_L00_0030F8F8(void)
+void level_l00_call_module_handler_4_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -223,7 +223,7 @@ int func_PAL_L00_0030F928(int argument)
     return 0;
 }
 
-void func_PAL_L00_0030F968(void)
+void level_l00_call_module_handler_5_pal(void)
 {
     int value = D_L00_001A904C_2;
 

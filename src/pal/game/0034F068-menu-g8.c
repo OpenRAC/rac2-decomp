@@ -56,14 +56,14 @@ typedef struct {
 extern MenuSlots *g_radial_menu_pages[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 extern ItemRecord g_weapon_table[];
-extern int D_00139868[], g_item_ammo_counts[];
+extern int g_help_entry_state[], g_item_ammo_counts[];
 typedef struct { char pad00[0x22B4]; unsigned char state; char pad22B5[0x217]; int value; } HeroHudState;
 extern HeroHudState g_hero_state;
-extern int D_001A7A00[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
-extern float D_001AE6EC __attribute__((sda));
-extern char D_001AE6F0[], D_001ADF98[];
+extern char *g_resident_data_base[] __attribute__((sda));
+extern float g_hud_ammo_scale_factor __attribute__((sda));
+extern char g_str_hud_ammo_format[], g_str_count_format[];
 extern int save_count_items_above_baseline(void);
 extern void object_set_flag_value(void *, int);
 extern UIColor *object_get_fourth_field(void *);
@@ -114,7 +114,7 @@ void func_PAL_0034F068(Hud *self)
                 object_set_flag_value(&self->slots[i], 1);
                 hud_set_widget_value_pair(&self->slots[i], g_radial_menu_pages[0]->slots[i].present, 0);
             }
-            widget = (Ui48 *)menu_return_object_unchanged(D_001A8CFC[0] + 0x36F28) + i;
+            widget = (Ui48 *)menu_return_object_unchanged(g_resident_data_base[0] + 0x36F28) + i;
             object_set_flag_value(widget, 0);
             /* FAKEMATCH: volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124) */
             *(volatile int *)&x = 0; y = 0; color = 0;
@@ -123,7 +123,7 @@ void func_PAL_0034F068(Hud *self)
                 UIColor *c = object_get_fourth_field(&self->slots[i]);
                 c->word = (c->word & 0xFF000000) | (color & 0xFFFFFF);
             }
-            widget = (Ui48 *)menu_return_object_unchanged(D_001A8CFC[0] + 0x36F28) + i;
+            widget = (Ui48 *)menu_return_object_unchanged(g_resident_data_base[0] + 0x36F28) + i;
             object_set_flag_value(widget, 1);
             object_set_first_pair(widget, x, y);
             meter_set_max(widget, 100);
@@ -136,7 +136,7 @@ void func_PAL_0034F068(Hud *self)
                     if (capacity || enabled) {
                         meter_set_max(widget, capacity);
                         if (ITEM(g_radial_menu_pages[0]->slots[i].item)->capacity > 0)
-                            meter_set_value(widget, D_00139868[g_radial_menu_pages[0]->slots[i].item] >> 5);
+                            meter_set_value(widget, g_help_entry_state[g_radial_menu_pages[0]->slots[i].item] >> 5);
                     }
                 }
             }
@@ -166,7 +166,7 @@ void func_PAL_0034F068(Hud *self)
         meter_set_value_start_timers(self->meter, 4);
         else {
 heroFallback:
-            meter_set_value_start_timers(self->meter, D_001A7A00[0]);
+            meter_set_value_start_timers(self->meter, g_player_stats[0]);
         }
     }
     meter_screen_update(self->meter);
@@ -280,8 +280,8 @@ heroFallback:
     if (selected && present) {
         int count;
         if (ITEM(selected)->capacity > 0) {
-            width = (float)(D_00139868[selected] >> 5) / (float)ITEM(selected)->capacity;
-            scale = D_001AE6EC * (0.5f - width * 0.5f);
+            width = (float)(g_help_entry_state[selected] >> 5) / (float)ITEM(selected)->capacity;
+            scale = g_hud_ammo_scale_factor * (0.5f - width * 0.5f);
             width *= 30.0f;
             scale = scale > 1.0f ? scale : 1.0f;
             width *= scale;
@@ -296,7 +296,7 @@ heroFallback:
             low = 1;
             max = ITEM(selected)->maxAmmo;
             self->maxAmmo = max;
-            sprintf(self->ammoText, D_001AE6F0, ammo, max);
+            sprintf(self->ammoText, g_str_hud_ammo_format, ammo, max);
         }
         count = func_001157AC(self->ammoText) - 3;
         if (count > 5) count = 5;
@@ -348,7 +348,7 @@ heroFallback:
         }
     }}
     rgb = *(self->boltMode ? &self->alternateBolts : self->boltCount);
-    sprintf(self->boltText, D_001ADF98, rgb);
+    sprintf(self->boltText, g_str_count_format, rgb);
     {
         int count;
         count = func_001157AC(self->boltText) - 1;

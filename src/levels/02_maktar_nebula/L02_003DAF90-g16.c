@@ -1,9 +1,9 @@
 #include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef struct { float position[4]; float original[4]; } EmitterOrigin;
-extern float D_L02_001B0440[4] __attribute__((sda));
-extern float D_L02_001B0438 __attribute__((sda));
-extern float D_L02_001B0434 __attribute__((sda));
+extern float g_boss_four_glow_local_offset[4] __attribute__((sda));
+extern float g_boss_four_glow_size_b __attribute__((sda));
+extern float g_boss_four_glow_size_a __attribute__((sda));
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void moby_transform_joint_point(char *, int, char *);
 extern void transform_vector(void *, void *, void *);
@@ -22,8 +22,8 @@ void boss_draw_joint_four_glow(char *moby)
     moby_transform_joint_to_world(moby, 4, (char *)emitter.position);
     *(Quadword *)emitter.original = *(Quadword *)emitter.position;
     moby_transform_joint_point(moby, 4, (char *)jointMatrix);
-    transform_vector(localOffset, D_L02_001B0440, jointMatrix);
+    transform_vector(localOffset, g_boss_four_glow_local_offset, jointMatrix);
     FastVecAdd(emitter.position, emitter.position, localOffset);
     gfx_l00_draw_billboard_quad(emitter.position, *(int *)(vars + 0x250),
-            D_L02_001B0438, D_L02_001B0434);
+            g_boss_four_glow_size_b, g_boss_four_glow_size_a);
 }

@@ -1,15 +1,15 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_0022AFA0[8][4];
-extern float D_0022B020[8][4];
-extern float D_001B27B0[4] __attribute__((sda));
-extern float D_001BAFA0[4];
-extern float D_001BAFC0[4] __attribute__((sda));
-extern int D_001B27C4;
-extern float D_001B0108 __attribute__((sda));
-extern float D_001B0134 __attribute__((sda));
-extern float D_001B0130 __attribute__((sda));
+extern float g_vehicle_probe_vectors[8][4];
+extern float g_vehicle_ground_points[8][4];
+extern float g_gravity_direction[4] __attribute__((sda));
+extern float g_coll_hit_position[4];
+extern float g_coll_hit_normal[4] __attribute__((sda));
+extern int g_ground_align_override;
+extern float g_vehicle_probe_lift __attribute__((sda));
+extern float g_vehicle_ground_angle_scale __attribute__((sda));
+extern float g_vehicle_ground_lerp_rate __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);

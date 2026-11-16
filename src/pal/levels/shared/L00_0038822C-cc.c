@@ -17,7 +17,7 @@ extern void moby_set_state(unsigned char *,unsigned char,int);
 extern int flag_set_first_pending(unsigned char *);
 extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 typedef struct { float x,y,a,b; float pad[4]; } Spark;
-extern Spark D_L00_00232AC0[];
+extern Spark g_rise_fall_sparks[];
 void func_PAL_L00_0038822C(unsigned char *object)
 {
     char *work=FIELD(char *,object,0x68);
@@ -40,8 +40,8 @@ void func_PAL_L00_0038822C(unsigned char *object)
                 object[0x30]=alpha;
             }
             for(i=0;i<64;++i) {
-                D_L00_00232AC0[i].a=math_random_float_range(0.5f,2);
-                D_L00_00232AC0[i].b=math_random_float_range(0.002f,0.006f);
+                g_rise_fall_sparks[i].a=math_random_float_range(0.5f,2);
+                g_rise_fall_sparks[i].b=math_random_float_range(0.002f,0.006f);
             }
         }
         moby_set_state(object,1,-1);return;

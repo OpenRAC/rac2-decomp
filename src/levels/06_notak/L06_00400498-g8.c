@@ -5,8 +5,8 @@ extern float FastDiffRots(float, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern int PlayMobySound(int, int, char *);
-extern char *D_L06_001B281C __attribute__((nosda));
-extern float D_L06_001AFE40 __attribute__((sda));
+extern char *g_moby_l06_table __attribute__((nosda));
+extern float g_oscillation_speed __attribute__((sda));
 
 void oscillating_height_update(char *object)
 {
@@ -25,15 +25,15 @@ void oscillating_height_update(char *object)
     }
     advance = 1;
     if (*(int *)state > 0) {
-        parent = D_L06_001B281C + (*(int *)state << 8);
+        parent = g_moby_l06_table + (*(int *)state << 8);
         if (parent != 0 && *(unsigned char *)(*(char **)(parent + 0x68) + 0x14) != 0)
             advance = 0;
     }
-    if (FastDiffRots(*(float *)(state + 0xc), 0.0f) < D_L06_001AFE40 * 0.00029088824521750211716f ||
-        FastDiffRots(*(float *)(state + 0xc), 3.14159297943115234375f) < D_L06_001AFE40 * 0.00029088824521750211716f)
+    if (FastDiffRots(*(float *)(state + 0xc), 0.0f) < g_oscillation_speed * 0.00029088824521750211716f ||
+        FastDiffRots(*(float *)(state + 0xc), 3.14159297943115234375f) < g_oscillation_speed * 0.00029088824521750211716f)
         PlayMobySound(0, 0, object);
     if (advance)
-        *(float *)(state + 0xc) = FastAddRotations(*(float *)(state + 0xc), D_L06_001AFE40 * 0.00029088824521750211716f);
+        *(float *)(state + 0xc) = FastAddRotations(*(float *)(state + 0xc), g_oscillation_speed * 0.00029088824521750211716f);
     wave = math_fast_sin_or_cos_b(*(float *)(state + 0xc));
     *(float *)(object + 0x18) = (*(float *)(state + 8) - 2.0f) + (wave + wave);
 }

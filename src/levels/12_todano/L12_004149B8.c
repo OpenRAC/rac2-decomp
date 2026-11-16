@@ -45,7 +45,7 @@ extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, void *, int);
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 
 extern f32 func_002F2950(f32, f32);
 
@@ -96,7 +96,7 @@ s32 path_is_at_last_point(u8 *self)
 {
     Tab698 *vars = *(Tab698 **)(self + 0x68);
 
-    return (vars->f220 ^ (u32)(*D_L12_001FEAC0[vars->f110] - 1)) < 1;
+    return (vars->f220 ^ (u32)(*g_path_zone_table[vars->f110] - 1)) < 1;
 }
 
 /* --- func_L12_00416390 (88 B) ------------------------------------------------------ */

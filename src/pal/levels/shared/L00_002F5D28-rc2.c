@@ -11,7 +11,7 @@ struct Obj27 {
 extern struct Obj27 ref_L00_002F46C8_00;
 extern void ref_L00_002F46C8_01(void *arg0);
 
-void func_PAL_L00_002F5D28(void) {
+void level_start_timed_object_once_pal(void) {
     struct Obj27 *p  = &ref_L00_002F46C8_00;
 
     if (p->f38 == 0) {

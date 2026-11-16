@@ -36,7 +36,7 @@ extern f32 math_fast_sin_or_cos_b(f32);
 extern f32 math_random_float_range(f32, f32);
 extern f32 math_random_angle(void);
 extern void part_update_fading_debris(void);
-extern s32 D_001A8CA0;
+extern s32 g_ground_check_inhibit;
 
 /* Throws out eight pieces of debris in random directions when the robot enemy is destroyed. */
 void robot_spawn_death_debris(void *moby) {
@@ -61,7 +61,7 @@ void robot_spawn_death_debris(void *moby) {
             velocity.z = 0.0f;
             velocity.y = value;
             velocity.z = math_random_float_range(3.0f, 5.0f) * 0.016666668f;
-            if (D_001A8CA0 != 0) {
+            if (g_ground_check_inhibit != 0) {
                 matrix_mul_vec3(&velocity, &velocity, (s8 *)moby + 0xC0);
             }
             FastVecAdd(&velocity, &velocity, &direction);

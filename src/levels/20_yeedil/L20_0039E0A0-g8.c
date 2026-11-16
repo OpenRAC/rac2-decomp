@@ -5,29 +5,29 @@
    D_L20_001FBB20[arg0] lands in $t0 instead of $v1 (the retail coalesces it with the
    shift), the loads of D_L20_001B2FB8 come out split instead of absolute. */
 
-extern char *D_L20_001FBB20[];
+extern char *g_group_l20_id_lists[];
 
-extern int D_L20_001B2FB8;
+extern int g_group_count;
 
-extern char *D_L20_001B2F9C;
+extern char *g_group_l20_member_table;
 
 /* Counts how many objects of a group are still alive (not in state 6). */
 s32 group_count_live_members(s32 group) {
-    char *id_list = D_L20_001FBB20[group];
+    char *id_list = g_group_l20_id_lists[group];
     s32 group_byte = group & 0xFF;
     s32 count = 0;
 
     if (group_byte == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < group) {
+    if (g_group_count < group) {
         goto end;
     }
     if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        char *member = D_L20_001B2F9C + ((*(u16 *)id_list & 0x7FFF) << 8);
+        char *member = g_group_l20_member_table + ((*(u16 *)id_list & 0x7FFF) << 8);
 
         if (member == 0) {
             goto end;
@@ -39,7 +39,7 @@ s32 group_count_live_members(s32 group) {
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < group) {
+        if (g_group_count < group) {
             goto end;
         }
         if (id_list == 0) {
@@ -48,7 +48,7 @@ s32 group_count_live_members(s32 group) {
         if (*(s16 *)(id_list - 2) >= 0) {
             continue;
         }
-        if (id_list == D_L20_001FBB20[group]) {
+        if (id_list == g_group_l20_id_lists[group]) {
             continue;
         }
         break;

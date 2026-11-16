@@ -12,17 +12,17 @@ typedef struct {
     s32 health;
 } PlayerHealthState;
 extern PlayerHealthState g_hero_state;
-extern s32 D_001A7A00[] __attribute__((sda));
+extern s32 g_player_stats[] __attribute__((sda));
 typedef struct {
     f32 scale[5];
 } PlayerDamageScale;
-extern PlayerDamageScale D_L00_001A7F30;
+extern PlayerDamageScale g_player_damage_scale;
 extern f32 IntToFloat(int value);
 extern int FloatToInt(f32 value);
-extern void func_US2_L00_0030D9F8(int argument);
+extern void module_l00_call_handler_with_arg_4_us2(int argument);
 
 /* Subtract scaled damage, clamp health to zero, and notify the registered handler. */
-void func_US2_L00_002A4EF8(int amount)
+void AdjustPlayerHealth_us2(int amount)
 {
     u8 mode;
     int level;
@@ -34,16 +34,16 @@ void func_US2_L00_002A4EF8(int amount)
     damage = amount;
     mode = g_hero_state.mode;
     if (mode == 0 && amount > 0) {
-        level = *(s16 *)((u8 *)D_001A7A00 + 0x18);
+        level = *(s16 *)((u8 *)g_player_stats + 0x18);
         level = level < 5 ? level : 4;
         level = level > -1 ? level : 0;
-        scale = D_L00_001A7F30;
+        scale = g_player_damage_scale;
         damage = FloatToInt(IntToFloat(amount) * scale.scale[level] + 0.5f);
         damage = damage > mode ? damage : 1;
     }
     g_hero_state.health -= damage;
     if (g_hero_state.health < 0)
         g_hero_state.health = 0;
-    func_US2_L00_0030D9F8(360);
+    module_l00_call_handler_with_arg_4_us2(360);
 }
 

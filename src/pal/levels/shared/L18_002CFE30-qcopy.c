@@ -7,10 +7,10 @@ extern void hero_clear_queued_anim(void);
 extern s32 func_PAL_L18_002E01E0(s32, s32);
 extern u8 g_hero_state[];
 extern u8 g_hero_state[];
-extern u8 D_L18_001B4E00[], D_L18_001B5400[];
-extern s32 D_L18_001A8F00[] __attribute__((sda));
+extern u8 g_anim_entry_table_a[], g_anim_entry_table_b[];
+extern s32 g_game_l18_mode_state[] __attribute__((sda));
 extern char *moby_get_private_value_0(u8 *);
-extern void func_PAL_0029C0F0(s32, s32);
+extern void level_store_value_pair_pal(s32, s32);
 extern void hero_reset_speeds_and_vectors(void);
 extern void attachment_reset_all(void);
 extern void func_PAL_0028C778(u8 *);
@@ -23,7 +23,7 @@ extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
 
-void func_PAL_L18_002CFE30(s32 keep)
+void hero_detach_from_object_pal(s32 keep)
 {
     u8 *base = g_hero_state;
     u8 *object;
@@ -40,7 +40,7 @@ void func_PAL_L18_002CFE30(s32 keep)
         qcopy((base + 0x80), (object + 0x10));
         qcopy((base + 0x90), (object + 0xF0));
         *(s32 *)(base + 0x24CC) = *(s16 *)(base + 0x24D4);
-        if (!keep) func_PAL_0029C0F0(0, 0);
+        if (!keep) level_store_value_pair_pal(0, 0);
         hero_reset_speeds_and_vectors();
         *(s16 *)(base + 0x34E) = 1;
         *(s32 *)(base + 0x3A4) &= ~1;
@@ -64,14 +64,14 @@ void func_PAL_L18_002CFE30(s32 keep)
     hero_clear_queued_anim();
     current = *(u8 **)(g_hero_state + 0x2290);
     if (current[0x42] != 255) {
-        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)D_L18_001B4E00);
+        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)g_anim_entry_table_a);
         *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x58) = value;
     }
     current = *(u8 **)(g_hero_state + 0x2290);
-    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)D_L18_001B5400);
+    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)g_anim_entry_table_b);
     *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x5C) = value;
     if (*(s32 *)(g_hero_state + 0x2294) != 0x61) goto reset;
-    switch (D_L18_001A8F00[0]) {
+    switch (g_game_l18_mode_state[0]) {
     case 2:
     case 6:
         goto done;

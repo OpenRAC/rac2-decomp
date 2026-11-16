@@ -6,14 +6,14 @@ extern int subtract_integer_with_clamp(int);
 extern float IntToFloat(int);
 extern float fast_vec_dist(void *, void *);
 extern int CollLine(void *, void *, int, void *, void *);
-extern u8 *D_L05_001FB5E0[];
+extern u8 *g_target_l05_list[];
 typedef struct { int object_class, screen_range; float world_range; } TargetRule;
-extern TargetRule D_L05_002B87F0[];
+extern TargetRule g_lock_target_rules[];
 extern float D_L05_001B1B1C_gp SDATA(D_L05_001B1B1C);
 extern float D_L05_001B1B18_gp SDATA(D_L05_001B1B18);
 extern int g_current_map_index[] __attribute__((sda));
-extern float D_L05_001B96C0[];
-extern int D_L05_001B2048[] __attribute__((sda));
+extern float g_origin_vec[];
+extern int g_feltzin_mission_index[] __attribute__((sda));
 
 static __inline__ int target_class(u8 *object)
 {
@@ -36,7 +36,7 @@ u8 *ship_find_lock_target(void *position, u8 **excluded, u8 *current)
     int n, j;
 
     gfx_convert_float_pair_bias_coords(position, &source_x, &source_y, 0);
-    cursor = D_L05_001FB5E0;
+    cursor = g_target_l05_list;
     while ((object = *cursor) != 0) {
         if (!object[0x31])
             goto next;
@@ -58,10 +58,10 @@ u8 *ship_find_lock_target(void *position, u8 **excluded, u8 *current)
             range = 40;
             i = 0;
 scan1:
-            if (D_L05_002B87F0[i].object_class == -1)
+            if (g_lock_target_rules[i].object_class == -1)
                 goto scan1_done;
-            if (*(s16 *)(object + 0xAA) == D_L05_002B87F0[i].object_class) {
-                range = D_L05_002B87F0[i].screen_range;
+            if (*(s16 *)(object + 0xAA) == g_lock_target_rules[i].object_class) {
+                range = g_lock_target_rules[i].screen_range;
                 break;
             }
             i++;
@@ -75,21 +75,21 @@ scan1_done:
             j = 0;
             level_id = g_current_map_index[0];
 scan2:
-            if (D_L05_002B87F0[j].object_class == -1)
+            if (g_lock_target_rules[j].object_class == -1)
                 goto scan2_done;
-            if (D_L05_002B87F0[j].object_class == *(s16 *)(object + 0xAA)) {
-                distance = D_L05_002B87F0[j].world_range;
+            if (g_lock_target_rules[j].object_class == *(s16 *)(object + 0xAA)) {
+                distance = g_lock_target_rules[j].world_range;
                 break;
             }
             j++;
             goto scan2;
         } while (0);
 scan2_done:
-        if (level_id != 20 && distance < fast_vec_dist(D_L05_001B96C0, object + 0x10))
+        if (level_id != 20 && distance < fast_vec_dist(g_origin_vec, object + 0x10))
             goto next;
-        if (current && current == object && D_L05_001B2048[0] % 3 != 0)
+        if (current && current == object && g_feltzin_mission_index[0] % 3 != 0)
             return object;
-        if (!CollLine(D_L05_001B96C0, object + 0x10, 16, object, 0))
+        if (!CollLine(g_origin_vec, object + 0x10, 16, object, 0))
             return object;
 next:
         cursor++;

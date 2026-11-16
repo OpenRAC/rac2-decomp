@@ -2,12 +2,12 @@
 
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern int D_001B01E8 __attribute__((sda));
+extern int g_thrown_burst_initialized __attribute__((sda));
 typedef struct { char pad[0x34]; int owner; char tail[8]; } ParticleRecord;
 extern ParticleRecord g_spark_records[100];
 typedef struct { char pad[0x24]; int kind; char *owner; char tail[0x3C]; int active; } OwnerContext;
 extern OwnerContext g_music_state;
-extern char D_001BAFA0[0x30];
+extern char g_coll_hit_position[0x30];
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern void FastVecScale(void *, void *, float);
@@ -21,9 +21,9 @@ extern float math_random_angle(void), math_random_float_range(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void func_PAL_002BEF58(void *, void *, int, float);
 extern int math_fast_float_d(int *);
-extern void moby_mark_spawned(void *), func_PAL_0032A0E0(void *), part_update_object_particles(void *);
+extern void moby_mark_spawned(void *), part_update_orbiting_sparks_pal(void *), part_update_object_particles(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern void func_PAL_0032A1E8(void);
+extern void DrawObjectSpriteEffects_pal(void);
 extern void ref_PAL_L00_003E4498_00(void *, void *);
 
 void func_PAL_L00_003E4498(char *self)
@@ -36,13 +36,13 @@ void func_PAL_L00_003E4498(char *self)
         *(unsigned char *)(self + 0x20) = 1;
         *(int *)(state + 0x48) = 0;
         {
-            int initialized = D_001B01E8;
+            int initialized = g_thrown_burst_initialized;
             *(int *)(state + 0x4C) = 0;
             *(int *)(state + 0x50) = 0;
             if (!initialized) {
                 int i;
                 for (i = 99; i >= 0; i--) g_spark_records[i].owner = 0;
-                D_001B01E8 = 1;
+                g_thrown_burst_initialized = 1;
             }
         }
         {
@@ -70,9 +70,9 @@ void func_PAL_L00_003E4498(char *self)
             vec_clear_128(state);
             hero_check_hit_by_object(self);
             PlayMobySound(0, 0, self);
-            FastVecScale(state + 0x20, D_001BAFA0 + 0x20, 0.0009765625f);
+            FastVecScale(state + 0x20, g_coll_hit_position + 0x20, 0.0009765625f);
             vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
-            *(Quad *)(state + 0x30) = *(Quad *)D_001BAFA0;
+            *(Quad *)(state + 0x30) = *(Quad *)g_coll_hit_position;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
                 int i;
@@ -111,7 +111,7 @@ void func_PAL_L00_003E4498(char *self)
         }
         break;
     }
-    func_PAL_0032A0E0(self);
+    part_update_orbiting_sparks_pal(self);
     part_update_object_particles(self);
-    ref_PAL_L00_003E4498_00(func_PAL_0032A1E8, self);
+    ref_PAL_L00_003E4498_00(DrawObjectSpriteEffects_pal, self);
 }

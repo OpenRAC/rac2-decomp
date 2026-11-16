@@ -2,9 +2,9 @@
 
 /* -G8: the group-index bound D_L20_001B2FB8 is read through $gp. */
 
-extern int D_L20_001B2FB8 __attribute__((sda));
-extern char *D_L20_001B2F9C;
-extern unsigned short *D_L20_001FBB20[];
+extern int g_group_count __attribute__((sda));
+extern char *g_group_l20_member_table;
+extern unsigned short *g_group_l20_id_lists[];
 
 /* For each entity of the object's group that has class 0xD0F and whose state has bit 0 set and
    word 0x420 equal to 1, sets the state byte to 2 and clears bit 1 of the entity's flags. */
@@ -15,12 +15,12 @@ void yeedil_wake_group_troopers(unsigned char *moby) {
 
     if (moby[0x21] == 0xFF)
         return;
-    q = D_L20_001FBB20[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L20_001B2FB8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == D_L20_001FBB20[moby[0x21]])) {
+    q = g_group_l20_id_lists[moby[0x21]];
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_group_count && q != 0 &&
+           ((q != 0 && (short)q[-1] >= 0) || q == g_group_l20_id_lists[moby[0x21]])) {
         char *trooper_vars;
 
-        member = D_L20_001B2F9C + ((*q & 0x7FFF) << 8);
+        member = g_group_l20_member_table + ((*q & 0x7FFF) << 8);
         if (member == 0)
             break;
         if (*(short *)(member + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {

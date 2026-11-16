@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern s32 CollLine(void *first, void *second, s32 mode, void *object, s32 flags);
-extern float D_L08_001BFF68;
+extern float g_ground_height_result;
 
 /* func_L08_003D8290 with a floor (-ffast-math for the max.s): the clear result is the floor, a hit is raised to it. */
 float coll_find_ground_height_floor(void *position, float first, float second, float floor)
@@ -13,7 +13,7 @@ float coll_find_ground_height_floor(void *position, float first, float second, f
     qcopy(endpoints[1], position);
     endpoints[1][2] = first;
     if (CollLine(endpoints[1], endpoints[0], 2, 0, 0)) {
-        return D_L08_001BFF68 > floor ? D_L08_001BFF68 : floor;
+        return g_ground_height_result > floor ? g_ground_height_result : floor;
     }
     return floor;
 }

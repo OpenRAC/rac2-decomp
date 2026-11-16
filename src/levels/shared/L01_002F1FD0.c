@@ -8,7 +8,7 @@
 typedef int L01_1FD0TI __attribute__((mode(TI)));
 
 extern u8 *g_moby_l01_table MACRO_ADDR;
-extern u8 *D_L01_001B2560 __attribute__((sda));
+extern u8 *g_moby_l01_table_end __attribute__((sda));
 extern float func_002E3618(void *a0, void *a1);
 
 /* Finds the TV Screens object nearest to a point. Returns it, or 0 if none is close enough. */
@@ -23,7 +23,7 @@ u8 *tv_screen_find_nearest(float x, float y, float z)
     query_point[0] = x; query_point[1] = y; query_point[2] = z;
     nearest_distance = 99999.0f;
     closest = 0;
-    for (candidate = g_moby_l01_table; candidate < D_L01_001B2560; candidate += 0x100) {
+    for (candidate = g_moby_l01_table; candidate < g_moby_l01_table_end; candidate += 0x100) {
         if (*(s16 *)(candidate + 0xAA) == MOBY_CLASS_TV_SCREENS) {
             float dist = func_002E3618(query_point, candidate + 0x10);
             if (dist < nearest_distance) {

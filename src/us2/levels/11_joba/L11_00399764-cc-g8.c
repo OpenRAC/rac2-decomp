@@ -23,21 +23,21 @@ extern Hero_00399764 g_hero_state;
 
 extern u8 *g_moby_l11_table MACRO_ADDR;
 
-extern u8 *D_L11_001B35A0 MACRO_ADDR;
+extern u8 *g_moby_table_limit MACRO_ADDR;
 
-extern s32 D_L11_001B30C8 MACRO_ADDR;
+extern s32 g_arena_progress_level MACRO_ADDR;
 
-extern s32 D_L11_001AED04 __attribute__((sda));
+extern s32 g_active_rider_count __attribute__((sda));
 
-extern s32 D_L11_001AED08 __attribute__((sda));
+extern s32 g_creature_burst_count __attribute__((sda));
 
-extern s32 D_US2_001A904C MACRO_ADDR;
+extern s32 g_level_cutscene_gate_flag MACRO_ADDR;
 
-extern s32 D_US2_001A9050 MACRO_ADDR;
+extern s32 g_level_event_state MACRO_ADDR;
 
-extern s32 D_L11_001A903C MACRO_ADDR;
+extern s32 g_level_progress_flag MACRO_ADDR;
 
-extern u8 D_001A7A60[] MACRO_ADDR;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
 
 void func_US2_L11_00399764(u8 *arg0) {
     u8 *v1 = arg0;
@@ -49,26 +49,26 @@ void func_US2_L11_00399764(u8 *arg0) {
         if (s0 < 2) {
             if (s0 == 0) {
                 v1[0x30] = 0xFF;
-                D_L11_001AED08 = 0;
+                g_creature_burst_count = 0;
                 moby_set_state(v1, 1, -1);
             }
         }
         return;
     }
     if (g_hero_state.w2294 == 0x74 || g_hero_state.w24CC <= 0) {
-        D_US2_001A9050 = 0;
-        D_L11_001AED04 = 0;
+        g_level_event_state = 0;
+        g_active_rider_count = 0;
     }
-    if (D_L11_001B30C8 >= 6 && g_hero_state.w2294 == 0 && g_hero_state.w24CC <= 0) {
-        D_US2_001A9050 = 1;
+    if (g_arena_progress_level >= 6 && g_hero_state.w2294 == 0 && g_hero_state.w24CC <= 0) {
+        g_level_event_state = 1;
     }
-    if (D_US2_001A904C != 0 && D_001A7A60[0x12] == 0) {
+    if (g_level_cutscene_gate_flag != 0 && g_item_enabled_flags[0x12] == 0) {
         int kind = 0xD07;
 
         for (i = 0; i < 40; i++) {
             u8 *e = g_moby_l11_table + (vars[1] << 8);
             u16 c = *(u16 *)(e + 0xAA);
-            u8 *flags = D_001A7A60;
+            u8 *flags = g_item_enabled_flags;
 
             if (c == 0xCF5 || c == 0xCF6 || (s16)c == kind) {
                 if (((s8 *)e)[0x20] >= 0) {
@@ -76,24 +76,24 @@ void func_US2_L11_00399764(u8 *arg0) {
                 }
             }
             vars[1]++;
-            if (g_moby_l11_table + (vars[1] << 8) >= D_L11_001B35A0) {
+            if (g_moby_l11_table + (vars[1] << 8) >= g_moby_table_limit) {
                 if (vars[0] == 0 && flags[0x12] == 0) {
                     flags[0x12] = 1;
                     snd_play_from_global_bank(1, 0, 0);
                     value_set_entry_by_index(0x1233, -1);
-                    D_L11_001A903C = 1;
+                    g_level_progress_flag = 1;
                 }
                 vars[1] = 0;
                 vars[0] = 0;
             }
         }
     }
-    if (D_L11_001AED08 < 12)
+    if (g_creature_burst_count < 12)
         return;
-    if (D_001A7A60[0x14] != 0)
+    if (g_item_enabled_flags[0x14] != 0)
         return;
-    D_001A7A60[0x14] = 1;
+    g_item_enabled_flags[0x14] = 1;
     snd_play_from_global_bank(1, 0, 0);
     value_set_entry_by_index(0x1233, -1);
-    D_L11_001A903C = 1;
+    g_level_progress_flag = 1;
 }

@@ -29,9 +29,9 @@ extern char *part_spawn_burst(float *out, float *dir, int a, int b, unsigned int
 
 extern char g_camera_l00_position[];
 
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 
-extern char D_001FE940[];
+extern char g_part_resident_buffer[];
 
 /* Throws out a puff of grey smoke and bright sparks at a point. The sparks are red when the flag is set and green otherwise. */
 void part_spawn_smoke_and_sparks(float *position, int unused, int flag)
@@ -61,7 +61,7 @@ void part_spawn_smoke_and_sparks(float *position, int unused, int flag)
 
     for (i = 19; i >= 0; i--) {
         randomValue = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)velocity, D_0018A0E0, -(randomValue * 0.01666666753590107f));
+        FastVecScale((char *)velocity, g_hero_state_block, -(randomValue * 0.01666666753590107f));
         spin = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         randomValue = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         spawnPos[0] = position[0] + math_random_signed_float_range(0.0f, 0.2f);
@@ -88,7 +88,7 @@ void part_spawn_smoke_and_sparks(float *position, int unused, int flag)
         part = part_spawn_burst(spawnPos, velocity, 30, 127, color, spin,
                           math_random_float_range(0.25f, 0.7f) * 210000.0f, 500.0f, 1.0f, 0.0f, 0.0f);
         if (part != 0) {
-            char *resident = D_001FE940;
+            char *resident = g_part_resident_buffer;
             *(unsigned char *)(part + 2) = *(unsigned char *)(*(char **)(resident + 0x184) + 6);
         }
     }

@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int g_active_yeti_count __attribute__((sda));
 extern int g_max_active_yetis __attribute__((sda));
 extern char *g_moby_l19_array __attribute__((sda));
-extern void *D_L19_001FB5A0[];
+extern void *g_group_ptr_table[];
 extern int moby_is_in_selected_zone(void *);
 extern int yeti_init_stats(void *);
 extern void moby_mark_spawned(void *);
@@ -29,7 +29,7 @@ extern int moby_l01_turn_toward_target(void *,void *);
 extern float vec_distance_xy(void *,void *);
 extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
-extern int func_US2_002AF9C8(void *,float);
+extern int math_is_value_within_step_us2(void *,float);
 extern float FastDiffRots(float,float);
 extern int moby_turn_toward_target_and_step(void *,void *,float);
 extern float moby_get_anim_value(void *);
@@ -57,14 +57,14 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
       I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
-void func_US2_L19_0041C3A8(char *obj)
+void yeti_update_us2(char *obj)
 {
     char *data;
     char *entity;
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
     int mode, result;
-    if (!moby_is_in_selected_zone(obj+0x10) || D_0018C0B4==111) return;
+    if (!moby_is_in_selected_zone(obj+0x10) || g_game_mode==111) return;
     data=*(char **)(obj+0x68);
     if (yeti_init_stats(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
@@ -73,7 +73,7 @@ void func_US2_L19_0041C3A8(char *obj)
     case 0:
         if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
-                if(I(data,0x250)==255 || !D_L19_001FB5A0[I(data,0x250)]) {
+                if(I(data,0x250)==255 || !g_group_ptr_table[I(data,0x250)]) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
                 } else if(!moby_count_group_not_in_state(I(data,0x250),-1)) {
                     HIDE(); moby_set_state(obj,10,2); ANIM(0,0,10); g_active_yeti_count++;
@@ -143,7 +143,7 @@ void func_US2_L19_0041C3A8(char *obj)
     case 10:
         entity=*(char **)(data+0x200);
         moby_start_effect_from_entry(obj,mat_fast_helper_a(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(func_US2_002AF9C8(obj,23.0f)) {
+        if(math_is_value_within_step_us2(obj,23.0f)) {
             ANIM(7,1,2);
             if(math_random_int_below(2)) {ANIM(6,0,2);}
             moby_set_state(obj,11,-1);
@@ -172,7 +172,7 @@ void func_US2_L19_0041C3A8(char *obj)
         if(flag_set_first_pending(obj)) { SOLID(); }
         attackDistance=moby_get_anim_value(obj);
         if(attackDistance>4.0f && attackDistance<15.0f) moby_l01_turn_toward_target(obj,data+0x1F0);
-        if(func_US2_002AF9C8(obj,30.0f)) {
+        if(math_is_value_within_step_us2(obj,30.0f)) {
             ANIM(7,0,10);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
             if(math_random_int_below(5)) { ANIM(5,0,10);moby_set_state(obj,17,-1); }
@@ -184,7 +184,7 @@ void func_US2_L19_0041C3A8(char *obj)
     }
     case 16:
         if(flag_set_first_pending(obj)) {SOLID();}
-        if(func_US2_002AF9C8(obj,25.0f)) {
+        if(math_is_value_within_step_us2(obj,25.0f)) {
             ANIM(7,0,10);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
             if(math_random_int_below(3)) {ANIM(5,0,10);moby_set_state(obj,17,-1);}
@@ -209,7 +209,7 @@ void func_US2_L19_0041C3A8(char *obj)
             angle=mat_fast_helper_a(dx,dy); }
             moby_move_to_target_temp_limits(obj,target,16,angle,-1.0f,-1.0f);
         }}
-        if(func_US2_002AF9C8(obj,21.0f)) {
+        if(math_is_value_within_step_us2(obj,21.0f)) {
             ANIM(7,0,10);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
         }

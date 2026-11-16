@@ -16,22 +16,22 @@ typedef struct {
     unsigned char prefix[0x80];Vector4 position;unsigned char gap90[8];float heading;
     unsigned char gap9C[0xD8];float speed;unsigned char gap178[0x2118];char *object;
 } PlayerTargetView;
-extern CameraTargetView D_001B8C80;
+extern CameraTargetView g_camera_target_view;
 extern PlayerTargetView g_hero_state;
 
-void func_PAL_L00_003853C8(char *object)
+void camera_marker_update_pal(char *object)
 {
     Vector4 difference, projected;
     float amount;
-    if (D_001B8C80.target) {
-        FIELD(Quadword,object,0x10)=FIELD(Quadword,D_001B8C80.target,0x30);
+    if (g_camera_target_view.target) {
+        FIELD(Quadword,object,0x10)=FIELD(Quadword,g_camera_target_view.target,0x30);
         FastVecSub(&difference,object+0x10,&g_hero_state.position);
         amount=FastVecDot(&difference,g_hero_state.object+0xE0);
         FastVecScale(&projected,g_hero_state.object+0xE0,amount);
         FastVecSub(&difference,&difference,&projected);
         if (math_fabs(amount)<2.5f) {
             if (FastVecLength(&difference)<0.1f ||
-                FastDiffRots(g_hero_state.heading,D_001B8C80.heading)<2.3561947f ||
+                FastDiffRots(g_hero_state.heading,g_camera_target_view.heading)<2.3561947f ||
                 g_hero_state.speed<0.002f) {
                 FIELD(float,object,0x10)=FIELD(float,object,0x14)=FIELD(float,object,0x18)=15;
             }

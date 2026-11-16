@@ -9,8 +9,8 @@ typedef struct YeedilEffectState {
     int unused190;
     char *second;
 } YeedilEffectState;
-extern YeedilEffectState D_L20_001BDCC0;
-extern int D_L20_001A8F00[] __attribute__((sda));
+extern YeedilEffectState g_yeedil_state_prefix;
+extern int g_hero_vehicle_mode[] __attribute__((sda));
 extern char *SpawnExplosion(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -40,9 +40,9 @@ void spark_l20_burst_update(unsigned char *object)
         object[0x20] = 1;
         break;
     case 1:
-        if (D_L20_001A8F00[0] != 2)
+        if (g_hero_vehicle_mode[0] != 2)
             break;
-        state = &D_L20_001BDCC0;
+        state = &g_yeedil_state_prefix;
         if (state->mode != 7)
             break;
         if (state->frame == 157)
@@ -66,9 +66,9 @@ void spark_l20_burst_update(unsigned char *object)
 
 /* func_L20_00310E38 is defined in L20_002DEBE0-g8.c (it reaches data through $gp). */
 
-extern unsigned char D_L20_001DBA60[];
+extern unsigned char g_class_index_table[];
 
-extern void *D_L20_001DB100[];
+extern void *g_class_info_table[];
 
 extern void update_moby_animation_state(void *);
 
@@ -83,8 +83,8 @@ void moby_change_class_from_tables(void *moby, int class_id)
     int extra_value;
 
     *(short *)(moby + 0xAA) = (short)class_id;
-    *(unsigned char *)(moby + 0x22) = D_L20_001DBA60[(short)class_id];
-    *(void **)(moby + 0x24) = D_L20_001DB100[*(unsigned char *)(moby + 0x22)];
+    *(unsigned char *)(moby + 0x22) = g_class_index_table[(short)class_id];
+    *(void **)(moby + 0x24) = g_class_info_table[*(unsigned char *)(moby + 0x22)];
     update_moby_animation_state(moby);
     type_data = *(unsigned char **)(moby + 0x24);
     *(unsigned char *)(moby + 0x62) = type_data[0xE];
@@ -128,11 +128,11 @@ extern void level_clear_first_table_entry(void);
 
 extern int request_begin_slot(int a, int b, int c, int d, int e);
 
-extern int D_L20_001FFE40[];
+extern int g_cutscene_table[];
 
-extern int D_L20_001A8FDC __attribute__((sda));
+extern int g_cutscene_l20_started_flag __attribute__((sda));
 
-extern int D_L20_00294F98;
+extern int g_cutscene_scene_word;
 
 /* Sets up a Yeedil scene: runs the common setup, stores a scene table and starts the scene. */
 void cutscene_start_scene(void)
@@ -141,11 +141,11 @@ void cutscene_start_scene(void)
     int *other;
 
     level_clear_first_table_entry();
-    base = D_L20_001FFE40;
-    other = &D_L20_00294F98;
+    base = g_cutscene_table;
+    other = &g_cutscene_scene_word;
     *(int *)(base + 0x40) = (int)other;
     *(int *)(base + 0x41) = 0xB;
-    D_L20_001A8FDC = 1;
+    g_cutscene_l20_started_flag = 1;
     request_begin_slot(3, 1, 0xB, 0, 0);
 }
 

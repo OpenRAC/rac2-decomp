@@ -7,45 +7,45 @@
    sound upkeep, colour fade, eight particle pairs, area damage, target locking and five ribbon arcs.
    Its own unit for -G8, -g (the nop pair before the ratio's div.s) and -frac2-mult-add-no-flatten (the
    ribbon point givs); flags in config/cflags.txt. */
-extern int D_L00_001A8F00;
+extern int g_game_l00_mode;
 extern char g_hero_position[];
 extern char g_sound_state[];
 extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad0[4]; unsigned char active; char pad5[0x6b]; float strength; char pad74[0x6c]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 typedef struct { char pad[0xb4]; int changed; } ChangedState;
-extern ChangedState D_00139868;
+extern ChangedState g_help_entry_state;
 typedef struct { char pad0[0x80]; float position[4]; char pad90[0x11b0]; int upgrades; char pad1244[0x104c]; char *moby; char pad2294[0x28]; unsigned char busy; } HeroState;
 extern HeroState D_00189E20_13;
 extern char g_camera_l00_position[];
 typedef struct { float v[4]; } __attribute__((aligned(16))) EffectVector;
-extern EffectVector D_L00_00240080[][10];
+extern EffectVector g_tesla_barrier_points[][10];
 extern EffectVector D_L00_00240080_1[][10];
-extern int D_L00_001B2950[] MACRO_ADDR;
-extern int D_L00_001B2970[] MACRO_ADDR;
+extern int g_tesla_barrier_effects[] MACRO_ADDR;
+extern int g_tesla_barrier_timers[] MACRO_ADDR;
 /* Ribbon state, one short per ribbon in three parallel arrays (as upstream's L25 tether declares
    its D_L25_001B2948/2950/2958): respawn timer, fade and the timer's starting value. */
-extern short D_L00_001B2990[] MACRO_ADDR;
-extern short D_L00_001B29A0[] MACRO_ADDR;
-extern short D_L00_001B29B0[] MACRO_ADDR;
+extern short g_tesla_ribbon_ids[] MACRO_ADDR;
+extern short g_electric_ribbon_alphas[] MACRO_ADDR;
+extern short g_electric_ribbon_lengths[] MACRO_ADDR;
 
 typedef struct { char pad[0xf8]; unsigned char *f8; } ParticleDefs;
-extern ParticleDefs D_L00_001FE940;
-extern int D_L00_001AFF98 __attribute__((sda));
-extern int D_L00_001AFF44 __attribute__((sda));
-extern int D_L00_001AFF90 __attribute__((sda));
-extern int D_L00_001AFF10 __attribute__((sda));
-extern int D_L00_001AFF14 __attribute__((sda));
-extern int D_L00_001AFF18 __attribute__((sda));
-extern int D_L00_001AFF1C __attribute__((sda));
-extern int D_L00_001AFF24 __attribute__((sda));
-extern float D_L00_001AFF2C __attribute__((sda));
-extern float D_L00_001AFF40 __attribute__((sda));
-extern float D_L00_001AFF4C __attribute__((sda));
-extern int D_L00_001AFF64 __attribute__((sda));
-extern int D_L00_001AFF68 __attribute__((sda));
-extern float D_L00_001AFF6C __attribute__((sda));
-extern int D_L00_001AFF70 __attribute__((sda));
+extern ParticleDefs g_effect_definitions;
+extern int g_trail_owner __attribute__((sda));
+extern int g_tesla_hit_counter __attribute__((sda));
+extern int g_tesla_timer_length __attribute__((sda));
+extern int g_tesla_barrier_color_a __attribute__((sda));
+extern int g_tesla_barrier_color_b __attribute__((sda));
+extern int g_tesla_barrier_alt_color_a __attribute__((sda));
+extern int g_tesla_barrier_alt_color_b __attribute__((sda));
+extern int g_tesla_arc_param __attribute__((sda));
+extern float g_glow_sphere_scale __attribute__((sda));
+extern float g_tesla_hit_damage __attribute__((sda));
+extern float g_trail_effect_length __attribute__((sda));
+extern int g_tesla_sound_id_min __attribute__((sda));
+extern int g_tesla_sound_id_max __attribute__((sda));
+extern float g_tesla_effect_size __attribute__((sda));
+extern int g_tesla_effect_color __attribute__((sda));
 /* Ribbon spread: D_L00_001AFF7C in most levels, 0x001AFF80 in 00_aranos_tutorial. */
 extern float ref_L00_003C3D90_00 __attribute__((sda));
 extern void fade_tick_timer(void);
@@ -76,7 +76,7 @@ extern float *moby_get_private_value_0(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecSub(void *,void *,void *);
 extern void QueueMobyImpact(void *,void *);
-extern void func_PAL_L00_003C9708(void *,int);
+extern void part_l00_spawn_spark_pairs_2_pal(void *,int);
 extern char *func_PAL_L00_00417ED0(void *,int);
 extern void part_spawn_random_direction_effect(void *,float,float);
 extern float math_random_float_range(float,float);
@@ -109,66 +109,66 @@ void func_PAL_L00_003C7B10(Moby *self)
     EffectContext *ctx=self->ctx;
     float value,ratio,sign;
     int i,j,k,slot;
-    if(D_L00_001A8F00) return;
+    if(g_game_l00_mode) return;
     qcopy(&self->x,g_hero_position);
     fade_tick_timer();
-    if(!D_L00_001A8F00) {
+    if(!g_game_l00_mode) {
         if(!snd_is_voice_playing_for_owner(self,ctx->sound))
             ctx->sound=PlayMobySound(3,4,self);
     } else if(snd_is_voice_playing_for_owner(self,ctx->sound)) clearSound(self,ctx);
     if(g_weapon_l00_table[g_item_slot_to_record[0x2d]].active && self->oclass==0xa5c) {
-        int saved=D_L00_001AFF98;
-        D_L00_001AFF98=0;
+        int saved=g_trail_owner;
+        g_trail_owner=0;
         if(func_PAL_L00_003C77F0(1)) {
             clearSound(self,ctx);
             PlayMobySound(2,0,self);
-            D_L00_001AFF98=0;
+            g_trail_owner=0;
             moby_mark_spawned(self);
             return;
         }
-        D_L00_001AFF98=saved;
+        g_trail_owner=saved;
     }
     value=fade_get_value();
-    if(!weapon_can_use_held(value) || D_L00_001AFF44==40) {
+    if(!weapon_can_use_held(value) || g_tesla_hit_counter==40) {
         clearSound(self,ctx);
-        D_L00_001AFF44=0;
+        g_tesla_hit_counter=0;
         fade_reset_level();
         PlayMobySound(2,0,self);
-        D_L00_001AFF98=0;
+        g_trail_owner=0;
         moby_mark_spawned(self);
         return;
     }
     if(value!=ctx->value) {
-        D_00139868.changed+=FloatToInt(math_fabs(ctx->value-value));
+        g_help_entry_state.changed+=FloatToInt(math_fabs(ctx->value-value));
         ctx->value=value;
-        ctx->timer=((int)(D_L00_001AFF90) * 5 + 2) / 6;
+        ctx->timer=((int)(g_tesla_timer_length) * 5 + 2) / 6;
     }
-    ratio=IntToFloat(ctx->timer)/IntToFloat(((int)(D_L00_001AFF90) * 5 + 2) / 6);
-    if(self->oclass==0xa5c) ctx->colour=FastTweenColor(ratio,D_L00_001AFF10,D_L00_001AFF14);
-    else ctx->colour=FastTweenColor(ratio,D_L00_001AFF18,D_L00_001AFF1C);
+    ratio=IntToFloat(ctx->timer)/IntToFloat(((int)(g_tesla_timer_length) * 5 + 2) / 6);
+    if(self->oclass==0xa5c) ctx->colour=FastTweenColor(ratio,g_tesla_barrier_color_a,g_tesla_barrier_color_b);
+    else ctx->colour=FastTweenColor(ratio,g_tesla_barrier_alt_color_a,g_tesla_barrier_alt_color_b);
     FastDecTimer(&ctx->timer);
     FastVecScale(offset,D_00189E20_13.moby+0xe0,0.75f);
     FastVecAdd(&self->x,D_00189E20_13.position,offset);
     moby_transform_joint_to_world(D_00189E20_13.moby,10,origin);
     for(i=0;i<8;i++) {
-        if(!D_L00_001B2950[i]) {
+        if(!g_tesla_barrier_effects[i]) {
             Particle *effect;
-            int id=((int)(math_random_int_range(D_L00_001AFF64,D_L00_001AFF68)) * 5 + 2) / 6;
+            int id=((int)(math_random_int_range(g_tesla_sound_id_min,g_tesla_sound_id_max)) * 5 + 2) / 6;
             value=math_random_angle();
             ratio=math_random_angle();
-            vec_build_spherical_offset(position,D_L00_001AFF4C,value,ratio);
+            vec_build_spherical_offset(position,g_trail_effect_length,value,ratio);
             FastVecAdd(position,position,origin);
-            effect=(Particle *)(D_L00_001B2950[i]=(int)part_spawn_bluish_fade(position,id,2,1));
+            effect=(Particle *)(g_tesla_barrier_effects[i]=(int)part_spawn_bluish_fade(position,id,2,1));
             if(effect) {
                 ParticleOwner *sub=&effect->owner;
                 sub->dx=effect->x-self->x;
                 sub->dy=effect->y-self->y;
                 sub->dz=effect->z-self->z;
                 sub->moby=self;
-                effect->colour=D_L00_001AFF70|ctx->colour;
-                effect->size=D_L00_001AFF6C*210000.0f;
-                effect->sprite=D_L00_001FE940.f8[1];
-                D_L00_001B2970[i]=id;
+                effect->colour=g_tesla_effect_color|ctx->colour;
+                effect->size=g_tesla_effect_size*210000.0f;
+                effect->sprite=g_effect_definitions.f8[1];
+                g_tesla_barrier_timers[i]=id;
             }
             effect=(Particle *)part_spawn_bluish_fade(position,id,2,1);
             if(effect) {
@@ -178,10 +178,10 @@ void func_PAL_L00_003C7B10(Moby *self)
                 sub->dz=effect->z-self->z;
                 sub->moby=self;
                 effect->colour=0x307f7f7f;
-                effect->size=D_L00_001AFF6C*63000.00390625f;
-                effect->sprite=D_L00_001FE940.f8[1];
+                effect->size=g_tesla_effect_size*63000.00390625f;
+                effect->sprite=g_effect_definitions.f8[1];
             }
-        } else if(math_fast_float_d(D_L00_001B2970+i)) D_L00_001B2950[i]=0;
+        } else if(math_fast_float_d(g_tesla_barrier_timers+i)) g_tesla_barrier_effects[i]=0;
     }
     slot=0;
     math_fast_float_d(&ctx->lock);
@@ -193,7 +193,7 @@ void func_PAL_L00_003C7B10(Moby *self)
     }
     }
     if(vec_fast_helper_b(&ctx->cooldown)) {
-        int count=coll_process_hit(&self->x,1,D_00189E20_13.moby,0,D_L00_001AFF2C*0.3f);
+        int count=coll_process_hit(&self->x,1,D_00189E20_13.moby,0,g_glow_sphere_scale*0.3f);
         if(count) {
             HitPacket packet;
             float scaled[4],output[4];
@@ -220,15 +220,15 @@ void func_PAL_L00_003C7B10(Moby *self)
                 FastVecSub(&packet,position,&self->x);
                 vec_scale_to_length(&packet,&packet,1.0f);
                 QueueMobyImpact(object,&packet);
-                FastVecScale(scaled,&packet,D_L00_001AFF2C*0.3f);
+                FastVecScale(scaled,&packet,g_glow_sphere_scale*0.3f);
                 FastVecAdd(output,&self->x,scaled);
-                func_PAL_L00_003C9708(output,ctx->colour);
+                part_l00_spawn_spark_pairs_2_pal(output,ctx->colour);
                 ctx->cooldown=0.5f;
             }
         }
     }
-    if(!D_L00_001A8F00 && slot && self->oclass==0x1192 && !ctx->lock && !D_00189E20_13.busy && D_00189E20_13.upgrades>=19) {
-        int hits=coll_process_hit(&self->x,1,D_00189E20_13.moby,0,D_L00_001AFF40);
+    if(!g_game_l00_mode && slot && self->oclass==0x1192 && !ctx->lock && !D_00189E20_13.busy && D_00189E20_13.upgrades>=19) {
+        int hits=coll_process_hit(&self->x,1,D_00189E20_13.moby,0,g_tesla_hit_damage);
         if(hits) for(j=0;j<hits;j++) {
             float *health=0;
             int freeSlot;
@@ -246,10 +246,10 @@ void func_PAL_L00_003C7B10(Moby *self)
                 if(freeSlot<0) break;
                 object=g_area_hit_targets[j];
                 ((Moby **)((char *)ctx+(freeSlot<<2)))[8]=object;
-                effect=(Particle *)func_PAL_L00_00417ED0(object,D_L00_001AFF24);
+                effect=(Particle *)func_PAL_L00_00417ED0(object,g_tesla_arc_param);
                 if(effect) {
                     effect->source=self;
-                    D_L00_001AFF44++;
+                    g_tesla_hit_counter++;
                     PlayMobySound(5,0,self);
                     ctx->timers[slot]=((int)(math_random_int_range(20,60)) * 5 + 2) / 6;
                 }
@@ -261,16 +261,16 @@ void func_PAL_L00_003C7B10(Moby *self)
     {
     int r;
     for(r=0;r<5;r++) {
-        if(FastDecTimer(&D_L00_001B2990[r])) D_L00_001B2990[r]=0;
-        if(!D_L00_001B2990[r]) {
+        if(FastDecTimer(&g_tesla_ribbon_ids[r])) g_tesla_ribbon_ids[r]=0;
+        if(!g_tesla_ribbon_ids[r]) {
             float velocity[4],scaled[4];
             int id=((int)(math_random_int_range(3,45)) * 5 + 2) / 6;
-            D_L00_001B2990[r]=id;
-            D_L00_001B29B0[r]=id;
-            D_L00_001B29A0[r]=64;
+            g_tesla_ribbon_ids[r]=id;
+            g_electric_ribbon_lengths[r]=id;
+            g_electric_ribbon_alphas[r]=64;
             part_spawn_random_direction_effect(velocity,ref_L00_003C3D90_00,ref_L00_003C3D90_00);
-            qcopy(D_L00_00240080[r],position);
-            D_L00_00240080[r]->v[3]=0.04f;
+            qcopy(g_tesla_barrier_points[r],position);
+            g_tesla_barrier_points[r]->v[3]=0.04f;
             sign=1.0f;
             {
             int n;
@@ -279,8 +279,8 @@ void func_PAL_L00_003C7B10(Moby *self)
                 FastVecSub(scaled,D_L00_00240080_1[r][n-1].v,g_camera_l00_position);
                 math_apply_axis_rotation_to_quat(velocity,velocity,scaled,math_random_float_range(0.0872664749622345f,1.3089970350265503f)*sign);
                 sign=-sign;
-                FastVecAdd(D_L00_00240080[r][n].v,D_L00_00240080_1[r][n-1].v,velocity);
-                D_L00_00240080[r][n].v[3]=width;
+                FastVecAdd(g_tesla_barrier_points[r][n].v,D_L00_00240080_1[r][n-1].v,velocity);
+                g_tesla_barrier_points[r][n].v[3]=width;
             }
             }
         }

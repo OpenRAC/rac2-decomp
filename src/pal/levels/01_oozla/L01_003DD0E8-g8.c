@@ -2,21 +2,21 @@
 
 #include "common.h"
 extern u8 *g_moby_l01_table;
-extern u32 D_L01_001FB020[];
+extern u32 g_group_list_table[];
 extern u8 *func_00305EE8(int);
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_nibble_table[];
+extern u8 g_moby_group_flags[];
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
-extern LevelSaveState D_L01_0021D840;
-extern LevelSaveState D_L01_0021E4B0;
+extern LevelSaveState g_level_l01_save_state;
+extern LevelSaveState g_level_save_state_backup;
 extern u8 g_sound_state[], g_hero_position[];
-extern u8 D_L01_001AFE18[] MACRO_ADDR;
+extern u8 g_water_l01_height[] MACRO_ADDR;
 extern int D_001A79F0_gp SDATA(D_001A79F0);
-extern float D_L01_001B0794 __attribute__((sda));
-extern float D_L01_001B0798 __attribute__((sda));
-extern float D_L01_001B079C __attribute__((sda));
-extern float D_L01_001B07A0 __attribute__((sda));
+extern float g_pod_scale_factor_a __attribute__((sda));
+extern float g_pod_scale_factor_b __attribute__((sda));
+extern float g_pod_scale_factor_c __attribute__((sda));
+extern float g_pod_scale_factor_d __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern void anim_start_immediate(void *, int, int);
 extern int moby_count_group_not_in_state(int, int);
@@ -64,8 +64,8 @@ void func_PAL_L01_003DD368(u8 *a0)
         if (state->persistent && a0[0xB0] != 255) {
             u16 id = *(u16 *)(a0 + 0xB2);
             int bits;
-            if (D_L01_0021E4B0.collected[(short)id] ||
-                (bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)],
+            if (g_level_save_state_backup.collected[(short)id] ||
+                (bits = g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)],
                  (id & 1) ? ((bits >> 4) & 7) : (bits & 7))) {
                 if (state->childIndex != -1)
                     moby_mark_spawned(g_moby_l01_table + (state->childIndex << 8));
@@ -88,21 +88,21 @@ void func_PAL_L01_003DD368(u8 *a0)
                         anim_start_immediate(a0, 9, 0);
                 }
             }
-            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B0794;
+            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * g_pod_scale_factor_a;
             break;
         case 1:
-            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B0798;
+            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * g_pod_scale_factor_b;
             anim_start_immediate(a0, 2, 0);
             break;
         case 2:
-            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B079C;
+            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * g_pod_scale_factor_c;
             anim_start_immediate(a0, 4, 0);
             if (state->linkIndex != -1)
                 state->linkCount = moby_count_group_not_in_state(state->linkIndex, -1);
             break;
         case 3:
             *(int *)(a0 + 0x98) = 0;
-            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L01_001B07A0;
+            *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * g_pod_scale_factor_d;
             anim_start_immediate(a0, 10, 0);
             break;
         }
@@ -135,7 +135,7 @@ void func_PAL_L01_003DD368(u8 *a0)
                 v[2] = func_PAL_L01_003BEB40();
                 f = math_random_float_range(0.2f, 2.0f);
                 color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-                part_spawn_drifting(v, f, D_L01_001AFE18, 1.2e+04f, color);
+                part_spawn_drifting(v, f, g_water_l01_height, 1.2e+04f, color);
             }
             hit = 0;
             if (part_find_owned_effect_slot(a0, 0x10001, 0))
@@ -228,7 +228,7 @@ void func_PAL_L01_003DD368(u8 *a0)
             v[2] = func_PAL_L01_003BEB40();
             f = math_random_float_range(0.2f, 2.0f);
             color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-            part_spawn_drifting(v, f, D_L01_001AFE18, 1.2e+04f, color);
+            part_spawn_drifting(v, f, g_water_l01_height, 1.2e+04f, color);
         }
         if (a0[0x60] & 2) {
             if (state->persistent) {
@@ -237,7 +237,7 @@ void func_PAL_L01_003DD368(u8 *a0)
                         u8 *counter;
                         u32 value;
 persist_high:
-                        counter = D_0019B4A8 + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
+                        counter = g_moby_nibble_table + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
                         value = *counter;
                         if (((value >> 4) & 7) != 7)
                             *counter = value + 16;
@@ -245,7 +245,7 @@ persist_high:
                         u8 *counter;
                         u32 value;
 persist_low:
-                        counter = D_0019B4A8 + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
+                        counter = g_moby_nibble_table + (((short)persist_id >> 1) + (D_001A79F0_gp << 10));
                         value = *counter;
                         if ((value & 7) != 7)
                             *counter = value + 1;
@@ -278,12 +278,12 @@ delete_current:
         if (state->persistent) {
             if (a0[0xB0] != 255) {
                 if (*(u16 *)(a0 + 0xB2) & 1) {
-                    u8 *counter = D_0019B4A8 + ((*(short *)(a0 + 0xB2) >> 1) + (D_001A79F0_gp << 10));
+                    u8 *counter = g_moby_nibble_table + ((*(short *)(a0 + 0xB2) >> 1) + (D_001A79F0_gp << 10));
                     u32 value = *counter;
                     if (((value >> 4) & 7) != 7)
                         *counter = value + 16;
                 } else {
-                    u8 *counter = D_0019B4A8 + ((*(short *)(a0 + 0xB2) >> 1) + (D_001A79F0_gp << 10));
+                    u8 *counter = g_moby_nibble_table + ((*(short *)(a0 + 0xB2) >> 1) + (D_001A79F0_gp << 10));
                     u32 value = *counter;
                     if ((value & 7) != 7)
                         *counter = value + 1;

@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern int math_fast_helper_a(void *, float);
-extern int D_L09_00257110[];
+extern int g_track_entry_ids[];
 extern float IntToFloat(int);
 extern void gfx_draw_spinning_layered_quads(void *);
 extern void light_ring_draw(void *);
@@ -28,11 +28,11 @@ void child_objects_draw(unsigned char *moby)
     Vec4_L09 sphere;
 
     for (i = 19; i >= 0; i--) {
-        D_L09_00257110[i] = clear_value;
+        g_track_entry_ids[i] = clear_value;
     }
     i = 0;
     if (*(short *)(vars + 0x424) > 0) {
-        int *table = D_L09_00257110;
+        int *table = g_track_entry_ids;
         int none_id = -1;
         int *table_slot = table;
         do {

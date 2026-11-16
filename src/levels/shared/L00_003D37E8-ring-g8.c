@@ -28,17 +28,17 @@ extern float math_ease_out_quad(float);
 extern float FastAddRotations(float, float);
 extern void draw_world_quad(void *, void *, int);
 extern char g_camera_l00_position[];
-extern int D_L00_001B04F4 __attribute__((sda));
-extern int D_L00_001B04F8 __attribute__((sda));
-extern int D_L00_001B04FC __attribute__((sda));
-extern int D_L00_001B0500 __attribute__((sda));
-extern int D_L00_001B0504 __attribute__((sda));
-extern int D_L00_001B0508 __attribute__((sda));
-extern unsigned int D_L00_001B050C __attribute__((sda));
-extern float D_L00_001B0434 __attribute__((sda));
-extern short D_L00_002967A0[][4][2];
-extern RenderVec D_L00_002961A0[];
-extern float D_L00_002474F0[][2];
+extern int g_ball_gs_flag_a __attribute__((sda));
+extern int g_ball_gs_flag_b __attribute__((sda));
+extern int g_ball_gs_flag_c __attribute__((sda));
+extern int g_ball_gs_flag_d __attribute__((sda));
+extern int g_ball_gs_flag_e __attribute__((sda));
+extern int g_ball_texture_id __attribute__((sda));
+extern unsigned int g_ball_color __attribute__((sda));
+extern float g_wobbling_ball_duration __attribute__((sda));
+extern short g_wobbling_ball_face_indices[][4][2];
+extern RenderVec g_wobbling_ball_vertices[];
+extern float g_wobbling_ball_angles[][2];
 
 /* Draws a wobbling 3D ball made of 48 textured faces around the object, facing the camera. The wobble shrinks as the object grows. */
 void gfx_draw_wobbling_ball(char *object)
@@ -55,13 +55,13 @@ void gfx_draw_wobbling_ball(char *object)
     vars = *(char **)(object + 0x68);
     up.word = 0;
     up.v[2] = 1.0f;
-    packet.tag[1] = GetEffectTextureDescriptor(D_L00_001B0508);
+    packet.tag[1] = GetEffectTextureDescriptor(g_ball_texture_id);
     packet.tag[2] = 0xFF9000000260LL;
-    flags = (long long)D_L00_001B04F4;
-    flags |= (long long)D_L00_001B04F8 << 2;
-    flags |= (long long)D_L00_001B04FC << 4;
-    flags |= (long long)D_L00_001B0500 << 6;
-    flags |= (long long)D_L00_001B0504 << 32;
+    flags = (long long)g_ball_gs_flag_a;
+    flags |= (long long)g_ball_gs_flag_b << 2;
+    flags |= (long long)g_ball_gs_flag_c << 4;
+    flags |= (long long)g_ball_gs_flag_d << 6;
+    flags |= (long long)g_ball_gs_flag_e << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
     FastVecSub(&matrix[0], g_camera_l00_position, object + 0x10);
@@ -73,25 +73,25 @@ void gfx_draw_wobbling_ball(char *object)
     matrix[3].y = *(float *)(object + 0x14);
     matrix[3].z = *(float *)(object + 0x18);
     matrix[3].w = 1.0f;
-    packet.color[3] = D_L00_001B050C;
-    packet.color[2] = D_L00_001B050C;
-    packet.color[1] = D_L00_001B050C;
-    packet.color[0] = D_L00_001B050C;
+    packet.color[3] = g_ball_color;
+    packet.color[2] = g_ball_color;
+    packet.color[1] = g_ball_color;
+    packet.color[0] = g_ball_color;
     uvStart = &packet.uv[0][0];
     for (face = 0; face < 48; face++) {
         texV = &packet.uv[0][1];
         texU = uvStart;
         for (corner = 0; corner < 4; corner++) {
-            vtx = D_L00_002967A0[face][corner][0];
-            index = D_L00_002967A0[face][corner][1];
-            FastVecScale(&packet.vertex[corner], &D_L00_002961A0[vtx], *(float *)(vars + 0x24) * 2.0f);
+            vtx = g_wobbling_ball_face_indices[face][corner][0];
+            index = g_wobbling_ball_face_indices[face][corner][1];
+            FastVecScale(&packet.vertex[corner], &g_wobbling_ball_vertices[vtx], *(float *)(vars + 0x24) * 2.0f);
             transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
             gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
-            cosValue = math_fast_sin_or_cos_a(D_L00_002474F0[index][0]);
-            delta = cosValue * math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            cosValue = math_fast_sin_or_cos_a(g_wobbling_ball_angles[index][0]);
+            delta = cosValue * math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / g_wobbling_ball_duration) * 0.0125f);
             *texU += delta;
-            sinValue = math_fast_sin_or_cos_b(D_L00_002474F0[index][0]);
-            scale = math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            sinValue = math_fast_sin_or_cos_b(g_wobbling_ball_angles[index][0]);
+            scale = math_ease_out_quad((1.0f - *(float *)(vars + 0x24) / g_wobbling_ball_duration) * 0.0125f);
             delta = -sinValue;
             delta *= scale;
             *texV += delta;
@@ -105,5 +105,5 @@ void gfx_draw_wobbling_ball(char *object)
         draw_world_quad(&packet, 0, 0);
     }
     for (face = 0; face < 98; face++)
-        D_L00_002474F0[face][0] = FastAddRotations(D_L00_002474F0[face][0], D_L00_002474F0[face][1]);
+        g_wobbling_ball_angles[face][0] = FastAddRotations(g_wobbling_ball_angles[face][0], g_wobbling_ball_angles[face][1]);
 }

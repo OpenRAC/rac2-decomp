@@ -42,22 +42,22 @@ typedef struct {
 } BoltCollision;
 extern BoltHero g_hero_state;
 extern BoltCollision g_collision_hit;
-extern char D_001B19A0[] __attribute__((sda));
-extern char D_0019B2E8[];
+extern char g_render_command_flags[] __attribute__((sda));
+extern char g_moby_group_flags[];
 /* Only the prefix is fixed here; collection entries continue after it. */
 typedef struct { u8 prefix[0x464]; u8 collected[0]; } BoltCollectionTable;
-extern BoltCollectionTable D_00210D40, D_002119B0;
+extern BoltCollectionTable g_bolt_collection_table, g_bolt_collection_checkpoint;
 /* The 0x40-byte player-stat block is saved/restored by func_002DE990. */
 typedef struct { int bolts; u8 prefix[0x18]; int pendingBolts; u8 suffix[0x20]; } BoltPlayerStats;
 extern BoltPlayerStats g_player_bolts __attribute__((sda));
 typedef struct { PickupMoby *start, *end, *active; void *aux; } BoltMobyPool;
-extern BoltMobyPool D_001B1B60 __attribute__((sda));
-extern char *D_001AE8E0 SDATA(D_001AE8E0);
+extern BoltMobyPool g_moby_pool_end __attribute__((sda));
+extern char *g_moby_light_color SDATA(D_001AE8E0);
 extern char *D_001B1B60_gp SDATA(D_001B1B60);
 extern int g_current_map_index SDATA(D_001A79F0);
-extern float D_001AE8B0 SDATA(D_001AE8B0), D_001AE8B4 SDATA(D_001AE8B4);
-extern float D_001AE8B8 SDATA(D_001AE8B8), D_001AE8BC SDATA(D_001AE8BC);
-extern float D_001AE8C0 SDATA(D_001AE8C0), D_001AE8C4 SDATA(D_001AE8C4), D_001AE8C8 SDATA(D_001AE8C8);
+extern float g_moby_scale_mult_a SDATA(D_001AE8B0), g_moby_scale_mult_b SDATA(D_001AE8B4);
+extern float g_moby_scale_mult_c SDATA(D_001AE8B8), g_moby_scale_mult_d SDATA(D_001AE8BC);
+extern float g_moby_scale_mult_e SDATA(D_001AE8C0), g_moby_scale_mult_f SDATA(D_001AE8C4), g_moby_scale_mult_g SDATA(D_001AE8C8);
 extern int math_random_int_below(int);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
@@ -75,7 +75,7 @@ extern int coll_test_point(void *,int,void *,float),GetCollHitMaterial(void);
 extern void mat_get_euler_angles(void *,void *),mat_build_rotation_from_angles(void *,void *);
 extern void func_00301F18(void *,void *,int);
 extern void vec_fast_normalize3(void *,void *,void *,float),lerp_vector(void *,void *,void *,float);
-extern int func_PAL_003033A8(void *,void *,float,float);
+extern int pickup_start_fly_to_target_pal(void *,void *,float,float);
 extern void moby_mark_spawned(void *),func_PAL_00303950(void *,int),transform_vector(void *,void *,void *);
 extern void vec_clamp_length(void *,float), matrix_mul_vec3(void *,void *,void *), euler_rotation_basis(void *,void *);
 extern f32 ApproachValue(void *,float,float);
@@ -125,24 +125,24 @@ void func_PAL_00302018(PickupMoby *m)
         p->random0=math_random_angle();
         p->random1=math_random_angle();
         p->initialHeight=m->position[2];
-        moby_set_light_color(m,D_001AE8E0);
+        moby_set_light_color(m,g_moby_light_color);
         get_moby_color(m,&x,&y,&z);
         gfx_pack_render_command_fields(m,0,13,0,0);
         set_moby_color(m,x,y,z);
         switch((s16)(m->classId-13)) {
-        case 0:m->scale=F(m->pClass,0x24)*D_001AE8B0;
+        case 0:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_a;
             break;
-        case 1:m->scale=F(m->pClass,0x24)*D_001AE8B4;
+        case 1:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_b;
             break;
-        case 2:m->scale=F(m->pClass,0x24)*D_001AE8B8;
+        case 2:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_c;
             break;
-        case 3:m->scale=F(m->pClass,0x24)*D_001AE8BC;
+        case 3:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_d;
             break;
-        case 4:m->scale=F(m->pClass,0x24)*D_001AE8C0;
+        case 4:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_e;
             break;
-        case 5:m->scale=F(m->pClass,0x24)*D_001AE8C4;
+        case 5:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_f;
             break;
-        case 6:m->scale=F(m->pClass,0x24)*D_001AE8C8;
+        case 6:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_g;
             break;
         }
         break;
@@ -157,7 +157,7 @@ void func_PAL_00302018(PickupMoby *m)
         multiply_matrix3x3(&m->orientation[0],scratch.ground.basis,&m->orientation[0]);
         if(m->position[2]<p->initialHeight-2.0f&&m->position[2]<g_hero_state.motion.position[2]-2.0f) {
             t=math_random_float_range(-15.0f,15.0f);
-            func_PAL_003033A8(m,g_hero_state.motion.moby,t*0.017453294f,0);
+            pickup_start_fly_to_target_pal(m,g_hero_state.motion.moby,t*0.017453294f,0);
             goto sparkle;
         }
         if(coll_test_point(&m->position[0],0x22,m,0.25f)) {
@@ -172,7 +172,7 @@ void func_PAL_00302018(PickupMoby *m)
             math_fabs(m->position[2]-g_hero_state.motion.position[2]) < g_hero_state.motion.pickupHeight) ||
             GetCollHitMaterial() != -1)) {
                 vec_scale_to_length(&p->velocity[0],&p->velocity[0],0.16000001f);
-                func_PAL_003033A8(m,g_hero_state.motion.moby,0,0);
+                pickup_start_fly_to_target_pal(m,g_hero_state.motion.moby,0,0);
             }
             else if(mat_fast_helper_a(scratch.ground.vector[2],vec_length_xy(scratch.ground.vector))<0.78539824f&&mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]))<0.78539824f) {
                 m->state=2;
@@ -216,7 +216,7 @@ void func_PAL_00302018(PickupMoby *m)
         float distance, s;
         distance=vec_distance_xy(&m->position[0],motion->position);
         if(p->activated || (distance<g_hero_state.motion.pickupRadius&&math_fabs(m->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight)) {
-            func_PAL_003033A8(m,motion->moby,0,0);
+            pickup_start_fly_to_target_pal(m,motion->moby,0,0);
         }
         else if((u32)D_001B1B60_gp<(u32)m&&distance>32.0f&&!m->visible) {
             switch((s16)(m->classId-13)) {
@@ -308,21 +308,21 @@ void func_PAL_00302018(PickupMoby *m)
         {
             func_PAL_00302E18(m);
             PlayMobySound(0,32,m);
-            if(m<D_001B1B60.start){
-                D_00210D40.collected[m->mission]=m->uid+2;
+            if(m<g_moby_pool_end.start){
+                g_bolt_collection_table.collected[m->mission]=m->uid+2;
                 {
                     int uid = m->uid;
                     if (uid != 255) {
                         int index = uid & 255;
-                        if (B(D_001B19A0, index) & 128)
+                        if (B(g_render_command_flags, index) & 128)
                             goto delete_pickup;
                         {
                             int row = 16 * g_current_map_index;
-                            if (!(B(D_0019B2E8, index + row) & 128))
+                            if (!(B(g_moby_group_flags, index + row) & 128))
                                 goto delete_pickup;
                         }
                     }
-                    D_002119B0.collected[m->mission] = uid + 2;
+                    g_bolt_collection_checkpoint.collected[m->mission] = uid + 2;
                 }
             }
         delete_pickup:

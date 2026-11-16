@@ -15,13 +15,13 @@ typedef int s32;
 typedef float f32;
 
 /* The angle limits, the reference axis and the slot field the elevation accumulates into. */
-extern f32 D_00138284[];
+extern f32 g_stick_axis_y[];
 
-extern u8 D_L03_00189EA0[];
+extern u8 g_hero_l03_position[];
 
-extern u8 D_L03_001B9840[];
+extern u8 g_hero_l03_state_alias[];
 
-extern f32 D_L03_001B21B8 __attribute__((sda));
+extern f32 g_aim_candidate_level_step __attribute__((sda));
 
 extern f32 math_fabs(f32);
 
@@ -43,7 +43,7 @@ typedef struct {
    facing into a normalised elevation and folds it into the slot's level. */
 /* Checks whether this object is close enough and in front of the camera to become its aim target, and builds up the camera slot value. */
 void cam_update_aim_target_candidate(u8 *moby) {
-    u8 *base = D_L03_001B9840;
+    u8 *base = g_hero_l03_state_alias;
     u8 *cur = *(u8 **)(base + 0x190);
     AimSlot *slot;
     f32 offset[4];
@@ -53,9 +53,9 @@ void cam_update_aim_target_candidate(u8 *moby) {
 
     if (*(short *)(cur + 0x86) != 0)
         return;
-    if (math_fabs(D_00138284[0]) > 0.05f)
+    if (math_fabs(g_stick_axis_y[0]) > 0.05f)
         return;
-    FastVecSub(offset, (float *)(moby + 0x10), (float *)D_L03_00189EA0);
+    FastVecSub(offset, (float *)(moby + 0x10), (float *)g_hero_l03_position);
     slot = (AimSlot *)(base + 0x3A0);
     size = FastVecLength(offset);
     if (!(size < 22.0f))
@@ -79,7 +79,7 @@ void cam_update_aim_target_candidate(u8 *moby) {
             slot->occupant = (u32)cur;
             slot->size = size;
             slot->owner = (u32)moby;
-            slot->level += D_L03_001B21B8;
+            slot->level += g_aim_candidate_level_step;
             if (slot->level > 1.0f)
                 slot->level = 1.0f;
         }

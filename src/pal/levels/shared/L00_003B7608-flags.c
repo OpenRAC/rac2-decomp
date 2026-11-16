@@ -13,14 +13,14 @@ typedef struct {
     unsigned char ba;
     unsigned char bb;
 } Sub_L00_003B3E78;
-extern float D_001AF908 __attribute__((sda));
-extern int D_001AF918 __attribute__((sda));
-extern unsigned short D_001AF91C __attribute__((sda));
-extern float D_001AF920 __attribute__((sda));
-extern float D_001AF924 __attribute__((sda));
-extern int D_001AF928 __attribute__((sda));
-extern unsigned char D_001AF92C __attribute__((sda));
-extern float D_001AF930 __attribute__((sda));
+extern float g_spark_ring_axis_z __attribute__((sda));
+extern int g_spark_ring_spark_count __attribute__((sda));
+extern unsigned short g_spark_ring_effect_id __attribute__((sda));
+extern float g_spark_ring_speed __attribute__((sda));
+extern float g_spark_ring_size __attribute__((sda));
+extern int g_spark_ring_spin_param __attribute__((sda));
+extern unsigned char g_spark_ring_alpha __attribute__((sda));
+extern float g_spark_ring_scale __attribute__((sda));
 extern float g_camera_l00_position[];
 extern void FastVecSub(void *, void *, void *);
 extern float IntToFloat(int);
@@ -39,24 +39,24 @@ void func_PAL_L00_003B7870(u8 *obj)
     int i;
 
     axis.bits = 0;
-    axis.f[2] = D_001AF908;
+    axis.f[2] = g_spark_ring_axis_z;
     FastVecSub(&w, g_camera_l00_position, obj + 0x10);
-    step = 6.2831855f / IntToFloat(D_001AF918);
-    for (i = 0; i < D_001AF918; i++) {
+    step = 6.2831855f / IntToFloat(g_spark_ring_spark_count);
+    for (i = 0; i < g_spark_ring_spark_count; i++) {
         u8 *e;
         int r;
         math_apply_axis_rotation_to_quat(&a, &axis, &w, (float)i * step);
-        vec_scale_to_length(&b, &a, D_001AF920 * 0.020000001f);
+        vec_scale_to_length(&b, &a, g_spark_ring_speed * 0.020000001f);
         r = math_random_int_below(16);
         if (math_random_int_below(2) != 0) {
             r = -r;
         }
-        e = func_PAL_002BE9A8(obj + 0x10, 0.5f, 1.0f, D_001AF930, D_001AF924 * 210000.0f, r, &b, D_001AF928, 0);
+        e = func_PAL_002BE9A8(obj + 0x10, 0.5f, 1.0f, g_spark_ring_scale, g_spark_ring_size * 210000.0f, r, &b, g_spark_ring_spin_param, 0);
         if (e != 0) {
             Sub_L00_003B3E78 *q = (Sub_L00_003B3E78 *)(e + 0x20);
-            *(unsigned short *)(e + 0xA) = D_001AF91C;
+            *(unsigned short *)(e + 0xA) = g_spark_ring_effect_id;
             q->w4 = 2;
-            q->ba = D_001AF92C;
+            q->ba = g_spark_ring_alpha;
             q->bb = e[0xA];
         }
     }

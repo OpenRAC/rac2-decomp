@@ -18,13 +18,13 @@ extern void func_L07_003EA2D8(void *,void *,int,int);
 extern void func_L07_003EA498(void *,void *);
 extern void entity_set_group_alert_b(void *);
 extern void entity_spawn_death_effects(void *);
-extern float D_L07_001B0B18 __attribute__((sda));
-extern unsigned short D_L07_001B0B20 __attribute__((sda));
-extern unsigned short D_L07_001B0B24[] __attribute__((sda));
-extern int D_L07_001C9780 NOT_SDA;
-extern char *D_L07_001B1F40[] __attribute__((sda));
-extern char D_L07_001B9200[];
-extern char D_00189F70[];
+extern float g_shooter_turn_rate __attribute__((sda));
+extern unsigned short g_shooter_timer_init __attribute__((sda));
+extern unsigned short g_shooter_timer_table[] __attribute__((sda));
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern char *g_shooter_path_table[] __attribute__((sda));
+extern char g_hero_position_block[];
+extern char g_hero_velocity[];
 
 /* Initialize the entity, handle nearby collision targets, and update its animation. */
 int shooter_entity_base_update(unsigned char *moby)
@@ -45,7 +45,7 @@ int shooter_entity_base_update(unsigned char *moby)
         FLOAT_AT(vars,0x17C)=0.15f;
         FLOAT_AT(vars,0x170)=1.0f;
         FLOAT_AT(vars,0x174)=1.0f;
-        turn=D_L07_001B0B18;
+        turn=g_shooter_turn_rate;
         turn*=0.017453294f;
         FLOAT_AT(vars,0x180)=FLOAT_AT(moby,0x18)-3.0f;
         FLOAT_AT(vars,0x54)=0.3f;
@@ -53,18 +53,18 @@ int shooter_entity_base_update(unsigned char *moby)
         FLOAT_AT(vars,0x60)=3.1415927f;
         if (math_random_int_below(2)) turn=-turn;
         FLOAT_AT(vars,0x12C)=turn;
-        U16_AT(vars,0x132)=D_L07_001B0B20;
-        U16_AT(vars,0x134)=D_L07_001B0B24[0];
+        U16_AT(vars,0x132)=g_shooter_timer_init;
+        U16_AT(vars,0x134)=g_shooter_timer_table[0];
         vars[0x2E]=1;
         func_L07_003EA2D8(moby,vars+0x330,0,2);
-        if (FLOAT_AT(moby,0x18)>FLOAT_AT((char *)&D_L07_001C9780,0x28)) {
+        if (FLOAT_AT(moby,0x18)>FLOAT_AT((char *)&g_cutscene_l07_active_flag,0x28)) {
             INT_AT(vars,0x350)=1;
             moby[0x30]=255;
         }
         FLOAT_AT(moby,0x18)+=0.5f;
         coll_get_ground_distance_below(moby+0x10,moby,moby+0x10);
         if (INT_AT(vars,0x2B0)!=-1) {
-            char *entry=D_L07_001B1F40[0]+INT_AT(vars,0x2B0)*0x30;
+            char *entry=g_shooter_path_table[0]+INT_AT(vars,0x2B0)*0x30;
             if (*(short *)(entry+0x30)) INT_AT(vars,0x8C)=**(int **)(entry+0x3C);
             else INT_AT(vars,0x8C)=-1;
         }
@@ -81,7 +81,7 @@ int shooter_entity_base_update(unsigned char *moby)
             if (moby[0x43]) anim_start_blended(moby,0,0,0);
         }
     }
-    if (moby[0x31] && fast_vec_dist(moby+0x10,D_L07_001B9200)<24.0f) {
+    if (moby[0x31] && fast_vec_dist(moby+0x10,g_hero_position_block)<24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F]=22;
     }
@@ -99,7 +99,7 @@ int shooter_entity_base_update(unsigned char *moby)
             entity_spawn_death_effects(moby);
             return 1;
         }
-        if (D_L07_001C9780) FLOAT_AT(vars,0x180)=0;
+        if (g_cutscene_l07_active_flag) FLOAT_AT(vars,0x180)=0;
     }
     if (vars[0x2E]==2) {
         if (vars+0x330)
@@ -107,6 +107,6 @@ int shooter_entity_base_update(unsigned char *moby)
         return 1;
     }
     INT_AT(vars,0x2D4)=weapon_select_aim_target(moby,INT_AT(vars,0x2B0),FLOAT_AT(vars,0x2B4),0,0,0);
-    if (D_L07_001C9780) FastVecAdd(vars+0x210,vars+0x210,D_00189F70);
+    if (g_cutscene_l07_active_flag) FastVecAdd(vars+0x210,vars+0x210,g_hero_velocity);
     return 0;
 }

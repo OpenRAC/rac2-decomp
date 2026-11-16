@@ -36,7 +36,7 @@ extern f32 IntToFloat(s32 value);
 extern s32 math_random_int_below(s32 limit);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
-extern u8 *D_L06_001FF50C;
+extern u8 *g_particle_record_byte_ptr;
 
 /* The func_L04_00362768 spawner with a colour word, a second size and a random
    spin halfword. */
@@ -53,7 +53,7 @@ void part_spawn_spinning_effect_record(void *position, void *direction, u32 angl
         record->field09 = (u8)(FloatToInt(2.0f) + 0x40);
         record->field03 = 0x48;
         record->field01 = 0;
-        record->field02 = *D_L06_001FF50C;
+        record->field02 = *g_particle_record_byte_ptr;
         record->field0C = size * 105000.0f;
         record->field08 = (u8)math_random_int_below(0xFF);
         record->field0A = (u16)angle;

@@ -18,7 +18,7 @@ extern void transform_vector(void *, void *, void *);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern void quad_record_init_default(void *);
-extern Vector4 D_L05_001B96C0;
+extern Vector4 g_origin_vec;
 
 /* The func_L05_0037D7D8 strip with this level's own setup helper: one strip from start
    to end, one colour, a caller texture and each end's basis taken from that end. */
@@ -40,14 +40,14 @@ void gfx_l05_draw_beam_strip_2(Vector4 *start, Vector4 *end, unsigned int color,
     strip.uv[0] = 0; strip.uv[1] = 0; strip.uv[2] = 0; strip.uv[3] = 1;
     strip.uv[4] = 1; strip.uv[5] = 0; strip.uv[6] = 1; strip.uv[7] = 1;
     FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], &D_L05_001B96C0, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], &g_origin_vec, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     strip.point[0].bits = size.bits;
     FastVecScale(&strip.point[1], &strip, -1);
     transform_vector(&strip, &strip, basis); transform_vector(&strip.point[1], &strip.point[1], basis);
     FastVecSub(&basis[0], end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], &D_L05_001B96C0, end); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], &g_origin_vec, end); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = end->bits;
     strip.point[2].bits = size.bits;

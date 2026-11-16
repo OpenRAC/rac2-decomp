@@ -13,7 +13,7 @@ extern s32 vec_fast_helper_a(void *a0);
 extern void moby_mark_spawned(void *a0);
 
 /* The scale factor of the state's two velocity halves, reached through $gp. */
-extern f32 D_L11_001AEC40 __attribute__((sda));
+extern f32 g_debris_velocity_scale __attribute__((sda));
 
 /* Scales the state's vector by the level's factor, clamps its timer to the state's
    limit, and runs the two animation angles through the engine's wrap function. */
@@ -25,8 +25,8 @@ void debris_update_falling_piece(u8 *moby_arg) {
 
     FastVecAdd((f32 *)(moby + 0x10), (f32 *)(moby + 0x10), (f32 *)vars);
     fall_speed = *(f32 *)(vars + 0x8) - 0.0041666667f;
-    value_a = *(f32 *)(vars + 0x0) * D_L11_001AEC40;
-    value_b = *(f32 *)(vars + 0x4) * D_L11_001AEC40;
+    value_a = *(f32 *)(vars + 0x0) * g_debris_velocity_scale;
+    value_b = *(f32 *)(vars + 0x4) * g_debris_velocity_scale;
     minFall = *(f32 *)(vars + 0x20);
     *(f32 *)(vars + 0x8) = fall_speed;
     *(f32 *)(vars + 0x0) = value_a;
@@ -56,24 +56,24 @@ extern f32 math_random_float_range(f32 low, f32 high);
 extern void curve_build_jittered_points(void *points, s32 count, void *control, f32 noise);
 extern void ribbon_draw_two_layer(void *points, s32 count, s32 flags, u32 color0, u32 color1,
                               f32 width, f32 scale);
-extern s32 D_L11_001AECD0 __attribute__((sda));
-extern f32 D_L11_001AECD4 __attribute__((sda));
-extern f32 D_L11_001AECD8 __attribute__((sda));
-extern f32 D_L11_001AECDC __attribute__((sda));
-extern f32 D_L11_001AECE0 __attribute__((sda));
-extern f32 D_L11_001AECE4 __attribute__((sda));
-extern f32 D_L11_001AECE8 __attribute__((sda));
-extern f32 D_L11_001AECEC __attribute__((sda));
-extern f32 D_L11_001AECF0 __attribute__((sda));
-extern u32 D_L11_001AECF4 __attribute__((sda));
-extern u32 D_L11_001AECF8 __attribute__((sda));
+extern s32 g_ribbon_l11_point_count __attribute__((sda));
+extern f32 g_ribbon_jitter __attribute__((sda));
+extern f32 g_ribbon_direction_min __attribute__((sda));
+extern f32 g_ribbon_direction_max __attribute__((sda));
+extern f32 g_ribbon_width_min __attribute__((sda));
+extern f32 g_ribbon_width_max __attribute__((sda));
+extern f32 g_ribbon_height_min __attribute__((sda));
+extern f32 g_ribbon_height_max __attribute__((sda));
+extern f32 g_ribbon_offset_scale __attribute__((sda));
+extern u32 g_ribbon_l11_inner_color __attribute__((sda));
+extern u32 g_ribbon_l11_outer_color __attribute__((sda));
 
 /* Builds a randomized strip from the object's position, as func_L18_003FD630 does from
    its state's point: two control points, two random tangents, then the ribbon. */
 /* Draws a jagged, lightning-like ribbon starting at the object's position. */
 void gfx_draw_random_ribbon(char *self) {
     f32 control[10][4];
-    s32 count = D_L11_001AECD0;
+    s32 count = g_ribbon_l11_point_count;
     Quad_003982F0 points[count];
     char *vars = *(char **)(self + 0x68);
     s32 texture;
@@ -81,14 +81,14 @@ void gfx_draw_random_ribbon(char *self) {
 
     qcopy(control[0], (self + 0x10));
     qcopy(control[1], (self + 0x10));
-    vec_add_random_offset(control[1], D_L11_001AECF0 * *(f32 *)(vars + 0x2C));
-    vec_random_direction(control[2], D_L11_001AECD8, D_L11_001AECDC);
-    vec_random_direction(control[3], D_L11_001AECD8, D_L11_001AECDC);
+    vec_add_random_offset(control[1], g_ribbon_offset_scale * *(f32 *)(vars + 0x2C));
+    vec_random_direction(control[2], g_ribbon_direction_min, g_ribbon_direction_max);
+    vec_random_direction(control[3], g_ribbon_direction_min, g_ribbon_direction_max);
     texture = math_random_int_range(16, 64);
-    width = math_random_float_range(D_L11_001AECE0, D_L11_001AECE4);
-    height = math_random_float_range(D_L11_001AECE8, D_L11_001AECEC);
-    curve_build_jittered_points(points, D_L11_001AECD0, control, D_L11_001AECD4);
-    ribbon_draw_two_layer(points, D_L11_001AECD0, texture, D_L11_001AECF4, D_L11_001AECF8, width, height);
+    width = math_random_float_range(g_ribbon_width_min, g_ribbon_width_max);
+    height = math_random_float_range(g_ribbon_height_min, g_ribbon_height_max);
+    curve_build_jittered_points(points, g_ribbon_l11_point_count, control, g_ribbon_jitter);
+    ribbon_draw_two_layer(points, g_ribbon_l11_point_count, texture, g_ribbon_l11_inner_color, g_ribbon_l11_outer_color, width, height);
 }
 
 extern void *CreateMoby(s32 classId);
@@ -98,16 +98,16 @@ extern s32 func_001163B0(void);
 extern s32 FloatToInt(f32 value);
 extern void func_002A0F48(void *moby);
 extern void hero_copy_field_to_moby(void *moby);
-extern s32 D_L11_001AEC3C __attribute__((sda));
-extern f32 D_L11_001AEC38 __attribute__((sda));
-extern u8 D_00139578[];
+extern s32 g_debris_lifetime_base __attribute__((sda));
+extern f32 g_debris_l11_scale_factor __attribute__((sda));
+extern u8 g_sheepinator_weapon_index[];
 /* One 0xE0-byte record of the level's selection table (as in L11_00443498-g8.c). */
 typedef struct {
     u8 pad[4];
     u8 enabled;
     u8 rest[0xDB];
 } JobaChoice_00396DC8;
-extern u8 D_L11_00279BA0[];
+extern u8 g_item_l11_record_table[];
 
 /* The spawned piece's private block, as func_L11_00397068 updates it. */
 typedef struct {
@@ -176,10 +176,10 @@ PieceMoby_00396DC8 *debris_l11_spawn_piece(void *unused, f32 *position, f32 *mot
         vars->spinRate = -(math_random_float_range(200.0f, 550.0f) * 0.00029088825f);
         vars->random10 = math_random_angle();
         vars->random14 = math_random_angle();
-        low = FloatToInt((f32)D_L11_001AEC3C * 0.7f);
-        vars->lifetime = math_random_int_range(low, FloatToInt((f32)D_L11_001AEC3C * 1.2f));
-        piece->scale *= D_L11_001AEC38;
-        if (((JobaChoice_00396DC8 *)(D_L11_00279BA0 + D_00139578[0] * 0xE0))->enabled)
+        low = FloatToInt((f32)g_debris_lifetime_base * 0.7f);
+        vars->lifetime = math_random_int_range(low, FloatToInt((f32)g_debris_lifetime_base * 1.2f));
+        piece->scale *= g_debris_l11_scale_factor;
+        if (((JobaChoice_00396DC8 *)(g_item_l11_record_table + g_sheepinator_weapon_index[0] * 0xE0))->enabled)
             piece->scale += piece->scale;
         vars->minFall = math_random_float_range(-1.2f, -0.4f) * 0.016666668f;
         func_002A0F48(piece);

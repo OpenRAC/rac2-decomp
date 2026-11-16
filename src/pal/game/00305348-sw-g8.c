@@ -13,17 +13,17 @@ typedef struct {
     int flags0, flags1, enabled, surface, active;
     float tolerance;
 } ProjectileQuery;
-extern int D_L03_001AEFCC __attribute__((sda));
-extern float D_L03_001AEFB0 __attribute__((sda));
-extern float D_L03_001AEFB8 __attribute__((sda));
-extern void *D_L03_001B31B0 __attribute__((sda));
-extern int D_L03_001B31B8[] __attribute__((sda));
-extern unsigned char *D_L03_001ADAAC[] __attribute__((sda));
+extern int g_miniturret_counter __attribute__((sda));
+extern float g_miniturret_move_speed __attribute__((sda));
+extern float g_miniturret_query_response __attribute__((sda));
+extern void *g_ripple_param_a __attribute__((sda));
+extern int g_ripple_param_b[] __attribute__((sda));
+extern unsigned char *g_miniturret_l03_owner_table[] __attribute__((sda));
 typedef struct { int row0[64]; int row1[64]; int row2[8]; int count; int flag; int limit; } ProjectilePool;
-extern ProjectilePool D_L03_0023B300 __attribute__((nosda));
-extern unsigned char *D_L03_0023B530[] __attribute__((nosda));
-extern ProjectileOffset D_L03_0023B6C0[] __attribute__((nosda));
-extern unsigned char D_L03_00189E20[] __attribute__((nosda));
+extern ProjectilePool g_miniturret_projectile_pool __attribute__((nosda));
+extern unsigned char *g_miniturret_l03_owner_table_2[] __attribute__((nosda));
+extern ProjectileOffset g_miniturret_projectile_offsets[] __attribute__((nosda));
+extern unsigned char g_hero_l03_state_block[] __attribute__((nosda));
 extern void moby_get_facing_direction(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -57,7 +57,7 @@ extern signed char part_alloc_effect_slot(float, float, float, void *, int);
 extern int slot_alloc_for_object(void *, int);
 extern void func_PAL_00305D30(void *);
 extern void func_PAL_00305DC8(void *);
-extern void func_PAL_002AD288(float, float, void *, void *, int);
+extern void part_spawn_explosion_with_sparks_pal(float, float, void *, void *, int);
 extern void slot_free(int);
 extern void slot_list_remove(void *, int);
 extern void moby_mark_spawned(void *);
@@ -90,9 +90,9 @@ void func_PAL_00305470(unsigned char *object) {
     switch (object[0x20]) {
     case 0:
         object[0x20] = 1;
-        { int counter = D_L03_001AEFCC;
+        { int counter = g_miniturret_counter;
         PI(state, 0x6C) = counter;
-        D_L03_001AEFCC = (counter + 1) % 100; }
+        g_miniturret_counter = (counter + 1) % 100; }
         PI(object, 0x98) = 0;
     case 1:
         moby_get_facing_direction(object + 0x10, &normal);
@@ -106,7 +106,7 @@ void func_PAL_00305470(unsigned char *object) {
         qcopy(&oldPosition, object + 0x10);
         FastVecAdd(object + 0x10, object + 0x10, state);
         part_steer_effect_direction((signed char)state[0x4F], state, 0);
-        vec_add_object_direction_scaled(D_L03_001AEFB0 * 0.00040000002f, object + 0x10, state);
+        vec_add_object_direction_scaled(g_miniturret_move_speed * 0.00040000002f, object + 0x10, state);
         vec_transform_or_copy(object + 0x10, object + 0x10);
         excluded[0] = 0;
         excluded[1] = 0xC5A;
@@ -117,7 +117,7 @@ void func_PAL_00305470(unsigned char *object) {
         query.excluded = excluded;
         query.mode = 2;
         query.radius = 0.1f;
-        query.response = D_L03_001AEFB8;
+        query.response = g_miniturret_query_response;
         query.friction = 0.5555555820465088f;
         query.flags0 = 0;
         query.flags1 = 0;
@@ -143,7 +143,7 @@ void func_PAL_00305470(unsigned char *object) {
                     PF(state, 8) = -0.030000001f;
                     object[0x20] = 7;
                     if (!query.surface) {
-                        RippleDisturb(D_L03_001B31B0, D_L03_001B31B8[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
+                        RippleDisturb(g_ripple_param_a, g_ripple_param_b[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
                         created = moby_spawn_scaled_effect(2.0f, object + 0x10);
                         if (created)
                             created[0x23] = 0x70;
@@ -151,9 +151,9 @@ void func_PAL_00305470(unsigned char *object) {
                 } else if (response == 1) {
                     object[0x20] = 8;
                 } else {
-                    state[0x4E] = slot_list_add(&D_L03_0023B300, object);
+                    state[0x4E] = slot_list_add(&g_miniturret_projectile_pool, object);
                     projectile_cleanup_table();
-                    if (D_L03_0023B300.row1[(signed char)state[0x4E]]) {
+                    if (g_miniturret_projectile_pool.row1[(signed char)state[0x4E]]) {
                         object[0x20] = 2;
                         PlayMobySound(1, 0, object);
                         anim_start_blended_with_flags(object, 1, 0, 0, 0);
@@ -162,14 +162,14 @@ void func_PAL_00305470(unsigned char *object) {
                     }
                 }
                 table_clear_entry_flag((signed char)state[0x4F]);
-                { unsigned char *owner = D_L03_001ADAAC[0];
-                D_L03_0023B530[PI(state, 0x6C)] = owner;
+                { unsigned char *owner = g_miniturret_l03_owner_table[0];
+                g_miniturret_l03_owner_table_2[PI(state, 0x6C)] = owner;
                 if (owner) {
                     FastVecSub(&relative, object + 0x10, owner + 0x10);
-                    matrix_from_basis_rows(inverse, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
+                    matrix_from_basis_rows(inverse, g_miniturret_l03_owner_table_2[PI(state, 0x6C)] + 0xC0);
                     transform_vector(&relative, &relative, inverse);
                     { int entry = PI(state, 0x6C) * 12;
-                    entry += (int)D_L03_0023B6C0;
+                    entry += (int)g_miniturret_projectile_offsets;
                     ((ProjectileOffset *)entry)->x = relative.v.x;
                     ((ProjectileOffset *)entry)->y = relative.v.y;
                     ((ProjectileOffset *)entry)->z = relative.v.z; }
@@ -213,7 +213,7 @@ checkAttached:
         }
         break;
     case 6:
-        if (D_L03_0023B300.row1[(signed char)state[0x4E]]) {
+        if (g_miniturret_projectile_pool.row1[(signed char)state[0x4E]]) {
             object[0x20] = 2;
             PlayMobySound(1, 0, object);
             anim_start_blended_with_flags(object, 1, 0, 0, 0);
@@ -226,7 +226,7 @@ checkAttached:
         break;
     case 8:
         PlayMobySound(3, 0, object);
-        func_PAL_002AD288(0.5f, 13.0f, object, object + 0x10, -1);
+        part_spawn_explosion_with_sparks_pal(0.5f, 13.0f, object, object + 0x10, -1);
         object[0x20] = 9;
         *(unsigned short *)(object + 0x34) |= 0x41;
         break;
@@ -235,32 +235,32 @@ checkAttached:
             if (PI(state, 0x48) != -1)
                 slot_free(PI(state, 0x48));
             if ((signed char)state[0x4E] != -1)
-                slot_list_remove(&D_L03_0023B300, (signed char)state[0x4E]);
+                slot_list_remove(&g_miniturret_projectile_pool, (signed char)state[0x4E]);
             moby_mark_spawned(object);
             return;
         }
         break;
     }
-    if (object[0x20] >= 2 && D_L03_0023B530[PI(state, 0x6C)]) {
+    if (object[0x20] >= 2 && g_miniturret_l03_owner_table_2[PI(state, 0x6C)]) {
         index = PI(state, 0x6C);
         { int entry = index * 12;
-        entry += (int)D_L03_0023B6C0;
+        entry += (int)g_miniturret_projectile_offsets;
         normal.v.x = ((ProjectileOffset *)entry)->x;
         normal.v.y = ((ProjectileOffset *)entry)->y;
         normal.v.z = ((ProjectileOffset *)entry)->z; }
         normal.v.w = 0;
-        matrix_mul_vec3(&normal, &normal, D_L03_0023B530[PI(state, 0x6C)] + 0xC0);
-        FastVecAdd(object + 0x10, D_L03_0023B530[PI(state, 0x6C)] + 0x10, &normal);
+        matrix_mul_vec3(&normal, &normal, g_miniturret_l03_owner_table_2[PI(state, 0x6C)] + 0xC0);
+        FastVecAdd(object + 0x10, g_miniturret_l03_owner_table_2[PI(state, 0x6C)] + 0x10, &normal);
     }
     if ((unsigned int)(object[0x20] - 3) < 2)
         part_advance_grow_effect(object);
     vec_fast_helper_b(state + 0x5C);
-    if ((math_fast_float_d(state + 0x40) || PI(D_L03_00189E20, 0x2294) == 0x6F) && object[0x20] != 9)
+    if ((math_fast_float_d(state + 0x40) || PI(g_hero_l03_state_block, 0x2294) == 0x6F) && object[0x20] != 9)
         object[0x20] = 8;
     UpdateOwnedParticleTrails(object);
     if ((unsigned int)(object[0x20] - 3) < 2) {
         projectile_check_hit_break(object);
-        if (!D_L03_0023B300.row1[(signed char)state[0x4E]]) {
+        if (!g_miniturret_projectile_pool.row1[(signed char)state[0x4E]]) {
             anim_start_blended_with_flags(object, 1, 9, 0, 0);
             object[0x20] = 5;
             PF(object, 0x48) = -1.0f;

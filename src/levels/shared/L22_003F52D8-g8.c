@@ -6,10 +6,10 @@ typedef union {
     float f[4];
 } Quad __attribute__((aligned(16)));
 
-extern u8 D_L22_001B9C80[];
-extern s32 D_L22_001B2040;
-extern f32 D_L22_001B0A0C __attribute__((sda));
-extern f32 D_L22_001B0A10 __attribute__((sda));
+extern u8 g_tether_origin[];
+extern s32 g_spray_max_count_base;
+extern f32 g_spray_count_scale __attribute__((sda));
+extern f32 g_spray_max_count_scale __attribute__((sda));
 extern f32 fast_vec_dist(void *a0, void *a1);
 extern f32 IntToFloat(s32 a0);
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
@@ -22,7 +22,7 @@ extern char *bouncing_debris_create(void *a0, void *a1, void *a2);
 void part_spray_height(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
-    f32 distance_scale = 60.0f / fast_vec_dist(D_L22_001B9C80, moby + 0x10);
+    f32 distance_scale = 60.0f / fast_vec_dist(g_tether_origin, moby + 0x10);
     f32 count;
     f32 step_size;
     f32 max_count;
@@ -33,8 +33,8 @@ void part_spray_height(u8 *moby)
     if (distance_scale > 2.2f)
         distance_scale = 2.7f;
     height = *(f32 *)(state + 0xA0);
-    count = distance_scale * distance_scale * height * D_L22_001B0A0C;
-    max_count = (f32)D_L22_001B2040 * D_L22_001B0A10;
+    count = distance_scale * distance_scale * height * g_spray_count_scale;
+    max_count = (f32)g_spray_max_count_base * g_spray_max_count_scale;
     step_size = height / count;
     if (count > max_count)
         count = max_count;

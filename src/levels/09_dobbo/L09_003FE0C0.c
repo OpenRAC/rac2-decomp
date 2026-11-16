@@ -10,7 +10,7 @@ extern int coll_process_hit(void *, int, void *, void *, float);
 extern void moby_transform_joint_point(char *, int, void *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void target_marker_draw(void *);
-extern unsigned char *D_L09_001C3EC0[];
+extern unsigned char *g_impact_l09_moby_table[];
 
 /* Unit of its own for -fno-gcse: with gcse, cprop carries the copy's destination into the
    ray call's argument and keeps it in a saved register (548 bytes).
@@ -60,11 +60,11 @@ int aim_update_at_target(unsigned char *moby, int register_overlay) {
         count = coll_process_hit(hit_point, 0, 0, 0, *(float *)(vars + 0x434) * 0.9f);
         if (count > 0) {
             for (i = 0; i < count; i++) {
-                if (D_L09_001C3EC0[i] != 0) {
-                    if (*(short *)(D_L09_001C3EC0[i] + 0xAA) == MOBY_CLASS_DECOY ||
-                        *(short *)(D_L09_001C3EC0[i] + 0xAA) == 0x76C /* moby class 1900 */ ||
-                        *(short *)(D_L09_001C3EC0[i] + 0xAA) == MOBY_CLASS_DARK_SHEEP) {
-                        hit = D_L09_001C3EC0[i];
+                if (g_impact_l09_moby_table[i] != 0) {
+                    if (*(short *)(g_impact_l09_moby_table[i] + 0xAA) == MOBY_CLASS_DECOY ||
+                        *(short *)(g_impact_l09_moby_table[i] + 0xAA) == 0x76C /* moby class 1900 */ ||
+                        *(short *)(g_impact_l09_moby_table[i] + 0xAA) == MOBY_CLASS_DARK_SHEEP) {
+                        hit = g_impact_l09_moby_table[i];
                         *(unsigned char **)(vars + 0x3AC) = hit;
                         *(int *)(vars + 0x44C) = *(short *)(hit + 0xAA);
                     }

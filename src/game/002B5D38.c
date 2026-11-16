@@ -11,7 +11,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 extern char g_collision_hit[];
-extern char D_001BAFB0[];
+extern char g_coll_hit_point[];
 
 /* Pushes the object out of a wall or floor it has moved into and returns 1 if it had to move it. */
 int coll_resolve_wall_floor(char *self, char *ctl)
@@ -40,7 +40,7 @@ int coll_resolve_wall_floor(char *self, char *ctl)
             if (*(float *)(g + 0x38) > V.f[2])
                 *(float *)(g + 0x38) = V.f[2];
         }
-        qcopy(&V, D_001BAFB0);
+        qcopy(&V, g_coll_hit_point);
         FastVecSub(self + 0x10, &V, &B);
         return 1;
     }

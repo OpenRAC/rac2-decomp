@@ -20,7 +20,7 @@ typedef struct {
     float f44;
 } OBJ_F3c007b59;
 
-void func_PAL_002BE040(OBJ_F3c007b59 *o)
+void part_update_pulsing_pal(OBJ_F3c007b59 *o)
 {
     float *p = (float *)((char *)o + 32);
     float f;

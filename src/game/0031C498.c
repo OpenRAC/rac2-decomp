@@ -5,7 +5,7 @@ extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_random_int_below(int);
-extern int D_001AFAFC SDATA(D_001AFAFC);
+extern int g_turret_random_range SDATA(D_001AFAFC);
 extern void part_spawn_spark_pairs(void *, int);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
@@ -47,15 +47,15 @@ void three_part_turret_update_parts(char *object)
         }
         /* Each snapshot is consumed by the immediately following opaque call;
          * no C memory access crosses the non-clobbering transfer. */
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x270) + 0x10);
             part_spawn_spark_pairs(axis, 1);
         }
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x274) + 0x10);
             part_spawn_spark_pairs(axis, 1);
         }
-        if (math_random_int_below(D_001AFAFC) == 1) {
+        if (math_random_int_below(g_turret_random_range) == 1) {
             qcopy_nc(axis, *(char **)(state + 0x278) + 0x10);
             part_spawn_spark_pairs(axis, 1);
         }

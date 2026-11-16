@@ -53,7 +53,7 @@ extern ClassRecord g_weapon_table[];
 
 extern unsigned char g_item_slot_to_record[];
 
-extern int D_00139868[];
+extern int g_help_entry_state[];
 
 extern int menu_seek_chain_entry(int, int);
 
@@ -76,7 +76,7 @@ int help_start_entry(int helpId)
         else
             result = menu_seek_chain_entry(helpId, 2);
         if (result != 0)
-            D_00139868[helpId] = 0;
+            g_help_entry_state[helpId] = 0;
     }
     return result;
 }

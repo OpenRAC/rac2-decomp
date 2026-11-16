@@ -13,9 +13,9 @@ extern void FastVecScale(char *, char *, float);
 extern void vec_scale_to_length(float *, float *, float);
 
 typedef struct { char pad[0x20]; int buffer; char pad24[0xAC]; int saved; } CaptureState;
-extern int D_001B1598 MACRO_ADDR __attribute__((sda));
+extern int g_frame_counter_3 MACRO_ADDR __attribute__((sda));
 extern int g_screen_height MACRO_ADDR __attribute__((sda));
-extern int D_001A72D4 __attribute__((sda));
+extern int g_vram_frame_base __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(int);
 extern void FlushCache(int);
 
@@ -52,16 +52,16 @@ typedef unsigned char BatchA_A15_u8;
 
 typedef unsigned int BatchA_A15_u32;
 
-extern BatchA_A15_u8 D_L15_001FF640[];
+extern BatchA_A15_u8 g_menu_block_fields[];
 
 /* Frozen Batch A A10-twin-base-32; acknowledged claim b588059f8808a6607867ee41ec367b24cfb85d2f4cc33273a4392842e34233d5. */
 typedef unsigned char BatchA_A10_u8;
 
 typedef unsigned int BatchA_A10_u32;
 
-extern BatchA_A10_u8 D_L03_001FF8C0[];
+extern BatchA_A10_u8 g_menu_block_fields_a[];
 
-extern BatchA_A10_u8 D_L03_001FFAC0[];
+extern BatchA_A10_u8 g_menu_block_fields_b[];
 
 extern char *func_00288FB8_1 ();
 
@@ -73,7 +73,7 @@ typedef int BatchA_A12_s32;
 
 typedef struct { BatchA_A12_s32 a; BatchA_A12_s32 b; } BatchA_A12_BatchA24;
 
-extern BatchA_A12_BatchA24 D_L08_001FF980;
+extern BatchA_A12_BatchA24 g_pause_menu_batch;
 
 /*
  * Disassembled at 0x002cd220
@@ -147,9 +147,9 @@ extern void FastVecSub(float *out, float *a, float *b);
 extern float vec_length_xy(float *v);
 extern float mat_fast_helper_a(float y, float x);
 
-extern int D_001F2A30;
+extern int g_saved_menu_value;
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void popup_set_box_value(void *, int);
 
 extern char g_pause_menu_state[];
@@ -157,12 +157,12 @@ extern char g_pause_menu_state[];
 /* func_002C9C60 is matched in 002C9C60.c (built with -g). */
 
 extern int g_current_game_mode __attribute__((sda));
-extern int D_001A7A08 __attribute__((sda));
-extern char D_00259918[];
-extern char D_00259AF8[];
-extern char D_00259AA8[];
+extern int g_challenge_score_words __attribute__((sda));
+extern char g_pause_link_first[];
+extern char g_pause_link_third[];
+extern char g_pause_link_second[];
 extern int g_current_map_index __attribute__((sda));
-extern int D_0025B5F8;
+extern int g_pause_state_word;
 extern void snd_send_cmd22(int);
 extern void music_Pause(int);
 extern int snd_Pump(void);
@@ -207,14 +207,14 @@ extern int sceGsExecLoadImage(GsLoadImage2C9E60 *, void *);
 extern int gfx_wait_paths_idle(int, int);
 
 extern void menu_enter_pause_state(void);
-extern unsigned int D_L00_001FEC40[2];
+extern unsigned int g_pause_input_state[2];
 
 extern void gfx_set_clear_color_packet(int, int, int, int);
 
 /* func_002CAB00 is defined in 002CAB00-g8.c. */
 
-extern short D_001A63AC;
-extern int D_001C51D0;
+extern short g_sequence_active_flag;
+extern int g_selected_map_index;
 extern int g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern int request_end_slot(int, int);
@@ -236,9 +236,9 @@ typedef struct {
 } GameState_1F2840;
 
 extern int menu_send_request(int, char *);
-extern char D_0025BA90[];
+extern char g_menu_request_screen_data[];
 
-extern short D_0018A000[];
+extern short g_menu_command_flag[];
 extern void level_set_dependent_value(void);
 
 typedef struct {
@@ -261,18 +261,18 @@ extern char g_pad_state[];
  * -G0 compiler addresses them absolutely, and $gp-relative only in delay slots. */
 typedef struct { char pad[0x1C4]; int flags; } InputState_2CCF68;
 typedef struct { short x, kind; int a, b; } MenuEntry_2CCF68;
-extern char D_00259148[], D_00259198[], D_002591E8[], D_00259238[], D_00259288[], D_002592D8[];
+extern char g_menu_widget_a[], g_menu_widget_b[], g_menu_widget_c[], g_menu_widget_d[], g_menu_widget_e[], g_menu_widget_f[];
 extern int UpdateMenuListActions(char *);
-extern int D_001A8B84 __attribute__((sda));
-extern int D_001B1680 __attribute__((sda));
+extern int g_frontend_done_flag __attribute__((sda));
+extern int g_small_data_value __attribute__((sda));
 typedef struct { unsigned char value; } ResidentFlag_2CCF68;
-extern ResidentFlag_2CCF68 D_001A7BC9 __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCA __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCB __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCC __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCE __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_a __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_b __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_c __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_d __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_e __attribute__((sda));
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 
 extern int func_0029C168(int);
 
@@ -312,8 +312,8 @@ typedef struct {
     int flags;
 } ToggleState_2CD4E0;
 
-extern MenuObject_2CD4E0 D_00259C78;
-extern ToggleState_2CD4E0 *D_00259C44;
+extern MenuObject_2CD4E0 g_menu_cursor_object;
+extern ToggleState_2CD4E0 *g_menu_flag_target;
 extern int func_0029C248(int first, void *second);
 extern int menu_get_setting_value(void);
 
@@ -642,13 +642,13 @@ void path_sample_position(char *path, int clamp, float *out, float *angles, int 
 
 /* Returns a saved value that other menu code reads. */
 int menu_get_saved_value(void) {
-    return D_001F2A30;
+    return g_saved_menu_value;
 }
 
 /* A15-struct-pad-20 freshly exact-verified under family reservation */
 /* Clears two fields in a fixed data block. */
 void menu_clear_block_fields(void) {
-    BatchA_A15_u8 *p = D_L15_001FF640;
+    BatchA_A15_u8 *p = g_menu_block_fields;
     *(BatchA_A15_u32 *)(p + 0xF0) = 0;
     *(BatchA_A15_u32 *)(p + 0x1F0) = 0;
 }
@@ -656,8 +656,8 @@ void menu_clear_block_fields(void) {
 /* A10-twin-base-32 freshly exact-verified under family reservation */
 /* Sets two fields in a fixed data block. */
 void menu_init_block_fields(void) {
-    BatchA_A10_u8 *p = D_L03_001FF8C0;
-    *(BatchA_A10_u32 *)(p + 0xF0) = (BatchA_A10_u32)D_L03_001FFAC0;
+    BatchA_A10_u8 *p = g_menu_block_fields_a;
+    *(BatchA_A10_u32 *)(p + 0xF0) = (BatchA_A10_u32)g_menu_block_fields_b;
     *(BatchA_A10_u32 *)(p + 0x1F0) = 1;
 }
 
@@ -683,15 +683,15 @@ void menu_ring_list_step_forward(s32 *ring) {
 
 /* Tells the sound or menu system to turn off, then returns 0. */
 int menu_disable_subsystem(void) {
-    if (D_001A8CFC[0] != 0)
-        popup_set_box_value(D_001A8CFC[0] + 0x3CAA8, 0);
+    if (g_resident_data_base[0] != 0)
+        popup_set_box_value(g_resident_data_base[0] + 0x3CAA8, 0);
     return 0;
 }
 
 /* Tells the sound or menu system to turn on, then returns 0. */
 int menu_enable_subsystem(void) {
-    if (D_001A8CFC[0] != 0)
-        popup_set_box_value(D_001A8CFC[0] + 0x3CAA8, 1);
+    if (g_resident_data_base[0] != 0)
+        popup_set_box_value(g_resident_data_base[0] + 0x3CAA8, 1);
     return 0;
 }
 
@@ -735,9 +735,9 @@ void menu_init_pause_state(int mode)
     if (!g_current_game_mode) ConfigureMenuChoiceList();
     ((State_2C9CF8 *)g_pause_menu_state)->f144 = 0;
     ((State_2C9CF8 *)g_pause_menu_state)->f148 = 0;
-    ((State_2C9CF8 *)g_pause_menu_state)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)g_pause_menu_state)->f108 ? 1 : 0;
-    ((Links_2C9CF8 *)D_00259918)->next = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? D_00259AF8 : D_00259AA8;
-    ((Links_2C9CF8 *)D_00259AA8)->previous = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? D_00259AF8 : D_00259918;
+    ((State_2C9CF8 *)g_pause_menu_state)->fE8 = (g_challenge_score_words & 0xFFFF0000) || ((State_2C9CF8 *)g_pause_menu_state)->f108 ? 1 : 0;
+    ((Links_2C9CF8 *)g_pause_link_first)->next = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? g_pause_link_third : g_pause_link_second;
+    ((Links_2C9CF8 *)g_pause_link_second)->previous = ((State_2C9CF8 *)g_pause_menu_state)->fE8 ? g_pause_link_third : g_pause_link_first;
     ((State_2C9CF8 *)g_pause_menu_state)->f8 = ((State_2C9CF8 *)g_pause_menu_state)->f104 ? (int)((State_2C9CF8 *)g_pause_menu_state)->f104 : mode;
     ((State_2C9CF8 *)g_pause_menu_state)->f1C = 0;
     ((State_2C9CF8 *)g_pause_menu_state)->f20 = 0;
@@ -748,7 +748,7 @@ void menu_init_pause_state(int mode)
     if (mode != 6) {
         map_set_current_and_refresh(g_current_map_index);
         menu_update_entry_states();
-        D_0025B5F8 = 0;
+        g_pause_state_word = 0;
         menu_update_unlock_entries();
     }
     ((State_2C9CF8 *)g_pause_menu_state)->f150 = 0;
@@ -767,10 +767,10 @@ void menu_restore_saved_screen_image(int from_end)
     *(int *)(state + 0xD0) = from_end != 0 ? 2 : 1;
     gfx_wait_for_dma_status_bits(1);
     sceGsSyncV(0);
-    D_001B1598++;
+    g_frame_counter_3++;
     remaining = g_screen_height * 0x600;
     src_ptr = *(char **)(state + 0x20);
-    dest_addr = D_001A72D4;
+    dest_addr = g_vram_frame_base;
     if (from_end != 0)
         dest_addr = 0x3FB000 - remaining;
     for (; remaining >= 0; remaining -= 0x4000) {
@@ -815,8 +815,8 @@ typedef struct {
 #define PAUSE ((PauseState *)D_001F2840)
 extern PauseCardState g_memcard_state;
 extern int g_save_menu_flags __attribute__((sda));
-extern int D_001B1684 __attribute__((sda));
-extern s32 D_001B18A4[] __attribute__((sda));
+extern int g_load_progress_counter __attribute__((sda));
+extern s32 g_weapon_wheel_slot_seven[] __attribute__((sda));
 extern void process_unlock_code_input(void);
 extern void menu_enter_pause_mode_two(void);
 extern void menu_enter_pause_mode_three(void);
@@ -836,7 +836,7 @@ void menu_update_pause(void)
     if (g_memcard_state.state < 3 && g_memcard_state.err < 0) ++PAUSE->card_error_frames;
     else PAUSE->card_error_frames = 0;
     process_unlock_code_input();
-    if ((g_save_menu_flags & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
+    if ((g_save_menu_flags & 1) && PAUSE->mode == 4 && g_load_progress_counter >= 8) {
         if (!request_begin_slot(4, 1, 1, PAUSE->arg, 0)) return;
     }
     switch (PAUSE->mode) {
@@ -847,8 +847,8 @@ void menu_update_pause(void)
     case 5:
         menu_handle_pause_fade_timer();
         UpdateSoundVoices();
-        D_0018A000[0] = 10;
-        D_001B18A4[1] = 0;
+        g_menu_command_flag[0] = 10;
+        g_weapon_wheel_slot_seven[1] = 0;
         return;
     }
     moby_update_visible_objects();
@@ -861,14 +861,14 @@ void menu_update_pause(void)
 void menu_enter_pause_mode_two(void)
 {
     menu_enter_pause_state();
-    D_L00_001FEC40[0] = 2;
-    D_L00_001FEC40[1] = 0;
+    g_pause_input_state[0] = 2;
+    g_pause_input_state[1] = 0;
 }
 
 /* A12-struct-2field-24 freshly exact-verified under family reservation */
 /* Switches the menu to mode 3. */
 void menu_enter_pause_mode_three(void) {
-    BatchA_A12_BatchA24 *p = &D_L08_001FF980;
+    BatchA_A12_BatchA24 *p = &g_pause_menu_batch;
     p->a = 3;
     p->b = 0;
 }
@@ -897,10 +897,10 @@ void menu_handle_pause_fade_timer(void)
         ((GameState_1F2840 *)g_pause_menu_state)->count = frames_left - 1;
     if (((GameState_1F2840 *)g_pause_menu_state)->count != 0)
         return;
-    if (D_001A63AC != 0)
+    if (g_sequence_active_flag != 0)
         return;
     if (((GameState_1F2840 *)g_pause_menu_state)->mode == 2) {
-        request_end_slot(0, D_001C51D0);
+        request_end_slot(0, g_selected_map_index);
     } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 3) {
         request_begin_slot(1, 1, 0, ((GameState_1F2840 *)g_pause_menu_state)->fieldF4, 0);
     } else if (((GameState_1F2840 *)g_pause_menu_state)->mode == 4) {
@@ -945,7 +945,7 @@ int menu_handle_step_simple(int mode)
     int result = 0;
     switch (mode) {
     case 0: result = 1; break;
-    case 1: result = menu_send_request(3, D_0025BA90); break;
+    case 1: result = menu_send_request(3, g_menu_request_screen_data); break;
     }
     return result;
 }
@@ -955,8 +955,8 @@ int menu_handle_step_with_reset(int mode)
 {
     int result = 0;
     switch (mode) {
-    case 0: D_0018A000[0] = 10; result = 1; break;
-    case 1: result = menu_send_request(3, D_0025BA90); break;
+    case 0: g_menu_command_flag[0] = 10; result = 1; break;
+    case 1: result = menu_send_request(3, g_menu_request_screen_data); break;
     case 2: level_set_dependent_value(); result = 1; break;
     }
     return result;
@@ -1018,36 +1018,36 @@ int menu_handle_entry_input(char *obj)
     MenuEntry_2CCF68 *entry;
 
     if (*(char **)(*(char **)(g_pause_menu_state + 0x14) + 0xE8) != obj) goto fallback;
-    if ((((InputState_2CCF68 *)g_pad_state)->flags & ~0x40) != 0 && obj == D_00259148) return 0;
-    old_selection = D_001B1680;
-    if (D_001A8B84) goto fallback;
+    if ((((InputState_2CCF68 *)g_pad_state)->flags & ~0x40) != 0 && obj == g_menu_widget_a) return 0;
+    old_selection = g_small_data_value;
+    if (g_frontend_done_flag) goto fallback;
     entry = (MenuEntry_2CCF68 *)(*(int *)(obj + 0x40) * 12 + *(int *)(obj + 0x34));
     kind = entry->kind;
     if (kind != 3) goto fallback;
-    if (obj == D_00259148) {
-        D_001A8B84 = 1;
-        D_001B1680 = 1;
+    if (obj == g_menu_widget_a) {
+        g_frontend_done_flag = 1;
+        g_small_data_value = 1;
         return 0;
     }
     if (((InputState_2CCF68 *)g_pad_state)->flags & 0x40) {
-        if (obj == D_00259198) {
-            D_001A8B84 = D_001A7BC9.value != 0;
-            D_001B1680 = 1;
-        } else if (obj == D_002591E8) {
-            D_001A8B84 = D_001A7BCA.value != 0;
-            D_001B1680 = 2;
-        } else if (obj == D_00259238) {
-            D_001A8B84 = D_001A7BCB.value != 0;
-            D_001B1680 = 3;
-        } else if (obj == D_00259288) {
-            D_001A8B84 = D_001A7BCC.value != 0;
-            D_001B1680 = 4;
-        } else if (obj == D_002592D8) {
-            D_001A8B84 = D_001A7BCE.value != 0;
-            D_001B1680 = 6;
+        if (obj == g_menu_widget_b) {
+            g_frontend_done_flag = g_unlock_flag_a.value != 0;
+            g_small_data_value = 1;
+        } else if (obj == g_menu_widget_c) {
+            g_frontend_done_flag = g_unlock_flag_b.value != 0;
+            g_small_data_value = 2;
+        } else if (obj == g_menu_widget_d) {
+            g_frontend_done_flag = g_unlock_flag_c.value != 0;
+            g_small_data_value = 3;
+        } else if (obj == g_menu_widget_e) {
+            g_frontend_done_flag = g_unlock_flag_d.value != 0;
+            g_small_data_value = 4;
+        } else if (obj == g_menu_widget_f) {
+            g_frontend_done_flag = g_unlock_flag_e.value != 0;
+            g_small_data_value = 6;
         }
-        if (!D_001A8B84)
-            D_001B1680 = old_selection;
+        if (!g_frontend_done_flag)
+            g_small_data_value = old_selection;
         return 0;
     }
 fallback:
@@ -1057,7 +1057,7 @@ fallback:
 /* Handles menu button input and picks the right handler for the current screen. Plays a sound if input was used. */
 int menu_handle_button_input(void)
 {
-    unsigned int flags = D_00138344;
+    unsigned int flags = g_menu_input_flags;
     int handled = 0;
 
     if (flags & 0x910) {
@@ -1106,7 +1106,7 @@ int menu_update_input_flags(void)
     int scratch[4];
     int first = menu_get_setting_value();
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
 
     if (flags & 0x10) {
         int value = *(int *)(((CallbackState_2CC490 *)g_pause_menu_state)->source + 0xE0);
@@ -1127,16 +1127,16 @@ return_value:
         func_0029C248(flags, scratch);
     }
 
-    if (D_001A8CFC[0] != 0) {
+    if (g_resident_data_base[0] != 0) {
         int second = menu_get_setting_value();
-        if (first == second && D_001A63AC == 0 &&
-            ((D_00259C78.handle == second && D_00259C78.state == 2) ||
-             (D_00259C78.last == second && D_00259C78.state == 4))) {
-            D_00259C44->flags &= -5;
+        if (first == second && g_sequence_active_flag == 0 &&
+            ((g_menu_cursor_object.handle == second && g_menu_cursor_object.state == 2) ||
+             (g_menu_cursor_object.last == second && g_menu_cursor_object.state == 4))) {
+            g_menu_flag_target->flags &= -5;
         } else {
-            D_00259C44->flags |= 4;
+            g_menu_flag_target->flags |= 4;
         }
-        D_00259C78.current = second;
+        g_menu_cursor_object.current = second;
     }
     return result;
 }

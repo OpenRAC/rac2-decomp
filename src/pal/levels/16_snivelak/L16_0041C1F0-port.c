@@ -19,7 +19,7 @@ extern f32 func_00313F98(f32, f32);
 extern f32 func_00313F38(f32, f32);
 extern void func_002D4CC8(char *, s32, s32, s32, char *, char *, char *, s32, f32, f32);
 extern void func_003140C0(char *, f32, f32);
-extern char D_001B9B00[];
+extern char g_turret_debris_vectors[];
 
 /* func_L16_00416EC8 uses its dedicated quadword-copy and G16 profile. */
 
@@ -28,7 +28,7 @@ extern char D_001B9B00[];
 /* func_L16_00417210 is defined in L16_00417210-g8.c. */
 
 /* the model index the object's data block points at */
-s32 func_PAL_L16_0041C9E8(char *arg0) {
+s32 turret_get_model_index_pal(char *arg0) {
     char *p = *(char **)(arg0 + 0x68);
     return *(s32 *)(p + 0x60);
 }

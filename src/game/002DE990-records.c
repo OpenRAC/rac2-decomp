@@ -30,22 +30,22 @@ extern int g_equipment_bits MACRO_ADDR;
 extern int D_001A7AF0_gp SDATA(D_001A7AF0);
 extern unsigned char g_subtitle_history[];
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern int D_00139868[];
+extern int g_help_entry_state[];
 extern RecordDE990 g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern int g_item_ammo_counts[];
-extern unsigned char D_001A7A60[] MACRO_ADDR;
-extern unsigned char D_001A7A40[] MACRO_ADDR;
-extern unsigned char D_001A7A80[] MACRO_ADDR;
-extern unsigned char D_001A7AB8[] MACRO_ADDR;
-extern unsigned char D_0019B278[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
+extern unsigned char g_unlocked_item_flags[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
+extern unsigned char g_movie_channel_flags[] MACRO_ADDR;
+extern unsigned char g_level_progress_flags[];
+extern unsigned char g_game_flag_table[];
 extern int g_weapon_menu_slots[] MACRO_ADDR;
-extern unsigned char D_001A7B94[] MACRO_ADDR;
-extern unsigned char D_001A7B08 MACRO_ADDR;
+extern unsigned char g_subtitles_option[] MACRO_ADDR;
+extern unsigned char g_status_flag_b MACRO_ADDR;
 extern unsigned char g_hero_state[];
 extern unsigned char g_memcard_state[];
-extern char D_001F2A40[];
+extern char g_save_packet_scratch[];
 extern void mem_copy_aligned(void *, void *, int);
 extern void mem_clear(void *, int, int);
 extern void save_load_game_data_reset_menu(void);
@@ -84,12 +84,12 @@ void level_restart_keep_progress(int selected)
     savedState = *gameState;
     for (j = 0; j < 56; j++) {
         saved.flags[j] = g_item_owned_flags[j];
-        saved.words[j] = D_00139868[j];
+        saved.words[j] = g_help_entry_state[j];
         *(saved.records + j) = g_weapon_table[j];
         saved.slots[j] = g_item_slot_to_record[j];
     }
-    for (i = 0; i < 32; i++) saved32[i] = D_001A7A60[i];
-    for (i = 0; i < 12; i++) saved12[i] = D_001A7A40[i];
+    for (i = 0; i < 32; i++) saved32[i] = g_item_enabled_flags[i];
+    for (i = 0; i < 12; i++) saved12[i] = g_unlocked_item_flags[i];
     saved.flags[51] = 0;
     saved.flags[36] = 0;
     saved.flags[20] = 0;
@@ -105,16 +105,16 @@ void level_restart_keep_progress(int selected)
     saved.flags[4] = 0;
     saved.flags[19] = 0;
     saved.flags[8] = 0;
-    mem_copy_aligned(savedBlock, D_0019B278, 112);
-    block = D_001395B8;
+    mem_copy_aligned(savedBlock, g_level_progress_flags, 112);
+    block = g_game_flag_table;
     control = block[0x90];
-    for (i = 0; i < 56; i++) saved56[i] = D_001A7A80[i];
+    for (i = 0; i < 56; i++) saved56[i] = g_movie_seen_flags[i];
     save_load_game_data_reset_menu();
-    mem_copy_aligned(D_0019B278, savedBlock, 112);
-    block = D_001395B8;
+    mem_copy_aligned(g_level_progress_flags, savedBlock, 112);
+    block = g_game_flag_table;
     block[0x90] = control;
-    mem_clear(D_001A7AB8, 0, 56);
-    for (i = 0; i < 56; i++) D_001A7A80[i] = saved56[i];
+    mem_clear(g_movie_channel_flags, 0, 56);
+    for (i = 0; i < 56; i++) g_movie_seen_flags[i] = saved56[i];
     { int m; for (m = 7; m >= 0; m--) g_weapon_menu_slots[m] = 0; }
     g_player_bolts = savedState;
     g_weapon_menu_slots[0] = 30;
@@ -123,8 +123,8 @@ void level_restart_keep_progress(int selected)
     g_player_bolts.f24 = 0;
     g_player_bolts.f18 = 0;
     g_player_bolts.f1c = 0;
-    D_001A7B94[0] = 0;
-    D_001A7B94[1] = 0;
+    g_subtitles_option[0] = 0;
+    g_subtitles_option[1] = 0;
     if (hadCard) {
         card = g_subtitle_history;
         if (*(unsigned short *)(card + 0x84) == 0)
@@ -132,17 +132,17 @@ void level_restart_keep_progress(int selected)
     }
     for (k = 0; k < 56; k++) {
         g_item_owned_flags[k] = saved.flags[k];
-        D_00139868[k] = saved.words[k];
+        g_help_entry_state[k] = saved.words[k];
         g_weapon_table[k] = *(saved.records + k);
         g_item_slot_to_record[k] = saved.slots[k];
         g_item_ammo_counts[k] = g_weapon_table[g_item_slot_to_record[k]].f.cost;
     }
-    for (i = 0; i < 32; i++) D_001A7A60[i] = saved32[i];
-    for (i = 0; i < 12; i++) D_001A7A40[i] = saved12[i];
-    D_001A7B94[1] = 0;
-    D_001A7B94[0] = 0;
+    for (i = 0; i < 32; i++) g_item_enabled_flags[i] = saved32[i];
+    for (i = 0; i < 12; i++) g_unlocked_item_flags[i] = saved12[i];
+    g_subtitles_option[1] = 0;
+    g_subtitles_option[0] = 0;
     menu_seek_chain_entry(10, 3);
-    if (D_001A7B08) {
+    if (g_status_flag_b) {
         if (g_weapon_table[g_item_slot_to_record[0x10]].f.kind == 0)
             menu_seek_chain_entry(16, 2);
         else
@@ -150,7 +150,7 @@ void level_restart_keep_progress(int selected)
         if (g_weapon_table[g_item_slot_to_record[0x10]].f.kind == 0) {
             help_copy_record_at_depth(&first, 16, 2);
             help_copy_record_at_depth(&second, 16, 0);
-            words = D_00139868;
+            words = g_help_entry_state;
             words[16] = (float)first.f.value * (float)words[16] / (float)second.f.value;
         }
     }
@@ -161,8 +161,8 @@ void level_restart_keep_progress(int selected)
         state = g_memcard_state;
         *(short *)(state + 0x18) = selected;
         *(int *)(state + selected * 28 + 0x30) = 0;
-        save_build_packet(D_001F2A40);
-        *(char **)(state + 0x174) = D_001F2A40;
+        save_build_packet(g_save_packet_scratch);
+        *(char **)(state + 0x174) = g_save_packet_scratch;
         *(int *)(state + 0x148) = 0;
         if (*(int *)(state + 0x164) < 0) {
             *(int *)(state + 0x168) = 0;

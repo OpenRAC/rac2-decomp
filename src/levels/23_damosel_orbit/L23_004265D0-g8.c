@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
-extern float D_L23_001B38E8[] __attribute__((sda));
-extern int D_L23_001B3900[] __attribute__((sda));
+extern float g_slot_effect_scale_table[] __attribute__((sda));
+extern int g_slot_effect_alpha_table[] __attribute__((sda));
 extern int g_slot_effect_in_use[] __attribute__((sda));
 extern float g_active_slot_effect_count __attribute__((sda));
 extern char g_camera_l23_position[];
@@ -18,8 +18,8 @@ void slot_effect_update(char *object)
     char *state = *(char **)(object + 0x68);
 
     if (!*(unsigned char *)(object + 0x20)) {
-        D_L23_001B38E8[*(int *)(state + 0x3C)] = 0.01f;
-        D_L23_001B3900[*(int *)(state + 0x3C)] = 0xFF;
+        g_slot_effect_scale_table[*(int *)(state + 0x3C)] = 0.01f;
+        g_slot_effect_alpha_table[*(int *)(state + 0x3C)] = 0xFF;
         *(unsigned char *)(object + 0x20) = 1;
         if (fast_vec_dist(object + 0x10, g_camera_l23_position) > 200.0f)
             *(float *)(state + 0x40) = 4.0f;

@@ -21,11 +21,11 @@ extern void projectile_damage_nearby_on_hit(void *,void *,void *,int);
 extern char *SpawnExplosion(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
 typedef struct { char pad0[10]; union { short lifetime; unsigned char bytes[2]; } age; } Particle9C58;
 typedef struct { char pad0[4]; int type; char pad8[2]; unsigned char alpha,life; } Payload9C58;
-extern char D_L00_001A8F20[] MACRO_ADDR;
-extern char D_L00_001BF220[] MACRO_ADDR;
+extern char g_default_vector[] MACRO_ADDR;
+extern char g_hero_l00_position[] MACRO_ADDR;
 typedef struct { char pad0[0x18]; char *hit; char pad1C[0x14]; float position[4],normal[4]; } Collision9C58;
 extern Collision9C58 g_collision_result;
-extern char D_L00_001B9000[];
+extern char g_scratch_vec_pair[];
 typedef struct {
  char pad0[0x1E0]; short control_state; char pad1E2[0x1230-0x1E2];
  int control_mask; char pad1234[0x1248-0x1234]; int state;
@@ -38,7 +38,7 @@ typedef struct {
 } Pad9C58;
 extern Pad9C58 g_pad_state;
 extern char g_sound_state[];
-extern int D_L00_001ADB2C __attribute__((sda));
+extern int g_active_tether_object __attribute__((sda));
 /* Updates the Hoverbomb projectile: it flies, bounces off walls, can be steered with the pad, and explodes when released or out of bounds. */
 void hoverbomb_projectile_update(char *moby)
 {
@@ -60,7 +60,7 @@ void hoverbomb_projectile_update(char *moby)
    LerpVector4(a,old,b,IntToFloat(i)*third);
    n=math_random_int_below(6);if(math_random_int_below(2))n=-n;
    t=H(vars,0x2C)/IntToFloat(50)*70000.0f+10000.0f;
-   { Particle9C58 *particle=(Particle9C58 *)SpawnSpinningSparkParticle(a,0.025f,one,one,n,D_L00_001A8F20,t,0x80808080,1);
+   { Particle9C58 *particle=(Particle9C58 *)SpawnSpinningSparkParticle(a,0.025f,one,one,n,g_default_vector,t,0x80808080,1);
    if(particle) {
      Payload9C58 *payload;
      particle->age.lifetime=life;
@@ -73,7 +73,7 @@ void hoverbomb_projectile_update(char *moby)
  if(H(vars,0x14)<7) {scale=IntToFloat(H(vars,0x14))/IntToFloat(7);scale*=0.45f;
  qcopy(a,moby+0x10);
  FastVecScale(b,direction,F(vars,0x20));FastVecSub(c,moby+0x10,b);
- if(CollLine(a,c,18,moby,0))FastVecAdd(moby+0x10,D_L00_001BF220,b);
+ if(CollLine(a,c,18,moby,0))FastVecAdd(moby+0x10,g_hero_l00_position,b);
  }
  F(vars,0x24)=FastAddRotations(F(vars,0x24),0.025f);
  FastVecScale(a,direction,F(vars,0x28));FastVecSub(moby+0x10,moby+0x10,a);
@@ -109,8 +109,8 @@ void hoverbomb_projectile_update(char *moby)
    B(moby,0x20)=1;prior=H(vars,0x16);
    if(FastDecTimer(vars+0x16)) {
      snd_stop_voice(I(vars,0x40));PlayMobySound(1,0,moby);
-     if(!prior)SpawnExplosion(moby+0x10,1,40,20,30,40,50,1,1,1,0,D_L00_001ADB2C,1.5f,20.0f);
-     else SpawnExplosion(moby+0x10,1,20,15,30,15,30,1,1,0,0,D_L00_001ADB2C,0.6f,20.0f);
+     if(!prior)SpawnExplosion(moby+0x10,1,40,20,30,40,50,1,1,1,0,g_active_tether_object,1.5f,20.0f);
+     else SpawnExplosion(moby+0x10,1,20,15,30,15,30,1,1,0,0,g_active_tether_object,0.6f,20.0f);
      projectile_damage_nearby_on_hit(moby,vars,moby+0x10,1);goto destroy;
    }
  }
@@ -122,8 +122,8 @@ steer:
    if(g_pad_state.axis_x!=0 || g_pad_state.axis_y!=0) {
      float speed2=FastVecLength(vars);
      if(speed2!=0) {
-       FastVecScale(a,D_L00_001B9000,-g_pad_state.axis_x*0.004166667f);FastVecAdd(vars,vars,a);
-       FastVecScale(a,D_L00_001B9000+16,-g_pad_state.axis_y*0.00083333341f);FastVecAdd(vars,vars,a);
+       FastVecScale(a,g_scratch_vec_pair,-g_pad_state.axis_x*0.004166667f);FastVecAdd(vars,vars,a);
+       FastVecScale(a,g_scratch_vec_pair+16,-g_pad_state.axis_y*0.00083333341f);FastVecAdd(vars,vars,a);
        vec_scale_to_length(vars,vars,speed2);
      }
    }

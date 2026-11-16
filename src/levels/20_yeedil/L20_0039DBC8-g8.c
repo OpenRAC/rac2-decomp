@@ -22,11 +22,11 @@ typedef struct YeedilObject {
     char reservedBC[0x100 - 0xBC];
 } YeedilObject;
 
-extern unsigned short *D_L20_001FBB20[];
+extern unsigned short *g_group_l20_id_lists[];
 
-extern int D_L20_001B2FB8;
+extern int g_group_count;
 
-extern YeedilObject *D_L20_001B2F9C;
+extern YeedilObject *g_group_l20_member_table;
 
 extern struct {
     char reserved00[0x80];
@@ -41,20 +41,20 @@ extern float mat_fast_helper_a(float, float);
    sets it up at pos; returns it, or 0 if there is none or the setup fails. */
 YeedilObject *trooper_spawn_from_free_slot(void *parent, int group, const float *pos) {
     YeedilObject *found = 0;
-    unsigned short *p = D_L20_001FBB20[group];
+    unsigned short *p = g_group_l20_id_lists[group];
     YeedilObject *obj;
 
     if ((group & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < group) {
+    if (g_group_count < group) {
         goto end;
     }
     if (p == 0) {
         goto end;
     }
     for (;;) {
-        obj = &D_L20_001B2F9C[*p & 0x7FFF];
+        obj = &g_group_l20_member_table[*p & 0x7FFF];
 
         if (obj == 0) {
             goto end;
@@ -68,7 +68,7 @@ YeedilObject *trooper_spawn_from_free_slot(void *parent, int group, const float 
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < group) {
+        if (g_group_count < group) {
             goto end;
         }
         if (p == 0) {
@@ -77,7 +77,7 @@ YeedilObject *trooper_spawn_from_free_slot(void *parent, int group, const float 
         if ((short)p[-1] >= 0) {
             continue;
         }
-        if (p == D_L20_001FBB20[group]) {
+        if (p == g_group_l20_id_lists[group]) {
             continue;
         }
         break;

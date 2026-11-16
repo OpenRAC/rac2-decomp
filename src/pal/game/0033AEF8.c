@@ -39,8 +39,8 @@ extern Float2_0033B218 ref_L00_0042EC50_01;
 extern Float2_0033B218 ref_L00_0042EC50_02;
 
 extern int g_game_time __attribute__((sda));
-extern int D_001C51D0;
-extern unsigned int D_001A7390 __attribute__((sda));
+extern int g_selected_map_index;
+extern unsigned int g_frame_counter __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern Statistics_0033B218 g_progress_statistics;
 
@@ -63,11 +63,11 @@ int func_PAL_0033B218(char *a0)
     object_set_first_float4(a0 + 0x138, g0.x + (*(float **)(a0 + 4))[0], g0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(a0 + 0x190, g1.x + (*(float **)(a0 + 4))[0], g1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(a0 + 0x1E8, g2.x + (*(float **)(a0 + 4))[0], g2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    text_format_location_name(a0 + 0x298, D_001C51D0);
+    text_format_location_name(a0 + 0x298, g_selected_map_index);
     if (g_game_time >= 11) {
         if (g_progress_statistics.count < 0xffff) g_progress_statistics.count++;
     }
-    if (((int)D_001A7390 * 5 + 2) / 6 > g_progress_statistics.maximum) g_progress_statistics.maximum = ((int)D_001A7390 * 5 + 2) / 6;
+    if (((int)g_frame_counter * 5 + 2) / 6 > g_progress_statistics.maximum) g_progress_statistics.maximum = ((int)g_frame_counter * 5 + 2) / 6;
     g_progress_statistics.levels = (g_progress_statistics.levels | (1u << g_current_map_index)) | 0x80000000u;
     return 0;
 }
@@ -94,24 +94,24 @@ void func_PAL_0033B4B8(char *a0)
 typedef int s32;
 typedef unsigned char u8;
 
-void func_PAL_0033B688(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
+void popup_set_flag_on_pal(u8 *a0) {s32 v=1;*(s32 *)(a0+0x330)=v;}
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
-void func_PAL_0033B698(unsigned char *owner, int value)
+void popup_set_box_value_pal(unsigned char *owner, int value)
 {
     prompt_bar_set_texts_enabled(owner + 8, value);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_0033B6B8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
+void popup_set_row_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
 
 extern char *func_00288FB8_3(int);
 extern void prompt_bar_set_texts(char *, int, int, int);
 extern void prompt_bar_set_spacing(char *, float);
 
 /* Calls a one-argument helper three times with three fixed small integers, passes the three results and a pointer plus 8 to a four-argument helper, calls a two-argument helper with the same address and 0.0f, then clears the word at offset 764. */
-void func_PAL_0033B6C0(char *p)
+void popup_init_texts_hidden_pal(char *p)
 {
     int first = func_00288FB8_3(2991);
     int second = func_00288FB8_3(2989);
@@ -127,7 +127,7 @@ extern char *func_L00_0042BAD0_1(char *object);
 extern char *func_L00_0042C290_1(char *object);
 
 /* calls two one-argument functions on a sequence of sub-objects of the argument (four at 8..236 stride 76, nine at 312..888 stride 72) and returns the argument */
-char *func_PAL_0033B960(char *object)
+char *list_screen_destroy_pal(char *object)
 {
     func_L00_0042BAD0_1(object + 8);
     func_L00_0042BAD0_1(object + 84);
@@ -153,18 +153,18 @@ extern void *memset(void *, int, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
-extern Point2_0033BE50 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
-extern Point2_0033BE50 D_001ADD00 __attribute__((sda));
+extern Point2_0033BE50 g_list_screen_title_pos, g_list_screen_list_pos, g_list_screen_prev_pos, g_list_screen_next_pos;
+extern Point2_0033BE50 g_list_screen_scale __attribute__((sda));
 extern Point2_0033BE50 D_001ADD00_gp __asm__("D_001ADD00__gp") __attribute__((section(".sdata")));
 extern char g_map_overlay_state[];
-extern int D_00258D70[];
-extern char D_001ADC88[];
+extern int g_menu_text_id_table[];
+extern char g_circle_menu_icon_data[];
 
 /* func_PAL_0033BE50, the PAL copy of func_00339F28: the same C, where the six list widgets from
    +0x190 sit 0x58 apart instead of 0x48, and the scale pair is read directly at each call instead
    of through a stack copy. Retail reads its x through $gp and its y absolute, so x uses the
    measured GP view of the same address. */
-int func_PAL_0033BE50(char *obj, int unused)
+int list_screen_layout_pal(char *obj, int unused)
 {
     Point2_0033BE50 z0, z1, z2, z3;
     Point2_0033BE50 title, list, prev, next;
@@ -175,16 +175,16 @@ int func_PAL_0033BE50(char *obj, int unused)
     memset(&z1, 0, 8);
     memset(&z2, 0, 8);
     memset(&z3, 0, 8);
-    title = D_001ADCE0;
-    list = D_001ADCE8;
-    prev = D_001ADCF0;
-    next = D_001ADCF8;
-    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
-    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    title = g_list_screen_title_pos;
+    list = g_list_screen_list_pos;
+    prev = g_list_screen_prev_pos;
+    next = g_list_screen_next_pos;
+    object_set_second_float4(obj + 0x190, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x1E8, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x240, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x298, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x2F0, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
+    object_set_second_float4(obj + 0x348, D_001ADD00_gp.x, g_list_screen_scale.y, 0.0f, 0.0f);
     object_set_first_float4(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
                   z0.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
@@ -213,11 +213,11 @@ int func_PAL_0033BE50(char *obj, int unused)
                   next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
     base = g_map_overlay_state;
     text_format_location_name(obj + 0x450, *(int *)(base + 0x230));
-    index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
+    index = g_menu_text_id_table[*(int *)(base + 0x230) * 2 + 1];
     if (index >= 0)
         hud_set_widget_field_b(obj + 0x3F8, GetLocalizedString(index));
     else
-        hud_set_widget_field_b(obj + 0x3F8, (int)D_001ADC88);
+        hud_set_widget_field_b(obj + 0x3F8, (int)g_circle_menu_icon_data);
     return 0;
 }
 
@@ -227,7 +227,7 @@ extern void F8ad956d6_FUN_00295F60(int first, int second);
 extern int F8ad956d6_FUN_002DAF68(char *target);
 extern void F8ad956d6_FUN_00336A78(char *target);
 
-void func_PAL_0033C308(char *object)
+void list_screen_draw_pal(char *object)
 {
     char *s0 = object;
 

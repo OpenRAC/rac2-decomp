@@ -83,7 +83,7 @@ extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
 extern void FastVecScale(void *a0, void *a1, float f12);
 
-extern char D_L00_00256BC0[];
+extern char g_tumbling_piece_records[];
 extern char *moby_get_private_value_0(char *);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), IntToFloat(int);
@@ -93,7 +93,7 @@ extern int math_fast_float_d(void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
 extern void func_PAL_L00_004177A8(void *, int, int);
-void func_PAL_L00_004169B0(char *object)
+void tumbling_pieces_update_pal(char *object)
 {
     Vector128 temp[1];
     char event[48];
@@ -101,7 +101,7 @@ void func_PAL_L00_004169B0(char *object)
     int i;
     float fraction, amount;
     for (i = 0; i < 48; i++) {
-        p = D_L00_00256BC0 + i * 0xd0;
+        p = g_tumbling_piece_records + i * 0xd0;
         if (*(char **)(p + 0xac) != object) continue;
         first = p + 0x20;
         qcopy(first, p + 0x40);

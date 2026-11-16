@@ -5,8 +5,8 @@ extern int math_random_int_range(int,int);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float,float);
-extern unsigned char *D_L07_001FEEA4, *D_L07_001FEF00;
-extern int D_L07_001B2534 __attribute__((sda));
+extern unsigned char *g_snow_particle_color_a, *g_snow_particle_color_b;
+extern int g_snow_spawn_counter __attribute__((sda));
 
 
 
@@ -21,14 +21,14 @@ char *part_spawn_snow(void *source, void *velocity, int is_burst, int use_group)
  *(int *)(params+0x10)=math_random_int_range(32,80);
  *(int *)(particle+4)=0x808080;
  particle[9]=FloatToInt(2.0f)-16; particle[1]=0; particle[3]=0x48;
- if(math_random_int_below(2)) particle[2]=D_L07_001FEEA4[0]; else particle[2]=D_L07_001FEF00[0];
+ if(math_random_int_below(2)) particle[2]=g_snow_particle_color_a[0]; else particle[2]=g_snow_particle_color_b[0];
  *(float *)(particle+12)=math_random_float_range(0.1f,0.24f)*210000.0f;
  particle[8]=math_random_int_below(255);
  qcopy(particle+16,source); qcopy(params,velocity);
  *(short *)(particle+10)=1<<math_random_int_range(6,10);
  if(is_burst) {*(short *)(particle+10)=120; *(int *)(params+20)=1;}
  if(use_group) *(int *)(particle+4)+=*(int *)(params+16)<<24;
- { float f=math_random_int_range(0,100); int n=D_L07_001B2534; *(float *)(params+12)=f; D_L07_001B2534=n+1; }
+ { float f=math_random_int_range(0,100); int n=g_snow_spawn_counter; *(float *)(params+12)=f; g_snow_spawn_counter=n+1; }
  }
  return particle;
 }

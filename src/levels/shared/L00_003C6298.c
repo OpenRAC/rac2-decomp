@@ -73,7 +73,7 @@ typedef struct Rac2Native_9cdc323a4d0c2fbd_ClearedRecord {
     unsigned char suffix_4C[4];
 } Rac2Native_9cdc323a4d0c2fbd_ClearedRecord;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 extern void func_002FDBD8_3(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
                                     float *vector, int mode);
@@ -84,7 +84,7 @@ extern void func_00282CF0_9(char *local, char *first, char *second);
 
 extern void func_00282CC0_15(char *target, char *first, char *local);
 
-extern Rac2Native_9cdc323a4d0c2fbd_ClearedRecord D_L00_00241500[];
+extern Rac2Native_9cdc323a4d0c2fbd_ClearedRecord g_spark_record_table[];
 
 extern float vec_distance_xy(void *dst, void *src);
 
@@ -147,7 +147,7 @@ void part_clear_spark_records(void)
     int i;
 
     for (i = 299; i >= 0; i--)
-        D_L00_00241500[i].field_48 = 0;
+        g_spark_record_table[i].field_48 = 0;
 }
 
 /* func_L00_003CA730 is defined in L00_003C6298-shot-g8.c. */
@@ -226,12 +226,12 @@ void gfx_l00_draw_billboard_sprite(char *position, int color, float scale, char 
     *(long long *)(work + 0x70) = 0;
 
     *(int *)(work + 0xDC) = 0;
-    first_angle = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(position + 0),
-                                D_L00_001B8C80.y_144 - *(float *)(position + 4));
+    first_angle = mat_fast_helper_a(g_scalar_transition_state.x_140 - *(float *)(position + 0),
+                                g_scalar_transition_state.y_144 - *(float *)(position + 4));
     *(float *)(work + 0xD8) = first_angle;
 
-    distance = vec_distance_xy(position, &D_L00_001B8C80.x_140);
-    second_angle = mat_fast_helper_a(distance, D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    distance = vec_distance_xy(position, &g_scalar_transition_state.x_140);
+    second_angle = mat_fast_helper_a(distance, g_scalar_transition_state.z_148 - *(float *)(position + 8));
     *(float *)(work + 0xD0) = alpha;
     *(float *)(work + 0xD4) = -second_angle;
 

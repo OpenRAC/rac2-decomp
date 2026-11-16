@@ -4,7 +4,7 @@
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4] __attribute__((aligned(16))); } Vector;
 typedef struct { unsigned char prefix[0x18]; char *object; int polygon; Vector point, offset, normal; } CollisionView;
-extern unsigned char D_L06_001BFC80[];
+extern unsigned char g_collision_l06_result[];
 #define COLLISION (*(CollisionView *)D_L06_001BFC80)
 extern int vec_fast_helper_a(unsigned char *);
 extern int FastDecTimer(unsigned char *);
@@ -29,7 +29,7 @@ extern void flock_release_second_member(char *, char *);
 typedef struct { Vector velocity; char *owner; char *successor; short timeout; unsigned char handoff, cooldown; } FlockStatePrefix;
 
 /* Move a small flock member, separating it from walls and its live siblings. */
-void func_PAL_L06_00420DC0(char *object)
+void flock_second_member_update_pal(char *object)
 {
     FlockStatePrefix *state = *(FlockStatePrefix **)(object + 0x68);
     struct { Vector old_position, probe, separation; } work;

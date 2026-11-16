@@ -30,9 +30,9 @@ extern float FastAddRotations(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 typedef struct Obj_L00_0033BA68 Obj_L00_0033BA68;
-extern Obj_L00_0033BA68 *func_PAL_L00_0033DE50(char *, int, float);
+extern Obj_L00_0033BA68 *part_spawn_glow_effect_pal(char *, int, float);
 
-void func_PAL_L00_002A6058(int kind, int side, int play_sound, int duration) {
+void hero_play_footstep_sound_dust_pal(int kind, int side, int play_sound, int duration) {
     float point[4];
     float offset[4];
     float heading;
@@ -70,5 +70,5 @@ effect:
             FastVecAdd(point, point, offset);
         }
     }
-    func_PAL_L00_0033DE50((char *)point, !side, heading);
+    part_spawn_glow_effect_pal((char *)point, !side, heading);
 }

@@ -5,7 +5,7 @@
 
 extern int g_spider_bot_moby __attribute__((sda));
 
-extern int D_L00_001B2B44 __attribute__((sda));
+extern int g_tracked_moby_flag __attribute__((sda));
 
 /* Returns 1 when the tracked object exists and is in one of its three active states (5 to 7). */
 int tracked_moby_is_active(void)
@@ -22,7 +22,7 @@ int tracked_moby_get_flag(void)
 {
     if (g_spider_bot_moby == 0)
         return 0;
-    return D_L00_001B2B44;
+    return g_tracked_moby_flag;
 }
 
 extern void helper_set_active_flag(void);
@@ -51,9 +51,9 @@ void tracked_moby_set_state(int use_first_state, int slot_value)
 
 extern int g_frame_l00_counter[] __attribute__((sda));
 
-extern char *D_L00_001B1EA8[] __attribute__((sda));
+extern char *g_moby_l00_list_head[] __attribute__((sda));
 
-extern float D_L00_001B0430 __attribute__((sda));
+extern float g_same_kind_min_distance __attribute__((sda));
 
 extern float func_002EE2B0(char *a, char *b);
 
@@ -69,7 +69,7 @@ void moby_find_nearby_same_kind(char *target)
     if ((g_frame_l00_counter[0] & 1) == 0)
         return;
 
-    for (entry = D_L00_001B1EA8[0]; entry != 0; entry = *(char **)(entry + 40)) {
+    for (entry = g_moby_l00_list_head[0]; entry != 0; entry = *(char **)(entry + 40)) {
         unsigned char state = *(unsigned char *)(entry + 32);
 
         if (state == 0xFE)
@@ -78,7 +78,7 @@ void moby_find_nearby_same_kind(char *target)
             return;
         if (entry == 0 || *(int *)(entry + 36) == 0 || *(short *)(*(int *)(entry + 36) + 70) != 0x13)
             continue;
-        if (func_002EE2B0(entry + 16, target + 16) < D_L00_001B0430)
+        if (func_002EE2B0(entry + 16, target + 16) < g_same_kind_min_distance)
             func_00381F80(entry, target);
     }
 }
@@ -195,9 +195,9 @@ extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int
 extern void moby_mark_spawned(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void part_spawn_bursts_at_moby(void *);
-extern int D_L00_001BF218 NOT_SDA;
-extern int D_L00_001B0518 __attribute__((sda));
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern int g_hit_l00_result NOT_SDA;
+extern int g_small_projectile_particle_color __attribute__((sda));
+extern char g_default_vector[] MACRO_ADDR;
 
 /* state 0: advances the object by its data's velocity; a collision deals damage and destroys it unless
    D_L00_001BF218 equals the data's type, otherwise it spawns three trail particles and grows its scale
@@ -226,8 +226,8 @@ void small_projectile_update(char *object)
         make_hit_descriptor(query, *(int *)(vars + 0x10), 1, vars, *(float *)(vars + 0x14));
         *(unsigned short *)(query + 0x1a) = *(unsigned short *)(object + 0xaa);
         if (CollLine(object + 0x10, next, 0, object, query) || coll_test_point(object + 0x10, 0, object, 0.3f)) {
-            if (D_L00_001BF218) {
-                if (D_L00_001BF218 != *(int *)(vars + 0x10)) {
+            if (g_hit_l00_result) {
+                if (g_hit_l00_result != *(int *)(vars + 0x10)) {
                     coll_sweep_from_object(*(int *)(vars + 0x10), 0.3f, object + 0x10, 0x10001, *(float *)(vars + 0x14), 0, 0, 1, 0);
                     moby_set_state(object, 1, -1);
                     return;
@@ -247,7 +247,7 @@ void small_projectile_update(char *object)
         }
         size0 = math_random_float_range(1.0f, 1.5f) * (*(float *)(vars + 0x20) * 210000.0f);
         spread = math_random_float_range(0.2f, 0.4f);
-        part_spawn_gravity_fade(object + 0x10, velocity, 5, D_L00_001B0518, 3, 0x4f, 0, size0,
+        part_spawn_gravity_fade(object + 0x10, velocity, 5, g_small_projectile_particle_color, 3, 0x4f, 0, size0,
                       spread * (*(float *)(vars + 0x20) * 210000.0f), 0.0f, 0);
         qcopy(pos, object + 0x10);
         pos[0] += math_random_signed_float_range(0.0f, 0.15f);
@@ -255,14 +255,14 @@ void small_projectile_update(char *object)
         pos[2] += math_random_signed_float_range(0.0f, 0.15f);
         size1 = math_random_float_range(1.0f, 1.5f) * (*(float *)(vars + 0x20) * 210000.0f);
         spread = math_random_float_range(0.1f, 0.3f);
-        part_spawn_gravity_fade(pos, velocity, 5, D_L00_001B0518, 7, 0x5f, 0, size1,
+        part_spawn_gravity_fade(pos, velocity, 5, g_small_projectile_particle_color, 7, 0x5f, 0, size1,
                       spread * (*(float *)(vars + 0x20) * 210000.0f), 0.0f, 0);
         pos[0] += math_random_signed_float_range(0.0f, 0.15f);
         pos[1] += math_random_signed_float_range(0.0f, 0.15f);
         pos[2] += math_random_signed_float_range(0.0f, 0.15f);
         size2 = math_random_float_range(1.0f, 1.5f) * (*(float *)(vars + 0x20) * 210000.0f);
         spread = math_random_float_range(0.2f, 0.4f);
-        part_spawn_gravity_fade(pos, velocity, 5, D_L00_001B0518, 12, 0x7f, 0, size2,
+        part_spawn_gravity_fade(pos, velocity, 5, g_small_projectile_particle_color, 12, 0x7f, 0, size2,
                       spread * (*(float *)(vars + 0x20) * 210000.0f), 0.0f, 0);
         if (*(int *)(vars + 0x24)) {
             moby_transform_point_and_rotation_by_parent(object, *(int *)(vars + 0x24), object + 0x10, object + 0xf0, object + 0x10, object + 0xf0);
@@ -270,7 +270,7 @@ void small_projectile_update(char *object)
         }
         break;
     case 1:
-        SpawnExplosionEffects(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
+        SpawnExplosionEffects(object, g_default_vector, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
                       15.0f, 0, 9, -1, 0, 0x810001);
         moby_mark_spawned(object);
         return;

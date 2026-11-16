@@ -28,7 +28,7 @@ typedef struct JobaGroupMoby {
 extern char *g_moby_l11_table MACRO_ADDR;
 extern short *g_group_id_lists[];
 extern int g_current_map_index;
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern unsigned char g_sound_state[];
 extern int hero_is_current_selected_id(void *moby);
 extern int flag_is_third_pending_set(void *moby);
@@ -97,7 +97,7 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
     }
     if (self->state == 1) {
         if (hero_is_current_selected_id(parent) || flag_is_third_pending_set(parent) ||
-            (D_0019B2E8[self->index + (g_current_map_index << 4)] & 0x80)) {
+            (g_moby_group_flags[self->index + (g_current_map_index << 4)] & 0x80)) {
             self->timer = 0;
             self->state = 2;
             PlayMobySound(1, 0, self);

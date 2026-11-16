@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern f32 D_L14_001B1820[2] __attribute__((sda));
-extern s32 D_L14_001B1828[2] __attribute__((sda));
-extern s32 D_L14_001B1830[4] __attribute__((sda));
-extern f32 D_L14_001B1840 __attribute__((sda));
-extern f32 D_L14_001B1850[2][4] __attribute__((sda));
+extern f32 g_spark_side_float_params[2] __attribute__((sda));
+extern s32 g_spark_side_color_params[2] __attribute__((sda));
+extern s32 g_spark_side_count_ranges[4] __attribute__((sda));
+extern f32 g_spark_spawn_chance __attribute__((sda));
+extern f32 g_spark_side_offsets[2][4] __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -27,18 +27,18 @@ void part_spawn_spark_side(u8 *self) {
 
     side = math_random_int_below(2);
     kind = 1;
-    if (!(math_random_float_range(0.0f, 1.0f) < D_L14_001B1840)) {
+    if (!(math_random_float_range(0.0f, 1.0f) < g_spark_spawn_chance)) {
         kind = 0;
     }
-    n = math_random_int_range(D_L14_001B1830[kind * 2], D_L14_001B1830[kind * 2 + 1]);
-    matrix_mul_vec3(pos, D_L14_001B1850[side], self + 0xC0);
+    n = math_random_int_range(g_spark_side_count_ranges[kind * 2], g_spark_side_count_ranges[kind * 2 + 1]);
+    matrix_mul_vec3(pos, g_spark_side_offsets[side], self + 0xC0);
     FastVecAdd(pos, pos, self + 0x10);
-    FastVecSub(step, D_L14_001B1850[(side + 1) & 1], D_L14_001B1850[side]);
+    FastVecSub(step, g_spark_side_offsets[(side + 1) & 1], g_spark_side_offsets[side]);
     matrix_mul_vec3(step, step, self + 0xC0);
     FastVecScale(step, step, 1.0f / IntToFloat(n));
     {
-        s32 *cp = &D_L14_001B1828[kind];
-        f32 *fp = &D_L14_001B1820[kind];
+        s32 *cp = &g_spark_side_color_params[kind];
+        f32 *fp = &g_spark_side_float_params[kind];
         part_spawn_hero_relative(pos, step, *cp, n & 0xFF, math_random_int_below(0xFF) & 0xFF, 0, *fp);
     }
 }

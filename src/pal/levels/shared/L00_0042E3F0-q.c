@@ -17,12 +17,12 @@ typedef struct {
     int f314;
 } Ctl_428F00;
 extern Hero_428F00 g_hero_state;
-extern Ctl_428F00 D_L00_001B8C80;
-extern void func_PAL_L00_0042DA78(char *);
+extern Ctl_428F00 g_scalar_transition_state;
+extern void cam_swingshot_init_pal(char *);
 extern void ref_L00_00428F00_00(char *);
 extern void ResolveCameraMovementCollisions(char *, float);
 
-void func_PAL_L00_0042E3F0(char *o)
+void cam_swingshot_update_node_switch_pal(char *o)
 {
     int *t = (int *)(*(char **)(o + 0x70) + 0xB8);
     int st = g_hero_state.state;
@@ -41,13 +41,13 @@ void func_PAL_L00_0042E3F0(char *o)
         y = g_hero_state.fAA4;
     }
     if (x != y) {
-        char *p = D_L00_001B8C80.dst;
+        char *p = g_scalar_transition_state.dst;
         *(Q128 *)(p + 0x30) = *(Q128 *)pos;
         *(Q128 *)p = *(Q128 *)o;
         *(Q128 *)(p + 0x10) = *(Q128 *)(o + 0x10);
         *(Q128 *)(p + 0x20) = *(Q128 *)(o + 0x20);
-        func_PAL_L00_0042DA78(o);
-        D_L00_001B8C80.f314 = 0x25;
+        cam_swingshot_init_pal(o);
+        g_scalar_transition_state.f314 = 0x25;
     }
 done:
     ref_L00_00428F00_00(o);

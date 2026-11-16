@@ -3,13 +3,13 @@
 #include "common.h"
 typedef int CloudQuad __attribute__((mode(TI)));
 typedef union { struct { float x,y,z,w; } v; CloudQuad q; } CloudVec;
-extern int D_L10_001A9018[] MACRO_ADDR;
-extern unsigned short **D_L10_001A9014 MACRO_ADDR;
-extern char *D_L10_001B2B94 MACRO_ADDR;
-extern char *D_L10_001B2B9C MACRO_ADDR;
-extern char D_L10_001B9680[];
-extern CloudVec D_L10_0026CEA0[];
-extern short D_L10_002273C0[];
+extern int g_cloud_sparkle_list_count[] MACRO_ADDR;
+extern unsigned short **g_cloud_sparkle_lists MACRO_ADDR;
+extern char *g_cloud_sparkle_prims MACRO_ADDR;
+extern char *g_cloud_sparkle_transforms MACRO_ADDR;
+extern char g_view_origin_vec[];
+extern CloudVec g_cloud_sparkle_points[];
+extern short g_sparkle_class_table[];
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -34,7 +34,7 @@ extern void *part_spawn_effect_record(void *, int, float);
    would hoist D_L10_0026CEA0's high half out of the list loop, which retail recomputes.
    The initial values of k, entry, prim, transform and case 0's i only size gcse's
    expression table (185 buckets), which orders the matrix pointers' registers as retail. */
-void func_PAL_L10_004312B0(char *p) {
+void cloud_sparkle_field_update_pal(char *p) {
     union {
         struct { float m[3][12]; CloudVec rotations[3]; } init;
         struct { CloudVec temp, visible, direction, position, offset; } update;
@@ -50,7 +50,7 @@ void func_PAL_L10_004312B0(char *p) {
     case 0: {
         int i = 0;
         int index = *(int *)st;
-        if (index >= D_L10_001A9018[0] || !D_L10_001A9014[index] || index == -1) {
+        if (index >= g_cloud_sparkle_list_count[0] || !g_cloud_sparkle_lists[index] || index == -1) {
             moby_mark_spawned(p);
             return;
         }
@@ -92,19 +92,19 @@ void func_PAL_L10_004312B0(char *p) {
         points[15].v.x=30; points[15].v.y=15; points[15].v.z=2.5f;
         points[16].v.x=60; points[16].v.y=-15; points[16].v.z=8;
         points[17].v.x=60; points[17].v.y=-30; points[17].v.z=10;
-        entry=D_L10_001A9014[*(int *)st];
+        entry=g_cloud_sparkle_lists[*(int *)st];
         while(entry) {
-            if ((short)entry[-1]<0 && entry!=D_L10_001A9014[*(int *)st]) break;
-            transform=D_L10_001B2B9C+(*entry&0x7fff)*64;
+            if ((short)entry[-1]<0 && entry!=g_cloud_sparkle_lists[*(int *)st]) break;
+            transform=g_cloud_sparkle_transforms+(*entry&0x7fff)*64;
             if(!transform) break;
-            prim=D_L10_001B2B94+(*entry&0x7fff)*32;
+            prim=g_cloud_sparkle_prims+(*entry&0x7fff)*32;
             {
             unsigned short *next = entry + 1;
             for(i=0;i<6;i++) {
-                k=D_L10_002273C0[(unsigned char)prim[0x1d]];
+                k=g_sparkle_class_table[(unsigned char)prim[0x1d]];
                 k=k==0xdf6 ? 0 : k==0xdf7 ? 6 : 12;
                 matrix_mul_vec3(&temp,points+(i+k),transform);
-                FastVecAdd(D_L10_0026CEA0+n,transform+0x30,&temp);
+                FastVecAdd(g_cloud_sparkle_points+n,transform+0x30,&temp);
                 n++;
             }
             entry = next;
@@ -117,9 +117,9 @@ void func_PAL_L10_004312B0(char *p) {
         int i;
         *(float *)(st+4)+=*(float *)(st+8);
         for(i=0;i<1056;i++) {
-            qcopy(&scratch.update.temp,D_L10_0026CEA0+i);
-            vec_subtract_vec4(&scratch.update.visible,&scratch.update.temp,D_L10_001B9680);
-            if(FastVecDot(D_L10_001B9680+0x230,&scratch.update.visible)<=0.0f) continue;
+            qcopy(&scratch.update.temp,g_cloud_sparkle_points+i);
+            vec_subtract_vec4(&scratch.update.visible,&scratch.update.temp,g_view_origin_vec);
+            if(FastVecDot(g_view_origin_vec+0x230,&scratch.update.visible)<=0.0f) continue;
             {
             float one=1.0f, lower=1.396263599395752f, lowEnd, highStart, upper;
             weight=0.0f;
@@ -145,7 +145,7 @@ void func_PAL_L10_004312B0(char *p) {
                 if(weight!=1) color=(int)(weight*color);
                 color <<= 24;
                 color |= 0x33aa00;
-                FastVecSub(&scratch.update.offset,D_L10_001B9680,&scratch.update.temp);
+                FastVecSub(&scratch.update.offset,g_view_origin_vec,&scratch.update.temp);
                 vec_scale_to_length(&scratch.update.offset,&scratch.update.offset,4.0f);
                 FastVecAdd(&scratch.update.temp,&scratch.update.temp,&scratch.update.offset);
                 part_spawn_effect_record(&scratch.update.temp,color,2100000.0f);

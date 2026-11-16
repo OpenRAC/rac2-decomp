@@ -21,7 +21,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void *part_spawn_random_tinted_effect(float, float, float *, float *, float *);
 
-void func_PAL_L00_002AA458(char *self, int arg1)
+void part_emit_hero_side_particles_pal(char *self, int arg1)
 {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
@@ -80,7 +80,7 @@ extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
 extern Effect2BFB38 *func_PAL_002C0838(void *, void *, int, int);
 
-void func_PAL_L00_002AA638(int period, int threshold)
+void part_emit_hero_trail_spark_pal(int period, int threshold)
 {
     EmissionStateView *state = (EmissionStateView *)g_hero_state;
     float position[4];

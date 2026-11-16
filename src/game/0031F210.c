@@ -60,12 +60,12 @@ extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(float *, float *, float *);
 extern int moby_apply_damage_to_object(char *, void *, int);
 extern float fast_vec_dist(void *, void *);
-extern float D_001BAFA0[];
-extern char *D_001B1C4C MACRO_ADDR;
+extern float g_coll_hit_position[];
+extern char *g_vec_record_table MACRO_ADDR;
 extern char g_camera_eye_state[];
-extern int D_001B1B78 MACRO_ADDR;
-extern short *D_001EE5A0[];
-extern char *D_001B1B5C MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern char *g_moby_pool_start MACRO_ADDR;
 #define F(p,o) (*(float *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
 #define U(p,o) (*(unsigned char *)((p)+(o)))
@@ -124,7 +124,7 @@ int robot_init_check_health(char *object)
         moby_transform_joint_to_world(object,0,data+0x380);
         F(data,0x388)+=20.0f;
         moby_transform_joint_to_world(object,0,data+0x390);
-        if(CollLine(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,D_001BAFA0);
+        if(CollLine(data+0x390,data+0x380,0,object,0)) qcopy(data+0x380,g_coll_hit_position);
         if(!I(data,0x27c) && I(data,0x288)==-1) {
             F(object,0x18)=coll_probe_ground_height_below(object+0x10,0,0.5f);
             moby_set_state((unsigned char *)object,1,0);
@@ -146,7 +146,7 @@ int robot_init_check_health(char *object)
         }
         if(I(data,0x288)!=-1) {
             moby_set_state((unsigned char *)object,2,0);
-            qcopy(data+0x380,D_001B1C4C+(I(data,0x288)<<7)+0x30);
+            qcopy(data+0x380,g_vec_record_table+(I(data,0x288)<<7)+0x30);
             U(object,0x30)=0x80;
         }
     }
@@ -168,10 +168,10 @@ int robot_init_check_health(char *object)
         F(data,0x30)=0.5f;
         if(status==5) {I(data,0xf0)=0;F(data,0xf4)=0.8377582f;}
         group_alert_peers_type_a(object);
-        if((status==4 || status==5 || special) && D_001B1B78>=U(object,0x21) && moby_count_group_not_in_state(U(object,0x21),-1)>=2) {
-            list=D_001EE5A0[U(object,0x21)];
+        if((status==4 || status==5 || special) && g_moby_group_count>=U(object,0x21) && moby_count_group_not_in_state(U(object,0x21),-1)>=2) {
+            list=g_moby_group_lists[U(object,0x21)];
             for (;;) {
-                other=(char *)(D_001B1B5C+((*list & 0x7fff)<<8));
+                other=(char *)(g_moby_pool_start+((*list & 0x7fff)<<8));
                 if (*(short *)(other+0xaa)==0xb0a /* moby class 2826 */) {
                     char *d=*(char **)(other+0x68);
                     if (!I(d,0x294)) {I(d,0x294)=1;break;}
@@ -340,7 +340,7 @@ extern int coll_sweep_from_object(char *, float *, float, int, float, float, int
 extern void *part_spawn_gravity_fade(float *, float *, float, float, float, int, int, int, int, int, int);
 extern unsigned char *part_spawn_burst(float *, float *, int, int, int, int,
                                     float, float, float, float, float);
-extern unsigned char *D_001F2540[];
+extern unsigned char *g_particle_texture_table[];
 
 /* Effect at an object's joint: func_002A8C28 at the joint and at two points along its axis,
    three grey func_002C65A0 particles at the joint and one func_002C16C0 particle at the near
@@ -387,7 +387,7 @@ void part_spawn_joint_hit_effects(char *object, float *position, int joint, floa
         particle = part_spawn_burst(near, drift, 15, 60, 0x606060, 3,
                                  105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
         if (particle) {
-            particle[2] = *D_001F2540[23];
+            particle[2] = *g_particle_texture_table[23];
             particle[3] = 0x44;
             if (math_random_int_range(0, 1)) {
                 unsigned char *payload;

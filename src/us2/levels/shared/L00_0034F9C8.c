@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
-extern int D_00138344;
-extern int func_US2_L00_0030F258(int);
+extern int g_menu_input_flags;
+extern int g_menu_input_flags;
+extern int level_l00_call_module_handler_with_arg_11_us2(int);
 
 /* func_002D2918 is built from 002D2918-g8.c. */
 
 int func_US2_L00_0034F9C8(void) {
-    func_US2_L00_0030F258(D_00138344);
+    level_l00_call_module_handler_with_arg_11_us2(g_menu_input_flags);
     return 0;
 }
 
@@ -16,7 +16,7 @@ int func_US2_L00_0034F9C8(void) {
 /* func_002D2918 is built from 002D2918-g8.c. */
 
 int func_US2_L00_0034F9F0(void) {
-    func_US2_L00_0030F258(D_00138344);
+    level_l00_call_module_handler_with_arg_11_us2(g_menu_input_flags);
     return 0;
 }
 

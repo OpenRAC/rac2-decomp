@@ -93,7 +93,7 @@ typedef struct {
 } PlaybackStream;
 extern PlaybackStream g_music_state;
 typedef struct { char pad[0xB0]; float fieldOfView; } PlaybackScreen;
-extern PlaybackScreen D_001B9040;
+extern PlaybackScreen g_view_params;
 typedef struct {
     char pad00[0x140];
     float position[4], rotation[4];
@@ -101,27 +101,27 @@ typedef struct {
     float forward[4], right[4], up[4];
 } PlaybackCamera;
 extern PlaybackCamera g_active_camera;
-extern char D_001B4580[], g_hero_state[];
-extern char D_00261FE0[], D_001CE4EA[];
-extern char D_001A8C30[] __attribute__((sda));
-extern char *D_001B1B60[] __attribute__((sda));
-extern char *D_001B2148;
-extern char *D_001B1C4C[] __attribute__((sda));
+extern char g_hero_joint_buffer[], g_hero_state[];
+extern char g_scene_skip_table[], g_hero_class_slot_flags[];
+extern char g_robot_part_ids_c[] __attribute__((sda));
+extern char *g_moby_pool_end[] __attribute__((sda));
+extern char *g_transition_effect_list;
+extern char *g_vec_record_table[] __attribute__((sda));
 extern PlaybackMoby *g_equipment_pieces[];
 typedef struct { float x, y, z, w; } PlaybackPoint;
 typedef struct { int count; char pad04[0xC]; PlaybackPoint points[1]; } PlaybackCurve;
 typedef struct { char pad00[0x10]; unsigned char n10; char pad11[2]; unsigned char n13; char pad14[8]; int a1C[1]; } PlaybackBones;
 extern PlaybackCurve *g_path_table[];
 extern float g_screen_fade __attribute__((sda));
-extern float D_001B15A4 __attribute__((sda));
+extern float g_screen_flash_alpha __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int D_001B1694 __attribute__((sda));
-extern int D_001A8B84 __attribute__((sda));
+extern int g_mode_change_flag __attribute__((sda));
+extern int g_frontend_done_flag __attribute__((sda));
 extern int g_current_game_mode __attribute__((sda));
 extern unsigned int g_equipment_bits[] __attribute__((sda));
-extern short D_0018C31C;
-extern float D_001AC1B0[] SDATA(D_001AC1B0);
-extern float D_001AC1C0[] SDATA(D_001AC1C0);
+extern short g_hud_offset_flag;
+extern float g_hero_attach_offset[] SDATA(D_001AC1B0);
+extern float g_companion_attach_offset[] SDATA(D_001AC1C0);
 extern void game_reset_frame_counters(void), moby_update_visible_objects(void), snd_run_callbacks(void);
 extern void stub_empty_3(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
 extern void load_select_segment_update_world(int), FadeToBlack(int), UpdateViewContext(void);
@@ -181,9 +181,9 @@ int func_PAL_002EA0B0(void)
         (&g_scene_playback_state)->frame++;
         {
             int skipIndex, advance, chunkLength;
-            for (skipIndex=0; W(D_00261FE0,(&g_scene_playback_state)->selected*32 + skipIndex*8)>=0; skipIndex++) {
-                if ((&g_scene_playback_state)->frame==(W(D_00261FE0,(&g_scene_playback_state)->selected*32 + skipIndex*8)*5+2)/6) {
-                    advance=(W(D_00261FE0,(&g_scene_playback_state)->selected*32 + skipIndex*8+4)*5+2)/6;
+            for (skipIndex=0; W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8)>=0; skipIndex++) {
+                if ((&g_scene_playback_state)->frame==(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8)*5+2)/6) {
+                    advance=(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8+4)*5+2)/6;
                     chunkLength=g_is_pal_video ? 80 : 96;
                     (&g_scene_playback_state)->frame+=advance;
                     (&g_scene_playback_state)->streamFrame+=advance;
@@ -233,7 +233,7 @@ int func_PAL_002EA0B0(void)
         if ((&g_scene_playback_state)->frame>=(&g_scene_playback_state)->endFrame) {
             if ((unsigned short)((unsigned short)g_music_state.mode-6)>=2) g_music_state.mode=5;
             gfx_select_packet_buffer_setup();
-            D_001B9040.fieldOfView=0.62f;
+            g_view_params.fieldOfView=0.62f;
             UpdateViewContext();
             {
                 int cleanupIndex;
@@ -254,12 +254,12 @@ int func_PAL_002EA0B0(void)
             }
             {
                 char *p;
-                for (p=D_001B1B60[0];B(p,0x20)!=255;p+=0x100) {
+                for (p=g_moby_pool_end[0];B(p,0x20)!=255;p+=0x100) {
                     if (!(B(p,0x20)&0x80) && (H(p,0xAA)==0x4A || H(p,0xAA)==0xCB)) UH(p,0x34)&=0xFF7F;
                 }
             }
             if ((&g_hero_moby_default)->mode==0) {
-                if (!request_begin_slot(3,1,4,0,0)) D_001B1694=1;
+                if (!request_begin_slot(3,1,4,0,0)) g_mode_change_flag=1;
             } else request_end_slot(0,0);
         } else {
             {
@@ -282,7 +282,7 @@ int func_PAL_002EA0B0(void)
             key=(&g_scene_playback_state)->keys+(&g_scene_playback_state)->streamFrame*32;
             last=B(key,0xC);
             rotation=key+0x10;
-            D_001B9040.fieldOfView=F(rotation,0xC);
+            g_view_params.fieldOfView=F(rotation,0xC);
             UpdateViewContext();
             qcopy(g_active_camera.position,key);
             transform_vector(g_active_camera.position,g_active_camera.position,matrix);
@@ -334,10 +334,10 @@ int func_PAL_002EA0B0(void)
                         int j, cast;
                         object->mobyState=4;
                         UpdateEquipmentPieces(object);
-                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
+                        if (!g_transition_effect_list || H(g_transition_effect_list,0xAA)==0xD54) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
                         gfx_register_world_draw_callback(gfx_draw_ground_shadow,object);
                         p=0;
-                        j=H(D_001A8C30,((g_equipment_bits[0]>>3)&2));
+                        j=H(g_robot_part_ids_c,((g_equipment_bits[0]>>3)&2));
                         for(cast=0;g_equipment_pieces[cast];cast++) {
                             if(g_equipment_pieces[cast]->mobyState>=5) g_equipment_pieces[cast]->mobyState=4;
                             if(j==g_equipment_pieces[cast]->classId) {p=g_equipment_pieces[cast];break;}
@@ -345,7 +345,7 @@ int func_PAL_002EA0B0(void)
                         if(p) {
                             if((&g_hero_moby_default)->mode==0) {
                                 int offset,color;
-                                offset=D_0018C31C ? 144 : -18;
+                                offset=g_hud_offset_flag ? 144 : -18;
                                 if((&g_scene_playback_state)->frame<((504-offset)*5+2)/6) {
                                     color=(int)(((&g_scene_playback_state)->frame-((360.0f-offset)*5.0f+2.0f)*0.16666667f)*1.8000001f);
                                     if(color>255) color=255;
@@ -357,13 +357,13 @@ int func_PAL_002EA0B0(void)
                                         gfx_register_world_draw_callback(part_draw_glow_quads,object);
                                     }
                                     if((&g_scene_playback_state)->frame>((464-offset)*5+2)/6) {
-                                        D_001B15A4+=0.0324f;
-                                        if(D_001B15A4>1.0f) D_001B15A4=1.0f;
+                                        g_screen_flash_alpha+=0.0324f;
+                                        if(g_screen_flash_alpha>1.0f) g_screen_flash_alpha=1.0f;
                                     }
                                 } else {
                                     p->color=0xA0A0A0;
-                                    D_001B15A4-=0.0324f;
-                                    if(D_001B15A4<0.0f) D_001B15A4=0.0f;
+                                    g_screen_flash_alpha-=0.0324f;
+                                    if(g_screen_flash_alpha<0.0f) g_screen_flash_alpha=0.0f;
                                 }
                             } else {
                                 if((&g_scene_playback_state)->frame<125) {
@@ -412,7 +412,7 @@ int func_PAL_002EA0B0(void)
                 (&g_hero_moby_default)->hero->updateState=0;
                 (&g_hero_moby_default)->hero->flags|=6;
                 (&g_hero_moby_default)->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
-                if (B(D_001CE4EA,0)!=255 && H(global,0x24FC)==0) {
+                if (B(g_hero_class_slot_flags,0)!=255 && H(global,0x24FC)==0) {
                     (&g_hero_moby_default)->companion=CreateMoby(10);
                     (&g_hero_moby_default)->companion->drawDistance=0x1FF;
                     (&g_hero_moby_default)->companion->opacity=255;
@@ -485,14 +485,14 @@ int func_PAL_002EA0B0(void)
         if ((&g_hero_moby_default)->cameraStart>=0 && (&g_hero_moby_default)->cameraEnd>=0) {
             float angle;
             math_step_value_toward_target(&(&g_hero_moby_default)->cameraBlend,&(&g_hero_moby_default)->cameraVelocity,1.0f,0.00026640002f,0.00026640002f,0.010000001f);
-            lerp_vector(matrix,D_001B1C4C[0]+(&g_hero_moby_default)->cameraStart*128+0x30,D_001B1C4C[0]+(&g_hero_moby_default)->cameraEnd*128+0x30,(&g_hero_moby_default)->cameraBlend);
+            lerp_vector(matrix,g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128+0x30,g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128+0x30,(&g_hero_moby_default)->cameraBlend);
             vec_clear_128(matrix+4);
-            angle=fast_subtract_rotations(F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraEnd*128,0x74),F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraStart*128,0x74));
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128,0x74),F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x74));
             matrix[5]=angle*(&g_hero_moby_default)->cameraBlend;
-            matrix[5]=FastAddRotations(F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraStart*128,0x74),matrix[5]);
-            angle=fast_subtract_rotations(F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraEnd*128,0x78),F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraStart*128,0x78));
+            matrix[5]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x74),matrix[5]);
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128,0x78),F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x78));
             matrix[6]=angle*(&g_hero_moby_default)->cameraBlend;
-            matrix[6]=FastAddRotations(F(D_001B1C4C[0]+(&g_hero_moby_default)->cameraStart*128,0x78),matrix[6]);
+            matrix[6]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x78),matrix[6]);
             object_copy_vector_to_selected(matrix);
             cam_set_state_rotation(matrix+4);
         }
@@ -537,7 +537,7 @@ int func_PAL_002EA0B0(void)
                 if((&g_hero_moby_default)->object->effectOpacity<160) (&g_hero_moby_default)->object->effectOpacity+=8;
                 (&g_hero_moby_default)->progress+=step;
                 ship_spawn_exhaust_puffs((&g_hero_moby_default)->object);
-                if((&g_hero_moby_default)->progress>(float)(curve->count-1) || g_screen_fade>=1.0f) D_001A8B84=1;
+                if((&g_hero_moby_default)->progress>(float)(curve->count-1) || g_screen_fade>=1.0f) g_frontend_done_flag=1;
                 else {
                     path_sample_position(curve,1,(&g_hero_moby_default)->object->position,(&g_hero_moby_default)->object->rotation,0,(&g_hero_moby_default)->progress);
                     (&g_hero_moby_default)->object->rotation[0]=(&g_hero_moby_default)->object->rotation[3];
@@ -547,23 +547,23 @@ int func_PAL_002EA0B0(void)
                 }
             }
             qcopy_nc((&g_hero_moby_default)->hero->rotation,(&g_hero_moby_default)->object->rotation);
-            matrix_mul_vec3((&g_hero_moby_default)->hero->position,D_001AC1B0,(&g_hero_moby_default)->object->matrix);
+            matrix_mul_vec3((&g_hero_moby_default)->hero->position,g_hero_attach_offset,(&g_hero_moby_default)->object->matrix);
             FastVecAdd((&g_hero_moby_default)->hero->position,(&g_hero_moby_default)->hero->position,(&g_hero_moby_default)->object->position);
             func_002A0F48((&g_hero_moby_default)->hero);
             p=(&g_hero_moby_default)->hero->classData;
             bones=(PlaybackBones *)P(p,0x48);
             table=&bones->a1C[bones->n10];
-            func_002A1130(table+bones->n13,bones->a1C[0],D_001B4580,B(p,8));
-            (&g_hero_moby_default)->hero->joints=D_001B4580;
-            (&g_hero_moby_default)->hero->previousJoints=D_001B4580;
+            func_002A1130(table+bones->n13,bones->a1C[0],g_hero_joint_buffer,B(p,8));
+            (&g_hero_moby_default)->hero->joints=g_hero_joint_buffer;
+            (&g_hero_moby_default)->hero->previousJoints=g_hero_joint_buffer;
             if((&g_hero_moby_default)->companion) {
                 qcopy_nc((&g_hero_moby_default)->companion->rotation,(&g_hero_moby_default)->object->rotation);
-                matrix_mul_vec3((&g_hero_moby_default)->companion->position,D_001AC1C0,(&g_hero_moby_default)->object->matrix);
+                matrix_mul_vec3((&g_hero_moby_default)->companion->position,g_companion_attach_offset,(&g_hero_moby_default)->object->matrix);
                 FastVecAdd((&g_hero_moby_default)->companion->position,(&g_hero_moby_default)->companion->position,(&g_hero_moby_default)->object->position);
                 func_002A0F48((&g_hero_moby_default)->companion);
             }
         } else {
-            D_001A8B84=1;
+            g_frontend_done_flag=1;
             g_screen_fade=1.0f;
         }
         UpdateEquipmentPieces((&g_hero_moby_default)->object);

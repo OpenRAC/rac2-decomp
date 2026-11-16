@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_L00_001B0464 __attribute__((sda));
+extern float g_move_friction_step __attribute__((sda));
 extern float math_fabs(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void BuildEightDirectionOffsets(void *);
-extern void func_PAL_003287E0(void *);
-extern void func_PAL_00328B28(void *);
+extern void moby_probe_surface_and_move_pal(void *);
+extern void vehicle_align_to_ground_surface_pal(void *);
 
 void func_PAL_00328538(char *object)
 {
@@ -19,7 +19,7 @@ void func_PAL_00328538(char *object)
         float step;
         *(float *)(data + 0x18) += speed * (0.010000001f);
         magnitude = math_fabs(*(float *)(data + 0x18));
-        step = D_L00_001B0464;
+        step = g_move_friction_step;
         if (step * (0.020000001f) < magnitude)
             *(float *)(data + 0x18) = step * *(float *)(data + 0x30) * (0.020000001f);
     } else {
@@ -31,6 +31,6 @@ void func_PAL_00328538(char *object)
     vec_scale_to_length(vector, object + 0xC0, *(float *)(data + 0x18));
     FastVecAdd(object + 0x10, object + 0x10, vector);
     BuildEightDirectionOffsets(object);
-    func_PAL_003287E0(object);
-    func_PAL_00328B28(object);
+    moby_probe_surface_and_move_pal(object);
+    vehicle_align_to_ground_surface_pal(object);
 }

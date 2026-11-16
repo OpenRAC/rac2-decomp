@@ -12,24 +12,24 @@ extern int FastTweenColor(int, int, float);
 extern unsigned char *part_spawn_fading(void *, int, int, int, int, int, int, float);
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4]; } Vector;
-extern Vector D_L01_001B94C0;
-extern int D_L01_001B2088;
+extern Vector g_level_origin_vec;
+extern int g_oozla_intro_stage;
 extern int ref_L01_003CEB00_0;
-extern float D_L01_001B0458 __attribute__((sda));
-extern float D_L01_001B045C __attribute__((sda));
-extern float D_L01_001B0460 __attribute__((sda));
-extern float D_L01_001B0464 __attribute__((sda));
-extern unsigned char D_L01_001B0468 __attribute__((sda));
-extern int D_L01_001B046C __attribute__((sda));
-extern int D_L01_001B0470 __attribute__((sda));
-extern float D_L01_001B0474 __attribute__((sda));
-extern float D_L01_001B0478 __attribute__((sda));
-extern int D_L01_001B047C __attribute__((sda));
-extern int D_L01_001B0480 __attribute__((sda));
-extern float D_L01_001B0484 __attribute__((sda));
-extern float D_L01_001B0488 __attribute__((sda));
-extern int D_L01_001B048C __attribute__((sda));
-extern int D_L01_001B0490 __attribute__((sda));
+extern float g_sparkle_l01_speed_min __attribute__((sda));
+extern float g_sparkle_l01_speed_max __attribute__((sda));
+extern float g_glow_ring_jitter_min __attribute__((sda));
+extern float g_sparkle_jitter_speed_max __attribute__((sda));
+extern unsigned char g_sparkle_l01_alpha __attribute__((sda));
+extern int g_sparkle_particle_sprite __attribute__((sda));
+extern int g_sparkle_trail_particle_sprite __attribute__((sda));
+extern float g_sparkle_particle_size __attribute__((sda));
+extern float g_sparkle_trail_particle_size __attribute__((sda));
+extern int g_sparkle_ring_color_start __attribute__((sda));
+extern int g_sparkle_ring_color_end __attribute__((sda));
+extern float g_sparkle_scale_base __attribute__((sda));
+extern float g_sparkle_scale_growth __attribute__((sda));
+extern int g_sparkle_fade_param __attribute__((sda));
+extern int g_sparkle_fade_sprite __attribute__((sda));
 
 /* Spawns sparkles and four pulsing rings between the moby and camera. */
 void part_spawn_sparkles_and_glow_rings(char *moby)
@@ -41,21 +41,21 @@ void part_spawn_sparkles_and_glow_rings(char *moby)
     float midpoint;
     qcopy(pos, moby + 0x10);
     if (math_random_int_below(4) == 0) {
-        vec_random_direction(v, D_L01_001B0458 * (1.0f / 60.0f), D_L01_001B045C * (1.0f / 60.0f));
-        alpha = D_L01_001B0468;
+        vec_random_direction(v, g_sparkle_l01_speed_min * (1.0f / 60.0f), g_sparkle_l01_speed_max * (1.0f / 60.0f));
+        alpha = g_sparkle_l01_alpha;
         n = math_random_int_below(255);
-        part_spawn_hero_relative(pos, v, D_L01_001B046C, alpha, n & 255, 0, D_L01_001B0474);
+        part_spawn_hero_relative(pos, v, g_sparkle_particle_sprite, alpha, n & 255, 0, g_sparkle_particle_size);
         for (i = 2; i >= 0; i--) {
             int trailAlpha;
-            vec_random_direction(jitter, D_L01_001B0460 * (1.0f / 60.0f), D_L01_001B0464 * (1.0f / 60.0f));
+            vec_random_direction(jitter, g_glow_ring_jitter_min * (1.0f / 60.0f), g_sparkle_jitter_speed_max * (1.0f / 60.0f));
             FastVecAdd(v, v, jitter);
-            trailAlpha = D_L01_001B0468;
+            trailAlpha = g_sparkle_l01_alpha;
             n = math_random_int_below(255);
-            part_spawn_hero_relative(pos, v, D_L01_001B0470, trailAlpha, n & 255, 0, D_L01_001B0478);
+            part_spawn_hero_relative(pos, v, g_sparkle_trail_particle_sprite, trailAlpha, n & 255, 0, g_sparkle_trail_particle_size);
         }
     }
     colorScale = 1.0f / 255.0f;
-    FastVecSub(dir, &D_L01_001B94C0, pos);
+    FastVecSub(dir, &g_level_origin_vec, pos);
     midpoint = 0.5f;
     vec_scale_to_length(dir, dir, -0.3f);
     vec_scale_to_length(step, dir, 0.1f);
@@ -64,16 +64,16 @@ void part_spawn_sparkles_and_glow_rings(char *moby)
         int ringAlpha;
         unsigned char finalAlpha;
         float t = IntToFloat(255 - ((ref_L01_003CEB00_0 + i * 20) & 255));
-        c = FastTweenColor(D_L01_001B047C, D_L01_001B0480, math_fabs(midpoint - t * colorScale));
-        ringAlpha = *(unsigned char *)&D_L01_001B2088;
+        c = FastTweenColor(g_sparkle_ring_color_start, g_sparkle_ring_color_end, math_fabs(midpoint - t * colorScale));
+        ringAlpha = *(unsigned char *)&g_oozla_intro_stage;
         if (i & 2)
             ringAlpha = ringAlpha * 2;
         if (i & 1)
             ringAlpha = 255 - ringAlpha;
         finalAlpha = ringAlpha;
         t = IntToFloat(i);
-        part_spawn_fading(dir, c, finalAlpha, D_L01_001B0490, D_L01_001B048C, 2, 0,
-          (D_L01_001B0484 + t * D_L01_001B0488) * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
+        part_spawn_fading(dir, c, finalAlpha, g_sparkle_fade_sprite, g_sparkle_fade_param, 2, 0,
+          (g_sparkle_scale_base + t * g_sparkle_scale_growth) * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(dir, dir, step);
     }
 }

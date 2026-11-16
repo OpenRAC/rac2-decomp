@@ -31,7 +31,7 @@ extern Particle_002C3F88 *part_alloc(int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F264C;
+extern unsigned char *g_part_tex_owned_spark_table;
 
 /* Spawns a spark particle at position for owner; mode 0 fades it out over its
    life, a velocity is copied when given. */
@@ -56,9 +56,9 @@ Particle_002C3F88 *part_spawn_owned_spark(int owner, TI128 *position, int life, 
         m->mode = mode;
         m->age = 0;
         if (mode == 0)
-            p->unk02 = D_001F264C[0];
+            p->unk02 = g_part_tex_owned_spark_table[0];
         else
-            p->unk02 = D_001F264C[1];
+            p->unk02 = g_part_tex_owned_spark_table[1];
         if (mode == 0)
             m->fade = FloatToInt(127.0f / IntToFloat(life));
         if (velocity != 0) {

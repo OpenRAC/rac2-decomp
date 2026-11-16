@@ -7,20 +7,20 @@ extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(void *);
 extern void euler_rotation_basis(void *,void *);
 extern void func_002A10E8(void *);
-extern void func_PAL_L18_004384D8(void *);
+extern void extermibot_beam_update_pal(void *);
 extern void DrawPairedBranchingRibbonEffects(void *);
 extern void extermibot_update_linked_parts(void *);
 extern void part_spawn_glow_flash(void *);
 extern void gfx_add_draw_callback_third(void (*)(void *),void *);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int,int);
-extern void func_PAL_L18_0043A158(void *,int);
+extern void part_spawn_small_spark_smoke_pal(void *,int);
 extern float fast_vec_dist(void *,void *);
 extern float g_camera_l18_position[];
 extern void moby_update_ground_check(void *);
 extern void func_PAL_002B14F8(void *,float *,float,int,int);
 
-void func_PAL_L18_00437388(unsigned char *object)
+void extermibot_update_parts_pal(unsigned char *object)
 {
     float position[4] __attribute__((aligned(16)));
     unsigned char *state=*(unsigned char **)(object+0x68);
@@ -56,7 +56,7 @@ void func_PAL_L18_00437388(unsigned char *object)
     }
     if(object && object[0x20]!=0xFE && object[0x20]!=0xFD && object[0x20]>=2) {
         if(*(short *)(state+0x7FC)==0 && *(void **)(state+0x7C8)) {
-            func_PAL_L18_004384D8(object);
+            extermibot_beam_update_pal(object);
             gfx_add_draw_callback_third(DrawPairedBranchingRibbonEffects,object);
         }
         if(object[0x31])
@@ -64,7 +64,7 @@ void func_PAL_L18_00437388(unsigned char *object)
         if(!*(void **)(state+0x7C0)) {
             moby_transform_joint_to_world(object,0,position);
             if(math_random_int_below(20)==0)
-                func_PAL_L18_0043A158(position,math_random_int_range(10,15));
+                part_spawn_small_spark_smoke_pal(position,math_random_int_range(10,15));
             gfx_add_draw_callback_third(part_spawn_glow_flash,object);
         }
     }

@@ -14,7 +14,7 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern Vector D_0018A0E0;
+extern Vector g_hero_state_block;
 extern Vector ref_L30_0041B848_01[4];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -69,7 +69,7 @@ void gfx_draw_screen_quad(Vector *position, float size, float offset, float roll
     qcopy(&frame.position, position);
     FastVecSub((char *)&frame.row[0], (char *)&ref_L30_0041B848_02, (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {

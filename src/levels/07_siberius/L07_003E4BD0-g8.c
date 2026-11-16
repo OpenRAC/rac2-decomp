@@ -30,13 +30,13 @@ extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
 extern void *part_spawn_hero_relative(void *, void *, int, float, int, int, int);
 struct Collision1310 { char pad[0x18]; void *object; };
-extern struct Collision1310 D_L07_001BF640;
+extern struct Collision1310 g_collision_l07_result;
 extern char g_hero_position[];
-extern float D_L07_001B0A50 __attribute__((sda));
-extern int D_L07_001B0A48[] __attribute__((sda));
+extern float g_sender_delta_param __attribute__((sda));
+extern int g_sender_color_pair[] __attribute__((sda));
 /* The first color is GP-relative; the second uses the absolute table view. */
 extern int D_L07_001B0A48_gp[] SDATA(D_L07_001B0A48);
-extern float D_L07_001B0A40[] __attribute__((sda));
+extern float g_sender_size_range[] __attribute__((sda));
 /* Update the launcher state, dispatch its target effect and emit particles. */
 /* Per-frame update for moby class 3356: it waits, then looks for a group member to send off
    while giving off sparks. */
@@ -55,7 +55,7 @@ void entity_sender_update(unsigned char *moby)
     int color, life;
     switch (moby[0x20]) {
     case 0:
-        D_L07_001BF640.object=0;
+        g_collision_l07_result.object=0;
         coll_get_ground_distance_below(moby+0x10,moby,moby+0x10);
         {
             float height = *(float *)(moby + 0x18);
@@ -63,8 +63,8 @@ void entity_sender_update(unsigned char *moby)
             *(float *)(moby + 0x18) = height;
         }
         *(int *)(vars+0x20)=-1;
-        if (D_L07_001BF640.object && moby_get_private_value_2(D_L07_001BF640.object))
-            *(int *)(vars+0x10)=(int)D_L07_001BF640.object;
+        if (g_collision_l07_result.object && moby_get_private_value_2(g_collision_l07_result.object))
+            *(int *)(vars+0x10)=(int)g_collision_l07_result.object;
         moby_set_state(moby,1,-1);
         break;
     case 1:
@@ -91,7 +91,7 @@ void entity_sender_update(unsigned char *moby)
         }
         ApproachValue(vars+0x18,1.0f,0.05000000447f);
         {
-            float delta = D_L07_001B0A50;
+            float delta = g_sender_delta_param;
             delta = turn * delta;
             *(float *)(vars + 0x1C) = FastAddRotations(*(float *)(vars + 0x1C), delta);
         }
@@ -107,8 +107,8 @@ void entity_sender_update(unsigned char *moby)
             spark_pos[1]=math_fast_sin_or_cos_b(angle)*0.4f;
             spark_pos[2]=0;
             FastVecAdd(spark_pos,spark_pos,moby+0x10);
-            size=math_random_float_range(D_L07_001B0A40[0],D_L07_001B0A40[1]);
-            color=FastTweenColor(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],math_random_float_range(0,1));
+            size=math_random_float_range(g_sender_size_range[0],g_sender_size_range[1]);
+            color=FastTweenColor(D_L07_001B0A48_gp[0],g_sender_color_pair[1],math_random_float_range(0,1));
             speed=math_random_float_range(1,2);
             life=math_random_int_range(30,60);
             qcopy(spark_vel,aim_pos);

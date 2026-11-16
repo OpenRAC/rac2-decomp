@@ -3,7 +3,7 @@
 #include "common.h"
 extern int FastDecTimer(short *p);
 
-void func_PAL_L08_0042AC50(char *a0)
+void hover_update_follow_counters_pal(char *a0)
 {
     char *s0 = a0;
     char *s1 = *(char **)(s0 + 0x68);

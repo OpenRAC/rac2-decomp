@@ -27,7 +27,7 @@ extern s16 moby_get_vars_counter(char *);
 
 /* Walks the 16-bit stream the object's table entry points at and calls the handler of the
    entity type each word names; a negative word ends the stream. */
-void func_PAL_L02_004002E8(char *a0) {
+void arena_reset_group_enemies_pal(char *a0) {
     char *state = *(char **)(a0 + 0x68);
     u32 index = *(u32 *)(state + 0x40);
     u32 entry;

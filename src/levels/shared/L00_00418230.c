@@ -3,8 +3,8 @@
 typedef unsigned int Q __attribute__((mode(TI)));
 typedef union { Q q; float f[4]; } V;
 typedef struct { V vertex[4]; unsigned color[4]; union { float uv[4][2]; unsigned uvBits[4][2]; } tex; unsigned long long flags,texture,mode,prim; } Packet;
-extern char D_L00_001B8C80[];
-extern int D_L00_0025A9B8;
+extern char g_scalar_transition_state[];
+extern int g_trail_ribbon_shade;
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern void ref_L00_00418230_00(void *,int), ref_L00_00418230_01(void *);
 extern void FastVecSub(void *,void *,void *),FastVecCross(void *,void *,void *),transform_vector(void *,void *,void *);
@@ -24,7 +24,7 @@ void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
     int i;
     float u_start,u_end;
     if(*(int *)(*(char **)(object+0x68)+4)==0) color=0x800000ff;
-    else { int shade=D_L00_0025A9B8*10; color=((unsigned)alpha<<24)|((unsigned)shade<<16)|(unsigned)(255-shade); }
+    else { int shade=g_trail_ribbon_shade*10; color=((unsigned)alpha<<24)|((unsigned)shade<<16)|(unsigned)(255-shade); }
     narrow.texture=GetEffectTextureDescriptor(43);
     narrow.mode=0xff9000000260ULL;
     narrow.prim=((unsigned long long)alpha<<32)|0x68;
@@ -50,7 +50,7 @@ void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
     wide.tex.uv[3][0]=.33f;wide.tex.uv[3][1]=1;
     FastVecSub(&frame[0],previous,points);
     vec_scale_to_length(&frame[0],&frame[0],1);
-    FastVecSub(&frame[1],D_L00_001B8C80+0x140,points);
+    FastVecSub(&frame[1],g_scalar_transition_state+0x140,points);
     FastVecCross(&frame[2],&frame[1],&frame[0]);
     vec_scale_to_length(&frame[2],&frame[2],1);
     FastVecCross(&frame[1],&frame[0],&frame[2]);
@@ -70,7 +70,7 @@ void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
         FastVecScale(&wide.vertex[3],&wide.vertex[2],-1);
         FastVecSub(&frame[0],&points[i+1],&points[i]);
         vec_scale_to_length(&frame[0],&frame[0],1);
-        FastVecSub(&frame[1],D_L00_001B8C80+0x140,&points[i]);
+        FastVecSub(&frame[1],g_scalar_transition_state+0x140,&points[i]);
         FastVecCross(&frame[2],&frame[1],&frame[0]);
         vec_scale_to_length(&frame[2],&frame[2],1);
         FastVecCross(&frame[1],&frame[0],&frame[2]);

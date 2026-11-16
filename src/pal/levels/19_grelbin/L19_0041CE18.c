@@ -13,7 +13,7 @@ extern void part_spawn_random_direction_effect(void *, float, float);
 extern void gfx_draw_billboard_quad(void *, int, int, float, int, float, float);
 extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
 
-void func_PAL_L19_0041CE18(char *obj)
+void leviathan_draw_charge_flash_pal(char *obj)
 {
     float mat[16] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));

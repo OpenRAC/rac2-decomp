@@ -51,7 +51,7 @@ struct B {
 
 extern struct A g_vendor_menu_state;
 extern struct B g_memcard_state;
-extern s32 D_001A7A20;
+extern s32 g_special_items_bought_flags;
 
 void func_PAL_L00_0037BEC8(void) {
     {
@@ -79,7 +79,7 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_1:
     rc2_case_3:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.f1C == 1) {
                     shop_set_message_text(GetLocalizedString(0x1B72));
                 } else if (g_memcard_state.f1C >= 3) {
@@ -109,7 +109,7 @@ goto *D_0026DBE0[rc2_selector];
         goto rc2_switch_end;
     rc2_case_5:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.fBC == 1) {
                     shop_set_message_text(GetLocalizedString(0x1B72));
                 } else if (g_memcard_state.fBC >= 3) {

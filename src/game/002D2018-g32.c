@@ -11,22 +11,22 @@ typedef struct { short text; short pad; } MenuText;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int D_001ABA60 __attribute__((sda));
-extern MenuPanel D_0025CAA0[];
-extern int D_0025CB50[];
-extern MenuText D_001ABD6A[] MACRO_ADDR;
+extern int g_page_viewer_short_cursor __attribute__((sda));
+extern MenuPanel g_page_viewer_panel[];
+extern int g_page_viewer_short_index[];
+extern MenuText g_page_viewer_menu_text_table[] MACRO_ADDR;
 
 /* Handles left and right on the six-page viewer and updates the page text and its scroll timer. */
 int page_viewer_handle_input_short(void)
 {
     int result = 0;
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int old_cursor = D_001ABA60;
+    int old_cursor = g_page_viewer_short_cursor;
 
     if (flags & 0x10) {
         int value;
         int return_code;
-        D_001ABA60 = 0;
+        g_page_viewer_short_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -39,26 +39,26 @@ finish:
         return return_code;
     }
     if (flags & 0x900) {
-        D_001ABA60 = 0;
+        g_page_viewer_short_cursor = 0;
         result = 1;
     } else if (flags & 0x8000) {
         if (old_cursor > 0)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (--D_001ABA60 < 0)
-            D_001ABA60 = 0;
+        if (--g_page_viewer_short_cursor < 0)
+            g_page_viewer_short_cursor = 0;
     } else if (flags & 0x2000) {
         if (old_cursor < 5)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (++D_001ABA60 > 5)
-            D_001ABA60 = 5;
+        if (++g_page_viewer_short_cursor > 5)
+            g_page_viewer_short_cursor = 5;
     }
-    if (old_cursor != D_001ABA60)
-        D_0025CAA0[0].timer = -300;
-    D_0025CB50[0] = D_001ABA60;
-    D_0025CAA0[0].text = D_001ABD6A[D_001ABA60].text;
+    if (old_cursor != g_page_viewer_short_cursor)
+        g_page_viewer_panel[0].timer = -300;
+    g_page_viewer_short_index[0] = g_page_viewer_short_cursor;
+    g_page_viewer_panel[0].text = g_page_viewer_menu_text_table[g_page_viewer_short_cursor].text;
     return result;
 }

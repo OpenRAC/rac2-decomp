@@ -21,7 +21,7 @@ typedef struct {
     float f24B8;
 } ResidentState_9F00;
 
-extern char D_00189F10[];
+extern char g_drive_velocity_view[];
 extern ResidentState_9F00 D_00189E20_2;
 extern char g_hero_position[];
 extern struct { char pad[0x1C]; int count; char pad20[0x20]; float v[4]; } g_collision_result;
@@ -41,7 +41,7 @@ extern void hero_scale_saved_vectors(float);
 void hero_try_surface_push_response(float amount, float minimum)
 {
     /* The resident block is viewed from three symbols (velocity, block, hero). */
-    char *vel = D_00189F10;
+    char *vel = g_drive_velocity_view;
     ResidentState_9F00 *state;
     ResidentState_9F00 *base;
     ResidentState_9F00 *hero;

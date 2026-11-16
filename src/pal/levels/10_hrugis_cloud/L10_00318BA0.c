@@ -15,7 +15,7 @@ typedef struct SceneState {
     u8 pad46[0x146];
     u8 *objects[0];
 } SceneState;
-extern SceneState D_L10_001BD380;
+extern SceneState g_scene_marker_state;
 extern void UpdateEquipmentPieces(u8 *);
 extern void math_store_angle_update_result(u8 *,void *,u32,u32,f32);
 extern void vec_fast_to_int_helper(void *,void *);
@@ -23,7 +23,7 @@ extern void moby_compute_local_point(u8 *,void *,f32,f32,f32);
 extern void func_L10_00425930(void *,s32,f32,s32,s32,s32,s32,s32,s32,s32,s32,s32);
 extern f32 math_random_signed_float_range(f32,f32);
 extern char *moby_spawn_shot_effect(u8 *,void *,void *,s32,s32,s32,s32,s32,f32);
-extern u8 D_L10_00296F00[];
+extern u8 g_scene_spark_table[];
 
 /*
  * func_PAL_L10_00318FF8, the PAL copy of func_L10_00317528: the same C at 50 Hz (frames 0x195, 0x187,
@@ -38,8 +38,8 @@ void func_PAL_L10_00318FF8(void) {
     s32 i;
     f32 sign;
     anim_start_startup_animations();
-    for(i=0;i<D_L10_001BD380.count;i++) {
-        u8 *object=D_L10_001BD380.objects[i];
+    for(i=0;i<g_scene_marker_state.count;i++) {
+        u8 *object=g_scene_marker_state.objects[i];
         if(object && *(s16 *)(object+0xAA)==0xE29) *(u16 *)(object+0x34)|=0x800;
         if(*(s16 *)(object+0xAA)==0xD54) UpdateEquipmentPieces(object);
         if(object) {
@@ -50,9 +50,9 @@ void func_PAL_L10_00318FF8(void) {
             }
         }
     }
-    if(g_current_map_index!=10 || D_L10_001BD380.active) return;
-    p=D_L10_001BD380.objects[2];
-    if(D_L10_001BD380.frame==0x151) {
+    if(g_current_map_index!=10 || g_scene_marker_state.active) return;
+    p=g_scene_marker_state.objects[2];
+    if(g_scene_marker_state.frame==0x151) {
         vec_fast_to_int_helper(*(u8 **)(p+0x58)+0x10,scratch.matrix);
         quaternion_to_rotation_basis(scratch.matrix,(f32 *)(p+0xC0));
         moby_compute_local_point(p,pos,4.0f,3.0f,5.0f);
@@ -60,11 +60,11 @@ void func_PAL_L10_00318FF8(void) {
         moby_compute_local_point(p,pos,9.0f,4.0f,4.0f);
         func_L10_00425930(pos,35,1.0f,50,30,30,30,50,1,1,1,1);
     }
-    if(!((u32)(D_L10_001BD380.frame-0x146)<0x65 || D_L10_001BD380.frame>=0x2A1)) return;
+    if(!((u32)(g_scene_marker_state.frame-0x146)<0x65 || g_scene_marker_state.frame>=0x2A1)) return;
     if(math_random_int_below(4)) return;
     sign=1.0f;
     if(math_random_int_below(2)) sign=-1.0f;
-    entry=D_L10_00296F00+math_random_int_below(3)*32;
+    entry=g_scene_spark_table+math_random_int_below(3)*32;
     moby_compute_local_point(p,pos,*(f32 *)entry,*(f32 *)(entry+4),*(f32 *)(entry+8));
     moby_compute_local_point(p,scratch.vectors.v,*(f32 *)(entry+0x10),*(f32 *)(entry+0x14),*(f32 *)(entry+0x18));
     scratch.vectors.v[0]+=math_random_signed_float_range(0.5f,1.5f);

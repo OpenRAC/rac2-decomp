@@ -5,7 +5,7 @@
    expands it to the retail's absolute lui + load through the destination register. -G0
    splits the address into a high-part register of its own. */
 
-extern u8 D_001A7BB4;
+extern u8 g_language;
 extern char Fd8e166aa_D_001B7F80[];
 
 /* Turns the offsets in a loaded data table into real addresses so the entries can be used directly. */
@@ -14,7 +14,7 @@ void load_relocate_data_table_offsets(void)
     char *g = Fd8e166aa_D_001B7F80;
     int i = 0;
     int *table = *(int **)(g + 8);
-    char *p = (char *)table + table[D_001A7BB4];
+    char *p = (char *)table + table[g_language];
     int n = *(int *)p;
 
     *(char **)(g + 12) = p + 8;

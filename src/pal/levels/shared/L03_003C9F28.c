@@ -4,12 +4,12 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int s32;
-extern u32 D_L03_0024A7B0;
+extern u32 g_emitter_pair_table;
 extern void moby_set_state(u8 *, u8, s32);
 extern u32 flag_is_third_pending_set(u8 *);
 typedef float f32;
-extern f32 D_L04_001B1C88 __attribute__((sda));
-extern u8 *D_L03_001B2A1C __attribute__((sda));
+extern f32 g_timer_tick_step __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
 /* func_L03_003C5B28 is defined in L03_003C5B28-g8.c (it reads the group count through $gp). */
 
 /* func_L03_003C5CE8 is defined in L03_003C5B28-g8.c (it reads the group count through $gp). */
@@ -58,21 +58,21 @@ extern f32 coll_probe_ground_height_below(f32 *, s32, f32);
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
-extern u32 D_0024A7B0;
+extern u32 g_path_puzzle_adjacency;
 extern s32 ref_L03_003E3750_00(u8 *, u32);
 extern u8 *CreateMoby(s32);
 extern s32 g_activeGadgetItem;
-extern f32 D_001B9C14;
-extern f32 D_001B2464 __attribute__((sda));
+extern f32 g_gadget_scale;
+extern f32 g_gadget_approach_value __attribute__((sda));
 extern f32 math_fabs(f32);
 extern u32 path_build_region_link_graph(u8 *, u8 *, u8 *, s32);
 extern s32 ComputeRegionRouteHeading(u8 *, u8 *, void *, u8 *, s32, s32 *, s32 *, float, float);
 extern s32 path_find_route_node_containing_point(u8 *, u8 *, s32, s32 *);
 s32 route_check_object_points(u8 *, u8 *, u8 *);
 extern s32 math_random_int_below(s32);
-extern f32 D_L03_001B9BEC;
+extern f32 g_effect_aim_offset_scale;
 
-void func_PAL_L03_003C9F28(L03_5EE8Moby *m) {
+void moby_place_held_object_pal(L03_5EE8Moby *m) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 test[4] __attribute__((aligned(16)));
     L03_5EE8Vars *v = m->f68;

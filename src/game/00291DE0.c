@@ -13,21 +13,21 @@ typedef struct {
     short d;
 } Entry_001B9740;
 
-extern int D_001B1600 __attribute__((sda));
-extern Entry_001B9740 D_001B9740[];
+extern int g_gfx_entry_count __attribute__((sda));
+extern Entry_001B9740 g_texture_upload_params[];
 extern short log2dim(int);
 
 void func_00291DE0(int *p, int count) {
-    for (D_001B1600 = 0; D_001B1600 < count; D_001B1600++) {
+    for (g_gfx_entry_count = 0; g_gfx_entry_count < count; g_gfx_entry_count++) {
         int w0 = *p++;
         int w1 = *p++;
         int w2 = *p++;
         int w3 = *p++;
-        D_001B9740[D_001B1600].a = w0 >> 4;
-        D_001B9740[D_001B1600].b = w1 >> 4;
-        D_001B9740[D_001B1600].c = log2dim(w2);
-        D_001B9740[D_001B1600].d = log2dim(w3);
-        D_001B9740[D_001B1600].head.clear = 0;
+        g_texture_upload_params[g_gfx_entry_count].a = w0 >> 4;
+        g_texture_upload_params[g_gfx_entry_count].b = w1 >> 4;
+        g_texture_upload_params[g_gfx_entry_count].c = log2dim(w2);
+        g_texture_upload_params[g_gfx_entry_count].d = log2dim(w3);
+        g_texture_upload_params[g_gfx_entry_count].head.clear = 0;
     }
 }
 
@@ -63,7 +63,7 @@ typedef struct {
     char *unk1C;
     SkyShell *shells[1]; /* 0x20 */
 } SkyDef;
-extern SkyDef *D_001B20C0 __attribute__((section(".sdata")));
+extern SkyDef *g_sky_shell_definition __attribute__((section(".sdata")));
 
 /* Relocates the sky definition s just loaded (its pointers are offsets from s)
    and makes it the current one: the page table and the +0x14/+0x18/+0x1C blocks
@@ -75,7 +75,7 @@ void RelocateSkyDefinition(SkyDef *s)
 {
     int i;
 
-    D_001B20C0 = s;
+    g_sky_shell_definition = s;
     s->unk04 = 1;
     s->pages = (SkyPage *)((char *)s->pages + (int)s);
     s->unk14 = s->unk14 + (int)s;
@@ -84,30 +84,30 @@ void RelocateSkyDefinition(SkyDef *s)
         s->unk1C = s->unk1C + (int)s;
     }
     {
-        int *src = (int *)D_001B20C0->pages;
+        int *src = (int *)g_sky_shell_definition->pages;
 
-        for (i = 0; i < D_001B20C0->npages; i++) {
+        for (i = 0; i < g_sky_shell_definition->npages; i++) {
             int a = *src++;
             int b = *src++;
             int c = *src++;
             int d = *src++;
 
-            D_001B20C0->pages[i].unk0A = a >> 4;
-            D_001B20C0->pages[i].unk08 = b >> 4;
-            D_001B20C0->pages[i].unk0C = log2dim(c);
-            D_001B20C0->pages[i].unk0E = log2dim(d);
-            D_001B20C0->pages[i].tag = 0;
+            g_sky_shell_definition->pages[i].unk0A = a >> 4;
+            g_sky_shell_definition->pages[i].unk08 = b >> 4;
+            g_sky_shell_definition->pages[i].unk0C = log2dim(c);
+            g_sky_shell_definition->pages[i].unk0E = log2dim(d);
+            g_sky_shell_definition->pages[i].tag = 0;
         }
     }
     {
         int j;
 
-        for (j = 0; j < D_001B20C0->count; j++) {
+        for (j = 0; j < g_sky_shell_definition->count; j++) {
             SkyShell *sh;
             int k;
 
-            D_001B20C0->shells[j] = (SkyShell *)((char *)D_001B20C0->shells[j] + (int)s);
-            sh = D_001B20C0->shells[j];
+            g_sky_shell_definition->shells[j] = (SkyShell *)((char *)g_sky_shell_definition->shells[j] + (int)s);
+            sh = g_sky_shell_definition->shells[j];
             k = 0;
             if (k < sh->count) {
                 SkyShellItem *it = (SkyShellItem *)sh;

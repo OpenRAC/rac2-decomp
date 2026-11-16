@@ -5,18 +5,18 @@
  * 0.020000001f, 0.024434613f. Callees renamed to their PAL rows. */
 #include "common.h"
 #define FIELD(p, type, off) (*(type *)((p) + (off)))
-extern int D_L08_001B29DC __attribute__((sda));
+extern int g_moby_array __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_0019B4A8[];
-extern char D_L08_001B9B00[];
-extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } D_L08_001B99C0;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
+extern unsigned char g_moby_nibble_table[];
+extern char g_hero_position_vec[];
+extern struct { char pad[0x160]; float amount; int pad164; int timer; int phase; } g_hero_l08_extra_state;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_a;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_b;
 extern int moby_is_in_selected_zone(void *);
 extern void moby_mark_spawned(void *);
 extern float vec_distance_xy(void *, void *);
-extern void func_PAL_L08_0042B190(char *);
-extern void func_PAL_L08_0042B610(char *);
+extern void hover_init_defaults_pal(char *);
+extern void creature_update_hit_reaction_pal(char *);
 extern int math_random_int_below(int);
 extern int SelectNearestListedMoby(char *, char *, float, float, int, int, int, int);
 extern int vec_apply_scaled_value(char *, float);
@@ -35,7 +35,7 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_range(int, int);
 extern float mat_fast_helper_a(float, float);
-extern int func_PAL_L08_0042B6D0(char *, float, float, int, float, float, float);
+extern int moby_move_to_target_braking_pal(char *, float, float, int, float, float, float);
 extern void creature_compute_aim_point(char *);
 extern int FastDecTimer(void *);
 extern float FastVecLength(void *);
@@ -52,7 +52,7 @@ extern void hero_copy_field_to_moby(char *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void group_remove_member(char *);
 extern void SetDeathBits(char *, int, int);
-extern void func_PAL_L08_0042AC50(char *);
+extern void hover_update_follow_counters_pal(char *);
 extern void UpdateNearestTarget(char *, void *);
 
 /* Per-frame state machine of a level-08 moby: wait for its trigger, rise above and sink
@@ -70,15 +70,15 @@ void func_PAL_L08_0042BE14(char *actor) {
     p = FIELD(actor, char *, 0x68);
     if (FIELD(actor, u8, 0x20) == 0) {
         u16 id = FIELD(actor, u16, 0xB2);
-        int bits = D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+        int bits = g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
         if ((id & 1) ? (((bits >> 4) & 7) != 0) : ((bits & 7) != 0)) {
             moby_mark_spawned(actor);
             return;
         }
-        func_PAL_L08_0042B190(actor);
+        hover_init_defaults_pal(actor);
     }
-    if (vec_distance_xy(actor + 0x10, D_L08_001B9B00) > (float)FIELD(actor, u8, 0x30)) return;
-    func_PAL_L08_0042B610(actor);
+    if (vec_distance_xy(actor + 0x10, g_hero_position_vec) > (float)FIELD(actor, u8, 0x30)) return;
+    creature_update_hit_reaction_pal(actor);
     switch (FIELD(actor, u8, 0x20)) {
     case 0: break;
     case 1: {
@@ -120,9 +120,9 @@ ready_nonzero:
             FIELD(actor, u8, 0x31) = 1;
             FIELD(actor, u16, 0x34) &= 0xFFFE;
             moby_set_state(actor, 2, -1);
-            D_L08_001B99C0.amount = 0.25f;
-            D_L08_001B99C0.timer = 32;
-            D_L08_001B99C0.phase = 0;
+            g_hero_l08_extra_state.amount = 0.25f;
+            g_hero_l08_extra_state.timer = 32;
+            g_hero_l08_extra_state.phase = 0;
             if (FIELD(p, char *, 0x22C)) {
                 FIELD(FIELD(p, char *, 0x22C), u8, 0xBC) = 1;
                 FIELD(p, char *, 0x22C) = 0;
@@ -198,7 +198,7 @@ ready_nonzero:
             }
             break;
         case 0:
-            if (func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
+            if (moby_move_to_target_braking_pal(actor, 5.5f, 5.5f, 1,
                 mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) FIELD(p, s16, 0x1B0) = 0;
             if (!FIELD(p, s16, 0x1B0)) {
@@ -226,7 +226,7 @@ ready_nonzero:
             }
             goto patrol_heading;
         case 4:
-            if (func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
+            if (moby_move_to_target_braking_pal(actor, 5.5f, 5.5f, 1,
                 mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                              FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f)) {
                 if (FIELD(actor, u8, 0x43)) anim_start_blended(actor, 0, 0, 180);
@@ -242,11 +242,11 @@ ready_nonzero:
             creature_compute_aim_point(actor);
             FIELD(p, float, 0x188) = FIELD(p, float, 0x1C8);
             if (FastDecTimer(p + 0x1B8)) {
-                func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1,
+                moby_move_to_target_braking_pal(actor, 5.5f, 5.5f, 1,
                     mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             } else {
-                func_PAL_L08_0042B6D0(actor, 32.0f, 12.0f, 1,
+                moby_move_to_target_braking_pal(actor, 32.0f, 12.0f, 1,
                     mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14)), 0.0f, 0.0f);
             }
@@ -290,11 +290,11 @@ resume_patrol:
             angle = mat_fast_helper_a(FIELD(p, float, 0x120) - FIELD(actor, float, 0x10),
                                  FIELD(p, float, 0x124) - FIELD(actor, float, 0x14));
             if (FastDecTimer(p + 0x1B8)) {
-                func_PAL_L08_0042B6D0(actor, 5.5f, 5.5f, 1, angle, 0.0f,
+                moby_move_to_target_braking_pal(actor, 5.5f, 5.5f, 1, angle, 0.0f,
                     -mat_fast_helper_a(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             } else {
-                func_PAL_L08_0042B6D0(actor, 32.0f, 12.0f, 1, angle, 0.0f,
+                moby_move_to_target_braking_pal(actor, 32.0f, 12.0f, 1, angle, 0.0f,
                     -mat_fast_helper_a(vec_distance_xy(actor + 0x10, p + 0x140),
                         FIELD(p, float, 0x148) - FIELD(actor, float, 0x18)));
             }
@@ -422,10 +422,10 @@ patrol_heading:
                 8.0f, 4.0f, 9.0f, 2.0f, -1, 30.0f, 1, 2, -1, 0, 0x810001);
         group_remove_member(actor);
         SetDeathBits(actor, 0, 3);
-        D_L08_0021DE80.flags[FIELD(actor, s16, 0xB2)] = 0;
-        D_L08_0021EAF0.flags[FIELD(actor, s16, 0xB2)] = 0;
+        g_moby_spawn_state_flags_a.flags[FIELD(actor, s16, 0xB2)] = 0;
+        g_moby_spawn_state_flags_b.flags[FIELD(actor, s16, 0xB2)] = 0;
         id = FIELD(actor, u16, 0xB2);
-        bits = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+        bits = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
         {
             u8 value = *bits;
             u8 low = value & 0xF8;
@@ -438,11 +438,11 @@ patrol_heading:
     }
     case 8: break;
     }
-    func_PAL_L08_0042AC50(actor);
+    hover_update_follow_counters_pal(actor);
     if ((unsigned int)(FIELD(actor, u8, 0x20) - 2) < 4 && FIELD(actor, u8, 0x31)) {
         int index = FIELD(p, int, 0x1E8);
         if (index != -1 && FIELD(FIELD(p, char *, 0x1FC), int, 0)) {
-            char *target = (char *)(D_L08_001B29DC + (index << 8));
+            char *target = (char *)(g_moby_array + (index << 8));
             if (!target || FIELD(target, u8, 0x20) == 0xFE || FIELD(target, u8, 0x20) == 0xFD)
                 UpdateNearestTarget(actor, actor + 0x10);
             else UpdateNearestTarget(actor, target + 0x10);

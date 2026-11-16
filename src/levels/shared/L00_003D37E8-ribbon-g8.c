@@ -17,11 +17,11 @@ typedef struct {
 } RibbonPacket;
 
 extern char g_camera_l00_position[];
-extern float D_L00_001B01CC __attribute__((sda));
-extern int D_L00_001B023C __attribute__((sda));
-extern int D_L00_001B0240 __attribute__((sda));
-extern u32 D_L00_001B01AC __attribute__((sda));
-extern u32 D_L00_001B01B0 __attribute__((sda));
+extern float g_ribbon_core_scroll_u_alt __attribute__((sda));
+extern int g_core_effect_texture_id __attribute__((sda));
+extern int g_halo_effect_texture_id __attribute__((sda));
+extern u32 g_ribbon_core_color_alt __attribute__((sda));
+extern u32 g_ribbon_l00_halo_color_3 __attribute__((sda));
 
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
@@ -45,8 +45,8 @@ void DrawScrollingRibbonWithFadedEnds(Vector *points, u32 alpha, u32 outerAlpha,
     /* Separate zero constants for the setup and for each loop. */
     const float zero = 0.0f;
 
-    core.texture = GetEffectTextureDescriptor(D_L00_001B023C);
-    coreColor = D_L00_001B01AC | (alpha << 24);
+    core.texture = GetEffectTextureDescriptor(g_core_effect_texture_id);
+    coreColor = g_ribbon_core_color_alt | (alpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
     core.primitive = 0;
@@ -55,11 +55,11 @@ void DrawScrollingRibbonWithFadedEnds(Vector *points, u32 alpha, u32 outerAlpha,
     core.color[1] = coreColor;
     core.color[0] = coreColor;
 
-    halo.texture = GetEffectTextureDescriptor(D_L00_001B0240);
+    halo.texture = GetEffectTextureDescriptor(g_halo_effect_texture_id);
     halo.flags = core.flags;
     halo.mode = core.mode;
     halo.primitive = core.primitive;
-    haloColor = D_L00_001B01B0 | (outerAlpha << 24);
+    haloColor = g_ribbon_l00_halo_color_3 | (outerAlpha << 24);
     halo.color[3] = haloColor;
     halo.color[2] = haloColor;
     halo.color[1] = haloColor;
@@ -74,13 +74,13 @@ void DrawScrollingRibbonWithFadedEnds(Vector *points, u32 alpha, u32 outerAlpha,
     halo.uv[6] = 1;
     halo.uv[7] = 1;
 
-    core.uv[0] = D_L00_001B01CC;
+    core.uv[0] = g_ribbon_core_scroll_u_alt;
     core.uv[1] = zero;
-    core.uv[2] = D_L00_001B01CC;
+    core.uv[2] = g_ribbon_core_scroll_u_alt;
     core.uv[3] = 1;
-    core.uv[4] = D_L00_001B01CC + 1.0f;
+    core.uv[4] = g_ribbon_core_scroll_u_alt + 1.0f;
     core.uv[5] = zero;
-    core.uv[6] = D_L00_001B01CC + 1.0f;
+    core.uv[6] = g_ribbon_core_scroll_u_alt + 1.0f;
     core.uv[7] = 1;
 
     FastVecSub(&eye, points, g_camera_l00_position);
@@ -107,11 +107,11 @@ void DrawScrollingRibbonWithFadedEnds(Vector *points, u32 alpha, u32 outerAlpha,
         FastVecSub(&core.vertex[3], points + i, &normal);
 
         if (i == 1) {
-            core.color[1] = D_L00_001B01AC;
-            core.color[0] = D_L00_001B01AC;
+            core.color[1] = g_ribbon_core_color_alt;
+            core.color[0] = g_ribbon_core_color_alt;
         } else if (i == count - 2) {
-            core.color[3] = D_L00_001B01AC;
-            core.color[2] = D_L00_001B01AC;
+            core.color[3] = g_ribbon_core_color_alt;
+            core.color[2] = g_ribbon_core_color_alt;
         } else if (i == 2) {
             core.color[1] = coreColor;
             core.color[0] = coreColor;
@@ -160,11 +160,11 @@ void DrawScrollingRibbonWithFadedEnds(Vector *points, u32 alpha, u32 outerAlpha,
         FastVecSub(&halo.vertex[3], &last, &widthVector);
 
         if (i == 0) {
-            halo.color[1] = D_L00_001B01B0;
-            halo.color[0] = D_L00_001B01B0;
+            halo.color[1] = g_ribbon_l00_halo_color_3;
+            halo.color[0] = g_ribbon_l00_halo_color_3;
         } else if (i == count - 2) {
-            halo.color[3] = D_L00_001B01B0;
-            halo.color[2] = D_L00_001B01B0;
+            halo.color[3] = g_ribbon_l00_halo_color_3;
+            halo.color[2] = g_ribbon_l00_halo_color_3;
         } else if (i == 1) {
             halo.color[1] = haloColor;
             halo.color[0] = haloColor;

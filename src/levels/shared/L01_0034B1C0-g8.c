@@ -1,34 +1,35 @@
+#include "names.h"
 /* Initialization-table relative of func_L00_00354DF8. The measured entry
  * correction leaves the preceding function's tail in assembly. */
 #include "include_asm.h"
 #include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
-extern int D_00139948[];
+extern int g_menu_entry_ids[];
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry12;
-extern SourceEntry12 D_L01_0028C820[];
-extern char D_L01_002882D0[];
-extern InitEntry12 D_L01_0021D5F0[];
+extern SourceEntry12 g_menu_l01_source_entries[];
+extern char g_menu_l01_item_callback[];
+extern InitEntry12 g_menu_l01_init_entries[];
 /* Reloaded at each search step in retail. */
-extern int * volatile D_L01_001AA7F0 __attribute__((sda));
-extern struct { char pad[0x230]; int selected; } D_L01_001C9AA0;
+extern int * volatile g_map_id_table __attribute__((sda));
+extern struct { char pad[0x230]; int selected; } g_menu_l01_state;
 
 /* Fills a menu list from a table of item ids and marks which entry is currently selected. */
 int menu_build_item_list(char *obj) {
     int i, entry;
     int *list;
-    for (i = 0; i < 28 && D_00139948[i]; i++) {
-        D_L01_0021D5F0[i].kind = 3;
-        D_L01_0021D5F0[i].callback = D_L01_002882D0;
-        D_L01_0021D5F0[i].id = D_L01_0028C820[D_00139948[i]].id;
-        D_L01_0021D5F0[i].value = D_L01_0028C820[D_00139948[i]].value;
+    for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {
+        g_menu_l01_init_entries[i].kind = 3;
+        g_menu_l01_init_entries[i].callback = g_menu_l01_item_callback;
+        g_menu_l01_init_entries[i].id = g_menu_l01_source_entries[g_menu_entry_ids[i]].id;
+        g_menu_l01_init_entries[i].value = g_menu_l01_source_entries[g_menu_entry_ids[i]].value;
     }
-    list = D_L01_001AA7F0;
-    D_L01_0021D5F0[i].id = 0;
+    list = g_map_id_table;
+    g_menu_l01_init_entries[i].id = 0;
     *(int *)(obj + 0x40) = 0;
     *(unsigned int *)(obj + 0x30) |= 0x8000;
-    for (i = 0, entry = list[0]; entry; entry = D_L01_001AA7F0[++i]) {
-        if (D_L01_001C9AA0.selected == entry) {
+    for (i = 0, entry = list[0]; entry; entry = g_map_id_table[++i]) {
+        if (g_menu_l01_state.selected == entry) {
             *(int *)(obj + 0x40) = i;
             break;
         }

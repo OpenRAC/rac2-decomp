@@ -12,16 +12,16 @@ typedef struct View_00422A30 {
 
 extern View_00422A30 g_hero_state;
 
-extern float D_L23_001B1910 __attribute__((sda));
+extern float g_shot_l23_speed_scale __attribute__((sda));
 
-extern float D_L23_001B1928 __attribute__((sda));
+extern float g_shot_min_aim_dot __attribute__((sda));
 
 extern u8 *g_mothership_boss_moby __attribute__((sda));
 
-extern s32 D_L23_001B36E0;
+extern s32 g_boss_effect_position;
 
 /* A 16-byte global vector: retain the unsplit address form, as in retail. */
-extern TI16 D_L23_001B1FB0 MACRO_ADDR;
+extern TI16 g_hero_back_dir MACRO_ADDR;
 
 extern u8 *CreateMoby(s32);
 
@@ -71,7 +71,7 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 track_moby, s32 trac
     if (obj != 0) {
         vars = *(u8 **)(obj + 0x68);
         moby_init_child_from_parent(obj, src);
-        *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) * D_L23_001B1910;
+        *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) * g_shot_l23_speed_scale;
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
         *(float *)(vars + 0x1C) = 0.33333334f;
         row0 = *(TI16 *)(src + 0xC0);
@@ -94,7 +94,7 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 track_moby, s32 trac
             if (hero != 0) {
                 *(u8 **)(vars + 0x18) = hero;
                 if (*(s16 *)(hero + 0xAA) == MOBY_CLASS_MOTHERSHIP_BOSS_PART) {
-                    *(s32 **)(vars + 0x2C) = &D_L23_001B36E0;
+                    *(s32 **)(vars + 0x2C) = &g_boss_effect_position;
                 } else {
                     *(u8 **)(vars + 0x2C) = hero + 0x10;
                 }
@@ -130,7 +130,7 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 track_moby, s32 trac
             qcopy(&loc[3], obj + 0xC0);
             aim_dot = FastVecDot(&loc[2], &loc[3]);
             if ((src == g_hero_state.f2290 && *(*(u8 **)(vars + 0x18) + 0x31) == 0) ||
-                aim_dot < D_L23_001B1928 || 50.0f < distance || too_far_off != 0 || mothership_is_held() != 0) {
+                aim_dot < g_shot_min_aim_dot || 50.0f < distance || too_far_off != 0 || mothership_is_held() != 0) {
                 *(s32 *)(vars + 0x18) = 0;
             }
             if (src == g_hero_state.f2290) {
@@ -138,10 +138,10 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 track_moby, s32 trac
                     g_hero_state.f188C = vars + 0x30;
                 } else if (g_hero_state.f2294 == 0x5B) {
                     back_dir = (TI16 *)(src + 0xE0);
-                    qcopy(&D_L23_001B1FB0, back_dir);
-                    FastVecScale(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
-                    g_hero_state.f188C = (u8 *)&D_L23_001B1FB0;
-                    qcopy(vars + 0x30, &D_L23_001B1FB0);
+                    qcopy(&g_hero_back_dir, back_dir);
+                    FastVecScale(&g_hero_back_dir, &g_hero_back_dir, -1.0f);
+                    g_hero_state.f188C = (u8 *)&g_hero_back_dir;
+                    qcopy(vars + 0x30, &g_hero_back_dir);
                     vars[0x28] = 0;
                     *(s32 *)(vars + 0x18) = 1;
                     vars[0x29] = 0;

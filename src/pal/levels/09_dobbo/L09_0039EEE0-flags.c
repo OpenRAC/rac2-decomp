@@ -11,12 +11,12 @@ extern int math_fast_helper_a(void *, float);
 extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(char *, char *, char *);
-extern unsigned char *D_L09_001B285C MACRO_ADDR;
+extern unsigned char *g_moby_record_table MACRO_ADDR;
 extern void gfx_free_point_light(int);
 extern void moby_mark_spawned(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
-extern unsigned char D_L09_001C7B80[];
+extern unsigned char g_sound_effect_table[];
 
 #define S(p, o) (*(signed char *)((p) + (o)))
 #define I(p, o) (*(int *)((p) + (o)))
@@ -50,7 +50,7 @@ void func_PAL_L09_0039EEE0(unsigned char *object)
         I(s, 0xC) = I(s, 0x24);
         S(s, 0x2E) = -1;
         if (I(s, 0x20) != -1)
-            *(unsigned char **)(s + 0x34) = D_L09_001B285C + (I(s, 0x20) << 8);
+            *(unsigned char **)(s + 0x34) = g_moby_record_table + (I(s, 0x20) << 8);
         I(s, 0x30) = ((s32)(s[0x2F]) * 5 + 2) / 6;
         s[0x2D] = 0;
         object[0x20] = 1;
@@ -120,7 +120,7 @@ void func_PAL_L09_0039EEE0(unsigned char *object)
             if (S(s, 0x2E) == -1) {
                 s[0x2E] = part_l00_alloc_effect_slot_2(object + 0x10, pitch2, IntToFloat(s[0x2A]) * 0.01f, r2, g2, b2);
             } else {
-                sound = D_L09_001C7B80 + (S(s, 0x2E) << 5);
+                sound = g_sound_effect_table + (S(s, 0x2E) << 5);
                 qcopy(sound + 0x10, object + 0x10);
                 F(sound, 0x1C) = pitch2;
                 F(sound, 0) = r2;

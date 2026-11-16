@@ -7,13 +7,13 @@ typedef union { float v[4]; HomingUpdateQuad q; } HomingUpdateVector;
 typedef struct { HomingUpdateVector v[5]; } __attribute__((aligned(16))) HomingUpdateTemplate;
 typedef struct { unsigned int v[6]; } HomingUpdateColors;
 typedef union { HomingUpdateColors colors; HomingUpdateVector vectors[2]; } HomingUpdateColorScratch;
-extern HomingUpdateTemplate D_L04_002CA100;
-extern unsigned char *D_L04_001FF25C;
-extern float D_L04_001B200C MACRO_ADDR;
-extern unsigned char D_L04_001B9540[];
-extern unsigned char D_L04_001C3B40[];
-extern char D_L04_001B9680[];
-extern HomingUpdateColors D_L04_001B0458, D_L04_001B0470;
+extern HomingUpdateTemplate g_homing_update_template;
+extern unsigned char *g_homing_rocket_particle_color;
+extern float g_camera_alignment_value MACRO_ADDR;
+extern unsigned char g_hero_l04_state[];
+extern unsigned char g_special_moby_list[];
+extern char g_tether_zero_vec[];
+extern HomingUpdateColors g_homing_rocket_colors_a, g_homing_rocket_colors_b;
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void add_vectors(void *, void *, void *);
@@ -90,7 +90,7 @@ void homing_rocket_update(unsigned char *rocket) {
     HomingCamera *camera;
     float yaw, pitch, jitter, threshold, camDist, angle, speed, fade;
     int i, j, count, lifeA, lifeB;
-    settings=D_L04_002CA100;
+    settings=g_homing_update_template;
     collision=0;
     velocity.q = 0; velocity.v[2] = 0.13333334f;
     normal.q = 0; normal.v[2] = 1.0f;
@@ -172,7 +172,7 @@ void homing_rocket_update(unsigned char *rocket) {
     vec_scale_to_length(&trailMotion,&direction,math_random_float_range(0,1)*BF(state,0x30));
     FastVecAdd(&trailMotion,&trailMotion,rocket+0x10);
     particle=part_spawn_burst(&trailMotion,&temp,60,127,0x606060,3,40000,1000,1,-0.0002f,0);
-    if(particle) { unsigned char b=*D_L04_001FF25C; particle[3]=0x44; particle[2]=b; }
+    if(particle) { unsigned char b=*g_homing_rocket_particle_color; particle[3]=0x44; particle[2]=b; }
     part_spawn_burst(rocket+0x10,&temp,6,127,0xB0B0B0,3,40000,1000,1,-0.0004f,0);
     random.q = 0; random.v[2]=0.02f;
     matrix_mul_vec3(&random,&random,rocket+0xC0);
@@ -195,7 +195,7 @@ void homing_rocket_update(unsigned char *rocket) {
     if(target && *(short *)(target+0xAA)!=0xBBC /* moby class 3004 */) {
         lifeA=coll_process_hit(rocket+0x10,16,rocket,2.0f,0);
         *(HomingUpdateQuad *)&temp = *(HomingUpdateQuad *)(rocket+0x10);
-        moby_queue_knockback_for_nodes(rocket,&temp,D_L04_001C3B40,lifeA,collision,0x30000,3,1,2,1,1);
+        moby_queue_knockback_for_nodes(rocket,&temp,g_special_moby_list,lifeA,collision,0x30000,3,1,2,1,1);
     }
     cross[0]=0; cross[4]=-normal.v[2]; cross[8]=normal.v[1]; cross[12]=0;
     cross[1]=normal.v[2]; cross[5]=0; cross[9]=-normal.v[0]; cross[13]=0;
@@ -218,7 +218,7 @@ void homing_rocket_update(unsigned char *rocket) {
     random.q = 0;
     random.v[0]=math_random_float_range(-1,1); random.v[1]=math_random_float_range(-1,1); random.v[2]=math_random_float_range(-1,1);
     *(HomingUpdateQuad *)&temp = *(HomingUpdateQuad *)(&random);
-    FastVecSub(&cameraMotion,D_L04_001B9680,rocket+0x10);
+    FastVecSub(&cameraMotion,g_tether_zero_vec,rocket+0x10);
     camDist=FastVecLength(&cameraMotion);
     cameraMotion.v[2]+=camDist*0.5f;
     vec_scale_to_length(&temp,&temp,camDist*0.00333333364687860012f);
@@ -232,7 +232,7 @@ void homing_rocket_update(unsigned char *rocket) {
     if(camDist<7) fade=7-camDist;
     for(j=0;j<count;j++) {
         speed=math_random_float_range(8,10)*0.016666668f;
-        colorsA.colors=D_L04_001B0458; colorsB=D_L04_001B0470;
+        colorsA.colors=g_homing_rocket_colors_a; colorsB=g_homing_rocket_colors_b;
         speed-=fade*0.016666668f;
         {
             unsigned int *ca=colorsA.colors.v+math_random_int_below(6), *cb=colorsB.v+math_random_int_below(6);
@@ -245,7 +245,7 @@ void homing_rocket_update(unsigned char *rocket) {
         }
     }
     for(j=0;j<10;j++) {
-        colorsA.colors=D_L04_001B0458; colorsC=D_L04_001B0470;
+        colorsA.colors=g_homing_rocket_colors_a; colorsC=g_homing_rocket_colors_b;
         random.q = 0;
         random.v[0]=math_random_float_range(-1,1); random.v[1]=math_random_float_range(-1,1); random.v[2]=math_random_float_range(-1,1);
         *(HomingUpdateQuad *)&colorsB = *(HomingUpdateQuad *)(&random);
@@ -255,7 +255,7 @@ void homing_rocket_update(unsigned char *rocket) {
             part_spawn_color_blend(rocket+0x10,&colorsB,*ca,*cb,math_random_int_range(20,35),200000);
         }
     }
-    if(D_L04_001B200C<0.95f && camDist>9) {
+    if(g_camera_alignment_value<0.95f && camDist>9) {
         part_spawn_shockwave_ring(rocket,rocket+0x10,&velocity,4,15,127,127,127,32);
         part_spawn_shockwave_ring(rocket,rocket+0x10,&velocity,4,24,127,127,127,32);
     }
@@ -264,11 +264,11 @@ void homing_rocket_update(unsigned char *rocket) {
     direction.v[0]=0;
     rocket[0xBC]=0;
     {
-        HomingCamera *shake=(HomingCamera *)D_L04_001B9540;
+        HomingCamera *shake=(HomingCamera *)g_hero_l04_state;
         if(camDist<20) shake->shakeA=0.4f-camDist*0.0175f;
         else shake->shakeA=0.050000012f;
     }
-    camera=(HomingCamera *)D_L04_001B9540;
+    camera=(HomingCamera *)g_hero_l04_state;
     camera->shakeTimeA=25; camera->shakeClockA=0;
     moby_spawn_template_effect(&settings,rocket+0x10,0,0);
     FastVecSub(&random,rocket+0x10,camera->focus);

@@ -8,14 +8,14 @@ typedef struct {
     f32 w;
 } L03_Pair;
 
-extern u32 D_L03_001B035C __attribute__((sda));
-extern s32 D_L03_001B0360 __attribute__((sda));
-extern s32 D_L03_001B0364 __attribute__((sda));
-extern L03_Pair D_L03_001B0368[] SDATA(D_L03_001B0368);
-extern L03_Pair D_L03_001B036C[] __attribute__((sda));
-extern TI128 D_L03_001B0390[] SDATA(D_L03_001B0390);
-extern s32 D_L03_001B03D0[] SDATA(D_L03_001B03D0);
-extern f32 D_L03_001B9840[];
+extern u32 g_effect_packet_texture_id __attribute__((sda));
+extern s32 g_effect_packet_mode_a __attribute__((sda));
+extern s32 g_effect_packet_mode_b __attribute__((sda));
+extern L03_Pair g_effect_packet_offset_table[] SDATA(D_L03_001B0368);
+extern L03_Pair g_effect_packet_source_table[] __attribute__((sda));
+extern TI128 g_effect_packet_quad_table[] SDATA(D_L03_001B0390);
+extern s32 g_effect_packet_index_table[] SDATA(D_L03_001B03D0);
+extern f32 g_hero_l03_state_alias[];
 
 extern void vec_clear_128(TI128 *moby);
 extern f32  mat_fast_helper_a(f32 moby, f32 a1);
@@ -40,27 +40,27 @@ void moby_build_effect_packet(char *moby)
 
     vars = *(f32 **)(moby + 0x68);
     vec_clear_128((TI128 *)(packet + 0xD0));
-    *(f32 *)(packet + 0xD8) = mat_fast_helper_a(D_L03_001B9840[0x140 / 4] - *(f32 *)(moby + 0x10),
-                                          D_L03_001B9840[0x144 / 4] - *(f32 *)(moby + 0x14));
+    *(f32 *)(packet + 0xD8) = mat_fast_helper_a(g_hero_l03_state_alias[0x140 / 4] - *(f32 *)(moby + 0x10),
+                                          g_hero_l03_state_alias[0x144 / 4] - *(f32 *)(moby + 0x14));
     euler_to_matrix(packet + 0x90, packet + 0xD0);
     qcopy(packet + 0xC0, moby + 0x10);
     *(f32 *)(packet + 0xCC) = 1.0f;
 
-    sourceq = D_L03_001B0390;
+    sourceq = g_effect_packet_quad_table;
     pq = (TI128 *)packet;
     px = (L03_Pair *)(packet + 0x54);
-    sourcex = D_L03_001B036C;
+    sourcex = g_effect_packet_source_table;
     pd = (L03_Pair *)(packet + 0x50);
     pi = (s32 *)(packet + 0x40);
     for (i = 0; i < 4; i++) {
-        pi[i] = D_L03_001B03D0[i];
-        pd[i].v = D_L03_001B0368[i].v + *vars;
+        pi[i] = g_effect_packet_index_table[i];
+        pd[i].v = g_effect_packet_offset_table[i].v + *vars;
         px[i].v = sourcex[i].v;
         qcopy(&pq[i], &sourceq[i]);
     }
 
-    *(u64 *)(packet + 0x78) = GetEffectTextureDescriptor(D_L03_001B035C);
-    mode_bits = ((u64)D_L03_001B0360 << 2) | ((u64)D_L03_001B0364 << 6)
+    *(u64 *)(packet + 0x78) = GetEffectTextureDescriptor(g_effect_packet_texture_id);
+    mode_bits = ((u64)g_effect_packet_mode_a << 2) | ((u64)g_effect_packet_mode_b << 6)
                | ((u64)0x8000 << 24);
     *(u64 *)(packet + 0x88) = mode_bits;
     *(u64 *)(packet + 0x80) = 0x0000FF9000000260ULL;

@@ -19,32 +19,32 @@ typedef struct {
     int c;
 } CheatEntry_25FC90;
 
-extern IdTable_1AB938 D_001AB938;
-extern StringTable_1AB958 D_001AB958;
-extern char D_001A7A40[] __attribute__((sda));
-extern unsigned char D_001A7A50[] __attribute__((sda));
-extern CheatEntry_25FC90 D_0025FC90[];
+extern IdTable_1AB938 g_cheat_id_table;
+extern StringTable_1AB958 g_cheat_string_table;
+extern char g_unlocked_item_flags[] __attribute__((sda));
+extern unsigned char g_cheat_unlocked_flags[] __attribute__((sda));
+extern CheatEntry_25FC90 g_cheat_list[];
 
 /* Builds the list of cheats the player has unlocked from two small lookup tables, and ends the list with a blank entry. */
 int menu_build_unlocked_cheat_list(void)
 {
-    IdTable_1AB938 ids = D_001AB938;
-    StringTable_1AB958 strings = D_001AB958;
+    IdTable_1AB938 ids = g_cheat_id_table;
+    StringTable_1AB958 strings = g_cheat_string_table;
     int count = 0;
     int i;
 
     for (i = 0; i < 12; i++) {
         if (ids.v[i] == -1)
             break;
-        if (D_001A7A50[ids.v[i]] != 0) {
-            D_0025FC90[count].value = strings.v[i];
-            D_0025FC90[count].id = (int)(D_001A7A40 + ids.v[i]);
-            D_0025FC90[count].a = 0x2DC6;
-            D_0025FC90[count].b = 0x2DC7;
-            D_0025FC90[count].c = 0;
+        if (g_cheat_unlocked_flags[ids.v[i]] != 0) {
+            g_cheat_list[count].value = strings.v[i];
+            g_cheat_list[count].id = (int)(g_unlocked_item_flags + ids.v[i]);
+            g_cheat_list[count].a = 0x2DC6;
+            g_cheat_list[count].b = 0x2DC7;
+            g_cheat_list[count].c = 0;
             count++;
         }
     }
-    D_0025FC90[count].value = 0;
+    g_cheat_list[count].value = 0;
     return 0;
 }

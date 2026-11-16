@@ -18,7 +18,7 @@ extern char g_hero_state[];
 extern int hero_slot_item_id(int index);
 extern void hero_steer_heading(int index, float a, float b, float c);
 
-void func_PAL_L00_002B3E90(void)
+void hero_set_turn_rates_pal(void)
 {
     float speed = ((MovementView *)g_hero_state)->speed;
     float first;

@@ -7,18 +7,18 @@ typedef struct { float u, v; } ScrollLayer;
 #define S16(p, o) (*(short *)((p) + (o)))
 
 extern u8 g_hero_state[], g_hero_position[];
-extern float D_001A7928;
-extern int D_L09_001C9F80[];
-extern Quad D_L09_001B3100 SDATA(D_L09_001B3100);
-extern u8 D_L09_001B9A00[];
-extern u8 *D_L09_001B294C;
-extern ScrollLayer D_L09_001B3110[] MACRO_ADDR;
-extern float D_L09_001AEC38[] SDATA(D_L09_001AEC38);
-extern float D_L09_001AEC48[] SDATA(D_L09_001AEC48);
-extern float D_L09_001AEC4C[] MACRO_ADDR;
-extern float D_L09_001B3120 MACRO_ADDR;
-extern float D_L09_001B3124 MACRO_ADDR;
-extern int D_L09_001B2388;
+extern float g_frame_delta_scale;
+extern int g_dobbo_limits[];
+extern Quad g_water_sheet_prev_pos SDATA(D_L09_001B3100);
+extern u8 g_camera_l09_position[];
+extern u8 *g_dobbo_point_table;
+extern ScrollLayer g_water_layer_uv_offsets[] MACRO_ADDR;
+extern float g_water_sheet_uv_scales[] SDATA(D_L09_001AEC38);
+extern float g_water_sheet_u_speeds[] SDATA(D_L09_001AEC48);
+extern float g_water_sheet_v_speeds[] MACRO_ADDR;
+extern float g_water_sheet_z MACRO_ADDR;
+extern float g_water_sheet_base_z MACRO_ADDR;
+extern int g_frame_l09_counter;
 
 extern int IsPointInCuboid(void *, int);
 extern void FastVecSub(void *, void *, void *);
@@ -39,19 +39,19 @@ void water_sheet_update(u8 *object)
     int found;
     int *scan;
 
-    if (D_L09_001C9F80[0] != I32(state, 0x30))
+    if (g_dobbo_limits[0] != I32(state, 0x30))
         return;
     if (object[0x20] == 0) {
         object[0x20] = 1;
         object[0x30] = 255;
         {
             for (i = 0; i < 2; i++) {
-                D_L09_001B3110[i].u = 0.0f;
-                D_L09_001B3110[i].v = 0.0f;
+                g_water_layer_uv_offsets[i].u = 0.0f;
+                g_water_layer_uv_offsets[i].v = 0.0f;
             }
         }
-        qcopy(&D_L09_001B3100, D_L09_001B9A00);
-        D_L09_001B3124 = F32(state, 0x14);
+        qcopy(&g_water_sheet_prev_pos, g_camera_l09_position);
+        g_water_sheet_base_z = F32(state, 0x14);
         return;
     }
     found = 0;
@@ -66,24 +66,24 @@ void water_sheet_update(u8 *object)
     }
     if (found)
         return;
-    D_L09_001B3124 = F32(state, 0x14);
+    g_water_sheet_base_z = F32(state, 0x14);
     scan = (int *)(state + 0x50);
     for (i = 0; i < 4; i++) {
         if (scan[i] == -1)
             continue;
         if (IsPointInCuboid(g_hero_position, scan[i])) {
-            D_L09_001B3124 = F32(D_L09_001B294C + scan[i] * 128, 0x38) + 0.15f;
+            g_water_sheet_base_z = F32(g_dobbo_point_table + scan[i] * 128, 0x38) + 0.15f;
             break;
         }
     }
     { u8 *h = g_hero_state; S16(h, 0x1FE) = 2; }
-    FastVecSub(delta, D_L09_001B9A00, &D_L09_001B3100);
-    qcopy(&D_L09_001B3100, D_L09_001B9A00);
-    if (!(F32(state, 0x20) < F32(D_L09_001B9A00, 8)))
+    FastVecSub(delta, g_camera_l09_position, &g_water_sheet_prev_pos);
+    qcopy(&g_water_sheet_prev_pos, g_camera_l09_position);
+    if (!(F32(state, 0x20) < F32(g_camera_l09_position, 8)))
         return;
 
     for (i = 0; i < 2; i++) {
-        float numerator = D_L09_001AEC38[i] + D_L09_001AEC38[i];
+        float numerator = g_water_sheet_uv_scales[i] + g_water_sheet_uv_scales[i];
         float denominator = F32(state, 0x18) * 5.0f;
         float scale = numerator / denominator;
         FastVecScale(scaled, delta, scale);
@@ -92,31 +92,31 @@ void water_sheet_update(u8 *object)
             scaled[0] -= IntToFloat(FloatToInt(scaled[0]));
         if (1.0f < scaled[1] || scaled[1] < 1.0f)
             scaled[1] -= IntToFloat(FloatToInt(scaled[1]));
-        D_L09_001B3110[i].u += scaled[0];
-        D_L09_001B3110[i].v += scaled[1];
-        if (1.0f < D_L09_001B3110[i].u)
-            D_L09_001B3110[i].u -= 1.0f;
-        if (D_L09_001B3110[i].u < -1.0f)
-            D_L09_001B3110[i].u += 1.0f;
-        if (1.0f < D_L09_001B3110[i].v)
-            D_L09_001B3110[i].v -= 1.0f;
-        if (D_L09_001B3110[i].v < -1.0f)
-            D_L09_001B3110[i].v += 1.0f;
+        g_water_layer_uv_offsets[i].u += scaled[0];
+        g_water_layer_uv_offsets[i].v += scaled[1];
+        if (1.0f < g_water_layer_uv_offsets[i].u)
+            g_water_layer_uv_offsets[i].u -= 1.0f;
+        if (g_water_layer_uv_offsets[i].u < -1.0f)
+            g_water_layer_uv_offsets[i].u += 1.0f;
+        if (1.0f < g_water_layer_uv_offsets[i].v)
+            g_water_layer_uv_offsets[i].v -= 1.0f;
+        if (g_water_layer_uv_offsets[i].v < -1.0f)
+            g_water_layer_uv_offsets[i].v += 1.0f;
     }
-    D_L09_001B3120 = D_L09_001B3124 +
-        math_fast_sin_or_cos_b(IntToFloat(D_L09_001B2388 % 360) *
+    g_water_sheet_z = g_water_sheet_base_z +
+        math_fast_sin_or_cos_b(IntToFloat(g_frame_l09_counter % 360) *
                      0.017444444820284843f - 3.140000104904175f) * F32(state, 0x34);
     for (i = 0; i < 2; i++) {
-        D_L09_001B3110[i].u += D_L09_001AEC48[i * 2] * D_001A7928;
-        if (1.0f < D_L09_001B3110[i].u)
-            D_L09_001B3110[i].u -= 1.0f;
-        if (D_L09_001B3110[i].u < -1.0f)
-            D_L09_001B3110[i].u += 1.0f;
-        D_L09_001B3110[i].v += D_L09_001AEC4C[i * 2] * D_001A7928;
-        if (1.0f < D_L09_001B3110[i].v)
-            D_L09_001B3110[i].v -= 1.0f;
-        if (D_L09_001B3110[i].v < -1.0f)
-            D_L09_001B3110[i].v += 1.0f;
+        g_water_layer_uv_offsets[i].u += g_water_sheet_u_speeds[i * 2] * g_frame_delta_scale;
+        if (1.0f < g_water_layer_uv_offsets[i].u)
+            g_water_layer_uv_offsets[i].u -= 1.0f;
+        if (g_water_layer_uv_offsets[i].u < -1.0f)
+            g_water_layer_uv_offsets[i].u += 1.0f;
+        g_water_layer_uv_offsets[i].v += g_water_sheet_v_speeds[i * 2] * g_frame_delta_scale;
+        if (1.0f < g_water_layer_uv_offsets[i].v)
+            g_water_layer_uv_offsets[i].v -= 1.0f;
+        if (g_water_layer_uv_offsets[i].v < -1.0f)
+            g_water_layer_uv_offsets[i].v += 1.0f;
     }
     if (I32(state, 0x38))
         gfx_add_draw_callback_second(water_sheet_draw, object);

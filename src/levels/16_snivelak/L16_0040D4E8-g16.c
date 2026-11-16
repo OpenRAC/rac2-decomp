@@ -9,12 +9,12 @@ typedef struct {
 extern u8 g_sound_state[];
 typedef union { u8 b[0x2600]; f32 f[0x980]; } Hero;
 extern Hero g_hero_state;
-extern float D_L16_001B9B00[4] NOT_SDA;
-extern int D_L16_001A8F00;
-extern u8 *D_L16_001BFF58 NOT_SDA;
-extern float D_L16_001B1648[3] __attribute__((sda));
-extern float D_L16_001B1658[3] __attribute__((sda));
-extern float D_L16_001B1664 __attribute__((sda));
+extern float g_scene_origin_transform[4] NOT_SDA;
+extern int g_snivelak_state;
+extern u8 *g_aim_target_moby NOT_SDA;
+extern float g_snivelak_shot_angles[3] __attribute__((sda));
+extern float g_snivelak_shot_times[3] __attribute__((sda));
+extern float g_snivelak_missile_progress_limit __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int), anim_start_blended(void *, int, int, int);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
@@ -57,12 +57,12 @@ void snivelak_missile_update(u8 *moby)
         rate = state->timing.rate;
         segmentEnd = &state->point[1];
         for (i = 0; i < 3; i++) {
-            if (i == 0 || timing->progress[i-1] > D_L16_001B1664) {
+            if (i == 0 || timing->progress[i-1] > g_snivelak_missile_progress_limit) {
                 math_step_value_toward_target(&timing->progress[i],
                     &rate[i], 1.0f,
-                    D_L16_001B1648[i] * 0.00027777778f,
-                    D_L16_001B1648[i] * 0.00027777778f,
-                    D_L16_001B1658[i] * 0.016666668f);
+                    g_snivelak_shot_angles[i] * 0.00027777778f,
+                    g_snivelak_shot_angles[i] * 0.00027777778f,
+                    g_snivelak_shot_times[i] * 0.016666668f);
                 if (i == 2 && state->timing.progress[1] > 0.95f && moby[0x43])
                     anim_start_blended(moby, 0, 0, 20);
             }
@@ -74,7 +74,7 @@ void snivelak_missile_update(u8 *moby)
             mat_fast_helper_a(g_hero_state.f[0x80 / 4] - *(float *)(moby + 0x10),
                 g_hero_state.f[0x84 / 4] - *(float *)(moby + 0x14)), 0.20943955f);
         snivelak_emit_smoke_sparks(moby);
-        if (part_find_owned_effect_slot(moby, 0x10000, 0) || D_L16_001A8F00 == 2) {
+        if (part_find_owned_effect_slot(moby, 0x10000, 0) || g_snivelak_state == 2) {
             PlayMobySound(2, 0, moby);
             handle = state->sound;
             if (handle != -1) {
@@ -98,9 +98,9 @@ void snivelak_missile_update(u8 *moby)
         } else {
             if (state->timing.progress[2] >= 1.0f) moby_set_state(moby, 1, -1);
             if (CollLine(oldPosition, moby + 0x10, 0, moby, 0)) {
-                if (D_L16_001BFF58 &&
-                    (*(short *)(D_L16_001BFF58 + 0xaa) == 0xf78 ||
-                     *(short *)(D_L16_001BFF58 + 0xaa) == 0x7e8)) return;
+                if (g_aim_target_moby &&
+                    (*(short *)(g_aim_target_moby + 0xaa) == 0xf78 ||
+                     *(short *)(g_aim_target_moby + 0xaa) == 0x7e8)) return;
             } else {
                 if (!(state->timing.progress[1] >= 0.9f)) return;
                 if (!coll_test_point(moby + 0x10, 0, moby, 1.5f)) return;
@@ -118,7 +118,7 @@ void snivelak_missile_update(u8 *moby)
         }
         state->sound = -1;
         PlayMobySound(1, 0, moby);
-        FastVecSub(oldPosition, D_L16_001B9B00, moby + 0x10);
+        FastVecSub(oldPosition, g_scene_origin_transform, moby + 0x10);
         vec_scale_to_length(oldPosition, oldPosition, 1.0f);
         part_spawn_blast_effect_moby(moby, moby + 0x10, oldPosition, 0.0f);
         coll_sweep_from_object(moby, moby + 0x10, 2.0f, 0x10001, 0, 5.0f, 1.0f, 1, 0);

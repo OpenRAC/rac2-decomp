@@ -3,14 +3,14 @@
 typedef struct { char pad[0x80]; float x, y; } PositionBase;
 extern PositionBase g_hero_state __attribute__((nosda));
 extern char g_hero_position[] __attribute__((nosda));
-extern float D_L00_001B0290 __attribute__((sda));
-extern float D_L00_001B0294 __attribute__((sda));
-extern float D_L00_001B0298 __attribute__((sda));
-extern float D_L00_001B02D0 __attribute__((sda));
-extern float D_L00_001B02D4 __attribute__((sda));
-extern float D_L00_001B02D8 __attribute__((sda));
-extern float D_L00_001B02DC __attribute__((sda));
-extern float D_L00_001B02E0 __attribute__((sda));
+extern float g_keep_near_yaw_rate __attribute__((sda));
+extern float g_keep_near_pitch_rate __attribute__((sda));
+extern float g_keep_near_turn_rate __attribute__((sda));
+extern float g_keep_near_param_a __attribute__((sda));
+extern float g_keep_near_param_b __attribute__((sda));
+extern float g_keep_near_param_c __attribute__((sda));
+extern float g_keep_near_limit __attribute__((sda));
+extern float g_keep_near_scale __attribute__((sda));
 extern void ref_L00_003D4548_00(void *, void *, void *);
 extern float ref_L00_003D4548_01(void *, void *);
 extern void ref_L00_003D4548_02(void *, void *, void *, float, float, float);
@@ -48,9 +48,9 @@ void moby_keep_near_target_or_hero(char *object, char *state)
                                0.00174532947f, 0.000872664736f, 0.191986248f);
         else
             ref_L00_003D4548_02(object, target + 0x10, state + 0x30,
-                               D_L00_001B0290 * 4.84813745e-6f,
-                               D_L00_001B0294 * 4.84813745e-6f,
-                               D_L00_001B0298 * 0.000290888245f);
+                               g_keep_near_yaw_rate * 4.84813745e-6f,
+                               g_keep_near_pitch_rate * 4.84813745e-6f,
+                               g_keep_near_turn_rate * 0.000290888245f);
         ref_L00_003D4548_03(difference, difference, 0.04f);
         ref_L00_003D4548_00(difference, difference, state + 0x10);
         if (distance > 1.3f)
@@ -86,11 +86,11 @@ void moby_keep_near_target_or_hero(char *object, char *state)
         if (distance > 1.3f) *(unsigned char *)(object + 0xbc) = 2;
         break;
     }
-    *(float *)(state + 0x54) = ref_L00_003D4548_11(*(float *)(state + 0x54), D_L00_001B02DC);
+    *(float *)(state + 0x54) = ref_L00_003D4548_11(*(float *)(state + 0x54), g_keep_near_limit);
     ref_L00_003D4548_03(offset, object + 0xe0, *(float *)(state + 0x50));
     ref_L00_003D4548_00(object + 0x10, object + 0x10, offset);
-    *(float *)(state + 0x50) = ref_L00_003D4548_10(*(float *)(state + 0x54)) * D_L00_001B02E0;
+    *(float *)(state + 0x50) = ref_L00_003D4548_10(*(float *)(state + 0x54)) * g_keep_near_scale;
     ref_L00_003D4548_03(offset, object + 0xe0, *(float *)(state + 0x50));
     ref_L00_003D4548_04(object + 0x10, object + 0x10, offset);
-    ref_L00_003D4548_12(object, state + 0x48, state + 0x4c, D_L00_001B02D0, D_L00_001B02D4, D_L00_001B02D8);
+    ref_L00_003D4548_12(object, state + 0x48, state + 0x4c, g_keep_near_param_a, g_keep_near_param_b, g_keep_near_param_c);
 }

@@ -9,18 +9,18 @@ extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void moby_mark_spawned(void *);
 extern void ref_L12_00407DE8_00(void *, void *);
 extern void blast_projectile_draw_glow(void *);
-extern char D_L12_001C0258[];
+extern char g_hit_l12_result[];
 typedef struct { u8 pad[24]; u8 mode; u8 active; u16 owner; u8 rest[20]; } Query __attribute__((aligned(16)));
 
 /* Projectile update (the func_L16_004051A8 family): expires after 240 frames, moves along its
  * velocity and, on a hit, unless the object hit is the one its state records at +0x10, sends a
  * blast request (velocity scaled 1.5, or 3 with no object hit) through func_00277F48. Both blast
  * branches are written out in full; cross-jumping merges their common tails, as in retail. */
-void func_PAL_L12_0040C938(u8 *obj) {
+void UpdateBlastProjectile_pal(u8 *obj) {
     u8 *state=*(u8 **)(obj+0x68);
     float next[4];
     Query hit;
@@ -36,8 +36,8 @@ void func_PAL_L12_0040C938(u8 *obj) {
         make_hit_descriptor(&hit,obj,1,state,*(float *)(state+0x14));
         hit.owner=*(u16 *)(obj+0xAA);
         if (CollLine(obj+0x10,next,0,obj,&hit)) {
-            if (*(void **)D_L12_001C0258) {
-                if (*(void **)D_L12_001C0258!=*(void **)(state+0x10)) {
+            if (*(void **)g_hit_l12_result) {
+                if (*(void **)g_hit_l12_result!=*(void **)(state+0x10)) {
                     *(Quadword *)impact=*(Quadword *)state;
                     FastVecScale(impact,impact,1.5f);
                     impact[2]=1.0f;
@@ -68,7 +68,7 @@ void func_PAL_L12_0040C938(u8 *obj) {
         FastVecScale(impact,state,-0.5f);
         break;
     case 1:
-        func_PAL_L00_003FB330(obj+0x10,0,3,3,3,3,3,0,0,0,0,0,0.75f,20.0f);
+        SpawnExplosion_pal(obj+0x10,0,3,3,3,3,3,0,0,0,0,0,0.75f,20.0f);
         moby_mark_spawned(obj);
         return;
     }

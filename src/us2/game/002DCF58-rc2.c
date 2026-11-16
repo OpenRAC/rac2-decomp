@@ -1,25 +1,25 @@
 #include "include_asm.h"
 #include "common.h"
-extern s8 *D_001F2854;
-extern s8 D_00262BE0[];
+extern s8 *g_active_menu_object;
+extern s8 g_menu_source_entries[];
 extern void SetupGifPaging(s32);
 extern void DoGifPaging(void);
 extern int text_draw_centered_small(s32, s32, u64, s32, s32);
 extern char *GetLocalizedString(s32);
 
-s32 func_US2_002DCF58(s8 *a0) {
+s32 menu_entry_message_draw_us2(s8 *a0) {
     s8 *v1;
     s32 s4;
 
-    v1 = (*(s8 **)((s8 *)(D_001F2854) + (0xE8)));
+    v1 = (*(s8 **)((s8 *)(g_active_menu_object) + (0xE8)));
     s4 = (*(s32 *)((s8 *)((*(s8 **)((s8 *)(v1) + (0x34))) + (*(s32 *)((s8 *)(v1) + (0x40))) * 12) + (4)));
     SetupGifPaging(0);
     if (s4 == -1) {
         text_draw_centered_small((*(s32 *)((s8 *)(a0) + (0x20))) / 2, (*(s32 *)((s8 *)(a0) + (0x24))) / 2 - 8, 0x80FFA888ULL, GetLocalizedString(0x2CFB), -1);
     } else {
         s32 t = s4 * 12;
-        text_draw_centered_small((*(s32 *)((s8 *)(a0) + (0x20))) / 2, (*(s32 *)((s8 *)(a0) + (0x24))) / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + t) + (0)))), -1);
-        text_draw_centered_small((*(s32 *)((s8 *)(a0) + (0x20))) / 2, (*(s32 *)((s8 *)(a0) + (0x24))) * 2 / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(D_00262BE0 + t) + (4)))), -1);
+        text_draw_centered_small((*(s32 *)((s8 *)(a0) + (0x20))) / 2, (*(s32 *)((s8 *)(a0) + (0x24))) / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(g_menu_source_entries + t) + (0)))), -1);
+        text_draw_centered_small((*(s32 *)((s8 *)(a0) + (0x20))) / 2, (*(s32 *)((s8 *)(a0) + (0x24))) * 2 / 3 - 8, 0x80FFA888ULL, GetLocalizedString((*(s32 *)((s8 *)(g_menu_source_entries + t) + (4)))), -1);
     }
     DoGifPaging();
     return 2;

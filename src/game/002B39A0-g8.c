@@ -23,8 +23,8 @@ typedef struct {
     unsigned char value;
 } Pick8_2B39A0;
 
-extern Record30_2B39A0 *D_001B17C0;
-extern Pick8_2B39A0 **D_001B17BC;
+extern Record30_2B39A0 *g_weapon_target_records;
+extern Pick8_2B39A0 **g_weapon_target_candidates;
 extern int g_game_time;
 extern float weapon_rate_aim_target(char *, char *);
 
@@ -35,24 +35,24 @@ char *weapon_pick_best_linked_target(char *self, int index, int *out)
     char *result;
     float best;
 
-    if (index < 0 || !(index < *(int *)D_001B17C0) || g_game_time < 2)
+    if (index < 0 || !(index < *(int *)g_weapon_target_records) || g_game_time < 2)
         return 0;
-    D_001B17C0[index + 1].mark = 10;
-    if (D_001B17BC[index]->count == 0)
+    g_weapon_target_records[index + 1].mark = 10;
+    if (g_weapon_target_candidates[index]->count == 0)
         return 0;
-    if (D_001B17BC[index]->count == 1) {
-        *out = D_001B17BC[index]->value;
-        return D_001B17BC[index]->target;
+    if (g_weapon_target_candidates[index]->count == 1) {
+        *out = g_weapon_target_candidates[index]->value;
+        return g_weapon_target_candidates[index]->target;
     }
     best = 9999999.0f;
     result = 0;
-    for (i = 0; i < D_001B17BC[index]->count; i++) {
-        if (D_001B17BC[index][i].target != 0) {
-            float d = weapon_rate_aim_target(self, D_001B17BC[index][i].target);
+    for (i = 0; i < g_weapon_target_candidates[index]->count; i++) {
+        if (g_weapon_target_candidates[index][i].target != 0) {
+            float d = weapon_rate_aim_target(self, g_weapon_target_candidates[index][i].target);
             if (d < best) {
                 best = d;
-                result = D_001B17BC[index][i].target;
-                *out = D_001B17BC[index][i].value;
+                result = g_weapon_target_candidates[index][i].target;
+                *out = g_weapon_target_candidates[index][i].value;
             }
         }
     }

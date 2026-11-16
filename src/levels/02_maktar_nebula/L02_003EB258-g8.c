@@ -19,12 +19,12 @@ typedef struct {
     float uv[4][2];
     unsigned long long state[4];
 } SurfacePacket __attribute__((aligned(16)));
-extern int D_L02_001B0D60[2] __attribute__((sda));
-extern float D_L02_001B0D68[][2] SDATA(D_L02_001B0D68);
-extern float D_L02_001B0D6C[][2] __attribute__((sda));
-extern unsigned int D_L02_001B0DA8 __attribute__((sda));
-extern unsigned int D_L02_001B0DAC[] __attribute__((sda));
-extern char *D_L02_001B368C;
+extern int g_energy_sheet_textures[2] __attribute__((sda));
+extern float g_energy_sheet_uv_table[][2] SDATA(D_L02_001B0D68);
+extern float g_energy_sheet_uv_second[][2] __attribute__((sda));
+extern unsigned int g_energy_sheet_colors __attribute__((sda));
+extern unsigned int g_energy_sheet_tints[] __attribute__((sda));
+extern char *g_matrix_l02_record_table;
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
@@ -52,23 +52,23 @@ void gfx_draw_energy_sheet(char *actor) {
     float (*uv)[2] = packet[0].uv;
     {
         int layer;
-        for (layer = 0; layer < 2; layer++) gfx_init_quad_packet_state(packet + layer, D_L02_001B0D60[layer], 0, 0x80);
+        for (layer = 0; layer < 2; layer++) gfx_init_quad_packet_state(packet + layer, g_energy_sheet_textures[layer], 0, 0x80);
     }
     calculated.weights[0] = math_fast_sin_or_cos_b(*(float *)(state + 0x14)) * 0.5f + 0.5f;
     calculated.weights[1] = math_fast_sin_or_cos_b(FastAddRotations(*(float *)(state + 0x14), 3.1415927f)) * 0.5f + 0.5f;
     blend = calculated;
-    count = FloatToInt(FastVecLength(D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x10));
+    count = FloatToInt(FastVecLength(g_matrix_l02_record_table + *(int *)(state + 8) * 0x80 + 0x10));
     *(Quad *)normal = 0;
     normal[3] = 1.0f;
     step = 2.0f / (float)count;
     mask = 0x00FFFFFF;
     for (i = 0, vertex = (char *)&packet; i < 4; vertex += 16, i++) {
-        uv[i][0] = D_L02_001B0D68[i][0];
-        packet[0].uv[i][1] = D_L02_001B0D6C[i][0];
-        packet[1].uv[i][0] = D_L02_001B0D68[i+4][0] + *(float *)(state + 0x18);
-        packet[1].uv[i][1] = D_L02_001B0D6C[i+4][0];
-        tint = D_L02_001B0DAC;
-        packet[0].color[i] = FastTweenColor(D_L02_001B0DA8, tint[0], blend.weights[0]);
+        uv[i][0] = g_energy_sheet_uv_table[i][0];
+        packet[0].uv[i][1] = g_energy_sheet_uv_second[i][0];
+        packet[1].uv[i][0] = g_energy_sheet_uv_table[i+4][0] + *(float *)(state + 0x18);
+        packet[1].uv[i][1] = g_energy_sheet_uv_second[i+4][0];
+        tint = g_energy_sheet_tints;
+        packet[0].color[i] = FastTweenColor(g_energy_sheet_colors, tint[0], blend.weights[0]);
         packet[1].color[i] = FastTweenColor(tint[1], tint[2], blend.weights[1]);
         if (*(float *)(state + 0x1C) < 1.0f) {
             packet[0].color[i] = FastTweenColor(packet[0].color[i] & mask, packet[0].color[i], *(float *)(state + 0x1C));
@@ -81,8 +81,8 @@ void gfx_draw_energy_sheet(char *actor) {
         if (i >= 2) *(float *)(vertex + 0x90) = -1.0f; else *(float *)(vertex + 0x90) = 1.0f;
         *(float *)(vertex + 0x94) = (i & 1) ? -1.0f : step + -1.0f;
     }
-    copy_matrix_rotation(matrix, D_L02_001B368C + *(int *)(state + 8) * 0x80);
-    qcopy(matrix + 12, D_L02_001B368C + *(int *)(state + 8) * 0x80 + 0x30);
+    copy_matrix_rotation(matrix, g_matrix_l02_record_table + *(int *)(state + 8) * 0x80);
+    qcopy(matrix + 12, g_matrix_l02_record_table + *(int *)(state + 8) * 0x80 + 0x30);
     for (slice = 0; slice < count; slice++) {
         draw_world_quad(packet, matrix, 0);
         draw_world_quad(packet + 1, matrix, 0);

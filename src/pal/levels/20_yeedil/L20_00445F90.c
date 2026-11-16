@@ -16,7 +16,7 @@ extern float vec_distance_xy(char *, char *);
 extern int moby_step_controller(char *, char *, float);
 extern int moby_l01_turn_toward_target(char *, char *);
 
-void func_PAL_L20_00448200(char *arg0, char *arg1, float f) {
+void moby_chase_target_update_pal(char *arg0, char *arg1, float f) {
     char *state = *(char **)(arg0 + 0x68);
 
     coll_sweep_from_object(arg0, arg0 + 0x10, 0x04010000, 0,

@@ -13,7 +13,7 @@ typedef unsigned char u8;
 extern char *moby_get_motion_data(unsigned char *owner);
 
 /* func_002ED870: owner ABI/declaration review retained. */
-extern unsigned int D_00214FCC;
+extern unsigned int g_scene_state_word;
 
 /* Decomposes a float returned by a bound producer into hours, minutes and hundredths written through three pointer arguments, rounding each step with a bound helper and clamping the last field at 99. */
 int math_split_time_into_parts(int value, int *outHours, int *outMinutes, int *outHundredths)
@@ -52,12 +52,12 @@ char *moby_get_motion_data(u8 *a0) {
 /* Returns a saved scene setting. */
 unsigned int scene_get_state_word(void)
 {
-    return D_00214FCC;
+    return g_scene_state_word;
 }
 
 
 
-extern int D_00214F90[];
+extern int g_moby_motion_state_words[];
 
 /* Frees an object's motion slot if it was in use. */
 void moby_release_motion_slot(unsigned char *owner)
@@ -65,7 +65,7 @@ void moby_release_motion_slot(unsigned char *owner)
     char *data = (char *)moby_get_motion_data(owner);
     if (data != 0 && *(int *)(data + 0x118) == 1) {
         *(int *)(data + 0x118) = 0;
-        D_00214F90[3]--;
+        g_moby_motion_state_words[3]--;
     }
 }
 

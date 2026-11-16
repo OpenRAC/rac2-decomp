@@ -11,15 +11,15 @@
  */
 #include "common.h"
 
-extern int D_001A7318 __attribute__((nosda));
-extern char D_001AB658 __attribute__((sda));
-extern char D_001AB628 __attribute__((sda));
+extern int g_menu_object_flag __attribute__((nosda));
+extern char g_menu_object_data_b __attribute__((sda));
+extern char g_menu_object_data_a __attribute__((sda));
 
 int menu_select_object_data_pointer(void *object)
 {
-    void *selected = &D_001AB658;
-    if (D_001A7318)
-        selected = &D_001AB628;
+    void *selected = &g_menu_object_data_b;
+    if (g_menu_object_flag)
+        selected = &g_menu_object_data_a;
     ((void **)object)[13] = selected;
     return 0;
 }

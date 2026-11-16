@@ -19,19 +19,19 @@ extern void transform_vector(void *, void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern char g_camera_l02_position[];
-extern void func_PAL_L02_00410598(u8 *);
+extern void flamethrower_robot_knock_out_pal(u8 *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
-extern u8 D_0019B2E8[];
-extern u16 D_0018CFDC;
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
+extern u8 g_moby_group_flags[];
+extern u16 g_beam_emitter_id;
 extern int math_random_int_below(int);
 extern float fast_vec_dist(void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int math_random_int_below(int);
 extern void vec_clear_128(void *);
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 
 /* Sets up the actor and refreshes its three effect tracks. In state 0 it points the sub-object's
    record at +0x100, draws two byte values and a turn rate (15 to 40 degrees, negated half of the
@@ -77,7 +77,7 @@ void func_PAL_L02_0040FD10(u8 *a0) {
         moby_set_controller_speed_limits(a0, 0.0064000003f, 0.16000001f,
                         0.0016755164f, 0.12566373f);
         s1[0x28] = 3;
-        func_PAL_L02_00410598(a0);
+        flamethrower_robot_knock_out_pal(a0);
     }
     if (a0[0x31] != 0) {
         if (fast_vec_dist(a0 + 0x10, g_camera_l02_position) < 24.0f) {
@@ -109,7 +109,7 @@ void func_PAL_L02_0040FD10(u8 *a0) {
             *(float *)(s1 + 0xE4) = 1.0053098f;
         }
         if (a0[0x20] >= 2 && s1[0x2E] == 2)
-            func_PAL_L02_00410598(a0);
+            flamethrower_robot_knock_out_pal(a0);
         *(s16 *)(s1 + 0x2E0) = weapon_select_aim_target(a0, *(u32 *)(s1 + 0x2DC), 100.0f, 100.0f, 0, 0);
         *(int *)(s1 + 0x2D4) = *(int *)(s1 + 0x200);
     }

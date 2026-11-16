@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_0034C008 (6,048 bytes): USA v2.00 copy of func_0034B2C8 (src/game/0034B2C8-hud.c). */
 #include "common.h"
 
@@ -6,20 +7,20 @@ typedef union {
     f32 f;
 } HudBits_34B2C8;
 
-extern char D_001AE668[];
-extern char D_001AE678[];
-extern char D_001AE688[];
-extern char D_001AE690[];
-extern char D_001AE6A0[];
-extern char D_001AE6B0[];
-extern char D_001AE6C0[];
-extern char D_001AE6D0[];
-extern char D_001AE6E0[];
-extern char D_001ADFE0[];
-extern char D_001ADFF0[];
-extern char D_001AE000[];
-extern char D_001AE010[];
-extern char D_001AE020[];
+extern char g_hud_ammo_bolt_widget_data_a[];
+extern char g_hud_ammo_bolt_widget_data_b[];
+extern char g_hud_ammo_bolt_widget_data_c[];
+extern char g_hud_ammo_bolt_widget_data_d[];
+extern char g_hud_ammo_bolt_widget_data_e[];
+extern char g_hud_ammo_bolt_widget_data_f[];
+extern char g_hud_ammo_bolt_widget_data_g[];
+extern char g_hud_ammo_bolt_widget_data_h[];
+extern char g_hud_ammo_bolt_widget_data_i[];
+extern char g_ammo_bolt_widget_desc_first[];
+extern char g_ammo_bolt_widget_desc_second[];
+extern char g_ammo_bolt_widget_desc_third[];
+extern char g_str_ammo_bolt_name_format_first[];
+extern char g_str_ammo_bolt_name_format_second[];
 extern s32 g_is_pal_video __attribute__((sda));
 extern s32 g_player_bolts[] __attribute__((sda));
 
@@ -117,38 +118,38 @@ void func_US2_0034C008(char *o, char *font, s32 arg)
 
     *(s32 *)(self + 0x159C) = 0;
     *(s32 *)(self + 0x15A0) = 0;
-    object_init_derived_arrays(self, D_001AE668, arg);
+    object_init_derived_arrays(self, g_hud_ammo_bolt_widget_data_a, arg);
     object_set_helper_result(self, font + 0x8710, 1);
     object_set_first_float4(self, 10.0f, 10.0f, 0.0f, 0.0f);
-    object_init_derived_arrays(self + 0x4C, D_001AE678, arg);
+    object_init_derived_arrays(self + 0x4C, g_hud_ammo_bolt_widget_data_b, arg);
     object_set_first_float4(self + 0x4C, 10.0f, 10.0f, 0.0f, 0.0f);
     object_set_helper_result(self + 0x4C, font + 0x8710, 2);
-    object_init_derived_arrays(self + 0x98, D_001AE688, arg);
+    object_init_derived_arrays(self + 0x98, g_hud_ammo_bolt_widget_data_c, arg);
     object_set_first_float4(self + 0x98, 10.0f, 18.5f, 0.0f, 0.0f);
     object_set_helper_result(self + 0x98, font + 0x8710, 5);
     memset(self + 0xE4, 0, 0x18);
-    hud_init_widget_defaults(self + 0x100, D_001AE690, arg);
+    hud_init_widget_defaults(self + 0x100, g_hud_ammo_bolt_widget_data_d, arg);
     object_set_second_float4(self + 0x100, 0.9f, 0.0f, 0.0f, 0.0f);
     hud_set_widget_field_b(self + 0x100, self + 0xE4);
     object_set_first_float4(self + 0x100, 64.0f, 15.0f, 0.0f, 0.0f);
     hud_set_widget_field_a(self + 0x100, 0);
-    object_init_derived_c(self + 0x158, D_001AE6A0, arg);
+    object_init_derived_c(self + 0x158, g_hud_ammo_bolt_widget_data_e, arg);
     object_set_second_float4(self + 0x158, 32.0f, 32.0f, 0.0f, 0.0f);
     object_set_first_float4(self + 0x158, 20.0f, 15.0f, 0.0f, 0.0f);
     *object_get_fourth_field(self + 0x158) = 0x60F0F0B0;
-    object_init_derived_arrays(self + 0x194, D_001AE6B0, arg);
+    object_init_derived_arrays(self + 0x194, g_hud_ammo_bolt_widget_data_f, arg);
     object_set_first_float4(self + 0x194, 498.0f, 10.0f, 0.0f, 0.0f);
     object_set_helper_result(self + 0x194, font + 0x8710, 3);
-    object_init_derived_arrays(self + 0x1E0, D_001AE6C0, arg);
+    object_init_derived_arrays(self + 0x1E0, g_hud_ammo_bolt_widget_data_g, arg);
     object_set_first_float4(self + 0x1E0, 498.0f, 10.0f, 0.0f, 0.0f);
     object_set_helper_result(self + 0x1E0, font + 0x8710, 4);
     memset(self + 0x22C, 0, 0x18);
-    hud_init_widget_defaults(self + 0x248, D_001AE6D0, arg);
+    hud_init_widget_defaults(self + 0x248, g_hud_ammo_bolt_widget_data_h, arg);
     object_set_second_float4(self + 0x248, 0.9f, 0.0f, 0.0f, 0.0f);
     hud_set_widget_field_b(self + 0x248, self + 0x22C);
     object_set_first_float4(self + 0x248, 440.0f, 15.0f, 0.0f, 0.0f);
     hud_set_widget_field_a(self + 0x248, 2);
-    object_init_derived_c(self + 0x2A0, D_001AE6E0, arg);
+    object_init_derived_c(self + 0x2A0, g_hud_ammo_bolt_widget_data_i, arg);
     object_set_second_float4(self + 0x2A0, 32.0f, 32.0f, 0.0f, 0.0f);
     object_set_first_float4(self + 0x2A0, 457.0f, 15.0f, 0.0f, 0.0f);
     hud_set_widget_value_pair(self + 0x2A0, 0x7567, 0);
@@ -162,21 +163,21 @@ void func_US2_0034C008(char *o, char *font, s32 arg)
         v[0] = 0.0f;
     }
 
-    object_init_derived_arrays(self + 0x2E0, D_001ADFE0, arg);
+    object_init_derived_arrays(self + 0x2E0, g_ammo_bolt_widget_desc_first, arg);
     object_set_helper_result(self + 0x2E0, font + 0x8710, 7);
     object_set_second_float4(self + 0x2E0, 1.0f, 1.0f, 0.0f, 0.0f);
     object_set_first_float4(self + 0x2E0, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0x442D00;
     *object_get_fourth_field(self + 0x2E0) = color;
     object_change_second_value(self + 0x2E0, *(f32 **)(self + 0x804));
-    object_init_derived_arrays(self + 0x32C, D_001ADFF0, arg);
+    object_init_derived_arrays(self + 0x32C, g_ammo_bolt_widget_desc_second, arg);
     object_set_helper_result(self + 0x32C, font + 0x8710, 6);
     object_set_second_float4(self + 0x32C, 1.0f, 1.0f, 0.0f, 0.0f);
     object_set_first_float4(self + 0x32C, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0xF0C070;
     *object_get_fourth_field(self + 0x32C) = color;
     object_change_second_value(self + 0x32C, *(f32 **)(self + 0x804));
-    object_init_derived_arrays(self + 0x5D8, D_001AE000, arg);
+    object_init_derived_arrays(self + 0x5D8, g_ammo_bolt_widget_desc_third, arg);
     object_set_helper_result(self + 0x5D8, font + 0x8710, 0x10);
     object_set_first_float4(self + 0x5D8, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0xFFFEED;
@@ -189,7 +190,7 @@ void func_US2_0034C008(char *o, char *font, s32 arg)
         f32 angle;
         f32 x;
 
-        sprintf(buf, D_001AE010, i);
+        sprintf(buf, g_str_ammo_bolt_name_format_first, i);
         w = self + (i * 0x4C + 0x378);
         object_init_derived_arrays(w, buf, arg);
         object_set_helper_result(w, font + 0x8710, i + 8);
@@ -198,7 +199,7 @@ void func_US2_0034C008(char *o, char *font, s32 arg)
         object_change_second_value(w, *(f32 **)(self + 0x804));
         color = 0x442D00;
         *object_get_fourth_field(w) = color;
-        sprintf(buf, D_001AE020, i);
+        sprintf(buf, g_str_ammo_bolt_name_format_second, i);
         ico = self + (i * 0x3C + 0x624);
         object_init_derived_c(ico, buf, arg);
         object_set_flag_value(ico, 0);

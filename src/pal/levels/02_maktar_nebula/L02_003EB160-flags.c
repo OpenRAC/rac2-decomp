@@ -6,7 +6,7 @@ extern void moby_set_state();
 extern int flag_set_first_pending(char *);
 extern int math_fast_float_d(int *);
 extern int FloatToInt(float);
-extern int D_L02_002A53B0[3][9];
+extern int g_slot_reel_symbol_table[3][9];
 typedef struct {
     char pad0[0x60];
     float pos[3];
@@ -56,7 +56,7 @@ void func_PAL_L02_003EB998(char *arg0) {
             st->pos[i] = st->pos[i] - st->speed[i];
             if (st->pos[i] < 0.0f)
                 st->pos[i] += 9.0f;
-            if (D_L02_002A53B0[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
+            if (g_slot_reel_symbol_table[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
                 if (st->pos[i] - (float)FloatToInt(st->pos[i]) < 0.2f)
                     st->mode[i] = 0;
             }

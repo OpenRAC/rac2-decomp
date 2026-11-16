@@ -3,7 +3,7 @@
 
 #include "common.h"
 typedef int GornQuad __attribute__((mode(TI)));
-extern char *D_L15_001FE480[];
+extern char *g_path_l15_table[];
 extern char *moby_get_motion_data(unsigned char *);
 extern int math_fast_float_d(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -15,7 +15,7 @@ extern int FloatToInt(float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecCross(void *, void *, void *);
 extern int PlayMobySound(int, int, void *);
-extern char *D_L15_001B261C __attribute__((sda));
+extern char *g_moby_base __attribute__((sda));
 typedef struct GornOwner {
     char pad00[0x11C];
     int flag11C;
@@ -23,11 +23,11 @@ typedef struct GornOwner {
     char pad124[0xC];
     int timer;
 } GornOwner;
-extern char D_L15_002B6CF0[];
-extern char *D_L15_001BFC18[];
-extern int D_L15_001B17B0[] SDATA(D_L15_001B17B0);
+extern char g_ship_route_points[];
+extern char *g_line_hit_result[];
+extern int g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
 extern u8 g_sound_state[];
-extern char *func_PAL_L05_0037DB90(int, int);
+extern char *SpawnFreeLevelObjectById_pal(int, int);
 extern int moby_process_collision_hit(void *, int, int, int);
 extern int follower_has_reached_target(void *);
 extern void follower_set_state(void *, int);
@@ -43,7 +43,7 @@ extern void func_PAL_L15_0043C0D8(void *);
 extern void func_PAL_L15_0043BDC8(void *, int);
 extern void gorn_ship_spawn_damage_effects(void *);
 
-void func_PAL_L15_0043A270(char *object, int flag) {
+void gorn_ship_update_flight_pal(char *object, int flag) {
     float z[4], point[4], matrix[16];
     char *state = *(char **)(object + 0x68);
     GornOwner *owner;
@@ -53,14 +53,14 @@ void func_PAL_L15_0043A270(char *object, int flag) {
     z[2] = 1.0f;
     owner = (GornOwner *)moby_get_motion_data((unsigned char *)object);
     owner->flag11C = 1;
-    owner->target = D_L15_001B261C + (*(int *)(state + 0x260) << 8);
+    owner->target = g_moby_base + (*(int *)(state + 0x260) << 8);
     if (math_fast_float_d(state + 0x444)) {
         *(int *)(state + 0x444) = 250;
         for (i = *(int *)(state + 0x440) * 3; i < *(int *)(state + 0x440) * 3 + 3; i++) {
-            qcopy_nc(point, D_L15_002B6CF0 + i * 16);
+            qcopy_nc(point, g_ship_route_points + i * 16);
             matrix_mul_vec3(point, point, object + 0xC0);
             FastVecAdd(point, point, object + 0x10);
-            spawn = func_PAL_L05_0037DB90(0x957, 1);
+            spawn = SpawnFreeLevelObjectById_pal(0x957, 1);
             if (spawn) {
                 data = (char *)moby_get_motion_data((unsigned char *)spawn);
                 qcopy_nc(spawn + 0x10, point);
@@ -78,13 +78,13 @@ void func_PAL_L15_0043A270(char *object, int flag) {
     }
     if (*(int *)(state + 0x264)) {
         for (j = 0; j < 6; j++) {
-            qcopy_nc(point, D_L15_002B6CF0 + j * 16);
+            qcopy_nc(point, g_ship_route_points + j * 16);
             matrix_mul_vec3(point, point, object + 0xC0);
             FastVecAdd(point, point, object + 0x10);
         }
     }
     gorn_ship_aim_parts(object);
-    route = D_L15_001FE480[*(int *)(state + 0x448)];
+    route = g_path_l15_table[*(int *)(state + 0x448)];
     if (follower_has_reached_target(object)) {
         next = *(int *)(state + 0x44C);
         *(int *)(state + 0x44C) = next + 1;
@@ -98,7 +98,7 @@ void func_PAL_L15_0043A270(char *object, int flag) {
     point[3] = *(float *)(object + 0xC) * 0.0009765599970705807f;
     if (math_fast_helper_a(point, 100.0f) != -1 &&
         CollLine(object + 0x10, owner->target + 0x10, 0, object, 0) &&
-        D_L15_001BFC18[0] && *(short *)(D_L15_001BFC18[0] + 0xAA) == *(short *)(owner->target + 0xAA))
+        g_line_hit_result[0] && *(short *)(g_line_hit_result[0] + 0xAA) == *(short *)(owner->target + 0xAA))
         func_PAL_L15_0043BF88(object);
     if (math_fast_helper_a(point, 192.0f) != -1 && (unsigned char)object[0x20] != 2)
         func_PAL_L15_0043C0D8(object);
@@ -126,7 +126,7 @@ void func_PAL_L15_0043A270(char *object, int flag) {
             n = FloatToInt(*(float *)(state + 0x180) * 0.02f);
             if (n < 7 && n != *(int *)(state + 0x26C)) {
                 func_PAL_L05_0042A240(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-n], matrix);
+                moby_transform_joint_to_world(object, g_gorn_ship_part_joints[7-n], matrix);
                 func_PAL_L05_0042A240(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 func_PAL_L15_0043BDC8(object, n-1);
             }
@@ -146,7 +146,7 @@ void func_PAL_L15_0043A270(char *object, int flag) {
             n = FloatToInt(*(float *)(state + 0x180) * 0.08f);
             if (n < 7 && n != *(int *)(state + 0x26C)) {
                 func_PAL_L05_0042A240(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-n], matrix);
+                moby_transform_joint_to_world(object, g_gorn_ship_part_joints[7-n], matrix);
                 func_PAL_L05_0042A240(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
                 func_PAL_L15_0043BDC8(object, n-1);
             }

@@ -8,7 +8,7 @@
 
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 extern int flag_set_first_pending(char *self);
 extern int FastDecTimer(char *p);
 extern void func_PAL_L14_003E92D8(char *self);
@@ -37,7 +37,7 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
     switch (self[0x20]) {
     case 0:
         for (p = g_group_entity_lists[self[0x21]];
-             self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && p != 0 &&
+             self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && p != 0 &&
              ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self[0x21]]);
              p++) {
             e = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
@@ -72,7 +72,7 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
         if (FastDecTimer((char *)(state + 0x14)) != 0) {
             *(unsigned short *)(state + 0x14) = (*(int *)(state + 0x34) * 5 + 2) / 6;
             for (q = g_group_entity_lists[self[0x21]];
-                 self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && q != 0 &&
+                 self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && q != 0 &&
                  ((q != 0 && (short)q[-1] >= 0) || q == g_group_entity_lists[self[0x21]]);
                  q++) {
                 e = g_moby_l14_pool + ((*q & 0x7FFF) << 8);
@@ -83,7 +83,7 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
             }
         }
         for (q = g_group_entity_lists[self[0x21]];
-             self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && q != 0 &&
+             self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && q != 0 &&
              ((q != 0 && (short)q[-1] >= 0) || q == g_group_entity_lists[self[0x21]]);
              q++) {
             e = g_moby_l14_pool + ((*q & 0x7FFF) << 8);

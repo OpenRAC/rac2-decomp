@@ -13,10 +13,10 @@ extern void gfx_draw_billboard_quad_with_uv(void *, s32, s32, float, float, floa
 extern s32 FloatToInt(float);
 /* The entity pool pointer and the second tuning word are read absolutely. */
 extern u8 *g_moby_l11_table[] __attribute__((sda));
-extern float D_L11_001B1944[] __attribute__((sda));
-extern float D_L11_001B1940 __attribute__((sda));
-extern s32 D_L11_001B1948 __attribute__((sda));
-extern float D_L11_001B194C __attribute__((sda));
+extern float g_channel_beam_angle_max[] __attribute__((sda));
+extern float g_channel_beam_angle_min __attribute__((sda));
+extern s32 g_channel_beam_count_scale __attribute__((sda));
+extern float g_channel_beam_quad_color __attribute__((sda));
 
 /* The part of the state at +0x68 that this function reads: two four-float tables and the
    index of a 256-byte record of the entity pool. */
@@ -48,12 +48,12 @@ void part_spawn_channel_beam_effects(char *moby)
         *(TI128 *)point = *(TI128 *)offset;
         matrix_mul_vec3(point, point, g_moby_l11_table[0] + (state->entity << 8) + 0xC0);
         FastVecAdd(point, point, g_moby_l11_table[0] + (state->entity << 8) + 0x10);
-        angle = math_lerp_float(D_L11_001B1940, D_L11_001B1944[0], state->level[i]);
+        angle = math_lerp_float(g_channel_beam_angle_min, g_channel_beam_angle_max[0], state->level[i]);
         level_value = state->level[i];
         if (level_value < 0.1f)
-            count = FloatToInt((float)D_L11_001B1948 * level_value * 10.0f);
+            count = FloatToInt((float)g_channel_beam_count_scale * level_value * 10.0f);
         else
-            count = FloatToInt((float)D_L11_001B1948 * (1.0f - level_value));
-        gfx_draw_billboard_quad_with_uv(point, count, 0, angle, D_L11_001B194C, 0.08f);
+            count = FloatToInt((float)g_channel_beam_count_scale * (1.0f - level_value));
+        gfx_draw_billboard_quad_with_uv(point, count, 0, angle, g_channel_beam_quad_color, 0.08f);
     }
 }

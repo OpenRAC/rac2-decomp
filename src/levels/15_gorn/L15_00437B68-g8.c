@@ -13,12 +13,12 @@
 typedef struct { float x,y,z,w; } GornVec __attribute__((aligned(16)));
 typedef struct { GornVec vertex[4]; unsigned int color[4]; float uv[4][2]; long long tag[4]; GornVec matrix[4]; } GornPacket;
 typedef struct { short position,uv,color; } GornCorner;
-extern GornVec D_L15_002B6D50[];
-extern GornCorner D_L15_002B74E0[][4];
-extern float D_L15_002B7E40[][2];
-extern unsigned int D_L15_002B8688[];
-extern int D_L15_001B1870 __attribute__((sda));
-extern int D_L15_001B1878 __attribute__((sda));
+extern GornVec g_backdrop_vertex_table[];
+extern GornCorner g_backdrop_corner_table[][4];
+extern float g_backdrop_uv_table[][2];
+extern unsigned int g_backdrop_color_table[];
+extern int g_backdrop_effect_flag __attribute__((sda));
+extern int g_backdrop_fade_amount __attribute__((sda));
 extern long long GetEffectTextureDescriptor(int);
 extern void FastVecScale(void *,const void *,float);
 extern void draw_world_quad(void *,void *,int);
@@ -46,57 +46,57 @@ void DrawScrollingGridLayers(char *object,int preview)
     *(float *)(state+4)-=0.00045f;
     if (*(float *)(state+4)<=-8.0f) *(float *)(state+4)+=8.0f;
     if (preview) {
-        for(i=0;i<121;i++) D_L15_002B6D50[i].z=300.0f;
+        for(i=0;i<121;i++) g_backdrop_vertex_table[i].z=300.0f;
         for(i=0;i<100;i++) {
             for(corner=0;corner<4;corner++) {
-                position_index=D_L15_002B74E0[i][corner].position; uv_index=D_L15_002B74E0[i][corner].uv; color_index=D_L15_002B74E0[i][corner].color;
-                FastVecScale(&packet.vertex[corner],&D_L15_002B6D50[position_index],1.0f);
-                packet.uv[corner][0]=D_L15_002B7E40[uv_index][0]+*(float *)(state+4);
-                packet.uv[corner][1]=D_L15_002B7E40[uv_index][1];
-                packet.color[corner]=(D_L15_002B8688[color_index]&0xFFFFFF)|0x7F000000;
+                position_index=g_backdrop_corner_table[i][corner].position; uv_index=g_backdrop_corner_table[i][corner].uv; color_index=g_backdrop_corner_table[i][corner].color;
+                FastVecScale(&packet.vertex[corner],&g_backdrop_vertex_table[position_index],1.0f);
+                packet.uv[corner][0]=g_backdrop_uv_table[uv_index][0]+*(float *)(state+4);
+                packet.uv[corner][1]=g_backdrop_uv_table[uv_index][1];
+                packet.color[corner]=(g_backdrop_color_table[color_index]&0xFFFFFF)|0x7F000000;
             }
             draw_world_quad(&packet,0,0);
         }
         return;
     }
-    for(i=0;i<121;i++) D_L15_002B6D50[i].z=800.0f;
+    for(i=0;i<121;i++) g_backdrop_vertex_table[i].z=800.0f;
     for(i=0;i<100;i++) {
         unsigned int *colors=packet.color; float *v=&packet.uv[0][1]; float *u=&packet.uv[0][0]; GornVec *vertex=packet.vertex;
         for(corner=0;corner<4;corner++) {
-            position_index=D_L15_002B74E0[i][corner].position; uv_index=D_L15_002B74E0[i][corner].uv; color_index=D_L15_002B74E0[i][corner].color;
-            FastVecScale(vertex,&D_L15_002B6D50[position_index],1.0f);
-            *u=D_L15_002B7E40[uv_index][0]+*(float *)(state+4);
-            *v=D_L15_002B7E40[uv_index][1];
-            *colors=D_L15_002B8688[color_index];
+            position_index=g_backdrop_corner_table[i][corner].position; uv_index=g_backdrop_corner_table[i][corner].uv; color_index=g_backdrop_corner_table[i][corner].color;
+            FastVecScale(vertex,&g_backdrop_vertex_table[position_index],1.0f);
+            *u=g_backdrop_uv_table[uv_index][0]+*(float *)(state+4);
+            *v=g_backdrop_uv_table[uv_index][1];
+            *colors=g_backdrop_color_table[color_index];
             vertex++;u+=2;v+=2;colors++;
         }
         draw_world_quad(&packet,0,0);
     }
-    for(i=0;i<121;i++) D_L15_002B6D50[i].z=1200.0f;
+    for(i=0;i<121;i++) g_backdrop_vertex_table[i].z=1200.0f;
     for(i=0;i<100;i++) {
         unsigned int *colors=packet.color; float *v=&packet.uv[0][1]; float *u=&packet.uv[0][0]; GornVec *vertex=packet.vertex;
         for(corner=0;corner<4;corner++) {
-            position_index=D_L15_002B74E0[i][corner].position; uv_index=D_L15_002B74E0[i][corner].uv; color_index=D_L15_002B74E0[i][corner].color;
-            FastVecScale(vertex,&D_L15_002B6D50[position_index],1.0f);
-            *u=D_L15_002B7E40[uv_index][0]+*(float *)(state+4);
-            *v=D_L15_002B7E40[uv_index][1];
-            *colors=D_L15_002B8688[color_index];
+            position_index=g_backdrop_corner_table[i][corner].position; uv_index=g_backdrop_corner_table[i][corner].uv; color_index=g_backdrop_corner_table[i][corner].color;
+            FastVecScale(vertex,&g_backdrop_vertex_table[position_index],1.0f);
+            *u=g_backdrop_uv_table[uv_index][0]+*(float *)(state+4);
+            *v=g_backdrop_uv_table[uv_index][1];
+            *colors=g_backdrop_color_table[color_index];
             vertex++;u+=2;v+=2;colors++;
         }
         draw_world_quad(&packet,0,0);
     }
-    if (D_L15_001B1870) {
-        for(i=0;i<121;i++) D_L15_002B6D50[i].z=405.0f;
+    if (g_backdrop_effect_flag) {
+        for(i=0;i<121;i++) g_backdrop_vertex_table[i].z=405.0f;
         for(i=0;i<100;i++) {
             for(corner=0;corner<4;corner++) {
                 GornVec *positions;
-                position_index=D_L15_002B74E0[i][corner].position; uv_index=D_L15_002B74E0[i][corner].uv; color_index=D_L15_002B74E0[i][corner].color;
-                positions=D_L15_002B6D50;
+                position_index=g_backdrop_corner_table[i][corner].position; uv_index=g_backdrop_corner_table[i][corner].uv; color_index=g_backdrop_corner_table[i][corner].color;
+                positions=g_backdrop_vertex_table;
                 FastVecScale(&packet.vertex[corner],positions+position_index,1.0f);
-                packet.uv[corner][0]=D_L15_002B7E40[uv_index][0]+*(float *)(state+4);
-                packet.uv[corner][1]=D_L15_002B7E40[uv_index][1];
-                color=D_L15_002B8688[color_index];
-                faded=((int)color>>24)-D_L15_001B1878;
+                packet.uv[corner][0]=g_backdrop_uv_table[uv_index][0]+*(float *)(state+4);
+                packet.uv[corner][1]=g_backdrop_uv_table[uv_index][1];
+                color=g_backdrop_color_table[color_index];
+                faded=((int)color>>24)-g_backdrop_fade_amount;
                 alpha=faded<0?0:faded;
                 packet.color[corner]=(color&0xFFFFFF)|((unsigned int)alpha<<24);
             }

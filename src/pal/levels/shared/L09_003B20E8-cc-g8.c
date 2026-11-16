@@ -19,8 +19,8 @@ typedef struct {
 } ProjectileState;
 
 extern char *CreateMoby(int);
-extern char D_0018A0E0[];
-extern float D_L09_001AF89C __attribute__((sda));
+extern char g_hero_state_block[];
+extern float g_projectile_spawn_factor __attribute__((sda));
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecLength(void *);
@@ -48,14 +48,14 @@ char *func_PAL_L09_003B20E8(void *pos, char *owner, float f, float range, float 
         qcopy(obj + 0x10, pos);
         st->range = range;
         qcopy(obj + 0xC0, &st->direction);
-        FastVecCross(obj + 0xD0, obj + 0xC0, D_0018A0E0);
+        FastVecCross(obj + 0xD0, obj + 0xC0, g_hero_state_block);
         vec_scale_to_length(obj + 0xD0, obj + 0xD0, -1.0f);
         FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
         length = FastVecLength(dir);
         ticks = st->range / length;
         st->ticks = (((int)(FloatToInt(ticks)) * 5 + 2) / 6);
         length = IntToFloat(st->ticks);
-        factor = D_L09_001AF89C;
+        factor = g_projectile_spawn_factor;
         st->owner = owner;
         st->f = f;
         st->a = a;

@@ -24,8 +24,8 @@ typedef struct {
     char gap2[0x146];
     char *objects[3];
 } Scene05;
-extern Scene05 D_L05_001BD3C0;
-extern char D_L05_00294A90[];
+extern Scene05 g_scene_objects;
+extern char g_scene_spawn_entries[];
 extern int g_current_map_index __attribute__((sda));
 
 void func_PAL_L05_003168F8(void)
@@ -38,8 +38,8 @@ void func_PAL_L05_003168F8(void)
     int i;
     char *obj;
     anim_start_startup_animations();
-    for (i = 0; i < D_L05_001BD3C0.count; i++) {
-        char *current = D_L05_001BD3C0.objects[i];
+    for (i = 0; i < g_scene_objects.count; i++) {
+        char *current = g_scene_objects.objects[i];
         if (current && *(short *)(current + 0xAA) == 0xE29)
             *(unsigned short *)(current + 0x34) |= 0x800;
         if (*(short *)(current + 0xAA) == 0xD54) func_PAL_002E7270(current);
@@ -51,9 +51,9 @@ void func_PAL_L05_003168F8(void)
             }
         }
     }
-    if (g_current_map_index != 5 || D_L05_001BD3C0.mode) return;
-    obj = D_L05_001BD3C0.objects[2];
-    if (D_L05_001BD3C0.timer == 0x52) {
+    if (g_current_map_index != 5 || g_scene_objects.mode) return;
+    obj = g_scene_objects.objects[2];
+    if (g_scene_objects.timer == 0x52) {
         vec_fast_to_int_helper(*(char **)(obj + 0x58) + 0x10, (char *)scratch.matrix);
         quaternion_to_rotation_basis((char *)scratch.matrix, obj + 0xC0);
         moby_compute_local_point(obj, (char *)pos, 4.0f, 3.0f, 5.0f);
@@ -61,11 +61,11 @@ void func_PAL_L05_003168F8(void)
         moby_compute_local_point(obj, (char *)pos, 9.0f, 4.0f, 4.0f);
         func_PAL_L05_0042A240((char *)pos, 35, 50, 30, 30, 30, 50, 1, 1, 1, 1, 1.0f);
     }
-    if ((unsigned int)(D_L05_001BD3C0.timer - 0x22) < 0x5f && !math_random_int_below(4)) {
+    if ((unsigned int)(g_scene_objects.timer - 0x22) < 0x5f && !math_random_int_below(4)) {
         float sign = 1.0f;
         float *entry;
         if (math_random_int_below(2)) sign = -1.0f;
-        entry = (float *)(D_L05_00294A90 + math_random_int_below(3) * 32);
+        entry = (float *)(g_scene_spawn_entries + math_random_int_below(3) * 32);
         moby_compute_local_point(obj, (char *)pos, entry[0], entry[1], entry[2]);
         moby_compute_local_point(obj, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
         scratch.vectors.dest[0] += math_random_signed_float_range(0.5f, 1.5f);

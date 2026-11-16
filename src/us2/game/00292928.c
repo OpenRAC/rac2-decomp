@@ -30,7 +30,7 @@ typedef struct {
     DiscPack packs[9];        /* 0x4F08 */
 } DiscToc;
 extern DiscToc g_copy_setup_data;
-extern unsigned long long D_001A72A0[] __attribute__((sda));
+extern unsigned long long g_tex_fill_table[] __attribute__((sda));
 
 /* Boot data words reached at their fixed addresses, which gives the retail
    code's absolute (lui) addressing. */
@@ -55,7 +55,7 @@ typedef struct {
 } TextureRecord;
 
 /* Loads the texture pack of a program: see func_00292078. */
-void func_US2_00292928(int pack)
+void tex_load_pack_to_vram_us2(int pack)
 {
     GsLoadImage work;
     TextureRecord *record;
@@ -118,7 +118,7 @@ void func_US2_00292928(int pack)
         tag |= (unsigned long long)n << 30;
         f = ((unsigned long long)clut_page << 37) | 0x400000000ULL;
         tag |= f;
-        D_001A72A0[i] = tag | 0x8000000000000000ULL;
+        g_tex_fill_table[i] = tag | 0x8000000000000000ULL;
         image_vram += record->width * record->height * 4;
         cursor++;
     }

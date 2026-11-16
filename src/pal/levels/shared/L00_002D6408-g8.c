@@ -18,15 +18,15 @@ typedef struct {
 
 extern Hero5940 g_hero_state;
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern int D_0018C350[];
-extern unsigned char D_001A7A00[] __attribute__((sda));
-extern int D_0018C2EC[];
-extern unsigned char D_001A7A28[] MACRO_ADDR;
+extern int g_collection_progress_table[];
+extern unsigned char g_player_stats[] __attribute__((sda));
+extern int g_request_enabled_flag[];
+extern unsigned char g_collection_progress_flags[] MACRO_ADDR;
 extern unsigned char g_item_slot_to_record[];
-extern int D_L00_001A903C;
+extern int g_collection_progress_flag;
 extern unsigned short g_subtitle_history __attribute__((section(".data")));
-extern int D_00139868[];
-extern int D_001A7398[] MACRO_ADDR;
+extern int g_help_entry_state[];
+extern int g_menu_choice_table[] MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
 /* One 0xE0-byte entry of D_L00_00262570, indexed through D_00139568. */
@@ -46,14 +46,14 @@ extern Entry1269 g_weapon_l00_table[];
 extern int math_sum_table_entries_under_limit(int *, int *, int *);
 extern void hud_queue_hint_message(int, int);
 extern void effect_controller_spawn(void);
-extern void func_PAL_L00_0030E648(int);
-extern void func_PAL_002B1588(int, int);
+extern void module_l00_call_handler_with_arg_4_pal(int);
+extern void value_set_entry_by_index_pal(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int flag_is_byte_set(void);
 extern int menu_count_chain_entries_after_head(int);
 extern void gfx_set_screen_pair_run_effect(int, int);
 extern void menu_advance_chain_entry(int);
-extern void func_PAL_00288E20(int);
+extern void help_show_message_for_id_pal(int);
 extern int ref_PAL_L00_002D6408_00 __attribute__((sda));
 
 static inline int special(int i)
@@ -89,7 +89,7 @@ static inline int owned(int i)
     return 0;
 }
 
-void func_PAL_L00_002D6408(void)
+void hero_update_collection_progress_pal(void)
 {
     int count, i, j, ok;
 
@@ -97,23 +97,23 @@ void func_PAL_L00_002D6408(void)
         return;
     count = 4;
     {
-        int *p = D_0018C350;
+        int *p = g_collection_progress_table;
         math_sum_table_entries_under_limit(p, p - 1, &count);
     }
     for (j = 0; j < 10; j++)
-        if (D_001A7A28[j])
+        if (g_collection_progress_flags[j])
             count++;
-    if (*(int *)D_001A7A00 != count) {
-        if (ref_PAL_L00_002D6408_00 >= 11 && *(int *)D_001A7A00 < count) {
+    if (*(int *)g_player_stats != count) {
+        if (ref_PAL_L00_002D6408_00 >= 11 && *(int *)g_player_stats < count) {
             if (!g_subtitle_history)
                 hud_queue_hint_message(0x9A9, 0);
             effect_controller_spawn();
-            func_PAL_L00_0030E648(0x12C);
-            func_PAL_002B1588(0x1235, -1);
+            module_l00_call_handler_with_arg_4_pal(0x12C);
+            value_set_entry_by_index_pal(0x1235, -1);
             snd_play_from_global_bank(6, 0, 0);
         }
-        D_0018C2EC[0] = count;
-        *(int *)D_001A7A00 = count;
+        g_request_enabled_flag[0] = count;
+        *(int *)g_player_stats = count;
     }
 
     for (i = 0; i < 56; i++) {
@@ -135,7 +135,7 @@ void func_PAL_L00_002D6408(void)
             continue;
         {
             Entry1269 *e = &g_weapon_l00_table[g_item_slot_to_record[i]];
-            if ((D_00139868[i] >> 5) < e->limit || e->limit <= 0)
+            if ((g_help_entry_state[i] >> 5) < e->limit || e->limit <= 0)
                 continue;
             if (i == 31 || i == 9 || i == 45) {
                 gfx_set_screen_pair_run_effect(i, g_weapon_l00_table[g_item_slot_to_record[i]].value);
@@ -144,7 +144,7 @@ void func_PAL_L00_002D6408(void)
             if (g_hero_state.weapon == i) {
                 if (!g_hero_state.f340)
                     continue;
-                if (D_001A7398[e->index] != i)
+                if (g_menu_choice_table[e->index] != i)
                     continue;
                 gfx_set_screen_pair_run_effect(i, e->value);
                 continue;
@@ -157,16 +157,16 @@ void func_PAL_L00_002D6408(void)
             if (unlocked(e, i)) {
                 if (owned(i)) {
                     menu_advance_chain_entry(i);
-                    func_PAL_00288E20(i);
+                    help_show_message_for_id_pal(i);
                 }
             }
         } else {
             menu_advance_chain_entry(i);
-            func_PAL_00288E20(i);
+            help_show_message_for_id_pal(i);
         }
     }
 
-    if ((g_frame_l00_counter[0] & 127) || D_001A7A00[0x7A])
+    if ((g_frame_l00_counter[0] & 127) || g_player_stats[0x7A])
         return;
     ok = 1;
     for (i = 0; i < 56; i++) {
@@ -190,10 +190,10 @@ void func_PAL_L00_002D6408(void)
             }
         }
     }
-    if (ok && !D_001A7A00[0x7A]) {
-        D_001A7A00[0x7A] = 1;
+    if (ok && !g_player_stats[0x7A]) {
+        g_player_stats[0x7A] = 1;
         snd_play_from_global_bank(1, 0, 0);
-        func_PAL_002B1588(0x1233, -1);
-        D_L00_001A903C = 1;
+        value_set_entry_by_index_pal(0x1233, -1);
+        g_collection_progress_flag = 1;
     }
 }

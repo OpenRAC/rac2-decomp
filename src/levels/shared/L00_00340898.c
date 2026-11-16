@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
-extern unsigned char *D_L00_001FEAEC;
+extern unsigned char *g_dark_puff_effect_byte;
 
 /* Spawns a dark puff particle that drifts along the given velocity and slowly changes size. */
 unsigned char *part_spawn_dark_puff(Quadword *position, float *velocity, int flags, int lifetime, float scale) {
@@ -20,7 +20,7 @@ unsigned char *part_spawn_dark_puff(Quadword *position, float *velocity, int fla
         particle[3] = flags;
         particle[1] = 0;
         particle[8] = math_random_int_below(255);
-        particle[2] = *D_L00_001FEAEC;
+        particle[2] = *g_dark_puff_effect_byte;
         *(short *)(particle + 0xA) = lifetime;
         *(float *)motion = velocity[0];
         *(float *)(motion + 4) = velocity[1];

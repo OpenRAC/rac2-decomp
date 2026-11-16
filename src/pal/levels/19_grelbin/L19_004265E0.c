@@ -2,36 +2,36 @@
 
 #include "common.h"
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern int D_L19_001C9FC0[];
+extern int g_mover_var_index[];
 extern void BuildObjectAttachmentTransforms(char *, char *, int, int, int, int, int, int);
 extern void moby_update_attached_transforms(char *, char *);
 extern void euler_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
-extern u16 *D_L19_001FB5A0[];
+extern u16 *g_group_ptr_table[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern s32 D_L19_001B2A38[] __attribute__((sda));
+extern s32 g_max_l19_group_index[] __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern s32 flag_is_third_pending_set(u8 *);
 extern void moby_mark_spawned(u8 *);
-extern float D_L19_001B1ECC[] SDATA(D_L19_001B1ECC);
-extern float D_L19_001B1ED0[] SDATA(D_L19_001B1ED0);
-extern float D_L19_001B1ED4[] SDATA(D_L19_001B1ED4);
-extern float D_L19_001B1ED8[] SDATA(D_L19_001B1ED8);
-extern u8 D_L19_001B1EDC[] SDATA(D_L19_001B1EDC);
-extern int D_L19_001B1EE0[] SDATA(D_L19_001B1EE0);
-extern int D_L19_001B1EE4[] SDATA(D_L19_001B1EE4);
-extern float D_L19_001B1EE8[] SDATA(D_L19_001B1EE8);
-extern float D_L19_001B1EEC[] SDATA(D_L19_001B1EEC);
-extern u32 D_L19_001B1EF0[] SDATA(D_L19_001B1EF0);
-extern u32 D_L19_001B1EF4[] SDATA(D_L19_001B1EF4);
-extern int D_L19_001B1EFC[] SDATA(D_L19_001B1EFC);
-extern int D_L19_001B1F00[] SDATA(D_L19_001B1F00);
+extern float g_group_release_speed_min_a[] SDATA(D_L19_001B1ECC);
+extern float g_group_release_speed_max_a[] SDATA(D_L19_001B1ED0);
+extern float g_group_release_speed_min_b[] SDATA(D_L19_001B1ED4);
+extern float g_group_release_speed_max_b[] SDATA(D_L19_001B1ED8);
+extern u8 g_group_release_glow_alpha[] SDATA(D_L19_001B1EDC);
+extern int g_group_release_particle_type_a[] SDATA(D_L19_001B1EE0);
+extern int g_group_release_particle_type_b[] SDATA(D_L19_001B1EE4);
+extern float g_group_release_particle_scale_a[] SDATA(D_L19_001B1EE8);
+extern float g_group_release_particle_scale_b[] SDATA(D_L19_001B1EEC);
+extern u32 g_group_release_color_start[] SDATA(D_L19_001B1EF0);
+extern u32 g_group_release_color_end[] SDATA(D_L19_001B1EF4);
+extern int g_group_release_fade_param_a[] SDATA(D_L19_001B1EFC);
+extern int g_group_release_fade_param_b[] SDATA(D_L19_001B1F00);
 
 /* Arms the rig object once its data arrives, then, when the level word matches the rig's tag, applies the stored rotations to the object and to every joint record. */
-void func_PAL_L19_004265E0(char *obj)
+void rotated_rig_update_pal(char *obj)
 {
     char *rig = *(char **)(obj + 0x68);
     float turn[4] __attribute__((aligned(16)));
@@ -55,7 +55,7 @@ void func_PAL_L19_004265E0(char *obj)
         }
         return;
     case 1:
-        if (D_L19_001C9FC0[0] == *(s32 *)(rig + 0xC)) {
+        if (g_mover_var_index[0] == *(s32 *)(rig + 0xC)) {
             turn[0] = *(float *)(rig + 0x10) * 0.0003490659f;
             turn[1] = *(float *)(rig + 0x14) * 0.0003490659f;
             turn[2] = *(float *)(rig + 0x18) * 0.0003490659f;

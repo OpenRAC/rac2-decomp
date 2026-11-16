@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
+extern u8 *g_moby_instance_table[] __attribute__((sda));
 
-extern u8 *D_L16_001B2B20[] __attribute__((sda));
+extern u8 *g_moby_instance_limit[] __attribute__((sda));
 
 extern u8 *moby_get_private_value_0(u8 *);
 
@@ -16,8 +16,8 @@ void snivelak_clean_up_arena_mobys(u8 *moby)
     u32 class_id;
     s16 class_short;
 
-    entity = D_L16_001B2B1C[0];
-    if (D_L16_001B2B20[0] < entity)
+    entity = g_moby_instance_table[0];
+    if (g_moby_instance_limit[0] < entity)
         return;
     do {
         class_id = *(u16 *)(entity + 0xAA);
@@ -39,5 +39,5 @@ void snivelak_clean_up_arena_mobys(u8 *moby)
             }
         }
         entity += 0x100;
-    } while (D_L16_001B2B20[0] >= entity);
+    } while (g_moby_instance_limit[0] >= entity);
 }

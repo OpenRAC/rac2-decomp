@@ -24,9 +24,9 @@ typedef struct {
     int count;      /* +0x34 -> 0x1A7274 */
 } LevelQueue5a29d35d;
 
-extern LevelQueue5a29d35d D_001A7240 __attribute__((sda));
+extern LevelQueue5a29d35d g_buffer_slot_queue __attribute__((sda));
 
-extern char D_L03_00226150[];
+extern char g_gfx_l03_buffer_slot_table[];
 
 extern int sceSifSetDma(int *dma, int flag);
 
@@ -45,9 +45,9 @@ struct Node {
     int count;
 };
 
-extern struct Node D_L05_00226A00 __attribute__((nosda));
+extern struct Node g_buffer_slot_nodes __attribute__((nosda));
 
-extern short D_L05_00226700[][2];
+extern short g_buffer_slot_overrides[][2];
 
 /* Apply nonzero signed halfword overrides to indexed rows of selected objects. */
 typedef struct {
@@ -68,11 +68,11 @@ typedef struct {
 
 typedef struct { short first; short second; } ListOverridePair;
 
-extern int D_L00_0022DC00[];
+extern int g_selected_object_rows[];
 
-extern ListOverrideObject *D_L00_00226700[];
+extern ListOverrideObject *g_tie_class_table[];
 
-extern ListOverridePair D_L00_0022D600[];
+extern ListOverridePair g_object_override_pairs[];
 
 /* Picks a float threshold (1.0 or 8.0) from a callee status code, compares a probed float against it, and returns a boolean that also latches a trailing probe. */
 /* Checks if the follower has reached its target (closer than 1.0, or 8.0 in state 2) and is not dying; returns 1 if so. */
@@ -100,11 +100,11 @@ int follower_has_reached_target(int *owner)
 void gfx_reset_buffer_slot_table(void)
 {
     int i;
-    D_001A7240.cursor = D_001A7240.start;
-    D_001A7240.count = 0;
+    g_buffer_slot_queue.cursor = g_buffer_slot_queue.start;
+    g_buffer_slot_queue.count = 0;
     for (i = 0; i < 64; i++) {
-        *(int *)(D_L03_00226150 + i * 16) = 0;
-        *(int *)(D_L03_00226150 + i * 16 + 4) = 0;
+        *(int *)(g_gfx_l03_buffer_slot_table + i * 16) = 0;
+        *(int *)(g_gfx_l03_buffer_slot_table + i * 16 + 4) = 0;
     }
 }
 
@@ -115,41 +115,41 @@ int gfx_alloc_buffer_slot(int tag, int sendCount, int recordCount, int label)
     int request[4];
     int slot, index;
 
-    if (D_001A7240.end - (D_001A7240.cursor - D_001A7240.start) < recordCount * 16)
+    if (g_buffer_slot_queue.end - (g_buffer_slot_queue.cursor - g_buffer_slot_queue.start) < recordCount * 16)
         return -1;
-    if (D_001A7240.count == 64)
+    if (g_buffer_slot_queue.count == 64)
         return -2;
 
     request[0] = tag;
-    request[1] = D_001A7240.cursor;
+    request[1] = g_buffer_slot_queue.cursor;
     request[2] = sendCount * 16;
     request[3] = 0;
     sceSifSetDma(request, 1);
 
-    slot = D_001A7240.count;
+    slot = g_buffer_slot_queue.count;
     index = slot;
     slot = slot + 1;
-    D_001A7240.count = slot;
-    *(int *)(D_L03_00226150 + index * 16) = D_001A7240.cursor;
-    *(int *)(D_L03_00226150 + index * 16 + 4) = recordCount;
-    *(int *)(D_L03_00226150 + index * 16 + 8) = label;
-    D_001A7240.cursor = D_001A7240.cursor + recordCount * 16;
+    g_buffer_slot_queue.count = slot;
+    *(int *)(g_gfx_l03_buffer_slot_table + index * 16) = g_buffer_slot_queue.cursor;
+    *(int *)(g_gfx_l03_buffer_slot_table + index * 16 + 4) = recordCount;
+    *(int *)(g_gfx_l03_buffer_slot_table + index * 16 + 8) = label;
+    g_buffer_slot_queue.cursor = g_buffer_slot_queue.cursor + recordCount * 16;
     return index;
 }
 
 typedef struct { int address, count, reserved[2]; } TransferRow16;
-extern TransferRow16 D_L00_002254D0[];
+extern TransferRow16 g_buffer_slot_transfers[];
 
 /* Sends part of an already reserved buffer slot. Returns 0 on success or a negative error code. */
 int gfx_send_buffer_slot_records(int tag, unsigned int slot, int firstRecord, int count)
 {
     int request[4];
-    if (slot >= 64 || D_L00_002254D0[slot].count == 0)
+    if (slot >= 64 || g_buffer_slot_transfers[slot].count == 0)
         return -3;
-    if (D_L00_002254D0[slot].count < firstRecord + count)
+    if (g_buffer_slot_transfers[slot].count < firstRecord + count)
         return -1;
     request[0] = tag;
-    request[1] = D_L00_002254D0[slot].address + firstRecord * 16;
+    request[1] = g_buffer_slot_transfers[slot].address + firstRecord * 16;
     request[2] = count * 16;
     request[3] = 0;
     sceSifSetDma(request, 1);
@@ -184,7 +184,7 @@ int gfx_get_buffer_slot_record_count(unsigned int slot) {
 /* Walks every terrain draw list and patches the drawing settings of each entry with the override values for its type. */
 void PatchTfragGifs(void)
 {
-    struct Node *table = &D_L05_00226A00;
+    struct Node *table = &g_buffer_slot_nodes;
 
     if (table->elems != 0) {
         do {
@@ -194,7 +194,7 @@ void PatchTfragGifs(void)
                 int remaining = table->count;
 
                 do {
-                    short *override = D_L05_00226700[elem->f35];
+                    short *override = g_buffer_slot_overrides[elem->f35];
                     if (override[0] != 0) elem->f0 = (elem->f0 & 0xFFFFC000u) | (unsigned int)override[0];
                     if (override[1] != 0) elem->f48 = (elem->f48 & 0xFFFFC000u) | (unsigned int)override[1];
                     elem++;
@@ -224,23 +224,23 @@ ASM_FUNC("asm/game", func_002F0D00);
 /* Runs one set of render steps for the level using the current list position. */
 void gfx_run_level_render_step(void)
 {
-    extern int D_001A72D0 __attribute__((sda));
+    extern int g_vram_cursor __attribute__((sda));
     extern void func_002F3300(int);
     extern void gfx_append_vu1_preset_a(void);
-    func_002F3300(D_001A72D0);
+    func_002F3300(g_vram_cursor);
     gfx_append_vu1_preset_a();
 }
 
 /* apply nonzero signed halfword overrides to selected object rows; observed count0F, rows1C, stride50 and key33 */
 void gfx_apply_object_row_overrides(void)
 {
-    int *selected = D_L00_0022DC00;
+    int *selected = g_selected_object_rows;
     while (*selected >= 0) {
-        ListOverrideObject *object = D_L00_00226700[*selected];
+        ListOverrideObject *object = g_tie_class_table[*selected];
         int i = 0;
         ListOverrideRow *row = object->rows;
         while (i < object->count) {
-            ListOverridePair *pair = &D_L00_0022D600[row->key];
+            ListOverridePair *pair = &g_object_override_pairs[row->key];
             if (pair->first != 0)
                 row->first = (row->first & 0xffffc000u) | pair->first;
             if (pair->second != 0)

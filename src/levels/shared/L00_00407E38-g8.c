@@ -5,8 +5,8 @@
 #include "common.h"
 
 extern struct { char pad[0x80]; float pos[4]; char gap[0x2200]; int surface; } g_hero_state;
-extern int D_L00_001ADB2C;
-extern int D_L00_001A8FF0, D_L00_001A8FF4;
+extern int g_active_tether_object;
+extern int g_hero_locked_flag, g_hero_action_blocked_flag;
 extern struct { char pad[0x18]; int surface; int gap; float point[4]; } g_collision_result;
 extern void copy_matrix_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
@@ -51,10 +51,10 @@ void dark_sheep_update(char *object)
     char *position;
     float angle, choice;
     int hit;
-    if (AI_B(object,0x20) && D_L00_001ADB2C) {
+    if (AI_B(object,0x20) && g_active_tether_object) {
         copy_matrix_rotation(scratch,object+0xC0);
         mat_get_euler_angles(scratch,end);
-        moby_transform_point_and_rotation_by_parent(object,D_L00_001ADB2C,object+0x10,end,object+0x10,offset);
+        moby_transform_point_and_rotation_by_parent(object,g_active_tether_object,object+0x10,end,object+0x10,offset);
         euler_rotation_basis(object+0xC0,offset);
         qcopy(object+0xF0,offset);
     }
@@ -72,7 +72,7 @@ void dark_sheep_update(char *object)
             if (choice>=0.0f && choice<25.0f) anim_start_blended(object,0,0,10);
             if (choice>=25.0f && choice<50.0f) anim_start_blended(object,4,0,10);
             if (choice>=50.0f && choice<75.0f) anim_start_blended(object,1,0,10);
-            if (choice>=75.0f && choice<100.0f && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
+            if (choice>=75.0f && choice<100.0f && !g_hero_action_blocked_flag && !g_hero_locked_flag) {
                 *(AI_Quad *)scratch=*(AI_Quad *)(object+0x10);
                 AI_P(state,0x7C)=FindBestTargetByReach(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
                 if (AI_P(state,0x7C)) {
@@ -82,14 +82,14 @@ void dark_sheep_update(char *object)
                 }
             }
         }
-        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2.0f && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
+        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2.0f && !g_hero_action_blocked_flag && !g_hero_locked_flag) {
             moby_set_state(object,2,-1);
             anim_start_blended(object,5,0,1);
             AI_F(object,0x48)=1.7f;
         }
         if (math_fast_float_d(state+0x70)) {
-            if (D_L00_001A8FF4) return;
-            if (!D_L00_001A8FF0) {
+            if (g_hero_action_blocked_flag) return;
+            if (!g_hero_locked_flag) {
                 if (math_random_int_below(2)) {
                     moby_set_state(object,5,-1);
                     AI_I(state,0x70)=math_random_int_range(400,600);
@@ -162,11 +162,11 @@ void dark_sheep_update(char *object)
             if (g_collision_result.surface!=g_hero_state.surface) qcopy(object+0x10,g_collision_result.point);
         }
         hit=GetCollHitMaterial();
-        if (hit>0 && hit!=10 && !D_L00_001A8FF4) {moby_explode_and_hurt_nearby(object);return;}
+        if (hit>0 && hit!=10 && !g_hero_action_blocked_flag) {moby_explode_and_hurt_nearby(object);return;}
         moby_set_state(object,1,-1);
         break;
     }
-    if (!D_L00_001A8FF4 && !D_L00_001A8FF0) {
+    if (!g_hero_action_blocked_flag && !g_hero_locked_flag) {
         qcopy(scratch,object+0x10);
         scratch[2]+=0.5f;
         AI_F(object,0x18)=coll_probe_ground_height_below(scratch,0,0.5f);

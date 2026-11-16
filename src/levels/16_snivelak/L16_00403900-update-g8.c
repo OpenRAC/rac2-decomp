@@ -32,8 +32,8 @@ typedef struct {
     u8 *target2290;
 } PlayerView;
 extern PlayerView g_hero_state NOT_SDA;
-extern float D_L16_001A8F20[4] __attribute__((sda));
-extern u8 *D_L16_001BFF58 NOT_SDA;
+extern float g_particle_template[4] __attribute__((sda));
+extern u8 *g_aim_target_moby NOT_SDA;
 /* Partial view shared with the matched sibling death/debris update. */
 extern struct {
     u8 pad000[0x160];
@@ -103,7 +103,7 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
                 vec_random_direction(position, 0.13333334f, 0.20000002f);
                 position[2] = math_fabs(position[2]);
                 position[2] *= 2.5f;
-                FastVecAdd(position, position, D_L16_001A8F20);
+                FastVecAdd(position, position, g_particle_template);
                 child = cam_moby_create(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, position, 255, 30.0f, 15.0f);
                 *(void (**)(void *))(child + 0x64) = moby_fade_out_update;
@@ -111,18 +111,18 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
             PlayMobySound(0, 0, moby);
             part_create_flash(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 2.0f, 1, 1);
             part_create_flash(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 1.0f, 1, 1);
-            D_L16_001B99C0.damping = 0.1f;
-            D_L16_001B99C0.lifetime = 90;
-            D_L16_001B99C0.strength = 0.2f;
-            D_L16_001B99C0.duration = 60;
-            D_L16_001B99C0.timer = 0;
+            g_snivelak_hero_state.damping = 0.1f;
+            g_snivelak_hero_state.lifetime = 90;
+            g_snivelak_hero_state.strength = 0.2f;
+            g_snivelak_hero_state.duration = 60;
+            g_snivelak_hero_state.timer = 0;
             moby_mark_spawned(*(void **)(state + 0x274));
             position[0] = math_random_signed_float_range(0.5f, 4.0f) * 0.016666668f;
             position[1] = math_random_signed_float_range(0.0f, 4.0f) * 0.016666668f;
             position[2] = math_random_float_range(7.0f, 9.0f) * 0.016666668f;
             position[2] = math_fabs(position[2]);
             position[2] += position[2];
-            FastVecAdd(position, position, D_L16_001A8F20);
+            FastVecAdd(position, position, g_particle_template);
             child = cam_moby_create(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, position, 255, 180.0f, 25.0f);
             hero_copy_field_to_moby(child);
@@ -209,8 +209,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
@@ -218,8 +218,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         break;
@@ -242,8 +242,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
@@ -251,8 +251,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         break;
@@ -282,8 +282,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
@@ -291,8 +291,8 @@ void UpdateSnivelakAimingAndDebris(u8 *moby)
         vec_scale_to_length(aim, aim, 0.833333373f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
             snivelak_spawn_aimed_shot(moby, aim, position, 0, (float)state[0x34]);
         }
         break;

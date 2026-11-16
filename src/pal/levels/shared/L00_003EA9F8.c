@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L00_001B2B54 __attribute__((sda));
+extern char *g_blast_l00_pool __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -16,7 +16,7 @@ char *func_PAL_L00_003EA9F8(char *rec, int mode, float amount, char *pos)
     char v[16] __attribute__((aligned(16)));
     char w[16] __attribute__((aligned(16)));
     char *p;
-    char *base = D_L00_001B2B54;
+    char *base = g_blast_l00_pool;
     int i;
     int z = 0;
     float zero = (float)z;
@@ -36,7 +36,7 @@ char *func_PAL_L00_003EA9F8(char *rec, int mode, float amount, char *pos)
             }
             break;
         }
-        p = D_L00_001B2B54 + i * 128;
+        p = g_blast_l00_pool + i * 128;
         *(char **)(p + 124) = rec;
         ++*(int *)(rec + 56);
         {

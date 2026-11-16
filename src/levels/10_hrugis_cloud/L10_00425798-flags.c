@@ -1,12 +1,12 @@
 #include "names.h"
 
-extern unsigned char *D_L10_001B2528;
+extern unsigned char *g_cloud_object_list;
 extern void moby_mark_spawned(void *);
 
 /* Like func_L05_0037B108 without its first three kinds, with this function's own callees. */
 /* Removes the leftover effect and decoration objects of several classes from the object list. */
 void cloud_destroy_leftover_objects(void) {
-    unsigned char *object = D_L10_001B2528;
+    unsigned char *object = g_cloud_object_list;
     int kind;
     while (object) {
         kind = *(short *)(object + 0xAA);

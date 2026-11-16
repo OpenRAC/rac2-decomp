@@ -12,16 +12,16 @@ typedef struct {
 } HeroBlock;
 extern HeroBlock g_hero_state;
 extern u8 *g_route_polygons[];
-extern float D_L02_001B1970 __attribute__((sda));
-extern float D_L02_001B1974[] __attribute__((sda));
-extern float D_L02_001B1978[] __attribute__((sda));
-extern float D_L02_001B1930 __attribute__((sda));
-extern float D_L02_001B1934 __attribute__((sda));
-extern float D_L02_001B1938 __attribute__((sda));
-extern float D_L02_001B193C __attribute__((sda));
-extern float D_L02_001B1940 __attribute__((sda));
-extern float D_L02_001B1944 __attribute__((sda));
-extern float D_L02_001B1948 __attribute__((sda));
+extern float g_blade_ball_turn_rate_x __attribute__((sda));
+extern float g_blade_ball_turn_rate_y[] __attribute__((sda));
+extern float g_blade_ball_turn_rate_z[] __attribute__((sda));
+extern float g_blade_ball_size_min __attribute__((sda));
+extern float g_blade_ball_size_max __attribute__((sda));
+extern float g_blade_ball_spread_min __attribute__((sda));
+extern float g_blade_ball_spread_max __attribute__((sda));
+extern float g_blade_ball_up_speed_min __attribute__((sda));
+extern float g_blade_ball_up_speed_max __attribute__((sda));
+extern float g_blade_ball_ground_effect_param __attribute__((sda));
 extern void func_PAL_L02_00411720(u8 *);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
@@ -32,19 +32,19 @@ extern s32 math_random_int_below(s32);
 extern s32 coll_sweep_from_object(void *, void *, u32, float, float, float, s32, s32, s32);
 extern void moby_set_state(u8 *, u8, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
-extern void func_PAL_L02_004009A0(void *, s32, s32);
-extern void func_PAL_L02_00411DB0(u8 *);
+extern void moby_set_anim_type_three_pal(void *, s32, s32);
+extern void blade_ball_explode_pal(u8 *);
 extern char *arena_get_camera_point(char *);
 extern s32 flag_set_first_pending(u8 *);
 extern s32 flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern s32 arena_get_state_word(char *);
 extern s32 coll_point_inside_record_volume(void *, s32);
-extern int func_PAL_L01_00323068(char *, char *);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void func_002A677C(void *);
-extern s32 func_PAL_002B5BA8(char *, float *, float);
+extern s32 moby_turn_toward_target_and_step_pal(char *, float *, float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern float math_random_float_range(float, float);
 extern float math_fabs(float);
@@ -93,8 +93,8 @@ void func_PAL_L02_00410A1C(u8 *object)
                 moby_set_state(object, 8, 3);
                 if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 4);
             } else {
-                func_PAL_L02_004009A0(object, 0, 1);
-                func_PAL_L02_00411DB0(object);
+                moby_set_anim_type_three_pal(object, 0, 1);
+                blade_ball_explode_pal(object);
             }
         }
     }
@@ -112,7 +112,7 @@ void func_PAL_L02_00410A1C(u8 *object)
         else if (object[0xBC] == 1) {
             if (coll_point_inside_record_volume(object + 0x10, arena_get_state_word(*(char **)(object + 0xB8))))
                 moby_set_state(object, 7, 3);
-            func_PAL_L01_00323068((char *)object, arena_get_camera_point(*(char **)(object + 0xB8)));
+            moby_l01_turn_toward_target_pal((char *)object, arena_get_camera_point(*(char **)(object + 0xB8)));
         }
         break;
     case 4:
@@ -159,7 +159,7 @@ void func_PAL_L02_00410A1C(u8 *object)
                 if (*(s32 *)(state + 0x194) >= *(s32 *)path - 6 && *(float *)(state + 0x198) >= 0.120000005f)
                     *(float *)(state + 0x198) -= 0.0036000002f;
                 func_002A677C(object);
-                func_PAL_002B5BA8((char *)object, point.f, *(float *)(state + 0x190));
+                moby_turn_toward_target_and_step_pal((char *)object, point.f, *(float *)(state + 0x190));
                 math_step_value_toward_target((float *)(object + 0x18), (float *)(state + 0x108), *(float *)(state + 0x188), 0.004f, 0.004f, 0.20000002f);
             }
             if (*(s16 *)(state + 0x1B8)) moby_set_state(object, 8, 3);
@@ -169,7 +169,7 @@ void func_PAL_L02_00410A1C(u8 *object)
         if (flag_set_first_pending(object))
             moby_set_controller_speed_limits(object, 0.012f, 1.2f, 0.0016755164f, 0.12566373f);
         if (range >= 1.7f)
-            func_PAL_002B5BA8((char *)object, target.f, *(float *)(state + 0x190));
+            moby_turn_toward_target_and_step_pal((char *)object, target.f, *(float *)(state + 0x190));
         height = *(float *)(ground + 8) + 0.7f;
         math_step_value_toward_target((float *)(object + 0x18), (float *)(state + 0x108), height, 0.004f, 0.004f, 0.20000002f);
         if (range < 1.7f && math_fabs(*(float *)(object + 0x18) - height) < 0.1f) {
@@ -194,12 +194,12 @@ void func_PAL_L02_00410A1C(u8 *object)
         *(float *)(object + 0x48) = 1.75f;
         math_step_value_toward_target((float *)(object + 0x18), (float *)(state + 0x108), *(float *)(ground + 8) + 0.7f, 0.004f, 0.004f, 0.20000002f);
         if (range >= 1.7f)
-            func_PAL_L01_00323068((char *)object, (char *)&target);
+            moby_l01_turn_toward_target_pal((char *)object, (char *)&target);
         else if (range < 1.7f) {
             FastVecSub(&point, object + 0x10, &target);
             vec_scale_to_length(&point, &point, 2.0f);
             FastVecAdd(&point, &point, object + 0x10);
-            func_PAL_L01_00323068((char *)object, (char *)&point);
+            moby_l01_turn_toward_target_pal((char *)object, (char *)&point);
         }
         i = 0;
         do {
@@ -230,9 +230,9 @@ void func_PAL_L02_00410A1C(u8 *object)
         }
         break;
     }
-    *(float *)(state + 0x170) = math_move_angle_toward_target(*(float *)(state + 0x170), D_L02_001B1970 * 0.0003490659f, 0.0625f);
-    *(float *)(state + 0x174) = math_move_angle_toward_target(*(float *)(state + 0x174), D_L02_001B1974[0] * 0.0003490659f, 0.0625f);
-    *(float *)(state + 0x178) = math_move_angle_toward_target(*(float *)(state + 0x178), D_L02_001B1978[0] * 0.0003490659f, 0.0625f);
+    *(float *)(state + 0x170) = math_move_angle_toward_target(*(float *)(state + 0x170), g_blade_ball_turn_rate_x * 0.0003490659f, 0.0625f);
+    *(float *)(state + 0x174) = math_move_angle_toward_target(*(float *)(state + 0x174), g_blade_ball_turn_rate_y[0] * 0.0003490659f, 0.0625f);
+    *(float *)(state + 0x178) = math_move_angle_toward_target(*(float *)(state + 0x178), g_blade_ball_turn_rate_z[0] * 0.0003490659f, 0.0625f);
     *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), *(float *)(state + 0x170));
     *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), *(float *)(state + 0x174));
     *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 0x178));
@@ -248,17 +248,17 @@ void func_PAL_L02_00410A1C(u8 *object)
             point.f[0] = *(float *)(object + 0x10) + math_random_float_range(-0.01f, 0.01f);
             point.f[1] = *(float *)(object + 0x14) + math_random_float_range(-0.01f, 0.01f);
             point.f[2] = *(float *)(object + 0x18) - 0.3f;
-            size = math_random_float_range(D_L02_001B1930, D_L02_001B1934);
+            size = math_random_float_range(g_blade_ball_size_min, g_blade_ball_size_max);
             side = math_random_int_below(2);
             if (!side) side--;
-            vec_random_direction(velocity.f, D_L02_001B1938 * 0.020000001f, D_L02_001B193C * 0.020000001f);
-            velocity.f[2] = math_random_float_range(D_L02_001B1940, D_L02_001B1944) * 0.020000001f;
-            part_spawn_ground_effect(size * 0.1f, size, D_L02_001B1948 * 1.44f, &point, 50, 0x7F007F7F, 0, side, velocity.f, 0);
+            vec_random_direction(velocity.f, g_blade_ball_spread_min * 0.020000001f, g_blade_ball_spread_max * 0.020000001f);
+            velocity.f[2] = math_random_float_range(g_blade_ball_up_speed_min, g_blade_ball_up_speed_max) * 0.020000001f;
+            part_spawn_ground_effect(size * 0.1f, size, g_blade_ball_ground_effect_param * 1.44f, &point, 50, 0x7F007F7F, 0, side, velocity.f, 0);
         }
     }
     if (*(s32 *)(state + 0xE0) > 150) {
-        func_PAL_L02_004009A0(object, 0, 1);
-        func_PAL_L02_00411DB0(object);
+        moby_set_anim_type_three_pal(object, 0, 1);
+        blade_ball_explode_pal(object);
         *(s32 *)(state + 0xE0) = 0;
     }
     coll_sweep_from_object(object, object + 0x10, 0x4000000, 0.8f, 1.0f, 1.0f, 0, 1, 0);

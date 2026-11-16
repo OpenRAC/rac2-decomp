@@ -10,14 +10,14 @@ extern void vec_build_spherical_offset(void *,float,float,float);
 extern void FastVecScale(void *,void *,float);
 extern void add_vectors(void *,void *,void *);
 extern void *part_spawn_ground_effect(void *,int,int,int,int,void *,int,float,float,float);
-extern float D_L22_001B0D08 __attribute__((sda));
-extern float D_L22_001B0D0C __attribute__((sda));
-extern float D_L22_001B0D10 __attribute__((sda));
-extern float D_L22_001B0D1C __attribute__((sda));
-extern float D_L22_001B0D20 __attribute__((sda));
-extern int D_L22_001B0D2C __attribute__((sda));
-extern int D_L22_001B0D30 __attribute__((sda));
-extern int D_L22_001B0D34 __attribute__((sda));
+extern float g_spray_burst_arg __attribute__((sda));
+extern float g_spray_burst_dist_min __attribute__((sda));
+extern float g_spray_burst_dist_max __attribute__((sda));
+extern float g_spray_burst_life_min __attribute__((sda));
+extern float g_spray_burst_life_max __attribute__((sda));
+extern int g_spray_ground_effect_left __attribute__((sda));
+extern int g_spray_ground_effect_right __attribute__((sda));
+extern int g_spray_ground_effect_type __attribute__((sda));
 /* Emit two particles for each randomly perturbed point. */
 void func_PAL_L22_00401788(float *position, float *direction, int count) {
     float velocity[4] __attribute__((aligned(16)));
@@ -27,12 +27,12 @@ void func_PAL_L22_00401788(float *position, float *direction, int count) {
     float life, yaw, tilt, speed;
     int sign, remaining;
     for (remaining = 0; remaining < count; remaining++) {
-        life = math_random_float_range(D_L22_001B0D1C, D_L22_001B0D20);
+        life = math_random_float_range(g_spray_burst_life_min, g_spray_burst_life_max);
         sign = math_random_int_below(2);
         if (sign == 0) sign--;
         yaw = math_random_angle();
         tilt = math_random_float_range(0.6981318f, 1.5358899f);
-        speed = math_random_float_range(D_L22_001B0D0C * 0.020000001f, D_L22_001B0D10 * 0.020000001f);
+        speed = math_random_float_range(g_spray_burst_dist_min * 0.020000001f, g_spray_burst_dist_max * 0.020000001f);
         vec_build_spherical_offset(velocity, speed, yaw, tilt);
         *(BurstVector *)scaled = *(BurstVector *)direction;
         FastVecScale(scaled, direction, math_random_float_range(0.75f, 0.95f));
@@ -41,7 +41,7 @@ void func_PAL_L22_00401788(float *position, float *direction, int count) {
         point[0] += math_random_signed_float_range(0.0f, 0.0375f);
         point[1] += math_random_signed_float_range(0.0f, 0.0375f);
         point[2] += math_random_signed_float_range(0.0f, 0.0375f);
-        part_spawn_ground_effect(point, ((s32)(D_L22_001B0D34) * 5 + 2) / 6, D_L22_001B0D2C, 0, sign, velocity, 0, life * 0.1f, life, D_L22_001B0D08);
-        part_spawn_ground_effect(point, ((s32)(D_L22_001B0D34) * 5 + 2) / 6, D_L22_001B0D30, 1, -sign, velocity, 0, life * 0.07f, life * 0.7f, D_L22_001B0D08);
+        part_spawn_ground_effect(point, ((s32)(g_spray_ground_effect_type) * 5 + 2) / 6, g_spray_ground_effect_left, 0, sign, velocity, 0, life * 0.1f, life, g_spray_burst_arg);
+        part_spawn_ground_effect(point, ((s32)(g_spray_ground_effect_type) * 5 + 2) / 6, g_spray_ground_effect_right, 1, -sign, velocity, 0, life * 0.07f, life * 0.7f, g_spray_burst_arg);
     }
 }

@@ -19,7 +19,7 @@ extern L02_003D7900_Hero g_hero_state;
 /* Builds a four-float vector and hands it to the two vector helpers, tints the three colour
    records of the actor's state from it, then walks the three actors the state points at:
    each gets the angle to the hero written at 0xF8 and the behaviour its type selects. */
-void func_PAL_L02_003DBA08(char *arg0) {
+void chainblade_release_held_actors_pal(char *arg0) {
     float v[4];
     char *state = *(char **)(arg0 + 0x68);
     char *obj;

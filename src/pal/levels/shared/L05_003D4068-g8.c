@@ -9,7 +9,7 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 /* Spawns the object's effect once its guards clear, then runs the timer and marks the run.
  * The two words of the effect's parameters are the same in both calls, so the compiler
  * loads the constant once and copies it into the two argument registers. */
-void func_PAL_L05_003D4168(char *obj)
+void moby_spawn_effect_once_pal(char *obj)
 {
     char *s1 = *(char **)(obj + 0x68);
     char *r;

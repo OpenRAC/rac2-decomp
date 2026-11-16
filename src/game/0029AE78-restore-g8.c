@@ -30,7 +30,7 @@ typedef struct {
 } CardState29B168;
 
 extern CardState29B168 g_memcard_state;
-extern int D_001A9968 __attribute__((sda));
+extern int g_restore_counter __attribute__((sda));
 extern int save_verify_block_checksum(char *);
 extern int memcard_GetDataSize(int *);
 extern int memcmp(void *, void *, int);
@@ -83,7 +83,7 @@ int MemcardRestoreData(unsigned char *save_packet, int slot, RestoreEntry29B168 
                 matched_entry->status = -2;
             }
             if (memcmp(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize) != 0) {
-                D_001A9968++;
+                g_restore_counter++;
             }
             if (((RestoreEntry29B168 *)(((unsigned int)i << 4) + (unsigned int)restore_entries))->id != 6000) {
                 mem_copy_aligned(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize);

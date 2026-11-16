@@ -5,7 +5,7 @@ extern char g_hero_state[];
 extern char *g_area_hit_targets[];
 extern int PlayMobySound(int index, int mode, void *object);
 extern void hero_apply_mode_transform_reversed(void *dst, void *src, float scale);
-extern void func_PAL_L00_0038E960(void *position, int count);
+extern void part_l00_spawn_spark_pairs_pal(void *position, int count);
 /* Type id of an object's data record, or 0 when the object or record is missing. */
 static __inline__ int object_type(char *object)
 {
@@ -15,7 +15,7 @@ static __inline__ int object_type(char *object)
 }
 
 /* Play sound 1 once, then for each of the first count slot objects of type 5 or 9 emit effect 4 at its scaled position. */
-void func_PAL_L00_002BA0B0(void *object, int count)
+void part_emit_effects_at_nearby_mobys_pal(void *object, int count)
 {
     float position[4] __attribute__((aligned(16)));
     char **slot;
@@ -37,7 +37,7 @@ void func_PAL_L00_002BA0B0(void *object, int count)
                 if (type == 5 || type == 9) {
                     qcopy(position, *slot + 0x10);
                     hero_apply_mode_transform_reversed(position, position, 0.5f);
-                    func_PAL_L00_0038E960(position, 4);
+                    part_l00_spawn_spark_pairs_pal(position, 4);
                 }
                 remaining--;
                 slot++;

@@ -6,8 +6,8 @@
    high-part register of its own; the flag would change the other bodies of the old unit. */
 
 extern s32 g_current_map_index;
-extern s16 D_001A7A1A;
-extern s32 D_001A7A1C;
+extern s16 g_orb_counter;
+extern s32 g_mode_setting_value;
 
 /* Two values of the resident word 0x001A79F0 select a shared byte or word. */
 /* Returns a setting value that depends on the current mode, or 0 for other modes. */
@@ -16,8 +16,8 @@ s32 mode_get_setting(void)
     s32 v = g_current_map_index;
 
     if (v == 8)
-        return D_001A7A1A;
+        return g_orb_counter;
     if (v == 0x13)
-        return D_001A7A1C;
+        return g_mode_setting_value;
     return 0;
 }

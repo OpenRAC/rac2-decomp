@@ -12,17 +12,17 @@ typedef struct { u8 pad[0x37]; u8 planet; } PurchaseSave;
 typedef struct { u8 pad[0x80]; int cost; u8 tail[0x5C]; } PurchaseLevelInfo;
 typedef struct { u8 pad[0xE0]; float x; float y; } PurchaseHero;
 
-extern u8 g_hero_position[], D_L18_0026BCF0[], D_L18_001BF9C0[];
-extern PurchaseParts D_001395B8;
+extern u8 g_hero_position[], g_weapon_l18_table[], g_request_l18_queue[];
+extern PurchaseParts g_game_flag_table;
 extern PurchaseSave g_item_slot_to_record;
-extern int D_001397F8 NOT_SDA;
+extern int g_object_state_flags_h NOT_SDA;
 extern int g_player_bolts;
-extern int D_00138324 NOT_SDA;
-extern u8 D_001A7B2F;
-extern u8 D_0013959F NOT_SDA;
-extern u8 D_001A7A40;
-extern int D_L18_001A8F00;
-extern int D_L18_001B2564[] __attribute__((sda));
+extern int g_pad_held_flags NOT_SDA;
+extern u8 g_mover_trigger_flag;
+extern u8 g_purchase_level_index NOT_SDA;
+extern u8 g_unlocked_item_flags;
+extern int g_game_l18_mode_state;
+extern int g_door_trigger_flags[] __attribute__((sda));
 extern u8 *g_waypoint_table, *g_moby_l18_table;
 
 extern void moby_reset_matching_effects(void *), moby_reset_vars_defaults(void *), level_apply_index_for_key(void *);
@@ -59,24 +59,24 @@ void func_PAL_L18_00445BB0(u8 *obj)
     moby_reset_matching_effects(obj);
     switch (U8_AT(obj, 0x20)) {
     case 0:
-        if (D_001A7B2F)
+        if (g_mover_trigger_flag)
             goto remove_object;
-        if (D_001397F8 & 0x10000)
+        if (g_object_state_flags_h & 0x10000)
             moby_set_state(obj, 3, -1);
         else
             moby_set_state(obj, 1, -1);
         moby_reset_vars_defaults(obj);
         break;
     case 1:
-        if (IsPointInCuboid(g_hero_position, S32_AT(state, 0x120)) && req_push_queue(D_L18_001BF9C0, 0x90)) {
+        if (IsPointInCuboid(g_hero_position, S32_AT(state, 0x120)) && req_push_queue(g_request_l18_queue, 0x90)) {
             level_apply_index_for_key(obj);
-            req_launch_queued(D_L18_001BF9C0);
+            req_launch_queued(g_request_l18_queue);
             moby_set_state(obj, 2, -1);
         }
         break;
     case 2:
-        D_L18_001B2564[1] = 1;
-        if (D_L18_001A8F00 == 2) {
+        g_door_trigger_flags[1] = 1;
+        if (g_game_l18_mode_state == 2) {
             U8_AT(obj, 0x31) = 0;
             U16_AT(obj, 0x34) |= 1;
         }
@@ -85,54 +85,54 @@ void func_PAL_L18_00445BB0(u8 *obj)
                               g_waypoint_table + S32_AT(state, 0x120) * 128 + 0x70, 0, 1);
             U8_AT(obj, 0x31) = 1;
             U16_AT(obj, 0x34) &= 0xFFFE;
-            D_L18_001B2564[1] = 0;
+            g_door_trigger_flags[1] = 0;
             moby_set_state(obj, 3, -1);
         }
         break;
     case 3:
-        if (D_001395B8.first && D_001395B8.second && D_001395B8.third) {
-            if (g_player_bolts >= ((PurchaseLevelInfo *)D_L18_0026BCF0)[D_0013959F].cost)
+        if (g_game_flag_table.first && g_game_flag_table.second && g_game_flag_table.third) {
+            if (g_player_bolts >= ((PurchaseLevelInfo *)g_weapon_l18_table)[g_purchase_level_index].cost)
                 moby_set_state(obj, 5, -1);
             else
                 moby_set_state(obj, 4, -1);
         } else if (hero_is_reachable_for_count(obj, 10, 1.0f)) {
             int count = 3;
-            if (D_001395B8.first)
+            if (g_game_flag_table.first)
                 count = 2;
-            if (D_001395B8.second)
+            if (g_game_flag_table.second)
                 count--;
-            if (D_001395B8.third)
+            if (g_game_flag_table.third)
                 count--;
             text_print_localized_formatted(0x132B, count, -1);
             level_apply_index_for_key(obj);
         }
         break;
     case 4:
-        if (((PurchaseLevelInfo *)D_L18_0026BCF0)[g_item_slot_to_record.planet].cost < g_player_bolts) {
+        if (((PurchaseLevelInfo *)g_weapon_l18_table)[g_item_slot_to_record.planet].cost < g_player_bolts) {
             moby_set_state(obj, 5, -1);
         } else if (hero_is_reachable_for_count(obj, 10, 1.0f)) {
             func_L00_0030C710(150);
-            text_print_localized_formatted(0x132C, ((PurchaseLevelInfo *)D_L18_0026BCF0)[g_item_slot_to_record.planet].cost, -1);
+            text_print_localized_formatted(0x132C, ((PurchaseLevelInfo *)g_weapon_l18_table)[g_item_slot_to_record.planet].cost, -1);
             level_apply_index_for_key(obj);
         }
         break;
     case 5:
-        if (g_player_bolts < ((PurchaseLevelInfo *)D_L18_0026BCF0)[g_item_slot_to_record.planet].cost) {
+        if (g_player_bolts < ((PurchaseLevelInfo *)g_weapon_l18_table)[g_item_slot_to_record.planet].cost) {
             func_L00_0030C710(150);
             moby_set_state(obj, 4, -1);
         } else if (hero_is_reachable_for_count(obj, 10, 1.0f)) {
             func_L00_0030C710(150);
-            text_print_localized_formatted(0x132D, ((PurchaseLevelInfo *)D_L18_0026BCF0)[g_item_slot_to_record.planet].cost, -1);
+            text_print_localized_formatted(0x132D, ((PurchaseLevelInfo *)g_weapon_l18_table)[g_item_slot_to_record.planet].cost, -1);
             level_apply_index_for_key(obj);
-            if ((D_00138324 & 16) && req_push_queue(D_L18_001BF9C0, 0x91)) {
-                req_launch_queued(D_L18_001BF9C0);
+            if ((g_pad_held_flags & 16) && req_push_queue(g_request_l18_queue, 0x91)) {
+                req_launch_queued(g_request_l18_queue);
                 moby_set_state(obj, 6, -1);
                 moby_mark_table_entry_flagged(U8_AT(obj, 0xB0));
             }
         }
         break;
     case 6:
-        if (D_L18_001A8F00 == 2) {
+        if (g_game_l18_mode_state == 2) {
             U8_AT(obj, 0x31) = 0;
             U16_AT(obj, 0x34) |= 1;
         }
@@ -141,13 +141,13 @@ void func_PAL_L18_00445BB0(u8 *obj)
             unsigned int elapsed = timer++;
             U16_AT(obj, 0x96) = timer;
             if (elapsed >= 17) {
-                D_L18_001B2564[1] = 1;
+                g_door_trigger_flags[1] = 1;
                 if (!game_is_either_mode_two()) {
-                    D_L18_001B2564[1] = 0;
+                    g_door_trigger_flags[1] = 0;
                     U8_AT(obj, 0x31) = 1;
                     U16_AT(obj, 0x34) &= 0xFFFE;
-                    if (!D_001A7B2F) {
-                        g_player_bolts -= ((PurchaseLevelInfo *)D_L18_0026BCF0)[D_0013959F].cost;
+                    if (!g_mover_trigger_flag) {
+                        g_player_bolts -= ((PurchaseLevelInfo *)g_weapon_l18_table)[g_purchase_level_index].cost;
                         func_L00_0030C710(150);
                         if (S32_AT(state, 0x124) != -1)
                             U8_AT(g_moby_l18_table + S32_AT(state, 0x124) * 256, 0xBC) = 1;
@@ -236,7 +236,7 @@ void func_PAL_L18_00445BB0(u8 *obj)
         F32_AT(state, 0x68) = yaw * 0.6f;
         F32_AT(state, 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40)
+    if (g_unlocked_item_flags)
         F32_AT(state, 0x70) = 2.75f;
     moby_update_eased_node(obj, state, 0, speed * 1.44f, blend * 1.44f);
     moby_update_eased_node(obj, state + 0x80, 1, speed * 1.44f, blend * 1.44f);

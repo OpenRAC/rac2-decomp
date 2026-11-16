@@ -6,7 +6,7 @@
 #define B(p,o) (*(u8 *)((char *)(p)+(o)))
 #define H(p,o) (*(u16 *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-extern void func_PAL_0031B110(void *), moby_update_ground_check(void *), moby_transform_joint_point(void *,int,void *), vec_clear_128(void *), transform_vector(void *,void *,void *), FastVecAdd(void *,void *,void *), mat_get_euler_angles(void *,void *), moby_rotate_about_point(void *,void *,float,float,float), func_PAL_002A7650(void *,int,int), moby_mark_spawned(void *), hover_enemy_alert_group(void *), group_pick_nearest_target(void *);
+extern void func_PAL_0031B110(void *), moby_update_ground_check(void *), moby_transform_joint_point(void *,int,void *), vec_clear_128(void *), transform_vector(void *,void *,void *), FastVecAdd(void *,void *,void *), mat_get_euler_angles(void *,void *), moby_rotate_about_point(void *,void *,float,float,float), SetDeathBits_pal(void *,int,int), moby_mark_spawned(void *), hover_enemy_alert_group(void *), group_pick_nearest_target(void *);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern float fast_vec_dist(void *,void *),coll_probe_ground_height_below(void *,int,float);
@@ -14,10 +14,10 @@ extern int func_PAL_002B1A50(void *,void *,int),CollLine(void *,void *,int,void 
 extern int GetCollHitMaterial(void);
 extern int group_pass_lead_token(void *);
 extern char g_camera_eye_state[];
-extern char D_001A8BD0[16] MACRO_ADDR;
-extern int D_001B1B78 MACRO_ADDR;
-extern short *D_001EE5A0[];
-extern char *D_001B1B5C MACRO_ADDR;
+extern char g_default_effect_vector[16] MACRO_ADDR;
+extern int g_moby_group_count MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern char *g_moby_pool_start MACRO_ADDR;
 extern char *g_hero_moby NOT_SDA;
 
 void func_PAL_0031AD58(char *self)
@@ -51,7 +51,7 @@ void func_PAL_0031AD58(char *self)
                 mat_get_euler_angles(self+0xC0,self+0xF0);
                 H(self,0x34)&=~0x100;
             }
-            qcopy(a,D_001A8BD0);
+            qcopy(a,g_default_effect_vector);
             a[2]+=0.5f;
             moby_rotate_about_point(self,a,0.05f,0.05f,0.0f);
         }
@@ -62,7 +62,7 @@ void func_PAL_0031AD58(char *self)
         if(CollLine(a,b,0,self,0)) {
             kind=GetCollHitMaterial();
             if(kind==1 || kind==11) {
-                func_PAL_002A7650(self,0,3);
+                SetDeathBits_pal(self,0,3);
                 moby_mark_spawned(self);
                 return;
             }
@@ -75,10 +75,10 @@ void func_PAL_0031AD58(char *self)
         }
         hover_enemy_alert_group(self);
         group_pass_lead_token(self);
-        if((result==4 || result==5) && D_001B1B78>=B(self,0x21) && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+        if((result==4 || result==5) && g_moby_group_count>=B(self,0x21) && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
+            list=g_moby_group_lists[B(self,0x21)];
             do {
-                moby=D_001B1B5C+((*list&0x7FFF)<<8);
+                moby=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if(*(short *)(moby+0xAA)==0x9B4 && I(P(moby,0x68),0x2A4)==0) {
                     I(P(moby,0x68),0x2A4)=1;
                     goto done_list;

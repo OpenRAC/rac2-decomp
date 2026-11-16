@@ -7,7 +7,7 @@ extern void *moby_get_vars_word_18(char *a0);
 extern void *moby_get_vars_word_18(char *a0);
 
 /* Set the record's fields for the call, then put the old ones back. */
-int func_PAL_L02_00333638(void *a0, void *a1, int a2, float f12, float f13, float f14) {
+int moby_move_to_target_temp_limits_pal(void *a0, void *a1, int a2, float f12, float f13, float f14) {
     char *rec;
     int old38;
     float old28;

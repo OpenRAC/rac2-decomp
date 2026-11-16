@@ -21,9 +21,9 @@ extern int func_001163B0(void);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern void gfx_init_square_packet(void *);
-extern Vector4 D_L11_001BA8C0;
-extern unsigned int D_L11_001B2018 __attribute__((sda));
-extern unsigned int D_L11_001B201C __attribute__((sda));
+extern Vector4 g_hero_l11_position;
+extern unsigned int g_spark_beam_color_a __attribute__((sda));
+extern unsigned int g_spark_beam_color_b __attribute__((sda));
 
 /* The func_L09_003AF9E8 spark with its colours from two level words (the second one's
    edge masked to RGB) and the owner's scale at +0x60. */
@@ -44,8 +44,8 @@ void part_spawn_random_spark_beam(char *object, Vector4 *start)
     first.alpha = 0xFF9000000260UL;
     first.tag = 0;
     test = ((unsigned long)(func_001163B0() % 2 + 1) << 2) | 0x8000000040UL;
-    first.color[0] = first.color[1] = D_L11_001B2018;
-    first.color[2] = first.color[3] = D_L11_001B2018;
+    first.color[0] = first.color[1] = g_spark_beam_color_a;
+    first.color[2] = first.color[3] = g_spark_beam_color_a;
     first.test = test;
     second.tex = GetEffectTextureDescriptor(23);
     nearSize.bits = 0;
@@ -53,8 +53,8 @@ void part_spawn_random_spark_beam(char *object, Vector4 *start)
     second.alpha = 0xFF9000000260UL;
     second.test = 0x8000000048UL;
     second.tag = 0;
-    second.color[0] = second.color[1] = D_L11_001B201C;
-    second.color[2] = second.color[3] = D_L11_001B201C & 0xFFFFFF;
+    second.color[0] = second.color[1] = g_spark_beam_color_b;
+    second.color[2] = second.color[3] = g_spark_beam_color_b & 0xFFFFFF;
     nearSize.f[3] = 1;
     farSize.f[3] = 1;
     width = math_random_float_range(0.1f, 0.2f);
@@ -76,7 +76,7 @@ void part_spawn_random_spark_beam(char *object, Vector4 *start)
         second.uv[4] = 1; second.uv[5] = 1; second.uv[6] = 1; second.uv[7] = 0;
     }
     FastVecSub(&basis[0], &end, start); vec_scale_to_length(&basis[0], &basis[0], 1);
-    FastVecSub(&basis[1], &D_L11_001BA8C0, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecSub(&basis[1], &g_hero_l11_position, start); FastVecCross(&basis[2], &basis[1], &basis[0]);
     vec_scale_to_length(&basis[2], &basis[2], 1); FastVecCross(&basis[1], &basis[0], &basis[2]);
     basis[3].bits = start->bits;
     first.point[0].bits = nearSize.bits; second.point[0].bits = farSize.bits;

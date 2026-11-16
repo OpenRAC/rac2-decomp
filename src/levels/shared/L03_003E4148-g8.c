@@ -2,10 +2,10 @@
 typedef float Vec[4] __attribute__((aligned(16)));
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef struct { Vec v[4]; u32 color[4]; float uv[4][2]; u64 regs[4]; } __attribute__((aligned(16))) Packet;
-extern int D_L03_001B0C1C __attribute__((sda));
-extern float D_L03_001B0C20 __attribute__((sda)),D_L03_001B0C24 __attribute__((sda));
-extern float D_L03_001B0C28[] SDATA(D_L03_001B0C28);
-extern float D_L03_001B0C2C[] __attribute__((sda));
+extern int g_path_puzzle_strip_texture __attribute__((sda));
+extern float g_path_puzzle_strip_step __attribute__((sda)),g_path_puzzle_strip_width __attribute__((sda));
+extern float g_path_puzzle_strip_u_table[] SDATA(D_L03_001B0C28);
+extern float g_path_puzzle_strip_v_table[] __attribute__((sda));
 extern void gfx_init_quad_packet_state(void *,int,int,int);
 extern void copy_matrix_rotation(void *,void *);
 extern void FastVecCross(void *,void *,void *);
@@ -22,17 +22,17 @@ void path_puzzle_draw_link_strip(u8 *moby,u32 start_color,u32 end_color,void *st
 {
  Packet packet,inner_packet; Vec matrix[4],axis,step,quat,rotation[3];
  float distance,angle,dt,shrink; int count,i,j,segment;
- gfx_init_quad_packet_state(&packet,D_L03_001B0C1C,0,128);
+ gfx_init_quad_packet_state(&packet,g_path_puzzle_strip_texture,0,128);
  copy_matrix_rotation(matrix,moby+0xc0);qcopy(matrix[3],moby+0x10);
  FastVecCross(axis,start_point,end_point);count=1;distance=FastVecDot(start_point,end_point);
  angle=FastVecLength(axis);distance=mat_fast_helper_a(distance,angle);
  {int n=FloatToInt(distance*11.45915412902832f);int z=0;if(n>z)count=n;}
  distance/=count;distance*=0.5f;
  vec_scale_to_length(quat,axis,math_fast_sin_or_cos_b(distance));quat[3]=math_fast_sin_or_cos_a(distance);
- quaternion_to_rotation_basis(quat,rotation);vec_scale_to_length(step,axis,D_L03_001B0C20);
+ quaternion_to_rotation_basis(quat,rotation);vec_scale_to_length(step,axis,g_path_puzzle_strip_step);
  for(i=0;i<4;i++){
-  packet.color[i]=start_color;packet.uv[i][0]=D_L03_001B0C28[i*2]+phase;packet.uv[i][1]=D_L03_001B0C2C[i*2];
-  vec_scale_to_length(packet.v[i],start_point,D_L03_001B0C24);
+  packet.color[i]=start_color;packet.uv[i][0]=g_path_puzzle_strip_u_table[i*2]+phase;packet.uv[i][1]=g_path_puzzle_strip_v_table[i*2];
+  vec_scale_to_length(packet.v[i],start_point,g_path_puzzle_strip_width);
   if(i&1)FastVecAdd(packet.v[i],packet.v[i],step);else FastVecSub(packet.v[i],packet.v[i],step);
   packet.v[i][3]=1.0f;
  }

@@ -2,7 +2,7 @@
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_001AEF60 __attribute__((sda));
+extern int g_effect_init_flag __attribute__((sda));
 
 /* Sets the starting values (colors, sizes, timers and position) of an effect moby when it is created. */
 void effect_init_moby_state(unsigned char *object) {
@@ -31,5 +31,5 @@ void effect_init_moby_state(unsigned char *object) {
     *(int *)(state + 0xD8) = -1;
     *(int *)(state + 0xDC) = *(int *)(state + 0xDC) << 3;
     *(float *)(state + 0xE8) = *(float *)(state + 0xE8) + 1.1f;
-    D_001AEF60 = 0;
+    g_effect_init_flag = 0;
 }

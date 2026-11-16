@@ -19,12 +19,12 @@ typedef struct {
     float throttle;
 } L00_00424F98_Input;
 
-extern float D_00138280[];
-extern float D_00138284[];
-extern s32 D_001A7BA8 MACRO_ADDR;
-extern s32 D_001A7BA4 MACRO_ADDR;
+extern float g_stick_axis_x[];
+extern float g_stick_axis_y[];
+extern s32 g_ship_steer_option MACRO_ADDR;
+extern s32 g_invert_aim_option MACRO_ADDR;
 extern s32 g_current_map_index MACRO_ADDR;
-extern unsigned int D_001A7390 MACRO_ADDR;
+extern unsigned int g_frame_counter MACRO_ADDR;
 extern L00_00424F98_Counter g_progress_statistics;
 extern s32 ref_L00_00424F98_00 __attribute__((sda));
 extern s32 ref_L00_00424F98_01 __attribute__((sda));
@@ -43,8 +43,8 @@ void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttl
     if (input->flags & 1) {
         *steerOut = 0.0f;
     } else {
-        *steerOut = D_00138280[0];
-        if (D_001A7BA8 == 0)
+        *steerOut = g_stick_axis_x[0];
+        if (g_ship_steer_option == 0)
             *steerOut = -*steerOut;
     }
     if (*steerOut == 0.0f) {
@@ -61,8 +61,8 @@ void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttl
             if (ref_L00_00424F98_01 == 0 && ref_L00_00424F98_00 > 0x3C) {
                 if ((unsigned short)run_count < 0xFFFF)
                     counter->count = run_count + 1;
-                if (D_001A7390 > counter->best)
-                    counter->best = D_001A7390;
+                if (g_frame_counter > counter->best)
+                    counter->best = g_frame_counter;
                 ref_L00_00424F98_01 = 1;
                 counter->flags = (counter->flags | (1u << g_current_map_index)) | 0x80000000u;
             }
@@ -71,9 +71,9 @@ void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttl
     if (input->flags & 2) {
         *throttle_out = 0.0f;
     } else {
-        stick_y = D_00138284[0];
+        stick_y = g_stick_axis_y[0];
         *throttle_out = -stick_y;
-        if (D_001A7BA4 == 0)
+        if (g_invert_aim_option == 0)
             *throttle_out = stick_y;
         if (*throttle_out != 0.0f)
             return;

@@ -20,10 +20,10 @@ typedef struct {
     int done;     /* 0x54: cleared and tested here, set elsewhere */
 } PageC3;
 
-extern u8 g_pad_state[], g_pause_menu_state[], D_00261A08[], D_00261AB8[], D_00261B78[];
-extern u8 D_001ABBA0[] SDATA(D_001ABBA0);
-extern u8 D_001ABBB8[] SDATA(D_001ABBB8);
-extern int D_0025ED8C[];
+extern u8 g_pad_state[], g_pause_menu_state[], g_dialog_menu_text_a[], g_dialog_menu_text_b[], g_dialog_menu_text_c[];
+extern u8 g_menu_text_a[] SDATA(D_001ABBA0);
+extern u8 g_menu_text_b[] SDATA(D_001ABBB8);
+extern int g_menu_text_id[];
 
 /* Runs the timed text pages (such as the credits): each page shows a text for a while, scrolls it, then moves to the next. Holding buttons speeds it up and the player can leave early. */
 int UpdateTimedTextPages(PageC3 *menu)
@@ -61,8 +61,8 @@ back_done:
         ++menu->state;
         menu->timer = 180;
         menu->scroll = 0;
-        D_0025ED8C[0] = 0x33c0;
-        menu->text = (int)D_00261A08;
+        g_menu_text_id[0] = 0x33c0;
+        menu->text = (int)g_dialog_menu_text_a;
         break;
     case 1:
     case 5:
@@ -91,12 +91,12 @@ back_done:
         menu->state = 5;
         menu->timer = 180;
         menu->scroll = 0;
-        D_0025ED8C[0] = 0x3410;
-        menu->text = (int)D_00261AB8;
+        g_menu_text_id[0] = 0x3410;
+        menu->text = (int)g_dialog_menu_text_b;
         break;
     case 3:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x340e;
+        g_menu_text_id[0] = 0x340e;
         menu->text = 0x340f;
         menu->timer = 240;
         menu->scroll = 0;
@@ -104,15 +104,15 @@ back_done:
         break;
     case 7:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x3458;
-        menu->text = (int)D_00261B78;
+        g_menu_text_id[0] = 0x3458;
+        menu->text = (int)g_dialog_menu_text_c;
         menu->timer = 240;
         ++menu->state;
         menu->scroll = 0;
         break;
     case 10:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x3488;
+        g_menu_text_id[0] = 0x3488;
         menu->text = 0x3489;
         menu->timer = 240;
         menu->scroll = 0;
@@ -122,13 +122,13 @@ back_done:
         if (menu->timer) break;
         menu->scroll = 0;
         menu->timer = 180;
-        D_0025ED8C[0] = 0x348a;
-        menu->text = (int)D_001ABBA0;
+        g_menu_text_id[0] = 0x348a;
+        menu->text = (int)g_menu_text_a;
         menu->state = 12;
         break;
     case 14:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0;
+        g_menu_text_id[0] = 0;
         menu->text = 0x349b;
         menu->timer = 240;
         menu->scroll = 0;
@@ -138,13 +138,13 @@ back_done:
         if (menu->timer) break;
         menu->scroll = 0;
         menu->timer = 180;
-        D_0025ED8C[0] = 0x349d;
-        menu->text = (int)D_001ABBB8;
+        g_menu_text_id[0] = 0x349d;
+        menu->text = (int)g_menu_text_b;
         menu->state = 16;
         break;
     case 18:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0;
+        g_menu_text_id[0] = 0;
         menu->timer = 300;
         menu->text = 0;
         ++menu->state;

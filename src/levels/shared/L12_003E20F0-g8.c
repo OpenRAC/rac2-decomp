@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern char *D_L12_001FEAC0[];
-extern float D_L12_001B0B14 SDATA(D_L12_001B0B14);
-extern float D_L12_001B0A54 SDATA(D_L12_001B0A54);
-extern char D_L12_001B0B18[];
+extern char *g_path_zone_table[];
+extern float g_enemy_height_limit SDATA(D_L12_001B0B14);
+extern float g_robot_guard_climb_speed SDATA(D_L12_001B0A54);
+extern char g_str_debug_ground_height[];
 extern int moby_l01_turn_toward_target(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern void StepAngleTowardTarget(void *, float, float, int);
@@ -16,7 +16,7 @@ void enemy_move_along_path_keep_height(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float oldHeight = *(float *)(object + 0x18);
-    char *path = D_L12_001FEAC0[*(int *)(state + 0x158)];
+    char *path = g_path_zone_table[*(int *)(state + 0x158)];
     int flags;
     float ground;
     float probeRadius;
@@ -35,12 +35,12 @@ void enemy_move_along_path_keep_height(char *object)
     position = object + 0x10;
     ground = coll_probe_ground_height_below(probeRadius, position, 0);
     if (flags & 0x20) {
-        if (*(int *)(state + 0x248) == 0 || *(float *)(object + 0x18) - ground > D_L12_001B0B14) {
+        if (*(int *)(state + 0x248) == 0 || *(float *)(object + 0x18) - ground > g_enemy_height_limit) {
             *(float *)(object + 0x18) = oldHeight;
         } else if (*(float *)(object + 0x18) < *(float *)(state + 0x2A8)) {
             *(float *)(object + 0x18) = *(float *)(state + 0x2A8);
         } else {
-            char *sink = D_L12_001B0B18;
+            char *sink = g_str_debug_ground_height;
             float floor = coll_probe_ground_height_below(probeRadius, position, 0);
             double heightDifference = __extendsfdf2(*(float *)(object + 0x18) - floor);
             STUB_printf(sink, heightDifference, *(short *)(object + 0xB2));
@@ -50,7 +50,7 @@ void enemy_move_along_path_keep_height(char *object)
     if (*(float *)(object + 0x18) < targetHeight) {
         targetHeight -= *(float *)(object + 0x18);
         if (targetHeight > 0.8f) {
-            *(float *)(object + 0x18) += D_L12_001B0A54 * 0.016666668f;
+            *(float *)(object + 0x18) += g_robot_guard_climb_speed * 0.016666668f;
             if (*(float *)(object + 0x18) < ground)
                 *(float *)(object + 0x18) = ground;
         }
@@ -59,7 +59,7 @@ void enemy_move_along_path_keep_height(char *object)
     if (*(float *)(object + 0x18) > targetHeight) {
         targetHeight -= *(float *)(object + 0x18);
         if (targetHeight < -0.8f) {
-            *(float *)(object + 0x18) -= D_L12_001B0A54 * 0.016666668f;
+            *(float *)(object + 0x18) -= g_robot_guard_climb_speed * 0.016666668f;
             if (*(float *)(object + 0x18) < ground)
                 *(float *)(object + 0x18) = ground;
         }

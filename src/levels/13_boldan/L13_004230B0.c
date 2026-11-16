@@ -12,8 +12,8 @@ typedef struct {
 } PlatformHero;
 extern PlatformHero g_hero_state;
 extern u8 g_sound_state[] NOT_SDA;
-extern u8 *D_L13_001BFD18;
-extern int D_L13_001B2448 MACRO_ADDR;
+extern u8 *g_hit_l13_result;
+extern int g_game_l13_frame_counter MACRO_ADDR;
 extern void snd_stop_voice(int);
 extern int hero_is_current_selected_id(void *);
 extern u8 *cam_alloc_override_slot(int);
@@ -87,7 +87,7 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
             I(vars,0xB0)=-1;
             if(!hero_is_current_selected_id(moby)) moby[0x20]=1;
         } else if(!coll_test_point(moby+0x10,1,moby,2.8f) ||
-            (F(moby,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==moby) || (D_L13_001BFD18 && *(short *)(D_L13_001BFD18+0xAA)==0xEA3))) {
+            (F(moby,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==moby) || (g_hit_l13_result && *(short *)(g_hit_l13_result+0xAA)==0xEA3))) {
             { u8 *sound=g_sound_state+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
             math_step_value_toward_target((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x88),0.00194444449f,0.00166666671f,0.100000009f);
         } else {
@@ -113,7 +113,7 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
         if(sound_id!=-1) { u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id); }
         I(vars,0xB0)=-1; break;
     }
-    phase=(float)D_L13_001B2448*(1.0f/60.0f);
+    phase=(float)g_game_l13_frame_counter*(1.0f/60.0f);
     tickPhase=(int)phase;
     phase-=(float)tickPhase;
     if(!(tickPhase&1)) phase=1.0f-phase;

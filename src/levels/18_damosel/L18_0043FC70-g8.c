@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern u8 D_001395B8[], g_hero_position[];
+extern u8 g_game_flag_table[], g_hero_position[];
 /* Read as D_001A7AF8[0x37] (0x001A7B2F): an sda incomplete array with a nonzero
  * index gives retail's unsplit `lui; lbu` pair, kept out of the delay slot. */
 extern u8 g_item_owned_flags[] __attribute__((sda));
@@ -24,7 +24,7 @@ void ship_part_pickup_update(u8 *obj) {
     int i, sign, n;
     float size, angle, pitch;
     if (obj[0x20] == 0) {
-        if (D_001395B8[0x86] || g_item_owned_flags[0x37]) {
+        if (g_game_flag_table[0x86] || g_item_owned_flags[0x37]) {
             moby_mark_spawned(obj);
         } else {
             *(float *)(obj + 0xf8) = FastAddRotations(*(float *)(obj + 0xf8), 0.087266475f);
@@ -43,7 +43,7 @@ void ship_part_pickup_update(u8 *obj) {
                 part_spawn_ground_effect(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
             }
             if (vec_distance_xy(obj + 0x10, g_hero_position) < 1.5f) {
-                D_001395B8[0x86] = 1;
+                g_game_flag_table[0x86] = 1;
                 if (*(int *)state != -1) {
                     g_moby_l18_table[(*(int *)state << 8) + 0xbc] = 1;
                     obj[0x31] = 0;
@@ -61,8 +61,8 @@ void ship_part_pickup_update(u8 *obj) {
         *(u16 *)(obj + 0x96) = timer;
         if (old > 40) {
             value_set_entry_by_index(0x1293, 120);
-            n = D_001395B8[0x86] ? 1 : 2;
-            if (D_001395B8[0x89]) n--;
+            n = g_game_flag_table[0x86] ? 1 : 2;
+            if (g_game_flag_table[0x89]) n--;
             if (n > 0) subtitle_request_voice_line(0xa0f, 0x66);
             else subtitle_request_voice_line(0xa10, 0x67);
             moby_mark_spawned(obj);

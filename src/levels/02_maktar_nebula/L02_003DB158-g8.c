@@ -10,9 +10,9 @@ typedef int s32;
 typedef float f32;
 typedef int TQ __attribute__((mode(TI)));
 
-extern f32 D_L02_001B0474 __attribute__((sda));
-extern f32 D_L02_001B0478 __attribute__((sda));
-extern s32 D_L02_001B0480 __attribute__((sda));
+extern f32 g_boss_glow_quad_size_a __attribute__((sda));
+extern f32 g_boss_glow_quad_size_b __attribute__((sda));
+extern s32 g_boss_glow_quad_offset __attribute__((sda));
 
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern void moby_transform_joint_point(char *, int, void *);
@@ -33,7 +33,7 @@ void boss_draw_joint_glow(char *moby, s32 jointIndex) {
     moby_transform_joint_to_world(moby, jointIndex, &jointPos);
     *(TQ *)&jointPosCopy = *(TQ *)&jointPos;
     moby_transform_joint_point(moby, jointIndex, &jointMatrix);
-    transform_vector(&localOffset, &D_L02_001B0480, &jointMatrix);
+    transform_vector(&localOffset, &g_boss_glow_quad_offset, &jointMatrix);
     FastVecAdd(&jointPos, &jointPos, &localOffset);
-    gfx_l00_draw_billboard_quad(&jointPos, *(s32 *)(vars + 0x250), D_L02_001B0478, D_L02_001B0474);
+    gfx_l00_draw_billboard_quad(&jointPos, *(s32 *)(vars + 0x250), g_boss_glow_quad_size_b, g_boss_glow_quad_size_a);
 }

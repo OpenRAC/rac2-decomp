@@ -29,13 +29,13 @@
  * label list keeps each C branch available; it is not read by the program. */
 extern void *D_0026CCC0[];
 
-extern s32 D_001AA6B8 __attribute__((sda));
-extern s32 D_001AA6D0 __attribute__((sda));
-extern s32 D_001AA6E8 __attribute__((sda));
-extern s32 D_001AA700 __attribute__((sda));
-extern s32 D_001AA718 __attribute__((sda));
-extern s32 D_001AA730 __attribute__((sda));
-extern s32 D_001AA748 __attribute__((sda));
+extern s32 g_menu_action_target_0 __attribute__((sda));
+extern s32 g_menu_action_target_1 __attribute__((sda));
+extern s32 g_menu_action_target_2 __attribute__((sda));
+extern s32 g_menu_action_target_3 __attribute__((sda));
+extern s32 g_menu_action_target_4 __attribute__((sda));
+extern s32 g_menu_action_target_5 __attribute__((sda));
+extern s32 g_menu_action_target_6 __attribute__((sda));
 extern s8 g_hero_state[];
 extern s32 menu_process_entry_request(void *, void *);
 
@@ -58,31 +58,31 @@ goto *D_0026CCC0[rc2_selector];
             result = &local;
             table = g_hero_state;
             (*(s32 *)((char *)(table) + (0x22C8))) = (*(s32 *)((char *)(table) + (0x1248)));
-            target = &D_001AA6B8;
+            target = &g_menu_action_target_0;
             goto rc2_switch_end;
         rc2_case_1:
             result = &local;
-            target = &D_001AA6D0;
+            target = &g_menu_action_target_1;
             goto rc2_switch_end;
         rc2_case_2:
             result = &local;
-            target = &D_001AA6E8;
+            target = &g_menu_action_target_2;
             goto rc2_switch_end;
         rc2_case_3:
             result = &local;
-            target = &D_001AA700;
+            target = &g_menu_action_target_3;
             goto rc2_switch_end;
         rc2_case_4:
             result = &local;
-            target = &D_001AA718;
+            target = &g_menu_action_target_4;
             goto rc2_switch_end;
         rc2_case_5:
             result = &local;
-            target = &D_001AA730;
+            target = &g_menu_action_target_5;
             goto rc2_switch_end;
         rc2_case_6:
             result = &local;
-            target = &D_001AA748;
+            target = &g_menu_action_target_6;
             goto rc2_switch_end;
         
 rc2_switch_end: ;

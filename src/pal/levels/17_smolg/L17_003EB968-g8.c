@@ -1,20 +1,20 @@
 #include "include_asm.h"
 #include "common.h"
 extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
-extern f32 D_L17_001B04B8 __attribute__((sda));
+extern f32 g_effect_spawner_seconds __attribute__((sda));
 extern void moby_set_state(void *, s32, s32);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 extern void moby_mark_spawned(void *);
-extern s32 D_L17_001B1E00 __attribute__((sda));
-extern s32 D_L17_001B1DE0 __attribute__((sda));
-extern s32 D_L17_001B1DD8 __attribute__((sda));
-extern s32 D_L17_001B1DD0 __attribute__((sda));
+extern s32 g_hit_burst_piece_param __attribute__((sda));
+extern s32 g_hit_burst_piece_table_c __attribute__((sda));
+extern s32 g_hit_burst_piece_table_b __attribute__((sda));
+extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 
 /* Sets the object's stage up: the first stage asks the level's own spawner for a child and
    gives up its handle, the second one only releases the handle. */
-void func_PAL_L17_0041E460(s32 a0)
+void hit_l17_burst_update_pal(s32 a0)
 {
     u8 v = *(u8 *)(a0 + 0x20);
 
@@ -29,8 +29,8 @@ void func_PAL_L17_0041E460(s32 a0)
         }
         break;
     case 2:
-        part_explode_object_into_pieces(a0, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
-                          0xFFFF, 0, D_L17_001B1E00, 0, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(a0, &g_hit_burst_piece_table_c, &g_hit_burst_piece_table_b, &g_hit_burst_piece_table_a,
+                          0xFFFF, 0, g_hit_burst_piece_param, 0, 0xFFFF, 0xFF, 0);
         SpawnExplosion(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
                       *(f32 *)(a0 + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
         moby_mark_spawned(a0);
@@ -63,7 +63,7 @@ extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
 
 /* Steers toward the linked object and maintains its movement sound. */
-void func_PAL_L17_0041E1B8(char *obj)
+void follower_l17_update_pal(char *obj)
 {
     float v[4] __attribute__((aligned(16)));
     float target[4] __attribute__((aligned(16)));

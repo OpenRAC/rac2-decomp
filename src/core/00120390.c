@@ -24,43 +24,43 @@ char *eh_alloc_context(void) {
     return record;
 }
 
-extern char *(*D_00135D38)(void);
+extern char *(*g_eh_context_getter)(void);
 
 /* Returns the current exception state record. */
 char *eh_get_context(void) {
-    return D_00135D38();
+    return g_eh_context_getter();
 }
 
 /* Returns the exception type information part of the current exception state. */
 char *func_00120448(void) {
-    return D_00135D38() + 8;
+    return g_eh_context_getter() + 8;
 }
 
 extern char *eh_get_static_context(void);
 
 /* Switches to the fallback exception state getter and returns the state. */
 char *eh_set_default_context_getter(void) {
-    D_00135D38 = eh_get_static_context;
-    return D_00135D38();
+    g_eh_context_getter = eh_get_static_context;
+    return g_eh_context_getter();
 }
 
-extern int D_00141800;
-extern char D_001417F0[];
-extern char D_00141808[];
+extern int g_eh_static_context_init;
+extern char g_eh_static_context[];
+extern char g_eh_static_context_data[];
 
 /* Returns the single shared exception state record, setting it up on first use. */
 char *eh_get_static_context(void) {
-    if (D_00141800 == 0) {
-        D_00141800 = 1;
-        memset((unsigned char *)D_001417F0, 0, 16);
-        *(char **)(D_001417F0 + 4) = D_00141808;
+    if (g_eh_static_context_init == 0) {
+        g_eh_static_context_init = 1;
+        memset((unsigned char *)g_eh_static_context, 0, 16);
+        *(char **)(g_eh_static_context + 4) = g_eh_static_context_data;
     }
-    return D_001417F0;
+    return g_eh_static_context;
 }
 
 /* Returns the handler-chain part of the current exception state. */
 char *eh_get_handler_chain(void) {
-    return D_00135D38() + 4;
+    return g_eh_context_getter() + 4;
 }
 
 /* Reads one small field from an exception record. */

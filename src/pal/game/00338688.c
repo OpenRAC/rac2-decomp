@@ -3,12 +3,12 @@
 
 /* func_PAL_00338688, the PAL copy of func_003369A8. */
 extern void object_alloc_float4_arrays(void *);
-extern unsigned char D_00263B50[];
+extern unsigned char g_font_glyphs_small[];
 
 void func_PAL_00338688(char *self)
 {
     object_alloc_float4_arrays(self);
-    *(char **)(self + 0x34) = (char *)D_00263B50;
+    *(char **)(self + 0x34) = (char *)g_font_glyphs_small;
     *(long long *)(self + 0x38) = 1;
     *(int *)(self + 0x40) = 0;
     **(float **)(self + 4) = 1.0f;

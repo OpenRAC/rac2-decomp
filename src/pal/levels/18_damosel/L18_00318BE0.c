@@ -45,19 +45,19 @@ typedef struct {
     float matrix[12];
 } SceneCamera;
 
-extern Scene18 D_L18_001BD4C0;
+extern Scene18 g_scene_movables_state;
 extern int g_current_map_index __attribute__((sda));
 extern SceneMoby *g_moby_l18_table MACRO_ADDR;
-extern SceneMoby *D_L18_001B2820 MACRO_ADDR;
-extern SceneCamera D_L18_001B9680;
-extern ExplosionSpot D_L18_00287D10[];
+extern SceneMoby *g_moby_l18_table_end MACRO_ADDR;
+extern SceneCamera g_hero_l18_state_extra;
+extern ExplosionSpot g_explosion_spots[];
 
 extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
 extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 void func_PAL_L18_00318BE0(void)
 {
@@ -69,8 +69,8 @@ void func_PAL_L18_00318BE0(void)
     Scene18 *scene;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L18_001BD4C0.count; i++) {
-        object = D_L18_001BD4C0.objects[i];
+    for (i = 0; i < g_scene_movables_state.count; i++) {
+        object = g_scene_movables_state.objects[i];
         if (object && *(short *)(object + 0xAA) == 0xE29) {
             *(unsigned short *)(object + 0x34) |= 0x800;
         }
@@ -88,32 +88,32 @@ void func_PAL_L18_00318BE0(void)
             }
         }
     }
-    if (g_current_map_index != 18 || D_L18_001BD4C0.mode != 4) {
+    if (g_current_map_index != 18 || g_scene_movables_state.mode != 4) {
         return;
     }
-    if (D_L18_001BD4C0.timer == 1) {
-        for (k = 0; &g_moby_l18_table[k] < D_L18_001B2820; k++) {
+    if (g_scene_movables_state.timer == 1) {
+        for (k = 0; &g_moby_l18_table[k] < g_moby_l18_table_end; k++) {
             moby = &g_moby_l18_table[k];
             moby->flags |= 0x41;
         }
     }
     for (j = 0; j < 13; j++) {
-        scene = &D_L18_001BD4C0;
-        table = D_L18_00287D10;
+        scene = &g_scene_movables_state;
+        table = g_explosion_spots;
         spot = &table[j];
         if (scene->timer == (((int)(spot->time) * 5 + 2) / 6)) {
             qcopy(position, spot->position);
             if (spot->cameraRelative) {
-                matrix_mul_vec3(position, position, D_L18_001B9680.matrix);
-                FastVecAdd(position, position, D_L18_001B9680.position);
+                matrix_mul_vec3(position, position, g_hero_l18_state_extra.matrix);
+                FastVecAdd(position, position, g_hero_l18_state_extra.position);
             }
-            func_PAL_L00_003FB330(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
+            SpawnExplosion_pal(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
-                D_L18_001B9680.shakeTime = 46;
-                D_L18_001B9680.shake = spot->shake * 0.08f;
-                D_L18_001B9680.shakeTimer = 0;
-                D_L18_001B9680.secondaryShakeTime = 58;
-                D_L18_001B9680.secondaryShake = spot->shake * 0.07f;
+                g_hero_l18_state_extra.shakeTime = 46;
+                g_hero_l18_state_extra.shake = spot->shake * 0.08f;
+                g_hero_l18_state_extra.shakeTimer = 0;
+                g_hero_l18_state_extra.secondaryShakeTime = 58;
+                g_hero_l18_state_extra.secondaryShake = spot->shake * 0.07f;
             }
         }
     }

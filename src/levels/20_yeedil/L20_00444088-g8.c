@@ -3,9 +3,9 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B2090 __attribute__((sda));
+extern float g_yeedil_shot_speed __attribute__((sda));
 
-extern int D_L20_001B2094 __attribute__((sda));
+extern int g_yeedil_shot_homing_param __attribute__((sda));
 
 extern void yeedil_boss_compute_shot_launch(char *, char *, char *, float *);
 
@@ -39,7 +39,7 @@ void yeedil_boss_launch_damage_shot(char *moby) {
 
     aimAngle = 0.78539824f;
     yeedil_boss_compute_shot_launch(moby, (char *)&launchPos, (char *)&launchVelocity, (float *)&aimAngle);
-    vec_scale_to_length((char *)&launchVelocity, (char *)&launchVelocity, D_L20_001B2090 * 0.0166666675f);
-    homing_l20_shot_spawn(moby, (char *)&launchPos, (char *)&launchVelocity, state + 0x1F0, D_L20_001B2094,
+    vec_scale_to_length((char *)&launchVelocity, (char *)&launchVelocity, g_yeedil_shot_speed * 0.0166666675f);
+    homing_l20_shot_spawn(moby, (char *)&launchPos, (char *)&launchVelocity, state + 0x1F0, g_yeedil_shot_homing_param,
                       (float)*(unsigned char *)(state + 0x35), *(int *)(state + 0x210));
 }

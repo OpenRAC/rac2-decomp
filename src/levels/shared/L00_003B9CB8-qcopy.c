@@ -73,7 +73,7 @@ typedef struct {
     int hit;                /* 0x9C */
 } Slot3BBB68;
 
-extern Slot3BBB68 D_L00_0023DDA0[];
+extern Slot3BBB68 g_spark_slot_records[];
 
 /* The 0xE0-byte class records; D_00139568 maps a class number to its record. */
 typedef struct {
@@ -132,9 +132,9 @@ void effect_update_spark_slots(char *owner)
     int i;
 
     for (i = 0; i < 30; i++) {
-        if (D_L00_0023DDA0[i].owner != owner)
+        if (g_spark_slot_records[i].owner != owner)
             continue;
-        slot = &D_L00_0023DDA0[i];
+        slot = &g_spark_slot_records[i];
         slot->start = *(Rac2TI128 *)(owner + 0x10);
         if (slot->time) {
             slot->ang0[0] = func_00283B98_8(slot->ang0[0], slot->rate0[0] * 100.0f);

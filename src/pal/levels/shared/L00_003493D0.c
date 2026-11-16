@@ -5,7 +5,7 @@ extern int D_L00_001A904C_3 __attribute__((sda));
 extern int grid_menu_get_selected_text_id(int x);
 
 /* When the global is set, derives a pointer from it plus a fixed offset, runs it through a callee and stores the result into a field of the argument. */
-int func_PAL_L00_003493D0(int *obj)
+int level_l00_store_table_entry_in_object_pal(int *obj)
 {
     if (D_L00_001A904C_3 != 0)
         obj[13] = grid_menu_get_selected_text_id(D_L00_001A904C_3 + 0x3A0B0);
@@ -17,7 +17,7 @@ extern void module_l00_call_handler_11(void);
 extern void func_0027C660_7(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-long long func_PAL_L00_00349418(void)
+long long level_l00_run_setup_return_zero_long_2_pal(void)
 {
     func_0027C540_7(0LL);
     module_l00_call_handler_11();
@@ -32,24 +32,24 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackStateL001FEC40;
-extern CallbackStateL001FEC40 D_L00_001FEC40;
+extern CallbackStateL001FEC40 g_pause_input_state;
 extern int g_pad_state[];
 extern int module_l00_call_handler_with_arg_12(int);
 extern char *tab_menu_get_selected_entry(int);
 extern void menu_start_action(int);
 
-int func_PAL_L00_003494A8(void)
+int pad_update_input_callback_with_request_pal(void)
 {
     int result = 0;
     int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
 
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }

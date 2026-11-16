@@ -1,27 +1,28 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_US2_0034F1C0(void *);
+extern char *g_resident_data_base[] __attribute__((sda));
+extern void hud_update_subsystems_us2(void *);
 
 void func_US2_L00_0030E3F8(void) {
-    if (D_001A8CFC[0] != 0)
-        func_US2_0034F1C0(D_001A8CFC[0] + 0x36F28);
+    if (g_resident_data_base[0] != 0)
+        hud_update_subsystems_us2(g_resident_data_base[0] + 0x36F28);
 }
 
 
-extern void func_US2_0034F240(void *);
+extern void hud_item_bolt_draw_us2(void *);
 
 void func_US2_L00_0030E428(void) {
-    if (D_001A8CFC[0] != 0)
-        func_US2_0034F240(D_001A8CFC[0] + 0x36F28);
+    if (g_resident_data_base[0] != 0)
+        hud_item_bolt_draw_us2(g_resident_data_base[0] + 0x36F28);
 }
 
 
 extern void func_US2_00349C00(void *);
 
 void func_US2_L00_0030E458(void) {
-    if (D_001A8CFC[0] != 0)
-        func_US2_00349C00(D_001A8CFC[0] + 0x39160);
+    if (g_resident_data_base[0] != 0)
+        func_US2_00349C00(g_resident_data_base[0] + 0x39160);
 }
 
 
@@ -29,16 +30,16 @@ void func_US2_L00_0030E458(void) {
 extern void func_US2_00348628(void *);
 
 void func_US2_L00_0030E4C8(void) {
-    if (D_001A8CFC[0] != 0)
-        func_US2_00348628(D_001A8CFC[0] + 0x39620);
+    if (g_resident_data_base[0] != 0)
+        func_US2_00348628(g_resident_data_base[0] + 0x39620);
 }
 
 
 extern void func_US2_00347550(void *);
 
 void func_US2_L00_0030E4F8(void) {
-    if (D_001A8CFC[0] != 0)
-        func_US2_00347550(D_001A8CFC[0] + 0x39AF0);
+    if (g_resident_data_base[0] != 0)
+        func_US2_00347550(g_resident_data_base[0] + 0x39AF0);
 }
 
 

@@ -16,14 +16,14 @@ typedef struct {
     float uv[4][2];
     u8 tail[0x20];
 } EffectPacket;
-extern const EffectUV D_L02_001B1AE0;
-extern const EffectUV D_L02_001B1B00;
-extern const EffectPalette D_L02_001B1B20;
-extern const EffectQuad D_L02_001B1B40;
-extern const EffectQuad D_L02_001B1B80;
-extern const EffectQuad D_L02_001B1BC0;
-extern u32 D_L02_001B1C00 __attribute__((sda));
-extern u32 D_L02_001B1C04 __attribute__((sda));
+extern const EffectUV g_energy_gate_primary_uv;
+extern const EffectUV g_energy_gate_secondary_uv;
+extern const EffectPalette g_energy_gate_palette;
+extern const EffectQuad g_energy_gate_primary_quad;
+extern const EffectQuad g_energy_gate_left_quad;
+extern const EffectQuad g_energy_gate_right_quad;
+extern u32 g_energy_gate_primary_packet_flags __attribute__((sda));
+extern u32 g_energy_gate_secondary_packet_flags __attribute__((sda));
 extern EffectVector g_camera_l02_position;
 extern void copy_matrix_rotation(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -41,9 +41,9 @@ extern void FastVecAdd(void *, void *, void *);
 /* Render seven related quads with scrolling UVs and two expanding wave pairs. */
 void energy_gate_draw_effect(u8 *object)
 {
-    EffectUV primary_uv = D_L02_001B1AE0;
-    EffectUV secondary_uv = D_L02_001B1B00;
-    EffectPalette palette = D_L02_001B1B20;
+    EffectUV primary_uv = g_energy_gate_primary_uv;
+    EffectUV secondary_uv = g_energy_gate_secondary_uv;
+    EffectPalette palette = g_energy_gate_palette;
     EffectQuad primary;
     EffectQuad left;
     EffectQuad right;
@@ -64,18 +64,18 @@ void energy_gate_draw_effect(u8 *object)
     s32 i;
     s32 j;
 
-    primary.vertex[0].quad = D_L02_001B1B40.vertex[0].quad;
-    primary.vertex[1].quad = D_L02_001B1B40.vertex[1].quad;
-    primary.vertex[2].quad = D_L02_001B1B40.vertex[2].quad;
-    primary.vertex[3].quad = D_L02_001B1B40.vertex[3].quad;
-    left.vertex[0].quad = D_L02_001B1B80.vertex[0].quad;
-    left.vertex[1].quad = D_L02_001B1B80.vertex[1].quad;
-    left.vertex[2].quad = D_L02_001B1B80.vertex[2].quad;
-    left.vertex[3].quad = D_L02_001B1B80.vertex[3].quad;
-    right.vertex[0].quad = D_L02_001B1BC0.vertex[0].quad;
-    right.vertex[1].quad = D_L02_001B1BC0.vertex[1].quad;
-    right.vertex[2].quad = D_L02_001B1BC0.vertex[2].quad;
-    right.vertex[3].quad = D_L02_001B1BC0.vertex[3].quad;
+    primary.vertex[0].quad = g_energy_gate_primary_quad.vertex[0].quad;
+    primary.vertex[1].quad = g_energy_gate_primary_quad.vertex[1].quad;
+    primary.vertex[2].quad = g_energy_gate_primary_quad.vertex[2].quad;
+    primary.vertex[3].quad = g_energy_gate_primary_quad.vertex[3].quad;
+    left.vertex[0].quad = g_energy_gate_left_quad.vertex[0].quad;
+    left.vertex[1].quad = g_energy_gate_left_quad.vertex[1].quad;
+    left.vertex[2].quad = g_energy_gate_left_quad.vertex[2].quad;
+    left.vertex[3].quad = g_energy_gate_left_quad.vertex[3].quad;
+    right.vertex[0].quad = g_energy_gate_right_quad.vertex[0].quad;
+    right.vertex[1].quad = g_energy_gate_right_quad.vertex[1].quad;
+    right.vertex[2].quad = g_energy_gate_right_quad.vertex[2].quad;
+    right.vertex[3].quad = g_energy_gate_right_quad.vertex[3].quad;
     copy_matrix_rotation(context, object + 0xC0);
     qcopy(&context[3], position);
     context[3].f[3] = 1.0f;
@@ -100,13 +100,13 @@ void energy_gate_draw_effect(u8 *object)
         wave_color[0] = FastTweenColor(wave_color[0] & 0xFFFFFF, wave_color[0], *(float *)(state + 0x1C));
         wave_color[1] = FastTweenColor(wave_color[1] & 0xFFFFFF, wave_color[1], *(float *)(state + 0x1C));
     }
-    FillQuadPacket(packets, D_L02_001B1C00, primary_color, primary_uv.uv, primary.vertex, 1);
-    FillQuadPacket(packets + 1, D_L02_001B1C04, secondary_color, secondary_uv.uv, left.vertex, 1);
-    FillQuadPacket(packets + 2, D_L02_001B1C04, secondary_color, secondary_uv.uv, right.vertex, 1);
-    FillQuadPacket(packets + 3, D_L02_001B1C04, wave_color[0], secondary_uv.uv, left.vertex, 1);
-    FillQuadPacket(packets + 4, D_L02_001B1C04, wave_color[0], secondary_uv.uv, right.vertex, 1);
-    FillQuadPacket(packets + 5, D_L02_001B1C04, wave_color[1], secondary_uv.uv, left.vertex, 1);
-    FillQuadPacket(packets + 6, D_L02_001B1C04, wave_color[1], secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets, g_energy_gate_primary_packet_flags, primary_color, primary_uv.uv, primary.vertex, 1);
+    FillQuadPacket(packets + 1, g_energy_gate_secondary_packet_flags, secondary_color, secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 2, g_energy_gate_secondary_packet_flags, secondary_color, secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets + 3, g_energy_gate_secondary_packet_flags, wave_color[0], secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 4, g_energy_gate_secondary_packet_flags, wave_color[0], secondary_uv.uv, right.vertex, 1);
+    FillQuadPacket(packets + 5, g_energy_gate_secondary_packet_flags, wave_color[1], secondary_uv.uv, left.vertex, 1);
+    FillQuadPacket(packets + 6, g_energy_gate_secondary_packet_flags, wave_color[1], secondary_uv.uv, right.vertex, 1);
     for (i = 0; i < 4; i++) {
         packets[1].uv[i][0] += *(float *)(state + 0x28);
         packets[2].uv[i][0] += *(float *)(state + 0x28);

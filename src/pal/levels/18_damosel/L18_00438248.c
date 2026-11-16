@@ -13,8 +13,8 @@ typedef int s32;
 extern int math_random_int_below(int);
 extern u8 *part_spawn_gravity_fade(void *, void *, int, unsigned, int, int, int,
                           float, float, float, int);
-extern u8 D_L18_001A8F20[] __attribute__((sda));
-extern u8 *D_L18_001FF414[];
+extern u8 g_explosion_effect_desc[] __attribute__((sda));
+extern u8 *g_particle_template_table[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -23,7 +23,7 @@ extern u8 *fireball_spawn(void *, void *, void *, int, float, float);
 extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_transform_joint_to_world(s32 arg0, s32 arg1, void *arg2);
 
-void func_PAL_L18_00438248(u8 *a)
+void extermibot_fire_shot_at_target_pal(u8 *a)
 {
     float pos[4], delta[4], end[4], vel[4];
     u8 *s = *(u8 **)(a + 0x68), *p, *particle;
@@ -35,14 +35,14 @@ void func_PAL_L18_00438248(u8 *a)
     *(s16 *)(s + 0x804) = 0;
     moby_transform_joint_to_world(*(s32 *)(s + 0x7C8), 0, pos);
     c = math_random_int_below(255);
-    particle = part_spawn_gravity_fade(pos, D_L18_001A8F20, 2, 0x808080, c, 127, 16,
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x808080, c, 127, 16,
                             840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
-        particle[2] = D_L18_001FF414[0][0];
-    particle = part_spawn_gravity_fade(pos, D_L18_001A8F20, 2, 0x608080, (c + 128) % 255,
+        particle[2] = g_particle_template_table[0][0];
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x608080, (c + 128) % 255,
                             127, 16, 840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
-        particle[2] = D_L18_001FF414[0][0];
+        particle[2] = g_particle_template_table[0][0];
     FastVecSub(delta, s + 0x760, pos);
     vec_scale_to_length(delta, delta, 0.3f);
     FastVecAdd(pos, pos, delta);

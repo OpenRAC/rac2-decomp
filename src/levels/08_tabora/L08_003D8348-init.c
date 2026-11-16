@@ -10,7 +10,7 @@ extern void moby_set_state(void *, int, int);
 extern int func_001163B0(void);
 extern void FastVecAdd(void *, void *, void *);
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 
 typedef int InitVector __attribute__((mode(TI)));
 typedef struct {
@@ -22,12 +22,12 @@ typedef struct {
     char pad2C[12];
     float f38;
 } InitContext;
-extern InitContext D_L08_001CA080;
+extern InitContext g_init_context;
 typedef struct {
     u8 pad0[0x464];
     u8 flags[0];
 } InitFlags;
-extern InitFlags D_L08_0021EAF0;
+extern InitFlags g_moby_spawn_state_flags_b;
 typedef struct {
     u8 pad0[0xB0];
     u8 fB0;
@@ -35,8 +35,8 @@ typedef struct {
     u16 fB2;
     u8 tail[0x4C];
 } InitEntry;
-extern u32 D_L08_001B29DC __attribute__((sda));
-extern void *D_L08_001FE7BC __attribute__((section(".data")));
+extern u32 g_moby_array __attribute__((sda));
+extern void *g_path_segment_list __attribute__((section(".data")));
 
 typedef struct {
     u8 pad0[0x10];
@@ -147,29 +147,29 @@ void herd_animal_init(InitObject *object)
     vars->f48 = FloatToInt(15.0f);
     vars->f4A = FloatToInt(9.6f);
     vars->f29 = 1;
-    if (D_L08_001CA080.fC) {
-        if (object->f18 < D_L08_001CA080.f28 && D_L08_001CA080.f0 == 1)
+    if (g_init_context.fC) {
+        if (object->f18 < g_init_context.f28 && g_init_context.f0 == 1)
             return;
-        if (object->f18 > D_L08_001CA080.f28 && D_L08_001CA080.f0 == 0)
+        if (object->f18 > g_init_context.f28 && g_init_context.f0 == 0)
             return;
-        if (D_L08_001CA080.fC == 2) {
-            if (object->f18 > D_L08_001CA080.f38 && D_L08_001CA080.f0 == 1)
+        if (g_init_context.fC == 2) {
+            if (object->f18 > g_init_context.f38 && g_init_context.f0 == 1)
                 return;
-            if (object->f18 < D_L08_001CA080.f38 && D_L08_001CA080.f0 == 2)
+            if (object->f18 < g_init_context.f38 && g_init_context.f0 == 2)
                 return;
         }
     }
     linked_entry = vars->f404;
     if (linked_entry != -1) {
         /* Entries are 0x100 bytes; the global holds their base address. */
-        linked_entry = D_L08_001B29DC + (linked_entry << 8);
+        linked_entry = g_moby_array + (linked_entry << 8);
         if (((InitEntry *)linked_entry)->fB0 != 255) {
             linked_flag = ((InitEntry *)linked_entry)->fB2;
-            if (D_L08_0021EAF0.flags[(short)linked_flag] ||
-                ((flag_bits = (u8)D_0019B4A8[((short)linked_flag >> 1) + (g_current_map_index << 10)]),
+            if (g_moby_spawn_state_flags_b.flags[(short)linked_flag] ||
+                ((flag_bits = (u8)g_moby_nibble_table[((short)linked_flag >> 1) + (g_current_map_index << 10)]),
                  (linked_flag & 1) ? (flag_bits >> 4) & 7 : flag_bits & 7)) {
                 unsigned short saved_flag = object->fB2;
-                flag_bits = (u8)D_0019B4A8[((short)saved_flag >> 1) + (g_current_map_index << 10)];
+                flag_bits = (u8)g_moby_nibble_table[((short)saved_flag >> 1) + (g_current_map_index << 10)];
                 if ((saved_flag & 1) ? (flag_bits >> 4) & 7 : flag_bits & 7) {
                     moby_mark_spawned(object);
                     return;
@@ -190,7 +190,7 @@ void herd_animal_init(InitObject *object)
     if (depth > 0)
         vars->f408 = FloatToInt(depth + 2.0f);
     if (vars->f428 == -1)
-        path_l01_compute_segment_lengths(D_L08_001FE7BC);
+        path_l01_compute_segment_lengths(g_path_segment_list);
     vars->f88 = 0;
     vars->f6A = 0;
     vars->f98 = -1;

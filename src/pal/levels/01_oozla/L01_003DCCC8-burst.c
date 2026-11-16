@@ -20,7 +20,7 @@ typedef struct {
     float accW;         /* 0x4C */
 } ParticleConfig;
 
-extern const ParticleConfig D_L01_002A4E78;
+extern const ParticleConfig g_burst_particle_config;
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -47,39 +47,39 @@ void func_PAL_L01_003DCCC8(ParticleOwner *a0)
     float acc[4] __attribute__((aligned(16)));
     u8 *r;
     ParticleOwner *owner = a0;
-    int color = D_L01_002A4E78.color, color2 = D_L01_002A4E78.color2, flag, x, y, z;
+    int color = g_burst_particle_config.color, color2 = g_burst_particle_config.color2, flag, x, y, z;
     int i, count;
     float trig, radialSpeed, verticalSpeed, w;
 
-    count = D_L01_002A4E78.count;
+    count = g_burst_particle_config.count;
     for (i = 0; i < count; i++) {
         trig = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f));
-        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig *= math_random_float_range(g_burst_particle_config.inner, g_burst_particle_config.outer);
         pos[0] = trig;
         trig = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f));
-        trig *= math_random_float_range(D_L01_002A4E78.inner, D_L01_002A4E78.outer);
+        trig *= math_random_float_range(g_burst_particle_config.inner, g_burst_particle_config.outer);
         pos[1] = trig;
         pos[2] = 0;
         matrix_mul_vec3(pos, pos, owner->rotation);
         radialSpeed = FastVecLength(pos);
-        w = D_L01_002A4E78.outer;
-        radialSpeed = D_L01_002A4E78.radialSpeed * ((w - radialSpeed) * 0.020000001f) / w;
-        vec_scale_to_length(vel, pos, math_random_float_range(radialSpeed / D_L01_002A4E78.radialDiv, radialSpeed));
-        verticalSpeed = D_L01_002A4E78.verticalSpeed;
-        vel[2] += math_random_float_range(verticalSpeed / D_L01_002A4E78.verticalDiv, verticalSpeed) * 0.020000001f;
+        w = g_burst_particle_config.outer;
+        radialSpeed = g_burst_particle_config.radialSpeed * ((w - radialSpeed) * 0.020000001f) / w;
+        vec_scale_to_length(vel, pos, math_random_float_range(radialSpeed / g_burst_particle_config.radialDiv, radialSpeed));
+        verticalSpeed = g_burst_particle_config.verticalSpeed;
+        vel[2] += math_random_float_range(verticalSpeed / g_burst_particle_config.verticalDiv, verticalSpeed) * 0.020000001f;
         qzero(acc);
         FastVecAdd(pos, pos, owner->position);
-        pos[2] += D_L01_002A4E78.height;
-        vel[3] = D_L01_002A4E78.velW;
-        acc[3] = D_L01_002A4E78.accW;
+        pos[2] += g_burst_particle_config.height;
+        vel[3] = g_burst_particle_config.velW;
+        acc[3] = g_burst_particle_config.accW;
         flag = func_001163B0() & 1;
         if (!flag && (func_001163B0() & 1)) {
-            color = D_L01_002A4E78.altColor;
-            color2 = D_L01_002A4E78.altColor2;
+            color = g_burst_particle_config.altColor;
+            color2 = g_burst_particle_config.altColor2;
         }
-        x = FloatToInt((math_random_float_range(D_L01_002A4E78.x[0], D_L01_002A4E78.x[1]) * 5.0f + 2.0f) * 0.16666667f);
-        y = FloatToInt((math_random_float_range(D_L01_002A4E78.y[0], D_L01_002A4E78.y[1]) * 5.0f + 2.0f) * 0.16666667f);
-        z = FloatToInt((math_random_float_range(D_L01_002A4E78.z[0], D_L01_002A4E78.z[1]) * 5.0f + 2.0f) * 0.16666667f);
+        x = FloatToInt((math_random_float_range(g_burst_particle_config.x[0], g_burst_particle_config.x[1]) * 5.0f + 2.0f) * 0.16666667f);
+        y = FloatToInt((math_random_float_range(g_burst_particle_config.y[0], g_burst_particle_config.y[1]) * 5.0f + 2.0f) * 0.16666667f);
+        z = FloatToInt((math_random_float_range(g_burst_particle_config.z[0], g_burst_particle_config.z[1]) * 5.0f + 2.0f) * 0.16666667f);
         r = part_spawn_trail(pos, vel, acc, color, color2, x, y, z, -1);
         if (r && flag)
             r[3] = 0x48;

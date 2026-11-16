@@ -11,13 +11,13 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { int i; float f; } Word;
 #define R(p,o) (((Word *)((u8 *)(p)+(o)))->f)
 extern int g_current_map_index;
-extern u8 D_0019B2E8[], g_hero_position[];
+extern u8 g_moby_group_flags[], g_hero_position[];
 typedef struct { u8 prefix[0x464]; u8 flags[0]; } FlagTable;
-extern FlagTable D_L19_0021EA30;
+extern FlagTable g_trigger_active_table;
 typedef struct { u8 prefix[0x30]; float position[4]; u8 middle[0x30]; float rotation[4]; } Transform;
-extern Transform *D_L19_001B2B0C MACRO_ADDR;
+extern Transform *g_linked_object_table MACRO_ADDR;
 extern u8 *g_moby_l19_array;
-extern int D_L19_001B9D00 NOT_SDA;
+extern int g_hero_l19_attached_flag NOT_SDA;
 extern void moby_set_state(void *,int,int);
 extern int coll_point_inside_region(void *,int);
 extern void moby_mark_spawned(void *);
@@ -26,11 +26,11 @@ extern void moby_mark_table_entry_flagged(int);
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float);
-extern void func_PAL_002AC718(void *,void *,void *,float,float,float,float,float,int,int,int,int,int,int,int,int,int,float,float);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,float,float,float,int,int,int,int,int,int,int,int,int,float,float);
 extern void func_PAL_002B15D8(void *,int,float,float,float,float,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern float math_fast_sin_or_cos_a(float),math_move_angle_toward_target(float,float,float);
-extern void func_PAL_L18_002CFE30(int),mat_combine_and_store(void *,void *,void *,void *);
+extern void hero_detach_from_object_pal(int),mat_combine_and_store(void *,void *,void *,void *);
 void func_PAL_L19_00416A3C(u8 *obj)
 {
     float oldpos[4] __attribute__((aligned(16)));
@@ -52,11 +52,11 @@ void func_PAL_L19_00416A3C(u8 *obj)
         I(state,0x5C)|=1;
         *(TI128 *)(state+0x60) = *(TI128 *)(obj+0x10);
         *(TI128 *)(state+0x70) = *(TI128 *)(obj+0xF0);
-        if (D_L19_0021EA30.flags[I(state,0x8C)] ||
-            (B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) ||
+        if (g_trigger_active_table.flags[I(state,0x8C)] ||
+            (B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) ||
             (I(state,0x98)!=-1 && coll_point_inside_region(g_hero_position,I(state,0x98)))) {
-            qcopy_nc(obj+0x10,D_L19_001B2B0C[I(state,0x80)].position);
-            qcopy_nc(obj+0xF0,D_L19_001B2B0C[I(state,0x80)].rotation);
+            qcopy_nc(obj+0x10,g_linked_object_table[I(state,0x80)].position);
+            qcopy_nc(obj+0xF0,g_linked_object_table[I(state,0x80)].rotation);
             H(obj,0x34)|=2;
             if (!B(state,0x91)) { moby_mark_spawned(obj); return; }
             moby_set_state(obj,3,-1);
@@ -66,7 +66,7 @@ void func_PAL_L19_00416A3C(u8 *obj)
         if (!B(obj,0xBC) && !flag_is_third_pending_set(obj) && I(state,0x8C)!=-1 &&
             B(g_moby_l19_array+I(state,0x8C)*256,0x20)!=254 &&
             B(g_moby_l19_array+I(state,0x8C)*256,0x20)!=253 &&
-            !(B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) &&
+            !(B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) &&
             (I(state,0x98)==-1 || !coll_point_inside_region(g_hero_position,I(state,0x98)))) goto effects;
         if (I(state,0x94)!=-1) B(g_moby_l19_array+I(state,0x94)*256,0xBC)=1;
         if (B(state,0x93)) moby_mark_table_entry_flagged(B(obj,0xB0));
@@ -77,7 +77,7 @@ void func_PAL_L19_00416A3C(u8 *obj)
             FastVecAdd(delta,obj+0xD0,obj+0xE0);
             vec_scale_to_length(delta,delta,0.10000001f);
             FastVecAdd(offset,obj+0x10,obj+0xE0);
-            func_PAL_002AC718(obj,delta,offset,0,0,4,2,9,10,3,16,-1,1,1,-1,0,0x810001,1,15);
+            SpawnExplosionEffects_pal(obj,delta,offset,0,0,4,2,9,10,3,16,-1,1,1,-1,0,0x810001,1,15);
             func_PAL_002B15D8(obj,31,3,6,3,6,delta,255);
             H(obj,0x34)|=1;
             B(obj,0x31)=0;
@@ -94,17 +94,17 @@ void func_PAL_L19_00416A3C(u8 *obj)
         if (F(state,0x88)>1) F(state,0x88)=1;
         t=1.0f-math_fast_sin_or_cos_a(F(state,0x88)*3.1415927f);
         t*=0.5f;
-        FastVecSub(delta,D_L19_001B2B0C[I(state,0x80)].position,state+0x60);
+        FastVecSub(delta,g_linked_object_table[I(state,0x80)].position,state+0x60);
         FastVecScale(delta,delta,t);
         FastVecAdd(obj+0x10,state+0x60,delta);
-        R(obj,0xF8)=math_move_angle_toward_target(F(state,0x78),D_L19_001B2B0C[I(state,0x80)].rotation[2],t);
-        R(obj,0xF4)=math_move_angle_toward_target(F(state,0x74),D_L19_001B2B0C[I(state,0x80)].rotation[1],t);
-        R(obj,0xF0)=math_move_angle_toward_target(F(state,0x70),D_L19_001B2B0C[I(state,0x80)].rotation[0],t);
+        R(obj,0xF8)=math_move_angle_toward_target(F(state,0x78),g_linked_object_table[I(state,0x80)].rotation[2],t);
+        R(obj,0xF4)=math_move_angle_toward_target(F(state,0x74),g_linked_object_table[I(state,0x80)].rotation[1],t);
+        R(obj,0xF0)=math_move_angle_toward_target(F(state,0x70),g_linked_object_table[I(state,0x80)].rotation[0],t);
         if (F(state,0x88)>=1) moby_set_state(obj,3,-1);
         break;
     case 3:
         if (I(state,0x94)!=-1 && B(g_moby_l19_array+I(state,0x94)*256,0xBC)) break;
-        if (B(state,0x90)) { D_L19_001B9D00=0; func_PAL_L18_002CFE30(0); }
+        if (B(state,0x90)) { g_hero_l19_attached_flag=0; hero_detach_from_object_pal(0); }
         H(obj,0x34)|=2;
         break;
     }

@@ -12,8 +12,8 @@ typedef int Quad00320550 __attribute__((mode(TI)));
 
 extern int g_current_game_mode MACRO_ADDR;
 extern u8 g_sound_state[];
-extern char D_001A8BD0[] __attribute__((sda));
-extern char D_001AFFD8[];
+extern char g_default_effect_vector[] __attribute__((sda));
+extern char g_str_hovering_robot_debug[];
 
 extern int robot_init_check_health(char *);
 extern void moby_mark_spawned(void *);
@@ -257,7 +257,7 @@ void hovering_robot_update(char *self)
         } else {
             int index;
             char *child;
-            STUB_printf(D_001AFFD8, *(int *)(vars + 0x2A0));
+            STUB_printf(g_str_hovering_robot_debug, *(int *)(vars + 0x2A0));
             index = *(int *)(vars + 0x2C0);
             if (index != -1) {
                 u8 *slot = g_sound_state + index * 0x70;
@@ -348,7 +348,7 @@ void hovering_robot_update(char *self)
                                         *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         }
         if (*(u8 *)(self + 0x42) == 0x1C)
-            part_spawn_joint_hit_effects(*(float *)(vars + 0x298), self, D_001A8BD0, 4);
+            part_spawn_joint_hit_effects(*(float *)(vars + 0x298), self, g_default_effect_vector, 4);
         break;
     case 13: {
         char *target;

@@ -73,7 +73,7 @@ typedef struct {
 } HeroTimerState;
 
 extern HeroTimerState g_hero_state;
-extern int D_L20_001B2AC8;
+extern int g_frame_l20_counter;
 
 #define BS(p, o) (*(short *)((p)+(o)))
 #define BU(p, o) (*(unsigned short *)((p)+(o)))
@@ -88,12 +88,12 @@ typedef struct {
 } TimerPadState;
 
 extern TimerPadState g_pad_state;
-extern unsigned char *D_L20_001FBEE0[];
-extern unsigned char D_L20_00267060[];
+extern unsigned char *g_moby_target_lists[];
+extern unsigned char g_hero_l20_timer_records[];
 extern int D_L20_001A8F00_abs __asm__("D_L20_001A8F00");
-extern float D_L20_001B29E0, D_L20_001B29E4;
-extern unsigned char D_001A7A70[] __attribute__((sda));
-extern void func_PAL_L00_002B92F0(void), hero_queue_glow_draw_routine(void), func_PAL_L00_002C39D8(void), func_PAL_L00_002B3000(void);
+extern float g_hero_timer_trigger_a, g_hero_timer_trigger_b;
+extern unsigned char g_hero_event_flags[] __attribute__((sda));
+extern void hero_ease_lean_to_upright_pal(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide_pal(void), hero_record_play_counters_pal(void);
 extern s32 func_PAL_L20_002D7920(int, int);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
@@ -107,11 +107,11 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
-void func_PAL_L20_002D6678(void) {
+void hero_l20_update_timers_pal(void) {
     unsigned char *m, *pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!g_hero_state.tilt_disabled) func_PAL_L00_002B92F0();
+    if (!g_hero_state.tilt_disabled) hero_ease_lean_to_upright_pal();
     {
         int state = g_hero_state.state_frames+1;
         int control = g_hero_state.control_mode_frames+1;
@@ -178,23 +178,23 @@ void func_PAL_L20_002D6678(void) {
         func_PAL_L20_002D7920(0x91, 1);
     }
     if (!D_L20_001A8F00_abs) {
-        if (D_L20_001B29E0>0) g_hero_state.field_22A++;
+        if (g_hero_timer_trigger_a>0) g_hero_state.field_22A++;
         else g_hero_state.field_22A = 0;
         if (g_hero_state.field_22A>100) {
-            D_L20_001B29E0 = 0;
+            g_hero_timer_trigger_a = 0;
             g_hero_state.field_22A = 0;
         }
-        if (D_L20_001B29E4>0) g_hero_state.field_228++;
+        if (g_hero_timer_trigger_b>0) g_hero_state.field_228++;
         else g_hero_state.field_228 = 0;
         if (g_hero_state.field_228>100) {
             g_hero_state.field_228 = 0;
-            D_L20_001B29E4 = 0;
+            g_hero_timer_trigger_b = 0;
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(m = D_L20_001FBEE0[i]) != 0;i++) {
+        for (i = 0;(m = g_moby_target_lists[i]) != 0;i++) {
             if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_L20_001B2AC8&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
+                if ((g_frame_l20_counter&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_state+0x80;
                     pos = m+0x10;
                     if (fast_vec_dist(hero, pos)<15.37f) {
@@ -206,7 +206,7 @@ void func_PAL_L20_002D6678(void) {
             }
         }
     }
-    for (i = 0;i<4;i++) math_fast_float_d(D_L20_00267060+i*0x70);
+    for (i = 0;i<4;i++) math_fast_float_d(g_hero_l20_timer_records+i*0x70);
     g_hero_state.current_path_dist = 9999.0f;
     if (g_hero_state.field_34E && cam_get_view_space_height(((unsigned char *)&g_hero_state)+0xF0)<0) {
         if (g_hero_state.pos_history_count != 32) goto history_done;
@@ -228,7 +228,7 @@ void func_PAL_L20_002D6678(void) {
     }
     g_hero_state.still_frames = 0;
 history_done:
-    func_PAL_L00_002C39D8();
+    hero_update_landing_slide_pal();
     switch (g_hero_state.mode) {
     case 1:
         hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.4f);
@@ -240,7 +240,7 @@ history_done:
         hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.7f);
         break;
     }
-    if (!(D_L20_001B2AC8&3)) {
+    if (!(g_frame_l20_counter&3)) {
         switch (g_hero_state.mode) {
         case 1:
             g_hero_state.reach_distance = 2.125f;
@@ -251,7 +251,7 @@ history_done:
             g_hero_state.reach_height = 1.25f;
             break;
         default:
-            if (D_001A7A70[0x8F]) {
+            if (g_hero_event_flags[0x8F]) {
                 g_hero_state.reach_distance = 14;
                 g_hero_state.reach_height = 4.5f;
             }
@@ -273,5 +273,5 @@ history_done:
             if (g_hero_state.field_5C0 && g_hero_state.field_1248 != 46) g_hero_state.field_5C0 = 0;
         }
     }
-    if (g_hero_state.field_88<1) func_PAL_L00_002B3000();
+    if (g_hero_state.field_88<1) hero_record_play_counters_pal();
 }

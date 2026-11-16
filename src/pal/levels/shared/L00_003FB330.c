@@ -37,7 +37,7 @@ typedef struct {
 } EffectState;
 
 /* Spawns an explosion object (CreateMoby) and starts its effect (EmitExplosionParticles). */
-char *func_PAL_L00_003FB330(EffectVector *position, int flash, int n0, int n1,
+char *SpawnExplosion_pal(EffectVector *position, int flash, int n0, int n1,
                   int n2, int n3, int n4, int orient, float size, float distance,
                   int mode, int extra, int flags, char *owner)
 {

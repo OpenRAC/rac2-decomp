@@ -14,7 +14,7 @@ extern void moby_update_attached_transforms(unsigned char *, unsigned char *);
    record flips to state 1. In state 1 the sub-object's first float is scaled by
    2*pi/21600 (a per-frame 1/100 s turn rate) and folded into the record's own
    angle before its track block is stepped again. */
-void func_PAL_L09_003CCCC0(unsigned char *a0) {
+void turn_record_update_pal(unsigned char *a0) {
     unsigned char *s0 = a0;
     unsigned char *s1 = *(unsigned char **)(s0 + 0x68);
     switch (s0[0x20]) {

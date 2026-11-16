@@ -4,7 +4,7 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 extern char *g_path_l17_table[];
 /* One storage identity supplies the absolute loop entry and GP backedge load. */
-extern int D_L17_001B2748[] __attribute__((sda));
+extern int g_flash_frame_counter[] __attribute__((sda));
 extern void anim_sample_key_track(float, float, void *, int *, float *, void *);
 extern float IntToFloat(int);
 extern float mat_fast_helper_a(float, float);
@@ -98,7 +98,7 @@ int PlacePathFollowerChainAtStart(ChainMoby *moby)
     FastVecAdd(&rear, &rear, &moby->position);
 
     while (link) {
-        flash = (D_L17_001B2748[0] + link->uid) % 60 < 15;
+        flash = (g_flash_frame_counter[0] + link->uid) % 60 < 15;
         link->color = flash ? 0x80FFFFFF : 0x80404040;
         linkVars = link->vars;
 
@@ -179,7 +179,7 @@ int UpdatePathFollowerChain(char *obj)
         low = 0.00087266474f;
         middle = 0.0017453295f;
         high = 0.10471977f;
-        flash = (D_L17_001B2748[0] + *(short *)(next_link + 0xB2)) % 60 < 15;
+        flash = (g_flash_frame_counter[0] + *(short *)(next_link + 0xB2)) % 60 < 15;
         *(int *)(next_link + 0x78) = flash ? 0x80FFFFFF : 0x80404040;
         next_vars = *(char **)(next_link + 0x68);
         qzero(&other);

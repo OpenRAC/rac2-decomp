@@ -6,29 +6,29 @@ typedef struct {
 } ObjectState;
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern u8 g_sound_state[];
 extern int g_current_map_index MACRO_ADDR;
-extern u16 D_0018CC7C NOT_SDA;
-extern int D_L16_001A8FF0 MACRO_ADDR;
-extern u8 *D_L16_001B2B1C __attribute__((sda));
-extern float D_L16_001B02B0 __attribute__((sda));
-extern float D_L16_001B02B8 __attribute__((sda));
-extern u32 D_L16_001B02C0[] MACRO_ADDR;
+extern u16 g_state_update_id NOT_SDA;
+extern int g_hero_l16_block_flag MACRO_ADDR;
+extern u8 *g_moby_instance_table __attribute__((sda));
+extern float g_moby_l16_push_scale __attribute__((sda));
+extern float g_moby_pulse_speed_a __attribute__((sda));
+extern u32 g_moby_pulse_colors[] MACRO_ADDR;
 extern u32 colorFirst[] SDATA(D_L16_001B02C0);
-extern float D_L16_001B02BC MACRO_ADDR;
+extern float g_moby_pulse_speed_b MACRO_ADDR;
 
-extern char D_L16_001B02D0[];
-extern int D_L16_001B2648 MACRO_ADDR;
-extern int D_L16_001B3814 MACRO_ADDR;
+extern char g_str_moby_format[];
+extern int g_frame_l16_counter MACRO_ADDR;
+extern int g_last_frame_counter MACRO_ADDR;
 typedef struct {
     u8 pad[0x160]; float strength; int pad164;
     int duration, timer; u8 pad170[0x10];
     float damping; int pad184, lifetime;
 } EffectControls;
-extern EffectControls D_L16_001B99C0;
-extern u8 D_L16_001A8F20[] MACRO_ADDR;
-extern float D_L16_001B9B00[4];
+extern EffectControls g_snivelak_hero_state;
+extern u8 g_particle_template[] MACRO_ADDR;
+extern float g_scene_origin_transform[4];
 extern void moby_set_state(u8 *,s32,s32);
 extern float moby_get_linked_float(const u8 *);
 extern void part_spawn_spark_side(void *);
@@ -72,12 +72,12 @@ void moby_state_update(u8 *object)
     switch (object[0x20]) {
     case 0: {
         float speed;
-        if (D_0019B2E8[object[0xB0]+g_current_map_index*16]&0x80) goto remove;
+        if (g_moby_group_flags[object[0xB0]+g_current_map_index*16]&0x80) goto remove;
         object[0x30]=255;
         *(u16 *)(object+0x32)=0x113;
         *(u16 *)(object+0x34)|=0x4000;
         qcopy_nc(state->origin,object+0x10);
-        speed=D_L16_001B02B8*0.00029088825f;
+        speed=g_moby_pulse_speed_a*0.00029088825f;
         state->amount=0.0f;
         state->sound=-1;
         state->angularSpeed=speed;
@@ -85,11 +85,11 @@ void moby_state_update(u8 *object)
         break;
     }
     case 1:
-        if (!D_L16_001A8FF0) break;
-        amount=moby_get_linked_float(D_L16_001B2B1C+(state->tableIndex<<8));
+        if (!g_hero_l16_block_flag) break;
+        amount=moby_get_linked_float(g_moby_instance_table+(state->tableIndex<<8));
         if (amount!=0.0f || state->amount!=0.0f) {
             part_spawn_spark_side(object);
-            vec_scale_to_length(point,object+0xE0,D_L16_001B02B0*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
+            vec_scale_to_length(point,object+0xE0,g_moby_l16_push_scale*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
             FastVecAdd(object+0x10,state->origin,point);
             if (amount<state->amount) coll_sweep_from_object(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
         }
@@ -106,8 +106,8 @@ void moby_state_update(u8 *object)
         }
         if (amount==1.0f && state->amount!=1.0f) subtitle_request_voice_line(0x9EC,67);
         state->amount=amount;
-        if (D_L16_001B3814!=D_L16_001B2648) {
-            D_L16_001B3814=D_L16_001B2648;
+        if (g_last_frame_counter!=g_frame_l16_counter) {
+            g_last_frame_counter=g_frame_l16_counter;
             gfx_add_draw_callback_first(DrawRotatingGroupInstances,object);
         }
         if (amount>=1.0f) {
@@ -115,7 +115,7 @@ void moby_state_update(u8 *object)
                 PlayMobySound(0,0,(char *)object);
                 object[0xA8]=255;
                 moby_set_state(object,2,-1);
-                D_0018CC7C=65535;
+                g_state_update_id=65535;
             }
         } else object[0xA8]=255;
         break;
@@ -130,18 +130,18 @@ void moby_state_update(u8 *object)
             coll_sweep_from_object(object,point,0x10000,0,1,0,6.0f,3.0f,1.0f);
             PlayMobySound(1,0,(char *)object);
             for (i=0;i<2;i++) {
-                FastVecSub(normal,D_L16_001B9B00,point);
+                FastVecSub(normal,g_scene_origin_transform,point);
                 vec_scale_to_length(normal,normal,1.0f);
                 part_spawn_blast_effect_moby(object,point,normal,0.0f);
                 FastVecAdd(point,point,step);
             }
-            D_L16_001B99C0.damping=0.1f;
-            D_L16_001B99C0.lifetime=90;
-            D_L16_001B99C0.strength=0.2f;
-            D_L16_001B99C0.duration=60;
-            D_L16_001B99C0.timer=0;
+            g_snivelak_hero_state.damping=0.1f;
+            g_snivelak_hero_state.lifetime=90;
+            g_snivelak_hero_state.strength=0.2f;
+            g_snivelak_hero_state.duration=60;
+            g_snivelak_hero_state.timer=0;
             mat_get_euler_angles((float *)(object+0xC0),(float *)(object+0xF0));
-            part_spawn_masked_debris((char *)object,0xFFF,(float *)D_L16_001A8F20,255,2.0f,4.0f,10.0f,20.0f);
+            part_spawn_masked_debris((char *)object,0xFFF,(float *)g_particle_template,255,2.0f,4.0f,10.0f,20.0f);
             state->counter=0;
             state->timer=180;
             state->flags=0;
@@ -149,7 +149,7 @@ void moby_state_update(u8 *object)
             *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)|0x41)&0xEFFF;
             count=moby_count_group_not_in_state(object[0x21],-1)-1;
             if (count!=0) {
-                char *format=D_L16_001B02D0;
+                char *format=g_str_moby_format;
                 char *text=message;
                 string=GetLocalizedString(0x2F3A);
                 sprintf(text,format,string,count);
@@ -182,13 +182,13 @@ remove:
     }
     if (object[0x31]) {
         if (object[0x20]==2) {
-            rate=FastAddRotations(state->angle,D_L16_001B02BC*0.00029088825f);
+            rate=FastAddRotations(state->angle,g_moby_pulse_speed_b*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=PulseColor(D_L16_001B02C0[2],D_L16_001B02C0[3],rate);
+            *(u32 *)(object+0x78)=PulseColor(g_moby_pulse_colors[2],g_moby_pulse_colors[3],rate);
         } else {
-            rate=FastAddRotations(state->angle,D_L16_001B02B8*0.00029088825f);
+            rate=FastAddRotations(state->angle,g_moby_pulse_speed_a*0.00029088825f);
             state->angle=rate;
-            *(u32 *)(object+0x78)=PulseColor(colorFirst[0],D_L16_001B02C0[1],rate);
+            *(u32 *)(object+0x78)=PulseColor(colorFirst[0],g_moby_pulse_colors[1],rate);
         }
     }
 }

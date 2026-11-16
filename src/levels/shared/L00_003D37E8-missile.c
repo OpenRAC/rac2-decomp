@@ -38,9 +38,9 @@ extern B2510Entry g_weapon_l00_table[];
 extern char *g_hero_moby NOT_SDA;
 typedef struct { char pad[0x18]; char *target; char pad1[4]; float position[4]; } B2510Hit;
 extern B2510Hit g_collision_result;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern unsigned char *D_L00_001FEA14;
-extern unsigned char *D_L00_001FE9F4;
+extern char g_default_vector[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b;
+extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter __attribute__((sda));
 extern char glowing_trail_update[];
 
@@ -133,10 +133,10 @@ target_done:
             *(int *)(vars + 0x38) = 6;
         }
         random_value = math_random_int_below(255);
-        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, random_value, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (effect) effect[2] = *D_L00_001FEA14;
-        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, (random_value + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (effect) effect[2] = *D_L00_001FEA14;
+        effect = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 2, 0x202080, random_value, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (effect) effect[2] = *g_effect_param_pointer_b;
+        effect = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 2, 0x202080, (random_value + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (effect) effect[2] = *g_effect_param_pointer_b;
         random_value = (int)delta;
         FastVecSub((void *)random_value, missile + 0x10, previous);
         FastVecScale((char *)random_value, (char *)random_value, 0.2f);
@@ -148,12 +148,12 @@ target_done:
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.1f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.1f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, random_value, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            part_spawn_gravity_fade(particle, g_default_vector, 15, 0x808080, random_value, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (effect) effect[2] = *D_L00_001FE9F4;
+            effect = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (effect) effect[2] = *g_effect_param_pointer_a;
         }
         ref_L00_003E2510_00(glowing_trail_update, missile);
         break;

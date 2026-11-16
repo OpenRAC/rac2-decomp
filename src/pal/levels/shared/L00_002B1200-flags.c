@@ -16,13 +16,13 @@ typedef struct {
 } Hero_2B2120;
 extern Hero_2B2120 g_hero_state;
 extern int hero_is_in_special_kind_or_mode(void);
-extern void func_PAL_L00_002AFAE8(void);
-extern void func_PAL_L00_002B0860(char *);
-extern void func_PAL_L00_002D4F60(void);
-extern void func_PAL_L00_002A7D48(void);
-extern void func_PAL_L00_002B1E88(void);
+extern void SpawnHeroItemMobies_pal(void);
+extern void update_hero_item_mobys_pal(char *);
+extern void level_fade_glow_colors_pal(void);
+extern void hero_update_item_glow_pal(void);
+extern void UpdateHeroSlotCallbacks_pal(void);
 
-void func_PAL_L00_002B2018(void)
+void hero_update_items_and_flags_pal(void)
 {
     int m = g_hero_state.mode;
 
@@ -35,9 +35,9 @@ void func_PAL_L00_002B2018(void)
         g_hero_state.b22BE = 1;
     else
         g_hero_state.b22BE = 0;
-    func_PAL_L00_002AFAE8();
-    func_PAL_L00_002B0860(g_hero_state.moby);
-    func_PAL_L00_002D4F60();
-    func_PAL_L00_002A7D48();
-    func_PAL_L00_002B1E88();
+    SpawnHeroItemMobies_pal();
+    update_hero_item_mobys_pal(g_hero_state.moby);
+    level_fade_glow_colors_pal();
+    hero_update_item_glow_pal();
+    UpdateHeroSlotCallbacks_pal();
 }

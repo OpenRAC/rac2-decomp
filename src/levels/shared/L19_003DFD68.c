@@ -55,42 +55,42 @@ typedef struct {
 
 extern char g_hero_state[];
 extern u8 g_sound_state[];
-extern int D_001A7A00[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
-extern char D_L19_001B9A40[];
-extern char *D_L19_001FE700[];
+extern char g_hero_origin_vec[];
+extern char *g_train_path_table[];
 extern ClassRec *g_moby_l19_array[] __attribute__((sda));
-extern char *D_L19_001C3F00[];
-extern f32 D_L19_001B0C1C[] __attribute__((sda));
-extern f32 D_L19_001B0C20[] __attribute__((sda));
-extern f32 D_L19_001B0B50 __attribute__((sda));
-extern f32 D_L19_001B0B54 __attribute__((sda));
-extern f32 D_L19_001B0B60[4] __attribute__((sda));
-extern f32 D_L19_001B0B70 __attribute__((sda));
-extern f32 D_L19_001B0B74 __attribute__((sda));
-extern f32 D_L19_001B0B78 __attribute__((sda));
-extern int D_L19_001B0B7C __attribute__((sda));
-extern f32 D_L19_001B0B90[4] __attribute__((sda));
-extern int D_L19_001B0BA0 __attribute__((sda));
-extern f32 D_L19_001B0BA4 __attribute__((sda));
-extern f32 D_L19_001B0BA8 __attribute__((sda));
-extern f32 D_L19_001B0BAC __attribute__((sda));
-extern f32 D_L19_001B0BB0 __attribute__((sda));
-extern f32 D_L19_001B0BB4 __attribute__((sda));
-extern f32 D_L19_001B0BB8 __attribute__((sda));
-extern f32 D_L19_001B0BC0[2] __attribute__((sda));
-extern f32 D_L19_001B0BC8[2] __attribute__((sda));
-extern f32 D_L19_001B0BD0 __attribute__((sda));
-extern f32 D_L19_001B0BD8[2] __attribute__((sda));
-extern f32 D_L19_001B0BE0 __attribute__((sda));
-extern f32 D_L19_001B0BF0[4] __attribute__((sda));
-extern f32 D_L19_001B0C00[4] __attribute__((sda));
-extern f32 D_L19_001B0C18 __attribute__((sda));
-extern int D_L19_001B0C28[] __attribute__((sda));
+extern char *g_impact_l19_moby_table[];
+extern f32 g_train_l19_value_mid[] __attribute__((sda));
+extern f32 g_train_l19_value_high[] __attribute__((sda));
+extern f32 g_train_roll_speed __attribute__((sda));
+extern f32 g_train_turn_speed __attribute__((sda));
+extern f32 g_train_vector_a[4] __attribute__((sda));
+extern f32 g_train_l19_hit_radius __attribute__((sda));
+extern f32 g_train_scale_pos __attribute__((sda));
+extern f32 g_train_scale_neg __attribute__((sda));
+extern int g_train_state_value __attribute__((sda));
+extern f32 g_train_vector_b[4] __attribute__((sda));
+extern int g_train_effect_count __attribute__((sda));
+extern f32 g_train_flash_min __attribute__((sda));
+extern f32 g_train_flash_max __attribute__((sda));
+extern f32 g_train_l19_speed_min __attribute__((sda));
+extern f32 g_train_l19_speed_max __attribute__((sda));
+extern f32 g_train_length_a __attribute__((sda));
+extern f32 g_train_length_b __attribute__((sda));
+extern f32 g_train_l19_accel_by_video[2] __attribute__((sda));
+extern f32 g_train_stretch_by_video[2] __attribute__((sda));
+extern f32 g_train_fade_duration_a __attribute__((sda));
+extern f32 g_train_l19_drag_by_video[2] __attribute__((sda));
+extern f32 g_train_fade_duration_b __attribute__((sda));
+extern f32 g_train_vector_c[4] __attribute__((sda));
+extern f32 g_train_vector_d[4] __attribute__((sda));
+extern f32 g_train_l19_value_low __attribute__((sda));
+extern int g_train_tween_colors[] __attribute__((sda));
 extern int g_frame_l19_counter __attribute__((sda));
-extern char D_L19_003E1C98[];
-extern char D_L19_003E10A0[];
-extern char D_L19_003E1D98[];
+extern char g_train_draw_data_extra[];
+extern char g_train_draw_data_main[];
+extern char g_train_draw_data_first[];
 
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern int math_fast_float_d(void *);
@@ -153,7 +153,7 @@ void train_l19_update(char *moby)
     vars = *(PvVars **)(moby + 0x68);
     qcopy(pos, moby + 0x10);
     qcopy(rot, moby + 0xF0);
-    if (vars->iD4 != -1 && coll_point_inside_region(D_L19_001B9A40, vars->iD4) != 0) {
+    if (vars->iD4 != -1 && coll_point_inside_region(g_hero_origin_vec, vars->iD4) != 0) {
         protopet_start_enter_anim(moby, 0);
     }
     if (vars->iE0 > 0) {
@@ -168,7 +168,7 @@ void train_l19_update(char *moby)
         qcopy(vars->v70, moby + 0xF0);
         if (vars->iB0 != -1) {
             vars->fD8 = 0.0f;
-            path = D_L19_001FE700[vars->iB0];
+            path = g_train_path_table[vars->iB0];
             scale = 1.0f / fast_vec_dist(path + 0x10, path + 0x20);
             vars->fDC = scale * (0.016666668f * vars->fD0);
             qcopy(moby + 0x10, path + 0x10);
@@ -208,7 +208,7 @@ void train_l19_update(char *moby)
             vec_scale_to_length(vars->v80, moby + 0xC0, vars->fD0 * 0.016666668f);
         }
         if (vars->iB0 != -1) {
-            path_sample_position(D_L19_001FE700[vars->iB0], 0, moby + 0x10, moby + 0xF0, 0, vars->fD8);
+            path_sample_position(g_train_path_table[vars->iB0], 0, moby + 0x10, moby + 0xF0, 0, vars->fD8);
             vars->fD8 = vars->fD8 + vars->fDC;
         } else {
             if (vars->iC8 != -1) {
@@ -248,47 +248,47 @@ void train_l19_update(char *moby)
             }
         }
         if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN) {
-            matrix_mul_vec3(vecs[0], D_L19_001B0B60, moby + 0xC0);
+            matrix_mul_vec3(vecs[0], g_train_vector_a, moby + 0xC0);
             FastVecAdd(vecs[0], vecs[0], moby + 0x10);
-            hit_count = coll_process_hit(D_L19_001B0B70, vecs[0], 0, moby, 0);
+            hit_count = coll_process_hit(g_train_l19_hit_radius, vecs[0], 0, moby, 0);
             if (hit_count != 0) {
                 for (hit_index = 0; hit_index < hit_count; hit_index++) {
-                    target = D_L19_001C3F00[hit_index];
+                    target = g_impact_l19_moby_table[hit_index];
                     if (target == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
-                        FastVecScale(vecs[1], moby + 0xC0, -D_L19_001B0B78);
-                        vecs[1][2] = D_L19_001B0B78 * 4.0f;
+                        FastVecScale(vecs[1], moby + 0xC0, -g_train_scale_neg);
+                        vecs[1][2] = g_train_scale_neg * 4.0f;
                         vecs[1][3] = 5627.9248f;
                         hero_l19_set_state(0, 1);
-                        force = (f32)D_001A7A00[0] * 30.0f;
+                        force = (f32)g_player_stats[0] * 30.0f;
                         part_queue_impact_effect(target, moby, 0x10001, g_hero_state + 0x80, vecs[1], force > 100.0f ? force : 100.0f);
-                        vars->iE0 = D_L19_001B0B7C;
+                        vars->iE0 = g_train_state_value;
                         SpawnExplosion(g_hero_state + 0x80, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
                     } else {
-                        FastVecScale(vecs[1], moby + 0xC0, D_L19_001B0B74);
+                        FastVecScale(vecs[1], moby + 0xC0, g_train_scale_pos);
                         vecs[1][3] = 5627.9248f;
-                        vecs[1][2] = D_L19_001B0B74 * 4.0f;
+                        vecs[1][2] = g_train_scale_pos * 4.0f;
                         part_queue_impact_effect(target, moby, 0x10001, target + 0x10, vecs[1], 50.0f);
                     }
                 }
             }
             part_spawn_upward(moby);
             if (*(u8 *)(moby + 0x31) != 0 && (g_frame_l19_counter & 0xF) == (((int)moby >> 8) & 0xF)) {
-                for (i = 0; i < D_L19_001B0BA0; i++) {
-                    matrix_mul_vec3(vecs[1], D_L19_001B0B90, moby + 0xC0);
+                for (i = 0; i < g_train_effect_count; i++) {
+                    matrix_mul_vec3(vecs[1], g_train_vector_b, moby + 0xC0);
                     FastVecAdd(vecs[1], vecs[1], moby + 0x10);
-                    speed = math_random_float_range(D_L19_001B0BAC, D_L19_001B0BB0) * 0.016666668f;
+                    speed = math_random_float_range(g_train_l19_speed_min, g_train_l19_speed_max) * 0.016666668f;
                     vec_scale_to_length(vecs[2], moby + 0xD0, math_random_int_below(2) != 0 ? -speed : speed);
                     vecs[2][2] = math_random_float_range(-0.083333336f, 0.016666668f);
                     vecs[2][3] = -0.008333334f;
-                    part_spawn_white_flash(vecs[1], vecs[2], 0, math_random_float_range(D_L19_001B0BA4, D_L19_001B0BA8));
+                    part_spawn_white_flash(vecs[1], vecs[2], 0, math_random_float_range(g_train_flash_min, g_train_flash_max));
                 }
             }
         }
         break;
     case 5:
         flag_set_first_pending(moby);
-        scale = D_L19_001B0B54 * 0.00029088825f;
-        vars->v80[2] = vars->v80[2] - D_L19_001B0B50 * 0.00027777778f;
+        scale = g_train_turn_speed * 0.00029088825f;
+        vars->v80[2] = vars->v80[2] - g_train_roll_speed * 0.00027777778f;
         *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), scale);
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;
@@ -297,30 +297,30 @@ void train_l19_update(char *moby)
             *(u8 *)(moby + 0xBC) = 0;
             *(u16 *)(moby + 0x96) = 0;
             *(u16 *)(moby + 0x34) |= 0x100;
-            vars->fC0 = D_L19_001B0C18;
-            matrix_mul_vec3(vars->v90, D_L19_001B0BF0, moby + 0xC0);
+            vars->fC0 = g_train_l19_value_low;
+            matrix_mul_vec3(vars->v90, g_train_vector_c, moby + 0xC0);
             FastVecAdd(vars->v90, moby + 0x10, vars->v90);
-            vec_scale_to_length(vars->v80, moby + 0xC0, D_L19_001B0BB4 * 0.016666668f);
+            vec_scale_to_length(vars->v80, moby + 0xC0, g_train_length_a * 0.016666668f);
             *(u16 *)(moby + 0x34) |= 8;
             snd_play_from_class_bank(1, 0, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
         } else if (*(u8 *)(moby + 0xBC) == 0) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, D_L19_001B0BC8[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f);
-            vars->fC0 = D_L19_001B0C18 + (D_L19_001B0C1C[0] - D_L19_001B0C18) * (IntToFloat(moby_timer(moby)) / D_L19_001B0BD0);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L19_001B0BD0, D_L19_001B0C28[0], D_L19_001B0C28[1]);
-            if (D_L19_001B0BD0 < (f32)moby_timer(moby)) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, g_train_stretch_by_video[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f);
+            vars->fC0 = g_train_l19_value_low + (g_train_l19_value_mid[0] - g_train_l19_value_low) * (IntToFloat(moby_timer(moby)) / g_train_fade_duration_a);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_fade_duration_a, g_train_tween_colors[0], g_train_tween_colors[1]);
+            if (g_train_fade_duration_a < (f32)moby_timer(moby)) {
                 *(u8 *)(moby + 0xBC) = 1;
-                vec_scale_to_length(vars->v80, moby + 0xC0, D_L19_001B0BB8 * 0.016666668f);
+                vec_scale_to_length(vars->v80, moby + 0xC0, g_train_length_b * 0.016666668f);
                 *(u16 *)(moby + 0x96) = 0;
             }
         } else if (*(u8 *)(moby + 0xBC) == 1) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f - D_L19_001B0BD8[g_is_pal_video[0] != 0] * 0.016666668f);
-            vars->fC0 = D_L19_001B0C1C[0] + (D_L19_001B0C20[0] - D_L19_001B0C1C[0]) * (IntToFloat(moby_timer(moby)) / D_L19_001B0BE0);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L19_001B0BE0, D_L19_001B0C28[1], D_L19_001B0C28[2]);
-            *(u8 *)(moby + 0x23) = FloatToInt((1.0f - IntToFloat(moby_timer(moby)) / D_L19_001B0BE0) * 128.0f);
-            if (D_L19_001B0BE0 < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f - g_train_l19_drag_by_video[g_is_pal_video[0] != 0] * 0.016666668f);
+            vars->fC0 = g_train_l19_value_mid[0] + (g_train_l19_value_high[0] - g_train_l19_value_mid[0]) * (IntToFloat(moby_timer(moby)) / g_train_fade_duration_b);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_fade_duration_b, g_train_tween_colors[1], g_train_tween_colors[2]);
+            *(u8 *)(moby + 0x23) = FloatToInt((1.0f - IntToFloat(moby_timer(moby)) / g_train_fade_duration_b) * 128.0f);
+            if (g_train_fade_duration_b < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
                 if (vars->iBC != 0) {
                     vars->fD8 = 0.0f;
                     qcopy(moby + 0x10, vars->v60);
@@ -333,9 +333,9 @@ void train_l19_update(char *moby)
             }
         }
         if (*(u8 *)(moby + 0x31) != 0) {
-            gfx_queue_draw_callback(D_L19_003E1C98, moby);
-            gfx_queue_draw_callback(D_L19_003E10A0, moby);
-            gfx_add_draw_callback_first(D_L19_003E1D98, moby);
+            gfx_queue_draw_callback(g_train_draw_data_extra, moby);
+            gfx_queue_draw_callback(g_train_draw_data_main, moby);
+            gfx_add_draw_callback_first(g_train_draw_data_first, moby);
         }
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;
@@ -344,26 +344,26 @@ void train_l19_update(char *moby)
             *(u8 *)(moby + 0xBC) = 1;
             *(u16 *)(moby + 0x96) = 0;
             *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & ~1) | 0x100;
-            vars->fC0 = D_L19_001B0C18;
+            vars->fC0 = g_train_l19_value_low;
             *(u8 *)(moby + 0x23) = 0;
             for (i = 0; i < 3; i++) {
                 vec_scale_to_length(vecs[i], moby + 0xC0 + i * 0x10, 1.0f);
             }
-            matrix_mul_vec3(vars->v90, D_L19_001B0C00, vecs[0]);
+            matrix_mul_vec3(vars->v90, g_train_vector_d, vecs[0]);
             FastVecScale(vars->v90, vars->v90, IntToFloat(vars->iCC) + 1.0f);
             FastVecAdd(vars->v90, moby + 0x10, vars->v90);
-            vec_scale_to_length(vars->v80, moby + 0xC0, (IntToFloat(vars->iCC) + 1.0f) * (0.016666668f * D_L19_001B0BC0[g_is_pal_video[0] != 0]));
+            vec_scale_to_length(vars->v80, moby + 0xC0, (IntToFloat(vars->iCC) + 1.0f) * (0.016666668f * g_train_l19_accel_by_video[g_is_pal_video[0] != 0]));
             *(u16 *)(moby + 0x34) |= 8;
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
             snd_play_from_class_bank(1, 0, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
         } else if (*(u8 *)(moby + 0xBC) == 1) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (1.0f - D_L19_001B0BD8[g_is_pal_video[0] != 0] * 0.016666668f));
-            vars->fC0 = D_L19_001B0C20[0] + (D_L19_001B0C1C[0] - D_L19_001B0C20[0]) * (IntToFloat(moby_timer(moby)) / D_L19_001B0BE0);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L19_001B0BE0, D_L19_001B0C28[2], D_L19_001B0C28[1]);
-            *(u8 *)(moby + 0x23) = FloatToInt(IntToFloat(moby_timer(moby)) * 128.0f / D_L19_001B0BE0);
-            if (D_L19_001B0BE0 < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (1.0f - g_train_l19_drag_by_video[g_is_pal_video[0] != 0] * 0.016666668f));
+            vars->fC0 = g_train_l19_value_high[0] + (g_train_l19_value_mid[0] - g_train_l19_value_high[0]) * (IntToFloat(moby_timer(moby)) / g_train_fade_duration_b);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_fade_duration_b, g_train_tween_colors[2], g_train_tween_colors[1]);
+            *(u8 *)(moby + 0x23) = FloatToInt(IntToFloat(moby_timer(moby)) * 128.0f / g_train_fade_duration_b);
+            if (g_train_fade_duration_b < (f32)moby_timer(moby) || *(f32 *)(moby + 0xE8) < 0.0f) {
                 *(u8 *)(moby + 0x23) = 0x80;
                 *(u8 *)(moby + 0xBC) = 0;
                 *(u16 *)(moby + 0x34) &= ~8;
@@ -371,10 +371,10 @@ void train_l19_update(char *moby)
                 *(u16 *)(moby + 0x96) = 0;
             }
         } else if (*(u8 *)(moby + 0xBC) == 0) {
-            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (D_L19_001B0BC8[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f));
-            vars->fC0 = D_L19_001B0C1C[0] + (D_L19_001B0C18 - D_L19_001B0C1C[0]) * (IntToFloat(moby_timer(moby)) / D_L19_001B0BD0);
-            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / D_L19_001B0BD0, D_L19_001B0C28[1], D_L19_001B0C28[0]);
-            if (D_L19_001B0BD0 < (f32)moby_timer(moby)) {
+            FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (g_train_stretch_by_video[g_is_pal_video[0] != 0] * 0.016666668f + 1.0f));
+            vars->fC0 = g_train_l19_value_mid[0] + (g_train_l19_value_low - g_train_l19_value_mid[0]) * (IntToFloat(moby_timer(moby)) / g_train_fade_duration_a);
+            vars->iC4 = FastTweenColor(IntToFloat(moby_timer(moby)) / g_train_fade_duration_a, g_train_tween_colors[1], g_train_tween_colors[0]);
+            if (g_train_fade_duration_a < (f32)moby_timer(moby)) {
                 *(u16 *)(moby + 0x34) &= ~0x100;
                 moby_set_state(moby, 1, -1);
             }
@@ -385,14 +385,14 @@ void train_l19_update(char *moby)
             vars->iE4 = snd_play_from_class_bank(0, 4, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
         }
         if (*(u8 *)(moby + 0x31) != 0) {
-            gfx_queue_draw_callback(D_L19_003E1C98, moby);
-            gfx_queue_draw_callback(D_L19_003E10A0, moby);
-            gfx_add_draw_callback_first(D_L19_003E1D98, moby);
+            gfx_queue_draw_callback(g_train_draw_data_extra, moby);
+            gfx_queue_draw_callback(g_train_draw_data_main, moby);
+            gfx_add_draw_callback_first(g_train_draw_data_first, moby);
         }
         FastVecAdd(moby + 0x10, moby + 0x10, vars->v80);
         break;
     case 2:
-        if (vars->iD4 != -1 && coll_point_inside_region(D_L19_001B9A40, vars->iD4) == 0) {
+        if (vars->iD4 != -1 && coll_point_inside_region(g_hero_origin_vec, vars->iD4) == 0) {
             link_rec = *(char **)(moby + 0x24);
             saved_state = *(u8 *)(moby + 0x94);
             *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;

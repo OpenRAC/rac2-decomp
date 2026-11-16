@@ -78,27 +78,27 @@ slow:
 
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; u8 *ptr[0x980]; } MovementHero;
 extern u8 g_hero_state[];
-extern float D_001A7DB0[] MACRO_ADDR;
+extern float g_hero_speed_params[] MACRO_ADDR;
 extern void hero_resolve_stick_direction(int, float);
 
-void func_PAL_L01_002B45C8(void)
+void hero_refresh_speed_from_timer_pal(void)
 {
     hero_resolve_stick_direction(0, 1.0f);
     if (0.0f < ((MovementHero *)g_hero_state)->f[0x1b0 / 4])
-        ((MovementHero *)g_hero_state)->f[0x1b0 / 4] = D_001A7DB0[4] * (((MovementHero *)g_hero_state)->f[0x24b8 / 4] * 0.020000001f);
+        ((MovementHero *)g_hero_state)->f[0x1b0 / 4] = g_hero_speed_params[4] * (((MovementHero *)g_hero_state)->f[0x24b8 / 4] * 0.020000001f);
 }
 
 
 extern float FastVecDot(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char D_L01_00189E20[];
-extern char D_L01_00189E20[];
+extern char g_hero_l01_state_block[];
+extern char g_hero_l01_state_block[];
 typedef struct { char prefix[0x2290]; void *moby; } ProbeHero;
 typedef struct { char pad[0x18]; void *moby; int count; char gap[0x20]; float normal[4]; } ProbeResult;
-extern ProbeResult D_L01_001BF900;
-extern char D_L01_00189F10[];
-extern int D_L01_001BF91C;
+extern ProbeResult g_collision_l01_hit;
+extern char g_hero_l01_velocity[];
+extern int g_collision_hit_count;
 extern float cam_get_view_space_vector_length(void *);
 extern void hero_build_relative_point(void *, float, float, float, int);
 extern float vec_length_xy(void *);
@@ -117,7 +117,7 @@ extern float cam_get_view_space_angle(void *);
 /* Stops the hero against a wall: casts two rays along the movement direction (or the vector at
    the start of the hero's data when forced or nearly still), keeps the moby it hit and takes the
    velocity component into the wall's flattened normal away. */
-void func_PAL_L01_002B4CC8(int force)
+void ClipHeroVelocityAgainstWall_pal(int force)
 {
     float origin[4] __attribute__((aligned(16)));
     float endpoint[4] __attribute__((aligned(16)));
@@ -126,7 +126,7 @@ void func_PAL_L01_002B4CC8(int force)
     float height, radius, slope;
     int material;
     char *base;
-    char *velocity = D_L01_00189F10;
+    char *velocity = g_hero_l01_velocity;
 
     if (cam_get_view_space_vector_length(velocity) < 0.002f)
         return;
@@ -151,29 +151,29 @@ void func_PAL_L01_002B4CC8(int force)
     material = -1;
     FastVecAdd(farEndpoint, farEndpoint, lowOrigin);
     {
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
+        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_hit_count > 0)
             material = GetCollHitMaterial();
     }
     slope = 0;
     {
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
-            slope = cam_get_view_space_angle(D_L01_001BF900.normal);
+        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_l01_hit.count > 0)
+            slope = cam_get_view_space_angle(g_collision_l01_hit.normal);
     }
     if (slope >= 0.8726647f || material == 8 || material == 12) {
         float dot;
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        *(void **)(hero + 0x270) = D_L01_001BF900.moby;
-        cam_set_view_space_height(D_L01_001BF900.normal, D_L01_001BF900.normal, 0);
-        vec_scale_to_length(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
-        dot = FastVecDot(D_L01_001BF900.normal, hero + 0xF0);
+        *(void **)(hero + 0x270) = g_collision_l01_hit.moby;
+        cam_set_view_space_height(g_collision_l01_hit.normal, g_collision_l01_hit.normal, 0);
+        vec_scale_to_length(g_collision_l01_hit.normal, g_collision_l01_hit.normal, 1);
+        dot = FastVecDot(g_collision_l01_hit.normal, hero + 0xF0);
         if (dot < 0) {
-            FastVecScale(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
-            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
+            FastVecScale(g_collision_l01_hit.normal, g_collision_l01_hit.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, g_collision_l01_hit.normal);
         }
     }
 }

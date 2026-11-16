@@ -44,7 +44,7 @@ typedef struct {
     float waterDepth;
 } HeroGroundFlags;
 extern HeroGroundFlags g_hero_state;
-extern unsigned char D_001A7B0B __attribute__((sda));
+extern unsigned char g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
 extern s32 hero_l04_enter_state(int, int);
@@ -73,7 +73,7 @@ void UpdateHeroGroundMaterialFlags(void)
     if (state == 2 && g_hero_state.inputLock == 0 &&
         (g_hero_state.framesOffGround == 0 || g_hero_state.groundDistance < 2.5f)) {
         g_hero_state.onMagnetGround = 1;
-        if (g_hero_state.vehicleMode == 0 && D_001A7B0B)
+        if (g_hero_state.vehicleMode == 0 && g_hero_input_enabled)
             g_hero_state.pendingJump = 1;
     }
     if (state == 14) {

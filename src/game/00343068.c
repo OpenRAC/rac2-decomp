@@ -6,17 +6,17 @@
 typedef struct { float x; float y; } VEC_F6bf9ce42;
 #endif
 
-extern int D_L04_001AE478 __attribute__((sda));
+extern int g_menu_panel_frame_left __attribute__((sda));
 
-extern int D_L04_001AE47C;
+extern int g_menu_panel_frame_top;
 
-extern int D_L04_001AE480;
+extern int g_menu_panel_frame_right;
 
-extern int D_L04_001AE484;
+extern int g_menu_panel_frame_bottom;
 
-extern int D_L04_001AE488 __attribute__((sda));
+extern int g_menu_panel_frame_margin_x __attribute__((sda));
 
-extern int D_L04_001AE48C;
+extern int g_menu_panel_frame_margin_y;
 
 extern int g_screen_width;
 
@@ -35,17 +35,17 @@ void menu_panel_draw_frame(VEC_F6bf9ce42 **positionPtr)
 
     VEC_F6bf9ce42 *position;
     position = *positionPtr;
-    left = (int)((float)D_L04_001AE478 + position->x - (float)D_L04_001AE488);
-    top = (int)((float)D_L04_001AE47C + position->y - (float)D_L04_001AE48C);
-    right = (int)((float)D_L04_001AE480 + position->x + (float)D_L04_001AE488);
-    bottom = (int)((float)D_L04_001AE484 + position->y + (float)D_L04_001AE48C);
+    left = (int)((float)g_menu_panel_frame_left + position->x - (float)g_menu_panel_frame_margin_x);
+    top = (int)((float)g_menu_panel_frame_top + position->y - (float)g_menu_panel_frame_margin_y);
+    right = (int)((float)g_menu_panel_frame_right + position->x + (float)g_menu_panel_frame_margin_x);
+    bottom = (int)((float)g_menu_panel_frame_bottom + position->y + (float)g_menu_panel_frame_margin_y);
 
     colour = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 20, 0, 0);
     DrawFramebufferRect(left, top, right, bottom, g_screen_width, g_screen_height, colour);
 
     position = *positionPtr;
-    DrawFramebufferRect((int)((float)D_L04_001AE478 + position->x), (int)((float)D_L04_001AE47C + position->y),
-            (int)((float)D_L04_001AE480 + position->x), (int)((float)D_L04_001AE484 + position->y),
+    DrawFramebufferRect((int)((float)g_menu_panel_frame_left + position->x), (int)((float)g_menu_panel_frame_top + position->y),
+            (int)((float)g_menu_panel_frame_right + position->x), (int)((float)g_menu_panel_frame_bottom + position->y),
             g_screen_width, g_screen_height, 0x60241700);
 
 }

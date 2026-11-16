@@ -37,18 +37,18 @@ extern ChargeWeaponMaterial g_weapon_l00_table[];
 typedef struct { char pad[0x1A0]; int pressed, released; } ChargeWeaponInput;
 extern ChargeWeaponInput g_pad_state;
 typedef struct { float values[18]; char pad[8]; ChargeWeaponVec a, b; char tail[16]; } ChargeWeaponEffect;
-extern ChargeWeaponEffect D_L00_0024F7C0[];
+extern ChargeWeaponEffect g_charge_weapon_effect_table[];
 extern char g_camera_l00_position[0x100];
-extern unsigned char D_00139584 NOT_SDA;
+extern unsigned char g_charged_beam_weapon_index NOT_SDA;
 /* These measured fields share one block. Its full 0x20-byte
  * extent keeps the reticle reset absolute while the small globals below use GP.
  */
 typedef struct { int active; char gap[0x18]; float reticle; } ChargeWeaponEffects;
-extern ChargeWeaponEffects D_L00_001B2B70 __attribute__((sda));
+extern ChargeWeaponEffects g_charge_weapon_effects __attribute__((sda));
 extern char *g_area_hit_targets[];
-extern int D_L00_001B06D0 __attribute__((sda)), D_L00_001B06B8 __attribute__((sda)), D_L00_001B06D8 __attribute__((sda));
-extern char *D_L00_001B06D4 __attribute__((sda));
-extern float D_L00_001B06BC __attribute__((sda)), D_L00_001B06C0 __attribute__((sda)), D_L00_001B06C4 __attribute__((sda)), D_L00_001B06C8 __attribute__((sda)), D_L00_001B06CC __attribute__((sda));
+extern int g_charge_weapon_state __attribute__((sda)), g_charge_weapon_initialized __attribute__((sda)), g_charge_cooldown_timer __attribute__((sda));
+extern char *g_charge_weapon_moby __attribute__((sda));
+extern float g_charge_rate_up __attribute__((sda)), g_charge_rate_down __attribute__((sda)), g_charge_min __attribute__((sda)), g_charge_boost_rate __attribute__((sda)), g_charge_max __attribute__((sda));
 extern void anim_start_blended(void *,int,int,int);
 extern void AttachManipulator(void *,int,void *);
 extern int AcquireEntitySlot(void *,int,void *);
@@ -81,7 +81,7 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
     int unused;
     char *hit = 0;
     ChargeWeaponVars *weapon_vars = obj->vars;
-    ChargeWeaponMaterial *material = &g_weapon_l00_table[D_00139584];
+    ChargeWeaponMaterial *material = &g_weapon_l00_table[g_charged_beam_weapon_index];
     float speed = material->speed * 0.016666668f;
     int i, enabled, count;
     switch (obj->state) {
@@ -94,36 +94,36 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
         weapon_vars->charge=0;
         weapon_vars->angle=0;
         obj->state=1;
-        D_L00_001B2B70.reticle=-1.0f;
-        D_L00_001B06D0=0;
-        D_L00_001B06B8=0;
+        g_charge_weapon_effects.reticle=-1.0f;
+        g_charge_weapon_state=0;
+        g_charge_weapon_initialized=0;
         weapon_vars->handle=AcquireEntitySlot(obj,0,&unused);
         weapon_vars->anim=level_get_slot_body(H(obj,0xAA),weapon_vars->handle);
         for (i=0;i<4;i++) {
-            D_L00_0024F7C0[i].values[0]=0; D_L00_0024F7C0[i].values[1]=0; D_L00_0024F7C0[i].values[2]=0;
-            D_L00_0024F7C0[i].values[3]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[4]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[5]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[6]=math_random_float_range(0.25f,0.75f);
-            D_L00_0024F7C0[i].values[7]=math_random_float_range(0.25f,0.75f);
-            D_L00_0024F7C0[i].values[8]=math_random_float_range(0.25f,0.75f);
-            D_L00_0024F7C0[i].values[9]=0; D_L00_0024F7C0[i].values[10]=0; D_L00_0024F7C0[i].values[11]=0;
-            D_L00_0024F7C0[i].values[12]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[13]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[14]=math_random_signed_float_range(0.05f,0.3f);
-            D_L00_0024F7C0[i].values[15]=math_random_float_range(0.25f,0.75f);
-            D_L00_0024F7C0[i].values[16]=math_random_float_range(0.25f,0.75f);
-            D_L00_0024F7C0[i].values[17]=math_random_float_range(0.25f,0.75f);
-            vec_clear_128(&D_L00_0024F7C0[i].a);
-            vec_clear_128(&D_L00_0024F7C0[i].b);
+            g_charge_weapon_effect_table[i].values[0]=0; g_charge_weapon_effect_table[i].values[1]=0; g_charge_weapon_effect_table[i].values[2]=0;
+            g_charge_weapon_effect_table[i].values[3]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[4]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[5]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[6]=math_random_float_range(0.25f,0.75f);
+            g_charge_weapon_effect_table[i].values[7]=math_random_float_range(0.25f,0.75f);
+            g_charge_weapon_effect_table[i].values[8]=math_random_float_range(0.25f,0.75f);
+            g_charge_weapon_effect_table[i].values[9]=0; g_charge_weapon_effect_table[i].values[10]=0; g_charge_weapon_effect_table[i].values[11]=0;
+            g_charge_weapon_effect_table[i].values[12]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[13]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[14]=math_random_signed_float_range(0.05f,0.3f);
+            g_charge_weapon_effect_table[i].values[15]=math_random_float_range(0.25f,0.75f);
+            g_charge_weapon_effect_table[i].values[16]=math_random_float_range(0.25f,0.75f);
+            g_charge_weapon_effect_table[i].values[17]=math_random_float_range(0.25f,0.75f);
+            vec_clear_128(&g_charge_weapon_effect_table[i].a);
+            vec_clear_128(&g_charge_weapon_effect_table[i].b);
         }
         sheepinator_clear_records();
         break;
     }
     case 1:
-        D_L00_001B2B70.reticle=-1;
+        g_charge_weapon_effects.reticle=-1;
         if (g_hero_state.selected) g_hero_state.held=g_hero_state.selected;
-        if (!D_L00_001B06B8) D_L00_001B06B8=1;
+        if (!g_charge_weapon_initialized) g_charge_weapon_initialized=1;
         if (g_hero_state.mode==1) hero_l00_set_action(29,1);
         enabled=1;
         if (g_hero_state.mode==29) {
@@ -156,31 +156,31 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
         if (vec_fast_helper_b(weapon_vars) && !g_hero_state.locked) {
             if ((g_pad_state.pressed&g_hero_state.mask) && enabled && !sheepinator_is_mode_four() && g_hero_state.frame>=23) {
                 if (weapon_spend_ammo(-1,1)) {
-                    D_L00_001B2B70.active=1;
+                    g_charge_weapon_effects.active=1;
                     PlayMobySound(2,0,obj);
-                    switch (D_L00_001B06D0) {
+                    switch (g_charge_weapon_state) {
                     case 0:
-                        D_L00_001B06D0=1; weapon_vars->charge=D_L00_001B06C4; weapon_vars->timer=0.5f;
+                        g_charge_weapon_state=1; weapon_vars->charge=g_charge_min; weapon_vars->timer=0.5f;
                         break;
                     case 2:
-                        D_L00_001B06D0=1; weapon_vars->timer=0.5f;
+                        g_charge_weapon_state=1; weapon_vars->timer=0.5f;
                         break;
                     }
-                } else if ((g_pad_state.released&g_hero_state.mask) || D_L00_001B2B70.active==1) {
-                    PlayMobySound(7,0,obj); D_L00_001B2B70.active=0;
+                } else if ((g_pad_state.released&g_hero_state.mask) || g_charge_weapon_effects.active==1) {
+                    PlayMobySound(7,0,obj); g_charge_weapon_effects.active=0;
                 }
             }
         }
-        switch (D_L00_001B06D0) {
+        switch (g_charge_weapon_state) {
         case 0:
-            if (weapon_vars->charge<D_L00_001B06C4) {
-                weapon_vars->charge+=D_L00_001B06C8;
-                if (weapon_vars->charge>D_L00_001B06C4) weapon_vars->charge=D_L00_001B06C4;
+            if (weapon_vars->charge<g_charge_min) {
+                weapon_vars->charge+=g_charge_boost_rate;
+                if (weapon_vars->charge>g_charge_min) weapon_vars->charge=g_charge_min;
             }
             break;
         case 1:
-            weapon_vars->charge+=D_L00_001B06BC;
-            if (weapon_vars->charge>D_L00_001B06CC) {
+            weapon_vars->charge+=g_charge_rate_up;
+            if (weapon_vars->charge>g_charge_max) {
                 moby_transform_joint_to_world(obj,0,&target);
                 if (g_hero_state.direction==1) vec_scale_to_length(&velocity,(char *)obj+0xD0,-speed);
                 else vec_scale_to_length(&velocity,&g_hero_state.camera,speed);
@@ -211,14 +211,14 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
                     FastVecSub(&velocity,&delta,&target);
                     vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                D_L00_001B06D4=SpawnParticlePoolMoby(obj,weapon_vars->handle,&target,&velocity);
-                if (D_L00_001B06D4) *(ChargeWeaponMoby **)(D_L00_001B06D4+0xB8)=obj;
-                D_L00_001B06D8=50; D_L00_001B06D0=2;
+                g_charge_weapon_moby=SpawnParticlePoolMoby(obj,weapon_vars->handle,&target,&velocity);
+                if (g_charge_weapon_moby) *(ChargeWeaponMoby **)(g_charge_weapon_moby+0xB8)=obj;
+                g_charge_cooldown_timer=50; g_charge_weapon_state=2;
             }
             break;
         case 2:
-            weapon_vars->charge-=D_L00_001B06C0;
-            if (weapon_vars->charge<=D_L00_001B06C4) { weapon_vars->charge=D_L00_001B06C4; D_L00_001B06D0=0; }
+            weapon_vars->charge-=g_charge_rate_down;
+            if (weapon_vars->charge<=g_charge_min) { weapon_vars->charge=g_charge_min; g_charge_weapon_state=0; }
             break;
         }
         if (B(obj,0x31)) ref_L00_003E8180_00(plasma_coil_draw_beams,obj);

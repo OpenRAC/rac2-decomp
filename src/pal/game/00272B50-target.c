@@ -11,24 +11,24 @@ typedef struct {
 } TargetReticleState;
 extern TargetReticleState g_hero_state;
 extern char g_camera_eye_state[];
-extern int D_001A7348[] __attribute__((sda));
-extern float D_001A85C0 SDATA(D_001A85C0);
-extern float D_001A85C4 SDATA(D_001A85C4);
-extern float D_001A85C8 SDATA(D_001A85C8);
-extern float D_001A85CC SDATA(D_001A85CC);
-extern unsigned int D_001A85D0[] SDATA(D_001A85D0);
-extern unsigned int D_001A85E0[] SDATA(D_001A85E0);
-extern float D_001A85F0[] SDATA(D_001A85F0);
-extern float D_001A85FC SDATA(D_001A85FC);
-extern float D_001A8600 SDATA(D_001A8600);
-extern int D_001A8604 SDATA(D_001A8604);
-extern unsigned int D_001A8608[] SDATA(D_001A8608);
-extern int D_001A8618 SDATA(D_001A8618);
-extern int D_001A861C SDATA(D_001A861C);
-extern unsigned int D_001A8620 SDATA(D_001A8620);
-extern unsigned int D_001A8624 SDATA(D_001A8624);
-extern float D_001A8628 SDATA(D_001A8628);
-extern float D_001A862C SDATA(D_001A862C);
+extern int g_reticle_screen_params[] __attribute__((sda));
+extern float g_target_scale_factor SDATA(D_001A85C0);
+extern float g_target_scale_max SDATA(D_001A85C4);
+extern float g_target_scale_min SDATA(D_001A85C8);
+extern float g_target_fade_speed SDATA(D_001A85CC);
+extern unsigned int g_target_colors_active[] SDATA(D_001A85D0);
+extern unsigned int g_target_colors_idle[] SDATA(D_001A85E0);
+extern float g_target_size_table[] SDATA(D_001A85F0);
+extern float g_target_angle_degrees SDATA(D_001A85FC);
+extern float g_target_spin_speed SDATA(D_001A8600);
+extern int g_target_arc_param SDATA(D_001A8604);
+extern unsigned int g_target_uv_table[] SDATA(D_001A8608);
+extern int g_target_width SDATA(D_001A8618);
+extern int g_target_height SDATA(D_001A861C);
+extern unsigned int g_target_color_a SDATA(D_001A8620);
+extern unsigned int g_target_color_b SDATA(D_001A8624);
+extern float g_target_bar_scale_a SDATA(D_001A8628);
+extern float g_target_bar_scale_b SDATA(D_001A862C);
 extern float ApproachValue(float *, float, float);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -49,7 +49,7 @@ extern void DrawTexturedArc(int, int, int, int, unsigned int *, unsigned int *, 
 /* Fades the reticle in on the requested target and out when the target changes, spins it, then
    draws it at the target's projected position: three layers of four rotated quads, with a
    health arc under them when the target's info gives a maximum health. */
-void func_PAL_00272B50(void)
+void DrawTargetReticle_pal(void)
 {
     float screen[4];
     float offset[4];
@@ -81,15 +81,15 @@ void func_PAL_00272B50(void)
         return;
     }
     if (g_hero_state.requested != g_hero_state.current) {
-        ApproachValue(&g_hero_state.fade, 0.0f, D_001A85CC * (0.020000001f));
+        ApproachValue(&g_hero_state.fade, 0.0f, g_target_fade_speed * (0.020000001f));
         if (g_hero_state.fade <= 0.0f) {
             g_hero_state.current = g_hero_state.requested;
         }
     } else if (g_hero_state.requested && g_hero_state.fade < 1.0f) {
-        ApproachValue(&g_hero_state.fade, 1.0f, D_001A85CC * (0.020000001f));
-        g_hero_state.angle = FastAddRotations(g_hero_state.angle, D_001A8600 * 0.0003490659f);
+        ApproachValue(&g_hero_state.fade, 1.0f, g_target_fade_speed * (0.020000001f));
+        g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_target_spin_speed * 0.0003490659f);
     }
-    g_hero_state.angle = FastAddRotations(g_hero_state.angle, D_001A8600 * 0.0003490659f);
+    g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_target_spin_speed * 0.0003490659f);
     obj = g_hero_state.current;
     if (!obj || g_hero_state.fade == 0.0f) {
         return;
@@ -108,17 +108,17 @@ void func_PAL_00272B50(void)
         pos = position;
     }
     gfx_project_world_point_to_screen(screen, pos);
-    offset[0] = (screen[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
-    offset[1] = (screen[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
+    offset[0] = (screen[0] - IntToFloat(g_reticle_screen_params[2])) * 0.0625f;
+    offset[1] = (screen[1] - IntToFloat(g_reticle_screen_params[3])) * 0.0625f;
     radius = *(float *)(info + 0x10);
     if (radius > 2.0f) {
         radius = 2.0f;
     }
-    scale = mat_fast_helper_a(fast_vec_dist(g_camera_eye_state, obj + 0x10), radius) * D_001A85C0;
-    if (scale > D_001A85C4) {
-        scale = D_001A85C4;
-    } else if (scale < D_001A85C8) {
-        scale = D_001A85C8;
+    scale = mat_fast_helper_a(fast_vec_dist(g_camera_eye_state, obj + 0x10), radius) * g_target_scale_factor;
+    if (scale > g_target_scale_max) {
+        scale = g_target_scale_max;
+    } else if (scale < g_target_scale_min) {
+        scale = g_target_scale_min;
     }
     for (i = 0; i < 3; i++) {
         switch (i) {
@@ -130,12 +130,12 @@ void func_PAL_00272B50(void)
             break;
         case 2:
         default:
-            angle = D_001A85FC * 0.01745329424738884f;
+            angle = g_target_angle_degrees * 0.01745329424738884f;
             break;
         }
         texture = GetEffectTextureDescriptor(i + 0x33);
-        color = FastTweenColor(D_001A85E0[i], D_001A85D0[i], g_hero_state.fade);
-        size = ((D_001A85F0[i] - 1.0f) * (1.0f - g_hero_state.fade) + 1.0f) * scale;
+        color = FastTweenColor(g_target_colors_idle[i], g_target_colors_active[i], g_hero_state.fade);
+        size = ((g_target_size_table[i] - 1.0f) * (1.0f - g_hero_state.fade) + 1.0f) * scale;
         AppendRotatedSpriteQuad(offset[0], offset[1], size, size, angle, 64, 64, texture, 0xFFFFF3, color,
                       0, 0, 0.0f, 0.0f);
         AppendRotatedSpriteQuad(offset[0], offset[1], size, size, FastAddRotations(angle, 1.57079637f), 64, 64,
@@ -146,24 +146,24 @@ void func_PAL_00272B50(void)
                       texture, 0xFFFFF3, color, 0, 0, 0.0f, 0.0f);
     }
     if (maxHealth != 0.0f) {
-        uv[0] = D_001A8608[0];
-        uv[1] = D_001A8608[1];
-        uv[2] = D_001A8608[2];
-        uv[3] = D_001A8608[3];
+        uv[0] = g_target_uv_table[0];
+        uv[1] = g_target_uv_table[1];
+        uv[2] = g_target_uv_table[2];
+        uv[3] = g_target_uv_table[3];
         colors[0] = colors[1] = colors[2] = colors[3] =
-            FastTweenColor(D_001A8620 & 0xFFFFFF, D_001A8620, g_hero_state.fade);
+            FastTweenColor(g_target_color_a & 0xFFFFFF, g_target_color_a, g_hero_state.fade);
         x = FloatToInt(screen[0]);
         y = FloatToInt(screen[1]);
-        bar = D_001A862C * mat_fast_helper_a(D_001A8628, maxHealth);
+        bar = g_target_bar_scale_b * mat_fast_helper_a(g_target_bar_scale_a, maxHealth);
         edge = -bar;
-        width = FloatToInt(scale * (float)D_001A8618);
-        height = FloatToInt(scale * (float)D_001A861C);
-        DrawTexturedArc(x, y, width, height, colors, uv, D_001A8604, 16, bar, edge);
+        width = FloatToInt(scale * (float)g_target_width);
+        height = FloatToInt(scale * (float)g_target_height);
+        DrawTexturedArc(x, y, width, height, colors, uv, g_target_arc_param, 16, bar, edge);
         colors[0] = colors[1] = colors[2] = colors[3] =
-            FastTweenColor(D_001A8624 & 0xFFFFFF, D_001A8624, g_hero_state.fade);
+            FastTweenColor(g_target_color_b & 0xFFFFFF, g_target_color_b, g_hero_state.fade);
         edge = bar - (bar + bar) * (health / maxHealth);
-        width2 = FloatToInt(scale * (float)D_001A8618);
-        height2 = FloatToInt(scale * (float)D_001A861C);
-        DrawTexturedArc(x, y, width2, height2, colors, uv, D_001A8604, 16, bar, edge);
+        width2 = FloatToInt(scale * (float)g_target_width);
+        height2 = FloatToInt(scale * (float)g_target_height);
+        DrawTexturedArc(x, y, width2, height2, colors, uv, g_target_arc_param, 16, bar, edge);
     }
 }

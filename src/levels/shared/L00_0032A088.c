@@ -11,20 +11,20 @@ typedef struct {
     u8 body[0xA430 - 0x20];
 } Slot;
 
-extern Slot D_L00_00268E20[];
+extern Slot g_level_slot_table[];
 
 /* Returns the main data of a slot if the slot belongs to this key, otherwise nothing. */
 u8 *level_get_slot_body(int key, int index)
 {
-    if (D_L00_00268E20[index].key != key)
+    if (g_level_slot_table[index].key != key)
         return 0;
-    return D_L00_00268E20[index].body;
+    return g_level_slot_table[index].body;
 }
 
 /* Returns the header data of a slot if the slot belongs to this key, otherwise nothing. */
 u8 *level_get_slot_header(int key, int index)
 {
-    if (D_L00_00268E20[index].key != key)
+    if (g_level_slot_table[index].key != key)
         return 0;
-    return D_L00_00268E20[index].head;
+    return g_level_slot_table[index].head;
 }

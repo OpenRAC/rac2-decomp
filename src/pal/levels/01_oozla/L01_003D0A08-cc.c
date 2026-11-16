@@ -11,32 +11,32 @@
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L01_001B2088;
+extern s32 g_oozla_intro_stage;
 extern u8 *g_moby_l01_table;
-extern u8 *D_L01_001B264C;
-extern s32 D_L01_001A8F40;
+extern u8 *g_swamp_patrol_positions;
+extern s32 g_hero_l01_control_mode;
 extern s32 g_current_map_index;
-extern f32 D_L01_001B0390 __attribute__((sda));
-extern s32 D_L01_001B0398 __attribute__((sda));
-extern s32 D_L01_001B039C __attribute__((sda));
-extern f32 D_L01_001B03A0 __attribute__((sda));
-extern f32 D_L01_001B03A4 __attribute__((sda));
-extern f32 D_L01_001B03A8 __attribute__((sda));
-extern f32 D_L01_001B03AC __attribute__((sda));
-extern f32 D_L01_001B03B0 __attribute__((sda));
-extern f32 D_L01_001B03B4 __attribute__((sda));
-extern f32 D_L01_001B03B8 __attribute__((sda));
-extern f32 D_L01_001B03BC __attribute__((sda));
-extern f32 D_L01_001B03C0 __attribute__((sda));
-extern f32 D_L01_001B03C4 __attribute__((sda));
-extern f32 D_L01_001B03C8 __attribute__((sda));
-extern s32 D_L01_001B03CC __attribute__((sda));
-extern s32 D_L01_001B03D0 __attribute__((sda));
-extern s32 D_L01_001B03D8[4] __attribute__((sda));
-extern u8 *D_L01_001FE180[];
+extern f32 g_swamp_arm_hero_offset_scale __attribute__((sda));
+extern s32 g_swamp_arm_particle_type_a __attribute__((sda));
+extern s32 g_swamp_arm_particle_type_b __attribute__((sda));
+extern f32 g_swamp_arm_random_min_a __attribute__((sda));
+extern f32 g_swamp_arm_random_max_a __attribute__((sda));
+extern f32 g_swamp_arm_random_min_b __attribute__((sda));
+extern f32 g_swamp_arm_random_max_b __attribute__((sda));
+extern f32 g_swamp_arm_random_min_c __attribute__((sda));
+extern f32 g_swamp_arm_random_max_c __attribute__((sda));
+extern f32 g_swamp_arm_vec_e_w __attribute__((sda));
+extern f32 g_swamp_arm_vec_h_w __attribute__((sda));
+extern f32 g_swamp_arm_rise_speed __attribute__((sda));
+extern f32 g_swamp_arm_spin_x_speed __attribute__((sda));
+extern f32 g_swamp_arm_spin_y_speed __attribute__((sda));
+extern s32 g_swamp_arm_particle_count __attribute__((sda));
+extern s32 g_swamp_arm_anim_frame_limit __attribute__((sda));
+extern s32 g_swamp_arm_frame_limit_table[4] __attribute__((sda));
+extern u8 *g_path_l01_table[];
 typedef struct { u8 pad[0x160]; f32 f160; s32 pad164; s32 i168; s32 i16C; } L01Fx;
-extern L01Fx D_L01_001B9380;
-extern u8 D_0019B2E8[];
+extern L01Fx g_drive_settings;
+extern u8 g_moby_group_flags[];
 
 extern s32 func_001163B0(void);
 extern s32 func_002D77E8(void);
@@ -57,7 +57,7 @@ extern void func_00306250(u8 *);
 extern f32 func_00306448(u8 *);
 extern void func_00307390(u8 *, s32, void *);
 extern void func_00307E70(u8);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern void func_PAL_002A7E68(u8 *, s32, s32, s32);
 extern void func_00310418(u8 *, s32, s32);
 extern s32 func_003104E8(s32);
@@ -73,11 +73,11 @@ extern s32 func_00337A60(void *, void *, void *, s32);
 extern void func_0034ECD0(void *, void *);
 extern s32 func_00355780(s32, s32, u8 *);
 extern s32 func_00355828(s32, s32, u8 *, s32);
-extern void func_PAL_L01_003CFDB0(u8 *, s32, s32, s32);
+extern void swamp_monster_spawn_splash_pal(u8 *, s32, s32, s32);
 extern void swamp_monster_release_attack_slot(u8 *);
-extern void func_PAL_L01_003D00C8(u8 *);
+extern void swamp_monster_arm_init_pal(u8 *);
 extern void swamp_monster_release_arm_timers(u8 *);
-extern void func_PAL_L01_003D0358(u8 *);
+extern void UpdateOozlaLinkedGroupDamage_pal(u8 *);
 extern void swamp_monster_test_attack_segment_hits_hero(u8 *, void *, void *, u8, void *);
 
 void func_PAL_L01_003D0A08(u8 *self)
@@ -145,12 +145,12 @@ void func_PAL_L01_003D0A08(u8 *self)
     s32 busy8 = 0;
 
     pv = *(u8 **)(self + 0x68);
-    func_PAL_L01_003D0358(self);
+    UpdateOozlaLinkedGroupDamage_pal(self);
     switch (self[0x95]) {
     case 0:
-        if (D_L01_001B2088 < 2)
+        if (g_oozla_intro_stage < 2)
             return;
-        func_PAL_L01_003D00C8(self);
+        swamp_monster_arm_init_pal(self);
         break;
     case 1:
         e1 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
@@ -197,7 +197,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         case 2:
             busy1 = func_003104E8(4);
             if (busy1 == 0)
-                func_PAL_L01_003CFDB0(self, 3, 10, 1);
+                swamp_monster_spawn_splash_pal(self, 3, 10, 1);
             if (!(self[0x60] & 2))
                 break;
             e3 = g_moby_l01_table + (*(s32 *)(pv + 0xB4) << 8);
@@ -219,7 +219,7 @@ void func_PAL_L01_003D0A08(u8 *self)
     case 2:
         busy2 = func_003104E8(5);
         if (busy2 == 0)
-            func_PAL_L01_003CFDB0(self, 3, 10, 1);
+            swamp_monster_spawn_splash_pal(self, 3, 10, 1);
         if ((self[0x42] == 6 || self[0x42] == 10) && (self[0x60] & 2)) {
             if (*(f32 *)(pv + 0xD4) > 0.0f)
                 *(f32 *)(self + 0x18) = *(f32 *)(pv + 0xD4);
@@ -233,7 +233,7 @@ void func_PAL_L01_003D0A08(u8 *self)
     case 3:
         busy3 = func_003104E8(5);
         if (busy3 == 0)
-            func_PAL_L01_003CFDB0(self, 3, 10, 1);
+            swamp_monster_spawn_splash_pal(self, 3, 10, 1);
         if (self[0x60] & 2) {
             *(u16 *)(self + 0x34) |= 0x1000;
             *(s32 *)(pv + 0xC0) = 200;
@@ -262,7 +262,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         break;
     case 5:
         if (*(s32 *)(pv + 0x74) == 1) {
-            func_00337A60(pv + 0x90, pv + 0x60, D_L01_001FE180[*(s32 *)(pv + 0xB8)] + 0x10, *(s32 *)D_L01_001FE180[*(s32 *)(pv + 0xB8)]);
+            func_00337A60(pv + 0x90, pv + 0x60, g_path_l01_table[*(s32 *)(pv + 0xB8)] + 0x10, *(s32 *)g_path_l01_table[*(s32 *)(pv + 0xB8)]);
             *(s32 *)(pv + 0xC0) = 200;
             tgt5 = pv + 0x90;
         } else {
@@ -271,7 +271,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         }
         hero5 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
         if (*(u8 **)(pv + 0x70) == hero5) {
-            func_002E34E0(v10, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
+            func_002E34E0(v10, &((Hero *)g_hero_state)->b[0x110], g_swamp_arm_hero_offset_scale);
             func_002E3470(v10, v10, *(u8 **)(pv + 0x70) + 0x10);
         } else {
             qcopy(v10, *(u8 **)(pv + 0x70) + 0x10);
@@ -291,7 +291,7 @@ void func_PAL_L01_003D0A08(u8 *self)
         func_00310D28(self, pv + 0xCC, f5, 0.0033510327f, 0.1f, 0.16755164f);
         if (self[0x60] & 2)
             *(f32 *)(self + 0x48) = func_00310580(0.8f, 1.2f);
-        if (D_L01_001A8F40 != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(pv + 0xC4) == 0 &&
+        if (g_hero_l01_control_mode != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(pv + 0xC4) == 0 &&
             (self[0x21] == 0xFF || **(s32 **)(pv + 0xD8) <= 0) && func_002E3650(pos5, pv + 0x60) < 35.0f &&
             (f5 = func_002E3B10(v10[0] - *(f32 *)(self + 0x10), v10[1] - *(f32 *)(self + 0x14)),
              func_002E4548(*(f32 *)(self + 0xF8), f5) < 0.034906588f)) {
@@ -349,8 +349,8 @@ void func_PAL_L01_003D0A08(u8 *self)
             pv[0xDE] = 1;
         }
         lv = func_002D9308(self[0xB0]);
-        D_L01_001B03D0 = D_L01_001B03D8[lv - 1];
-        if (d < (f32)D_L01_001B03D0 &&
+        g_swamp_arm_anim_frame_limit = g_swamp_arm_frame_limit_table[lv - 1];
+        if (d < (f32)g_swamp_arm_anim_frame_limit &&
             (d < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
                            ((Hero *)g_hero_state)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
@@ -375,9 +375,9 @@ void func_PAL_L01_003D0A08(u8 *self)
         }
         if (d > 55.0f && d < 58.0f) {
             if (d <= 56.0f) {
-                D_L01_001B9380.f160 = 0.2f;
-                D_L01_001B9380.i168 = 17;
-                D_L01_001B9380.i16C = 0;
+                g_drive_settings.f160 = 0.2f;
+                g_drive_settings.i168 = 17;
+                g_drive_settings.i16C = 0;
             }
             f6 = *(f32 *)(self + 0x18);
             for (i2 = 1; i2 < 8; i2++) {
@@ -392,27 +392,27 @@ void func_PAL_L01_003D0A08(u8 *self)
             v30[2] = f6;
             func_002E34A0(v30, v30, v20);
             qzero(v80);
-            v80[3] = D_L01_001B03BC;
-            for (j = 0; j < D_L01_001B03CC; j++) {
+            v80[3] = g_swamp_arm_vec_h_w;
+            for (j = 0; j < g_swamp_arm_particle_count; j++) {
                 rnd = func_00310580(0.0f, 1.0f);
                 func_002E34E0(v40, v30, rnd);
                 func_00316348(v40, 0.1f);
                 func_002E3470(v40, v40, v20);
-                spinx = func_00310580(-(D_L01_001B03C4 * 0.020000001f), D_L01_001B03C4 * 0.020000001f);
+                spinx = func_00310580(-(g_swamp_arm_spin_x_speed * 0.020000001f), g_swamp_arm_spin_x_speed * 0.020000001f);
                 func_002E3738(v60, self + 0xD0, spinx);
-                spiny = func_00310580(-(D_L01_001B03C8 * 0.020000001f), D_L01_001B03C8 * 0.020000001f);
+                spiny = func_00310580(-(g_swamp_arm_spin_y_speed * 0.020000001f), g_swamp_arm_spin_y_speed * 0.020000001f);
                 func_002E3738(v70, self + 0xC0, spiny);
                 func_002E3470(v50, v60, v70);
-                rise = func_00310580(0.0f, D_L01_001B03C0 * 0.020000001f);
+                rise = func_00310580(0.0f, g_swamp_arm_rise_speed * 0.020000001f);
                 v50[2] = rise;
-                v50[3] = D_L01_001B03B8;
-                ra = func_00310580(D_L01_001B03A0, D_L01_001B03A4);
+                v50[3] = g_swamp_arm_vec_e_w;
+                ra = func_00310580(g_swamp_arm_random_min_a, g_swamp_arm_random_max_a);
                 a = func_002E45B8((ra * 5.0f + 2.0f) * 0.16666667f);
-                rb = func_00310580(D_L01_001B03A8, D_L01_001B03AC);
+                rb = func_00310580(g_swamp_arm_random_min_b, g_swamp_arm_random_max_b);
                 b = func_002E45B8((rb * 5.0f + 2.0f) * 0.16666667f);
-                rc = func_00310580(D_L01_001B03B0, D_L01_001B03B4);
+                rc = func_00310580(g_swamp_arm_random_min_c, g_swamp_arm_random_max_c);
                 c = func_002E45B8((rc * 5.0f + 2.0f) * 0.16666667f);
-                p = func_00327360(v40, v50, v80, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
+                p = func_00327360(v40, v50, v80, g_swamp_arm_particle_type_a, g_swamp_arm_particle_type_b, a, b, c, -1);
                 if (p != 0 && (func_001163B0() & 1))
                     p[3] = 0x48;
             }
@@ -431,12 +431,12 @@ void func_PAL_L01_003D0A08(u8 *self)
         self[0xA8] = 0xFF;
         pos7 = self + 0x10;
         func_002E3470(v10, pos7, pv + 0xA0);
-        tbl7a = D_L01_001FE180[*(s32 *)(pv + 0xB8)];
+        tbl7a = g_path_l01_table[*(s32 *)(pv + 0xB8)];
         hit7 = func_00311B48(v10, tbl7a + 0x10, *(s32 *)tbl7a);
         if (hit7 != 0) {
             qcopy(pos7, v10);
         } else {
-            tbl7b = D_L01_001FE180[*(s32 *)(pv + 0xB8)];
+            tbl7b = g_path_l01_table[*(s32 *)(pv + 0xB8)];
             func_00337A60(pos7, v10, tbl7b + 0x10, *(s32 *)tbl7b);
             func_002E34A0(v20, pv + 0x80, pos7);
             func_002E3738(v20, v20, 0.040000003f);
@@ -471,14 +471,14 @@ void func_PAL_L01_003D0A08(u8 *self)
     case 8:
         busy8 = func_003104E8(4);
         if (busy8 == 0)
-            func_PAL_L01_003CFDB0(self, 3, 10, 1);
+            swamp_monster_spawn_splash_pal(self, 3, 10, 1);
         if (!(self[0x60] & 2))
             break;
     case 9:
-        func_PAL_002A7650(self, 0x200, 3);
-        if (*(s32 *)(pv + 0xE4) != -1 && !(D_0019B2E8[self[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+        SetDeathBits_pal(self, 0x200, 3);
+        if (*(s32 *)(pv + 0xE4) != -1 && !(g_moby_group_flags[self[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             func_00307E70(self[0xB0]);
-            e9 = D_L01_001B264C + (*(s32 *)(pv + 0xE4) << 7);
+            e9 = g_swamp_patrol_positions + (*(s32 *)(pv + 0xE4) << 7);
             func_0034ECD0(e9 + 0x30, e9 + 0x70);
         }
     done:

@@ -82,7 +82,7 @@ typedef struct {
     unsigned char pad_15C[0x214];
     HopVector basis;
 } HopSavedState;
-extern unsigned char D_L03_001B9840[];
+extern unsigned char g_hero_l03_state_alias[];
 #define HOP_SAVED (*(HopSavedState *)D_L03_001B9840)
 /* Object (moby) header: its state pointer and class id. */
 /* Particle record returned by func_002BDCE8; its payload follows at 0x20. */
@@ -115,11 +115,11 @@ extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, vo
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern unsigned char D_L03_00189E20[];
+extern unsigned char g_hero_l03_state_block[];
 
 extern int r1_D_L02_0015F04C MACRO_ADDR;
 
-extern TI128 D_001A8F20;
+extern TI128 g_default_quad;
 
 /* func_L03_002ADC00 is in its dedicated zero-vector profile unit. */
 
@@ -128,20 +128,20 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 extern float vec_distance_xy(void *, void *);
 
 void func_PAL_L03_002B8C28(void) {
-    switch (D_L03_00189E20[0x22B4]) {
+    switch (g_hero_l03_state_block[0x22B4]) {
     case 0:
-        *(float *)(D_L03_00189E20 + 0x258) = 0.8f;
-        *(float *)(D_L03_00189E20 + 0x25C) = 0.7f;
-        *(float *)(D_L03_00189E20 + 0x260) = 0.449999988079071f;
+        *(float *)(g_hero_l03_state_block + 0x258) = 0.8f;
+        *(float *)(g_hero_l03_state_block + 0x25C) = 0.7f;
+        *(float *)(g_hero_l03_state_block + 0x260) = 0.449999988079071f;
         break;
     case 1:
-        *(float *)(D_L03_00189E20 + 0x258) = 0.599999964237213f;
-        *(float *)(D_L03_00189E20 + 0x25C) = 0.450000017881394f;
-        *(float *)(D_L03_00189E20 + 0x260) = 0.3f;
+        *(float *)(g_hero_l03_state_block + 0x258) = 0.599999964237213f;
+        *(float *)(g_hero_l03_state_block + 0x25C) = 0.450000017881394f;
+        *(float *)(g_hero_l03_state_block + 0x260) = 0.3f;
         break;
     }
     {
-        unsigned char *g = D_L03_00189E20;
+        unsigned char *g = g_hero_l03_state_block;
         if (*(int *)(g + 0x229C) == 4) {
             if (*(short *)(g + 0x4AC) < *(int *)(g + 0x1B8) && !g[0x49E])
                 *(float *)(g + 0x25C) = *(float *)(g + 0x4B8);
@@ -153,13 +153,13 @@ void func_PAL_L03_002B8C28(void) {
             *(float *)(g + 0x260) = 0.8f;
         }
     }
-    if (!D_L03_00189E20[0x287] || *(int *)(D_L03_00189E20 + 0x22A4) == 0x12 ||
-        *(int *)(D_L03_00189E20 + 0x22B0) == 0x12 ||
-        (!D_L03_00189E20[0x22B4] && *(float *)(D_L03_00189E20 + 0x254) < 0.53f) ||
-        *(int *)(D_L03_00189E20 + 0x229C) == 0x11 || D_L03_00189E20[0x1494] ||
-        vec_distance_xy(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
-        float *p = (float *)(D_L03_00189E20 + 0x250);
-        unsigned char *g = D_L03_00189E20;
+    if (!g_hero_l03_state_block[0x287] || *(int *)(g_hero_l03_state_block + 0x22A4) == 0x12 ||
+        *(int *)(g_hero_l03_state_block + 0x22B0) == 0x12 ||
+        (!g_hero_l03_state_block[0x22B4] && *(float *)(g_hero_l03_state_block + 0x254) < 0.53f) ||
+        *(int *)(g_hero_l03_state_block + 0x229C) == 0x11 || g_hero_l03_state_block[0x1494] ||
+        vec_distance_xy(g_hero_l03_state_block + 0x240, g_hero_l03_state_block + 0x80) > *(float *)(g_hero_l03_state_block + 0x264) * 0.5f) {
+        float *p = (float *)(g_hero_l03_state_block + 0x250);
+        unsigned char *g = g_hero_l03_state_block;
         ApproachValue(p, *(float *)(g + 0x258), 0.024f);
         ApproachValue(p + 1, *(float *)(g + 0x25C), 0.024f);
         math_spring_float_to_goal(p + 5, p + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
@@ -182,7 +182,7 @@ void func_PAL_L03_002B8C28(void) {
 /* func_L03_0038B238 is defined in L03_002AB5C8-g8.c (this unit has no $gp access for it). */
 
 extern void FastVecAdd(void *, void *, void *);
-extern float (*D_L03_001FE700[])[4];
+extern float (*g_path_l03_entry_table[])[4];
 
 /* Effect state hung off an object: four vertex-table indices, a vertex count and an offset. */
 /* Adjusts each vertex of the object's groups relative to a computed centre, then offsets it by the state vector. */

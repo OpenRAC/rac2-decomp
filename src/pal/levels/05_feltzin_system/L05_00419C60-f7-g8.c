@@ -23,14 +23,14 @@ extern void moby_mark_table_entry_flagged(int);
 extern void moby_set_state(void *, int, int);
 extern int IsPointInCuboid(void *, int);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_PAL_002AFC10(int);
+extern void snd_play_indexed_pal(int);
 extern int flag_is_third_pending_set(void *);
 extern void level_capture_checkpoint_state(void *, void *);
-extern void func_PAL_002F6C18(void);
+extern void game_set_slowdown_factor_pal(void);
 extern int game_is_either_mode_two(void);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 typedef struct {
     char pad0[0x80]; char body[0x2294 - 0x80];
     int mode; char pad2298[0x24CC - 0x2298];
@@ -38,16 +38,16 @@ typedef struct {
 } HeroView;
 extern HeroView g_hero_state;
 extern char g_hero_position[];
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index;
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern int D_L06_001A8F00;
-extern char D_L06_001B1810[];
-extern int D_L06_001B2348;
-extern char *D_L06_001B290C;
-extern char D_L06_001BFA40[];
-extern short **D_L06_002AA490[];
-extern char D_L06_002E2210[];
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern int g_coin_door_state;
+extern char g_str_l06_item_trigger_debug[];
+extern int g_game_l06_frame_counter;
+extern char *g_region_table;
+extern char g_request_l06_queue[];
+extern short **g_item_trigger_entry_lists[];
+extern char g_str_l06_item_trigger_debug_2[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -67,8 +67,8 @@ void func_PAL_L05_00419C60(Thing *m)
 
     switch (m->state) {
     case 0:
-        if ((p->item != -1 && D_001A7BC8[p->item] != 0)
-            || (m->group != 0xFF && (D_0019B2E8[m->group + g_current_map_index * 16] & 0x80))) {
+        if ((p->item != -1 && g_map_visited_flags[p->item] != 0)
+            || (m->group != 0xFF && (g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80))) {
             moby_mark_spawned(m);
             break;
         }
@@ -87,24 +87,24 @@ void func_PAL_L05_00419C60(Thing *m)
             break;
         if (g_hero_state.health <= 0)
             break;
-        if (D_L06_001A8F00 != 0)
+        if (g_coin_door_state != 0)
             break;
         if (p->msg != -1 && IsPointInCuboid(g_hero_state.body, p->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L06_002AA490[g_current_map_index] != 0 && D_L06_002AA490[g_current_map_index][p->idx] != 0) {
-            for (i = 0; D_L06_002AA490[g_current_map_index][p->idx][i] != -1; i++) {
-                int e = D_L06_002AA490[g_current_map_index][p->idx][i];
+        if (g_item_trigger_entry_lists[g_current_map_index] != 0 && g_item_trigger_entry_lists[g_current_map_index][p->idx] != 0) {
+            for (i = 0; g_item_trigger_entry_lists[g_current_map_index][p->idx][i] != -1; i++) {
+                int e = g_item_trigger_entry_lists[g_current_map_index][p->idx][i];
 
                 missing = 0;
                 if (p->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
-                    if (D_00139768[(unsigned int)e >> 2] & bit)
+                    if (g_request_flag_table[(unsigned int)e >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L06_001BFA40, e) == 0 && i == 0) {
-                    STUB_printf(D_L06_002E2210, m->id, m->oclass, g_current_map_index, p->idx, e);
+                if (req_push_queue(g_request_l06_queue, e) == 0 && i == 0) {
+                    STUB_printf(g_str_l06_item_trigger_debug_2, m->id, m->oclass, g_current_map_index, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,7 +116,7 @@ void func_PAL_L05_00419C60(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(D_L06_001B1810, g_current_map_index, p->idx);
+                STUB_printf(g_str_l06_item_trigger_debug, g_current_map_index, p->idx);
         } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
@@ -124,16 +124,16 @@ void func_PAL_L05_00419C60(Thing *m)
             break;
         }
         p->tail.b.had = 1;
-        req_launch_queued(D_L06_001BFA40);
-        if (D_L06_001B2348 < 5 || (g_current_map_index == 6 && p->idx == 0))
-            func_PAL_002F6C18();
+        req_launch_queued(g_request_l06_queue);
+        if (g_game_l06_frame_counter < 5 || (g_current_map_index == 6 && p->idx == 0))
+            game_set_slowdown_factor_pal();
         moby_set_state(m, 3, -1);
         break;
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
-                func_PAL_L00_002B9CD8(o + 0x30, o + 0x70, 0, 1);
+                char *o = g_region_table + (p->link << 7);
+                hero_reset_position_and_direction_pal(o + 0x30, o + 0x70, 0, 1);
             }
             moby_set_state(m, 4, -1);
         }
@@ -147,16 +147,16 @@ void func_PAL_L05_00419C60(Thing *m)
         if (p->item != -1) {
             moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
-                func_PAL_002AFC10(p->item);
+                snd_play_indexed_pal(p->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             notify = 1;
         }
         if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
+                char *o = g_region_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(m->pos, m->dir);
@@ -171,16 +171,16 @@ void func_PAL_L05_00419C60(Thing *m)
         if (p->item != -1) {
             moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
-                func_PAL_002AFC10(p->item);
+                snd_play_indexed_pal(p->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             played = 1;
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
+                char *o = g_region_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);

@@ -14,7 +14,7 @@
 
 /* func_L20_00440198 is defined in L20_00440198.c (its slot-table and func_002A7750 declarations conflict with this unit's). */
 
-extern unsigned int D_L20_001B2F9C __attribute__((sda));
+extern unsigned int g_group_l20_member_table __attribute__((sda));
 
 /* Counts the objects of a group whose state byte (object + 0x20) is neither 6 nor negative.
    D_L20_001FBB20 holds a list of 16-bit object ids per group; the low 15 bits of an id index
@@ -54,7 +54,7 @@ extern int math_random_int_range(int, int);
 /* func_L20_004431E0 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004431E0.c and belongs in the -G8 sibling. */
 
-extern unsigned int D_L20_001B2F9C __attribute__((sda));
+extern unsigned int g_group_l20_member_table __attribute__((sda));
 /* func_L20_004499E8 is defined in L20_004499E8-g8.c. */
 /* func_L20_004433B0 is defined in L20_004433B0-g8.c (it reaches a global through $gp). */
 
@@ -67,8 +67,8 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* func_PAL_L20_004495C0 is defined in L20_00443B60-helpers.c. */
 
-extern void func_PAL_L20_004495C0(char *, char *, char *, float *);
-extern char *func_PAL_L20_0044FC48(char *, char *, char *, float, int, float);
+extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
+extern char *yeedil_projectile_spawn_pal(char *, char *, char *, float, int, float);
 
 char *func_PAL_L20_004497B8(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
@@ -79,10 +79,10 @@ char *func_PAL_L20_004497B8(char *arg0) {
     int r;
 
     f = 1.0471977f;
-    func_PAL_L20_004495C0(arg0, (char *)&a, (char *)&b, &f);
+    yeedil_boss_compute_shot_launch_pal(arg0, (char *)&a, (char *)&b, &f);
     g = f;
     r = (((int)(math_random_int_range(0x12C, 0x258)) * 5 + 2) / 6);
-    return func_PAL_L20_0044FC48(arg0, (char *)&a, (char *)&b, g, r, (float)*(unsigned char *)(state + 0x36));
+    return yeedil_projectile_spawn_pal(arg0, (char *)&a, (char *)&b, g, r, (float)*(unsigned char *)(state + 0x36));
 }
 
 /* func_L20_00443DF0 is defined in L20_00443DF0.c (it needs -frac2-hazard-labels). */
@@ -114,7 +114,7 @@ extern float math_step_value_toward_target(char *, char *, float, float, float, 
 
 extern int PlayMobySound(int, int, char *);
 
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
 /* func_L20_00445890 is defined in L20_00445890-g8.c. */
@@ -126,7 +126,7 @@ extern int flag_is_third_pending_set(char *);
 
 extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */

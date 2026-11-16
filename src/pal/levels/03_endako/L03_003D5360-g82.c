@@ -2,8 +2,8 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L03_001B064C __attribute__((sda));
-extern char D_L03_001A8F20[] __attribute__((sda));
+extern float g_trail_projectile_trace_length __attribute__((sda));
+extern char g_effect_descriptor_default[] __attribute__((sda));
 typedef struct {
     char pad[0x1C];
     int count;
@@ -11,7 +11,7 @@ typedef struct {
     char pad2[0x10];
     float normal[4];
 } HitResult;
-extern HitResult D_L03_001BFDC0;
+extern HitResult g_hero_ground_collision;
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
@@ -21,7 +21,7 @@ extern int math_random_int_below(int);
 extern void vec_random_direction(void *, float, float);
 extern void *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void func_PAL_L00_003E74D8(void *, int, int);
+extern void part_l00_spawn_spark_burst_3_pal(void *, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_fast_float_d(void *);
 extern float vec_length_xy(void *);
@@ -42,9 +42,9 @@ void func_PAL_L03_003D56E8(char *obj)
     case 0: {
         float f;
         FastVecAdd(nextPosition, obj + 0x10, state);
-        vec_scale_to_length(traceEnd, obj + 0xc0, D_L03_001B064C);
+        vec_scale_to_length(traceEnd, obj + 0xc0, g_trail_projectile_trace_length);
         FastVecAdd(traceEnd, traceEnd, nextPosition);
-        make_hit_descriptor(matrix, obj, 1, D_L03_001A8F20, (float)*(int *)(state + 0x38));
+        make_hit_descriptor(matrix, obj, 1, g_effect_descriptor_default, (float)*(int *)(state + 0x38));
         *(TI128 *)(trailPosition) = *(TI128 *)(obj + 0x10);
         FastVecScale(trailStep, state, -0.2f);
         i = 4;
@@ -54,14 +54,14 @@ void func_PAL_L03_003D56E8(char *obj)
             color = math_random_int_below(255);
             vec_random_direction(particlePosition, 0.0f, 0.1f);
             FastVecAdd(particlePosition, particlePosition, trailPosition);
-            part_spawn_gravity_fade(particlePosition, D_L03_001A8F20, 12, 0x808080, color, 32, 0, f*210000.0f, f*42000.0f, 0.0f, 0);
+            part_spawn_gravity_fade(particlePosition, g_effect_descriptor_default, 12, 0x808080, color, 32, 0, f*210000.0f, f*42000.0f, 0.0f, 0);
             FastVecAdd(trailPosition, trailPosition, trailStep);
         } while (i >= 0);
-        if (CollLine(nextPosition, traceEnd, 0, obj, matrix) && D_L03_001BFDC0.count > 0) {
-            *(TI128 *)(state + 0x20) = *(TI128 *)(D_L03_001BFDC0.pos);
-            *(TI128 *)(state + 0x10) = *(TI128 *)(D_L03_001BFDC0.normal);
-            *(float *)(state + 0x34) = D_L03_001B064C;
-            func_PAL_L00_003E74D8(D_L03_001BFDC0.pos, 10, 1);
+        if (CollLine(nextPosition, traceEnd, 0, obj, matrix) && g_hero_ground_collision.count > 0) {
+            *(TI128 *)(state + 0x20) = *(TI128 *)(g_hero_ground_collision.pos);
+            *(TI128 *)(state + 0x10) = *(TI128 *)(g_hero_ground_collision.normal);
+            *(float *)(state + 0x34) = g_trail_projectile_trace_length;
+            part_l00_spawn_spark_burst_3_pal(g_hero_ground_collision.pos, 10, 1);
             moby_set_state(obj, 1, -1);
         }
         *(TI128 *)(obj + 0x10) = *(TI128 *)(nextPosition);

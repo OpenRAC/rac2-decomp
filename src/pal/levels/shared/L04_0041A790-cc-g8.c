@@ -28,8 +28,8 @@ typedef struct Trail416018 {
 } Trail416018;
 extern Trail416018 g_racer_trail_pool[] __attribute__((sda));
 extern unsigned char g_hero_state[];
-extern int D_L04_001B08F0 __attribute__((sda));
-extern void *D_L04_001B0914 __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
+extern void *g_race_controller __attribute__((sda));
 extern void FastVecAdd(float *, float *, float *);
 extern void FastVecScale(float *, float *, float);
 extern void matrix_mul_vec3(float *, float *, char *);
@@ -81,7 +81,7 @@ void func_PAL_L04_0041A790(void)
             point[3] = trail->ages[0] * widthStep + 0.01f + *age * widthStep;
         }
         if (count < 8 &&
-            ((*(short *)(trail->owner + 0xaa) == 0xbbc && D_L04_001B08F0) ||
+            ((*(short *)(trail->owner + 0xaa) == 0xbbc && g_race_bike_mode) ||
              (*(short *)(trail->owner + 0xaa) == 0xb2d &&
               *(int *)(*(char **)(trail->owner + 0x68) + 0x244)))) {
             if (trail->ages[count - 1] < 3)
@@ -103,5 +103,5 @@ void func_PAL_L04_0041A790(void)
             }
         }
     }
-    gfx_add_draw_callback_first(trail_update_active_entries, D_L04_001B0914);
+    gfx_add_draw_callback_first(trail_update_active_entries, g_race_controller);
 }

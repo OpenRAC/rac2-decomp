@@ -9,10 +9,10 @@ extern void func_33B330(char *dst, float a, float b, float c);
 extern char *func_379CA0(char *object);
 extern void func_37AEC0(char *object, int flag);
 extern void feltzin_enemy_init_position_fast(char *obj);
-extern int D_L05_00221D10[];
-extern char *D_L05_001B2614 __attribute__((sda));
+extern int g_feltzin_challenge_state[];
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
-void func_PAL_L05_00421830(char *obj)
+void feltzin_enemy_init_position_fast_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
@@ -22,7 +22,7 @@ void func_PAL_L05_00421830(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 5;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x268) = 0;
     *(float *)(sub + 0x180) = 5.0f;
     *(float *)(obj + 0x2C) = 0.08f;

@@ -9,7 +9,7 @@ extern void hud_set_widget_field_b(void *a0, int a1);
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
 
-void func_US2_00344808(char *self)
+void item_menu_draw_us2(char *self)
 {
     int r;
     char *rec;

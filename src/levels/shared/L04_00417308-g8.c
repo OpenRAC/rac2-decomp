@@ -5,21 +5,21 @@ typedef unsigned short u16;
 
 typedef int s32;
 
-extern s32 D_L04_001B1CB8 __attribute__((sda));
+extern s32 g_cam_follow_index __attribute__((sda));
 
-extern s32 D_L04_001B1CBC __attribute__((sda));
+extern s32 g_cam_prev_follow_index __attribute__((sda));
 
-extern s32 D_L04_001B1CCC __attribute__((sda));
+extern s32 g_cam_boost_timer __attribute__((sda));
 
-extern float D_L04_001B1C8C __attribute__((sda));
+extern float g_cam_offset_x __attribute__((sda));
 
-extern float D_L04_001B1C90 __attribute__((sda));
+extern float g_cam_offset_y __attribute__((sda));
 
-extern float D_L04_001B1C94 __attribute__((sda));
+extern float g_cam_offset_z __attribute__((sda));
 
-extern float D_L04_001B1C98 __attribute__((sda));
+extern float g_cam_offset_w __attribute__((sda));
 
-extern s32 D_L04_001B1CC4 __attribute__((sda));
+extern s32 g_cam_side_flip __attribute__((sda));
 
 extern float func_30EEF8(char *);
 
@@ -33,7 +33,7 @@ void cam_reset_follow_state(char *camera)
 
     cam_init_follow_offset(cameraCopy, 0);
     *(u16 *)(cameraCopy + 0x7E) = 0;
-    D_L04_001B1CB8 = -1;
-    D_L04_001B1CBC = -1;
-    D_L04_001B1CCC = -1;
+    g_cam_follow_index = -1;
+    g_cam_prev_follow_index = -1;
+    g_cam_boost_timer = -1;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L04_00378838, in levels 4 and 10, is a copy of func_L00_00354DF8 (L00_002FC7A8-g8.c)
  * with the levels' own tables, named here by level 4's addresses. Its catalogue entry starts
  * at 0x00378848 in level 4 and 0x00369160 in level 10, after the previous body's 16-byte tail
@@ -7,31 +8,31 @@
 #include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
-extern int D_00139948[];
+extern int g_menu_entry_ids[];
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry12;
-extern SourceEntry12 D_L04_002A4420[];
-extern char D_L04_0029FEE0[];
-extern InitEntry12 D_L04_0021D7B0[];
+extern SourceEntry12 g_menu_l04_source_entries[];
+extern char g_menu_l04_entry_callback[];
+extern InitEntry12 g_menu_l04_entry_list[];
 /* Reloaded at each search step in retail. */
-extern int * volatile D_L04_001AA770 __attribute__((sda));
-extern struct { char pad[0x230]; int selected; } D_L04_001C9C60;
+extern int * volatile g_menu_entry_id_list __attribute__((sda));
+extern struct { char pad[0x230]; int selected; } g_menu_l04_state;
 
 /* Fills the menu entry list from the level tables and selects the entry that is current. */
 int menu_l04_build_entry_list(char *menu) {
     int i, entry;
     int *id_list;
-    for (i = 0; i < 28 && D_00139948[i]; i++) {
-        D_L04_0021D7B0[i].kind = 3;
-        D_L04_0021D7B0[i].callback = D_L04_0029FEE0;
-        D_L04_0021D7B0[i].id = D_L04_002A4420[D_00139948[i]].id;
-        D_L04_0021D7B0[i].value = D_L04_002A4420[D_00139948[i]].value;
+    for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {
+        g_menu_l04_entry_list[i].kind = 3;
+        g_menu_l04_entry_list[i].callback = g_menu_l04_entry_callback;
+        g_menu_l04_entry_list[i].id = g_menu_l04_source_entries[g_menu_entry_ids[i]].id;
+        g_menu_l04_entry_list[i].value = g_menu_l04_source_entries[g_menu_entry_ids[i]].value;
     }
-    id_list = D_L04_001AA770;
-    D_L04_0021D7B0[i].id = 0;
+    id_list = g_menu_entry_id_list;
+    g_menu_l04_entry_list[i].id = 0;
     *(int *)(menu + 0x40) = 0;
     *(unsigned int *)(menu + 0x30) |= 0x8000;
-    for (i = 0, entry = id_list[0]; entry; entry = D_L04_001AA770[++i]) {
-        if (D_L04_001C9C60.selected == entry) {
+    for (i = 0, entry = id_list[0]; entry; entry = g_menu_entry_id_list[++i]) {
+        if (g_menu_l04_state.selected == entry) {
             *(int *)(menu + 0x40) = i;
             break;
         }

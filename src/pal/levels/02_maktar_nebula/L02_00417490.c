@@ -12,10 +12,10 @@ typedef struct { float f[4]; } SparkRange;
 typedef struct { float f[2]; } SparkSizes;
 typedef struct { int i[2]; } SparkColours;
 typedef struct { u8 b[4]; } SparkKinds;
-extern SparkRange D_L02_001B1C10;
-extern SparkSizes D_L02_001B1C20;
-extern SparkColours D_L02_001B1C28;
-extern SparkKinds D_L02_001B1C30;
+extern SparkRange g_spark_l02_range_2;
+extern SparkSizes g_spark_sizes;
+extern SparkColours g_spark_colours;
+extern SparkKinds g_spark_kinds;
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -28,10 +28,10 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
 /* func_PAL_L02_00417490, the PAL copy of func_L02_00412808: the same C, where the per-frame
    0.016666668f becomes 0.020000001f and the spark kind is scaled to 50 Hz. */
 void func_PAL_L02_00417490(u8 *a0) {
-    SparkRange range = D_L02_001B1C10;
-    SparkSizes sizes = D_L02_001B1C20;
-    SparkColours colours = D_L02_001B1C28;
-    SparkKinds kinds = D_L02_001B1C30;
+    SparkRange range = g_spark_l02_range_2;
+    SparkSizes sizes = g_spark_sizes;
+    SparkColours colours = g_spark_colours;
+    SparkKinds kinds = g_spark_kinds;
     float vel[4];
     float front[4];
     float spot[4];

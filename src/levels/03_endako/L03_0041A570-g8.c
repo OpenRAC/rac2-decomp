@@ -2,9 +2,9 @@
 /* Local vector transfers retain all four components. */
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern int D_L03_001AEBF8;
-extern int D_L03_001B1B50 __attribute__((sda));
-extern float D_L03_001B1B30[8] SDATA(D_L03_001B1B30) __attribute__((sda)), D_L03_001B1B28[2] SDATA(D_L03_001B1B28) __attribute__((sda)), D_L03_001B1B20[2] SDATA(D_L03_001B1B20) __attribute__((sda));
+extern int g_arc_effect_count;
+extern int g_explode_skip_flag __attribute__((sda));
+extern float g_explode_piece_lifetimes[8] SDATA(D_L03_001B1B30) __attribute__((sda)), g_explode_piece_spin[2] SDATA(D_L03_001B1B28) __attribute__((sda)), g_explode_piece_speeds[2] SDATA(D_L03_001B1B20) __attribute__((sda));
 extern void FastVecScale(void *,void *,float);
 extern void *part_spawn_object_following_effect(void *,void *,int,float,int,int,float,int,int,int);
 extern void *part_find_owned_effect_slot(void *,u32,int);
@@ -31,17 +31,17 @@ void UpdateDestructibleObjectEffects(u8 *moby) {
         FastVecScale(&pos,&pos,*(float *)(moby+0x2c));
         vars->handle=part_spawn_object_following_effect(&pos,moby,0x40202080,*(float *)(moby+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
         moby_set_state(moby,1,-1);
-        if (vars->enabled) D_L03_001AEBF8--;
+        if (vars->enabled) g_arc_effect_count--;
         break;
     case 1:
         if(part_find_owned_effect_slot(moby,0x4010000,0) && !vars->enabled) {
-            D_L03_001AEBF8--; moby_set_state(moby,2,-1);
+            g_arc_effect_count--; moby_set_state(moby,2,-1);
         }
         moby[0xa8]=255;
         break;
     case 2: {
-        int skip = D_L03_001B1B50;
-        part_explode_object_into_pieces(moby,D_L03_001B1B30,D_L03_001B1B28,D_L03_001B1B20,63,0,skip,0,65535,255,0);
+        int skip = g_explode_skip_flag;
+        part_explode_object_into_pieces(moby,g_explode_piece_lifetimes,g_explode_piece_spin,g_explode_piece_speeds,63,0,skip,0,65535,255,0);
         PlayMobySound(0,0,moby);
         SpawnExplosion(moby+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
         { u16 *flags=(u16 *)(moby+0x34);

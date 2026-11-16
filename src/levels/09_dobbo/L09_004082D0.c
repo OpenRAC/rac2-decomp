@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern s32 D_L09_001B2388 MACRO_ADDR;
-extern char D_L09_00189EA0[];
-extern char D_L09_001B9A00[];
+extern s32 g_frame_l09_counter MACRO_ADDR;
+extern char g_dobbo_target_point[];
+extern char g_camera_l09_position[];
 extern s32 func_325E78(char *a0, s32 a1);
 extern void dobbo_apply_setting_group(char *a0, char *a1, s32 a2, s32 a3);
 extern void dobbo_apply_setting_by_index(char *a0, s32 a1, char *a2, s32 a3);
@@ -20,14 +20,14 @@ void trigger_switch_update(u8 *obj) {
     s32 v;
     TQ_L09_004082D0 buf;
 
-    if (D_L09_001B2388 >= 5) {
+    if (g_frame_l09_counter >= 5) {
         vars = *(char **)(obj + 0x68);
         obj[0x30] = 0xFF;
         flag = 0;
         if (*(s8 *)(vars + 0xBE) != 0) {
-            qcopy(&buf, D_L09_001B9A00);
+            qcopy(&buf, g_camera_l09_position);
         } else {
-            qcopy(&buf, D_L09_00189EA0);
+            qcopy(&buf, g_dobbo_target_point);
         }
         state = obj[0x95];
         if (state == 0) {

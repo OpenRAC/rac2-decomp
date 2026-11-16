@@ -18,13 +18,13 @@ extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
 extern char *func_PAL_L00_004012A0(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern int func_PAL_0032F0B8(int, int, char *);
+extern int StartAttachedEffect_pal(int, int, char *);
 extern int g_hero_moby;
-extern unsigned char D_00139582;
+extern unsigned char g_ray_weapon_index;
 extern L00AimState g_collision_result;
 extern L00AimEntry g_weapon_l00_table[];
 
-int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
+int weapon_fire_damage_ray_pal(char *a0, char *a1, char *a2, char *a3)
 {
     char local[16];
     float distance;
@@ -40,7 +40,7 @@ int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
         FastVecSub(local, (char *)g_collision_result.vector_20, a1);
         func_PAL_L00_004012A0(a1, local, (char *)g_collision_result.vector_20, 1);
         if (g_collision_result.object_18 != 0) {
-            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            saved = (g_weapon_l00_table + g_ray_weapon_index)->value_70;
             distance = fast_vec_dist((char *)g_collision_result.vector_20, a1);
             if (distance < 10.0f) {
                 *(float *)(a3 + 0x1C) = saved;
@@ -52,7 +52,7 @@ int func_PAL_L00_003D6A38(char *a0, char *a1, char *a2, char *a3)
                 *(float *)(a3 + 0x1C) = saved * 0.125f;
             }
             QueueMobyImpact(g_collision_result.object_18, a3);
-            func_PAL_0032F0B8(g_collision_result.object_18, 0x44, a0);
+            StartAttachedEffect_pal(g_collision_result.object_18, 0x44, a0);
         }
         ret = g_collision_result.object_18;
     } else {

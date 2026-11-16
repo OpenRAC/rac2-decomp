@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L30_001AEE90 __attribute__((sda));
-extern float D_L30_001AEE94 __attribute__((sda));
-extern char D_L30_001AEE98[];
+extern float g_museum_look_angle_rate __attribute__((sda));
+extern float g_museum_look_param __attribute__((sda));
+extern char g_str_museum_look_debug[];
 extern void STUB_printf(const char *, ...);
 extern void func_001163A0(unsigned int);
 extern int math_random_int_below(int);
@@ -30,16 +30,16 @@ void func_PAL_L30_003890DC(u8 *object) {
             short a2 = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            STUB_printf(D_L30_001AEE98, a1, a2);
+            STUB_printf(g_str_museum_look_debug, a1, a2);
             func_001163A0(ticks);
             *(int *)state = math_random_int_below(13);
         }
         *(u16 *)(object + 0x7C) = 1 << *(int *)state;
         moby_set_state(object, 1, -1);
     } else {
-        float f0 = D_L30_001AEE94;
+        float f0 = g_museum_look_param;
 
-        math_update_wrapped_angle_offset(object, state + 4, state + 8, D_L30_001AEE90,
+        math_update_wrapped_angle_offset(object, state + 4, state + 8, g_museum_look_angle_rate,
                       f0 * 0.0003490659f, *(float *)(state + 0xC));
         *(float *)(object + 0xF8) =
             FastAddRotations(*(float *)(object + 0xF8), 0.01745329424738884f);

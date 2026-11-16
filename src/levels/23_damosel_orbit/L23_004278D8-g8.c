@@ -11,13 +11,13 @@
 
 extern u8 *g_mothership_boss_moby __attribute__((sda));
 
-extern s32 D_L23_001B1694 __attribute__((sda));
+extern s32 g_charged_l23_blast_timer __attribute__((sda));
 
 extern s32 g_hero_moby __attribute__((nosda));
 
-extern float D_L23_001B36FC;
+extern float g_mothership_max_health;
 
-extern char D_L23_001BA500[];
+extern char g_hero_l23_state_block[];
 
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 
@@ -67,7 +67,7 @@ void boss_part_handle_hit(u8 *moby) {
     if (hit != 0) {
         if (mothership_is_attack_state() == 0 || *(s16 *)(vars + 0x26) != 0 ||
             (g_mothership_boss_moby != 0 && mothership_is_held() != 0) ||
-            (*(s32 *)(hit + 0x20) == g_hero_moby && D_L23_001B1694 < 0)) {
+            (*(s32 *)(hit + 0x20) == g_hero_moby && g_charged_l23_blast_timer < 0)) {
             if (mothership_is_held() != 0)
                 boss_start_fight_once();
             hit = 0;
@@ -84,7 +84,7 @@ void boss_part_handle_hit(u8 *moby) {
             if (*(u16 *)(moby + 0x7C) != 0) {
                 float health_ratio;
 
-                health_ratio = *(float *)(vars + 0x20) / D_L23_001B36FC;
+                health_ratio = *(float *)(vars + 0x20) / g_mothership_max_health;
                 piece_count = 10 - (s32)(health_ratio * 10.0f);
                 for (i = 0; i < piece_count; i++) {
                     s32 mask = *(u16 *)(moby + 0x7C);
@@ -92,7 +92,7 @@ void boss_part_handle_hit(u8 *moby) {
                     if ((mask >> i) & 1) {
                         float angle, speed;
                         u8 *piece;
-                        u8 *base = (u8 *)D_L23_001BA500;
+                        u8 *base = (u8 *)g_hero_l23_state_block;
                         float spread = 90.0f;
                         float per_tick = 0.016666668f;
                         float to_rad = 0.017453294f;

@@ -17,7 +17,7 @@ extern float FastAddRotations(float, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern int D_L00_001A8FF0[] __attribute__((sda));
+extern int g_hero_locked_flag[] __attribute__((sda));
 
 /* Moves every active beam particle along its path and counts how many are still alive. */
 int beam_update_particles(char *object)
@@ -41,7 +41,7 @@ int beam_update_particles(char *object)
                 *(TI128 *)local[0] = 0;
                 local[0][2] = 1.0f;
                 local[0][3] = 1.0f;
-                if (D_L00_001A8FF0[0] != 0)
+                if (g_hero_locked_flag[0] != 0)
                     cam_compute_view_direction(&base[i], local[0], 1);
                 FastVecScale(scaled, local[0], base[i].scale);
                 FastVecAdd(&base[i], &base[i], scaled);

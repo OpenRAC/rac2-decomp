@@ -27,8 +27,8 @@ typedef struct {
     Moby *moby;                 /* 0x2290 */
 } Hero;
 
-extern Moby *D_001B1B68 __attribute__((sda));   /* the first moby of the moby list */
-extern float D_001AF54C;                        /* the search range */
+extern Moby *g_moby_list_head __attribute__((sda));   /* the first moby of the moby list */
+extern float g_nearest_search_range;                        /* the search range */
 extern char g_camera_eye_state[];                       /* the camera position */
 extern Collision g_collision_hit;
 extern Hero g_hero_state;
@@ -44,11 +44,11 @@ extern float fast_vec_dist(void *a, void *b);
 Moby *FindNearestEligibleTarget(Moby *self)
 {
     Moby *best = 0;
-    Moby *moby = D_001B1B68;
+    Moby *moby = g_moby_list_head;
     float nearest;
     float sphere[4];
 
-    nearest = D_001AF54C;
+    nearest = g_nearest_search_range;
     while (moby != 0) {
         if ((moby->oClass == 0xCB5 /* moby class 3253 */ || moby->oClass == 0x12EA /* moby class 4842 */) && moby->state != 2) {
             int accept;

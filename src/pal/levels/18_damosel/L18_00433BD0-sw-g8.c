@@ -7,15 +7,15 @@ extern int PlayMobySound(int, int, u8 *);
 extern void snd_stop_voice(int);
 extern u8 g_sound_state[];
 extern void *part_find_owned_effect_slot(u8 *, int, int);
-extern float func_PAL_002AA108(u8 *, int);
-extern int func_PAL_002B3F18(void *, void *, void *);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, float, float, int, int, int, int, int, int, int, void *);
+extern float moby_update_aim_target_strength_pal(u8 *, int);
+extern int part_spawn_damage_debris_pal(void *, void *, void *);
+extern char *SpawnExplosion_pal(void *, int, int, int, float, float, int, int, int, int, int, int, int, void *);
 extern u8 *g_moby_l18_table;
-extern void func_PAL_L18_00437A28(u8 *);
+extern void extermibot_destroy_piece_and_parts_pal(u8 *);
 extern void extermibot_shrink_piece_and_parts(u8 *, int);
 extern void extermibot_advance_piece_to_state(u8 *);
 extern void leader_start_moving(u8 *);
-extern void func_PAL_L18_00434320(u8 *, int, int);
+extern void leader_steer_pal(u8 *, int, int);
 extern int path_step_along_point(u8 *, void *, int, void *, int, float);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -26,7 +26,7 @@ extern int IsPointInCuboid(u8 *, int);
 extern u8 g_hero_position[];
 extern float moby_get_anim_value(u8 *);
 extern int flag_set_first_pending(u8 *);
-extern int *D_L18_001FE480[];
+extern int *g_path_l18_table[];
 extern int path_measure_moby_against_entry(void *, int, float);
 typedef struct {
     u8 pad00[0x20];
@@ -57,9 +57,9 @@ static inline void ReleaseVoice(u8 *a, LeaderState *s) {
     }
     s->voice = -1;
 }
-extern u8 *D_PAL_FFFF001B;
+extern u8 *g_level_base_pointer;
 
-void func_PAL_L18_00433BD0(u8 *a) {
+void leader_update_pal(u8 *a) {
     LeaderState *s = *(LeaderState **)(a + 0x68);
     float hit;
     float vec[4];
@@ -70,16 +70,16 @@ void func_PAL_L18_00433BD0(u8 *a) {
     } else if (snd_is_voice_playing_for_owner(a, s->voice)) {
         ReleaseVoice(a, s);
     }
-    hit = func_PAL_002AA108(a, part_find_owned_effect_slot(a, 0x10000, 0));
+    hit = moby_update_aim_target_strength_pal(a, part_find_owned_effect_slot(a, 0x10000, 0));
     if (a[0x20] >= 2) {
         s->health -= hit;
-        func_PAL_002B3F18(a, s->hit, &s->health);
+        part_spawn_damage_debris_pal(a, s->hit, &s->health);
         if (s->health <= 0.0f || s->state == 2) {
             int i;
-            func_PAL_L00_003FB330(a + 0x10, 1, 0x19, 20, 1.0f, 20.0f, 20, 20, 45, 1, 1, 1, 0, 0);
+            SpawnExplosion_pal(a + 0x10, 1, 0x19, 20, 1.0f, 20.0f, 20, 20, 45, 1, 1, 1, 0, 0);
             for (i = 0; i < 6; i++) {
                 if (s->ids[i] != -1)
-                    func_PAL_L18_00437A28(g_moby_l18_table + (s->ids[i] << 8));
+                    extermibot_destroy_piece_and_parts_pal(g_moby_l18_table + (s->ids[i] << 8));
             }
             if (snd_is_voice_playing_for_owner(a, s->voice))
                 ReleaseVoice(a, s);
@@ -102,7 +102,7 @@ void func_PAL_L18_00433BD0(u8 *a) {
         moby_set_state(a, 1, -1);
         s->state = 1;
         ReleaseVoice(a, s);
-        base = D_PAL_FFFF001B;
+        base = g_level_base_pointer;
         *(u16 *)(a + 0x34) |= 0x1000;
         all = 1;
         for (i = 0; i < 6; i++) {
@@ -140,7 +140,7 @@ void func_PAL_L18_00433BD0(u8 *a) {
                     extermibot_shrink_piece_and_parts(g_moby_l18_table + (s->ids[i] << 8), (int)a);
             }
         } else if (a[0xBC] == 0) {
-            func_PAL_L18_00434320(a, 1, 1);
+            leader_steer_pal(a, 1, 1);
             if (damage > 8.0f) {
                 int i;
                 a[0xBC] = 1;
@@ -154,13 +154,13 @@ void func_PAL_L18_00433BD0(u8 *a) {
                 *(int *)(a + 0x48) = 0;
             }
         } else if (a[0xBC] == 1) {
-            func_PAL_L18_00434320(a, 1, 1);
+            leader_steer_pal(a, 1, 1);
             if (*(u16 *)(a + 0x96) >= 26) {
                 a[0xBC] = 2;
                 *(float *)(a + 0x48) = 1.0f;
             }
         } else if (a[0xBC] == 2) {
-            func_PAL_L18_00434320(a, 1, 1);
+            leader_steer_pal(a, 1, 1);
             if (damage > 59.0f) {
                 *(int *)(a + 0x48) = 0;
                 moby_set_state(a, a[0x94], -1);
@@ -175,7 +175,7 @@ void func_PAL_L18_00433BD0(u8 *a) {
         } else {
             int id = s->paths[s->group];
             float speed = 5.0f;
-            if (s->waypoint == D_L18_001FE480[id][0] - 1)
+            if (s->waypoint == g_path_l18_table[id][0] - 1)
                 speed = 0.3f;
             if (!path_step_along_point(a, s->movement, id, &s->waypoint, 0, speed)) {
                 if (s->group <= 0 && s->paths[1] != -1)
@@ -185,7 +185,7 @@ void func_PAL_L18_00433BD0(u8 *a) {
                 moby_set_state(a, 2, -1);
             }
         }
-        func_PAL_L18_00434320(a, 1, 1);
+        leader_steer_pal(a, 1, 1);
         break;
     case 4:
         if (flag_set_first_pending(a)) {
@@ -197,7 +197,7 @@ void func_PAL_L18_00433BD0(u8 *a) {
             moby_mark_spawned(a);
             return;
         }
-        func_PAL_L18_00434320(a, 1, 1);
+        leader_steer_pal(a, 1, 1);
         break;
     }
     if (*(u16 *)(a + 0x96) <= 0xFFFE)

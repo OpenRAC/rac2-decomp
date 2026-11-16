@@ -19,7 +19,7 @@ typedef struct {
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 
-extern int D_L04_001B08F0 __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
 extern int g_current_lap;
 /* Route selection takes the object only; it reads its own state pointer. */
 extern void UpdateLinkedRouteSelection(void *);
@@ -41,11 +41,11 @@ extern void add_vectors(void *,void *,void *);
 void hoverbike_update_route_steering(char *bike,RouteState1006 *state) {
  int old_route_index,i; float gap,angle; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
  UpdateLinkedRouteSelection(bike);
- state->progress=UpdateNearestRoutePoint(bike,state,&state->pathIndex,&state->pointIndex,g_current_lap,D_L04_001B08F0);
+ state->progress=UpdateNearestRoutePoint(bike,state,&state->pathIndex,&state->pointIndex,g_current_lap,g_race_bike_mode);
  old_route_index=state->routeIndex;
  gap=vec_distance_xy(&state->routePos[0],bike+0x10);
- if (D_L04_001B08F0 ? gap<20.0f : gap<5.0f) {
-  state->distance+=(D_L04_001B08F0 ? 20.0f:5.0f)-gap;
+ if (g_race_bike_mode ? gap<20.0f : gap<5.0f) {
+  state->distance+=(g_race_bike_mode ? 20.0f:5.0f)-gap;
   if (state->distance>state->route->points[0][3]*IntToFloat(state->route->count))
    state->distance-=state->route->points[0][3]*IntToFloat(state->route->count);
   anim_sample_key_track(state->distance,state->route->points[0][3],state->route,&state->routeIndex,&state->fraction,state->routePos);
@@ -56,7 +56,7 @@ void hoverbike_update_route_steering(char *bike,RouteState1006 *state) {
   angle=mat_fast_helper_a(state->routePos[0]-F(bike,0x10),state->routePos[1]-F(bike,0x14));
   if(FastDiffRots(F(bike,0xf8),angle)>1.0471977f) {
    angle=IntToFloat(FindNearestRoutePointIndex(bike,state->route,0))*state->route->points[0][3];
-   state->distance=angle+(D_L04_001B08F0?20.0f:5.0f);
+   state->distance=angle+(g_race_bike_mode?20.0f:5.0f);
    anim_sample_key_track(state->distance,state->route->points[0][3],state->route,&state->routeIndex,&state->fraction,state->routePos);
   }
  }

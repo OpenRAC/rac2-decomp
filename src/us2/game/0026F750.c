@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-unsigned int func_US2_0026F750(void)
+unsigned int stub_empty_9_us2(void)
 {
     return 0;
 }

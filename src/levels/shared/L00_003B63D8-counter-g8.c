@@ -10,14 +10,14 @@ typedef struct {
 } CameraBasisPrefix;
 typedef struct NODE NODE;
 typedef void (*DrawCallback_r002E6CF0)(void *);
-extern unsigned int D_00138324[];
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern unsigned int g_pad_held_flags[];
+extern int g_game_l00_mode MACRO_ADDR;
 extern int mode_gp SDATA(D_L00_001A8F00);
-extern int D_L00_001B1BE8 MACRO_ADDR;
-extern float D_L00_001B18E0;
+extern int g_cinematic_phase_flag MACRO_ADDR;
+extern float g_hero_scalar_transition_value;
 extern CameraBasisPrefix g_camera_l00_position;
-extern float D_L00_001AFA44 __attribute__((sda));
-extern int D_L00_001AFA4C __attribute__((sda));
+extern float g_pair_game_update_pull __attribute__((sda));
+extern int g_pair_game_timer_limit __attribute__((sda));
 extern void moby_set_state(unsigned char *,unsigned char,int),moby_mark_spawned(void *);
 extern int request_begin_slot(int,int,int,int,unsigned char *),request_end_slot(int,int);
 extern int InitializePairedObjects(void *);
@@ -40,8 +40,8 @@ void pair_game_update(unsigned char *object)
     char *context=*(char **)(object+0x68);
     int mode;
     switch(object[0x20]) { case 0: {
-        if(!D_L00_001A8F00) {request_begin_slot(7,1,(int)object,2,0);return;}
-        if(D_L00_001A8F00==7 && InitializePairedObjects(object)) {
+        if(!g_game_l00_mode) {request_begin_slot(7,1,(int)object,2,0);return;}
+        if(g_game_l00_mode==7 && InitializePairedObjects(object)) {
             point.q=0;point.v[1]=1.5707964f;
             euler_rotation_basis(g_camera_l00_position.basis,point.v);
             moby_set_state(object,1,-1);return;
@@ -50,30 +50,30 @@ void pair_game_update(unsigned char *object)
           U(object,0x96)=timer; if(old<6)return; }
         moby_mark_spawned(object);return;
     break; } case 1: {
-        D_L00_001B1BE8=1;
+        g_cinematic_phase_flag=1;
         UpdatePairedObjects(object);
         moby_update_same_class(object);
         part_spawn_camera_sparkles(object);
         pair_game_spawn_background_particles(object);
         gfx_add_draw_callback_first(pair_game_draw_scores,object);
         if(I(context,0x60) && I(context,0x64)++>=91) {
-            ApproachValue(&D_L00_001B18E0,1.0f,0.06666667f);
+            ApproachValue(&g_hero_scalar_transition_value,1.0f,0.06666667f);
             mode=mode_gp;
-            if(D_L00_001B18E0>=1.0f) {
+            if(g_hero_scalar_transition_value>=1.0f) {
                 pair_game_destroy_objects((NODE *)object);
                 InitializePairedObjects(object);
                 I(context,0x64)=0; I(context,0x60)=0;
-                mode=D_L00_001A8F00;
+                mode=g_game_l00_mode;
             }
         } else {
-            ApproachValue(&D_L00_001B18E0,0.0f,0.06666667f);
-            mode=D_L00_001A8F00;
+            ApproachValue(&g_hero_scalar_transition_value,0.0f,0.06666667f);
+            mode=g_game_l00_mode;
         }
         if(mode!=7) {
             pair_game_destroy_objects((NODE *)object);
             moby_mark_spawned(object);return;
         } else {
-            if(!(D_00138324[0]&0x10))return;
+            if(!(g_pad_held_flags[0]&0x10))return;
             request_end_slot(1,0);return;
         }
     break; } case 2: {
@@ -82,7 +82,7 @@ void pair_game_update(unsigned char *object)
         matrix_mul_vec3(&point,&point,inverse);
         matrix_mul_vec3(&velocity,context,inverse);
         pair_game_wrap_coordinates(point.v+1,point.v+2);
-        pair_game_apply_centre_pull(point.v[1],point.v[2],D_L00_001AFA44*0.00027777778f,velocity.v+1,velocity.v+2);
+        pair_game_apply_centre_pull(point.v[1],point.v[2],g_pair_game_update_pull*0.00027777778f,velocity.v+1,velocity.v+2);
         velocity.v[0]=0.0f;
         FastVecAdd(&point,&point,&velocity);
         matrix_mul_vec3(object+0x10,&point,g_camera_l00_position.basis);
@@ -97,7 +97,7 @@ void pair_game_update(unsigned char *object)
             coll_sweep_from_object(*(void **)(object+0xB8),spawn.v,0.1f,0x10000,1.0f,1.0f,0,1,0);
             FastVecSub(&spawn,object+0x10,&offset);
             coll_sweep_from_object(*(void **)(object+0xB8),spawn.v,0.1f,0x10000,1.0f,1.0f,0,1,0);
-            if(D_L00_001A8F00==7) {int limit=D_L00_001AFA4C; unsigned timer=U(object,0x96),old=timer++;
+            if(g_game_l00_mode==7) {int limit=g_pair_game_timer_limit; unsigned timer=U(object,0x96),old=timer++;
               U(object,0x96)=timer; if((int)old<=limit)return;}
         }
     }

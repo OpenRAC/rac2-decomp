@@ -15,7 +15,7 @@ extern int FloatToInt(float);
 extern int math_random_int_below(int);
 
 /* Emits paired particles with opposite spin and randomized velocities. */
-void func_PAL_L02_003C8738(float *pos, int count) {
+void part_l02_spawn_spinning_pairs_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;

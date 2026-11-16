@@ -12,11 +12,11 @@ extern void shop_trigger_current_state_effect(void *, void *);
 extern float FastVecLength(void *);
 extern void mat_build_rotation_toward_vector(void *, void *, void *, int, float);
 extern int coll_test_point(void *, int, void *, float);
-extern char *D_L00_001BF218;
+extern char *g_hit_l00_result;
 extern char *g_hero_moby;
-extern char D_L00_001BF230[];
+extern char g_collision_position[];
 typedef struct { float x, y, z; int unused; float position[4]; } EffectLightRecord;
-extern EffectLightRecord D_L00_001C6F40[];
+extern EffectLightRecord g_light_table[];
 extern float FastVecDot(void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void func_PAL_L00_003C11A0(float *, float *, int, int);
@@ -36,7 +36,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 /* The 128-bit unit four of these bodies copy whole. */
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -78,11 +78,11 @@ char *func_PAL_L00_003BEE68(char *self)
     if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
         mat_build_rotation_toward_vector(ctx, ctx, ctx + 0x20, 0, 0.075f);
     if (coll_test_point(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
-        p = D_L00_001BF218;
+        p = g_hit_l00_result;
         if (p && p != g_hero_moby && *(short *)(p + 0xAA) != 0x5CA)
             hit = (*(unsigned short *)(p + 0x34) & 0x1000) ? p : 0;
-        qcopy(self + 0x10, D_L00_001BF230);
-        func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
+        qcopy(self + 0x10, g_collision_position);
+        func_002EE178_1((char *)normal, g_collision_position + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
         vec_fast_normalize(ctx, ctx, normal);
         f = FastVecDot(ctx, normal);
@@ -91,13 +91,13 @@ char *func_PAL_L00_003BEE68(char *self)
         func_002EE178_1(ctx, (char *)projection, 0.85f);
         FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
-        func_PAL_L00_003C11A0(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
-        func_PAL_L00_003C11A0(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
+        func_PAL_L00_003C11A0(g_collision_position - 0x10, normal, 6, 0x72FF);
+        func_PAL_L00_003C11A0(g_collision_position - 0x10, normal, 6, 0xFF0000);
         PlayMobySound(1, 0, self);
     }
     light_index = *(int *)(ctx + 0x5C);
     if (light_index != -1) {
-        light = D_L00_001C6F40 + light_index;
+        light = g_light_table + light_index;
         qcopy(light->position, self + 0x10);
         light->position[3] = 4.0f;
         light->x = 0.25f;
@@ -157,7 +157,7 @@ typedef struct Rac2Native_003BC998_Slot {
     unsigned char tail_A4[0xC];
 } Rac2Native_003BC998_Slot;
 
-extern Rac2Native_003BC998_Slot D_L00_0023F060[];
+extern Rac2Native_003BC998_Slot g_orbit_spark_records[];
 
 /* Claims the first free record of the sixteen 0xB0-byte records at D_L00_0023F060, keeps the
    owner's pointer in it and fills the drawn values. The base and the output pointer are kept

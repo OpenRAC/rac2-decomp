@@ -12,7 +12,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern u16 *g_entity_group_lists[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 extern void euler_rotation_basis(float *, float *);
 extern void matrix_from_basis_rows(float *, float *);
@@ -43,7 +43,7 @@ int swing_platform_is_leading(char *actor) {
     matrix_mul_vec3(offset, offset, inverse);
     limit = math_fabs(offset[1]);
     for (listEntry = g_entity_group_lists[*(u8 *)(actor + 0x21)];
-         *(u8 *)(actor + 0x21) != 0xFF && *(u8 *)(actor + 0x21) <= D_L02_001B35B8 && listEntry != 0 &&
+         *(u8 *)(actor + 0x21) != 0xFF && *(u8 *)(actor + 0x21) <= g_group_max_index && listEntry != 0 &&
          ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == g_entity_group_lists[*(u8 *)(actor + 0x21)]);
          listEntry++) {
         entity = D_L02_001B359C_1[0] + ((*listEntry & 0x7FFF) << 8);

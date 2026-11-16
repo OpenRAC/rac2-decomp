@@ -15,10 +15,10 @@ typedef int Quad __attribute__((mode(TI)));
 #define HALF(p,o) (*(short *)((char *)(p)+(o)))
 #define UHALF(p,o) (*(u16 *)((char *)(p)+(o)))
 typedef struct { u8 pad0[0xAA]; s16 oclass; u8 padAC[0xF8 - 0xAC]; float rotz; u8 padFC[0x100 - 0xFC]; } Moby;
-extern int D_L04_001C9C00[];
+extern int g_barlow_state_flags[];
 extern int g_current_map_index __attribute__((sda));
 extern char *g_moby_l04_pool[] __attribute__((sda));
-extern float D_L04_001B1874 __attribute__((sda)), D_L04_001B1878 __attribute__((sda));
+extern float g_hound_chase_range __attribute__((sda)), g_hound_move_speed __attribute__((sda));
 extern void func_PAL_L04_00452A80(char *);
 extern void moby_set_state(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);
@@ -30,10 +30,10 @@ extern int math_random_int_range(int,int);
 extern float math_random_float_range(float,float);
 extern int FloatToInt(float);
 extern unsigned int moby_dispatch_action_by_kind(void *,void *);
-extern void func_PAL_002A7650(void *,int,int);
+extern void SetDeathBits_pal(void *,int,int);
 extern void part_queue_moby_for_glow(void *,int,int);
 extern float ApproachValue(float *,float,float);
-extern void func_PAL_002AF420(void *,void *,float,float);
+extern void moby_wander_around_home_point_pal(void *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern float FastAddRotations(float,float);
 extern float MobySpringTurn(void *,float,float *,float,float,float);
@@ -56,7 +56,7 @@ void func_PAL_L04_00451F20(u8 *object)
     unsigned int flags;
     int kind, choice, state;
     float delay;
-    if (D_L04_001C9C00[0]) return;
+    if (g_barlow_state_flags[0]) return;
     vars=*(char **)(object+0x68);
     func_PAL_L04_00452A80(object);
     kind=(u8)object[0x95];
@@ -123,7 +123,7 @@ void func_PAL_L04_00451F20(u8 *object)
     case 3:
         if(object[0x20]!=7) {
         flags=moby_dispatch_action_by_kind(object,vars+0x60);
-        if(flags&1) { HALF(vars,0x98)=0; func_PAL_002A7650(object,0,3); part_queue_moby_for_glow(object,0,0); return; }
+        if(flags&1) { HALF(vars,0x98)=0; SetDeathBits_pal(object,0,3); part_queue_moby_for_glow(object,0,0); return; }
         if(flags&2) {
             if(INT(vars,0x254)==1) {
                 moby_set_state(object,4,2);
@@ -141,11 +141,11 @@ void func_PAL_L04_00451F20(u8 *object)
 heightCheck:
     if(FLOAT(object,0x18)-FLOAT(vars,0x2e8)>10.0f || FLOAT(object,0x18)<10.0f) {
         HALF(vars,0x98)=0; qzero(object+0xf0);
-        func_PAL_002A7650(object,0,3); moby_mark_spawned(object); return;
+        SetDeathBits_pal(object,0,3); moby_mark_spawned(object); return;
     }
     if(FLOAT(object,0x18)<75.0f && g_current_map_index==11) {
         HALF(vars,0x98)=0; qzero(object+0xf0);
-        func_PAL_002A7650(object,0,3); moby_mark_spawned(object); return;
+        SetDeathBits_pal(object,0,3); moby_mark_spawned(object); return;
     }
     state=(u8)object[0x20];
     switch(state) {
@@ -153,7 +153,7 @@ heightCheck:
         FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) func_PAL_002A7E68(object,7,0,12);
         if (HALF(vars,0x300)>=18)
-            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.020000001f,0.0028000001f);
+            ApproachValue((float *)(vars+0x124),g_hound_move_speed*0.020000001f,0.0028000001f);
         else
             ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(object[0x43]==7) {
@@ -164,7 +164,7 @@ heightCheck:
                     func_PAL_002A7E68(object,choice,0,10);
                 }
             }
-            func_PAL_002AF420(object,vars+0x110,0.35f,0.25f);
+            moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if(((u8)object[0x43]<=2) && (object[0x60]&2)) {
             HALF(vars,0x300)=math_random_int_range(100,417);
             if(object[0x43]!=7) func_PAL_002A7E68(object,7,0,10);
@@ -174,7 +174,7 @@ heightCheck:
         FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) func_PAL_002A7E68(object,7,0,12);
         if (HALF(vars,0x300)>=18)
-            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.020000001f,0.0028000001f);
+            ApproachValue((float *)(vars+0x124),g_hound_move_speed*0.020000001f,0.0028000001f);
         else
             ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(object[0x43]==7) {
@@ -185,7 +185,7 @@ heightCheck:
                     func_PAL_002A7E68(object,choice,0,10);
                 }
             }
-            func_PAL_002AF420(object,vars+0x110,0.35f,0.25f);
+            moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if(((u8)(object[0x43]-5)<2) && (object[0x60]&2)) {
             HALF(vars,0x300)=math_random_int_range(100,417);
             if(object[0x43]!=7) func_PAL_002A7E68(object,7,0,10);
@@ -194,7 +194,7 @@ heightCheck:
         break;
     case 4:
         FLOAT(object,0x48)=1.0f;
-        if(vec_distance_xy(object+0x10,vars+0x240)<=D_L04_001B1874) {
+        if(vec_distance_xy(object+0x10,vars+0x240)<=g_hound_chase_range) {
             moby_set_state(object,5,2);
             if(object[0x43]!=8) func_PAL_002A7E68(object,8,2,5);
             FLOAT(vars,0x314)=0.0f;
@@ -214,7 +214,7 @@ heightCheck:
             break;
         }
         if(object[0x42]!=8) break;
-        if((object[0x60]&2) && vec_distance_xy(object+0x10,vars+0x240)>D_L04_001B1874) {
+        if((object[0x60]&2) && vec_distance_xy(object+0x10,vars+0x240)>g_hound_chase_range) {
             moby_set_state(object,4,2);
             if(object[0x43]!=7) func_PAL_002A7E68(object,7,0,5);
         }
@@ -237,7 +237,7 @@ heightCheck:
         break;
     case 8:
         if(func_PAL_L04_00453220(object)) {
-            func_PAL_002A7650(object,0,3); moby_mark_spawned(object); return;
+            SetDeathBits_pal(object,0,3); moby_mark_spawned(object); return;
         }
         break;
     }

@@ -92,7 +92,7 @@ typedef union Quad {
 /* Advances the thirteen chain points one Verlet step: each moves by its damped displacement
    from its old position plus a small downward pull, and the old position takes the point's
    previous value. The damping blends 0.97 to 0.98 with the count at 0x378. */
-void func_PAL_L11_0043D438(void *object)
+void IntegrateVerletChain_pal(void *object)
 {
     struct RotorObject *obj = object;
     struct RotorState *state = obj->state;

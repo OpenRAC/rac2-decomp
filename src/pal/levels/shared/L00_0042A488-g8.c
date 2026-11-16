@@ -22,12 +22,12 @@ typedef struct {
     float throttle;
 } L00_00424F98_Input;
 
-extern float D_00138280[];
-extern float D_00138284[];
-extern s32 D_001A7BA8 MACRO_ADDR;
-extern s32 D_001A7BA4 MACRO_ADDR;
+extern float g_stick_axis_x[];
+extern float g_stick_axis_y[];
+extern s32 g_ship_steer_option MACRO_ADDR;
+extern s32 g_invert_aim_option MACRO_ADDR;
 extern s32 g_current_map_index MACRO_ADDR;
-extern unsigned int D_001A7390 MACRO_ADDR;
+extern unsigned int g_frame_counter MACRO_ADDR;
 extern L00_00424F98_Counter g_progress_statistics;
 extern s32 ref_L00_00424F98_00 __attribute__((sda));
 extern s32 ref_L00_00424F98_01 __attribute__((sda));
@@ -46,8 +46,8 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
     if (t->flags & 1) {
         *x = 0.0f;
     } else {
-        *x = D_00138280[0];
-        if (D_001A7BA8 == 0)
+        *x = g_stick_axis_x[0];
+        if (g_ship_steer_option == 0)
             *x = -*x;
     }
     if (*x == 0.0f) {
@@ -64,8 +64,8 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
             if (ref_L00_00424F98_01 == 0 && ref_L00_00424F98_00 > 0x32) {
                 if ((unsigned short)n < 0xFFFF)
                     c->count = n + 1;
-                if (((s32)(D_001A7390) * 5 + 2) / 6 > c->best)
-                    c->best = ((s32)(D_001A7390) * 5 + 2) / 6;
+                if (((s32)(g_frame_counter) * 5 + 2) / 6 > c->best)
+                    c->best = ((s32)(g_frame_counter) * 5 + 2) / 6;
                 ref_L00_00424F98_01 = 1;
                 c->flags = (c->flags | (1u << g_current_map_index)) | 0x80000000u;
             }
@@ -74,9 +74,9 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
     if (t->flags & 2) {
         *y = 0.0f;
     } else {
-        v = D_00138284[0];
+        v = g_stick_axis_y[0];
         *y = -v;
-        if (D_001A7BA4 == 0)
+        if (g_invert_aim_option == 0)
             *y = v;
         if (*y != 0.0f)
             return;

@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 position,angles,delta,step; } RotatingMoverWorkspace;
-extern char *D_L16_001B2B1C MACRO_ADDR;
+extern char *g_moby_instance_table MACRO_ADDR;
 extern char g_sound_state[];
 extern float fast_subtract_rotations(float,float);
 extern float FastAddRotations(float,float);
@@ -13,7 +13,7 @@ extern int PlayMobySound(int,int,char *);
 extern void FastVecSub(void *,void *,void *);
 extern void mat_combine_and_store(void *,void *,void *,void *);
 
-void func_PAL_L16_0041D858(char *object)
+void rotating_platform_update_pal(char *object)
 {
     RotatingMoverWorkspace local;
     char *state=*(char **)(object+0x68);
@@ -30,7 +30,7 @@ void func_PAL_L16_0041D858(char *object)
             *(unsigned short *)(object+0x34)=(*(unsigned short *)(object+0x34)|0x41)&0xefff;
         }
     }
-    if(*(unsigned char *)(object+0x20)==1 && *(unsigned char *)(D_L16_001B2B1C+(*(int *)(state+0x6C)<<8)+0x20)==2) object[0x20]=2;
+    if(*(unsigned char *)(object+0x20)==1 && *(unsigned char *)(g_moby_instance_table+(*(int *)(state+0x6C)<<8)+0x20)==2) object[0x20]=2;
     if(*(unsigned char *)(object+0x20)==2) {
         if(*(int *)(state+0x68)==0) {
             if(*(short *)(object+0xaa)==0x10fe) {
@@ -47,7 +47,7 @@ void func_PAL_L16_0041D858(char *object)
                 *(float *)(object+0xf8)=fast_subtract_rotations(*(float *)(object+0xf8),0.0054454277f);
                 vec_scale_to_length(&local.step,object+0xC0,0.052f);
                 FastVecAdd(object+0x10,&local.step,object+0x10);
-                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
+                FastVecAdd(g_moby_instance_table+*(int *)(state+0x6C)*0x100+0x10,&local.step,g_moby_instance_table+*(int *)(state+0x6C)*0x100+0x10);
                 sound=g_sound_state+0x70**(int *)(state+0x70);
                 if((*(char **)(sound+0x88))!=object || (*(unsigned char *)(sound+0x74))==0) *(int *)(state+0x70)=PlayMobySound(0,4,object);
             }
@@ -69,7 +69,7 @@ void func_PAL_L16_0041D858(char *object)
                 vec_scale_to_length(&local.step,object+0xC0,-1.0f);
                 vec_scale_to_length(&local.step,&local.step,0.052f);
                 FastVecAdd(object+0x10,&local.step,object+0x10);
-                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6C)*0x100+0x10);
+                FastVecAdd(g_moby_instance_table+*(int *)(state+0x6C)*0x100+0x10,&local.step,g_moby_instance_table+*(int *)(state+0x6C)*0x100+0x10);
             }
         }
     }

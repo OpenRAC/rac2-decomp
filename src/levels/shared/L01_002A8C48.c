@@ -5,7 +5,7 @@
 #include "common.h"
 
 extern char g_hero_state[];
-extern int D_L01_001A8F40 MACRO_ADDR;
+extern int g_hero_l01_control_mode MACRO_ADDR;
 extern char g_hero_position[];
 
 extern void hero_update_subsystems(void);
@@ -62,7 +62,7 @@ void game_update_frame(void) {
     hero_read_input_command_flags();
     ProbeLedgeGrab(hero + 0x80, hero + 0x90, hero + 0x550);
     hero_l01_update_state_transitions();
-    if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
+    if (g_hero_l01_control_mode == 2 || g_hero_l01_control_mode == 6) {
         if (*(unsigned char *)(hero + 0x22B5) != 0)
             func_2C8628();
         else

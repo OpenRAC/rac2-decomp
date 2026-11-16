@@ -61,22 +61,22 @@ extern float math_fast_sin_or_cos_b(float);
 
 extern OceanHero g_hero_state;
 extern OceanCamera g_camera_state;
-extern int D_L06_001C9DC0;
+extern int g_water_state_word;
 extern int g_current_map_index __attribute__((sda));
-extern float D_001A7928 __attribute__((sda));
-extern int D_L06_001A9010 __attribute__((sda));
-extern int D_L06_001A8A48 __attribute__((sda));
-extern int D_L06_001B2348 __attribute__((sda));
+extern float g_frame_delta_scale __attribute__((sda));
+extern int g_level_trigger_flag __attribute__((sda));
+extern int g_hero_l06_override_flag __attribute__((sda));
+extern int g_game_l06_frame_counter __attribute__((sda));
 extern float g_water_surface_height __attribute__((sda));
-extern float D_L06_001B3284 __attribute__((sda));
-extern OceanVector D_L06_001B9A70[];
-extern OceanVector D_L06_001B3290[3] __attribute__((sda));
-extern OceanUV D_L06_001B3270[] __attribute__((sda));
-extern OceanVector D_L06_001B3260 SDATA(D_L06_001B3260);
-extern float D_L06_001B0060[] SDATA(D_L06_001B0060);
+extern float g_water_l06_base_height __attribute__((sda));
+extern OceanVector g_water_basis_matrix[];
+extern OceanVector g_water_axes_matrix[3] __attribute__((sda));
+extern OceanUV g_water_layer_offsets[] __attribute__((sda));
+extern OceanVector g_water_prev_camera_pos SDATA(D_L06_001B3260);
+extern float g_ocean_layer_scales[] SDATA(D_L06_001B0060);
 /* Layer scroll speeds: retail reads the u column through $gp and the v column
  * (0x001B0074) through an absolute address, so the table has both views. */
-extern OceanUV D_L06_001B0070[] __attribute__((sda));
+extern OceanUV g_ocean_uv_speeds[] __attribute__((sda));
 extern OceanUV D_L06_001B0070_gp[] SDATA(D_L06_001B0070);
 
 void UpdateOceanWaterSheet(OceanMoby *moby)
@@ -86,25 +86,25 @@ void UpdateOceanWaterSheet(OceanMoby *moby)
     float range, tide;
     int i;
 
-    if (D_L06_001C9DC0 != vars->f38)
+    if (g_water_state_word != vars->f38)
         return;
     if (g_current_map_index == 13 && g_hero_state.position[2] < 88.0f && g_hero_state.action != 116)
         return;
-    if (g_current_map_index == 11 && D_L06_001A9010 != 0)
+    if (g_current_map_index == 11 && g_level_trigger_flag != 0)
         return;
-    D_L06_001B3284 = vars->level;
+    g_water_l06_base_height = vars->level;
     if (moby->state == 0) {
         moby->state = 1;
         moby->f30 = 0xFF;
-        qcopy(&D_L06_001B3290[0], &D_L06_001B9A70[0]);
-        qcopy(&D_L06_001B3290[1], &D_L06_001B9A70[1]);
-        qcopy(&D_L06_001B3290[2], &D_L06_001B9A70[2]);
+        qcopy(&g_water_axes_matrix[0], &g_water_basis_matrix[0]);
+        qcopy(&g_water_axes_matrix[1], &g_water_basis_matrix[1]);
+        qcopy(&g_water_axes_matrix[2], &g_water_basis_matrix[2]);
         for (i = 0; i < 2; i++) {
-            D_L06_001B3270[i].u = 0.0f;
-            D_L06_001B3270[i].v = 0.0f;
+            g_water_layer_offsets[i].u = 0.0f;
+            g_water_layer_offsets[i].v = 0.0f;
         }
-        qcopy(&D_L06_001B3260, &g_camera_state.pos);
-        D_L06_001B3284 = vars->level;
+        qcopy(&g_water_prev_camera_pos, &g_camera_state.pos);
+        g_water_l06_base_height = vars->level;
         return;
     }
     if (IsPointInCuboid(g_hero_state.position, vars->outerArea)) {
@@ -122,46 +122,46 @@ void UpdateOceanWaterSheet(OceanMoby *moby)
         return;
     }
     range = vars->scale;
-    if (g_hero_state.action == 28 || D_L06_001A8A48 != 0) {
+    if (g_hero_state.action == 28 || g_hero_l06_override_flag != 0) {
         if (range > 32.0f)
             range = 32.0f;
     }
     g_hero_state.waterState = 2;
-    FastVecSub(&movement, &g_camera_state.pos, &D_L06_001B3260);
-    qcopy(&D_L06_001B3260, &g_camera_state.pos);
+    FastVecSub(&movement, &g_camera_state.pos, &g_water_prev_camera_pos);
+    qcopy(&g_water_prev_camera_pos, &g_camera_state.pos);
     if (!(g_camera_state.pos.f[2] > vars->limit))
         return;
     for (i = 0; i < 2; i++) {
-        float layer = D_L06_001B0060[i] + D_L06_001B0060[i];
+        float layer = g_ocean_layer_scales[i] + g_ocean_layer_scales[i];
         FastVecScale(&scaled, &movement, layer / (range * 5.0f));
         if (scaled.f[0] > 1.0f || scaled.f[0] < 1.0f)
             scaled.f[0] -= IntToFloat(FloatToInt(scaled.f[0]));
         if (scaled.f[1] > 1.0f || scaled.f[1] < 1.0f)
             scaled.f[1] -= IntToFloat(FloatToInt(scaled.f[1]));
-        D_L06_001B3270[i].u += scaled.f[0];
-        D_L06_001B3270[i].v += scaled.f[1];
-        if (D_L06_001B3270[i].u > 1.0f)
-            D_L06_001B3270[i].u -= 1.0f;
-        if (D_L06_001B3270[i].u < -1.0f)
-            D_L06_001B3270[i].u += 1.0f;
-        if (D_L06_001B3270[i].v > 1.0f)
-            D_L06_001B3270[i].v -= 1.0f;
-        if (D_L06_001B3270[i].v < -1.0f)
-            D_L06_001B3270[i].v += 1.0f;
+        g_water_layer_offsets[i].u += scaled.f[0];
+        g_water_layer_offsets[i].v += scaled.f[1];
+        if (g_water_layer_offsets[i].u > 1.0f)
+            g_water_layer_offsets[i].u -= 1.0f;
+        if (g_water_layer_offsets[i].u < -1.0f)
+            g_water_layer_offsets[i].u += 1.0f;
+        if (g_water_layer_offsets[i].v > 1.0f)
+            g_water_layer_offsets[i].v -= 1.0f;
+        if (g_water_layer_offsets[i].v < -1.0f)
+            g_water_layer_offsets[i].v += 1.0f;
     }
-    tide = IntToFloat(D_L06_001B2348 % 360) * 0.017444445f - 3.14f;
-    g_water_surface_height = D_L06_001B3284 + math_fast_sin_or_cos_b(tide) * vars->amplitude;
+    tide = IntToFloat(g_game_l06_frame_counter % 360) * 0.017444445f - 3.14f;
+    g_water_surface_height = g_water_l06_base_height + math_fast_sin_or_cos_b(tide) * vars->amplitude;
     for (i = 0; i < 2; i++) {
-        D_L06_001B3270[i].u += D_L06_001B0070_gp[i].u * D_001A7928;
-        if (D_L06_001B3270[i].u > 1.0f)
-            D_L06_001B3270[i].u -= 1.0f;
-        if (D_L06_001B3270[i].u < -1.0f)
-            D_L06_001B3270[i].u += 1.0f;
-        D_L06_001B3270[i].v += D_L06_001B0070[i].v * D_001A7928;
-        if (D_L06_001B3270[i].v > 1.0f)
-            D_L06_001B3270[i].v -= 1.0f;
-        if (D_L06_001B3270[i].v < -1.0f)
-            D_L06_001B3270[i].v += 1.0f;
+        g_water_layer_offsets[i].u += D_L06_001B0070_gp[i].u * g_frame_delta_scale;
+        if (g_water_layer_offsets[i].u > 1.0f)
+            g_water_layer_offsets[i].u -= 1.0f;
+        if (g_water_layer_offsets[i].u < -1.0f)
+            g_water_layer_offsets[i].u += 1.0f;
+        g_water_layer_offsets[i].v += g_ocean_uv_speeds[i].v * g_frame_delta_scale;
+        if (g_water_layer_offsets[i].v > 1.0f)
+            g_water_layer_offsets[i].v -= 1.0f;
+        if (g_water_layer_offsets[i].v < -1.0f)
+            g_water_layer_offsets[i].v += 1.0f;
     }
     if (vars->drawMode < 0)
         gfx_add_draw_callback_second(DrawOceanWaterSheet, moby);

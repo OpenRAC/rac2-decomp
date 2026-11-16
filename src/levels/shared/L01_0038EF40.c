@@ -15,7 +15,7 @@ extern float FastVecLength(void *);
 extern void FastVecCross(void *, void *, void *);
 extern float math_fast_float_g(float);
 extern void draw_world_quad(void *, int, int);
-extern char D_L01_001B94C0[];
+extern char g_level_origin_vec[];
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecSub(void *, void *, void *);
@@ -81,7 +81,7 @@ void DrawWavyLinkStrip(char *moby)
         FastVecAdd(current, current, direction);
         qcopy(strip.pos[1], current);
         qcopy(strip.pos[3], current);
-        FastVecSub(view, D_L01_001B94C0, current);
+        FastVecSub(view, g_level_origin_vec, current);
         FastVecCross(width, view, direction);
         vec_scale_to_length(width, width, 0.05f);
         FastVecAdd(strip.pos[1], strip.pos[1], width);

@@ -13,7 +13,7 @@ struct Vecs {
 
 extern char g_hero_state[];
 
-extern float D_L23_001B370C __attribute__((sda));
+extern float g_mothership_hit_speed __attribute__((sda));
 
 extern void FastVecScale(char *, char *, float);
 
@@ -55,7 +55,7 @@ void hero_launch_hit_effect(char *moby, float strength, int unused1, int mirror)
     moby_transform_joint_point(*(char **)(vars + 0x2A0), mirror, (char *)&v.b);
     transform_vector((char *)&v.c, (char *)&v.c, (char *)&v.b);
     FastVecSub((char *)&v.d, (char *)&v.a, (char *)&v.c);
-    vec_scale_to_length((char *)&v.d, (char *)&v.d, D_L23_001B370C * 0.016666668f);
+    vec_scale_to_length((char *)&v.d, (char *)&v.d, g_mothership_hit_speed * 0.016666668f);
     fast_shot_create_child(moby, (char *)&v.d, (char *)&v.c, 0, strength);
     snd_play_from_class_bank(3, 0, moby, 0x7E5);
 }

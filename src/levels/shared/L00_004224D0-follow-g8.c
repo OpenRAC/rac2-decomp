@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern char D_L00_001B8E20[] NOT_SDA;
-extern char D_00189F00[];
-extern int D_0018A160 NOT_SDA;
-extern float D_L00_001B14C4 __attribute__((sda));
+extern char g_camera_move_state[] NOT_SDA;
+extern char g_hero_target_point[];
+extern int g_controller_active NOT_SDA;
+extern float g_cam_vehicle_turn_divisor __attribute__((sda));
 
 extern int FastDecTimer(void *timer);
 extern void FastVecSub(void *out, void *a, void *b);
@@ -34,12 +34,12 @@ void follow_camera_build_view(char *cam)
     float g, r0, g2, d, r, e, t, x, h, g3, l;
     float v0[4], v1[4], v2[4], v3[4], v4[4];
 
-    view = D_L00_001B8E20;
+    view = g_camera_move_state;
     target = *(char **)(cam + 0x70);
     settings = target + 0x60;
     state = target + 0x20;
     if (*(unsigned char *)(settings + 0xC4) == 0xB) {
-        FastVecSub(cam, D_00189F00, cam + 0x30);
+        FastVecSub(cam, g_hero_target_point, cam + 0x30);
         right = cam + 0x10;
         vec_scale_to_length(cam, cam, 1.0f);
         up = cam + 0x20;
@@ -92,8 +92,8 @@ void follow_camera_build_view(char *cam)
             }
             g3 = FastVecDot(motion, view + 0x20);
             l = FastVecLength(motion);
-            if (D_0018A160) {
-                x = mat_fast_helper_a(l, g3) / D_L00_001B14C4;
+            if (g_controller_active) {
+                x = mat_fast_helper_a(l, g3) / g_cam_vehicle_turn_divisor;
                 if (x < -0.1f) {
                     x = -x;
                     if (0.5f < x) {

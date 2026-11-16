@@ -11,14 +11,14 @@ extern float FastAddRotations(float, float);
 extern float vec_length_xy(void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern u8 *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
-extern float D_L16_001B1500 __attribute__((sda));
-extern s32 D_L16_001B1460 __attribute__((sda));
-extern s32 D_L16_001B1464 __attribute__((sda));
-extern u8 D_L16_001A8F20[] __attribute__((sda));
+extern float g_snivelak_shot_scale __attribute__((sda));
+extern s32 g_snivelak_glow_texture_a __attribute__((sda));
+extern s32 g_snivelak_glow_texture_b __attribute__((sda));
+extern u8 g_particle_template[] __attribute__((sda));
 
 /* Spawns the 0xEBD object at the position with the velocity, aims it along the velocity,
    hands it to its owner and starts two particle bursts on it. */
-u8 *func_PAL_L16_0040A008(float speed, u8 *owner, float *velocity, TI128 *position)
+u8 *snivelak_spawn_aimed_shot_pal(float speed, u8 *owner, float *velocity, TI128 *position)
 {
     u8 *obj;
     u8 *state;
@@ -51,12 +51,12 @@ u8 *func_PAL_L16_0040A008(float speed, u8 *owner, float *velocity, TI128 *positi
         math_apply_axis_rotation_to_quat(rotation, rotation, axis, angle);
         euler_rotation_basis(rotation, obj + 0xF0);
         obj[0x23] = 128;
-        *(float *)(obj + 0x2C) = D_L16_001B1500;
+        *(float *)(obj + 0x2C) = g_snivelak_shot_scale;
         *(u16 *)(obj + 0x34) |= 0x100;
         *(s32 *)(state + 0x24) = 0;
         scale = math_random_float_range(8.0f, 10.0f);
-        part_spawn_ground_effect(pos, 12, D_L16_001B1460, 0, 10, D_L16_001A8F20, scale * 0.3f, scale, 0.0f, 0);
-        part_spawn_ground_effect(pos, 12, D_L16_001B1464, 1, -10, D_L16_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(pos, 12, g_snivelak_glow_texture_a, 0, 10, g_particle_template, scale * 0.3f, scale, 0.0f, 0);
+        part_spawn_ground_effect(pos, 12, g_snivelak_glow_texture_b, 1, -10, g_particle_template, scale * 0.04f, scale * 0.4f, 0.0f, 0);
     }
     return obj;
 }

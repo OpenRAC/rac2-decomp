@@ -17,7 +17,7 @@ extern float math_random_float_range(float, float);
 #define B(p, o) (*(unsigned char *)((p) + (o)))
 #define P(p, o) (*(char **)((p) + (o)))
 
-void func_PAL_L09_003FDB18(char *object)
+void trooper_torso_update_attachment_pal(char *object)
 {
     char *data=P(object,0x68);
 

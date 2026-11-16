@@ -4,10 +4,10 @@
 extern char g_sound_state[];
 typedef struct { char pad[0x33c]; char *object; int active; } Player10608;
 extern Player10608 g_hero_state;
-extern char D_L09_001B17F8[];
-extern char *D_L09_001B294C;
-extern int D_L09_001BFE58 NOT_SDA;
-extern float D_L09_001B17F4 __attribute__((sda));
+extern char g_str_object_debug_state[];
+extern char *g_dobbo_point_table;
+extern int g_collision_hit_object NOT_SDA;
+extern float g_hit_test_radius __attribute__((sda));
 extern void STUB_printf(void *, int, int);
 extern void moby_set_state(void *, int, int);
 extern int flag_set_first_pending(void *);
@@ -18,8 +18,8 @@ extern void vec_scale_to_length(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
 extern float fast_vec_dist(const void *, const void *);
 extern int coll_test_point(void *, int, void *, float);
-extern void func_PAL_L09_00415DA0(void *);
-extern void func_PAL_L09_00415E28(void *);
+extern void parts_turn_to_target_angles_pal(void *);
+extern void part_spawn_below_object_pal(void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 #define WORD(p,o) (*(int *)((char *)(p)+(o)))
 #define FLOAT(p,o) (*(float *)((char *)(p)+(o)))
@@ -31,7 +31,7 @@ typedef struct { char pad[0x74]; u8 active; char gap[0x13]; char *owner; } Sound
 #define SOUND_SLOT(i) ((SoundSlot *)SLOT(i))
 
 /* Moves to the selected waypoint while ridden, then returns to its starting position. */
-void func_PAL_L09_00415868(char *object)
+void UpdateReturningWaypointMover_pal(char *object)
 {
     float old_position[4] __attribute__((aligned(16)));
     float old_rotation[4] __attribute__((aligned(16)));
@@ -46,7 +46,7 @@ void func_PAL_L09_00415868(char *object)
         FLOAT(state,0x64) *= 0.020000001f;
         FLOAT(object,0x2c) *= 1.75f;
         if (WORD(state,0x60) == -1)
-            STUB_printf(D_L09_001B17F8, HALF(object,0xaa), HALF(object,0xb2));
+            STUB_printf(g_str_object_debug_state, HALF(object,0xaa), HALF(object,0xb2));
         WORD(state,0x6c) = -1;
         moby_set_state(object,1,-1);
         break;
@@ -77,10 +77,10 @@ void func_PAL_L09_00415868(char *object)
         slot = SLOT(WORD(state,0x6c));
         if (*(char **)(slot+0x88) != object || !BYTE(slot,0x74))
             WORD(state,0x6c) = PlayMobySound(0,4,object);
-        FastVecSub(delta,D_L09_001B294C+WORD(state,0x60)*0x80+0x30,object+0x10);
+        FastVecSub(delta,g_dobbo_point_table+WORD(state,0x60)*0x80+0x30,object+0x10);
         vec_scale_to_length(delta,delta,FLOAT(state,0x64));
         FastVecAdd(object+0x10,object+0x10,delta);
-        if (fast_vec_dist(object+0x10,D_L09_001B294C+WORD(state,0x60)*0x80+0x30)<=0.88f)
+        if (fast_vec_dist(object+0x10,g_dobbo_point_table+WORD(state,0x60)*0x80+0x30)<=0.88f)
             moby_set_state(object,3,-1);
         break;
     case 3:
@@ -106,7 +106,7 @@ void func_PAL_L09_00415868(char *object)
             }
             WORD(state,0x6c) = -1;
         }
-        if (coll_test_point(object+0x10,0x10,object,D_L09_001B17F4) && D_L09_001BFE58)
+        if (coll_test_point(object+0x10,0x10,object,g_hit_test_radius) && g_collision_hit_object)
             break;
         if (SOUND_SLOT(WORD(state,0x6c))->owner != object || !SOUND_SLOT(WORD(state,0x6c))->active)
             WORD(state,0x6c) = PlayMobySound(0,4,object);
@@ -118,8 +118,8 @@ void func_PAL_L09_00415868(char *object)
         break;
     }
     }
-    func_PAL_L09_00415DA0(object);
-    func_PAL_L09_00415E28(object);
+    parts_turn_to_target_angles_pal(object);
+    part_spawn_below_object_pal(object);
     FastVecSub(delta,object+0x10,old_position);
     mat_combine_and_store(state+0x20,delta,old_rotation,object+0xf0);
 }

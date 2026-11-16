@@ -4,8 +4,8 @@
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern int math_random_int_below(int);
-extern int D_0018C2EC;
-extern int D_001A7A00 MACRO_ADDR;
+extern int g_request_enabled_flag;
+extern int g_player_stats MACRO_ADDR;
 extern float math_random_float_range(float, float);
 
 void func_PAL_L02_003D8B70(char *self, int previous) {
@@ -16,7 +16,7 @@ void func_PAL_L02_003D8B70(char *self, int previous) {
     float choice;
     if (mode == 1) {
         fraction = ((float)*(short *)(state + 0x24) - *(float *)(state + 0x20)) / (float)*(short *)(state + 0x24);
-        elapsed = (float)((D_001A7A00 - D_0018C2EC) / D_001A7A00);
+        elapsed = (float)((g_player_stats - g_request_enabled_flag) / g_player_stats);
         choice = elapsed - fraction + math_random_float_range(-0.2f, 0.2f);
         {
             if (previous != mode && (choice < 0.0f || previous == -1)) {

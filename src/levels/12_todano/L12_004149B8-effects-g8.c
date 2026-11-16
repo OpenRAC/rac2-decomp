@@ -1,5 +1,5 @@
 #include "common.h"
-extern s32 D_L12_001B1828 __attribute__((sda));
+extern s32 g_guard_attack_sequence_value __attribute__((sda));
 
 typedef struct { char pad[0x2F0]; u8 *slots[2]; } SlotVars;
 extern s32 path_is_entry_reachable(void *, s32);
@@ -40,7 +40,7 @@ void guard_update_attack_sequence(u8 *moby)
             if (!vars[0x303] || grab_done) {
                 guard_switch_animation(moby,12,0,math_random_int_range(7,12));
                 moby_set_state(moby,8,5);
-                *(u16 *)(vars+0x2E4)=D_L12_001B1828;
+                *(u16 *)(vars+0x2E4)=g_guard_attack_sequence_value;
             }
             break;
         }

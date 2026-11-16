@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_L01_002F1588 (levels 01, 03, 07, 16, 20): the HUD overlay with its icon. The icon block's
    two label ys go through label_y; the other coordinates keep the dead-test rounding helpers. */
 #include "common.h"
 typedef struct { int first, second; } OverlayColorPair;
-extern unsigned char *D_L01_001A908C __attribute__((sda));
-extern unsigned char D_L01_0027EAC8[];
-extern int D_L01_001A90D0[] SDATA(D_L01_001A90D0);
-extern int D_L01_001A90CC[] SDATA(D_L01_001A90CC);
-extern float D_L01_001A90C4[] SDATA(D_L01_001A90C4);
-extern float D_L01_001B2DC4[] __attribute__((sda));
-extern unsigned char D_L01_001BD9C0[];
+extern unsigned char *g_hud_node_table __attribute__((sda));
+extern unsigned char g_hint_scene[];
+extern int g_hud_overlay_result_code[] SDATA(D_L01_001A90D0);
+extern int g_hud_overlay_icon_id[] SDATA(D_L01_001A90CC);
+extern float g_hud_overlay_fade[] SDATA(D_L01_001A90C4);
+extern float g_hud_label_offsets[] __attribute__((sda));
+extern unsigned char g_render_scales[];
 extern void UpdateViewContext(void);
 extern void *table_find_by_id(void *, int);
 extern void gfx_draw_scaled_object_two_axes(void *, int, float, float, float, float, float);
@@ -19,7 +20,7 @@ extern void gfx_draw_screen_rectangle(int, int, int, int, int, const void *);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite(int, int, int, int, int, int);
 
-extern int D_L01_001B2DC0[] __attribute__((sda));
+extern int g_hud_mode_table[] __attribute__((sda));
 
 /* dead-test helper allowed by owner ruling (master precedent: src/game/002D2188-g8.c) */
 
@@ -28,7 +29,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     float scaled = scale * value + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_L01_001B2DC0[0] == active)
+    if (result != 0 && g_hud_mode_table[0] == active)
         scaled = 1.0f;
     return result;
 }
@@ -45,7 +46,7 @@ static __inline__ int hud_round(float value, float scale, float half, int active
 
 static __inline__ unsigned char *hud_camera(void)
 {
-    return D_L01_001BD9C0;
+    return g_render_scales;
 }
 
 /* label_y, the HUD label idiom (the shared definition in src/levels/15_gorn/L15_00431590-g8.c). Its
@@ -53,7 +54,7 @@ static __inline__ unsigned char *hud_camera(void)
    allocation and both scheduling passes, which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L01_001B2DC0[0];
+    int mode = g_hud_mode_table[0];
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -76,8 +77,8 @@ int hud_draw_overlay(void)
     int top, bottom;
     unsigned char *node;
     int bar_right, labelY, one, node_offset;
-    if (!D_L01_001A908C || *(int *)D_L01_0027EAC8 || *(int *)(D_L01_0027EAC8 + 0x24) != -1)
-        return D_L01_001A90D0[0];
+    if (!g_hud_node_table || *(int *)g_hint_scene || *(int *)(g_hint_scene + 0x24) != -1)
+        return g_hud_overlay_result_code[0];
     oldProjection = *(float *)(hud_camera() + 0xB0);
     *(float *)(hud_camera() + 0xB0) = 0.6200000047683716f;
     span = 375.0f;
@@ -85,33 +86,33 @@ int hud_draw_overlay(void)
     rounding = 0.5f;
     one = 1;
     node_offset = 0x8710;
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 142);
-    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    node = (unsigned char *)table_find_by_id(g_hud_node_table + node_offset, 142);
+    labelY = hud_coord(span, g_hud_label_offsets[0], rounding, one);
     height = 1.0f;
     unit = height;
     height = 0.0f;
     zero = height;
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x60442D00, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 143);
-    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    node = (unsigned char *)table_find_by_id(g_hud_node_table + node_offset, 143);
+    labelY = hud_coord(span, g_hud_label_offsets[0], rounding, one);
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x60241700, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 144);
-    labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
+    node = (unsigned char *)table_find_by_id(g_hud_node_table + node_offset, 144);
+    labelY = hud_coord(span, g_hud_label_offsets[0], rounding, one);
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
-    source.second = FastTweenColor(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
+    source.second = FastTweenColor(0x800050C0, 0x80C04000, g_hud_overlay_fade[0]);
     colors = source;
-    bar_right = FloatToInt(190.0f + IntToFloat(198) * D_L01_001A90C4[0]);
-    height = D_L01_001B2DC4[0];
+    bar_right = FloatToInt(190.0f + IntToFloat(198) * g_hud_overlay_fade[0]);
+    height = g_hud_label_offsets[0];
     top = hud_round(374.0f, height, rounding, one);
     bottom = hud_round(388.0f, height, rounding, one);
     gfx_draw_screen_rectangle(190, top, bar_right, bottom, 0, &colors);
-    if (D_L01_001A90CC[0]) {
-        int icon = GetIconFrame(0xEAA7, D_L01_001A90CC[0] - 1);
-        height = D_L01_001B2DC4[0];
+    if (g_hud_overlay_icon_id[0]) {
+        int icon = GetIconFrame(0xEAA7, g_hud_overlay_icon_id[0] - 1);
+        height = g_hud_label_offsets[0];
         /* This caller passes `one`, a local holding 1, as `active` (allowed by owner ruling). */
         top = label_y((void *)icon, 352.0f, height, rounding, one);
         bottom = label_y((void *)icon, 43.0f, height, rounding, one);
@@ -119,5 +120,5 @@ int hud_draw_overlay(void)
     }
     *(float *)(hud_camera() + 0xB0) = oldProjection;
     UpdateViewContext();
-    return D_L01_001A90D0[0];
+    return g_hud_overlay_result_code[0];
 }

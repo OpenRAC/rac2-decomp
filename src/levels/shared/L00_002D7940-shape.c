@@ -29,10 +29,10 @@ typedef struct {
     char pad[12];
 } CollisionPill;
 
-extern CollisionShape *D_L00_001B1F8C __attribute__((sda));
-extern CollisionShape *D_L00_001B1F94 __attribute__((sda));
-extern CollisionShape *D_L00_001B1F9C __attribute__((sda));
-extern CollisionPill *D_L00_001B1F84 __attribute__((sda));
+extern CollisionShape *g_aranos_launch_poses __attribute__((sda));
+extern CollisionShape *g_collision_sphere_table __attribute__((sda));
+extern CollisionShape *g_collision_cylinder_table __attribute__((sda));
+extern CollisionPill *g_collision_pill_table __attribute__((sda));
 
 extern void FastVecAdd(float *, float *, float *);
 extern void FastVecSub(float *, float *, float *);
@@ -53,7 +53,7 @@ int IsPointInCollisionPrimitive(Quad *position, CollisionPrimitive *primitive, f
     origin.q = *position;
     switch (primitive->type) {
     case 3: {
-        CollisionShape *cuboid = D_L00_001B1F8C + primitive->index;
+        CollisionShape *cuboid = g_aranos_launch_poses + primitive->index;
 
         FastVecSub(local.f, point, cuboid->position);
         local.f[3] = 0.0f;
@@ -63,7 +63,7 @@ int IsPointInCollisionPrimitive(Quad *position, CollisionPrimitive *primitive, f
             && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f;
     }
     case 6: {
-        CollisionShape *cylinder = D_L00_001B1F9C + primitive->index;
+        CollisionShape *cylinder = g_collision_cylinder_table + primitive->index;
         int inside = 0;
 
         FastVecSub(local.f, point, cylinder->position);
@@ -74,13 +74,13 @@ int IsPointInCollisionPrimitive(Quad *position, CollisionPrimitive *primitive, f
         return inside;
     }
     case 5: {
-        CollisionShape *sphere = D_L00_001B1F94 + primitive->index;
+        CollisionShape *sphere = g_collision_sphere_table + primitive->index;
         float limit = FastVecLength(sphere->matrix) + radius;
 
         return fast_vec_dist(point, sphere->position) < limit;
     }
     case 7: {
-        CollisionPill *pill = D_L00_001B1F84 + primitive->index;
+        CollisionPill *pill = g_collision_pill_table + primitive->index;
 
         FastVecSub(local.f, point, pill->position);
         local.f[3] = 0.0f;

@@ -24,8 +24,8 @@
  */
 #include "common.h"
 
-extern s32 D_001AD7EC;
-extern s8 D_001A8BD0;
+extern s32 g_turret_target_moby;
+extern s8 g_default_effect_vector;
 extern s32 g_hero_moby[];
 extern int moby_transform_point_and_rotation_by_parent(s32, s32, void *, void *, void *, void *);
 typedef int TI __attribute__((mode(TI)));
@@ -33,9 +33,9 @@ typedef int TI __attribute__((mode(TI)));
 /* Copies a 4-float vector, passing it through the current transform when one is set. */
 void vec_transform_or_copy(void *dest, void *source) {
     s8 scratch[16];
-    s32 transform = D_001AD7EC;
+    s32 transform = g_turret_target_moby;
     if (transform != 0) {
-        moby_transform_point_and_rotation_by_parent(g_hero_moby[0], transform, source, &D_001A8BD0, dest, scratch);
+        moby_transform_point_and_rotation_by_parent(g_hero_moby[0], transform, source, &g_default_effect_vector, dest, scratch);
         return;
     }
     *(TI *)dest = *(TI *)source;

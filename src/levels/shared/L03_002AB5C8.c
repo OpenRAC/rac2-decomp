@@ -76,15 +76,15 @@ typedef struct {
     float field_24B8;
 } HopPlayer;
 #define HOP_PLAYER (*(HopPlayer *)D_L03_00189E20)
-extern int D_L03_001A8FF0[] __attribute__((sda));
-extern float D_L03_001A7DC0[] __attribute__((sda));
+extern int g_hero_l03_block_flag[] __attribute__((sda));
+extern float g_hero_camera_speed_params[] __attribute__((sda));
 typedef struct {
     unsigned char pad_0[0x158];
     float angle;
     unsigned char pad_15C[0x214];
     HopVector basis;
 } HopSavedState;
-extern unsigned char D_L03_001B9840[];
+extern unsigned char g_hero_l03_state_alias[];
 #define HOP_SAVED (*(HopSavedState *)D_L03_001B9840)
 extern void hero_build_move_impulse(float, float);
 extern void hero_approach_speed(float, float);
@@ -133,7 +133,7 @@ typedef struct {
 } Particle;
 
 /* Particle emitter inputs; the two register banks retain their EE argument order. */
-extern float D_L03_001A8F20[] __attribute__((sda));
+extern float g_effect_descriptor_default[] __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_below(int);
 extern void moby_transform_joint_point(void *, int, void *);
@@ -148,7 +148,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern int func_2B3760(int);
 
-extern unsigned char D_L03_00189E20[];
+extern unsigned char g_hero_l03_state_block[];
 
 extern int r1_D_L02_0015F04C MACRO_ADDR;
 
@@ -158,7 +158,7 @@ extern int func_2EEC20(void *);
 
 extern void func_331270(void *);
 
-extern TI128 D_001A8F20;
+extern TI128 g_default_quad;
 
 extern void func_2EEFB0(void *, void *, void *);
 
@@ -166,7 +166,7 @@ extern void func_2EF020(void *, float);
 
 extern void func_2ECA50(unsigned char *, int, int, int);
 
-extern int D_001AEF60 __attribute__((sda));
+extern int g_effect_init_flag __attribute__((sda));
 
 extern float func_2EF158(void *, void *);
 
@@ -184,7 +184,7 @@ extern float func_2EF670(float, float);
 
 /* Copies a value from the hero into the object the hero is holding, when the hero has one. */
 void hero_copy_value_to_held_object(void) {
-    unsigned char *hero = D_L03_00189E20;
+    unsigned char *hero = g_hero_l03_state_block;
 
     if (*(short *)(hero + 0x6BC) != 0 && *(int *)(hero + 0x660) == 0)
         *(float *)(*(unsigned char **)(hero + 0x2290) + 0xF4) = *(float *)(hero + 0x6B0);
@@ -197,20 +197,20 @@ extern float vec_distance_xy(void *, void *);
 
 /* Picks target values for the hero's camera settings from the hero's state, then eases the current values toward them. */
 void cam_update_hero_targets(void) {
-    switch (D_L03_00189E20[0x22B4]) {
+    switch (g_hero_l03_state_block[0x22B4]) {
     case 0:
-        *(float *)(D_L03_00189E20 + 0x258) = 0.8f;
-        *(float *)(D_L03_00189E20 + 0x25C) = 0.7f;
-        *(float *)(D_L03_00189E20 + 0x260) = 0.449999988079071f;
+        *(float *)(g_hero_l03_state_block + 0x258) = 0.8f;
+        *(float *)(g_hero_l03_state_block + 0x25C) = 0.7f;
+        *(float *)(g_hero_l03_state_block + 0x260) = 0.449999988079071f;
         break;
     case 1:
-        *(float *)(D_L03_00189E20 + 0x258) = 0.599999964237213f;
-        *(float *)(D_L03_00189E20 + 0x25C) = 0.450000017881394f;
-        *(float *)(D_L03_00189E20 + 0x260) = 0.3f;
+        *(float *)(g_hero_l03_state_block + 0x258) = 0.599999964237213f;
+        *(float *)(g_hero_l03_state_block + 0x25C) = 0.450000017881394f;
+        *(float *)(g_hero_l03_state_block + 0x260) = 0.3f;
         break;
     }
     {
-        unsigned char *hero = D_L03_00189E20;
+        unsigned char *hero = g_hero_l03_state_block;
         if (*(int *)(hero + 0x229C) == 4) {
             if (*(short *)(hero + 0x4AC) < *(int *)(hero + 0x1B8) && !hero[0x49E])
                 *(float *)(hero + 0x25C) = *(float *)(hero + 0x4B8);
@@ -222,13 +222,13 @@ void cam_update_hero_targets(void) {
             *(float *)(hero + 0x260) = 0.8f;
         }
     }
-    if (!D_L03_00189E20[0x287] || *(int *)(D_L03_00189E20 + 0x22A4) == 0x12 ||
-        *(int *)(D_L03_00189E20 + 0x22B0) == 0x12 ||
-        (!D_L03_00189E20[0x22B4] && *(float *)(D_L03_00189E20 + 0x254) < 0.53f) ||
-        *(int *)(D_L03_00189E20 + 0x229C) == 0x11 || D_L03_00189E20[0x1494] ||
-        vec_distance_xy(D_L03_00189E20 + 0x240, D_L03_00189E20 + 0x80) > *(float *)(D_L03_00189E20 + 0x264) * 0.5f) {
-        float *values = (float *)(D_L03_00189E20 + 0x250);
-        unsigned char *hero = D_L03_00189E20;
+    if (!g_hero_l03_state_block[0x287] || *(int *)(g_hero_l03_state_block + 0x22A4) == 0x12 ||
+        *(int *)(g_hero_l03_state_block + 0x22B0) == 0x12 ||
+        (!g_hero_l03_state_block[0x22B4] && *(float *)(g_hero_l03_state_block + 0x254) < 0.53f) ||
+        *(int *)(g_hero_l03_state_block + 0x229C) == 0x11 || g_hero_l03_state_block[0x1494] ||
+        vec_distance_xy(g_hero_l03_state_block + 0x240, g_hero_l03_state_block + 0x80) > *(float *)(g_hero_l03_state_block + 0x264) * 0.5f) {
+        float *values = (float *)(g_hero_l03_state_block + 0x250);
+        unsigned char *hero = g_hero_l03_state_block;
         ApproachValue(values, *(float *)(hero + 0x258), 0.02f);
         ApproachValue(values + 1, *(float *)(hero + 0x25C), 0.02f);
         math_spring_float_to_goal(values + 5, values + 6, *(float *)(hero + 0x260), 0.02f, 0.3f, 0.06666667f);
@@ -352,7 +352,7 @@ void HeroUpdateHopVelocity(void) {
         return;
     }
 
-    if (HOP_PLAYER.state == 0x81 && !D_L03_001A8FF0[0]) {
+    if (HOP_PLAYER.state == 0x81 && !g_hero_l03_block_flag[0]) {
         hero_steer_heading(0.04f, 0.2f, HOP_PLAYER.field_494, 0);
         HOP_PLAYER.field_1B4 = 0.0f;
         return;
@@ -387,7 +387,7 @@ void HeroUpdateHopVelocity(void) {
     qcopy(&HOP_PLAYER.field_160, &HOP_PLAYER.field_A60);
 
     step = 0.0055555556900799274f;
-    if (HOP_PLAYER.field_1B0 < D_L03_001A7DC0[0] * 0.0033333336468786f) {
+    if (HOP_PLAYER.field_1B0 < g_hero_camera_speed_params[0] * 0.0033333336468786f) {
         if (HOP_PLAYER.field_229C == 2) {
             float brake = HOP_PLAYER.field_A84;
             float angle = cam_get_view_space_vector_length(&HOP_PLAYER.vel_x);
@@ -467,7 +467,7 @@ void EmitScaledObjectParticles(Moby *object)
             spin = math_random_int_below(16);
             if (math_random_int_below(2))
                 spin = -spin;
-            particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 0.75f, spin, D_L03_001A8F20, energy, 0x503030FF, 0);
+            particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 0.75f, spin, g_effect_descriptor_default, energy, 0x503030FF, 0);
             if (particle != 0) {
                 ParticlePayload *payload = &particle->payload;
 
@@ -501,7 +501,7 @@ void EmitScaledObjectParticles(Moby *object)
             do {
                 Particle *particle;
 
-                particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 1.0f, 16, D_L03_001A8F20, energy, 0x7FFFFFFF, 0);
+                particle = SpawnSpinningSparkParticle(point, radius, 1.0f, 1.0f, 16, g_effect_descriptor_default, energy, 0x7FFFFFFF, 0);
                 if (particle != 0) {
                     ParticlePayload *payload = &particle->payload;
 
@@ -562,7 +562,7 @@ void part_l03_init_effect_record(unsigned char *effect, int param_a, int param_b
 extern void vec_average_list(void *, void *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern float (*D_L03_001FE700[])[4];
+extern float (*g_path_l03_entry_table[])[4];
 
 /* Effect state hung off an object: four vertex-table indices, a vertex count and an offset. */
 typedef struct {
@@ -578,7 +578,7 @@ void func_L03_0038B408(Moby *object)
 {
     float center[4];
     VertexGroupState *state = (VertexGroupState *)object->state;
-    float (**table)[4] = D_L03_001FE700;
+    float (**table)[4] = g_path_l03_entry_table;
     float (*vertices)[4];
     int i, j;
 
@@ -599,7 +599,7 @@ void func_L03_0038B408(Moby *object)
 
 /* Fires a trigger on the object when the hero is standing close to it. */
 void moby_trigger_when_hero_near(unsigned char *object) {
-    unsigned char *hero = D_L03_00189E20;
+    unsigned char *hero = g_hero_l03_state_block;
 
     if (*(unsigned char *)(hero + 0x22B4) == 0)
         if (func_2EF158(hero + 0x80, object + 0x10) < 1.7f)
@@ -655,7 +655,7 @@ extern int math_random_int_below(int);
 extern void ref_L03_003C4BD8_00(unsigned char *, void *);
 
 /* The position the tilt is measured from: a four-float vector in the boot's resident data. */
-extern char D_L00_00189F00[];
+extern char g_zero_l00_vector[];
 
 /* Every so often picks a new random head tilt for the bot, or makes it look toward a fixed point. */
 void bot_update_head_tilt(unsigned char *object) {
@@ -684,7 +684,7 @@ void bot_update_head_tilt(unsigned char *object) {
     }
 
     if (*(int *)(state + 0x390) != 0) {
-        ref_L03_003C4BD8_00(object, D_L00_00189F00);
+        ref_L03_003C4BD8_00(object, g_zero_l00_vector);
     } else {
         tilt_yaw = *(float *)(state + 0x38C);
         tilt_pitch = *(float *)(state + 0x388);
@@ -699,11 +699,11 @@ void bot_update_head_tilt(unsigned char *object) {
 
 /* The level's entity table base, the group count and the table of group id lists (in the
    resident image: the list of group g ends after its first entry with bit 15 set). */
-extern unsigned char *D_L03_001B2A1C __attribute__((sda));
+extern unsigned char *g_moby_record_base __attribute__((sda));
 
-extern int D_L03_001B2A38[] __attribute__((sda));
+extern int g_object_group_count[] __attribute__((sda));
 
-extern unsigned short *D_L03_001FB5A0[];
+extern unsigned short *g_entity_id_lists[];
 
 /* The part of the object's private state (at +0x68) that these walks read: eight group ids at
    +0x200 and the id of an entity at +0x220. */
@@ -734,11 +734,11 @@ unsigned char *moby_find_nearest_tilt_target(unsigned char *object) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (id_list = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
-             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+        for (id_list = g_entity_id_lists[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == g_entity_id_lists[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x20] == 0xFE)
@@ -775,11 +775,11 @@ unsigned char *moby_find_nearest_entity_a(unsigned char *object) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (id_list = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
-             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+        for (id_list = g_entity_id_lists[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == g_entity_id_lists[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0xEF9 /* moby class 3833 */) {
@@ -807,23 +807,23 @@ extern unsigned int moby_check_against_stored_value(unsigned char *, unsigned ch
    out of the walk, as in retail. */
 unsigned char *moby_find_entity_nearby(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short **group_table = D_L03_001FB5A0;
+    unsigned short **group_table = g_entity_id_lists;
     unsigned short *id_list;
     unsigned char *entity;
     int i;
 
     for (i = 0; i < 8; i++) {
         for (id_list = group_table[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
              ((short)id_list[-1] >= 0 || id_list == group_table[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0x97A /* moby class 2426 */) {
                 if (moby_check_against_stored_value(entity, object + 0x10))
                     return entity;
-                if (moby_check_against_stored_value(entity, D_L03_00189E20 + 0x80))
+                if (moby_check_against_stored_value(entity, g_hero_l03_state_block + 0x80))
                     return entity;
             }
         }
@@ -845,11 +845,11 @@ unsigned char *moby_find_nearest_entity_b(unsigned char *object) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (id_list = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
-             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+        for (id_list = g_entity_id_lists[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == g_entity_id_lists[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(unsigned short *)(entity + 0xAA) == 0xE87 /* moby class 3719 */ || *(unsigned short *)(entity + 0xAA) == 0xE88 /* moby class 3720 */) {
@@ -874,7 +874,7 @@ extern int moby_is_in_state_one(unsigned char *);
    what leaves 0xFE out of loop.c's budget for hoisting the walk's constants, as in retail. */
 unsigned char *moby_find_nearest_pickup_target(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short **group_table = D_L03_001FB5A0;
+    unsigned short **group_table = g_entity_id_lists;
     unsigned short *id_list;
     unsigned char *entity;
     unsigned char *best = 0;
@@ -885,10 +885,10 @@ unsigned char *moby_find_nearest_pickup_target(unsigned char *object) {
 
     for (i = 0; i < 8; i++) {
         for (id_list = group_table[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
              ((short)id_list[-1] >= 0 || id_list == group_table[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x20] == 0xFE)
@@ -946,11 +946,11 @@ void ChooseVisibleGroupTarget(unsigned char *object, float *out_position, float 
     else
         reachable = 0;
     for (i = 0; i < 8; i++) {
-        for (id_list = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
-             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+        for (id_list = g_entity_id_lists[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= g_object_group_count[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == g_entity_id_lists[vars->ids[i]]);
              id_list++) {
-            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+            entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0x972 /* moby class 2418 */) {

@@ -15,15 +15,15 @@ extern void joba_enemy_update_state_machine(u8 *arg0);
 extern void joba_enemy_update_orbit(u8 *arg0);
 extern void joba_enemy_update_effects(u8 *arg0);
 extern s32 joba_enemy_is_active(u8 *arg0);
-extern u8 D_L11_00188660[];
-extern u8 D_L11_001BA8C0[];
-extern s32 D_L11_001A8FF0 __attribute__((sda));
-extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern u8 g_sound_l11_slot_table[];
+extern u8 g_hero_l11_position[];
+extern s32 g_hero_control_locked __attribute__((sda));
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
 extern f32 vec_get_heading_angle(u8 *a0, f32 *a1, s32 a2);
 extern f32 vec_distance_xy(u8 *a0, u8 *a1);
-extern u8 D_L11_00189EA0[];
+extern u8 g_hero_l11_state_data[];
 
-void func_PAL_L11_003F5F18(u8 *arg0) {
+void arachnoid_update_pal(u8 *arg0) {
     u8 *s0 = arg0;
     if (*(u8 *)(s0 + 0x20) == 0) {
         joba_enemy_init();
@@ -31,7 +31,7 @@ void func_PAL_L11_003F5F18(u8 *arg0) {
         if (joba_enemy_is_active(s0) != 0)
             return;
         if (*(u8 *)(s0 + 0x31) != 0
-            && fast_vec_dist(s0 + 0x10, D_L11_001BA8C0) < 48.0f) {
+            && fast_vec_dist(s0 + 0x10, g_hero_l11_position) < 48.0f) {
             moby_update_ground_check(s0);
             *(u8 *)(s0 + 0x6F) = 0x2D;
         }

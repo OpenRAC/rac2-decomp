@@ -27,13 +27,13 @@
 extern void FlushCache();
 extern s32 UploadMipTexture();
 extern s32 fast_decompress();
-extern s32 D_001A7288;
-extern s32 D_001A72D0;
-extern s32 D_001A72D4;
-extern u8 D_001A7BB4;
+extern s32 g_level_data_ptr;
+extern s32 g_vram_cursor;
+extern s32 g_vram_frame_base;
+extern u8 g_language;
 extern s32 g_dma_packet_cursor;
-extern s64 D_001B2160;
-extern s64 D_001B2168;
+extern s64 g_overlay_quad_packet;
+extern s64 g_fade_strip_packet;
 
 /* Loads a data block for the next scene and keeps its first two values for drawing. */
 void scene_load_texture_block(void) {
@@ -43,19 +43,19 @@ void scene_load_texture_block(void) {
     s32 archive;
     s32 loaded;
 
-    archive = D_001A7288;
+    archive = g_level_data_ptr;
     if (*(s32 *)(archive + 0x50) != -1) {
-        level_index = D_001A7BB4 - 1;
+        level_index = g_language - 1;
         clamped_index = (level_index > -1) ? level_index : 0;
         FlushCache(0);
         fast_decompress(archive + *(s32 *)(archive + 0x50), g_dma_packet_cursor);
         FlushCache(0);
         loaded = g_dma_packet_cursor;
-        D_001A72D0 = D_001A72D4;
+        g_vram_cursor = g_vram_frame_base;
         UploadMipTexture(loaded + *(s32 *)(loaded + 4), values);
-        D_001B2160 = values[0];
+        g_overlay_quad_packet = values[0];
         UploadMipTexture(loaded + *(s32 *)(loaded + clamped_index * 4 + 8), values);
-        D_001B2168 = values[0];
-        D_001A72D4 = D_001A72D0 + 0x2000;
+        g_fade_strip_packet = values[0];
+        g_vram_frame_base = g_vram_cursor + 0x2000;
     }
 }

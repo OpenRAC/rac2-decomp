@@ -12,7 +12,7 @@ struct SetupOwnerView {
     unsigned char gap294[0x314-0x294];
     int value314;
 };
-extern struct SetupOwnerView D_L00_001B8C80;
+extern struct SetupOwnerView g_scalar_transition_state;
 struct SetupBlendView {
     unsigned int word0;
     float value4;
@@ -26,7 +26,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern float mat_fast_helper_a(float,float);
 
-void func_PAL_L00_0042DA78(unsigned char *object)
+void cam_swingshot_init_pal(unsigned char *object)
 {
     unsigned char *data=*(unsigned char **)(object+0x70);
     unsigned char *part=data+0x40;
@@ -68,7 +68,7 @@ void func_PAL_L00_0042DA78(unsigned char *object)
     updated=*(unsigned char **)(object+0x70);
     tracking=updated+0xB8;
     *(int *)(tracking+4)=0;
-    matrix=D_L00_001B8C80.matrix;
+    matrix=g_scalar_transition_state.matrix;
     translation=object+0x30;
     qcopy(translation,matrix+0x30);
     qcopy(object,matrix);
@@ -91,9 +91,9 @@ void func_PAL_L00_0042DA78(unsigned char *object)
         *(float *)(updated+0xB8)=mat_fast_helper_a(*(float *)(part+0x30),*(float *)(part+0x34));
         *(void **)(tracking+8)=*(void **)(hero+0xAA4);
     }
-    D_L00_001B8C80.value293=2;
-    D_L00_001B8C80.value290=1;
-    D_L00_001B8C80.value314=50;
+    g_scalar_transition_state.value293=2;
+    g_scalar_transition_state.value290=1;
+    g_scalar_transition_state.value314=50;
 }
 
 

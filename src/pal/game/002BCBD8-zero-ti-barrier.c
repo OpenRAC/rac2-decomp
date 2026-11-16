@@ -15,7 +15,7 @@ extern Particle *part_alloc(int);
 extern int FloatToInt(float);
 extern int func_001163B0(void);
 extern float IntToFloat(int);
-extern unsigned char *D_001F257C;
+extern unsigned char *g_part_tex_spark;
 
 /* The effect-record initialiser of func_L00_0033E888, without the rotation argument. */
 Particle *func_PAL_002BD790(float life,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
@@ -33,7 +33,7 @@ Particle *func_PAL_002BD790(float life,Quad *position,Quad *velocity,int color,i
         p->b1=0;
         p->life=life;
         p->seed=func_001163B0();
-        if(texture==-1) p->b2=*D_001F257C; else p->b2=texture;
+        if(texture==-1) p->b2=*g_part_tex_spark; else p->b2=texture;
         out=p->payload;
         p->size=size;
         *(short *)((char*)out+0x18)=size;

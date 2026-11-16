@@ -16,7 +16,7 @@ extern Particle *part_alloc(int);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F2614;
+extern unsigned char *g_part_tex_ground_effect;
 
 /* func_002C2210: initializes an allocated effect record and its payload, as func_L00_0033C638
    does, with a lifted position and a scaled counter in place of the owner lookup. */
@@ -33,7 +33,7 @@ Particle *part_spawn_ground_effect(float life, float secondLife, float third, Qu
         p->b3 = 0x48;
         p->alpha = FloatToInt(0.4f) + 32;
         p->b1 = 0;
-        p->b2 = *D_001F2614;
+        p->b2 = *g_part_tex_ground_effect;
         p->size = size;
         p->life = life * 210000.0f;
         if (mode == 0) p->seed = 0;

@@ -8,56 +8,56 @@ extern int func_001157AC(char *);
 extern int sprintf(char *,char *,...);
 extern void text_draw_medium(int,int,u64,char *,int), text_draw_small(int,int,u64,char *,int);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int),text_draw_window_large(void *,u64,char *,int);
-extern int D_L11_001B1650 __attribute__((sda));
-extern int D_L11_001B1654 __attribute__((sda));
-extern int D_L11_001B1658 __attribute__((sda));
-extern int D_L11_001B165C __attribute__((sda));
-extern int D_L11_001B1660 __attribute__((sda));
-extern int D_L11_001B1664;
-extern int D_L11_001B1668;
-extern int D_L11_001B166C;
-extern int D_L11_001B1670 __attribute__((sda));
-extern int D_L11_001B1674 __attribute__((sda));
-extern int D_L11_001B1678 __attribute__((sda));
-extern int D_L11_001B167C __attribute__((sda));
-extern int D_L11_001B1680 __attribute__((sda));
-extern int D_L11_001B1684 __attribute__((sda));
-extern int D_L11_001B1688 __attribute__((sda));
-extern int D_L11_001B168C __attribute__((sda));
-extern int D_L11_001B1690 __attribute__((sda));
-extern int D_L11_001B1694 __attribute__((sda));
-extern int D_L11_001B1698 __attribute__((sda));
-extern int D_L11_001B169C __attribute__((sda));
-extern int D_L11_001B16A0 __attribute__((sda));
-extern int D_L11_001B16A4 __attribute__((sda));
-extern int D_L11_001B16A8 __attribute__((sda));
-extern int D_L11_001B16AC __attribute__((sda));
-extern int D_L11_001B16B0 __attribute__((sda));
-extern int D_L11_001B16B4 __attribute__((sda));
-extern int D_L11_001B16B8 __attribute__((sda));
-extern int D_L11_001B16BC __attribute__((sda));
-extern int D_L11_001B16C0 __attribute__((sda));
-extern int D_L11_001B16C4 __attribute__((sda));
-extern int D_L11_001B16C8 __attribute__((sda));
-extern int D_L11_001B16CC __attribute__((sda));
-extern int D_L11_001B16D0 __attribute__((sda));
-extern int D_L11_001B16D4 __attribute__((sda));
-extern int D_L11_001B16D8 __attribute__((sda));
-extern int D_L11_001B16DC __attribute__((sda));
-extern int D_L11_001B16E0 __attribute__((sda));
+extern int g_selection_panel_header_color __attribute__((sda));
+extern int g_selection_panel_window_arg_d __attribute__((sda));
+extern int g_selection_panel_height __attribute__((sda));
+extern int g_selection_panel_spare_a __attribute__((sda));
+extern int g_selection_panel_x __attribute__((sda));
+extern int g_selection_panel_y;
+extern int g_selection_panel_window_arg_a;
+extern int g_selection_panel_window_arg_b;
+extern int g_selection_panel_window_arg_c __attribute__((sda));
+extern int g_selection_panel_spare_b __attribute__((sda));
+extern int g_selection_panel_value_x __attribute__((sda));
+extern int g_selection_panel_value_y __attribute__((sda));
+extern int g_selection_panel_value_color __attribute__((sda));
+extern int g_selection_panel_spare_c __attribute__((sda));
+extern int g_selection_panel_prev_hint_x __attribute__((sda));
+extern int g_selection_panel_prev_hint_y __attribute__((sda));
+extern int g_selection_panel_prev_hint_color __attribute__((sda));
+extern int g_selection_panel_spare_d __attribute__((sda));
+extern int g_selection_panel_next_hint_x __attribute__((sda));
+extern int g_selection_panel_next_hint_y __attribute__((sda));
+extern int g_selection_panel_next_hint_color __attribute__((sda));
+extern int g_selection_panel_spare_e __attribute__((sda));
+extern int g_selection_panel_count_x __attribute__((sda));
+extern int g_selection_panel_count_y __attribute__((sda));
+extern int g_selection_panel_count_color __attribute__((sda));
+extern int g_selection_panel_spare_f __attribute__((sda));
+extern int g_selection_panel_hint_a_x __attribute__((sda));
+extern int g_selection_panel_hint_a_y __attribute__((sda));
+extern int g_selection_panel_hint_a_color __attribute__((sda));
+extern int g_selection_panel_spare_g __attribute__((sda));
+extern int g_selection_panel_hint_c_x __attribute__((sda));
+extern int g_selection_panel_hint_c_y __attribute__((sda));
+extern int g_selection_panel_hint_c_color __attribute__((sda));
+extern int g_selection_panel_spare_h __attribute__((sda));
+extern int g_selection_panel_hint_b_x __attribute__((sda));
+extern int g_selection_panel_hint_b_y __attribute__((sda));
+extern int g_selection_panel_hint_b_color __attribute__((sda));
 
-extern float D_L11_001B3E04;
-extern char D_L11_001B15A0[],D_L11_001B16E8[];
-extern unsigned char g_item_slot_to_record[],D_001395B8[];
+extern float g_hud_label_y_param;
+extern char g_str_count_line_format[],g_str_challenge_label_format[];
+extern unsigned char g_item_slot_to_record[],g_game_flag_table[];
 typedef struct { unsigned char pad[4]; unsigned char enabled; unsigned char rest[0xdb]; } MenuRecord;
-extern unsigned char D_L11_00279BA0[];
+extern unsigned char g_item_l11_record_table[];
 extern int *g_arena_challenge_table[] SDATA(D_L11_001B14F8);
 #define TABLE D_L11_001B14F8
 #define SEL (*(short *)(state+0x1e8))
-extern int D_L11_001B3E00;
+extern int g_hud_coord_mode;
 static __inline__ int hud_coord(float value, float scale, float half)
 {
-    int mode = D_L11_001B3E00;
+    int mode = g_hud_coord_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     int copy;
@@ -79,39 +79,39 @@ void joba_menu_draw_selection_panel(unsigned char *moby) {
     joba_menu_draw_help_prompts(moby,1);
     state=*(unsigned char **)(moby+0x68);
     text=((char *)GetLocalizedString(arena_get_challenge_title_text_id(SEL)));
-    bx=hud_coord((float)D_L11_001B1660, D_L11_001B3E04, 0.5f);
-    by=hud_coord((float)D_L11_001B1664, D_L11_001B3E04, 0.5f);
-    bh=hud_coord((float)D_L11_001B1658, D_L11_001B3E04, 0.5f);
-    FontSetWindow(box,bx,by,D_L11_001B1668,D_L11_001B166C,D_L11_001B1654,bh,D_L11_001B1670,3);
-    header_color=D_L11_001B1650; text_draw_window_large(box,header_color,text,func_001157AC(text));
-    if(SEL==0 && !D_001395B8[arena_get_challenge_flag_index(0)]) goto counts;
-    if(SEL==one && !D_001395B8[arena_get_challenge_flag_index(one)]) goto counts;
+    bx=hud_coord((float)g_selection_panel_x, g_hud_label_y_param, 0.5f);
+    by=hud_coord((float)g_selection_panel_y, g_hud_label_y_param, 0.5f);
+    bh=hud_coord((float)g_selection_panel_height, g_hud_label_y_param, 0.5f);
+    FontSetWindow(box,bx,by,g_selection_panel_window_arg_a,g_selection_panel_window_arg_b,g_selection_panel_window_arg_d,bh,g_selection_panel_window_arg_c,3);
+    header_color=g_selection_panel_header_color; text_draw_window_large(box,header_color,text,func_001157AC(text));
+    if(SEL==0 && !g_game_flag_table[arena_get_challenge_flag_index(0)]) goto counts;
+    if(SEL==one && !g_game_flag_table[arena_get_challenge_flag_index(one)]) goto counts;
     {
         do {
             text=((char *)GetLocalizedString(0x2f44)); unit=((char *)GetLocalizedString(0x2f5e)); value=func_L11_00442958(SEL);
-            if(value<10000) { sprintf(buffer,D_L11_001B15A0,text,value,unit); line_text=buffer; goto draw1; }
-            sprintf(buffer,D_L11_001B16E8,text,value);
+            if(value<10000) { sprintf(buffer,g_str_count_line_format,text,value,unit); line_text=buffer; goto draw1; }
+            sprintf(buffer,g_str_challenge_label_format,text,value);
         } while(0);
         line_text=buffer;
     draw1:
-        value_y=hud_coord((float)D_L11_001B167C, D_L11_001B3E04, 0.5f); value_color=D_L11_001B1680; text_draw_medium(D_L11_001B1678,value_y,value_color,line_text,func_001157AC(line_text));
+        value_y=hud_coord((float)g_selection_panel_value_y, g_hud_label_y_param, 0.5f); value_color=g_selection_panel_value_color; text_draw_medium(g_selection_panel_value_x,value_y,value_color,line_text,func_001157AC(line_text));
     }
 counts:
-    if(D_001395B8[arena_get_challenge_flag_index(SEL)]) {
+    if(g_game_flag_table[arena_get_challenge_flag_index(SEL)]) {
         label_text=((char *)GetLocalizedString(0x2f3e));
-        sprintf(buffer,D_L11_001B16E8,label_text,D_001395B8[arena_get_challenge_flag_index(SEL)]); line_text=buffer;
-        count_y=(int)((float)D_L11_001B16AC * D_L11_001B3E04 + 0.5f); do { count_color=D_L11_001B16B0; } while(0); text_draw_medium(D_L11_001B16A8,count_y,count_color,line_text,func_001157AC(line_text));
+        sprintf(buffer,g_str_challenge_label_format,label_text,g_game_flag_table[arena_get_challenge_flag_index(SEL)]); line_text=buffer;
+        count_y=(int)((float)g_selection_panel_count_y * g_hud_label_y_param + 0.5f); do { count_color=g_selection_panel_count_color; } while(0); text_draw_medium(g_selection_panel_count_x,count_y,count_color,line_text,func_001157AC(line_text));
     }
-    if(SEL!=0) { label_text=((char *)GetLocalizedString(0x2f40)); prev_hint_y=hud_coord((float)D_L11_001B168C, D_L11_001B3E04, 0.5f); prev_hint_color=D_L11_001B1690; text_draw_small(D_L11_001B1688,prev_hint_y,prev_hint_color,label_text,func_001157AC(label_text)); }
+    if(SEL!=0) { label_text=((char *)GetLocalizedString(0x2f40)); prev_hint_y=hud_coord((float)g_selection_panel_prev_hint_y, g_hud_label_y_param, 0.5f); prev_hint_color=g_selection_panel_prev_hint_color; text_draw_small(g_selection_panel_prev_hint_x,prev_hint_y,prev_hint_color,label_text,func_001157AC(label_text)); }
     for(i=SEL+1;i<13;i++) {
         half=0.5f;
-        if(!D_001395B8[arena_get_challenge_flag_index(TABLE[i][2])]) continue;
+        if(!g_game_flag_table[arena_get_challenge_flag_index(TABLE[i][2])]) continue;
         if(i>=11 && !flag_is_byte_set()) continue;
-        if(i==8 && !((MenuRecord *)(D_L11_00279BA0 + g_item_slot_to_record[0x1e] * 0xe0))->enabled) continue;
-        next_hint_text=((char *)GetLocalizedString(0x2f41)); next_hint_y=hud_coord((float)D_L11_001B169C, D_L11_001B3E04, half); next_hint_color=D_L11_001B16A0; text_draw_small(D_L11_001B1698,next_hint_y,next_hint_color,next_hint_text,func_001157AC(next_hint_text)); break;
+        if(i==8 && !((MenuRecord *)(g_item_l11_record_table + g_item_slot_to_record[0x1e] * 0xe0))->enabled) continue;
+        next_hint_text=((char *)GetLocalizedString(0x2f41)); next_hint_y=hud_coord((float)g_selection_panel_next_hint_y, g_hud_label_y_param, half); next_hint_color=g_selection_panel_next_hint_color; text_draw_small(g_selection_panel_next_hint_x,next_hint_y,next_hint_color,next_hint_text,func_001157AC(next_hint_text)); break;
     }
     half=0.5f;
-    text=((char *)GetLocalizedString(0x2f3f)); hint_y1=hud_coord((float)D_L11_001B16BC, D_L11_001B3E04, half); hint_color1=D_L11_001B16C0; text_draw_small(D_L11_001B16B8,hint_y1,hint_color1,text,func_001157AC(text));
-    text=((char *)GetLocalizedString(0x2f42)); hint_y2=hud_coord((float)D_L11_001B16DC, D_L11_001B3E04, half); hint_color2=D_L11_001B16E0; text_draw_small(D_L11_001B16D8,hint_y2,hint_color2,text,func_001157AC(text));
-    text=((char *)GetLocalizedString(0x2f43)); hint_y3=hud_coord((float)D_L11_001B16CC, D_L11_001B3E04, half); hint_color3=D_L11_001B16D0; text_draw_small(D_L11_001B16C8,hint_y3,hint_color3,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f3f)); hint_y1=hud_coord((float)g_selection_panel_hint_a_y, g_hud_label_y_param, half); hint_color1=g_selection_panel_hint_a_color; text_draw_small(g_selection_panel_hint_a_x,hint_y1,hint_color1,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f42)); hint_y2=hud_coord((float)g_selection_panel_hint_b_y, g_hud_label_y_param, half); hint_color2=g_selection_panel_hint_b_color; text_draw_small(g_selection_panel_hint_b_x,hint_y2,hint_color2,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f43)); hint_y3=hud_coord((float)g_selection_panel_hint_c_y, g_hud_label_y_param, half); hint_color3=g_selection_panel_hint_c_color; text_draw_small(g_selection_panel_hint_c_x,hint_y3,hint_color3,text,func_001157AC(text));
 }

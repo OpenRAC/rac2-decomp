@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L05_0042B2C0 (2128 bytes; Feltzin System and three more levels): the ring-strip builder.
  * A FAKEMATCH unit (owner rulings of 13 and 14 November 2026; config/fakematch.tsv). The C is plain:
  * no volatile, no register pins. What is not the authors' is listed at each site:
@@ -11,10 +12,10 @@
 #include "common.h"
 typedef unsigned int QBC __attribute__((mode(TI)));
 typedef union { QBC q; float v[4]; } VBC;
-extern VBC D_L05_00270AE0[32];
-extern float D_L05_0026ECE0[][3], D_L05_002700E0[][2], D_L05_00270D60[][2];
-extern unsigned D_L05_0026FBE0[], D_L05_00270CE0[];
-extern int D_L05_001B1724 __attribute__((sda));
+extern VBC g_ring_strip_points[32];
+extern float g_ring_strip_positions[][3], g_ring_strip_uvs[][2], g_ring_ring_uvs[][2];
+extern unsigned g_ring_strip_colors[], g_ring_ring_colors[];
+extern int g_ring_strip_packet_flags __attribute__((sda));
 extern void ref_L05_0042B2C0_00(void *, void *, float);
 extern void ref_L05_0042B2C0_01(void *, void *, float);
 extern void ref_L05_0042B2C0_02(void *, void *, void *);
@@ -68,7 +69,7 @@ void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned
     u = startU;
     qcopy_nc(&center, origin);
     ref_L05_0042B2C0_00(&delta, axis, advance);
-    ring = D_L05_00270AE0;
+    ring = g_ring_strip_points;
     ref_L05_0042B2C0_00(&radial, &unit, radius);
     radial.v[3] = 0;
     ref_L05_0042B2C0_01(&rotation, axis, 0.202683404f);
@@ -76,24 +77,24 @@ void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned
     inverse.v[3] = rotation.v[3];
 
     ref_L05_0042B2C0_02(&ring[0], &center, &radial);
-        D_L05_00270CE0[0] = color;
-        D_L05_00270D60[0][1] = startV;
-        D_L05_00270D60[0][0] = u;
+        g_ring_ring_colors[0] = color;
+        g_ring_ring_uvs[0][1] = startV;
+        g_ring_ring_uvs[0][0] = u;
         v = startV + stepU;
     for (k = 1, i = 29; i >= 0; i--, k++) {
         ref_L05_0042B2C0_03(&radial, &rotation, &radial);
         ref_L05_0042B2C0_03(&radial, &radial, &inverse);
         ref_L05_0042B2C0_02(&ring[k], &center, &radial);
-        D_L05_00270D60[k][1] = v;
+        g_ring_ring_uvs[k][1] = v;
         v += stepU;
-        D_L05_00270CE0[k] = color;
-        D_L05_00270D60[k][0] = startU;
+        g_ring_ring_colors[k] = color;
+        g_ring_ring_uvs[k][0] = startU;
     }
-        { VBC *qs = D_L05_00270AE0; VBC *qd = &D_L05_00270AE0[31]; qcopy(qd, qs); }
+        { VBC *qs = g_ring_strip_points; VBC *qd = &g_ring_strip_points[31]; qcopy(qd, qs); }
         u += stepV;
-        D_L05_00270D60[31][1] = v;
-        D_L05_00270D60[31][0] = startU;
-        D_L05_00270CE0[31] = D_L05_00270CE0[0];
+        g_ring_ring_uvs[31][1] = v;
+        g_ring_ring_uvs[31][0] = startU;
+        g_ring_ring_colors[31] = g_ring_ring_colors[0];
         ref_L05_0042B2C0_02(&center, &center, &delta);
         nextV = startV + stepU;
     for (row = 1; row < 6; row++) {
@@ -107,94 +108,94 @@ void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned
         v = startV;
         first = out + 1;
         if (row == 5) color &= 0xFFFFFF;
-        ee = D_L05_002700E0;
-        ae = D_L05_00270AE0;
-        r = D_L05_0026ECE0[out];
-        r[0] = D_L05_00270AE0[0].v[0];
-        r[1] = D_L05_00270AE0[0].v[1];
-        r[2] = D_L05_00270AE0[0].v[2];
-        D_L05_002700E0[out][0] = D_L05_00270D60[0][0];
-        D_L05_002700E0[out][1] = D_L05_00270D60[0][1];
-        D_L05_0026FBE0[out] = D_L05_00270CE0[0];
+        ee = g_ring_strip_uvs;
+        ae = g_ring_strip_points;
+        r = g_ring_strip_positions[out];
+        r[0] = g_ring_strip_points[0].v[0];
+        r[1] = g_ring_strip_points[0].v[1];
+        r[2] = g_ring_strip_points[0].v[2];
+        g_ring_strip_uvs[out][0] = g_ring_ring_uvs[0][0];
+        g_ring_strip_uvs[out][1] = g_ring_ring_uvs[0][1];
+        g_ring_strip_colors[out] = g_ring_ring_colors[0];
         out = first;
-        D_L05_0026ECE0[out][0] = center.v[0] + radial.v[0];
-        D_L05_0026ECE0[out][1] = center.v[1] + radial.v[1];
-        D_L05_0026ECE0[out][2] = center.v[2] + radial.v[2];
-        D_L05_002700E0[out][1] = v;
-        D_L05_002700E0[out][0] = u;
-        D_L05_0026FBE0[out] = color;
-        { float *t = D_L05_0026ECE0[out]; float w0 = t[0], w1 = t[1], w2 = t[2];
-        D_L05_00270AE0[0].v[0] = w0;
-        D_L05_00270AE0[0].v[1] = w1;
-        D_L05_00270AE0[0].v[2] = w2; }
-        D_L05_00270AE0[0].v[3] = 0;
-        D_L05_00270D60[0][0] = u;
-        D_L05_00270CE0[0] = color;
-        D_L05_00270D60[0][1] = D_L05_002700E0[out][1];
+        g_ring_strip_positions[out][0] = center.v[0] + radial.v[0];
+        g_ring_strip_positions[out][1] = center.v[1] + radial.v[1];
+        g_ring_strip_positions[out][2] = center.v[2] + radial.v[2];
+        g_ring_strip_uvs[out][1] = v;
+        g_ring_strip_uvs[out][0] = u;
+        g_ring_strip_colors[out] = color;
+        { float *t = g_ring_strip_positions[out]; float w0 = t[0], w1 = t[1], w2 = t[2];
+        g_ring_strip_points[0].v[0] = w0;
+        g_ring_strip_points[0].v[1] = w1;
+        g_ring_strip_points[0].v[2] = w2; }
+        g_ring_strip_points[0].v[3] = 0;
+        g_ring_ring_uvs[0][0] = u;
+        g_ring_ring_colors[0] = color;
+        g_ring_ring_uvs[0][1] = g_ring_strip_uvs[out][1];
         out++;
         nextU = u + stepV;
         v = nextV;
 
         for (i = 1; i < 31; i++) {
             e1 = &ee[0][1]; /* FAKEMATCH: loop-invariant set inside the inner loop (ee = E0 base per row): loop moves it and the 00E0 giv's add_val becomes (plus ee 4), so the giv init is retail's (out*8 + 4) + E0 instead of out*8 + (E0+4) */
-            p = D_L05_0026ECE0[out];
+            p = g_ring_strip_positions[out];
             p[0] = ae[i].v[0];
             p[1] = ae[i].v[1];
             p[2] = ae[i].v[2];
-            D_L05_0026FBE0[out] = D_L05_00270CE0[i];
-            e1[out * 2 - 1] = D_L05_00270D60[i][0];
-            e1[out * 2] = D_L05_00270D60[i][1];
+            g_ring_strip_colors[out] = g_ring_ring_colors[i];
+            e1[out * 2 - 1] = g_ring_ring_uvs[i][0];
+            e1[out * 2] = g_ring_ring_uvs[i][1];
             out++;
             ref_L05_0042B2C0_03(&radial, &rotation2, &radial);
             ref_L05_0042B2C0_03(&radial, &radial, &inverse2);
-            D_L05_0026ECE0[out][0] = center.v[0] + radial.v[0];
+            g_ring_strip_positions[out][0] = center.v[0] + radial.v[0];
             e1[out * 2] = v;
-            D_L05_0026ECE0[out][1] = center.v[1] + radial.v[1];
-            D_L05_00270D60[i][1] = e1[out * 2];
+            g_ring_strip_positions[out][1] = center.v[1] + radial.v[1];
+            g_ring_ring_uvs[i][1] = e1[out * 2];
             v += stepU;
-            ae[i].v[0] = D_L05_0026ECE0[out][0];
-            t = D_L05_0026ECE0[out];
+            ae[i].v[0] = g_ring_strip_positions[out][0];
+            t = g_ring_strip_positions[out];
             ae[i].v[1] = t[1];
-            D_L05_0026ECE0[out][2] = ae[i].v[2] = center.v[2] + radial.v[2];
-            D_L05_0026FBE0[out] = color;
+            g_ring_strip_positions[out][2] = ae[i].v[2] = center.v[2] + radial.v[2];
+            g_ring_strip_colors[out] = color;
             e1[out * 2 - 1] = u;
             ae[i].v[3] = 0;
-            D_L05_00270CE0[i] = color;
-            D_L05_00270D60[i][0] = u;
+            g_ring_ring_colors[i] = color;
+            g_ring_ring_uvs[i][0] = u;
             out++;
         }
 
         {
         float *sp, *sq, *sw;
         unsigned sc;
-        sp = D_L05_0026ECE0[out];
-        sp[0] = D_L05_00270AE0[i].v[0];
-        sp[1] = D_L05_00270AE0[i].v[1];
-        sp[2] = D_L05_00270AE0[i].v[2];
-        D_L05_002700E0[out][0] = D_L05_00270D60[i][0];
-        D_L05_002700E0[out][1] = D_L05_00270D60[i][1];
-        D_L05_0026FBE0[out] = D_L05_00270CE0[i];
-        sq = D_L05_0026ECE0[first];
+        sp = g_ring_strip_positions[out];
+        sp[0] = g_ring_strip_points[i].v[0];
+        sp[1] = g_ring_strip_points[i].v[1];
+        sp[2] = g_ring_strip_points[i].v[2];
+        g_ring_strip_uvs[out][0] = g_ring_ring_uvs[i][0];
+        g_ring_strip_uvs[out][1] = g_ring_ring_uvs[i][1];
+        g_ring_strip_colors[out] = g_ring_ring_colors[i];
+        sq = g_ring_strip_positions[first];
         out++;
         /* FAKEMATCH: do { } while (0) keeps cse from merging this pointer with the reload pointer below (-frac2-cse2-loop-end-forgets-arith); retail forms the address twice */
         do {
-        sw = D_L05_0026ECE0[out];
+        sw = g_ring_strip_positions[out];
         sw[0] = sq[0];
         sw[1] = sq[1];
         sw[2] = sq[2];
         } while (0);
-        D_L05_002700E0[out][1] = v;
-        D_L05_002700E0[out][0] = u;
-        sc = D_L05_0026FBE0[first];
-        D_L05_0026FBE0[out] = sc;
-        { float *st = D_L05_0026ECE0[out]; float t0 = st[0], t1 = st[1], t2 = st[2];
-        D_L05_00270AE0[i].v[0] = t0;
-        D_L05_00270AE0[i].v[1] = t1;
-        D_L05_00270AE0[i].v[2] = t2;
-        D_L05_00270AE0[i].v[3] = 0; }
-        D_L05_00270D60[i][0] = u;
-        D_L05_00270CE0[i] = sc;
-        D_L05_00270D60[i][1] = D_L05_002700E0[out][1];
+        g_ring_strip_uvs[out][1] = v;
+        g_ring_strip_uvs[out][0] = u;
+        sc = g_ring_strip_colors[first];
+        g_ring_strip_colors[out] = sc;
+        { float *st = g_ring_strip_positions[out]; float t0 = st[0], t1 = st[1], t2 = st[2];
+        g_ring_strip_points[i].v[0] = t0;
+        g_ring_strip_points[i].v[1] = t1;
+        g_ring_strip_points[i].v[2] = t2;
+        g_ring_strip_points[i].v[3] = 0; }
+        g_ring_ring_uvs[i][0] = u;
+        g_ring_ring_colors[i] = sc;
+        g_ring_ring_uvs[i][1] = g_ring_strip_uvs[out][1];
         }
         out++;
         u = nextU;
@@ -203,7 +204,7 @@ void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned
     }
 
     ref_L05_0042B2C0_05(6, ref_L05_0042B2C0_04(texture));
-    ref_L05_0042B2C0_05(0x42, 0x8000000040ULL | ((long long)D_L05_001B1724 << 2));
+    ref_L05_0042B2C0_05(0x42, 0x8000000040ULL | ((long long)g_ring_strip_packet_flags << 2));
     ref_L05_0042B2C0_05(8, 0);
     ref_L05_0042B2C0_05(0x14, 0xFF9000000260ULL);
     ref_L05_0042B2C0_05(0x47, 0x53001);
@@ -213,7 +214,7 @@ void gfx_build_textured_ring_strip(VBC *origin, VBC *axis, int texture, unsigned
         base = 0;
     while (1) {
         n = remaining < 149 ? remaining : 148;
-        ref_L05_0042B2C0_07(n, D_L05_0026ECE0[base], &D_L05_0026FBE0[base], D_L05_002700E0[base], 1);
+        ref_L05_0042B2C0_07(n, g_ring_strip_positions[base], &g_ring_strip_colors[base], g_ring_strip_uvs[base], 1);
         remaining -= n;
         if (remaining > 0) {
             remaining += 2;

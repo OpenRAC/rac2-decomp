@@ -35,13 +35,13 @@ typedef struct {
 } MenuSystem;
 
 extern MenuSystem g_pause_menu_state;
-extern MenuPage D_00258EE8, D_00259018;
-extern MenuDescriptor D_00259148, D_00259198, D_002591E8, D_00259238, D_00259288, D_002592D8;
-extern unsigned char D_00263B50[], D_00263EF0[], D_00264290[];
+extern MenuPage g_menu_page_main, g_menu_page_pause;
+extern MenuDescriptor g_menu_widget_a, g_menu_widget_b, g_menu_widget_c, g_menu_widget_d, g_menu_widget_e, g_menu_widget_f;
+extern unsigned char g_font_glyphs_small[], g_font_glyphs_medium[], g_font_glyphs_large[];
 /* Pairs of text ids: the id to look for, then the id of the text it is formatted with. */
-extern int D_00258D70[];
-extern char D_00210C40[], D_001ABAC8[];
-extern int D_001AA444 __attribute__((sda)), D_001AA448 __attribute__((sda));
+extern int g_menu_text_id_table[];
+extern char g_menu_text_buffer[], g_str_render_text_fmt[];
+extern int g_text_shadow_offset_x __attribute__((sda)), g_text_shadow_offset_y __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long);
 extern void SetupGifPaging(int);
 extern void gfx_disable_screen_flag(void);
@@ -85,17 +85,17 @@ int RenderLocalizedUiEntryList(MenuDescriptor *menu) {
     int shadow_x;
     font_height = 12;
     font_texture_index = 1;
-    glyphs = D_00263B50;
+    glyphs = g_font_glyphs_small;
     focused = g_pause_menu_state.current->focus == menu;
     if (menu->flags & 4) {
         font_height = 14;
         font_texture_index = 3;
-        glyphs = D_00264290;
+        glyphs = g_font_glyphs_large;
     }
     if (menu->flags & 8) {
         font_height = 10;
         font_texture_index = 2;
-        glyphs = D_00263EF0;
+        glyphs = g_font_glyphs_medium;
     }
     VU1_addGSregister(0x42, 0x44);
     VU1_addGSregister(0x47, 0x2004B);
@@ -164,24 +164,24 @@ int RenderLocalizedUiEntryList(MenuDescriptor *menu) {
                 color = 0x80303030;
             }
             text_id = GetLocalizedString(menu->items[selection_index].text_id);
-            if ((g_pause_menu_state.current == &D_00258EE8 || g_pause_menu_state.current == &D_00259018) &&
-                (menu == &D_00259148 || menu == &D_00259198 || menu == &D_002591E8 ||
-                 menu == &D_00259238 || menu == &D_00259288 || menu == &D_002592D8)) {
+            if ((g_pause_menu_state.current == &g_menu_page_main || g_pause_menu_state.current == &g_menu_page_pause) &&
+                (menu == &g_menu_widget_a || menu == &g_menu_widget_b || menu == &g_menu_widget_c ||
+                 menu == &g_menu_widget_d || menu == &g_menu_widget_e || menu == &g_menu_widget_f)) {
                 int j, found = -1;
                 j = 0;
                 while (j < 14) {
-                    if (D_00258D70[j] == menu->items[selection_index].text_id) {
+                    if (g_menu_text_id_table[j] == menu->items[selection_index].text_id) {
                         found = j + 1;
                         break;
                     }
                     j += 2;
                 }
                 if (found >= 0) {
-                    mem_clear(D_00210C40, 0, 256);
+                    mem_clear(g_menu_text_buffer, 0, 256);
                     text_id = GetLocalizedString(menu->items[selection_index].text_id);
-                    sprintf(D_00210C40, D_001ABAC8,
-                                 GetLocalizedString(D_00258D70[found]), text_id);
-                    text_id = D_00210C40;
+                    sprintf(g_menu_text_buffer, g_str_render_text_fmt,
+                                 GetLocalizedString(g_menu_text_id_table[found]), text_id);
+                    text_id = g_menu_text_buffer;
                 }
             }
             if (menu->items[selection_index].enabled == 2) {
@@ -194,7 +194,7 @@ int RenderLocalizedUiEntryList(MenuDescriptor *menu) {
                 x = half_width - (maximum_text_width >> 1);
             }
             gfx_disable_screen_flag();
-            text_draw_line(x + D_001AA444, y + D_001AA448, 0x80000000L, text_id, -1,
+            text_draw_line(x + g_text_shadow_offset_x, y + g_text_shadow_offset_y, 0x80000000L, text_id, -1,
                        GetEffectTextureDescriptor(font_texture_index), glyphs);
             gfx_enable_screen_flag();
             if (menu->flags & 0x80) {
@@ -204,8 +204,8 @@ int RenderLocalizedUiEntryList(MenuDescriptor *menu) {
             y += row_height;
             if (menu->items[selection_index].secondary_text_id != 0) {
                 gfx_disable_screen_flag();
-                shadow_x = x + D_001AA444;
-                shadow_y = y + D_001AA448;
+                shadow_x = x + g_text_shadow_offset_x;
+                shadow_y = y + g_text_shadow_offset_y;
                 secondary_text = GetLocalizedString(menu->items[selection_index].secondary_text_id);
                 text_draw_line(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
                            GetEffectTextureDescriptor(font_texture_index), glyphs);

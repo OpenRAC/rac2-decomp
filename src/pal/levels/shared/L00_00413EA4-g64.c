@@ -26,11 +26,11 @@ extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void *func_PAL_L00_003AF190(int a, void *b, int c, char *d, float e, float f, float g, float h);
-extern float D_L00_001B12C0[4][4] __attribute__((sda));
-extern int D_L00_001B2D58 __attribute__((nosda));
+extern void *projectile_spawn_targeted_pal(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern float g_sequenced_child_offset_table[4][4] __attribute__((sda));
+extern int g_sequenced_child_flag __attribute__((nosda));
 
-void func_PAL_L00_00415310(Obj_410508 *self)
+void sequenced_child_spawn_pal(Obj_410508 *self)
 {
     Node_410508 *st = self->node;
     float v[4];
@@ -48,7 +48,7 @@ void func_PAL_L00_00415310(Obj_410508 *self)
     if (sign == 0.0f)
         sign = -1.0f;
     st->n = n - 1;
-    matrix_mul_vec3(v, D_L00_001B12C0[n], self->mtx);
+    matrix_mul_vec3(v, g_sequenced_child_offset_table[n], self->mtx);
     FastVecAdd(w, self->pos, v);
     if (st->n == -1) {
         if (st->count0 != 0) {
@@ -56,11 +56,11 @@ void func_PAL_L00_00415310(Obj_410508 *self)
             v[0] = 0.0f;
         }
     }
-    r = (Obj_410508 *)func_PAL_L00_003AF190((int)self, w, st->count0, (char *)v, st->f8, 4.0f, 8.0f, 0.5f);
+    r = (Obj_410508 *)projectile_spawn_targeted_pal((int)self, w, st->count0, (char *)v, st->f8, 4.0f, 8.0f, 0.5f);
     if (r != 0) {
         Sub_410508 *p;
         weapon_spend_ammo(-1, 1);
-        D_L00_001B2D58 = 1;
+        g_sequenced_child_flag = 1;
         r->owner = self;
         p = r->node;
         {

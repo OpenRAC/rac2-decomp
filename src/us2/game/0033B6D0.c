@@ -9,24 +9,24 @@ typedef unsigned char u8;
 /* func_0033A6D8 is matched in 003399B0-g8.c (-G8 small data). */
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_US2_0033BA10(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x214) = a1; }
+void circle_menu_set_radius_us2(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x214) = a1; }
 
 typedef int s32;
 
 /* lot6 -- measured bodies with sizes recorded in the catalogue. */
-void func_US2_0033BA18(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x1C8) = a2; }
+void circle_menu_set_entry_mode_us2(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x1C8) = a2; }
 
 /* writes the value if it is below the maximum; byte-identical across all 27 levels. */
-void func_US2_0033BA28(u8 *a0, s32 a1) { if (a1 < *(s32 *)(a0 + 0x208)) *(s32 *)(a0 + 0x218) = a1; }
+void circle_menu_set_selection_us2(u8 *a0, s32 a1) { if (a1 < *(s32 *)(a0 + 0x208)) *(s32 *)(a0 + 0x218) = a1; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_US2_0033BA40(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x21C) = a1; }
+void circle_menu_set_enabled_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x21C) = a1; }
 
 extern int prompt_bar_destroy(int);
 extern void *F7d9c8805_FUN_003361A8(int);
 extern char *F7d9c8805_FUN_00336968(int);
 
-void *func_US2_0033BB98(int a0)
+void *prompt_bar_destroy_us2(int a0)
 {
 	char *p = (char *)a0 + 12;
 	int i;
@@ -47,15 +47,15 @@ extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 /* func_0033ABD8 is matched in 003399B0-g8.c (-G8 small data). */
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_US2_0033BE60(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C0) = a1; }
+void prompt_bar_set_texts_enabled_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C0) = a1; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_US2_0033BE68(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C4) = a1; }
+void prompt_bar_set_extras_enabled_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C4) = a1; }
 
 extern void object_set_first_float4(void *, float, float, float, float);
 extern void object_set_value_float(void *, float);
 
-void func_US2_0033BE70(char *object) {
+void prompt_bar_update_us2(char *object) {
     char *r = object + 12;
     char *q = object + 0x188;
     int i;
@@ -78,7 +78,7 @@ void func_US2_0033BE70(char *object) {
 extern void F624a0727_FUN_00336A78(char *target);
 typedef struct { char pad[8]; short n; void (*fn)(char *); } ENTRY_F624a0727;
 
-void func_US2_0033BF90(char *object)
+void prompt_bar_draw_us2(char *object)
 {
     char *r = object + 12;
     char *q = object + 60;

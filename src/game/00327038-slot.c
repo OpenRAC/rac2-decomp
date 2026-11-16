@@ -9,10 +9,10 @@ extern s32 part_find_effect_slot_by_object(void *object);
 /* func_0032D758's effect type rows, kind flags and per-bank effect parameters. */
 typedef struct { int active; unsigned char type; char pad[0x47]; short kind; char tail[0x92]; } EffectType;
 extern EffectType g_weapon_table[];
-extern unsigned char D_001A7A80[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
 extern unsigned char g_item_slot_to_record[];
 typedef struct { float scale; int ticks; char pad[8]; } EffectParams;
-extern EffectParams D_00236510[2][119];
+extern EffectParams g_effect_params_table[2][119];
 extern float *moby_get_private_value_0(void *);
 /* The matched slot consumer reads +0x0C as phase; creation clears its bits. */
 typedef struct {
@@ -58,7 +58,7 @@ int StartAttachedEffect(char *self, int index, int arg)
     char *p;
     float *health;
     if (!kind) kind = index;
-    if (!(D_001A7A80[kind] & 8)) return result;
+    if (!(g_movie_seen_flags[kind] & 8)) return result;
     alternate = 0;
     if (EffectAlternate(kind) || EffectThird(kind)) alternate = 1;
     if (*(short *)(*(char **)(self + 0x24) + 0x46) != 5) return 1;
@@ -77,8 +77,8 @@ int StartAttachedEffect(char *self, int index, int arg)
         slot = &g_health_l00_drain_slots[i];
         found = 0;
         slot->object = self;
-        slot->remaining = D_00236510[alternate][index].ticks * 60;
-        slot->rate = D_00236510[alternate][index].scale * 0.01666667f;
+        slot->remaining = g_effect_params_table[alternate][index].ticks * 60;
+        slot->rate = g_effect_params_table[alternate][index].scale * 0.01666667f;
         flags = *(unsigned short *)(self + 0x34);
         if (flags & 0x20) {
             char *colour = *(char **)(*(char **)(self + 0x68) + 0x10);

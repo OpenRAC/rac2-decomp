@@ -1,11 +1,11 @@
 #include "common.h"
 
 typedef int DobboQuad __attribute__((mode(TI)));
-extern int D_L09_001B1428 __attribute__((sda));
-extern float D_L09_001B13F4 __attribute__((sda));
-extern float D_L09_001B13F8 __attribute__((sda));
+extern int g_dobbo_wander_disabled __attribute__((sda));
+extern float g_dobbo_slow_move_speed __attribute__((sda));
+extern float g_dobbo_wander_range __attribute__((sda));
 extern float D_L09_001B13F8_1[] __attribute__((sda)); /* { lower, upper } bounds, read as a pair */
-extern char D_L09_00189EA0[];
+extern char g_dobbo_target_point[];
 extern void dobbo_update_release_record(char *);
 extern int flag_set_second_pending(char *);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
@@ -53,7 +53,7 @@ void dobbo_wandering_update(char *obj)
     int flags;
     int animation;
     float angle, speed;
-    if (D_L09_001B1428) return;
+    if (g_dobbo_wander_disabled) return;
     data = *(char **)(obj + 0x68);
     dobbo_update_release_record(obj);
     if (!obj || BYTE(obj,0x20) == 0xFE || BYTE(obj,0x20) == 0xFD) return;
@@ -77,7 +77,7 @@ void dobbo_wandering_update(char *obj)
     case 1:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.002222222276f,0.083333336f,0.006981317885f,0.4188790917f);
-            FLOAT(data,0x1D0)=D_L09_001B13F4*0.0166666675f;
+            FLOAT(data,0x1D0)=g_dobbo_slow_move_speed*0.0166666675f;
             FLOAT(data,0x134)=0.05f;
         }
         if (HALF(data,0x334)==1) moby_set_state(obj,9,2);
@@ -86,7 +86,7 @@ void dobbo_wandering_update(char *obj)
     case 2:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.003333333414f,0.083333336f,0.006981317885f,0.4188790917f);
-            FLOAT(data,0x1D0)=D_L09_001B13F4*0.0166666675f;
+            FLOAT(data,0x1D0)=g_dobbo_slow_move_speed*0.0166666675f;
             FLOAT(data,0x124)=0.006666666828f;
             FLOAT(data,0x134)=0.05f;
             WORD(data,0x35C)=math_random_int_range(0,30);
@@ -140,7 +140,7 @@ void dobbo_wandering_update(char *obj)
         if (flag_set_first_pending(obj)) {
             if (BYTE(obj,0x43)!=math_random_int_below(2)+4) anim_start_blended(obj,math_random_int_below(2)+4,0,10);
         }
-        if (fast_vec_dist(obj+0x10,D_L09_00189EA0)<D_L09_001B13F8) moby_set_state(obj,4,-1);
+        if (fast_vec_dist(obj+0x10,g_dobbo_target_point)<g_dobbo_wander_range) moby_set_state(obj,4,-1);
         else if (BYTE(obj,0x60)&2) {
             switch (math_random_int_below(3)) {
             case 0: moby_set_state(obj,6,-1); break;
@@ -166,9 +166,9 @@ void dobbo_wandering_update(char *obj)
     case 4:
         if (flag_set_first_pending(obj)) {
             dobbo_start_slow_move_anim(obj,10);
-            FLOAT(data,0x238)=math_random_float_range(D_L09_001B13F8,D_L09_001B13F8_1[1])+0.5f;
+            FLOAT(data,0x238)=math_random_float_range(g_dobbo_wander_range,D_L09_001B13F8_1[1])+0.5f;
         }
-        if ((dobbo_move_toward_point(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,D_L09_00189EA0)) {
+        if ((dobbo_move_toward_point(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,g_dobbo_target_point)) {
             if (math_random_int_below(2)) moby_set_state(obj,6,-1);
             else moby_set_state(obj,7,-1);
         }

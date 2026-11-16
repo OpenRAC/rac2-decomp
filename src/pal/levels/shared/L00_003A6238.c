@@ -82,12 +82,12 @@ void func_PAL_L00_003A77D8(char *moby)
 
 
 
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
 extern void func_0029FCC0_1(int a, int b, void *c);
 extern void *projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 
 /* Runs one helper over the object and a stack buffer, then builds a second call from the object's field 104 sub-object - its field 24 as a float, the constants 2.0f/5.0f/0.6f and a bound data address - and stores the object into field 184 of the returned pointer when it is non-null. */
-void func_PAL_L00_003A8978(int a0)
+void weapon_spawn_muzzle_effect_pal(int a0)
 {
     int buf[4];
     int s0;
@@ -95,7 +95,7 @@ void func_PAL_L00_003A8978(int a0)
 
     s0 = *(int *)(a0 + 104);
     func_0029FCC0_1(a0, 0, buf);
-    v = projectile_spawn_targeted(a0, buf, *(int *)(s0 + 16), D_L00_001A8F20, *(float *)(s0 + 24), 2.0f, 5.0f, 0.6f);
+    v = projectile_spawn_targeted(a0, buf, *(int *)(s0 + 16), g_default_vector, *(float *)(s0 + 24), 2.0f, 5.0f, 0.6f);
     if (v != 0) {
         *(int *)(v + 184) = a0;
     }
@@ -117,15 +117,15 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
-extern char *func_PAL_L00_00400968(char *, char *, char *, int);
+extern char *spark_trail_create_pal(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern int func_PAL_0032F0B8(int, int, char *);
+extern int StartAttachedEffect_pal(int, int, char *);
 extern int g_hero_moby;
-extern unsigned char D_00139582;
+extern unsigned char g_ray_weapon_index;
 extern L00AimState g_collision_result;
 extern L00AimEntry g_weapon_l00_table[];
 
-int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
+int beam_trace_and_apply_damage_pal(char *a0, char *a1, char *a2, char *a3)
 {
     char local[16];
     float distance;
@@ -139,9 +139,9 @@ int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
         FastVecSub(local, a2, a1);
         vec_scale_to_length(local, local, 1.0f);
         FastVecSub(local, (char *)g_collision_result.vector_20, a1);
-        func_PAL_L00_00400968(a1, local, (char *)g_collision_result.vector_20, 1);
+        spark_trail_create_pal(a1, local, (char *)g_collision_result.vector_20, 1);
         if (g_collision_result.object_18 != 0) {
-            saved = (g_weapon_l00_table + D_00139582)->value_70;
+            saved = (g_weapon_l00_table + g_ray_weapon_index)->value_70;
             distance = fast_vec_dist((char *)g_collision_result.vector_20, a1);
             if (distance < 10.0f) {
                 *(float *)(a3 + 0x1C) = saved;
@@ -153,12 +153,12 @@ int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
                 *(float *)(a3 + 0x1C) = saved * 0.125f;
             }
             QueueMobyImpact(g_collision_result.object_18, a3);
-            func_PAL_0032F0B8(g_collision_result.object_18, 26, a0);
+            StartAttachedEffect_pal(g_collision_result.object_18, 26, a0);
         }
         ret = g_collision_result.object_18;
     } else {
     FastVecSub(local, a2, a1);
-    func_PAL_L00_00400968(a1, local, a2, 0);
+    spark_trail_create_pal(a1, local, a2, 0);
     ret = 0;
     }
     return ret;

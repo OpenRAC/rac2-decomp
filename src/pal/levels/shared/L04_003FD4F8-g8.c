@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int L04_FBD80Quad __attribute__((mode(TI)));
 typedef struct {
@@ -12,7 +13,7 @@ extern unsigned char *ref_L04_003FBD80_00(int kind);
 extern int ref_L04_003FBD80_01(int a0, int a1, void *owner);
 extern float ref_L04_003FBD80_02(float low, float high);
 extern void func_PAL_L04_003FFB98(unsigned char *object, L04_FBD80Vars *vars);
-extern int D_L04_001B0488 __attribute__((sda));
+extern int g_shield_dome_sound_handle __attribute__((sda));
 
 /* Spawns a kind-0xABE object for an entity of kind 0xBBC: it takes the entity's 8-byte
    word at +0x38, the given position raised by 0.2 and the entity's quadword at +0xF0 (with
@@ -41,7 +42,7 @@ unsigned char *func_PAL_L04_003FFF88(unsigned char *entity, L04_FBD80Quad *posit
         vars = *(L04_FBD80Vars **)(object + 0x68);
         result = ref_L04_003FBD80_01(9, 0, entity);
         word = *(long *)(entity + 0x38);
-        D_L04_001B0488 = result;
+        g_shield_dome_sound_handle = result;
         *(long *)(object + 0x38) = word;
         *(L04_FBD80Quad *)(object + 0x10) = *(L04_FBD80Quad *)pos;
         *(float *)(object + 0x18) += 0.2f;

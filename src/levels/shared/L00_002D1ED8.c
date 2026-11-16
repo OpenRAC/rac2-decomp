@@ -14,7 +14,7 @@ extern BatchA_A14_S g_hero_state;
 
 typedef struct { short key; short val; } Entry;
 
-extern Entry *D_0018C2B8;
+extern Entry *g_hero_anim_table;
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef int Rac2Native_28c929cadd7aca24_s32;
@@ -78,7 +78,7 @@ void hero_clear_anim_flags(void) {
 /* Looks up a key in the current table and gives back its value. Returns 1 when found, otherwise 0. */
 int hero_lookup_anim_by_key(int key, int *out)
 {
-    Entry *table = D_0018C2B8;
+    Entry *table = g_hero_anim_table;
     Entry *entry;
 
     if (table == 0)
@@ -168,14 +168,14 @@ void hero_clear_queued_anim(void) {
 }
 
 /* The resident word published below. */
-extern int D_0018AA68;
+extern int g_hero_anim_mode;
 
 /* Publishes the argument into the resident word, with 0xFFFFFFFF becoming 5. */
 void hero_set_anim_mode(int value)
 {
     if (value == -1)
         value = 5;
-    D_0018AA68 = value;
+    g_hero_anim_mode = value;
 }
 
 
@@ -273,7 +273,7 @@ void hero_clear_pair_flag_bit(void) {
 
 
 /* The matrix the level state keeps 0x90 bytes in; the state itself is 0x90 below it. */
-extern char D_00189EB0[];
+extern char g_hero_turn_rotation[];
 
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -299,9 +299,9 @@ float hero_compute_aim_angle(void)
     aimVec[0] = math_fast_sin_or_cos_a(0.0f);
     aimVec[1] = math_fast_sin_or_cos_b(0.0f);
     aimVec[2] = 0.0f;
-    euler_to_matrix(matrix, D_00189EB0);
+    euler_to_matrix(matrix, g_hero_turn_rotation);
     transform_vector(aimVec, aimVec, matrix);
-    heroState = D_00189EB0 - 0x90;
+    heroState = g_hero_turn_rotation - 0x90;
 
     if (*(float *)(heroState + 0x2A0) != 0.0f || *(float *)(heroState + 0x2A4) != 0.0f) {
         *(TI128_L00_002D3290 *)aimCopy = *(TI128_L00_002D3290 *)(heroState + 0x2A0);

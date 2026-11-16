@@ -7,18 +7,18 @@ extern void vec_random_direction(float *, float, float);
 extern void FastVecAdd(float *, float *, float *);
 extern void matrix_mul_vec3(float *, float *, void *);
 extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
-extern float D_L00_001AFAE8 __attribute__((sda));
-extern float D_L00_001AFAEC;
-extern float D_L00_001AFAF8 __attribute__((sda));
-extern float D_L00_001AFAFC;
-extern int D_L00_001AFB00 __attribute__((sda));
-extern int D_L00_001AFB04;
-extern int D_L00_001AFB08 __attribute__((sda));
-extern int D_L00_001AFB0C[] __attribute__((sda));
-extern int D_L00_001AFB18 __attribute__((sda));
-extern float D_L00_001AFB20[4] __attribute__((sda));
+extern float g_explosion_l00_speed_min __attribute__((sda));
+extern float g_explosion_l00_speed_max;
+extern float g_sparkle_hero_param_a __attribute__((sda));
+extern float g_sparkle_hero_param_b;
+extern int g_sparkle_color_a __attribute__((sda));
+extern int g_sparkle_color_b;
+extern int g_sparkle_kind_min __attribute__((sda));
+extern int g_sparkle_kind_ranges[] __attribute__((sda));
+extern int g_sparkle_count __attribute__((sda));
+extern float g_sparkle_camera_offset[4] __attribute__((sda));
 extern char g_camera_l00_position[];
-extern float D_L00_001A8F20[4];
+extern float g_default_vector[4];
 
 /* Spawns a few sparkles near the camera. */
 void part_spawn_camera_sparkles(void)
@@ -26,43 +26,43 @@ void part_spawn_camera_sparkles(void)
     float point[4], velocity[4], scatter[4];
     int i = 0;
     unsigned char kind, random;
-    matrix_mul_vec3(point, D_L00_001AFB20, g_camera_l00_position + 0x230);
+    matrix_mul_vec3(point, g_sparkle_camera_offset, g_camera_l00_position + 0x230);
     FastVecAdd(point, point, (float *)g_camera_l00_position);
-    kind = math_random_int_range(D_L00_001AFB08, D_L00_001AFB0C[0]);
+    kind = math_random_int_range(g_sparkle_kind_min, g_sparkle_kind_ranges[0]);
     random = math_random_int_below(255);
-    part_spawn_hero_relative(point, D_L00_001A8F20, D_L00_001AFB00, kind, random, 0, D_L00_001AFAF8);
-    vec_random_direction(velocity, D_L00_001AFAE8 * (1.0f / 60.0f), D_L00_001AFAEC * (1.0f / 60.0f));
-    while (i < D_L00_001AFB18) {
+    part_spawn_hero_relative(point, g_default_vector, g_sparkle_color_a, kind, random, 0, g_sparkle_hero_param_a);
+    vec_random_direction(velocity, g_explosion_l00_speed_min * (1.0f / 60.0f), g_explosion_l00_speed_max * (1.0f / 60.0f));
+    while (i < g_sparkle_count) {
         i++;
         vec_random_direction(scatter, 0.0f, 0.25f);
         FastVecAdd(scatter, scatter, point);
-        kind = math_random_int_range(D_L00_001AFB0C[1], D_L00_001AFB0C[2]);
+        kind = math_random_int_range(g_sparkle_kind_ranges[1], g_sparkle_kind_ranges[2]);
         random = math_random_int_below(255);
-        part_spawn_hero_relative(scatter, velocity, D_L00_001AFB04, kind, random, 0, D_L00_001AFAFC);
+        part_spawn_hero_relative(scatter, velocity, g_sparkle_color_b, kind, random, 0, g_sparkle_hero_param_b);
     }
 }
 
-extern float D_L00_001AFB30 __attribute__((sda));
-extern float D_L00_001AFB34;
-extern float D_L00_001AFB40 __attribute__((sda));
-extern float D_L00_001AFB44;
-extern int D_L00_001AFB48[2][2] __attribute__((sda));
-extern int D_L00_001AFB58 __attribute__((sda));
-extern int D_L00_001AFB5C[] __attribute__((sda));
+extern float g_two_color_sparkle_speed_min __attribute__((sda));
+extern float g_two_color_sparkle_speed_max;
+extern float g_two_color_sparkle_param_a __attribute__((sda));
+extern float g_two_color_sparkle_param_b;
+extern int g_two_color_sparkle_colors[2][2] __attribute__((sda));
+extern int g_two_color_sparkle_kind_min __attribute__((sda));
+extern int g_two_color_sparkle_kind_ranges[] __attribute__((sda));
 
 /* Spawns two small sparkles at a position, colored by the object's state. */
 void part_spawn_two_colored_sparkles(char *object, void *position)
 {
     float velocity[4];
     void *first = *(void **)(object + 0x68);
-    unsigned char kind = math_random_int_range(D_L00_001AFB58, D_L00_001AFB5C[0]);
-    int *color = &D_L00_001AFB48[(unsigned char)object[0xbc]][0];
+    unsigned char kind = math_random_int_range(g_two_color_sparkle_kind_min, g_two_color_sparkle_kind_ranges[0]);
+    int *color = &g_two_color_sparkle_colors[(unsigned char)object[0xbc]][0];
     int *color2;
     unsigned char random = math_random_int_below(255);
-    part_spawn_hero_relative(position, first, *color, kind, random, 0, D_L00_001AFB40);
-    vec_random_direction(velocity, D_L00_001AFB30 * (1.0f / 60.0f), D_L00_001AFB34 * (1.0f / 60.0f));
-    kind = math_random_int_range(D_L00_001AFB5C[1], D_L00_001AFB5C[2]);
-    color2 = (int *)((char *)D_L00_001AFB48 + (((unsigned char)object[0xbc] << 3) | 4));
+    part_spawn_hero_relative(position, first, *color, kind, random, 0, g_two_color_sparkle_param_a);
+    vec_random_direction(velocity, g_two_color_sparkle_speed_min * (1.0f / 60.0f), g_two_color_sparkle_speed_max * (1.0f / 60.0f));
+    kind = math_random_int_range(g_two_color_sparkle_kind_ranges[1], g_two_color_sparkle_kind_ranges[2]);
+    color2 = (int *)((char *)g_two_color_sparkle_colors + (((unsigned char)object[0xbc] << 3) | 4));
     random = math_random_int_below(255);
-    part_spawn_hero_relative(position, velocity, *color2, kind, random, 0, D_L00_001AFB44);
+    part_spawn_hero_relative(position, velocity, *color2, kind, random, 0, g_two_color_sparkle_param_b);
 }

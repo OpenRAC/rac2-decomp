@@ -24,7 +24,7 @@ extern L02_003F5710_Hero g_hero_state;
 
    The flag is a plain extern int: the assembler decides each access at its use, a gp-relative one
    inside a delay slot and the absolute lui/lw pair elsewhere, as retail has them. */
-extern char *D_L02_001B1190[] __attribute__((sda));
+extern char *g_arena_challenge_table_2[] __attribute__((sda));
 
 /* Whether the pair of table entries the object names still agree with its own four words. */
 /* func_L02_003FCBF0 is defined in L02_003FCBF0-g8.c. */
@@ -36,12 +36,12 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 
-extern char *D_L02_001B1190[2] __attribute__((sda));
+extern char *g_arena_challenge_table_2[2] __attribute__((sda));
 extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern u32 g_entity_group_lists[];
-extern f32 D_L02_001B1258 __attribute__((sda));
-extern f32 D_L02_001B125C __attribute__((sda));
+extern f32 g_cutscene_camera_time __attribute__((sda));
+extern f32 g_cutscene_camera_angle __attribute__((sda));
 extern s32 moby_is_state_six(char *);
 extern s32 moby_is_state_one_cleared_vars(char *);
 extern s32 math_random_int_below(s32);
@@ -104,7 +104,7 @@ extern void teleporter_bind_captured_object(char *, char *, f32, f32);
 
 void func_PAL_L02_00401980(char *a0) {
     char *state = *(char **)(a0 + 0x68);
-    char *rec = *(char **)(D_L02_001B1190[*(s16 *)(state + 0x120)] + 4)
+    char *rec = *(char **)(g_arena_challenge_table_2[*(s16 *)(state + 0x120)] + 4)
                 + *(s16 *)(state + 0x122) * 0x14;
     char *buf[16];
     u16 *p;
@@ -120,7 +120,7 @@ void func_PAL_L02_00401980(char *a0) {
    object names (+0x44) is walked: the first entity for which func_L02_003FD000 and
    func_L02_003D77B8 both return non-zero goes into the slot; if the slot is still empty, the
    first one with func_L02_003D77B8 non-zero that is more than 30.0 away from D_00189EA0. */
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
 /* D_001A7A0C, written as the second word of an 8-byte object: cc1 then counts the store as two
    instructions and keeps it out of func_L02_003FCDF8's delay slot, and the assembler gives the
@@ -148,14 +148,14 @@ extern s32 arena_start_announcer_message(char *, s32);
    entity's float at +0x20 is below its half-word at +0x24 scaled by D_L02_001B1534, unless the
    state's half-word at 0x1F4 (0x200) is set, and 0x13 (0x19) when that float is not above zero,
    unless the half-word at 0x1F6 (0x202) is set.  A positive pick is handed to func_L02_00400650. */
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 typedef struct {
     char pad0[4];
     u8 f4;
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 
-extern L02_003FF9A0_Rec D_L02_00264A70[];
+extern L02_003FF9A0_Rec g_material_l02_table[];
 
 extern s32 arena_get_challenge_save_index(s32);
 /* Calls func_L00_002C42E0(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test

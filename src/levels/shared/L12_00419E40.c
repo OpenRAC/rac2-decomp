@@ -5,15 +5,15 @@
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern int D_L12_001A79F0 MACRO_ADDR;
-extern int D_L12_001A8F00 MACRO_ADDR;
+extern int g_robot_kill_counter MACRO_ADDR;
+extern int g_hero_l12_control_mode MACRO_ADDR;
 struct L12GlobalState {
     char pad0[0x24]; int f24;
     char pad28[0x40]; int f68; short f6C;
     char pad6E[4]; short f72;
 };
-extern struct L12GlobalState D_L12_001A63A8;
-extern char *D_L12_001FEAC0[];
+extern struct L12GlobalState g_path_shooter_state;
+extern char *g_path_zone_table[];
 extern void path_enemy_init_scale(void *);
 extern int moby_dispatch_action_by_kind(void *,void *);
 extern void moby_mark_spawned(void *);
@@ -37,8 +37,8 @@ extern void enemy_tick_timers_age(void *);
 void path_shooter_update(char *obj) {
     char *vars=P(obj,0x68);
     int anim_index;
-    if(D_L12_001A79F0==13) {
-        if(D_L12_001A8F00!=2) {
+    if(g_robot_kill_counter==13) {
+        if(g_hero_l12_control_mode!=2) {
             U(obj,0x34)=(U(obj,0x34)&0xFFBE)|0x1000;
             W(obj,0x98)=W(P(obj,0x24),0x10);
         } else {
@@ -67,12 +67,12 @@ void path_shooter_update(char *obj) {
         break;
     case 8:
         moby_step_at_own_position_factor(obj,F(vars,0x228));
-        if(D_L12_001A63A8.f72==3 && D_L12_001A63A8.f6C<6000) {
+        if(g_path_shooter_state.f72==3 && g_path_shooter_state.f6C<6000) {
             snd_resume_music_stream(); moby_set_state(obj,5,-1);
         }
         break;
     case 5:
-        if(!D_L12_001A63A8.f68 && D_L12_001A63A8.f24==-1) {
+        if(!g_path_shooter_state.f68 && g_path_shooter_state.f24==-1) {
             tourist_increment_counters(W(vars,0x114));
             moby_set_state(obj,6,-1);
             if(B(obj,0x43)) anim_start_blended(obj,0,0,20);
@@ -86,7 +86,7 @@ void path_shooter_update(char *obj) {
         break;
     case 6:
         if(AimAtPathCursorAndAdvance(obj)) {
-            if(W(vars,0x220)==W(D_L12_001FEAC0[W(vars,0x110)],0)-1) {
+            if(W(vars,0x220)==W(g_path_zone_table[W(vars,0x110)],0)-1) {
                 moby_set_state(obj,3,-1);
                 if(B(obj,0x43)!=9)anim_start_blended(obj,9,0,20);
             } else {

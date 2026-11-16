@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
-extern char D_L00_001B8E20[];
+extern char g_camera_move_state[];
 extern int cam_resolve_position(void *, int);
 extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -13,7 +13,7 @@ void cam_init_state_vectors(char *self)
 {
     float direction[4], projected[4], offset[4];
     char *data = *(char **)(self + 0x70);
-    char *base = D_L00_001B8E20;
+    char *base = g_camera_move_state;
     char *axis = base + 0x30;
     char *position = data + 0x60;
     char *end;

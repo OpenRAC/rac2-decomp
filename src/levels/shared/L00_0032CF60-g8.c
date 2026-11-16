@@ -5,10 +5,10 @@
    unless flag 4 is set. Built with -G8 -g. */
 #include "common.h"
 
-extern int D_L00_001FACE0 __attribute__((nosda));
-extern char *D_L00_001B1EA8;
+extern int g_target_l00_list __attribute__((nosda));
+extern char *g_moby_l00_list_head;
 extern char *D_L00_001B1EA8_1 __attribute__((sda));
-extern char *D_L00_001B1E9C;
+extern char *g_moby_array_base;
 extern void func_002A05A8(void *object);
 extern void func_002A0F48(void *object);
 
@@ -17,9 +17,9 @@ void moby_update_live_mobys(void)
 {
     char *scan, *object, *last = 0;
 
-    D_L00_001FACE0 = 0;
-    D_L00_001B1EA8 = 0;
-    for (scan = D_L00_001B1E9C; *(unsigned char *)(scan + 0x20) != 255; scan += 0x100) {
+    g_target_l00_list = 0;
+    g_moby_l00_list_head = 0;
+    for (scan = g_moby_array_base; *(unsigned char *)(scan + 0x20) != 255; scan += 0x100) {
         if ((*(unsigned char *)(scan + 0x20) & 0x80) == 0 &&
             (*(unsigned short *)(scan + 0x34) & 2) == 0) {
             if (last != 0)
@@ -31,7 +31,7 @@ void moby_update_live_mobys(void)
     }
     if (last != 0)
         *(char **)(last + 0x28) = 0;
-    object = D_L00_001B1EA8;
+    object = g_moby_l00_list_head;
     while (object != 0) {
         if (*(signed char *)(object + 0x20) >= 0) {
             if ((*(unsigned short *)(object + 0x34) & 0x40) == 0)

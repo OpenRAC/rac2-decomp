@@ -5,7 +5,7 @@ typedef float V4_F307808[4] __attribute__((aligned(16)));
 
 extern u8 g_item_slot_to_record[];
 extern char g_weapon_table[];
-extern s32 D_001AEC68 __attribute__((sda));
+extern s32 g_megaturret_shot_param __attribute__((sda));
 
 extern void moby_transform_joint_to_world(char *, s32, void *);
 extern void moby_get_facing_direction(char *, void *);
@@ -51,7 +51,7 @@ void megaturret_fire_shot(char *moby)
                 effect = shot_moby_create(muzzle_pos, shot_velocity, 2.0f, 15.0f, 0.5f, 3.0f, 0x50, 0xC8, 1, 0, 0x10E, *(char **)(vars + 0x64));
                 if (effect != 0)
                     *(s32 *)(effect + 0xB8) = *(s32 *)(vars + 0x68);
-                *(s32 *)(vars + 0x40) = D_001AEC68;
+                *(s32 *)(vars + 0x40) = g_megaturret_shot_param;
                 *(s32 *)(vars + 0x44) = 6;
                 if (--*(s32 *)(vars + 0x60) <= 0)
                     *(u8 *)(moby + 0x20) = 8;

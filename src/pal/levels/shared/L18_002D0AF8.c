@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_L18_001AFBB0 MACRO_ADDR;
+extern s32 g_hero_frozen_flag MACRO_ADDR;
 extern u8 g_hero_state[];
 typedef struct {
     u8 reserved000[0x80];
@@ -23,7 +23,7 @@ typedef struct {
 extern InputRecordPrefix g_pad_state;
 extern void hero_reset_speeds_and_vectors(void);
 extern s32 FastDecTimer(void *);
-extern s32 func_PAL_L00_002D3928(void);
+extern s32 hero_get_movement_mode_pal(void);
 extern float hero_get_stick_magnitude(void);
 extern float vec_length_xy(void *);
 extern void func_PAL_L18_002D7598(void);
@@ -31,8 +31,8 @@ extern void euler_to_matrix(void *, void *);
 extern void set_identity_matrix(void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void func_PAL_L18_002D0738(void);
-extern void func_PAL_L00_002C2F88(void);
-extern void func_PAL_L18_002DF168(void);
+extern void hero_probe_ground_and_ledge_pal(void);
+extern void hero_update_timers_reach_pal(void);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 GetCollHitMaterial(void);
 
@@ -44,13 +44,13 @@ extern s32 GetCollHitMaterial(void);
 
 /* func_L18_002CFF48 is defined in L18_002CFD68-qcopy.c. */
 
-void func_PAL_L18_002D0AF8(void)
+void hero_update_frame_input_pal(void)
 {
     u8 *base;
     u8 *snapshot;
     u8 *positions;
     s32 index;
-    s32 active = D_L18_001AFBB0;
+    s32 active = g_hero_frozen_flag;
     if (active) {
         hero_reset_speeds_and_vectors();
         return;
@@ -63,7 +63,7 @@ void func_PAL_L18_002D0AF8(void)
     } else FastDecTimer(snapshot - 0xBDC);
     base = g_hero_state;
     if (*(s32 *)(base + 0x2294) == 16) *(s16 *)(base + 0x1454) = 0;
-    base[0x22C3] = func_PAL_L00_002D3928();
+    base[0x22C3] = hero_get_movement_mode_pal();
     *(float *)(base + 0x1FB0) = g_pad_state.horizontal;
     *(float *)(base + 0x1FB4) = g_pad_state.vertical;
     *(s32 *)(base + 0x270) = 0;
@@ -93,14 +93,14 @@ void func_PAL_L18_002D0AF8(void)
     set_identity_matrix(base + 0x40);
     matrix_from_basis_rows(base + 0x40, base);
     func_PAL_L18_002D0738();
-    func_PAL_L00_002C2F88();
-    func_PAL_L18_002DF168();
+    hero_probe_ground_and_ledge_pal();
+    hero_update_timers_reach_pal();
 }
 
 
 extern s32 hero_get_movement_mode(void);
 typedef struct { u8 prefix[0x18]; s32 object; s32 count; u8 gap[0x20]; float normal[4]; } MotionCollision;
-extern MotionCollision D_L18_001BFC00;
+extern MotionCollision g_hero_ground_hit;
 extern float cam_get_view_space_vector_length(void *);
 extern void hero_build_relative_point(float *, float, float, float, s32);
 extern void vec_scale_to_length(void *, void *, float);
@@ -114,7 +114,7 @@ extern void FastVecAdd(void *a0, void *a1, void *a2);
 extern void vec_scale_to_length(void *a0, void *a1, float f12);
 extern void FastVecAdd(void *a0, void *a1, void *a2);
 
-void func_PAL_L18_002D1890(s32 force)
+void ClipHeroVelocityAtWall_pal(s32 force)
 {
     float start[4], end[4], lowerStart[4], lowerEnd[4];
     float height, reach, angle, dot;
@@ -145,22 +145,22 @@ void func_PAL_L18_002D1890(s32 force)
     FastVecAdd(lowerEnd, lowerEnd, lowerStart);
     {
         u8 *hero = g_hero_state;
-        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = GetCollHitMaterial();
+        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) material = GetCollHitMaterial();
     }
     angle = 0.0f;
     {
         u8 *hero = g_hero_state;
-        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = cam_get_view_space_angle(D_L18_001BFC00.normal);
+        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) angle = cam_get_view_space_angle(g_hero_ground_hit.normal);
     }
     if (angle >= 0.8726647f || material == 8 || material == 12) {
         u8 *hero = g_hero_state;
-        *(s32 *)(hero + 0x270) = D_L18_001BFC00.object;
-        cam_set_view_space_height(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 0.0f);
-        vec_scale_to_length(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
-        dot = FastVecDot(D_L18_001BFC00.normal, hero + 0xF0);
+        *(s32 *)(hero + 0x270) = g_hero_ground_hit.object;
+        cam_set_view_space_height(g_hero_ground_hit.normal, g_hero_ground_hit.normal, 0.0f);
+        vec_scale_to_length(g_hero_ground_hit.normal, g_hero_ground_hit.normal, 1.0f);
+        dot = FastVecDot(g_hero_ground_hit.normal, hero + 0xF0);
         if (dot < 0.0f) {
-            FastVecScale(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
-            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
+            FastVecScale(g_hero_ground_hit.normal, g_hero_ground_hit.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, g_hero_ground_hit.normal);
         }
     }
 }

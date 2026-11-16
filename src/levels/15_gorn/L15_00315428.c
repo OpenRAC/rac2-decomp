@@ -7,7 +7,7 @@ typedef unsigned int u32;
 typedef int s32;
 typedef short s16;
 
-extern u32 D_L15_001FB320[];
+extern u32 g_moby_list_address_table[];
 extern char *moby_get_motion_data(void *);
 extern char *D_L15_001B261C_base[] __asm__("D_L15_001B261C") __attribute__((sda));
 
@@ -36,7 +36,7 @@ s32 CountActiveLinkedListObjects(char *list) {
     s32 count = 0;
     float threshold;
 
-    listAddr = D_L15_001FB320[(u8)list[0x21]];
+    listAddr = g_moby_list_address_table[(u8)list[0x21]];
     if (listAddr == 0)
         return 0;
     cursor = (u16 *)listAddr;
@@ -88,7 +88,7 @@ s32 CountActiveLinkedListObjects(char *list) {
 
 /* func_L15_004320B0 is matched in its own unit, src/levels/shared/L15_004320B0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
-extern unsigned char D_L15_004328E8[];
+extern unsigned char g_gorn_armed_data[];
 
 extern void RebuildExpiredChannelCurves(void *id);
 extern void func_802FFC98(void *id, void *value);
@@ -102,7 +102,7 @@ void gorn_armed_update(char *moby)
 
     if (*(unsigned char *)(moby + 0x20) == 1) {
         RebuildExpiredChannelCurves(moby);
-        func_802FFC98(D_L15_004328E8, moby);
+        func_802FFC98(g_gorn_armed_data, moby);
         if (func_803068A0(vars + 0x54) != 0) {
             func_80329048(moby);
         }

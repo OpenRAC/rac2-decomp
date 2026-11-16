@@ -13,10 +13,10 @@ extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
 extern int hero_l00_set_action(int, int);
 extern int level_run_slot_callback(int);
-extern int D_00138320[];
-extern char D_L00_002F8588[];
-extern char D_L00_002F85D0[];
-extern char D_L00_002F8AD8[];
+extern int g_pad_pressed_flags[];
+extern char g_str_timed_state_text_a[];
+extern char g_str_timed_state_text_b[];
+extern char g_str_timed_state_text_c[];
 
 extern void update_hero_item_slot_animation_blends(void);
 
@@ -40,9 +40,9 @@ extern void func_0029F338_1(void *moby);
 typedef int V4_Fa012328c __attribute__((mode(TI)));
 #endif
 
-extern char D_00189F20[];
+extern char g_hero_vector_block[];
 
-extern char D_00189F30[] __attribute__((sda));
+extern char g_hero_zero_vector[] __attribute__((sda));
 
 extern void hero_clear_speeds(void);
 
@@ -98,7 +98,7 @@ extern float math_approach_with_velocity(float *, float, char *, float, float, f
 
 extern void func_L00_002B3DC0_1(float, float, float);
 
-extern char D_00189FB0[];
+extern char g_hero_steer_block[];
 
 #ifndef RAC2_T_V4S_F31E44309
 #define RAC2_T_V4S_F31E44309
@@ -164,16 +164,16 @@ typedef struct {
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001A7A00[] __attribute__((sda));
-extern int D_001A7398[] __attribute__((sda));
+extern unsigned char g_player_stats[] __attribute__((sda));
+extern int g_menu_choice_table[] __attribute__((sda));
 extern int g_item_ammo_counts[];
-extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
     char padA2[14];
 } HeroItemEase;
-extern HeroItemEase D_0018B9A0[];
+extern HeroItemEase g_hero_item_ease_table[];
 typedef struct {
     char pad0[0x14];
     int object;
@@ -206,21 +206,21 @@ void SpawnHeroItemMobies(void)
     HeroItemMoby *moby;
     int disabled;
 
-    if (!HERO_ITEMS->slots[0].moby && D_L00_001B18D8[0] > HERO_ITEMS->slots[0].respawnFrame &&
+    if (!HERO_ITEMS->slots[0].moby && g_ring_animation_counter[0] > HERO_ITEMS->slots[0].respawnFrame &&
         (!HERO_ITEMS->pendingItem || HERO_ITEMS->pendingItem == HERO_ITEMS->selectedItem0)) {
         int id = HERO_ITEMS->selectedItem0;
         int saved, i;
 
         if (!id) {
-            if (D_001A7A00[8] || (saved = D_001A7398[0]) == 0)
+            if (g_player_stats[8] || (saved = g_menu_choice_table[0]) == 0)
                 id = 10;
             else
                 id = saved;
         }
         SwitchCachedDiscAsset(ITEM_DEF(id)->object);
         for (i = 0; i < 3; i++) {
-            mem_clear(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
-            D_0018B9A0[i].joint = -1;
+            mem_clear(&g_hero_item_ease_table[i], 0, sizeof(HeroItemEase));
+            g_hero_item_ease_table[i].joint = -1;
         }
         HERO_ITEMS->slots[0].id = id;
         moby = CreateMoby(ITEM_DEF(id)->object);
@@ -250,11 +250,11 @@ void SpawnHeroItemMobies(void)
         int id = HERO_ITEMS->selectedItem3;
 
         if (!id) {
-            id = D_001A7398[3];
+            id = g_menu_choice_table[3];
             if (!id || id == 8 || id == 4) {
-                id = D_001A7A00[0x9] ? 3 : 2;
+                id = g_player_stats[0x9] ? 3 : 2;
                 if (id)
-                    D_001A7398[3] = id;
+                    g_menu_choice_table[3] = id;
             }
         }
         HERO_ITEMS->slots[3].id = id;
@@ -292,8 +292,8 @@ void SpawnHeroItemMobies(void)
     }
 
     disabled = 0;
-    if (*(short *)(D_001A7A00 + 0x18) == 4 || D_001A7A00[0x49]
-        || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
+    if (*(short *)(g_player_stats + 0x18) == 4 || g_player_stats[0x49]
+        || g_player_stats[0x42] || g_player_stats[0x4B] || g_player_stats[0x4A])
         disabled = 1;
     if (HERO_ITEMS->slots[2].moby && disabled) {
         func_0029F338_1(HERO_ITEMS->slots[2].moby);
@@ -301,7 +301,7 @@ void SpawnHeroItemMobies(void)
     }
     if (!HERO_ITEMS->slots[2].moby && !disabled) {
         HeroItemMoby *slotMoby;
-        int id = D_001A7398[2];
+        int id = g_menu_choice_table[2];
 
         if (!id)
             id = 47;
@@ -322,8 +322,8 @@ void SpawnHeroItemMobies(void)
     }
 
     disabled = 0;
-    if (*(short *)(D_001A7A00 + 0x18) == 4 || D_001A7A00[0x49]
-        || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
+    if (*(short *)(g_player_stats + 0x18) == 4 || g_player_stats[0x49]
+        || g_player_stats[0x42] || g_player_stats[0x4B] || g_player_stats[0x4A])
         disabled = 1;
     if (disabled) {
         if (HERO_ITEMS->slots[1].moby) {
@@ -337,9 +337,9 @@ void SpawnHeroItemMobies(void)
     }
     if (!HERO_ITEMS->slots[1].moby && !disabled) {
         if (g_frame_l00_counter[0] < 3)
-            HERO_ITEMS->slots[1].id = D_001A7398[1] = (*(short *)(D_001A7A00 + 0x24));
+            HERO_ITEMS->slots[1].id = g_menu_choice_table[1] = (*(short *)(g_player_stats + 0x24));
         else
-            HERO_ITEMS->slots[1].id = D_001A7398[1];
+            HERO_ITEMS->slots[1].id = g_menu_choice_table[1];
         if (!HERO_ITEMS->slots[1].id)
             HERO_ITEMS->slots[1].id = 52;
         moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
@@ -366,7 +366,7 @@ void SpawnHeroItemMobies(void)
         }
     }
 
-    if (!HERO_ITEMS->slots[4].moby && D_001A7A00[0xFD]) {
+    if (!HERO_ITEMS->slots[4].moby && g_player_stats[0xFD]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(5)->object);
@@ -381,7 +381,7 @@ void SpawnHeroItemMobies(void)
             HERO_ITEMS->slots[4].state = 2;
         }
     }
-    if (!HERO_ITEMS->slots[4].other && D_001A7A00[0x12A]) {
+    if (!HERO_ITEMS->slots[4].other && g_player_stats[0x12A]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(50)->object);
@@ -394,7 +394,7 @@ void SpawnHeroItemMobies(void)
             HERO_ITEMS->slots[4].state = 2;
         }
     }
-    if (!HERO_ITEMS->slots[4].extra && D_001A7A00[0xFF]) {
+    if (!HERO_ITEMS->slots[4].extra && g_player_stats[0xFF]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(7)->object);
@@ -536,7 +536,7 @@ ret:
 extern void ApplyHeroEquipmentRequest(int);
 /* Read through its macro symbol: the copy reorg puts in a branch delay slot assembles
  * $gp-relative, the one in ordinary flow as lui/lw. */
-extern int D_L00_001B18D8[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda));
 
 /* Per-frame pass over the seven 80-byte slots at +0x1220: an empty slot is released; in
  * state 2 a slot counts a tick, is released and, for a flagged entry whose animation set
@@ -566,7 +566,7 @@ void UpdateHeroSlotCallbacks(void)
             case 3:
                 ++slot[0x123B];
                 if ((entry[0x60] & 2) || i == 1 || i == 0)
-                    hero_release_item_slot(i, D_L00_001B18D8[0] + 2);
+                    hero_release_item_slot(i, g_ring_animation_counter[0] + 2);
                 break;
             }
             {
@@ -617,9 +617,9 @@ void SetHeroMode(int mode, int value, char *object)
         heroAlias[0x22B4] = (char)mode;
         *(int *)(heroAlias + 0xC14) = (int)object;
         *(int *)(heroAlias + 0x2290) = (int)object;
-        if ((unsigned char)mode == 1 && (D_00138320[0] & 0x10) != 0) {
-            func_L00_002F6BE0(0x23, 0, D_L00_002F8588,
-                             D_L00_002F85D0, D_L00_002F8AD8, 0, 0);
+        if ((unsigned char)mode == 1 && (g_pad_pressed_flags[0] & 0x10) != 0) {
+            func_L00_002F6BE0(0x23, 0, g_str_timed_state_text_a,
+                             g_str_timed_state_text_b, g_str_timed_state_text_c, 0, 0);
             level_run_slot_callback(3);
         }
         {
@@ -651,9 +651,9 @@ void hero_reset_speeds_and_vectors(void)
 {
     char *block;
 
-    *(volatile V4_Fa012328c *)D_00189F30 = 0;
+    *(volatile V4_Fa012328c *)g_hero_zero_vector = 0;
     hero_clear_speeds();
-    block = D_00189F20;
+    block = g_hero_vector_block;
     func_00282C88_4(block);
     func_00282C88_4(block - 16);
     func_00282C88_4(block + 16);
@@ -694,11 +694,11 @@ typedef struct {
 } HeroSlotState;
 
 extern int g_current_map_index[] __attribute__((sda));
-extern int D_001A73D8[] __attribute__((sda));
-extern int D_001A73E0[] __attribute__((sda));
-extern int D_0013A148[];
-extern unsigned char D_0019B2E8[][16];
-extern int D_001A24A8[][16];
+extern int g_play_counter_total[] __attribute__((sda));
+extern int g_slot_play_counters[] __attribute__((sda));
+extern int g_map_play_counts[];
+extern unsigned char g_moby_group_flags[][16];
+extern int g_play_counters[][16];
 extern void level_clear_entry_top_bits(void);
 extern void FadeToBlack(int);
 
@@ -712,8 +712,8 @@ void hero_record_play_counters(void)
     int threshold;
     int mode;
 
-    D_0013A148[g_current_map_index[0]]++;
-    D_001A73D8[0]++;
+    g_map_play_counts[g_current_map_index[0]]++;
+    g_play_counter_total[0]++;
     level_clear_entry_top_bits();
     if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
         mode = ((HeroSlotState *)D_00189E20_1)->mode;
@@ -724,12 +724,12 @@ void hero_record_play_counters(void)
         if (g_frame_l00_counter[0] >= threshold) {
             int level = g_current_map_index[0];
             int slot = ((HeroSlotState *)D_00189E20_1)->slot;
-            if ((D_0019B2E8[level][slot] & 0x80) == 0)
-                D_001A24A8[level][slot & 0xF]++;
+            if ((g_moby_group_flags[level][slot] & 0x80) == 0)
+                g_play_counters[level][slot & 0xF]++;
         }
-        D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
+        g_slot_play_counters[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
     }
-    D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot]++;
+    g_slot_play_counters[((HeroSlotState *)D_00189E20_1)->slot]++;
     FadeToBlack(0x10);
     ((HeroSlotState *)D_00189E20_1)->visited = 1;
 }
@@ -741,11 +741,11 @@ s32 moby_is_class_71(u8 *object) {
  return *(short *)(object+0xaa)==71 /* moby class 71 */;
 }
 
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 
-extern float D_L00_001B8DD8;
+extern float g_camera_target_rotation;
 
 extern float hero_get_direction_angle_delta(char *, int);
 
@@ -757,11 +757,11 @@ extern float FastDiffRots(float, float);
 int hero_is_turned_past_angle(float minAngle) {
     float angle;
 
-    if ((D_00138320[0] & 3) != 0) {
+    if ((g_pad_pressed_flags[0] & 3) != 0) {
         if (g_hero_state.flag != 0)
-            angle = math_fabs(hero_get_direction_angle_delta(D_L00_001B8FF0, 0));
+            angle = math_fabs(hero_get_direction_angle_delta(g_cam_follow_matrix, 0));
         else
-            angle = FastDiffRots(g_hero_state.f98, D_L00_001B8DD8);
+            angle = FastDiffRots(g_hero_state.f98, g_camera_target_rotation);
         if (angle < minAngle)
             return 0;
         return 1;
@@ -775,7 +775,7 @@ int hero_is_turned_past_angle(float minAngle) {
 
 /* func_L00_002B36E0 is in L00_002B36E0-hero.c. */
 
-extern char D_0018BDD0[];
+extern char g_player_state[];
 
 extern float FastVecLength(char *);
 
@@ -790,7 +790,7 @@ float hero_get_stick_magnitude(void) {
         largest = math_fabs(g_hero_state.f1FB0);
     else
         largest = math_fabs(g_hero_state.f1FB4);
-    magnitude = (largest + FastVecLength(D_0018BDD0)) * 0.5f;
+    magnitude = (largest + FastVecLength(g_player_state)) * 0.5f;
     if (1.0f < magnitude)
         magnitude = 1.0f;
     return magnitude;
@@ -837,7 +837,7 @@ void hero_rotate_matrix(f32 x, f32 y, f32 z) {
 void hero_steer_heading_special(int index, float first, float second, float third)
 {
     float offsetXY[2];
-    char *block = D_00189FB0;
+    char *block = g_hero_steer_block;
     float turnOut;
     float angleToTarget;
 
@@ -868,13 +868,13 @@ void hero_approach_speed(float riseRate, float fallRate) {
 }
 
 
-extern char D_00189F10[];
+extern char g_drive_velocity_view[];
 
 extern void vec_scale_to_length(char *, void *, float);
 
 /* Copies a direction into the hero push vector and gives it the stored push length. */
 void hero_set_push_direction(void *direction) {
-    vec_scale_to_length(D_00189F10, direction, *(float *)(D_00189F10 + 0xC4));
+    vec_scale_to_length(g_drive_velocity_view, direction, *(float *)(g_drive_velocity_view + 0xC4));
 }
 
 /* func_L00_002B4308 is in L00_002B4308.c. */

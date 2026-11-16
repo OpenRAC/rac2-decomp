@@ -14,8 +14,8 @@ typedef struct {
     f32 axis[4];
 } Moby_L10_0041EE00;
 
-extern u16 *D_L10_001FB1E0[];
-extern char *D_L10_001B251C[] __attribute__((sda));
+extern u16 *g_group_moby_id_lists[];
+extern char *g_moby_base_table[] __attribute__((sda));
 extern void gfx_draw_billboard_quad(void *, s32, u32, s32, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -28,7 +28,7 @@ extern char *moby_get_motion_data(void *);
 void pulsing_light_draw_group_glows(u8 *moby)
 {
     f32 glow_pos[4] __attribute__((aligned(16)));
-    u16 *first = D_L10_001FB1E0[moby[0x21]];
+    u16 *first = g_group_moby_id_lists[moby[0x21]];
     u16 *list;
     Moby_L10_0041EE00 *target;
     Vars_L10_0041EE00 *vars;
@@ -37,7 +37,7 @@ void pulsing_light_draw_group_glows(u8 *moby)
     if (first != 0) {
         list = first;
         do {
-            target = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
+            target = (Moby_L10_0041EE00 *)(g_moby_base_table[0] + ((*list & 0x7FFF) << 8));
             if (*(s32 *)(moby_get_motion_data(target) + 0x110) != 0) {
                 vars = target->vars;
                 FastVecScale(glow_pos, target->axis, 0.25f);

@@ -7,9 +7,9 @@ extern int func_419CA0(int);
 
 extern char g_hero_position[];
 
-extern const int D_L23_001B1684 __attribute__((sda));
+extern const int g_moby_idle_link_count __attribute__((sda));
 
-extern int *D_L23_001B36A8 __attribute__((sda));
+extern int *g_path_piece_table __attribute__((sda));
 
 extern int *g_path_lists[];
 
@@ -25,7 +25,7 @@ extern void func_3242D0(int, int, int);
 
 extern void moby_stop_effects(char *arg0);
 
-extern int D_L23_001B36B0 __attribute__((sda));
+extern int g_selected_moby __attribute__((sda));
 
 
 /* func_L23_00394218 is defined in L23_00394218.c. */
@@ -35,15 +35,15 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 
 extern char *g_hero_moby;
 
-extern int D_L23_001AC790 __attribute__((sda));
+extern int g_shell_model_pointer __attribute__((sda));
 
 extern Collision g_last_ray_hit;
 
-extern Material D_L23_00266A70[];
+extern Material g_item_l23_material_table[];
 
 extern int CollLine(void *, void *, int, void *, void *);
 
@@ -103,7 +103,7 @@ void shell_update_thrown(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L23_00266A70)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l23_material_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -122,7 +122,7 @@ void shell_update_thrown(char *obj) {
                 goto finish;
             reread = &g_last_ray_hit;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L23_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_shell_model_pointer && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -241,13 +241,13 @@ void SelectNearestPathNode(char *arg0, int arg1) {
     best = 30000.0f;
     vec_scale_to_length(loc.b, loc.b, 4.0f);
     FastVecAdd((char *)&loc.a, (char *)&loc.a, (char *)loc.b);
-    for (i = 0; i < D_L23_001B1684; i++) {
+    for (i = 0; i < g_moby_idle_link_count; i++) {
         int *obj;
         int k;
 
         if (arg1 != 0 && func_419CA0(i) == 0)
             continue;
-        obj = g_path_lists[D_L23_001B36A8[i]];
+        obj = g_path_lists[g_path_piece_table[i]];
         for (k = 0; k < *obj; k++) {
             float d = fast_vec_dist((char *)obj + 0x10 + k * 0x10, &loc.a);
 
@@ -282,7 +282,7 @@ int math_list_set_bit_indices(int arg0, unsigned long long mask, int *out_ids, i
     return count;
 }
 
-extern int *D_L23_001B36A8 __attribute__((sda));
+extern int *g_path_piece_table __attribute__((sda));
 
 extern int *g_path_lists[];
 
@@ -296,10 +296,10 @@ int path_get_piece_end(int arg0, int index, char *arg) {
     int piece_b;
     int last_point;
 
-    piece_a = D_L23_001B36A8[index];
+    piece_a = g_path_piece_table[index];
     if (func_419070(*(long long *)(g_path_end_masks + (piece_a << 4)), arg) != 0)
         return 0;
-    piece_b = D_L23_001B36A8[index];
+    piece_b = g_path_piece_table[index];
     last_point = *g_path_lists[piece_b] - 1;
     func_419070(*(long long *)(g_path_end_masks + (piece_b << 4) + 8), arg);
     return last_point;
@@ -320,9 +320,9 @@ void path_push_piece_history(char *moby, int new_piece) {
     *(short *)(state + 0x2B4) = new_piece;
 }
 
-extern const int D_L23_001B1688 __attribute__((sda));
+extern const int g_path_piece_count __attribute__((sda));
 
-extern int *D_L23_001B36A8 __attribute__((sda));
+extern int *g_path_piece_table __attribute__((sda));
 
 extern int *g_path_lists[];
 
@@ -350,7 +350,7 @@ extern float FastVecDot(void *, void *);
 void path_choose_next_piece(char *arg0, unsigned long long mask, int mode, int check)
 {
     char *state = *(char **)(arg0 + 0x68);
-    int count = D_L23_001B1688;
+    int count = g_path_piece_count;
     int ids[count];
     int n;
     int id;
@@ -385,13 +385,13 @@ void path_choose_next_piece(char *arg0, unsigned long long mask, int mode, int c
 
             id = ids[i];
             res[i] = path_get_piece_end((int)arg0, id, (char *)(int)*(short *)(state + 0x2B4));
-            q = g_path_lists[D_L23_001B36A8[id]];
+            q = g_path_lists[g_path_piece_table[id]];
             if (res[i] == 0) {
                 pos[i] = (char *)(q + *q * 4);
-                bits[i] = (long long *)(g_path_end_masks + 8 + (D_L23_001B36A8[id] << 4));
+                bits[i] = (long long *)(g_path_end_masks + 8 + (g_path_piece_table[id] << 4));
             } else {
                 pos[i] = (char *)(q + 4);
-                bits[i] = (long long *)(g_path_end_masks + (D_L23_001B36A8[id] << 4));
+                bits[i] = (long long *)(g_path_end_masks + (g_path_piece_table[id] << 4));
             }
         }
         best = 0;
@@ -472,7 +472,7 @@ void path_choose_next_piece(char *arg0, unsigned long long mask, int mode, int c
 
 /* Clears the selected-object flag and releases the object's two effects. */
 void moby_clear_selected(char *moby) {
-    D_L23_001B36B0 = 0;
+    g_selected_moby = 0;
     moby_stop_effects(moby);
 }
 
@@ -499,7 +499,7 @@ void moby_stop_effects(char *moby) {
 /* Starts an animation on an object and marks it as the selected object. */
 void moby_select_play_anim(int moby) {
     func_3242D0(moby, 9, 2);
-    D_L23_001B36B0 = moby;
+    g_selected_moby = moby;
 }
 
 

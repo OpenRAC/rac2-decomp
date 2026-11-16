@@ -45,7 +45,7 @@ typedef struct {
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(Moby *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
-extern ScenePrefix D_L06_001BD540;
+extern ScenePrefix g_scene_object_list;
 extern int g_current_map_index MACRO_ADDR;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int math_random_int_below(int);
@@ -66,8 +66,8 @@ void func_PAL_L06_0033D990(void)
 
     anim_start_startup_animations();
 
-    for (i = 0; i < D_L06_001BD540.count; i++) {
-        Moby *obj = D_L06_001BD540.objects[i];
+    for (i = 0; i < g_scene_object_list.count; i++) {
+        Moby *obj = g_scene_object_list.objects[i];
 
         if (obj && obj->class_id == 0xE29)
             obj->flags |= 0x800;
@@ -81,10 +81,10 @@ void func_PAL_L06_0033D990(void)
         }
     }
 
-    if (g_current_map_index != 6 || D_L06_001BD540.active)
+    if (g_current_map_index != 6 || g_scene_object_list.active)
         return;
 
-    ship = D_L06_001BD540.objects[2];
+    ship = g_scene_object_list.objects[2];
     if (ship->class_id != 0xE29)
         return;
 

@@ -18,7 +18,7 @@ typedef struct {
 } InputVector __attribute__((aligned(16)));
 
 extern HeroInputState g_hero_state;
-extern int D_00138324;
+extern int g_pad_held_flags;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void CalculateAimedLaunchVelocity(void *, void *, int, int, float, float, float, float);
 extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, void *, int, int, float);
@@ -61,7 +61,7 @@ void megaturret_glove_update(char *owner)
         FIELD(context, int, 0x24) = 0;
         /* Fall through. */
     case 1:
-        if ((D_00138324 & g_hero_state.input) && !g_hero_state.flag && allowed) {
+        if ((g_pad_held_flags & g_hero_state.input) && !g_hero_state.flag && allowed) {
             if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
                 FIELD(owner, unsigned char, 0x20) = 2;

@@ -8,12 +8,12 @@ typedef struct {
     float phase;
 } L06Grid;
 extern int g_current_map_index;
-extern u8 D_0018C0D4[] NOT_SDA;
-extern int D_L06_001B31B0;
-extern int D_L06_001B31B4;
-extern float D_L06_001AF718 __attribute__((sda));
-extern float D_L06_001AF714 __attribute__((sda));
-extern float D_L06_001AF710 __attribute__((sda));
+extern u8 g_screen_mode_flag[] NOT_SDA;
+extern int g_ripple_grid_duration;
+extern int g_ripple_grid_fade_start;
+extern float g_ripple_phase_speed __attribute__((sda));
+extern float g_ripple_grid_size __attribute__((sda));
+extern float g_ripple_random_speed __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern int math_fast_float_d(int *);
 extern void vec_clear_128(void *);
@@ -29,16 +29,16 @@ void ripple_grid_update(u8 *moby)
 
     switch (moby[0x20]) {
     case 0:
-        if (g_current_map_index == 10 && D_0018C0D4[0] == 1) {
+        if (g_current_map_index == 10 && g_screen_mode_flag[0] == 1) {
             moby_mark_spawned(moby);
             break;
         }
-        D_L06_001B31B4 = 22;
-        D_L06_001B31B0 = 45;
+        g_ripple_grid_fade_start = 22;
+        g_ripple_grid_duration = 45;
         {
             int i;
             for (i = 0; i < 10; i++) {
-                int delay = i * D_L06_001B31B0 / 10;
+                int delay = i * g_ripple_grid_duration / 10;
                 grid->timer[0][i] = delay;
                 grid->timer[1][i] = delay + 11;
                 grid->timer[2][i] = delay + 23;
@@ -50,7 +50,7 @@ void ripple_grid_update(u8 *moby)
     case 1: {
         int group, col, row;
 
-        grid->phase += D_L06_001AF718 * (0.016666668f);
+        grid->phase += g_ripple_phase_speed * (0.016666668f);
         if (grid->phase > 1.0f) grid->phase -= 1.0f;
         for (group = 0; group < 4; group++) {
             for (col = 0; col < 10; col++) {
@@ -61,9 +61,9 @@ void ripple_grid_update(u8 *moby)
                 if (hit) {
                     for (row = 0; row < 20; row++) {
                         vec_clear_128(&points[row][col]);
-                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
+                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * g_ripple_grid_size - g_ripple_grid_size * 0.5f;
                         ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
-                        vec_random_direction(&temporary[row][col], 0.0f, D_L06_001AF710 * (0.016666668f));
+                        vec_random_direction(&temporary[row][col], 0.0f, g_ripple_random_speed * (0.016666668f));
                     }
                     {
                         int k;
@@ -81,7 +81,7 @@ void ripple_grid_update(u8 *moby)
                             FastVecScale(&velocities[k][col], &velocities[k][col], 0.333f);
                         }
                     }
-                    grid->timer[group][col] = D_L06_001B31B0;
+                    grid->timer[group][col] = g_ripple_grid_duration;
                 } else {
                     int k;
                     for (k = 1; k < 19; k++) {

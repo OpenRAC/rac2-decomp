@@ -2,7 +2,7 @@
 #include "names.h"
 typedef int V4_L00_004170A8 __attribute__((mode(TI)));
 extern char g_spark_l00_records[];
-extern V4_L00_004170A8 D_L00_001BF220;
+extern V4_L00_004170A8 g_hero_l00_position;
 extern int math_fast_float_d(void *);
 extern void part_emit_spark_burst_at_moby(char *);
 extern float math_random_angle(void);
@@ -38,7 +38,7 @@ void spark_l00_effect_update(char *object)
         }
         FastVecAdd(&target, &target, object + 0x10);
         if (CollLine(object + 0x10, &target, 0, object, 0) != 0)
-            target = D_L00_001BF220;
+            target = g_hero_l00_position;
         spark_record_claim(object, &target, 20);
         spark_records_update(object);
         ref_L00_004170A8_00(beam_glow_sprites_update_owned, object);

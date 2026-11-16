@@ -1,24 +1,24 @@
 #include "common.h"
 
-extern u16 *D_L18_001FB320[];
+extern u16 *g_condition_target_lists[];
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
-extern s32 D_L18_001B0454 __attribute__((sda));
-extern s32 D_L18_001B04F0 __attribute__((sda));
-extern u8 D_L18_001B0500[] SDATA(D_L18_001B0500);
-extern u8 D_L18_001B0510[] SDATA(D_L18_001B0510);
-extern s32 D_L18_001B2348[] __attribute__((sda));
-extern s32 D_L18_001B2564[] __attribute__((sda));
-extern s32 D_L18_001A8F00[] __attribute__((sda));
-extern s32 D_L18_001A903C[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
+extern s32 g_state_random_range __attribute__((sda));
+extern s32 g_reset_sequence_stage __attribute__((sda));
+extern u8 g_hero_l18_reset_position[] SDATA(D_L18_001B0500);
+extern u8 g_hero_l18_reset_direction[] SDATA(D_L18_001B0510);
+extern s32 g_frame_l18_counter[] __attribute__((sda));
+extern s32 g_door_trigger_flags[] __attribute__((sda));
+extern s32 g_game_l18_mode_state[] __attribute__((sda));
+extern s32 g_two_step_trigger_step[] __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[];
-extern u8 D_001395B8[];
+extern u8 g_moby_group_flags[];
+extern u8 g_game_flag_table[];
 extern u8 g_hero_position[];
-extern u8 D_L18_001BF9C0[];
-extern s32 D_0018C0B4[];
-extern u8 D_001A7AFD[] __attribute__((sda));
-extern u8 D_001A7A78[] __attribute__((sda));
+extern u8 g_request_l18_queue[];
+extern s32 g_game_mode[];
+extern u8 g_map_overlay_flag[] __attribute__((sda));
+extern u8 g_trigger_event_flags[] __attribute__((sda));
 
 extern int math_random_int_below(int);
 extern void owner_set_word(void *, void *);
@@ -102,10 +102,10 @@ void UpdateDamoselGroupTriggerController(u8 *object)
         object[0x30] = 255;
         for (i = 0; i < 4; i++) {
             *StreamFlag(state, i) = 0;
-            for (entry = D_L18_001FB320[StreamGroup(state, i, 0)];
+            for (entry = g_condition_target_lists[StreamGroup(state, i, 0)];
                  (StreamGroup(state, i, 0) & 255) != 255 &&
-                 StreamGroup(state, i, 0) <= D_L18_001B2838[0] && entry &&
-                 ((s16)entry[-1] >= 0 || entry == D_L18_001FB320[StreamGroup(state, i, 0)]);
+                 StreamGroup(state, i, 0) <= g_max_l18_group_index[0] && entry &&
+                 ((s16)entry[-1] >= 0 || entry == g_condition_target_lists[StreamGroup(state, i, 0)]);
                  entry++) {
                 entity = g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
@@ -115,7 +115,7 @@ void UpdateDamoselGroupTriggerController(u8 *object)
         HALF(state, 0xA8) = 1;
         object[0x20] = 1;
         WORD(state, 0x88) = -1;
-        HALF(state, 0xAA) = math_random_int_below(D_L18_001B0454);
+        HALF(state, 0xAA) = math_random_int_below(g_state_random_range);
         HALF(state, 0xAE) = -1;
         HALF(state, 0xAC) = 0;
         protopet_reset_group_members(object);
@@ -135,33 +135,33 @@ void UpdateDamoselGroupTriggerController(u8 *object)
             state_set_flag_one();
             hero_reset_position_and_direction(ENTITY(0xE4) + 0x10, ENTITY(0xE4) + 0xF0, 0, 1);
         }
-        if (D_001395B8[0x9F]) {
+        if (g_game_flag_table[0x9F]) {
             state_set_flag_one();
-            hero_reset_position_and_direction(D_L18_001B0500, D_L18_001B0510, 0, 1);
-            D_001395B8[0x9F] = 0;
-            D_L18_001B04F0 = 1;
+            hero_reset_position_and_direction(g_hero_l18_reset_position, g_hero_l18_reset_direction, 0, 1);
+            g_game_flag_table[0x9F] = 0;
+            g_reset_sequence_stage = 1;
         }
         if (IsPointInCuboid(g_hero_position, WORD(state, 0x84)))
             WORD(state, 0x88) = 5;
     } else {
-        if (D_L18_001B2348[0] < 10 && D_L18_001B04F0 == 1) {
-            if (req_push_queue(D_L18_001BF9C0, 0x95)) {
-                req_launch_queued(D_L18_001BF9C0);
+        if (g_frame_l18_counter[0] < 10 && g_reset_sequence_stage == 1) {
+            if (req_push_queue(g_request_l18_queue, 0x95)) {
+                req_launch_queued(g_request_l18_queue);
                 game_set_slowdown_factor();
-                D_L18_001B04F0 = 2;
+                g_reset_sequence_stage = 2;
             }
-        } else if (D_L18_001B04F0 == 2) {
+        } else if (g_reset_sequence_stage == 2) {
             if (game_is_either_mode_two()) {
-                D_L18_001B2564[1] = 1;
-                if (D_L18_001A8F00[0] == 2) {
+                g_door_trigger_flags[1] = 1;
+                if (g_game_l18_mode_state[0] == 2) {
                     object[0x31] = 0;
                     FLAGS(object) |= 1;
                 }
             } else {
-                D_L18_001B2564[1] = 0;
+                g_door_trigger_flags[1] = 0;
                 snd_start_mode_sound(0);
-                D_L18_001B04F0 = 0;
-                if (!D_001A7AFD[0] && D_001395B8[0xA1]) {
+                g_reset_sequence_stage = 0;
+                if (!g_map_overlay_flag[0] && g_game_flag_table[0xA1]) {
                     help_unlock_entry(5);
                     moby_handle_request_slot_state(5);
                     value_set_entry_by_index(0x129F, -1);
@@ -170,7 +170,7 @@ void UpdateDamoselGroupTriggerController(u8 *object)
                 MemcardSave(0, -1);
             }
         }
-        if (D_0018C0B4[0] != 0x6F) {
+        if (g_game_mode[0] != 0x6F) {
             for (i = 0; i < 4; i++) {
                 if (!*StreamFlag(state, i)) {
                     if (IsPointInCuboid(g_hero_position, *StateSlot(state, i, 0x30)))
@@ -178,7 +178,7 @@ void UpdateDamoselGroupTriggerController(u8 *object)
                 } else if (*StreamFlag(state, i) > 0) {
                     if (FastDecTimer((s16 *)(state + 0xAA)) &&
                         SelectGroupMembersAndTarget(object, i))
-                        HALF(state, 0xAA) = math_random_int_below(D_L18_001B0454);
+                        HALF(state, 0xAA) = math_random_int_below(g_state_random_range);
                 }
             }
         }
@@ -214,12 +214,12 @@ void UpdateDamoselGroupTriggerController(u8 *object)
             int i;
             for (i = 0; i < 4; i++) {
                 if (*StateSlot(state, i, 0x90) != -1 &&
-                    ((u32)i >= 8 || (((D_001395B8[0x94] >> i) ^ 1) & 1)) &&
+                    ((u32)i >= 8 || (((g_game_flag_table[0x94] >> i) ^ 1) & 1)) &&
                     IsPointInCuboid(g_hero_position, *StateSlot(state, i, 0x90))) {
                     *StateSlot(state, i, 0x90) = -1;
                     HALF(state, 0xAE) = i;
                     part_start_timed_sequence(object);
-                    if ((u32)i < 8) D_001395B8[0x94] |= 1 << i;
+                    if ((u32)i < 8) g_game_flag_table[0x94] |= 1 << i;
                 }
             }
         }
@@ -288,14 +288,14 @@ void UpdateDamoselGroupTriggerController(u8 *object)
         protopet_clear_link_zero(ENTITY(0xDC));
     }
     {
-        if (!D_001A7A78[3]) {
+        if (!g_trigger_event_flags[3]) {
             int ready;
             u16 *entry;
             u8 *entity;
             ready = 1;
-            for (entry = D_L18_001FB320[WORD(state, 0xE0)];
-            (WORD(state, 0xE0) & 255) != 255 && WORD(state, 0xE0) <= D_L18_001B2838[0] && entry &&
-            ((entry && (s16)entry[-1] >= 0) || entry == D_L18_001FB320[WORD(state, 0xE0)]); entry++) {
+            for (entry = g_condition_target_lists[WORD(state, 0xE0)];
+            (WORD(state, 0xE0) & 255) != 255 && WORD(state, 0xE0) <= g_max_l18_group_index[0] && entry &&
+            ((entry && (s16)entry[-1] >= 0) || entry == g_condition_target_lists[WORD(state, 0xE0)]); entry++) {
                 entity = g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
                 if (entity[0x20] != 0xFE) {
@@ -311,10 +311,10 @@ void UpdateDamoselGroupTriggerController(u8 *object)
                 u16 *entry;
                 u8 *entity;
                 for (i = 0; i < 4 && allReady; i++) {
-                    for (entry = D_L18_001FB320[StreamGroup(state, i, 0xF0)];
+                    for (entry = g_condition_target_lists[StreamGroup(state, i, 0xF0)];
                     (StreamGroup(state, i, 0xF0) & 255) != 255 &&
-                    StreamGroup(state, i, 0xF0) <= D_L18_001B2838[0] && entry &&
-                    ((s16)entry[-1] >= 0 || entry == D_L18_001FB320[StreamGroup(state, i, 0xF0)]);
+                    StreamGroup(state, i, 0xF0) <= g_max_l18_group_index[0] && entry &&
+                    ((s16)entry[-1] >= 0 || entry == g_condition_target_lists[StreamGroup(state, i, 0xF0)]);
                     entry++) {
                         entity = g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8);
                         if (!entity) break;
@@ -329,11 +329,11 @@ void UpdateDamoselGroupTriggerController(u8 *object)
                     }
                 }
                 if (allReady) {
-                    if (!D_001A7A78[3]) {
-                        D_001A7A78[3] = 1;
+                    if (!g_trigger_event_flags[3]) {
+                        g_trigger_event_flags[3] = 1;
                         snd_play_from_global_bank(1, 0, 0);
                         value_set_entry_by_index(0x1233, -1);
-                        D_L18_001A903C[0] = 1;
+                        g_two_step_trigger_step[0] = 1;
                     }
                     moby_mark_table_entry_flagged(WORD(state, 0xE8));
                 }

@@ -28,27 +28,27 @@ typedef struct {
     int delay;
 } HeroUpdate;
 extern HeroUpdate g_hero_state;
-extern float D_L00_001B05C4 __attribute__((sda));
-extern float D_L00_001B05C8 __attribute__((sda));
-extern float D_L00_001B05CC __attribute__((sda));
-extern float D_L00_001B05D0 __attribute__((sda));
-extern float D_L00_001B15CC MACRO_ADDR;
-extern float D_L00_001B15D0 MACRO_ADDR;
-extern float D_L00_001B15D4 MACRO_ADDR;
-extern float D_L00_001B15D8 MACRO_ADDR;
-extern int D_L00_001AA0F8 MACRO_ADDR;
+extern float g_vaporizer_horizontal_size __attribute__((sda));
+extern float g_vaporizer_vertical_size __attribute__((sda));
+extern float g_vaporizer_depth_size __attribute__((sda));
+extern float g_vaporizer_blend_angle __attribute__((sda));
+extern float g_zoom_fov_value_a MACRO_ADDR;
+extern float g_zoom_fov_value_b MACRO_ADDR;
+extern float g_zoom_fov_value_c MACRO_ADDR;
+extern float g_zoom_fov_value_d MACRO_ADDR;
+extern int g_render_state_word MACRO_ADDR;
 extern int g_frame_l00_counter;
 typedef struct { UpdateVector position; char pad[0x220]; UpdateVector forward; } ScopeCamera;
 extern ScopeCamera g_camera_l00_position;
-extern u8 *D_L00_001BF218 NOT_SDA;
-extern float D_L00_001BD370 NOT_SDA;
-extern int D_00138320 NOT_SDA;
+extern u8 *g_hit_l00_result NOT_SDA;
+extern float g_fast_math_ratio NOT_SDA;
+extern int g_pad_pressed_flags NOT_SDA;
 extern int g_pad_state[];
-extern unsigned char D_0013957F NOT_SDA;
+extern unsigned char g_beam_weapon_index NOT_SDA;
 extern UpdateTuning g_weapon_l00_table[];
 typedef struct { float red, green, blue, unused; UpdateVector position; } ScopeLight;
-extern ScopeLight D_L00_001C6F40[];
-extern char D_L00_00296AA0[];
+extern ScopeLight g_light_table[];
+extern char g_vaporizer_sound_records[];
 extern void anim_start_blended_with_flags(char *, int, int, int, int);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void gfx_free_point_light(int);
@@ -117,14 +117,14 @@ void vaporizer_update(u8 *object)
         anim_start_blended_with_flags(object, 1, 0, 2, 0);
     if (g_hero_state.state == 3) {
         if ((u8)object[0x20] == 0) return;
-        D_L00_001B15D0 = D_L00_001B05C4;
-        D_L00_001B15D4 = D_L00_001B05C8;
-        D_L00_001B15D8 = D_L00_001B05CC;
-        D_L00_001B15CC = D_L00_001B05D0;
+        g_zoom_fov_value_b = g_vaporizer_horizontal_size;
+        g_zoom_fov_value_c = g_vaporizer_vertical_size;
+        g_zoom_fov_value_d = g_vaporizer_depth_size;
+        g_zoom_fov_value_a = g_vaporizer_blend_angle;
         cam_set_value_target(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
         if (data->light >= 0) gfx_free_point_light(data->light);
         data->light = -1;
-        D_L00_001AA0F8 = 224;
+        g_render_state_word = 224;
         gfx_update_frame_time_scales(1);
         return;
     }
@@ -133,10 +133,10 @@ void vaporizer_update(u8 *object)
         object[0x20] = 4;
         if (data->light >= 0) gfx_free_point_light(data->light);
         data->light = -1;
-        D_L00_001B15D0 = D_L00_001B05C4;
-        D_L00_001B15D4 = D_L00_001B05C8;
-        D_L00_001B15D8 = D_L00_001B05CC;
-        D_L00_001B15CC = D_L00_001B05D0;
+        g_zoom_fov_value_b = g_vaporizer_horizontal_size;
+        g_zoom_fov_value_c = g_vaporizer_vertical_size;
+        g_zoom_fov_value_d = g_vaporizer_depth_size;
+        g_zoom_fov_value_a = g_vaporizer_blend_angle;
         cam_set_value_target(0, 3, 1.1243411302566528f, 0.005f, 0.2f, 0.0f);
         gfx_update_frame_time_scales(1);
         return;
@@ -150,7 +150,7 @@ void vaporizer_update(u8 *object)
             vec_scale_to_length(first, g_camera_l00_position.forward, 128.0f);
             FastVecAdd(first, first, g_camera_l00_position.position);
             if (CollLine(g_camera_l00_position.position, first, 16, g_hero_state.camera, 0)) {
-                target = D_L00_001BF218;
+                target = g_hit_l00_result;
                 if (target && (u8)target[0x31]) {
                     health = moby_get_private_value_0(target);
                     if (moby_is_in_special_class_range(target) || (health && *health > 0.0f &&
@@ -177,14 +177,14 @@ void vaporizer_update(u8 *object)
         data->scoped = 0;
         data->cooldown = 0.36666667461395264f;
         object[0x20] = 3;
-        angle = mat_fast_helper_a(1.0f, D_L00_001BD370);
+        angle = mat_fast_helper_a(1.0f, g_fast_math_ratio);
         angle += angle;
         data->initialFov = angle;
         data->zoomFov = angle + (0.174532949924469f - angle) * 0.25f;
-        D_L00_001B05C4 = D_L00_001B15D0;
-        D_L00_001B05C8 = D_L00_001B15D4;
-        D_L00_001B05CC = D_L00_001B15D8;
-        D_L00_001B05D0 = D_L00_001B15CC;
+        g_vaporizer_horizontal_size = g_zoom_fov_value_b;
+        g_vaporizer_vertical_size = g_zoom_fov_value_c;
+        g_vaporizer_depth_size = g_zoom_fov_value_d;
+        g_vaporizer_blend_angle = g_zoom_fov_value_a;
         data->flashTimer = 0;
         data->targeting = 0;
         data->targetFrames = 0;
@@ -215,13 +215,13 @@ void vaporizer_update(u8 *object)
     case 1:
         if (g_hero_state.mode == 1) hero_l00_set_action(29, 1);
         if (g_hero_state.scope) {
-            if (data->scoped == 0) D_L00_001AA0F8 = 0;
+            if (data->scoped == 0) g_render_state_word = 0;
             data->scoped = 1;
         }
         if (g_hero_state.controller) g_hero_state.saved = g_hero_state.controller;
         if (g_hero_state.scope) {
-            if (D_00138320 & 8) data->zoomFov -= 0.01f;
-            else if (D_00138320 & 2) data->zoomFov += 0.01f;
+            if (g_pad_pressed_flags & 8) data->zoomFov -= 0.01f;
+            else if (g_pad_pressed_flags & 2) data->zoomFov += 0.01f;
             if (data->zoomFov > data->initialFov) data->zoomFov = data->initialFov;
             else if (data->zoomFov < 0.174532949924469f) data->zoomFov = 0.174532949924469f;
             cam_set_value_target(0, 3, data->zoomFov, 0.02f, 0.2f, 0.0f);
@@ -230,16 +230,16 @@ void vaporizer_update(u8 *object)
             data->zoomFov = data->initialFov + (0.174532949924469f - data->initialFov) * 0.25f;
             cam_set_value_target(0, 3, data->initialFov, 0.005f, 0.2f, 0.0f);
             data->scoped = 0;
-            D_L00_001AA0F8 = 224;
+            g_render_state_word = 224;
             gfx_update_frame_time_scales(1);
         }
         fraction = (data->zoomFov - 0.174532949924469f) / (data->initialFov - 0.174532949924469f);
-        horizontal = (D_L00_001B05C4 - 0.03f) * fraction + 0.03f;
-        vertical = (D_L00_001B05C8 - 0.4f) * fraction + 0.4f;
-        blend = (D_L00_001B05D0 - 0.010471977293491364f) * fraction + 0.010471977293491364f;
-        D_L00_001B15D0 = horizontal;
-        D_L00_001B15CC = blend;
-        D_L00_001B15D4 = vertical;
+        horizontal = (g_vaporizer_horizontal_size - 0.03f) * fraction + 0.03f;
+        vertical = (g_vaporizer_vertical_size - 0.4f) * fraction + 0.4f;
+        blend = (g_vaporizer_blend_angle - 0.010471977293491364f) * fraction + 0.010471977293491364f;
+        g_zoom_fov_value_b = horizontal;
+        g_zoom_fov_value_a = blend;
+        g_zoom_fov_value_c = vertical;
         canFire = 1;
         if (g_hero_state.scope) {
             if (!math_fast_float_d(&g_hero_state.delay)) canFire = 0;
@@ -247,7 +247,7 @@ void vaporizer_update(u8 *object)
         if (g_hero_state.blocked == 0 && (g_pad_state[0x1A4/4] & g_hero_state.input) && canFire) {
             if (weapon_spend_ammo(-1, 1)) {
                 start_equipped_item_animation();
-                data->sound = slot_copy_records_to_free(D_L00_00296AA0);
+                data->sound = slot_copy_records_to_free(g_vaporizer_sound_records);
                 data->firingDelay = 2;
                 object[0x20] = 2;
                 anim_start_blended(object, 2, 0, 0);
@@ -264,7 +264,7 @@ void vaporizer_update(u8 *object)
         if (FastDecTimer(&data->firingDelay) || data->scoped) {
             PlayMobySound(0, 0, object);
             AimAndSpawnBeamWithMuzzleFlashes(object);
-            tuning = (UpdateTuning *)(D_0013957F * 224 + (char *)g_weapon_l00_table);
+            tuning = (UpdateTuning *)(g_beam_weapon_index * 224 + (char *)g_weapon_l00_table);
         data->cooldown = 1.0f / tuning->rate;
             object[0x20] = 3;
         }
@@ -288,14 +288,14 @@ void vaporizer_update(u8 *object)
                     moby_transform_joint_to_world(object, 0, first);
                     vec_scale_to_length(second, g_hero_state.direction, 1.5f);
                 }
-                FastVecAdd(D_L00_001C6F40[data->light].position, first, second);
-                D_L00_001C6F40[data->light].position[3] = 10.0f;
+                FastVecAdd(g_light_table[data->light].position, first, second);
+                g_light_table[data->light].position[3] = 10.0f;
                 intensity = IntToFloat(data->flashTimer);
                 intensity /= IntToFloat(30);
-                D_L00_001C6F40[data->light].red = intensity;
+                g_light_table[data->light].red = intensity;
                 intensity *= 0.7f;
-                D_L00_001C6F40[data->light].green = intensity;
-                D_L00_001C6F40[data->light].blue = 0;
+                g_light_table[data->light].green = intensity;
+                g_light_table[data->light].blue = 0;
             }
         }
     }

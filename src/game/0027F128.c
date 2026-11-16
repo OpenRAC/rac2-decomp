@@ -17,13 +17,13 @@ typedef float f32;
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern short D_001A65EE;
+extern short g_screen_copy_page;
 extern void gfx_build_screen_sprite_packet(int width, int height, int address, int mode);
 extern void gfx_configure_projection(int width, int height, float scale, float a, float b, float c, float d);
 
 typedef struct { u8 pad[0x10]; float *result; u32 threshold; u8 gap[4]; int flags; short x, y, w, h; u8 tail[8]; } CopyRegion;
 
-extern CopyRegion D_001B8A10[];
+extern CopyRegion g_screen_copy_regions[];
 
 extern s32 g_is_pal_video;
 
@@ -48,17 +48,17 @@ extern void sceGsSetDefDispEnv(u8 *,short,short,short,short,short);
    express). */
 extern int *D_L02_001B3D08_1 __attribute__((sda));
 
-extern int D_001A742C __attribute__((sda));
+extern int g_fs_aa_buffer_table __attribute__((sda));
 
-extern void D_00126108(void *);
+extern void g_gfx_draw_list_init(void *);
 
 extern volatile int * volatile D_L02_001B3D08_2 __attribute__((sda));
 
 extern volatile int * volatile D_L02_001B3D08_4 __attribute__((sda));
 
-extern char D_001A6D40[];
+extern char g_dma_packet_source[];
 
-extern char D_001A6E90[];
+extern char g_dma_packet_copy[];
 
 /* Adds up the widths of the letters in a piece of text, using a letter-width table. */
 s32 measure_text_width(u8 *text,s32 length,u8 *glyphs) {
@@ -76,32 +76,32 @@ s32 measure_text_width(u8 *text,s32 length,u8 *glyphs) {
  return width;
 }
 
-extern u8 D_00263B50[];
+extern u8 g_font_glyphs_small[];
 
 /* Measures how wide text will be in the small font. */
 s32 text_measure_width_small(u8 *text, s32 length) {
-    return measure_text_width(text, length, D_00263B50);
+    return measure_text_width(text, length, g_font_glyphs_small);
 }
 
-extern u8 D_00263EF0[];
+extern u8 g_font_glyphs_medium[];
 
 /* Measures how wide text will be in the medium font. */
 s32 text_measure_width_medium(u8 *text, s32 length) {
-    return measure_text_width(text, length, D_00263EF0);
+    return measure_text_width(text, length, g_font_glyphs_medium);
 }
 
-extern u8 D_00264290[];
+extern u8 g_font_glyphs_large[];
 
 /* Measures how wide text will be in the large font. */
 s32 text_measure_width_large(u8 *text, s32 length) {
-    return measure_text_width(text, length, D_00264290);
+    return measure_text_width(text, length, g_font_glyphs_large);
 }
 
 extern int text_measure_width_scaled(u8 *, int, u8 *, float);
 
 /* Measures how wide text will be in the small font at a given size. */
 int text_measure_width_small_scaled(u8 *text, int length, float scale) {
-    return text_measure_width_scaled(text, length, D_00263B50, scale);
+    return text_measure_width_scaled(text, length, g_font_glyphs_small, scale);
 }
 
 /* func_0027F2A8 is in 0027F128-font-g8.c. */
@@ -113,14 +113,14 @@ extern void text_draw_line(int, int, u64, u8 *, int, u64, u8 *);
 void text_draw_small(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(1);
-    text_draw_line(x, y, style, text, length, font, D_00263B50);
+    text_draw_line(x, y, style, text, length, font, g_font_glyphs_small);
 }
 
 /* Draws text in the medium font at the given screen position. */
 void text_draw_medium(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(2);
-    text_draw_line(x, y, style, text, length, font, D_00263EF0);
+    text_draw_line(x, y, style, text, length, font, g_font_glyphs_medium);
 }
 
 
@@ -149,14 +149,14 @@ extern void FontPrintWindow(unsigned short *, u64, u8 *, int, u64, u8 *);
 void text_draw_window_small(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(1);
-    FontPrintWindow(layout, style, text, length, font, D_00263B50);
+    FontPrintWindow(layout, style, text, length, font, g_font_glyphs_small);
 }
 
 /* Draws word-wrapped text inside a text box using the medium font. */
 void text_draw_window_medium(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(2);
-    FontPrintWindow(layout, style, text, length, font, D_00263EF0);
+    FontPrintWindow(layout, style, text, length, font, g_font_glyphs_medium);
 }
 
 
@@ -164,7 +164,7 @@ void text_draw_window_medium(unsigned short *layout, u64 style, u8 *text, int le
 void text_draw_window_large(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = GetEffectTextureDescriptor(3);
-    FontPrintWindow(layout, style, text, length, font, D_00264290);
+    FontPrintWindow(layout, style, text, length, font, g_font_glyphs_large);
 }
 
 /* Fills in a text box: its edges, the anchor point, line height and layout flags. */
@@ -182,7 +182,7 @@ void gfx_setup_screen_copy_draw_state(int width, int height, int use_saved, floa
     int address;
 
     if (use_saved) {
-        address = D_001A65EE << 13;
+        address = g_screen_copy_page << 13;
     } else {
         int shift = width + height;
         if (shift > 16) shift = 16;
@@ -214,7 +214,7 @@ void gfx_run_screen_effect_setup(void) {
 
 /* The share of a region's pixels whose low 24 bits do not exceed the region's threshold. */
 void ComputeRegionThresholdRatio(u32 *pixels, int index) {
-    CopyRegion *region = &D_001B8A10[index];
+    CopyRegion *region = &g_screen_copy_regions[index];
     s32 total = region->w * region->h;
     s32 count = 0;
     s32 i;
@@ -222,7 +222,7 @@ void ComputeRegionThresholdRatio(u32 *pixels, int index) {
     for (i = 0; i < total; i++) {
         if ((pixels[i] & 0xFFFFFF) > region->threshold) count++;
     }
-    *(&D_001B8A10[index])->result = (float)(total - count) / (float)total;
+    *(&g_screen_copy_regions[index])->result = (float)(total - count) / (float)total;
 }
 
 /* func_00280710 -- see src/game/0027F128-copy-g8.c (built with -G8). */
@@ -254,7 +254,7 @@ ASM_FUNC("asm/game", func_00281810);
    64-bit flag word; the packet's own type goes in the top half. */
 typedef struct { int f0, f1, f2, f3, f4; } QuadEntry;
 
-extern QuadEntry D_00239B10[];
+extern QuadEntry g_quad_entry_table[];
 
 typedef struct {
     u8 pad[0x70];
@@ -271,7 +271,7 @@ void gfx_init_quad_packet_state(QuadPacket *q, int fontId, int entryIndex, int t
     q->f78 = GetEffectTextureDescriptor(fontId);
     q->f80 = ((long)0xFF90 << 32) | 0x260;
     q->f70 = 0;
-    e = &D_00239B10[entryIndex];
+    e = &g_quad_entry_table[entryIndex];
     flags = (long)e->f0;
     flags |= (long)e->f1 << 2;
     flags |= (long)e->f2 << 4;
@@ -551,18 +551,18 @@ ASM_FUNC("asm/game", func_00283EB0);
 
 ASM_FUNC("asm/game", func_00283EF0);
 
-extern long long D_001A6D78;
+extern long long g_clear_color_value;
 
 /* Sets the background color of the screen from red, green and blue values. */
 void SetBackgroundColor(s32 red, s32 green, s32 blue) {
-    D_001A6D78 = red | ((long long)green << 8) | ((long long)blue << 16) | 0x80000000ULL;
+    g_clear_color_value = red | ((long long)green << 8) | ((long long)blue << 16) | 0x80000000ULL;
 }
 
 /* Asks the display system for a result using the current display buffer. */
 int gfx_query_display_buffer(void)
 {
     extern int func_00125D98(void *);
-    return func_00125D98((void *)D_001A742C);
+    return func_00125D98((void *)g_fs_aa_buffer_table);
 }
 
 
@@ -572,12 +572,12 @@ void gfx_append_draw_list_header(void)
 {
     if (D_L02_001B3D08_1 != 0) {
         *(int *)D_L02_001B3D08_1 = 0x30000009;
-        *(int *)((char *)D_L02_001B3D08_1 + 4) = (D_001A742C + 48) & 0x0FFFFFFF;
+        *(int *)((char *)D_L02_001B3D08_1 + 4) = (g_fs_aa_buffer_table + 48) & 0x0FFFFFFF;
         *(int *)((char *)D_L02_001B3D08_1 + 8) = 0;
         *(int *)((char *)D_L02_001B3D08_1 + 12) = 0x50000009;
         D_L02_001B3D08_1 = (int *)((char *)D_L02_001B3D08_1 + 16);
     } else {
-        D_00126108((void *)(D_001A742C + 48));
+        g_gfx_draw_list_init((void *)(g_fs_aa_buffer_table + 48));
     }
 }
 
@@ -591,9 +591,9 @@ void gfx_append_draw_list_buffer_tag(int useAlt)
         return;
     list[0] = 0x30000015;
     if (useAlt == 0)
-        D_L02_001B3D08_2[1] = (int)D_001A6D40;
+        D_L02_001B3D08_2[1] = (int)g_dma_packet_source;
     else
-        D_L02_001B3D08_2[1] = (int)D_001A6E90;
+        D_L02_001B3D08_2[1] = (int)g_dma_packet_copy;
     D_L02_001B3D08_2[2] = 0;
     D_L02_001B3D08_2[3] = 0x50000015;
     D_L02_001B3D08_4 = D_L02_001B3D08_2 + 4;

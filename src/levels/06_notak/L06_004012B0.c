@@ -28,7 +28,7 @@ extern char *part_spawn_burst(void *, void *, int, int, int, int, float, float, 
 typedef struct { char pad[0x140]; Vec position; char gap[0x10]; float scale; int unused; int duration, timer; char gap2[0x10]; float speed; int unused2, limit; } Effect;
 extern Effect g_camera_state;
 
-extern unsigned char *D_L06_001FF41C;
+extern unsigned char *g_particle_l06_byte_ptr;
 typedef struct { int timer; float speed, height; int handle; Vec velocity; } UpdateState;
 /* Updates an object (moby class 2232) that waits to be hit, then either floats up trailing smoke or bursts with a blast, and goes away. */
 void hit_reaction_burst_update(char *moby) {
@@ -110,7 +110,7 @@ void hit_reaction_burst_update(char *moby) {
     FastVecAdd(&frame.pos,&frame.pos,position);
     particle=part_spawn_burst(&frame.pos,&frame.direction,20,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
     if (particle) {
-        particle[2]=*D_L06_001FF41C;
+        particle[2]=*g_particle_l06_byte_ptr;
         particle[3]=0x44;
         if (math_random_int_range(0,1)) {
             particle[3]=0x48;

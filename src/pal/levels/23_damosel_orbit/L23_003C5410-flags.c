@@ -6,9 +6,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern char g_hero_position[];
 extern char g_hero_state[];
 extern char *g_hero_moby;
-extern int D_L23_001B1644 __attribute__((sda));
-extern int D_L23_001B164C __attribute__((sda));
-extern int D_L23_001B36AC __attribute__((sda));
+extern int g_enemy_relocate_slot_count __attribute__((sda));
+extern int g_boss_part_index __attribute__((sda));
+extern int g_enemy_relocate_count __attribute__((sda));
 extern void *D_L23_002AB170[];
 extern void mothership_project_point_onto_surface(char *, float);
 extern int math_random_int_below(int);
@@ -21,7 +21,7 @@ extern void moby_play_anim_and_link(char *, int, int, int, int, float);
    target, or the average of two of them), picked by func_002A77E0(8). The dispatch reads the
    level's own jump table (eight code addresses in the level's data at 0x2AB170); `cases` only
    keeps the labels alive. */
-void func_PAL_L23_003C5480(char *arg0) {
+void enemy_relocate_near_hero_pal(char *arg0) {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     char *state = *(char **)(arg0 + 0x68);
     TI128 v[7];
@@ -90,6 +90,6 @@ tail:
     enemy_reset_calm(arg0);
     moby_set_state(arg0, 5, 0);
     moby_play_anim_and_link(arg0, 3, 0, 0x11, 3, 1.0f);
-    D_L23_001B164C = (D_L23_001B164C + 1) % D_L23_001B1644;
-    D_L23_001B36AC = D_L23_001B36AC + 1;
+    g_boss_part_index = (g_boss_part_index + 1) % g_enemy_relocate_slot_count;
+    g_enemy_relocate_count = g_enemy_relocate_count + 1;
 }

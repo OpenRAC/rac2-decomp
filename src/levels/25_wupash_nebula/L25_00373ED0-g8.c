@@ -9,9 +9,9 @@ typedef float f32;
 
 /* The level's own live-object count lives in the small-data area; the list it walks
    is far larger than the eight-byte threshold, so it keeps absolute addressing. */
-extern s32 D_L25_001AC4D8 __attribute__((sda));
+extern s32 g_level_offer_entry_count __attribute__((sda));
 
-extern u8 *D_L25_00225910[] __attribute__((nosda));
+extern u8 *g_level_entry_lists[] __attribute__((nosda));
 
 extern void entry_spawn_list_objects_with_flag(void *, void *);
 
@@ -22,16 +22,16 @@ extern void func_L05_0037CEE0(void *, void *, f32);
 /* Offers every live entry to the handler that takes one pointer through the loop. */
 void level_offer_entries_ptr(u8 *entryArg) {
     s32 i;
-    for (i = 0; i < D_L25_001AC4D8; i++) {
-        entry_spawn_list_objects_with_flag(D_L25_00225910[i], entryArg);
+    for (i = 0; i < g_level_offer_entry_count; i++) {
+        entry_spawn_list_objects_with_flag(g_level_entry_lists[i], entryArg);
     }
 }
 
 /* Offers every live entry to the handler that carries one float through the loop. */
 void level_offer_entries_float(u8 *entryArg, f32 extraValue) {
     s32 i;
-    for (i = 0; i < D_L25_001AC4D8; i++) {
-        func_L05_0037CEE0(D_L25_00225910[i], entryArg, extraValue);
+    for (i = 0; i < g_level_offer_entry_count; i++) {
+        func_L05_0037CEE0(g_level_entry_lists[i], entryArg, extraValue);
     }
 }
 
@@ -40,7 +40,7 @@ extern void func_L05_0037D608(void *, void *, f32);
 /* Offers every live entry to the handler that carries one float through the loop. */
 void level_offer_entries_float_alt(u8 *entryArg, f32 extraValue) {
     s32 i;
-    for (i = 0; i < D_L25_001AC4D8; i++) {
-        func_L05_0037D608(D_L25_00225910[i], entryArg, extraValue);
+    for (i = 0; i < g_level_offer_entry_count; i++) {
+        func_L05_0037D608(g_level_entry_lists[i], entryArg, extraValue);
     }
 }

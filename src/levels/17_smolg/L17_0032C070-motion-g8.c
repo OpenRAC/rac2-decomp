@@ -52,15 +52,15 @@ typedef struct {
 /* The frame counter is an incomplete array: it keeps its absolute address
    load, while the complete tuning scalars use GP addressing. The -g profile
    keeps retail's div.s hazards. */
-extern int D_L17_001B2748[] __attribute__((sda));
-extern float D_L17_001B0248 __attribute__((sda));
-extern float D_L17_001B024C __attribute__((sda));
-extern float D_L17_001B0250 __attribute__((sda));
-extern float D_L17_001B0254 __attribute__((sda));
-extern float D_L17_001B0258 __attribute__((sda));
+extern int g_flash_frame_counter[] __attribute__((sda));
+extern float g_motion_bob_period __attribute__((sda));
+extern float g_motion_bob_amplitude __attribute__((sda));
+extern float g_motion_sway_amplitude __attribute__((sda));
+extern float g_motion_sway_period __attribute__((sda));
+extern float g_motion_tilt_period __attribute__((sda));
 extern char g_hero_position[];          /* the hero's position */
 extern SoundRecord g_sound_state[];
-extern char D_L17_001A8F20[] MACRO_ADDR;
+extern char g_effect_color_params[] MACRO_ADDR;
 
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -94,7 +94,7 @@ void UpdateBobbingSpinningObject(Moby *moby)
     int flash;
 
     /* Flash bright for 15 frames of every 60, phased by the instance id. */
-    flash = (D_L17_001B2748[0] + moby->uid) % 60 < 15;
+    flash = (g_flash_frame_counter[0] + moby->uid) % 60 < 15;
     color = flash ? 0x80FFFFFF : 0x80404040;
     moby->color = color;
     if (vars->stopped == 1)
@@ -171,11 +171,11 @@ void UpdateBobbingSpinningObject(Moby *moby)
     }
 
     /* The periods are in seconds: 0.00029088825 is one degree per second, in radians per frame. */
-    math_update_wrapped_angle_offset(moby, &vars->bobPhase, &vars->bobOffset, D_L17_001B024C,
-                  360.0f / D_L17_001B0248 * 0.00029088825f, moby->position[2]);
-    moby_scale_owner_words_by_angles(moby, &vars->swayPhase, &vars->tiltPhase, D_L17_001B0250,
-                  360.0f / D_L17_001B0254 * 0.00029088825f,
-                  360.0f / D_L17_001B0258 * 0.00029088825f);
+    math_update_wrapped_angle_offset(moby, &vars->bobPhase, &vars->bobOffset, g_motion_bob_amplitude,
+                  360.0f / g_motion_bob_period * 0.00029088825f, moby->position[2]);
+    moby_scale_owner_words_by_angles(moby, &vars->swayPhase, &vars->tiltPhase, g_motion_sway_amplitude,
+                  360.0f / g_motion_sway_period * 0.00029088825f,
+                  360.0f / g_motion_tilt_period * 0.00029088825f);
     moby->rotation[2] = FastAddRotations(moby->rotation[2], vars->spinSpeed);
 
     if (vec_distance_xy(moby->position, g_hero_position) < 80.0f) {
@@ -194,7 +194,7 @@ void UpdateBobbingSpinningObject(Moby *moby)
 
     if (part_find_owned_effect_slot(moby, 0x4010000, 0)) {
         SpawnExplosion(moby->position, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 10.0f, 20.0f);
-        part_spawn_masked_debris(moby, 127, D_L17_001A8F20, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_masked_debris(moby, 127, g_effect_color_params, 255, 3.0f, 6.0f, 3.0f, 6.0f);
         part_spawn_scaled_bolts(moby, 9, 0);
         moby_mark_spawned(moby);
     } else {

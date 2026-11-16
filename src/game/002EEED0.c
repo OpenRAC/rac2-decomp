@@ -13,8 +13,8 @@ typedef struct {
     s32 pad[2];
 } RecordTable;
 
-extern RecordTable D_00215050[];
-extern s32 D_001A7248 MACRO_ADDR;
+extern RecordTable g_gfx_buffer_slot_table[];
+extern s32 g_gfx_rpc_client MACRO_ADDR;
 extern s32 gfx_get_buffer_slot_record_count(u32);
 extern s32 sceSifCallRpc(void *, s32, s32, u8 **, s32, u8 *, s32, s32, s32);
 
@@ -26,20 +26,20 @@ s32 gfx_upload_records_to_buffer_slot(u8 *src, u32 slot, s32 first_record, s32 c
     if (count == -1) {
         count = gfx_get_buffer_slot_record_count(slot);
     }
-    if (slot >= 64 || D_00215050[slot].count == 0) {
+    if (slot >= 64 || g_gfx_buffer_slot_table[slot].count == 0) {
         return -3;
     }
-    if (D_00215050[slot].count < first_record + count) {
+    if (g_gfx_buffer_slot_table[slot].count < first_record + count) {
         return -1;
     }
-    dest = D_00215050[slot].base + first_record * 16;
+    dest = g_gfx_buffer_slot_table[slot].base + first_record * 16;
     while (count != 0) {
         chunk = count;
         if (chunk > 0xFFFF) {
             chunk = 0xFFFF;
         }
         bytes = chunk * 16;
-        sceSifCallRpc(&D_001A7248, 1, mode, &dest, 16, src, bytes, 0, 0);
+        sceSifCallRpc(&g_gfx_rpc_client, 1, mode, &dest, 16, src, bytes, 0, 0);
         count -= chunk;
         src += bytes;
         dest += bytes;

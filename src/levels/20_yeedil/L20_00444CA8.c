@@ -6,11 +6,11 @@ typedef union {
     float f[4];
 } Vec4;
 
-extern char *D_L20_001B2F9C __attribute__((sda));
+extern char *g_group_l20_member_table __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 extern float fast_subtract_rotations(float, float);
 extern void FastVecAdd(char *, char *, char *);
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int g_current_map_index __attribute__((sda));
 extern void moby_destroy_with_explosion(char *);
@@ -30,13 +30,13 @@ void swinging_l20_arm_update(char *obj) {
     Vec4 v, w;
     unsigned int sel;
     char *state = *(char **)(obj + 0x68);
-    char *target = D_L20_001B2F9C + (*(int *)state << 8);
+    char *target = g_group_l20_member_table + (*(int *)state << 8);
 
     sel = *(unsigned char *)(obj + 0x20);
     if (sel >= 8) goto c7;
     goto *jtbl_002B5940[sel];
     c0:
-        if (*(int *)(state + 8)>=0) *(char **)(state + 0x10)=(char *)(D_L20_001B2F9C+(*(int *)(state + 8)<<8));
+        if (*(int *)(state + 8)>=0) *(char **)(state + 0x10)=(char *)(g_group_l20_member_table+(*(int *)(state + 8)<<8));
         else *(char **)(state + 0x10)=0;
         moby_set_state(obj, 1, -1); goto c7;
     c1:
@@ -44,7 +44,7 @@ void swinging_l20_arm_update(char *obj) {
             PlayMobySound(0, 0, obj);
             moby_set_state(obj, 2, -1);
         }
-        if (D_0019B2E8[(unsigned char)obj[0xB0]+g_current_map_index*16]&0x80) {
+        if (g_moby_group_flags[(unsigned char)obj[0xB0]+g_current_map_index*16]&0x80) {
             *(float *)(obj + 0xF0)=fast_subtract_rotations(*(float *)(obj + 0xF0), 1.57079649f);
             moby_set_state(obj, 6, -1);
         }

@@ -29,7 +29,7 @@ extern int queue_copy_record_by_index(s32);
 extern void part_start_random_scale_effect(void *, s32, s32);
 
 /* the object's first record is set up against the table entry, then its marker byte is set */
-void func_PAL_L23_00427A48(u8 *arg0, void *arg1) {
+void shot_update_hit_check_pal(u8 *arg0, void *arg1) {
     u8 *payload = *(u8 **)(arg0 + 0x68);
     L23Vec dir;
     L23Hit hit;

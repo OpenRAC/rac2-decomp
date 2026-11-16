@@ -6,7 +6,7 @@
 
 extern char g_hero_state[];
 extern unsigned char g_item_slot_to_record[];
-extern char D_L22_002645F0[];
+extern char g_weapon_l22_table[];
 extern int hero_slot_item_id(int index);
 
 typedef struct {
@@ -42,7 +42,7 @@ int shop_get_entry_for_state(int check)
         if (check && STATE->field_22BA && !STATE->field_24EC) {
             int index = hero_slot_item_id(0);
 
-            return ((Entry_002A8CE0 *)D_L22_002645F0)[g_item_slot_to_record[index]].value;
+            return ((Entry_002A8CE0 *)g_weapon_l22_table)[g_item_slot_to_record[index]].value;
         }
         if (STATE->field_24CC != 1) {
             return STATE->field_1492 ? 0x67 : 0;

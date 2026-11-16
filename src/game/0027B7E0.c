@@ -59,9 +59,9 @@ void counter_clear_group(void)
 
 extern char *g_dma_packet_cursor __attribute__((sda));
 extern char *ref_L00_0027B858_00;
-extern char D_001391D0[];
-extern char D_00139120[];
-extern char D_001B9040[];
+extern char g_gfx_clear_color_packet[];
+extern char g_gs_draw_env_regs[];
+extern char g_view_params[];
 extern void VU1_addGSregister(unsigned int, unsigned long);
 
 /* Writes two drawing packets and sends the current color to the graphics chip. */
@@ -69,7 +69,7 @@ void gfx_write_clear_color_packets(void)
 {
     unsigned long packed;
     *(int *)(ref_L00_0027B858_00 + 0) = 0x30000013;
-    *(char **)(ref_L00_0027B858_00 + 4) = D_001391D0;
+    *(char **)(ref_L00_0027B858_00 + 4) = g_gfx_clear_color_packet;
     *(int *)(ref_L00_0027B858_00 + 8) = 0;
     *(int *)(ref_L00_0027B858_00 + 12) = 0x50000013;
     {
@@ -77,11 +77,11 @@ void gfx_write_clear_color_packets(void)
         ref_L00_0027B858_00 = old + 16;
         *(int *)(old + 16) = 0x3000000B;
     }
-    *(char **)(ref_L00_0027B858_00 + 4) = D_00139120;
+    *(char **)(ref_L00_0027B858_00 + 4) = g_gs_draw_env_regs;
     *(int *)(ref_L00_0027B858_00 + 8) = 0;
     *(int *)(ref_L00_0027B858_00 + 12) = 0x5000000B;
     {
-        char *base = D_001B9040;
+        char *base = g_view_params;
         int w0 = *(int *)(base + 0x230);
         int w1 = *(int *)(base + 0x234);
         int w2 = *(int *)(base + 0x238);

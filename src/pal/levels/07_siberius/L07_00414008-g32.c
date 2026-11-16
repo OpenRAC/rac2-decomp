@@ -16,11 +16,11 @@ extern f32 ApproachValue(void *,f32,f32);
 extern void snd_stop_voice(s32);
 extern u8 g_sound_state[];
 typedef struct { f32 v[4]; } Vec;
-extern Vec D_L07_001B1790[2] __attribute__((sda));
-extern Vec D_L07_001B17B0[2] __attribute__((sda));
+extern Vec g_ship_attach_offsets_left[2] __attribute__((sda));
+extern Vec g_ship_attach_offsets_right[2] __attribute__((sda));
 typedef struct {u8 pad[0x108];u8 *children[2];f32 angles[2];} State;
 
-void func_PAL_L07_00414008(u8 *obj)
+void ship_update_attached_parts_pal(u8 *obj)
 {
  f32 mat[16],oldpos[4],oldrot[4],delta[4],rot[4];
  u8 *p=*(u8 **)(obj+0x68),*child,*state,*sound;
@@ -48,7 +48,7 @@ void func_PAL_L07_00414008(u8 *obj)
   } else {
    qcopy_nc(oldpos,child+0x10);
    qcopy_nc(oldrot,child+0xf0);
-   transform_vector(child+0x10,&D_L07_001B1790[i],mat);
+   transform_vector(child+0x10,&g_ship_attach_offsets_left[i],mat);
    qzero_nc(rot);
    rot[1]=ps->angles[i];
    euler_rotation_basis(child+0xc0,rot);
@@ -84,7 +84,7 @@ void func_PAL_L07_00414008(u8 *obj)
    }
   }
   index=*(s16 *)(obj+0xaa)!=0x11d9;
-  qcopy(attachment+0x10,&D_L07_001B17B0[index]);
+  qcopy(attachment+0x10,&g_ship_attach_offsets_right[index]);
   *(f32 *)(attachment+0x18)+=*(f32 *)(p+0x16c4);
   transform_vector(attachment+0x10,attachment+0x10,mat);
   *(TI128 *)oldpos=0;

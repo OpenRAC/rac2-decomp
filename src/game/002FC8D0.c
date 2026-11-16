@@ -47,11 +47,11 @@ extern int *volatile D_L02_001B3D08_3 __attribute__((sda));
 
 extern int *D_L02_001B3D08_5 __attribute__((sda));
 
-extern void D_00126288(int *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7);
+extern void g_gfx_gs_image_packet_build(int *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7);
 
-extern int D_L03_001B31A0 __attribute__((sda));
+extern int g_dmac_handler_id_a __attribute__((sda));
 
-extern int D_L03_001B31A4 __attribute__((sda));
+extern int g_dmac_handler_id_b __attribute__((sda));
 
 extern void RemoveDmacHandler(int, int);
 
@@ -68,7 +68,7 @@ typedef struct {
     Rac2Native_74a5d71aacb394c6_u32 current;
 } Rac2Native_74a5d71aacb394c6_ExtraIndexState48;
 
-extern int D_L03_002325D0[];
+extern int g_known_id_list[];
 
 /* Copies a block of image data from the console memory to the graphics chip in 16 KB pieces. */
 void gfx_copy_image_to_gs_blocks(u8 *dest, s32 vram_addr, s32 size) {
@@ -100,7 +100,7 @@ void gfx_upload_image_to_gs_packets(int data, int vram_addr, int size)
         {
             int *next = (int *)((char *)D_L02_001B3D08_3 + 16);
             D_L02_001B3D08_5 = next;
-            D_00126288(next, (short)((vram_addr + vram_offset) >> 8), 1, 1, 0, 0, 64, 64);
+            g_gfx_gs_image_packet_build(next, (short)((vram_addr + vram_offset) >> 8), 1, 1, 0, 0, 64, 64);
         }
         vram_offset += 16384;
         remaining -= 16384;
@@ -157,7 +157,7 @@ long long tex_upload_blocks_return_setup(int data, int destination, int width, i
             next = D_L02_001B3D08_5 + 4;
             D_L02_001B3D08_5 = next;
             remaining -= block;
-            D_00126288(next, (short)((destination + offset) >> 8), buffer_width >> 16,
+            g_gfx_gs_image_packet_build(next, (short)((destination + offset) >> 8), buffer_width >> 16,
                        0, 0, 0, image_width >> 16, 32);
             cursor = D_L02_001B3D08_5;
             source = data + offset;
@@ -185,9 +185,9 @@ long long tex_upload_blocks_return_setup(int data, int destination, int width, i
    fresh load), and the write of the initialiser's result is an ordinary store, which is what
    leaves the first call's `lui` in the `bne` delay slot instead of duplicating it.  Both cells
    are reached with retail's one-instruction macro form, so they carry the `sda` attribute. */
-extern int D_001B22C0 __attribute__((sda));
+extern int g_vif1_dma_handler_id __attribute__((sda));
 
-extern int D_001B22C4 __attribute__((sda));
+extern int g_dma_error_handler_id __attribute__((sda));
 
 extern void gfx_handle_vif1_dma_interrupt(void);
 
@@ -200,17 +200,17 @@ extern void kernel_process_queue_entry_d(int);
 /* Installs the two DMA interrupt handlers, once. */
 void gfx_install_dma_handlers(void)
 {
-    if (D_001B22C0 != 0) {
+    if (g_vif1_dma_handler_id != 0) {
         return;
     }
-    if (D_001B22C4 != 0) {
+    if (g_dma_error_handler_id != 0) {
         return;
     }
     if ((D_STAT & 0x20000) == 0) {
         *(unsigned int *)0x1000E010 = 0x20000;
     }
-    D_001B22C0 = AddDmacHandler(1, gfx_handle_vif1_dma_interrupt, 0);
-    D_001B22C4 = AddDmacHandler(15, gfx_handle_dma_error_hang, 0);
+    g_vif1_dma_handler_id = AddDmacHandler(1, gfx_handle_vif1_dma_interrupt, 0);
+    g_dma_error_handler_id = AddDmacHandler(15, gfx_handle_dma_error_hang, 0);
     kernel_process_queue_entry_d(1);
 }
 
@@ -221,11 +221,11 @@ void gfx_remove_dma_handlers(void)
     if ((D_STAT & 0x20000) != 0) {
         D_STAT = 0x20000;
     }
-    RemoveDmacHandler(1, D_L03_001B31A0);
-    RemoveDmacHandler(15, D_L03_001B31A4);
+    RemoveDmacHandler(1, g_dmac_handler_id_a);
+    RemoveDmacHandler(15, g_dmac_handler_id_b);
     kernel_process_queue_entry_c(1);
-    D_L03_001B31A0 = 0;
-    D_L03_001B31A4 = 0;
+    g_dmac_handler_id_a = 0;
+    g_dmac_handler_id_b = 0;
 }
 
 ASM_FUNC("asm/game", func_002FCE18);
@@ -429,13 +429,13 @@ int CollideSweptSphere(SweptSphere *sphere)
     return result;
 }
 
-extern char D_0021F9C0[];
+extern char g_object_slot_table[];
 
 /* Returns slot number index of the 64-slot table, or nothing if out of range. */
 void *slot_get_by_index(int index) {
     void *result = 0;
     if ((unsigned int)index < 64u)
-        result = D_0021F9C0 + index * 0x50;
+        result = g_object_slot_table + index * 0x50;
     return result;
 }
 
@@ -444,7 +444,7 @@ extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 /* Finds a free slot in the 64-slot table, sets it up for an object and returns its number. */
 int slot_alloc_for_object(unsigned char *object, unsigned int flags)
 {
-    char *p = D_0021F9C0;
+    char *p = g_object_slot_table;
     int i = 0;
     do {
         if (*(unsigned char **)(p + 0x40) != 0) {
@@ -481,18 +481,18 @@ int slot_alloc_for_object(unsigned char *object, unsigned int flags)
 
 extern void moby_detach_manipulator(char *, char *);
 /* Releases a slot of the 64-slot table. */
-void slot_free(unsigned int index) { if (index < 64u) { char *p = D_0021F9C0 + index * 0x50; moby_detach_manipulator(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
+void slot_free(unsigned int index) { if (index < 64u) { char *p = g_object_slot_table + index * 0x50; moby_detach_manipulator(*(char **)(p + 0x40), p); *(char **)(p + 0x40) = 0; } }
 
 
 /* func_002FED90 is matched in its own unit, src/game/002FED90-qcopy.c (-frac2-qcopy). */
 
-extern char D_002212E0[];
+extern char g_effect_slot_table[];
 
 /* Clears the flag word of one entry in a table of small records. */
 void table_clear_entry_flag(int index) {
     int *p;
     if (index < 0) return;
-    p = (int *)((unsigned int)D_002212E0 + (index << 5));
+    p = (int *)((unsigned int)g_effect_slot_table + (index << 5));
     p[7] = 0;
 }
 
@@ -523,15 +523,15 @@ void moby_init_with_private_data(char *object, int kind)
 
 /* func_002FF300 is matched in its own unit, src/game/002FF300.c (default flags). */
 
-extern char *D_001B2348 __attribute__((sda));
+extern char *g_effect_object __attribute__((sda));
 extern void moby_init_with_private_data(char *, int);
 
 /* Sets up the preview object so it is small, hidden at first and ready to show. */
 void shop_setup_preview_object(void)
 {
     char *object;
-    moby_init_with_private_data(D_001B2348, 0x3EF);
-    object = D_001B2348;
+    moby_init_with_private_data(g_effect_object, 0x3EF);
+    object = g_effect_object;
     *(unsigned char *)(object + 0x30) = 255;
     *(unsigned short *)(object + 0x34) |= 0x43;
     *(int *)(object + 0x98) = 0;
@@ -577,11 +577,11 @@ extern PreviewState g_object_preview_state __attribute__((sda));
 /* Distances along the preview's basis rows, separate small-data floats
    (retail loads D_001AD814 in a branch delay slot, so it is not an offset
    from a common base). */
-extern float D_001AD808 SDATA(D_001AD808) __attribute__((sda));
-extern float D_001AD80C SDATA(D_001AD80C) __attribute__((sda));
-extern float D_001AD810 SDATA(D_001AD810) __attribute__((sda));
-extern float D_001AD814 SDATA(D_001AD814) __attribute__((sda));
-extern float D_001AD818 SDATA(D_001AD818) __attribute__((sda));
+extern float g_preview_basis_scale_a SDATA(D_001AD808) __attribute__((sda));
+extern float g_preview_basis_scale_b SDATA(D_001AD80C) __attribute__((sda));
+extern float g_preview_basis_scale_c SDATA(D_001AD810) __attribute__((sda));
+extern float g_preview_basis_scale_d SDATA(D_001AD814) __attribute__((sda));
+extern float g_preview_basis_scale_e SDATA(D_001AD818) __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern void euler_rotation_basis(float *, float *);
 extern void shop_spawn_preview_light_burst(void *);
@@ -615,18 +615,18 @@ void PlaceObjectBeforeCamera(PreviewObjectPrefix *object)
     euler_rotation_basis(basis, object->rotation);
     if (g_object_preview_state.spin) {
         if (compact) {
-            FastVecScale(temporary, basis + 4, D_001AD818);
+            FastVecScale(temporary, basis + 4, g_preview_basis_scale_e);
             FastVecAdd(object->position, object->position, temporary);
-            FastVecScale(temporary, basis, D_001AD814);
+            FastVecScale(temporary, basis, g_preview_basis_scale_d);
             FastVecAdd(object->position, object->position, temporary);
         } else {
-            FastVecScale(temporary, basis + 4, D_001AD80C);
+            FastVecScale(temporary, basis + 4, g_preview_basis_scale_b);
             FastVecAdd(object->position, object->position, temporary);
-            FastVecScale(temporary, basis, D_001AD808);
+            FastVecScale(temporary, basis, g_preview_basis_scale_a);
             FastVecAdd(object->position, object->position, temporary);
         }
     } else {
-        FastVecScale(temporary, basis + 8, D_001AD810);
+        FastVecScale(temporary, basis + 8, g_preview_basis_scale_c);
         FastVecAdd(object->position, object->position, temporary);
     }
     func_002A0F48(object);
@@ -650,9 +650,9 @@ typedef struct {
     float size, position[4];
     ParticleContext_C65A0 context;
 } Particle_C65A0;
-extern float D_001AD81C SDATA(D_001AD81C) __attribute__((sda));
-extern float D_001A8BD0[] MACRO_ADDR;
-extern unsigned char *D_001F2614;
+extern float g_preview_size_scale SDATA(D_001AD81C) __attribute__((sda));
+extern float g_default_effect_vector[] MACRO_ADDR;
+extern unsigned char *g_part_tex_ground_effect;
 extern float IntToFloat(int);
 extern void lerp_vector(float *, float *, float *, float);
 extern int FloatToInt(float);
@@ -682,31 +682,31 @@ void EmitParticlesBeforeCamera(void)
     FastVecAdd(nearPoint, g_active_camera.position, offset);
     interpolation = IntToFloat(g_object_preview_state.frames) * g_object_preview_state.rate;
     lerp_vector(position, nearPoint, farPoint, interpolation);
-    size = D_001AD81C * 210000.0f;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFF2020, phase, 127, 127,
+    size = g_preview_size_scale * 210000.0f;
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 4, 0xFF2020, phase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     secondPhase = (phase + 128) % 255;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFF2020, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 4, 0xFF2020, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     size *= 0.5f;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 4, 0xFFFFFF, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 4, 0xFFFFFF, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     g_object_preview_state.phase++;
 }
 
-extern short D_001B2346;
+extern short g_unused_short;
 
 extern short ref_L00_002FFFE0_00 __attribute__((sda));
 
@@ -773,7 +773,7 @@ extern float vec_fast_helper_c(char *origin, char *point);
 /* The origin the distance helper is given.  The retail materialises it as
    `lui $s5,0x19` + `addiu $a0,$s5,-0x6160`, so it is the word at 0x190000 taken 0x6160
    lower; the helper's point is the row word plus 0x10. */
-extern char D_00190000[];
+extern char g_data_block_base[];
 
 /* Sorts the listed objects by distance from the player and keeps the nearest ones. */
 void moby_sort_entries_by_distance(void *table_ptr) {
@@ -793,7 +793,7 @@ void moby_sort_entries_by_distance(void *table_ptr) {
     for (i = 0; i < 64; i++) {
         if (state->row0[i] != 0) {
             state->row1[i] = 0;
-            distances[i] = vec_fast_helper_c((char *)D_00190000 - 0x6160, (char *)(state->row0[i] + 0x10));
+            distances[i] = vec_fast_helper_c((char *)g_data_block_base - 0x6160, (char *)(state->row0[i] + 0x10));
             calls++;
         }
         if (calls == state->count) {
@@ -841,13 +841,13 @@ typedef struct {
     int index;
 } State003004B0;
 
-extern State003004B0 D_00220DC0;
+extern State003004B0 g_game_override_state;
 
 /* Returns the saved value for the current entry if enabled, otherwise the value given. */
 float game_get_override_value(float value) {
     float result = value;
-    if (D_00220DC0.enabled != 0)
-        result = D_00220DC0.records[D_00220DC0.index].value;
+    if (g_game_override_state.enabled != 0)
+        result = g_game_override_state.records[g_game_override_state.index].value;
     return result;
 }
 
@@ -858,9 +858,9 @@ int game_is_id_in_list(int value)
     int i;
     int found = 0;
 
-    for (i = 0; i < D_L03_002325D0[64]; i++)
+    for (i = 0; i < g_known_id_list[64]; i++)
     {
-        if (D_L03_002325D0[i] == value)
+        if (g_known_id_list[i] == value)
         {
             found = 1;
             break;

@@ -10,7 +10,7 @@ typedef struct OBJ_3B0AB0 {
     SUB_3B0AB0 s20;
 } OBJ_3B0AB0;
 
-extern char D_L00_0023BB78[];
+extern char g_effect_path_node_table[];
 
 extern void part_kill(void *);
 
@@ -18,7 +18,7 @@ extern void part_kill(void *);
 void node_free_effect_object(int idx)
 {
     unsigned char index = idx;
-    char *base = D_L00_0023BB78;
+    char *base = g_effect_path_node_table;
     char *at = base + 0x10;
     char *slot = at + (unsigned char)idx * 0x1C;
     OBJ_3B0AB0 *obj = *(OBJ_3B0AB0 **)slot;

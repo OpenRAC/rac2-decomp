@@ -12,25 +12,25 @@ typedef struct { short f0; short text; short f4; } TextEntry;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int D_001AB9FC __attribute__((sda));
-extern short D_001A63AC[];
-extern unsigned char D_001A7A60[] MACRO_ADDR;
-extern MenuFields D_0025C0B8;
-extern FlagTarget *D_0025C024[];
-extern int D_0025C094[];
-extern TextEntry D_0026CF18[];
+extern int g_skill_points_cursor __attribute__((sda));
+extern short g_sequence_active_flag[];
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
+extern MenuFields g_skill_menu_fields;
+extern FlagTarget *g_skill_menu_flag_targets[];
+extern int g_skill_menu_text_slot[];
+extern TextEntry g_skill_text_entries[];
 
 /* Handles input on the skill points list: moves the cursor through the 30 entries and shows the earned entry text. */
 int menu_handle_skill_points_list_input(void)
 {
     int result = 0;
     int flags = g_pad_state.flags;
-    int old_cursor = D_001AB9FC;
+    int old_cursor = g_skill_points_cursor;
 
     if (flags & 0x10) {
         int value;
         int return_code;
-        D_001AB9FC = 0;
+        g_skill_points_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -43,34 +43,34 @@ finish:
         return return_code;
     }
     if (flags & 0x900) {
-        D_001AB9FC = 0;
+        g_skill_points_cursor = 0;
         result = 1;
     } else if (flags & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
-        if (--D_001AB9FC < 0)
-            D_001AB9FC = 29;
+        if (--g_skill_points_cursor < 0)
+            g_skill_points_cursor = 29;
     } else if (flags & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        if (++D_001AB9FC >= 30)
-            D_001AB9FC = 0;
+        if (++g_skill_points_cursor >= 30)
+            g_skill_points_cursor = 0;
     }
     {
-        MenuFields *menu = &D_0025C0B8;
-        menu->f58 = D_001AB9FC;
-        if (D_001A7A60[D_001AB9FC] != 0) {
-            if (old_cursor == D_001AB9FC) {
-                if (D_001A63AC[0] == 0) {
+        MenuFields *menu = &g_skill_menu_fields;
+        menu->f58 = g_skill_points_cursor;
+        if (g_item_enabled_flags[g_skill_points_cursor] != 0) {
+            if (old_cursor == g_skill_points_cursor) {
+                if (g_sequence_active_flag[0] == 0) {
                     if (menu->f50 == old_cursor && menu->f44 == 2) {
-                        D_0025C024[0]->flags &= -5;
+                        g_skill_menu_flag_targets[0]->flags &= -5;
                     } else if (menu->f54 == old_cursor && menu->f44 == 4) {
-                        D_0025C024[0]->flags &= -5;
+                        g_skill_menu_flag_targets[0]->flags &= -5;
                     }
                 }
             }
-            D_0025C094[0] = D_0026CF18[D_001AB9FC].text;
+            g_skill_menu_text_slot[0] = g_skill_text_entries[g_skill_points_cursor].text;
         } else {
-            D_0025C024[0]->flags |= 4;
-            D_0025C094[0] = 0;
+            g_skill_menu_flag_targets[0]->flags |= 4;
+            g_skill_menu_text_slot[0] = 0;
         }
     }
     return result;

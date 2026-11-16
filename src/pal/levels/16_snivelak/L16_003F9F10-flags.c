@@ -13,7 +13,7 @@ extern float math_fabs(float);
 extern void QueueMobyImpact(s32, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float vec_distance_xy(void *, void *);
-extern u8 D_L16_00189E20[];
+extern u8 g_hero_l16_moby[];
 
 void func_PAL_L16_00409AD0(u8 *arg)
 {
@@ -36,7 +36,7 @@ void func_PAL_L16_00409AD0(u8 *arg)
         pos[2] += 3.5f;
         vec_scale_to_length(delta, arg + 0xC0, -1.3f);
         FastVecAdd(pos, delta, pos);
-        hero = D_L16_00189E20;
+        hero = g_hero_l16_moby;
         if (math_fabs(*(float *)(hero + 0x88) - pos[2]) < 0.1f &&
             vec_distance_xy(pos, hero + 0x80) < 9.1f)
             QueueMobyImpact(*(s32 *)(hero + 0x2290), query);

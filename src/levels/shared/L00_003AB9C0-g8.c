@@ -75,10 +75,10 @@ extern void func_002A0F48(void *), AddMobyToIndexList(void *, void *, int);
 extern int part_alloc_effect_slot(void *, int, float, float, float);
 
 extern Material g_weapon_l00_table[];
-extern int D_L00_001AF7A0 __attribute__((sda));
-extern unsigned char D_00139583 NOT_SDA;
-extern int D_L00_001A8FF0[] __attribute__((sda));
-extern char D_L00_001BF220[], D_L00_0023B710[], D_L00_001B1FB0[] __attribute__((sda));
+extern int g_projectile_slot_index __attribute__((sda));
+extern unsigned char g_targeted_weapon_index NOT_SDA;
+extern int g_hero_locked_flag[] __attribute__((sda));
+extern char g_hero_l00_position[], g_projectile_offset_points[], g_homing_moby_index_list[] __attribute__((sda));
 extern HeroState g_hero_state;
 
 SpawnObject *projectile_spawn_targeted(SpawnObject *owner, char *pos, SpawnObject *target, char *arg,
@@ -101,15 +101,15 @@ SpawnObject *projectile_spawn_targeted(SpawnObject *owner, char *pos, SpawnObjec
         obj->flags |= 0x100;
         data = obj->data;
 
-        if ((unsigned)D_L00_001AF7A0 >= 9)
-            D_L00_001AF7A0 = 0;
+        if ((unsigned)g_projectile_slot_index >= 9)
+            g_projectile_slot_index = 0;
         {
-            int index = D_L00_001AF7A0;
+            int index = g_projectile_slot_index;
             data->material = index;
-            D_L00_001AF7A0 = (index + 1) % 8;
+            g_projectile_slot_index = (index + 1) % 8;
         }
 
-        speed = ((Material *)(D_00139583 * 0xE0 + (char *)g_weapon_l00_table))->speed * (1.0f / 60.0f);
+        speed = ((Material *)(g_targeted_weapon_index * 0xE0 + (char *)g_weapon_l00_table))->speed * (1.0f / 60.0f);
         qcopy(obj->position, pos);
 
         if (target) {
@@ -158,7 +158,7 @@ SpawnObject *projectile_spawn_targeted(SpawnObject *owner, char *pos, SpawnObjec
         qcopy(data->basis, basis);
         qcopy(data->argument, arg);
 
-        if (D_L00_001A8FF0[0]) {
+        if (g_hero_locked_flag[0]) {
             float projection;
             cam_compute_view_direction(obj->position, w, 1);
             projection = FastVecDot(w, data->basis);
@@ -191,12 +191,12 @@ SpawnObject *projectile_spawn_targeted(SpawnObject *owner, char *pos, SpawnObjec
 
         if (CollLine(w, pos, 0, g_hero_state.target, 0)) {
             obj->blocked = on;
-            qcopy(obj->position, D_L00_001BF220);
+            qcopy(obj->position, g_hero_l00_position);
         }
 
-        moby_transform_offset_to_world(obj, D_L00_0023B710 + (data->material << 6));
+        moby_transform_offset_to_world(obj, g_projectile_offset_points + (data->material << 6));
         func_002A0F48(obj);
-        AddMobyToIndexList(obj, D_L00_001B1FB0, 31);
+        AddMobyToIndexList(obj, g_homing_moby_index_list, 31);
         obj->radius *= 2.5f;
         data->sound = part_alloc_effect_slot(obj, 0, 1.0f, 1.0f, 1.0f);
     }

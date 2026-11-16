@@ -3,9 +3,9 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F449178;
 
-extern s32 D_L20_001B23A0 __attribute__((sda));
-extern s32 D_L20_001B23A8 __attribute__((sda));
-extern s32 D_L20_001B23B0 __attribute__((sda));
+extern s32 g_burst_explode_param_c __attribute__((sda));
+extern s32 g_burst_explode_param_b __attribute__((sda));
+extern s32 g_burst_explode_param_a __attribute__((sda));
 
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, s32, s32);
@@ -36,7 +36,7 @@ void triggered_l20_burst_update_2(char *moby)
         *(u8 *)(moby + 0xA8) = 0xFF;
         return;
     case 2:
-        part_explode_object_into_pieces(moby, &D_L20_001B23B0, &D_L20_001B23A8, &D_L20_001B23A0, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(moby, &g_burst_explode_param_a, &g_burst_explode_param_b, &g_burst_explode_param_c, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
         moby_compute_local_point(moby, &burst_pos, 0.0f, 0.0f, 2.0f);
         SpawnExplosion(&burst_pos, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
         moby_l00_spawn_child(moby, 0x126A, 0);

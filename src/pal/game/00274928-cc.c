@@ -9,7 +9,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void vec_set_direction_with_complement(float *, float *, float);
 extern void multiply_quaternions(void *, void *, void *);
 
-void func_PAL_00274928(void *unused, float *output, const TI128_00274A88 *input)
+void coll_clamp_movement_vector_pal(void *unused, float *output, const TI128_00274A88 *input)
 {
     TI128_00274A88 vector;
     float halfLength;

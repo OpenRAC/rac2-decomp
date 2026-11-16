@@ -25,9 +25,9 @@ extern HeroActionState g_hero_state;
 
 typedef struct { float start, end, reserved0, reserved1; } AnimationRange;
 /* The same table from its first end field; retail reaches these through an absolute address. */
-extern float D_L00_001A7DAC[][4] MACRO_ADDR;
+extern float g_hero_anim_range_table[][4] MACRO_ADDR;
 extern AnimationRange animation_ranges[2] SDATA(D_L00_001A7DA8);
-extern int D_L00_001A7DC8[2][2] SDATA(D_L00_001A7DC8);
+extern int g_hero_anim_offset_table[2][2] SDATA(D_L00_001A7DC8);
 extern void set_hero_animation(int, int, float);
 
 /* Sets the animation scale. Mode 1 scales from field_170. With both 0x1454 flags set it plays
@@ -60,7 +60,7 @@ void hero_update_anim_scale(void)
         old = g_hero_state.frame;
         start = animation_ranges[old].start * 0.01666666753590107f;
         before_range = time < start;
-        if (before_range || D_L00_001A7DAC[old][0] * 0.01666666753590107f < time) {
+        if (before_range || g_hero_anim_range_table[old][0] * 0.01666666753590107f < time) {
             if (before_range) {
                 if (time < start) {
                     do {
@@ -68,7 +68,7 @@ void hero_update_anim_scale(void)
                     } while (time < animation_ranges[g_hero_state.frame].start * 0.01666666753590107f);
                 }
             } else {
-                while (D_L00_001A7DAC[g_hero_state.frame][0] * 0.01666666753590107f < time) g_hero_state.frame++;
+                while (g_hero_anim_range_table[g_hero_state.frame][0] * 0.01666666753590107f < time) g_hero_state.frame++;
             }
             if (g_hero_state.frame < 0) g_hero_state.frame = 0;
             if (g_hero_state.frame > 1) g_hero_state.frame = 1;
@@ -77,7 +77,7 @@ void hero_update_anim_scale(void)
                 struct { char pad[0x48]; unsigned char *entry[1]; } *frames = *(void **)(object + 0x24);
                 int before = frames->entry[old + 3][0x10];
                 int after = frames->entry[g_hero_state.frame + 3][0x10];
-                int offset = D_L00_001A7DC8[old][g_hero_state.frame];
+                int offset = g_hero_anim_offset_table[old][g_hero_state.frame];
                 set_hero_animation(g_hero_state.frame + 3, ((unsigned char)object[0x41] * after / before + offset) % after, 8.0f);
             }
         }

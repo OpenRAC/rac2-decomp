@@ -12,7 +12,7 @@ typedef short s16;
 
 typedef int s32;
 
-extern char *D_L02_001B3AF8 __attribute__((sda));
+extern char *g_actor_entry_table __attribute__((sda));
 
 extern s32 func_002F3220(char *, float);
 
@@ -26,7 +26,7 @@ extern void gfx_add_draw_callback_third(char *, char *);
 
 extern void module_l00_call_handler_2(void);
 
-extern char D_L02_004004D8[];
+extern char g_stage_draw_callback[];
 
 extern void moby_set_state(char *, s32, s32);
 
@@ -58,9 +58,9 @@ extern void blade_ball_explode(char *);
 
 extern s32 arena_start_announcer_message(char *, s32);
 
-extern char D_L02_001BA3C0[];
+extern char g_hero_effect_state[];
 
-extern char *D_L02_001B368C __attribute__((sda));
+extern char *g_matrix_l02_record_table __attribute__((sda));
 
 extern void moby_transform_joint_to_world(char *, s32, char *);
 
@@ -83,7 +83,7 @@ void sway_update_piece_mask(char *actor) {
     for (i = 0; i < *(s32 *)(state + 0x80); i++) {
         char *entity;
         idCursor = (s16 *)(state + 0x40 + i * 2);
-        entity = D_L02_001B3AF8 + *idCursor * 32;
+        entity = g_actor_entry_table + *idCursor * 32;
         if (func_002F3220(entity, *(float *)(entity + 0x10)) != -1)
             *(u32 *)(state + 0x84) |= 1 << i;
     }
@@ -92,8 +92,8 @@ void sway_update_piece_mask(char *actor) {
 typedef int TI128 __attribute__((mode(TI)));
 
 extern int g_frame_l02_counter __attribute__((sda));
-extern float D_L02_001B1040[2] __attribute__((sda));
-extern char *D_L02_001B3B00 __attribute__((sda));
+extern float g_sway_angle_range[2] __attribute__((sda));
+extern char *g_sway_piece_table __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float ApproachValue(float *, float, float);
@@ -125,10 +125,10 @@ void sway_update_pieces(char *actor) {
             *(s32 *)(state + 0x90) = math_random_int_range(0x1E, 0x5A);
             if (0.0f < *(float *)(state + 0x8C))
                 *(float *)(state + 0x8C) =
-                    -(math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f);
+                    -(math_random_float_range(g_sway_angle_range[0], g_sway_angle_range[1]) * 2.908882452175021e-4f);
             else
                 *(float *)(state + 0x8C) =
-                    math_random_float_range(D_L02_001B1040[0], D_L02_001B1040[1]) * 2.908882452175021e-4f;
+                    math_random_float_range(g_sway_angle_range[0], g_sway_angle_range[1]) * 2.908882452175021e-4f;
         }
     } else {
         ApproachValue((float *)(state + 0x88), 0.0f, 8.726647356525064e-4f);
@@ -145,7 +145,7 @@ void sway_update_pieces(char *actor) {
         skip = ((*(s32 *)(state + 0x84) >> i) & 1) == 0;
         if (skip)
             continue;
-        piece = D_L02_001B3B00 + *idCursor * 64;
+        piece = g_sway_piece_table + *idCursor * 64;
         mat_multiply_rotation(piece, piece, matrix);
     }
 }
@@ -239,7 +239,7 @@ void arena_tick_controller(char *actor) {
         *(u16 *)(actorAlias + 0x96) = timer + 1;
     math_fast_float_d(state + 0xE4);
     if (*(u8 *)(actorAlias + 0x20) > 1)
-        gfx_add_draw_callback_third(D_L02_004004D8, actorAlias);
+        gfx_add_draw_callback_third(g_stage_draw_callback, actorAlias);
     module_l00_call_handler_2();
 }
 
@@ -466,7 +466,7 @@ void arena_reset_group_enemies(char *actor) {
     } while (*idCursor++ >= 0);
 }
 
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern void IncrementMaktarTypeCounter(char *, s32);
 
 /* The test of the entity walks below: the group word at +0x40 is read again for every condition,
@@ -566,7 +566,7 @@ void arena_pick_nearest_attackers(char *actor) {
 /* Makes the given boss the arena's current boss and plays its announcer line. */
 void arena_set_current_boss(char *actor, char *boss) {
     char *state = *(char **)(actor + 0x68);
-    char *shared = D_L02_001BA3C0;
+    char *shared = g_hero_effect_state;
     s16 classId;
     if (*(u32 *)(shared + 0x284) == *(u32 *)(state + 0xD0))
         *(u32 *)(shared + 0x284) = 0;
@@ -585,7 +585,7 @@ void arena_set_current_boss(char *actor, char *boss) {
 /* Returns the position of the arena's current camera point. */
 char *arena_get_camera_point(char *actor) {
     char *state = *(char **)(actor + 0x68);
-    return D_L02_001B368C + *(u32 *)(state + 0x88) * 128 + 0x30;
+    return g_matrix_l02_record_table + *(u32 *)(state + 0x88) * 128 + 0x30;
 }
 
 /* Returns one stored number from the arena controller's data. */
@@ -676,7 +676,7 @@ inc5c:
 }
 
 extern char *g_moby_l02_pool __attribute__((section(".sdata")));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern s16 moby_get_vars_counter(char *);
 extern void moby_set_vars_counter_to_1(char *);
 extern void moby_clear_vars_counter(char *);
@@ -840,10 +840,10 @@ extern int arena_get_challenge_save_index(int);
 extern void hero_reset_position_and_direction(char *, float *, int, int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void script_queue_keyed_request(int, int);
-extern int D_L02_001CAA80;
-extern u8 D_001395B8[];
-extern char *D_L02_001B369C __attribute__((sda));
-extern int D_L02_001AA1B0 __attribute__((sda));
+extern int g_arena_l02_active_flag;
+extern u8 g_game_flag_table[];
+extern char *g_hero_position_records __attribute__((sda));
+extern int g_arena_challenge_index __attribute__((sda));
 
 /* Starts the actor: calls func_L02_00400650 with 0x25 plus a random pick below 2, sets state 1,
    releases the object held at +0xC0 and, by a per-slot flag, hands a vector whose third float
@@ -860,22 +860,22 @@ void arena_cancel_challenge_menu(char *actor) {
         cam_end_override(*(char **)(state + 0xC0));
         *(s32 *)(state + 0xC0) = 0;
     }
-    if (D_L02_001CAA80 != 0)
+    if (g_arena_l02_active_flag != 0)
         load_scene_chunk(0, *(s32 *)(state + 0x224));
     vec_clear_128(heroPos);
-    if (D_001395B8[arena_get_challenge_save_index(0)] != 0) {
+    if (g_game_flag_table[arena_get_challenge_save_index(0)] != 0) {
         heroPos[2] = -1.59f;
-        hero_reset_position_and_direction(D_L02_001B369C + *(s32 *)(state + 0x74) * 128 + 0x30, heroPos, 0, 1);
+        hero_reset_position_and_direction(g_hero_position_records + *(s32 *)(state + 0x74) * 128 + 0x30, heroPos, 0, 1);
     } else {
         heroPos[2] = 2.16f;
-        hero_reset_position_and_direction(D_L02_001B368C + *(s32 *)(state + 0x78) * 128 + 0x30, heroPos, 0, 1);
+        hero_reset_position_and_direction(g_matrix_l02_record_table + *(s32 *)(state + 0x78) * 128 + 0x30, heroPos, 0, 1);
     }
     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
     arena_reset_group_enemies(actor);
     arena_match_active_count_a(actor, 0);
     arena_match_active_count_b(actor, 0);
     script_queue_keyed_request(*(s32 *)(state + 0x224), *(s32 *)(state + 0x22C));
-    D_L02_001AA1B0 = -1;
+    g_arena_challenge_index = -1;
 }
 
 /* func_L02_003FCBF0 is defined in L02_003F5430-g8.c (this unit has no $gp access for it). */
@@ -910,7 +910,7 @@ void arena_run_scenery_setup(char *actor) {
     listStart = (u16 *)g_entity_group_lists[GROUP(0xC8)];
     if (listStart == 0)
         return;
-    for (idCursor = listStart; (GROUP(0xC8) & 0xFF) != 0xFF && GROUP(0xC8) <= D_L02_001B35B8[0] && idCursor != 0 &&
+    for (idCursor = listStart; (GROUP(0xC8) & 0xFF) != 0xFF && GROUP(0xC8) <= g_group_max_index[0] && idCursor != 0 &&
                 ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)g_entity_group_lists[GROUP(0xC8)]);
          idCursor++) {
         entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
@@ -923,7 +923,7 @@ void arena_run_scenery_setup(char *actor) {
     listStart = (u16 *)g_entity_group_lists[GROUP(0xC4)];
     if (listStart == 0)
         return;
-    for (idCursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L02_001B35B8[0] && idCursor != 0 &&
+    for (idCursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= g_group_max_index[0] && idCursor != 0 &&
                 ((idCursor != 0 && (s16)idCursor[-1] >= 0) || idCursor == (u16 *)g_entity_group_lists[GROUP(0xC4)]);
          idCursor++) {
         entity = g_moby_l02_pool + ((*idCursor & 0x7FFF) << 8);
@@ -1035,7 +1035,7 @@ fail:
 
 /* func_L02_00400948 is defined in L02_003F5430-g8.c ($gp accesses). */
 
-extern char *D_L02_001B35A8 __attribute__((sda));
+extern char *g_moby_l02_list_head __attribute__((sda));
 extern void explosion_effect_update(char *);
 extern void moby_explode_and_hurt_nearby(char *);
 extern void moby_copy_sub_byte_40_to_25(char *);
@@ -1052,7 +1052,7 @@ extern void moby_mark_spawned(char *);
 void arena_notify_mobys_challenge_start(void) {
     char *moby;
 
-    for (moby = D_L02_001B35A8; moby != 0; moby = *(char **)(moby + 0x28)) {
+    for (moby = g_moby_l02_list_head; moby != 0; moby = *(char **)(moby + 0x28)) {
         switch (*(s16 *)(moby + 0xAA)) {
         case MOBY_CLASS_SHEEP:
             explosion_effect_update(moby);

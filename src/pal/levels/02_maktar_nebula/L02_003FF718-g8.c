@@ -5,7 +5,7 @@
 
 extern char *g_moby_l02_pool __attribute__((sda));
 extern u32 g_entity_group_lists[];
-extern int D_L02_001B1214 __attribute__((sda));
+extern int g_arena_tally_reload_time __attribute__((sda));
 extern char g_hero_state[];
 
 /* Accumulate the active group entries and reset their current report state. */
@@ -49,6 +49,6 @@ void func_PAL_L02_003FF718(char *object)
     *(float *)(state + 0x68) = (float)*(int *)(hero + 0x24CC);
     *(short *)(state + 0x11C) = 0;
     do {
-        *(u16 *)(state + 0x11E) = ((int)D_L02_001B1214 * 5 + 2) / 6;
+        *(u16 *)(state + 0x11E) = ((int)g_arena_tally_reload_time * 5 + 2) / 6;
     } while (0);
 }

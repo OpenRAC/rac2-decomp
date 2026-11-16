@@ -4,7 +4,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern void *moby_find_record_by_handle_id(int);
 extern void cam_switch_active(void *, void *, int);
-extern int D_001B1504;
+extern int g_camera_definition_table;
 extern char g_camera_eye_state[];
 
 /* Sets up an effect entry on the object: stores the user data, builds four vectors and starts it. */
@@ -12,7 +12,7 @@ void part_setup_object_effect_entry(TI128 *first, TI128 *second, void *userData)
 {
     TI128 vecs[4];
     char *obj = (char *)moby_find_record_by_handle_id(0x1B);
-    char *table = (char *)D_001B1504;
+    char *table = (char *)g_camera_definition_table;
     short idx = *(short *)(obj + 0x84);
     char *entry = *(char **)(table + idx * 32 + 0x1C);
     char *colorTable;

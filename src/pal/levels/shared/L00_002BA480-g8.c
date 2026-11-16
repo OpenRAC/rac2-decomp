@@ -29,7 +29,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 
-void func_PAL_L00_002C2F88(void)
+void hero_probe_ground_and_ledge_pal(void)
 {
     float first[4], second[4], probe[4];
     if (g_hero_state.gate != 0) return;

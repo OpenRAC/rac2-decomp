@@ -5,15 +5,15 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern float func_PAL_002AA108(char *, void *);
+extern float moby_update_aim_target_strength_pal(char *, void *);
 extern void vec_resolve_direction(char *, char *, char *, char *);
 extern void func_PAL_L08_0032DFC0(char *, char *, int, int, int, float);
 extern void func_PAL_002A7E68(char *, int, int, int);
-extern void func_PAL_002A7650(char *, int, int);
+extern void SetDeathBits_pal(char *, int, int);
 extern void func_PAL_002AC290(char *, char *);
 extern void func_PAL_002AC3C0(char *, char *);
 
-void func_PAL_L08_003FAAB0(char *self, char *a1)
+void destructible_update_pal(char *self, char *a1)
 {
     char *s0 = a1;
     char *s2;
@@ -24,7 +24,7 @@ void func_PAL_L08_003FAAB0(char *self, char *a1)
     if (*(u8 *)(self + 0x20) == 4)
         return;
     s2 = part_find_owned_effect_slot(self, 0xC30000, 0);
-    f = func_PAL_002AA108(self, s2);
+    f = moby_update_aim_target_strength_pal(self, s2);
     if (0.0f < f) {
         v = *(float *)(s0 + 0x20) - *(float *)(s2 + 0x2C);
         *(float *)(s0 + 0x20) = v;
@@ -54,7 +54,7 @@ void func_PAL_L08_003FAAB0(char *self, char *a1)
             *(float *)(s0 + 0xB4) = 10.0f;
             if (*(u8 *)(self + 0x43) != 3)
                 func_PAL_002A7E68(self, 3, 0, 0);
-            func_PAL_002A7650(self, 0, 3);
+            SetDeathBits_pal(self, 0, 3);
         }
         func_PAL_002AC290(self, s0 + 0x50);
     }

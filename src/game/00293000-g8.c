@@ -1,6 +1,6 @@
 #include "common.h"
-extern int D_001A72F4 MACRO_ADDR, D_001A72D4 MACRO_ADDR, D_001A7304 MACRO_ADDR;
-extern int D_001A72D0 MACRO_ADDR;
+extern int g_vram_clut_third MACRO_ADDR, g_vram_frame_base MACRO_ADDR, g_vram_pixel_base MACRO_ADDR;
+extern int g_vram_cursor MACRO_ADDR;
 extern void FlushCache(int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int sceGsExecLoadImage(void *, void *);
@@ -14,11 +14,11 @@ void UploadTextureImages(int base, int count, int palettes, UploadChunk *list)
 {
     UploadImage image;
     int i, j, cursor;
-    D_001A72D4 = D_001A72D0 = D_001A72F4;
+    g_vram_frame_base = g_vram_cursor = g_vram_clut_third;
     for (i = 0; i < count; i++, list++) {
         int addr = base + list->size;
         int packed = list->packed;
-        int vram_pos = D_001A72D0;
+        int vram_pos = g_vram_cursor;
         int w = packed & 0xffff;
         int h = packed >> 16;
         if (list->type == 0x13) {
@@ -28,20 +28,20 @@ void UploadTextureImages(int base, int count, int palettes, UploadChunk *list)
             func_00126288(&image, vram_pos >> 8, dbw, 0x13, 0, 0, w, h);
             sz = w*h;
             if (sz < 0x100) sz = 0x100;
-            D_001A72D0 += sz;
+            g_vram_cursor += sz;
         } else if (list->type == 2) {
             func_00126288(&image, vram_pos >> 8, 1, 2, 0, 0, 16, 16);
-            D_001A72D0 += 0x200;
+            g_vram_cursor += 0x200;
         } else if (list->type == 0) {
             func_00126288(&image, vram_pos >> 8, 1, 0, 0, 0, 16, 16);
-            D_001A72D0 += 0x400;
+            g_vram_cursor += 0x400;
         }
         FlushCache(0);
         sceGsExecLoadImage(&image, (void *)addr);
         gfx_wait_paths_idle(0,0);
     }
-    D_001A72D4 = D_001A72D0;
-    cursor = D_001A7304;
+    g_vram_frame_base = g_vram_cursor;
+    cursor = g_vram_pixel_base;
     for (j=0; j<palettes; j++, list++) {
         int packed = list->packed;
         int addr = base + list->offset;

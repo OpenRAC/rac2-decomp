@@ -7,14 +7,14 @@
  * the lower pseudo `wanted` takes $a2 as in retail). Incomplete SDA arrays keep
  * the absolute rematerialisation in this G0 unit.
  */
-extern float D_L00_001B25E0[] __attribute__((sda));
+extern float g_menu_slide_scale[] __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
 extern int g_screen_width[] __attribute__((sda));
 extern int g_screen_height[] __attribute__((sda));
 typedef struct { int words[0x744/4]; } Menu705;
 extern Menu705 g_purchase_menu_model[];
 typedef struct { int key; unsigned int color; } MenuColor;
-extern MenuColor D_L00_0028E9F0[];
+extern MenuColor g_menu_color_table[];
 extern void gfx_set_scissor_clamped(int, int, int, int);
 extern int subtract_integer_with_clamp(int);
 extern void DrawFramebufferRect(int,int,int,int,int,int,unsigned int);
@@ -38,7 +38,7 @@ void shop_draw_vendor_item_list(void)
     unsigned int colors[4];
 
     bottom=MY(382.0f);
-    top=(int)(D_L00_001B25E0[0]*320.0f+0.5f);
+    top=(int)(g_menu_slide_scale[0]*320.0f+0.5f);
     gfx_set_scissor_clamped(58,456,top,bottom);
     if (MW(0x6c)<0) MW(0x6c)+=4;
     else if(MW(0x6c)>0) MW(0x6c)-=4;
@@ -74,23 +74,23 @@ void shop_draw_vendor_item_list(void)
             one=1;
         top:
                 off=j*8;
-                key=*(int *)((char *)D_L00_0028E9F0+off);
+                key=*(int *)((char *)g_menu_color_table+off);
                 if(key) {
                     j++;
                     wanted=(int *)((char *)g_purchase_menu_model+0x158+idx*28);
                     if(*wanted!=key) goto top;
-                    color=*(unsigned int *)((char *)D_L00_0028E9F0+(off+4));
+                    color=*(unsigned int *)((char *)g_menu_color_table+(off+4));
                 }
             } while(0);
             label=GetIconFrame(0xea97,one);
             colors[2]=colors[0]=a|color;
             colors[3]=colors[1]=b|color;
-            hud_draw_sprite_gradient(label,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
+            hud_draw_sprite_gradient(label,y+2,MY(332.0f),40,(int)(g_menu_slide_scale[0]*40.0f+0.5f),colors);
             color=0xf0f0b0;
         }
         colors[3]=colors[1]=b|color;
         colors[2]=colors[0]=a|color;
-        hud_draw_sprite_gradient(text,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
+        hud_draw_sprite_gradient(text,y+2,MY(332.0f),40,(int)(g_menu_slide_scale[0]*40.0f+0.5f),colors);
     }
     }
 }

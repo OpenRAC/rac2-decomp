@@ -1,11 +1,12 @@
+#include "names.h"
 /* func_L04_0044D428: its own -G8 unit with -frac2-zero-ti-por (the stack clear of
  * the ground angles keeps retail's por + sq). */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern f32 D_L04_001B1870 __attribute__((sda));
-extern u8 D_L04_001BFAC0[];
-extern TI128 D_L04_001BFB00;
+extern f32 g_barlow_enemy_move_time __attribute__((sda));
+extern u8 g_probe_hit[];
+extern TI128 g_scratch_direction_quad;
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastAddRotations(f32, f32);
 /* RAC1's counterpart MobySpringTurn (func_L00_002592B0, same body: clamp, spring
@@ -44,11 +45,11 @@ void barlow_enemy_update_movement(D428Object *object) {
                                data->target[1] - object->position[1]);
         heading = FastAddRotations(heading, data->heading);
         MobySpringTurn(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
-        data->steps = FloatToInt(D_L04_001B1870 * 1024.0f);
-        data->time = D_L04_001B1870;
+        data->steps = FloatToInt(g_barlow_enemy_move_time * 1024.0f);
+        data->time = g_barlow_enemy_move_time;
         coll_probe_ahead_of_moby(object, &data->steps);
         if (data->channel != -1)
-            path_push_point_away(data->channel, object->position, object->position, D_L04_001B1870);
+            path_push_point_away(data->channel, object->position, object->position, g_barlow_enemy_move_time);
     } else if (object->state == 5) {
         heading = mat_fast_helper_a(data->target[0] - object->position[0],
                                data->target[1] - object->position[1]);
@@ -66,7 +67,7 @@ void barlow_enemy_update_movement(D428Object *object) {
         floor = coll_probe_ground_height_below(object->position, 0, 0.5f);
         object->position[2] -= 2.0f;
         if (object->position[2] < floor) {
-            u8 *controller = D_L04_001BFAC0;
+            u8 *controller = g_probe_hit;
             if (*(void **)(controller + 0x18) && moby_get_private_value_2(*(void **)(controller + 0x18))) {
                 data->ground = *(void **)(controller + 0x18);
             } else if (data->ground) {
@@ -76,7 +77,7 @@ void barlow_enemy_update_movement(D428Object *object) {
             data->velocity = 0;
             if (data->ground) {
                 rotation = object->rotation.q;
-                angles.q = D_L04_001BFB00;
+                angles.q = g_scratch_direction_quad;
                 mat_build_axis_angle_rotation(&angles, &rotation, object->rotation.f[2]);
             }
         }

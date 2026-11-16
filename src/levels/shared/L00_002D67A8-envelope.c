@@ -11,7 +11,7 @@ typedef struct {
     short delay, duration, frame, rise, fall;
     unsigned char amplitude, bias;
 } WaveChannel;
-extern WaveChannel D_L00_001B8C00[8];
+extern WaveChannel g_wave_l00_channels[8];
 
 /* Mixes the eight active wave channels into two output values, one per output. Returns how many channels are in use. */
 int LevelActuatorCalcPower(int *out)
@@ -33,19 +33,19 @@ int LevelActuatorCalcPower(int *out)
         WaveChannel *channel;
         int phase, value;
 
-        if (!D_L00_001B8C00[i].kind)
+        if (!g_wave_l00_channels[i].kind)
             continue;
         active++;
-        if (!D_L00_001B8C00[i].permanent) {
-            if (D_L00_001B8C00[i].duration-- <= 0)
-                D_L00_001B8C00[i].kind = 0;
+        if (!g_wave_l00_channels[i].permanent) {
+            if (g_wave_l00_channels[i].duration-- <= 0)
+                g_wave_l00_channels[i].kind = 0;
         }
-        if (D_L00_001B8C00[i].delay) {
-            D_L00_001B8C00[i].delay--;
+        if (g_wave_l00_channels[i].delay) {
+            g_wave_l00_channels[i].delay--;
             continue;
         }
-        channel = &D_L00_001B8C00[i];
-        D_L00_001B8C00[i].frame++;
+        channel = &g_wave_l00_channels[i];
+        g_wave_l00_channels[i].frame++;
         value = 0;
         phase = channel->frame % (channel->rise + channel->fall);
         switch (channel->kind) {

@@ -5,19 +5,19 @@
    case after the numbered ones, as retail lays the compare chain out. */
 
 /* Read absolutely (lui/lw) although it is a word. */
-extern s32 D_L18_001C9D40 NOT_SDA;
+extern s32 g_color_effect_freed_flag NOT_SDA;
 
 /* Three constant triples. Read-only, so sched1 may load them ahead of the stores through the
    object's vector; the stores' common tail then cross-jumps between the three cases. */
-extern const float D_L18_001B0430 __attribute__((sda));
-extern const float D_L18_001B0434 __attribute__((sda));
-extern const float D_L18_001B0438 __attribute__((sda));
-extern const float D_L18_001B043C __attribute__((sda));
-extern const float D_L18_001B0440 __attribute__((sda));
-extern const float D_L18_001B0444 __attribute__((sda));
-extern const float D_L18_001B0448 __attribute__((sda));
-extern const float D_L18_001B044C __attribute__((sda));
-extern const float D_L18_001B0450 __attribute__((sda));
+extern const float g_color_a_r __attribute__((sda));
+extern const float g_color_a_g __attribute__((sda));
+extern const float g_color_a_b __attribute__((sda));
+extern const float g_color_b_r __attribute__((sda));
+extern const float g_color_b_g __attribute__((sda));
+extern const float g_color_b_b __attribute__((sda));
+extern const float g_color_c_r __attribute__((sda));
+extern const float g_color_c_g __attribute__((sda));
+extern const float g_color_c_b __attribute__((sda));
 extern void *cam_alloc_override_slot(s32);
 extern void cam_end_override(void *);
 
@@ -29,25 +29,25 @@ void moby_set_color_effect(char *object, s32 mode)
 {
     char *state = *(char **)(object + 0x68);
 
-    if (D_L18_001C9D40 == 0) {
+    if (g_color_effect_freed_flag == 0) {
         if (*(float **)(state + 0x80) == 0) {
             *(void **)(state + 0x80) = cam_alloc_override_slot(5);
         } else {
             switch (mode) {
             case 1:
-                (*(float **)(state + 0x80))[0] = D_L18_001B043C;
-                (*(float **)(state + 0x80))[1] = D_L18_001B0440;
-                (*(float **)(state + 0x80))[2] = D_L18_001B0444;
+                (*(float **)(state + 0x80))[0] = g_color_b_r;
+                (*(float **)(state + 0x80))[1] = g_color_b_g;
+                (*(float **)(state + 0x80))[2] = g_color_b_b;
                 break;
             case 2:
-                (*(float **)(state + 0x80))[0] = D_L18_001B0448;
-                (*(float **)(state + 0x80))[1] = D_L18_001B044C;
-                (*(float **)(state + 0x80))[2] = D_L18_001B0450;
+                (*(float **)(state + 0x80))[0] = g_color_c_r;
+                (*(float **)(state + 0x80))[1] = g_color_c_g;
+                (*(float **)(state + 0x80))[2] = g_color_c_b;
                 break;
             default:
-                (*(float **)(state + 0x80))[0] = D_L18_001B0430;
-                (*(float **)(state + 0x80))[1] = D_L18_001B0434;
-                (*(float **)(state + 0x80))[2] = D_L18_001B0438;
+                (*(float **)(state + 0x80))[0] = g_color_a_r;
+                (*(float **)(state + 0x80))[1] = g_color_a_g;
+                (*(float **)(state + 0x80))[2] = g_color_a_b;
                 break;
             }
         }

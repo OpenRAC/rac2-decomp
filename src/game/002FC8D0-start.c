@@ -4,7 +4,7 @@
    its own: it is built with -g, whose line label before the division keeps
    the two padding nops retail has in front of div.s. */
 
-extern u16 D_001AD7F8 SDATA(D_001AD7F8);
+extern u16 g_preview_frame_count SDATA(D_001AD7F8);
 typedef struct {
     s16 elapsed;
     s16 count;
@@ -21,8 +21,8 @@ typedef struct {
     u8 owned;
 } Transition;
 extern Transition g_object_preview_state __attribute__((sda));
-extern int D_001AD7E4 SDATA(D_001AD7E4) __attribute__((sda));
-extern int D_001AD7E8 SDATA(D_001AD7E8) __attribute__((sda));
+extern int g_preview_music_flag SDATA(D_001AD7E4) __attribute__((sda));
+extern int g_preview_timer SDATA(D_001AD7E8) __attribute__((sda));
 /* Real preview vectors in the owning resident byte object. The model-slot
  * table is addressed from that complete object, without a made-up one-slot bound. */
 typedef struct {
@@ -47,7 +47,7 @@ extern char *part_init_shared_effect_object(int, int);
    line 1511 (key 2000 + 1511) if it is idle, and picks the item's model. */
 void BeginPreviewTransition(void)
 {
-    g_object_preview_state.count = D_001AD7F8;
+    g_object_preview_state.count = g_preview_frame_count;
     g_object_preview_state.rate = 1.0f / IntToFloat(g_object_preview_state.count);
     qcopy(g_object_preview_state.from, ((ResidentPreviewPrefix *)g_hero_state)->previewFrom);
     qcopy(g_object_preview_state.to, ((ResidentPreviewPrefix *)g_hero_state)->previewTo);
@@ -58,8 +58,8 @@ void BeginPreviewTransition(void)
            sched2 (where $a1 has no known base) issues selection first. */
         g_music_state.key = 0xDB7;
         g_music_state.selection = 0;
-        D_001AD7E4 = 1;
-        D_001AD7E8 = 0;
+        g_preview_music_flag = 1;
+        g_preview_timer = 0;
     }
     g_object_preview_state.flag1C = 0;
     g_object_preview_state.flag1D = 0;

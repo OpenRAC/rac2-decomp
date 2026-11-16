@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void F5a19df7a_FUN_002FC560(unsigned int a, unsigned long b);
 extern void F5a19df7a_FUN_0031E2A0(char *p);
@@ -7,7 +8,7 @@ extern int F5a19df7a_FUN_002A7820(int a, int b);
 extern float F5a19df7a_FUN_002A7940(void);
 extern void F5a19df7a_FUN_0031EB00(char *a, int b, float e, char *c, float f, int d, int g);
 
-void func_PAL_0031FF78(char *p)
+void part_spawn_spark_burst_pal(char *p)
 {
     char *q;
     char *o;

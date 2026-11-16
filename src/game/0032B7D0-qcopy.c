@@ -1,6 +1,6 @@
 #include "common.h"
 typedef int EffectQuad __attribute__((mode(TI)));
-extern char D_L00_00189F00[];
+extern char g_zero_l00_vector[];
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -17,7 +17,7 @@ void part_update_ring_pieces(char *owner)
     float delta[4];
     int i;
     char *table = g_ring_pieces;
-    char *origin = D_L00_00189F00;
+    char *origin = g_zero_l00_vector;
     for (i = 0; i < 12; i++) {
         char *piece = table + i * 0xB0;
         float ratio;

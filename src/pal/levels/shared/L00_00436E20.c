@@ -4,7 +4,7 @@
 extern int prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
-char *func_PAL_L00_00436E20(char *object)
+char *menu_init_page_record_a_pal(char *object)
 {
     prompt_bar_destroy(object + 8);
     return object;
@@ -114,11 +114,11 @@ char *func_PAL_L00_00438B60(char *object)
 
 
 extern char *GetLocalizedString(int);
-extern void func_PAL_0033CF78(void *, int, int, int);
-extern void func_PAL_0033CD50(void *);
+extern void prompt_bar_set_texts_pal(void *, int, int, int);
+extern void prompt_bar_update_pal(void *);
 extern void mem_store_two_floats_through_cell(void *, float, float);
 extern int snd_play_from_global_bank(int a, int b, int c);
-extern unsigned char D_001A7BB2 __attribute__((sda));
+extern unsigned char g_option_toggle_b __attribute__((sda));
 
 /* func_PAL_L00_00438CC0, the PAL copy of func_L00_00433560: the same C, with the child's three
    text ids set up first and the two object fields 0x30 further on. */
@@ -130,15 +130,15 @@ int func_PAL_L00_00438CC0(char *object, int flags)
 
     text = GetLocalizedString(0xB72);
     second = GetLocalizedString(0xB5F);
-    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
-    func_PAL_0033CD50(child);
+    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_update_pal(child);
     vec = *(float **)(object + 0x2DC);
     mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
         int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
@@ -166,15 +166,15 @@ int func_PAL_L00_00438FB8(char *object, int flags)
 
     text = GetLocalizedString(0xB72);
     second = GetLocalizedString(0xB5F);
-    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
-    func_PAL_0033CD50(child);
+    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_update_pal(child);
     vec = *(float **)(object + 0x2DC);
     mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
         int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
@@ -200,25 +200,25 @@ int func_PAL_L00_004391F8(char *object, int flags)
 
     text = GetLocalizedString(0xB72);
     second = GetLocalizedString(0xB5F);
-    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
-    func_PAL_0033CD50(child);
+    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_update_pal(child);
     vec = *(float **)(object + 0x2DC);
     mem_store_two_floats_through_cell(child, vec[0], vec[1]);
 
     if ((flags & 0x40) && *(int *)(object + 0x2D8) == 0) {
         int discarded = snd_play_from_global_bank(4, 0, 0);
         (void)discarded;
-        D_001A7BB2 = (D_001A7BB2 < 1);
+        g_option_toggle_b = (g_option_toggle_b < 1);
     }
 
     return (flags >> 6) & 1;
 }
 
-extern void *func_PAL_0033CA78(void *);
+extern void *prompt_bar_destroy_pal(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_PAL_L00_004392D8(char *object) {
-    func_PAL_0033CA78(object + 0x8);
+    prompt_bar_destroy_pal(object + 0x8);
     menu_pass_through_handle(object + 0x2E0);
     return object;
 }
@@ -227,7 +227,7 @@ void *func_PAL_L00_004392D8(char *object) {
 extern void *cam_init_object_table_d(void *);
 
 void *func_PAL_L00_00439630(char *object) {
-    func_PAL_0033CA78(object + 0x8);
+    prompt_bar_destroy_pal(object + 0x8);
     cam_init_object_table_d(object + 0x2E0);
     return object;
 }
@@ -235,7 +235,7 @@ void *func_PAL_L00_00439630(char *object) {
 
 extern void prompt_bar_draw(char *p);
 
-void func_PAL_L00_004397D0(char *p)
+void menu_get_sub_object_value_pal(char *p)
 {
     prompt_bar_draw(p + 8);
 }

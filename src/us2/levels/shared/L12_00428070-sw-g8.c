@@ -6,12 +6,12 @@
 #define U(p,o) (*(u16 *)((char *)(p)+(o)))
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-extern float D_L12_001B21C0 __attribute__((sda));
-extern float D_L12_001B21C4 __attribute__((sda));
-extern float D_L12_001B21C8[] __attribute__((sda));
+extern float g_hopping_enemy_hop_rate __attribute__((sda));
+extern float g_hopping_enemy_alt_hop_rate __attribute__((sda));
+extern float g_hopping_enemy_random_range[] __attribute__((sda));
 extern float D_L12_001B21C8_gp[] SDATA(D_L12_001B21C8);
-extern int D_L12_001B29C8[] __attribute__((sda));
-extern char D_0018A0E0[], g_hero_position[];
+extern int g_frame_l12_counter[] __attribute__((sda));
+extern char g_hero_state_block[], g_hero_position[];
 extern int g_hero_moby[];
 extern void hopping_enemy_init_react(void *);
 extern int flag_set_second_pending(void *);
@@ -41,7 +41,7 @@ extern int moby_count_group_side_from_object(void *,int,int);
 extern void moby_turn_toward_target_limited(void *);
 extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
-extern int func_US2_002AF9C8(void *,float);
+extern int math_is_value_within_step_us2(void *,float);
 extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 extern int coll_sweep_from_object(void *,void *,int,int,int,int,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
@@ -49,7 +49,7 @@ extern void part_spawn_falling_puff(void *);
 extern void hopping_enemy_tick_timers(void *);
 extern void pulsing_group_update(void *);
 
-void func_US2_L12_00428070(char *obj) {
+void hopping_enemy_update_us2(char *obj) {
     char *s = *(char **)(obj+0x68);
     /* The aligned local preserves the old position or a temporary vector. */
     typedef int Quad __attribute__((mode(TI)));
@@ -61,7 +61,7 @@ void func_US2_L12_00428070(char *obj) {
     case 0:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.005f,0.06666667f,0.006981317885220051f,0.4188791f);
-            F(s,0x1D0)=D_L12_001B21C4*0.016666668f;
+            F(s,0x1D0)=g_hopping_enemy_alt_hop_rate*0.016666668f;
             F(s,0x124)=0.006666667f;
             F(s,0x134)=0.5f;
             H(s,0x35A)=math_random_int_range(0,30);
@@ -79,7 +79,7 @@ void func_US2_L12_00428070(char *obj) {
     case 1:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
-            F(s,0x1D0)=D_L12_001B21C0*0.016666668f;
+            F(s,0x1D0)=g_hopping_enemy_hop_rate*0.016666668f;
             F(s,0x134)=0.05f;
         }
         if (H(s,0x334)==1) moby_set_state(obj,9,2);
@@ -88,7 +88,7 @@ void func_US2_L12_00428070(char *obj) {
     case 2:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.005f,0.06666667f,0.017453294f,1.0471977f);
-            F(s,0x1D0)=D_L12_001B21C0*0.016666668f;
+            F(s,0x1D0)=g_hopping_enemy_hop_rate*0.016666668f;
             F(s,0x124)=0.006666667f;
             F(s,0x134)=0.05f;
             H(s,0x35A)=math_random_int_range(0,30);
@@ -125,7 +125,7 @@ void func_US2_L12_00428070(char *obj) {
         if (B(obj,0x43)==1) {
             if (B(obj,0x60)&2) anim_start_blended(obj,0,0,20);
         } else if (H(s,0x332)==0) {
-            if (!H(s,0x358) || FastVecDot(s+0x320,D_0018A0E0)>0.8f) moby_set_state(obj,2,-1);
+            if (!H(s,0x358) || FastVecDot(s+0x320,g_hero_state_block)>0.8f) moby_set_state(obj,2,-1);
         }
         break;
     case 2:
@@ -172,7 +172,7 @@ void func_US2_L12_00428070(char *obj) {
     case 4:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=6) anim_start_blended(obj,6,0,10);
-            F(s,0x354)=math_random_float_range(D_L12_001B21C8_gp[0],D_L12_001B21C8[1])+0.5f;
+            F(s,0x354)=math_random_float_range(D_L12_001B21C8_gp[0],g_hopping_enemy_random_range[1])+0.5f;
         }
         if ((moby_step_shared_movement(obj,s+0x300,0)&128) || vec_distance_xy(obj+0x10,g_hero_position)>F(s,0x354)) {
             if (math_random_int_below(2)) moby_set_state(obj,6,-1);
@@ -214,13 +214,13 @@ void func_US2_L12_00428070(char *obj) {
             if (B(obj,0x43)!=8) anim_start_blended(obj,8,2,10);
         }
         moby_start_effect_from_entry(obj,F(s,0x340));
-        if (func_US2_002AF9C8(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)B(s,0x34),1.0f);
+        if (math_is_value_within_step_us2(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)B(s,0x34),1.0f);
         if (B(obj,0x60)&2) moby_set_state(obj,9,-1);
         break;
     case 14:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=10) anim_start_blended(obj,10,0,5);
-            W(s,0x1BC)=D_L12_001B29C8[0];
+            W(s,0x1BC)=g_frame_l12_counter[0];
         }
         vec_scale_to_length(&vec,s+0x1A0,1.0f);
         moby_step_shared_movement(obj,&vec,0);

@@ -20,18 +20,18 @@ typedef struct SnivelakScene {
     unsigned char pad46[0x146];
     char *objects[0];
 } SnivelakScene;
-extern SnivelakScene D_L16_001BD800;
-extern float D_L16_001B2564;
+extern SnivelakScene g_snivelak_scene;
+extern float g_snivelak_room_fade;
 /* Partial view of the position and transform used by the scene effect. */
 typedef struct {
     float position[4];
     unsigned char pad10[0x220];
     float matrix[16];
 } SceneEffectTransform;
-extern SceneEffectTransform D_L16_001B9B00;
-extern char D_L16_001A8F20[] __attribute__((sda));
+extern SceneEffectTransform g_scene_origin_transform;
+extern char g_particle_template[] __attribute__((sda));
 typedef struct { unsigned char prefix[0xD4]; u8 *material; } SceneEffectMaterial;
-extern SceneEffectMaterial D_L16_001FF680;
+extern SceneEffectMaterial g_scene_effect_material;
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(char *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
@@ -57,8 +57,8 @@ void func_US2_L16_002F6CE0(void)
     char *object;
     int i = 0;
     anim_start_startup_animations();
-    for (; i < D_L16_001BD800.objectCount; i++) {
-        char *entry = D_L16_001BD800.objects[i];
+    for (; i < g_snivelak_scene.objectCount; i++) {
+        char *entry = g_snivelak_scene.objects[i];
         if (entry && *(short *)(entry + 0xaa) == 0xe29)
             *(u16 *)(entry + 0x34) |= 0x800;
         if (*(short *)(entry + 0xaa) == 0xd54)
@@ -69,17 +69,17 @@ void func_US2_L16_002F6CE0(void)
                 math_store_angle_update_result(entry, (float *)(*(char **)(entry + 0x68) + 12), 0x80aaaad2, 0x80396464, 0.06108653545379639f);
         }
     }
-    if (g_current_map_index[0] == 16 && D_L16_001BD800.state == 1) {
-        object = D_L16_001BD800.objects[6];
+    if (g_current_map_index[0] == 16 && g_snivelak_scene.state == 1) {
+        object = g_snivelak_scene.objects[6];
         *(int *)(object + 0x78) = 0xff0020ff;
         *(u16 *)(object + 0x34) |= 16;
-        if (subtract_integer_with_clamp(D_L16_001BD800.frame - 0x334) < 4) {
-            float fade = (float)subtract_integer_with_clamp(D_L16_001BD800.frame - 0x334) * 0.333f;
+        if (subtract_integer_with_clamp(g_snivelak_scene.frame - 0x334) < 4) {
+            float fade = (float)subtract_integer_with_clamp(g_snivelak_scene.frame - 0x334) * 0.333f;
             if (fade > 1.0f) fade = 1.0f;
             else if (fade < 0.0f) fade = 0.0f;
-            D_L16_001B2564 = 1.0f - fade;
+            g_snivelak_room_fade = 1.0f - fade;
         }
-        if (D_L16_001BD800.frame == 0x336) {
+        if (g_snivelak_scene.frame == 0x336) {
             int particleIndex;
             position.q = 0;
             position.f[0] = 0.2f;
@@ -99,14 +99,14 @@ void func_US2_L16_002F6CE0(void)
                 randomPosition[2] = position.f[2] + math_random_signed_float_range(0.0f, 0.05f);
                 random = math_random_int_below(255);
                 scale = 42000.0f;
-                part_spawn_gravity_fade(randomPosition, D_L16_001A8F20, 20, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
+                part_spawn_gravity_fade(randomPosition, g_particle_template, 20, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
                 scale = 273000.0f;
-                particle = part_spawn_gravity_fade(&position, D_L16_001A8F20, 30, 0x406080, random, 16, 0, scale, scale, 0.0f, 0);
-                if (particle) particle[2] = *D_L16_001FF680.material;
+                particle = part_spawn_gravity_fade(&position, g_particle_template, 30, 0x406080, random, 16, 0, scale, scale, 0.0f, 0);
+                if (particle) particle[2] = *g_scene_effect_material.material;
                 FastVecAdd(&position, &position, step);
                 particleIndex--;
             } while (particleIndex >= 0);
-        } else if (D_L16_001BD800.frame == 0x366) {
+        } else if (g_snivelak_scene.frame == 0x366) {
             object = CreateMoby(0xa79);
             if (object) {
                 moby_init_child_from_parent(object, 0);
@@ -115,11 +115,11 @@ void func_US2_L16_002F6CE0(void)
                 position.q = 0;
                 position.f[0] = -3.0f;
                 position.f[1] = 2.0f;
-                matrix_mul_vec3(&position, &position, D_L16_001B9B00.matrix);
-                FastVecAdd(&position, &position, D_L16_001B9B00.position);
+                matrix_mul_vec3(&position, &position, g_scene_origin_transform.matrix);
+                FastVecAdd(&position, &position, g_scene_origin_transform.position);
                 *(Quadword *)(object + 0x10) = position.q;
-                part_spawn_masked_debris(object, 0xfff, D_L16_001A8F20, 3.0f, 9.0f, -3.0f, 3.0f, 255);
-                part_spawn_masked_debris(object, 0xfff, D_L16_001A8F20, 3.0f, 9.0f, -3.0f, 3.0f, 255);
+                part_spawn_masked_debris(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
+                part_spawn_masked_debris(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
                 moby_mark_spawned(object);
             }
         }

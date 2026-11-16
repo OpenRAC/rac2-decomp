@@ -10,11 +10,11 @@
 
 typedef unsigned char u8;
 typedef unsigned short u16;
-extern u8 D_001A7B2B;
+extern u8 g_focus_lock_flag;
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 prefix[0x464]; u8 flags[1]; } LevelFlags;
-extern LevelFlags D_L11_0021F8B0;
+extern LevelFlags g_level_flags;
 extern u8 g_hero_position[];
 extern u8 g_sound_state[];
 extern u8 *g_moby_l11_table __attribute__((sda));
@@ -36,11 +36,11 @@ void collectible_spot_update(u8 *moby) {
     u8 *record;
     u8 *counter;
     if (moby[0x20] == 0) {
-        if (D_001A7B2B) {
+        if (g_focus_lock_flag) {
             u16 id = *(u16 *)(moby + 0xB2);
             int bits;
-            if (D_L11_0021F8B0.flags[(short)id] == 0) {
-                bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
+            if (g_level_flags.flags[(short)id] == 0) {
+                bits = g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400];
                 if (*(u16 *)(moby + 0xB2) & 1) bits = (bits >> 4) & 7;
                 else bits &= 7;
                 if (bits == 0 && moby_is_in_selected_zone(moby + 0x10)) {
@@ -74,8 +74,8 @@ void collectible_spot_update(u8 *moby) {
     if (!flag_is_third_pending_set(moby)) {
         u16 id = *(u16 *)(moby + 0xB2);
         int bits;
-        if (!D_L11_0021F8B0.flags[(short)id]) {
-            bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
+        if (!g_level_flags.flags[(short)id]) {
+            bits = g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400];
             if ((*(u16 *)(moby + 0xB2) & 1)
                 ? ((bits >> 4) & 7) != 0
                 : (bits & 7) != 0) goto cleanup;
@@ -89,10 +89,10 @@ cleanup:
     {
         int counter_id = *(u16 *)(moby + 0xB2);
         if (counter_id & 1) {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if ((*counter & 7) != 7) ++*counter;
         }
     }

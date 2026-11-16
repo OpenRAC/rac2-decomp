@@ -11,9 +11,9 @@ typedef struct {
     f32 f20;
 } FollowVars;
 extern char g_hero_state[];
-extern u32 D_00138320;
-extern unsigned int func_PAL_0026F580(int);
-extern unsigned int func_PAL_0026F5B8(int, int);
+extern u32 g_pad_pressed_flags;
+extern unsigned int stub_empty_2_pal(int);
+extern unsigned int stub_empty_9_pal(int, int);
 extern void stub_empty_13(int, int, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
@@ -26,7 +26,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int PlayMobySound(int, int, char *);
-extern s32 func_PAL_00311D98(s32 arg0, f32 fparg0);
+extern s32 swingshot_hook_spawn_pal(s32 arg0, f32 fparg0);
 extern void gfx_draw_wavy_link_strip(char *);
 
 

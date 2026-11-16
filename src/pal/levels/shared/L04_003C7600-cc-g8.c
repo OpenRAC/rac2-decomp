@@ -14,25 +14,25 @@ typedef struct { float x,y,z,w; } RPoint __attribute__((aligned(16)));
 #define EH(p,o) (*(s16 *)((char *)(p)+(o)))
 #define EI(p,o) (*(s32 *)((char *)(p)+(o)))
 #define EF(p,o) (*(float *)((char *)(p)+(o)))
-extern char *D_L04_001B25CC;
-extern char D_L04_001B9680[];
-extern EVec D_L04_0023BDD0[];
-extern float D_L04_0023CA50[],D_L04_0023CD70[];
-extern u8 D_L04_0023D090[],D_L04_0023D158[];
-extern float D_L04_0023D220[],D_L04_0023D540[];
-extern s16 D_L04_0023D860[],D_L04_0023D9F0[],D_L04_0023DB80[];
-extern float D_L04_001B2E78,D_L04_001B2E80;
-extern u16 D_L04_001B2E7C __attribute__((sda));
-extern int D_L04_001AF330 __attribute__((sda));
-extern float D_L04_001AF334 __attribute__((sda));
-extern EVec D_L04_001AF340[] SDATA(D_L04_001AF340);
-extern u8 D_L04_001AF380[] SDATA(D_L04_001AF380);
-extern float D_L04_001AF388[] SDATA(D_L04_001AF388);
-extern float D_L04_001AF38C[] MACRO_ADDR;
-extern u8 D_L04_001AF3A8[] SDATA(D_L04_001AF3A8);
-extern RPoint D_L04_002AB6E0[],D_L04_002AB7A0[];
-extern int D_L04_002AB860[][4];
-extern float D_L04_002AB8C0[],D_L04_002AB8C4[],D_L04_002AB920[];
+extern char *g_linked_record_table;
+extern char g_tether_zero_vec[];
+extern EVec g_particle_positions[];
+extern float g_particle_speeds[],g_particle_sizes[];
+extern u8 g_particle_mirror_flags[],g_particle_sprite_flags[];
+extern float g_particle_uv_offsets[],g_particle_life_rates[];
+extern s16 g_particle_fade_in_timers[],g_particle_fade_out_timers[],g_particle_delay_timers[];
+extern float g_particle_l04_opacity_scale_2,g_particle_fade_scale;
+extern u16 g_particle_delay_reload __attribute__((sda));
+extern int g_particle_base_opacity __attribute__((sda));
+extern float g_particle_l04_opacity_scale __attribute__((sda));
+extern EVec g_particle_quad_vertices[] SDATA(D_L04_001AF340);
+extern u8 g_particle_color_weights[] SDATA(D_L04_001AF380);
+extern float g_particle_l04_uv_u_table[] SDATA(D_L04_001AF388);
+extern float g_particle_l04_uv_v_table[] MACRO_ADDR;
+extern u8 g_particle_color_mask_table[] SDATA(D_L04_001AF3A8);
+extern RPoint g_particle_vertex_offsets_a[],g_particle_vertex_offsets_b[];
+extern int g_particle_quad_indices[][4];
+extern float g_particle_l04_uv_v_table_2[],g_particle_l04_uv_u_table_2[],g_particle_uv_scroll_table[];
 extern float ref_L04_003C4050_00;
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *,int,int);
@@ -59,7 +59,7 @@ void func_PAL_L04_003C7600(char *self) {
         u32 colors[4]; struct { float u,v; } uv[4]; u64 giftag[4];
     } packet;
     char *state=*(char **)(self+0x68);
-    char *matrix=D_L04_001B25CC+EI(state,4)*128;
+    char *matrix=g_linked_record_table+EI(state,4)*128;
     u32 alpha=(u32)EB(state,0x5C)<<24;
     u32 rgb=(EB(state,0x5F)<<16)|(EB(state,0x5E)<<8)|EB(state,0x5D);
     int end=EH(state,0)+EH(state,2)+EH(state,0x40);
@@ -69,7 +69,7 @@ void func_PAL_L04_003C7600(char *self) {
     qcopy(&position,self+0x10);
     up.q=0;
     position.f[3]=1.0f; up.f[2]=1.0f;
-    FastVecSub(&basis[0],D_L04_001B9680,&position);
+    FastVecSub(&basis[0],g_tether_zero_vec,&position);
     vec_scale_to_length(&basis[0],&basis[0],1.0f);
     FastVecCross(&basis[1],&basis[0],&up);
     vec_scale_to_length(&basis[1],&basis[1],1.0f);
@@ -89,54 +89,54 @@ void func_PAL_L04_003C7600(char *self) {
     VU1_addGSregister(0x4A,0); VU1_addGSregister(0x47,0x51001);
     for(i=EH(state,0);i<end;i++) {
         EVec *transform,*chosen;
-        age=D_L04_0023D220[i]-((D_L04_0023D540[i]) * 1.2f);
-        chosen=D_L04_0023D090[i] ? other : basis;
+        age=g_particle_uv_offsets[i]-((g_particle_life_rates[i]) * 1.2f);
+        chosen=g_particle_mirror_flags[i] ? other : basis;
         transform=chosen;
-        D_L04_0023D220[i]=age;
-        if(age<=-8.0f) D_L04_0023D220[i]=age+8.0f;
-        transform_vector(&transform[3],&D_L04_0023BDD0[i],matrix);
-        speed=D_L04_0023CA50[i]; size=D_L04_0023CD70[i];
-        if(D_L04_0023D158[i]) {
+        g_particle_uv_offsets[i]=age;
+        if(age<=-8.0f) g_particle_uv_offsets[i]=age+8.0f;
+        transform_vector(&transform[3],&g_particle_positions[i],matrix);
+        speed=g_particle_speeds[i]; size=g_particle_sizes[i];
+        if(g_particle_sprite_flags[i]) {
             packet.giftag[3]=0x8000000044ULL;
             for(j=2;j<4;j++) {
                 for(k=0;k<4;k++) {
                     vertex=&packet.vertices[k];
-                    index=D_L04_002AB860[j][k];
-                    vertex->x=D_L04_002AB7A0[index].x;
-                    vertex->y=D_L04_002AB7A0[index].y*speed;
-                    vertex->z=D_L04_002AB7A0[index].z*size;
+                    index=g_particle_quad_indices[j][k];
+                    vertex->x=g_particle_vertex_offsets_b[index].x;
+                    vertex->y=g_particle_vertex_offsets_b[index].y*speed;
+                    vertex->z=g_particle_vertex_offsets_b[index].z*size;
                     vertex->w=1.0f;
                     TransformVertex(vertex,transform);
-                    packet.uv[k].u=(D_L04_002AB920+1)[index*2]+D_L04_0023D220[i]; /* u: the second float of each pair */
-                    packet.uv[k].v=D_L04_002AB920[index*2];
-                    packet.colors[k]=alpha*D_L04_001AF3A8[index]|rgb;
+                    packet.uv[k].u=(g_particle_uv_scroll_table+1)[index*2]+g_particle_uv_offsets[i]; /* u: the second float of each pair */
+                    packet.uv[k].v=g_particle_uv_scroll_table[index*2];
+                    packet.colors[k]=alpha*g_particle_color_mask_table[index]|rgb;
                 }
                 draw_world_quad(&packet,0,0);
             }
         } else {
-            if(D_L04_0023D860[i]) {
-                FastDecTimer(&D_L04_0023D860[i]);
-                opacity=FloatToInt((1.0f-IntToFloat(D_L04_0023D860[i])*D_L04_001B2E78)*D_L04_001AF334);
-            } else if(D_L04_0023D9F0[i]) {
-                if(FastDecTimer(&D_L04_0023D9F0[i])) {
+            if(g_particle_fade_in_timers[i]) {
+                FastDecTimer(&g_particle_fade_in_timers[i]);
+                opacity=FloatToInt((1.0f-IntToFloat(g_particle_fade_in_timers[i])*g_particle_l04_opacity_scale_2)*g_particle_l04_opacity_scale);
+            } else if(g_particle_fade_out_timers[i]) {
+                if(FastDecTimer(&g_particle_fade_out_timers[i])) {
                     part_init_from_ranges(self,i); opacity=0;
-                    D_L04_0023D090[i]=math_random_int_below(2);
-                } else opacity=FloatToInt(IntToFloat(D_L04_0023D9F0[i])*D_L04_001B2E80*D_L04_001AF334);
+                    g_particle_mirror_flags[i]=math_random_int_below(2);
+                } else opacity=FloatToInt(IntToFloat(g_particle_fade_out_timers[i])*g_particle_fade_scale*g_particle_l04_opacity_scale);
             } else {
-                if(FastDecTimer(&D_L04_0023DB80[i])) D_L04_0023D9F0[i]=D_L04_001B2E7C;
-                opacity=D_L04_001AF330;
+                if(FastDecTimer(&g_particle_delay_timers[i])) g_particle_fade_out_timers[i]=g_particle_delay_reload;
+                opacity=g_particle_base_opacity;
             }
             packet.giftag[3]=0x8000000048ULL;
             opacity=(u32)opacity<<24;
             for(k=0;k<4;k++) {
                 vertex=&packet.vertices[k];
-                vertex->x=D_L04_001AF340[k].f[0];
-                vertex->y=D_L04_001AF340[k].f[1]*speed;
-                vertex->z=D_L04_001AF340[k].f[2]*size;
+                vertex->x=g_particle_quad_vertices[k].f[0];
+                vertex->y=g_particle_quad_vertices[k].f[1]*speed;
+                vertex->z=g_particle_quad_vertices[k].f[2]*size;
                 vertex->w=1.0f;
-                packet.uv[k].u=D_L04_001AF388[k*2]-D_L04_0023D220[i];
-                packet.uv[k].v=D_L04_001AF38C[k*2];
-                packet.colors[k]=(u32)opacity*D_L04_001AF380[k]|EI(state,0x38);
+                packet.uv[k].u=g_particle_l04_uv_u_table[k*2]-g_particle_uv_offsets[i];
+                packet.uv[k].v=g_particle_l04_uv_v_table[k*2];
+                packet.colors[k]=(u32)opacity*g_particle_color_weights[k]|EI(state,0x38);
                 TransformVertex(vertex,transform);
             }
             draw_world_quad(&packet,0,0);
@@ -150,15 +150,15 @@ void func_PAL_L04_003C7600(char *self) {
         for(j=0;j<6;j++) {
             for(k=0;k<4;k++) {
                 vertex=&packet.vertices[k];
-                index=D_L04_002AB860[j][k];
-                vertex->x=D_L04_002AB6E0[index].x;
-                vertex->y=D_L04_002AB6E0[index].y*EF(state,0x48);
-                vertex->z=D_L04_002AB6E0[index].z*EF(state,0x4C);
+                index=g_particle_quad_indices[j][k];
+                vertex->x=g_particle_vertex_offsets_a[index].x;
+                vertex->y=g_particle_vertex_offsets_a[index].y*EF(state,0x48);
+                vertex->z=g_particle_vertex_offsets_a[index].z*EF(state,0x4C);
                 vertex->w=1.0f;
                 TransformVertex(vertex,basis);
-                packet.uv[k].u=D_L04_002AB8C4[index*2]+ref_L04_003C4050_00;
-                packet.uv[k].v=D_L04_002AB8C0[index*2];
-                packet.colors[k]=D_L04_001AF3A8[index]*0xFF000000|rgb;
+                packet.uv[k].u=g_particle_l04_uv_u_table_2[index*2]+ref_L04_003C4050_00;
+                packet.uv[k].v=g_particle_l04_uv_v_table_2[index*2];
+                packet.colors[k]=g_particle_color_mask_table[index]*0xFF000000|rgb;
             }
             draw_world_quad(&packet,0,0);
         }

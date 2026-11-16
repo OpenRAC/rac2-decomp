@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int F46b43b72_FUN_002B7B18(int value, char *target);
 extern short F46b43b72_FUN_002B7CE0(int value);
 extern int F46b43b72_D_001B8840[];
 extern int F46b43b72_D_0014B540[];
 
-int func_PAL_002945B8(int index)
+int load_chunk_part_from_disc_pal(int index)
 {
     int j = index + 1;
     int *d = F46b43b72_D_001B8840;

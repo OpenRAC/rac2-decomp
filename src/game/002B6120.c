@@ -75,13 +75,13 @@ typedef struct ResidentChannels64 {
 
 typedef struct __attribute__((packed)) { u8 mode[4]; } CdMode;
 
-extern CdMode D_001A63E8;
+extern CdMode g_cd_mode;
 
-extern u8 D_001A7900[] __attribute__((sda));
+extern u8 g_load_read_mode[] __attribute__((sda));
 
-extern s32 D_001A7430[] __attribute__((sda));
+extern s32 g_cd_error_retry_count[] __attribute__((sda));
 
-extern s32 D_001A7434 __attribute__((sda));
+extern s32 g_cd_error_seen __attribute__((sda));
 
 extern s32 CdStartRead(s32,s32,s32,CdMode *);
 
@@ -184,11 +184,11 @@ int coll_check_object_inside_polygon(unsigned char *object)
 
 
 extern unsigned int g_dma_packet_cursor __attribute__((sda));
-extern char *D_001A742C __attribute__((section(".sdata")));
-extern char D_001BAD40[];
+extern char *g_fs_aa_buffer_table __attribute__((section(".sdata")));
+extern char g_loader_movie[];
 extern void text_draw_pulsing(void);
 extern void DrawSubtitles(void);
-extern char D_001A6AF0[];
+extern char g_dma_screen_packet[];
 extern int g_scene_playback_state[];
 extern void iFlushCache(int);
 
@@ -202,16 +202,16 @@ void BuildFrameDmaChain(void *packet, int unusedMode)
 {
     g_dma_packet_cursor = (unsigned int)packet;
     *(unsigned int *)(g_dma_packet_cursor + 0x00) = 0x30000009;
-    *(unsigned int *)(g_dma_packet_cursor + 0x04) = (unsigned int)(D_001A742C + 0xC0) & 0x0FFFFFFF;
+    *(unsigned int *)(g_dma_packet_cursor + 0x04) = (unsigned int)(g_fs_aa_buffer_table + 0xC0) & 0x0FFFFFFF;
     *(unsigned int *)(g_dma_packet_cursor + 0x08) = 0;
     *(unsigned int *)(g_dma_packet_cursor + 0x0C) = 0x50000009;
     *(unsigned int *)(g_dma_packet_cursor + 0x10) = 0x30000025;
-    *(unsigned int *)(g_dma_packet_cursor + 0x14) = (unsigned int)D_001A6AF0;
+    *(unsigned int *)(g_dma_packet_cursor + 0x14) = (unsigned int)g_dma_screen_packet;
     *(unsigned int *)(g_dma_packet_cursor + 0x18) = 0;
     *(unsigned int *)(g_dma_packet_cursor + 0x1C) = 0x50000025;
     g_dma_packet_cursor += 0x20;
     g_scene_playback_state[13]++;
-    if (*(int *)D_001BAD40)
+    if (*(int *)g_loader_movie)
         text_draw_pulsing();
     else
         DrawSubtitles();
@@ -225,15 +225,15 @@ void BuildFrameDmaChain(void *packet, int unusedMode)
 
 /* func_002B6658 is in 002B6120-g8.c (its list head is in small data). */
 
-extern char D_001A7248[] __attribute__((sda));
+extern char g_gfx_rpc_client[] __attribute__((sda));
 extern int sceSifCallRpc(void *, int, int, int, int, int, int, int, int);
 extern int snd_send_cmd2a_once(int, int, int, int);
 
 /* Runs a short fixed sequence of three sound setup calls. */
 void snd_run_setup_sequence(void) {
-    sceSifCallRpc(D_001A7248, 3, 0, 0, 0, 0, 0, 0, 0);
+    sceSifCallRpc(g_gfx_rpc_client, 3, 0, 0, 0, 0, 0, 0, 0);
     snd_send_cmd2a_once(7, 0xA000, 0, 1);
-    sceSifCallRpc(D_001A7248, 3, 0, 0, 0, 0, 0, 0, 0);
+    sceSifCallRpc(g_gfx_rpc_client, 3, 0, 0, 0, 0, 0, 0, 0);
 }
 
 /* Callback that stores a result value at the address it was given. */
@@ -432,20 +432,20 @@ void music_set_active_track_value(s32 newValue)
 
 /* func_002B7578 is matched in 002B7578.c (its own jump-table unit). */
 
-extern char D_001AA1E8[];
+extern char g_str_disc_read_break_message[];
 extern void STUB_printf(void *);
 extern int snd_run_handler_or_send_cmd37(void);
 /* Asks the music system to stop the disc read that is in progress. */
 void load_request_disc_read_break(void) {
     u8 *state = g_music_state;
     if (*(short *)(state + 4) != 0) {
-        STUB_printf(D_001AA1E8);
+        STUB_printf(g_str_disc_read_break_message);
         snd_run_handler_or_send_cmd37();
         state[6] = 1;
     }
 }
 
-extern u8 D_001AA1F8[];
+extern u8 g_str_disc_read_message[];
 extern void math_trap_always(void);
 
 /* Starts reading disc sectors into memory when no read is running. Returns the number of bytes requested, or 0 if it could not start. */
@@ -462,7 +462,7 @@ int load_start_disc_read(int dest, int sector, int sectorCount)
             *(int *)(state + 0x10) = sectorCount;
             return sectorCount << 11;
         }
-        STUB_printf(D_001AA1F8);
+        STUB_printf(g_str_disc_read_message);
         math_trap_always();
     }
     return 0;
@@ -486,9 +486,9 @@ int load_start_disc_read_with_callback(int dest, int sector, int sectorCount, in
 
 /* Reads disc sectors into memory and waits for the read to be handled. Always returns 1. */
 s32 load_read_disc_sectors_blocking(s32 dest, s32 sector, s32 sectorCount) {
-    CdMode mode = D_001A63E8;
-    mode.mode[1] = D_001A7900[0];
-    D_001A7430[0] = 0; D_001A7434 = 0;
+    CdMode mode = g_cd_mode;
+    mode.mode[1] = g_load_read_mode[0];
+    g_cd_error_retry_count[0] = 0; g_cd_error_seen = 0;
     CdStartRead(sector,sectorCount,dest,&mode);
     snd_clear_flag_and_update(); snd_Pump();
     return 1;

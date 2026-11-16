@@ -51,7 +51,7 @@ struct RotorObject {
 };
 
 extern char *g_moby_l11_table;
-extern float D_L11_001B1240[12] __attribute__((sda));
+extern float g_rotor_reset_weights[12] __attribute__((sda));
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void chain_creature_set_segments_anim(void *, int, int, int);
@@ -98,7 +98,7 @@ void rotor_reset_group(struct RotorObject *obj)
     }
 
     for (i = 0; i < 12; i++)
-        state->weights[i] = D_L11_001B1240[i];
+        state->weights[i] = g_rotor_reset_weights[i];
 
     LINKED_RECORD(obj)->flags &= 0xFFFD;
     LINKED_RECORD(obj)->flags &= 0xFFFB;

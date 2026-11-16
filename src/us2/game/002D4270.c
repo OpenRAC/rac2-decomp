@@ -3,12 +3,12 @@
 
 extern int g_pad_state[];
 extern char g_pause_menu_state[];
-extern int D_001A8CFC __attribute__((sda));
+extern int g_resident_data_base __attribute__((sda));
 extern int func_0029C920(int);
 extern int list_page_get_selected_record(int);
 extern void menu_start_action(int);
 
-int func_US2_002D4270(void)
+int menu_page_update_with_preview_us2(void)
 {
     int result = 0;
     int *state = g_pad_state;
@@ -36,8 +36,8 @@ finish:
         result = 1;
     else {
         func_0029C920(flags);
-        if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC) {
-            char *entry = (char *)list_page_get_selected_record(D_001A8CFC + 0x3F3F0);
+        if ((state[0x1C4 / 4] & 0x40) && g_resident_data_base) {
+            char *entry = (char *)list_page_get_selected_record(g_resident_data_base + 0x3F3F0);
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);
@@ -56,7 +56,7 @@ extern void SetupGifPaging(long param_1);
 extern void func_0029C960(void);
 
 /* Candidate function: FUN_002d3390 */
-unsigned long long func_US2_002D4340(void)
+unsigned long long menu_page_draw_9_us2(void)
 {
     SetupGifPaging(0);
     func_0029C960();
@@ -66,7 +66,7 @@ unsigned long long func_US2_002D4340(void)
 
 extern void func_0029C5A0(void);
 
-int func_US2_002D4438(void) {
+int menu_page_draw_10_us2(void) {
     SetupGifPaging(0);
     func_0029C5A0();
     DoGifPaging();

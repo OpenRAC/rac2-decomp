@@ -17,9 +17,9 @@ typedef struct {
 } UploadRequest;
 
 extern UploadRequest g_pause_menu_state;
-extern s32 D_001B1598 MACRO_ADDR;
+extern s32 g_frame_counter_3 MACRO_ADDR;
 extern s32 g_screen_height MACRO_ADDR;
-extern s32 D_001A72D4 __attribute__((sda));
+extern s32 g_vram_frame_base __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(s32);
 extern int sceGsSyncV(s32);
 extern s32 func_00126470(void *, s16, s32, s32, s32, s32, s32, s32);
@@ -35,10 +35,10 @@ void menu_upload_pause_background_to_gs(void) {
 
     gfx_wait_for_dma_status_bits(1);
     sceGsSyncV(0);
-    D_001B1598++;
+    g_frame_counter_3++;
     size = g_screen_height * 1536;
     src = g_pause_menu_state.src;
-    dst = D_001A72D4;
+    dst = g_vram_frame_base;
     if (g_pause_menu_state.mode >= 2) {
         dst = 0x3FB000 - size;
     }

@@ -1,23 +1,23 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L01_001A8F40;
-extern char D_L01_001A90C8 __attribute__((sda));
-extern int D_L01_001A90D0 __attribute__((sda));
+extern int g_hero_l01_control_mode;
+extern char g_hud_overlay_timer __attribute__((sda));
+extern int g_hud_overlay_result_code __attribute__((sda));
 extern int math_fast_float_d(char *);
 extern void level_clear_table_entry(int);
 
 /* Counts down a timer while the level flag is clear, then returns a stored value. */
 int level_tick_timer_get_value(void) {
-    if (D_L01_001A8F40 == 0) {
-        if (math_fast_float_d(&D_L01_001A90C8))
+    if (g_hero_l01_control_mode == 0) {
+        if (math_fast_float_d(&g_hud_overlay_timer))
             level_clear_table_entry(0);
     }
-    return D_L01_001A90D0;
+    return g_hud_overlay_result_code;
 }
 
-extern int D_001B2088;
-extern int D_001B2458;
+extern int g_frame_counter_4;
+extern int g_level_table_ptr;
 
 /* Looks up a 16-bit value for an entry in a table, or gives -1 when the game is too early to have it. */
 int level_get_table_entry_short(int index)
@@ -25,7 +25,7 @@ int level_get_table_entry_short(int index)
     int entryIndex = index;
     int table;
 
-    if (D_001B2088 < 5 || (table = D_001B2458) == 0)
+    if (g_frame_counter_4 < 5 || (table = g_level_table_ptr) == 0)
         return -1;
     return *(short *)(table + entryIndex * 0x28 + 0x24);
 }
@@ -36,7 +36,7 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef float f32;
 
-extern u8 D_L01_00189E20[];
+extern u8 g_hero_l01_state_block[];
 
 /* The same object as plain D_L01_001A8F40 above: that use stays absolute, this one is the
    $gp form the reach test reads. */
@@ -49,7 +49,7 @@ extern f32 func_002E3618(void *a0, void *a1);
    the helper whether the doubled radius fits, and finally whether the stored count
    covers the caller's index. */
 int hero_is_reachable_for_count(u8 *target, int minCount, f32 radius) {
-    u8 *hero = D_L01_00189E20;
+    u8 *hero = g_hero_l01_state_block;
     int limit = minCount;
     f32 radiusCopy = radius;
     int heroState = *(int *)(hero + 0x2294);
@@ -72,5 +72,5 @@ int hero_is_reachable_for_count(u8 *target, int minCount, f32 radius) {
     distance = func_002E3618(target + 0x10, hero + 0x80);
     if (radiusCopy + radiusCopy < distance)
         return 0;
-    return D_001B2088 >= limit;
+    return g_frame_counter_4 >= limit;
 }

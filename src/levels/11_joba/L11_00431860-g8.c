@@ -1,7 +1,7 @@
 #include "common.h"
-extern int D_L11_001AED04;
-extern int D_L11_001AED00;
-extern char D_L11_001BA8C0[];
+extern int g_active_rider_count;
+extern int g_enemy_spawn_enabled;
+extern char g_hero_l11_position[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -24,7 +24,7 @@ void saur_beast_update_base(u8 *obj) {
  u8 *d=*(u8 **)(obj+0x68); int hit_result; u8 *attacker;
  if (!obj[0x20]) {
   float height;
-  D_L11_001AED04++;
+  g_active_rider_count++;
   height=coll_probe_ground_height_below(obj+0x10,0,0.5f);
   *(void **)(d+0x18)=d+0x140;
   *(float *)(obj+0x18)=height;
@@ -48,7 +48,7 @@ void saur_beast_update_base(u8 *obj) {
   *(float *)(obj+0x48)=math_random_float_range(0.5f,1.25f);
   if (I(0x2bc)!=-1) moby_set_state(obj,2,-1);
  }
- if(obj[0x31] && fast_vec_dist(obj+0x10,D_L11_001BA8C0)<24.0f) {moby_update_ground_check(obj);obj[0x6f]=22;}
+ if(obj[0x31] && fast_vec_dist(obj+0x10,g_hero_l11_position)<24.0f) {moby_update_ground_check(obj);obj[0x6f]=22;}
  if(obj[0x95]!=3) {
   float height=coll_probe_ground_height_below(obj+0x10,0,0.5f);
   *(float *)(obj+0x18)-=1.146666765f;
@@ -57,7 +57,7 @@ void saur_beast_update_base(u8 *obj) {
  hit_result=moby_apply_damage_to_object(obj,d+0x60,0);
  if(hit_result) {
   attacker=*(u8 **)(d+0x38);
-  if(attacker) {int attacker_class=*(short *)(attacker+0xaa); if(attacker_class!=0x47 /* moby class 71 */ && attacker_class!=0xdd9 /* moby class 3545 */ && attacker_class!=0xd1b /* moby class 3355 */ && attacker_class!=0xce7 /* moby class 3303 */ && attacker_class!=MOBY_CLASS_JOBIAN_SAUR_BEAST && attacker_class) D_L11_001AED00=0;}
+  if(attacker) {int attacker_class=*(short *)(attacker+0xaa); if(attacker_class!=0x47 /* moby class 71 */ && attacker_class!=0xdd9 /* moby class 3545 */ && attacker_class!=0xd1b /* moby class 3355 */ && attacker_class!=0xce7 /* moby class 3303 */ && attacker_class!=MOBY_CLASS_JOBIAN_SAUR_BEAST && attacker_class) g_enemy_spawn_enabled=0;}
   I(0x2a0)=0;
   if(I(0x2b0)>=0) {gfx_free_point_light(I(0x2b0));I(0x2b0)=-1;}
   if(hit_result==5) {I(0xf0)=0;F(0xf4)=0.837758183f;}

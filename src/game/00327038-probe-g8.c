@@ -2,13 +2,13 @@
 
 /* The two small constants this probe reads through $gp, and the world axis
    beside them, which is too large for $gp and is reached with a full address. */
-extern float D_001B0108 __attribute__((sda)), D_001B010C __attribute__((sda));
-extern float D_001B27B0[4] __attribute__((sda));
-extern int D_001B27C8;
+extern float g_vehicle_probe_lift __attribute__((sda)), g_vehicle_probe_radius __attribute__((sda));
+extern float g_gravity_direction[4] __attribute__((sda));
+extern int g_surface_probe_skip;
 /* The collision result: the object hit at +0x18, then vectors at +0x20 (the
    hit point), +0x30 and +0x40. */
 extern char g_collision_hit[32];
-extern float D_001BAFA0[12], D_001BAFB0[4];
+extern float g_coll_hit_position[12], g_coll_hit_point[4];
 
 extern float math_fabs(float);
 extern void vec_clear_128(void *);
@@ -44,11 +44,11 @@ void moby_probe_surface_and_move(char *self)
         return;
     negative = *(float *)(state + 0x18) <= 0.0f;
     vec_clear_128(total);
-    vec_scale_to_length(origin, D_001B27B0, -D_001B0108);
+    vec_scale_to_length(origin, g_gravity_direction, -g_vehicle_probe_lift);
     count = 0;
     FastVecAdd(origin, origin, self + 0x10);
-    if (!D_001B27C8 && coll_process_triangles(origin, D_001B010C)) {
-        FastVecSub(offset, D_001BAFB0, origin);
+    if (!g_surface_probe_skip && coll_process_triangles(origin, g_vehicle_probe_radius)) {
+        FastVecSub(offset, g_coll_hit_point, origin);
         FastVecAdd(self + 0x10, offset, self + 0x10);
     }
     end_ptr = end;
@@ -58,7 +58,7 @@ void moby_probe_surface_and_move(char *self)
     for (i = 0; i < 32; i++) {
         angle = IntToFloat(i);
         angle /= IntToFloat(31);
-        vec_scale_to_length(offset, rowD, D_001B010C);
+        vec_scale_to_length(offset, rowD, g_vehicle_probe_radius);
         angle *= 1.57079637f;
         sine = math_fast_sin_or_cos_b(angle);
         if (!negative)
@@ -74,10 +74,10 @@ void moby_probe_surface_and_move(char *self)
         FastVecAdd(end, rotated, origin);
         if (CollLine(origin, end, 0, self, 0)) {
             count++;
-            FastVecScale(opposite, D_001B27B0, -1.0f);
-            FastVecScale(normal, D_001BAFA0 + 8, 0.0009765625f);
+            FastVecScale(opposite, g_gravity_direction, -1.0f);
+            FastVecScale(normal, g_coll_hit_position + 8, 0.0009765625f);
             vec_scale_to_length(normal, normal, 1.0f);
-            FastVecSub(hit, D_001BAFA0, end_ptr);
+            FastVecSub(hit, g_coll_hit_position, end_ptr);
             FastVecAdd(total, total, hit);
             result = g_collision_hit;
             if (*(char **)(result + 0x18) != 0

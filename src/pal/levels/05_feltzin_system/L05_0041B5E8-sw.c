@@ -23,12 +23,12 @@ extern float math_square(float);
 extern void vec_fast_normalize3(void *, void *, void *, float);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void object_step_along_direction(char *, int);
-extern void func_PAL_L05_0041BC50(char *, char *);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void feltzin_helper_check_hit_attach_pal(char *, char *);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void moby_mark_spawned(void *);
 extern int feltzin_helper_end_if_hit(char *);
 
-void func_PAL_L05_0041B5E8(char *object)
+void homing_helper_update_pal(char *object)
 {
     char matrix[0x30];
     char delta[0x10], rot0[0x10], rot1[0x10], rot2[0x10], point[0x10];
@@ -115,11 +115,11 @@ void func_PAL_L05_0041B5E8(char *object)
         FastVecAdd(object + 0x10, delta, object + 0x10);
         FastVecScale(drift, drift, .99f);
         *(float *)(sub + 0x5C) += 0.14f;
-        func_PAL_L05_0041BC50(object, point);
+        feltzin_helper_check_hit_attach_pal(object, point);
         break;
     }
     case 4:
-        func_PAL_002AD288(object, object + 0x10, -1, 3.0f, 13.0f);
+        part_spawn_explosion_with_sparks_pal(object, object + 0x10, -1, 3.0f, 13.0f);
         feltzin_helper_clear_slot(*(int *)(sub + 0x50), *(int *)(sub + 0x54));
         moby_mark_spawned(object);
         return;

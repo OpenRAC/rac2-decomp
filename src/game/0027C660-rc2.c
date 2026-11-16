@@ -25,8 +25,8 @@
 #include "common.h"
 
 extern s8 *g_dma_packet_cursor;
-extern s8 *D_001B15F4;
-extern s8 *D_001B15F8;
+extern s8 *g_clear_color_packet;
+extern s8 *g_gfx_packet_cursor;
 extern void func_0029D0E0(s8 *p);
 extern void gfx_append_vu1_preset_a(void);
 
@@ -37,20 +37,20 @@ void DoGifPaging(void) {
     s8 *packet_copy;
     s32 tag_word;
     cursor = g_dma_packet_cursor;
-    D_001B15F8 = cursor;
+    g_gfx_packet_cursor = cursor;
     tag_word = 0x20000000;
-    packet = D_001B15F4;
+    packet = g_clear_color_packet;
     g_dma_packet_cursor = cursor + 0x10;
     *(s32 *)packet = tag_word;
-    packet_copy = D_001B15F4;
+    packet_copy = g_clear_color_packet;
     *(s32 *)(packet_copy + 4) = (s32)g_dma_packet_cursor;
-    *(s32 *)(D_001B15F4 + 8) = 0;
-    *(s32 *)(D_001B15F4 + 0xC) = 0;
+    *(s32 *)(g_clear_color_packet + 8) = 0;
+    *(s32 *)(g_clear_color_packet + 0xC) = 0;
     func_0029D0E0(packet_copy);
     gfx_append_vu1_preset_a();
     packet = g_dma_packet_cursor;
     *(s32 *)packet = tag_word;
-    cursor = D_001B15F4;
+    cursor = g_clear_color_packet;
     packet_copy = g_dma_packet_cursor;
     *(s32 *)(packet_copy + 4) = (s32)(cursor + 0x10);
     packet = g_dma_packet_cursor;
@@ -58,14 +58,14 @@ void DoGifPaging(void) {
     packet_copy = g_dma_packet_cursor;
     *(s32 *)(packet_copy + 0xC) = 0;
     cursor = g_dma_packet_cursor;
-    packet = D_001B15F8;
+    packet = g_gfx_packet_cursor;
     g_dma_packet_cursor = cursor + 0x10;
     *(s32 *)packet = tag_word;
     cursor = g_dma_packet_cursor;
-    packet_copy = D_001B15F8;
+    packet_copy = g_gfx_packet_cursor;
     *(s32 *)(packet_copy + 4) = (s32)cursor;
-    packet = D_001B15F8;
+    packet = g_gfx_packet_cursor;
     *(s32 *)(packet + 8) = 0;
-    cursor = D_001B15F8;
+    cursor = g_gfx_packet_cursor;
     *(s32 *)(cursor + 0xC) = 0;
 }

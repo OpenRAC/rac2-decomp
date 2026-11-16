@@ -7,8 +7,8 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B2470 __attribute__((sda));
-extern int D_L20_001B246C __attribute__((sda));
+extern float g_homing_shot_speed_scale __attribute__((sda));
+extern int g_homing_shot_spark_count __attribute__((sda));
 
 extern void *CreateMoby(int);
 extern void moby_init_child_from_parent(u8 *, u8 *);
@@ -20,7 +20,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_L11_00465FD0(char *, int);
+extern void part_l11_spawn_spark_ring_pal(char *, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 
 char *func_PAL_L20_00450D78(char *arg0, char *arg1, char *arg2, char *arg3, int arg4,
@@ -37,7 +37,7 @@ char *func_PAL_L20_00450D78(char *arg0, char *arg1, char *arg2, char *arg3, int 
         dst = obj + 0x10;
         qcopy(dst, arg1);
         *(float *)(obj + 0x2C) =
-            *(float *)(*(u32 *)(obj + 0x24) + 0x24) * D_L20_001B2470;
+            *(float *)(*(u32 *)(obj + 0x24) + 0x24) * g_homing_shot_speed_scale;
         state = *(char **)(obj + 0x68);
         qcopy(state, arg2);
         *(float *)(state + 0x20) = f12;
@@ -51,7 +51,7 @@ char *func_PAL_L20_00450D78(char *arg0, char *arg1, char *arg2, char *arg3, int 
         FastVecSub(state + 0x10, arg3, &buf);
         r = FastVecLength(state);
         vec_scale_to_length(state + 0x10, state + 0x10, r);
-        func_PAL_L11_00465FD0(dst, D_L20_001B246C);
+        part_l11_spawn_spark_ring_pal(dst, g_homing_shot_spark_count);
         snd_play_from_class_bank(0, 0, obj, 0x12F7);
     }
     return obj;

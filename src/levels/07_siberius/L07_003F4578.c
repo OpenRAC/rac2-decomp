@@ -6,7 +6,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* func_L07_003F4578 is defined in L07_003F4578-ring-g8.c. */
 
-extern u8 D_L07_001B31AF __attribute__((sda));
+extern u8 g_flag_block __attribute__((sda));
 
 /* Clears a block of 16 flag bytes to zero. */
 void flag_block_clear(void)
@@ -14,7 +14,7 @@ void flag_block_clear(void)
     u8 *p;
     s32 i;
 
-    for (i = 15, p = &D_L07_001B31AF; i >= 0; i--) {
+    for (i = 15, p = &g_flag_block; i >= 0; i--) {
         *p = 0;
         p--;
     }
@@ -40,7 +40,7 @@ extern f32 func_2E49C8(f32 a, f32 b);
 
 extern f32 func_2E5360(f32 a, f32 b);
 
-extern f32 D_L07_00189E20[];
+extern f32 g_lift_state[];
 
 extern void swing_update_yaw(u8 *a0, f32 x);
 
@@ -54,8 +54,8 @@ void turret_start_swinging(u8 *moby)
     vars = *(u8 **)(moby + 0x68);
     *(u8 *)(moby + 0x7F) = 0;
     *(f32 *)(vars + 0x20) = (f32)*(s16 *)(vars + 0x24);
-    side = func_2E5360(func_2E49C8(D_L07_00189E20[0x20] - *(f32 *)(moby + 0x10),
-                                D_L07_00189E20[0x21] - *(f32 *)(moby + 0x14)),
+    side = func_2E5360(func_2E49C8(g_lift_state[0x20] - *(f32 *)(moby + 0x10),
+                                g_lift_state[0x21] - *(f32 *)(moby + 0x14)),
                     *(f32 *)(vars + 0x60));
     if (side > 0.0f) {
         *(f32 *)(vars + 0x54) = -1.5707964f;
@@ -70,7 +70,7 @@ extern u16 *g_moby_l07_group_lists[];
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
 extern u8 *g_moby_l07_array[] __attribute__((sda));
-extern s32 D_L07_001B22F8[] __attribute__((sda));
+extern s32 g_entity_group_count[] __attribute__((sda));
 
 extern s32 math_random_int_below(s32 n);
 
@@ -88,7 +88,7 @@ u8 *group_pick_random_active_entity(s32 group)
     s32 pick_index;
 
     for (id_ptr = g_moby_l07_group_lists[group];
-         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && id_ptr != 0 &&
+         (group & 0xFF) != 0xFF && group <= g_entity_group_count[0] && id_ptr != 0 &&
          ((s16)id_ptr[-1] >= 0 || id_ptr == g_moby_l07_group_lists[group]);
          id_ptr++) {
         entity = g_moby_l07_array[0] + ((*id_ptr & 0x7FFF) << 8);
@@ -101,7 +101,7 @@ u8 *group_pick_random_active_entity(s32 group)
         return 0;
     pick_index = math_random_int_below(active_count);
     for (id_ptr_b = g_moby_l07_group_lists[group];
-         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && id_ptr_b != 0 &&
+         (group & 0xFF) != 0xFF && group <= g_entity_group_count[0] && id_ptr_b != 0 &&
          ((s16)id_ptr_b[-1] >= 0 || id_ptr_b == g_moby_l07_group_lists[group]);
          id_ptr_b++) {
         entity = g_moby_l07_array[0] + ((*id_ptr_b & 0x7FFF) << 8);
@@ -212,7 +212,7 @@ typedef struct {
     u8 rest[128 - 0x3C];
 } SibRec128;
 
-extern SibRec128 *D_L07_001B23CC;
+extern SibRec128 *g_shooter_mount_table;
 
 
 /* func_L07_003F8D90 is defined in L07_003F8D90.c. */
@@ -251,14 +251,14 @@ void boss_select_attack_anim(u8 *moby)
     }
 }
 
-extern u8 D_001A7BD0 __attribute__((sda));
+extern u8 g_moby_update_inhibit_flag __attribute__((sda));
 
 extern void UpdateCuboidTriggeredMoby(u8 *a0);
 
 /* Updates the object with the standard code, unless a global flag is set, in which case it only marks the object. */
 void moby_update_unless_paused(u8 *moby)
 {
-    if (D_001A7BD0 != 0) {
+    if (g_moby_update_inhibit_flag != 0) {
         *(u16 *)(moby + 0x34) |= 0x2;
         return;
     }
@@ -276,9 +276,9 @@ extern void func_31AFD8(void *a, void *b, f32 c, f32 d, f32 e);
 extern void func_335848(void *a, void *b, s32 c);
 
 /* The two shared level floats; `sda` gives the retail's `lui %hi ; swc1 %lo($at)` form. */
-extern f32 D_L07_001AA698 __attribute__((sda));
+extern f32 g_spark_burst_scale __attribute__((sda));
 
-extern f32 D_L07_001B3198 __attribute__((sda));
+extern f32 g_spark_burst_saved_value __attribute__((sda));
 
 /* Runs the object's own 200 steps: each step advances the shared record's third
    float, then the three angles are computed and handed to the shared passes. */
@@ -292,8 +292,8 @@ void part_l07_spawn_spark_burst(u8 *moby)
     f32 random_y;
     f32 random_x;
 
-    D_L07_001B3198 = D_L07_001AA698;
-    D_L07_001AA698 = 0.99f;
+    g_spark_burst_saved_value = g_spark_burst_scale;
+    g_spark_burst_scale = 0.99f;
     for (i = 0xC7; i >= 0; i--) {
         func_310D80(spark_pos, 1.0f / 60.0f, 0.23333335f);
         spark_pos[2] = func_2E4280(spark_pos[2]) + 1.0f / 12.0f;
@@ -359,7 +359,7 @@ void group_walk_entities(u8 *a0)
         if (state->groups[i] == -1)
             continue;
         for (p = g_moby_l07_group_lists[state->groups[i]];
-             (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= D_L07_001B22F8[0] && p != 0 &&
+             (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= g_entity_group_count[0] && p != 0 &&
              ((s16)p[-1] >= 0 || p == g_moby_l07_group_lists[state->groups[i]]);
              p++) {
             e = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
@@ -375,7 +375,7 @@ void group_walk_entities(u8 *a0)
 
 
 typedef struct { f32 x, y, z, w; } __attribute__((aligned(16))) Vec4;
-extern Vec4 D_L07_002A0100[][18];
+extern Vec4 g_path_points[][18];
 extern void func_2E4310(void *a, void *b, void *c);
 extern void func_2E4398(void *a, void *b, f32 c);
 extern f32 func_2E44D0(void *a, void *b);
@@ -393,24 +393,24 @@ void path_compute_centers_and_radii(void)
         sum_index = 0;
         qzero(center);
         /* separate counters for the test (testIndex) and the call (sumIndex); pointCount stays for after the loop */
-        while (D_L07_002A0100[i][test_index].w == 1.0f) {
-            func_2E4310(center, center, &D_L07_002A0100[i][sum_index]);
+        while (g_path_points[i][test_index].w == 1.0f) {
+            func_2E4310(center, center, &g_path_points[i][sum_index]);
             point_count++;
             sum_index++;
             test_index++;
         }
-        func_2E4398(&D_L07_002A0100[i][point_count], &D_L07_002A0100[i][point_count], 1.0f / point_count);
-        D_L07_002A0100[i][point_count].w = 0.0f;
+        func_2E4398(&g_path_points[i][point_count], &g_path_points[i][point_count], 1.0f / point_count);
+        g_path_points[i][point_count].w = 0.0f;
         for (j = 0; j < point_count; j++) {
-            distance = func_2E44D0(&D_L07_002A0100[i][j], &D_L07_002A0100[i][point_count]) + 4.0f;
-            if (D_L07_002A0100[i][point_count].w < distance)
-                D_L07_002A0100[i][point_count].w = distance;
+            distance = func_2E44D0(&g_path_points[i][j], &g_path_points[i][point_count]) + 4.0f;
+            if (g_path_points[i][point_count].w < distance)
+                g_path_points[i][point_count].w = distance;
         }
     }
 }
 
-extern u8 *D_L07_001B1F40 MACRO_ADDR;
-extern s32 *D_L07_001FDEC0[];
+extern u8 *g_shooter_path_table MACRO_ADDR;
+extern s32 *g_path_l07_table[];
 extern void func_2E4DD8(void *, void *);
 extern void func_2E47F8(void *, void *, void *);
 
@@ -427,22 +427,22 @@ void path_upload_points_to_world(u8 *moby, s32 index)
 
     if (*(s32 *)(state + 0xBC) == -1)
         return;
-    record = D_L07_001B1F40 + *(s32 *)(state + 0xBC) * 0x30;
-    dest = D_L07_001FDEC0[**(s32 **)(record + 0x3C)];
+    record = g_shooter_path_table + *(s32 *)(state + 0xBC) * 0x30;
+    dest = g_path_l07_table[**(s32 **)(record + 0x3C)];
     *dest = 0;
     func_2E4DD8(matrix, moby + 0xC0);
     qcopy(matrix + 12, moby + 0x10);
     matrix[15] = 1.0f;
-    for (i = 0; (D_L07_002A0100[index] + i)->w == 1.0f; i++) {
-        func_2E47F8(dest + 4 + i * 4, D_L07_002A0100[index] + i, matrix);
+    for (i = 0; (g_path_points[index] + i)->w == 1.0f; i++) {
+        func_2E47F8(dest + 4 + i * 4, g_path_points[index] + i, matrix);
         (*dest)++;
     }
-    qcopy(end_point, &D_L07_002A0100[index][*dest]);
+    qcopy(end_point, &g_path_points[index][*dest]);
     radius = end_point[3];
     end_point[3] = 1.0f;
-    func_2E47F8(D_L07_001B1F40 + (*(s32 *)(state + 0xBC) * 0x30 + 0x20), end_point, matrix);
+    func_2E47F8(g_shooter_path_table + (*(s32 *)(state + 0xBC) * 0x30 + 0x20), end_point, matrix);
     {
-        u8 *table = D_L07_001B1F40;
+        u8 *table = g_shooter_path_table;
         table += *(s32 *)(state + 0xBC) * 0x30;
         ((f32 *)table)[11] = radius;
     }

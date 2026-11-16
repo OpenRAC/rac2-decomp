@@ -2,14 +2,14 @@
 
 #include "common.h"
 typedef int quad __attribute__((mode(TI)));
-extern char D_L16_001BFF60[];
-extern f32 D_L16_001B1FF0 __attribute__((sda));
-extern f32 D_L16_001B1FF4 __attribute__((sda));
+extern char g_aim_target_position[];
+extern f32 g_shockwave_growth_rate __attribute__((sda));
+extern f32 g_shockwave_radius_limit __attribute__((sda));
 extern void FastVecAdd(char *, char *, char *);
 extern void func_PAL_L16_00424590(char *);
 extern s32 CollLine(char *, char *, s32, s32, s32);
 extern void moby_set_state(char *, s32, s32);
-extern char *func_PAL_L00_003FB330(char *, f32, f32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern char *SpawnExplosion_pal(char *, f32, f32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 extern int coll_sweep_from_object(char *, char *, f32, f32, u32, s32, s32, s32, f32);
 extern s32 flag_set_first_pending(char *);
 extern f32 ApproachValue(f32 *, f32, f32);
@@ -31,7 +31,7 @@ void func_PAL_L16_004242D0(char *self) {
         *(f32 *)(st + 8) -= *(f32 *)(st + 0x24);
         func_PAL_L16_00424590(self);
         if (CollLine(old, position, 0, *(s32 *)(self + 0xB8), 0)) {
-            qcopy(position ,D_L16_001BFF60);
+            qcopy(position ,g_aim_target_position);
             if (*(s32 *)(st + 0x20)) moby_set_state(self, 2, -1);
             else moby_set_state(self, 1, -1);
         }
@@ -39,14 +39,14 @@ void func_PAL_L16_004242D0(char *self) {
     }
     case 1: {
         char *position = self + 16;
-        func_PAL_L00_003FB330(position, 1.0f, 20.0f, 0, 25, 20, 20, 20, 45, 1, 1, 0, 0, 0);
+        SpawnExplosion_pal(position, 1.0f, 20.0f, 0, 25, 20, 20, 20, 45, 1, 1, 0, 0, 0);
         coll_sweep_from_object(self, position, 2.0f, 6.0f, 0x10001, 0, 1, 0, 1.0f);
         moby_mark_spawned(self);
         break;
     }
     case 2:
         if (flag_set_first_pending(self)) {
-            func_PAL_L00_003FB330(self + 16, 0.6660000085830688f, 20.0f, 0, 20, 15, 15, 15, 35, 1, 1, 0, 0, 0);
+            SpawnExplosion_pal(self + 16, 0.6660000085830688f, 20.0f, 0, 20, 15, 15, 15, 35, 1, 1, 0, 0, 0);
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
             *(f32 *)(self + 0x18) += 0.5f;
@@ -55,8 +55,8 @@ void func_PAL_L16_004242D0(char *self) {
         *(f32 *)(st + 0x34) += 0.080000006f;
         if (*(f32 *)(st + 0x34) > 1.0f) *(f32 *)(st + 0x34) -= 1.0f;
         { f32 radius = *(f32 *)(st + 0x2C);
-          f32 growth = D_L16_001B1FF0 * 0.020000001f;
-          f32 limit = D_L16_001B1FF4;
+          f32 growth = g_shockwave_growth_rate * 0.020000001f;
+          f32 limit = g_shockwave_radius_limit;
           radius += growth;
           *(f32 *)(st + 0x2C) = radius;
         if (radius >= limit) ApproachValue((f32 *)(st + 0x30), 0.0f, 0.080000006f);

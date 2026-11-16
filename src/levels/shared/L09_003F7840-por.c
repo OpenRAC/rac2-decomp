@@ -4,7 +4,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F3F7840;
 
-extern s32 D_L09_001B2388[];
+extern s32 g_frame_l09_counter[];
 
 extern float math_random_float_range(char *, float, float);
 extern s32 math_random_int_range(s32, s32);
@@ -30,7 +30,7 @@ void trooper_draw_flame_sprays(char *moby)
                 FastVecAdd(&offset, &offset, vars + 0x1A0);
                 moby_transform_joint_to_world(*(char **)(vars + 0x2F8), 5, &hand_a);
                 moby_transform_joint_to_world(*(char **)(vars + 0x2F8), 6, &hand_b);
-                if (D_L09_001B2388[0] & 1) {
+                if (g_frame_l09_counter[0] & 1) {
                     part_spawn_scaling(&hand_a, &offset, 0xCF0000FF, 0xCF, math_random_int_range(0x12, 0x16), 0x28, -10, 1);
                     part_spawn_scaling(&hand_b, &offset, 0xCF0000FF, 0xCF, math_random_int_range(0x12, 0x16), 0x28, -10, 1);
                 } else {

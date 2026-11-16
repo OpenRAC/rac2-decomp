@@ -14,8 +14,8 @@ typedef struct {
     int err;
 } SqrtException;
 
-extern int D_0013BF10;
-extern char D_0013BF28[];
+extern int g_math_error_mode;
+extern char g_str_sqrt_name[];
 extern double math_sqrt_double(double);
 extern int math_is_finite_double(double) __attribute__((const));
 extern int math_handle_sqrt_error(SqrtException *);
@@ -28,18 +28,18 @@ double math_sqrt_with_errno(double x)
     double z;
 
     z = math_sqrt_double(x);
-    if (D_0013BF10 == -1 || math_is_finite_double(x))
+    if (g_math_error_mode == -1 || math_is_finite_double(x))
         return z;
     if (x < 0.0) {
         exc.type = 1;
-        exc.name = D_0013BF28;
+        exc.name = g_str_sqrt_name;
         exc.err = 0;
         exc.arg1 = exc.arg2 = x;
-        if (D_0013BF10 == 0)
+        if (g_math_error_mode == 0)
             exc.retval = 0.0;
         else
             exc.retval = 0.0 / 0.0;
-        if (D_0013BF10 == 2)
+        if (g_math_error_mode == 2)
             *libc_get_state_record() = 33;
         else if (!math_handle_sqrt_error(&exc))
             *libc_get_state_record() = 33;

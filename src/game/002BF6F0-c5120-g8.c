@@ -26,8 +26,8 @@ extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecLength(void *);
-extern char D_0018A0E0[];
-extern float D_001AA3C0 __attribute__((sda));
+extern char g_hero_state_block[];
+extern float g_particle_side_length __attribute__((sda));
 
 /* Move a particle while tweening its size and alpha (as func_002C23B8). When
    its offset to the owner at q+24 is at most 2 on x and y, it is moved along
@@ -67,8 +67,8 @@ void UpdateOwnerOrbitingParticle(char *particle)
     if (*(char **)(state + 24) != 0) {
         FastVecSub(delta, *(char **)(state + 24) + 16, particle + 16);
         if (delta[0] <= 2.0f && delta[1] <= 2.0f) {
-            FastVecCross(side, delta, D_0018A0E0);
-            vec_scale_to_length(side, side, D_001AA3C0);
+            FastVecCross(side, delta, g_hero_state_block);
+            vec_scale_to_length(side, side, g_particle_side_length);
             FastVecAdd(particle + 16, particle + 16, side);
             if (delta[0] <= 0.5f && delta[1] <= 0.5f)
                 vec_scale_to_length(velocity.f, delta, 0.03f);

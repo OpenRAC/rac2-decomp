@@ -8,17 +8,17 @@ extern void func_32C328(char *a0, char *a1, s32 a2);
 extern s32  func_32AB10(char *a0);
 extern s32  func_360A80(s32 a0, s32 a1, char *a2);
 extern s32  func_312898(s32 a0, s32 a1, void *a2);
-extern u8  *D_L03_001B2A1C;
-extern u8   D_001395BF;
-extern u8   D_001395C0;
-extern u8   D_001A7AFA;
-extern u8   D_001A7B32;
-extern u8   D_001A7AFB;
-extern u8   D_001A7B33;
-extern u8   D_001A7AFC;
-extern u8   D_001A7B34;
+extern u8  *g_moby_record_base;
+extern u8   g_clank_scene_done_flag;
+extern u8   g_remote_view_done_flag;
+extern u8   g_barlow_hint_inside_flag;
+extern u8   g_unused_byte_c;
+extern u8   g_unused_byte_a;
+extern u8   g_unused_byte_d;
+extern u8   g_unused_byte_b;
+extern u8   g_unused_byte_e;
 
-void func_PAL_L03_003D3C90(char *a0)
+void attached_effect_update_pal(char *a0)
 {
     char *moby = *(char **)(a0 + 0x68);
 

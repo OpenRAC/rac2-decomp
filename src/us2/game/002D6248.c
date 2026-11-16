@@ -9,23 +9,23 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CB20(void);
 
-int func_US2_002D6380(void) {
+int menu_page_draw_second_us2(void) {
     SetupGifPaging(0);
     func_0029CB20();
     DoGifPaging();
     return 0;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_set_value(char *, int);
 extern void list_menu_set_records(char *, char *);
-extern char D_00261540[];
+extern char g_list_menu_records_first[];
 
-int func_US2_002D63B0(void)
+int menu_page_text_init_first_us2(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        menu_set_value(D_001A8CFC[0] + 0x3E9C8, 1);
-        list_menu_set_records(D_001A8CFC[0] + 0x3E9C8, D_00261540);
+    if (g_resident_data_base[0] != 0) {
+        menu_set_value(g_resident_data_base[0] + 0x3E9C8, 1);
+        list_menu_set_records(g_resident_data_base[0] + 0x3E9C8, g_list_menu_records_first);
     }
     return 0;
 }
@@ -36,7 +36,7 @@ extern int func_0029CA70(int);
 extern int list_menu_get_selected_record(unsigned char *);
 extern void menu_start_action(int);
 
-int func_US2_002D6408(void)
+int menu_page_handle_input_confirm_us2(void)
 {
     int result = 0;
     int *state = g_pad_state;
@@ -64,8 +64,8 @@ finish:
         result = 1;
     else {
         func_0029CA70(flags);
-        if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC[0]) {
-            char *entry = (char *)list_menu_get_selected_record((unsigned char *)(D_001A8CFC[0] + 0x3E760));
+        if ((state[0x1C4 / 4] & 0x40) && g_resident_data_base[0]) {
+            char *entry = (char *)list_menu_get_selected_record((unsigned char *)(g_resident_data_base[0] + 0x3E760));
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);

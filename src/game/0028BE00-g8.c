@@ -8,29 +8,29 @@ typedef struct { int f0; int f4; int f8; int fC; int f10; int f14; int f18; } Sl
 typedef struct { char pad[0x64]; int handle; char pad68[4]; int timer; unsigned char fade[4]; int selected, state, timeout; } Selector;
 
 extern int g_notice_owner;
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 #define D_001A7BB3 D_001A7BB0[3]
-extern int D_001A8CFC;
-extern int D_001A8D30 __attribute__((sda));
+extern int g_resident_data_base;
+extern int g_wheel_fade_count __attribute__((sda));
 extern int g_radial_menu_page_index __attribute__((sda));
-extern int D_001A8D90[] __attribute__((sda));
+extern int g_wheel_default_choices[] __attribute__((sda));
 extern int g_radial_slot_count;
 extern Slot **g_radial_menu_pages;
-extern float D_001A8E10;
-extern int D_001B1900;
-extern int D_001B18FC;
-extern int D_001B1598, D_001B18F8;
+extern float g_wheel_angle_delta;
+extern int g_weapon_wheel_selected;
+extern int g_weapon_wheel_state;
+extern int g_frame_counter_3, g_weapon_wheel_open_frame;
 extern unsigned char g_item_slot_to_record[];
 extern int g_item_ammo_counts[];
 extern Info g_weapon_table[];
 extern Controller g_pad_state;
-extern char D_0018C316[];
-extern char D_001A8E18[];
+extern char g_weapon_wheel_timer[];
+extern char g_str_wheel_debug[];
 extern Stats g_progress_statistics;
 extern Hero g_hero_state;
-extern unsigned int D_001A7390;
+extern unsigned int g_frame_counter;
 extern int g_current_map_index;
-extern short D_001A63AC NOT_SDA;
+extern short g_sequence_active_flag NOT_SDA;
 extern int menu_is_state_seven(void), hud_is_open_done(void);
 extern void hud_request_open(void), menu_set_state_word_three(void);
 extern void menu_set_screen_value_restart_six_fades(void *, int);
@@ -58,21 +58,21 @@ void weapon_wheel_update_select(Selector *selector)
 
     if (g_notice_owner) return;
     active = 0;
-    if (!D_001A7BB3 || menu_is_state_seven() || !D_001A7BB3) {
+    if (!g_weapon_wheel_enabled || menu_is_state_seven() || !g_weapon_wheel_enabled) {
         active = 1;
-        if (!D_001A7BB3) {
+        if (!g_weapon_wheel_enabled) {
             hud_request_open();
             if (!hud_is_open_done()) active = 0;
         }
     }
     fade_start = selector->fade;
-    if (active && D_001A8CFC) {
-        menu_set_screen_value_restart_six_fades((char *)D_001A8CFC + 0x376C8, menu_is_state_seven() ? D_001A8D30 : 2);
+    if (active && g_resident_data_base) {
+        menu_set_screen_value_restart_six_fades((char *)g_resident_data_base + 0x376C8, menu_is_state_seven() ? g_wheel_fade_count : 2);
         menu_set_state_word_three();
     }
     selector->timeout = 180;
     selector->timer = 24;
-    if (FastDecTimer(D_0018C316) && !D_001A7BB3) g_pad_state.inhibit = 2;
+    if (FastDecTimer(g_weapon_wheel_timer) && !g_weapon_wheel_enabled) g_pad_state.inhibit = 2;
     stick_x = g_pad_state.x;
     stick_y = g_pad_state.y;
     stick_magnitude = square_root(stick_x * stick_x + stick_y * stick_y);
@@ -104,33 +104,33 @@ void weapon_wheel_update_select(Selector *selector)
                 }
                 selector->selected = slot;
                 nudge = -1;
-                D_001A8E10 = math_fast_float_g(shifted_angle - ((float)slot * 0.78539824f + 0.39269912f));
-                if (D_001A8E10 > 0.0f) nudge = 1;
+                g_wheel_angle_delta = math_fast_float_g(shifted_angle - ((float)slot * 0.78539824f + 0.39269912f));
+                if (g_wheel_angle_delta > 0.0f) nudge = 1;
             }
         } else if (g_pad_state.repeat == 0 && (g_pad_state.pressed & 0xF000)) {
             int wanted;
             wanted = old_selection;
             if (g_pad_state.pressed & 0x1000) {
                 int target;
-                if (wanted == -1) target = D_001A8D90[4];
+                if (wanted == -1) target = g_wheel_default_choices[4];
                 else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f10;
                 wanted = target;
             }
             if (g_pad_state.pressed & 0x4000) {
                 int target;
-                if (wanted == -1) target = D_001A8D90[5];
+                if (wanted == -1) target = g_wheel_default_choices[5];
                 else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f14;
                 wanted = target;
             }
             if (g_pad_state.pressed & 0x8000) {
                 int target;
-                if (wanted == -1) target = D_001A8D90[2];
+                if (wanted == -1) target = g_wheel_default_choices[2];
                 else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f8;
                 wanted = target;
             }
             if (g_pad_state.pressed & 0x2000) {
                 int target;
-                if (wanted == -1) target = D_001A8D90[3];
+                if (wanted == -1) target = g_wheel_default_choices[3];
                 else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].fC;
                 wanted = target;
             }
@@ -147,7 +147,7 @@ void weapon_wheel_update_select(Selector *selector)
     }
     fade = selector->fade;
     if (selector->selected != old_selection) {
-        STUB_printf(D_001A8E18);
+        STUB_printf(g_str_wheel_debug);
         load_request_disc_read_break();
         fade[1] = 0;
         snd_play_from_global_bank(3, 0, 0);
@@ -155,18 +155,18 @@ void weapon_wheel_update_select(Selector *selector)
     if (selector->selected >= 0 && !load_is_class_cached(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18)->name)) {
         LoadClassIntoFreeCacheSlot(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18)->name);
     } else {
-        if (!(g_pad_state.held & 0x10) && !D_001A63AC) {
+        if (!(g_pad_state.held & 0x10) && !g_sequence_active_flag) {
             if (fade[0]) fade[0]--;
             if (fade[0] == 0 && selector->selected >= 0 && (weapon_id = g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18) != 0) {
                 Info *info;
                 if (g_hero_state.selected != weapon_id && g_progress_statistics.uses < 0xFFFF) g_progress_statistics.uses++;
-                if (g_progress_statistics.maxFrame < D_001A7390) g_progress_statistics.maxFrame = D_001A7390;
+                if (g_progress_statistics.maxFrame < g_frame_counter) g_progress_statistics.maxFrame = g_frame_counter;
                 g_progress_statistics.levels = g_progress_statistics.levels | (1 << g_current_map_index) | 0x80000000;
                 g_hero_state.pending = weapon_id;
                 info = InfoOf(weapon_id);
                 if (info->valid && info->ammo < g_item_ammo_counts[weapon_id]) g_item_ammo_counts[weapon_id] = info->ammo;
             }
-            if (D_001A7BB3) menu_advance_state_in_mode_seven();
+            if (g_weapon_wheel_enabled) menu_advance_state_in_mode_seven();
             else {
                 hud_clear_flag_b();
                 hud_clear_flag_a();
@@ -176,11 +176,11 @@ void weapon_wheel_update_select(Selector *selector)
     if (fade_start[0] == 0) {
         {
             int state = selector->state;
-            D_001B1900 = selector->selected;
-            D_001B18FC = state;
+            g_weapon_wheel_selected = selector->selected;
+            g_weapon_wheel_state = state;
         }
         hud_close_element_by_key(selector->handle);
         selector->timer = -6;
-        D_001B18F8 = D_001B1598;
+        g_weapon_wheel_open_frame = g_frame_counter_3;
     }
 }

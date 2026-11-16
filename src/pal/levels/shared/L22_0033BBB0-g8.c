@@ -11,7 +11,7 @@ extern s32 func_2F4BE0(f32);
 extern void *func_332F58(s32);
 
 /* A word read through $gp; USA v1.01 reads a halfword here. */
-extern s32 D_L22_001AA5EC __attribute__((sda));
+extern s32 g_homing_trail_value __attribute__((sda));
 
 /* func_PAL_L22_0033BBB0, the PAL copy of func_L22_003398B8: the same C, where the halfword read
    becomes a word read scaled to 50 Hz. */
@@ -37,6 +37,6 @@ void func_PAL_L22_0033BBB0(u32 colour, Vector point, u8 *handle)
     record[0x9] = func_2F4BE0(4.0f) + 0x70;
     record[0x3] = 0x44;
     record[0x1] = 2;
-    *(u16 *)(record + 0xA) = (D_L22_001AA5EC * 5 + 2) / 6;
+    *(u16 *)(record + 0xA) = (g_homing_trail_value * 5 + 2) / 6;
     *(u8 **)(record + 0x30) = handle;
 }

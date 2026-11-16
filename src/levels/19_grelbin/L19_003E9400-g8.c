@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern float D_L19_001B1D28 __attribute__((sda));
+extern float g_attachment_timer_param __attribute__((sda));
 
 extern void func_2EB590();
 
@@ -18,17 +18,17 @@ void moby_update_timers_attachment(char *moby)
     if (*(unsigned short *)(moby_ptr + 0x96) < 0xFFFF) {
         *(unsigned short *)(moby_ptr + 0x96) += 1;
     }
-    func_3238E0(moby_ptr, vars_addr + 0x2A0, 1, 1, D_L19_001B1D28);
+    func_3238E0(moby_ptr, vars_addr + 0x2A0, 1, 1, g_attachment_timer_param);
 }
 
-extern int D_L19_001A8F00 __attribute__((sda));
-extern u8 D_001A7BDC[] __attribute__((sda));
-extern int D_L19_001B2724[4] __attribute__((sda));
-extern char *D_L19_001B2B0C[] __attribute__((sda));
+extern int g_hero_l19_mode __attribute__((sda));
+extern u8 g_warp_trigger_flags[] __attribute__((sda));
+extern int g_glow_state_flags[4] __attribute__((sda));
+extern char *g_linked_object_table[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern char g_hero_position[];
-extern char D_L19_001BFC40[];
+extern char g_request_l19_queue[];
 
 extern void func_4239B8(char *a0);
 extern void func_30DFE8(char *a0);
@@ -57,7 +57,7 @@ void warp_trigger_update(char *moby)
     case 0:
         *(s32 *)(moby + 0x98) = 0;
         *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
-        if (D_001A7BDC[0] != 0) {
+        if (g_warp_trigger_flags[0] != 0) {
             func_30DFE8(moby);
         } else {
             func_318240(moby, 1, -1);
@@ -66,32 +66,32 @@ void warp_trigger_update(char *moby)
         break;
     case 1:
         if (func_31E128(g_hero_position, *(s32 *)(vars + 0x120)) != 0) {
-            if (func_2F1940(D_L19_001BFC40, 0x96) != 0) {
-                func_2F1940(D_L19_001BFC40, 0x14);
-                func_2F1940(D_L19_001BFC40, 0x97);
+            if (func_2F1940(g_request_l19_queue, 0x96) != 0) {
+                func_2F1940(g_request_l19_queue, 0x14);
+                func_2F1940(g_request_l19_queue, 0x97);
                 func_32C2E8(moby);
-                func_2F1A88(D_L19_001BFC40);
+                func_2F1A88(g_request_l19_queue);
                 func_318240(moby, 2, -1);
             }
         }
         break;
     case 2:
-        D_L19_001B2724[1] = 1;
-        if (D_L19_001A8F00 == 2) {
+        g_glow_state_flags[1] = 1;
+        if (g_hero_l19_mode == 2) {
             *(u8 *)(moby + 0x31) = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
         if (func_36E868() == 0) {
-            D_L19_001B2724[1] = 0;
+            g_glow_state_flags[1] = 0;
             func_31F110(0x14);
             func_321BB0(0x14);
-            func_2BBFD8(D_L19_001B2B0C[0] + (*(s32 *)(vars + 0x120) << 7) + 0x30,
-                        D_L19_001B2B0C[0] + (*(s32 *)(vars + 0x120) << 7) + 0x70, 0, 1);
+            func_2BBFD8(g_linked_object_table[0] + (*(s32 *)(vars + 0x120) << 7) + 0x30,
+                        g_linked_object_table[0] + (*(s32 *)(vars + 0x120) << 7) + 0x70, 0, 1);
             *(u16 *)(moby + 0x34) &= 0xFFFE;
             *(u8 *)(moby + 0x31) = 1;
             if (*(u8 *)(moby + 0xB0) != 0xFF) {
                 id = *(u8 *)(moby + 0xB0);
-                if ((D_0019B2E8[id + (g_current_map_index[0] << 4)] & 0x80) == 0)
+                if ((g_moby_group_flags[id + (g_current_map_index[0] << 4)] & 0x80) == 0)
                     func_30FC48(id);
                 func_356928(g_hero_position, g_hero_position + 0x10);
                 func_309FB8(0, -1);
@@ -104,10 +104,10 @@ void warp_trigger_update(char *moby)
     }
 }
 
-extern float D_L19_001B1EB0 __attribute__((sda)), D_L19_001B1EB4 __attribute__((sda));
-extern float D_L19_001B1EB8 __attribute__((sda)), D_L19_001B1EBC __attribute__((sda));
-extern float D_L19_001B1EC0 __attribute__((sda)), D_L19_001B1EC4 __attribute__((sda));
-extern float D_L19_001B1EC8 __attribute__((sda));
+extern float g_warp_trigger_radius __attribute__((sda)), g_warp_trigger_speed_in __attribute__((sda));
+extern float g_warp_trigger_speed_out __attribute__((sda)), g_warp_trigger_blend_rate __attribute__((sda));
+extern float g_warp_trigger_height_range __attribute__((sda)), g_warp_trigger_reset_value __attribute__((sda));
+extern float g_warp_trigger_lift_rate __attribute__((sda));
 /* The hero: its state word and another mode word. */
 typedef struct {
     char pad0[0x2294];
@@ -116,12 +116,12 @@ typedef struct {
     int mode;
 } HeroModes;
 extern HeroModes g_hero_state;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 /* Player stats: the pending bolt credit at +0x1C. */
 typedef struct { u8 pad0[0x1C]; int pendingBolts; } PlayerStats;
-extern PlayerStats D_001A7A00 MACRO_ADDR;
-extern u8 D_001A7A60[] MACRO_ADDR;
-extern int D_L19_001A903C[] MACRO_ADDR;
+extern PlayerStats g_player_stats MACRO_ADDR;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
+extern int g_warp_triggered_flags[] MACRO_ADDR;
 extern void anim_start_blended(void *, int, int, int);
 extern void EmitGrelbinGlowSprites(void *);
 extern float vec_distance_xy(void *, void *);
@@ -151,9 +151,9 @@ void UpdateHomingCollectible(u8 *object)
         if (object[0x43]) anim_start_blended(object, 0, 0, 0);
         break;
     case 1:
-        if (vec_distance_xy(object + 0x10, g_hero_position) < D_L19_001B1EB0 &&
-            math_fabs(*(float *)(object + 0x18) - *(float *)(g_hero_position + 8)) < D_L19_001B1EC0) {
-            *(float *)vars = D_L19_001B1EC4;
+        if (vec_distance_xy(object + 0x10, g_hero_position) < g_warp_trigger_radius &&
+            math_fabs(*(float *)(object + 0x18) - *(float *)(g_hero_position + 8)) < g_warp_trigger_height_range) {
+            *(float *)vars = g_warp_trigger_reset_value;
             if (object[0x43] != 1) anim_start_blended(object, 1, 0, 20);
             *(float *)(object + 0x48) = *(float *)vars + *(float *)vars;
             object[0x20] = 2;
@@ -162,22 +162,22 @@ void UpdateHomingCollectible(u8 *object)
         break;
     case 2:
         if (object[0x43] != 1) anim_start_blended(object, 1, 0, 20);
-        *(float *)vars += (1.0f - *(float *)vars) * D_L19_001B1EBC;
+        *(float *)vars += (1.0f - *(float *)vars) * g_warp_trigger_blend_rate;
         *(float *)(object + 0x48) = *(float *)vars + *(float *)vars;
         FastVecSub(direction, g_hero_position, object + 0x10);
         direction[2] += 0.6f;
         distance = vec_length_xy(direction);
         threshold = 0.12f;
         if (*(int *)(g_hero_position + 0x2214) != 0x31)
-            movement = D_L19_001B1EB4 * (*(float *)vars * 0.016666668f);
+            movement = g_warp_trigger_speed_in * (*(float *)vars * 0.016666668f);
         else {
-            movement = D_L19_001B1EB8 * (*(float *)vars * 0.016666668f);
+            movement = g_warp_trigger_speed_out * (*(float *)vars * 0.016666668f);
             threshold = 0.8f;
         }
         vec_fast_divide_helper(direction, direction, movement);
         FastVecAdd(object + 0x10, object + 0x10, direction);
         if (*(float *)(object + 0x2C) > 0.1f || distance < threshold || distance < movement)
-            *(float *)(object + 0x2C) -= D_L19_001B1EC8 * *(float *)(*(u8 **)(object + 0x24) + 0x24);
+            *(float *)(object + 0x2C) -= g_warp_trigger_lift_rate * *(float *)(*(u8 **)(object + 0x24) + 0x24);
         if ((distance < movement &&
              *(float *)(object + 0x2C) < *(float *)(*(u8 **)(object + 0x24) + 0x24) * 0.01f) ||
             g_hero_state.mode == 0x14 || g_hero_state.mode == 0x19 ||
@@ -186,26 +186,26 @@ void UpdateHomingCollectible(u8 *object)
                 u8 *linked = *(u8 **)(vars + 4);
                 int flag_index = *(unsigned short *)(linked + 0xB2);
                 if (flag_index & 1) {
-                    unsigned char *flag_byte = &D_0019B4A8[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
+                    unsigned char *flag_byte = &g_moby_nibble_table[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
                     if (((*flag_byte >> 4) & 7) != 7) {
                         *flag_byte += 0x10;
                     }
                 } else {
-                    unsigned char *flag_byte = &D_0019B4A8[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
+                    unsigned char *flag_byte = &g_moby_nibble_table[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
                     if ((*flag_byte & 7) != 7) {
                         *flag_byte += 1;
                     }
                 }
                 moby_mark_spawned(*(u8 **)(vars + 4));
             }
-            D_001A7A00.pendingBolts++;
+            g_player_stats.pendingBolts++;
             snd_play_from_class_bank(3, 0, object, 0x11C7);
             moby_mark_spawned(object);
-            if (!text_sum_subtitle_lengths() && !D_001A7A60[6]) {
-                D_001A7A60[6] = 1;
+            if (!text_sum_subtitle_lengths() && !g_item_enabled_flags[6]) {
+                g_item_enabled_flags[6] = 1;
                 snd_play_from_global_bank(1, 0, 0);
                 value_set_entry_by_index(0x1233, -1);
-                D_L19_001A903C[0] = 1;
+                g_warp_triggered_flags[0] = 1;
             }
             moby_mark_spawned(object);
         } else EmitGrelbinGlowSprites(object);

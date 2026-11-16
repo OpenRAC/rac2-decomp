@@ -102,7 +102,7 @@ extern void *memset(void *, int, int);
 
 extern int coll_process_hit(float, char *, int, char *, int);
 
-extern void *D_L01_001C3980[];
+extern void *g_contact_moby_list[];
 
 /* Finds up to 16 nearby creatures of one kind, marks them and remembers them in a list. */
 void swamp_beast_collect_nearby(void *object, void **list, int *found) {
@@ -116,14 +116,14 @@ void swamp_beast_collect_nearby(void *object, void **list, int *found) {
     if (hit_count <= 0)
         return;
     for (i = 0; i < hit_count; i++) {
-        other = D_L01_001C3980[i];
+        other = g_contact_moby_list[i];
         if (other == 0)
             continue;
         if (*(s16 *)((u8 *)other + 0xAA) != 0xA26 /* moby class 2598 */)
             continue;
         *(u32 *)((u8 *)other + 0x9C) = 1;
-        *(u8 *)((u8 *)D_L01_001C3980[i] + 0xBC) = 1;
-        list[*found] = D_L01_001C3980[i];
+        *(u8 *)((u8 *)g_contact_moby_list[i] + 0xBC) = 1;
+        list[*found] = g_contact_moby_list[i];
         *found = *found + 1;
         if (*found >= 16)
             break;
@@ -243,7 +243,7 @@ void swamp_beast_update_timers(u8 *object) {
 /* func_L01_003B53C8 is defined in L01_003835D8-g8.c. */
 
 /* func_L01_003B57A8 uses the SDA pointer to the position table. */
-extern u8 *D_L01_001B264C __attribute__((sda));
+extern u8 *g_swamp_patrol_positions __attribute__((sda));
 extern char g_hero_position[];
 extern float vec_distance_xy(void *, void *);
 
@@ -260,7 +260,7 @@ void swamp_beast_find_best_patrol_position(u8 *object, u8 *result) {
     *(f32 *)(result + 0xC) = 0.0f;
     while (--count >= 0) {
         if (*index_list != -1) {
-            qcopy(pos, D_L01_001B264C + *index_list * 0x80 + 0x30);
+            qcopy(pos, g_swamp_patrol_positions + *index_list * 0x80 + 0x30);
             rating = vec_distance_xy(pos, g_hero_position);
             if (*(f32 *)(result + 0xC) < rating) {
                 qcopy(result, pos);

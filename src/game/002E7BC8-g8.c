@@ -14,8 +14,8 @@ extern void vec_clear_128(void *);
 extern void part_update_effect_records(void *);
 extern void part_add_effect_record(void *, void *);
 extern void gfx_draw_billboard_quad(void *, unsigned int, unsigned int, int, float, float, float);
-extern float D_001AC130 __attribute__((sda));
-extern float D_001AC140 __attribute__((sda));
+extern float g_thruster_offset_a __attribute__((sda));
+extern float g_thruster_offset_b __attribute__((sda));
 typedef struct { char pad[0x34]; int frame; } Frame7B;
 extern Frame7B g_scene_playback_state;
 typedef struct {
@@ -47,8 +47,8 @@ void ship_spawn_thruster_particles(void *object)
  vec_copy_helper_b(combined, first, second);
  quaternion_to_rotation_basis(combined, matrix);
  multiply_matrix3x3(matrix, o + 0xc0, matrix);
- matrix_mul_vec3(pos, &D_001AC130, matrix);
- matrix_mul_vec3(other, &D_001AC140, matrix);
+ matrix_mul_vec3(pos, &g_thruster_offset_a, matrix);
+ matrix_mul_vec3(other, &g_thruster_offset_b, matrix);
  FastVecAdd(pos, pos, o + 0x10);
  FastVecAdd(other, other, o + 0x10);
  part_update_effect_records(object);

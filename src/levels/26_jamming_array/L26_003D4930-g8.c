@@ -10,13 +10,13 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L26_001B1C38 __attribute__((sda));
+extern int g_trail_group_count __attribute__((sda));
 
 extern u8 *D_L26_001B1C1C_1[3] __attribute__((sda));
 
-extern u16 *D_L26_001FA6E0[];
+extern u16 *g_trail_group_id_lists[];
 
-extern int D_L26_001B1748;
+extern int g_frame_l26_counter;
 
 extern void mat_get_euler_angles(u8 *, u8 *);
 
@@ -37,19 +37,19 @@ void trail_advance_samples(u8 *a0) {
     u8 *e;
     float phase;
 
-    if (*(int *)(state + 0x19C) != D_L26_001B1748) {
-        for (p = D_L26_001FA6E0[a0[0x21]];
-             a0[0x21] != 0xFF && a0[0x21] <= D_L26_001B1C38 && p != 0 &&
-             ((p != 0 && (short)p[-1] >= 0) || p == D_L26_001FA6E0[a0[0x21]]);
+    if (*(int *)(state + 0x19C) != g_frame_l26_counter) {
+        for (p = g_trail_group_id_lists[a0[0x21]];
+             a0[0x21] != 0xFF && a0[0x21] <= g_trail_group_count && p != 0 &&
+             ((p != 0 && (short)p[-1] >= 0) || p == g_trail_group_id_lists[a0[0x21]]);
              p++) {
             e = D_L26_001B1C1C_1[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
                 break;
-            *(int *)(*(u8 **)(e + 0x68) + 0x19C) = D_L26_001B1748;
+            *(int *)(*(u8 **)(e + 0x68) + 0x19C) = g_frame_l26_counter;
         }
         gfx_add_draw_callback_first((void *)part_submit_group_trail_effects, a0);
     }
-    phase = (float)(D_L26_001B1748 % 8) * 0.125f;
+    phase = (float)(g_frame_l26_counter % 8) * 0.125f;
     *(float *)(state + 0x198) = phase;
     if (phase == 0.0f) {
         *(int *)(state + 0x194) = (*(int *)(state + 0x194) + 1) % 8;

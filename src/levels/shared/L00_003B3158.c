@@ -35,7 +35,7 @@ typedef struct {
 } Hero;
 
 extern Hero g_hero_state;
-extern u32 D_00138320[];        /* controller 1's held buttons (D_00138180 + 0x1A0) */
+extern u32 g_pad_pressed_flags[];        /* controller 1's held buttons (D_00138180 + 0x1A0) */
 extern float *moby_get_private_value_0(Moby *moby);
 extern char *SelectBestTargetInCone(void *origin, void *direction, int *count, Moby **candidates, int capacity,
                          int, int, void *config,
@@ -55,7 +55,7 @@ extern OBJ *D_L06_001B2820_1 __attribute__((sda));
 
 extern OBJ *D_L06_001B2824_1 __attribute__((sda));
 
-extern OBJ *D_L06_001AC000 __attribute__((sda));
+extern OBJ *g_compared_object __attribute__((sda));
 
 typedef struct NODE {
     char pad0[0x8];
@@ -80,7 +80,7 @@ typedef struct V2 {
     float y;
 } V2;
 
-extern V2 D_L00_001AFBC8;
+extern V2 g_helper_hit_position;
 
 extern void func_37CB80(void *, void *, float, void *);
 
@@ -126,7 +126,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void euler_rotation_basis(void *, void *);
 extern void func_002A0F48(void *);
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 
 void UpdatePairedObjects(NODE *object)
 {
@@ -143,9 +143,9 @@ void UpdatePairedObjects(NODE *object)
     q = v + 0x10;
     p = slots;
     for (i = 1; i >= 0; i--) {
-        matrix_mul_vec3((char *)*p + 0x10, q, D_L00_001B8FF0);
+        matrix_mul_vec3((char *)*p + 0x10, q, g_cam_follow_matrix);
         q += 0x10;
-        FastVecAdd((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
+        FastVecAdd((char *)*p + 0x10, (char *)*p + 0x10, g_cam_follow_matrix - 0x230);
         v = (char *)*p + 0xF0;
         euler_rotation_basis((char *)*p + 0xC0, v);
         func_002A0F48(*p);
@@ -165,7 +165,7 @@ void pair_game_destroy_objects(NODE *object)
     if (b[1] != 0)
         func_310440(b[1]);
 
-    key = D_L06_001AC000->fAA;
+    key = g_compared_object->fAA;
     for (p = D_L06_001B2820_1; p < D_L06_001B2824_1; p = (OBJ *)((char *)p + 256)) {
         if (p == 0)
             continue;
@@ -175,7 +175,7 @@ void pair_game_destroy_objects(NODE *object)
             continue;
         if (p->f20 == 253)
             continue;
-        if (p == D_L06_001AC000)
+        if (p == g_compared_object)
             continue;
         func_310440(p);
     }
@@ -213,7 +213,7 @@ void pair_game_wrap_coordinates(float *value_a, float *value_b)
 void moby_update_same_class(void *object)
 {
     OBJ *p;
-    short key = D_L06_001AC000->fAA;
+    short key = g_compared_object->fAA;
 
     for (p = D_L06_001B2820_1; p < D_L06_001B2824_1; p = (OBJ *)((char *)p + 256)) {
         if (p == 0)
@@ -224,7 +224,7 @@ void moby_update_same_class(void *object)
             continue;
         if (p->f20 == 253)
             continue;
-        if (p == D_L06_001AC000)
+        if (p == g_compared_object)
             continue;
         p->f64(p);
     }
@@ -243,7 +243,7 @@ void helper_update_hit_test(NODE *object)
     if (vars->f2C == 0) {
         func_37CB80(vars, (char *)vars + 0x10, 1.0f, 0);
     } else {
-        V2 v = D_L00_001AFBC8;
+        V2 v = g_helper_hit_position;
 
         func_37CB80(vars, (char *)vars + 0x10, 1.0f, &v);
     }
@@ -280,7 +280,7 @@ Moby *SelectCurrentOrPreferredTarget(void *origin, void *direction, Moby *prefer
                   angle0, angle1, range, angle2, angle3);
 
     /* The preferred moby first. */
-    if (g_hero_state.f340 && !g_hero_state.f34E && (D_00138320[0] & g_hero_state.buttonMask)
+    if (g_hero_state.f340 && !g_hero_state.f34E && (g_pad_pressed_flags[0] & g_hero_state.buttonMask)
         && preferred && preferred->state != 0xFE && preferred->state != 0xFD) {
         for (i = 0; i < count; ++i) {
             candidate = candidates[i];

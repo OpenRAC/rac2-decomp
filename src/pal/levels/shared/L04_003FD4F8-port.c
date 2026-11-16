@@ -30,7 +30,7 @@ typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 
 /* func_L04_003C8380 is in L04_003C8380-stream.c. */
 
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void vec_scale_to_length(char *, char *, float);
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
 extern float math_random_signed_float_range(float, float);
@@ -192,8 +192,8 @@ extern float FastVecDot(void *, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern void func_PAL_L04_00410678(void *, void *, int, int);
-extern Collision D_L04_001BFAC0;
-extern CollisionHit D_L04_001BFAE0;
+extern Collision g_probe_hit;
+extern CollisionHit g_spark_origin_quad;
 
 extern void ref_L04_003FA5A8_00(void *, float, float, float);
 extern unsigned char *ref_L04_003FA5A8_01(void *, void *, void *, float *, float *, float *, float, float);
@@ -205,7 +205,7 @@ extern void ref_L04_003FA5A8_03(void *, void *, void *, void *, void *, void *, 
 
 extern int PlayMobySound(int, int, char *);
 
-extern unsigned char *D_L04_001C3B40[];
+extern unsigned char *g_special_moby_list[];
 extern float FastDiffRots(float, float);
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(char *, char *);
@@ -247,16 +247,16 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
     if (radius < 0.75f) radius = 0.75f;
     n = coll_process_hit(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
     for (count = 0; count < n; count++) {
-        if (D_L04_001C3B40[count] == *(unsigned char **)(v + 0x74)) continue;
+        if (g_special_moby_list[count] == *(unsigned char **)(v + 0x74)) continue;
         if (*(float *)(v + 0x7C) > 0) {
-            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
             if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, D_L04_001C3B40[count] + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
+            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, g_special_moby_list[count] + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x18) - *(float *)(m + 0x18));
             if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (fast_vec_dist((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)m + 0x10, (char *)g_special_moby_list[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
             impact.source = *(void **)(v + 0x74);
             impact.flags = 0x230000;
@@ -265,13 +265,13 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
             impact.objectClass = *(unsigned short *)(m + 0xAA);
             impact.strength = 1.0f;
             impact.unk20 = 0x230000;
-            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
             impact.vector[0] = math_fast_sin_or_cos_a(angle);
             impact.vector[1] = math_fast_sin_or_cos_b(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
-            QueueMobyImpact(D_L04_001C3B40[count], &impact);
+            QueueMobyImpact(g_special_moby_list[count], &impact);
             PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
         }
     }
@@ -289,7 +289,7 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
             add_vectors(ray[2], ray[1], m + 0x10);
             if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
                 vec_build_spherical_offset(ray[2], 0.40000004f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
-                func_PAL_L04_00410678(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
+                func_PAL_L04_00410678(&g_spark_origin_quad, ray[2], sparkKind, sparkArg);
             }
         }
     }
@@ -324,7 +324,7 @@ extern void gfx_add_draw_callback_second(void *, void *);
 extern void func_PAL_L04_003FFB98(unsigned char *, void *);
 extern void DrawDomeEffect(void);
 extern unsigned char g_sound_state[];
-extern int D_L04_001B0488 __attribute__((sda));
+extern int g_shield_dome_sound_handle __attribute__((sda));
 
 /* func_L04_00400AB0 and func_L04_00400D48 are in L04_003C8380-path-g8.c. */
 
@@ -344,4 +344,4 @@ extern int FastDecTimer(short *);
 
 extern float fast_vec_dist(char *arg0, char *arg1);
 
-extern char *D_001FE340[];
+extern char *g_race_route_table[];

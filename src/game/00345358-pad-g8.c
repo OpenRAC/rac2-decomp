@@ -9,7 +9,7 @@ extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
 extern unsigned char g_item_slot_to_record[];
 extern MaterialRecord g_weapon_table[];
 extern int g_selected_item_material __attribute__((sda));
-extern SelectionEntry D_001AA898[];
+extern SelectionEntry g_item_grid_second_mode_rows[];
 extern EquipmentState g_pause_menu_state;
 
 #define MATERIAL(id) ((MaterialRecord *)(D_00139568[id]*224 + (char *)D_00239BA0))->material
@@ -49,7 +49,7 @@ void HandleColumnSelectionInput(SelectionOwner *owner, int buttons)
         if (column >= 3)
             owner->column = 0;
     } else if (buttons & 0x40) {
-        id = D_001AA898[owner->column].v[3];
+        id = g_item_grid_second_mode_rows[owner->column].v[3];
         if (id != 0 && g_item_owned_flags[id] != 0) {
             snd_play_from_global_bank(4, 0, 0);
             g_selected_item_material = MATERIAL(owner->selected);
@@ -62,7 +62,7 @@ void HandleColumnSelectionInput(SelectionOwner *owner, int buttons)
         }
     }
     {
-        int selected = D_001AA898[owner->column].v[3];
+        int selected = g_item_grid_second_mode_rows[owner->column].v[3];
         owner->selected = selected;
         if (selected != 0 && g_item_owned_flags[selected] != 0)
             g_selected_item_material = MATERIAL(selected);

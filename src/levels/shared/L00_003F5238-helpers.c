@@ -10,7 +10,7 @@ typedef struct {
     int active;
     char pad[12];
 } CollisionRequest5238;
-extern unsigned char D_0013957F;
+extern unsigned char g_beam_weapon_index;
 typedef struct { char prefix[0x50]; float speed; char gap[0x1c]; float distance; char rest[0x6c]; } Tuning;
 extern Tuning g_weapon_l00_table[];
 extern char *g_hero_moby;
@@ -26,7 +26,7 @@ extern int weapon_start_health_drain(char *,int,int);
    and damage. Returns 1 when the bolt should stop. */
 int vaporizer_bolt_test_hit(char *object,char *source)
 {
-    unsigned int settingsIndex = D_0013957F;
+    unsigned int settingsIndex = g_beam_weapon_index;
     Tuning *settings = g_weapon_l00_table + settingsIndex;
     CollisionRequest5238 request;
     TI128 position;

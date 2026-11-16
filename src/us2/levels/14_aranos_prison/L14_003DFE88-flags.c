@@ -27,10 +27,10 @@ extern void gfx_draw_moby_edge_lines(char *, int);
 extern void lift_clamp_group_riders(char *);
 extern int group_is_linked_to_owner(char *), group_is_misaligned(char *);
 extern int TryClaimNotice(int, int, int);
-extern unsigned int D_00138324 NOT_SDA;
-extern Projection *D_L14_001B268C __attribute__((sda));
+extern unsigned int g_pad_held_flags NOT_SDA;
+extern Projection *g_platform_projection_table __attribute__((sda));
 extern Projection *D_L14_001B268C_gp SDATA(D_L14_001B268C);
-extern char D_L14_001A8F20[] __attribute__((sda));
+extern char g_identity_l14_matrix[] __attribute__((sda));
 extern float vec_distance_xy(void *, void *);
 
 /* Move between the initial height and the projection-table height, updating
@@ -62,7 +62,7 @@ void func_US2_L14_003E01F8(char *self) {
             if (!*(int *)(state + 0x6C) || group_is_linked_to_owner(self) || group_is_misaligned(self)) {
                 TryClaimNotice(4, 0x12EC, 1);
                 {
-                    int flags = D_00138324 & 0x10;
+                    int flags = g_pad_held_flags & 0x10;
                     active = flags != 0;
                 }
             }
@@ -76,7 +76,7 @@ void func_US2_L14_003E01F8(char *self) {
                 }
             } else {
                 PlayerState *player = &g_hero_state;
-                if (math_fabs(player->pos[2] - D_L14_001B268C[*(int *)(state + 0x60)].height) < 1.0f) {
+                if (math_fabs(player->pos[2] - g_platform_projection_table[*(int *)(state + 0x60)].height) < 1.0f) {
                     if (vec_distance_xy(player->pos, self + 0x10) < 24.0f)
                         active = 1;
                 }
@@ -108,7 +108,7 @@ void func_US2_L14_003E01F8(char *self) {
             gfx_draw_moby_edge_lines(self, 0);
             {
                 char *collision = state + 0x20;
-                mat_combine_and_store(collision, D_L14_001A8F20, self + 0xF0, self + 0xF0);
+                mat_combine_and_store(collision, g_identity_l14_matrix, self + 0xF0, self + 0xF0);
             }
         } else {
             math_step_value_toward_target(self + 0x18, state + 0x74, target, 0.00055555557f, speed, 0.166666672f);

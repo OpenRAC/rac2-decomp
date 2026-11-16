@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_001A8C88[] __attribute__((sda));
-extern int D_001A8C8C[] __attribute__((sda));
+extern int g_menu_panel_active[] __attribute__((sda));
+extern int g_menu_panel_flag[] __attribute__((sda));
 
-extern int *D_001AA4F0 __attribute__((section(".sdata")));
+extern int *g_map_select_list __attribute__((section(".sdata")));
 extern int *D_001AA4F0_1 __attribute__((sda));
-extern unsigned char D_001A7AFD __attribute__((section(".sdata")));
+extern unsigned char g_map_overlay_flag __attribute__((section(".sdata")));
 extern int map_is_entry_available(int);
 
 extern char D_0014B540_1[];
 
-extern short D_00152CE4[];
+extern short g_load_entry_index[];
 
 int load_start_disc_entry(int, int, int, int);
 
@@ -30,9 +30,9 @@ typedef struct {
     u8 fielda7;
 } OrbitalBitmapView;
 
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 
-extern int D_L03_001CA2A8[];
+extern int g_map_used_slot_table[];
 
 /* 28-entry table scan.  The table is reached through the resident pointer at
    0x1AA7F0; the caller's id is looked up from index 0, the first hit wins, and
@@ -46,7 +46,7 @@ extern int D_L03_001CA2A8[];
    with the global gcc loads it into $v1, hoists the loop-invariant value and
    emits the retail `move $a2,$v1` copy at the block boundary (28 instructions,
    byte-identical). */
-extern int *D_L01_001AA7F0 __attribute__((sda));
+extern int *g_map_id_table __attribute__((sda));
 
 extern int D_001A79F0_3 __attribute__((sda));
 
@@ -85,11 +85,11 @@ typedef struct {
     unsigned char gap84[0x5c];
 } DobboFormatMapped396;
 
-extern DobboFormatRoot396 D_L00_001C93A0;
+extern DobboFormatRoot396 g_format_root;
 
-extern const char D_L00_001A9AA0[];
+extern const char g_str_amount_format[];
 
-extern const char D_L00_001A9AA8[];
+extern const char g_str_amount_plain[];
 
 extern char *GetLocalizedString(int);
 
@@ -106,16 +106,16 @@ void load_start_disc_entry_by_id(int id, int destBuffer)
             break;
     }
     if (i != 48) {
-        D_00152CE4[0] = (short)i;
+        g_load_entry_index[0] = (short)i;
         load_start_disc_entry(i, -1, destBuffer, 1);
     }
 }
 
 extern int log2dim(int);
 
-extern int D_001A72D0[] __attribute__((sda));
+extern int g_vram_cursor[] __attribute__((sda));
 
-extern int D_001B15FC[] __attribute__((sda));
+extern int g_palette_upload_count[] __attribute__((sda));
 
 typedef struct {
     int addr;
@@ -127,7 +127,7 @@ typedef struct {
     short tbp;
 } TexSlot;
 
-extern TexSlot D_001B9340[];
+extern TexSlot g_upload_slots[];
 
 typedef struct {
     char *clut;
@@ -159,11 +159,11 @@ long load_texture_file(char *p)
     t.tw = log2dim(*(int *)(p + 8));
     t.th = log2dim(*(int *)(p + 0xC));
     t.pix = p + 0x20 + t.clutSize;
-    addr = D_001A72D0[0];
+    addr = g_vram_cursor[0];
     cbp = addr >> 8;
     addr += 0x400;
     tbp = addr >> 8;
-    D_001A72D0[0] = addr + (1 << (t.tw + t.th));
+    g_vram_cursor[0] = addr + (1 << (t.tw + t.th));
     w = t.tw - 6;
     if (w < 0) {
         w = 0;
@@ -174,15 +174,15 @@ long load_texture_file(char *p)
                  | ((unsigned long)t.th << 30) | ((unsigned long)1 << 34)
                  | ((unsigned long)cbp << 37))
         | ((long)4 << 61);
-    if (D_001B15FC[0] < 0x40) {
-        D_001B9340[D_001B15FC[0]].addr = (int)t.clut;
-        D_001B9340[D_001B15FC[0]].cbp = cbp;
-        D_001B9340[D_001B15FC[0]].unk4 = 0;
-        D_001B9340[D_001B15FC[0]].unk8 = (int)t.pix;
-        D_001B9340[D_001B15FC[0]].tw = t.tw;
-        D_001B9340[D_001B15FC[0]].th = t.th;
-        D_001B9340[D_001B15FC[0]].tbp = tbp;
-        D_001B15FC[0]++;
+    if (g_palette_upload_count[0] < 0x40) {
+        g_upload_slots[g_palette_upload_count[0]].addr = (int)t.clut;
+        g_upload_slots[g_palette_upload_count[0]].cbp = cbp;
+        g_upload_slots[g_palette_upload_count[0]].unk4 = 0;
+        g_upload_slots[g_palette_upload_count[0]].unk8 = (int)t.pix;
+        g_upload_slots[g_palette_upload_count[0]].tw = t.tw;
+        g_upload_slots[g_palette_upload_count[0]].th = t.th;
+        g_upload_slots[g_palette_upload_count[0]].tbp = tbp;
+        g_palette_upload_count[0]++;
     }
     return reg;
 }
@@ -212,7 +212,7 @@ u32 save_test_flag_bit(s32 index) {
     u32 bit=index%8;
     u32 previous=0;
     if(bit<8) {
-        OrbitalBitmapView *state=(OrbitalBitmapView *)(D_001395B8+byteIndex);
+        OrbitalBitmapView *state=(OrbitalBitmapView *)(g_game_flag_table+byteIndex);
         previous=((s32)state->fielda7>>bit)&1;
     }
     return previous;
@@ -224,7 +224,7 @@ u32 save_test_flag_bit(s32 index) {
 /* Finds the first used map slot out of five that is still unassigned, scanning forward or backward. */
 int map_find_free_slot(int reverse)
 {
-    int *usedTable = D_L03_001CA2A8;
+    int *usedTable = g_map_used_slot_table;
     int *assignTable = usedTable + 5;
     int i;
 
@@ -274,7 +274,7 @@ int map_find_cache_slot_by_id(int id) {
 /* looks the level up in the map's table and then walks the levels next to it */
 int PickNextMap(void)
 {
-    int flag = D_001A7AFD ? 0x100 : 0;
+    int flag = g_map_overlay_flag ? 0x100 : 0;
     unsigned int id = g_map_overlay_state[0x230 / 4] + flag;
     int level;
     int *p;
@@ -293,7 +293,7 @@ int PickNextMap(void)
     level = g_map_overlay_state[0x230 / 4];
     index = 0;
     if (level < 0x1C) {
-        p = D_001AA4F0;
+        p = g_map_select_list;
         while (*p != level) {
             p++;
             index++;
@@ -329,9 +329,9 @@ int map_find_table_index(int mapId)
     int i;
 
     for (i = 0; i < 28; i++)
-        if (D_L01_001AA7F0[i] == mapId) { index = i; break; }
+        if (g_map_id_table[i] == mapId) { index = i; break; }
 
-    if (D_L01_001AA7F0[index] == 0)
+    if (g_map_id_table[index] == 0)
         index = D_001A79F0_3 ? -1 : index;
 
     return index;
@@ -410,12 +410,12 @@ void compose_bitmap_from_mask(u8 *out,u8 *sourceSet,u8 *sourceClear,u8 *maskBits
  } while(i<0x8000);
 }
 
-extern int D_001C51D0;
+extern int g_selected_map_index;
 extern int map_refresh_ready_flag(void);
 
 /* Stores the current map number and refreshes the map-ready flag. */
 void map_set_current_and_refresh(int mapId) {
-    D_001C51D0 = mapId;
+    g_selected_map_index = mapId;
     map_refresh_ready_flag();
 }
 
@@ -522,7 +522,7 @@ void decode_map_rle_row(u8 *out,s32 index,u8 *base,short *offsets) {
 
 extern int D_001A79F0_4[] __attribute__((sda));
 
-extern int D_001399B8[];
+extern int g_map_fill_max_counts[];
 
 extern void mem_clear(void *, int, int);
 
@@ -549,8 +549,8 @@ void map_fill_buffer(void *buffer)
     count = math_fast_helper_c(buffer, 0x800, table[0x14 / 4], table[0xC / 4]);
     if (count == -1)
         map_build_occlusion_from_image(buffer);
-    if (D_001399B8[D_001A79F0_4[0]] < count)
-        D_001399B8[D_001A79F0_4[0]] = count;
+    if (g_map_fill_max_counts[D_001A79F0_4[0]] < count)
+        g_map_fill_max_counts[D_001A79F0_4[0]] = count;
 }
 
 
@@ -604,7 +604,7 @@ void map_expand_mask_to_pixels(char *dst, unsigned char *src)
 void text_format_localized_amount(int index, unsigned char *output)
 {
     unsigned char temporary[80];
-    const unsigned char *source = GetLocalizedString(D_L00_001C93A0.rows[index].text_id);
+    const unsigned char *source = GetLocalizedString(g_format_root.rows[index].text_id);
     unsigned char *p = temporary;
     if (!source)
         return;
@@ -616,11 +616,11 @@ void text_format_localized_amount(int index, unsigned char *output)
     }
     ++source;
     if (*source == 'b') {
-        int key = D_L00_001C93A0.rows[index].mapped_key;
+        int key = g_format_root.rows[index].mapped_key;
         DobboFormatMapped396 *record = (DobboFormatMapped396 *)&g_weapon_l00_table[g_item_slot_to_record[key]];
-        sprintf((char *)temporary, D_L00_001A9AA0, record->amount);
+        sprintf((char *)temporary, g_str_amount_format, record->amount);
     } else {
-        sprintf((char *)temporary, D_L00_001A9AA8);
+        sprintf((char *)temporary, g_str_amount_plain);
     }
     ++source;
     while (*p)
@@ -632,9 +632,9 @@ void text_format_localized_amount(int index, unsigned char *output)
 
 
 
-extern int D_L00_0028D890[];
-extern void *D_L00_001C5620[];
-extern float D_00139A28[];
+extern int g_map_band_offsets[];
+extern void *g_map_band_colours[];
+extern float g_map_marker_table[];
 
 /* Copies the colour entries of one band of the resident table.
    The two base addresses are taken in the retail's order - the source
@@ -653,12 +653,12 @@ void map_copy_band_colours(void)
 
     if ((unsigned)band >= 0x13)
         return;
-    first = D_L00_0028D890[band];
-    last = D_L00_0028D890[band + 1];
+    first = g_map_band_offsets[band];
+    last = g_map_band_offsets[band + 1];
     if (first >= last)
         return;
-    table = D_L00_001C5620;
-    colours = D_00139A28;
+    table = g_map_band_colours;
+    colours = g_map_marker_table;
     dst = &colours[first * 4];
     src = &table[first];
     first = last - first;
@@ -692,9 +692,9 @@ extern SharedState g_memcard_state;
 extern int g_save_menu_screen[] __attribute__((sda));
 
 extern unsigned int g_save_menu_flags[] __attribute__((sda));
-extern int D_001B1A3C __attribute__((sda));
-extern int D_001B1A38 __attribute__((sda));
-extern void (*D_002560D0[])(void);
+extern int g_map_state_flag __attribute__((sda));
+extern int g_map_state_timer __attribute__((sda));
+extern void (*g_map_state_handlers[])(void);
 /* Runs the current state's update function once per frame and counts how long the state has lasted; flag bits can first switch to state 20 or 21. */
 void map_update_state_machine(void)
 {
@@ -703,7 +703,7 @@ void map_update_state_machine(void)
     char *state = (char *)&g_memcard_state;
     if (*(int *)(state + 0x16c) != 0 ||
         *(int *)(state + 0x10) != 0 || *(int *)(state + 0x24) > 0)
-        D_001B1A3C = 1;
+        g_map_state_flag = 1;
     flags = *(int *)g_save_menu_flags;
     prevState = g_save_menu_screen[0];
     if (flags & 0x80) {
@@ -715,10 +715,10 @@ void map_update_state_machine(void)
         g_save_menu_screen[0] = 20;
         *(int *)g_save_menu_flags = (flags & ~0x100) | 0x40;
     }
-    D_002560D0[g_save_menu_screen[0]]();
-    D_001B1A38++;
+    g_map_state_handlers[g_save_menu_screen[0]]();
+    g_map_state_timer++;
     if (g_save_menu_screen[0] != prevState)
-        D_001B1A38 = 0;
+        g_map_state_timer = 0;
 }
 
 /* Goes back to the default state 3 and clears the shared state fields. */
@@ -756,7 +756,7 @@ void map_resolve_state_requests(void)
     }
     if (state->field10 != 0) {
         state->field17c = 0;
-        if (D_001A8C88[0] != 0 || D_001A8C8C[0] != 0) {
+        if (g_menu_panel_active[0] != 0 || g_menu_panel_flag[0] != 0) {
             g_save_menu_screen[0] = 3;
             return;
         }

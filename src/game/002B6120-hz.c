@@ -1,7 +1,7 @@
 #include "names.h"
 extern char *moby_get_private_value_4(void *);
 extern float gravity_get_center_distance(void *);
-extern int D_001A8CA0 __attribute__((sda));
+extern int g_ground_check_inhibit __attribute__((sda));
 
 /* Compares the object's float at 0x18 with the partner's float at 0x90 and, when the
    object is still smaller, with the found object's float at 0x40 less half; the
@@ -22,7 +22,7 @@ int coll_is_object_well_above_ground(void *self, void *ctl)
         return 0;
     }
     result = 0;
-    if (D_001A8CA0 != 0) {
+    if (g_ground_check_inhibit != 0) {
         f = gravity_get_center_distance((char *)self + 0x10);
         if (f < *(float *)((char *)ground + 0x40) - 0.5f) {
             result = 1;

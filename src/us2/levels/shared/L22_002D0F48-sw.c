@@ -9,25 +9,25 @@ extern char g_pad_state[];
 extern char g_item_slot_to_record[];
 extern char g_sound_state[];
 extern char g_hero_state[];
-extern u8 D_001A7BB2[] MACRO_ADDR;
+extern u8 g_option_toggle_b[] MACRO_ADDR;
 extern u8 g_item_owned_flags[] MACRO_ADDR;
 extern s32 g_current_map_index;
-extern f32 D_L22_001A7DAC[][4] MACRO_ADDR;
-extern s32 D_L22_001A7DDC;
-extern s32 D_L22_001A8FF4;
-extern f32 D_L22_001B1D68;
-extern s32 D_L22_001A8FB4;
-extern s32 D_L22_001B1C44;
-extern s32 D_L22_001A8A48;
-extern u8 D_L22_001A7CA0[16] __attribute__((sda));
-extern u8 D_L22_001A7CB0[16] __attribute__((sda));
-extern s32 D_L22_001A7DD8[2] __attribute__((sda));
-extern char D_L22_0025DC80[];
-extern char D_L22_0025DE90[];
+extern f32 g_hero_distance_params[][4] MACRO_ADDR;
+extern s32 g_hero_l22_extra_animation_id;
+extern s32 g_hero_flag_b;
+extern f32 g_hero_l22_speed_threshold;
+extern s32 g_hero_l22_input_block_flag;
+extern s32 g_hero_l22_action_flag_2;
+extern s32 g_hero_l22_action_flag;
+extern u8 g_hero_l22_particle_params_a[16] __attribute__((sda));
+extern u8 g_hero_l22_particle_params_b[16] __attribute__((sda));
+extern s32 g_hero_l22_animation_ids[2] __attribute__((sda));
+extern char g_hero_action_records[];
+extern char g_hero_tuning_block[];
 typedef struct { s32 w[11]; } Rec2C;
-extern Rec2C D_L22_0025FA10[];
-extern char D_L22_002645F0[];
-extern char D_L22_001B9B40[];
+extern Rec2C g_hero_anim_records[];
+extern char g_weapon_l22_table[];
+extern char g_hero_l22_state_block[];
 s32 CollLine(void *, void *, s32, void *, s32);
 s32 coll_test_point(void *, s32, void *, f32);
 s32 math_fast_float_d(void *);
@@ -106,7 +106,7 @@ f32 cam_get_view_space_height(s8 *in);
 void cam_set_view_space_height(void *dst, void *src, f32 k);
 f32 EvaluateQuantizedHeight(f32 *a0, f32 *a1, s32 *out, f32 scale);
 void func_L00_0030C710(s32 argument);
-void func_US2_L00_0030D9F8(s32 argument);
+void module_l00_call_handler_with_arg_4_us2(s32 argument);
 f32 math_compute_falling_step_offset(f32 *a0, f32 *a1, s32 *a2, f32 factor);
 f32 weapon_compute_shot_launch_speed(f32 *a, f32 *b, f32 *out, f32 d, f32 e);
 void moby_set_flag_bit(u8 *entity, s32 enabled);
@@ -116,10 +116,10 @@ s32 Spline_AdvanceByDistance(void *path, void *out, s32 *index, f32 *offset, s32
 s32 find_nearest_path_point(void *, void *, void *, s32 *, f32 *, s32, f32, f32, f32);
 void part_l00_spawn_spark_pairs(void *position,s32 count);
 s32 level_get_saved_value(void);
-s32 func_US2_L22_002B7658(s32);
+s32 hero_l22_apply_hazard_contact_us2(s32);
 s32 nearest_rail_point(s8 *, void **, s128 *, void *, void *, s32 *, void *, s32, s32);
-extern char D_L22_0025DE90[];
-extern char D_L22_001B9B40[];
+extern char g_hero_tuning_block[];
+extern char g_hero_l22_state_block[];
 extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
 s32 player_slot_has_object(u32 a0);
 extern void euler_rotation_basis(void *, void *);
@@ -155,7 +155,7 @@ void func_US2_L22_002D0F48(void) {
     sp78 = FLD(g_hero_state, s32, 0x229C);
     sp7C = FLD(g_hero_state, s32, 0x2298);
     sp80 = FLD(sp74, u8, 0x43);
-    if (func_US2_L22_002B7658(1) != 0) {
+    if (hero_l22_apply_hazard_contact_us2(1) != 0) {
         goto end;
     }
     UpdateHeroHeldTarget();
@@ -171,7 +171,7 @@ void func_US2_L22_002D0F48(void) {
     if ((hero_check_fall_transition() != 0) || (hero_try_start_ledge_move() != 0) || (hero_try_start_transition() != 0)) {
         goto end;
     }
-    if (((FLD(g_pad_state, s32, 0x1A4) & 0x10) || (FLD(g_pad_state, s32, 0x1C4) & 0x10)) && (FLD(g_hero_state, u8, 0x123C) != 2) && (D_L22_001A8FB4 == 0) && (D_001A7BB2[1] == 0) && (D_L22_001B1C44 >= 8)) {
+    if (((FLD(g_pad_state, s32, 0x1A4) & 0x10) || (FLD(g_pad_state, s32, 0x1C4) & 0x10)) && (FLD(g_hero_state, u8, 0x123C) != 2) && (g_hero_l22_input_block_flag == 0) && (g_option_toggle_b[1] == 0) && (g_hero_l22_action_flag_2 >= 8)) {
         if (((FLD(g_hero_state, u8, 0x22BC) == 0) || (FLD(g_hero_state, u8, 0x22B4) == 1) || (FLD(g_hero_state, s16, 0x1D2) != 0))
             && ((FLD(g_hero_state, u8, 0x22B7) == 0) || (FLD(g_hero_state, u8, 0x22B4) == 1) || (FLD(g_hero_state, s16, 0x1D2) != 0))) {
             switch (FLD(g_hero_state, u8, 0x22B4)) {
@@ -183,7 +183,7 @@ void func_US2_L22_002D0F48(void) {
                     FLD(g_hero_state, s16, 0x24F6) = 0xF;
                 }
                 hud_set_slot_contents(0x23, 0, menu_init_panel_layout, weapon_wheel_update_select, weapon_wheel_draw, 0, 0);
-                func_US2_L00_0030D9F8(0x168);
+                module_l00_call_handler_with_arg_4_us2(0x168);
                 func_L00_0030C710(0xB4);
                 break;
             case 1:
@@ -194,7 +194,7 @@ void func_US2_L22_002D0F48(void) {
     }
     hero_update_button_hold_timers();
     hero_apply_pending_change();
-    if (FLD(g_hero_state, f32, 0x88) < D_L22_001B1D68) {
+    if (FLD(g_hero_state, f32, 0x88) < g_hero_l22_speed_threshold) {
         if ((FLD(g_hero_state, f32, 0x31C) > 2.0f) && (FLD(g_hero_state, u8, 0x22B4) != 2) && (FLD(g_hero_state, u32, 0x2294) != 0x74)) {
             func_US2_L22_002C9B20(0x74, 1);
             goto end;
@@ -230,7 +230,7 @@ void func_US2_L22_002D0F48(void) {
             }
         }
         }
-        if ((FLD(D_L22_0025DE90, f32, 0x258) > 0.6108653f) || (FLD(D_L22_0025DE90, f32, 0x254) > 0.43633235f)) {
+        if ((FLD(g_hero_tuning_block, f32, 0x258) > 0.6108653f) || (FLD(g_hero_tuning_block, f32, 0x254) > 0.43633235f)) {
             obj = FLD(g_hero_state, u8 *, 0x1310);
             if ((obj != NULL) && (FLD(obj, u8, 0x43) != 1)) {
                 anim_start_blended(obj, 1, 0, 0xC);
@@ -246,7 +246,7 @@ void func_US2_L22_002D0F48(void) {
                 u8 *rec;
                 FLD(g_hero_state, s16, 0x208) = 0x78;
                 FLD(g_hero_state, s32, 0x248C) = sp40;
-                rec = D_L22_0025DC80 + sp40 * 0x70;
+                rec = g_hero_action_records + sp40 * 0x70;
                 FLD(rec, s32, 0x60) = FLD(rec, f32, 0x5C) * 60.0f;
                 if (FLD(rec, s32, 0x44) != 0) {
                     func_US2_L22_002C9B20(0x3C, 1);
@@ -270,7 +270,7 @@ void func_US2_L22_002D0F48(void) {
         }
         if (FLD(g_hero_state, s32, 0x1B8) >= 0xB) {
             u8 *o2 = FLD(g_hero_state, u8 *, 0x1314);
-            if ((o2 != NULL) && (FLD(o2, u8, 0x43) == 1) && (math_fast_float_d(g_hero_state + 0x24E8) != 0) && (FLD(D_L22_0025DE90, f32, 0x258) < 0.5585054f) && (FLD(D_L22_0025DE90, f32, 0x254) < 0.3490659f) && (FLD(g_hero_state, s32, 0x1334) == 2)) {
+            if ((o2 != NULL) && (FLD(o2, u8, 0x43) == 1) && (math_fast_float_d(g_hero_state + 0x24E8) != 0) && (FLD(g_hero_tuning_block, f32, 0x258) < 0.5585054f) && (FLD(g_hero_tuning_block, f32, 0x254) < 0.3490659f) && (FLD(g_hero_state, s32, 0x1334) == 2)) {
                 FLD(g_hero_state, s32, 0x24E8) = math_random_int_range(0x6E, 0x10E);
                 hero_set_linked_objects_anim();
             }
@@ -280,7 +280,7 @@ void func_US2_L22_002D0F48(void) {
             if (slot != FLD(g_hero_state, s32, 0x24B4)) {
                 cancel_hero_item_animation();
             } else {
-                s32 want = FLD(D_L22_002645F0 + ((u8 *)g_item_slot_to_record)[slot] * 0xE0, s32, 0x28);
+                s32 want = FLD(g_weapon_l22_table + ((u8 *)g_item_slot_to_record)[slot] * 0xE0, s32, 0x28);
                 if (FLD(FLD(g_hero_state, u8 *, 0x2290), u8, 0x43) != want) {
                     if (FLD(g_hero_state, s32, 0xE98) != 0) {
                         FLD(g_hero_state, s32, 0xEA4) = 1;
@@ -317,7 +317,7 @@ void func_US2_L22_002D0F48(void) {
                 }
             }
         }
-        if ((FLD(g_hero_state, s16, 0x348) == 1) && (D_L22_001A8FF4 == 0) && (PadPressedWithin(0x40, 7, NULL) != 0)) {
+        if ((FLD(g_hero_state, s16, 0x348) == 1) && (g_hero_flag_b == 0) && (PadPressedWithin(0x40, 7, NULL) != 0)) {
             func_US2_L22_002C9B20(0x6E, 1);
             break;
         }
@@ -340,7 +340,7 @@ void func_US2_L22_002D0F48(void) {
             s32 turned;
             if (((FLD(g_hero_state, s32, 0x22A0) == 1) || (FLD(g_hero_state, s32, 0x22A0) == 0x1D)) && (FLD(g_hero_state, s32, 0x1B8) < 0x18) && (FLD(g_hero_state, s16, 0x348) != 1)) {
                 hero_resolve_stick_direction(0, 1.0f);
-                if ((FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(D_L22_001B9B40, f32, 0x158)) > 1.2217306f) && (fast_vec_dist(g_hero_state + 0x80, D_L22_001B9B40 + 0x140) < 2.5f)) {
+                if ((FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_l22_state_block, f32, 0x158)) > 1.2217306f) && (fast_vec_dist(g_hero_state + 0x80, g_hero_l22_state_block + 0x140) < 2.5f)) {
                     go = 0;
                 }
             }
@@ -616,7 +616,7 @@ void func_US2_L22_002D0F48(void) {
                 FLD(g_hero_state, f32, 0xC20) = 1.0f;
             }
         }
-        rec = (u8 *)&D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)];
+        rec = (u8 *)&g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)];
         frames = (FloatToInt(FLD(g_hero_state, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
         if ((f32)FLD(rec, s32, 0x14) < FLD(g_hero_state, f32, 0xC38)) {
             if (FLD(g_hero_state, s32, 0xC2C) != 0) {
@@ -640,7 +640,7 @@ void func_US2_L22_002D0F48(void) {
     case 0x13:
     case 0x15:
     {
-        u8 *rec = (u8 *)&D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)];
+        u8 *rec = (u8 *)&g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)];
         s32 frames = (FloatToInt(FLD(g_hero_state, f32, 0xC38)) - FLD(rec, s32, 0xC)) * 2;
         u32 st = FLD(g_hero_state, u32, 0x2294);
         s32 lim;
@@ -669,7 +669,7 @@ void func_US2_L22_002D0F48(void) {
         }
         if ((FLD(g_hero_state, f32, 0xC38) > 34.0f) && (FLD(g_hero_state, f32, 0x24B8) > 0.9f)) {
             func_US2_L22_002C9B20(2, 0);
-            set_hero_animation(3, D_L22_001A7DD8[FLD(g_hero_state, s32, 0x2298)], 13.0f);
+            set_hero_animation(3, g_hero_l22_animation_ids[FLD(g_hero_state, s32, 0x2298)], 13.0f);
             break;
         }
         if (FLD(g_hero_state, s32, 0xC2C) != 0) {
@@ -917,10 +917,10 @@ void func_US2_L22_002D0F48(void) {
             v30[0] = -0.083333336f;
             moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)v10);
             moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)v20);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v10, v30, (s32 *)D_L22_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v10, v30, (s32 *)D_L22_001A7CB0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v20, v30, (s32 *)D_L22_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v20, v30, (s32 *)D_L22_001A7CB0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v10, v30, (s32 *)g_hero_l22_particle_params_a, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v10, v30, (s32 *)g_hero_l22_particle_params_b, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v20, v30, (s32 *)g_hero_l22_particle_params_a, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), v20, v30, (s32 *)g_hero_l22_particle_params_b, 1);
         }
         break;
     }
@@ -995,7 +995,7 @@ void func_US2_L22_002D0F48(void) {
                     hero_record_play_counters();
                     return;
     case 0x6D:
-        if ((f32)D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)].w[6] < FLD(g_hero_state, f32, 0xC38)) {
+        if ((f32)g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)].w[6] < FLD(g_hero_state, f32, 0xC38)) {
             func_US2_L22_002C9B20(0, 1);
         }
         break;
@@ -1300,7 +1300,7 @@ void func_US2_L22_002D0F48(void) {
             FLD(g_hero_state, s16, 0x68C) = 0;
         } else if (st == 0x2A) {
             s32 top;
-            if ((PadPressedWithin(0x40, 5, NULL) != 0) && ((f32)D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)].w[5] <= FLD(g_hero_state, f32, 0xC38))) {
+            if ((PadPressedWithin(0x40, 5, NULL) != 0) && ((f32)g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)].w[5] <= FLD(g_hero_state, f32, 0xC38))) {
                 func_US2_L22_002C9B20(0x28, 1);
                 break;
             }
@@ -1314,7 +1314,7 @@ void func_US2_L22_002D0F48(void) {
                 }
                 break;
             }
-            if ((f32)D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)].w[6] < FLD(g_hero_state, f32, 0xC38)) {
+            if ((f32)g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)].w[6] < FLD(g_hero_state, f32, 0xC38)) {
                 func_US2_L22_002C9B20(0x27, 1);
                 break;
             }
@@ -1729,7 +1729,7 @@ void func_US2_L22_002D0F48(void) {
             hero_set_level_clock_and_bytes(5, 2, 0, 1, 0.016f, 0.002f);
             break;
         }
-        if ((D_L22_001A7DAC[0][2] < FLD(g_hero_state, f32, 0x1B0)) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
+        if ((g_hero_distance_params[0][2] < FLD(g_hero_state, f32, 0x1B0)) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
             if ((FLD(g_hero_state, u8, 0x1492) != 0) || (FLD(g_hero_state, u8, 0x22B9) != 0)) {
                 func_US2_L22_002C9B20(2, 1);
                 break;
@@ -1741,7 +1741,7 @@ void func_US2_L22_002D0F48(void) {
                 FLD(g_hero_state, s8, 0x40E) = 1;
             }
             hero_set_level_clock_and_bytes(5, 2, 1, 0, 0.016f, 0.002f);
-        } else if (D_L22_001A7DAC[0][2] < FLD(g_hero_state, f32, 0x1B0)) {
+        } else if (g_hero_distance_params[0][2] < FLD(g_hero_state, f32, 0x1B0)) {
             if ((FLD(g_hero_state, u8, 0x1492) != 0) || (FLD(g_hero_state, u8, 0x22B9) != 0)) {
                 func_US2_L22_002C9B20(2, 1);
                 break;
@@ -1749,7 +1749,7 @@ void func_US2_L22_002D0F48(void) {
             func_US2_L22_002C9B20(2, 0);
             if (FLD(g_hero_state, u32, 0x2294) == 2) {
                 FLD(g_hero_state, s32, 0x2298) = 1;
-                set_hero_animation(4, D_L22_001A7DDC, 12.0f);
+                set_hero_animation(4, g_hero_l22_extra_animation_id, 12.0f);
             }
             hero_set_level_clock_and_bytes(5, 2, 1, 0, 0.016f, 0.002f);
         } else if (FLD(g_hero_state, s16, 0x34E) == 0) {
@@ -1928,7 +1928,7 @@ void func_US2_L22_002D0F48(void) {
                 }
             }
             cur = FLD(g_hero_state, u32, 0x2294);
-            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(sp74, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(sp74, u8, 0x42)) == cur)) && (FLD(sp74, u8, 0x42) == FLD(sp74, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L22_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
+            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(sp74, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(sp74, u8, 0x42)) == cur)) && (FLD(sp74, u8, 0x42) == FLD(sp74, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < g_hero_distance_params[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
                 f32 rate = 9.0f / FLD(g_hero_state, f32, 0xC20);
                 s32 at;
                 if (rate > 10.0f) {
@@ -1954,11 +1954,11 @@ void func_US2_L22_002D0F48(void) {
                 break;
             }
             if ((FLD(g_hero_state, u8, 0x149A) == 0) && (FLD(g_hero_state, s16, 0x1E0) == 0) && (PadPressedWithin(0x40, 8, NULL) != 0) && (FLD(g_hero_state, s16, 0x34E) < 4)) {
-                if (!(FLD(g_hero_state, f32, 0x1B0) > D_L22_001A7DAC[0][2])) {
+                if (!(FLD(g_hero_state, f32, 0x1B0) > g_hero_distance_params[0][2])) {
                     func_US2_L22_002C9B20(7, 1);
                 } else if (!(FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.0471976f)) {
                     func_US2_L22_002C9B20(7, 1);
-                } else if (D_L22_001A7DAC[1][1] * 0.014166668f < FLD(g_hero_state, f32, 0x174)) {
+                } else if (g_hero_distance_params[1][1] * 0.014166668f < FLD(g_hero_state, f32, 0x174)) {
                     func_US2_L22_002C9B20(9, 1);
                 } else {
                     func_US2_L22_002C9B20(7, 1);
@@ -2119,7 +2119,7 @@ void func_US2_L22_002D0F48(void) {
             func_US2_L22_002C9B20(0x4E, 1);
             break;
         }
-        rec = (u8 *)&D_L22_0025FA10[FLD(g_hero_state, s16, 0xBFC)];
+        rec = (u8 *)&g_hero_anim_records[FLD(g_hero_state, s16, 0xBFC)];
         if (FLD(g_hero_state, s32, 0xC2C) == 0) {
             s32 busy;
             if ((f32)FLD(rec, s32, 0x18) < FLD(g_hero_state, f32, 0xC38)) {
@@ -2207,7 +2207,7 @@ void func_US2_L22_002D0F48(void) {
         if (FLD(g_hero_state, u8, 0x49C) >= 2) {
             FLD(g_hero_state, s32, 0x24A0) = 0;
             hero_resolve_stick_direction(0, 1.0f);
-            if ((FLD(g_hero_state, f32, 0x1B0) > D_L22_001A7DAC[0][2]) && (FLD(g_hero_state, f32, 0x24B8) > 0.5f) && (FLD(g_hero_state, u8, 0x149A) == 0) && (FLD(g_hero_state, s16, 0x1E0) == 0) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
+            if ((FLD(g_hero_state, f32, 0x1B0) > g_hero_distance_params[0][2]) && (FLD(g_hero_state, f32, 0x24B8) > 0.5f) && (FLD(g_hero_state, u8, 0x149A) == 0) && (FLD(g_hero_state, s16, 0x1E0) == 0) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
                 func_US2_L22_002C9B20(0x40, 1);
             } else if (FLD(g_hero_state, u8, 0x49C) >= 0xD) {
                 func_US2_L22_002C9B20(0x3F, 1);
@@ -2481,12 +2481,12 @@ void func_US2_L22_002D0F48(void) {
     {
         s32 lo;
         s32 now;
-        FLD(D_L22_0025DE90, f32, 0x1334) = 0.015f;
-        FLD(D_L22_0025DE90, f32, 0x1338) = 0.3f;
-        FLD(D_L22_0025DE90, f32, 0x12F4) = 0.6981318f;
+        FLD(g_hero_tuning_block, f32, 0x1334) = 0.015f;
+        FLD(g_hero_tuning_block, f32, 0x1338) = 0.3f;
+        FLD(g_hero_tuning_block, f32, 0x12F4) = 0.6981318f;
         if (FLD(g_hero_state, s32, 0x187C) != 0) {
-            FLD(D_L22_0025DE90, f32, 0x1504) = 0.52359885f;
-            FLD(D_L22_0025DE90, f32, 0x15B4) = 0.52359885f;
+            FLD(g_hero_tuning_block, f32, 0x1504) = 0.52359885f;
+            FLD(g_hero_tuning_block, f32, 0x15B4) = 0.52359885f;
         }
         if (FLD(g_hero_state, u8, 0x49E) != 0) {
             qcopy(v10, g_hero_state + 0x80);
@@ -2510,9 +2510,9 @@ void func_US2_L22_002D0F48(void) {
             } else if ((FLD(g_hero_state, s16, 0x34E) == 0) && (FLD(g_hero_state, u8, 0x49E) != 0)) {
                 s32 k;
                 FLD(g_hero_state, u8, 0x49C) = 1;
-                FLD(D_L22_001B9B40, f32, 0x160) = 0.15f;
-                FLD(D_L22_001B9B40, s32, 0x168) = 0x1E;
-                FLD(D_L22_001B9B40, s32, 0x16C) = 0;
+                FLD(g_hero_l22_state_block, f32, 0x160) = 0.15f;
+                FLD(g_hero_l22_state_block, s32, 0x168) = 0x1E;
+                FLD(g_hero_l22_state_block, s32, 0x16C) = 0;
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 3;
                 if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC)) {
                     set_hero_animation(FLD(sp74, u8, 0x43), k, 6.0f);
@@ -2555,7 +2555,7 @@ void func_US2_L22_002D0F48(void) {
                 func_US2_L22_002C9B20(0x56, 1);
                 break;
             }
-            if ((FLD(g_hero_state, f32, 0x1B0) > D_L22_001A7DAC[0][2]) && (FLD(g_hero_state, f32, 0x24B8) > 0.5f) && (FLD(g_hero_state, s16, 0x1E0) == 0) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
+            if ((FLD(g_hero_state, f32, 0x1B0) > g_hero_distance_params[0][2]) && (FLD(g_hero_state, f32, 0x24B8) > 0.5f) && (FLD(g_hero_state, s16, 0x1E0) == 0) && (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FLD(g_hero_state, f32, 0x98)) < 1.5707964f)) {
                 func_US2_L22_002C9B20(0x57, 1);
                 break;
             }
@@ -2581,9 +2581,9 @@ void func_US2_L22_002D0F48(void) {
         if (FLD(g_hero_state, f32, 0xF8) < -0.15f) {
             FLD(g_hero_state, f32, 0xF8) = -0.15f;
         }
-        FLD(D_L22_001B9B40, f32, 0x160) = 0.15f;
-        FLD(D_L22_001B9B40, s32, 0x168) = 0x1E;
-        FLD(D_L22_001B9B40, s32, 0x16C) = 0;
+        FLD(g_hero_l22_state_block, f32, 0x160) = 0.15f;
+        FLD(g_hero_l22_state_block, s32, 0x168) = 0x1E;
+        FLD(g_hero_l22_state_block, s32, 0x16C) = 0;
         if (FLD(g_hero_state, s32, 0x1874) <= 0) {
             func_US2_L22_002C9B20(0x5F, 1);
             break;
@@ -2687,7 +2687,7 @@ void func_US2_L22_002D0F48(void) {
                     set_hero_animation(anim, 0, 8.0f);
                 }
             }
-            D_L22_001A8A48 = 0;
+            g_hero_l22_action_flag = 0;
         }
         break;
     case 0x1F:

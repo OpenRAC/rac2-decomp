@@ -17,7 +17,7 @@ import names_header  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 HEADER = ROOT / "include/names.h"
-SYMBOL = r"(?:func|D)_(?:L\d\d_)?[0-9A-Fa-f]{8}"
+SYMBOL = r"(?:func|D)_(?:(?:PAL|US2)_)?(?:L\d\d_)?[0-9A-Fa-f]{8}"
 
 
 @lru_cache(maxsize=1)

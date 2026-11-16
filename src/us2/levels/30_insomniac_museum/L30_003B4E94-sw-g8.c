@@ -9,14 +9,14 @@ typedef struct {
 extern D00138180_Flags g_pad_state;
 extern int g_current_map_index;
 extern char g_hero_state[];
-extern char *D_001B2D1C __attribute__((sda));
+extern char *g_museum_entries __attribute__((sda));
 extern void anim_start_blended(void *, int, int, int);
 extern void cam_reset_entry(int);
 extern int TryClaimNotice(int, int, int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void museum_info_stand_advance_state(char *);
 
-void func_US2_L30_003BE9F8(char *object) {
+void museum_info_stand_update_us2(char *object) {
     char *g;
     char *state = *(char **)(object + 0x68);
     int id;
@@ -62,7 +62,7 @@ void func_US2_L30_003BE9F8(char *object) {
         if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
             TryClaimNotice(8, id, 1);
             if (g_pad_state.f1A4 & 0x10) {
-                char *s0 = D_001B2D1C + (*(int *)state << 8);
+                char *s0 = g_museum_entries + (*(int *)state << 8);
 
                 museum_info_stand_advance_state(s0);
                 hero_reset_position_and_direction(s0 + 0x10, s0 + 0xF0, 0x6F, 1);

@@ -41,11 +41,11 @@ extern void weapon_update_held_anim_state(void *);
 extern void cam_follow_compute_position(void *, void *);
 extern void weapon_update_anim_blend(void *, void *);
 extern void follow_camera_set_height(float, float);
-extern float D_L00_001B14D0 __attribute__((sda));
-extern int D_L00_001B184C MACRO_ADDR;
+extern float g_cam_collision_base_radius __attribute__((sda));
+extern int g_cam_collision_line_mask MACRO_ADDR;
 extern char *g_follow_camera_object[];
-extern char D_L00_001B8E20[];
-extern char D_L00_001BF220[];
+extern char g_camera_move_state[];
+extern char g_hero_l00_position[];
 #define HERO ((Hero *)D_00189E20)
 /* Updates the follow camera each frame: eases its eye position and look-at point toward the target and pulls the camera in when a wall is in the way. */
 void cam_follow_update_collision(char *moby)
@@ -57,7 +57,7 @@ void cam_follow_update_collision(char *moby)
     char *motion = cam_data + 0x160;
     char *out_vec = cam_data + 0x70;
     char *eye_offset;
-    char *cam = D_L00_001B8E20;
+    char *cam = g_camera_move_state;
     char *pi;
     char *vp;
     float dist, scale, r, r2, dd;
@@ -111,18 +111,18 @@ void cam_follow_update_collision(char *moby)
     FastVecAdd(settings + 0x50, e, settings);
     {
         char *o = *(char **)(g_follow_camera_object[0] + 0x70);
-        scale = D_L00_001B14D0 + *(float *)(o + 0x234) * *(float *)(o + 0x22C) * (*(float *)(o + 0x230) - 1.0f);
+        scale = g_cam_collision_base_radius + *(float *)(o + 0x234) * *(float *)(o + 0x22C) * (*(float *)(o + 0x230) - 1.0f);
     }
     FastVecScale(g, cam + 0x20, 20.0f);
     FastVecAdd(g, f, g);
-    if (CollLine(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
-        qcopy(h, D_L00_001BF220);
+    if (CollLine(f, g, g_cam_collision_line_mask, HERO->i[0x8A4], 0))
+        qcopy(h, g_hero_l00_position);
     else
         qcopy(h, g);
     FastVecScale(g, cam + 0x20, 20.0f);
     FastVecSub(g, f, g);
-    if (CollLine(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
-        qcopy(g, D_L00_001BF220);
+    if (CollLine(f, g, g_cam_collision_line_mask, HERO->i[0x8A4], 0))
+        qcopy(g, g_hero_l00_position);
         FastVecSub(i, g, h);
     if (FastVecLength(i) < 2.0f * scale) {
         FastVecAdd(midpoint, h, g);

@@ -20,22 +20,22 @@ typedef struct {
 } DebugMarks;
 
 extern s32 g_current_game_mode;
-extern s32 D_001A8630 __attribute__((sda));
-extern DebugMarks D_001B7600;
+extern s32 g_moby_marker_max_alpha __attribute__((sda));
+extern DebugMarks g_hud_reticle_marks;
 
 /* Adds a marker (for an object or a position) to the list of markers drawn this frame. */
 void hud_add_moby_marker(void *moby, f32 scale, u32 color, void *pos, s32 type, f32 size, s32 arg, f32 angle, s32 unused) {
     DebugMark *mark;
 
-    if (g_current_game_mode != 2 && D_001B7600.count < 6) {
-        mark = &D_001B7600.e[D_001B7600.count];
+    if (g_current_game_mode != 2 && g_hud_reticle_marks.count < 6) {
+        mark = &g_hud_reticle_marks.e[g_hud_reticle_marks.count];
         mark->moby = moby;
         mark->scale = scale;
         mark->size = size;
         mark->color = color;
         mark->type = type;
-        if (D_001A8630 < (s32)(color >> 24)) {
-            mark->color = (color & 0xFFFFFF) | (D_001A8630 << 24);
+        if (g_moby_marker_max_alpha < (s32)(color >> 24)) {
+            mark->color = (color & 0xFFFFFF) | (g_moby_marker_max_alpha << 24);
         }
         if (pos != 0) {
             qcopy(mark->pos, pos);
@@ -58,6 +58,6 @@ void hud_add_moby_marker(void *moby, f32 scale, u32 color, void *pos, s32 type, 
             mark->angle = angle;
             mark->arg = arg;
         }
-        D_001B7600.count++;
+        g_hud_reticle_marks.count++;
     }
 }

@@ -13,10 +13,10 @@ extern void part_kill(void *);
 extern char *moby_l00_spawn_child(char *,int,int);
 extern int math_fast_float_d(int *);
 extern int math_random_int_range(int,int);
-extern char D_L16_001B1BF0[] SDATA(D_L16_001B1BF0);
-extern char D_L16_001B1BE8[] SDATA(D_L16_001B1BE8);
-extern char D_L16_001B1BE0[] SDATA(D_L16_001B1BE0);
-extern int D_L16_001B1C10 __attribute__((sda));
+extern char g_destructible_smoke_params_c[] SDATA(D_L16_001B1BF0);
+extern char g_destructible_smoke_params_b[] SDATA(D_L16_001B1BE8);
+extern char g_destructible_smoke_params_a[] SDATA(D_L16_001B1BE0);
+extern int g_destructible_smoke_group_bit __attribute__((sda));
 /* Runs a destructible object: it smokes, then bursts into sparks and fire when destroyed, then keeps puffing for a while. */
 void destructible_smoke_burst_update(char *object)
 {
@@ -39,7 +39,7 @@ void destructible_smoke_burst_update(char *object)
         *(unsigned char *)(object+0xa8)=0xff;
         break;
     case 2:
-        part_explode_object_into_pieces(object,D_L16_001B1BF0,D_L16_001B1BE8,D_L16_001B1BE0,0xffff,0,D_L16_001B1C10,0,0xffff,0xff,0);
+        part_explode_object_into_pieces(object,g_destructible_smoke_params_c,g_destructible_smoke_params_b,g_destructible_smoke_params_a,0xffff,0,g_destructible_smoke_group_bit,0,0xffff,0xff,0);
         part_l00_spawn_spark_burst(object,position,0.2f,velocity,0.1166666746f,40,1,1.0f,5.0f,1.0f);
         *(Vector128 *)zero=0;
         vec_local_offset_to_world(object,(char *)position,13.0f,0.0f,14.0f);

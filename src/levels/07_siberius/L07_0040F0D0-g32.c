@@ -15,8 +15,8 @@ extern void func_313DD8(void *,f32,f32);
 extern void func_355188(s32);
 extern u8 g_sound_state[];
 typedef struct { f32 v[4]; } Vec;
-extern Vec D_L07_001B1790[2] __attribute__((sda));
-extern Vec D_L07_001B17B0[2] __attribute__((sda));
+extern Vec g_ship_attach_offsets_left[2] __attribute__((sda));
+extern Vec g_ship_attach_offsets_right[2] __attribute__((sda));
 typedef struct {u8 pad[0x108];u8 *children[2];f32 angles[2];} State;
 /* Creates the two side parts and the top attachment of a Siberius ship and keeps them attached to its body every frame. */
 void ship_update_attached_parts(u8 *moby)
@@ -47,7 +47,7 @@ void ship_update_attached_parts(u8 *moby)
   } else {
    qcopy_nc(oldpos,child+0x10);
    qcopy_nc(oldrot,child+0xf0);
-   func_2E47F8(child+0x10,&D_L07_001B1790[i],mat);
+   func_2E47F8(child+0x10,&g_ship_attach_offsets_left[i],mat);
    qzero_nc(rot);
    rot[1]=parts->angles[i];
    func_2E4B70(child+0xc0,rot);
@@ -83,7 +83,7 @@ void ship_update_attached_parts(u8 *moby)
    }
   }
   side=*(s16 *)(moby+0xaa)!=0x11d9 /* moby class 4569 */;
-  qcopy(attachment+0x10,&D_L07_001B17B0[side]);
+  qcopy(attachment+0x10,&g_ship_attach_offsets_right[side]);
   *(f32 *)(attachment+0x18)+=*(f32 *)(vars+0x16c4);
   func_2E47F8(attachment+0x10,attachment+0x10,mat);
   *(TI128 *)oldpos=0;

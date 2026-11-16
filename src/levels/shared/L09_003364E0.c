@@ -21,7 +21,7 @@ typedef struct {
     ParticleContext context;
 } __attribute__((aligned(16))) ParticleSlot;
 
-extern u8 *D_L09_001FF65C;
+extern u8 *g_part_header_bytes;
 extern void *part_alloc(int);
 extern int FloatToInt(float);
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -41,7 +41,7 @@ char *part_spawn_sized(char *object, int index, float first_scale, u32 value,
         slot->header.bytes[9] = (u8)(FloatToInt(0.4f) + 0x20);
         slot->header.bytes[3] = 0x48;
         slot->header.bytes[1] = 3;
-        slot->header.bytes[2] = D_L09_001FF65C[0];
+        slot->header.bytes[2] = g_part_header_bytes[0];
         if (index > 0) {
             position = slot->position;
             moby_transform_joint_to_world(object, index, (char *)position);

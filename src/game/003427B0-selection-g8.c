@@ -13,7 +13,7 @@ typedef struct {
     int scrollOffset, frames;
 } MenuList;
 
-extern const int D_001AE1CC __attribute__((sda));
+extern const int g_menu_list_visible_rows_limit __attribute__((sda));
 extern int snd_play_from_global_bank(int, int, void *);
 
 /* Moves the menu list cursor up or down when the player presses the direction buttons, scrolls smoothly, and works out which entries are on screen. */
@@ -58,15 +58,15 @@ int UpdateListSelection(MenuList *self, int flags)
     row = self->selected;
     self->firstVisible = 0;
     if (row > 0) {
-        if (0 > -D_001AE1CC) do {
+        if (0 > -g_menu_list_visible_rows_limit) do {
             row--;
             self->firstVisible--;
-        } while (row > 0 && self->firstVisible > -D_001AE1CC);
+        } while (row > 0 && self->firstVisible > -g_menu_list_visible_rows_limit);
     }
     row = self->selected;
     self->lastVisible = 0;
     if (row < self->count - 1) {
-        while (row < self->count - 1 && self->lastVisible < D_001AE1CC) {
+        while (row < self->count - 1 && self->lastVisible < g_menu_list_visible_rows_limit) {
             row++;
             self->lastVisible++;
         }
@@ -77,11 +77,11 @@ int UpdateListSelection(MenuList *self, int flags)
 extern void menu_panel_draw_frame(MenuListPosition **);
 extern int ComputeListEntryAlpha(char *, float, float, float, float, int);
 extern unsigned char g_item_slot_to_record[], g_weapon_table[];
-extern MenuColourQuad D_001AE1D8, D_001AE1E8;
-extern float D_001AE1D0 __attribute__((sda));
-extern int D_001AE1D4 __attribute__((sda));
-extern int D_001B23C0 __attribute__((sda));
-extern MenuClipRectangle D_001B23B0 MACRO_ADDR;
+extern MenuColourQuad g_menu_list_normal_colour, g_menu_list_alternate_colour;
+extern float g_menu_list_highlight_float __attribute__((sda));
+extern int g_menu_list_highlight_int __attribute__((sda));
+extern int g_menu_list_initialized __attribute__((sda));
+extern MenuClipRectangle g_menu_clip_rect MACRO_ADDR;
 extern MenuClipRectangle menuClipGP SDATA(D_001B23B0);
 extern int g_screen_width MACRO_ADDR, g_screen_height MACRO_ADDR;
 extern int screenWidthGP SDATA(D_001A7340);
@@ -103,31 +103,31 @@ void menu_list_draw_entries(MenuList *object)
     high = object->position->y + object->iconSize * 0.5f;
     for (index = object->firstVisible;
             index <= object->lastVisible && object->count; index++) {
-        normal = D_001AE1D8;
-        alternate = D_001AE1E8;
+        normal = g_menu_list_normal_colour;
+        alternate = g_menu_list_alternate_colour;
         entry = g_weapon_table + g_item_slot_to_record[object->ids[object->selected + index]] * 224;
         colours = (char *)&normal;
         if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
         top_alpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + (float)object->scrollOffset,
-                high, D_001AE1D0, D_001AE1D4);
+                high, g_menu_list_highlight_float, g_menu_list_highlight_int);
         bottom_alpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
-                high, D_001AE1D0, D_001AE1D4);
+                high, g_menu_list_highlight_float, g_menu_list_highlight_int);
         *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)top_alpha << 24);
         *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)top_alpha << 24);
         *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)bottom_alpha << 24);
         *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)bottom_alpha << 24);
-        if (D_001B23C0 == 0) {
+        if (g_menu_list_initialized == 0) {
             clip.y0 = 63;
             clip.y1 = 340;
             clip.x1 = screenWidthGP - 1;
             clip.x0 = 0;
-            D_001B23C0 = 1;
+            g_menu_list_initialized = 1;
             menuClipGP = clip;
         }
-        gfx_set_scissor_clamped(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
+        gfx_set_scissor_clamped(g_menu_clip_rect.x0, g_menu_clip_rect.x1, g_menu_clip_rect.y0, g_menu_clip_rect.y1);
         entry = g_weapon_table + g_item_slot_to_record[object->ids[object->selected + index]] * 224;
         texture = GetIconFrame(*(unsigned short *)(entry + 0x3C), 0);
         hud_draw_sprite_gradient(texture, (int)object->position->x,

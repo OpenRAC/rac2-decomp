@@ -22,17 +22,17 @@ extern void SetDeathBits(void *,int,int);
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *);
-extern u8 *D_L03_001FE700[] NOT_SDA;
-extern float D_L03_001B1C00 __attribute__((sda));
-extern float D_L03_001B1C04 __attribute__((sda));
-extern float D_L03_001B1C0C __attribute__((sda));
-extern float D_L03_001B1C30[4] SDATA(D_L03_001B1C30) __attribute__((sda));
-extern int D_0018C0B4 NOT_SDA;
-extern int D_L03_001A9044[] NOT_SDA __attribute__((sda));
+extern u8 *g_path_l03_entry_table[] NOT_SDA;
+extern float g_robot_speed_scale __attribute__((sda));
+extern float g_robot_turn_scale __attribute__((sda));
+extern float g_laser_bot_damage_scale __attribute__((sda));
+extern float g_laser_bot_beam_point[4] SDATA(D_L03_001B1C30) __attribute__((sda));
+extern int g_game_mode NOT_SDA;
+extern int g_bot_hit_count[] NOT_SDA __attribute__((sda));
 extern int D_L03_001A9044_gp SDATA(D_L03_001A9044) __attribute__((sda));
-extern int D_L03_001A903C[] __attribute__((sda));
-extern u8 D_001A7A60[] MACRO_ADDR;
-extern float D_L03_001B9980[] NOT_SDA;
+extern int g_bot_hit_flag[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
+extern float g_camera_pose_buffer[] NOT_SDA;
 typedef struct {
     u8 pad0[0x20];
     float f20;
@@ -113,7 +113,7 @@ void laser_bot_init_check_hit(u8 *entity) {
                 moby_mark_spawned(entity);
                 return;
             }
-            qcopy(entity+0x10,D_L03_001FE700[pathIndex]+16);
+            qcopy(entity+0x10,g_path_l03_entry_table[pathIndex]+16);
             st->f148|=0x210;
             st->f32C=1;
             if(st->f28C) {
@@ -136,8 +136,8 @@ void laser_bot_init_check_hit(u8 *entity) {
         st->f94=0.5f;
         st->f9C=0.4f;
         st->fA0=*(float *)(entity+0x18)-1;
-        a=D_L03_001B1C00*0.00027777778f;
-        b=D_L03_001B1C04*0.016666668f;
+        a=g_robot_speed_scale*0.00027777778f;
+        b=g_robot_turn_scale*0.016666668f;
         st->f30=0.75f;
         st->f144=0.05f;
         st->f114=0.25f;
@@ -150,7 +150,7 @@ void laser_bot_init_check_hit(u8 *entity) {
         st->f330=1;
         st->f130=a;
         st->f138=b;
-        *(float *)(entity+0x2C)=*(float *)(*(u8 **)(entity+0x24)+0x24)*D_L03_001B1C0C;
+        *(float *)(entity+0x2C)=*(float *)(*(u8 **)(entity+0x24)+0x24)*g_laser_bot_damage_scale;
         st->f290=0;
     }
     hit=part_find_owned_effect_slot(entity,0x10000,0);
@@ -159,18 +159,18 @@ void laser_bot_init_check_hit(u8 *entity) {
         if(*(s16 *)(other+0xAA)==MOBY_CLASS_MEGACORP_LASER_BOT && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
     }
     if(moby_apply_damage_to_object(entity,st->f60,0) && st->f20<=0) {
-        matrix_mul_vec3(point,D_L03_001B1C30,entity+0xC0);
+        matrix_mul_vec3(point,g_laser_bot_beam_point,entity+0xC0);
         FastVecAdd(point,point,entity+0x10);
         SpawnExplosion(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
         vec_scale_to_length(velocity,st->fE0,0.06666667f);
         part_spawn_masked_debris(entity,31,velocity,3,6,3,6,255);
-        if(D_0018C0B4==49) {
-            D_L03_001A9044_gp=D_L03_001A9044[0]+1;
-            if(D_L03_001A9044_gp>=10 && !D_001A7A60[0x1C]) {
-                D_001A7A60[0x1C]=1;
+        if(g_game_mode==49) {
+            D_L03_001A9044_gp=g_bot_hit_count[0]+1;
+            if(D_L03_001A9044_gp>=10 && !g_item_enabled_flags[0x1C]) {
+                g_item_enabled_flags[0x1C]=1;
                 snd_play_from_global_bank(1,0,0);
                 value_set_entry_by_index(0x1233,-1);
-                D_L03_001A903C[0]=1;
+                g_bot_hit_flag[0]=1;
             }
         }
         PlayMobySound(3,0,entity);
@@ -182,7 +182,7 @@ void laser_bot_init_check_hit(u8 *entity) {
         moby_mark_spawned(entity);
         return;
     }
-    if(entity[0x31] && fast_vec_dist(entity+0x10,D_L03_001B9980)<24) {
+    if(entity[0x31] && fast_vec_dist(entity+0x10,g_camera_pose_buffer)<24) {
         moby_update_ground_check(entity);
         entity[0x6F]=22;
     }

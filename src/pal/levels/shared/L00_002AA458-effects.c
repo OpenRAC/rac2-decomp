@@ -7,13 +7,13 @@ extern unsigned char g_hero_state[];
 extern float math_random_float_range(float, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void FastVecScale(void *, void *, float);
-extern void func_PAL_L00_00337918(Vector *, void *, float);
+extern void part_spawn_spark_effect_pal(Vector *, void *, float);
 extern unsigned char *func_PAL_002C0428(Vector *, Vector *, float, float);
 
 /* Joint branches and velocity copy follow RAC1 emit_hero_randomized_motion_effects
  * in overlays/shared/hero_idle_and_animation.c (OpenRAC/rac1-decomp, GPL-3.0). */
 /* Emit particles either around the player or alternately from selected joints. */
-void func_PAL_L00_002AA820(int count, int sourceMode, int sparks) {
+void EmitHeroRandomizedMotionEffects_pal(int count, int sourceMode, int sparks) {
     Vector position;
     Vector velocity;
     unsigned char *player;
@@ -47,7 +47,7 @@ void func_PAL_L00_002AA820(int count, int sourceMode, int sparks) {
         if (sparks) {
             unsigned char *matrix = *(unsigned char **)(player + 0x2290) + 0xC0;
             size = math_random_float_range(0.7f, 1.1f);
-            func_PAL_L00_00337918(&position, matrix, *(float *)(player + 0x170) * size);
+            part_spawn_spark_effect_pal(&position, matrix, *(float *)(player + 0x170) * size);
         } else {
             size = math_random_float_range(4200.0f, 7350.0f);
             func_PAL_002C0428(&position, &velocity, size, -1.0f);
@@ -70,7 +70,7 @@ extern unsigned char *part_spawn_scaling(Vector *, Vector *, unsigned int, unsig
 /* Timer-relative views and copy lifetimes follow RAC1 emit_hero_timed_effects
  * in overlays/shared/hero_idle_and_animation.c (OpenRAC/rac1-decomp, GPL-3.0). */
 /* Update two timers that emit falling motes and a burst of colored particles. */
-void func_PAL_L00_002AACE8(void) {
+void EmitHeroTimedEffects_pal(void) {
     Vector position, velocity;
     unsigned int color;
     int alpha, index, firstLife, secondLife;

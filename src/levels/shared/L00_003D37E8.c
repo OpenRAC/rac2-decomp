@@ -107,7 +107,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 /* func_L00_003D37E8 lives in L00_003D37E8-ribbon-g8.c. */
 
@@ -180,19 +180,19 @@ void gfx_draw_two_layer_glow_sprite(int unused, char *pos, int color, int first,
     *(long long *)(pkt + 120) = r;
     *(long long *)(pkt + 128) = 0xFF9000000260LL;
     *(long long *)(pkt + 136) = 0x8000000048LL;
-    dx = D_L00_001B8C80.x_140 - *(float *)pos;
-    dy = D_L00_001B8C80.y_144 - *(float *)(pos + 4);
+    dx = g_scalar_transition_state.x_140 - *(float *)pos;
+    dy = g_scalar_transition_state.y_144 - *(float *)(pos + 4);
     *(int *)(pkt + 76) = color + first;
     *(int *)(pkt + 72) = color + first;
     *(int *)(pkt + 68) = color + first;
     *(int *)(pkt + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_802EE7A8_1(dx, dy);
-    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
-                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &g_scalar_transition_state.x_140),
+                              g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = func_0031A888_1();
     func_802EE970_1(m, quat);
-    func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
+    func_802EE138_1(off, &g_scalar_transition_state.x_140, pos);
     func_802EE3D0_1(off, off, 0.5f);
     m[12] = *(float *)(pos) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -393,14 +393,14 @@ void gfx_draw_camera_facing_sprite(char *pos, int color_rgb, float scale, int al
     *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
-    quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                              D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
-                               D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[2] = func_802EE7A8_1(g_scalar_transition_state.x_140 - *(float *)(pos + 0),
+                              g_scalar_transition_state.y_144 - *(float *)(pos + 4));
+    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &g_scalar_transition_state.x_140),
+                               g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     func_802EE970_1(m, quat);
-    func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
+    func_802EE138_1(off, &g_scalar_transition_state.x_140, pos);
     func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
@@ -633,14 +633,14 @@ void gfx_draw_camera_facing_sprite_b(char *pos, int color_rgb, int alpha, char *
     *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
-    quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                              D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
-                               D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[2] = func_802EE7A8_1(g_scalar_transition_state.x_140 - *(float *)(pos + 0),
+                              g_scalar_transition_state.y_144 - *(float *)(pos + 4));
+    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &g_scalar_transition_state.x_140),
+                               g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     func_802EE970_1(m, quat);
-    func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
+    func_802EE138_1(off, &g_scalar_transition_state.x_140, pos);
     func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
@@ -754,14 +754,14 @@ void gfx_draw_camera_facing_sprite_c(char *pos, int color_rgb, int alpha, char *
     *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
-    quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                              D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
-                               D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[2] = func_802EE7A8_1(g_scalar_transition_state.x_140 - *(float *)(pos + 0),
+                              g_scalar_transition_state.y_144 - *(float *)(pos + 4));
+    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &g_scalar_transition_state.x_140),
+                               g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     func_802EE970_1(m, quat);
-    func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
+    func_802EE138_1(off, &g_scalar_transition_state.x_140, pos);
     func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];

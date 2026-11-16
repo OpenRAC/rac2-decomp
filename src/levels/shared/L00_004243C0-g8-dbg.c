@@ -7,16 +7,16 @@
  * aim (+0xB0), movement (+0x160) and state (+0x1F0) parts; `goal` is assigned inside the
  * loop (loop.c hoists it) so its spill slot precedes the scan and hidden pointers. */
 
-extern char D_L00_001B8E20[],D_L00_001BF220[];
+extern char g_camera_move_state[],g_hero_l00_position[];
 typedef struct { char pad[404]; char *active; char gap[620]; int counter; } GlobalCamera243;
 typedef struct { char pad[256]; float x, y; } Controls243;
-extern GlobalCamera243 D_L00_001B8C80;
+extern GlobalCamera243 g_scalar_transition_state;
 extern Controls243 g_pad_state;
-extern char *g_area_hit_targets[], *D_L00_0025B9A0[];
-extern char *D_L00_001B184C;
-extern float D_L00_001B14CC __attribute__((sda));
+extern char *g_area_hit_targets[], *g_hidden_area_hit_targets[];
+extern char *g_cam_collision_line_mask;
+extern float g_cam_follow_probe_minimum __attribute__((sda));
 typedef struct { char pad[0x2290]; char *owner; int mode; } Player243;
-extern Player243 D_L00_00189E20;
+extern Player243 g_camera_player;
 extern void lerp_vector(void *,void *,void *,float);
 extern int coll_process_hit(void *,int,void *,int,float),level_has_pending_inner_flag(void *);
 extern void FastVecSub(void *,void *,void *),FastVecScale(void *,void *,float),vec_scale_to_length(void *,void *,float);
@@ -44,7 +44,7 @@ void FollowCameraHideObstructions(char *obj)
     char *pos=base+96;
     Move243 *move=(Move243 *)(base+352);
     State243 *state=(State243 *)(base+496);
-    char *camera=D_L00_001B8E20;
+    char *camera=g_camera_move_state;
     char probe[16],to_moby[16],along_axis[16],perpendicular[16],side[16];
     Moby243 *moby;
     char *axis;
@@ -55,11 +55,11 @@ void FollowCameraHideObstructions(char *obj)
     Moby243 *entry;
     char *goal;
     lerp_vector(probe,base+176,camera-96,0.5f);
-    count=coll_process_hit(probe,1,D_L00_00189E20.owner,0,distance*0.5f);
+    count=coll_process_hit(probe,1,g_camera_player.owner,0,distance*0.5f);
     if(count>0) {
         char **scan,**hidden;
         scan=g_area_hit_targets;
-        hidden=D_L00_0025B9A0;
+        hidden=g_hidden_area_hit_targets;
         for(i=0;i<count;i++) {
             goal=base+176;
             moby=(Moby243 *)*scan;
@@ -101,15 +101,15 @@ void FollowCameraHideObstructions(char *obj)
     if(cam_follow_probe_collision(obj))blocked=1;
     {
     float current_distance=move->distance;
-    float minimum=D_L00_001B14CC;
+    float minimum=g_cam_follow_probe_minimum;
     if(current_distance-state->offset<minimum) {
         state->timer=2000;
         state->offset=current_distance-minimum;
     }
     }
     {
-    char *active_camera=D_L00_001B8C80.active;
-    if(active_camera && ((camera_type=S(active_camera,134))==4 || camera_type==81) && D_L00_001B8C80.counter<10) state->timer=1700;
+    char *active_camera=g_scalar_transition_state.active;
+    if(active_camera && ((camera_type=S(active_camera,134))==4 || camera_type==81) && g_scalar_transition_state.counter<10) state->timer=1700;
     }
     if(!state->flag) {
         timer=(unsigned short)state->timer;
@@ -130,14 +130,14 @@ hold:
 scaled:
     vec_scale_to_length(move,move,move->distance-state->offset);
     FastVecAdd(to_moby,move,pos+80);
-    if(D_L00_00189E20.mode!=49 && !state->locked &&
-       CollLine(pos+80,to_moby,D_L00_001B184C,D_L00_00189E20.owner,0) &&
-       !coll_is_point_in_grid(D_L00_001BF220)) {
+    if(g_camera_player.mode!=49 && !state->locked &&
+       CollLine(pos+80,to_moby,g_cam_collision_line_mask,g_camera_player.owner,0) &&
+       !coll_is_point_in_grid(g_hero_l00_position)) {
         state->counter++;
         if(state->counter>=30)cam_reset_default();
     } else state->counter=0;
     if(numhidden>0) {
-        char **restore=D_L00_0025B9A0;
+        char **restore=g_hidden_area_hit_targets;
         int remaining=numhidden;
         do {
             entry=(Moby243 *)*restore++;

@@ -93,25 +93,25 @@ typedef struct {
 
 extern int g_collision_hit[];
 extern Menu g_pause_menu_state;
-extern View D_001B9040;
-extern Buffers D_001BAEC0;
+extern View g_view_params;
+extern Buffers g_loader_memory;
 extern Snd g_map_overlay_state;
-extern Cutscene D_00210A40;
-extern int D_0025A190[], D_0025E488[], D_00261238[], D_00259458[], D_00259328[], D_0025A738[], D_00259018[], D_00258D70[];
-extern int D_001A8C8C[] __attribute__((sda));
-extern int D_001A7478[] __attribute__((sda));
-extern int D_001B22B0[] __attribute__((sda));
-extern int D_001A8BC0 __attribute__((sda));
-extern int D_001B1598[] __attribute__((sda));
+extern Cutscene g_pause_cinema_controller;
+extern int g_pause_page_b[], g_pause_page_e[], g_pause_page_f[], g_menu_page_known_screen[], g_menu_page_options[], g_pause_page_d[], g_menu_page_pause[], g_menu_text_id_table[];
+extern int g_menu_panel_flag[] __attribute__((sda));
+extern int g_loader_state_word[] __attribute__((sda));
+extern int g_packet_buffer_size[] __attribute__((sda));
+extern int g_packet_buffer_offset __attribute__((sda));
+extern int g_frame_counter_3[] __attribute__((sda));
 extern int D_001B1598_sda __attribute__((sda));
-extern int D_001A72D4[] __attribute__((sda));
-extern int D_001A72D8[] __attribute__((sda));   /* the two frame buffers */
+extern int g_vram_frame_base[] __attribute__((sda));
+extern int g_vram_fb_offset[] __attribute__((sda));   /* the two frame buffers */
 extern int g_screen_width[] __attribute__((sda));   /* the screen size pair: [0] width, [1] height */
-extern int D_001A7398[] __attribute__((sda));
-extern u8 D_001AA4B0[16] __attribute__((sda));
-extern u8 D_001AA490[16] __attribute__((sda));
-extern u8 D_001AA4A0[16] __attribute__((sda));
-extern u8 D_001C2AD0[];
+extern int g_menu_choice_table[] __attribute__((sda));
+extern u8 g_pause_start_action_data[16] __attribute__((sda));
+extern u8 g_pause_camera_scale_vec[16] __attribute__((sda));
+extern u8 g_pause_camera_copy_vec[16] __attribute__((sda));
+extern u8 g_pause_camera_state[];
 extern u8 g_camera_eye_state[];
 
 extern void menu_set_pause_scale_inverse(float);
@@ -154,58 +154,58 @@ void func_PAL_002CAEA0(void)
         break;
     case 2:
         queued = 1;
-        g_pause_menu_state.page = D_0025A190;
-        g_pause_menu_state.next = D_0025A190;
+        g_pause_menu_state.page = g_pause_page_b;
+        g_pause_menu_state.next = g_pause_page_b;
         break;
     case 3:
         g_pause_menu_state.page = 0;
         g_pause_menu_state.next = 0;
         break;
     case 4:
-        g_pause_menu_state.page = D_0025E488;
-        g_pause_menu_state.next = D_0025E488;
+        g_pause_menu_state.page = g_pause_page_e;
+        g_pause_menu_state.next = g_pause_page_e;
         queued = 1;
         menu_set_pause_scale_inverse(6.0f);
         break;
     case 11:
-        g_pause_menu_state.next = g_pause_menu_state.page = D_00261238;
-        D_001A8C8C[0] = g_pause_menu_state.unk134 = 1;
+        g_pause_menu_state.next = g_pause_menu_state.page = g_pause_page_f;
+        g_menu_panel_flag[0] = g_pause_menu_state.unk134 = 1;
         g_pause_menu_state.state = 5;
-        menu_start_action(D_001AA4B0);
+        menu_start_action(g_pause_start_action_data);
         break;
     case 5:
-        g_pause_menu_state.page = D_00261238;
-        g_pause_menu_state.next = D_00261238;
+        g_pause_menu_state.page = g_pause_page_f;
+        g_pause_menu_state.next = g_pause_page_f;
         g_pause_menu_state.unk134 = 1;
-        D_001A8C8C[0] = 1;
+        g_menu_panel_flag[0] = 1;
         break;
     case 6:
-        g_pause_menu_state.page = D_00259458;
-        g_pause_menu_state.next = D_00259458;
+        g_pause_menu_state.page = g_menu_page_known_screen;
+        g_pause_menu_state.next = g_menu_page_known_screen;
         break;
     case 1:
-        g_pause_menu_state.page = D_00259328;
-        g_pause_menu_state.next = D_00259328;
+        g_pause_menu_state.page = g_menu_page_options;
+        g_pause_menu_state.next = g_menu_page_options;
         break;
     case 10:
-        g_pause_menu_state.page = D_0025A738;
-        g_pause_menu_state.next = D_0025A738;
+        g_pause_menu_state.page = g_pause_page_d;
+        g_pause_menu_state.next = g_pause_page_d;
         break;
     case 8:
-        g_pause_menu_state.page = D_00259018;
-        g_pause_menu_state.next = D_00259018;
-        D_00210A40.a = 0x18;
-        D_00210A40.b = 0x18;
-        D_00210A40.c = D_00258D70;
-        D_00210A40.upd = menu_draw_level_select_list;
-        D_00210A40.init = RebuildLevelSelectAvailability;
-        D_00210A40.init(0);
-        menu_ring_list_step_forward(&D_00210A40);
+        g_pause_menu_state.page = g_menu_page_pause;
+        g_pause_menu_state.next = g_menu_page_pause;
+        g_pause_cinema_controller.a = 0x18;
+        g_pause_cinema_controller.b = 0x18;
+        g_pause_cinema_controller.c = g_menu_text_id_table;
+        g_pause_cinema_controller.upd = menu_draw_level_select_list;
+        g_pause_cinema_controller.init = RebuildLevelSelectAvailability;
+        g_pause_cinema_controller.init(0);
+        menu_ring_list_step_forward(&g_pause_cinema_controller);
         break;
     }
 
     if (g_pause_menu_state.hasQueued != 0) {
-        D_001A7478[0] = g_pause_menu_state.unk140;
+        g_loader_state_word[0] = g_pause_menu_state.unk140;
         g_pause_menu_state.page = g_pause_menu_state.queued;
         g_pause_menu_state.next = g_pause_menu_state.queued;
         if (g_pause_menu_state.state == 2 || g_pause_menu_state.state == 4) {
@@ -218,13 +218,13 @@ void func_PAL_002CAEA0(void)
     }
 
     {
-        u8 *r = D_001C2AD0;
-        FastVecScale(r, D_001AA490, 1.0f);
-        qcopy(r - 0x10, D_001AA4A0);
+        u8 *r = g_pause_camera_state;
+        FastVecScale(r, g_pause_camera_scale_vec, 1.0f);
+        qcopy(r - 0x10, g_pause_camera_copy_vec);
         r += 0x20;
         qzero_nc(r);
     }
-    qzero_nc(D_001C2AD0 + 0x10);
+    qzero_nc(g_pause_camera_state + 0x10);
     qcopy(g_pause_menu_state.v50, g_camera_eye_state);
     qcopy(g_pause_menu_state.v60, g_camera_eye_state + 0x10);
     mem_copy_aligned(g_pause_menu_state.v200, g_camera_eye_state + 0x230, 0x30);
@@ -232,28 +232,28 @@ void func_PAL_002CAEA0(void)
         float zfar = 524288.0f;
         float fog = 255.0f;
         float scale = 0.62f;
-        g_pause_menu_state.unkF8 = D_001B9040.fB0;
-        D_001B9040.fB0 = scale;
-        D_001B9040.f21C = zfar;
-        D_001B9040.f228 = fog;
-        D_001B9040.i22C = 0;
-        D_001B9040.i218 = 0;
+        g_pause_menu_state.unkF8 = g_view_params.fB0;
+        g_view_params.fB0 = scale;
+        g_view_params.f21C = zfar;
+        g_view_params.f228 = fog;
+        g_view_params.i22C = 0;
+        g_view_params.i218 = 0;
     }
     UpdateViewContext();
     cam_reset_active_position();
     gfx_build_view_matrices();
     gfx_wait_for_dma_status_bits(1);
     sceGsSyncV(0);
-    D_001B1598_sda = D_001B1598[0] + 1;
+    D_001B1598_sda = g_frame_counter_3[0] + 1;
 
     if (queued) {
         int a, b, c, d;
-        a = D_001BAEC0.fC + 0x30000;
-        b = D_001BAEC0.f10 + 0x30000;
+        a = g_loader_memory.fC + 0x30000;
+        b = g_loader_memory.f10 + 0x30000;
         c = a + 0x3C000;
         d = b + 0xE0000;
         g_pause_menu_state.unk10C = c + 0x11800;
-        D_001B22B0[0] = 0x30000;
+        g_packet_buffer_size[0] = 0x30000;
         g_pause_menu_state.unk114 = a;
         g_pause_menu_state.unk20 = b;
         g_pause_menu_state.unk118 = c;
@@ -262,8 +262,8 @@ void func_PAL_002CAEA0(void)
         menu_stream_chunk_table_init(0);
     } else {
         int a, b, c, d, e, f;
-        a = D_001BAEC0.fC + 0x60000;
-        b = D_001BAEC0.f10 + 0x60000;
+        a = g_loader_memory.fC + 0x60000;
+        b = g_loader_memory.f10 + 0x60000;
         b = b + 0xC000;
         a = a + 0xC000;
         c = a + 0x30000;
@@ -271,7 +271,7 @@ void func_PAL_002CAEA0(void)
         e = c + 0xC1000;
         f = d + 0x60800;
         g_pause_menu_state.unk10C = e;
-        D_001B22B0[0] = 0x60000;
+        g_packet_buffer_size[0] = 0x60000;
         g_pause_menu_state.unk114 = a;
         g_pause_menu_state.unk20 = b;
         g_pause_menu_state.unk118 = c;
@@ -279,7 +279,7 @@ void func_PAL_002CAEA0(void)
         g_pause_menu_state.unk110 = f;
         menu_stream_chunk_table_init(1);
     }
-    D_001A8BC0 = 0x2000;
+    g_packet_buffer_offset = 0x2000;
     gfx_reset_packet_buffer();
     if (queued) {
         map_reset_cache_and_reload();
@@ -291,21 +291,21 @@ void func_PAL_002CAEA0(void)
         LoadStashedHudBanks(0);
     }
     if (g_pause_menu_state.unkD0 == 0) {
-        gfx_copy_image_to_gs_blocks(g_pause_menu_state.unk20, D_001A72D8[1], g_screen_width[1] << 11);
+        gfx_copy_image_to_gs_blocks(g_pause_menu_state.unk20, g_vram_fb_offset[1], g_screen_width[1] << 11);
     } else {
         menu_upload_pause_background_to_gs();
     }
-    t = D_001A72D4[0];
+    t = g_vram_frame_base[0];
     g_pause_menu_state.unk28 = t;
     if (queued) {
         g_map_overlay_state.unk24C = t;
         u = t + 0x40000;
         g_map_overlay_state.unk250 = u;
-        D_001A72D4[0] = u + 0x400;
+        g_vram_frame_base[0] = u + 0x400;
         for (j = 0; j < 4; j++) {
-            int v = D_001A72D4[0];
+            int v = g_vram_frame_base[0];
             g_map_overlay_state.bufs[j] = v;
-            D_001A72D4[0] = v + 0x4000;
+            g_vram_frame_base[0] = v + 0x4000;
         }
     } else {
         int z;
@@ -319,7 +319,7 @@ void func_PAL_002CAEA0(void)
     }
     select_moby_context(1);
     for (k = 0; k < 4; k++) {
-        g_pause_menu_state.unk40[k] = D_001A7398[k];
-        g_pause_menu_state.unk30[k] = D_001A7398[k];
+        g_pause_menu_state.unk40[k] = g_menu_choice_table[k];
+        g_pause_menu_state.unk30[k] = g_menu_choice_table[k];
     }
 }

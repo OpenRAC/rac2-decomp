@@ -5,13 +5,13 @@ extern char g_hero_state[];
 
 extern int g_current_map_index;
 
-extern int D_001A73A0;
+extern int g_hero_aim_speed_start;
 
 extern unsigned char g_item_slot_to_record[];
 
-extern char D_L22_002645F0[];
+extern char g_weapon_l22_table[];
 
-extern char D_L22_001B1920[];
+extern char g_pickup_entry_table[];
 
 extern void hero_clear_queued_anim(void);
 
@@ -27,7 +27,7 @@ extern int hero_slot_item_id(int index);
 
 extern void hero_build_relative_point(void *, int, float, float, float);
 extern float ApproachValue(float *, float, float);
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 extern int PadPressedWithin(int, int, int);
 extern int player_slot_has_object(void *);
 extern void release_moby_animation_slot(void *, void *);
@@ -118,7 +118,7 @@ void hero_update_effect_slot(void) {
         }
     }
     if (HERO->active) {
-        if (!(D_00138320 & 0x20) || !available) {
+        if (!(g_pad_pressed_flags & 0x20) || !available) {
             if (HERO->effect) {
                 if (HERO->effect->flags & 2)
                     HERO->fading = 1;
@@ -165,7 +165,7 @@ void hero_update_effect_slot(void) {
 
 #undef HERO
 
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 
 extern void cancel_hero_item_animation(void);
 
@@ -228,7 +228,7 @@ void hero_restart_in_mode(int mode, int entryId, void *mobyArg) {
         *(int *)(heroAfter + 0x2290) = (int)mobyArg;
     }
     if ((mode & 0xFF) == 1) {
-        if (D_00138320 & 0x10) {
+        if (g_pad_pressed_flags & 0x10) {
             hud_set_slot_contents(0x23, 0, &ref_L22_002B70F8_00, &ref_L22_002B70F8_01,
                           &ref_L22_002B70F8_02, 0, 0);
             level_run_slot_callback(3);
@@ -326,14 +326,14 @@ void hero_l22_update_speed_targets(void) {
 
 
 
-extern unsigned char D_0018C0D4;
+extern unsigned char g_screen_mode_flag;
 
 extern int hero_l22_set_action(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */
 void text_play_mode_message(int slow) {
-    unsigned char type = D_0018C0D4;
+    unsigned char type = g_screen_mode_flag;
     int mode = 1;
 
     if (slow != 0)

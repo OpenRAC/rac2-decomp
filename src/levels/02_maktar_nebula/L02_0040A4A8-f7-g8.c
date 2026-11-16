@@ -30,7 +30,7 @@ extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 typedef struct {
     char pad0[0x80]; char body[0x2294 - 0x80];
     int mode; char pad2298[0x24CC - 0x2298];
@@ -38,16 +38,16 @@ typedef struct {
 } HeroView;
 extern HeroView g_hero_state;
 extern char g_hero_position[];
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index;
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern int D_L02_001A8F00;
-extern char D_L02_001B2860[];
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern int g_arena_state_words;
+extern char g_str_l02_trigger_zone_debug[];
 extern int g_frame_l02_counter;
-extern char *D_L02_001B368C;
-extern char D_L02_001C0700[];
-extern short **D_L02_002A2200[];
-extern char D_L02_002A5FB0[];
+extern char *g_matrix_l02_record_table;
+extern char g_message_queue[];
+extern short **g_zone_trigger_event_lists[];
+extern char g_str_zone_trigger_event_debug[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -68,8 +68,8 @@ void trigger_l02_zone_update(Thing *moby)
 
     switch (moby->state) {
     case 0:
-        if ((trigger->item != -1 && D_001A7BC8[trigger->item] != 0)
-            || (moby->group != 0xFF && (D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80))) {
+        if ((trigger->item != -1 && g_map_visited_flags[trigger->item] != 0)
+            || (moby->group != 0xFF && (g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80))) {
             moby_mark_spawned(moby);
             break;
         }
@@ -88,24 +88,24 @@ void trigger_l02_zone_update(Thing *moby)
             break;
         if (g_hero_state.health <= 0)
             break;
-        if (D_L02_001A8F00 != 0)
+        if (g_arena_state_words != 0)
             break;
         if (trigger->msg != -1 && IsPointInCuboid(g_hero_state.body, trigger->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L02_002A2200[g_current_map_index] != 0 && D_L02_002A2200[g_current_map_index][trigger->idx] != 0) {
-            for (i = 0; D_L02_002A2200[g_current_map_index][trigger->idx][i] != -1; i++) {
-                int event_id = D_L02_002A2200[g_current_map_index][trigger->idx][i];
+        if (g_zone_trigger_event_lists[g_current_map_index] != 0 && g_zone_trigger_event_lists[g_current_map_index][trigger->idx] != 0) {
+            for (i = 0; g_zone_trigger_event_lists[g_current_map_index][trigger->idx][i] != -1; i++) {
+                int event_id = g_zone_trigger_event_lists[g_current_map_index][trigger->idx][i];
 
                 missing = 0;
                 if (trigger->tail.b.quiet == 0) {
                     int bit = 1 << (event_id & 0x1F);
-                    if (D_00139768[(unsigned int)event_id >> 2] & bit)
+                    if (g_request_flag_table[(unsigned int)event_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L02_001C0700, event_id) == 0 && i == 0) {
-                    STUB_printf(D_L02_002A5FB0, moby->id, moby->oclass, g_current_map_index, trigger->idx, event_id);
+                if (req_push_queue(g_message_queue, event_id) == 0 && i == 0) {
+                    STUB_printf(g_str_zone_trigger_event_debug, moby->id, moby->oclass, g_current_map_index, trigger->idx, event_id);
                     return;
                 }
                 fail = 0;
@@ -117,7 +117,7 @@ void trigger_l02_zone_update(Thing *moby)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(D_L02_001B2860, g_current_map_index, trigger->idx);
+                STUB_printf(g_str_l02_trigger_zone_debug, g_current_map_index, trigger->idx);
         } while (0);
         if (fail != 0) {
             trigger->tail.b.had = 0;
@@ -125,7 +125,7 @@ void trigger_l02_zone_update(Thing *moby)
             break;
         }
         trigger->tail.b.had = 1;
-        req_launch_queued(D_L02_001C0700);
+        req_launch_queued(g_message_queue);
         if (g_frame_l02_counter < 5 || (g_current_map_index == 6 && trigger->idx == 0))
             game_set_slowdown_factor();
         moby_set_state(moby, 3, -1);
@@ -133,7 +133,7 @@ void trigger_l02_zone_update(Thing *moby)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (trigger->link != -1) {
-                char *linked_moby = D_L02_001B368C + (trigger->link << 7);
+                char *linked_moby = g_matrix_l02_record_table + (trigger->link << 7);
                 hero_reset_position_and_direction(linked_moby + 0x30, linked_moby + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
@@ -151,13 +151,13 @@ void trigger_l02_zone_update(Thing *moby)
                 snd_play_indexed(trigger->item);
             notify = 1;
         }
-        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80)) {
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(moby->group);
             notify = 1;
         }
         if (trigger->count != 0 && (trigger->tail.word & 0xFFFF0000)) {
             if (trigger->link != -1) {
-                char *linked_moby = D_L02_001B368C + (trigger->link << 7);
+                char *linked_moby = g_matrix_l02_record_table + (trigger->link << 7);
                 level_capture_checkpoint_state(linked_moby + 0x30, linked_moby + 0x70);
             } else
                 level_capture_checkpoint_state(moby->pos, moby->dir);
@@ -175,13 +175,13 @@ void trigger_l02_zone_update(Thing *moby)
                 snd_play_indexed(trigger->item);
             played = 1;
         }
-        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + g_current_map_index * 16] & 0x80)) {
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(moby->group);
             played = 1;
         }
         if (trigger->count > 0 && (trigger->tail.word & 0xFFFF0000)) {
             if (trigger->link != -1) {
-                char *linked_moby = D_L02_001B368C + (trigger->link << 7);
+                char *linked_moby = g_matrix_l02_record_table + (trigger->link << 7);
                 level_capture_checkpoint_state(linked_moby + 0x30, linked_moby + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);

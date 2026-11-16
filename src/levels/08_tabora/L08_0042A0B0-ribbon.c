@@ -26,14 +26,14 @@ extern float cubic_hermite_scalar(float, float, float, float, float);
 extern int func_001163B0(void);
 extern int level_is_resident_flag_clear(void);
 extern char *part_spawn_short_lived(void *, void *, int, void *);
-extern float D_L08_001B3A20[] MACRO_ADDR;
+extern float g_beam_phases[] MACRO_ADDR;
 extern char *g_beam_slot_key[] MACRO_ADDR;
 
-extern TaboraVec D_L08_001B3A40[] MACRO_ADDR;
-extern TaboraVec D_L08_002603E0[][4];
-extern TaboraVec D_L08_001B9B00;
-extern TaboraVec D_0018A0E0;
-extern char D_L08_001FF680[];
+extern TaboraVec g_beam_targets[] MACRO_ADDR;
+extern TaboraVec g_slot_pane_matrices[][4];
+extern TaboraVec g_hero_position_vec;
+extern TaboraVec g_hero_state_block;
+extern char g_ribbon_base_data[];
 
 /* Draws a pair of ribbon strips between the supplied endpoints, with occasional
    particles at the requested segment. The two strips have independent textures.
@@ -68,7 +68,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = color0;
     glow.texture = GetEffectTextureDescriptor(texture1);
     width = 0.6f;
-    u = D_L08_001B3A20[slot];
+    u = g_beam_phases[slot];
     color1 = (alpha1 << 24) | 0xFF10FF;
     glow.color[0] = glow.color[1] = glow.color[2] = glow.color[3] = color1;
     glow.flags = q.flags;
@@ -84,17 +84,17 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
     *(TaboraTI *)offsets[1] = 0;
     offsets[0][3] = 1; offsets[0][2] = width;
     offsets[1][2] = width + width; offsets[1][3] = 1;
-    qcopy(frame[0], D_L08_002603E0[slot][1]);
-    FastVecSub(frame[1], D_L08_001B9B00, D_L08_002603E0[slot][3]);
+    qcopy(frame[0], g_slot_pane_matrices[slot][1]);
+    FastVecSub(frame[1], g_hero_position_vec, g_slot_pane_matrices[slot][3]);
     FastVecScale(frame[1], frame[1], 1);
     FastVecCross(frame[2], frame[1], frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1);
     FastVecCross(frame[0], frame[2], frame[1]);
-    qcopy(frame[3], D_L08_002603E0[slot][3]);
-    qcopy(basis[3], D_L08_002603E0[slot][3]);
-    FastVecSub(tangent, D_L08_001B3A40[slot], basis[3]);
+    qcopy(frame[3], g_slot_pane_matrices[slot][3]);
+    qcopy(basis[3], g_slot_pane_matrices[slot][3]);
+    FastVecSub(tangent, g_beam_targets[slot], basis[3]);
     vec_scale_to_length(basis[0], tangent, 1);
-    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    FastVecCross(basis[1], basis[0], g_hero_state_block);
     vec_scale_to_length(basis[1], basis[1], -1);
     FastVecCross(basis[2], basis[1], basis[0]);
     qcopy(q.pos[0], offsets[0]);
@@ -105,7 +105,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
     transform_vector(endpoints[1], points[1], basis);
     FastVecSub(frame[0], endpoints[1], endpoints[0]);
     vec_scale_to_length(frame[0], frame[0], 1);
-    FastVecSub(frame[1], D_L08_001B9B00, endpoints[0]);
+    FastVecSub(frame[1], g_hero_position_vec, endpoints[0]);
     FastVecCross(frame[2], frame[1], frame[0]);
     vec_scale_to_length(frame[2], frame[2], 1);
     FastVecCross(frame[1], frame[0], frame[2]);
@@ -123,7 +123,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
         transform_vector(endpoints[1], path[i + 1], basis);
         FastVecSub(frame[0], endpoints[1], endpoints[0]);
         vec_scale_to_length(frame[0], frame[0], 1);
-        FastVecSub(frame[1], D_L08_001B9B00, endpoints[0]);
+        FastVecSub(frame[1], g_hero_position_vec, endpoints[0]);
         FastVecCross(frame[2], frame[1], frame[0]);
         vec_scale_to_length(frame[2], frame[2], 1);
         FastVecCross(frame[1], frame[0], frame[2]);
@@ -154,11 +154,11 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
             particle[3] = particle[0] = 1;
             particle[0] = randomRadius * math_fast_sin_or_cos_a(randomAngle);
             particle[1] = randomRadius * math_fast_sin_or_cos_b(randomAngle);
-            matrix_mul_vec3(particle, particle, D_L08_002603E0[row]);
+            matrix_mul_vec3(particle, particle, g_slot_pane_matrices[row]);
             corner = func_001163B0() & mask;
             spark = part_spawn_short_lived(q.pos[corner], particle, sparkCount, *owner);
             if (spark) {
-                base = D_L08_001FF680;
+                base = g_ribbon_base_data;
                 visual = spark + 0x20;
                 settings = *(char **)(base + 0xD4);
                 spark[2] = settings[0];
@@ -181,7 +181,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
         segments = IntToFloat(total);
         t = cubic_hermite_scalar(-1, 0, 1, 0, t / segments);
         {
-            float u2 = D_L08_001B3A20[slot];
+            float u2 = g_beam_phases[slot];
             q.uv[0] = u2; q.uv[1] = 0; q.uv[2] = u2; q.uv[3] = 1;
             q.uv[4] = u2 + 1; q.uv[5] = 0; q.uv[6] = u2 + 1; q.uv[7] = 1;
         }

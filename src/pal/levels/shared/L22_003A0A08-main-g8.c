@@ -35,7 +35,7 @@ typedef union {
 #define NULL ((void *)0)
 
 extern void STUB_printf(void *, ...);
-extern void * func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void * cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void FadeToBlack(int);
 extern int math_fast_float_d(void *);
 extern int FastDecTimer(int);
@@ -57,7 +57,7 @@ extern void euler_rotation_basis(void *, void *);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float FastDiffRots(float, float);
-extern void func_PAL_0029C0F0(int, int);
+extern void level_store_value_pair_pal(int, int);
 extern void level_set_dependent_value(void);
 extern void * CreateMoby(int);
 extern void moby_mark_spawned(void *);
@@ -65,7 +65,7 @@ extern float moby_get_anim_value(void *);
 extern void moby_transform_joint_to_world(int, int, int);
 extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(void *);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
@@ -87,13 +87,13 @@ extern float math_spring_float_to_goal(int, int, float, float, float, float);
 extern float vec_spring_to_target(int, int, int, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void mat_get_euler_angles(void *, void *);
-extern void func_PAL_002AD288(void *, void *, float, float, int);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, float, float, int);
 extern int func_PAL_002AF6C0(void *, float);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void vec_build_spherical_offset(int, float, float, float);
 extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
 extern float gravity_get_center_distance(void *);
-extern void func_PAL_002B1588(int, int);
+extern void value_set_entry_by_index_pal(int, int);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
 extern int flag_set_second_pending(void *);
@@ -107,11 +107,11 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern int PlayMobySound(int, int, void *);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int game_is_id_in_list(int);
-extern void * func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void * SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern void SetCamera5Pose(void *, void *, int, int, int);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern int queue_copy_record_by_index(int);
 extern void release_moby_animation_slot(void *, void *);
 extern void moby_set_flag_bit(void *, int);
@@ -120,10 +120,10 @@ extern int moby_l01_turn_toward_target(void *, void *);
 extern void part_queue_moby_for_glow(void *, int, void *);
 extern float moby_measure_step_angle(void *, void *, void *);
 extern int moby_check_target_point_from_offset(void *, void *);
-extern void func_PAL_L02_00335630(void *, void *);
+extern void moby_aim_at_target_offset_pal(void *, void *);
 extern u8 *moby_find_linked_object(void *);
 extern void moby_store_position_private(void *, void *);
-extern int func_PAL_L11_00342558(void *);
+extern int moby_call_helper_with_blocks_pal(void *);
 extern int joba_enemy_apply_source_damage(void *);
 extern int tribesman_turn_toward_point(void *, void *, float, float, float, float);
 extern void tribesman_rearm_guard_nodes(void *);
@@ -138,12 +138,12 @@ extern void func_PAL_L22_003A7930(void *, int, int, int, int, float);
 extern void space_ship_run_attached_part_effect(void *, int, int, int, int);
 extern int list_has_key(int, int);
 extern void lane_find_point_ahead_of_ship(void *);
-extern int func_PAL_L22_003A9540(void *);
+extern int space_ship_is_aligned_with_target_pal(void *);
 extern void keyed_object_place(void *, void *, int);
 extern void player_slot_clear_object(int);
 extern void * effect_create_attached(void *, void *);
 extern void func_PAL_L22_003A4910(s8 *);
-extern void func_PAL_L22_003A54A0(s8 *);
+extern void WalkPathUpdate_pal(s8 *);
 extern s32 WalkPathIsClear(s8 *, s8 *, s128 *);
 extern void WalkPathPickNext(s8 *, s32, s32, f32);
 extern void pickup_update_spawned(s8 *);
@@ -154,65 +154,65 @@ extern void func_PAL_L22_003A7FF0(s8 *);
 extern void func_PAL_L22_003A8F68(s8 *, s32, s32);
 extern void stat_restore_random(s8 *);
 extern void func_PAL_L22_003A99D8(s32, s32, s32, f32);
-extern s32 D_00138324 __attribute__((nosda));
-extern s8 D_001395E6 __attribute__((nosda));
+extern s32 g_pad_held_flags __attribute__((nosda));
+extern s8 g_space_ship_flag __attribute__((nosda));
 extern unsigned char g_hero_state[];
-extern s16 D_0018A16E __attribute__((nosda));
-extern s32 D_0018B694 __attribute__((nosda));
+extern s16 g_platform_mode __attribute__((nosda));
+extern s32 g_ship_progress_count __attribute__((nosda));
 extern s32 g_hero_moby __attribute__((nosda));
-extern unsigned char D_001A7A60[] MACRO_ADDR;
-extern s32 D_L22_001A8F00 MACRO_ADDR;
-extern s32 D_L22_001A903C MACRO_ADDR;
-extern void * D_L22_001AF2E0 __attribute__((sda));
-extern s32 D_L22_001AF2E4 __attribute__((sda));
-extern s32 D_L22_001AF2E8 __attribute__((sda));
-extern f32 D_L22_001AF2F4 __attribute__((sda));
-extern s32 D_L22_001AF2F8 __attribute__((sda));
-extern s32 D_L22_001AF2FC __attribute__((sda));
-extern s32 D_L22_001AF300 __attribute__((sda));
-extern s32 D_L22_001AF304 __attribute__((sda));
-extern f32 D_L22_001AF30C __attribute__((sda));
-extern f32 D_L22_001AF310 __attribute__((sda));
-extern s32 D_L22_001AF318 __attribute__((sda));
-extern s32 D_L22_001AF354 __attribute__((sda));
-extern f32 D_L22_001AF358 __attribute__((sda));
-extern f32 D_L22_001AF35C __attribute__((sda));
-extern s32 D_L22_001AF364 __attribute__((sda));
-extern s32 D_L22_001AF368 __attribute__((sda));
-extern s32 D_L22_001AF36C __attribute__((sda));
-extern f32 D_L22_001AF370 __attribute__((sda));
-extern f32 D_L22_001AF388 __attribute__((sda));
-extern f32 D_L22_001AF38C __attribute__((sda));
-extern f32 D_L22_001AF390 __attribute__((sda));
-extern s32 D_L22_001AF394 __attribute__((sda));
-extern s32 D_L22_001AF398 __attribute__((sda));
-extern f32 D_L22_001AF3D8 __attribute__((sda));
-extern f32 D_L22_001AF3DC __attribute__((sda));
-extern f32 D_L22_001AF3E0 __attribute__((sda));
-extern f32 D_L22_001AF3E4 __attribute__((sda));
-extern f32 D_L22_001AF3E8 __attribute__((sda));
-extern f32 D_L22_001AF3EC __attribute__((sda));
-extern f32 D_L22_001AF3F0 __attribute__((sda));
-extern f32 D_L22_001AF3F4 __attribute__((sda));
-extern f32 D_L22_001AF3F8 __attribute__((sda));
-extern f32 D_L22_001AF3FC __attribute__((sda));
-extern f32 D_L22_001AF400 __attribute__((sda));
-extern void * D_L22_001B2128 MACRO_ADDR;
-extern s16 D_L22_001B2A88 MACRO_ADDR;
-extern f32 D_L22_001B2A94 MACRO_ADDR;
-extern f32 D_L22_001B2A98 MACRO_ADDR;
-extern f32 D_L22_001B2A9C MACRO_ADDR;
-extern f32 D_L22_001B2AA0 MACRO_ADDR;
-extern f32 D_L22_001B2AA4 MACRO_ADDR;
-extern s32 D_L22_001B2AA8 MACRO_ADDR;
-extern f32 D_L22_001B2AAC MACRO_ADDR;
-extern s32 D_L22_001B2AB0 MACRO_ADDR;
-extern void * D_L22_001B2AB4 MACRO_ADDR;
-extern unsigned char D_L22_001B9C80[];
-extern unsigned char D_L22_001B9EB0[];
-extern s128 D_L22_001C00E0 __attribute__((nosda));
-extern s8 *D_L22_001FE940[];
-extern s32 D_L22_003A6858 __attribute__((nosda));
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
+extern s32 g_hero_l22_mode_state MACRO_ADDR;
+extern s32 g_trigger_event_flag MACRO_ADDR;
+extern void * g_space_ship_target_moby __attribute__((sda));
+extern s32 g_space_ship_init_flag __attribute__((sda));
+extern s32 g_space_ship_difficulty __attribute__((sda));
+extern f32 g_space_ship_scale __attribute__((sda));
+extern s32 g_space_ship_fade_time __attribute__((sda));
+extern s32 g_space_ship_sound_a __attribute__((sda));
+extern s32 g_space_ship_sound_b __attribute__((sda));
+extern s32 g_space_ship_timer __attribute__((sda));
+extern f32 g_space_ship_float_param_a __attribute__((sda));
+extern f32 g_space_ship_float_param_b __attribute__((sda));
+extern s32 g_space_ship_pending_flag __attribute__((sda));
+extern s32 g_space_ship_state_default __attribute__((sda));
+extern f32 g_space_ship_reach __attribute__((sda));
+extern f32 g_space_ship_trigger_distance __attribute__((sda));
+extern s32 g_space_ship_value_max __attribute__((sda));
+extern s32 g_space_ship_value_min __attribute__((sda));
+extern s32 g_space_ship_blended_value __attribute__((sda));
+extern f32 g_space_ship_scatter_param __attribute__((sda));
+extern f32 g_space_ship_random_dir_a __attribute__((sda));
+extern f32 g_space_ship_random_dir_b __attribute__((sda));
+extern f32 g_space_ship_z_scale __attribute__((sda));
+extern s32 g_space_ship_active_flag __attribute__((sda));
+extern s32 g_space_ship_saved_word __attribute__((sda));
+extern f32 g_orbit_param_e __attribute__((sda));
+extern f32 g_orbit_param_f __attribute__((sda));
+extern f32 g_space_ship_speed_limit_a __attribute__((sda));
+extern f32 g_space_ship_speed_limit_b __attribute__((sda));
+extern f32 g_space_ship_orbit_arg __attribute__((sda));
+extern f32 g_space_ship_threshold __attribute__((sda));
+extern f32 g_space_ship_anim_max __attribute__((sda));
+extern f32 g_space_ship_anim_min __attribute__((sda));
+extern f32 g_space_ship_move_length __attribute__((sda));
+extern f32 g_space_ship_steer_param_a __attribute__((sda));
+extern f32 g_space_ship_steer_param_b __attribute__((sda));
+extern void * g_trigger_event_list_head MACRO_ADDR;
+extern s16 g_space_ship_mode MACRO_ADDR;
+extern f32 g_space_ship_param_x MACRO_ADDR;
+extern f32 g_space_ship_param_y MACRO_ADDR;
+extern f32 g_space_ship_param_z MACRO_ADDR;
+extern f32 g_space_ship_param_w MACRO_ADDR;
+extern f32 g_planet_radius MACRO_ADDR;
+extern s32 g_space_ship_max_health MACRO_ADDR;
+extern f32 g_space_ship_speed_param MACRO_ADDR;
+extern s32 g_space_ship_boost_timer MACRO_ADDR;
+extern void * g_space_ship_pickup_slots MACRO_ADDR;
+extern unsigned char g_tether_origin[];
+extern unsigned char g_space_ship_scratch_vectors[];
+extern s128 g_spawn_point __attribute__((nosda));
+extern s8 *g_ship_path_table[];
+extern s32 g_ship_model_marker __attribute__((nosda));
 
 /* The moby vars block (temp_s6): only the 0x448 member is named. */
 typedef struct { u8 pad[0x448]; void *p448; } VarsD708;
@@ -356,34 +356,34 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
     void *var_a0;
     void *var_v1;
 
-    if (D_L22_001AF2E4 == 0) {
-        D_00138324 = 0;
-        if ((D_L22_001AF2E0 == NULL) && (D_L22_001A8F00 != 2) && (M2C_FIELD(arg0, u8 *, 0x20) == 0)) {
-            for (var_a0 = D_L22_001B2128; var_a0 != NULL; var_a0 = M2C_FIELD(var_a0, void **, 0x28)) {
+    if (g_space_ship_init_flag == 0) {
+        g_pad_held_flags = 0;
+        if ((g_space_ship_target_moby == NULL) && (g_hero_l22_mode_state != 2) && (M2C_FIELD(arg0, u8 *, 0x20) == 0)) {
+            for (var_a0 = g_trigger_event_list_head; var_a0 != NULL; var_a0 = M2C_FIELD(var_a0, void **, 0x28)) {
                 if (M2C_FIELD(var_a0, s16 *, 0xAA) == 0xF6E) {
-                    D_L22_001AF2E0 = var_a0;
+                    g_space_ship_target_moby = var_a0;
                     M2C_FIELD(var_a0, u8 *, 0x30) = 0xFF;
-                    temp_v1 = M2C_FIELD(D_L22_001AF2E0, void **, 0x68);
+                    temp_v1 = M2C_FIELD(g_space_ship_target_moby, void **, 0x68);
                     M2C_FIELD(temp_v1, s8 *, 8) = 0;
                     M2C_FIELD(temp_v1, s8 *, 0xA) = 0;
                     M2C_FIELD(temp_v1, s8 *, 0xC) = -1;
                 }
             }
-            M2C_FIELD(M2C_FIELD(D_L22_001AF2E0, void **, 0x68), s8 *, 8) = 0;
-            moby_set_flag_bit(D_L22_001AF2E0, 1);
+            M2C_FIELD(M2C_FIELD(g_space_ship_target_moby, void **, 0x68), s8 *, 8) = 0;
+            moby_set_flag_bit(g_space_ship_target_moby, 1);
             moby_set_state(arg0, 0x27, 0xB);
             FadeToBlack(0);
             M2C_FIELD(arg0, u16 *, 0x34) = (u16) (M2C_FIELD(arg0, u16 *, 0x34) | 0x41);
             return;
         }
         if (M2C_FIELD(arg0, u8 *, 0x20) == 0x27) {
-            for (var_v1 = D_L22_001B2128; var_v1 != NULL; var_v1 = M2C_FIELD(var_v1, void **, 0x28)) {
+            for (var_v1 = g_trigger_event_list_head; var_v1 != NULL; var_v1 = M2C_FIELD(var_v1, void **, 0x28)) {
                 if (M2C_FIELD(var_v1, s16 *, 0xAA) == 0xF6E) {
                     return;
                 }
             }
-            D_L22_001AF2E0 = NULL;
-            D_L22_001AF2E4 = 1;
+            g_space_ship_target_moby = NULL;
+            g_space_ship_init_flag = 1;
             moby_set_state(arg0, 0, -1);
             M2C_FIELD(arg0, u16 *, 0x34) = (u16) (M2C_FIELD(arg0, u16 *, 0x34) & 0xFFBE);
             return;
@@ -391,17 +391,17 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
     }
     {
         temp_s6 = M2C_FIELD(arg0, void **, 0x68);
-        math_fast_float_d(&D_L22_001B2AB0);
-        if (D_L22_001B2AB0 != 0) {
+        math_fast_float_d(&g_space_ship_boost_timer);
+        if (g_space_ship_boost_timer != 0) {
             M2C_FIELD(arg0, u8 *, 0xA8) = 0xFF;
         }
         temp_s3 = part_find_owned_effect_slot(arg0, 0x30000, 1);
         func_PAL_L22_003A4910(arg0);
-        if (D_L22_001AF304 >= 0xC9) {
+        if (g_space_ship_timer >= 0xC9) {
             space_ship_align_parts_at_end(arg0);
         } else {
-            if (D_L22_001AF304 == 0) {
-                D_L22_001AF2E8 += 1;
+            if (g_space_ship_timer == 0) {
+                g_space_ship_difficulty += 1;
             }
             if (M2C_FIELD(arg0, u8 *, 0x20) != 0) {
                 {
@@ -409,23 +409,23 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                     f32 y = M2C_FIELD(temp_s6, f32 *, 0x334);
                     f32 z = M2C_FIELD(temp_s6, f32 *, 0x338);
                     f32 w = M2C_FIELD(temp_s6, f32 *, 0x33C);
-                    D_L22_001B2A94 = x;
-                    D_L22_001B2A98 = y;
-                    D_L22_001B2A9C = z;
-                    D_L22_001B2AA0 = w;
+                    g_space_ship_param_x = x;
+                    g_space_ship_param_y = y;
+                    g_space_ship_param_z = z;
+                    g_space_ship_param_w = w;
                 }
                 space_ship_pick_next_lane_to_check(arg0);
-                if (D_L22_001AF318 != 0) {
+                if (g_space_ship_pending_flag != 0) {
                     vec_scale_to_length(&scratch[3].q, arg0 + 0xC0, -10.0f);
                     scratch[3].f[3] = 5627.925f;
                     make_hit_descriptor((s32) &workspace.pair.first.query_view.query, g_hero_moby, 0x10000, 20.0f, (s32) &scratch[3].q);
                     QueueMobyImpact(arg0, &workspace.pair.first.query_view.query);
-                    D_L22_001AF318 = 0;
+                    g_space_ship_pending_flag = 0;
                 }
             }
             temp_a1 = (s32) M2C_FIELD(temp_s6, f32 *, 0x20);
-            D_L22_001AF394 = 0;
-            M2C_FIELD(temp_s6, s16 *, 0x41C) = (temp_a1 < ((s32) (D_L22_001B2AA8 * 2) / 3)) && (((s32) D_L22_001B2AA8 / 6) < temp_a1);
+            g_space_ship_active_flag = 0;
+            M2C_FIELD(temp_s6, s16 *, 0x41C) = (temp_a1 < ((s32) (g_space_ship_max_health * 2) / 3)) && (((s32) g_space_ship_max_health / 6) < temp_a1);
             if ((temp_s3 != NULL) && (M2C_FIELD(temp_s3, s32 *, 0x20) != g_hero_moby)) {
                 M2C_FIELD(temp_s6, s32 *, 0x4EC) = 0;
             }
@@ -468,25 +468,25 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                 M2C_FIELD(game, s16 *, 0x1DC) = 0x7D00;
                 moby_set_state(arg0, 0x26, 0xA);
                 M2C_FIELD(game, s32 *, 0x2294) = 0;
-                func_PAL_L00_002AF6C0();
+                cancel_hero_item_animation_pal();
                 release_moby_animation_slot(M2C_FIELD(game, void **, 0x2290), game + 0x1870);
                 M2C_FIELD(game, s32 *, 0x187C) = 0;
                 func_PAL_L22_002C99C8(0, 1);
                 M2C_FIELD(temp_s6, s32 *, 0x344) = 0;
             }
             temp_a0 = M2C_FIELD(temp_s6, u16 *, 0x41E);
-            if ((M2C_FIELD(temp_s6, s16 *, 0x41E) == 0) && (M2C_FIELD(temp_s6, f32 *, 0x20) < (f32) ((s32) (D_L22_001B2AA8 * 2) / 3)) && (M2C_FIELD(temp_s6, s16 *, 0x468) == 0)) {
+            if ((M2C_FIELD(temp_s6, s16 *, 0x41E) == 0) && (M2C_FIELD(temp_s6, f32 *, 0x20) < (f32) ((s32) (g_space_ship_max_health * 2) / 3)) && (M2C_FIELD(temp_s6, s16 *, 0x468) == 0)) {
                 M2C_FIELD(temp_s6, s16 *, 0x41E) = 1;
-                D_L22_001B2A88 = 1;
-                D_L22_001AF394 = 1;
+                g_space_ship_mode = 1;
+                g_space_ship_active_flag = 1;
                 M2C_FIELD(temp_s6, s16 *, 0x468) = 1;
-            } else if (((s16) temp_a0 == 1) && (M2C_FIELD(temp_s6, f32 *, 0x20) < (f32) ((s32) D_L22_001B2AA8 / 3)) && (M2C_FIELD(temp_s6, s16 *, 0x46A) == 0)) {
-                saved398 = D_L22_001AF398;
+            } else if (((s16) temp_a0 == 1) && (M2C_FIELD(temp_s6, f32 *, 0x20) < (f32) ((s32) g_space_ship_max_health / 3)) && (M2C_FIELD(temp_s6, s16 *, 0x46A) == 0)) {
+                saved398 = g_space_ship_saved_word;
                 M2C_FIELD(temp_s6, s16 *, 0x41E) = 2;
-                D_L22_001B2A88 = 2;
+                g_space_ship_mode = 2;
                 {
                     s32 one = (s16) temp_a0;
-                    D_L22_001AF394 = one;
+                    g_space_ship_active_flag = one;
                     M2C_FIELD(temp_s6, s32 *, 0x464) = (saved398 * 5 + 2) / 6;
                     M2C_FIELD(temp_s6, s16 *, 0x46A) = one;
                 }
@@ -502,7 +502,7 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                     } else if ((M2C_FIELD(temp_s6, s32 *, 0x464) != 0) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 2)) {
                         moby_set_state(arg0, 0x13, 9);
                     } else if (M2C_FIELD(temp_s6, s16 *, 0x41C) == 0) {
-                        if ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0)) {
+                        if ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0) || (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0)) {
                             moby_set_state(arg0, 0x1D, 3);
                         } else if (math_random_int_below(2) == 0) {
                             moby_set_state(arg0, 0x12, 9);
@@ -511,11 +511,11 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         } else {
                             moby_set_state(arg0, 0x12, 9);
                         }
-                    } else if (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6)) {
+                    } else if (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) g_space_ship_max_health / 6)) {
                         moby_set_state(arg0, 0x12, 9);
-                    } else if ((M2C_FIELD(temp_s6, s16 *, 0x32A) / 2 < M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC)) || (M2C_FIELD(temp_s6, s16 *, 0x32E) / 2 < M2C_FIELD(D_L22_001B2AB4, s32 *, 8))) {
+                    } else if ((M2C_FIELD(temp_s6, s16 *, 0x32A) / 2 < M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC)) || (M2C_FIELD(temp_s6, s16 *, 0x32E) / 2 < M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8))) {
                         moby_set_state(arg0, 0x1D, 3);
-                    } else if ((math_random_int_below(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))) {
+                    } else if ((math_random_int_below(2) == 0) && ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0) || (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0))) {
                         moby_set_state(arg0, 0x1D, 3);
                     } else if ((math_random_int_below(2) != 0) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 0)) {
                         moby_set_state(arg0, 0x1C, 3);
@@ -525,9 +525,9 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                 }
                 break;
             case 9:                                 /* switch 1 */
-                if (((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x26) && (func_PAL_L22_003A9540(arg0) != 0)) {
+                if (((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x26) && (space_ship_is_aligned_with_target_pal(arg0) != 0)) {
                     if ((M2C_FIELD(temp_s6, s16 *, 0x41E) != 2) || (M2C_FIELD(temp_s6, s32 *, 0x464) == 0)) {
-                        func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, D_L22_001AF3E8);
+                        func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, g_space_ship_orbit_arg);
                         moby_set_state(arg0, 0x1F, 4);
                     }
                 }
@@ -535,7 +535,7 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
             case 3:                                 /* switch 1 */
                 if (M2C_FIELD(temp_s6, s32 *, 0x418) != 0) {
                     moby_set_state(arg0, 6, 4);
-                } else if (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6)) {
+                } else if (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) g_space_ship_max_health / 6)) {
                     moby_set_state(arg0, 0x12, 9);
                 }
                 break;
@@ -543,8 +543,8 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                 if (M2C_FIELD(temp_s6, s32 *, 0x418) != 0) {
                     moby_set_state(arg0, 6, 4);
                 } else if (((M2C_FIELD(temp_s6, s32 *, 0x464) != 0) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 2))
-                        || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))
-                        || ((D_0018A16E >= 0x12) && (M2C_FIELD(arg0, u8 *, 0x20) == 0x1E))) {
+                        || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) g_space_ship_max_health / 6))
+                        || ((g_platform_mode >= 0x12) && (M2C_FIELD(arg0, u8 *, 0x20) == 0x1E))) {
                     moby_set_state(arg0, 0x12, 9);
                 }
                 break;
@@ -561,7 +561,7 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                 len8 = FastVecLength(((s128 *) (temp_s6 + 0xE0)));
                 if (len8 > 0.0f) {
                     var_v0_10 = 0;
-                    if (M2C_FIELD(temp_s6, f32 *, 0x410) < D_L22_001B2AA4) {
+                    if (M2C_FIELD(temp_s6, f32 *, 0x410) < g_planet_radius) {
                         arena_push_point_out((arg0 + 0x10), 0.0f);
                         var_v0_10 = 0;
                     }
@@ -586,8 +586,8 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         }
                         if ((M2C_FIELD(g_hero_moby, u8 *, 0x43) == 4) && (M2C_FIELD(temp_s3, s32 *, 0x20) == g_hero_moby)) {
                             FastVecSub(&scratch[0].q, temp_s6 + 0x400, temp_s6 + 0x3F0);
-                            vec_scale_to_length(((s128 *) (temp_s6 + 0xE0)), &scratch[0].q, D_L22_001AF3F8);
-                            func_PAL_L00_003FB330(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 1, 0xA, 0xA, 0xA, 0x14, 0x32, 0, 1.2f, 20.0f, 0, 1, 0, 0);
+                            vec_scale_to_length(((s128 *) (temp_s6 + 0xE0)), &scratch[0].q, g_space_ship_move_length);
+                            SpawnExplosion_pal(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 1, 0xA, 0xA, 0xA, 0x14, 0x32, 0, 1.2f, 20.0f, 0, 1, 0, 0);
                         }
                     }
                     func_PAL_L22_003A7930(arg0, (s32) M2C_FIELD(arg0, u8 *, 0x43), 0, 3, 2, 1.0f);
@@ -620,41 +620,41 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                 temp_v1_12 = M2C_FIELD(temp_s6, void **, 0x388);
                 M2C_FIELD(temp_v1_12, u16 *, 0x34) = (u16) (M2C_FIELD(temp_v1_12, u16 *, 0x34) | 0x41);
                 if (flag_set_first_pending(arg0) != 0) {
-                    if ((M2C_FIELD(temp_s6, s32 *, 0x4EC) != 0) && (D_001A7A60[8] == 0)) {
-                        D_001A7A60[8] = 1;
+                    if ((M2C_FIELD(temp_s6, s32 *, 0x4EC) != 0) && (g_item_enabled_flags[8] == 0)) {
+                        g_item_enabled_flags[8] = 1;
                         snd_play_from_global_bank(1, 0, NULL);
-                        func_PAL_002B1588(0x1233, -1);
-                        D_L22_001A903C = 1;
+                        value_set_entry_by_index_pal(0x1233, -1);
+                        g_trigger_event_flag = 1;
                     }
-                    FadeToBlack(D_L22_001AF2F8);
+                    FadeToBlack(g_space_ship_fade_time);
                     goto block_183;
                 }
                 temp_a0_13 = M2C_FIELD(arg0, u16 *, 0x96);
-                temp_v0_9 = (s32) D_L22_001AF2F8 / 2;
+                temp_v0_9 = (s32) g_space_ship_fade_time / 2;
                 if (temp_v0_9 < (s32) temp_a0_13) {
-                    if ((func_PAL_002AF6C0(arg0, 27.0f) != 0) && ((M2C_FIELD(arg0, u16 *, 0x34) ^ 1) & 1) && ((((s32) D_L22_001AF2F8 / 2) - 4) < (s32) M2C_FIELD(arg0, u16 *, 0x96))) {
+                    if ((func_PAL_002AF6C0(arg0, 27.0f) != 0) && ((M2C_FIELD(arg0, u16 *, 0x34) ^ 1) & 1) && ((((s32) g_space_ship_fade_time / 2) - 4) < (s32) M2C_FIELD(arg0, u16 *, 0x96))) {
                         coll_sweep_from_object((s32) arg0, (s32) (arg0 + 0x10), 0x90000, 25.0f, 100.0f, 0.0f, 0, 1, 0);
-                        func_PAL_L02_00335630(arg0, game10 + 0x80);
+                        moby_aim_at_target_offset_pal(arg0, game10 + 0x80);
 
-                        func_PAL_002A7650(arg0, 0, 3);
-                        func_PAL_002AD288(arg0, (arg0 + 0x10), 2.0f, 7.0f, -1);
+                        SetDeathBits_pal(arg0, 0, 3);
+                        part_spawn_explosion_with_sparks_pal(arg0, (arg0 + 0x10), 2.0f, 7.0f, -1);
                         for (var_s0_2 = 0; var_s0_2 < 5; var_s0_2++) {
-                            vec_random_direction(&scratch[0].q, D_L22_001AF388 * 0.020000001f, D_L22_001AF38C * 0.020000001f);
-                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * D_L22_001AF390;
+                            vec_random_direction(&scratch[0].q, g_space_ship_random_dir_a * 0.020000001f, g_space_ship_random_dir_b * 0.020000001f);
+                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * g_space_ship_z_scale;
                             matrix_mul_vec3(&scratch[0].q, &scratch[0].q, M2C_FIELD(temp_s6, s32 *, 0x440) + 0xC0);
                             temp_a0_14 = M2C_FIELD(temp_s6, s32 *, 0x440);
-                            temp_v0_11 = func_PAL_002735D0((void *) temp_a0_14, 1, (s32) M2C_FIELD(temp_a0_14, s16 *, 0xAA), var_s0_2, temp_a0_14 + 0x10, temp_a0_14 + 0xF0, &scratch[0].q, 0xFF, 30.0f, 15.0f);
-                            *(s32 **)((s8 *)temp_v0_11 + 0x64) = &D_L22_003A6858;
+                            temp_v0_11 = cam_moby_create_pal((void *) temp_a0_14, 1, (s32) M2C_FIELD(temp_a0_14, s16 *, 0xAA), var_s0_2, temp_a0_14 + 0x10, temp_a0_14 + 0xF0, &scratch[0].q, 0xFF, 30.0f, 15.0f);
+                            *(s32 **)((s8 *)temp_v0_11 + 0x64) = &g_ship_model_marker;
                         }
                         for (var_s0_3 = 0; var_s0_3 < 2; var_s0_3++) {
-                            vec_random_direction(&scratch[0].q, D_L22_001AF388 * 0.020000001f, D_L22_001AF38C * 0.020000001f);
-                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * D_L22_001AF390;
+                            vec_random_direction(&scratch[0].q, g_space_ship_random_dir_a * 0.020000001f, g_space_ship_random_dir_b * 0.020000001f);
+                            scratch[0].f[2] = math_fabs(scratch[0].f[2]) * g_space_ship_z_scale;
                             matrix_mul_vec3(&scratch[0].q, &scratch[0].q, ((void *) (arg0 + 0xC0)));
-                            temp_v0_12 = func_PAL_002735D0(arg0, 1, (s32) M2C_FIELD(arg0, s16 *, 0xAA), var_s0_3, (arg0 + 0x10), ((void *) (arg0 + 0xF0)), &scratch[0].q, 0xFF, 30.0f, 15.0f);
-                            *(s32 **)((s8 *)temp_v0_12 + 0x64) = &D_L22_003A6858;
+                            temp_v0_12 = cam_moby_create_pal(arg0, 1, (s32) M2C_FIELD(arg0, s16 *, 0xAA), var_s0_3, (arg0 + 0x10), ((void *) (arg0 + 0xF0)), &scratch[0].q, 0xFF, 30.0f, 15.0f);
+                            *(s32 **)((s8 *)temp_v0_12 + 0x64) = &g_ship_model_marker;
                         }
-                        func_PAL_L00_003FB330(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0, 0x73, 0x50, 0x46, 0x4E, 0x4B, 1, 7.5f, 20.0f, 1, 1, 0, 0);
-                        func_PAL_L00_003FB330((arg0 + 0x10), 1, 0x2D, 0x28, 0x28, 0x28, 0x3A, 1, 3.0f, 20.0f, 1, 1, 0, 0);
+                        SpawnExplosion_pal(M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0, 0x73, 0x50, 0x46, 0x4E, 0x4B, 1, 7.5f, 20.0f, 1, 1, 0, 0);
+                        SpawnExplosion_pal((arg0 + 0x10), 1, 0x2D, 0x28, 0x28, 0x28, 0x3A, 1, 3.0f, 20.0f, 1, 1, 0, 0);
                         M2C_FIELD(arg0, u16 *, 0x34) = (u16) (M2C_FIELD(arg0, u16 *, 0x34) | 0x41);
                         temp_a0_15 = M2C_FIELD(temp_s6, void **, 0x388);
                         M2C_FIELD(temp_a0_15, u16 *, 0x34) = (u16) (M2C_FIELD(temp_a0_15, u16 *, 0x34) | 0x41);
@@ -666,9 +666,9 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         M2C_FIELD(temp_a0_17, s128 *, 0x10) = *(s128 *)(arg0 + 0x10);
                         func_PAL_002A7E68(temp_a0_17, 6, 0, 3);
                         {
-                            f32 v = D_L22_001AF30C;
+                            f32 v = g_space_ship_float_param_a;
                             M2C_FIELD(((VarsD708 *) temp_s6)->p448, f32 *, 0x48) = 3.2f;
-                            D_L22_001B2AAC = v;
+                            g_space_ship_speed_param = v;
                             arena_push_point_out(((VarsD708 *) temp_s6)->p448 + 0x10, v);
                         }
                         goto block_183;
@@ -683,15 +683,15 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         M2C_FIELD(temp_s6, void **, 0x444) = NULL;
                         moby_mark_spawned(((VarsD708 *) temp_s6)->p448);
                         ((VarsD708 *) temp_s6)->p448 = NULL;
-                        func_PAL_0029C0F0(0, 0);
-                        D_001395E6 = 1;
+                        level_store_value_pair_pal(0, 0);
+                        g_space_ship_flag = 1;
                         level_set_dependent_value();
                         moby_mark_spawned(arg0);
                         return;
                     } else {
                         if ((temp_v1_14 >= 0xda) && (M2C_FIELD(arg0, u16 *, 0x34) & 1) && (temp_a0_18 = ((VarsD708 *) temp_s6)->p448, (((M2C_FIELD(temp_a0_18, u16 *, 0x34) ^ 1) & 1) != 0))) {
-                            temp_f12_3 = D_L22_001B2AAC - D_L22_001AF310;
-                            D_L22_001B2AAC = temp_f12_3;
+                            temp_f12_3 = g_space_ship_speed_param - g_space_ship_float_param_b;
+                            g_space_ship_speed_param = temp_f12_3;
                             if (temp_f12_3 > 0.0f) {
                                 arena_push_point_out(temp_a0_18 + 0x10, temp_f12_3);
                                 M2C_FIELD(((VarsD708 *) temp_s6)->p448, f32 *, 0x48) = 3.2f;
@@ -702,8 +702,8 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                                     FastVecScale(&scratch[0].q, temp_a0_18 + 0xC0, 2.2f);
                                     FastVecAdd(&scratch[0].q, &scratch[0].q, ((VarsD708 *) temp_s6)->p448 + 0x10);
                                     arena_push_point_out(&scratch[0].q, 0.5f);
-                                    func_PAL_L00_003FB330(&scratch[0].q, 1, 0xA, 0xA, 0xA, 0xA, 0x14, 0, 0.9f, 20.0f, 0, 0, 0, 0);
-                                    PlayMobySound(D_L22_001AF2FC, 0, arg0);
+                                    SpawnExplosion_pal(&scratch[0].q, 1, 0xA, 0xA, 0xA, 0xA, 0x14, 0, 0.9f, 20.0f, 0, 0, 0, 0);
+                                    PlayMobySound(g_space_ship_sound_a, 0, arg0);
                                     temp_v1_15 = ((VarsD708 *) temp_s6)->p448;
                                     M2C_FIELD(temp_v1_15, u16 *, 0x34) = (u16) (M2C_FIELD(temp_v1_15, u16 *, 0x34) | 0x41);
                                 }
@@ -715,10 +715,10 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                                 } else {
                                     moby_transform_joint_to_world(M2C_FIELD(temp_s6, s32 *, 0x440), math_random_int_below(6), (s32) &scratch[0].q);
                                 }
-                                func_PAL_L00_003FB330(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, math_random_float_range(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
+                                SpawnExplosion_pal(&scratch[0].q, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, math_random_float_range(1.0f, 1.9f), 20.0f, 0, 0, 0, 0);
                             }
                             if (!(M2C_FIELD(arg0, u16 *, 0x96) & 0xF) && ((M2C_FIELD(arg0, u16 *, 0x34) ^ 1) & 1)) {
-                                PlayMobySound(D_L22_001AF300, 0, arg0);
+                                PlayMobySound(g_space_ship_sound_b, 0, arg0);
                             }
                         }
                         goto block_183;
@@ -728,22 +728,22 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                     if (temp_a0_13 == temp_v0_10) {
                         FadeToBlack(1);
                         arena_push_point_out((arg0 + 0x10), 0.0f);
-                        scratch[4].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0);
-                        scratch[5].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
-                        scratch[6].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
+                        scratch[4].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0);
+                        scratch[5].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0x10);
+                        scratch[6].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0x20);
                         qzero_nc(&scratch[7].q);
                         mat_get_euler_angles(&workspace.pair.second, &scratch[0].q);
                         temp_s2 = (arg0 + 0x10);
-                        SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
+                        SetCamera5Pose(g_tether_origin, &scratch[0].q, 1, 0, 0);
                         func_PAL_L22_003A7930(arg0, 0xE, 0, 3, 3, 0.6f);
                         M2C_FIELD(temp_s6, f32 *, 0x138) = 0.012f;
                         FastVecSub(&scratch[7].q, temp_s6 + 0x3F0, temp_s2);
-                        vec_scale_to_length(&scratch[6].q, &scratch[7].q, -(D_L22_001AF2F4 * 33.0f));
+                        vec_scale_to_length(&scratch[6].q, &scratch[7].q, -(g_space_ship_scale * 33.0f));
                         FastVecAdd(&scratch[6].q, &scratch[6].q, temp_s2);
                         arena_push_point_out(&scratch[6].q, 2.0f);
-                        vec_scale_to_length(&scratch[5].q, &scratch[7].q, -(D_L22_001AF2F4 * 55.0f));
+                        vec_scale_to_length(&scratch[5].q, &scratch[7].q, -(g_space_ship_scale * 55.0f));
                         FastVecAdd(&scratch[5].q, &scratch[5].q, temp_s2);
-                        arena_push_point_out(&scratch[5].q, D_L22_001AF2F4 * 45.0f);
+                        arena_push_point_out(&scratch[5].q, g_space_ship_scale * 45.0f);
                         vec_scale_to_length(&scratch[7].q, &scratch[7].q, 1.0f);
                         scratch[0].q = scratch[7].q;
                         {
@@ -757,13 +757,13 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         cam_set_state_rotation(&scratch[4].q);
                         object_copy_vector_to_selected(&scratch[5].q);
                     } else if (temp_v0_10 < (s32) temp_a0_13) {
-                        scratch[1].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0);
-                        scratch[2].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
-                        scratch[3].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
+                        scratch[1].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0);
+                        scratch[2].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0x10);
+                        scratch[3].q = M2C_FIELD(g_space_ship_scratch_vectors, s128 *, 0x20);
                         qzero_nc(&scratch[4].q);
                         mat_get_euler_angles(&workspace.shifted.basis, &workspace.shifted.rotation);
-                        SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
-                        FastVecSub(&scratch[0].q, (arg0 + 0x10), D_L22_001B9C80);
+                        SetCamera5Pose(g_tether_origin, &scratch[0].q, 1, 0, 0);
+                        FastVecSub(&scratch[0].q, (arg0 + 0x10), g_tether_origin);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         scratch[2].q = M2C_FIELD(arg0, s128 *, 0xE0);
                         qzero_nc(&scratch[3].q);
@@ -780,33 +780,33 @@ void func_PAL_L22_003A0A08(s8 *arg0) {
                         scratch[6].b[9] = 1;
 
                         scratch[6].h[5] = M2C_FIELD(M2C_FIELD(temp_s3_2, s32 *, 0x2290), u16 *, 0xAA);
-                        coll_sweep_from_object((s32) arg0, (s32) D_L22_001B9C80, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
-                        temp_s4 = D_L22_001B9C80 + 0x240;
-                        CollLine(D_L22_001B9C80, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        temp_s5 = D_L22_001B9C80 + 0x250;
+                        coll_sweep_from_object((s32) arg0, (s32) g_tether_origin, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
+                        temp_s4 = g_tether_origin + 0x240;
+                        CollLine(g_tether_origin, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        temp_s5 = g_tether_origin + 0x250;
                         FastVecScale(&spA0, M2C_FIELD(temp_s3_2, s32 *, 0x2290) + 0xE0, 4.0f);
                         FastVecAdd(&spA0, &spA0, temp_s3_2 + 0x80);
                         CollLine(&spA0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        temp_f20 = D_L22_001AF2F4 * 6.875f;
+                        temp_f20 = g_space_ship_scale * 6.875f;
                         temp_f21 = -temp_f20;
                         FastVecScale(&spB0, temp_s4, temp_f20);
-                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        FastVecAdd(&spB0, &spB0, g_tether_origin);
                         CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         FastVecScale(&spB0, temp_s4, temp_f21);
-                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        FastVecAdd(&spB0, &spB0, g_tether_origin);
                         CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         FastVecScale(&spB0, temp_s5, temp_f20);
-                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        FastVecAdd(&spB0, &spB0, g_tether_origin);
                         CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         FastVecScale(&spB0, temp_s5, temp_f21);
-                        FastVecAdd(&spB0, &spB0, D_L22_001B9C80);
+                        FastVecAdd(&spB0, &spB0, g_tether_origin);
                         CollLine(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                     } else {
                         FadeToBlack(1);
                     }
 block_183:
                     qzero_nc(((s128 *) (temp_s6 + 0xE0)));
-                    func_PAL_L11_00342558(arg0);
+                    moby_call_helper_with_blocks_pal(arg0);
                     goto block_184;
                 }
                 break;
@@ -819,7 +819,7 @@ block_184:
                         if (M2C_FIELD(temp_s6, s16 *, 0x380) != 0) {
                             FastDecTimer((s32) (temp_s6 + 0x380));
                         } else {
-                            temp_f1_4 = D_L22_001AF3EC;
+                            temp_f1_4 = g_space_ship_threshold;
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                             if ((M2C_FIELD(temp_s6, f32 *, 0x3E0) < temp_f1_4) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 0)) {
                                 moby_set_state(arg0, 6, 0);
@@ -841,14 +841,14 @@ block_184:
                 case 19:                            /* switch 2 */
                     temp_a0_4 = M2C_FIELD(temp_s6, s32 *, 0x440);
                     if (M2C_FIELD(temp_a0_4, u8 *, 0x43) == 3) {
-                        if ((M2C_FIELD(temp_a0_4, u8 *, 0x60) & 2) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || (M2C_FIELD(temp_s6, f32 *, 0x3DC) > 70.0f))) {
+                        if ((M2C_FIELD(temp_a0_4, u8 *, 0x60) & 2) && ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) == 0) || (M2C_FIELD(temp_s6, f32 *, 0x3DC) > 70.0f))) {
                             func_PAL_L22_003A7930(arg0, 0xB, (s32) moby_get_anim_value(arg0), 3, 2, 1.0f);
                         } else if ((moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) >= 4.0f) && (M2C_FIELD(temp_s6, f32 *, 0x44C) < 4.0f)) {
                             space_ship_run_attached_part_effect(arg0, 1, g_hero_moby, 0, 0);
                         } else if ((moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) >= 2.0f) && (M2C_FIELD(temp_s6, f32 *, 0x44C) < 2.0f)) {
                             space_ship_run_attached_part_effect(arg0, 2, g_hero_moby, 0, 0);
                         }
-                    } else if ((M2C_FIELD(temp_s6, f32 *, 0x3DC) < 70.0f) && (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0) && (M2C_FIELD(temp_s6, s32 *, 0x464) == 0)) {
+                    } else if ((M2C_FIELD(temp_s6, f32 *, 0x3DC) < 70.0f) && (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0) && (M2C_FIELD(temp_s6, s32 *, 0x464) == 0)) {
                         func_PAL_L22_003A7930(arg0, 3, 0, 3, 2, 1.0f);
                         func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 7, 0, 3);
                     }
@@ -856,15 +856,15 @@ block_184:
                         moby_set_state(arg0, 0x14, 9);
                         break;
                     }
-                    func_PAL_L22_003A54A0(arg0);
+                    WalkPathUpdate_pal(arg0);
                     if (((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x1a) && (M2C_FIELD(temp_s6, f32 *, 0x43C) <= M2C_FIELD(temp_s6, f32 *, 0x140))) {
                         FastVecSub(&scratch[0].q, (arg0 + 0x10), (s128 *) (g_hero_state + 0x80));
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, 1.0f);
                         if ((FastVecDot(arg0 + 0xC0, &scratch[0].q) < -0.5f) && (FastVecLength(&scratch[0].q) < 10.0f)) {
                             moby_set_state(arg0, 0x21, 9);
-                            if (M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) {
+                            if (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0) {
                                 M2C_FIELD(temp_s6, s16 *, 0x3A6) = 3;
-                            } else if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0) {
+                            } else if (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0) {
                                 M2C_FIELD(temp_s6, s16 *, 0x3A6) = 3;
                             } else {
                                 M2C_FIELD(temp_s6, s16 *, 0x3A6) = 2;
@@ -884,11 +884,11 @@ block_184:
                             func_PAL_L22_003A7930(arg0, 0xB, 0, 3, 3, 1.0f);
                         } else {
                             stat_restore_random(arg0);
-                            if ((((f32) ((s32) (D_L22_001B2AA8 * 2) / 3) <= M2C_FIELD(temp_s6, f32 *, 0x20)) || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))
-                                    || ((math_random_int_below(2) == 0) && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))))
+                            if ((((f32) ((s32) (g_space_ship_max_health * 2) / 3) <= M2C_FIELD(temp_s6, f32 *, 0x20)) || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) g_space_ship_max_health / 6))
+                                    || ((math_random_int_below(2) == 0) && ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0) || (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0))))
                                 && ((M2C_FIELD(temp_s6, s32 *, 0x464) == 0) || (M2C_FIELD(temp_s6, s16 *, 0x41E) != 2))) {
-                                if (((f32) ((s32) D_L22_001B2AA8 / 6) < M2C_FIELD(temp_s6, f32 *, 0x20))
-                                        && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0))
+                                if (((f32) ((s32) g_space_ship_max_health / 6) < M2C_FIELD(temp_s6, f32 *, 0x20))
+                                        && ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0) || (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0))
                                         && (math_random_int_below(5) == 0)) {
                                     moby_set_state(arg0, 0x1D, 3);
                                 } else {
@@ -906,11 +906,11 @@ block_184:
                         func_PAL_L22_003A7930(arg0, 0, 0, 0x11, 3, 1.0f);
                         break;
                     }
-                    func_PAL_L22_003A54A0(arg0);
+                    WalkPathUpdate_pal(arg0);
                     break;
                 case 22:                            /* switch 2 */
                     if ((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x1a) {
-                        if (((f32) ((s32) (D_L22_001B2AA8 * 2) / 3) <= M2C_FIELD(temp_s6, f32 *, 0x20)) || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) D_L22_001B2AA8 / 6))) {
+                        if (((f32) ((s32) (g_space_ship_max_health * 2) / 3) <= M2C_FIELD(temp_s6, f32 *, 0x20)) || (M2C_FIELD(temp_s6, f32 *, 0x20) <= (f32) ((s32) g_space_ship_max_health / 6))) {
                             moby_set_state(arg0, 5, 0);
                         } else if (M2C_FIELD(temp_s6, f32 *, 0x3DC) < 55.0f) {
                             moby_set_state(arg0, 0x12, 9);
@@ -923,7 +923,7 @@ block_184:
                     if (M2C_FIELD(temp_s6, f32 *, 0x3E0) < 33.0f) {
                         moby_set_state(arg0, 0x1E, 4);
                     } else {
-                        func_PAL_L22_003A54A0(arg0);
+                        WalkPathUpdate_pal(arg0);
                     }
                     break;
                 case 6:                             /* switch 2 */
@@ -932,23 +932,23 @@ block_184:
                         if (temp_f1_4 < 20.0f) {
                             moby_set_state(arg0, 0xF, 6);
                         } else {
-                            func_PAL_L22_003A54A0(arg0);
+                            WalkPathUpdate_pal(arg0);
                         }
-                    } else if (temp_f1_4 < D_L22_001AF3EC) {
+                    } else if (temp_f1_4 < g_space_ship_threshold) {
                         moby_set_state(arg0, 0x1E, 4);
                     } else {
-                        func_PAL_L22_003A54A0(arg0);
+                        WalkPathUpdate_pal(arg0);
                     }
                     break;
                 case 28:                            /* switch 2 */
                     if (flag_set_first_pending(arg0) != 0) {
                         func_PAL_L22_003A7930(arg0, 0xB, 0, 5, 3, 1.0f);
                     }
-                    if ((M2C_FIELD(temp_s6, f32 *, 0x3E0) < D_L22_001AF3EC) && (M2C_FIELD(temp_s6, s32 *, 0x3D8) != 0)) {
+                    if ((M2C_FIELD(temp_s6, f32 *, 0x3E0) < g_space_ship_threshold) && (M2C_FIELD(temp_s6, s32 *, 0x3D8) != 0)) {
                         moby_set_state(arg0, 0x1E, 4);
                     }
                     M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
-                    func_PAL_L22_003A54A0(arg0);
+                    WalkPathUpdate_pal(arg0);
                     break;
                 case 29:                            /* switch 2 */
                     if (flag_set_first_pending(arg0) != 0) {
@@ -958,7 +958,7 @@ block_184:
                         moby_set_state(arg0, 0x1E, 4);
                     }
                     M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
-                    func_PAL_L22_003A54A0(arg0);
+                    WalkPathUpdate_pal(arg0);
                     break;
                 case 31:                            /* switch 2 */
                     temp_v1_3 = M2C_FIELD(arg0, u8 *, 0x43);
@@ -970,11 +970,11 @@ block_184:
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
-                            func_PAL_L22_003A54A0(arg0);
-                            func_PAL_L22_003A7930(arg0, 0xA, 0, 3, 3, D_L22_001AF3E8);
+                            WalkPathUpdate_pal(arg0);
+                            func_PAL_L22_003A7930(arg0, 0xA, 0, 3, 3, g_space_ship_orbit_arg);
                         }
                         if ((moby_get_anim_value(arg0) > 0.0f) && (moby_get_anim_value(arg0) < 23.0f)) {
-                            func_PAL_L02_00335630(arg0, (s128 *) (g_hero_state + 0x80));
+                            moby_aim_at_target_offset_pal(arg0, (s128 *) (g_hero_state + 0x80));
                         }
                         break;
                     case 10:                        /* switch 3 */
@@ -984,29 +984,29 @@ block_184:
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
-                            func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, D_L22_001AF3E8);
+                            func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, g_space_ship_orbit_arg);
                         }
-                        func_PAL_L02_00335630(arg0, (s128 *) (g_hero_state + 0x80));
+                        moby_aim_at_target_offset_pal(arg0, (s128 *) (g_hero_state + 0x80));
                         break;
                     case 13:                        /* switch 3 */
                         if (flag_set_first_pending(arg0) != 0) {
-                            D_L22_001B2AB0 = 0;
+                            g_space_ship_boost_timer = 0;
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
-                            if ((D_L22_001B2AB0 != 0) && ((math_random_int_below(4) == 0) || ((f32) (D_0018B694 * 7) < M2C_FIELD(temp_s6, f32 *, 0x20)))) {
-                                if ((M2C_FIELD(temp_s6, f32 *, 0x20) == (f32) M2C_FIELD(temp_s6, s16 *, 0x326)) && (D_0018B694 < 0x64)) {
+                            if ((g_space_ship_boost_timer != 0) && ((math_random_int_below(4) == 0) || ((f32) (g_ship_progress_count * 7) < M2C_FIELD(temp_s6, f32 *, 0x20)))) {
+                                if ((M2C_FIELD(temp_s6, f32 *, 0x20) == (f32) M2C_FIELD(temp_s6, s16 *, 0x326)) && (g_ship_progress_count < 0x64)) {
                                     moby_set_state(arg0, 4, 2);
                                 } else {
                                     moby_set_state(arg0, 3, 2);
                                 }
-                            } else if (func_PAL_L22_003A9540(arg0) != 0) {
-                                func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, D_L22_001AF3E8);
+                            } else if (space_ship_is_aligned_with_target_pal(arg0) != 0) {
+                                func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, g_space_ship_orbit_arg);
                                 moby_set_state(arg0, 0x1F, 4);
                             } else {
                                 moby_set_state(arg0, 0x12, 9);
                             }
-                        } else if (D_L22_001AF3F0 < moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440))) {
-                            if (moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < D_L22_001AF3F4) {
+                        } else if (g_space_ship_anim_max < moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440))) {
+                            if (moby_get_anim_value((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < g_space_ship_anim_min) {
                                 moby_transform_joint_to_world(M2C_FIELD(temp_s6, s32 *, 0x440), 4, (s32) &scratch[1].q);
                                 moby_transform_joint_to_world(M2C_FIELD(temp_s6, s32 *, 0x440), 3, (s32) &scratch[0].q);
                                 FastVecAdd(&scratch[2].q, &scratch[0].q, &scratch[1].q);
@@ -1015,32 +1015,32 @@ block_184:
                                 coll_sweep_from_object((s32) arg0, (s32) &scratch[2].q, 0x10007, 4.0f, 100.0f, 14.5f, 0, 2, 0);
                                 {
                                     u8 *g = g_hero_state;
-                                    f32 reach = D_L22_001AF358;
+                                    f32 reach = g_space_ship_reach;
                                     M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                                     FastVecScale(&scratch[3].q, M2C_FIELD(g, void **, 0x2290) + 0xE0, reach);
                                     FastVecAdd(&scratch[3].q, &scratch[3].q, g + 0x80);
                                 }
 
-                                if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < D_L22_001AF35C) {
+                                if (fast_vec_dist(&scratch[2].q, &scratch[3].q) < g_space_ship_trigger_distance) {
                                     queue_copy_record_by_index(0x2B);
-                                    D_L22_001B2AB0 = (D_L22_001AF354 * 5 + 2) / 6;
+                                    g_space_ship_boost_timer = (g_space_ship_state_default * 5 + 2) / 6;
                                 }
                             }
                         }
-                        moby_set_controller_speed_limits(arg0, D_L22_001AF3E0 * 0.00040000002f, D_L22_001AF3E4 * 0.020000001f, D_L22_001AF3D8 * 6.981318e-06f, D_L22_001AF3DC * 0.0003490659f);
-                        func_PAL_L02_00335630(arg0, (s128 *) (g_hero_state + 0x80));
+                        moby_set_controller_speed_limits(arg0, g_space_ship_speed_limit_a * 0.00040000002f, g_space_ship_speed_limit_b * 0.020000001f, g_orbit_param_e * 6.981318e-06f, g_orbit_param_f * 0.0003490659f);
+                        moby_aim_at_target_offset_pal(arg0, (s128 *) (g_hero_state + 0x80));
                         break;
                     }
-                    if ((M2C_FIELD(arg0, u8 *, 0x95) != 6) && (M2C_FIELD(temp_s6, f32 *, 0x3DC) > D_L22_001AF3EC) && (D_L22_001B2AB0 == 0)) {
+                    if ((M2C_FIELD(arg0, u8 *, 0x95) != 6) && (M2C_FIELD(temp_s6, f32 *, 0x3DC) > g_space_ship_threshold) && (g_space_ship_boost_timer == 0)) {
                         moby_set_state(arg0, 0x12, 9);
                     }
                     break;
                 case 15:                            /* switch 2 */
-                    func_PAL_L02_00335630(arg0, (s128 *) (g_hero_state + 0x80));
+                    moby_aim_at_target_offset_pal(arg0, (s128 *) (g_hero_state + 0x80));
                     FastVecScale(&scratch[0].q, arg0 + 0xC0, 3.0f);
                     FastVecAdd(&scratch[0].q, &scratch[0].q, (arg0 + 0x10));
                     if (WalkPathIsClear(arg0, (arg0 + 0x10), &scratch[0].q) == 0) {
-                        func_PAL_L22_003A7930(arg0, 9, 0, 3, 3, D_L22_001AF3E8);
+                        func_PAL_L22_003A7930(arg0, 9, 0, 3, 3, g_space_ship_orbit_arg);
                         moby_set_state(arg0, 0x1F, 6);
                         break;
                     }
@@ -1058,9 +1058,9 @@ block_184:
                             func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 1, 0, 3);
                         }
                     }
-                    if ((M2C_FIELD(temp_s6, s16 *, 0x384) <= 0) || (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || (M2C_FIELD(temp_s6, s32 *, 0x3D8) == 0)
+                    if ((M2C_FIELD(temp_s6, s16 *, 0x384) <= 0) || (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) == 0) || (M2C_FIELD(temp_s6, s32 *, 0x3D8) == 0)
                         || ((temp_f1_5 = M2C_FIELD(temp_s6, f32 *, 0x3DC)) > 60.0f)
-                        || ((temp_a0_6 = M2C_FIELD(temp_s6, s32 *, 0x440), (M2C_FIELD(temp_a0_6, u8 *, 0x60) & 2)) && (temp_f1_5 < D_L22_001AF3EC))) {
+                        || ((temp_a0_6 = M2C_FIELD(temp_s6, s32 *, 0x440), (M2C_FIELD(temp_a0_6, u8 *, 0x60) & 2)) && (temp_f1_5 < g_space_ship_threshold))) {
                         moby_set_state(arg0, 5, 0);
                     } else if (M2C_FIELD(temp_a0_6, u8 *, 0x60) & 2) {
                         M2C_FIELD(temp_s6, s16 *, 0x386) = 0;
@@ -1077,8 +1077,8 @@ block_184:
                             func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 1, 0, 3);
                         }
                     }
-                    if (M2C_FIELD(temp_s6, f32 *, 0x3E0) < D_L22_001AF3EC) {
-                        func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, D_L22_001AF3E8);
+                    if (M2C_FIELD(temp_s6, f32 *, 0x3E0) < g_space_ship_threshold) {
+                        func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, g_space_ship_orbit_arg);
                         moby_set_state(arg0, 0x1F, 4);
                         break;
                     }
@@ -1087,16 +1087,16 @@ block_184:
                         if (M2C_FIELD(temp_s6, f32 *, 0x3DC) < 37.0f) {
                             func_PAL_L22_003A7930(arg0, 0, 0, 3, 1, 1.0f);
                         } else {
-                            func_PAL_L22_003A54A0(arg0);
+                            WalkPathUpdate_pal(arg0);
                         }
                     } else if (temp_v1_4 == 0xB) {
-                        if ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) >= M2C_FIELD(temp_s6, s16 *, 0x430)) && (M2C_FIELD(temp_s6, f32 *, 0x3DC) > 32.0f)) {
+                        if ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) >= M2C_FIELD(temp_s6, s16 *, 0x430)) && (M2C_FIELD(temp_s6, f32 *, 0x3DC) > 32.0f)) {
                             func_PAL_L22_003A7930(arg0, 0, 0, 3, 1, 1.0f);
                         } else {
-                            func_PAL_L22_003A54A0(arg0);
+                            WalkPathUpdate_pal(arg0);
                         }
                     } else {
-                        if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) < M2C_FIELD(temp_s6, s16 *, 0x430)) {
+                        if (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) < M2C_FIELD(temp_s6, s16 *, 0x430)) {
                             func_PAL_L22_003A7930(arg0, 0xB, 0, 3, 1, 1.0f);
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (g_hero_state + 0x80);
                             M2C_FIELD(temp_s6, s16 *, 0x430) = 0x3E8;
@@ -1114,7 +1114,7 @@ block_184:
                             lane_find_nearest_point(arg0, temp_s0_3, &scratch[0].q, 1);
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = temp_s0_3;
                         } else {
-                            func_PAL_L11_00342558(arg0);
+                            moby_call_helper_with_blocks_pal(arg0);
                         }
                     }
                     break;
@@ -1125,13 +1125,13 @@ block_184:
                     }
                     lane_store_nearest_point_as_current(arg0, 1);
                     temp_s0_4 = temp_s6 + 0x360;
-                    M2C_FIELD(temp_s6, s128 *, 0x360) = (s128) M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
+                    M2C_FIELD(temp_s6, s128 *, 0x360) = (s128) M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + g_ship_path_table[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
                     arena_push_point_out(temp_s0_4, 8.0f);
                     M2C_FIELD(temp_s6, f32 *, 0x3A0) = fast_vec_dist((arg0 + 0x10), temp_s0_4);
                     moby_set_state(arg0, 0x22, 5);
                     M2C_FIELD(temp_s6, u16 *, 0x3A4) = 0U;
                     if (M2C_FIELD(temp_s6, s16 *, 0x3A6) == 3) {
-                        if (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) {
+                        if (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) == 0) {
                             M2C_FIELD(temp_s6, s16 *, 0x3A6) = 0;
                         } else {
                             M2C_FIELD(temp_s6, s16 *, 0x3A6) = 1;
@@ -1163,7 +1163,7 @@ block_184:
                     if ((M2C_FIELD(temp_s6, s16 *, 0x384) <= 0) || (M2C_FIELD(temp_s6, s32 *, 0x3D8) == 0) || (M2C_FIELD(temp_s6, s32 *, 0x418) != 0)
                         || ((M2C_FIELD(temp_s6, s32 *, 0x464) != 0) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 2))
                         || ((temp_a1_2 = (u16) M2C_FIELD(temp_s6, s16 *, 0x3A6), (M2C_FIELD(temp_s6, s16 *, 0x3A6) == 1))
-                            && ((M2C_FIELD(D_L22_001B2AB4, s32 *, 8) == 0) || ((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x65)))) {
+                            && ((M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) == 0) || ((u16) M2C_FIELD(arg0, u16 *, 0x96) >= 0x65)))) {
                         var_s5 = arg0 + 0xE0;
                         moby_set_state(arg0, 0x24, 5);
                         func_PAL_L22_003A7930(arg0, 2, 0, 3, 2, 1.0f);
@@ -1173,7 +1173,7 @@ block_184:
                                 if (M2C_FIELD(temp_a0_7, u8 *, 0x60) & 2) {
                                     mode3A6 = (s16) temp_a1_2;
                                     if (mode3A6 == 0) {
-                                        if (M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) == 0) {
+                                        if (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) == 0) {
                                             var_s5 = arg0 + 0xE0;
                                             moby_set_state(arg0, 0x24, 5);
                                             func_PAL_L22_003A7930(arg0, 6, 0, 3, 3, 1.0f);
@@ -1235,9 +1235,9 @@ block_184:
                                                 func_PAL_L22_003A7930(arg0, 3, 0, 3, 2, 1.0f);
                                                 func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 5, 0, 3);
                                             } else if (temp_v1_6 == 0) {
-                                                temp_v0_5 = M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC);
+                                                temp_v0_5 = M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC);
                                                 if (temp_v0_5 > 0) {
-                                                    M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) = (s32) (temp_v0_5 - 1);
+                                                    M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) = (s32) (temp_v0_5 - 1);
                                                 }
                                                 func_PAL_L22_003A7930(arg0, 0xE, 0, 3, 2, 1.0f);
                                                 func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 5, 0, 3);
@@ -1269,7 +1269,7 @@ block_184:
                         }
                         M2C_FIELD(temp_s6, u16 *, 0x3A4) = var_v0_7;
                         if ((u16) M2C_FIELD(arg0, u16 *, 0x96) < 0x32) {
-                            temp_s0_6 = (s32 *) D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]];
+                            temp_s0_6 = (s32 *) g_ship_path_table[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]];
                             if (spC8 == 0) {
                                 var_s3 = M2C_FIELD(temp_s6, s16 *, 0x356) + 1;
                                 if (var_s3 >= *temp_s0_6) {
@@ -1330,7 +1330,7 @@ block_184:
                         }
                         if ((spC8 != 0) || (near = ((s128 *) (temp_s6 + 0x360)), fast_vec_dist((arg0 + 0x10), near) < 2.0f)) {
                             temp_a1_3 = M2C_FIELD(temp_s6, s16 *, 0x356) + M2C_FIELD(temp_s6, s16 *, 0x352);
-                            temp_a2 = D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]];
+                            temp_a2 = g_ship_path_table[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]];
                             if (temp_a1_3 < 0) {
                                 WalkPathPickNext(arg0, var_fp, 1, M2C_FIELD(temp_a2, f32 *, 0x1C));
                             } else {
@@ -1341,7 +1341,7 @@ block_184:
                                     M2C_FIELD(temp_s6, s16 *, 0x356) = temp_a1_3;
                                 }
                             }
-                            *((s128 *) (temp_s6 + 0x360)) = M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + D_L22_001FE940[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
+                            *((s128 *) (temp_s6 + 0x360)) = M2C_FIELD(((M2C_FIELD(temp_s6, s16 *, 0x356) * 0x10) + g_ship_path_table[((OwnerD708 *) temp_s6)->paths[M2C_FIELD(temp_s6, s16 *, 0x354)]]), s128 *, 0x10);
                             arena_push_point_out(((s128 *) (temp_s6 + 0x360)), 8.0f);
                         } else {
                             FastVecSub(&scratch[0].q, near, (arg0 + 0x10));
@@ -1355,15 +1355,15 @@ block_184:
                             M2C_FIELD(temp_s6, s32 *, 0x3E8) = 0;
                         }
                     }
-                    math_steer_along_direction(arg0, temp_s6 + 0x3E4, temp_s6 + 0x3E8, var_s5, D_L22_001AF3FC, D_L22_001AF400, -1.0f);
+                    math_steer_along_direction(arg0, temp_s6 + 0x3E4, temp_s6 + 0x3E8, var_s5, g_space_ship_steer_param_a, g_space_ship_steer_param_b, -1.0f);
                     break;
                 case 36:                            /* switch 2 */
-                    if (gravity_get_center_distance((arg0 + 0x10)) <= D_L22_001B2AA4) {
+                    if (gravity_get_center_distance((arg0 + 0x10)) <= g_planet_radius) {
                         moby_set_state(arg0, 5, 0);
                         M2C_FIELD(temp_s6, s16 *, 0x350) = 0;
                         M2C_FIELD(temp_s6, f32 *, 0x3E4) = M2C_FIELD(temp_s6, f32 *, 0x3E8) = 0.0f;
                     } else {
-                        spC4 = gravity_get_center_distance((arg0 + 0x10)) - D_L22_001B2AA4;
+                        spC4 = gravity_get_center_distance((arg0 + 0x10)) - g_planet_radius;
                         scratch[1].q = *(s128 *)(arg0 + 0x10);
                         arena_push_point_out(&scratch[1].q, 0.0f);
                         FastVecSub(&scratch[0].q, &scratch[1].q, (arg0 + 0x10));
@@ -1376,19 +1376,19 @@ block_184:
                     if (M2C_FIELD(arg0, u8 *, 0x20) == 0x1E) {
                         if ((M2C_FIELD(temp_s6, s32 *, 0x3D0) != 0) && (M2C_FIELD(temp_s6, s32 *, 0x3D8) != 0)) {
                             temp_f1_7 = M2C_FIELD(temp_s6, f32 *, 0x3DC);
-                            if (temp_f1_7 < D_L22_001AF3EC) {
-                                if ((math_random_int_below(5) == 0) && (M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0)) {
+                            if (temp_f1_7 < g_space_ship_threshold) {
+                                if ((math_random_int_below(5) == 0) && (M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0)) {
                                     moby_set_state(arg0, 0x21, 5);
                                     M2C_FIELD(temp_s6, s16 *, 0x3A6) = 3;
                                 } else {
-                                    func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, D_L22_001AF3E8);
+                                    func_PAL_L22_003A7930(arg0, 0xD, 0, 3, 3, g_space_ship_orbit_arg);
                                     moby_set_state(arg0, 0x1F, 4);
                                 }
                             } else if (temp_f1_7 < 33.0f) {
                                 var_s1_2 = 0;
-                                var_s0 = M2C_FIELD(D_L22_001B2AB4, s32 *, 8) != 0;
+                                var_s0 = M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) != 0;
                                 if (M2C_FIELD(temp_s6, s16 *, 0x41E) > 0) {
-                                    var_s1_2 = M2C_FIELD(D_L22_001B2AB4, s32 *, 0xC) != 0;
+                                    var_s1_2 = M2C_FIELD(g_space_ship_pickup_slots, s32 *, 0xC) != 0;
                                 }
                                 if ((var_s0 != 0) && (var_s1_2 != 0)) {
                                     if (math_random_int_below(2) != 0) {
@@ -1398,9 +1398,9 @@ block_184:
                                     }
                                 }
                                 if (var_s0 != 0) {
-                                    temp_a1_4 = M2C_FIELD(D_L22_001B2AB4, s32 *, 8);
+                                    temp_a1_4 = M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8);
                                     if (temp_a1_4 >= 0x32) {
-                                        M2C_FIELD(temp_s6, s16 *, 0x430) = (s16) ((u16) M2C_FIELD(D_L22_001B2AB4, s32 *, 8) - math_random_int_below(0x23));
+                                        M2C_FIELD(temp_s6, s16 *, 0x430) = (s16) ((u16) M2C_FIELD(g_space_ship_pickup_slots, s32 *, 8) - math_random_int_below(0x23));
                                     } else {
                                         if (temp_a1_4 >= 3) {
                                             M2C_FIELD(temp_s6, s16 *, 0x430) = (s16) math_random_int_below(temp_a1_4 / 2);
@@ -1421,22 +1421,22 @@ block_184:
                                     moby_set_state(arg0, 0x12, 9);
                                 }
                             } else {
-                                func_PAL_L22_003A54A0(arg0);
+                                WalkPathUpdate_pal(arg0);
                             }
                         } else {
-                            func_PAL_L22_003A54A0(arg0);
+                            WalkPathUpdate_pal(arg0);
                         }
                     }
                     break;
                 case 1:                             /* switch 2 */
-                    if (D_L22_001AF304 < 0xC8) {
+                    if (g_space_ship_timer < 0xC8) {
                         moby_check_target_point_from_offset(arg0, (s128 *) (g_hero_state + 0x80));
                         if (flag_set_first_pending(arg0) != 0) {
                             func_PAL_L22_003A7930(arg0, 0, 0, 0, 3, 1.0f);
                             func_PAL_002A7E68(((VarsD708 *) temp_s6)->p448, 7, 0, 0);
                         }
                         if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
-                            func_PAL_L11_00342558(arg0);
+                            moby_call_helper_with_blocks_pal(arg0);
                         }
                     }
                     break;
@@ -1451,7 +1451,7 @@ block_184:
                     }
                     FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
-                        func_PAL_L11_00342558(arg0);
+                        moby_call_helper_with_blocks_pal(arg0);
                     }
                     break;
                 case 3:                             /* switch 2 */
@@ -1468,7 +1468,7 @@ block_184:
                     }
                     FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
-                        func_PAL_L11_00342558(arg0);
+                        moby_call_helper_with_blocks_pal(arg0);
                     }
                     break;
                 case 4:                             /* switch 2 */
@@ -1484,7 +1484,7 @@ block_184:
                     }
                     FastDecTimer((s32) (temp_s6 + 0x384));
                     if (M2C_FIELD(temp_s6, s16 *, 0x1D0) == 0) {
-                        func_PAL_L11_00342558(arg0);
+                        moby_call_helper_with_blocks_pal(arg0);
                     }
                     break;
                 case 37:                            /* switch 2 */
@@ -1571,25 +1571,25 @@ block_184:
                     vec_scale_to_length(&scratch[1].q, temp_s6 + 0x200, 12.0f);
                     FastVecAdd(&scratch[1].q, &scratch[1].q, d);
                     if (CollLine(d, &scratch[1].q, 0x12, 0, 0) != 0) {
-                        *(s128 *)(arg0 + 0x10) = D_L22_001C00E0;
+                        *(s128 *)(arg0 + 0x10) = g_spawn_point;
                     }
                 }
                 if (M2C_FIELD(arg0, u8 *, 0x20) != 0x26) {
                     temp_f1_8 = (f32) ((s16) M2C_FIELD(temp_s6, s16 *, 0x24) / 3);
                     temp_f0 = M2C_FIELD(temp_s6, f32 *, 0x20);
                     if (temp_f0 < temp_f1_8) {
-                        if (D_L22_001AF36C == 0) {
+                        if (g_space_ship_blended_value == 0) {
                             {
                                 f32 ratio = temp_f0 / (f32) ((s16) M2C_FIELD(temp_s6, s16 *, 0x24) / 3);
-                                D_L22_001AF36C = D_L22_001AF368 + (s32) ((f32) (D_L22_001AF364 - D_L22_001AF368) * ratio);
+                                g_space_ship_blended_value = g_space_ship_value_min + (s32) ((f32) (g_space_ship_value_max - g_space_ship_value_min) * ratio);
                             }
                             if (math_random_int_below(2) != 0) {
-                                func_PAL_L22_003A99D8((s32) arg0, math_random_int_below(4), 0, D_L22_001AF370);
+                                func_PAL_L22_003A99D8((s32) arg0, math_random_int_below(4), 0, g_space_ship_scatter_param);
                             } else {
-                                func_PAL_L22_003A99D8(M2C_FIELD(temp_s6, s32 *, 0x440), math_random_int_below(6), 0, D_L22_001AF370);
+                                func_PAL_L22_003A99D8(M2C_FIELD(temp_s6, s32 *, 0x440), math_random_int_below(6), 0, g_space_ship_scatter_param);
                             }
                         } else {
-                            math_fast_float_d(&D_L22_001AF36C);
+                            math_fast_float_d(&g_space_ship_blended_value);
                         }
                     }
                 }

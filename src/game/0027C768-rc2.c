@@ -28,7 +28,7 @@ extern void FastVecSub(f32 *a, s32 b, s8 *c);
 extern void FastVecScale(f32 *a, f32 *b, f32 c);
 extern void transform_vector(f32 *a, f32 *b, s8 *c);
 extern s8 g_camera_eye_state[];
-extern s8 D_001B9250[];
+extern s8 g_projection_scale[];
 extern s32 g_screen_width;
 extern s32 g_screen_height;
 
@@ -46,7 +46,7 @@ void gfx_world_to_screen_unit(s32 world_pos, f32 *screen_x, f32 *screen_y) {
     point[3] = 1.0f;
     transform_vector(point, point, matrices - 0x100);
     w = point[3];
-    FastVecScale(point, point, *(f32 *)D_001B9250 / w);
+    FastVecScale(point, point, *(f32 *)g_projection_scale / w);
     pixel_x = point[0] + (f32)(g_screen_width >> 1);
     *screen_x = pixel_x;
     *screen_x = pixel_x / (f32)g_screen_width;

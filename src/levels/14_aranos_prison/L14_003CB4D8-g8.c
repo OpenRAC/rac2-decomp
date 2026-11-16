@@ -3,7 +3,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
-extern float D_L14_001AFF0C __attribute__((sda));
+extern float g_swing_offset __attribute__((sda));
 extern void euler_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -22,7 +22,7 @@ void swing_apply_to_object(char *object) {
     euler_rotation_basis(matrix, angles);
     object += 0x10;
     initial.q = 0;
-    initial.f[2] = D_L14_001AFF0C;
+    initial.f[2] = g_swing_offset;
     world.q = initial.q;
     matrix_mul_vec3(&world, &world, matrix);
     FastVecAdd(&world, &world, object);

@@ -4,13 +4,13 @@ typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300];
 extern unsigned char g_hero_state[];
 
 #include "include_asm.h"
-extern char *D_L16_001B2B1C;
+extern char *g_moby_instance_table;
 
 extern char g_sound_state[];
-extern int D_L16_001AF894 __attribute__((sda));
-extern int D_L16_001AF898 __attribute__((sda));
-extern int D_L16_001AF890 __attribute__((sda));
-extern int D_L16_001AF89C __attribute__((sda));
+extern int g_beam_active_flag __attribute__((sda));
+extern int g_beam_done_flag __attribute__((sda));
+extern int g_beam_age_limit __attribute__((sda));
+extern int g_beam_blocked_flag __attribute__((sda));
 extern int IsPointInCuboid(void *, int);
 extern void snd_stop_voice(int);
 extern int moby_count_group_not_in_state(int, int);
@@ -47,7 +47,7 @@ void func_PAL_L16_003AD850(char *object)
     char *record;
     if (*(unsigned char *)(object + 32) != 0) {
         if (*(unsigned char *)(object + 32) == 1) {
-            target = D_L16_001B2B1C + *(int *)(state + 1576) * 256;
+            target = g_moby_instance_table + *(int *)(state + 1576) * 256;
             if (target == 0 || *(unsigned char *)(target + 32) == 254 || *(unsigned char *)(target + 32) == 253) {
                 if (IsPointInCuboid((&((Hero *)g_hero_state)->c[128]), *(int *)(state + 1632))) {
                     clear_link(state);
@@ -62,7 +62,7 @@ void func_PAL_L16_003AD850(char *object)
         return;
     }
 active:
-    if (D_L16_001AF894)
+    if (g_beam_active_flag)
         return;
     switch (*(unsigned char *)(object + 32)) {
     case 0:
@@ -100,9 +100,9 @@ active:
         break;
     }
     if (*(short *)(state + 18)) {
-        if (D_L16_001AF898 == 0)
+        if (g_beam_done_flag == 0)
             streak_effect_update(object);
-        if (D_L16_001AF890 < *(short *)(state + 18) && D_L16_001AF89C == 0)
+        if (g_beam_age_limit < *(short *)(state + 18) && g_beam_blocked_flag == 0)
             gfx_add_draw_callback_third(gfx_draw_electric_beam, object);
     }
 }

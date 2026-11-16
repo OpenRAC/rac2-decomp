@@ -11,7 +11,7 @@ extern int moby_pick_random_matching(void *, int, int *, float *, float *, float
                          float *, float *, float *);
 extern void anim_start_blended(void *, int, int, int);
 extern void gfx_start_color_fade(void *, void *);
-extern int D_L05_001A8FF0;
+extern int g_tether_l05_active_flag;
 extern float vec_get_vertical_offset(void *, void *, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -132,7 +132,7 @@ update:
         goto done;
     if (!valid)
         goto done;
-    if (D_L05_001A8FF0) {
+    if (g_tether_l05_active_flag) {
         length = vec_get_vertical_offset(object, vector, 0);
         if (length < 1.0f)
             length = 1.0f;

@@ -17,7 +17,7 @@ typedef float f32_Fe9770b1e;
 #endif
 
 /* Resident shared table reached through $gp (small-data symbol). */
-extern f32_Fe9770b1e D_L04_001AE0B8[2] __attribute__((sda));
+extern f32_Fe9770b1e g_prompt_menu_data[2] __attribute__((sda));
 
 extern void *func_00336E40_1(void *);
 
@@ -52,7 +52,7 @@ void prompt_menu_init(u8_Fe9770b1e *self, void *arg) {
     prompt = self + 8;
     ((f32_Fe9770b1e *)*(void **)(self + 684))[0] = 255.0f;
     ((f32_Fe9770b1e *)*(void **)(self + 684))[1] = 195.0f;
-    func_0033ABD8_1(prompt, arg, D_L04_001AE0B8);
+    func_0033ABD8_1(prompt, arg, g_prompt_menu_data);
     textA = func_00288FB8_1(11667);
     textB = func_00288FB8_1(11598);
     textC = func_00288FB8_1(11599);

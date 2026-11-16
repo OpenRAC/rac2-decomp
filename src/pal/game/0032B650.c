@@ -14,7 +14,7 @@ extern void *func_PAL_002C0838(char *p, float *q, int a, int b);
 
 
 /* Per frame: scales the value one helper returns by the factor another helper returns, stores both scaled samples and a third sample into a three-float record, and hands the record to a setter with two selector results. */
-void func_PAL_0032B650(char *a0)
+void part_emit_spark_burst_pal(char *a0)
 {
     float v[3];
     float a;
@@ -36,21 +36,21 @@ void func_PAL_0032B650(char *a0)
 }
 
 
-extern unsigned char *D_001BAF98[];
+extern unsigned char *g_hit_result[];
 extern char g_music_state[];
 extern int snd_resume_music_stream(void);
 extern void moby_set_byte_on_group(int, int);
 extern void STUB_printf(const char *, ...);
-extern char D_001B0238[];
+extern char g_str_hero_under_falling_debug[];
 extern int g_surface_height_tiles[] __attribute__((sda));
-extern int D_001B22D8[] __attribute__((sda));
+extern int g_surface_box_count[] __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
 extern int func_PAL_0026F670(void);
 
-void func_PAL_0032B730(char *self)
+void hero_check_under_falling_object_pal(char *self)
 {
-    unsigned char *target = D_001BAF98[0];
+    unsigned char *target = g_hit_result[0];
     char *state = *(char **)(self + 0x68);
     unsigned char *object;
     unsigned char *obj_state;
@@ -84,7 +84,7 @@ void func_PAL_0032B730(char *self)
                     return;
                 }
                 if (obj_state[0x14] == 0) {
-                    RippleDisturb(g_surface_height_tiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
+                    RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
                     if (func_PAL_0026F670() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
@@ -101,7 +101,7 @@ void func_PAL_0032B730(char *self)
                 *(int *)(state + 0x44) = 1;
             }
         } else {
-            STUB_printf(D_001B0238, *(short *)(object + 0xAA));
+            STUB_printf(g_str_hero_under_falling_debug, *(short *)(object + 0xAA));
         }
         *(int *)(state + 0x38) = 1;
     } else {

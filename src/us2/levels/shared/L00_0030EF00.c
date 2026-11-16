@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 extern int func_US2_00340AA8(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EF00(int argument)
+int level_l00_call_module_handler_with_arg_8_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 

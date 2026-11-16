@@ -10,7 +10,7 @@ extern float func_002A7878_1(float low, float high);
 extern void *part_spawn_bubble(char *object, char *local, float amount, float base);
 
 /* Family 6eb4f363e5305bed: seed body at func_PAL_L00_0038A408. */
-void func_PAL_L00_0038A408(char *object)
+void part_l00_spawn_object_effect_burst_pal(char *object)
 {
     char local[16];
     float base;

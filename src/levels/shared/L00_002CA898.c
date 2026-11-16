@@ -24,7 +24,7 @@ typedef struct {
 } HeroActionState;
 extern HeroActionState g_hero_state;
 
-extern unsigned int D_00138320[];
+extern unsigned int g_pad_pressed_flags[];
 extern int ref_L00_002CA898_00(int, int);
 
 extern void hero_resolve_stick_direction(int, float);
@@ -32,7 +32,7 @@ extern void set_hero_animation(int, int, float);
 extern void hero_select_anim_frame(int, int);
 extern int ref_L00_002CA898_01(int);
 extern void vec_clamp_length(void *, float);
-extern int D_L00_001A7DDC __attribute__((sda));
+extern int g_hero_landing_anim_id __attribute__((sda));
 
 /* Picks what the hero does next after a landing or a stop, such as starting to run or idling. */
 void hero_choose_next_move_after_landing(void)
@@ -43,7 +43,7 @@ void hero_choose_next_move_after_landing(void)
         return;
     }
     hero_resolve_stick_direction(0, 1.0f);
-    if (D_00138320[0] & 8) {
+    if (g_pad_pressed_flags[0] & 8) {
         ref_L00_002CA898_00(4, 0);
         set_hero_animation(0xD, 2, -2.0f);
         hero_select_anim_frame(3, 0x12);
@@ -58,7 +58,7 @@ void hero_choose_next_move_after_landing(void)
             amount = 8;
             if (g_hero_state.level_49c > 5) amount = 14;
             g_hero_state.frame = 1;
-            set_hero_animation(4, D_L00_001A7DDC, (float)amount);
+            set_hero_animation(4, g_hero_landing_anim_id, (float)amount);
             g_hero_state.flag_40e = 1;
         }
         return;

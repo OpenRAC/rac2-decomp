@@ -7,7 +7,7 @@ typedef struct {
     float normal[4];
 } CollisionResult;
 
-extern CollisionResult D_L08_001BFF40;
+extern CollisionResult g_collision_l08_result;
 extern int coll_test_point(void *, int, void *, float);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -25,9 +25,9 @@ typedef struct {
     int width, height, half_width, half_height;
     int left, top, right, bottom;
 } ScreenExtent;
-extern LensFlare D_L08_001B9E00;
-extern u8 D_L08_001B9B00[];
-extern int D_L08_001B0DC0;
+extern LensFlare g_lens_flare_2;
+extern u8 g_hero_position_vec[];
+extern int g_lens_l08_flare_base_size;
 extern ScreenExtent g_screen_width __attribute__((sda));
 extern f32 fast_vec_dist(void *, void *);
 extern f32 IntToFloat(int);
@@ -55,7 +55,7 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 extern unsigned char *effect_create_timed(void *, void *, int, int, int, int, int, float);
 extern int coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
 extern float FastAddRotations(float, float);
-extern int D_0018C0BC;
+extern int g_hero_mode;
 
 /* the level's object-handle table entry: 0x100 bytes, indexed by the handle */
 typedef struct {
@@ -156,8 +156,8 @@ extern void func_2F9DF0(void *, void *, void *);
 extern void func_2F9E20(void *, void *, void *);
 extern void func_2FA0B8(void *, void *, f32);
 extern void sandfly_pick_flight_target(Ent *);
-extern f32 D_L08_001BFF68;
-extern f32 D_00189EA8;
+extern f32 g_ground_height_result;
+extern f32 g_hero_height_limit;
 extern char g_hero_position[];
 
 extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
@@ -279,8 +279,8 @@ typedef struct {
     int handle;
 } HeroTarget;
 extern HeroTarget g_hero_state;
-extern HeightGate D_L08_001CA080;
-extern char D_L08_001BFF80[];
+extern HeightGate g_init_context;
+extern char g_collision_aim_vector[];
 extern int GetCollHitMaterial(void);
 extern void moby_update_ground_check(void *);
 extern void moby_store_ground_height(void *);
@@ -304,15 +304,15 @@ void crawler_update_hits_aim(u8 *object)
     float *pitchAngle, *rollAngle;
     int hit;
 
-    if (D_L08_001CA080.active) {
-        if (*(float *)(object + 0x18) < D_L08_001CA080.lower && D_L08_001CA080.mode == 1) return;
-        if (D_L08_001CA080.lower < *(float *)(object + 0x18) && D_L08_001CA080.mode == 0) return;
-        if (D_L08_001CA080.active == 2) {
-            if (D_L08_001CA080.upper < *(float *)(object + 0x18) && D_L08_001CA080.mode == 1) return;
-            if (*(float *)(object + 0x18) < D_L08_001CA080.upper && D_L08_001CA080.mode == 2) return;
+    if (g_init_context.active) {
+        if (*(float *)(object + 0x18) < g_init_context.lower && g_init_context.mode == 1) return;
+        if (g_init_context.lower < *(float *)(object + 0x18) && g_init_context.mode == 0) return;
+        if (g_init_context.active == 2) {
+            if (g_init_context.upper < *(float *)(object + 0x18) && g_init_context.mode == 1) return;
+            if (*(float *)(object + 0x18) < g_init_context.upper && g_init_context.mode == 2) return;
         }
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L08_001B9B00) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_position_vec) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 22;
     }
@@ -342,7 +342,7 @@ void crawler_update_hits_aim(u8 *object)
         matrix_from_basis_rows(inverse, matrix);
         matrix_from_basis_rows(other, object + 0xC0);
         coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
-        func_2FA0B8(angles, D_L08_001BFF80, 1.0f);
+        func_2FA0B8(angles, g_collision_aim_vector, 1.0f);
         matrix_mul_vec3(angles, angles, inverse);
         target = mat_fast_helper_a(angles[2], angles[0]);
         math_approach_target_with_direction_mode(pitchAngle, state + 0x460, target, 0.0017453294713050127f,
@@ -401,7 +401,7 @@ void crawler_spawn_spit_effect(char *object)
     qcopy_nc(start,origin);
     vec_scale_to_length(end,matrix,3.0f);
     if (*(int *)(state+0x250)) {
-        if ((unsigned)(D_0018C0BC-17)<2) end[2]=*(float *)(state+0x218)-start[2];
+        if ((unsigned)(g_hero_mode-17)<2) end[2]=*(float *)(state+0x218)-start[2];
         else end[2]=*(float *)(state+0x248)-start[2];
         if (end[2]>1.2f) end[2]=1.2f;
         else if(end[2]<-1.2f) end[2]=-1.2f;
@@ -477,7 +477,7 @@ void crawler_spawn_spit_effect(char *object)
 
 
 
-extern u32 D_L08_001B9E04;
+extern u32 g_far_target_flag;
 
 /* 128-bit copies reach lq/sq only through TImode. */
 typedef int TQ_003F79E0 __attribute__((mode(TI)));
@@ -496,25 +496,25 @@ void gfx_l08_draw_lens_flare(u8 *object) {
     long long tex;
     int *base_size;
 
-    if (D_L08_001B9E00.state != 1 || (D_L08_001B9E00.moby->flags & 0x80)) {
-        D_L08_001B9E00.state = 0;
+    if (g_lens_flare_2.state != 1 || (g_lens_flare_2.moby->flags & 0x80)) {
+        g_lens_flare_2.state = 0;
         return;
     }
-    if (D_L08_001B9E00.intensity <= 0.0f)
+    if (g_lens_flare_2.intensity <= 0.0f)
         return;
-    dist = fast_vec_dist(D_L08_001B9B00, vars + 0x10);
+    dist = fast_vec_dist(g_hero_position_vec, vars + 0x10);
     ctr[0] = IntToFloat(g_screen_width.half_width);
     ctr[1] = IntToFloat(g_screen_width.half_height);
-    base_size = &D_L08_001B0DC0;
+    base_size = &g_lens_l08_flare_base_size;
     gfx_project_world_point_to_screen(scr, vars + 0x10);
     scr[0] = (scr[0] - IntToFloat(g_screen_width.left)) * 0.0625f;
     scr[1] = (scr[1] - IntToFloat(g_screen_width.top)) * 0.0625f;
     d[0] = ctr[0] - scr[0];
     d[1] = ctr[1] - scr[1];
     for (i = 0; i < 12; i++) {
-        tex = GetEffectTextureDescriptor(D_L08_001B9E00.tex[i] + 0x45);
-        off[0] = d[0] * D_L08_001B9E00.dist[i];
-        off[1] = d[1] * D_L08_001B9E00.dist[i];
+        tex = GetEffectTextureDescriptor(g_lens_flare_2.tex[i] + 0x45);
+        off[0] = d[0] * g_lens_flare_2.dist[i];
+        off[1] = d[1] * g_lens_flare_2.dist[i];
         at[0] = ctr[0] + off[0];
         at[1] = ctr[1] + off[1];
         fade = dist - 5.0f;
@@ -532,25 +532,25 @@ void gfx_l08_draw_lens_flare(u8 *object) {
             fy = 1.0f;
         else if (fy < 0.0f)
             fy = 0.0f;
-        fade *= fx * fy * D_L08_001B9E00.intensity;
-        rgba = (FloatToInt(fade * D_L08_001B9E00.alpha[i]) << 24) | (D_L08_001B9E00.color[i] & 0xFFFFFF);
-        size = FloatToInt(*base_size * D_L08_001B9E00.scale[i]);
+        fade *= fx * fy * g_lens_flare_2.intensity;
+        rgba = (FloatToInt(fade * g_lens_flare_2.alpha[i]) << 24) | (g_lens_flare_2.color[i] & 0xFFFFFF);
+        size = FloatToInt(*base_size * g_lens_flare_2.scale[i]);
         VU1_addGSregister(0x42, 0x8000000048LL);
         half = size >> 1;
         x = FloatToInt(at[0] - half);
         y = FloatToInt(at[1] - half);
         DrawTexturedQuad(x, y, size, size, 0, 0, 0x40, 0x40, rgba, tex);
     }
-    D_L08_001B9E00.intensity = 0.0f;
+    g_lens_flare_2.intensity = 0.0f;
 }
 
 
 extern void moby_set_state(void *, s32, s32);
-extern u8 D_001A7B00[] __attribute__((sda));
-extern u8 D_L08_001BFD00[];
-extern s32 D_L08_001A8F00[] __attribute__((sda));
-extern s32 D_L08_001B2700[] __attribute__((sda));
-extern u8 *D_L08_001B2ACC[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
+extern u8 g_request_l08_queue[];
+extern s32 g_cutscene_l08_active_flag[] __attribute__((sda));
+extern s32 g_glider_flag_table[] __attribute__((sda));
+extern u8 *g_collision_box_table[] __attribute__((sda));
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 req_push_queue(void *, s32);
 extern s32 req_launch_queued(void *);
@@ -568,7 +568,7 @@ void glider_update(u8 *self) {
 
     switch (self[0x20]) {
     case 0:
-        if (D_001A7B00[13] != 0) {
+        if (g_inventory_have_flags[13] != 0) {
             moby_mark_spawned(self);
             break;
         }
@@ -579,8 +579,8 @@ void glider_update(u8 *self) {
     case 1:
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), 0.07853982597589493f);
         if (IsPointInCuboid(g_hero_position, *(s32 *)(vars + 4)) != 0) {
-            if (req_push_queue(D_L08_001BFD00, 0x5B) != 0) {
-                req_launch_queued(D_L08_001BFD00);
+            if (req_push_queue(g_request_l08_queue, 0x5B) != 0) {
+                req_launch_queued(g_request_l08_queue);
                 self[0x20] = 2;
             }
         }
@@ -588,16 +588,16 @@ void glider_update(u8 *self) {
             part_spawn_sparkles_and_glow_rings(self);
         break;
     case 2:
-        D_L08_001B2700[10] = 1;
-        if (D_L08_001A8F00[0] == 2) {
+        g_glider_flag_table[10] = 1;
+        if (g_cutscene_l08_active_flag[0] == 2) {
             self[0x31] = 0;
             *(u16 *)(self + 0x34) |= 1;
         }
         if (game_is_either_mode_two() != 0)
             break;
-        D_L08_001B2700[10] = 0;
+        g_glider_flag_table[10] = 0;
         self[0x31] = 1;
-        entry = D_L08_001B2ACC[0];
+        entry = g_collision_box_table[0];
         *(u16 *)(self + 0x34) &= 0xFFFE;
         entry += *(s32 *)(vars + 8) * 0x80;
         hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
@@ -626,13 +626,13 @@ void thrown_l08_object_update(char *object)
         hit = coll_test_point(position, 0, *(void **)(state + 0x18), 0.3f);
         position[2] -= 0.3f;
     } else {
-        qcopy(D_L08_001BFF40.adjusted, D_L08_001BFF40.hit);
-        D_L08_001BFF40.adjusted[2] += 0.3f;
+        qcopy(g_collision_l08_result.adjusted, g_collision_l08_result.hit);
+        g_collision_l08_result.adjusted[2] += 0.3f;
     }
     if (hit) {
-        qcopy(object + 0x10, D_L08_001BFF40.adjusted);
+        qcopy(object + 0x10, g_collision_l08_result.adjusted);
         *(float *)(object + 0x18) -= 0.3f;
-        vec_fast_normalize(state, state, D_L08_001BFF40.normal);
+        vec_fast_normalize(state, state, g_collision_l08_result.normal);
         FastVecScale(state, state, 0.75f);
         if (FastVecLength(state) < 0.01f) {
             moby_mark_spawned(object);
@@ -772,10 +772,10 @@ void snd_stop_queued(Ent *moby)
     }
 }
 
-extern char D_L08_001BFF60[];
+extern char g_collision_l08_hit_point[];
 extern void FastVecSub(void *, void *, void *);
-extern char *D_L08_001FE7BC;
-extern char *D_L08_001B29DC[] __attribute__((sda));
+extern char *g_path_segment_list;
+extern char *g_moby_array[] __attribute__((sda));
 extern s32 math_closest_point_on_polygon_edge(void *, void *, void *, int);
 extern int coll_test_point_against_shapes(void *, int, int, int, int);
 extern float coll_probe_ground_height_below(void *, int, float);
@@ -793,7 +793,7 @@ void sandfly_pick_flight_target(Ent *object) {
                 {
                     float y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 3.0f;
                     int handle = *(int *)(state + 0x184);
-                    char *entry = D_L08_001B29DC[0];
+                    char *entry = g_moby_array[0];
                     *(float *)(state + 0x168) = 0;
                     *(float *)(state + 0x164) = y;
                     FastVecAdd(state + 0x160, state + 0x160, entry + (handle << 8) + 0x10);
@@ -819,12 +819,12 @@ void sandfly_pick_flight_target(Ent *object) {
             *(float *)(state + 0x164) = (func_001163B0() & 1) ? value - offset : value + offset;
         }
     } else if (*(int *)(state + 0x1A8) == -1) {
-        math_closest_point_on_polygon_edge(state + 0x160, state + 0x160, D_L08_001FE7BC + 0x10, *(int *)D_L08_001FE7BC);
+        math_closest_point_on_polygon_edge(state + 0x160, state + 0x160, g_path_segment_list + 0x10, *(int *)g_path_segment_list);
     }
     if (CollLine((char *)object + 0x10, state + 0x160, 2, object, 0)) {
-        FastVecSub(state + 0x160, D_L08_001BFF60, state + 0x160);
+        FastVecSub(state + 0x160, g_collision_l08_hit_point, state + 0x160);
         vec_scale_to_length(state + 0x160, state + 0x160, 2.0f);
-        FastVecAdd(state + 0x160, state + 0x160, D_L08_001BFF60);
+        FastVecAdd(state + 0x160, state + 0x160, g_collision_l08_hit_point);
     }
     *(float *)(state + 0x168) = coll_probe_ground_height_below(state + 0x160, 0, 4.0f) + 1.7f;
 }

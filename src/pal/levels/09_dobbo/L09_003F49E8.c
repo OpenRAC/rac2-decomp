@@ -16,14 +16,14 @@ typedef struct {
     char pad2C[0xC];
     float high;
 } DobboLimits;
-extern DobboLimits D_L09_001C9F80;
+extern DobboLimits g_dobbo_limits;
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 
 struct DobboMoby;
 extern void counter_tick_release_sounds(unsigned char *);
-extern void func_PAL_L09_003F49E8(unsigned char *);
+extern void dobbo_handle_damage_pal(unsigned char *);
 extern int PlayMobySound(int, int, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_mark_spawned(void *);
@@ -55,20 +55,20 @@ void func_PAL_L09_003F4B40(unsigned char *object)
     Vec point, direction;
     int i;
 
-    if (D_L09_001C9F80.mode) {
-        if (F32(object, 0x18) < D_L09_001C9F80.low && D_L09_001C9F80.side == 1)
+    if (g_dobbo_limits.mode) {
+        if (F32(object, 0x18) < g_dobbo_limits.low && g_dobbo_limits.side == 1)
             return;
-        if (D_L09_001C9F80.low < F32(object, 0x18) && D_L09_001C9F80.side == 0)
+        if (g_dobbo_limits.low < F32(object, 0x18) && g_dobbo_limits.side == 0)
             return;
-        if (D_L09_001C9F80.mode == 2) {
-            if (D_L09_001C9F80.high < F32(object, 0x18) && D_L09_001C9F80.side == 1)
+        if (g_dobbo_limits.mode == 2) {
+            if (g_dobbo_limits.high < F32(object, 0x18) && g_dobbo_limits.side == 1)
                 return;
-            if (F32(object, 0x18) < D_L09_001C9F80.high && D_L09_001C9F80.side == 2)
+            if (F32(object, 0x18) < g_dobbo_limits.high && g_dobbo_limits.side == 2)
                 return;
         }
     }
     state = *(unsigned char **)(object + 0x68);
-    func_PAL_L09_003F49E8(object);
+    dobbo_handle_damage_pal(object);
     /* the jump table has entries 0 to 4; 0, 3 and 4 do nothing */
     switch (object[0x95]) {
     case 0:

@@ -13,7 +13,7 @@ typedef struct {
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
 extern SurfacePlayer g_hero_state;
-extern char D_001A8BD0[] __attribute__((sda));
+extern char g_default_effect_vector[] __attribute__((sda));
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
@@ -27,7 +27,7 @@ extern int ref_00302DA0_03(void);
 extern int FindSurfaceGridCell(char *, void *, int *, int *);
 extern void moby_set_state(u8 *, u8, s32);
 extern float math_lerp_float(float, float, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
     float, float, float, float, int, float, int, int, int, int, int);
 
 /* func_00302A20 uses the quadword-copy profile in 00300618-qcopy.c. */
@@ -58,7 +58,7 @@ void func_PAL_00303F38(char *object)
             (player->state!=0x39 || *(int *)(*(char **)(player->field2290+0x24)+0x1f0)) &&
             player->state!=0x7a) {
             if (player->state==0x31) {
-                func_PAL_002AC718(player->field1830, D_001A8BD0, 0, 0.0f, 0.0f, 10, 3, 16,
+                SpawnExplosionEffects_pal(player->field1830, g_default_effect_vector, 0, 0.0f, 0.0f, 10, 3, 16,
                     4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x00810001);
                 ref_00302DA0_00(0x88,0,0.0f);
                 player->field1830=0;

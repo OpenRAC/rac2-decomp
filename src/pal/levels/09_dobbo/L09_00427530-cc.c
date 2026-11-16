@@ -75,10 +75,10 @@ void dobbo_apply_setting_by_index(char *a0, s32 a1, char *a2, s32 a3);
 /* func_L09_00408478 reads D_001A7AF8[k] and stores D_L09_001B25A0[2] as elements of sda arrays:
  * (mem (const (plus sym k))) is a two-word move, so these stay out of delay slots. */
 typedef struct { char pad[0x5c]; int state; int flags; } DobboPlayerFlags;
-extern DobboPlayerFlags D_00139768;
+extern DobboPlayerFlags g_request_flag_table;
 extern int g_player_bolts SDATA(D_001A79F8);
 extern int g_current_map_index SDATA(D_001A79F0);
-extern char *D_L09_001B294C SDATA(D_L09_001B294C);
+extern char *g_dobbo_point_table SDATA(D_L09_001B294C);
 /* func_L09_00409308 is in L09_00409308.c. */
 
 /* func_L09_0040A2E8 is in L09_0040A2E8-g8.c. */

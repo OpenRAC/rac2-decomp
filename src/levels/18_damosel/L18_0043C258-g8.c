@@ -14,18 +14,18 @@ extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
 extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
 extern void vec_scale_to_length(void *, void *, float), matrix_mul_vec3(void *, void *, void *), vec_add_random_offset(void *, float), FastVecAdd(void *, void *, void *);
 extern u8 g_hero_position[];
-extern u8 D_L18_001A8F20[] __attribute__((sda));
-extern float D_L18_001B1AB0 __attribute__((sda));
-extern float D_L18_001B1AB4 __attribute__((sda));
-extern float D_L18_001B1AB8 __attribute__((sda));
-extern float D_L18_001B1ABC __attribute__((sda));
-extern float D_L18_001B1AC0 __attribute__((sda));
-extern float D_L18_001B1AC4 __attribute__((sda));
-extern float D_L18_001B1ACC __attribute__((sda));
-extern int D_L18_001B1AD0 __attribute__((sda));
-extern int D_L18_001B1AD4 __attribute__((sda));
-extern u8 D_L18_001B1AE0[] SDATA(D_L18_001B1AE0);
-extern u8 D_L18_001B1AF0[] SDATA(D_L18_001B1AF0);
+extern u8 g_explosion_effect_desc[] __attribute__((sda));
+extern float g_turret_velocity_z_max __attribute__((sda));
+extern float g_turret_turn_x_max_deg __attribute__((sda));
+extern float g_turret_turn_y_max_deg __attribute__((sda));
+extern float g_turret_muzzle_jitter __attribute__((sda));
+extern float g_turret_shot_speed_max __attribute__((sda));
+extern float g_turret_shot_speed_min __attribute__((sda));
+extern float g_turret_gravity __attribute__((sda));
+extern int g_turret_fire_timer_min __attribute__((sda));
+extern int g_turret_fire_timer_max __attribute__((sda));
+extern u8 g_turret_l18_muzzle_offset[] SDATA(D_L18_001B1AE0);
+extern u8 g_turret_shot_direction[] SDATA(D_L18_001B1AF0);
 extern u8 *protopet_count_group(int, int *);
 extern void protopet_launch_shot(void *, void *, void *);
 
@@ -74,7 +74,7 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
         gfx_start_color_fade(obj, vars->transform);
         if (vars->health <= 0.0f) {
             SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-            part_spawn_masked_debris(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
+            part_spawn_masked_debris(obj, 0x3a, g_explosion_effect_desc, 3, 6, 3, 6, 255);
             PlayMobySound(1, 0, obj);
             moby_mark_spawned(obj);
             return;
@@ -103,15 +103,15 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
             obj->rotation[1] = 0;
             z = obj->rotation[0];
             obj->position[2] = vars->baseZ;
-            vars->velocityZ += math_random_float_range(z, D_L18_001B1AB0 * (1.0f / 60.0f));
-            vars->turnX = math_random_float_range(z, D_L18_001B1AB4 * 0.0002908882452175021f);
-            vars->turnY = math_random_float_range(z, D_L18_001B1AB8 * 0.0002908882452175021f);
+            vars->velocityZ += math_random_float_range(z, g_turret_velocity_z_max * (1.0f / 60.0f));
+            vars->turnX = math_random_float_range(z, g_turret_turn_x_max_deg * 0.0002908882452175021f);
+            vars->turnY = math_random_float_range(z, g_turret_turn_y_max_deg * 0.0002908882452175021f);
             obj->position[2] = vars->baseZ;
             PlayMobySound(0, 0, obj);
         }
         if (obj->position[2] >= vars->baseZ) {
             obj->position[2] += vars->velocityZ;
-            vars->velocityZ -= D_L18_001B1ACC * 0.00027777778450399637f;
+            vars->velocityZ -= g_turret_gravity * 0.00027777778450399637f;
             if (vars->velocityZ > 0) {
                 obj->rotation[0] = FastAddRotations(vars->turnX, obj->rotation[0]);
                 obj->rotation[1] = FastAddRotations(vars->turnY, obj->rotation[1]);
@@ -126,23 +126,23 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
             zero = 0;
             child = protopet_count_group(vars->childId, &zero);
             if (child) {
-                vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
+                vec_scale_to_length(velocity, g_turret_shot_direction, g_turret_shot_speed_max * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
-                vec_add_random_offset(velocity, D_L18_001B1ABC * (1.0f / 60.0f));
-                matrix_mul_vec3(muzzle_pos, D_L18_001B1AE0, obj->matrix);
+                vec_add_random_offset(velocity, g_turret_muzzle_jitter * (1.0f / 60.0f));
+                matrix_mul_vec3(muzzle_pos, g_turret_l18_muzzle_offset, obj->matrix);
                 FastVecAdd(muzzle_pos, muzzle_pos, obj->position);
                 protopet_launch_shot(child, muzzle_pos, velocity);
                 *(s32 *)(child + 0xB8) = (s32)obj;
-                vars->fireTimer = math_random_int_range(D_L18_001B1AD0, D_L18_001B1AD4);
+                vars->fireTimer = math_random_int_range(g_turret_fire_timer_min, g_turret_fire_timer_max);
             }
         } else if (vars->fireTimer == -1) {
             if (vars->fireRegion != -1 && IsPointInCuboid(g_hero_position, vars->fireRegion)) {
                 vars->fireTimer++;
                 SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
                 PlayMobySound(1, 0, obj);
-                vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
+                vec_scale_to_length(velocity, g_turret_shot_direction, g_turret_shot_speed_min * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
-                vec_add_random_offset(muzzle_pos, D_L18_001B1ABC * (1.0f / 60.0f));
+                vec_add_random_offset(muzzle_pos, g_turret_muzzle_jitter * (1.0f / 60.0f));
                 FastVecAdd(velocity, velocity, muzzle_pos);
                 part_spawn_masked_debris(obj, 5, velocity, 3, 6, 3, 6, 255);
             }

@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern short *D_L06_001FB3A0[];
-extern char *D_L06_001B281C[] __attribute__((sda));
+extern short *g_group_l06_id_lists[];
+extern char *g_moby_l06_table[] __attribute__((sda));
 extern float func_35A780(void);
 extern void func_458138(char *);
 
@@ -14,7 +14,7 @@ extern int math_random_int_range(int, int);
 /* EE argument banks preserve position/count/velocity/color/flags and four floats. */
 extern char *SpawnSpinningSparkParticle(char *, float, float, float, int, char *, float, unsigned int, int);
 
-extern char D_L06_002AA500[];
+extern char g_effect_items[];
 
 extern int func_32D268(char *);
 extern void func_366160(char *, char *, float, int, int);
@@ -22,14 +22,14 @@ extern int func_36C158();
 extern int func_36C1B0(float);
 extern void func_3BFBB8(char *, int);
 
-extern char D_L06_00189EA0[];
-extern char D_L06_001B13B0[];
-extern char D_L06_001B13F0[];
-extern char D_L06_001B1330[];
-extern char D_L06_001B1370[];
-extern char D_L06_001395CE;
-extern char D_L06_001395CF;
-extern char D_L06_001395D0;
+extern char g_gate_trigger_vec[];
+extern char g_str_gate_message_c[];
+extern char g_str_gate_message_d[];
+extern char g_str_gate_message_a[];
+extern char g_str_gate_message_b[];
+extern char g_gate_flag_a;
+extern char g_gate_flag_b;
+extern char g_gate_flag_c;
 
 /* The two flags the re-arm sets, at 0x001395B8. */
 typedef struct {
@@ -38,7 +38,7 @@ typedef struct {
     char flag_014;
 } L06ArmFlags;
 
-extern L06ArmFlags D_L06_001395B8;
+extern L06ArmFlags g_gate_arm_flags;
 
 extern int func_333898(void);
 extern void func_2E3EF0(char *);
@@ -61,8 +61,8 @@ extern int func_32E728(float);
 extern void func_352000(char *, int, int, int);
 extern void func_32D8A8(char *, char *, float);
 extern void moby_fade_out_update();
-extern int D_L06_001B375C __attribute__((sda));
-extern int D_L06_001B3758 __attribute__((sda));
+extern int g_machine_hit_counter __attribute__((sda));
+extern int g_machine_hit_flag __attribute__((sda));
 extern void func_L06_003DDCA8();
 extern int func_32D238(char *);
 extern int func_35A620(int);
@@ -70,7 +70,7 @@ extern void func_35A270(char *, int, int, int);
 extern void *D_L06_002E1F00[];
 extern char *func_31B0D0(char *, int, int, int, float, float, char *, char *, char *,
                          int);
-extern char D_L06_001A8F20[];
+extern char g_effect_vector[];
 /* Pushes the moby away and starts its tumbling fall with a burst of effects. */
 extern void object_start_tumble(char *);
 
@@ -142,9 +142,9 @@ void object_start_tumble(char *a0)
     int v;
 
     func_32D5C8(a0 + 0x10, a0 + 0x10, s2);
-    v = func_32E728((float)D_L06_001B375C * 1.5f);
-    func_352000(a0, v, func_32E728((float)D_L06_001B375C * 1.25f), D_L06_001B375C);
-    if (D_L06_001B3758 != 0) {
+    v = func_32E728((float)g_machine_hit_counter * 1.5f);
+    func_352000(a0, v, func_32E728((float)g_machine_hit_counter * 1.25f), g_machine_hit_counter);
+    if (g_machine_hit_flag != 0) {
         func_32D8A8(s2, s2, 0.11666667461395264f);
         *(float *)(s2 + 0x8) = *(float *)(s2 + 0x8) + 0.18333333730697632f;
         *(unsigned int *)(a0 + 0x64) = (unsigned int)func_L06_003DDCA8;
@@ -159,7 +159,7 @@ void actor_aim_head_at_hero(char *moby)
     char *vars = *(char **)(moby + 0x68);
     float to_hero[3];
 
-    func_32D5F8((char *)to_hero, D_L06_00189EA0, moby + 0x10);
+    func_32D5F8((char *)to_hero, g_gate_trigger_vec, moby + 0x10);
     func_365030(moby, (char *)to_hero, (char *)to_hero, 0);
     *(float *)(vars + 0x2C0) = func_32DC80(to_hero[0], to_hero[1]);
     if (*(float *)(vars + 0x2C0) > 0.78539825f) {
@@ -246,8 +246,8 @@ void trigger_linked_object(char *moby)
 
 /* func_L06_0041DED8 is defined in L06_0041DED8-update.c. */
 
-extern char D_L06_001B0820[];
-extern char D_L06_001B9840[];
+extern char g_str_actor_hit_debug[];
+extern char g_hero_l06_position[];
 extern int path_build_route_nodes(void *, int, void *, int);
 extern void STUB_printf(const char *, ...);
 extern float math_random_signed_float_range(float, float);
@@ -279,7 +279,7 @@ void actor_init_and_check_hits(u8 *moby)
 
     if (moby[0x20] == 0) {
         I(0x480) = path_build_route_nodes(moby, I(0x230), v + 0x260, 16);
-        STUB_printf(D_L06_001B0820, I(0x480));
+        STUB_printf(g_str_actor_hit_debug, I(0x480));
         qcopy(v + 0x460, moby + 0x10);
         F(0x46C) = *(float *)(moby + 0xF8);
         B(0x70) = 15;
@@ -326,7 +326,7 @@ void actor_init_and_check_hits(u8 *moby)
             B(0x4A) = FloatToInt(24.0f);
         }
     }
-    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, D_L06_001B9840) < 24.0f) {
+    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, g_hero_l06_position) < 24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 0x16;
     }
@@ -415,7 +415,7 @@ done:
 
 /* func_L06_0041F558 is defined in L06_0041F558.c. */
 
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern int func_35A620(int);
 extern float func_35A718(float, float);
 extern void func_361300(void *, void *, void *, float);
@@ -430,7 +430,7 @@ void part_spawn_colored_burst(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_32D5F8((char *)direction, (char *)D_L06_001B9840, (char *)pos);
+    func_32D5F8((char *)direction, (char *)g_hero_l06_position, (char *)pos);
     func_32D8A8((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -639,12 +639,12 @@ void gate_trigger_two_flags_update(char *moby)
     handle = *(int *)(*(int *)(moby + 0x68));
     if (handle == -1)
         return;
-    if (func_360F58(D_L06_00189EA0, handle) == 0)
+    if (func_360F58(g_gate_trigger_vec, handle) == 0)
         return;
-    func_2E3EF0(D_L06_001B1330);
-    func_2E3EF0(D_L06_001B1370);
-    D_L06_001395B8.flag_013 = 1;
-    D_L06_001395B8.flag_014 = 1;
+    func_2E3EF0(g_str_gate_message_a);
+    func_2E3EF0(g_str_gate_message_b);
+    g_gate_arm_flags.flag_013 = 1;
+    g_gate_arm_flags.flag_014 = 1;
     func_35A550(moby, 1, -1);
 }
 
@@ -659,10 +659,10 @@ void gate_trigger_flag_a_update(char *moby)
     handle = *(int *)(*(int *)(moby + 0x68));
     if (handle == -1)
         return;
-    if (func_360F58(D_L06_00189EA0, handle) == 0)
+    if (func_360F58(g_gate_trigger_vec, handle) == 0)
         return;
-    func_2E3EF0(D_L06_001B13B0);
-    D_L06_001395CE = 1;
+    func_2E3EF0(g_str_gate_message_c);
+    g_gate_flag_a = 1;
     func_35A550(moby, 1, -1);
 }
 
@@ -677,10 +677,10 @@ void gate_trigger_flag_b_update(char *moby)
     handle = *(int *)(*(int *)(moby + 0x68));
     if (handle == -1)
         return;
-    if (func_360F58(D_L06_00189EA0, handle) == 0)
+    if (func_360F58(g_gate_trigger_vec, handle) == 0)
         return;
-    func_2E3EF0(D_L06_001B13F0);
-    D_L06_001395CF = 1;
+    func_2E3EF0(g_str_gate_message_d);
+    g_gate_flag_b = 1;
     func_35A550(moby, 1, -1);
 }
 
@@ -695,11 +695,11 @@ void gate_trigger_flag_c_update(char *moby)
     handle = *(int *)(*(int *)(moby + 0x68));
     if (handle == -1)
         return;
-    if (func_360F58(D_L06_00189EA0, handle) == 0)
+    if (func_360F58(g_gate_trigger_vec, handle) == 0)
         return;
     if (func_333898() == 0)
         return;
-    D_L06_001395D0 = 1;
+    g_gate_flag_c = 1;
     func_35A550(moby, 1, -1);
 }
 
@@ -711,7 +711,7 @@ void gate_trigger_flag_c_update(char *moby)
 /* Clears the level's pool of small effect objects. */
 void effect_pool_clear(void)
 {
-    func_3BFBB8(D_L06_002AA500, 0x30);
+    func_3BFBB8(g_effect_items, 0x30);
 }
 
 /* func_L06_00456F08 is defined in L06_00456F08.c. */
@@ -780,12 +780,12 @@ void wake_actors_trigger_update(unsigned char *moby)
     if (hit_moby && *(short *)(*(char **)(hit_moby + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
         if (*(int *)vars == 255) { func_458138((char *)moby); return; }
         {
-            id_list = D_L06_001FB3A0[*(int *)vars];
+            id_list = g_group_l06_id_lists[*(int *)vars];
             if (id_list == 0) { func_458138((char *)moby); return; }
             {
                 id_cursor = id_list;
                 do {
-                    actor = D_L06_001B281C[0] + ((*id_cursor & 0x7FFF) << 8);
+                    actor = g_moby_l06_table[0] + ((*id_cursor & 0x7FFF) << 8);
                     if (*(signed char *)(actor + 0x20) >= 0 && *(short *)(actor + 0xAA) == 0xBBA /* moby class 3002 */) {
                         actor_vars = *(char **)(actor + 0x68);
                         if (*(float *)(actor_vars + 0x20) > 0.0f) {
@@ -804,7 +804,7 @@ void wake_actors_trigger_update(unsigned char *moby)
             }
         }
         if (*(int *)(vars + 4) == 255) goto destroy;
-        id_list = D_L06_001FB3A0[*(int *)(vars + 4)];
+        id_list = g_group_l06_id_lists[*(int *)(vars + 4)];
         if (id_list == 0) {
  destroy:
             func_458138((char *)moby); return;
@@ -812,7 +812,7 @@ void wake_actors_trigger_update(unsigned char *moby)
         {
             id_cursor = id_list;
             do {
-                actor = D_L06_001B281C[0] + ((*id_cursor & 0x7FFF) << 8);
+                actor = g_moby_l06_table[0] + ((*id_cursor & 0x7FFF) << 8);
                 if (*(signed char *)(actor + 0x20) >= 0 && *(short *)(actor + 0xAA) == 0xBBA /* moby class 3002 */) {
                     actor_vars = *(char **)(actor + 0x68);
                     *(float *)(actor_vars + 0x5A4) = func_35A780();

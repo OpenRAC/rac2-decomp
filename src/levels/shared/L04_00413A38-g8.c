@@ -11,10 +11,10 @@ typedef struct {
     float distance;
 } Collision;
 
-extern int D_L04_001B092C SDATA(D_L04_001B092C);
-extern u8 *D_L04_001B0914 SDATA(D_L04_001B0914);
+extern int g_race_mode_active_flag SDATA(D_L04_001B092C);
+extern u8 *g_race_controller SDATA(D_L04_001B0914);
 extern u8 *g_moby_l04_pool;
-extern Collision D_L04_001BFAC0;
+extern Collision g_probe_hit;
 
 extern void func_001290E0(void *, void *);
 extern float FastVecLength(void *);
@@ -58,8 +58,8 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
     cur.q = oldpos.q = pos->q;
     ground = 1;
     savedHit = 0;
-    if (mode && D_L04_001B092C) {
-        D_L04_001B092C = 0;
+    if (mode && g_race_mode_active_flag) {
+        g_race_mode_active_flag = 0;
         return 2;
     }
     cur.f[2] += height;
@@ -81,35 +81,35 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
         }
         FastVecAdd(&cur, &cur, &step);
         if (coll_test_point(&cur, radius, 4, object)) {
-            vec_scale_to_length(&normal, &D_L04_001BFAC0.normal, 1.0f);
-            if (D_L04_001BFAC0.object) {
+            vec_scale_to_length(&normal, &g_probe_hit.normal, 1.0f);
+            if (g_probe_hit.object) {
                 vertical = cur.f[2];
-                cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
+                cur.q = ((Vec *)(&g_probe_hit.position))->q;
                 horizontal.q = normal.q;
                 cur.f[2] = vertical;
                 horizontal.f[2] = 0;
                 func_001290E0(&horizontal, &horizontal);
                 if (!savedHit) {
-                    hitpos->q = ((Vec *)(&D_L04_001BFAC0.point))->q;
+                    hitpos->q = ((Vec *)(&g_probe_hit.point))->q;
                     savedHit = 1;
                 }
                 type = 0xA1F /* moby class 2591 */;
                 result = 1;
-                if (S(D_L04_001BFAC0.object, 0xAA) == type) {
+                if (S(g_probe_hit.object, 0xAA) == type) {
                     result = 2;
-                } else if (!mode && S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
-                    a = P(D_L04_001BFAC0.object, 0x68);
+                } else if (!mode && S(g_probe_hit.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
+                    a = P(g_probe_hit.object, 0x68);
                     I(a, 0x178) = 40;
                     FastVecScale(a + 0x100, &horizontal, -0.05f);
                     a = P(object, 0x68);
                     I(a, 0x178) = 40;
                     FastVecScale(a + 0x100, &horizontal, 0.05f);
-                } else if ((mode && S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
-                           || (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xBBC /* moby class 3004 */)) {
-                    part_l04_spawn_burst(&D_L04_001BFAC0.point, vel, 2, 0);
+                } else if ((mode && S(g_probe_hit.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
+                           || (!mode && S(g_probe_hit.object, 0xAA) == 0xBBC /* moby class 3004 */)) {
+                    part_l04_spawn_burst(&g_probe_hit.point, vel, 2, 0);
                     if (mode) {
                         b = P(object, 0x68);
-                        other = D_L04_001BFAC0.object;
+                        other = g_probe_hit.object;
                         a = P(other, 0x68);
                         FastVecScale(b + 0x2F0, &horizontal, 0.04f);
                         FastVecScale(a + 0x100, &horizontal, -0.04f);
@@ -122,8 +122,8 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                         FastVecScale(a + 0x100, &horizontal, 0.04f);
                         if (I(b, 0x1DC) != -1) {
                             anim = g_moby_l04_pool + (I(b, 0x1DC) << 8);
-                            angle = mat_fast_helper_a(D_L04_001BFAC0.point.f[0] - F(object, 0x10),
-                                                  D_L04_001BFAC0.point.f[1] - F(object, 0x14));
+                            angle = mat_fast_helper_a(g_probe_hit.point.f[0] - F(object, 0x10),
+                                                  g_probe_hit.point.f[1] - F(object, 0x14));
                             angle = fast_subtract_rotations(F(P(a, 0x164), 0xF8), angle);
                             if (angle > 0.52359885f && angle < 2.61799407f) {
                                 animation = 3;
@@ -176,27 +176,27 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                         F(a, 0x1E8) = 1;
                     }
                     *flag = 2;
-                } else if (S(D_L04_001BFAC0.object, 0xAA) == 0x8BA /* moby class 2234 */ || S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) {
+                } else if (S(g_probe_hit.object, 0xAA) == 0x8BA /* moby class 2234 */ || S(g_probe_hit.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) {
                     *flag = 3;
                     make_hit_descriptor(damage, object, 0x30000, &step, 1.0f);
                     B(damage, 0x18) = 0;
                     B(damage, 0x19) = 1;
                     S(damage, 0x1A) = S(object, 0xAA);
-                    QueueMobyImpact(D_L04_001BFAC0.object, damage);
-                    if (friction > 0.25f || S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) result = 2;
+                    QueueMobyImpact(g_probe_hit.object, damage);
+                    if (friction > 0.25f || S(g_probe_hit.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) result = 2;
                 }
             } else {
-                cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
+                cur.q = ((Vec *)(&g_probe_hit.position))->q;
                 result = 1;
                 if (!savedHit) {
-                    hitpos->q = ((Vec *)(&D_L04_001BFAC0.point))->q;
+                    hitpos->q = ((Vec *)(&g_probe_hit.point))->q;
                     savedHit = 1;
                 }
                 dot = FastVecDot(&direction, &normal);
                 if (dot < -0.2f) *wall = 1;
                 else *wall = 0;
                 if ((slopeLimit < slope && dot < -0.866f) || GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) {
-                    cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;
+                    cur.q = ((Vec *)(&g_probe_hit.position))->q;
                     vec_fast_normalize(bounce, vel, &normal);
                     result = 2;
                     ground = 0;
@@ -204,7 +204,7 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                 }
                 if (GetCollHitMaterial() == 2 || GetCollHitMaterial() == 4) *flag = 1;
             }
-            if (normal.f[2] > 0.707f && !D_L04_001BFAC0.object) {
+            if (normal.f[2] > 0.707f && !g_probe_hit.object) {
                 normalOut->q = normal.q;
                 dot = FastVecDot(vel, normalOut);
                 FastVecScale(&step, normalOut, -dot);
@@ -212,7 +212,7 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                 vertical = vel->f[2];
                 vel->f[2] = 0;
                 vec_clamp_length(vel, friction);
-                if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
+                if (!g_probe_hit.object || vertical < 0) vel->f[2] = vertical;
                 prev->f[2] = vel->f[2];
                 ground = 0;
             } else {
@@ -244,18 +244,18 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
         pos->f[2] -= height;
         if (coll_test_point(pos, radius, 4, object)) {
             if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) result = 2;
-            pos->q = ((Vec *)(&D_L04_001BFAC0.position))->q;
-            angle = mat_fast_helper_a(D_L04_001BFAC0.normal.f[2], vec_length_xy(&D_L04_001BFAC0.normal));
+            pos->q = ((Vec *)(&g_probe_hit.position))->q;
+            angle = mat_fast_helper_a(g_probe_hit.normal.f[2], vec_length_xy(&g_probe_hit.normal));
             if (angle < 0.785398245f) {
                 oldVertical = vel->f[2];
-                vec_scale_to_length(normalOut, &D_L04_001BFAC0.normal, 1.0f);
+                vec_scale_to_length(normalOut, &g_probe_hit.normal, 1.0f);
                 dot = FastVecDot(vel, normalOut);
                 FastVecScale(&step, normalOut, -dot);
                 FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
                 vec_clamp_length(vel, friction);
-                if (!D_L04_001BFAC0.object || vertical < 0) vel->f[2] = vertical;
+                if (!g_probe_hit.object || vertical < 0) vel->f[2] = vertical;
                 if (oldVertical < 0 && vel->f[2] > 0) vel->f[2] = 0;
                 prev->f[2] = vel->f[2];
             } else if (vel->f[2] > 0) {
@@ -267,6 +267,6 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
         result = 2;
         pos->q = oldpos.q;
     }
-    if (B(D_L04_001B0914, 0xBC) == 1 || B(D_L04_001B0914, 0xBC) == 3 || B(D_L04_001B0914, 0xBC) == 4) result = 0;
+    if (B(g_race_controller, 0xBC) == 1 || B(g_race_controller, 0xBC) == 3 || B(g_race_controller, 0xBC) == 4) result = 0;
     return result;
 }

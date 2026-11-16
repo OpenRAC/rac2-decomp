@@ -98,11 +98,11 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, void *);
 extern void moby_set_state(void *, s32, s32);
-extern char D_L11_001BA8C0[];
-extern s32 D_001A8FF4;
+extern char g_hero_l11_position[];
+extern s32 g_enemy_ai_frozen;
 
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
-extern void func_PAL_L11_004589C8(void *);
+extern void flamethrower_robot_deactivate_pal(void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_transform_joint_point(void *, int, void *);
 extern void vec_clear_128(void *);
@@ -145,11 +145,11 @@ void func_PAL_L11_00458020(char *object)
         moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f,
                       0.0016755164f, 0.12566373f);
         *(u8 *)(state + 0x28) = 3;
-        func_PAL_L11_004589C8(object);
+        flamethrower_robot_deactivate_pal(object);
     }
-    if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
+    if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && g_enemy_ai_frozen == 0) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(object);
             *(u8 *)(object + 0x6F) = 0x16;
         }
@@ -190,7 +190,7 @@ void func_PAL_L11_00458020(char *object)
             }
         }
         if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
-            func_PAL_L11_004589C8(object);
+            flamethrower_robot_deactivate_pal(object);
         *(s16 *)(state + 0x2D0) = weapon_select_aim_target(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
         *(s32 *)(state + 0x2C4) = *(s32 *)(state + 0x220);
     }

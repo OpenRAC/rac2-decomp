@@ -6,7 +6,7 @@ extern float vec_distance_xy(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern f32 D_00189EA8;
+extern f32 g_hero_height_limit;
 extern char g_hero_position[];
 extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
 extern void FastVecSub(void *, void *, void *);
@@ -57,7 +57,7 @@ int func_PAL_L08_00428528(char *object, float turn, float turnAccel, float turnD
     FastVecAdd(point,point,object+0x10);
     height=*(float *)(state+0x1D4);
     if ((unsigned char)object[0x20] == 8)
-        height = height > D_00189EA8 ? height : D_00189EA8;
+        height = height > g_hero_height_limit ? height : g_hero_height_limit;
     point[2]=coll_find_ground_height((Quad *)point,*(float *)(state+0x158)+3.0f,
                               *(float *)(state+0x158)-10.0f,height,*(float *)(state+0x1D0));
     if (vec_distance_xy(object+0x10,g_hero_position)<5.0f && point[2]>*(float *)(g_hero_position+8))

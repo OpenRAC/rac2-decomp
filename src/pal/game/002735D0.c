@@ -8,7 +8,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_transform_by_object_or_given(void *, void *, void *, int);
 extern void moby_get_joint_midpoint(void *, int, void *);
 
-void func_PAL_00273818(char *obj, int mode, int index, void *a, void *b, unsigned char tag, float angle) {
+void cam_moby_init_tracking_pal(char *obj, int mode, int index, void *a, void *b, unsigned char tag, float angle) {
     char *p;
     float local[4];
     *(int *)(obj+0x98) = 0;
@@ -67,7 +67,7 @@ extern unsigned int Fdb046c5d_FUN_00274768(void *, int, void *);
 extern int Fdb046c5d_FUN_002E5F00(int, void *);
 extern char Fdb046c5d_D_001BAFC0[];
 
-int func_PAL_00273BB0(char *obj)
+int target_seeker_update_pal(char *obj)
 {
     float buf[4];
     float out[4];

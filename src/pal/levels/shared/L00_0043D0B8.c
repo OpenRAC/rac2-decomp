@@ -3,7 +3,7 @@
 
 extern int menu_get_selected_index(char *p);
 
-int func_PAL_L00_0043D0B8(char *p)
+int sub_object_get_value_near_pal(char *p)
 {
     return menu_get_selected_index(p + 16);
 }

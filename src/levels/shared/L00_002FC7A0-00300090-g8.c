@@ -1,12 +1,13 @@
+#include "names.h"
 /* Adapted from RAC1 src/game/loaders.c, initialize_tfrag_render_data. */
 #include "common.h"
 
-extern int D_L00_001B24D4 __attribute__((section(".sdata")));
-extern float D_L00_001B24DC __attribute__((section(".sdata")));
-extern float D_L00_001B24E0[];
-extern int D_L00_001C9358 __attribute__((nosda));
-extern unsigned char *D_L00_001B24D0 __attribute__((section(".sdata")));
-extern int D_001A72F4 __attribute__((section(".sdata")));
+extern int g_tfrag_count __attribute__((section(".sdata")));
+extern float g_tfrag_scale __attribute__((section(".sdata")));
+extern float g_tfrag_scale_params[];
+extern int g_tfrag_header_word __attribute__((nosda));
+extern unsigned char *g_tfrag_render_data __attribute__((section(".sdata")));
+extern int g_vram_clut_third __attribute__((section(".sdata")));
 extern void SetTfragDists(void);
 extern int log2dim(int);
 typedef struct { int x0; int x4; float scale; int extra; } TfragRenderHeader;
@@ -40,23 +41,23 @@ void initialize_tfrag_render_data(TfragRenderHeader *hdr, char *tbl) {
     int n;
     int k;
 
-    D_L00_001B24D4 = *(int *)((char *)hdr + 4);
+    g_tfrag_count = *(int *)((char *)hdr + 4);
     scale = *(float *)((char *)hdr + 8);
-    D_L00_001B24DC = scale;
-    D_L00_001C9358 = *(int *)((char *)hdr + 12);
-    D_L00_001B24E0[0] = scale * 6.0f;
-    D_L00_001B24E0[1] = scale * 4.0f;
-    D_L00_001B24E0[2] = scale + scale;
+    g_tfrag_scale = scale;
+    g_tfrag_header_word = *(int *)((char *)hdr + 12);
+    g_tfrag_scale_params[0] = scale * 6.0f;
+    g_tfrag_scale_params[1] = scale * 4.0f;
+    g_tfrag_scale_params[2] = scale + scale;
     SetTfragDists();
     base = (char *)hdr + *(int *)hdr;
-    D_L00_001B24D0 = base;
-    n = D_L00_001B24D4;
+    g_tfrag_render_data = base;
+    n = g_tfrag_count;
     for (k = 0; k < n; k++) {
         *(int *)(base + k * 0x40 + 0x10) = (int)base + *(int *)(base + k * 0x40 + 0x10);
     }
-    for (i = 0; i < D_L00_001B24D4; i++) {
-        for (j = 0; j < ((TfragRenderRecord *)D_L00_001B24D0)[i].count; j++) {
-            TfragRenderRecord *run = (TfragRenderRecord *)((i << 6) + (int)D_L00_001B24D0);
+    for (i = 0; i < g_tfrag_count; i++) {
+        for (j = 0; j < ((TfragRenderRecord *)g_tfrag_render_data)[i].count; j++) {
+            TfragRenderRecord *run = (TfragRenderRecord *)((i << 6) + (int)g_tfrag_render_data);
             unsigned long *o = (unsigned long *)((char *)run->glyphs + run->off1C + j * 0x50);
             int k0 = ((TfragMaterialPacket *)o)->x0;
             int k10 = ((TfragMaterialPacket *)o)->x10;
@@ -80,7 +81,7 @@ void initialize_tfrag_render_data(TfragRenderHeader *hdr, char *tbl) {
             }
             u = log2dim(t >> 16);
             v = log2dim(m->x6);
-            gs = D_001A72F4 >> 8;
+            gs = g_vram_clut_third >> 8;
             /* The s64/u64 casts keep every OR chain at three operands of one type, so
                fold's reduce_expression_tree_depth leaves the left-to-right GS word trees
                as written (the same idiom as func_L00_002FFAB8). */

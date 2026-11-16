@@ -20,32 +20,32 @@ extern float math_fabs(float);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
 extern void moby_mark_spawned(void *);
-extern int D_L05_001AFCAC __attribute__((sda));
-extern int D_L05_001AFCA0 __attribute__((sda));
-extern int D_L05_001AFCA4 __attribute__((sda));
-extern int D_L05_001AFC98 __attribute__((sda));
-extern int D_L05_001AFC9C __attribute__((sda));
-extern float D_L05_001AFCB4 __attribute__((sda));
-extern float D_L05_001AFCB8 __attribute__((sda));
-extern int D_L05_001AFCB0 __attribute__((sda));
-extern struct { char pad[0x140]; float pos[4]; } D_L05_001B9580;
-extern int D_L05_0024CFD0[][4], D_L05_0024CF30[][4], D_L05_0024CF80[][4];
+extern int g_quad_init_arg __attribute__((sda));
+extern int g_blend_mode_c __attribute__((sda));
+extern int g_blend_mode_d __attribute__((sda));
+extern int g_blend_mode_a __attribute__((sda));
+extern int g_blend_mode_b __attribute__((sda));
+extern float g_quad_scale __attribute__((sda));
+extern float g_effect_slot_state __attribute__((sda));
+extern int g_quad_l05_color __attribute__((sda));
+extern struct { char pad[0x140]; float pos[4]; } g_hero_l05_state;
+extern int g_emitter_group_timers[][4], g_emitter_group_alphas[][4], g_emitter_group_fade_rates[][4];
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) VectorD2618;
-extern VectorD2618 D_L05_0024D020[][4];
-extern float D_L05_0024A460[][4][137];
-extern float D_L05_0023F920[][4][137][4];
-extern float D_L05_002ADDF0[][4];
-extern short D_L05_002ACD30[][4][3];
-extern float D_L05_002AC4A0[][4];
-extern float D_L05_002AD930[][2];
-extern float D_L05_001B2F58[] MACRO_ADDR;
-extern float D_L05_001B2F88[] MACRO_ADDR;
-extern float D_L05_001B2FB8[] MACRO_ADDR;
-extern float D_L05_001B2FD0[] MACRO_ADDR;
-extern int D_L05_001B2F70[] MACRO_ADDR;
-extern int D_L05_001B2FA0[] MACRO_ADDR;
-extern int D_L05_001B2FE8[] MACRO_ADDR;
-extern char *D_L05_001B3018[] MACRO_ADDR;
+extern VectorD2618 g_emitter_group_positions[][4];
+extern float g_emitter_vertex_speeds[][4][137];
+extern float g_emitter_vertex_offsets[][4][137][4];
+extern float g_glow_quad_offsets[][4];
+extern short g_glow_quad_corner_indices[][4][3];
+extern float g_glow_quad_vertices[][4];
+extern float g_glow_l05_quad_uvs[][2];
+extern float g_glow_effect_scales[] MACRO_ADDR;
+extern float g_glow_effect_sizes[] MACRO_ADDR;
+extern float g_glow_effect_angles_a[] MACRO_ADDR;
+extern float g_glow_effect_angles_b[] MACRO_ADDR;
+extern int g_glow_effect_alphas[] MACRO_ADDR;
+extern int g_glow_effect_blends[] MACRO_ADDR;
+extern int g_glow_effect_timers[] MACRO_ADDR;
+extern char *g_spawned_effect_mobys[] MACRO_ADDR;
 /* Selects the quad's texture and resets its GS tags. */
 static inline void InitQuadD2618(QuadD2618 *q, int texture)
 {
@@ -67,15 +67,15 @@ static inline float PositionAxisD2618(char *object, int axis)
 static inline void FaceCameraD2618(float *rotation, char *object)
 {
     float x, y;
-    x = D_L05_001B9580.pos[0] - *(float *)(object + 0x10);
-    y = D_L05_001B9580.pos[1] - PositionAxisD2618(object, 1);
+    x = g_hero_l05_state.pos[0] - *(float *)(object + 0x10);
+    y = g_hero_l05_state.pos[1] - PositionAxisD2618(object, 1);
     rotation[0] = RotationAxisD2618(object, 0);
     rotation[1] = RotationAxisD2618(object, 1);
     rotation[2] = RotationAxisD2618(object, 2);
     rotation[3] = 0;
     rotation[2] = mat_fast_helper_a(x, y);
-    x = vec_distance_xy(object + 0x10, D_L05_001B9580.pos);
-    rotation[1] = -mat_fast_helper_a(x, D_L05_001B9580.pos[2] - PositionAxisD2618(object, 2));
+    x = vec_distance_xy(object + 0x10, g_hero_l05_state.pos);
+    rotation[1] = -mat_fast_helper_a(x, g_hero_l05_state.pos[2] - PositionAxisD2618(object, 2));
 }
 
 /* Faces the camera, then draws four layers of a 128-quad mesh, a growing flash quad and, in mode 0,
@@ -92,7 +92,7 @@ void func_PAL_L05_003D6360(char *object)
     int vertex;
     int corner;
     int inactive;
-    InitQuadD2618(&q, D_L05_001AFCAC);
+    InitQuadD2618(&q, g_quad_init_arg);
     VU1_addGSregister(0x47, 0x53001);
     FaceCameraD2618(rotation, object);
     {
@@ -100,69 +100,69 @@ void func_PAL_L05_003D6360(char *object)
         int group;
         for (group = 0; group < 4; group++) {
             inactive = 0;
-            if (math_fast_float_d(&D_L05_0024CFD0[state->index][group]) ||
-                !D_L05_0024CFD0[state->index][group]) {
+            if (math_fast_float_d(&g_emitter_group_timers[state->index][group]) ||
+                !g_emitter_group_timers[state->index][group]) {
                 inactive = 1;
-                D_L05_0024CFD0[state->index][group] = 0;
+                g_emitter_group_timers[state->index][group] = 0;
             }
             euler_to_matrix(matrix, rotation);
-            matrix[12 + 0] = D_L05_0024D020[state->index][group].x;
-            matrix[12 + 1] = D_L05_0024D020[state->index][group].y;
-            matrix[12 + 2] = D_L05_0024D020[state->index][group].z;
+            matrix[12 + 0] = g_emitter_group_positions[state->index][group].x;
+            matrix[12 + 1] = g_emitter_group_positions[state->index][group].y;
+            matrix[12 + 2] = g_emitter_group_positions[state->index][group].z;
             matrix[12 + 3] = 1.0f;
-            q.color[0] = q.color[1] = q.color[2] = q.color[3] = D_L05_001AFCB0;
+            q.color[0] = q.color[1] = q.color[2] = q.color[3] = g_quad_l05_color;
             {
-                unsigned long blend = (unsigned long)D_L05_001AFC98;
-                blend |= (unsigned long)D_L05_001AFC9C << 2;
-                blend |= (unsigned long)D_L05_001AFCA0 << 4;
-                blend |= (unsigned long)D_L05_001AFCA4 << 6;
-                blend |= ((unsigned long)D_L05_0024CF30[state->index][group] << 32);
+                unsigned long blend = (unsigned long)g_blend_mode_a;
+                blend |= (unsigned long)g_blend_mode_b << 2;
+                blend |= (unsigned long)g_blend_mode_c << 4;
+                blend |= (unsigned long)g_blend_mode_d << 6;
+                blend |= ((unsigned long)g_emitter_group_alphas[state->index][group] << 32);
                 q.gs[3] = blend;
             }
             if (inactive == 1) {
-                D_L05_0024CF30[state->index][group] -= D_L05_0024CF80[state->index][group];
-                if (D_L05_0024CF30[state->index][group] < 0)
-                    D_L05_0024CF30[state->index][group] = 0;
+                g_emitter_group_alphas[state->index][group] -= g_emitter_group_fade_rates[state->index][group];
+                if (g_emitter_group_alphas[state->index][group] < 0)
+                    g_emitter_group_alphas[state->index][group] = 0;
             }
             if (inactive == 0) {
                 for (vertex = 0; vertex < 137; vertex++) {
                     if (vertex % 5 == 0 && vertex > 5) {
-                        FastVecScale(temporary, D_L05_002ADDF0[vertex], D_L05_0024A460[state->index][group][vertex]);
-                        add_vectors(scratch, D_L05_0023F920[state->index][group][vertex], temporary);
+                        FastVecScale(temporary, g_glow_quad_offsets[vertex], g_emitter_vertex_speeds[state->index][group][vertex]);
+                        add_vectors(scratch, g_emitter_vertex_offsets[state->index][group][vertex], temporary);
                     }
                 }
             } else {
                 for (vertex = 0; vertex < 137; vertex++) {
                     if (vertex % 5 == 0 && vertex > 5) {
-                        FastVecScale(temporary, D_L05_002ADDF0[vertex], D_L05_0024A460[state->index][group][vertex] * 0.25f);
-                        add_vectors(scratch, D_L05_0023F920[state->index][group][vertex], temporary);
+                        FastVecScale(temporary, g_glow_quad_offsets[vertex], g_emitter_vertex_speeds[state->index][group][vertex] * 0.25f);
+                        add_vectors(scratch, g_emitter_vertex_offsets[state->index][group][vertex], temporary);
                     }
                 }
             }
             for (vertex = 0; vertex < 128; vertex++) {
                 for (corner = 0; corner < 4; corner++) {
-                    int vi = D_L05_002ACD30[vertex][corner][0];
-                    int ti = D_L05_002ACD30[vertex][corner][1];
-                    FastVecAdd(temporary, D_L05_002AC4A0[vi], D_L05_0023F920[state->index][group][vi]);
-                    FastVecScale(q.v[corner], temporary, D_L05_001AFCB4 * state->scale);
-                    q.uv[corner][0] = D_L05_002AD930[ti][0];
-                    q.uv[corner][1] = D_L05_002AD930[ti][1];
-                    D_L05_002AD930[ti][0] += 0.0001f;
-                    if (D_L05_002AD930[ti][0] > 8.0f)
-                        D_L05_002AD930[ti][0] -= 8.0f;
+                    int vi = g_glow_quad_corner_indices[vertex][corner][0];
+                    int ti = g_glow_quad_corner_indices[vertex][corner][1];
+                    FastVecAdd(temporary, g_glow_quad_vertices[vi], g_emitter_vertex_offsets[state->index][group][vi]);
+                    FastVecScale(q.v[corner], temporary, g_quad_scale * state->scale);
+                    q.uv[corner][0] = g_glow_l05_quad_uvs[ti][0];
+                    q.uv[corner][1] = g_glow_l05_quad_uvs[ti][1];
+                    g_glow_l05_quad_uvs[ti][0] += 0.0001f;
+                    if (g_glow_l05_quad_uvs[ti][0] > 8.0f)
+                        g_glow_l05_quad_uvs[ti][0] -= 8.0f;
                 }
-                if (fast_vec_dist(object + 0x10, D_L05_001B9580.pos) > 10.0f)
+                if (fast_vec_dist(object + 0x10, g_hero_l05_state.pos) > 10.0f)
                     draw_world_quad(&q, matrix, 0);
             }
         }
     }
     InitQuadD2618(&q, 0x43);
     {
-        unsigned long blend = (unsigned long)D_L05_001AFC98;
-        blend |= (unsigned long)D_L05_001AFC9C << 2;
-        blend |= (unsigned long)D_L05_001AFCA0 << 4;
-        blend |= (unsigned long)D_L05_001AFCA4 << 6;
-        blend |= ((unsigned long)D_L05_001B2F70[state->index] << 32);
+        unsigned long blend = (unsigned long)g_blend_mode_a;
+        blend |= (unsigned long)g_blend_mode_b << 2;
+        blend |= (unsigned long)g_blend_mode_c << 4;
+        blend |= (unsigned long)g_blend_mode_d << 6;
+        blend |= ((unsigned long)g_glow_effect_alphas[state->index] << 32);
         q.gs[3] = blend;
     }
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x7F204080;
@@ -172,32 +172,32 @@ void func_PAL_L05_003D6360(char *object)
     q.v[0][1] = -2; q.v[1][1] = -2; q.v[2][1] = 2; q.v[3][1] = 2;
     q.v[0][0] = 0; q.v[1][0] = 0; q.v[2][0] = 0; q.v[3][0] = 0;
     euler_to_matrix(matrix, rotation);
-    FastVecScale(q.v[0], q.v[0], D_L05_001B2F58[state->index] * state->scale);
-    FastVecScale(q.v[1], q.v[1], D_L05_001B2F58[state->index] * state->scale);
-    FastVecScale(q.v[2], q.v[2], D_L05_001B2F58[state->index] * state->scale);
-    FastVecScale(q.v[3], q.v[3], D_L05_001B2F58[state->index] * state->scale);
+    FastVecScale(q.v[0], q.v[0], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(q.v[1], q.v[1], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(q.v[2], q.v[2], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(q.v[3], q.v[3], g_glow_effect_scales[state->index] * state->scale);
     matrix[12 + 0] = *(float *)(object + 0x10);
     matrix[12 + 1] = *(float *)(object + 0x14);
     matrix[12 + 2] = *(float *)(object + 0x18);
     matrix[12 + 3] = 1;
     draw_world_quad(&q, matrix, 0);
-    D_L05_001B2F58[state->index] += 0.4f;
-    D_L05_001B2F70[state->index] -= 5;
-    if (D_L05_001B2F70[state->index] < 0) D_L05_001B2F70[state->index] = 0;
+    g_glow_effect_scales[state->index] += 0.4f;
+    g_glow_effect_alphas[state->index] -= 5;
+    if (g_glow_effect_alphas[state->index] < 0) g_glow_effect_alphas[state->index] = 0;
     if (state->mode == 0) {
         float *angle_a, *size, *angle_b;
         int color = 0x7F8080FF;
         q.gs[1] = GetEffectTextureDescriptor(0x44);
-        angle_a = D_L05_001B2FB8;
-        size = D_L05_001B2F88;
-        angle_b = D_L05_001B2FD0;
+        angle_a = g_glow_effect_angles_a;
+        size = g_glow_effect_sizes;
+        angle_b = g_glow_effect_angles_b;
         q.color[0] = q.color[1] = q.color[2] = q.color[3] = color;
         {
-            unsigned long blend = (unsigned long)D_L05_001AFC98;
-            blend |= (unsigned long)D_L05_001AFC9C << 2;
-            blend |= (unsigned long)D_L05_001AFCA0 << 4;
-            blend |= (unsigned long)D_L05_001AFCA4 << 6;
-            blend |= ((unsigned long)D_L05_001B2FA0[state->index] << 32);
+            unsigned long blend = (unsigned long)g_blend_mode_a;
+            blend |= (unsigned long)g_blend_mode_b << 2;
+            blend |= (unsigned long)g_blend_mode_c << 4;
+            blend |= (unsigned long)g_blend_mode_d << 6;
+            blend |= ((unsigned long)g_glow_effect_blends[state->index] << 32);
             q.gs[3] = blend;
         }
         q.uv[0][0] = 0; q.uv[0][1] = 0; q.uv[1][0] = 1; q.uv[1][1] = 0;
@@ -249,12 +249,12 @@ void func_PAL_L05_003D6360(char *object)
         angle_b[state->index] = fast_subtract_rotations(angle_b[state->index], 0.055850547f);
         size[state->index] += 0.02f;
     }
-    if (math_fast_float_d(D_L05_001B2FE8 + state->index)) {
-        D_L05_001B2FA0[state->index] -= 2;
-        if (D_L05_001B2FA0[state->index] < 0) {
-            D_L05_001B2FA0[state->index] = 0;
-            D_L05_001B3018[state->index] = 0;
-            D_L05_001AFCB8 -= 1.0f;
+    if (math_fast_float_d(g_glow_effect_timers + state->index)) {
+        g_glow_effect_blends[state->index] -= 2;
+        if (g_glow_effect_blends[state->index] < 0) {
+            g_glow_effect_blends[state->index] = 0;
+            g_spawned_effect_mobys[state->index] = 0;
+            g_effect_slot_state -= 1.0f;
             moby_mark_spawned(object);
             return;
         }

@@ -21,7 +21,7 @@ typedef struct {
     s16 last, length, field60, cursor, depth;
 } L03ChoicePath;
 
-extern u32 D_L03_0024A7B0;
+extern u32 g_emitter_pair_table;
 extern void choice_list_build(u8 *);
 extern void ComputePathPuzzleTurn(u8 *);
 
@@ -42,14 +42,14 @@ typedef struct {
     f32 field0C;
 } NativeCallbackTimer;
 
-extern NativeCallbackTimer D_L04_001B98E0;
+extern NativeCallbackTimer g_callback_timer;
 
-extern f32 D_L04_001B1C88 __attribute__((sda));
+extern f32 g_timer_tick_step __attribute__((sda));
 
 /* Four-byte pointer in the resident image (0x001B2A1C).  The retail reads it
    with a per-site `lui $r,%hi` + `lw $r,%lo($r)` pair, which is gas's expansion
    of the bare-symbol macro cc1 emits only for an `sda` symbol. */
-extern u8 *D_L03_001B2A1C __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
 
 /* func_L03_003C5B28 is defined in L03_003C5B28-g8.c (it reads the group count through $gp). */
 
@@ -267,7 +267,7 @@ s32 SelectUnusedTableEntry(u8 *moby, u32 row, s32 usedCount, u32 *extraUsed, s32
         s32 index = (i + start) % six;
         s32 j;
 
-        value = *(u32 *)((u8 *)&D_L03_0024A7B0 + (rowOffset + index * 4));
+        value = *(u32 *)((u8 *)&g_emitter_pair_table + (rowOffset + index * 4));
         if (value == -1)
             continue;
         j = 0;
@@ -331,7 +331,7 @@ void UpdateChoicePath(u8 *moby) {
 
 /* func_L03_003E3018 is defined in L03_003E3018.c. */
 
-extern u32 D_0024A7B0;
+extern u32 g_path_puzzle_adjacency;
 
 extern s32 ref_L03_003E3750_00(u8 *, u32);
 
@@ -340,7 +340,7 @@ extern s32 ref_L03_003E3750_00(u8 *, u32);
    with 255. */
 void choice_list_build(u8 *a0) {
     u32 rec = *(u32 *)(a0 + 0x68);
-    u32 v = *(u32 *)((u8 *)&D_0024A7B0 + *(short *)(rec + 0x50) * 24);
+    u32 v = *(u32 *)((u8 *)&g_path_puzzle_adjacency + *(short *)(rec + 0x50) * 24);
     s32 count = 0;
     u32 n = 0;
     u32 ok;
@@ -365,7 +365,7 @@ void choice_list_build(u8 *a0) {
             count++;
             if (count >= 6)
                 break;
-            v = *(u32 *)((u8 *)&D_0024A7B0 + count * 4 + *(short *)(rec + 0x50) * 24);
+            v = *(u32 *)((u8 *)&g_path_puzzle_adjacency + count * 4 + *(short *)(rec + 0x50) * 24);
         } while (v != 255);
     }
     *(u8 *)(rec + n + 0x40) = 255;
@@ -415,11 +415,11 @@ extern void moby_mark_spawned(u8 *);
 
 extern s32 g_activeGadgetItem;
 
-extern f32 D_001B9C14;
+extern f32 g_gadget_scale;
 
 /* The retail materialises this one's address with `lui $at`, which is gas's expansion of the
    bare-symbol macro cc1 only emits for an `sda` symbol. */
-extern f32 D_001B2464 __attribute__((sda));
+extern f32 g_gadget_approach_value __attribute__((sda));
 
 /* Hands the entity's gadget class id to the active-gadget global, clears the entity's
  * gadget state and releases the resident class it was holding. */
@@ -429,11 +429,11 @@ void gadget_reset_state(u8 *moby) {
     f32 scale = 1.12434113f;    /* bits 0x3F8FEA69 (0x3F8FEA69 != 1.12434f) */
 
     cam_set_mode_state(3);
-    D_001B9C14 = scale;
+    g_gadget_scale = scale;
     cam_set_value_target(1, 0, scale, 0.005f, 0.2f, zero);
     *(f32 *)(vars + 0x6C) = zero;
     g_activeGadgetItem = *(s32 *)(vars + 0x64);
-    D_001B2464 = zero;
+    g_gadget_approach_value = zero;
     if (*(u8 **)(vars + 0x58) != 0) {
         moby_mark_spawned(*(u8 **)(vars + 0x58));
         *(u32 *)(vars + 0x58) = 0;
@@ -508,7 +508,7 @@ void route_init_pool_record(u8 *moby) {
 /* Hands one record of the pool the level index selects to the shared lookup and then sets or
    clears the low bit of the record's tenth halfword flag. */
 void route_set_node_enabled_flag(u32 a0, u8 *a1, s32 a2) {
-    u8 *rec = (u8 *)D_L03_001B2A1C + (a0 << 8);
+    u8 *rec = (u8 *)g_moby_record_base + (a0 << 8);
     u8 *q = *(u8 **)(rec + 0x68);
     s32 index;
 
@@ -528,7 +528,7 @@ extern s32 ComputeRegionRouteHeading(u8 *, u8 *, void *, u8 *, s32, s32 *, s32 *
 /* Asks the route graph of the indexed record about two points and a heading. Passes along the margin and tolerance. */
 s32 route_query_graph_heading(u32 poolIndex, u8 *first, u8 *second, u8 *heading, s32 *firstIndex, s32 *secondIndex,
                      float margin, float tolerance) {
-    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
+    u8 *vars = *(u8 **)((u8 *)g_moby_record_base + (poolIndex << 8) + 0x68);
 
     return ComputeRegionRouteHeading(first, second, heading, vars + 0x80, *(s32 *)(vars + 0x480), firstIndex, secondIndex,
                             margin, tolerance);
@@ -536,7 +536,7 @@ s32 route_query_graph_heading(u32 poolIndex, u8 *first, u8 *second, u8 *heading,
 
 /* Returns the value stored for a route node, or -1 if there is no node. */
 s32 route_get_node_value(u32 poolIndex, s32 nodeIndex) {
-    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
+    u8 *vars = *(u8 **)((u8 *)g_moby_record_base + (poolIndex << 8) + 0x68);
     u8 *node;
 
     if (nodeIndex != -1) {
@@ -550,7 +550,7 @@ extern s32 path_find_route_node_containing_point(u8 *, u8 *, s32, s32 *);
 
 /* Finds which node of the route graph holds a point and writes its index. */
 void route_lookup_node_index(u32 poolIndex, u8 *point, u8 *outIndex) {
-    u8 *vars = *(u8 **)((u8 *)D_L03_001B2A1C + (poolIndex << 8) + 0x68);
+    u8 *vars = *(u8 **)((u8 *)g_moby_record_base + (poolIndex << 8) + 0x68);
 
     path_find_route_node_containing_point(point, vars + 0x80, *(s32 *)(vars + 0x480), (s32 *)outIndex);
 }
@@ -558,7 +558,7 @@ void route_lookup_node_index(u32 poolIndex, u8 *point, u8 *outIndex) {
 s32 route_check_object_points(u8 *, u8 *, u8 *);
 
 s32 route_check_points(u32 a0, u8 *first, u8 *second) {
-    return route_check_object_points((u8 *)D_L03_001B2A1C + (a0 << 8), first, second);
+    return route_check_object_points((u8 *)g_moby_record_base + (a0 << 8), first, second);
 }
 
 /* The route graph a pool record points to. Reading count through the struct matters:
@@ -585,7 +585,7 @@ s32 route_check_object_points(u8 *object, u8 *first, u8 *second) {
 
 /* Returns the node of the indexed record's route graph that holds a1, or -1. */
 s32 FindRouteNodeIndex(u32 a0, f32 *a1) {
-    L03RouteState *state = *(L03RouteState **)((u8 *)D_L03_001B2A1C + (a0 << 8) + 0x68);
+    L03RouteState *state = *(L03RouteState **)((u8 *)g_moby_record_base + (a0 << 8) + 0x68);
     s32 out = -1;
 
     path_find_route_node_containing_point((u8 *)a1, state->nodes, state->count, &out);
@@ -720,7 +720,7 @@ void global_record_reset(void) {
     r1_D_L02_00167680_FBB10.e = r1_func_L02_002FBB48;
 }
 
-extern f32 D_L03_001B9BEC;
+extern f32 g_effect_aim_offset_scale;
 
 extern void cam_set_aim_offset_target(s32, f32, f32);
 
@@ -730,8 +730,8 @@ extern void timer_tick_countdown(void);
 
 /* If a strength value is set, starts a timed effect scaled by it and registers a callback. */
 void effect_start_scaled_if_set(void) {
-    if (D_L03_001B9BEC != 0.0f) {
-        cam_set_aim_offset_target(1, D_L03_001B9BEC * 0.35f, 0.005f);
+    if (g_effect_aim_offset_scale != 0.0f) {
+        cam_set_aim_offset_target(1, g_effect_aim_offset_scale * 0.35f, 0.005f);
         register_camera_update_callback(timer_tick_countdown);
     }
 }

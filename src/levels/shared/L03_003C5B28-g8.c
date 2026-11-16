@@ -13,19 +13,19 @@ typedef struct {
     f32 field0C;
 } NativeCallbackTimer;
 
-extern NativeCallbackTimer D_L04_001B98E0;
-extern f32 D_L04_001B1C88 __attribute__((sda));
+extern NativeCallbackTimer g_callback_timer;
+extern f32 g_timer_tick_step __attribute__((sda));
 
 /* The group count is read through $gp here; the group table and the resident word are
    absolute, and the entity base (D_L03_001B2A1C in the -G0 sibling) is the bare `lui`/`lw` pair,
    a second name sized over 8 bytes with `sda` in this -G8 unit. */
-extern int D_0018A15C __attribute__((nosda));
+extern int g_platform_actor_ref __attribute__((nosda));
 
-extern int D_L03_001B2A38 __attribute__((sda));
+extern int g_object_group_count __attribute__((sda));
 
 extern u8 *D_L03_001B2A1C_1[3] __attribute__((sda));
 
-extern unsigned short *D_L03_001FB5A0[];
+extern unsigned short *g_entity_id_lists[];
 
 extern void FastVecSub(float *, u8 *, u8 *);
 
@@ -46,9 +46,9 @@ void entity_stun_in_front(u8 *obj, float value) {
 
     if (obj[0x21] == 0xFF)
         return;
-    for (idPtr = D_L03_001FB5A0[obj[0x21]];
-         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
-         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+    for (idPtr = g_entity_id_lists[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= g_object_group_count && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == g_entity_id_lists[obj[0x21]]);
          idPtr++) {
         entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
@@ -76,13 +76,13 @@ int group_is_state_word_matching(u8 *obj) {
     unsigned short *idPtr;
     u8 *entity;
 
-    if (D_0018A15C == *(int *)(vars + 0x358))
+    if (g_platform_actor_ref == *(int *)(vars + 0x358))
         return 1;
     if (obj[0x21] == 0xFF)
         return 0;
-    for (idPtr = D_L03_001FB5A0[obj[0x21]];
-         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
-         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+    for (idPtr = g_entity_id_lists[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= g_object_group_count && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == g_entity_id_lists[obj[0x21]]);
          idPtr++) {
         entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
@@ -104,9 +104,9 @@ int group_is_nearest_to_target(u8 *obj, u8 *target) {
     u8 *entity;
 
     ownDist = vec_distance_xy(obj + 0x10, target);
-    for (idPtr = D_L03_001FB5A0[obj[0x21]];
-         obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && idPtr != 0 &&
-         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L03_001FB5A0[obj[0x21]]);
+    for (idPtr = g_entity_id_lists[obj[0x21]];
+         obj[0x21] != 0xFF && obj[0x21] <= g_object_group_count && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == g_entity_id_lists[obj[0x21]]);
          idPtr++) {
         entity = D_L03_001B2A1C_1[0] + ((*idPtr & 0x7FFF) << 8);
         if (entity == 0)
@@ -122,11 +122,11 @@ int group_is_nearest_to_target(u8 *obj, u8 *target) {
 
 typedef struct { u8 b[0x10]; } Local16;
 
-extern f32 D_L03_001B0344 __attribute__((sda));
+extern f32 g_moby_opposite_point_distance __attribute__((sda));
 
-extern f32 D_L03_001B0CA0 __attribute__((sda));
+extern f32 g_attached_child_speed __attribute__((sda));
 
-extern u8 D_L03_001B9BB0[] __attribute__((nosda));
+extern u8 g_moby_basis_matrix[] __attribute__((nosda));
 
 extern void vec_scale_to_length(u8 *, u8 *, f32);
 
@@ -141,7 +141,7 @@ void moby_compute_opposite_points(u8 *obj, u8 *outA, u8 *outB) {
     Local16 dirA;
     Local16 dirB;
 
-    vec_scale_to_length(dirA.b, obj + 0xC0, D_L03_001B0344);
+    vec_scale_to_length(dirA.b, obj + 0xC0, g_moby_opposite_point_distance);
     FastVecScale(dirB.b, dirA.b, -1.0f);
     FastVecAdd(outA, dirA.b, obj + 0x10);
     FastVecAdd(outB, dirB.b, obj + 0x10);
@@ -152,8 +152,8 @@ void moby_update_attached_child(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     u8 *child = *(u8 **)(vars + 0x58);
 
-    vec_scale_to_length(child + 0x10, D_L03_001B9BB0, D_L03_001B0CA0);
-    FastVecAdd(child + 0x10, child + 0x10, D_L03_001B9BB0 - 0x230);
+    vec_scale_to_length(child + 0x10, g_moby_basis_matrix, g_attached_child_speed);
+    FastVecAdd(child + 0x10, child + 0x10, g_moby_basis_matrix - 0x230);
     if (*(u32 *)(child + 0x64) != 0)
         (*(void (**)(u8 *))(*(u8 **)(vars + 0x58) + 0x64))(child);
     func_002A0F48(*(u8 **)(vars + 0x58));
@@ -161,11 +161,11 @@ void moby_update_attached_child(u8 *obj) {
 
 /* updates the registered countdown state and clears its original completion flags */
 void timer_tick_countdown(void) {
-    NativeCallbackTimer *timer = &D_L04_001B98E0;
+    NativeCallbackTimer *timer = &g_callback_timer;
     u32 mode = timer->field04;
     timer->field08 = 10000.0f;
     if (mode == 0) {
-        timer->field0C -= D_L04_001B1C88;
+        timer->field0C -= g_timer_tick_step;
         if (timer->field0C < 0.0f) timer->field0C = 0.0f;
     } else {
         timer->field04 = 0;
@@ -174,23 +174,23 @@ void timer_tick_countdown(void) {
 }
 
 /* The $gp float each of the two mutual twins reads (3.0f and 1.0f). */
-extern f32 D_L03_001B02F0 __attribute__((sda));
+extern f32 g_moby_point_ahead_scale __attribute__((sda));
 
-extern f32 D_L03_001B1A90 __attribute__((sda));
+extern f32 g_point_ahead_length __attribute__((sda));
 
 /* Places a point at the object's position plus its direction scaled by a fixed amount. */
 void moby_compute_point_ahead_scaled(u8 *obj, u8 *out) {
-    FastVecScale(out, obj + 0xC0, D_L03_001B02F0);
+    FastVecScale(out, obj + 0xC0, g_moby_point_ahead_scale);
     FastVecAdd(out, out, obj + 0x10);
 }
 
 /* The same body with func_00282F20 and 1.0f. */
 void moby_compute_point_ahead_unit(u8 *obj, u8 *out) {
-    vec_scale_to_length(out, obj + 0xC0, D_L03_001B1A90);
+    vec_scale_to_length(out, obj + 0xC0, g_point_ahead_length);
     FastVecAdd(out, out, obj + 0x10);
 }
 
-extern f32 D_L03_001B1FC4 __attribute__((sda));
+extern f32 g_moby_hit_radius_scale __attribute__((sda));
 
 extern f32 FastAddRotations(f32, f32);
 
@@ -203,7 +203,7 @@ void entity_age_and_blend(u8 *obj) {
     u8 *vars = *(u8 **)(obj + 0x68);
     u8 *owner = *(u8 **)(obj + 0x24);
 
-    *(f32 *)(obj + 0x2C) = *(f32 *)(owner + 0x24) * D_L03_001B1FC4;
+    *(f32 *)(obj + 0x2C) = *(f32 *)(owner + 0x24) * g_moby_hit_radius_scale;
     *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.0041666669f;
     FastVecAdd(obj + 0x10, obj + 0x10, vars);
     FastVecAdd(obj + 0xF0, obj + 0xF0, vars + 0x10);
@@ -229,9 +229,9 @@ typedef struct {
     u8 path[16];
 } PathState;
 
-extern PathEntry D_L03_0029BCD0[];
+extern PathEntry g_path_entries[];
 
-extern s32 D_L03_001B0B50 __attribute__((sda));
+extern s32 g_path_puzzle_step_count __attribute__((sda));
 
 extern s32 SelectUnusedTableEntry(u8 *, u32, s32, u32 *, s32);
 
@@ -245,24 +245,24 @@ void SelectPathStepNodes(u8 *obj) {
     s32 i;
     u32 node, prev, prev2;
 
-    for (i = 0; i < D_L03_001B0B50; i++) {
-        D_L03_0029BCD0[i].first = -1;
-        D_L03_0029BCD0[i].second = -1;
-        D_L03_0029BCD0[i].flag = -1;
+    for (i = 0; i < g_path_puzzle_step_count; i++) {
+        g_path_entries[i].first = -1;
+        g_path_entries[i].second = -1;
+        g_path_entries[i].flag = -1;
         node = state->path[i];
-        switch (D_L03_0029BCD0[i].type) {
+        switch (g_path_entries[i].type) {
         case 1:
-            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
+            g_path_entries[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
             break;
         case 2:
-            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
-            prev = D_L03_0029BCD0[i].first;
-            D_L03_0029BCD0[i].second = SelectUnusedTableEntry(obj, prev, i, &prev, 1);
+            g_path_entries[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
+            prev = g_path_entries[i].first;
+            g_path_entries[i].second = SelectUnusedTableEntry(obj, prev, i, &prev, 1);
             break;
         case 3:
-            D_L03_0029BCD0[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
-            prev2 = D_L03_0029BCD0[i].first;
-            D_L03_0029BCD0[i].second = SelectUnusedTableEntry(obj, node, i, &prev2, 1);
+            g_path_entries[i].first = SelectUnusedTableEntry(obj, node, i, 0, 0);
+            prev2 = g_path_entries[i].first;
+            g_path_entries[i].second = SelectUnusedTableEntry(obj, node, i, &prev2, 1);
             break;
         }
     }

@@ -36,38 +36,38 @@ typedef struct {
     int buttons;
 } InputState;
 extern HeroFrame g_hero_state;
-extern char D_0018BE50[];
+extern char g_hero_state_block_2[];
 extern InputState g_pad_state;
 extern int FastDecTimer(void *);
-extern int func_PAL_L00_002D3928(void);
+extern int hero_get_movement_mode_pal(void);
 extern float vec_length_xy(void *);
 extern void func_PAL_L00_002BA750(void);
 extern void euler_to_matrix(void *, void *);
 extern void set_identity_matrix(void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void func_PAL_L00_002B3210(void);
-extern void func_PAL_L00_002C2F88(void);
-extern void func_PAL_L00_002C3250(void);
+extern void hero_probe_ground_and_ledge_pal(void);
+extern void hero_l00_update_timers_pal(void);
 extern float hero_get_stick_magnitude(void);
 
 /* Updates input and history rings, then refreshes the hero's movement matrices. */
-void func_PAL_L00_002B3608(void)
+void UpdateHeroInputAndHistory_pal(void)
 {
     HeroFrame *p;
     int bits;
 
-    qcopy(D_0018BE50, D_0018BE50 - 0x1fb0);
+    qcopy(g_hero_state_block_2, g_hero_state_block_2 - 0x1fb0);
     if (g_pad_state.flags & 3) {
-        if (((TimerState *)(D_0018BE50 - 0x2030))->timer <= 0)
-            ((TimerState *)(D_0018BE50 - 0x2030))->timer = 1;
+        if (((TimerState *)(g_hero_state_block_2 - 0x2030))->timer <= 0)
+            ((TimerState *)(g_hero_state_block_2 - 0x2030))->timer = 1;
     } else {
-        FastDecTimer(D_0018BE50 - 0xbdc);
+        FastDecTimer(g_hero_state_block_2 - 0xbdc);
     }
     p = &g_hero_state;
     if (p->state == 16)
         p->timer = 0;
     {
-        int active = func_PAL_L00_002D3928();
+        int active = hero_get_movement_mode_pal();
         p->stick_x = g_pad_state.x;
         p->gravity_mode = active;
         p->stick_y = g_pad_state.y;
@@ -105,6 +105,6 @@ void func_PAL_L00_002B3608(void)
     set_identity_matrix((char *)p + 0x40);
     matrix_from_basis_rows((char *)p + 0x40, p);
     func_PAL_L00_002B3210();
-    func_PAL_L00_002C2F88();
-    func_PAL_L00_002C3250();
+    hero_probe_ground_and_ledge_pal();
+    hero_l00_update_timers_pal();
 }

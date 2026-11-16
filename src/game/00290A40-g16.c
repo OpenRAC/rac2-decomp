@@ -24,11 +24,11 @@ typedef struct {
     int flags;
 } LightEnvironment;
 
-extern float D_001A9190[4] __attribute__((sda));
-extern float D_001B5358 __attribute__((nosda));
-extern LightEnvironment D_001C2740;
-extern DynamicLight D_001C2B40[8];
-extern DynamicLightState D_001C2C40[8];
+extern float g_ambient_color[4] __attribute__((sda));
+extern float g_rotation_base_angle __attribute__((nosda));
+extern LightEnvironment g_light_environment;
+extern DynamicLight g_dynamic_lights[8];
+extern DynamicLightState g_dynamic_light_states[8];
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -46,15 +46,15 @@ void UpdateLightingEnvironment(void)
     DynamicLight *light;
     DynamicLightState *state;
 
-    qcopy(D_001C2740.ambient, D_001A9190);
-    angle = FastAddRotations(D_001B5358, -0.8f);
-    D_001C2740.direction[0] = math_fast_sin_or_cos_a(angle) * 0.866f;
-    D_001C2740.direction[1] = math_fast_sin_or_cos_b(angle) * 0.866f;
-    D_001C2740.direction[2] = -0.5f;
-    D_001C2740.flags = 0;
+    qcopy(g_light_environment.ambient, g_ambient_color);
+    angle = FastAddRotations(g_rotation_base_angle, -0.8f);
+    g_light_environment.direction[0] = math_fast_sin_or_cos_a(angle) * 0.866f;
+    g_light_environment.direction[1] = math_fast_sin_or_cos_b(angle) * 0.866f;
+    g_light_environment.direction[2] = -0.5f;
+    g_light_environment.flags = 0;
     for (i = 0; i < 8; i++) {
-        light = &D_001C2B40[i];
-        state = &D_001C2C40[i];
+        light = &g_dynamic_lights[i];
+        state = &g_dynamic_light_states[i];
         if (state->state != 0) {
             if (fast_vec_dist(light->position, state->position) > 1.0f
                 || math_fabs(light->radius - state->position[3]) > 1.0f) {

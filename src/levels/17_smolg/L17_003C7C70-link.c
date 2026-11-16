@@ -9,8 +9,8 @@ typedef struct { int index; short uid; signed char state; unsigned char pad; } L
 extern char *entity_base_abs[] __asm__("D_L17_001B2C1C") __attribute__((sda));
 extern int g_current_map_index SDATA(D_001A79F0);
 extern char *entity_base_gp SDATA(D_L17_001B2C1C);
-extern unsigned char D_0019B2E8[],D_0019B4A8[];
-extern char D_L17_001B1FB8[],D_L17_001B1FE8[],D_L17_001B2018[];
+extern unsigned char g_moby_group_flags[],g_moby_nibble_table[];
+extern char g_str_l17_link_debug_a[],g_str_l17_link_debug_b[],g_str_l17_link_debug_c[];
 extern int flag_is_third_pending_set(void *),math_fast_float_d(void *),FloatToInt(float);
 extern void moby_set_flag_bit(void *,int),moby_mark_spawned(void *),coll_hit_mobys_inside_box(void *,void *);
 extern float IntToFloat(int);
@@ -40,7 +40,7 @@ void UpdateLinkedMobyController(unsigned char *moby)
     active=0;
     target=0;
     if(*(int *)(vars+0x10)!=-1)target=(unsigned char *)entity_base_abs[0]+(*(int *)(vars+0x10)<<8);
-    if((moby[0xb0]==0xff || !(D_0019B2E8[moby[0xb0]+(g_current_map_index<<4)]&0x80)) && moby[0x20]!=0) {
+    if((moby[0xb0]==0xff || !(g_moby_group_flags[moby[0xb0]+(g_current_map_index<<4)]&0x80)) && moby[0x20]!=0) {
         int i;
         link=row;
         for(i=0;i<5;++i,++link) {
@@ -51,7 +51,7 @@ void UpdateLinkedMobyController(unsigned char *moby)
                 if(!linked || *(short *)(linked+0xaa)!=link->uid || linked[0x20]==0xfe || linked[0x20]==0xfd)goto clear_active;
                 id=*(unsigned short *)(linked+0xb2);
                 half=(short)id;
-                bits=D_0019B4A8[(half>>1)+(g_current_map_index<<10)];
+                bits=g_moby_nibble_table[(half>>1)+(g_current_map_index<<10)];
                 if(id&1)bits=(bits>>4)&7;else bits&=7;
                 if(bits)goto clear_active;
                 ++active;
@@ -72,7 +72,7 @@ next_row:;
             else if(*(int *)(vars+8)&0x40)qcopy(target+0x10,moby+0x10);
             if(*(int *)(vars+8)&0x20)qcopy(moby+0xf0,target+0xf0);
             else if(*(int *)(vars+8)&0x80)qcopy(target+0xf0,moby+0xf0);
-        } else STUB_printf(D_L17_001B1FB8);
+        } else STUB_printf(g_str_l17_link_debug_a);
         { int i; unsigned char *diag;
         for(diag=(unsigned char *)row,i=0;i<5;++i,diag+=8) {
             if(*(int *)diag!=-1) {
@@ -80,8 +80,8 @@ next_row:;
                 unsigned int offset=*(int *)diag<<8;
                 unsigned char *linked=(unsigned char *)(offset+(unsigned int)base);
                 *(unsigned short *)(diag+4)=*(unsigned short *)(linked+0xaa);
-                STUB_printf(D_L17_001B1FE8,((char *)moby-base)>>8,i,*(int *)diag,*(short *)(diag+4));
-            } else STUB_printf(D_L17_001B2018,((char *)moby-entity_base_abs[0])>>8,i);
+                STUB_printf(g_str_l17_link_debug_b,((char *)moby-base)>>8,i,*(int *)diag,*(short *)(diag+4));
+            } else STUB_printf(g_str_l17_link_debug_c,((char *)moby-entity_base_abs[0])>>8,i);
         }
         }
         { float factor=*(float *)(*(char **)(moby+0x24)+0x24);

@@ -1,6 +1,6 @@
 #include "common.h"
-extern f32 D_L12_001B1C60[4] __attribute__((sda));
-extern f32 D_L12_001B1C50[4] __attribute__((sda));
+extern f32 g_driver_spark_offset_b[4] __attribute__((sda));
+extern f32 g_driver_spark_offset_a[4] __attribute__((sda));
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -20,8 +20,8 @@ void part_spawn_driver_spark_bursts(u8 *self)
     u8 *particle;
     u8 *origin=self+0x10;
     for(i=0;i<2;i++) {
-        if(i==0) matrix_mul_vec3(offset,D_L12_001B1C50,self+0xC0);
-        else matrix_mul_vec3(offset,D_L12_001B1C60,self+0xC0);
+        if(i==0) matrix_mul_vec3(offset,g_driver_spark_offset_a,self+0xC0);
+        else matrix_mul_vec3(offset,g_driver_spark_offset_b,self+0xC0);
         qcopy(pos,origin);
         FastVecAdd(pos,pos,offset);
         velocity[0]=math_fast_sin_or_cos_a(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;

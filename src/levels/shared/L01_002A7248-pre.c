@@ -7,7 +7,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u
 
 extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
-extern char D_L01_002637A0[];
+extern char g_action_table[];
 extern int hero_slot_item_id(int);
 
 typedef struct {
@@ -19,7 +19,7 @@ int hero_get_weapon_anim_id(char *a0)
 {
     if (a0 != 0 && ((Hero *)g_hero_state)->b[0x22BA] != 0 && ((Hero *)g_hero_state)->h[0x24EC / 2] == 0) {
         int idx = hero_slot_item_id(0);
-        return ((WeaponEntry *)(D_L01_002637A0 + g_item_slot_to_record[idx] * 224))->v;
+        return ((WeaponEntry *)(g_action_table + g_item_slot_to_record[idx] * 224))->v;
     }
     if (((Hero *)g_hero_state)->i[0x24CC / 4] != 1)
         return 0;
@@ -35,7 +35,7 @@ typedef struct {
 } SubtitleHistory;
 
 extern SubtitleHistory g_subtitle_history[];
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern char g_hero_position[];
 extern int IsPointInCuboid(void *, int);
@@ -61,22 +61,22 @@ void TriggerSubtitleInCuboid(int key, int selection, int mode, int area, int exc
                 subtitle_request_voice_line(key, selection);
                 break;
             case 1:
-                if (D_001A7390[0] - g_subtitle_history[selection].time > 1080 || g_subtitle_history[selection].time == 0)
+                if (g_frame_counter[0] - g_subtitle_history[selection].time > 1080 || g_subtitle_history[selection].time == 0)
                     subtitle_request_voice_line(key, selection);
-                else if (g_subtitle_history[selection].time < D_001A7390[0])
-                    g_subtitle_history[selection].time = D_001A7390[0];
+                else if (g_subtitle_history[selection].time < g_frame_counter[0])
+                    g_subtitle_history[selection].time = g_frame_counter[0];
                 break;
             case 2:
                 if (g_subtitle_history[selection].count != 0) {
-                    if (D_001A7390[0] - g_subtitle_history[selection].time > 1080 || g_subtitle_history[selection].time == 0)
+                    if (g_frame_counter[0] - g_subtitle_history[selection].time > 1080 || g_subtitle_history[selection].time == 0)
                         subtitle_request_voice_line(key, selection);
-                    else if (g_subtitle_history[selection].time < D_001A7390[0])
-                        g_subtitle_history[selection].time = D_001A7390[0];
+                    else if (g_subtitle_history[selection].time < g_frame_counter[0])
+                        g_subtitle_history[selection].time = g_frame_counter[0];
                     break;
                 }
                 g_subtitle_history[selection].count++;
-                if (g_subtitle_history[selection].time < D_001A7390[0])
-                    g_subtitle_history[selection].time = D_001A7390[0];
+                if (g_subtitle_history[selection].time < g_frame_counter[0])
+                    g_subtitle_history[selection].time = g_frame_counter[0];
                 g_subtitle_history[selection].levels = (g_subtitle_history[selection].levels | (1 << g_current_map_index[0])) | 0x80000000;
                 break;
             case 3:

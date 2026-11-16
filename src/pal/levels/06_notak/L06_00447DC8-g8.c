@@ -1,10 +1,11 @@
+#include "names.h"
 /* func_PAL_L06_00447DC8, the PAL copy of func_L06_00443280: the same C at 50 Hz, with the
    timers from func_002A7820 scaled by 5/6, frame counts and rates converted, and PAL callees. */
 #include "common.h"
 
-extern float D_L06_001B1090 __attribute__((sda));
-extern float D_L06_001B1094 __attribute__((sda));
-extern int D_L06_001B2348;
+extern float g_creature_wander_time_a __attribute__((sda));
+extern float g_creature_wander_time_b __attribute__((sda));
+extern int g_game_l06_frame_counter;
 extern void func_PAL_L06_004485C0(char *);
 extern int flag_set_second_pending(char *);
 extern int flag_set_first_pending(char *);
@@ -14,13 +15,13 @@ extern int math_random_int_range(int, int);
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern int moby_dispatch_action_by_kind(char *, char *);
-extern void func_PAL_L06_00448AB8(char *);
+extern void moby_l06_explode_and_remove_pal(char *);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(char *, char *, char *);
-extern int func_PAL_L06_00448968(char *, char *, int);
+extern int actor_set_glow_effect_pal(char *, char *, int);
 extern int moby_count_group_side_from_object(char *, int, int);
 extern void actor_aim_head_at_hero(char *);
 extern float mat_fast_helper_a(float, float);
@@ -29,7 +30,7 @@ extern int func_PAL_002AF6C0(char *, float);
 extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
 extern void vec_scale_to_length(char *, char *, float);
 extern void actor_tick_timers_effects(char *);
-extern void func_PAL_L06_00448CF0(char *);
+extern void marker_update_pulse_pal(char *);
 
 #define F(p,o) (*(float *)((p)+(o)))
 #define H(p,o) (*(short *)((p)+(o)))
@@ -52,7 +53,7 @@ void func_PAL_L06_00447DC8(char *obj)
             F(st,0x124) = 0.0096f;
             F(st,0x134) = 0.5f;
         }
-        F(st,0x1D0) = D_L06_001B1094 * 0.020000001f;
+        F(st,0x1D0) = g_creature_wander_time_b * 0.020000001f;
         if (H(st,0x314) == 1) {
             if (math_random_int_below(5) == 0) {
                 moby_set_state(obj,5,2);
@@ -70,7 +71,7 @@ void func_PAL_L06_00447DC8(char *obj)
             moby_set_controller_speed_limits(obj, 0.0072000003f, 0.080000006f, 0.005026549f, 0.5026549f);
             F(st,0x134) = 0.05f;
         }
-        F(st,0x1D0) = D_L06_001B1090 * 0.020000001f;
+        F(st,0x1D0) = g_creature_wander_time_a * 0.020000001f;
         if (H(st,0x314) == 1) moby_set_state(obj,6,2);
         else if (!H(st,0x310)) moby_set_state(obj,1,0);
         break;
@@ -80,7 +81,7 @@ void func_PAL_L06_00447DC8(char *obj)
             F(st,0x124) = 0.0096f;
             F(st,0x134) = 0.05f;
         }
-        F(st,0x1D0) = D_L06_001B1090 * 0.020000001f;
+        F(st,0x1D0) = g_creature_wander_time_a * 0.020000001f;
         if (H(st,0x314) == 1) break;
         else {
             moby_set_state(obj,3,1);
@@ -89,7 +90,7 @@ void func_PAL_L06_00447DC8(char *obj)
         break;
     case 3:
         flags = moby_dispatch_action_by_kind(obj,st+0x50);
-        if (flags & 1) func_PAL_L06_00448AB8(obj);
+        if (flags & 1) moby_l06_explode_and_remove_pal(obj);
         else if (flags & 2) {
             if (H(st,0x314) == 1) {
                 moby_set_state(obj,6,2);
@@ -121,7 +122,7 @@ void func_PAL_L06_00447DC8(char *obj)
             F(st,0x2F8) = 0;
             FastVecAdd(st+0x2F0,st+0x2F0,st+0x2E0);
         }
-        func_PAL_L06_00448968(obj,st+0x2F0,0);
+        actor_set_glow_effect_pal(obj,st+0x2F0,0);
         if (U(obj,0x96)>25 && (F(st,0x1CC)<=0.5f || U(obj,0x96)>150)) moby_set_state(obj,1,-1);
         break;
     case 3:
@@ -131,7 +132,7 @@ void func_PAL_L06_00447DC8(char *obj)
         break;
     case 4:
         if (flag_set_first_pending(obj) && B(obj,0x43)!=6) func_PAL_002A7E68(obj,6,0,8);
-        if (func_PAL_L06_00448968(obj,st+0x2E0,0)&0x80) moby_set_state(obj,3,-1);
+        if (actor_set_glow_effect_pal(obj,st+0x2E0,0)&0x80) moby_set_state(obj,3,-1);
         break;
     case 5:
         if (flag_set_first_pending(obj)) {
@@ -142,7 +143,7 @@ void func_PAL_L06_00447DC8(char *obj)
     case 6:
         if (flag_set_first_pending(obj) && B(obj,0x43)!=6) func_PAL_002A7E68(obj,6,0,4);
         if (!(U(obj,0x96)&3)) F(st,0x31C) = (float)moby_count_group_side_from_object(obj,I(st,0x200),-1)*0.087266475f;
-        func_PAL_L06_00448968(obj,st+0x1F0,1);
+        actor_set_glow_effect_pal(obj,st+0x1F0,1);
         actor_aim_head_at_hero(obj);
         if (F(st,0x1CC)<=1.25f) moby_set_state(obj,7,-1);
         break;
@@ -158,10 +159,10 @@ void func_PAL_L06_00447DC8(char *obj)
     case 10:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=10) func_PAL_002A7E68(obj,10,0,5);
-            I(st,0x1BC) = D_L06_001B2348;
+            I(st,0x1BC) = g_game_l06_frame_counter;
         }
         vec_scale_to_length(tmp,st+0x1A0,1.0f);
-        func_PAL_L06_00448968(obj,tmp,0);
+        actor_set_glow_effect_pal(obj,tmp,0);
         if (F(st,0x190)>=F(obj,0x18)) {
             moby_set_state(obj,5,2);
             I(st,0x138) &= ~0x11;
@@ -169,5 +170,5 @@ void func_PAL_L06_00447DC8(char *obj)
         break;
     }
     actor_tick_timers_effects(obj);
-    if (B(obj,0x31)) func_PAL_L06_00448CF0(obj);
+    if (B(obj,0x31)) marker_update_pulse_pal(obj);
 }

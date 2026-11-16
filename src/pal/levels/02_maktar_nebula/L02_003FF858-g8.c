@@ -16,13 +16,13 @@ extern u32 g_entity_group_lists[];
 
 extern char g_hero_state[];
 
-extern f32 D_L02_001B1218 __attribute__((sda));
+extern f32 g_arena_tally_sum_weight __attribute__((sda));
 
-extern f32 D_L02_001B121C __attribute__((sda));
+extern f32 g_arena_tally_count_weight __attribute__((sda));
 
-extern f32 D_L02_001B1220 __attribute__((sda));
+extern f32 g_arena_tally_hero_weight __attribute__((sda));
 
-extern s32 D_L02_001B1214 __attribute__((sda));
+extern s32 g_arena_tally_reload_time __attribute__((sda));
 
 extern void func_PAL_L02_00405040(char *, s32, f32, f32);
 
@@ -124,14 +124,14 @@ void func_PAL_L02_003FF858(char *a0) {
                     s2 += w * *(f32 *)(b8 + (r << 4));
                 }
                 *(f32 *)(state + 0x6C) =
-                    D_L02_001B1218 * s1 + D_L02_001B121C * s0 + D_L02_001B1220 * s2;
+                    g_arena_tally_sum_weight * s1 + g_arena_tally_count_weight * s0 + g_arena_tally_hero_weight * s2;
                 {
                     char *timer = state + 0x11E;
 
                     if (FastDecTimer(timer)) {
                         char *b4 = state + 4;
                         char *b8 = state + 8;
-                        s32 reload = D_L02_001B1214;
+                        s32 reload = g_arena_tally_reload_time;
                         s32 t;
                         s32 idx;
 

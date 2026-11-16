@@ -2,7 +2,7 @@
 
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } RopeVector;
-extern RopeVector D_L03_00238040[][16];
+extern RopeVector g_rope_strand_points[][16];
 
 typedef struct {
     unsigned char pad_0[0x28];
@@ -27,8 +27,8 @@ typedef struct {
     float center[4];
 } RopeState;
 
-extern float (*D_L03_001FE700[])[4];
-extern RopeVector D_L03_00237F40[];
+extern float (*g_path_l03_entry_table[])[4];
+extern RopeVector g_random_vector_table[];
 extern float g_hero_position[];
 extern float FastAddRotations(float, float);
 extern void FastVecSub(void *, void *, void *);
@@ -57,10 +57,10 @@ void rope_update_strand_points(u8 *object)
         state->cycle -= 1.0f;
     for (row = 0; row < 4; row++) {
         if ((state->flags & 1) && state->groups[row] >= 0) {
-            RopeVector *source = (RopeVector *)D_L03_001FE700[state->groups[row]];
+            RopeVector *source = (RopeVector *)g_path_l03_entry_table[state->groups[row]];
             int limit = state->count;
             for (column = 0; column < limit; column++)
-                qcopy_nc(&D_L03_00238040[state->pool + row][column], &source[column + 1]);
+                qcopy_nc(&g_rope_strand_points[state->pool + row][column], &source[column + 1]);
             if (state->flags & 8) {
                 float distance, strength;
                 FastVecSub(&toward, g_hero_position, state->center);
@@ -70,7 +70,7 @@ void rope_update_strand_points(u8 *object)
                     strength = 1.0f - (distance - 1.1f) / state->radius;
                     for (column = 0; column < state->count; column++) {
                         float length, amount;
-                        qcopy(&relative, &D_L03_00238040[state->pool + row][column]);
+                        qcopy(&relative, &g_rope_strand_points[state->pool + row][column]);
                         FastVecSub(&relative, &relative, state->center);
                         length = FastVecLength(&relative);
                         if (length > 1.1f)
@@ -80,7 +80,7 @@ void rope_update_strand_points(u8 *object)
                         FastVecScale(&blended, &toward, amount);
                         FastVecScale(&relative, &relative, 1.0f - amount);
                         FastVecAdd(&blended, &blended, &relative);
-                        FastVecAdd(&D_L03_00238040[state->pool + row][column], &blended, state->center);
+                        FastVecAdd(&g_rope_strand_points[state->pool + row][column], &blended, state->center);
                     }
                 }
             }
@@ -108,19 +108,19 @@ void rope_update_strand_points(u8 *object)
             }
             for (column = 0; column < state->count; column++) {
                 vec_scale_to_length(&radial, &tangent, (float)column / ((float)state->count - 0.5f));
-                qcopy_nc(&D_L03_00238040[state->pool + row][column], &radial);
-                FastVecAdd(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], state->center);
+                qcopy_nc(&g_rope_strand_points[state->pool + row][column], &radial);
+                FastVecAdd(&g_rope_strand_points[state->pool + row][column], &g_rope_strand_points[state->pool + row][column], state->center);
             }
         }
     }
-    FastVecSub(&tangent, &(*(RopeVector *)((unsigned int)D_L03_00238040 + ((state->pool) * 256 + (1) * 16))),
-                             &(*(RopeVector *)((unsigned int)D_L03_00238040 + ((state->pool) * 256 + (0) * 16))));
+    FastVecSub(&tangent, &(*(RopeVector *)((unsigned int)g_rope_strand_points + ((state->pool) * 256 + (1) * 16))),
+                             &(*(RopeVector *)((unsigned int)g_rope_strand_points + ((state->pool) * 256 + (0) * 16))));
     segmentLength = FastVecLength(&tangent);
     for (column = 0; column < state->count; column++) {
         vertical = 0.0f;
         phase = 0.0f;
         if (!(state->flags & 0x40))
-            FastVecScale(&jitter, &D_L03_00237F40[column], state->jitterScale * segmentLength);
+            FastVecScale(&jitter, &g_random_vector_table[column], state->jitterScale * segmentLength);
         if (!(state->flags & 0x80)) {
             float firstPhase = math_wrap_angle_to_pi(state->phaseA + (float)column * -1.780236005783081f);
             float first = state->amplitude * math_fast_sin_or_cos_b(firstPhase);
@@ -135,16 +135,16 @@ void rope_update_strand_points(u8 *object)
             radial.f[2] = 0.0f;
         }
         for (row = 0; row < 4; row++) {
-            qcopy_nc(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row][column]);
+            qcopy_nc(&g_rope_strand_points[state->pool + row + 4][column], &g_rope_strand_points[state->pool + row][column]);
             if (column != 0 && column != state->count - 1) {
                 if (!(state->flags & 0x40)) {
-                    FastVecAdd(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &jitter);
-                    FastVecAdd(&D_L03_00238040[state->pool + row][column], &D_L03_00238040[state->pool + row][column], &jitter);
+                    FastVecAdd(&g_rope_strand_points[state->pool + row + 4][column], &g_rope_strand_points[state->pool + row + 4][column], &jitter);
+                    FastVecAdd(&g_rope_strand_points[state->pool + row][column], &g_rope_strand_points[state->pool + row][column], &jitter);
                 }
                 if (!(state->flags & 0x80))
-                    D_L03_00238040[state->pool + row + 4][column].f[2] += vertical;
+                    g_rope_strand_points[state->pool + row + 4][column].f[2] += vertical;
                 if (!(state->flags & 0x100))
-                    FastVecAdd(&D_L03_00238040[state->pool + row + 4][column], &D_L03_00238040[state->pool + row + 4][column], &radial);
+                    FastVecAdd(&g_rope_strand_points[state->pool + row + 4][column], &g_rope_strand_points[state->pool + row + 4][column], &radial);
             }
         }
     }

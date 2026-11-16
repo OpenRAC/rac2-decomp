@@ -37,17 +37,17 @@ typedef struct {
 } L23Flight;
 extern L23Game D_00189E20_2;
 extern L23RayHit g_last_ray_hit;
-extern float D_L23_001B36C0[4] __attribute__((sda));
-extern float D_L23_001B1A10 __attribute__((sda));
-extern float D_L23_001B1A18 __attribute__((sda));
-extern float D_L23_001B1A1C __attribute__((sda));
-extern float D_L23_001B1A24 __attribute__((sda));
-extern float D_L23_001B1A28 __attribute__((sda));
-extern float D_L23_001B1A30 __attribute__((sda));
-extern float D_L23_001B1A34 __attribute__((sda));
-extern float D_L23_001B1A3C __attribute__((sda));
-extern float D_L23_001B1A40 __attribute__((sda));
-extern float D_L23_001B1ADC __attribute__((sda));
+extern float g_player_target_point[4] __attribute__((sda));
+extern float g_flying_shot_vel_max_a __attribute__((sda));
+extern float g_flying_shot_vel_step_a __attribute__((sda));
+extern float g_flying_shot_vel_max_d __attribute__((sda));
+extern float g_flying_shot_vel_step_d __attribute__((sda));
+extern float g_flying_shot_vel_max_b __attribute__((sda));
+extern float g_flying_shot_vel_step_b __attribute__((sda));
+extern float g_flying_shot_vel_max_c __attribute__((sda));
+extern float g_flying_shot_vel_step_c __attribute__((sda));
+extern float g_flying_shot_spin_degrees __attribute__((sda));
+extern float g_flying_shot_hit_distance __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_clear_128(void *);
@@ -67,7 +67,7 @@ extern void blast_projectile_draw_glow(u8 *);
    or the hit is near, else a second probe) and leaves, otherwise it moves the object; state 1
    spawns the burst and removes it. It then integrates the velocity, turns two matrix rows and
    registers the next update. */
-void func_PAL_L23_0042D230(u8 *moby) {
+void flying_l23_shot_update_pal(u8 *moby) {
     L23Flight *vars = *(L23Flight **)(moby + 0x68);
     TI16 target[1];
     L23Probe q1;
@@ -88,11 +88,11 @@ void func_PAL_L23_0042D230(u8 *moby) {
             make_hit_descriptor(&q1, moby, 0x90003, vars, vars->radius);
             q1.id = *(u16 *)(moby + 0xAA);
             if (CollLine(moby + 0x10, target, 0, moby, 0) != 0) {
-                float dist = fast_vec_dist(D_L23_001B36C0, g_last_ray_hit.point);
+                float dist = fast_vec_dist(g_player_target_point, g_last_ray_hit.point);
                 u8 *player = D_00189E20_2.player;
                 s32 isPlayer = g_last_ray_hit.hit == player;
 
-                if (isPlayer || dist < D_L23_001B1ADC) {
+                if (isPlayer || dist < g_flying_shot_hit_distance) {
                     TI16 t;
                     s32 radius;
 
@@ -137,23 +137,23 @@ void func_PAL_L23_0042D230(u8 *moby) {
             return;
         }
     }
-    vars->vel[0] += D_L23_001B1A18;
-    vars->vel[1] += D_L23_001B1A30;
-    vars->vel[2] += D_L23_001B1A3C;
-    vars->vel[3] += D_L23_001B1A24;
-    if (vars->vel[0] > D_L23_001B1A10) {
-        vars->vel[0] = D_L23_001B1A10;
+    vars->vel[0] += g_flying_shot_vel_step_a;
+    vars->vel[1] += g_flying_shot_vel_step_b;
+    vars->vel[2] += g_flying_shot_vel_step_c;
+    vars->vel[3] += g_flying_shot_vel_step_d;
+    if (vars->vel[0] > g_flying_shot_vel_max_a) {
+        vars->vel[0] = g_flying_shot_vel_max_a;
     }
-    if (vars->vel[1] > D_L23_001B1A28) {
-        vars->vel[1] = D_L23_001B1A28;
+    if (vars->vel[1] > g_flying_shot_vel_max_b) {
+        vars->vel[1] = g_flying_shot_vel_max_b;
     }
-    if (vars->vel[2] > D_L23_001B1A34) {
-        vars->vel[2] = D_L23_001B1A34;
+    if (vars->vel[2] > g_flying_shot_vel_max_c) {
+        vars->vel[2] = g_flying_shot_vel_max_c;
     }
-    if (vars->vel[3] > D_L23_001B1A1C) {
-        vars->vel[3] = D_L23_001B1A1C;
+    if (vars->vel[3] > g_flying_shot_vel_max_d) {
+        vars->vel[3] = g_flying_shot_vel_max_d;
     }
-    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
-    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1A40 * 0.017453294f);
+    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, g_flying_shot_spin_degrees * 0.017453294f);
+    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, g_flying_shot_spin_degrees * 0.017453294f);
     gfx_add_draw_callback_third((void *)blast_projectile_draw_glow, moby);
 }

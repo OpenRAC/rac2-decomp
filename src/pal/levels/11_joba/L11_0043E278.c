@@ -52,7 +52,7 @@ struct RotorObject {
       char padBC[4];
       struct RotorAxis basis[3];
 };
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern int g_moby_l11_table __attribute__((sda));
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -65,11 +65,11 @@ extern void moby_transform_joint_point(void *, int, void *);
 extern char *moby_find_active_in_group(int);
 extern void joba_shot_init(char *, void *, int, int, void *, void *, int, float, float);
 extern void vec_random_direction(float *, float, float);
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern void vec_random_direction(float *out, float a, float b);
 
 /* Emits a projectile from the next enabled record, with a fifteen-frame delay. */
-void func_PAL_L11_0043E278(struct RotorObject *obj)
+void chain_creature_fire_projectile_pal(struct RotorObject *obj)
 {
     float pos[4];
     float matrix[4][4];

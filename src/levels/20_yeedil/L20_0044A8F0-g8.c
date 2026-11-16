@@ -1,14 +1,15 @@
+#include "names.h"
 /* Updates motion and clamps the independent yaw and pitch components.
  * Full position transfers use the approved helper; the measured speed local is scalar. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B2444 __attribute__((sda));
+extern float g_turret_move_accel __attribute__((sda));
 
-extern float D_L20_001B2448 __attribute__((sda));
+extern float g_turret_move_max_speed __attribute__((sda));
 
-extern float D_L20_001B244C __attribute__((sda));
+extern float g_turret_turn_gain __attribute__((sda));
 
 extern float FastVecLength(void *);
 
@@ -36,15 +37,15 @@ float turret_move_toward_target(char *moby) {
     FastVecSub(to_target, state + 0x190, state + 0x180);
     speed = FastVecLength(state + 0xF0);
     distance = FastVecLength(to_target);
-    math_approach_target_with_braking(&speed, distance, D_L20_001B2444 * 0.00027777778f,
-                  D_L20_001B2444 * 0.00027777778f,
-                  D_L20_001B2448 * 0.016666668f);
+    math_approach_target_with_braking(&speed, distance, g_turret_move_accel * 0.00027777778f,
+                  g_turret_move_accel * 0.00027777778f,
+                  g_turret_move_max_speed * 0.016666668f);
     vec_scale_to_length(state + 0xF0, to_target, speed);
     qcopy(position, saved_pos);
     hero_set_control_motion_and_step(moby, state + 0xF0);
     qcopy(saved_pos, position);
     vec_transform_by_object_or_given(moby, aim_delta, state + 0xF0, 0);
-    turn_gain = D_L20_001B244C;
+    turn_gain = g_turret_turn_gain;
     yaw = aim_delta[1] * -turn_gain;
     *(float *)(state + 0x1A8) = yaw;
     *(float *)(state + 0x1AC) = aim_delta[0] * turn_gain;

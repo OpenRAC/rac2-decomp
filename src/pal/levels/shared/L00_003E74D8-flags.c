@@ -24,7 +24,7 @@ extern float math_random_signed_float_range(float, float);
 /* Twenty rounds that spawn a particle at the point: each round draws a step and a random
    magnitude, jitters the point on each axis and hands the result to the spawn helper with
    210000.0f, 500.0f, 1.0f, 0.0f and 1.0f; the original game role is unknown. */
-void func_PAL_L00_003E78E8(float *pos)
+void part_spawn_small_spark_spray_pal(float *pos)
 {
     float v[4];
     float dir[4];

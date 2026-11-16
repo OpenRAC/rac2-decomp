@@ -17,7 +17,7 @@ typedef struct {
     unsigned char tail[0x54];
 } SoundSlot;
 extern SoundSlot g_sound_state[];
-extern Vec D_L00_001BF220;
+extern Vec g_hero_l00_position;
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
@@ -103,7 +103,7 @@ void func_PAL_L00_003D10A8(unsigned char *obj) {
             if (!snd_is_voice_playing_for_owner(g_hero_moby, *(int *)(ctx + 0x224))) {
                 *(int *)(ctx + 0x224) = snd_start_in_slot(0x18, 4, g_hero_moby);
             }
-            qcopy(&frame.position, &D_L00_001BF220);
+            qcopy(&frame.position, &g_hero_l00_position);
             particle_count = 0;
             do {
                 size = math_random_float_range(1.0f, 2.0f);

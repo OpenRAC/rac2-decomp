@@ -13,9 +13,9 @@ extern void entity_follow_platform(char *);
 extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 
 /* Two tuning values: the first scaled by 1/3600, the second by 1/60. */
-extern float D_L07_001B0AA0 __attribute__((sda));
-extern float D_L07_001B0AA4 __attribute__((sda));
-extern char D_L07_001B9200[];
+extern float g_group_entity_accel_step __attribute__((sda));
+extern float g_group_entity_speed_limit __attribute__((sda));
+extern char g_hero_position_block[];
 /* The sound slots, 0x70 bytes each. */
 extern char g_sound_state[];
 
@@ -38,8 +38,8 @@ void group_entity_base_update(char *moby)
         *(unsigned char *)(vars + 0x60) = 7;
         *(unsigned char *)(vars + 0x2E) = 1;
         *(unsigned char *)(vars + 0xC7) = 1;
-        accel_step = D_L07_001B0AA0;
-        speed_limit = D_L07_001B0AA4;
+        accel_step = g_group_entity_accel_step;
+        speed_limit = g_group_entity_speed_limit;
         accel_step *= 0.00027777778f;
         speed_limit *= 0.016666667f;
         *(int *)(vars + 0x98) = 3;
@@ -64,7 +64,7 @@ void group_entity_base_update(char *moby)
             moby_set_state(moby, 8, 4);
         }
     }
-    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L07_001B9200) < 24.0f) {
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, g_hero_position_block) < 24.0f) {
         moby_update_ground_check(moby);
         *(unsigned char *)(moby + 0x6F) = 22;
     }

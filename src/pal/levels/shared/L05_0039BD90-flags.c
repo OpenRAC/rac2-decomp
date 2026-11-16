@@ -16,7 +16,7 @@ struct Camera98 {
     char pad170[0x200];
     float forward[4];
 };
-extern struct Camera98 D_L05_001B9580;
+extern struct Camera98 g_hero_l05_state;
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -40,7 +40,7 @@ char *func_PAL_L05_0039BD90(void *position, int shake, int a2, int a3, int a4, i
         obj[0x20] = 0;
         qcopy(obj + 0x10, position);
         *(float *)(obj + 0x1c) = 1.0f;
-        FastVecSub(direction, D_L05_001B9580.position, obj + 0x10);
+        FastVecSub(direction, g_hero_l05_state.position, obj + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(obj + 0x10, normal, 1);
         qcopy(obj + 0xc0, direction);
@@ -63,16 +63,16 @@ char *func_PAL_L05_0039BD90(void *position, int shake, int a2, int a3, int a4, i
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 8;
             state->fade = 0.125f;
-            if (fast_vec_dist(position, D_L05_001B9580.position) < 48.0f && shake) {
-                char *camera = (char *)&D_L05_001B9580;
+            if (fast_vec_dist(position, g_hero_l05_state.position) < 48.0f && shake) {
+                char *camera = (char *)&g_hero_l05_state;
                 *(int *)(camera + 0x16c) = 0;
                 *(int *)(camera + 0x168) = 33;
                 *(float *)(camera + 0x160) = 0.075f;
             }
             if (state->visible) {
-                FastVecSub(delta, obj + 0x10, D_L05_001B9580.position);
+                FastVecSub(delta, obj + 0x10, g_hero_l05_state.position);
                 vec_scale_to_length(delta, delta, 1.0f);
-                if (1.57079637f - math_fast_angle_helper(FastVecDot(delta, D_L05_001B9580.forward)) < 0.45378566f)
+                if (1.57079637f - math_fast_angle_helper(FastVecDot(delta, g_hero_l05_state.forward)) < 0.45378566f)
                     state->visible = 1;
                 else
                     state->visible = 0;

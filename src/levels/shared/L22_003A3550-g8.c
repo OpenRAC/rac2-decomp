@@ -10,7 +10,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char *ref_L22_003A3550_00 __attribute__((sda));
 
-extern int *D_L22_001FE940[];
+extern int *g_ship_path_table[];
 
 extern char g_hero_position[];
 
@@ -37,7 +37,7 @@ int lane_pick_random_point_away_from_ship(char *outPoint, int requireAllowed, fl
     for (;;) {
         found = 0;
         laneIndex = math_random_int_below(0x20);
-        lane = D_L22_001FE940[*(int *)(slots + (laneIndex << 2))];
+        lane = g_ship_path_table[*(int *)(slots + (laneIndex << 2))];
         point = (char *)lane + 0x10;
         for (j = 0; j < *lane; j++) {
             if (func_002F3C40(g_hero_position, point) < best) {

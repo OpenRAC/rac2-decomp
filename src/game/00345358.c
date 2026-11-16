@@ -123,7 +123,7 @@ typedef struct Rac2Native_79744baad5ad7f65_ScalarChange48Owner {
     int previous_3fc;
 } Rac2Native_79744baad5ad7f65_ScalarChange48Owner;
 
-extern unsigned char D_0018C0D4[];
+extern unsigned char g_screen_mode_flag[];
 
 extern void func_00349630_2(char *, int);
 
@@ -150,7 +150,7 @@ extern void hud_draw_progress_bar(char *);
 extern void menu_grid_compute_tile_placement(char *, int, int, float *, float *, float *, int *);
 extern void object_set_first_float4(char *, float, float, float, float);
 extern void object_set_second_float4(char *, float, float, float, float);
-extern char *D_001A8CFC __attribute__((section(".sdata")));
+extern char *g_resident_data_base __attribute__((section(".sdata")));
 
 /* Draws every part of a menu screen (labels, icons and buttons) when the screen is switched on. */
 void menu_screen_draw_parts(char *menu)
@@ -254,9 +254,9 @@ void *menu_screen_large_init_parts(char *menu)
    grid entry, and placed relative to the owner's position record. */
 typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
-extern MenuGridEntry D_00259F58[];
+extern MenuGridEntry g_menu_item_table_first[];
 extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
-extern u8 D_001A7A80[] __attribute__((section(".sdata")));
+extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 extern MenuLabelOffset ref_003472B8_00;
 extern void object_set_flag_value(void *, int);
 
@@ -268,13 +268,13 @@ void UpdateMenuGridLabels(char *obj)
     float x, y, x2, y2;
     u8 *flags;
     int bits;
-    int index = D_00259F58[*(int *)(obj + 0x4FC) + *(int *)(obj + 0x500) * 4].id;
+    int index = g_menu_item_table_first[*(int *)(obj + 0x4FC) + *(int *)(obj + 0x500) * 4].id;
 
     if (g_item_owned_flags[index] == 0)
         return;
     a = obj + 0x2E8;
     pad = ref_003472B8_00;
-    flags = &D_001A7A80[index];
+    flags = &g_movie_seen_flags[index];
     b = obj + 0x330;
     bits = flags[0] & 4;
     object_set_flag_value(a, (flags[0] & 1) | (bits != 0));
@@ -304,7 +304,7 @@ unsigned long long menu_pass_through_handle(unsigned long long handle)
 extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
 extern void hud_init_widget_defaults(void *, void *, void *);
-extern char D_001AE5A8[];
+extern char g_list_menu_attach_widget_defaults[];
 
 /* Resets a list menu to its start state and attaches its item data. */
 void list_menu_reset_attach_items(char *menu, void *items)
@@ -318,7 +318,7 @@ void list_menu_reset_attach_items(char *menu, void *items)
         *(int **)(menu + 0x4C) = cursorPos;
         cursorPos[1] = 0; cursorPos[2] = 0; cursorPos[3] = 0; cursorPos[0] = 0;
     }
-    hud_init_widget_defaults(menu, D_001AE5A8, items);
+    hud_init_widget_defaults(menu, g_list_menu_attach_widget_defaults, items);
     *(int *)(menu + 0x9C) = 0x70FFFEED;
     *(int *)(menu + 0xA0) = 0x80F0F0F0;
     *(int *)(menu + 0xA4) = 0x80808080;
@@ -644,8 +644,8 @@ void fade_set_amount(u8 *fade, f32 amount) { *(f32 *)(fade + 0x18) = amount; }
 extern void *object_construct_derived_a(char *);
 extern void *object_construct_derived_b(char *);
 extern char *object_init_type_pointer(char *);
-extern char D_001AD908[] __attribute__((sda));
-extern char D_001AD928[] __attribute__((sda));
+extern char g_meter_vtable_b[] __attribute__((sda));
+extern char g_meter_vtable_a[] __attribute__((sda));
 
 /* Sets up the sprites, labels and fade effects of a meter screen. */
 char *meter_screen_init_parts(char *meter)
@@ -656,9 +656,9 @@ char *meter_screen_init_parts(char *meter)
     object_construct_derived_b(meter + 0xF4);
     menu_clear_sixteen_words(meter + 0x140);
     object_init_type_pointer(meter + 0x1CC);
-    *(char **)(meter + 0x1CC) = D_001AD908;
+    *(char **)(meter + 0x1CC) = g_meter_vtable_b;
     object_init_type_pointer(meter + 0x1D0);
-    *(char **)(meter + 0x1D0) = D_001AD928;
+    *(char **)(meter + 0x1D0) = g_meter_vtable_a;
     menu_clear_sixteen_words(meter + 0x1D4);
     menu_clear_sixteen_words(meter + 0x25C);
     menu_clear_sixteen_words(meter + 0x2E4);
@@ -675,7 +675,7 @@ void menu_set_first_field(u8 *object, s32 value) { *(s32 *)(object + 0x0) = valu
 void meter_set_value_start_timers(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int value)
 {
     int previous = owner->value_04;
-    if (previous != value && D_0018C0D4[0] == 0) {
+    if (previous != value && g_screen_mode_flag[0] == 0) {
         owner->previous_3fc = previous;
         owner->counter_3f8 = 180;
         owner->counter_3f4 = 300;
@@ -687,8 +687,8 @@ typedef struct { char bytes[0x4C]; } StageSprite;
 typedef struct { char prefix[0x5C]; StageSprite left, right; } StageOwner;
 typedef struct { float values[3]; } StageFloatTable;
 typedef struct { int values[3]; } StageIntTable;
-extern const StageFloatTable D_001AE628, D_001AE638;
-extern const StageIntTable D_001AE648, D_001AE658;
+extern const StageFloatTable g_item_grid_spacing_table, g_item_grid_result_table;
+extern const StageIntTable g_item_grid_x_offsets, g_item_grid_y_offsets;
 extern void object_set_value_float(char *widget, float position);
 
 /* Works out the layout of the item grid for the given item number and sets up its two arrow sprites. */
@@ -702,16 +702,16 @@ float item_grid_layout(char *screen, int type, int *columns, int *rows,
     int index, tier;
     float position, result = 0.0f;
 
-    spacings = D_001AE628;
-    results = D_001AE638;
+    spacings = g_item_grid_spacing_table;
+    results = g_item_grid_result_table;
     *flag = 0;
     index = type - 1;
-    xOffsets = D_001AE648;
+    xOffsets = g_item_grid_x_offsets;
     tier = 1;
     if (type > 20) tier = 2;
     *rows = tier;
     if (index < 0) index = 0;
-    yOffsets = D_001AE658;
+    yOffsets = g_item_grid_y_offsets;
     if (type >= 1 && type <= 20) {
         position = (float)(index / 4);
         *columns = 6;
@@ -722,8 +722,8 @@ float item_grid_layout(char *screen, int type, int *columns, int *rows,
         *extra = 0.0f;
         object_set_value_float((char *)&owner->left, position);
         object_set_value_float((char *)&owner->right, position);
-        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 17);
-        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 18);
+        object_set_helper_result((char *)&owner->left, g_resident_data_base + 0x8710, 17);
+        object_set_helper_result((char *)&owner->right, g_resident_data_base + 0x8710, 18);
     } else if (type >= 21 && type <= 40) {
         int row = index / 4 - 5;
         if (row < 0) row = 0;
@@ -736,8 +736,8 @@ float item_grid_layout(char *screen, int type, int *columns, int *rows,
         result = results.values[1];
         object_set_value_float((char *)&owner->left, position);
         object_set_value_float((char *)&owner->right, position);
-        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 19);
-        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 20);
+        object_set_helper_result((char *)&owner->left, g_resident_data_base + 0x8710, 19);
+        object_set_helper_result((char *)&owner->right, g_resident_data_base + 0x8710, 20);
     } else if (type >= 41 && type <= 80) {
         int row = index / 4 - 10;
         if (row < 0) row = 0;
@@ -751,8 +751,8 @@ float item_grid_layout(char *screen, int type, int *columns, int *rows,
         result = results.values[2];
         object_set_value_float((char *)&owner->left, position);
         object_set_value_float((char *)&owner->right, position);
-        object_set_helper_result((char *)&owner->left, D_001A8CFC + 0x8710, 21);
-        object_set_helper_result((char *)&owner->right, D_001A8CFC + 0x8710, 22);
+        object_set_helper_result((char *)&owner->left, g_resident_data_base + 0x8710, 21);
+        object_set_helper_result((char *)&owner->right, g_resident_data_base + 0x8710, 22);
     }
     return result;
 }
@@ -845,26 +845,26 @@ void DrawSegmentedRingMeter(char *o)
             object_set_second_float4(o + 0x10, sx, sy, 0, 0);
             if (*(int *)(o + 4) < 21) {
                 if (*(int *)o >= i + 1) {
-                    object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 26);
+                    object_set_helper_result(o + 0x10, g_resident_data_base + 0x8710, 26);
                     if (flash)
                         *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = color;
                     else
                         *(float *)object_get_fourth_field((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
                     gfx_draw_screen_element_stored(o + 0x10);
                 }
-                object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 25);
+                object_set_helper_result(o + 0x10, g_resident_data_base + 0x8710, 25);
                 *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = 0x55F0C070;
                 gfx_draw_screen_element_stored(o + 0x10);
             } else {
                 if (*(int *)o >= i + 1) {
-                    object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 27);
+                    object_set_helper_result(o + 0x10, g_resident_data_base + 0x8710, 27);
                     if (flash)
                         *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = color;
                     else
                         *(float *)object_get_fourth_field((unsigned char *)o + 0x10) = **(float **)(o + 0x1C8);
                     gfx_draw_screen_element_stored(o + 0x10);
                 }
-                object_set_helper_result(o + 0x10, D_001A8CFC + 0x8710, 24);
+                object_set_helper_result(o + 0x10, g_resident_data_base + 0x8710, 24);
                 *(int *)object_get_fourth_field((unsigned char *)o + 0x10) = 0x55F0C070;
                 gfx_draw_screen_element_stored(o + 0x10);
             }
@@ -967,7 +967,7 @@ void menu_set_screen_value_restart_six_fades(char *screen, int value)
     }
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 
 extern float *object_get_field_a(void *);
@@ -977,7 +977,7 @@ void menu_show_colored_label(char *screen, int text, float value)
 {
     int *color;
     char *label;
-    if (D_00138344 & 0xF000)
+    if (g_menu_input_flags & 0xF000)
         math_ping_pong_blend_values(0, 0, 1, 0, 1);
     label = screen + 0x5B8;
     color = (int *)object_get_fourth_field((unsigned char *)label);

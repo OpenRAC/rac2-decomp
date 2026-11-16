@@ -14,38 +14,38 @@ extern void func_0033B330(void *,float,float,float);
 extern int func_00336380(int,int);
 extern char *func_00345D48(void *,void *,int,int,int,int,int,int,int,float);
 extern void func_002FF698(void *,void *),DrawAnimatedMeshAndGlowEffect(void);
-extern int D_L05_001B3000[] __attribute__((sda));
-extern char D_L05_001B96C0[],D_L05_001B98F0[],D_L05_0024D020[];
-extern float D_L05_001AFC94 __attribute__((sda));
+extern int g_effect_timers[] __attribute__((sda));
+extern char g_origin_vec[],g_unit_dir_vec[],g_emitter_group_positions[];
+extern float g_effect_scale_base __attribute__((sda));
 /* On its first frame sets up and then bursts out debris, sparks and smoke, and draws its effect. */
 void func_L05_003D2048(char *obj)
 {
  BurstVector v,small,offset,pos,velocity;
  char *s=*(char **)(obj+0x68);
- int *timers=D_L05_001B3000;
+ int *timers=g_effect_timers;
  int color1,color2,duration;
  float scale,a,b;
  if (*(unsigned char *)(obj+0x20)==0) {
   part_reset_emitter_slot_effect(obj);*(unsigned char *)(obj+0x20)=1;
   timers[*(int *)s]=5;
-  if(func_003067D8(obj+0x10,D_L05_001B96C0)>200.0f) *(float *)(s+4)=4;
-  else if(func_003067D8(obj+0x10,D_L05_001B96C0)>100.0f) *(float *)(s+4)=2;
-  else if(func_003067D8(obj+0x10,D_L05_001B96C0)>25.0f) *(float *)(s+4)=1;
-  else if(func_003067D8(obj+0x10,D_L05_001B96C0)>0.0f) *(float *)(s+4)=0.5f;
+  if(func_003067D8(obj+0x10,g_origin_vec)>200.0f) *(float *)(s+4)=4;
+  else if(func_003067D8(obj+0x10,g_origin_vec)>100.0f) *(float *)(s+4)=2;
+  else if(func_003067D8(obj+0x10,g_origin_vec)>25.0f) *(float *)(s+4)=1;
+  else if(func_003067D8(obj+0x10,g_origin_vec)>0.0f) *(float *)(s+4)=0.5f;
   func_003719A8(10,0,obj,0xFBF);
  }
- if(!func_003062A0(&D_L05_001B3000[*(int *)s]) && !*(int *)(s+8)) {
+ if(!func_003062A0(&g_effect_timers[*(int *)s]) && !*(int *)(s+8)) {
   int i;
   void *smallp=&small,*posp=&pos;
   for(i=0;i<4;i++) {
    int j;
    char *effect,*record;
    float lim;
-   scale=D_L05_001AFC94*8.0f;
-   qcopy(&v,D_L05_0024D020+*(int *)s*64+i*16);
+   scale=g_effect_scale_base*8.0f;
+   qcopy(&v,g_emitter_group_positions+*(int *)s*64+i*16);
    v.f[0]+=0.1f;
-   func_003068F8(smallp,D_L05_001B98F0,0.20000002f);
-   func_003068F8(&offset,D_L05_001B98F0,0.5f);
+   func_003068F8(smallp,g_unit_dir_vec,0.20000002f);
+   func_003068F8(&offset,g_unit_dir_vec,0.5f);
    func_00306630(&v,&v,&offset);
    scale*=3.0f;
    lim=10.0f;

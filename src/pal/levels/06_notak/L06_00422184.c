@@ -10,16 +10,16 @@ extern int FloatToInt(float);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_angle(void);
 extern void func_PAL_L06_00423250(char *);
-extern void func_PAL_L06_00423E58(char *);
+extern void actor_choose_idle_anim_pal(char *);
 extern int math_random_int_range(int, int);
 extern int moby_dispatch_action_by_kind(char *, char *);
-extern void func_PAL_002A7650(char *, int, int);
+extern void SetDeathBits_pal(char *, int, int);
 extern void func_L06_004294A0(char *, int, int);
 extern float FastDiffRots(float, float);
 extern int *g_path_list[];
 
 extern int FastDecTimer(char *);
-extern void func_PAL_L06_0045D258(char *);
+extern void part_emit_spark_burst_remove_pal(char *);
 extern void FastVecAdd(char *, char *, char *);
 extern void FastVecSub(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
@@ -30,14 +30,14 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int coll_test_point(char *, int, char *, float);
-extern char *D_L06_001BFC98;
+extern char *g_hit_l06_result;
 extern float vec_distance_xy(char *, char *);
 extern float math_random_signed_float_range(float, float);
 extern int func_PAL_002AF6C0(char *, float);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern void *D_L06_001B3760[6];
-extern void func_PAL_L06_00423B78(float *, int);
-extern char *func_PAL_L06_0045DF30(char *, float *, float *, int, float);
+extern void *g_child_slot_used[6];
+extern void part_spawn_colored_burst_pal(float *, int);
+extern char *moby_spawn_child_in_slot_pal(char *, float *, float *, int, float);
 extern void lerp_vector(void *, void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern int coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
@@ -62,18 +62,18 @@ void func_PAL_L06_00422184(char *obj)
                 *(int *)(st + 0x5C8) = 0;
                 PlayMobySound(11, 0, obj);
             }
-            func_PAL_L06_00423E58(obj);
+            actor_choose_idle_anim_pal(obj);
             if (*(int *)(st + 0x5C0)) {
                 *(int *)(st + 0x238) = *(int *)(st + 0x234);
                 *(int *)(st + 0x220) = *(int *)(st + 0x224);
             }
         } else if (*(int *)(st + 0x258)) {
-            func_PAL_L06_00423E58(obj);
+            actor_choose_idle_anim_pal(obj);
         }
         break;
     case 1:
         if (*(int *)(st + 0x228) == 1 || *(int *)(st + 0x22C) == 1)
-            func_PAL_L06_00423E58(obj);
+            actor_choose_idle_anim_pal(obj);
         else if (*(short *)(st + 0x24A) == 0)
             obj[0x95] = 0;
         *(int *)(st + 0x258) = 0;
@@ -90,7 +90,7 @@ void func_PAL_L06_00422184(char *obj)
     case 3:
         hit = moby_dispatch_action_by_kind(obj, st + 0x60);
         if (hit & 1) {
-            func_PAL_002A7650(obj, 0, 3);
+            SetDeathBits_pal(obj, 0, 3);
             func_L06_004294A0(obj, 0, 0);
             return;
         }
@@ -223,9 +223,9 @@ void func_PAL_L06_00422184(char *obj)
             target[2] = 0.0f;
             FastVecAdd((char *)pos, (char *)target, (char *)pos);
             if (coll_test_point((char *)pos, 0, obj, 0.5f)) {
-                char *hit_obj = D_L06_001BFC98;
+                char *hit_obj = g_hit_l06_result;
                 if (hit_obj && *(short *)(hit_obj + 0xAA) == 0xFDC)
-                    func_PAL_L06_0045D258(hit_obj);
+                    part_emit_spark_burst_remove_pal(hit_obj);
             }
         }
         break;
@@ -321,14 +321,14 @@ void func_PAL_L06_00422184(char *obj)
             vec_scale_to_length((char *)direction, (char *)direction, 0.20000002f);
             *(int *)(st + 0x498) = -1;
             for (i = 0; i < 6; i++) {
-                if (!D_L06_001B3760[i]) {
+                if (!g_child_slot_used[i]) {
                     *(int *)(st + 0x498) = i;
                     break;
                 }
             }
             if (*(int *)(st + 0x498) != -1) {
-                func_PAL_L06_00423B78(pos, 10);
-                func_PAL_L06_0045DF30(obj, direction, pos, *(int *)(st + 0x498),
+                part_spawn_colored_burst_pal(pos, 10);
+                moby_spawn_child_in_slot_pal(obj, direction, pos, *(int *)(st + 0x498),
                                   (float)*(unsigned char *)(st + 0x35));
                 *(int *)(st + 0x498) = -1;
             }

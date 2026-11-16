@@ -3,9 +3,9 @@
 #include "include_asm.h"
 
 extern void *memset(void *, int, int);
-extern char D_001BAEC0[];
-extern char D_02000000[];
-extern int D_001B22B0[] __attribute__((sda));
+extern char g_loader_memory[];
+extern char g_ram_end[];
+extern int g_packet_buffer_size[] __attribute__((sda));
 extern char ref_L00_00290B48_00[];
 extern char ref_L00_00290B48_01[];
 
@@ -67,7 +67,7 @@ int iop_send_block(int source, int destination, int length)
 /* Works out where each big memory area starts and stores the addresses in one table. */
 void InitMemSlots(void)
 {
-    int *state = (int *)D_001BAEC0;
+    int *state = (int *)g_loader_memory;
     unsigned int start, size;
 
     memset(state, 0, 0x9C);
@@ -76,7 +76,7 @@ void InitMemSlots(void)
     start = ((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF;
     state[2] = start;
     state[3] = start;
-    size = D_001B22B0[0];
+    size = g_packet_buffer_size[0];
     state[4] = state[3] + size;
     state[5] = state[4] + size;
     state[6] = state[5] + state[1];
@@ -86,7 +86,7 @@ void InitMemSlots(void)
     state[0x78 / 4] = state[0x7C / 4] - 0x2C000;
     state[0x74 / 4] = state[0x78 / 4] - 0x8000;
     state[0x68 / 4] = state[6];
-    state[0x88 / 4] = (unsigned int)D_02000000 - 0x4000;
+    state[0x88 / 4] = (unsigned int)g_ram_end - 0x4000;
     state[0x70 / 4] = state[0x74 / 4] - 0x14000;
     state[0x6C / 4] = state[0x70 / 4];
     state[0x8C / 4] = 0x07000000;
@@ -144,18 +144,18 @@ extern int gfx_wait_paths_idle(int, int);
 extern void tex_load_pif_from_disc_table(void);
 extern void req_reset_queue(void *);
 
-extern char D_001A9048[];   /* path of the IOP reboot image */
-extern char D_001A9060[];   /* "Rebooted IOP" */
-extern char D_001A9070[];   /* "loaded irx modules" */
-extern char D_0010E9E0[];
-extern char D_001BB000[];
-extern char D_001BAD40[];
+extern char g_str_iop_reboot_image[];   /* path of the IOP reboot image */
+extern char g_str_rebooted_iop[];   /* "Rebooted IOP" */
+extern char g_str_loaded_irx_modules[];   /* "loaded irx modules" */
+extern char g_iop_send_dma_block[];
+extern char g_gs_transfer_buffer[];
+extern char g_loader_movie[];
 extern int g_widescreen_flag[] __attribute__((sda));
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int D_001A7290[] __attribute__((sda));
-extern int D_001A72F8 __attribute__((sda));
-extern int D_001A72FC __attribute__((sda));
+extern int g_iop_block_table[] __attribute__((sda));
+extern int g_vram_iop_offset __attribute__((sda));
+extern int g_vram_image_address __attribute__((sda));
 extern int g_hero_moby_default[];
 
 typedef struct {
@@ -182,7 +182,7 @@ void InitOnce(void)
     func_00124418();
     sceDmaReset(1);
     g_widescreen_flag[0] = 0;
-    D_001A7BB0[1] = 0;
+    g_language_settings[1] = 0;
     gfx_update_display_mode_from_screen_type();
     func_0029D050();
     SetPalMode(1);
@@ -196,11 +196,11 @@ void InitOnce(void)
     gfx_write_clear_color_packets();
     sceCdInit(0);
     sce_cd_disk_ready(0);
-    while (!sceSifRebootIop(D_001A9048)) {
+    while (!sceSifRebootIop(g_str_iop_reboot_image)) {
     }
     while (!iop_is_reset_done()) {
     }
-    STUB_printf(D_001A9060);
+    STUB_printf(g_str_rebooted_iop);
     sceSifInitRpc(0);
     DIntr();
     func_0011E7A0();
@@ -214,10 +214,10 @@ void InitOnce(void)
     FlushCache(0);
     g_is_pal_video = 0;
     save_build_file_names(buffer);
-    gfx_start_dma_channel0_and_wait(D_0010E9E0);
-    load_default_copy_setup(D_02000000 - 0xFE8C);
+    gfx_start_dma_channel0_and_wait(g_iop_send_dma_block);
+    load_default_copy_setup(g_ram_end - 0xFE8C);
     image = (char *)((((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF) + 0x2C0000);
-    scratch = D_02000000 - 0x8000 - (g_copy_setup_data.count << 11);
+    scratch = g_ram_end - 0x8000 - (g_copy_setup_data.count << 11);
     load_start_request(g_copy_setup_data.offset + g_copy_setup_data.base, g_copy_setup_data.count, scratch);
     FlushCache(0);
     fast_decompress(scratch, image);
@@ -234,21 +234,21 @@ void InitOnce(void)
     iop_send_block(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
     iop_send_block(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
     iop_remote_cmd_send1(handle);
-    STUB_printf(D_001A9070);
+    STUB_printf(g_str_loaded_irx_modules);
     iop_init_remote_buffer_server();
     sce_cd_disk_ready(0);
     pad_init_ports();
-    state = (int *)D_001BAEC0;
-    D_001A7290[0] = -1;
-    D_001A7290[12] = -1;
-    D_001A72F8 = 0;
-    D_001A72FC = 0x60000;
-    D_001A7290[28] = 0x70000;
-    D_001A7290[29] = 0xB0000;
-    D_001A7290[30] = 0x140000;
-    D_001A7290[31] = 0x1D0000;
-    D_001A7290[32] = 0x1E0000;
-    D_001A7290[1] = state[0x78 / 4];
+    state = (int *)g_loader_memory;
+    g_iop_block_table[0] = -1;
+    g_iop_block_table[12] = -1;
+    g_vram_iop_offset = 0;
+    g_vram_image_address = 0x60000;
+    g_iop_block_table[28] = 0x70000;
+    g_iop_block_table[29] = 0xB0000;
+    g_iop_block_table[30] = 0x140000;
+    g_iop_block_table[31] = 0x1D0000;
+    g_iop_block_table[32] = 0x1E0000;
+    g_iop_block_table[1] = state[0x78 / 4];
     g_hero_moby_default[12] = -1;
     g_hero_moby_default[6] = -1;
     sce_cd_disk_ready(0);
@@ -263,22 +263,22 @@ void InitOnce(void)
     mode = func_00131628();
     switch (mode) {
     case 1:
-        D_001A7BB0[1] = mode;
+        g_language_settings[1] = mode;
         break;
     case 0:
     case 2:
-        D_001A7BB0[1] = 0;
+        g_language_settings[1] = 0;
         break;
     }
-    mem_clear(D_001BB000, 0x80808080, 0x100);
+    mem_clear(g_gs_transfer_buffer, 0x80808080, 0x100);
     func_00126288(buffer, 0x3FFB, 1, 0, 0, 0, 8, 8);
     FlushCache(0);
-    sceGsExecLoadImage(buffer, D_001BB000);
+    sceGsExecLoadImage(buffer, g_gs_transfer_buffer);
     gfx_wait_paths_idle(0, 0);
     tex_load_pif_from_disc_table();
     T1_MODE = 0x82;
     T1_COUNT = 0;
-    req_reset_queue(D_001BAD40);
+    req_reset_queue(g_loader_movie);
 }
 
 /* Calls func_00278EB0, which fills the lighting data block. */
@@ -327,9 +327,9 @@ typedef struct {
 } LightSlot;
 
 extern float IntToFloat(int);
-extern char D_001C2DC0[];
-extern char D_001C2B40[];
-extern char D_001C2C40[];
+extern char g_light_buffers[];
+extern char g_dynamic_lights[];
+extern char g_dynamic_light_states[];
 extern void mem_fast_helper_b(void *, int);
 
 /* Adds a point light with the given position, range, radius and color. Returns its slot number, or -1 if all 8 slots are used. */
@@ -340,15 +340,15 @@ int gfx_add_point_light(float *position, float range, float radius, int color)
     int i;
 
     for (i = 0; i < 8; i++) {
-        if (((LightSlot *)D_001C2C40)[i].active == 0) {
+        if (((LightSlot *)g_dynamic_light_states)[i].active == 0) {
             break;
         }
     }
     if (i == 8) {
         return -1;
     }
-    def = (LightDef *)(D_001C2B40 + (i << 5));
-    slot = (LightSlot *)(D_001C2C40 + i * 0x30);
+    def = (LightDef *)(g_dynamic_lights + (i << 5));
+    slot = (LightSlot *)(g_dynamic_light_states + i * 0x30);
     qcopy(def->position, position);
     def->range = range;
     def->color[0] = IntToFloat(color & 0xFF) * 0.0078125f;
@@ -357,23 +357,23 @@ int gfx_add_point_light(float *position, float range, float radius, int color)
     def->radius = radius;
     mem_fast_helper_b(slot, 0x30);
     slot->active = 1;
-    slot->buffer = D_001C2DC0 + (i << 10);
+    slot->buffer = g_light_buffers + (i << 10);
     return i;
 }
 
 
 extern void gfx_flush_light_part_indices(int index);
 extern void mem_fast_helper_b(void *, int);
-extern char D_001C2B40[];
-extern char D_001C2C40[];
+extern char g_dynamic_lights[];
+extern char g_dynamic_light_states[];
 
 /* Frees a point light slot and clears its data. */
 void gfx_free_point_light(int index) {
     if ((unsigned int)index >= 8)
         return;
     gfx_flush_light_part_indices(index);
-    mem_fast_helper_b((void *)(D_001C2B40 + (index << 5)), 0x20);
-    mem_fast_helper_b((void *)(D_001C2C40 + index * 0x30), 0x30);
+    mem_fast_helper_b((void *)(g_dynamic_lights + (index << 5)), 0x20);
+    mem_fast_helper_b((void *)(g_dynamic_light_states + index * 0x30), 0x30);
 }
 
 /* func_002914B8 is in 00290A40-g16.c. */
@@ -384,7 +384,7 @@ void CreatePointLight(int index)
     unsigned char *record = ref_L00_00291640_01 + index * 0x30;
     unsigned short *position = *(unsigned short **)(record + 0xC);
     unsigned short *end = position + 0x200;
-    LightDef *def = &((LightDef *)D_001C2B40)[index];
+    LightDef *def = &((LightDef *)g_dynamic_lights)[index];
     ParserScratch *scratch = (ParserScratch *)def->position;
     ParserScratch scratchCopy;
     qcopy(&scratchCopy, scratch);

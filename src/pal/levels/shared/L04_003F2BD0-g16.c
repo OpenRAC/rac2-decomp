@@ -4,12 +4,12 @@ typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300];
 extern unsigned char g_hero_state[];
 extern unsigned char g_pad_state[];
 
-extern u8 D_00139581[];
-extern int D_L00_001A8F00;
-extern int D_L00_001B28EC;
-extern float D_L00_001AFEF0[4] __attribute__((sda));
-extern int D_L00_001AFF00 __attribute__((sda));
-extern int D_L00_001AFF04 __attribute__((sda));
+extern u8 g_hoverbomb_weapon_index[];
+extern int g_game_l00_mode;
+extern int g_hoverbomb_fire_held;
+extern float g_hoverbomb_gun_offset[4] __attribute__((sda));
+extern int g_hoverbomb_fire_delay __attribute__((sda));
+extern int g_hoverbomb_fire_repeat __attribute__((sda));
 extern void moby_init_vars_once(char *);
 extern void moby_fire_shot(char *, void *);
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
@@ -37,7 +37,7 @@ extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *
 extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void slot_reset_active(void);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
@@ -64,7 +64,7 @@ void func_PAL_L04_003F2BD0(unsigned char *object) {
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 8, 0);
     if (state->repeat != 0 && FastDecTimer(&state->repeat)) cancel_hero_item_animation();
-    matrix_mul_vec3(origin, D_L00_001AFEF0, object + 0xC0);
+    matrix_mul_vec3(origin, g_hoverbomb_gun_offset, object + 0xC0);
     FastVecAdd(origin, origin, object + 0x10);
     vec_fast_helper_b(&state->timer);
     allowed = 1;
@@ -79,22 +79,22 @@ void func_PAL_L04_003F2BD0(unsigned char *object) {
     } else ((Hero *)g_hero_state)->i[2381] = 33;
     phase = (u8)object[0x20];
     if (phase == 1) {
-        if (D_L00_001A8F00 != 0 || state->timer != 0.0f || ((Hero *)g_hero_state)->b[8892] != 0 ||
+        if (g_game_l00_mode != 0 || state->timer != 0.0f || ((Hero *)g_hero_state)->b[8892] != 0 ||
             (u8)object[0x42] > 1 || !(((Hero *)g_pad_state)->u[104] & ((Hero *)g_hero_state)->u[1164]) || ((Hero *)g_hero_state)->i[1168] < 19 || !allowed) return;
         if (get_ammo(-1)) {
             weapon_spend_ammo(-1, 1);
-            D_L00_001B28EC = phase;
+            g_hoverbomb_fire_held = phase;
             anim_start_blended_with_flags(object, 2, 4, 2, 0);
             PlayMobySound(0, 0, object);
             start_equipped_item_animation();
             object[0x20] = 2;
-            state->delay = ((s32)(D_L00_001AFF00) * 5 + 2) / 6;
-            state->repeat = ((s32)(D_L00_001AFF04) * 5 + 2) / 6;
-        } else if ((((Hero *)g_pad_state)->u[105] & ((Hero *)g_hero_state)->u[1164]) || D_L00_001B28EC == 1) {
+            state->delay = ((s32)(g_hoverbomb_fire_delay) * 5 + 2) / 6;
+            state->repeat = ((s32)(g_hoverbomb_fire_repeat) * 5 + 2) / 6;
+        } else if ((((Hero *)g_pad_state)->u[105] & ((Hero *)g_hero_state)->u[1164]) || g_hoverbomb_fire_held == 1) {
             PlayMobySound(1, 0, object);
-            D_L00_001B28EC = 0;
+            g_hoverbomb_fire_held = 0;
         }
-        entry = g_weapon_l00_table + D_00139581[0];
+        entry = g_weapon_l00_table + g_hoverbomb_weapon_index[0];
         state->timer = 1.0f / entry->rate;
     } else if (phase == 2) {
         if (!FastDecTimer(&state->delay)) return;

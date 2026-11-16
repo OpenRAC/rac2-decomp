@@ -53,7 +53,7 @@ void flying_l00_shot_update(char *arg)
 extern int snd_play_from_class_bank(int a, int b, void *c, int d);
 extern int CollLine(void *a, void *b, int c, void *d, int e);
 extern void moby_mark_spawned(char *arg);
-extern TI128 D_L00_001BF220;
+extern TI128 g_hero_l00_position;
 
 /* Removes the object if it leaves the map; if it hits something it snaps to a saved spot, plays a sound and enters its end state. */
 void shot_handle_impact(char *arg, void *a1)
@@ -68,7 +68,7 @@ void shot_handle_impact(char *arg, void *a1)
     }
     p = arg + 16;
     if (CollLine(a1, p, 0, arg, 0) != 0) {
-        *(TI128 *)p = D_L00_001BF220;
+        *(TI128 *)p = g_hero_l00_position;
         arg[32] = 2;
         snd_play_from_class_bank(5, 0, arg, 3705);
     }

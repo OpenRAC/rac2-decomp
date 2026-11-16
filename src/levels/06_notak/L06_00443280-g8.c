@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern float D_L06_001B1090 __attribute__((sda));
-extern float D_L06_001B1094 __attribute__((sda));
-extern int D_L06_001B2348;
+extern float g_creature_wander_time_a __attribute__((sda));
+extern float g_creature_wander_time_b __attribute__((sda));
+extern int g_game_l06_frame_counter;
 extern void notak_enemy_update(char *);
 extern int flag_set_second_pending(char *);
 extern int flag_set_first_pending(char *);
@@ -51,7 +51,7 @@ void wandering_l06_creature_update(char *obj)
             F(vars,0x124) = 0.006666667f;
             F(vars,0x134) = 0.5f;
         }
-        F(vars,0x1D0) = D_L06_001B1094 * 0.016666667f;
+        F(vars,0x1D0) = g_creature_wander_time_b * 0.016666667f;
         if (H(vars,0x314) == 1) {
             if (math_random_int_below(5) == 0) {
                 moby_set_state(obj,5,2);
@@ -69,7 +69,7 @@ void wandering_l06_creature_update(char *obj)
             moby_set_controller_speed_limits(obj, 0.005f, 0.06666667f, 0.0034906589f, 0.41887909f);
             F(vars,0x134) = 0.05f;
         }
-        F(vars,0x1D0) = D_L06_001B1090 * 0.016666667f;
+        F(vars,0x1D0) = g_creature_wander_time_a * 0.016666667f;
         if (H(vars,0x314) == 1) moby_set_state(obj,6,2);
         else if (!H(vars,0x310)) moby_set_state(obj,1,0);
         break;
@@ -79,7 +79,7 @@ void wandering_l06_creature_update(char *obj)
             F(vars,0x124) = 0.006666667f;
             F(vars,0x134) = 0.05f;
         }
-        F(vars,0x1D0) = D_L06_001B1090 * 0.016666667f;
+        F(vars,0x1D0) = g_creature_wander_time_a * 0.016666667f;
         if (H(vars,0x314) == 1) break;
         else {
             moby_set_state(obj,3,1);
@@ -157,7 +157,7 @@ void wandering_l06_creature_update(char *obj)
     case 10:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=10) anim_start_blended(obj,10,0,5);
-            I(vars,0x1BC) = D_L06_001B2348;
+            I(vars,0x1BC) = g_game_l06_frame_counter;
         }
         vec_scale_to_length(aim_vec,vars+0x1A0,1.0f);
         actor_set_glow_effect(obj,aim_vec,0);

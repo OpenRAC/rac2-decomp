@@ -3,7 +3,7 @@
 #include "common.h"
 extern char g_hero_position[];
 extern char *g_path_l17_table[];
-extern float D_L17_001B0344 __attribute__((sda));
+extern float g_platform_move_speed __attribute__((sda));
 extern int IsPointInCuboid(void *, int);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -32,7 +32,7 @@ typedef struct {
     unsigned char choice;
 } SelectMoby;
 
-void func_PAL_L17_003CA030(char *self) {
+void ride_platform_select_entry_pal(char *self) {
     SelectMoby *moby = (SelectMoby *)self;
     SelectData *data = moby->data;
     char *target;
@@ -57,7 +57,7 @@ void func_PAL_L17_003CA030(char *self) {
             moby->choice = i;
             moby->state = 2;
             moby->timer = 0x80;
-            data->cooldown = D_L17_001B0344 * 0.020000001f;
+            data->cooldown = g_platform_move_speed * 0.020000001f;
             data->active = 1;
             data->current = -1;
             return;

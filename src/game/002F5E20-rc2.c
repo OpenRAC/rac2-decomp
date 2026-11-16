@@ -25,19 +25,19 @@
  */
 #include "common.h"
 
-extern s32  D_001B2208;
+extern s32  g_movie_sector;
 
-extern s32  D_001B221C;
+extern s32  g_movie_music_stream;
 
-extern s32  D_001B220C;
+extern s32  g_movie_size;
 
-extern s32  D_001B2210;
+extern s32  g_movie_file_entry;
 
-extern s32  D_001B2214;
+extern s32  g_movie_mode;
 
-extern s32 D_001B2218 __attribute__((sda));
+extern s32 g_movie_flag __attribute__((sda));
 extern u8 g_sound_state[];
-extern s16 D_001A63F0[];
+extern s16 g_current_music_id[];
 extern void FlushCache(s32 a);
 extern void func_00133710(s32 a, s32 b, s32 c, s32 d, s32 e);
 extern void FadeToBlack(s32 a);
@@ -56,12 +56,12 @@ void mpeg_begin_movie_playback(s32 sector, s32 size, s32 file_entry, s32 mode, s
     FlushCache(0);
     snd_clear_all_voices();
     snd_wait_for_music_idle();
-    D_001B2208 = sector;
-    D_001B221C = (s32) D_001A63F0[0];
-    D_001B220C = size;
-    D_001B2210 = file_entry;
-    D_001B2214 = mode;
-    D_001B2218 = flag;
+    g_movie_sector = sector;
+    g_movie_music_stream = (s32) g_current_music_id[0];
+    g_movie_size = size;
+    g_movie_file_entry = file_entry;
+    g_movie_mode = mode;
+    g_movie_flag = flag;
     FadeToBlack(4);
     subtitle_clear_state();
 }

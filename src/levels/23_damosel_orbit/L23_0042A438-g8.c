@@ -8,51 +8,51 @@ typedef int TI16 __attribute__((mode(TI)));
 /* the state object word, read through an absolute access */
 extern u8 *D_L23_001B1484_2;
 
-extern float D_L23_001B1470;
+extern float g_mothership_scale_factor;
 
-extern s32 D_L23_001B1474;
+extern s32 g_spinning_quad_period;
 
-extern float D_L23_001B39D0 __attribute__((sda));
+extern float g_star_quad_scale __attribute__((sda));
 
-extern float D_L23_001B3930;
+extern float g_trail_ribbon_phase;
 
-extern s16 D_L23_001B1B94 __attribute__((sda));
+extern s16 g_effect_sound_handle_a __attribute__((sda));
 
-extern s32 D_L23_001B1BAC __attribute__((sda));
+extern s32 g_alpha_blend_a __attribute__((sda));
 
-extern s32 D_L23_001B1BB0 __attribute__((sda));
+extern s32 g_alpha_blend_b __attribute__((sda));
 
-extern s32 D_L23_001B1BB4 __attribute__((sda));
+extern s32 g_alpha_blend_c __attribute__((sda));
 
-extern s32 D_L23_001B1BB8 __attribute__((sda));
+extern s32 g_alpha_blend_d __attribute__((sda));
 
-extern s32 D_L23_001B1BC4 __attribute__((sda));
+extern s32 g_trail_color_start __attribute__((sda));
 
-extern s32 D_L23_001B1BC8 __attribute__((sda));
+extern s32 g_trail_color_end __attribute__((sda));
 
-extern float D_L23_001B1C00 __attribute__((sda));
+extern float g_trail_l23_uv_scroll __attribute__((sda));
 
-extern float D_L23_001B1C04 __attribute__((sda));
+extern float g_trail_uv_scroll_speed __attribute__((sda));
 
-extern float D_L23_001B1C0C __attribute__((sda));
+extern float g_trail_matrix_param __attribute__((sda));
 
-extern float D_L23_001B1C10 __attribute__((sda));
+extern float g_trail_length_scale __attribute__((sda));
 
-extern s32 D_L23_001B1C14 __attribute__((sda));
+extern s32 g_trail_effect_texture __attribute__((sda));
 
-extern float D_L23_001B1C18 __attribute__((sda));
+extern float g_trail_alpha_scale __attribute__((sda));
 
-extern float D_L23_001B1C1C __attribute__((sda));
+extern float g_trail_alpha_factor __attribute__((sda));
 
-extern float D_L23_001B1C20 __attribute__((sda));
+extern float g_trail_time_offset __attribute__((sda));
 
-extern s32 D_L23_001B1C24 __attribute__((sda));
+extern s32 g_trail_initial_alpha __attribute__((sda));
 
-extern float D_L23_001B1C28 __attribute__((sda));
+extern float g_trail_width_a __attribute__((sda));
 
-extern float D_L23_001B1C2C __attribute__((sda));
+extern float g_trail_width_b __attribute__((sda));
 
-extern float D_L23_001B1C30 __attribute__((sda));
+extern float g_trail_width_c __attribute__((sda));
 
 /* the quad record handed to the draw helper */
 typedef struct {
@@ -74,11 +74,11 @@ typedef struct {
     L23Spin3 *vars;
 } L23Obj;
 
-extern s32 D_L23_0025E8B0[];
+extern s32 g_effect_link_active_flags[];
 
-extern TI16 D_L23_002A75F0[];
+extern TI16 g_trail_ribbon_vertices[];
 
-extern TI16 D_L23_002A7170[];
+extern TI16 g_trail_ribbon_dirs[];
 
 extern TI16 g_camera_l23_position[];
 
@@ -146,33 +146,33 @@ void hero_draw_trail_ribbons(u8 *moby) {
     s64 tex;
 
     if (D_L23_001B1484_2 != 0) {
-        if (D_L23_001B1B94 != -1) {
-            gfx_free_point_light(D_L23_001B1B94);
+        if (g_effect_sound_handle_a != -1) {
+            gfx_free_point_light(g_effect_sound_handle_a);
         }
         FastVecScale(w, D_L23_001B1484_2 + 0xE0, 10.0f);
         FastVecAdd(w, w, D_L23_001B1484_2 + 0x10);
-        f = math_random_float_range(0.0f, D_L23_001B1C28);
-        fa = D_L23_001B1C28 + f;
-        f = math_random_float_range(0.0f, D_L23_001B1C2C);
-        fb = D_L23_001B1C2C + f;
-        f = math_random_float_range(0.0f, D_L23_001B1C30 * 0.5f);
-        fc = D_L23_001B1C30 + f;
-        D_L23_001B1B94 = part_l00_alloc_effect_slot_2(w, 20.0f, 0.0f, fa, fb, fc);
-        D_L23_001B1C00 = D_L23_001B1C00 - D_L23_001B1C04;
-        D_L23_001B39D0 = D_L23_001B1470 * 0.94f;
+        f = math_random_float_range(0.0f, g_trail_width_a);
+        fa = g_trail_width_a + f;
+        f = math_random_float_range(0.0f, g_trail_width_b);
+        fb = g_trail_width_b + f;
+        f = math_random_float_range(0.0f, g_trail_width_c * 0.5f);
+        fc = g_trail_width_c + f;
+        g_effect_sound_handle_a = part_l00_alloc_effect_slot_2(w, 20.0f, 0.0f, fa, fb, fc);
+        g_trail_l23_uv_scroll = g_trail_l23_uv_scroll - g_trail_uv_scroll_speed;
+        g_star_quad_scale = g_mothership_scale_factor * 0.94f;
         vars = ((L23Obj *)moby)->vars;
-        if (D_L23_001B1C00 <= -6.0f) {
-            D_L23_001B1C00 = D_L23_001B1C00 + 6.0f;
+        if (g_trail_l23_uv_scroll <= -6.0f) {
+            g_trail_l23_uv_scroll = g_trail_l23_uv_scroll + 6.0f;
         }
-        i = *(u16 *)(moby + 0x96) % (D_L23_001B1474 >> 2);
-        vars->alpha = D_L23_001B1C24;
-        reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
-        reg |= (s64)D_L23_001B1BB4 << 4;
-        reg |= (s64)D_L23_001B1BB8 << 6;
+        i = *(u16 *)(moby + 0x96) % (g_spinning_quad_period >> 2);
+        vars->alpha = g_trail_initial_alpha;
+        reg = g_alpha_blend_a | ((s64)g_alpha_blend_b << 2);
+        reg |= (s64)g_alpha_blend_c << 4;
+        reg |= (s64)g_alpha_blend_d << 6;
         reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
-        D_L23_001B1C18 = (float)vars->alpha * D_L23_001B1C1C;
-        tex = GetEffectTextureDescriptor(D_L23_001B1C14);
+        g_trail_alpha_scale = (float)vars->alpha * g_trail_alpha_factor;
+        tex = GetEffectTextureDescriptor(g_trail_effect_texture);
         pkt.tail[2] = 0xFF9000000260LL;
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
@@ -183,7 +183,7 @@ void hero_draw_trail_ribbons(u8 *moby) {
         qcopy_nc(&matrix.rows[2], hero + 0xE0);
         qzero_nc(&matrix.rows[3]);
         mp = matrix.rows;
-        func_L03_002EFB60(mp, mp, D_L23_001B1C0C);
+        func_L03_002EFB60(mp, mp, g_trail_matrix_param);
         qcopy(&matrix.rows[3], D_L23_001B1484_2 + 0x10);
         ((float *)&matrix.rows[3])[3] = 1.0f;
         basis = (float *)mp;
@@ -191,23 +191,23 @@ void hero_draw_trail_ribbons(u8 *moby) {
         ((float *)axis)[2] = vars->turn;
         euler_rotation_basis(rot, axis);
         multiply_matrix3x3(basis, basis, rot);
-        pkt.col[0] = pkt.col[1] = D_L23_001B1BC4;
-        pkt.col[2] = pkt.col[3] = D_L23_001B1BC8;
+        pkt.col[0] = pkt.col[1] = g_trail_color_start;
+        pkt.col[2] = pkt.col[3] = g_trail_color_end;
         for (i = 0; i < 0x48; i++) {
-            if (D_L23_0025E8B0[i] != 0) {
-                alphaScale = D_L23_001B1C18;
-                transform_vector(v120, &D_L23_002A75F0[i], &matrix);
-                matrix_mul_vec3(v140, &D_L23_002A7170[i], mp);
+            if (g_effect_link_active_flags[i] != 0) {
+                alphaScale = g_trail_alpha_scale;
+                transform_vector(v120, &g_trail_ribbon_vertices[i], &matrix);
+                matrix_mul_vec3(v140, &g_trail_ribbon_dirs[i], mp);
                 FastVecSub(v150, v120, g_camera_l23_position);
                 FastVecCross(v160, v140, v150);
                 vec_scale_to_length(v160, v160, alphaScale);
                 f = FastVecLength(v150);
-                scaledLength = f * D_L23_001B1C10;
-                t = D_L23_001B3930;
+                scaledLength = f * g_trail_length_scale;
+                t = g_trail_ribbon_phase;
                 ribbonWidth = scaledLength * t;
-                D_L23_001B3930 = t + D_L23_001B1C20;
-                if (D_L23_001B3930 > 1.0f) {
-                    D_L23_001B3930 = 1.0f;
+                g_trail_ribbon_phase = t + g_trail_time_offset;
+                if (g_trail_ribbon_phase > 1.0f) {
+                    g_trail_ribbon_phase = 1.0f;
                 }
                 FastVecScale(v130, v140, ribbonWidth);
                 FastVecAdd(v130, v130, v120);
@@ -219,8 +219,8 @@ void hero_draw_trail_ribbons(u8 *moby) {
                 pkt.uv[1][1] = 1.0f;
                 pkt.uv[2][1] = 0.0f;
                 pkt.uv[3][1] = 1.0f;
-                pkt.uv[2][0] = pkt.uv[3][0] = D_L23_001B1C00 + 1.0f;
-                pkt.uv[0][0] = pkt.uv[1][0] = D_L23_001B1C00;
+                pkt.uv[2][0] = pkt.uv[3][0] = g_trail_l23_uv_scroll + 1.0f;
+                pkt.uv[0][0] = pkt.uv[1][0] = g_trail_l23_uv_scroll;
                 draw_world_quad(&pkt, 0, 0);
             }
         }

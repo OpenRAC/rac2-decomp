@@ -4,8 +4,8 @@
 extern void vec_add_random_offset(void *, float);
 extern int coll_process_hit(float, void *, int, int, int);
 extern char *func_PAL_002C63D0(void *, int, int, int, int, int, int, float, float);
-extern unsigned char *D_001F2628;
-extern char *D_001B1D90[] __attribute__((sda));
+extern unsigned char *g_part_tex_burst_ember_table;
+extern char *g_particle_pool_base[] __attribute__((sda));
 typedef struct {
     char pad00[0x2290];
     void *owner;
@@ -54,8 +54,8 @@ void func_PAL_002C65C8(char *p) {
   f=(a-IntToFloat(*(short *)(p+10)))/a;
   *(int *)(p+4)=FastTweenColor((*(unsigned char *)(q+22)<<24)|0x4060,0x8fafff,f);
   if(f<0.6f)*(float *)(p+12)+=10836.001f;else *(float *)(p+12)-=2.016e+04f;
-  p[2]=D_001F2628[func_001163B0()&7];
-  if((((p-D_001B1D90[0])>>6)&1))p[8]++;else p[8]--;
+  p[2]=g_part_tex_burst_ember_table[func_001163B0()&7];
+  if((((p-g_particle_pool_base[0])>>6)&1))p[8]++;else p[8]--;
   if(FastDecTimer((short *)(p+10)))part_kill(p);
   break;
  }
@@ -69,7 +69,7 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_001F2688;
+extern unsigned char *g_part_tex_split_spark_low_table;
 extern void FastVecScale(char *dst, char *table, float scale);
 extern int math_random_int_below(int);
 extern int CollLine(void *, void *, int, void *, void *);
@@ -119,7 +119,7 @@ void func_PAL_002C6A20(FadeSplitParticle *m) {
         m->pos.f[1] += math_random_float_range(nr, r);
         m->pos.f[2] += math_random_float_range(nr, r);
     }
-    tab = D_001F2688;
+    tab = g_part_tex_split_spark_low_table;
     { int index = m->b2 - tab[0];
     m->b2 = tab[(m->hA + e->h16 + index) & 7]; }
     FastVecAdd((char *)&v, (char *)&m->pos, (char *)e);

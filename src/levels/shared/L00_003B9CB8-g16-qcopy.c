@@ -33,18 +33,18 @@ typedef struct State_L00_003C27A0 {
     u8 *target;         /* 0x1FB0 */
 } State_L00_003C27A0;
 
-extern s32 D_L00_001C9340 __attribute__((nosda));
+extern s32 g_tutorial_points __attribute__((nosda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u16 **D_L00_001A9014;
-extern u16 *D_L00_001FA920[];
-extern u8 *D_L00_001B1E9C;
-extern u8 *D_L00_001B251C;
-extern u8 *D_L00_001B2514;
-extern s16 D_L00_00226900[];
-extern Vec_L00_003C27A0 D_L00_001AFEB0[] __attribute__((sda));
-extern Vec_L00_003C27A0 D_L00_001AFEA0 __attribute__((sda));
-extern s32 D_L00_001AFE98[2] __attribute__((sda));
-extern s32 D_L00_001AFE90[2] __attribute__((sda));
+extern u16 **g_level_reloc_record;
+extern u16 *g_turn_state_table[];
+extern u8 *g_moby_array_base;
+extern u8 *g_tie_matrix_table;
+extern u8 *g_tie_table;
+extern s16 g_tie_class_ids[];
+extern Vec_L00_003C27A0 g_follower_color_table[] __attribute__((sda));
+extern Vec_L00_003C27A0 g_follower_color_vec __attribute__((sda));
+extern s32 g_follower_scatter_params[2] __attribute__((sda));
+extern s32 g_follower_scatter_params_b[2] __attribute__((sda));
 
 extern u8 *CreateMoby(s32);
 extern void moby_init_child_from_parent(void *, void *);
@@ -88,7 +88,7 @@ void target_l00_follower_update(u8 *self)
     s32 moby_id;
     s32 i;
 
-    if (st->gate >= 0 && D_L00_001C9340 != st->gate)
+    if (st->gate >= 0 && g_tutorial_points != st->gate)
         return;
     switch (self[0x20]) {
     case 0:
@@ -109,22 +109,22 @@ void target_l00_follower_update(u8 *self)
         }
         BuildObjectAttachmentTransforms(self, st->track, 100, st->group_b, st->group, st->x18, 8, 0);
         if (g_current_map_index[0] == 2 && st->group_b != -1) {
-            moby_ids = D_L00_001FA920[st->group_b];
+            moby_ids = g_turn_state_table[st->group_b];
             do {
                 moby_id = *moby_ids & 0x7FFF;
-                level_set_record_payload_by_key(st->track, 0, moby_id, *(u8 **)(D_L00_001B1E9C + (moby_id << 8) + 0x68) + 0x50);
+                level_set_record_payload_by_key(st->track, 0, moby_id, *(u8 **)(g_moby_array_base + (moby_id << 8) + 0x68) + 0x50);
             } while ((s16)*moby_ids++ >= 0);
         }
         if (st->moby != 0) {
             vec_clear_128(st->moby + 0xF0);
             st->target = 0;
-            for (scan_id = D_L00_001A9014[st->group];
-                 scan_id != 0 && ((s16)scan_id[-1] >= 0 || scan_id == D_L00_001A9014[st->group]); scan_id++) {
-                entry = D_L00_001B251C + ((*scan_id & 0x7FFF) << 6);
+            for (scan_id = g_level_reloc_record[st->group];
+                 scan_id != 0 && ((s16)scan_id[-1] >= 0 || scan_id == g_level_reloc_record[st->group]); scan_id++) {
+                entry = g_tie_matrix_table + ((*scan_id & 0x7FFF) << 6);
                 if (entry == 0)
                     break;
-                marker = D_L00_001B2514 + ((*scan_id & 0x7FFF) << 5);
-                if (D_L00_00226900[marker[0x1D]] == 0xAB6 /* moby class 2742 */) {
+                marker = g_tie_table + ((*scan_id & 0x7FFF) << 5);
+                if (g_tie_class_ids[marker[0x1D]] == 0xAB6 /* moby class 2742 */) {
                     st->target = entry;
                     break;
                 }
@@ -142,28 +142,28 @@ void target_l00_follower_update(u8 *self)
                 *(f32 *)(st->moby + 0x2C) = *(f32 *)(*(u8 **)(st->moby + 0x24) + 0x24) * 1.35f;
                 euler_rotation_basis(st->moby + 0xC0, st->moby + 0xF0);
                 if (math_fabs(*(f32 *)(st->moby + 0xF8)) > 1.6f) {
-                    qcopy_nc(&cols[0], D_L00_001AFEB0);
-                    qcopy_nc(&cols[1], &D_L00_001AFEA0);
+                    qcopy_nc(&cols[0], g_follower_color_table);
+                    qcopy_nc(&cols[1], &g_follower_color_vec);
                 } else {
-                    qcopy_nc(&cols[0], &D_L00_001AFEA0);
-                    qcopy_nc(&cols[1], D_L00_001AFEB0);
+                    qcopy_nc(&cols[0], &g_follower_color_vec);
+                    qcopy_nc(&cols[1], g_follower_color_table);
                 }
-                ScatterObjectPieces(st->moby, cols, D_L00_001AFE98, D_L00_001AFE90, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
+                ScatterObjectPieces(st->moby, cols, g_follower_scatter_params, g_follower_scatter_params_b, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
                 part_spawn_bolt_pickups(st->moby, 30, 50, 2, -1, math_random_int_range(3, 5), 0.0f);
                 snd_play_from_class_bank(0, 0, st->moby, 0xE9B /* moby class 3739 */);
                 here = *(Vec_L00_003C27A0 *)(self + 0x10);
                 part_spawn_random_spark_rays((char *)st->moby, (char *)&here, 1.5f, 0.116666675f);
                 SpawnExplosion(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
-                for (clear_ids = D_L00_001A9014[st->group];
-                     clear_ids != 0 && ((s16)clear_ids[-1] >= 0 || clear_ids == D_L00_001A9014[st->group]); clear_ids++) {
-                    marker_b = D_L00_001B2514 + ((*clear_ids & 0x7FFF) << 5);
+                for (clear_ids = g_level_reloc_record[st->group];
+                     clear_ids != 0 && ((s16)clear_ids[-1] >= 0 || clear_ids == g_level_reloc_record[st->group]); clear_ids++) {
+                    marker_b = g_tie_table + ((*clear_ids & 0x7FFF) << 5);
                     if (marker_b == 0)
                         break;
                     marker_b[0x1C] = 0;
                 }
-                for (zero_ids = D_L00_001A9014[st->group];
-                     zero_ids != 0 && ((s16)zero_ids[-1] >= 0 || zero_ids == D_L00_001A9014[st->group]); zero_ids++) {
-                    zero_entry = D_L00_001B251C + ((*zero_ids & 0x7FFF) << 6);
+                for (zero_ids = g_level_reloc_record[st->group];
+                     zero_ids != 0 && ((s16)zero_ids[-1] >= 0 || zero_ids == g_level_reloc_record[st->group]); zero_ids++) {
+                    zero_entry = g_tie_matrix_table + ((*zero_ids & 0x7FFF) << 6);
                     if (zero_entry == 0)
                         break;
                     for (i = 0; i < 3; i++) {

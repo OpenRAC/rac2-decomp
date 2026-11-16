@@ -14,9 +14,9 @@ extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_value_pair(void *, int, int);
 extern char *GetLocalizedString(int);
 extern int map_screen_update_layout(char *, int);
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[];
-extern char D_001ADD58[], D_001ADD60[], D_001ADD68[], D_001ADD70[], D_001ADD78[];
-extern char *D_001A8CFC;
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[];
+extern char g_menu_hud_desc_title[], g_menu_hud_desc_body[], g_menu_hud_desc_label[], g_map_screen_derived_desc_left[], g_map_screen_derived_desc_right[];
+extern char *g_resident_data_base;
 
 /* Constructor of an on-screen map object: stores the owner, allocates the 16-byte anchor (255, 207)
    at +0x1C8, then names and tints three sprites ("0", "1", "2" at +0x0, +0x4C, +0x98), three more
@@ -40,18 +40,18 @@ void map_screen_init(char *self, char *owner)
     *(int *)(self + 0x328) = 1;
     (*(float **)(self + 0x1C8))[0] = 255.0f;
     (*(float **)(self + 0x1C8))[1] = 207.0f;
-    object_init_derived_arrays(self, D_001ADC10, owner);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, owner);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, owner);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, owner);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, owner);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, owner);
     for (i = 0; i < 3; i++)
-        object_init_derived_arrays(self + 0xE4 + i * 0x4C, D_001ADC28, owner);
-    hud_init_widget_defaults(self + 0x1D8, D_001ADD58, owner);
-    hud_init_widget_defaults(self + 0x268, D_001ADD60, owner);
-    hud_init_widget_defaults(self + 0x220, D_001ADD68, owner);
+        object_init_derived_arrays(self + 0xE4 + i * 0x4C, g_menu_widget_desc_fourth, owner);
+    hud_init_widget_defaults(self + 0x1D8, g_menu_hud_desc_title, owner);
+    hud_init_widget_defaults(self + 0x268, g_menu_hud_desc_body, owner);
+    hud_init_widget_defaults(self + 0x220, g_menu_hud_desc_label, owner);
     hud_set_widget_field_a(self + 0x268, 0);
     hud_set_widget_field_a(self + 0x220, 0);
-    object_init_derived_c(self + 0x2B0, D_001ADD70, owner);
-    object_init_derived_c(self + 0x2EC, D_001ADD78, owner);
+    object_init_derived_c(self + 0x2B0, g_map_screen_derived_desc_left, owner);
+    object_init_derived_c(self + 0x2EC, g_map_screen_derived_desc_right, owner);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -61,11 +61,11 @@ void map_screen_init(char *self, char *owner)
     *object_get_fourth_field(self + 0x1D8) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x268) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x220) = 0x80F0F0F0;
-    object_set_helper_result(self, D_001A8CFC + 0x8710, 0x87);
-    object_set_helper_result(self + 0x4C, D_001A8CFC + 0x8710, 0x88);
-    object_set_helper_result(self + 0x98, D_001A8CFC + 0x8710, 0x89);
+    object_set_helper_result(self, g_resident_data_base + 0x8710, 0x87);
+    object_set_helper_result(self + 0x4C, g_resident_data_base + 0x8710, 0x88);
+    object_set_helper_result(self + 0x98, g_resident_data_base + 0x8710, 0x89);
     for (k = 0; k < 3; k++)
-        object_set_helper_result(self + 0xE4 + k * 0x4C, D_001A8CFC + 0x8710, 0x8A);
+        object_set_helper_result(self + 0xE4 + k * 0x4C, g_resident_data_base + 0x8710, 0x8A);
     object_set_second_float4(self + 0x130, 1.0f, -1.0f, 0.0f, 0.0f);
     hud_set_widget_value_pair(self + 0x2B0, 0xE99A, 10);
     object_set_second_float4(self + 0x2B0, 302.0f, 194.0f, 0.0f, 0.0f);
@@ -79,20 +79,20 @@ void map_screen_init(char *self, char *owner)
 
 extern void object_set_first_float4(char *, float, float, float, float);
 extern float *object_get_first_field(char *);
-extern float D_001ADD88 __attribute__((sda));
-extern float D_001ADD8C;
-extern float D_001ADD90;
-extern float D_001ADD94;
-extern float D_001ADD98;
-extern float D_001ADD9C;
-extern float D_001ADDA0 __attribute__((sda));
-extern float D_001ADDA4;
-extern float D_001ADDA8 __attribute__((sda));
-extern float D_001ADDAC;
-extern float D_001ADDB0 __attribute__((sda));
-extern float D_001ADDB4;
-extern float D_001ADDB8 __attribute__((sda));
-extern float D_001ADDBC;
+extern float g_map_screen_offset_x_first __attribute__((sda));
+extern float g_map_screen_offset_y_first;
+extern float g_map_screen_offset_x_second;
+extern float g_map_screen_offset_y_second;
+extern float g_map_screen_offset_x_third;
+extern float g_map_screen_offset_y_third;
+extern float g_map_screen_offset_x_fourth __attribute__((sda));
+extern float g_map_screen_offset_y_fourth;
+extern float g_map_screen_offset_x_fifth __attribute__((sda));
+extern float g_map_screen_offset_y_fifth;
+extern float g_map_screen_offset_x_sixth __attribute__((sda));
+extern float g_map_screen_offset_y_sixth;
+extern float g_map_screen_offset_x_seventh __attribute__((sda));
+extern float g_map_screen_offset_y_seventh;
 extern char g_map_overlay_state[];
 
 typedef struct { int first, second, third; float scale; } Entry_0033B540;
@@ -120,7 +120,7 @@ int map_screen_update_layout(char *self, int unused)
     if (*(int *)(game + 0x230) < 0x15) {
         float step;
 
-        dx = object_get_first_field(self + 0xE4)[0] - (D_001ADD88 + (*(float **)(self + 0x1C8))[0]);
+        dx = object_get_first_field(self + 0xE4)[0] - (g_map_screen_offset_x_first + (*(float **)(self + 0x1C8))[0]);
         if (object_get_first_field(self + 0xE4)[0] == 0.0f) {
             dx = 56.0f;
         } else {
@@ -131,7 +131,7 @@ int map_screen_update_layout(char *self, int unused)
                 step = -5.0f;
             dx += step;
         }
-        dy = object_get_first_field(self + 0x17C)[1] - (D_001ADD9C + (*(float **)(self + 0x1C8))[1]);
+        dy = object_get_first_field(self + 0x17C)[1] - (g_map_screen_offset_y_third + (*(float **)(self + 0x1C8))[1]);
         if (object_get_first_field(self + 0x17C)[1] == 0.0f) {
             dy = -50.0f;
         } else {
@@ -145,17 +145,17 @@ int map_screen_update_layout(char *self, int unused)
         }
     }
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0xE4, D_001ADD88 + anchor[0] + dx, D_001ADD8C + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0xE4, g_map_screen_offset_x_first + anchor[0] + dx, g_map_screen_offset_y_first + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0x130, D_001ADD90 + anchor[0] + dx, D_001ADD94 + anchor[1], 0.0f, 0.0f);
-    object_set_first_float4(self + 0x17C, D_001ADD98 + (*(float **)(self + 0x1C8))[0], D_001ADD9C + (*(float **)(self + 0x1C8))[1] + dy, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x130, g_map_screen_offset_x_second + anchor[0] + dx, g_map_screen_offset_y_second + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0x17C, g_map_screen_offset_x_third + (*(float **)(self + 0x1C8))[0], g_map_screen_offset_y_third + (*(float **)(self + 0x1C8))[1] + dy, 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0x1D8, D_001ADDA0 + anchor[0], D_001ADDA4 + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0x1D8, g_map_screen_offset_x_fourth + anchor[0], g_map_screen_offset_y_fourth + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0x220, D_001ADDA8 + anchor[0], D_001ADDAC + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0x220, g_map_screen_offset_x_fifth + anchor[0], g_map_screen_offset_y_fifth + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0x268, D_001ADDB0 + anchor[0], D_001ADDB4 + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0x268, g_map_screen_offset_x_sixth + anchor[0], g_map_screen_offset_y_sixth + anchor[1], 0.0f, 0.0f);
     anchor = *(float **)(self + 0x1C8);
-    object_set_first_float4(self + 0x2B0, D_001ADDB8 + anchor[0], D_001ADDBC + anchor[1], 0.0f, 0.0f);
+    object_set_first_float4(self + 0x2B0, g_map_screen_offset_x_seventh + anchor[0], g_map_screen_offset_y_seventh + anchor[1], 0.0f, 0.0f);
     return 0;
 }

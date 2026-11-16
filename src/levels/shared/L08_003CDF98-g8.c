@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L08_003CDF98: the hero-NPC state machine shared by Tabora, Dobbo and Grelbin
  * (levels 08, 09, 19), dispatched on moby byte 0x20 over the NPC block at moby+0x68.
  * Own unit: -G8 for the $gp tuning constants, -g for the nop pairs before div.s,
@@ -10,62 +11,62 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; int i[4]; } Vec;
 
 /* $gp-relative tuning constants (retail reads them as one-instruction gp loads). */
-extern float D_L08_001AFFD0 __attribute__((sda));
-extern float D_L08_001AFFD4 __attribute__((sda));
-extern float D_L08_001AFFD8 __attribute__((sda));
-extern s32 D_L08_001AFFDC __attribute__((sda));
-extern s32 D_L08_001AFFE0 __attribute__((sda));
-extern s32 D_L08_001AFFE4 __attribute__((sda));
-extern float D_L08_001AFFE8 __attribute__((sda));
-extern float D_L08_001AFFF8 __attribute__((sda));
-extern float D_L08_001AFFFC __attribute__((sda));
-extern float D_L08_001B0000 __attribute__((sda));
-extern float D_L08_001B000C __attribute__((sda));
-extern float D_L08_001B0010 __attribute__((sda));
-extern float D_L08_001B0014 __attribute__((sda));
-extern float D_L08_001B0018 __attribute__((sda));
-extern float D_L08_001B0070 __attribute__((sda));
-extern float D_L08_001B007C __attribute__((sda));
-extern s32 D_L08_001B0084 __attribute__((sda));
-extern float D_L08_001B0088 __attribute__((sda));
-extern float D_L08_001B008C __attribute__((sda));
-extern s32 D_L08_001B0090 __attribute__((sda));
-extern float D_L08_001B0094 __attribute__((sda));
-extern float D_L08_001B0098 __attribute__((sda));
-extern float D_L08_001B009C __attribute__((sda));
-extern float D_L08_001B00A0 __attribute__((sda));
-extern float D_L08_001B00A4 __attribute__((sda));
-extern float D_L08_001B00A8 __attribute__((sda));
-extern float D_L08_001B00FC __attribute__((sda));
-extern float D_L08_001B0100 __attribute__((sda));
-extern float D_L08_001B0104 __attribute__((sda));
-extern s32 D_L08_001B0108 __attribute__((sda));
-extern float D_L08_001B010C __attribute__((sda));
-extern float D_L08_001B0124 __attribute__((sda));
-extern float D_L08_001B0128 __attribute__((sda));
-extern s32 D_L08_001B0130 __attribute__((sda));
-extern float D_L08_001B0134 __attribute__((sda));
-extern float D_L08_001B0138 __attribute__((sda));
-extern float D_L08_001B013C __attribute__((sda));
-extern s32 D_L08_001B0140 __attribute__((sda));
-extern float D_L08_001B3410;
+extern float g_vehicle_df8_step __attribute__((sda));
+extern float g_vehicle_hero_near_distance __attribute__((sda));
+extern float g_vehicle_hero_far_distance __attribute__((sda));
+extern s32 g_vehicle_timer_start __attribute__((sda));
+extern s32 g_vehicle_timer_length __attribute__((sda));
+extern s32 g_vehicle_timer_margin __attribute__((sda));
+extern float g_vehicle_target_angle_degrees __attribute__((sda));
+extern float g_vehicle_l08_max_speed __attribute__((sda));
+extern float g_vehicle_speed_accel __attribute__((sda));
+extern float g_vehicle_l08_turn_rate __attribute__((sda));
+extern float g_vehicle_slope_threshold __attribute__((sda));
+extern float g_vehicle_slow_speed __attribute__((sda));
+extern float g_vehicle_slope_limit __attribute__((sda));
+extern float g_vehicle_cruise_speed __attribute__((sda));
+extern float g_vehicle_bank_limit_degrees __attribute__((sda));
+extern float g_vehicle_df28_blend_scale __attribute__((sda));
+extern s32 g_vehicle_df50_frames __attribute__((sda));
+extern float g_vehicle_decel_a __attribute__((sda));
+extern float g_vehicle_angle_limit_degrees __attribute__((sda));
+extern s32 g_vehicle_df50_reset __attribute__((sda));
+extern float g_vehicle_angle_threshold_degrees __attribute__((sda));
+extern float g_vehicle_yaw_step __attribute__((sda));
+extern float g_vehicle_decel_b __attribute__((sda));
+extern float g_vehicle_df64_offset __attribute__((sda));
+extern float g_vehicle_param_copy_a __attribute__((sda));
+extern float g_vehicle_param_copy_b __attribute__((sda));
+extern float g_vehicle_push_speed __attribute__((sda));
+extern float g_vehicle_max_reverse_speed __attribute__((sda));
+extern float g_vehicle_reverse_limit __attribute__((sda));
+extern s32 g_vehicle_df50_alt_frames __attribute__((sda));
+extern float g_vehicle_decel_c __attribute__((sda));
+extern float g_vehicle_l08_velocity_damping __attribute__((sda));
+extern float g_vehicle_velocity_length_scale __attribute__((sda));
+extern s32 g_vehicle_threshold_frames __attribute__((sda));
+extern float g_vehicle_target_angle_step __attribute__((sda));
+extern float g_vehicle_angle_step_zero __attribute__((sda));
+extern float g_vehicle_unk_ratio_scale __attribute__((sda));
+extern s32 g_vehicle_active_flag __attribute__((sda));
+extern float g_vehicle_saved_x;
 typedef struct { u8 bytes[0x100]; } HeroCDF98;
-extern HeroCDF98 *D_L08_001B29DC;
-extern float D_L08_001B2094;
-extern float D_L08_001B2098;
-extern float D_L08_001B3414;
-extern s32 D_00138324[];
+extern HeroCDF98 *g_moby_array;
+extern float g_vehicle_collision_x;
+extern float g_vehicle_collision_y;
+extern float g_vehicle_saved_y;
+extern s32 g_pad_held_flags[];
 typedef struct { float f[0x100]; } StateCDF98;
-extern StateCDF98 D_L08_001B99C0;
-extern char D_L08_001B9B00[];
-extern char D_L08_001A8F20[] MACRO_ADDR;
-extern char D_L08_001B0148[];
-extern char D_L08_001B0168[];
-extern char D_L08_001B0180[];
-extern u8 D_001A7B0D;
-extern s32 D_0018B650[];
+extern StateCDF98 g_hero_l08_extra_state;
+extern char g_hero_position_vec[];
+extern char g_str_effect_name[] MACRO_ADDR;
+extern char g_str_vehicle_debug_printf[];
+extern char g_str_vehicle_debug_message_a[];
+extern char g_str_vehicle_debug_message_b[];
+extern u8 g_level_flag_byte_2;
+extern s32 g_held_object_ptr[];
 typedef struct { u8 bytes[0x80]; } TargetCDF98;
-extern TargetCDF98 *D_L08_001B2ACC;
+extern TargetCDF98 *g_collision_box_table;
 typedef struct {
     u32 handle;
     u8 active;
@@ -78,7 +79,7 @@ typedef struct {
     VoiceCDF98 voice;
 } VoiceSlotCDF98;
 extern u8 g_sound_state[];
-extern void *D_0018A15C[];
+extern void *g_platform_actor_ref[];
 
 extern int func_001163B0(void);
 extern void STUB_printf(void *, ...);
@@ -171,14 +172,14 @@ void UpdateHeroNpc(u8 *obj)
     case 0:
         checkpoint_index = DI(0x6C);
         if (checkpoint_index > 0) {
-            HeroCDF98 *table = D_L08_001B29DC;
+            HeroCDF98 *table = g_moby_array;
             qcopy(d, table[checkpoint_index].bytes + 0x10);
             qcopy(d + 0x10, table[checkpoint_index].bytes + 0xF0);
             moby_place_at_stored_transform(obj);
         } else {
-            STUB_printf(D_L08_001B0148, *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_vehicle_debug_printf, *(s16 *)(obj + 0xB2));
         }
-        DF(8) = DF(8) + D_L08_001AFFD0;
+        DF(8) = DF(8) + g_vehicle_df8_step;
         moby_transform_joint_to_world(obj, 8, d + 0x30);
         FastVecSub(d + 0x30, obj + 0x10, d + 0x30);
         matrix_from_basis_rows(scratch.inverse, obj + 0xC0);
@@ -195,18 +196,18 @@ void UpdateHeroNpc(u8 *obj)
         DI(0xB0) = 0;
         break;
     case 1:
-        if (D_001A7B0D == 0)
+        if (g_level_flag_byte_2 == 0)
             return;
         {
             if (DI(0x6C) < 0) {
-                if (fast_vec_dist(d, g_hero_state.pos) < D_L08_001AFFD4 && g_hero_state.unk2294 != 0x31) {
+                if (fast_vec_dist(d, g_hero_state.pos) < g_vehicle_hero_near_distance && g_hero_state.unk2294 != 0x31) {
                     if (OB(0x43) != 0)
                         anim_start_blended(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
                 }
             } else {
-                u8 *q = (u8 *)D_0018A15C[0];
-                if (q != 0 && *(s16 *)(q + 0xAA) == MOBY_CLASS_GLIDER_PAD && q == D_L08_001B29DC[DI(0x6C)].bytes) {
+                u8 *q = (u8 *)g_platform_actor_ref[0];
+                if (q != 0 && *(s16 *)(q + 0xAA) == MOBY_CLASS_GLIDER_PAD && q == g_moby_array[DI(0x6C)].bytes) {
                     if (OB(0x43) != 0)
                         anim_start_blended(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
@@ -220,22 +221,22 @@ void UpdateHeroNpc(u8 *obj)
         if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != MOBY_CLASS_GLIDER_PAD) {
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);
-            qcopy(d, D_L08_001B29DC[DI(0x6C)].bytes + 0x10);
-            DF(8) = DF(8) + D_L08_001AFFD0;
+            qcopy(d, g_moby_array[DI(0x6C)].bytes + 0x10);
+            DF(8) = DF(8) + g_vehicle_df8_step;
             moby_set_state(obj, 1, -1);
         }
         can_grab = TryClaimNotice(7, 0x279E, 1) != 0;
-        if (OB(0x20) == 2 && (D_00138324[0] & 0x40)) {
-            if (can_grab && g_hero_state.target == D_L08_001B29DC[DI(0x6C)].bytes && g_hero_state.unk340 != 0
+        if (OB(0x20) == 2 && (g_pad_held_flags[0] & 0x40)) {
+            if (can_grab && g_hero_state.target == g_moby_array[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
                 hero_l08_enter_state(0x31, 0);
                 set_hero_animation(0x87, 0, 3.0f);
                 ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
-                q = D_L08_001B29DC[DI(0x6C)].bytes;
-                vec_scale_to_length(d + 0x20, q + 0xC0, D_L08_001B00FC * 0.016666668f);
-                DI(0x50) = D_L08_001B0108;
-                DF(0x28) = D_L08_001B0100 * 0.016666668f;
+                q = g_moby_array[DI(0x6C)].bytes;
+                vec_scale_to_length(d + 0x20, q + 0xC0, g_vehicle_push_speed * 0.016666668f);
+                DI(0x50) = g_vehicle_df50_alt_frames;
+                DF(0x28) = g_vehicle_max_reverse_speed * 0.016666668f;
                 DF(0x18) = *(float *)(q + 0xF8);
                 g_hero_state.unk1830 = obj;
                 DI(0x9C) = 0;
@@ -247,7 +248,7 @@ void UpdateHeroNpc(u8 *obj)
     case 3: {
         if (flag_set_first_pending(obj) != 0) {
             if (DI(0xBC) != -1) {
-                STUB_printf(D_L08_001B0168);
+                STUB_printf(g_str_vehicle_debug_message_a);
                 script_queue_keyed_request(DI(0xBC), DI(0xB8));
             }
             DI(0xB0) = 0x1E;
@@ -257,11 +258,11 @@ void UpdateHeroNpc(u8 *obj)
         }
         if (DI(0x9C) != 0 || g_hero_state.unkC38 > 10.0f) {
             DI(0x9C) = DI(0x9C) | 4;
-            StepAngleTowardTarget(d + 0x14, 0, D_L08_001AFFE8 * 0.017453294f, D_L08_001B0134 * 0.00029088825f);
-            if (D_L08_001B0140 != 0)
+            StepAngleTowardTarget(d + 0x14, 0, g_vehicle_target_angle_degrees * 0.017453294f, g_vehicle_target_angle_step * 0.00029088825f);
+            if (g_vehicle_active_flag != 0)
                 FastVecAdd(d, d, d + 0x20);
-            DF(0x28) = DF(0x28) - D_L08_001B010C * 0.00027777778f;
-            if (DF(0x28) < -(D_L08_001B0104 * 0.016666668f))
+            DF(0x28) = DF(0x28) - g_vehicle_decel_c * 0.00027777778f;
+            if (DF(0x28) < -(g_vehicle_reverse_limit * 0.016666668f))
                 DI(0x9C) = DI(0x9C) | 1;
             if (g_hero_state.unkC28 & 2) {
                 DI(0x9C) = DI(0x9C) | 2;
@@ -276,22 +277,22 @@ void UpdateHeroNpc(u8 *obj)
                             anim_start_blended(obj, 1, 0, 5);
                         snd_play_from_class_bank(0, 0, obj, 0x988);
                     }
-                    DI(0x50) = D_L08_001AFFDC;
+                    DI(0x50) = g_vehicle_timer_start;
                     hero_l08_enter_state(0x31, 0);
                     set_hero_animation(0x81, 0, 15.0f);
                     ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
-                    if (D_L08_001B0140 != 0)
-                        DF(0x14) = D_L08_001AFFE8 * 0.017453294f;
+                    if (g_vehicle_active_flag != 0)
+                        DF(0x14) = g_vehicle_target_angle_degrees * 0.017453294f;
                     DF(0x54) = 0.060000002f;
                     qzero_nc(d + 0x20);
                     DI(0xA8) = 0;
                     DF(0x58) = DF(8);
                     cam_update_aim_values(d + 0xA8, obj);
                     DF(0x64) = 0.0f;
-                    D_L08_001B3410 = D_L08_001B2094;
-                    D_L08_001B3414 = D_L08_001B2098;
-                    D_L08_001B2094 = D_L08_001B00A4;
-                    D_L08_001B2098 = D_L08_001B00A8;
+                    g_vehicle_saved_x = g_vehicle_collision_x;
+                    g_vehicle_saved_y = g_vehicle_collision_y;
+                    g_vehicle_collision_x = g_vehicle_param_copy_a;
+                    g_vehicle_collision_y = g_vehicle_param_copy_b;
                     g_hero_state.unk1830 = obj;
                     moby_set_state(obj, 5, -1);
                 }
@@ -304,7 +305,7 @@ void UpdateHeroNpc(u8 *obj)
         break;
     }
     case 4:
-        if (D_L08_001AFFD8 < vec_distance_xy(obj + 0x10, g_hero_state.pos)) {
+        if (g_vehicle_hero_far_distance < vec_distance_xy(obj + 0x10, g_hero_state.pos)) {
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);
             moby_set_state(obj, 1, -1);
@@ -323,7 +324,7 @@ void UpdateHeroNpc(u8 *obj)
             DF(0x20) = c * math_fast_sin_or_cos_a(DF(0x18));
             DF(0x24) = c * math_fast_sin_or_cos_b(DF(0x18));
         }
-        if (D_L08_001AFFE0 >= DI(0x50)) {
+        if (g_vehicle_timer_length >= DI(0x50)) {
             if (OH(0x34) & 1) {
                 OH(0x34) = OH(0x34) & 0xFFFE;
                 OB(0x31) = 1;
@@ -331,7 +332,7 @@ void UpdateHeroNpc(u8 *obj)
                     anim_start_blended(obj, 1, 0, 0xA);
             }
             {
-                float r = IntToFloat(D_L08_001AFFE0 - DI(0x50)) / IntToFloat(D_L08_001AFFE0);
+                float r = IntToFloat(g_vehicle_timer_length - DI(0x50)) / IntToFloat(g_vehicle_timer_length);
                 DF(0x64) = r;
                 if (r > 1.0f)
                     DF(0x64) = 1.0f;
@@ -344,17 +345,17 @@ void UpdateHeroNpc(u8 *obj)
             FastVecScale(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
             FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
         }
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         if (vehicle_handle_collision(obj, &previous_pos) == 0) {
-            float new_speed = DF(0x54) + D_L08_001AFFFC * 0.00027777778f;
-            float max_speed = D_L08_001AFFF8 * 0.016666668f;
+            float new_speed = DF(0x54) + g_vehicle_speed_accel * 0.00027777778f;
+            float max_speed = g_vehicle_l08_max_speed * 0.016666668f;
             float turn_rate;
             DF(0x54) = new_speed;
             if (max_speed < new_speed)
                 DF(0x54) = max_speed;
-            turn_rate = D_L08_001B0000 * 0.00029088825f;
-            if (DI(0x50) < D_L08_001AFFDC - D_L08_001AFFE4 && D_L08_001B0140 != 0)
+            turn_rate = g_vehicle_l08_turn_rate * 0.00029088825f;
+            if (DI(0x50) < g_vehicle_timer_start - g_vehicle_timer_margin && g_vehicle_active_flag != 0)
                 DF(0x14) = fast_subtract_rotations(DF(0x14), turn_rate);
             if (DF(0x14) < 0.0f)
                 DF(0x14) = 0.0f;
@@ -364,7 +365,7 @@ void UpdateHeroNpc(u8 *obj)
                 set_hero_animation(0x82, 0, 15.0f);
                 DF(0x40) = 0.0f;
                 DF(0x48) = 0.0f;
-                DF(0x44) = -(D_L08_001B0000 * 0.00029088825f);
+                DF(0x44) = -(g_vehicle_l08_turn_rate * 0.00029088825f);
                 moby_set_state(obj, 6, -1);
             }
         }
@@ -394,10 +395,10 @@ void UpdateHeroNpc(u8 *obj)
                 snd_play_from_class_bank(2, 0, obj, 0x988);
             }
         } else {
-            if (D_L08_001B0070 * 0.000041555468f < DF(0x44)) {
+            if (g_vehicle_bank_limit_degrees * 0.000041555468f < DF(0x44)) {
                 if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x83 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x83)
                     set_hero_animation(0x83, 0, 25.0f);
-            } else if (DF(0x44) < -D_L08_001B0070 * 0.000041555468f) {
+            } else if (DF(0x44) < -g_vehicle_bank_limit_degrees * 0.000041555468f) {
                 if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x81 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x81) {
                     set_hero_animation(0x81, 0, 25.0f);
                     if (DI(0xB0) == 0) {
@@ -410,14 +411,14 @@ void UpdateHeroNpc(u8 *obj)
             }
         }
         {
-            float a = DF(8), b = DF(0x58), c = D_L08_001B0014;
+            float a = DF(8), b = DF(0x58), c = g_vehicle_slope_limit;
             if (a - b <= c) {
                 if (DI(0x98) == 0) {
                     float s = DF(0x54);
-                    DF(0x54) = s + (((D_L08_001B0018 * 0.016666668f) - s) * 0.1f);
+                    DF(0x54) = s + (((g_vehicle_cruise_speed * 0.016666668f) - s) * 0.1f);
                 }
             } else {
-                float e = D_L08_001B000C;
+                float e = g_vehicle_slope_threshold;
                 float k = b - a;
                 float lo, new_speed, max_speed;
                 k += e;
@@ -426,18 +427,18 @@ void UpdateHeroNpc(u8 *obj)
                     k = 1.0f;
                 else if (k < 0.0f)
                     k = 0.0f;
-                lo = D_L08_001B0018 * 0.016666668f;
+                lo = g_vehicle_cruise_speed * 0.016666668f;
                 k = 1.0f - k;
-                new_speed = lo + (k * ((D_L08_001B0010 * 0.016666668f) - lo));
+                new_speed = lo + (k * ((g_vehicle_slow_speed * 0.016666668f) - lo));
                 if (DI(0x98) == 0 || new_speed < DF(0x54))
                     DF(0x54) = DF(0x54) + ((new_speed - DF(0x54)) * 0.1f);
-                max_speed = D_L08_001B0018 * 0.016666668f;
+                max_speed = g_vehicle_cruise_speed * 0.016666668f;
                 if (max_speed < DF(0x54))
                     DF(0x54) = max_speed;
             }
         }
         if (DF(0x64) < 1.0f) {
-            float w = DF(0x64) + D_L08_001B00A0;
+            float w = DF(0x64) + g_vehicle_df64_offset;
             DF(0x64) = w;
             if (w > 1.0f)
                 DF(0x64) = 1.0f;
@@ -448,21 +449,21 @@ void UpdateHeroNpc(u8 *obj)
         } else {
             vec_build_spherical_offset(d + 0x20, DF(0x54), DF(0x18), -DF(0x14));
         }
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
-        D_L08_001B99C0.f[0x3C8 / 4] = D_L08_001B99C0.f[0x3C8 / 4]
-            + (((DF(0x28) * D_L08_001B007C) - D_L08_001B99C0.f[0x3C8 / 4]) * 0.5f);
-        if (D_L08_001B000C < DF(8) - DF(0x58)) {
+        g_hero_l08_extra_state.f[0x3C8 / 4] = g_hero_l08_extra_state.f[0x3C8 / 4]
+            + (((DF(0x28) * g_vehicle_df28_blend_scale) - g_hero_l08_extra_state.f[0x3C8 / 4]) * 0.5f);
+        if (g_vehicle_slope_threshold < DF(8) - DF(0x58)) {
             float ang, lim;
             if (OB(0x43) != 2)
                 anim_start_blended(obj, 2, 0, 3);
             set_hero_animation(0x84, 0, 15.0f);
             ang = DF(0x14);
-            lim = D_L08_001B008C * 0.017453294f;
+            lim = g_vehicle_angle_limit_degrees * 0.017453294f;
             DI(0x60) = 0;
-            DI(0x50) = D_L08_001B0084;
+            DI(0x50) = g_vehicle_df50_frames;
             if (lim < ang)
-                DF(0x68) = fast_subtract_rotations(lim, ang) / IntToFloat(D_L08_001B0084);
+                DF(0x68) = fast_subtract_rotations(lim, ang) / IntToFloat(g_vehicle_df50_frames);
             else
                 DF(0x68) = 0.0f;
             moby_set_state(obj, 7, -1);
@@ -476,18 +477,18 @@ void UpdateHeroNpc(u8 *obj)
     case 7: {
         cam_update_aim_values(d + 0xA8, obj);
         if (math_fast_float_d(d + 0x50) != 0) {
-            DI(0x50) = D_L08_001B0090;
+            DI(0x50) = g_vehicle_df50_reset;
             moby_set_state(obj, 8, -1);
         }
-        DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00027777778f);
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_a * 0.00027777778f);
         FastVecAdd(d, d, d + 0x20);
         DF(0x54) = FastVecLength(d + 0x20);
-        amount = IntToFloat(DI(0x50)) / IntToFloat(D_L08_001B0084);
+        amount = IntToFloat(DI(0x50)) / IntToFloat(g_vehicle_df50_frames);
         if (amount > 1.0f)
             amount = 1.0f;
         else if (amount < 0.0f)
             amount = 0.0f;
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             DF(0x14) = FastAddRotations(DF(0x14), DF(0x68));
         vehicle_update_steering(obj, d, 1.0f);
         vehicle_handle_collision(obj, &previous_pos);
@@ -496,7 +497,7 @@ void UpdateHeroNpc(u8 *obj)
     }
     case 8: {
         cam_update_aim_values(d + 0xA8, obj);
-        if (D_L08_001B0094 * 0.017453294f < DF(0x14) && DF(8) - DF(0x58) < D_L08_001B000C) {
+        if (g_vehicle_angle_threshold_degrees * 0.017453294f < DF(0x14) && DF(8) - DF(0x58) < g_vehicle_slope_threshold) {
             set_hero_animation(0x82, 0, 15.0f);
             if (OB(0x43) != 2)
                 anim_start_blended(obj, 2, 0, 0xA);
@@ -505,8 +506,8 @@ void UpdateHeroNpc(u8 *obj)
         } else {
             math_fast_float_d(d + 0x50);
         }
-        DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00027777778f);
-        if (D_L08_001B0140 != 0)
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_a * 0.00027777778f);
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         DF(0x54) = FastVecLength(d + 0x20);
         vehicle_update_steering(obj, d, 1.0f);
@@ -526,18 +527,18 @@ void UpdateHeroNpc(u8 *obj)
             snd_play_from_class_bank(4, 0, obj, 0x988);
             DI(0xB0) = 0xF;
         }
-        if (D_L08_001B0140 != 0)
-            DF(0x18) = FastAddRotations(DF(0x18), D_L08_001B0098 * 0.00029088825f);
-        DF(0x28) = DF(0x28) + (-D_L08_001B009C * 0.00027777778f);
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
+            DF(0x18) = FastAddRotations(DF(0x18), g_vehicle_yaw_step * 0.00029088825f);
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_b * 0.00027777778f);
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         hero_move_with_mount_to_transform(obj, d);
         vehicle_handle_collision(obj, &previous_pos);
         if (DF(0x28) > 0.0f || DF(8) < 12.0f || FastVecLength(d + 0x20) < 0.016666668f
-            || D_L08_001B0130 < (s32)OH(0x96)) {
-            SpawnExplosionEffects(obj, D_L08_001A8F20, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
+            || g_vehicle_threshold_frames < (s32)OH(0x96)) {
+            SpawnExplosionEffects(obj, g_str_effect_name, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
                           -1, 15.0f, 1, 1, -1, 0, 0x810001);
-            D_0018B650[0] = 0;
+            g_held_object_ptr[0] = 0;
             hero_record_play_counters();
         }
         break;
@@ -552,9 +553,9 @@ void UpdateHeroNpc(u8 *obj)
         DI(0xAC) = -1;
         dist_to_target = fast_vec_dist(d, d + 0x80);
         lim = DF(0x94) < dist_to_target ? DF(0x94) : dist_to_target;
-        if (D_L08_001B0140 != 0) {
-            StepAngleTowardTarget(d + 0x14, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
-            StepAngleTowardTarget(d + 0x10, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
+        if (g_vehicle_active_flag != 0) {
+            StepAngleTowardTarget(d + 0x14, 0, 0.0f, g_vehicle_angle_step_zero * 0.00029088825f);
+            StepAngleTowardTarget(d + 0x10, 0, 0.0f, g_vehicle_angle_step_zero * 0.00029088825f);
         }
         if ((OB(0x60) & 2) && OB(0x42) == 3) {
             if (OB(0x43) != 0)
@@ -564,10 +565,10 @@ void UpdateHeroNpc(u8 *obj)
         }
         if (lim < dist_to_target) {
             FastVecSub(&scratch.v.velocity, d + 0x80, d);
-            vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * D_L08_001B0128);
-            FastVecScale(d + 0x20, d + 0x20, D_L08_001B0124);
+            vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * g_vehicle_velocity_length_scale);
+            FastVecScale(d + 0x20, d + 0x20, g_vehicle_l08_velocity_damping);
             FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
-            if (D_L08_001B0140 != 0)
+            if (g_vehicle_active_flag != 0)
                 FastVecAdd(d, d, d + 0x20);
             hero_move_with_mount_to_transform(obj, d);
             break;
@@ -576,19 +577,19 @@ void UpdateHeroNpc(u8 *obj)
         DF(0x94) = 0.0f;
         if (g_hero_state.unkC28 & 2) {
             g_hero_state.unk1830 = 0;
-            D_L08_001B2094 = D_L08_001B3410;
-            D_L08_001B2098 = D_L08_001B3414;
+            g_vehicle_collision_x = g_vehicle_saved_x;
+            g_vehicle_collision_y = g_vehicle_saved_y;
             DI(0x50) = 0;
             hero_l08_enter_state(0, 1);
             hero_reset_speeds_and_vectors();
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);
             if (DI(0x6C) > 0) {
-                qcopy(d, D_L08_001B29DC[DI(0x6C)].bytes + 0x10);
+                qcopy(d, g_moby_array[DI(0x6C)].bytes + 0x10);
                 moby_place_at_stored_transform(obj);
             }
             if (DI(0xC4) != -1) {
-                STUB_printf(D_L08_001B0180);
+                STUB_printf(g_str_vehicle_debug_message_b);
                 script_queue_keyed_request(DI(0xC4), DI(0xC0));
             }
             moby_set_state(obj, 1, -1);
@@ -607,7 +608,7 @@ void UpdateHeroNpc(u8 *obj)
         if (DF(8) > 1013.0f) DF(8) = 1013.0f;
         if ((u32)(OB(0x20) - 5) < 5) {
             if (OB(0x31) != 0) {
-                if (fast_vec_dist(obj + 0x10, D_L08_001B9B00) < 80.0f) {
+                if (fast_vec_dist(obj + 0x10, g_hero_position_vec) < 80.0f) {
                     moby_update_ground_check(obj);
                     OB(0x6F) = 0x4B;
                 }
@@ -630,17 +631,17 @@ void UpdateHeroNpc(u8 *obj)
             slot = (s32 *)(d + 0x70);
             for (i = 0; i < 4; i++) {
                 if (slot[i] != 0xFF && IsPointInCuboid(d, slot[i]) != 0
-                    && *(float *)(D_L08_001B2ACC[slot[i]].bytes + 0x38) < g_hero_state.pos[2]) {
+                    && *(float *)(g_collision_box_table[slot[i]].bytes + 0x38) < g_hero_state.pos[2]) {
                     if (OB(0x43) != 3)
                         anim_start_blended(obj, 3, 0, 3);
                     set_hero_animation(0x88, 0, 15.0f);
-                    qcopy(d + 0x80, D_L08_001B2ACC[slot[i]].bytes + 0x30);
+                    qcopy(d + 0x80, g_collision_box_table[slot[i]].bytes + 0x30);
                     DF(0x90) = fast_vec_dist(g_hero_state.pos, d + 0x80);
                     {
                         float m = FastVecLength(d + 0x20) > 0.06666667f ? FastVecLength(d + 0x20) : 0.06666667f;
                         DF(0x94) = m;
                     }
-                    g_hero_state.unkC20 = D_L08_001B013C / (DF(0x90) / DF(0x94));
+                    g_hero_state.unkC20 = g_vehicle_unk_ratio_scale / (DF(0x90) / DF(0x94));
                     moby_set_state(obj, 0xA, -1);
                 }
             }

@@ -15,7 +15,7 @@ extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern int g_game_time SDATA(D_001B1688);
 extern void *func_PAL_002BD790(void *,void *,int,int,float,int,int,int,int,int);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern void cam_compute_view_direction(void *,void *,int);
 extern void vec_transform_or_copy(void *,void *);
 
@@ -35,7 +35,7 @@ void func_PAL_002BD8E8(char *p) {
  *(int *)(p+4)=moby_forward_two_values_and_amount(*(int *)(q+20),*(int *)(q+16),IntToFloat(*(short *)(p+10))/IntToFloat(*(short *)(q+24)));
  FastVecAdd(p+16,p+16,q);
  pos=p+16;
- if (D_001A8CA0) {
+ if (g_ground_check_inhibit) {
   cam_compute_view_direction(pos,accel,0);
   FastVecScale(accel,accel,*(float *)(q+12));
   FastVecAdd(q,q,accel);

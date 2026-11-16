@@ -3,16 +3,16 @@
 #define H(p, o) (*(unsigned short *)((p)+(o)))
 #define B(p, o) (*(unsigned char *)((p)+(o)))
 #define F(p, o) (*(float *)((p)+(o)))
-extern int D_L07_001B1E08 MACRO_ADDR;
-extern int D_L07_001C9780 NOT_SDA;
-extern float D_L07_001B0AE8 __attribute__((sda));
-extern float D_L07_001B0AEC __attribute__((sda));
-extern float D_L07_001B0AF0 __attribute__((sda));
-extern float D_L07_001B0AF4 __attribute__((sda));
-extern float D_L07_001B0AF8 __attribute__((sda));
-extern float D_L07_001B0AFC __attribute__((sda));
-extern float D_L07_001B0B00 __attribute__((sda));
-extern struct Choice61 {int a, b, c, d;} D_L07_001B0B08;
+extern int g_frame_l07_counter MACRO_ADDR;
+extern int g_cutscene_l07_active_flag NOT_SDA;
+extern float g_entity_arrive_distance __attribute__((sda));
+extern float g_entity_accel_limit __attribute__((sda));
+extern float g_entity_speed_limit __attribute__((sda));
+extern float g_entity_turn_accel_limit __attribute__((sda));
+extern float g_entity_turn_speed_limit __attribute__((sda));
+extern float g_follow_cam_distance __attribute__((sda));
+extern float g_follow_cam_height __attribute__((sda));
+extern struct Choice61 {int a, b, c, d;} g_entity_choice_set;
 extern int shooter_entity_base_update(void *);
 extern void entity_spawn_death_effects(void *);
 extern void entity_finish_update(void *);
@@ -51,7 +51,7 @@ void UpdateSiberiusEntityActions(char *actor)
     float time;
     int result;
     int choices[4];
-    if (D_L07_001B1E08 >= 2 && D_L07_001C9780 != I(state, 0x350)) return;
+    if (g_frame_l07_counter >= 2 && g_cutscene_l07_active_flag != I(state, 0x350)) return;
     if (shooter_entity_base_update(actor)) goto cleanup;
     {
         switch (B(actor, 0x95)) {
@@ -67,10 +67,10 @@ void UpdateSiberiusEntityActions(char *actor)
             if (I(state, 0x2D4) == 1) moby_set_state(actor, 6, 2);
             break;
         case 2:
-            follow_camera_set_distance(0, D_L07_001B0AFC, 0.003f);
-            follow_camera_set_height(D_L07_001B0B00, 0.003f);
+            follow_camera_set_distance(0, g_follow_cam_distance, 0.003f);
+            follow_camera_set_height(g_follow_cam_height, 0.003f);
             if (flag_set_second_pending(actor))
-                moby_set_controller_speed_limits(actor, D_L07_001B0AEC*0.00027777778f, D_L07_001B0AF0*0.016666668f, D_L07_001B0AF4*4.848137450608192e-06f, D_L07_001B0AF8*0.0002908882452175021f);
+                moby_set_controller_speed_limits(actor, g_entity_accel_limit*0.00027777778f, g_entity_speed_limit*0.016666668f, g_entity_turn_accel_limit*4.848137450608192e-06f, g_entity_turn_speed_limit*0.0002908882452175021f);
             if (I(state, 0x2D4) != 1 && B(actor, 0x20) != 7) {
                 if (I(state, 0x338)) moby_set_state(actor, 3, 1);
                 else moby_set_state(actor, 4, 1);
@@ -112,7 +112,7 @@ cleanup:
     }
     case 3:
         if (flag_set_first_pending(actor)) {
-            *(struct Choice61 *)choices = D_L07_001B0B08;
+            *(struct Choice61 *)choices = g_entity_choice_set;
             if (B(actor, 0x43) != choices[math_random_int_below(4)]) anim_start_blended(actor, choices[math_random_int_below(4)], 0, 20);
         }
         if ((B(actor, 0x60) & 2) && !I(state, 0x338)) moby_set_state(actor, 4, -1);
@@ -137,7 +137,7 @@ cleanup:
     case 6:
         if (flag_set_first_pending(actor) && B(actor, 0x43) != 11) anim_start_blended(actor, 11, 0, 20);
         moby_turn_toward_target_and_step(actor, state + 0x210, 0);
-        if (vec_distance_xy(actor + 0x10, state + 0x210) < D_L07_001B0AE8) moby_set_state(actor, 7, -1);
+        if (vec_distance_xy(actor + 0x10, state + 0x210) < g_entity_arrive_distance) moby_set_state(actor, 7, -1);
         break;
     case 7:
         if (flag_set_first_pending(actor) && B(actor, 0x43) != 12) anim_start_blended(actor, 12, 5, 10);
@@ -149,7 +149,7 @@ cleanup:
         }
         if (B(actor, 0x60) & 2) {
             time = vec_distance_xy(actor + 0x10, state + 0x210);
-            if (D_L07_001B0AE8+0.5f < time ||
+            if (g_entity_arrive_distance+0.5f < time ||
                 FastDiffRots(F(actor, 0xF8), mat_fast_helper_a(F(state, 0x210)-F(actor, 0x10), F(state, 0x214)-F(actor, 0x14))) > 0.349065899848938f)
                 moby_set_state(actor, 6, -1);
         }

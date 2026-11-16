@@ -34,11 +34,11 @@ typedef struct {
 } Obj_416A50;
 
 extern void part_spawn_sparkle_drift(Obj_416A50 *a0);
-extern float D_L01_001B1A58 __attribute__((sda));
-extern float D_L01_001B1A5C __attribute__((sda));
-extern float D_L01_001B1A60 __attribute__((sda));
-extern float D_L01_001B1A74 __attribute__((sda));
-extern int D_L01_001B1A98 __attribute__((sda));
+extern float g_bobbing_scale_factor __attribute__((sda));
+extern float g_bobbing_base_offset __attribute__((sda));
+extern float g_bobbing_amplitude __attribute__((sda));
+extern float g_spin_rate_w __attribute__((sda));
+extern int g_random_effect_chance __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
@@ -50,18 +50,18 @@ void bobbing_l01_moby_update_2(Obj_416A50 *moby)
     State_416A50 *vars = moby->st;
     float bob_sine;
 
-    moby->f2C = moby->cls->f24 * D_L01_001B1A58;
+    moby->f2C = moby->cls->f24 * g_bobbing_scale_factor;
 
     if (moby->b20 == 1) {
         bob_sine = math_fast_sin_or_cos_b(moby->fFC);
-        moby->f18 = vars->f18 + D_L01_001B1A5C + D_L01_001B1A60 * bob_sine;
+        moby->f18 = vars->f18 + g_bobbing_base_offset + g_bobbing_amplitude * bob_sine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
         moby->fF8 = FastAddRotations(moby->fF8, vars->f60);
-        moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * D_L01_001B1A74);
+        moby->fFC = FastAddRotations(moby->fFC, 0.0002908882452175021f * g_spin_rate_w);
     }
 
     gfx_draw_glow_rings(moby);
-    if (math_random_int_below(D_L01_001B1A98) == 0)
+    if (math_random_int_below(g_random_effect_chance) == 0)
         part_spawn_sparkle_drift(moby);
 }

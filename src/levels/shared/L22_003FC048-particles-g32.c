@@ -21,8 +21,8 @@ extern float ref_L22_003FC048_01 __attribute__((sda)), ref_L22_003FC048_02 __att
 extern float ref_L22_003FC048_04 __attribute__((sda)), ref_L22_003FC048_05 __attribute__((sda));
 extern int ref_L22_003FC048_07 __attribute__((sda));
 extern u8 ref_L22_003FC048_08 __attribute__((sda));
-extern u8 * D_L22_001B1D6C;
-extern u8 D_L22_001B9C80[];
+extern u8 * g_effect_owner_moby;
+extern u8 g_tether_origin[];
 extern float math_fast_sin_or_cos_b(float), FastAddRotations(float, float), vec_distance_xy(void *, void *);
 extern void part_rotate_anchor_table(void), part_get_anchor_position(void *, void *, int), gfx_draw_pulsing_ring(void *);
 extern void gfx_add_draw_callback_first(void *, void *);
@@ -49,7 +49,7 @@ void part_update_effect_particles(u8 * obj) {
             }
         }
     }
-    if (D_L22_001B1D6C == obj)
+    if (g_effect_owner_moby == obj)
         part_rotate_anchor_table();
     qcopy(p, obj + 0x10);
     FastVecScale(tmp, obj + 0xE0, ref_L22_003FC048_03);
@@ -60,7 +60,7 @@ void part_update_effect_particles(u8 * obj) {
     gfx_add_draw_callback_first(gfx_draw_pulsing_ring, obj);
     if (obj[0x20])
         return;
-    distance = vec_distance_xy(obj + 0x10, D_L22_001B9C80);
+    distance = vec_distance_xy(obj + 0x10, g_tether_origin);
     if (distance > 30.0f)
         count = 2;
     else if (distance > 10.0f)

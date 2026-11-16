@@ -1,17 +1,17 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_US2_0033C0F0(void *, float);
+extern void prompt_bar_set_spacing_us2(void *, float);
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern void func_US2_0033BC20(void *, void *, void *);
+extern void prompt_bar_init_us2(void *, void *, void *);
 extern char *GetLocalizedString(int);
-extern void func_US2_0033C098(void *, int, int, int);
-extern void func_US2_0033C078(void *, float, float, float, float, float, float);
+extern void prompt_bar_set_texts_us2(void *, int, int, int);
+extern void prompt_bar_set_text_offsets_us2(void *, float, float, float, float, float, float);
 extern int func_US2_L00_004348C8(void *, int);
-extern int D_001ADDE0[2] __attribute__((sda));
+extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
-extern int D_US2_001AE1A0[2] __attribute__((sda));
+extern int g_child_param_pair_e[2] __attribute__((sda));
 
 void func_US2_L00_004347A0(char *object, void *argument)
 {
@@ -30,12 +30,12 @@ void func_US2_L00_004347A0(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001AE1A0);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_e);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_L00_004348C8(object, 0);
 }
@@ -44,7 +44,7 @@ void func_US2_L00_004347A0(char *object, void *argument)
 
 extern int func_US2_L00_00434F48(void *, int);
 
-extern int D_US2_001AE1C0[2] __attribute__((sda));
+extern int g_child_param_pair_f[2] __attribute__((sda));
 
 void func_US2_L00_00434E20(char *object, void *argument)
 {
@@ -63,12 +63,12 @@ void func_US2_L00_00434E20(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001AE1C0);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_f);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_L00_00434F48(object, 0);
 }
@@ -77,7 +77,7 @@ void func_US2_L00_00434E20(char *object, void *argument)
 
 extern int func_US2_L00_00435140(void *, int);
 
-extern int D_US2_001AE1D0[2] __attribute__((sda));
+extern int g_child_param_pair_g[2] __attribute__((sda));
 
 void func_US2_L00_00435018(char *object, void *argument)
 {
@@ -96,12 +96,12 @@ void func_US2_L00_00435018(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001AE1D0);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_g);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_L00_00435140(object, 0);
 }

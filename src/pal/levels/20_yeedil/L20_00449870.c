@@ -5,7 +5,7 @@
    frames become 150 and 500. -O2 -G0 -ffunction-sections -frac2-hazard-labels, as v1.01's. */
 #include "common.h"
 
-extern void func_PAL_L20_004495C0(char *, char *, char *, float *);
+extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -32,7 +32,7 @@ char *func_PAL_L20_00449870(char *arg0)
     float f;
 
     t = 0.78539825f;
-    func_PAL_L20_004495C0(arg0, (char *)ang, (char *)v, &t);
+    yeedil_boss_compute_shot_launch_pal(arg0, (char *)ang, (char *)v, &t);
     ang[2] = ang[2] + 1.0f;
     if (t < 0.0f) {
         if (t > -0.52359885f)

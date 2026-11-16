@@ -4,9 +4,9 @@ extern s32 *ref_L06_0047AC68_00[] __attribute__((sda));
 
 extern void ref_L06_0047AC68_01(s32);
 
-extern u8 D_0018C0D4 __attribute__((nosda));
+extern u8 g_screen_mode_flag __attribute__((nosda));
 
-extern s32 D_0018C0BC __attribute__((nosda));
+extern s32 g_hero_mode __attribute__((nosda));
 
 typedef struct {
     char pad0[0x34C];
@@ -34,7 +34,7 @@ s32 cam_volume_update(s32 moby)
     if (*(s16 *)(state + 0x48) == 1 && *(s16 *)(state + 0x4A) != 0)
         return 0;
     tag = *(u16 *)(state + 0x2C);
-    if (*(s16 *)(state + 0x2C) == 11 && D_0018C0D4 != 2)
+    if (*(s16 *)(state + 0x2C) == 11 && g_screen_mode_flag != 2)
         return 0;
 
     switch ((s16)tag) {
@@ -52,7 +52,7 @@ s32 cam_volume_update(s32 moby)
 clear:
     if ((s16)tag != 2)
         goto call;
-    if (D_0018C0BC == 26)
+    if (g_hero_mode == 26)
         goto call;
     *(u16 *)(state + 0x2E) = 0;
     return 0;

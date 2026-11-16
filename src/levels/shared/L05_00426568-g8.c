@@ -21,7 +21,7 @@ typedef struct Moby_L05_00426568 {
 /* The moby of class 0xFBF, found once (D_L05_001B1500 in the USA release; PAL places it elsewhere). */
 extern Moby_L05_00426568 *ref_L05_00426568_0 __attribute__((sda));
 /* The head of the moby list. */
-extern Moby_L05_00426568 *D_L05_001B2528;
+extern Moby_L05_00426568 *g_moby_l05_list_head;
 
 extern Moby_L05_00426568 *CreateMoby(int);
 extern void vec_clear_128(float *);
@@ -44,7 +44,7 @@ Moby_L05_00426568 *moby_spawn_class_b(Moby_L05_00426568 *object)
         moby->rot[2] = math_random_angle();
         moby->scale = moby->scale * 0.5f;
         if (ref_L05_00426568_0 == 0) {
-            for (m = D_L05_001B2528; m != 0; m = m->pChain) {
+            for (m = g_moby_l05_list_head; m != 0; m = m->pChain) {
                 if (m->oClass == 0xFBF)
                     ref_L05_00426568_0 = m;
             }

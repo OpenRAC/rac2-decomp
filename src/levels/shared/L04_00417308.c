@@ -78,7 +78,7 @@ void moby_apply_fade_color_to_linked(char *moby)
 
 /* func_L04_0043BEE8 is defined in L04_0043BEE8-g8.c. */
 
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -96,7 +96,7 @@ void part_l04_spawn_spinning_pairs(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    FastVecSub(direction, (float *)g_tether_zero_vec, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -192,14 +192,14 @@ int stub_l04_return_zero(void *unused) {
 /* func_L04_0046D250 is in L04_0046D250-g8.c. */
 
 
-extern s32 D_L04_001B1E84 __attribute__((sda));
+extern s32 g_moby_definition_table __attribute__((sda));
 
 extern s32 g_moby_l04_pool __attribute__((sda));
 
 /* Tells whether the object linked to this one is in state 2 or 3. */
 int moby_is_linked_in_state_two_or_three(u8 *moby)
 {
-    s32 entryAddr = (*(s16 *)(moby + 0x84) << 5) + D_L04_001B1E84;
+    s32 entryAddr = (*(s16 *)(moby + 0x84) << 5) + g_moby_definition_table;
     u8 *linked = (u8 *)(g_moby_l04_pool + (*(s32 *)(*(s32 *)(entryAddr + 0x1C) + 0x60) << 8));
     return (u32)(*(u8 *)(linked + 0x20) - 2) < 2;
 }

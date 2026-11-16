@@ -14,7 +14,7 @@ extern int coll_sweep_from_object(char *, float *, float, int, float, float, int
 extern void *part_spawn_gravity_fade(float *, float *, float, float, float, int, int, int, int, int, int);
 extern unsigned char *func_PAL_002C23B8(float *, float *, int, int, int, int,
                                     float, float, float, float, float);
-extern unsigned char *D_001F2540[];
+extern unsigned char *g_particle_texture_table[];
 
 /* Effect at an object's joint: func_002A8C28 at the joint and at two points along its axis,
    three grey func_002C65A0 particles at the joint and one func_PAL_002C23B8 particle at the near
@@ -61,7 +61,7 @@ void func_PAL_00323D48(char *object, float *position, int joint, float intensity
         particle = func_PAL_002C23B8(near, drift, 12, 60, 0x606060, 3,
                                  1.05e+05f, 2.1e+04f, 1.0f, -0.0002f, 0.0f);
         if (particle) {
-            particle[2] = *D_001F2540[23];
+            particle[2] = *g_particle_texture_table[23];
             particle[3] = 0x44;
             if (math_random_int_range(0, 1)) {
                 unsigned char *payload;
@@ -82,7 +82,7 @@ void func_PAL_00323D48(char *object, float *position, int joint, float intensity
 
 
 extern void moby_mark_spawned(void *);
-extern int func_PAL_00273A10(char *);
+extern int cam_moby_update_pal(char *);
 extern void moby_set_state(unsigned char *, unsigned char, int);
 
 void func_PAL_003242C8(char *object)
@@ -91,13 +91,13 @@ void func_PAL_003242C8(char *object)
     *(float *)(data + 4) -= 0.012f;
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
-        if (func_PAL_00273A10(object)) {
+        if (cam_moby_update_pal(object)) {
             moby_set_state((unsigned char *)object, 1, -1);
             *(unsigned short *)(object + 0x34) |= 0x2800;
         }
         break;
     case 1:
-        func_PAL_00273A10(object);
+        cam_moby_update_pal(object);
         if (*(unsigned char *)(object + 0x23) < 2)
             moby_mark_spawned(object);
         else

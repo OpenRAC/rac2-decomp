@@ -26,21 +26,21 @@ typedef struct {
     char rotation[0x10];
 } EndakoPlacement;
 extern EndakoPlayerState g_hero_state;
-extern EndakoFlags D_001395B8;
-extern char D_0019B2E8[];
+extern EndakoFlags g_game_flag_table;
+extern char g_moby_group_flags[];
 extern u8 g_item_owned_flags[] MACRO_ADDR;
-extern int g_current_map_index, D_L03_001A8F00;
-extern char *D_L03_001B2A1C;
-extern EndakoPlacement *D_L03_001B2B0C;
-extern char D_L03_001BFB80[];
-extern char D_L03_001B0650[] SDATA(D_L03_001B0650);
-extern float D_L03_001B0664, D_L03_001B0668;
+extern int g_current_map_index, g_hero_l03_mode;
+extern char *g_moby_record_base;
+extern EndakoPlacement *g_linked_effect_records;
+extern char g_str_clank_scene_key[];
+extern char g_clank_scene_spawn_position[] SDATA(D_L03_001B0650);
+extern float g_clank_scene_spawn_value_x, g_clank_scene_spawn_value_y;
 extern void moby_set_state(), script_queue_keyed_request(), moby_init_child_from_parent(), anim_start_immediate();
-extern void func_002A0F48(), state_set_flag_one(), func_PAL_L02_003294D8(), moby_set_group_enabled();
-extern void func_PAL_L00_002B9CD8(), hero_reset_carried_objects(), moby_mark_spawned(), moby_mark_table_entry_flagged();
-extern void game_set_stored_value_pair(), func_PAL_002F6C18();
+extern void func_002A0F48(), state_set_flag_one(), part_start_record_effect_by_index_pal(), moby_set_group_enabled();
+extern void hero_reset_position_and_direction_pal(), hero_reset_carried_objects(), moby_mark_spawned(), moby_mark_table_entry_flagged();
+extern void game_set_stored_value_pair(), game_set_slowdown_factor_pal();
 extern s32 req_launch_queued();
-extern void func_PAL_L03_003D61B8(), func_PAL_L03_003D6298(), func_PAL_L03_003D6150();
+extern void clank_scene_finish_pal(), console_remote_view_cleanup_pal(), object_restore_linked_after_scene_pal();
 extern char *CreateMoby();
 extern int IsPointInCuboid(), req_push_queue(), flag_is_third_pending_set();
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float);
@@ -61,48 +61,48 @@ void func_PAL_L03_003D5B68(char *obj)
         char *p;
 
         B(obj, 0x30) = 255;
-        if (!(B(D_0019B2E8, B(obj, 0xB0) + (g_current_map_index << 4)) & 128)) {
+        if (!(B(g_moby_group_flags, B(obj, 0xB0) + (g_current_map_index << 4)) & 128)) {
             if (g_hero_state.mode == 1) {
                 moby_set_state(obj, 2, -1);
                 script_queue_keyed_request(I(v, 0x20), -1);
             } else {
                 moby_set_state(obj, 1, -1);
                 {
-                    char *existing = D_L03_001B2A1C + (I(v, 0) << 8);
+                    char *existing = g_moby_record_base + (I(v, 0) << 8);
                     I(existing, 0x98) = 0;
                     H(existing, 0x34) = (H(existing, 0x34) | 0x41) & ~0x1000;
                 }
                 p = CreateMoby(0x57);
                 moby_init_child_from_parent(p, obj);
-                qcopy_nc(p + 0x10, D_L03_001B2B0C[I(v, 4)].position);
-                qcopy_nc(p + 0xF0, D_L03_001B2B0C[I(v, 4)].rotation);
+                qcopy_nc(p + 0x10, g_linked_effect_records[I(v, 4)].position);
+                qcopy_nc(p + 0xF0, g_linked_effect_records[I(v, 4)].rotation);
                 H(p, 0x32) = 0x30;
                 H(p, 0x34) |= 2;
                 anim_start_immediate(p, 0x13, 0);
                 I(p, 0x98) = 0;
-                qcopy_nc(p + 0x10, D_L03_001B0650);
-                F(p, 0xF4) = D_L03_001B0664;
-                F(p, 0xF8) = D_L03_001B0668;
+                qcopy_nc(p + 0x10, g_clank_scene_spawn_position);
+                F(p, 0xF4) = g_clank_scene_spawn_value_x;
+                F(p, 0xF8) = g_clank_scene_spawn_value_y;
                 func_002A0F48(p);
                 P(v, 0x2C) = p;
-                if (D_001395B8.first) {
+                if (g_game_flag_table.first) {
                     state_set_flag_one();
-                    func_PAL_L02_003294D8(I(v, 0x18), I(v, 0x1C));
+                    part_start_record_effect_by_index_pal(I(v, 0x18), I(v, 0x1C));
                 }
             }
             moby_set_group_enabled(I(v, 0xC), 1);
             g_hero_state.flag = 1;
         } else {
-            if (!D_001395B8.seen) {
+            if (!g_game_flag_table.seen) {
                 state_set_flag_one();
-                func_PAL_L00_002B9CD8(obj + 0x10, obj + 0xF0, 0, 1);
+                hero_reset_position_and_direction_pal(obj + 0x10, obj + 0xF0, 0, 1);
             }
             if (g_hero_state.mode == 1) {
                 script_queue_keyed_request(I(v, 0x24), -1);
                 hero_reset_carried_objects(0);
-                moby_mark_spawned(D_L03_001B2A1C + (I(v, 0) << 8));
+                moby_mark_spawned(g_moby_record_base + (I(v, 0) << 8));
                 moby_mark_table_entry_flagged(B(obj, 0xB0));
-                func_PAL_L00_002B9CD8(obj + 0x10, obj + 0xF0, 0, 1);
+                hero_reset_position_and_direction_pal(obj + 0x10, obj + 0xF0, 0, 1);
             }
             /* Resident flag bytes, 8 bytes further on in USA v2.00. A symbol-plus-offset
                .sdata address is neither split nor a one-insn operand, so each store stays
@@ -121,14 +121,14 @@ void func_PAL_L03_003D5B68(char *obj)
         return;
     }
     case 1:
-        if (!D_001395B8.first
+        if (!g_game_flag_table.first
             && IsPointInCuboid(g_hero_state.position, I(v, 4))
-            && req_push_queue(D_L03_001BFB80, 0x31)) {
-            req_launch_queued(D_L03_001BFB80);
-            game_set_stored_value_pair(func_PAL_L03_003D6150, obj);
-            D_001395B8.first = state;
+            && req_push_queue(g_str_clank_scene_key, 0x31)) {
+            req_launch_queued(g_str_clank_scene_key);
+            game_set_stored_value_pair(object_restore_linked_after_scene_pal, obj);
+            g_game_flag_table.first = state;
         }
-        if (D_L03_001A8F00 != 2) {
+        if (g_hero_l03_mode != 2) {
             {
                 u32 timer = H(P(v, 0x2C), 0x96);
                 u32 old = timer++;
@@ -148,20 +148,20 @@ void func_PAL_L03_003D5B68(char *obj)
             H(P(v, 0x2C), 0x34) |= 0x41;
             H(P(v, 0x2C), 0x34) &= ~0x1000;
             I(P(v, 0x2C), 0x98) = 0;
-            if (D_001395B8.second)
-                func_PAL_L03_003D61B8(obj);
-            else if (req_push_queue(D_L03_001BFB80, 0x32)) {
-                req_launch_queued(D_L03_001BFB80);
-                game_set_stored_value_pair(func_PAL_L03_003D61B8, obj);
+            if (g_game_flag_table.second)
+                clank_scene_finish_pal(obj);
+            else if (req_push_queue(g_str_clank_scene_key, 0x32)) {
+                req_launch_queued(g_str_clank_scene_key);
+                game_set_stored_value_pair(clank_scene_finish_pal, obj);
             }
-            func_PAL_002F6C18();
+            game_set_slowdown_factor_pal();
             moby_set_state(obj, 2, -1);
             return;
         } else if (g_hero_state.mode == 1) {
             char *p;
 
             script_queue_keyed_request(I(v, 0x20), -1);
-            p = D_L03_001B2A1C + (I(v, 0) << 8);
+            p = g_moby_record_base + (I(v, 0) << 8);
             H(p, 0x34) = (H(p, 0x34) & ~0x41) | 0x1000;
             I(p, 0x98) = I(P(p, 0x24), 0x10);
             H(P(v, 0x2C), 0x34) |= 0x41;
@@ -175,9 +175,9 @@ void func_PAL_L03_003D5B68(char *obj)
         if (g_hero_state.object == obj && g_hero_state.active) {
             moby_set_group_enabled(I(v, 8), 1);
             moby_set_group_enabled(I(v, 0xC), 0);
-            if (req_push_queue(D_L03_001BFB80, 0x33)) {
-                req_launch_queued(D_L03_001BFB80);
-                game_set_stored_value_pair(func_PAL_L03_003D6298, obj);
+            if (req_push_queue(g_str_clank_scene_key, 0x33)) {
+                req_launch_queued(g_str_clank_scene_key);
+                game_set_stored_value_pair(console_remote_view_cleanup_pal, obj);
                 moby_set_state(obj, 3, -1);
             }
             return;

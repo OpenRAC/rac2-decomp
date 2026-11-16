@@ -6,7 +6,7 @@ extern u8 D_00189E20_1[];
 extern int FastDecTimer(char *);
 typedef int AnimQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0x158]; float value; u8 gap[0x370-0x15c]; AnimQuad vector; } AnimBase;
-extern AnimBase D_L00_001B8C80;
+extern AnimBase g_scalar_transition_state;
 extern void hero_steer_heading(int, float, float, float);
 
 void func_PAL_L00_002B34C0(void)
@@ -30,7 +30,7 @@ void func_PAL_L00_002B34C0(void)
     }
     {
         u8 *q=D_00189E20_1;
-        AnimBase *anim=&D_L00_001B8C80;
+        AnimBase *anim=&g_scalar_transition_state;
         *(float *)(q+0x1a0)=anim->value;
         *(float *)(q+0x1b4)*=f;
         qcopy_nc(q+0x190,&anim->vector);

@@ -18,12 +18,12 @@ extern int math_random_int_range(int, int);
    gives retail's mix: element 0 is a one-instruction load (GP in a call's delay slot, absolute
    elsewhere), while every other element is a `sym+offset` address, which cc1 counts as two
    instructions, keeps out of delay slots and the assembler expands absolute. */
-extern float D_L07_001B0C00[] __attribute__((sda));
+extern float g_debris_velocity_range[] __attribute__((sda));
 /* The offset vector, addressed through $gp. */
-extern float D_L07_001B0C20[] SDATA(D_L07_001B0C20);
+extern float g_debris_velocity_matrix[] SDATA(D_L07_001B0C20);
 /* Two {minimum, maximum} pairs for the child's two random parameters; retail reads +0x08 $gp
    relative and the others absolute. */
-extern float D_L07_001B0C30[] __attribute__((sda));
+extern float g_debris_child_param_range[] __attribute__((sda));
 extern float D_L07_001B0C30_gp[] SDATA(D_L07_001B0C30);
 
 /* A four-state burst: state 1 passes the rotated, offset position to func_0032DA58, state 2
@@ -44,7 +44,7 @@ void burst_debris_update(char *moby)
         break;
     case 1:
         if (flag_is_third_pending_set(moby)) {
-            matrix_mul_vec3(velocity, D_L07_001B0C20, moby + 0xC0);
+            matrix_mul_vec3(velocity, g_debris_velocity_matrix, moby + 0xC0);
             FastVecAdd(velocity, velocity, moby + 0x10);
             part_spawn_blast_effect_moby(moby, velocity, moby + 0xD0, 0.0f);
             moby_set_state(moby, 2, -1);
@@ -54,12 +54,12 @@ void burst_debris_update(char *moby)
         if (flag_set_first_pending(moby))
             PlayMobySound(0, 0, moby);
         for (i = 0; i < 9; i++) {
-            velocity[0] = math_random_float_range(D_L07_001B0C00[0], D_L07_001B0C00[4]) * 0.016666667f;
-            velocity[1] = math_random_float_range(D_L07_001B0C00[1], D_L07_001B0C00[5]) * 0.016666667f;
-            velocity[2] = math_random_float_range(D_L07_001B0C00[2], D_L07_001B0C00[6]) * 0.016666667f;
+            velocity[0] = math_random_float_range(g_debris_velocity_range[0], g_debris_velocity_range[4]) * 0.016666667f;
+            velocity[1] = math_random_float_range(g_debris_velocity_range[1], g_debris_velocity_range[5]) * 0.016666667f;
+            velocity[2] = math_random_float_range(g_debris_velocity_range[2], g_debris_velocity_range[6]) * 0.016666667f;
             matrix_mul_vec3(velocity, velocity, moby + 0xC0);
-            child_param_a = math_random_signed_float_range(D_L07_001B0C30[0], D_L07_001B0C30[1]);
-            child_param_b = math_random_float_range(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
+            child_param_a = math_random_signed_float_range(g_debris_child_param_range[0], g_debris_child_param_range[1]);
+            child_param_b = math_random_float_range(D_L07_001B0C30_gp[2], g_debris_child_param_range[3]);
             child = cam_moby_create(moby, 2, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, child_param_a, child_param_b);
             if (child) {
                 *(void (**)(char *))(child + 0x64) = burst_debris_update;

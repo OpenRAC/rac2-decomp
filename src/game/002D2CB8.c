@@ -54,8 +54,8 @@ int menu_page_draw(void)
     return 0;
 }
 
-extern unsigned int D_00138344;
-extern unsigned int D_001A7390 __attribute__((sda));
+extern unsigned int g_menu_input_flags;
+extern unsigned int g_frame_counter __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern char g_pause_menu_state[];
 typedef struct {
@@ -72,13 +72,13 @@ extern int func_0029C6F0(int);
 int menu_page_update_count_stats(void)
 {
     int result = 0;
-    unsigned int flags = D_00138344;
+    unsigned int flags = g_menu_input_flags;
     if (flags & 0x10) {
         Statistics_2D2CE8 *stats = &g_progress_statistics;
         char *root;
         int value, status;
         if (stats->count < 0xffff) stats->count++;
-        if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
+        if (g_frame_counter > stats->maximum) stats->maximum = g_frame_counter;
         stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         root = g_pause_menu_state;
         value = *(int *)(*(char **)(root + 0x14) + 0xe0);
@@ -96,7 +96,7 @@ finish:
     if (flags & 0x900) {
         Statistics_2D2CE8 *stats = &g_progress_statistics;
         if (stats->count < 0xffff) stats->count++;
-        if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
+        if (g_frame_counter > stats->maximum) stats->maximum = g_frame_counter;
         stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         result = 1;
     } else func_0029C6F0(flags);

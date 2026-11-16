@@ -6,7 +6,7 @@ extern float FastAddRotations(float,float),math_fast_sin_or_cos_a(float),math_fa
 extern void *cam_moby_create(void *,int,int,int,void *,void *,void *,int,float,float);
 extern int snd_play_from_global_bank(int,int,int);
 extern struct {char pad[0x158];float angle;} g_active_camera __attribute__((nosda));
-extern float D_001AA030 __attribute__((sda));
+extern float g_debris_param __attribute__((sda));
 extern void moby_fade_out_update(unsigned char *);
 typedef struct { unsigned char threshold[16];float previous;} DamageThresholds;
 typedef struct {float current;short maximum;} DamageHealth;
@@ -47,7 +47,7 @@ int part_spawn_damage_debris(char *moby,DamageThresholds *thresholds,DamageHealt
                 velocity[1]=math_fast_sin_or_cos_b(throw_angle)*throw_speed;
                 velocity[2]=0;
                 velocity[2]=math_random_float_range(5.0f,8.0f)*0.01666666753590107f;
-                debris=cam_moby_create(moby,1,*(short *)(moby+0xaa),i,moby+0x10,moby+0xf0,velocity,255,D_001AA030,15.0f);
+                debris=cam_moby_create(moby,1,*(short *)(moby+0xaa),i,moby+0x10,moby+0xf0,velocity,255,g_debris_param,15.0f);
                 if(debris) *(void (**)(unsigned char *))((char *)debris+0x64)=moby_fade_out_update;
                 *(unsigned short *)(moby+0x7c)&=~part_bit;
                 if(!any_broke)snd_play_from_global_bank(7,0,0);

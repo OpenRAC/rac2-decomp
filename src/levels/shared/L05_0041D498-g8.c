@@ -19,9 +19,9 @@ typedef struct Moby_L05_0041D498 {
 } Moby_L05_0041D498;
 
 /* The moby of class 0xFBF, found once. */
-extern Moby_L05_0041D498 *D_L05_001B1348 __attribute__((sda));
+extern Moby_L05_0041D498 *g_glow_ring_target_moby __attribute__((sda));
 /* The head of the moby list. */
-extern Moby_L05_0041D498 *D_L05_001B2528;
+extern Moby_L05_0041D498 *g_moby_l05_list_head;
 
 extern Moby_L05_0041D498 *CreateMoby(int);
 extern void vec_clear_128(float *);
@@ -43,10 +43,10 @@ Moby_L05_0041D498 *pickup_spawn_homing_variant(Moby_L05_0041D498 *caller)
         qcopy(moby->position, caller->position);
         vec_clear_128(moby->rot);
         moby->rot[2] = math_random_angle();
-        if (D_L05_001B1348 == 0) {
-            for (other = D_L05_001B2528; other != 0; other = other->pChain) {
+        if (g_glow_ring_target_moby == 0) {
+            for (other = g_moby_l05_list_head; other != 0; other = other->pChain) {
                 if (other->oClass == 0xFBF /* moby class 4031 */)
-                    D_L05_001B1348 = other;
+                    g_glow_ring_target_moby = other;
             }
         }
         glow_l05_ring_init_state_2(moby);

@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern unsigned char D_001A7A33 MACRO_ADDR;
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern unsigned char g_contact_hit_flag MACRO_ADDR;
 extern unsigned char g_bolt_multiplier MACRO_ADDR;
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern float math_random_float_range(float, float);
@@ -11,8 +11,8 @@ extern u32 FastDecTimer(u8 *);
 extern int FloatToInt(float);
 extern void vec_scale_to_length(float *, float *, float);
 extern float FastVecDot(void *, void *);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
 extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 typedef int L04Quad __attribute__((mode(TI)));
@@ -51,39 +51,39 @@ extern u8 *ref_L04_00358868_00[];
 extern s32 FloatToInt(f32);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
-extern f32 D_002A7A40[];
-extern f32 D_002A7BC0[];
-extern s32 D_002A7D90[];
+extern f32 g_water_texture_coords[];
+extern f32 g_water_base_texture_coords[];
+extern s32 g_water_scroll_flags[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
 extern u32 FastDecTimer(u8 *ptr);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
 void *func_PAL_L04_00364D88(void *a0, void *a1, u32 a2, f32 f3) {
     L04Spawned *p = (L04Spawned *)(u32)part_alloc(0x5F);

@@ -22,13 +22,13 @@ extern int g_radial_slot_count;
 extern char **g_radial_menu_pages;
 extern int g_radial_menu_page_index __attribute__((sda));
 extern int g_notice_owner __attribute__((sda));
-extern char *D_001A8CFC __attribute__((sda));
+extern char *g_resident_data_base __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 extern int g_weapon_menu_slots[] MACRO_ADDR;
 extern int g_item_ammo_counts[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
 extern WheelWeaponRecord g_weapon_l00_table[];
-extern char D_001A8E28[];
+extern char g_str_ammo_format[];
 int func_PAL_0028D0C0(char *o)
 {
     float a,b;
@@ -47,13 +47,13 @@ int func_PAL_0028D0C0(char *o)
     hud_screen_position(o,&x,&y);
     for(;i<g_radial_slot_count;i++) {
         FastAddRotations(((float)i*2.0f*3.1415927f)/(float)g_radial_slot_count-3.1415927f,1.5707964f);
-        if(F(o,int,0x74)==i && F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && D_001A8CFC) {
+        if(F(o,int,0x74)==i && F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && g_resident_data_base) {
             float f=(float)(i+7);
             if(f>7.0f) f-=8.0f;
-            func_PAL_0034EF38(D_001A8CFC+0x376c8,1,f);
+            func_PAL_0034EF38(g_resident_data_base+0x376c8,1,f);
         }
-        if(F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && D_001A8CFC) {
-            char *p=D_001A8CFC+0x38000;
+        if(F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && g_resident_data_base) {
+            char *p=g_resident_data_base+0x38000;
             F(p,int,0x7a8c)=hud_is_open_done()?FloatToInt((float)alpha*0.5f):0;
         }
     }
@@ -66,7 +66,7 @@ int func_PAL_0028D0C0(char *o)
 
         if(record->active && record->sellsAmmo) {
             value=g_item_ammo_counts[n];
-            sprintf(buffer,D_001A8E28,value,record->ammoCapacity);
+            sprintf(buffer,g_str_ammo_format,value,record->ammoCapacity);
             {
                 unsigned int c;
                 if (value) c=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);

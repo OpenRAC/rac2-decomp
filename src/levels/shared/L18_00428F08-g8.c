@@ -6,36 +6,36 @@
 typedef struct { int q __attribute__((mode(TI))); } Vec4;
 
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_0013965E[];
+extern u8 g_hero_frame_flag[];
 extern u8 g_sound_state[];
 typedef union { u8 b[0x1000]; s16 h[0x800]; u16 uh[0x800]; s32 i[0x400]; u32 ui[0x400]; f32 f[0x400]; u8 *p[0x400]; } View;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *p[0x980]; } Hero;
 extern u8 g_hero_state[];
 extern u8 g_hero_position[];
 extern u8 g_subtitle_history[];
-extern u8 D_0019B2E8[];
-extern u8 D_0019B4A8[];
-extern u8 D_L18_001A8F20[] MACRO_ADDR;
-extern s32 D_L18_001AFBB0 MACRO_ADDR;
-extern float D_L18_001B1230 __attribute__((sda));
-extern float D_L18_001B1238 __attribute__((sda));
-extern s32 D_L18_001B1258 __attribute__((sda));
-extern s32 D_L18_001B125C __attribute__((sda));
-extern u16 D_L18_001B1260 __attribute__((sda));
-extern s32 D_L18_001B1274 __attribute__((sda));
-extern s32 D_L18_001B1278 __attribute__((sda));
-extern s32 D_L18_001B127C __attribute__((sda));
-extern s32 D_L18_001B1290 __attribute__((sda));
-extern float D_L18_001B1294 __attribute__((sda));
-extern float D_L18_001B1298 __attribute__((sda));
-extern float D_L18_001B129C __attribute__((sda));
-extern s32 D_L18_001B2564[] __attribute__((sda));
-extern u8 D_L18_001B2660[] MACRO_ADDR;
+extern u8 g_moby_group_flags[];
+extern u8 g_moby_nibble_table[];
+extern u8 g_explosion_effect_desc[] MACRO_ADDR;
+extern s32 g_hero_frozen_flag MACRO_ADDR;
+extern float g_receiver_aim_turn_rate __attribute__((sda));
+extern float g_receiver_aim_move_speed __attribute__((sda));
+extern s32 g_enemy_timer_min __attribute__((sda));
+extern s32 g_enemy_timer_max __attribute__((sda));
+extern u16 g_receiver_timer_reset __attribute__((sda));
+extern s32 g_receiver_delay_min __attribute__((sda));
+extern s32 g_receiver_delay_max __attribute__((sda));
+extern s32 g_receiver_delay_limit __attribute__((sda));
+extern s32 g_receiver_targeting_frames __attribute__((sda));
+extern float g_receiver_targeting_distance __attribute__((sda));
+extern float g_receiver_offset_height __attribute__((sda));
+extern float g_receiver_sway_angle __attribute__((sda));
+extern s32 g_door_trigger_flags[] __attribute__((sda));
+extern u8 g_map_flags_table[] MACRO_ADDR;
 extern s32 g_moby_l18_table MACRO_ADDR;
 extern Vec4 g_camera_l18_position[];
-extern u8 D_L18_0021DB40[][0x464];
-extern u8 D_L18_0021E7B0[][0x464];
-extern u8 D_L18_002571A0[];
+extern u8 g_trigger_flag_tables[][0x464];
+extern u8 g_trigger_l18_flags[][0x464];
+extern u8 g_receiver_flag_buffer[];
 
 extern s32 FastDecTimer(void *);
 extern void mem_clear(void *, u32, s32);
@@ -124,8 +124,8 @@ void receiver_bot_update(u8 *moby) {
             ((View *)vars)->h[0x392 / 2] = ((View *)vars)->b[0x398];
             if (((View *)vars)->i[0x368 / 4] != -1
                 && (((View *)vars)->i[0x3A4 / 4] == -1 || coll_point_inside_region(vars + 0x220, ((View *)vars)->i[0x3A4 / 4]) == 0)) {
-                if (**(s32 **)(vars + 0x3A8) == 0 && **(s32 **)(vars + 0x3AC) < D_L18_001B127C) {
-                    **(s32 **)(vars + 0x3A8) = math_random_int_range(D_L18_001B1274, D_L18_001B1278);
+                if (**(s32 **)(vars + 0x3A8) == 0 && **(s32 **)(vars + 0x3AC) < g_receiver_delay_limit) {
+                    **(s32 **)(vars + 0x3A8) = math_random_int_range(g_receiver_delay_min, g_receiver_delay_max);
                     moby_acquire_shared_resource(moby);
                     moby_set_state(moby, 1, 4);
                 }
@@ -142,7 +142,7 @@ void receiver_bot_update(u8 *moby) {
                 moby_set_state(moby, 3, 5);
             } else {
                 moby_set_anim(moby, ((View *)vars)->i[0x374 / 4], -1);
-                ((View *)vars)->h[0x390 / 2] = math_random_int_range(D_L18_001B1258, D_L18_001B125C);
+                ((View *)vars)->h[0x390 / 2] = math_random_int_range(g_enemy_timer_min, g_enemy_timer_max);
                 moby_set_state(moby, 3, 6);
             }
         }
@@ -153,13 +153,13 @@ void receiver_bot_update(u8 *moby) {
             ((View *)moby)->uh[0x34 / 2] &= ~1;
             path_find_best_point_by_id(camera_pos, moby + 0x10, g_hero_position, ((View *)vars)->i[0x368 / 4], 0.0f);
             moby_start_or_forward_anim(moby, 6, 0, 5.0f);
-            moby_aim_move_record_at_target(moby, camera_pos, D_L18_001B1238 * 0.0166666675f, D_L18_001B1230 * 0.000277777785f);
+            moby_aim_move_record_at_target(moby, camera_pos, g_receiver_aim_move_speed * 0.0166666675f, g_receiver_aim_turn_rate * 0.000277777785f);
             moby_set_state(moby, 5, 10);
         }
         break;
     case 5:
         if (((View *)vars)->i[0x234 / 4] == 1 && ((View *)vars)->h[0x390 / 2] == 0)
-            ((View *)vars)->h[0x390 / 2] = math_random_int_range(D_L18_001B1258, D_L18_001B125C);
+            ((View *)vars)->h[0x390 / 2] = math_random_int_range(g_enemy_timer_min, g_enemy_timer_max);
         break;
     case 6:
         if ((((View *)vars)->i[0x234 / 4] != 1 && ((View *)vars)->h[0x390 / 2] == 0)
@@ -170,8 +170,8 @@ void receiver_bot_update(u8 *moby) {
             moby_set_state(moby, 2, 2);
         } else if (((View *)vars)->b[0x3B0] == 0 && ((View *)vars)->i[0x368 / 4] != -1 && ((View *)vars)->i[0x3A4 / 4] != -1
                    && coll_point_inside_region(vars + 0x220, ((View *)vars)->i[0x3A4 / 4]) == 0
-                   && **(s32 **)(vars + 0x3A8) == 0 && **(s32 **)(vars + 0x3AC) < D_L18_001B127C) {
-            **(s32 **)(vars + 0x3A8) = math_random_int_range(D_L18_001B1274, D_L18_001B1278);
+                   && **(s32 **)(vars + 0x3A8) == 0 && **(s32 **)(vars + 0x3AC) < g_receiver_delay_limit) {
+            **(s32 **)(vars + 0x3A8) = math_random_int_range(g_receiver_delay_min, g_receiver_delay_max);
             moby_acquire_shared_resource(moby);
             moby_set_state(moby, 0, 4);
         }
@@ -183,7 +183,7 @@ void receiver_bot_update(u8 *moby) {
             SetDeathBits(moby, 0, 3);
             moby_set_state(moby, 12, -1);
         } else if (hit_flags & 2) {
-            ((View *)vars)->h[0x390 / 2] = math_random_int_range(D_L18_001B1258, D_L18_001B125C);
+            ((View *)vars)->h[0x390 / 2] = math_random_int_range(g_enemy_timer_min, g_enemy_timer_max);
             shooter_flag_group(moby, ((View *)moby)->b[0x21]);
             if (((View *)moby)->b[0xBC] == 1) {
                 moby_start_or_forward_anim(moby, 13, 0, 10.0f);
@@ -290,7 +290,7 @@ void receiver_bot_update(u8 *moby) {
                       mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((View *)moby)->f[0x10 / 4],
                                     ((Hero *)g_hero_state)->f[0x84 / 4] - ((View *)moby)->f[0x14 / 4]),
                       vars + 0x1B4, 0, ((View *)vars)->f[0x114 / 4], ((View *)vars)->f[0x118 / 4], ((View *)vars)->f[0x11C / 4]);
-        D_L18_001B2564[1] = 1;
+        g_door_trigger_flags[1] = 1;
         qcopy(camera_pos, g_camera_l18_position);
         ((Hero *)g_hero_state)->h[0x1DC / 2] = 5;
         ((Hero *)g_hero_state)->h[0x1E0 / 2] = 10;
@@ -300,25 +300,25 @@ void receiver_bot_update(u8 *moby) {
             saved_rot = ((View *)moby)->f[0xF8 / 4];
             if (((Hero *)g_hero_state)->b[0x22B4] == 4) {
                 if (g_current_map_index == 0x14)
-                    D_0013965E[0] = 1;
+                    g_hero_frame_flag[0] = 1;
                 hero_detach_from_object(1);
             }
             moby_reset_color_grey(moby);
             ((View *)moby)->b[0xBC] = 1;
             ((View *)vars)->i[0x13C / 4] = -1;
             ((View *)vars)->h[0x392 / 2] = 30;
-            mem_clear(D_L18_002571A0, 0, 0x50);
+            mem_clear(g_receiver_flag_buffer, 0, 0x50);
             hero_attach_to_object(4, 0x8D, moby);
             ((Hero *)g_hero_state)->f[0x98 / 4] = saved_rot;
             ((View *)moby)->f[0xF8 / 4] = saved_rot;
-            D_L18_001B2564[1] = 0;
+            g_door_trigger_flags[1] = 0;
             if (g_current_map_index == 0x13) {
                 if (((View *)g_subtitle_history)->uh[0x504 / 2] == 0)
                     subtitle_request_voice_line(0xA14, 0x6B);
                 else
                     ((View *)g_subtitle_history)->uh[0x504 / 2] = 0xFFFF;
             }
-            D_L18_001AFBB0 = 0;
+            g_hero_frozen_flag = 0;
             moby_set_state(moby, 7, 8);
             effect_index = ((View *)vars)->i[0x3F0 / 4];
             if (effect_index != -1) {
@@ -328,7 +328,7 @@ void receiver_bot_update(u8 *moby) {
             }
             ((View *)vars)->i[0x3F0 / 4] = -1;
         }
-        blend = 1.0f - IntToFloat(((View *)vars)->h[0x396 / 2]) / (float)D_L18_001B1290;
+        blend = 1.0f - IntToFloat(((View *)vars)->h[0x396 / 2]) / (float)g_receiver_targeting_frames;
         if (blend > 1.0f)
             blend = 1.0f;
         else if (blend < 0.0f)
@@ -336,16 +336,16 @@ void receiver_bot_update(u8 *moby) {
         FastVecSub(temp_vec, g_hero_position, moby + 0x10);
         *(Vec4 *)offset_vec = *(Vec4 *)temp_vec;
         offset_vec[2] = 0.0f;
-        vec_scale_to_length(offset_vec, offset_vec, D_L18_001B1294);
+        vec_scale_to_length(offset_vec, offset_vec, g_receiver_targeting_distance);
         add_vectors(temp_vec, offset_vec, moby + 0x10);
-        offset_vec[2] += D_L18_001B1298;
+        offset_vec[2] += g_receiver_offset_height;
         FastVecSub(temp_vec, camera_pos, offset_vec);
         *(Vec4 *)dir_vec = *(Vec4 *)temp_vec;
         vec_scale_to_length(dir_vec, dir_vec, ((View *)vars)->f[0x3B8 / 4] * IntToFloat(((View *)vars)->h[0x396 / 2]));
         add_vectors(temp_vec, dir_vec, offset_vec);
         angles[2] = mat_fast_helper_a(((View *)moby)->f[0x10 / 4] - dir_vec[0], ((View *)moby)->f[0x14 / 4] - dir_vec[1]);
         angles[1] = -mat_fast_helper_a(vec_distance_xy(dir_vec, moby + 0x10), ((View *)moby)->f[0x18 / 4] - dir_vec[2]);
-        angles[0] = D_L18_001B129C * (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(blend * 6.28318548f)) * 0.0174532942f);
+        angles[0] = g_receiver_sway_angle * (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(blend * 6.28318548f)) * 0.0174532942f);
         object_copy_vector_to_selected(dir_vec);
         cam_set_state_rotation(angles);
         if (((View *)moby)->b[0x95] == 8)
@@ -357,7 +357,7 @@ void receiver_bot_update(u8 *moby) {
         if ((((Hero *)g_hero_state)->b[0x22B4] != 4 || ((Hero *)g_hero_state)->p[0x2290 / 4] != moby) && ((View *)vars)->h[0x392 / 2] == 0) {
             if (((Hero *)g_hero_state)->b[0x22B4] != 4)
                 level_store_value_pair(0, 0);
-            D_L18_001AFBB0 = 0;
+            g_hero_frozen_flag = 0;
             ((View *)vars)->i[0x13C / 4] = ((View *)vars)->i[0x384 / 4];
             ((View *)vars)->i[0x37C / 4] = ((View *)vars)->i[0x360 / 4];
             ((View *)vars)->i[0x38C / 4] = -1;
@@ -366,7 +366,7 @@ void receiver_bot_update(u8 *moby) {
                           ((View *)vars)->f[0x3D4 / 4] * 4.84813745e-06f, ((View *)vars)->f[0x3D0 / 4] * 0.000290888245f);
             ((View *)moby)->uh[0x34 / 2] &= 0xFFBE;
             enemy_kind = enemy_get_kind_index(moby);
-            SpawnExplosionEffects(moby, D_L18_001A8F20, 0, 2.0f, (float)((View *)vars)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
+            SpawnExplosionEffects(moby, g_explosion_effect_desc, 0, 2.0f, (float)((View *)vars)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
                           enemy_kind, 0.0f, 1, 1, -2, 0, 0x850001);
             moby_set_state(moby, 11, -1);
         }
@@ -381,7 +381,7 @@ void receiver_bot_update(u8 *moby) {
     case 2:
         moby_step_at_own_position(moby);
         if (((View *)vars)->h[0x392 / 2] == 0) {
-            ((View *)vars)->h[0x392 / 2] = D_L18_001B1260;
+            ((View *)vars)->h[0x392 / 2] = g_receiver_timer_reset;
             moby_start_or_forward_anim(moby, 2, 0, 10.0f);
             moby_set_state(moby, 4, -1);
         }
@@ -427,7 +427,7 @@ void receiver_bot_update(u8 *moby) {
         break;
     case 12:
         enemy_kind = enemy_get_kind_index(moby);
-        SpawnExplosionEffects(moby, D_L18_001A8F20, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
+        SpawnExplosionEffects(moby, g_explosion_effect_desc, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
                       enemy_kind, 15.0f, 1, 1, -1, 0, 0x810001);
     case 11: {
         u16 slot_bits;
@@ -437,20 +437,20 @@ void receiver_bot_update(u8 *moby) {
         moby_release_shared_resource(moby);
         slot_bits = ((View *)moby)->uh[0xB2 / 2];
         if (slot_bits & 1) {
-            u8 *slot_flags = D_0019B4A8 + (((s16)slot_bits >> 1) + (g_current_map_index << 10));
+            u8 *slot_flags = g_moby_nibble_table + (((s16)slot_bits >> 1) + (g_current_map_index << 10));
             if (((*slot_flags >> 4) & 7) != 7)
                 *slot_flags += 0x10;
         } else {
-            u8 *slot_flags = D_0019B4A8 + (((s16)slot_bits >> 1) + (g_current_map_index << 10));
+            u8 *slot_flags = g_moby_nibble_table + (((s16)slot_bits >> 1) + (g_current_map_index << 10));
             if ((*slot_flags & 7) != 7)
                 *slot_flags += 1;
         }
-        D_L18_0021DB40[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
-        if (((View *)moby)->b[0xB0] == 0xFF || (!(D_L18_001B2660[((View *)moby)->b[0xB0]] & 0x80) && (D_0019B2E8[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80)))
-            D_L18_0021E7B0[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
+        g_trigger_flag_tables[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
+        if (((View *)moby)->b[0xB0] == 0xFF || (!(g_map_flags_table[((View *)moby)->b[0xB0]] & 0x80) && (g_moby_group_flags[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80)))
+            g_trigger_l18_flags[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
         state_flags = ((View *)vars)->b[0x3B1];
         if (state_flags != 0 && state_flags != 0xFE
-            && (((View *)moby)->b[0xB0] == 0xFF || !(D_0019B2E8[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80))) {
+            && (((View *)moby)->b[0xB0] == 0xFF || !(g_moby_group_flags[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80))) {
             moby_wake_linked_enemy(moby);
         } else {
             moby_mark_spawned(moby);

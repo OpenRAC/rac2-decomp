@@ -5,7 +5,7 @@
 extern s32 FloatToInt(f32 value);
 extern void vec_scale_to_length(void *out, void *in, f32 scale);
 extern void FastVecAdd(void *out, void *a, void *b);
-extern void func_PAL_L11_0039A880(void *moby);
+extern void part_spawn_particle_burst_pal(void *moby);
 extern void moby_set_state(void *moby, s32 state, s32 arg);
 extern void moby_mark_spawned(void *moby);
 extern void gfx_add_draw_callback_third(void (*callback)(void *), void *moby);
@@ -14,14 +14,14 @@ extern s32 FastTweenColor(s32 from, s32 to, f32 t);
 extern f32 IntToFloat(s32 value);
 extern void gfx_draw_random_ribbon(void *moby);
 extern void gfx_draw_facing_quad(void *moby);
-extern f32 D_L11_001AEC60 __attribute__((sda));
-extern f32 D_L11_001AEC64 __attribute__((sda));
-extern s32 D_L11_001AEC68 __attribute__((sda));
-extern s32 D_L11_001AEC6C __attribute__((sda));
+extern f32 g_glow_start_scale __attribute__((sda));
+extern f32 g_glow_end_scale __attribute__((sda));
+extern s32 g_glow_grow_frames __attribute__((sda));
+extern s32 g_glow_fade_frames __attribute__((sda));
 /* Three words interpolated pairwise by func_00283D38. Declared as an incomplete sda array:
    element 0 is a one-instruction load (retail's GP form in a call's delay slot), elements 1
    and 2 are constant-offset macro loads that stay out of delay slots and assemble absolute. */
-extern s32 D_L11_001AEC78[] __attribute__((sda));
+extern s32 g_glow_colors[] __attribute__((sda));
 
 typedef struct {
     u8 pad00[0x10];
@@ -65,16 +65,16 @@ void func_PAL_L11_0039A270(u8 *obj) {
         ctx->target->modeBits |= 8;
         ctx->target->modeBits |= 2;
         ctx->curExtent = 0;
-        func_PAL_L11_0039A880(obj);
+        part_spawn_particle_burst_pal(obj);
         moby_set_state(obj, 1, -1);
         break;
     case 1:
         if (flag_set_first_pending(obj)) {
             vec_scale_to_length(ctx, ctx->target->points[ctx->point], ctx->speed * 0.020000001f);
             {
-                f32 delta = D_L11_001AEC64 - D_L11_001AEC60;
-                f32 step = delta / (f32)D_L11_001AEC68;
-                ctx->scale = D_L11_001AEC60;
+                f32 delta = g_glow_end_scale - g_glow_start_scale;
+                f32 step = delta / (f32)g_glow_grow_frames;
+                ctx->scale = g_glow_start_scale;
                 ctx->scaleStep = step;
             }
             ctx->target->modeBits &= 0xFFFE;
@@ -83,26 +83,26 @@ void func_PAL_L11_0039A270(u8 *obj) {
         FastVecAdd(ctx->target->pos, ctx->target->pos, ctx);
         vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        t = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC68) * 5 + 2) / 6);
+        t = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(g_glow_grow_frames) * 5 + 2) / 6);
         ctx->target->alpha = FloatToInt(t * 128.0f);
         ctx->curExtent = ctx->extent * t;
-        ctx->color = FastTweenColor(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
-        if (*(u16 *)(obj + 0x96) > (((int)(D_L11_001AEC68) * 5 + 2) / 6))
+        ctx->color = FastTweenColor(g_glow_colors[0], g_glow_colors[1], t);
+        if (*(u16 *)(obj + 0x96) > (((int)(g_glow_grow_frames) * 5 + 2) / 6))
             moby_set_state(obj, 2, -1);
         break;
     case 2: {
         f32 fade;
         if (flag_set_first_pending(obj)) {
-            ctx->scaleStep = (ctx->scale - 1.0f) / (f32)D_L11_001AEC6C;
+            ctx->scaleStep = (ctx->scale - 1.0f) / (f32)g_glow_fade_frames;
             ctx->target->alpha = 0x80;
             ctx->target->modeBits &= 0xFFF7;
         }
         vec_scale_to_length(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
         ctx->scale += ctx->scaleStep;
-        fade = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(D_L11_001AEC6C) * 5 + 2) / 6);
+        fade = IntToFloat(*(u16 *)(obj + 0x96)) / (f32)(((int)(g_glow_fade_frames) * 5 + 2) / 6);
         ctx->curExtent = ctx->extent + -ctx->extent * fade;
-        ctx->color = FastTweenColor(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
-        if (((int)((*(u16 *)(obj + 0x96) > (((int)(D_L11_001AEC6C) * 5 + 2) / 6))) * 5 + 2) / 6) {
+        ctx->color = FastTweenColor(g_glow_colors[1], g_glow_colors[2], fade);
+        if (((int)((*(u16 *)(obj + 0x96) > (((int)(g_glow_fade_frames) * 5 + 2) / 6))) * 5 + 2) / 6) {
             ctx->target->modeBits = ctx->savedModeBits;
             ctx->target->modeBits &= 0xFFFE;
             ctx->target->drawn = 1;

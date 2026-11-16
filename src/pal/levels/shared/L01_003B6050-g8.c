@@ -5,29 +5,29 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 extern int math_fast_float_d(char *);
 extern char g_hero_state[];
 extern void CalculateAimedLaunchVelocity(void *, void *, int, int, float, float, float, float);
-extern int func_PAL_002FF5F8(void *, void *, void *, void *, void *, char **, int *, float);
+extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, void *, char **, int *, float);
 extern int weapon_get_group(int);
 extern void moby_get_facing_direction(void *, void *);
 extern float FastVecDot(void *, void *);
 extern int weapon_spend_ammo(int, int);
 extern int ForceClaimNotice(int, int, int);
 extern void func_PAL_L00_002AF458(void);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern int PlayMobySound(int, int, void *);
 extern char *spider_bot_spawn(void *, void *);
 extern void ref_L00_003B7D48_00(void (*)(void *), void *);
-extern void func_PAL_L00_003BBD00(void *);
+extern void helper_update_hit_test_pal(void *);
 typedef struct OBJ2 {
     char pad0[0x28];
     int f28;
     char pad1[0x68 - 0x2C];
     struct OBJ2 *f68;
 } OBJ2;
-extern OBJ2 *D_L00_001AFBC0 __attribute__((sda));
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001A8F08 MACRO_ADDR;
-extern int D_L00_001A8FF4 MACRO_ADDR;
-extern int D_00138324 NOT_SDA;
+extern OBJ2 *g_active_pickup_object __attribute__((sda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern int g_input_lock_state MACRO_ADDR;
+extern int g_hero_action_blocked_flag MACRO_ADDR;
+extern int g_pad_held_flags NOT_SDA;
 
 void func_PAL_L01_003B6050(char *m) {
     float pos[4], sweep_storage[4], normal[4];
@@ -42,18 +42,18 @@ void func_PAL_L01_003B6050(char *m) {
         char *g = g_hero_state;
 
         if (*(int *)(g + 0x1244) == 3)
-            D_L00_001AFBC0 = 0;
+            g_active_pickup_object = 0;
         moby_transform_joint_to_world(m, 0, pos);
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
         CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.16000001f, 0.0044f);
     }
-    *(int *)(d + 0x24) = func_PAL_002FF5F8(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.0044f);
+    *(int *)(d + 0x24) = coll_trace_projectile_to_impact_pal(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.0044f);
     result = weapon_get_group(aux);
-    if (D_L00_001A8F00 || D_L00_001A8F08 != -2)
+    if (g_game_l00_mode || g_input_lock_state != -2)
         *(int *)(d + 0x2C) = 1;
-    if (D_L00_001A8FF4 && *(float *)(d + 8) < 462.42999267578125f)
+    if (g_hero_action_blocked_flag && *(float *)(d + 8) < 462.42999267578125f)
         *(int *)(d + 0x2C) = 1;
     if (result || !*(int *)(d + 0x24) || !*(int *)(d + 0x28))
         goto blocked;
@@ -88,7 +88,7 @@ timer:
     }
     switch (*(unsigned char *)(m + 0x20)) {
     case 0:
-        D_L00_001AFBC0 = (OBJ2 *)m;
+        g_active_pickup_object = (OBJ2 *)m;
         *(unsigned char *)(m + 0x20) = 1;
         *(int *)(d + 0x28) = 1;
         *(int *)(d + 0x24) = 0;
@@ -96,7 +96,7 @@ timer:
     case 1: {
         char *g = g_hero_state;
 
-        if ((D_00138324 & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
+        if ((g_pad_held_flags & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
             !*(int *)(d + 0x2C) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;
@@ -118,7 +118,7 @@ timer:
             if (p)
                 *(char **)(p + 0xB8) = m;
             PlayMobySound(1, 0, m);
-            func_PAL_L00_002AF6C0();
+            cancel_hero_item_animation_pal();
             *(unsigned char *)(m + 0x20) = 3;
             *(int *)(d + 0x20) = 4;
         }
@@ -128,5 +128,5 @@ timer:
             *(unsigned char *)(m + 0x20) = 1;
         break;
     }
-    ref_L00_003B7D48_00(func_PAL_L00_003BBD00, m);
+    ref_L00_003B7D48_00(helper_update_hit_test_pal, m);
 }

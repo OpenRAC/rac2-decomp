@@ -10,9 +10,9 @@ typedef struct {
     float f[2];
 } L02Pair2;
 
-extern L02Pair2 D_L02_001AFE20;
-extern L02Pair D_L02_001AFE28;
-extern L02Pair D_L02_001AFE30;
+extern L02Pair2 g_glow_turn_pair;
+extern L02Pair g_glow_low_pair;
+extern L02Pair g_glow_high_pair;
 
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
@@ -33,9 +33,9 @@ typedef struct {
 void part_update_pulsing_glow_tint(L02Owner *self)
 {
     char *state = self->state;
-    L02Pair2 turn = D_L02_001AFE20;
-    L02Pair low = D_L02_001AFE28;
-    L02Pair high = D_L02_001AFE30;
+    L02Pair2 turn = g_glow_turn_pair;
+    L02Pair low = g_glow_low_pair;
+    L02Pair high = g_glow_high_pair;
     float *angle = (float *)(state + 0x128);
     float *step = turn.f;
     int i;

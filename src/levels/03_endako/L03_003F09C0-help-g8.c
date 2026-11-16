@@ -20,7 +20,7 @@ typedef union {
     u8 bytes[0xA3];
     struct { u8 pad[0x78]; unsigned char bit0:1; unsigned char other:7; } bits;
 } Flags;
-extern Flags D_001395B8;
+extern Flags g_game_flag_table;
 typedef struct { u8 pad00[0x70]; u32 field70; u8 pad74[0x7C]; u16 fieldF0; u16 padF2; u32 fieldF4; } HelpState;
 extern HelpState g_progress_statistics;
 /* Subtitle history records: count, last frame, and per-level flags. */
@@ -29,20 +29,20 @@ extern SubtitleHistory g_subtitle_history[];
 typedef struct {
     int active; u8 pad04[0x20]; int key; int type;
 } VoiceState;
-extern VoiceState D_L03_00282078;
-extern u8 D_L03_001BFB80[];
-extern u8 *D_L03_001B2B0C[] __attribute__((sda));
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u16 *D_L03_001FB5A0[];
-extern int D_L03_001B2A38 __attribute__((sda));
-extern int D_L03_001B0F20 __attribute__((sda));
-extern u32 D_001A7390[] __attribute__((sda));
+extern VoiceState g_help_voice_state;
+extern u8 g_str_clank_scene_key[];
+extern u8 *g_linked_effect_records[] __attribute__((sda));
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u16 *g_entity_id_lists[];
+extern int g_object_group_count __attribute__((sda));
+extern int g_help_voice_draw_flag __attribute__((sda));
+extern u32 g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index;
 extern int g_frame_l03_counter __attribute__((nosda));
 /* The published map identifies the persistent save block at this base. */
 typedef struct { u8 pad00[0x12]; u8 field12; u8 pad13[0xFA]; u8 mapDataSet; u8 pad10E[0xD804 - 0x10E]; } PlayerProgress;
 extern PlayerProgress g_player_bolts __attribute__((sda));
-extern u8 D_001A7BED[] __attribute__((sda));
+extern u8 g_help_voice_suppress_flags[] __attribute__((sda));
 extern void state_set_flag_one(void);
 extern void hero_reset_position_and_direction(void *,void *,int,int);
 extern int moby_handle_request_slot_state(int);
@@ -74,18 +74,18 @@ void endako_help_voice_update(u8 *entity) {
         entity[0x30] = 0xFF;
         I(state,0x74) = 0;
         if (g_player_bolts.mapDataSet) {
-            if (!D_001395B8.bytes[0xD]) {
+            if (!g_game_flag_table.bytes[0xD]) {
                 u8 *entry;
                 state_set_flag_one();
-                entry = D_L03_001B2B0C[0] + I(state,0x70)*0x80;
+                entry = g_linked_effect_records[0] + I(state,0x70)*0x80;
                 hero_reset_position_and_direction(entry+0x30,entry+0x70,0,1);
                 moby_handle_request_slot_state(13);
             }
             if (g_player_bolts.mapDataSet) {
-                for(p=D_L03_001FB5A0[I(state,0x80)];
-                    (I(state,0x80)&255)!=255 && I(state,0x80)<=D_L03_001B2A38 && p &&
-                    ((p != 0 && (short)p[-1]>=0) || p==D_L03_001FB5A0[I(state,0x80)]); p++) {
-                    record = D_L03_001B2A1C[0] + ((*p&0x7fff)<<8);
+                for(p=g_entity_id_lists[I(state,0x80)];
+                    (I(state,0x80)&255)!=255 && I(state,0x80)<=g_object_group_count && p &&
+                    ((p != 0 && (short)p[-1]>=0) || p==g_entity_id_lists[I(state,0x80)]); p++) {
+                    record = g_moby_record_base[0] + ((*p&0x7fff)<<8);
                     if(!record) break;
                     moby_mark_spawned(record);
                 }
@@ -94,11 +94,11 @@ void endako_help_voice_update(u8 *entity) {
         moby_set_state(entity,1,-1);
         break;
     case 1:
-        if (!D_001395B8.bytes[0xD] && IsPointInCuboid(g_hero_state.position,I(state,0x6C)))
-            D_001395B8.bytes[0xD] = mode;
-        if (!D_001395B8.bytes[9] && IsPointInCuboid(g_hero_state.position,I(state,0x4C)) && req_push_queue(D_L03_001BFB80,0x34)) {
-            req_launch_queued(D_L03_001BFB80);
-            D_001395B8.bytes[9]=1;
+        if (!g_game_flag_table.bytes[0xD] && IsPointInCuboid(g_hero_state.position,I(state,0x6C)))
+            g_game_flag_table.bytes[0xD] = mode;
+        if (!g_game_flag_table.bytes[9] && IsPointInCuboid(g_hero_state.position,I(state,0x4C)) && req_push_queue(g_str_clank_scene_key,0x34)) {
+            req_launch_queued(g_str_clank_scene_key);
+            g_game_flag_table.bytes[9]=1;
             game_set_stored_value_pair(endako_boss_start_area_objects,entity);
         }
         if (!g_hero_state.field22B4 && IsPointInCuboid(g_hero_state.position,I(state,8))) {
@@ -109,39 +109,39 @@ void endako_help_voice_update(u8 *entity) {
         } else if (IsPointInCuboid(g_hero_state.position,I(state,0xC))) {
             if(g_subtitle_history[34].count!=65535) {
                 g_subtitle_history[34].count=65535;
-                if (D_L03_00282078.active || D_L03_00282078.key!=-1) {
-                    if (D_L03_00282078.type==0x22) subtitle_begin_close();
+                if (g_help_voice_state.active || g_help_voice_state.key!=-1) {
+                    if (g_help_voice_state.type==0x22) subtitle_begin_close();
                 }
             }
         }
-        if(IsPointInCuboid(g_hero_state.position,I(state,0x10)) && !D_L03_00282078.active && D_L03_00282078.key==-1) {
-            u32 now = D_001A7390[0], prev = g_subtitle_history[35].time;
+        if(IsPointInCuboid(g_hero_state.position,I(state,0x10)) && !g_help_voice_state.active && g_help_voice_state.key==-1) {
+            u32 now = g_frame_counter[0], prev = g_subtitle_history[35].time;
             if (now - prev > 120) {
                 subtitle_request_voice_line(0x9CC,0x23);
-                if (g_subtitle_history[35].time < D_001A7390[0]) g_subtitle_history[35].time = D_001A7390[0];
+                if (g_subtitle_history[35].time < g_frame_counter[0]) g_subtitle_history[35].time = g_frame_counter[0];
             } else {
                 if (prev < now) g_subtitle_history[35].time = now;
             }
         } else if(IsPointInCuboid(g_hero_state.position,I(state,0x14))) {
             if(g_subtitle_history[35].count!=65535) {
                 g_subtitle_history[35].count=65535;
-                if(D_L03_00282078.active || D_L03_00282078.key!=-1) subtitle_begin_close();
+                if(g_help_voice_state.active || g_help_voice_state.key!=-1) subtitle_begin_close();
             }
         }
         if(IsPointInCuboid(g_hero_state.position,I(state,0x18))) {
-            if(D_001A7390[0]-g_subtitle_history[36].time>2400) subtitle_request_voice_line(0x9CD,0x24);
+            if(g_frame_counter[0]-g_subtitle_history[36].time>2400) subtitle_request_voice_line(0x9CD,0x24);
         } else if(IsPointInCuboid(g_hero_state.position,I(state,0x1C))) {
-            D_001395B8.bytes[0xA2]=1;
+            g_game_flag_table.bytes[0xA2]=1;
             g_subtitle_history[36].count=65535;
-            if(D_L03_00282078.active || D_L03_00282078.key!=-1) subtitle_begin_close();
+            if(g_help_voice_state.active || g_help_voice_state.key!=-1) subtitle_begin_close();
         }
         if(IsPointInCuboid(g_hero_state.position,I(state,0x64)) && !g_subtitle_history[123].count) {
-            D_001395B8.bytes[0xA2]=1;
+            g_game_flag_table.bytes[0xA2]=1;
             subtitle_request_voice_line(0xA24,0x7B);
         }
         TriggerSubtitleInCuboid(0x9D3,0x2A,0,I(state,0x20),-1);
-        if(IsPointInCuboid(g_hero_state.position,I(state,0x24)) && ((D_001395B8.bytes[0x78] ^ 1) & 1)) {
-            u32 now=D_001A7390[0], prev=g_subtitle_history[131].time;
+        if(IsPointInCuboid(g_hero_state.position,I(state,0x24)) && ((g_game_flag_table.bytes[0x78] ^ 1) & 1)) {
+            u32 now=g_frame_counter[0], prev=g_subtitle_history[131].time;
             if(now-prev>1080 || !prev) subtitle_request_voice_line(0xA2C,0x83);
             else if(prev<now) g_subtitle_history[131].time=now;
         }
@@ -162,23 +162,23 @@ void endako_help_voice_update(u8 *entity) {
         TriggerSubtitleInCuboid(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
         TriggerSubtitleInCuboid(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
         if(IsPointInCuboid(g_hero_state.position,I(state,0x7C))) {
-            if(!g_progress_statistics.fieldF0 || D_001A7390[0]-g_progress_statistics.fieldF4>72000) {
+            if(!g_progress_statistics.fieldF0 || g_frame_counter[0]-g_progress_statistics.fieldF4>72000) {
                 u32 seen = g_subtitle_history[32].levels & (1 << g_current_map_index);
                 if (!seen) subtitle_request_voice_line(0x9C9,0x20);
             }
         }
-        if(!g_player_bolts.field12 && g_frame_l03_counter>0 && !(g_frame_l03_counter&0x7F) && !D_001A7BED[0] && !level_count_active_entries()) {
+        if(!g_player_bolts.field12 && g_frame_l03_counter>0 && !(g_frame_l03_counter&0x7F) && !g_help_voice_suppress_flags[0] && !level_count_active_entries()) {
             u32 count = g_subtitle_history[138].count;
             if (count < 3) {
                 if (!count && IsPointInCuboid(g_hero_state.position,I(state,0x78))) subtitle_request_voice_line(0xA33,0x8A);
-                else if (D_001A7390[0] - g_subtitle_history[138].time > 36000) subtitle_request_voice_line(0xA33,0x8A);
+                else if (g_frame_counter[0] - g_subtitle_history[138].time > 36000) subtitle_request_voice_line(0xA33,0x8A);
             }
         }
-        if(D_001A7390[0]-g_progress_statistics.field70>108000 && IsPointInCuboid(g_hero_state.position,I(state,0x78))) {
+        if(g_frame_counter[0]-g_progress_statistics.field70>108000 && IsPointInCuboid(g_hero_state.position,I(state,0x78))) {
             u32 seen = g_subtitle_history[12].levels & (1 << g_current_map_index);
             if (!seen) subtitle_request_voice_line(0x9B5,0xC);
         }
         break;
     }
-    if(D_L03_001B0F20) gfx_add_draw_callback_first(blast_call_helper_no_args,entity);
+    if(g_help_voice_draw_flag) gfx_add_draw_callback_first(blast_call_helper_no_args,entity);
 }

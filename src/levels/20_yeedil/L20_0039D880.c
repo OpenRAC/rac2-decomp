@@ -15,7 +15,7 @@ extern int snd_play_from_global_bank(int, int, int);
 extern void moby_mark_spawned(void *);
 extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_fade_out_update(unsigned char *);
-extern char D_L20_001B9E80[];
+extern char g_hero_l20_extra_state[];
 
 /* Drops pieces off the trooper as its health falls, and removes its parts when it is out of health. */
 void SpawnHealthThresholdEffects(char *self) {
@@ -36,7 +36,7 @@ void SpawnHealthThresholdEffects(char *self) {
         float fraction;
         fraction = health / maximum;
         threshold = FloatToInt(fraction * 255.0f) & 0xFF;
-        global = D_L20_001B9E80;
+        global = g_hero_l20_extra_state;
         callback = moby_fade_out_update;
         for (i = 0; i < 10; i++) {
             if ((unsigned int)(i - 4) < 2) continue;

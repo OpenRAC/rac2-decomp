@@ -16,8 +16,8 @@ extern int FloatToInt(float);
 extern int FastTweenColor(int, int, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern void vec_add_random_offset(void *, float);
-extern int D_L02_001B2410[2] __attribute__((sda));
-extern int D_L02_001B2418[2] __attribute__((sda));
+extern int g_spark_fan_colors_a[2] __attribute__((sda));
+extern int g_spark_fan_colors_b[2] __attribute__((sda));
 
 /* Throws a fan of thirty sparks out in front of the object, each with its own speed, size and colour. */
 void part_throw_spark_fan(u8 *moby, float lo, float hi) {
@@ -55,8 +55,8 @@ void part_throw_spark_fan(u8 *moby, float lo, float hi) {
         pull[2] = -k * (float)(partA + partB + partC);
         FastVecAdd(pull, pull, velocity);
         pull[3] = 0.01f;
-        colorA = FastTweenColor(D_L02_001B2410[0], D_L02_001B2410[1], math_random_float_range(0.0f, 1.0f));
-        colorB = FastTweenColor(D_L02_001B2418[0], D_L02_001B2418[1], math_random_float_range(0.0f, 1.0f));
+        colorA = FastTweenColor(g_spark_fan_colors_a[0], g_spark_fan_colors_a[1], math_random_float_range(0.0f, 1.0f));
+        colorB = FastTweenColor(g_spark_fan_colors_b[0], g_spark_fan_colors_b[1], math_random_float_range(0.0f, 1.0f));
         *(TI128 *)sparkPos = *(TI128 *)origin;
         vec_add_random_offset(sparkPos, 0.25f);
         part_spawn_trail(sparkPos, velocity, pull, colorA, colorB, partA, partB, partC, 0x1003C);

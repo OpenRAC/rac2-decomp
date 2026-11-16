@@ -9,15 +9,15 @@ typedef unsigned short u16;
 typedef short s16;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern unsigned int D_L18_001FB320[];
+extern unsigned int g_condition_target_lists[];
 extern char *g_moby_l18_table;
 extern char *D_L18_001B281C_sda __attribute__((sda));
-extern int D_L18_001B2838 __attribute__((sda));
-extern const unsigned short D_L18_001B125C __attribute__((sda));
-extern int D_L18_001B2348;
-extern char D_L18_002C0A90[];
+extern int g_max_l18_group_index __attribute__((sda));
+extern const unsigned short g_enemy_timer_max __attribute__((sda));
+extern int g_frame_l18_counter;
+extern char g_str_spawner_debug[];
 extern char g_hero_position[];
-extern char *D_001FE480[];
+extern char *g_path_pointer_table[];
 
 extern void STUB_printf(char *fmt, int a1, int a2);
 extern float path_find_best_point_by_id(void *a0, void *a1, void *a2, int a3, float f12);
@@ -40,18 +40,18 @@ void spawner_activate_nearest_enemy(u8 *obj)
 
     if (*(int *)(vars + 0x378) == -1) {
         if (*(int *)(vars + 0x368) == -1) {
-            STUB_printf(D_L18_002C0A90, *(s16 *)(obj + 0xB2), D_L18_001B2348);
+            STUB_printf(g_str_spawner_debug, *(s16 *)(obj + 0xB2), g_frame_l18_counter);
         } else {
             path_find_best_point_by_id(targetPoint, obj + 0x10, g_hero_position, *(int *)(vars + 0x368), 0.0f);
             foundPoint = 1;
         }
     } else {
-        *(TI128 *)targetPoint = *(TI128 *)(D_001FE480[*(int *)(vars + 0x378)] + 0x10);
+        *(TI128 *)targetPoint = *(TI128 *)(g_path_pointer_table[*(int *)(vars + 0x378)] + 0x10);
     }
 
-    listEntry = (u16 *)D_L18_001FB320[obj[0x21]];
-    while (obj[0x21] != 0xFF && obj[0x21] <= D_L18_001B2838 && listEntry != 0 &&
-           ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == (u16 *)D_L18_001FB320[obj[0x21]])) {
+    listEntry = (u16 *)g_condition_target_lists[obj[0x21]];
+    while (obj[0x21] != 0xFF && obj[0x21] <= g_max_l18_group_index && listEntry != 0 &&
+           ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == (u16 *)g_condition_target_lists[obj[0x21]])) {
         candidate = (u8 *)(g_moby_l18_table + ((*listEntry & 0x7FFF) << 8));
         if (candidate == 0)
             break;
@@ -70,7 +70,7 @@ void spawner_activate_nearest_enemy(u8 *obj)
         bestObject[0x31] = 1;
         *(u16 *)(bestObject + 0x34) &= 0xFFFE;
         bestState = *(u8 **)(bestObject + 0x68);
-        timerValue = D_L18_001B125C;
+        timerValue = g_enemy_timer_max;
         *(int *)(bestState + 0x36C) = *(int *)(vars + 0x36C);
         *(int *)(bestState + 0x370) = *(int *)(vars + 0x370);
         *(int *)(bestState + 0x374) = *(int *)(vars + 0x374);

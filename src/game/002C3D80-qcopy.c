@@ -31,7 +31,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned char *D_001F2648;
+extern unsigned char *g_part_tex_puff_table;
 
 /* Spawns a puff particle at position drifting outward in a random direction;
    colour -1 picks a random grey. */
@@ -50,9 +50,9 @@ Particle_002C3D80 *part_spawn_puff(TI128 *position, int colour, float scale, flo
         p->unk03 = 0x48;
         p->unk01 = 1;
         if (math_random_int_below(0x100) & 1)
-            p->unk02 = D_001F2648[0];
+            p->unk02 = g_part_tex_puff_table[0];
         else
-            p->unk02 = D_001F2648[1];
+            p->unk02 = g_part_tex_puff_table[1];
         p->unk08 = func_001163B0();
         p->unk0A = 4;
         p->unk0C = scale * 210000.0f;

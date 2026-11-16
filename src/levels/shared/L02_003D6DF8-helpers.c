@@ -11,10 +11,10 @@ extern void moby_find_nearby_record(char *);
 extern void moby_update_attached_transforms(void *, void *);
 
 /* The level's own rate, read $gp-relative. */
-extern float D_L02_001B0380 __attribute__((sda));
+extern float g_platform_rotation_speed_degrees __attribute__((sda));
 
 /* Integer duration counter: readers use integer loads; this store is absolute. */
-extern int D_L02_001B3FD8 NOT_SDA;
+extern int g_snd_emitter_cooldown NOT_SDA;
 
 /* Sets up a moving platform when it first appears: sets its turn speed, its timer and its starting state. */
 void platform_init(char *moby_arg) {
@@ -31,12 +31,12 @@ void platform_init(char *moby_arg) {
     *(unsigned short *)(moby + 0x34) &= 0xEFFF;
     moby_set_state((u8 *)moby, 2, -1);
     rotation[1] = 0;
-    *(float *)&rotation[1] = D_L02_001B0380 * 0.0002908882452175021f;
+    *(float *)&rotation[1] = g_platform_rotation_speed_degrees * 0.0002908882452175021f;
     rotation[0] = rotation[1];
     euler_rotation_basis((char *)(vars + 0x80), (char *)&rotation[0]);
-    seconds = 180.0f / D_L02_001B0380;
+    seconds = 180.0f / g_platform_rotation_speed_degrees;
     *(unsigned short *)(moby + 0x34) |= 0x100;
-    D_L02_001B3FD8 = (int)(seconds * 60.0f);
+    g_snd_emitter_cooldown = (int)(seconds * 60.0f);
     moby_find_nearby_record(moby);
     moby_update_attached_transforms(moby, vars + 0x30);
     *(int *)(vars + 0xBC) = 0;

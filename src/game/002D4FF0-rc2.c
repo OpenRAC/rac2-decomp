@@ -24,23 +24,23 @@
  */
 #include "common.h"
 
-extern s32 D_001ABAA0 __attribute__((sda));
-extern s32 D_001AAA38 __attribute__((sda));
-extern s8 D_0025B9C0[];
-extern s8 D_0025BA80[];
+extern s32 g_choice_slide_choice __attribute__((sda));
+extern s32 g_choice_slide_values __attribute__((sda));
+extern s8 g_menu_choice_number_source[];
+extern s8 g_menu_choice_counter[];
 
 /* Sets the given menu item to show the current choice and starts it sliding in from the side when the choice changed, then moves on to the next choice. */
 s32 menu_choice_slide_init(s32 display) {
     s32 choice_number;
     s32 byte_offset;
 
-    choice_number = *(s32 *)D_0025B9C0;
-    if (D_001ABAA0 != choice_number) {
+    choice_number = *(s32 *)g_menu_choice_number_source;
+    if (g_choice_slide_choice != choice_number) {
         (*(s32 *)((s8 *)(display) + (0x3C))) = -0x2BC;
-        D_001ABAA0 = choice_number;
+        g_choice_slide_choice = choice_number;
     }
     byte_offset = choice_number * 4;
-    (*(s32 *)((s8 *)(display) + (0x34))) = *(s32 *)((s8 *)&D_001AAA38 + byte_offset);
-    *(s32 *)D_0025BA80 = choice_number + 1;
+    (*(s32 *)((s8 *)(display) + (0x34))) = *(s32 *)((s8 *)&g_choice_slide_values + byte_offset);
+    *(s32 *)g_menu_choice_counter = choice_number + 1;
     return 0;
 }

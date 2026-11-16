@@ -16,13 +16,13 @@ extern void func_337400(s32, s32);
 extern s32 func_2AF870(u8 *);
 extern void func_327D00(f32 *, f32 *, f32, f32, f32, f32);
 extern char g_hero_position[];
-extern f32 D_L13_001B2568 __attribute__((sda));
-extern u32 D_L13_001B291C[] __attribute__((sda));
-extern u8 D_L13_001B1E60[];
+extern f32 g_hero_l13_height_limit __attribute__((sda));
+extern u32 g_object_table_base[] __attribute__((sda));
+extern u8 g_str_rising_platform_sound[];
 extern void func_2F8A20(u8 *, u8 *, f32);
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 *D_L13_001B2A0C __attribute__((sda));
+extern u8 *g_moby_slot_table __attribute__((sda));
 extern u8 *D_L13_001B291C_2;
 extern u8 g_hero_state[];
 
@@ -286,8 +286,8 @@ void lift_arm_tilt_up_update(u8 *moby) {
 void cam_set_value_from_trigger_boxes(u8 *moby) {
     s32 *vars = *(s32 **)(moby + 0x68);
     u8 *base = g_hero_position;
-    if (func_32A4D0(base, vars[0]) != 0) D_L13_001B2568 = 30.0f;
-    if (func_32A4D0(base, vars[1]) != 0) D_L13_001B2568 = 95.0f;
+    if (func_32A4D0(base, vars[0]) != 0) g_hero_l13_height_limit = 30.0f;
+    if (func_32A4D0(base, vars[1]) != 0) g_hero_l13_height_limit = 95.0f;
 }
 
 /* func_L13_0041BDA8 is in L13_0041BDA8.c. */
@@ -300,10 +300,10 @@ void cam_set_value_from_trigger_boxes(u8 *moby) {
    (the five-word table in the level's data at 0x2ADD00); `cases` only keeps the labels alive. */
 extern void *D_L13_002ADD00[];
 extern u8 g_sound_state[];
-extern u8 D_L13_001B1C20[];
-extern u8 D_L13_001B1C48[];
-extern u16 *D_L13_001FB420[];
-extern s32 D_L13_001B2938 __attribute__((sda));
+extern u8 g_str_linked_door_msg_a[];
+extern u8 g_str_linked_door_msg_b[];
+extern u16 *g_door_list_table[];
+extern s32 g_level_l13_progress_stage __attribute__((sda));
 extern void STUB_printf(void *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(u8 *, s32, s32);
@@ -330,13 +330,13 @@ void linked_l13_door_update(u8 *moby) {
     goto done;
 c0:
     *(s32 *)(vars + 0x2C) = -1;
-    if (D_L13_001FB420[*(s32 *)vars] == 0) {
-        STUB_printf(D_L13_001B1C20);
+    if (g_door_list_table[*(s32 *)vars] == 0) {
+        STUB_printf(g_str_linked_door_msg_a);
         moby_mark_spawned(moby);
         return;
     }
     if (*(s32 *)(vars + 4) == -1) {
-        STUB_printf(D_L13_001B1C48);
+        STUB_printf(g_str_linked_door_msg_b);
         moby_mark_spawned(moby);
         return;
     }
@@ -363,11 +363,11 @@ c3:
     if (soundId == -1 || *(u8 **)((soundSlot = g_sound_state + soundId * 0x70) + 0x88) != moby || soundSlot[0x74] == 0)
         *(s32 *)(vars + 0x2C) = snd_start_in_slot(0x13, 4, moby);
     if (math_fast_float_d(vars + 0x24) != 0 && *(s32 *)(vars + 0x14) == 0) {
-        for (listEntry = D_L13_001FB420[*(s32 *)vars];
-             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= D_L13_001B2938 && listEntry != 0 &&
-             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == D_L13_001FB420[*(s32 *)vars]);
+        for (listEntry = g_door_list_table[*(s32 *)vars];
+             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= g_level_l13_progress_stage && listEntry != 0 &&
+             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == g_door_list_table[*(s32 *)vars]);
              listEntry++) {
-            target = (u8 *)D_L13_001B291C[0] + ((*listEntry & 0x7FFF) << 8);
+            target = (u8 *)g_object_table_base[0] + ((*listEntry & 0x7FFF) << 8);
             if (target == 0)
                 break;
             if (*(s16 *)(target + 0xAA) == 0xEE7)
@@ -376,7 +376,7 @@ c3:
         *(s32 *)(vars + 0x14) = 1;
     }
     if (math_fast_float_d(vars + 0x28) != 0 && *(s32 *)(vars + 0x18) == 0) {
-        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 1;
+        *(s32 *)(*(u8 **)((u8 *)g_object_table_base[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 1;
         *(s32 *)(vars + 0x18) = 1;
     }
     if (*(s32 *)(vars + 0x18) != 0 && *(s32 *)(vars + 0x14) != 0) {
@@ -387,11 +387,11 @@ c3:
     goto done;
 c4:
     if (math_fast_float_d(vars + 0x24) != 0 && *(s32 *)(vars + 0x14) != 0) {
-        for (listEntry = D_L13_001FB420[*(s32 *)vars];
-             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= D_L13_001B2938 && listEntry != 0 &&
-             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == D_L13_001FB420[*(s32 *)vars]);
+        for (listEntry = g_door_list_table[*(s32 *)vars];
+             (*(s32 *)vars & 0xFF) != 0xFF && *(s32 *)vars <= g_level_l13_progress_stage && listEntry != 0 &&
+             ((listEntry != 0 && (s16)listEntry[-1] >= 0) || listEntry == g_door_list_table[*(s32 *)vars]);
              listEntry++) {
-            target = (u8 *)D_L13_001B291C[0] + ((*listEntry & 0x7FFF) << 8);
+            target = (u8 *)g_object_table_base[0] + ((*listEntry & 0x7FFF) << 8);
             if (target == 0)
                 break;
             if (*(s16 *)(target + 0xAA) == 0xEE7)
@@ -400,7 +400,7 @@ c4:
         *(s32 *)(vars + 0x14) = 0;
     }
     if (math_fast_float_d(vars + 0x28) != 0 && *(s32 *)(vars + 0x18) != 0) {
-        *(s32 *)(*(u8 **)((u8 *)D_L13_001B291C[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 0;
+        *(s32 *)(*(u8 **)((u8 *)g_object_table_base[0] + (*(s32 *)(vars + 4) << 8) + 0x68) + 0x3C) = 0;
         *(s32 *)(vars + 0x18) = 0;
     }
     if (*(s32 *)(vars + 0x18) == 0 && *(s32 *)(vars + 0x14) == 0) {
@@ -415,34 +415,34 @@ done:
 /* func_L13_004230B0 is in L13_004230B0.c. */
 
 extern s32 IsPointInCuboid(u8 *, s32);
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 
 /* Marks five progress flags when the player enters four trigger boxes or another object reaches a certain state. */
 void boldan_set_progress_flags_from_triggers(u8 *moby) {
     s32 *vars = *(s32 **)(moby + 0x68);
     if (IsPointInCuboid((u8 *)g_hero_position, vars[2]) != 0) {
-        if (D_001395B8[0x25] == 0) {
-            D_001395B8[0x25] = 1;
+        if (g_game_flag_table[0x25] == 0) {
+            g_game_flag_table[0x25] = 1;
         }
     }
     if (IsPointInCuboid((u8 *)g_hero_position, vars[3]) != 0) {
-        if (D_001395B8[0x24] == 0) {
-            D_001395B8[0x24] = 1;
+        if (g_game_flag_table[0x24] == 0) {
+            g_game_flag_table[0x24] = 1;
         }
     }
     if (IsPointInCuboid((u8 *)g_hero_position, vars[0]) != 0) {
-        if (D_001395B8[0x27] == 0) {
-            D_001395B8[0x27] = 1;
+        if (g_game_flag_table[0x27] == 0) {
+            g_game_flag_table[0x27] = 1;
         }
     }
     if (IsPointInCuboid((u8 *)g_hero_position, vars[1]) != 0) {
-        if (D_001395B8[0x28] == 0) {
-            D_001395B8[0x28] = 1;
+        if (g_game_flag_table[0x28] == 0) {
+            g_game_flag_table[0x28] = 1;
         }
     }
-    if (*((u8 *)D_L13_001B291C[0] + (vars[4] << 8) + 0x20) == 2) {
-        if (D_001395B8[0x26] == 0) {
-            D_001395B8[0x26] = 1;
+    if (*((u8 *)g_object_table_base[0] + (vars[4] << 8) + 0x20) == 2) {
+        if (g_game_flag_table[0x26] == 0) {
+            g_game_flag_table[0x26] = 1;
         }
     }
 }
@@ -465,7 +465,7 @@ void rising_l13_platform_update(u8 *moby) {
         moby[0x20] = 1;
     }
     if (moby[0x20] == 1) {
-        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)vars << 8) + 0x20);
+        u8 v = *((u8 *)g_object_table_base[0] + (*(u32 *)vars << 8) + 0x20);
         if (v == 2) {
             PlayMobySound(0, 0, moby);
             moby[0x20] = v;
@@ -479,7 +479,7 @@ void rising_l13_platform_update(u8 *moby) {
 
 extern s32 func_2AF870(u8 *);
 extern void func_327D00(f32 *, f32 *, f32, f32, f32, f32);
-extern u8 D_L13_001B1E60[];
+extern u8 g_str_rising_platform_sound[];
 
 /* Waits for another object to reach its active state, then lifts this object up to its top height and starts a sound. */
 void rising_platform_sound_update(u8 *moby) {
@@ -491,10 +491,10 @@ void rising_platform_sound_update(u8 *moby) {
         moby[0x20] = 1;
     }
     if (moby[0x20] == 1) {
-        u8 v = *((u8 *)D_L13_001B291C[0] + (*(u32 *)vars << 8) + 0x20);
+        u8 v = *((u8 *)g_object_table_base[0] + (*(u32 *)vars << 8) + 0x20);
         if (v == 2) {
             moby[0x20] = v;
-            func_2AF870(D_L13_001B1E60);
+            func_2AF870(g_str_rising_platform_sound);
         }
     }
     if (moby[0x20] == 2) {

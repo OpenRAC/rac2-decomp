@@ -1,20 +1,20 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L09_001B3620[] MACRO_ADDR;
-extern int D_L09_001B3660[] MACRO_ADDR;
-extern int D_L09_001B36A0[] MACRO_ADDR;
-extern int D_L09_001B36E0[] MACRO_ADDR;
-extern int D_L09_001B3720[] MACRO_ADDR;
-extern int D_L09_001B3760[] MACRO_ADDR;
-extern int D_L09_001B37A0[] MACRO_ADDR;
-extern float D_L09_001B37E0[16] MACRO_ADDR;
-extern int D_L09_001B35E0[16] MACRO_ADDR;
-extern unsigned char *D_L09_00255E90[16][2];
+extern int g_beam_slot_angle_x[] MACRO_ADDR;
+extern int g_beam_slot_angle_y[] MACRO_ADDR;
+extern int g_beam_slot_angle_z[] MACRO_ADDR;
+extern int g_beam_slot_light_handle[] MACRO_ADDR;
+extern int g_beam_slot_light_handle_alt[] MACRO_ADDR;
+extern int g_beam_slot_third_value[] MACRO_ADDR;
+extern int g_beam_slot_flag[] MACRO_ADDR;
+extern float g_beam_slot_uv_scroll[16] MACRO_ADDR;
+extern int g_beam_slot_state_2[16] MACRO_ADDR;
+extern unsigned char *g_sound_slot_ptrs[16][2];
 extern void gfx_queue_draw_callback(void *, void *);
 extern void beam_slot_clear_by_index(int);
-extern void func_PAL_L09_004005A8(void *, int);
-extern void func_PAL_L09_00400B48(char *);
+extern void UpdateBeamLinkStrips_pal(void *, int);
+extern void DrawBeamLinks_pal(char *);
 typedef struct DobboMoby DobboMoby;
 typedef struct {
     float direction[4];
@@ -71,7 +71,7 @@ struct DobboMoby {
    them: a slot whose first moby has been destroyed is released, a slot in state 4 is handed to
    func_L09_003FB860, and any other live slot is handed to func_PAL_L09_004005A8 and moves to state 4.
    If any slot was handed over, func_PAL_L09_00400B48 is queued on the moby to draw the links. */
-void func_PAL_L09_00400080(DobboMoby *moby)
+void UpdateBeamLinkSlots_pal(DobboMoby *moby)
 {
     int i, count;
     int clearIndex;
@@ -79,9 +79,9 @@ void func_PAL_L09_00400080(DobboMoby *moby)
     switch (moby->state) {
     case 0:
         for (clearIndex = 0; clearIndex < 16; clearIndex++) {
-            D_L09_001B35E0[clearIndex] = 0;
-            D_L09_00255E90[clearIndex][0] = 0;
-            D_L09_00255E90[clearIndex][1] = 0;
+            g_beam_slot_state_2[clearIndex] = 0;
+            g_sound_slot_ptrs[clearIndex][0] = 0;
+            g_sound_slot_ptrs[clearIndex][1] = 0;
         }
         moby->state = 1;
         moby->f30 = 255;
@@ -89,22 +89,22 @@ void func_PAL_L09_00400080(DobboMoby *moby)
     case 1:
         count = 0;
         for (i = 0; i < 16; i++) {
-            if (D_L09_001B35E0[i] == 1) {
-                if ((signed char)D_L09_00255E90[i][0][0x20] < 0) {
-                    D_L09_00255E90[i][0] = 0;
-                    D_L09_001B35E0[i] = 0;
-                    D_L09_00255E90[i][1] = 0;
+            if (g_beam_slot_state_2[i] == 1) {
+                if ((signed char)g_sound_slot_ptrs[i][0][0x20] < 0) {
+                    g_sound_slot_ptrs[i][0] = 0;
+                    g_beam_slot_state_2[i] = 0;
+                    g_sound_slot_ptrs[i][1] = 0;
                 }
-            } else if (D_L09_001B35E0[i] == 4) {
+            } else if (g_beam_slot_state_2[i] == 4) {
                 beam_slot_clear_by_index(i);
-            } else if (D_L09_001B35E0[i]) {
+            } else if (g_beam_slot_state_2[i]) {
                 count++;
-                func_PAL_L09_004005A8(D_L09_00255E90[i][0], i);
-                D_L09_001B35E0[i] = 4;
+                UpdateBeamLinkStrips_pal(g_sound_slot_ptrs[i][0], i);
+                g_beam_slot_state_2[i] = 4;
             }
         }
         if (count)
-            gfx_queue_draw_callback(func_PAL_L09_00400B48, moby);
+            gfx_queue_draw_callback(DrawBeamLinks_pal, moby);
         break;
     }
 }

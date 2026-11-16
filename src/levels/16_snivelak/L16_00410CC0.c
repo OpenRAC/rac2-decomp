@@ -4,9 +4,9 @@ typedef int TI128 __attribute__((mode(TI)));
 /* Partial table view: retail visits up to eight four-short rows. GP access
  * is independently evidenced; this is not a complete global extent claim. */
 typedef struct { s16 row[8][4]; } RowTablePrefix;
-extern RowTablePrefix D_L16_001B1710 __attribute__((sda));
+extern RowTablePrefix g_snivelak_path_neighbor_table __attribute__((sda));
 
-extern u32 D_L16_001FE7C0[];
+extern u32 g_path_l16_table[];
 
 extern float math_closest_point_on_segment(void *, void *, void *, void *);
 
@@ -32,16 +32,16 @@ void snivelak_find_closest_path_point(u8 *moby, u8 *point)
 
     vars = *(u32 **)(moby + 0x68);
     best = 2001.0f;
-    path = *(u8 **)(D_L16_001FE7C0 + vars[92]);
+    path = *(u8 **)(g_path_l16_table + vars[92]);
     qcopy(&best_point, point);
     best_out = (u8 *)vars + 0x200;
     for (row = 0; row < 8; row = next) {
         count = 0;
-        neighbor = D_L16_001B1710.row[row][0];
+        neighbor = g_snivelak_path_neighbor_table.row[row][0];
         next = row + 1;
         if (neighbor == -1)
             continue;
-        row_ptr = D_L16_001B1710.row[row];
+        row_ptr = g_snivelak_path_neighbor_table.row[row];
         do {
             if (neighbor >= row) {
                 along = math_closest_point_on_segment(&work, path + (row * 16 + 0x10), path + (neighbor * 16 + 0x10), point);
@@ -90,7 +90,7 @@ void snivelak_pick_next_path_segment(u8 *moby)
     for (;;) {
         for (i = 0; i < 8; i++) {
             if ((mask >> i) & 1) {
-                for (j = 0; j < 4 && (neighbor = D_L16_001B1710.row[i][j]) != -1; j++) {
+                for (j = 0; j < 4 && (neighbor = g_snivelak_path_neighbor_table.row[i][j]) != -1; j++) {
                     acc |= 1 << neighbor;
                     if (neighbor == vars[0x88]) {
                         vars[0x8A] = neighbor;

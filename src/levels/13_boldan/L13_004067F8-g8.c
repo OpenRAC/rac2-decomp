@@ -17,7 +17,7 @@ typedef struct {
     int collision;
     u8 pad9C[0x100-0x9C];
 } ClockMoby;
-extern ClockMoby *D_L13_001B291C NOT_SDA;
+extern ClockMoby *g_object_table_base NOT_SDA;
 extern u8 *D_L13_001B291C_gp SDATA(D_L13_001B291C);
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define P(p,o) (*(u8 **)((u8 *)(p)+(o)))
@@ -77,7 +77,7 @@ void UpdateBoldanClock(u8 *moby) {
         if(hour_value>12.0f) hour_value-=12.0f;
         hour12=FloatToInt(hour_value);
         if(hour12==0 || hour12==2 || hour12==4 || hour12==6 || hour12==8 || hour12==10 || hour12==12) {
-            ClockMoby *a=&D_L13_001B291C[I(vars,0x28)];
+            ClockMoby *a=&g_object_table_base[I(vars,0x28)];
             int collision;
 
             a->flags=(a->flags&0xFFBE)|0x1000;
@@ -85,7 +85,7 @@ void UpdateBoldanClock(u8 *moby) {
             a->flags&=0xFFFD;
             a->collision=collision;
         } else {
-            ClockMoby *a=&D_L13_001B291C[I(vars,0x28)];
+            ClockMoby *a=&g_object_table_base[I(vars,0x28)];
             a->collision=0; a->flags=(a->flags&0xEFFF)|0x43;
         }
         if(hour==3) {

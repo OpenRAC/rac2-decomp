@@ -12,9 +12,9 @@ typedef struct {
     int flag;
 } BurstCamera;
 extern BurstCamera g_active_camera;
-extern char D_0018A0E0[], D_L00_001FE940[];
-extern char D_001A8BD0[] __attribute__((sda));
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern char g_hero_state_block[], g_effect_definitions[];
+extern char g_default_effect_vector[] __attribute__((sda));
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
@@ -35,28 +35,28 @@ extern char *func_PAL_002BE9A8_smoke(void *, float, float, float, int, float,
                                    void *, int, int) __asm__("func_PAL_002BE9A8");
 extern int math_random_int_range(int, int), FloatToInt(float);
 extern float IntToFloat(int), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
-extern float D_001B0804 __attribute__((sda));
-extern float D_001B080C __attribute__((sda));
-extern float D_001B0808 __attribute__((sda));
-extern float D_001B079C __attribute__((sda));
-extern float D_001B0780 __attribute__((sda));
-extern float D_001B0784 __attribute__((sda));
-extern float D_001B0788 __attribute__((sda));
-extern float D_001B078C __attribute__((sda));
-extern float D_001B0790 __attribute__((sda));
-extern float D_001B0794 __attribute__((sda));
-extern float D_001B0798 __attribute__((sda));
-extern float D_001B07E4 __attribute__((sda));
-extern float D_001B07E8 __attribute__((sda));
-extern float D_001B07EC __attribute__((sda));
-extern float D_001B07F0 __attribute__((sda));
-extern float D_001B07F4 __attribute__((sda));
-extern int D_001B0810 __attribute__((sda));
-extern int D_001B07A0 __attribute__((sda));
-extern int D_001B07A4 __attribute__((sda));
-extern int D_001B07FC __attribute__((sda));
-extern int D_001B0800 __attribute__((sda));
-extern unsigned char D_001B07F8 __attribute__((sda));
+extern float g_blast_delta_length __attribute__((sda));
+extern float g_blast_spark_spread __attribute__((sda));
+extern float g_blast_spark_size __attribute__((sda));
+extern float g_blast_position_spread __attribute__((sda));
+extern float g_blast_size_min __attribute__((sda));
+extern float g_blast_size_max __attribute__((sda));
+extern float g_blast_speed_min __attribute__((sda));
+extern float g_blast_speed_max __attribute__((sda));
+extern float g_blast_velocity_z_min __attribute__((sda));
+extern float g_blast_velocity_z_max __attribute__((sda));
+extern float g_blast_fade_life_scale __attribute__((sda));
+extern float g_blast_energy_min __attribute__((sda));
+extern float g_blast_energy_max __attribute__((sda));
+extern float g_blast_other_spread __attribute__((sda));
+extern float g_blast_back_speed_min __attribute__((sda));
+extern float g_blast_back_speed_max __attribute__((sda));
+extern int g_blast_spark_param __attribute__((sda));
+extern int g_blast_kind_min __attribute__((sda));
+extern int g_blast_kind_max __attribute__((sda));
+extern int g_blast_kind_alt_min __attribute__((sda));
+extern int g_blast_kind_alt_max __attribute__((sda));
+extern unsigned char g_blast_sub_byte __attribute__((sda));
 
 /* Emits three particle groups around the object and sets camera shake when visible. */
 void func_PAL_0032F7C8(char *self)
@@ -75,9 +75,9 @@ void func_PAL_0032F7C8(char *self)
         g_active_camera.amplitude = 0.1f;
     }
     eye = g_active_camera.position;
-    func_PAL_002AC718(self, D_001A8BD0, self + 0x10, 0, 0, 0, 0, 0, 0, 0, 9, 0, -1, 20, 0, 0, -1, 0, 0x810001);
+    SpawnExplosionEffects_pal(self, g_default_effect_vector, self + 0x10, 0, 0, 0, 0, 0, 0, 0, 9, 0, -1, 20, 0, 0, -1, 0, 0x810001);
     FastVecSub(delta, eye, self + 0x10);
-    vec_scale_to_length(delta, delta, D_001B0804);
+    vec_scale_to_length(delta, delta, g_blast_delta_length);
     FastVecAdd(center, self + 0x10, delta);
     qcopy(self + 0x10, center);
     angle = mat_fast_helper_a(g_active_camera.position[0] - *(float *)(self + 0x10), g_active_camera.position[1] - *(float *)(self + 0x14));
@@ -87,14 +87,14 @@ void func_PAL_0032F7C8(char *self)
         char *particle, *sub;
 
         sign = -sign;
-        position[0] = center[0] + math_random_signed_float_range(0, D_001B080C);
-        position[1] = center[1] + math_random_signed_float_range(0, D_001B080C);
-        position[2] = center[2] + math_random_signed_float_range(0, D_001B080C);
+        position[0] = center[0] + math_random_signed_float_range(0, g_blast_spark_spread);
+        position[1] = center[1] + math_random_signed_float_range(0, g_blast_spark_spread);
+        position[2] = center[2] + math_random_signed_float_range(0, g_blast_spark_spread);
         speed = math_random_float_range(0.020000001f, 0.040000003f);
         a = math_random_signed_float_range(0, 1.3962636f);
         b = math_random_signed_float_range(0, 1.5707964897155762f);
         vec_build_spherical_offset(velocity, speed, FastAddRotations(angle, b), a);
-        particle = func_PAL_002BE9A8(position, 0, 1, 1.01f, D_001B0808 * 210000, sign, velocity, D_001B0810, 1);
+        particle = func_PAL_002BE9A8(position, 0, 1, 1.01f, g_blast_spark_size * 210000, sign, velocity, g_blast_spark_param, 1);
         if (particle) {
             *(short *)(particle + 0xA) = ((s32)math_random_int_range(40, 70) * 5 + 2) / 6;
             particle[9] = FloatToInt(4) + 64;
@@ -109,27 +109,27 @@ void func_PAL_0032F7C8(char *self)
         float size, speed, a, energy;
         int count, kind;
         char *particle;
-        int definitions = (int)D_L00_001FE940;
+        int definitions = (int)g_effect_definitions;
 
         count = FloatToInt(math_random_signed_float_range(2, 5));
-        kind = math_random_int_range(D_001B07A0, D_001B07A4);
-        position[0] = center[0] + math_random_signed_float_range(0, D_001B079C);
-        position[1] = center[1] + math_random_signed_float_range(0, D_001B079C);
-        position[2] = center[2] + math_random_signed_float_range(0, D_001B079C);
-        size = math_random_float_range(D_001B0780, D_001B0784);
-        speed = math_random_float_range(D_001B0788, D_001B078C);
+        kind = math_random_int_range(g_blast_kind_min, g_blast_kind_max);
+        position[0] = center[0] + math_random_signed_float_range(0, g_blast_position_spread);
+        position[1] = center[1] + math_random_signed_float_range(0, g_blast_position_spread);
+        position[2] = center[2] + math_random_signed_float_range(0, g_blast_position_spread);
+        size = math_random_float_range(g_blast_size_min, g_blast_size_max);
+        speed = math_random_float_range(g_blast_speed_min, g_blast_speed_max);
         a = FastAddRotations(angle, math_random_signed_float_range(0, 1.3962636f));
         velocity[0] = math_fast_sin_or_cos_a(a) * 0.020000001f * speed;
         velocity[1] = math_fast_sin_or_cos_b(a) * 0.020000001f * speed;
         velocity[2] = 0;
-        velocity[2] = math_random_float_range(D_001B0790, D_001B0794) * 0.020000001f;
+        velocity[2] = math_random_float_range(g_blast_velocity_z_min, g_blast_velocity_z_max) * 0.020000001f;
         energy = size * 210000;
-        part_spawn_gravity_fade(position, velocity, ((s32)kind * 5 + 2) / 6, 0x7F7F7F, count, 127, 127, 1, energy, 2100, D_001B0798 * 0.00040000002f);
+        part_spawn_gravity_fade(position, velocity, ((s32)kind * 5 + 2) / 6, 0x7F7F7F, count, 127, 127, 1, energy, 2100, g_blast_fade_life_scale * 0.00040000002f);
         other[0] = position[0] + math_random_signed_float_range(0, 0.01f);
         other[1] = position[1] + math_random_signed_float_range(0, 0.01f);
         other[2] = position[2] + math_random_signed_float_range(0, 0.01f);
-        func_002C65A0_layer(other, velocity, ((s32)kind * 5 + 2) / 6, 0x7F7F7F, -count, 127, 127, energy, 2100, D_001B0798 * 0.00040000002f, 1);
-        particle = part_spawn_gravity_fade(position, velocity, ((s32)kind * 5 + 2) / 6, 0x202080, -(count << 1), 48, 48, 1, size * 1260000, 4200, D_001B0798 * 0.00040000002f);
+        func_002C65A0_layer(other, velocity, ((s32)kind * 5 + 2) / 6, 0x7F7F7F, -count, 127, 127, energy, 2100, g_blast_fade_life_scale * 0.00040000002f, 1);
+        particle = part_spawn_gravity_fade(position, velocity, ((s32)kind * 5 + 2) / 6, 0x202080, -(count << 1), 48, 48, 1, size * 1260000, 4200, g_blast_fade_life_scale * 0.00040000002f);
         if (particle) particle[2] = **(char **)(definitions + 0xD4);
     }
     FastVecSub(position, g_active_camera.position, center);
@@ -142,13 +142,13 @@ void func_PAL_0032F7C8(char *self)
             int kind, count;
             char *particle, *sub;
 
-            FastVecScale(velocity, D_0018A0E0, -(math_random_float_range(D_001B07F0, D_001B07F4) * 0.020000001f));
-            kind = ((s32)math_random_int_range(D_001B07FC, D_001B0800) * 5 + 2) / 6;
+            FastVecScale(velocity, g_hero_state_block, -(math_random_float_range(g_blast_back_speed_min, g_blast_back_speed_max) * 0.020000001f));
+            kind = ((s32)math_random_int_range(g_blast_kind_alt_min, g_blast_kind_alt_max) * 5 + 2) / 6;
             count = FloatToInt(math_random_signed_float_range(1, 2));
-            energy = math_random_float_range(D_001B07E4, D_001B07E8) * 210000;
-            other[0] = center[0] + math_random_signed_float_range(0, D_001B07EC);
-            other[1] = center[1] + math_random_signed_float_range(0, D_001B07EC);
-            other[2] = center[2] + math_random_signed_float_range(0, D_001B07EC);
+            energy = math_random_float_range(g_blast_energy_min, g_blast_energy_max) * 210000;
+            other[0] = center[0] + math_random_signed_float_range(0, g_blast_other_spread);
+            other[1] = center[1] + math_random_signed_float_range(0, g_blast_other_spread);
+            other[2] = center[2] + math_random_signed_float_range(0, g_blast_other_spread);
             particle = func_PAL_002BE9A8_smoke(other, 0, 1, 1.01f, count, energy, velocity, 0x7F202020, 1);
             if (particle) {
                 *(short *)(particle + 0xA) = kind;
@@ -157,7 +157,7 @@ void func_PAL_0032F7C8(char *self)
                 sub = particle + 0x20;
                 *(float *)(sub + 0x1C) = IntToFloat(((s32)math_random_int_range(7, 15) * 5 + 2) / 6);
                 *(int *)(sub + 4) = 3;
-                sub[0xA] = D_001B07F8;
+                sub[0xA] = g_blast_sub_byte;
                 sub[0xB] = particle[0xA];
             }
         }

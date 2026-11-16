@@ -82,7 +82,7 @@ typedef struct {
 extern HeldAnimationHero g_hero_state;
 extern unsigned char g_item_slot_to_record[];
 extern HeldAnimationItem g_weapon_l00_table[];
-extern HeldMatrixBuffers D_L00_001B7400[];
+extern HeldMatrixBuffers g_item_matrix_buffers[];
 /* What func_L00_00310BC8 allocates for each of the two slots, addressed $gp-relative. */
 extern int D_L00_001A7D00[2] __asm__("D_L00_001A7D00__gp") __attribute__((section(".sdata")));
 extern int hero_slot_item_id(int);
@@ -160,14 +160,14 @@ void start_equipped_item_animation(void)
     for (i = 0; i < 2 && (i != 1 || g_hero_state.dual == 2); i++) {
         if (g_hero_state.slots[i])
             release_moby_animation_slot(g_hero_state.moby, &g_hero_state.slots[i]);
-        slot = allocate_moby_animation_slot(g_hero_state.moby, D_L00_001A7D00[i]);
+        slot = allocate_moby_animation_slot(g_hero_state.moby, g_hero_item_anim_ids[i]);
         g_hero_state.slots[i] = slot;
         if (slot) {
             g_hero_state.animation = held;
             g_hero_state.cancel = 0;
             slot->weight = 1.0f;
-            slot->firstMatrices = D_L00_001B7400[i].first;
-            slot->secondMatrices = D_L00_001B7400[i].second;
+            slot->firstMatrices = g_item_matrix_buffers[i].first;
+            slot->secondMatrices = g_item_matrix_buffers[i].second;
             initialize_moby_animation_blend(g_hero_state.moby, slot, g_hero_state.animation, 0, blendDuration, 1);
         }
     }
@@ -210,8 +210,8 @@ void update_hero_held_items_and_orientation(void)
 
         if (*slot == 0)
             continue;
-        (*slot)->firstMatrices = D_L00_001B7400[i].first;
-        (*slot)->secondMatrices = D_L00_001B7400[i].second;
+        (*slot)->firstMatrices = g_item_matrix_buffers[i].first;
+        (*slot)->secondMatrices = g_item_matrix_buffers[i].second;
         item = hero_slot_item_id(0);
         if (item == slotOwner->item) {
             HeldAnimationItem *definition = &g_weapon_l00_table[g_item_slot_to_record[item]];

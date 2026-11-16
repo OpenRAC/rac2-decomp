@@ -1,5 +1,5 @@
 #include "common.h"
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern int ref_L00_002FE5A0_00[] __attribute__((sda));
 typedef struct { char pad[0x1C]; int count; float point[4]; char rest[0x20]; } CollisionE5;
 extern CollisionE5 ref_L00_002FE5A0_01;
@@ -29,7 +29,7 @@ int coll_trace_projectile_to_impact(float *start, float *motion, float *destinat
     int count;
     int result = 0;
     int slot, i, type;
-    if (D_0018C0B4 == 111 || ref_L00_002FE5A0_00[0]) return 0;
+    if (g_game_mode == 111 || ref_L00_002FE5A0_00[0]) return 0;
     qcopy(effect.last, start);
     slot = part_alloc_effect_slot(&effect, 0, 1.0f, 1.0f, 1.0f);
     qcopy(previous, start);

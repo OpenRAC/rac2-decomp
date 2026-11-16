@@ -5,7 +5,7 @@
 
 
 
-extern float D_L11_001BA8C0[];
+extern float g_hero_l11_position[];
 
 extern float math_random_float_range(float, float);
 
@@ -68,13 +68,13 @@ typedef struct {
 
 /* func_L18_00433B70 lives in L18_00433B70.c. */
 
-extern float D_L11_001B0654 __attribute__((sda));
-extern float D_L11_001B0658 __attribute__((sda));
-extern float D_L11_001B065C __attribute__((sda));
-extern float D_L11_001B0660 __attribute__((sda));
-extern float D_L11_001B0664 __attribute__((sda));
-extern float D_L11_001B0668 __attribute__((sda));
-extern float D_L11_001B066C __attribute__((sda));
+extern float g_joba_spark_speed_min __attribute__((sda));
+extern float g_joba_spark_speed_max __attribute__((sda));
+extern float g_joba_spark_velocity_z_min __attribute__((sda));
+extern float g_joba_spark_velocity_z_max __attribute__((sda));
+extern float g_joba_spark_ground_effect_param __attribute__((sda));
+extern float g_joba_spark_size_min __attribute__((sda));
+extern float g_joba_spark_size_max __attribute__((sda));
 
 /* Sprays a burst of spark particles from a point, flying away from the object in random directions. */
 void part_spawn_beam_hit_sparks(char *pos, int count) {
@@ -89,36 +89,36 @@ void part_spawn_beam_hit_sparks(char *pos, int count) {
 
     *(TI128 *)axis = 0;
     axis[2] = 1.0f;
-    FastVecSub(direction, D_L11_001BA8C0, (float *)pos);
+    FastVecSub(direction, g_hero_l11_position, (float *)pos);
     direction[2] = 0.0f;
     for (i = 0; i < count; i++) {
-        size = math_random_float_range(D_L11_001B0668, D_L11_001B066C);
+        size = math_random_float_range(g_joba_spark_size_min, g_joba_spark_size_max);
         sign = math_random_int_below(2);
         if (sign == 0)
             sign--;
         angle = math_random_float_range(-1.0471977f, 1.0471977f);
         math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
-        speed = math_random_float_range(D_L11_001B0654, D_L11_001B0658) * (1.0f / 60.0f);
+        speed = math_random_float_range(g_joba_spark_speed_min, g_joba_spark_speed_max) * (1.0f / 60.0f);
         vec_scale_to_length((char *)velocity, (char *)velocity, speed);
-        velocity[2] = math_random_float_range(D_L11_001B065C, D_L11_001B0660) * (1.0f / 60.0f);
+        velocity[2] = math_random_float_range(g_joba_spark_velocity_z_min, g_joba_spark_velocity_z_max) * (1.0f / 60.0f);
         qcopy(point, pos);
         point[0] += math_random_signed_float_range(0.0f, 0.15f);
         point[1] += math_random_signed_float_range(0.0f, 0.15f);
         point[2] += math_random_signed_float_range(0.0f, 0.15f);
         if (!(func_001163B0() & 1)) {
             FastVecScale(velocity, velocity, 1.5f);
-            particle = part_spawn_ground_effect(point, 60, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664);
+            particle = part_spawn_ground_effect(point, 60, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, g_joba_spark_ground_effect_param);
             if (particle)
                 particle[9] = FloatToInt(4.0f) + 0x70;
-            particle = part_spawn_ground_effect(point, 60, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664);
+            particle = part_spawn_ground_effect(point, 60, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_joba_spark_ground_effect_param);
         } else {
-            FastVecSub(extra, D_L11_001BA8C0, point);
+            FastVecSub(extra, g_hero_l11_position, point);
             vec_scale_to_length((char *)extra, (char *)extra, speed);
             FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
-            particle = part_spawn_ground_effect(point, 40, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664);
+            particle = part_spawn_ground_effect(point, 40, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, g_joba_spark_ground_effect_param);
             if (particle)
                 particle[9] = FloatToInt(4.0f) + 0x70;
-            particle = part_spawn_ground_effect(point, 40, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664);
+            particle = part_spawn_ground_effect(point, 40, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_joba_spark_ground_effect_param);
         }
         if (particle)
             particle[9] = FloatToInt(4.0f) + 0x70;

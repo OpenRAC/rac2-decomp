@@ -70,18 +70,18 @@ extern void VU1_addGSregister(int, u64);
 
 /* The level's entity array, read as a bare symbol (lui/lw) as in the level's other units. */
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
-extern float D_00189EA8 NOT_SDA;
-extern FieldMob *D_0018A0B4 NOT_SDA;
-extern char D_0018A0E0[];
-extern char D_L14_001B9500[];
+extern float g_hero_height_limit NOT_SDA;
+extern FieldMob *g_field_mob_contact NOT_SDA;
+extern char g_hero_state_block[];
+extern char g_tether_l14_origin_vec[];
 /* sda keeps the 64-byte corner table one `la` macro at -G8. */
-extern float D_L14_001AA250[4][4] __attribute__((sda));
-extern float D_L14_001B04BC __attribute__((sda));
-extern float D_L14_001B04C0 __attribute__((sda));
-extern int D_L14_001B04C4 __attribute__((sda));
-extern int D_L14_001B04C8 __attribute__((sda));
-extern int D_L14_001B04CC __attribute__((sda));
-extern int D_L14_001B04D0 __attribute__((sda));
+extern float g_particle_corner_offsets[4][4] __attribute__((sda));
+extern float g_flash_spread __attribute__((sda));
+extern float g_spark_offset_scale __attribute__((sda));
+extern int g_emitter_color_blue __attribute__((sda));
+extern int g_emitter_color_green __attribute__((sda));
+extern int g_emitter_color_red __attribute__((sda));
+extern int g_emitter_emit_timer __attribute__((sda));
 
 /* A field that cycles off (1) -> rising (2) -> on (3) -> falling (4) -> off. Rising and
    falling run the same emitter, colour fade and draw (written out in both cases; the compiler
@@ -101,15 +101,15 @@ void DrawFadingField(char *self) {
     int i, j, k;
 
     qcopy(pos, self + 0x10);
-    FastVecSub(a, D_L14_001B9500, pos);
+    FastVecSub(a, g_tether_l14_origin_vec, pos);
     vec_scale_to_length(a, a, 1.0f);
-    FastVecCross(b, a, D_0018A0E0);
+    FastVecCross(b, a, g_hero_state_block);
     vec_scale_to_length(b, b, 1.0f);
     FastVecCross(c, b, a);
-    FastVecScale(off, a, D_L14_001B04C0);
+    FastVecScale(off, a, g_spark_offset_scale);
     FastVecAdd(pos, pos, off);
     for (i = 0; i < 4; i++) {
-        FastVecScale(p.pos[i], D_L14_001AA250[i], D_L14_001B04BC * moby_get_state_progress(self));
+        FastVecScale(p.pos[i], g_particle_corner_offsets[i], g_flash_spread * moby_get_state_progress(self));
         transform_vector(p.pos[i], p.pos[i], a);
         qcopy(corners[i], p.pos[i]);
     }

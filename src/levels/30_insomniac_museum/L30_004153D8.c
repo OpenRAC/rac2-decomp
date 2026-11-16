@@ -41,7 +41,7 @@ char *museum_explosion_spawn(void *pos, float scale, int shake, int a2, int a3, 
         *(unsigned char *)(moby + 0x20) = 0;
         qcopy(moby + 0x10, pos);
         *(float *)(moby + 0x1C) = 1.0f;
-        FastVecSub(direction, D_L30_001B9C80.position, moby + 0x10);
+        FastVecSub(direction, g_camera_l30_state.position, moby + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(moby + 0x10, normal, 1);
         qcopy(moby + 0xC0, direction);
@@ -67,15 +67,15 @@ char *museum_explosion_spawn(void *pos, float scale, int shake, int a2, int a3, 
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->duration = 10;
             state->strength = 0.1f;
-            if (fast_vec_dist(pos, D_L30_001B9C80.position) < 48.0f && shake) {
-                D_L30_001B9C80.shakeTimer = 0;
-                D_L30_001B9C80.shakeDuration = 40;
-                D_L30_001B9C80.shakeStrength = 0.075f;
+            if (fast_vec_dist(pos, g_camera_l30_state.position) < 48.0f && shake) {
+                g_camera_l30_state.shakeTimer = 0;
+                g_camera_l30_state.shakeDuration = 40;
+                g_camera_l30_state.shakeStrength = 0.075f;
             }
             if (state->sound) {
-                FastVecSub(towardPlayer, moby + 0x10, D_L30_001B9C80.position);
+                FastVecSub(towardPlayer, moby + 0x10, g_camera_l30_state.position);
                 vec_scale_to_length(towardPlayer, towardPlayer, 1.0f);
-                if (1.5707963705062866f - math_fast_angle_helper(FastVecDot(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
+                if (1.5707963705062866f - math_fast_angle_helper(FastVecDot(towardPlayer, g_camera_l30_state.forward)) < 0.45378565788269043f)
                     state->sound = 1;
                 else
                     state->sound = 0;

@@ -7,9 +7,9 @@ extern u8 g_hero_state[];
 extern char g_hero_position[];
 extern u8 g_sound_state[];
 
-extern char D_L00_001A8F20[16] MACRO_ADDR;
-extern char *D_L00_001FDA80[];
-extern char D_L00_001AFDC0[];
+extern char g_default_vector[16] MACRO_ADDR;
+extern char *g_launch_path_table[];
+extern char g_str_shooting_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_add_draw_callback_third(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -230,7 +230,7 @@ void func_PAL_L00_003C1478(char *obj)
         } else if (diff12 > 0.05f) {
             math_step_value_toward_target(obj + 0x18, pv + 0x290, h12, 0.020000001f, 0.19600002f, 0.20000002f);
         } else {
-            STUB_printf(D_L00_001AFDC0, *(s32 *)(pv + 0x2C0));
+            STUB_printf(g_str_shooting_enemy_debug, *(s32 *)(pv + 0x2C0));
             moby_set_state(obj, 6, -1);
             if (*(u8 *)(obj + 0x43) != 0xE)
                 anim_start_blended(obj, 0xE, 0, 2);
@@ -320,7 +320,7 @@ void func_PAL_L00_003C1478(char *obj)
             }
             if (moby_is_target_outside_turn_limit(obj, 10.0f) != 0) {
                 FastVecSub(v40, pos, v0);
-                qcopy(v20, D_L00_001A8F20);
+                qcopy(v20, g_default_vector);
                 v20[0] = 1.0f;
                 matrix_mul_vec3(v20, v20, obj + 0xC0);
                 FastVecCross(v30, v20, v40);
@@ -367,7 +367,7 @@ void func_PAL_L00_003C1478(char *obj)
             if (IsPointInCuboid(g_hero_position, *(s32 *)(pv + 0x35C)) != 0)
                 *(s32 *)(pv + 0x37C) = 1;
         } else {
-            path = (s32 *)D_L00_001FDA80[*(s32 *)(pv + 0x370)];
+            path = (s32 *)g_launch_path_table[*(s32 *)(pv + 0x370)];
             math_step_value_toward_target(pv + 0x374, pv + 0x378, (f32)(*path - 1), 0.020000001f, 0.002f, 0.40000004f);
             path_sample_position(path, 0, obj + 0x10, obj + 0xF0, 0, *(f32 *)(pv + 0x374));
             euler_rotation_basis(obj + 0xC0, obj + 0xF0);
@@ -413,7 +413,7 @@ void func_PAL_L00_003C1478(char *obj)
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(v0, D_L00_001A8F20, 3, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(v0, g_default_vector, 3, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }

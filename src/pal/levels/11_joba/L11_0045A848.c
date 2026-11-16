@@ -9,7 +9,7 @@ extern void vec_clear_128(void *);
 extern int moby_spawn_linked(char *, int, float, float);
 
 /* Aims the object's stage, re-arms its effect and stores the new heading. */
-void func_PAL_L11_0045A848(char *p, int a1, int a2)
+void drone_init_state_pal(char *p, int a1, int a2)
 {
     char *q = *(char **)(p + 0x68);
     char *definition;
@@ -59,7 +59,7 @@ extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, fl
 extern char g_sound_state[];
 
 /* Releases the object's slot in the shared table and drops it to the idle flag block. */
-void func_PAL_L11_0045A9A8(char *p)
+void drone_reset_to_idle_pal(char *p)
 {
     char *q = *(char **)(p + 0x68);
     int i = *(int *)(q + 0x1DC);
@@ -147,13 +147,13 @@ typedef struct {
     u8 pad138[0x256 - 0x138];
     s16 f256;
 } JobaActorState;
-extern JobaObject *D_L11_001C4D80[];
+extern JobaObject *g_damage_target_list[];
 extern int FloatToInt(float);
 extern HitRecord *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void fighter_reset_to_idle(char *);
 extern void fighter_update_lock_on(char *);
 
@@ -202,7 +202,7 @@ void func_PAL_L11_0045B9E8(JobaObject *obj)
                 state->fE4 = 1.0053098f;
             }
         }
-        if (obj->active && fast_vec_dist(obj->position, D_L11_001BA8C0) < 24.0f) {
+        if (obj->active && fast_vec_dist(obj->position, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(obj);
             obj->f6F = 22;
         }

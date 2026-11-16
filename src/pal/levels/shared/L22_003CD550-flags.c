@@ -9,13 +9,13 @@ typedef int s32;
  * becomes 1/50, the phase step 0.0003490659f, the 1080 window 900, and every read of the
  * clock D_001A7390 is scaled to 50 Hz.  The window test reads history[31].time after the
  * scaling (retail's load follows the division's zero check), not through a local. */
-extern float D_L22_001AFF08[] __attribute__((sda));
-extern float D_L22_001AFF10[] __attribute__((sda));
-extern int D_L22_001AFF18[] __attribute__((sda));
+extern float g_spark_rate_min[] __attribute__((sda));
+extern float g_spark_value_min[] __attribute__((sda));
+extern int g_spark_color_pair[] __attribute__((sda));
 extern int D_L22_001AFF18_gp[] __asm__("D_L22_001AFF18__gp") __attribute__((section(".sdata")));
-extern float D_L22_001AFF20[] __attribute__((sda));
-extern float D_L22_001A7CD8[] __attribute__((sda));
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern float g_spark_angle_scale[] __attribute__((sda));
+extern float g_hero_action_float_param[] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 
 /* The per-subtitle history src/game/00289178.c updates (12-byte rows). */
@@ -57,8 +57,8 @@ void func_PAL_L22_003CD550(u8 *obj)
             offset = (float *)(ctl + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
-                *rate++ = math_random_float_range(D_L22_001AFF08[0], D_L22_001AFF08[1]) * 0.020000001f;
-                *radius++ = math_random_float_range(D_L22_001AFF10[0], D_L22_001AFF10[1]);
+                *rate++ = math_random_float_range(g_spark_rate_min[0], g_spark_rate_min[1]) * 0.020000001f;
+                *radius++ = math_random_float_range(g_spark_value_min[0], g_spark_value_min[1]);
             }
         }
         break;
@@ -67,7 +67,7 @@ void func_PAL_L22_003CD550(u8 *obj)
         SubtitleHistory *history;
 
         if (fast_vec_dist(g_hero_state + 0x80, obj + 0x10) < 3.0f)
-            D_L22_001A7CD8[0] = *(float *)ctl;
+            g_hero_action_float_param[0] = *(float *)ctl;
         player = g_hero_state;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
             PlayMobySound(0, 0, (char *)obj);
@@ -84,14 +84,14 @@ void func_PAL_L22_003CD550(u8 *obj)
                     /* each arm reads the clock itself: reorg merges the two
                      * reads into the branch's delay slot */
                     if ((unsigned short)count != 0) {
-                        if (((s32)D_001A7390[0] * 5 + 2) / 6 - history[31].time > 900 || history[31].time == 0)
+                        if (((s32)g_frame_counter[0] * 5 + 2) / 6 - history[31].time > 900 || history[31].time == 0)
                             subtitle_request_voice_line(2504, 31);
-                        else if (history[31].time < ((s32)D_001A7390[0] * 5 + 2) / 6)
-                            history[31].time = ((s32)D_001A7390[0] * 5 + 2) / 6;
+                        else if (history[31].time < ((s32)g_frame_counter[0] * 5 + 2) / 6)
+                            history[31].time = ((s32)g_frame_counter[0] * 5 + 2) / 6;
                     } else {
                         history[31].count = count + 1;
-                        if (history[31].time < ((s32)D_001A7390[0] * 5 + 2) / 6)
-                            history[31].time = ((s32)D_001A7390[0] * 5 + 2) / 6;
+                        if (history[31].time < ((s32)g_frame_counter[0] * 5 + 2) / 6)
+                            history[31].time = ((s32)g_frame_counter[0] * 5 + 2) / 6;
                         history[31].levels =
                             (history[31].levels | (1 << g_current_map_index[0])) | 0x80000000;
                     }
@@ -108,11 +108,11 @@ void func_PAL_L22_003CD550(u8 *obj)
     if (obj[0x31]) {
         float f;
         *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
-                                            D_L22_001AFF20[0] * 0.0003490659f);
+                                            g_spark_angle_scale[0] * 0.0003490659f);
         f = math_fast_sin_or_cos_b(*(float *)(ctl + 4));
         f = f * f;
         f = f * f;
-        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
+        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], g_spark_color_pair[1], f * f);
     }
 }
 

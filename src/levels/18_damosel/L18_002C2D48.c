@@ -6,7 +6,7 @@ typedef short s16;
 
 extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
-extern char D_0026BCF0[];
+extern char g_weapon_records[];
 extern int func_002CB1C8(int);
 
 typedef struct {
@@ -26,7 +26,7 @@ int hero_get_screen_id(char *hero)
         return 0xD;
     if (hero != 0 && *(u8 *)(heroBase + 0x22BA) != 0 && *(s16 *)(heroBase + 0x24EC) == 0) {
         int weaponIndex = func_002CB1C8(0);
-        return ((WeaponEntry *)(D_0026BCF0 + g_item_slot_to_record[weaponIndex] * 224))->v;
+        return ((WeaponEntry *)(g_weapon_records + g_item_slot_to_record[weaponIndex] * 224))->v;
     }
     hero = g_hero_state;
     if (*(int *)(hero + 0x24CC) != 1)

@@ -1,17 +1,17 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_001B1594[] MACRO_ADDR;
-extern int D_001B169C[] MACRO_ADDR;
+extern int g_render_layer_flags[] MACRO_ADDR;
+extern int g_gfx_pass_mode[] MACRO_ADDR;
 extern int g_current_game_mode[] MACRO_ADDR;
 extern float g_screen_fade[] MACRO_ADDR;
-extern float D_001B15A4[] MACRO_ADDR;
+extern float g_screen_flash_alpha[] MACRO_ADDR;
 extern char *ref_0027BD70_00[] MACRO_ADDR;
-extern int D_001B1608[] MACRO_ADDR, D_001B160C[] MACRO_ADDR, D_001B1610[] MACRO_ADDR;
-extern int D_001B1614[] MACRO_ADDR, D_001B1638[] MACRO_ADDR;
-extern int D_001A8770[] SDATA(D_001A8770);
-extern char D_0010FFC0[];
-extern unsigned short D_0010FFB0 NOT_SDA;
+extern int g_world_draw_callback_count[] MACRO_ADDR, g_overlay_draw_callback_count[] MACRO_ADDR, g_early_draw_callback_count[] MACRO_ADDR;
+extern int g_late_draw_callback_count[] MACRO_ADDR, g_final_draw_callback_count[] MACRO_ADDR;
+extern int g_screen_tint_params[] SDATA(D_001A8770);
+extern char g_water_vu_program[];
+extern unsigned short g_water_vu_data_size NOT_SDA;
 extern int ref_0027BD70_01 NOT_SDA;
 extern unsigned long ref_0027BD70_02 NOT_SDA;
 extern float g_hero_state[];
@@ -19,14 +19,14 @@ extern float ref_0027BD70_03[];
 extern char ref_0027BD70_04[], ref_0027BD70_05[];
 extern int g_screen_height[] MACRO_ADDR;
 extern int ref_0027BD70_06 NOT_SDA;
-extern unsigned char D_001AD580[] MACRO_ADDR, D_001AD581[] MACRO_ADDR;
-extern unsigned char D_001AD582[] MACRO_ADDR, D_001AD583[] MACRO_ADDR;
-extern int D_001A86F4 __attribute__((sda)), D_001A8758 __attribute__((sda));
-extern char D_00100AE0[];
+extern unsigned char g_clear_color_r[] MACRO_ADDR, g_clear_color_g[] MACRO_ADDR;
+extern unsigned char g_clear_color_b[] MACRO_ADDR, g_clear_color_a[] MACRO_ADDR;
+extern int g_screen_tint_flag_a __attribute__((sda)), g_screen_tint_flag_b __attribute__((sda));
+extern char g_gfx_dma_chain_buffer[];
 extern int g_is_pal_video[] MACRO_ADDR;
-extern float D_001B1690[] MACRO_ADDR;
+extern float g_tick_time_scale[] MACRO_ADDR;
 extern char ref_0027BD70_07[], ref_0027BD70_08[];
-extern int D_001B170C[] MACRO_ADDR;
+extern int g_vis_fallback_mode[] MACRO_ADDR;
 extern void gfx_append_draw_list_buffer_tag(int);
 extern void SetupGifPaging(int);
 extern void append_dma_tag(int);
@@ -67,12 +67,12 @@ extern void part_draw_all(void);
 extern void gfx_run_overlay_draw_callbacks(void);
 extern void DrawGlowSprites(void);
 extern void gfx_run_final_draw_callbacks(void);
-extern void func_PAL_002732B8(void);
+extern void hud_draw_reticle_and_markers_pal(void);
 extern void gfx_queue_first_strip_packet(void);
 extern void DrawLetterboxBars(void);
 extern void level_run_callbacks_and_draw(void);
-extern void func_PAL_0028ECD8(void);
-extern void func_PAL_0028A470(void);
+extern void hud_update_record_handlers_pal(void);
+extern void DrawSubtitleBox_pal(void);
 extern void DrawSubtitles(void);
 extern void gfx_draw_screen_stripe_effect(void);
 extern void PatchTfragGifs(void);
@@ -82,47 +82,47 @@ extern void patch_shrub_gifs(void);
 extern void PatchMobyGifs(void);
 extern void gfx_apply_display_config(void);
 
-void func_PAL_0027C258(void)
+void RenderFrame_pal(void)
 {
     char text[64];
     float ticks;
 
     if (!ref_0027BD70_00[0] || *(short *)(ref_0027BD70_00[0] + 4) ||
-        ((D_001B1594[0] ^ 1) & 1))
+        ((g_render_layer_flags[0] ^ 1) & 1))
         gfx_append_draw_list_buffer_tag(0);
     gfx_build_view_matrices();
     moby_update_watched_objects();
     vis_update_by_mode();
     gfx_write_clear_color_packets();
-    D_001B169C[0] = -1;
-    if (ref_0027BD70_00[0] && (D_001B1594[0] & 1))
+    g_gfx_pass_mode[0] = -1;
+    if (ref_0027BD70_00[0] && (g_render_layer_flags[0] & 1))
         level_init_rendering();
-    if (D_001B1594[0] & 2)
+    if (g_render_layer_flags[0] & 2)
         gfx_begin_render_frame();
     append_dma_tag(0x02010000);
-    if (D_001B1594[0] & 4)
+    if (g_render_layer_flags[0] & 4)
         gfx_draw_level_render_passes();
     append_dma_tag(0x02020000);
-    if (D_001B1610[0]) {
+    if (g_early_draw_callback_count[0]) {
         gfx_append_vu1_preset_c();
         SetupGifPaging(1);
         gfx_run_early_draw_callbacks();
         DoGifPaging();
         gfx_append_vu1_preset_b();
     }
-    if (D_001B1594[0] & 8)
+    if (g_render_layer_flags[0] & 8)
         gfx_begin_render_setup();
     append_dma_tag(0x02040000);
-    if (D_001A8770[0])
-        gfx_draw_screen_tint_step(D_001A8770);
-    if (D_001B1614[0]) {
+    if (g_screen_tint_params[0])
+        gfx_draw_screen_tint_step(g_screen_tint_params);
+    if (g_late_draw_callback_count[0]) {
         gfx_append_vu1_preset_c();
         SetupGifPaging(1);
         gfx_run_late_draw_callbacks();
         DoGifPaging();
         gfx_append_vu1_preset_b();
     }
-    if (D_001B1594[0] & 0x10) {
+    if (g_render_layer_flags[0] & 0x10) {
         if (g_current_game_mode[0] == 2)
             gfx_render_object_preview_to_texture();
         else
@@ -130,13 +130,13 @@ void func_PAL_0027C258(void)
     }
     append_dma_tag(0x02080000);
     SetupGifPaging(0);
-    if ((D_001B1594[0] & 0x20) && D_001B169C[0] != 6) {
-        VU1_addDataRef(D_0010FFC0, D_0010FFB0);
-        D_001B169C[0] = 6;
+    if ((g_render_layer_flags[0] & 0x20) && g_gfx_pass_mode[0] != 6) {
+        VU1_addDataRef(g_water_vu_program, g_water_vu_data_size);
+        g_gfx_pass_mode[0] = 6;
     }
-    if (D_001B1594[0] & 0x20) {
+    if (g_render_layer_flags[0] & 0x20) {
         gfx_append_vu1_preset_c();
-        if (D_001B1608[0])
+        if (g_world_draw_callback_count[0])
             gfx_run_world_draw_callbacks();
         VU1_addGSregister(0x42, 0x8000000048UL);
         DrawLensFlare();
@@ -146,28 +146,28 @@ void func_PAL_0027C258(void)
         gfx_append_vu1_preset_c();
         FlushCache(0);
         part_draw_all();
-        D_001B169C[0] = 9;
-        if (D_001B160C[0]) {
+        g_gfx_pass_mode[0] = 9;
+        if (g_overlay_draw_callback_count[0]) {
             gfx_append_vu1_preset_c();
             gfx_run_overlay_draw_callbacks();
         }
         DrawGlowSprites();
-        if (D_001B1638[0]) {
+        if (g_final_draw_callback_count[0]) {
             gfx_append_vu1_preset_c();
             gfx_run_final_draw_callbacks();
         }
         VU1_addGSregister(0x42, 0x8000000044UL);
-        func_PAL_002732B8();
+        hud_draw_reticle_and_markers_pal();
     }
     gfx_queue_first_strip_packet();
     gfx_append_vu1_preset_c();
-    if ((D_001B1594[0] & 0x180) && !request_is_current_slot(3)) {
+    if ((g_render_layer_flags[0] & 0x180) && !request_is_current_slot(3)) {
         VU1_addGSregister(0x47, 0x33001);
         DrawLetterboxBars();
-        if (D_001B1594[0] & 0x80) {
+        if (g_render_layer_flags[0] & 0x80) {
             level_run_callbacks_and_draw();
-            func_PAL_0028ECD8();
-            func_PAL_0028A470();
+            hud_update_record_handlers_pal();
+            DrawSubtitleBox_pal();
         }
     }
     if (g_current_game_mode[0] == 2)
@@ -185,45 +185,45 @@ void func_PAL_0027C258(void)
         text_draw_medium(24, g_screen_height[0] - 40, 0x80F0F0F0L, text, -1);
     }
     DoGifPaging();
-    if (D_001B1594[0] & 0x40) {
+    if (g_render_layer_flags[0] & 0x40) {
         VU1_addGSregister(0x42, 0x8000000044UL);
         if (ref_0027BD70_06)
-            gfx_set_clear_color_packet(D_001AD580[0], D_001AD581[0], D_001AD582[0], D_001AD583[0]);
+            gfx_set_clear_color_packet(g_clear_color_r[0], g_clear_color_g[0], g_clear_color_b[0], g_clear_color_a[0]);
         if (g_screen_fade[0] > 0.0f) {
             if (g_screen_fade[0] > 1.0f)
                 g_screen_fade[0] = 1.0f;
             gfx_set_clear_color_packet(0, 0, 0, FloatToInt(g_screen_fade[0] * 128.0f));
         }
-        if (D_001B15A4[0] > 0.0f) {
-            if (D_001B15A4[0] > 1.0f)
-                D_001B15A4[0] = 1.0f;
-            gfx_set_clear_color_packet(255, 255, 255, FloatToInt(D_001B15A4[0] * 128.0f));
+        if (g_screen_flash_alpha[0] > 0.0f) {
+            if (g_screen_flash_alpha[0] > 1.0f)
+                g_screen_flash_alpha[0] = 1.0f;
+            gfx_set_clear_color_packet(255, 255, 255, FloatToInt(g_screen_flash_alpha[0] * 128.0f));
         }
-        if (D_001A86F4 && D_001A8758)
+        if (g_screen_tint_flag_a && g_screen_tint_flag_b)
             gfx_draw_screen_stripe_effect();
     }
-    gfx_start_dma_channel0_and_wait(D_00100AE0);
+    gfx_start_dma_channel0_and_wait(g_gfx_dma_chain_buffer);
     FlushCache(0);
     ticks = IntToFloat(((int)T1_COUNT));
-    D_001B1690[0] = ticks * (g_is_pal_video[0] ? (1.0f / 11520.0f) : (1.0f / 9600.0f));
+    g_tick_time_scale[0] = ticks * (g_is_pal_video[0] ? (1.0f / 11520.0f) : (1.0f / 9600.0f));
     gfx_wait_for_dma_status_bits(2);
-    if (D_001B1594[0] & 2) {
+    if (g_render_layer_flags[0] & 2) {
         func_002F0468(ref_0027BD70_07);
         PatchTfragGifs();
     }
     gfx_wait_for_dma_status_bits(4);
-    if (D_001B1594[0] & 4) {
+    if (g_render_layer_flags[0] & 4) {
         func_002F3E78();
         gfx_apply_object_row_overrides();
     }
     gfx_wait_for_dma_status_bits(8);
-    if (D_001B1594[0] & 8) {
+    if (g_render_layer_flags[0] & 8) {
         shrub_process_render_data(ref_0027BD70_08);
         patch_shrub_gifs();
     }
     gfx_wait_for_dma_status_bits(16);
-    if (D_001B1594[0] & 16)
+    if (g_render_layer_flags[0] & 16)
         PatchMobyGifs();
     gfx_apply_display_config();
-    D_001B170C[0] = 0;
+    g_vis_fallback_mode[0] = 0;
 }

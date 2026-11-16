@@ -14,7 +14,7 @@ extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
 extern void SpawnBurstEffects(char *, char *);
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
     short timer;
@@ -159,7 +159,7 @@ char *flare_spawn(float size, char *position, int trigger, int kind, int red, in
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = D_L00_001B8C80 + 0x140;
+        camera = g_scalar_transition_state + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -193,9 +193,9 @@ char *flare_spawn(float size, char *position, int trigger, int kind, int red, in
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, g_scalar_transition_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -319,7 +319,7 @@ void tracked_target_offsets_update(char *moby)
 }
 
 
-extern char D_L00_00256BC0[];
+extern char g_tumbling_piece_records[];
 extern char *moby_get_private_value_0(char *);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), IntToFloat(int);
@@ -338,7 +338,7 @@ void tumbling_pieces_update(char *moby)
     int i;
     float fraction, amount;
     for (i = 0; i < 48; i++) {
-        record = D_L00_00256BC0 + i * 0xd0;
+        record = g_tumbling_piece_records + i * 0xd0;
         if (*(char **)(record + 0xac) != moby) continue;
         current_pos = record + 0x20;
         qcopy(current_pos, record + 0x40);

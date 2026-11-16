@@ -11,7 +11,7 @@ typedef struct { u8 pad[0x1B8]; int busy; u8 pad2[0x62]; short timer; u8 pad3[0x
 extern Player g_hero_state;
 typedef struct { u8 pad[0x6C]; short id; u8 pad2[4]; short mode; } Voice;
 extern Voice g_music_state;
-extern float D_L03_001B3760 __attribute__((sda));
+extern float g_endako_boss_health_ratio __attribute__((sda));
 /* Picks boss voice lines to play based on its health, its state and what the hero is doing. */
 void endako_boss_play_voice_lines(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
@@ -34,16 +34,16 @@ void endako_boss_play_voice_lines(u8 *entity) {
         if (g_hero_state.weapon == 7 && !g_hero_state.busy) {
             if (func_31B9F0(5) == 0 && !state[0x41A]) endako_boss_start_voice_line(entity, 10);
         }
-        if (ratio < 0.8f && D_L03_001B3760 >= 0.8f && !func_31B9F0(2)) {
+        if (ratio < 0.8f && g_endako_boss_health_ratio >= 0.8f && !func_31B9F0(2)) {
             endako_boss_start_voice_line(entity, 2);
-        } else if (ratio < 0.6f && D_L03_001B3760 >= 0.6f && !func_31B9F0(2)) {
+        } else if (ratio < 0.6f && g_endako_boss_health_ratio >= 0.6f && !func_31B9F0(2)) {
             endako_boss_start_voice_line(entity, 5);
-        } else if (ratio < 0.4f && D_L03_001B3760 >= 0.4f && !func_31B9F0(2)) {
+        } else if (ratio < 0.4f && g_endako_boss_health_ratio >= 0.4f && !func_31B9F0(2)) {
             endako_boss_start_voice_line(entity, 6);
-        } else if (ratio < 0.2f && D_L03_001B3760 >= 0.2f && !func_31B9F0(2)) {
+        } else if (ratio < 0.2f && g_endako_boss_health_ratio >= 0.2f && !func_31B9F0(2)) {
             endako_boss_start_voice_line(entity, 4);
         }
-        D_L03_001B3760 = ratio;
+        g_endako_boss_health_ratio = ratio;
     }
     if (g_music_state.mode == 3 && g_music_state.id < 6000) {
         func_31B640(*(int *)(state + 0x2C4), 1, 0, 10);

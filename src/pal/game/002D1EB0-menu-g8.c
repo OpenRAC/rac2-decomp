@@ -8,15 +8,15 @@ typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int 
 
 extern CallbackMenuState g_pad_state;
 extern SelectionCallback g_pause_menu_state;
-extern int D_001ABA28 __attribute__((sda));
-extern unsigned char D_001ABA30[8] __attribute__((sda));
-extern int D_001A7904 __attribute__((sda));
-extern short D_001A63AC[];
-extern FlagTarget *D_0025C540[];
-extern MenuFields D_0025C580;
+extern int g_eight_entry_cursor __attribute__((sda));
+extern unsigned char g_special_item_collected_flags[8] __attribute__((sda));
+extern int g_arena_state_flag __attribute__((sda));
+extern short g_sequence_active_flag[];
+extern FlagTarget *g_eight_entry_flag_targets[];
+extern MenuFields g_eight_entry_menu_fields;
 extern int D_0026CD20[];
-extern int D_PAL_001A7A78 MACRO_ADDR;
-extern int D_PAL_001A7988 MACRO_ADDR;
+extern int g_current_level MACRO_ADDR;
+extern int g_current_level_set MACRO_ADDR;
 
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void data_set_small_value_and_refresh(int, int);
@@ -27,13 +27,13 @@ int func_PAL_002D1EB0(void)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int old = D_001ABA28;
+    int old = g_eight_entry_cursor;
     int result = 0;
 
     if (flags & 0x10) {
         int value;
         int status;
-        D_001ABA28 = 0;
+        g_eight_entry_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -46,36 +46,36 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        D_001ABA28 = 0;
+        g_eight_entry_cursor = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (--D_001ABA28 < 0)
-                D_001ABA28 = 7;
+            if (--g_eight_entry_cursor < 0)
+                g_eight_entry_cursor = 7;
         } else if (flags & 0x4000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (++D_001ABA28 >= 8)
-                D_001ABA28 = 0;
+            if (++g_eight_entry_cursor >= 8)
+                g_eight_entry_cursor = 0;
         }
         if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
-            if (D_001ABA30[D_001ABA28] != 0) {
+            if (g_special_item_collected_flags[g_eight_entry_cursor] != 0) {
                 snd_play_from_global_bank(4, 0, 0);
-                if ((unsigned)D_001ABA28 < 8)
-                    goto *D_0026CD20[D_001ABA28];
+                if ((unsigned)g_eight_entry_cursor < 8)
+                    goto *D_0026CD20[g_eight_entry_cursor];
                 goto cont;
-c0:            D_001A7904 = 2; data_set_small_value_and_refresh(2, 1); goto cont;
-c1:            D_001A7904 = 3; data_set_small_value_and_refresh(4, 1); goto cont;
-c2:            D_001A7904 = 3; data_set_small_value_and_refresh(11, 1); goto cont;
-c3:            D_001A7904 = 2; data_set_small_value_and_refresh(11, 1); goto cont;
-c4:            D_001A7904 = 1; data_set_small_value_and_refresh(26, 1); goto cont;
-c5:            D_001A7904 = 1; data_set_small_value_and_refresh(22, 1); goto cont;
-c6:            D_001A7904 = 1; data_set_small_value_and_refresh(23, 1); goto cont;
-c7:            D_001A7904 = 1;
+c0:            g_arena_state_flag = 2; data_set_small_value_and_refresh(2, 1); goto cont;
+c1:            g_arena_state_flag = 3; data_set_small_value_and_refresh(4, 1); goto cont;
+c2:            g_arena_state_flag = 3; data_set_small_value_and_refresh(11, 1); goto cont;
+c3:            g_arena_state_flag = 2; data_set_small_value_and_refresh(11, 1); goto cont;
+c4:            g_arena_state_flag = 1; data_set_small_value_and_refresh(26, 1); goto cont;
+c5:            g_arena_state_flag = 1; data_set_small_value_and_refresh(22, 1); goto cont;
+c6:            g_arena_state_flag = 1; data_set_small_value_and_refresh(23, 1); goto cont;
+c7:            g_arena_state_flag = 1;
                {
-                   int level = D_PAL_001A7A78;
+                   int level = g_current_level;
                    if (level != 21)
-                       D_PAL_001A7988 = level;
+                       g_current_level_set = level;
                }
                data_set_small_value_and_refresh(21, 1);
                goto cont;
@@ -85,20 +85,20 @@ c7:            D_001A7904 = 1;
         }
 cont:
         {
-            MenuFields *menu = &D_0025C580;
-            menu->f58 = D_001ABA28;
-            if (D_001ABA30[D_001ABA28] != 0) {
-                if (old == D_001ABA28) {
-                    if (D_001A63AC[0] == 0) {
+            MenuFields *menu = &g_eight_entry_menu_fields;
+            menu->f58 = g_eight_entry_cursor;
+            if (g_special_item_collected_flags[g_eight_entry_cursor] != 0) {
+                if (old == g_eight_entry_cursor) {
+                    if (g_sequence_active_flag[0] == 0) {
                         if (menu->f50 == old && menu->f44 == 2) {
-                            D_0025C540[0]->flags &= -5;
+                            g_eight_entry_flag_targets[0]->flags &= -5;
                         } else if (menu->f54 == old && menu->f44 == 4) {
-                            D_0025C540[0]->flags &= -5;
+                            g_eight_entry_flag_targets[0]->flags &= -5;
                         }
                     }
                 }
             } else {
-                D_0025C540[0]->flags |= 4;
+                g_eight_entry_flag_targets[0]->flags |= 4;
             }
         }
     }

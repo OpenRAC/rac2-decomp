@@ -16,10 +16,10 @@ typedef struct {
 } Player003E8CE8;
 
 extern char *g_moby_l02_pool[3] __attribute__((sda));
-extern float D_L02_001B0C00 __attribute__((sda));
-extern float D_L02_001B0C04 __attribute__((sda));
-extern float D_L02_001B0C08 __attribute__((sda));
-extern float D_L02_001B0C0C __attribute__((sda));
+extern float g_tether_pull_height __attribute__((sda));
+extern float g_tether_pull_step_limit __attribute__((sda));
+extern float g_tether_spring_stiffness __attribute__((sda));
+extern float g_tether_pull_damping __attribute__((sda));
 extern Player003E8CE8 g_hero_state;
 
 extern void FastVecSub(void *, void *, void *);
@@ -47,11 +47,11 @@ void tether_pull_entity(char *actor) {
     float speed;
 
     *(TI128 *)pos = *(TI128 *)(actor + 0x10);
-    pos[2] += D_L02_001B0C00;
+    pos[2] += g_tether_pull_height;
     if (g_hero_state.target5C0 == target) {
         FastVecSub(vec, g_hero_state.vecE0, pos);
         step = FastVecLength(vec);
-        ApproachValue(&step, 0.1f, D_L02_001B0C04);
+        ApproachValue(&step, 0.1f, g_tether_pull_step_limit);
         vec_scale_to_length(vec, vec, step);
         FastVecAdd(vec, vec, pos);
     } else {
@@ -62,8 +62,8 @@ void tether_pull_entity(char *actor) {
     distance = FastVecLength(diff);
     speed = FastVecLength(state + 0x10);
     distance = distance * 0.00027777778f;
-    speed = speed / D_L02_001B0C0C;
-    vec_scale_to_length(spring, diff, -(D_L02_001B0C08 * distance));
+    speed = speed / g_tether_pull_damping;
+    vec_scale_to_length(spring, diff, -(g_tether_spring_stiffness * distance));
     vec_scale_to_length(damp, state + 0x10, -speed);
     FastVecAdd(state + 0x10, state + 0x10, spring);
     FastVecAdd(state + 0x10, state + 0x10, damp);

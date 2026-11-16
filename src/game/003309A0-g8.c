@@ -7,11 +7,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_001B2854;
+extern float g_vehicle_steer_damping;
 extern float D_001B2854_1 __attribute__((sda));
-extern s32 D_001B2850;
+extern s32 g_vehicle_steer_active_flag;
 extern s32 D_001B2850_1 __attribute__((sda));
-extern char D_001B5570[];
+extern char g_camera_basis_vectors[];
 
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -42,7 +42,7 @@ void moby_steer_heading_to_aim(char *obj)
 
     aim[0] = *(float *)(vars + 0x50);
     aim[1] = *(float *)(vars + 0x54);
-    D_001B2854 = D_001B2854 * 0.7f;
+    g_vehicle_steer_damping = g_vehicle_steer_damping * 0.7f;
     aim[2] = 0.0f;
     aim[3] = 0.0f;
     D_001B2850_1 = 0;
@@ -50,7 +50,7 @@ void moby_steer_heading_to_aim(char *obj)
         heading = obj + 0xE0;
         facing = obj + 0xC0;
         vec_scale_to_length(aim, aim, 1.0f);
-        matrix_mul_vec3(aim, aim, D_001B5570);
+        matrix_mul_vec3(aim, aim, g_camera_basis_vectors);
         angle_cos = FastVecDot(aim, heading);
         FastVecScale(projection, heading, angle_cos);
         FastVecSub(aim, aim, projection);
@@ -63,7 +63,7 @@ void moby_steer_heading_to_aim(char *obj)
         angle_cos = FastVecDot(facing, aim);
         D_001B2854_1 = 1.0f - angle_cos;
         if (angle_cos > 0.75f)
-            D_001B2850 = 1;
+            g_vehicle_steer_active_flag = 1;
         angle_cos = 1.5707964f - math_fast_angle_helper(angle_cos);
         angle_cos = angle_cos * 0.1f;
         FastVecScale(turn_quat, turn_axis, math_fast_sin_or_cos_b(angle_cos));

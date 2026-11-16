@@ -32,7 +32,7 @@ typedef struct {
 } HeroActionState;
 extern HeroActionState g_hero_state;
 
-extern unsigned int D_00138320[];
+extern unsigned int g_pad_pressed_flags[];
 extern int ref_L00_002CAB08_00(int, int);
 
 extern int hero_get_step_offset_from_direction(void);
@@ -47,7 +47,7 @@ int hero_choose_jump_or_roll_move(void)
     int offset;
     if (g_hero_state.mode == 14) return 0;
     offset = hero_get_step_offset_from_direction();
-    if ((D_00138320[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 5, offset)) {
+    if ((g_pad_pressed_flags[0] & 8) && offset > 0 && pad_presses_within_frames(0x40, 0x1F000, offset + 5, offset)) {
         ref_L00_002CAB08_00(11, 1);
         return 1;
     }

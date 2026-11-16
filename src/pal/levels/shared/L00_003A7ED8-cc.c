@@ -51,14 +51,14 @@ typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
 extern u8 g_hero_state[], g_item_slot_to_record[];
 extern Vector g_hero_position;
 extern u32 g_pad_state[];
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001B2864 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
+extern int g_minirocket_fire_held MACRO_ADDR;
 extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
-extern MuzzleLight D_L00_001C6F40[];
-extern WeaponEntry D_00262570[];
-extern u8 D_00294880[];
+extern MuzzleLight g_light_table[];
+extern WeaponEntry g_weapon_table_2[];
+extern u8 g_minirocket_sound_records[];
 
 extern void func_PAL_L00_003A77D8(void *);
 extern int vec_fast_helper_b(void *);
@@ -81,8 +81,8 @@ extern int FastDecTimer(short *);
 extern int PlayMobySound(int, int, void *);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern void func_PAL_L00_003A7A68(Moby *);
-extern void func_PAL_L00_003A8978(Moby *);
-extern void func_PAL_L00_002D2668(int, int, float);
+extern void weapon_spawn_muzzle_effect_pal(Moby *);
+extern void set_hero_animation_pal(int, int, float);
 extern void func_PAL_L00_002AF458(void);
 extern void slot_reset_active(int);
 extern int slot_copy_records_to_free(void *);
@@ -196,12 +196,12 @@ void func_PAL_L00_003A7ED8(Moby *moby)
     else
         ((Hero *)g_hero_state)->i[0x2534 / 4] = 0x21;
 
-    if (D_L00_001A8F00 != 2 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 && moby->animation < 2 &&
+    if (g_game_l00_mode != 2 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 && moby->animation < 2 &&
         (g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 19 && ready) {
         if (moby->nextAnimation == 0)
             func_PAL_002A7E68(moby, 1, 0, 3);
         if (weapon_spend_ammo(-1, 1)) {
-            D_L00_001B2864 = 1;
+            g_minirocket_fire_held = 1;
             if (candidate == 0) {
                 int count, i;
                 FastVecScale(&muzzle, &moby->forward, -1.0f);
@@ -242,20 +242,20 @@ void func_PAL_L00_003A7ED8(Moby *moby)
             PlayMobySound(0, 0, moby);
             vars->flash = 12;
             func_PAL_L00_003A7A68(moby);
-            func_PAL_L00_003A8978(moby);
+            weapon_spawn_muzzle_effect_pal(moby);
             if (((Hero *)g_hero_state)->i[0x229C / 4] == 0 || (((Hero *)g_hero_state)->i[0x2294 / 4] == 2 && ((Hero *)g_hero_state)->f[0x24B8 / 4] < 0.7f))
-                func_PAL_L00_002D2668(0x36, 1, 8.0f);
+                set_hero_animation_pal(0x36, 1, 8.0f);
             else
                 func_PAL_L00_002AF458();
             func_PAL_002A7E68(moby, 2, 0, 0);
-            vars->sound = slot_copy_records_to_free(D_00294880);
+            vars->sound = slot_copy_records_to_free(g_minirocket_sound_records);
             {
-                WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
+                WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
                 vars->cooldown = 1.0f / weapon->rate;
             }
-        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || D_L00_001B2864 == 1) {
+        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || g_minirocket_fire_held == 1) {
             PlayMobySound(1, 0, moby);
-            D_L00_001B2864 = 0;
+            g_minirocket_fire_held = 0;
         }
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && get_ammo(-1) && ((Hero *)g_hero_state)->b[0x22B8]) &&
             vars->sound >= 0) {
@@ -296,7 +296,7 @@ void func_PAL_L00_003A7ED8(Moby *moby)
         if (vars->light == -1) {
             vars->light = part_l00_alloc_effect_slot_2(pos, 8.0f, 0.0f, alpha, width, power);
         } else {
-            MuzzleLight *light = &D_L00_001C6F40[vars->light];
+            MuzzleLight *light = &g_light_table[vars->light];
             qcopy(&light->position, pos);
             light->position.f[3] = 8.0f;
             light->radius = alpha;

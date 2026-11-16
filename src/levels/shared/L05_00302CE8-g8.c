@@ -6,8 +6,8 @@ typedef struct {
     s8 y, advance;
 } L05Glyph;
 
-extern u32 D_L05_001A8D00[8] SDATA(D_L05_001A8D00);
-extern int D_L05_001B2028 __attribute__((sda));
+extern u32 g_color_mask_table[8] SDATA(D_L05_001A8D00);
+extern int g_level_enable_flag __attribute__((sda));
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, u64, u64);
 
 /* Word-wrapping FontPrint: draws text inside the box (x, y, width, height), moving a word
@@ -21,7 +21,7 @@ int FontPrintWrapped(int x, int y, int width, int height, u64 color, u8 *text, i
     float startX, wordWidth;
     u8 character;
 
-    D_L05_001A8D00[0] = (s32)color;
+    g_color_mask_table[0] = (s32)color;
     if (count && *text) {
         while (cursorY + 16 <= y + height) {
             /* Measure the word that starts here. */
@@ -39,9 +39,9 @@ int FontPrintWrapped(int x, int y, int width, int height, u64 color, u8 *text, i
                 cursorX = x;
                 cursorY += 16;
             } else if (*word >= 8 && *word < 16) {
-                if (D_L05_001B2028) {
+                if (g_level_enable_flag) {
                     color &= 0xFF000000ULL;
-                    color |= D_L05_001A8D00[*word - 8] & 0xFFFFFF;
+                    color |= g_color_mask_table[*word - 8] & 0xFFFFFF;
                 }
             } else {
                 character = *word;

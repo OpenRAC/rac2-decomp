@@ -3,11 +3,11 @@
 extern void FastVecAdd(char *, char *, char *);
 extern float IntToFloat(int);
 extern int FastTweenColor(int, int, float);
-extern int D_L13_001B1624 __attribute__((sda));
-extern int D_L13_001B1628 __attribute__((sda));
-extern int D_L13_001B1650 __attribute__((sda));
-extern int D_L13_001B1654 __attribute__((sda));
-extern int D_L13_001B1658 __attribute__((sda));
+extern int g_streak_fade_start __attribute__((sda));
+extern int g_streak_fade_end __attribute__((sda));
+extern int g_streak_color_a __attribute__((sda));
+extern int g_streak_color_b __attribute__((sda));
+extern int g_streak_color_c __attribute__((sda));
 /* Steps the streak effect each frame: moves its trail points and fades its brightness as the timer runs down. */
 void streak_effect_update(char *obj)
 {
@@ -49,13 +49,13 @@ void streak_effect_update(char *obj)
             }
         }
     }
-    if (*(short *)(s + 0x12) > D_L13_001B1624) {
-        float a = IntToFloat(*(short *)(s + 0x12) - D_L13_001B1624);
-        float b = IntToFloat(*(int *)(s + 0x620) - D_L13_001B1624);
-        *(int *)(s + 0x14) = FastTweenColor(D_L13_001B1654, D_L13_001B1650, a / b);
-    } else if (*(short *)(s + 0x12) > D_L13_001B1628) {
-        float a = IntToFloat(*(short *)(s + 0x12) - D_L13_001B1628);
-        float b = IntToFloat(D_L13_001B1624 - D_L13_001B1628);
-        *(int *)(s + 0x14) = FastTweenColor(D_L13_001B1658, D_L13_001B1654, a / b);
+    if (*(short *)(s + 0x12) > g_streak_fade_start) {
+        float a = IntToFloat(*(short *)(s + 0x12) - g_streak_fade_start);
+        float b = IntToFloat(*(int *)(s + 0x620) - g_streak_fade_start);
+        *(int *)(s + 0x14) = FastTweenColor(g_streak_color_b, g_streak_color_a, a / b);
+    } else if (*(short *)(s + 0x12) > g_streak_fade_end) {
+        float a = IntToFloat(*(short *)(s + 0x12) - g_streak_fade_end);
+        float b = IntToFloat(g_streak_fade_start - g_streak_fade_end);
+        *(int *)(s + 0x14) = FastTweenColor(g_streak_color_c, g_streak_color_b, a / b);
     } else *(int *)(s + 0x14) = 0;
 }

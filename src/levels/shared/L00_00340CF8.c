@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
-extern unsigned char *D_L00_001FEAF0;
+extern unsigned char *g_accelerated_puff_byte;
 
 /* Spawns a puff particle that is pushed by an extra acceleration as well as its velocity. */
 unsigned char *part_spawn_accelerated_puff(Quadword *position, float *velocity, float *acceleration,
@@ -22,7 +22,7 @@ unsigned char *part_spawn_accelerated_puff(Quadword *position, float *velocity, 
         particle[3] = flags;
         particle[1] = 0;
         particle[8] = math_random_int_below(255);
-        particle[2] = *D_L00_001FEAF0;
+        particle[2] = *g_accelerated_puff_byte;
         *(short *)(particle + 0xA) = lifetime;
         *(float *)motion = velocity[0];
         *(float *)(motion + 4) = velocity[1];

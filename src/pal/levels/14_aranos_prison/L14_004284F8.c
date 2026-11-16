@@ -7,7 +7,7 @@ extern void func_423358();
 extern void func_423B30();
 extern void func_423BD8();
 
-void func_PAL_L14_004284F8(char *a0)
+void space_l14_tourist_update_pal(char *a0)
 {
     if (*(unsigned char *)(a0 + 0x20) == 0) {
         func_423000(a0);
@@ -27,7 +27,7 @@ extern int moby_turn_toward_target_and_step(char *object, char *bone, float fact
 extern void *jtbl_002AA360[];
 
 /* Dispatches on the owner's animation step and plays the matching bone animation. */
-void func_PAL_L14_004290A8(char *object)
+void actor_play_bone_anim_pal(char *object)
 {
     static void * volatile tab[] = { &&cA, &&cC };
     char *state;
@@ -58,15 +58,15 @@ end:
 }
 
 #include "common.h"
-extern char D_L14_001B9500[];
-extern char D_L14_001B9500[];
+extern char g_tether_l14_origin_vec[];
+extern char g_tether_l14_origin_vec[];
 extern void func_PAL_002AC3C0(char *a0, void *a1);
 extern void moby_update_eased_node(char *a0, void *a1, int a2, float a3, float a4);
 extern float fast_vec_dist(char *a0, void *a1);
 extern void moby_update_ground_check(char *a0);
 
 /* Restarts the owner's animation: two timed fades, the counter, then the panic state. */
-void func_PAL_L14_00429150(char *a0)
+void actor_restart_anim_pal(char *a0)
 {
     char *s1;
     float f20;
@@ -84,7 +84,7 @@ void func_PAL_L14_00429150(char *a0)
     *(unsigned short *)(s1 + 0x778) = 0;
     *(unsigned short *)(s1 + 0x77A) = 0;
     if (*(unsigned char *)(a0 + 0x31) != 0) {
-        if (fast_vec_dist(a0 + 0x10, D_L14_001B9500) < 24.0f) {
+        if (fast_vec_dist(a0 + 0x10, g_tether_l14_origin_vec) < 24.0f) {
             moby_update_ground_check(a0);
             *(unsigned char *)(a0 + 0x6F) = 0x16;
         }

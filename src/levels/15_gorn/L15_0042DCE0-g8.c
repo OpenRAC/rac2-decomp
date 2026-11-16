@@ -64,41 +64,41 @@ typedef struct {
     Moby *moby;                 /* 0x2290 */
 } Hero;
 
-extern MissionState D_L15_00221E10;
-extern MissionSlot D_L15_0029FD80[];
-extern SaveGame D_001395B8;
+extern MissionState g_gorn_challenge_vars;
+extern MissionSlot g_weapon_l15_table[];
+extern SaveGame g_game_flag_table;
 extern Hero g_hero_state;
-extern Moby *D_L15_001B261C;
-extern s32 D_L15_001B369C;
-extern s32 D_L15_001B36A0;
-extern void (*D_L15_001AA720)(void);
-extern void (*D_L15_001AA728)(void);
-extern s32 D_L15_001B1524;
-extern s32 D_L15_001B1528;
-extern s32 D_L15_001B152C;
-extern s32 D_L15_001A8F00;
-extern f32 D_L15_001B2E84;
-extern s32 D_0013A170[];
-extern s32 D_L15_001B1530 __attribute__((sda));
-extern Moby *D_L15_001B1580 __attribute__((sda));
-extern s32 D_L15_001B15C4 __attribute__((sda));
-extern s32 D_L15_001B15B0 __attribute__((sda));
-extern s32 D_L15_001B1534 __attribute__((sda));
-extern s32 D_L15_001B158C __attribute__((sda));
-extern s32 D_L15_001B1560 __attribute__((sda));
-extern s32 D_L15_001B1564 __attribute__((sda));
-extern s32 D_L15_001B1568 __attribute__((sda));
-extern s32 D_L15_001B1578 __attribute__((sda));
-extern s32 D_L15_001B157C __attribute__((sda));
-extern s32 D_L15_001B15AC __attribute__((sda));
-extern s32 D_L15_001B15B8 __attribute__((sda));
-extern s32 D_L15_001B1520 __attribute__((sda));
-extern s32 D_L15_001B15D0 __attribute__((sda));
-extern s32 D_L15_001B15A8 __attribute__((sda));
-extern s32 D_L15_001B15B4 __attribute__((sda));
-extern s32 D_L15_001B2148 __attribute__((sda));
-extern s32 D_L15_001A904C MACRO_ADDR;
-extern s32 D_L15_001B15CC __attribute__((sda));
+extern Moby *g_moby_base;
+extern s32 g_gorn_timer_start_value;
+extern s32 g_gorn_timer_limit_value;
+extern void (*g_challenge_callback_a)(void);
+extern void (*g_challenge_callback_b)(void);
+extern s32 g_challenge_completed_b;
+extern s32 g_challenge_completed_c;
+extern s32 g_challenge_completed_d;
+extern s32 g_challenge_mode;
+extern f32 g_screen_l15_scale;
+extern s32 g_item_state_words[];
+extern s32 g_challenge_menu_choice __attribute__((sda));
+extern Moby *g_gorn_hud_moby __attribute__((sda));
+extern s32 g_gorn_enabled_flag __attribute__((sda));
+extern s32 g_gorn_weapon_slot_index __attribute__((sda));
+extern s32 g_cutscene_l15_started_flag __attribute__((sda));
+extern s32 g_gorn_path_effect __attribute__((sda));
+extern s32 g_label_sprite_a __attribute__((sda));
+extern s32 g_label_sprite_b __attribute__((sda));
+extern s32 g_label_sprite_c __attribute__((sda));
+extern s32 g_challenge_menu_loaded __attribute__((sda));
+extern s32 g_gorn_challenge_active_flag __attribute__((sda));
+extern s32 g_gorn_message_counter __attribute__((sda));
+extern s32 g_gorn_save_loaded_flag __attribute__((sda));
+extern s32 g_challenge_completed_a __attribute__((sda));
+extern s32 g_gorn_cutscene_active_flag __attribute__((sda));
+extern s32 g_gorn_hud_first_flag __attribute__((sda));
+extern s32 g_gorn_setup_flag __attribute__((sda));
+extern s32 g_gorn_challenge_count __attribute__((sda));
+extern s32 g_challenge_menu_data MACRO_ADDR;
+extern s32 g_gorn_stage_finished_flag __attribute__((sda));
 
 extern void hero_set_state_value_a(s32 value);
 extern void hero_set_state_value_b(s32 value);
@@ -142,56 +142,56 @@ void UpdateGornController(Moby *moby)
         moby->drawDistance = 0x1FF;
         moby->updateDistance = 0xFF;
         moby->state = 1;
-        D_L15_00221E10.index = vars->index;
-        D_L15_00221E10.f30 = 8.0f;
-        D_L15_001B1530 = -2;
-        D_L15_00221E10.f24 = 1;
-        D_L15_001B1580 = moby;
-        D_L15_001B15C4 = 1;
-        D_L15_001B15B0 = 0;
-        D_L15_001B1534 = 0;
-        D_L15_001B158C = 0;
-        D_L15_001B1560 = 0;
-        D_L15_001B1564 = 0;
-        D_L15_001B1568 = 0;
-        D_L15_001B1578 = 0;
-        D_L15_001B157C = 0;
+        g_gorn_challenge_vars.index = vars->index;
+        g_gorn_challenge_vars.f30 = 8.0f;
+        g_challenge_menu_choice = -2;
+        g_gorn_challenge_vars.f24 = 1;
+        g_gorn_hud_moby = moby;
+        g_gorn_enabled_flag = 1;
+        g_gorn_weapon_slot_index = 0;
+        g_cutscene_l15_started_flag = 0;
+        g_gorn_path_effect = 0;
+        g_label_sprite_a = 0;
+        g_label_sprite_b = 0;
+        g_label_sprite_c = 0;
+        g_challenge_menu_loaded = 0;
+        g_gorn_challenge_active_flag = 0;
         moby->drawDistance = 0x1FF;
         moby->updateDistance = 0xFF;
         moby->state = 1;
         vars->f34 = 0;
-        D_L15_001B15AC = 0;
+        g_gorn_message_counter = 0;
         vars->f50 = 5400;
         vars->f54 = 120;
         vars->f64 = 240;
         vars->f6C = 180;
         vars->timer = 360;
-        D_L15_001B369C = 540;
-        D_L15_001B36A0 = 360;
-        D_L15_00221E10.reset = func_L15_0042FDD8;
-        D_L15_00221E10.resetAll = func_L15_0042FED0;
-        D_L15_001B15B8 = 0;
-        D_L15_00221E10.onHit = moby_l15_apply_hit_damage;
-        D_L15_00221E10.controller = moby;
+        g_gorn_timer_start_value = 540;
+        g_gorn_timer_limit_value = 360;
+        g_gorn_challenge_vars.reset = func_L15_0042FDD8;
+        g_gorn_challenge_vars.resetAll = func_L15_0042FED0;
+        g_gorn_save_loaded_flag = 0;
+        g_gorn_challenge_vars.onHit = moby_l15_apply_hit_damage;
+        g_gorn_challenge_vars.controller = moby;
         hero_set_state_value_a(1);
         hero_set_state_value_b(0);
-        while (!D_L15_0029FD80[slot_find_active_in_chain(D_L15_001B15B0)].f00
-               || !D_L15_0029FD80[slot_find_active_in_chain(D_L15_001B15B0)].f1E)
-            ++D_L15_001B15B0;
-        completed0 = D_001395B8.completions[0];
-        completed1 = D_001395B8.completions[1];
-        completed2 = D_001395B8.completions[2];
-        completed3 = D_001395B8.completions[3];
-        D_L15_001AA720 = func_L15_0042FDD8;
-        D_L15_001AA728 = func_L15_0042FED0;
-        D_L15_001B1524 = completed1;
-        D_L15_001B1528 = completed2;
-        D_L15_001B152C = completed3;
-        D_L15_001B1520 = completed0;
-        if (!D_L15_001B1520)
-            D_L15_001B15D0 = 1;
+        while (!g_weapon_l15_table[slot_find_active_in_chain(g_gorn_weapon_slot_index)].f00
+               || !g_weapon_l15_table[slot_find_active_in_chain(g_gorn_weapon_slot_index)].f1E)
+            ++g_gorn_weapon_slot_index;
+        completed0 = g_game_flag_table.completions[0];
+        completed1 = g_game_flag_table.completions[1];
+        completed2 = g_game_flag_table.completions[2];
+        completed3 = g_game_flag_table.completions[3];
+        g_challenge_callback_a = func_L15_0042FDD8;
+        g_challenge_callback_b = func_L15_0042FED0;
+        g_challenge_completed_b = completed1;
+        g_challenge_completed_c = completed2;
+        g_challenge_completed_d = completed3;
+        g_challenge_completed_a = completed0;
+        if (!g_challenge_completed_a)
+            g_gorn_cutscene_active_flag = 1;
         else
-            D_L15_001B15D0 = 0;
+            g_gorn_cutscene_active_flag = 0;
         if (g_hero_state.moby != 0)
             g_hero_state.moby->flags |= 0x41;
         /* fall through */
@@ -200,39 +200,39 @@ void UpdateGornController(Moby *moby)
         s32 on = 1;
 
         level_select_random_object();
-        level_store_pair_with_increment((s32)(D_L15_001B2E84 * -230.0f + 0.5f), 2);
-        if (!D_L15_001B15A8) {
-            moby_set_flag_bit(&D_L15_001B261C[vars->moby], 1);
-            D_L15_001B15A8 = on;
-            D_L15_001B15AC = 0;
+        level_store_pair_with_increment((s32)(g_screen_l15_scale * -230.0f + 0.5f), 2);
+        if (!g_gorn_hud_first_flag) {
+            moby_set_flag_bit(&g_moby_base[vars->moby], 1);
+            g_gorn_hud_first_flag = on;
+            g_gorn_message_counter = 0;
         }
-        if (D_L15_001B15AC++ < 5 || D_L15_001A8F00 == 2)
+        if (g_gorn_message_counter++ < 5 || g_challenge_mode == 2)
             break;
 
         hero_l00_set_action(0x31, 0);
-        if (D_L15_001B15C4) {
+        if (g_gorn_enabled_flag) {
             hero_set_state_value_c(on);
-            D_L15_001B1530 = LockedEntryMenuInput();
-            if (D_L15_001B1530 != -2)
+            g_challenge_menu_choice = LockedEntryMenuInput();
+            if (g_challenge_menu_choice != -2)
                 ship_save_transform_state();
             break;
         }
-        if (!D_L15_001B15B4) {
+        if (!g_gorn_setup_flag) {
             subtitle_request_voice_line(0xA17, 0x6E);
-            D_L15_001B15B4 = on;
+            g_gorn_setup_flag = on;
         }
-        if ((D_0013A170[5] == on || D_0013A170[5] == 5 || D_0013A170[5] == 10)
-            && !status_any_record_nonzero() && !D_L15_001B15B8) {
+        if ((g_item_state_words[5] == on || g_item_state_words[5] == 5 || g_item_state_words[5] == 10)
+            && !status_any_record_nonzero() && !g_gorn_save_loaded_flag) {
             subtitle_request_voice_line(0xA18, 0x6F);
-            D_L15_001B15B8 = 1;
+            g_gorn_save_loaded_flag = 1;
         }
         if (math_fast_float_d(&vars->timer))
-            D_L15_00221E10.waiting = 0;
+            g_gorn_challenge_vars.waiting = 0;
         else
-            D_L15_00221E10.waiting = 1;
+            g_gorn_challenge_vars.waiting = 1;
         hero_set_state_value_c(0);
-        if (D_L15_001B1530 != -2 && D_L15_001B2148 >= 3) {
-            switch (D_L15_001B1530) {
+        if (g_challenge_menu_choice != -2 && g_gorn_challenge_count >= 3) {
+            switch (g_challenge_menu_choice) {
             case 0:
                 gorn_cutscene_update(moby);
                 break;
@@ -247,10 +247,10 @@ void UpdateGornController(Moby *moby)
                 break;
             }
         }
-        if (D_L15_001A904C && !D_L15_001B1578 && !D_L15_001B15CC) {
+        if (g_challenge_menu_data && !g_challenge_menu_loaded && !g_gorn_stage_finished_flag) {
             level_store_value_pair(0, DrawGornStageHud);
-            D_L15_001B157C = 0;
-            D_L15_001B1578 = 1;
+            g_gorn_challenge_active_flag = 0;
+            g_challenge_menu_loaded = 1;
         }
         break;
     }
@@ -258,8 +258,8 @@ void UpdateGornController(Moby *moby)
         break;
     case 3:
         if (!cam_is_mode_active()) {
-            D_L15_00221E10.waiting = 0;
-            D_L15_00221E10.rounds++;
+            g_gorn_challenge_vars.waiting = 0;
+            g_gorn_challenge_vars.rounds++;
             moby->state = 1;
         }
         break;

@@ -32,8 +32,8 @@ typedef struct {
     unsigned int f2524;               /* 0x2524 */
 } Hero_L00_002A7A50;
 extern Hero_L00_002A7A50 g_hero_state;
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 extern void gfx_l00_draw_billboard_quad(void *, unsigned int, float, float);
 extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);
@@ -50,7 +50,7 @@ void DrawHeroGlowQuads(void)
     float value, divisor, size, step, peak;
     unsigned int color;
 
-    if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
+    if (g_game_l00_mode == 2 || g_game_l00_mode == 6) {
         for (index = 0; index < g_hero_state.queueCount; index++)
             gfx_l00_draw_billboard_quad(g_hero_state.queue[index], g_hero_state.queueColor[index],
                               g_hero_state.queueSize[index], g_hero_state.queueFade[index]);
@@ -92,7 +92,7 @@ void DrawHeroGlowQuads(void)
         gfx_l00_draw_billboard_quad(g_hero_state.v2010, 0x300000C0U, 0.25f, 0.08f);
     } else if (g_hero_state.mode == 1) {
         size = g_hero_state.f2520 ? 0.101500004529953f : 0.07f;
-        if (D_001A7A40[3]) {
+        if (g_unlocked_item_flags[3]) {
             g_hero_state.v2010[2] -= 0.01f;
             size *= 1.7f;
         } else {

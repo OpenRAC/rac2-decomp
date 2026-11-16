@@ -13,9 +13,9 @@ typedef struct {
     int flags, mask, response, surface, gravity;
     float maxTurn;
 } CollisionQuery;
-extern int D_001A8CA4 MACRO_ADDR;
-extern Vector D_001BAFC0;
-extern u16 D_001B1CB0[] MACRO_ADDR;
+extern int g_hero_effect_inhibit MACRO_ADDR;
+extern Vector g_coll_hit_normal;
+extern u16 g_projectile_moby_index_list[] MACRO_ADDR;
 extern void anim_start_blended(char *, int, int, int), moby_get_facing_direction(void *, float *);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
@@ -82,7 +82,7 @@ void projectile_update(char *actor) {
         collision = CollideSweptSphere(&scratch.phase.query);
         qcopy((actor + 0x10), &scratch.phase.query.position);
         qcopy((vars + 0x10), &scratch.phase.query.velocity);
-        if (D_001A8CA4 && *(float *)(actor + 0x18) < 462.43f) {
+        if (g_hero_effect_inhibit && *(float *)(actor + 0x18) < 462.43f) {
             vec_add_random_offset(scratch.scatter.f, 0.5f);
             SpawnExplosionEffects(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
@@ -96,7 +96,7 @@ void projectile_update(char *actor) {
             *(char **)(vars + 0x38) = hit;
         }
         {
-            FastVecScale(&scratch.desired, &D_001BAFC0, 0.0009765625f);
+            FastVecScale(&scratch.desired, &g_coll_hit_normal, 0.0009765625f);
             vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
             vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
             FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
@@ -136,7 +136,7 @@ response_done:
         break;
     case 6:
         table_clear_entry_flag(*(int *)(vars + 0x20));
-        if (!*(int *)(vars + 0x40)) RemoveMobyFromIndexList((int)actor, D_001B1CB0);
+        if (!*(int *)(vars + 0x40)) RemoveMobyFromIndexList((int)actor, g_projectile_moby_index_list);
         moby_mark_spawned(actor);
         return;
     }

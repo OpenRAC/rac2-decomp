@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_PAL_L00_003D6F08, the PAL copy of func_L00_003D2ED0: the same C, where scale D_L00_001B021C; scale D_L00_001B020C. */
 #include "common.h"
 typedef struct { float x, y, z, w; } EffectVector;
-extern short D_L00_001B2AF0[] MACRO_ADDR;
-extern char D_L00_00247310[], D_L00_00247450[];
-extern short D_L00_001B2AF8, D_L00_001B2AFA;
+extern short g_lightning_arc_alphas[] MACRO_ADDR;
+extern char g_lightning_arc_points[], g_scrolling_ribbon_points[];
+extern short g_ribbon_l00_param_a, g_ribbon_l00_param_b;
 extern char g_camera_l00_position[];
-extern char D_0018A580[];
+extern char g_strip_axis[];
 extern short g_screen_adjust_offsets[];
-extern float D_L00_001B01BC __attribute__((sda)), D_L00_001B01C0 __attribute__((sda)), D_L00_001B01C4 __attribute__((sda)), D_L00_001B01C8 __attribute__((sda));
-extern int D_L00_001B021C __attribute__((sda)), D_L00_001B020C __attribute__((sda));
-extern float D_L00_001B0208 __attribute__((sda)), D_L00_001B0210 __attribute__((sda));
+extern float g_scrolling_ribbon_param_a __attribute__((sda)), g_scrolling_ribbon_param_b __attribute__((sda)), g_scrolling_ribbon_param_c __attribute__((sda)), g_scrolling_ribbon_param_d __attribute__((sda));
+extern int g_effect_timer_limit_b __attribute__((sda)), g_effect_timer_limit_a __attribute__((sda));
+extern float g_effect_point_length __attribute__((sda)), g_effect_fade_alpha_scale __attribute__((sda));
 extern void DrawScrollingRibbonWithFadedEnds(void *, int, int, int, float, float, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecSub(void *, void *,void *);
@@ -34,27 +35,27 @@ void func_PAL_L00_003D6F08(char *object)
     struct { EffectVector points[20], offset, center, radial, rotated; int color; } effect;
     int color;
     int i, remaining;
-    short *indices = D_L00_001B2AF0;
-    char *records = D_L00_00247310;
+    short *indices = g_lightning_arc_alphas;
+    char *records = g_lightning_arc_points;
     char *context = *(char **)(object + 0x68);
     float fade;
     float radius, spread;
     for (remaining = 3; remaining >= 0; indices++, records += 0x50, remaining--)
-        DrawScrollingRibbonWithFadedEnds(records, *indices, *indices, 5, D_L00_001B01BC, D_L00_001B01C0, 0.2f);
-    DrawScrollingRibbonWithFadedEnds(D_L00_00247450, D_L00_001B2AF8, D_L00_001B2AF8, 5, D_L00_001B01C4, D_L00_001B01C8, 0.2f);
-    DrawScrollingRibbonWithFadedEnds(D_L00_00247450 + 0x50, D_L00_001B2AFA, D_L00_001B2AFA, 5, D_L00_001B01C4, D_L00_001B01C8, 0.2f);
+        DrawScrollingRibbonWithFadedEnds(records, *indices, *indices, 5, g_scrolling_ribbon_param_a, g_scrolling_ribbon_param_b, 0.2f);
+    DrawScrollingRibbonWithFadedEnds(g_scrolling_ribbon_points, g_ribbon_l00_param_a, g_ribbon_l00_param_a, 5, g_scrolling_ribbon_param_c, g_scrolling_ribbon_param_d, 0.2f);
+    DrawScrollingRibbonWithFadedEnds(g_scrolling_ribbon_points + 0x50, g_ribbon_l00_param_b, g_ribbon_l00_param_b, 5, g_scrolling_ribbon_param_c, g_scrolling_ribbon_param_d, 0.2f);
     qcopy(&position, context + 0x10);
     cam_compute_view_direction(&position, &axis, 1);
     FastVecSub(&direction, g_camera_l00_position, &position);
     fade = 1.0f;
     vec_scale_to_length(&direction, &direction, fade);
     if (*(int *)(context + 0x44)) {
-        if (*(int *)(context + 0x44) < (((int)(D_L00_001B021C) * 5 + 2) / 6))
+        if (*(int *)(context + 0x44) < (((int)(g_effect_timer_limit_b) * 5 + 2) / 6))
             fade = IntToFloat(*(int *)(context + 0x44)) * *(float *)(context + 0x48);
         effect.color = FloatToInt(fade * 64.0f);
         radius = (1.0f - fade) * 10.0f + 0.05f;
         spread = (1.0f - fade) * 0.5f;
-        FastVecScale(&effect.offset, D_0018A580, (1.0f - fade)* 32.0f);
+        FastVecScale(&effect.offset, g_strip_axis, (1.0f - fade)* 32.0f);
         FastVecAdd(&effect.center, &position, &effect.offset);
         for (i = 0; i < 20; i++) {
             math_build_axis_angle_quat(&effect.rotated, &direction, IntToFloat(i)* 0.3141593f);
@@ -66,7 +67,7 @@ void func_PAL_L00_003D6F08(char *object)
         DrawScrollingRibbonWithFadedEnds(effect.points, effect.color, effect.color, 20, 0.3f, 1.2f, 0.2f);
     }
     if (*(int *)(context + 0x28)) {
-        if (*(int *)(context + 0x28) < (((int)(D_L00_001B020C) * 5 + 2) / 6))
+        if (*(int *)(context + 0x28) < (((int)(g_effect_timer_limit_a) * 5 + 2) / 6))
             fade = IntToFloat(*(int *)(context + 0x28)) * *(float *)(context + 0x2C);
         else fade = 1.0f;
         gfx_init_quad_packet_state(render, 11, 1, 128);
@@ -86,9 +87,9 @@ void func_PAL_L00_003D6F08(char *object)
         FastVecScale(&effect.points[0], &direction, -0.1f);
         FastVecAdd(&effect.points[1], g_camera_l00_position, &effect.points[0]);
         FastVecCross(&effect.points[2], &direction, &axis);
-        vec_scale_to_length(&effect.points[2], &effect.points[2], D_L00_001B0208);
+        vec_scale_to_length(&effect.points[2], &effect.points[2], g_effect_point_length);
         FastVecCross(&effect.points[3], &effect.points[2], &direction);
-        vec_scale_to_length(&effect.points[3], &effect.points[3], D_L00_001B0208);
+        vec_scale_to_length(&effect.points[3], &effect.points[3], g_effect_point_length);
         FastVecAdd(&effect.points[4], &effect.points[1], &effect.points[3]);
         FastVecAdd(render, &effect.points[4], &effect.points[2]);
         FastVecSub(render+0x10, &effect.points[4], &effect.points[2]);
@@ -96,7 +97,7 @@ void func_PAL_L00_003D6F08(char *object)
         FastVecAdd(render+0x20, &effect.points[4], &effect.points[2]);
         FastVecSub(render+0x30, &effect.points[4], &effect.points[2]);
         draw_world_quad(render, 0, 0);
-        color = (FloatToInt(D_L00_001B0210 * fade) << 24) | 0x808080;
+        color = (FloatToInt(g_effect_fade_alpha_scale * fade) << 24) | 0x808080;
         *(int *)(render+0x4C)=color;
         *(int *)(render+0x48)=color;
         *(int *)(render+0x44)=color;

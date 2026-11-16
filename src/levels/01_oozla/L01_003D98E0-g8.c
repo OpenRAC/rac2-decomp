@@ -30,7 +30,7 @@ typedef struct {
     Vec position;
     u8 pad40[0x40];
 } AnchorRecord;
-extern AnchorRecord *D_L01_001B264C;
+extern AnchorRecord *g_swamp_patrol_positions;
 typedef struct {
     u8 pad00[0x80];
     Vec position;
@@ -40,28 +40,28 @@ typedef struct {
     s16 mode;
 } HeroView;
 extern u8 g_hero_state[];
-extern char D_L01_001B0800[];
-extern float D_L01_001B07A8 __attribute__((sda));
-extern float D_L01_001B07AC __attribute__((sda));
-extern float D_L01_001B07B0 __attribute__((sda));
-extern float D_L01_001B07B4 __attribute__((sda));
-extern float D_L01_001B07B8 __attribute__((sda));
-extern float D_L01_001B07BC __attribute__((sda));
-extern float D_L01_001B07C0 __attribute__((sda));
-extern float D_L01_001B07C4 __attribute__((sda));
-extern float D_L01_001B07C8 __attribute__((sda));
-extern float D_L01_001B07CC __attribute__((sda));
-extern float D_L01_001B07D0 __attribute__((sda));
-extern float D_L01_001B07D4 __attribute__((sda));
-extern float D_L01_001B07D8 __attribute__((sda));
-extern float D_L01_001B07DC __attribute__((sda));
-extern float D_L01_001B07E0 __attribute__((sda));
-extern float D_L01_001B07E4 __attribute__((sda));
-extern float D_L01_001B07E8 __attribute__((sda));
-extern float D_L01_001B07EC __attribute__((sda));
-extern float D_L01_001B07F0 __attribute__((sda));
-extern float D_L01_001B07F4 __attribute__((sda));
-extern float D_L01_001B07F8 __attribute__((sda));
+extern char g_str_swing_debug_format[];
+extern float g_swing_object_scale __attribute__((sda));
+extern float g_swing_tilt_accel __attribute__((sda));
+extern float g_swing_tilt_max_speed __attribute__((sda));
+extern float g_swing_tilt_damping __attribute__((sda));
+extern float g_swing_return_accel __attribute__((sda));
+extern float g_swing_return_max_speed __attribute__((sda));
+extern float g_swing_return_damping __attribute__((sda));
+extern float g_swing_outer_pull_radius __attribute__((sda));
+extern float g_swing_inner_pull_radius __attribute__((sda));
+extern float g_swing_pull_scale __attribute__((sda));
+extern float g_swing_pull_time_a __attribute__((sda));
+extern float g_swing_pull_time_b __attribute__((sda));
+extern float g_swing_rotation_strength __attribute__((sda));
+extern float g_swing_outer_push_radius __attribute__((sda));
+extern float g_swing_inner_push_radius __attribute__((sda));
+extern float g_swing_push_time __attribute__((sda));
+extern float g_swing_min_radius __attribute__((sda));
+extern float g_swing_max_radius __attribute__((sda));
+extern float g_swing_sink_height_limit __attribute__((sda));
+extern float g_swing_sink_speed __attribute__((sda));
+extern float g_swing_rise_speed __attribute__((sda));
 
 /* Floating platform. It bobs on the water, tilts under the hero and is pushed away from nearby platforms. */
 void UpdateFloatingPlatform(u8 *moby)
@@ -80,7 +80,7 @@ void UpdateFloatingPlatform(u8 *moby)
     case 0:
         if(0.0f<height) {
             if(*(int *)(vars+0xC0)==-1) {
-                STUB_printf(D_L01_001B0800,*(s16 *)(moby+0xAA),*(s16 *)(moby+0xB2));
+                STUB_printf(g_str_swing_debug_format,*(s16 *)(moby+0xAA),*(s16 *)(moby+0xB2));
                 *(int *)(vars+0xC8)=0;
                 moby_mark_spawned(moby);
                 return;
@@ -103,7 +103,7 @@ void UpdateFloatingPlatform(u8 *moby)
             if(*(float *)(moby+0x18)<*(float *)(vars+0xB8)) *(float *)(moby+0x18)=*(float *)(vars+0xB8);
             break;
         }
-        qcopy(anchor,D_L01_001B264C[*(int *)(otherState+0x2CC)].position);
+        qcopy(anchor,g_swamp_patrol_positions[*(int *)(otherState+0x2CC)].position);
         anchor[2]=*(float *)(moby+0x18);
         vec_scale_to_length(target,*(u8 **)(vars+0xC8)+0xC0,5.0f);
         FastVecAdd(target,target,*(u8 **)(vars+0xC8)+0x10);
@@ -112,17 +112,17 @@ void UpdateFloatingPlatform(u8 *moby)
             FastVecSub(delta,((HeroView *)g_hero_state)->position,moby+0x10);
             dotX=FastVecDot(delta,moby+0xC0);
             dotY=FastVecDot(delta,moby+0xD0);
-            scale=D_L01_001B07A8;
+            scale=g_swing_object_scale;
             y=-scale*dotY;
             x=scale*dotX;
             *(Quad *)prevRot=*(Quad *)(vars+0x90);
             *(Quad *)prevPos=*(Quad *)(moby+0x10);
-            math_approach_with_velocity((float *)(vars+0x90),y,(float *)(vars+0xA0),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
-            math_approach_with_velocity((float *)(vars+0x94),x,(float *)(vars+0xA4),D_L01_001B07AC*4.848137450608192e-06f,D_L01_001B07B0,D_L01_001B07B4*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x90),y,(float *)(vars+0xA0),g_swing_tilt_accel*4.848137450608192e-06f,g_swing_tilt_max_speed,g_swing_tilt_damping*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x94),x,(float *)(vars+0xA4),g_swing_tilt_accel*4.848137450608192e-06f,g_swing_tilt_max_speed,g_swing_tilt_damping*0.0002908882452175021f,0);
             mat_transform_offset_two_matrices(((HeroView *)g_hero_state)->position,out,moby+0x10,prevRot,vars+0x90);
         } else {
-            math_approach_with_velocity((float *)(vars+0x90),0.0f,(float *)(vars+0xA0),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
-            math_approach_with_velocity((float *)(vars+0x94),0.0f,(float *)(vars+0xA4),D_L01_001B07B8*4.848137450608192e-06f,D_L01_001B07BC,D_L01_001B07C0*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x90),0.0f,(float *)(vars+0xA0),g_swing_return_accel*4.848137450608192e-06f,g_swing_return_max_speed,g_swing_return_damping*0.0002908882452175021f,0);
+            math_approach_with_velocity((float *)(vars+0x94),0.0f,(float *)(vars+0xA4),g_swing_return_accel*4.848137450608192e-06f,g_swing_return_max_speed,g_swing_return_damping*0.0002908882452175021f,0);
             other=*(u8 **)(vars+0xC8);
             if(other!=0 && other[0x20]!=0xFE && other[0x20]!=0xFD && other[0x95]>=2) {
                 float dist,dist2;
@@ -130,20 +130,20 @@ void UpdateFloatingPlatform(u8 *moby)
                 dist=FastVecLength(delta);
                 dist2=vec_distance_xy(moby+0x10,target);
                 if(dist2<dist) { FastVecSub(delta,moby+0x10,target); dist=dist2; }
-                if(dist<D_L01_001B07C4) {
+                if(dist<g_swing_outer_pull_radius) {
                     float falloff,anchorDistance,d;
-                    dist=D_L01_001B07C4-dist;
-                    falloff=dist/(D_L01_001B07C4-D_L01_001B07C8);
+                    dist=g_swing_outer_pull_radius-dist;
+                    falloff=dist/(g_swing_outer_pull_radius-g_swing_inner_pull_radius);
                     if(falloff>1.0f) falloff=1.0f;
                     else if(falloff<0.0f) falloff=0.0f;
                     vec_scale_to_length(delta,delta,dist*falloff);
-                    vec_fast_divide_helper(delta,delta,D_L01_001B07D4*(1.0f/60.0f));
+                    vec_fast_divide_helper(delta,delta,g_swing_pull_time_b*(1.0f/60.0f));
                     anchorDistance=vec_distance_xy(*(u8 **)(vars+0xC8)+0x10,anchor);
                     FastVecSub(prevRot,moby+0x10,anchor);
                     d=FastVecLength(prevRot)-anchorDistance;
                     d=d/math_fabs(d);
                     d*=1.0f/60.0f;
-                    vec_scale_to_length(prevRot,prevRot,(D_L01_001B07D8*d)*falloff);
+                    vec_scale_to_length(prevRot,prevRot,(g_swing_rotation_strength*d)*falloff);
                     FastVecAdd(moby+0x10,moby+0x10,prevRot);
                     FastVecAdd(moby+0x10,moby+0x10,delta);
                 }
@@ -151,9 +151,9 @@ void UpdateFloatingPlatform(u8 *moby)
         }
         FastVecSub(delta,vars+0xB0,moby+0x10);
         fieldD8=(float *)(vars+0xD8);
-        FastVecScale(delta,delta,D_L01_001B07CC);
+        FastVecScale(delta,delta,g_swing_pull_scale);
         fieldDC=(float *)(vars+0xDC); fieldD0=(float *)(vars+0xD0);
-        vec_fast_divide_helper(delta,delta,D_L01_001B07D0*(1.0f/60.0f));
+        vec_fast_divide_helper(delta,delta,g_swing_pull_time_a*(1.0f/60.0f));
         fieldD4=(float *)(vars+0xD4);
         FastVecAdd(moby+0x10,moby+0x10,delta);
         limit=vec_distance_xy(moby+0x10,*(u8 **)(vars+0xC8)+0x10);
@@ -165,26 +165,26 @@ void UpdateFloatingPlatform(u8 *moby)
             float dist,dist2,falloff;
             FastVecSub(delta,moby+0x10,cursor+0x10);
             dist=FastVecLength(delta);
-            if(dist<D_L01_001B07DC) {
+            if(dist<g_swing_outer_push_radius) {
                 dist2=vec_distance_xy(cursor+0x10,*(u8 **)(vars+0xC8)+0x10);
                 secondary=vec_distance_xy(moby+0x10,target);
                 dist2=dist2<secondary?dist2:secondary;
-                dist=D_L01_001B07DC-dist;
-                falloff=dist/(D_L01_001B07DC-D_L01_001B07E0);
+                dist=g_swing_outer_push_radius-dist;
+                falloff=dist/(g_swing_outer_push_radius-g_swing_inner_push_radius);
                 if(falloff>1.0f) falloff=1.0f;
                 else if(falloff<0.0f) falloff=0.0f;
                 vec_scale_to_length(delta,delta,dist*falloff);
-                vec_fast_divide_helper(delta,delta,D_L01_001B07E4*(1.0f/60.0f));
+                vec_fast_divide_helper(delta,delta,g_swing_push_time*(1.0f/60.0f));
                 if(limit<dist2) {
                     float radius;
                     FastVecSub(cursor+0x10,cursor+0x10,delta);
                     FastVecSub(prevRot,cursor+0x10,anchor);
                     radius=FastVecLength(prevRot);
-                    if(radius<D_L01_001B07E8) {
-                        vec_scale_to_length(prevRot,prevRot,D_L01_001B07E8);
+                    if(radius<g_swing_min_radius) {
+                        vec_scale_to_length(prevRot,prevRot,g_swing_min_radius);
                         FastVecAdd(cursor+0x10,anchor,prevRot);
-                    } else if(D_L01_001B07EC<radius) {
-                        vec_scale_to_length(prevRot,prevRot,D_L01_001B07EC);
+                    } else if(g_swing_max_radius<radius) {
+                        vec_scale_to_length(prevRot,prevRot,g_swing_max_radius);
                         FastVecAdd(cursor+0x10,anchor,prevRot);
                     }
                 } else FastVecAdd(moby+0x10,moby+0x10,delta);
@@ -195,11 +195,11 @@ void UpdateFloatingPlatform(u8 *moby)
             float dist;
             FastVecSub(delta,moby+0x10,anchor);
             dist=FastVecLength(delta);
-            if(dist<D_L01_001B07E8) {
-                vec_scale_to_length(delta,delta,D_L01_001B07E8);
+            if(dist<g_swing_min_radius) {
+                vec_scale_to_length(delta,delta,g_swing_min_radius);
                 FastVecAdd(moby+0x10,anchor,delta);
-            } else if(D_L01_001B07EC<dist) {
-                vec_scale_to_length(delta,delta,D_L01_001B07EC);
+            } else if(g_swing_max_radius<dist) {
+                vec_scale_to_length(delta,delta,g_swing_max_radius);
                 FastVecAdd(moby+0x10,anchor,delta);
             }
         }
@@ -212,12 +212,12 @@ void UpdateFloatingPlatform(u8 *moby)
         break;
     }
     case 2:
-        if(height-D_L01_001B07F0<*(float *)(moby+0x18)) *(float *)(moby+0x18)-=D_L01_001B07F4*(1.0f/60.0f);
+        if(height-g_swing_sink_height_limit<*(float *)(moby+0x18)) *(float *)(moby+0x18)-=g_swing_sink_speed*(1.0f/60.0f);
         if(math_fast_float_d(vars+0xC4)) moby_set_state(moby,3,-1);
         break;
     case 3:
         if(*(float *)(moby+0x18)<height) {
-            *(float *)(moby+0x18)+=D_L01_001B07F8*(1.0f/60.0f);
+            *(float *)(moby+0x18)+=g_swing_rise_speed*(1.0f/60.0f);
             if(height<*(float *)(moby+0x18)) {
                 *(float *)(moby+0x18)=height;
                 moby_set_state(moby,1,-1);

@@ -11,15 +11,15 @@ typedef struct {
     char gap46[0x18C - 0x46];
     char *parts[0];
 } Hero;
-extern Hero D_L26_001BC880;
+extern Hero g_hero_part_state;
 typedef struct { char pad[0x34]; unsigned short flags; char gap[0xAA - 0x36]; short id; } Object;
 extern int g_current_map_index[] __attribute__((sda));
-extern float D_L26_001A9450[][4] SDATA(D_L26_001A9450);
-extern float D_L26_001A9420[] __attribute__((sda));
+extern float g_part_offset_positions[][4] SDATA(D_L26_001A9450);
+extern float g_part_acceleration_params[] __attribute__((sda));
 extern float D_L26_001A9420_gp SDATA(D_L26_001A9420);
-extern unsigned int D_L26_001A9428[] __attribute__((sda));
+extern unsigned int g_part_color_range[] __attribute__((sda));
 extern unsigned int D_L26_001A9428_gp SDATA(D_L26_001A9428);
-extern int D_L26_001A9430[] __attribute__((sda));
+extern int g_part_kind_range[] __attribute__((sda));
 extern int D_L26_001A9430_gp SDATA(D_L26_001A9430);
 extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
@@ -55,8 +55,8 @@ void func_PAL_L26_002FE890(void) {
     int i;
     int j;
     anim_start_startup_animations();
-    for (i = 0; i < D_L26_001BC880.count; i++) {
-        hero = &D_L26_001BC880;
+    for (i = 0; i < g_hero_part_state.count; i++) {
+        hero = &g_hero_part_state;
         slot = &hero->parts[i];
         object = *slot;
         if (object && ((Object *)object)->id == 0xE29) {
@@ -67,23 +67,23 @@ void func_PAL_L26_002FE890(void) {
             math_store_angle_update_result(object, (float *)(*(char **)(object + 0x68) + 0xC),
                               (int)0x80AAAAD2, (int)0x80396464, 0.07330384f);
     }
-    if (g_current_map_index[0] == 26 && D_L26_001BC880.mode == 0 && D_L26_001BC880.timer < 217) {
-        object = D_L26_001BC880.parts[3];
+    if (g_current_map_index[0] == 26 && g_hero_part_state.mode == 0 && g_hero_part_state.timer < 217) {
+        object = g_hero_part_state.parts[3];
         moby_transform_joint_point(object, 0, (char *)transform);
         object += 0x10;
         qcopy((transform + 3), object);
         for (j = 0; j < 8; j++) {
-            transform_vector(&position, D_L26_001A9450[j & 1], transform);
+            transform_vector(&position, g_part_offset_positions[j & 1], transform);
             vec_scale_to_length(&velocity, transform, 0.080000006f);
             velocity.f[3] = D_L26_001A9420_gp;
             qzero_nc(&acceleration);
-            acceleration.f[3] = D_L26_001A9420[1];
-            color = FastTweenColor(D_L26_001A9428_gp, D_L26_001A9428[1], math_random_float_range(0.0f, 1.0f));
+            acceleration.f[3] = g_part_acceleration_params[1];
+            color = FastTweenColor(D_L26_001A9428_gp, g_part_color_range[1], math_random_float_range(0.0f, 1.0f));
             {
                 unsigned int rgb = color & 0xFFFFFF;
-                kind = (math_random_int_range(D_L26_001A9430_gp, D_L26_001A9430[1]) * 5 + 2) / 6;
-                duration = (math_random_int_range(D_L26_001A9430[2], D_L26_001A9430[3]) * 5 + 2) / 6;
-                size = (math_random_int_range(D_L26_001A9430[4], D_L26_001A9430[5]) * 5 + 2) / 6;
+                kind = (math_random_int_range(D_L26_001A9430_gp, g_part_kind_range[1]) * 5 + 2) / 6;
+                duration = (math_random_int_range(g_part_kind_range[2], g_part_kind_range[3]) * 5 + 2) / 6;
+                size = (math_random_int_range(g_part_kind_range[4], g_part_kind_range[5]) * 5 + 2) / 6;
                 effect = part_spawn_trail(&position, &velocity, &acceleration, color, rgb,
                                        kind, duration, size, -1);
                 if (effect) effect[9] = FloatToInt(2.0f) - 16;

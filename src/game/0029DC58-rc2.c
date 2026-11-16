@@ -24,13 +24,13 @@
  */
 #include "common.h"
 
-extern s8 D_001397E0[];
-extern u8 D_001A7A0A;
+extern s8 g_status_bit_words[];
+extern u8 g_extras_unlocked_flag;
 /* Returns 1 when one status bit is set and a flag byte is clear, otherwise 0. */
 s32 menu_is_status_bit_set_flag_clear(void) {
     s32 result;
 
-    if ((D_001A7A0A != 0) || (result = 1, ((*(s32 *)((s32)D_001397E0) & 0x08000000) == 0))) {
+    if ((g_extras_unlocked_flag != 0) || (result = 1, ((*(s32 *)((s32)g_status_bit_words) & 0x08000000) == 0))) {
         result = 0;
     }
     return result;

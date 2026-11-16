@@ -14,9 +14,9 @@ typedef struct {
     TI128 colour;
 } ShadowBlob;
 
-extern ShadowBlob D_001BA640[];
-extern TI128 D_001BAFC0;
-extern int D_001B163C[] __attribute__((sda));
+extern ShadowBlob g_light_records[];
+extern TI128 g_coll_hit_normal;
+extern int g_ground_shadow_count[] __attribute__((sda));
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int GetCollHitMaterial(void);
 extern float math_fabs(float);
@@ -31,17 +31,17 @@ void part_queue_ground_shadow(unsigned char *object, float scale)
 
     if (object[0x31] == 0)
         return;
-    if (D_001B163C[0] >= 32)
+    if (g_ground_shadow_count[0] >= 32)
         return;
-    *(TI128 *)&D_001BA640[D_001B163C[0]] = *(TI128 *)(object + 0x10);
+    *(TI128 *)&g_light_records[g_ground_shadow_count[0]] = *(TI128 *)(object + 0x10);
     ground = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
     if (GetCollHitMaterial() == 0)
         return;
-    D_001BA640[D_001B163C[0]].z = ground + 0.025f;
-    D_001BA640[D_001B163C[0]].colour = D_001BAFC0;
+    g_light_records[g_ground_shadow_count[0]].z = ground + 0.025f;
+    g_light_records[g_ground_shadow_count[0]].colour = g_coll_hit_normal;
     size = (8.0f - math_fabs(*(float *)(object + 0x18) - ground)) * 0.125f;
     if (size < 0.25f)
         size = 0.25f;
-    D_001BA640[D_001B163C[0]].size = scale * size;
-    D_001B163C[0]++;
+    g_light_records[g_ground_shadow_count[0]].size = scale * size;
+    g_ground_shadow_count[0]++;
 }

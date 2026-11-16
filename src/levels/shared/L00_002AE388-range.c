@@ -4,7 +4,7 @@
 typedef struct { char pad0[0x40]; float matrix[16]; float position[4]; char pad1[0x318-0x90]; float height; char pad2[0x2294-0x31c]; int mode; } ScorerState;
 extern ScorerState D_00189E20_26;
 typedef struct { char pad[0x140]; float position[4]; float pad1; float pitch; float heading; } ScorerCamera;
-extern ScorerCamera D_L00_001B8C80;
+extern ScorerCamera g_scalar_transition_state;
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -29,8 +29,8 @@ float hero_score_target_by_heading(char *object, float heading, float range, int
     horizontal = sum;
     vertical = FastDiffRots(mat_fast_helper_a(vec_distance_xy(position,object+0x10),F(object,0x18)-position[2]),0.0f);
     if (D_00189E20_26.mode==1 || D_00189E20_26.mode==29) {
-        horizontal = FastDiffRots(mat_fast_helper_a(F(object,0x10)-D_L00_001B8C80.position[0],F(object,0x14)-D_L00_001B8C80.position[1]),D_L00_001B8C80.heading);
-        vertical = FastDiffRots(mat_fast_helper_a(vec_distance_xy(D_L00_001B8C80.position,object+0x10),F(object,0x18)-D_L00_001B8C80.position[2]),-D_L00_001B8C80.pitch);
+        horizontal = FastDiffRots(mat_fast_helper_a(F(object,0x10)-g_scalar_transition_state.position[0],F(object,0x14)-g_scalar_transition_state.position[1]),g_scalar_transition_state.heading);
+        vertical = FastDiffRots(mat_fast_helper_a(vec_distance_xy(g_scalar_transition_state.position,object+0x10),F(object,0x18)-g_scalar_transition_state.position[2]),-g_scalar_transition_state.pitch);
         sum = horizontal + vertical;
         horizontal = (horizontal > vertical ? horizontal : vertical);
     }

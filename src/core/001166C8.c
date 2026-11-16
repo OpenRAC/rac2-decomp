@@ -40,7 +40,7 @@ extern void malloc_lock_acquire(struct _reent *);
 extern void malloc_lock_release(struct _reent *);
 extern void func_00116460(struct _reent *, INTERNAL_SIZE_T);
 
-extern u32 D_001341E8[];
+extern u32 g_malloc_arena[];
 
 /* sizes, alignments */
 

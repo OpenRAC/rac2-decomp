@@ -32,23 +32,23 @@ extern float vec_distance_xy(void *, void *);
 extern float func_PAL_L01_003BEB40();
 extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002B4D38(void *, void *, int, int, void *, int, int, int, void *, void *, int);
-extern void func_PAL_002B5050(void *, void *, int);
-extern char D_L01_001B94C0[];
-extern float D_L01_001AFF6C __attribute__((sda));
-extern long long D_L01_001AFF60 __attribute__((sda));
-extern long long D_L01_001AFF50 __attribute__((sda));
-extern long long D_L01_001AFF40 __attribute__((sda));
-extern char D_L01_002A4C50[];
+extern void moby_init_controller_params_pal(void *, void *, int, int, void *, int, int, int, void *, void *, int);
+extern void moby_update_sway_pal(void *, void *, int);
+extern char g_level_origin_vec[];
+extern float g_water_surface_height_offset __attribute__((sda));
+extern long long g_water_surface_param_b __attribute__((sda));
+extern long long g_water_surface_param_c __attribute__((sda));
+extern long long g_water_surface_param_a __attribute__((sda));
+extern char g_str_water_surface_debug[];
 
-void func_PAL_L01_003C65B8(L01_003C2680_OBJ *a0)
+void water_surface_update_pal(L01_003C2680_OBJ *a0)
 {
     char *p = (char *)a0;
     L01_003C2680_OWNED *s1 = a0->f68;
     Quad frame[2];
 
     if (s1 == 0) {
-        STUB_printf(D_L01_002A4C50, a0->fAA, a0->fB2);
+        STUB_printf(g_str_water_surface_debug, a0->fAA, a0->fB2);
         return;
     }
     qcopy(&frame[0], p + 0x10);
@@ -63,13 +63,13 @@ void func_PAL_L01_003C65B8(L01_003C2680_OBJ *a0)
             qzero(&s1->f140);
             moby_set_state(a0, 1, -1);
         }
-        a0->f18 = a0->f18 + D_L01_001AFF6C;
-        func_PAL_002B4D38(a0, (char *)s1 + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
+        a0->f18 = a0->f18 + g_water_surface_height_offset;
+        moby_init_controller_params_pal(a0, (char *)s1 + 0x60, 0, 0, &g_water_surface_param_a, 0, 0, 0, &g_water_surface_param_b, &g_water_surface_param_c, 0);
         return;
     case 1:
-        if (a0->f31 != 0 && vec_distance_xy(p + 0x10, D_L01_001B94C0) < 32.0f) {
-            s1->f68 = func_PAL_L01_003BEB40() + D_L01_001AFF6C;
-            func_PAL_002B5050(a0, (char *)s1 + 0x60, 0);
+        if (a0->f31 != 0 && vec_distance_xy(p + 0x10, g_level_origin_vec) < 32.0f) {
+            s1->f68 = func_PAL_L01_003BEB40() + g_water_surface_height_offset;
+            moby_update_sway_pal(a0, (char *)s1 + 0x60, 0);
         }
         return;
     }

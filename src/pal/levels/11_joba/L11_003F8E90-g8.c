@@ -2,7 +2,7 @@
 
 /* func_PAL_L11_003F8E90, the PAL copy of func_L11_003F4A58: 1/60 becomes 0.02f, the particle lifetimes take the 50 Hz scale, and D_L11_001B0664 is scaled by 1.44f. */
 
-extern float D_L11_001BA8C0[];
+extern float g_hero_l11_position[];
 
 extern float math_random_float_range(float, float);
 extern void FastVecSub(float *, const float *, const float *);
@@ -18,13 +18,13 @@ extern u8 *part_spawn_ground_effect(void *, int, float, float, unsigned int, int
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L11_001B0654 __attribute__((sda));
-extern float D_L11_001B0658 __attribute__((sda));
-extern float D_L11_001B065C __attribute__((sda));
-extern float D_L11_001B0660 __attribute__((sda));
-extern float D_L11_001B0664 __attribute__((sda));
-extern float D_L11_001B0668 __attribute__((sda));
-extern float D_L11_001B066C __attribute__((sda));
+extern float g_joba_spark_speed_min __attribute__((sda));
+extern float g_joba_spark_speed_max __attribute__((sda));
+extern float g_joba_spark_velocity_z_min __attribute__((sda));
+extern float g_joba_spark_velocity_z_max __attribute__((sda));
+extern float g_joba_spark_ground_effect_param __attribute__((sda));
+extern float g_joba_spark_size_min __attribute__((sda));
+extern float g_joba_spark_size_max __attribute__((sda));
 
 void func_PAL_L11_003F8E90(char *pos, int count) {
     float velocity[4] __attribute__((aligned(16)));
@@ -38,36 +38,36 @@ void func_PAL_L11_003F8E90(char *pos, int count) {
 
     *(TI128 *)axis = 0;
     axis[2] = 1.0f;
-    FastVecSub(direction, D_L11_001BA8C0, (float *)pos);
+    FastVecSub(direction, g_hero_l11_position, (float *)pos);
     direction[2] = 0.0f;
     for (i = 0; i < count; i++) {
-        size = math_random_float_range(D_L11_001B0668, D_L11_001B066C);
+        size = math_random_float_range(g_joba_spark_size_min, g_joba_spark_size_max);
         sign = math_random_int_below(2);
         if (sign == 0)
             sign--;
         angle = math_random_float_range(-1.0471977f, 1.0471977f);
         math_apply_axis_rotation_to_quat(velocity, direction, axis, angle);
-        speed = math_random_float_range(D_L11_001B0654, D_L11_001B0658) * 0.020000001f;
+        speed = math_random_float_range(g_joba_spark_speed_min, g_joba_spark_speed_max) * 0.020000001f;
         vec_scale_to_length((char *)velocity, (char *)velocity, speed);
-        velocity[2] = math_random_float_range(D_L11_001B065C, D_L11_001B0660) * 0.020000001f;
+        velocity[2] = math_random_float_range(g_joba_spark_velocity_z_min, g_joba_spark_velocity_z_max) * 0.020000001f;
         qcopy(point, pos);
         point[0] += math_random_signed_float_range(0.0f, 0.15f);
         point[1] += math_random_signed_float_range(0.0f, 0.15f);
         point[2] += math_random_signed_float_range(0.0f, 0.15f);
         if (!(func_001163B0() & 1)) {
             FastVecScale(velocity, velocity, 1.5f);
-            particle = part_spawn_ground_effect(point, ((s32)(60) * 5 + 2) / 6, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664 * 1.44f);
+            particle = part_spawn_ground_effect(point, ((s32)(60) * 5 + 2) / 6, size * 0.35f, size, 0x7F800000, 0, sign, velocity, 0, g_joba_spark_ground_effect_param * 1.44f);
             if (particle)
                 particle[9] = FloatToInt(4.0f) + 0x70;
-            particle = part_spawn_ground_effect(point, ((s32)(60) * 5 + 2) / 6, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664 * 1.44f);
+            particle = part_spawn_ground_effect(point, ((s32)(60) * 5 + 2) / 6, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_joba_spark_ground_effect_param * 1.44f);
         } else {
-            FastVecSub(extra, D_L11_001BA8C0, point);
+            FastVecSub(extra, g_hero_l11_position, point);
             vec_scale_to_length((char *)extra, (char *)extra, speed);
             FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
-            particle = part_spawn_ground_effect(point, ((s32)(40) * 5 + 2) / 6, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, D_L11_001B0664 * 1.44f);
+            particle = part_spawn_ground_effect(point, ((s32)(40) * 5 + 2) / 6, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, g_joba_spark_ground_effect_param * 1.44f);
             if (particle)
                 particle[9] = FloatToInt(4.0f) + 0x70;
-            particle = part_spawn_ground_effect(point, ((s32)(40) * 5 + 2) / 6, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, D_L11_001B0664 * 1.44f);
+            particle = part_spawn_ground_effect(point, ((s32)(40) * 5 + 2) / 6, size * 1.43500006f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, g_joba_spark_ground_effect_param * 1.44f);
         }
         if (particle)
             particle[9] = FloatToInt(4.0f) + 0x70;

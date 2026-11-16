@@ -24,17 +24,17 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void draw_world_quad(void *, int, int);
 extern float math_random_float_range(float, float);
-extern char D_L11_001BA8C0[];
-extern float D_L11_001B12B0 __attribute__((sda));
-extern float D_L11_001B12B8 __attribute__((sda));
-extern float D_L11_001B12BC __attribute__((sda));
-extern float D_L11_001B12C0 __attribute__((sda));
-extern float D_L11_001B12A8 __attribute__((sda));
-extern unsigned int D_L11_001B12A0 __attribute__((sda));
-extern unsigned int D_L11_001B12A4 __attribute__((sda));
-extern float D_L11_001B1280[] SDATA(D_L11_001B1280);
-extern float D_L11_001B1284[];
-extern float D_L11_001B12B4[] NOT_SDA;
+extern char g_hero_l11_position[];
+extern float g_chain_creature_ribbon_alpha_min __attribute__((sda));
+extern float g_chain_creature_ribbon_length_a __attribute__((sda));
+extern float g_chain_creature_ribbon_length_b __attribute__((sda));
+extern float g_chain_creature_ribbon_inset __attribute__((sda));
+extern float g_chain_creature_ribbon_scroll_speed __attribute__((sda));
+extern unsigned int g_chain_creature_ribbon_color __attribute__((sda));
+extern unsigned int g_chain_creature_quad_color __attribute__((sda));
+extern float g_chain_creature_ribbon_uv_u[] SDATA(D_L11_001B1280);
+extern float g_chain_creature_ribbon_uv_v[];
+extern float g_chain_creature_ribbon_alpha_max[] NOT_SDA;
 /* The alpha range endpoint at 001B12B4 is read as float by retail. */
 /* Draws the chain as a glowing ribbon between its points and scrolls its texture. */
 void chain_creature_draw_ribbon(char *obj) {
@@ -54,38 +54,38 @@ void chain_creature_draw_ribbon(char *obj) {
         qcopy(start,vars+0x100+prev*16);
         following=next+1;
         FastVecSub(inset,start,end);
-        vec_scale_to_length(inset,inset,D_L11_001B12C0);
+        vec_scale_to_length(inset,inset,g_chain_creature_ribbon_inset);
         FastVecAdd(end,end,inset);
         FastVecSub(span,end,start);
-        FastVecSub(a,end,D_L11_001BA8C0);
-        FastVecSub(b,start,D_L11_001BA8C0);
+        FastVecSub(a,end,g_hero_l11_position);
+        FastVecSub(b,start,g_hero_l11_position);
         FastVecCross(a,a,span);
         FastVecCross(b,b,span);
-        vec_scale_to_length(a,a,D_L11_001B12B8);
-        vec_scale_to_length(b,b,D_L11_001B12B8);
+        vec_scale_to_length(a,a,g_chain_creature_ribbon_length_a);
+        vec_scale_to_length(b,b,g_chain_creature_ribbon_length_a);
         gfx_init_quad_packet_state(&quad,23,1,128);
-        color=(D_L11_001B12A0 & 0xFFFFFF) | ((int)(math_random_float_range(D_L11_001B12B0,D_L11_001B12B4[0])*(int)(D_L11_001B12A0>>24))<<24);
+        color=(g_chain_creature_ribbon_color & 0xFFFFFF) | ((int)(math_random_float_range(g_chain_creature_ribbon_alpha_min,g_chain_creature_ribbon_alpha_max[0])*(int)(g_chain_creature_ribbon_color>>24))<<24);
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=color;
         uv0=&quad.uv[0][0]; uv1=&quad.uv[0][1];
-        for(i=0;i<4;i++) { uv0[i*2]=D_L11_001B1280[i*2]+*(float *)(vars+0x35C); uv1[i*2]=D_L11_001B1284[i*2]; }
+        for(i=0;i<4;i++) { uv0[i*2]=g_chain_creature_ribbon_uv_u[i*2]+*(float *)(vars+0x35C); uv1[i*2]=g_chain_creature_ribbon_uv_v[i*2]; }
         FastVecSub(&corner,end,a); quad.pos[0]=corner;
         FastVecAdd(&corner,end,a); quad.pos[1]=corner;
         FastVecSub(&corner,start,b); quad.pos[2]=corner;
         FastVecAdd(&corner,start,b); quad.pos[3]=corner;
         draw_world_quad(&quad,0,0);
-        vec_scale_to_length(a,a,D_L11_001B12BC);
-        vec_scale_to_length(b,b,D_L11_001B12BC);
+        vec_scale_to_length(a,a,g_chain_creature_ribbon_length_b);
+        vec_scale_to_length(b,b,g_chain_creature_ribbon_length_b);
         FastVecSub(&corner,end,a); quad.pos[0]=corner;
         FastVecAdd(&corner,end,a); quad.pos[1]=corner;
         FastVecSub(&corner,start,b); quad.pos[2]=corner;
         FastVecAdd(&corner,start,b); quad.pos[3]=corner;
         gfx_init_quad_packet_state(&quad,43,1,128);
-        quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=D_L11_001B12A4;
+        quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=g_chain_creature_quad_color;
         draw_world_quad(&quad,0,0);
         prev=next; next=following;
         while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     }
-    *(float *)(vars+0x35C)+=D_L11_001B12A8;
+    *(float *)(vars+0x35C)+=g_chain_creature_ribbon_scroll_speed;
     if (*(float *)(vars+0x35C)>1) *(float *)(vars+0x35C)-=2;
     if (*(float *)(vars+0x35C)<-1) *(float *)(vars+0x35C)+=2;
 }

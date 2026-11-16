@@ -32,7 +32,7 @@ extern int math_ping_pong_blend_values(int, int, int, int, int);
    grid entry, and placed relative to the owner's position record. */
 typedef struct { int x; int y; } MenuLabelOffset;
 typedef struct { short a, b, c, id, e; } MenuGridEntry;
-extern MenuGridEntry D_00259F58[];
+extern MenuGridEntry g_menu_item_table_first[];
 extern MenuLabelOffset ref_003472B8_00;
 extern void object_set_flag_value(void *, int);
 
@@ -81,8 +81,8 @@ void *func_US2_00349E88(void *object) {
 /* Replace the value at offset 0x04 and, when it changes while the bound debug byte is zero, retain the previous value and set the two counters to 180 and 300; original game role is unknown. */
 typedef struct { float values[3]; } StageFloatTable;
 typedef struct { int values[3]; } StageIntTable;
-extern const StageFloatTable D_001AE628, D_001AE638;
-extern const StageIntTable D_001AE648, D_001AE658;
+extern const StageFloatTable g_item_grid_spacing_table, g_item_grid_result_table;
+extern const StageIntTable g_item_grid_x_offsets, g_item_grid_y_offsets;
 /* func_0034A808 is in 0034A808.c. */
 
 /* func_0034AA30 is built from 0034AA30.c. */

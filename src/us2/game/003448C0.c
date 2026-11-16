@@ -36,11 +36,11 @@ extern void object_set_helper_result(void *, void *, int);
 extern void object_init_derived_c(void *, void *, void *);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
-extern int func_US2_003453D0();
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADFC0[], D_001ADFC8[];
-extern char D_001ADF10[], D_001ADF18[], D_001ADF20[], D_001ADD60[], D_001AE250[];
-extern char D_001ADD58[], D_001AE030[], D_001ADFD8[];
-extern char *D_001A8CFC[] __attribute__((sda));
+extern int grid_menu_update_us2();
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[], g_menu_frame_desc[], g_menu_panel_desc[];
+extern char g_info_panel_count_desc_first[], g_info_panel_count_desc_second[], g_info_panel_count_desc_third[], g_menu_hud_desc_body[], g_grid_menu_widget_defaults[];
+extern char g_menu_hud_desc_title[], g_menu_hud_label_desc_alt[], g_menu_icon_desc[];
+extern char *g_resident_data_base[] __attribute__((sda));
 
 void func_US2_00344950(char *self, void *arg)
 {
@@ -60,19 +60,19 @@ void func_US2_00344950(char *self, void *arg)
     *(int *)(self + 0x4A8) = 1;
     (*(float **)(self + 0x4A0))[0] = 250.0f;
     (*(float **)(self + 0x4A0))[1] = 207.0f;
-    object_init_derived_arrays(self, D_001ADC10, arg);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, arg);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, arg);
-    object_init_derived_arrays(self + 0xE4, D_001ADC28, arg);
-    object_init_derived_arrays(self + 0x130, D_001ADFC0, arg);
-    object_init_derived_arrays(self + 0x17C, D_001ADFC8, arg);
-    func_US2_003377B0(self + 0x368, D_001ADF10, arg);
-    func_US2_003377B0(self + 0x3C0, D_001ADF18, arg);
-    func_US2_003377B0(self + 0x418, D_001ADF20, arg);
-    func_US2_003377B0(self + 0x2B8, D_001ADD60, arg);
-    func_US2_003377B0(self + 0x310, D_001AE250, arg);
-    func_US2_003377B0(self + 0x1C8, D_001ADD58, arg);
-    func_US2_003377B0(self + 0x220, D_001AE030, arg);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, arg);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, arg);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, arg);
+    object_init_derived_arrays(self + 0xE4, g_menu_widget_desc_fourth, arg);
+    object_init_derived_arrays(self + 0x130, g_menu_frame_desc, arg);
+    object_init_derived_arrays(self + 0x17C, g_menu_panel_desc, arg);
+    func_US2_003377B0(self + 0x368, g_info_panel_count_desc_first, arg);
+    func_US2_003377B0(self + 0x3C0, g_info_panel_count_desc_second, arg);
+    func_US2_003377B0(self + 0x418, g_info_panel_count_desc_third, arg);
+    func_US2_003377B0(self + 0x2B8, g_menu_hud_desc_body, arg);
+    func_US2_003377B0(self + 0x310, g_grid_menu_widget_defaults, arg);
+    func_US2_003377B0(self + 0x1C8, g_menu_hud_desc_title, arg);
+    func_US2_003377B0(self + 0x220, g_menu_hud_label_desc_alt, arg);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -89,16 +89,16 @@ void func_US2_00344950(char *self, void *arg)
     hud_set_widget_field_a(self + 0x2B8, 0);
     hud_set_widget_field_a(self + 0x310, 1);
     object_set_second_float4(self + 0x310, 0.9f, 0.9f, zero, zero);
-    object_set_helper_result(self, D_001A8CFC[0] + 0x8710, 0x9E);
-    object_set_helper_result(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9F);
-    object_set_helper_result(self + 0x98, D_001A8CFC[0] + 0x8710, 0xA0);
-    object_set_helper_result(self + 0xE4, D_001A8CFC[0] + 0x8710, 0xA1);
-    object_set_helper_result(self + 0x130, D_001A8CFC[0] + 0x8710, 0x5D);
-    object_set_helper_result(self + 0x17C, D_001A8CFC[0] + 0x8710, 0x5E);
+    object_set_helper_result(self, g_resident_data_base[0] + 0x8710, 0x9E);
+    object_set_helper_result(self + 0x4C, g_resident_data_base[0] + 0x8710, 0x9F);
+    object_set_helper_result(self + 0x98, g_resident_data_base[0] + 0x8710, 0xA0);
+    object_set_helper_result(self + 0xE4, g_resident_data_base[0] + 0x8710, 0xA1);
+    object_set_helper_result(self + 0x130, g_resident_data_base[0] + 0x8710, 0x5D);
+    object_set_helper_result(self + 0x17C, g_resident_data_base[0] + 0x8710, 0x5E);
     *(int *)(self + 0x4AC) = 0;
     *(int *)(self + 0x4B0) = 0;
     *(int *)(self + 0x4B8) = 3;
-    object_init_derived_c(self + 0x278, D_001ADFD8, arg);
+    object_init_derived_c(self + 0x278, g_menu_icon_desc, arg);
     *object_get_fourth_field(self + 0x278) = 0x60F0F0B0;
     object_set_second_float4(self + 0x278, 32.0f, 32.0f, zero, zero);
     *object_get_fourth_field(self + 0x1C8) = 0x80F0F0F0;
@@ -113,7 +113,7 @@ void func_US2_00344950(char *self, void *arg)
     hud_set_widget_field_a(self + 0x418, 0);
     *(int *)(self + 0x4B4) = 0;
     hud_set_widget_field_b(self + 0x2B8, GetLocalizedString(0x2BE5));
-    func_US2_003453D0(self, 0);
+    grid_menu_update_us2(self, 0);
 }
 
 
@@ -122,7 +122,7 @@ typedef struct {
     int column, row, index, mode;
 } DobboGridState312;
 typedef struct { unsigned char pad[6]; short id; short tail; } SelectionRow;
-extern SelectionRow D_001AA810[];
+extern SelectionRow g_grid_menu_selection_rows[];
 extern SelectionRow ref_L00_00286D68_00[];
 
 void func_US2_00344E08(DobboGridState312 *state, unsigned int buttons)
@@ -151,7 +151,7 @@ void func_US2_00344E08(DobboGridState312 *state, unsigned int buttons)
             state->row = 0;
         }
     }
-    state->index = D_001AA810[state->column].id;
+    state->index = g_grid_menu_selection_rows[state->column].id;
 }
 
 
@@ -243,7 +243,7 @@ void func_US2_00345080(DobboGridState312 *state, unsigned int buttons)
 
 
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern short D_L00_001AAB76;
+extern short g_grid_menu_choice_value;
 
 void func_US2_003451B8(char *object, unsigned int buttons)
 {
@@ -268,7 +268,7 @@ void func_US2_003451B8(char *object, unsigned int buttons)
         *(int *)(object + 0x4B8) = 3;
         *(int *)(object + 0x4AC) = 0;
     }
-    *(int *)(object + 0x4B4) = D_L00_001AAB76;
+    *(int *)(object + 0x4B4) = g_grid_menu_choice_value;
 }
 
 
@@ -280,11 +280,11 @@ extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char g_weapon_table[];
 typedef struct { unsigned char pad[0x42]; short field42; unsigned char rest[0xE0 - 0x44]; } Entry224;
 typedef struct { int v[4]; } Ids_00344378;
-extern Ids_00344378 D_001AE260;
+extern Ids_00344378 g_grid_menu_text_ids;
 
 int func_US2_00345298(DobboGridState312 *state)
 {
-    Ids_00344378 table = D_001AE260;
+    Ids_00344378 table = g_grid_menu_text_ids;
     int value;
     int index;
 

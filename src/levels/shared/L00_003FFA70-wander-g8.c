@@ -11,8 +11,8 @@
 
 extern struct { char pad[0x80]; float pos[4]; char gap[0x2200]; int surface; } g_hero_state;
 extern struct { char pad[0x18]; int surface; int gap; float point[4]; } g_collision_result;
-extern int D_L00_001ADB2C;
-extern int D_L00_001A8FF0, D_L00_001A8FF4;
+extern int g_active_tether_object;
+extern int g_hero_locked_flag, g_hero_action_blocked_flag;
 extern void copy_matrix_rotation(void *,void *);
 extern void mat_get_euler_angles(void *,void *);
 extern int moby_transform_point_and_rotation_by_parent(void *,int,void *,void *,void *,void *);
@@ -56,10 +56,10 @@ void sheep_update(char *object)
     float *saved;
     int hit;
 
-    if (AI_B(object,0x20) && D_L00_001ADB2C) {
+    if (AI_B(object,0x20) && g_active_tether_object) {
         copy_matrix_rotation(work.matrix,object+0xc0);
         mat_get_euler_angles(work.matrix,dest);
-        moby_transform_point_and_rotation_by_parent(object,D_L00_001ADB2C,object+0x10,dest,object+0x10,temp);
+        moby_transform_point_and_rotation_by_parent(object,g_active_tether_object,object+0x10,dest,object+0x10,temp);
         euler_rotation_basis(object+0xc0,temp);
         qcopy(object+0xf0,temp);
     }
@@ -77,14 +77,14 @@ void sheep_update(char *object)
             if (r>=20 && r<50) anim_start_blended(object,4,0,10);
             if (r>=50 && r<100) anim_start_blended(object,1,0,10);
         }
-        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2 && !D_L00_001A8FF4 && !D_L00_001A8FF0) {
+        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2 && !g_hero_action_blocked_flag && !g_hero_locked_flag) {
             moby_set_state(object,2,-1);
             anim_start_blended(object,2,0,10);
             AI_F(object,0x48)=0.75f;
         }
         if (math_fast_float_d(state+0x70)) {
-            if (D_L00_001A8FF4) return;
-            if (!D_L00_001A8FF0) {
+            if (g_hero_action_blocked_flag) return;
+            if (!g_hero_locked_flag) {
                 if (math_random_int_below(2)) {
                     moby_set_state(object,5,-1);
                     AI_I(state,0x70)=math_random_int_range(400,600);
@@ -164,13 +164,13 @@ void sheep_update(char *object)
             if (g_collision_result.surface!=g_hero_state.surface) qcopy(object+0x10,g_collision_result.point);
         }
         hit=GetCollHitMaterial();
-        if (hit>0 && hit!=10 && !D_L00_001A8FF4) {explosion_effect_update(object);return;}
+        if (hit>0 && hit!=10 && !g_hero_action_blocked_flag) {explosion_effect_update(object);return;}
         moby_set_state(object,0,-1);
         break;
     case 3:
         break;
     }
-    if (!D_L00_001A8FF4 && !D_L00_001A8FF0) {
+    if (!g_hero_action_blocked_flag && !g_hero_locked_flag) {
         qcopy(work.matrix,object+0x10);
         work.matrix[2]+=0.5f;
         AI_F(object,0x18)=coll_probe_ground_height_below(work.matrix,0,0.5f);

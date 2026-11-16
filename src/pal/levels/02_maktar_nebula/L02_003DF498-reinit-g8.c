@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern char D_L02_001B03F0[] SDATA(D_L02_001B03F0);
+extern char g_brawler_target_position[] SDATA(D_L02_001B03F0);
 extern char *g_moby_l02_pool;
 typedef struct { char pad[0x80]; float x, y; } HeroPosition;
 extern HeroPosition g_hero_state;
@@ -37,7 +37,7 @@ void func_PAL_L02_003DF498(char *actor, int alternate) {
     *(int *)(actor + 0x9C) = 0;
     *(unsigned char *)(actor + 0x7F) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
-    qcopy(actor + 0x10, D_L02_001B03F0);
+    qcopy(actor + 0x10, g_brawler_target_position);
     *(char **)(PRIVATE + 0x260) = CreateMoby(0xA4C);
     if (ATTACHMENT != 0) {
         *(unsigned char *)(ATTACHMENT + 0x30) = *(unsigned char *)(actor + 0x30);

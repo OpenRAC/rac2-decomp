@@ -6,7 +6,7 @@ extern int FastDecTimer(void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void func_PAL_002B14F8(char *, char *, int, int, float);
 
-void func_PAL_00323538(char *object)
+void robot_update_timers_limbs_pal(char *object)
 {
     char *data = *(char **)(object + 0x68);
     char *first;

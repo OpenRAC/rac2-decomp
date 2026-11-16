@@ -3,8 +3,8 @@
 #include "common.h"
 extern u8 *g_moby_l11_table[] __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[][16];
-extern u8 D_L11_00188660[];
+extern u8 g_moby_group_flags[][16];
+extern u8 g_sound_l11_slot_table[];
 extern s32 PlayMobySound(s32,s32,u8 *);
 extern void snd_stop_voice(s32);
 extern void vec_scale_to_length(void *,void *,f32);
@@ -20,7 +20,7 @@ void func_PAL_L11_003FC670(u8 *arg0) {
     u8 *s0 = arg0;
     u8 *s1 = *(u8 **)(s0 + 0x68);
     u8 *s2 = g_moby_l11_table[0] + *(s32 *)(s1 + 0x6C) * 256;
-    if (D_0019B2E8[g_current_map_index[0]][*(u8 *)(s0 + 0xB0)] & 0x80) return;
+    if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(s0 + 0xB0)] & 0x80) return;
     if (*(u8 *)(s0 + 0x20) == 0) {
         if (*(s16 *)(s0 + 0xAA) == 0xB71) *(u32 *)(s1 + 0x5C) |= 1;
         *(u8 *)(s0 + 0x20) = 1;
@@ -29,7 +29,7 @@ void func_PAL_L11_003FC670(u8 *arg0) {
         if (IsPointInCuboid(s2 + 0x10, *(s32 *)(s1 + 0x60))) {
             u8 *v;
             *(u8 *)(s0 + 0x20) = 2;
-            v = D_L11_00188660 + *(s32 *)(s1 + 0x70) * 0x70;
+            v = g_sound_l11_slot_table + *(s32 *)(s1 + 0x70) * 0x70;
             if (*(u8 **)(v + 0x88) != s0 || *(u8 *)(v + 0x74) == 0)
                 *(s32 *)(s1 + 0x70) = PlayMobySound(0, 4, s0);
             *(s32 *)(s1 + 0x64) = 37;
@@ -44,7 +44,7 @@ void func_PAL_L11_003FC670(u8 *arg0) {
         if (math_fast_float_d(s1 + 0x64)) {
             s32 sound = *(s32 *)(s1 + 0x70);
             if (sound != -1) {
-                u8 *v = D_L11_00188660 + sound * 0x70;
+                u8 *v = g_sound_l11_slot_table + sound * 0x70;
                 if (*(u8 **)(v + 0x88) == s0 && *(u8 *)(v + 0x74)) snd_stop_voice(sound);
             }
             *(s32 *)(s1 + 0x70) = -1;
@@ -53,7 +53,7 @@ void func_PAL_L11_003FC670(u8 *arg0) {
     }
     if (*(u8 *)(s0 + 0x20) == 3) {
         if (!IsPointInCuboid(s2 + 0x10, *(s32 *)(s1 + 0x60))) {
-            u8 *v = D_L11_00188660 + *(s32 *)(s1 + 0x70) * 0x70;
+            u8 *v = g_sound_l11_slot_table + *(s32 *)(s1 + 0x70) * 0x70;
             if (*(u8 **)(v + 0x88) != s0 || *(u8 *)(v + 0x74) == 0)
                 *(s32 *)(s1 + 0x70) = PlayMobySound(0, 4, s0);
             *(u8 *)(s0 + 0x20) = 4;
@@ -69,7 +69,7 @@ void func_PAL_L11_003FC670(u8 *arg0) {
         if (math_fast_float_d(s1 + 0x64)) {
             s32 sound = *(s32 *)(s1 + 0x70);
             if (sound != -1) {
-                u8 *v = D_L11_00188660 + sound * 0x70;
+                u8 *v = g_sound_l11_slot_table + sound * 0x70;
                 if (*(u8 **)(v + 0x88) == s0 && *(u8 *)(v + 0x74)) snd_stop_voice(sound);
             }
             *(s32 *)(s1 + 0x70) = -1;

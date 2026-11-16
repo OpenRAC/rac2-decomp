@@ -12,12 +12,12 @@ typedef float Vec4[4] __attribute__((aligned(16)));
 typedef struct { u8 pad[0x140]; float target[4]; } CameraView;
 typedef struct { u8 pad[0xD4]; u8 *sparkColors; u8 pad2[0x98]; u8 *fireColors; } EffectTables;
 
-extern float D_L00_001B13EC __attribute__((sda));
-extern float D_L00_001B13F0 __attribute__((sda));
-extern int D_L00_001B13F4 __attribute__((sda));
-extern float D_L00_001A8F20[4] MACRO_ADDR;
-extern CameraView D_L00_001B8C80;
-extern EffectTables D_L00_001FE940;
+extern float g_explosion_burst2_inner_scale __attribute__((sda));
+extern float g_explosion_burst2_outer_scale __attribute__((sda));
+extern int g_explosion_burst2_particle_texture __attribute__((sda));
+extern float g_default_vector[4] MACRO_ADDR;
+extern CameraView g_scalar_transition_state;
+extern EffectTables g_effect_definitions;
 
 extern u8 *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern float mat_fast_helper_a(float, float);
@@ -51,28 +51,28 @@ void part_l00_spawn_explosion_burst_2(u8 *object, void *unused)
     u8 *effect;
     int core_idx, glow_idx, bright_idx, large_idx, small_idx, debris_idx, smoke_idx, sign;
 
-    inner = D_L00_001B13EC * F(state, 0x14) * 210000.0f;
-    outer = D_L00_001B13F0 * F(state, 0x14) * 210000.0f;
-    effect = part_spawn_gravity_fade(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 100, 0, inner, outer, 0.0f, 0);
+    inner = g_explosion_burst2_inner_scale * F(state, 0x14) * 210000.0f;
+    outer = g_explosion_burst2_outer_scale * F(state, 0x14) * 210000.0f;
+    effect = part_spawn_gravity_fade(object + 0x10, g_default_vector, g_explosion_burst2_particle_texture, 0x388EF7, 0, 100, 0, inner, outer, 0.0f, 0);
     if (effect)
-        effect[2] = D_L00_001FE940.fireColors[0];
-    effect = part_spawn_gravity_fade(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x63F7, 0, 100, 0, inner, outer, 0.0f, 0);
+        effect[2] = g_effect_definitions.fireColors[0];
+    effect = part_spawn_gravity_fade(object + 0x10, g_default_vector, g_explosion_burst2_particle_texture, 0x63F7, 0, 100, 0, inner, outer, 0.0f, 0);
     if (effect)
-        effect[2] = D_L00_001FE940.fireColors[0];
+        effect[2] = g_effect_definitions.fireColors[0];
     for (core_idx = 1; core_idx >= 0; core_idx--) {
-        effect = part_spawn_gravity_fade(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
+        effect = part_spawn_gravity_fade(object + 0x10, g_default_vector, g_explosion_burst2_particle_texture, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
         if (effect)
-            effect[2] = D_L00_001FE940.fireColors[5];
+            effect[2] = g_effect_definitions.fireColors[5];
     }
     for (glow_idx = 1; glow_idx >= 0; glow_idx--) {
-        effect = part_spawn_gravity_fade(object + 0x10, D_L00_001A8F20, D_L00_001B13F4, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
+        effect = part_spawn_gravity_fade(object + 0x10, g_default_vector, g_explosion_burst2_particle_texture, 0x388EF7, 0, 127, 0, inner, outer, 0.0f, 0);
         if (effect)
-            effect[2] = D_L00_001FE940.fireColors[6];
+            effect[2] = g_effect_definitions.fireColors[6];
     }
     for (bright_idx = 0; bright_idx < I(state, 0x20); bright_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
         phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         lifetime = math_random_int_range(30, 50);
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
@@ -90,13 +90,13 @@ void part_l00_spawn_explosion_burst_2(u8 *object, void *unused)
         {
             u8 *effect = part_spawn_fading_drift(position, velocity, lifetime, 0x20FF, -(phase * 2), 48, 48, size * 1260000.0f, F(state, 0x14) * 4200.0f, 0.00405555591f, 0);
             if (effect)
-                effect[2] = D_L00_001FE940.sparkColors[0];
+                effect[2] = g_effect_definitions.sparkColors[0];
         }
     }
     for (large_idx = 0; large_idx < I(state, 0x24); large_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
         phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         lifetime = math_random_int_range(30, 50);
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
@@ -115,7 +115,7 @@ void part_l00_spawn_explosion_burst_2(u8 *object, void *unused)
     for (small_idx = 0; small_idx < I(state, 0x28); small_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
-        heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+        heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
         phase = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         lifetime = math_random_int_range(30, 50);
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 0.1f) * F(state, 0x14);
@@ -149,9 +149,9 @@ void part_l00_spawn_explosion_burst_2(u8 *object, void *unused)
         *(Quad *)position = *(Quad *)velocity;
         part_spawn_shockwave_ring(object, object + 0x10, position, 16, 255, 0, 0, 40, F(state, 0x14) * 3.5f);
     }
-    SpawnExplosionEffects(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
+    SpawnExplosionEffects(object, g_default_vector, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
     sign = 1;
-    angle = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
+    angle = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
     for (smoke_idx = 0; smoke_idx < I(state, 0x2C); smoke_idx++) {
         float radius, roll, turn;
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);

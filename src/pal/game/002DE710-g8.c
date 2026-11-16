@@ -33,42 +33,42 @@ typedef struct {
     int selected;
 } SaveData;
 
-extern SaveRow D_00139410[];
+extern SaveRow g_save_slot_rows[];
 
 /* GP-relative layout coefficients of the save-slot panel. */
-extern int D_001ABBF0 __attribute__((sda)); /* line height */
-extern int D_001ABBF4 __attribute__((sda)); /* slot gap */
-extern int D_001ABBF8 __attribute__((sda));
-extern int D_001ABBFC __attribute__((sda));
-extern int D_001ABC00 __attribute__((sda));
-extern int D_001ABC04 __attribute__((sda));
-extern int D_001ABC08 __attribute__((sda));
-extern int D_001ABC10 __attribute__((sda));
-extern int D_001ABC14[] MACRO_ADDR;
-extern int D_001ABC18 __attribute__((sda));
-extern int D_001ABC1C[] MACRO_ADDR;
-extern int D_001ABC20 __attribute__((sda));
+extern int g_save_slot_line_height __attribute__((sda)); /* line height */
+extern int g_save_slot_gap __attribute__((sda)); /* slot gap */
+extern int g_save_slot_icon_width __attribute__((sda));
+extern int g_save_slot_icon_height __attribute__((sda));
+extern int g_save_slot_extra_icon_offset __attribute__((sda));
+extern int g_save_slot_text_x __attribute__((sda));
+extern int g_save_slot_text_y_offset __attribute__((sda));
+extern int g_save_slot_icon_x __attribute__((sda));
+extern int g_save_slot_icon_y_table[] MACRO_ADDR;
+extern int g_save_slot_icon_z __attribute__((sda));
+extern int g_save_slot_icon_size_table[] MACRO_ADDR;
+extern int g_save_slot_icon_alpha __attribute__((sda));
 
 /* Format strings. */
-extern char D_001ABC28[] NOT_SDA;
-extern char D_001ABAF0[] NOT_SDA;
-extern char D_001ABC48[] NOT_SDA;
-extern char D_PAL_001ABD28[] NOT_SDA; /* "," */
-extern char D_PAL_001ABD30[] NOT_SDA; /* "." */
+extern char g_str_save_slot_time_fmt[] NOT_SDA;
+extern char g_str_save_slot_score_fmt[] NOT_SDA;
+extern char g_str_save_slot_date_fmt[] NOT_SDA;
+extern char g_str_score_comma_format[] NOT_SDA; /* "," */
+extern char g_str_score_plain_format[] NOT_SDA; /* "." */
 
 /* The settings bytes at D_001A7BB0 (0x1A7C38 in PAL): [4] is the language, written by func_PAL_002914E0 as
    D_001A7BB0[4] and read the same way by func_US2_002DE768 and func_PAL_0034FD60. The symbol-plus-offset
    form is the unsplit two-word load, which reorg keeps out of the delay slot of the digit-count loop's
    first test, as retail does. */
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 
 /* The right-aligned score: column width, the offsets of ',' and of '.', the width of a digit. */
-extern int D_PAL_001ABD0C __attribute__((sda));
-extern int D_PAL_001ABD10 __attribute__((sda));
-extern int D_PAL_001ABD14 __attribute__((sda));
-extern int D_PAL_001ABD18 __attribute__((sda));
-extern int D_PAL_001ABD1C __attribute__((sda));
-extern float D_PAL_001ABD20 __attribute__((sda));
+extern int g_score_x_offset __attribute__((sda));
+extern int g_score_comma_dx __attribute__((sda));
+extern int g_score_comma_dy __attribute__((sda));
+extern int g_score_plain_dx __attribute__((sda));
+extern int g_score_plain_dy __attribute__((sda));
+extern float g_score_digit_spacing __attribute__((sda));
 
 extern void text_draw_medium(int, int, long, char *, int);
 extern void text_draw_right_aligned_medium(int, int, long, char *, int);
@@ -89,19 +89,19 @@ int func_PAL_002DE710(char *menu)
 
     y = *(int *)(menu + 0x1C);
     SetupGifPaging(0);
-    hud_draw_sprite(GetIconFrame(0xEAA9, 0), D_001ABC10, D_001ABC14[0], D_001ABC18, D_001ABC1C[0], D_001ABC20);
+    hud_draw_sprite(GetIconFrame(0xEAA9, 0), g_save_slot_icon_x, g_save_slot_icon_y_table[0], g_save_slot_icon_z, g_save_slot_icon_size_table[0], g_save_slot_icon_alpha);
 
     for (i = 0; i < 4; i++) {
-        record = &D_00139410[i];
-        context = (SaveData *)((char *)D_00139410 - 0x30);
+        record = &g_save_slot_rows[i];
+        context = (SaveData *)((char *)g_save_slot_rows - 0x30);
         if (context->mode >= 3 || context->selected >= 0 || *(int *)(g_pause_menu_state + 0x164) <= 10 || context->head[2] != 2) {
-            y += D_001ABBF0 * 3;
+            y += g_save_slot_line_height * 3;
         } else if (record->state == -1) {
-            y += D_001ABBF0;
-            text_draw_centered_medium(*(int *)(menu + 0x18) + *(int *)(menu + 0x20) / 2, y + D_001ABC08, 0x80F0F0F0UL,
+            y += g_save_slot_line_height;
+            text_draw_centered_medium(*(int *)(menu + 0x18) + *(int *)(menu + 0x20) / 2, y + g_save_slot_text_y_offset, 0x80F0F0F0UL,
                           GetLocalizedString(0xE39), -1);
-            y += D_001ABBF0;
-            y += D_001ABBF0;
+            y += g_save_slot_line_height;
+            y += g_save_slot_line_height;
         } else {
             hours = record->ticks / 216000;
             minutes = record->ticks / 3600 - hours * 60;
@@ -112,54 +112,54 @@ int func_PAL_002DE710(char *menu)
                 hours = 99;
                 minutes = 59;
             }
-            sprintf(text, D_001ABC28, hours, minutes);
-            hud_draw_sprite(GetIconFrame(0xE99D, 3), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
-            text_draw_medium(D_001ABC04 + (long)(D_001ABBFC + 6), y + D_001ABC08, color, text, -1);
+            sprintf(text, g_str_save_slot_time_fmt, hours, minutes);
+            hud_draw_sprite(GetIconFrame(0xE99D, 3), g_save_slot_text_x + 4, y + g_save_slot_text_y_offset, g_save_slot_icon_width, g_save_slot_icon_height, 128);
+            text_draw_medium(g_save_slot_text_x + (long)(g_save_slot_icon_height + 6), y + g_save_slot_text_y_offset, color, text, -1);
 
             if (record->extra) {
                 int iconRight, extraX;
 
-                hud_draw_sprite(GetIconFrame(0xE99D, 4), D_001ABC04 + D_001ABC00, y + D_001ABC08, D_001ABBF8,
-                              D_001ABBFC, 128);
+                hud_draw_sprite(GetIconFrame(0xE99D, 4), g_save_slot_text_x + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, g_save_slot_icon_width,
+                              g_save_slot_icon_height, 128);
                 extra = record->extra;
                 if (extra > 99)
                     extra = 99;
-                sprintf(text, D_001ABAF0, extra);
-                iconRight = D_001ABBFC + 2;
-                extraX = D_001ABC04 + iconRight;
-                text_draw_medium((long)extraX + D_001ABC00, y + D_001ABC08, color, text, -1);
+                sprintf(text, g_str_save_slot_score_fmt, extra);
+                iconRight = g_save_slot_icon_height + 2;
+                extraX = g_save_slot_text_x + iconRight;
+                text_draw_medium((long)extraX + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, color, text, -1);
             }
 
             score = record->score;
             if (score > 9999999)
                 score = 9999999;
-            y += D_001ABBF0;
-            sprintf(text, D_001ABAF0, score);
-            hud_draw_sprite(GetIconFrame(0x7567, 0), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
-            iconWidth = D_001ABBFC + 6;
-            scoreX = D_001ABC04 + iconWidth;
-            text_draw_right_aligned_medium((long)scoreX + D_PAL_001ABD0C, y + D_001ABC08, color, text, -1);
+            y += g_save_slot_line_height;
+            sprintf(text, g_str_save_slot_score_fmt, score);
+            hud_draw_sprite(GetIconFrame(0x7567, 0), g_save_slot_text_x + 4, y + g_save_slot_text_y_offset, g_save_slot_icon_width, g_save_slot_icon_height, 128);
+            iconWidth = g_save_slot_icon_height + 6;
+            scoreX = g_save_slot_text_x + iconWidth;
+            text_draw_right_aligned_medium((long)scoreX + g_score_x_offset, y + g_save_slot_text_y_offset, color, text, -1);
             digits = 1;
             for (value = score; value >= 10; value /= 10)
                 digits++;
-            comma = !(D_001A7BB0[4] == 3 || D_001A7BB0[4] == 5 || D_001A7BB0[4] == 4);
-            sprintf(text, comma ? D_PAL_001ABD28 : D_PAL_001ABD30);
-            dy = comma ? D_PAL_001ABD14 : D_PAL_001ABD1C;
-            dx = comma ? D_PAL_001ABD10 : D_PAL_001ABD18;
-            if (D_001A7BB0[4] != 2) {
+            comma = !(g_language_settings[4] == 3 || g_language_settings[4] == 5 || g_language_settings[4] == 4);
+            sprintf(text, comma ? g_str_score_comma_format : g_str_score_plain_format);
+            dy = comma ? g_score_comma_dy : g_score_plain_dy;
+            dx = comma ? g_score_comma_dx : g_score_plain_dx;
+            if (g_language_settings[4] != 2) {
                 float place;
                 for (place = 3.0f; place < digits; place += 3.0f)
-                    text_draw_right_aligned_medium(D_001ABC04 + dx + (long)(D_001ABBFC + 6) + D_PAL_001ABD0C - (int)(D_PAL_001ABD20 * place),
-                                  y + D_001ABC08 + dy, color, text, -1);
+                    text_draw_right_aligned_medium(g_save_slot_text_x + dx + (long)(g_save_slot_icon_height + 6) + g_score_x_offset - (int)(g_score_digit_spacing * place),
+                                  y + g_save_slot_text_y_offset + dy, color, text, -1);
             }
-            y += D_001ABBF0;
+            y += g_save_slot_line_height;
 
-            sprintf(text, D_001ABC48, record->date[1], record->date[2], record->date[3]);
-            hud_draw_sprite(GetIconFrame(0xE99D, 2), D_001ABC04 + 4, y + D_001ABC08, D_001ABBF8, D_001ABBFC, 128);
-            text_draw_medium(D_001ABC04 + (long)(D_001ABBFC + 6), y + D_001ABC08, color, text, -1);
-            y += D_001ABBF0;
+            sprintf(text, g_str_save_slot_date_fmt, record->date[1], record->date[2], record->date[3]);
+            hud_draw_sprite(GetIconFrame(0xE99D, 2), g_save_slot_text_x + 4, y + g_save_slot_text_y_offset, g_save_slot_icon_width, g_save_slot_icon_height, 128);
+            text_draw_medium(g_save_slot_text_x + (long)(g_save_slot_icon_height + 6), y + g_save_slot_text_y_offset, color, text, -1);
+            y += g_save_slot_line_height;
         }
-        y += D_001ABBF4;
+        y += g_save_slot_gap;
     }
     DoGifPaging();
     return 2;

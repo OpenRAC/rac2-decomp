@@ -3,10 +3,10 @@
 typedef int Vector128 __attribute__((mode(TI)));
 
 typedef struct { float f0,f4,f8,fC,f10,f14,f18; } MotionDefaults;
-extern MotionDefaults D_L18_001B1218 __attribute__((sda));
+extern MotionDefaults g_shooter_motion_defaults __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_0019B2E8[];
-extern unsigned char D_L18_0021E7B0[][0x464];
+extern unsigned char g_moby_group_flags[];
+extern unsigned char g_trigger_l18_flags[][0x464];
 extern float math_random_float_range(float,float);
 extern void moby_set_controller_speed_limits(unsigned char *,float,float,float,float);
 extern int math_random_int_range(int,int);
@@ -24,8 +24,8 @@ int shooter_init(unsigned char *object)
     float randomAngle;
     unsigned int ownerClass;
     if(object[0xb0]!=0xff) {
-        if((D_0019B2E8[object[0xb0]+g_current_map_index*16]&0x80)!=0) {
-            if(D_L18_0021E7B0[1][*(short *)(object+0xb2)]!=0) return 1;
+        if((g_moby_group_flags[object[0xb0]+g_current_map_index*16]&0x80)!=0) {
+            if(g_trigger_l18_flags[1][*(short *)(object+0xb2)]!=0) return 1;
         }
     }
     state=*(unsigned char **)(object+0x68);
@@ -58,7 +58,7 @@ int shooter_init(unsigned char *object)
     *(float *)(state+0x10c)=0.5f;
     *(float *)(state+0x110)=1.22173059f;
     randomAngle=math_random_float_range(20.0f,25.0f);
-    { float turn_speed=D_L18_001B1218.f18;
+    { float turn_speed=g_shooter_motion_defaults.f18;
     *(float *)(state+0x134)=0.5f;
     state[0x1e8]=0; state[0x1e9]=0;
     *(float *)(state+0x130)=randomAngle*0.017453294f;
@@ -66,9 +66,9 @@ int shooter_init(unsigned char *object)
     if(*(short *)(object+0xaa)==0xed4 /* moby class 3796 */) *(float *)(state+0x100)=1.0f;
     if(*(short *)(object+0xaa)==MOBY_CLASS_RECEIVER_BOT) *(float *)(state+0x100)=1.1f;
     if(*(float *)(state+0x3c4)==0.0f && *(float *)(state+0x3c0)==0.0f && *(float *)(state+0x3cc)==0.0f && *(float *)(state+0x3c8)==0.0f) {
-        float walk_speed=D_L18_001B1218.f0,run_speed=D_L18_001B1218.f4;
-        float strafe_speed=D_L18_001B1218.f8,back_speed=D_L18_001B1218.fC;
-        float turn_rate=D_L18_001B1218.f10,aim_rate=D_L18_001B1218.f14;
+        float walk_speed=g_shooter_motion_defaults.f0,run_speed=g_shooter_motion_defaults.f4;
+        float strafe_speed=g_shooter_motion_defaults.f8,back_speed=g_shooter_motion_defaults.fC;
+        float turn_rate=g_shooter_motion_defaults.f10,aim_rate=g_shooter_motion_defaults.f14;
         *(float *)(state+0x3c4)=walk_speed;
         *(float *)(state+0x3c0)=run_speed;
         *(float *)(state+0x3cc)=strafe_speed;

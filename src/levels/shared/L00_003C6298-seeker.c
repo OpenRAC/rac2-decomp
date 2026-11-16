@@ -102,13 +102,13 @@ typedef struct Collide_003C9978 {
 
 extern Moby_003C9978 *g_area_hit_targets[];
 extern void *g_hero_moby;
-extern s16 D_0018A168;
-extern s32 D_L00_001A8FF0 __attribute__((sda));
-extern s32 D_L00_001A8FF4;
-extern s32 D_L00_001ADB2C MACRO_ADDR;
-extern Collide_003C9978 *D_L00_001BF218;
-extern u8 D_L00_001BF230[];
-extern struct Pair_003C9978 D_L00_001B0128;
+extern s16 g_hero_busy_flag;
+extern s32 g_hero_locked_flag __attribute__((sda));
+extern s32 g_hero_action_blocked_flag;
+extern s32 g_active_tether_object MACRO_ADDR;
+extern Collide_003C9978 *g_hit_l00_result;
+extern u8 g_collision_position[];
+extern struct Pair_003C9978 g_seeker_info_pair;
 
 extern int func_001163B0(void);
 extern int CollLine(void *, void *, int, void *, void *);
@@ -262,7 +262,7 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
         else
             hit = CollLine(&saved, &self->pos, 0x10, self, 0) != 0;
         if (hit) {
-            if (D_L00_001BF218 != 0 && (D_L00_001BF218->oclass == MOBY_CLASS_MINITURRET || D_L00_001BF218->oclass == MOBY_CLASS_MEGATURRET))
+            if (g_hit_l00_result != 0 && (g_hit_l00_result->oclass == MOBY_CLASS_MINITURRET || g_hit_l00_result->oclass == MOBY_CLASS_MEGATURRET))
                 hit = 0;
             if (hit) {
                 int n = coll_process_hit(1.0f, &self->pos, 0, self, 0);
@@ -278,7 +278,7 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
                         weapon_start_health_drain(g_area_hit_targets[i], 0x40, self->b8);
                     }
                 }
-                part_spawn_explosion_with_sparks(self, D_L00_001BF230, 1.0f, 13.0f, 0);
+                part_spawn_explosion_with_sparks(self, g_collision_position, 1.0f, 13.0f, 0);
                 self->state = 2;
                 self->flags.h.mode |= 0x41;
             }
@@ -294,10 +294,10 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
 
 
             moby_forward_position_call(vars->target, &info, 1);
-            if (health != 0 && D_L00_001A8FF0 == 0) {
+            if (health != 0 && g_hero_locked_flag == 0) {
                 FastVecScale(&info.v.b, &vars->target->m[2], health[4]);
                 FastVecAdd(&info.v.b, &info.v.b, &vars->target->pos);
-            } else if (D_L00_001A8FF0 != 0) {
+            } else if (g_hero_locked_flag != 0) {
                 moby_call_handler_on_inner_data(self, &info.v.direction);
                 vec_scale_to_length(&info.v.direction, &info.v.direction, 1.0f);
                 FastVecAdd(&info.v.b, &info.v.direction, &vars->target->pos);
@@ -312,10 +312,10 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
                 if (dist < 0.25f)
                     dist = 0.0f;
             }
-            n = D_L00_001A8FF0;
+            n = g_hero_locked_flag;
             if (n == 0)
-                n = D_L00_001A8FF4;
-            if (n == 0 && D_0018A168 == 0) {
+                n = g_hero_action_blocked_flag;
+            if (n == 0 && g_hero_busy_flag == 0) {
                 info.v.b.y += math_fast_sin_or_cos_b(vars->wobble) * (dist * 0.749f < 0.749f ? dist * 0.749f : 0.749f);
                 info.v.b.x -= math_fast_sin_or_cos_a(vars->wobble) * (dist * 0.751f < 0.751f ? dist * 0.751f : 0.751f);
                 info.v.b.z += (math_fast_sin_or_cos_b(vars->wobble_z) + 1.0f) * (dist * 0.5f < 0.5f ? dist * 0.5f : 0.5f);
@@ -330,14 +330,14 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
         info.v.a.w = -1.0f;
         spark = vars->spark;
         if (math_fast_float_d(&spark) != 0 || vars->spark == 0) {
-            info.t.pair = D_L00_001B0128;
+            info.t.pair = g_seeker_info_pair;
             part_spawn_owner_forward(self, &info, info.t.pair.p[vars->flip % 2], vars->b78, vars->b79, travelled * 0.5f);
             vars->flip++;
         }
         vars->spark = spark;
         vars->wobble = FastAddRotations(vars->wobble, math_random_float_range(0.01f, 0.1f));
         vars->wobble_z = fast_subtract_rotations(vars->wobble_z, math_random_float_range(0.025f, 0.25f));
-        fast_trail = D_L00_001ADB2C;
+        fast_trail = g_active_tether_object;
         trail_timer = vars->trail_timer;
         if (fast_trail != 0) {
             for (i = 3; i > 0; i--) {

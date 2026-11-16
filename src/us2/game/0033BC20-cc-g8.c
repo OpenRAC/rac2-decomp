@@ -8,7 +8,7 @@ extern void func_US2_003377B0(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern char *GetLocalizedString(int);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 /* Binds the screen to its owner: allocates the 16-byte position block, initialises the four
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
    colours, fonts and labels, marks the "  Exit" label with glyph 0x12 and lays them out.
@@ -20,8 +20,8 @@ extern void object_set_first_float4(char *, float, float, float, float);
    shared spawn helper with no rotation. */
 /* The table of four resident ints is reached through $gp and the resident
    pointer through the small-data unit, so this body needs -G8. */
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char D_001ADC88[];
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
 extern int *object_get_fourth_field(void *);
 extern char *GetLocalizedString(int);
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
@@ -46,15 +46,15 @@ extern void func_US2_003377B0(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void *memset(void *, int, int);
-extern char D_001ADC80[], D_001ADC88[];
-extern int D_001ADD40[2] __attribute__((sda));
+extern char g_circle_menu_header_data[], g_circle_menu_icon_data[];
+extern int g_prompt_bar_slot_colors[2] __attribute__((sda));
 
 /* Constructor of a gadget made of five sprite slots (76 bytes each from +0xC, switched on by the
    five shorts of LIST, which are also kept at +0x188) and three 72-byte sprites at +0x198, +0x1E0
    and +0x228, each with an 8-byte offset beside it at +0x278, +0x280 and +0x288.  The blank name
    is D_001ADC88; the slot loop reaches it as D_001ADC80 + 8 and the three sprites through the
    spent list pointer, which keeps the compiler from hoisting it across the loop. */
-void func_US2_0033BC20(char *object, char *owner, short *list)
+void prompt_bar_init_us2(char *object, char *owner, short *list)
 {
     char *vel278, *vel280, *rec1E0, *rec228, *record, *rec198, *vel288;
     short *flags, *p;
@@ -76,15 +76,15 @@ void func_US2_0033BC20(char *object, char *owner, short *list)
     rec228 = object + 0x248;
     flags = (short *)(object + 0x188);
     rec1E0 = object + 0x1f0;
-    color = D_001ADD40;
+    color = g_prompt_bar_slot_colors;
     record = object + 0xC;
     vel280 = object + 0x2b0;
     p = list;
     for (i = 4; i >= 0; i--) {
         if (*p != 0) {
-            object_init_derived_arrays(record, D_001ADC80 + 8, owner);
+            object_init_derived_arrays(record, g_circle_menu_header_data + 8, owner);
             *object_get_fourth_field(record) = *color;
-            object_set_helper_result(record, D_001A8CFC[0] + 0x8710, *p);
+            object_set_helper_result(record, g_resident_data_base[0] + 0x8710, *p);
         }
         *flags = *p;
         color++;
@@ -92,7 +92,7 @@ void func_US2_0033BC20(char *object, char *owner, short *list)
         p++;
         flags++;
     }
-    p = (short *)D_001ADC88;
+    p = (short *)g_circle_menu_icon_data;
     func_US2_003377B0(rec198, p, owner);
     memset(vel278, 0, 8);
     object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);

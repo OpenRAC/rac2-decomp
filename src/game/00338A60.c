@@ -83,8 +83,8 @@ extern Float2_00339320 ref_L00_0042EC50_01;
 extern Float2_00339320 ref_L00_0042EC50_02;
 
 extern int g_game_time __attribute__((sda));
-extern int D_001C51D0;
-extern unsigned int D_001A7390 __attribute__((sda));
+extern int g_selected_map_index;
+extern unsigned int g_frame_counter __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern Statistics_00339320 g_progress_statistics;
 
@@ -109,11 +109,11 @@ int mission_screen_place_parts(char *screen)
     object_set_first_float4(screen + 0x138, g0.x + (*(float **)(screen + 4))[0], g0.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(screen + 0x180, g1.x + (*(float **)(screen + 4))[0], g1.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
     object_set_first_float4(screen + 0x1C8, g2.x + (*(float **)(screen + 4))[0], g2.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
-    text_format_location_name(screen + 0x258, D_001C51D0);
+    text_format_location_name(screen + 0x258, g_selected_map_index);
     if (g_game_time >= 11) {
         if (g_progress_statistics.count < 0xffff) g_progress_statistics.count++;
     }
-    if (D_001A7390 > g_progress_statistics.maximum) g_progress_statistics.maximum = D_001A7390;
+    if (g_frame_counter > g_progress_statistics.maximum) g_progress_statistics.maximum = g_frame_counter;
     g_progress_statistics.levels = (g_progress_statistics.levels | (1u << g_current_map_index)) | 0x80000000u;
     return 0;
 }

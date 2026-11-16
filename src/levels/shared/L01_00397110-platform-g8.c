@@ -3,7 +3,7 @@
 extern void moby_set_state(char *, int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern char g_hero_position[];
-extern char *D_001B255C __attribute__((sda));
+extern char *g_moby_pool_base_copy __attribute__((sda));
 extern int IsPointInCuboid(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -44,7 +44,7 @@ void UpdateCuboidTriggeredMoby(char *moby)
             moby_set_state(moby, 2, -1);
         }
         if (BI(vars, 0xB0) != -1) {
-            char *other = D_001B255C + (BI(vars, 0xB0) << 8);
+            char *other = g_moby_pool_base_copy + (BI(vars, 0xB0) << 8);
             if (other && BU(other, 0x20) != 254 && BU(other, 0x20) != 253 &&
                 IsPointInCuboid(other + 0x10, BI(vars, 0xA0))) {
                 if (!BI(vars, 0xB8)) PlayMobySound(0, 0, moby);
@@ -75,7 +75,7 @@ void UpdateCuboidTriggeredMoby(char *moby)
     case 3:
         if (!BI(vars, 0xA8) && !IsPointInCuboid(g_hero_position, BI(vars, 0xA0))) {
             if (BI(vars, 0xB0) != -1) {
-                char *other = D_001B255C + (BI(vars, 0xB0) << 8);
+                char *other = g_moby_pool_base_copy + (BI(vars, 0xB0) << 8);
                 if (!other || BU(other, 0x20) == 254 || BU(other, 0x20) == 253 ||
                     IsPointInCuboid(other + 0x10, BI(vars, 0xA0)))
                     goto clear;
@@ -106,7 +106,7 @@ void UpdateCuboidTriggeredMoby(char *moby)
             moby_set_state(moby, 2, -1);
         }
         if (BI(vars, 0xB0) != -1) {
-            char *other = D_001B255C + (BI(vars, 0xB0) << 8);
+            char *other = g_moby_pool_base_copy + (BI(vars, 0xB0) << 8);
             if (other && BU(other, 0x20) != 254 && BU(other, 0x20) != 253 &&
                 IsPointInCuboid(other + 0x10, BI(vars, 0xA0))) {
                 if (!BI(vars, 0xB8)) PlayMobySound(0, 0, moby);
@@ -122,7 +122,7 @@ void UpdateCuboidTriggeredMoby(char *moby)
 clear:
     BU(moby, 0xBC) = 0;
     if (BI(vars, 0xB0) != -1) {
-        char *other = D_001B255C + (BI(vars, 0xB0) << 8);
+        char *other = g_moby_pool_base_copy + (BI(vars, 0xB0) << 8);
         if (!other || BU(other, 0x20) == 254 || BU(other, 0x20) == 253) BI(vars, 0xB0) = -1;
     }
     if (BU(moby, 0x20) < 5) {

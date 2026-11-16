@@ -1,10 +1,10 @@
 #include "common.h"
 extern int FloatToInt(float);
 extern void moby_set_state(void *, int, int);
-extern float D_L03_001B1BC0 __attribute__((sda));
-extern float D_L03_001B1BC4 __attribute__((sda));
-extern float D_L03_001B1BC8 __attribute__((sda));
-extern u8 D_L03_001B9980[];
+extern float g_rivet_bot_rate_c __attribute__((sda));
+extern float g_rivet_bot_rate_a __attribute__((sda));
+extern float g_rivet_bot_rate_b __attribute__((sda));
+extern u8 g_camera_pose_buffer[];
 extern void moby_mark_spawned(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_update_ground_check(void *);
@@ -48,14 +48,14 @@ void rivet_bot_init_check_hit(u8 *self) {
             anim_start_blended(self, 0, 0, 0);
     }
     if (self[0x31] != 0) {
-        if (fast_vec_dist(self + 0x10, D_L03_001B9980) < 48.0f) {
+        if (fast_vec_dist(self + 0x10, g_camera_pose_buffer) < 48.0f) {
             moby_update_ground_check(self);
             self[0x6F] = 0x2D;
         }
     }
-    ((RateView *)st)->rate[2] = D_L03_001B1BC0 * 0.01666666753590107f;
-    ((RateView *)st)->rate[0] = D_L03_001B1BC4 * 0.00027777778450399637f;
-    ((RateView *)st)->rate[1] = D_L03_001B1BC8 * 0.00027777778450399637f;
+    ((RateView *)st)->rate[2] = g_rivet_bot_rate_c * 0.01666666753590107f;
+    ((RateView *)st)->rate[0] = g_rivet_bot_rate_a * 0.00027777778450399637f;
+    ((RateView *)st)->rate[1] = g_rivet_bot_rate_b * 0.00027777778450399637f;
     if (moby_apply_damage_to_object(self, st + 0x50, 0))
         rivet_bot_mark_stream(self);
     weapon_select_aim_target(self, *(s32 *)(st + 0x214), 0, 0, 16.0f, 0.0f);

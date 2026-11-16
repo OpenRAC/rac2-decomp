@@ -2,8 +2,8 @@
 extern u8 *g_moby_l18_table MACRO_ADDR;
 extern int ref_L18_00428AE8_00 __attribute__((sda));
 typedef union { u8 b[0x100]; s16 h[0x80]; int i[0x40]; float f[0x40]; } Obj;
-extern u16 D_L18_001B1240 __attribute__((sda));
-extern u16 D_L18_001B1264 __attribute__((sda));
+extern u16 g_enemy_timer_reset_value __attribute__((sda));
+extern u16 g_receiver_wander_timer __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void add_vectors(void *, void *, void *);
 extern int moby_l01_turn_toward_target(void *, void *);
@@ -53,13 +53,13 @@ void receiver_bot_move_toward_target(u8 *moby) {
                 case 5:
                     if (vars[0x399] & 2) vars[0x399] = 0;
                     moby_set_anim(moby, *(int *)(vars+0x374), -1);
-                    *(u16 *)(vars+0x392) = D_L18_001B1240;
+                    *(u16 *)(vars+0x392) = g_enemy_timer_reset_value;
                     moby_start_or_forward_anim(moby,2,0,10.0f);
                     moby_set_state(moby,4,6);
                     break;
                 case 6:
                     if (moby_toggle_anim_helper(moby)) {
-                        *(u16 *)(vars+0x392) = D_L18_001B1240;
+                        *(u16 *)(vars+0x392) = g_enemy_timer_reset_value;
                         moby_start_or_forward_anim(moby,2,0,10.0f);
                         moby_set_state(moby,4,6);
                     }
@@ -92,7 +92,7 @@ void receiver_bot_move_toward_target(u8 *moby) {
 wander:
             enemy_update_wander_heading(moby,vars+0x1F0,vars+0x100);
             if (*(s16 *)(vars+0x392) == 0) {
-                *(u16 *)(vars+0x392) = D_L18_001B1264;
+                *(u16 *)(vars+0x392) = g_receiver_wander_timer;
                 moby_start_or_forward_anim(moby,func_001163B0() & 1,0,10.0f);
                 moby_set_state(moby,2,-1);
             }

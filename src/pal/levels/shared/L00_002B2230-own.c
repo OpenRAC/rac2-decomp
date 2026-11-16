@@ -20,9 +20,9 @@ typedef struct {
     float mat[16];
 } Obj2318;
 
-extern unsigned char D_001A7B00[] __attribute__((sda));
+extern unsigned char g_inventory_have_flags[] __attribute__((sda));
 extern int math_fast_float_d(void *);
-extern Obj2318 *D_L00_001FACE0[];
+extern Obj2318 *g_target_l00_list[];
 extern char *moby_get_private_value_0(void *);
 extern float vec_length_xy(void *);
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
     unsigned char index;
 } ItemSelector2318;
 extern ItemSelector2318 g_item_slot_to_record;
-extern unsigned char D_00139571;
+extern unsigned char g_weapon_misc_byte;
 typedef struct {
     char pad0[4];
     unsigned char flag;
@@ -51,8 +51,8 @@ typedef struct {
     char pad[0x64];
     unsigned char *owner;
 } Owner2318;
-extern Owner2318 D_L00_001FE940;
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern Owner2318 g_effect_definitions;
+extern char g_default_vector[] MACRO_ADDR;
 extern char *part_spawn_burst(void *, void *, int, int, int, int, float, float, float, float, float);
 
 extern int hero_slot_item_id(int);
@@ -83,11 +83,11 @@ void func_PAL_L00_002B2230(void) {
     char *effect;
     Record2318 *record;
 
-    if (g_hero_state.active && !g_hero_state.mode && (D_001A7B00[1] || D_001A7B00[0x41])) {
+    if (g_hero_state.active && !g_hero_state.mode && (g_inventory_have_flags[1] || g_inventory_have_flags[0x41])) {
         if ((hero_slot_item_id(3) == 3 || hero_slot_item_id(3) == 2) && !g_hero_state.blocked) {
             if (math_fast_float_d(&g_hero_state.timer)) {
                 Obj2318 *object;
-                for (k = 0; (object = D_L00_001FACE0[k]) != 0; k++) {
+                for (k = 0; (object = g_target_l00_list[k]) != 0; k++) {
                     if (object->type && object->type->kind == 5 && object && object->state != 254 && object->state != 253 && moby_get_private_value_0(object)) {
                         FastVecSub(v, object->pos, g_hero_state.position);
                         if (!(16.0f < vec_length_xy(v))) g_hero_state.target = object;
@@ -134,10 +134,10 @@ void func_PAL_L00_002B2230(void) {
                         b[0] += math_random_signed_float_range(0.0f, 0.004f);
                         b[1] += math_random_signed_float_range(0.0f, 0.004f);
                         b[2] += math_random_signed_float_range(0.0f, 0.004f);
-                        effect = part_spawn_burst(a, D_L00_001A8F20, 2, 127, 0x2020ff, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
-                        if (effect) effect[2] = *D_L00_001FE940.owner;
-                        effect = part_spawn_burst(b, D_L00_001A8F20, 2, 127, 0x2020ff, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
-                        if (effect) effect[2] = *D_L00_001FE940.owner;
+                        effect = part_spawn_burst(a, g_default_vector, 2, 127, 0x2020ff, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
+                        if (effect) effect[2] = *g_effect_definitions.owner;
+                        effect = part_spawn_burst(b, g_default_vector, 2, 127, 0x2020ff, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 25200.0f, 500.0f, 1.0f, 0.0f, 0.0f);
+                        if (effect) effect[2] = *g_effect_definitions.owner;
                     }
                 }
                 qcopy(v, g_hero_state.point);
@@ -150,11 +150,11 @@ void func_PAL_L00_002B2230(void) {
                         /* Identical arms: retail still reads this flag into $v0 and the next call clobbers it, the
                            dead load jump2's cross-jump leaves. One arm is 36 bytes short of retail. */
                         if (record->flag) {
-                            effect = part_spawn_burst(a, D_L00_001A8F20, 2, 127, 0x20ff20, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
-                            if (effect) effect[2] = *D_L00_001FE940.owner;
+                            effect = part_spawn_burst(a, g_default_vector, 2, 127, 0x20ff20, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
+                            if (effect) effect[2] = *g_effect_definitions.owner;
                         } else {
-                            effect = part_spawn_burst(a, D_L00_001A8F20, 2, 127, 0x20ff20, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
-                            if (effect) effect[2] = *D_L00_001FE940.owner;
+                            effect = part_spawn_burst(a, g_default_vector, 2, 127, 0x20ff20, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
+                            if (effect) effect[2] = *g_effect_definitions.owner;
                         }
                     }
                 }

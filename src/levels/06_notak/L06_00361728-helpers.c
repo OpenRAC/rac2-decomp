@@ -7,8 +7,8 @@ typedef struct {
     int unused; int mode;
 } PlayerView;
 extern PlayerView g_hero_state;
-extern char *D_L06_001B281C;
-extern short D_L06_001B2970[] __attribute__((sda));
+extern char *g_moby_l06_table;
+extern short g_target_index_list[] __attribute__((sda));
 extern float vec_distance_xy(char *, char *);
 
 /* Find the nearest active target and fill the target's position frames. */
@@ -22,8 +22,8 @@ int moby_find_nearest_target(char *moby, char *target, float distance)
         best = 0;
         kind = 2;
     }
-    for (index = 1; index <= D_L06_001B2970[0]; index++) {
-        char *candidate = D_L06_001B281C + (D_L06_001B2970[index] << 8);
+    for (index = 1; index <= g_target_index_list[0]; index++) {
+        char *candidate = g_moby_l06_table + (g_target_index_list[index] << 8);
         if (candidate &&
             (*(short *)(candidate + 0xAA) == MOBY_CLASS_DECOY ||
              *(short *)(candidate + 0xAA) == 0x76C /* moby class 1900 */) &&

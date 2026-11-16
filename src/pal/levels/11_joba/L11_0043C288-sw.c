@@ -2,24 +2,24 @@
 
 #include "common.h"
 extern int g_moby_l11_table __attribute__((sda));
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_L11_0043EBD0(char *, char *);
-extern void func_PAL_L11_0043E968(char *, int, int);
+extern void part_spawn_blast_burst_pal(char *, char *);
+extern void rotor_aim_at_entry_pal(char *, int, int);
 extern void chain_creature_clear_sound_flags(char *);
-extern void func_PAL_L11_004400D0(char *);
+extern void drone_kill_with_effects_pal(char *);
 extern void chain_creature_choose_path(char *);
-extern int func_PAL_L11_0043E660(char *);
+extern int chain_creature_follow_path_pal(char *);
 extern int chain_creature_pick_move_state(char *);
 extern void chain_creature_reset_projectile_seq(char *);
-extern void func_PAL_L11_0043E278(char *);
+extern void chain_creature_fire_projectile_pal(char *);
 extern void LayOutVerletChain(char *);
-extern void func_PAL_L11_0043D280(char *);
-extern void func_PAL_L02_004009A0(char *, int, int);
+extern void chain_creature_update_body_pal(char *);
+extern void moby_set_anim_type_three_pal(char *, int, int);
 extern int flag_set_first_pending(char *);
 extern int PlayMobySound(int, int, char *);
 extern void snd_stop_voice(int);
@@ -66,13 +66,13 @@ void func_PAL_L11_0043C500(char *obj)
             *(float *)(obj+0xF8)=mat_fast_helper_a(*(float *)(p+0x20)-*(float *)(obj+0x10),*(float *)(p+0x24)-*(float *)(obj+0x14));
             euler_rotation_basis(obj+0xC0,obj+0xF0);
             LayOutVerletChain(obj);
-        } else if (func_PAL_L11_0043E660(obj)==1) moby_set_state(obj,3,-1);
+        } else if (chain_creature_follow_path_pal(obj)==1) moby_set_state(obj,3,-1);
         break;
     case 3:
         if (flag_set_first_pending(obj)) {
             if (*(unsigned char *)(obj+0x43)!=0) func_PAL_002A7E68(obj,0,0,8);
             chain_creature_choose_path(obj);
-        } else if (func_PAL_L11_0043E660(obj)==1)
+        } else if (chain_creature_follow_path_pal(obj)==1)
             moby_set_state(obj,chain_creature_pick_move_state(obj),-1);
         break;
     case 4:
@@ -80,10 +80,10 @@ void func_PAL_L11_0043C500(char *obj)
             if (*(unsigned char *)(obj+0x43)!=0) func_PAL_002A7E68(obj,0,0,8);
             chain_creature_choose_path(obj);
         } else {
-            if (func_PAL_L11_0043E660(obj)==1) moby_set_state(obj,chain_creature_pick_move_state(obj),-1);
+            if (chain_creature_follow_path_pal(obj)==1) moby_set_state(obj,chain_creature_pick_move_state(obj),-1);
             if (*(unsigned char *)(obj+0x31)) {
                 if (*(short *)(s+0x374)==-1) chain_creature_reset_projectile_seq(obj);
-                func_PAL_L11_0043E278(obj);
+                chain_creature_fire_projectile_pal(obj);
             }
         }
         break;
@@ -99,7 +99,7 @@ void func_PAL_L11_0043C500(char *obj)
         if (*(unsigned char *)(obj+0x60)&2) {
             if (*(unsigned char *)(obj+0x43)!=0) func_PAL_002A7E68(obj,0,0,6);
         }
-        if (func_PAL_L11_0043E660(obj)==1) moby_set_state(obj,chain_creature_pick_move_state(obj),-1);
+        if (chain_creature_follow_path_pal(obj)==1) moby_set_state(obj,chain_creature_pick_move_state(obj),-1);
         break;
     case 7: break;
     case 6:
@@ -108,10 +108,10 @@ void func_PAL_L11_0043C500(char *obj)
             if (*(unsigned char *)(obj+0x43)!=4) func_PAL_002A7E68(obj,4,0,8);
         }
         if (*(unsigned short *)(obj+0x96)>8) {
-            FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+            FastVecSub(direction,(float *)g_hero_l11_position,(float *)(obj+0x10));
             vec_scale_to_length((char *)direction,(char *)direction,0.6f);
             qcopy(pos,s+0x100);
-            func_PAL_L11_0043EBD0(obj,(char *)pos);
+            part_spawn_blast_burst_pal(obj,(char *)pos);
             vec_random_direction(random,0.040000003f,0.080000006f);
             FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                 count=0;
@@ -123,14 +123,14 @@ void func_PAL_L11_0043C500(char *obj)
                         vec_random_direction(random,0.20000002f,0.40000004f);
                         FastVecAdd((char *)velocity,(char *)direction,(char *)random);
                         func_PAL_002B15D8(CHILD(obj,i),3,velocity,3,6,3,6,255);
-                        func_PAL_L11_0043EBD0(obj,(char *)pos);
-                        func_PAL_L11_004400D0(CHILD(obj,i));
+                        part_spawn_blast_burst_pal(obj,(char *)pos);
+                        drone_kill_with_effects_pal(CHILD(obj,i));
                     } else {
                         char *records=(char *)g_moby_l11_table;
                         (*(short *)(s+0x378))--;
                         count++;
-                        func_PAL_L11_0043EBD0(obj,records+(((ChildSlots *)*(char **)(obj+0x68))->children[i]<<8)+0x10);
-                        func_PAL_L11_0043E968(obj,i,0);
+                        part_spawn_blast_burst_pal(obj,records+(((ChildSlots *)*(char **)(obj+0x68))->children[i]<<8)+0x10);
+                        rotor_aim_at_entry_pal(obj,i,0);
                     }
                 }
             }
@@ -138,11 +138,11 @@ void func_PAL_L11_0043C500(char *obj)
             vec_random_direction(random,0.40000004f,0.6f);
             FastVecAdd((char *)velocity,(char *)direction,(char *)random);
             func_PAL_002B15D8((char *)(g_moby_l11_table+(*(int *)(*(char **)(obj+0x68)+0x358)<<8)),7,velocity,3,6,3,6,255);
-            func_PAL_L11_0043EBD0(obj,(char *)pos);
-            func_PAL_L02_004009A0(obj,0,-1);
+            part_spawn_blast_burst_pal(obj,(char *)pos);
+            moby_set_anim_type_three_pal(obj,0,-1);
             chain_creature_clear_sound_flags(obj);
         }
         break;
     }
-    func_PAL_L11_0043D280(obj);
+    chain_creature_update_body_pal(obj);
 }

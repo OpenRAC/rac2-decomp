@@ -2,8 +2,8 @@
 #include "names.h"
 
 typedef int OozlaQuad __attribute__((mode(TI)));
-extern int D_L01_001B2088 __attribute__((sda));
-extern char D_L01_001B03E8[];
+extern int g_oozla_intro_stage __attribute__((sda));
+extern char g_str_swamp_splash[];
 extern void STUB_printf(char *, int, int);
 extern float func_PAL_L01_003BEB40(void);
 extern void *moby_spawn_scaled_effect(float *, float);
@@ -16,9 +16,9 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern void *part_spawn_drifting(void *, void *, int, float, float);
 extern void *func_PAL_002C0838(void *, void *, int, int);
-extern float D_L01_001AFE18[] __attribute__((sda));
+extern float g_water_l01_height[] __attribute__((sda));
 
-void func_PAL_L01_003CFDB0(char *object, int bubbles, int drops, int splash)
+void swamp_monster_spawn_splash_pal(char *object, int bubbles, int drops, int splash)
 {
     float velocity[4], position[4];
     float height, angle, radius, size;
@@ -33,8 +33,8 @@ void func_PAL_L01_003CFDB0(char *object, int bubbles, int drops, int splash)
         timer = (int *)(*(char **)(object + 0x68) + 0xC8);
     }
     if (timer == 0)
-        STUB_printf(D_L01_001B03E8, *(short *)(object + 0xAA), *(short *)(object + 0xB2));
-    now = D_L01_001B2088;
+        STUB_printf(g_str_swamp_splash, *(short *)(object + 0xAA), *(short *)(object + 0xB2));
+    now = g_oozla_intro_stage;
     if (now - *timer < 11)
         return;
     height = func_PAL_L01_003BEB40();
@@ -54,7 +54,7 @@ void func_PAL_L01_003CFDB0(char *object, int bubbles, int drops, int splash)
         velocity[2] = height;
         size = math_random_float_range(0.5f, 0.9f);
         type = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-        part_spawn_drifting(velocity, D_L01_001AFE18, type, size, 5250.0f);
+        part_spawn_drifting(velocity, g_water_l01_height, type, size, 5250.0f);
       } while (i != 0);
     }
     if (nd > 0) {
@@ -74,5 +74,5 @@ void func_PAL_L01_003CFDB0(char *object, int bubbles, int drops, int splash)
         func_PAL_002C0838(position, velocity, type, lifetime);
       } while (j != 0);
     }
-    *timer = D_L01_001B2088;
+    *timer = g_oozla_intro_stage;
 }

@@ -8,13 +8,13 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { int i; float f; } Word;
 #define R(p,o) (((Word *)((u8 *)(p)+(o)))->f)
 extern int g_current_map_index;
-extern u8 D_0019B2E8[], g_hero_position[];
+extern u8 g_moby_group_flags[], g_hero_position[];
 typedef struct { u8 prefix[0x464]; u8 flags[0]; } FlagTable;
-extern FlagTable D_L19_0021EA30;
+extern FlagTable g_trigger_active_table;
 typedef struct { u8 prefix[0x30]; float position[4]; u8 middle[0x30]; float rotation[4]; } Transform;
-extern Transform *D_L19_001B2B0C MACRO_ADDR;
+extern Transform *g_linked_object_table MACRO_ADDR;
 extern u8 *g_moby_l19_array;
-extern int D_L19_001B9D00 NOT_SDA;
+extern int g_hero_l19_attached_flag NOT_SDA;
 extern void moby_set_state(void *,int,int);
 extern int coll_point_inside_region(void *,int);
 extern void moby_mark_spawned(void *);
@@ -50,11 +50,11 @@ void triggered_move_to_target_update(u8 *moby)
         I(vars,0x5C)|=1;
         *(TI128 *)(vars+0x60) = *(TI128 *)(moby+0x10);
         *(TI128 *)(vars+0x70) = *(TI128 *)(moby+0xF0);
-        if (D_L19_0021EA30.flags[I(vars,0x8C)] ||
-            (B(moby,0xB0)!=255 && B(vars,0x92) && (D_0019B2E8[B(moby,0xB0)+g_current_map_index*16]&128)) ||
+        if (g_trigger_active_table.flags[I(vars,0x8C)] ||
+            (B(moby,0xB0)!=255 && B(vars,0x92) && (g_moby_group_flags[B(moby,0xB0)+g_current_map_index*16]&128)) ||
             (I(vars,0x98)!=-1 && coll_point_inside_region(g_hero_position,I(vars,0x98)))) {
-            qcopy_nc(moby+0x10,D_L19_001B2B0C[I(vars,0x80)].position);
-            qcopy_nc(moby+0xF0,D_L19_001B2B0C[I(vars,0x80)].rotation);
+            qcopy_nc(moby+0x10,g_linked_object_table[I(vars,0x80)].position);
+            qcopy_nc(moby+0xF0,g_linked_object_table[I(vars,0x80)].rotation);
             H(moby,0x34)|=2;
             if (!B(vars,0x91)) { moby_mark_spawned(moby); return; }
             moby_set_state(moby,3,-1);
@@ -64,7 +64,7 @@ void triggered_move_to_target_update(u8 *moby)
         if (!B(moby,0xBC) && !flag_is_third_pending_set(moby) && I(vars,0x8C)!=-1 &&
             B(g_moby_l19_array+I(vars,0x8C)*256,0x20)!=254 &&
             B(g_moby_l19_array+I(vars,0x8C)*256,0x20)!=253 &&
-            !(B(moby,0xB0)!=255 && B(vars,0x92) && (D_0019B2E8[B(moby,0xB0)+g_current_map_index*16]&128)) &&
+            !(B(moby,0xB0)!=255 && B(vars,0x92) && (g_moby_group_flags[B(moby,0xB0)+g_current_map_index*16]&128)) &&
             (I(vars,0x98)==-1 || !coll_point_inside_region(g_hero_position,I(vars,0x98)))) goto effects;
         if (I(vars,0x94)!=-1) B(g_moby_l19_array+I(vars,0x94)*256,0xBC)=1;
         if (B(vars,0x93)) moby_mark_table_entry_flagged(B(moby,0xB0));
@@ -92,17 +92,17 @@ void triggered_move_to_target_update(u8 *moby)
         if (F(vars,0x88)>1) F(vars,0x88)=1;
         ease=1.0f-math_fast_sin_or_cos_a(F(vars,0x88)*3.1415927f);
         ease*=0.5f;
-        FastVecSub(delta,D_L19_001B2B0C[I(vars,0x80)].position,vars+0x60);
+        FastVecSub(delta,g_linked_object_table[I(vars,0x80)].position,vars+0x60);
         FastVecScale(delta,delta,ease);
         FastVecAdd(moby+0x10,vars+0x60,delta);
-        R(moby,0xF8)=math_move_angle_toward_target(F(vars,0x78),D_L19_001B2B0C[I(vars,0x80)].rotation[2],ease);
-        R(moby,0xF4)=math_move_angle_toward_target(F(vars,0x74),D_L19_001B2B0C[I(vars,0x80)].rotation[1],ease);
-        R(moby,0xF0)=math_move_angle_toward_target(F(vars,0x70),D_L19_001B2B0C[I(vars,0x80)].rotation[0],ease);
+        R(moby,0xF8)=math_move_angle_toward_target(F(vars,0x78),g_linked_object_table[I(vars,0x80)].rotation[2],ease);
+        R(moby,0xF4)=math_move_angle_toward_target(F(vars,0x74),g_linked_object_table[I(vars,0x80)].rotation[1],ease);
+        R(moby,0xF0)=math_move_angle_toward_target(F(vars,0x70),g_linked_object_table[I(vars,0x80)].rotation[0],ease);
         if (F(vars,0x88)>=1) moby_set_state(moby,3,-1);
         break;
     case 3:
         if (I(vars,0x94)!=-1 && B(g_moby_l19_array+I(vars,0x94)*256,0xBC)) break;
-        if (B(vars,0x90)) { D_L19_001B9D00=0; hero_detach_from_object(0); }
+        if (B(vars,0x90)) { g_hero_l19_attached_flag=0; hero_detach_from_object(0); }
         H(moby,0x34)|=2;
         break;
     }

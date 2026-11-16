@@ -39,10 +39,10 @@ extern u8 g_hero_state[];
 extern u32 g_pad_state[];
 extern u8 g_item_slot_to_record[];
 extern ItemClass g_weapon_l00_table[];
-extern int D_001A7398[] __attribute__((sda));
-extern u8 D_001A7A80[] __attribute__((sda));
-extern u8 D_001A7A00[] __attribute__((sda));
-extern u8 D_001A7B08[] __attribute__((sda));
+extern int g_menu_choice_table[] __attribute__((sda));
+extern u8 g_movie_seen_flags[] __attribute__((sda));
+extern u8 g_player_stats[] __attribute__((sda));
+extern u8 g_status_flag_b[] __attribute__((sda));
 extern void synthenoid_spawn_or_kilonoid(Vector *, int);
 extern int weapon_spend_ammo(int, int);
 extern unsigned char *CreateTrailOwnerMoby(int);
@@ -106,12 +106,12 @@ void ApplyHeroEquipmentRequest(int slot) {
     }
     if (slot == 0) {
         combo = 0;
-        if (((HeroState *)g_hero_state)->slots[0].item == 10 && D_001A7398[0] && (D_001A7A80[D_001A7398[0]] & 0x20)) {
+        if (((HeroState *)g_hero_state)->slots[0].item == 10 && g_menu_choice_table[0] && (g_movie_seen_flags[g_menu_choice_table[0]] & 0x20)) {
             if ((g_pad_state[0x1A0 / 4] & 3) == 3 && (g_pad_state[0x1A4 / 4] & 3)) combo = 1;
         }
         if (((g_pad_state[0x1A4 / 4] & 0x20) || ((g_pad_state[0x1A4 / 4] & 5) && hero_is_action_allowed()) || combo) &&
             !((HeroState *)g_hero_state)->locked) {
-            int item = D_001A7398[slot];
+            int item = g_menu_choice_table[slot];
             if (((HeroState *)g_hero_state)->slots[0].item != item && item) {
                 changed = 1;
                 ((HeroState *)g_hero_state)->current[slot] = item;
@@ -119,8 +119,8 @@ void ApplyHeroEquipmentRequest(int slot) {
         }
     }
     if (slot == 1) {
-        if (((HeroState *)g_hero_state)->state == 0xF && D_001A7B08[4]) {
-            if (D_001A7398[1] != 0x14 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item) {
+        if (((HeroState *)g_hero_state)->state == 0xF && g_status_flag_b[4]) {
+            if (g_menu_choice_table[1] != 0x14 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item) {
                 ((HeroState *)g_hero_state)->request[1] = 0x14;
                 if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)
                     ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item;
@@ -128,8 +128,8 @@ void ApplyHeroEquipmentRequest(int slot) {
             }
         }
         {
-            if (((HeroState *)g_hero_state)->swimming && D_001A7B08[3] &&
-                (D_001A7398[1] != 0x13 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)) {
+            if (((HeroState *)g_hero_state)->swimming && g_status_flag_b[3] &&
+                (g_menu_choice_table[1] != 0x13 || !((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)) {
                 ((HeroState *)g_hero_state)->request[1] = 0x13;
                 if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item)
                     ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].item;
@@ -148,7 +148,7 @@ void ApplyHeroEquipmentRequest(int slot) {
     keepSuit = 0;
     if (slot == 3) {
         if (hero_is_in_special_kind_or_mode() || ((HeroState *)g_hero_state)->move == 0x12) {
-            if (D_001A7398[3] != 4 && ((HeroState *)g_hero_state)->slots[slot].item != 4) {
+            if (g_menu_choice_table[3] != 4 && ((HeroState *)g_hero_state)->slots[slot].item != 4) {
                 ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)g_hero_state)->slots[slot].item;
                 keepHelmet = 1;
                 ((HeroState *)g_hero_state)->request[slot] = 4;
@@ -157,7 +157,7 @@ void ApplyHeroEquipmentRequest(int slot) {
             ((HeroState *)g_hero_state)->restore[slot] = 1;
         }
         if (((HeroState *)g_hero_state)->move == 0x82) {
-            if (D_001A7398[slot] != 8 && ((HeroState *)g_hero_state)->slots[slot].item != 8) {
+            if (g_menu_choice_table[slot] != 8 && ((HeroState *)g_hero_state)->slots[slot].item != 8) {
                 keepSuit = 1;
                 ((HeroState *)g_hero_state)->previous[slot] = ((HeroState *)g_hero_state)->slots[slot].item;
                 ((HeroState *)g_hero_state)->request[slot] = 8;
@@ -166,8 +166,8 @@ void ApplyHeroEquipmentRequest(int slot) {
             ((HeroState *)g_hero_state)->restore[slot] = 1;
         }
         if (((HeroState *)g_hero_state)->move == 8 &&
-            (D_001A7398[slot] == 4 || D_001A7398[slot] == ((HeroState *)g_hero_state)->move)) {
-            if (D_001A7A00[9]) ((HeroState *)g_hero_state)->request[slot] = 3;
+            (g_menu_choice_table[slot] == 4 || g_menu_choice_table[slot] == ((HeroState *)g_hero_state)->move)) {
+            if (g_player_stats[9]) ((HeroState *)g_hero_state)->request[slot] = 3;
             else ((HeroState *)g_hero_state)->request[slot] = 2;
         }
     }
@@ -176,7 +176,7 @@ void ApplyHeroEquipmentRequest(int slot) {
         ((HeroState *)g_hero_state)->restore[slot] = 0;
         item = ((HeroState *)g_hero_state)->previous[slot];
         if (item && item != ((HeroState *)g_hero_state)->slots[slot].item) {
-            { int *tbl = D_001A7398;
+            { int *tbl = g_menu_choice_table;
             if (item == 0x77) item = 0;
             ((HeroState *)g_hero_state)->previous[slot] = 0;
             ((HeroState *)g_hero_state)->current[slot] = item;
@@ -204,25 +204,25 @@ void ApplyHeroEquipmentRequest(int slot) {
     if (((HeroState *)g_hero_state)->request[slot]) {
         if (((HeroState *)g_hero_state)->request[slot] != ((HeroState *)g_hero_state)->current[slot]) {
             if (slot == 1 && !((HeroState *)g_hero_state)->previous[slot]) {
-                *(s16 *)&D_001A7A00[0x24] = ((HeroState *)g_hero_state)->request[slot];
-                if (*(s16 *)&D_001A7A00[0x24] == 0x77) *(s16 *)&D_001A7A00[0x24] = 0;
+                *(s16 *)&g_player_stats[0x24] = ((HeroState *)g_hero_state)->request[slot];
+                if (*(s16 *)&g_player_stats[0x24] == 0x77) *(s16 *)&g_player_stats[0x24] = 0;
             }
             if (((HeroState *)g_hero_state)->request[slot] == 0x77) {
                 ((HeroState *)g_hero_state)->current[slot] = 0;
-                D_001A7398[slot] = 0;
+                g_menu_choice_table[slot] = 0;
             } else {
                 int item;
                 if (slot == 0) {
-                    int item = D_001A7398[0];
+                    int item = g_menu_choice_table[0];
                     if (item != 0x26 && item != 0x33 && item && ((HeroState *)g_hero_state)->request[0] != 0x26 &&
                         ((HeroState *)g_hero_state)->request[0] != 0x33 && ((HeroState *)g_hero_state)->request[0] != item)
-                        *(int *)&D_001A7A00[4] = item;
+                        *(int *)&g_player_stats[4] = item;
                 }
                 item = ((HeroState *)g_hero_state)->request[slot];
                 ((HeroState *)g_hero_state)->current[slot] = item;
-                if (!keepHelmet || item != 4) D_001A7398[slot] = item;
+                if (!keepHelmet || item != 4) g_menu_choice_table[slot] = item;
                 if (!keepSuit || ((HeroState *)g_hero_state)->current[slot] != 8)
-                    D_001A7398[slot] = ((HeroState *)g_hero_state)->current[slot];
+                    g_menu_choice_table[slot] = ((HeroState *)g_hero_state)->current[slot];
                 if (slot == 0) ITEM_ENTRY(((HeroState *)g_hero_state)->current[0]).flags = 0x20;
             }
             changed = 1;
@@ -257,12 +257,12 @@ void ApplyHeroEquipmentRequest(int slot) {
         hero_start_timed_state_for_mode(((HeroState *)g_hero_state)->current[slot]);
         if (((HeroState *)g_hero_state)->refresh) cancel_hero_item_animation();
         if (slot == 0) {
-            if (((HeroState *)g_hero_state)->current[0] == 10) D_001A7A00[8] = 1;
-            else D_001A7A00[8] = 0;
+            if (((HeroState *)g_hero_state)->current[0] == 10) g_player_stats[8] = 1;
+            else g_player_stats[8] = 0;
         }
         if (slot == 3) {
-            if (((HeroState *)g_hero_state)->slots[3].item == 3) D_001A7A00[9] = 1;
-            else D_001A7A00[9] = 0;
+            if (((HeroState *)g_hero_state)->slots[3].item == 3) g_player_stats[9] = 1;
+            else g_player_stats[9] = 0;
         }
         ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].swap = 0;
         ((HeroState *)g_hero_state)->request[slot] = 0;
@@ -279,8 +279,8 @@ void ApplyHeroEquipmentRequest(int slot) {
             anim_start_blended(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster, 2, 0, 2);
         ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].mode = 3;
     }
-    if (slot == 2 && !D_001A7398[2] && !((HeroState *)g_hero_state)->slots[2].moby)
+    if (slot == 2 && !g_menu_choice_table[2] && !((HeroState *)g_hero_state)->slots[2].moby)
         ((HeroState *)g_hero_state)->request[2] = 0x2F;
-    if (slot == 1 && !D_001A7398[1] && !((HeroState *)g_hero_state)->slots[1].moby)
+    if (slot == 1 && !g_menu_choice_table[1] && !((HeroState *)g_hero_state)->slots[1].moby)
         ((HeroState *)g_hero_state)->request[1] = 0x34;
 }

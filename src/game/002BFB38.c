@@ -23,7 +23,7 @@ typedef struct {
     Spark2BFB38 s;
 } Effect2BFB38;
 
-extern u8 *D_001F25CC[];
+extern u8 *g_part_tex_spark_table[];
 
 extern Effect2BFB38 *part_alloc(int);
 extern int FloatToInt(float);
@@ -43,7 +43,7 @@ Effect2BFB38 *part_spawn_spark_2(void *pos, void *dir, s32 kind, s32 life) {
         e->f1 = 0;
         e->f3 = 0x44;
         e->fC = math_random_float_range(10500.0f, 16800.0f);
-        e->f2 = *D_001F25CC[0];
+        e->f2 = *g_part_tex_spark_table[0];
         qcopy(s->pos, dir);
         s->life = life;
         s->kind = kind;

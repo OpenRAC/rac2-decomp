@@ -5,9 +5,9 @@ extern void moby_set_state(void *,int,int),moby_mark_spawned(void *);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern float math_random_float_range(float,float);
 extern void FastVecScale(void *,void *,float),FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *);
-extern int D_L00_001B1370 SDATA(D_L00_001B1370);
-extern char D_L00_001B1368[8] SDATA(D_L00_001B1368);
-extern char D_L00_001B1360[8] SDATA(D_L00_001B1360);
+extern int g_hit_flash_piece_param SDATA(D_L00_001B1370);
+extern char g_hit_flash_piece_table_b[8] SDATA(D_L00_001B1368);
+extern char g_hit_flash_piece_table_a[8] SDATA(D_L00_001B1360);
 extern void part_explode_object_into_pieces(void *,void *,void *,void *,int,int,int,int,int,int,int);
 /* Spawns a small flash effect where the object hits something, then removes itself. */
 void hit_l00_flash_update(unsigned char *object) {
@@ -26,7 +26,7 @@ void hit_l00_flash_update(unsigned char *object) {
             qcopy(maximum,minimum);
             FastVecSub(minimum,minimum,size);
             FastVecAdd(maximum,maximum,size);
-            part_explode_object_into_pieces(object,minimum,D_L00_001B1368,D_L00_001B1360,65535,0,D_L00_001B1370,8,65535,255,0);
+            part_explode_object_into_pieces(object,minimum,g_hit_flash_piece_table_b,g_hit_flash_piece_table_a,65535,0,g_hit_flash_piece_param,8,65535,255,0);
             moby_set_state(object,2,-1);
         }
         object[0xa8]=255;break;

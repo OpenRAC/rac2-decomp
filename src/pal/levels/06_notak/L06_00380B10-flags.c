@@ -35,7 +35,7 @@ extern f32 IntToFloat(s32 value);
 extern s32 math_random_int_below(s32 limit);
 
 /* the level's pointer to the byte the record carries in its second flag byte */
-extern u8 *D_L06_001FF50C;
+extern u8 *g_particle_record_byte_ptr;
 
 /* func_PAL_L06_00380B10, the PAL copy of func_L06_0037E6B0: the same C, where the
    spin halfword a2 is scaled for 50 Hz once before its two uses. */
@@ -51,7 +51,7 @@ void func_PAL_L06_00380B10(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
         p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
         p->field03 = 0x48;
         p->field01 = 0;
-        p->field02 = *D_L06_001FF50C;
+        p->field02 = *g_particle_record_byte_ptr;
         p->field0C = f3 * 105000.0f;
         p->field08 = (u8)math_random_int_below(0xFF);
         a2 = ((s32)a2 * 5 + 2) / 6;

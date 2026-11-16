@@ -8,11 +8,11 @@ extern s32 math_random_int_below(s32 arg0);
 
 extern s32 arena_get_fighter_count(s32 arg0);
 
-extern s32 D_L11_001B056C __attribute__((sda));
+extern s32 g_joba_max_fighter_count __attribute__((sda));
 
-extern s32 D_L11_001B058C __attribute__((sda));
+extern s32 g_joba_attack_random_range __attribute__((sda));
 
-extern f32 D_L11_001B0670;
+extern f32 g_l11_unused_float;
 
 extern void joba_beams_update(u8 *arg0);
 
@@ -42,9 +42,9 @@ extern s32 weapon_select_aim_target(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, f32 
 extern void joba_enemy_reset(u8 *arg0);
 
 /* The 7.0 the timed effect is compared against, reached through $gp. */
-extern f32 D_L11_001B0570 __attribute__((sda));
+extern f32 g_joba_damage_threshold __attribute__((sda));
 
-extern s32 D_L11_001FFA78[];
+extern s32 g_enemy_damage_accum[];
 
 /* Runs the object's timer down, keeps the shared step counter in step with it, and retires
    the object when the timed effect is over. */
@@ -70,11 +70,11 @@ void joba_enemy_apply_damage(u8 *moby_arg) {
             /* The index is a byte offset into the table: keeping it in a variable leaves
                the constant out of the symbol's address, as the retail has it. */
             table_offset = *(u8 *)(vars + 0x37) * 4 + 0xE0;
-            *(s32 *)((u8 *)D_L11_001FFA78 + table_offset) += (s32)(damage * 32.0f);
+            *(s32 *)((u8 *)g_enemy_damage_accum + table_offset) += (s32)(damage * 32.0f);
             if (*(f32 *)(attacker + 0x2C) != 0.0f) {
                 hit_info = vars + 0x70;
                 gfx_start_color_fade(moby, hit_info);
-                if (*(f32 *)(attacker + 0x2C) >= D_L11_001B0570 || *(f32 *)(vars + 0x20) <= 0.0f) {
+                if (*(f32 *)(attacker + 0x2C) >= g_joba_damage_threshold || *(f32 *)(vars + 0x20) <= 0.0f) {
                     gfx_start_color_fade(moby, hit_info);
                     moby_set_state(moby, 8, -1);
                 }
@@ -103,8 +103,8 @@ void joba_enemy_choose_attack_state(u8 *moby_arg) {
         return;
     if (*(u16 *)(vars + 0x27A) >= 2)
         return;
-    if (math_random_int_below(D_L11_001B058C) != 0
-        && arena_get_fighter_count(*(s32 *)(moby + 0xB8)) < D_L11_001B056C) {
+    if (math_random_int_below(g_joba_attack_random_range) != 0
+        && arena_get_fighter_count(*(s32 *)(moby + 0xB8)) < g_joba_max_fighter_count) {
         moby_set_state(moby, 7, -1);
     } else {
         moby_set_state(moby, 6, -1);
@@ -133,7 +133,7 @@ extern void drone_init_state(u8 *a0, s32 a1, s32 a2);
 
 extern void path_mover_reset(u8 *a0, s32 a1);
 
-extern u32 D_L11_001B0D9C __attribute__((sda));
+extern u32 g_joba_child_offset_step __attribute__((sda));
 
 extern u8 g_hero_state[];
 
@@ -215,7 +215,7 @@ void joba_place_child_mobys(u8 *moby_arg) {
             enemy_init_state(part, offset_total, 0);
             break;
         }
-        offset_total += D_L11_001B0D9C;
+        offset_total += g_joba_child_offset_step;
     }
 
     *(u8 **)(vars + 0x10) = 0;

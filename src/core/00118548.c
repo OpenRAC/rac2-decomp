@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Convert the signed input using an unsigned magnitude, then reverse the digits. */
-extern char D_00134640[];
+extern char g_str_digit_chars[];
 
 extern char *str_reverse(char *arg0);
 
@@ -17,7 +17,7 @@ char *IntegerToAscii(int input, char *buf, unsigned int base) {
     }
     len = 0;
     do {
-        buf[len++] = D_00134640[value % base];
+        buf[len++] = g_str_digit_chars[value % base];
         value /= base;
     } while (value != 0);
     if (neg)

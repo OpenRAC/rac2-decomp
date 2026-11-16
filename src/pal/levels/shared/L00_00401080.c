@@ -17,7 +17,7 @@ extern float math_random_float_range(float, float);
    build a direction from a random step and a random magnitude, jitter the point by a random
    small amount on each axis and hand the result to the spawn helper with 210000.0f, 500.0f,
    1.0f, 0.0f and 0.0f; the original game role is unknown. */
-void func_PAL_L00_00401080(float *pos)
+void part_l00_spawn_spark_spray_2_pal(float *pos)
 {
     float v[4];
     float dir[4];

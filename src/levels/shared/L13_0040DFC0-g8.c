@@ -2,30 +2,30 @@
 
 extern unsigned int ref_L13_0040DFC0_01 __attribute__((sda));
 extern unsigned int ref_L13_0040DFC0_02 __attribute__((sda));
-extern float D_L13_001B12FC __attribute__((sda));
-extern unsigned int D_L13_001B1318 __attribute__((sda));
-extern unsigned int D_L13_001B131C __attribute__((sda));
-extern unsigned int D_L13_001B1320 __attribute__((sda));
-extern unsigned int D_L13_001B1324 __attribute__((sda));
-extern unsigned int D_L13_001B1328 __attribute__((sda));
-extern unsigned int D_L13_001B132C __attribute__((sda));
-extern unsigned int D_L13_001B1330 __attribute__((sda));
-extern unsigned int D_L13_001B1334 __attribute__((sda));
-extern unsigned int D_L13_001B1338 __attribute__((sda));
-extern unsigned int D_L13_001B133C __attribute__((sda));
-extern unsigned int D_L13_001B1340 __attribute__((sda));
-extern unsigned int D_L13_001B1344 __attribute__((sda));
-extern unsigned int D_L13_001B1348 __attribute__((sda));
-extern unsigned int D_L13_001B134C __attribute__((sda));
-extern unsigned int D_L13_001B1350 __attribute__((sda));
-extern unsigned int D_L13_001B1354 __attribute__((sda));
-extern float D_L13_001B12DC __attribute__((sda));
-extern float D_L13_001B12D0 __attribute__((sda));
-extern float D_L13_001B12D8 __attribute__((sda));
-extern int D_L13_001B12E0 __attribute__((sda));
-extern int D_L13_001B12E8 __attribute__((sda));
-extern float D_L13_001B12E4 __attribute__((sda));
-extern float D_L13_001B98C0[];
+extern float g_beam_step_length __attribute__((sda));
+extern unsigned int g_beam_outer_red __attribute__((sda));
+extern unsigned int g_beam_outer_green __attribute__((sda));
+extern unsigned int g_beam_outer_blue __attribute__((sda));
+extern unsigned int g_beam_outer_alpha __attribute__((sda));
+extern unsigned int g_beam_inner_red __attribute__((sda));
+extern unsigned int g_beam_inner_green __attribute__((sda));
+extern unsigned int g_beam_inner_blue __attribute__((sda));
+extern unsigned int g_beam_inner_alpha __attribute__((sda));
+extern unsigned int g_beam_core_red __attribute__((sda));
+extern unsigned int g_beam_core_green __attribute__((sda));
+extern unsigned int g_beam_core_blue __attribute__((sda));
+extern unsigned int g_beam_core_alpha __attribute__((sda));
+extern unsigned int g_beam_tip_red __attribute__((sda));
+extern unsigned int g_beam_tip_green __attribute__((sda));
+extern unsigned int g_beam_tip_blue __attribute__((sda));
+extern unsigned int g_beam_tip_alpha __attribute__((sda));
+extern float g_beam_l13_side_length_c __attribute__((sda));
+extern float g_beam_l13_side_length_a __attribute__((sda));
+extern float g_beam_l13_side_length_b __attribute__((sda));
+extern int g_beam_l13_quad_texture __attribute__((sda));
+extern int g_beam_quad_flags __attribute__((sda));
+extern float g_beam_quad_size __attribute__((sda));
+extern float g_camera_l13_position[];
 extern void ref_L13_0040DFC0_00(void *);
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -55,17 +55,17 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     ref_L13_0040DFC0_00(&packet);
     gfx_init_quad_packet_state(&packet, ref_L13_0040DFC0_01, 0, 128);
     {
-        unsigned alpha = (D_L13_001B1324 << 24);
-        unsigned alphaBlue = alpha | (D_L13_001B1320 << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L13_001B131C << 8);
-        unsigned rgba = alphaBlueGreen | D_L13_001B1318;
+        unsigned alpha = (g_beam_outer_alpha << 24);
+        unsigned alphaBlue = alpha | (g_beam_outer_blue << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_beam_outer_green << 8);
+        unsigned rgba = alphaBlueGreen | g_beam_outer_red;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned alpha = (D_L13_001B1334 << 24);
-        unsigned alphaBlue = alpha | (D_L13_001B1330 << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L13_001B132C << 8);
-        unsigned rgba = alphaBlueGreen | D_L13_001B1328;
+        unsigned alpha = (g_beam_inner_alpha << 24);
+        unsigned alphaBlue = alpha | (g_beam_inner_blue << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_beam_inner_green << 8);
+        unsigned rgba = alphaBlueGreen | g_beam_inner_red;
         packet.color[2] = packet.color[3] = rgba;
     }
     packet.uv[0] = 0;
@@ -88,11 +88,11 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     vec_scale_to_length(nearPoint, state, -0.17f);
     position = (float *)(object + 0x10);
     FastVecAdd(nearPoint, position, nearPoint);
-    FastVecSub(viewDelta, position, D_L13_001B98C0);
-    vec_scale_to_length(beamStep, state, -D_L13_001B12FC);
+    FastVecSub(viewDelta, position, g_camera_l13_position);
+    vec_scale_to_length(beamStep, state, -g_beam_step_length);
     FastVecAdd(farPoint, nearPoint, beamStep);
     FastVecCross(side, viewDelta, beamStep);
-    vec_scale_to_length(side, side, D_L13_001B12DC);
+    vec_scale_to_length(side, side, g_beam_l13_side_length_c);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     FastVecAdd(packet.v[2], farPoint, side);
@@ -108,10 +108,10 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     draw_world_quad(&packet, 0, 0);
     gfx_init_quad_packet_state(&packet, ref_L13_0040DFC0_02, 1, 128);
     {
-        unsigned alpha = (D_L13_001B1344 << 24);
-        unsigned alphaBlue = alpha | (D_L13_001B1340 << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L13_001B133C << 8);
-        unsigned rgba = alphaBlueGreen | D_L13_001B1338;
+        unsigned alpha = (g_beam_core_alpha << 24);
+        unsigned alphaBlue = alpha | (g_beam_core_blue << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_beam_core_green << 8);
+        unsigned rgba = alphaBlueGreen | g_beam_core_red;
         packet.color[1] = rgba;
         packet.color[0] = packet.color[1];
     }
@@ -124,13 +124,13 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     packet.uv[6] = 1;
     packet.uv[7] = 1;
     {
-        unsigned blue = (D_L13_001B1340 << 16);
-        unsigned blueGreen = blue | (D_L13_001B133C << 8);
-        unsigned rgb = blueGreen | D_L13_001B1338;
+        unsigned blue = (g_beam_core_blue << 16);
+        unsigned blueGreen = blue | (g_beam_core_green << 8);
+        unsigned rgb = blueGreen | g_beam_core_red;
         packet.color[3] = rgb;
         packet.color[2] = packet.color[3];
     }
-    vec_scale_to_length(side, side, D_L13_001B12D8);
+    vec_scale_to_length(side, side, g_beam_l13_side_length_b);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     FastVecAdd(farPoint, position, beamStep);
@@ -139,19 +139,19 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     {
-        unsigned alpha = (D_L13_001B1344 << 24);
-        unsigned alphaBlue = alpha | (D_L13_001B1340 << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L13_001B133C << 8);
-        unsigned rgba = alphaBlueGreen | D_L13_001B1338;
+        unsigned alpha = (g_beam_core_alpha << 24);
+        unsigned alphaBlue = alpha | (g_beam_core_blue << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_beam_core_green << 8);
+        unsigned rgba = alphaBlueGreen | g_beam_core_red;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned blue = (D_L13_001B1340 << 16);
-        unsigned blueGreen = blue | (D_L13_001B133C << 8);
-        unsigned rgb = blueGreen | D_L13_001B1338;
+        unsigned blue = (g_beam_core_blue << 16);
+        unsigned blueGreen = blue | (g_beam_core_green << 8);
+        unsigned rgb = blueGreen | g_beam_core_red;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L13_001B12D0);
+    vec_scale_to_length(side, side, g_beam_l13_side_length_a);
     vec_scale_to_length(nearPoint, state, -0.1f);
     FastVecAdd(nearPoint, position, nearPoint);
     FastVecAdd(packet.v[0], nearPoint, side);
@@ -162,19 +162,19 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     {
-        unsigned alpha = (D_L13_001B1354 << 24);
-        unsigned alphaBlue = alpha | (D_L13_001B1350 << 16);
-        unsigned alphaBlueGreen = alphaBlue | (D_L13_001B134C << 8);
-        unsigned rgba = alphaBlueGreen | D_L13_001B1338;
+        unsigned alpha = (g_beam_tip_alpha << 24);
+        unsigned alphaBlue = alpha | (g_beam_tip_blue << 16);
+        unsigned alphaBlueGreen = alphaBlue | (g_beam_tip_green << 8);
+        unsigned rgba = alphaBlueGreen | g_beam_core_red;
         packet.color[0] = packet.color[1] = rgba;
     }
     {
-        unsigned blue = (D_L13_001B1350 << 16);
-        unsigned blueGreen = blue | (D_L13_001B134C << 8);
-        unsigned rgb = blueGreen | D_L13_001B1348;
+        unsigned blue = (g_beam_tip_blue << 16);
+        unsigned blueGreen = blue | (g_beam_tip_green << 8);
+        unsigned rgb = blueGreen | g_beam_tip_red;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L13_001B12D0);
+    vec_scale_to_length(side, side, g_beam_l13_side_length_a);
     vec_scale_to_length(nearPoint, state, -0.1f);
     FastVecAdd(nearPoint, position, nearPoint);
     FastVecAdd(packet.v[0], nearPoint, side);
@@ -186,12 +186,12 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     draw_world_quad(&packet, 0, 0);
     packet.color[0] = packet.color[1] = 0x40FFFFFF;
     {
-        unsigned blue = (D_L13_001B1340 << 16);
-        unsigned blueGreen = blue | (D_L13_001B133C << 8);
-        unsigned rgb = blueGreen | D_L13_001B1338;
+        unsigned blue = (g_beam_core_blue << 16);
+        unsigned blueGreen = blue | (g_beam_core_green << 8);
+        unsigned rgb = blueGreen | g_beam_core_red;
         packet.color[2] = packet.color[3] = rgb;
     }
-    vec_scale_to_length(side, side, D_L13_001B12D8);
+    vec_scale_to_length(side, side, g_beam_l13_side_length_b);
     FastVecAdd(packet.v[0], position, side);
     FastVecSub(packet.v[1], position, side);
     vec_scale_to_length(beamStep, state, -0.6f);
@@ -201,5 +201,5 @@ void gfx_draw_scrolling_beam(u8 *unused, int ua, float uf, int ub, int uc,
     FastVecSub(packet.v[3], farPoint, side);
     draw_world_quad(&packet, 0, 0);
     random = math_random_angle();
-    gfx_draw_billboard_quad(position, D_L13_001B12E0, D_L13_001B12E8, 1, D_L13_001B12E4, 0.08f, random);
+    gfx_draw_billboard_quad(position, g_beam_l13_quad_texture, g_beam_quad_flags, 1, g_beam_quad_size, 0.08f, random);
 }

@@ -29,7 +29,7 @@ typedef struct {
 
 extern char g_pause_menu_state[];
 extern char g_camera_eye_state[];
-extern float D_001B90F0[];
+extern float g_fov_tangent[];
 
 extern void gfx_select_packet_buffer_setup(void);
 extern void mem_copy_aligned(void *, void *, int);
@@ -58,7 +58,7 @@ void func_US2_002CB720(void)
     qcopy(dst, &s->field_050);
     qcopy(dst + 1, &s->field_060);
     mem_copy_aligned((char *)dst + 0x230, (char *)s + 0x200, 0x30);
-    *(float *)D_001B90F0 = s->field_0F8;
+    *(float *)g_fov_tangent = s->field_0F8;
     UpdateViewContext();
     gfx_build_view_matrices();
     select_moby_context(0);

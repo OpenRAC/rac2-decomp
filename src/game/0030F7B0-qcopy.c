@@ -9,7 +9,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern void gravity_offset_position(void *p, float *a1, float *a2, float f);
 extern int CollLine(void *a, void *b, int mode, void *self, int flag);
-extern char D_00189F00[];
+extern char g_hero_target_point[];
 
 /* Checks that nothing blocks the line from a nanotech ball to its target. Returns 1 when the way is clear. */
 int is_nanotech_ball_target_line_clear(char *x)
@@ -19,7 +19,7 @@ int is_nanotech_ball_target_line_clear(char *x)
 
     *(TI128 *)local = *(TI128 *)p;
     gravity_offset_position(p, (float *)local, (float *)local, -0.5f);
-    return CollLine(local, D_00189F00, 0x12, 0, 0) == 0;
+    return CollLine(local, g_hero_target_point, 0x12, 0, 0) == 0;
 }
 
 /* func_00314E28: the distance test passes target and origin straight through from $a0/$a1. */

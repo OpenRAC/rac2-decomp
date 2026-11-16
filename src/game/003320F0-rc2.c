@@ -24,10 +24,10 @@
  */
 #include "common.h"
 
-extern s32 D_001AFC6C;
+extern s32 g_explosion_particle_trim;
 extern s32 g_001AFC6C __attribute__((sda));
-extern f32 D_001B0A80 __attribute__((sda));
-extern f32 D_001B0A84 __attribute__((sda));
+extern f32 g_explosion_speed_a __attribute__((sda));
+extern f32 g_explosion_speed_b __attribute__((sda));
 extern s8 g_active_camera[];
 
 struct Vec4 { f32 x; f32 y; f32 z; f32 w; };
@@ -77,7 +77,7 @@ void explosion_effect_update(struct Obj *moby)
     f32 speed;
 
     i = 0;
-    if (0x21 - D_001AFC6C > 0) {
+    if (0x21 - g_explosion_particle_trim > 0) {
         do {
             i++;
             rand_a = math_random_float_range(0.0f, 0.3700000047683716f);
@@ -93,10 +93,10 @@ void explosion_effect_update(struct Obj *moby)
             vec_build_spherical_offset(&vec_b, rand_e, rand_f, rand_g);
             rand_h = math_random_int_range(0x1E, 0x39);
             part_spawn_growing_puff(&vec_a, &vec_b, 0x4F20507F, 0x102F, rand_h, 150000.0f);
-        } while (i < 0x21 - D_001AFC6C);
+        } while (i < 0x21 - g_explosion_particle_trim);
     }
     j = 0;
-    if (0x32 - D_001AFC6C > 0) {
+    if (0x32 - g_explosion_particle_trim > 0) {
         camera = (struct Tab *)g_active_camera;
         do {
             j++;
@@ -108,19 +108,19 @@ void explosion_effect_update(struct Obj *moby)
             vec_b.y = moby->pos.y + offset_y;
             offset_z = math_random_signed_float_range(0.0f, 0.15000000596046448f);
             vec_b.z = moby->pos.z + offset_z;
-            speed = D_001B0A80;
+            speed = g_explosion_speed_a;
             turn = math_random_signed_float_range(0.0f, -1.5707964897155762f);
             spread_angle = FastAddRotations(angle, turn);
             cos_part = math_fast_sin_or_cos_a(spread_angle);
             vec_a.x = cos_part * 0.01666666753590107f * speed;
             sin_part = math_fast_sin_or_cos_b(spread_angle);
             vec_a.y = sin_part * 0.01666666753590107f * speed;
-            speed = D_001B0A84;
+            speed = g_explosion_speed_b;
             vec_a.z = speed * 0.01666666753590107f;
             part_spawn_spinning_spark(&vec_b, &vec_a, 0x12C);
-        } while (j < 0x32 - D_001AFC6C);
+        } while (j < 0x32 - g_explosion_particle_trim);
     }
-    g_001AFC6C = D_001AFC6C - 1;
+    g_001AFC6C = g_explosion_particle_trim - 1;
     moby_release_slot_by_id(moby);
     moby_mark_spawned(moby);
 }

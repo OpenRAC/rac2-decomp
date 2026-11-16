@@ -6,7 +6,7 @@
 extern char g_hero_state[];
 
 extern void mem_fast_helper_b(void *, int);
-extern u8 D_L18_001A7B0B MACRO_ADDR;
+extern u8 g_hero_mode_flag MACRO_ADDR;
 
 /* Re-initialises the 16-byte block at 0x1490 and then, from the saved mode in it, raises the matching flags. */
 void hero_reset_mode_flags(void)
@@ -33,7 +33,7 @@ void hero_reset_mode_flags(void)
             char *hero = g_hero_state;
             if (*(s16 *)(hero + 0x1DE) == 0 && (*(s16 *)(hero + 0x34C) == 0 || *(float *)(hero + 0x31C) < 2.5f)) {
                 *(u8 *)(hero + 0x1497) = 1;
-                if (*(u8 *)(hero + 0x22B4) == 0 && D_L18_001A7B0B != 0)
+                if (*(u8 *)(hero + 0x22B4) == 0 && g_hero_mode_flag != 0)
                     *(s16 *)(hero + 0x348) = 1;
             }
         }

@@ -21,15 +21,15 @@ typedef struct {
 } TurretHero;
 extern TurretHero g_hero_state __attribute__((nosda));
 extern struct { u8 pad0[0x6c]; void *owner; u8 slots[0]; } g_sound_state __attribute__((nosda));
-extern s32 D_L11_001CAE40 __attribute__((nosda));
-extern s32 D_L11_001A7BA4[] __attribute__((sda));
-extern s32 D_L11_001A8FB4 SDATA(D_L11_001A8FB4);
+extern s32 g_enemy_freeze_flag __attribute__((nosda));
+extern s32 g_hero_invert_flags[] __attribute__((sda));
+extern s32 g_hero_l11_action_block_flag SDATA(D_L11_001A8FB4);
 extern s32 D_L11_001A8FB4_block[] __asm__("D_L11_001A8FB4") __attribute__((sda));
 extern struct { u8 pad[0x1a0]; s32 held, pressed; } g_pad_state __attribute__((nosda));
-extern f32 D_L11_001B0C90 __attribute__((sda)), D_L11_001B0C94 __attribute__((sda));
-extern TurretVec D_L11_001B0CA0 SDATA(D_L11_001B0CA0);
-extern TurretBeam D_L11_001C8A40[];
-extern struct { u8 pad[0x160]; f32 unk160; s32 pad164, unk168, unk16C; f32 unk170; s32 pad174, unk178; } D_L11_001BA780;
+extern f32 g_l11_turret_shot_radius __attribute__((sda)), g_l11_turret_shot_height_offset __attribute__((sda));
+extern TurretVec g_l11_turret_muzzle_offset SDATA(D_L11_001B0CA0);
+extern TurretBeam g_turret_beam_table[];
+extern struct { u8 pad[0x160]; f32 unk160; s32 pad164, unk168, unk16C; f32 unk170; s32 pad174, unk178; } g_hero_l11_state_block;
 extern s32 FastDecTimer(void *);
 extern void moby_transform_joint_to_world(void *, s32, void *);
 extern f32 math_fast_sin_or_cos_a(f32);
@@ -94,13 +94,13 @@ void TurretUpdate(TurretMoby *moby) {
     int invert;
 
     vars = (TurretVars *)moby->pvars;
-    if (D_L11_001CAE40 || moby->state == 6) return;
+    if (g_enemy_freeze_flag || moby->state == 6) return;
     moby->flags &= ~4;
     moby_transform_joint_to_world(moby, 3, &seat);
     seat.f[2] += 0.4f;
     if (moby->state >= 4) {
         if (FastDecTimer(&vars->mount_delay) != 0 && moby->command == 1 &&
-            g_hero_state.mode != 0x14 && g_hero_state.mode != 7 && g_hero_state.state != 0x39 && D_L11_001A8FB4 == 0) {
+            g_hero_state.mode != 0x14 && g_hero_state.mode != 7 && g_hero_state.state != 0x39 && g_hero_l11_action_block_flag == 0) {
             qcopy_nc(&g_hero_state.pos, &seat);
             qcopy_nc(&g_hero_state.rot, moby->rot);
             offset.f[0] = math_fast_sin_or_cos_a(g_hero_state.rot.f[2]) * -0.4f;
@@ -162,14 +162,14 @@ void TurretUpdate(TurretMoby *moby) {
                 vars->yaw_speed = yaw;
                 moby->rot[2] = FastAddRotations(moby->rot[2], yaw);
             } else vars->yaw_speed = 0.0f;
-            matrix_mul_vec3(&tmp, &D_L11_001B0CA0, moby->matrix);
+            matrix_mul_vec3(&tmp, &g_l11_turret_muzzle_offset, moby->matrix);
             FastVecAdd(&tmp, &tmp, &seat);
             if (vars->beam == -1) {
                 vars->beam_frames = 0;
                 vars->beam = part_l00_alloc_effect_slot_2(&tmp, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
                 PlayMobySound(2, 0, moby);
             } else {
-                beam = &D_L11_001C8A40[vars->beam];
+                beam = &g_turret_beam_table[vars->beam];
                 beam->pos[0] = tmp.f[0];
                 beam->pos[1] = tmp.f[1];
                 beam->pos[2] = tmp.f[2];
@@ -206,7 +206,7 @@ void TurretUpdate(TurretMoby *moby) {
         }
         tmp.f[0] = g_hero_state.stick_x;
         invert = -1;
-        if (D_L11_001A7BA4[0]) invert = 1;
+        if (g_hero_invert_flags[0]) invert = 1;
         stick_y = -g_hero_state.stick_y * invert;
         tmp.f[1] = stick_y;
         len = vec_length_xy(&tmp);
@@ -251,11 +251,11 @@ void TurretUpdate(TurretMoby *moby) {
                     moby_transform_joint_to_world(moby, 0, &muzzle);
                     robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
                     PlayMobySound(1, 0, moby);
-                    D_L11_001BA780.unk160 = 0.03f;
-                    D_L11_001BA780.unk168 = 10;
-                    D_L11_001BA780.unk170 = 0.03f;
-                    D_L11_001BA780.unk178 = 7;
-                    D_L11_001BA780.unk16C = 0;
+                    g_hero_l11_state_block.unk160 = 0.03f;
+                    g_hero_l11_state_block.unk168 = 10;
+                    g_hero_l11_state_block.unk170 = 0.03f;
+                    g_hero_l11_state_block.unk178 = 7;
+                    g_hero_l11_state_block.unk16C = 0;
                     vars->barrel = 0;
                     for (i = 0; i < 5; i++) {
                         rnd.q = 0;
@@ -279,11 +279,11 @@ void TurretUpdate(TurretMoby *moby) {
                     moby_transform_joint_to_world(moby, 1, &muzzle);
                     robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
                     PlayMobySound(1, 0, moby);
-                    D_L11_001BA780.unk160 = 0.03f;
-                    D_L11_001BA780.unk168 = 10;
-                    D_L11_001BA780.unk170 = 0.03f;
-                    D_L11_001BA780.unk178 = 7;
-                    D_L11_001BA780.unk16C = 0;
+                    g_hero_l11_state_block.unk160 = 0.03f;
+                    g_hero_l11_state_block.unk168 = 10;
+                    g_hero_l11_state_block.unk170 = 0.03f;
+                    g_hero_l11_state_block.unk178 = 7;
+                    g_hero_l11_state_block.unk16C = 0;
                     vars->barrel = 1;
                     for (i = 0; i < 5; i++) {
                         rnd.q = 0;
@@ -310,8 +310,8 @@ void TurretUpdate(TurretMoby *moby) {
             moby->flags |= 4;
             overlay_set_shared_flag();
             moby_transform_joint_to_world(moby, 2, &tmp);
-            vec_build_spherical_offset(&shot, D_L11_001B0C90, moby->rot[2], vars->pitch);
-            shot.f[2] += D_L11_001B0C94;
+            vec_build_spherical_offset(&shot, g_l11_turret_shot_radius, moby->rot[2], vars->pitch);
+            shot.f[2] += g_l11_turret_shot_height_offset;
             FastVecAdd(&muzzle, &tmp, &shot);
             object_copy_vector_to_selected(&muzzle);
             dir.f[0] = 0.0f;

@@ -15,7 +15,7 @@ typedef struct {short a,b,c,id,e;} MenuGridEntry;
 extern MenuGridEntry ref_00347468_10[];
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
-extern int D_00139868[],g_item_ammo_counts[];
+extern int g_help_entry_state[],g_item_ammo_counts[];
 typedef struct { char pad0[0x3c]; unsigned short icon; char pad3e[0x2e]; int max; char pad70[0x18]; unsigned short ammo; char pad8a[0x56]; } MenuWeaponRecord;
 extern MenuWeaponRecord ref_US2_00348628_04[];
 extern void meter_set_max(void *,int),meter_set_value(void *,int);
@@ -65,7 +65,7 @@ void func_US2_00348628(char *o)
       MenuIntegerPair base=ref_US2_00348628_08[0],stride=ref_US2_00348628_09[0];
       int a,b,color;
       meter_set_max((o+0x1c8),weapons[slots[*id]].max);
-      meter_set_value((o+0x1c8),D_00139868[*id]>>5);
+      meter_set_value((o+0x1c8),g_help_entry_state[*id]>>5);
 
       object_set_first_float4((o+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(o+0x438))[0],(float)(stride.y*row+base.y)+(*(float **)(o+0x438))[1],0.0f,0.0f);
       object_set_flag_value((o+0x1c8),1);

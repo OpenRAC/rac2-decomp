@@ -4,11 +4,11 @@
    the branch. func_0029CD20 reads its global itself and ignores the argument, but the retail
    sets $a0 from D_001A7B90 before calling it: the load survives only as an argument of the call. */
 
-extern char D_001BAEC0[];
+extern char g_loader_memory[];
 extern int g_pad_state[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_is_pal_video[] __attribute__((sda));
-extern char *D_001A8CFC __attribute__((sda));
+extern char *g_resident_data_base __attribute__((sda));
 
 extern void *memset(void *, int, int); /* memset */
 extern void func_0029CD20(int);
@@ -25,7 +25,7 @@ typedef struct { char pad[0x734C]; void *cb1; void *cb2; } SubBf;
 /* Sets up the level object: clears its memory block and global table, then picks which pair of callbacks it uses for this level. */
 void level_init_callbacks(void)
 {
-    char *state = D_001BAEC0;
+    char *state = g_loader_memory;
     char *obj;
 
     memset(*(void **)(state + 0x80), 0xCD, 0x40000);
@@ -43,7 +43,7 @@ void level_init_callbacks(void)
     g_pad_state[115] = 0;
     func_0029CD20(g_is_pal_video[0]);
     obj = menu_system_init(ui_return_second_arg(0x3F490, *(int *)(state + 0x80)), 0x40000);
-    D_001A8CFC = obj;
+    g_resident_data_base = obj;
     if (g_current_map_index == 0x1F5) {
         ((SubBf *)(obj + 0x38000))->cb1 = func_0029C0D0;
         ((SubBf *)(obj + 0x38000))->cb2 = func_0029CD18;

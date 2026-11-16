@@ -7,7 +7,7 @@ typedef signed short s16;
 typedef signed int s32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 
 typedef struct {
     char pad0[0x10];
@@ -35,8 +35,8 @@ typedef struct {
     Todano_Owned *f68;
 } Todano_Obj;
 
-extern char D_L12_001B1860[];
-extern char D_L12_001C0258[];
+extern char g_str_guard_line_of_sight[];
+extern char g_hit_l12_result[];
 extern s32 CollLine(void *, void *, int, void *, int);
 extern s32 coll_test_point(void *, int, void *, float);
 extern void STUB_printf(void *);
@@ -55,7 +55,7 @@ s32 guard_is_line_of_sight_blocked(Todano_Obj *moby, s32 checkHitKind, s32 useAn
         return 1;
     pos[0] = *(TI128 *)((char *)moby + 0x10);
     if (useAnchor != 0 && vars->f2DC != -1 && vars->f1CA != -1)
-        pos[0] = *(TI128 *)((char *)D_L12_001FEAC0[vars->f2DC] + vars->f1CA * 16 + 0x10);
+        pos[0] = *(TI128 *)((char *)g_path_zone_table[vars->f2DC] + vars->f1CA * 16 + 0x10);
     if (crouched != 0)
         ((float *)pos)[2] += 1.0f;
     else
@@ -63,13 +63,13 @@ s32 guard_is_line_of_sight_blocked(Todano_Obj *moby, s32 checkHitKind, s32 useAn
     aim[0] = vars->f200->f10;
     blocked = 0;
     ((float *)aim)[2] += 1.18f;
-    if (CollLine(pos, aim, 0, moby, 0) == 0 || *(Todano_Hit **)D_L12_001C0258 == (Todano_Hit *)vars->f200)
+    if (CollLine(pos, aim, 0, moby, 0) == 0 || *(Todano_Hit **)g_hit_l12_result == (Todano_Hit *)vars->f200)
         blocked = 1;
-    STUB_printf(D_L12_001B1860);
+    STUB_printf(g_str_guard_line_of_sight);
     if (checkHitKind != 0 && blocked == 0) {
-        probe[0] = *(TI128 *)(D_L12_001C0258 + 8);
+        probe[0] = *(TI128 *)(g_hit_l12_result + 8);
         if (coll_test_point(probe, 1, moby, 0.5f) != 0) {
-            Todano_Hit *h = *(Todano_Hit **)D_L12_001C0258;
+            Todano_Hit *h = *(Todano_Hit **)g_hit_l12_result;
             if (h == 0 || h->f24 == 0 || *(s16 *)(h->f24 + 0x46) != 5)
                 blocked = 1;
         }

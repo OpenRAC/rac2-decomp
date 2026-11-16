@@ -44,7 +44,7 @@ extern float FastVecDot(Vec4458 *, Vec4458 *);
  * under the first ray, or collision type 8 or 12 under the second, records the hit's word
  * at +0x18 in +0x270 and removes the part of the velocity at +0xF0 that runs into the
  * flattened surface normal. */
-void func_PAL_L00_002B4380(int force)
+void DeflectHeroOffSteepSurface_pal(int force)
 {
     Vec4458 upper;
     Vec4458 upperEnd;

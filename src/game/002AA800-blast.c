@@ -27,8 +27,8 @@ typedef struct {
     int reserved;
 } ExplosionDamage;
 typedef struct { float vector[4], random[4]; } ExplosionVectors;
-extern BurstColors D_001A9F20, D_001A9F38;
-extern float D_001B168C[] __attribute__((sda)), D_001B1690[] __attribute__((sda));
+extern BurstColors g_burst_colors_a, g_burst_colors_b;
+extern float g_frame_time_scale[] __attribute__((sda)), g_tick_time_scale[] __attribute__((sda));
 extern char g_camera_eye_state[];
 typedef struct {
     char unknown[0x160];
@@ -39,7 +39,7 @@ typedef struct {
 } ExplosionCamera;
 extern ExplosionCamera g_active_camera;
 typedef struct { char unknown[32]; float scale[3]; } BlastEffect;
-extern BlastEffect D_00258C80, D_00258CD0;
+extern BlastEffect g_blast_effect_a, g_blast_effect_b;
 extern void part_init_effect_record(void *, void *, int, float);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern void *part_spawn_spark(void *, void *, int, int, float, int, int, int, int, int);
@@ -60,7 +60,7 @@ void SpawnExplosionEffects(char *owner, void *direction, float *position,
     float drift[4];
     float delta[4];
     float distance;
-    float load = D_001B1690[0] + D_001B168C[0];
+    float load = g_tick_time_scale[0] + g_frame_time_scale[0];
     *(Quad *)drift = 0;
     drift[2] = scale * 0.13333334028720856f;
     if (quality == -1 && load > 1.7000000476837158f) quality = 1;
@@ -154,8 +154,8 @@ void SpawnExplosionEffects(char *owner, void *direction, float *position,
                 float size, big;
                 int c1, c2;
                 size = math_random_float_range(8.0f, 10.0f) * 0.01666666753590107f;
-                colors1 = D_001A9F20;
-                colors2 = D_001A9F38;
+                colors1 = g_burst_colors_a;
+                colors2 = g_burst_colors_b;
                 size = size - under * 0.01666666753590107f;
                 c1 = math_random_int_below(6);
                 size *= scale;
@@ -183,8 +183,8 @@ void SpawnExplosionEffects(char *owner, void *direction, float *position,
                 ExplosionVectors v;
                 float speed, k;
                 int c1, c2;
-                colors1 = D_001A9F20;
-                colors2 = D_001A9F38;
+                colors1 = g_burst_colors_a;
+                colors2 = g_burst_colors_b;
                 *(Quad *)v.random = 0;
                 v.random[0] = math_random_float_range(-1.0f, 1.0f);
                 v.random[1] = math_random_float_range(-1.0f, 1.0f);
@@ -205,7 +205,7 @@ void SpawnExplosionEffects(char *owner, void *direction, float *position,
             if (!(channels & 4)) { r = 70; b = 70; r2 = 60; }
             else { r = 35; g = 0; b = 250; r2 = 32; g2 = 0; b2 = 100; }
         }
-        if (D_001B168C[0] < 0.949999988079071f && cutoff < distance) {
+        if (g_frame_time_scale[0] < 0.949999988079071f && cutoff < distance) {
             part_spawn_shockwave_ring(owner, position, drift, glow, 16, r, g, b, 32);
             part_spawn_shockwave_ring(owner, position, drift, glow, 22, r2 & 255, g2 & 255, b2 + 80, 32);
         }
@@ -237,18 +237,18 @@ void SpawnExplosionEffects(char *owner, void *direction, float *position,
             vector[3] = blast;
             if (math_fast_helper_a(vector, 100.0f) != -1) {
                 if (blast > 0.0f) {
-                    BlastEffect *effect = &D_00258C80;
+                    BlastEffect *effect = &g_blast_effect_a;
                     effect->scale[1] = blast;
                     effect->scale[2] = blast;
                     effect->scale[0] = blast;
                 } else {
-                    BlastEffect *effect = &D_00258C80;
+                    BlastEffect *effect = &g_blast_effect_a;
                     effect->scale[1] = 15.0f;
                     effect->scale[2] = 15.0f;
                     effect->scale[0] = 15.0f;
                 }
-                if (channels) moby_spawn_template_effect(&D_00258CD0, position, 0, 0);
-                else moby_spawn_template_effect(&D_00258C80, position, 0, 0);
+                if (channels) moby_spawn_template_effect(&g_blast_effect_b, position, 0, 0);
+                else moby_spawn_template_effect(&g_blast_effect_a, position, 0, 0);
             }
         }
     }

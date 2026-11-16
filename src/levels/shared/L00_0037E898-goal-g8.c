@@ -18,17 +18,17 @@ typedef struct {
     ControllerMatrix basis;
 } ControllerCamera;
 typedef struct { unsigned char prefix[0x18]; char *object; } ControllerContact;
-extern int D_L00_001A8F00;
+extern int g_game_l00_mode;
 extern int D_L00_001A8F00_gp SDATA(D_L00_001A8F00);
-extern int D_L00_001AEDD0[] __attribute__((sda));
+extern int g_goal_trail_flags[] __attribute__((sda));
 extern int D_L00_001AEDD0_gp[2] SDATA(D_L00_001AEDD0);
-extern int D_L00_001AED30 __attribute__((sda)),D_L00_001AED34 __attribute__((sda));
-extern float D_L00_001AED64 __attribute__((sda));
-extern int D_L00_001B1BE8 MACRO_ADDR;
-extern float D_L00_001B18E4,D_L00_001B18E0;
-extern int D_00138324 NOT_SDA,D_001386A4 NOT_SDA;
-extern char *D_L00_001AC0C0;
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern int g_goal_limit_a __attribute__((sda)),g_goal_limit_b __attribute__((sda));
+extern float g_goal_local_z_max __attribute__((sda));
+extern int g_cinematic_phase_flag MACRO_ADDR;
+extern float g_hero_second_scalar_transition_value,g_hero_scalar_transition_value;
+extern int g_pad_held_flags NOT_SDA,g_pad_held_flags_alt NOT_SDA;
+extern char *g_goal_object_list;
+extern char g_default_vector[] MACRO_ADDR;
 extern ControllerContact g_collision_result;
 extern ControllerCamera g_camera_l00_position;
 extern int request_begin_slot(int,int,int,int,unsigned char *);
@@ -64,11 +64,11 @@ void goal_controller_update(unsigned char *object)
     case 0:
         {
             int mode=D_L00_001A8F00_gp;
-            if (D_L00_001A8F00==0) {
+            if (g_game_l00_mode==0) {
                 D_L00_001AEDD0_gp[0]=0;
-                D_L00_001AEDD0[1]=0;
+                g_goal_trail_flags[1]=0;
                 request_begin_slot(7,1,(int)object,3,0);
-                mode=D_L00_001A8F00;
+                mode=g_game_l00_mode;
             }
             if (mode==7 && sheep_board_create_objects((char *)object)) {
                 set_identity_rotation_rows(&g_camera_l00_position.basis);
@@ -85,21 +85,21 @@ void goal_controller_update(unsigned char *object)
         {
             float zero=0.0f;
             float step;
-            D_L00_001B1BE8=phase;
+            g_cinematic_phase_flag=phase;
             gfx_add_draw_callback_first(DrawThreeObjectCounters,object);
             step=0.13333334028720856f;
-            ApproachValue(&D_L00_001B18E4,zero,step);
-            ApproachValue(&D_L00_001B18E0,zero,step);
+            ApproachValue(&g_hero_second_scalar_transition_value,zero,step);
+            ApproachValue(&g_hero_scalar_transition_value,zero,step);
             twin_guns_update_and_fire(object);
             sheep_board_update(object);
             sheep_board_update_same_class(object);
             part_l00_spawn_random_burst(object);
-            if (D_L00_001A8F00!=7) {
+            if (g_game_l00_mode!=7) {
                 sheep_board_destroy_objects(object);
                 goto destroy;
             }
-            if ((D_00138324&0x810) || (D_001386A4&0x810) ||
-                (D_L00_001AEDD0_gp[0] && D_L00_001AEDD0[1]))
+            if ((g_pad_held_flags&0x810) || (g_pad_held_flags_alt&0x810) ||
+                (D_L00_001AEDD0_gp[0] && g_goal_trail_flags[1]))
                 request_end_slot(0,0);
         }
         break;
@@ -111,18 +111,18 @@ void goal_controller_update(unsigned char *object)
             g_collision_result.object) {
             FastVecSub(&workspace.local,position,g_collision_result.object+0x10);
             vec_transform_by_object_or_given(g_collision_result.object,&workspace.local,&workspace.local,0);
-            if (workspace.local.z>=0.0f && workspace.local.z<=D_L00_001AED64) {
-                part_queue_impact_effect(g_collision_result.object,(int)object,0x10000,position,D_L00_001A8F20,1.0f);
+            if (workspace.local.z>=0.0f && workspace.local.z<=g_goal_local_z_max) {
+                part_queue_impact_effect(g_collision_result.object,(int)object,0x10000,position,g_default_vector,1.0f);
                 {
-                    ControllerOwnerState *state=*(ControllerOwnerState **)(D_L00_001AC0C0+0x68);
+                    ControllerOwnerState *state=*(ControllerOwnerState **)(g_goal_object_list+0x68);
                     state->scores[object[0xBC]]+=10;
                 }
                 moby_mark_spawned(object);
                 break;
             }
         }
-        if (D_L00_001A8F00==7) {
-            int limit=D_L00_001AED30;
+        if (g_game_l00_mode==7) {
+            int limit=g_goal_limit_a;
             int timer=*(unsigned short *)(object+0x96);
             int old=timer++;
             *(unsigned short *)(object+0x96)=timer;
@@ -138,7 +138,7 @@ destroy:
             char *motion=*(char **)(object+0x68);
             char *vector=(char *)object+0x10;
             char *goal;
-            owner=*(ControllerOwnerState **)(D_L00_001AC0C0+0x68);
+            owner=*(ControllerOwnerState **)(g_goal_object_list+0x68);
             *(float *)(object+0xF0)=FastAddRotations(*(float *)(object+0xF0),-0.05235988646745682f);
             FastVecAdd(vector,vector,motion);
             matrix_from_basis_rows(&workspace.inverse,&g_camera_l00_position.basis);
@@ -157,8 +157,8 @@ destroy:
                 }
             }
             func_002A0F48(object);
-            if (D_L00_001A8F00==7) {
-                int limit=D_L00_001AED34;
+            if (g_game_l00_mode==7) {
+                int limit=g_goal_limit_b;
                 int timer=*(unsigned short *)(object+0x96);
                 int old=timer++;
                 *(unsigned short *)(object+0x96)=timer;

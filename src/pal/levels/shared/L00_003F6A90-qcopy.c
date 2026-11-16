@@ -11,7 +11,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void ref_L00_003F26C8_00(void *, int, void *, int);
 
-void func_PAL_L00_003F6A90(char *object, char *state) {
+void gfx_draw_jittered_curve_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;
     int i;

@@ -3,14 +3,14 @@
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 
 extern char g_hero_state[];
-extern char *D_L19_001B1EAC __attribute__((sda));
-extern float D_L19_001B1E94 __attribute__((sda));
-extern float D_L19_001B1E98 __attribute__((sda));
-extern float D_L19_001B1E9C __attribute__((sda));
-extern float D_L19_001B1EA4 __attribute__((sda));
-extern float D_L19_001B1EA8 __attribute__((sda));
-extern int D_L19_001B258C;
-extern char D_L19_001B9A40[];
+extern char *g_carried_marker_cam_slot __attribute__((sda));
+extern float g_carried_marker_radius __attribute__((sda));
+extern float g_carried_marker_override_x __attribute__((sda));
+extern float g_carried_marker_override_x_alt __attribute__((sda));
+extern float g_carried_marker_override_w __attribute__((sda));
+extern float g_carried_marker_override_z __attribute__((sda));
+extern int g_carried_marker_state;
+extern char g_hero_origin_vec[];
 
 extern int IsPointInCuboid(char *, int);
 extern void vec_build_spherical_offset(float *, float, float, float);
@@ -29,16 +29,16 @@ void carried_marker_update(char *obj) {
 
     switch (FLD(obj, u8, 0x20)) {
     case 0:
-        D_L19_001B1EAC = 0;
+        g_carried_marker_cam_slot = 0;
         FLD(obj, u8, 0x20) = 1;
         FLD(obj, u8, 0x30) = 0xFF;
         return;
     case 1:
         if (vars[0] != -1) {
-            if (IsPointInCuboid(D_L19_001B9A40, vars[0]) != 0) {
-                D_L19_001B258C = 2;
-            } else if (D_L19_001B258C == 2) {
-                D_L19_001B258C = 0;
+            if (IsPointInCuboid(g_hero_origin_vec, vars[0]) != 0) {
+                g_carried_marker_state = 2;
+            } else if (g_carried_marker_state == 2) {
+                g_carried_marker_state = 0;
             }
         }
         break;
@@ -46,29 +46,29 @@ void carried_marker_update(char *obj) {
         return;
     }
     if (FLD(g_hero_state, int, 0x2294) == 0x31 && (held_object = FLD(g_hero_state, char *, 0x1830)) != 0) {
-        vec_build_spherical_offset(marker_offset, D_L19_001B1E94, FLD(held_object, float, 0xF8), -FLD(held_object, float, 0xF4) * 0.5f);
+        vec_build_spherical_offset(marker_offset, g_carried_marker_radius, FLD(held_object, float, 0xF8), -FLD(held_object, float, 0xF4) * 0.5f);
         FastVecAdd(marker_pos, marker_offset, FLD(g_hero_state, char *, 0x1830) + 0x10);
-        if (D_L19_001B1EAC == 0) {
-            D_L19_001B1EAC = cam_alloc_override_slot(5);
-            if (D_L19_001B1EAC == 0) {
+        if (g_carried_marker_cam_slot == 0) {
+            g_carried_marker_cam_slot = cam_alloc_override_slot(5);
+            if (g_carried_marker_cam_slot == 0) {
                 return;
             }
         }
         if (FLD(FLD(g_hero_state, char *, 0x1830), s16, 0xAA) == MOBY_CLASS_GLIDER) {
-            FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E98;
-            FLD(D_L19_001B1EAC, float, 0xC) = -1.0f;
-            FLD(D_L19_001B1EAC, float, 8) = -1.0f;
+            FLD(g_carried_marker_cam_slot, float, 0) = g_carried_marker_override_x;
+            FLD(g_carried_marker_cam_slot, float, 0xC) = -1.0f;
+            FLD(g_carried_marker_cam_slot, float, 8) = -1.0f;
         } else {
-            FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E9C;
-            FLD(D_L19_001B1EAC, float, 0xC) = D_L19_001B1EA4;
-            FLD(D_L19_001B1EAC, float, 8) = D_L19_001B1EA8;
+            FLD(g_carried_marker_cam_slot, float, 0) = g_carried_marker_override_x_alt;
+            FLD(g_carried_marker_cam_slot, float, 0xC) = g_carried_marker_override_w;
+            FLD(g_carried_marker_cam_slot, float, 8) = g_carried_marker_override_z;
         }
-        FLD(D_L19_001B1EAC, u8, 0x1F) = 1;
-        FastVecSub(D_L19_001B1EAC + 0x20, marker_pos, D_L19_001B9A40);
+        FLD(g_carried_marker_cam_slot, u8, 0x1F) = 1;
+        FastVecSub(g_carried_marker_cam_slot + 0x20, marker_pos, g_hero_origin_vec);
         return;
     }
-    if (D_L19_001B1EAC != 0) {
-        cam_end_override(D_L19_001B1EAC);
-        D_L19_001B1EAC = 0;
+    if (g_carried_marker_cam_slot != 0) {
+        cam_end_override(g_carried_marker_cam_slot);
+        g_carried_marker_cam_slot = 0;
     }
 }

@@ -13,7 +13,7 @@ typedef struct {
     float f2C;
 } Rec_3CB538;
 
-extern Rec_3CB538 *D_L00_001B2AD4 __attribute__((section(".sdata")));
+extern Rec_3CB538 *g_pool_particles __attribute__((section(".sdata")));
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -26,7 +26,7 @@ void part_spawn_pool_particle(void *owner)
     int i;
 
     for (i = 0; i < 64; i++) {
-        particle = &D_L00_001B2AD4[i];
+        particle = &g_pool_particles[i];
         if (particle->owner == 0) {
             particle->v[0] = math_random_float_range(-1.0f, 1.0f);
             particle->v[1] = math_random_float_range(-1.0f, 1.0f);

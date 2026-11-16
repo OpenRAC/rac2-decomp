@@ -18,18 +18,18 @@
  * The two arrays are declared with 2 elements so that their addresses are one `la` (lui + addiu)
  * rather than a high part held in a register of its own.
  */
-extern int D_001AA100 __attribute__((sda));
-extern int D_001AA0F8 __attribute__((sda));
-extern int D_001AA0FC __attribute__((sda));
-extern int D_001AA104 __attribute__((sda));
-extern int D_001B170C;
+extern int g_mode_stack_depth __attribute__((sda));
+extern int g_pending_mode_arg_a __attribute__((sda));
+extern int g_pending_mode_arg_b __attribute__((sda));
+extern int g_pending_mode_done_flag __attribute__((sda));
+extern int g_vis_fallback_mode;
 extern int g_requested_game_mode;
 extern int g_current_map_index;
 extern int g_current_game_mode;
-extern int D_0018C2EC __attribute__((nosda));
-extern int D_001C4F40 __attribute__((nosda));
-extern int D_001A8B88[2];
-extern int D_001B1D50[2];
+extern int g_request_enabled_flag __attribute__((nosda));
+extern int g_map_mode __attribute__((nosda));
+extern int g_request_slot_flags[2];
+extern int g_game_mode_stack[2];
 extern void menu_set_setting(int);
 
 /* Starts a request for a slot, unless one is already running or the slot is blocked, and returns a code saying whether it started. */
@@ -43,35 +43,35 @@ int request_begin_slot(int index, int mode, int argA, int argB, unsigned char *f
     result = -1;
     if (g_requested_game_mode == -2)
         result = 0;
-    if (mode == 1 && !(D_001AA100 < 8))
+    if (mode == 1 && !(g_mode_stack_depth < 8))
         result = -2;
-    entry = index >= 0 ? D_001A8B88[index] : 0;
+    entry = index >= 0 ? g_request_slot_flags[index] : 0;
     if (entry != 0)
         result = -3;
-    if (D_0018C2EC == 0)
+    if (g_request_enabled_flag == 0)
         result = -1;
     if (result != 0)
         return result;
-    D_001AA0F8 = argA;
-    D_001AA0FC = argB;
-    D_001AA104 = (int)flag;
+    g_pending_mode_arg_a = argA;
+    g_pending_mode_arg_b = argB;
+    g_pending_mode_done_flag = (int)flag;
     g_requested_game_mode = index;
-    if ((g_current_map_index == 8 && D_001C4F40 == 1) || (g_current_map_index == 0x13 && D_001C4F40 == 0)) {
+    if ((g_current_map_index == 8 && g_map_mode == 1) || (g_current_map_index == 0x13 && g_map_mode == 0)) {
         if ((unsigned)(index - 3) < 2) {
-            D_001B170C = 2;
+            g_vis_fallback_mode = 2;
             if (index == 4)
                 menu_set_setting(2);
         }
     }
     if ((unsigned)(g_current_map_index - 22) < 2) {
         if ((unsigned)(index - 3) < 2) {
-            D_001B170C = 3;
+            g_vis_fallback_mode = 3;
             if (index == 4)
                 menu_set_setting(3);
         }
     }
     if (mode == 1) {
-        D_001B1D50[D_001AA100++] = g_current_game_mode;
+        g_game_mode_stack[g_mode_stack_depth++] = g_current_game_mode;
     }
     return result;
 }

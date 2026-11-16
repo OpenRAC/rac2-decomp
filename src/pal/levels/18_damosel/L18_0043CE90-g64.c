@@ -2,25 +2,25 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L18_001B1B40[16] __attribute__((sda));
-extern int D_L18_001B1B30 __attribute__((sda));
-extern float D_L18_001B1B08[2] __attribute__((sda));
-extern float D_L18_001B1B00[2] __attribute__((sda));
-extern float D_L18_001B1B10[4] __attribute__((sda));
+extern float g_breakable_corner_table[16] __attribute__((sda));
+extern int g_breakable_piece_lifetime __attribute__((sda));
+extern float g_breakable_piece_spread_range[2] __attribute__((sda));
+extern float g_breakable_piece_speed_range[2] __attribute__((sda));
+extern float g_breakable_piece_offset[4] __attribute__((sda));
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
 extern void vec_local_to_world(void *, void *, float, float, float);
 extern void *part_spawn_object_following_effect(void *, void *, int, int, int, int, int, int, float, float);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern float math_random_float_range(float, float);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L18_00441B80(u8 *obj) {
+void breakable_l18_object_update_pal(u8 *obj) {
     float v[4] __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
@@ -35,7 +35,7 @@ void func_PAL_L18_00441B80(u8 *obj) {
         ap = a;
         y = 20;
         x = 4;
-        q = D_L18_001B1B40;
+        q = g_breakable_corner_table;
         for (; i < 4; i++, y -= 8, x -= 8, q += 4) {
             FastVecScale(v, q, *(float *)(obj + 0x2C));
             part_spawn_object_following_effect(v, obj, 0x28808080, -1, 0, -1, 0, 0x60,
@@ -63,17 +63,17 @@ void func_PAL_L18_00441B80(u8 *obj) {
             qcopy(a, v);
             FastVecSub(v, v, b);
             FastVecAdd(a, a, b);
-            func_PAL_L00_0032C328(obj, v, D_L18_001B1B08, D_L18_001B1B00,
-                             0xFFFF, -1, D_L18_001B1B30, 9, -128, 255, 0);
+            part_explode_object_into_pieces_pal(obj, v, g_breakable_piece_spread_range, g_breakable_piece_speed_range,
+                             0xFFFF, -1, g_breakable_piece_lifetime, 9, -128, 255, 0);
             moby_set_state(obj, 2, -1);
         }
         obj[0xA8] = 255;
         break;
     case 2:
-        func_PAL_L00_0032C328(obj, D_L18_001B1B10, D_L18_001B1B08, D_L18_001B1B00,
-                         0xFFFF, 0, D_L18_001B1B30, 6, 0xFA7F, 255, 0);
+        part_explode_object_into_pieces_pal(obj, g_breakable_piece_offset, g_breakable_piece_spread_range, g_breakable_piece_speed_range,
+                         0xFFFF, 0, g_breakable_piece_lifetime, 6, 0xFA7F, 255, 0);
         vec_local_offset_to_world(obj, v, 0, 0, 20.f);
-        func_PAL_L00_003FB330(v, 0, 5, 5, 5, 5, 5, 0, 1, 0, 1, 0,
+        SpawnExplosion_pal(v, 0, 5, 5, 5, 5, 5, 0, 1, 0, 1, 0,
                       *(float *)(obj + 0x2C) * 2.f, 20.f);
         moby_mark_spawned(obj);
         break;

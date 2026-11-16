@@ -3,24 +3,24 @@
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry30;
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry30;
 /* Reloaded at each search step in retail. */
-extern struct { char pad[0x230]; int selected; } D_L30_001CA3A0;
+extern struct { char pad[0x230]; int selected; } g_menu_l30_state;
 
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 extern void gfx_draw_beam_quads_glows(void *, int, float, int, float, float, int, int, void *);
-extern float D_L30_001B15AC __attribute__((sda));
-extern float D_L30_001B15B0 __attribute__((sda));
-extern int D_L30_001B15A4 __attribute__((sda));
-extern int D_L30_001B15A8 __attribute__((sda));
-extern int D_L30_001B156C __attribute__((sda));
-extern int D_L30_001B1570 __attribute__((sda));
+extern float g_dust_puff_scale __attribute__((sda));
+extern float g_dust_puff_scale_mul __attribute__((sda));
+extern int g_dust_puff_beam_flags __attribute__((sda));
+extern int g_dust_puff_beam_flags_alt __attribute__((sda));
+extern int g_dust_puff_effect_main __attribute__((sda));
+extern int g_dust_puff_effect_side __attribute__((sda));
 
 /* Small-data unit: every body here reaches a global through $gp, so the file is built
    with -G8 (the -g8.c name gives it that profile). */
 
-extern float D_L30_001AEE90 __attribute__((sda));
-extern float D_L30_001AEE94 __attribute__((sda));
-extern char D_L30_001AEE98[];
+extern float g_museum_look_angle_rate __attribute__((sda));
+extern float g_museum_look_param __attribute__((sda));
+extern char g_str_museum_look_debug[];
 
 extern void STUB_printf(const char *, ...);
 extern void func_001163A0(unsigned int);
@@ -36,20 +36,20 @@ typedef struct {
 } D00138180_Flags;
 
 extern D00138180_Flags g_pad_state;
-extern float D_001B35B8;
+extern float g_museum_water_offset;
 extern int g_current_map_index;
-extern float D_L30_001AEC24 __attribute__((sda));
-extern float D_L30_001AEC2C __attribute__((sda));
-extern float D_L30_001AEC28 __attribute__((sda));
-extern float D_L30_001AEC20 __attribute__((sda));
-extern int D_L30_001AEC18 __attribute__((sda));
-extern int D_L30_001AEC10 __attribute__((sda));
-extern int D_L30_001AEC1C __attribute__((sda));
-extern int D_L30_001AEC14 __attribute__((sda));
-extern int D_L30_001AEC08 __attribute__((sda));
-extern float D_L30_001AEC0C __attribute__((sda));
-extern int D_L30_001AEBB8 __attribute__((sda));
-extern float D_00233A60[][24][24];
+extern float g_museum_water_ripple_timer __attribute__((sda));
+extern float g_museum_water_ripple_threshold __attribute__((sda));
+extern float g_museum_water_ripple_step __attribute__((sda));
+extern float g_museum_water_wave_height __attribute__((sda));
+extern int g_museum_water_pos_row __attribute__((sda));
+extern int g_museum_water_step_row __attribute__((sda));
+extern int g_museum_water_pos_col __attribute__((sda));
+extern int g_museum_water_step_col __attribute__((sda));
+extern int g_museum_water_dome_radius __attribute__((sda));
+extern float g_museum_water_dome_height __attribute__((sda));
+extern int g_museum_water_current_buffer __attribute__((sda));
+extern float g_museum_water_grids[][24][24];
 
 extern float IntToFloat(int);
 extern int FloatToInt(float);
@@ -61,7 +61,7 @@ extern void RaiseMuseumHeightFieldDome(int, int, float, float);
 extern void DrawMuseumWaterGrid(void *);
 
 extern char g_hero_state[];
-extern char *D_001B2D1C __attribute__((sda));
+extern char *g_museum_entries __attribute__((sda));
 extern void anim_start_blended(void *, int, int, int);
 extern void cam_reset_entry(int);
 extern int TryClaimNotice(int, int, int);
@@ -75,33 +75,33 @@ void museum_water_update(char *object) {
     switch (state) {
     case 0:
         *(unsigned char *)(object + 0x20) = 1;
-        *(float *)(object + 0x18) += D_001B35B8;
+        *(float *)(object + 0x18) += g_museum_water_offset;
         museum_water_init_grid();
         *(unsigned char *)(object + 0x30) = 0xFF;
         break;
     case 1:
         if (!(g_pad_state.f1A0 & 0x80))
             museum_water_step_shape();
-        if (D_L30_001AEC24 >= D_L30_001AEC2C && math_random_int_below(200) == 1) {
-            D_L30_001AEC24 = 0.0f;
-            D_L30_001AEC18 += D_L30_001AEC10;
-            D_L30_001AEC1C += D_L30_001AEC14;
-            if (D_L30_001AEC18 < 4 || D_L30_001AEC18 > 20)
-                D_L30_001AEC10 = -D_L30_001AEC10;
-            if (D_L30_001AEC1C < 4 || D_L30_001AEC1C > 20)
-                D_L30_001AEC14 = -D_L30_001AEC14;
-            D_00233A60[D_L30_001AEBB8][D_L30_001AEC18][D_L30_001AEC1C] = D_L30_001AEC20;
+        if (g_museum_water_ripple_timer >= g_museum_water_ripple_threshold && math_random_int_below(200) == 1) {
+            g_museum_water_ripple_timer = 0.0f;
+            g_museum_water_pos_row += g_museum_water_step_row;
+            g_museum_water_pos_col += g_museum_water_step_col;
+            if (g_museum_water_pos_row < 4 || g_museum_water_pos_row > 20)
+                g_museum_water_step_row = -g_museum_water_step_row;
+            if (g_museum_water_pos_col < 4 || g_museum_water_pos_col > 20)
+                g_museum_water_step_col = -g_museum_water_step_col;
+            g_museum_water_grids[g_museum_water_current_buffer][g_museum_water_pos_row][g_museum_water_pos_col] = g_museum_water_wave_height;
         } else {
-            FloatToInt(math_l30_lerp_float(IntToFloat(D_L30_001AEC18),
-                                            IntToFloat(D_L30_001AEC18 + D_L30_001AEC10),
-                                            D_L30_001AEC24));
-            FloatToInt(math_l30_lerp_float(IntToFloat(D_L30_001AEC1C),
-                                            IntToFloat(D_L30_001AEC1C + D_L30_001AEC14),
-                                            D_L30_001AEC24));
+            FloatToInt(math_l30_lerp_float(IntToFloat(g_museum_water_pos_row),
+                                            IntToFloat(g_museum_water_pos_row + g_museum_water_step_row),
+                                            g_museum_water_ripple_timer));
+            FloatToInt(math_l30_lerp_float(IntToFloat(g_museum_water_pos_col),
+                                            IntToFloat(g_museum_water_pos_col + g_museum_water_step_col),
+                                            g_museum_water_ripple_timer));
         }
-        D_L30_001AEC24 += D_L30_001AEC28;
+        g_museum_water_ripple_timer += g_museum_water_ripple_step;
         if (g_pad_state.f1A0 & 0x20)
-            RaiseMuseumHeightFieldDome(12, 12, D_L30_001AEC08, D_L30_001AEC0C);
+            RaiseMuseumHeightFieldDome(12, 12, g_museum_water_dome_radius, g_museum_water_dome_height);
         gfx_add_draw_callback_first(DrawMuseumWaterGrid, object);
         break;
     }
@@ -127,16 +127,16 @@ void museum_random_look_update(u8 *object) {
             short extra_id = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            STUB_printf(D_L30_001AEE98, class_id, extra_id);
+            STUB_printf(g_str_museum_look_debug, class_id, extra_id);
             func_001163A0(ticks);
             *(int *)state = math_random_int_below(13);
         }
         *(u16 *)(object + 0x7C) = 1 << *(int *)state;
         moby_set_state(object, 1, -1);
     } else {
-        float f0 = D_L30_001AEE94;
+        float f0 = g_museum_look_param;
 
-        math_update_wrapped_angle_offset(object, state + 4, state + 8, D_L30_001AEE90,
+        math_update_wrapped_angle_offset(object, state + 4, state + 8, g_museum_look_angle_rate,
                       f0 * 0.000290888245f, *(float *)(state + 0xC));
         *(float *)(object + 0xF8) =
             FastAddRotations(*(float *)(object + 0xF8), 0.01745329424738884f);
@@ -193,7 +193,7 @@ void museum_info_stand_update(char *object) {
         if (*(char **)(hero + 0x33C) == object && *(int *)(hero + 0x340) != 0) {
             TryClaimNotice(8, id, 1);
             if (g_pad_state.f1A4 & 0x10) {
-                char *entry = D_001B2D1C + (*(int *)state << 8);
+                char *entry = g_museum_entries + (*(int *)state << 8);
 
                 museum_info_stand_advance_state(entry);
                 hero_reset_position_and_direction(entry + 0x10, entry + 0xF0, 0x6F, 1);
@@ -223,47 +223,47 @@ void part_spawn_dust_puff_pair(char *object) {
     float scale;
     float scale2;
     float random;
-    scale = D_L30_001B15AC;
+    scale = g_dust_puff_scale;
     scale *= *(float *)(object + 0x2C);
     value = math_random_int_range(95, 111);
     random = math_random_angle();
-    gfx_draw_beam_quads_glows(object + 0x10, D_L30_001B156C, scale, value, random, 1.0f, D_L30_001B15A4, 2, object);
-    scale2 = D_L30_001B15AC;
+    gfx_draw_beam_quads_glows(object + 0x10, g_dust_puff_effect_main, scale, value, random, 1.0f, g_dust_puff_beam_flags, 2, object);
+    scale2 = g_dust_puff_scale;
     scale2 *= *(float *)(object + 0x2C);
-    scale2 *= D_L30_001B15B0;
+    scale2 *= g_dust_puff_scale_mul;
     value2 = math_random_int_range(111, 127);
     random = math_random_angle();
-    gfx_draw_beam_quads_glows(object + 0x10, D_L30_001B1570, scale2, value2, random, 1.0f, D_L30_001B15A8, 2, object);
+    gfx_draw_beam_quads_glows(object + 0x10, g_dust_puff_effect_side, scale2, value2, random, 1.0f, g_dust_puff_beam_flags_alt, 2, object);
 }
 
-extern float D_L30_001AEBC8 __attribute__((sda));
-extern float D_L30_001AEBCC __attribute__((sda));
-extern int D_L30_001AEBC0 __attribute__((sda));
-extern int D_L30_001AEBC4 __attribute__((sda));
-extern int D_L30_001AEBBC __attribute__((sda));
+extern float g_museum_water_blend_t __attribute__((sda));
+extern float g_museum_water_blend_step __attribute__((sda));
+extern int g_museum_water_front_buffer __attribute__((sda));
+extern int g_museum_water_previous_buffer __attribute__((sda));
+extern int g_museum_water_source_buffer __attribute__((sda));
 
 extern void StepMuseumHeightField(void);
 
 /* Moves the water surface toward its next shape; when that is done it runs one step of the ripple simulation instead. */
 void museum_water_step_shape(void) {
-    if (0.95f <= D_L30_001AEBC8) {
-        D_L30_001AEBC8 = D_L30_001AEBCC;
+    if (0.95f <= g_museum_water_blend_t) {
+        g_museum_water_blend_t = g_museum_water_blend_step;
         StepMuseumHeightField();
-        D_L30_001AEBC0 = D_L30_001AEBBC;
-        D_L30_001AEBC4 = D_L30_001AEBB8;
+        g_museum_water_front_buffer = g_museum_water_source_buffer;
+        g_museum_water_previous_buffer = g_museum_water_current_buffer;
     } else {
         int x;
         int y;
 
-        D_L30_001AEBC0 = 2;
-        D_L30_001AEBC4 = 2;
+        g_museum_water_front_buffer = 2;
+        g_museum_water_previous_buffer = 2;
         for (x = 0; x < 24; x++) {
             for (y = 0; y < 24; y++) {
-                D_00233A60[D_L30_001AEBC0][y][x] =
-                    math_l30_lerp_float(D_00233A60[D_L30_001AEBBC][y][x],
-                                      D_00233A60[D_L30_001AEBB8][y][x], D_L30_001AEBC8);
+                g_museum_water_grids[g_museum_water_front_buffer][y][x] =
+                    math_l30_lerp_float(g_museum_water_grids[g_museum_water_source_buffer][y][x],
+                                      g_museum_water_grids[g_museum_water_current_buffer][y][x], g_museum_water_blend_t);
             }
         }
     }
-    D_L30_001AEBC8 = D_L30_001AEBC8 + D_L30_001AEBCC;
+    g_museum_water_blend_t = g_museum_water_blend_t + g_museum_water_blend_step;
 }

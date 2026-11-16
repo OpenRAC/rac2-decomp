@@ -14,7 +14,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern unsigned short *g_entity_group_lists[];
 extern char *g_moby_l02_pool[] __attribute__((sda));
-extern int D_L02_001B35B8[] __attribute__((sda));
+extern int g_group_max_index[] __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -37,7 +37,7 @@ void swing_platform_init_group(unsigned char *actor) {
     state = *(char **)(actor + 0x68);
     *(TI128 *)center = 0;
     for (listEntry = g_entity_group_lists[actor[0x21]];
-         actor[0x21] != 0xFF && actor[0x21] <= D_L02_001B35B8[0] && listEntry != 0 &&
+         actor[0x21] != 0xFF && actor[0x21] <= g_group_max_index[0] && listEntry != 0 &&
          ((listEntry != 0 && (short)listEntry[-1] >= 0) || listEntry == g_entity_group_lists[actor[0x21]]);
          listEntry++) {
         entity = g_moby_l02_pool[0] + ((*listEntry & 0x7FFF) << 8);
@@ -65,7 +65,7 @@ void swing_platform_init_group(unsigned char *actor) {
     vec_scale_to_length(off, actor + 0xD0, 0.5f);
     off[2] -= 0.5f;
     for (listEntry = g_entity_group_lists[actor[0x21]];
-         actor[0x21] != 0xFF && actor[0x21] <= D_L02_001B35B8[0] && listEntry != 0 &&
+         actor[0x21] != 0xFF && actor[0x21] <= g_group_max_index[0] && listEntry != 0 &&
          ((listEntry != 0 && (short)listEntry[-1] >= 0) || listEntry == g_entity_group_lists[actor[0x21]]);
          listEntry++) {
         entity = g_moby_l02_pool[0] + ((*listEntry & 0x7FFF) << 8);

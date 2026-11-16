@@ -12,7 +12,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L23_001AFA64 __attribute__((sda));
+extern int g_child_orientation_timer __attribute__((sda));
 extern char g_hero_position[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -63,14 +63,14 @@ void child_update_orientation(char *moby) {
         func_002A0F48(*(char **)(vars + 0x2A0));
         FastVecScale(scratch_vec, vars + 0x280, -1.0f);
         mat_align_to_dir(*(char **)(vars + 0x2A0) + 0xC0, scratch_vec, 0);
-        *(short *)(vars + 0x2A6) = D_L23_001AFA64;
+        *(short *)(vars + 0x2A6) = g_child_orientation_timer;
         return;
     }
     {
         short timer = *(short *)(vars + 0x2A6);
 
         if (timer != 0) {
-            if (timer == D_L23_001AFA64)
+            if (timer == g_child_orientation_timer)
                 *(int *)(vars + 0x2AC) = 0;
             *base_vec = 0;
             ((float *)base_vec)[0] = 1.0f;

@@ -34,7 +34,7 @@ extern int moby_apply_damage_to_object(char *,char *,int);
 extern int weapon_select_aim_target(char *,int,float,float,int,int);
 extern void SetDeathBits(char *,int,int);
 extern void guard_alt_alert_nearby(u8 *);
-extern char D_L13_001B98C0[];
+extern char g_camera_l13_position[];
 
 typedef int Vector128 __attribute__((mode(TI)));
 extern char *CreateMoby(int);
@@ -50,7 +50,7 @@ typedef struct CamMgr_00435CE8 {
     u8 pad150[0x40];
     Cam_00435CE8 *cam;
 } CamMgr_00435CE8;
-extern CamMgr_00435CE8 D_L13_001B9780;
+extern CamMgr_00435CE8 g_camera_l13_state;
 typedef struct SpawnState {
     short life;
     short timer;
@@ -118,7 +118,7 @@ extern int coll_test_point(void *, int, void *, float);
 
 extern void matrix_mul_vec3(char *, char *, char *);
 
-extern char D_L13_001BFD00[];
+extern char g_collision_l13_result[];
 
 extern void guard_alert_nearby(u8 *);
 /* Sets up a guard enemy the first time it runs, then checks its senses and whether it fell too low. */
@@ -159,7 +159,7 @@ int guard_init_check(char *obj) {
         }
         B(vars,0x48)=FloatToInt(17.0f); B(vars,0x4a)=FloatToInt(12.0f); B(vars,0x29)=1;
     }
-    if (B(obj,0x31) && fast_vec_dist(obj+0x10,D_L13_001B98C0)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
+    if (B(obj,0x31) && fast_vec_dist(obj+0x10,g_camera_l13_position)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
     if (moby_apply_damage_to_object(obj,vars+0x140,0)) guard_alert_nearby((u8 *)obj);
     I(vars,0x264)=weapon_select_aim_target(obj,I(vars,0x260),0.0f,0.0f,0,0);
     I(vars,0x278)=weapon_select_aim_target(obj,I(vars,0x274),0.0f,0.0f,0,0);
@@ -272,7 +272,7 @@ void moby_probe_ground(char *object, char *state)
     FastVecAdd((char *)top, (char *)top, object + 0x10);
     FastVecAdd((char *)bottom, (char *)bottom, object + 0x10);
     if (CollLine(top, bottom, 0, object, 0) != 0) {
-        hit = D_L13_001BFD00 + 0x20;
+        hit = g_collision_l13_result + 0x20;
         height = gravity_get_center_distance(hit);
         record = hit - 0x20;
         *(float *)(state + 0x90) = height;
@@ -447,9 +447,9 @@ typedef struct L13EntState {
     s32 f2CC;
 } L13EntState;
 
-extern u16 *D_L13_001FB420[];
-extern u8 *D_L13_001B291C __attribute__((section(".sdata")));
-extern int D_L13_001B2938 __attribute__((section(".sdata")));
+extern u16 *g_door_list_table[];
+extern u8 *g_object_table_base __attribute__((section(".sdata")));
+extern int g_level_l13_progress_stage __attribute__((section(".sdata")));
 
 /* Raises the +0x24C flag of each entity of kind 0xEA3 or 0xEA4 in the object's group, and the
    +0x244 flag of kind 0xF35. The kinds are tested one by one, as retail's separate branches show. */
@@ -462,13 +462,13 @@ void guard_alert_nearby(u8 *object)
 
     if (object[0x21] == 0xFF)
         return;
-    list_start = D_L13_001FB420[object[0x21]];
+    list_start = g_door_list_table[object[0x21]];
     if (list_start == 0)
         return;
-    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
-           ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L13_001FB420[object[0x21]]);
+    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= g_level_l13_progress_stage && entry != 0 &&
+           ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_door_list_table[object[0x21]]);
          entry++) {
-        other = D_L13_001B291C + ((*entry & 0x7FFF) << 8);
+        other = g_object_table_base + ((*entry & 0x7FFF) << 8);
         if (other == 0)
             break;
         if (*(s16 *)(other + 0xAA) == 0xEA3) {
@@ -488,7 +488,7 @@ void guard_alert_nearby(u8 *object)
 s32 rps_judge_round(u8 *object)
 {
     L13EntState *vars = *(L13EntState **)(object + 0x68);
-    u8 *entity = D_L13_001B291C + (vars->f2C0 << 8);
+    u8 *entity = g_object_table_base + (vars->f2C0 << 8);
     s32 kind = *(s16 *)(entity + 0xAA);
     s32 mine, other;
 
@@ -581,7 +581,7 @@ int guard_alt_init_check(char *obj) {
         }
         B(vars,0x29)=1; B(vars,0x48)=FloatToInt(17.0f); B(vars,0x4a)=FloatToInt(12.0f);
     }
-    if (B(obj,0x31) && fast_vec_dist(obj+0x10,D_L13_001B98C0)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
+    if (B(obj,0x31) && fast_vec_dist(obj+0x10,g_camera_l13_position)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
     if (P(vars,0x25c) && S(P(vars,0x25c),0xaa)==0xea9) {
         moby_transform_joint_point(obj,0,mat); copy_matrix3x4(P(vars,0x25c)+0xc0,mat); qcopy(P(vars,0x25c)+0x10,mat+0x30);
     }
@@ -634,13 +634,13 @@ void guard_alt_alert_nearby(u8 *object)
 
     if (object[0x21] == 0xFF)
         return;
-    list_start = D_L13_001FB420[object[0x21]];
+    list_start = g_door_list_table[object[0x21]];
     if (list_start == 0)
         return;
-    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
-           ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L13_001FB420[object[0x21]]);
+    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= g_level_l13_progress_stage && entry != 0 &&
+           ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_door_list_table[object[0x21]]);
          entry++) {
-        other = D_L13_001B291C + ((*entry & 0x7FFF) << 8);
+        other = g_object_table_base + ((*entry & 0x7FFF) << 8);
         if (other == 0)
             break;
         if (*(s16 *)(other + 0xAA) == 0xEA3) {
@@ -674,7 +674,7 @@ char *part_l13_spawn_flash(float size, char *position, int trigger, int kind, in
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = (char *)D_L13_001B9780.f140;
+        camera = (char *)g_camera_l13_state.f140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -708,9 +708,9 @@ char *part_l13_spawn_flash(float size, char *position, int trigger, int kind, in
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L13_001B9780.f140);
+                FastVecSub(difference, object + 0x10, g_camera_l13_state.f140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L13_001B9780 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&g_camera_l13_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

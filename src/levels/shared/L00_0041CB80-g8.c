@@ -43,7 +43,7 @@ extern LevelClass g_weapon_l00_table[];
 extern void *g_hero_moby __attribute__((nosda));
 extern CollResult g_collision_result __attribute__((aligned(16)));
 extern char g_camera_l00_position[];
-extern f32 D_L00_001B1470 __attribute__((sda));
+extern f32 g_guided_rocket_turn_rate __attribute__((sda));
 
 extern u8 *level_get_slot_body(int id, int index);
 extern int *level_get_slot_header(int id, int index);
@@ -455,7 +455,7 @@ void guided_rocket_update(char *rocket)
             }
             ref_L00_0041CB80_00(rocket_draw_trail, rocket);
         }
-        *(f32 *)(vars + 0x64) = FastAddRotations(*(f32 *)(vars + 0x64), D_L00_001B1470 * 0.000290888245f);
+        *(f32 *)(vars + 0x64) = FastAddRotations(*(f32 *)(vars + 0x64), g_guided_rocket_turn_rate * 0.000290888245f);
         glow = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x64)) * 0.5f + 0.5f;
         if (g_weapon_l00_table[g_item_slot_to_record[0x16]].b4 != 0) {
             if (*(char **)(vars + 0x68) != 0) {

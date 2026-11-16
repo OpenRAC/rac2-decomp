@@ -1,19 +1,19 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L05_001B1EC4, *D_L05_001B251C;
+extern char *g_path_l05_entry_table, *g_feltzin_target_mobys;
 typedef struct {
     char pad[0x7C];
     int timer, flag;
 } DriverState;
-extern DriverState D_L05_00221D10;
-extern char D_L05_002B8770[];
-extern float D_L05_001B1A84 __attribute__((sda));
-extern float D_L05_001B1A7C __attribute__((sda));
-extern float D_L05_001B1A80 __attribute__((sda));
-extern float D_L05_001B1BF8 __attribute__((sda));
-extern float D_L05_001B1BFC __attribute__((sda));
-extern float D_L05_001B1A98 __attribute__((sda));
+extern DriverState g_feltzin_challenge_state;
+extern char g_slot_record_source[];
+extern float g_ship_moby_scale_factor __attribute__((sda));
+extern float g_ship_forward_offset __attribute__((sda));
+extern float g_ship_lift_offset_scale __attribute__((sda));
+extern float g_ship_lean_spring_stiffness __attribute__((sda));
+extern float g_ship_lean_spring_damping __attribute__((sda));
+extern float g_cam_look_d_spring_length __attribute__((sda));
 extern float direction[] SDATA(D_L05_001B1C00);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -46,7 +46,7 @@ extern void ship_draw_aim_crosshair(void);
 #define H(p, o) (*(short *)((char *)(p) + (o)))
 
 /* Updates the driven moby position and rebuilds its basis, including bank and roll. */
-void func_PAL_L05_00449A28(char *obj)
+void UpdateDrivenMobyTransform_pal(char *obj)
 {
     char old[16] __attribute__((aligned(16)));
     char a[16] __attribute__((aligned(16)));
@@ -56,18 +56,18 @@ void func_PAL_L05_00449A28(char *obj)
     char e[16] __attribute__((aligned(16)));
     char rotation[16] __attribute__((aligned(16)));
     char *input = P(obj, 0x70) + 0x50;
-    char *moby = D_L05_001B251C +
-        (I(P(D_L05_001B1EC4 + H(obj, 0x84) * 32, 0x1C), 0x20) << 8);
+    char *moby = g_feltzin_target_mobys +
+        (I(P(g_path_l05_entry_table + H(obj, 0x84) * 32, 0x1C), 0x20) << 8);
     char *state = P(moby, 0x68);
     float t, angle;
     float forward;
 
     qcopy(old, moby + 0x10);
-    forward = D_L05_001B1A7C;
-    F(moby, 0x2C) = F(P(moby, 0x24), 0x24) * D_L05_001B1A84;
+    forward = g_ship_forward_offset;
+    F(moby, 0x2C) = F(P(moby, 0x24), 0x24) * g_ship_moby_scale_factor;
     FastVecScale(a, obj, forward);
     FastVecAdd(moby + 0x10, obj + 0x30, a);
-    FastVecScale(b, obj + 0x20, D_L05_001B1A80);
+    FastVecScale(b, obj + 0x20, g_ship_lift_offset_scale);
     FastVecAdd(moby + 0x10, moby + 0x10, b);
     t = -F(input, 0x68) / (F(input, 0x78) * 0.017453294f);
     if (t > 1.0f) t = 1.0f;
@@ -81,22 +81,22 @@ void func_PAL_L05_00449A28(char *obj)
     } else if (t > 1.0f) {
         t = 1.0f;
     }
-    F(state, 0xC) = math_step_spring_damper_clamped(F(state, 0xC), t, D_L05_001B1BF8,
-                                  D_L05_001B1BFC, 0.0f, state + 0x10);
+    F(state, 0xC) = math_step_spring_damper_clamped(F(state, 0xC), t, g_ship_lean_spring_stiffness,
+                                  g_ship_lean_spring_damping, 0.0f, state + 0x10);
     FastVecScale(b, obj + 0x20, F(state, 0x254) * F(state, 0xC));
     FastVecAdd(moby + 0x10, moby + 0x10, b);
-    if (D_L05_00221D10.flag) {
-        if (!math_fast_float_d(&D_L05_00221D10.timer)) {
-            slot_copy_records_to_free(D_L05_002B8770);
+    if (g_feltzin_challenge_state.flag) {
+        if (!math_fast_float_d(&g_feltzin_challenge_state.timer)) {
+            slot_copy_records_to_free(g_slot_record_source);
         } else {
-            D_L05_00221D10.flag = 0;
-            D_L05_00221D10.timer = 6;
+            g_feltzin_challenge_state.flag = 0;
+            g_feltzin_challenge_state.timer = 6;
         }
     }
     func_PAL_L05_0044B738(obj, old);
     ship_update_aim_point(obj, moby);
     FastVecSub(d, state + 0x20, obj + 0x30);
-    vec_scale_to_length(d, d, D_L05_001B1A98);
+    vec_scale_to_length(d, d, g_cam_look_d_spring_length);
     FastVecAdd(e, obj + 0x30, d);
     FastVecSub(moby + 0xC0, e, moby + 0x10);
     vec_scale_to_length(moby + 0xC0, moby + 0xC0, 1.0f);

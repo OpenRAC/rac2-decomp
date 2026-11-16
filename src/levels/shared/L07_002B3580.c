@@ -5,7 +5,7 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_spawn_spark_puff(void *);
@@ -13,8 +13,8 @@ extern void part_l00_spawn_impact_burst(void *, void *, void *);
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
+extern int g_projectile_model_ref __attribute__((sda));
+extern int g_ripple_object __attribute__((sda)), g_ripple_param __attribute__((sda));
 extern Collision g_collision_result;
 extern Material g_weapon_l00_table[];
 extern void part_steer_effect_direction(int, void *, int);
@@ -41,7 +41,7 @@ extern int math_fast_float_d(char *);
 extern void table_clear_entry_flag(int);
 extern void part_spawn_big_explosion(void *, void *, void *);
 
-extern char D_L07_001FDEC0[];
+extern char g_path_l07_table[];
 extern void func_338D68();
 
 typedef int DriveVector __attribute__((mode(TI)));
@@ -82,15 +82,15 @@ typedef struct DriveVelocityView {
     DriveVector velocity;
     unsigned char pad10[0xC4 - 0x10]; float targetSpeed;
 } DriveVelocityView;
-extern DriveVelocityView D_00189F10;
-extern int D_L07_001A8FF0 MACRO_ADDR;
-extern float D_L07_001A7DC0 MACRO_ADDR;
+extern DriveVelocityView g_drive_velocity_view;
+extern int g_hero_l07_lock_flag MACRO_ADDR;
+extern float g_hero_speed_scale MACRO_ADDR;
 /* The settings prefix ends at the observed direction vector. */
 typedef struct DriveSettings {
     unsigned char pad0[0x158]; float heading;
     unsigned char pad15C[0x370 - 0x15C]; DriveVector direction;
 } DriveSettings;
-extern DriveSettings D_L07_001B90C0;
+extern DriveSettings g_hero_l07_state_block;
 extern void hero_build_move_impulse(float, float);
 extern void hero_approach_speed(float, float);
 extern void hero_steer_heading(int, float, float, float);
@@ -132,8 +132,8 @@ void UpdateHeroVelocityForStateWithYawSpring(void)
         else speed = 0.058333337f;
         hero->speed = speed;
         hero_approach_speed(0.012222223f, 0.0125f);
-        cam_set_view_space_vector_length(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
-        cam_offset_point_by_side_direction((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
+        cam_set_view_space_vector_length(&g_drive_velocity_view.velocity, &g_drive_velocity_view.velocity, 0.0f);
+        cam_offset_point_by_side_direction((DriveVector *)(&g_drive_velocity_view.velocity), (DriveVector *)(&g_drive_velocity_view.velocity), g_drive_velocity_view.targetSpeed);
     } else if (state == 27) {
         if (g_hero_state.frame > 40) {
             hero_steer_heading(0, 0.04f, 0.2f, 0.250163913f);
@@ -203,7 +203,7 @@ void UpdateHeroVelocityForStateWithYawSpring(void)
             }
         }
         g_hero_state.targetSpeed = g_hero_state.planarDistance;
-    } else if (state == 129 && D_L07_001A8FF0 == 0) {
+    } else if (state == 129 && g_hero_l07_lock_flag == 0) {
         hero_steer_heading(0, 0.04f, 0.2f, g_hero_state.acceleration);
         g_hero_state.targetSpeed = 0.0f;
     } else {
@@ -218,8 +218,8 @@ void UpdateHeroVelocityForStateWithYawSpring(void)
             oldHeading = g_hero_state.heading;
             qcopy(&local, &g_hero_state.direction);
             if (g_hero_state.overrideDirection != 0) {
-                g_hero_state.heading = D_L07_001B90C0.heading;
-                qcopy(&g_hero_state.direction, &D_L07_001B90C0.direction);
+                g_hero_state.heading = g_hero_l07_state_block.heading;
+                qcopy(&g_hero_state.direction, &g_hero_l07_state_block.direction);
             }
             hero_steer_heading(0, 0.04f, 0.2f, g_hero_state.acceleration);
             if (g_hero_state.overrideDirection != 0) {
@@ -233,7 +233,7 @@ void UpdateHeroVelocityForStateWithYawSpring(void)
         qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
         {
             float damping = 0.0055555557f;
-            if (g_hero_state.speed < D_L07_001A7DC0 * 0.00333333365f) {
+            if (g_hero_state.speed < g_hero_speed_scale * 0.00333333365f) {
                 if (g_hero_state.mode == 2) {
                     float rate = g_hero_state.pendingDamping;
                     smoothed = cam_get_view_space_vector_length((char *)&g_hero_state.velocity);
@@ -260,7 +260,7 @@ int table_run_entry_by_index(int index)
 
     if (index == -1)
         return -1;
-    entry = *(char **)(D_L07_001FDEC0 + index * 4);
+    entry = *(char **)(g_path_l07_table + index * 4);
     if (entry == 0)
         return -1;
     func_338D68(entry);
@@ -317,7 +317,7 @@ void bouncing_l07_projectile_update(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(g_ripple_object, g_ripple_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -353,7 +353,7 @@ void bouncing_l07_projectile_update(unsigned char *obj) {
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -415,7 +415,7 @@ void bouncing_projectile_update_counted(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -434,7 +434,7 @@ void bouncing_projectile_update_counted(char *obj) {
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -475,7 +475,7 @@ extern unsigned short *g_moby_l07_group_lists[];
 
 extern unsigned char *g_moby_l07_array[] __attribute__((sda));
 
-extern int D_L07_001B22F8[] __attribute__((sda));
+extern int g_entity_group_count[] __attribute__((sda));
 
 /* Returns the first entity of the group's id list whose state byte is 1, or 0. */
 unsigned char *moby_find_active_in_group(int group) {
@@ -483,7 +483,7 @@ unsigned char *moby_find_active_in_group(int group) {
     unsigned char *e;
 
     for (p = g_moby_l07_group_lists[group];
-         (unsigned char)group != 0xFF && group <= D_L07_001B22F8[0] && p != 0 &&
+         (unsigned char)group != 0xFF && group <= g_entity_group_count[0] && p != 0 &&
          ((short)p[-1] >= 0 || p == g_moby_l07_group_lists[group]);
          p++) {
         e = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);

@@ -5,10 +5,10 @@ typedef union { Quad q; float f[4]; } Vector;
 typedef struct { Vector direction; u8 *source; u32 mask; u8 kind,enabled; u16 type; float strength; int mode; } ImpactInfo;
 typedef struct { Vector previous,normal,start; ImpactInfo impact; } BeamQuery;
 typedef struct { u8 reserved[0x18]; u8 *other; u32 reserved1c; Vector position; } HitView;
-extern HitView D_L02_001C0940 __attribute__((nosda));
-extern float D_L02_001B1FBC __attribute__((sda)),D_L02_001B1FC0 __attribute__((sda));
-extern float D_L02_001B1FB8 __attribute__((sda));
-extern u32 D_L02_001B1FC8 __attribute__((sda)),D_L02_001B1FCC __attribute__((sda));
+extern HitView g_collision_l02_result __attribute__((nosda));
+extern float g_impact_size_min __attribute__((sda)),g_impact_size_max __attribute__((sda));
+extern float g_ground_effect_last_arg __attribute__((sda));
+extern u32 g_ground_effect_color_a __attribute__((sda)),g_ground_effect_color_b __attribute__((sda));
 extern void cam_compute_view_direction(void *,void *,int);
 extern void FastVecAdd(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
@@ -50,15 +50,15 @@ void UpdateBeamEndpointAndParticles(u8 *object)
         query.impact.kind=1;
         query.impact.enabled=1;
         query.impact.type=*(u16 *)(object+0xAA);
-        if(CollLine(&query.start,object+0x10,0,object,0) && D_L02_001C0940.other!=*(u8 **)(state+0x50)) {
+        if(CollLine(&query.start,object+0x10,0,object,0) && g_collision_l02_result.other!=*(u8 **)(state+0x50)) {
             PlayMobySound(0,0,object);
-            if(!D_L02_001C0940.other) part_spawn_impact_particles(&D_L02_001C0940.position,5,0);
-            else if(*(int *)(D_L02_001C0940.other+0x98)) part_spawn_impact_particles(&D_L02_001C0940.position,10,1);
-            SpawnSparkRingBurst(object,&D_L02_001C0940.position);
+            if(!g_collision_l02_result.other) part_spawn_impact_particles(&g_collision_l02_result.position,5,0);
+            else if(*(int *)(g_collision_l02_result.other+0x98)) part_spawn_impact_particles(&g_collision_l02_result.position,10,1);
+            SpawnSparkRingBurst(object,&g_collision_l02_result.position);
             part_init_effect_record((char *)&impact,(int)object,0x810001,*(float *)(state+0x64));
             impact.kind=2;impact.enabled=1;
             impact.type=*(u16 *)(*(u8 **)(state+0x50)+0xAA);
-            coll_process_hit(&D_L02_001C0940.position,16,object,&impact,0.8f);
+            coll_process_hit(&g_collision_l02_result.position,16,object,&impact,0.8f);
             moby_mark_spawned(object);
             return;
         }
@@ -67,7 +67,7 @@ void UpdateBeamEndpointAndParticles(u8 *object)
         u8 *position=object+0x10;
         float size;
         int sign,left;
-        size=math_random_float_range(D_L02_001B1FBC,D_L02_001B1FC0);
+        size=math_random_float_range(g_impact_size_min,g_impact_size_max);
         sign=math_random_int_below(2);if(sign==0)sign--;
         left=4;
         do {
@@ -76,8 +76,8 @@ void UpdateBeamEndpointAndParticles(u8 *object)
             query.impact.direction.f[0]=math_random_float_range(-1.0f,1.0f);
             vec_scale_to_length(&query.impact.direction,&query.impact.direction,0.025f);
             query.impact.direction.f[2]=math_random_float_range(0,0.1f);
-            part_spawn_ground_effect(position,60,D_L02_001B1FC8,size*0.35f,size,0,sign,&query.impact.direction,0,D_L02_001B1FB8);
-            part_spawn_ground_effect(position,60,D_L02_001B1FCC,size*0.245f,size*0.7f,1,sign,&query.impact.direction,0,D_L02_001B1FB8);
+            part_spawn_ground_effect(position,60,g_ground_effect_color_a,size*0.35f,size,0,sign,&query.impact.direction,0,g_ground_effect_last_arg);
+            part_spawn_ground_effect(position,60,g_ground_effect_color_b,size*0.245f,size*0.7f,1,sign,&query.impact.direction,0,g_ground_effect_last_arg);
             sign=-sign;
         } while(--left>=0);
         moby_mark_spawned(object);
@@ -89,13 +89,13 @@ void UpdateBeamEndpointAndParticles(u8 *object)
             int sign;
             float size;
             sign=math_random_int_below(2);if(sign==0)sign--;
-            size=math_random_float_range(D_L02_001B1FBC,D_L02_001B1FC0);
+            size=math_random_float_range(g_impact_size_min,g_impact_size_max);
             query.impact.direction.f[2]=math_random_float_range(-1.0f,1.0f);
             query.impact.direction.f[1]=math_random_float_range(-1.0f,1.0f);
             query.impact.direction.f[0]=math_random_float_range(-1.0f,1.0f);
             vec_scale_to_length(&query.impact.direction,&query.impact.direction,0.025f);
-            part_spawn_ground_effect(object+0x10,60,D_L02_001B1FC8,size*0.05f,size,0,sign,&query.impact.direction,0,D_L02_001B1FB8);
-            part_spawn_ground_effect(object+0x10,60,D_L02_001B1FCC,size*0.0035f,size*0.035f,1,sign,&query.impact.direction,0,D_L02_001B1FB8);
+            part_spawn_ground_effect(object+0x10,60,g_ground_effect_color_a,size*0.05f,size,0,sign,&query.impact.direction,0,g_ground_effect_last_arg);
+            part_spawn_ground_effect(object+0x10,60,g_ground_effect_color_b,size*0.0035f,size*0.035f,1,sign,&query.impact.direction,0,g_ground_effect_last_arg);
         }
     }
     if(*(float *)(object+0x10)<2.0f || *(float *)(object+0x10)>1021.0f ||

@@ -4,7 +4,7 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 extern char *g_path_l17_table[];
-extern int D_L17_001B2748[] __attribute__((sda));
+extern int g_flash_frame_counter[] __attribute__((sda));
 extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -48,7 +48,7 @@ struct ChainMoby {
 
 /* Puts the leading link at the start of its path, facing along the first
    segment, and lines the following links up behind it. */
-int func_PAL_L17_003C07C0(ChainMoby *moby)
+int PlacePathFollowerChainAtStart_pal(ChainMoby *moby)
 {
     Vec rear;
     Vec start;
@@ -80,7 +80,7 @@ int func_PAL_L17_003C07C0(ChainMoby *moby)
     FastVecAdd(&rear, &rear, &moby->position);
 
     while (link) {
-        flash = (D_L17_001B2748[0] + link->uid) % 50 < 12;
+        flash = (g_flash_frame_counter[0] + link->uid) % 50 < 12;
         link->color = flash ? 0x80FFFFFF : 0x80404040;
         linkVars = link->vars;
 
@@ -126,7 +126,7 @@ extern void vec_scale_to_length(void *, void *, float);
 
 /* Samples the leader's path, then positions and turns each linked follower
    relative to the preceding object's transformed attachment point. */
-int func_PAL_L17_003C0A50(char *obj)
+int UpdatePathFollowerChain_pal(char *obj)
 {
     Vec anchor, target, other, desired, delta;
     float *heading, *pitch;
@@ -172,7 +172,7 @@ int func_PAL_L17_003C0A50(char *obj)
         low = 0.0012566373f;
         middle = 0.0025132746f;
         high = 0.12566373f;
-        flash = (D_L17_001B2748[0] + *(short *)(next + 0xB2)) % 50 < 12;
+        flash = (g_flash_frame_counter[0] + *(short *)(next + 0xB2)) % 50 < 12;
         *(int *)(next + 0x78) = flash ? 0x80FFFFFF : 0x80404040;
         nctx = *(char **)(next + 0x68);
         qzero(&other);

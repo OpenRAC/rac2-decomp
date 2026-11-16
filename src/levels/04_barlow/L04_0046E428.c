@@ -1,6 +1,6 @@
 #include "common.h"
-extern float D_L04_001B9680[4];
-extern unsigned char *D_L04_001B202C __attribute__((sda));
+extern float g_tether_zero_vec[4];
+extern unsigned char *g_ambient_sound_table __attribute__((sda));
 extern unsigned char *g_moby_l04_pool __attribute__((sda));
 extern unsigned char g_sound_state[];
 extern void FastVecSub(float *, float *, void *);
@@ -26,7 +26,7 @@ void snd_update_ambient_volume(unsigned char *obj)
     int volume, flags;
     unsigned char *slot;
     scale[2] = scale[1] = scale[0] = *(float *)(obj+12);
-    FastVecSub(pos,D_L04_001B9680,obj+0x40);
+    FastVecSub(pos,g_tether_zero_vec,obj+0x40);
     pos[3] = 0;
     matrix_mul_vec3(delta,pos,obj+0x50);
     matrix_mul_vec3(extent,scale,obj+0x50);
@@ -35,13 +35,13 @@ void snd_update_ambient_volume(unsigned char *obj)
     if (distance < outer) {
         flags = 16;
         if (math_fabs(delta[0]) <= 1.0f && math_fabs(delta[1]) <= 1.0f && math_fabs(delta[2]) <= 1.0f) {
-            volume = *(int *)(D_L04_001B202C+ambient->sound*32+12);
+            volume = *(int *)(g_ambient_sound_table+ambient->sound*32+12);
         } else {
             if(delta[0]>1.0f) delta[0]=1.0f; else if(delta[0]<-1.0f) delta[0]=-1.0f;
             if(delta[1]>1.0f) delta[1]=1.0f; else if(delta[1]<-1.0f) delta[1]=-1.0f;
             if(delta[2]>1.0f) delta[2]=1.0f; else if(delta[2]<-1.0f) delta[2]=-1.0f;
             edge=FastVecLength(delta);
-            volume=snd_compute_falloff(D_L04_001B202C+ambient->sound*32,distance,edge,outer);
+            volume=snd_compute_falloff(g_ambient_sound_table+ambient->sound*32,distance,edge,outer);
         }
         if(ambient->target!=-1) {
             unsigned char *target=g_moby_l04_pool+ambient->target*256;
@@ -57,7 +57,7 @@ void snd_update_ambient_volume(unsigned char *obj)
             }
         }
         slot=g_sound_state+ambient->handle*0x70;
-        if(D_L04_001B202C[ambient->sound*32+24]) flags=20;
+        if(g_ambient_sound_table[ambient->sound*32+24]) flags=20;
         if(*(unsigned char **)(slot+0x8C)!=obj || !slot[0x74]) {
             if(math_fast_float_d(&ambient->timer)) {
                 ambient->handle=snd_start_from_table_entry(ambient->sound,flags,obj,volume);

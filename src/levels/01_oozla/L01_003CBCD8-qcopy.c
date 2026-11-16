@@ -6,8 +6,8 @@
 
 typedef int OozlaQuad __attribute__((mode(TI)));
 
-extern int D_L01_001B2088 __attribute__((sda));
-extern char D_L01_001B03E8[];
+extern int g_oozla_intro_stage __attribute__((sda));
+extern char g_str_swamp_splash[];
 extern void func_002A6CF0(char *, int, int);
 extern float level_get_water_height(void);
 extern void *moby_spawn_scaled_effect(float *, float);
@@ -20,7 +20,7 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern void *part_spawn_drifting(void *, void *, int, float, float);
 extern void *part_spawn_spark_2(void *, void *, int, int);
-extern float D_L01_001AFE18[] __attribute__((sda));
+extern float g_water_l01_height[] __attribute__((sda));
 
 
 
@@ -40,8 +40,8 @@ void swamp_monster_spawn_splash(char *object, int bubbles, int drops, int splash
         timer = (int *)(*(char **)(object + 0x68) + 0xC8);
     }
     if (timer == 0)
-        func_002A6CF0(D_L01_001B03E8, *(short *)(object + 0xAA), *(short *)(object + 0xB2));
-    currentFrame = D_L01_001B2088;
+        func_002A6CF0(g_str_swamp_splash, *(short *)(object + 0xAA), *(short *)(object + 0xB2));
+    currentFrame = g_oozla_intro_stage;
     if (currentFrame - *timer < 11)
         return;
     height = level_get_water_height();
@@ -61,7 +61,7 @@ void swamp_monster_spawn_splash(char *object, int bubbles, int drops, int splash
         velocity[2] = height;
         size = math_random_float_range(0.5f, 0.9f);
         type = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-        part_spawn_drifting(velocity, D_L01_001AFE18, type, size, 5250.0f);
+        part_spawn_drifting(velocity, g_water_l01_height, type, size, 5250.0f);
       } while (i != 0);
     }
     if (dropCount > 0) {
@@ -81,5 +81,5 @@ void swamp_monster_spawn_splash(char *object, int bubbles, int drops, int splash
         part_spawn_spark_2(position, velocity, type, lifetime);
       } while (j != 0);
     }
-    *timer = D_L01_001B2088;
+    *timer = g_oozla_intro_stage;
 }

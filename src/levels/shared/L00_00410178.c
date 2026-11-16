@@ -15,7 +15,7 @@ typedef struct { char pad0[0xc]; short light; short timer; } FlashState;
 typedef struct { float color[4]; float position[4]; } LightRecord;
 
 extern EffectResident g_hero_state;
-extern LightRecord D_L00_001C6F40[];
+extern LightRecord g_light_table[];
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -72,7 +72,7 @@ void light_flash_update(char *object, void *origin)
         if (state->light == -1) {
             state->light = part_l00_alloc_effect_slot_2(position, 14.0f, 0.0f, red, green, blue);
         } else {
-            LightRecord *light = &D_L00_001C6F40[state->light];
+            LightRecord *light = &g_light_table[state->light];
             qcopy(light->position, position);
             light->position[3] = 14.0f;
             light->color[0] = red;

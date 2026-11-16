@@ -14,11 +14,11 @@ extern void cam_set_strength_and_steer(char *, float, float);
 extern void cam_reset_default(void);
 extern int FastDecTimer(char *);
 typedef struct { char *table; } Table_b0898;
-extern Table_b0898 D_L00_001B1844[] __attribute__((section(".sdata")));
+extern Table_b0898 g_camera_def_table[] __attribute__((section(".sdata")));
 extern int ref_L00_00426C78_00 __attribute__((sda));
 extern char *g_follow_camera_object __attribute__((section(".data")));
 extern char g_hero_position[];
-extern unsigned int D_001A7390[] __attribute__((section(".sdata")));
+extern unsigned int g_frame_counter[] __attribute__((section(".sdata")));
 extern int g_current_map_index[] __attribute__((section(".sdata")));
 typedef struct {
  char pad[0x98]; float angle; char pad9c[0x2290-0x9C]; char *owner;
@@ -37,7 +37,7 @@ int func_PAL_L00_0042C190(char *a, char *b)
     float temp[4] __attribute__((aligned(16)));
     char v1[16] __attribute__((aligned(16)));
     char v2[16] __attribute__((aligned(16)));
-    TransitionState *p = *(TransitionState **)(D_L00_001B1844[0].table + *(short *)(a + 0x84)*32 + 28);
+    TransitionState *p = *(TransitionState **)(g_camera_def_table[0].table + *(short *)(a + 0x84)*32 + 28);
     char *owner;
     char *hit;
     int type;
@@ -79,7 +79,7 @@ clear:
     p->active = 0;
     if (*(short *)(D_L00_001B8C80_6C78.owner + 0x86) != 0) goto timer;
     if (D_0018C750_6C78.count < 65535) ++D_0018C750_6C78.count;
-    if (((int)D_001A7390[0] * 5 + 2) / 6 > D_0018C750_6C78.time) D_0018C750_6C78.time = ((int)D_001A7390[0] * 5 + 2) / 6;
+    if (((int)g_frame_counter[0] * 5 + 2) / 6 > D_0018C750_6C78.time) D_0018C750_6C78.time = ((int)g_frame_counter[0] * 5 + 2) / 6;
     D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << g_current_map_index[0])) | 0x80000000U;
     dot = FastVecDot(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
     FastVecScale((char *)temp, D_L00_001B8C80_6C78.axis, dot);

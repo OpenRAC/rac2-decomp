@@ -8,20 +8,20 @@ extern f32 fast_vec_dist(void *, void *);
 extern f32 FastVecDot(void *, void *);
 extern f32 math_fast_angle_helper(f32);
 extern f32 FastVecLength(void *);
-extern u8 D_L10_001B9680[];
+extern u8 g_view_origin_vec[];
 extern f32 func_00335320(void);
 extern u8 *func_0037B670();
 extern f32 func_00309138(f32 f12);
 extern f32 func_00309120(f32 f12);
-extern u8 *D_L10_0020B1E0[];
-extern u8 *D_001B251C;
-extern u8 D_L10_00265BA0[];
-extern u8 D_L10_00188660[];
-extern u8 D_L10_00221CD0[];
+extern u8 *g_unused_pointer_table[];
+extern u8 *g_moby_pool_base;
+extern u8 g_group_state_buffer[];
+extern u8 g_effect_l10_record_table[];
+extern u8 g_mission_state[];
 extern u8 g_sound_state[];
 extern f32 math_random_float_range(f32, f32);
 extern f32 math_random_angle(void);
-extern u8 *D_001B2614 __attribute__((sda));
+extern u8 *g_spot_record_table __attribute__((sda));
 extern u8 *moby_get_motion_data(u8 *arg0);
 extern f32 math_random_angle(void);
 extern f32 math_fast_sin_or_cos_a(f32 f12);
@@ -32,7 +32,7 @@ extern u8 func_L10_00423780(void);
 
 /* func_L10_004174C8 is in L10_003170D0-g8.c: it only comes out right with -G8. */
 
-void func_PAL_L10_0041C2C8(u8 *arg0) {
+void hrugis_update_sway_speed_pal(u8 *arg0) {
     u8 *s = *(u8 **)(arg0 + 0x68);
 
     switch (arg0[0x20]) {

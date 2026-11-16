@@ -132,23 +132,23 @@ typedef struct { char pad000[0x160]; float amount; char pad164[4]; int frames; i
 
 extern HeroAE900 g_hero_state;
 extern unsigned char g_item_slot_to_record[];
-extern WeaponAE900 D_00262570[];
+extern WeaponAE900 g_weapon_table_2[];
 extern SoundAE900 g_sound_state;
 extern CollAE900 g_collision_result;
-extern TemplateAE900 D_L00_002A2870;
-extern TemplateAE900 D_L00_002A28C0;
-extern RatesAE900 D_L00_001AF7E0;
+extern TemplateAE900 g_small_effect_template;
+extern TemplateAE900 g_big_effect_template;
+extern RatesAE900 g_effect_default_rates;
 extern int g_frame_l00_counter MACRO_ADDR;
-extern float D_L00_001AF7B4 __attribute__((sda));
-extern int D_L00_001AF7B0 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda));
-extern int D_L00_001B2638 __attribute__((sda));
+extern float g_effect_duration_frames __attribute__((sda));
+extern int g_effect_skip_flag __attribute__((sda));
+extern int g_ripple_object __attribute__((sda));
+extern int g_ripple_param __attribute__((sda));
 extern VecAE900 g_camera_l00_position;
-extern ShakeAE900 D_L00_001B8C80;
+extern ShakeAE900 g_scalar_transition_state;
 extern char g_area_hit_targets[];
-extern MobyAE900 *D_L00_001FACE0[];
-extern char D_L00_001FDEF8[];
-extern char D_L00_001FE940[];
+extern MobyAE900 *g_target_l00_list[];
+extern char g_moby_index_list_head[];
+extern char g_effect_definitions[];
 
 extern void func_PAL_L00_003B16B8(void);
 extern int func_PAL_L00_003B1D70(VarsAE900 *, MobyAE900 *, int);
@@ -203,7 +203,7 @@ extern char *part_find_owned_effect_slot(void *, unsigned int, int);
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern int moby_move_over_ground(void *, void *, void *, float, float, float, float, int);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void RemoveMobyFromIndexList(void *, void *);
 extern void moby_mark_spawned(void *);
 extern float FastAddRotations(float, float);
@@ -211,7 +211,7 @@ extern void moby_queue_knockback_for_nodes(void *, void *, void *, int, int, int
 extern float coll_get_ground_height_under_object(void *);
 extern int gfx_swap_packed_color_channels(unsigned int, int);
 extern char *func_PAL_002BD790(void *, void *, int, int, float, int, int, int, int, int);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int FloatToInt(float);
 extern char *part_spawn_falling_drop(void *, void *, int, int, float, int, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
@@ -275,8 +275,8 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
     char *landed;
     MobyAE900 *owner;
 
-    small = D_L00_002A2870;
-    big = D_L00_002A28C0;
+    small = g_small_effect_template;
+    big = g_big_effect_template;
     landed = 0;
     impulse.q = 0;
     impulse.f[2] = 2.0f * FRAME_AE900;
@@ -357,7 +357,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
         hit.owner = moby;
         hit.flags = 0x830000;
         hit.i20 = 1;
-        hit.damage = (D_00262570 + g_item_slot_to_record[0x22])->rate;
+        hit.damage = (g_weapon_table_2 + g_item_slot_to_record[0x22])->rate;
         qcopy(&hit.dir, &vars->vel);
         vec_fast_normalize_helper(&hit.dir, &hit.dir, 1.0f);
         hit.b18 = 2;
@@ -366,7 +366,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
         hit.oClass = moby->oClass;
         hit.dir.f[2] = 1.0f;
         moby->pos.f[2] -= 0.4f;
-        t = IntToFloat(g_frame_l00_counter - vars->frame) / ((D_L00_001AF7B4 * 5.0f + 2.0f) * (1.0f / 6.0f));
+        t = IntToFloat(g_frame_l00_counter - vars->frame) / ((g_effect_duration_frames * 5.0f + 2.0f) * (1.0f / 6.0f));
         if (t > 1.0f)
             t = 1.0f;
         else if (t < 0.0f)
@@ -378,7 +378,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 char *splash;
                 int i;
 
-                RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1, moby->pos.f[0], moby->pos.f[1], 0.5f, -0.35f);
+                RippleDisturb(g_ripple_object, g_ripple_param, 1, moby->pos.f[0], moby->pos.f[1], 0.5f, -0.35f);
                 vars->inWater = 1;
                 vec_clear_128(vars);
                 vars->vel.f[2] = -1.5f * FRAME_AE900;
@@ -564,7 +564,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 FastVecSub(&t120, &vars->target->pos, &moby->pos);
                 vec_scale_to_length(&t120, &t120, vars->pull);
                 FastVecAdd(&moby->pos, &moby->pos, &t120);
-                make_hit_descriptor(&t140, moby, 0x10000, &t120, (D_00262570 + g_item_slot_to_record[0x22])->rate);
+                make_hit_descriptor(&t140, moby, 0x10000, &t120, (g_weapon_table_2 + g_item_slot_to_record[0x22])->rate);
                 qcopy(&t170, &moby->pos);
                 t170.f[2] += 0.35f;
                 if (coll_process_hit(&t170, 0x10, moby, &t140, 0.35f)) {
@@ -618,7 +618,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 moby_move_over_ground(moby, &moby->pos, &t130, 0.4f, 0.25f, 0.25f, 30.0f * DEG_AE900, 0);
             } else {
                 int i = 0;
-                MobyAE900 *other = D_L00_001FACE0[0];
+                MobyAE900 *other = g_target_l00_list[0];
 
                 while (other) {
                     if (!(fast_vec_dist(&moby->pos, &other->pos) > 30.0f)) {
@@ -628,14 +628,14 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                         }
                     }
                     i++;
-                    other = D_L00_001FACE0[i];
+                    other = g_target_l00_list[i];
                 }
             }
         }
         vars->i78 = 0;
-        if (vars->i5C < 0 || D_L00_001AF7B0 != 0) {
-            func_PAL_002AD288(moby, &moby->pos, -1, 0.33f, 13.0f);
-            RemoveMobyFromIndexList(moby, D_L00_001FDEF8);
+        if (vars->i5C < 0 || g_effect_skip_flag != 0) {
+            part_spawn_explosion_with_sparks_pal(moby, &moby->pos, -1, 0.33f, 13.0f);
+            RemoveMobyFromIndexList(moby, g_moby_index_list_head);
             moby_mark_spawned(moby);
         }
         if (vars->amp > 0.05f) {
@@ -643,7 +643,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
             if (vars->amp < 0.05f)
                 vars->amp = 0.05f;
         }
-        t = IntToFloat(g_frame_l00_counter - vars->frame) / ((D_L00_001AF7B4 * 5.0f + 2.0f) * (1.0f / 6.0f));
+        t = IntToFloat(g_frame_l00_counter - vars->frame) / ((g_effect_duration_frames * 5.0f + 2.0f) * (1.0f / 6.0f));
         if (t > 1.0f)
             t = 1.0f;
         else if (t < 0.0f)
@@ -656,11 +656,11 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 float radius = 2.0f;
                 int count;
 
-                if ((D_00262570 + g_item_slot_to_record[0x22])->upgraded)
+                if ((g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded)
                     radius = 3.0f;
                 count = coll_process_hit(&moby->pos, 0x10, moby, 0, radius);
                 t120.q = moby->pos.q;
-                moby_queue_knockback_for_nodes(moby, &t120, g_area_hit_targets, count, 0, 0x810000, 4, 1, (D_00262570 + g_item_slot_to_record[0x22])->rate, 0.25f, 1.5f);
+                moby_queue_knockback_for_nodes(moby, &t120, g_area_hit_targets, count, 0, 0x810000, 4, 1, (g_weapon_table_2 + g_item_slot_to_record[0x22])->rate, 0.25f, 1.5f);
             }
             water = coll_get_ground_height_under_object(&moby->pos);
             if (vars->inWater != 0) {
@@ -731,24 +731,24 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     t140.f[2] = math_random_float_range(3.0f, 6.0f) * FRAME_AE900;
                     t130.q = moby->pos.q;
                     t130.f[2] = surface;
-                    c1 = gfx_swap_packed_color_channels(c1, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
-                    c2 = gfx_swap_packed_color_channels(c2, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
+                    c1 = gfx_swap_packed_color_channels(c1, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
+                    c2 = gfx_swap_packed_color_channels(c2, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
                     sz = math_random_float_range(0.15f * 210000.0f, 0.25f * 210000.0f);
                     life = math_random_int_range(75, 125);
-                    defs = (char **)D_L00_001FE940;
+                    defs = (char **)g_effect_definitions;
                     tex = *(unsigned char *)defs[11];
                     func_PAL_002BD790(&t130, &t140, c1, c2, sz, life, 1, tex, -1, 0);
                 }
             } else if (water + 2.0f < moby->pos.f[2]) {
                 vec_clear_128(&t120);
-                func_PAL_002AC718(moby, &t120, 0, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, 2, 7.0f, 0, 1, -1,
-                              (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0, 0x810001);
+                SpawnExplosionEffects_pal(moby, &t120, 0, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, 2, 7.0f, 0, 1, -1,
+                              (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0, 0x810001);
             } else {
                 float scale = 1.0f;
                 int count;
                 int i;
 
-                if ((D_00262570 + g_item_slot_to_record[0x22])->upgraded)
+                if ((g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded)
                     scale = 1.5f;
                 count = FloatToInt(dist * 15.0f);
                 for (i = 0; i < count; i++) {
@@ -757,7 +757,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     float r;
                     float a;
 
-                    *rates = D_L00_001AF7E0;
+                    *rates = g_effect_default_rates;
                     t140.q = 0;
                     t140.f[0] = math_random_float_range(-0.5f * FRAME_AE900, 0.5f * FRAME_AE900) * scale;
                     t140.f[1] = math_random_float_range(-0.5f * FRAME_AE900, 0.5f * FRAME_AE900) * scale;
@@ -773,14 +773,14 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     t130.f[2] -= r * (8.0f * FRAME_AE900);
                     switch (kind) {
                     case 0: {
-                        int c = gfx_swap_packed_color_channels(0x1F101820, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        int c = gfx_swap_packed_color_channels(0x1F101820, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
                         float f = math_random_float_range(200000.0f, 300000.0f) * scale;
                         part_spawn_falling_drop(&t140, &t130, c, 0x101010, f, math_random_int_range(150, 200), 0);
                         break;
                     }
                     case 1: {
-                        int c1 = gfx_swap_packed_color_channels(0x3F081020, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
-                        int c2 = gfx_swap_packed_color_channels(0x0F081020, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        int c1 = gfx_swap_packed_color_channels(0x3F081020, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        int c2 = gfx_swap_packed_color_channels(0x0F081020, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
                         part_spawn_falling_drop(&t140, &t130, c1, c2, math_random_float_range(50000.0f, 100000.0f) * scale, 150, 1);
                         break;
                     }
@@ -794,8 +794,8 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                         color = 0x2F486078;
                         if (roll <= 39)
                             color = 0x5FF8F8F8;
-                        c1 = gfx_swap_packed_color_channels(color, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
-                        c2 = gfx_swap_packed_color_channels(0x0F000020, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        c1 = gfx_swap_packed_color_channels(color, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        c2 = gfx_swap_packed_color_channels(0x0F000020, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
                         f = scale * 150000.0f;
                         part_spawn_falling_drop(&t140, &t130, c1, c2, f, math_random_int_range(25, 37), 2);
                         break;
@@ -805,8 +805,8 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                         int c2 = math_lerp_int_fraction(0, 0x5F5F5F, math_random_float_range(0.5f, 1.0f));
                         float f;
 
-                        c1 = gfx_swap_packed_color_channels(c1, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
-                        c2 = gfx_swap_packed_color_channels(c2, (D_00262570 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        c1 = gfx_swap_packed_color_channels(c1, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
+                        c2 = gfx_swap_packed_color_channels(c2, (g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded != 0);
                         vec_build_spherical_offset(&t130, math_random_float_range(0.0f, 1.0f) * FRAME_AE900, a, math_random_angle());
                         f = math_random_float_range(200000.0f, 300000.0f) * scale;
                         part_spawn_falling_drop(&t140, &t130, c1, c2, f, math_random_int_range(200, 250), 3);
@@ -816,25 +816,25 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 }
             }
             moby->bBC = 0;
-            if ((D_00262570 + g_item_slot_to_record[0x22])->upgraded)
+            if ((g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded)
                 PlayMobySound(3, 0, moby);
             else
                 PlayMobySound(2, 0, moby);
             {
-                ShakeAE900 *shake = &D_L00_001B8C80;
+                ShakeAE900 *shake = &g_scalar_transition_state;
 
                 if (dist < 20.0f)
                     shake->amount = 0.4f - dist * 0.0175f;
                 else
                     shake->amount = 0.4f - 20.0f * 0.0175f;
             }
-            D_L00_001B8C80.counter = 0;
-            D_L00_001B8C80.frames = 21;
-            if ((D_00262570 + g_item_slot_to_record[0x22])->upgraded)
+            g_scalar_transition_state.counter = 0;
+            g_scalar_transition_state.frames = 21;
+            if ((g_weapon_table_2 + g_item_slot_to_record[0x22])->upgraded)
                 moby_spawn_template_effect(&big, &moby->pos, 0, 0);
             else
                 moby_spawn_template_effect(&small, &moby->pos, 0, 0);
-            RemoveMobyFromIndexList(moby, D_L00_001FDEF8);
+            RemoveMobyFromIndexList(moby, g_moby_index_list_head);
             moby_mark_spawned(moby);
         } else {
             part_queue_ground_shadow(moby, 0.25f);

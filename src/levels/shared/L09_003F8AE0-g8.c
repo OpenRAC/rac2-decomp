@@ -6,11 +6,11 @@
 #define P(p,o) (*(u8 **)((p)+(o)))
 typedef struct __attribute__((packed)) { u64 fields[6]; } AnimationParameters;
 typedef struct { char prefix[0x38]; u8 *owner; char suffix[4]; } TargetSlot;
-extern TargetSlot D_L09_001C40C0[];
-extern char D_L09_001B9A00[];
+extern TargetSlot g_target_slot_table[];
+extern char g_camera_l09_position[];
 extern int g_current_map_index MACRO_ADDR;
-extern u8 *D_L09_001B285C __attribute__((sda));
-extern int D_L09_001A9040 __attribute__((sda));
+extern u8 *g_moby_record_table __attribute__((sda));
+extern int g_release_busy_flag __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern int moby_apply_damage_to_object(void *,void *,int),part_spawn_damage_debris(void *,void *,void *);
 extern int math_random_int_below(int),weapon_select_aim_target(void *,int,void *,int,float,float);
@@ -30,7 +30,7 @@ void trooper_legs_update_frame(u8 *object)
     u8 *state = P(object,0x68), *vars, *moved, **effects;
     int before, result, i, remove = 0;
     if (object[0x95] == 0) trooper_legs_init(object);
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L09_001B9A00) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_camera_l09_position) < 24.0f) {
         moby_update_ground_check(object); object[0x6F] = 22;
     }
     if (object[0xA8] == 255) {
@@ -38,7 +38,7 @@ void trooper_legs_update_frame(u8 *object)
         if (child && S(child,0xAA) == MOBY_CLASS_MEGACORP_TROOPER_TORSO && child[0x20] != 0xFE && child[0x20] != 0xFD) {
             if (child[0xA8] != 255) {
                 int index = child[0xA8];
-                TargetSlot *slots = D_L09_001C40C0;
+                TargetSlot *slots = g_target_slot_table;
                 if (slots[index].owner == child) {
                     object[0xA8] = index;
                     slots[object[0xA8]].owner = object;
@@ -49,7 +49,7 @@ void trooper_legs_update_frame(u8 *object)
     before = object[0x20];
     result = moby_apply_damage_to_object(object, state + 0x50, 0);
     if (g_current_map_index == 9 && S(state,0xC0) != -1) {
-        if (!moby_is_hero_or_special(D_L09_001B285C + (S(state,0xC0) << 8))) D_L09_001A9040 = 0;
+        if (!moby_is_hero_or_special(g_moby_record_table + (S(state,0xC0) << 8))) g_release_busy_flag = 0;
         S(state,0xC0) = -1;
     }
     if (result) {

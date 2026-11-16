@@ -10,9 +10,9 @@ extern void prompt_bar_set_texts (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s
 extern void prompt_bar_set_text_offsets (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
 extern void prompt_bar_set_spacing (s32_F09f721e0, f32_F09f721e0);
 extern int screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
-extern s32_F09f721e0 D_L04_001AE040 __attribute__ ((sda));
+extern s32_F09f721e0 g_screen_adjust_prompt_data __attribute__ ((sda));
 
-void func_US2_0033CDB8 (s32_F09f721e0 self, s32_F09f721e0 arg)
+void screen_adjust_menu_init_us2 (s32_F09f721e0 self, s32_F09f721e0 arg)
 {
   s32_F09f721e0 q;
   s32_F09f721e0 p;
@@ -30,7 +30,7 @@ void func_US2_0033CDB8 (s32_F09f721e0 self, s32_F09f721e0 arg)
   q = self + 8;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 732))[0] = 255.0f;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 732))[1] = 195.0f;
-  prompt_bar_init (q, arg, &D_L04_001AE040);
+  prompt_bar_init (q, arg, &g_screen_adjust_prompt_data);
   a = GetLocalizedString (12411);
   b = GetLocalizedString (11236);
   prompt_bar_set_texts (q, a, b, GetLocalizedString (11237));
@@ -44,7 +44,7 @@ void func_US2_0033CDB8 (s32_F09f721e0 self, s32_F09f721e0 arg)
 typedef unsigned char u8_Ff4eb83c9;
 typedef int s32_Ff4eb83c9;
 typedef float f32_Ff4eb83c9;
-extern f32_Ff4eb83c9 D_L04_001AE070[2] __attribute__((sda));
+extern f32_Ff4eb83c9 g_four_option_prompt_data[2] __attribute__((sda));
 extern void *func_00336E40_3(void *);
 extern void *func_00336DA8_3(s32_Ff4eb83c9, void *);
 extern void func_0033ABD8_3(u8_Ff4eb83c9 *, void *, f32_Ff4eb83c9 *);
@@ -54,7 +54,7 @@ extern void func_0033B030_3(u8_Ff4eb83c9 *, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff
 extern void func_0033B0A8_2(u8_Ff4eb83c9 *, f32_Ff4eb83c9);
 extern int UpdateFourOptionMenuInput(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
 
-void func_US2_0033D4B0(u8_Ff4eb83c9 *self, void *arg) {
+void four_option_menu_init_us2(u8_Ff4eb83c9 *self, void *arg) {
     u8_Ff4eb83c9 *sub;
     void *first, *second, *third;
     *(void **)self = arg;
@@ -70,7 +70,7 @@ void func_US2_0033D4B0(u8_Ff4eb83c9 *self, void *arg) {
     sub = self + 8;
     ((f32_Ff4eb83c9 *)*(void **)(self + 732))[0] = 255.0f;
     ((f32_Ff4eb83c9 *)*(void **)(self + 732))[1] = 195.0f;
-    func_0033ABD8_3(sub, arg, D_L04_001AE070);
+    func_0033ABD8_3(sub, arg, g_four_option_prompt_data);
     first = func_00288FB8_2(11310);
     second = func_00288FB8_2(11236);
     third = func_00288FB8_2(11237);
@@ -84,7 +84,7 @@ void func_US2_0033D4B0(u8_Ff4eb83c9 *self, void *arg) {
 typedef unsigned char u8_Fe9770b1e;
 typedef int s32_Fe9770b1e;
 typedef float f32_Fe9770b1e;
-extern f32_Fe9770b1e D_L04_001AE0B8[2] __attribute__((sda));
+extern f32_Fe9770b1e g_prompt_menu_data[2] __attribute__((sda));
 extern void *func_00336E40_1(void *);
 extern void *func_00336DA8_1(s32_Fe9770b1e, void *);
 extern void func_0033ABD8_1(u8_Fe9770b1e *, void *, f32_Fe9770b1e *);
@@ -94,7 +94,7 @@ extern void func_0033B030_1(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe
 extern void func_0033B0A8_1(u8_Fe9770b1e *, f32_Fe9770b1e);
 extern int menu_handle_page_input_a(u8_Fe9770b1e *, s32_Fe9770b1e);
 
-void func_US2_0033DA38(u8_Fe9770b1e *self, void *arg) {
+void prompt_menu_init_us2(u8_Fe9770b1e *self, void *arg) {
     u8_Fe9770b1e *sub;
     void *first, *second, *third;
     *(void **)self = arg;
@@ -110,7 +110,7 @@ void func_US2_0033DA38(u8_Fe9770b1e *self, void *arg) {
     sub = self + 8;
     ((f32_Fe9770b1e *)*(void **)(self + 732))[0] = 255.0f;
     ((f32_Fe9770b1e *)*(void **)(self + 732))[1] = 195.0f;
-    func_0033ABD8_1(sub, arg, D_L04_001AE0B8);
+    func_0033ABD8_1(sub, arg, g_prompt_menu_data);
     first = func_00288FB8_1(11305);
     second = func_00288FB8_1(11236);
     third = func_00288FB8_1(11237);

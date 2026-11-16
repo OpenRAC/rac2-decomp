@@ -45,24 +45,24 @@ typedef struct { u8 pad0[0x28]; int id; u8 pad2C[0x28]; float rate; u8 pad58[0x1
 extern u8 g_hero_state[];
 extern u8 g_pad_state[];
 extern u8 g_item_slot_to_record[];
-extern u8 D_001395AC NOT_SDA;
-extern float D_0018A580[4] NOT_SDA;
+extern u8 g_hero_weapon_id_index NOT_SDA;
+extern float g_strip_axis[4] NOT_SDA;
 extern WeaponEntry g_weapon_l00_table[];
-extern u8 D_L00_00296120[];
-extern u8 D_L00_001A8F20[] MACRO_ADDR;
+extern u8 g_effect_handle_records[];
+extern u8 g_default_vector[] MACRO_ADDR;
 typedef struct { u8 pad[0x160]; float f160; int pad164; int i168; int i16C; float f170; int pad174; int i178; } Shake;
-extern Shake D_L00_001B8C80;
+extern Shake g_scalar_transition_state;
 extern u8 *g_area_hit_targets[];
-extern float D_L00_001B0190[16] __attribute__((sda));
-extern int D_L00_001B01E8 __attribute__((sda));
-extern int D_L00_001B01EC __attribute__((sda));
-extern int D_L00_001B020C __attribute__((sda));
-extern int D_L00_001B0214 __attribute__((sda));
-extern int D_L00_001B021C __attribute__((sda));
-extern float D_L00_001B0220 __attribute__((sda));
-extern float D_L00_001B0224 __attribute__((sda));
-extern float D_L00_001B0228 __attribute__((sda));
-extern int D_L00_001B0238 __attribute__((sda));
+extern float g_euler_rotation_params[16] __attribute__((sda));
+extern int g_effect_state_param_a __attribute__((sda));
+extern int g_effect_state_param_b __attribute__((sda));
+extern int g_effect_timer_limit_a __attribute__((sda));
+extern int g_effect_state_param_c __attribute__((sda));
+extern int g_effect_timer_limit_b __attribute__((sda));
+extern float g_effect_local_pos_x __attribute__((sda));
+extern float g_local_pos_y_offset __attribute__((sda));
+extern float g_local_pos_z_offset __attribute__((sda));
+extern int g_effect_state_param __attribute__((sda));
 
 extern s32 FastDecTimer(s16 *);
 extern int math_fast_float_d(void *);
@@ -71,7 +71,7 @@ extern s32 func_PAL_L00_002C4480(int, int);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern void func_PAL_L00_002AF458(void);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int slot_copy_records_to_free(void *);
@@ -89,7 +89,7 @@ extern u8 *part_spawn_pulled_particle(void *, int, float, float, u32, int, int, 
 extern void func_PAL_L00_003D6C38(u8 *, void *, int);
 extern s32 coll_process_hit(f32, void *, s32, void *, s32);
 extern void QueueMobyImpact(u8 *, Hit *);
-extern int func_PAL_0032F0B8(u8 *, int, u8 *);
+extern int StartAttachedEffect_pal(u8 *, int, u8 *);
 extern void euler_to_matrix(void *, void *);
 extern void copy_matrix3x4(void *, void *);
 extern void moby_transform_joint_to_world(u8 *, int, void *);
@@ -98,16 +98,16 @@ extern float math_random_float_range(float, float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern float FastAddRotations(float, float);
-extern int func_PAL_L00_003D6A38(u8 *, void *, void *, Hit *);
+extern int weapon_fire_damage_ray_pal(u8 *, void *, void *, Hit *);
 
 
 static inline void SetShake(float amount)
 {
-    D_L00_001B8C80.f160 = amount;
-    D_L00_001B8C80.i168 = (30 * 5 + 2) / 6;
-    D_L00_001B8C80.f170 = amount;
-    D_L00_001B8C80.i178 = (30 * 5 + 2) / 6;
-    D_L00_001B8C80.i16C = 0;
+    g_scalar_transition_state.f160 = amount;
+    g_scalar_transition_state.i168 = (30 * 5 + 2) / 6;
+    g_scalar_transition_state.f170 = amount;
+    g_scalar_transition_state.i178 = (30 * 5 + 2) / 6;
+    g_scalar_transition_state.i16C = 0;
 }
 
 void func_PAL_L14_003E3E84(u8 *self)
@@ -143,7 +143,7 @@ void func_PAL_L14_003E3E84(u8 *self)
         hud_add_moby_marker(self, 1.3f, color, 0, 0x21, 0.0f, -1, 90.0f, 4);
     }
     if (st->t4C != 0 && math_fast_float_d(&st->t4C))
-        func_PAL_L00_002AF6C0();
+        cancel_hero_item_animation_pal();
     if (self[0x42] == self[0x43] && (self[0x60] & 2))
         anim_start_blended_with_flags(self, 1, 0, 2, 0);
     /* moby/state and turret/shot are copies, and large and small are named constants, that gcse's cprop folds back:
@@ -163,8 +163,8 @@ void func_PAL_L14_003E3E84(u8 *self)
         }
         if (self[0x20] == 1 && ((Hero *)g_hero_state)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)g_hero_state)->i[0x1240 / 4] >= (0x17 * 5 + 2) / 6 && ready) {
             if ((((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && weapon_spend_ammo(-1, 1)) {
-                if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + D_001395AC * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
-                    delay = ((s32)(D_L00_001B01E8) * 5 + 2) / 6;
+                if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_hero_weapon_id_index * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
+                    delay = ((s32)(g_effect_state_param_a) * 5 + 2) / 6;
                     st->t40 = 1;
                     st->t6 = delay;
                 } else {
@@ -172,19 +172,19 @@ void func_PAL_L14_003E3E84(u8 *self)
                     st->t6 = 2;
                 }
                 func_PAL_L00_002AF458();
-                st->handle = slot_copy_records_to_free(D_L00_00296120);
+                st->handle = slot_copy_records_to_free(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
-                st->t4C = ((s32)(D_L00_001B0238) * 5 + 2) / 6;
+                st->t4C = ((s32)(g_effect_state_param) * 5 + 2) / 6;
                 self[0x20] = 2;
                 st->fC = math_random_angle();
-                st->t8 = ((s32)(D_L00_001B01EC) * 5 + 2) / 6;
+                st->t8 = ((s32)(g_effect_state_param_b) * 5 + 2) / 6;
                 st->f20 = 1.0f / IntToFloat(st->t8);
                 st->t8 += 2;
-                st->tA = ((s32)(D_L00_001B0214) * 5 + 2) / 6;
+                st->tA = ((s32)(g_effect_state_param_c) * 5 + 2) / 6;
                 st->f24 = 1.0f / IntToFloat(st->tA);
-                st->t28 = ((s32)(D_L00_001B020C) * 5 + 2) / 6;
+                st->t28 = ((s32)(g_effect_timer_limit_a) * 5 + 2) / 6;
                 st->f2C = 1.0f / IntToFloat(st->t28);
-                st->t44 = ((s32)(D_L00_001B021C) * 5 + 2) / 6;
+                st->t44 = ((s32)(g_effect_timer_limit_b) * 5 + 2) / 6;
                 st->f48 = 1.0f / IntToFloat(st->t44);
                 st->t44 += 2;
             } else if (((Hero *)g_pad_state)->i[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) {
@@ -212,25 +212,25 @@ void func_PAL_L14_003E3E84(u8 *self)
             if (FastDecTimer(&shot->t6)) {
                 if (turret[0x20] == 2) {
                     turret[0x20] = 3;
-                    qcopy(shot->q30, D_0018A580);
-                    a[0] = D_L00_001B0220;
-                    a[1] = D_L00_001B0224 - 0.25f;
-                    a[2] = D_L00_001B0228;
+                    qcopy(shot->q30, g_strip_axis);
+                    a[0] = g_effect_local_pos_x;
+                    a[1] = g_local_pos_y_offset - 0.25f;
+                    a[2] = g_local_pos_z_offset;
                     a[3] = 1.0f;
                     matrix_mul_vec3(b, a, turret + 0xC0);
                     FastVecAdd(b, b, turret + 0x10);
                     {
-                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, D_L00_001A8F20, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, D_L00_001A8F20, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
@@ -238,22 +238,22 @@ void func_PAL_L14_003E3E84(u8 *self)
                     matrix_mul_vec3(b, a, turret + 0xC0);
                     FastVecAdd(b, b, turret + 0x10);
                     {
-                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, D_L00_001A8F20, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, D_L00_001A8F20, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
                             *(TI128 *)(q + 0x10) = *(TI128 *)(b);
                     }
                     a[2] = 0.0f;
-                    a[1] = D_L00_001B0224;
+                    a[1] = g_local_pos_y_offset;
                     matrix_mul_vec3(b, a, turret + 0xC0);
                     FastVecAdd(shot->v10, b, turret + 0x10);
                     func_PAL_L00_003D6C38(turret, shot->v10, 0);
@@ -301,10 +301,10 @@ void func_PAL_L14_003E3E84(u8 *self)
                             FastVecScale(hit.pos, turret + 0xD0, -1.5f);
                             hit.pos[3] = 5627.925f;
                             QueueMobyImpact(g_area_hit_targets[h], &hit);
-                            func_PAL_0032F0B8(g_area_hit_targets[h], 0x44, turret);
+                            StartAttachedEffect_pal(g_area_hit_targets[h], 0x44, turret);
                         }
                     }
-                    euler_to_matrix(mtx, D_L00_001B0190);
+                    euler_to_matrix(mtx, g_euler_rotation_params);
                     copy_matrix3x4(inv, mtx);
                     moby_transform_joint_to_world(turret, 0, origin);
                     if (((Hero *)g_hero_state)->h[0x24EC / 2] == 1) {
@@ -337,7 +337,7 @@ void func_PAL_L14_003E3E84(u8 *self)
                         FastVecScale(dir, dir, 38.0f);
                         FastVecAdd(from, origin, offs);
                         FastVecAdd(to, from, dir);
-                        p = ((u8 *)func_PAL_L00_003D6A38(turret, from, to, &hit));
+                        p = ((u8 *)weapon_fire_damage_ray_pal(turret, from, to, &hit));
                         if (p) {
                             saved[count] = *(int *)(p + 0x98);
                             list[count] = p;

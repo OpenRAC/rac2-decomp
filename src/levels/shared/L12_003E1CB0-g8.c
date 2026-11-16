@@ -6,12 +6,12 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed short s16;
 
-extern u16 D_L12_001B0B0C __attribute__((sda));
+extern u16 g_moby_init_state_value __attribute__((sda));
 
 /* Sets the object's byte at +0x95 to 9 and copies a level-wide halfword into its private data. */
 void moby_init_state_byte(u8 *moby) {
     *(u8 *)(moby + 0x95) = 9;
-    *(u16 *)(*(u32 *)(moby + 0x68) + 0x29E) = D_L12_001B0B0C;
+    *(u16 *)(*(u32 *)(moby + 0x68) + 0x29E) = g_moby_init_state_value;
 }
 
 extern float FastAddRotations(float, float);
@@ -33,10 +33,10 @@ extern void group_draw_entity_glows(u8 *);
    lets cc1 keep retail's order of its load and of the member load before it (with the array
    element cc1 loads the member first). The pair at D_L12_001B21D0 is copied as one 8-byte
    block (`ldl`/`ldr`/`sdl`/`sdr`). */
-extern unsigned short *D_L12_001FB960[];
-extern int D_L12_001B2EB8 __attribute__((sda));
-extern u8 *D_L12_001B2E9C[3] __attribute__((sda));
-extern int D_L12_001B29C8[3] __attribute__((sda));
+extern unsigned short *g_moby_l12_group_lists[];
+extern int g_moby_l12_group_count __attribute__((sda));
+extern u8 *g_moby_list_start[3] __attribute__((sda));
+extern int g_frame_l12_counter[3] __attribute__((sda));
 extern int D_L12_001B29C8_s __asm__("D_L12_001B29C8") __attribute__((sda));
 
 struct L12PairWord {
@@ -44,7 +44,7 @@ struct L12PairWord {
     int b;
 };
 
-extern struct L12PairWord D_L12_001B21D0 __attribute__((nosda));
+extern struct L12PairWord g_pulsing_group_color_pair __attribute__((nosda));
 
 /* The kind's private block at +0x68 of the object and of each entity. */
 struct L12Kind348 {
@@ -79,7 +79,7 @@ struct L12Kind348Object {
    and refreshes every live entity of kind 0x11EB, then registers func_L12_004281D8. */
 void pulsing_group_update(struct L12Kind348Object *moby) {
     struct L12Kind348 *vars = moby->obj;
-    struct L12PairWord colorPair = D_L12_001B21D0;
+    struct L12PairWord colorPair = g_pulsing_group_color_pair;
     float wave;
     unsigned short *groupEntry;
     struct L12Kind348Entity *entity;
@@ -91,17 +91,17 @@ void pulsing_group_update(struct L12Kind348Object *moby) {
     vars->f34C = wave * 0.5f + 0.5f;
     moby->f78 = FastTweenColor(colorPair.a, colorPair.b, vars->f34C);
     if (vars->f350 != D_L12_001B29C8_s) {
-        for (groupEntry = D_L12_001FB960[moby->group];
-             moby->group != 0xFF && moby->group <= D_L12_001B2EB8 && groupEntry != 0 &&
-             ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == D_L12_001FB960[moby->group]);
+        for (groupEntry = g_moby_l12_group_lists[moby->group];
+             moby->group != 0xFF && moby->group <= g_moby_l12_group_count && groupEntry != 0 &&
+             ((groupEntry != 0 && (short)groupEntry[-1] >= 0) || groupEntry == g_moby_l12_group_lists[moby->group]);
              groupEntry++) {
-            entity = (struct L12Kind348Entity *)(D_L12_001B2E9C[0] + ((*groupEntry & 0x7FFF) << 8));
+            entity = (struct L12Kind348Entity *)(g_moby_list_start[0] + ((*groupEntry & 0x7FFF) << 8));
             if (entity == 0)
                 break;
             if (entity->f31 != 0 && entity->type == 0x11EB && entity->state != 0xFE && entity->state != 0xFD) {
                 entityVars = entity->obj;
                 moby_transform_joint_point((char *)entity, 0, (char *)entityVars + 0x240);
-                entityVars->f350 = D_L12_001B29C8[0];
+                entityVars->f350 = g_frame_l12_counter[0];
             }
         }
         gfx_add_draw_callback_first((void *)group_draw_entity_glows, moby);
@@ -124,8 +124,8 @@ extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
    `lui $a1` / `lw $a1`. With `sda` both words come through $gp (380 bytes); as two separate
    words each load is one instruction and the second argument's takes the slot. */
 extern int D_L12_001B2EB8_a[3] __asm__("D_L12_001B2EB8") __attribute__((sda));
-extern char D_L12_001B21E0[8] __attribute__((sda));
-extern struct L12PairWord D_L12_001B21F0;
+extern char g_pulsing_group_glow_vector[8] __attribute__((sda));
+extern struct L12PairWord g_pulsing_group_tween_colors;
 
 /* Turns the entities of the object's group that are kind 0x11EB and in use (flag byte at +0x31
    set, state byte at +0x20 not 0xFE or 0xFD): the vector at D_L12_001B21E0 is turned by the
@@ -141,20 +141,20 @@ void group_draw_entity_glows(u8 *moby) {
 
     if (moby[0x21] == 0xFF)
         return;
-    q = D_L12_001FB960[moby[0x21]];
+    q = g_moby_l12_group_lists[moby[0x21]];
     if (q == 0)
         return;
     for (p = q; moby[0x21] != 0xFF && moby[0x21] <= D_L12_001B2EB8_a[0] && p != 0 &&
-           ((p != 0 && (s16)p[-1] >= 0) || p == D_L12_001FB960[moby[0x21]]);
+           ((p != 0 && (s16)p[-1] >= 0) || p == g_moby_l12_group_lists[moby[0x21]]);
          p++) {
-        e = D_L12_001B2E9C[0] + ((*p & 0x7FFF) << 8);
+        e = g_moby_list_start[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         if (e[0x31] != 0 && *(s16 *)(e + 0xAA) == 0x11EB /* moby class 4587 */ && e[0x20] != 0xFE && e[0x20] != 0xFD) {
             priv = *(u8 **)(e + 0x68);
-            FastVecScale(buf, D_L12_001B21E0, *(float *)(priv + 0x344));
+            FastVecScale(buf, g_pulsing_group_glow_vector, *(float *)(priv + 0x344));
             transform_vector(buf, buf, priv + 0x240);
-            r = FastTweenColor(D_L12_001B21F0.a, D_L12_001B21F0.b, *(float *)(priv + 0x34C));
+            r = FastTweenColor(g_pulsing_group_tween_colors.a, g_pulsing_group_tween_colors.b, *(float *)(priv + 0x34C));
             gfx_l00_draw_billboard_quad(buf, r, *(float *)(priv + 0x344) * 0.2f, 0.08f);
         }
     }
@@ -163,12 +163,12 @@ void group_draw_entity_glows(u8 *moby) {
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 extern void ref_L12_00429D60_00(void *, int, float, int, float, float, int, int, void *);
-extern float D_L12_001B2328 __attribute__((sda));
-extern float D_L12_001B232C __attribute__((sda));
-extern int D_L12_001B2320 __attribute__((sda));
-extern int D_L12_001B2324 __attribute__((sda));
-extern int D_L12_001B22E4 __attribute__((sda));
-extern int D_L12_001B22E8 __attribute__((sda));
+extern float g_flare_scale __attribute__((sda));
+extern float g_flare_far_scale_mult __attribute__((sda));
+extern int g_laser_quad_state_a __attribute__((sda));
+extern int g_laser_quad_state_b __attribute__((sda));
+extern int g_flare_texture_near __attribute__((sda));
+extern int g_flare_texture_far __attribute__((sda));
 
 /* Draws two glow effects at the object's position, each with a random brightness and its own scale and colour. */
 void part_spawn_two_flare_effects(char *object) {
@@ -177,15 +177,15 @@ void part_spawn_two_flare_effects(char *object) {
     float scale;
     float scale2;
     float random;
-    scale = D_L12_001B2328;
+    scale = g_flare_scale;
     scale *= *(float *)(object + 0x2C);
     flareAlpha = math_random_int_range(95, 111);
     random = math_random_angle();
-    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E4, scale, flareAlpha, random, 1.0f, D_L12_001B2320, 2, object);
-    scale2 = D_L12_001B2328;
+    ref_L12_00429D60_00(object + 0x10, g_flare_texture_near, scale, flareAlpha, random, 1.0f, g_laser_quad_state_a, 2, object);
+    scale2 = g_flare_scale;
     scale2 *= *(float *)(object + 0x2C);
-    scale2 *= D_L12_001B232C;
+    scale2 *= g_flare_far_scale_mult;
     flareAlpha2 = math_random_int_range(111, 127);
     random = math_random_angle();
-    ref_L12_00429D60_00(object + 0x10, D_L12_001B22E8, scale2, flareAlpha2, random, 1.0f, D_L12_001B2324, 2, object);
+    ref_L12_00429D60_00(object + 0x10, g_flare_texture_far, scale2, flareAlpha2, random, 1.0f, g_laser_quad_state_b, 2, object);
 }

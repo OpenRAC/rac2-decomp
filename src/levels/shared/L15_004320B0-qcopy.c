@@ -4,8 +4,8 @@ typedef unsigned char u8;
 extern char *CreateMoby(int);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
-extern short D_L15_001B36A8[] __attribute__((sda));
-extern short D_L15_001B36B8[] __attribute__((sda));
+extern short g_part_channel_timers[] __attribute__((sda));
+extern short g_part_channel_reload_values[] __attribute__((sda));
 
 /* Creates a timed effect moby of class 4522 between two points with a random timer. */
 char *part_spawn_timed_effect_between_points(char *origin, char *endPoint) {
@@ -27,8 +27,8 @@ char *part_spawn_timed_effect_between_points(char *origin, char *endPoint) {
         *(int *)(st + 0x50) = r;
         *(int *)(st + 0x54) = r * 2;
         for (i = 0; i < 3; i++) {
-            D_L15_001B36A8[i] = -1;
-            D_L15_001B36B8[i] = 10;
+            g_part_channel_timers[i] = -1;
+            g_part_channel_reload_values[i] = 10;
         }
     }
     return o;

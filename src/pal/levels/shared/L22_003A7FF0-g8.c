@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern int D_L22_001AF34C __attribute__((sda));
+extern int g_space_ship_tilt_value __attribute__((sda));
 extern char g_hero_position[];
 extern void moby_transform_joint_point(void *, int, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -45,14 +45,14 @@ void func_PAL_L22_003A7FF0(char *obj) {
         func_002A0F48(*(char **)(state + 0x440));
         FastVecScale(u, state + 0x200, -1.0f);
         mat_align_to_dir(*(char **)(state + 0x440) + 0xC0, u, 0);
-        *(short *)(state + 0x460) = ((s32)(D_L22_001AF34C) * 5 + 2) / 6;
+        *(short *)(state + 0x460) = ((s32)(g_space_ship_tilt_value) * 5 + 2) / 6;
         return;
     }
     {
         short v = *(short *)(state + 0x460);
 
         if (v != 0) {
-            if (v == ((s32)(D_L22_001AF34C) * 5 + 2) / 6)
+            if (v == ((s32)(g_space_ship_tilt_value) * 5 + 2) / 6)
                 *(int *)(state + 0x458) = 0;
             *v0 = 0;
             ((float *)v0)[0] = 1.0f;

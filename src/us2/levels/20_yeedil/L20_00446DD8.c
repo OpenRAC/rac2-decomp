@@ -6,16 +6,16 @@ extern void moby_set_state(int, int, int);
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
 extern float math_step_value_toward_target(char *, char *, float, float, float, float);
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern void *jtbl_002B5980[];
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
 extern float math_step_value_toward_target(char *, char *, float, float, float, float);
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
-void func_US2_L20_004483B8(char *arg0) {
+void switch_platform_quiet_update_us2(char *arg0) {
     static void * volatile tab[] = { &&c0, &&c1, &&c2, &&c3, &&c4 };
     char *state;
     unsigned char sel;
@@ -31,7 +31,7 @@ c0:
     moby_set_state(arg0, 1, -1);
     goto out;
 c1:
-    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + *(int *)0x1A79F8 * 16] & 0x80) == 0) {
+    if ((g_moby_group_flags[((unsigned char *)arg0)[0xB0] + *(int *)0x1A79F8 * 16] & 0x80) == 0) {
         goto end;
     }
     moby_set_state(arg0, 2, -1);

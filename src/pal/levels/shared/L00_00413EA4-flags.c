@@ -14,7 +14,7 @@ typedef struct {
 typedef struct { char pad0[0xc]; short light; short timer; } FlashState;
 typedef struct { float color[4]; float position[4]; } LightRecord;
 extern EffectResident g_hero_state;
-extern LightRecord D_L00_001C6F40[];
+extern LightRecord g_light_table[];
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -30,7 +30,7 @@ extern int FastDecTimer(void *);
    is updated. When the timer has run out, or the resident mode is 3, the light is
    released. Each branch keeps its own reciprocal, which is what lets 1.0f share the
    reciprocal's register. */
-void func_PAL_L00_00414F80(char *object, void *origin)
+void light_flash_update_pal(char *object, void *origin)
 {
     float position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -70,7 +70,7 @@ void func_PAL_L00_00414F80(char *object, void *origin)
         if (state->light == -1) {
             state->light = part_l00_alloc_effect_slot_2(position, 14.0f, 0.0f, a, b, c);
         } else {
-            LightRecord *light = &D_L00_001C6F40[state->light];
+            LightRecord *light = &g_light_table[state->light];
             qcopy(light->position, position);
             light->position[3] = 14.0f;
             light->color[0] = a;

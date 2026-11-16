@@ -16,7 +16,7 @@ extern int FastDecTimer(short *);
 /* Tallies the group's living members and their health, records the losses in
  * the four-slot history and stores their weighted sum at 0x14C. Built with -g:
  * the debug line layout gives retail's single nop before div.s. */
-void func_PAL_L11_00445BB8(u8 *object)
+void arena_update_loss_history_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     short *list;

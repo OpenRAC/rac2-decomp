@@ -6,7 +6,7 @@
 extern char *g_moby_l14_pool __attribute__((sda));
 extern char g_hero_position[];
 /* One unsplit `la`: it cannot fill the guard branch's delay slot, so the slot comes from the target. */
-extern char D_L14_001A8F20[] MACRO_ADDR;
+extern char g_identity_l14_matrix[] MACRO_ADDR;
 extern void moby_set_state(void *, int, int);
 extern int flag_set_first_pending(void *);
 extern float fast_vec_dist(void *, void *);
@@ -66,7 +66,7 @@ void swinging_glow_update(char *self) {
             *(float *)(self + 0xF8) += *(float *)(vars + 4);
         }
         if (*(char **)(vars + 0x10)) {
-            qcopy(link_pos, D_L14_001A8F20);
+            qcopy(link_pos, g_identity_l14_matrix);
             link_pos[2] -= 0.5f;
             moby_rotate_about_point(*(char **)(vars + 0x10), link_pos, *(float *)(vars + 4), 0.0f, 0.0f);
             euler_rotation_basis(*(char **)(vars + 0x10) + 0xC0, *(char **)(vars + 0x10) + 0xF0);

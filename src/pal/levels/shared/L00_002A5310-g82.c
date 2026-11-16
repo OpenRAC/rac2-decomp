@@ -30,40 +30,40 @@ typedef struct {
     float out_pitch;
     float out_yaw;
 } Control5518;
-extern Control5518 D_L00_0025BE10;
-extern Vector D_L00_0025DD90[7];
-extern Vector D_L00_0025DE00[7];
-extern Vector D_L00_0025DE70[7];
-extern int D_L00_001A7E40[7] SDATA(D_L00_001A7E40);
-extern float D_L00_001A7E10[12] SDATA(D_L00_001A7E10);
-extern void func_PAL_L00_002A5310(void);
+extern Control5518 g_hero_item_attach_records;
+extern Vector g_hero_effect_vectors_a[7];
+extern Vector g_hero_effect_vectors_b[7];
+extern Vector g_hero_effect_vectors_c[7];
+extern int g_hero_manipulator_ids[7] SDATA(D_L00_001A7E40);
+extern float g_hero_effect_fade_table[12] SDATA(D_L00_001A7E10);
+extern void hero_update_effect_delay_timer_pal(void);
 extern void moby_detach_manipulator(char *, char *);
 extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 
 /* Clamp control rotations and initialize, fade or retire the hero effects. */
-void func_PAL_L00_002A53A8(void)
+void ClampHeroControlAndUpdateEffects_pal(void)
 {
-    D_L00_0025BE10.out_yaw = D_L00_0025BE10.yaw * 0.25f;
-    if (D_L00_0025BE10.out_yaw > 0.148353f)
-        D_L00_0025BE10.out_yaw = 0.148353f;
-    else if (D_L00_0025BE10.out_yaw < -0.148353f)
-        D_L00_0025BE10.out_yaw = -0.148353f;
-    D_L00_0025BE10.out_pitch = D_L00_0025BE10.pitch * 0.35714287f;
-    if (D_L00_0025BE10.out_pitch > 0.296706f)
-        D_L00_0025BE10.out_pitch = 0.296706f;
-    if (D_L00_0025BE10.out_pitch < -0.17453295f)
-        D_L00_0025BE10.out_pitch = -0.17453295f;
+    g_hero_item_attach_records.out_yaw = g_hero_item_attach_records.yaw * 0.25f;
+    if (g_hero_item_attach_records.out_yaw > 0.148353f)
+        g_hero_item_attach_records.out_yaw = 0.148353f;
+    else if (g_hero_item_attach_records.out_yaw < -0.148353f)
+        g_hero_item_attach_records.out_yaw = -0.148353f;
+    g_hero_item_attach_records.out_pitch = g_hero_item_attach_records.pitch * 0.35714287f;
+    if (g_hero_item_attach_records.out_pitch > 0.296706f)
+        g_hero_item_attach_records.out_pitch = 0.296706f;
+    if (g_hero_item_attach_records.out_pitch < -0.17453295f)
+        g_hero_item_attach_records.out_pitch = -0.17453295f;
     if ((unsigned int)(*(unsigned char *)((char *)g_hero_state.moby + 0x43) - 1) < 2) {
-        if (D_L00_0025BE10.out_yaw > 0.03490659f)
-            D_L00_0025BE10.out_yaw = 0.03490659f;
-        if (D_L00_0025BE10.out_yaw < -0.03490659f)
-            D_L00_0025BE10.out_yaw = -0.03490659f;
-        if (D_L00_0025BE10.out_pitch > 0.122173056f)
-            D_L00_0025BE10.out_pitch = 0.122173056f;
-        if (D_L00_0025BE10.out_pitch < -0.122173056f)
-            D_L00_0025BE10.out_pitch = -0.122173056f;
+        if (g_hero_item_attach_records.out_yaw > 0.03490659f)
+            g_hero_item_attach_records.out_yaw = 0.03490659f;
+        if (g_hero_item_attach_records.out_yaw < -0.03490659f)
+            g_hero_item_attach_records.out_yaw = -0.03490659f;
+        if (g_hero_item_attach_records.out_pitch > 0.122173056f)
+            g_hero_item_attach_records.out_pitch = 0.122173056f;
+        if (g_hero_item_attach_records.out_pitch < -0.122173056f)
+            g_hero_item_attach_records.out_pitch = -0.122173056f;
     }
-    func_PAL_L00_002A5310();
+    hero_update_effect_delay_timer_pal();
     if (g_hero_state.counter == 0)
         return;
     g_hero_state.counter += 1;
@@ -81,18 +81,18 @@ void func_PAL_L00_002A53A8(void)
         int i;
         for (i = 0; i < 7; i++) {
             if (!g_hero_state.effects[i].active) {
-                AttachManipulator(g_hero_state.moby, D_L00_001A7E40[i],
+                AttachManipulator(g_hero_state.moby, g_hero_manipulator_ids[i],
                              (unsigned char *)&g_hero_state.effects[i]);
                 g_hero_state.effects[i].enabled = 1;
-                qcopy(&g_hero_state.effects[i].a, D_L00_0025DD90 + i);
-                qcopy(&g_hero_state.effects[i].b, D_L00_0025DE00 + i);
-                qcopy(&g_hero_state.effects[i].c, D_L00_0025DE70 + i);
+                qcopy(&g_hero_state.effects[i].a, g_hero_effect_vectors_a + i);
+                qcopy(&g_hero_state.effects[i].b, g_hero_effect_vectors_b + i);
+                qcopy(&g_hero_state.effects[i].c, g_hero_effect_vectors_c + i);
             }
         }
     }
     {
         int i;
         for (i = 0; i < 7; i++)
-            g_hero_state.effects[i].fade = D_L00_001A7E10[g_hero_state.counter];
+            g_hero_state.effects[i].fade = g_hero_effect_fade_table[g_hero_state.counter];
     }
 }

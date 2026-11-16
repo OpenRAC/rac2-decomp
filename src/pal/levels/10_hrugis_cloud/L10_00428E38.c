@@ -40,7 +40,7 @@ extern s32 moby_is_in_use(Moby *moby);
 extern void moby_release_from_group(Moby *moby);
 extern void moby_reset_action_state(Moby *moby);
 extern s32 snd_play_from_class_bank(s32 index, s32 value, Moby *moby, s32 kind);
-extern s32 D_L10_001B354C __attribute__((sda));
+extern s32 g_collision_effect_timer __attribute__((sda));
 
 /* Hit callback of the Hrugis controller: plays the moby's colour flash, takes the damage
    of the hit it took off its health (class 0xCBE only from a class 0xF93 moby) with a
@@ -74,9 +74,9 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
         *health -= hit->damage;
         if (moby->oClass != 0xB73 && moby->oClass != 0xF8E)
             snd_play_from_class_bank(0xD, 0, moby, 0xFBF);
-        if (math_fast_float_d(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E) {
+        if (math_fast_float_d(&g_collision_effect_timer) != 0 && moby->oClass == 0xF8E) {
             snd_play_from_class_bank(3, 0, moby, 0xF8E);
-            D_L10_001B354C = ((s32)(FloatToInt(math_random_float_range(10.0f, 20.0f))) * 5 + 2) / 6;
+            g_collision_effect_timer = ((s32)(FloatToInt(math_random_float_range(10.0f, 20.0f))) * 5 + 2) / 6;
         }
         if (*health <= 0.0f) {
             *health = 0.0f;

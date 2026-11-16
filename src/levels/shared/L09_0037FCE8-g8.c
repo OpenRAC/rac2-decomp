@@ -49,22 +49,22 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float IntToFloat(int);
 extern void part_draw_glint_effect(int, void *, void *, void *, int);
-extern int D_0018C0B4 __attribute__((nosda));
+extern int g_game_mode __attribute__((nosda));
 extern int g_current_map_index MACRO_ADDR;
-extern char D_L09_001BDF00[];
-extern int D_L09_001A8A48 MACRO_ADDR;
-extern char D_L09_001B9C30[];
-extern float D_L09_001B9A00[];
-extern float D_L09_001B3120 MACRO_ADDR;
-extern char D_L09_001B98C0[];
-extern Pos_30BCD8 D_L09_002336A0[];
-extern int D_L09_002339A0[];
-extern UV_30BCD8 D_L09_00233EA0[];
-extern Pos_30BCD8 D_L09_00233AA0[];
-extern int D_L09_00233DA0[];
-extern UV_30BCD8 D_L09_002340A0[];
-extern float D_L09_001AEC38[2] __attribute__((sda));
-extern UV_30BCD8 D_L09_001B3110[] MACRO_ADDR;
+extern char g_fog_state[];
+extern int g_water_sheet_disable MACRO_ADDR;
+extern char g_camera_matrix[];
+extern float g_camera_l09_position[];
+extern float g_water_sheet_z MACRO_ADDR;
+extern char g_hero_l09_aux_state[];
+extern Pos_30BCD8 g_water_sheet_positions[];
+extern int g_water_sheet_colors[];
+extern UV_30BCD8 g_water_sheet_uvs[];
+extern Pos_30BCD8 g_water_sheet_fade_positions[];
+extern int g_water_sheet_fade_colors[];
+extern UV_30BCD8 g_water_sheet_fade_uvs[];
+extern float g_water_sheet_uv_scales[2] __attribute__((sda));
+extern UV_30BCD8 g_water_layer_uv_offsets[] MACRO_ADDR;
 
 /* Draws the fading edge strip and two scrolling water grid layers. */
 void water_sheet_draw(char *moby) {
@@ -77,8 +77,8 @@ void water_sheet_draw(char *moby) {
     Vec4f d1;
     Quad_30BCD8 q;
     Data_30BCD8 *d = (Data_30BCD8 *)*(void **)(moby + 0x68);
-    float s228 = ((Fog_30BCD8 *)D_L09_001BDF00)->f228;
-    float s22C = ((Fog_30BCD8 *)D_L09_001BDF00)->f22C;
+    float s228 = ((Fog_30BCD8 *)g_fog_state)->f228;
+    float s22C = ((Fog_30BCD8 *)g_fog_state)->f22C;
     int i;
     int layer;
     int colA;
@@ -88,9 +88,9 @@ void water_sheet_draw(char *moby) {
     float x;
     float y;
 
-    if (D_0018C0B4 != 0x1C && D_L09_001A8A48 == 0) {
-        ((Fog_30BCD8 *)D_L09_001BDF00)->f228 = 255.0f;
-        ((Fog_30BCD8 *)D_L09_001BDF00)->f22C = 249.9f;
+    if (g_game_mode != 0x1C && g_water_sheet_disable == 0) {
+        ((Fog_30BCD8 *)g_fog_state)->f228 = 255.0f;
+        ((Fog_30BCD8 *)g_fog_state)->f22C = 249.9f;
     }
     VU1_addGSregister(0x42, 0x3200000044LL);
     VU1_addGSregister(8, 0);
@@ -103,12 +103,12 @@ void water_sheet_draw(char *moby) {
     a.y = 0.0f;
     a.z = 0.0f;
     a.w = 1.0f;
-    matrix_mul_vec3(&a, &a, D_L09_001B9C30);
+    matrix_mul_vec3(&a, &a, g_camera_matrix);
     b.x = 0.0f;
     b.y = 1.0f;
     b.z = 0.0f;
     b.w = 1.0f;
-    matrix_mul_vec3(&b, &b, D_L09_001B9C30);
+    matrix_mul_vec3(&b, &b, g_camera_matrix);
     if (g_current_map_index != 13) a.z = 0.0f;
     vec_scale_to_length(&a, &a, 1.0f);
     if (g_current_map_index != 13) b.z = 0.0f;
@@ -125,8 +125,8 @@ void water_sheet_draw(char *moby) {
     FastVecAdd(&c[3], &v0, &v1);
     for (i = 0; i < 4; i++) {
         Vec4f *p = &c[i];
-        FastVecAdd(p, p, D_L09_001B9A00);
-        p->z = D_L09_001B3120;
+        FastVecAdd(p, p, g_camera_l09_position);
+        p->z = g_water_sheet_z;
     }
     FastVecSub(&d0, &c[1], &c[0]);
     FastVecSub(&d1, &c[3], &c[2]);
@@ -138,23 +138,23 @@ void water_sheet_draw(char *moby) {
         blend = blend / t;
         col = FastTweenColor(d->f0, d->f4, blend);
         FastVecScale(&v0, &d0, f);
-        D_L09_002339A0[i] = col;
-        D_L09_00233EA0[i].u = 0.0f;
-        D_L09_00233EA0[i].v = 0.0f;
+        g_water_sheet_colors[i] = col;
+        g_water_sheet_uvs[i].u = 0.0f;
+        g_water_sheet_uvs[i].v = 0.0f;
         FastVecAdd(&v0, &v0, &c[0]);
-        D_L09_002336A0[i].x = v0.x;
-        D_L09_002336A0[i].y = v0.y;
-        D_L09_002336A0[i].z = v0.z;
+        g_water_sheet_positions[i].x = v0.x;
+        g_water_sheet_positions[i].y = v0.y;
+        g_water_sheet_positions[i].z = v0.z;
         FastVecScale(&v0, &d1, f);
-        D_L09_002339A0[i + 1] = col;
-        D_L09_00233EA0[i + 1].u = 0.0f;
-        D_L09_00233EA0[i + 1].v = 0.0f;
+        g_water_sheet_colors[i + 1] = col;
+        g_water_sheet_uvs[i + 1].u = 0.0f;
+        g_water_sheet_uvs[i + 1].v = 0.0f;
         FastVecAdd(&v0, &v0, &c[2]);
-        D_L09_002336A0[i + 1].x = v0.x;
-        D_L09_002336A0[i + 1].y = v0.y;
-        D_L09_002336A0[i + 1].z = v0.z;
+        g_water_sheet_positions[i + 1].x = v0.x;
+        g_water_sheet_positions[i + 1].y = v0.y;
+        g_water_sheet_positions[i + 1].z = v0.z;
     }
-    part_draw_glint_effect(0xC, D_L09_002336A0, D_L09_002339A0, D_L09_00233EA0, 1);
+    part_draw_glint_effect(0xC, g_water_sheet_positions, g_water_sheet_colors, g_water_sheet_uvs, 1);
     q.z78 = GetEffectTextureDescriptor(0x16);
     q.q80 = 0xFF9000000260LL;
     q.q88 = 0x8000000044LL;
@@ -177,52 +177,52 @@ void water_sheet_draw(char *moby) {
                 for (x = d->f18 * -2.0f; x < d->f18 * 2.0f; x += d->f18) {
                     float z;
 
-                    D_L09_002340A0[n].u = x / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].u;
-                    D_L09_002340A0[n].v = y / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].v;
-                    D_L09_00233AA0[n].x = x + ((Cam_30BCD8 *)D_L09_001B98C0)->x + 1.0f;
-                    D_L09_00233AA0[n].y = y + ((Cam_30BCD8 *)D_L09_001B98C0)->y + 1.0f;
-                    z = D_L09_001B3120;
+                    g_water_sheet_fade_uvs[n].u = x / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].u;
+                    g_water_sheet_fade_uvs[n].v = y / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].v;
+                    g_water_sheet_fade_positions[n].x = x + ((Cam_30BCD8 *)g_hero_l09_aux_state)->x + 1.0f;
+                    g_water_sheet_fade_positions[n].y = y + ((Cam_30BCD8 *)g_hero_l09_aux_state)->y + 1.0f;
+                    z = g_water_sheet_z;
                     z += (float)(layer + 1) * 0.05f;
-                    D_L09_00233AA0[n].z = z;
+                    g_water_sheet_fade_positions[n].z = z;
                     i = n + 1;
-                    D_L09_002340A0[i].u = x / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].u;
-                    D_L09_002340A0[i].v = (y + d->f18) / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].v;
-                    D_L09_00233AA0[i].x = x + ((Cam_30BCD8 *)D_L09_001B98C0)->x + 1.0f;
-                    D_L09_00233AA0[i].y = y + d->f18 + ((Cam_30BCD8 *)D_L09_001B98C0)->y + 1.0f;
-                    D_L09_00233AA0[i].z = z;
+                    g_water_sheet_fade_uvs[i].u = x / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].u;
+                    g_water_sheet_fade_uvs[i].v = (y + d->f18) / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].v;
+                    g_water_sheet_fade_positions[i].x = x + ((Cam_30BCD8 *)g_hero_l09_aux_state)->x + 1.0f;
+                    g_water_sheet_fade_positions[i].y = y + d->f18 + ((Cam_30BCD8 *)g_hero_l09_aux_state)->y + 1.0f;
+                    g_water_sheet_fade_positions[i].z = z;
                     i = n + 2;
-                    D_L09_002340A0[i].u = (x + d->f18) / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].u;
-                    D_L09_002340A0[i].v = y / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].v;
-                    D_L09_00233AA0[i].x = x + d->f18 + ((Cam_30BCD8 *)D_L09_001B98C0)->x + 1.0f;
-                    D_L09_00233AA0[i].y = y + ((Cam_30BCD8 *)D_L09_001B98C0)->y + 1.0f;
-                    D_L09_00233AA0[i].z = z;
+                    g_water_sheet_fade_uvs[i].u = (x + d->f18) / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].u;
+                    g_water_sheet_fade_uvs[i].v = y / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].v;
+                    g_water_sheet_fade_positions[i].x = x + d->f18 + ((Cam_30BCD8 *)g_hero_l09_aux_state)->x + 1.0f;
+                    g_water_sheet_fade_positions[i].y = y + ((Cam_30BCD8 *)g_hero_l09_aux_state)->y + 1.0f;
+                    g_water_sheet_fade_positions[i].z = z;
                     i = n + 3;
-                    D_L09_002340A0[i].u = (x + d->f18) / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].u;
-                    D_L09_002340A0[i].v = (y + d->f18) / (d->f18 * 2.0f) * D_L09_001AEC38[layer] + D_L09_001B3110[layer].v;
-                    D_L09_00233AA0[i].x = x + d->f18 + ((Cam_30BCD8 *)D_L09_001B98C0)->x + 1.0f;
-                    D_L09_00233AA0[i].y = y + d->f18 + ((Cam_30BCD8 *)D_L09_001B98C0)->y + 1.0f;
-                    D_L09_00233AA0[i].z = z;
+                    g_water_sheet_fade_uvs[i].u = (x + d->f18) / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].u;
+                    g_water_sheet_fade_uvs[i].v = (y + d->f18) / (d->f18 * 2.0f) * g_water_sheet_uv_scales[layer] + g_water_layer_uv_offsets[layer].v;
+                    g_water_sheet_fade_positions[i].x = x + d->f18 + ((Cam_30BCD8 *)g_hero_l09_aux_state)->x + 1.0f;
+                    g_water_sheet_fade_positions[i].y = y + d->f18 + ((Cam_30BCD8 *)g_hero_l09_aux_state)->y + 1.0f;
+                    g_water_sheet_fade_positions[i].z = z;
                     for (i = n; i < n + 4; i++) {
-                        v0.x = D_L09_00233AA0[i].x - ((Cam_30BCD8 *)D_L09_001B98C0)->x;
-                        v0.y = D_L09_00233AA0[i].y - ((Cam_30BCD8 *)D_L09_001B98C0)->y;
-                        v0.z = D_L09_00233AA0[i].z - ((Cam_30BCD8 *)D_L09_001B98C0)->z;
+                        v0.x = g_water_sheet_fade_positions[i].x - ((Cam_30BCD8 *)g_hero_l09_aux_state)->x;
+                        v0.y = g_water_sheet_fade_positions[i].y - ((Cam_30BCD8 *)g_hero_l09_aux_state)->y;
+                        v0.z = g_water_sheet_fade_positions[i].z - ((Cam_30BCD8 *)g_hero_l09_aux_state)->z;
                         v0.w = 1.0f;
                         t = vec_length_xy(&v0) / (d->f18 * 2.0f);
                         if (t > 1.0f) {
                             t = 1.0f;
                         }
-                        D_L09_00233DA0[i] = FastTweenColor(colA, colB, t);
+                        g_water_sheet_fade_colors[i] = FastTweenColor(colA, colB, t);
                     }
                     n += 4;
                     if (n >= 0x40) {
                         math_trap_always();
                     }
                 }
-                part_draw_glint_effect(n, D_L09_00233AA0, D_L09_00233DA0, D_L09_002340A0, 1);
+                part_draw_glint_effect(n, g_water_sheet_fade_positions, g_water_sheet_fade_colors, g_water_sheet_fade_uvs, 1);
             }
         }
     }
-    ((Fog_30BCD8 *)D_L09_001BDF00)->f228 = s228;
-    ((Fog_30BCD8 *)D_L09_001BDF00)->f22C = s22C;
+    ((Fog_30BCD8 *)g_fog_state)->f228 = s228;
+    ((Fog_30BCD8 *)g_fog_state)->f22C = s22C;
     VU1_addGSregister(0x47, 0x5360B);
 }

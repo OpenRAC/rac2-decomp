@@ -15,8 +15,8 @@ extern ShotTuning g_weapon_l00_table[];
 
 extern unsigned char g_item_slot_to_record[];
 
-extern float D_L00_001B08F8 __attribute__((sda));
-extern float D_L00_0025C64C[];
+extern float g_hk22_speed_scale __attribute__((sda));
+extern float g_weapon_effect_scale[];
 extern void ReleaseDeadOrExpiredSlots(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int func_US2_L00_002C4560(int, int);
@@ -49,8 +49,8 @@ void func_US2_L00_003F51EC(unsigned char *object) {
     ReleaseDeadOrExpiredSlots(((Hero *)g_hero_state)->ptr[2212]);
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 2, 0);
-    *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * D_L00_001B08F8;
-    D_L00_0025C64C[0] = 0.1f;
+    *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * g_hk22_speed_scale;
+    g_weapon_effect_scale[0] = 0.1f;
     if (((Hero *)g_hero_state)->i[2213] == 1)
         func_US2_L00_002C4560(0x1D, 1);
     if (((Hero *)g_hero_state)->i[2213] == 0x1D) {

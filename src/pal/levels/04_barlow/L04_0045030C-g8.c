@@ -7,17 +7,17 @@ extern void FastVecScale(void *, void *, float);
 extern char *part_spawn_object_following_effect(void *, void *, unsigned int, int, int, int, int, int, float, float);
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, unsigned char, void *);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, unsigned char, void *);
 extern void func_PAL_L03_002EE460(void *, void *, void *, void *, void *, int, unsigned char);
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_mark_spawned(void *);
-extern float D_L04_001B1830[] SDATA(D_L04_001B1830);
-extern float D_L04_001B1828[] SDATA(D_L04_001B1828);
-extern float D_L04_001B1820[] SDATA(D_L04_001B1820);
-extern int D_L04_001B1850 SDATA(D_L04_001B1850);
+extern float g_barlow_emitter_pieces_a[] SDATA(D_L04_001B1830);
+extern float g_barlow_emitter_pieces_b[] SDATA(D_L04_001B1828);
+extern float g_barlow_emitter_pieces_c[] SDATA(D_L04_001B1820);
+extern int g_barlow_emitter_pieces_param SDATA(D_L04_001B1850);
 
-void func_PAL_L04_00451600(unsigned char *object)
+void barlow_effect_emitter_update_pal(unsigned char *object)
 {
     BarlowEffectVector velocity, lower, upper, min_offset, max_offset;
     char *state = *(char **)(object + 0x68);
@@ -35,7 +35,7 @@ void func_PAL_L04_00451600(unsigned char *object)
         object[0xa8] = 255;
         break;
     case 2:
-        func_PAL_L00_0032C328(object, D_L04_001B1830, D_L04_001B1828, D_L04_001B1820, 65535, 0, D_L04_001B1850, 8, 65535, 255, 0);
+        part_explode_object_into_pieces_pal(object, g_barlow_emitter_pieces_a, g_barlow_emitter_pieces_b, g_barlow_emitter_pieces_c, 65535, 0, g_barlow_emitter_pieces_param, 8, 65535, 255, 0);
         min_offset.q = 0;
         max_offset.q = 0;
         lower.q = 0;
@@ -48,7 +48,7 @@ void func_PAL_L04_00451600(unsigned char *object)
         max_offset.f[2] = 4.0f;
         func_PAL_L03_002EE460(object, &lower, &upper, &min_offset, &max_offset, 45, 0);
         vec_local_offset_to_world(object, &velocity, -21.5f, 0.0f, 0.0f);
-        func_PAL_L00_003FB330(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
+        SpawnExplosion_pal(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
                      *(float *)(object + 0x2c) * 5.0f, 20.0f, 1, 1, 0, 0);
         moby_mark_spawned(object);
         break;
@@ -60,9 +60,9 @@ typedef int Quad __attribute__((mode(TI)));
 #define H(p,o) (*(short *)((u8 *)(p)+(o)))
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 extern u8 *g_moby_l04_pool __attribute__((sda));
-extern float D_L04_001B1870 __attribute__((sda));
-extern u8 D_L04_001B1880[8] __attribute__((sda));
-extern u8 D_L04_001B9680[];
+extern float g_barlow_enemy_move_time __attribute__((sda));
+extern u8 g_barlow_enemy_data_block[8] __attribute__((sda));
+extern u8 g_tether_zero_vec[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int FloatToInt(float);
 extern void MoveCtl_Init(void *);
@@ -200,8 +200,8 @@ void func_PAL_L04_00452A80(u8 *obj)
         MoveCtl_Init(&p->t140);
         p->t140.f0C = 2.5f;
         p->t140.f08 = 2.0f;
-        p->t140.i00 = FloatToInt(D_L04_001B1870 * 1024.0f);
-        p->t140.f04 = D_L04_001B1870;
+        p->t140.i00 = FloatToInt(g_barlow_enemy_move_time * 1024.0f);
+        p->t140.f04 = g_barlow_enemy_move_time;
         p->t140.f24 = p->f30C * (0.020000001f);
         if (p->v2E0.f[3] != 12439.4f) {
             p->v2E0.q = *(Quad *)(obj + 0x10);
@@ -216,13 +216,13 @@ void func_PAL_L04_00452A80(u8 *obj)
         p->f220 = p->f30;
         p->b28 = 0;
         p->i318 = 0;
-        p->p200 = D_L04_001B1880;
+        p->p200 = g_barlow_enemy_data_block;
         p->f330 = (float)p->b34;
         moby_set_state(obj, 1, 0);
         if (obj[0x43])
             func_PAL_002A7E68(obj, 0, 0, 0);
     }
-    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }

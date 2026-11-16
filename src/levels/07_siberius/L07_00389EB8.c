@@ -34,7 +34,7 @@ extern unsigned short *g_moby_l07_group_lists[];
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit. */
 extern unsigned char *g_moby_l07_array[] __attribute__((sda));
-extern int D_L07_001B22F8[] __attribute__((sda));
+extern int g_entity_group_count[] __attribute__((sda));
 
 /* Sets the +0x244 word of every entity of the object's group state to 1. */
 /* Raises an alert flag on every object in this object's group. */
@@ -46,7 +46,7 @@ void entity_set_group_alert_a(unsigned char *moby)
     if (moby[0x21] == 0xFF)
         return;
     member_list = g_moby_l07_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && member_list != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_entity_group_count[0] && member_list != 0 &&
            ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == g_moby_l07_group_lists[moby[0x21]])) {
         member = g_moby_l07_array[0] + ((*member_list & 0x7FFF) << 8);
         if (member == 0)
@@ -70,7 +70,7 @@ unsigned char *entity_find_last_idle_member(int group, int *count)
         return 0;
     result = 0;
     for (member_list = g_moby_l07_group_lists[group];
-         (unsigned char)group != 0xFF && group <= D_L07_001B22F8[0] && member_list != 0 &&
+         (unsigned char)group != 0xFF && group <= g_entity_group_count[0] && member_list != 0 &&
          ((short)member_list[-1] >= 0 || member_list == g_moby_l07_group_lists[group]);
          member_list++) {
         member = g_moby_l07_array[0] + ((*member_list & 0x7FFF) << 8);
@@ -123,7 +123,7 @@ void entity_set_group_alert_b(unsigned char *moby)
     if (moby[0x21] == 0xFF)
         return;
     member_list = g_moby_l07_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && member_list != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_entity_group_count[0] && member_list != 0 &&
            ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == g_moby_l07_group_lists[moby[0x21]])) {
         member = g_moby_l07_array[0] + ((*member_list & 0x7FFF) << 8);
         if (member == 0)
@@ -146,7 +146,7 @@ extern void FastVecScale(void *,void *,float);
 typedef int Quad128 __attribute__((mode(TI)));
 extern void matrix_mul_vec3(Quad128 *, Quad128 *, char *);
 typedef struct { char pad[24]; char *object; } Collision;
-extern Collision D_L07_001BF640;
+extern Collision g_collision_l07_result;
 
 /* With no platform attached, probe below the object and attach to the object hit when it is
    a platform (flag 2), recording the relative offset; otherwise carry the object along with
@@ -166,9 +166,9 @@ void RideMobyBelow(char *moby)
         qcopy(rayEnd, pos);
         rayStart[2] += 2.0f;
         rayEnd[2] -= 3.0f;
-        if (CollLine(rayStart, rayEnd, 0, moby, 0) && D_L07_001BF640.object != 0) {
-            if (*(int *)(moby_get_private_value_2(D_L07_001BF640.object) + 0x3C) & 2) {
-                *(char **)(state + 0x338) = D_L07_001BF640.object;
+        if (CollLine(rayStart, rayEnd, 0, moby, 0) && g_collision_l07_result.object != 0) {
+            if (*(int *)(moby_get_private_value_2(g_collision_l07_result.object) + 0x3C) & 2) {
+                *(char **)(state + 0x338) = g_collision_l07_result.object;
                 FastVecSub(localOffset, pos, *(char **)(state + 0x338) + 0x10);
                 vec_transform_by_object_or_given(*(char **)(state + 0x338), localOffset, localOffset, 0);
                 *(float *)(state + 0x33C) = localOffset[2] - 1.0f;
@@ -271,7 +271,7 @@ extern int math_fast_float_d(char *);
 
 extern void value_set_and_smooth(char *, char *, int, int, float);
 
-extern int D_L07_001C9780;
+extern int g_cutscene_l07_active_flag;
 
 /* Ticks two countdown timers, advances the frame counter and carries the object on its
    platform. */
@@ -285,7 +285,7 @@ void entity_tick_timers_ride_platform(char *moby)
     counter = *(unsigned short *)(moby + 0x96);
     if (counter <= 0xFFFE)
         *(unsigned short *)(moby + 0x96) = counter + 1;
-    if (D_L07_001C9780 != 0)
+    if (g_cutscene_l07_active_flag != 0)
         entity_ride_platform_snap_height(moby);
     value_set_and_smooth(moby, vars + 0x230, 5, 1, 2.5f);
 }
@@ -300,7 +300,7 @@ void entity_set_group_alert_c(unsigned char *moby)
     if (moby[0x21] == 0xFF)
         return;
     member_list = g_moby_l07_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8[0] && member_list != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_entity_group_count[0] && member_list != 0 &&
            ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == g_moby_l07_group_lists[moby[0x21]])) {
         member = g_moby_l07_array[0] + ((*member_list & 0x7FFF) << 8);
         if (member == 0)

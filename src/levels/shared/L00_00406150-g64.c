@@ -14,51 +14,51 @@ typedef struct { char pad[0x18]; char *hit; int count; Vec point; Vec normal; ch
 typedef struct { unsigned char pad[0x2290]; char *object; } PlayerView;
 typedef struct { int c[5]; } Colors;
 
-extern Colors D_L00_001B0EC8 NOT_SDA;
+extern Colors g_sheepinator_beam_colors NOT_SDA;
 
 extern PlayerView g_hero_state;
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 extern Collision g_collision_result;
-extern float D_L00_001A8F20;
-extern unsigned char *D_L00_001FEAC4[];
-extern signed char D_L00_001B0EBF;
+extern float g_default_vector;
+extern unsigned char *g_lightning_particle_bytes[];
+extern signed char g_sheepinator_beam_byte_param;
 
-extern float D_L00_001B0E38 __attribute__((sda));
-extern float D_L00_001B0E4C __attribute__((sda));
-extern float D_L00_001B0E54 __attribute__((sda));
-extern float D_L00_001B0E58 __attribute__((sda));
-extern float D_L00_001B0E60 __attribute__((sda));
-extern float D_L00_001B0E64 __attribute__((sda));
-extern float D_L00_001B0E68 __attribute__((sda));
-extern float D_L00_001B0E88 __attribute__((sda));
-extern float D_L00_001B0E8C __attribute__((sda));
-extern float D_L00_001B0E90 __attribute__((sda));
-extern float D_L00_001B0E98 __attribute__((sda));
-extern float D_L00_001B0E9C __attribute__((sda));
-extern int D_L00_001B0E50 __attribute__((sda));
-extern int D_L00_001B0EA0 __attribute__((sda));
-extern int D_L00_001B0EA8 __attribute__((sda));
-extern int D_L00_001B0EAC __attribute__((sda));
-extern float D_L00_001B0EA4 __attribute__((sda));
-extern float D_L00_001B0EB4 __attribute__((sda));
-extern float D_L00_001B0EB8 __attribute__((sda));
-extern float D_L00_001B0EC4 __attribute__((sda));
+extern float g_sheepinator_beam_range __attribute__((sda));
+extern float g_sheepinator_beam_step_scale __attribute__((sda));
+extern float g_sheepinator_beam_twist_rate __attribute__((sda));
+extern float g_sheepinator_beam_twist_step __attribute__((sda));
+extern float g_sheepinator_beam_sample_angle __attribute__((sda));
+extern float g_sheepinator_beam_side_start __attribute__((sda));
+extern float g_sheepinator_beam_side_end __attribute__((sda));
+extern float g_sheepinator_beam_radius_start __attribute__((sda));
+extern float g_sheepinator_beam_radius_end __attribute__((sda));
+extern float g_sheepinator_beam_segment_length __attribute__((sda));
+extern float g_sheepinator_beam_jitter __attribute__((sda));
+extern float g_sheepinator_beam_offset_length __attribute__((sda));
+extern int g_sheepinator_beam_min_segments __attribute__((sda));
+extern int g_sheepinator_beam_particle_init __attribute__((sda));
+extern int g_sheepinator_beam_particle_life __attribute__((sda));
+extern int g_sheepinator_beam_fade_threshold __attribute__((sda));
+extern float g_sheepinator_beam_particle_speed __attribute__((sda));
+extern float g_sheepinator_beam_size_end __attribute__((sda));
+extern float g_sheepinator_beam_size_start __attribute__((sda));
+extern float g_sheepinator_beam_fade_step __attribute__((sda));
 
-extern float D_L00_001B2C80;
-extern float D_L00_001B2C84;
-extern Vec D_L00_001B2C90[3];
-extern Vec D_L00_001B2CC0[3];
-extern int D_L00_001B2CF0[3];
-extern float D_L00_001B2D00[3];
-extern float D_L00_001B2D10[3];
-extern float D_L00_001B2D20[3];
-extern int D_L00_001B2D30[3];
-extern int D_L00_001B2D3C;
+extern float g_sheepinator_segment_length;
+extern float g_sheepinator_spin_angle;
+extern Vec g_sheepinator_spark_positions[3];
+extern Vec g_sheepinator_spark_directions[3];
+extern int g_sheepinator_spark_timers[3];
+extern float g_sheepinator_spark_alphas[3];
+extern float g_sheepinator_spark_ages[3];
+extern float g_sheepinator_spark_sizes[3];
+extern int g_sheepinator_spark_active[3];
+extern int g_sheepinator_spark_cooldown;
 
-extern Vec D_L00_00254A60[];
-extern Vec D_L00_00254B20[];
-extern Vec D_L00_00254BE0[];
-extern Vec D_L00_00254CA0[][20];
+extern Vec g_sheepinator_beam_points[];
+extern Vec g_sheepinator_ribbon_inner_points[];
+extern Vec g_sheepinator_ribbon_outer_points[];
+extern Vec g_sheepinator_ribbon_surface_a[][20];
 
 extern void sheepinator_reset_beam(char *);
 extern void DrawScrollingRingMesh();
@@ -105,18 +105,18 @@ void sheepinator_update_beam_shape(char *object)
     obj = *(char **)(object + 0x68);
     *(int *)ring_offset = 0;
     sheepinator_reset_beam(object);
-    D_L00_001B2C84 = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E54);
-    FastVecScale(sag, object + 0xD0, -D_L00_001B2C80);
+    g_sheepinator_spin_angle = math_wrap_angle_to_pi(g_sheepinator_spin_angle + g_sheepinator_beam_twist_rate);
+    FastVecScale(sag, object + 0xD0, -g_sheepinator_segment_length);
     if (*(char **)(obj + 0x10) != 0 && (def = moby_get_private_value_0(*(char **)(obj + 0x10))) != 0) {
         FastVecScale(temp, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
         FastVecAdd(beam_end, *(char **)(obj + 0x10) + 0x10, temp);
     } else {
         float x = *(float *)(obj + 0x48), y = *(float *)(obj + 0x4C);
-        vec_build_spherical_offset(beam_end, D_L00_001B0E38, x, y);
+        vec_build_spherical_offset(beam_end, g_sheepinator_beam_range, x, y);
         FastVecAdd(beam_end, beam_end, obj);
     }
     n = 0;
-    dist = D_L00_001B0E38;
+    dist = g_sheepinator_beam_range;
     tries = 0;
     if (*(char **)(obj + 0x10) == 0) {
         qcopy(temp, obj);
@@ -153,51 +153,51 @@ void sheepinator_update_beam_shape(char *object)
         FastVecSub(side, temp, edge);
         dist = FastVecLength(side);
     }
-    D_L00_001B2C80 = dist * D_L00_001B0E4C;
-    qcopy(&D_L00_00254A60[0], obj);
-    qcopy(&D_L00_00254B20[0], obj);
-    qcopy(&D_L00_00254BE0[0], obj);
+    g_sheepinator_segment_length = dist * g_sheepinator_beam_step_scale;
+    qcopy(&g_sheepinator_beam_points[0], obj);
+    qcopy(&g_sheepinator_ribbon_inner_points[0], obj);
+    qcopy(&g_sheepinator_ribbon_outer_points[0], obj);
     {
     int i;
     for (i = 1; i < 12; i++) {
-        vec_transform_or_copy(&D_L00_00254A60[i], &D_L00_00254A60[i]);
-        FastVecSub(segment, &D_L00_00254A60[i], &D_L00_00254A60[i - 1]);
-        progress = IntToFloat(i) * D_L00_001B0E4C;
+        vec_transform_or_copy(&g_sheepinator_beam_points[i], &g_sheepinator_beam_points[i]);
+        FastVecSub(segment, &g_sheepinator_beam_points[i], &g_sheepinator_beam_points[i - 1]);
+        progress = IntToFloat(i) * g_sheepinator_beam_step_scale;
         pull = progress * -0.49999997f + 0.9f;
-        if (D_L00_001B0E50 < i && *(char **)(obj + 0x10) != 0) {
-            FastVecSub(temp, *(char **)(obj + 0x10) + 0x10, &D_L00_00254A60[i]);
-            vec_scale_to_length(temp, temp, D_L00_001B2C80);
+        if (g_sheepinator_beam_min_segments < i && *(char **)(obj + 0x10) != 0) {
+            FastVecSub(temp, *(char **)(obj + 0x10) + 0x10, &g_sheepinator_beam_points[i]);
+            vec_scale_to_length(temp, temp, g_sheepinator_segment_length);
             lerp_vector(sag, sag, temp, 0.2f);
         }
         lerp_vector(temp, segment, sag, pull);
         len = FastVecLength(temp);
         if (len == 0.0f) {
-            qcopy(&D_L00_00254A60[i], &D_L00_00254A60[i - 1]);
+            qcopy(&g_sheepinator_beam_points[i], &g_sheepinator_beam_points[i - 1]);
         } else {
-            FastVecScale(temp, temp, D_L00_001B2C80 / len);
-            FastVecAdd(&D_L00_00254A60[i], &D_L00_00254A60[i - 1], temp);
+            FastVecScale(temp, temp, g_sheepinator_segment_length / len);
+            FastVecAdd(&g_sheepinator_beam_points[i], &g_sheepinator_beam_points[i - 1], temp);
         }
-        FastVecSub(edge, &D_L00_00254A60[i], &D_L00_00254A60[i - 1]);
-        FastVecCross(side, edge, D_0018A0E0);
-        vec_scale_to_length(side, side, D_L00_001B0E64 + (D_L00_001B0E68 - D_L00_001B0E64) * progress);
+        FastVecSub(edge, &g_sheepinator_beam_points[i], &g_sheepinator_beam_points[i - 1]);
+        FastVecCross(side, edge, g_hero_state_block);
+        vec_scale_to_length(side, side, g_sheepinator_beam_side_start + (g_sheepinator_beam_side_end - g_sheepinator_beam_side_start) * progress);
         {
         float sample[4];
         float m[4][4];
         for (j = 0; j < 20; j++) {
-            math_apply_axis_rotation_to_quat(sample, side, edge, (float)j * D_L00_001B0E60);
-            FastVecAdd(&D_L00_00254CA0[i][j], sample, &D_L00_00254A60[i]);
+            math_apply_axis_rotation_to_quat(sample, side, edge, (float)j * g_sheepinator_beam_sample_angle);
+            FastVecAdd(&g_sheepinator_ribbon_surface_a[i][j], sample, &g_sheepinator_beam_points[i]);
         }
-        qcopy(m[3], &D_L00_00254A60[i]);
+        qcopy(m[3], &g_sheepinator_beam_points[i]);
         vec_scale_to_length(m[0], edge, 1.0f);
         vec_scale_to_length(m[1], side, 1.0f);
         FastVecCross(m[2], m[1], m[0]);
-        radius = D_L00_001B0E88 + (D_L00_001B0E8C - D_L00_001B0E88) * progress;
-        angle = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E58 * IntToFloat(i));
+        radius = g_sheepinator_beam_radius_start + (g_sheepinator_beam_radius_end - g_sheepinator_beam_radius_start) * progress;
+        angle = math_wrap_angle_to_pi(g_sheepinator_spin_angle + g_sheepinator_beam_twist_step * IntToFloat(i));
         ring_offset[1] = radius * math_fast_sin_or_cos_b(angle);
         ring_offset[2] = radius * math_fast_sin_or_cos_a(angle);
-        transform_vector(&D_L00_00254B20[i], ring_offset, m);
+        transform_vector(&g_sheepinator_ribbon_inner_points[i], ring_offset, m);
         ring_offset[2] = -ring_offset[2];
-        transform_vector(&D_L00_00254BE0[i], ring_offset, m);
+        transform_vector(&g_sheepinator_ribbon_outer_points[i], ring_offset, m);
         }
     }
     }
@@ -206,92 +206,92 @@ void sheepinator_update_beam_shape(char *object)
     sign = math_random_int_below(2);
     if (sign == 0) sign = sign - 1;
     if (math_random_int_below(2) == 0) {
-        qcopy_nc(temp, &D_L00_00254B20[11]);
-        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x7F103FFF, 0, sign, &D_L00_001A8F20, 0.003f, 1);
-        if (p) p->b2 = D_L00_001FEAC4[0][7];
+        qcopy_nc(temp, &g_sheepinator_ribbon_inner_points[11]);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x7F103FFF, 0, sign, &g_default_vector, 0.003f, 1);
+        if (p) p->b2 = g_lightning_particle_bytes[0][7];
         sign = -sign;
-        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
-        if (p) p->b2 = D_L00_001FEAC4[0][7];
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &g_default_vector, 0.003f, 1);
+        if (p) p->b2 = g_lightning_particle_bytes[0][7];
     }
     if (math_random_int_below(2) == 0) {
-        qcopy_nc(temp, &D_L00_00254BE0[11]);
-        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x80FF4F10, 0, sign, &D_L00_001A8F20, 0.003f, 1);
-        if (p) p->b2 = D_L00_001FEAC4[0][7];
+        qcopy_nc(temp, &g_sheepinator_ribbon_outer_points[11]);
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.1f, scale, 0x80FF4F10, 0, sign, &g_default_vector, 0.003f, 1);
+        if (p) p->b2 = g_lightning_particle_bytes[0][7];
         sign = -sign;
-        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &D_L00_001A8F20, 0.003f, 1);
-        if (p) p->b2 = D_L00_001FEAC4[0][7];
+        p = part_spawn_ground_effect(temp, 0x1E, scale * 0.07f, scale * 0.7f, 0x80808080, 1, sign, &g_default_vector, 0.003f, 1);
+        if (p) p->b2 = g_lightning_particle_bytes[0][7];
     }
-    FastVecSub(edge, &D_L00_00254A60[1], &D_L00_00254A60[0]);
-    vec_scale_to_length(edge, edge, D_L00_001B0E90);
+    FastVecSub(edge, &g_sheepinator_beam_points[1], &g_sheepinator_beam_points[0]);
+    vec_scale_to_length(edge, edge, g_sheepinator_beam_segment_length);
     if (math_random_int_below(2) == 0) {
-        vec_scale_to_length(side, object + 0xD0, D_L00_001B0E9C);
-        FastVecAdd(temp, &D_L00_00254A60[0], side);
+        vec_scale_to_length(side, object + 0xD0, g_sheepinator_beam_offset_length);
+        FastVecAdd(temp, &g_sheepinator_beam_points[0], side);
         {
-            Colors colors = D_L00_001B0EC8;
+            Colors colors = g_sheepinator_beam_colors;
             float up[4], side[4];
             int color, count;
             float a, b;
         color = colors.c[math_random_int_below(5)];
-        a = math_random_signed_float_range(0.0f, D_L00_001B0E98);
-        b = math_random_signed_float_range(0.0f, D_L00_001B0E98);
-        math_apply_axis_rotation_to_quat(up, edge, D_0018A0E0, b);
-        FastVecCross(side, edge, D_0018A0E0);
+        a = math_random_signed_float_range(0.0f, g_sheepinator_beam_jitter);
+        b = math_random_signed_float_range(0.0f, g_sheepinator_beam_jitter);
+        math_apply_axis_rotation_to_quat(up, edge, g_hero_state_block, b);
+        FastVecCross(side, edge, g_hero_state_block);
         math_apply_axis_rotation_to_quat(up, up, side, a);
-        count = FloatToInt(dist * 1.2f / D_L00_001B0E90);
+        count = FloatToInt(dist * 1.2f / g_sheepinator_beam_segment_length);
         if (*(char **)(obj + 0x10) != 0) count *= 3;
         p = part_spawn_owned_particle(scale * 0.1f, scale, temp, count, color, 0, sign, up, *(int *)(obj + 0x10));
-        if (p) p->b2 = D_L00_001FEAC4[0][6];
+        if (p) p->b2 = g_lightning_particle_bytes[0][6];
         p = part_spawn_owned_particle(scale * 0.07f, scale * 0.7f, temp, count, 0x7F7F7F7F, 1, -sign, up, *(int *)(obj + 0x10));
-        if (p) p->b2 = D_L00_001FEAC4[0][6];
+        if (p) p->b2 = g_lightning_particle_bytes[0][6];
         }
     }
-    if (math_fast_float_d(&D_L00_001B2D3C)) {
-        D_L00_001B2D3C = D_L00_001B0EA0;
+    if (math_fast_float_d(&g_sheepinator_spark_cooldown)) {
+        g_sheepinator_spark_cooldown = g_sheepinator_beam_particle_init;
         for (k = 0; k < 3; k++) {
-            if (D_L00_001B2D30[k] == 0) {
-                D_L00_001B2D30[k] = 1;
-                D_L00_001B2CF0[k] = D_L00_001B0EA8;
-                D_L00_001B2D10[k] = 0;
-                D_L00_001B2D20[k] = D_L00_001B0EB8;
-                D_L00_001B2D00[k] = IntToFloat(D_L00_001B0EBF);
-                qcopy(&D_L00_001B2C90[k], obj);
-                FastVecSub(side, &D_L00_00254A60[1], &D_L00_00254A60[0]);
-                vec_scale_to_length(&D_L00_001B2CC0[k], side, 1.0f);
+            if (g_sheepinator_spark_active[k] == 0) {
+                g_sheepinator_spark_active[k] = 1;
+                g_sheepinator_spark_timers[k] = g_sheepinator_beam_particle_life;
+                g_sheepinator_spark_ages[k] = 0;
+                g_sheepinator_spark_sizes[k] = g_sheepinator_beam_size_start;
+                g_sheepinator_spark_alphas[k] = IntToFloat(g_sheepinator_beam_byte_param);
+                qcopy(&g_sheepinator_spark_positions[k], obj);
+                FastVecSub(side, &g_sheepinator_beam_points[1], &g_sheepinator_beam_points[0]);
+                vec_scale_to_length(&g_sheepinator_spark_directions[k], side, 1.0f);
                 break;
             }
         }
     }
     {
     for (kk = 0; kk < 3; kk++) {
-        if (D_L00_001B2D30[kk] != 0) {
-            if (math_fast_float_d(&D_L00_001B2CF0[kk]) != 0) {
-                D_L00_001B2D30[kk] = 0;
+        if (g_sheepinator_spark_active[kk] != 0) {
+            if (math_fast_float_d(&g_sheepinator_spark_timers[kk]) != 0) {
+                g_sheepinator_spark_active[kk] = 0;
             } else {
                 float step, u, rem, inv;
                 float sample[4];
-                if (D_L00_001B2CF0[kk] < D_L00_001B0EAC) D_L00_001B2D00[kk] -= D_L00_001B0EC4;
-                step = D_L00_001B0EA4 * 0.016666668f;
-                D_L00_001B2D10[kk] += step;
-                u = D_L00_001B2D10[kk] / D_L00_001B0E38;
+                if (g_sheepinator_spark_timers[kk] < g_sheepinator_beam_fade_threshold) g_sheepinator_spark_alphas[kk] -= g_sheepinator_beam_fade_step;
+                step = g_sheepinator_beam_particle_speed * 0.016666668f;
+                g_sheepinator_spark_ages[kk] += step;
+                u = g_sheepinator_spark_ages[kk] / g_sheepinator_beam_range;
                 if (u > 1.0f) u = 1.0f;
-                D_L00_001B2D20[kk] = D_L00_001B0EB8 + (D_L00_001B0EB4 - D_L00_001B0EB8) * u;
-                if (D_L00_001B2D10[kk] >= D_L00_001B0E38) {
-                    FastVecScale(side, &D_L00_001B2CC0[kk], step);
-                    FastVecAdd(&D_L00_001B2C90[kk], &D_L00_001B2C90[kk], side);
+                g_sheepinator_spark_sizes[kk] = g_sheepinator_beam_size_start + (g_sheepinator_beam_size_end - g_sheepinator_beam_size_start) * u;
+                if (g_sheepinator_spark_ages[kk] >= g_sheepinator_beam_range) {
+                    FastVecScale(side, &g_sheepinator_spark_directions[kk], step);
+                    FastVecAdd(&g_sheepinator_spark_positions[kk], &g_sheepinator_spark_positions[kk], side);
                 } else {
-                    seg = FloatToInt(D_L00_001B2D10[kk] / D_L00_001B2C80);
-                    rem = D_L00_001B2D10[kk] - IntToFloat(seg) * D_L00_001B2C80;
-                    qcopy(&D_L00_001B2C90[kk], &D_L00_00254A60[seg]);
-                    if (seg == 11) FastVecSub(side, &D_L00_00254A60[seg], &D_L00_00254A60[seg + -1]);
-                    else FastVecSub(side, &D_L00_00254A60[seg + 1], &D_L00_00254A60[seg]);
+                    seg = FloatToInt(g_sheepinator_spark_ages[kk] / g_sheepinator_segment_length);
+                    rem = g_sheepinator_spark_ages[kk] - IntToFloat(seg) * g_sheepinator_segment_length;
+                    qcopy(&g_sheepinator_spark_positions[kk], &g_sheepinator_beam_points[seg]);
+                    if (seg == 11) FastVecSub(side, &g_sheepinator_beam_points[seg], &g_sheepinator_beam_points[seg + -1]);
+                    else FastVecSub(side, &g_sheepinator_beam_points[seg + 1], &g_sheepinator_beam_points[seg]);
                     inv = FastVecLength(side);
                     if (inv != 0.0f) {
                         inv = 1.0f / inv;
                         FastVecScale(sample, side, rem * inv);
-                        FastVecAdd(&D_L00_001B2C90[kk], &D_L00_001B2C90[kk], sample);
+                        FastVecAdd(&g_sheepinator_spark_positions[kk], &g_sheepinator_spark_positions[kk], sample);
                         vec_scale_to_length(sample, side, inv);
-                        lerp_vector(&D_L00_001B2CC0[kk], &D_L00_001B2CC0[kk], sample, 0.1f);
-                        vec_scale_to_length(&D_L00_001B2CC0[kk], &D_L00_001B2CC0[kk], 1.0f);
+                        lerp_vector(&g_sheepinator_spark_directions[kk], &g_sheepinator_spark_directions[kk], sample, 0.1f);
+                        vec_scale_to_length(&g_sheepinator_spark_directions[kk], &g_sheepinator_spark_directions[kk], 1.0f);
                     }
                 }
             }

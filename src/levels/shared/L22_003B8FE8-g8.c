@@ -21,20 +21,20 @@ extern int ref_L22_003B8FE8_01 __attribute__((sda));
 
 /* The level block the object arms, written as bare symbols through $at: each is sized past
  * the $gp limit so it keeps the absolute `lui`/`sw` form. */
-extern s32 D_L22_001A8AB4[3] __attribute__((sda));
+extern s32 g_keyed_object_color_init[3] __attribute__((sda));
 
-extern s32 D_L22_001A8AC4[3] __attribute__((sda));
+extern s32 g_keyed_object_color_default[3] __attribute__((sda));
 
-extern long long D_L22_001A8AC8[2] __attribute__((sda));
+extern long long g_keyed_object_command_default[2] __attribute__((sda));
 
-extern long long D_L22_001A8AB8[2] __attribute__((sda));
+extern long long g_keyed_object_command_init[2] __attribute__((sda));
 
-extern s32 D_L22_001A8AB0;
+extern s32 g_charged_shot_active;
 
-extern s32 D_L22_001A8AC0;
+extern s32 g_charged_shot_screen_effect;
 
 /* a plain small extern: $gp in the delay slot reorg copies it into, absolute where it stays */
-extern s32 D_L22_001A8FF0;
+extern s32 g_hero_flag_a;
 
 extern s16 gfx_add_point_light(TI128 *, s32, float, float);
 
@@ -61,16 +61,16 @@ u8 *keyed_object_create(u8 *hero, TI128 *position) {
         payload = *(u8 **)(obj + 0x68);
         *(TI128 *)(obj + 0x10) = *position;
         *slot = (s32)obj;
-        D_L22_001A8AB4[0] = 0xFF;
-        D_L22_001A8AC4[0] = 0x00FFFFFF;
-        D_L22_001A8AC8[0] = 0x1F00000042LL;
-        D_L22_001A8AB8[0] = 0;
-        D_L22_001A8AB0 = 0;
-        D_L22_001A8AC0 = 0;
+        g_keyed_object_color_init[0] = 0xFF;
+        g_keyed_object_color_default[0] = 0x00FFFFFF;
+        g_keyed_object_command_default[0] = 0x1F00000042LL;
+        g_keyed_object_command_init[0] = 0;
+        g_charged_shot_active = 0;
+        g_charged_shot_screen_effect = 0;
         *(s32 *)(payload + 0x10) = 0;
         *(s16 *)(payload + 0x2C) = gfx_add_point_light(position, 0, 0.0f, 0.0f);
     }
-    if (D_L22_001A8FF0 != 0) {
+    if (g_hero_flag_a != 0) {
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
         *(TI128 *)(obj + 0xC0) = *(TI128 *)(hero + 0xC0);
         *(TI128 *)(obj + 0xD0) = *(TI128 *)(hero + 0xD0);

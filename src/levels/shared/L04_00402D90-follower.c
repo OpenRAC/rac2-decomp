@@ -3,10 +3,10 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { Quad v[3]; } __attribute__((aligned(16))) Axes4045E0;
 
-extern char D_L04_001B9680[];
-extern Quad D_L04_001BFAF0;
+extern char g_tether_zero_vec[];
+extern Quad g_collision_quad;
 /* const: retail loads the three rows past the flag stores before them. */
-extern const Axes4045E0 D_001B0630;
+extern const Axes4045E0 g_hoverbike_axes;
 
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
@@ -56,7 +56,7 @@ void enemy_hoverbike_update(u8 *bike)
     *(f32 *)(bike + 0x2C) = *(f32 *)(*(u8 **)(bike + 0x24) + 0x24) * 0.25f;
     bike[0x30] = 0xFF;
     *(s16 *)(bike + 0x32) = 0x7F;
-    if (bike[0x31] != 0 && fast_vec_dist(bike + 0x10, D_L04_001B9680) < 9.0f) {
+    if (bike[0x31] != 0 && fast_vec_dist(bike + 0x10, g_tether_zero_vec) < 9.0f) {
         moby_update_ground_check(bike);
         bike[0x6F] = 8;
     }
@@ -69,7 +69,7 @@ void enemy_hoverbike_update(u8 *bike)
     switch (bike[0x20]) {
     case 0:
         if (coll_test_point(bike + 0x10, 4, bike, *(f32 *)(vars + 0x90)))
-            *(Quad *)(bike + 0x10) = D_L04_001BFAF0;
+            *(Quad *)(bike + 0x10) = g_collision_quad;
         *(Quad *)(vars + 0xB0) = *(Quad *)(bike + 0x10);
         *(Quad *)(vars + 0xC0) = *(Quad *)(bike + 0xF0);
         dst = vars + 0x200;
@@ -77,9 +77,9 @@ void enemy_hoverbike_update(u8 *bike)
         racer_compute_route_lengths(bike);
         bike[0x20] = 1;
         *(s32 *)(vars + 0x30) = 0;
-        axis_row0 = D_001B0630.v[0];
-        axis_row1 = D_001B0630.v[1];
-        axis_row2 = D_001B0630.v[2];
+        axis_row0 = g_hoverbike_axes.v[0];
+        axis_row1 = g_hoverbike_axes.v[1];
+        axis_row2 = g_hoverbike_axes.v[2];
         *(u16 *)(bike + 0x34) |= 0x41;
         bike[0x62] = 1;
         u.axes.v[0] = axis_row0;

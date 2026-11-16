@@ -5,19 +5,19 @@ extern s32 func_313EA0(s32);
 extern void moby_set_state(void *, s32, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern float fast_vec_dist(void *, void *);
-extern u8 *D_L16_001B2C0C[] __attribute__((sda));
-extern u8 D_0013963B;
+extern u8 *g_beam_definition_table[] __attribute__((sda));
+extern u8 g_snivelak_boss_state;
 extern s32 math_fast_float_d(void *);
-extern u8 *D_L16_001FE7C0[];
+extern u8 *g_path_l16_table[];
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern s32 FloatToInt(float);
 extern void moby_update_ground_check(void *);
 extern s32 func_PAL_002B1A50(void *, void *, s32);
 extern void group_wake_members(u8 *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
-extern float D_L16_001B9B00[];
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern s32 D_L16_001B2B38[] __attribute__((sda));
+extern float g_scene_origin_transform[];
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern s32 g_group_id_limit[] __attribute__((sda));
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
 
@@ -56,7 +56,7 @@ void func_PAL_L16_00411C78(u8 *arg)
         state[0x4A] = FloatToInt(16.0f);
         *(float *)(state + 0x358) = *(float *)(arg + 0x18);
     }
-    if (arg[0x31] && fast_vec_dist(arg + 0x10, D_L16_001B9B00) < 32.0f) {
+    if (arg[0x31] && fast_vec_dist(arg + 0x10, g_scene_origin_transform) < 32.0f) {
         moby_update_ground_check(arg);
         arg[0x6F] = 30;
     }

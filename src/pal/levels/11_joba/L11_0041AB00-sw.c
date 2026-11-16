@@ -8,16 +8,16 @@ extern s32 PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern s32 FloatToInt(f32 arg0);
 extern f32 fast_vec_dist(u8 *arg0, u8 *arg1);
 extern s32 joba_enemy_is_active(u8 *arg0);
-extern u8 D_L11_00188660[];
-extern u8 D_L11_001BA8C0[];
-extern s32 D_L11_001A8FF0 __attribute__((sda));
-extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern u8 g_sound_l11_slot_table[];
+extern u8 g_hero_l11_position[];
+extern s32 g_hero_control_locked __attribute__((sda));
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
 extern f32 vec_get_heading_angle(u8 *a0, f32 *a1, s32 a2);
 extern f32 vec_distance_xy(u8 *a0, u8 *a1);
-extern u8 D_L11_00189EA0[];
+extern u8 g_hero_l11_state_data[];
 extern u8 *g_moby_l11_table[] __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[][16];
+extern u8 g_moby_group_flags[][16];
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 extern s32 flag_is_third_pending_set(u8 *);
@@ -59,7 +59,7 @@ void func_PAL_L11_0041B670(u8 *arg0) {
             PlayMobySound(0, 0, s2);
             moby_set_state(s2, 2, -1);
         }
-        if (D_0019B2E8[g_current_map_index[0]][*(u8 *)(s2 + 0xB0)] & 0x80) {
+        if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(s2 + 0xB0)] & 0x80) {
             *(f32 *)(s2 + 0xF0) = fast_subtract_rotations(*(f32 *)(s2 + 0xF0), 1.5707965f);
             moby_set_state(s2, 6, -1);
         }

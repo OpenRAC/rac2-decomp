@@ -67,16 +67,16 @@ typedef struct {
 extern HazardPath *g_path_l17_table[];
 extern Moby *g_moby_l17_pool;
 extern Moby *D_L17_001B2C1C_1[] __attribute__((sda));
-extern int D_L17_001B2748 MACRO_ADDR;
-extern float D_L17_001AFCD0 __attribute__((sda)), D_L17_001AFCD4 __attribute__((sda));
-extern float D_L17_001AFCD8 __attribute__((sda)), D_L17_001AFCDC __attribute__((sda));
-extern float D_L17_001AFCE0 __attribute__((sda)), D_L17_001AFCE4 __attribute__((sda));
-extern float D_L17_001AFCE8 __attribute__((sda)), D_L17_001AFCEC __attribute__((sda));
-extern int D_L17_001AFCF0 __attribute__((sda));
+extern int g_flash_frame_counter MACRO_ADDR;
+extern float g_hazard_var24_a __attribute__((sda)), g_hazard_var20_a __attribute__((sda));
+extern float g_hazard_var28_a __attribute__((sda)), g_hazard_var10_a __attribute__((sda));
+extern float g_hazard_var24_b __attribute__((sda)), g_hazard_var20_b __attribute__((sda));
+extern float g_hazard_var28_b __attribute__((sda)), g_hazard_var10_b __attribute__((sda));
+extern int g_hazard_linked_flag __attribute__((sda));
 extern char g_hero_position[];
 extern SoundRecord g_sound_state[];
-extern char D_L17_001A8F20[] MACRO_ADDR;
-extern char D_L17_001AFCF8[], D_L17_001AFD28[];
+extern char g_effect_color_params[] MACRO_ADDR;
+extern char g_str_hazard_debug_a[], g_str_hazard_debug_b[];
 
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(void *, void *);
@@ -105,12 +105,12 @@ void UpdatePathHazard(Moby *moby)
     int flash;
     int color;
 
-    vars->x20 = moby->oClass == 0x8AD ? D_L17_001AFCD4 : D_L17_001AFCE4;
-    vars->x24 = moby->oClass == 0x8AD ? D_L17_001AFCD0 : D_L17_001AFCE0;
-    vars->x28 = moby->oClass == 0x8AD ? D_L17_001AFCD8 : D_L17_001AFCE8;
-    vars->x10 = moby->oClass == 0x8AD ? D_L17_001AFCDC : D_L17_001AFCEC;
+    vars->x20 = moby->oClass == 0x8AD ? g_hazard_var20_a : g_hazard_var20_b;
+    vars->x24 = moby->oClass == 0x8AD ? g_hazard_var24_a : g_hazard_var24_b;
+    vars->x28 = moby->oClass == 0x8AD ? g_hazard_var28_a : g_hazard_var28_b;
+    vars->x10 = moby->oClass == 0x8AD ? g_hazard_var10_a : g_hazard_var10_b;
 
-    flash = (D_L17_001B2748 + moby->uid) % 60 < 15;
+    flash = (g_flash_frame_counter + moby->uid) % 60 < 15;
     color = flash ? 0x80FFFFFF : 0x80404040;
     moby->color = color;
 
@@ -135,8 +135,8 @@ void UpdatePathHazard(Moby *moby)
         vars->sound = -1;
         vars->isLinked = 0;
         if (vars->path == -1 || g_path_l17_table[vars->path]->count < 2) {
-            STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
-            STUB_printf(D_L17_001AFD28);
+            STUB_printf(g_str_hazard_debug_a, moby->oClass, moby->uid);
+            STUB_printf(g_str_hazard_debug_b);
             moby_mark_spawned(moby);
             break;
         }
@@ -173,13 +173,13 @@ void UpdatePathHazard(Moby *moby)
         break;
     case 1:
         PlacePathFollowerChainAtStart(moby);
-        if (D_L17_001AFCF0 && !vars->isLinked)
+        if (g_hazard_linked_flag && !vars->isLinked)
             moby->state = 2;
         else
             moby->state = 3;
         break;
     case 2:
-        if (D_L17_001AFCF0)
+        if (g_hazard_linked_flag)
             UpdatePathFollowerChain(moby);
         if (part_find_owned_effect_slot(moby, 0x4010000, 1))
             moby_set_state(moby, 5, -1);
@@ -210,10 +210,10 @@ void UpdatePathHazard(Moby *moby)
             moby->updateDist = 1000000.0f;
             SpawnExplosion(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
-            part_spawn_masked_debris(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris(moby, 11, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             a = math_random_float_range(-10.0f, 10.0f);
             b = math_random_float_range(20.0f, 30.0f);
-            created = cam_moby_create(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
+            created = cam_moby_create(moby, 2, 0x8AD, 2, pos, rot, g_effect_color_params, 255, a, b);
             if (created)
                 created->vars->sound = 0;
             part_spawn_scaled_bolts(moby, 1, 0.0f);
@@ -221,7 +221,7 @@ void UpdatePathHazard(Moby *moby)
         } else {
             moby->updateDist = 1000000.0f;
             SpawnExplosion(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
-            part_spawn_masked_debris(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris(moby, 31, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             part_spawn_scaled_bolts(moby, 1, 0.0f);
             moby_mark_spawned(moby);
         }

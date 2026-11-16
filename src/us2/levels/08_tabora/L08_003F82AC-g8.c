@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L08_003F82AC, the USA v2.00 copy of func_L08_003F6E18: the same C, where the 0x88 float
    is read as a member of D_00189E20 and a block runs after func_L01_002EABA8 while the mode word is
    0x31 and the level's object is class 0xEEF. D_00139568_1 is D_00139568: gcse numbers its reaching
@@ -8,25 +9,25 @@ typedef struct {
     void *data; u8 pad6c[0xB0-0x6c]; u8 id; u8 padB1;
     s16 index; u8 padB4[0x100-0xB4];
 } TaboraMoby;
-extern TaboraMoby *D_L08_001B29DC;
-extern u8 D_001395B8[], D_00139568_1[];
+extern TaboraMoby *g_moby_array;
+extern u8 g_game_flag_table[], D_00139568_1[];
 typedef struct { u8 pad[0x50]; int flags[2]; } TaboraProgress;
-extern TaboraProgress D_00139768;
+extern TaboraProgress g_request_flag_table;
 typedef struct { int state; u8 pad[0x24]; float value; } FlareStatus;
-extern FlareStatus D_L08_001CA080;
+extern FlareStatus g_init_context;
 typedef struct { u8 pad[4]; u8 count; u8 rest[0xDB]; } StageStatus;
-extern u8 D_L08_0026CCF0[];
+extern u8 g_item_stage_records[];
 typedef struct { u8 pad[0x464]; u8 flags[1]; } TaboraLevelFlags;
-extern TaboraLevelFlags D_L08_0021EAF0, D_L08_0021DE80;
-extern u8 D_0019B2E8[], D_0019B4A8[], D_0019B278[];
-extern u8 D_L08_001B2840[] MACRO_ADDR;
-extern int g_current_map_index, D_0018CD20 NOT_SDA;
+extern TaboraLevelFlags g_moby_spawn_state_flags_b, g_moby_spawn_state_flags_a;
+extern u8 g_moby_group_flags[], g_moby_nibble_table[], g_level_progress_flags[];
+extern u8 g_moby_state_flags[] MACRO_ADDR;
+extern int g_current_map_index, g_tabora_seen_mask NOT_SDA;
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern int D_L08_0021F758 NOT_SDA, D_L08_001A8F00, D_L08_001B2514;
-extern float D_L08_001B2420 __attribute__((sda));
-extern float D_L08_001B9E08 NOT_SDA;
-extern char D_L08_001BFD00[], g_hero_position[];
-extern char D_L08_002B53E0[], D_L08_001B0BE8[], D_L08_001B0C00[], D_L08_001B0C28[], D_L08_001B0C50[], D_L08_001B0C70[], D_L08_001B0C90[], D_L08_001B0CC0[], D_L08_001B0CF0[], D_L08_001B0D08[], D_L08_001B0D30[], D_L08_001B0D48[], D_L08_001B0D70[], D_L08_001B0DA8[];
+extern int g_tabora_progress_mode NOT_SDA, g_cutscene_l08_active_flag, g_tabora_progress_flag;
+extern float g_tabora_float_param __attribute__((sda));
+extern float g_tabora_ground_height NOT_SDA;
+extern char g_request_l08_queue[], g_hero_position[];
+extern char g_str_tabora_debug[], g_str_tabora_progress_first[], g_str_tabora_progress_second[], g_str_tabora_progress_third[], g_str_tabora_progress_fourth[], g_str_tabora_progress_fifth[], g_str_tabora_progress_sixth[], g_str_tabora_progress_seventh[], g_str_tabora_progress_mode[], g_str_tabora_progress_eighth[], g_str_tabora_progress_ninth[], g_str_tabora_progress_tenth[], g_str_tabora_progress_eleventh[], g_str_tabora_progress_twelfth[];
 extern void STUB_printf(char *, ...);
 extern void hero_reset_position_and_direction(void *,void *,int,int);
 extern void gfx_add_draw_callback_first(void *,void *);
@@ -55,15 +56,15 @@ extern void gfx_l08_draw_lens_flare(void *);
 extern void level_store_pair_with_increment(int,int);
 typedef struct { u8 pad[0x88]; float value; u8 pad8c[0x1830-0x8C]; u8 *object; u8 pad1834[0x2294-0x1834]; int mode; } LevelGlobals;
 extern LevelGlobals g_hero_state;
-extern int D_0018D074 NOT_SDA;
-extern float D_L08_001B3244;
+extern int g_voice_line_trigger_flag NOT_SDA;
+extern float g_hud_l08_scale;
 
 static __inline__ int TaboraStageComplete(void)
 {
     int threshold;
     if (flag_is_byte_set()) threshold = 4;
     else threshold = 1;
-    if (((StageStatus *)D_L08_0026CCF0)[D_00139568_1[0xA]].count >= threshold) return 1;
+    if (((StageStatus *)g_item_stage_records)[D_00139568_1[0xA]].count >= threshold) return 1;
     return 0;
 }
 
@@ -78,74 +79,74 @@ void func_US2_L08_003F82AC(u8 *o)
     case 0:
         o[0x30]=255;
         *(u16 *)(o+0x96)=0;
-        if (!D_001395B8[0x1C]) state_set_flag_one();
-        if (*(int *)(s+4)!=-1 && g_hero_state.value < D_L08_001CA080.value) {
-            p=(D_L08_001B29DC+*(int *)(s+4));
-            if (p->state || (D_0019B2E8[p->id+(g_current_map_index<<4)]&128) ||
-                D_L08_0021EAF0.flags[p->index])
+        if (!g_game_flag_table[0x1C]) state_set_flag_one();
+        if (*(int *)(s+4)!=-1 && g_hero_state.value < g_init_context.value) {
+            p=(g_moby_array+*(int *)(s+4));
+            if (p->state || (g_moby_group_flags[p->id+(g_current_map_index<<4)]&128) ||
+                g_moby_spawn_state_flags_b.flags[p->index])
                 goto relocate_child;
-            bits = D_0019B4A8[(p->index>>1)+(g_current_map_index<<10)];
+            bits = g_moby_nibble_table[(p->index>>1)+(g_current_map_index<<10)];
             if (((u16)p->index & 1) ? ((bits >> 4) & 7) : (bits & 7)) {
 relocate_child:
-                STUB_printf(D_L08_002B53E0);
+                STUB_printf(g_str_tabora_debug);
                 hero_reset_position_and_direction((u8 *)p+0x10,(u8 *)p+0xF0,0,1);
                 moby_set_state(o,5,-1);
             }
         }
         if (TaboraStageComplete()) {
             if (*(int *)(s+0x30)!=-1) {
-                moby_mark_spawned((D_L08_001B29DC+*(int *)(s+0x30)));
+                moby_mark_spawned((g_moby_array+*(int *)(s+0x30)));
                 *(int *)(s+0x30)=-1;
             }
-            if (g_hero_state.value < D_L08_001CA080.value) {
+            if (g_hero_state.value < g_init_context.value) {
                 mode=0;
-                STUB_printf(D_L08_001B0BE8);
-                D_L08_0021F758=0;
+                STUB_printf(g_str_tabora_progress_first);
+                g_tabora_progress_mode=0;
                 state_set_flag_one();
                 moby_set_state(o,5,-1);
             } else {
                 mode=1;
-                STUB_printf(D_L08_001B0C00);
-                D_L08_0021F758=mode;
+                STUB_printf(g_str_tabora_progress_second);
+                g_tabora_progress_mode=mode;
                 moby_set_state(o,5,-1);
             }
             moby_replace_tracked(o);
-        } else if (!(D_00139768.flags[0]&0x80000) || !(D_00139768.flags[1]&0x100000)) {
+        } else if (!(g_request_flag_table.flags[0]&0x80000) || !(g_request_flag_table.flags[1]&0x100000)) {
             mode=1;
-            STUB_printf(D_L08_001B0C28);
-            if (req_push_queue(D_L08_001BFD00,0x53)) {
-                req_push_queue(D_L08_001BFD00,0x54);
-                req_launch_queued(D_L08_001BFD00);
+            STUB_printf(g_str_tabora_progress_third);
+            if (req_push_queue(g_request_l08_queue,0x53)) {
+                req_push_queue(g_request_l08_queue,0x54);
+                req_launch_queued(g_request_l08_queue);
                 game_set_slowdown_factor();
                 state_set_flag_one();
                 moby_set_state(o,1,-1);
             }
-        } else if (D_00139768.flags[1]&0x200000) {
+        } else if (g_request_flag_table.flags[1]&0x200000) {
             mode=0;
-            STUB_printf(D_L08_001B0C50);
-            D_L08_0021F758=0;
+            STUB_printf(g_str_tabora_progress_fourth);
+            g_tabora_progress_mode=0;
             state_set_flag_one();
             moby_set_state(o,3,-1);
         } else {
             mode=0;
-            STUB_printf(D_L08_001B0C70);
+            STUB_printf(g_str_tabora_progress_fifth);
             state_set_flag_one();
             moby_set_state(o,1,-1);
             *(u16 *)(o+0x96)=6;
         }
         if (g_item_owned_flags[0x15] && *(int *)(s+0x20)!=-1 &&
-            (D_L08_001B29DC+*(int *)(s+0x20))->state!=0xFE &&
-            (D_L08_001B29DC+*(int *)(s+0x20))->state!=0xFD &&
+            (g_moby_array+*(int *)(s+0x20))->state!=0xFE &&
+            (g_moby_array+*(int *)(s+0x20))->state!=0xFD &&
             *(int *)(s+0x24)!=-1 &&
-            (D_L08_001B29DC+*(int *)(s+0x24))->state!=0xFE &&
-            (D_L08_001B29DC+*(int *)(s+0x24))->state!=0xFD) {
-            STUB_printf(D_L08_001B0C90);
-            if (!D_0019B278[*(int *)D_L08_001B29DC[*(int *)(s+0x24)].data+(g_current_map_index<<2)]) {
+            (g_moby_array+*(int *)(s+0x24))->state!=0xFE &&
+            (g_moby_array+*(int *)(s+0x24))->state!=0xFD) {
+            STUB_printf(g_str_tabora_progress_sixth);
+            if (!g_level_progress_flags[*(int *)g_moby_array[*(int *)(s+0x24)].data+(g_current_map_index<<2)]) {
                 mode=1;
-                D_L08_0021F758=mode;
-                STUB_printf(D_L08_001B0CC0);
+                g_tabora_progress_mode=mode;
+                STUB_printf(g_str_tabora_progress_seventh);
                 {
-                    TaboraMoby *replacement = D_L08_001B29DC + *(int *)(s+0x20);
+                    TaboraMoby *replacement = g_moby_array + *(int *)(s+0x20);
                     hero_reset_position_and_direction((u8 *)replacement+0x10,(u8 *)replacement+0xF0,0,1);
                 }
                 state_set_flag_one();
@@ -157,21 +158,21 @@ relocate_child:
             }
             moby_set_state(o,5,-1);
         }
-        STUB_printf(D_L08_001B0CF0,mode);
+        STUB_printf(g_str_tabora_progress_mode,mode);
         load_scene_chunk(mode,0);
         moby_set_far_target_point(o);
         part_start_sparkle_burst(o);
         break;
     case 1:
         if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
-            D_001395B8[0x19]=1;
-            if (req_push_queue(D_L08_001BFD00,0x55)) {
-                req_launch_queued(D_L08_001BFD00);
-                D_L08_0021F758=0;
-                STUB_printf(D_L08_001B0D08);
+            g_game_flag_table[0x19]=1;
+            if (req_push_queue(g_request_l08_queue,0x55)) {
+                req_launch_queued(g_request_l08_queue);
+                g_tabora_progress_mode=0;
+                STUB_printf(g_str_tabora_progress_eighth);
                 game_set_slowdown_factor();
-                D_L08_001B2514=1;
-                D_L08_001B2420=1.2f;
+                g_tabora_progress_flag=1;
+                g_tabora_float_param=1.2f;
                 moby_disable_object_list_flags();
                 load_scene_chunk(0,0);
                 moby_set_state(o,2,-1);
@@ -180,24 +181,24 @@ relocate_child:
         break;
     case 2:
         if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
-            D_001395B8[0x1A]=1;
-            STUB_printf(D_L08_001B0D30);
+            g_game_flag_table[0x1A]=1;
+            STUB_printf(g_str_tabora_progress_ninth);
             MemcardSave(0,-1);
             moby_set_state(o,3,-1);
         }
         break;
     case 3:
         if (coll_point_inside_region(g_hero_position,*(int *)s)) {
-            if (req_push_queue(D_L08_001BFD00,0x56)) {
-                req_launch_queued(D_L08_001BFD00);
-                STUB_printf(D_L08_001B0D48);
+            if (req_push_queue(g_request_l08_queue,0x56)) {
+                req_launch_queued(g_request_l08_queue);
+                STUB_printf(g_str_tabora_progress_tenth);
                 moby_set_state(o,4,-1);
             }
         }
         break;
     case 4:
-        if (D_L08_001A8F00==2 && *(int *)(s+0x30)!=-1) {
-            moby_mark_spawned((D_L08_001B29DC+*(int *)(s+0x30)));
+        if (g_cutscene_l08_active_flag==2 && *(int *)(s+0x30)!=-1) {
+            moby_mark_spawned((g_moby_array+*(int *)(s+0x30)));
             *(int *)(s+0x30)=-1;
         }
         if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
@@ -207,37 +208,37 @@ relocate_child:
             help_show_message_for_id(10);
             moby_replace_tracked(o);
             if (*(int *)(s+8)!=-1) {
-                p=D_L08_001B29DC + *(int *)(s+8);
-                STUB_printf(D_L08_001B0D70);
-                D_L08_0021DE80.flags[p->index]=p->id+2;
+                p=g_moby_array + *(int *)(s+8);
+                STUB_printf(g_str_tabora_progress_eleventh);
+                g_moby_spawn_state_flags_a.flags[p->index]=p->id+2;
                 {
                     int id = p->id;
-                    if (id == 255 || (!(D_L08_001B2840[(u8)id] & 128) &&
-                        (D_0019B2E8[(u8)id + (g_current_map_index << 4)] & 128)))
-                        D_L08_0021EAF0.flags[p->index]=id+2;
+                    if (id == 255 || (!(g_moby_state_flags[(u8)id] & 128) &&
+                        (g_moby_group_flags[(u8)id + (g_current_map_index << 4)] & 128)))
+                        g_moby_spawn_state_flags_b.flags[p->index]=id+2;
                 }
             }
-            STUB_printf(D_L08_001B0DA8);
+            STUB_printf(g_str_tabora_progress_twelfth);
             MemcardSave(0,-1);
             moby_set_state(o,5,-1);
         }
         break;
     }
     ++*(u16 *)(o+0x96);
-    if (D_001395B8[0x1C]) {
-        seen = (unsigned)D_0018CD20 & (1 << g_current_map_index);
+    if (g_game_flag_table[0x1C]) {
+        seen = (unsigned)g_tabora_seen_mask & (1 << g_current_map_index);
         if (!seen) subtitle_request_voice_line(0x9F9,0x50);
     }
     TriggerSubtitleInCuboid(0xA3A,0x91,0,*(int *)(s+0xC),-1);
     if (g_hero_state.mode==0x31 && g_hero_state.object && *(short *)(g_hero_state.object+0xAA)==0xEEF) {
-        if (D_0018D074>=0) subtitle_request_voice_line(0xA40,0x97);
+        if (g_voice_line_trigger_flag>=0) subtitle_request_voice_line(0xA40,0x97);
         {
             float scale = -65.0f;
-            level_store_pair_with_increment((int)(D_L08_001B3244 * scale + 0.5f), 2);
+            level_store_pair_with_increment((int)(g_hud_l08_scale * scale + 0.5f), 2);
         }
     }
-    if (D_L08_001CA080.state==1) {
-        D_L08_001B9E08=level_get_height_map_ground(o);
+    if (g_init_context.state==1) {
+        g_tabora_ground_height=level_get_height_map_ground(o);
         gfx_add_draw_callback_first(gfx_l08_draw_lens_flare,o);
     }
 }

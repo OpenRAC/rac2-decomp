@@ -43,12 +43,12 @@ struct PadState {
     u8 rep_timer;                        
 };
 typedef struct PadState PadState;
-extern struct { s32 word; u8 mirror; u8 rest[7]; } D_001A7A40 MACRO_ADDR;
+extern struct { s32 word; u8 mirror; u8 rest[7]; } g_unlocked_item_flags MACRO_ADDR;
 extern float vec_length_xy(float *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 
-void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
+void pad_decode_reading_pal(PadState *p, u8 *buf, s32 len) {
     float v[2];
     s32 i, j, k;
     s32 cur;
@@ -80,7 +80,7 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
             p->analog[i] = IntToFloat(buf[i + 2]) * 0.003921569f;
         }
     }
-    if (D_001A7A40.mirror) {
+    if (g_unlocked_item_flags.mirror) {
         p->analog[2] = -p->analog[2];
         p->analog[0] = -p->analog[0];
         if (p->held & 0x8000) {
@@ -116,7 +116,7 @@ void func_PAL_002B94A8(PadState *p, u8 *buf, s32 len) {
     p->released_unmasked = p->released;
     p->held_unmasked = p->held;
     p->unk348 = p->held;
-    if (D_001A7A40.mirror) {
+    if (g_unlocked_item_flags.mirror) {
         p->analog_prev[2] = -p->analog_prev[2];
         p->analog_prev[0] = -p->analog_prev[0];
         if (((s32)p->held_unmasked) & 0x8000) {
@@ -203,10 +203,10 @@ typedef struct {
 } State_2B8518;
 extern State_2B8518 g_pad_state;
 
-void func_PAL_002B9BB8(void) {
+void pad_poll_ports_pal(void) {
     extern void poll_pad_device_state(void *);
-    extern State_2B8518 D_00138500;
+    extern State_2B8518 g_pad_device_state;
     poll_pad_device_state(&g_pad_state);
-    poll_pad_device_state(&D_00138500);
+    poll_pad_device_state(&g_pad_device_state);
 }
 

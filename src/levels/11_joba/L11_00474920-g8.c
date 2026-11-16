@@ -2,13 +2,13 @@
 typedef unsigned char u8;
 typedef int Quadword __attribute__((mode(TI)));
 extern u8 *g_moby_l11_table;
-extern int D_L11_001A8FF4;
-extern int D_L11_001B30C8;
-extern int D_L11_001B2AAC __attribute__((sda));
-extern float D_L11_001B2AA0 __attribute__((sda));
-extern float D_L11_001B2AA4 __attribute__((sda));
-extern float D_L11_001B2AA8 __attribute__((sda));
-extern float D_L11_001B2AB0 __attribute__((sda));
+extern int g_hero_l11_input_blocked;
+extern int g_arena_progress_level;
+extern int g_arena_crowd_slot_count __attribute__((sda));
+extern float g_arena_crowd_level_low __attribute__((sda));
+extern float g_arena_crowd_level_mid __attribute__((sda));
+extern float g_arena_crowd_level_high __attribute__((sda));
+extern float g_arena_crowd_facing_tolerance __attribute__((sda));
 extern int moby_is_state_at_least_2(u8 *);
 extern int math_fast_helper_a(float *, float);
 extern void moby_start_idle_anim_variant(u8 *);
@@ -36,7 +36,7 @@ void arena_crowd_update(u8 *object) {
     center[2] = *(float *)(object + 0x18);
     center[3] = 5.0f;
     *(Quadword *)bounds = *(Quadword *)center;
-    if (math_fast_helper_a(bounds, 255.0f) <= 0 || D_L11_001A8FF4) {
+    if (math_fast_helper_a(bounds, 255.0f) <= 0 || g_hero_l11_input_blocked) {
         *(unsigned short *)(object + 0x32) = 0;
         return;
     }
@@ -50,9 +50,9 @@ void arena_crowd_update(u8 *object) {
             animation = math_random_int_below(2);
             anim_start_blended(object, animation, 0, 10);
         }
-        if (level > D_L11_001B2AA8 && !math_random_int_below(60)) {
+        if (level > g_arena_crowd_level_high && !math_random_int_below(60)) {
             moby_set_state(object, 2, -1);
-        } else if (level < D_L11_001B2AA0 && !math_random_int_below(60)) {
+        } else if (level < g_arena_crowd_level_low && !math_random_int_below(60)) {
             moby_set_state(object, 3, -1);
         }
         break;
@@ -64,21 +64,21 @@ void arena_crowd_update(u8 *object) {
             }
             return;
         }
-        if (level < D_L11_001B2AA4 && !math_random_int_below(60)) moby_set_state(object, 1, -1);
+        if (level < g_arena_crowd_level_mid && !math_random_int_below(60)) moby_set_state(object, 1, -1);
         break;
     case 3:
-        angle = ((float)(D_L11_001B30C8 % D_L11_001B2AAC) * -6.2831855f) / (float)D_L11_001B2AAC + 3.1415927f;
+        angle = ((float)(g_arena_progress_level % g_arena_crowd_slot_count) * -6.2831855f) / (float)g_arena_crowd_slot_count + 3.1415927f;
         delta = *(float *)(object + 0x10) - *(float *)arena_get_center_point(target);
         target = arena_get_center_point(g_moby_l11_table + *state * 0x100);
         heading = mat_fast_helper_a(delta, *(float *)(object + 0x14) - *(float *)(target + 4));
-        if (FastDiffRots(heading, angle) < D_L11_001B2AB0 ||
-            FastDiffRots(heading, FastAddRotations(angle, 3.1415927f)) < D_L11_001B2AB0) {
+        if (FastDiffRots(heading, angle) < g_arena_crowd_facing_tolerance ||
+            FastDiffRots(heading, FastAddRotations(angle, 3.1415927f)) < g_arena_crowd_facing_tolerance) {
             if (object[0x43] != 4) anim_start_blended(object, 4, 0, 10);
         } else if ((object[0x60] & 2) && object[0x43] != math_random_int_below(2)) {
             animation = math_random_int_below(2);
             anim_start_blended(object, animation, 0, 10);
         }
-        if (level > D_L11_001B2AA4 && !math_random_int_below(60)) moby_set_state(object, 1, -1);
+        if (level > g_arena_crowd_level_mid && !math_random_int_below(60)) moby_set_state(object, 1, -1);
         break;
     }
 }

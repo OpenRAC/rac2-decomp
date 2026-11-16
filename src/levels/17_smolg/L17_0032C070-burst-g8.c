@@ -1,7 +1,7 @@
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern float D_L17_001AF320 __attribute__((sda)), D_L17_001AF324 __attribute__((sda));
+extern float g_burst_l17_speed_scale __attribute__((sda)), g_burst_jitter_scale __attribute__((sda));
 extern char g_sound_state[];
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float, float);
@@ -44,8 +44,8 @@ void part_burst_update(unsigned char *obj)
         qcopy(&position, obj + 0x10);
         euler_to_matrix(matrix, obj + 0xF0);
         vec_clear_128(&velocity);
-        velocity.f[0] = *(float *)state * (D_L17_001AF320 * 3.0f) * 0.016666668f;
-        FastVecScale(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
+        velocity.f[0] = *(float *)state * (g_burst_l17_speed_scale * 3.0f) * 0.016666668f;
+        FastVecScale(&jitter, &jitter, velocity.f[0] * g_burst_jitter_scale);
         transform_vector(&velocity, &velocity, matrix);
         add_vectors(&random, &velocity, &jitter);
         if (*(int *)(state + 0xC) >= 10 || math_random_int_below(10 - *(int *)(state + 0xC)) == 0) {

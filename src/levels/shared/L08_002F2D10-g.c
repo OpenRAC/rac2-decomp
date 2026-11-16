@@ -7,7 +7,7 @@ typedef unsigned int SoundVectorQuad __attribute__((mode(TI)));
 typedef union { SoundVectorQuad q; float f[4]; } SoundVector;
 struct SoundRecordView { char unknown0[0x7e]; short id; char unknown80[4]; int level; void *owner; };
 extern unsigned char g_sound_state[];
-extern const char D_L08_001AA400[];
+extern const char g_str_sound_fade_debug[];
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void STUB_printf(const char *, ...);
@@ -64,7 +64,7 @@ int snd_fade_looping_by_distance(unsigned char *owner, unsigned char *state, int
         next = entry->level - step;
         if (next > low) entry->level = next;
         else entry->level = low;
-        STUB_printf(D_L08_001AA400, value);
+        STUB_printf(g_str_sound_fade_debug, value);
         return 2;
     }
     return 0;

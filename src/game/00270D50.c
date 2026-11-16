@@ -2,7 +2,7 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 extern char g_hero_state[];
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 extern void vec_scale_to_length(float *, float *, float);
 extern void cam_compute_aim_angles(float *, float *, float *, float *, float *, float *);
 
@@ -13,7 +13,7 @@ void cam_rebuild_look_at_from_hero(void)
     Vector second;
     Vector third;
     char *resident = g_hero_state;
-    char *camera = D_L00_001B8C80 + 0x290;
+    char *camera = g_scalar_transition_state + 0x290;
 
     vec_scale_to_length(first.f, (float *)(*(char **)(resident + 0x2290) + 0xC0), 1.0f);
     vec_scale_to_length(second.f, (float *)(*(char **)(resident + 0x2290) + 0xD0), 1.0f);

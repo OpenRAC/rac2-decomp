@@ -5,16 +5,16 @@ typedef struct { float vertex[4][4]; unsigned int color[4]; float uv[4][2]; unsi
 extern int g_frame_l02_counter;
 extern char *g_moby_l02_pool;
 extern unsigned short *g_entity_group_lists[];
-extern int D_L02_001B0A68[] __attribute__((sda)), D_L02_001B0A98[] __attribute__((sda));
+extern int g_quad_packet_texture_ids[] __attribute__((sda)), g_quad_packet_colors[] __attribute__((sda));
 extern int D_L02_001B0A68_gp SDATA(D_L02_001B0A68), D_L02_001B0A98_gp SDATA(D_L02_001B0A98);
-extern float D_L02_001B0A78[][2] SDATA(D_L02_001B0A78);
-extern float D_L02_001B0AB0[][4] MACRO_ADDR;
+extern float g_quad_packet_uv_pairs[][2] SDATA(D_L02_001B0A78);
+extern float g_quad_packet_extents[][4] MACRO_ADDR;
 extern float D_L02_001B0AB0_gp[][4] SDATA(D_L02_001B0AB0);
 extern float D_L02_001B0AF0_gp[][4] SDATA(D_L02_001B0AF0);
-extern int D_L02_001B0B30 __attribute__((sda));
-extern unsigned int D_L02_001B0B38[] SDATA(D_L02_001B0B38);
-extern float D_L02_001B0B40 __attribute__((sda));
-extern float D_L02_001B0B48[][2] MACRO_ADDR;
+extern int g_quad_l02_packet_texture_id __attribute__((sda));
+extern unsigned int g_quad_packet_color_pair[] SDATA(D_L02_001B0B38);
+extern float g_quad_packet_extent_step __attribute__((sda));
+extern float g_quad_packet_uv_table[][2] MACRO_ADDR;
 extern float D_L02_001B0B48_gp[][2] SDATA(D_L02_001B0B48);
 extern char g_camera_l02_position[];
 extern float IntToFloat(int);
@@ -76,10 +76,10 @@ void DrawRotatingObjectGroupEffects(char *actor) {
         }
         if ((short)*entry++ < 0) break;
     }
-    FillQuadPacket(packet, D_L02_001B0A68_gp, D_L02_001B0A98_gp, D_L02_001B0A78, D_L02_001B0AB0_gp, 1);
-    FillQuadPacket(packet + 1, D_L02_001B0A68[1], D_L02_001B0A98[2], D_L02_001B0A78, D_L02_001B0AF0_gp, 1);
-    packet[0].color[1] = packet[0].color[3] = D_L02_001B0A98[1];
-    packet[1].color[1] = packet[1].color[3] = D_L02_001B0A98[3];
+    FillQuadPacket(packet, D_L02_001B0A68_gp, D_L02_001B0A98_gp, g_quad_packet_uv_pairs, D_L02_001B0AB0_gp, 1);
+    FillQuadPacket(packet + 1, g_quad_packet_texture_ids[1], g_quad_packet_colors[2], g_quad_packet_uv_pairs, D_L02_001B0AF0_gp, 1);
+    packet[0].color[1] = packet[0].color[3] = g_quad_packet_colors[1];
+    packet[1].color[1] = packet[1].color[3] = g_quad_packet_colors[3];
     vec_clear_128(angles);
     angles[0] = 0.3926991f;
     euler_rotation_basis(tilt, angles);
@@ -100,11 +100,11 @@ void DrawRotatingObjectGroupEffects(char *actor) {
             }
         }
     }
-    packet[0].state[1] = GetEffectTextureDescriptor(D_L02_001B0B30);
+    packet[0].state[1] = GetEffectTextureDescriptor(g_quad_l02_packet_texture_id);
     for (uvIndex = 0; uvIndex < 4; uvIndex++) {
         packet[0].uv[uvIndex][0] = D_L02_001B0B48_gp[uvIndex][0];
-        packet[0].uv[uvIndex][1] = D_L02_001B0B48[uvIndex][1];
-        packet[0].color[uvIndex] = D_L02_001B0B38[uvIndex & 1];
+        packet[0].uv[uvIndex][1] = g_quad_packet_uv_table[uvIndex][1];
+        packet[0].color[uvIndex] = g_quad_packet_color_pair[uvIndex & 1];
     }
     set_identity_matrix(identity);
     {
@@ -125,24 +125,24 @@ void DrawRotatingObjectGroupEffects(char *actor) {
             do {
                 float extent = g[2];
                 offsetAddress = offset;
-                lowerEnd = D_L02_001B0AB0;
+                lowerEnd = g_quad_packet_extents;
                 lowerEnd += 2;
-                if ((int)g < (int)lowerEnd) extent += D_L02_001B0B40;
-                else extent -= D_L02_001B0B40;
+                if ((int)g < (int)lowerEnd) extent += g_quad_packet_extent_step;
+                else extent -= g_quad_packet_extent_step;
                 vec_scale_to_length(*v, normal, extent);
                 vec_scale_to_length(offset, matrices[objectIndex], g[0]);
                 g += 4;
                 FastVecAdd(*v, *v, offset);
                 v++;
-                allEnd = D_L02_001B0AB0;
+                allEnd = g_quad_packet_extents;
                 allEnd += 4;
             } while ((int)g < (int)allEnd);
         }
         draw_world_quad(packet, identity, 0);
         for (vertex = 0; vertex < 4; vertex++) {
             float extent = geometry[vertex * 4 + 2];
-            if (vertex < 2) extent += D_L02_001B0B40;
-            else extent -= D_L02_001B0B40;
+            if (vertex < 2) extent += g_quad_packet_extent_step;
+            else extent -= g_quad_packet_extent_step;
             vec_scale_to_length(offset, normal, extent * -2.0f);
             FastVecAdd(packet[0].vertex[vertex], packet[0].vertex[vertex], offset);
         }
@@ -152,11 +152,11 @@ void DrawRotatingObjectGroupEffects(char *actor) {
         offset[3] = 1.0f;
         transform_vector(offset, offsetAddress, matrices[objectIndex]);
         frame = math_random_float_range(0.0f, 1.0f);
-        color = FastTweenColor(D_L02_001B0A98_gp, D_L02_001B0A98[1], frame);
+        color = FastTweenColor(D_L02_001B0A98_gp, g_quad_packet_colors[1], frame);
         frame = math_random_angle();
         gfx_draw_billboard_quad(offset, 11, color, 1, 2.0f, 0.0f, frame);
         frame = math_random_float_range(0.0f, 1.0f);
-        color = FastTweenColor(D_L02_001B0A98[2], D_L02_001B0A98[3], frame);
+        color = FastTweenColor(g_quad_packet_colors[2], g_quad_packet_colors[3], frame);
         frame = math_random_angle();
         gfx_draw_billboard_quad(offset, 11, color, 1, 2.75f, 0.0f, frame);
         frame = math_random_angle();

@@ -1,21 +1,21 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern u32 D_L03_001B0C48 __attribute__((sda));
+extern u32 g_path_puzzle_glow_color_a __attribute__((sda));
 
-extern u32 D_L03_001B0C4C NOT_SDA;
+extern u32 g_path_puzzle_glow_color_b NOT_SDA;
 
-extern u32 D_L03_001B0C50 NOT_SDA;
+extern u32 g_path_puzzle_glow_color_c NOT_SDA;
 
-extern u32 D_L03_001B0C54 NOT_SDA;
+extern u32 g_path_puzzle_glow_color_d NOT_SDA;
 
-extern u32 D_L03_001B0C58 NOT_SDA;
+extern u32 g_path_puzzle_glow_color_e NOT_SDA;
 
-extern u32 D_L03_001B0C5C NOT_SDA;
+extern u32 g_path_puzzle_glow_color_f NOT_SDA;
 
-extern f32 D_L03_001B0C60 __attribute__((sda));
+extern f32 g_path_puzzle_glow_ease_rate_a __attribute__((sda));
 
-extern f32 D_L03_001B0C64 NOT_SDA;
+extern f32 g_path_puzzle_glow_ease_rate_b NOT_SDA;
 
 extern f32 FastAddRotations(f32, f32);
 
@@ -33,17 +33,17 @@ void path_puzzle_update_glow_color(u8 *moby) {
     f32 blend;
 
     if (moby[0x20] == 5 || *(short *)(vars + 0x6A) == 0) {
-        colors[0] = D_L03_001B0C48;
-        colors[1] = D_L03_001B0C4C;
-        ease_step = D_L03_001B0C60 * 0.00029088825f;
+        colors[0] = g_path_puzzle_glow_color_a;
+        colors[1] = g_path_puzzle_glow_color_b;
+        ease_step = g_path_puzzle_glow_ease_rate_a * 0.00029088825f;
     } else if (*(short *)(vars + 0x68) != 0) {
-        colors[0] = D_L03_001B0C50;
-        colors[1] = D_L03_001B0C54;
-        ease_step = D_L03_001B0C64 * 0.00029088825f;
+        colors[0] = g_path_puzzle_glow_color_c;
+        colors[1] = g_path_puzzle_glow_color_d;
+        ease_step = g_path_puzzle_glow_ease_rate_b * 0.00029088825f;
     } else {
-        colors[0] = D_L03_001B0C58;
-        colors[1] = D_L03_001B0C5C;
-        ease_step = D_L03_001B0C64 * 0.00029088825f;
+        colors[0] = g_path_puzzle_glow_color_e;
+        colors[1] = g_path_puzzle_glow_color_f;
+        ease_step = g_path_puzzle_glow_ease_rate_b * 0.00029088825f;
     }
     blend = FastAddRotations(*(f32 *)(vars + 0x78), ease_step);
     *(f32 *)(vars + 0x78) = blend;

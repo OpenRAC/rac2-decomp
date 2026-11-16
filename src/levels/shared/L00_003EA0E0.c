@@ -1,12 +1,13 @@
 #include "include_asm.h"
+#include "names.h"
 #include "moby_classes.h"
 #include "names.h"
 
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 extern void gfx_set_clamped_view_distance(float value);
 extern float math_fabs(float value);
-extern char D_L00_001D9F00[];
-extern char D_L00_001DA860[];
+extern char g_sound_bank_table[];
+extern char g_class_slot_indices[];
 char *kilonoid_spawn(char *a, char *b);
 char *SpawnCB2Moby(char *a, char *b);
 void func_L00_0035F180(char *a, int b, int c, char *d, int e);
@@ -44,19 +45,19 @@ extern void STUB_printf(void *, ...);
 
 extern unsigned char g_hero_position[];
 
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 
 extern int g_current_map_index __attribute__((sda));
 
-extern int D_001A7A10 __attribute__((sda));
+extern int g_player_state_shorts __attribute__((sda));
 
-extern int D_001A7A14 __attribute__((sda));
+extern int g_collectible_total __attribute__((sda));
 
-extern int D_L00_001C5480[][3];
+extern int g_collectible_value_table[][3];
 
-extern int D_L00_001C5540[][3];
+extern int g_collectible_bonus_table[][3];
 
-extern char D_L00_001B0700[];
+extern char g_str_collectible_debug[];
 
 extern char g_camera_l00_position[];
 
@@ -115,7 +116,7 @@ void sweeping_scale_update(char *moby)
     }
     if (*(unsigned char *)(moby + 0x20) != 1)
         return;
-    if (D_L00_001A8F00 == 2)
+    if (g_game_l00_mode == 2)
         return;
 
     posY = *(float *)(moby + 0x14);
@@ -171,7 +172,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 extern void func_3EA860(char *);
 extern int func_2E67A0(int);
 extern float func_2EE7A8(float, float);
@@ -209,12 +210,12 @@ void gfx_draw_aimed_glow_sprite(char *unused, char *position, int color, float a
     *(long long *)(work + 0x70) = 0;
     *(int *)(work + 0xDC) = 0;
 
-    yaw = func_2EE7A8(D_L00_001B8C80.x_140 - *(float *)(position + 0),
-                        D_L00_001B8C80.y_144 - *(float *)(position + 4));
+    yaw = func_2EE7A8(g_scalar_transition_state.x_140 - *(float *)(position + 0),
+                        g_scalar_transition_state.y_144 - *(float *)(position + 4));
     *(float *)(work + 0xD8) = yaw;
 
-    pitch = func_2EE7A8(func_2EE2E8(position, &D_L00_001B8C80.x_140),
-                         D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    pitch = func_2EE7A8(func_2EE2E8(position, &g_scalar_transition_state.x_140),
+                         g_scalar_transition_state.z_148 - *(float *)(position + 8));
     *(float *)(work + 0xD4) = -pitch;
     *(float *)(work + 0xD0) = func_31A888();
     func_2EE970((char *)work + 0x90, (char *)work + 0xD0);
@@ -253,27 +254,27 @@ void collectible_pickup_update(char *object) {
     g_hero_position[0x2246] = *(unsigned char *)(object + 0xB0);
     if (state[2])
         return;
-    if ((D_0019B2E8[*(unsigned char *)(object + 0xB0) + g_current_map_index * 16] >>
+    if ((g_moby_group_flags[*(unsigned char *)(object + 0xB0) + g_current_map_index * 16] >>
          (*(unsigned char *)(object + 0xB1) * 2)) & 3)
         return;
     state[2] = 1;
     result = level_get_difficulty_scaled(*(unsigned char *)(object + 0xB0));
     index = (*(unsigned char *)(object + 0xB0) & 15) + g_current_map_index * 16;
     shift = (*(unsigned char *)(object + 0xB1) & 3) * 2;
-    entry = D_0019B2E8 + index;
+    entry = g_moby_group_flags + index;
     if (!((*entry >> shift) & 3)) {
         *entry = (*entry & ~(3 << shift)) | (result << shift);
-        D_001A7A10 += D_L00_001C5480[*(unsigned char *)(object + 0xB0) & 15]
+        g_player_state_shorts += g_collectible_value_table[*(unsigned char *)(object + 0xB0) & 15]
                                    [*(unsigned char *)(object + 0xB1) & 3];
-        D_001A7A14 += D_L00_001C5540[*(unsigned char *)(object + 0xB0) & 15]
+        g_collectible_total += g_collectible_bonus_table[*(unsigned char *)(object + 0xB0) & 15]
                                    [*(unsigned char *)(object + 0xB1) & 3];
     }
-    STUB_printf(D_L00_001B0700,
-        D_L00_001C5480[*(unsigned char *)(object + 0xB0)][*(unsigned char *)(object + 0xB1)],
-        D_L00_001C5540[*(unsigned char *)(object + 0xB0)][*(unsigned char *)(object + 0xB1)]);
+    STUB_printf(g_str_collectible_debug,
+        g_collectible_value_table[*(unsigned char *)(object + 0xB0)][*(unsigned char *)(object + 0xB1)],
+        g_collectible_bonus_table[*(unsigned char *)(object + 0xB0)][*(unsigned char *)(object + 0xB1)]);
 }
 
-extern int D_L00_001C9340;
+extern int g_tutorial_points;
 
 extern void BuildObjectAttachmentTransforms(char *, void *, int, int, int, int, int, int);
 
@@ -347,7 +348,7 @@ void rotating_parts_update(char *self)
         self[0x20] = 1;
         break;
     case 1:
-        if (D_L00_001C9340 != st->level)
+        if (g_tutorial_points != st->level)
             break;
         if (st->firstStep > 0.0f)
             math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,
@@ -385,13 +386,13 @@ void rotating_parts_update(char *self)
 
 extern int moby_count_group_not_in_state(int, int);
 
-extern unsigned char *D_L00_001B1E9C __attribute__((sda));
+extern unsigned char *g_moby_array_base __attribute__((sda));
 
-extern int D_L00_001FA920[];
+extern int g_turn_state_table[];
 
-extern int D_L00_001B0720[];
+extern int g_str_object_group_toggle_a[];
 
-extern int D_L00_001B0738[];
+extern int g_str_object_group_toggle_b[];
 
 /* Four-id switch: wait for the resident check, flip bit 0x43 of every record the first
    list of each of the four ids names and arm D_L00_001B0720; wait again, clear those bits
@@ -417,18 +418,18 @@ void object_group_toggle_update(char *self)
 
             row = (char *)state + i * 4;
             groupId = *(int *)row;
-            if (D_L00_001FA920[groupId] == 0)
+            if (g_turn_state_table[groupId] == 0)
                 continue;
             if (moby_count_group_not_in_state(groupId, -1) < 2)
                 continue;
-            records = D_L00_001B1E9C;
-            idList = (unsigned short *)D_L00_001FA920[*(int *)(state + i * 4)];
+            records = g_moby_array_base;
+            idList = (unsigned short *)g_turn_state_table[*(int *)(state + i * 4)];
             do {
                 entry = records + (*idList & 0x7FFF) * 256;
                 *(unsigned short *)(entry + 0x34) |= 0x43;
             } while ((short)*idList++ >= 0);
         }
-        STUB_printf(D_L00_001B0720);
+        STUB_printf(g_str_object_group_toggle_a);
         *(unsigned char *)(self + 0x20) = 2;
     }
     if (*(unsigned char *)(self + 0x20) == 2) {
@@ -446,18 +447,18 @@ void object_group_toggle_update(char *self)
 
             row = (char *)state + i * 4;
             groupId = *(int *)row;
-            if (D_L00_001FA920[groupId] == 0)
+            if (g_turn_state_table[groupId] == 0)
                 continue;
             if (moby_count_group_not_in_state(groupId, -1) < 2)
                 continue;
-            records = D_L00_001B1E9C;
-            idList = (unsigned short *)D_L00_001FA920[*(int *)(state + i * 4)];
+            records = g_moby_array_base;
+            idList = (unsigned short *)g_turn_state_table[*(int *)(state + i * 4)];
             do {
                 entry = records + (*idList & 0x7FFF) * 256;
                 *(unsigned short *)(entry + 0x34) &= 0xFFBC;
             } while ((short)*idList++ >= 0);
         }
-        STUB_printf(D_L00_001B0738);
+        STUB_printf(g_str_object_group_toggle_b);
         *(unsigned char *)(self + 0x20) = 0;
     }
 }
@@ -547,7 +548,7 @@ void synthenoid_spawn_or_kilonoid(char *spawnPos, int classId)
     } while (++i < 4);
     if (spawned != 0)
         return;
-    func_L00_0035F180((char *)(*(int *)(*(int *)(D_L00_001D9F00 + *(unsigned char *)(D_L00_001DA860 + cls) * 4) + 0x28) + 0xC0),
+    func_L00_0035F180((char *)(*(int *)(*(int *)(g_sound_bank_table + *(unsigned char *)(g_class_slot_indices + cls) * 4) + 0x28) + 0xC0),
                       0, 0, (char *)g_hero_position, 0x400);
 }
 
@@ -582,7 +583,7 @@ extern void *part_spawn_burst(float *out, float *dir, int a, int b, unsigned int
 
 extern char g_camera_l00_position[];
 
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 
 /* Twenty times over: take the angle of the constant vector at D_L00_001B8DC0 and the point,
    scale the hero facing direction by a random small amount, spawn a particle at the point
@@ -610,7 +611,7 @@ void part_l00_spawn_impact_spark_burst(float *origin)
 
     for (i = 19; i >= 0; i--) {
         randomValue = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)direction, D_0018A0E0, -(randomValue * 0.01666666753590107f));
+        FastVecScale((char *)direction, g_hero_state_block, -(randomValue * 0.01666666753590107f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         randomValue = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         spawnPos[0] = origin[0] + math_random_signed_float_range(0.0f, 0.2f);

@@ -1,7 +1,8 @@
+#include "names.h"
 /* func_PAL_L09_00409AC8, the PAL copy of func_L09_00404BF0: the same C, where rename-macro func_002A7470 becomes func_PAL_002A7E68; scale a1; rename func_L08_00316678 becomes func_PAL_002A7E68; rename D_L09_001B13F4 becomes D_PAL_001B1420. */
 #include "common.h"
 
-extern f32 D_PAL_001B1420 __attribute__((sda));
+extern f32 g_level_float_scale_a __attribute__((sda));
 extern void func_PAL_002A7E68(char *a, s32 b, s32 c, s32 d);
 
 typedef union {
@@ -9,10 +10,10 @@ typedef union {
     s32 w;
 } U16S32;
 
-extern U16S32 D_L09_001B13C0 __attribute__((sda));
+extern U16S32 g_dobbo_timer_value __attribute__((sda));
 void func_PAL_L09_00409AC8(char *a0, s32 a1) {
     char *v = a0;
-    f32 f = D_PAL_001B1420 * 0.020000001f;
+    f32 f = g_level_float_scale_a * 0.020000001f;
     char *p = *(char **)(v + 0x68);
     *(f32 *)(p + 0x1D4) = 3.0f;
     *(f32 *)(p + 0x1D0) = f;
@@ -22,13 +23,13 @@ void func_PAL_L09_00409AC8(char *a0, s32 a1) {
     func_PAL_002A7E68(a0, 7, 0, (((int)(a1) * 5 + 2) / 6));
 }
 
-extern f32 D_PAL_001B1424 __attribute__((sda));
+extern f32 g_level_float_scale_b __attribute__((sda));
 
 /* func_PAL_L09_00409B48, the same C as func_PAL_L09_00409AC8, where state 7 becomes 6, 3.0f becomes
    1.75f and D_PAL_001B1420 becomes D_PAL_001B1424. */
 void func_PAL_L09_00409B48(char *a0, s32 a1) {
     char *v = a0;
-    f32 f = D_PAL_001B1424 * 0.020000001f;
+    f32 f = g_level_float_scale_b * 0.020000001f;
     char *p = *(char **)(v + 0x68);
     *(f32 *)(p + 0x1D4) = 1.75f;
     *(f32 *)(p + 0x1D0) = f;
@@ -63,7 +64,7 @@ typedef struct {
 
 /* The object's blended colour word: a member store, which the scheduler knows cannot alias the
    scalar global D_L09_001B2388 (a plain cast store it must keep in front of that load). */
-extern ColorPair D_L09_001B1400[2];
+extern ColorPair g_dobbo_tint_colors[2];
 
 void dobbo_draw_pulsing_glows(u8 *a0);
 
@@ -80,4 +81,4 @@ void dobbo_draw_pulsing_glows(u8 *a0);
 void dobbo_draw_pulsing_glows(u8 *a0);
 
 typedef struct { u8 pad[0x464]; u8 spent[1]; } L09_CellFlags;
-extern L09_CellFlags D_L09_0021E9F0;
+extern L09_CellFlags g_dobbo_flags;

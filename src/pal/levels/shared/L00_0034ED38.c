@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 typedef struct {
     char reserved00[0x14];
     char *source;
@@ -9,19 +9,19 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackStateL001FEC40;
-extern CallbackStateL001FEC40 D_L00_001FEC40;
+extern CallbackStateL001FEC40 g_pause_input_state;
 extern int level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
-int func_PAL_L00_0034ED38(void)
+int pad_l00_update_input_callback_6_pal(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -42,7 +42,7 @@ extern void level_l00_call_module_handler_2(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Implementation matching decompiled output */
-long func_PAL_L00_0034EDC0(void)
+long setup_l00_run_three_return_zero_pal(void)
 {
   func_0027C540_5(0);
   level_l00_call_module_handler_2();
@@ -57,18 +57,18 @@ extern int list_page_get_selected_record(int);
 extern void menu_start_action(int);
 
 /* The same guarded callback update with its own setup call and pending-request reader. */
-int func_PAL_L00_0034EDF0(void)
+int input_l00_callback_send_request_pal(void)
 {
     int result = 0;
     int *state = g_pad_state;
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
 
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -98,7 +98,7 @@ extern void level_l00_call_module_handler_3(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
 /* Candidate function: FUN_002d3390 */
-unsigned long long func_PAL_L00_0034EEC0(void)
+unsigned long long setup_l00_run_three_return_zero_2_pal(void)
 {
     func_0027C540_8(0);
     level_l00_call_module_handler_3();
@@ -111,7 +111,7 @@ extern void DoGifPaging(void);
 extern void module_l00_call_handler_14(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_PAL_L00_0034EFB8(void)
+int setup_l00_run_three_return_zero_3_pal(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_14();
@@ -122,7 +122,7 @@ int func_PAL_L00_0034EFB8(void)
 extern void *tab_menu_get_selected_value(int x);
 
 /* When a global flag is set, derives a pointer from that global plus a fixed offset, runs it through one callee and stores the callee result into a field of the argument. */
-int func_PAL_L00_00350A48(int *obj)
+int table_store_entry_in_object_pal(int *obj)
 {
     if (D_L00_001A904C_3 != 0)
         obj[13] = tab_menu_get_selected_value(D_L00_001A904C_3 + 0x3C210);

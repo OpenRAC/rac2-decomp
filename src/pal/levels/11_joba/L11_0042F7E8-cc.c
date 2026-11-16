@@ -1,7 +1,7 @@
 #include "names.h"
 /* func_PAL_L11_0042F7E8, the PAL copy of func_L11_0042A5B0: the same C, where template sibling func_PAL_L04_00456C90. */
 
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -19,7 +19,7 @@ void func_PAL_L11_0042F7E8(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    FastVecSub(direction, (float *)g_tether_zero_vec, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;

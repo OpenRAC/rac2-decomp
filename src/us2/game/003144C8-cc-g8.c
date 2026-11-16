@@ -57,36 +57,36 @@ typedef struct D_2D9EA0 {
     int f7C;
 } D_2D9EA0;
 extern char g_hero_state[], g_hero_position[];
-extern Vec D_L00_0023A670[], D_L00_0023A6F0[];
+extern Vec g_nanotech_ball_axes[], g_nanotech_ball_basis_vectors[];
 extern float D_001AF180_gp[] SDATA(D_001AF180);
 extern char g_camera_l00_position[];
-extern Moby *D_L00_001B1AEC;
-extern int D_001A7A00;
-extern unsigned char D_001A7A44[] MACRO_ADDR;
-extern unsigned char D_001A7A0A;
-extern int D_001AD7EC, g_game_time;
-extern int D_001AF11C __attribute__((sda)), D_001AF1A0 __attribute__((sda));
+extern Moby *g_nanotech_ball_moby;
+extern int g_player_stats;
+extern unsigned char g_cheat_flags[] MACRO_ADDR;
+extern unsigned char g_extras_unlocked_flag;
+extern int g_turret_target_moby, g_game_time;
+extern int g_nanotech_special_phase __attribute__((sda)), g_nanotech_amount_alt __attribute__((sda));
 extern int moby_transform_point_by_attachment(void *,void *,void *,void *);
 extern int moby_is_state_six(void *), moby_is_in_selected_zone(void *);
-extern void moby_set_state(void *,int,int), func_US2_0029C510(int);
-extern float D_001AF130 __attribute__((sda));
-extern float D_001AF178 __attribute__((sda));
-extern unsigned short D_001AF174 __attribute__((sda));
-extern float D_001AF170 __attribute__((sda));
-extern float D_001AF16C __attribute__((sda));
-extern int D_001AF164 __attribute__((sda));
-extern int D_001AF160 __attribute__((sda));
-extern int D_001AF15C __attribute__((sda));
-extern unsigned short D_001AF158 __attribute__((sda));
-extern float D_001AF128 __attribute__((sda));
-extern int D_001AF118 __attribute__((sda));
-extern float D_001AF114 __attribute__((sda));
-extern float D_001AF110 __attribute__((sda));
-extern unsigned char D_001AF10C __attribute__((sda));
+extern void moby_set_state(void *,int,int), level_forward_value_b_us2(int);
+extern float g_nanotech_base_length __attribute__((sda));
+extern float g_nanotech_scale_wobble __attribute__((sda));
+extern unsigned short g_nanotech_duration __attribute__((sda));
+extern float g_nanotech_hero_offset __attribute__((sda));
+extern float g_nanotech_hero_push __attribute__((sda));
+extern int g_nanotech_life_max __attribute__((sda));
+extern int g_nanotech_life_min __attribute__((sda));
+extern int g_nanotech_random_value __attribute__((sda));
+extern unsigned short g_nanotech_timer_init __attribute__((sda));
+extern float g_nanotech_spin_step __attribute__((sda));
+extern int g_nanotech_slot_phase __attribute__((sda));
+extern float g_nanotech_slot_scale_alt __attribute__((sda));
+extern float g_nanotech_slot_scale __attribute__((sda));
+extern unsigned char g_nanotech_phase_step __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 
-extern float D_001AF12C __attribute__((sda));
+extern float g_nanotech_pulse_amp __attribute__((sda));
 extern void gravity_offset_position(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -119,7 +119,7 @@ extern int snd_play_from_class_bank(int, int, void *, int);
 extern float IntToFloat(int);
 extern float cubic_hermite_scalar(float, float, float, float, float);
 
-void func_US2_003144C8(Moby *m) {
+void nanotech_ball_update_us2(Moby *m) {
     V_2D9EA0 v0, v10, v20, v30, v40, v50, v60;
     D_2D9EA0 *d = (D_2D9EA0 *)m->pvars;
 
@@ -142,34 +142,34 @@ void func_US2_003144C8(Moby *m) {
         d->h56 = 0;
         d->owner = 0;
         for (i = 0; i < 4; i++) d->f60[i] = (float)math_random_int_below(0xFF);
-        for (i = 0; i < 4; i++) d->h58[i] = D_001AF174;
+        for (i = 0; i < 4; i++) d->h58[i] = g_nanotech_duration;
         for (i = 0; i < 8; i++) d->slots[i] = 0;
-        if (D_L00_001B1AEC == 0) {
+        if (g_nanotech_ball_moby == 0) {
             euler_rotation_basis(&m->rot_row0, &m->rot);
-            D_L00_001B1AEC = m;
+            g_nanotech_ball_moby = m;
             m->update_dist = 0xFF;
             d->pending = 0;
-            vec_scale_to_length(&D_L00_0023A670[0], &m->rot_row0, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[0], &m->rot_row2);
-            vec_scale_to_length(&D_L00_0023A670[1], &m->rot_row1, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[1], &m->rot_row0);
-            vec_scale_to_length(&D_L00_0023A670[2], &m->rot_row2, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[2], &m->rot_row1);
-            FastVecAdd(&D_L00_0023A670[3], &m->rot_row0, &m->rot_row2);
-            vec_scale_to_length(&D_L00_0023A670[3], &D_L00_0023A670[3], D_001AF130);
-            FastVecCross(&D_L00_0023A6F0[3], &D_L00_0023A670[3], &m->rot_row1);
-            FastVecAdd(&D_L00_0023A670[4], &m->rot_row0, &m->rot_row1);
-            vec_scale_to_length(&D_L00_0023A670[4], &D_L00_0023A670[4], D_001AF130);
-            FastVecCross(&D_L00_0023A6F0[4], &D_L00_0023A670[4], &m->rot_row2);
-            FastVecSub(&D_L00_0023A670[5], &m->rot_row1, &m->rot_row2);
-            vec_scale_to_length(&D_L00_0023A670[5], &D_L00_0023A670[5], D_001AF130);
-            FastVecCross(&D_L00_0023A6F0[5], &D_L00_0023A670[5], &m->rot_row0);
-            FastVecSub(&D_L00_0023A670[6], &m->rot_row0, &m->rot_row2);
-            vec_scale_to_length(&D_L00_0023A670[6], &D_L00_0023A670[6], D_001AF130);
-            FastVecCross(&D_L00_0023A6F0[6], &D_L00_0023A670[6], &m->rot_row1);
-            FastVecSub(&D_L00_0023A670[7], &m->rot_row0, &m->rot_row1);
-            vec_scale_to_length(&D_L00_0023A670[7], &D_L00_0023A670[7], D_001AF130);
-            FastVecCross(&D_L00_0023A6F0[7], &D_L00_0023A670[7], &m->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[0], &m->rot_row0, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[0], &m->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[1], &m->rot_row1, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[1], &m->rot_row0);
+            vec_scale_to_length(&g_nanotech_ball_axes[2], &m->rot_row2, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[2], &m->rot_row1);
+            FastVecAdd(&g_nanotech_ball_axes[3], &m->rot_row0, &m->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[3], &g_nanotech_ball_axes[3], g_nanotech_base_length);
+            FastVecCross(&g_nanotech_ball_basis_vectors[3], &g_nanotech_ball_axes[3], &m->rot_row1);
+            FastVecAdd(&g_nanotech_ball_axes[4], &m->rot_row0, &m->rot_row1);
+            vec_scale_to_length(&g_nanotech_ball_axes[4], &g_nanotech_ball_axes[4], g_nanotech_base_length);
+            FastVecCross(&g_nanotech_ball_basis_vectors[4], &g_nanotech_ball_axes[4], &m->rot_row2);
+            FastVecSub(&g_nanotech_ball_axes[5], &m->rot_row1, &m->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[5], &g_nanotech_ball_axes[5], g_nanotech_base_length);
+            FastVecCross(&g_nanotech_ball_basis_vectors[5], &g_nanotech_ball_axes[5], &m->rot_row0);
+            FastVecSub(&g_nanotech_ball_axes[6], &m->rot_row0, &m->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[6], &g_nanotech_ball_axes[6], g_nanotech_base_length);
+            FastVecCross(&g_nanotech_ball_basis_vectors[6], &g_nanotech_ball_axes[6], &m->rot_row1);
+            FastVecSub(&g_nanotech_ball_axes[7], &m->rot_row0, &m->rot_row1);
+            vec_scale_to_length(&g_nanotech_ball_axes[7], &g_nanotech_ball_axes[7], g_nanotech_base_length);
+            FastVecCross(&g_nanotech_ball_basis_vectors[7], &g_nanotech_ball_axes[7], &m->rot_row2);
         }
         {
             float a;
@@ -198,34 +198,34 @@ void func_US2_003144C8(Moby *m) {
             for (i = 0; i < 8; i++) {
                 if (d->slots[i] != 0) {
                     Ext_2D9EA0 *x = (Ext_2D9EA0 *)(d->slots[i] + 1);
-                    x->u.s.scale = D_001AF178 * math_fast_sin_or_cos_b(x->u.s.ang) + D_001AF130;
+                    x->u.s.scale = g_nanotech_scale_wobble * math_fast_sin_or_cos_b(x->u.s.ang) + g_nanotech_base_length;
                     x->u.s.ang = FastAddRotations(x->u.s.ang, D_001AF180_gp[i]);
                 }
             }
         }
         {
             Hero *g = (Hero *)g_hero_state;
-            int lim = D_001A7A00;
+            int lim = g_player_stats;
             if (g->vehicle_mode == 1) lim = 4;
-            if (m->state != 1 && D_L00_001B1AEC != 0 && (D_2D9EA0 *)D_L00_001B1AEC->pvars != 0 && g->health.hp != 0
-                && (g->health.hp + ((D_2D9EA0 *)D_L00_001B1AEC->pvars)->pending < lim || (D_001A7A44[2] != 0 && g->invulnerable_frames == 0))
+            if (m->state != 1 && g_nanotech_ball_moby != 0 && (D_2D9EA0 *)g_nanotech_ball_moby->pvars != 0 && g->health.hp != 0
+                && (g->health.hp + ((D_2D9EA0 *)g_nanotech_ball_moby->pvars)->pending < lim || (g_cheat_flags[2] != 0 && g->invulnerable_frames == 0))
                 && (d->slots[0] || d->slots[1] || d->slots[2] || d->slots[3] || d->slots[4] || d->slots[5] || d->slots[6] || d->slots[7])
                 && fast_vec_dist(&m->pos, g_hero_position) < 10.0f
                 && is_nanotech_ball_target_line_clear(m)) {
                 int i;
                 m->state = 3;
-                ((D_2D9EA0 *)D_L00_001B1AEC->pvars)->pending++;
-                if (D_001A7A44[2] != 0) *(short *)(g_hero_position + 0x15C) = 0x258;
-                d->h54 = D_001AF158;
-                FastVecScale(&v30, g_hero_position + 0x240, -D_001AF170);
+                ((D_2D9EA0 *)g_nanotech_ball_moby->pvars)->pending++;
+                if (g_cheat_flags[2] != 0) *(short *)(g_hero_position + 0x15C) = 0x258;
+                d->h54 = g_nanotech_timer_init;
+                FastVecScale(&v30, g_hero_position + 0x240, -g_nanotech_hero_offset);
                 FastVecAdd(&v30, g_hero_position, &v30);
-                FastVecScale(&v0, g_hero_position + 0x240, -D_001AF16C);
+                FastVecScale(&v0, g_hero_position + 0x240, -g_nanotech_hero_push);
                 FastVecSub(&v20, &v30, &m->pos);
                 gravity_offset_position(&m->pos, &v20, &v20, 0.5f);
                 FastVecCross(&v40, &v20, &v0);
                 FastVecCross(&v0, &v40, &v20);
                 math_apply_axis_rotation_to_quat(&v0, &v0, -1.5707964f, &v20);
-                vec_scale_to_length(&v0, &v0, D_001AF16C);
+                vec_scale_to_length(&v0, &v0, g_nanotech_hero_push);
                 FastVecScale(&v50, &v20, 0.5f);
                 for (i = 0; i < 8; i++) {
                     if (d->slots[i] != 0) {
@@ -245,14 +245,14 @@ void func_US2_003144C8(Moby *m) {
                             dst->y = src->y;
                             dst->z = src->z;
                         }
-                        x->h1E = x->h1C = math_random_int_range(D_001AF160, D_001AF164);
+                        x->h1E = x->h1C = math_random_int_range(g_nanotech_life_min, g_nanotech_life_max);
                     }
                 }
             }
         }
-        d->f0 = D_001AF12C * math_fast_sin_or_cos_b(d->f4);
-        d->f4 = FastAddRotations(d->f4, D_001AF128);
-        if (D_L00_001B1AEC == m) update_nanotech_ball_slot_offsets();
+        d->f0 = g_nanotech_pulse_amp * math_fast_sin_or_cos_b(d->f4);
+        d->f4 = FastAddRotations(d->f4, g_nanotech_spin_step);
+        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
         qcopy(&v0, &m->pos);
         gravity_offset_position(&m->pos, &v0, &v0, -0.5f);
         v0.w = 1.0f;
@@ -282,45 +282,45 @@ void func_US2_003144C8(Moby *m) {
                     x->b.z = e->pos.z - v20.z;
                     if (m->state == 2) x->u.s.owner = m;
                     else x->u.s.owner = m->owner;
-                    if (d->special) e->f4 = D_001AF11C;
-                    else e->f4 = D_001AF118;
-                    e->fC = D_001AF110;
+                    if (d->special) e->f4 = g_nanotech_special_phase;
+                    else e->f4 = g_nanotech_slot_phase;
+                    e->fC = g_nanotech_slot_scale;
                 }
                 p = d->slots[i];
                 if (p == 0) {
                     d->slots[i] = part_spawn_bluish_fade(&v10, 0, 1, 0);
                     if (d->slots[i] != 0) {
                         Ext_2D9EA0 *x = (Ext_2D9EA0 *)(d->slots[i] + 1);
-                        x->u.s.scale = D_001AF130;
+                        x->u.s.scale = g_nanotech_base_length;
                         x->u.s.ang = 0.0f;
-                        d->slots[i]->fC = D_001AF114;
-                        if (d->special) d->slots[i]->f4 = D_001AF11C;
-                        else d->slots[i]->f4 = D_001AF118;
+                        d->slots[i]->fC = g_nanotech_slot_scale_alt;
+                        if (d->special) d->slots[i]->f4 = g_nanotech_special_phase;
+                        else d->slots[i]->f4 = g_nanotech_slot_phase;
                     }
                 } else {
                     qcopy_nc(&p->pos, &v10);
-                    p->b8 += D_001AF10C;
+                    p->b8 += g_nanotech_phase_step;
                 }
             }
-        } else if (D_001AD7EC || d->owner) {
+        } else if (g_turret_target_moby || d->owner) {
             int i;
             for (i = 0; i < 8; i++) if (d->slots[i]) qcopy_nc(&d->slots[i]->pos, &m->pos);
         }
         break;
     case 3:
-        if (D_L00_001B1AEC == m) update_nanotech_ball_slot_offsets();
+        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
         if (d->h56 != 0) {
-            FastVecScale(&m->pos, g_hero_state + 0x2C0, -D_001AF170);
+            FastVecScale(&m->pos, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
             FastVecAdd(&m->pos, g_hero_state + 0x80, &m->pos);
             m->rot.w = 0.523598849773407f;
             if (EmitFourTimedParticlePairs(m) != 0 && math_random_int_below(5) == 0) part_spawn_sparkles(m);
         }
         {
             Hero *g = (Hero *)g_hero_state;
-            int lim = D_001A7A00;
+            int lim = g_player_stats;
             if (g->vehicle_mode == 1) lim = 4;
-            if (g->health.hp == lim && g->invulnerable_frames != 0 && D_001A7A44[2] != 0) {
-                int r = D_001AF15C;
+            if (g->health.hp == lim && g->invulnerable_frames != 0 && g_cheat_flags[2] != 0) {
+                int r = g_nanotech_random_value;
                 if (d->h54 < r) {
                     int i;
                     d->h54 = r;
@@ -336,11 +336,11 @@ void func_US2_003144C8(Moby *m) {
                     d->slots[i] = 0;
                 }
             }
-            if (D_L00_001B1AEC == m) m->state = 4;
+            if (g_nanotech_ball_moby == m) m->state = 4;
             else moby_mark_spawned(m);
         } else {
             int i;
-            FastVecScale(&v20, g_hero_state + 0x2C0, -D_001AF170);
+            FastVecScale(&v20, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
             FastVecAdd(&v20, g_hero_state + 0x80, &v20);
             for (i = 0; i < 8; i++) {
                 Part_2D9EA0 *e = d->slots[i];
@@ -350,13 +350,13 @@ void func_US2_003144C8(Moby *m) {
                 if (FastDecTimer(&x->h1E)) {
                     if (d->h56 == 0) {
                         Hero *g = (Hero *)g_hero_state;
-                        int lim = D_001A7A00;
+                        int lim = g_player_stats;
                         int old_health = 0;
                         if (g->vehicle_mode == 1) lim = 4;
                         old_health = g->health.hp;
                         if (g->health.hp != 0) {
                             int amount = 1;
-                            if (D_001A7A0A) amount = D_001AF1A0;
+                            if (g_extras_unlocked_flag) amount = g_nanotech_amount_alt;
                             if (d->special) {
                                 int t = g->health.hp + amount * 4;
                                 g->health.hp = (lim < t) ? lim : t;
@@ -364,10 +364,10 @@ void func_US2_003144C8(Moby *m) {
                                 int t = g->health.hp + amount;
                                 g->health.hp = (lim < t) ? lim : t;
                             }
-                            if (old_health != ((Hero *)g_hero_state)->health.hp) func_US2_0029C510(0x168);
+                            if (old_health != ((Hero *)g_hero_state)->health.hp) level_forward_value_b_us2(0x168);
                         }
                         {
-                            D_2D9EA0 *o = (D_2D9EA0 *)D_L00_001B1AEC->pvars;
+                            D_2D9EA0 *o = (D_2D9EA0 *)g_nanotech_ball_moby->pvars;
                             o->pending--;
                             if ((signed char)o->pending < 0) o->pending = 0;
                         }
@@ -409,9 +409,9 @@ void func_US2_003144C8(Moby *m) {
                     v50.z = math_random_signed_float_range(0.0f, 0.00999999978f) + e->pos.z;
                     n = part_spawn_bluish_fade(&v50, 0x14, 0, 0);
                     if (n != 0) {
-                        if (d->special) n->f4 = D_001AF11C;
-                        else n->f4 = D_001AF118;
-                        n->fC = D_001AF110;
+                        if (d->special) n->f4 = g_nanotech_special_phase;
+                        else n->f4 = g_nanotech_slot_phase;
+                        n->fC = g_nanotech_slot_scale;
                     }
                     FastVecAdd(&v40, &e->pos, &v40);
                     FastVecScale(&v40, &v40, 0.5f);
@@ -420,16 +420,16 @@ void func_US2_003144C8(Moby *m) {
                     v50.z = math_random_signed_float_range(0.0f, 0.00999999978f) + v40.z;
                     n = part_spawn_bluish_fade(&v50, 0x14, 0, 0);
                     if (n != 0) {
-                        if (d->special) n->f4 = D_001AF11C;
-                        else n->f4 = D_001AF118;
-                        n->fC = D_001AF110;
+                        if (d->special) n->f4 = g_nanotech_special_phase;
+                        else n->f4 = g_nanotech_slot_phase;
+                        n->fC = g_nanotech_slot_scale;
                     }
                 }
             }
         }
         break;
     case 4:
-        if (D_L00_001B1AEC == m) update_nanotech_ball_slot_offsets();
+        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
         break;
     case 5:
         if ((g_game_time & 1) && moby_is_in_selected_zone(&m->pos)) moby_set_state(m, 2, -1);

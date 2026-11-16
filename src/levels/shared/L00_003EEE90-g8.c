@@ -7,12 +7,12 @@ extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x2290]; char *target; } Hero4BF0;
 extern Hero4BF0 g_hero_state;
 typedef struct { char pad[0x160]; float amount; int unused, timer, state; } Camera4BF0;
-extern Camera4BF0 D_L00_001B8C80;
-extern char *D_L00_001B2BB4 __attribute__((sda));
-extern char *D_L00_001B2BB8;
-extern int *D_L00_001B2BBC[] MACRO_ADDR;
-extern float D_L00_001B0830 __attribute__((sda));
-extern float D_L00_001B0834 __attribute__((sda));
+extern Camera4BF0 g_scalar_transition_state;
+extern char *g_blast_alloc_base __attribute__((sda));
+extern char *g_blast_l00_pool_2;
+extern int *g_blast_l00_ripple_particles_2[] MACRO_ADDR;
+extern float g_blast_scroll_u __attribute__((sda));
+extern float g_blast_scroll_v __attribute__((sda));
 extern char *D_L00_001B2BB4_1 MACRO_ADDR;
 extern char *g_area_hit_targets[];
 extern int save_is_record_value(short,int);
@@ -67,12 +67,12 @@ void blast_l00_update(char *object)
         data->count=111;
         data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=level_get_slot_body(*(short *)(object+0xAA),data->handle);
-        D_L00_001B2BB4=mem;
-        D_L00_001B2BB8=(char *)mem_align_up_sixteen((int)(mem+0x50));
-        D_L00_001B2BBC[0]=(int *)mem_align_up_sixteen((int)(D_L00_001B2BB8+0xA000));
+        g_blast_alloc_base=mem;
+        g_blast_l00_pool_2=(char *)mem_align_up_sixteen((int)(mem+0x50));
+        g_blast_l00_ripple_particles_2[0]=(int *)mem_align_up_sixteen((int)(g_blast_l00_pool_2+0xA000));
         i=0;
-        do { D_L00_001B2BBC[0][i]=0; i++; } while(i<144);
-        { char *p = D_L00_001B2BB8+319*128+124;
+        do { g_blast_l00_ripple_particles_2[0][i]=0; i++; } while(i<144);
+        { char *p = g_blast_l00_pool_2+319*128+124;
         for(i=319;i>=0;i--,p-=128) *(int *)p=0; }
         *(int *)(D_L00_001B2BB4_1+0x30)=0;
         qcopy(center,object+0x10);
@@ -82,9 +82,9 @@ void blast_l00_update(char *object)
         qcopy(query,center);
         query[3]=2.0f;
         if(math_fast_helper_a(query,100.0f)!=-1) {
-            D_L00_001B8C80.amount=0.45f;
-            D_L00_001B8C80.timer=40;
-            D_L00_001B8C80.state=0;
+            g_scalar_transition_state.amount=0.45f;
+            g_scalar_transition_state.timer=40;
+            g_scalar_transition_state.state=0;
         }
     }
     case 1: {
@@ -134,9 +134,9 @@ destroy:
         }
         break;
     }
-    D_L00_001B0834-=0.04f;
-    if(D_L00_001B0830 < -8.0f) D_L00_001B0830+=8.0f;
-    if(D_L00_001B0834 < -8.0f) D_L00_001B0834+=8.0f;
+    g_blast_scroll_v-=0.04f;
+    if(g_blast_scroll_u < -8.0f) g_blast_scroll_u+=8.0f;
+    if(g_blast_scroll_v < -8.0f) g_blast_scroll_v+=8.0f;
     effect_update_owner_records(object);
     ref_L00_003EEE90_00(blast_run_effect_frame,object);
 }

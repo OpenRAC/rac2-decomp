@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L05_001B14FC __attribute__((sda));
+extern int g_glow_effect_target_moby __attribute__((sda));
 extern int g_current_map_index;
 extern float fast_vec_dist(void *, void *);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
@@ -16,11 +16,11 @@ void func_US2_L05_00427E40(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001B14FC != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001B14FC + 0x10), object + 0x10);
+    if (g_glow_effect_target_moby != 0) {
+        scale = fast_vec_dist((void *)(g_glow_effect_target_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_effect_target_moby + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -35,7 +35,7 @@ void func_US2_L05_00427E40(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_effect_target_moby + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:

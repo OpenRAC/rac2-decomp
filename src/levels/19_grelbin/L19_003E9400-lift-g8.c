@@ -1,8 +1,8 @@
 #include "common.h"
-extern float D_L19_001B1D5C __attribute__((sda));
-extern float D_L19_001B1D60 __attribute__((sda));
-extern float D_L19_001B1D64 __attribute__((sda));
-extern float D_L19_001B1D68 __attribute__((sda));
+extern float g_lift_travel_height __attribute__((sda));
+extern float g_lift_rise_frames __attribute__((sda));
+extern float g_lift_lower_frames __attribute__((sda));
+extern float g_lift_trigger_distance __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float vec_distance_xy(void *, void *);
@@ -21,7 +21,7 @@ void grelbin_lift_update(u8 *moby)
         vars->angle = *(float *)(moby + 0xF8);
         vars->height = *(float *)(moby + 0x18);
         angle = FastAddRotations(*(float *)(moby + 0xF8), 3.1415927f);
-        height = *(float *)(moby + 0x18) - D_L19_001B1D5C;
+        height = *(float *)(moby + 0x18) - g_lift_travel_height;
         *(float *)(moby + 0xF8) = angle;
         *(float *)(moby + 0x18) = height;
         moby_set_state(moby, 1, -1);
@@ -35,7 +35,7 @@ void grelbin_lift_update(u8 *moby)
         break;
     case 2:
         if (flag_set_first_pending(moby)) PlayMobySound(0, 0, moby);
-        vars->time += 1.0f / D_L19_001B1D60;
+        vars->time += 1.0f / g_lift_rise_frames;
         if (vars->time > 1.0f) {
             vars->time = 0;
             *(float *)(moby + 0x18) = vars->height;
@@ -45,11 +45,11 @@ void grelbin_lift_update(u8 *moby)
             float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             if (ease > 1.0f) ease = 1.0f;
             else if (ease < 0.0f) ease = 0.0f;
-            *(float *)(moby + 0x18) = vars->height - ease * D_L19_001B1D5C;
+            *(float *)(moby + 0x18) = vars->height - ease * g_lift_travel_height;
         }
         break;
     case 3:
-        vars->time += 1.0f / D_L19_001B1D64;
+        vars->time += 1.0f / g_lift_lower_frames;
         if (vars->time > 1.0f) {
             vars->time = 0;
             *(float *)(moby + 0xF8) = vars->angle;
@@ -62,7 +62,7 @@ void grelbin_lift_update(u8 *moby)
         break;
     case 4:
         if (!vars->other || vars->other[0x20] == 0xFE || vars->other[0x20] == 0xFD ||
-            vec_distance_xy(moby + 0x10, vars->other + 0x10) > D_L19_001B1D68) {
+            vec_distance_xy(moby + 0x10, vars->other + 0x10) > g_lift_trigger_distance) {
             moby[0xBC] = 3;
             vars->other = 0;
             vars->time = 1.0f;
@@ -71,7 +71,7 @@ void grelbin_lift_update(u8 *moby)
         break;
     case 5:
         if (flag_set_first_pending(moby)) PlayMobySound(1, 0, moby);
-        vars->time -= 1.0f / D_L19_001B1D64;
+        vars->time -= 1.0f / g_lift_lower_frames;
         if (vars->time <= 0.0f) {
             vars->time = 1.0f;
             *(float *)(moby + 0xF8) = FastAddRotations(vars->angle, 3.1415927f);
@@ -82,9 +82,9 @@ void grelbin_lift_update(u8 *moby)
         }
         break;
     case 6:
-        vars->time -= 1.0f / D_L19_001B1D60;
+        vars->time -= 1.0f / g_lift_rise_frames;
         if (vars->time <= 0.0f) {
-            float height = vars->height - D_L19_001B1D5C;
+            float height = vars->height - g_lift_travel_height;
             vars->time = 0;
             moby[0xBC] = 0;
             *(float *)(moby + 0x18) = height;
@@ -93,7 +93,7 @@ void grelbin_lift_update(u8 *moby)
             float ease = (math_fast_sin_or_cos_a(vars->time * 3.1415927f) + 1.0f) * 0.5f;
             if (ease > 1.0f) ease = 1.0f;
             else if (ease < 0.0f) ease = 0.0f;
-            *(float *)(moby + 0x18) = vars->height - ease * D_L19_001B1D5C;
+            *(float *)(moby + 0x18) = vars->height - ease * g_lift_travel_height;
         }
         break;
     }

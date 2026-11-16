@@ -8,13 +8,13 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern void weapon_menu_sync_slots(void);
 extern int func_0029CBE0(int);
 
-int func_PAL_002CE600(void) {
+int menu_handle_input_with_fallback_pal(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value;
         weapon_menu_sync_slots();

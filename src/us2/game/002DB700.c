@@ -19,8 +19,8 @@ typedef struct {
     StreamRead2DAD18 first[5];
     StreamRead2DAD18 second[5];
 } StreamReads2DAD18;
-extern short D_001A63AC;
-extern int D_0025E0B0;
+extern short g_sequence_active_flag;
+extern int g_menu_selection_input_state;
 extern StreamReads2DAD18 g_copy_setup_data;
 extern int load_start_disc_read(int, int, int);
 
@@ -29,15 +29,15 @@ int func_US2_002DBA70(Handles_2DCB28 *object)
     switch (object->state) {
     case 0:
         if (object->first != 0) {
-            if (D_001A63AC != 0)
+            if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
                 if (load_start_disc_read(object->first,
-                                  reads->first[D_0025E0B0].start + offset,
-                                  reads->first[D_0025E0B0].length) != 0)
+                                  reads->first[g_menu_selection_input_state].start + offset,
+                                  reads->first[g_menu_selection_input_state].length) != 0)
                     object->state++;
                 else
                     object->state = -1;
@@ -45,21 +45,21 @@ int func_US2_002DBA70(Handles_2DCB28 *object)
         }
         break;
     case 1:
-        if (D_001A63AC != 0)
+        if (g_sequence_active_flag != 0)
             break;
         object->state = 2;
         break;
     case 2:
         if (object->second != 0) {
-            if (D_001A63AC != 0)
+            if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
                 if (load_start_disc_read(object->second,
-                                  reads->second[D_0025E0B0].start + offset,
-                                  reads->second[D_0025E0B0].length) != 0)
+                                  reads->second[g_menu_selection_input_state].start + offset,
+                                  reads->second[g_menu_selection_input_state].length) != 0)
                     object->state++;
                 else
                     object->state = -1;
@@ -67,7 +67,7 @@ int func_US2_002DBA70(Handles_2DCB28 *object)
         }
         break;
     case 3:
-        if (D_001A63AC != 0)
+        if (g_sequence_active_flag != 0)
             break;
         object->state = 4;
         break;

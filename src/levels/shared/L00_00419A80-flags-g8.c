@@ -5,7 +5,7 @@
 typedef unsigned char u8;
 typedef float f32;
 extern void FastVecAdd(u8 *, u8 *, u8 *);
-extern f32 D_L03_001B1FC4 __attribute__((sda));
+extern f32 g_moby_hit_radius_scale __attribute__((sda));
 extern f32 FastAddRotations(f32, f32);
 extern void moby_mark_spawned(u8 *);
 
@@ -15,7 +15,7 @@ void falling_l00_debris_update(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     u8 *config = *(u8 **)(object + 0x24);
 
-    *(f32 *)(object + 0x2C) = *(f32 *)(config + 0x24) * D_L03_001B1FC4;
+    *(f32 *)(object + 0x2C) = *(f32 *)(config + 0x24) * g_moby_hit_radius_scale;
     *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.0041666669f;
     FastVecAdd(object + 0x10, object + 0x10, vars);
     FastVecAdd(object + 0xF0, object + 0xF0, vars + 0x10);

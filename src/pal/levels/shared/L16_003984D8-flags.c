@@ -4,7 +4,7 @@
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 difference, local, previous, velocity, lateral; } MotionWorkspace;
 extern char g_hero_state[];
-extern float D_L16_001AF43C __attribute__((sda));
+extern float g_spinning_move_length __attribute__((sda));
 extern void hero_resolve_stick_direction(int,float);
 extern void FastVecSub(void *,void *,void *);
 extern void FastVecCross(void *,void *,void *);
@@ -18,7 +18,7 @@ extern void FastVecAdd(void *,void *,void *);
 extern void mem_fast_helper_b(void *,int);
 extern void vec_clamp_length(float *,float);
 
-void func_PAL_L16_00398C40(char *object)
+void spinning_object_move_along_ground_pal(char *object)
 {
     MotionWorkspace local;
     char *state=*(char **)(object+0x68);
@@ -29,7 +29,7 @@ void func_PAL_L16_00398C40(char *object)
     FastVecCross((g_hero_state+0x190),&local.difference,object+0xe0);
     vec_scale_to_length((g_hero_state+0x190),(g_hero_state+0x190),1.0f);
     vec_transform_by_object_or_given(object,(char *)&local.local,(char *)&local.difference,0);
-    vec_fast_normalize_helper(&local.velocity,&local.local,D_L16_001AF43C);
+    vec_fast_normalize_helper(&local.velocity,&local.local,g_spinning_move_length);
     matrix_mul_vec3(&local.velocity,&local.velocity,object+0xc0);
     alignment=FastVecDot(&local.previous,(g_hero_state+0x190));
     if (*(float *)(g_hero_state+0x24b8)>0.5f && alignment>0.5f)

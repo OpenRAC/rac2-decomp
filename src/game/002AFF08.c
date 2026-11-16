@@ -29,11 +29,11 @@ float vec_get_vertical_offset(char *first, char *second, char *third) {
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
-extern char D_001A8CB0[] __attribute__((sda));
+extern char g_origin_vector[] __attribute__((sda));
 
 void vec_compute_flat_direction_from_point(char *point, char *outDir, int flag)
 {
-    FastVecSub(outDir, D_001A8CB0, point);
+    FastVecSub(outDir, g_origin_vector, point);
     *(int *)(outDir + 8) = 0;
     vec_scale_to_length(outDir, outDir, 1.0f);
     if (flag == 0)

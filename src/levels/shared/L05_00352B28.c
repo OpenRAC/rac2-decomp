@@ -4,7 +4,7 @@ extern u8 *part_alloc(int);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
-extern u8 *D_L05_001FF3E4;
+extern u8 *g_fading_particle_params;
 extern void part_l00_update_fading_effect_3(char *);
 /* Spawns a short-lived particle that moves and fades, and returns it (0 if none is free). */
 u8 *part_spawn_fading_particle(float *position,float *velocity,int duration,int color,int kind,int alpha,int endAlpha,float size,float endSize,float drag)
@@ -21,7 +21,7 @@ u8 *part_spawn_fading_particle(float *position,float *velocity,int duration,int 
         *(float *)(effect+0xC) = size;
         effect[3] = 0x48;
         effect[8] = math_random_int_below(255);
-        effect[2] = *D_L05_001FF3E4;
+        effect[2] = *g_fading_particle_params;
         *(short *)(effect+0xA) = duration;
         *(float *)(effect+0x20) = velocity[0];
         *(float *)(motion+4) = velocity[1];

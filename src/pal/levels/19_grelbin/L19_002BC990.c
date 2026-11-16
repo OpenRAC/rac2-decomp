@@ -14,21 +14,21 @@ typedef struct {
     u8 pad46[0x18C - 0x46];
     char *items[1]; /* bounded by count */
 } L19Cutscene;
-extern L19Cutscene D_L19_001BD740;
+extern L19Cutscene g_cutscene_l19_state;
 typedef struct { u8 prefix[0x160]; float strength; u8 unknown164[4]; int ticks, mode; } CameraShakeView;
-extern CameraShakeView D_L19_001B9900;
+extern CameraShakeView g_hero_l19_state_block;
 /* Separate scalars: only a plain symbol operand is one instruction to cc1, so
  * only these reach the delay slots where retail has their $gp forms. */
 extern int g_current_map_index MACRO_ADDR;
-extern char *D_L19_001B2814 MACRO_ADDR;
-extern Vec D_L19_001B2820 MACRO_ADDR;
-extern float D_L19_001B2830 MACRO_ADDR;
-extern float D_L19_001B2834 MACRO_ADDR;
-extern float D_L19_001B2838 MACRO_ADDR;
-extern float D_L19_001B283C MACRO_ADDR;
-extern float D_L19_001B2840 MACRO_ADDR;
-extern int D_L19_001B2844 MACRO_ADDR;
-extern u8 D_L19_001A8F20[] MACRO_ADDR;
+extern char *g_cutscene_actor_ptr MACRO_ADDR;
+extern Vec g_cutscene_offset_vec MACRO_ADDR;
+extern float g_cutscene_offset_y MACRO_ADDR;
+extern float g_cutscene_accum_rate_a MACRO_ADDR;
+extern float g_cutscene_accum_rate_b MACRO_ADDR;
+extern float g_cutscene_accum_a MACRO_ADDR;
+extern float g_cutscene_accum_b MACRO_ADDR;
+extern int g_cutscene_frame MACRO_ADDR;
+extern u8 g_particle_effect_template[] MACRO_ADDR;
 extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(void *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
@@ -53,8 +53,8 @@ void func_PAL_L19_002FBA78(void)
     char *actor;
     int i;
     anim_start_startup_animations();
-    for (i = 0; i < D_L19_001BD740.count; i++) {
-        actor = D_L19_001BD740.items[i];
+    for (i = 0; i < g_cutscene_l19_state.count; i++) {
+        actor = g_cutscene_l19_state.items[i];
         if (actor && *(short *)(actor + 0xaa) == 0xe29)
             *(unsigned short *)(actor + 0x34) |= 0x800;
         /* Retail makes this test without a null check: it also reads an
@@ -71,26 +71,26 @@ void func_PAL_L19_002FBA78(void)
         }
     }
     if (g_current_map_index == 19) {
-        if (D_L19_001BD740.state == 4) {
-            int frame = D_L19_001BD740.frame;
+        if (g_cutscene_l19_state.state == 4) {
+            int frame = g_cutscene_l19_state.frame;
             if (frame == 1) {
-                D_L19_001B2814 = D_L19_001BD740.items[3];
-                D_L19_001B2830 = 3.5f;
-                D_L19_001B2834 = 11.0f;
-                D_L19_001B2838 = 10.7f;
-                D_L19_001B283C = 0.0f;
-                D_L19_001B2840 = 0.0f;
-                D_L19_001B2844 = frame;
+                g_cutscene_actor_ptr = g_cutscene_l19_state.items[3];
+                g_cutscene_offset_y = 3.5f;
+                g_cutscene_accum_rate_a = 11.0f;
+                g_cutscene_accum_rate_b = 10.7f;
+                g_cutscene_accum_a = 0.0f;
+                g_cutscene_accum_b = 0.0f;
+                g_cutscene_frame = frame;
             }
-            D_L19_001B2820.q = *(Quad *)(D_L19_001B2814 + 0x10);
+            g_cutscene_offset_vec.q = *(Quad *)(g_cutscene_actor_ptr + 0x10);
             if (frame == 750) {
-                D_L19_001B9900.strength = 1.0f;
-                D_L19_001B9900.ticks = 15;
-                D_L19_001B9900.mode = 0;
+                g_hero_l19_state_block.strength = 1.0f;
+                g_hero_l19_state_block.ticks = 15;
+                g_hero_l19_state_block.mode = 0;
             }
-            if (D_L19_001BD740.frame >= 750 && D_L19_001BD740.frame <= 770) {
-                D_L19_001B2840 += D_L19_001B2838;
-                if (D_L19_001B2840 >= 1.0f) {
+            if (g_cutscene_l19_state.frame >= 750 && g_cutscene_l19_state.frame <= 770) {
+                g_cutscene_accum_b += g_cutscene_accum_rate_b;
+                if (g_cutscene_accum_b >= 1.0f) {
                     do {
                         int color;
                         float angle;
@@ -100,40 +100,40 @@ void func_PAL_L19_002FBA78(void)
                         direction.f[3] = 1.0f;
                         color = ((u32)math_random_int_range(96, 128) << 16) | 0x1e00;
                         position.f[0] = 0.0f;
-                        position.f[1] = D_L19_001B2830 * math_random_float_range(0.9f, 1.1f);
+                        position.f[1] = g_cutscene_offset_y * math_random_float_range(0.9f, 1.1f);
                         position.f[2] = 0.0f;
                         position.f[3] = 1.0f;
                         angle = math_random_float_range(0.0f, 6.2831855f);
                         math_apply_axis_rotation_to_quat(&position, &position, &direction, angle);
-                        FastVecAdd((char *)&position, (char *)&position, (char *)&D_L19_001B2820);
+                        FastVecAdd((char *)&position, (char *)&position, (char *)&g_cutscene_offset_vec);
                         vec_scale_to_length(&direction, &direction, math_random_float_range(1.5f, 2.5f));
                         FastVecAdd((char *)&position, (char *)&position, (char *)&direction);
                         FastVecAdd((char *)&position, (char *)&position, (char *)&direction);
-                        D_L19_001B2840 -= 1.0f;
+                        g_cutscene_accum_b -= 1.0f;
                         {
                             int life = math_random_int_range(4, 8);
                             float speed = math_random_float_range(0.6f, 0.8f) * 210000.0f;
-                            part_spawn_fading_drift(&position, D_L19_001A8F20, 24, color, life, 128, 32, speed, 21000.0f, 0.0f, 0);
+                            part_spawn_fading_drift(&position, g_particle_effect_template, 24, color, life, 128, 32, speed, 21000.0f, 0.0f, 0);
                         }
                         {
                             int life = math_random_int_range(4, 8);
                             float speed = math_random_float_range(0.6f, 0.8f) * 210000.0f;
                             int style = math_random_int_range(1, 7);
-                            part_spawn_fading_drift(&position, D_L19_001A8F20, 24, color, life, 128, 32, speed, 21000.0f, 0.0f, style);
+                            part_spawn_fading_drift(&position, g_particle_effect_template, 24, color, life, 128, 32, speed, 21000.0f, 0.0f, style);
                         }
-                    } while (D_L19_001B2840 >= 1.0f);
+                    } while (g_cutscene_accum_b >= 1.0f);
                 }
             }
-            if (D_L19_001BD740.frame >= 761 && D_L19_001BD740.frame <= 839) {
-                D_L19_001B283C += D_L19_001B2834;
-                if (D_L19_001B283C >= 1.0f) {
+            if (g_cutscene_l19_state.frame >= 761 && g_cutscene_l19_state.frame <= 839) {
+                g_cutscene_accum_a += g_cutscene_accum_rate_a;
+                if (g_cutscene_accum_a >= 1.0f) {
                     do {
                         int color, life, style;
                         float speed, other, angle;
                         color = FastTweenColor(math_random_float_range(0.0f, 1.0f), 0x803c14, 0x400000);
                         position.f[0] = 0.0f;
                         position.f[1] = 0.0f;
-                        position.f[2] = D_L19_001B2830 * -0.8f;
+                        position.f[2] = g_cutscene_offset_y * -0.8f;
                         position.f[3] = 1.0f;
                         direction.f[0] = 1.0f;
                         direction.f[1] = 0.0f;
@@ -146,19 +146,19 @@ void func_PAL_L19_002FBA78(void)
                         math_apply_axis_rotation_to_quat(&direction, &direction, &axis, math_random_float_range(0.0f, 6.2831855f));
                         angle = math_random_float_range(0.0f, 1.5707964f);
                         math_apply_axis_rotation_to_quat(&position, &position, &direction, angle);
-                        FastVecAdd((char *)&position, (char *)&position, (char *)&D_L19_001B2820);
+                        FastVecAdd((char *)&position, (char *)&position, (char *)&g_cutscene_offset_vec);
                         life = math_random_int_range(22, 55);
                         style = math_random_int_range(0, 10);
                         speed = math_random_float_range(0.5f, 1.0f) * 21000.0f;
                         other = math_random_float_range(0.7f, 1.0f) * 21000.0f;
-                        part_spawn_size_changing(&position, D_L19_001A8F20, life, color, style, 128, 0, speed, other, 0.0033333334f, 3);
-                        D_L19_001B283C -= 1.0f;
-                    } while (D_L19_001B283C >= 1.0f);
+                        part_spawn_size_changing(&position, g_particle_effect_template, life, color, style, 128, 0, speed, other, 0.0033333334f, 3);
+                        g_cutscene_accum_a -= 1.0f;
+                    } while (g_cutscene_accum_a >= 1.0f);
                 }
             }
         }
-        if (g_current_map_index == 19 && D_L19_001BD740.state == 5 && D_L19_001BD740.frame == 1146) {
-            char *burstActor = D_L19_001BD740.items[4];
+        if (g_current_map_index == 19 && g_cutscene_l19_state.state == 5 && g_cutscene_l19_state.frame == 1146) {
+            char *burstActor = g_cutscene_l19_state.items[4];
             int n;
             for (n = 0; n < 47; n++) {
                 int color, style, life, red, gray, high;

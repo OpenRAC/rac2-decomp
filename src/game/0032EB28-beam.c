@@ -9,12 +9,12 @@ extern struct {
     char pad1248[0x104C];
     int planet;
 } D_00189E20;
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 
 /* The colours are one block: element 0 is the one-instruction load the delay slot
  * can take, while +4/+8/+12 are the backend's two-instruction form. */
 extern int g_game_time[] __attribute__((sda));
-extern int D_001B0F08[] __attribute__((sda));
+extern int g_thermanator_beam_colors[] __attribute__((sda));
 
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float game_get_override_value(float);
@@ -130,7 +130,7 @@ void thermanator_update(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+        if ((g_pad_pressed_flags & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
             stub_empty_10();
             obj->state = 3;
             if (!v->reverse) {
@@ -147,7 +147,7 @@ void thermanator_update(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+        if (!(g_pad_pressed_flags & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
             stub_empty_11();
             obj->state = 2;
         } else if (math_fast_float_d(&v->countdown)) {
@@ -200,8 +200,8 @@ void thermanator_update(Target *obj)
         v->smoothed = v->fraction;
     }
 
-    a = gfx_blend_colors_by_cycle(g_game_time[0], 90, D_001B0F08[0], D_001B0F08[1]);
-    b = gfx_blend_colors_by_cycle(g_game_time[0], 90, D_001B0F08[2], D_001B0F08[3]);
+    a = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[0], g_thermanator_beam_colors[1]);
+    b = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[2], g_thermanator_beam_colors[3]);
     if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
         gauge_popup_show(0, a, b, v->smoothed);
     }

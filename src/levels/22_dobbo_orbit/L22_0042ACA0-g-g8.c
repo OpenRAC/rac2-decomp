@@ -91,49 +91,49 @@ typedef struct CamMgr_004402D8 {
     Cam_004402D8 *cam; /* 0x190 */
 } CamMgr_004402D8;
 
-extern Entry_004402D8 *D_L22_001B1AC4;
+extern Entry_004402D8 *g_ride_entry_table;
 
-extern s32 D_L22_001A8FF0;
+extern s32 g_hero_flag_a;
 
 extern s32 g_current_map_index;
 
-extern s32 D_0018C0B4 __attribute__((nosda));
+extern s32 g_game_mode __attribute__((nosda));
 
 extern Player_004402D8 g_hero_state;
 
 extern Pad_004402D8 g_pad_state;
 
-extern CamMgr_004402D8 D_L22_001B9B40;
+extern CamMgr_004402D8 g_hero_l22_state_block;
 
-extern s32 D_L22_001B1CCC;
+extern s32 g_ride_camera_mode;
 
-extern f32 D_L22_001B16BC __attribute__((sda));
+extern f32 g_ride_cam_angle_rad __attribute__((sda));
 
-extern f32 D_L22_001B183C __attribute__((sda));
+extern f32 g_ride_cam_max_dist __attribute__((sda));
 
-extern f32 D_L22_001B1844 __attribute__((sda));
+extern f32 g_ride_cam_speed __attribute__((sda));
 
-extern f32 D_L22_001B1848 __attribute__((sda));
+extern f32 g_ride_cam_param_near_a __attribute__((sda));
 
-extern f32 D_L22_001B184C __attribute__((sda));
+extern f32 g_ride_cam_param_near_b __attribute__((sda));
 
-extern f32 D_L22_001B1850 __attribute__((sda));
+extern f32 g_ride_cam_param_far_a __attribute__((sda));
 
-extern f32 D_L22_001B1854 __attribute__((sda));
+extern f32 g_ride_cam_param_far_b __attribute__((sda));
 
-extern f32 D_L22_001B1858 __attribute__((sda));
+extern f32 g_ride_cam_distance __attribute__((sda));
 
-extern f32 D_L22_001B185C __attribute__((sda));
+extern f32 g_ride_cam_height __attribute__((sda));
 
-extern f32 D_L22_001B1860 __attribute__((sda));
+extern f32 g_ride_cam_aim_offset_a __attribute__((sda));
 
-extern f32 D_L22_001B1864 __attribute__((sda));
+extern f32 g_ride_cam_aim_offset_b __attribute__((sda));
 
-extern f32 D_L22_001B1868 __attribute__((sda));
+extern f32 g_ride_cam_tuning_deg __attribute__((sda));
 
-extern f32 D_L22_001B186C __attribute__((sda));
+extern f32 g_ride_cam_angle_deg __attribute__((sda));
 
-extern f32 D_L22_001B1870 __attribute__((sda));
+extern f32 g_ride_cam_gravity_dist __attribute__((sda));
 
 extern f32 fast_vec_dist(void *, void *);
 
@@ -180,12 +180,12 @@ extern void cam_set_tuning_value(f32);
 /* Controls the camera and player while on this ride: picks camera distance, height and speed settings from the player state and distance travelled. */
 void ride_update_camera_control(Moby_004402D8 *moby)
 {
-    Entry_004402D8 *entry = (Entry_004402D8 *)(moby->f84 * 32 + (s32)D_L22_001B1AC4);
+    Entry_004402D8 *entry = (Entry_004402D8 *)(moby->f84 * 32 + (s32)g_ride_entry_table);
     Vars_004402D8 *vars = entry->vars;
     s32 i;
 
     if (vars->f20 == 0) {
-        if (D_L22_001A8FF0 != 0 || (g_current_map_index == 16 && D_0018C0B4 == 0x81)) {
+        if (g_hero_flag_a != 0 || (g_current_map_index == 16 && g_game_mode == 0x81)) {
             f32 tmp[4];
 
             tmp[0] = entry->x;
@@ -197,12 +197,12 @@ void ride_update_camera_control(Moby_004402D8 *moby)
         }
         return;
     }
-    if (D_L22_001B9B40.cam->f86 != 0
-        || (D_L22_001A8FF0 == 0 && (g_current_map_index != 16 || D_0018C0B4 != 0x81))) {
-        if (D_L22_001B1870 < gravity_get_center_distance(D_L22_001B9B40.f140)) {
-            D_L22_001B1CCC = 3;
+    if (g_hero_l22_state_block.cam->f86 != 0
+        || (g_hero_flag_a == 0 && (g_current_map_index != 16 || g_game_mode != 0x81))) {
+        if (g_ride_cam_gravity_dist < gravity_get_center_distance(g_hero_l22_state_block.f140)) {
+            g_ride_camera_mode = 3;
         } else {
-            D_L22_001B1CCC = 0;
+            g_ride_camera_mode = 0;
         }
         cam_release_request_slot(moby);
         return;
@@ -234,7 +234,7 @@ void ride_update_camera_control(Moby_004402D8 *moby)
         set_follow_camera_orbit_clamp_mode(0);
     }
     cam_set_lock_flag();
-    cam_set_speeds_if_nonzero(D_L22_001B1844, 0.2f);
+    cam_set_speeds_if_nonzero(g_ride_cam_speed, 0.2f);
     if (math_fast_float_d(&vars->f50) != 0 && !(g_hero_state.f170 > 0.005f)) {
         cam_set_strength_and_steer(g_hero_state.f2290 + 0xC0, 0.0052359886f, 0.0f);
     }
@@ -244,7 +244,7 @@ void ride_update_camera_control(Moby_004402D8 *moby)
     if (g_hero_state.f22B4 == 2) {
         s32 n;
 
-        D_L22_001B9B40.cam->f70->f250 = 2;
+        g_hero_l22_state_block.cam->f70->f250 = 2;
         n = 0;
         if (g_hero_state.f49E != 0) {
             n = FloatToInt(hero_find_collision_time(90.0f, g_hero_state.f520, -1.0f));
@@ -253,39 +253,39 @@ void ride_update_camera_control(Moby_004402D8 *moby)
             cam_set_speeds_if_nonzero(0.5f, 1.0f);
             cam_set_turn_speeds_if_nonzero(0.05f, 0.2f);
             moby_push_axis_to_linked_node(0.04f, 0.0f);
-            cam_set_aim_offset_target(0, D_L22_001B1864, 0.005f);
-            follow_camera_set_distance(1, D_L22_001B1858, 0.01f);
-            follow_camera_set_height(D_L22_001B185C, 0.01f);
-            D_L22_001B16BC = D_L22_001B186C * 0.017453294f;
-            cam_set_tuning_value(D_L22_001B1868 * 0.017453294f);
+            cam_set_aim_offset_target(0, g_ride_cam_aim_offset_b, 0.005f);
+            follow_camera_set_distance(1, g_ride_cam_distance, 0.01f);
+            follow_camera_set_height(g_ride_cam_height, 0.01f);
+            g_ride_cam_angle_rad = g_ride_cam_angle_deg * 0.017453294f;
+            cam_set_tuning_value(g_ride_cam_tuning_deg * 0.017453294f);
         } else {
             f32 d;
             f32 t;
             f32 a;
             f32 b;
 
-            cam_set_aim_offset_target(0, D_L22_001B1860, 0.03f);
+            cam_set_aim_offset_target(0, g_ride_cam_aim_offset_a, 0.03f);
             if (g_hero_state.f229C == 2) {
                 cam_set_turn_speeds_if_nonzero(0.04f, 0.2f);
             } else {
                 cam_set_turn_speeds_if_nonzero(0.015f, 0.2f);
             }
             d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
-            if (D_L22_001B183C < d) {
-                d = D_L22_001B183C;
+            if (g_ride_cam_max_dist < d) {
+                d = g_ride_cam_max_dist;
             } else if (d < 0.0f) {
                 d = 0.0f;
             }
-            t = d / D_L22_001B183C;
-            a = (D_L22_001B1850 - D_L22_001B1848) * t + D_L22_001B1848;
-            b = (D_L22_001B1854 - D_L22_001B184C) * t + D_L22_001B184C;
+            t = d / g_ride_cam_max_dist;
+            a = (g_ride_cam_param_far_a - g_ride_cam_param_near_a) * t + g_ride_cam_param_near_a;
+            b = (g_ride_cam_param_far_b - g_ride_cam_param_near_b) * t + g_ride_cam_param_near_b;
             follow_camera_set_distance(1, a, 0.005f);
             follow_camera_set_height(b, 0.005f);
         }
-        if (D_L22_001B1870 < gravity_get_center_distance(D_L22_001B9B40.f140)) {
-            D_L22_001B1CCC = 3;
+        if (g_ride_cam_gravity_dist < gravity_get_center_distance(g_hero_l22_state_block.f140)) {
+            g_ride_camera_mode = 3;
         } else {
-            D_L22_001B1CCC = 0;
+            g_ride_camera_mode = 0;
         }
     } else if (g_hero_state.f2294 == 0x81) {
         cam_set_turn_speeds_if_nonzero(0.05f, 0.2f);
@@ -315,12 +315,12 @@ void ride_update_camera_control(Moby_004402D8 *moby)
             f32 b;
 
             d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
-            if (D_L22_001B183C < d) {
-                d = D_L22_001B183C;
+            if (g_ride_cam_max_dist < d) {
+                d = g_ride_cam_max_dist;
             } else if (d < 0.0f) {
                 d = 0.0f;
             }
-            t = d / D_L22_001B183C;
+            t = d / g_ride_cam_max_dist;
             a = (vars->f48 - vars->f40) * t + vars->f40;
             b = (vars->f4C - vars->f44) * t + vars->f44;
             follow_camera_set_distance(0, a, 0.003f);

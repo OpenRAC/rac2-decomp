@@ -38,9 +38,9 @@ void func_PAL_L00_003944E8(char *parent, char *context)
 
 #include "common.h"
 typedef struct { int color[6]; } EffectPalette;
-extern EffectPalette D_L00_001AF0F8, D_L00_001AF110;
+extern EffectPalette g_tether_impact_palette_a, g_tether_impact_palette_b;
 extern char g_camera_l00_position[];
-extern float D_L00_001B19CC MACRO_ADDR;
+extern float g_effect_fade_value_a MACRO_ADDR;
 extern void *func_PAL_002BD400(void *, int, int, float, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), vec_clear_128(Quad *);
 extern float FastVecLength(void *), math_random_float_range(float, float);
@@ -72,8 +72,8 @@ void func_PAL_L00_00394630(char *actor, int fragments) {
     for (i = 0; i < count; i++) {
         speed = math_random_float_range(8.0f, 10.0f) * 0.020000001f;
         speed -= nearPenalty * 0.020000001f;
-        first = D_L00_001AF0F8;
-        second = D_L00_001AF110;
+        first = g_tether_impact_palette_a;
+        second = g_tether_impact_palette_b;
         firstColor = first.color + math_random_int_below(6);
         lastColor = second.color + math_random_int_below(6);
         startLife = math_random_int_range(12, 17);
@@ -81,7 +81,7 @@ void func_PAL_L00_00394630(char *actor, int fragments) {
         part_spawn_firework_spark(actor + 0x10, velocity, *firstColor, *lastColor, startLife, endLife, 0, 0,
                       400000.0f, speed);
     }
-    if (D_L00_001B19CC < 0.95f) {
+    if (g_effect_fade_value_a < 0.95f) {
         func_PAL_003096D0(actor, actor + 0x10, velocity, 12, 0x7F, 0x7F, 0x7F, 0x20, 3.0f);
         func_PAL_003096D0(actor, actor + 0x10, velocity, 20, 0x7F, 0x20, 0, 0x20, 2.0f);
     }

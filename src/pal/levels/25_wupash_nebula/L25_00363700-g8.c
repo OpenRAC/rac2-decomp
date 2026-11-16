@@ -1,29 +1,30 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { unsigned short id, kind; void *callback; unsigned short value, pad; } InitEntry12;
-extern int D_00139948[];
+extern int g_menu_entry_ids[];
 typedef struct { unsigned short id, pad, value; char rest[6]; } SourceEntry12;
-extern SourceEntry12 D_L00_0028B620[];
-extern char D_L00_002870C0[];
-extern InitEntry12 D_L00_0021CEF0[];
-extern int * volatile D_L00_001AA830 __attribute__((sda));
-extern struct { char pad[0x230]; int selected; } D_L00_001C93A0;
+extern SourceEntry12 g_menu_l00_source_entries[];
+extern char g_menu_l00_entry_callback[];
+extern InitEntry12 g_menu_l00_entry_table[];
+extern int * volatile g_menu_l00_item_list __attribute__((sda));
+extern struct { char pad[0x230]; int selected; } g_format_root;
 
 int func_PAL_L25_00363700(char *obj) {
     int i, entry;
     int *list;
-    for (i = 0; i < 28 && D_00139948[i]; i++) {
-        D_L00_0021CEF0[i].kind = 3;
-        D_L00_0021CEF0[i].callback = D_L00_002870C0;
-        D_L00_0021CEF0[i].id = D_L00_0028B620[D_00139948[i]].id;
-        D_L00_0021CEF0[i].value = D_L00_0028B620[D_00139948[i]].value;
+    for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {
+        g_menu_l00_entry_table[i].kind = 3;
+        g_menu_l00_entry_table[i].callback = g_menu_l00_entry_callback;
+        g_menu_l00_entry_table[i].id = g_menu_l00_source_entries[g_menu_entry_ids[i]].id;
+        g_menu_l00_entry_table[i].value = g_menu_l00_source_entries[g_menu_entry_ids[i]].value;
     }
-    list = D_L00_001AA830;
-    D_L00_0021CEF0[i].id = 0;
+    list = g_menu_l00_item_list;
+    g_menu_l00_entry_table[i].id = 0;
     *(int *)(obj + 0x40) = 0;
     *(unsigned int *)(obj + 0x30) |= 0x8000;
-    for (i = 0, entry = list[0]; entry; entry = D_L00_001AA830[++i]) {
-        if (D_L00_001C93A0.selected == entry) {
+    for (i = 0, entry = list[0]; entry; entry = g_menu_l00_item_list[++i]) {
+        if (g_format_root.selected == entry) {
             *(int *)(obj + 0x40) = i;
             break;
         }

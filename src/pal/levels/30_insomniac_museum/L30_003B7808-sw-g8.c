@@ -9,11 +9,11 @@ typedef struct {
 extern D00138180_Flags g_pad_state;
 extern int g_current_map_index;
 extern char g_hero_state[];
-extern char *D_001B2D1C __attribute__((sda));
+extern char *g_museum_entries __attribute__((sda));
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void cam_reset_entry(int);
 extern int TryClaimNotice(int, int, int);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void museum_info_stand_advance_state(char *);
 
 void func_PAL_L30_003C2230(char *object) {
@@ -62,10 +62,10 @@ void func_PAL_L30_003C2230(char *object) {
         if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
             TryClaimNotice(8, id, 1);
             if (g_pad_state.f1A4 & 0x10) {
-                char *s0 = D_001B2D1C + (*(int *)state << 8);
+                char *s0 = g_museum_entries + (*(int *)state << 8);
 
                 museum_info_stand_advance_state(s0);
-                func_PAL_L00_002B9CD8(s0 + 0x10, s0 + 0xF0, 0x6F, 1);
+                hero_reset_position_and_direction_pal(s0 + 0x10, s0 + 0xF0, 0x6F, 1);
                 *(unsigned char *)(g + 0x22B5) = 1;
             }
         }
@@ -77,7 +77,7 @@ void func_PAL_L30_003C2230(char *object) {
 
         if (*(int *)(h + 0x2294) == 0x6F) {
             *(unsigned char *)(h + 0x22B5) = 0;
-            func_PAL_L00_002B9CD8(h + 0x80, h + 0x90, 0, 0);
+            hero_reset_position_and_direction_pal(h + 0x80, h + 0x90, 0, 0);
         }
         *(unsigned char *)(object + 0x20) = 3;
         break;

@@ -29,9 +29,9 @@ extern Hero_2CAF20 g_hero_state;
 extern u8 g_item_slot_to_record[];
 extern Entry_2CAF20 g_weapon_l00_table[];
 extern s32 hero_slot_item_id(s32);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern int func_PAL_L00_002C4480(int a0, int a1);
-extern void func_PAL_L00_002D2668(void *, int, f32);
+extern void set_hero_animation_pal(void *, int, f32);
 extern void vec_clamp_length(float *, float);
 
 int func_PAL_L00_002CB2C8(void)
@@ -43,7 +43,7 @@ int func_PAL_L00_002CB2C8(void)
     if (h->b22B8 != 0 && h->b22BA != 0 && h->h24EC == 0) {
     idx = hero_slot_item_id(0);
     if (idx != h->f24B4) {
-        func_PAL_L00_002AF6C0();
+        cancel_hero_item_animation_pal();
         return 0;
     }
     moby = (g_weapon_l00_table + g_item_slot_to_record[idx])->moby;
@@ -52,7 +52,7 @@ int func_PAL_L00_002CB2C8(void)
     vec_clamp_length(h->v160, 0.030000001f);
     if (0.030000001f < h->f1B4)
         h->f1B4 = 0.030000001f;
-    func_PAL_L00_002D2668(moby, 0, 9.0f);
+    set_hero_animation_pal(moby, 0, 9.0f);
     if (h->fE98 != 0)
         h->fEA4 = 1;
     h->f24B0 = moby;
@@ -61,9 +61,9 @@ int func_PAL_L00_002CB2C8(void)
     return 0;
 }
 
-extern char D_0018C318[];
+extern char g_hero_button_hold_timers[];
 extern char g_pad_state[];
-extern int D_L00_001A8FB4 __attribute__((section(".sdata")));
+extern int g_input_block_flag __attribute__((section(".sdata")));
 extern s32 FastDecTimer(s32);
 extern void level_set_flag_d_true(void);
 
@@ -73,14 +73,14 @@ void func_PAL_L00_002CB5E8(void)
     char *o;
     u64 w;
 
-    FastDecTimer(D_0018C318);
-    FastDecTimer(D_0018C318 + 2);
-    b = D_0018C318 - 0x24F8;
+    FastDecTimer(g_hero_button_hold_timers);
+    FastDecTimer(g_hero_button_hold_timers + 2);
+    b = g_hero_button_hold_timers - 0x24F8;
     if (0x37 == *(int *)(b + 0x2294))
         return;
     if (*(u8 *)(b + 0x22BC) != 0)
         return;
-    if (D_L00_001A8FB4 != 0)
+    if (g_input_block_flag != 0)
         return;
     o = g_pad_state;
     if (*(int *)(o + 0x1A4) & 0x10)

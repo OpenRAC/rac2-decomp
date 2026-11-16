@@ -17,7 +17,7 @@ extern void vec_scale_to_length(float *, float *, float);
 
 /* Takes the first free debris slot for owner: a random spin and speed, a 37-frame life, and a
    direction pointing away from the hero's target. */
-void func_PAL_0032C3B0(void *owner)
+void part_claim_debris_piece_pal(void *owner)
 {
     Debris0032ABC0 *debris;
     int i;

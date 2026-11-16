@@ -38,7 +38,7 @@ extern int D_18C0A0;
 
 extern int D_18C0B4;
 
-extern int D_L00_001B9080;
+extern int g_hero_ledge_move_flag;
 
 extern void anim_start_blended(char *object, int mode, int a2, int a3);
 
@@ -70,19 +70,19 @@ typedef struct {
     unsigned char b42;
 } LevelSavedState_390E10;
 
-extern int D_L00_001A8A44 __attribute__((section(".sdata")));
-extern float D_L00_001B1984 __attribute__((section(".sdata")));
-extern float D_L00_001B1988 __attribute__((section(".sdata")));
-extern float D_L00_001B198C __attribute__((section(".sdata")));
-extern float D_L00_001B1990 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1980 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1981 __attribute__((section(".sdata")));
-extern unsigned char D_L00_001B1982 __attribute__((section(".sdata")));
-extern float D_L00_001B2500 __attribute__((section(".sdata")));
-extern float D_L00_001B2408 __attribute__((section(".sdata")));
-extern int D_L00_001B1EB4 __attribute__((section(".sdata")));
-extern int D_L00_001B20C0 __attribute__((section(".sdata")));
-extern int D_L00_001B255C __attribute__((section(".sdata")));
+extern int g_lighting_saved_flag __attribute__((section(".sdata")));
+extern float g_fog_near __attribute__((section(".sdata")));
+extern float g_fog_far __attribute__((section(".sdata")));
+extern float g_fog_near_intensity __attribute__((section(".sdata")));
+extern float g_fog_far_intensity __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_r __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_g __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_b __attribute__((section(".sdata")));
+extern float g_light_far_param __attribute__((section(".sdata")));
+extern float g_light_falloff_param __attribute__((section(".sdata")));
+extern int g_light_scale_first __attribute__((section(".sdata")));
+extern int g_light_distance_param __attribute__((section(".sdata")));
+extern int g_light_scale_second __attribute__((section(".sdata")));
 extern void SetBackgroundColor(int, int, int);
 
 typedef unsigned char u8;
@@ -115,7 +115,7 @@ typedef struct {
     int cooldown;
 } LaunchHero;
 extern LaunchHero g_hero_state;
-extern unsigned int D_00138320;
+extern unsigned int g_pad_pressed_flags;
 extern void moby_transform_joint_to_world(char *, int, char *);
 /* Interleaved declarations preserve the EE ABI's independent GPR and FP argument order. */
 extern void CalculateAimedLaunchVelocity(void *, void *, void *, float, float, float, float, void *);
@@ -128,7 +128,7 @@ extern void ref_L00_0039D110_00(void *, void *);
 extern void decoy_glove_draw_projectile(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *);
 
 typedef struct { float value[3]; } QuerySettings;
-extern QuerySettings D_L00_001AF410;
+extern QuerySettings g_fin_query_settings;
 typedef struct { char prefix[0x1A0]; unsigned int held, pressed; } LaunchInput;
 extern LaunchInput g_pad_state;
 extern char *SelectBestTargetInCone(void *, void *, int *, void *, int, int, float, float, float, float, float, int, void *);
@@ -155,7 +155,7 @@ void part_spawn_spark_puff(char *object)
 
 typedef union { TI128 quad; float f[4]; } ParticleUpdateVector;
 typedef struct { int color[4]; } ParticleUpdateColors;
-extern ParticleUpdateColors D_L00_001AF010;
+extern ParticleUpdateColors g_spark_particle_colors;
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int gfx_swap_packed_color_channels(int, int);
@@ -178,7 +178,7 @@ void spark_particle_update(char *object)
             enabled = 0;
     if ((*(unsigned char *)(object + 0xBC) & 1) && enabled) {
         int color;
-        colors = D_L00_001AF010;
+        colors = g_spark_particle_colors;
         random.quad = 0;
         random.f[0] = math_random_float_range(-1.0f, 1.0f);
         random.f[1] = math_random_float_range(-1.0f, 1.0f);
@@ -243,32 +243,32 @@ char *tether_create_holder(char *owner)
 void level_save_and_dim_lighting(char *object)
 {
     LevelSavedState_390E10 *st = *(LevelSavedState_390E10 **)(object + 0x68);
-    float f30 = D_L00_001B1984;
-    float f34 = D_L00_001B1988;
-    float f38 = D_L00_001B198C;
-    float f3C = D_L00_001B1990;
+    float f30 = g_fog_near;
+    float f34 = g_fog_far;
+    float f38 = g_fog_near_intensity;
+    float f3C = g_fog_far_intensity;
 
-    D_L00_001A8A44 = 1;
+    g_lighting_saved_flag = 1;
     st->f30 = f30;
     st->f34 = f34;
     st->f38 = f38;
     st->f3C = f3C;
-    st->b40 = D_L00_001B1980;
-    st->b41 = D_L00_001B1981;
-    st->b42 = D_L00_001B1982;
-    D_L00_001B1980 = 0x40;
-    D_L00_001B1981 = 0x60;
-    D_L00_001B1982 = 0x40;
-    D_L00_001B1984 = 0.0f;
-    D_L00_001B1988 = 131072.0f;
-    D_L00_001B198C = 255.0f;
-    D_L00_001B2500 = 147456.0f;
-    D_L00_001B2408 = 144.0f;
-    D_L00_001B255C = 144;
-    D_L00_001B1EB4 = 144;
-    D_L00_001B20C0 = 0x50000;
-    D_L00_001B1990 = 0.0f;
-    SetBackgroundColor(D_L00_001B1980, D_L00_001B1981, D_L00_001B1982);
+    st->b40 = g_fog_color_r;
+    st->b41 = g_fog_color_g;
+    st->b42 = g_fog_color_b;
+    g_fog_color_r = 0x40;
+    g_fog_color_g = 0x60;
+    g_fog_color_b = 0x40;
+    g_fog_near = 0.0f;
+    g_fog_far = 131072.0f;
+    g_fog_near_intensity = 255.0f;
+    g_light_far_param = 147456.0f;
+    g_light_falloff_param = 144.0f;
+    g_light_scale_second = 144;
+    g_light_scale_first = 144;
+    g_light_distance_param = 0x50000;
+    g_fog_far_intensity = 0.0f;
+    SetBackgroundColor(g_fog_color_r, g_fog_color_g, g_fog_color_b);
 }
 
 
@@ -293,7 +293,7 @@ void tether_release(char *actor, char *tether)
     level_clear_second_table_entry();
     table_clear_entry_flag(*(int *)(tetherRef + 0x4C));
     moby_mark_spawned((NativeUpdate775View *)actorRef);
-    D_L00_001B9080 = 0;
+    g_hero_ledge_move_flag = 0;
 }
 
 
@@ -303,7 +303,7 @@ void tether_release(char *actor, char *tether)
 /* Gates on the sub-object's tag byte, mirrors one status bit from that object into its own
  * halfword, clamps the wrapped value at +4 against a signed window and finishes with the
  * three transform helpers; original game role is unknown. */
-extern int D_0018B060;
+extern int g_tether_fin_counter;
 
 extern void func_310440(char *object);
 
@@ -336,7 +336,7 @@ void tether_fin_piece_update(char *object)
             *(unsigned short *)(object + 0x34) = bits;
         }
     }
-    if (D_0018B060 < 0x19)
+    if (g_tether_fin_counter < 0x19)
         *(unsigned short *)(object + 0x34) |= 0x41;
     {
         int current = *(int *)(vars + 4);
@@ -408,7 +408,7 @@ void UpdateAimedProjectileLauncher(char *actor)
     char *target;
     int ready;
     moby_transform_joint_to_world(actor, 0, position);
-    settings = D_L00_001AF410;
+    settings = g_fin_query_settings;
     target = SelectBestTargetInCone(actor + 0x10, g_hero_state.aimAxis, &foundCount, 0, 0, 0,
                           0.3926991f, 0.7853982f, 11.1f, 0.0f, 0.0f, 0, &settings);
     CalculateAimedLaunchVelocity(direction, position, target, 1.5f, g_hero_state.level == 29 ? 11.0f : 10.0f, 0.16666667f, 0.003055555745959282f, 0);
@@ -482,7 +482,7 @@ void UpdateProjectileLauncher(char *actor)
         *(unsigned char *)(actor + 0x20) = 1;
         *(int *)(state + 0x24) = 0;
     case 1:
-        if ((D_00138320 & g_hero_state.buttons) == 0 || g_hero_state.busy || g_hero_state.resource < 9 || !ready) break;
+        if ((g_pad_pressed_flags & g_hero_state.buttons) == 0 || g_hero_state.busy || g_hero_state.resource < 9 || !ready) break;
         if (weapon_spend_ammo(-1, 1)) {
             start_equipped_item_animation();
             *(unsigned char *)(actor + 0x20) = 2;

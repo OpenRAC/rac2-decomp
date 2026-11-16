@@ -8,23 +8,23 @@
    form with a GPREL16 relocation, whose symbol must therefore be named GP + the retail
    displacement. `sda` only adds `.extern SYM,size`. */
 
-extern unsigned int D_L04_001A8ED0;
+extern unsigned int g_race_state_flags;
 
-extern unsigned int D_L04_001B0908 __attribute__((sda));
+extern unsigned int g_race_state_request __attribute__((sda));
 
 /* Sets two level-04 race state flags. */
 void race_set_state_flags_a(void)
 {
-    D_L04_001A8ED0 = 2;
-    D_L04_001B0908 = 1;
+    g_race_state_flags = 2;
+    g_race_state_request = 1;
 }
 
-extern unsigned int D_L04_001B0910 __attribute__((sda));
+extern unsigned int g_race_state_flag_b __attribute__((sda));
 
 /* Sets one level-04 race state flag. */
 void race_set_state_flag_b(void)
 {
-    D_L04_001B0910 = 1;
+    g_race_state_flag_b = 1;
 }
 
 /* func_L04_0040AC30 reaches its globals off $gp too, but its body is not matched
@@ -36,14 +36,14 @@ void race_set_state_flag_b(void)
    first and then the source order, which is the order retail has. */
 extern unsigned int D_L04_001A8ED0_1 __attribute__((sda));
 
-extern unsigned int D_L04_001A8EE4;
+extern unsigned int g_race_l04_state_flag_c;
 
 /* Sets three level-04 race state flags. */
 void race_set_state_flags_c(void)
 {
-    D_L04_001A8EE4 = 1;
+    g_race_l04_state_flag_c = 1;
     D_L04_001A8ED0_1 = 2;
-    D_L04_001B0908 = 2;
+    g_race_state_request = 2;
 }
 
 /* The record func_L04_004044B8 walks: the fields it uses, at the retail's offsets. */
@@ -130,7 +130,7 @@ void racer_update_checkpoint_progress(void *racer, L04_004044B8_Record *record)
 #define H(p,o) (*(short *)((p)+(o)))
 typedef unsigned int AttackQuad __attribute__((mode(TI)));
 typedef struct { int v[5]; } AttackChoices;
-extern AttackChoices D_L04_001B0A10;
+extern AttackChoices g_attack_choices;
 extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } g_hero_state;
 typedef struct {
  unsigned char pad0[0x260]; int triggerList;
@@ -146,9 +146,9 @@ typedef struct {
 typedef struct { int unused, flags; unsigned char pad8[0x38]; } AttackSettings;
 extern AttackSettings g_race_challenge_table[];
 
-extern unsigned char *D_L04_001C3B40[];
+extern unsigned char *g_special_moby_list[];
 extern int g_current_race_index __attribute__((sda));
-extern int D_00138320 NOT_SDA,D_00138324 NOT_SDA;
+extern int g_pad_pressed_flags NOT_SDA,g_pad_held_flags NOT_SDA;
 extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int coll_process_hit(void *,float,int,void *,int);
@@ -178,14 +178,14 @@ void racer_update_item_use(unsigned char *racer)
  AttackChoices choices;
  float origin[4],dir[4],delta[4],probe[4],temp[4];
  unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *racerState=*(AttackState **)(racer+0x68); unsigned char *boxVars; int count,i,state,choice;
- choices=D_L04_001B0A10;
+ choices=g_attack_choices;
  FastVecScale(probe,racerState->offset,3);
  FastVecAdd(probe,probe,((unsigned char *)&g_hero_state + 0xe0));
  count=coll_process_hit(probe,0.7f,0,g_hero_state.hero,0);
  if(count) {
   FastVecScale(delta,racerState->offset,7);
-  for(i=0;i<count;i++) if(moby_is_in_special_class_range(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85 /* moby class 133 */)
-   part_queue_impact_effect(D_L04_001C3B40[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
+  for(i=0;i<count;i++) if(moby_is_in_special_class_range(g_special_moby_list[i]) || H(g_special_moby_list[i],0xaa)==0x85 /* moby class 133 */)
+   part_queue_impact_effect(g_special_moby_list[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
  }
  racer_update_boost(racer);
  if((g_race_challenge_table[g_current_race_index].flags&1) && racerState->triggerList!=-1) {
@@ -214,7 +214,7 @@ void racer_update_item_use(unsigned char *racer)
  switch(racerState->state) {
  case 0: break;
  case 1:
-  if(math_fast_float_d(&racerState->timer) && (D_00138320&5)) {
+  if(math_fast_float_d(&racerState->timer) && (g_pad_pressed_flags&5)) {
    racerState->timer=3;moby_transform_joint_to_world(racer,((racerState->duration^1)&1),origin);
    if(racerState->elevated)vec_build_spherical_offset(dir,racerState->length+0.5f,F(racer,0xf8),-racerState->tilt);
    else vec_build_spherical_offset(dir,racerState->length+0.5f,F(racer,0xf8),-F(racer,0xf4));
@@ -223,7 +223,7 @@ void racer_update_item_use(unsigned char *racer)
   }return;
  case 2: {
   unsigned char *target; float tilt;
-  if(math_fast_float_d(&racerState->timer) && (D_00138324&5)) {
+  if(math_fast_float_d(&racerState->timer) && (g_pad_held_flags&5)) {
    yaw=0;extra=0;racerState->timer=30;moby_transform_joint_to_world(racer,((racerState->duration^1)&1),origin);tilt=F(racer,0xf8);
    if(racerState->elevated)vec_build_spherical_offset(dir,racerState->length+0.5f+racerState->height,tilt,yaw);
    else {vec_build_spherical_offset(dir,racerState->length+0.5f+racerState->height,tilt,-F(racer,0xf4));yaw=F(racer,0xf4);}
@@ -238,7 +238,7 @@ void racer_update_item_use(unsigned char *racer)
    if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }return; }
  case 3:
-  if(math_fast_float_d(&racerState->timer) && (D_00138324&5)) {
+  if(math_fast_float_d(&racerState->timer) && (g_pad_held_flags&5)) {
    racerState->timer=30;FastVecAdd(temp,racer+16,racerState->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;shield_dome_spawn(racer,origin);
    if(math_fast_float_d(&racerState->duration))racerState->state=0;
   }

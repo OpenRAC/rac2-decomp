@@ -39,7 +39,7 @@ extern State2D6E78 g_pause_menu_state;
 extern void load_request_disc_read_break(void);
 
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
-extern Base2D75E8 D_0025A6E0;
+extern Base2D75E8 g_page_preview;
 /* D_001A7B90 is the 40-byte saved settings block (func_00298E08 copies it whole). Read as
    fields, its symbol+offset macro loads never fill a delay slot, as in retail. The two
    sliders are numbered by the menu row that edits them. */
@@ -58,7 +58,7 @@ typedef struct { char pad0[0x36C]; int offset; char pad370[0x16B0 - 0x370]; int 
 typedef struct { unsigned int key; unsigned int flags; } Slot2D81B0;
 extern Stream2D81B0 g_copy_setup_data;
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern Slot2D81B0 D_001B1F50[] MACRO_ADDR;
+extern Slot2D81B0 g_menu_chunk_table[] MACRO_ADDR;
 /* Halves the stream length while it marks the slots whose key is older than the clock and
    (outside the mode) asks for the next block; the result picks state 1 or 3. */
 extern void load_request_disc_read_break(void);
@@ -150,7 +150,7 @@ typedef struct {
 } Menu2DA9A8;
 
 extern unsigned char g_item_owned_flags[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 extern int request_is_current_slot(int);
 extern char *GetLocalizedString(int);
 extern void SetupGifPaging(int);
@@ -204,7 +204,7 @@ int func_PAL_002DB6C8(MenuPanel2DA9A8 *menu)
             short id = row->id;
             if (!g_item_owned_flags[id]) return 1;
         }
-        if (row->type == 1 && !D_001395B8[row->id]) return 1;
+        if (row->type == 1 && !g_game_flag_table[row->id]) return 1;
     }
     SetupGifPaging(0);
     if (menu->mode < 4) texture = load_texture_file(menu->texture[0]);
@@ -226,7 +226,7 @@ int func_PAL_002DB6C8(MenuPanel2DA9A8 *menu)
 /* func_002DAE90 is in 002D5E98-g8.c. */
 
 /* The map screen's frame: the page and image being shown and the two frame textures. */
-extern char *D_001F2854;
+extern char *g_active_menu_object;
 /* The frame counter as an incomplete sda array: retail's tied absolute macro load. */
 /* Draws the textured frame around the map dialog, scrolling the inner texture. */
 /* func_002DB3C0 is in 002DB3C0.c. */
@@ -236,7 +236,7 @@ extern char *D_001F2854;
 
 /* func_002DB988 is defined in 002DB988-init-g8.c. */
 
-extern char *D_001F2854;
+extern char *g_active_menu_object;
 
 undefined8 menu_convert_object_handle(int param_1);
 
@@ -254,11 +254,11 @@ extern int r1_D_0015EE84 MACRO_ADDR;
 /* `r1_D_001D48A8[(unsigned)r1_D_0015EE84 % 19]`; the older near-miss
    predated MACRO_ADDR. */
 extern int g_pad_state[];
-extern int D_001F2974;
+extern int g_menu_list_busy_flag;
 extern void snd_play_menu_sound_if_enabled(int, int);
 
 extern int g_pad_state[];
-extern int D_001F2974;
+extern int g_menu_list_busy_flag;
 extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Two-branch draw set-up: copies a 2-byte record from one of two tables into a 16-byte local, then issues a draw call with five float arguments (scale, per-instance angle, two constants, colour value) plus a 64-bit attribute word, a geometry handle, a fifth integer argument -1 and a local buffer. */

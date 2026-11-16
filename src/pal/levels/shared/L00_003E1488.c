@@ -49,7 +49,7 @@ typedef struct BounceState {
 } BounceState;
 
 /* Per-frame update of a bouncing object: runs its timed phases, then moves and bounces it. */
-void func_PAL_L00_003E1488(BounceObject *object)
+void UpdateRotatingBouncingEffect_pal(BounceObject *object)
 {
     float point[4];
     float rotation[12];

@@ -3,8 +3,8 @@
 
 typedef struct { float x, y, z, w; } L03EffectVector;
 typedef struct { float x, y; } L03EffectRange;
-extern L03EffectRange D_L03_001AA2E8;
-extern unsigned char D_L03_001A8F20[] MACRO_ADDR;
+extern L03EffectRange g_effect_burst_range;
+extern unsigned char g_effect_descriptor_default[] MACRO_ADDR;
 extern void vec_random_direction(L03EffectVector *, float, float);
 extern float math_random_angle(void);
 extern void vec_clear_128(L03EffectVector *);
@@ -18,7 +18,7 @@ extern char *part_spawn_flying_fragment(void *, int, void *, void *, int, int, v
 void part_spawn_effect_burst(unsigned char *object, int first, int count, int randomFirst,
                         int randomCount, int limit, int alternate, void *offset) {
     L03EffectVector velocity;
-    L03EffectRange range = D_L03_001AA2E8;
+    L03EffectRange range = g_effect_burst_range;
     L03EffectVector points[16];
     L03EffectVector rotation;
     int flags = alternate ? 2 : 0;
@@ -29,7 +29,7 @@ void part_spawn_effect_burst(unsigned char *object, int first, int count, int ra
             velocity.z = math_fabs(velocity.z) * 1.5f;
             FastVecAdd(&velocity, &velocity, offset);
             part_spawn_flying_fragment(object, first + i, object + 0x10, object + 0xF0,
-                            0, flags, &velocity, D_L03_001A8F20, D_L03_001A8F20, 0.0f);
+                            0, flags, &velocity, g_effect_descriptor_default, g_effect_descriptor_default, 0.0f);
         }
     }
     if (randomFirst > 0 && randomCount > 0) {
@@ -45,7 +45,7 @@ void part_spawn_effect_burst(unsigned char *object, int first, int count, int ra
                 rotation.z = math_random_angle();
                 part_spawn_flying_fragment(object, randomFirst + math_random_int_below(randomCount),
                                 &points[i], &rotation, 0, flags, &velocity,
-                                D_L03_001A8F20, D_L03_001A8F20, 0.0f);
+                                g_effect_descriptor_default, g_effect_descriptor_default, 0.0f);
             }
         }
     }

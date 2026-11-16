@@ -6,7 +6,7 @@ extern void ref_L06_00457920_01(s32, s32, f32);
 extern s32 ref_L06_00457920_02;
 extern s8 ref_L06_00457920_03[];
 
-void func_PAL_L06_0045CA40(void *arg0) {
+void part_spawn_debris_pieces_pal(void *arg0) {
     void *temp_s0;
     s32 temp_a0;
     s32 var_s2;

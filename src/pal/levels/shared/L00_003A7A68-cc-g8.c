@@ -6,17 +6,17 @@ extern Hero g_hero_state;
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
 
-extern float D_L00_001AF62C __attribute__((sda));
-extern float D_L00_001AF630 __attribute__((sda));
-extern int D_L00_001AF634 __attribute__((sda));
-extern int D_L00_001AF638 __attribute__((sda));
-extern unsigned int D_L00_001AF63C __attribute__((sda));
-extern float D_L00_001AF640 __attribute__((sda));
-extern float D_L00_001AF644 __attribute__((sda));
-extern float D_L00_001AF648 __attribute__((sda));
-extern float D_L00_001AF64C __attribute__((sda));
-extern float D_L00_001AF650 __attribute__((sda));
-extern float D_L00_001AF654 __attribute__((sda));
+extern float g_fragment_fan_angle __attribute__((sda));
+extern float g_fragment_jitter_range __attribute__((sda));
+extern int g_fragment_burst_param_a __attribute__((sda));
+extern int g_fragment_burst_param_b __attribute__((sda));
+extern unsigned int g_fragment_color __attribute__((sda));
+extern float g_fragment_spawn_param_b __attribute__((sda));
+extern float g_fragment_speed_min __attribute__((sda));
+extern float g_fragment_speed_max __attribute__((sda));
+extern float g_fragment_size_min __attribute__((sda));
+extern float g_fragment_size_max __attribute__((sda));
+extern float g_fragment_spawn_param_a __attribute__((sda));
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -72,7 +72,7 @@ void func_PAL_L00_003A7A68(char *moby)
         }
     }
     angle = 0.0f;
-    math_apply_axis_rotation_to_quat(base, &g_hero_state.f[460], &g_hero_state.f[464], D_L00_001AF62C * 0.017453294f);
+    math_apply_axis_rotation_to_quat(base, &g_hero_state.f[460], &g_hero_state.f[464], g_fragment_fan_angle * 0.017453294f);
     qcopy(direction, base);
     qzero_nc(drift);
     if (g_hero_state.i[208])
@@ -82,18 +82,18 @@ void func_PAL_L00_003A7A68(char *moby)
         int spin;
         float size;
         angle = FastAddRotations(angle, math_random_float_range(0.0f, 0.6283186078f));
-        FastVecScale(velocity, direction, math_random_float_range(D_L00_001AF644 * (0.020000001f),
-                                                       D_L00_001AF648 * (0.020000001f)));
+        FastVecScale(velocity, direction, math_random_float_range(g_fragment_speed_min * (0.020000001f),
+                                                       g_fragment_speed_max * (0.020000001f)));
         FastVecAdd(velocity, velocity, drift);
-        color = (((int)(D_L00_001AF63C) * 5 + 2) / 6);
+        color = (((int)(g_fragment_color) * 5 + 2) / 6);
         spin = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
-        jitter[0] = origin[0] + math_random_signed_float_range(0.0f, D_L00_001AF630);
-        jitter[1] = origin[1] + math_random_signed_float_range(0.0f, D_L00_001AF630);
-        jitter[2] = origin[2] + math_random_signed_float_range(0.0f, D_L00_001AF630);
-        size = math_random_float_range(D_L00_001AF64C, D_L00_001AF650) * 210000.0f;
+        jitter[0] = origin[0] + math_random_signed_float_range(0.0f, g_fragment_jitter_range);
+        jitter[1] = origin[1] + math_random_signed_float_range(0.0f, g_fragment_jitter_range);
+        jitter[2] = origin[2] + math_random_signed_float_range(0.0f, g_fragment_jitter_range);
+        size = math_random_float_range(g_fragment_size_min, g_fragment_size_max) * 210000.0f;
         FastVecSub(jitter, jitter, velocity);
-        func_PAL_002C23B8(jitter, velocity, color, D_L00_001AF634, D_L00_001AF638, spin,
-                      size, D_L00_001AF654, D_L00_001AF640, 0.0f, 0.0f);
+        func_PAL_002C23B8(jitter, velocity, color, g_fragment_burst_param_a, g_fragment_burst_param_b, spin,
+                      size, g_fragment_spawn_param_a, g_fragment_spawn_param_b, 0.0f, 0.0f);
         if (math_fabs(angle) > 0.00001f) {
             math_build_axis_angle_quat(rotation, &g_hero_state.f[460], angle);
             vec_rotate_by_quaternion(direction, base, rotation);

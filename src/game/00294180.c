@@ -31,7 +31,7 @@ typedef struct {
 } SifDma;
 
 extern StreamBank g_copy_setup_data;
-extern u8 *D_001A7278 MACRO_ADDR;
+extern u8 *g_sound_bank_buffer MACRO_ADDR;
 
 extern void FlushCache(int);
 extern int sceSifSetDma(SifDma *, int);
@@ -57,7 +57,7 @@ void load_continue_stream(StreamLoad *load, s32 go) {
             dma.size = g_copy_setup_data.files[load->file].sectors << 11;
             dma.data = buf;
             dma.mode = 0;
-            dma.addr = D_001A7278 + slot_offset;
+            dma.addr = g_sound_bank_buffer + slot_offset;
             *(s32 *)(buf + 0x14) = 0xC000;
             hdr[0x28 / 4] = 0xC000;
             hdr[0x2C / 4] = 0xC000;

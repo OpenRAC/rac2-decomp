@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern int PlayMobySound(int, int, char *);
-extern void *func_PAL_L00_003FB330(float, float, void *, int, int, int, int, int, int, int, int, int, int, void *);
+extern void *SpawnExplosion_pal(float, float, void *, int, int, int, int, int, int, int, int, int, int, void *);
 extern void moby_get_facing_direction(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -12,8 +12,8 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern char *func_PAL_L00_0040E0B0(void *, void *, int, int);
 extern void table_clear_entry_flag(int);
-extern void *D_L00_001ADB2C MACRO_ADDR;
-extern int D_L00_001B0C24 __attribute__((sda));
+extern void *g_active_tether_object MACRO_ADDR;
+extern int g_shot_fragment_count __attribute__((sda));
 
 /* Build a surface-aligned frame, then launch the configured number of fragments. */
 
@@ -33,8 +33,8 @@ void func_PAL_L00_00403E50(char *object) {
 
     PlayMobySound(0, 0, object);
     for (j = 1; j >= 0; j--) {
-        func_PAL_L00_003FB330(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
-                       0, 1, 0, D_L00_001ADB2C);
+        SpawnExplosion_pal(strength, 20.0f, object + 0x10, 1, 14, 10, 15, 10, 20, 1,
+                       0, 1, 0, g_active_tether_object);
         strength += 0.3f;
     }
     moby_get_facing_direction(position, basis[2]);
@@ -44,7 +44,7 @@ void func_PAL_L00_00403E50(char *object) {
     vec_scale_to_length(basis[0], perpendicular, 1.0f);
     FastVecCross(basis[1], basis[0], basis[2]);
     basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
-    for (i = 0; i < D_L00_001B0C24; i++) {
+    for (i = 0; i < g_shot_fragment_count; i++) {
         heading = math_random_angle();
         if (*(int *)(state + 0x2C) != 0) {
             elevation = math_random_float_range(0.698131799697876f, 1.3089970350265503f);

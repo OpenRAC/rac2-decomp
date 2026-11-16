@@ -11,7 +11,7 @@ typedef struct { char reserved00[0x1C4]; int flags; } MenuGameState;
 typedef struct { short reserved00, key; int value; } MenuMessage;
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern void menu_clear_counter(void);
@@ -20,7 +20,7 @@ extern int func_0029C560(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
-int func_US2_002D5F10(void)
+int menu_popup_update_us2(void)
 {
     MenuMessage message;
     int result = 0;
@@ -50,8 +50,8 @@ return_value:
         result = 1;
     else {
         func_0029C560(flags);
-        if ((state->flags & 0x40) && D_001A8CFC[0] != 0) {
-            char *data = tab_menu_get_selected_entry(D_001A8CFC[0] + 0x3C160);
+        if ((state->flags & 0x40) && g_resident_data_base[0] != 0) {
+            char *data = tab_menu_get_selected_entry(g_resident_data_base[0] + 0x3C160);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
             menu_start_action((int)&message);

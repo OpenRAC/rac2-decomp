@@ -4,9 +4,9 @@
 /* Select one of three measured pointer slots for the requested kind. */
 extern void *g_hero_moby;
 
-extern void *D_0018B134;
+extern void *g_attachment_owner_b;
 
-extern void *D_0018B040;
+extern void *g_attachment_owner_a;
 
 typedef unsigned char u8;
 typedef short s16;
@@ -22,12 +22,12 @@ typedef struct {
 } PlayerHealthState;
 extern PlayerHealthState g_hero_state;
 /* The scaling index is a signed halfword at player-stats offset 0x18. */
-extern s32 D_001A7A00[] __attribute__((sda));
+extern s32 g_player_stats[] __attribute__((sda));
 /* Five damage multipliers copied into a local lookup table. */
 typedef struct {
     f32 scale[5];
 } PlayerDamageScale;
-extern PlayerDamageScale D_L00_001A7F30;
+extern PlayerDamageScale g_player_damage_scale;
 
 extern f32 IntToFloat(int value);
 extern int FloatToInt(f32 value);
@@ -56,10 +56,10 @@ void AdjustPlayerHealth(int amount)
     damage = amount;
     mode = g_hero_state.mode;
     if (mode == 0 && amount > 0) {
-        level = *(s16 *)((u8 *)D_001A7A00 + 0x18);
+        level = *(s16 *)((u8 *)g_player_stats + 0x18);
         level = level < 5 ? level : 4;
         level = level > -1 ? level : 0;
-        scale = D_L00_001A7F30;
+        scale = g_player_damage_scale;
         damage = FloatToInt(IntToFloat(amount) * scale.scale[level] + 0.5f);
         damage = damage > mode ? damage : 1;
     }
@@ -75,9 +75,9 @@ void *attachment_get_owner_by_kind(int kind)
     if (kind == 0 || kind == 2 || kind == 3 || kind == 4 || kind == 5)
         return g_hero_moby;
     if (kind == 1)
-        return D_0018B134;
+        return g_attachment_owner_b;
     if (kind == 6)
-        return D_0018B040;
+        return g_attachment_owner_a;
     return 0;
 }
 

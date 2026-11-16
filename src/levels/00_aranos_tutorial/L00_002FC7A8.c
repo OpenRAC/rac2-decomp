@@ -50,8 +50,8 @@ typedef struct AranosMoby {
     Vec rotation;
 } AranosMoby;
 
-extern float D_L00_001B19CC __attribute__((sda));
-extern float D_L00_001B19D0 __attribute__((sda));
+extern float g_effect_fade_value_a __attribute__((sda));
+extern float g_effect_fade_value_b __attribute__((sda));
 extern void *part_find_owned_effect_slot(void *, unsigned int, int);
 extern int flag_set_first_pending(void *);
 extern void moby_set_state(void *, int, int);
@@ -69,7 +69,7 @@ extern int IsPointInCuboid(char *, unsigned int);
 extern void moby_mark_spawned(void *);
 extern int PlayMobySound(int, int, void *);
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -80,8 +80,8 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
+extern int g_projectile_model_ref __attribute__((sda));
+extern int g_ripple_object __attribute__((sda)), g_ripple_param __attribute__((sda));
 extern Collision g_collision_result;
 extern Material g_weapon_l00_table[];
 extern void part_steer_effect_direction(int, void *, int);
@@ -111,7 +111,7 @@ extern void part_spawn_big_explosion(void *, void *, void *);
 extern void *part_alloc(int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
-extern unsigned char *D_L00_001FEA00[];
+extern unsigned char *g_aranos_spark_table[];
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Per-spark data after the common header: velocity, fade rate and colour. */
@@ -151,7 +151,7 @@ void *aranos_spark_spawn(TI128 *position, TI128 *velocity, int frames, int step,
         obj->f09 = FloatToInt(2.0f) + 0x10;
         obj->f03 = 0x44;
         obj->f01 = 0;
-        obj->f02 = D_L00_001FEA00[0][0];
+        obj->f02 = g_aranos_spark_table[0][0];
         obj->f0C = scale * 210000.0f;
         obj->f08 = math_random_int_below(0x100);
         qcopy_nc(cursor, velocity);
@@ -208,8 +208,8 @@ void gfx_draw_object_multi_pass(void *obj) {
 /* AranosMoby.matrix as the three rows it holds. */
 typedef struct { char pad[0xC0]; float matrix[3][4]; } AranosMatrixView;
 
-extern AranosMoby *D_L00_00220DA0[];
-extern int D_L00_001A8F00 __attribute__((sda));
+extern AranosMoby *g_launch_moby_list[];
+extern int g_game_l00_mode __attribute__((sda));
 extern void moby_transform_joint_point(void *, int, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -224,42 +224,42 @@ void SnapMobyListToParent(AranosMoby *obj) {
     int i = 0, j;
     Vec *source;
 
-    if (D_L00_00220DA0[0]) {
+    if (g_launch_moby_list[0]) {
         do {
-            D_L00_00220DA0[i]->flags &= 0xFFBE;
-            D_L00_00220DA0[i]->flags |= 0x1000;
-            D_L00_00220DA0[i]->f98 = *(int *)((char *)D_L00_00220DA0[i]->model + 0x10);
+            g_launch_moby_list[i]->flags &= 0xFFBE;
+            g_launch_moby_list[i]->flags |= 0x1000;
+            g_launch_moby_list[i]->f98 = *(int *)((char *)g_launch_moby_list[i]->model + 0x10);
             /* Retail stores these two saves and never reads them back. */
-            qcopy_nc(&position, &D_L00_00220DA0[i]->position);
-            qcopy_nc(&rotation, &D_L00_00220DA0[i]->rotation);
+            qcopy_nc(&position, &g_launch_moby_list[i]->position);
+            qcopy_nc(&rotation, &g_launch_moby_list[i]->rotation);
             /* A statement of its own: the longer life lets loop hoist it on its first pass. */
             source = &obj->position;
-            qcopy(&D_L00_00220DA0[i]->position, source);
+            qcopy(&g_launch_moby_list[i]->position, source);
             moby_transform_joint_point(obj, 0, matrix);
             for (j = 0; j < 3; j++) {
                 float *row = matrix[j];
-                ((AranosMatrixView *)D_L00_00220DA0[i])->matrix[j][0] = row[0];
-                ((AranosMatrixView *)D_L00_00220DA0[i])->matrix[j][1] = row[1];
-                ((AranosMatrixView *)D_L00_00220DA0[i])->matrix[j][2] = row[2];
+                ((AranosMatrixView *)g_launch_moby_list[i])->matrix[j][0] = row[0];
+                ((AranosMatrixView *)g_launch_moby_list[i])->matrix[j][1] = row[1];
+                ((AranosMatrixView *)g_launch_moby_list[i])->matrix[j][2] = row[2];
             }
-            if (D_L00_001A8F00 == 2) {
+            if (g_game_l00_mode == 2) {
                 offset.q = 0;
                 offset.f[0] = -4.1919f;
                 offset.f[2] = -1.355f;
                 moby_transform_joint_to_world(obj, 1, &transformed);
-                matrix_mul_vec3(&offset, &offset, D_L00_00220DA0[i]->matrix);
+                matrix_mul_vec3(&offset, &offset, g_launch_moby_list[i]->matrix);
                 FastVecAdd(&transformed, &transformed, &offset);
-                qcopy(&D_L00_00220DA0[i]->position, &transformed);
+                qcopy(&g_launch_moby_list[i]->position, &transformed);
             }
-            mat_get_euler_angles(D_L00_00220DA0[i]->matrix, &D_L00_00220DA0[i]->rotation);
-            func_002A10E8(D_L00_00220DA0[i]);
-            if (D_L00_001A8F00 != 0) {
-                D_L00_00220DA0[i]->f98 = 0;
+            mat_get_euler_angles(g_launch_moby_list[i]->matrix, &g_launch_moby_list[i]->rotation);
+            func_002A10E8(g_launch_moby_list[i]);
+            if (g_game_l00_mode != 0) {
+                g_launch_moby_list[i]->f98 = 0;
             } else if (obj->f98) {
-                D_L00_00220DA0[i]->f98 = *(int *)((char *)D_L00_00220DA0[i]->model + 0x10);
+                g_launch_moby_list[i]->f98 = *(int *)((char *)g_launch_moby_list[i]->model + 0x10);
             }
             i++;
-        } while (D_L00_00220DA0[i]);
+        } while (g_launch_moby_list[i]);
     }
 }
 
@@ -311,7 +311,7 @@ void projectile_falling_update(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L00_001B2630, D_L00_001B2638, 1,
+            RippleDisturb(g_ripple_object, g_ripple_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -347,7 +347,7 @@ void projectile_falling_update(unsigned char *obj) {
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -408,7 +408,7 @@ void projectile_bouncing_update(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + g_weapon_l00_table)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l00_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -427,7 +427,7 @@ void projectile_bouncing_update(char *obj) {
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_projectile_model_ref && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -485,7 +485,7 @@ extern void flyer_tick_timers(char *);
 extern unsigned char g_sound_state[];
 extern unsigned char g_hero_state[];
 typedef struct { char pad[0x249C]; char *target; } Hero3173;
-extern char *D_L00_001FDA80[];
+extern char *g_launch_path_table[];
 #define FI(p,o) (*(int *)((p)+(o)))
 #define FF(p,o) (*(float *)((p)+(o)))
 #define FH(p,o) (*(short *)((p)+(o)))
@@ -590,7 +590,7 @@ void path_walker_update(char *self)
         }
         break;
     case 4:
-        path=D_L00_001FDA80[FI(d,0x294)];
+        path=g_launch_path_table[FI(d,0x294)];
         if (FI(d,0x298)>=FI(path,0)) {
             FI(d,0x294)=-1;
             FF(d,0x28C)=coll_probe_ground_height_below(self+0x10,0,0.5f)+0.5f;
@@ -781,7 +781,7 @@ void aranos_spark_burst_update(AranosMoby *obj) {
         unsigned char alpha;
         int count = 5, n;
 
-        if (D_L00_001B19CC < 0.85f && D_L00_001B19D0 < 0.85f)
+        if (g_effect_fade_value_a < 0.85f && g_effect_fade_value_b < 0.85f)
             count = 14;
         for (n = 0; n < count; n++) {
             vec_random_direction(&frame.offset, 0.85f, 1.95f);

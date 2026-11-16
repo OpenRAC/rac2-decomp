@@ -9,7 +9,7 @@ extern char g_hero_position[];
 /* func_L13_0040A3B0 is matched in L13_0040A3B0.c (built with -frac2-zero-ti-barrier). */
 
 
-void func_PAL_L13_0040EDF0(char *a0)
+void moby_turn_toward_hero_pal(char *a0)
 {
     char tmp[16];
     FastVecSub(tmp, g_hero_position, a0 + 0x10);

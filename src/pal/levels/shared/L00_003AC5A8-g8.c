@@ -25,9 +25,9 @@ typedef struct {
     char pad20[0x48];
     TrailSource *source;
 } TrailActor;
-extern float D_L00_001AF760 __attribute__((sda));
-extern float D_L00_001AF798 __attribute__((sda));
-extern float D_L00_001AF774 __attribute__((sda));
+extern float g_trail_time_step __attribute__((sda));
+extern float g_trail_u_scroll_step __attribute__((sda));
+extern float g_trail_rotation_rate __attribute__((sda));
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 extern int ref_L00_003A9000_00(void *);
@@ -49,13 +49,13 @@ int func_PAL_L00_003AC7A0(TrailActor *self)
         return 0;
     }
     qcopy_nc(&slots[source->index].b, &self->pos);
-    slots[source->index].t += D_L00_001AF760;
+    slots[source->index].t += g_trail_time_step;
     if (slots[source->index].t >= 4.0f)
         slots[source->index].t -= 4.0f;
-    slots[source->index].u += D_L00_001AF798;
+    slots[source->index].u += g_trail_u_scroll_step;
     if (slots[source->index].u >= 4.0f)
         slots[source->index].u -= 4.0f;
-    vec_scale_to_length(rot, source, D_L00_001AF774 * 0.020000001f);
+    vec_scale_to_length(rot, source, g_trail_rotation_rate * 0.020000001f);
     FastVecAdd(&slots[source->index], &slots[source->index], rot);
     FastVecAdd(&slots[source->index].a, &slots[source->index].a, rot);
     return 1;

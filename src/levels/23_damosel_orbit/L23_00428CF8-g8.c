@@ -22,7 +22,7 @@ typedef struct Hit_00428CF8 {
     u8 pad1C[0x14];
 } Hit_00428CF8;
 
-extern float D_L23_001B1AE4 __attribute__((sda));
+extern float g_fast_shot_spin_degrees __attribute__((sda));
 
 extern u8 g_last_ray_hit[];
 
@@ -131,8 +131,8 @@ void fast_shot_update(u8 *moby) {
             return;
         }
     }
-    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L23_001B1AE4 * 0.017453294f);
-    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L23_001B1AE4 * 0.017453294f);
+    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, g_fast_shot_spin_degrees * 0.017453294f);
+    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, g_fast_shot_spin_degrees * 0.017453294f);
     gfx_add_draw_callback_third((void *)part_draw_sign_band_sparkles, moby);
     counter = *(s32 *)(vars + 0x2C) + 2;
     *(s32 *)(vars + 0x2C) = counter;

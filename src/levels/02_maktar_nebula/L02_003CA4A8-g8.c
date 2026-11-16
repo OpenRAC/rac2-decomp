@@ -3,11 +3,11 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
 
 extern Vector g_camera_l02_position;
-extern struct { Vector point, normal; } D_L02_001C0970;
+extern struct { Vector point, normal; } g_surface_hit;
 extern char *g_route_polygons[];
-extern float D_L02_001B0080 __attribute__((sda)), D_L02_001B0084 __attribute__((sda)), D_L02_001B0088 __attribute__((sda));
-extern float D_L02_001B008C __attribute__((sda)), D_L02_001B0090 __attribute__((sda));
-extern int D_L02_001B0098[2];
+extern float g_controller_scale __attribute__((sda)), g_controller_rotate_rate __attribute__((sda)), g_controller_speed_limit_a __attribute__((sda));
+extern float g_controller_speed_limit_b __attribute__((sda)), g_controller_spin_rate __attribute__((sda));
+extern int g_pulse_color_pair[2];
 extern int g_frame_l02_counter[] MACRO_ADDR;
 extern float fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), FastVecDot(void *, void *), vec_length_xy(void *), mat_fast_helper_a(float, float), FastAddRotations(float, float);
 extern void moby_update_ground_check(char *), moby_set_state(u8 *, int, int), anim_start_blended(char *, int, int, int);
@@ -46,7 +46,7 @@ void UpdatePathFollowerAI(char *self) {
     }
     switch (((u8 *)self)[0x20]) {
     case 0:
-        *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * D_L02_001B0080;
+        *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * g_controller_scale;
         ((L02_PathState *)state)->f24 = 1;
         ((L02_PathState *)state)->f20 = 1; ((L02_PathState *)state)->f30 = 1.5f; ((L02_PathState *)state)->f84 = 0.05f;
         ((L02_PathState *)state)->f54 = 0.2f; ((L02_PathState *)state)->f50 = 0.825f; ((L02_PathState *)state)->f5c = ((L02_PathState *)state)->f58 = 0.4f;
@@ -63,7 +63,7 @@ void UpdatePathFollowerAI(char *self) {
     case 4:
         if (flag_set_first_pending((u8 *)self)) {
             if (((u8 *)self)[0x43] != 5) anim_start_blended(self, 5, 0, 20);
-            moby_set_controller_speed_limits((u8 *)self, 0.002222222276031971f, D_L02_001B008C * 0.016666668f, 0.0034906589426100254f, 0.20943954586982727f);
+            moby_set_controller_speed_limits((u8 *)self, 0.002222222276031971f, g_controller_speed_limit_b * 0.016666668f, 0.0034906589426100254f, 0.20943954586982727f);
         }
         enemy_follow_path_toward_point(self, (int)(&g_hero_state.position_80));
         if (*(float *)(state + 0x11C) < 6) moby_set_state((u8 *)self, 1, -1);
@@ -71,7 +71,7 @@ void UpdatePathFollowerAI(char *self) {
     case 2:
         if (flag_set_first_pending((u8 *)self)) {
             if (((u8 *)self)[0x43] != 4) anim_start_blended(self, 4, 0, 20);
-            moby_set_controller_speed_limits((u8 *)self, 0.0011111111380159855f, D_L02_001B0088 * 0.016666668f, 0.0008726647356525064f, 0.10471977293491364f);
+            moby_set_controller_speed_limits((u8 *)self, 0.0011111111380159855f, g_controller_speed_limit_a * 0.016666668f, 0.0008726647356525064f, 0.10471977293491364f);
             path_enemy_pick_patrol_point(self, state + 0x3A0);
         }
         enemy_follow_path_toward_point(self, (int)(state + 0x3A0));
@@ -80,7 +80,7 @@ void UpdatePathFollowerAI(char *self) {
     case 3:
         if (flag_set_first_pending((u8 *)self)) {
             if (((u8 *)self)[0x43] != 5) anim_start_blended(self, 5, 0, 20);
-            moby_set_controller_speed_limits((u8 *)self, 0.003888888983055949f, D_L02_001B008C * 0.016666668f, 0.0034906589426100254f, 0.41887909173965454f);
+            moby_set_controller_speed_limits((u8 *)self, 0.003888888983055949f, g_controller_speed_limit_b * 0.016666668f, 0.0034906589426100254f, 0.41887909173965454f);
             path_enemy_pick_patrol_point(self, state + 0x3A0);
         }
         enemy_follow_path_toward_point(self, (int)(state + 0x3A0));
@@ -111,7 +111,7 @@ void UpdatePathFollowerAI(char *self) {
         break;
     case 7:
         FastVecAdd(self + 0x10, self + 0x10, state + 0xF0);
-        *(float *)(state + 0xF8) -= D_L02_001B0084 * 0.00027777778f;
+        *(float *)(state + 0xF8) -= g_controller_rotate_rate * 0.00027777778f;
         path_enemy_refresh_timer(self);
         if (IsPointInCuboid(self + 0x10, *(int *)(state + 0x398))) {
             length = vec_length_xy(state + 0xF0); if (length > 0.016666668f) length = 0.016666668f;
@@ -119,13 +119,13 @@ void UpdatePathFollowerAI(char *self) {
         }
         qcopy(&point,self + 0x10); point.f[2] += 0.5f;
         if (coll_test_point(&point, 0, 0.5f, self)) {
-            qcopy(self + 0x10,&D_L02_001C0970.point); *(float *)(self + 0x18) -= 0.5f;
-            vec_scale_to_length(&D_L02_001C0970.normal, &D_L02_001C0970.normal, 1);
-            if (FastVecDot(&D_L02_001C0970.normal, state + 0xF0) < 0) {
-                vec_fast_normalize(state + 0xF0, state + 0xF0, &D_L02_001C0970.normal);
+            qcopy(self + 0x10,&g_surface_hit.point); *(float *)(self + 0x18) -= 0.5f;
+            vec_scale_to_length(&g_surface_hit.normal, &g_surface_hit.normal, 1);
+            if (FastVecDot(&g_surface_hit.normal, state + 0xF0) < 0) {
+                vec_fast_normalize(state + 0xF0, state + 0xF0, &g_surface_hit.normal);
                 FastVecScale(state + 0xF0, state + 0xF0, 0.5f);
             }
-            if (D_L02_001C0970.normal.f[2] >= 0.95f) {
+            if (g_surface_hit.normal.f[2] >= 0.95f) {
                 *(u16 *)(self + 0x34) |= 0x1000; moby_set_state((u8 *)self, 1, 0);
                 qzero(state + 0xF0); qcopy(state + 0x150,self + 0x10);
                 vec_clear_128((Quad *)(state + 0x140));
@@ -134,8 +134,8 @@ void UpdatePathFollowerAI(char *self) {
         break;
     }
     if (((u8 *)self)[0x31]) {
-        *(float *)(state + 0x3B0) = FastAddRotations(*(float *)(state + 0x3B0), D_L02_001B0090 * 0.0002908882452175021f);
-        *(int *)(self + 0x78) = PulseColor(D_L02_001B0098[0], D_L02_001B0098[1], *(float *)(state + 0x3B0));
+        *(float *)(state + 0x3B0) = FastAddRotations(*(float *)(state + 0x3B0), g_controller_spin_rate * 0.0002908882452175021f);
+        *(int *)(self + 0x78) = PulseColor(g_pulse_color_pair[0], g_pulse_color_pair[1], *(float *)(state + 0x3B0));
     }
     if ((g_frame_l02_counter[0] & 31) == (((int)self >> 8) & 31)) {
         step = *(int *)(state + 0x3C4);

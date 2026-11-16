@@ -18,7 +18,7 @@ typedef struct {
 } L17Player;
 
 extern L17Player g_hero_state;
-extern f32 D_L17_001B04BC SDATA(D_L17_001B04BC);
+extern f32 g_fan_var_value SDATA(D_L17_001B04BC);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
 extern f32 math_fast_sin_or_cos_a(f32);
@@ -26,13 +26,13 @@ extern f32 ApproachValue(void *, f32, f32);
 extern void add_vectors(void *, void *, void *);
 
 extern s32 coll_is_point_inside_bounds(u8 *a0, TI128 *a1, f32 f1, f32 f2);
-void func_PAL_L17_003D0B70(u8 *a0)
+void fan_l17_update_pal(u8 *a0)
 {
     f32 *st = *(f32 **)(a0 + 0x68);
     TI128 here __attribute__((aligned(16)));
     f32 dir[4] __attribute__((aligned(16)));
 
-    st[2] = D_L17_001B04BC;
+    st[2] = g_fan_var_value;
     switch (a0[0x20]) {
     case 0:
         *(f32 *)(a0 + 0x18) = *(f32 *)(a0 + 0x18) - 0.05f;

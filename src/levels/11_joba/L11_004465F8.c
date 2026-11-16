@@ -5,7 +5,7 @@ extern char *CreateMoby(int id);
 extern float math_random_float_range(float a, float b);
 extern float math_random_angle(void);
 extern void *part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
-extern char D_L11_001A8F20[] __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
 
 
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
@@ -109,7 +109,7 @@ s32 security_robot_is_holding_item_attacking(char *object)
    `sda` in this -G0 unit), the limit is a $gp word. */
 extern u16 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((sda));
-extern s32 D_L11_001B35B8[] __attribute__((sda));
+extern s32 g_tribe_group_limit[] __attribute__((sda));
 extern f32 vec_distance_xy(u8 *, u8 *);
 extern s32 arena_consume_waiting_fighter(u8 *, s32);
 /* Runs what the id in its second argument names on the object and returns a value the caller
@@ -180,7 +180,7 @@ void security_robot_update_pairing(u8 *self)
         best = 0;
         best_distance = 1000.0f;
         for (id_ptr = g_group_id_lists[self[0x21]];
-             (group = self[0x21]) != 0xFF && group <= D_L11_001B35B8[0] && id_ptr != 0 &&
+             (group = self[0x21]) != 0xFF && group <= g_tribe_group_limit[0] && id_ptr != 0 &&
              ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_group_id_lists[group]);
              id_ptr++) {
             entry = g_moby_l11_table + ((*id_ptr & 0x7FFF) << 8);
@@ -598,8 +598,8 @@ char *robot_spawn_debris(char *owner, TI128 *velocity, TI128 *position, float li
         *(unsigned short *)(projectile + 0x34) |= 0x200;
         size = math_random_float_range(2.0f, 4.0f);
         *(unsigned short *)(projectile + 0x34) |= 0x41;
-        part_spawn_ground_effect(projectile + 0x10, 4, 0x801060E0, 0, 10, D_L11_001A8F20, size * 0.3f, size, 0.0f, 0);
-        part_spawn_ground_effect(projectile + 0x10, 4, -1, 1, -10, D_L11_001A8F20, size * 0.04f, size * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(projectile + 0x10, 4, 0x801060E0, 0, 10, g_identity_l11_matrix, size * 0.3f, size, 0.0f, 0);
+        part_spawn_ground_effect(projectile + 0x10, 4, -1, 1, -10, g_identity_l11_matrix, size * 0.04f, size * 0.4f, 0.0f, 0);
     }
     return projectile;
 }

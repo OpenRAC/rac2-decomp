@@ -5,7 +5,7 @@
    first axis is negated only while the byte D_US2_001A7A4C is clear. */
 
 extern char D_00189E20_9[];
-extern unsigned char D_US2_001A7A4C MACRO_ADDR;
+extern unsigned char g_level_status_byte MACRO_ADDR;
 extern void func_00282C88_1(float *buf);
 extern float FastVecLength(float *buf);
 
@@ -15,7 +15,7 @@ void func_US2_00327AB0(char *obj)
     char *e = *(char **)(obj + 104);
     float a, b, x;
 
-    if (D_US2_001A7A4C != 0) {
+    if (g_level_status_byte != 0) {
         char *d = D_00189E20_9;
         *(float *)(e + 20) = *(float *)(d + 8112);
     } else {

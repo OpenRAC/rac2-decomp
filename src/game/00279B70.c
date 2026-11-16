@@ -6,13 +6,13 @@
  * table, and scales the byte found there: times the scale, over 100. */
 #include "common.h"
 
-extern u8 D_0019B4A8[][0x400];
+extern u8 g_moby_nibble_table[][0x400];
 extern int g_current_map_index __attribute__((sda));
 
 /* Looks up a stat byte for a nibble and scales it by a percentage. */
 int stat_scale_by_nibble_lookup(u8 *table, int scale, int index)
 {
-    int packed = D_0019B4A8[g_current_map_index][index >> 1];
+    int packed = g_moby_nibble_table[g_current_map_index][index >> 1];
 
     return (table[(index & 1) ? ((packed >> 4) & 7) : (packed & 7)] * scale) / 100;
 }

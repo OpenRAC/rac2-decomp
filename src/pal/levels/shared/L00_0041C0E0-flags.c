@@ -13,7 +13,7 @@ extern char g_spark_l00_records[];
 /* Claims the first free record of the twenty-four 0xB0-byte records at D_L00_0025A920 for the
    owner, starts it at the owner (or at an offset from the owner's parent) and fills it with
    eighteen drawn values. */
-void func_PAL_L00_0041CBB8(char *owner, char *vel, int life)
+void spark_record_claim_pal(char *owner, char *vel, int life)
 {
     char *base = g_spark_l00_records;
     char *info = *(char **)(owner + 0x68);

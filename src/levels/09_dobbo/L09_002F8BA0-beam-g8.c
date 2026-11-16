@@ -12,14 +12,14 @@ extern void vec_add_random_offset(void *, float);
 extern int math_random_int_below(int);
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(void *, void *, float);
-extern float D_L09_001B0EF8 __attribute__((sda)), D_L09_001B0EFC __attribute__((sda));
-extern float D_L09_001B0EE0 __attribute__((sda)), D_L09_001B0EE4 __attribute__((sda));
-extern float D_L09_001B0F00 __attribute__((sda));
-extern int D_L09_001B0EF0 __attribute__((sda)), D_L09_001B0EF4 __attribute__((sda));
-extern unsigned char D_L09_001B0EEC __attribute__((sda));
+extern float g_beam_angle_min __attribute__((sda)), g_beam_angle_max __attribute__((sda));
+extern float g_beam_blend_rate __attribute__((sda)), g_beam_l09_scale_factor __attribute__((sda));
+extern float g_beam_scale_multiplier __attribute__((sda));
+extern int g_beam_alpha_min __attribute__((sda)), g_beam_alpha_max __attribute__((sda));
+extern unsigned char g_beam_alpha_step __attribute__((sda));
 extern char g_hero_position[];
-extern char D_L09_001AC5A0[] MACRO_ADDR;
-extern void *D_L09_001BFE58 NOT_SDA;
+extern char g_beam_basis_vector[] MACRO_ADDR;
+extern void *g_collision_hit_object NOT_SDA;
 extern char *g_hero_moby NOT_SDA;
 extern float math_square(float);
 extern void moby_mark_spawned(void *);
@@ -95,7 +95,7 @@ struct DobboMoby {
     float rotation[3];
 };
 
-extern DobboLimits D_L09_001C9F80;
+extern DobboLimits g_dobbo_limits;
 
 /* Steps a beam link (class 0xD09) once per frame: spins it, runs its state (ramp up, hold, fade
    out and destroy once its owner is gone, too far or past the level limits), damages what the
@@ -108,26 +108,26 @@ void UpdateBeamLink(DobboMoby *moby)
     float distance;
     int hit;
 
-    if (D_L09_001C9F80.mode) {
-        if (moby->position[2] < D_L09_001C9F80.low && D_L09_001C9F80.side == 1)
+    if (g_dobbo_limits.mode) {
+        if (moby->position[2] < g_dobbo_limits.low && g_dobbo_limits.side == 1)
             goto destroy;
-        if (D_L09_001C9F80.low < moby->position[2] && !D_L09_001C9F80.side)
+        if (g_dobbo_limits.low < moby->position[2] && !g_dobbo_limits.side)
             goto destroy;
-        if (D_L09_001C9F80.mode == 2) {
-            if (D_L09_001C9F80.high < moby->position[2] && D_L09_001C9F80.side == 1)
+        if (g_dobbo_limits.mode == 2) {
+            if (g_dobbo_limits.high < moby->position[2] && g_dobbo_limits.side == 1)
                 goto destroy;
-            if (moby->position[2] < D_L09_001C9F80.high && D_L09_001C9F80.side == 2)
+            if (moby->position[2] < g_dobbo_limits.high && g_dobbo_limits.side == 2)
                 goto destroy;
         }
     }
     state = moby->data;
     /* each axis draws its own random turn */
     moby->rotation[0] = FastAddRotations(moby->rotation[0],
-        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(g_beam_angle_min * 0.017453294f, g_beam_angle_max * 0.017453294f));
     moby->rotation[1] = FastAddRotations(moby->rotation[1],
-        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(g_beam_angle_min * 0.017453294f, g_beam_angle_max * 0.017453294f));
     moby->rotation[2] = FastAddRotations(moby->rotation[2],
-        math_random_float_range(D_L09_001B0EF8 * 0.017453294f, D_L09_001B0EFC * 0.017453294f));
+        math_random_float_range(g_beam_angle_min * 0.017453294f, g_beam_angle_max * 0.017453294f));
     switch (moby->state) {
     case 0:
         func_002A7750_3((unsigned char *)moby, 1, -1);
@@ -139,7 +139,7 @@ void UpdateBeamLink(DobboMoby *moby)
             moby->f48 = 2;
         }
         moby_blend_pos_toward_target((unsigned char *)moby,
-            D_L09_001B0EE4 * math_square(1.0f - IntToFloat(state->timer) / state->duration_f));
+            g_beam_l09_scale_factor * math_square(1.0f - IntToFloat(state->timer) / state->duration_f));
         if (math_fast_float_d((char *)&state->timer))
             func_002A7750_3((unsigned char *)moby, 2, -1);
         if (!state->owner || state->owner->state == 254 || state->owner->state == 253)
@@ -152,21 +152,21 @@ void UpdateBeamLink(DobboMoby *moby)
                 anim_start_blended((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
-        moby_blend_pos_toward_target((unsigned char *)moby, D_L09_001B0EE0);
+        moby_blend_pos_toward_target((unsigned char *)moby, g_beam_blend_rate);
         moby_rescale_vector((unsigned char *)moby);
         owner = state->owner;
         if (state->max_distance < vec_distance_xy(moby->position, owner->position) || !state->owner ||
             state->owner->state == 254 || state->owner->state == 253)
             func_002A7750_3((unsigned char *)moby, 3, -1);
         if (moby->state == 3) {
-            if (moby->alpha < D_L09_001B0EF0) {
+            if (moby->alpha < g_beam_alpha_min) {
             destroy:
                 ReleaseRecordSlot(moby);
                 moby_mark_spawned(moby);
                 return;
             }
-            moby->scale *= D_L09_001B0F00;
-            moby->alpha -= D_L09_001B0EF0;
+            moby->scale *= g_beam_scale_multiplier;
+            moby->alpha -= g_beam_alpha_min;
         }
         break;
     }
@@ -184,14 +184,14 @@ void UpdateBeamLink(DobboMoby *moby)
                     vec_add_random_offset(&ray_end, 0.1f);
                     if (coll_cast_object_line(state->owner, &ray_start, &ray_end, 0x210001, 0, 1, 0,
                                           state->f2c, 1)) {
-                        if (D_L09_001BFE58 == *(void **)(g_hero_position + 0x2210))
+                        if (g_collision_hit_object == *(void **)(g_hero_position + 0x2210))
                             hit = 1;
                     }
                 }
                 if (!math_random_int_below(4) && distance < 2 &&
                     coll_sweep_from_object(state->owner, moby->position, 0x210001, 0, 1, 0,
                                   moby->scale * 0.4f / moby->cls->scale, state->f2c, 1)) {
-                    if (D_L09_001BFE58 == g_hero_moby)
+                    if (g_collision_hit_object == g_hero_moby)
                         hit = 1;
                 }
                 if (math_fast_float_d((char *)&state->hit_timer) && hit)
@@ -200,16 +200,16 @@ void UpdateBeamLink(DobboMoby *moby)
         }
     }
     if (moby->state != 3) {
-        moby->alpha += D_L09_001B0EEC;
-        if (moby->alpha > D_L09_001B0EF4)
-            moby->alpha = D_L09_001B0EF4;
+        moby->alpha += g_beam_alpha_step;
+        if (moby->alpha > g_beam_alpha_max)
+            moby->alpha = g_beam_alpha_max;
     }
     if (moby->f_bc == 1) {
         DobboMoby *partner = state->partner;
         if (partner && partner->state != 254 && partner->state != 253) {
             FastVecSub(basis[0].f, partner->position, moby->position);
             vec_scale_to_length(basis, basis, 1);
-            qcopy(&basis[2], D_L09_001AC5A0);
+            qcopy(&basis[2], g_beam_basis_vector);
             FastVecCross(&basis[2], basis, &basis[1]);
             qcopy(&basis[3], moby->position);
             UpdateBeamLinkRecord(moby, basis);

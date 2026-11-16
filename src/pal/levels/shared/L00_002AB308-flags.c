@@ -45,7 +45,7 @@ typedef struct {
     unsigned char pad484[0xac];
     float f530;
 } PointEffectJoints;
-extern PointEffectJoints D_L00_0025BE10;
+extern PointEffectJoints g_hero_item_attach_records;
 extern int hero_is_in_special_kind_or_mode(void);
 extern float math_fabs(float);
 extern float mat_fast_helper_a(float, float);
@@ -53,10 +53,10 @@ extern float fast_subtract_rotations(float, float);
 extern void hero_set_level_clock_and_bytes(short, unsigned char, unsigned char, unsigned char, float, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern float math_random_float_range(float, float);
-extern void func_PAL_L00_00337918(void *, void *, float);
+extern void part_spawn_spark_effect_pal(void *, void *, float);
 
 /* Drive articulated offsets and emit the active pair of joint effects. */
-void func_PAL_L00_002AC088(void)
+void UpdateHeroEasingTargetsAndPointEffects_pal(void)
 {
     Quadword position;
     unsigned char *matrix;
@@ -64,8 +64,8 @@ void func_PAL_L00_002AC088(void)
     int index;
 
     if (g_hero_state.f1270) {
-        D_L00_0025BE10.f36C = 0.01f;
-        D_L00_0025BE10.f41C = 0.01f;
+        g_hero_item_attach_records.f36C = 0.01f;
+        g_hero_item_attach_records.f41C = 0.01f;
     }
     if (hero_is_in_special_kind_or_mode())
         return;
@@ -76,8 +76,8 @@ void func_PAL_L00_002AC088(void)
          math_fabs(g_hero_state.f310) > 0.01745329424738884f ||
          math_fabs(g_hero_state.f314) > 0.01745329424738884f) &&
         g_hero_state.f348 != 1) {
-        D_L00_0025BE10.f324 = -g_hero_state.f308;
-        D_L00_0025BE10.f3D4 = -g_hero_state.f30C;
+        g_hero_item_attach_records.f324 = -g_hero_state.f308;
+        g_hero_item_attach_records.f3D4 = -g_hero_state.f30C;
         left = mat_fast_helper_a(0.2f, g_hero_state.f300) * 1.2f;
         right = -mat_fast_helper_a(0.2f, g_hero_state.f304) * 1.2f;
         if (left > 0.785398244857788f)
@@ -88,10 +88,10 @@ void func_PAL_L00_002AC088(void)
             right = 0.174532949924469f;
         if (right < -0.785398244857788f)
             right = -0.785398244857788f;
-        D_L00_0025BE10.f480 = left;
-        D_L00_0025BE10.f530 = right;
-        D_L00_0025BE10.f320 = -fast_subtract_rotations(g_hero_state.f310, -left);
-        D_L00_0025BE10.f3D0 = -fast_subtract_rotations(g_hero_state.f314, -right);
+        g_hero_item_attach_records.f480 = left;
+        g_hero_item_attach_records.f530 = right;
+        g_hero_item_attach_records.f320 = -fast_subtract_rotations(g_hero_state.f310, -left);
+        g_hero_item_attach_records.f3D0 = -fast_subtract_rotations(g_hero_state.f314, -right);
     }
     if (!(g_hero_state.f143E & 0x80)) {
         if (g_hero_state.f2294 == 3)
@@ -106,12 +106,12 @@ void func_PAL_L00_002AC088(void)
             moby_transform_joint_to_world((char *)g_hero_state.f2290, 22, (char *)&position);
             for (index = 0; index < g_hero_state.f143C; ++index) {
                 draw = math_random_float_range(-g_hero_state.f1434, g_hero_state.f1434);
-                func_PAL_L00_00337918(&position, matrix, g_hero_state.f1430 + draw);
+                part_spawn_spark_effect_pal(&position, matrix, g_hero_state.f1430 + draw);
             }
             moby_transform_joint_to_world((char *)g_hero_state.f2290, 23, (char *)&position);
             for (index = 0; index < g_hero_state.f143C; ++index) {
                 draw = math_random_float_range(-g_hero_state.f1434, g_hero_state.f1434);
-                func_PAL_L00_00337918(&position, matrix, g_hero_state.f1430 + draw);
+                part_spawn_spark_effect_pal(&position, matrix, g_hero_state.f1430 + draw);
             }
         }
     } else {

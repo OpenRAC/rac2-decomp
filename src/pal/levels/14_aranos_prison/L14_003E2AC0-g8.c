@@ -10,7 +10,7 @@
 extern char *g_moby_l14_pool __attribute__((sda));
 extern char g_hero_position[];
 /* One unsplit `la`: it cannot fill the guard branch's delay slot, so the slot comes from the target. */
-extern char D_L14_001A8F20[] MACRO_ADDR;
+extern char g_identity_l14_matrix[] MACRO_ADDR;
 extern void moby_set_state(void *, int, int);
 extern int flag_set_first_pending(void *);
 extern float fast_vec_dist(void *, void *);
@@ -72,7 +72,7 @@ void func_PAL_L14_003E2AC0(char *self) {
             *(float *)(self + 0xF8) += *(float *)(s + 4);
         }
         if (*(char **)(s + 0x10)) {
-            qcopy(v, D_L14_001A8F20);
+            qcopy(v, g_identity_l14_matrix);
             v[2] -= 0.5f;
             moby_rotate_about_point(*(char **)(s + 0x10), v, *(float *)(s + 4), 0.0f, 0.0f);
             euler_rotation_basis(*(char **)(s + 0x10) + 0xC0, *(char **)(s + 0x10) + 0xF0);

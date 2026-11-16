@@ -3,8 +3,8 @@
 typedef signed int s32;
 
 extern s32 g_beam_slot_state[];
-extern s32 D_L08_001B39E0[];
-extern s32 D_L08_001B39F0[];
+extern s32 g_beam_start_light_ids[];
+extern s32 g_beam_end_light_ids[];
 extern s32 g_beam_slot_key[];
 extern void gfx_free_point_light(s32 slotKey);
 
@@ -17,8 +17,8 @@ s32 slot_release_by_key(s32 slotKey)
     s32 handle;
     i = 0;
     pActive = g_beam_slot_state;
-    pHandleA = D_L08_001B39E0;
-    pHandleB = D_L08_001B39F0;
+    pHandleA = g_beam_start_light_ids;
+    pHandleB = g_beam_end_light_ids;
     pOwner = g_beam_slot_key;
     for (; i < 3; i++) {
         if (*pOwner == slotKey) {

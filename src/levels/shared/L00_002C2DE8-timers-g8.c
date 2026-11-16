@@ -84,12 +84,12 @@ typedef struct {
 } TimerPadState;
 
 extern TimerPadState g_pad_state;
-extern unsigned char *D_L00_001FACE0[];
-extern unsigned char D_L00_0025BC60[];
+extern unsigned char *g_target_l00_list[];
+extern unsigned char g_hero_l00_timer_records[];
 extern int D_L00_001A8F00_abs __asm__("D_L00_001A8F00");
-extern float D_L00_001B18E0, D_L00_001B18E4;
+extern float g_hero_scalar_transition_value, g_hero_second_scalar_transition_value;
 /* The equipment flag at 0x1A7AFF: a small-data object at a nonzero offset, length 2 for reorg. */
-extern unsigned char D_001A7A70[] __attribute__((sda));
+extern unsigned char g_hero_event_flags[] __attribute__((sda));
 extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
@@ -171,21 +171,21 @@ void hero_l00_update_timers(void) {
     if (g_hero_state.field_1454) g_hero_state.field_1E8 = 0;
     else g_hero_state.field_1E8++;
     if (!D_L00_001A8F00_abs) {
-        if (D_L00_001B18E0>0) g_hero_state.field_22A++;
+        if (g_hero_scalar_transition_value>0) g_hero_state.field_22A++;
         else g_hero_state.field_22A = 0;
         if (g_hero_state.field_22A>120) {
-            D_L00_001B18E0 = 0;
+            g_hero_scalar_transition_value = 0;
             g_hero_state.field_22A = 0;
         }
-        if (D_L00_001B18E4>0) g_hero_state.field_228++;
+        if (g_hero_second_scalar_transition_value>0) g_hero_state.field_228++;
         else g_hero_state.field_228 = 0;
         if (g_hero_state.field_228>120) {
             g_hero_state.field_228 = 0;
-            D_L00_001B18E4 = 0;
+            g_hero_second_scalar_transition_value = 0;
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(moby = D_L00_001FACE0[i]) != 0;i++) {
+        for (i = 0;(moby = g_target_l00_list[i]) != 0;i++) {
             if (moby_is_in_special_class_range(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
                 if ((g_frame_l00_counter&7) == (((int)moby>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_state+0x80;
@@ -199,7 +199,7 @@ void hero_l00_update_timers(void) {
             }
         }
     }
-    for (i = 0;i<4;i++) math_fast_float_d(D_L00_0025BC60+i*0x70);
+    for (i = 0;i<4;i++) math_fast_float_d(g_hero_l00_timer_records+i*0x70);
     g_hero_state.current_path_dist = 9999.0f;
     if (g_hero_state.field_34E && cam_get_view_space_height(((unsigned char *)&g_hero_state)+0xF0)<0) {
         if (g_hero_state.pos_history_count != 32) goto history_done;
@@ -229,7 +229,7 @@ history_done:
             g_hero_state.reach_distance = 2.125f;
             g_hero_state.reach_height = 1.25f;
         }
-        else if (D_001A7A70[0x8F]) {
+        else if (g_hero_event_flags[0x8F]) {
             g_hero_state.reach_distance = 14;
             g_hero_state.reach_height = 4.5f;
         }

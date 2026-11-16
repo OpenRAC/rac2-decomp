@@ -12,7 +12,7 @@ typedef struct {
     char flag_014;
 } L06ArmFlags;
 
-extern L06ArmFlags D_L06_001395B8;
+extern L06ArmFlags g_gate_arm_flags;
 
 extern void part_spawn_debris_mask(char *, int, void *, int, float, float, float, float);
 extern int func_32E728(float);
@@ -24,8 +24,8 @@ void object_start_tumble(char *a0);
 
 /* func_L06_0041DED8 is defined in L06_0041DED8-update.c. */
 
-extern char D_L06_001B0820[];
-extern char D_L06_001B9840[];
+extern char g_str_actor_hit_debug[];
+extern char g_hero_l06_position[];
 extern int path_build_route_nodes(void *, int, void *, int);
 extern void STUB_printf(const char *, ...);
 extern float math_random_signed_float_range(float, float);
@@ -36,8 +36,8 @@ extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern void actor_alert_group(u8 *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
-extern void func_PAL_002A7650(void *, int, int);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void SetDeathBits_pal(void *, int, int);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void moby_mark_spawned(void *);
 
 /* A Notak enemy's update, the same shape as func_L06_00443A38: spawn-time setup, then the
@@ -57,7 +57,7 @@ void func_PAL_L06_00423250(u8 *m)
 
     if (m[0x20] == 0) {
         I(0x480) = path_build_route_nodes(m, I(0x230), v + 0x260, 16);
-        STUB_printf(D_L06_001B0820, I(0x480));
+        STUB_printf(g_str_actor_hit_debug, I(0x480));
         qcopy(v + 0x460, m + 0x10);
         F(0x46C) = *(float *)(m + 0xF8);
         B(0x70) = 15;
@@ -104,7 +104,7 @@ void func_PAL_L06_00423250(u8 *m)
             B(0x4A) = FloatToInt(24.0f);
         }
     }
-    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, D_L06_001B9840) < 24.0f) {
+    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, g_hero_l06_position) < 24.0f) {
         moby_update_ground_check(m);
         m[0x6F] = 0x16;
     }
@@ -122,8 +122,8 @@ void func_PAL_L06_00423250(u8 *m)
     I(0x228) = weapon_select_aim_target(m, I(0x220), F(0x240), 10.0f, 0, 0);
     I(0x22C) = weapon_select_aim_target(m, I(0x224), F(0x244), 10.0f, 0, 0);
     if (*(float *)(m + 0x18) < 48.0f) {
-        func_PAL_002A7650(m, 0, 3);
-        func_PAL_002AD288(m, m + 0x10, -1, 1.0f, 13.0f);
+        SetDeathBits_pal(m, 0, 3);
+        part_spawn_explosion_with_sparks_pal(m, m + 0x10, -1, 1.0f, 13.0f);
         moby_mark_spawned(m);
     }
 }
@@ -137,7 +137,7 @@ void func_PAL_L06_00423250(u8 *m)
    +0x474 of its state; returns 1 when the actor's state changed. */
 /* func_L06_0041F558 is defined in L06_0041F558.c. */
 
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern int func_35A620(int);
 extern int func_32E728(float);
 /* func_L06_0041FC58 is matched in its own unit, src/levels/06_notak/L06_0041FC58-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */

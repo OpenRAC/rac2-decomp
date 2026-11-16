@@ -22,11 +22,11 @@ extern void gfx_draw_pulsing_glow_strip(void *);
 extern float ApproachValue(float *,float,float);
 extern int g_current_map_index;
 
-extern char *D_L16_001BFF58 NOT_SDA;
-extern Quad16 D_L16_001A8F20 MACRO_ADDR;
-extern float D_L16_001B1CA0 __attribute__((sda));
-extern float D_L16_001B1CA4 __attribute__((sda));
-extern float D_L16_001B1CA8 __attribute__((sda));
+extern char *g_aim_target_moby NOT_SDA;
+extern Quad16 g_particle_template MACRO_ADDR;
+extern float g_marker_spin_speed __attribute__((sda));
+extern float g_marker_l16_rise_speed __attribute__((sda));
+extern float g_marker_drift_rate __attribute__((sda));
 /* Runs a glowing marker that spins and pulses, and reports when the player or a shot touches it. */
 void spinning_marker_update(char *object)
 {
@@ -53,8 +53,8 @@ active:
         qcopy(&local.position,&H->q[8]);
         vec_scale_to_length(&local.offset,H->ptr[2212]+0xe0,0.75f);
         FastVecAdd(&local.position,&local.position,&local.offset);
-        if (coll_test_point(&local.position,0,H->ptr[2212],0.5f)!=0 && D_L16_001BFF58!=0 && D_L16_001BFF58==object) {
-            make_hit_descriptor((char *)&local.request,(int)object,1,100.0f,&D_L16_001A8F20);
+        if (coll_test_point(&local.position,0,H->ptr[2212],0.5f)!=0 && g_aim_target_moby!=0 && g_aim_target_moby==object) {
+            make_hit_descriptor((char *)&local.request,(int)object,1,100.0f,&g_particle_template);
             local.request.id=*(unsigned short *)(object+0xaa);
             hero_record_play_counters();
         }
@@ -72,11 +72,11 @@ active:
 common:
     if (state[0]!=0.0f) {
         scale_vector(&local.position,object,0.0009765625f);
-        state[8]=FastAddRotations(state[8],D_L16_001B1CA0*0.0002908882452f);
-        state[3]+=(D_L16_001B1CA4+math_random_signed_float_range(0.25f,0.5f))*0.016666668f;
+        state[8]=FastAddRotations(state[8],g_marker_spin_speed*0.0002908882452f);
+        state[3]+=(g_marker_l16_rise_speed+math_random_signed_float_range(0.25f,0.5f))*0.016666668f;
         if (state[3]>1.0f) state[3]-=1.0f;
         for(i=1;i<=2;i++) {
-            value=state[i]+D_L16_001B1CA8*0.016666668f;
+            value=state[i]+g_marker_drift_rate*0.016666668f;
             state[i]=value;
             if(value>1.0f) state[i]=value-1.0f;
         }

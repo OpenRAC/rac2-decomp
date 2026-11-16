@@ -54,35 +54,35 @@ typedef struct { char pad[10]; unsigned char index; } LoaderSelection;
 typedef struct { char pad[4]; unsigned char mode; char rest[219]; } LoaderOption;
 typedef struct { char pad[0x18]; int format; char pad1c[0x14]; int audio; } LoaderSettings;
 
-extern LoaderMemory D_001BAEC0;
+extern LoaderMemory g_loader_memory;
 extern LoaderDisc g_copy_setup_data;
 extern BootMemcard g_memcard_state[];
 extern LoaderPad g_pad_state;
 extern LoaderTables g_subtitle_state;
 extern LoaderGame g_hero_state;
 extern LoaderSound g_music_state;
-extern LoaderMovie D_001BAD40;
+extern LoaderMovie g_loader_movie;
 extern LoaderSelection g_item_slot_to_record;
 extern LoaderOption g_weapon_table[];
 extern LoaderSettings g_hero_moby_default;
-extern char D_00238C80[], D_01806380[], D_0180DA80[];
-extern int D_00138320[];
-extern char *D_001B1604 __attribute__((sda));
+extern char g_loader_buffer[], g_splash_screen_buffer_a[], g_splash_screen_buffer_b[];
+extern int g_pad_pressed_flags[];
+extern char *g_texture_data_base __attribute__((sda));
 extern LoaderResource *g_subtitle_entries __attribute__((sda));
-extern LoaderArchive *D_001A7280[] __attribute__((sda));
-extern unsigned long long D_001A7200 __attribute__((sda));
-extern int D_001A8C88[] __attribute__((sda));
-extern int D_001B16A8[] __attribute__((sda)), D_001B16AC[] __attribute__((sda));
+extern LoaderArchive *g_loader_archives[] __attribute__((sda));
+extern unsigned long long g_timer_base_count __attribute__((sda));
+extern int g_menu_panel_active[] __attribute__((sda));
+extern int g_loader_constant_flag[] __attribute__((sda)), g_global_sound_bank_table[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda)), g_previous_game_mode[] __attribute__((sda));
-extern int g_requested_game_mode[] __attribute__((sda)), D_001A8BBC[] __attribute__((sda));
-extern int D_001A8B84[] __attribute__((sda)), D_001B1684[] __attribute__((sda)), D_001B1598[] __attribute__((sda));
-extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern short D_001A7A10[] __attribute__((sda));
-extern int D_001A7290[] __attribute__((sda)), D_001A72C0[] __attribute__((sda));
-extern int g_equipment_bits[] __attribute__((sda)), g_is_pal_video[] __attribute__((sda)), D_001A72D0[] __attribute__((sda));
-extern unsigned short D_001A7AF2[] __attribute__((sda));
-extern int D_001A7478 MACRO_ADDR;
-extern float D_001B168C MACRO_ADDR;
+extern int g_requested_game_mode[] __attribute__((sda)), g_global_bank_count[] __attribute__((sda));
+extern int g_frontend_done_flag[] __attribute__((sda)), g_load_progress_counter[] __attribute__((sda)), g_frame_counter_3[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
+extern short g_player_state_shorts[] __attribute__((sda));
+extern int g_iop_block_table[] __attribute__((sda)), g_current_weapon_channel[] __attribute__((sda));
+extern int g_equipment_bits[] __attribute__((sda)), g_is_pal_video[] __attribute__((sda)), g_vram_cursor[] __attribute__((sda));
+extern unsigned short g_hero_texture_bits[] __attribute__((sda));
+extern int g_loader_state_word MACRO_ADDR;
+extern float g_frame_time_scale MACRO_ADDR;
 
 extern void FlushCache(int);
 extern int sceGsSyncV(int);
@@ -143,10 +143,10 @@ void RunBootTitleLoop(void)
     char *image, *extra;
     float time;
 
-    D_001A8C88[0] = 1;
+    g_menu_panel_active[0] = 1;
     InitOnce();
     {
-        LoaderMemory *memory = &D_001BAEC0;
+        LoaderMemory *memory = &g_loader_memory;
         LoaderDisc *disc = &g_copy_setup_data;
         load_start_disc_read((int)memory->archive + 0x400000, disc->offset + disc->base, disc->count);
     }
@@ -167,9 +167,9 @@ void RunBootTitleLoop(void)
         loaded = 1;
         if (g_memcard_state->state < 3 && g_memcard_state->next_state < 0) {
             if (g_memcard_state->card[0].type != 2)
-                gfx_draw_splash_screen_frame((int)D_01806380);
+                gfx_draw_splash_screen_frame((int)g_splash_screen_buffer_a);
             else if (g_memcard_state->card[0].status != -4)
-                gfx_draw_splash_screen_frame((int)D_0180DA80);
+                gfx_draw_splash_screen_frame((int)g_splash_screen_buffer_b);
             if (g_memcard_state->next_state < 0) {
                 g_memcard_state->next_state = 7;
                 g_memcard_state->next_card = 0;
@@ -194,7 +194,7 @@ void RunBootTitleLoop(void)
             sceGsSyncV(0);
     }
     {
-        LoaderMemory *memory = &D_001BAEC0;
+        LoaderMemory *memory = &g_loader_memory;
         snd_pump_music_and_disc_read(1);
         FlushCache(0);
         fast_decompress((int)memory->archive + 0x400000, (int)memory->archive);
@@ -202,12 +202,12 @@ void RunBootTitleLoop(void)
         gfx_reset_buffer_slot_table();
         archive = memory->archive;
         ShowSplashImage(archive->offsets[0x50 / 4] + (int)archive);
-        D_001A7280[2] = memory->archive;
+        g_loader_archives[2] = memory->archive;
         hud_load_banks();
         snd_start_bank_load(archive->offsets[8 / 4] + (int)archive, 0);
         {
             LoaderBank *bank = (LoaderBank *)(archive->offsets[0] + (int)archive);
-            D_001B1604 = (char *)bank + bank->code + bank->size;
+            g_texture_data_base = (char *)bank + bank->code + bank->size;
             func_00291DE0((int *)((char *)bank + bank->data), bank->count);
         }
     }
@@ -224,8 +224,8 @@ void RunBootTitleLoop(void)
                 tables[i][j].data += (int)tables[i] - 8;
         }
     }
-    g_subtitle_state.count = counts[D_001A7BB0[4]];
-    g_subtitle_entries = tables[D_001A7BB0[4]];
+    g_subtitle_state.count = counts[g_language_settings[4]];
+    g_subtitle_entries = tables[g_language_settings[4]];
     image = (char *)(archive->offsets[0x10 / 4] + (int)archive);
     extra = (char *)(archive->offsets[0x60 / 4] + (int)archive);
     {
@@ -244,14 +244,14 @@ void RunBootTitleLoop(void)
         LoaderSound *sound;
         g_hero_state.enabled = 1;
         sound = &g_music_state;
-        D_001A8BBC[0] = 20;
-        D_001B16A8[0] = 20;
-        D_001B16AC[0] = (int)D_00238C80;
+        g_global_bank_count[0] = 20;
+        g_loader_constant_flag[0] = 20;
+        g_global_sound_bank_table[0] = (int)g_loader_buffer;
         sound->flag = 0;
         g_requested_game_mode[0] = -2;
         g_current_game_mode[0] = 0;
         g_previous_game_mode[0] = 0;
-        D_001B1684[0] = 0;
+        g_load_progress_counter[0] = 0;
     }
     map_setup_screen();
     InitializeHudSlotsAndBuffers();
@@ -264,19 +264,19 @@ void RunBootTitleLoop(void)
     }
     FadeToBlack(30);
     frames = 1800;
-    D_001B1598[0] = 0;
+    g_frame_counter_3[0] = 0;
     sceGsSyncV(0);
     gfx_query_display_buffer();
     snd_set_current_buffer_flag();
-    D_001A7478 = 3;
-    req_push_queue((unsigned char *)&D_001BAD40, 0xB2);
-    req_launch_queued(&D_001BAD40);
+    g_loader_state_word = 3;
+    req_push_queue((unsigned char *)&g_loader_movie, 0xB2);
+    req_launch_queued(&g_loader_movie);
     mode_apply_pending_change();
-    while (!D_001A8B84[0]) {
-        g_subtitle_entries = tables[D_001A7BB0[4]];
-        g_subtitle_state.count = counts[D_001A7BB0[4]];
+    while (!g_frontend_done_flag[0]) {
+        g_subtitle_entries = tables[g_language_settings[4]];
+        g_subtitle_state.count = counts[g_language_settings[4]];
         /* T1_COUNT, the timer-1 counter register. */
-        D_001A7200 += T1_COUNT;
+        g_timer_base_count += T1_COUNT;
         T1_COUNT = 0;
         gfx_process_screen_copy_regions();
         SubmitBufferedDmaChain();
@@ -292,13 +292,13 @@ void RunBootTitleLoop(void)
             if (g_previous_game_mode[0] == 3 || frames >= 1800) {
                 frames = 0;
                 menu_fill_shuffled_tile_table((unsigned short *)sequence);
-                D_001BAD40.active = 1;
-                D_001A7478 = 2;
-                D_001BAD40.sequence = sequence;
-                req_push_queue((unsigned char *)&D_001BAD40, sequence[1]);
-                req_launch_queued(&D_001BAD40);
+                g_loader_movie.active = 1;
+                g_loader_state_word = 2;
+                g_loader_movie.sequence = sequence;
+                req_push_queue((unsigned char *)&g_loader_movie, sequence[1]);
+                req_launch_queued(&g_loader_movie);
             } else {
-                tex_upload_blocks_return_setup((int)(image + 0x10), D_001A72D0[3], 512, 416);
+                tex_upload_blocks_return_setup((int)(image + 0x10), g_vram_cursor[3], 512, 416);
                 request_begin_slot(3, 1, 6, 0, 0);
             }
             break;
@@ -316,7 +316,7 @@ void RunBootTitleLoop(void)
         case 3:
             frames++;
             pad_poll_ports();
-            if (D_00138320[0])
+            if (g_pad_pressed_flags[0])
                 frames = 0;
             menu_update_pause();
             gfx_call_frame_helper_zero();
@@ -340,25 +340,25 @@ void RunBootTitleLoop(void)
             break;
         }
         if (g_current_game_mode[0] != state)
-            D_001B1684[0] = 0;
+            g_load_progress_counter[0] = 0;
         else
-            D_001B1684[0]++;
+            g_load_progress_counter[0]++;
         mc_update_state();
         map_update_state_machine();
         gfx_wait_for_dma_status_bits(1);
         time = IntToFloat(T1_COUNT);
-        D_001B168C = time * (g_is_pal_video[0] ? 0.0000868055578f : 0.000104166669f);
+        g_frame_time_scale = time * (g_is_pal_video[0] ? 0.0000868055578f : 0.000104166669f);
         ResetGsRegistersPr();
         mode_apply_pending_change();
-        D_001B1598[0]++;
+        g_frame_counter_3[0]++;
         sceGsSyncV(0);
     }
-    if (D_001A7290[0] != D_001A7A10[4])
-        tex_load_pack_to_vram(D_001A7A10[4]);
-    if (D_001A72C0[0] != (g_weapon_table + g_item_slot_to_record.index)->mode)
+    if (g_iop_block_table[0] != g_player_state_shorts[4])
+        tex_load_pack_to_vram(g_player_state_shorts[4]);
+    if (g_current_weapon_channel[0] != (g_weapon_table + g_item_slot_to_record.index)->mode)
         LoadPackSingleTexture((g_weapon_table + g_item_slot_to_record.index)->mode);
-    if (g_hero_moby_default.audio != (D_001A7AF2[0] & 31))
-        LoadDiscTableTexture(D_001A7AF2[0] & 31);
+    if (g_hero_moby_default.audio != (g_hero_texture_bits[0] & 31))
+        LoadDiscTableTexture(g_hero_texture_bits[0] & 31);
     if (g_hero_moby_default.format != (g_equipment_bits[0] & 3))
         load_disc_table_entry_for_draw(g_equipment_bits[0] & 3);
     RunLevelTransition();

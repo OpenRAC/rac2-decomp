@@ -143,7 +143,7 @@ typedef union {
 
 #define __clz_tab D_0013AE58
 
-extern const UQItype D_0013AE58[];
+extern const UQItype g_clz_tab_a[];
 
 #define count_leading_zeros(count, x)                                                              \
     do {                                                                                           \

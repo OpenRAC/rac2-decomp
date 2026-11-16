@@ -15,11 +15,11 @@ typedef struct {
 } Context;
 
 extern int g_current_map_index[] __attribute__((sda));
-extern Context D_L09_001BD700;
-extern char D_L09_00281210[];
-extern Vec D_L09_001B9A00 __attribute__((nosda));
-extern float D_L09_001A93E0 __attribute__((sda));
-extern Vec D_L09_001A93F0[4] __attribute__((sda));
+extern Context g_glow_context;
+extern char g_glow_dest_buffer[];
+extern Vec g_camera_l09_position __attribute__((nosda));
+extern float g_glow_rotation __attribute__((sda));
+extern Vec g_glow_corner_vectors[4] __attribute__((sda));
 extern void euler_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -37,32 +37,32 @@ void glow_place_state_nine_corners(void) {
         return;
     minimum = -1;
     index = 0;
-    if (D_L09_001BD700.mode == 3) {
+    if (g_glow_context.mode == 3) {
         minimum = 1;
         index = 2;
     }
-    object = D_L09_001BD700.object;
+    object = g_glow_context.object;
     if (minimum != -1) {
-        if (D_L09_001BD700.count < minimum)
+        if (g_glow_context.count < minimum)
             goto fail;
-        if (maximum < D_L09_001BD700.count)
+        if (maximum < g_glow_context.count)
             goto fail;
         {
-            D_L09_001BD700.dest = D_L09_00281210;
+            g_glow_context.dest = g_glow_dest_buffer;
             qzero_nc(&rotation);
-            rotation.z = D_L09_001A93E0;
+            rotation.z = g_glow_rotation;
             euler_rotation_basis(matrix, &rotation);
             for (i = 0; i < 4; i++) {
-                matrix_mul_vec3(D_L09_001BD700.dest + 0x20 + i * 16, &D_L09_001A93F0[i], matrix);
-                FastVecAdd(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, object + 0x10);
-                FastVecSub(&temp, &D_L09_001B9A00, D_L09_001BD700.dest + 0x20 + i * 16);
+                matrix_mul_vec3(g_glow_context.dest + 0x20 + i * 16, &g_glow_corner_vectors[i], matrix);
+                FastVecAdd(g_glow_context.dest + 0x20 + i * 16, g_glow_context.dest + 0x20 + i * 16, object + 0x10);
+                FastVecSub(&temp, &g_camera_l09_position, g_glow_context.dest + 0x20 + i * 16);
                 vec_scale_to_length(&temp, &temp, 0.05f);
-                FastVecAdd(D_L09_001BD700.dest + 0x20 + i * 16, D_L09_001BD700.dest + 0x20 + i * 16, &temp);
+                FastVecAdd(g_glow_context.dest + 0x20 + i * 16, g_glow_context.dest + 0x20 + i * 16, &temp);
             }
-            *(int *)(D_L09_001BD700.dest + 0x68) = D_L09_001BD700.values[index];
+            *(int *)(g_glow_context.dest + 0x68) = g_glow_context.values[index];
         }
         return;
 fail:
-        D_L09_001BD700.dest = 0;
+        g_glow_context.dest = 0;
     }
 }

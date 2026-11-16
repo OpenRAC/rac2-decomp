@@ -2,29 +2,29 @@
 
 #include "common.h"
 typedef struct { char pad[0x464]; unsigned char flags[0]; } L02E1A40Progress;
-extern L02E1A40Progress D_L02_0021F4F0;
-extern unsigned char D_0019B4A8[];
+extern L02E1A40Progress g_cell_flags;
+extern unsigned char g_moby_nibble_table[];
 extern int g_current_map_index[] __attribute__((sda));
 extern int currentLevel_gp SDATA(D_001A79F0);
 typedef struct L02E1A40Object L02E1A40Object;
 extern L02E1A40Object *g_moby_l02_pool[] __attribute__((sda));
 extern L02E1A40Object *entityPool_gp SDATA(D_L02_001B359C);
-extern char *D_0018A15C[];
+extern char *g_platform_actor_ref[];
 typedef struct {
     char pad0[0x24]; int message; int timer;
     char pad1[0x3c]; int disabled; short f6c; char pad2[4]; short f72;
 } L02E1A40Hud;
 extern L02E1A40Hud g_music_state;
-extern float D_L02_001B0760 SDATA(D_L02_001B0760);
-extern float D_L02_001B0764 SDATA(D_L02_001B0764);
-extern float D_L02_001B0768 SDATA(D_L02_001B0768);
+extern float g_pickup_spin_speed SDATA(D_L02_001B0760);
+extern float g_pickup_second_spin_speed SDATA(D_L02_001B0764);
+extern float g_pickup_sparkle_size_range SDATA(D_L02_001B0768);
 extern float D_L02_001B0768_abs[] __asm__("D_L02_001B0768") __attribute__((sda));
-extern int D_L02_001B0770 SDATA(D_L02_001B0770);
+extern int g_pickup_sparkle_color_pair SDATA(D_L02_001B0770);
 extern int D_L02_001B0770_abs[] __asm__("D_L02_001B0770") __attribute__((sda));
-extern int D_L02_001B0778 SDATA(D_L02_001B0778);
-extern int D_L02_001B0780 SDATA(D_L02_001B0780);
+extern int g_pickup_init_done SDATA(D_L02_001B0778);
+extern int g_pickup_color_a SDATA(D_L02_001B0780);
 extern int D_L02_001B0780_abs[] __asm__("D_L02_001B0780") __attribute__((sda));
-extern int D_L02_001B0788 SDATA(D_L02_001B0788);
+extern int g_pickup_color_b SDATA(D_L02_001B0788);
 extern int D_L02_001B0788_abs[] __asm__("D_L02_001B0788") __attribute__((sda));
 extern int g_frame_l02_counter[] __attribute__((sda));
 extern void moby_set_flag_bit(void *,int);
@@ -48,7 +48,7 @@ extern void hero_start_target_state(void *,int,float);
 extern float vec_distance_xy(void *,void *),math_fabs(float);
 extern int flag_set_first_pending(void *);
 extern int PlayMobySound(int,int,char *);
-extern void func_US2_002B1880(int,int);
+extern void value_set_entry_by_index_us2(int,int);
 extern s32 snd_resume_music_stream(void);
 typedef struct {
     int other, first, second; char pad0[8]; int auxiliary;
@@ -65,7 +65,7 @@ typedef struct { char pad[0x5c0]; L02E1A40Object *target; } L02E1A40Hero;
 extern L02E1A40Hero g_hero_state;
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 
-void func_US2_L02_003E2FA8(L02E1A40Object *obj)
+void progress_pickup_update_us2(L02E1A40Object *obj)
 {
     float pos[4], vel[4];
     L02E1A40Data *d=obj->data;
@@ -82,8 +82,8 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
     case 0:
         d->f38=0; d->f3c=0; d->count=0;
         index=obj->index;
-        if(D_L02_0021F4F0.flags[(short)index] ||
-           ((initialPacked=D_0019B4A8[((short)index>>1)+(g_current_map_index[0]<<10)]),
+        if(g_cell_flags.flags[(short)index] ||
+           ((initialPacked=g_moby_nibble_table[((short)index>>1)+(g_current_map_index[0]<<10)]),
             (index&1) ? ((initialPacked>>4)&7) : (initialPacked&7))) {
             moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
             moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
@@ -92,7 +92,7 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
         } else moby_set_state(obj,1,-1);
         break;
     case 1:
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0002908882452175021f);
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
         if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.033333335f);
         if(obj->active && !math_random_int_below(5)) {
@@ -102,18 +102,18 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
             pos[2]=0;
             FastVecAdd(pos,pos,obj->position);
             pos[2]+=0.1f;
-            size=math_random_float_range(D_L02_001B0768,D_L02_001B0768_abs[1]);
-            color=FastTweenColor(D_L02_001B0770,D_L02_001B0770_abs[1],math_random_float_range(0,1));
+            size=math_random_float_range(g_pickup_sparkle_size_range,D_L02_001B0768_abs[1]);
+            color=FastTweenColor(g_pickup_sparkle_color_pair,D_L02_001B0770_abs[1],math_random_float_range(0,1));
             speed=math_random_float_range(1,2);
             duration=math_random_int_range(60,180);
             vec_clear_128(vel);
             vel[2]=speed/IntToFloat(duration);
             part_spawn_hero_relative(pos,vel,color,size,(unsigned char)duration,(unsigned char)math_random_int_below(255),0);
         }
-        if(D_0018A15C[0]==(char *)obj) {
+        if(g_platform_actor_ref[0]==(char *)obj) {
             moby_set_state(obj,2,-1);
-            if(!D_L02_001B0778) {
-                D_L02_001B0778=1;
+            if(!g_pickup_init_done) {
+                g_pickup_init_done=1;
                 hero_start_target_state(obj->position,1,obj->radius);
             }
         } else {
@@ -125,19 +125,19 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
     case 2:
         if(flag_set_first_pending(obj)) {
             PlayMobySound(1,0,(char *)obj);
-            d->color0=D_L02_001B0780;
+            d->color0=g_pickup_color_a;
             d->color1=D_L02_001B0780_abs[1];
             d->fade=0;d->alpha=0;
-            func_US2_002B1880(0x131D,180);
+            value_set_entry_by_index_us2(0x131D,180);
             if(!g_music_state.disabled && g_music_state.message==-1) {
                 message0=d->message0;
                 g_music_state.timer=0;
                 g_music_state.message=(message0&0x3fff)+2000;
             }
         }
-        if(D_0018A15C[0]!=(char *)obj) moby_set_state(obj,1,-1);
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        if(g_platform_actor_ref[0]!=(char *)obj) moby_set_state(obj,1,-1);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0002908882452175021f);
         frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
@@ -147,10 +147,10 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
     case 3:
         if(flag_set_first_pending(obj)) {
             I(d,0x40)++;
-            d->color0=D_L02_001B0788;
+            d->color0=g_pickup_color_b;
             d->color1=D_L02_001B0788_abs[1];
             d->fade=0;d->alpha=0;
-            func_US2_002B1880(0x131E,180);
+            value_set_entry_by_index_us2(0x131E,180);
             message1=d->message1;
             g_music_state.timer=0;
             g_music_state.message=(message1&0x3fff)+2000;
@@ -163,8 +163,8 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
             moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
             moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
         }
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0002908882452175021f);
         frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
@@ -177,11 +177,11 @@ void func_US2_L02_003E2FA8(L02E1A40Object *obj)
         if(d->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {
-                save=&D_0019B4A8[((short)completedIndex>>1)+(currentLevel_gp<<10)];
+                save=&g_moby_nibble_table[((short)completedIndex>>1)+(currentLevel_gp<<10)];
                 savedByte=*save;
                 if(((savedByte>>4)&7)!=7) *save=savedByte+16;
             } else {
-                save=&D_0019B4A8[((short)completedIndex>>1)+(currentLevel_gp<<10)];
+                save=&g_moby_nibble_table[((short)completedIndex>>1)+(currentLevel_gp<<10)];
                 savedByte=*save;
                 if((savedByte&7)!=7) *save=savedByte+1;
             }

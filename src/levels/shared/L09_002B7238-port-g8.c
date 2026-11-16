@@ -55,11 +55,11 @@ typedef struct {
 } HeroGround;
 extern HeroGround g_hero_state;
 typedef struct { u8 pad[24]; int i18, i1C; Vec4 v20; u8 pad30[16]; float f40, f44; } Hit;
-extern Hit D_L09_001BFE40;
-extern char D_L09_001BFE60[];
+extern Hit g_collision_l09_result;
+extern char g_collision_l09_hit_point[];
 extern int g_current_map_index;
-extern int D_001A8FF0 MACRO_ADDR;
-extern int D_001A8FF4;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern int g_enemy_ai_frozen;
 extern int hero_is_in_special_kind_or_mode(void);
 extern void vec_clear_128(void *);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
@@ -124,11 +124,11 @@ void hero_probe_ground(void) {
     r = func_L00_002E2048();
 
     g_hero_state.xB12ed = r;
-    if (D_L09_001BFE40.i18 != 0) g_hero_state.xB12ed = 0;
-    if (g_current_map_index == 7 && D_L09_001BFE40.i18 != 0) g_hero_state.xB12ed = 1;
+    if (g_collision_l09_result.i18 != 0) g_hero_state.xB12ed = 0;
+    if (g_current_map_index == 7 && g_collision_l09_result.i18 != 0) g_hero_state.xB12ed = 1;
     g_hero_state.xH12e0 = GetCollHitMaterial();
     if (g_hero_state.xH12e0 == 0) {
-        g_hero_state.xF2f0 = coll_get_ground_height_at_position(D_L09_001BFE60, (u8 *)&g_hero_state + 0x2B0);
+        g_hero_state.xF2f0 = coll_get_ground_height_at_position(g_collision_l09_hit_point, (u8 *)&g_hero_state + 0x2B0);
         if (g_hero_state.xF88 < g_hero_state.xF2f0 && g_hero_state.xI2f8 <= 0) {
             g_hero_state.xI2f8 = 1;
         }
@@ -139,39 +139,39 @@ void hero_probe_ground(void) {
         g_hero_state.xB12ed = r;
     }
     if (g_hero_state.xH12e0 == 3) {
-        g_hero_state.xF2f4 = D_L09_001BFE40.v20.f[2];
-        v10.f[2] = D_L09_001BFE40.v20.f[2] - 0.01f;
+        g_hero_state.xF2f4 = g_collision_l09_result.v20.f[2];
+        v10.f[2] = g_collision_l09_result.v20.f[2] - 0.01f;
         if (CollLine(&v10, &v0, 4, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
     }
     if (g_hero_state.xH12e0 == 11) {
-        g_hero_state.xF2f4 = D_L09_001BFE40.v20.f[2];
+        g_hero_state.xF2f4 = g_collision_l09_result.v20.f[2];
         goto tail;
     }
     if (g_hero_state.xH12e0 == 1 && (u32)(g_hero_state.xI2084 - 0x79) < 2) {
         goto tail;
     }
-    if (D_L09_001BFE40.i18 != 0) {
-        if (moby_is_in_special_class_range(D_L09_001BFE40.i18)) {
+    if (g_collision_l09_result.i18 != 0) {
+        if (moby_is_in_special_class_range(g_collision_l09_result.i18)) {
             g_hero_state.xH30a = 1;
         }
-        p = moby_get_private_value_0(D_L09_001BFE40.i18);
+        p = moby_get_private_value_0(g_collision_l09_result.i18);
         if (p != 0 && (*(u16 *)(p + 0x1E) & 8)) {
             g_hero_state.xH30a = 1;
         }
-        p = moby_get_private_value_2(D_L09_001BFE40.i18);
+        p = moby_get_private_value_2(g_collision_l09_result.i18);
         if (p != 0 && (*(int *)(p + 0x3c) & 8)) g_hero_state.xH30a = 1;
     }
-    if (D_L09_001BFE40.i1C > 0) {
-        qcopy((u8 *)&g_hero_state + 0x2D0, &D_L09_001BFE40.v20);
-        g_hero_state.u2d8.F = D_L09_001BFE40.v20.f[2];
-        if (D_001A8FF0) g_hero_state.u2d8.F = gravity_get_center_distance(&D_L09_001BFE40.v20);
+    if (g_collision_l09_result.i1C > 0) {
+        qcopy((u8 *)&g_hero_state + 0x2D0, &g_collision_l09_result.v20);
+        g_hero_state.u2d8.F = g_collision_l09_result.v20.f[2];
+        if (g_hero_height_zone_active) g_hero_state.u2d8.F = gravity_get_center_distance(&g_collision_l09_result.v20);
         g_hero_state.xF2dc = fast_vec_dist((u8 *)&g_hero_state + 0x80, ((u8 *)&g_hero_state + 0x2D0));
-        g_hero_state.xI2fc = D_L09_001BFE40.i18;
-        func_001290E0((u8 *)&g_hero_state + 0x2A0, (u8 *)&D_L09_001BFE40.f40);
-        g_hero_state.u2e0.F = cam_get_view_space_angle((u8 *)&D_L09_001BFE40.f40);
-        g_hero_state.xF2ec = mat_fast_helper_a(D_L09_001BFE40.f40, D_L09_001BFE40.f44);
+        g_hero_state.xI2fc = g_collision_l09_result.i18;
+        func_001290E0((u8 *)&g_hero_state + 0x2A0, (u8 *)&g_collision_l09_result.f40);
+        g_hero_state.u2e0.F = cam_get_view_space_angle((u8 *)&g_collision_l09_result.f40);
+        g_hero_state.xF2ec = mat_fast_helper_a(g_collision_l09_result.f40, g_collision_l09_result.f44);
         FastVecSub(&v20, ((u8 *)&g_hero_state + 0x2D0), (u8 *)&g_hero_state + 0x80);
         if (0.0f < FastVecDot(&v20, (u8 *)&g_hero_state + 0x2A0)) {
             g_hero_state.xF2dc = -g_hero_state.xF2dc;
@@ -180,7 +180,7 @@ void hero_probe_ground(void) {
             g_hero_state.u30c.H = 0;
             if (g_hero_state.u2e0.F <= 0.87266469f || g_hero_state.xB20b3 != 0) {
                 g_hero_state.u30e.H = 0;
-                g_hero_state.xIa80 = D_L09_001BFE40.i18;
+                g_hero_state.xIa80 = g_collision_l09_result.i18;
             }
         }
     }
@@ -201,7 +201,7 @@ tail:
         hero->xF298 = -1.0f;
         break;
     case 1:
-        if (D_001A8FF4) vec_compute_flat_direction_from_point((u8 *)normal - 0x240, normal, 0);
+        if (g_enemy_ai_frozen) vec_compute_flat_direction_from_point((u8 *)normal - 0x240, normal, 0);
         else if (*(float *)((u8 *)hero + 0x2fc) != 0.0f) {
             ApproachValue((float *)((u8 *)normal + 0x3c), 0.0f, 1.0f);
             qcopy(normal, (u8 *)normal + 0x30);
@@ -246,12 +246,12 @@ tail:
         hero_build_relative_offset(&v30, 0.2f, a, 0.45f, 1);
         hero_build_relative_offset(&v40, 0.2f, a, -0.45f, 1);
         if (CollLine(&v30, &v40, 0x22, g_hero_state.xI2080, 0)) {
-            if (D_001A8FF0) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&D_L09_001BFE40.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
-            else g_hero_state.a2c0.f[i] = D_L09_001BFE40.v20.f[2] - g_hero_state.u2d8.F;
+            if (g_hero_height_zone_active) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&g_collision_l09_result.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
+            else g_hero_state.a2c0.f[i] = g_collision_l09_result.v20.f[2] - g_hero_state.u2d8.F;
             if (0.4f < math_fabs(g_hero_state.a2c0.f[i])) {
                 g_hero_state.a2c0.f[i] = 0.0f;
             }
-            func_001290E0(&v60, (u8 *)&D_L09_001BFE40.f40);
+            func_001290E0(&v60, (u8 *)&g_collision_l09_result.f40);
             hero_compute_angles_to_local_dir(&v60, &v50);
             if (-0.785398244f < v50.f[1] && v50.f[1] < 0.785398244f) {
                 g_hero_state.a2c8.f[i] = v50.f[1];

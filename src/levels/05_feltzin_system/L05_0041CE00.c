@@ -3,9 +3,9 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_L05_001B1310 __attribute__((sda));
-extern char D_L05_001B1320 __attribute__((sda));
-extern char D_L05_001B1330 __attribute__((sda));
+extern char g_tail_trail_particle_a __attribute__((sda));
+extern char g_tail_trail_particle_b __attribute__((sda));
+extern char g_tail_trail_particle_c __attribute__((sda));
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -44,11 +44,11 @@ void tail_trail_spawn_burst(char *object)
     vec_add_random_offset(v5, 0.1f);
     f = math_random_float_range(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    part_spawn_object_relative_particle(object, v3, v1, &D_L05_001B1310, 1);
+    part_spawn_object_relative_particle(object, v3, v1, &g_tail_trail_particle_a, 1);
     f = math_random_float_range(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    part_spawn_object_relative_particle(object, v4, v1, &D_L05_001B1320, 1);
+    part_spawn_object_relative_particle(object, v4, v1, &g_tail_trail_particle_b, 1);
     f = math_random_float_range(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    part_spawn_object_relative_particle(object, v5, v1, &D_L05_001B1330, 1);
+    part_spawn_object_relative_particle(object, v5, v1, &g_tail_trail_particle_c, 1);
 }

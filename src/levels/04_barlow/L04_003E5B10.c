@@ -13,7 +13,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern int moby_step_at_own_position_factor(void *, float);
 extern char *SpawnSpinningSparkParticle(void *, int, float, float, void *, float, int, int, float);
 extern int moby_l01_turn_toward_target(void *, void *);
-extern float D_L04_002AF630[];
+extern float g_object_anim_sparks_table[];
 
 /* Moves the object along its animation toward a target point and turns it to face that point. On two key frames it also sprays a burst of sparks. */
 void object_move_along_anim_sparks(char *moby, float *targetPos)
@@ -35,7 +35,7 @@ void object_move_along_anim_sparks(char *moby, float *targetPos)
         frameStart = IntToFloat(frameIndex);
         frame -= frameStart;
         FastVecScale(step, moby + 0xc0,
-                      D_L04_002AF630[frameIndex] + (D_L04_002AF630[nextIndex] - D_L04_002AF630[frameIndex]) * frame);
+                      g_object_anim_sparks_table[frameIndex] + (g_object_anim_sparks_table[nextIndex] - g_object_anim_sparks_table[frameIndex]) * frame);
     }
     FastVecAdd(moby + 0x10, step, moby + 0x10);
     moby_step_at_own_position_factor(moby, mat_fast_helper_a(targetPos[0] - *(float *)(moby + 0x10), targetPos[1] - *(float *)(moby + 0x14)));

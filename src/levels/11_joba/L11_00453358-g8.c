@@ -46,9 +46,9 @@ extern void draw_world_quad(char *pkt, float *matrix, int mode);
 
 extern int func_001163B0(void);
 
-extern int D_L11_001B2014 __attribute__((sda));
+extern int g_effect_quad_color __attribute__((sda));
 
-extern int D_L11_001B2020 __attribute__((sda));
+extern int g_joba_quad_color_base __attribute__((sda));
 
 /* The vector the aim helpers read, at 0x001BA780 in joba. */
 typedef struct {
@@ -58,32 +58,32 @@ typedef struct {
     float z_148;
 } L11AimVector;
 
-extern L11AimVector D_L11_001BA780;
+extern L11AimVector g_hero_l11_state_block;
 
-extern void *D_L11_001B1DB4 __attribute__((sda));
+extern void *g_ring_effect_sprite __attribute__((sda));
 
-extern void *D_L11_001B1DB8 __attribute__((sda));
+extern void *g_ring_l11_effect_color __attribute__((sda));
 
-extern float D_L11_001B1DBC __attribute__((sda));
+extern float g_ring_effect_size __attribute__((sda));
 
-extern void *D_L11_001B1FBC __attribute__((sda));
+extern void *g_shot_smoke_sprite_a __attribute__((sda));
 
-extern void *D_L11_001B1FC0 __attribute__((sda));
+extern void *g_shot_smoke_sprite_b __attribute__((sda));
 
-extern float D_L11_001B1FC8 __attribute__((sda));
+extern float g_shot_smoke_size __attribute__((sda));
 
-extern float D_L11_001B1FCC __attribute__((sda));
+extern float g_shot_smoke_random_scale __attribute__((sda));
 
-extern float D_L11_001B1FFC __attribute__((sda));
+extern float g_effect_offset_angle __attribute__((sda));
 
 /* The level's script gate, read through $gp. */
-extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
 
 /* The shared table of the level's live projectiles. */
 extern char g_sound_state[];
 
 /* The aiming target the level's spot checks measure against. */
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 
 extern int FloatToInt(float);
 
@@ -147,15 +147,15 @@ extern char *part_spawn_ground_effect(void *, int, int, float, float, float, int
 
 extern void *part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
 
-extern float D_L11_001B1FE0 __attribute__((sda));
-extern float D_L11_001B1FE4 __attribute__((sda));
-extern float D_L11_001B1FE8 __attribute__((sda));
-extern float D_L11_001B1FEC __attribute__((sda));
-extern float D_L11_001B1FF0 __attribute__((sda));
-extern float D_L11_001B1FF4 __attribute__((sda));
-extern float D_L11_001B1FF8 __attribute__((sda));
-extern int D_L11_001B2000 __attribute__((sda));
-extern int D_L11_001B2004 __attribute__((sda));
+extern float g_smoke_spray_speed_min __attribute__((sda));
+extern float g_smoke_spray_speed_max __attribute__((sda));
+extern float g_smoke_spray_rise_min __attribute__((sda));
+extern float g_smoke_spray_rise_max __attribute__((sda));
+extern float g_ground_effect_param __attribute__((sda));
+extern float g_effect_size_min __attribute__((sda));
+extern float g_effect_size_max __attribute__((sda));
+extern int g_ground_effect_kind_a __attribute__((sda));
+extern int g_ground_effect_kind_b __attribute__((sda));
 
 /* Sprays smoke puffs and a few sparks out of a point, thrown toward the level's aim target. The mode picks the smaller puffs. */
 void part_spray_smoke_and_sparks(float *center, int count, int mode)
@@ -165,22 +165,22 @@ void part_spray_smoke_and_sparks(float *center, int count, int mode)
     char *effect;
     float size, speed, angle, heading;
 
-    FastVecSub(axis, D_L11_001BA8C0, center);
+    FastVecSub(axis, g_hero_l11_position, center);
     axis[2] = 0;
     up[0] = 0;
     up[1] = 0;
     up[2] = 1;
     up[3] = 1;
     for (i = 0; i < count; i++) {
-        size = math_random_float_range(D_L11_001B1FF4, D_L11_001B1FF8);
+        size = math_random_float_range(g_effect_size_min, g_effect_size_max);
         sign = math_random_int_below(2);
         if (!sign)
             --sign;
         angle = math_random_float_range(-1.0471977f, 1.0471977f);
         math_apply_axis_rotation_to_quat(vel, axis, up, angle);
-        speed = math_random_float_range(D_L11_001B1FE0, D_L11_001B1FE4) * (1.0f / 60.0f);
+        speed = math_random_float_range(g_smoke_spray_speed_min, g_smoke_spray_speed_max) * (1.0f / 60.0f);
         vec_scale_to_length((char *)vel, vel, speed);
-        vel[2] = math_random_float_range(D_L11_001B1FE8, D_L11_001B1FEC) * (1.0f / 60.0f);
+        vel[2] = math_random_float_range(g_smoke_spray_rise_min, g_smoke_spray_rise_max) * (1.0f / 60.0f);
         qcopy(pos, center);
         pos[0] += math_random_signed_float_range(0, 0.15f);
         pos[1] += math_random_signed_float_range(0, 0.15f);
@@ -188,34 +188,34 @@ void part_spray_smoke_and_sparks(float *center, int count, int mode)
         if (!mode) {
             if (!(func_001163B0() & 1)) {
                 FastVecScale((char *)vel, vel, 1.5f);
-                effect = part_spawn_ground_effect(pos, 60, D_L11_001B2000, size * 0.35f, size, D_L11_001B1FF0, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 60, g_ground_effect_kind_a, size * 0.35f, size, g_ground_effect_param, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 60, D_L11_001B2004, size * 0.245f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 60, g_ground_effect_kind_b, size * 0.245f, size * 0.7f, g_ground_effect_param, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, D_L11_001BA8C0, pos);
+                FastVecSub(a, g_hero_l11_position, pos);
                 vec_scale_to_length((char *)a, a, speed);
                 FastVecAdd(vel, vel, a);
-                effect = part_spawn_ground_effect(pos, 40, D_L11_001B2000, size * 2.05f, size, D_L11_001B1FF0, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 40, g_ground_effect_kind_a, size * 2.05f, size, g_ground_effect_param, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 40, D_L11_001B2004, size * 1.4350000619888306f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 40, g_ground_effect_kind_b, size * 1.4350000619888306f, size * 0.7f, g_ground_effect_param, 1, -sign, vel, 0);
             }
         } else {
             if (!(func_001163B0() & 1)) {
                 FastVecScale((char *)vel, vel, 1.5f);
-                effect = part_spawn_ground_effect(pos, 60, D_L11_001B2000, size * 0.3f, size, D_L11_001B1FF0, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 60, g_ground_effect_kind_a, size * 0.3f, size, g_ground_effect_param, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 60, D_L11_001B2004, size * (0.3f * 0.7f), size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 60, g_ground_effect_kind_b, size * (0.3f * 0.7f), size * 0.7f, g_ground_effect_param, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, D_L11_001BA8C0, pos);
+                FastVecSub(a, g_hero_l11_position, pos);
                 vec_scale_to_length((char *)a, a, speed);
                 FastVecAdd(vel, vel, a);
-                effect = part_spawn_ground_effect(pos, 40, D_L11_001B2000, size * 0.25f, size, D_L11_001B1FF0, 0, sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 40, g_ground_effect_kind_a, size * 0.25f, size, g_ground_effect_param, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
-                effect = part_spawn_ground_effect(pos, 40, D_L11_001B2004, size * 0.175f, size * 0.7f, D_L11_001B1FF0, 1, -sign, vel, 0);
+                effect = part_spawn_ground_effect(pos, 40, g_ground_effect_kind_b, size * 0.175f, size * 0.7f, g_ground_effect_param, 1, -sign, vel, 0);
             }
         }
         if (effect)
@@ -225,7 +225,7 @@ void part_spray_smoke_and_sparks(float *center, int count, int mode)
         angle = math_random_float_range(-0.9599312f, -1.3962636f);
         heading = math_random_angle();
         vec_build_spherical_offset(a, math_random_float_range(0, 0.5f) * (1.0f / 60.0f), heading, angle);
-        FastVecSub(b, D_L11_001BA8C0, center);
+        FastVecSub(b, g_hero_l11_position, center);
         vec_scale_to_length((char *)b, b, 0.15f);
         FastVecAdd(center, center, b);
         size = math_random_float_range(30000, 60000);
@@ -255,7 +255,7 @@ void joba_effect_prepare_offsets(char *moby)
     FastVecAdd(vars + 0x10, moby + 0x10, vars + 0x10);
     FastVecAdd(vars + 0x20, moby + 0x10, vars + 0x20);
     *(float *)(vars + 0x30) = fast_subtract_rotations(*(float *)(vars + 0x30),
-                                         D_L11_001B1FFC * 0.000290888245f);
+                                         g_effect_offset_angle * 0.000290888245f);
     gfx_add_draw_callback_first(joba_effect_update_particles, moby);
 }
 
@@ -285,15 +285,15 @@ void joba_effect_spawn_quad(char *moby)
     parity = func_001163B0();
     *(long long *)(pkt + 136) = ((long long)((parity % 2) + 1) << 2) | 0x8000000040LL;
     alpha_shift = math_random_int_range(0x40, 0x7F) << 24;
-    *(int *)(pkt + 76) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 72) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 68) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 64) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 76) = (g_effect_quad_color & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 72) = (g_effect_quad_color & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 68) = (g_effect_quad_color & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 64) = (g_effect_quad_color & 0xFFFFFF) + alpha_shift;
 
     quat[3] = 0.0f;
-    quat[2] = mat_fast_helper_a(D_L11_001BA780.x_140 - point[0], D_L11_001BA780.y_144 - point[1]);
-    quat[1] = -mat_fast_helper_a(vec_distance_xy((char *)point, &D_L11_001BA780.x_140),
-                             D_L11_001BA780.z_148 - point[2]);
+    quat[2] = mat_fast_helper_a(g_hero_l11_state_block.x_140 - point[0], g_hero_l11_state_block.y_144 - point[1]);
+    quat[1] = -mat_fast_helper_a(vec_distance_xy((char *)point, &g_hero_l11_state_block.x_140),
+                             g_hero_l11_state_block.z_148 - point[2]);
     quat[0] = math_random_angle();
     euler_to_matrix(matrix, quat);
 
@@ -309,10 +309,10 @@ void joba_effect_spawn_quad(char *moby)
     FastVecScale(pkt + 48, pkt + 48, scale);
     draw_world_quad(pkt, matrix, 0);
 
-    *(int *)(pkt + 76) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 72) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 68) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
-    *(int *)(pkt + 64) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 76) = (g_joba_quad_color_base & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 72) = (g_joba_quad_color_base & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 68) = (g_joba_quad_color_base & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 64) = (g_joba_quad_color_base & 0xFFFFFF) + alpha_shift;
 
     FastVecScale(pkt, pkt, 0.5f);
     FastVecScale(pkt + 16, pkt + 16, 0.5f);
@@ -368,10 +368,10 @@ void drone_launcher_update_state(char *moby)
         drone_reset_to_idle(moby);
     }
     if (*(short *)(vars + 0x1FC) == 0 && *(u8 *)(moby + 0x20) != 0xE &&
-        D_L11_001A8FF4 == 0) {
+        g_hero_l11_input_blocked == 0) {
         *(u16 *)(moby + 0x34) |= 0x400;
         if (*(u8 *)(moby + 0x31) != 0) {
-            if (fast_vec_dist(moby + 0x10, D_L11_001BA8C0) < 24.0f) {
+            if (fast_vec_dist(moby + 0x10, g_hero_l11_position) < 24.0f) {
                 moby_update_ground_check(moby);
                 *(u8 *)(moby + 0x6F) = 0x16;
             }
@@ -465,7 +465,7 @@ void drone_launcher_update_state(char *moby)
     drone_update_lock_on(moby);
 }
 
-extern unsigned short D_L11_001B1F84 __attribute__((sda));
+extern unsigned short g_joba_shot_lifetime __attribute__((sda));
 extern float mat_fast_helper_a(float a, float b);
 extern void func_002A0F48(char *p);
 
@@ -489,7 +489,7 @@ void joba_shot_init(char *moby, int owner, int controller, int goal_object, floa
     *(int *)(moby + 0xB8) = controller;
     qcopy(moby + 0x10, start_pos);
     qcopy(vars + 0xC0, velocity);
-    *(unsigned short *)(vars + 0x16C) = D_L11_001B1F84;
+    *(unsigned short *)(vars + 0x16C) = g_joba_shot_lifetime;
     *(int *)(vars + 0x150) = fade_time;
     *(float *)(vars + 0x4C) = gravity;
     *(unsigned short *)(vars + 0x16E) = 0;
@@ -504,6 +504,6 @@ void joba_shot_init(char *moby, int owner, int controller, int goal_object, floa
 
 extern char *CreateMoby(int);
 extern void part_l11_spawn_spark_ring(void *, int);
-extern float D_L11_001B22C4 __attribute__((sda));
-extern int D_L11_001B22CC __attribute__((sda));
+extern float g_swirl_effect_scale __attribute__((sda));
+extern int g_swirl_effect_arg __attribute__((sda));
 extern int snd_play_from_class_bank(int, int, char *, int);

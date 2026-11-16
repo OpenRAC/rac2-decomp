@@ -3,21 +3,21 @@
 #include "common.h"
 typedef u64 TI128 __attribute__((mode(TI)));
 extern u8 *g_hero_moby;
-extern f32 D_L08_001BE0B0;
+extern f32 g_saved_hold_float;
 extern u64 GetEffectTextureDescriptor(int);
-extern u8 D_L08_00296CD0[];
-extern u8 D_L08_001DB5E7;
-extern s32 D_L08_001DAC40[];
-extern s32 D_L08_001BFEF4;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u32 D_L08_001FB660[];
+extern u8 g_font_print_data[];
+extern u8 g_screen_update_index;
+extern s32 g_screen_update_headers[];
+extern s32 g_screen_update_param;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
+extern u32 g_moby_l08_group_lists[];
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(void *);
 extern u8 *g_hero_moby;
 
-s32 func_PAL_L08_0033B2D0(u8 *p, s32 a1, s32 a2, u8 *out, f32 f1, f32 f2) {
+s32 part_fill_effect_record_pal(u8 *p, s32 a1, s32 a2, u8 *out, f32 f1, f32 f2) {
     u8 *q;
     if (p == 0)
         return -1;

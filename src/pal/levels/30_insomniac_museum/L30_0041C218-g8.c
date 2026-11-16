@@ -10,11 +10,11 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
 extern float math_random_float_range(float, float);
 extern void *part_spawn_ground_effect(void *, int, int, float, float, int, int, void *, float, int);
-extern float D_L30_001B1FAC __attribute__((sda));
-extern int D_L30_001B1F08 __attribute__((sda)), D_L30_001B1F0C __attribute__((sda));
-extern char D_L30_001A8F20[] __attribute__((sda)) NOT_SDA;
+extern float g_projectile_spawn_scale __attribute__((sda));
+extern int g_spark_particle_texture_a __attribute__((sda)), g_spark_particle_texture_b __attribute__((sda));
+extern char g_particle_spawn_template[] __attribute__((sda)) NOT_SDA;
 
-char *func_PAL_L30_0041C218(char *owner, float *velocity, void *position, int type, float scale) {
+char *museum_projectile_spawn_pal(char *owner, float *velocity, void *position, int type, float scale) {
     char *obj = CreateMoby(0x11EA);
     char *st;
     float angle, size;
@@ -39,12 +39,12 @@ char *func_PAL_L30_0041C218(char *owner, float *velocity, void *position, int ty
         math_apply_axis_rotation_to_quat(obj + 0xC0, obj + 0xC0, obj + 0xD0, angle);
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         *(unsigned char *)(obj + 0x23) = 0x80;
-        *(float *)(obj + 0x2C) = D_L30_001B1FAC;
+        *(float *)(obj + 0x2C) = g_projectile_spawn_scale;
         *(unsigned short *)(obj + 0x34) |= 0x100;
         *(int *)(st + 0x24) = 0;
         size = math_random_float_range(8.0f, 10.0f);
-        part_spawn_ground_effect(obj + 0x10, 12, D_L30_001B1F08, size * 0.3f, size, 0, 10, D_L30_001A8F20, 0.0f, 0);
-        part_spawn_ground_effect(obj + 0x10, 12, D_L30_001B1F0C, size * 0.04f, size * 0.4f, 1, -10, D_L30_001A8F20, 0.0f, 0);
+        part_spawn_ground_effect(obj + 0x10, 12, g_spark_particle_texture_a, size * 0.3f, size, 0, 10, g_particle_spawn_template, 0.0f, 0);
+        part_spawn_ground_effect(obj + 0x10, 12, g_spark_particle_texture_b, size * 0.04f, size * 0.4f, 1, -10, g_particle_spawn_template, 0.0f, 0);
     }
     return obj;
 }

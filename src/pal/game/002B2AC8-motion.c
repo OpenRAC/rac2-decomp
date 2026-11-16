@@ -38,7 +38,7 @@ extern struct ImpactQueueState g_collision_hit;
 #define BI(p,n) (*(int *)((p)+(n)))
 
 /* Steps motion, animation speed and collision response; returns motion flags. */
-int func_PAL_002B2AC8(char *object,char *state)
+int moby_update_ground_motion_pal(char *object,char *state)
 {
     float destination[4], original[4], offset[4], start[4];
     /* Collision vectors and the later 3x4 rotation matrix share stack storage. */

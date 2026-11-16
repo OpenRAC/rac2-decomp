@@ -21,18 +21,18 @@ typedef struct {
     s32 timer;
 } HudTimerVars;
 
-extern u8 *D_L15_001B1580 __attribute__((sda));
-extern s32 D_L15_001B3694 __attribute__((sda));
-extern s32 D_L15_001B3690 __attribute__((sda));
+extern u8 *g_gorn_hud_moby __attribute__((sda));
+extern s32 g_gorn_hud_timer_started_flag __attribute__((sda));
+extern s32 g_gorn_hud_last_time __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 *D_L15_001A904C;
-extern s32 D_L15_001B1620 __attribute__((sda)), D_L15_001B1628 __attribute__((sda));
-extern s32 D_L15_001B1630 __attribute__((sda)), D_L15_001B1638 __attribute__((sda));
-extern s32 D_L15_001B1624, D_L15_001B162C, D_L15_001B1634, D_L15_001B163C;
-extern f32 D_L15_001B2E84;
-extern s32 D_L15_001B2E80;
-extern Block D_L15_001B1698;
-extern char D_L15_001B16A8[] MACRO_ADDR;
+extern u8 *g_challenge_menu_data;
+extern s32 g_gorn_hud_icon_x __attribute__((sda)), g_gorn_hud_badge_x __attribute__((sda));
+extern s32 g_gorn_hud_bar_x __attribute__((sda)), g_gorn_hud_text_x __attribute__((sda));
+extern s32 g_gorn_hud_icon_y, g_gorn_hud_badge_y, g_gorn_hud_bar_y, g_gorn_hud_text_y;
+extern f32 g_screen_l15_scale;
+extern s32 g_screen_l15_mode;
+extern Block g_gorn_hud_color;
+extern char g_str_gorn_hud_format[] MACRO_ADDR;
 
 extern void *table_find_by_id(void *, s32);
 extern void gfx_draw_scaled_object_two_axes(void *, s32, f32, f32, f32, f32, f32);
@@ -46,7 +46,7 @@ extern void text_draw_medium(s32, s32, u64, char *, s32);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L15_001B2E84 + 0.5f;
+    f32 scaled = value * g_screen_l15_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -59,7 +59,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
    which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L15_001B2E80;
+    int mode = g_screen_l15_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -87,23 +87,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 /* Draws the Gorn HUD sprite pairs, including the timed pair with its countdown and fade. */
 void gorn_hud_draw_sprites(s32 first, s32 timed, s32 third, s32 fourth)
 {
-    HudTimerVars *vars = *(HudTimerVars **)(D_L15_001B1580 + 0x68);
+    HudTimerVars *vars = *(HudTimerVars **)(g_gorn_hud_moby + 0x68);
     f32 fade;
     void *sprite;
     char text[128];
     Block color;
 
-    if (!D_L15_001B3694) {
-        D_L15_001B3690 = g_current_map_index[3];
-        D_L15_001B3694 = 1;
+    if (!g_gorn_hud_timer_started_flag) {
+        g_gorn_hud_last_time = g_current_map_index[3];
+        g_gorn_hud_timer_started_flag = 1;
     }
-    if (!D_L15_001A904C)
+    if (!g_challenge_menu_data)
         return;
     if (first) {
-        HUD_SPRITE(0xBD, 0x60442D00, D_L15_001B1620, D_L15_001B1624, -1.0f, 1.0f, 0.0f);
-        HUD_SPRITE(0xBE, 0x55F0C070, D_L15_001B1620, D_L15_001B1624, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBD, 0x60442D00, g_gorn_hud_icon_x, g_gorn_hud_icon_y, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBE, 0x55F0C070, g_gorn_hud_icon_x, g_gorn_hud_icon_y, -1.0f, 1.0f, 0.0f);
     }
-    if (timed && D_L15_001B3690 < g_current_map_index[3]) {
+    if (timed && g_gorn_hud_last_time < g_current_map_index[3]) {
         if (!math_fast_float_d(&vars->timer)) {
             if (vars->timer >= 291) {
                 fade = IntToFloat(300 - vars->timer) * 0.1f;
@@ -119,41 +119,41 @@ void gorn_hud_draw_sprites(s32 first, s32 timed, s32 third, s32 fourth)
                     fade = 0.0f;
             } else
                 goto full;
-            HUD_SPRITE(0xBF, 0x60442D00, D_L15_001B1628, D_L15_001B162C, fade, fade, 0.0f);
-            HUD_SPRITE(0xC0, 0x55F0C070, D_L15_001B1628, D_L15_001B162C, fade, fade, 0.0f);
+            HUD_SPRITE(0xBF, 0x60442D00, g_gorn_hud_badge_x, g_gorn_hud_badge_y, fade, fade, 0.0f);
+            HUD_SPRITE(0xC0, 0x55F0C070, g_gorn_hud_badge_x, g_gorn_hud_badge_y, fade, fade, 0.0f);
             goto timed_done;
         full:
-            HUD_SPRITE(0xBF, 0x60442D00, D_L15_001B1628, D_L15_001B162C, 1.0f, 1.0f, 0.0f);
-            HUD_SPRITE(0xC0, 0x55F0C070, D_L15_001B1628, D_L15_001B162C, 1.0f, 1.0f, 0.0f);
-            color = D_L15_001B1698;
+            HUD_SPRITE(0xBF, 0x60442D00, g_gorn_hud_badge_x, g_gorn_hud_badge_y, 1.0f, 1.0f, 0.0f);
+            HUD_SPRITE(0xC0, 0x55F0C070, g_gorn_hud_badge_x, g_gorn_hud_badge_y, 1.0f, 1.0f, 0.0f);
+            color = g_gorn_hud_color;
             {
                 s32 icon = GetIconFrame(0xEAA2, 3);
-                s32 x = D_L15_001B1628 - 51;
-                s32 y = screen_coord(D_L15_001B2E80, (f32)(D_L15_001B162C - 13), 1.0f);
+                s32 x = g_gorn_hud_badge_x - 51;
+                s32 y = screen_coord(g_screen_l15_mode, (f32)(g_gorn_hud_badge_y - 13), 1.0f);
 
                 hud_draw_sprite_gradient(icon, x, y, 28, 28, &color);
             }
-            sprintf(text, D_L15_001B16A8, g_current_map_index[3]);
+            sprintf(text, g_str_gorn_hud_format, g_current_map_index[3]);
             {
-                s32 textX = D_L15_001B1628 + 5;
+                s32 textX = g_gorn_hud_badge_x + 5;
 
-                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L15_001B162C + 2), D_L15_001B2E84, 0.5f, 1),
+                text_draw_medium(textX, label_y((void *)textX, (f32)(g_gorn_hud_badge_y + 2), g_screen_l15_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;
         } else {
             s32 reset = 300;
 
-            D_L15_001B3690 = g_current_map_index[3];
+            g_gorn_hud_last_time = g_current_map_index[3];
             vars->timer = reset;
         }
     }
     if (third) {
-        HUD_SPRITE(0xC1, 0x60442D00, D_L15_001B1630, D_L15_001B1634, 1.1f, 1.0f, 0.0f);
-        HUD_SPRITE(0xC2, 0x55F0C070, D_L15_001B1630, D_L15_001B1634, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC1, 0x60442D00, g_gorn_hud_bar_x, g_gorn_hud_bar_y, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC2, 0x55F0C070, g_gorn_hud_bar_x, g_gorn_hud_bar_y, 1.1f, 1.0f, 0.0f);
     }
     if (fourth) {
-        HUD_SPRITE(0xC1, 0x60442D00, D_L15_001B1638, D_L15_001B163C, 1.1f, 1.0f, 0.0f);
-        HUD_SPRITE(0xC2, 0x55F0C070, D_L15_001B1638, D_L15_001B163C, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC1, 0x60442D00, g_gorn_hud_text_x, g_gorn_hud_text_y, 1.1f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC2, 0x55F0C070, g_gorn_hud_text_x, g_gorn_hud_text_y, 1.1f, 1.0f, 0.0f);
     }
 }

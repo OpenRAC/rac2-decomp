@@ -4,7 +4,7 @@
 extern char g_hero_state[];
 extern void hero_clear_queued_anim(void);
 extern int hero_l22_set_action(int mode, int flag);
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
 extern void level_release_slot_list(void *p);
@@ -29,7 +29,7 @@ extern int hero_l22_set_action(int a0, int a1);
    sites: the ignored result keeps $v0 from the base load after the call. */
 extern void hero_build_relative_point(void *, int, float, float, float);
 extern f32 ApproachValue(float *, float, float);
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 extern int PadPressedWithin(int, int, int);
 extern int player_slot_has_object(void *);
 extern void release_moby_animation_slot(void *, void *);
@@ -83,7 +83,7 @@ typedef struct {
 /* Per-frame update of the hero's effect slot (0x1870): spends the counted charges
    on the two level-specific actions, fades the effect out (releasing it at zero)
    or in, and creates it when it is allowed and absent. */
-void func_PAL_L22_002AA488(void) {
+void hero_update_effect_slot_pal(void) {
     float v[4];
     int available;
     int i;
@@ -119,7 +119,7 @@ void func_PAL_L22_002AA488(void) {
         }
     }
     if (((Hero_002AA678 *)g_hero_state)->active) {
-        if (!(D_00138320 & 0x20) || !available) {
+        if (!(g_pad_pressed_flags & 0x20) || !available) {
             if (((Hero_002AA678 *)g_hero_state)->effect) {
                 if (((Hero_002AA678 *)g_hero_state)->effect->flags & 2)
                     ((Hero_002AA678 *)g_hero_state)->fading = 1;
@@ -171,7 +171,7 @@ void func_PAL_L22_002AA488(void) {
    so each stretch of the body re-materialises the base instead of keeping it
    live across the calls; the three table entries are the routines the tuning
    table points at, whose places differ from level to level. */
-void func_PAL_L22_002B6F90(int a0, int a1, void *a2) {
+void hero_restart_in_mode_pal(int a0, int a1, void *a2) {
     char *s0 = g_hero_state;
 
     cancel_hero_item_animation();
@@ -193,7 +193,7 @@ void func_PAL_L22_002B6F90(int a0, int a1, void *a2) {
         *(int *)(s1 + 0x2290) = (int)a2;
     }
     if ((a0 & 0xFF) == 1) {
-        if (D_00138320 & 0x10) {
+        if (g_pad_pressed_flags & 0x10) {
             hud_set_slot_contents(0x23, 0, &ref_L22_002B70F8_00, &ref_L22_002B70F8_01,
                           &ref_L22_002B70F8_02, 0, 0);
             level_run_slot_callback(3);

@@ -30,11 +30,11 @@ typedef struct {
 
 extern u16 *g_group_id_lists[];
 extern Entity *g_moby_l11_table[] __attribute__((sda));
-extern s32 D_L11_001B35B8 __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
 
-extern float D_L11_001B1230 __attribute__((sda));
-extern float D_L11_001B1234 __attribute__((sda));
-extern float D_L11_001B1238 __attribute__((sda));
+extern float g_enemy_aim_max_distance __attribute__((sda));
+extern float g_enemy_l11_aim_cone_degrees __attribute__((sda));
+extern float g_enemy_aim_turn_degrees __attribute__((sda));
 
 extern int math_fast_helper_a(void *vec, float radius);
 extern float vec_distance_xy(void *, void *);
@@ -44,12 +44,12 @@ extern float fast_subtract_rotations(float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern int func_PAL_L01_00323068(void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int moby_get_busy_flag(void *);
 
 /* Looks for an entity of the object's group that is in range and inside its view cone, and if
    found turns the object toward it and runs the follow-up call with a tiny turn rate. */
-s32 func_PAL_L11_0043C288(AimObject *obj)
+s32 enemy_aim_at_group_entity_in_cone_short_pal(AimObject *obj)
 {
     AimState *state = obj->state;
     float copy[4];
@@ -72,7 +72,7 @@ s32 func_PAL_L11_0043C288(AimObject *obj)
         return 0;
 
     for (ids = g_group_id_lists[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && ids != 0 &&
+         (state->group & 0xFF) != 0xFF && state->group <= g_tribe_group_limit && ids != 0 &&
          ((ids != 0 && (s16)ids[-1] >= 0) || ids == g_group_id_lists[state->group]);
          ids++) {
         entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
@@ -80,18 +80,18 @@ s32 func_PAL_L11_0043C288(AimObject *obj)
             return 0;
         if (!moby_get_busy_flag(entity))
             continue;
-        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1230))
+        if (!(vec_distance_xy(obj->position, entity->position) < g_enemy_aim_max_distance))
             continue;
 
         angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        if (!(FastDiffRots(obj->heading, angle) < D_L11_001B1234 * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, angle) < g_enemy_l11_aim_cone_degrees * 0.017453294f))
             continue;
         if (ids == 0)
             return 0;
 
         FastVecSub(vec, obj->position, entity->position);
-        turn = D_L11_001B1238 * 0.017453294f;
+        turn = g_enemy_aim_turn_degrees * 0.017453294f;
         angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
         math_apply_axis_rotation_to_quat(vec, vec, obj->axis,
@@ -100,7 +100,7 @@ s32 func_PAL_L11_0043C288(AimObject *obj)
 
         savedTurnRate = state->turnRate;
         state->turnRate = 0.0001f;
-        func_PAL_L01_00323068(obj, vec);
+        moby_l01_turn_toward_target_pal(obj, vec);
         state->turnRate = savedTurnRate;
         return 1;
     }

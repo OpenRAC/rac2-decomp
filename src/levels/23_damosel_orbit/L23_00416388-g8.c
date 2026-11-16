@@ -4,33 +4,33 @@
 /* Level 23 globals the retail code reaches through $gp. */
 extern char *g_mothership_boss_moby __attribute__((sda));
 
-extern int D_L23_001B13EC __attribute__((sda));
+extern int g_boss_part_was_active __attribute__((sda));
 
-extern int D_L23_001B1658 __attribute__((sda));
+extern int g_mothership_scan_slots __attribute__((sda));
 
-extern int D_L23_001B15A4 __attribute__((sda));
+extern int g_beam_frame_count __attribute__((sda));
 
-extern int D_L23_001B178C __attribute__((sda));
+extern int g_mothership_fade_scale __attribute__((sda));
 
-extern int D_L23_001B1790 __attribute__((sda));
+extern int g_mothership_clear_red __attribute__((sda));
 
-extern int D_L23_001B1794 __attribute__((sda));
+extern int g_mothership_clear_green __attribute__((sda));
 
-extern int D_L23_001B1798 __attribute__((sda));
+extern int g_mothership_clear_blue __attribute__((sda));
 
-extern int D_L23_001B3788;
+extern int g_energy_barrier_timer;
 
-extern int D_L23_001B38C0;
+extern int g_mothership_slot_count;
 
 extern int PlayMobySound(int index, int a1, char *a2);
 
 extern void gfx_set_clear_color_packet(int, int, int, int);
 
-extern int D_L23_001B1694 __attribute__((sda));
+extern int g_charged_l23_blast_timer __attribute__((sda));
 
-extern int D_L23_001B1698 __attribute__((sda));
+extern int g_charged_blast_timer_max __attribute__((sda));
 
-extern float D_L23_001B14E4 __attribute__((sda));
+extern float g_boss_timer_value __attribute__((sda));
 
 extern void func_31A108(int);
 
@@ -50,9 +50,9 @@ extern void build_axis_rotation_quaternion(void *, int, float);
 
 extern float fast_subtract_rotations(float, float);
 
-extern float D_L23_001B1570 __attribute__((sda));
+extern float g_joint_turn_speed_a __attribute__((sda));
 
-extern float D_L23_001B1574 __attribute__((sda));
+extern float g_joint_turn_speed_b __attribute__((sda));
 
 /* Relatches the two measured pairs at +0x580 and +0x584 from the two float arguments. */
 /* Turns two boss joints a little each frame, starting their effects first if needed. */
@@ -62,11 +62,11 @@ void mothership_turn_joints(char *moby, float deltaA, float deltaB) {
     if (*(unsigned char *)(vars + 0x4F1) == 0)
         AttachManipulator(moby, 0x28, vars + 0x4F0);
     build_axis_rotation_quaternion(vars + 0x500, 0, *(float *)(vars + 0x580));
-    *(float *)(vars + 0x580) = fast_subtract_rotations(*(float *)(vars + 0x580), deltaA * D_L23_001B1570 * 0.00029088825f);
+    *(float *)(vars + 0x580) = fast_subtract_rotations(*(float *)(vars + 0x580), deltaA * g_joint_turn_speed_a * 0.00029088825f);
     if (*(unsigned char *)(vars + 0x531) == 0)
         AttachManipulator(moby, 0x29, vars + 0x530);
     build_axis_rotation_quaternion(vars + 0x540, 0, *(float *)(vars + 0x584));
-    *(float *)(vars + 0x584) = fast_subtract_rotations(*(float *)(vars + 0x584), deltaB * D_L23_001B1574 * 0.00029088825f);
+    *(float *)(vars + 0x584) = fast_subtract_rotations(*(float *)(vars + 0x584), deltaB * g_joint_turn_speed_b * 0.00029088825f);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -106,7 +106,7 @@ void part_l23_spawn_hit_sparks(char *hitMoby) {
 /* Zero unless the counter is positive and below the limit. */
 /* Says whether the blast timer is running (above zero and below its limit). */
 int mothership_is_blast_timer_running(void) {
-    if (D_L23_001B1694 > 0 && D_L23_001B1694 < D_L23_001B1698)
+    if (g_charged_l23_blast_timer > 0 && g_charged_l23_blast_timer < g_charged_blast_timer_max)
         return 1;
     return 0;
 }
@@ -128,7 +128,7 @@ int mothership_is_attack_state(void) {
 void mothership_mark_held(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
-    if (D_L23_001B13EC == 0 && g_mothership_boss_moby != 0)
+    if (g_boss_part_was_active == 0 && g_mothership_boss_moby != 0)
         PlayMobySound(0x10, 0, g_mothership_boss_moby);
     *(int *)(vars + 0x604) = 1;
 }
@@ -155,15 +155,15 @@ void mothership_disable_part_flags(char *moby) {
     *(int *)(moby + 0x98) = 0;
 }
 
-extern int D_L23_001B150C __attribute__((sda));
+extern int g_mothership_beam_light __attribute__((sda));
 
-extern float D_L23_001B17A0 __attribute__((sda));
+extern float g_mothership_beam_param_a __attribute__((sda));
 
-extern float D_L23_001B17A4 __attribute__((sda));
+extern float g_mothership_beam_param_b __attribute__((sda));
 
-extern float D_L23_001B17A8 __attribute__((sda));
+extern float g_mothership_beam_param_c __attribute__((sda));
 
-extern float D_L23_001B179C __attribute__((sda));
+extern float g_mothership_beam_effect_size __attribute__((sda));
 
 extern void gfx_free_point_light(int);
 
@@ -193,20 +193,20 @@ void mothership_restart_beam_effect(char *moby) {
     float valueB;
     float valueC;
 
-    frameDiff = D_L23_001B15A4 - D_L23_001B3788;
-    if (D_L23_001B150C != -1)
-        gfx_free_point_light(D_L23_001B150C);
+    frameDiff = g_beam_frame_count - g_energy_barrier_timer;
+    if (g_mothership_beam_light != -1)
+        gfx_free_point_light(g_mothership_beam_light);
     if ((frameDiff & 3) != 0) {
         FastVecAdd(offset, moby + 0x10, g_hero_position);
         FastVecScale(offset, offset, 0.5f);
         mothership_project_point_onto_surface(offset, 5.0f);
-        jitter = math_random_float_range(0.0f, D_L23_001B17A0 * 0.33333334f);
-        valueA = D_L23_001B17A0 + jitter;
-        jitter = math_random_float_range(0.0f, D_L23_001B17A4 * 0.33333334f);
-        valueB = D_L23_001B17A4 + jitter;
-        jitter = math_random_float_range(0.0f, D_L23_001B17A8 * 0.33333334f);
-        valueC = D_L23_001B17A8 + jitter;
-        D_L23_001B150C = part_l00_alloc_effect_slot_2(offset, 35.0f, D_L23_001B179C, valueA, valueB, valueC);
+        jitter = math_random_float_range(0.0f, g_mothership_beam_param_a * 0.33333334f);
+        valueA = g_mothership_beam_param_a + jitter;
+        jitter = math_random_float_range(0.0f, g_mothership_beam_param_b * 0.33333334f);
+        valueB = g_mothership_beam_param_b + jitter;
+        jitter = math_random_float_range(0.0f, g_mothership_beam_param_c * 0.33333334f);
+        valueC = g_mothership_beam_param_c + jitter;
+        g_mothership_beam_light = part_l00_alloc_effect_slot_2(offset, 35.0f, g_mothership_beam_effect_size, valueA, valueB, valueC);
     }
     gfx_register_final_draw_callback(mothership_apply_fade_ratio, (int)moby);
 }
@@ -214,13 +214,13 @@ void mothership_restart_beam_effect(char *moby) {
 /* Calls the measured shared helper with the measured ratio expression. */
 /* Passes the current fade amount to the screen effect. */
 void mothership_apply_fade_ratio(void) {
-    gfx_set_clear_color_packet(D_L23_001B1790, D_L23_001B1794, D_L23_001B1798,
-                  (D_L23_001B15A4 - D_L23_001B3788) * D_L23_001B178C / D_L23_001B15A4);
+    gfx_set_clear_color_packet(g_mothership_clear_red, g_mothership_clear_green, g_mothership_clear_blue,
+                  (g_beam_frame_count - g_energy_barrier_timer) * g_mothership_fade_scale / g_beam_frame_count);
 }
 
 /* Stores the incoming float in the level global reached through $gp. */
 /* Sets the boss timer value used by the attack logic. */
-void mothership_set_timer_value(float value) { D_L23_001B14E4 = value; }
+void mothership_set_timer_value(float value) { g_boss_timer_value = value; }
 
 /* Copies the measured word of every live slot into the object the argument names. */
 /* Gives all the boss parts their normal object flags back. */
@@ -270,7 +270,7 @@ void mothership_free_effect_handles(void) {
 /* Zero while the counter is negative. */
 /* Says whether the blast timer is negative (cooling down). */
 int mothership_is_blast_cooling_down(void) {
-    if (D_L23_001B1694 < 0)
+    if (g_charged_l23_blast_timer < 0)
         return 1;
     return 0;
 }
@@ -278,19 +278,19 @@ int mothership_is_blast_cooling_down(void) {
 /* Zero when the value is among the first D_L23_001B38C0 words of the table, else one. */
 /* Says whether a value is not yet in the list of used slots. */
 int mothership_is_value_not_in_slots(int value) {
-    int *table = &D_L23_001B1658;
+    int *table = &g_mothership_scan_slots;
     int i;
 
-    for (i = 0; i < D_L23_001B38C0; i++) {
+    for (i = 0; i < g_mothership_slot_count; i++) {
         if (table[i] == value)
             return 0;
     }
     return 1;
 }
 
-extern int D_L23_001B1424 __attribute__((sda));
+extern int g_boss_part_age_counter __attribute__((sda));
 
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 
 
 extern void level_store_value_pair(int, int);
@@ -320,8 +320,8 @@ void mothership_destroy_parts(void) {
         moby_mark_spawned(g_mothership_boss_moby);
         g_mothership_boss_moby = 0;
     }
-    flags = D_001395B8;
-    D_L23_001B1424 = 1;
+    flags = g_game_flag_table;
+    g_boss_part_age_counter = 1;
     flags[0xA1] = 1;
     flags[0x88] = 1;
 }
@@ -338,7 +338,7 @@ typedef struct Vars_0041BE70 {
 } Vars_0041BE70;
 
 /* A scalar: declared as an array, its address is scheduled differently in the two calls. */
-extern int D_L23_001B36E0;
+extern int g_boss_effect_position;
 
 extern void part_start_effect_default_table(void *, int, int, void *, float);
 
@@ -359,20 +359,20 @@ void mothership_attach_hit_effect(char *source) {
             return;
         }
     } else {
-        part_start_effect_default_table(vars->slot[index], *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
+        part_start_effect_default_table(vars->slot[index], *(int *)(source + 0x20), 0x10000, &g_boss_effect_position,
                       *(float *)(source + 0x2C));
         return;
     }
     if ((*(unsigned short *)(p + 0x34) | 0x4000) != 0)
-        part_start_effect_default_table(p, *(int *)(source + 0x20), 0x10000, &D_L23_001B36E0,
+        part_start_effect_default_table(p, *(int *)(source + 0x20), 0x10000, &g_boss_effect_position,
                       *(float *)(source + 0x2C));
 }
 
-extern float D_L23_001B1400 __attribute__((sda));
+extern float g_ease_angle_start_degrees __attribute__((sda));
 
-extern float D_L23_001B1404 __attribute__((sda));
+extern float g_ease_angle_end_degrees __attribute__((sda));
 
-extern float D_L23_001B1408 __attribute__((sda));
+extern float g_ease_time_scale __attribute__((sda));
 
 /* Returns the new value in $f0. Declared void, the call leaves $f0 free and the measure
  * reloaded right after it takes $f0 where retail has $f1. */
@@ -389,8 +389,8 @@ void mothership_ease_value_to_target(char *moby) {
     if (*(int *)(vars + 0x5DC) != 0)
         return;
     math_step_value_toward_target((float *)(vars + 0x5C8), (float *)(vars + 0x5CC), *(float *)(vars + 0x5D0),
-                  D_L23_001B1400 * 0.00027777778f, D_L23_001B1404 * 0.00027777778f,
-                  D_L23_001B1408 * 0.016666668f);
+                  g_ease_angle_start_degrees * 0.00027777778f, g_ease_angle_end_degrees * 0.00027777778f,
+                  g_ease_time_scale * 0.016666668f);
     if (math_fabs(*(float *)(vars + 0x5C8) - *(float *)(vars + 0x5D0)) < 0.1f) {
         *(int *)(vars + 0x5DC) = 1;
         *(int *)(vars + 0x5CC) = 0;
@@ -403,18 +403,18 @@ extern void snd_stop_voice(int);
 
 extern void gfx_free_point_light(int);
 
-extern int D_L23_001B1418 __attribute__((sda));
+extern int g_mothership_barrier_voice __attribute__((sda));
 
-extern short D_L23_001B146C __attribute__((sda));
+extern short g_mothership_barrier_light __attribute__((sda));
 
 /* the two 8 x 3 handle tables */
-extern void *D_L23_00259320[8][3];
+extern void *g_mothership_beam_handles[8][3];
 
-extern void *D_L23_00259380[8][3];
+extern void *g_mothership_beam_end_handles[8][3];
 
 /* four handles; declared at 8 bytes so this -G8 unit loads its address as the bare
    lui/addiu pair into one register, as retail does (an incomplete or 16-byte array splits it) */
-extern void *D_L23_001B3790[2];
+extern void *g_mothership_effect_handles[2];
 
 /* Releases the measured handles, then every object handle of the three tables, and clears them. */
 /* Removes all the boss's effect objects and handles, and clears them. */
@@ -423,35 +423,35 @@ void mothership_release_effect_handles(char *boss) {
     int i;
     int j;
 
-    if (D_L23_001B1418 != -1) {
-        snd_stop_voice(D_L23_001B1418);
-        D_L23_001B1418 = -1;
+    if (g_mothership_barrier_voice != -1) {
+        snd_stop_voice(g_mothership_barrier_voice);
+        g_mothership_barrier_voice = -1;
     }
-    if (D_L23_001B146C != -1) {
-        gfx_free_point_light(D_L23_001B146C);
-        D_L23_001B146C = -1;
+    if (g_mothership_barrier_light != -1) {
+        gfx_free_point_light(g_mothership_barrier_light);
+        g_mothership_barrier_light = -1;
     }
     if (*(int *)(vars + 0x5B0) != 0) {
         *(int *)(vars + 0x5C4) = 0;
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
-                if (D_L23_00259320[i][j] != 0) {
-                    moby_mark_spawned(D_L23_00259320[i][j]);
-                    D_L23_00259320[i][j] = 0;
+                if (g_mothership_beam_handles[i][j] != 0) {
+                    moby_mark_spawned(g_mothership_beam_handles[i][j]);
+                    g_mothership_beam_handles[i][j] = 0;
                 }
             }
         }
         for (i = 0; i < 4; i++) {
-            if (D_L23_001B3790[i] != 0) {
-                moby_mark_spawned(D_L23_001B3790[i]);
-                D_L23_001B3790[i] = 0;
+            if (g_mothership_effect_handles[i] != 0) {
+                moby_mark_spawned(g_mothership_effect_handles[i]);
+                g_mothership_effect_handles[i] = 0;
             }
         }
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
-                if (D_L23_00259380[i][j] != 0) {
-                    moby_mark_spawned(D_L23_00259380[i][j]);
-                    D_L23_00259380[i][j] = 0;
+                if (g_mothership_beam_end_handles[i][j] != 0) {
+                    moby_mark_spawned(g_mothership_beam_end_handles[i][j]);
+                    g_mothership_beam_end_handles[i][j] = 0;
                 }
             }
         }
@@ -528,25 +528,25 @@ typedef struct {
     short heat;
 } C0E8Hero;
 
-extern int D_L23_001B141C __attribute__((sda));
+extern int g_charged_blast_saved_value __attribute__((sda));
 
-extern float D_L23_001B168C __attribute__((sda));
+extern float g_boss_blast_range __attribute__((sda));
 
-extern float D_L23_001B1690 __attribute__((sda));
+extern float g_boss_blast_level_tolerance __attribute__((sda));
 
-extern int D_L23_001B169C __attribute__((sda));
+extern int g_charged_blast_timer_start __attribute__((sda));
 
-extern int D_L23_001B16A4 __attribute__((sda));
+extern int g_charged_blast_fired_flag __attribute__((sda));
 
-extern int D_L23_001B16A8 __attribute__((sda));
+extern int g_charged_blast_armed_flag __attribute__((sda));
 
-extern int D_L23_001B16AC __attribute__((sda));
+extern int g_charged_blast_cooldown_frames __attribute__((sda));
 
-extern float D_L23_001B16B0 __attribute__((sda));
+extern float g_blast_impulse_length __attribute__((sda));
 
-extern float D_L23_001B36D0[4] __attribute__((sda));
+extern float g_boss_hit_point[4] __attribute__((sda));
 
-extern int D_L23_001B371C;
+extern int g_charged_l23_blast_timer_2;
 
 extern int math_fast_float_d(int *);
 
@@ -564,58 +564,58 @@ void mothership_update_charged_blast(C0E8Moby *boss) {
     float impulse[4] __attribute__((aligned(16)));
     TI128 spawnPos;
 
-    math_fast_float_d(&D_L23_001B371C);
-    if (boss->state == 0x10 && state->dist < D_L23_001B168C && state->level > state->limit &&
-        math_fabs(state->level - state->limit) < D_L23_001B1690) {
+    math_fast_float_d(&g_charged_l23_blast_timer_2);
+    if (boss->state == 0x10 && state->dist < g_boss_blast_range && state->level > state->limit &&
+        math_fabs(state->level - state->limit) < g_boss_blast_level_tolerance) {
         C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
-        if (hero->charge >= 11 && D_L23_001B1694 == 0) {
-            D_L23_001B16A4 = 1;
-            D_L23_001B1694 = D_L23_001B169C;
-            if (D_L23_001B16A8 != 0) {
-                D_L23_001B16A8 = 0;
-                D_L23_001B1694 = D_L23_001B1698;
+        if (hero->charge >= 11 && g_charged_l23_blast_timer == 0) {
+            g_charged_blast_fired_flag = 1;
+            g_charged_l23_blast_timer = g_charged_blast_timer_start;
+            if (g_charged_blast_armed_flag != 0) {
+                g_charged_blast_armed_flag = 0;
+                g_charged_l23_blast_timer = g_charged_blast_timer_max;
             }
         }
     }
-    if (D_L23_001B1694 > 0) {
-        if (D_L23_001B1694 == D_L23_001B1698) {
-            if (D_L23_001B16A4 != 0)
-                D_L23_001B371C = 0;
+    if (g_charged_l23_blast_timer > 0) {
+        if (g_charged_l23_blast_timer == g_charged_blast_timer_max) {
+            if (g_charged_blast_fired_flag != 0)
+                g_charged_l23_blast_timer_2 = 0;
             else
-                D_L23_001B1694 += 2;
+                g_charged_l23_blast_timer += 2;
         } else {
             C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
             if (hero->heat >= 11)
-                D_L23_001B16A8 = 1;
+                g_charged_blast_armed_flag = 1;
         }
     }
-    if (D_L23_001B16A8 != 0 && D_L23_001B1694 > D_L23_001B1698) {
+    if (g_charged_blast_armed_flag != 0 && g_charged_l23_blast_timer > g_charged_blast_timer_max) {
         C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge >= 11)
-            D_L23_001B1694 = D_L23_001B1698;
+            g_charged_l23_blast_timer = g_charged_blast_timer_max;
     }
     {
         C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
         if (hero->charge != 0 && hero->armed == 0)
-            D_L23_001B16A8 = 0;
+            g_charged_blast_armed_flag = 0;
     }
     {
         C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
-        if (hero->charge >= 11 && D_L23_001B16A4 == 0 && D_L23_001B1694 > 0 && D_L23_001B1694 <= D_L23_001B1698)
-            D_L23_001B1694 = D_L23_001B1698 + 5;
+        if (hero->charge >= 11 && g_charged_blast_fired_flag == 0 && g_charged_l23_blast_timer > 0 && g_charged_l23_blast_timer <= g_charged_blast_timer_max)
+            g_charged_l23_blast_timer = g_charged_blast_timer_max + 5;
     }
-    if (D_L23_001B1694 == D_L23_001B1698) {
+    if (g_charged_l23_blast_timer == g_charged_blast_timer_max) {
         PlayMobySound(10, 0, (char *)boss);
         PlayMobySound(0x11, 0, (char *)boss);
     }
-    if (D_L23_001B1694 < 0) {
-        D_L23_001B1694++;
-        if (D_L23_001B371C == 0) {
+    if (g_charged_l23_blast_timer < 0) {
+        g_charged_l23_blast_timer++;
+        if (g_charged_l23_blast_timer_2 == 0) {
             C0E8Hero *hero = (C0E8Hero *)g_hero_state;
 
             if (hero->charge != 0 && state->range < 10.0f && state->level > state->limit) {
@@ -624,15 +624,15 @@ void mothership_update_charged_blast(C0E8Moby *boss) {
                 spawnPos = boss->pos;
                 impulse[3] = 5627.9248046875f;
                 cam_play_effect_on_target((void *)state->handle, 0x10007, 0x46, &spawnPos, impulse, 0);
-                D_L23_001B371C = D_L23_001B141C;
-                SpawnExplosion((char *)D_L23_001B36D0, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
+                g_charged_l23_blast_timer_2 = g_charged_blast_saved_value;
+                SpawnExplosion((char *)g_boss_hit_point, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
             }
         }
-    } else if (D_L23_001B1694 > 0) {
-        math_fast_float_d(&D_L23_001B1694);
-        if (D_L23_001B1694 == 0) {
+    } else if (g_charged_l23_blast_timer > 0) {
+        math_fast_float_d(&g_charged_l23_blast_timer);
+        if (g_charged_l23_blast_timer == 0) {
             state->handle = slot_effect_create(&boss->pos, boss, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1.0f, 1, 1, 0, 0, 0x40);
-            D_L23_001B1694 = -D_L23_001B16AC;
+            g_charged_l23_blast_timer = -g_charged_blast_cooldown_frames;
             PlayMobySound(7, 0, (char *)boss);
             PlayMobySound(12, 0, (char *)boss);
             if (state->range < 15.0f && state->level > state->limit) {
@@ -640,11 +640,11 @@ void mothership_update_charged_blast(C0E8Moby *boss) {
 
                 if (hero->busy == 0) {
                     FastVecSub(impulse, hero->pos, (float *)&boss->pos);
-                    vec_scale_to_length(impulse, impulse, D_L23_001B16B0);
+                    vec_scale_to_length(impulse, impulse, g_blast_impulse_length);
                     spawnPos = boss->pos;
                     impulse[3] = 5627.9248046875f;
                     cam_play_effect_on_target(boss, 0x10007, 0x46, &spawnPos, impulse, 0);
-                    SpawnExplosion((char *)D_L23_001B36D0, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
+                    SpawnExplosion((char *)g_boss_hit_point, 1, 5, 0x46, 3, 15, 20, 1, 3.0f, 20.0f, 0, 1, 0, 0);
                 }
             }
         }

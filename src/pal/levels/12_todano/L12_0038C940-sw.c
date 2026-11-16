@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void FastVecAdd(void *,void *,void *);
 extern void FastVecScale(void *,void *,float);
 extern int coll_test_point(void *,int,void *,float);
@@ -10,12 +10,12 @@ extern int math_fast_float_d(void *);
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
-extern Collision D_L12_001C0240;
+extern Collision g_collision_l12_result;
 extern float FastAddRotations(float,float);
 extern void moby_mark_spawned(void *);
 
 /* Mirrors its linked object, then moves and destroys the detached fragment. */
-void func_PAL_L12_003A4158(u8 *object) {
+void mirrored_fragment_update_pal(u8 *object) {
     u8 *data=*(u8 **)(object+0x68);u8 *tracked=*(u8 **)(data+0x3C);
     if(tracked && *(short *)(tracked+0xAA)==0x184 && tracked[0x20]!=254 && tracked[0x20]!=253) {
         *(u16 *)(object+0x34)&=0xFFFC;
@@ -32,12 +32,12 @@ void func_PAL_L12_003A4158(u8 *object) {
             FastVecAdd(object+0x10,object+0x10,data+0x10);
             FastVecScale(data+0x10,data+0x10,0.995f);
             if(coll_test_point(object+0x10,0,object,2.0f)) {
-                u8 *hit=D_L12_001C0240.hit;
+                u8 *hit=g_collision_l12_result.hit;
                 if(hit) {
                     int type=*(short *)(hit+0xAA);
                     if(type==0x191 || type==0x184 || type==0x185 || type==0x186 || type==0x187 || type==0x188 || type==0x189 || type==0x18A || type==0x18B || type==0x18C || type==0x18F || type==0x190) goto rotate;
                 }
-                vec_fast_normalize(data+0x10,data+0x10,D_L12_001C0240.normal.f);object[0x20]=4;
+                vec_fast_normalize(data+0x10,data+0x10,g_collision_l12_result.normal.f);object[0x20]=4;
             }
 rotate:
             *(float *)(object+0xF0)=FastAddRotations(*(float *)(object+0xF0),*(float *)(data+0x30));
@@ -50,7 +50,7 @@ destroy:
             }
             break;
         case 4:
-            func_PAL_002AC718(object,data+0x10,0,2,4,10,3,16,4,2,9,1,-1,15,1,1,-1,0,0x810001);
+            SpawnExplosionEffects_pal(object,data+0x10,0,2,4,10,3,16,4,2,9,1,-1,15,1,1,-1,0,0x810001);
             moby_mark_spawned(object);break;
         }
     } else goto destroy;

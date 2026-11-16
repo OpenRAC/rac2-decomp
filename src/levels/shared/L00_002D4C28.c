@@ -1,6 +1,6 @@
 #include "names.h"
 extern char g_hero_state[];
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 
 extern void SpawnHeroItemMobies(void);
 
@@ -35,7 +35,7 @@ typedef struct {
 } Rec_1BCAC0;
 #endif
 
-extern Rec_1BCAC0 D_L00_001BCAC0;
+extern Rec_1BCAC0 g_tutorial_probe_context;
 
 /* Set bit 0x800 on list objects of either supported kind, dispatch the level
    updates, then clear bit 0 on the six resident object slots. */
@@ -46,14 +46,14 @@ void level_update_glow_objects(char *object)
     void *listObject;
     unsigned short flags;
 
-    if (D_L00_001A8F00 != 2 && D_L00_001A8F00 != 6)
+    if (g_game_l00_mode != 2 && g_game_l00_mode != 6)
         return;
 
     if (((Base_2A *)g_hero_state)->f12C0 == 0)
         SpawnHeroItemMobies();
 
-    for (i = 0; i < D_L00_001BCAC0.count; i++) {
-        listObject = D_L00_001BCAC0.list[i];
+    for (i = 0; i < g_tutorial_probe_context.count; i++) {
+        listObject = g_tutorial_probe_context.list[i];
         if (listObject != 0 && (*(short *)((char *)listObject + 0xAA) == 0x50A /* moby class 1290 */ ||
                           *(short *)((char *)listObject + 0xAA) == 0xD54 /* moby class 3412 */)) {
             flags = *(unsigned short *)((char *)listObject + 0x34);

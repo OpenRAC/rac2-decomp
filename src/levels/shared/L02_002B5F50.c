@@ -88,7 +88,7 @@ int moby_pack_handle(char *object) {
     return (w8 << 16) | packed | w0;
 }
 
-extern char *D_L02_001B368C __attribute__((section(".sdata")));
+extern char *g_matrix_l02_record_table __attribute__((section(".sdata")));
 extern void part_start_record_effect_by_level_kind(char *arg0, char *arg1, int arg2);
 
 /* Index -1 means "no record". */
@@ -97,12 +97,12 @@ void part_start_record_effect_by_index(int index, int param) {
     char *record;
 
     if (index != -1) {
-        record = D_L02_001B368C + (index << 7);
+        record = g_matrix_l02_record_table + (index << 7);
         part_start_record_effect_by_level_kind(record + 0x30, record + 0x70, param);
     }
 }
 
-extern unsigned char D_0018C0D4;
+extern unsigned char g_screen_mode_flag;
 extern void hero_reset_position_and_direction(int a0, int a1, int a2, int a3);
 extern void cam_reset_entry(int arg0);
 
@@ -110,7 +110,7 @@ extern void cam_reset_entry(int arg0);
 void part_start_record_effect_by_level_kind(char *first, char *second, int extra) {
     int variant = 0;
 
-    switch (D_0018C0D4) {
+    switch (g_screen_mode_flag) {
     case 1:
         variant = 0x3F;
         break;
@@ -393,7 +393,7 @@ int moby_check_target_point_from_offset(char *object, void *target) {
     return moby_check_move_target_reachable(object, (char *)offset);
 }
 
-extern int D_L02_001A8FF0 __attribute__((sda));
+extern int g_tether_lock_active __attribute__((sda));
 extern float mat_fast_helper_a(float a, float b);
 extern int moby_start_effect_from_entry(char *a0, float f12);
 extern void *moby_get_vars_word_18(char *a0);
@@ -404,7 +404,7 @@ int moby_check_move_target_reachable(char *arg0, char *arg1) {
     void *rec;
     float h;
 
-    if (D_L02_001A8FF0 == 0)
+    if (g_tether_lock_active == 0)
         return moby_start_effect_from_entry(arg0, mat_fast_helper_a(*(float *)(arg1), *(float *)(arg1 + 4)));
 
     rec = moby_get_vars_word_18(arg0);
@@ -518,7 +518,7 @@ extern void cam_compute_view_direction(char *a0, char *a1, int a2);
 extern void FastVecAdd(void *a0, void *a1, void *a2);
 extern int CollLine(char *a0, char *a1, int mode, char *self, int flag);
 extern float gravity_get_center_distance(char *p);
-extern char D_L02_001C0960;
+extern char g_scratch_vec;
 
 /* Scale the shape's two axes, compare them with the record and copy the
    result into the second argument. */
@@ -535,7 +535,7 @@ void coll_probe_ground_ahead(char *a0, char *a1) {
     FastVecAdd((char *)buf1, (char *)buf1, a0 + 0x10);
     FastVecAdd((char *)buf2, (char *)buf2, a0 + 0x10);
     if (CollLine((char *)buf1, (char *)buf2, 0, a0, 0)) {
-        obj = &D_L02_001C0960;
+        obj = &g_scratch_vec;
         *(float *)(a1 + 0x90) = gravity_get_center_distance(obj);
         sub = obj - 0x20;
         *(int *)(a1 + 0x88) = *(int *)(sub + 0x18);
@@ -567,7 +567,7 @@ extern float math_random_float_range(float a, float b);
 extern float IntToFloat(int n);
 extern int math_lerp_int_fraction(int a0, int a1, float f12);
 extern void FastVecScale(void *a0, void *a1, float f12);
-extern unsigned char *D_L02_002001D8;
+extern unsigned char *g_enemy_spawn_id_ptr;
 extern int func_001163B0(void);
 
 /* Build one enemy record: pick its kind, place it, and aim it. */
@@ -586,7 +586,7 @@ void *enemy_spawn_record(void *origin, void *direction, void *config, void *flag
         rec[9] = (unsigned char)(FloatToInt(0.04f) - 0x60);
         rec[3] = (flag != 0) ? 0x48 : 0x44;
         rec[1] = 0;
-        rec[2] = *D_L02_002001D8;
+        rec[2] = *g_enemy_spawn_id_ptr;
         rec[8] = (unsigned char)func_001163B0();
         roll = math_random_float_range(0.0f, 1.0f);
 
@@ -634,9 +634,9 @@ extern View_00189E20 g_hero_state;
 /* sda: the bare load `lui $v1 ; lw $v1,%lo($v1)` retail has twice; a plain extern keeps the %hi
    in a saved register across the calls. */
 extern int g_current_map_index __attribute__((sda));
-extern int D_L02_001CAA80;
+extern int g_arena_l02_active_flag;
 extern char g_camera_l02_position[];
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 extern int coll_point_inside_region(void *a0, int a1);
 extern void moby_set_state(void *a0, int a1, int a2);
 extern void InitRailGroupMembers(unsigned char *a0, int a1);
@@ -664,7 +664,7 @@ void lamp_controller_update(unsigned char *controller) {
     }
     if (*(unsigned short *)(controller + 0x34) & 2)
         return;
-    if (D_L02_001CAA80 != 0)
+    if (g_arena_l02_active_flag != 0)
         return;
     switch (controller[0x20]) {
     case 0:
@@ -677,7 +677,7 @@ void lamp_controller_update(unsigned char *controller) {
             unsigned char *entity;
 
             idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-            while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+            while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
                    ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
                 entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
                 if (entity == 0)
@@ -698,7 +698,7 @@ void lamp_controller_update(unsigned char *controller) {
             unsigned char *entity;
 
             idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-            while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+            while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
                    ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
                 entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
                 if (entity == 0)
@@ -762,7 +762,7 @@ extern void scale_vector(void *buf, void *value, float scale);
 extern int math_fast_helper_a(void *buf, float value);
 extern void DrawOrientedQuadsAtPoints(void *a0, void *a1, int a2, unsigned int a3,
                               float f12, float f13, float f14, int t0, int t1);
-extern char *D_L02_001FBFC0[];
+extern char *g_level_string_table[];
 extern int level_is_resident_flag_clear(void);
 
 /* Walks the object's group id list: every entity of kind 0x9B0 in state 1 that passes the
@@ -779,7 +779,7 @@ void lamp_draw_group_glows_a(unsigned char *controller) {
         return;
     animate = level_is_resident_flag_clear();
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -818,7 +818,7 @@ void scenery_ship_draw_group_glows(unsigned char *controller) {
         return;
     animate = level_is_resident_flag_clear();
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -855,7 +855,7 @@ void lamp_draw_group_glows_b(unsigned char *controller) {
         return;
     animate = level_is_resident_flag_clear();
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -893,7 +893,7 @@ void lamp_draw_group_glows_c(unsigned char *controller) {
         return;
     animate = level_is_resident_flag_clear();
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -930,7 +930,7 @@ void part_draw_group_glows_a(unsigned char *controller) {
     if (controller[0x21] == 0xFF)
         return;
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -964,7 +964,7 @@ void part_draw_group_glows_b(unsigned char *controller) {
     if (controller[0x21] == 0xFF)
         return;
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -1000,7 +1000,7 @@ void part_draw_group_glows_double(unsigned char *controller) {
     if (controller[0x21] == 0xFF)
         return;
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -1039,7 +1039,7 @@ void part_draw_group_glows_c(unsigned char *controller) {
         return;
     animate = level_is_resident_flag_clear();
     idPtr = (unsigned short *)g_entity_group_lists[controller[0x21]];
-    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+    while (controller[0x21] != 0xFF && controller[0x21] <= g_group_max_index && idPtr != 0 &&
            ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)g_entity_group_lists[controller[0x21]])) {
         entity = (unsigned char *)(g_moby_l02_pool + ((*idPtr & 0x7FFF) << 8));
         if (entity == 0)
@@ -1129,7 +1129,7 @@ void nanotech_crate_init(char *moby) {
 
 extern void part_kill(void *p);
 extern void moby_mark_spawned(void *e);
-extern void *D_L02_001B31EC __attribute__((sda));
+extern void *g_retiring_moby __attribute__((sda));
 
 /* Release the eight slots behind the entity, then retire it. */
 void moby_release_slots_retire(char *moby) {
@@ -1144,7 +1144,7 @@ void moby_release_slots_retire(char *moby) {
         }
         slot++;
     }
-    if (D_L02_001B31EC == moby)
+    if (g_retiring_moby == moby)
         moby[0x20] = 4;
     else
         moby_mark_spawned(moby);

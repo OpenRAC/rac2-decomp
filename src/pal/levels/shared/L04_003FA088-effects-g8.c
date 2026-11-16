@@ -4,7 +4,7 @@
 typedef int EffectQuad __attribute__((mode(TI)));
 typedef struct { unsigned char b[256]; } EffectSlot;
 extern EffectSlot *g_moby_l04_pool;
-extern int D_L04_001B2008 __attribute__((section(".data")));
+extern int g_game_tick_counter __attribute__((section(".data")));
 extern void func_PAL_L04_003FA088(unsigned char *);
 extern void *moby_create_at_parent_pose(unsigned char *,void *,float);
 extern float FastAddRotations(float,float);
@@ -38,7 +38,7 @@ void func_PAL_L04_003FA368(unsigned char *m) {
     if(!EFFECT_PTR(s,4)||!EFFECT_PTR(s,8)||!EFFECT_PTR(s,12))return;
     EFFECT_FLOAT(m,0xF8)=FastAddRotations(EFFECT_FLOAT(m,0xF8),0.062831864f);
     math_update_wrapped_angle_offset(m,s+0x54,&delta,0.01f,0.12566373f,EFFECT_FLOAT(s,0x58));
-    mode=D_L04_001B2008;
+    mode=g_game_tick_counter;
     EFFECT_QUAD(EFFECT_PTR(s,4),0x10)=EFFECT_QUAD(m,0x10);
     EFFECT_QUAD(EFFECT_PTR(s,8),0x10)=EFFECT_QUAD(m,0x10);
     EFFECT_QUAD(EFFECT_PTR(s,12),0x10)=EFFECT_QUAD(m,0x10);

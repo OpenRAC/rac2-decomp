@@ -11,9 +11,9 @@ extern void FastVecAdd(unsigned char *, unsigned char *, unsigned char *);
 /* Sets up the four fading quads of one record in the resident state block:
    picks the 0xD54 record, rebuilds its 0x10-byte blocks through the colour
    helpers and stores the record's first word into the state's draw object. */
-extern int D_001AC200 __attribute__((sda));
-extern char D_002628D0[];
-extern char D_002628F0[];
+extern int g_backdrop_quad_offsets __attribute__((sda));
+extern char g_backdrop_quad_data[];
+extern char g_backdrop_quad_base[];
 extern char g_camera_eye_state[];
 
 extern void matrix_mul_vec3(char *, char *, char *);
@@ -39,7 +39,7 @@ void scene_update_backdrop_quads(void)
         return;
     if (limit < g_scene_playback_state.count34)
         return;
-    g_scene_playback_state.obj50 = D_002628D0;
+    g_scene_playback_state.obj50 = g_backdrop_quad_data;
     record = 0;
     for (i = 0; i < g_scene_playback_state.n44; i++) {
         char *entry = g_scene_playback_state.list[i];
@@ -50,12 +50,12 @@ void scene_update_backdrop_quads(void)
         }
     }
     if (record != 0) {
-        char *base = D_002628F0;
+        char *base = g_backdrop_quad_base;
         char buf[16];
         int j;
 
         for (j = 0; j < 4; j++) {
-            matrix_mul_vec3(base, (char *)&D_001AC200 + j * 0x10, record + 0xC0);
+            matrix_mul_vec3(base, (char *)&g_backdrop_quad_offsets + j * 0x10, record + 0xC0);
             FastVecAdd((unsigned char *)base, (unsigned char *)base, (unsigned char *)(record + 0x10));
             FastVecSub(buf, g_camera_eye_state, base);
             vec_scale_to_length(buf, buf, 0.15f);

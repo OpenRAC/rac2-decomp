@@ -6,11 +6,11 @@
  */
 #include "common.h"
 
-extern u8 * D_L22_001A904C MACRO_ADDR;
-extern int D_L22_001B2980 MACRO_ADDR;
-extern float D_L22_001B2984 MACRO_ADDR;
-extern int D_0018B694 NOT_SDA;
-extern int D_L22_001B2AA8 MACRO_ADDR;
+extern u8 * g_hud_l22_sprite_base MACRO_ADDR;
+extern int g_hud_label_mode MACRO_ADDR;
+extern float g_hud_l22_scale MACRO_ADDR;
+extern int g_ship_progress_count NOT_SDA;
+extern int g_space_ship_max_health MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR;
 typedef struct HudCounters {
     int unknown[2];
@@ -20,13 +20,13 @@ typedef struct HudCounters {
     int leftCount;
     int leftIcons;
 } HudCounters;
-extern HudCounters D_L22_001B1910 NOT_SDA;
-extern char D_L22_001AF4D8[] NOT_SDA;
-extern int D_L22_001B2AC8 MACRO_ADDR;
-extern int D_L22_001B2ACC MACRO_ADDR;
-extern int D_L22_001B2AD0 MACRO_ADDR;
-extern u64 D_L22_001AF418 MACRO_ADDR;
-extern u64 D_L22_001AF428 MACRO_ADDR;
+extern HudCounters g_ship_pickup_table NOT_SDA;
+extern char g_str_hud_count_format[] NOT_SDA;
+extern int g_pickup_message_kind MACRO_ADDR;
+extern int g_pickup_message_amount MACRO_ADDR;
+extern int g_pickup_message_timer MACRO_ADDR;
+extern u64 g_hud_color_word_left MACRO_ADDR;
+extern u64 g_hud_color_word_right MACRO_ADDR;
 extern u8 *ref_L22_003A5018_00 __attribute__((sda));
 extern float ref_L22_003A5018_01 __attribute__((sda)), ref_L22_003A5018_02 __attribute__((sda));
 extern u64 ref_L22_003A5018_03 __attribute__((sda)), ref_L22_003A5018_04 __attribute__((sda));
@@ -87,10 +87,10 @@ extern void FontSetWindow(void *, int, int, int, int, int, int, int, int);
 extern void level_forward_draw_args(void *, unsigned int, char *, int, int, int, int, char *, int, int);
 extern void module_l00_call_handler_2(void);
 
-extern int D_L22_001B2980;
+extern int g_hud_label_mode;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L22_001B2980;
+    int mode = g_hud_label_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -107,7 +107,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 
 static __inline__ int screen_coord(int mode, float value, float offset)
 {
-    float scaled = value * D_L22_001B2984 + 0.5f;
+    float scaled = value * g_hud_l22_scale + 0.5f;
 
     if (mode == 1)
         return (int)(scaled + offset);
@@ -127,114 +127,114 @@ int func_PAL_L22_003A83A8(void) {
     char *label, *hint;
 
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC3);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC3);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC4);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC4);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x60241700, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC5);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC5);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC3);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC3);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC4);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC4);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x60241700, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)table_find_by_id(D_L22_001A904C + 0x8710, 0xC5);
-        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
+        void *sprite = (void *)(u32)table_find_by_id(g_hud_l22_sprite_base + 0x8710, 0xC5);
+        float sy = (float)screen_coord(g_hud_label_mode, ref_L22_003A5018_02, 3.0f);
         gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     one = 1;
     { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, one);
-    hud_draw_sprite_gradient(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
+    hud_draw_sprite_gradient(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, g_hud_l22_scale, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
     { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, 0);
-    hud_draw_sprite_gradient(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
+    hud_draw_sprite_gradient(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, g_hud_l22_scale, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
 
     {
-        float ratio = (float)D_0018B694 / (float)*(short *)(ctl + 0x324);
+        float ratio = (float)g_ship_progress_count / (float)*(short *)(ctl + 0x324);
         int x, width;
         colours.d[0] = ref_L22_003A5018_03;
         width = ref_L22_003A5018_12;
         x = ref_L22_003A5018_09 + ref_L22_003A5018_07 + ref_L22_003A5018_13;
         y = ref_L22_003A5018_10 + ref_L22_003A5018_08 / 2 - ref_L22_003A5018_11 / 2;
         ref_L22_003A5018_43++;
-        colours.d[1] = D_L22_001AF418;
+        colours.d[1] = g_hud_color_word_left;
         colours.w[1] = (colours.w[1] & 0xFFFF00FF) | ((int)(ratio * 255.0f) << 8);
         gfx_draw_screen_rectangle(x, y, x + (int)(ratio * (float)width), y + ref_L22_003A5018_11, 0xFFFFF1, &colours);
     }
     {
-        float ratio = *(float *)(ctl + 0x20) / (float)D_L22_001B2AA8;
+        float ratio = *(float *)(ctl + 0x20) / (float)g_space_ship_max_health;
         int right, width, height;
         colours.d[0] = ref_L22_003A5018_04;
         width = ref_L22_003A5018_12;
         right = g_screen_width - ref_L22_003A5018_09 - ref_L22_003A5018_07 - 4;
         colours.w[0] = (colours.w[1] & 0xFFFF00FF) | ((int)(ratio * 255.0f) << 8);
         height = ref_L22_003A5018_11;
-        colours.d[1] = D_L22_001AF428;
+        colours.d[1] = g_hud_color_word_right;
         gfx_draw_screen_rectangle(right - (int)(ratio * (float)width), y, right, y + height, 0xFFFFF1, &colours);
     }
 
     {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
-        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_22, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_22, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
     }
     {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
-        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_26, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_26, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
-    sprintf(textBuffer, D_L22_001AF4D8, D_L22_001B1910.leftCount);
+    sprintf(textBuffer, g_str_hud_count_format, g_ship_pickup_table.leftCount);
     text = textBuffer;
     {
-    int value = label_y(obj, (float)ref_L22_003A5018_33, D_L22_001B2984, 0.5f, 1);
+    int value = label_y(obj, (float)ref_L22_003A5018_33, g_hud_l22_scale, 0.5f, 1);
     colour = ref_L22_003A5018_30;
     text_draw_centered_medium(ref_L22_003A5018_32, value, colour, text, func_001157AC(text));
     }
-    sprintf(text, D_L22_001AF4D8, D_L22_001B1910.rightCount);
+    sprintf(text, g_str_hud_count_format, g_ship_pickup_table.rightCount);
     {
-    int value = label_y((void *)colour, (float)ref_L22_003A5018_35, D_L22_001B2984, 0.5f, 1);
+    int value = label_y((void *)colour, (float)ref_L22_003A5018_35, g_hud_l22_scale, 0.5f, 1);
     colour = ref_L22_003A5018_30;
     text_draw_centered_medium(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }
-    if (D_L22_001B1910.leftIcons) {
+    if (g_ship_pickup_table.leftIcons) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, one2);
-        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_36, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_36, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (D_L22_001B1910.leftIcons >= 2) {
+    if (g_ship_pickup_table.leftIcons >= 2) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
-        hud_draw_sprite_gradient(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, x, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (D_L22_001B1910.rightIcons) {
+    if (g_ship_pickup_table.rightIcons) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
-        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_38, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, ref_L22_003A5018_38, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (D_L22_001B1910.rightIcons >= 2) {
+    if (g_ship_pickup_table.rightIcons >= 2) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
-        hud_draw_sprite_gradient(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        hud_draw_sprite_gradient(sprite, x, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (D_L22_001B2AC8 != -1 && obj[0x95] != 10) {
-        switch (D_L22_001B2AC8) {
+    if (g_pickup_message_kind != -1 && obj[0x95] != 10) {
+        switch (g_pickup_message_kind) {
         case 0: level_l00_call_module_handler_with_arg_9((int)GetLocalizedString(0xEC8), -1); break;
         case 2: GetLocalizedString(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
-        case 1: GetLocalizedString(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
+        case 1: GetLocalizedString(0x1240); func_0029CC50(0x1240, g_pickup_message_amount, -1); break;
         }
         ref_L22_003A5018_05 = 0;
-        math_fast_float_d(&D_L22_001B2AD0);
-        if (D_L22_001B2AD0 <= 0) D_L22_001B2AC8 = -1;
+        math_fast_float_d(&g_pickup_message_timer);
+        if (g_pickup_message_timer <= 0) g_pickup_message_kind = -1;
     }
     if (ref_L22_003A5018_31) {
         FontSetWindow(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);

@@ -82,7 +82,7 @@ done:
 extern int func_36C158();
 extern int func_36C1B0(float);
 
-int func_PAL_L06_00448968(char *a0, int a1, int a2)
+int actor_set_glow_effect_pal(char *a0, int a1, int a2)
 {
     char *p = *(char **)(a0 + 0x68);
     int result;

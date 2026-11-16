@@ -12,9 +12,9 @@ typedef struct {
     int flags, mask, response, surface, gravity;
     float maxTurn;
 } CollisionQuery;
-extern int D_L00_001A8FF4 MACRO_ADDR;
-extern Vector D_L00_001BF240;
-extern u16 D_L00_001B1FF0[] MACRO_ADDR;
+extern int g_hero_action_blocked_flag MACRO_ADDR;
+extern Vector g_hero_l00_velocity;
+extern u16 g_decoy_moby_index_list[] MACRO_ADDR;
 extern void anim_start_blended(char *, int, int, int), moby_get_facing_direction(void *, float *);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
@@ -82,7 +82,7 @@ void decoy_update(char *actor) {
         collision = CollideSweptSphere(&scratch.phase.query);
         qcopy((actor + 0x10), &scratch.phase.query.position);
         qcopy((state + 0x10), &scratch.phase.query.velocity);
-        if (D_L00_001A8FF4 && *(float *)(actor + 0x18) < 462.43f) {
+        if (g_hero_action_blocked_flag && *(float *)(actor + 0x18) < 462.43f) {
             vec_add_random_offset(scratch.scatter.f, 0.5f);
             SpawnExplosionEffects(actor, &scratch.scatter, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
@@ -96,7 +96,7 @@ void decoy_update(char *actor) {
             *(char **)(state + 0x38) = hit;
         }
         {
-            FastVecScale(&scratch.desired, &D_L00_001BF240, 0.0009765625f);
+            FastVecScale(&scratch.desired, &g_hero_l00_velocity, 0.0009765625f);
             vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
             vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
             FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
@@ -136,7 +136,7 @@ response_done:
         break;
     case 6:
         table_clear_entry_flag(*(int *)(state + 0x20));
-        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, D_L00_001B1FF0);
+        if (!*(int *)(state + 0x40)) RemoveMobyFromIndexList((int)actor, g_decoy_moby_index_list);
         moby_mark_spawned(actor);
         return;
     }

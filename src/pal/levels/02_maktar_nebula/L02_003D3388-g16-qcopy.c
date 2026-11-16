@@ -36,18 +36,18 @@ typedef struct State_L00_003C27A0 {
     f32 base_z;         /* 0x1FB4 */
 } State_L00_003C27A0;
 
-extern s32 D_L00_001C9340 __attribute__((nosda));
+extern s32 g_tutorial_points __attribute__((nosda));
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u16 **D_L00_001A9014;
-extern u16 *D_L00_001FA920[];
-extern u8 *D_L00_001B1E9C;
-extern u8 *D_L00_001B251C;
-extern u8 *D_L00_001B2514;
-extern s16 D_L00_00226900[];
-extern Vec_L00_003C27A0 D_L00_001AFEB0[] __attribute__((sda));
-extern Vec_L00_003C27A0 D_L00_001AFEA0 __attribute__((sda));
-extern s32 D_L00_001AFE98[2] __attribute__((sda));
-extern s32 D_L00_001AFE90[2] __attribute__((sda));
+extern u16 **g_level_reloc_record;
+extern u16 *g_turn_state_table[];
+extern u8 *g_moby_array_base;
+extern u8 *g_tie_matrix_table;
+extern u8 *g_tie_table;
+extern s16 g_tie_class_ids[];
+extern Vec_L00_003C27A0 g_follower_color_table[] __attribute__((sda));
+extern Vec_L00_003C27A0 g_follower_color_vec __attribute__((sda));
+extern s32 g_follower_scatter_params[2] __attribute__((sda));
+extern s32 g_follower_scatter_params_b[2] __attribute__((sda));
 
 extern u8 *CreateMoby(s32);
 extern void moby_init_child_from_parent(void *, void *);
@@ -58,12 +58,12 @@ extern float mat_fast_helper_a(float, float);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern void euler_rotation_basis(void *, void *);
 extern float math_fabs(float);
-extern void func_PAL_L00_0032C600(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
+extern void ScatterObjectPieces_pal(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 extern s32 math_random_int_range(s32, s32);
-extern void func_PAL_L00_00323918(void *, s32, s32, s32, s32, s32, float);
+extern void part_spawn_bolt_pickups_pal(void *, s32, s32, s32, s32, s32, float);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
 extern void part_spawn_random_spark_rays(char *, char *, float, float);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern s32 PlayMobySound(s32, s32, void *);
 extern void moby_mark_spawned(void *);
 extern s32 math_fast_helper_a(void *, float);
@@ -89,7 +89,7 @@ void func_PAL_L02_003D3388(u8 *self)
     s32 id;
     s32 i;
 
-    if (st->gate >= 0 && D_L00_001C9340 != st->gate)
+    if (st->gate >= 0 && g_tutorial_points != st->gate)
         return;
     switch (self[0x20]) {
     case 0:
@@ -110,22 +110,22 @@ void func_PAL_L02_003D3388(u8 *self)
         }
         BuildObjectAttachmentTransforms(self, st->track, 100, st->group_b, st->group, st->x18, 7, 0);
         if (g_current_map_index[0] == 2 && st->group_b != -1) {
-            p = D_L00_001FA920[st->group_b];
+            p = g_turn_state_table[st->group_b];
             do {
                 id = *p & 0x7FFF;
-                level_set_record_payload_by_key(st->track, 0, id, *(u8 **)(D_L00_001B1E9C + (id << 8) + 0x68) + 0x50);
+                level_set_record_payload_by_key(st->track, 0, id, *(u8 **)(g_moby_array_base + (id << 8) + 0x68) + 0x50);
             } while ((s16)*p++ >= 0);
         }
         if (st->moby != 0) {
             vec_clear_128(st->moby + 0xF0);
             st->target = 0;
-            for (q = D_L00_001A9014[st->group];
-                 q != 0 && ((s16)q[-1] >= 0 || q == D_L00_001A9014[st->group]); q++) {
-                e = D_L00_001B251C + ((*q & 0x7FFF) << 6);
+            for (q = g_level_reloc_record[st->group];
+                 q != 0 && ((s16)q[-1] >= 0 || q == g_level_reloc_record[st->group]); q++) {
+                e = g_tie_matrix_table + ((*q & 0x7FFF) << 6);
                 if (e == 0)
                     break;
-                rec = D_L00_001B2514 + ((*q & 0x7FFF) << 5);
-                if (D_L00_00226900[rec[0x1D]] == 0xAB6) {
+                rec = g_tie_table + ((*q & 0x7FFF) << 5);
+                if (g_tie_class_ids[rec[0x1D]] == 0xAB6) {
                     st->target = e;
                     break;
                 }
@@ -144,28 +144,28 @@ void func_PAL_L02_003D3388(u8 *self)
                 *(f32 *)(st->moby + 0x2C) = *(f32 *)(*(u8 **)(st->moby + 0x24) + 0x24) * 1.35f;
                 euler_rotation_basis(st->moby + 0xC0, st->moby + 0xF0);
                 if (math_fabs(*(f32 *)(st->moby + 0xF8)) > 1.6f) {
-                    qcopy_nc(&cols[0], D_L00_001AFEB0);
-                    qcopy_nc(&cols[1], &D_L00_001AFEA0);
+                    qcopy_nc(&cols[0], g_follower_color_table);
+                    qcopy_nc(&cols[1], &g_follower_color_vec);
                 } else {
-                    qcopy_nc(&cols[0], &D_L00_001AFEA0);
-                    qcopy_nc(&cols[1], D_L00_001AFEB0);
+                    qcopy_nc(&cols[0], &g_follower_color_vec);
+                    qcopy_nc(&cols[1], g_follower_color_table);
                 }
-                func_PAL_L00_0032C600(st->moby, cols, D_L00_001AFE98, D_L00_001AFE90, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
-                func_PAL_L00_00323918(st->moby, 30, 50, 2, -1, math_random_int_range(3, 5), 0.0f);
+                ScatterObjectPieces_pal(st->moby, cols, g_follower_scatter_params, g_follower_scatter_params_b, 0, 0, -1, 1, 0xFFFE, 0xFF, 0);
+                part_spawn_bolt_pickups_pal(st->moby, 30, 50, 2, -1, math_random_int_range(3, 5), 0.0f);
                 snd_play_from_class_bank(0, 0, st->moby, 0xE9B);
                 here = *(Vec_L00_003C27A0 *)(self + 0x10);
                 part_spawn_random_spark_rays((char *)st->moby, (char *)&here, 1.5f, 0.14000002f);
-                func_PAL_L00_003FB330(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
-                for (r = D_L00_001A9014[st->group];
-                     r != 0 && ((s16)r[-1] >= 0 || r == D_L00_001A9014[st->group]); r++) {
-                    spot = D_L00_001B2514 + ((*r & 0x7FFF) << 5);
+                SpawnExplosion_pal(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
+                for (r = g_level_reloc_record[st->group];
+                     r != 0 && ((s16)r[-1] >= 0 || r == g_level_reloc_record[st->group]); r++) {
+                    spot = g_tie_table + ((*r & 0x7FFF) << 5);
                     if (spot == 0)
                         break;
                     spot[0x1C] = 0;
                 }
-                for (t = D_L00_001A9014[st->group];
-                     t != 0 && ((s16)t[-1] >= 0 || t == D_L00_001A9014[st->group]); t++) {
-                    f = D_L00_001B251C + ((*t & 0x7FFF) << 6);
+                for (t = g_level_reloc_record[st->group];
+                     t != 0 && ((s16)t[-1] >= 0 || t == g_level_reloc_record[st->group]); t++) {
+                    f = g_tie_matrix_table + ((*t & 0x7FFF) << 6);
                     if (f == 0)
                         break;
                     for (i = 0; i < 3; i++) {

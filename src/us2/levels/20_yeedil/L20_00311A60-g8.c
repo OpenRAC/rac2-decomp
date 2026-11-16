@@ -25,17 +25,17 @@ typedef struct {
         } named;
     } refs;
 } YeedilStatePrefix;
-extern YeedilStatePrefix D_L20_001BDCC0;
+extern YeedilStatePrefix g_yeedil_state_prefix;
 extern u32 g_current_map_index;
 typedef struct { u8 before_owner[0x5C0]; int owner; } YeedilHeroPrefix;
 extern YeedilHeroPrefix g_hero_state;
-extern u8 D_0018A550[];
+extern u8 g_hero_matrix[];
 typedef struct {
     Vector origin, point;
     float unknown20, scale;
 } YeedilCameraPrefix;
-extern YeedilCameraPrefix D_L20_001C6AE0;
-extern u8 D_L20_001BA1F0[];
+extern YeedilCameraPrefix g_yeedil_camera_prefix;
+extern u8 g_level_script_matrix[];
 typedef struct {
     u8 before_effect[0x160];
     float scale1;
@@ -44,14 +44,14 @@ typedef struct {
     float scale2;
     int unknown184, count2;
 } YeedilEffectPrefix;
-extern YeedilEffectPrefix D_L20_001B9E80;
-extern int D_L20_001A9430 __attribute__((sda));
-extern int D_L20_001A9434 __attribute__((sda));
-extern int D_L20_001A9438 __attribute__((sda));
-extern int D_L20_001A943C __attribute__((sda));
-extern int D_L20_001A9440 __attribute__((sda));
-extern Vector D_L20_001A9420 SDATA(D_L20_001A9420);
-extern int D_L20_001AF3B0[] __attribute__((sda));
+extern YeedilEffectPrefix g_hero_l20_extra_state;
+extern int g_level_script_state_limit __attribute__((sda));
+extern int g_level_script_lower_a __attribute__((sda));
+extern int g_level_script_upper_a __attribute__((sda));
+extern int g_level_script_lower_b __attribute__((sda));
+extern int g_level_script_upper_b __attribute__((sda));
+extern Vector g_level_script_offset_vec SDATA(D_L20_001A9420);
+extern int g_level_script_flags[] __attribute__((sda));
 extern void anim_start_startup_animations(void *);
 extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(char *,float *,s32,s32,float);
@@ -83,9 +83,9 @@ void func_US2_L20_00311A60(void *incoming)
     anim_start_startup_animations(incoming);
     {
         int i;
-        for (i = 0; i < D_L20_001BDCC0.count; ++i) {
+        for (i = 0; i < g_yeedil_state_prefix.count; ++i) {
             u8 *object;
-            object = D_L20_001BDCC0.refs.objects[i];
+            object = g_yeedil_state_prefix.refs.objects[i];
             if (object && *(s16 *)(object+0xAA) == 0xE29)
                 *(u16 *)(object+0x34) |= 0x800;
             if (*(s16 *)(object+0xAA) == 0xD54)
@@ -103,51 +103,51 @@ void func_US2_L20_00311A60(void *incoming)
     }
     if (g_current_map_index != 20) return;
     {
-        if ((u32)(D_L20_001BDCC0.mode-4) < 2) {
+        if ((u32)(g_yeedil_state_prefix.mode-4) < 2) {
             {
                 YeedilHeroPrefix *hero = &g_hero_state;
-                int owner = D_L20_001BDCC0.refs.named.owner;
+                int owner = g_yeedil_state_prefix.refs.named.owner;
                 hero->owner = owner;
-                if (D_L20_001BDCC0.mode == 4) {
-                    hero->owner = D_L20_001BDCC0.refs.named.secondary_owner;
-                    target = D_L20_001BDCC0.refs.named.secondary_target;
-                    lower = D_L20_001A9434;
-                    upper = D_L20_001A9438;
+                if (g_yeedil_state_prefix.mode == 4) {
+                    hero->owner = g_yeedil_state_prefix.refs.named.secondary_owner;
+                    target = g_yeedil_state_prefix.refs.named.secondary_target;
+                    lower = g_level_script_lower_a;
+                    upper = g_level_script_upper_a;
                 } else {
-                    lower = D_L20_001A943C;
+                    lower = g_level_script_lower_b;
                     /* Same value as the store above. It leaves no instruction of its
                      * own, but it keeps owner live into this arm. */
                     hero->owner = owner;
-                    target = D_L20_001BDCC0.refs.named.alternate;
-                    upper = D_L20_001A9440;
+                    target = g_yeedil_state_prefix.refs.named.alternate;
+                    upper = g_level_script_upper_b;
                 }
                 {
-                    YeedilCameraPrefix *camera = &D_L20_001C6AE0;
-                    if (D_L20_001BDCC0.state == lower) {
+                    YeedilCameraPrefix *camera = &g_yeedil_camera_prefix;
+                    if (g_yeedil_state_prefix.state == lower) {
                         mem_clear(camera,0,0x50);
-                        D_L20_001AF3B0[0] = 1;
+                        g_level_script_flags[0] = 1;
                         camera->scale = 0.8f;
                     }
-                    if (lower < D_L20_001BDCC0.state && D_L20_001BDCC0.state < upper) {
+                    if (lower < g_yeedil_state_prefix.state && g_yeedil_state_prefix.state < upper) {
                         moby_transform_joint_point(target,0,matrix);
-                        copy_matrix3x4(D_0018A550,matrix);
+                        copy_matrix3x4(g_hero_matrix,matrix);
                         value = camera->scale;
                         value += (12.0f-value)*0.07f;
                         camera->scale = value;
                         moby_transform_joint_to_world(target,0,camera);
-                        vec_scale_to_length(&camera->point,D_0018A550,camera->scale);
+                        vec_scale_to_length(&camera->point,g_hero_matrix,camera->scale);
                         FastVecAdd(&camera->point,camera,&camera->point);
                         InitializeBoltPointChain(target);
                         beam_update_chain_points(target);
                         gfx_add_draw_callback_third(beam_draw_ribbons_level,target);
-                        if (D_L20_001BDCC0.mode == 5 && D_L20_001BDCC0.state == upper-1) {
+                        if (g_yeedil_state_prefix.mode == 5 && g_yeedil_state_prefix.state == upper-1) {
                             offset.q = 0;
                             offset.f[0] = 18.0f; offset.f[1] = -2.5f; offset.f[2] = 1.0f;
-                            matrix_mul_vec3(&offset,&offset,D_L20_001BA1F0);
-                            FastVecAdd(&offset,&offset,D_L20_001BA1F0-0x230);
-                            FastVecSub(&work,D_L20_001BA1F0-0x230,&offset);
+                            matrix_mul_vec3(&offset,&offset,g_level_script_matrix);
+                            FastVecAdd(&offset,&offset,g_level_script_matrix-0x230);
+                            FastVecSub(&work,g_level_script_matrix-0x230,&offset);
                             vec_scale_to_length(&work,&work,1.0f);
-                            part_spawn_blast_effect_moby(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
+                            part_spawn_blast_effect_moby(*(void **)(g_hero_matrix-0x170),&offset,&work,0.0f);
                         }
                     } else g_hero_state.owner = 0;
                 }
@@ -157,24 +157,24 @@ void func_US2_L20_00311A60(void *incoming)
     {
         int i;
         u8 *object;
-        if ((u32)(D_L20_001BDCC0.mode-2) < 3) {
-            for (i = 0; i < D_L20_001BDCC0.count; ++i) {
+        if ((u32)(g_yeedil_state_prefix.mode-2) < 3) {
+            for (i = 0; i < g_yeedil_state_prefix.count; ++i) {
                 u16 word;
-                object = D_L20_001BDCC0.refs.objects[i];
+                object = g_yeedil_state_prefix.refs.objects[i];
                 word = *(u16 *)(object+0xAA);
                 if ((u32)(word-0xD0E) < 2) {
                     *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
                 }
-                if (*(s16 *)(object+0xAA) == 0xCE0 && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
+                if (*(s16 *)(object+0xAA) == 0xCE0 && (g_yeedil_state_prefix.mode != 3 || g_yeedil_state_prefix.state < g_level_script_state_limit))
                     EmitScaledObjectParticles();
             }
         }
-        if (D_L20_001BDCC0.mode == 3 && D_L20_001BDCC0.state == D_L20_001A9430) {
-            qcopy(matrix,(u8 *)D_L20_001BDCC0.refs.named.target+0x10);
-            FastVecAdd(matrix,matrix,&D_L20_001A9420);
+        if (g_yeedil_state_prefix.mode == 3 && g_yeedil_state_prefix.state == g_level_script_state_limit) {
+            qcopy(matrix,(u8 *)g_yeedil_state_prefix.refs.named.target+0x10);
+            FastVecAdd(matrix,matrix,&g_level_script_offset_vec);
             SpawnExplosion(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
             {
-                YeedilEffectPrefix *effect = &D_L20_001B9E80;
+                YeedilEffectPrefix *effect = &g_hero_l20_extra_state;
                 effect->scale1 = 0.09f;
                 effect->count1 = 0x37;
                 effect->scale2 = 0.08f;

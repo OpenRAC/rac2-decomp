@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern const s32 D_001A7A00;
+extern const s32 g_player_stats;
 extern s8 g_hero_position[];
 extern s32 ref_L16_003D6D00_00;
 extern struct { s32 w0; s32 w1; s32 w2; } ref_L16_003D6D00_01;
@@ -63,7 +63,7 @@ void hero_pull_and_hurt_on_contact(s8 *moby) {
             if ((*(s32 *)((s8 *)(hero_base) + (0x340))) != 0 && (*(s32 *)((s8 *)(hero_base) + (0x2294))) != 0x38) {
                 ref_L16_003D6D00_05(offset, hero, hero_pos);
                 if (ref_L16_003D6D00_06(hero + 0x60, offset, 0, (*(s32 *)((s8 *)(hero_base) + (0x2290))), 0) != 0 && ref_L16_003D6D00_07() != 2 && ref_L16_003D6D00_01.w0 == 0) {
-                    ref_L16_003D6D00_08(hero + 0x244C, 0, (s32)((f32)D_001A7A00 * 0.333f));
+                    ref_L16_003D6D00_08(hero + 0x244C, 0, (s32)((f32)g_player_stats * 0.333f));
                     if ((*(s32 *)((s8 *)(hero_base) + (0x24CC))) != 0) {
                         ref_L16_003D6D00_09(0x38, 1);
                     }

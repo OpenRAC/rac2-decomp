@@ -20,10 +20,10 @@ typedef struct {
     short h24EC;
 } Res_189E20;
 
-extern unsigned char D_00139580[];
+extern unsigned char g_seeker_weapon_index[];
 extern AngleRecord_262570 g_weapon_l00_table[];
 extern Res_189E20 g_hero_state;
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
 extern char *func_US2_L00_003AB8F8(void *, void *, void *, void *, int);
@@ -35,10 +35,10 @@ void func_US2_L00_003ACCF0(char *a0, char *a1) {
     Res_189E20 *g;
     void *p;
 
-    e = &g_weapon_l00_table[D_00139580[0]];
+    e = &g_weapon_l00_table[g_seeker_weapon_index[0]];
     angle = e->angle * 0.01666666753590107f;
     if (g_hero_state.i2294 == 0x1D) {
-        vec_scale_to_length(buf, D_L00_001B8FF0, angle);
+        vec_scale_to_length(buf, g_cam_follow_matrix, angle);
     } else if (g_hero_state.h24EC == 1) {
         vec_scale_to_length(buf, a1 + 0xD0, -angle);
     } else {

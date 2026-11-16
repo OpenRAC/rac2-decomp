@@ -2,8 +2,8 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L03_001B064C __attribute__((sda));
-extern char D_L03_001A8F20[] __attribute__((sda));
+extern float g_trail_projectile_trace_length __attribute__((sda));
+extern char g_effect_descriptor_default[] __attribute__((sda));
 typedef struct {
     char pad[0x1C];
     int count;
@@ -11,7 +11,7 @@ typedef struct {
     char pad2[0x10];
     float normal[4];
 } HitResult;
-extern HitResult D_L03_001BFDC0;
+extern HitResult g_hero_ground_collision;
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
@@ -42,9 +42,9 @@ void trail_l03_projectile_update(char *moby)
     case 0: {
         float value;
         FastVecAdd(nextPosition, moby + 0x10, vars);
-        vec_scale_to_length(traceEnd, moby + 0xc0, D_L03_001B064C);
+        vec_scale_to_length(traceEnd, moby + 0xc0, g_trail_projectile_trace_length);
         FastVecAdd(traceEnd, traceEnd, nextPosition);
-        make_hit_descriptor(matrix, moby, 1, D_L03_001A8F20, (float)*(int *)(vars + 0x38));
+        make_hit_descriptor(matrix, moby, 1, g_effect_descriptor_default, (float)*(int *)(vars + 0x38));
         *(TI128 *)(trailPosition) = *(TI128 *)(moby + 0x10);
         FastVecScale(trailStep, vars, -0.2f);
         i = 4;
@@ -54,14 +54,14 @@ void trail_l03_projectile_update(char *moby)
             color = math_random_int_below(255);
             vec_random_direction(particlePosition, 0.0f, 0.1f);
             FastVecAdd(particlePosition, particlePosition, trailPosition);
-            part_spawn_gravity_fade(particlePosition, D_L03_001A8F20, 15, 0x808080, color, 32, 0, value*210000.0f, value*42000.0f, 0.0f, 0);
+            part_spawn_gravity_fade(particlePosition, g_effect_descriptor_default, 15, 0x808080, color, 32, 0, value*210000.0f, value*42000.0f, 0.0f, 0);
             FastVecAdd(trailPosition, trailPosition, trailStep);
         } while (i >= 0);
-        if (CollLine(nextPosition, traceEnd, 0, moby, matrix) && D_L03_001BFDC0.count > 0) {
-            *(TI128 *)(vars + 0x20) = *(TI128 *)(D_L03_001BFDC0.pos);
-            *(TI128 *)(vars + 0x10) = *(TI128 *)(D_L03_001BFDC0.normal);
-            *(float *)(vars + 0x34) = D_L03_001B064C;
-            part_l00_spawn_spark_burst_3(D_L03_001BFDC0.pos, 10, 1);
+        if (CollLine(nextPosition, traceEnd, 0, moby, matrix) && g_hero_ground_collision.count > 0) {
+            *(TI128 *)(vars + 0x20) = *(TI128 *)(g_hero_ground_collision.pos);
+            *(TI128 *)(vars + 0x10) = *(TI128 *)(g_hero_ground_collision.normal);
+            *(float *)(vars + 0x34) = g_trail_projectile_trace_length;
+            part_l00_spawn_spark_burst_3(g_hero_ground_collision.pos, 10, 1);
             moby_set_state(moby, 1, -1);
         }
         *(TI128 *)(moby + 0x10) = *(TI128 *)(nextPosition);

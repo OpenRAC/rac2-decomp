@@ -4,7 +4,7 @@ extern float fast_vec_dist(void *, void *);
 extern float math_facing_angle_from_vector(char *, float *, const void *);
 extern float vec_get_vertical_offset(char *, char *, char *);
 extern void vec_add_transformed_point(float, float, float, char *, char *);
-extern char D_L13_001B2590[] MACRO_ADDR;
+extern char g_creature_ground_ref_pos[] MACRO_ADDR;
 
 void creature_resolve_ground_coll(char *object, char *state, char *target,
                        char *old_position, char *transform)
@@ -13,7 +13,7 @@ void creature_resolve_ground_coll(char *object, char *state, char *target,
     char *position;
     float height;
     moby_probe_ground(object, state);
-    height = fast_vec_dist(object + 0x10, D_L13_001B2590);
+    height = fast_vec_dist(object + 0x10, g_creature_ground_ref_pos);
     if (height < *(float *)(state + 0x90) - *(float *)(state + 8)) {
         *(int *)(state + 0x94) |= 2;
         blocked = 1;
@@ -34,7 +34,7 @@ void creature_resolve_ground_coll(char *object, char *state, char *target,
     if (blocked) {
         qcopy(position, old_position);
         moby_probe_ground(object, state);
-        height = fast_vec_dist(position, D_L13_001B2590);
+        height = fast_vec_dist(position, g_creature_ground_ref_pos);
     }
     if (height <= *(float *)(state + 0x90) + 0.005f) {
         vec_get_vertical_offset(object, state + 0xa0, 0);

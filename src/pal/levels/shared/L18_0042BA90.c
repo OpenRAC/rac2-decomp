@@ -3,11 +3,11 @@
 #include "common.h"
 typedef unsigned char BatchA_A18_u8;
 typedef int BatchA_A18_s32;
-extern BatchA_A18_u8 D_0018C0D4;
+extern BatchA_A18_u8 g_screen_mode_flag;
 extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 extern BatchA_A18_s32 point_in_path_xy(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
-extern BatchA_A18_s32 D_001FE480[];
-extern BatchA_A18_s32 D_001FE480[];
+extern BatchA_A18_s32 g_path_pointer_table[];
+extern BatchA_A18_s32 g_path_pointer_table[];
 extern BatchA_A18_s32 protopet_is_in_either_active_state(BatchA_A18_u8 *s);
 extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
 extern u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
@@ -19,7 +19,7 @@ extern BatchA_A18_s32 path_apply_entry_to_moby(BatchA_A18_u8 *a0, BatchA_A18_s32
                                         BatchA_A18_s32 a2, BatchA_A18_s32 a3);
 extern BatchA_A18_s32 path_get_entry_id(void *a0);
 
-void func_PAL_L18_0042BA90(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2, float f12) {
+void moby_start_or_forward_anim_pal(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2, float f12) {
     if (a0[0xBC] == 0) {
         if (a0[0x43] != a1) {
             func_00335388(a0, a1, a2, (BatchA_A18_s32)f12);
@@ -34,7 +34,7 @@ extern int math_fast_float_d(void *a0);
 extern int math_fast_float_d(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */
-void func_PAL_L18_0042BAE0(BatchA_A18_u8 *a0) {
+void moby_rebuild_scale_matrix_pal(BatchA_A18_u8 *a0) {
     BatchA_A18_u8 *p = *(BatchA_A18_u8 **)(a0 + 0x68);
     if (a0[0x21] != 0xFF) {
         if (*(BatchA_A18_u8 *)(p + 0x39F) != 0) {

@@ -15,12 +15,12 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern char *joba_swirl_effect_create(void *, void *, void *, float, float, float, float);
 extern TI128 g_hero_position;
-extern u16 D_L11_001B19A8 __attribute__((sda));
-extern s32 D_L11_001B19AC __attribute__((sda));
-extern float D_L11_001B19B0 __attribute__((sda));
-extern float D_L11_001B19B4 __attribute__((sda));
+extern u16 g_timed_effect_duration __attribute__((sda));
+extern s32 g_timed_effect_chance __attribute__((sda));
+extern float g_timed_effect_gravity __attribute__((sda));
+extern float g_timed_effect_radius __attribute__((sda));
 
-extern s32 D_L11_005A0000 __attribute__((sda));
+extern s32 g_level_global_word __attribute__((sda));
 
 extern float func_32CB48(float f12, float f13);
 extern s32 func_32CAB0(s32 a0);
@@ -88,11 +88,11 @@ s32 joba_group_has_three_live_objects(u8 *object)
 extern void func_2FD7E8(void *a0, int a1, void *a2, void *a3, int a4, int a5,
                         int a6, int a7, float f12);
 
-extern s32 D_L11_001B1C50 __attribute__((sda));
+extern s32 g_scene_effect_param_a __attribute__((sda));
 
-extern u8 D_L11_001B1C10 __attribute__((sda));
+extern u8 g_scene_effect_param_bytes __attribute__((sda));
 
-extern s32 D_L11_001B1C54;
+extern s32 g_scene_effect_param_b;
 
 /* hands the object's 0x270 and 0x370 tables, its 0x4B0/0x4B4/0x4B8 words and the level's
    own 0x1B1C50/0x1B1C54 state to the scene manager */
@@ -100,9 +100,9 @@ void joba_submit_scene_effect_params(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
-    func_2FD7E8(&D_L11_001B1C10, 4, vars + 0x270, vars + 0x370,
+    func_2FD7E8(&g_scene_effect_param_bytes, 4, vars + 0x270, vars + 0x370,
                 *(s32 *)(vars + 0x4B4), *(s32 *)(vars + 0x4B0),
-                D_L11_001B1C50, D_L11_001B1C54,
+                g_scene_effect_param_a, g_scene_effect_param_b,
                 *(f32 *)(vars + 0x4B8));
 }
 
@@ -197,26 +197,26 @@ void part_spawn_timed_effect_near_anchor(JobObject *object)
     u16 timer;
 
     if (FastDecTimer(&state->spawnTimer)) {
-        timer = D_L11_001B19A8;
-        chance = D_L11_001B19AC;
+        timer = g_timed_effect_duration;
+        chance = g_timed_effect_chance;
         state->spawnTimer = timer;
         if (!math_random_int_below(chance)) {
             qcopy(position, &g_hero_position);
             FastVecSub(velocity, position, arena_get_center_point(object));
             velocity[2] = 0;
-            vec_scale_to_length(velocity, velocity, D_L11_001B19B4);
+            vec_scale_to_length(velocity, velocity, g_timed_effect_radius);
             FastVecAdd(position, velocity, arena_get_center_point(object));
             position[2] += 5.0f;
         } else {
             angle = math_random_float_range(-3.1415927410125732f, 3.1415927410125732f);
             base = arena_get_center_point(object);
-            position[0] = base[0] + D_L11_001B19B4 * math_fast_sin_or_cos_a(angle);
+            position[0] = base[0] + g_timed_effect_radius * math_fast_sin_or_cos_a(angle);
             base = arena_get_center_point(object);
-            position[1] = base[1] + D_L11_001B19B4 * math_fast_sin_or_cos_b(angle);
+            position[1] = base[1] + g_timed_effect_radius * math_fast_sin_or_cos_b(angle);
             position[2] = arena_get_center_point(object)[2] + 5.0f;
         }
         *(TI128 *)acceleration = 0;
-        acceleration[2] = D_L11_001B19B0 * (1.0f / 60.0f);
+        acceleration[2] = g_timed_effect_gravity * (1.0f / 60.0f);
         *(TI128 *)velocity = *(TI128 *)acceleration;
         joba_swirl_effect_create(object, velocity, position, state->health, (float)state->f34, 1.0f,
                           550.0f);
@@ -232,8 +232,8 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, void *);
 extern void moby_set_state(void *, s32, s32);
-extern char D_L11_001BA8C0[];
-extern s32 D_001A8FF4;
+extern char g_hero_l11_position[];
+extern s32 g_enemy_ai_frozen;
 extern void security_robot_deactivate(void *);
 extern void security_robot_update_pairing(void *);
 /* Two arguments: retail sets $a1 to the object func_002A9640 returned just before the call;
@@ -285,9 +285,9 @@ void turret_enemy_update(JobObject *object)
         state->turret = 0;
         security_robot_deactivate(object);
     }
-    if (state->f36E == 0 && object->stage != 18 && !D_001A8FF4) {
+    if (state->f36E == 0 && object->stage != 18 && !g_enemy_ai_frozen) {
         object->flags |= 0x400;
-        if (object->f31 && fast_vec_dist(object->position, D_L11_001BA8C0) < 24.0f) {
+        if (object->f31 && fast_vec_dist(object->position, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(object);
             object->f6F = 22;
         }
@@ -375,9 +375,9 @@ void turret_enemy_update_b(char *object)
         *(u8 *)(state + 0x28) = 3;
         flamethrower_robot_deactivate(object);
     }
-    if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
+    if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && g_enemy_ai_frozen == 0) {
         *(u16 *)(object + 0x34) |= 0x400;
-        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+        if (*(u8 *)(object + 0x31) != 0 && fast_vec_dist(object + 0x10, g_hero_l11_position) < 24.0f) {
             moby_update_ground_check(object);
             *(u8 *)(object + 0x6F) = 0x16;
         }

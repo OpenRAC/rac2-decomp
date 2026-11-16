@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00134688;
+extern int g_libc_flag;
 
 ASM_FUNC("asm/core", func_0011A830);
 
@@ -400,7 +400,7 @@ ASM_FUNC("asm/core", func_0011B090);
 /* Clears a library flag back to zero. */
 void libc_clear_flag(void)
 {
-    D_00134688 = 0;
+    g_libc_flag = 0;
 }
 
 /* Waits for the start of the screen refresh interval. */

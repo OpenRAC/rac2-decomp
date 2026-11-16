@@ -9,10 +9,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L15_001AC810 __attribute__((sda));
-extern int D_L15_001B2DB0 __attribute__((sda)), D_L15_001B2DB8 __attribute__((sda));
-extern Collision D_L15_001BFC00;
-extern Material D_L15_00276FF0[];
+extern int g_bounce_model_ptr __attribute__((sda));
+extern int g_ripple_l15_x __attribute__((sda)), g_ripple_l15_y __attribute__((sda));
+extern Collision g_hit_l15_result;
+extern Material g_item_l15_slot_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -78,7 +78,7 @@ void projectile_bounce_update(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L15_00276FF0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l15_slot_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -90,14 +90,14 @@ void projectile_bounce_update(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L15_001B2DB0, D_L15_001B2DB8, 1,
+            RippleDisturb(g_ripple_l15_x, g_ripple_l15_y, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L15_001BFC00.point.f[2];
+            frame.position.f[2] = g_hit_l15_result.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -117,16 +117,16 @@ void projectile_bounce_update(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L15_001BFC00;
+            Collision *collision = &g_hit_l15_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L15_001BFC00;
+                reread = &g_hit_l15_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L15_001AC810 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_bounce_model_ptr && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);

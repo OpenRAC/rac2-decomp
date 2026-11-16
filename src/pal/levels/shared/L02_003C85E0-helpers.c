@@ -42,7 +42,7 @@ struct L02SpinObj {
 };
 
 /* Measured pointer-list starts are accessed without guessing their capacities. */
-void func_PAL_L02_003C85E0(char *arg)
+void puzzle_reset_linked_part_group_pal(char *arg)
 {
     char *parent = *(char **)(arg + 0x68);
     struct L02ListObj **list;

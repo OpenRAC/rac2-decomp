@@ -7,22 +7,22 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector_L05_004432E0;
 
-extern char *D_001B1EC4, *D_L05_001B251C;
+extern char *g_ship_encounter_table, *g_feltzin_target_mobys;
 extern int g_current_map_index;
 /* Retail splits this address: its lui fills a branch delay slot on its own. */
-extern char *D_L05_00221D88 __attribute__((nosda));
-extern char *D_L05_001B2614 __attribute__((sda));
+extern char *g_chase_target __attribute__((nosda));
+extern char *g_feltzin_enemy_table __attribute__((sda));
 /* The output vector. As an incomplete sda array its address stays one `la` (an adjacent
    lui/addiu pair), which reorg does not copy into the early exits' delay slots. */
-extern char D_L05_001B3600[] __attribute__((sda));
-extern float D_L05_001B1AC0 __attribute__((sda));
-extern float D_L05_001B1AC4 __attribute__((sda)), D_L05_001B1AC8 __attribute__((sda));
-extern float D_L05_001B1BF0 __attribute__((sda)), D_L05_001B1BF4 __attribute__((sda));
-extern float D_L05_001B1BD0 __attribute__((sda)), D_L05_001B1BD4 __attribute__((sda));
-extern float D_L05_001B1BD8 __attribute__((sda)), D_L05_001B1BDC __attribute__((sda));
-extern float D_L05_001B1BE0 __attribute__((sda)), D_L05_001B1BE4 __attribute__((sda));
-extern float D_L05_001B1BE8 __attribute__((sda)), D_L05_001B1BEC __attribute__((sda));
-extern float D_L05_001B1A7C __attribute__((sda));
+extern char g_ship_saved_position[] __attribute__((sda));
+extern float g_cam_chase_goal_rate __attribute__((sda));
+extern float g_cam_goal_rate_normal __attribute__((sda)), g_cam_goal_rate_alt __attribute__((sda));
+extern float g_cam_chase_spring_rate_a __attribute__((sda)), g_cam_chase_spring_rate_b __attribute__((sda));
+extern float g_cam_rise_rate_end __attribute__((sda)), g_cam_rise_rate_start __attribute__((sda));
+extern float g_cam_side_high __attribute__((sda)), g_cam_side_low __attribute__((sda));
+extern float g_cam_roll_amount_scale __attribute__((sda)), g_cam_climb_rate_end_a __attribute__((sda));
+extern float g_cam_climb_rate_end_b __attribute__((sda)), g_cam_climb_rate_start __attribute__((sda));
+extern float g_ship_forward_offset __attribute__((sda));
 extern int hero_get_state_value_b(void);
 extern float math_step_spring_damper_clamped(float *velocity, float current, float goal, float a, float b, float c);
 extern float IntToFloat(int);
@@ -48,25 +48,25 @@ static inline float Lerp_L05_004432E0(float from, float to, float t)
    height to 400..650. A sway along camera+0x10 driven by the record's +0xD4 block follows, then
    the [5, 1000] box clamp and a pull back towards entry `index` of D_L05_001B2614. The frame's
    motion is accumulated at record+0x30; the position is copied to D_L05_001B3600. */
-void func_PAL_L05_004495C8(char *camera)
+void cam_update_chase_position_pal(char *camera)
 {
     Vector_L05_004432E0 motion;
     Vector_L05_004432E0 delta;
     char *record = *(char **)(camera + 0x70);
-    char *moby = D_L05_001B251C
-        + (*(int *)(*(char **)(D_001B1EC4 + *(short *)(camera + 0x84) * 32 + 0x1C) + 0x20) << 8);
+    char *moby = g_feltzin_target_mobys
+        + (*(int *)(*(char **)(g_ship_encounter_table + *(short *)(camera + 0x84) * 32 + 0x1C) + 0x20) << 8);
     char *state = *(char **)(moby + 0x68);
 
     if (g_current_map_index != 20) {
         float goal;
         if (*(int *)(state + 0x34)) {
-            goal = (hero_get_state_value_b() ? D_L05_001B1AC8 : D_L05_001B1AC4) * FRAME_TIME;
+            goal = (hero_get_state_value_b() ? g_cam_goal_rate_alt : g_cam_goal_rate_normal) * FRAME_TIME;
             *(float *)(state + 0x38) = math_step_spring_damper_clamped((float *)(state + 0x3C),
-                *(float *)(state + 0x38), goal, D_L05_001B1BF0, 0.2f, 0.0f);
+                *(float *)(state + 0x38), goal, g_cam_chase_spring_rate_a, 0.2f, 0.0f);
         } else {
-            goal = D_L05_001B1AC0 * FRAME_TIME;
+            goal = g_cam_chase_goal_rate * FRAME_TIME;
             *(float *)(state + 0x38) = math_step_spring_damper_clamped((float *)(state + 0x3C),
-                *(float *)(state + 0x38), goal, D_L05_001B1BF4, 0.2f, 0.0f);
+                *(float *)(state + 0x38), goal, g_cam_chase_spring_rate_b, 0.2f, 0.0f);
         }
     }
     FastVecScale(&motion, moby + 0xC0, *(float *)(state + 0x38));
@@ -76,8 +76,8 @@ void func_PAL_L05_004495C8(char *camera)
     if (g_current_map_index == 20) {
         char *input = *(char **)(camera + 0x70) + 0x50;
         float t = -*(float *)(input + 0x64) / (*(float *)(input + 0x74) * DEG_TO_RAD);
-        float rise = (D_L05_001B1BD4 + (D_L05_001B1BD0 - D_L05_001B1BD4) * t) * FRAME_TIME;
-        float sideLow = D_L05_001B1BDC, sideHigh = D_L05_001B1BD8;
+        float rise = (g_cam_rise_rate_start + (g_cam_rise_rate_end - g_cam_rise_rate_start) * t) * FRAME_TIME;
+        float sideLow = g_cam_side_low, sideHigh = g_cam_side_high;
         float side;
         *(float *)(camera + 0x38) += rise;
         *(float *)(record + 0x38) = rise;
@@ -93,9 +93,9 @@ void func_PAL_L05_004495C8(char *camera)
         float t = *(float *)(record + 0x40);
         float climb;
         if (hero_get_state_value_b())
-            climb = Lerp_L05_004432E0(D_L05_001B1BEC, D_L05_001B1BE8, t) * FRAME_TIME;
+            climb = Lerp_L05_004432E0(g_cam_climb_rate_start, g_cam_climb_rate_end_b, t) * FRAME_TIME;
         else
-            climb = Lerp_L05_004432E0(D_L05_001B1BEC, D_L05_001B1BE4, t) * FRAME_TIME;
+            climb = Lerp_L05_004432E0(g_cam_climb_rate_start, g_cam_climb_rate_end_a, t) * FRAME_TIME;
         *(float *)(camera + 0x38) += climb;
         if (*(float *)(camera + 0x38) < 400.0f)
             *(float *)(camera + 0x38) = 400.0f;
@@ -108,7 +108,7 @@ void func_PAL_L05_004495C8(char *camera)
         char *roll = *(char **)(camera + 0x70) + 0xD4;
         if (*(short *)(roll + 4)) {
             float amount = IntToFloat(*(short *)(roll + 6));
-            amount = D_L05_001B1BE0 * math_fast_sin_or_cos_b(amount * *(float *)(roll + 8) * 3.1415927f);
+            amount = g_cam_roll_amount_scale * math_fast_sin_or_cos_b(amount * *(float *)(roll + 8) * 3.1415927f);
             if (*(short *)(roll + 4) == 1)
                 amount = -amount;
             FastVecScale(&delta, camera + 0x10, amount);
@@ -124,11 +124,11 @@ void func_PAL_L05_004495C8(char *camera)
     if (*(float *)(camera + 0x34) > 1000.0f) *(float *)(camera + 0x34) = 1000.0f;
     if (*(float *)(camera + 0x38) > 1000.0f) *(float *)(camera + 0x38) = 1000.0f;
 
-    if (!hero_get_state_value_b() && D_L05_00221D88) {
-        int index = **(int **)(D_L05_00221D88 + 0x68);
+    if (!hero_get_state_value_b() && g_chase_target) {
+        int index = **(int **)(g_chase_target + 0x68);
         if (index >= 0) {
-            char *sphere = D_L05_001B2614 + index * 128;
-            float radius = FastVecLength(sphere) - D_L05_001B1A7C;
+            char *sphere = g_feltzin_enemy_table + index * 128;
+            float radius = FastVecLength(sphere) - g_ship_forward_offset;
             float distance;
             FastVecSub(&delta, sphere + 0x30, camera + 0x30);
             distance = FastVecLength(&delta);
@@ -138,5 +138,5 @@ void func_PAL_L05_004495C8(char *camera)
             }
         }
     }
-    *(Quad *)D_L05_001B3600 = *(Quad *)(camera + 0x30);
+    *(Quad *)g_ship_saved_position = *(Quad *)(camera + 0x30);
 }

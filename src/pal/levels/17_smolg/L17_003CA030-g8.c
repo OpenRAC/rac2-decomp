@@ -4,13 +4,13 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 extern char *g_path_l17_table[];
-extern float D_L17_001B0344 __attribute__((sda));
-extern float D_L17_001B0348 __attribute__((sda));
-extern float D_L17_001B034C __attribute__((sda));
-extern float D_L17_001B0350 __attribute__((sda));
-extern float D_L17_001B0354 __attribute__((sda));
-extern float D_L17_001B0358 __attribute__((sda));
-extern unsigned char D_L17_001DBF82[];
+extern float g_platform_move_speed __attribute__((sda));
+extern float g_platform_deceleration __attribute__((sda));
+extern float g_platform_stop_angle_rate __attribute__((sda));
+extern float g_platform_yaw_rate __attribute__((sda));
+extern float g_platform_turn_rate __attribute__((sda));
+extern float g_platform_turn_scale __attribute__((sda));
+extern unsigned char g_platform_l17_sound_flag_2[];
 extern unsigned char g_sound_state[];
 extern void FastVecSub(void *,void *,void *);
 extern float FastVecLength(void *);
@@ -27,7 +27,7 @@ extern int snd_play_from_class_bank(int,int,void *,int);
 extern void snd_stop_voice(int);
 
 /* Moves along the selected path, turns smoothly, and manages its movement sound. */
-int func_PAL_L17_003CAA80(char *object,int pathIndex,int *sound)
+int ride_platform_move_along_path_pal(char *object,int pathIndex,int *sound)
 {
     Vec target,delta;
     char *state=*(char **)(object+0x68);
@@ -36,26 +36,26 @@ int func_PAL_L17_003CAA80(char *object,int pathIndex,int *sound)
     float speedSquared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
     FastVecSub(&delta,&target,object+16);
-    if(FastVecLength(&delta)<(D_L17_001B0344*0.020000001f)*2.0f) {
+    if(FastVecLength(&delta)<(g_platform_move_speed*0.020000001f)*2.0f) {
         (*(int *)(state+0x94))++;
         complete=*(int *)(state+0x94)==*(int *)*path;
     }
     distance=fast_vec_dist(object+16,*path+*(int *)*path*16);
-    deceleration=D_L17_001B0348*0.00040000002f;
+    deceleration=g_platform_deceleration*0.00040000002f;
     speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
     if(distance<=speedSquared/(deceleration*2.0f))
         ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
-    else ApproachValue(state+0x90,D_L17_001B0344*0.020000001f,deceleration);
+    else ApproachValue(state+0x90,g_platform_move_speed*0.020000001f,deceleration);
     vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
     FastVecAdd(object+16,&delta,object+16);
     pitch=-mat_fast_helper_a(vec_length_xy(&delta),delta.f[2]);
     if(pitch>0.261799425f) pitch=0.261799425f;
     else if(pitch< -0.261799425f) pitch= -0.261799425f;
-    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,D_L17_001B034C*6.981318e-06f,D_L17_001B034C*6.981318e-06f,0.25132746f);
-    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,D_L17_001B0350*6.981318e-06f,D_L17_001B0350*6.981318e-06f,0.25132746f,0);
-    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*D_L17_001B0358,state+0xa0,0,D_L17_001B0354*6.981318e-06f,D_L17_001B0354*6.981318e-06f,0.25132746f);
+    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,g_platform_stop_angle_rate*6.981318e-06f,g_platform_stop_angle_rate*6.981318e-06f,0.25132746f);
+    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,g_platform_yaw_rate*6.981318e-06f,g_platform_yaw_rate*6.981318e-06f,0.25132746f,0);
+    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*g_platform_turn_scale,state+0xa0,0,g_platform_turn_rate*6.981318e-06f,g_platform_turn_rate*6.981318e-06f,0.25132746f);
     if(!complete) {
-        if(!snd_is_voice_playing_for_owner(object,*sound) && D_L17_001DBF82[0]!=255)
+        if(!snd_is_voice_playing_for_owner(object,*sound) && g_platform_l17_sound_flag_2[0]!=255)
             *sound=snd_play_from_class_bank(0,4,object,0x922);
     } else {
         if(*sound!=-1) {
@@ -68,7 +68,7 @@ int func_PAL_L17_003CAA80(char *object,int pathIndex,int *sound)
 }
 
 /* Moves along the selected path, turns smoothly, and manages its movement sound. */
-int func_PAL_L17_003CADC0(char *object,int pathIndex,int *sound)
+int platform_move_along_path_with_sound_pal(char *object,int pathIndex,int *sound)
 {
     Vec target,delta;
     char *state=*(char **)(object+0x68);
@@ -77,26 +77,26 @@ int func_PAL_L17_003CADC0(char *object,int pathIndex,int *sound)
     float speedSquared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
     FastVecSub(&delta,&target,object+16);
-    if(FastVecLength(&delta)<(D_L17_001B0344*0.020000001f)*2.0f) {
+    if(FastVecLength(&delta)<(g_platform_move_speed*0.020000001f)*2.0f) {
         (*(int *)(state+0x94))--;
         complete=*(int *)(state+0x94)==-1;
     }
     distance=fast_vec_dist(object+16,*path+16);
-    deceleration=D_L17_001B0348*0.00040000002f;
+    deceleration=g_platform_deceleration*0.00040000002f;
     speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
     if(distance<=speedSquared/(deceleration*2.0f))
         ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
-    else ApproachValue(state+0x90,D_L17_001B0344*0.020000001f,deceleration);
+    else ApproachValue(state+0x90,g_platform_move_speed*0.020000001f,deceleration);
     vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
     FastVecAdd(object+16,&delta,object+16);
     pitch=-mat_fast_helper_a(vec_length_xy(&delta),delta.f[2]);
     if(pitch>0.261799425f) pitch=0.261799425f;
     else if(pitch< -0.261799425f) pitch= -0.261799425f;
-    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,D_L17_001B034C*6.981318e-06f,D_L17_001B034C*6.981318e-06f,0.25132746f);
-    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,D_L17_001B0350*6.981318e-06f,D_L17_001B0350*6.981318e-06f,0.25132746f,0);
-    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*D_L17_001B0358,state+0xa0,0,D_L17_001B0354*6.981318e-06f,D_L17_001B0354*6.981318e-06f,0.25132746f);
+    math_approach_target_with_direction_mode(object+0xf4,pitch,state+0x9c,0,g_platform_stop_angle_rate*6.981318e-06f,g_platform_stop_angle_rate*6.981318e-06f,0.25132746f);
+    func_002AAA00_yaw(object+0xf8,mat_fast_helper_a(target.f[0]-*(float *)(object+16),target.f[1]-*(float *)(object+20)),state+0x98,g_platform_yaw_rate*6.981318e-06f,g_platform_yaw_rate*6.981318e-06f,0.25132746f,0);
+    math_approach_target_with_direction_mode(object+0xf0,*(float *)(state+0x98)* *(float *)(state+0x90)*g_platform_turn_scale,state+0xa0,0,g_platform_turn_rate*6.981318e-06f,g_platform_turn_rate*6.981318e-06f,0.25132746f);
     if(!complete) {
-        if(!snd_is_voice_playing_for_owner(object,*sound) && D_L17_001DBF82[0]!=255)
+        if(!snd_is_voice_playing_for_owner(object,*sound) && g_platform_l17_sound_flag_2[0]!=255)
             *sound=snd_play_from_class_bank(0,4,object,0x922);
     } else {
         if(*sound!=-1) {
@@ -108,11 +108,11 @@ int func_PAL_L17_003CADC0(char *object,int pathIndex,int *sound)
     return complete;
 }
 
-extern float D_L17_001B032C __attribute__((sda));
-extern float D_L17_001B0330 __attribute__((sda));
-extern float D_L17_001B0334 __attribute__((sda));
-extern float D_L17_001B0338 __attribute__((sda));
-extern float D_L17_001B033C __attribute__((sda));
+extern float g_platform_bob_amplitude __attribute__((sda));
+extern float g_platform_bob_period __attribute__((sda));
+extern float g_platform_sway_amplitude __attribute__((sda));
+extern float g_platform_sway_period __attribute__((sda));
+extern float g_platform_tilt_period __attribute__((sda));
 extern void math_update_wrapped_angle_offset(char *, char *, char *, float, float, float);
 extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, float, float);
 
@@ -120,19 +120,19 @@ extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, floa
    pair takes 0.000290888245f (arcseconds to radians) times the shared 0x1B0330 word, with the
    record's own 0x12C float as the third argument in the type-3 arm and -1.0f otherwise; the
    0x120/0x124 pair then takes the other two scaled words. */
-void func_PAL_L17_003CB0F0(char *arg0)
+void platform_update_bob_sway_pal(char *arg0)
 {
     char *state = *(char **)(arg0 + 0x68);
 
     if (*(u8 *)(arg0 + 0x20) == 3) {
-        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, D_L17_001B032C,
-                      D_L17_001B0330 * 0.0003490659f,
+        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+                      g_platform_bob_period * 0.0003490659f,
                       *(f32 *)(state + 0x12C));
     } else {
-        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, D_L17_001B032C,
-                      D_L17_001B0330 * 0.0003490659f, -1.0f);
+        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+                      g_platform_bob_period * 0.0003490659f, -1.0f);
     }
-    moby_scale_owner_words_by_angles(arg0, state + 0x120, state + 0x124, D_L17_001B0334,
-                  D_L17_001B0338 * 0.0003490659f,
-                  D_L17_001B033C * 0.0003490659f);
+    moby_scale_owner_words_by_angles(arg0, state + 0x120, state + 0x124, g_platform_sway_amplitude,
+                  g_platform_sway_period * 0.0003490659f,
+                  g_platform_tilt_period * 0.0003490659f);
 }

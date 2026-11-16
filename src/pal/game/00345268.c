@@ -24,9 +24,9 @@ u8 *func_PAL_00345268(u8 *a0) {
 
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_hud_label_desc[], g_circle_menu_icon_data[], g_menu_small_icon_desc[];
 /* sda in this -G0 unit gives the one-instruction (macro) load of D_001A8CFC that retail has */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
 extern void object_init_derived_c(void *, void *, void *);
@@ -58,13 +58,13 @@ void func_PAL_003452C8(char *self, void *argument)
     *(int *)(self + 0x2C0) = 1;
     **(float **)(self + 0x2B8) = 251.0f;
     (*(float **)(self + 0x2B8))[1] = 210.0f;
-    object_init_derived_arrays(self, D_001ADC10, argument);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, argument);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, argument);
-    func_PAL_00338688(self + 0x1B0, D_001ADC30, argument);
-    func_PAL_00338688(self + 0x208, D_001ADC88, argument);
-    func_PAL_00338688(self + 0x260, D_001ADC88, argument);
-    object_init_derived_c(self + 0xE4, D_001AE0C0, argument);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, argument);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, argument);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, argument);
+    func_PAL_00338688(self + 0x1B0, g_menu_hud_label_desc, argument);
+    func_PAL_00338688(self + 0x208, g_circle_menu_icon_data, argument);
+    func_PAL_00338688(self + 0x260, g_circle_menu_icon_data, argument);
+    object_init_derived_c(self + 0xE4, g_menu_small_icon_desc, argument);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -72,9 +72,9 @@ void func_PAL_003452C8(char *self, void *argument)
     *object_get_fourth_field(self + 0x260) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0x208) = 0x80F0F0F0;
     *object_get_fourth_field(self + 0xE4) = 0x80F0F0F0;
-    object_set_helper_result(self, D_001A8CFC[0] + 0x8710, 0x99);
-    object_set_helper_result(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9A);
-    object_set_helper_result(self + 0x98, D_001A8CFC[0] + 0x8710, 0x9B);
+    object_set_helper_result(self, g_resident_data_base[0] + 0x8710, 0x99);
+    object_set_helper_result(self + 0x4C, g_resident_data_base[0] + 0x8710, 0x9A);
+    object_set_helper_result(self + 0x98, g_resident_data_base[0] + 0x8710, 0x9B);
     hud_set_widget_field_b(self + 0x1B0, self + 0x120);
     hud_set_widget_field_b(self + 0x208, self + 0x160);
     hud_set_widget_field_b(self + 0x260, (void *)GetLocalizedString(0xB60));

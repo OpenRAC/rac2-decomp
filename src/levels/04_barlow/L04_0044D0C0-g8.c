@@ -10,9 +10,9 @@ typedef int Quad __attribute__((mode(TI)));
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 
 extern u8 *g_moby_l04_pool __attribute__((sda));
-extern float D_L04_001B1870 __attribute__((sda));
-extern u8 D_L04_001B1880[8] __attribute__((sda));
-extern u8 D_L04_001B9680[];
+extern float g_barlow_enemy_move_time __attribute__((sda));
+extern u8 g_barlow_enemy_data_block[8] __attribute__((sda));
+extern u8 g_tether_zero_vec[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int FloatToInt(float);
 extern void MoveCtl_Init(void *);
@@ -156,8 +156,8 @@ void barlow_enemy_update_common(u8 *obj)
         MoveCtl_Init(&vars->t140);
         vars->t140.f0C = 2.5f;
         vars->t140.f08 = 2.0f;
-        vars->t140.i00 = FloatToInt(D_L04_001B1870 * 1024.0f);
-        vars->t140.f04 = D_L04_001B1870;
+        vars->t140.i00 = FloatToInt(g_barlow_enemy_move_time * 1024.0f);
+        vars->t140.f04 = g_barlow_enemy_move_time;
         vars->t140.f24 = vars->f30C * (1.0f / 60.0f);
         if (vars->v2E0.f[3] != 12439.4f) {
             vars->v2E0.q = *(Quad *)(obj + 0x10);
@@ -172,13 +172,13 @@ void barlow_enemy_update_common(u8 *obj)
         vars->f220 = vars->f30;
         vars->b28 = 0;
         vars->i318 = 0;
-        vars->p200 = D_L04_001B1880;
+        vars->p200 = g_barlow_enemy_data_block;
         vars->f330 = (float)vars->b34;
         moby_set_state(obj, 1, 0);
         if (obj[0x43])
             anim_start_blended(obj, 0, 0, 0);
     }
-    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L04_001B9680) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }

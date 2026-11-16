@@ -72,8 +72,8 @@ extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
 extern int g_item_ammo_counts[];
 extern int g_game_time;
-extern int D_001B275C;
-extern int D_001A8CA0;
+extern int g_pickup_time;
+extern int g_ground_check_inhibit;
 extern char g_hero_state[];
 extern PickupObject *g_hero_moby NOT_SDA;
 
@@ -156,7 +156,7 @@ void UpdateWeaponAmmoPickup(PickupObject *object)
         }
         if (g_item_ammo_counts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
-        if (D_001A8CA0) {
+        if (g_ground_check_inhibit) {
             if (gravity_get_center_distance(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
@@ -182,9 +182,9 @@ void UpdateWeaponAmmoPickup(PickupObject *object)
             moby_set_state(object, 2, -1);
             data->pull = 1.0f / 7.5f;
             vec_clear_128(data);
-            if (subtract_integer_with_clamp(g_game_time - D_001B275C) >= 11) {
+            if (subtract_integer_with_clamp(g_game_time - g_pickup_time) >= 11) {
                 PlayMobySound(0, 0, object);
-                D_001B275C = g_game_time;
+                g_pickup_time = g_game_time;
             }
         }
         break;

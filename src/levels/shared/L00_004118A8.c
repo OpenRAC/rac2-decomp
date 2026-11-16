@@ -12,13 +12,13 @@ typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 extern float func_002A7878_2(float low, float high);
 extern float func_002A78D8_1(float low, float high);
 extern void func_00282C88_1(void *p);
-extern char D_L00_00256BC0[];
+extern char g_tumbling_piece_records[];
 
 /* Claims the first free record of the forty-eight 0xD0-byte records at D_L00_00256BC0, keeps
    the owner and the caller's words in it, and fills it with eighteen drawn values. */
 void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *vel, int flag, int time_a, int time_b, int effect_slot, float scale)
 {
-    char *records = D_L00_00256BC0;
+    char *records = g_tumbling_piece_records;
     char *record;
     char *pos_out;
     int i;

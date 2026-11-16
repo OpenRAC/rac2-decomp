@@ -46,7 +46,7 @@ typedef struct {
     unsigned char pad484[0xac];
     float f530;
 } PointEffectJoints;
-extern PointEffectJoints D_L00_0025BE10;
+extern PointEffectJoints g_hero_item_attach_records;
 extern int hero_is_in_special_kind_or_mode(void);
 extern float math_fabs(float);
 extern float mat_fast_helper_a(float, float);
@@ -66,8 +66,8 @@ void UpdateHeroEasingTargetsAndPointEffects(void)
     int index;
 
     if (g_hero_state.f1270) {
-        D_L00_0025BE10.f36C = 0.01f;
-        D_L00_0025BE10.f41C = 0.01f;
+        g_hero_item_attach_records.f36C = 0.01f;
+        g_hero_item_attach_records.f41C = 0.01f;
     }
     if (hero_is_in_special_kind_or_mode())
         return;
@@ -78,8 +78,8 @@ void UpdateHeroEasingTargetsAndPointEffects(void)
          math_fabs(g_hero_state.f310) > 0.01745329424738884f ||
          math_fabs(g_hero_state.f314) > 0.01745329424738884f) &&
         g_hero_state.f348 != 1) {
-        D_L00_0025BE10.f324 = -g_hero_state.f308;
-        D_L00_0025BE10.f3D4 = -g_hero_state.f30C;
+        g_hero_item_attach_records.f324 = -g_hero_state.f308;
+        g_hero_item_attach_records.f3D4 = -g_hero_state.f30C;
         left = mat_fast_helper_a(0.2f, g_hero_state.f300) * 1.2f;
         right = -mat_fast_helper_a(0.2f, g_hero_state.f304) * 1.2f;
         if (left > 0.785398244857788f)
@@ -90,10 +90,10 @@ void UpdateHeroEasingTargetsAndPointEffects(void)
             right = 0.174532949924469f;
         if (right < -0.785398244857788f)
             right = -0.785398244857788f;
-        D_L00_0025BE10.f480 = left;
-        D_L00_0025BE10.f530 = right;
-        D_L00_0025BE10.f320 = -fast_subtract_rotations(g_hero_state.f310, -left);
-        D_L00_0025BE10.f3D0 = -fast_subtract_rotations(g_hero_state.f314, -right);
+        g_hero_item_attach_records.f480 = left;
+        g_hero_item_attach_records.f530 = right;
+        g_hero_item_attach_records.f320 = -fast_subtract_rotations(g_hero_state.f310, -left);
+        g_hero_item_attach_records.f3D0 = -fast_subtract_rotations(g_hero_state.f314, -right);
     }
     if (!(g_hero_state.f143E & 0x80)) {
         if (g_hero_state.f2294 == 3)

@@ -8,7 +8,7 @@ extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
 extern void *part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
 
-void func_PAL_L00_003FD928(char *self)
+void twin_trail_effect_update_pal(char *self)
 {
     Vec_3f9368 v1;
     Vec_3f9368 v2;

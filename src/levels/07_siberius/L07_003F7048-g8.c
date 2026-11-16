@@ -5,17 +5,17 @@
 #define F(p,o) (*(f32 *)((p)+(o)))
 #define H(p,o) (*(u16 *)((p)+(o)))
 extern u8 g_hero_position[] NOT_SDA;
-extern u8 D_0013962A NOT_SDA;
-extern u8 D_L07_001BF400[] NOT_SDA;
+extern u8 g_boss_started_flag NOT_SDA;
+extern u8 g_boss_request_queue[] NOT_SDA;
 typedef struct { u8 pad[0x30]; f32 pos[4]; u8 rest[0x40]; } PathRec;
-extern PathRec *D_L07_001B23CC[] __attribute__((sda));
+extern PathRec *g_shooter_mount_table[] __attribute__((sda));
 extern u8 *g_moby_l07_array[] __attribute__((sda));
-extern f32 D_L07_001B2CB8;
-extern s32 D_L07_001B104C;
-extern s32 D_L07_001B1044;
-extern s32 D_L07_001A8F00;
-extern f32 D_0018C2C4 NOT_SDA;
-extern s32 D_0018C0BC NOT_SDA;
+extern f32 g_boss_l07_turn_rate_2;
+extern s32 g_boss_active_flag;
+extern s32 g_boss_frame_offset;
+extern s32 g_game_l07_mode_state;
+extern f32 g_boss_float_param NOT_SDA;
+extern s32 g_hero_mode NOT_SDA;
 extern void UpdatePhasedDamageState(u8 *);
 extern void boss_setup_screen_effect(u8 *);
 extern void cam_end_override(u8 *);
@@ -66,7 +66,7 @@ void boss_update(u8 *moby)
     case 0:
     case 1:
         if (moby[0x20] != 3 && moby[0x20] != 11) boss_setup_screen_effect(moby);
-        if (moby[0x95] == 0) D_L07_001B2CB8 = 0.6981318f;
+        if (moby[0x95] == 0) g_boss_l07_turn_rate_2 = 0.6981318f;
         break;
     case 2:
         if (P(vars,0x450)) {
@@ -78,16 +78,16 @@ void boss_update(u8 *moby)
     switch (moby[0x20]) {
     case 1:
         if (IsPointInCuboid(g_hero_position,W(vars,0x170))) {
-            D_L07_001B104C=1;
-            if (!D_0013962A) {
-                if (req_push_queue(D_L07_001BF400,0x4f)) {
-                    req_launch_queued(D_L07_001BF400);
+            g_boss_active_flag=1;
+            if (!g_boss_started_flag) {
+                if (req_push_queue(g_boss_request_queue,0x4f)) {
+                    req_launch_queued(g_boss_request_queue);
                     moby_set_state(moby,2,-1);
                     goto start_path;
                 }
             }
             boss_start_move_tier(moby,0,2);
-            qcopy_nc(vars+0x3e0,D_L07_001B23CC[0][W(vars,0x174)].pos);
+            qcopy_nc(vars+0x3e0,g_shooter_mount_table[0][W(vars,0x174)].pos);
             F(vars,0x3e8)+=1.5f;
 start_path:
             script_queue_keyed_request(W(vars,0x18c),-1);
@@ -95,14 +95,14 @@ start_path:
         break;
     case 2:
         if (!game_is_either_mode_two()) {
-            D_0013962A=1;
-            vec_scale_to_length(pos,(u8 *)&D_L07_001B23CC[0][W(vars,0x174)]+0x10,8.0f);
-            FastVecAdd(pos,pos,D_L07_001B23CC[0][W(vars,0x174)].pos);
+            g_boss_started_flag=1;
+            vec_scale_to_length(pos,(u8 *)&g_shooter_mount_table[0][W(vars,0x174)]+0x10,8.0f);
+            FastVecAdd(pos,pos,g_shooter_mount_table[0][W(vars,0x174)].pos);
             qzero_nc(rot);
-            rot[2]=mat_fast_helper_a(D_L07_001B23CC[0][W(vars,0x174)].pos[0]-pos[0],D_L07_001B23CC[0][W(vars,0x174)].pos[1]-pos[1]);
+            rot[2]=mat_fast_helper_a(g_shooter_mount_table[0][W(vars,0x174)].pos[0]-pos[0],g_shooter_mount_table[0][W(vars,0x174)].pos[1]-pos[1]);
             hero_reset_position_and_direction(pos,rot,0,1);
             boss_start_move_tier(moby,0,2);
-            qcopy_nc(vars+0x3e0,D_L07_001B23CC[0][W(vars,0x174)].pos);
+            qcopy_nc(vars+0x3e0,g_shooter_mount_table[0][W(vars,0x174)].pos);
             F(vars,0x3e8)+=1.5f;
         }
         break;
@@ -126,7 +126,7 @@ start_path:
         boss_move_toward_target(moby,-1.0f);
         if (H(moby,0x96)==W(vars,0x444)-W(vars,0x448))
             moby_start_timer_state(P(vars,0x414),W(vars,0x448),W(vars,0x448)+10);
-        else if (H(moby,0x96)==W(vars,0x444)-D_L07_001B1044)
+        else if (H(moby,0x96)==W(vars,0x444)-g_boss_frame_offset)
             moby_store_attached_pos(moby,vars+0x140);
         else if (W(vars,0x444)<H(moby,0x96))
             moby_set_state(moby,W(vars,0x43c),-1);
@@ -181,8 +181,8 @@ start_path:
         }
         boss_move_toward_target(moby,-1.0f);
         if (F(vars,0x20)<=0.0f) {
-            D_0018C2C4=40.0f;
-            coll_sweep_from_object(moby,D_L07_001B23CC[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
+            g_boss_float_param=40.0f;
+            coll_sweep_from_object(moby,g_shooter_mount_table[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
         }
         if (moby[0x60]&2) {
             if (F(vars,0x20)<=0.0f) moby_set_state(moby,13,2);
@@ -198,18 +198,18 @@ start_path:
         }
         break;
     case 13:
-        if (req_push_queue(D_L07_001BF400,0x50)) {
-            req_push_queue(D_L07_001BF400,0x51);
-            req_push_queue(D_L07_001BF400,8);
-            req_push_queue(D_L07_001BF400,0x52);
-            req_launch_queued(D_L07_001BF400);
+        if (req_push_queue(g_boss_request_queue,0x50)) {
+            req_push_queue(g_boss_request_queue,0x51);
+            req_push_queue(g_boss_request_queue,8);
+            req_push_queue(g_boss_request_queue,0x52);
+            req_launch_queued(g_boss_request_queue);
             moby_set_state(moby,14,-1);
         }
         break;
     case 14:
-        if (((H(moby,0x34)^1)&1) && D_L07_001A8F00==2) boss_reset_with_children(moby);
-        coll_sweep_from_object(moby,D_L07_001B23CC[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
-        if (!game_is_either_mode_two() && D_L07_001A8F00!=2 && D_L07_001A8F00!=1 && D_0018C0BC!=20) {
+        if (((H(moby,0x34)^1)&1) && g_game_l07_mode_state==2) boss_reset_with_children(moby);
+        coll_sweep_from_object(moby,g_shooter_mount_table[0][W(vars,0x174)].pos,0x10000,50.0f,100.0f,0.0f,0,1,0);
+        if (!game_is_either_mode_two() && g_game_l07_mode_state!=2 && g_game_l07_mode_state!=1 && g_hero_mode!=20) {
             moby_mark_flag_and_append_to_list(8);
             data_set_small_value_and_refresh(8,1);
         }

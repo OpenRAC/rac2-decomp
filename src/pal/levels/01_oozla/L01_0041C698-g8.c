@@ -4,14 +4,14 @@
 extern char *CreateMoby(s32 size);
 extern f32 math_random_angle(void);
 extern u32 g_pHeroMoby[];
-extern f32 D_L01_001B1A68 __attribute__((sda));
-extern f32 D_L01_001B1A6C __attribute__((sda));
-extern f32 D_L01_001B1A70 __attribute__((sda));
+extern f32 g_spin_rate_x __attribute__((sda));
+extern f32 g_spin_rate_y __attribute__((sda));
+extern f32 g_spin_rate_z __attribute__((sda));
 extern void func_PAL_L01_0041BFF0(void *a0);
 
 /* Spawns a gold bolt moby at a position, already in its idle state, with random spin angles.
  * Adapted from the state 0 of RAC1's gold_bolt_update (GPL-3.0). */
-void *func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
+void *SpawnGoldBolt_pal(void *a0, void *a1, void *a2, void *a3) {
     u8 *m;
     u8 *st;
     f32 t, x, y, z;
@@ -35,9 +35,9 @@ void *func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
         t = math_random_angle();
         *(f32 *)(m + 0xF8) = t;
         t = math_random_angle();
-        x = D_L01_001B1A68;
-        y = D_L01_001B1A6C;
-        z = D_L01_001B1A70;
+        x = g_spin_rate_x;
+        y = g_spin_rate_y;
+        z = g_spin_rate_z;
         *(f32 *)(m + 0xFC) = t;
         *(u32 *)(st + 8) = (u32)a3;
         *(u32 *)(st + 4) = (u32)a2;

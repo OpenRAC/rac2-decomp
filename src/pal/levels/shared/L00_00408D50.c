@@ -20,7 +20,7 @@ extern char g_camera_l00_position[];
 /* one func_PAL_L00_0041D8A8 effect at pos, then two func_PAL_L00_00340CA0 particles with random
    velocities; before each, pos moves 0.3 of the way towards D_L00_001B8DC0 (FastVecSub,
    scale, FastVecAdd) */
-void func_PAL_L00_00408D50(float *pos, int unused, int mode)
+void sheep_shot_spawn_hit_sparks_pal(float *pos, int unused, int mode)
 {
     float velocity[4], offset[4], point[4];
     float pitch, heading, speed;
@@ -58,16 +58,16 @@ extern void shot_handle_impact(void *,void *),func_PAL_L00_004098C0(void *,void 
 extern char *func_PAL_L00_0041A788(void *,float,int,int,int,int,int,int,int,int,int);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern char *g_area_hit_targets[];
-extern char g_item_slot_to_record[],g_weapon_l00_table[],D_L00_001C6F40[];
+extern char g_item_slot_to_record[],g_weapon_l00_table[],g_light_table[];
 extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(void *,void *,float,int,void *),QueueMobyImpact(void *,void *);
 extern void gfx_free_point_light(int);
-extern int func_PAL_0032F0B8(void *,int,int);
+extern int StartAttachedEffect_pal(void *,int,int);
 extern int part_l00_alloc_effect_slot_2(void *,float,float,float,float,float);
 
 /* Moves a projectile, applies its explosion hit to nearby objects, and updates
  * its persistent trail record while active. */
-void func_PAL_L00_00408FD0(char *arg)
+void UpdateExplodingTrailProjectile_pal(char *arg)
 {
     float old[4],delta[4];
     char hit[48] __attribute__((aligned(16)));
@@ -120,7 +120,7 @@ void func_PAL_L00_00408FD0(char *arg)
                     hit[25]=3; *(int *)(hit+32)=1; hit[24]=5;
                     *(unsigned short *)(hit+26)=*(unsigned short *)(obj+170);
                     QueueMobyImpact(obj,hit);
-                    func_PAL_0032F0B8(obj,78,*(int *)(*(char **)(ctx+52)+184));
+                    StartAttachedEffect_pal(obj,78,*(int *)(*(char **)(ctx+52)+184));
                 }
                 objects++;
             } while(--count);
@@ -142,7 +142,7 @@ void func_PAL_L00_00408FD0(char *arg)
     if (*(int *)(ctx+24)==-1)
         *(int *)(ctx+24)=part_l00_alloc_effect_slot_2(arg+16,5.0f,0.0f,1.0f,0.8f,0.25f);
     else {
-        entry=D_L00_001C6F40+32**(int *)(ctx+24);
+        entry=g_light_table+32**(int *)(ctx+24);
         qcopy(entry+16,arg+16);
         *(float *)(entry+24)+=1.0f;
         *(float *)(entry+28)=5.0f;

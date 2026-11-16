@@ -3,10 +3,10 @@
    words are read as ints and scaled to 50 Hz before they go to the halfwords at 0x1E2 and 0x1E4. */
 #include "common.h"
 
-extern float D_L26_001B05D8 __attribute__((sda));
-extern int D_L26_001B05E0 __attribute__((sda));
-extern int D_L26_001B05E4;
-extern float D_L26_001B8B80[4];
+extern float g_flying_creature_turn_degrees __attribute__((sda));
+extern int g_flying_creature_value_a __attribute__((sda));
+extern int g_flying_creature_value_b;
+extern float g_hero_l26_origin[4];
 extern float gravity_get_center_distance(char *);
 extern int math_random_int_below(int);
 extern void enemy_spawn_child_parts(char *, char **, int, int);
@@ -32,7 +32,7 @@ int func_PAL_L26_003E0168(unsigned char *object) {
         *(float *)(private + 0x84) = 0.8f;
         *(float *)(private + 0x8C) = 0.15f;
         height = gravity_get_center_distance((char *)object + 0x10) - 1.5f;
-        turn = D_L26_001B05D8;
+        turn = g_flying_creature_turn_degrees;
         *(float *)(private + 0x100) = 1.0f;
         turn *= 0.017453294f;
         *(float *)(private + 0x90) = height;
@@ -43,8 +43,8 @@ int func_PAL_L26_003E0168(unsigned char *object) {
             if (flip) angle = -angle;
             *(float *)(private + 0x1DC) = angle;
         }
-        *(unsigned short *)(private + 0x1E2) = ((s32)(D_L26_001B05E0) * 5 + 2) / 6;
-        *(unsigned short *)(private + 0x1E4) = ((s32)(D_L26_001B05E4) * 5 + 2) / 6;
+        *(unsigned short *)(private + 0x1E2) = ((s32)(g_flying_creature_value_a) * 5 + 2) / 6;
+        *(unsigned short *)(private + 0x1E4) = ((s32)(g_flying_creature_value_b) * 5 + 2) / 6;
         private[0x2E] = 1;
         *(unsigned short *)(object + 0x34) |= 0x100;
         if (*(float *)(private + 0x20) == 0.0f) {
@@ -55,7 +55,7 @@ int func_PAL_L26_003E0168(unsigned char *object) {
         moby_set_state(object, 1, 0);
         if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 0);
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L26_001B8B80) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_l26_origin) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 0x16;
     }

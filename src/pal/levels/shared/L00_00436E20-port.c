@@ -7,7 +7,7 @@ extern void func_0033AE28_2(char *p);
 extern void func_L00_00430948_3(char *p, float a, float b);
 extern int func_002E5E58_3(int a, int b, int c);
 
-extern void func_US2_0033BE70 (char *object);
+extern void prompt_bar_update_us2 (char *object);
 extern void mem_store_two_floats_through_cell (char *object, float x, float y);
 extern int snd_play_from_global_bank (int a, int b, int c);
 
@@ -15,7 +15,7 @@ extern int snd_play_from_global_bank (int a, int b, int c);
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
-extern unsigned char D_PAL_001A7C38[] __attribute__((sda));
+extern unsigned char g_pal_toggle_flags[] __attribute__((sda));
 
 int func_PAL_L00_004388F8(char *a0, int a1)
 {
@@ -38,10 +38,10 @@ int func_PAL_L00_004388F8(char *a0, int a1)
         Fc558ca70_FUN_002E5E58(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_PAL_001A7C38[2] = D_PAL_001A7C38[2] == 0;
+            g_pal_toggle_flags[2] = g_pal_toggle_flags[2] == 0;
             break;
         case 1:
-            D_PAL_001A7C38[3] = D_PAL_001A7C38[3] == 0;
+            g_pal_toggle_flags[3] = g_pal_toggle_flags[3] == 0;
             break;
         }
     }
@@ -57,7 +57,7 @@ extern void F5979c03f_FUN_0033B018 (char *object, float x, float y);
 extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 
-extern void *func_US2_0033BB98(void *);
+extern void *prompt_bar_destroy_us2(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
 

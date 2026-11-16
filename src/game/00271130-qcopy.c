@@ -3,7 +3,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_00189F70[];
+extern char g_hero_velocity[];
 extern char g_camera_eye_state[];
 
 extern void FastVecAdd(void *, void *, void *);
@@ -25,7 +25,7 @@ int cam_advance_blend(char *target, char *blend)
     if (weights[3] == 1.0f && weights[0] == 1.0f)
         return 1;
     posEase = math_cosine_blend(0.0f, 1.0f, weights[3]);
-    FastVecAdd(blend + 0x30, D_00189F70, blend + 0x30);
+    FastVecAdd(blend + 0x30, g_hero_velocity, blend + 0x30);
     x = *(float *)(blend + 0x30);
     y = *(float *)(blend + 0x34);
     z = *(float *)(blend + 0x38);

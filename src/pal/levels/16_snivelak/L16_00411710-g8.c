@@ -16,19 +16,19 @@ extern DispatchFlags moby_dispatch_action_by_kind(
     void *, DispatchContext *);
 extern void vec_random_direction(void *, float, float), FastVecAdd(void *, void *, void *);
 extern float math_fabs(float), math_random_float_range(float, float), math_random_signed_float_range(float, float);
-extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
+extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
 extern u8 *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, void *), hero_copy_field_to_moby(void *), moby_fade_out_update(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern char *func_PAL_L13_004170F0(void *, int, int, int, int, int, int, int, float, int, int);
-extern void func_PAL_002A7650(void *, int, int), moby_mark_spawned(void *);
+extern void SetDeathBits_pal(void *, int, int), moby_mark_spawned(void *);
 extern int func_PAL_002AF6C0(void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
-extern u8 *func_PAL_L16_00418EE0(void *, void *, void *, int, float);
-extern int func_PAL_L09_0032B088(char *, int);
-extern float D_L16_001A8F20[] __attribute__((sda));
+extern u8 *snivelak_spawn_spark_projectile_pal(void *, void *, void *, int, float);
+extern int path_check_entry_for_moby_pal(char *, int);
+extern float g_particle_template[] __attribute__((sda));
 /* Partial view of the shared effect controls: retail forms this base once. */
 extern struct {
     u8 pad000[0x160];
@@ -84,8 +84,8 @@ void func_PAL_L16_00411710(u8 *moby)
                 vec_random_direction(velocity, 0.16000001f, 0.24000001f);
                 velocity[2] = math_fabs(velocity[2]);
                 velocity[2] *= 1.5f;
-                FastVecAdd(velocity, velocity, D_L16_001A8F20);
-                child = func_PAL_002735D0(moby, 1, *(short *)(moby + 0xaa), i,
+                FastVecAdd(velocity, velocity, g_particle_template);
+                child = cam_moby_create_pal(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, velocity, 255, 30.0f, 15.0f);
                 *(void (**)(void *))(child + 0x64) = moby_fade_out_update;
             }
@@ -94,21 +94,21 @@ void func_PAL_L16_00411710(u8 *moby)
             *(float *)(child + 0x18) = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
             hero_copy_field_to_moby(child);
             func_PAL_L13_004170F0(moby + 0x10, 0, 45, 40, 40, 40, 45, 1, 1.0f, 1, 1);
-            D_L16_001B99C0.lifetime = 75;
-            D_L16_001B99C0.strength = 0.2f;
-            D_L16_001B99C0.duration = 50;
-            D_L16_001B99C0.damping = 0.1f;
-            D_L16_001B99C0.timer = 0;
+            g_snivelak_hero_state.lifetime = 75;
+            g_snivelak_hero_state.strength = 0.2f;
+            g_snivelak_hero_state.duration = 50;
+            g_snivelak_hero_state.damping = 0.1f;
+            g_snivelak_hero_state.timer = 0;
             velocity[0] = math_random_signed_float_range(0.5f, 4.0f) * 0.020000001f;
             velocity[1] = math_random_signed_float_range(0.0f, 4.0f) * 0.020000001f;
             velocity[2] = math_random_float_range(7.0f, 9.0f) * 0.020000001f;
             velocity[2] = math_fabs(velocity[2]);
             velocity[2] *= 3.0f;
-            FastVecAdd(velocity, velocity, D_L16_001A8F20);
-            child = func_PAL_002735D0(moby, 3, 0xecb, 0, moby + 0x10,
+            FastVecAdd(velocity, velocity, g_particle_template);
+            child = cam_moby_create_pal(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, velocity, 255, 180.0f, 25.0f);
             hero_copy_field_to_moby(child);
-            func_PAL_002A7650(moby, 0, 3);
+            SetDeathBits_pal(moby, 0, 3);
             moby_mark_spawned(moby);
             return;
         }
@@ -133,10 +133,10 @@ void func_PAL_L16_00411710(u8 *moby)
             moby_transform_joint_to_world((char *)moby, 2, (char *)velocity);
             FastVecSub(aim, state + 0x1f0, velocity);
             vec_scale_to_length(aim, aim, 0.50000006f);
-            func_PAL_L16_00418EE0(moby, aim, velocity, 0, 2.0f);
+            snivelak_spawn_spark_projectile_pal(moby, aim, velocity, 0, 2.0f);
         }
         if (*(int *)(state + 0x24c) != -1)
-            func_PAL_L09_0032B088((char *)moby, *(int *)(state + 0x24c));
+            path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x24c));
         if (*(unsigned short *)(moby + 0x96) > 180) {
             if (moby[0x43]) func_PAL_002A7E68(moby, 0, 0, 8);
             moby_set_state(moby, 4, -1);
@@ -144,7 +144,7 @@ void func_PAL_L16_00411710(u8 *moby)
         break;
     case 4:
         if (*(int *)(state + 0x24c) != -1)
-            func_PAL_L09_0032B088((char *)moby, *(int *)(state + 0x24c));
+            path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x24c));
         if (*(unsigned short *)(moby + 0x96) > 180) {
             if (moby[0x43] != 1) func_PAL_002A7E68(moby, 1, 0, 8);
             moby_set_state(moby, 3, -1);

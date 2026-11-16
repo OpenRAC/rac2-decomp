@@ -3,8 +3,8 @@
 extern int FastDecTimer(short *);
 extern void FastVecAdd(char *, char *, char *);
 extern void part_kill(void *);
-extern float D_L00_001AA708 __attribute__((sda));
-extern float D_L00_001AA704 __attribute__((sda));
+extern float g_spark_random_range __attribute__((sda));
+extern float g_spark_pull_base __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
@@ -33,8 +33,8 @@ void func_PAL_002C7080(char *self)
     float f2;
     float f3;
 
-    f0 = math_random_float_range(-D_L00_001AA708, D_L00_001AA708);
-    f1 = ((D_L00_001AA704 + f0) * 1.44f);
+    f0 = math_random_float_range(-g_spark_random_range, g_spark_random_range);
+    f1 = ((g_spark_pull_base + f0) * 1.44f);
     f3 = *(float *)(s1 + 0x10) + 0.0075f;
     f2 = *(float *)(s1 + 8) - f1;
     f0 = *(float *)(s1 + 0x14) * f3 * 210000.0f;

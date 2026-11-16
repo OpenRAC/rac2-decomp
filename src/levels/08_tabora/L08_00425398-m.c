@@ -3,7 +3,7 @@
 
 extern float coll_find_ground_height_floor(void *position, float first, float second, float floor);
 extern int GetCollHitMaterial(void);
-extern float D_00189EA8;
+extern float g_hero_height_limit;
 
 /* Works out the ground heights under the object and keeps a floor height at least a little above a minimum. */
 void moby_update_ground_probe(char *moby)
@@ -18,6 +18,6 @@ void moby_update_ground_probe(char *moby)
         *(float *)(vars + 0x1C4) = *(float *)(vars + 0x1C4) + 2.0f;
     {
         float height = *(float *)(vars + 0x1C4) + 6.5f;
-        *(float *)(vars + 0x1C8) = height > D_00189EA8 ? height : D_00189EA8;
+        *(float *)(vars + 0x1C8) = height > g_hero_height_limit ? height : g_hero_height_limit;
     }
 }

@@ -24,13 +24,13 @@ extern void EmitJitteredParticleTrail(char *);
 
 extern void part_l20_spawn_spark_burst(char *, int, int);
 
-extern char D_L20_001C0420[];
+extern char g_spark_position[];
 
-extern char *D_L20_001FBB20[];
+extern char *g_group_l20_id_lists[];
 
-extern char *D_L20_001B2F9C __attribute__((sda));
+extern char *g_group_l20_member_table __attribute__((sda));
 
-extern float D_L20_0023E670[];
+extern float g_group_saved_heights[];
 
 /* func_L20_0039C448 is defined in L20_0039C448-qcopy.c (its copy needs the grouped-copy profile). */
 
@@ -46,7 +46,7 @@ extern char *CreateMoby(int);
 /* func_L20_0039D340 is defined in L20_0039D340-g8.c (it reads data through $gp). */
 
 
-extern int D_L20_001B2AC8 __attribute__((sda));
+extern int g_frame_l20_counter __attribute__((sda));
 
 extern int trooper_spawn_parts(char *, int);
 
@@ -70,7 +70,7 @@ void trooper_update_body(char *moby_in) {
     vars = *(char **)(moby + 0x68);
     trooper_spawn_parts(moby, 0);
     SpawnHealthThresholdEffects(moby);
-    if ((D_L20_001B2AC8 & 7) == (((s32)moby >> 8) & 7)) {
+    if ((g_frame_l20_counter & 7) == (((s32)moby >> 8) & 7)) {
         trooper_count_closer_mates(moby);
     }
     turn_rate = 0.009696274995803833f;
@@ -205,7 +205,7 @@ out:
     return result;
 }
 
-extern int D_L20_001B2FB8;
+extern int g_group_count;
 
 /* func_L20_0039E0A0 is defined in L20_0039E0A0-g8.c (it needs the -G8 profile). */
 
@@ -224,7 +224,7 @@ extern f32 FastVecLength(void *);
 extern void vec_fast_normalize_helper(char *, char *, f32);
 extern f32 vec_distance_xy(void *, void *);
 extern char g_hero_state[];
-extern float D_L20_001B9FD8;
+extern float g_hero_aim_data;
 
 /* func_L20_0039E1E8: picks a point state[0x260] 8 to 12 units (in xy) from a target.
  * When the target at state[0x200] is the hero's moby (D_00189E20 + 0x2290), the point
@@ -244,7 +244,7 @@ void trooper_choose_stand_point(char *moby) {
     hero = g_hero_state;
     if (*(char **)(state + 0x200) == *(char **)(hero + 0x2290)) {
         angle = math_random_float_range(-45.0f, 45.0f);
-        angle = FastAddRotations(angle * 0.017453294f, D_L20_001B9FD8);
+        angle = FastAddRotations(angle * 0.017453294f, g_hero_aim_data);
         *(f32 *)(state + 0x260) = math_fast_sin_or_cos_a(angle) * dist;
         *(f32 *)(state + 0x264) = math_fast_sin_or_cos_b(angle) * dist;
         *(int *)(state + 0x268) = 0;
@@ -303,12 +303,12 @@ void electric_orb_draw(char *moby) {
 /* Lowers every object of a group by 20 units, hides them, and remembers their old heights. */
 void group_lower_save_heights(char *moby) {
     s32 index = *(s32 *)(*(char **)(moby + 0x68));
-    u16 *id_list = (u16 *)D_L20_001FBB20[index];
+    u16 *id_list = (u16 *)g_group_l20_id_lists[index];
 
     if (id_list != 0) {
-        char *base = D_L20_001B2F9C;
+        char *base = g_group_l20_member_table;
         f32 twenty = 20.0f;
-        f32 *saved_z = D_L20_0023E670;
+        f32 *saved_z = g_group_saved_heights;
 
         do {
             u16 entry = *id_list;
@@ -329,7 +329,7 @@ extern float cubic_hermite_scalar(float, float, float, float, float);
 /* Lifts a group of objects back from their lowered height as a timer runs, then shows them again. */
 void group_raise_from_saved_heights(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    u16 *id_list = (u16 *)D_L20_001FBB20[*(s32 *)vars];
+    u16 *id_list = (u16 *)g_group_l20_id_lists[*(s32 *)vars];
     f32 *saved_z;
     char *base;
     f32 scale;
@@ -341,8 +341,8 @@ void group_raise_from_saved_heights(char *moby) {
         f32 progress = IntToFloat(*(s32 *)(vars + 4)) * *(f32 *)(vars + 8);
         scale = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f - progress);
     }
-    saved_z = D_L20_0023E670;
-    base = D_L20_001B2F9C;
+    saved_z = g_group_saved_heights;
+    base = g_group_l20_member_table;
     do {
         f32 old_z = *saved_z;
         u16 entry = *id_list;
@@ -367,7 +367,7 @@ extern s32 path_check_entry_for_moby(char *, s32);
 
 extern f32 vec_distance_xy(void *, void *);
 
-extern char *D_L20_001FEC80[];
+extern char *g_path_point_tables[];
 
 /* Tells whether this object is done or close enough to its goal point. */
 s32 moby_is_near_goal_point(char *moby_in, s32 table_id) {
@@ -382,7 +382,7 @@ s32 moby_is_near_goal_point(char *moby_in, s32 table_id) {
     if (result == 0) {
         if (id != -1) {
             distance = vec_distance_xy(moby + 0x10,
-                               D_L20_001FEC80[id] + ((*(s16 *)(vars + 0x1CA) << 4) + 0x10));
+                               g_path_point_tables[id] + ((*(s16 *)(vars + 0x1CA) << 4) + 0x10));
             if (!(*(f32 *)(vars + 0x134) > distance)) {
             } else {
                 result = 1;

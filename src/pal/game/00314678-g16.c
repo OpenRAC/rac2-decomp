@@ -33,17 +33,17 @@ extern int FastTweenColor(unsigned int from, unsigned int to, float amount);
 extern unsigned char *part_spawn_fading(float *position, int color, int angle, int, int, int, int,
                                     float size);
 extern float g_camera_eye_state[];                              /* the camera position */
-extern int D_001AF174 __attribute__((sda));             /* the pairs' lifetime */
-extern unsigned int D_001AF1C4 __attribute__((sda));    /* the colour pairs */
-extern unsigned int D_001AF1C8 __attribute__((sda));
-extern unsigned int D_001AF1CC __attribute__((sda));
-extern unsigned int D_001AF1D0 __attribute__((sda));
-extern int D_001AF1D4 __attribute__((sda));
-extern int D_001AF1D8 __attribute__((sda));
-extern float D_001AF1E0[4] __attribute__((sda));       /* spin per frame */
-extern float D_001AF1F0[4] __attribute__((sda));       /* size */
-extern float D_001AF200[4] __attribute__((sda));       /* height */
-extern unsigned char *D_001F2540[];                     /* the texture table */
+extern int g_nanotech_duration __attribute__((sda));             /* the pairs' lifetime */
+extern unsigned int g_spark_color_a_from __attribute__((sda));    /* the colour pairs */
+extern unsigned int g_spark_color_a_to __attribute__((sda));
+extern unsigned int g_spark_color_b_from __attribute__((sda));
+extern unsigned int g_spark_color_b_to __attribute__((sda));
+extern int g_spark_param_a __attribute__((sda));
+extern int g_spark_param_b __attribute__((sda));
+extern float g_spark_spin_table[4] __attribute__((sda));       /* spin per frame */
+extern float g_spark_size_table[4] __attribute__((sda));       /* size */
+extern float g_spark_height_table[4] __attribute__((sda));       /* height */
+extern unsigned char *g_particle_texture_table[];                     /* the texture table */
 
 /* The loop reaches each pair's entries by byte offset (4 per float, 2 per timer), from a
  * fresh base pointer at every access: indexing them by pair, or sharing one base pointer,
@@ -98,7 +98,7 @@ int func_PAL_00314678(Moby *self)
         if (FastDecTimer(timer) == 0) {
             if (TIMER(timerOffset) >= 41)
                 active = 1;
-            ANGLE(floatOffset) += ENTRY(D_001AF1E0, floatOffset);
+            ANGLE(floatOffset) += ENTRY(g_spark_spin_table, floatOffset);
             if (ANGLE(floatOffset) >= 255.0f)
                 ANGLE(floatOffset) -= 255.0f;
             else if (ANGLE(floatOffset) <= 0.0f)
@@ -106,27 +106,27 @@ int func_PAL_00314678(Moby *self)
 
             mix = math_fabs(0.5f - IntToFloat(span - TIMER(timerOffset)) * 0.004716981f);
             if (vars->altColors)
-                color = FastTweenColor(D_001AF1CC, D_001AF1D0, mix);
+                color = FastTweenColor(g_spark_color_b_from, g_spark_color_b_to, mix);
             else
-                color = FastTweenColor(D_001AF1C4, D_001AF1C8, mix);
+                color = FastTweenColor(g_spark_color_a_from, g_spark_color_a_to, mix);
             oldAlpha = color >> 24;
-            duration = IntToFloat(((s32)(D_001AF174) * 5 + 2) / 6);
+            duration = IntToFloat(((s32)(g_nanotech_duration) * 5 + 2) / 6);
             remaining = 1.0f - (float)TIMER(timerOffset) / duration;
             alpha = FloatToInt(IntToFloat(oldAlpha) * (1.0f - remaining)) << 24;
             color = alpha | (color & 0xFFFFFF);
 
-            position[2] = baseZ + ENTRY(D_001AF200, floatOffset);
+            position[2] = baseZ + ENTRY(g_spark_height_table, floatOffset);
             particle = part_spawn_fading(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
-                                     D_001AF1D8, 0, 2, 1,
-                                     ENTRY(D_001AF1F0, floatOffset) * remaining);
+                                     g_spark_param_b, 0, 2, 1,
+                                     ENTRY(g_spark_size_table, floatOffset) * remaining);
             if (particle != 0)
-                particle[2] = D_001F2540[62][0];
+                particle[2] = g_particle_texture_table[62][0];
             particle = part_spawn_fading(position, alpha | 0xFFFFFF,
-                                     FloatToInt(ANGLE(floatOffset)) & 255, D_001AF1D8,
-                                     D_001AF1D4, 2, 1,
-                                     ENTRY(D_001AF1F0, floatOffset) * 0.7f * remaining);
+                                     FloatToInt(ANGLE(floatOffset)) & 255, g_spark_param_b,
+                                     g_spark_param_a, 2, 1,
+                                     ENTRY(g_spark_size_table, floatOffset) * 0.7f * remaining);
             if (particle != 0)
-                particle[2] = D_001F2540[62][0];
+                particle[2] = g_particle_texture_table[62][0];
             FastVecAdd(position, position, step);
         }
         floatOffset += 4;

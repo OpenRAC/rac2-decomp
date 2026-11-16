@@ -3,21 +3,21 @@
    words scaled to 50 Hz, the rates become 0.2f and 0.02f, and the limits 900 and 100. */
 
 #include "common.h"
-extern int D_L03_001A8F00, g_current_map_index, D_001A7390;
-extern int D_00138324 __attribute__((nosda));
+extern int g_hero_l03_mode, g_current_map_index, g_frame_counter;
+extern int g_pad_held_flags __attribute__((nosda));
 extern u8 g_subtitle_history[], g_sound_state[];
-extern u16 D_0018D090[];
-extern u8 *D_L03_001AC040 MACRO_ADDR;
-extern float D_001B2464;
-extern int D_L03_001B2768;
-extern int D_L03_001B0B50 __attribute__((sda)), D_L03_001B0B58 __attribute__((sda));
-extern int D_L03_001B0B5C __attribute__((sda));
-extern int D_L03_001B0B60 __attribute__((sda));
-extern float D_L03_001B0B74 __attribute__((sda));
+extern u16 g_infiltrator_ball_id[];
+extern u8 *g_scene_switch_moby MACRO_ADDR;
+extern float g_gadget_approach_value;
+extern int g_puzzle_triggered_flag;
+extern int g_path_puzzle_step_count __attribute__((sda)), g_path_puzzle_timer_max __attribute__((sda));
+extern int g_path_puzzle_duration __attribute__((sda));
+extern int g_path_puzzle_limit __attribute__((sda));
+extern float g_path_puzzle_drain_rate __attribute__((sda));
 extern void moby_set_state(u8 *, int, int);
 extern float ApproachValue(float *, float, float);
 extern void snd_stop_voice(int);
-extern void func_PAL_L03_003E6CA8(u8 *), ComputePathPuzzleTurn(u8 *),UpdateChoicePath(u8 *),func_PAL_L03_003E7C78(u8 *),path_puzzle_choose_next_node(u8 *),func_PAL_L03_003E8B88(u8 *),moby_set_flag_on(u8 *);
+extern void func_PAL_L03_003E6CA8(u8 *), ComputePathPuzzleTurn(u8 *),UpdateChoicePath(u8 *),path_puzzle_animate_turn_pal(u8 *),path_puzzle_choose_next_node(u8 *),path_puzzle_update_glow_color_pal(u8 *),moby_set_flag_on(u8 *);
 extern int path_puzzle_select_node_from_stick(u8 *);
 extern int func_PAL_00289730(int,int);
 extern int PlayMobySound(int,int,u8 *);
@@ -49,13 +49,13 @@ void func_PAL_L03_003E66F8(u8 *p) {
     float f;
     u8 *timeRecord;
 
-    if (D_L03_001A8F00 != 7) {
+    if (g_hero_l03_mode != 7) {
         if (p[0x20])
             moby_set_state(p, 0, -1);
         return;
     }
-    ApproachValue(&D_001B2464, 0.0f, 0.20000002f);
-    D_L03_001B2768 = 1;
+    ApproachValue(&g_gadget_approach_value, 0.0f, 0.20000002f);
+    g_puzzle_triggered_flag = 1;
     switch (p[0x20]) {
     case 0:
         for (i = 0; i < 52; i++)
@@ -67,11 +67,11 @@ void func_PAL_L03_003E66F8(u8 *p) {
         break;
     case 1:
         timeRecord = g_subtitle_history;
-        if ((u32)(((s32)(D_001A7390) * 5 + 2) / 6 - *(u32 *)(timeRecord + 0x73C)) > 900 ||
+        if ((u32)(((s32)(g_frame_counter) * 5 + 2) / 6 - *(u32 *)(timeRecord + 0x73C)) > 900 ||
             !*(u32 *)(timeRecord + 0x73C))
             func_PAL_00289730(0xA43, 0x9A);
-        else if (*(u32 *)(timeRecord + 0x73C) < (u32)(((s32)(D_001A7390) * 5 + 2) / 6))
-            *(u32 *)(timeRecord + 0x73C) = ((s32)(D_001A7390) * 5 + 2) / 6;
+        else if (*(u32 *)(timeRecord + 0x73C) < (u32)(((s32)(g_frame_counter) * 5 + 2) / 6))
+            *(u32 *)(timeRecord + 0x73C) = ((s32)(g_frame_counter) * 5 + 2) / 6;
         moby_set_state(p, 3, -1);
         break;
     case 2:
@@ -87,7 +87,7 @@ void func_PAL_L03_003E66F8(u8 *p) {
         }
         break;
     case 3:
-        func_PAL_L03_003E7C78(p);
+        path_puzzle_animate_turn_pal(p);
         if (!path->f56)
             break;
         if (path->pending != -1) {
@@ -106,18 +106,18 @@ void func_PAL_L03_003E66F8(u8 *p) {
                 h = PlayMobySound(1, 0, p);
                 if (h != -1) {
                     f = IntToFloat(path->length);
-                    f /= IntToFloat(D_L03_001B0B50);
+                    f /= IntToFloat(g_path_puzzle_step_count);
                     snd_set_voice_pitch_bend(h, FloatToInt(f * 1024.0f) + 1024);
                 }
             }
         }
         if (path->length > path->maximumLength) {
             path->maximumLength = *(u16 *)(q + 0x5E);
-            path->timer += ((s32)(D_L03_001B0B60) * 5 + 2) / 6;
-            if (path->timer > ((s32)(D_L03_001B0B58) * 5 + 2) / 6)
-                path->timer = ((s32)(D_L03_001B0B58) * 5 + 2) / 6;
+            path->timer += ((s32)(g_path_puzzle_limit) * 5 + 2) / 6;
+            if (path->timer > ((s32)(g_path_puzzle_timer_max) * 5 + 2) / 6)
+                path->timer = ((s32)(g_path_puzzle_timer_max) * 5 + 2) / 6;
         }
-        if (path->length == D_L03_001B0B50) {
+        if (path->length == g_path_puzzle_step_count) {
             PlayMobySound(5, 0, p);
             moby_set_state(p, 5, -1);
         } else {
@@ -131,30 +131,30 @@ void func_PAL_L03_003E66F8(u8 *p) {
                 UpdateChoicePath(p);
                 PlayMobySound(2, 0, p);
             } else {
-                path->timer = ((s32)(D_L03_001B0B5C) * 5 + 2) / 6;
+                path->timer = ((s32)(g_path_puzzle_duration) * 5 + 2) / 6;
                 path->active = 0;
                 path->maximumLength = 0;
                 moby_set_state(p, 2, -1);
             }
         } else {
-            func_PAL_L03_003E7C78(p);
+            path_puzzle_animate_turn_pal(p);
         }
         break;
     case 5:
         if (flag_set_first_pending(p))
             *(u16 *)(p + 0x96) = 100;
         if (!*(u16 *)(p + 0x96)) {
-            D_0018D090[0] = 65535;
-            moby_set_flag_on(D_L03_001AC040);
+            g_infiltrator_ball_id[0] = 65535;
+            moby_set_flag_on(g_scene_switch_moby);
             goto exit;
         } else {
             --*(u16 *)(p + 0x96);
         }
         break;
     }
-    if (D_00138324 & 16) {
+    if (g_pad_held_flags & 16) {
         if (p[0x20] == 5)
-            moby_set_flag_on(D_L03_001AC040);
+            moby_set_flag_on(g_scene_switch_moby);
     exit:
         request_end_slot(0, 0);
         moby_mark_spawned(p);
@@ -176,8 +176,8 @@ void func_PAL_L03_003E66F8(u8 *p) {
         }
         *(int *)(q + 0x7C) = -1;
     }
-    func_PAL_L03_003E8B88(p);
-    *(float *)(q + 0x58) -= D_L03_001B0B74 * 0.020000001f;
+    path_puzzle_update_glow_color_pal(p);
+    *(float *)(q + 0x58) -= g_path_puzzle_drain_rate * 0.020000001f;
     if (*(float *)(q + 0x58) < -1.0f)
         *(float *)(q + 0x58) += 1.0f;
     gfx_add_draw_callback_first(DrawPathPuzzleHud, p);

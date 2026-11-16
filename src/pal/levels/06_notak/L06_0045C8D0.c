@@ -7,24 +7,24 @@ extern void FastVecAdd(char *, char *, char *);
 extern int FloatToInt(float);
 extern void set_moby_color(char *, int, int, int);
 extern void vec_scale_to_length(char *, char *, float);
-extern int D_L06_001B375C __attribute__((sda));
-extern int D_L06_001B3758 __attribute__((sda));
-extern void func_PAL_003120C0();
+extern int g_machine_hit_counter __attribute__((sda));
+extern int g_machine_hit_flag __attribute__((sda));
+extern void moby_fade_out_update_pal();
 extern void object_start_tumble(char *);
 extern int FloatToInt(float);
 
-void func_PAL_L06_0045CAE8(char *a0)
+void object_start_tumble_pal(char *a0)
 {
     char *s2 = *(char **)(a0 + 0x68);
     int v;
 
     FastVecAdd(a0 + 0x10, a0 + 0x10, s2);
-    v = FloatToInt((float)D_L06_001B375C * 1.5f);
-    set_moby_color(a0, v, FloatToInt((float)D_L06_001B375C * 1.25f), D_L06_001B375C);
-    if (D_L06_001B3758 != 0) {
+    v = FloatToInt((float)g_machine_hit_counter * 1.5f);
+    set_moby_color(a0, v, FloatToInt((float)g_machine_hit_counter * 1.25f), g_machine_hit_counter);
+    if (g_machine_hit_flag != 0) {
         vec_scale_to_length(s2, s2, 0.14000002f);
         *(float *)(s2 + 0x8) = *(float *)(s2 + 0x8) + 0.22000001f;
-        *(unsigned int *)(a0 + 0x64) = (unsigned int)func_PAL_003120C0;
+        *(unsigned int *)(a0 + 0x64) = (unsigned int)moby_fade_out_update_pal;
         *(float *)(a0 + 0x2C) = *(float *)(a0 + 0x2C) * 0.75f;
         set_moby_color(a0, 0x10, 0x10, 0x10);
     }
@@ -34,12 +34,12 @@ void func_PAL_L06_0045CAE8(char *a0)
 extern void moby_set_state(char *, int, int);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern int PlayMobySound(int, int, char *);
-extern void func_PAL_L00_003281C0(char *, int, float);
+extern void part_spawn_scaled_bolts_pal(char *, int, float);
 extern void moby_mark_spawned(char *);
 extern void FastVecScale(char *, char *, float);
-extern void func_PAL_L06_0045CD20(char *, int, void *, int, float, float, float, float);
+extern void part_spawn_debris_mask_pal(char *, int, void *, int, float, float, float, float);
 
-void func_PAL_L06_0045CBF0(unsigned char *a0)
+void breakable_l06_object_update_pal(unsigned char *a0)
 {
     char *o = *(char **)(a0 + 0x68);
 
@@ -60,9 +60,9 @@ void func_PAL_L06_0045CBF0(unsigned char *a0)
         char tmp[16];
 
         FastVecScale(tmp, (char *)(a0 + 0xD0), -0.040000003f);
-        func_PAL_L06_0045CD20((char *)a0, 7, tmp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_debris_mask_pal((char *)a0, 7, tmp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         PlayMobySound(0, 0, (char *)a0);
-        func_PAL_L00_003281C0((char *)a0, 1, 0.0f);
+        part_spawn_scaled_bolts_pal((char *)a0, 1, 0.0f);
         moby_mark_spawned((char *)a0);
         break;
     }
@@ -71,7 +71,7 @@ void func_PAL_L06_0045CBF0(unsigned char *a0)
 
 
 
-void func_PAL_L06_0045CEC0(unsigned char *a0)
+void breakable_object_alt_update_pal(unsigned char *a0)
 {
     char *o = *(char **)(a0 + 0x68);
 
@@ -92,9 +92,9 @@ void func_PAL_L06_0045CEC0(unsigned char *a0)
         char tmp[16];
 
         FastVecScale(tmp, (char *)(a0 + 0xD0), -0.040000003f);
-        func_PAL_L06_0045CD20((char *)a0, 7, tmp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_debris_mask_pal((char *)a0, 7, tmp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
         PlayMobySound(0, 0, (char *)a0);
-        func_PAL_L00_003281C0((char *)a0, 1, 0.0f);
+        part_spawn_scaled_bolts_pal((char *)a0, 1, 0.0f);
         moby_mark_spawned((char *)a0);
         break;
     }
@@ -102,13 +102,13 @@ void func_PAL_L06_0045CEC0(unsigned char *a0)
 }
 
 
-extern short *D_L06_001FB3A0[];
-extern char *D_L06_001B281C[] __attribute__((sda));
+extern short *g_group_l06_id_lists[];
+extern char *g_moby_l06_table[] __attribute__((sda));
 extern float math_random_angle(void);
-extern void func_PAL_L06_0045D258(char *);
+extern void part_emit_spark_burst_remove_pal(char *);
 extern void func_PAL_002A7E68(char *, int, int, int);
 
-void func_PAL_L06_0045CFF0(unsigned char *obj)
+void wake_actors_trigger_update_pal(unsigned char *obj)
 {
     char *data;
     char *hit;
@@ -122,14 +122,14 @@ void func_PAL_L06_0045CFF0(unsigned char *obj)
     data = *(char **)(obj + 0x68);
     hit = (char *)part_find_owned_effect_slot((char *)obj, 0x10000, 0);
     if (hit && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5) {
-        if (*(int *)data == 255) { func_PAL_L06_0045D258((char *)obj); return; }
+        if (*(int *)data == 255) { part_emit_spark_burst_remove_pal((char *)obj); return; }
         {
-            list = D_L06_001FB3A0[*(int *)data];
-            if (list == 0) { func_PAL_L06_0045D258((char *)obj); return; }
+            list = g_group_l06_id_lists[*(int *)data];
+            if (list == 0) { part_emit_spark_burst_remove_pal((char *)obj); return; }
             {
                 cursor = list;
                 do {
-                    target = D_L06_001B281C[0] + ((*cursor & 0x7FFF) << 8);
+                    target = g_moby_l06_table[0] + ((*cursor & 0x7FFF) << 8);
                     if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == 0xBBA) {
                         state = *(char **)(target + 0x68);
                         if (*(float *)(state + 0x20) > 0.0f) {
@@ -148,15 +148,15 @@ void func_PAL_L06_0045CFF0(unsigned char *obj)
             }
         }
         if (*(int *)(data + 4) == 255) goto destroy;
-        list = D_L06_001FB3A0[*(int *)(data + 4)];
+        list = g_group_l06_id_lists[*(int *)(data + 4)];
         if (list == 0) {
  destroy:
-            func_PAL_L06_0045D258((char *)obj); return;
+            part_emit_spark_burst_remove_pal((char *)obj); return;
         }
         {
             cursor = list;
             do {
-                target = D_L06_001B281C[0] + ((*cursor & 0x7FFF) << 8);
+                target = g_moby_l06_table[0] + ((*cursor & 0x7FFF) << 8);
                 if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == 0xBBA) {
                     state = *(char **)(target + 0x68);
                     *(float *)(state + 0x5A4) = math_random_angle();
@@ -169,7 +169,7 @@ void func_PAL_L06_0045CFF0(unsigned char *obj)
                 }
             } while (*cursor++ >= 0);
         }
-        func_PAL_L06_0045D258((char *)obj);
+        part_emit_spark_burst_remove_pal((char *)obj);
     }
     obj[0xA8] = 255;
 }

@@ -6,14 +6,14 @@ typedef unsigned int u32;
 typedef signed short s16;
 typedef signed int s32;
 extern void moby_set_state(void *, s32, s32);
-extern s32 D_L16_001B18F0 __attribute__((sda));
-extern s32 D_L16_001B18E0 __attribute__((sda));
-extern s32 D_L16_001B1704 __attribute__((sda));
+extern s32 g_snivelak_attach_rotation __attribute__((sda));
+extern s32 g_snivelak_attach_offset __attribute__((sda));
+extern s32 g_snivelak_voice_cue_count __attribute__((sda));
 extern void func_PAL_002A7E68(void *, s32, s32, void *);
 extern u32 g_current_map_index[1];
-extern float D_L16_001B1444 __attribute__((sda));
-extern float D_L16_001B1448 __attribute__((sda));
-extern char D_L16_001B9B00[];
+extern float g_snivelak_angle_limit __attribute__((sda));
+extern float g_snivelak_angle_rate __attribute__((sda));
+extern char g_scene_origin_transform[];
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern s32 FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
@@ -22,16 +22,16 @@ extern void math_update_wrapped_angle_offset(void *, void *, void *, float, floa
 extern void func_PAL_002AC3C0(void *, void *);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 FastDecTimer(void *);
-extern float func_PAL_002AA108(void *, void *);
+extern float moby_update_aim_target_strength_pal(void *, void *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_002A7650(void *, s32, s32);
+extern void SetDeathBits_pal(void *, s32, s32);
 extern s32 math_random_int_range(s32, s32);
-extern u8 *D_L16_001B9B50 __attribute__((nosda));
-extern s32 D_L16_001B2648[] __attribute__((sda));
+extern u8 *g_linked_node_state_ptr __attribute__((nosda));
+extern s32 g_frame_l16_counter[] __attribute__((sda));
 extern s32 moby_pack_handle(void *);
-extern u8 D_L16_00189EF0[] __attribute__((nosda));
-extern u8 D_L16_00189F30[] __attribute__((nosda));
+extern u8 g_snivelak_shot_origin[] __attribute__((nosda));
+extern u8 g_turret_aim_vector[] __attribute__((nosda));
 
 /* func_L16_0040DAE0 is defined in L16_00403900.c (this unit has no $gp access for it). */
 
@@ -83,13 +83,13 @@ s32 func_PAL_L16_004095E0(u8 *arg0)
         *(u8 *)(s1 + 0x4A) = FloatToInt(32.0f);
     }
     if (*(u8 *)(arg0 + 0x31) != 0) {
-        if (fast_vec_dist(arg0 + 0x10, D_L16_001B9B00) < 24.0f) {
+        if (fast_vec_dist(arg0 + 0x10, g_scene_origin_transform) < 24.0f) {
             moby_update_ground_check(arg0);
             *(u8 *)(arg0 + 0x6F) = 0x16;
         }
     }
-    math_update_wrapped_angle_offset(arg0, s1 + 0x284, s1 + 0x278, D_L16_001B1444,
-                  D_L16_001B1448 * 0.0003490659f, -1.0f);
+    math_update_wrapped_angle_offset(arg0, s1 + 0x284, s1 + 0x278, g_snivelak_angle_limit,
+                  g_snivelak_angle_rate * 0.0003490659f, -1.0f);
     func_PAL_002AC3C0(arg0, s1 + 0x140);
     s0 = part_find_owned_effect_slot(arg0, 0x10000, 0);
     if (FastDecTimer(s1 + 0x26) == 0)
@@ -103,7 +103,7 @@ s32 func_PAL_L16_004095E0(u8 *arg0)
             *(float *)(s0 + 0x2C) = v * *(float *)(s1 + 0x1E8);
         *(u8 *)(arg0 + 0xA8) = 0xFF;
     }
-    d = func_PAL_002AA108(arg0, s0);
+    d = moby_update_aim_target_strength_pal(arg0, s0);
     *(u8 *)(arg0 + 0xA8) = 0xFF;
     *(float *)(s1 + 0x20) = *(float *)(s1 + 0x20) - d;
     if ((float)*(s16 *)(s1 + 0x24) * 0.33000001f <= d || *(float *)(s1 + 0x20) <= 0.0f) {
@@ -113,7 +113,7 @@ s32 func_PAL_L16_004095E0(u8 *arg0)
     }
     if (*(u8 *)(s1 + 0x2E) == 2) {
         moby_mark_spawned(*(u8 **)(s1 + 0x274));
-        func_PAL_002A7650(arg0, 0, 3);
+        SetDeathBits_pal(arg0, 0, 3);
         return 1;
     }
     f20 = 0.0f;

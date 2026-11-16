@@ -15,9 +15,9 @@ extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float FastAddRotations(float, float);
 extern void moby_update_eased_node(void *, void *, s32, float, float);
-extern u8 D_L16_00189F30[] __attribute__((nosda));
-extern float D_L16_001B1640 __attribute__((sda));
-extern float D_L16_001B1644 __attribute__((sda));
+extern u8 g_turret_aim_vector[] __attribute__((nosda));
+extern float g_turret_ease_rate_a __attribute__((sda));
+extern float g_turret_ease_rate_b __attribute__((sda));
 
 void func_PAL_L16_00411E88(u8 *arg)
 {
@@ -36,7 +36,7 @@ void func_PAL_L16_00411E88(u8 *arg)
     if (arg[0x20] != 4) {
         origin = state + 0x1F0;
         value = fast_vec_dist(temp, origin) - 1.0f;
-        FastVecScale(target, D_L16_00189F30, value * 1.6666666f);
+        FastVecScale(target, g_turret_aim_vector, value * 1.6666666f);
         target[2] = 0.0f;
         FastVecAdd(target, target, origin);
         FastVecSub(temp, target, temp);
@@ -53,6 +53,6 @@ void func_PAL_L16_00411E88(u8 *arg)
         scale = 0.085f;
     }
     rate = scale * 1.44f;
-    moby_update_eased_node(arg, state + 0x250, 0, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
-    moby_update_eased_node(arg, state + 0x2D0, 1, D_L16_001B1640 * rate, D_L16_001B1644 * rate);
+    moby_update_eased_node(arg, state + 0x250, 0, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
+    moby_update_eased_node(arg, state + 0x2D0, 1, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
 }

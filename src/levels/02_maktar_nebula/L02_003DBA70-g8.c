@@ -8,12 +8,12 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L02_001B0518 __attribute__((sda));
-extern float D_L02_001B051C __attribute__((sda));
-extern float D_L02_001B0520 __attribute__((sda));
-extern float D_L02_001B0524 __attribute__((sda));
-extern float D_L02_001B0528 __attribute__((sda));
-extern char D_L02_001B0500[4] __attribute__((sda));
+extern float g_rising_particle_jitter __attribute__((sda));
+extern float g_rising_particle_speed_min __attribute__((sda));
+extern float g_rising_particle_speed_max __attribute__((sda));
+extern float g_rising_particle_height_offset __attribute__((sda));
+extern float g_rising_particle_push_length __attribute__((sda));
+extern char g_rising_particle_spawn_record[4] __attribute__((sda));
 extern char g_camera_l02_position[];
 
 extern void FastVecSub(void *, void *, void *);
@@ -35,15 +35,15 @@ void part_spawn_rising(char *point, int count) {
 
     *(TI128 *)vel = 0;
     *(TI128 *)pos = *(TI128 *)point;
-    pos[2] += D_L02_001B0524;
+    pos[2] += g_rising_particle_height_offset;
     pos[3] = 0;
     FastVecSub(tmp, g_camera_l02_position, pos);
     tmp[2] = 0;
-    vec_scale_to_length(tmp, tmp, D_L02_001B0528);
+    vec_scale_to_length(tmp, tmp, g_rising_particle_push_length);
     FastVecAdd(pos, pos, tmp);
     for (i = 0; i < count; i++) {
-        vec_add_random_offset(pos, D_L02_001B0518);
-        vel[2] = math_random_float_range(D_L02_001B051C, D_L02_001B0520) * 0.016666668f;
-        enemy_spawn_record(pos, vel, D_L02_001B0500, (void *)math_random_int_below(2), 1);
+        vec_add_random_offset(pos, g_rising_particle_jitter);
+        vel[2] = math_random_float_range(g_rising_particle_speed_min, g_rising_particle_speed_max) * 0.016666668f;
+        enemy_spawn_record(pos, vel, g_rising_particle_spawn_record, (void *)math_random_int_below(2), 1);
     }
 }

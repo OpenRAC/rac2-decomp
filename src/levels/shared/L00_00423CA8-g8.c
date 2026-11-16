@@ -1,10 +1,10 @@
 #include "common.h"
 extern char *g_follow_camera_object __attribute__((section(".data")));
-extern char D_L00_001BF220_1[],D_L00_001BF230[];
+extern char D_L00_001BF220_1[],g_collision_position[];
 typedef struct { char pad[0x2290]; char *owner; } Player3C;
 extern Player3C g_hero_state;
-extern void *D_L00_001B1850[] __attribute__((sda));
-extern float D_L00_001B14D0 __attribute__((sda));
+extern void *g_cam_collision_point_mask[] __attribute__((sda));
+extern float g_cam_collision_base_radius __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void FastVecSub(void *,void *,void *);
@@ -26,39 +26,39 @@ int cam_push_point_out_of_walls(char *obj,void *point,int index,float blend,floa
     float threshold;
     float distance, limit;
     int result=0;
-    threshold=D_L00_001B14D0+F(global,564)*F(global,556)*(F(global,560)-1.0f);
+    threshold=g_cam_collision_base_radius+F(global,564)*F(global,556)*(F(global,560)-1.0f);
     vec_clear_128(accumulated);
     qcopy(original,point);
     qcopy(plane,D_L00_001BF220_1);
-    qcopy(hit,D_L00_001BF230);
+    qcopy(hit,g_collision_position);
     origin=base+176;
     FastVecAdd(endpoint,origin,movement);
     distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
     limit=fast_vec_dist(origin,closest);
     limit /= F(movement,44)-F(state,48);
-    limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
+    limit=(g_cam_collision_base_radius+(threshold-g_cam_collision_base_radius)*limit)*0.75f;
     if(distance<limit) {
         result=1;
         cam_compute_push_out(obj,accumulated,closest,plane,original,limit-distance,blend);
         qcopy(point,hit);
-        if(coll_test_point(point,D_L00_001B1850[0],g_hero_state.owner,radius)) {
+        if(coll_test_point(point,g_cam_collision_point_mask[0],g_hero_state.owner,radius)) {
             FastVecSub(difference,original,point);
             FastVecAdd(plane,D_L00_001BF220_1,difference);
             distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
             limit=fast_vec_dist(origin,closest);
             limit /= F(movement,44)-F(state,48);
-            limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
+            limit=(g_cam_collision_base_radius+(threshold-g_cam_collision_base_radius)*limit)*0.75f;
             if(distance<limit) {
                 cam_compute_push_out(obj,correction,closest,plane,original,limit-distance,blend);
                 FastVecAdd(accumulated,accumulated,correction);
-                qcopy(point,D_L00_001BF230);
-                if(coll_test_point(point,D_L00_001B1850[0],g_hero_state.owner,radius)) {
+                qcopy(point,g_collision_position);
+                if(coll_test_point(point,g_cam_collision_point_mask[0],g_hero_state.owner,radius)) {
                     FastVecSub(difference,original,point);
                     FastVecAdd(plane,D_L00_001BF220_1,difference);
                     distance=ProjectPointOntoSegment(closest,plane,origin,endpoint,0.0f);
                     limit=fast_vec_dist(origin,closest);
                     limit /= F(movement,44)-F(state,48);
-                    limit=(D_L00_001B14D0+(threshold-D_L00_001B14D0)*limit)*0.75f;
+                    limit=(g_cam_collision_base_radius+(threshold-g_cam_collision_base_radius)*limit)*0.75f;
                     if(distance<limit) {
                         cam_compute_push_out(obj,correction,closest,plane,original,limit-distance,blend);
                         FastVecAdd(accumulated,accumulated,correction);

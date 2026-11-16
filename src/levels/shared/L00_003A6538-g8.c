@@ -4,15 +4,15 @@ typedef struct { u8 pad[0x70]; long f70, f78, f80, f88; } QuadPacket;
 typedef struct { float vertex[4][4]; unsigned int color[4]; float uv[4][2]; long registers[4]; } EffectQuad;
 extern float g_camera_l00_position[4];
 extern short g_screen_adjust_offsets[];
-extern float D_L00_001AF694 __attribute__((sda));
-extern float D_L00_001AF698 __attribute__((sda));
-extern float D_L00_001AF69C __attribute__((sda));
-extern float D_L00_001AF6A0 __attribute__((sda));
-extern float D_L00_001AF6A4 __attribute__((sda));
-extern float D_L00_001AF6A8 __attribute__((sda));
-extern float D_L00_001AF6AC __attribute__((sda));
-extern float D_L00_001AF6B0 __attribute__((sda));
-extern float D_L00_001AF6B8 __attribute__((sda));
+extern float g_beam_ring_radius_scale __attribute__((sda));
+extern float g_beam_ring_spoke_length __attribute__((sda));
+extern float g_beam_ring_spoke_target __attribute__((sda));
+extern float g_beam_ring_scale_end __attribute__((sda));
+extern float g_beam_ring_scale_start __attribute__((sda));
+extern float g_beam_ring_first_angle_deg __attribute__((sda));
+extern float g_beam_ring_step_angle_deg __attribute__((sda));
+extern float g_beam_ring_quad_length __attribute__((sda));
+extern float g_beam_l00_ring_alpha_scale __attribute__((sda));
 extern void cam_compute_view_direction(char *, char *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -51,16 +51,16 @@ void beam_draw_ring_and_core(char *moby)
         quad.uv[1][0] = 0.5f; quad.uv[1][1] = 1.0f;
         quad.uv[2][0] = 1.0f; quad.uv[2][1] = 0.0f;
         quad.uv[3][0] = 1.0f; quad.uv[3][1] = 1.0f;
-        FastVecScale(radius, normal, D_L00_001AF694);
+        FastVecScale(radius, normal, g_beam_ring_radius_scale);
         FastVecAdd(center, position, radius);
         math_build_axis_angle_quat(rotation, view, *(float *)(state + 0xC));
         vec_rotate_by_quaternion(radius, radius, rotation);
         for (i = 0; i < 8; i++) {
             FastVecCross(spoke, view, radius);
-            vec_scale_to_length(spoke, spoke, D_L00_001AF698);
+            vec_scale_to_length(spoke, spoke, g_beam_ring_spoke_length);
             FastVecAdd(quad.vertex[0], position, spoke);
             FastVecSub(quad.vertex[1], position, spoke);
-            FastVecScale(spoke, spoke, D_L00_001AF69C / D_L00_001AF698);
+            FastVecScale(spoke, spoke, g_beam_ring_spoke_target / g_beam_ring_spoke_length);
             FastVecAdd(side, position, radius);
             FastVecAdd(quad.vertex[2], side, spoke);
             FastVecSub(quad.vertex[3], side, spoke);
@@ -73,8 +73,8 @@ void beam_draw_ring_and_core(char *moby)
     }
     alpha = IntToFloat(*(short *)(state + 10)) * *(float *)(state + 0x24);
     {
-        float first = FastAddRotations(*(float *)(state + 0x28), D_L00_001AF6A8 * 0.017453294f);
-        float secondStep = D_L00_001AF6AC * 0.017453294f;
+        float first = FastAddRotations(*(float *)(state + 0x28), g_beam_ring_first_angle_deg * 0.017453294f);
+        float secondStep = g_beam_ring_step_angle_deg * 0.017453294f;
         *(float *)(state + 0x28) = first;
         *(float *)(state + 0x2C) = FastAddRotations(*(float *)(state + 0x2C), secondStep);
     }
@@ -92,7 +92,7 @@ void beam_draw_ring_and_core(char *moby)
     FastVecCross(side, rotation, normal);
     FastVecCross(up, side, rotation);
     vec_rotate_by_quaternion(horizontal, up, spoke);
-    scale = D_L00_001AF6A4 + (D_L00_001AF6A0 - D_L00_001AF6A4) * alpha;
+    scale = g_beam_ring_scale_start + (g_beam_ring_scale_end - g_beam_ring_scale_start) * alpha;
     vec_scale_to_length(horizontal, horizontal, scale);
     FastVecCross(vertical, rotation, horizontal);
     vec_scale_to_length(vertical, vertical, scale);
@@ -122,9 +122,9 @@ void beam_draw_ring_and_core(char *moby)
         FastVecScale(temporary, view, -0.1f);
         FastVecAdd(center, g_camera_l00_position, temporary);
         FastVecCross(vertical, view, normal);
-        vec_scale_to_length(vertical, vertical, D_L00_001AF6B0);
+        vec_scale_to_length(vertical, vertical, g_beam_ring_quad_length);
         FastVecCross(horizontal, vertical, view);
-        vec_scale_to_length(horizontal, horizontal, D_L00_001AF6B0);
+        vec_scale_to_length(horizontal, horizontal, g_beam_ring_quad_length);
         FastVecAdd(corner, center, horizontal);
         FastVecAdd(quad.vertex[0], corner, vertical);
         FastVecSub(quad.vertex[1], corner, vertical);
@@ -132,7 +132,7 @@ void beam_draw_ring_and_core(char *moby)
         FastVecAdd(quad.vertex[2], corner, vertical);
         FastVecSub(quad.vertex[3], corner, vertical);
         draw_world_quad(&quad, 0, 0);
-        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (FloatToInt(D_L00_001AF6B8 * alpha) << 24) | 0x808080;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (FloatToInt(g_beam_l00_ring_alpha_scale * alpha) << 24) | 0x808080;
         VU1_addGSregister(0x42, 0x48ULL);
         gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], quad.color[0]);
     }

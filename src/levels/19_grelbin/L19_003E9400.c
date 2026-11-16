@@ -52,8 +52,8 @@ typedef struct {
     long zero, texture, state, flags;
 } Quad;
 
-extern char D_L19_001BFEA0[], D_L19_001B9A40[];
-extern UV D_L19_001B1C08[] MACRO_ADDR;
+extern char g_hit_position_vec[], g_hero_origin_vec[];
+extern UV g_beam_l19_quad_uvs[] MACRO_ADDR;
 extern void moby_transform_joint_point(void *, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -107,7 +107,7 @@ void DrawGrelbinBeamEffect(char *moby)
     FastVecAdd(ray, ray, origin);
     hit = CollLine(origin, ray, mask, moby, flags);
     if (hit) {
-        qcopy_nc(impact, D_L19_001BFEA0);
+        qcopy_nc(impact, g_hit_position_vec);
     } else {
         qcopy_nc(impact, ray);
     }
@@ -116,8 +116,8 @@ void DrawGrelbinBeamEffect(char *moby)
     factor[1] = 0;
     factor[2] = 1;
     factor[3] = 1;
-    FastVecSub(jitter, origin, D_L19_001B9A40);
-    FastVecSub(other, impact, D_L19_001B9A40);
+    FastVecSub(jitter, origin, g_hero_origin_vec);
+    FastVecSub(other, impact, g_hero_origin_vec);
     vec_scale_to_length(jitter, jitter, 1);
     vec_scale_to_length(other, other, 1);
     FastVecCross(jitter, jitter, factor);
@@ -132,8 +132,8 @@ void DrawGrelbinBeamEffect(char *moby)
     q.zero = 0;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x80804020;
     for (i = 0; i < 4; i++) {
-        q.uv[i].u = D_L19_001B1C08[i].u;
-        q.uv[i].v = D_L19_001B1C08[i].v;
+        q.uv[i].u = g_beam_l19_quad_uvs[i].u;
+        q.uv[i].v = g_beam_l19_quad_uvs[i].v;
     }
 
     FastVecSub(corner, origin, jitter);
@@ -159,9 +159,9 @@ void DrawGrelbinBeamEffect(char *moby)
 
 /* func_L19_0041BFD0 is defined in L19_0041BFD0-g8.c. */
 
-extern u16 *D_L19_001FB5A0[];
+extern u16 *g_group_ptr_table[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern s32 D_L19_001B2A38[] __attribute__((sda));
+extern s32 g_max_l19_group_index[] __attribute__((sda));
 
 /* Mark every entity in this object's group state. */
 void group_mark_entities(u8 *object)
@@ -171,9 +171,9 @@ void group_mark_entities(u8 *object)
 
     if (object[0x21] == 0xFF)
         return;
-    group_ptr = D_L19_001FB5A0[object[0x21]];
-    while (object[0x21] != 0xFF && object[0x21] <= D_L19_001B2A38[0] && group_ptr != 0 &&
-           ((group_ptr != 0 && (s16)group_ptr[-1] >= 0) || group_ptr == D_L19_001FB5A0[object[0x21]])) {
+    group_ptr = g_group_ptr_table[object[0x21]];
+    while (object[0x21] != 0xFF && object[0x21] <= g_max_l19_group_index[0] && group_ptr != 0 &&
+           ((group_ptr != 0 && (s16)group_ptr[-1] >= 0) || group_ptr == g_group_ptr_table[object[0x21]])) {
         entity = g_moby_l19_array[0] + ((*group_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
@@ -198,10 +198,10 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void moby_set_state(void *, int, int);
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern char g_sound_state[];
-extern float D_L19_001A8F20[] MACRO_ADDR;
+extern float g_particle_effect_template[] MACRO_ADDR;
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern int PlayMobySound(int, int, void *);
 extern float fast_vec_dist(void *, void *);
@@ -229,7 +229,7 @@ void UpdateGrelbinTriggeredShuttle(char *moby)
         qcopy(vars + 0x20, moby + 0x10);
         *(int *)(vars + 0x40) = -1;
     case 1:
-        if ((*(u8 *)(moby + 0xB0) != 0xFF && (D_0019B2E8[*(u8 *)(moby + 0xB0) + (g_current_map_index << 4)] & 0x80)) ||
+        if ((*(u8 *)(moby + 0xB0) != 0xFF && (g_moby_group_flags[*(u8 *)(moby + 0xB0) + (g_current_map_index << 4)] & 0x80)) ||
             (*(int *)(vars + 0x1C) != -1 &&
              *(u8 *)((char *)((*(int *)(vars + 0x1C) << 8) + (int)g_moby_l19_array[0]) + 0x20) != 0))
             moby_set_state(moby, 2, -1);
@@ -255,7 +255,7 @@ void UpdateGrelbinTriggeredShuttle(char *moby)
     }
     if (*(u8 *)(moby + 0x20) >= 2) {
         gfx_add_draw_callback_first(gfx_draw_beam_along_heading, moby);
-        make_hit_descriptor(4.0f, query, moby, 1, D_L19_001A8F20);
+        make_hit_descriptor(4.0f, query, moby, 1, g_particle_effect_template);
         *(u16 *)(query + 0x1A) = *(u16 *)(moby + 0xAA);
         vec_scale_to_length(offset, moby + 0xE0, *(float *)(vars + 0xC));
         FastVecAdd(offset, moby + 0x10, offset);
@@ -264,7 +264,7 @@ void UpdateGrelbinTriggeredShuttle(char *moby)
 }
 
 
-extern int D_L19_001C9FC0[];
+extern int g_mover_var_index[];
 extern void BuildObjectAttachmentTransforms(char *, char *, int, int, int, int, int, int);
 extern void moby_update_attached_transforms(char *, char *);
 extern void euler_rotation_basis(void *, void *);
@@ -295,7 +295,7 @@ void rotated_rig_update(char *moby)
         }
         return;
     case 1:
-        if (D_L19_001C9FC0[0] == *(s32 *)(rig + 0xC)) {
+        if (g_mover_var_index[0] == *(s32 *)(rig + 0xC)) {
             turn[0] = *(float *)(rig + 0x10) * 0.00029088825f;
             turn[1] = *(float *)(rig + 0x14) * 0.00029088825f;
             turn[2] = *(float *)(rig + 0x18) * 0.00029088825f;
@@ -321,12 +321,12 @@ void rotated_rig_update(char *moby)
 
 /* func_L19_00422238 is defined in L19_00422238.c. */
 
-extern u16 *D_L19_001FB5A0[];
+extern u16 *g_group_ptr_table[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern s32 D_L19_001B2A38[] __attribute__((sda));
+extern s32 g_max_l19_group_index[] __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
-extern char D_0019B4A8[];
+extern u8 g_moby_group_flags[];
+extern char g_moby_nibble_table[];
 
 extern s32 flag_is_third_pending_set(u8 *);
 extern void moby_mark_spawned(u8 *);
@@ -361,7 +361,7 @@ void group_release_linked_when_triggered(u8 *moby)
                 first = (u8 *)((state->first << 8) + (int)g_moby_l19_array[0]);
                 if (first[0x20] != 0xFE) {
                     if (first[0x20] != 0xFD) {
-                        if ((D_0019B2E8[moby[0xB0] + g_current_map_index * 16] & 0x80) == 0)
+                        if ((g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80) == 0)
                             return;
                     }
                 }
@@ -371,9 +371,9 @@ void group_release_linked_when_triggered(u8 *moby)
     for (i = 0; i < 3; i++) {
         if (state->groups[i] == -1)
             continue;
-        for (group_ptr = D_L19_001FB5A0[state->groups[i]];
-             (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= D_L19_001B2A38[0] &&
-             group_ptr != 0 && ((s16)group_ptr[-1] >= 0 || group_ptr == D_L19_001FB5A0[state->groups[i]]);
+        for (group_ptr = g_group_ptr_table[state->groups[i]];
+             (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= g_max_l19_group_index[0] &&
+             group_ptr != 0 && ((s16)group_ptr[-1] >= 0 || group_ptr == g_group_ptr_table[state->groups[i]]);
              group_ptr++) {
             entity = g_moby_l19_array[0] + ((*group_ptr & 0x7FFF) << 8);
             if (entity == 0)
@@ -387,13 +387,13 @@ void group_release_linked_when_triggered(u8 *moby)
     }
     flag_word = *(u16 *)(moby + 0xB2);
     if (flag_word & 1) {
-        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 c = *q;
 
         if (((c >> 4) & 7) != 7)
             *q = c + 0x10;
     } else {
-        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 c = *q;
 
         if ((c & 7) != 7)
@@ -404,20 +404,20 @@ void group_release_linked_when_triggered(u8 *moby)
 
 /* func_L19_00422A98 is defined in L19_00422A98-g8.c. */
 
-extern char D_L19_001B9A40[];
-extern float D_L19_001B1ECC[] SDATA(D_L19_001B1ECC);
-extern float D_L19_001B1ED0[] SDATA(D_L19_001B1ED0);
-extern float D_L19_001B1ED4[] SDATA(D_L19_001B1ED4);
-extern float D_L19_001B1ED8[] SDATA(D_L19_001B1ED8);
-extern u8 D_L19_001B1EDC[] SDATA(D_L19_001B1EDC);
-extern int D_L19_001B1EE0[] SDATA(D_L19_001B1EE0);
-extern int D_L19_001B1EE4[] SDATA(D_L19_001B1EE4);
-extern float D_L19_001B1EE8[] SDATA(D_L19_001B1EE8);
-extern float D_L19_001B1EEC[] SDATA(D_L19_001B1EEC);
-extern u32 D_L19_001B1EF0[] SDATA(D_L19_001B1EF0);
-extern u32 D_L19_001B1EF4[] SDATA(D_L19_001B1EF4);
-extern int D_L19_001B1EFC[] SDATA(D_L19_001B1EFC);
-extern int D_L19_001B1F00[] SDATA(D_L19_001B1F00);
+extern char g_hero_origin_vec[];
+extern float g_group_release_speed_min_a[] SDATA(D_L19_001B1ECC);
+extern float g_group_release_speed_max_a[] SDATA(D_L19_001B1ED0);
+extern float g_group_release_speed_min_b[] SDATA(D_L19_001B1ED4);
+extern float g_group_release_speed_max_b[] SDATA(D_L19_001B1ED8);
+extern u8 g_group_release_glow_alpha[] SDATA(D_L19_001B1EDC);
+extern int g_group_release_particle_type_a[] SDATA(D_L19_001B1EE0);
+extern int g_group_release_particle_type_b[] SDATA(D_L19_001B1EE4);
+extern float g_group_release_particle_scale_a[] SDATA(D_L19_001B1EE8);
+extern float g_group_release_particle_scale_b[] SDATA(D_L19_001B1EEC);
+extern u32 g_group_release_color_start[] SDATA(D_L19_001B1EF0);
+extern u32 g_group_release_color_end[] SDATA(D_L19_001B1EF4);
+extern int g_group_release_fade_param_a[] SDATA(D_L19_001B1EFC);
+extern int g_group_release_fade_param_b[] SDATA(D_L19_001B1F00);
 extern int g_frame_l19_counter[] __attribute__((sda));
 extern int math_random_int_below(int);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -451,31 +451,31 @@ void EmitGrelbinGlowSprites(char *moby)
         moby_transform_joint_to_world(moby, 0, origin);
     }
     if (!math_random_int_below(4)) {
-        vec_random_direction(velocity, D_L19_001B1ECC[0] * 0.016666668f, D_L19_001B1ED0[0] * 0.016666668f);
+        vec_random_direction(velocity, g_group_release_speed_min_a[0] * 0.016666668f, g_group_release_speed_max_a[0] * 0.016666668f);
         {
-            int glowAlpha = D_L19_001B1EDC[0];
-            part_spawn_hero_relative(origin, velocity, D_L19_001B1EE0[0], glowAlpha, math_random_int_below(255), 0,
-                          D_L19_001B1EE8[0]);
+            int glowAlpha = g_group_release_glow_alpha[0];
+            part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_a[0], glowAlpha, math_random_int_below(255), 0,
+                          g_group_release_particle_scale_a[0]);
         }
         for (i = 2; i >= 0; i--) {
-            vec_random_direction(jitter, D_L19_001B1ED4[0] * 0.016666668f, D_L19_001B1ED8[0] * 0.016666668f);
+            vec_random_direction(jitter, g_group_release_speed_min_b[0] * 0.016666668f, g_group_release_speed_max_b[0] * 0.016666668f);
             FastVecAdd(velocity, velocity, jitter);
             {
-                int glowAlpha = D_L19_001B1EDC[0];
-                part_spawn_hero_relative(origin, velocity, D_L19_001B1EE4[0], glowAlpha, math_random_int_below(255), 0,
-                              D_L19_001B1EEC[0]);
+                int glowAlpha = g_group_release_glow_alpha[0];
+                part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_b[0], glowAlpha, math_random_int_below(255), 0,
+                              g_group_release_particle_scale_b[0]);
             }
         }
     }
     inv255 = 1.0f / 255.0f;
     half = 0.5f;
     three = 3.0f;
-    FastVecSub(point, D_L19_001B9A40, origin);
+    FastVecSub(point, g_hero_origin_vec, origin);
     vec_scale_to_length(point, point, -0.3f);
     vec_scale_to_length(step, point, 0.1f);
     FastVecAdd(point, point, origin);
     for (i = 0; i < 4; i++) {
-        color = FastTweenColor(D_L19_001B1EF0[0], D_L19_001B1EF4[0],
+        color = FastTweenColor(g_group_release_color_start[0], g_group_release_color_end[0],
                               math_fabs(half - IntToFloat(255 - ((g_frame_l19_counter[0] + i * 20) & 255)) * inv255));
         alpha = *(u8 *)g_frame_l19_counter;
         if (i & 2)
@@ -483,7 +483,7 @@ void EmitGrelbinGlowSprites(char *moby)
         if (i & 1)
             alpha = 255 - alpha;
         spriteAlpha = (u8)alpha;
-        part_spawn_fading(point, color, spriteAlpha, D_L19_001B1F00[0], D_L19_001B1EFC[0], 2, 0,
+        part_spawn_fading(point, color, spriteAlpha, g_group_release_fade_param_b[0], g_group_release_fade_param_a[0], 2, 0,
                       (IntToFloat(i) + three) * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(point, point, step);
     }
@@ -495,7 +495,7 @@ void EmitGrelbinGlowSprites(char *moby)
 
 /* func_L19_00423CC0 is defined in L19_00423CC0.c. */
 
-extern struct { u8 pad[0x464]; u8 flags[1]; } D_L19_0021EA30;
+extern struct { u8 pad[0x464]; u8 flags[1]; } g_trigger_active_table;
 extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_a(float);
 extern void FastVecScale(void *, void *, float);
@@ -524,8 +524,8 @@ void sinking_l19_platform_update(u8 *moby)
         if (other[0x20] == 0xFE) goto alreadyActive;
         if (other[0x20] == 0xFD) goto alreadyActive;
         id = *(u16 *)(other + 0xB2);
-        if (D_L19_0021EA30.flags[(s16)id]) goto alreadyActive;
-        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8);
+        if (g_trigger_active_table.flags[(s16)id]) goto alreadyActive;
+        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table);
         if (id & 1) {
             if ((bits >> 4) & 7) goto alreadyActive;
         } else if (bits & 7) goto alreadyActive;
@@ -545,8 +545,8 @@ void sinking_l19_platform_update(u8 *moby)
         u16 id;
         other = (u8 *)((*(int *)(vars + 0x7C) << 8) + (int)g_moby_l19_array[0]);
         id = *(u16 *)(other + 0xB2);
-        if (D_L19_0021EA30.flags[(s16)id]) goto activate;
-        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8);
+        if (g_trigger_active_table.flags[(s16)id]) goto activate;
+        bits = *((u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table);
         if (id & 1) {
             if ((bits >> 4) & 7) goto activate;
         } else if (bits & 7) goto activate;

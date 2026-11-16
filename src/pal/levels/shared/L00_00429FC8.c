@@ -5,7 +5,7 @@ extern char *g_follow_camera_object;
 extern char *g_follow_camera_object;
 
 /* Stores one float and two scaled by an arcsecond-sized constant into the block at +32. */
-void func_PAL_L00_00429FC8(float a, float b, float c)
+void cam_set_turn_limits_pal(float a, float b, float c)
 {
     char *p = g_follow_camera_object;
 

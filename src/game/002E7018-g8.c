@@ -9,8 +9,8 @@ extern unsigned int ref_L00_00361F20_01 __attribute__((sda));
 extern unsigned int ref_L00_00361F20_02 __attribute__((sda));
 
 extern int g_current_map_index;
-extern unsigned long long D_001B2160;
-extern float D_00261EC0[];
+extern unsigned long long g_overlay_quad_packet;
+extern float g_overlay_scale_table[];
 
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void mem_fast_helper_c(unsigned char *, unsigned char *, int);
@@ -34,7 +34,7 @@ void gfx_draw_overlay_quads(void)
 
     VU1_addGSregister(0x47, 0x31801);
 
-    packet = D_001B2160;
+    packet = g_overlay_quad_packet;
 
     *(unsigned long long *)(buf + 0x20) = 0;
     *(unsigned long long *)(buf + 0x28) = packet;
@@ -44,7 +44,7 @@ void gfx_draw_overlay_quads(void)
 
     mode = g_current_map_index;
     if (mode < 0x13) {
-        scale = D_00261EC0[mode];
+        scale = g_overlay_scale_table[mode];
     }
 
     for (i = 0; i < 4; i++) {
@@ -74,7 +74,7 @@ typedef struct {
     unsigned int fb0;
 } SelectionFlags;
 
-extern SelectionFlags D_00139768;
+extern SelectionFlags g_request_flag_table;
 extern char D_001A63A8_3[];
 extern int PlayBonusReelWithGameLoop(int);
 extern int mpeg_play_movie_by_id(int);
@@ -91,23 +91,23 @@ void scene_start_sequence_for_state(void)
     D_001A63A8_3[7] = 0;
 
     if (stateId == 0xA9) {
-        D_00139768.f00 |= 2;
-        D_00139768.fa8 |= 0x600;
+        g_request_flag_table.f00 |= 2;
+        g_request_flag_table.fa8 |= 0x600;
         if (PlayBonusReelWithGameLoop(0xA9)) goto done;
         if (mpeg_play_movie_by_id(1)) goto done;
         PlayBonusReelWithGameLoop(0xAA);
     } else if (stateId == 0x17) {
         mpeg_play_movie_by_id(0x17);
     } else if (stateId == 0xAB) {
-        D_00139768.fa8 |= 0x800;
-        D_00139768.f18 = (D_00139768.f18 & 0xFEFFFFFF) | 0x1000000;
-        D_00139768.fac |= 0x1000;
+        g_request_flag_table.fa8 |= 0x800;
+        g_request_flag_table.f18 = (g_request_flag_table.f18 & 0xFEFFFFFF) | 0x1000000;
+        g_request_flag_table.fac |= 0x1000;
         if (PlayBonusReelWithGameLoop(0xAB)) goto done;
         if (mpeg_play_movie_by_id(0x18)) goto done;
         PlayBonusReelWithGameLoop(0xAC);
     } else if (stateId == 0xAD) {
-        D_00139768.f18 = (D_00139768.f18 & 0xFDFFFFFF) | 0x2000000;
-        D_00139768.fac |= 0x6000;
+        g_request_flag_table.f18 = (g_request_flag_table.f18 & 0xFDFFFFFF) | 0x2000000;
+        g_request_flag_table.fac |= 0x6000;
         if (PlayBonusReelWithGameLoop(0xAD)) goto done;
         if (mpeg_play_movie_by_id(0x19)) goto done;
         PlayBonusReelWithGameLoop(0xAE);
@@ -116,9 +116,9 @@ void scene_start_sequence_for_state(void)
     } else if (stateId == 0x1B) {
         mpeg_play_movie_by_id(0x1B);
     } else if (stateId == 0xAF) {
-        D_00139768.fac |= 0x8000;
-        D_00139768.f1c = (D_00139768.f1c & 0xEFFFFFFF) | 0x10000000;
-        D_00139768.fb0 = (D_00139768.fb0 & 0xFFFEFFFF) | 0x10000;
+        g_request_flag_table.fac |= 0x8000;
+        g_request_flag_table.f1c = (g_request_flag_table.f1c & 0xEFFFFFFF) | 0x10000000;
+        g_request_flag_table.fb0 = (g_request_flag_table.fb0 & 0xFFFEFFFF) | 0x10000;
         if (PlayBonusReelWithGameLoop(0xAF)) goto done;
         if (mpeg_play_movie_by_id(0x1C)) goto done;
         PlayBonusReelWithGameLoop(0xB0);

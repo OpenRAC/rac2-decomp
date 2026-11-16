@@ -7,11 +7,11 @@
  */
 #include "common.h"
 extern void beam_draw_tip_glow(char *);
-extern char D_L09_001B9A00[];
-extern int D_L09_001B11D8 __attribute__((sda));
-extern float D_L09_002A1FF0[][3];
-extern u32 D_L09_002A2658[];
-extern char D_L09_002A23C8[];
+extern char g_camera_l09_position[];
+extern int g_light_ring_point_count __attribute__((sda));
+extern float g_light_ring_points[][3];
+extern u32 g_color_pulse_colors[];
+extern char g_light_ring_uvs[];
 extern u64 GetEffectTextureDescriptor(int);
 extern void VU1_addGSregister(int,u64);
 extern void font_queue_vu_state(void);
@@ -34,7 +34,7 @@ void light_ring_draw(char *moby) {
 
     beam_draw_tip_glow(moby);
     qcopy(frame.mat[0], vars + 0x340);
-    FastVecSub(frame.mat[2], vars + 0x370, D_L09_001B9A00);
+    FastVecSub(frame.mat[2], vars + 0x370, g_camera_l09_position);
     FastVecCross(frame.mat[1], frame.mat[0], frame.mat[2]);
     vec_scale_to_length(frame.mat[1], frame.mat[1], 1.0f);
     FastVecCross(frame.mat[2], frame.mat[1], frame.mat[0]);
@@ -47,8 +47,8 @@ void light_ring_draw(char *moby) {
     VU1_addGSregister(0x47, 0x51001);
     VU1_addGSregister(0x4A, 0);
     font_queue_vu_state();
-    for (i = 0; i < D_L09_001B11D8; i++) {
-        float *src = D_L09_002A1FF0[i];
+    for (i = 0; i < g_light_ring_point_count; i++) {
+        float *src = g_light_ring_points[i];
         float *out = frame.verts[i];
         point[0] = src[0];
         point[1] = src[1];
@@ -59,19 +59,19 @@ void light_ring_draw(char *moby) {
         out[1] = point[1];
         out[2] = point[2];
         if (*(short *)(vars + 0x422) != 0) {
-            colors[i] = D_L09_002A2658[i] & 0xFF0000FF;
+            colors[i] = g_color_pulse_colors[i] & 0xFF0000FF;
         }
     }
     if (*(short *)(vars + 0x422) != 0) {
-        part_draw_glint_effect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
+        part_draw_glint_effect(g_light_ring_point_count, frame.verts, colors, g_light_ring_uvs, 1);
     } else {
-        part_draw_glint_effect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        part_draw_glint_effect(g_light_ring_point_count, frame.verts, g_color_pulse_colors, g_light_ring_uvs, 1);
     }
     FastVecScale(frame.mat[1], frame.mat[1], -1.0f);
     FastVecScale(frame.mat[2], frame.mat[2], -1.0f);
-    for (j = 0; j < D_L09_001B11D8; j++) {
+    for (j = 0; j < g_light_ring_point_count; j++) {
         float *out = frame.verts[j];
-        float *src = D_L09_002A1FF0[j];
+        float *src = g_light_ring_points[j];
         point[0] = src[0];
         point[1] = src[1];
         point[2] = src[2];
@@ -82,8 +82,8 @@ void light_ring_draw(char *moby) {
         out[2] = point[2];
     }
     if (*(short *)(vars + 0x422) != 0) {
-        part_draw_glint_effect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
+        part_draw_glint_effect(g_light_ring_point_count, frame.verts, colors, g_light_ring_uvs, 1);
     } else {
-        part_draw_glint_effect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        part_draw_glint_effect(g_light_ring_point_count, frame.verts, g_color_pulse_colors, g_light_ring_uvs, 1);
     }
 }

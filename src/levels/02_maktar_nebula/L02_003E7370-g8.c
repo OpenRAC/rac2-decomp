@@ -8,7 +8,7 @@ extern void matrix_mul_vec3(float *, float *, float *);
 extern void FastVecAdd(float *, float *, float *);
 extern char *cam_moby_create(char *, int, int, int, char *, char *, float *, int, float, float);
 extern void *moby_spawn_bolt_pickup(char *, float *, float *, int, int, int);
-extern int D_L02_001B096C __attribute__((sda));
+extern int g_slot_machine_debris_budget __attribute__((sda));
 
 /* Spawns five particles at the actor (the ids 0xCA5 to 0xCA9, each with a random velocity in a
    0.0167-scaled box rotated by the matrix at +0xC0), then, while D_L02_001B096C stays above 0, up
@@ -33,13 +33,13 @@ void part_spawn_slot_machine_debris(char *actor) {
     spawn_point[2] = 1.5f;
     matrix_mul_vec3(spawn_point, spawn_point, (float *)mat);
     FastVecAdd(spawn_point, spawn_point, (float *)pos);
-    for (i = 0; i < 5 && D_L02_001B096C > 0; i++) {
+    for (i = 0; i < 5 && g_slot_machine_debris_budget > 0; i++) {
         qzero(vel);
         vel[0] = math_random_float_range(1.0f, 4.0f) * 0.016666668f;
         vel[1] = math_random_signed_float_range(1.0f, 3.0f) * 0.016666668f;
         vel[2] = math_random_float_range(4.0f, 9.0f) * 0.016666668f;
         matrix_mul_vec3(vel, vel, (float *)mat);
         moby_spawn_bolt_pickup(actor, spawn_point, vel, 0, 5, 0);
-        D_L02_001B096C -= 5;
+        g_slot_machine_debris_budget -= 5;
     }
 }

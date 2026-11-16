@@ -5,8 +5,8 @@ extern void vec_add_random_offset(void *, float);
 extern float vec_distance_xy(void *, void *);
 extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
 extern char *func_PAL_002C3798(void *, int, int, int, int, int, int, float, float);
-extern unsigned char *D_001F2628;
-extern char *D_001B1D90[] __attribute__((sda));
+extern unsigned char *g_part_tex_burst_ember_table;
+extern char *g_particle_pool_base[] __attribute__((sda));
 extern char g_hero_position[];
 typedef struct {
     char pad00[0x88];
@@ -73,8 +73,8 @@ void func_PAL_002C3990(char *p) {
   f=(a-IntToFloat(*(short *)(p+10)))/a;
   *(int *)(p+4)=FastTweenColor((*(unsigned char *)(q+22)<<24)|0x4060,0x8fafff,f);
   if(f<0.6f)*(float *)(p+12)+=10836.001f;else *(float *)(p+12)-=2.016e+04f;
-  p[2]=D_001F2628[func_001163B0()&7];
-  if((((p-D_001B1D90[0])>>6)&1))p[8]++;else p[8]--;
+  p[2]=g_part_tex_burst_ember_table[func_001163B0()&7];
+  if((((p-g_particle_pool_base[0])>>6)&1))p[8]++;else p[8]--;
   if(FastDecTimer((short *)(p+10)))part_kill(p);
   break;
  }

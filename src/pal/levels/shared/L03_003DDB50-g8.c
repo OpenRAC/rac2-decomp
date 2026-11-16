@@ -14,7 +14,7 @@ extern u8 *CreateMoby(s32);
 extern void moby_init_child_from_parent(u8 *, u8 *);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(void *);
-extern f32 D_L03_001B08D8 __attribute__((sda));
+extern f32 g_spark_shot_speed_scale __attribute__((sda));
 
 u8 *func_PAL_L03_003DDB50(u8 *owner, void *position, f32 *velocity, s32 value)
 {
@@ -31,7 +31,7 @@ u8 *func_PAL_L03_003DDB50(u8 *owner, void *position, f32 *velocity, s32 value)
         vars->timer = 0x4B;
         vars->owner = owner;
         vars->count = 0;
-        *(f32 *)(object + 0x2C) = *(f32 *)(*(u8 **)(object + 0x24) + 0x24) * D_L03_001B08D8;
+        *(f32 *)(object + 0x2C) = *(f32 *)(*(u8 **)(object + 0x24) + 0x24) * g_spark_shot_speed_scale;
     }
     return object;
 }

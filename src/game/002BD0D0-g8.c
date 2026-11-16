@@ -8,12 +8,12 @@ extern int moby_forward_two_values_and_amount(int,int,float);
 extern void FastVecAdd(void *,void *,void *);
 extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
-extern float D_001B168C __attribute__((sda));
+extern float g_frame_time_scale __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern char g_camera_eye_state[];
 extern char *part_spawn_falling_drop(void *,void *,int,int,float,int,int);
 typedef struct { float v[4]; } GravityTable;
-extern GravityTable D_001AA350;
+extern GravityTable g_falling_drop_gravity;
 /* Updates a falling drop. It falls, fades near the end and near the camera, and splashes into a small drop when it lands. */
 void part_update_falling_drop(char *particle)
 {
@@ -21,8 +21,8 @@ void part_update_falling_drop(char *particle)
  struct { Quad saved; GravityTable gravity; } local;
  float life_ratio,camera_distance,size;
  int color,alpha,end_color,drop_type;
- local.gravity=D_001AA350;
- if(*(short *)(motion+26)==3 && D_001B168C>0.95f) FastDecTimer(particle+10);
+ local.gravity=g_falling_drop_gravity;
+ if(*(short *)(motion+26)==3 && g_frame_time_scale>0.95f) FastDecTimer(particle+10);
  if(FastDecTimer(particle+10)) {part_kill(particle);return;}
  pos=particle+16;
  life_ratio=IntToFloat(*(short *)(particle+10));

@@ -4,8 +4,8 @@
 
 typedef unsigned char u8;
 extern int g_current_map_index __attribute__((sda));
-extern int D_L19_001A9010 __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern int g_hero_l19_special_state_flag __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
 extern int hero_l19_set_state(int, int);
@@ -77,7 +77,7 @@ void hero_process_button_command(void)
     if (command == 2 && !g_hero_state.inputLock &&
         (!g_hero_state.jumpCount || g_hero_state.elapsed < 2.5f)) {
         g_hero_state.jumpPressed = 1;
-        if (!g_hero_state.mode && D_001A7B0B) g_hero_state.pendingJump = 1;
+        if (!g_hero_state.mode && g_hero_input_enabled) g_hero_state.pendingJump = 1;
     }
     if (command == 14) {
         g_hero_state.flag1494 = 1;
@@ -99,7 +99,7 @@ void hero_process_button_command(void)
         if (g_hero_state.attack && active &&
             (g_hero_state.state != 0x38 || g_hero_state.animationDone)) {
             if (g_hero_state.health) { hero_l19_set_state(0x38,1); return; }
-            if (g_current_map_index == 2 && D_L19_001A9010) { hero_l19_set_state(0x7d,1); return; }
+            if (g_current_map_index == 2 && g_hero_l19_special_state_flag) { hero_l19_set_state(0x7d,1); return; }
             if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l19_set_state(0x79,1); return; }
             hero_l19_set_state(0x39,1); return;
         }

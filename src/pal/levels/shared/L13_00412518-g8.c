@@ -12,10 +12,10 @@ extern void euler_rotation_basis(char *, char *);
 extern float math_random_float_range(float, float);
 extern void *part_spawn_ground_effect(void *, int, int, float, int, int, int, float, float, int);
 extern int PlayMobySound(int, int, char *);
-extern float D_L13_001B1360 __attribute__((sda));
-extern int D_L13_001B1308 __attribute__((sda));
-extern int D_L13_001B130C __attribute__((sda));
-extern char D_L13_001A8F20[] __attribute__((sda));
+extern float g_effect_object_scale __attribute__((sda));
+extern int g_sparkle_effect_type_a __attribute__((sda));
+extern int g_sparkle_effect_type_b __attribute__((sda));
+extern char g_default_l13_effect_vector[] __attribute__((sda));
 typedef struct {
     unsigned char pad00[0x20];
     unsigned char active;
@@ -27,7 +27,7 @@ typedef struct {
     unsigned short color, flags;
 } DCObject;
 
-char *func_PAL_L13_00412518(char *a0, char *a1, char *a2, int a3, float f12)
+char *SpawnEA7Moby_pal(char *a0, char *a1, char *a2, int a3, float f12)
 {
     float angle, scale;
     char *p = a2;
@@ -60,13 +60,13 @@ char *func_PAL_L13_00412518(char *a0, char *a1, char *a2, int a3, float f12)
 
         ((DCObject *)entity)->opacity = 0x80;
         ((DCObject *)entity)->flags |= 0x100;
-        ((DCObject *)entity)->scale = D_L13_001B1360;
+        ((DCObject *)entity)->scale = g_effect_object_scale;
         *(int *)(p + 0x24) = 0;
         scale = math_random_float_range(8.0f, 10.0f);
-        part_spawn_ground_effect(entity + 0x10, 0xC, D_L13_001B1308, scale * 0.30000001192092896f, 0, 0xA,
-                    (int)D_L13_001A8F20, scale, 0.0f, 0);
-        part_spawn_ground_effect(entity + 0x10, 0xC, D_L13_001B130C, scale * 0.03999999910593033f, 1, -0xA,
-                    (int)D_L13_001A8F20, scale * 0.4000000059604645f, 0.0f, 0);
+        part_spawn_ground_effect(entity + 0x10, 0xC, g_sparkle_effect_type_a, scale * 0.30000001192092896f, 0, 0xA,
+                    (int)g_default_l13_effect_vector, scale, 0.0f, 0);
+        part_spawn_ground_effect(entity + 0x10, 0xC, g_sparkle_effect_type_b, scale * 0.03999999910593033f, 1, -0xA,
+                    (int)g_default_l13_effect_vector, scale * 0.4000000059604645f, 0.0f, 0);
         PlayMobySound(0, 0, entity);
     }
     return entity;

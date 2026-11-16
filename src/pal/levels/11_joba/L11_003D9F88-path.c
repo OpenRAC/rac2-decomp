@@ -4,11 +4,11 @@
 extern void moby_set_state(u8 *, s32, s32);
 extern s32 FloatToInt(f32);
 extern float math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
-extern u8 *D_L11_001FF580[];
+extern u8 *g_path_l11_table[];
 extern s32 math_fast_float_d(void *);
 extern void lerp_vector(void *, void *, void *, f32);
 
-void func_PAL_L11_003D9F88(u8 *arg0) {
+void path_l11_follower_update_pal(u8 *arg0) {
     u8 *s1 = arg0;
     u8 *s0 = *(u8 **)(s1 + 0x68);
     u8 *s2;
@@ -22,7 +22,7 @@ void func_PAL_L11_003D9F88(u8 *arg0) {
         }
         *(u8 *)(s1 + 0x30) = 255;
         moby_set_state(s1, 1, -1);
-        qcopy(s1 + 0x10, D_L11_001FF580[*(s32 *)s0] + 0x10);
+        qcopy(s1 + 0x10, g_path_l11_table[*(s32 *)s0] + 0x10);
         *(f32 *)(s0 + 0x10) = 0.0016000001f / (*(f32 *)(s0 + 4) * *(f32 *)(s0 + 4));
         *(s32 *)(s0 + 0x1C) = (s32)(*(f32 *)(s0 + 8) * 5e+01f);
         break;
@@ -33,7 +33,7 @@ void func_PAL_L11_003D9F88(u8 *arg0) {
         }
         break;
     case 2:
-        s2 = D_L11_001FF580[*(s32 *)s0];
+        s2 = g_path_l11_table[*(s32 *)s0];
         math_step_value_toward_target(s0 + 0x18, s0 + 0xC, (f32)*(s32 *)(s0 + 0x14), *(f32 *)(s0 + 0x10), *(f32 *)(s0 + 0x10), 1.0f);
         i = FloatToInt(*(f32 *)(s0 + 0x18) * (f32)(*(s32 *)s2 - 1));
         t = *(f32 *)(s0 + 0x18) * (f32)(*(s32 *)s2 - 1) - (f32)i;

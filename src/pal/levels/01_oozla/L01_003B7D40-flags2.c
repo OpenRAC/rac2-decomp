@@ -10,10 +10,10 @@ extern float math_random_float_range(float a, float b);
 extern int math_random_int_below(int a);
 extern void *part_spawn_drifting(char *a0, int a1, int a2, float f12, float f13);
 extern float FastVecLength(void *a0);
-extern void func_PAL_L01_003B7D40(void *a0, int a1, int a2, int a3);
-extern f32 D_L01_001AFE18[];
+extern void part_spawn_water_splash_effects_pal(void *a0, int a1, int a2, int a3);
+extern f32 g_water_l01_height[];
 
-void func_PAL_L01_003B7FC0(u8 *arg0)
+void swamp_beast_spawn_bubbles_pal(u8 *arg0)
 {
     u8 *state = *(u8 **)(arg0 + 0x68);
     float v[4];
@@ -32,12 +32,12 @@ void func_PAL_L01_003B7FC0(u8 *arg0)
             vec_add_random_offset(v, 0.15f);
             v[2] = func_PAL_L01_003BEB40();
             f = math_random_float_range(0.3f, 2.5f);
-            part_spawn_drifting((char *)v, (int)D_L01_001AFE18,
+            part_spawn_drifting((char *)v, (int)g_water_l01_height,
                           (int)((((u32)math_random_int_below(6) + 0x14) << 24) | 0x5060), f, 13200.001f);
             i--;
         }
         f = 0.040000003f;
         if (f < FastVecLength(q) || f < FastVecLength(state + 0x2F0))
-            func_PAL_L01_003B7D40(arg0, 3, 10, 1);
+            part_spawn_water_splash_effects_pal(arg0, 3, 10, 1);
     }
 }

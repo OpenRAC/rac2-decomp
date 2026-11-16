@@ -23,7 +23,7 @@ extern float FastVecLength(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_angle_helper(float);
 extern float math_fast_sin_or_cos_a(float);
-extern char D_L15_001B97C0[];
+extern char g_camera_l15_position[];
 
 extern void DrawPath(char *, int, int, int, float, int);
 extern int follower_has_reached_target(char *);
@@ -41,7 +41,7 @@ typedef struct GornPath {
     int pad[3];
     GornPathPoint points[1];
 } GornPath;
-extern char *D_L15_001FE480[];
+extern char *g_path_l15_table[];
 extern void gorn_path_mover_init(char *);
 extern void path_start_following(void);
 
@@ -62,7 +62,7 @@ extern void gfx_draw_colored_rectangle(int, int, int, int, long);
 extern int math_fast_float_d(void *);
 extern void DrawGornRibbon(void *, int, int, float, float, float, int, int, int);
 extern short g_screen_adjust_offsets[];
-extern char D_L15_00269FE0[];
+extern char g_part_channel_points[];
 
 /* Sets the level's four effect blocks up: the screen context first, then, when
    the level's own record says the object is idle, the four blocks of the
@@ -73,7 +73,7 @@ void gorn_draw_ribbon_effects(void *moby) {
     VU1_addGSregister(0x42, 0x48);
     gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], 0x40404040);
     if (math_fast_float_d(vars + 0x50) == 0) {
-        char *ribbon_data = D_L15_00269FE0;
+        char *ribbon_data = g_part_channel_points;
 
         DrawGornRibbon(ribbon_data, 0x46, 0x46, 3.2f, 6.35f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1010);
         DrawGornRibbon(ribbon_data + 0xA0, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
@@ -191,10 +191,10 @@ void gorn_ship_update(unsigned char *moby) {
     math_fast_float_d(vars + 0x450);
 }
 
-extern s32 D_L15_001AEE20[] __attribute__((sda));
-extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
-extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
-extern u8 D_L15_00188660[];
+extern s32 g_ship_damage_effect_count[] __attribute__((sda));
+extern s32 g_gorn_ship_damage_joints[] SDATA(D_L15_001B1780);
+extern s32 g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
+extern u8 g_ship_sound_slots[];
 extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -210,7 +210,7 @@ void gorn_ship_spawn_damage_effects(void *object)
 {
     u8 *obj = (u8 *)object;
     u8 *vars = *(u8 **)(obj + 0x68);
-    u8 *sound_slot = D_L15_00188660 + *(s32 *)(vars + 0x458) * 0x70;
+    u8 *sound_slot = g_ship_sound_slots + *(s32 *)(vars + 0x458) * 0x70;
     f32 from_point[4] __attribute__((aligned(16)));
     f32 to_point[4] __attribute__((aligned(16)));
     s32 burst_count;
@@ -220,17 +220,17 @@ void gorn_ship_spawn_damage_effects(void *object)
     if (*(u8 **)(sound_slot + 0x88) != obj || sound_slot[0x74] == 0) {
         *(s32 *)(vars + 0x458) = PlayMobySound(3, 4, obj);
     }
-    if (math_random_int_below(0xF) == 0 && D_L15_001AEE20[0] < 4) {
-        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], from_point);
-        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], to_point);
-        D_L15_001AEE20[0] = D_L15_001AEE20[0] + 1;
+    if (math_random_int_below(0xF) == 0 && g_ship_damage_effect_count[0] < 4) {
+        moby_transform_joint_to_world(obj, g_gorn_ship_damage_joints[math_random_int_below(0xB)], from_point);
+        moby_transform_joint_to_world(obj, g_gorn_ship_damage_joints[math_random_int_below(0xB)], to_point);
+        g_ship_damage_effect_count[0] = g_ship_damage_effect_count[0] + 1;
         CreateEnergyStrip(from_point, to_point, 0x19, 0, 0.5f, 0.2f, 0.4020000100135803f, 1.122249960899353f, 0x7F7F7F, 0xFF1010, 0x46, 0x46);
     }
     if (*(s32 *)(vars + 0x26C) < 7) {
         burst_count = FloatToInt(8.0f - (f32)*(s32 *)(vars + 0x26C));
         if (burst_count > 0) {
             remaining = burst_count;
-            joint_list = D_L15_001B17B0;
+            joint_list = g_gorn_ship_part_joints;
             while (1) {
                 if (math_random_int_below(2) != 0) {
                     gorn_part_spawn_puff((char *)obj, *joint_list, 0, math_random_float_range(2.0f, 3.0f));
@@ -254,8 +254,8 @@ typedef struct GornEffectCamera {
     char pad00[0x140];
     float position[4];
 } GornEffectCamera;
-extern GornEffectCamera D_L15_001B9680;
-extern unsigned char *D_L15_001FF4AC;
+extern GornEffectCamera g_hero_l15_state_floats;
+extern unsigned char *g_particle_l15_byte_ptr;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -278,8 +278,8 @@ void gorn_part_spawn_smoke(char *object, int joint, int unused, float radius) {
     unsigned char *data;
 
     moby_transform_joint_to_world(object, joint, initial);
-    heading = mat_fast_helper_a(D_L15_001B9680.position[0] - *(float *)(object + 0x10),
-                            D_L15_001B9680.position[1] - *(float *)(object + 0x14));
+    heading = mat_fast_helper_a(g_hero_l15_state_floats.position[0] - *(float *)(object + 0x10),
+                            g_hero_l15_state_floats.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);
@@ -299,7 +299,7 @@ void gorn_part_spawn_smoke(char *object, int joint, int unused, float radius) {
         *(int *)(data + 4) = 3;
         data[0xA] = 0x7F;
         data[0xB] = particle[0xA];
-        particle[2] = *D_L15_001FF4AC;
+        particle[2] = *g_particle_l15_byte_ptr;
     }
 }
 
@@ -420,7 +420,7 @@ void gorn_ship_aim_parts(char *object) {
     matrix_mul_vec3(side, side, object + 0xC0);
     moby_transform_joint_point(object, 14, matrix1);
     moby_transform_joint_point(object, 15, matrix2);
-    FastVecSub(delta, D_L15_001B97C0, matrix1 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix1 + 12);
     dot = FastVecDot(delta, up);
     FastVecScale(temp, up, dot);
     FastVecSub(delta, delta, temp);
@@ -429,7 +429,7 @@ void gorn_ship_aim_parts(char *object) {
     if (FastVecDot(delta, side) > 0.0f) angle = -angle;
     FastVecScale(state + 0x4F0, axis1, math_fast_sin_or_cos_b(angle));
     *(float *)(state + 0x4FC) = math_fast_sin_or_cos_a(angle);
-    FastVecSub(delta, D_L15_001B97C0, matrix2 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix2 + 12);
     FastVecScale(temp, up, FastVecDot(delta, up));
     FastVecSub(delta, delta, temp);
     vec_scale_to_length(delta, forward, FastVecLength(delta));
@@ -442,7 +442,7 @@ void gorn_ship_aim_parts(char *object) {
     *(float *)(state + 0x53C) = math_fast_sin_or_cos_a(angle);
     moby_transform_joint_point(object, 16, matrix1);
     moby_transform_joint_point(object, 17, matrix2);
-    FastVecSub(delta, D_L15_001B97C0, matrix1 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix1 + 12);
     FastVecScale(temp, side, FastVecDot(delta, side));
     FastVecSub(delta, delta, temp);
     vec_scale_to_length(delta, delta, 1.0f);
@@ -450,7 +450,7 @@ void gorn_ship_aim_parts(char *object) {
     if (FastVecDot(delta, up) > 0.0f) angle = -angle;
     FastVecScale(state + 0x570, axis2, -math_fast_sin_or_cos_b(angle));
     *(float *)(state + 0x57C) = math_fast_sin_or_cos_a(angle);
-    FastVecSub(delta, D_L15_001B97C0, matrix2 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix2 + 12);
     FastVecScale(temp, side, FastVecDot(delta, side));
     FastVecSub(delta, delta, temp);
     vec_scale_to_length(delta, forward, FastVecLength(delta));
@@ -464,7 +464,7 @@ void gorn_ship_aim_parts(char *object) {
     moby_transform_joint_point(object, 18, matrix1);
     moby_transform_joint_point(object, 19, matrix2);
     FastVecScale(side, side, -1.0f);
-    FastVecSub(delta, D_L15_001B97C0, matrix1 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix1 + 12);
     FastVecScale(temp, side, FastVecDot(delta, side));
     FastVecSub(delta, delta, temp);
     vec_scale_to_length(delta, delta, 1.0f);
@@ -472,7 +472,7 @@ void gorn_ship_aim_parts(char *object) {
     if (FastVecDot(delta, up) > 0.0f) angle = -angle;
     FastVecScale(state + 0x5F0, axis2, -math_fast_sin_or_cos_b(angle));
     *(float *)(state + 0x5FC) = math_fast_sin_or_cos_a(angle);
-    FastVecSub(delta, D_L15_001B97C0, matrix2 + 12);
+    FastVecSub(delta, g_camera_l15_position, matrix2 + 12);
     FastVecScale(temp, side, FastVecDot(delta, side));
     FastVecSub(delta, delta, temp);
     vec_scale_to_length(delta, forward, FastVecLength(delta));
@@ -567,7 +567,7 @@ void UpdateGornPathMover(char *object) {
 
         DrawPath(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
         owner = (char *)moby_get_motion_data(mover);
-        path = (GornPath *)D_L15_001FE480[*(int *)(state + 0x268)];
+        path = (GornPath *)g_path_l15_table[*(int *)(state + 0x268)];
         if (follower_has_reached_target(mover) != 0) {
             index = *(int *)(state + 0x26C);
             *(int *)(state + 0x26C) = index + 1;
@@ -636,8 +636,8 @@ void gorn_register_grid_draw_callbacks(void *moby) {
 
 /* func_L15_00438518 is in L15_00438518-g8.c. */
 
-extern int D_L15_001A8FF0[] __attribute__((sda));
-extern char D_00189ED0[];
+extern int g_tether_l15_active[] __attribute__((sda));
+extern char g_camera_position[];
 extern int math_random_int_below(int);
 extern int func_001163B0(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -653,12 +653,12 @@ void gorn_part_spawn_spark_burst(char *pos, int count, int mode) {
     float size, angle, speed;
     u8 *particle;
 
-    FastVecSub(direction, D_L15_001B97C0, (float *)pos);
-    if (D_L15_001A8FF0[0] == 0) {
+    FastVecSub(direction, g_camera_l15_position, (float *)pos);
+    if (g_tether_l15_active[0] == 0) {
         direction[2] = 0.0f;
         axis[0] = 0.0f; axis[1] = 0.0f; axis[2] = 1.0f; axis[3] = 1.0f;
     } else {
-        FastVecSub(extra, pos, D_00189ED0);
+        FastVecSub(extra, pos, g_camera_position);
         vec_scale_to_length(axis, extra, 1.0f);
         FastVecScale(extra, axis, FastVecDot(axis, direction));
         FastVecSub(direction, direction, extra);
@@ -685,7 +685,7 @@ void gorn_part_spawn_spark_burst(char *pos, int count, int mode) {
                     particle[9] = FloatToInt(4.0f) + 0x70;
                 particle = part_spawn_ground_effect(point, 60, size * 0.245f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
             } else {
-                FastVecSub(extra, D_L15_001B97C0, point);
+                FastVecSub(extra, g_camera_l15_position, point);
                 vec_scale_to_length((char *)extra, (char *)extra, speed);
                 FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
                 particle = part_spawn_ground_effect(point, 40, size * 2.05f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
@@ -701,7 +701,7 @@ void gorn_part_spawn_spark_burst(char *pos, int count, int mode) {
                     particle[9] = FloatToInt(4.0f) + 0x70;
                 particle = part_spawn_ground_effect(point, 60, size * 0.21000000834465027f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
             } else {
-                FastVecSub(extra, D_L15_001B97C0, point);
+                FastVecSub(extra, g_camera_l15_position, point);
                 vec_scale_to_length((char *)extra, (char *)extra, speed);
                 FastVecAdd((char *)velocity, (char *)velocity, (char *)extra);
                 particle = part_spawn_ground_effect(point, 40, size * 0.25f, size, 0x7F800000, 0, sign, velocity, 0, 0.002f);
@@ -720,11 +720,11 @@ void gorn_part_spawn_spark_burst(char *pos, int count, int mode) {
    through $gp in a branch delay slot and as a bare lui/lw elsewhere: `sda` arrays of unknown size
    give that), the base of the 64-byte records of the first walk, the base of the 32-byte records
    of the second, and the table that maps a record's byte at +0x1D to a class. */
-extern int D_L15_001A9018[] __attribute__((sda));
-extern unsigned short **D_L15_001A9014[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C9C[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C94[] __attribute__((sda));
-extern short D_L15_00227500[];
+extern int g_gorn_group_count[] __attribute__((sda));
+extern unsigned short **g_gorn_group_paths[] __attribute__((sda));
+extern unsigned char *g_gorn_group_record_base[] __attribute__((sda));
+extern unsigned char *g_gorn_aim_record_base[] __attribute__((sda));
+extern short g_gorn_group_class_table[];
 
 extern float vec_distance_xy(void *, void *);
 extern float math_random_angle(void);
@@ -769,11 +769,11 @@ void gorn_group_aim_update(unsigned char *moby)
     case 0:
         best_group = -1;
         best_distance = 9999.0f;
-        for (i = 0; i < D_L15_001A9018[0]; i++) {
-            for (p = D_L15_001A9014[0][i];
-                 p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L15_001A9014[0][i]);
+        for (i = 0; i < g_gorn_group_count[0]; i++) {
+            for (p = g_gorn_group_paths[0][i];
+                 p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_gorn_group_paths[0][i]);
                  p++) {
-                record = D_L15_001B2C9C[0] + ((*p & 0x7FFF) << 6);
+                record = g_gorn_group_record_base[0] + ((*p & 0x7FFF) << 6);
                 if (record == 0)
                     break;
                 distance = vec_distance_xy(record + 0x30, moby + 0x10);
@@ -799,13 +799,13 @@ void gorn_group_aim_update(unsigned char *moby)
             moby_mark_spawned(moby);
             return;
         }
-        for (q = D_L15_001A9014[0][*(int *)vars];
-             q != 0 && ((q != 0 && (short)q[-1] >= 0) || q == D_L15_001A9014[0][*(int *)vars]);
+        for (q = g_gorn_group_paths[0][*(int *)vars];
+             q != 0 && ((q != 0 && (short)q[-1] >= 0) || q == g_gorn_group_paths[0][*(int *)vars]);
              q++) {
-            record = D_L15_001B2C94[0] + ((*q & 0x7FFF) << 5);
+            record = g_gorn_aim_record_base[0] + ((*q & 0x7FFF) << 5);
             if (record == 0)
                 break;
-            cls = D_L15_00227500[record[0x1D]];
+            cls = g_gorn_group_class_table[record[0x1D]];
             if (cls == 0xD34 /* moby class 3380 */)
                 level_set_record_payload_by_key(vars + 0x40, 1, (short)*q, vars + 0x680);
             if (cls == 0xD33 /* moby class 3379 */)

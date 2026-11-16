@@ -19,7 +19,7 @@ extern int func_001163B0(void);
 
 extern int g_current_map_index __attribute__((sda));
 
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 
 extern void moby_set_state_in_list(int, int);
 
@@ -31,13 +31,13 @@ void moby_increment_saved_switch_counter(char *moby)
     unsigned short index_word = *(unsigned short *)(moby + 0xB2);
 
     if (index_word & 1) {
-        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         unsigned char counter_byte = *(unsigned char *)counter_ptr;
 
         if (((counter_byte >> 4) & 7) != 7)
             *(unsigned char *)counter_ptr = counter_byte + 0x10;
     } else {
-        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         unsigned char counter_byte = *(unsigned char *)counter_ptr;
 
         if ((counter_byte & 7) != 7)
@@ -180,7 +180,7 @@ extern void hero_start_move_state_walk_or_run(int);
 extern s32 SetHeroMoveState(int, int);
 extern void script_queue_keyed_request(int, int);
 extern int MemcardSave(int, int);
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern char g_hero_position[];
 
 /* Level data, at another address in each level that has this function. The trigger flag is
@@ -209,7 +209,7 @@ void activation_trigger_update(char *moby)
         if (*(int *)(vars + 8) == -1)
             STUB_printf(ref_L01_003FFFE8_03, *(short *)(moby + 0xB2));
         if (*(unsigned char *)(moby + 0xB0) != 255) {
-            if (D_0019B2E8[*(unsigned char *)(moby + 0xB0) + (g_current_map_index << 4)] & 128) {
+            if (g_moby_group_flags[*(unsigned char *)(moby + 0xB0) + (g_current_map_index << 4)] & 128) {
                 moby_mark_spawned(moby);
                 break;
             }
@@ -265,7 +265,7 @@ void activation_trigger_update(char *moby)
         if (*(unsigned char *)(moby + 0xB0) != 255) {
             int n = *(unsigned char *)(moby + 0xB0);
 
-            if (!(D_0019B2E8[n + (g_current_map_index << 4)] & 128)) {
+            if (!(g_moby_group_flags[n + (g_current_map_index << 4)] & 128)) {
                 moby_mark_table_entry_flagged(n);
                 level_capture_checkpoint_state(moby + 0x10, moby + 0xF0);
             }
@@ -283,7 +283,7 @@ extern void moby_set_state(char *, int, int);
 
 extern void math_store_angle_update_result(char *, char *, float, int, int);
 
-extern int D_L01_001A8F40 __attribute__((sda));
+extern int g_hero_l01_control_mode __attribute__((sda));
 
 /* Updates a TV Screens moby: starts it, then keeps its screen effect running. */
 void tv_l01_screens_update(char *moby)
@@ -298,7 +298,7 @@ void tv_l01_screens_update(char *moby)
     case 1:
         if (vars == 0)
             break;
-        if (D_L01_001A8F40 == 2)
+        if (g_hero_l01_control_mode == 2)
             math_store_angle_update_result(moby, vars + 0xC, 0.055268768f,
                               (int)0x80AABED2u, (int)0x80466464u);
         else
@@ -332,8 +332,8 @@ typedef struct {
     char end[0x14];
 } ParticleEffectSlot;
 extern char g_hero_state[];
-extern ParticleEffectSlot D_L01_00257920[];
-extern char *D_L01_001C3980[];
+extern ParticleEffectSlot g_particle_l01_effect_slots[];
+extern char *g_contact_moby_list[];
 
 /* Updates up to 30 glow effects attached to other mobys: pulses their colour, throws sparks near them and frees them when the target is gone. */
 void part_update_attached_glow_effects(char *moby) {
@@ -346,9 +346,9 @@ void part_update_attached_glow_effects(char *moby) {
         char *other;
         int dead;
 
-        if (!D_L01_00257920[i].target)
+        if (!g_particle_l01_effect_slots[i].target)
             continue;
-        slot = (char *)&D_L01_00257920[i];
+        slot = (char *)&g_particle_l01_effect_slots[i];
         *(float *)(slot + 0xC) = FastAddRotations(*(float *)(slot + 0xC), 0.20943954586982727f);
         dead = 0;
         if (*(signed char *)(*(char **)(slot + 0x18) + 0x20) < 0)
@@ -364,7 +364,7 @@ void part_update_attached_glow_effects(char *moby) {
             *(float *)(slot + 0x1C) = *(float *)(slot + 0x14);
             count = coll_process_hit(target + 0x10, 0, target, 0, 8.0f);
             for (j = 0; j < count; j++) {
-                other = D_L01_001C3980[j];
+                other = g_contact_moby_list[j];
                 if ((*(unsigned short *)(other + 0x34) & 0x1000) && other &&
                     *(unsigned char *)(other + 0x20) != 254 && *(unsigned char *)(other + 0x20) != 253 &&
                     *(short *)(*(char **)(other + 0x24) + 0x46) == 5)
@@ -420,11 +420,11 @@ void part_update_attached_glow_effects(char *moby) {
 }
 
 
-extern char *D_001B9510;
+extern char *g_unused_pointer;
 
 extern float func_2E3618(char *);
 
-extern char D_001B9380[];
+extern char g_camera_script_state[];
 
 extern char g_hero_position[];
 

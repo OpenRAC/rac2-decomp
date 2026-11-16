@@ -14,8 +14,8 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern Vector D_0018A0E0;
-extern Vector D_L00_001AA310[4];
+extern Vector g_hero_state_block;
+extern Vector g_billboard_corner_table[4];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -207,23 +207,23 @@ void weapon_draw_aim_effect(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 /* func_L00_003EF3E0 uses its dedicated quadword-copy profile. */
 
-extern int D_L00_001B0838 __attribute__((sda));
+extern int g_blast_moby __attribute__((sda));
 
 /* Clears an effect flag. */
 void effect_clear_flag(void)
 {
-    D_L00_001B0838 = 0;
+    g_blast_moby = 0;
 }
 
-extern int D_L00_001B0838 __attribute__((sda));
+extern int g_blast_moby __attribute__((sda));
 
-extern int D_L00_001B2BB4 __attribute__((sda));
+extern int g_blast_alloc_base __attribute__((sda));
 
 /* Clears the effect record table pointer and an effect flag. */
 void effect_clear_records_and_flag(void)
 {
-    D_L00_001B2BB4 = 0;
-    D_L00_001B0838 = 0;
+    g_blast_alloc_base = 0;
+    g_blast_moby = 0;
 }
 
 
@@ -339,7 +339,7 @@ void effect_draw_owner_records(char *owner_moby)
 
 
 
-extern char *D_L00_001B2BB8 __attribute__((sda));
+extern char *g_blast_l00_pool_2 __attribute__((sda));
 
 extern void ref_L00_003F09A0_00(char *rec, float f1, int a1, int a2, int a3,
                                 float f2, int a4, float f3);
@@ -351,7 +351,7 @@ void part_respawn_owner_particles(char *owner_moby)
     int i;
 
     for (i = 0; i < 320; i++) {
-        rec = (char *)(i * 128 + (int)D_L00_001B2BB8);
+        rec = (char *)(i * 128 + (int)g_blast_l00_pool_2);
         if (*(int *)(rec + 0x7C) == (int)owner_moby)
             ref_L00_003F09A0_00(rec, *(float *)(rec + 0x48), *(int *)(rec + 0x68),
                                 *(int *)(rec + 0x60), 46, *(float *)(rec + 0x34),
@@ -430,7 +430,7 @@ typedef struct {
 } Aimvec_F0b10;
 #endif
 
-extern Aimvec_F0b10 D_L00_001B8C80;
+extern Aimvec_F0b10 g_scalar_transition_state;
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
 /* Draws a flat sprite at a position that turns to face the camera. */
@@ -456,14 +456,14 @@ void gfx_draw_camera_facing_sprite_d(char *pos, int color_base, int alpha, char 
     *(long long *)(packet + 120) = texture_key;
 
     quat[3] = 0.0f;
-    quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                            D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
-                             D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[2] = mat_fast_helper_a(g_scalar_transition_state.x_140 - *(float *)(pos + 0),
+                            g_scalar_transition_state.y_144 - *(float *)(pos + 4));
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_scalar_transition_state.x_140),
+                             g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     euler_to_matrix(matrix, quat);
-    FastVecSub(offset, &D_L00_001B8C80.x_140, pos);
+    FastVecSub(offset, &g_scalar_transition_state.x_140, pos);
     vec_scale_to_length(offset, offset, pull);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
@@ -478,12 +478,12 @@ void gfx_draw_camera_facing_sprite_d(char *pos, int color_base, int alpha, char 
 
 /* func_L00_003F1300 is defined in L00_003F1300-g8.c. */
 
-extern int D_L00_001B08D0 __attribute__((sda));
+extern int g_lightning_burst_object __attribute__((sda));
 
 /* Clears the flag that says the lightning burst exists. */
 void lightning_burst_clear_active_flag(void)
 {
-    D_L00_001B08D0 = 0;
+    g_lightning_burst_object = 0;
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
@@ -528,7 +528,7 @@ void vec_scale_four_copy(char *vectors, float scale)
     func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
-extern Aimvec_F0b10 D_L00_001B8C80;
+extern Aimvec_F0b10 g_scalar_transition_state;
 
 extern void ref_L00_003F1EB8_00(char *pkt);
 
@@ -558,14 +558,14 @@ void gfx_draw_camera_facing_sprite_copy(char *pos, int color_base, int alpha, ch
     *(long long *)(packet + 120) = texture_key;
 
     quat[3] = 0.0f;
-    quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
-                            D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
-                             D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[2] = mat_fast_helper_a(g_scalar_transition_state.x_140 - *(float *)(pos + 0),
+                            g_scalar_transition_state.y_144 - *(float *)(pos + 4));
+    quat[1] = -mat_fast_helper_a(vec_distance_xy(pos, &g_scalar_transition_state.x_140),
+                             g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = roll;
 
     euler_to_matrix(matrix, quat);
-    FastVecSub(offset, &D_L00_001B8C80.x_140, pos);
+    FastVecSub(offset, &g_scalar_transition_state.x_140, pos);
     vec_scale_to_length(offset, offset, pull);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
@@ -602,11 +602,11 @@ extern void ref_L00_003F3160_00(void *, void *);
 
 extern void gfx_draw_lit_group_points(char *);
 
-extern int D_L00_001A9018 __attribute__((sda));
+extern int g_tie_group_count __attribute__((sda));
 
-extern unsigned short **D_L00_001A9014 __attribute__((sda));
+extern unsigned short **g_level_reloc_record __attribute__((sda));
 
-extern unsigned char *D_L00_001B2514 __attribute__((sda));
+extern unsigned char *g_tie_table __attribute__((sda));
 
 /* A three-state object whose record (the pointer at +0x68) carries a group index at +0, two
    RGB triples and two RGBA quadruples as separate bytes, a packed colour at +0x10 and a few
@@ -635,7 +635,7 @@ void color_l00_fade_update(char *moby)
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         group = *(int *)vars;
-        if (group >= D_L00_001A9018 || D_L00_001A9014[group] == 0 || group == -1) {
+        if (group >= g_tie_group_count || g_level_reloc_record[group] == 0 || group == -1) {
             moby_mark_spawned(moby);
             return;
         }
@@ -670,7 +670,7 @@ void color_l00_fade_update(char *moby)
         return;
     case 1:
         if (*(int *)(vars + 0x64) != -1) {
-            if (IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(vars + 0x64)) == 0)
+            if (IsPointInCuboid(&g_scalar_transition_state.x_140, *(int *)(vars + 0x64)) == 0)
                 return;
         }
         angle = FastAddRotations(*(float *)(vars + 0xC), *(float *)(vars + 4));
@@ -687,18 +687,18 @@ void color_l00_fade_update(char *moby)
         }
         if (*(int *)(vars + 0x10) == prev)
             return;
-        id_list = D_L00_001A9014[*(int *)vars];
+        id_list = g_level_reloc_record[*(int *)vars];
         red = *(int *)(vars + 0x10) & 0xFF;
         green = (*(int *)(vars + 0x10) >> 8) & 0xFF;
         blue = (*(int *)(vars + 0x10) >> 16) & 0xFF;
-        for (; id_list != 0 && ((short)id_list[-1] >= 0 || id_list == D_L00_001A9014[*(int *)vars]) &&
-               (entity = D_L00_001B2514 + ((*id_list & 0x7FFF) << 5)) != 0;
+        for (; id_list != 0 && ((short)id_list[-1] >= 0 || id_list == g_level_reloc_record[*(int *)vars]) &&
+               (entity = g_tie_table + ((*id_list & 0x7FFF) << 5)) != 0;
              id_list++)
             func_L00_0036EF68((char *)entity, red, green, blue);
         return;
     case 2:
         if (*(int *)(vars + 0x64) == -1 ||
-            IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(vars + 0x64)) != 0)
+            IsPointInCuboid(&g_scalar_transition_state.x_140, *(int *)(vars + 0x64)) != 0)
             ref_L00_003F3160_00((void *)gfx_draw_lit_group_points, moby);
         return;
     }
@@ -737,11 +737,11 @@ void shape_a_update(Obj_L00_003F37A0 *moby)
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float FastVecDot(void *, void *);
-extern Vector D_L00_0029DAE0[];
-extern Vector D_L00_0029D7C0[];
-extern Vector D_L00_0029CB30[];
-extern short D_L00_0029D170[][4][2];
-extern float D_L00_0029D490[][2];
+extern Vector g_shape_a_face_vectors[];
+extern Vector g_shape_a_face_normals[];
+extern Vector g_shape_a_vertices[];
+extern short g_shape_a_quad_indices[][4][2];
+extern float g_shape_a_uvs[][2];
 
 /* Draws 50 quads through the object's frame (its basis at 0xC0 and position at 0x10). Per
    quad, a transformed table point is offset from the 0x001B8C80 vector and normalised, a
@@ -779,20 +779,20 @@ void shape_a_draw_fifty_quads(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        FastVecScale(&scratch.transformed, &D_L00_0029DAE0[face], 1.0f);
+        FastVecScale(&scratch.transformed, &g_shape_a_face_vectors[face], 1.0f);
         transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
         FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
-                      (char *)&D_L00_001B8C80.x_140);
+                      (char *)&g_scalar_transition_state.x_140);
         vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        matrix_mul_vec3(&scratch.transformed, &D_L00_0029D7C0[face], matrix);
+        matrix_mul_vec3(&scratch.transformed, &g_shape_a_face_normals[face], matrix);
         FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
-            Vector *position = &D_L00_0029CB30[D_L00_0029D170[face][corner][0]];
-            int uv = D_L00_0029D170[face][corner][1];
+            Vector *position = &g_shape_a_vertices[g_shape_a_quad_indices[face][corner][0]];
+            int uv = g_shape_a_quad_indices[face][corner][1];
 
             FastVecScale(&packet.vertex[corner], position, 1.0f);
-            packet.uv[corner][0] = D_L00_0029D490[uv][0];
-            packet.uv[corner][1] = D_L00_0029D490[uv][1];
+            packet.uv[corner][0] = g_shape_a_uvs[uv][0];
+            packet.uv[corner][1] = g_shape_a_uvs[uv][1];
             if (position->v[2] == -0.002112f)
                 packet.color[corner] = 0xff0000;
         }
@@ -825,11 +825,11 @@ void shape_b_update(Obj_L00_003F3A88 *moby)
     ref_L00_003F3A88_00((void *)shape_b_draw_fifty_quads, (char *)moby);
 }
 
-extern Vector D_L00_0029EDB0[];
-extern Vector D_L00_0029EA90[];
-extern Vector D_L00_0029DE00[];
-extern short D_L00_0029E440[][4][2];
-extern float D_L00_0029E760[][2];
+extern Vector g_shape_b_face_vectors[];
+extern Vector g_shape_b_face_normals[];
+extern Vector g_shape_b_vertices[];
+extern short g_shape_b_quad_indices[][4][2];
+extern float g_shape_b_uvs[][2];
 
 /* Draws the 50 quads of the second shape, fading with the object alpha. */
 void shape_b_draw_fifty_quads(char *object)
@@ -862,20 +862,20 @@ void shape_b_draw_fifty_quads(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        FastVecScale(&scratch.transformed, &D_L00_0029EDB0[face], 1.0f);
+        FastVecScale(&scratch.transformed, &g_shape_b_face_vectors[face], 1.0f);
         transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
         FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
-                      (char *)&D_L00_001B8C80.x_140);
+                      (char *)&g_scalar_transition_state.x_140);
         vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        matrix_mul_vec3(&scratch.transformed, &D_L00_0029EA90[face], matrix);
+        matrix_mul_vec3(&scratch.transformed, &g_shape_b_face_normals[face], matrix);
         FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
-            Vector *position = &D_L00_0029DE00[D_L00_0029E440[face][corner][0]];
-            int uv = D_L00_0029E440[face][corner][1];
+            Vector *position = &g_shape_b_vertices[g_shape_b_quad_indices[face][corner][0]];
+            int uv = g_shape_b_quad_indices[face][corner][1];
 
             FastVecScale(&packet.vertex[corner], position, 1.0f);
-            packet.uv[corner][0] = D_L00_0029E760[uv][0];
-            packet.uv[corner][1] = D_L00_0029E760[uv][1];
+            packet.uv[corner][0] = g_shape_b_uvs[uv][0];
+            packet.uv[corner][1] = g_shape_b_uvs[uv][1];
             if (position->v[2] == 0.001432f)
                 packet.color[corner] = 0xff0000;
         }
@@ -1058,9 +1058,9 @@ void gfx_draw_flash_quad(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    FastVecSub((char *)&frame.row[0], (char *)&D_L00_001B8C80.x_140, (char *)&frame.position);
+    FastVecSub((char *)&frame.row[0], (char *)&g_scalar_transition_state.x_140, (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
@@ -1074,7 +1074,7 @@ void gfx_draw_flash_quad(Vector *position, float size, float offset, float roll,
     {
         Vector *vertex = packet.vertex;
         int count;
-        corner = D_L00_001AA310;
+        corner = g_billboard_corner_table;
         count = 3;
         do {
             FastVecScale(vertex, corner, size);

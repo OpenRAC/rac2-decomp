@@ -62,7 +62,7 @@ struct RotorObject {
     /* 0xC0 */ struct RotorAxis basis[3];
 };
 
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern char g_sound_state[];
 extern void func_3739C0(int);
 extern int PlayMobySound(int, int, char *);
@@ -133,7 +133,7 @@ void projectile_run_trail_steps(char *moby)
     joba_draw_beam_second_stage(moby, &v);
 }
 
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -150,7 +150,7 @@ void part_l11_spawn_impact_burst(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L11_001BA8C0, pos);
+    FastVecSub(direction, (float *)g_hero_l11_position, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -418,7 +418,7 @@ void enemy_reset_to_idle(char *obj)
 
 /* func_L11_004375B8 is defined in L11_004375B8.c. */
 
-extern unsigned char D_L11_00438880[];
+extern unsigned char g_moby_l11_script_data[];
 
 extern void func_802F8AD0(void *a0, void *a1);
 extern void func_80338398(void *a0, void *a1, int a2, int a3, float f12);
@@ -435,7 +435,7 @@ void chain_creature_update_body(char *moby)
     char *vars = *(char **)(moby + 0x68);
     int i;
 
-    func_802F8AD0((void *)D_L11_00438880, moby);
+    func_802F8AD0((void *)g_moby_l11_script_data, moby);
 
     for (i = 12; i >= 0; i--)
         ;
@@ -723,20 +723,20 @@ void chain_creature_choose_path(struct RotorObject *obj)
     state->toggle = toggled;
     switch (obj->mode) {
     case 2:
-        state->path = D_L11_001FF580[state->pathIndex];
+        state->path = g_path_l11_table[state->pathIndex];
         break;
     case 3:
         if (toggled != 0)
-            path = D_L11_001FF580[state->choices[0][math_random_int_below(4)]];
+            path = g_path_l11_table[state->choices[0][math_random_int_below(4)]];
         else
-            path = D_L11_001FF580[state->choices[1][math_random_int_below(4)]];
+            path = g_path_l11_table[state->choices[1][math_random_int_below(4)]];
         state->path = path;
         break;
     case 4:
         if (toggled != 0)
-            path = D_L11_001FF580[state->choices[2][math_random_int_below(4)]];
+            path = g_path_l11_table[state->choices[2][math_random_int_below(4)]];
         else
-            path = D_L11_001FF580[state->choices[3][math_random_int_below(4)]];
+            path = g_path_l11_table[state->choices[3][math_random_int_below(4)]];
         state->path = path;
         break;
     }
@@ -821,7 +821,7 @@ extern int func_373978(char *obj, int a);
 
 extern void func_3739C0(int a);
 
-extern struct RotorPath *D_L11_001FF580[];
+extern struct RotorPath *g_path_l11_table[];
 extern char g_sound_state[];
 
 #define REC_L11_359C(o, t) ((*(int *)(*(char **)((o) + 0x68) + 0x358) << 8) + (int)(t))
@@ -874,7 +874,7 @@ extern int moby_apply_damage_to_object(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 
 /* Sets up the flying drone on its first frame, then each frame handles hits and checks whether the hero is very close. */
 void drone_setup_and_hits(char *object) {
@@ -915,7 +915,7 @@ void drone_setup_and_hits(char *object) {
     *(int *)(state + 0x2D8) = weapon_select_aim_target(object, *(int *)(state + 0x2E8),
                                          0, 0, 255.0f, 255.0f);
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 48.0f) {
+        if (fast_vec_dist(object + 0x10, g_hero_l11_position) < 48.0f) {
             moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 45;
         }

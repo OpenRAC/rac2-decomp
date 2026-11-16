@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_001AEBF0 __attribute__((sda));
+extern float g_projectile_speed __attribute__((sda));
 extern void FastVecAdd(void *a, void *b, void *c);
 extern void vec_add_object_direction_scaled(void *a, void *b, float c);
 extern int CollLine(void *a, void *b, int c, void *d, int e);
@@ -18,7 +18,7 @@ void func_PAL_00305D30(void *obj)
 
     *(TI128 *)&local = *(TI128 *)s0;
     FastVecAdd(s0, s0, s1);
-    vec_add_object_direction_scaled(s0, s1, D_001AEBF0 * 4.0000003e-05f);
+    vec_add_object_direction_scaled(s0, s1, g_projectile_speed * 4.0000003e-05f);
     if (CollLine(&local, s0, 0x10, s2, 0) != 0)
         *(unsigned char *)((char *)s2 + 0x20) = 8;
 }

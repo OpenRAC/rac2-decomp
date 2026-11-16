@@ -27,7 +27,7 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
    or the player has moved to the other side of the object, start the turn (states 5 and 6),
    which steps func_L14_003DE360 until the angle at 0x80 reaches 0 or pi/2 and then stops the
    object's sound. */
-void func_PAL_L14_003E1E48(char *self)
+void swinging_mover_update_pal(char *self)
 {
     float pos[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));

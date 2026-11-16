@@ -1,19 +1,19 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_001B5348;
-extern int D_001B1DD4[] __attribute__((sda));
+extern float g_water_level_threshold;
+extern int g_particle_spin_counter[] __attribute__((sda));
 extern int D_001B1DD4_sda __attribute__((sda));
 extern int g_game_time[] __attribute__((sda));
-extern char D_001B1DF0[] __attribute__((sda));
-extern char D_001B5580[];
+extern char g_particle_spin_vector[] __attribute__((sda));
+extern char g_sway_vector[];
 extern int FastDecTimer(void *);
 extern void part_kill(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_002C9408(char *obj)
+void part_update_fading_spin_pal(char *obj)
 {
     float v[4];
     char *p = obj + 0x20;
@@ -21,13 +21,13 @@ void func_PAL_002C9408(char *obj)
     int n;
     int top;
 
-    if (*(float *)(obj + 0x18) - D_001B5348 < -7.0f ||
+    if (*(float *)(obj + 0x18) - g_water_level_threshold < -7.0f ||
         (*(int *)(p + 0x14) != 0 && FastDecTimer(obj + 0xA) != 0)) {
         n = *(int *)(p + 0x10) - 1;
         *(int *)(p + 0x10) = n;
         if (n <= 0) {
             part_kill(obj);
-            D_001B1DD4_sda = D_001B1DD4[0] - 1;
+            D_001B1DD4_sda = g_particle_spin_counter[0] - 1;
             return;
         }
         *(int *)(obj + 4) = (*(int *)(obj + 4) & 0xFFFFFF) + (n << 24);
@@ -42,11 +42,11 @@ void func_PAL_002C9408(char *obj)
         *(unsigned char *)(obj + 8) -= 2;
     q = obj + 0x10;
     FastVecAdd(q, q, p);
-    FastVecAdd(q, q, D_001B1DF0);
+    FastVecAdd(q, q, g_particle_spin_vector);
     if (*(int *)(p + 0x14) == 0) {
         short h = *(short *)(obj + 0xA);
         float f = math_fast_sin_or_cos_b((float)(g_game_time[0] & (h - 1)) / (float)h * 6.2831855f);
-        FastVecScale(v, D_001B5580, f * 0.020000001f);
+        FastVecScale(v, g_sway_vector, f * 0.020000001f);
         FastVecAdd(q, v, q);
     }
 }

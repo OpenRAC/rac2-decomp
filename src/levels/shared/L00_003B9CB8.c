@@ -10,11 +10,11 @@ extern void shop_trigger_current_state_effect(void *, void *);
 extern float FastVecLength(void *);
 extern void mat_build_rotation_toward_vector(void *, void *, void *, int, float);
 extern int coll_test_point(void *, int, void *, float);
-extern char *D_L00_001BF218;
+extern char *g_hit_l00_result;
 extern char *g_hero_moby;
-extern char D_L00_001BF230[];
+extern char g_collision_position[];
 typedef struct { float x, y, z; int unused; float position[4]; } EffectLightRecord;
-extern EffectLightRecord D_L00_001C6F40[];
+extern EffectLightRecord g_light_table[];
 extern float FastVecDot(void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void part_l00_spawn_spark_burst_2(float *, float *, int, int);
@@ -46,7 +46,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 
 
@@ -75,7 +75,7 @@ typedef struct {
 } Vec16_Fc936841d;
 #endif
 
-extern char D_L00_001BF240[];
+extern char g_hero_l00_velocity[];
 
 extern void func_00282F20_2(void *out, void *in, float scale);
 
@@ -158,11 +158,11 @@ char *spark_move_projectile(char *moby)
     if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
         mat_build_rotation_toward_vector(ctx, ctx, ctx + 0x20, 0, 0.075f);
     if (coll_test_point(moby + 0x10, 0, moby, *(float *)(ctx + 0x4C))) {
-        hit_object = D_L00_001BF218;
+        hit_object = g_hit_l00_result;
         if (hit_object && hit_object != g_hero_moby && *(short *)(hit_object + 0xAA) != MOBY_CLASS_PLASMA_STORM)
             hit = (*(unsigned short *)(hit_object + 0x34) & 0x1000) ? hit_object : 0;
-        qcopy(moby + 0x10, D_L00_001BF230);
-        func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
+        qcopy(moby + 0x10, g_collision_position);
+        func_002EE178_1((char *)normal, g_collision_position + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
         vec_fast_normalize(ctx, ctx, normal);
         dot = FastVecDot(ctx, normal);
@@ -171,13 +171,13 @@ char *spark_move_projectile(char *moby)
         func_002EE178_1(ctx, (char *)projection, 0.85f);
         FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
-        part_l00_spawn_spark_burst_2(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
-        part_l00_spawn_spark_burst_2(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
+        part_l00_spawn_spark_burst_2(g_collision_position - 0x10, normal, 6, 0x72FF);
+        part_l00_spawn_spark_burst_2(g_collision_position - 0x10, normal, 6, 0xFF0000);
         PlayMobySound(1, 0, moby);
     }
     light_index = *(int *)(ctx + 0x5C);
     if (light_index != -1) {
-        light = D_L00_001C6F40 + light_index;
+        light = g_light_table + light_index;
         qcopy(light->position, moby + 0x10);
         light->position[3] = 4.0f;
         light->x = 0.25f;
@@ -244,7 +244,7 @@ void spark_draw_projectile(char *moby)
     VU1_addGSregister(0x47, 0x0005360B);
 }
 
-extern int D_L00_0023DDA0[];
+extern int g_spark_slot_records[];
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void vec_clear_128(void *);
@@ -258,7 +258,7 @@ extern void FastVecScale(void *, void *, float);
    func_L00_003252A8 when func_002AB1F0 finds target's info). */
 void spark_spawn_orbiting_record(char *self, char *target, int count)
 {
-    char *pool = (char *)D_L00_0023DDA0;
+    char *pool = (char *)g_spark_slot_records;
     char *position = self + 0x10;
     char *target_position = target + 0x10;
     char *data = *(char **)(self + 0x68);
@@ -389,7 +389,7 @@ typedef struct Rac2Native_003BC998_Slot {
     unsigned char tail_A4[0xC];
 } Rac2Native_003BC998_Slot;
 
-extern Rac2Native_003BC998_Slot D_L00_0023F060[];
+extern Rac2Native_003BC998_Slot g_orbit_spark_records[];
 
 extern float func_002A78D8_1(float low, float high);
 
@@ -404,7 +404,7 @@ extern void func_00282C88_1(void *p);
    way retail does. */
 void spark_spawn_orbit(char *moby, char *linked_value)
 {
-    Rac2Native_003BC998_Slot *base = D_L00_0023F060;
+    Rac2Native_003BC998_Slot *base = g_orbit_spark_records;
     Rac2Native_003BC998_Slot *slot;
     float *out;
     char *ctx;
@@ -452,7 +452,7 @@ void spark_spawn_orbit(char *moby, char *linked_value)
 
 extern void lightning_build_and_draw_ribbon(char *a0, char *a1);
 
-extern char D_0023F060[];
+extern char g_unused_data_buffer[];
 
 /* Near miss: nonmatching/levels/func_L00_003BCDC0.c - every instruction present but the
    loop test is `sltu` here against retail's `slt`, and the base is derived from the end
@@ -536,7 +536,7 @@ void coll_compute_surface_direction(char *moby, char *out_vector, int keep_sign)
     func_00282CC0_6(b, b, moby + 16);
 
     if (CollLine(a, b, 2, moby, 0))
-        func_00282F20_2(out_vector, D_L00_001BF240, 1.0f);
+        func_00282F20_2(out_vector, g_hero_l00_velocity, 1.0f);
     else
         func_00282F20_2(out_vector, moby + 224, -1.0f);
 
@@ -645,19 +645,19 @@ void gfx_l00_draw_facing_glow_sprite(int unused, char *pos, int color, int first
     *(long long *)(packet + 120) = texture;
     *(long long *)(packet + 128) = 0xFF9000000260LL;
     *(long long *)(packet + 136) = 0x8000000048LL;
-    dx = D_L00_001B8C80.x_140 - *(float *)pos;
-    dy = D_L00_001B8C80.y_144 - *(float *)(pos + 4);
+    dx = g_scalar_transition_state.x_140 - *(float *)pos;
+    dy = g_scalar_transition_state.y_144 - *(float *)(pos + 4);
     *(int *)(packet + 76) = color + first;
     *(int *)(packet + 72) = color + first;
     *(int *)(packet + 68) = color + first;
     *(int *)(packet + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_802EE7A8_1(dx, dy);
-    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
-                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
+    quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &g_scalar_transition_state.x_140),
+                              g_scalar_transition_state.z_148 - *(float *)(pos + 8));
     quat[0] = func_0031A888_1();
     func_802EE970_1(matrix, quat);
-    func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
+    func_802EE138_1(off, &g_scalar_transition_state.x_140, pos);
     func_802EE3D0_1(off, off, 0.5f);
     matrix[12] = *(float *)(pos) + off[0];
     matrix[13] = *(float *)(pos + 4) + off[1];

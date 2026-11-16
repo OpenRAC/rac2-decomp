@@ -4,17 +4,17 @@
    /* current buffer */
 extern short r1_D_0015EDC4;
 extern void menu_set_confirm_pending(void);
-extern int D_001A8A64 __attribute__((sda));
+extern int g_menu_confirm_pending __attribute__((sda));
 
 /* Sets a flag that tells the menu a confirmation is pending. */
 void menu_set_confirm_pending(void) {
-    D_001A8A64 = 1;
+    g_menu_confirm_pending = 1;
 }
 
 
 /* Clears the confirmation-pending flag. */
 void menu_clear_confirm_pending(void) {
-    D_001A8A64 = 0;
+    g_menu_confirm_pending = 0;
 }
 
 /* 0xE0-byte slots of the table at D_00239BA0; f4A and f4C link the slots. */
@@ -31,7 +31,7 @@ typedef struct {
 } Slot287E98;
 extern Slot287E98 g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
-extern int D_00139868[];
+extern int g_help_entry_state[];
 extern int g_item_ammo_counts[];
 
 /* The second lookup re-reads D_00139568[index], which cc1 forwards from the stored value. With
@@ -47,7 +47,7 @@ void menu_advance_chain_entry(int index)
         int x = s->f6C;
         if (x >= 0) {
             x <<= 5;
-            if (D_00139868[index] < x) D_00139868[index] = x;
+            if (g_help_entry_state[index] < x) g_help_entry_state[index] = x;
         }
     }
     g_item_slot_to_record[index] = v;

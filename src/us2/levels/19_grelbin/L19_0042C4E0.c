@@ -12,8 +12,8 @@ typedef struct L19Thing {
     s16 kind;
 } L19Thing;
 
-extern s32 D_L19_001A8F00[] __attribute__((sda));
-extern u8 D_001A7A40[] MACRO_ADDR;
+extern s32 g_hero_l19_mode[] __attribute__((sda));
+extern u8 g_unlocked_item_flags[] MACRO_ADDR;
 
 extern int text_sum_subtitle_lengths(void);
 extern int game_is_either_mode_two(void);
@@ -36,15 +36,15 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_update_eased_node(void *, void *, void *, float, float);
 
 extern int g_frame_l19_counter[] __attribute__((sda));
-extern int D_L19_001B2724[] __attribute__((sda));
+extern int g_glow_state_flags[] __attribute__((sda));
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern int D_L19_001B1FB8[] __attribute__((sda));
+extern int g_subtitle_total_length[] __attribute__((sda));
 extern int g_player_bolts[] __attribute__((sda));
-extern u8 D_L19_001A7C80[] __attribute__((sda));
-extern u8 D_001395B8[];
-extern u32 D_00139800, D_00138324;
-extern int D_L19_0028E950[];
-extern u8 D_L19_001BFC40[];
+extern u8 g_price_flags[] __attribute__((sda));
+extern u8 g_game_flag_table[];
+extern u32 g_glow_class_flags, g_pad_held_flags;
+extern int g_item_l19_price_table[];
+extern u8 g_request_l19_queue[];
 
 extern void moby_glow_all_same_class(L19Thing *a0);
 extern int func_US2_L19_0042BBF8(void);
@@ -69,25 +69,25 @@ void func_US2_L19_0042C4E0(u8 *self)
         self[0x30] = 0xFF;
         if (game_is_either_mode_two())
             break;
-        if (D_00139800 & 0x4000000) {
+        if (g_glow_class_flags & 0x4000000) {
             H(self, 0x34) = (H(self, 0x34) & 0xFFBE) | 0x1000;
             I(self, 0x98) = I(*(u8 **)(self + 0x24), 0x10);
-            if (D_001395B8[0x89]) {
+            if (g_game_flag_table[0x89]) {
                 text_sum_subtitle_lengths();
                 if (g_player_bolts[9] < 1)
                     moby_set_state(self, 7, -1);
                 else
                     moby_set_state(self, 8, -1);
-            } else if (g_player_bolts[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
+            } else if (g_player_bolts[9] < (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]))
                 moby_set_state(self, 4, -1);
             else
                 moby_set_state(self, 5, -1);
             moby_reset_vars_defaults(self);
-        } else if (D_00139800 & 0x1000000) {
+        } else if (g_glow_class_flags & 0x1000000) {
             text_sum_subtitle_lengths();
             H(self, 0x34) = (H(self, 0x34) & 0xFFBE) | 0x1000;
             I(self, 0x98) = I(*(u8 **)(self + 0x24), 0x10);
-            if (g_player_bolts[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
+            if (g_player_bolts[9] < (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]))
                 moby_set_state(self, 1, -1);
             else
                 moby_set_state(self, 2, -1);
@@ -97,42 +97,42 @@ void func_US2_L19_0042C4E0(u8 *self)
         }
         break;
     case 1:
-        if (g_player_bolts[9] >= (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
+        if (g_player_bolts[9] >= (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]))
             moby_set_state(self, 2, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x132E, (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]), -1);
+            text_print_localized_formatted(0x132E, (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]), -1);
             level_apply_index_for_key(self);
         }
         break;
     case 2:
-        if (g_player_bolts[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
+        if (g_player_bolts[9] < (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]))
             moby_set_state(self, 1, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x132F, (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]), -1);
+            text_print_localized_formatted(0x132F, (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]), -1);
             level_apply_index_for_key(self);
-            if (D_00138324 & 0x10) {
-                req_push_queue(D_L19_001BFC40, 0x9A);
-                req_launch_queued(D_L19_001BFC40);
+            if (g_pad_held_flags & 0x10) {
+                req_push_queue(g_request_l19_queue, 0x9A);
+                req_launch_queued(g_request_l19_queue);
                 moby_set_state(self, 3, -1);
             }
         }
         break;
     case 3:
-        D_L19_001B2724[1] = 1;
-        if (D_L19_001A8F00[0] == 2) {
+        g_glow_state_flags[1] = 1;
+        if (g_hero_l19_mode[0] == 2) {
             self[0x31] = 0;
             H(self, 0x34) |= 1;
         }
-        if (I(data, 0x80) != -1 && D_L19_001A8F00[0] == 2) {
+        if (I(data, 0x80) != -1 && g_hero_l19_mode[0] == 2) {
             companion = g_moby_l19_array;
             H(companion + I(data, 0x80) * 0x100, 0x34) |= 1;
             (companion + I(data, 0x80) * 0x100)[0x31] = 0;
         }
         if (!game_is_either_mode_two()) {
-            D_L19_001B2724[1] = 0;
+            g_glow_state_flags[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
-            g_player_bolts[9] -= (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]);
+            g_player_bolts[9] -= (g_price_flags[0xF] ? g_item_l19_price_table[15] : g_item_l19_price_table[14]);
             if (self[0x21] != 0xFF)
                 moby_set_byte_on_group(self[0x21], 1);
             if (I(data, 0x80) != -1) {
@@ -140,52 +140,52 @@ void func_US2_L19_0042C4E0(u8 *self)
                 I(data, 0x80) = -1;
             }
             MemcardSave(0, -1);
-            if ((u32)g_player_bolts[9] <= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
+            if ((u32)g_player_bolts[9] <= (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]))
                 moby_set_state(self, 4, -1);
             else
                 moby_set_state(self, 5, -1);
         }
         break;
     case 4:
-        if (g_player_bolts[9] >= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
+        if (g_player_bolts[9] >= (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]))
             moby_set_state(self, 5, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x1330, (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]), -1);
+            text_print_localized_formatted(0x1330, (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]), -1);
             level_apply_index_for_key(self);
         }
         break;
     case 5:
-        if (g_player_bolts[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
+        if (g_player_bolts[9] < (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]))
             moby_set_state(self, 4, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            text_print_localized_formatted(0x1331, (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]), -1);
+            text_print_localized_formatted(0x1331, (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]), -1);
             level_apply_index_for_key(self);
-            if (D_00138324 & 0x10) {
-                req_push_queue(D_L19_001BFC40, 0x99);
-                req_launch_queued(D_L19_001BFC40);
+            if (g_pad_held_flags & 0x10) {
+                req_push_queue(g_request_l19_queue, 0x99);
+                req_launch_queued(g_request_l19_queue);
                 moby_set_state(self, 6, -1);
             }
         }
         break;
     case 6:
-        D_L19_001B2724[1] = 1;
-        if (D_L19_001A8F00[0] == 2) {
+        g_glow_state_flags[1] = 1;
+        if (g_hero_l19_mode[0] == 2) {
             self[0x31] = 0;
             H(self, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            g_player_bolts[9] -= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]);
-            D_L19_001B2724[1] = 0;
+            g_player_bolts[9] -= (g_price_flags[0xF] ? g_item_l19_price_table[17] : g_item_l19_price_table[16]);
+            g_glow_state_flags[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
             if (self[0x21] != 0xFF)
                 moby_set_byte_on_group(self[0x21], 1);
-            D_001395B8[0x89] = 1;
+            g_game_flag_table[0x89] = 1;
             value_set_entry_by_index(0x1294, -1);
             remaining = 2;
-            if (D_001395B8[0x84])
+            if (g_game_flag_table[0x84])
                 remaining--;
-            if (D_001395B8[0x86])
+            if (g_game_flag_table[0x86])
                 remaining--;
             if (remaining > 0)
                 subtitle_request_voice_line(0xA0F, 0x66);
@@ -202,7 +202,7 @@ void func_US2_L19_0042C4E0(u8 *self)
         if (g_player_bolts[9] > 0)
             moby_set_state(self, 8, -1);
         else if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-            if (!D_L19_001B1FB8[0])
+            if (!g_subtitle_total_length[0])
                 text_print_localized_formatted(0x1334, 0, -1);
             else
                 text_print_localized_formatted(0x1332, -1);
@@ -216,7 +216,7 @@ void func_US2_L19_0042C4E0(u8 *self)
             if (flag_is_byte_set()) {
                 text_print_localized_formatted(0x1333, g_player_bolts[9], g_player_bolts[9] * 30000, -1);
                 level_apply_index_for_key(self);
-                if (D_00138324 & 0x10) {
+                if (g_pad_held_flags & 0x10) {
                     text_sum_subtitle_lengths();
                     g_player_bolts[0] += g_player_bolts[9] * 30000;
                     g_player_bolts[9] = 0;
@@ -227,7 +227,7 @@ void func_US2_L19_0042C4E0(u8 *self)
             } else {
                 text_print_localized_formatted(0x1333, g_player_bolts[9], g_player_bolts[9] * 3000, -1);
                 level_apply_index_for_key(self);
-                if (D_00138324 & 0x10) {
+                if (g_pad_held_flags & 0x10) {
                     text_sum_subtitle_lengths();
                     g_player_bolts[0] += g_player_bolts[9] * 3000;
                     g_player_bolts[9] = 0;
@@ -244,13 +244,13 @@ void func_US2_L19_0042C4E0(u8 *self)
         if (H(self, 0x96) > 40 && H(self, 0x96) < 90 && H(self, 0x96) % 4 == 0)
             snd_play_from_class_bank(0, 0, (char *)self, math_random_int_range(13, 17));
         if (hero_is_reachable_for_count(self, 10, 2.5f))
-            text_print_localized_formatted(0x1334, D_L19_001B1FB8[0], -1);
+            text_print_localized_formatted(0x1334, g_subtitle_total_length[0], -1);
         else
             moby_set_state(self, 7, -1);
         break;
     }
     func_US2_L19_0042BBF8();
-    if (D_001A7A40[0])
+    if (g_unlocked_item_flags[0])
         *(float *)(data + 0x70) = 2.75f;
     moby_update_eased_node(self, data, 0, 0.02f, 0.3f);
 }

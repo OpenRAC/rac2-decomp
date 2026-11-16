@@ -6,7 +6,7 @@ extern void *CreateMoby(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
-extern int D_L00_001B0BB4 __attribute__((sda));
+extern int g_large_spark_trail_lifetime __attribute__((sda));
 extern void ref_L00_003FCA40_00(void *);
 extern void ref_L00_003FCA40_01(void *, void *);
 extern void ref_L00_003FCA40_02(void);
@@ -39,7 +39,7 @@ char *func_PAL_L00_004012A0(char *a0, char *a1, Quad_3fca40 *a2, int a3)
         *(Quad_3fca40 *)obj10 = *a2;
         vec_scale_to_length(&local, q, -0.25f);
         FastVecAdd((char *)p + 0x50, a0, &local);
-        g = (int)((s32)(D_L00_001B0BB4) * 5 + 2) / 6;
+        g = (int)((s32)(g_large_spark_trail_lifetime) * 5 + 2) / 6;
         *(int *)((char *)p + 0x38) = g;
         f = IntToFloat(g);
         *(int *)((char *)p + 0x34) = a3;

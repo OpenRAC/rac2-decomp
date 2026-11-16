@@ -38,7 +38,7 @@ extern HeroState g_hero_state;
 extern InputState g_pad_state;
 extern Selection3EA540 g_item_slot_to_record;
 extern Entry g_weapon_l00_table[];
-extern char D_L00_001B2B90[] __attribute__((sda));
+extern char g_meteor_gun_muzzle[] __attribute__((sda));
 
 extern void meteor_gun_draw_glow(void);
 extern int math_fast_float_d(void *), vec_fast_helper_b(void *);
@@ -89,8 +89,8 @@ void meteor_gun_update(char *self)
             vec_clear_128(v);
             v[1] = -1.0f;
             matrix_mul_vec3(v, v, self + 0xC0);
-            moby_transform_joint_to_world(self, 0, D_L00_001B2B90);
-            shot = projectile_spawn_small(self, *(int *)(vars + 4), D_L00_001B2B90, v);
+            moby_transform_joint_to_world(self, 0, g_meteor_gun_muzzle);
+            shot = projectile_spawn_small(self, *(int *)(vars + 4), g_meteor_gun_muzzle, v);
             PlayMobySound(0, 0, self);
             if (*(unsigned char *)(self + 0x43) != 2)
                 anim_start_blended(self, 2, 0, 0);

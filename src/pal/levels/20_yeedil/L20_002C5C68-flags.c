@@ -15,7 +15,7 @@ typedef struct {
     unsigned char pad20[0x20]; Vec4 normal;
 } ContactView;
 #define VELOCITY ((char *)(D_00189E20 + 0xf0))
-extern unsigned char D_L20_001C0400[];
+extern unsigned char g_collision_contact[];
 #define PLAYER ((MotionView *)D_00189E20)
 #define CONTACT ((ContactView *)D_L20_001C0400)
 extern float cam_get_view_space_vector_length(char *);
@@ -30,7 +30,7 @@ extern int GetCollHitMaterial(void);
 extern float cam_get_view_space_angle(char *);
 extern float FastVecDot(void *, void *);
 
-void func_PAL_L20_002C7500(int force)
+void hero_slide_along_wall_pal(int force)
 {
     Vec4 offset, start, lowerOffset, lowerStart;
     float height, radius, angle;

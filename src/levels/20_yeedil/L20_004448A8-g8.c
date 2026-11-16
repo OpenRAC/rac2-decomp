@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern char *D_L20_001FBB20[];
-extern int D_L20_001B2FB8;
-extern char *D_L20_001B2F9C;
+extern char *g_group_l20_id_lists[];
+extern int g_group_count;
+extern char *g_group_l20_member_table;
 extern float vec_distance_xy(void *, void *);
 
 /* Walks the id lists that arg0's state names for arg1's class (0xD0F: two lists,
@@ -37,11 +37,11 @@ char *FindLastGroupMemberInRange(char *moby, char *owner) {
     for (i = 0; i < list_count; i++) {
         u16 *record;
 
-        for (record = (u16 *)D_L20_001FBB20[group_ids[i]];
-             (group_ids[i] & 0xFF) != 0xFF && D_L20_001B2FB8 >= group_ids[i] && record != 0 &&
-             (*(s16 *)(record - 1) >= 0 || record == (u16 *)D_L20_001FBB20[group_ids[i]]);
+        for (record = (u16 *)g_group_l20_id_lists[group_ids[i]];
+             (group_ids[i] & 0xFF) != 0xFF && g_group_count >= group_ids[i] && record != 0 &&
+             (*(s16 *)(record - 1) >= 0 || record == (u16 *)g_group_l20_id_lists[group_ids[i]]);
              record++) {
-            char *member = D_L20_001B2F9C + ((*record & 0x7FFF) << 8);
+            char *member = g_group_l20_member_table + ((*record & 0x7FFF) << 8);
 
             if (member == 0) {
                 break;

@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern char g_hero_position[];
-extern char *D_L16_001B2B1C;
+extern char *g_moby_instance_table;
 
 extern void moby_set_state(char *, int, int);
 extern int IsPointInCuboid(char *, int);
@@ -24,12 +24,12 @@ void UpdateCuboidTrigger(char *obj) {
         }
         break;
     case 1:
-        linked_moby = D_L16_001B2B1C + (vars[0] << 8);
+        linked_moby = g_moby_instance_table + (vars[0] << 8);
         if (linked_moby == 0 || *(u8 *)(linked_moby + 0x20) == 0xFE || *(u8 *)(linked_moby + 0x20) == 0xFD) {
             if (IsPointInCuboid(g_hero_position, vars[1]) != 0) {
                 for (i = 0; i < 8; i++) {
                     if (vars[4 + i] != -1) {
-                        char *entry = D_L16_001B2B1C + (vars[4 + i] << 8);
+                        char *entry = g_moby_instance_table + (vars[4 + i] << 8);
                         if (*(s16 *)(entry + 0xAA) == 0xEA3) {
                             *(int *)(*(char **)(entry + 0x68) + 0x24C) = 1;
                         } else {
@@ -45,7 +45,7 @@ void UpdateCuboidTrigger(char *obj) {
         if (moby_count_group_not_in_state(vars[2], -1) == 0) {
             for (i = 0; i < 8; i++) {
                 if (vars[4 + i] != -1) {
-                    char *entry = D_L16_001B2B1C + (vars[4] << 8);
+                    char *entry = g_moby_instance_table + (vars[4] << 8);
                     if (*(s16 *)(entry + 0xAA) == 0xEA3) {
                         *(int *)(*(char **)(entry + 0x68) + 0x24C) = 1;
                     } else {

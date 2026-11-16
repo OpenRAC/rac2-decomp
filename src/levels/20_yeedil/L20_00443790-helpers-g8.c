@@ -2,9 +2,9 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B2168 __attribute__((sda));
-extern float D_L20_001B216C __attribute__((sda));
-extern float D_L20_001B2170 __attribute__((sda));
+extern float g_yeedil_lobbed_speed __attribute__((sda));
+extern float g_yeedil_lobbed_accel __attribute__((sda));
+extern float g_yeedil_lobbed_angle __attribute__((sda));
 
 extern void *CreateMoby(int);
 extern void moby_init_child_from_parent(char *, char *);
@@ -36,8 +36,8 @@ char *yeedil_boss_spawn_lobbed_object(char *owner, int class_id, char *aim_targe
         flags |= 0x100;
         flags &= 0xEFDF;
         state = *(char **)(obj + 0x68);
-        speed = D_L20_001B2168 * 0.0166666675f;
-        acceleration = D_L20_001B216C * 0.000277777785f;
+        speed = g_yeedil_lobbed_speed * 0.0166666675f;
+        acceleration = g_yeedil_lobbed_accel * 0.000277777785f;
         velocity = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
         flight_time = 0.0f;
@@ -45,7 +45,7 @@ char *yeedil_boss_spawn_lobbed_object(char *owner, int class_id, char *aim_targe
         *(float *)(state + 8) = 0.0f;
         vec_scale_to_length(state, state, speed);
         FastVecCross(velocity, state, obj + 0xE0);
-        vec_set_direction_with_complement((float *)velocity, (float *)velocity, math_fast_sin_or_cos_b(D_L20_001B2170 * 0.000290888245f));
+        vec_set_direction_with_complement((float *)velocity, (float *)velocity, math_fast_sin_or_cos_b(g_yeedil_lobbed_angle * 0.000290888245f));
         *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, aim_target, &flight_time, speed, -acceleration);
         *(float *)(state + 0x20) = acceleration;
         *(int *)(state + 0x24) = FloatToInt(flight_time);

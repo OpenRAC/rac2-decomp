@@ -11,8 +11,8 @@ typedef struct { char head[0x10]; Vec position; char tail[0xD0]; Vec rotation; }
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; char *owner; } LiftSound;
 extern unsigned char g_sound_state[];
 typedef struct { char pad[0x140]; Vec from, to; char gap[0x30]; char *camera; } LiftCamera;
-extern LiftCamera D_L00_001B8C80;
-extern const int D_001A7908;
+extern LiftCamera g_scalar_transition_state;
+extern const int g_menu_toggle_option;
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float), math_fabs(float), math_random_angle(void);
 extern float vec_distance_xy(void *, void *), fast_vec_dist(void *, void *);
 extern int FloatToInt(float), hero_is_current_selected_id(int), snd_is_voice_playing_for_owner(void *, int), PlayMobySound(int, int, void *);
@@ -130,8 +130,8 @@ void UpdateAranosVerticalLift(LiftMoby *moby) {
             moby_set_state(obj, 2, -1);
             ctx->velocity = 0.0f;
             I(ctx->child, 0x78) = 0x8000DF2A;
-            if (!D_001A7908) {
-                SetCamera5Pose(&D_L00_001B8C80.from, &D_L00_001B8C80.to, 2, 120, 0);
+            if (!g_menu_toggle_option) {
+                SetCamera5Pose(&g_scalar_transition_state.from, &g_scalar_transition_state.to, 2, 120, 0);
                 frame.camera.f[0] = 246.85f;
                 frame.camera.f[1] = 198.19f;
                 frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
@@ -217,12 +217,12 @@ void UpdateAranosVerticalLift(LiftMoby *moby) {
         qcopy(child + 0x10, &moby->position);
         F(child, 0x18) += 0.25f;
     }
-    if (*(short *)(D_L00_001B8C80.camera + 0x86) == 5) {
+    if (*(short *)(g_scalar_transition_state.camera + 0x86) == 5) {
         frame.camera.f[0] = 246.85f;
         frame.camera.f[1] = 198.19f;
         frame.camera.f[2] = g_hero_state.position.f[2] + 1.5f;
         object_copy_vector_to_selected(&frame.camera);
-        if (vec_distance_xy(D_L00_001B8C80.camera + 0x30, &frame.camera) < 0.5f)
+        if (vec_distance_xy(g_scalar_transition_state.camera + 0x30, &frame.camera) < 0.5f)
             cam_set_mode_state(1);
     }
 }

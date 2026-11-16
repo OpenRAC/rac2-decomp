@@ -5,7 +5,7 @@ typedef unsigned char u8;
 
 typedef int s32;
 
-extern u8 D_L24_0025B710[];
+extern u8 g_attachment_records[];
 
 extern void *attachment_get_owner_by_kind(short);
 
@@ -15,7 +15,7 @@ extern void vec_clear_128(void *);
 
 /* Detaches every active attachment record from its owner and resets its blend and rotation values. */
 void attachment_reset_all(void) {
- u8 *records=D_L24_0025B710;
+ u8 *records=g_attachment_records;
  u8 *rotPtr=records+0x40;
  u8 *posVelPtr=records+0x90;
  u8 *rotVelPtr=records+0x60;

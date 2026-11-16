@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern unsigned char D_0013957F[];
+extern unsigned char g_beam_weapon_index[];
 typedef struct { char pad[112]; float scale; char tail[108]; } TableEntry;
 extern char g_weapon_l00_table[];
 extern void *g_hero_moby;
@@ -26,7 +26,7 @@ int beam_test_segment_hit(char *object, void *target)
     *(char **)(local + 16) = object;
     *(int *)(local + 20) = 0x10000;
     *(int *)(local + 32) = 1;
-    *(float *)(local + 28) = ((TableEntry *)(g_weapon_l00_table + D_0013957F[0] * 224))->scale;
+    *(float *)(local + 28) = ((TableEntry *)(g_weapon_l00_table + g_beam_weapon_index[0] * 224))->scale;
     *(TI128 *)local = *(TI128 *)state;
     vec_scale_to_length(local, local, 1.0f);
     *(unsigned short *)(local + 26) = *(unsigned short *)(object + 0xAA);

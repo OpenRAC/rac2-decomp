@@ -26,7 +26,7 @@ typedef struct {
     int unused1[4];
 } Entry_24efc0;
 
-extern char *D_L00_001B2B54 __attribute__((sda));
+extern char *g_blast_l00_pool __attribute__((sda));
 
 extern void func_002833F0_1(char *a, char *b);
 
@@ -107,8 +107,8 @@ extern Entry_24efc0 g_fading_moby_list[];
 #ifndef RAC2_T_VEC16_FC936841D
 #endif
 
-extern char D_0018A0E0[];
-extern unsigned char *D_L00_001FEA14;
+extern char g_hero_state_block[];
+extern unsigned char *g_effect_param_pointer_b;
 extern char g_camera_l00_position[];
 extern char D_L00_001A8F20_1[] __attribute__((sda));
 extern void FastVecSub(char *, char *, char *);
@@ -131,7 +131,7 @@ void part_l00_spawn_spark_burst_3(float *pos, int unused, int extra)
     FastVecSub((char *)to_camera, g_camera_l00_position, (char *)pos);
     camera_angle = mat_fast_helper_a(to_camera[0], to_camera[1]);
     for (i = 19; i >= 0; i--) {
-        FastVecScale(velocity, D_0018A0E0, -(math_random_float_range(0.2f, 3.0f) * 0.01666666753590107f));
+        FastVecScale(velocity, g_hero_state_block, -(math_random_float_range(0.2f, 3.0f) * 0.01666666753590107f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         speed = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         spawn_pos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.2f);
@@ -163,9 +163,9 @@ void part_l00_spawn_spark_burst_3(float *pos, int unused, int extra)
         speed = 525000.0f;
         color_seed = math_random_int_below(255);
         last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, color_seed, speed, 0.0f, 1.0f, 0.0f, 1.0f);
-        if (last) last[2] = *D_L00_001FEA14;
+        if (last) last[2] = *g_effect_param_pointer_b;
         last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, (color_seed + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
-        if (last) last[2] = *D_L00_001FEA14;
+        if (last) last[2] = *g_effect_param_pointer_b;
     }
 }
 
@@ -273,8 +273,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern void *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
-extern char D_L00_001FE940[];
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_effect_definitions[];
+extern char g_default_vector[] __attribute__((sda));
 /* Throws out bright particles in a short line from an object's position. */
 void part_spawn_line_at_moby(char *moby) {
     float origin[4];
@@ -299,16 +299,16 @@ void part_spawn_line_at_moby(char *moby) {
     FastVecScale(up_step, moby + 0xE0, 0.15f);
     FastVecAdd(origin, origin, up_step);
     FastVecScale(up_step, moby + 0xE0, -0.033333335f);
-    table = D_L00_001FE940;
+    table = g_effect_definitions;
     for (i = 8; i >= 0; i--) {
         jittered[0] = origin[0] + math_random_signed_float_range(0.0f, 0.1f);
         jittered[1] = origin[1] + math_random_signed_float_range(0.0f, 0.1f);
         jittered[2] = origin[2] + math_random_signed_float_range(0.0f, 0.1f);
         color_seed = math_random_int_below(0xFF);
         size = 42000.0f;
-        part_spawn_gravity_fade(jittered, D_L00_001A8F20, 4, 0x808080, color_seed, 0x7F, 0x7F, size, size, 0.0f, 1);
+        part_spawn_gravity_fade(jittered, g_default_vector, 4, 0x808080, color_seed, 0x7F, 0x7F, size, size, 0.0f, 1);
         size = 273000.0f;
-        particle = part_spawn_gravity_fade(origin, D_L00_001A8F20, 4, 0x406080, color_seed, 0x10, 0x10, size, size, 0.0f, 1);
+        particle = part_spawn_gravity_fade(origin, g_default_vector, 4, 0x406080, color_seed, 0x10, 0x10, size, size, 0.0f, 1);
         if (particle != 0)
             *(unsigned char *)(particle + 2) = *(unsigned char *)(*(unsigned *)(table + 0xD4));
         FastVecAdd(origin, origin, up_step);
@@ -448,7 +448,7 @@ void blast_finish_effect_records(char *object)
 /* func_L00_003E6778 is defined in L00_003E6778.c. */
 
 
-extern char *D_L00_001B2BB8 __attribute__((sda));
+extern char *g_blast_l00_pool_2 __attribute__((sda));
 extern void ref_L00_003E6F48_01(char *rec, float f1, int a1, int a2, int a3,
                                 float f2, int a4, float f3);
 

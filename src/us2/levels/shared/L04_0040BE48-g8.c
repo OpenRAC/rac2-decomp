@@ -3,22 +3,22 @@
 #include "common.h"
 #define F(p,T,o) (((struct { char pad[o]; T v; } *)(p))->v)
 typedef int B971Quad __attribute__((mode(TI)));
-extern char *D_L04_001B25CC[] __attribute__((sda)) NOT_SDA, *D_L04_001B24E8[] __attribute__((sda)) NOT_SDA, *g_moby_l04_pool[] __attribute__((sda)) NOT_SDA;
-extern char D_L04_001B9540[] NOT_SDA, g_hero_state[] NOT_SDA;
+extern char *g_linked_record_table[] __attribute__((sda)) NOT_SDA, *g_racer_moby_list[] __attribute__((sda)) NOT_SDA, *g_moby_l04_pool[] __attribute__((sda)) NOT_SDA;
+extern char g_hero_l04_state[] NOT_SDA, g_hero_state[] NOT_SDA;
 extern int g_current_lap, g_race_time_ticks;
-extern int D_L04_001B0918 __attribute__((sda));
-extern char *D_L04_001B08F4 __attribute__((sda));
+extern int g_race_progress_counter __attribute__((sda));
+extern char *g_race_bike_child_moby __attribute__((sda));
 extern void racer_release_sound_handles(char *,char *),racer_reset_state(char *,int),hoverbike_init_race_course(char *);
 extern void hero_reset_position_and_direction(void *,void *,int,int),moby_mark_spawned(char *);
-extern void part_refresh_active_records(char *),racer_activate_linked(char *),func_US2_0029C548(int,int);
+extern void part_refresh_active_records(char *),racer_activate_linked(char *),level_store_value_pair_us2(int,int);
 
-void func_US2_L04_0040BE48(char *m,int hidden)
+void race_reset_controller_us2(char *m,int hidden)
 {
     float point[4] __attribute__((aligned(16))), rotation[4] __attribute__((aligned(16)));
     char *p=F(m,char *,0x68), *obj;
-    *(B971Quad *)point=F((F(p,volatile int,0x198)<<7)+(unsigned int)D_L04_001B25CC[0],B971Quad,0x30);
-    *(B971Quad *)rotation=F((F(p,volatile int,0x198)<<7)+(unsigned int)D_L04_001B25CC[0],B971Quad,0x70);
-    F(D_L04_001B9540,int,0x16c)=F(D_L04_001B9540,int,0x188)=F(D_L04_001B9540,int,0x180)=F(D_L04_001B9540,int,0x168)=F(D_L04_001B9540,int,0x160)=0;
+    *(B971Quad *)point=F((F(p,volatile int,0x198)<<7)+(unsigned int)g_linked_record_table[0],B971Quad,0x30);
+    *(B971Quad *)rotation=F((F(p,volatile int,0x198)<<7)+(unsigned int)g_linked_record_table[0],B971Quad,0x70);
+    F(g_hero_l04_state,int,0x16c)=F(g_hero_l04_state,int,0x188)=F(g_hero_l04_state,int,0x180)=F(g_hero_l04_state,int,0x168)=F(g_hero_l04_state,int,0x160)=0;
     racer_release_sound_handles(m,p);
     racer_reset_state(m,0);
     hoverbike_init_race_course(m);
@@ -29,8 +29,8 @@ void func_US2_L04_0040BE48(char *m,int hidden)
     F(p,int,0x394)=150;
     F(m,unsigned char,0x30)=255;
     F(p,int,0x270)=0;
-    g_current_lap=0;g_race_time_ticks=0;D_L04_001B0918=0;
-    obj=D_L04_001B24E8[0];
+    g_current_lap=0;g_race_time_ticks=0;g_race_progress_counter=0;
+    obj=g_racer_moby_list[0];
     F(p,int,0x31c)=0;
     for(;obj;obj=F(obj,char *,0x28)) {
         unsigned short type=F(obj,unsigned short,0xaa);
@@ -38,7 +38,7 @@ void func_US2_L04_0040BE48(char *m,int hidden)
     }
     part_refresh_active_records(m);racer_activate_linked(m);
     F(g_hero_state,int,0x24a0)=26;
-    F(D_L04_001B9540,int,0x400)=0;
+    F(g_hero_l04_state,int,0x400)=0;
     F(g_hero_state,unsigned char,0x22b7)=1;
     F(g_hero_state,unsigned char,0x22b5)=1;
     F(F(g_hero_state,char *,0x2290),int,0x98)=0;
@@ -47,11 +47,11 @@ void func_US2_L04_0040BE48(char *m,int hidden)
         char *hiddenObj;
         F(m,unsigned char,0xbc)=0;
         F(m,unsigned short,0x34)|=0x41;
-        func_US2_0029C548(0,0);
+        level_store_value_pair_us2(0,0);
         if (F(p,int,0x1dc)!=-1) {
             char *child;
             hiddenObj=g_moby_l04_pool[0]+(F(p,int,0x1dc)<<8);
-            child=D_L04_001B08F4;
+            child=g_race_bike_child_moby;
             F(hiddenObj,unsigned short,0x34)|=0x41;
             if(child) F(child,unsigned short,0x34)|=0x41;
         }

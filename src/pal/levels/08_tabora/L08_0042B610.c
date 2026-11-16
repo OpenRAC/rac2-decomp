@@ -3,7 +3,7 @@
 
 typedef int s32;
 typedef float f32;
-extern s32 D_L08_001B29DC __attribute__((sda));
+extern s32 g_moby_array __attribute__((sda));
 extern f32 math_random_float_range(f32, f32);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
@@ -19,13 +19,13 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char g_hero_position[];
 extern s32 g_beam_slot_state[];
-extern s32 D_L08_001B39E0[];
-extern s32 D_L08_001B39F0[];
+extern s32 g_beam_start_light_ids[];
+extern s32 g_beam_end_light_ids[];
 extern s32 g_beam_slot_key[];
 
 /* The record's whole per-frame pass: the sibling step, the aim vector copied out of the
    sub-object, the shared sprite pass, then the dispatch the shared tag call returns. */
-void func_PAL_L08_0042B610(char *a0) {
+void creature_update_hit_reaction_pal(char *a0) {
     char *q = *(char **)(a0 + 0x68);
     int r;
 

@@ -12,7 +12,7 @@ typedef struct {
     Quad position;
     Quad normal;
 } CollisionView;
-extern unsigned char D_L16_001BFF50[];
+extern unsigned char g_coll_view_buffer[];
 #define HIT ((CollisionView *)D_L16_001BFF50)
 typedef struct {
     unsigned char pad_0[0x20];
@@ -51,7 +51,7 @@ typedef struct {
 } PlayerView;
 extern PlayerView D_00189E20_view __asm__("D_00189E20");
 #define PLAYER (&D_00189E20_view)
-extern int D_L16_001A8FF0 __attribute__((sda));
+extern int g_hero_l16_block_flag __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
 extern float FastVecDot(void *, void *);
@@ -66,7 +66,7 @@ extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 
-int func_PAL_L16_002B5848(int mode)
+int hero_l16_push_out_of_collision_pal(int mode)
 {
     Vec previous;
     Vec offset, displacement;
@@ -96,7 +96,7 @@ int func_PAL_L16_002B5848(int mode)
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_L16_001A8FF0) {
+            } else if (g_hero_l16_block_flag) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);

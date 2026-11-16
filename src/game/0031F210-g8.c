@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
-extern float D_L00_001B0464 __attribute__((sda));
+extern float g_move_friction_step __attribute__((sda));
 extern float math_fabs(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -19,7 +19,7 @@ void moby_move_with_friction(char *object)
         float step;
         *(float *)(data + 0x18) += speed * (1.0f / 120.0f);
         magnitude = math_fabs(*(float *)(data + 0x18));
-        step = D_L00_001B0464;
+        step = g_move_friction_step;
         if (step * (1.0f / 60.0f) < magnitude)
             *(float *)(data + 0x18) = step * *(float *)(data + 0x30) * (1.0f / 60.0f);
     } else {
@@ -36,8 +36,8 @@ void moby_move_with_friction(char *object)
 }
 extern char *g_spider_bot_moby __attribute__((sda));
 /* These scalar symbols anchor eight adjacent small-data words in each table. */
-extern float D_L00_001B03F0 __attribute__((sda));
-extern int D_L00_001B0410 __attribute__((sda));
+extern float g_spider_bot_threshold_table __attribute__((sda));
+extern int g_spider_bot_sound_table __attribute__((sda));
 extern float moby_get_anim_value(void *);
 extern int PlayMobySound(int, int, void *);
 
@@ -50,11 +50,11 @@ void snd_play_on_threshold_cross(void)
         float current = moby_get_anim_value(object);
         int i;
         for (i = 0; i < 8; i++) {
-            float threshold = (&D_L00_001B03F0)[i];
+            float threshold = (&g_spider_bot_threshold_table)[i];
             float delta = current - threshold;
             if ((0.0f < delta || 0.0f < *(float *)(data + 0x2C) - threshold) &&
                 (delta < 0.0f || *(float *)(data + 0x2C) - threshold < 0.0f)) {
-                PlayMobySound((&D_L00_001B0410)[i], 0, g_spider_bot_moby);
+                PlayMobySound((&g_spider_bot_sound_table)[i], 0, g_spider_bot_moby);
                 break;
             }
         }
@@ -77,8 +77,8 @@ void robot_draw_trails(char *object)
         count, state, *(float *)(data + 0x2B8));
 }
 
-extern volatile int D_001AFFF0 __attribute__((sda));
-extern volatile int D_001AFFF4 __attribute__((sda));
+extern volatile int g_robot_glow_flash_param_a __attribute__((sda));
+extern volatile int g_robot_glow_flash_param_b __attribute__((sda));
 extern void gfx_draw_beam_quad_between_points_b(char *);
 extern void gfx_draw_camera_facing_flash(char *, char *, float, int, int, int);
 /* Draws three glowing effects on the object. In some states it also draws the beam between its two points. */
@@ -88,22 +88,22 @@ void robot_draw_glow_effects(char *object)
     unsigned int state = *(unsigned char *)(object + 0x20);
     if (state == 4 || state == 5 || *(unsigned char *)(object + 0x95) == 2 || state == 10)
         gfx_draw_beam_quad_between_points_b(object);
-    gfx_draw_camera_facing_flash(object, data + 0x3A0, 0.125f, D_001AFFF0, 0x20000000, 0x20000000);
-    gfx_draw_camera_facing_flash(object, data + 0x3B0, 0.15f, D_001AFFF4, 0x30000000, 0x20000000);
-    gfx_draw_camera_facing_flash(object, data + 0x3C0, 0.15f, D_001AFFF4, 0x10000000, 0x30000000);
+    gfx_draw_camera_facing_flash(object, data + 0x3A0, 0.125f, g_robot_glow_flash_param_a, 0x20000000, 0x20000000);
+    gfx_draw_camera_facing_flash(object, data + 0x3B0, 0.15f, g_robot_glow_flash_param_b, 0x30000000, 0x20000000);
+    gfx_draw_camera_facing_flash(object, data + 0x3C0, 0.15f, g_robot_glow_flash_param_b, 0x10000000, 0x30000000);
 }
 
-extern unsigned short *D_001EE5A0[];
-extern char *D_001B1B5C __attribute__((sda));
+extern unsigned short *g_moby_group_lists[];
+extern char *g_moby_pool_start __attribute__((sda));
 
 /* Walks the moby group list of the object's group id and raises the flag at data + 0x276
    on every peer of class 0xB0A whose class byte is not negative. */
 void group_alert_peers_type_a(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
-        unsigned short *list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+        unsigned short *list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
         if (list != 0) {
-            char *base = D_001B1B5C;
+            char *base = g_moby_pool_start;
             unsigned short *entry = list;
             int key;
             do {
@@ -120,9 +120,9 @@ void group_alert_peers_type_a(char *self)
 void group_alert_peers_type_b(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
-        unsigned short *list = D_001EE5A0[*(unsigned char *)(self + 0x21)];
+        unsigned short *list = g_moby_group_lists[*(unsigned char *)(self + 0x21)];
         if (list != 0) {
-            char *base = D_001B1B5C;
+            char *base = g_moby_pool_start;
             unsigned short *entry = list;
             int key;
             do {
@@ -157,10 +157,10 @@ typedef struct {
 } AmmoSpawnData;
 
 extern unsigned int stub_empty_19(int);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern unsigned char g_item_slot_to_record[];
 extern AmmoSpawnWeapon g_weapon_table[];
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 extern char D_00189E20_9[];
 extern float math_random_angle(void);
 extern float mat_fast_helper_a(float, float);
@@ -196,7 +196,7 @@ char *SpawnWeaponAmmoPickup(float *position, int weapon, int amount, int extra)
     *(AmmoSpawnQuad *)velocity = 0;
     velocity[2] = math_random_angle();
     *(AmmoSpawnQuad *)rotation = *(AmmoSpawnQuad *)velocity;
-    if (D_001A8CA0) {
+    if (g_ground_check_inhibit) {
         cam_compute_view_direction(position, velocity, 1);
         rotation[1] = mat_fast_helper_a(velocity[2], vec_length_xy(velocity));
         rotation[2] = mat_fast_helper_a(velocity[0], velocity[1]);
@@ -218,12 +218,12 @@ char *SpawnWeaponAmmoPickup(float *position, int weapon, int amount, int extra)
                 + slots[stub_empty_19(weapon)] * stride))->pickupAmount;
         else
             data->amount = amount;
-        if (D_001A7A0A)
+        if (g_extras_unlocked_flag)
             data->amount *= 2;
         data->weapon = weapon;
         data->f6C = (float)extra;
         data->f70 = 16;
-        if (D_001A8CA0)
+        if (g_ground_check_inhibit)
             data->groundZ = gravity_get_center_distance((float *)(spawn + 0x10));
         else
             data->groundZ = *(float *)(spawn + 0x18);

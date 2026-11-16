@@ -7,7 +7,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_0032A0E0(char *owner)
+void part_update_orbiting_sparks_pal(char *owner)
 {
     int address = (int)g_spark_records;
     char *position = (char *)(address + 0x10);
@@ -41,7 +41,7 @@ extern void gfx_draw_facing_sprite(char *, int, int, float, char *, int, char *,
 extern void gfx_draw_facing_sprite_near_cam(char *, int, int, float, float, int, int, float);
 extern void DrawAndReleaseObjectParticles(char *);
 
-void func_PAL_0032A1E8(char *obj)
+void DrawObjectSpriteEffects_pal(char *obj)
 {
     char *data;
     float f;

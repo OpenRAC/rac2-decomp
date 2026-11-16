@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L03_003A7720, the PAL copy of func_L03_003A40A0: the same C, where the turn rates
  * 0.0017453294f and 0.20943955f become 0.0025132746f and 0.25132746f, and the particle time
  * D_L03_001AF510 is read through the 50 Hz scale (x * 5 + 2) / 6 at both of its uses. */
@@ -5,15 +6,15 @@
 #include "names.h"
 typedef struct { float x, y, z, w; } SwitchVector;
 typedef struct { char pad0[0x80]; float x,y; char pad1[0x2294-0x88]; int mode; } SwitchPlayer;
-extern unsigned char D_L03_00189E20[] __attribute__((nosda));
-extern unsigned char *D_L03_001B2A1C __attribute__((sda));
+extern unsigned char g_hero_l03_state_block[] __attribute__((nosda));
+extern unsigned char *g_moby_record_base __attribute__((sda));
 extern int g_frame_l03_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern unsigned char D_0019B2E8[] __attribute__((nosda));
-extern float D_L03_001AF510 __attribute__((sda));
-extern int D_L03_001AF514 __attribute__((sda));
-extern float D_L03_001AF518 __attribute__((sda));
-extern float D_L03_001AF51C __attribute__((sda));
+extern unsigned char g_moby_group_flags[] __attribute__((nosda));
+extern float g_swingshot_particle_scale __attribute__((sda));
+extern int g_swingshot_particle_type __attribute__((sda));
+extern float g_swingshot_particle_size __attribute__((sda));
+extern float g_swingshot_offset_scale __attribute__((sda));
 extern void set_moby_color(void *, int, int, int);
 extern void global_record_reset(void *);
 extern float mat_fast_helper_a(float, float);
@@ -42,7 +43,7 @@ void func_PAL_L03_003A7720(unsigned char *object) {
         *(unsigned short *)(object + 0x34) = flags;
         if (*(int *)(state + 0x30) != -1 ||
             (*(int *)(state + 0x3C) != -1 &&
-             (related = D_L03_001B2A1C + (*(int *)(state + 0x3C) << 8)) != 0 &&
+             (related = g_moby_record_base + (*(int *)(state + 0x3C) << 8)) != 0 &&
              related[0x20] != 0xFE && related[0x20] != 0xFD)) {
             object[0x30] = 0xFF;
             *(unsigned short *)(object + 0x34) = flags | 0x41;
@@ -56,30 +57,30 @@ void func_PAL_L03_003A7720(unsigned char *object) {
     case 1:
         if (*(short *)(object + 0xAA) == 0x323) {
             anglePointer = (float *)(object + 0xF8);
-            angle = mat_fast_helper_a(((SwitchPlayer *)D_L03_00189E20)->x - *(float *)(object + 0x10),
-                                  ((SwitchPlayer *)D_L03_00189E20)->y - *(float *)(object + 0x14));
+            angle = mat_fast_helper_a(((SwitchPlayer *)g_hero_l03_state_block)->x - *(float *)(object + 0x10),
+                                  ((SwitchPlayer *)g_hero_l03_state_block)->y - *(float *)(object + 0x14));
             math_approach_target_with_direction_mode(anglePointer, angle, 0.0025132746f, 0.0025132746f, 0.25132746f, state + 0x38, 0);
             m = g_frame_l03_counter[0];
             if ((m & 1) && object[0x31]) {
                 direction = 1.0f;
                 if (m & 4)
                     direction = -1.0f;
-                vec_scale_to_length(&position, object + 0xD0, direction * D_L03_001AF51C);
-                vec_scale_to_length(&velocity, &position, -2.0f / ((D_L03_001AF510 * 5.0f + 2.0f) * 0.16666667f));
+                vec_scale_to_length(&position, object + 0xD0, direction * g_swingshot_offset_scale);
+                vec_scale_to_length(&velocity, &position, -2.0f / ((g_swingshot_particle_scale * 5.0f + 2.0f) * 0.16666667f));
                 FastVecAdd(&position, &position, object + 0x10);
-                color = FloatToInt((D_L03_001AF510 * 5.0f + 2.0f) * 0.16666667f) & 0xFF;
+                color = FloatToInt((g_swingshot_particle_scale * 5.0f + 2.0f) * 0.16666667f) & 0xFF;
                 random = math_random_int_below(0xFF) & 0xFF;
-                part_spawn_hero_relative(&position, &velocity, D_L03_001AF514, color, random, 0, D_L03_001AF518);
+                part_spawn_hero_relative(&position, &velocity, g_swingshot_particle_type, color, random, 0, g_swingshot_particle_size);
             }
         }
-        if (((SwitchPlayer *)D_L03_00189E20)->mode != 0x2B)
+        if (((SwitchPlayer *)g_hero_l03_state_block)->mode != 0x2B)
             cam_update_aim_target_candidate(object);
         break;
     case 2:
-        if (D_0019B2E8[*(int *)(state + 0x30) + g_current_map_index[0] * 16] == 0) {
+        if (g_moby_group_flags[*(int *)(state + 0x30) + g_current_map_index[0] * 16] == 0) {
             if (*(int *)(state + 0x3C) == -1)
                 return;
-            related = D_L03_001B2A1C + (*(int *)(state + 0x3C) << 8);
+            related = g_moby_record_base + (*(int *)(state + 0x3C) << 8);
             if (related && related[0x20] != 0xFE && related[0x20] != 0xFD)
                 return;
         }

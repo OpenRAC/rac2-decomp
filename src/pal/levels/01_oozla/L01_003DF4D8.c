@@ -4,12 +4,12 @@
 #include "common.h"
 
 extern void muckdweller_update_targeting(void *);
-extern void func_PAL_L01_003E1648(void *);
+extern void muckdweller_init_pal(void *);
 extern void func_PAL_L01_003E05D0(void *);
-extern void func_PAL_L01_003E1DB0(void *);
+extern void muckdweller_tick_timers_pal(void *);
 extern void muckdweller_find_farthest_anchor(void *, void *);
-extern void func_PAL_L01_003E1448(void *, void *);
-extern s32 func_PAL_L01_003E14E0(void *, void *);
+extern void moby_move_keeping_transform_alt_pal(void *, void *);
+extern s32 moby_move_keeping_transform_pal(void *, void *);
 extern void func_PAL_L01_003E0710(void *, s32);
 extern void part_spawn_puffs_around_point(void *, s32);
 extern void part_queue_moby_for_glow(void *, s32, s32);
@@ -21,7 +21,7 @@ extern s32 moby_dispatch_action_by_kind(void *, void *);
 extern s32 level_has_pending_inner_flag(void *);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
-extern void func_PAL_002A7650(void *, s32, s32);
+extern void SetDeathBits_pal(void *, s32, s32);
 extern f32 math_fabs(f32);
 extern f32 FastVecLength(void *);
 extern f32 vec_distance_xy(void *, void *);
@@ -42,7 +42,7 @@ extern void MobySpringTurn(void *, f32, f32, f32, f32, void *);
 extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, s32);
 extern int coll_test_hit_at_bone(void *, s32, s32, s32, s32, s32, f32, f32, f32);
 extern u8 g_hero_state[];
-extern u8 D_L01_001AC5A0[] MACRO_ADDR;
+extern u8 g_monster_vector_template[] MACRO_ADDR;
 
 /* A 16-bit struct stays in HImode, so a local copy loads with lhu and tests with sll. */
 typedef struct { s16 value; } Timer16;
@@ -71,7 +71,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         muckdweller_update_targeting(obj);
     switch (obj[0x95]) {
     case 0:
-        func_PAL_L01_003E1648(obj);
+        muckdweller_init_pal(obj);
         break;
     case 1:
         if (state[0x3D0]) {
@@ -159,7 +159,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             }
             break;
         case 2:
-            func_PAL_L01_003E1448(obj, state + 0x2B0);
+            moby_move_keeping_transform_alt_pal(obj, state + 0x2B0);
             if (!obj[0x40]) {
                 if ((I(state, 0x2F4) == 1 || H(state, 0x3D6)) &&
                     (I(state, 0x408) != -1 || (**(s32 **)(state + 0x400) == H(obj, 0xB2) && !I(state, 0x404)))) {
@@ -196,7 +196,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         case 3: {
             f32 distance;
 
-            func_PAL_L01_003E14E0(obj, state + 0x390);
+            moby_move_keeping_transform_pal(obj, state + 0x390);
             distance = vec_distance_xy(obj + 0x10, state + 0x390);
             if (obj[0x60] & 2) {
                 if ((H(*(u8 **)(state + 0x2F0), 0xAA) != 0xB1A && distance <= 3) ||
@@ -226,7 +226,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             break;
         }
         case 4:
-            func_PAL_L01_003E1448(obj, state + 0x2B0);
+            moby_move_keeping_transform_alt_pal(obj, state + 0x2B0);
             if (obj[0x60] & 2) {
                 if (!I(state, 0x404) || vec_distance_xy(obj + 0x10, g_hero_state + 0x80) > 7) {
                     H(state, 0x3D8) = 50;
@@ -297,7 +297,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         }
         break;
     case 6:
-        func_PAL_002A7650(obj, 0, 3);
+        SetDeathBits_pal(obj, 0, 3);
         func_PAL_L01_003E05D0(obj);
         part_spawn_puffs_around_point(obj, 1);
         part_queue_moby_for_glow(obj, 0, 0);
@@ -316,7 +316,7 @@ void func_PAL_L01_003DF4D8(u8 *obj)
 
             if (target && !level_has_pending_inner_flag(target)) {
                 v = pos;
-                qcopy(v, D_L01_001AC5A0);
+                qcopy(v, g_monster_vector_template);
             } else
                 vec_scale_to_length(pos, state + 0x210, 1);
             v = pos;
@@ -337,5 +337,5 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         math_approach_target_with_direction_mode(obj + 0xF0, pitch, 0.0025132746f, 0.0025132746f,
                       0.12566373f, state + 0x3E8, 0);
     }
-    func_PAL_L01_003E1DB0(obj);
+    muckdweller_tick_timers_pal(obj);
 }

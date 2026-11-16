@@ -25,7 +25,7 @@ extern int *ref_L00_0033BA68_00;
 
 /* Allocates the 0x46 record, copies the caller's sixteen-byte block into it and
    fills its flag bytes, its tag word and its two level-derived fields. */
-Obj_L00_0033BA68 *func_PAL_L00_0033DE50(char *src1, int index, f32 value)
+Obj_L00_0033BA68 *part_spawn_glow_effect_pal(char *src1, int index, f32 value)
 {
     Obj_L00_0033BA68 *o = (Obj_L00_0033BA68 *)part_alloc(0x46);
 

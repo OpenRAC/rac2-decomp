@@ -1,13 +1,13 @@
 #include "common.h"
 
 typedef struct { char prefix[0x3C]; int abort; } SequencePlayback;
-extern SequencePlayback D_L00_001BEFC0;
-extern float D_L00_001B18E0 __attribute__((sda));
-extern int D_001A7A00[] __attribute__((sda));
-extern int D_001A7478 __attribute__((sda)), g_current_map_index __attribute__((sda)), g_is_pal_video __attribute__((sda));
+extern SequencePlayback g_request_l00_queue;
+extern float g_hero_scalar_transition_value __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
+extern int g_loader_state_word __attribute__((sda)), g_current_map_index __attribute__((sda)), g_is_pal_video __attribute__((sda));
 typedef struct { char prefix[0x1A0]; union { unsigned long long all; struct { unsigned int low, high; } word; } buttons; } SequenceInput;
 extern SequenceInput g_pad_state;
-extern short D_001A63AC;
+extern short g_sequence_active_flag;
 extern void req_flush_queue(void *);
 extern int request_end_slot(int, int);
 extern void tutorial_probe_points_update(void);
@@ -34,7 +34,7 @@ extern void tutorial_scene_objects_update(void);
 extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 
-extern int D_L00_001BCAC0[];
+extern int g_tutorial_probe_context[];
 extern s16 snd_pump_music_and_disc_read(int);
 extern void game_reset_frame_counters(void);
 extern void part_update_all(void);
@@ -64,10 +64,10 @@ void cutscene_update_frame(void) {
     int complete;
     int i;
     short id;
-    if (((SequenceState *)D_L00_001BCAC0)->done) return;
-    if (((SequenceState *)D_L00_001BCAC0)->end_time == 0) {
-        req_flush_queue(&D_L00_001BEFC0);
-        ((SequenceState *)D_L00_001BCAC0)->done = 1;
+    if (((SequenceState *)g_tutorial_probe_context)->done) return;
+    if (((SequenceState *)g_tutorial_probe_context)->end_time == 0) {
+        req_flush_queue(&g_request_l00_queue);
+        ((SequenceState *)g_tutorial_probe_context)->done = 1;
         request_end_slot(0, 0);
         return;
     }
@@ -77,44 +77,44 @@ void cutscene_update_frame(void) {
     snd_run_callbacks();
     hero_l00_update_frame_2();
     part_update_all();
-    { int t; ++((SequenceState *)D_L00_001BCAC0)->frame; t = ++((SequenceState *)D_L00_001BCAC0)->time; if (t < 18) {
-        ApproachValue(&D_L00_001B18E0, 0.0f, 0.16666667f);
-        if (D_L00_001B18E0 > 1.0f) D_L00_001B18E0 = 1.0f;
+    { int t; ++((SequenceState *)g_tutorial_probe_context)->frame; t = ++((SequenceState *)g_tutorial_probe_context)->time; if (t < 18) {
+        ApproachValue(&g_hero_scalar_transition_value, 0.0f, 0.16666667f);
+        if (g_hero_scalar_transition_value > 1.0f) g_hero_scalar_transition_value = 1.0f;
     }
     }
-    if (((SequenceState *)D_L00_001BCAC0)->fade_time <= ((SequenceState *)D_L00_001BCAC0)->time) snd_resume_music_stream();
-    ended = ((SequenceState *)D_L00_001BCAC0)->time >= ((SequenceState *)D_L00_001BCAC0)->end_time;
+    if (((SequenceState *)g_tutorial_probe_context)->fade_time <= ((SequenceState *)g_tutorial_probe_context)->time) snd_resume_music_stream();
+    ended = ((SequenceState *)g_tutorial_probe_context)->time >= ((SequenceState *)g_tutorial_probe_context)->end_time;
     abort = 0;
-    if (((SequenceState *)D_L00_001BCAC0)->time > 17 && D_L00_001B18E0 == 0.0f) {
-        if (!(((D_001A7A00[2] & 0xFFFF0000) == 0) && D_001A7478 == 0 && g_current_map_index > 0) && (g_pad_state.buttons.word.high & 0x800)) abort = 1;
+    if (((SequenceState *)g_tutorial_probe_context)->time > 17 && g_hero_scalar_transition_value == 0.0f) {
+        if (!(((g_player_stats[2] & 0xFFFF0000) == 0) && g_loader_state_word == 0 && g_current_map_index > 0) && (g_pad_state.buttons.word.high & 0x800)) abort = 1;
         else { unsigned long long v = (g_pad_state.buttons.all & 0x8000000000FULL) ^ 0x8000000000FULL; abort = 1; if (v) abort = 0; }
     }
     if (abort) {
-        D_L00_001BEFC0.abort = 1;
-        req_flush_queue(&D_L00_001BEFC0);
-        ((SequenceState *)D_L00_001BCAC0)->done = 1;
+        g_request_l00_queue.abort = 1;
+        req_flush_queue(&g_request_l00_queue);
+        ((SequenceState *)g_tutorial_probe_context)->done = 1;
         request_end_slot(0, 0);
     } else {
         if (ended) {
-            ((SequenceState *)D_L00_001BCAC0)->done = 1;
-            if (!req_launch_queued(&D_L00_001BEFC0)) request_end_slot(0, 0);
+            ((SequenceState *)g_tutorial_probe_context)->done = 1;
+            if (!req_launch_queued(&g_request_l00_queue)) request_end_slot(0, 0);
         } else {
             threshold = g_is_pal_video ? 80 : 96;
-            if (((SequenceState *)D_L00_001BCAC0)->frame >= threshold) {
-                ++((SequenceState *)D_L00_001BCAC0)->chunk;
-                if (D_001A63AC) snd_pump_music_and_disc_read(1);
+            if (((SequenceState *)g_tutorial_probe_context)->frame >= threshold) {
+                ++((SequenceState *)g_tutorial_probe_context)->chunk;
+                if (g_sequence_active_flag) snd_pump_music_and_disc_read(1);
                 load_relocate_world_object_parts();
-                load_queue_level_data_chunk(((SequenceState *)D_L00_001BCAC0)->chunk + 1);
+                load_queue_level_data_chunk(((SequenceState *)g_tutorial_probe_context)->chunk + 1);
             }
             complete = cutscene_apply_camera_key();
-            for (i = 0; i < ((SequenceState *)D_L00_001BCAC0)->count; i++) {
-                object = ((SequenceState *)D_L00_001BCAC0)->actors[i];
-                { int frame = ((SequenceState *)D_L00_001BCAC0)->frame >> 1;
+            for (i = 0; i < ((SequenceState *)g_tutorial_probe_context)->count; i++) {
+                object = ((SequenceState *)g_tutorial_probe_context)->actors[i];
+                { int frame = ((SequenceState *)g_tutorial_probe_context)->frame >> 1;
                 object[0x41] = frame + 1;
                 object[0x40] = frame; }
                 update_moby_animation_state(object);
-                *(float *)(object + 0x44) = IntToFloat(((SequenceState *)D_L00_001BCAC0)->frame & 1) * 0.5f;
-                if (complete && (((SequenceState *)D_L00_001BCAC0)->frame & 1)) *(float *)(object + 0x44) = 1.0f;
+                *(float *)(object + 0x44) = IntToFloat(((SequenceState *)g_tutorial_probe_context)->frame & 1) * 0.5f;
+                if (complete && (((SequenceState *)g_tutorial_probe_context)->frame & 1)) *(float *)(object + 0x44) = 1.0f;
                 path = *(char **)(object + 0x68);
                 FastVecScale(first, path + object[0x40] * 16, 1.0f - *(float *)(object + 0x44));
                 FastVecScale(second, path + object[0x41] * 16, *(float *)(object + 0x44));

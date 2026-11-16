@@ -7,7 +7,7 @@ typedef union {
     float f[4];
 } L20_0039BB18_V4;
 
-extern float D_L20_001AEC68 __attribute__((sda));
+extern float g_glow_trail_drift __attribute__((sda));
 
 extern int math_fast_float_d(int *);
 extern float vec_distance_xy(void *, void *);
@@ -47,17 +47,17 @@ typedef struct {
         } named;
     } refs;
 } YeedilStatePrefix;
-extern YeedilStatePrefix D_L20_001BDCC0;
+extern YeedilStatePrefix g_yeedil_state_prefix;
 extern u32 g_current_map_index;
 typedef struct { u8 before_owner[0x5C0]; int owner; } YeedilHeroPrefix;
 extern YeedilHeroPrefix g_hero_state;
-extern u8 D_0018A550[];
+extern u8 g_hero_matrix[];
 typedef struct {
     Vector origin, point;
     float unknown20, scale;
 } YeedilCameraPrefix;
-extern YeedilCameraPrefix D_L20_001C6AE0;
-extern u8 D_L20_001BA1F0[];
+extern YeedilCameraPrefix g_yeedil_camera_prefix;
+extern u8 g_level_script_matrix[];
 typedef struct {
     u8 before_effect[0x160];
     float scale1;
@@ -66,14 +66,14 @@ typedef struct {
     float scale2;
     int unknown184, count2;
 } YeedilEffectPrefix;
-extern YeedilEffectPrefix D_L20_001B9E80;
-extern int D_L20_001A9430 __attribute__((sda));
-extern int D_L20_001A9434 __attribute__((sda));
-extern int D_L20_001A9438 __attribute__((sda));
-extern int D_L20_001A943C __attribute__((sda));
-extern int D_L20_001A9440 __attribute__((sda));
-extern Vector D_L20_001A9420 SDATA(D_L20_001A9420);
-extern int D_L20_001AF3B0[] __attribute__((sda));
+extern YeedilEffectPrefix g_hero_l20_extra_state;
+extern int g_level_script_state_limit __attribute__((sda));
+extern int g_level_script_lower_a __attribute__((sda));
+extern int g_level_script_upper_a __attribute__((sda));
+extern int g_level_script_lower_b __attribute__((sda));
+extern int g_level_script_upper_b __attribute__((sda));
+extern Vector g_level_script_offset_vec SDATA(D_L20_001A9420);
+extern int g_level_script_flags[] __attribute__((sda));
 extern void anim_start_startup_animations(void *);
 extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(char *,float *,s32,s32,float);
@@ -137,7 +137,7 @@ pathA:
         ApproachValue((float *)vars, 1.0f, 0.016666667f);
     }
 
-    drift = D_L20_001AEC68;
+    drift = g_glow_trail_drift;
     {
         float v = *(float *)(vars + 0xC) + drift * 0.016666667f;
         *(float *)(vars + 0xC) = v;
@@ -194,9 +194,9 @@ void level_script_update(void *incoming)
     anim_start_startup_animations(incoming);
     {
         int i;
-        for (i = 0; i < D_L20_001BDCC0.count; ++i) {
+        for (i = 0; i < g_yeedil_state_prefix.count; ++i) {
             u8 *object;
-            object = D_L20_001BDCC0.refs.objects[i];
+            object = g_yeedil_state_prefix.refs.objects[i];
             if (object && *(s16 *)(object+0xAA) == 0xE29 /* moby class 3625 */)
                 *(u16 *)(object+0x34) |= 0x800;
             if (*(s16 *)(object+0xAA) == 0xD54 /* moby class 3412 */)
@@ -209,51 +209,51 @@ void level_script_update(void *incoming)
     }
     if (g_current_map_index != 20) return;
     {
-        if ((u32)(D_L20_001BDCC0.mode-4) < 2) {
+        if ((u32)(g_yeedil_state_prefix.mode-4) < 2) {
             {
                 YeedilHeroPrefix *hero = &g_hero_state;
-                int owner = D_L20_001BDCC0.refs.named.owner;
+                int owner = g_yeedil_state_prefix.refs.named.owner;
                 hero->owner = owner;
-                if (D_L20_001BDCC0.mode == 4) {
-                    hero->owner = D_L20_001BDCC0.refs.named.secondary_owner;
-                    target = D_L20_001BDCC0.refs.named.secondary_target;
-                    lower = D_L20_001A9434;
-                    upper = D_L20_001A9438;
+                if (g_yeedil_state_prefix.mode == 4) {
+                    hero->owner = g_yeedil_state_prefix.refs.named.secondary_owner;
+                    target = g_yeedil_state_prefix.refs.named.secondary_target;
+                    lower = g_level_script_lower_a;
+                    upper = g_level_script_upper_a;
                 } else {
-                    lower = D_L20_001A943C;
+                    lower = g_level_script_lower_b;
                     /* Same value as the store above. It leaves no instruction of its
                      * own, but it keeps owner live into this arm. */
                     hero->owner = owner;
-                    target = D_L20_001BDCC0.refs.named.alternate;
-                    upper = D_L20_001A9440;
+                    target = g_yeedil_state_prefix.refs.named.alternate;
+                    upper = g_level_script_upper_b;
                 }
                 {
-                    YeedilCameraPrefix *camera = &D_L20_001C6AE0;
-                    if (D_L20_001BDCC0.state == lower) {
+                    YeedilCameraPrefix *camera = &g_yeedil_camera_prefix;
+                    if (g_yeedil_state_prefix.state == lower) {
                         mem_clear(camera,0,0x50);
-                        D_L20_001AF3B0[0] = 1;
+                        g_level_script_flags[0] = 1;
                         camera->scale = 0.8f;
                     }
-                    if (lower < D_L20_001BDCC0.state && D_L20_001BDCC0.state < upper) {
+                    if (lower < g_yeedil_state_prefix.state && g_yeedil_state_prefix.state < upper) {
                         moby_transform_joint_point(target,0,matrix);
-                        copy_matrix3x4(D_0018A550,matrix);
+                        copy_matrix3x4(g_hero_matrix,matrix);
                         value = camera->scale;
                         value += (12.0f-value)*0.07f;
                         camera->scale = value;
                         moby_transform_joint_to_world(target,0,camera);
-                        vec_scale_to_length(&camera->point,D_0018A550,camera->scale);
+                        vec_scale_to_length(&camera->point,g_hero_matrix,camera->scale);
                         FastVecAdd(&camera->point,camera,&camera->point);
                         InitializeBoltPointChain(target);
                         beam_update_chain_points(target);
                         gfx_add_draw_callback_third(beam_draw_ribbons_level,target);
-                        if (D_L20_001BDCC0.mode == 5 && D_L20_001BDCC0.state == upper-1) {
+                        if (g_yeedil_state_prefix.mode == 5 && g_yeedil_state_prefix.state == upper-1) {
                             offset.q = 0;
                             offset.f[0] = 18.0f; offset.f[1] = -2.5f; offset.f[2] = 1.0f;
-                            matrix_mul_vec3(&offset,&offset,D_L20_001BA1F0);
-                            FastVecAdd(&offset,&offset,D_L20_001BA1F0-0x230);
-                            FastVecSub(&work,D_L20_001BA1F0-0x230,&offset);
+                            matrix_mul_vec3(&offset,&offset,g_level_script_matrix);
+                            FastVecAdd(&offset,&offset,g_level_script_matrix-0x230);
+                            FastVecSub(&work,g_level_script_matrix-0x230,&offset);
                             vec_scale_to_length(&work,&work,1.0f);
-                            part_spawn_blast_effect_moby(*(void **)(D_0018A550-0x170),&offset,&work,0.0f);
+                            part_spawn_blast_effect_moby(*(void **)(g_hero_matrix-0x170),&offset,&work,0.0f);
                         }
                     } else g_hero_state.owner = 0;
                 }
@@ -263,24 +263,24 @@ void level_script_update(void *incoming)
     {
         int i;
         u8 *object;
-        if ((u32)(D_L20_001BDCC0.mode-2) < 3) {
-            for (i = 0; i < D_L20_001BDCC0.count; ++i) {
+        if ((u32)(g_yeedil_state_prefix.mode-2) < 3) {
+            for (i = 0; i < g_yeedil_state_prefix.count; ++i) {
                 u16 word;
-                object = D_L20_001BDCC0.refs.objects[i];
+                object = g_yeedil_state_prefix.refs.objects[i];
                 word = *(u16 *)(object+0xAA);
                 if ((u32)(word-0xD0E /* Megacorp Trooper Torso, Legs */) < 2) {
                     *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
                 }
-                if (*(s16 *)(object+0xAA) == 0xCE0 /* moby class 3296 */ && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
+                if (*(s16 *)(object+0xAA) == 0xCE0 /* moby class 3296 */ && (g_yeedil_state_prefix.mode != 3 || g_yeedil_state_prefix.state < g_level_script_state_limit))
                     EmitScaledObjectParticles(object);
             }
         }
-        if (D_L20_001BDCC0.mode == 3 && D_L20_001BDCC0.state == D_L20_001A9430) {
-            qcopy(matrix,(u8 *)D_L20_001BDCC0.refs.named.target+0x10);
-            FastVecAdd(matrix,matrix,&D_L20_001A9420);
+        if (g_yeedil_state_prefix.mode == 3 && g_yeedil_state_prefix.state == g_level_script_state_limit) {
+            qcopy(matrix,(u8 *)g_yeedil_state_prefix.refs.named.target+0x10);
+            FastVecAdd(matrix,matrix,&g_level_script_offset_vec);
             SpawnExplosion(matrix,0,0x19,0x14,0x14,0x14,0x2D,1,1.0f,20.0f,1,1,0,0);
             {
-                YeedilEffectPrefix *effect = &D_L20_001B9E80;
+                YeedilEffectPrefix *effect = &g_hero_l20_extra_state;
                 effect->scale1 = 0.09f;
                 effect->count1 = 0x37;
                 effect->scale2 = 0.08f;
@@ -348,16 +348,16 @@ void level_script_update(void *incoming)
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { float x, y; } Pair;
 typedef struct { Vec position[4]; u32 color[4]; Pair uv[4]; u64 descriptor[4]; } TrailPacket;
-extern int D_L20_001AEC6C __attribute__((sda)), D_L20_001AECA0 __attribute__((sda));
-extern u32 D_L20_001AEC70[2] __attribute__((sda)), D_L20_001AECA8[2] __attribute__((sda));
-extern float D_L20_001AEC84[] __attribute__((sda)) NOT_SDA, D_L20_001AECBC[] __attribute__((sda)) NOT_SDA;
+extern int g_glow_trail_texture_a __attribute__((sda)), g_glow_trail_texture_b __attribute__((sda));
+extern u32 g_glow_trail_colors_a[2] __attribute__((sda)), g_glow_trail_colors_b[2] __attribute__((sda));
+extern float g_glow_trail_uv_a[] __attribute__((sda)) NOT_SDA, g_glow_trail_uv_b[] __attribute__((sda)) NOT_SDA;
 extern Pair D_L20_001AEC80_gp[4] SDATA(D_L20_001AEC80) __attribute__((sda));
 extern Pair D_L20_001AECB8_gp[4] SDATA(D_L20_001AECB8) __attribute__((sda));
-extern float D_L20_001AEC78 __attribute__((sda)), D_L20_001AEC7C __attribute__((sda)), D_L20_001AECB4 __attribute__((sda));
+extern float g_glow_trail_z_offset __attribute__((sda)), g_glow_trail_width_a __attribute__((sda)), g_glow_trail_width_b __attribute__((sda));
 extern u32 D_L20_001AECD8_gp SDATA(D_L20_001AECD8) __attribute__((sda));
-extern u32 D_L20_001AECD8[] __attribute__((sda));
-extern float D_L20_001AECE8 __attribute__((sda)), D_L20_001AECEC;
-extern float D_L20_001B9FC0[4];
+extern u32 g_glow_trail_tween_colors[] __attribute__((sda));
+extern float g_glow_trail_quad_scale_a __attribute__((sda)), g_glow_trail_quad_scale_b;
+extern float g_camera_l20_position[4];
 extern void copy_matrix_rotation(void *,void *);
 extern u64 GetEffectTextureDescriptor(int);
 extern int FastTweenColor(int, int, float);
@@ -384,7 +384,7 @@ void part_draw_glow_trail(void *arg)
     u32 color;
     copy_matrix_rotation(matrix, object + 0xc0);
     qcopy(matrix + 12, object + 0x10);
-    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AEC6C);
+    packet.descriptor[1] = GetEffectTextureDescriptor(g_glow_trail_texture_a);
     packet.descriptor[0] = 0;
     packet.descriptor[2] = 0xff9000000260ULL;
     packet.descriptor[3] = 0x8000000048ULL;
@@ -393,13 +393,13 @@ void part_draw_glow_trail(void *arg)
         for (i = 0; i < 4; i++) {
             u32 color;
             packet.uv[i].x = D_L20_001AEC80_gp[i].x;
-            packet.uv[i].y = D_L20_001AEC84[i * 2];
-            color = D_L20_001AEC70[(i & 1) ? 0 : 1];
+            packet.uv[i].y = g_glow_trail_uv_a[i * 2];
+            color = g_glow_trail_colors_a[(i & 1) ? 0 : 1];
             packet.color[i] = color;
             packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
             vec_store_helper(&packet.position[i]);
-            packet.position[i].f[0] = D_L20_001AEC7C;
-            if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
+            packet.position[i].f[0] = g_glow_trail_width_a;
+            if ((i & 1) == 0) packet.position[i].f[2] = g_glow_trail_z_offset;
             else packet.position[i].f[2] = 0.0f;
         }
     }
@@ -407,7 +407,7 @@ void part_draw_glow_trail(void *arg)
     rotated[14] = 0.19634954631328583f;
     euler_rotation_basis(rotated, rotated + 12);
     gfx_transform_and_draw_entries(&packet, 1, rotated, 32, matrix);
-    FastVecSub(&direction, D_L20_001B9FC0, object + 0x10);
+    FastVecSub(&direction, g_camera_l20_position, object + 0x10);
     vec_transform_by_object_or_given(object, (char *)&direction, (char *)&direction, 0);
     normal.q = 0;
     normal.f[0] = direction.f[1];
@@ -415,20 +415,20 @@ void part_draw_glow_trail(void *arg)
     normal.f[3] = 1.0f;
     tangent.q = normal.q;
     direction.f[2] = 0.0f;
-    packet.descriptor[1] = GetEffectTextureDescriptor(D_L20_001AECA0);
+    packet.descriptor[1] = GetEffectTextureDescriptor(g_glow_trail_texture_b);
     {
         int i;
         for (i = 0; i < 4; i++) {
             u32 color;
             float width;
             packet.uv[i].x = D_L20_001AECB8_gp[i].x + vars[3];
-            packet.uv[i].y = D_L20_001AECBC[i * 2];
-            color = D_L20_001AECA8[(i & 1) ? 0 : 1];
+            packet.uv[i].y = g_glow_trail_uv_b[i * 2];
+            color = g_glow_trail_colors_b[(i & 1) ? 0 : 1];
             packet.color[i] = color;
             packet.color[i] = FastTweenColor(color & 0xffffff, color, vars[0]);
-            width = i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C;
+            width = i > 1 ? g_glow_trail_width_b : g_glow_trail_width_a;
             vec_scale_to_length(&packet.position[i], &tangent, width);
-            if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
+            if ((i & 1) == 0) packet.position[i].f[2] = g_glow_trail_z_offset;
             else packet.position[i].f[2] = 0.0f;
         }
     }
@@ -436,22 +436,22 @@ void part_draw_glow_trail(void *arg)
     {
         int i;
         for (i = 0; i < 4; i++) {
-            float width = -(i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C);
+            float width = -(i > 1 ? g_glow_trail_width_b : g_glow_trail_width_a);
             vec_scale_to_length(&packet.position[i], &tangent, width);
-            if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
+            if ((i & 1) == 0) packet.position[i].f[2] = g_glow_trail_z_offset;
             else packet.position[i].f[2] = 0.0f;
         }
     }
     draw_world_quad(&packet, matrix, 0);
     qcopy(&normal, object + 0x10);
     normal.f[2] += 0.333f;
-    color = FastTweenColor(D_L20_001AECD8_gp, D_L20_001AECD8[1], math_random_float_range(0.0f,1.0f));
+    color = FastTweenColor(D_L20_001AECD8_gp, g_glow_trail_tween_colors[1], math_random_float_range(0.0f,1.0f));
     color = FastTweenColor(color & 0xffffff, color, vars[0]);
-    gfx_draw_billboard_quad(&normal, 11, color, 1, D_L20_001AECE8, 0.0f, math_random_angle());
-    color = FastTweenColor(D_L20_001AECD8[2], D_L20_001AECD8[3], math_random_float_range(0.0f,1.0f));
+    gfx_draw_billboard_quad(&normal, 11, color, 1, g_glow_trail_quad_scale_a, 0.0f, math_random_angle());
+    color = FastTweenColor(g_glow_trail_tween_colors[2], g_glow_trail_tween_colors[3], math_random_float_range(0.0f,1.0f));
     color = FastTweenColor(color & 0xffffff, color, vars[0]);
-    gfx_draw_billboard_quad(&normal, 11, color, 1, D_L20_001AECEC, 0.0f, math_random_angle());
-    gfx_draw_billboard_quad(object + 0x10, 49, color, 1, D_L20_001AECEC, 0.0f, math_random_angle());
+    gfx_draw_billboard_quad(&normal, 11, color, 1, g_glow_trail_quad_scale_b, 0.0f, math_random_angle());
+    gfx_draw_billboard_quad(object + 0x10, 49, color, 1, g_glow_trail_quad_scale_b, 0.0f, math_random_angle());
 }
 
 /* func_L20_002DEBE0 is in the sibling file L20_002DEBE0-decider.c. */

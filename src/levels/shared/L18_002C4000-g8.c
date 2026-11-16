@@ -11,13 +11,13 @@ extern char g_subtitle_history[];
 
 /* A byte global read as an absolute (its low half has bit 15 set, so it needs the
    %hi/%lo pair), and the two counters read the same way. */
-extern unsigned char D_0013965E __attribute__((nosda));
+extern unsigned char g_hero_frame_flag __attribute__((nosda));
 extern int g_current_map_index;
-extern int D_001A7390;
+extern int g_frame_counter;
 
 /* The counter the level publishes in its literal pool: read absolutely in the
    first block and through $gp in the second, so it needs two names. */
-extern int D_L18_001AFBB0;
+extern int g_hero_frozen_flag;
 extern int D_L18_001AFBB0_sda __attribute__((sda));
 
 /* The resident counter, likewise read absolutely once and through $gp once. */
@@ -64,7 +64,7 @@ void hero_l18_update_frame(void)
 
     base = g_hero_state;
     if (*(u8 *)(base + 0x22B4) == 4) {
-        if (D_L18_001AFBB0 == 0) {
+        if (g_hero_frozen_flag == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
@@ -72,9 +72,9 @@ void hero_l18_update_frame(void)
                         ref_L18_002C41F0_01(0x91, 1);
                     }
                     if (g_current_map_index == 0x14) {
-                        if (D_0013965E == 0) {
+                        if (g_hero_frame_flag == 0) {
                             blk = g_subtitle_history;
-                            if (D_001A7390 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
+                            if (g_frame_counter - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
                                 if (subtitle_request_voice_line(0xA15, 0x6C) != 0) {
                                     now = D_001A7390_sda;
                                     then = *(unsigned int *)(blk + 0x7900);
@@ -115,9 +115,9 @@ void hero_l18_update_frame(void)
 
 /* The group id lists and the entity bank base are read absolutely, the resident group count
    through $gp. */
-extern unsigned int D_L18_001FB320[];
+extern unsigned int g_condition_target_lists[];
 extern char *g_moby_l18_table;
-extern int D_L18_001B2838 __attribute__((sda));
+extern int g_max_l18_group_index __attribute__((sda));
 extern void protopet_choose_anim_if_active(unsigned char *a0);
 
 /* Walks the id list of the object's group and hands every entity it names to
@@ -131,9 +131,9 @@ void group_update_members(unsigned char *object)
 
     if (object[0x21] == 0xFF)
         return;
-    idList = (unsigned short *)D_L18_001FB320[object[0x21]];
-    while (object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838 && idList != 0 &&
-           ((idList != 0 && (short)idList[-1] >= 0) || idList == (unsigned short *)D_L18_001FB320[object[0x21]])) {
+    idList = (unsigned short *)g_condition_target_lists[object[0x21]];
+    while (object[0x21] != 0xFF && object[0x21] <= g_max_l18_group_index && idList != 0 &&
+           ((idList != 0 && (short)idList[-1] >= 0) || idList == (unsigned short *)g_condition_target_lists[object[0x21]])) {
         member = (unsigned char *)(g_moby_l18_table + ((*idList & 0x7FFF) << 8));
         if (member == 0)
             break;

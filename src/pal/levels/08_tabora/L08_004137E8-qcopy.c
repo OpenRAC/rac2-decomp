@@ -10,7 +10,7 @@ extern f32 math_random_angle(void);
 extern u8 *moby_create_effect_at_position(void *a0, s32 a1);
 extern void STUB_printf(void *a0);
 extern void moby_mark_spawned(void *a0);
-extern u8 D_L08_001B14F0[];
+extern u8 g_spinning_object_data[];
 typedef int V4 __attribute__((mode(TI)));
 
 s32 func_PAL_L08_00414850(void *a0, void *a1, void *a2, f32 p1, f32 p2)
@@ -43,7 +43,7 @@ s32 func_PAL_L08_00414850(void *a0, void *a1, void *a2, f32 p1, f32 p2)
         r = moby_create_effect_at_position(p, 0);
         *(u32 *)(st + 0x1C) = r;
         if (r == 0) {
-            STUB_printf(D_L08_001B14F0);
+            STUB_printf(g_spinning_object_data);
             moby_mark_spawned(m);
             m = 0;
         }

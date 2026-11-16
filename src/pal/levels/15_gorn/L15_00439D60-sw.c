@@ -11,16 +11,16 @@ extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern void moby_reset_action_state(void *);
 extern void func_PAL_L15_0043B0D8(char *);
-extern void func_PAL_L15_0043A270(void *, int);
+extern void gorn_ship_update_flight_pal(void *, int);
 extern void func_PAL_L15_0043BB70(void);
 extern void gorn_ship_spawn_damage_effects(void *);
 extern char *func_PAL_L05_0042A240(void *, int, int, int, int, int, int, int, float, int, int, int);
 extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
-extern s32 D_L15_001AEE20[] __attribute__((sda));
-extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
-extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
+extern s32 g_ship_damage_effect_count[] __attribute__((sda));
+extern s32 g_gorn_ship_damage_joints[] SDATA(D_L15_001B1780);
+extern s32 g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
 extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -34,7 +34,7 @@ extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
 
-void func_PAL_L15_00439D60(unsigned char *object) {
+void gorn_ship_update_pal(unsigned char *object) {
     float point[4] __attribute__((aligned(16)));
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float ratio;
@@ -48,17 +48,17 @@ void func_PAL_L15_00439D60(unsigned char *object) {
         qcopy(state + 0x430, object + 0x10);
         break;
     case 1:
-        func_PAL_L15_0043A270(object, 0);
+        gorn_ship_update_flight_pal(object, 0);
         break;
     case 2:
-        func_PAL_L15_0043A270(object, 1);
+        gorn_ship_update_flight_pal(object, 1);
         if (math_fast_float_d(state + 0x274)) {
             object[0x20] = 3;
             *(int *)(state + 0x274) = 150;
         }
         break;
     case 3:
-        func_PAL_L15_0043A270(object, 1);
+        gorn_ship_update_flight_pal(object, 1);
         ratio = IntToFloat(*(int *)(state + 0x274)) / IntToFloat(150);
         object[0x23] = FloatToInt((1.0f - ratio) * 95.0f) + 32;
         if (math_fast_float_d(state + 0x274)) {
@@ -70,7 +70,7 @@ void func_PAL_L15_00439D60(unsigned char *object) {
         }
         break;
     case 4:
-        func_PAL_L15_0043A270(object, 0);
+        gorn_ship_update_flight_pal(object, 0);
         if (math_fast_float_d(state + 0x274)) {
             *(int *)(object + 0x98) = 0;
             object[0x20] = 5;
@@ -79,7 +79,7 @@ void func_PAL_L15_00439D60(unsigned char *object) {
         }
         break;
     case 5:
-        func_PAL_L15_0043A270(object, 1);
+        gorn_ship_update_flight_pal(object, 1);
         ratio = IntToFloat(*(int *)(state + 0x274)) / IntToFloat(150);
         object[0x23] = FloatToInt(ratio * 95.0f) + 32;
         if (math_fast_float_d(state + 0x274)) {

@@ -17,11 +17,11 @@ extern char *debris_l01_spawn_piece(char *, int, void *, void *, int, int, void 
 
 /* Level save state: collected[] is indexed by a moby's save id (s16 at +0xB2). */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
-extern LevelSaveState D_L01_0021E4B0;
+extern LevelSaveState g_level_save_state_backup;
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 /* Its address is rebuilt (unsplit la) before each spawn call, as in L01_00388FD0-tether-g8.c. */
-extern float D_L01_001A8F60[] MACRO_ADDR;
+extern float g_zero_l01_vector[] MACRO_ADDR;
 
 /* Updates the breakable Oozla object. When it is hit it bursts into spinning debris pieces, plays a sound, removes itself and records that it was destroyed. */
 void breakable_l01_debris_update(char *moby)
@@ -37,8 +37,8 @@ void breakable_l01_debris_update(char *moby)
     if(*(unsigned char *)(moby+0x20)==0) {
         *(float *)(moby+0x2C)*=math_random_float_range(0.8f,1.1f);
         if(*(unsigned char *)(moby+0xB0)!=255) {
-            if(D_L01_0021E4B0.collected[*(short *)(moby+0xB2)]) goto remove_initial;
-            save_byte=D_0019B4A8[(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10)];
+            if(g_level_save_state_backup.collected[*(short *)(moby+0xB2)]) goto remove_initial;
+            save_byte=g_moby_nibble_table[(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10)];
             if(*(short *)(moby+0xB2)&1) {
                 if((save_byte>>4)&7) goto remove_initial;
                 goto initial_path;
@@ -75,7 +75,7 @@ initial_path:
             moby_transform_joint_to_world(moby,i,delta);
             position[2]=math_random_angle();
             for(j=2;j>=0;j--) {
-                debris_piece=debris_l01_spawn_piece(moby,0xA28 /* moby class 2600 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
+                debris_piece=debris_l01_spawn_piece(moby,0xA28 /* moby class 2600 */,delta,position,0,1,g_zero_l01_vector,g_zero_l01_vector,rotation,0.0f);
                 *(float *)(debris_piece+0x2C)*=scale;
                 position[2]=FastAddRotations(position[2],2.0943954f);
             }
@@ -86,7 +86,7 @@ initial_path:
         moby_transform_joint_to_world(moby,4,delta);
         qcopy(position,moby+0xF0);
         for(j=2;j>=0;j--) {
-            debris_piece=debris_l01_spawn_piece(moby,0xA27 /* moby class 2599 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
+            debris_piece=debris_l01_spawn_piece(moby,0xA27 /* moby class 2599 */,delta,position,0,1,g_zero_l01_vector,g_zero_l01_vector,dimensions,0.0f);
             *(float *)(debris_piece+0x2C)*=size_ratio;
             position[2]=FastAddRotations(position[2],2.0943954f);
         }
@@ -94,10 +94,10 @@ initial_path:
         SetDeathBits(moby,0,3);
         if(*(short *)(moby+0xB2)&1) {
             save_index=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
-            if(((D_0019B4A8[save_index]>>4)&7)!=7) D_0019B4A8[save_index]+=16;
+            if(((g_moby_nibble_table[save_index]>>4)&7)!=7) g_moby_nibble_table[save_index]+=16;
         } else {
             save_index=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
-            if((D_0019B4A8[save_index]&7)!=7) D_0019B4A8[save_index]++;
+            if((g_moby_nibble_table[save_index]&7)!=7) g_moby_nibble_table[save_index]++;
         }
         moby_mark_spawned(moby);
     }

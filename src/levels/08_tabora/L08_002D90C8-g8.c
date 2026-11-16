@@ -1,26 +1,26 @@
 #include "common.h"
 
-extern char *D_L08_001B29DC __attribute__((sda));
+extern char *g_moby_array __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Tuning words read by func_L08_003D3EF8. */
-extern float D_L08_001B0338 __attribute__((sda));
-extern float D_L08_001B033C __attribute__((sda));
-extern float D_L08_001B0340 __attribute__((sda));
-extern float D_L08_001B0344 __attribute__((sda));
-extern unsigned char D_L08_001B0348 __attribute__((sda));
-extern int D_L08_001B034C __attribute__((sda));
-extern int D_L08_001B0350 __attribute__((sda));
-extern float D_L08_001B0354 __attribute__((sda));
-extern float D_L08_001B0358 __attribute__((sda));
-extern int D_L08_001B035C __attribute__((sda));
-extern int D_L08_001B0360 __attribute__((sda));
-extern int D_L08_001B0368 __attribute__((sda));
-extern int D_L08_001B036C __attribute__((sda));
+extern float g_seesaw_spark_speed_min __attribute__((sda));
+extern float g_seesaw_spark_speed_max __attribute__((sda));
+extern float g_seesaw_step_speed_min __attribute__((sda));
+extern float g_seesaw_step_speed_max __attribute__((sda));
+extern unsigned char g_seesaw_spark_angle_byte __attribute__((sda));
+extern int g_seesaw_spark_color_a __attribute__((sda));
+extern int g_seesaw_spark_color_b __attribute__((sda));
+extern float g_seesaw_spark_size_a __attribute__((sda));
+extern float g_seesaw_spark_size_b __attribute__((sda));
+extern int g_seesaw_ring_color_start __attribute__((sda));
+extern int g_seesaw_ring_color_end __attribute__((sda));
+extern int g_seesaw_ring_fade_param __attribute__((sda));
+extern int g_seesaw_ring_size_param __attribute__((sda));
 /* The frame counter: absolute loads, $gp in a delay slot. */
-extern int D_L08_001B2508 MACRO_ADDR;
-extern char D_L08_001B9B00[];
+extern int g_frame_l08_counter MACRO_ADDR;
+extern char g_hero_position_vec[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int math_random_int_below(int);
@@ -37,14 +37,14 @@ extern int FastTweenColor(int, int, float);
 /* Returns the height of the object with the given index, or 0 when there is none. */
 float moby_get_height(int moby_index) {
     if (moby_index != -1)
-        return *(float *)(D_L08_001B29DC + ((unsigned int)moby_index << 8) + 0x18);
+        return *(float *)(g_moby_array + ((unsigned int)moby_index << 8) + 0x18);
     return 0.0f;
 }
 
 /* Tells whether the linked object is switched on. */
 int moby_is_linked_switched_on(int moby_index) {
     if (moby_index != -1) {
-        if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
+        if (*(unsigned char *)(*(unsigned char **)(g_moby_array
                                                   + ((unsigned int)moby_index << 8) + 0x68)
                               + 0x14) != 0)
             return 1;
@@ -70,15 +70,15 @@ typedef struct {
 } L08SpawnBlock;
 
 extern char g_hero_state[];
-extern char D_L08_002A0D00[];
-extern char D_L08_0023EC80[];
-extern char D_L08_0023ECF0[];
-extern char D_L08_002A87F0[];
-extern int D_L08_001B01B8[2] __attribute__((sda));
+extern char g_water_spawn_table_zero[];
+extern char g_water_spawn_table_one[];
+extern char g_water_spawn_table_two[];
+extern char g_water_spawn_table_three[];
+extern int g_water_spawn_counts[2] __attribute__((sda));
 /* Kind 7 consumes seven halfwords; the full owner extent remains unknown. */
-extern u16 D_L08_001B01C8[] SDATA(D_L08_001B01C8);
-extern int D_L08_001B01D8 __attribute__((sda));
-extern int D_L08_001B01DC __attribute__((sda));
+extern u16 g_water_small_spawn_table[] SDATA(D_L08_001B01C8);
+extern int g_water_small_spawn_value_a __attribute__((sda));
+extern int g_water_small_spawn_value_b __attribute__((sda));
 extern void water_start_effect(void);
 extern void gfx_add_draw_callback_first(void);
 extern void water_init_object(L08SpawnBlock *);
@@ -109,18 +109,18 @@ void water_update(char *owner)
         return;
     spawn_count = 1;
     if (*(int *)(vars + 0x18) != -1)
-        spawn_count = D_L08_001B01B8[*(int *)(vars + 0x18)];
+        spawn_count = g_water_spawn_counts[*(int *)(vars + 0x18)];
     spawn_count += *(int *)(vars + 0x10);
     spawn_block.kind = 7;
     spawn_block.count = spawn_count;
-    spawn_block.small1 = &D_L08_001B01D8;
-    spawn_block.small2 = &D_L08_001B01DC;
-    spawn_block.table0 = D_L08_002A0D00;
-    spawn_block.table1 = D_L08_0023EC80;
-    spawn_block.small0 = D_L08_001B01C8;
-    spawn_block.counts = D_L08_001B01B8;
-    spawn_block.table2 = D_L08_0023ECF0;
-    spawn_block.table3 = D_L08_002A87F0;
+    spawn_block.small1 = &g_water_small_spawn_value_a;
+    spawn_block.small2 = &g_water_small_spawn_value_b;
+    spawn_block.table0 = g_water_spawn_table_zero;
+    spawn_block.table1 = g_water_spawn_table_one;
+    spawn_block.small0 = g_water_small_spawn_table;
+    spawn_block.counts = g_water_spawn_counts;
+    spawn_block.table2 = g_water_spawn_table_two;
+    spawn_block.table3 = g_water_spawn_table_three;
     spawn_block.owner = owner;
     spawn_block.callback = water_start_effect;
     spawn_block.callback2 = gfx_add_draw_callback_first;
@@ -141,7 +141,7 @@ void water_update(char *owner)
 /* Tells whether the linked object is switched on. */
 int seesaw_is_linked_switched_on(int moby_index) {
     if (moby_index != -1) {
-        if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
+        if (*(unsigned char *)(*(unsigned char **)(g_moby_array
                                                   + ((unsigned int)moby_index << 8) + 0x68)
                               + 0x14) != 0)
             return 1;
@@ -167,17 +167,17 @@ void SpawnParticlesAndDrawGlowRings(char *moby)
 
     moby_transform_joint_to_world(moby, 0, &joint_pos);
     if (math_random_int_below(4) == 0) {
-        vec_random_direction(&spark_velocity, D_L08_001B0338 * 0.016666668f, D_L08_001B033C * 0.016666668f);
-        angle_byte = D_L08_001B0348;
-        part_spawn_hero_relative(&joint_pos, &spark_velocity, D_L08_001B034C, angle_byte, math_random_int_below(255), 0, D_L08_001B0354);
+        vec_random_direction(&spark_velocity, g_seesaw_spark_speed_min * 0.016666668f, g_seesaw_spark_speed_max * 0.016666668f);
+        angle_byte = g_seesaw_spark_angle_byte;
+        part_spawn_hero_relative(&joint_pos, &spark_velocity, g_seesaw_spark_color_a, angle_byte, math_random_int_below(255), 0, g_seesaw_spark_size_a);
         for (spark_index = 2; spark_index >= 0; spark_index--) {
-            vec_random_direction(&velocity_step, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
+            vec_random_direction(&velocity_step, g_seesaw_step_speed_min * 0.016666668f, g_seesaw_step_speed_max * 0.016666668f);
             FastVecAdd(&spark_velocity, &spark_velocity, &velocity_step);
-            angle_byte = D_L08_001B0348;
-            part_spawn_hero_relative(&joint_pos, &spark_velocity, D_L08_001B0350, angle_byte, math_random_int_below(255), 0, D_L08_001B0358);
+            angle_byte = g_seesaw_spark_angle_byte;
+            part_spawn_hero_relative(&joint_pos, &spark_velocity, g_seesaw_spark_color_b, angle_byte, math_random_int_below(255), 0, g_seesaw_spark_size_b);
         }
     }
-    FastVecSub(&ring_pos, D_L08_001B9B00, &joint_pos);
+    FastVecSub(&ring_pos, g_hero_position_vec, &joint_pos);
     vec_scale_to_length(&ring_pos, &ring_pos, -0.3f);
     vec_scale_to_length(&ring_step, &ring_pos, 0.1f);
     FastVecAdd(&ring_pos, &ring_pos, &joint_pos);
@@ -185,14 +185,14 @@ void SpawnParticlesAndDrawGlowRings(char *moby)
     half = 0.5f;
     size = 3.0f;
     for (ring_index = 0; ring_index < 4; ring_index++) {
-        phase = IntToFloat(0xFF - ((D_L08_001B2508 + ring_index * 20) & 0xFF));
-        ring_color = FastTweenColor(D_L08_001B035C, D_L08_001B0360, math_fabs(half - phase * reciprocal));
-        angle_byte = D_L08_001B2508 & 0xFF;
+        phase = IntToFloat(0xFF - ((g_frame_l08_counter + ring_index * 20) & 0xFF));
+        ring_color = FastTweenColor(g_seesaw_ring_color_start, g_seesaw_ring_color_end, math_fabs(half - phase * reciprocal));
+        angle_byte = g_frame_l08_counter & 0xFF;
         if (ring_index & 2)
             angle_byte = angle_byte * 2;
         if (ring_index & 1)
             angle_byte = 0xFF - angle_byte;
-        part_spawn_fading(&ring_pos, ring_color, angle_byte, D_L08_001B036C, D_L08_001B0368, 2, 0,
+        part_spawn_fading(&ring_pos, ring_color, angle_byte, g_seesaw_ring_size_param, g_seesaw_ring_fade_param, 2, 0,
                       (IntToFloat(ring_index) + size)
                           * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(&ring_pos, &ring_pos, &ring_step);

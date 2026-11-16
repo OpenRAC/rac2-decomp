@@ -60,9 +60,9 @@ extern Game2EB1E0 D_00189E20_9;
 extern char g_pad_state[];
 #define INPUT ((Input2EB1E0 *)D_00138180)
 extern char D_001A63A8_3[];
-extern SceneActor *D_001B2148;
-extern Global001A7A00 D_001A7A00 MACRO_ADDR;
-extern int D_001A7478 MACRO_ADDR;
+extern SceneActor *g_transition_effect_list;
+extern Global001A7A00 g_player_stats MACRO_ADDR;
+extern int g_loader_state_word MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_requested_game_mode MACRO_ADDR;
@@ -70,27 +70,27 @@ extern float g_screen_fade MACRO_ADDR;
 extern void game_reset_frame_counters(void);
 extern void scene_update_backdrop_quads(void);
 extern int snd_resume_music_stream(void);
-extern s16 func_PAL_002B8898(int);
+extern s16 snd_pump_music_and_disc_read_pal(int);
 extern void moby_spawn_model_parts(void);
-extern int func_PAL_002EC070(int);
-extern int func_PAL_002F6A48(void);
+extern int scene_load_chunk_data_pal(int);
+extern int cutscene_apply_camera_key_pal(void);
 extern void update_moby_animation_state(void *);
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002E7270(void *);
-extern void func_PAL_002EDA88(void);
+extern void render_environment_mapped_object_pal(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
 extern void stub_empty_17(void *, int);
-extern s32 func_PAL_002E5898(void);
+extern s32 UpdateSoundVoices_pal(void);
 extern void UpdateLightingEnvironment(void);
-extern void func_PAL_002F6208(void);
+extern void game_update_idle_frame_counters_pal(void);
 
 /* Advances the scripted scene one frame: fades in, lets the player skip once the fade is
    done, pages in the next chunk every 80 or 96 ticks and poses each actor between its two
    current keys. Returns 1 when the player skipped. */
-int func_PAL_002EC0F8(void)
+int cutscene_update_scripted_actors_pal(void)
 {
     SceneActor *actor;
     float first[4], last[4];
@@ -118,7 +118,7 @@ int func_PAL_002EC0F8(void)
     skip = 0;
     done = g_scene_playback_state.frame >= g_scene_playback_state.end;
     if (g_scene_playback_state.frame >= 15 && g_screen_fade == 0.0f) {
-        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || g_current_map_index <= 0)
+        if ((g_player_stats.x0A || g_player_stats.x0B || g_loader_state_word || g_current_map_index <= 0)
             && (INPUT->buttons.words[1] & 0x800))
             skip = 1;
         else if ((INPUT->buttons.held & 0x8000000000FULL) == 0x8000000000FULL)
@@ -133,11 +133,11 @@ int func_PAL_002EC0F8(void)
         if (g_scene_playback_state.tick >= ticks) {
             g_scene_playback_state.chunk++;
             if (*(short *)(D_001A63A8_3 + 4))
-                func_PAL_002B8898(1);
+                snd_pump_music_and_disc_read_pal(1);
             moby_spawn_model_parts();
-            func_PAL_002EC070(g_scene_playback_state.chunk + 1);
+            scene_load_chunk_data_pal(g_scene_playback_state.chunk + 1);
         }
-        camera = func_PAL_002F6A48();
+        camera = cutscene_apply_camera_key_pal();
         for (i = 0; i < g_scene_playback_state.count; i++) {
             char *keys;
             int key, type;
@@ -158,8 +158,8 @@ int func_PAL_002EC0F8(void)
             if (type == 0xD54) {
                 actor->flags = 8;
                 func_PAL_002E7270(actor);
-                if (!D_001B2148 || D_001B2148->type == type)
-                    gfx_register_overlay_draw_callback(func_PAL_002EDA88, actor);
+                if (!g_transition_effect_list || g_transition_effect_list->type == type)
+                    gfx_register_overlay_draw_callback(render_environment_mapped_object_pal, actor);
             }
             actor->alpha = 255;
             func_002A0F48(actor);
@@ -169,8 +169,8 @@ int func_PAL_002EC0F8(void)
             }
         }
     }
-    func_PAL_002E5898();
+    UpdateSoundVoices_pal();
     UpdateLightingEnvironment();
-    func_PAL_002F6208();
+    game_update_idle_frame_counters_pal();
     return skip;
 }

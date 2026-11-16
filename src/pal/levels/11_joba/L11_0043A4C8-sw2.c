@@ -11,26 +11,26 @@ typedef int Quad __attribute__((mode(TI)));
 #define I(p,n) (*(int *)((char *)(p)+(n)))
 #define F(p,n) (*(float *)((char *)(p)+(n)))
 #define P(p,n) (*(char **)((char *)(p)+(n)))
-extern int D_L11_001A8FF4 __attribute__((sda));
+extern int g_hero_l11_input_blocked __attribute__((sda));
 extern char g_hero_position[];
-extern char *D_L11_001C0D18 NOT_SDA;
+extern char *g_hit_l11_result NOT_SDA;
 extern char *g_active_attacker_robot NOT_SDA;
-extern void func_PAL_L11_0043B8D0(char *),enemy_count_frames_draw_glow(char *),func_PAL_L11_0043BFF8(char *);
+extern void flying_enemy_hit_and_init_pal(char *),enemy_count_frames_draw_glow(char *),enemy_reset_to_idle_pal(char *);
 extern void enemy_pick_random_home_spot(char *,char *);
-extern int func_PAL_L11_0043C288(char *,void *);
+extern int enemy_aim_at_group_entity_in_cone_short_pal(char *,void *);
 extern char *arena_get_center_point(char *);
 extern int arena_is_point_in_polygon(char *,void *);
-extern void func_PAL_L02_004009A0(char *,int,int);
+extern void moby_set_anim_type_three_pal(char *,int,int);
 extern void moby_set_state(void *,int,int),func_PAL_002A7E68(void *,int,int,int);
 extern int math_random_int_below(int),flag_set_second_pending(void *),flag_set_first_pending(void *),moby_dispatch_action_by_kind(void *,void *);
 extern float vec_get_heading_angle(void *,void *,void *),mat_fast_helper_a(float,float),FastDiffRots(float,float),fast_vec_dist(void *,void *),vec_distance_xy(void *,void *),moby_get_anim_value(void *),math_random_float_range(float,float);
 extern void FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float),euler_rotation_basis(void *,void *),mat_get_euler_angles(void *,void *);
-extern void moby_set_controller_speed_limits(void *,float,float,float,float), func_PAL_L02_00335630(void *,void *), moby_rotate_about_point(void *,void *,float,float,float);
-extern int func_PAL_L01_00323068(void *,void *);
-extern int func_PAL_002B5E30(void *,float);
-extern int func_PAL_002B5BA8(void *,void *,float);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float), moby_aim_at_target_offset_pal(void *,void *), moby_rotate_about_point(void *,void *,float,float,float);
+extern int moby_l01_turn_toward_target_pal(void *,void *);
+extern int moby_step_at_own_position_factor_pal(void *,float);
+extern int moby_turn_toward_target_and_step_pal(void *,void *,float);
 extern int hero_set_control_motion_and_step(void *,void *);
-extern int func_PAL_002B5C98(void *,void *,float);
+extern int moby_step_controller_pal(void *,void *,float);
 extern int coll_test_point(void *,int,void *,float);
 extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 static __inline__ void SetAnimation(char *p, int animation, int mode, int blend)
@@ -40,11 +40,11 @@ static __inline__ void SetAnimation(char *p, int animation, int mode, int blend)
 /* Flies to one point from afar and another up close; case 7 uses one point for both. */
 static __inline__ void FlyByDistance(char *p, float *farPoint, float *nearPoint, float distance)
 {
-    if (distance>3.0f) func_PAL_L02_00335630(p,farPoint);
-    else func_PAL_L02_00335630(p,nearPoint);
+    if (distance>3.0f) moby_aim_at_target_offset_pal(p,farPoint);
+    else moby_aim_at_target_offset_pal(p,nearPoint);
 }
 
-void func_PAL_L11_0043AB80(char *p)
+void flying_l11_enemy_update_pal(char *p)
 {
     float target[4],delta[4],zero[4],matrix[4][4];
     char *s=P(p,0x68), *node;
@@ -52,10 +52,10 @@ void func_PAL_L11_0043AB80(char *p)
     int i,flags,clear;
     float *spin;
     if (B(p,0x20)==1) return;
-    if (H(s,0x286) && !D_L11_001A8FF4 && B(p,0x20)!=11 && B(p,0x20)!=10) return;
-    func_PAL_L11_0043B8D0(p);
+    if (H(s,0x286) && !g_hero_l11_input_blocked && B(p,0x20)!=11 && B(p,0x20)!=10) return;
+    flying_enemy_hit_and_init_pal(p);
     if (B(p,0x20)==1) return;
-    if (H(s,0x286) && !D_L11_001A8FF4) return;
+    if (H(s,0x286) && !g_hero_l11_input_blocked) return;
     if (!H(s,0x282)) {
         I(s,0x270)=0;
         if (B(p,0x95)==3) {
@@ -103,8 +103,8 @@ void func_PAL_L11_0043AB80(char *p)
         {
             char *home=s+0x250;
             if (!B(p,0xBC) && vec_distance_xy(p+0x10,home)<0.5f) B(p,0xBC)=1;
-            else if (H(s,0x286)) func_PAL_L02_00335630(p,home);
-            else func_PAL_L01_00323068(p,home);
+            else if (H(s,0x286)) moby_aim_at_target_offset_pal(p,home);
+            else moby_l01_turn_toward_target_pal(p,home);
         }
     }
     switch (B(p,0x20)) {
@@ -119,7 +119,7 @@ void func_PAL_L11_0043AB80(char *p)
             B(p,0xBC)=1;
         } else if (B(p,0xBC)==1) {
             if (arena_is_point_in_polygon(P(p,0xB8),p+0x10)) moby_set_state(p,5,2);
-            func_PAL_L01_00323068(p,arena_get_center_point(P(p,0xB8)));
+            moby_l01_turn_toward_target_pal(p,arena_get_center_point(P(p,0xB8)));
         }
         break;
     case 4:
@@ -130,7 +130,7 @@ void func_PAL_L11_0043AB80(char *p)
         vec_scale_to_length(zero,p+0xE0,F(s,0x104)+F(s,0x100));
         FastVecAdd(delta,p+0x10,zero);
         clear=1;
-        if (coll_test_point(delta,5,p,F(s,0x100)) && D_L11_001C0D18 && H(D_L11_001C0D18,0xAA)==0xB3A) clear=0;
+        if (coll_test_point(delta,5,p,F(s,0x100)) && g_hit_l11_result && H(g_hit_l11_result,0xAA)==0xB3A) clear=0;
         if (clear) {
             I(p,0x98)=I(P(p,0x24),0x10);
             moby_set_state(p,5,2);
@@ -160,23 +160,23 @@ void func_PAL_L11_0043AB80(char *p)
                 moby_set_state(p,9,-1);
                 SetAnimation(p,3,4,2);
             } else if (distance>3.0f) {
-                if (!func_PAL_L11_0043C288(p,p+0x10)) func_PAL_002B5BA8(p,target,F(s,0x274));
-            } else func_PAL_002B5C98(p,p+0x10,angle);
+                if (!enemy_aim_at_group_entity_in_cone_short_pal(p,p+0x10)) moby_turn_toward_target_and_step_pal(p,target,F(s,0x274));
+            } else moby_step_controller_pal(p,p+0x10,angle);
         }
         break;
     case 8:
         if (flag_set_first_pending(p)) moby_set_controller_speed_limits(p,0.2f,2.0000002f,0.005026549f,0.12566373f);
         if (B(p,0x42)==7) {
             if (moby_get_anim_value(p)<=14.0f) {
-                if (H(s,0x286)) func_PAL_L02_00335630(p,target);
-                else func_PAL_002B5C98(p,target,angle);
+                if (H(s,0x286)) moby_aim_at_target_offset_pal(p,target);
+                else moby_step_controller_pal(p,target,angle);
                 coll_test_hit_at_bone(p,0,1,0,1,0,0.4f,B(s,0x34),1.0f);
             } else {
                 moby_set_controller_speed_limits(p,0.080000006f,0.040000003f,0.005026549f,0.12566373f);
                 vec_scale_to_length(delta,p+0xC0,-4.0f);
                 FastVecAdd(delta,p+0x10,delta);
                 I(s,0x138)|=0x10;
-                if (H(s,0x286)) func_PAL_L02_00335630(p,delta); else func_PAL_L01_00323068(p,delta);
+                if (H(s,0x286)) moby_aim_at_target_offset_pal(p,delta); else moby_l01_turn_toward_target_pal(p,delta);
                 I(s,0x138)&=~0x10;
                 coll_test_hit_at_bone(p,0,1,0,1,0,0.4f,B(s,0x34),1.0f);
             }
@@ -189,7 +189,7 @@ void func_PAL_L11_0043AB80(char *p)
         }
         break;
     case 9:
-        if (!H(s,0x286)) func_PAL_002B5E30(p,angle);
+        if (!H(s,0x286)) moby_step_at_own_position_factor_pal(p,angle);
         if (B(p,0x60)&2) {
             SetAnimation(p,7,4,2);
             moby_set_state(p,8,-1);
@@ -200,7 +200,7 @@ void func_PAL_L11_0043AB80(char *p)
         if (B(p,0x42)==8) {
             if (!math_random_int_below(30) || (flags&1)) {
                 if (moby_get_anim_value(p)<10.0f && H(s,0x286) && !math_random_int_below(2)) moby_set_state(p,11,-1);
-                else { func_PAL_L02_004009A0(p,0,-1); func_PAL_L11_0043BFF8(p); }
+                else { moby_set_anim_type_three_pal(p,0,-1); enemy_reset_to_idle_pal(p); }
             }
         } else if (flags&2) {
             SetAnimation(p,2,0,8);
@@ -231,8 +231,8 @@ void func_PAL_L11_0043AB80(char *p)
         moby_rotate_about_point(p,delta,F(s,0x260),F(s,0x264),F(s,0x268));
         euler_rotation_basis(p+0xC0,p+0xF0);
         if (F(p,0x18)<F(arena_get_center_point(P(p,0xB8)),8)+5.0f || !math_random_int_below(450) || U(p,0x96)>=301) {
-            func_PAL_L02_004009A0(p,0,-1);
-            func_PAL_L11_0043BFF8(p);
+            moby_set_anim_type_three_pal(p,0,-1);
+            enemy_reset_to_idle_pal(p);
         }
         break;
     }

@@ -89,5 +89,5 @@ typedef unsigned short u16;
  * written to the shared vertex buffer as three strips; then 32 quads are drawn
  * from the ring's index table, the outer two corners pushed out by a factor. */
 typedef struct { f32 x, y, z; } RingVertex;
-extern RingVertex D_L22_00255920[];
+extern RingVertex g_ring_vertices[];
 extern void FastVecSub(void *, void *, void *);

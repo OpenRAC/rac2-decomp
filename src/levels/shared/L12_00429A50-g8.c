@@ -27,8 +27,8 @@ extern void moby_mark_spawned(void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void part_spawn_two_flare_effects(void *);
-extern char D_L12_001C0258[];   /* collision result; +0x0 the object hit */
-extern float D_L12_001B22E0 __attribute__((sda));
+extern char g_hit_l12_result[];   /* collision result; +0x0 the object hit */
+extern float g_spin_rotation_degrees __attribute__((sda));
 
 /* Updates a spinning blast projectile: it flies, checks for hits, damages what it touches and blows up after 240 frames or on impact. */
 void UpdateSpinningBlastProjectile(char *object)
@@ -47,8 +47,8 @@ void UpdateSpinningBlastProjectile(char *object)
             make_hit_descriptor((char *)&local.move, (int)object, 3, *(float *)(state + 0x14), (Quad16 *)state);
             local.move.id = *(unsigned short *)(object + 0xAA);
             if (CollLine(object + 0x10, &local.next, 0, object, &local.move) != 0 || coll_test_point(object + 0x10, 0, object, 0.3f) != 0) {
-                if (*(char **)D_L12_001C0258 != 0) {
-                    if (*(char **)D_L12_001C0258 != *(char **)(state + 0x10)) {
+                if (*(char **)g_hit_l12_result != 0) {
+                    if (*(char **)g_hit_l12_result != *(char **)(state + 0x10)) {
                         qcopy(&local.direction, state);
                         FastVecScale(&local.direction, &local.direction, 1.5f);
                         ((float *)&local.direction)[2] = 1.0f;
@@ -88,7 +88,7 @@ void UpdateSpinningBlastProjectile(char *object)
             return;
         }
     }
-    math_apply_axis_rotation_to_quat(object + 0xE0, object + 0xE0, object + 0xD0, D_L12_001B22E0 * 0.017453294f);
-    math_apply_axis_rotation_to_quat(object + 0xC0, object + 0xC0, object + 0xD0, D_L12_001B22E0 * 0.017453294f);
+    math_apply_axis_rotation_to_quat(object + 0xE0, object + 0xE0, object + 0xD0, g_spin_rotation_degrees * 0.017453294f);
+    math_apply_axis_rotation_to_quat(object + 0xC0, object + 0xC0, object + 0xD0, g_spin_rotation_degrees * 0.017453294f);
     gfx_add_draw_callback_third(part_spawn_two_flare_effects, object);
 }

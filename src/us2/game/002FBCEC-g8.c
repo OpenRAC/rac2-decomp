@@ -19,7 +19,7 @@ typedef struct {
 extern void *D_0026DBE0[];
 extern CardPrompt g_vendor_menu_state;
 extern CardStatus g_memcard_state;
-extern int D_001A7A20;
+extern int g_special_items_bought_flags;
 extern void shop_set_message_text(char *);
 extern void shop_mark_bought_special_items_owned(void);
 extern char *GetLocalizedString(int);
@@ -52,7 +52,7 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_1:
     rc2_case_3:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.f1C == 1) {
                     shop_set_message_text((char *)GetLocalizedString(0x313A));
                 } else if (g_memcard_state.f1C >= 3) {
@@ -82,7 +82,7 @@ goto *D_0026DBE0[rc2_selector];
         goto rc2_switch_end;
     rc2_case_5:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
-            if (D_001A7A20 & 0x80) {
+            if (g_special_items_bought_flags & 0x80) {
                 if (g_memcard_state.fBC == 1) {
                     shop_set_message_text((char *)GetLocalizedString(0x313A));
                 } else if (g_memcard_state.fBC >= 3) {

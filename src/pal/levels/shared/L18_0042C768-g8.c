@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L18_001B1254 __attribute__((sda));
-extern int D_L18_001B1258 __attribute__((sda));
-extern int D_L18_001B125C __attribute__((sda));
-extern f32 D_L18_001B12FC __attribute__((sda));
+extern int g_enemy_timer_threshold __attribute__((sda));
+extern int g_enemy_timer_min __attribute__((sda));
+extern int g_enemy_timer_max __attribute__((sda));
+extern f32 g_enemy_smooth_time __attribute__((sda));
 extern int math_random_int_range(int, int);
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
@@ -15,8 +15,8 @@ void func_PAL_L18_0042CC40(char *self) {
 
     if (*(u8 *)(s0 + 0x39A) != 0) {
         *(u8 *)(s0 + 0x39A) = 0;
-        if (*(s16 *)(s0 + 0x390) < ((s32)(D_L18_001B1254) * 5 + 2) / 6) {
-            *(s16 *)(s0 + 0x390) = ((s32)(math_random_int_range(D_L18_001B1258, D_L18_001B125C)) * 5 + 2) / 6;
+        if (*(s16 *)(s0 + 0x390) < ((s32)(g_enemy_timer_threshold) * 5 + 2) / 6) {
+            *(s16 *)(s0 + 0x390) = ((s32)(math_random_int_range(g_enemy_timer_min, g_enemy_timer_max)) * 5 + 2) / 6;
         }
     }
     FastDecTimer(s0 + 0x392);
@@ -26,5 +26,5 @@ void func_PAL_L18_0042CC40(char *self) {
     if (*(u16 *)(self + 0x96) <= 0xFFFE) {
         *(u16 *)(self + 0x96) += 1;
     }
-    func_PAL_002B14F8(self, s0 + 0x2C0, 1, 1, D_L18_001B12FC);
+    func_PAL_002B14F8(self, s0 + 0x2C0, 1, 1, g_enemy_smooth_time);
 }

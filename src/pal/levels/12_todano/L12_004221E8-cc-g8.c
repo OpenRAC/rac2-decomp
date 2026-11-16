@@ -3,20 +3,20 @@
 #include "common.h"
 
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B4A8[];
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 g_moby_nibble_table[];
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern int D_L12_001B1DA0 __attribute__((sda));
+extern int g_break_controller_duration __attribute__((sda));
 
 extern int linked_moby_is_finished(void *);
-extern void func_PAL_L12_00423C50(void *);
+extern void linked_moby_trigger_burst_pal(void *);
 extern void moby_set_state(void *, int, int);
 extern int math_fast_float_d(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, u8);
 /* GPR and FP arguments retain their respective EE ABI order. */
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void moby_mark_spawned(void *);
 
@@ -33,10 +33,10 @@ void func_PAL_L12_004221E8(u8 *self)
         self[0x20] = 1;
         *(float *)(state + 0x10) = *(float *)(self + 0x18);
         id = *(u16 *)(self + 0xB2);
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto Destroy0;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            int packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
@@ -67,7 +67,7 @@ Destroy0:
     case 4: {
         int i;
         int *p;
-        u8 *base = D_L12_001B2E9C;
+        u8 *base = g_moby_list_start;
 
         *(float *)(state + 0xC) += 0.002f;
         *(float *)(self + 0x18) += *(float *)(state + 0xC);
@@ -82,7 +82,7 @@ Destroy0:
     }
     case 2:
         moby_set_state(self, 3, -1);
-        *(int *)(state + 0x14) = (((int)(D_L12_001B1DA0) * 5 + 2) / 6);
+        *(int *)(state + 0x14) = (((int)(g_break_controller_duration) * 5 + 2) / 6);
         break;
     case 3: {
         int i;
@@ -99,21 +99,21 @@ Destroy0:
             for (i = 0; i < 3; i++, p++) {
                 if (*p != -1) {
                     child = D_L12_001B2E9C_gp + (*p << 8);
-                    func_PAL_L12_00423C50(child);
-                    func_PAL_L00_003FB330(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
+                    linked_moby_trigger_burst_pal(child);
+                    SpawnExplosion_pal(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
                                   1, 1, 0, 0, 2.0f, 20.0f);
-                    moby_mark_spawned(D_L12_001B2E9C + (*p << 8));
+                    moby_mark_spawned(g_moby_list_start + (*p << 8));
                 }
             }
             id = *(u16 *)(self + 0xB2);
             if (id & 1) {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                 u8 packed = *counter;
 
                 if (((packed >> 4) & 7) != 7)
                     *counter = packed + 16;
             } else {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                 u8 packed = *counter;
 
                 if ((packed & 7) != 7)
@@ -122,7 +122,7 @@ Destroy0:
             moby_mark_spawned(self);
             break;
         }
-        if (*(int *)(state + 0x14) == (((int)(D_L12_001B1DA0 / 2) * 5 + 2) / 6)) {
+        if (*(int *)(state + 0x14) == (((int)(g_break_controller_duration / 2) * 5 + 2) / 6)) {
             int *p2 = (int *)state;
             int i2;
 
@@ -149,13 +149,13 @@ Destroy0:
         }
         id = *(u16 *)(self + 0xB2);
         if (id & 1) {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
             u8 packed = *counter;
 
             if (((packed >> 4) & 7) != 7)
                 *counter = packed + 16;
         } else {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
             u8 packed = *counter;
 
             if ((packed & 7) != 7)

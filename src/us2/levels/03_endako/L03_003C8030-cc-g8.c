@@ -40,25 +40,25 @@ extern void SetCamera5Pose(void *, void *, int, int, int);
 extern void console_start_remote_view(char *);
 extern void console_end_remote_view(char *);
 extern void cam_set_mode_state(int);
-extern void func_US2_0029C600(int);
+extern void level_clear_table_entry_us2(int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern int entity_prepare_shot(void *);
 extern void moby_set_flag_bit(void *, int);
-extern int func_US2_0029C5B0(void *, void *, int);
+extern int level_set_table_entry_us2(void *, void *, int);
 extern int menu_draw_two_line_panel(void);
 
 extern Hero6A28 g_hero_state;
 extern char g_hero_position[];
 /* Entity pool base (256-byte entries): absolute and $gp-relative views. */
-extern char *D_L03_001B2A1C MACRO_ADDR;
+extern char *g_moby_record_base MACRO_ADDR;
 extern char *D_L03_001B2A1C_GP SDATA(D_L03_001B2A1C);
-extern char *D_0018B650 NOT_SDA;
-extern int D_00138324 NOT_SDA;
-extern AimState6A28 D_L03_001B9840;
-extern char D_L03_003C7010[];
+extern char *g_held_object_ptr NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
+extern AimState6A28 g_hero_l03_state_alias;
+extern char g_str_camera_console_entry[];
 
-void func_US2_L03_003C8030(char *obj)
+void camera_console_update_us2(char *obj)
 {
     char mat[0x40] __attribute__((aligned(16)));
     float local[4] __attribute__((aligned(16)));
@@ -95,7 +95,7 @@ void func_US2_L03_003C8030(char *obj)
                     break;
                 }
                 TryClaimNotice(8, 0x12fa, 1);
-                if (hero_is_allowed_for_mode(8) && (D_00138324 & 0x10)) {
+                if (hero_is_allowed_for_mode(8) && (g_pad_held_flags & 0x10)) {
                     moby_set_state(obj, 3, -1);
                     *(Quad *)pos = 0;
                     pos[0] = 2.0f;
@@ -104,10 +104,10 @@ void func_US2_L03_003C8030(char *obj)
                     vec_clear_128(rot);
                     rot[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
                     hero_reset_position_and_direction(pos, rot, 0x31, 1);
-                    D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
+                    g_held_object_ptr = g_moby_record_base + (*(int *)vars << 8);
                     camera_select_remote_view(obj, cam1, cam2);
                     SetCamera5Pose(cam1, cam2, 1, 0, 0);
-                    console_start_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
+                    console_start_remote_view(g_moby_record_base + (*(int *)vars << 8));
                 }
             }
         }
@@ -115,16 +115,16 @@ void func_US2_L03_003C8030(char *obj)
 
     case 3:
         g_hero_state.mode = 5;
-        if (D_00138324 & 0x10) {
+        if (g_pad_held_flags & 0x10) {
             cam_set_mode_state(0);
             hero_reset_position_and_direction(g_hero_state.pos, g_hero_state.rot, 0, 1);
             g_hero_state.field1830 = 0;
-            console_end_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
-            D_L03_001B9840.f = 64.42f;
-            D_L03_001B9840.b1 = 1;
-            D_L03_001B9840.b0 = 0;
+            console_end_remote_view(g_moby_record_base + (*(int *)vars << 8));
+            g_hero_l03_state_alias.f = 64.42f;
+            g_hero_l03_state_alias.b1 = 1;
+            g_hero_l03_state_alias.b0 = 0;
             moby_set_state(obj, 2, -1);
-            func_US2_0029C600(0);
+            level_clear_table_entry_us2(0);
         } else {
             camera_select_remote_view(obj, mat, mat + 0x10);
             object_copy_vector_to_selected(mat);
@@ -134,7 +134,7 @@ void func_US2_L03_003C8030(char *obj)
                 if (*(int *)(vars + 0x20) != -1)
                     moby_set_flag_bit(D_L03_001B2A1C_GP + (*(int *)(vars + 0x20) << 8), 1);
             }
-            func_US2_0029C5B0(D_L03_003C7010, menu_draw_two_line_panel, 0);
+            level_set_table_entry_us2(g_str_camera_console_entry, menu_draw_two_line_panel, 0);
         }
         break;
     }

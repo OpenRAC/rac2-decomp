@@ -20,14 +20,14 @@ extern s32 req_launch_queued(void *);
 extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_US2_002AFF10(int);
+extern void snd_play_indexed_us2(int);
 extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void hero_start_move_state_walk_or_run(int);
 extern void ref_US2_L01_0040153C_00(int, int);
 extern void script_queue_keyed_request(int, int);
 extern int MemcardSave(int, int);
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern char g_hero_position[];
 
 /* Level data, at another address in each level that has this function. The trigger flag is
@@ -56,7 +56,7 @@ void func_US2_L01_0040153C(char *m)
         if (*(int *)(d + 8) == -1)
             STUB_printf(ref_L01_003FFFE8_03, *(short *)(m + 0xB2));
         if (*(unsigned char *)(m + 0xB0) != 255) {
-            if (D_0019B2E8[*(unsigned char *)(m + 0xB0) + (g_current_map_index << 4)] & 128) {
+            if (g_moby_group_flags[*(unsigned char *)(m + 0xB0) + (g_current_map_index << 4)] & 128) {
                 moby_mark_spawned(m);
                 break;
             }
@@ -103,7 +103,7 @@ void func_US2_L01_0040153C(char *m)
             ref_L01_003FFFE8_00[1] = 0;
             if (*(short *)(d + 6) != -1) {
                 moby_mark_flag_and_append_to_list(*(short *)(d + 6));
-                func_US2_002AFF10(*(short *)(d + 6));
+                snd_play_indexed_us2(*(short *)(d + 6));
             }
             moby_set_state(m, 4, -1);
         }
@@ -112,7 +112,7 @@ void func_US2_L01_0040153C(char *m)
         if (*(unsigned char *)(m + 0xB0) != 255) {
             int n = *(unsigned char *)(m + 0xB0);
 
-            if (!(D_0019B2E8[n + (g_current_map_index << 4)] & 128)) {
+            if (!(g_moby_group_flags[n + (g_current_map_index << 4)] & 128)) {
                 moby_mark_table_entry_flagged(n);
                 level_capture_checkpoint_state(m + 0x10, m + 0xF0);
             }

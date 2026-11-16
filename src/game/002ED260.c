@@ -6,11 +6,11 @@
 typedef unsigned int u32_Fe8672ea5;
 #endif
 
-extern u32_Fe8672ea5 D_L04_001B2AF0[];
+extern u32_Fe8672ea5 g_part_effect_table[];
 
 extern u32_Fe8672ea5 g_effect_record_table __attribute__((sda));
 
-extern float D_L04_001AC190 __attribute__((sda));
+extern float g_effect_scale __attribute__((sda));
 
 extern void vec_clear_128(void *target);
 
@@ -25,8 +25,8 @@ void part_init_effect_table(u32_Fe8672ea5 tableBase)
         *(u32_Fe8672ea5 *)cursor = 0;
         cursor -= 80;
     }
-    D_L04_001AC190 = 1.0f;
-    vec_clear_128(D_L04_001B2AF0);
+    g_effect_scale = 1.0f;
+    vec_clear_128(g_part_effect_table);
 }
 
 /* func_002ED2B8 is matched in 002ED2B8-g8.c (built with -frac2-qcopy). */
@@ -88,7 +88,7 @@ typedef unsigned int u32_Fe8672ea5;
 #endif
 
 extern u32_Fe8672ea5 g_effect_record_table __attribute__((sda));
-extern float D_L04_001AC190 __attribute__((sda));
+extern float g_effect_scale __attribute__((sda));
 
 extern void gfx_draw_billboard_quad(void *a0, u32_Fe8672ea5 a1, u32_Fe8672ea5 a2, int a3, float f12, float f13, float f14);
 
@@ -114,7 +114,7 @@ void part_draw_effect_records(void)
             if (typeBits != 0) {
                 flag = typeBits != 1;
             }
-            scaled = (float)*(int *)(cursor + 0x38) * D_L04_001AC190;
+            scaled = (float)*(int *)(cursor + 0x38) * g_effect_scale;
             gfx_draw_billboard_quad((void *)cursor, *(u32_Fe8672ea5 *)(cursor + 0x4C),
                           *(u32_Fe8672ea5 *)(cursor + 0x30) | ((u32_Fe8672ea5)(int)scaled << 24),
                           flag,

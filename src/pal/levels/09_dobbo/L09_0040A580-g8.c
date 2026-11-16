@@ -1,14 +1,15 @@
+#include "names.h"
 /* func_PAL_L09_0040A580, the PAL copy of func_L09_00405610 in L09_00405610-g8.c: the same C, where the
    timers take the 50 Hz scale, the turn and blend rates change, and callees take their PAL names. */
 #include "common.h"
 
 typedef int DobboQuad __attribute__((mode(TI)));
-extern int D_L09_001B1428 __attribute__((sda));
-extern float D_L09_001B13F4 __attribute__((sda));
-extern float D_L09_001B13F8 __attribute__((sda));
+extern int g_dobbo_wander_disabled __attribute__((sda));
+extern float g_dobbo_slow_move_speed __attribute__((sda));
+extern float g_dobbo_wander_range __attribute__((sda));
 extern float D_L09_001B13F8_1[] __attribute__((sda)); /* { lower, upper } bounds, read as a pair */
-extern char D_L09_00189EA0[];
-extern void func_PAL_L09_00409DC8(char *);
+extern char g_dobbo_target_point[];
+extern void dobbo_update_release_record_pal(char *);
 extern int flag_set_second_pending(char *);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern int math_fast_float_d(void *);
@@ -16,7 +17,7 @@ extern int math_random_int_below(int);
 extern void moby_set_state(char *, int, int);
 extern int math_random_int_range(int, int);
 extern int moby_dispatch_action_by_kind(char *, void *);
-extern void func_PAL_L09_0040A050(char *);
+extern void dobbo_destroy_with_debris_pal(char *);
 extern int flag_set_first_pending(char *);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void func_PAL_L09_00409AC8(char *, int);
@@ -27,19 +28,19 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
 extern void path_clamp_move_to_area(void *, void *, void *, int, float);
-extern int func_PAL_L09_00409F00(char *, void *, int);
+extern int dobbo_move_toward_point_pal(char *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern float mat_fast_helper_a(float, float);
-extern int func_PAL_002B5E30(char *, float);
+extern int moby_step_at_own_position_factor_pal(char *, float);
 extern int moby_count_group_side_from_object(char *, void *, int);
 extern void moby_turn_toward_target_limited(char *);
 extern int moby_start_effect_from_entry(char *, float);
 extern int func_PAL_002AF6C0(char *, float);
 extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
-extern void func_PAL_L09_00409F38(char *);
-extern void func_PAL_L09_0040A268(char *);
+extern void dobbo_tick_timers_effects_pal(char *);
+extern void dobbo_update_pulsing_tint_pal(char *);
 
 #define BYTE(p,o) (*(u8 *)((p)+(o)))
 #define HALF(p,o) (*(s16 *)((p)+(o)))
@@ -54,9 +55,9 @@ void func_PAL_L09_0040A580(char *obj)
     int flags;
     int animation;
     float angle, speed;
-    if (D_L09_001B1428) return;
+    if (g_dobbo_wander_disabled) return;
     data = *(char **)(obj + 0x68);
-    func_PAL_L09_00409DC8(obj);
+    dobbo_update_release_record_pal(obj);
     if (!obj || BYTE(obj,0x20) == 0xFE || BYTE(obj,0x20) == 0xFD) return;
     switch (BYTE(obj,0x95)) {
     case 0:
@@ -78,7 +79,7 @@ void func_PAL_L09_0040A580(char *obj)
     case 1:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.0032000002f,0.10000001f,0.010053098f,0.5026549f);
-            FLOAT(data,0x1D0)=D_L09_001B13F4*0.020000001f;
+            FLOAT(data,0x1D0)=g_dobbo_slow_move_speed*0.020000001f;
             FLOAT(data,0x134)=0.05f;
         }
         if (HALF(data,0x334)==1) moby_set_state(obj,9,2);
@@ -87,7 +88,7 @@ void func_PAL_L09_0040A580(char *obj)
     case 2:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.0048f,0.10000001f,0.010053098f,0.5026549f);
-            FLOAT(data,0x1D0)=D_L09_001B13F4*0.020000001f;
+            FLOAT(data,0x1D0)=g_dobbo_slow_move_speed*0.020000001f;
             FLOAT(data,0x124)=0.0096f;
             FLOAT(data,0x134)=0.05f;
             WORD(data,0x35C)=(((int)(math_random_int_range(0,30)) * 5 + 2) / 6);
@@ -99,7 +100,7 @@ void func_PAL_L09_0040A580(char *obj)
         break;
     case 3:
         flags=moby_dispatch_action_by_kind(obj,data+0x50);
-        if (flags&1) func_PAL_L09_0040A050(obj);
+        if (flags&1) dobbo_destroy_with_debris_pal(obj);
         else if (flags&2) {
             if (HALF(data,0x334)==1) moby_set_state(obj,9,2);
             else {
@@ -134,14 +135,14 @@ void func_PAL_L09_0040A580(char *obj)
                 path_clamp_move_to_area(&position,(data+0x310),(data+0x310),WORD(data,0x234),1.5f);
             }
         }
-        func_PAL_L09_00409F00(obj,(data+0x310),0);
+        dobbo_move_toward_point_pal(obj,(data+0x310),0);
         if (*(u16 *)(obj+0x96)>25 && (FLOAT(data,0x1CC)<=0.5f || *(u16 *)(obj+0x96)>150)) moby_set_state(obj,1,-1);
         break;
     case 3:
         if (flag_set_first_pending(obj)) {
             if (BYTE(obj,0x43)!=math_random_int_below(2)+4) func_PAL_002A7E68(obj,math_random_int_below(2)+4,0,8);
         }
-        if (fast_vec_dist(obj+0x10,D_L09_00189EA0)<D_L09_001B13F8) moby_set_state(obj,4,-1);
+        if (fast_vec_dist(obj+0x10,g_dobbo_target_point)<g_dobbo_wander_range) moby_set_state(obj,4,-1);
         else if (BYTE(obj,0x60)&2) {
             switch (math_random_int_below(3)) {
             case 0: moby_set_state(obj,6,-1); break;
@@ -167,9 +168,9 @@ void func_PAL_L09_0040A580(char *obj)
     case 4:
         if (flag_set_first_pending(obj)) {
             func_PAL_L09_00409B48(obj,10);
-            FLOAT(data,0x238)=math_random_float_range(D_L09_001B13F8,D_L09_001B13F8_1[1])+0.5f;
+            FLOAT(data,0x238)=math_random_float_range(g_dobbo_wander_range,D_L09_001B13F8_1[1])+0.5f;
         }
-        if ((func_PAL_L09_00409F00(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,D_L09_00189EA0)) {
+        if ((dobbo_move_toward_point_pal(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,g_dobbo_target_point)) {
             if (math_random_int_below(2)) moby_set_state(obj,6,-1);
             else moby_set_state(obj,7,-1);
         }
@@ -187,7 +188,7 @@ void func_PAL_L09_0040A580(char *obj)
                 path_clamp_move_to_area(&position,(data+0x310),(data+0x310),WORD(data,0x234),1.5f);
             }
         }
-        func_PAL_L09_00409F00(obj,(data+0x310),0);
+        dobbo_move_toward_point_pal(obj,(data+0x310),0);
         if (*(u16 *)(obj+0x96)>25 && (FLOAT(data,0x1CC)<=0.5f || *(u16 *)(obj+0x96)>150)) moby_set_state(obj,3,-1);
         break;
     case 8:
@@ -197,7 +198,7 @@ void func_PAL_L09_0040A580(char *obj)
             if (BYTE(obj,0x43)!=math_random_int_below(2)+2) func_PAL_002A7E68(obj,math_random_int_below(2)+2,0,8);
         }
         target=*(char **)(data+0x200);
-        func_PAL_002B5E30(obj,mat_fast_helper_a(FLOAT(target,0x10)-FLOAT(obj,0x10),FLOAT(target,0x14)-FLOAT(obj,0x14)));
+        moby_step_at_own_position_factor_pal(obj,mat_fast_helper_a(FLOAT(target,0x10)-FLOAT(obj,0x10),FLOAT(target,0x14)-FLOAT(obj,0x14)));
         flags = BYTE(obj,0x60);
         flags &= 2;
         if (flags) {
@@ -209,7 +210,7 @@ void func_PAL_L09_0040A580(char *obj)
     case 9:
         if (flag_set_first_pending(obj)) func_PAL_L09_00409B48(obj,5);
         if (!(*(u16 *)(obj+0x96)&3)) FLOAT(data,0x33C)=moby_count_group_side_from_object(obj,*(void **)(data+0x200),-1)*0.08726647496f;
-        func_PAL_L09_00409F00(obj,data+0x1F0,1);
+        dobbo_move_toward_point_pal(obj,data+0x1F0,1);
         moby_turn_toward_target_limited(obj);
         if (FLOAT(data,0x1CC)<=1.25f) moby_set_state(obj,10,-1);
         break;
@@ -223,6 +224,6 @@ void func_PAL_L09_0040A580(char *obj)
         if (BYTE(obj,0x60)&2) moby_set_state(obj,9,-1);
         break;
     }
-    func_PAL_L09_00409F38(obj);
-    if (BYTE(obj,0x31)) func_PAL_L09_0040A268(obj);
+    dobbo_tick_timers_effects_pal(obj);
+    if (BYTE(obj,0x31)) dobbo_update_pulsing_tint_pal(obj);
 }

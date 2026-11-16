@@ -4,7 +4,7 @@
 
 typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
-extern u8 D_0018C0D4;
+extern u8 g_screen_mode_flag;
 extern void *attachment_get_owner_by_kind(int);
 extern float math_fabs(float);
 extern float math_approach_with_velocity(float *, float, float *, float, float, float, int);
@@ -23,7 +23,7 @@ void func_PAL_L00_002A4EA8(u8 *node)
 
     if (owner == 0)
         return;
-    if (D_0018C0D4 == 0) {
+    if (g_screen_mode_flag == 0) {
         int kind = *(short *)(node + 0xA2);
         if (kind == 4 || kind == 2 || kind == 5 || kind == 3)
             return;

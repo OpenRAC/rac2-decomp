@@ -7,7 +7,7 @@ extern float math_random_float_range(float lo, float hi);
 extern int part_alloc_effect_slot(char *object, int a, float b, float c, float d);
 extern void func_002A0F48(char *object);
 
-char *func_PAL_L00_003EB8F0(int a0, TI128 *a1, TI128 *a2)
+char *mini_nuke_projectile_spawn_pal(int a0, TI128 *a1, TI128 *a2)
 {
     char *p;
     char *s0;

@@ -12,8 +12,8 @@ typedef float f32;
  * -G8 unit emits; the same symbol is reached with an absolute `lui`/`lw` pair
  * inside func_L03_003F66D8 and func_L03_0041D128, so those stay in the -G0 file. */
 /* The two words the entity's state is chosen by, both reached through $gp. */
-extern s32 D_L03_001B108C __attribute__((sda));
-extern u32 D_L03_001B1058 __attribute__((sda));
+extern s32 g_endako_boss_forced_behaviour __attribute__((sda));
+extern u32 g_endako_boss_initial_timer __attribute__((sda));
 
 extern void moby_set_state(void *entity, int a, int b);
 extern int math_random_int_below(int id);
@@ -30,8 +30,8 @@ void func_PAL_L03_003FAB20(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 sel;
 
-    if (D_L03_001B108C >= 0) {
-        sel = D_L03_001B108C;
+    if (g_endako_boss_forced_behaviour >= 0) {
+        sel = g_endako_boss_forced_behaviour;
     } else if (state[0x30A] != 0) {
         state[0x30A]--;
         sel = 1;
@@ -64,7 +64,7 @@ void func_PAL_L03_003FAB20(u8 *entity) {
         state[0x309] = math_random_int_below(2) + 1;
         break;
     case 2:
-        *(u32 *)(state + 0x2E4) = (((int)(D_L03_001B1058) * 5 + 2) / 6);
+        *(u32 *)(state + 0x2E4) = (((int)(g_endako_boss_initial_timer) * 5 + 2) / 6);
         moby_set_state(entity, 12, 5);
         state[0x309] = 1;
         break;
@@ -92,6 +92,6 @@ typedef struct {
     u8 *field194;
 } L03Block;
 
-extern L03Block D_L03_001BD680;
+extern L03Block g_endako_state;
 
 /* The level's mode word, reached through $gp. */

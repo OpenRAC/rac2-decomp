@@ -5,7 +5,7 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -13,10 +13,10 @@ extern void part_spawn_spark_puff(void *);
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L24_001AC790 __attribute__((sda));
-extern int D_L24_001B1F30 __attribute__((sda)), D_L24_001B1F38 __attribute__((sda));
-extern Collision D_L24_001BEB00;
-extern Material D_L24_00261E70[];
+extern int g_bounce_model_pointer __attribute__((sda));
+extern int g_ripple_l24_disturb_x __attribute__((sda)), g_ripple_l24_disturb_y __attribute__((sda));
+extern Collision g_bounce_collision;
+extern Material g_item_l24_material_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -82,7 +82,7 @@ void projectile_update_bouncing_sparks(unsigned char *moby) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L24_00261E70 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l24_material_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -94,14 +94,14 @@ void projectile_update_bouncing_sparks(unsigned char *moby) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L24_001B1F30, D_L24_001B1F38, 1,
+            RippleDisturb(g_ripple_l24_disturb_x, g_ripple_l24_disturb_y, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(moby + 0x10);
             frame.position.f[1] = *(float *)(moby + 0x14);
-            frame.position.f[2] = D_L24_001BEB00.point.f[2];
+            frame.position.f[2] = g_bounce_collision.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -121,16 +121,16 @@ void projectile_update_bouncing_sparks(unsigned char *moby) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L24_001BEB00;
+            Collision *collision = &g_bounce_collision;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L24_001BEB00;
+                reread = &g_bounce_collision;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L24_001AC790 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_bounce_model_pointer && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
@@ -192,7 +192,7 @@ void projectile_l24_update_bouncing(char *moby) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L24_00261E70)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l24_material_table)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -202,16 +202,16 @@ void projectile_l24_update_bouncing(char *moby) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
-        collision = &D_L24_001BEB00;
+        collision = &g_bounce_collision;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L24_001BEB00;
+            reread = &g_bounce_collision;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L24_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_bounce_model_pointer && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             moby[0xBC] = 1;
             {
@@ -223,7 +223,7 @@ void projectile_l24_update_bouncing(char *moby) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L24_001BEB00;
+            collision = &g_bounce_collision;
             if (collision->count <= 0)
                 goto finish;
             moby[0xBC] = 1;

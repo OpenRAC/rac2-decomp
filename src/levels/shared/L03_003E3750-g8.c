@@ -4,8 +4,8 @@
    fixed ones (only at step 0). */
 #include "common.h"
 
-extern s32 D_L03_001B0B50 __attribute__((sda));
-extern s32 D_L03_0029BCD0[];
+extern s32 g_path_puzzle_step_count __attribute__((sda));
+extern s32 g_path_entries[];
 
 /* Says whether the given object is one of the targets the current puzzle step asks for. */
 s32 path_puzzle_is_step_target(char *moby, s32 candidate)
@@ -15,23 +15,23 @@ s32 path_puzzle_is_step_target(char *moby, s32 candidate)
     s32 kind;
     s32 i;
 
-    if (*(s16 *)(vars + 0x5E) == D_L03_001B0B50 - 1)
+    if (*(s16 *)(vars + 0x5E) == g_path_puzzle_step_count - 1)
         return 0;
     entry_offset = *(s16 *)(vars + 0x62) * 16;
-    kind = *(s32 *)((char *)D_L03_0029BCD0 + entry_offset);
+    kind = *(s32 *)((char *)g_path_entries + entry_offset);
     switch (kind) {
     case 1:
     case 2:
         i = *(s16 *)(vars + 0x64) + 1;
-        if (candidate != *(s32 *)((i * 4 + entry_offset) + (char *)D_L03_0029BCD0))
+        if (candidate != *(s32 *)((i * 4 + entry_offset) + (char *)g_path_entries))
             break;
         return 1;
     case 3:
         if (*(s16 *)(vars + 0x64) != 0)
             return 0;
-        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entry_offset + 4))
+        if (candidate == *(s32 *)((char *)g_path_entries + entry_offset + 4))
             return 1;
-        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entry_offset + 8))
+        if (candidate == *(s32 *)((char *)g_path_entries + entry_offset + 8))
             return 1;
         break;
     }

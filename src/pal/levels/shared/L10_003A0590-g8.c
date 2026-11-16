@@ -2,8 +2,8 @@
 
 #include "common.h"
 extern void *CreateMoby(s32);
-extern short D_L10_001B2DB8[4];
-extern u8 D_L10_0039D9C0[];
+extern short g_lightning_strip_timers[4];
+extern u8 g_lightning_draw_callback_data[];
 
 /* Creates a strip-effect object with its supplied vectors and rendering parameters. */
 void *func_PAL_L10_003A0590(void *position, void *direction, s32 duration, s32 kind,
@@ -30,7 +30,7 @@ void *func_PAL_L10_003A0590(void *position, void *direction, s32 duration, s32 k
         *(float *)(state + 0x34) = jitter;
         qcopy(state, direction);
         qcopy((object + 0x10), position);
-        for (i = 2; i >= 0; i--) D_L10_001B2DB8[i] = -1;
+        for (i = 2; i >= 0; i--) g_lightning_strip_timers[i] = -1;
     }
     return object;
 }

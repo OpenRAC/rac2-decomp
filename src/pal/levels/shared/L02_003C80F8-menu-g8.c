@@ -12,16 +12,16 @@ extern void VU1_addGSregister(int, unsigned long);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(int, int, u64, char *, int);
 extern int text_draw_centered_large(int, int, u64, char *, int);
-extern char *D_L02_001A904C;
-extern float D_L02_001B3E04;
-extern int D_L02_001B3E00;
+extern char *g_arena_menu_base;
+extern float g_hud_label_scale;
+extern int g_hud_l02_mode;
 
 static __inline__ int menu_coord(float scale, float value, float half, int active)
 {
     float scaled = scale * value + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_L02_001B3E00 == active)
+    if (result != 0 && g_hud_l02_mode == active)
         scaled = 1.0f;
     return result;
 }
@@ -30,7 +30,7 @@ static __inline__ int header_y(float value, float scale, float half, int active)
 {
     float scaled = scale * value + half;
 
-    if (D_L02_001B3E00 == active)
+    if (g_hud_l02_mode == active)
         return (int)(scaled + -1.0f);
     return (int)scaled;
 }
@@ -39,7 +39,7 @@ static __inline__ int footer_y(float value, float scale, float half, int active)
 {
     float scaled = half + scale * value;
 
-    if (D_L02_001B3E00 == active)
+    if (g_hud_l02_mode == active)
         return (int)(scaled + 2.0f);
     return (int)scaled;
 }
@@ -55,29 +55,29 @@ void func_PAL_L02_003C80F8(char *obj) {
     k = 203.0f;
     half = 0.5f;
     on = 1;
-    id = table_find_by_id(D_L02_001A904C + entry, 0x70);
-    y = menu_coord(D_L02_001B3E04, k, half, on);
+    id = table_find_by_id(g_arena_menu_base + entry, 0x70);
+    y = menu_coord(g_hud_label_scale, k, half, on);
     one = 1.0f;
     zero = 0.0f;
     s = (float)y;
     gfx_draw_scaled_object_two_axes(id, 0x60442D00, 258.0f, s, one, one, zero);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
-                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
-                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    id = table_find_by_id(D_L02_001A904C + entry, 0x72);
-    y = menu_coord(D_L02_001B3E04, k, half, on);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + entry, 0x6F), 0x60442D00, 258.0f,
+                  (float)menu_coord(g_hud_label_scale, k, half, on), one, one, zero);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + entry, 0x71), 0x55F0C070, 258.0f,
+                  (float)menu_coord(g_hud_label_scale, k, half, on), one, one, zero);
+    id = table_find_by_id(g_arena_menu_base + entry, 0x72);
+    y = menu_coord(g_hud_label_scale, k, half, on);
     s = one;
     gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
     VU1_addGSregister(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
         text = GetLocalizedString(0xE81);
-        text_draw_centered_small(254, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
+        text_draw_centered_small(254, header_y(23.0f, g_hud_label_scale, half, on), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
         text = GetLocalizedString(0xE80);
-        text_draw_centered_small(254, header_y(23.0f, D_L02_001B3E04, half, on), 0x88FFFFFF, text, -1);
+        text_draw_centered_small(254, header_y(23.0f, g_hud_label_scale, half, on), 0x88FFFFFF, text, -1);
     }
     text = GetLocalizedString(0xE7F);
-    text_draw_centered_large(254, footer_y(373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
+    text_draw_centered_large(254, footer_y(373.0f, g_hud_label_scale, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

@@ -31,7 +31,7 @@ extern DiscToc g_copy_setup_data;
 /* The level archive load: stage, busy flag and the two archive buffers
    (archive0 is the level data D_001A7288 points at). */
 typedef struct { int stage, busy, archive0, archive1; } ArchiveLoad;
-extern ArchiveLoad D_001A7280 __attribute__((sda));
+extern ArchiveLoad g_loader_archives __attribute__((sda));
 /* The two sound bank statuses: -1 while a load is pending. */
 /* The class cache header: VRAM offsets of the slot's image (in words) and
    CLUT, the one material map entry and the slot. */
@@ -43,7 +43,7 @@ typedef struct {
     short map;                  /* 0x10 */
     short slot;                 /* 0x12 */
 } ClassCache;
-extern ClassCache D_00152CD0;
+extern ClassCache g_load_slots;
 /* A loaded class: the count of its 32-byte entries at 0x0D and the table of
    them at 0x28. */
 typedef struct {
@@ -59,8 +59,8 @@ typedef struct {
 /* The decode buffer; a texture part starts with a type word, has its width
    at 0x18 and its CLUT and pixels at 0x30 and 0x430. */
 typedef struct { int type; } DecodeHeader;
-extern DecodeHeader D_00178510;
-extern ClassData *D_001CDB80[];
+extern DecodeHeader g_decode_header;
+extern ClassData *g_class_cache_objects[];
 /* Frozen Batch A A02-list-add-88; acknowledged claim 38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f. */
 typedef int s32;
 
@@ -103,7 +103,7 @@ void gfx_flush_light_part_indices(int index);
 /* Texture ranges: the particle renderer (func_002B9420) hands this table to
    the toSPR DMA channel; C only ever writes it. */
 typedef struct { int a, b; } TextureRange;
-extern volatile TextureRange D_001F1F40[];
+extern volatile TextureRange g_texture_ranges[];
 
 /* Rebases the offset table of a loaded pack onto the copy of its data in
    D_001F2740, then fills the texture range table from count four-word list
@@ -126,21 +126,21 @@ extern volatile TextureRange D_001F1F40[];
    D_001A72A0. The pack's first part then replaces the buffer's contents.
    The buffer, the count, the VRAM cursors and the flags are words addressed
    absolutely. */
-void func_US2_00292928(int pack);
+void tex_load_pack_to_vram_us2(int pack);
 
-extern void func_US2_00292928(int);
+extern void tex_load_pack_to_vram_us2(int);
 extern void tex_build_draw_packets(void *);
-extern u8 *D_L03_001DAB80[];
+extern u8 *g_object_l03_pointer_table[];
 extern void load_copy_header_relocate_pointers(u8 *, u8 *);
-extern unsigned char *D_001BAF38;
-extern int D_001A7290[] __attribute__((sda));
+extern unsigned char *g_level_pack_data;
+extern int g_iop_block_table[] __attribute__((sda));
 
-void func_US2_00292C70(void *param)
+void tex_load_level_pack_us2(void *param)
 {
-    func_US2_00292928(param);
+    tex_load_pack_to_vram_us2(param);
     tex_build_draw_packets(param);
-    load_copy_header_relocate_pointers((u8 *)D_L03_001DAB80[0], D_001BAF38);
-    D_001A7290[0] = (int)param;
+    load_copy_header_relocate_pointers((u8 *)g_object_l03_pointer_table[0], g_level_pack_data);
+    g_iop_block_table[0] = (int)param;
 }
 
 /* func_00292408 is in 00292408.c. */

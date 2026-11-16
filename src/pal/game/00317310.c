@@ -19,8 +19,8 @@ typedef struct {
     int duration;                
     int expired;                 
 } PoolEffect;
-extern PoolEffect D_0022AA10[3];
-extern char D_001B2520[] MACRO_ADDR;
+extern PoolEffect g_pool_effect_slots[3];
+extern char g_emitter_origin[] MACRO_ADDR;
 extern float math_random_float_range(float min, float max);
 extern float math_random_signed_float_range(float min, float max);
 extern void vec_clear_128(void *vector);
@@ -28,7 +28,7 @@ extern char *moby_get_private_value_0(void *object);
 extern void gravity_get_dir_at_object(void *object, void *out, int);
 extern void FastVecScale(void *out, void *vector, float scale);
 extern void FastVecAdd(void *,void *,void *);
-extern int D_001A73E0[] MACRO_ADDR;
+extern int g_slot_play_counters[] MACRO_ADDR;
 extern void FastVecAdd(void *, void *, void *);
 
 /* func_00316248 is in 0030F7B0-g8.c. */
@@ -37,9 +37,9 @@ extern void FastVecAdd(void *, void *, void *);
  * of duration frames, and the object's position as the start (offset when it has a record). */
 void func_PAL_00317928(void *owner, char *object, int duration)
 {
-    PoolEffect *pool = D_0022AA10;
+    PoolEffect *pool = g_pool_effect_slots;
     int i = 0;
-    const char *origin = D_001B2520;
+    const char *origin = g_emitter_origin;
     PoolEffect *effect;
     float displacement[4] __attribute__((aligned(16)));
     char *info;

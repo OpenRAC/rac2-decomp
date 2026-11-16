@@ -2,8 +2,8 @@
 
 extern u8 g_sound_state[];
 extern u8 *g_moby_l01_table MACRO_ADDR;
-extern u8 *D_L01_001FE180[];
-extern f32 D_L01_001B0540 __attribute__((sda));
+extern u8 *g_path_l01_table[];
+extern f32 g_l01_moby_scale_factor __attribute__((sda));
 
 extern s32 AdvancePointAlongPolyline(u8 *object, u8 *entry, void *out, s32 current, s32 direction, f32 step);
 extern s32 PlayMobySound(s32 a0, s32 a1, void *a2);
@@ -20,9 +20,9 @@ void launched_projectile_update(u8 *moby)
     u8 *sound_handle;
     f32 move_delta[4];
 
-    *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B0540;
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * g_l01_moby_scale_factor;
     qcopy(vars + 0x60, moby + 0x10);
-    path_table = D_L01_001FE180[*(s32 *)(vars + 0x74)];
+    path_table = g_path_l01_table[*(s32 *)(vars + 0x74)];
     *(s32 *)(vars + 0x78) =
         AdvancePointAlongPolyline(moby, path_table, moby + 0x10, *(s32 *)(vars + 0x78), 1,
                           *(f32 *)(launcher_vars + 0x20) * 0.016666668f);

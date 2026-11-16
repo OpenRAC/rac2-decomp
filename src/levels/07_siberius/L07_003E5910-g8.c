@@ -22,9 +22,9 @@ typedef struct {
 } Moby_L07_003E5910;
 
 extern char g_hero_state[];
-extern f32 D_L07_001B0AA0 __attribute__((sda));
-extern f32 D_L07_001B0AA4 __attribute__((sda));
-extern f32 D_L07_001B0AA8 __attribute__((sda));
+extern f32 g_group_entity_accel_step __attribute__((sda));
+extern f32 g_group_entity_speed_limit __attribute__((sda));
+extern f32 g_tracked_height_offset __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
@@ -46,13 +46,13 @@ float entity_move_to_tracked_height(Moby_L07_003E5910 *moby, float *goal_pos, fl
     }
     lo = home_pos[2] - 2.0f;
     hi = lo + 5.0f;
-    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + D_L07_001B0AA8;
+    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + g_tracked_height_offset;
     if (hi < h) h = hi;
     else if (h < lo) h = lo;
-    floor = coll_probe_ground_height_below(moby->pos, 0, 0.5f) + D_L07_001B0AA8;
+    floor = coll_probe_ground_height_below(moby->pos, 0, 0.5f) + g_tracked_height_offset;
     if (h < floor) h = floor;
-    math_approach_target_with_braking(vars->cam, h - moby->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
-                  D_L07_001B0AA4 * 0.0166666675f);
+    math_approach_target_with_braking(vars->cam, h - moby->pos[2], g_group_entity_accel_step * 0.000277777785f, g_group_entity_accel_step * 0.000277777785f,
+                  g_group_entity_speed_limit * 0.0166666675f);
     moby_turn_toward_target_and_step(moby, goal_pos, turn_rate);
     return vars->f1EC;
 }

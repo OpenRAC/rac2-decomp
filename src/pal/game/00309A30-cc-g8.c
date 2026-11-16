@@ -10,19 +10,19 @@ typedef struct { float u, v; } UV_2B4918;
 typedef struct Child_2B4918 { char pad0[0xAA]; short cls; } Child_2B4918;
 typedef struct Data_2B4918 { int f0; int f4; Child_2B4918 *child; char padC[0x14]; float f20; char pad24[8]; float f2C; } Data_2B4918;
 
-extern Child_2B4918 *D_0018B130 NOT_SDA;
-extern Ids_2B4918 D_001AED90 NOT_SDA;
-extern Ids_2B4918 D_001AED98 NOT_SDA;
-extern float D_001AECF0[][4] SDATA(D_001AECF0);
-extern UV_2B4918 D_001AED70[] SDATA(D_001AED70);
+extern Child_2B4918 *g_beam_child NOT_SDA;
+extern Ids_2B4918 g_beam_ids_a NOT_SDA;
+extern Ids_2B4918 g_beam_ids_b NOT_SDA;
+extern float g_beam_quad_offsets_a[][4] SDATA(D_001AECF0);
+extern UV_2B4918 g_beam_quad_uvs[] SDATA(D_001AED70);
 /* Retail constructs the V-component address absolutely, the U base through GP. */
 extern UV_2B4918 beam_uv_absolute[] __asm__("D_001AED70") MACRO_ADDR;
-extern float D_001AED30[][4] SDATA(D_001AED30);
+extern float g_beam_quad_offsets_b[][4] SDATA(D_001AED30);
 extern float g_camera_eye_state[];
-extern UV_2B4918 D_00265FA0[];
-extern float D_00265360[][4];
-extern P3_2B4918 D_00228840[];
-extern int D_002665C0[];
+extern UV_2B4918 g_beam_uvs[];
+extern float g_beam_vectors[][4];
+extern P3_2B4918 g_beam_glint_points[];
+extern int g_beam_colors[];
 extern char g_hero_state[];
 extern void moby_transform_point_list(void *, int, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -54,7 +54,7 @@ void func_PAL_00309A30(char *m) {
     BeamVec c;
     BeamVec d;
     BeamVec e;
-    Child_2B4918 *child = D_0018B130;
+    Child_2B4918 *child = g_beam_child;
     Data_2B4918 *data = (Data_2B4918 *)*(void **)(m + 0x68);
     int i;
     int j;
@@ -66,10 +66,10 @@ void func_PAL_00309A30(char *m) {
     pk.tag[3] = 0x8000000048;
     pk.tag[0] = 0;
     if (data->f4 != 0) {
-        ids = D_001AED90;
+        ids = g_beam_ids_a;
         moby_transform_point_list(child, 2, &ids, out);
     } else {
-        ids = D_001AED98;
+        ids = g_beam_ids_b;
         moby_transform_point_list(child, 2, &ids, out);
     }
     *(Q_2B4918 *)&up = 0;
@@ -98,22 +98,22 @@ void func_PAL_00309A30(char *m) {
     for (i = 0; i < 4; i++) {
         pk.col[i] = 0x80808080;
         if (i == 0 || i == 2) {
-            FastVecScale(pk.pos[i], D_001AECF0[i], data->f2C);
+            FastVecScale(pk.pos[i], g_beam_quad_offsets_a[i], data->f2C);
         } else {
             float *v = pk.pos[i];
-            FastVecScale(v, D_001AECF0[i], data->f2C);
+            FastVecScale(v, g_beam_quad_offsets_a[i], data->f2C);
             v[2] -= math_random_float_range(0.0f, 0.1f);
         }
-        pk.uv[i][0] = D_001AED70[i].u;
+        pk.uv[i][0] = g_beam_quad_uvs[i].u;
         pk.uv[i][1] = beam_uv_absolute[i].v;
     }
     draw_world_quad(&pk, res, 0);
     for (i = 0; i < 4; i++) {
         if (i == 0 || i == 2) {
-            FastVecScale(pk.pos[i], D_001AED30[i], data->f2C);
+            FastVecScale(pk.pos[i], g_beam_quad_offsets_b[i], data->f2C);
         } else {
             float *v = pk.pos[i];
-            FastVecScale(v, D_001AED30[i], data->f2C);
+            FastVecScale(v, g_beam_quad_offsets_b[i], data->f2C);
             v[2] -= math_random_float_range(0.0f, 0.1f);
         }
     }
@@ -128,7 +128,7 @@ void func_PAL_00309A30(char *m) {
     FastVecCross(&c, &b, &a);
     pk.col[0] = pk.col[1] = pk.col[2] = pk.col[3] = 0x7F2020FF;
     for (j = 0; j < 4; j++) {
-        FastVecScale(pk.pos[j], D_001AECF0[j], 0.1f);
+        FastVecScale(pk.pos[j], g_beam_quad_offsets_a[j], 0.1f);
         transform_vector(pk.pos[j], pk.pos[j], &a);
     }
     draw_world_quad(&pk, 0, 0);
@@ -139,16 +139,16 @@ void func_PAL_00309A30(char *m) {
     VU1_addGSregister(0x4A, 0);
     font_queue_vu_state();
     for (i = 0; i < 0xC4; i++) {
-        FastVecScale(&e, D_00265360[i], data->f20);
+        FastVecScale(&e, g_beam_vectors[i], data->f20);
         transform_vector(&e, &e, mtx);
-        D_00228840[i].x = e.x;
-        D_00228840[i].y = e.y;
-        D_00228840[i].z = e.z;
-        D_00265FA0[i].v -= 0.025f;
-        if (D_00265FA0[i].v < -7.0f) {
-            D_00265FA0[i].v += 7.0f;
+        g_beam_glint_points[i].x = e.x;
+        g_beam_glint_points[i].y = e.y;
+        g_beam_glint_points[i].z = e.z;
+        g_beam_uvs[i].v -= 0.025f;
+        if (g_beam_uvs[i].v < -7.0f) {
+            g_beam_uvs[i].v += 7.0f;
         }
     }
-    part_draw_glint_effect(0x94, D_00228840, D_002665C0, D_00265FA0, 1);
-    part_draw_glint_effect(0x32, &D_00228840[0x92], &D_002665C0[0x92], &D_00265FA0[0x92], 1);
+    part_draw_glint_effect(0x94, g_beam_glint_points, g_beam_colors, g_beam_uvs, 1);
+    part_draw_glint_effect(0x32, &g_beam_glint_points[0x92], &g_beam_colors[0x92], &g_beam_uvs[0x92], 1);
 }

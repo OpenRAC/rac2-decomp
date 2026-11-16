@@ -5,7 +5,7 @@
    count drops from 80 to 79 and the freed slot (0x40 + 79 * 0x50 = 0x18F0) keeps the z read at
    init, which replaces the -1.0f passed to func_002AEE70. */
 
-extern int D_L00_001C9340;
+extern int g_tutorial_points;
 
 extern void BuildObjectAttachmentTransforms(char *, void *, int, int, int, int, int, int);
 
@@ -47,7 +47,7 @@ typedef struct {
     float startZ;
 } L00_003EC540_State;
 
-void func_US2_L00_003EC540(char *self)
+void rotating_parts_update_us2(char *self)
 {
     float angles[4];
     char mat[48];
@@ -81,7 +81,7 @@ void func_US2_L00_003EC540(char *self)
         self[0x20] = 1;
         break;
     case 1:
-        if (D_L00_001C9340 != st->level)
+        if (g_tutorial_points != st->level)
             break;
         if (st->firstStep > 0.0f)
             math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,

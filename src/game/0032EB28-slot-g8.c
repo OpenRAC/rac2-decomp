@@ -23,12 +23,12 @@ typedef struct { int active; unsigned char type; char pad[0x47]; short map; char
 typedef struct { float cost,a; int frames; float b; } Effect1271;
 typedef struct { int timer,color,alpha; float zero,a,b; char *object; int state,owner,active; char pad[8]; } Slot1271;
 extern Weapon1271 g_weapon_table[];
-extern unsigned char D_001A7A80[] MACRO_ADDR;
+extern unsigned char g_movie_seen_flags[] MACRO_ADDR;
 extern unsigned char g_item_slot_to_record[];
-extern Effect1271 D_00237DA0[2][119];
+extern Effect1271 g_health_drain_table[2][119];
 extern Slot1271 g_health_drain_slots[30];
 typedef struct { char pad[0xb8]; int owner; } Attacker341;
-extern Attacker341 *D_001B1000 __attribute__((sda));
+extern Attacker341 *g_health_drain_attacker __attribute__((sda));
 extern float *moby_get_private_value_0(void *);
 extern int moby_find_entry_index_by_id(int);
 extern void get_moby_color(void *,int *,int *,int *);
@@ -71,7 +71,7 @@ int weapon_start_health_drain(char *object,int id,int owner)
     int mode,result=1,i;
     int mask=2;
     if(!mapped) mapped=id;
-    if(!(D_001A7A80[mapped]&mask)) return 1;
+    if(!(g_movie_seen_flags[mapped]&mask)) return 1;
     mode=IsEffect1271(mapped) || IsEffect3_1271(mapped);
     {
         if(H(P(object,0x24),0x46)!=5) return 1;
@@ -88,11 +88,11 @@ int weapon_start_health_drain(char *object,int id,int owner)
                 if(!g_health_drain_slots[i].object) {
                     Slot1271 *slot=&g_health_drain_slots[i];
                     float *health;
-                    slot->timer=D_00237DA0[mode][id].frames*60;
-                    slot->a=D_00237DA0[mode][id].a; slot->b=D_00237DA0[mode][id].b;
+                    slot->timer=g_health_drain_table[mode][id].frames*60;
+                    slot->a=g_health_drain_table[mode][id].a; slot->b=g_health_drain_table[mode][id].b;
                     slot->object=object;slot->owner=owner;slot->state=0;
                     health=moby_get_private_value_0(object);
-                    *health-=D_00237DA0[mode][id].cost;
+                    *health-=g_health_drain_table[mode][id].cost;
                     {
                     int colored=0;
                     if(*(unsigned short *)(slot->object+0x34)&0x20) {
@@ -104,11 +104,11 @@ int weapon_start_health_drain(char *object,int id,int owner)
                     slot->color=(b<<16)+(g<<8)+r;
                     slot->alpha=0xff0000;slot->zero=0.0f;slot->active=1;
                     result=0;
-                    if(*health<=slot->zero && D_001B1000) {
+                    if(*health<=slot->zero && g_health_drain_attacker) {
                         FastVecScale(backwards,slot->object+0xc0,-1.0f);
                         vec_scale_to_length(damage.vector,damage.vector,0.0016666668234393f);
-                        D_001B1000->owner=slot->owner;
-                        make_hit_descriptor(damage.vector,D_001B1000,0x810000,backwards,0.001f);
+                        g_health_drain_attacker->owner=slot->owner;
+                        make_hit_descriptor(damage.vector,g_health_drain_attacker,0x810000,backwards,0.001f);
                         *(Quad341 *)damage.vector=*(Quad341 *)backwards;
                         damage.vector[3]=5627.9248046875f;
                         damage.flag=1;

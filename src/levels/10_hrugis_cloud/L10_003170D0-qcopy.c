@@ -8,8 +8,8 @@ typedef struct HrugisEffectCamera {
     float position[4];
 } HrugisEffectCamera;
 
-extern HrugisEffectCamera D_L10_001B9540;
-extern unsigned char *D_L10_001FF36C;
+extern HrugisEffectCamera g_effect_camera;
+extern unsigned char *g_smoke_particle_colors;
 extern float func_003091E8(float, float);
 extern float func_003352B8(float, float);
 extern float func_00335258(float, float);
@@ -30,8 +30,8 @@ void part_spawn_dark_smoke_radius(char *object, int joint, float radius) {
     unsigned char *data;
 
     *(TI128 *)initial = *(TI128 *)(object + 0x10);
-    heading = func_003091E8(D_L10_001B9540.position[0] - *(float *)(object + 0x10),
-                            D_L10_001B9540.position[1] - *(float *)(object + 0x14));
+    heading = func_003091E8(g_effect_camera.position[0] - *(float *)(object + 0x10),
+                            g_effect_camera.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + func_003352B8(0, radius);
     point[1] = initial[1] + func_003352B8(0, radius);
     point[2] = initial[2] + func_003352B8(0, radius);
@@ -51,6 +51,6 @@ void part_spawn_dark_smoke_radius(char *object, int joint, float radius) {
         *(int *)(data + 4) = 3;
         data[0xA] = 0x7F;
         data[0xB] = particle[0xA];
-        particle[2] = D_L10_001FF36C[1];
+        particle[2] = g_smoke_particle_colors[1];
     }
 }

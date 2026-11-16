@@ -1,8 +1,8 @@
 #include "common.h"
 
 extern u8 g_hero_state[];
-extern u8 D_L20_001B5600[], D_L20_001B5C00[];
-extern s32 D_L20_001A8F00[] __attribute__((sda));
+extern u8 g_anim_entry_buffer_low[], g_anim_entry_buffer_high[];
+extern s32 g_hero_vehicle_mode[] __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern char *moby_get_private_value_0(u8 *);
 extern void level_store_value_pair(s32, s32);
@@ -80,14 +80,14 @@ void hero_exit_vehicle_mode(s32 keep)
     hero_clear_queued_anim();
     current = *(u8 **)(g_hero_state + 0x2290);
     if (current[0x42] != 255) {
-        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)D_L20_001B5600);
+        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)g_anim_entry_buffer_low);
         *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x58) = value;
     }
     current = *(u8 **)(g_hero_state + 0x2290);
-    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)D_L20_001B5C00);
+    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)g_anim_entry_buffer_high);
     *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x5C) = value;
     if (*(s32 *)(g_hero_state + 0x2294) != 0x61) goto reset;
-    switch (D_L20_001A8F00[0]) {
+    switch (g_hero_vehicle_mode[0]) {
     case 2:
     case 6:
         goto done;

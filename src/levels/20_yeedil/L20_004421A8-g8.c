@@ -14,8 +14,8 @@ typedef struct {
 } Globals;
 
 extern Globals g_hero_state;
-extern char D_L20_001A8F20[] __attribute__((sda));
-extern float D_L20_001B2124 SDATA(D_L20_001B2124);
+extern char g_effect_color_table[] __attribute__((sda));
+extern float g_yeedil_grab_turn_scale SDATA(D_L20_001B2124);
 
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
@@ -52,7 +52,7 @@ int yeedil_boss_update_grab(char *obj) {
     }
     *(int *)(g_hero_state.hero + 0x98) = 0;
     basis = state + 0xF0;
-    moby_move_to_target_temp_limits(obj, D_L20_001A8F20, 0x10, *(float *)(obj + 0xF8), -1.0f, -1.0f);
+    moby_move_to_target_temp_limits(obj, g_effect_color_table, 0x10, *(float *)(obj + 0xF8), -1.0f, -1.0f);
     hero = g_hero_state.hero;
     *(int *)(hero + 0x98) = *(int *)(*(char **)(hero + 0x24) + 0x10);
     vec_transform_by_object_or_given(obj, basis, basis, 0);
@@ -63,7 +63,7 @@ int yeedil_boss_update_grab(char *obj) {
         rate = 0.5f;
     }
     *(float *)(state + 0x1804) =
-        FastAddRotations(*(float *)(state + 0x1804), D_L20_001B2124 * (rate * 0.000290888245f));
+        FastAddRotations(*(float *)(state + 0x1804), g_yeedil_grab_turn_scale * (rate * 0.000290888245f));
     FastVecAdd(&pos, obj + 0xC0, obj + 0x10);
     coll_sweep_from_object(obj, &pos, 0x10008, 3.0f, (float)*(u8 *)(state + 0x34), 2.0f, 0, 1, 0);
     qcopy(&pos, obj + 0x10);

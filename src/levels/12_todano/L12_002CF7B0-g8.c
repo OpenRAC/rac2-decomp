@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L12_001A8F00 __attribute__((nosda));
+extern int g_hero_l12_control_mode __attribute__((nosda));
 
-extern int D_L12_001BDB30 __attribute__((nosda));
+extern int g_level_render_word __attribute__((nosda));
 
-extern char *D_L12_001B2EA8 __attribute__((sda));
+extern char *g_level_pointer_unused __attribute__((sda));
 
 /* Clear the two flag bits on every object of the chain while a mode gate holds.
    Near miss: nonmatching/levels/func_L12_00388038.c */
@@ -20,9 +20,9 @@ extern void FastVecScale(void *, void *, float);
 
 extern void FastVecAdd(void *, void *, void *);
 
-extern char D_L12_0027F710[];
+extern char g_trail_slice_mesh[];
 
-extern int D_L12_001A9410 __attribute__((sda));
+extern int g_trail_slice_source __attribute__((sda));
 
 typedef struct {
     char pad0[0x30];
@@ -34,7 +34,7 @@ typedef struct {
     int *entries[4];
 } L12_002FFF88_STATE;
 
-extern L12_002FFF88_STATE D_L12_001BDB00;
+extern L12_002FFF88_STATE g_trail_slice_state;
 
 /* Builds the level's four trail slices for the mesh its state points at. */
 void todano_build_trail_slice_meshes(void)
@@ -51,35 +51,35 @@ void todano_build_trail_slice_meshes(void)
 
     obj = 0;
     index = -1;
-    if (D_L12_001BDB00.mode < 2) {
+    if (g_trail_slice_state.mode < 2) {
         obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
         index = 2;
     }
     if (index != -1 && obj != 0) {
-        if (D_L12_001BDB00.entries[index] != 0) {
+        if (g_trail_slice_state.entries[index] != 0) {
             char *objPos = obj + 0x10;
             char *objRot = obj + 0xC0;
-            D_L12_001BDB00.mesh = (int)D_L12_0027F710;
-            srcRow = (char *)&D_L12_001A9410;
+            g_trail_slice_state.mesh = (int)g_trail_slice_mesh;
+            srcRow = (char *)&g_trail_slice_source;
             rowOffset = 0x20;
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
-                matrix_mul_vec3((char *)(D_L12_001BDB00.mesh + rowOffset), srcRow, objRot);
-                FastVecScale((char *)(D_L12_001BDB00.mesh + rowOffset),
-                              (char *)(D_L12_001BDB00.mesh + rowOffset), scale);
-                FastVecAdd((char *)(D_L12_001BDB00.mesh + rowOffset),
-                              (char *)(D_L12_001BDB00.mesh + rowOffset), objPos);
+                matrix_mul_vec3((char *)(g_trail_slice_state.mesh + rowOffset), srcRow, objRot);
+                FastVecScale((char *)(g_trail_slice_state.mesh + rowOffset),
+                              (char *)(g_trail_slice_state.mesh + rowOffset), scale);
+                FastVecAdd((char *)(g_trail_slice_state.mesh + rowOffset),
+                              (char *)(g_trail_slice_state.mesh + rowOffset), objPos);
                 rowOffset += 0x10;
                 srcRow += 0x10;
             }
-            *(int *)(D_L12_001BDB00.mesh + 0x68) = D_L12_001BDB00.entries[index];
+            *(int *)(g_trail_slice_state.mesh + 0x68) = g_trail_slice_state.entries[index];
         }
     }
-    if (D_L12_001BDB00.mode == 0 && D_L12_001BDB00.count >= 0x925)
-        D_L12_001BDB00.mesh = 0;
-    if (D_L12_001BDB00.mode == 1 && D_L12_001BDB00.count < 0x3C)
-        D_L12_001BDB00.mesh = 0;
+    if (g_trail_slice_state.mode == 0 && g_trail_slice_state.count >= 0x925)
+        g_trail_slice_state.mesh = 0;
+    if (g_trail_slice_state.mode == 1 && g_trail_slice_state.count < 0x3C)
+        g_trail_slice_state.mesh = 0;
 }
 
 typedef int Quadword89F80 __attribute__((mode(TI)));

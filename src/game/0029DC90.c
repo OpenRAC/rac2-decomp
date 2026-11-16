@@ -3,17 +3,17 @@
    retail's absolute lui + load through the destination register, never in a delay slot, while the
    first byte stays split. Without the offset the load moves into a delay slot as one $gp load. */
 
-extern unsigned char D_001395C1[];
-extern unsigned char D_001A7B00[] __attribute__((sda));
+extern unsigned char g_menu_status_bytes[];
+extern unsigned char g_inventory_have_flags[] __attribute__((sda));
 
 /* Returns 1 only if three separate status bytes are all non-zero. */
 int menu_are_all_status_bytes_set(void)
 {
-    if (D_001395C1[0] == 0)
+    if (g_menu_status_bytes[0] == 0)
         goto no;
-    if (D_001A7B00[5] == 0)
+    if (g_inventory_have_flags[5] == 0)
         goto no;
-    if (D_001A7B00[12] != 0)
+    if (g_inventory_have_flags[12] != 0)
         return 1;
 no:
     return 0;

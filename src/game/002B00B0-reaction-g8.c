@@ -11,7 +11,7 @@ extern int moby_pick_random_matching(void *, int, int *, float *, float *, float
                          float *, float *, float *);
 extern void anim_start_blended(void *, int, int, int);
 extern void gfx_start_color_fade(void *, void *);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern float vec_get_vertical_offset(void *, void *, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -132,7 +132,7 @@ update:
         goto done;
     if (!valid)
         goto done;
-    if (D_001A8CA0) {
+    if (g_ground_check_inhibit) {
         length = vec_get_vertical_offset(object, vector, 0);
         if (length < 1.0f)
             length = 1.0f;

@@ -92,7 +92,7 @@ typedef struct {
 } PlaybackStream;
 extern PlaybackStream g_music_state;
 typedef struct { char pad[0xB0]; float fieldOfView; } PlaybackScreen;
-extern PlaybackScreen D_001B9040;
+extern PlaybackScreen g_view_params;
 typedef struct {
     char pad00[0x140];
     float position[4], rotation[4];
@@ -100,27 +100,27 @@ typedef struct {
     float forward[4], right[4], up[4];
 } PlaybackCamera;
 extern PlaybackCamera g_active_camera;
-extern char D_001B4580[], g_hero_state[];
-extern char D_00261FE0[], D_001CE4EA[];
-extern char D_001A8C30[] __attribute__((sda));
-extern char *D_001B1B60[] __attribute__((sda));
-extern char *D_001B2148;
-extern char *D_001B1C4C[] __attribute__((sda));
+extern char g_hero_joint_buffer[], g_hero_state[];
+extern char g_scene_skip_table[], g_hero_class_slot_flags[];
+extern char g_robot_part_ids_c[] __attribute__((sda));
+extern char *g_moby_pool_end[] __attribute__((sda));
+extern char *g_transition_effect_list;
+extern char *g_vec_record_table[] __attribute__((sda));
 extern PlaybackMoby *g_equipment_pieces[];
 typedef struct { float x, y, z, w; } PlaybackPoint;
 typedef struct { int count; char pad04[0xC]; PlaybackPoint points[1]; } PlaybackCurve;
 typedef struct { char pad00[0x10]; unsigned char n10; char pad11[2]; unsigned char n13; char pad14[8]; int a1C[1]; } PlaybackBones;
 extern PlaybackCurve *g_path_table[];
 extern float g_screen_fade __attribute__((sda));
-extern float D_001B15A4 __attribute__((sda));
+extern float g_screen_flash_alpha __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int D_001B1694 __attribute__((sda));
-extern int D_001A8B84 __attribute__((sda));
+extern int g_mode_change_flag __attribute__((sda));
+extern int g_frontend_done_flag __attribute__((sda));
 extern int g_current_game_mode __attribute__((sda));
 extern unsigned int g_equipment_bits[] __attribute__((sda));
-extern short D_0018C31C;
-extern float D_001AC1B0[] SDATA(D_001AC1B0);
-extern float D_001AC1C0[] SDATA(D_001AC1C0);
+extern short g_hud_offset_flag;
+extern float g_hero_attach_offset[] SDATA(D_001AC1B0);
+extern float g_companion_attach_offset[] SDATA(D_001AC1C0);
 extern void game_reset_frame_counters(void), moby_update_visible_objects(void), snd_run_callbacks(void);
 extern void stub_empty_2(void), part_update_all(void), gfx_select_packet_buffer_setup(void);
 extern void load_select_segment_update_world(int), FadeToBlack(int), UpdateViewContext(void);
@@ -181,9 +181,9 @@ int UpdatePlaybackScene(void)
         scene->frame++;
         {
             int skipIndex, advance, chunkLength;
-            for (skipIndex=0; W(D_00261FE0,scene->selected*32 + skipIndex*8)>=0; skipIndex++) {
-                if (scene->frame==W(D_00261FE0,scene->selected*32 + skipIndex*8)) {
-                    advance=W(D_00261FE0,scene->selected*32 + skipIndex*8+4);
+            for (skipIndex=0; W(g_scene_skip_table,scene->selected*32 + skipIndex*8)>=0; skipIndex++) {
+                if (scene->frame==W(g_scene_skip_table,scene->selected*32 + skipIndex*8)) {
+                    advance=W(g_scene_skip_table,scene->selected*32 + skipIndex*8+4);
                     chunkLength=g_is_pal_video ? 80 : 96;
                     scene->frame+=advance;
                     scene->streamFrame+=advance;
@@ -233,7 +233,7 @@ int UpdatePlaybackScene(void)
         if (scene->frame>=scene->endFrame) {
             if ((unsigned short)((unsigned short)g_music_state.mode-6)>=2) g_music_state.mode=5;
             gfx_select_packet_buffer_setup();
-            D_001B9040.fieldOfView=0.62f;
+            g_view_params.fieldOfView=0.62f;
             UpdateViewContext();
             {
                 int cleanupIndex;
@@ -254,12 +254,12 @@ int UpdatePlaybackScene(void)
             }
             {
                 char *scan_moby;
-                for (scan_moby=D_001B1B60[0];B(scan_moby,0x20)!=255;scan_moby+=0x100) {
+                for (scan_moby=g_moby_pool_end[0];B(scan_moby,0x20)!=255;scan_moby+=0x100) {
                     if (!(B(scan_moby,0x20)&0x80) && (H(scan_moby,0xAA)==0x4A /* moby class 74 */ || H(scan_moby,0xAA)==MOBY_CLASS_DECOY)) UH(scan_moby,0x34)&=0xFF7F;
                 }
             }
             if (state->mode==0) {
-                if (!request_begin_slot(3,1,4,0,0)) D_001B1694=1;
+                if (!request_begin_slot(3,1,4,0,0)) g_mode_change_flag=1;
             } else request_end_slot(0,0);
         } else {
             {
@@ -282,7 +282,7 @@ int UpdatePlaybackScene(void)
             key=scene->keys+scene->streamFrame*32;
             last=B(key,0xC);
             rotation=key+0x10;
-            D_001B9040.fieldOfView=F(rotation,0xC);
+            g_view_params.fieldOfView=F(rotation,0xC);
             UpdateViewContext();
             qcopy(g_active_camera.position,key);
             transform_vector(g_active_camera.position,g_active_camera.position,matrix);
@@ -334,10 +334,10 @@ int UpdatePlaybackScene(void)
                         int j, cast;
                         object->mobyState=4;
                         UpdateEquipmentPieces(object);
-                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54 /* moby class 3412 */) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
+                        if (!g_transition_effect_list || H(g_transition_effect_list,0xAA)==0xD54 /* moby class 3412 */) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
                         gfx_register_world_draw_callback(gfx_draw_ground_shadow,object);
                         cast_moby=0;
-                        j=H(D_001A8C30,((g_equipment_bits[0]>>3)&2));
+                        j=H(g_robot_part_ids_c,((g_equipment_bits[0]>>3)&2));
                         for(cast=0;g_equipment_pieces[cast];cast++) {
                             if(g_equipment_pieces[cast]->mobyState>=5) g_equipment_pieces[cast]->mobyState=4;
                             if(j==g_equipment_pieces[cast]->classId) {cast_moby=g_equipment_pieces[cast];break;}
@@ -345,7 +345,7 @@ int UpdatePlaybackScene(void)
                         if(cast_moby) {
                             if(state->mode==0) {
                                 int offset,color;
-                                offset=D_0018C31C ? 144 : -18;
+                                offset=g_hud_offset_flag ? 144 : -18;
                                 if(scene->frame<504-offset) {
                                     color=(int)((scene->frame-(360.0f-offset))*1.5f);
                                     if(color>255) color=255;
@@ -357,13 +357,13 @@ int UpdatePlaybackScene(void)
                                         gfx_register_world_draw_callback(part_draw_glow_quads,object);
                                     }
                                     if(scene->frame>464-offset) {
-                                        D_001B15A4+=0.027f;
-                                        if(D_001B15A4>1.0f) D_001B15A4=1.0f;
+                                        g_screen_flash_alpha+=0.027f;
+                                        if(g_screen_flash_alpha>1.0f) g_screen_flash_alpha=1.0f;
                                     }
                                 } else {
                                     cast_moby->color=0xA0A0A0;
-                                    D_001B15A4-=0.027f;
-                                    if(D_001B15A4<0.0f) D_001B15A4=0.0f;
+                                    g_screen_flash_alpha-=0.027f;
+                                    if(g_screen_flash_alpha<0.0f) g_screen_flash_alpha=0.0f;
                                 }
                             } else {
                                 if(scene->frame<150) {
@@ -412,7 +412,7 @@ int UpdatePlaybackScene(void)
                 state->hero->updateState=0;
                 state->hero->flags|=6;
                 state->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
-                if (B(D_001CE4EA,0)!=255 && H(global,0x24FC)==0) {
+                if (B(g_hero_class_slot_flags,0)!=255 && H(global,0x24FC)==0) {
                     state->companion=CreateMoby(10);
                     state->companion->drawDistance=0x1FF;
                     state->companion->opacity=255;
@@ -485,14 +485,14 @@ int UpdatePlaybackScene(void)
         if (state->cameraStart>=0 && state->cameraEnd>=0) {
             float angle;
             math_step_value_toward_target(&state->cameraBlend,&state->cameraVelocity,1.0f,0.00018500001f,0.00018500001f,0.008333334f);
-            lerp_vector(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
+            lerp_vector(matrix,g_vec_record_table[0]+state->cameraStart*128+0x30,g_vec_record_table[0]+state->cameraEnd*128+0x30,state->cameraBlend);
             vec_clear_128(matrix+4);
-            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+state->cameraEnd*128,0x74),F(g_vec_record_table[0]+state->cameraStart*128,0x74));
             matrix[5]=angle*state->cameraBlend;
-            matrix[5]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
-            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
+            matrix[5]=FastAddRotations(F(g_vec_record_table[0]+state->cameraStart*128,0x74),matrix[5]);
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+state->cameraEnd*128,0x78),F(g_vec_record_table[0]+state->cameraStart*128,0x78));
             matrix[6]=angle*state->cameraBlend;
-            matrix[6]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
+            matrix[6]=FastAddRotations(F(g_vec_record_table[0]+state->cameraStart*128,0x78),matrix[6]);
             object_copy_vector_to_selected(matrix);
             cam_set_state_rotation(matrix+4);
         }
@@ -537,7 +537,7 @@ int UpdatePlaybackScene(void)
                 if(state->object->effectOpacity<160) state->object->effectOpacity+=8;
                 state->progress+=step;
                 ship_spawn_exhaust_puffs(state->object);
-                if(state->progress>(float)(curve->count-1) || g_screen_fade>=1.0f) D_001A8B84=1;
+                if(state->progress>(float)(curve->count-1) || g_screen_fade>=1.0f) g_frontend_done_flag=1;
                 else {
                     path_sample_position(curve,1,state->object->position,state->object->rotation,0,state->progress);
                     state->object->rotation[0]=state->object->rotation[3];
@@ -547,23 +547,23 @@ int UpdatePlaybackScene(void)
                 }
             }
             qcopy_nc(state->hero->rotation,state->object->rotation);
-            matrix_mul_vec3(state->hero->position,D_001AC1B0,state->object->matrix);
+            matrix_mul_vec3(state->hero->position,g_hero_attach_offset,state->object->matrix);
             FastVecAdd(state->hero->position,state->hero->position,state->object->position);
             func_002A0F48(state->hero);
             classData=state->hero->classData;
             bones=(PlaybackBones *)P(classData,0x48);
             table=&bones->a1C[bones->n10];
-            func_002A1130(table+bones->n13,bones->a1C[0],D_001B4580,B(classData,8));
-            state->hero->joints=D_001B4580;
-            state->hero->previousJoints=D_001B4580;
+            func_002A1130(table+bones->n13,bones->a1C[0],g_hero_joint_buffer,B(classData,8));
+            state->hero->joints=g_hero_joint_buffer;
+            state->hero->previousJoints=g_hero_joint_buffer;
             if(state->companion) {
                 qcopy_nc(state->companion->rotation,state->object->rotation);
-                matrix_mul_vec3(state->companion->position,D_001AC1C0,state->object->matrix);
+                matrix_mul_vec3(state->companion->position,g_companion_attach_offset,state->object->matrix);
                 FastVecAdd(state->companion->position,state->companion->position,state->object->position);
                 func_002A0F48(state->companion);
             }
         } else {
-            D_001A8B84=1;
+            g_frontend_done_flag=1;
             g_screen_fade=1.0f;
         }
         UpdateEquipmentPieces(state->object);

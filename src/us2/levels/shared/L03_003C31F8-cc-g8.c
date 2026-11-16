@@ -12,22 +12,22 @@ typedef union { Quad q; float f[4]; } MotionVector;
 typedef struct {
     u8 reserved00[0x18]; u8 enabled, count, kind; u8 reserved1B[0x65]; u8 payload[1];
 } DispatchContext;
-extern float g_hero_position[], D_00189F00[];
+extern float g_hero_position[], g_hero_target_point[];
 extern u8 g_hero_state[];
 typedef union { u8 b[0x2600]; u8 *ptr[0x980]; float f[0x980]; } Hero;
-extern u16 D_0018CB20[], D_0018CB38[], D_0018CDCC[];
-extern u16 D_0018CB2C[], D_0018CF58[], D_0018CDE4[];
-extern int D_0018CB4C[];
+extern u16 g_bot_voice_played_first[], g_bot_voice_played_second[], g_bot_voice_played_third[];
+extern u16 g_bot_flag_reset_first[], g_bot_state_id[], g_timed_effect_id[];
+extern int g_bot_voice_counter[];
 extern int g_frame_l03_counter MACRO_ADDR;
-extern u8 *D_L03_001B2A1C MACRO_ADDR;
-extern u8 *D_L03_001B2A20 MACRO_ADDR;
-extern u8 *D_L03_001BFDD8[];
-extern float D_L03_001AFEE0 __attribute__((sda));
-extern float D_L03_001AFEE4 __attribute__((sda));
-extern float D_L03_001AFEE8 __attribute__((sda));
-extern float D_L03_001AFEEC __attribute__((sda));
-extern float D_L03_001AFEF0 __attribute__((sda));
-extern float D_L03_001AFEF4 __attribute__((sda));
+extern u8 *g_moby_record_base MACRO_ADDR;
+extern u8 *g_moby_record_end MACRO_ADDR;
+extern u8 *g_collision_hit_result[];
+extern float g_bot_move_speed __attribute__((sda));
+extern float g_bot_chase_distance __attribute__((sda));
+extern float g_bot_speed_limit_a __attribute__((sda));
+extern float g_bot_turn_limit_a __attribute__((sda));
+extern float g_bot_speed_limit_b __attribute__((sda));
+extern float g_bot_turn_limit_b __attribute__((sda));
 extern void UpdateCommandedMoby(u8 *);
 extern int flag_set_second_pending(u8 *);
 extern int flag_set_first_pending(u8 *);
@@ -61,7 +61,7 @@ extern void moby_mark_spawned(void *);
 extern u8 *moby_find_nearest_tilt_target(u8 *);
 extern void entity_stun_in_front(u8 *, float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern int func_US2_002AF9C8(char *, float);
+extern int math_is_value_within_step_us2(char *, float);
 extern int coll_test_hit_at_bone(float, float, float, void *, int, int, int, int, int);
 extern float moby_get_anim_value(char *);
 extern float vec_step_toward_target_limited(void *, void *, float);
@@ -79,7 +79,7 @@ extern void euler_rotation_basis(void *, void *);
 extern void bot_update_timers_and_path(u8 *), func_002A677C(u8 *);
 extern int moby_step_at_own_position(char *);
 
-void func_US2_L03_003C31F8(u8 *object)
+void bot_update_us2(u8 *object)
 {
     MotionVector point, other, delta;
     u8 *state = *(u8 **)(object + 0x68);
@@ -93,38 +93,38 @@ void func_US2_L03_003C31F8(u8 *object)
         break;
     case 1:
         if (flag_set_second_pending(object)) {
-            moby_set_controller_speed_limits(object, D_L03_001AFEF0 * 0.00027777778f, D_L03_001AFEF4 * 0.016666668f,
+            moby_set_controller_speed_limits(object, g_bot_speed_limit_b * 0.00027777778f, g_bot_turn_limit_b * 0.016666668f,
                           0.0034906589426100254f, 0.10471977293491364f);
             ((MotionInit *)state)->acceleration = 0.0016666667f;
-            ((MotionInit *)state)->max_speed = D_L03_001AFEE0;
+            ((MotionInit *)state)->max_speed = g_bot_move_speed;
         }
         break;
     case 2:
         if (flag_set_second_pending(object)) {
-            moby_set_controller_speed_limits(object, D_L03_001AFEE8 * 0.00027777778f, D_L03_001AFEEC * 0.016666668f,
+            moby_set_controller_speed_limits(object, g_bot_speed_limit_a * 0.00027777778f, g_bot_turn_limit_a * 0.016666668f,
                           0.006981317885220051f, 0.20943954586982727f);
             (*(float *)(state + 0x144)) = 0.0f; (*(float *)(state + 0x134)) = 0.0055555557f;
         }
         break;
     case 3:
         if (flag_set_second_pending(object)) {
-            moby_set_controller_speed_limits(object, D_L03_001AFEF0 * 0.00027777778f, D_L03_001AFEF4 * 0.016666668f,
+            moby_set_controller_speed_limits(object, g_bot_speed_limit_b * 0.00027777778f, g_bot_turn_limit_b * 0.016666668f,
                           0.006981317885220051f, 0.20943954586982727f);
             (*(float *)(state + 0x134)) = 0.0055555557f; (*(float *)(state + 0x144)) = 0.1f;
         }
         break;
     case 4:
-        moby_set_controller_speed_limits(object, D_L03_001AFEF0 * 0.00027777778f, D_L03_001AFEF4 * 0.016666668f,
+        moby_set_controller_speed_limits(object, g_bot_speed_limit_b * 0.00027777778f, g_bot_turn_limit_b * 0.016666668f,
                       0.0034906589426100254f, 0.10471977293491364f);
         (*(float *)(state + 0x134)) = 0.0016666667f; (*(float *)(state + 0x144)) = 0.4f;
         break;
     case 5:
-        moby_set_controller_speed_limits(object, D_L03_001AFEF0 * 0.00027777778f, D_L03_001AFEF4 * 0.016666668f,
+        moby_set_controller_speed_limits(object, g_bot_speed_limit_b * 0.00027777778f, g_bot_turn_limit_b * 0.016666668f,
                       0.0034906589426100254f, 0.10471977293491364f);
         (*(float *)(state + 0x134)) = 0.0016666667f; (*(float *)(state + 0x144)) = 0.05f;
         break;
     case 6:
-        moby_set_controller_speed_limits(object, D_L03_001AFEF0 * 0.00027777778f, D_L03_001AFEF4 * 0.016666668f,
+        moby_set_controller_speed_limits(object, g_bot_speed_limit_b * 0.00027777778f, g_bot_turn_limit_b * 0.016666668f,
                       0.006981317885220051f, 0.20943954586982727f);
         (*(float *)(state + 0x134)) = 0.005f; (*(float *)(state + 0x144)) = 0.05f;
         break;
@@ -141,17 +141,17 @@ void func_US2_L03_003C31F8(u8 *object)
                 type = *(s16 *)(object + 0xAA);
                 switch (type) {
                 case 0x940:
-                    if (D_0018CB20[0] == 0) func_US2_00289840(0x9CF, 0x26);
+                    if (g_bot_voice_played_first[0] == 0) func_US2_00289840(0x9CF, 0x26);
                     break;
                 case 0x93C:
-                    if (D_0018CB38[0] == 0) func_US2_00289840(0x9D1, 0x28);
+                    if (g_bot_voice_played_second[0] == 0) func_US2_00289840(0x9D1, 0x28);
                     break;
                 case 0xA59:
-                    if (D_0018CDCC[0] == 0) func_US2_00289840(0xA08, 0x5F);
+                    if (g_bot_voice_played_third[0] == 0) func_US2_00289840(0xA08, 0x5F);
                     break;
                 case 0x964:
                 default:
-                    if (D_0018CB4C[0] >= 0) func_US2_00289840(0x9D2, 0x29);
+                    if (g_bot_voice_counter[0] >= 0) func_US2_00289840(0x9D2, 0x29);
                     break;
                 }
                 moby_set_state(object, 4, 1);
@@ -172,12 +172,12 @@ void func_US2_L03_003C31F8(u8 *object)
                 moby_push_toward_target(object, &((Hero *)g_hero_state)->b[0x80]);
             moby_turn_toward_move_direction(object);
             distance = vec_distance_xy(object + 0x10, g_hero_state + 0x80);
-            if (D_L03_001AFEE4 < distance && route_check_points((u32)(*(int *)(state + 0x220)), object + 0x10, g_hero_state + 0x80)) {
+            if (g_bot_chase_distance < distance && route_check_points((u32)(*(int *)(state + 0x220)), object + 0x10, g_hero_state + 0x80)) {
                 moby_set_state(object, 3, -1);
                 if (object[0x43] != 2) anim_start_blended(object, 2, math_random_int_below((*(u8 *)(*(u8 **)(*(u8 **)(object + 0x24) + 0x50) + 0x10))), 10);
             } else {
                 if (object[0x31] && object[0x42] != 1) {
-                    if ((*(int *)(state + 0x380)) < 5) moby_aim_body_toward_point(object, D_00189F00);
+                    if ((*(int *)(state + 0x380)) < 5) moby_aim_body_toward_point(object, g_hero_target_point);
                     else bot_update_head_tilt(object);
                 }
             }
@@ -191,8 +191,8 @@ void func_US2_L03_003C31F8(u8 *object)
             }
             break;
         case 3:
-            if (!bot_move_toward_waypoint(object, (int)g_hero_position, 1) || (*(float *)(state + 0x1DC)) < D_L03_001AFEE0 ||
-                ((*(int *)(state + 0x190)) > 60 && (*(float *)(state + 0x1DC)) < D_L03_001AFEE4)) {
+            if (!bot_move_toward_waypoint(object, (int)g_hero_position, 1) || (*(float *)(state + 0x1DC)) < g_bot_move_speed ||
+                ((*(int *)(state + 0x190)) > 60 && (*(float *)(state + 0x1DC)) < g_bot_chase_distance)) {
                 moby_set_state(object, 4, -1);
                 if (object[0x43]) anim_start_blended(object, 0, math_random_int_below((*(u8 *)(*(u8 **)(*(u8 **)(object + 0x24) + 0x48) + 0x10))), 10);
             }
@@ -208,7 +208,7 @@ void func_US2_L03_003C31F8(u8 *object)
             FastVecAdd(&point, &point, object + 0x10);
             bot_move_toward_waypoint(object, (int)&point, 1);
             if (*(u16 *)(object + 0x96) >= 61) {
-                (*(float *)(state + 0x144)) = D_L03_001AFEE0;
+                (*(float *)(state + 0x144)) = g_bot_move_speed;
                 moby_set_state(object, 4, 1);
                 if (object[0x43]) anim_start_blended(object, 0, math_random_int_below((*(u8 *)(*(u8 **)(*(u8 **)(object + 0x24) + 0x48) + 0x10))), 10);
             }
@@ -273,14 +273,14 @@ void func_US2_L03_003C31F8(u8 *object)
                 qcopy(&point, object + 0x10); point.f[2] += 0.2f;
                 vec_scale_to_length(&other, object + 0xC0, 0.3330000042915344f);
                 FastVecAdd(&other, &other, object + 0x10); other.f[2] += 0.2f;
-                if (CollLine(&point, &other, 0, object, 0) && D_L03_001BFDD8[0] == (*(u8 **)(state + 0x358))) {
+                if (CollLine(&point, &other, 0, object, 0) && g_collision_hit_result[0] == (*(u8 **)(state + 0x358))) {
                     moby_set_state(object, 10, -1);
                     if (object[0x43] != 4) anim_start_blended(object, 4, 0, 10);
                 }
             }
             break;
         case 10:
-            if (func_US2_002AF9C8((char *)object, 14.0f))
+            if (math_is_value_within_step_us2((char *)object, 14.0f))
                 coll_test_hit_at_bone(0.3330000042915344f, 4.0f, 1.0f, object, 1, 0x10000, 0, 1, 0);
             else if (object[0x60] & 2) {
                 (*(u8 **)(state + 0x358)) = moby_find_nearest_tilt_target(object);
@@ -306,7 +306,7 @@ void func_US2_L03_003C31F8(u8 *object)
             break;
         case 14:
             bot_move_toward_waypoint(object, (int)(state + 0x340), 0);
-            if (flag_set_first_pending(object)) D_0018CB2C[0] = -1;
+            if (flag_set_first_pending(object)) g_bot_flag_reset_first[0] = -1;
             if ((*(u8 **)(state + 0x194))) entity_stun_in_front(object, FastAddRotations((*(float *)(object + 0xF8)), 3.141592741012573f));
             if ((*(int *)(state + 0x1A4)) & 0x80) moby_set_state(object, 15, -1);
             break;
@@ -367,7 +367,7 @@ void func_US2_L03_003C31F8(u8 *object)
                     moby_set_state(object, 6, 1); moby_set_flag_bit((*(u8 **)(state + 0x358)), 0);
                 }
             }
-            D_0018CF58[0] = -1;
+            g_bot_state_id[0] = -1;
             break;
         case 20:
             bot_move_toward_waypoint(object, (int)(state + 0x340), 0);
@@ -377,11 +377,11 @@ void func_US2_L03_003C31F8(u8 *object)
         case 21:
             if (flag_set_first_pending(object)) {
                 if (object[0x43] != 5) anim_start_blended(object, 5, 0, 10);
-                D_0018CDE4[0] = -1;
+                g_timed_effect_id[0] = -1;
             }
             moby_start_effect_from_entry((int)object, mat_fast_helper_a(*(float *)((*(u8 **)(state + 0x358)) + 0x10) - (*(float *)(object + 0x10)), *(float *)((*(u8 **)(state + 0x358)) + 0x14) - (*(float *)(object + 0x14))));
             if (object[0x60] & 2) moby_set_state(object, 6, 1);
-            else if (func_US2_002AF9C8((char *)object, 20.0f)) moby_set_flag_bit((*(u8 **)(state + 0x358)), 1);
+            else if (math_is_value_within_step_us2((char *)object, 20.0f)) moby_set_flag_bit((*(u8 **)(state + 0x358)), 1);
             break;
         case 22: {
             MotionVector *offset;
@@ -411,9 +411,9 @@ void func_US2_L03_003C31F8(u8 *object)
                     floor = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
                     if ((*(float *)(object + 0x18)) <= floor) {
                         (*(float *)(object + 0x18)) = floor; moby_set_state(object, 4, 1);
-                        for (member = D_L03_001B2A1C; member <= D_L03_001B2A20; member += 256) {
+                        for (member = g_moby_record_base; member <= g_moby_record_end; member += 256) {
                             if (*(s16 *)(member + 0xAA) == 0xF2D && route_check_object_points(member, object + 0x10, object + 0x10)) {
-                                (*(int *)(state + 0x220)) = ((int)member - (int)D_L03_001B2A1C) >> 8;
+                                (*(int *)(state + 0x220)) = ((int)member - (int)g_moby_record_base) >> 8;
                                 (*(int *)(state + 0x368)) = -1; (*(int *)(state + 0x36C)) = -1;
                             }
                         }

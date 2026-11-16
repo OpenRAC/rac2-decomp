@@ -4,25 +4,25 @@
 extern void FastVecAdd(void *, void *, void *);
 typedef int TI16_2B41A8 __attribute__((mode(TI)));
 typedef struct { float x, y, z; } Vec3_2B41A8;
-extern const Vec3_2B41A8 D_001AA060, D_001AA070, D_001AA080, D_001AA090, D_001AA0A0, D_001AA0B0;
+extern const Vec3_2B41A8 g_controller_param_vec_a, g_controller_param_vec_b, g_controller_param_vec_c, g_controller_param_vec_d, g_controller_param_vec_e, g_controller_param_vec_f;
 extern float math_random_angle(void);
 extern void matrix_mul_vec3(void *, void *, void *);
 
-void func_PAL_002B4D38(char *obj, char *dst, char *p2, char *p3, float *p4, float *p5, float *p6, float *p7,
+void moby_init_controller_params_pal(char *obj, char *dst, char *p2, char *p3, float *p4, float *p5, float *p6, float *p7,
                    float *p8, float *p9, float *p10)
 {
     Vec3_2B41A8 v0, v1, v2, v3, v4, v5, v6;
     float *a, *b, *c, *d, *e, *f, *g;
     float *o0, *o1, *o2, *o3, *o4, *o5, *o6, *o7;
     int i;
-    v0 = D_001AA060;
-    v1 = D_001AA070;
-    v2 = D_001AA080;
-    v3 = D_001AA090;
-    v4 = D_001AA0A0;
-    v5 = D_001AA090;
+    v0 = g_controller_param_vec_a;
+    v1 = g_controller_param_vec_b;
+    v2 = g_controller_param_vec_c;
+    v3 = g_controller_param_vec_d;
+    v4 = g_controller_param_vec_e;
+    v5 = g_controller_param_vec_d;
     *(unsigned short *)(obj + 0x34) |= 0x100;
-    v6 = D_001AA0B0;
+    v6 = g_controller_param_vec_f;
     if (p2 != 0) {
         matrix_mul_vec3(dst, p2, obj + 0xC0);
         FastVecAdd(dst, dst, obj + 0x10);

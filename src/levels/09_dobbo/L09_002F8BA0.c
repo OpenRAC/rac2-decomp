@@ -1,12 +1,12 @@
 #include "common.h"
 
-extern int D_L09_001B3620[] MACRO_ADDR;
-extern int D_L09_001B3660[] MACRO_ADDR;
-extern int D_L09_001B36A0[] MACRO_ADDR;
-extern int D_L09_001B36E0[] MACRO_ADDR;
-extern int D_L09_001B3720[] MACRO_ADDR;
-extern int D_L09_001B3760[] MACRO_ADDR;
-extern int D_L09_001B37A0[] MACRO_ADDR;
+extern int g_beam_slot_angle_x[] MACRO_ADDR;
+extern int g_beam_slot_angle_y[] MACRO_ADDR;
+extern int g_beam_slot_angle_z[] MACRO_ADDR;
+extern int g_beam_slot_light_handle[] MACRO_ADDR;
+extern int g_beam_slot_light_handle_alt[] MACRO_ADDR;
+extern int g_beam_slot_third_value[] MACRO_ADDR;
+extern int g_beam_slot_flag[] MACRO_ADDR;
 
 extern void VU1_addGSregister(int, unsigned long long);
 extern void gfx_append_vectors_to_packet(int, int, unsigned long, int, unsigned long);
@@ -14,10 +14,10 @@ extern void scale_vector_xyz_in_place(void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern int math_fast_helper_a(void *, float);
 extern int level_is_resident_flag_clear(void);
-extern float D_L09_001B37E0[16] MACRO_ADDR;
-extern char D_L09_00256510[][0x60];
-extern int D_L09_001B35E0[16] MACRO_ADDR;
-extern unsigned char *D_L09_00255E90[16][2];
+extern float g_beam_slot_uv_scroll[16] MACRO_ADDR;
+extern char g_beam_strip_buffers[][0x60];
+extern int g_beam_slot_state_2[16] MACRO_ADDR;
+extern unsigned char *g_sound_slot_ptrs[16][2];
 extern unsigned char *CreateMoby(int);
 extern float IntToFloat(int);
 extern void gfx_queue_draw_callback(void *, void *);
@@ -27,7 +27,7 @@ extern void DrawDobboPairedGlowQuads(void *, int, int);
 extern void DrawBeamLinkStrip(int, int, void *, int, int, int, int, int);
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -40,10 +40,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L09_001AC810 __attribute__((sda));
-extern int D_L09_001B2FF0 __attribute__((sda)), D_L09_001B2FF8 __attribute__((sda));
-extern Collision D_L09_001BFE40;
-extern Material D_L09_002651F0[];
+extern int g_debris_l09_model_ptr __attribute__((sda));
+extern int g_ripple_surface_handle __attribute__((sda)), g_ripple_surface_param __attribute__((sda));
+extern Collision g_collision_l09_result;
+extern Material g_item_l09_record_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -91,10 +91,10 @@ extern void moby_update_attached_transforms(unsigned char *, unsigned char *);
 /* the sixteen-float record starter, called here for its live-record flag */
 extern int Spline_AdvanceByDistance(char *, char *, char *, char *, int, float);
 
-extern unsigned int D_L09_001FE6C0[];
+extern unsigned int g_path_l09_table[];
 
 /* Level 09 table of track pointers, indexed by a record byte. */
-extern short *D_L09_001FB560[];
+extern short *g_track_entry_table[];
 
 extern float math_random_angle(void);
 extern void beam_slot_clear_by_index(int);
@@ -188,7 +188,7 @@ void debris_update_falling(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L09_002651F0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l09_record_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -200,14 +200,14 @@ void debris_update_falling(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L09_001B2FF0, D_L09_001B2FF8, 1,
+            RippleDisturb(g_ripple_surface_handle, g_ripple_surface_param, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L09_001BFE40.point.f[2];
+            frame.position.f[2] = g_collision_l09_result.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -227,16 +227,16 @@ void debris_update_falling(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L09_001BFE40;
+            Collision *collision = &g_collision_l09_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L09_001BFE40;
+                reread = &g_collision_l09_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L09_001AC810 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_debris_l09_model_ptr && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -297,7 +297,7 @@ void debris_update_ground(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L09_002651F0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l09_record_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -307,16 +307,16 @@ void debris_update_ground(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L09_001BFE40;
+        collision = &g_collision_l09_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L09_001BFE40;
+            reread = &g_collision_l09_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L09_001AC810 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_debris_l09_model_ptr && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -328,7 +328,7 @@ void debris_update_ground(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L09_001BFE40;
+            collision = &g_collision_l09_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
@@ -484,7 +484,7 @@ typedef struct {
     char pad2C[0xC];
     float high;
 } DobboLimits;
-extern DobboLimits D_L09_001C9F80;
+extern DobboLimits g_dobbo_limits;
 extern void dobbo_handle_damage(unsigned char *);
 extern int PlayMobySound(int, int, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -516,15 +516,15 @@ void UpdateBeamLinkEmitter(unsigned char *object)
     Vec point, direction;
     int i;
 
-    if (D_L09_001C9F80.mode) {
-        if (F32(object, 0x18) < D_L09_001C9F80.low && D_L09_001C9F80.side == 1)
+    if (g_dobbo_limits.mode) {
+        if (F32(object, 0x18) < g_dobbo_limits.low && g_dobbo_limits.side == 1)
             return;
-        if (D_L09_001C9F80.low < F32(object, 0x18) && D_L09_001C9F80.side == 0)
+        if (g_dobbo_limits.low < F32(object, 0x18) && g_dobbo_limits.side == 0)
             return;
-        if (D_L09_001C9F80.mode == 2) {
-            if (D_L09_001C9F80.high < F32(object, 0x18) && D_L09_001C9F80.side == 1)
+        if (g_dobbo_limits.mode == 2) {
+            if (g_dobbo_limits.high < F32(object, 0x18) && g_dobbo_limits.side == 1)
                 return;
-            if (F32(object, 0x18) < D_L09_001C9F80.high && D_L09_001C9F80.side == 2)
+            if (F32(object, 0x18) < g_dobbo_limits.high && g_dobbo_limits.side == 2)
                 return;
         }
     }
@@ -746,9 +746,9 @@ void UpdateBeamLinkSlots(DobboMoby *moby)
     switch (moby->state) {
     case 0:
         for (clearIndex = 0; clearIndex < 16; clearIndex++) {
-            D_L09_001B35E0[clearIndex] = 0;
-            D_L09_00255E90[clearIndex][0] = 0;
-            D_L09_00255E90[clearIndex][1] = 0;
+            g_beam_slot_state_2[clearIndex] = 0;
+            g_sound_slot_ptrs[clearIndex][0] = 0;
+            g_sound_slot_ptrs[clearIndex][1] = 0;
         }
         moby->state = 1;
         moby->f30 = 255;
@@ -756,18 +756,18 @@ void UpdateBeamLinkSlots(DobboMoby *moby)
     case 1:
         count = 0;
         for (i = 0; i < 16; i++) {
-            if (D_L09_001B35E0[i] == 1) {
-                if ((signed char)D_L09_00255E90[i][0][0x20] < 0) {
-                    D_L09_00255E90[i][0] = 0;
-                    D_L09_001B35E0[i] = 0;
-                    D_L09_00255E90[i][1] = 0;
+            if (g_beam_slot_state_2[i] == 1) {
+                if ((signed char)g_sound_slot_ptrs[i][0][0x20] < 0) {
+                    g_sound_slot_ptrs[i][0] = 0;
+                    g_beam_slot_state_2[i] = 0;
+                    g_sound_slot_ptrs[i][1] = 0;
                 }
-            } else if (D_L09_001B35E0[i] == 4) {
+            } else if (g_beam_slot_state_2[i] == 4) {
                 beam_slot_clear_by_index(i);
-            } else if (D_L09_001B35E0[i]) {
+            } else if (g_beam_slot_state_2[i]) {
                 count++;
-                UpdateBeamLinkStrips(D_L09_00255E90[i][0], i);
-                D_L09_001B35E0[i] = 4;
+                UpdateBeamLinkStrips(g_sound_slot_ptrs[i][0], i);
+                g_beam_slot_state_2[i] = 4;
             }
         }
         if (count)
@@ -786,24 +786,24 @@ int ReserveDobboPairSlot(unsigned char *object, unsigned char *partner, int thir
     int j;
 
     for (i = 0; i < 16; i++) {
-        if (D_L09_00255E90[i][0] == object)
+        if (g_sound_slot_ptrs[i][0] == object)
             return 1;
-        if (D_L09_00255E90[i][1] == object)
+        if (g_sound_slot_ptrs[i][1] == object)
             return 1;
     }
     for (j = 0; j < 16; j++) {
-        if (D_L09_00255E90[j][0] == 0) {
-            D_L09_00255E90[j][0] = object;
-            D_L09_00255E90[j][1] = partner;
-            D_L09_001B3620[j] = 0;
-            D_L09_001B3660[j] = 0;
-            D_L09_001B36A0[j] = 0;
-            D_L09_001B36E0[j] = -1;
-            D_L09_001B3720[j] = -1;
-            D_L09_001B3760[j] = third;
-            D_L09_001B37A0[j] = fourth;
-            D_L09_001B37E0[j] = 0;
-            D_L09_001B35E0[j] = 1;
+        if (g_sound_slot_ptrs[j][0] == 0) {
+            g_sound_slot_ptrs[j][0] = object;
+            g_sound_slot_ptrs[j][1] = partner;
+            g_beam_slot_angle_x[j] = 0;
+            g_beam_slot_angle_y[j] = 0;
+            g_beam_slot_angle_z[j] = 0;
+            g_beam_slot_light_handle[j] = -1;
+            g_beam_slot_light_handle_alt[j] = -1;
+            g_beam_slot_third_value[j] = third;
+            g_beam_slot_flag[j] = fourth;
+            g_beam_slot_uv_scroll[j] = 0;
+            g_beam_slot_state_2[j] = 1;
             return 1;
         }
     }
@@ -823,30 +823,30 @@ int ReserveDobboPairSlot(unsigned char *object, unsigned char *partner, int thir
    handles are given back. */
 
 
-extern Quad D_L09_00255F10[][4];
-extern Quad D_L09_00256310[];
+extern Quad g_sound_slot_matrices[][4];
+extern Quad g_sound_slot_positions[];
 extern void mem_fast_helper_c(void *, void *, int);
 
 /* Stores a new record for the link that holds object, copies both end positions and moves its
    state on (1 to 2, 4 to 3). Returns 1, or 0 when no link holds object. */
 int UpdateBeamLinkRecord(unsigned char *object, void *src)
 {
-    Quad (*blocks)[4] = D_L09_00255F10;
+    Quad (*blocks)[4] = g_sound_slot_matrices;
     int i;
 
     for (i = 0; i < 16; i++) {
-        if (D_L09_00255E90[i][0] == object || D_L09_00255E90[i][1] == object) {
+        if (g_sound_slot_ptrs[i][0] == object || g_sound_slot_ptrs[i][1] == object) {
             unsigned char **row;
             Quad *position;
-            if (D_L09_001B35E0[i] == 1)
-                D_L09_001B35E0[i] = 2;
-            else if (D_L09_001B35E0[i] == 4)
-                D_L09_001B35E0[i] = 3;
+            if (g_beam_slot_state_2[i] == 1)
+                g_beam_slot_state_2[i] = 2;
+            else if (g_beam_slot_state_2[i] == 4)
+                g_beam_slot_state_2[i] = 3;
             mem_fast_helper_c(blocks[i], src, 0x40);
             position = &blocks[i][3];
-            row = D_L09_00255E90[i];
+            row = g_sound_slot_ptrs[i];
             qcopy(position, row[0] + 0x10);
-            qcopy(&D_L09_00256310[i], row[1] + 0x10);
+            qcopy(&g_sound_slot_positions[i], row[1] + 0x10);
             return 1;
         }
     }
@@ -870,29 +870,29 @@ void DrawBeamLinks(char *moby)
 
     VU1_addGSregister(0x47, 0x51001);
     for (i = 0; i < 16; i++) {
-        if (!D_L09_00255E90[i][0] || !D_L09_00255E90[i][1] || D_L09_001B35E0[i] < 2)
+        if (!g_sound_slot_ptrs[i][0] || !g_sound_slot_ptrs[i][1] || g_beam_slot_state_2[i] < 2)
             continue;
 
-        FastVecAdd((char *)&midpoint, D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10);
+        FastVecAdd((char *)&midpoint, g_sound_slot_ptrs[i][0] + 0x10, g_sound_slot_ptrs[i][1] + 0x10);
         sphere.q = midpoint.q;
         scale_vector_xyz_in_place(&midpoint, &sphere, 0.5f);
-        sphere.f[3] = fast_vec_dist(D_L09_00255E90[i][0] + 0x10, D_L09_00255E90[i][1] + 0x10) * 0.5263158f;
+        sphere.f[3] = fast_vec_dist(g_sound_slot_ptrs[i][0] + 0x10, g_sound_slot_ptrs[i][1] + 0x10) * 0.5263158f;
         if (math_fast_helper_a(&sphere, 64.0f) == -1)
             continue;
 
         big = i * 2;
         small = big + 1;
-        fade = D_L09_00255E90[i][0][0x23];
+        fade = g_sound_slot_ptrs[i][0][0x23];
         if (level_is_resident_flag_clear()) {
-            D_L09_001B37E0[i] -= 0.2f;
-            if (D_L09_001B37E0[i] <= -8.0f)
-                D_L09_001B37E0[i] += 8.0f;
+            g_beam_slot_uv_scroll[i] -= 0.2f;
+            if (g_beam_slot_uv_scroll[i] <= -8.0f)
+                g_beam_slot_uv_scroll[i] += 8.0f;
         }
-        small_tex = D_L09_00256510[small];
-        DrawDobboPairedGlowQuads(D_L09_00255E90[i][0], i, fade);
+        small_tex = g_beam_strip_buffers[small];
+        DrawDobboPairedGlowQuads(g_sound_slot_ptrs[i][0], i, fade);
         y = screen->y + 63;
         x = screen->x + 63;
-        DrawBeamLinkStrip(y, x, D_L09_00256510[big], 128, 64, fade, i, -1);
+        DrawBeamLinkStrip(y, x, g_beam_strip_buffers[big], 128, 64, fade, i, -1);
         DrawBeamLinkStrip(y, x, small_tex, 48, 16, fade, i, math_random_int_range(1, 6));
     }
     gfx_append_vectors_to_packet(2, 0x47, 0x5340BUL, 0x42, 0x8000000044UL);
@@ -925,7 +925,7 @@ void sub_object_ramp_channels(unsigned char *moby) {
     float keep = *(float *)(vars + 0x3EC);
     int save = *(int *)(vars + 0x324);
     int live = Spline_AdvanceByDistance(
-        (char *)D_L09_001FE6C0[*(int *)(vars + 0x318)], (char *)buf,
+        (char *)g_path_l09_table[*(int *)(vars + 0x318)], (char *)buf,
         (char *)(vars + 0x324), (char *)(vars + 0x3EC), *(short *)(vars + 0x32A),
         *(float *)(vars + 0x388));
     math_spring_float_to_goal((char *)(vars + 0x390), (char *)(vars + 0x3A0), buf[0], step, 0.2f,
@@ -984,7 +984,7 @@ void sub_object_update_turn_ramps(unsigned char *moby) {
    (`v = *q; q++;`) inside a do/while: the indexed spelling rotates the two
    body instructions the other way and grows an induction-variable copy. */
 int track_count_entries(unsigned char *moby) {
-    short *q = D_L09_001FB560[moby[0x21]];
+    short *q = g_track_entry_table[moby[0x21]];
     int i = 0;
     int v;
     if (q == 0)

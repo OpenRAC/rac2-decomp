@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern float D_L12_001B1C74 __attribute__((sda));
-extern float D_L12_001B1C70 __attribute__((sda));
-extern u8 D_L12_001B9E00[];
+extern float g_path_enemy_rate __attribute__((sda));
+extern float g_path_enemy_scale_factor __attribute__((sda));
+extern u8 g_hero_prev_position[];
 
 extern void moby_set_state(char *, int, int);
 extern void anim_start_blended(char *, int, int, int);
@@ -33,7 +33,7 @@ void path_enemy_init_scale(char *moby) {
             float turn = 0.261799425f;
             float step = 0.00555555569f;
             float pi = 3.14159012f;
-            rate = D_L12_001B1C74 * 0.016666668f;
+            rate = g_path_enemy_rate * 0.016666668f;
             *(float *)(state + 0x154) = quarter;
             *(float *)(state + 0x120) = fraction;
             *(float *)(state + 0x12C) = *(float *)(state + 0x128) = *(float *)(state + 0x124) = half;
@@ -46,9 +46,9 @@ void path_enemy_init_scale(char *moby) {
         *(int *)(state + 0x11C) = 0;
         *(int *)(state + 0x258) = 0;
     }
-    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L12_001B1C70;
+    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * g_path_enemy_scale_factor;
     if (*(u8 *)(moby + 0x31) != 0) {
-        if (fast_vec_dist(moby + 0x10, D_L12_001B9E00) < 24.0f) {
+        if (fast_vec_dist(moby + 0x10, g_hero_prev_position) < 24.0f) {
             moby_update_ground_check(moby);
             *(u8 *)(moby + 0x6F) = 0x16;
         }

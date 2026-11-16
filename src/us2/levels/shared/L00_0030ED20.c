@@ -5,7 +5,7 @@ extern int D_L00_001A904C_2 __attribute__((sda));
 extern int menu_update_two_part_flags_a(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030ED20(int argument)
+int level_l00_call_module_handler_with_arg_4_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -14,7 +14,7 @@ int func_US2_L00_0030ED20(int argument)
     return 0;
 }
 
-void func_US2_L00_0030ED60(void)
+void level_l00_call_module_handler_5_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -25,7 +25,7 @@ void func_US2_L00_0030ED60(void)
 extern int list_menu_update(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030ED90(int argument)
+int level_l00_call_module_handler_with_arg_5_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -34,7 +34,7 @@ int func_US2_L00_0030ED90(int argument)
     return 0;
 }
 
-void func_US2_L00_0030EDD0(void)
+void level_l00_call_module_handler_6_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -45,7 +45,7 @@ void func_US2_L00_0030EDD0(void)
 extern int list_menu_set_selection(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EE00(int argument)
+int level_l00_call_module_handler_with_arg_6_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 

@@ -1,16 +1,16 @@
 #include "common.h"
 
-extern char *D_L20_001B2F9C;
-extern char *D_L20_001B308C;
-extern float D_L20_001B29E0 MACRO_ADDR;
+extern char *g_group_l20_member_table;
+extern char *g_linked_moby_table;
+extern float g_hero_timer_trigger_a MACRO_ADDR;
 extern void moby_set_scaled_speed_capped(char *);
-extern u32 D_L20_001CA540 __attribute__((nosda));
-extern float D_L20_001B2BE8;
+extern u32 g_level_mode __attribute__((nosda));
+extern float g_level_shared_float;
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern float g_hero_position[];
-extern int D_L20_001A8F08;
-extern int D_L20_001A8F00;
+extern int g_boss_timer;
+extern int g_hero_vehicle_mode;
 extern int MemcardSave(int, int);
 extern void script_queue_keyed_request(int, int);
 extern void load_scene_chunk(int, int);
@@ -30,18 +30,18 @@ void UpdateLinkedPlatformController(u8 *moby) {
     s32 *state = *(s32 **)(moby + 0x68);
     int save_offset;
 
-    if (D_L20_001CA540 < 2) D_L20_001B2BE8 = 85.0f;
+    if (g_level_mode < 2) g_level_shared_float = 85.0f;
     switch (moby[0x20]) {
     case 0: {
         char *other_moby;
         save_offset = g_current_map_index * 16;
-        state[8] = D_L20_001CA540;
+        state[8] = g_level_mode;
         state[5] = 0;
         state[4] = 0;
-        state[0x23] = D_0019B2E8[state[2] + save_offset] >> 7;
-        if ((D_0019B2E8[state[1] + save_offset] & 0x80) == 0) {
+        state[0x23] = g_moby_group_flags[state[2] + save_offset] >> 7;
+        if ((g_moby_group_flags[state[1] + save_offset] & 0x80) == 0) {
             state[0x1F] = 0;
-            other_moby = (char *)((state[0x1C] << 8) + (u32)D_L20_001B2F9C);
+            other_moby = (char *)((state[0x1C] << 8) + (u32)g_group_l20_member_table);
             *(float *)(state + 0x1D) = *(float *)(other_moby + 0x18);
             *(float *)(other_moby + 0x18) += 20.0f;
         } else state[0x1F] = 1;
@@ -51,12 +51,12 @@ void UpdateLinkedPlatformController(u8 *moby) {
     case 1: {
         char *other_moby;
         if (state[0x23] == 0 &&
-            (D_0019B2E8[state[2] + g_current_map_index * 16] & 0x80) != 0 &&
+            (g_moby_group_flags[state[2] + g_current_map_index * 16] & 0x80) != 0 &&
             IsPointInCuboid(g_hero_position, state[10]) != 0) {
             state[0x23] = 1;
             MemcardSave(0, -1);
         }
-        if (D_L20_001CA540 == 2) {
+        if (g_level_mode == 2) {
             if (state[4] == 0) {
                 if (IsPointInCuboid(g_hero_position, state[0x18])) {
                     state[4] = 1;
@@ -65,23 +65,23 @@ void UpdateLinkedPlatformController(u8 *moby) {
             }
         }
         if (IsPointInCuboid(g_hero_position, state[11]) != 0) {
-            if (D_0019B2E8[state[1] + g_current_map_index * 16] & 0x80) return;
+            if (g_moby_group_flags[state[1] + g_current_map_index * 16] & 0x80) return;
             moby_mark_table_entry_flagged(state[1]);
             if (state[0x13] >= 0)
-                moby_set_flag_bit((u8 *)D_L20_001B2F9C + state[0x13] * 0x100, 1);
+                moby_set_flag_bit((u8 *)g_group_l20_member_table + state[0x13] * 0x100, 1);
             trooper_legs_destroy_group(state[0x14]);
             trooper_legs_destroy_group(state[0x15]);
             state[8] = 2;
             state[15] = 3;
             moby_set_state(moby, 5, -1);
         }
-        if (D_0019B2E8[state[1] + g_current_map_index * 16] & 0x80) return;
-        if (*(u8 *)(D_L20_001B2F9C + state[0x1B] * 0x100 + 0xBC) == 1) return;
+        if (g_moby_group_flags[state[1] + g_current_map_index * 16] & 0x80) return;
+        if (*(u8 *)(g_group_l20_member_table + state[0x1B] * 0x100 + 0xBC) == 1) return;
         if (state[0x1F] != 0) return;
-        other_moby = D_L20_001B2F9C + state[0x19] * 0x100;
+        other_moby = g_group_l20_member_table + state[0x19] * 0x100;
         if (other_moby != 0 && *(s16 *)(other_moby + 0xAA) == MOBY_CLASS_MEGACORP_HOVER_TANK &&
             *(u8 *)(other_moby + 0x20) != 0xFE && *(u8 *)(other_moby + 0x20) != 0xFD) return;
-        other_moby = D_L20_001B2F9C + state[0x1A] * 0x100;
+        other_moby = g_group_l20_member_table + state[0x1A] * 0x100;
         if (other_moby != 0 && *(s16 *)(other_moby + 0xAA) == MOBY_CLASS_MEGACORP_HOVER_TANK) {
             int status = *(u8 *)(other_moby + 0x20);
             if (status != 0xFE && *(u8 *)(other_moby + 0x20) != 0xFD) return;
@@ -104,35 +104,35 @@ movement_callback:
     case 4: {
         char *other_moby;
         s32 *entry = (s32 *)((u32)state + (state[15] * 4));
-        other_moby = D_L20_001B308C + entry[9] * 0x80;
+        other_moby = g_linked_moby_table + entry[9] * 0x80;
         load_scene_chunk(state[8], state[0x21]);
         moby_mark_table_entry_flagged(state[0]);
         hero_reset_position_and_direction(other_moby + 0x30, other_moby + 0x70, 0x6F, 1);
         hero_load_state_by_game_mode(0);
         state[7] = 1;
-        D_L20_001B29E0 = 1.0f;
+        g_hero_timer_trigger_a = 1.0f;
         *(float *)(state + 3) = 1.0f;
         gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, moby);
         moby_set_state(moby, 6, -1);
         break;
     }
     case 5:
-        if (D_L20_001A8F08 == -2 && D_L20_001A8F00 != 2) {
+        if (g_boss_timer == -2 && g_hero_vehicle_mode != 2) {
             *(float *)(state + 3) = 1.0f;
             gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, moby);
-            if (*(u8 *)(D_L20_001B2F9C + state[0x13] * 0x100 + 0x20) > 0x80)
+            if (*(u8 *)(g_group_l20_member_table + state[0x13] * 0x100 + 0x20) > 0x80)
                 moby_set_state(moby, 4, -1);
         }
         state[6]++;
         break;
     case 6: {
-        if (D_L20_001A8F00 != 2) {
-            D_L20_001B29E0 = 1.0f;
+        if (g_hero_vehicle_mode != 2) {
+            g_hero_timer_trigger_a = 1.0f;
             *(float *)(state + 3) = 1.0f;
             gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, moby);
-        } else D_L20_001B29E0 = 0.0f;
-        if (D_L20_001A8F00 != 2) {
-            char *mobys = D_L20_001B2F9C;
+        } else g_hero_timer_trigger_a = 0.0f;
+        if (g_hero_vehicle_mode != 2) {
+            char *mobys = g_group_l20_member_table;
             if (*(u8 *)(mobys + state[0x12] * 0x100 + 0x20) > 0x80) {
                 *(u16 *)(mobys + state[0x17] * 0x100 + 0x34) &= 0xFFFD;
                 *(u16 *)(mobys + state[0x16] * 0x100 + 0x34) &= 0xFFFD;
@@ -148,7 +148,7 @@ movement_callback:
                     char *second = (char *)((state[0x16] << 8) + (u32)mobys);
                     *(int *)(second + 0x98) = *(int *)(*(char **)(second + 0x24) + 0x10);
                 }
-                D_L20_001B29E0 = 0.0f;
+                g_hero_timer_trigger_a = 0.0f;
                 moby_set_state(moby, 3, -1);
             }
         }
@@ -158,7 +158,7 @@ movement_callback:
     case 7: {
         char *other_moby;
         if (flag_set_first_pending(moby)) {
-            other_moby = D_L20_001B2F9C + state[0x1B] * 0x100;
+            other_moby = g_group_l20_member_table + state[0x1B] * 0x100;
             other_moby[0xBC] = 1;
             {
                 int duration = *(int *)(*(char **)(other_moby + 0x68) + 0x2C);
@@ -167,7 +167,7 @@ movement_callback:
                 state[0x1E] = duration;
             }
         }
-        *(float *)(D_L20_001B2F9C + state[0x1C] * 0x100 + 0x18) =
+        *(float *)(g_group_l20_member_table + state[0x1C] * 0x100 + 0x18) =
             *(float *)(state + 0x1D) + ((float)state[6] * 20.0f) / (float)state[0x1E];
         if (math_fast_float_d(state + 6)) moby_set_state(moby, 1, -1);
         break;

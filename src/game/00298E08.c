@@ -24,8 +24,8 @@ extern Table_0014B540 g_copy_setup_data;
 extern State_001393E0 g_memcard_state;
 extern char g_is_pal_video[] __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern int D_001A7290 __attribute__((sda));
-extern int D_001A72C0 __attribute__((sda));
+extern int g_iop_block_table __attribute__((sda));
+extern int g_current_weapon_channel __attribute__((sda));
 extern int g_save_menu_flags __attribute__((sda));
 extern int g_hero_moby_default[];
 
@@ -55,9 +55,9 @@ void save_load_game_data_reset_menu(void)
         g_memcard_state.f17C = 0;
     if (g_memcard_state.f18 >= 0)
         g_memcard_state.f18 = -1;
-    D_001A7290 = -1;
+    g_iop_block_table = -1;
     g_save_menu_flags &= ~0x200;
-    D_001A72C0 = -1;
+    g_current_weapon_channel = -1;
     g_hero_moby_default[12] = -1;
     g_hero_moby_default[6] = -1;
 }

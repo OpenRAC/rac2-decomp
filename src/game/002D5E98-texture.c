@@ -98,8 +98,8 @@ typedef struct {
 extern MenuSystem g_pause_menu_state;
 extern LevelMap g_map_overlay_state;
 extern MemoryCardState g_memcard_state;
-extern int D_0014B8AC, D_0014D11C;
-extern s16 D_001A63AC;
+extern int g_stream_sector_base, g_stream_sector_base_alt;
+extern s16 g_sequence_active_flag;
 extern int menu_stream_chunk_get_size(int), menu_stream_chunk_set_latch(int), menu_stream_chunk_clear_latch(int);
 extern int load_start_disc_read(int, int, int), log2dim(int);
 extern void func_0029D0E0(void);
@@ -117,13 +117,13 @@ static inline int startRead(MenuStream *stream, int index, int buffer)
         buffer += offset;
     }
     if (stream->flags & 0x10000)
-        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014D11C,
+        return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base_alt,
                              stream->entries[index].count);
     /* Flag 0x10 reads from the same base as the default. */
     if (stream->flags & 0x10)
-        return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
+        return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base,
                              stream->entries[index].count);
-    return load_start_disc_read(buffer, stream->entries[index].sector + D_0014B8AC,
+    return load_start_disc_read(buffer, stream->entries[index].sector + g_stream_sector_base,
                          stream->entries[index].count);
 }
 
@@ -163,7 +163,7 @@ int UpdateMenuPreviewTexture(MenuStream *stream)
     switch (stream->state) {
     case 0:
     case 2:
-        if (index == stream->loaded[0] || stream->buffer[0] == 0 || D_001A63AC != 0)
+        if (index == stream->loaded[0] || stream->buffer[0] == 0 || g_sequence_active_flag != 0)
             break;
         if (stream->entries[index].count == 0)
             break;
@@ -178,7 +178,7 @@ int UpdateMenuPreviewTexture(MenuStream *stream)
         return 0;
     case 1:
     case 3:
-        if (D_001A63AC == 0 && (!(stream->flags & 0x40000) || stream->frames > 4)) {
+        if (g_sequence_active_flag == 0 && (!(stream->flags & 0x40000) || stream->frames > 4)) {
             StreamImage *image;
             u8 *clut;
             u8 *pixels;

@@ -7,9 +7,9 @@ void map_decode_occlusion(char *destination, unsigned char *source, int argument
     extern void map_empty_stub(void);
     extern void map_decode_compressed_occlusion(char *, unsigned char *, int);
     extern void map_expand_mask_to_pixels(char *, unsigned char *);
-    extern int D_L00_001C93C8;
+    extern int g_map_occlusion_flag;
     map_empty_stub();
-    if (D_L00_001C93C8) {
+    if (g_map_occlusion_flag) {
         if (source[0] & 1)
             map_decode_compressed_occlusion(destination, source, argument);
         else

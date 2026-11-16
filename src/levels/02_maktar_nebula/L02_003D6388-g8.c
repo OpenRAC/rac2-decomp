@@ -25,19 +25,19 @@ extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
 extern float g_camera_l02_position[4];
 
-extern char D_L02_001B02E0[8] __attribute__((sda));
+extern char g_joint_flare_offset_a[8] __attribute__((sda));
 
-extern char D_L02_001B0300[8] __attribute__((sda));
+extern char g_joint_flare_offset_b[8] __attribute__((sda));
 
-extern unsigned int D_L02_001B0310 __attribute__((sda));
+extern unsigned int g_joint_flare_color __attribute__((sda));
 
-extern float D_L02_001B0314 __attribute__((sda));
+extern float g_joint_flare_facing_threshold __attribute__((sda));
 
-extern float D_L02_001B02DC __attribute__((sda));
+extern float g_joint_flare_radius_a __attribute__((sda));
 
-extern float D_L02_001B02D8 __attribute__((sda));
+extern float g_joint_flare_size_param __attribute__((sda));
 
-extern float D_L02_001B02F0 __attribute__((sda));
+extern float g_joint_flare_radius_b __attribute__((sda));
 
 /* Draws the glow flares at one joint, two offset spots, and fades them out when the joint faces away from the camera. */
 void chainblade_draw_joint_flares(char *self, int joint, int mirror) {
@@ -55,8 +55,8 @@ void chainblade_draw_joint_flares(char *self, int joint, int mirror) {
     moby_transform_joint_to_world(self, joint, origin);
     *(TI128 *)origin2 = *(TI128 *)origin;
     moby_transform_joint_point(self, joint, matrix);
-    *(TI128 *)offsetA = *(TI128 *)D_L02_001B02E0;
-    *(TI128 *)offsetB = *(TI128 *)D_L02_001B0300;
+    *(TI128 *)offsetA = *(TI128 *)g_joint_flare_offset_a;
+    *(TI128 *)offsetB = *(TI128 *)g_joint_flare_offset_b;
     if (mirror != 0) {
         offsetA[1] = -offsetA[1];
         offsetB[1] = -offsetB[1];
@@ -69,13 +69,13 @@ void chainblade_draw_joint_flares(char *self, int joint, int mirror) {
     vec_scale_to_length(toCamera, toCamera, 1.0f);
     vec_scale_to_length(facing, matrix + 8, -1.0f);
     facingDot = FastVecDot(toCamera, facing);
-    if (D_L02_001B0314 < facingDot) {
-        color = D_L02_001B0310;
+    if (g_joint_flare_facing_threshold < facingDot) {
+        color = g_joint_flare_color;
         alpha = (float)(int)(color >> 24);
         color &= 0xFFFFFF;
         facingDot = facingDot * facingDot;
         color |= (int)(facingDot * alpha) << 24;
-        gfx_l00_draw_billboard_quad(origin, color, D_L02_001B02DC, D_L02_001B02D8);
-        gfx_l00_draw_billboard_quad(origin2, color, D_L02_001B02F0, D_L02_001B02D8);
+        gfx_l00_draw_billboard_quad(origin, color, g_joint_flare_radius_a, g_joint_flare_size_param);
+        gfx_l00_draw_billboard_quad(origin2, color, g_joint_flare_radius_b, g_joint_flare_size_param);
     }
 }

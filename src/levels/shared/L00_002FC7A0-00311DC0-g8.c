@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L00_001B1F10 __attribute__((section(".sdata")));
+extern int g_env_preset_count __attribute__((section(".sdata")));
 typedef struct {
     int objectValue;
     unsigned short x, y, z;
@@ -11,11 +11,11 @@ typedef struct {
     short fogNear, fogFar;
     unsigned short reserved;
 } EnvironmentPreset;
-extern EnvironmentPreset *D_L00_001B1F40 __attribute__((section(".sdata")));
+extern EnvironmentPreset *g_env_preset_table __attribute__((section(".sdata")));
 extern unsigned char g_sound_state[];
-extern unsigned char D_L00_001B1980[] __attribute__((section(".sdata"))), D_L00_001B1981[] __attribute__((section(".sdata"))), D_L00_001B1982[] __attribute__((section(".sdata")));
-extern float D_L00_001B1984 __attribute__((section(".sdata"))), D_L00_001B1988 __attribute__((section(".sdata"))), D_L00_001B198C __attribute__((section(".sdata")));
-extern float D_L00_001B1990 __attribute__((section(".sdata")));
+extern unsigned char g_fog_color_r[] __attribute__((section(".sdata"))), g_fog_color_g[] __attribute__((section(".sdata"))), g_fog_color_b[] __attribute__((section(".sdata")));
+extern float g_fog_near __attribute__((section(".sdata"))), g_fog_far __attribute__((section(".sdata"))), g_fog_near_intensity __attribute__((section(".sdata")));
+extern float g_fog_far_intensity __attribute__((section(".sdata")));
 extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
 extern void func_L00_00312098(void *, int, int, int, int);
@@ -28,9 +28,9 @@ void level_apply_nearest_env_preset(unsigned char *object)
     float position[4], delta[4];
     int i = 0, best = -1;
     float distance = 1000000.0f;
-    if (D_L00_001B1F10 > 0) {
+    if (g_env_preset_count > 0) {
         do {
-            EnvironmentPreset *row = (EnvironmentPreset *)(i * 32 + (int)D_L00_001B1F40);
+            EnvironmentPreset *row = (EnvironmentPreset *)(i * 32 + (int)g_env_preset_table);
             float d;
             position[0] = row->x * 0.25f;
             position[1] = row->y * 0.25f;
@@ -42,17 +42,17 @@ void level_apply_nearest_env_preset(unsigned char *object)
                 best = i;
             }
             i++;
-        } while (i < D_L00_001B1F10);
+        } while (i < g_env_preset_count);
     }
     if (best == -1 || distance > 400.0f)
         return;
     {
-        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
+        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)g_env_preset_table);
         func_L00_00312098(object, ((row->b << 16) + (row->g << 8)) | row->r, 0, 0, 0);
     }
-    *(int *)(object + 0x38) = D_L00_001B1F40[best].objectValue;
+    *(int *)(object + 0x38) = g_env_preset_table[best].objectValue;
     {
-        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
+        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)g_env_preset_table);
         if (row->audioEnabled) {
             unsigned char *sound = g_sound_state;
             *(int *)(sound + 0x64) = row->audioMode;
@@ -62,21 +62,21 @@ void level_apply_nearest_env_preset(unsigned char *object)
             sound[0x6b] |= 7;
         }
     }
-    snd_start_music_stream_no_loop(D_L00_001B1F40[best].musicTrack, 1, 1024);
+    snd_start_music_stream_no_loop(g_env_preset_table[best].musicTrack, 1, 1024);
     {
-        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)D_L00_001B1F40);
+        EnvironmentPreset *row = (EnvironmentPreset *)(best * 32 + (int)g_env_preset_table);
         if (row->fogNear < row->fogFar) {
-            D_L00_001B1980[0] = row->fogR;
-            D_L00_001B1981[0] = row->fogG;
-            D_L00_001B1982[0] = row->fogB;
+            g_fog_color_r[0] = row->fogR;
+            g_fog_color_g[0] = row->fogG;
+            g_fog_color_b[0] = row->fogB;
             {
                 float near = row->fogNear * 1024.0f;
                 float far = row->fogFar * 1024.0f;
-                D_L00_001B1984 = near;
-                D_L00_001B1988 = far;
+                g_fog_near = near;
+                g_fog_far = far;
             }
-            D_L00_001B198C = row->nearIntensity;
-            D_L00_001B1990 = row->farIntensity;
+            g_fog_near_intensity = row->nearIntensity;
+            g_fog_far_intensity = row->farIntensity;
             gfx_apply_display_config();
         }
     }

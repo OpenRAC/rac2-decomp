@@ -1,19 +1,19 @@
 #include "common.h"
 extern char *g_moby_l02_pool;
-extern char D_L02_001B0BC0[] SDATA(D_L02_001B0BC0);
-extern float D_L02_001B0C68 __attribute__((sda));
-extern float D_L02_001B0C6C __attribute__((sda));
-extern int D_L02_001B0C50 __attribute__((sda));
-extern int D_L02_001B0C58 __attribute__((sda));
-extern int D_L02_001B0C74 __attribute__((sda));
-extern int D_L02_001B0C78 __attribute__((sda));
-extern float D_L02_001B0C80 __attribute__((sda));
-extern float D_L02_001B0C84 __attribute__((sda));
-extern float D_L02_001B0C90 __attribute__((sda));
-extern float D_L02_001B0C94 __attribute__((sda));
-extern float D_L02_001B0CB4 __attribute__((sda));
-extern float D_L02_001B0CB8 __attribute__((sda));
-extern char D_L02_00249090[];
+extern char g_tether_local_offset[] SDATA(D_L02_001B0BC0);
+extern float g_tether_ribbon_uv_scroll __attribute__((sda));
+extern float g_tether_ribbon_scroll_speed __attribute__((sda));
+extern int g_tether_ribbon_alpha_core __attribute__((sda));
+extern int g_tether_ribbon_alpha_halo __attribute__((sda));
+extern int g_tether_ribbon_halo_color __attribute__((sda));
+extern int g_tether_ribbon_color_rgb __attribute__((sda));
+extern float g_tether_ribbon_width_scale __attribute__((sda));
+extern float g_tether_ribbon_param_a __attribute__((sda));
+extern float g_tether_ribbon_width_scale_b __attribute__((sda));
+extern float g_tether_ribbon_param_b __attribute__((sda));
+extern float g_tether_ribbon_end_param_a __attribute__((sda));
+extern float g_tether_ribbon_end_param_b __attribute__((sda));
+extern char g_tether_strand_points[];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -41,24 +41,24 @@ void func_PAL_L02_003EDCE8(char *actor) {
     int color0, color1;
     int side, nextSide, lastSide;
     *(char **)(state + 0x4C) = record;
-    matrix_mul_vec3(state + 0x20, &D_L02_001B0BC0, actor + 0xC0);
+    matrix_mul_vec3(state + 0x20, &g_tether_local_offset, actor + 0xC0);
     FastVecAdd(state + 0x20, state + 0x20, actor + 0x10);
     qcopy(state + 0x30, record + 0x10);
-    D_L02_001B0C68 -= D_L02_001B0C6C * 1.2f;
-    if (D_L02_001B0C68 <= -8.0f) D_L02_001B0C68 += 8.0f;
-    color0 = (D_L02_001B0C50 << 24) | D_L02_001B0C74;
-    color1 = (D_L02_001B0C58 << 24) | D_L02_001B0C78;
+    g_tether_ribbon_uv_scroll -= g_tether_ribbon_scroll_speed * 1.2f;
+    if (g_tether_ribbon_uv_scroll <= -8.0f) g_tether_ribbon_uv_scroll += 8.0f;
+    color0 = (g_tether_ribbon_alpha_core << 24) | g_tether_ribbon_halo_color;
+    color1 = (g_tether_ribbon_alpha_halo << 24) | g_tether_ribbon_color_rgb;
     func_PAL_L02_003ED450(actor);
     func_PAL_L02_003ED620(actor);
-    tether_draw_ribbon(D_L02_001B0C80, D_L02_00249090, D_L02_001B0C84, color0, D_L02_001B0CB4, color1, *(int *)(state + 0x50));
-    tether_draw_ribbon(D_L02_001B0C90, D_L02_00249090 + 0x140, D_L02_001B0C94, color0, D_L02_001B0CB8, color1, *(int *)(state + 0x50));
+    tether_draw_ribbon(g_tether_ribbon_width_scale, g_tether_strand_points, g_tether_ribbon_param_a, color0, g_tether_ribbon_end_param_a, color1, *(int *)(state + 0x50));
+    tether_draw_ribbon(g_tether_ribbon_width_scale_b, g_tether_strand_points + 0x140, g_tether_ribbon_param_b, color0, g_tether_ribbon_end_param_b, color1, *(int *)(state + 0x50));
     matrix_from_basis_rows(inverse, actor + 0xC0);
     for (side = 0; side < 2; side = nextSide) {
         int i = 0;
         int more = i < *(int *)(state + 0x50);
         nextSide = side + 1;
         if (more) do {
-            char *point = D_L02_00249090 + side * 0x140 + i*16;
+            char *point = g_tether_strand_points + side * 0x140 + i*16;
             FastVecSub(point, point, actor + 0x10);
             matrix_mul_vec3(point, point, inverse);
             *(float *)(point + 4) = -*(float *)(point + 4);
@@ -66,14 +66,14 @@ void func_PAL_L02_003EDCE8(char *actor) {
             FastVecAdd(point, point, actor + 0x10);
         } while (++i < *(int *)(state + 0x50));
     }
-    tether_draw_ribbon(D_L02_001B0C80, D_L02_00249090, D_L02_001B0C84, color0, D_L02_001B0CB4, color1, *(int *)(state + 0x50));
-    tether_draw_ribbon(D_L02_001B0C90, D_L02_00249090 + 0x140, D_L02_001B0C94, color0, D_L02_001B0CB8, color1, *(int *)(state + 0x50));
+    tether_draw_ribbon(g_tether_ribbon_width_scale, g_tether_strand_points, g_tether_ribbon_param_a, color0, g_tether_ribbon_end_param_a, color1, *(int *)(state + 0x50));
+    tether_draw_ribbon(g_tether_ribbon_width_scale_b, g_tether_strand_points + 0x140, g_tether_ribbon_param_b, color0, g_tether_ribbon_end_param_b, color1, *(int *)(state + 0x50));
     for (side = 0; side < 2; side = lastSide) {
         int i = 0;
         int more = i < *(int *)(state + 0x50);
         lastSide = side + 1;
         if (more) do {
-            char *point = D_L02_00249090 + side * 0x140 + i*16;
+            char *point = g_tether_strand_points + side * 0x140 + i*16;
             FastVecSub(point, point, actor + 0x10);
             matrix_mul_vec3(point, point, inverse);
             *(float *)(point + 4) = -*(float *)(point + 4);

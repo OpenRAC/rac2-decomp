@@ -51,10 +51,10 @@ typedef struct {
 
 extern u8 g_music_state[];
 extern SoundToc g_copy_setup_data;
-extern u8 D_00151858[];
+extern u8 g_stream_sound_table[];
 extern u8 g_sound_state[];
-extern u8 D_001A7BB4[] __attribute__((sda));
-extern u8 D_001AA170[32] __attribute__((sda));
+extern u8 g_language[] __attribute__((sda));
+extern u8 g_stream_sound_def[32] __attribute__((sda));
 extern int snd_find_free_voice(void *);
 extern void vec_clear_128(void *);
 extern void request_store_result_and_advance(int, long);
@@ -74,7 +74,7 @@ void snd_play_stream_by_id(int id, int mode, void *object, int volume)
     second = 0;
     if (id >= 6000) {
         int lang, offset;
-        lang = D_001A7BB4[0];
+        lang = g_language[0];
         if (lang) lang--;
         offset = ((int (*)[256])g_copy_setup_data.ids6000)[lang][id - 6000];
         if (offset) first = offset + g_copy_setup_data.base1;
@@ -83,14 +83,14 @@ void snd_play_stream_by_id(int id, int mode, void *object, int volume)
         int offset = g_copy_setup_data.ids5000[id - 5000].offset;
         if (offset) first = g_copy_setup_data.base4 + offset;
     } else if (id >= 4000) {
-        if (((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][D_001A7BB4[0] * 2]) {
+        if (((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][g_language[0] * 2]) {
             int offset2;
             /* base4 through the struct puts the table's own address in a register before the
                second entry is read, so cse builds that entry's address in full, as retail does,
                instead of as the first entry's address plus 4. */
             first = g_copy_setup_data.base4
-                + ((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][D_001A7BB4[0] * 2];
-            offset2 = ((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][D_001A7BB4[0] * 2 + 1];
+                + ((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][g_language[0] * 2];
+            offset2 = ((int (*)[83])g_copy_setup_data.ids4000)[id - 4000][g_language[0] * 2 + 1];
             second = offset2 ? g_copy_setup_data.base4 + offset2 : 0;
         }
     } else if (id >= 3000) {
@@ -98,21 +98,21 @@ void snd_play_stream_by_id(int id, int mode, void *object, int volume)
         if (offset) first = g_copy_setup_data.base2 + offset;
     } else if (id >= 2000) {
         int lang, offset;
-        lang = D_001A7BB4[0];
+        lang = g_language[0];
         if (lang) lang--;
         offset = g_copy_setup_data.ids2000[id - 2000 + lang].offset;
         if (offset) first = g_copy_setup_data.base2 + offset;
     } else if (id >= 1000) {
         int lang, offset;
-        lang = D_001A7BB4[0];
+        lang = g_language[0];
         if (lang) lang--;
         offset = g_copy_setup_data.ids1000[id - 1000 + lang];
         if (offset) first = g_copy_setup_data.base1 + offset;
     } else {
-        if (((int (*)[83])D_00151858)[id][D_001A7BB4[0] * 2]) {
-            int offset2 = ((int (*)[83])D_00151858)[id][D_001A7BB4[0] * 2 + 1];
-            first = *(int *)(D_00151858 - 4) + ((int (*)[83])D_00151858)[id][D_001A7BB4[0] * 2];
-            second = offset2 ? *(int *)(D_00151858 - 4) + offset2 : 0;
+        if (((int (*)[83])g_stream_sound_table)[id][g_language[0] * 2]) {
+            int offset2 = ((int (*)[83])g_stream_sound_table)[id][g_language[0] * 2 + 1];
+            first = *(int *)(g_stream_sound_table - 4) + ((int (*)[83])g_stream_sound_table)[id][g_language[0] * 2];
+            second = offset2 ? *(int *)(g_stream_sound_table - 4) + offset2 : 0;
         }
     }
     if (!first) return;
@@ -135,8 +135,8 @@ void snd_play_stream_by_id(int id, int mode, void *object, int volume)
     if (STATE->channel[1].slot >= 0) {
         slot = STATE->channel[1].slot;
         sound = (SoundAnchor *)(g_sound_state + slot * 0x70);
-        sound->def = D_001AA170;
-        sound->defFlags = ((StreamSoundDef *)D_001AA170)->flags;
+        sound->def = g_stream_sound_def;
+        sound->defFlags = ((StreamSoundDef *)g_stream_sound_def)->flags;
         sound->sentinel = -1;
         sound->volume = volume;
         sound->object = object;

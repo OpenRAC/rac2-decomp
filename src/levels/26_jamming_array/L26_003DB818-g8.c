@@ -3,9 +3,9 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 typedef struct { int action[4]; } ActionChoices;
-extern int D_L26_001A8FF0;
-extern ActionChoices D_L26_001B05C8;
-extern float D_L26_001B05C0 __attribute__((sda));
+extern int g_hero_tether_enabled;
+extern ActionChoices g_creature_action_choices;
+extern float g_creature_float_threshold __attribute__((sda));
 extern float g_hero_position[4];
 extern int flying_creature_update_state(unsigned char *);
 extern void moby_set_state(unsigned char *, int, int);
@@ -44,7 +44,7 @@ void creature_update(unsigned char *object) {
     float time;
     int next;
     int i;
-    if (!D_L26_001A8FF0) return;
+    if (!g_hero_tether_enabled) return;
     private = *(char **)(object + 0x68);
     if (flying_creature_update_state(object)) { moby_mark_spawned(object); return; }
     switch (object[0x95]) {
@@ -100,7 +100,7 @@ void creature_update(unsigned char *object) {
             anim_start_blended(object, 2, 0, 20);
         break;
     case 3:
-        workspace.choices = D_L26_001B05C8;
+        workspace.choices = g_creature_action_choices;
         if (flag_set_first_pending(object) && object[0x43] != workspace.choices.action[math_random_int_below(4)])
             anim_start_blended(object, workspace.choices.action[math_random_int_below(4)], 0, 20);
         moby_check_target_point_from_offset((char *)object, g_hero_position);
@@ -119,7 +119,7 @@ void creature_update(unsigned char *object) {
         if (flag_set_first_pending(object) && object[0x43] != 8)
             anim_start_blended(object, 8, 0, 20);
         moby_aim_at_target_offset((char *)object, private + 0x1F0);
-        if ((*(float *)(private + 0x1CC) < D_L26_001B05C0) &&
+        if ((*(float *)(private + 0x1CC) < g_creature_float_threshold) &&
             (math_fabs(coll_sample_height_at_position(object, private + 0x1F0, private + 0x230)) < 0.17453295f))
             moby_set_state(object, 6, -1);
         break;

@@ -15,7 +15,7 @@ typedef struct {
     char pad0[0x18]; void *object; int count;
     char pad20[0x20]; float normal[4];
 } CollisionResult;
-extern CollisionResult D_L22_001C00C0;
+extern CollisionResult g_collision_l22_result;
 
 /* Checks ahead of the hero for walls and slides the hero's speed along them so it does not run into the wall. */
 void hero_slide_along_walls(int force) {
@@ -55,18 +55,18 @@ void hero_slide_along_walls(int force) {
     FastVecAdd(extended_end, extended_end, extended_start);
     {
         char *hero = g_hero_state;
-        if (CollLine(extended_start, extended_end, 2, *(void **)(hero + 0x2290), 0) && D_L22_001C00C0.count > 0)
+        if (CollLine(extended_start, extended_end, 2, *(void **)(hero + 0x2290), 0) && g_collision_l22_result.count > 0)
             hit = GetCollHitMaterial();
     }
     angle = 0;
     {
         char *hero = g_hero_state;
-        if (CollLine(start, end, 2, *(void **)(hero + 0x2290), 0) && D_L22_001C00C0.count > 0)
-            angle = cam_get_view_space_angle(D_L22_001C00C0.normal);
+        if (CollLine(start, end, 2, *(void **)(hero + 0x2290), 0) && g_collision_l22_result.count > 0)
+            angle = cam_get_view_space_angle(g_collision_l22_result.normal);
     }
     if (angle >= 0.8726647f || hit == 8 || hit == 12) {
         char *hero = g_hero_state;
-        CollisionResult *contact = &D_L22_001C00C0;
+        CollisionResult *contact = &g_collision_l22_result;
         float *normal = contact->normal;
         float dot;
         *(void **)(hero + 0x270) = contact->object;

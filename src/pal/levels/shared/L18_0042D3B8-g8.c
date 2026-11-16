@@ -1,19 +1,19 @@
 #include "common.h"
-extern float D_L18_001B1270 __attribute__((sda));
-extern int D_L18_001B1240 __attribute__((sda)), D_L18_001B1244 __attribute__((sda));
-extern int D_L18_001B1268 __attribute__((sda));
-extern u8 D_L18_001B1248 __attribute__((sda));
-extern int D_L18_001B124C __attribute__((sda)), D_L18_001B1250 __attribute__((sda));
-extern u32 D_00138320[];
-extern char D_L18_001B1360[];
+extern float g_shooter_attack_distance __attribute__((sda));
+extern int g_enemy_timer_reset_value __attribute__((sda)), g_shooter_cooldown_reset __attribute__((sda));
+extern int g_shooter_cooldown __attribute__((sda));
+extern u8 g_shooter_burst_count __attribute__((sda));
+extern int g_shooter_burst_delay_min __attribute__((sda)), g_shooter_burst_delay_max __attribute__((sda));
+extern u32 g_pad_pressed_flags[];
+extern char g_str_debug_stub[];
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
-extern int func_PAL_002B5E30(void *, float);
-extern int func_PAL_002B5E10(void *);
+extern int moby_step_at_own_position_factor_pal(void *, float);
+extern int moby_step_at_own_position_pal(void *);
 extern int enemy_aim_at_target(void *);
-extern int func_PAL_L01_00323068(void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int FastDecTimer(short *), vec_fast_helper_a(u8 *);
-extern void func_PAL_002A7650(void *, int, int), moby_set_state(void *, int, int);
-extern void func_PAL_L18_0042BA90(void *, int, int, float), func_PAL_L18_0042BAE0(void *);
+extern void SetDeathBits_pal(void *, int, int), moby_set_state(void *, int, int);
+extern void moby_start_or_forward_anim_pal(void *, int, int, float), moby_rebuild_scale_matrix_pal(void *);
 extern u8 *func_PAL_L18_0042D088(void *, int);
 extern int math_random_int_range(int, int), func_001163B0(void);
 extern void STUB_printf(const char *, ...);
@@ -32,25 +32,25 @@ int func_PAL_L18_0042D3B8(u8 *object)
     switch (*(short *)(object + 0xAA)) {
     case 0xEC0:
         if (object[0xBC] != 1) {
-            if (vec_distance_xy(object + 0x10, state + 0x220) < D_L18_001B1270)
-                func_PAL_002B5E10(object);
-            else func_PAL_L01_00323068(object, state + 0x220);
+            if (vec_distance_xy(object + 0x10, state + 0x220) < g_shooter_attack_distance)
+                moby_step_at_own_position_pal(object);
+            else moby_l01_turn_toward_target_pal(object, state + 0x220);
         } else {
-            if (D_00138320[1] & 0x80) *(u16 *)(state + 0x392) = (D_L18_001B1240 * 5 + 2) / 6;
+            if (g_pad_pressed_flags[1] & 0x80) *(u16 *)(state + 0x392) = (g_enemy_timer_reset_value * 5 + 2) / 6;
             FastDecTimer((short *)(state + 0x392));
         }
         if (*(float *)(object + 0x18) < *(float *)(state + 0x90)) {
-            func_PAL_002A7650(object, 0, 3);
+            SetDeathBits_pal(object, 0, 3);
             changed = 1;
             moby_set_state(object, 12, -1);
         }
         enemy_aim_at_target(object);
         if (*(short *)(state + 0x392) == 0) {
             if (object[0xBC] != 1) {
-                func_PAL_L18_0042BAE0(object);
+                moby_rebuild_scale_matrix_pal(object);
                 changed = 1;
-                *(u16 *)(state + 0x396) = (D_L18_001B1244 * 5 + 2) / 6;
-                func_PAL_L18_0042BA90(object, 2, 0, 10.0f);
+                *(u16 *)(state + 0x396) = (g_shooter_cooldown_reset * 5 + 2) / 6;
+                moby_start_or_forward_anim_pal(object, 2, 0, 10.0f);
                 moby_set_state(object, 4, 6);
             } else changed = 1;
         }
@@ -59,16 +59,16 @@ int func_PAL_L18_0042D3B8(u8 *object)
     case 0xEE1:
         if (object[0xBC] != 1) {
             u8 *target = *(u8 **)(state + 0x230);
-            func_PAL_002B5E30(object, mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
+            moby_step_at_own_position_factor_pal(object, mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
                                              *(float *)(target + 0x14) - *(float *)(object + 0x14)));
         }
         switch (object[0x42]) {
         case 10:
             if (object[0x60] & 2) {
-                func_PAL_L18_0042BA90(object, 11, 0, 10.0f);
+                moby_start_or_forward_anim_pal(object, 11, 0, 10.0f);
                 *(float *)(object + 0x48) = 3.0f;
                 {
-                    u8 bursts = D_L18_001B1248;
+                    u8 bursts = g_shooter_burst_count;
                     *(short *)(state + 0x394) = 0;
                     state[0x39D] = bursts;
                 }
@@ -88,23 +88,23 @@ int func_PAL_L18_0042D3B8(u8 *object)
             {
                 int controlled = object[0xBC];
                 if (controlled == 1) {
-                    changed = (D_00138320[0] & 0x80) ? changed : controlled;
-                } else if (state[0x39D] == 0) func_PAL_L18_0042BA90(object, 12, 0, 10.0f);
+                    changed = (g_pad_pressed_flags[0] & 0x80) ? changed : controlled;
+                } else if (state[0x39D] == 0) moby_start_or_forward_anim_pal(object, 12, 0, 10.0f);
             }
             break;
         case 12:
             if (object[0x60] & 2) {
                 changed = 1;
-                ((Timers *)state)->delay = (math_random_int_range(D_L18_001B124C, D_L18_001B1250) * 5 + 2) / 6;
-                ((Timers *)state)->cooldown = (D_L18_001B1268 * 5 + 2) / 6;
-                func_PAL_L18_0042BA90(object, (func_001163B0() & 1) | 4, 0, 10.0f);
+                ((Timers *)state)->delay = (math_random_int_range(g_shooter_burst_delay_min, g_shooter_burst_delay_max) * 5 + 2) / 6;
+                ((Timers *)state)->cooldown = (g_shooter_cooldown * 5 + 2) / 6;
+                moby_start_or_forward_anim_pal(object, (func_001163B0() & 1) | 4, 0, 10.0f);
                 moby_set_state(object, 2, 6);
             }
             break;
         }
         break;
     default:
-        STUB_printf(D_L18_001B1360);
+        STUB_printf(g_str_debug_stub);
         break;
     }
     return changed;

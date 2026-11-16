@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 D_0019B4A8[];
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 g_moby_nibble_table[];
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern s32 D_L12_001B1DC0 __attribute__((sda));
+extern s32 g_break_child_duration __attribute__((sda));
 /* The burst helper reads a vector at this GP-relative address. */
-extern f32 D_L12_001B1DD0[] SDATA(D_L12_001B1DD0);
+extern f32 g_explosion_position_offset[] SDATA(D_L12_001B1DD0);
 extern u8 g_hero_position[];
 
 extern void moby_mark_spawned(void *);
@@ -38,9 +38,9 @@ void UpdateThreeChildRiseController(u8 *self)
         self[0x20] = 1;
         *(f32 *)(vars + 0x10) = *(f32 *)(self + 0x18);
         id = *(u16 *)(self + 0xB2);
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto Destroy0;
-        packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+        packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
         if (id & 1) {
             if ((packed >> 4) & 7)
                 goto Destroy0;
@@ -70,7 +70,7 @@ Destroy0:
         break;
     }
     case 4: {
-        u8 *base = D_L12_001B2E9C;
+        u8 *base = g_moby_list_start;
         s32 *child_ids;
         s32 i;
 
@@ -87,7 +87,7 @@ Destroy0:
     }
     case 2:
         moby_set_state(self, 3, -1);
-        *(s32 *)(vars + 0x14) = D_L12_001B1DC0;
+        *(s32 *)(vars + 0x14) = g_break_child_duration;
         break;
 
     case 3: {
@@ -97,7 +97,7 @@ Destroy0:
         s32 j;
 
         if (math_fast_float_d(vars + 0x14)) {
-            SpawnExplosion(D_L12_001B1DD0, 1, 14, 10, 15, 10, 20, 1,
+            SpawnExplosion(g_explosion_position_offset, 1, 14, 10, 15, 10, 20, 1,
                           1, 1, 0, 0, 2.0f, 20.0f);
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
@@ -110,11 +110,11 @@ Destroy0:
             for (i = 0; i < 3; i++) {
                 if (child_ids[i] != -1) {
                     D_L12_001B2E9C_gp[(child_ids[i] << 8) + 0x20] = 4;
-                    linked_moby_trigger_burst(D_L12_001B2E9C + (child_ids[i] << 8));
+                    linked_moby_trigger_burst(g_moby_list_start + (child_ids[i] << 8));
                 }
             }
         }
-        if (*(s32 *)(vars + 0x14) == D_L12_001B1DC0 / 2) {
+        if (*(s32 *)(vars + 0x14) == g_break_child_duration / 2) {
             child_ids2 = (s32 *)vars;
             for (j = 0; j < 3; j++) {
                 if (child_ids2[j] != -1)
@@ -140,11 +140,11 @@ Destroy0:
         }
         id = *(u16 *)(self + 0xB2);
         if (id & 1) {
-            counter = &D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            counter = &g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if (((*counter >> 4) & 7) != 7)
                 *counter += 16;
         } else {
-            counter = &D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            counter = &g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if ((*counter & 7) != 7)
                 *counter += 1;
         }

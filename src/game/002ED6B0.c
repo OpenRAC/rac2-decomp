@@ -9,8 +9,8 @@ typedef unsigned char u8;
 extern char *moby_get_motion_data(unsigned char *);
 typedef struct { float lim; char pad[0x2c]; float v[4]; char pad2[0x40]; } Rec128;
 /* Retail loads this pointer with the assembler's lui/lw macro (lui into the destination). */
-extern Rec128 *D_001B1C54[] __attribute__((sda));
-extern int D_00214F90[];
+extern Rec128 *g_follower_tuning_table[] __attribute__((sda));
+extern int g_moby_motion_state_words[];
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -39,7 +39,7 @@ void follower_clamp_range_spawn_sparks(u8 *owner)
 
     vars = (u8 *)moby_get_motion_data(owner);
     if (vars != 0 && !scene_get_state_word() && follower_get_state(owner) != 2) {
-        tuning = &D_001B1C54[0][D_00214F90[0]];
+        tuning = &g_follower_tuning_table[0][g_moby_motion_state_words[0]];
         tuneVec = tuning->v;
         FastVecSub(offset, owner + 0x10, tuneVec);
         dist = FastVecLength(offset);

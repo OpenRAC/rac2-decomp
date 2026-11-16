@@ -38,7 +38,7 @@ typedef struct {
 } InputState;
 
 extern HeroFrame g_hero_state;
-extern char D_0018BE50[];
+extern char g_hero_state_block_2[];
 extern InputState g_pad_state;
 extern void func_L00_002EDD78(void *);
 extern int hero_get_movement_mode(void);
@@ -58,12 +58,12 @@ void UpdateHeroInputAndHistory(void)
     HeroFrame *p;
     int bits;
 
-    qcopy(D_0018BE50, D_0018BE50 - 0x1fb0);
+    qcopy(g_hero_state_block_2, g_hero_state_block_2 - 0x1fb0);
     if (g_pad_state.flags & 3) {
-        if (((TimerState *)(D_0018BE50 - 0x2030))->timer <= 0)
-            ((TimerState *)(D_0018BE50 - 0x2030))->timer = 1;
+        if (((TimerState *)(g_hero_state_block_2 - 0x2030))->timer <= 0)
+            ((TimerState *)(g_hero_state_block_2 - 0x2030))->timer = 1;
     } else {
-        func_L00_002EDD78(D_0018BE50 - 0xbdc);
+        func_L00_002EDD78(g_hero_state_block_2 - 0xbdc);
     }
     p = &g_hero_state;
     if (p->state == 16)

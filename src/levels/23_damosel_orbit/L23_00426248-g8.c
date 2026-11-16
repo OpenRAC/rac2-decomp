@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 /* number of live effects of this kind, and the five slots they occupy */
 extern float g_active_slot_effect_count __attribute__((sda));
 extern s32 g_slot_effect_in_use[5] MACRO_ADDR;
-extern u8 D_L23_001BA500[];
+extern u8 g_hero_l23_state_block[];
 
 extern void *CreateMoby(s32);
 extern float math_random_signed_float_range(float, float);
@@ -81,16 +81,16 @@ void *slot_effect_create(u8 *pos, u8 *parent, s32 shake_camera, float scale, s32
         if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
-            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && shake_camera != 0) {
-                u8 *ref = D_L23_001BA500;
+            if (fast_vec_dist(pos, g_hero_l23_state_block + 0x140) < 48.0f && shake_camera != 0) {
+                u8 *ref = g_hero_l23_state_block;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x28;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                FastVecSub(&dir, obj + 0x10, D_L23_001BA500 + 0x140);
+                FastVecSub(&dir, obj + 0x10, g_hero_l23_state_block + 0x140);
                 vec_scale_to_length(&dir, &dir, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(&dir, D_L23_001BA500 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(&dir, g_hero_l23_state_block + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {

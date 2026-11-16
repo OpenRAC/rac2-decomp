@@ -32,8 +32,8 @@ extern u8 *menu_clear_sixteen_words();
 extern u8 *effect_clear_row_groups();
 extern char *meter_screen_init_parts();
 
-extern s8 D_001AD928[];
-extern s8 D_001AD908[];
+extern s8 g_meter_vtable_a[];
+extern s8 g_meter_vtable_b[];
 /* Builds the empty HUD object: starts every text, sprite, meter and animation part so the HUD can be filled in later. */
 s32 hud_construct(s32 hud) {
     s32 anim14D4;
@@ -114,9 +114,9 @@ s32 hud_construct(s32 hud) {
     effect_clear_row_groups(fade131C);
     effect_clear_row_groups(fade13B0);
     object_init_type_pointer(link1444);
-    (*(s32 *)((s8 *)(hud) + (0x1444))) = ((s32)D_001AD928);
+    (*(s32 *)((s8 *)(hud) + (0x1444))) = ((s32)g_meter_vtable_a);
     object_init_type_pointer(link1448);
-    (*(s32 *)((s8 *)(hud) + (0x1448))) = ((s32)D_001AD908);
+    (*(s32 *)((s8 *)(hud) + (0x1448))) = ((s32)g_meter_vtable_b);
     menu_clear_sixteen_words(anim144C);
     menu_clear_sixteen_words(anim14D4);
     return hud;

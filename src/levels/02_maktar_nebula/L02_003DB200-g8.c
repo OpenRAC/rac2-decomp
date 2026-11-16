@@ -7,12 +7,12 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L02_001B04B0 __attribute__((sda));
-extern float D_L02_001B04C8 __attribute__((sda));
-extern float D_L02_001B04CC __attribute__((sda));
-extern float D_L02_001B04D0 __attribute__((sda));
-extern float D_L02_001B04D4 __attribute__((sda));
-extern float D_L02_001B04D8 __attribute__((sda));
+extern float g_boss_spark_spawn_record __attribute__((sda));
+extern float g_boss_spark_jitter __attribute__((sda));
+extern float g_boss_spark_speed_min __attribute__((sda));
+extern float g_boss_spark_speed_max __attribute__((sda));
+extern float g_boss_spark_height_offset __attribute__((sda));
+extern float g_boss_spark_away_speed __attribute__((sda));
 extern int g_moby_l02_pool;
 extern float g_camera_l02_position[4];
 
@@ -33,12 +33,12 @@ void boss_spawn_joint_sparks(char *moby) {
 
     *(TI128 *)launchVelocity = 0;
     moby_transform_joint_to_world((char *)(g_moby_l02_pool + (*(int *)(*(char **)(moby + 0x68) + 0x244) << 8)), 4, jointPos);
-    jointPos[2] = jointPos[2] + D_L02_001B04D4;
+    jointPos[2] = jointPos[2] + g_boss_spark_height_offset;
     FastVecSub(awayDir, g_camera_l02_position, jointPos);
     awayDir[2] = 0.0f;
-    vec_scale_to_length(awayDir, awayDir, D_L02_001B04D8);
+    vec_scale_to_length(awayDir, awayDir, g_boss_spark_away_speed);
     FastVecAdd(jointPos, jointPos, awayDir);
-    vec_add_random_offset(jointPos, D_L02_001B04C8);
-    launchVelocity[2] = math_random_float_range(D_L02_001B04CC, D_L02_001B04D0) * 0.016666668f;
-    enemy_spawn_record(jointPos, launchVelocity, &D_L02_001B04B0, math_random_int_below(2), 1);
+    vec_add_random_offset(jointPos, g_boss_spark_jitter);
+    launchVelocity[2] = math_random_float_range(g_boss_spark_speed_min, g_boss_spark_speed_max) * 0.016666668f;
+    enemy_spawn_record(jointPos, launchVelocity, &g_boss_spark_spawn_record, math_random_int_below(2), 1);
 }

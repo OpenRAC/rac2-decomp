@@ -25,9 +25,9 @@ extern void FastVecCross(float *out, float *a, float *b);
 extern void cam_compute_view_direction(float *a, float *b, int c);
 extern void quaternion_to_rotation_basis(float *a, float *b);
 extern void multiply_matrix3x3(float *a, float *b, float *c);
-extern void func_PAL_00274928(char *o, float *p, float *v);
+extern void coll_clamp_movement_vector_pal(char *o, float *p, float *v);
 
-void func_PAL_00274188(char *o)
+void moby_slide_along_hit_points_pal(char *o)
 {
     float a[4] __attribute__((aligned(16)));
     float c[4] __attribute__((aligned(16)));
@@ -57,7 +57,7 @@ void func_PAL_00274188(char *o)
     vec_scale_to_length(e, e, 1.0f);
     FastVecCross(f, e, d);
     vec_scale_to_length(f, f, *(float *)(m + 0x4C));
-    func_PAL_00274928(o, (float *)(m + 0x10), f);
+    coll_clamp_movement_vector_pal(o, (float *)(m + 0x10), f);
     if (m[0x5C] >= 2)
         vec_scale_by_direction(o, (float *)(m + 0x10), b);
     quaternion_to_rotation_basis((float *)(m + 0x10), g[0]);

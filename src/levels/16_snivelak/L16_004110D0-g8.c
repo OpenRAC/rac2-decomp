@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern u8 *D_L16_001FE7C0[];
-extern float D_L16_001B1750 __attribute__((sda));
+extern u8 *g_path_l16_table[];
+extern float g_snivelak_path_move_speed __attribute__((sda));
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void math_approach_target_with_braking(float *, float, float, float, float);
@@ -23,7 +23,7 @@ void snivelak_move_along_path(u8 *moby, float dt)
     float delta[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
-    u8 *path = D_L16_001FE7C0[*(int *)(state + 0x170)];
+    u8 *path = g_path_l16_table[*(int *)(state + 0x170)];
     int finalPoint = 1;
     float distance, heading;
     float *orientation;
@@ -42,7 +42,7 @@ void snivelak_move_along_path(u8 *moby, float dt)
     FastVecSub(delta, point, moby + 0x10);
     delta[2] = 0.0f;
     distance = FastVecLength(delta);
-    math_approach_target_with_braking((float *)(state + 0x230), distance, D_L16_001B1750 * 0.00027777778f, D_L16_001B1750 * 0.00027777778f, dt);
+    math_approach_target_with_braking((float *)(state + 0x230), distance, g_snivelak_path_move_speed * 0.00027777778f, g_snivelak_path_move_speed * 0.00027777778f, dt);
     heading = mat_fast_helper_a(delta[0], delta[1]);
     math_approach_target_with_direction_mode(orientation, (float *)(state + 0x234), 0, heading, 0.00174532947f, 0.00174532947f, 0.104719773f);
     vec_scale_to_length(step, delta, *(float *)(state + 0x230));

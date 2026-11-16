@@ -66,7 +66,7 @@ typedef struct {
 } HeroView;
 
 extern HeroView g_hero_state;
-extern char D_001AFAE0[];
+extern char g_str_turret_ticks_debug[];
 
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_world_draw_callback(void (*)(Object *), Object *);
@@ -221,7 +221,7 @@ void three_part_turret_update(Object *self)
         if (self->pos[2] - ground > 0.05f) {
             math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            STUB_printf(D_001AFAE0, vars->ticks);
+            STUB_printf(g_str_turret_ticks_debug, vars->ticks);
             moby_set_state(self, 8, -1);
             if (self->animNext != 15) anim_start_blended(self, 15, 0, 3);
         }

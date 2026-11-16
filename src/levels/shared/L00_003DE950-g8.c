@@ -6,17 +6,17 @@
 
 /* Retail copies the probe order {0, 4, 1, 7, 3, 5, 2, 6} to its stack. */
 typedef struct { int index[8]; } GroundProbeOrder;
-extern const GroundProbeOrder D_L00_001B0478;
+extern const GroundProbeOrder g_ground_probe_order;
 
-extern float D_L00_00247800[8][4];
-extern float D_L00_00247880[8][4];
-extern float D_L00_001B2B30[4] __attribute__((sda));
-extern float D_L00_001BF220[4];
-extern float D_L00_001BF240[4] __attribute__((sda));
-extern int D_L00_001B2B44;
-extern float D_L00_001B0448 __attribute__((sda));
-extern float D_L00_001B0474 __attribute__((sda));
-extern float D_L00_001B0470 __attribute__((sda));
+extern float g_ground_probe_offsets[8][4];
+extern float g_ground_probe_points[8][4];
+extern float g_spider_bot_vector[4] __attribute__((sda));
+extern float g_hero_l00_position[4];
+extern float g_hero_l00_velocity[4] __attribute__((sda));
+extern int g_tracked_moby_flag;
+extern float g_ground_probe_distance __attribute__((sda));
+extern float g_angle_scale __attribute__((sda));
+extern float g_moby_lerp_factor __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -43,11 +43,11 @@ extern void multiply_matrix3x3(void *, void *, void *);
    hit it sets state 4 and a velocity along the first row. */
 void AlignObjectToGroundProbes(char *object)
 {
-    float (*probes)[4] = D_L00_00247800;
+    float (*probes)[4] = g_ground_probe_offsets;
     float edges[8][4];
     float offset[4], center[4], normal[4];
     char *state = *(char **)(object + 0x68);
-    GroundProbeOrder order = D_L00_001B0478;
+    GroundProbeOrder order = g_ground_probe_order;
     float a[4], b[4], c[4], axis[4], matrix[12];
     float target[4];
     int count, hit, i;
@@ -59,8 +59,8 @@ void AlignObjectToGroundProbes(char *object)
     vec_clear_128(center);
     hit = 0;
     vec_clear_128(normal);
-    vec_scale_to_length(offset, D_L00_001B2B30, D_L00_001B0448 + D_L00_001B0448);
-    points = D_L00_00247880;
+    vec_scale_to_length(offset, g_spider_bot_vector, g_ground_probe_distance + g_ground_probe_distance);
+    points = g_ground_probe_points;
     out = points;
     count = 0;
     for (i = 0; i < 8; i++) {
@@ -73,13 +73,13 @@ void AlignObjectToGroundProbes(char *object)
                 *(int *)(state + 0x20) = 10;
                 continue;
             }
-            FastVecScale(b, D_L00_001BF240, 0.0009765625f);
+            FastVecScale(b, g_hero_l00_velocity, 0.0009765625f);
             vec_scale_to_length(b, b, 1.0f);
-            vec_scale_to_length(c, D_L00_001B2B30, -1.0f);
-            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || D_L00_001B2B44) {
-                qcopy(out, D_L00_001BF220);
+            vec_scale_to_length(c, g_spider_bot_vector, -1.0f);
+            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || g_tracked_moby_flag) {
+                qcopy(out, g_hero_l00_position);
                 ++out;
-                FastVecAdd(center, center, D_L00_001BF220);
+                FastVecAdd(center, center, g_hero_l00_position);
                 ++count;
             }
         }
@@ -112,16 +112,16 @@ void AlignObjectToGroundProbes(char *object)
             vec_scale_to_length(c, moby + 0xE0, 1.0f);
             vec_scale_to_length(b, a, 1.0f);
             FastVecCross(axis, c, b);
-            angle = FastVecDot(c, b) * (D_L00_001B0474 * 0.5f);
+            angle = FastVecDot(c, b) * (g_angle_scale * 0.5f);
             FastVecScale(b, axis, math_fast_sin_or_cos_b(angle));
             b[3] = math_fast_sin_or_cos_a(angle);
             quaternion_to_rotation_basis(b, matrix);
             multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
             FastVecScale(center, center, inv);
             FastVecSub(target, center, moby + 0x10);
-            FastVecScale(target, D_L00_001B2B30, FastVecDot(target, D_L00_001B2B30));
+            FastVecScale(target, g_spider_bot_vector, FastVecDot(target, g_spider_bot_vector));
             FastVecAdd(target, target, moby + 0x10);
-            lerp_vector(moby + 0x10, moby + 0x10, target, D_L00_001B0470);
+            lerp_vector(moby + 0x10, moby + 0x10, target, g_moby_lerp_factor);
         }
         vec_scale_to_length(a, moby + 0xE0, 0.15f);
         FastVecAdd(a, moby + 0x10, a);

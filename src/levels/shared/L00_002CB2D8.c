@@ -22,9 +22,9 @@ typedef struct {
 
 extern Hero_2CB2D8 g_hero_state;
 extern Stats_2CB2D8 g_progress_statistics;
-extern int D_001A7A04 __attribute__((section(".sdata")));
-extern int D_001A7398 __attribute__((section(".sdata")));
-extern unsigned int D_001A7390 __attribute__((section(".sdata")));
+extern int g_current_item_slot __attribute__((section(".sdata")));
+extern int g_menu_choice_table __attribute__((section(".sdata")));
+extern unsigned int g_frame_counter __attribute__((section(".sdata")));
 extern int g_current_map_index __attribute__((section(".sdata")));
 extern int math_l00_return_argument_2(int);
 
@@ -36,19 +36,19 @@ void hero_apply_pending_change(void)
 
     if (g_hero_state.f2538 == 0)
         return;
-    altValue = D_001A7398;
-    newValue = D_001A7A04;
+    altValue = g_menu_choice_table;
+    newValue = g_current_item_slot;
     if (g_hero_state.f1248 == 10)
         newValue = altValue;
     g_hero_state.f2538 = 0;
     if (newValue == 0)
         return;
-    if (g_hero_state.f1248 == D_001A7A04)
+    if (g_hero_state.f1248 == g_current_item_slot)
         return;
     if (g_progress_statistics.count <= 0xFFFE)
         g_progress_statistics.count++;
-    if (D_001A7390 > g_progress_statistics.best)
-        g_progress_statistics.best = D_001A7390;
+    if (g_frame_counter > g_progress_statistics.best)
+        g_progress_statistics.best = g_frame_counter;
     g_progress_statistics.mask = g_progress_statistics.mask | (1 << g_current_map_index) | 0x80000000;
     g_hero_state.f22C8 = math_l00_return_argument_2(newValue);
     g_hero_state.h24F8 = 0;

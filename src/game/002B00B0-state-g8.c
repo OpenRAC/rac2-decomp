@@ -6,7 +6,7 @@
  * $gp-relative and absolutely, so its `_1` name is the $gp view. */
 extern int g_notice_owner MACRO_ADDR;
 extern int D_001A8C64_1 MACRO_ADDR;
-extern int D_001A8C60 MACRO_ADDR;
+extern int g_hero_style_state MACRO_ADDR;
 extern int D_001A8C60_1 __attribute__((sda));
 extern int g_notice_text_id MACRO_ADDR;
 extern int D_001B1D48_1 MACRO_ADDR;
@@ -29,7 +29,7 @@ int TryClaimNotice(int owner, int text_id, int style)
         if (text_id != 0)
             func_0029CCD8(GetLocalizedString(text_id), style);
         D_001A8C64_1 = owner;
-        D_001A8C60 = 2;
+        g_hero_style_state = 2;
         D_001B1D48_1 = text_id;
         return 1;
     }
@@ -44,7 +44,7 @@ int ForceClaimNotice(int owner, int text_id, int style)
     if (result == 0) {
         if (text_id != 0) {
             func_0029CCD8(GetLocalizedString(text_id), style);
-            D_001A8C60 = style;
+            g_hero_style_state = style;
             result = 3;
         } else {
             D_001A8C60_1 = style;

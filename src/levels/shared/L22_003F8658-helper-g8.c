@@ -4,21 +4,21 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* the two ends of the speed ramp, the three words of the direction vector and the
  * two scales the turn uses, all through $gp. */
-extern f32 D_L22_001B0BA4 __attribute__((sda));
+extern f32 g_flyer_ramp_start __attribute__((sda));
 
-extern f32 D_L22_001B0BA8 __attribute__((sda));
+extern f32 g_flyer_ramp_end __attribute__((sda));
 
-extern f32 D_L22_001B0BB4 __attribute__((sda));
+extern f32 g_flyer_l22_speed __attribute__((sda));
 
-extern f32 D_L22_001B0B90 __attribute__((sda));
+extern f32 g_flyer_offset_x __attribute__((sda));
 
-extern f32 D_L22_001B0B94 __attribute__((sda));
+extern f32 g_flyer_offset_y __attribute__((sda));
 
-extern f32 D_L22_001B0B98 __attribute__((sda));
+extern f32 g_flyer_offset_z __attribute__((sda));
 
-extern f32 D_L22_001B0BB0 __attribute__((sda));
+extern f32 g_flyer_scale __attribute__((sda));
 
-extern u8 D_L22_001B9C80[];
+extern u8 g_tether_origin[];
 
 extern void matrix_mul_vec3(f32 *, f32 *, u8 *);
 
@@ -47,30 +47,30 @@ void ramping_flyer_update(u8 *moby) {
     f32 x, y, z, angle, scale, speed;
 
     *(f32 *)(obj + 0x2C) = *(f32 *)(sub + 0x24)
-        * (D_L22_001B0BA4 + (D_L22_001B0BA8 - D_L22_001B0BA4) * *(f32 *)(ctl + 0x18));
+        * (g_flyer_ramp_start + (g_flyer_ramp_end - g_flyer_ramp_start) * *(f32 *)(ctl + 0x18));
     target = *(u8 **)(ctl + 0x10);
     if (target == 0 || *(u8 *)(target + 0x20) == 0xFE || *(u8 *)(target + 0x20) == 0xFD) {
         moby_mark_spawned(obj);
         return;
     }
     dst = obj + 0x10;
-    speed = D_L22_001B0BB4;
-    x = D_L22_001B0B90;
-    y = D_L22_001B0B94;
-    z = D_L22_001B0B98;
+    speed = g_flyer_l22_speed;
+    x = g_flyer_offset_x;
+    y = g_flyer_offset_y;
+    z = g_flyer_offset_z;
     *(f32 *)(ctl + 0xC) = speed;
     v[0] = x;
     v[1] = y;
     v[2] = z;
-    matrix_mul_vec3(v, v, D_L22_001B9C80 + 0x230);
+    matrix_mul_vec3(v, v, g_tether_origin + 0x230);
     buf = (u8 *)(v + 4);
-    FastVecAdd(buf, (u8 *)v, D_L22_001B9C80);
+    FastVecAdd(buf, (u8 *)v, g_tether_origin);
     qcopy(dst, buf);
     *(f32 *)(obj + 0xF8) = mat_fast_helper_a(*(f32 *)(ctl + 0x0) - *(f32 *)(obj + 0x10),
                                          *(f32 *)(ctl + 0x4) - *(f32 *)(obj + 0x14));
     t = vec_distance_xy(dst, ctl);
     angle = -mat_fast_helper_a(t, *(f32 *)(ctl + 0x8) - *(f32 *)(obj + 0x18));
-    scale = D_L22_001B0BB0;
+    scale = g_flyer_scale;
     *(f32 *)(obj + 0xF4) = angle;
     *(f32 *)(obj + 0xF0) = FastAddRotations(*(f32 *)(obj + 0xF0), scale * 0.00029088825f);
 }

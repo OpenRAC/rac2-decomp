@@ -8,16 +8,16 @@ typedef int Quad __attribute__((mode(TI)));
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
 
-extern char D_0018A0E0[], g_hero_position[];
+extern char g_hero_state_block[], g_hero_position[];
 extern int g_hero_moby __attribute__((nosda));
 extern int g_frame_l02_counter;
 
 /* The distance bound is read absolutely in state 3 and through GP in state 4.
  * Both symbols resolve to the same word in each of the three programs. */
-extern float D_L02_001B00F8 __attribute__((sda));
+extern float g_chickenbot_wait_min __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
 /* State 4 snapshots the upper bound before reading the lower bound. */
-extern volatile float D_L02_001B00FC MACRO_ADDR;
+extern volatile float g_chickenbot_wait_max MACRO_ADDR;
 
 extern void enemy_init(void *);
 extern void moby_l02_explode_and_remove(void *);
@@ -147,7 +147,7 @@ void chickenbot_state_machine_update(char *object)
                 if (U8(object, 0x60) & 2)
                     anim_start_blended(object, 0, 0, 20);
             } else if (!S(vars, 0x312) &&
-                       (!S(vars, 0x338) || FastVecDot(vars + 0x300, D_0018A0E0) > 0.8f))
+                       (!S(vars, 0x338) || FastVecDot(vars + 0x300, g_hero_state_block) > 0.8f))
                 moby_set_state(object, 2, -1);
         }
         break;
@@ -208,8 +208,8 @@ void chickenbot_state_machine_update(char *object)
             if (U8(object, 0x43) != 6)
                 anim_start_blended(object, 6, 0, 10);
             {
-                float upper = D_L02_001B00FC;
-                F(vars, 0x334) = math_random_float_range(D_L02_001B00F8, upper) + 0.5f;
+                float upper = g_chickenbot_wait_max;
+                F(vars, 0x334) = math_random_float_range(g_chickenbot_wait_min, upper) + 0.5f;
             }
         }
         if ((moby_run_entry_hook_by_mode(object, vars + 0x2E0, 0) & 0x80) ||

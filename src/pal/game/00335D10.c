@@ -3,7 +3,7 @@
 
 extern void part_draw_spinning_billboard_pair(void *, void *, int, float);
 
-void func_PAL_00335D10(char *object)
+void moby_update_attached_effect_by_state_pal(char *object)
 {
     char *data = *(char **)(object + 0x68);
     unsigned int mode = *(unsigned char *)(object + 0x20);

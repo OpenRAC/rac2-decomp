@@ -3,10 +3,10 @@
 #include "common.h"
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
-extern float D_L12_001B09F8 __attribute__((sda));
-extern int D_L12_001B09F4 __attribute__((sda));
-extern u8 *D_L12_001B2F8C[] __attribute__((sda));
-extern u8 D_L12_001B9E00[];
+extern float g_creature_float_param __attribute__((sda));
+extern int g_tourist_wait_counter __attribute__((sda));
+extern u8 *g_path_waypoint_table[] __attribute__((sda));
+extern u8 g_hero_prev_position[];
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
 extern int path_build_route_nodes(void *, int, void *, int);
@@ -116,7 +116,7 @@ void func_PAL_L12_003E4728(TodanoInitObject *o) {
         o->f30 = 200;
         o->f32 = 200;
         d->f584 = 0.25f;
-        d->f554 = D_L12_001B09F8;
+        d->f554 = g_creature_float_param;
         d->f550 = 0.3f;
         d->f558 = 1;
         d->f55C = 1;
@@ -127,8 +127,8 @@ void func_PAL_L12_003E4728(TodanoInitObject *o) {
         d->f588 |= 1;
         moby_set_controller_speed_limits(o, 0.0048f, 0.120000005f, 0.005026549f, 0.25132746f);
         qcopy((u8 *)d + 0x760, (u8 *)o + 0x10);
-        FastVecSub((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
-        matrix_mul_vec3((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
+        FastVecSub((u8 *)d + 0x770, (u8 *)o + 0x10, g_path_waypoint_table[0] + (d->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)d + 0x770, (u8 *)d + 0x770, g_path_waypoint_table[0] + (d->f518 << 7) + 0x40);
         d->f598 = (u8 *)d + 0x6C0;
         d->f59C = (u8 *)d + 0x640;
         d->f790 = path_build_route_nodes(o, d->f510, (u8 *)d + 0x110, 32);
@@ -136,9 +136,9 @@ void func_PAL_L12_003E4728(TodanoInitObject *o) {
         o->f34 = (o->f34 | 0x41) & 0xEFFF;
         moby_set_state(o, 1, 0);
         if (o->f43)func_PAL_002A7E68(o, 0, 0, 0);
-        D_L12_001B09F4 = 0;
+        g_tourist_wait_counter = 0;
     }
-    if (o->f31 && fast_vec_dist((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
+    if (o->f31 && fast_vec_dist((u8 *)o + 0x10, g_hero_prev_position) < 24) {
         moby_update_ground_check(o);
         o->f6F = 22;
     }

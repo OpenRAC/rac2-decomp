@@ -16,7 +16,7 @@ typedef struct {
     float age;
 } L04_DomeVars;
 
-extern int D_L04_001B2008 MACRO_ADDR;
+extern int g_game_tick_counter MACRO_ADDR;
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern float math_fast_sin_or_cos_a(float);
@@ -44,7 +44,7 @@ void DrawDomeEffect(unsigned char *moby)
     union { QuadWord q; float f[4]; } rotation;
     L04_DomeVars *vars = *(L04_DomeVars **)(moby + 0x68);
     float radius = vars->radius * vars->age;
-    float phase = fast_fmod(IntToFloat(D_L04_001B2008), 30.0f) * (1.0f / 30.0f);
+    float phase = fast_fmod(IntToFloat(g_game_tick_counter), 30.0f) * (1.0f / 30.0f);
     int i, j, k, l;
 
     rotation.q = *(QuadWord *)(moby + 0xF0);

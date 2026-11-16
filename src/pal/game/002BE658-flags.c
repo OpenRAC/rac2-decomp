@@ -23,7 +23,7 @@ typedef struct {
     f32 pos[4];
     Puff2BDBC0 p;
 } Effect2BDBC0;
-extern u8 *D_001F2598[];
+extern u8 *g_part_tex_growing_puff_table[];
 extern Effect2BDBC0 *part_alloc(int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
@@ -44,7 +44,7 @@ void func_PAL_002BE880(void *pos, void *dir, u32 color, s32 flags, s32 frames, f
         e->f3 = 0x44;
         e->size = size * 0.2f;
         e->f8 = func_001163B0();
-        e->f2 = *D_001F2598[0];
+        e->f2 = *g_part_tex_growing_puff_table[0];
         e->frames = frames;
         p->frames = frames;
         len = IntToFloat(frames);

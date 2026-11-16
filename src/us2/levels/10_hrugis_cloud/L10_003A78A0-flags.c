@@ -2,8 +2,8 @@
 
 #include "common.h"
 extern void FastVecScale(void *, void *, float);
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern unsigned char D_001A7A33 MACRO_ADDR;
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern unsigned char g_contact_hit_flag MACRO_ADDR;
 extern unsigned char g_bolt_multiplier MACRO_ADDR;
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
@@ -13,8 +13,8 @@ extern int FloatToInt(float);
 extern void vec_scale_to_length(float *, float *, float);
 extern float FastVecDot(void *, void *);
 extern int CollLine(void *, void *, int, void *, void *);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
 extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 #define NOT_SDA __attribute__((section(".data")))
@@ -35,14 +35,14 @@ extern s32 FloatToInt(f32);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
 extern void FastVecAdd(void *, void *, void *);
-extern f32 D_002A7A40[];
-extern f32 D_002A7BC0[];
-extern s32 D_002A7D90[];
+extern f32 g_water_texture_coords[];
+extern f32 g_water_base_texture_coords[];
+extern s32 g_water_scroll_flags[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
 extern u32 FastDecTimer(u8 *ptr);
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -52,43 +52,43 @@ typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern char *g_hero_moby NOT_SDA;
-extern int D_L04_001AC790 __attribute__((sda));
-extern Collision D_L04_001BFAC0;
-extern Material D_L04_0027B470[];
+extern int g_debris_l04_model_id __attribute__((sda));
+extern Collision g_probe_hit;
+extern Material g_item_l04_record_table[];
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern int math_fast_float_d(char *);
 extern void table_clear_entry_flag(int);
 extern void part_spawn_big_explosion(void *, void *, void *);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
-void func_US2_L10_003A7CB8(char *obj) {
+void falling_l04_debris_update_us2(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -120,7 +120,7 @@ void func_US2_L10_003A7CB8(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L04_0027B470)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l04_record_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -130,16 +130,16 @@ void func_US2_L10_003A7CB8(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L04_001BFAC0;
+        collision = &g_probe_hit;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L04_001BFAC0;
+            reread = &g_probe_hit;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L04_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_debris_l04_model_id && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -151,7 +151,7 @@ void func_US2_L10_003A7CB8(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L04_001BFAC0;
+            collision = &g_probe_hit;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

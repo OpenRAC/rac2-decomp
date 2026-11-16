@@ -11,13 +11,13 @@ extern int flag_is_third_pending_set(char *);
 extern int PlayMobySound(int, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *D_0018A15C[3] __attribute__((sda));
+extern char *g_platform_actor_ref[3] __attribute__((sda));
 typedef struct { unsigned short value; } FlagA180;
-extern FlagA180 D_0018CA54 NOT_SDA;
-extern float D_L02_001B0D40 __attribute__((sda));
-extern float D_L02_001B0D44 __attribute__((sda));
-extern float D_L02_001B0D48 __attribute__((sda));
-extern float D_L02_001B0D4C __attribute__((sda));
+extern FlagA180 g_tether_flag_state NOT_SDA;
+extern float g_tether_anchor_max_position __attribute__((sda));
+extern float g_tether_anchor_force __attribute__((sda));
+extern float g_tether_anchor_spring __attribute__((sda));
+extern float g_tether_anchor_damping __attribute__((sda));
 typedef struct { char pad[0x78]; int color; } ActorA180;
 typedef int QuadA180 __attribute__((mode(TI)));
 typedef struct { float origin[4]; float position, velocity, angle; } StateA180;
@@ -42,7 +42,7 @@ void func_PAL_L02_003EE5D0(char *actor) {
         color = FloatToInt((math_fast_sin_or_cos_b(s->angle) * 4.0f - 3.0f) * 208.0f);
         if (color > 208) color = 208;
         else if (color < 80) color = 80;
-        if (D_0018A15C[0] != 0 && *(short *)(D_0018A15C[0] + 0xAA) == 0xA61 && color >= 101) {
+        if (g_platform_actor_ref[0] != 0 && *(short *)(g_platform_actor_ref[0] + 0xAA) == 0xA61 && color >= 101) {
             part_spawn_object_following_effect(&vector, actor, 0x20000012, 3.15e+05f, -1, 0, 0.0f, 12, 0, -1);
             part_spawn_object_following_effect(&vector, actor, 0x20000012, 3.15e+05f, -1, 1, 0.0f, 12, 0, -1);
         }
@@ -55,16 +55,16 @@ void func_PAL_L02_003EE5D0(char *actor) {
     case 2: {
         float force, spring;
         ((ActorA180 *)actor)->color = 0xFF0CFF0C;
-        force = D_L02_001B0D44 * 0.00040000002f;
-        spring = s->position * 0.00040000002f * D_L02_001B0D48;
+        force = g_tether_anchor_force * 0.00040000002f;
+        spring = s->position * 0.00040000002f * g_tether_anchor_spring;
         force += spring;
         s->velocity += force;
         s->position += s->velocity;
-        D_0018CA54.value = -1;
-        if (s->position > D_L02_001B0D40) {
-            s->position = D_L02_001B0D40;
+        g_tether_flag_state.value = -1;
+        if (s->position > g_tether_anchor_max_position) {
+            s->position = g_tether_anchor_max_position;
             if (s->velocity > 0.020000001f) {
-                s->velocity *= D_L02_001B0D4C;
+                s->velocity *= g_tether_anchor_damping;
             } else {
                 s->velocity = 0;
                 moby_set_state(actor, 3, -1);

@@ -14,7 +14,7 @@ typedef struct {
     char gap[0x10];
     Vec4 normal;
 } Collision;
-extern Collision D_L13_001BFD00;
+extern Collision g_collision_l13_result;
 
 /* Tests whether a creature would hit something and, if so, moves it to the contact point. */
 int creature_push_out_of_coll(char *object, char *record) {
@@ -32,9 +32,9 @@ int creature_push_out_of_coll(char *object, char *record) {
         result = 0;
         goto done;
     }
-    *(char **)(record + 0x84) = D_L13_001BFD00.hit;
-    qcopy(record + 0x60, &D_L13_001BFD00.point);
-    qcopy(&position, D_L13_001BFD00.gap);
+    *(char **)(record + 0x84) = g_collision_l13_result.hit;
+    qcopy(record + 0x60, &g_collision_l13_result.point);
+    qcopy(&position, g_collision_l13_result.gap);
     FastVecSub((float *)origin, (float *)&position, (float *)&offset);
     result = 1;
 done:

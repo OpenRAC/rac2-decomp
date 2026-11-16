@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void popup_set_box_value(void *, int);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void popup_set_box_value(void *, int);
 extern char *func_00288FB8_1 ();
 extern void text_draw_medium (int v, int p7, long k, int r, int m1);
@@ -11,15 +11,15 @@ extern void text_draw_right_aligned_medium (int v, int p7, long k, int r, int m1
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
 
-int func_US2_002CAA38(void) {
-    if (D_001A8CFC[0] != 0)
-        popup_set_box_value(D_001A8CFC[0] + 0x3CEA0, 0);
+int menu_disable_subsystem_us2(void) {
+    if (g_resident_data_base[0] != 0)
+        popup_set_box_value(g_resident_data_base[0] + 0x3CEA0, 0);
     return 0;
 }
 
-int func_US2_002CAA70(void) {
-    if (D_001A8CFC[0] != 0)
-        popup_set_box_value(D_001A8CFC[0] + 0x3CEA0, 1);
+int menu_enable_subsystem_us2(void) {
+    if (g_resident_data_base[0] != 0)
+        popup_set_box_value(g_resident_data_base[0] + 0x3CEA0, 1);
     return 0;
 }
 

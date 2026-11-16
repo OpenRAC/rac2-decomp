@@ -15,49 +15,49 @@
 
 extern unsigned char g_hero_state[];
 extern int g_screen_width, g_screen_height;
-extern int D_00138320 __attribute__((section(".data")));
+extern int g_pad_pressed_flags __attribute__((section(".data")));
 extern int g_current_map_index;
-extern unsigned char D_PAL_001A7C3C;
+extern unsigned char g_pal_region_mode;
 extern int g_frame_l19_counter;
-extern unsigned char *D_L19_001A904C;
-extern int D_L19_001B3280;
-extern float D_L19_001B3284;
-extern unsigned char D_L19_001B1A54 __attribute__((sda));
-extern unsigned char D_L19_001B1A55 __attribute__((sda));
-extern unsigned char D_L19_001B1A56 __attribute__((sda));
-extern unsigned char D_L19_001B1A57 __attribute__((sda));
-extern unsigned char D_L19_001B1A58 __attribute__((sda));
-extern unsigned char D_L19_001B1A59 __attribute__((sda));
-extern unsigned char D_L19_001B1A5A __attribute__((sda));
-extern unsigned char D_L19_001B1A5B __attribute__((sda));
-extern unsigned char D_L19_001B1A5C __attribute__((sda));
-extern unsigned char D_L19_001B1A5D __attribute__((sda));
-extern unsigned char D_L19_001B1A5E __attribute__((sda));
-extern unsigned char D_L19_001B1A5F __attribute__((sda));
-extern unsigned char D_L19_001B1A60 __attribute__((sda));
-extern int D_L19_001B1A94 __attribute__((sda));
-extern int D_L19_001B1A98 __attribute__((sda));
-extern float D_L19_001B1AA0 __attribute__((sda));
-extern float D_L19_001B1AA4 __attribute__((sda));
-extern float D_L19_001B1AA8 __attribute__((sda));
-extern float D_L19_001B1AAC __attribute__((sda));
-extern int D_L19_001B1AB0 __attribute__((sda));
-extern int D_L19_001B1AB4 __attribute__((sda));
-extern int D_L19_001B1AB8 __attribute__((sda));
-extern float D_L19_001B1ACC __attribute__((sda));
-extern float D_L19_001B1AD0 __attribute__((sda));
-extern float D_L19_001B1AD4 __attribute__((sda));
-extern float D_L19_001B1AD8 __attribute__((sda));
-extern float D_L19_001B1ADC __attribute__((sda));
-extern float D_L19_001B1AE0 __attribute__((sda));
-extern float D_L19_001B1AE4 __attribute__((sda));
-extern float D_L19_001B1AE8 __attribute__((sda));
-extern float D_L19_001B1AEC __attribute__((sda));
-extern float D_L19_001B1AF0 __attribute__((sda));
-extern unsigned int D_L19_001B1AF4 __attribute__((sda));
-extern unsigned int D_L19_001B1AF8 __attribute__((sda));
-extern float D_L19_001B19BC __attribute__((sda));
-extern float D_L19_001B0120 __attribute__((sda));
+extern unsigned char *g_hud_l19_text_table;
+extern int g_hud_scale_mode;
+extern float g_hud_scale_factor_global;
+extern unsigned char g_hud_gauge_alpha_flag0 __attribute__((sda));
+extern unsigned char g_hud_gauge_alpha_flag1 __attribute__((sda));
+extern unsigned char g_hud_gauge_alpha_flag2 __attribute__((sda));
+extern unsigned char g_hud_gauge_alpha_flag3 __attribute__((sda));
+extern unsigned char g_hud_gauge_alpha_high __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag0 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag1 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag2 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag3 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag4 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag5 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_flag6 __attribute__((sda));
+extern unsigned char g_hud_gauge_test_high __attribute__((sda));
+extern int g_hud_l19_bar_y_offset __attribute__((sda));
+extern int g_hud_bar_slide_frames __attribute__((sda));
+extern float g_hud_bar_slide_dx __attribute__((sda));
+extern float g_hud_bar_slide_dy __attribute__((sda));
+extern float g_hud_bar_top_base __attribute__((sda));
+extern float g_hud_l19_bar_right_margin __attribute__((sda));
+extern int g_hud_text_x_inset __attribute__((sda));
+extern int g_hud_label_x_inset __attribute__((sda));
+extern int g_hud_label_y_inset __attribute__((sda));
+extern float g_hud_scale_ease_sub __attribute__((sda));
+extern float g_hud_text_scale __attribute__((sda));
+extern float g_hud_scale_bias __attribute__((sda));
+extern float g_hud_scale_factor __attribute__((sda));
+extern float g_hud_scale_start __attribute__((sda));
+extern float g_hud_scale_end __attribute__((sda));
+extern float g_hud_rect_left __attribute__((sda));
+extern float g_hud_bar_height __attribute__((sda));
+extern float g_hud_rect_width __attribute__((sda));
+extern float g_hud_size_value __attribute__((sda));
+extern unsigned int g_hud_color_start __attribute__((sda));
+extern unsigned int g_hud_color_end __attribute__((sda));
+extern float g_hud_label_y_base __attribute__((sda));
+extern float g_hud_l19_bar_threshold __attribute__((sda));
 extern void gfx_append_vectors_to_packet(int,int,unsigned long,int,unsigned long);
 extern int FastDecTimer(void *);
 extern s32 hero_begin_saved_float_hold(void);
@@ -93,7 +93,7 @@ static __inline__ unsigned long PackGaugeFlag(unsigned long flags, unsigned char
 /* A screen coordinate scaled for the display, offset in display mode `active`. */
 static __inline__ int hud_coord(int mode, float value, float half, int active, float offset)
 {
-    float scaled = value * D_L19_001B3284 + half;
+    float scaled = value * g_hud_scale_factor_global + half;
     if (mode == active)
         return (int)(scaled + offset);
     return (int)scaled;
@@ -118,7 +118,7 @@ static __inline__ int hud_size(int mode, float value, float scale, float half)
    result: flow deletes it after allocation. */
 static __inline__ int scaled_coord(int value, float scale, float half, int active)
 {
-    int mode = D_L19_001B3280;
+    int mode = g_hud_scale_mode;
     float scaled = (float)value * scale + half;
     int result = (int)scaled;
 
@@ -132,7 +132,7 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
    allocation, as with scaled_coord in src/levels/02_maktar_nebula/L02_003FF6E8-g8.c. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L19_001B3280;
+    int mode = g_hud_scale_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -156,17 +156,17 @@ static __inline__ void sprite(char *id, int col, float x, int y, float a, float 
 /* The status bar's bottom edge. */
 static __inline__ int hud_bar_bottom(void)
 {
-    int mode = D_L19_001B3280;
+    int mode = g_hud_scale_mode;
     int h = g_screen_height;
-    float scaled = D_L19_001B1AE8 * D_L19_001B3284 + 0.5f;
-    float scale = D_L19_001B3284;
+    float scaled = g_hud_bar_height * g_hud_scale_factor_global + 0.5f;
+    float scale = g_hud_scale_factor_global;
     int y;
 
     if (mode == 1)
         y = (int)(scaled + -4.0f);
     else
         y = (int)scaled;
-    return h - y + hud_size(mode, D_L19_001B1AF0, scale, 0.5f);
+    return h - y + hud_size(mode, g_hud_size_value, scale, 0.5f);
 }
 
 int func_PAL_L08_00422A2C(void)
@@ -183,22 +183,22 @@ int func_PAL_L08_00422A2C(void)
         if ((g_frame_l19_counter / 90) & 1) mask = 0xFF0F0FFF;
     {
         unsigned long test, alpha;
-        test = D_L19_001B1A59;
-        test = PackGaugeFlag(test, D_L19_001B1A5A, 1);
-        test = PackGaugeFlag(test, D_L19_001B1A5B, 4);
-        test = PackGaugeFlag(test, D_L19_001B1A5C, 12);
-        test = PackGaugeFlag(test, D_L19_001B1A5D, 14);
-        test = PackGaugeFlag(test, D_L19_001B1A5E, 15);
-        alpha = D_L19_001B1A54;
-        alpha = PackGaugeFlag(alpha, D_L19_001B1A55, 2);
-        test = PackGaugeFlag(test, D_L19_001B1A5F, 16);
-        alpha = PackGaugeFlag(alpha, D_L19_001B1A56, 4);
-        alpha = PackGaugeFlag(alpha, D_L19_001B1A57, 6);
-        gfx_append_vectors_to_packet(2, 0x47, test | ((unsigned long)D_L19_001B1A60 << 17),
-            0x42, alpha | ((unsigned long)D_L19_001B1A58 << 32));
+        test = g_hud_gauge_test_flag0;
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag1, 1);
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag2, 4);
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag3, 12);
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag4, 14);
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag5, 15);
+        alpha = g_hud_gauge_alpha_flag0;
+        alpha = PackGaugeFlag(alpha, g_hud_gauge_alpha_flag1, 2);
+        test = PackGaugeFlag(test, g_hud_gauge_test_flag6, 16);
+        alpha = PackGaugeFlag(alpha, g_hud_gauge_alpha_flag2, 4);
+        alpha = PackGaugeFlag(alpha, g_hud_gauge_alpha_flag3, 6);
+        gfx_append_vectors_to_packet(2, 0x47, test | ((unsigned long)g_hud_gauge_test_high << 17),
+            0x42, alpha | ((unsigned long)g_hud_gauge_alpha_high << 32));
     }
     FastDecTimer(s + 0x8E);
-    if (D_L19_001A904C) {
+    if (g_hud_l19_text_table) {
         float delta, ratio;
         unsigned char *str;
         int y;
@@ -211,15 +211,15 @@ int func_PAL_L08_00422A2C(void)
         one = 1;
         hero_set_saved_float_and_update();
         half = 0.5f;
-        str = (unsigned char *)table_find_by_id(D_L19_001A904C + entry,0xA8);
+        str = (unsigned char *)table_find_by_id(g_hud_l19_text_table + entry,0xA8);
         x = (float)(g_screen_width / 2);
-        y = label_y(str, D_L19_001B19BC, D_L19_001B3284, half, 1);
+        y = label_y(str, g_hud_label_y_base, g_hud_scale_factor_global, half, 1);
         fade = 1.0f;
         z = 0.0f;
         sprite((char *)str, mask & 0x60442D00, x, g_screen_height / 2 + y, fade, fade, z);
-        str = (unsigned char *)table_find_by_id(D_L19_001A904C + entry,0xA9);
+        str = (unsigned char *)table_find_by_id(g_hud_l19_text_table + entry,0xA9);
         x = (float)(g_screen_width / 2);
-        y = label_y(str, D_L19_001B19BC, D_L19_001B3284, half, 1);
+        y = label_y(str, g_hud_label_y_base, g_hud_scale_factor_global, half, 1);
         sprite((char *)str, mask & 0x55F0C070, x, g_screen_height / 2 + y, fade, fade, z);
         delta = *(float *)(hero + 0x183C) - ((HudState *)s)->level;
         delta *= 0.2f;
@@ -227,17 +227,17 @@ int func_PAL_L08_00422A2C(void)
             float magnitude = math_fabs(delta);
             if (magnitude > fade) delta /= magnitude;
         }
-        c0 = D_L19_001B1AF4;
-        c1 = D_L19_001B1AF8;
+        c0 = g_hud_color_start;
+        c1 = g_hud_color_end;
         ((HudState *)s)->level += delta;
         ratio = ((HudState *)s)->level / *(float *)(hero + 0x1840);
         palette.a = c0;
         palette.b = c1;
         *(struct Palette *)colors = palette;
         colors[1] = FastTweenColor(c0,c1,ratio);
-        gfx_draw_screen_rectangle((int)D_L19_001B1AE4,
-            g_screen_height - hud_coord(D_L19_001B3280, D_L19_001B1AE8, half, one, -4.0f),
-            (int)(D_L19_001B1AE4 + D_L19_001B1AEC * ratio),
+        gfx_draw_screen_rectangle((int)g_hud_rect_left,
+            g_screen_height - hud_coord(g_hud_scale_mode, g_hud_bar_height, half, one, -4.0f),
+            (int)(g_hud_rect_left + g_hud_rect_width * ratio),
             hud_bar_bottom(),
             0xFFFFF1, colors);
         hero_end_saved_float_hold();
@@ -249,68 +249,68 @@ int func_PAL_L08_00422A2C(void)
             int color;
             if (*(short *)(s + 0x8E) == 1) snd_play_from_class_bank(3,0,obj,0x85C);
             ratio = IntToFloat(180-*(short *)(s + 0x8E)) / IntToFloat(180);
-            scale = D_L19_001B1ADC + (D_L19_001B1AE0-D_L19_001B1ACC)*math_ease_out_quad(ratio);
+            scale = g_hud_scale_start + (g_hud_scale_end-g_hud_scale_ease_sub)*math_ease_out_quad(ratio);
             alpha = IntegerPower(3,1.0f-ratio)*127.0f;
             color = FloatToInt(alpha*0.5f) << 24;
             str = GetLocalizedString(0xe7e);
-            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                 (color|0x80)&mask,str,0x11,scale*0.96f);
             color = FloatToInt(alpha*0.75f) << 24;
-            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                 (color|0x800000)&mask,str,0x11,scale*0.98f);
             color = FloatToInt(alpha) << 24;
-            DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+            DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                 (color|0x808080)&mask,str,0x11,scale);
         } else if (*(int *)(s + 0x6C)) {
-            if (*(float *)(s + 0x68) > D_L19_001B0120) {
+            if (*(float *)(s + 0x68) > g_hud_l19_bar_threshold) {
                 int x, y, pad;
                 char *line;
                 str = GetLocalizedString(0x10f8);
                 thread_call_var_args_worker(text,str,FloatToInt(*(float *)(s + 0x68)));
                 line = text;
-                pad = D_PAL_001A7C3C == 3 ? 24 : 0;
-                x = g_screen_width-D_L19_001B1AB0-pad;
-                y = g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f);
+                pad = g_pal_region_mode == 3 ? 24 : 0;
+                x = g_screen_width-g_hud_text_x_inset-pad;
+                y = g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f);
                 hero = 0x80FFDE8D; /* From here on `hero` is the counter's colour. */
                 hero = mask & hero;
                 text_draw_medium(x,y,(unsigned int)hero,line,func_001157AC(line));
-            } else if (D_00138320 & 0x80) {
+            } else if (g_pad_pressed_flags & 0x80) {
                 str = GetLocalizedString(0xe7c);
-                DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
-                    (unsigned int)(mask&0x80F0F0F0),str,0xD,D_L19_001B1AD0);
+                DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
+                    (unsigned int)(mask&0x80F0F0F0),str,0xD,g_hud_text_scale);
             } else {
                 float scale;
                 scale = math_wrap_angle_to_pi(IntToFloat(g_frame_l19_counter)*0.1f);
                 scale = math_fast_sin_or_cos_b(scale);
-                scale = D_L19_001B1AD4 + D_L19_001B1AD8*scale;
+                scale = g_hud_scale_bias + g_hud_scale_factor*scale;
                 str = GetLocalizedString(0xe7d);
-                DrawCenteredScaledText(g_screen_width-D_L19_001B1AB4,g_screen_height-hud_coord(D_L19_001B3280, (float)D_L19_001B1AB8, 0.5f, 1, -6.0f),
+                DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                     (unsigned int)(mask&0x80F0F0F0),str,0x11,scale);
             }
         }
         if (s[0x8A]) {
             float ratio, width, height, dx, dy, top;
             int color, tex, x, y, a, b, alpha;
-            ratio = IntToFloat(*(short *)(s + 0x88))/IntToFloat((((int)(D_L19_001B1A98) * 5 + 2) / 6));
+            ratio = IntToFloat(*(short *)(s + 0x88))/IntToFloat((((int)(g_hud_bar_slide_frames) * 5 + 2) / 6));
             width = math_square(ratio)*32.0f;
             height = math_square(ratio)*24.0f;
-            dx = D_L19_001B1AA0*math_ease_out_quad(ratio);
-            dy = D_L19_001B1AA4*math_ease_out_quad(ratio);
+            dx = g_hud_bar_slide_dx*math_ease_out_quad(ratio);
+            dy = g_hud_bar_slide_dy*math_ease_out_quad(ratio);
             color = FloatToInt(ratio*128.0f)<<24;
             top = 16.0f-width*0.5f;
-            if (D_L19_001A904C) {
+            if (g_hud_l19_text_table) {
                 hero_begin_saved_float_hold();
                 hero_set_saved_float_and_update();
                 alpha = FloatToInt(IntToFloat(96)*ratio)<<24;
-                str = (unsigned char *)table_find_by_id(D_L19_001A904C+0x8710,0xAA);
+                str = (unsigned char *)table_find_by_id(g_hud_l19_text_table+0x8710,0xAA);
                 gfx_draw_scaled_object_two_axes((char *)str,
                     (alpha|0x442D00)&mask,
-                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
+                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+g_hud_l19_bar_y_offset),1.0f,1.0f,0.0f);
                 alpha = FloatToInt(IntToFloat(85)*ratio)<<24;
-                str = (unsigned char *)table_find_by_id(D_L19_001A904C+0x8710,0xAB);
+                str = (unsigned char *)table_find_by_id(g_hud_l19_text_table+0x8710,0xAB);
                 gfx_draw_scaled_object_two_axes((char *)str,
                     (alpha|0xF0C070)&mask,
-                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+D_L19_001B1A94),1.0f,1.0f,0.0f);
+                    (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+g_hud_l19_bar_y_offset),1.0f,1.0f,0.0f);
                 hero_end_saved_float_hold();
             }
             if (s[0x8A] < 3) {
@@ -320,9 +320,9 @@ int func_PAL_L08_00422A2C(void)
                 colors[2]=c;
                 colors[3]=c;
                 tex=GetIconFrame(0xEAA2,3);
-                x=FloatToInt((float)g_screen_width-D_L19_001B1AAC-dy);
-                y=FloatToInt(D_L19_001B1AA8+(float)D_L19_001B1A94+(float)*(short *)(s + 0x8C)+top);
-                y=scaled_coord(y,D_L19_001B3284,0.5f,1);
+                x=FloatToInt((float)g_screen_width-g_hud_l19_bar_right_margin-dy);
+                y=FloatToInt(g_hud_bar_top_base+(float)g_hud_l19_bar_y_offset+(float)*(short *)(s + 0x8C)+top);
+                y=scaled_coord(y,g_hud_scale_factor_global,0.5f,1);
                 a=FloatToInt(height);
                 b=FloatToInt(height);
                 hud_draw_sprite_gradient(tex,x,y,a,b,colors);

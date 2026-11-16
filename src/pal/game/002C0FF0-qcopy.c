@@ -31,11 +31,11 @@ extern float IntToFloat(int);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern int func_001163B0(void);
-extern unsigned char *D_001F2570;
+extern unsigned char *g_part_tex_smoke_table;
 
 /* Spawns a grey smoke particle like func_002C0CC0, sized by scale; kinds below 5
    get a random size and a shorter random life. */
-Particle_002C02F0 *func_PAL_002C0FF0(TI128 *position, TI128 *velocity, unsigned char kind, int arg3,
+Particle_002C02F0 *part_spawn_scaled_smoke_pal(TI128 *position, TI128 *velocity, unsigned char kind, int arg3,
                                  unsigned char scale, int shade)
 {
     Particle_002C02F0 *p = part_alloc(0x28);
@@ -52,7 +52,7 @@ Particle_002C02F0 *func_PAL_002C0FF0(TI128 *position, TI128 *velocity, unsigned 
         f = math_random_angle();
         m->unk10 = f;
         p->unk08 = (int)(f * 256.0f);
-        p->unk02 = D_001F2570[func_001163B0() & 7];
+        p->unk02 = g_part_tex_smoke_table[func_001163B0() & 7];
         m->scale = scale;
         m->kind = kind;
         m->unk14 = 0;

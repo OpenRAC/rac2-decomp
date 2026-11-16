@@ -23,7 +23,7 @@ typedef struct EffectParticleExtension {
     unsigned char alpha, life;
 } EffectParticleExtension;
 extern EffectParticle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, unsigned, int);
-extern float D_L00_001A8F20[4] MACRO_ADDR;
+extern float g_default_vector[4] MACRO_ADDR;
 
 
 extern void cam_compute_view_direction(void *, void *, int);
@@ -39,7 +39,7 @@ extern int PlayMobySound(int, int, void *);
 extern void shot_spawn_fragments(void *);
 extern void part_queue_ground_shadow(void *, float);
 extern float FastVecDot(void *, void *);
-extern unsigned char D_0013958D[];
+extern unsigned char g_bouncer_weapon_index[];
 typedef struct EffectPlayer {
     unsigned char prefix[0x70];
     float scale;
@@ -48,16 +48,16 @@ typedef struct EffectPlayer {
 extern EffectPlayer g_weapon_l00_table[];
 extern void *g_hero_moby[];
 extern void *g_area_hit_targets[];
-extern int D_L00_001A8FF0[] MACRO_ADDR, D_L00_001A8FF4[] MACRO_ADDR;
-extern float D_L00_001B0C20 __attribute__((sda));
-extern float D_L00_001B0C28 __attribute__((sda));
-extern float D_L00_001B0C30 __attribute__((sda));
-extern float D_L00_001B0C34 __attribute__((sda));
-extern float D_L00_001B0C3C __attribute__((sda));
-extern float D_L00_001B0C40 __attribute__((sda));
-extern int D_L00_001B0C44 __attribute__((sda));
-extern char D_L00_001BF230[];
-extern unsigned char D_L00_001B0C48[8] NOT_SDA;
+extern int g_hero_locked_flag[] MACRO_ADDR, g_hero_action_blocked_flag[] MACRO_ADDR;
+extern float g_bouncing_shot_query_scale __attribute__((sda));
+extern float g_bouncing_shot_fade_radius __attribute__((sda));
+extern float g_bouncing_shot_radius __attribute__((sda));
+extern float g_bouncing_shot_speed_scale __attribute__((sda));
+extern float g_bouncing_shot_alt_radius __attribute__((sda));
+extern float g_bouncing_shot_scale __attribute__((sda));
+extern int g_bouncing_shot_timer __attribute__((sda));
+extern char g_collision_position[];
+extern unsigned char g_bouncing_shot_excluded_ids[8] NOT_SDA;
 
 typedef int EffectQuad __attribute__((mode(TI)));
 typedef union EffectVector { EffectQuad quad; float f[4]; } EffectVector;
@@ -127,7 +127,7 @@ void bouncing_l00_shot_update(char *self)
                     id = -id;
                 }
                 x = (float)shot->trail / IntToFloat(50) * 65000.0f + 10000.0f;
-                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
+                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, g_default_vector, x, 0x80808080, 1);
                 if (r) {
                     short life = 50;
                     EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
@@ -138,14 +138,14 @@ void bouncing_l00_shot_update(char *self)
                 }
             }
         }
-        __builtin_memcpy(work.params.excluded, D_L00_001B0C48, 8);
+        __builtin_memcpy(work.params.excluded, g_bouncing_shot_excluded_ids, 8);
         extra = 1.5f;
         if ((float)shot->bounces == 3.0f) {
             extra = 0.0f;
         }
-        radius = D_L00_001B0C30;
+        radius = g_bouncing_shot_radius;
         if (shot->charged) {
-            radius = D_L00_001B0C3C;
+            radius = g_bouncing_shot_alt_radius;
         }
         qcopy(work.query.start.f, work.old.f);
         qcopy(work.query.end.f, self + 0x10);
@@ -154,7 +154,7 @@ void bouncing_l00_shot_update(char *self)
         work.query.owner = self;
         work.query.mode = 2;
         work.query.radius = radius;
-        work.query.scale = (D_L00_001B0C20 - 1.0f) + 1.0f;
+        work.query.scale = (g_bouncing_shot_query_scale - 1.0f) + 1.0f;
         work.query.extra = extra;
         work.query.field48 = 0;
         work.query.field4c = 0;
@@ -173,7 +173,7 @@ void bouncing_l00_shot_update(char *self)
         vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, shot->axis.f);
         work.hit.owner = self;
         work.hit.flags = 0x830000;
-        { EffectPlayer *pl = &g_weapon_l00_table[D_0013958D[0]]; work.hit.scale = pl->scale; }
+        { EffectPlayer *pl = &g_weapon_l00_table[g_bouncer_weapon_index[0]]; work.hit.scale = pl->scale; }
         work.hit.enabled = 1;
         qcopy(work.hit.pos, shot);
         vec_scale_to_length(work.hit.pos, work.hit.pos, 1.0f);
@@ -215,12 +215,12 @@ void bouncing_l00_shot_update(char *self)
             PlayMobySound(1, 0, self);
             shot->bounces += 1;
             if (shot->bounces >= 4) {
-                qcopy(self + 0x10, D_L00_001BF230);
+                qcopy(self + 0x10, g_collision_position);
                 self[0x20] = 1;
-                shot->timer = D_L00_001B0C44;
-                speed = D_L00_001B0C28 * 0.05235988646745682f;
+                shot->timer = g_bouncing_shot_timer;
+                speed = g_bouncing_shot_fade_radius * 0.05235988646745682f;
                 if (shot->charged) {
-                    speed *= D_L00_001B0C34;
+                    speed *= g_bouncing_shot_speed_scale;
                 }
                 moby_forward_position_call(self, work.offset.f, 1);
                 scale = FastVecDot(work.offset.f, shot);
@@ -238,7 +238,7 @@ void bouncing_l00_shot_update(char *self)
         vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, work.old.f);
         vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, work.old.f);
         vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, work.old.f);
-        scale = (D_L00_001B0C40 - 1.0f) + 1.0f;
+        scale = (g_bouncing_shot_scale - 1.0f) + 1.0f;
         shot->axis.f[3] *= scale;
         FastVecScale(shot, shot, scale);
         if (math_fast_float_d(&shot->timer)) {
@@ -248,11 +248,11 @@ void bouncing_l00_shot_update(char *self)
         }
         break;
     }
-    fadeRadius = D_L00_001B0C28;
+    fadeRadius = g_bouncing_shot_fade_radius;
     if (shot->charged) {
-        fadeRadius *= D_L00_001B0C34;
+        fadeRadius *= g_bouncing_shot_speed_scale;
     }
-    if (D_L00_001A8FF0[0] == 0 && D_L00_001A8FF4[0] == 0) {
+    if (g_hero_locked_flag[0] == 0 && g_hero_action_blocked_flag[0] == 0) {
         part_queue_ground_shadow(self, fadeRadius);
     }
 }

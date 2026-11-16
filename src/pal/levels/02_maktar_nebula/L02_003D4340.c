@@ -28,7 +28,7 @@ extern void func_PAL_L02_003D64F8(char *, int, int);
    stores come out in an order of the scheduler's own (the statement order below is the
    measured one), and 0.017453294f, 1.5707965f and 0.52359885f are retail's bits. */
 
-void func_PAL_L02_003D5140(char *self) {
+void armed_enemy_update_pal(char *self) {
     char *s = *(char **)(self + 0x68);
     float ang;
     float dir;

@@ -9,21 +9,21 @@
 typedef int QuadWord __attribute__((mode(TI)));
 typedef struct { float x,y,z,w; } __attribute__((aligned(16))) RenderVec;
 typedef struct { RenderVec points[4]; u32 colors[4]; float uv[4][2]; u64 r70,texture,flags,blend; } RenderQuad;
-extern char *D_L06_001B281C;
-extern char D_L06_001B9840[];
-extern float D_L06_001AFE7C[] MACRO_ADDR;
-extern s32 D_L06_001AFE50 __attribute__((sda));
-extern s32 D_L06_001AFE54 __attribute__((sda));
-extern s32 D_L06_001AFE58 __attribute__((sda));
-extern s32 D_L06_001AFE5C __attribute__((sda));
-extern u32 D_L06_001AFE70 __attribute__((sda));
-extern u32 D_L06_001AFE74 __attribute__((sda));
-extern float D_L06_001AFE78[8] __attribute__((sda));
-extern RenderVec D_L06_001AFEA0[4] __attribute__((sda));
-extern float D_L06_001AF71C;
-extern s32 D_L06_001B31B4;
-extern s32 D_L06_001B31B0;
-extern float D_L06_001AFF20 __attribute__((sda));
+extern char *g_moby_l06_table;
+extern char g_hero_l06_position[];
+extern float g_ripple_uv_init_table[] MACRO_ADDR;
+extern s32 g_ripple_blend_a __attribute__((sda));
+extern s32 g_ripple_blend_b __attribute__((sda));
+extern s32 g_ripple_blend_c __attribute__((sda));
+extern s32 g_ripple_blend_d __attribute__((sda));
+extern u32 g_ripple_color_start __attribute__((sda));
+extern u32 g_ripple_color_end __attribute__((sda));
+extern float g_ripple_uv_table[8] __attribute__((sda));
+extern RenderVec g_ripple_quad_offsets[4] __attribute__((sda));
+extern float g_texture_scroll_step;
+extern s32 g_ripple_grid_fade_start;
+extern s32 g_ripple_grid_duration;
+extern float g_ripple_fade_duration __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern void set_scale_matrix(void *,float);
 extern void euler_to_matrix(void *,void *);
@@ -39,7 +39,7 @@ void gfx_draw_ripple_grid(char *obj)
     RenderQuad quad[2];
     RenderVec rotation[4];
     char *data = *(char **)(obj+0x68);
-    char *mesh = *(char **)(D_L06_001B281C + RI(data,0xC)*256+0x68);
+    char *mesh = *(char **)(g_moby_l06_table + RI(data,0xC)*256+0x68);
     char *matrices = __builtin_alloca((u32)(RI(data,4)<<9)>>3);
     float fade;
     float distance;
@@ -58,7 +58,7 @@ void gfx_draw_ripple_grid(char *obj)
     u32 color;
     s32 opacity;
 
-    distance = fast_vec_dist(obj+0x10,D_L06_001B9840);
+    distance = fast_vec_dist(obj+0x10,g_hero_l06_position);
     if (distance>48.0f) fade=(80.0f-distance)*0.03125f;
     else fade=1.0f;
     set_scale_matrix(rotation,RF(data,0)*0.5f);
@@ -74,9 +74,9 @@ void gfx_draw_ripple_grid(char *obj)
         RF(matrix,0x38)+=IntToFloat(matrixIndex+1)*RF(data,8);
     }
     texture=GetEffectTextureDescriptor(14);
-    blend=(u64)D_L06_001AFE50 | ((u64)D_L06_001AFE54<<2);
-    blend |= ((u64)D_L06_001AFE58<<4);
-    blend |= ((u64)D_L06_001AFE5C<<6);
+    blend=(u64)g_ripple_blend_a | ((u64)g_ripple_blend_b<<2);
+    blend |= ((u64)g_ripple_blend_c<<4);
+    blend |= ((u64)g_ripple_blend_d<<6);
     blend |= 0x8000000000ULL;
     quad[1].texture=texture;
     quad[0].texture=texture;
@@ -87,7 +87,7 @@ void gfx_draw_ripple_grid(char *obj)
     {
         s32 initialUV;
         for(initialUV=0;initialUV<4;initialUV++) {
-            v0[initialUV*2]=v1[initialUV*2]=D_L06_001AFE7C[initialUV*2];
+            v0[initialUV*2]=v1[initialUV*2]=g_ripple_uv_init_table[initialUV*2];
         }
     }
     i=0;
@@ -97,11 +97,11 @@ void gfx_draw_ripple_grid(char *obj)
         j=0;
         do {
             s32 next;
-            scroll+=D_L06_001AF71C;
+            scroll+=g_texture_scroll_step;
             if(scroll>1.0f) scroll-=1.0f;
             nextRow=j+1;
             for(uvIndex=0;uvIndex<4;uvIndex++) {
-                float uv=D_L06_001AFE78[uvIndex*2]+scroll+RF(mesh,0x12DE0);
+                float uv=g_ripple_uv_table[uvIndex*2]+scroll+RF(mesh,0x12DE0);
                 uv0[uvIndex*2]=uv1[uvIndex*2]=uv;
             }
             for(n=0;n<RI(data,4);n=next) {
@@ -115,15 +115,15 @@ void gfx_draw_ripple_grid(char *obj)
                 ages=ageBase+0x2C00;
                 time=RI(ages,order[n]*4+groupAge);
                 groupVertices=i*0x2580;
-                if(time>D_L06_001B31B4) progress=IntToFloat(time-D_L06_001B31B4)/IntToFloat(D_L06_001B31B0-D_L06_001B31B4);
-                else progress=1.0f-IntToFloat(time)/IntToFloat(D_L06_001B31B4);
-                color=FastTweenColor(D_L06_001AFE70,D_L06_001AFE74,progress);
+                if(time>g_ripple_grid_fade_start) progress=IntToFloat(time-g_ripple_grid_fade_start)/IntToFloat(g_ripple_grid_duration-g_ripple_grid_fade_start);
+                else progress=1.0f-IntToFloat(time)/IntToFloat(g_ripple_grid_fade_start);
+                color=FastTweenColor(g_ripple_color_start,g_ripple_color_end,progress);
                 alpha=IntToFloat((s32)color>>24);
                 opacity=FloatToInt(fade*fade*alpha);
                 color=(color&0xFFFFFF)+(opacity<<24);
                 if((u8)obj[0x20]==2) {
                     alpha=IntToFloat(opacity)*IntToFloat(RI(data,0x34));
-                    color=(color&0xFFFFFF)+(FloatToInt(alpha/(D_L06_001AFF20*60.0f))<<24);
+                    color=(color&0xFFFFFF)+(FloatToInt(alpha/(g_ripple_fade_duration*60.0f))<<24);
                 }
                 k=0;
                 offset=n*64;
@@ -133,7 +133,7 @@ void gfx_draw_ripple_grid(char *obj)
                 quad[1].colors[1]=color;
                 quad[1].colors[0]=color;
                 for(;k<4;k++) {
-                    FastVecAdd(&quad[1].points[k],&D_L06_001AFEA0[k],&((RenderVec (*)[20])(mesh+groupVertices))[j+(k>>1)][order[n]]);
+                    FastVecAdd(&quad[1].points[k],&g_ripple_quad_offsets[k],&((RenderVec (*)[20])(mesh+groupVertices))[j+(k>>1)][order[n]]);
                 }
                 draw_world_quad(&quad[1],matrices+offset,0);
             }

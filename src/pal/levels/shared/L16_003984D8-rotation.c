@@ -13,7 +13,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void quaternion_to_rotation_basis(void *,void *);
 extern void multiply_matrix3x3(void *,void *,void *);
 
-void func_PAL_L16_00398E88(char *object)
+void moby_tilt_to_ground_slope_pal(char *object)
 {
     GroundRotation local;
     char *state=*(char **)(object+0x68);

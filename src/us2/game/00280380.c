@@ -6,11 +6,11 @@ extern u8 *g_hero_moby;
 extern int text_measure_width_small_scaled(u8 *, int, float);
 extern u64 func_US2_0027CED8(int);
 extern void func_US2_0027FCB0(float, float, u64, u8 *, int, float, u64, u8 *);
-extern u8 D_L08_00296CD0[];
-extern u8 D_L08_001DB5E7;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 g_font_print_data[];
+extern u8 g_screen_update_index;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern u8 *g_hero_moby;
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
@@ -24,7 +24,7 @@ void func_US2_00280380(int x, int y, u64 color, u8 *text, int length, float scal
     fx = x - (text_measure_width_small_scaled(text, length, scale) >> 1);
     fy = y;
     texture = func_US2_0027CED8(1);
-    func_US2_0027FCB0(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
+    func_US2_0027FCB0(fx, fy, color, text, length, scale, texture, g_font_print_data);
 }
 
 

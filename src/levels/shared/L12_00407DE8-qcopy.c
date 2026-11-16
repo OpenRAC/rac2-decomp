@@ -15,7 +15,7 @@ extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int,
 extern void moby_mark_spawned(void *);
 extern void ref_L12_00407DE8_00(void *, void *);
 extern void blast_projectile_draw_glow(void *);
-extern char D_L12_001C0258[];   /* collision result; +0x0 the object hit */
+extern char g_hit_l12_result[];   /* collision result; +0x0 the object hit */
 typedef struct { u8 pad[24]; u8 mode; u8 active; u16 owner; u8 rest[20]; } Query __attribute__((aligned(16)));
 /* Projectile update (the func_L16_004051A8 family): expires after 240 frames, moves along its
  * velocity and, on a hit, unless the object hit is the one its state records at +0x10, sends a
@@ -38,8 +38,8 @@ void UpdateBlastProjectile(u8 *obj) {
         make_hit_descriptor(&hit,obj,1,state,*(float *)(state+0x14));
         hit.owner=*(u16 *)(obj+0xAA);
         if (CollLine(obj+0x10,next,0,obj,&hit)) {
-            if (*(void **)D_L12_001C0258) {
-                if (*(void **)D_L12_001C0258!=*(void **)(state+0x10)) {
+            if (*(void **)g_hit_l12_result) {
+                if (*(void **)g_hit_l12_result!=*(void **)(state+0x10)) {
                     *(Quadword *)impact=*(Quadword *)state;
                     FastVecScale(impact,impact,1.5f);
                     impact[2]=1.0f;

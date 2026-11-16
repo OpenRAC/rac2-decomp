@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L15_001B187C __attribute__((sda));
-extern char *D_L15_001B261C __attribute__((sda));
+extern int g_backdrop_grid_enabled __attribute__((sda));
+extern char *g_moby_base __attribute__((sda));
 extern void DrawScrollingGridLayers(void *,int);
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float,float);
@@ -12,19 +12,19 @@ extern void FastVecAdd(void *,void *,void *);
 extern char *func_PAL_L15_00437CD0(void *,void *);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern void func_PAL_L15_0043E840(void *,int,int);
+extern void gorn_part_spawn_spark_burst_pal(void *,int,int);
 extern int snd_play_from_class_bank(int,int,void *,int);
-extern void func_PAL_L05_0037D3D0(float);
+extern void hero_apply_damage_pal(float);
 
 void func_PAL_L15_0043DF7C(char *self) {
  char *state=*(char **)(self+0x68);
  char *obj,*basis,*pos,*axis;
  float a[4],b[4],c[4];
  float distance;
- if(!D_L15_001B187C) return;
+ if(!g_backdrop_grid_enabled) return;
  DrawScrollingGridLayers(self,0);
  if(!math_fast_float_d(state+0xC)) return;
- obj=D_L15_001B261C+(*(int *)state<<8);
+ obj=g_moby_base+(*(int *)state<<8);
  basis=obj+0xC0;
  qcopy(a,basis);
  axis=obj+0xE0;
@@ -48,17 +48,17 @@ void func_PAL_L15_0043DF7C(char *self) {
   vec_scale_to_length(c,c,10.0f);
   FastVecAdd(c,pos,c);
   c[2]-=1.25f;
-  func_PAL_L15_0043E840(c,40,0);
+  gorn_part_spawn_spark_burst_pal(c,40,0);
   snd_play_from_class_bank(16,0,self,0xFBF);
-  func_PAL_L05_0037D3D0(40.0f);
+  hero_apply_damage_pal(40.0f);
  }
  if(*(float *)(obj+0x18)<=415.0f) {
   qcopy(c,basis);
   vec_scale_to_length(c,c,10.0f);
   FastVecAdd(c,pos,c);
   c[2]-=1.25f;
-  func_PAL_L15_0043E840(c,40,0);
+  gorn_part_spawn_spark_burst_pal(c,40,0);
   snd_play_from_class_bank(16,0,self,0xFBF);
-  func_PAL_L05_0037D3D0(40.0f);
+  hero_apply_damage_pal(40.0f);
  }
 }

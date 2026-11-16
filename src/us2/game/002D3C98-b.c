@@ -8,12 +8,12 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029C760(int);
 
-int func_US2_002D3E08(void) {
+int menu_page_update_us2(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)

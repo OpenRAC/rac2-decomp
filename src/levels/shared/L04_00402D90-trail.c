@@ -3,8 +3,8 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vec73E8;
 typedef struct { Vec73E8 vertex[4]; u32 color[4]; float uv[8]; u64 primitive, texture, mode, flags; } Packet73E8;
-extern char D_001A8F20[] __attribute__((sda));
-extern char D_L04_001B9680[];
+extern char g_default_quad[] __attribute__((sda));
+extern char g_tether_zero_vec[];
 extern void set_identity_matrix(void *);
 extern void part_compute_ribbon_point_offset(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -45,7 +45,7 @@ void racer_draw_trail(u8 *obj)
     if (*(short *)(vars + 0x32) < 3)
         return;
     set_identity_matrix(cam);
-    head.quad = *(Quad *)D_001A8F20;
+    head.quad = *(Quad *)g_default_quad;
     point_count = *(short *)(vars + 0x32);
     if (point_count > 30)
         point_count = 30;
@@ -67,7 +67,7 @@ void racer_draw_trail(u8 *obj)
             t = 0.0f;
         FastVecSub(&d, &pts[i + 1], &pts[i]);
         tangent.quad = d.quad;
-        FastVecSub(&d, D_L04_001B9680, &pts[i]);
+        FastVecSub(&d, g_tether_zero_vec, &pts[i]);
         eye.quad = d.quad;
         FastVecCross(&normal, &eye, &tangent);
         vec_scale_to_length(left_point, &normal, t);

@@ -3,19 +3,19 @@
 
 extern char g_hero_state[];
 
-extern int D_L22_001B2AC8 __attribute__((sda));
+extern int g_pickup_message_kind __attribute__((sda));
 
 extern int D_L22_001B2AC8_2;
 
-extern int D_L22_001B2ACC __attribute__((sda));
+extern int g_pickup_message_amount __attribute__((sda));
 
 extern int D_L22_001B2ACC_2;
 
-extern int D_L22_001B2AD0;
+extern int g_pickup_message_timer;
 
-extern int D_L22_001AF384 __attribute__((sda));
+extern int g_pickup_ship_value __attribute__((sda));
 
-extern char D_L22_001B1910[];
+extern char g_ship_pickup_table[];
 
 /* Raises one of three level values by its step and clamps it to its limit. Retail reads the
  * entry word again after the stores to the globals; built with -fno-gcse, as here, this cc1
@@ -24,7 +24,7 @@ extern char D_L22_001B1910[];
 /* Gives the ship the effect of a pickup: more health, more ammo for one side, or more of the third value. Returns 1 when something was raised. */
 int pickup_apply_to_ship(char *obj, int unused, int mode, int flag) {
     char *state = *(char **)(obj + 0x68);
-    char *entry = D_L22_001B1910 + flag * 16;
+    char *entry = g_ship_pickup_table + flag * 16;
     int result = 0;
 
     switch (mode) {
@@ -37,7 +37,7 @@ int pickup_apply_to_ship(char *obj, int unused, int mode, int flag) {
                 if (*(short *)(state + 0x324) < *(int *)(g + 0x1874))
                     *(int *)(g + 0x1874) = *(short *)(state + 0x324);
                 result = 1;
-                D_L22_001B2AC8 = 0;
+                g_pickup_message_kind = 0;
             }
         } else {
             float lim = (float)*(short *)(state + 0x24);
@@ -55,9 +55,9 @@ int pickup_apply_to_ship(char *obj, int unused, int mode, int flag) {
         if (*(int *)(entry + 8) < lim) {
             if (flag) {
                 int step = *(short *)(state + 0x328);
-                D_L22_001B2AC8 = 1;
+                g_pickup_message_kind = 1;
                 if (lim < *(int *)(entry + 8) + step)
-                    D_L22_001B2ACC = lim - *(int *)(entry + 8);
+                    g_pickup_message_amount = lim - *(int *)(entry + 8);
                 else
                     D_L22_001B2ACC_2 = step;
             }
@@ -80,6 +80,6 @@ int pickup_apply_to_ship(char *obj, int unused, int mode, int flag) {
         break;
     }
     if (result)
-        D_L22_001B2AD0 = D_L22_001AF384;
+        g_pickup_message_timer = g_pickup_ship_value;
     return result;
 }

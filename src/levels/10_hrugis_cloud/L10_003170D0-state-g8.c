@@ -73,43 +73,43 @@ typedef struct {
     Moby *moby;                 /* 0x2290 */
 } Hero;
 
-extern MissionState D_L10_00221CD0;
-extern MissionSlot D_L10_002A3C70[];
-extern SaveGame D_001395B8;
+extern MissionState g_mission_state;
+extern MissionSlot g_reward_slot_table[];
+extern SaveGame g_game_flag_table;
 extern Hero g_hero_state;
-extern Moby *D_L10_001B251C;            /* the moby table */
-extern s32 D_L10_001B3554;
-extern s32 D_L10_001B3558;
-extern void (*D_L10_001AA7A0)(void);
-extern void (*D_L10_001AA7A8)(void);
+extern Moby *g_moby_base_table;            /* the moby table */
+extern s32 g_mission_timer_a;
+extern s32 g_mission_timer_b;
+extern void (*g_mission_reset_callback)(void);
+extern void (*g_mission_reset_alt_callback)(void);
 /* The completion counts while the level runs: kind 0 at D_L10_001B1390 (sda), 1 to 3
    here (absolute). */
-extern s32 D_L10_001B1394;
-extern s32 D_L10_001B1398;
-extern s32 D_L10_001B139C;
-extern s32 D_L10_001A8F00;
-extern f32 D_L10_001B2D84;
-extern s32 D_0013A170[];
-extern s32 D_L10_001B13A0 __attribute__((sda));  /* the selected kind, -2 for none */
-extern Moby *D_L10_001B13F0 __attribute__((sda));
-extern s32 D_L10_001B1438 __attribute__((sda));  /* set while a kind is being chosen */
-extern s32 D_L10_001B1428 __attribute__((sda));  /* index of a D_L10_002A3C70 record */
+extern s32 g_mission_completed_first;
+extern s32 g_mission_completed_second;
+extern s32 g_mission_completed_third;
+extern s32 g_mission_reward_state;
+extern f32 g_screen_l10_scale;
+extern s32 g_item_state_words[];
+extern s32 g_selected_mission_kind __attribute__((sda));  /* the selected kind, -2 for none */
+extern Moby *g_hud_blink_moby __attribute__((sda));
+extern s32 g_kind_choosing_flag __attribute__((sda));  /* set while a kind is being chosen */
+extern s32 g_mission_record_index __attribute__((sda));  /* index of a D_L10_002A3C70 record */
 extern s32 g_mission_initialized __attribute__((sda));
-extern s32 D_L10_001B1408 __attribute__((sda));
-extern s32 D_L10_001B13D0 __attribute__((sda));
-extern s32 D_L10_001B13D4 __attribute__((sda));
-extern s32 D_L10_001B13D8 __attribute__((sda));
-extern s32 D_L10_001B13E8 __attribute__((sda));
-extern s32 D_L10_001B13EC __attribute__((sda));
-extern s32 D_L10_001B1424 __attribute__((sda));  /* frames in state 1 */
-extern s32 D_L10_001B1430 __attribute__((sda));  /* subtitle 0xA18 queued */
+extern s32 g_gate_pending_moby __attribute__((sda));
+extern s32 g_hud_label_sprite_first __attribute__((sda));
+extern s32 g_hud_label_sprite_second __attribute__((sda));
+extern s32 g_hud_label_sprite_third __attribute__((sda));
+extern s32 g_hud_setup_done __attribute__((sda));
+extern s32 g_hud_state_flag __attribute__((sda));
+extern s32 g_state_frame_count __attribute__((sda));  /* frames in state 1 */
+extern s32 g_subtitle_second_queued __attribute__((sda));  /* subtitle 0xA18 queued */
 extern s32 g_mission_completion_counts __attribute__((sda));
-extern s32 D_L10_001B1444 __attribute__((sda));  /* no kind 0 completion yet */
-extern s32 D_L10_001B1420 __attribute__((sda));  /* vars->moby enabled */
-extern s32 D_L10_001B142C __attribute__((sda));  /* subtitle 0xA17 queued */
-extern s32 D_L10_001B2048 __attribute__((sda));
-extern s32 D_L10_001A904C MACRO_ADDR;
-extern s32 D_L10_001B1440 __attribute__((sda));
+extern s32 g_no_first_completion_flag __attribute__((sda));  /* no kind 0 completion yet */
+extern s32 g_moby_enabled_flag __attribute__((sda));  /* vars->moby enabled */
+extern s32 g_subtitle_first_queued __attribute__((sda));  /* subtitle 0xA17 queued */
+extern s32 g_mission_reward_level __attribute__((sda));
+extern s32 g_hud_sprite_table_base MACRO_ADDR;
+extern s32 g_reward_active_flag __attribute__((sda));
 
 extern void hero_set_state_value_a(s32 value);
 extern void hero_set_state_value_b(s32 value);
@@ -154,25 +154,25 @@ void UpdateHrugisController(Moby *moby)
         moby->drawDistance = 0x1FF;
         moby->updateDistance = 0xFF;
         moby->state = 1;
-        D_L10_00221CD0.index = vars->index;
-        D_L10_00221CD0.f30 = 8.0f;
-        D_L10_001B13A0 = -2;
-        D_L10_00221CD0.f24 = 1;
-        D_L10_001B13F0 = moby;
-        D_L10_001B1438 = 1;
-        D_L10_001B1428 = 0;
+        g_mission_state.index = vars->index;
+        g_mission_state.f30 = 8.0f;
+        g_selected_mission_kind = -2;
+        g_mission_state.f24 = 1;
+        g_hud_blink_moby = moby;
+        g_kind_choosing_flag = 1;
+        g_mission_record_index = 0;
         g_mission_initialized = 0;
-        D_L10_001B1408 = 0;
-        D_L10_001B13D0 = 0;
-        D_L10_001B13D4 = 0;
-        D_L10_001B13D8 = 0;
-        D_L10_001B13E8 = 0;
-        D_L10_001B13EC = 0;
+        g_gate_pending_moby = 0;
+        g_hud_label_sprite_first = 0;
+        g_hud_label_sprite_second = 0;
+        g_hud_label_sprite_third = 0;
+        g_hud_setup_done = 0;
+        g_hud_state_flag = 0;
         moby->drawDistance = 0x1FF;
         moby->updateDistance = 0xFF;
         moby->state = 1;
         vars->f34 = 0;
-        D_L10_001B1424 = 0;
+        g_state_frame_count = 0;
         vars->f40 = 162000;
         vars->f50 = 240;
         vars->f44 = 120;
@@ -180,32 +180,32 @@ void UpdateHrugisController(Moby *moby)
         vars->f58 = 120;
         vars->f48 = 10800;
         vars->f5C = 150;
-        D_L10_001B3554 = 540;
-        D_L10_001B3558 = 360;
-        D_L10_001B1430 = 0;
-        D_L10_00221CD0.reset = mission_reset_counters;
-        D_L10_00221CD0.resetAll = mission_reset_counters_alt;
-        D_L10_00221CD0.onHit = ProcessObjectCollisionDamage;
-        D_L10_00221CD0.controller = moby;
+        g_mission_timer_a = 540;
+        g_mission_timer_b = 360;
+        g_subtitle_second_queued = 0;
+        g_mission_state.reset = mission_reset_counters;
+        g_mission_state.resetAll = mission_reset_counters_alt;
+        g_mission_state.onHit = ProcessObjectCollisionDamage;
+        g_mission_state.controller = moby;
         hero_set_state_value_a(1);
         hero_set_state_value_b(0);
-        while (!D_L10_002A3C70[slot_find_active_in_chain(D_L10_001B1428)].f00
-               || !D_L10_002A3C70[slot_find_active_in_chain(D_L10_001B1428)].f1E)
-            ++D_L10_001B1428;
-        completed0 = D_001395B8.completions[0];
-        completed1 = D_001395B8.completions[1];
-        completed2 = D_001395B8.completions[2];
-        completed3 = D_001395B8.completions[3];
-        D_L10_001AA7A0 = mission_reset_counters;
-        D_L10_001AA7A8 = mission_reset_counters_alt;
-        D_L10_001B1394 = completed1;
-        D_L10_001B1398 = completed2;
-        D_L10_001B139C = completed3;
+        while (!g_reward_slot_table[slot_find_active_in_chain(g_mission_record_index)].f00
+               || !g_reward_slot_table[slot_find_active_in_chain(g_mission_record_index)].f1E)
+            ++g_mission_record_index;
+        completed0 = g_game_flag_table.completions[0];
+        completed1 = g_game_flag_table.completions[1];
+        completed2 = g_game_flag_table.completions[2];
+        completed3 = g_game_flag_table.completions[3];
+        g_mission_reset_callback = mission_reset_counters;
+        g_mission_reset_alt_callback = mission_reset_counters_alt;
+        g_mission_completed_first = completed1;
+        g_mission_completed_second = completed2;
+        g_mission_completed_third = completed3;
         g_mission_completion_counts = completed0;
         if (!g_mission_completion_counts)
-            D_L10_001B1444 = 1;
+            g_no_first_completion_flag = 1;
         else
-            D_L10_001B1444 = 0;
+            g_no_first_completion_flag = 0;
         if (g_hero_state.moby != 0)
             g_hero_state.moby->flags |= 0x41;
         /* fall through */
@@ -214,43 +214,43 @@ void UpdateHrugisController(Moby *moby)
         s32 on = 1;
 
         level_select_random_object();
-        level_store_pair_with_increment((s32)(D_L10_001B2D84 * -230.0f + 0.5f), 2);
-        if (D_L10_00221CD0.selection != D_L10_001B13A0) {
-            D_L10_00221CD0.selection = D_L10_001B13A0;
-            D_L10_00221CD0.f88 = 0;
+        level_store_pair_with_increment((s32)(g_screen_l10_scale * -230.0f + 0.5f), 2);
+        if (g_mission_state.selection != g_selected_mission_kind) {
+            g_mission_state.selection = g_selected_mission_kind;
+            g_mission_state.f88 = 0;
         }
-        if (!D_L10_001B1420) {
-            moby_set_flag_bit(&D_L10_001B251C[vars->moby], 1);
-            D_L10_001B1420 = on;
-            D_L10_001B1424 = 0;
+        if (!g_moby_enabled_flag) {
+            moby_set_flag_bit(&g_moby_base_table[vars->moby], 1);
+            g_moby_enabled_flag = on;
+            g_state_frame_count = 0;
         }
-        if (D_L10_001B1424++ < 5 || D_L10_001A8F00 == 2)
+        if (g_state_frame_count++ < 5 || g_mission_reward_state == 2)
             break;
 
         hero_l00_set_action(0x31, 0);
-        if (D_L10_001B1438) {
+        if (g_kind_choosing_flag) {
             hero_set_state_value_c(on);
-            D_L10_001B13A0 = LockedEntryMenuInput();
-            if (D_L10_001B13A0 != -2)
+            g_selected_mission_kind = LockedEntryMenuInput();
+            if (g_selected_mission_kind != -2)
                 ship_save_transform_state();
             break;
         }
-        if (!D_L10_001B142C) {
+        if (!g_subtitle_first_queued) {
             subtitle_request_voice_line(0xA17, 0x6E);
-            D_L10_001B142C = on;
+            g_subtitle_first_queued = on;
         }
-        if ((D_0013A170[0] == on || D_0013A170[0] == 5 || D_0013A170[0] == 10)
-            && !status_any_record_nonzero() && !D_L10_001B1430) {
+        if ((g_item_state_words[0] == on || g_item_state_words[0] == 5 || g_item_state_words[0] == 10)
+            && !status_any_record_nonzero() && !g_subtitle_second_queued) {
             subtitle_request_voice_line(0xA18, 0x6F);
-            D_L10_001B1430 = 1;
+            g_subtitle_second_queued = 1;
         }
         if (math_fast_float_d(&vars->timer))
-            D_L10_00221CD0.waiting = 0;
+            g_mission_state.waiting = 0;
         else
-            D_L10_00221CD0.waiting = 1;
+            g_mission_state.waiting = 1;
         hero_set_state_value_c(0);
-        if (D_L10_001B13A0 != -2 && D_L10_001B2048 >= 3) {
-            switch (D_L10_001B13A0) {
+        if (g_selected_mission_kind != -2 && g_mission_reward_level >= 3) {
+            switch (g_selected_mission_kind) {
             case 0:
                 mission_first_update(moby);
                 break;
@@ -265,10 +265,10 @@ void UpdateHrugisController(Moby *moby)
                 break;
             }
         }
-        if (D_L10_001A904C && !D_L10_001B13E8 && !D_L10_001B1440) {
+        if (g_hud_sprite_table_base && !g_hud_setup_done && !g_reward_active_flag) {
             level_store_value_pair(0, DrawHrugisMissionHud);
-            D_L10_001B13EC = 0;
-            D_L10_001B13E8 = 1;
+            g_hud_state_flag = 0;
+            g_hud_setup_done = 1;
         }
         break;
     }
@@ -276,8 +276,8 @@ void UpdateHrugisController(Moby *moby)
         break;
     case 3:
         if (!cam_is_mode_active()) {
-            D_L10_00221CD0.waiting = 0;
-            D_L10_00221CD0.rounds++;
+            g_mission_state.waiting = 0;
+            g_mission_state.rounds++;
             moby->state = 1;
         }
         break;

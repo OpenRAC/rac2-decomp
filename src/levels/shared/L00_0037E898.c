@@ -9,11 +9,11 @@ typedef struct { V1306TI q[5]; } __attribute__((aligned(16))) V1306Packet;
 typedef struct { char pad[4]; unsigned char flag; char mid[107]; float f70; char tail[108]; } V1306Material;
 extern unsigned char g_item_slot_to_record[];
 extern V1306Material g_weapon_l00_table[];
-extern V1306Packet D_L00_002A26A0;
-extern V1306Table D_L00_001AEFE0, D_L00_001AEFF8;
+extern V1306Packet g_particle_packet_template;
+extern V1306Table g_big_explosion_table_a, g_big_explosion_table_b;
 extern char g_camera_l00_position[], g_area_hit_targets[];
 typedef struct { char pad[0x160]; float amount; int unused, duration, state; } V1439Camera;
-extern V1439Camera D_L00_001B8C80;
+extern V1439Camera g_scalar_transition_state;
 extern float IntToFloat(int);
 extern void FastVecScale(char *, char *, float);
 extern void FastVecSub(char *, char *, char *);
@@ -96,9 +96,9 @@ typedef struct {
     QwenRecovery_4ecc6b5a4034_u8 tail[8];
 } QwenRecovery_4ecc6b5a4034_ExtraResetRecord164;
 
-extern QwenRecovery_4ecc6b5a4034_ExtraResetRecord164 D_L00_002372C0[100];
+extern QwenRecovery_4ecc6b5a4034_ExtraResetRecord164 g_extra_reset_records[100];
 
-extern QwenRecovery_4ecc6b5a4034_u32 D_L00_00238580[139];
+extern QwenRecovery_4ecc6b5a4034_u32 g_state_reset_words_a[139];
 
 extern void func_00282CF0_12(Rac2Native_b1b523716b470b36_FamilyNative192Vector *out,
     const Rac2Native_b1b523716b470b36_FamilyNative192Vector *first, const Rac2Native_b1b523716b470b36_FamilyNative192Vector *second);
@@ -111,7 +111,7 @@ extern void moby_l00_place_part_from_direction_2(void *owner, void *out);
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_03c444112283bc5f_u32;
 
-extern Rac2Native_03c444112283bc5f_u32 D_L00_00238DF0[139];
+extern Rac2Native_03c444112283bc5f_u32 g_state_reset_words_b[139];
 
 extern void projectile_bouncing_update(char *object);
 
@@ -154,7 +154,7 @@ extern int UpdateSoundVoices();
 
 extern L00_0037F7E8_u8 *func_002A08A0(void);
 
-extern L00_0037F7E8_u8 *D_L00_001B1EA8 __attribute__((sda));
+extern L00_0037F7E8_u8 *g_moby_l00_list_head __attribute__((sda));
 
 extern void func_002A05A8(char *);
 
@@ -208,7 +208,7 @@ void moby_update_level_objects(void)
         return;
     game_reset_frame_counters();
     UpdateSoundVoices();
-    D_L00_001B1EA8 = head = func_002A08A0();
+    g_moby_l00_list_head = head = func_002A08A0();
     object = (L00_0037F7E8_Object *)head;
     if (object != 0) {
         while (object != 0) {
@@ -245,7 +245,7 @@ typedef struct {
     int best;
 } L00_0037FE08_Pool;
 
-extern L00_0037FE08_Pool D_L00_00231540;
+extern L00_0037FE08_Pool g_moby_pool_entries;
 
 extern char g_hero_position[];
 
@@ -259,13 +259,13 @@ void moby_find_nearest_pool_entry(void)
     float best;
     int i;
 
-    if (D_L00_00231540.count != 0) {
+    if (g_moby_pool_entries.count != 0) {
         best = 100000000.0f;
-        for (i = 0; i < D_L00_00231540.count; i++) {
-            float distance = vec_fast_helper_c(g_hero_position, D_L00_00231540.entry[i][0] + 0x10);
+        for (i = 0; i < g_moby_pool_entries.count; i++) {
+            float distance = vec_fast_helper_c(g_hero_position, g_moby_pool_entries.entry[i][0] + 0x10);
 
             if (distance < best) {
-                D_L00_00231540.best = i;
+                g_moby_pool_entries.best = i;
                 best = distance;
             }
         }
@@ -417,16 +417,16 @@ void state_reset_records(void)
 {
     int i;
     for (i = 99; i >= 0; --i)
-        D_L00_002372C0[i].word = 0;
-    D_L00_00238580[138] = 5;
-    D_L00_00238580[137] = 0;
-    D_L00_00238580[136] = 0;
+        g_extra_reset_records[i].word = 0;
+    g_state_reset_words_a[138] = 5;
+    g_state_reset_words_a[137] = 0;
+    g_state_reset_words_a[136] = 0;
     for (i = 0; i < 64; ++i) {
-        D_L00_00238580[i] = 0;
-        D_L00_00238580[i + 64] = 0;
+        g_state_reset_words_a[i] = 0;
+        g_state_reset_words_a[i + 64] = 0;
     }
     for (i = 7; i >= 0; --i)
-        D_L00_00238580[i + 128] = 0;
+        g_state_reset_words_a[i + 128] = 0;
 }
 
 extern void ref_L00_00387F98_00(void *arg);
@@ -434,7 +434,7 @@ extern void ref_L00_00387F98_00(void *arg);
 /* Runs the shared reset on the state word block. */
 void state_l00_apply_shared_reset_words(void)
 {
-    ref_L00_00387F98_00(D_L00_00238580);
+    ref_L00_00387F98_00(g_state_reset_words_a);
 }
 
 /* shared native body of family a04928c6 */
@@ -549,15 +549,15 @@ void moby_l00_advance_child_blend_2(Owner_F9e2cd219 *self)
 void state_reset_words(void)
 {
     int i;
-    D_L00_00238DF0[138] = 5;
-    D_L00_00238DF0[137] = 0;
-    D_L00_00238DF0[136] = 0;
+    g_state_reset_words_b[138] = 5;
+    g_state_reset_words_b[137] = 0;
+    g_state_reset_words_b[136] = 0;
     for (i = 0; i < 64; ++i) {
-        D_L00_00238DF0[i] = 0;
-        D_L00_00238DF0[i + 64] = 0;
+        g_state_reset_words_b[i] = 0;
+        g_state_reset_words_b[i + 64] = 0;
     }
     for (i = 7; i >= 0; --i)
-        D_L00_00238DF0[i + 128] = 0;
+        g_state_reset_words_b[i + 128] = 0;
 }
 
 extern void ref_L00_0038A9E0_00(void *arg);
@@ -565,7 +565,7 @@ extern void ref_L00_0038A9E0_00(void *arg);
 /* Runs the shared reset on the state word block. */
 void state_l00_apply_shared_reset_words_2(void)
 {
-    ref_L00_0038A9E0_00(D_L00_00238DF0);
+    ref_L00_0038A9E0_00(g_state_reset_words_b);
 }
 
 /* shared native body of family a04928c6 */
@@ -603,7 +603,7 @@ void gfx_l00_init_default_block_2(char *block)
 /* func_L00_0038AAD0 is defined in L00_0038AAD0.c. */
 
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 extern void *ref_L00_0038B848_00(void *arg);
 
@@ -612,8 +612,8 @@ int record_is_current_byte_one(void)
 {
     int result = 0;
     unsigned char *record = 0;
-    if (D_L00_001BF218) {
-        record = (unsigned char *)ref_L00_0038B848_00(D_L00_001BF218);
+    if (g_hit_l00_result) {
+        record = (unsigned char *)ref_L00_0038B848_00(g_hit_l00_result);
     }
     if (record) {
         result = (record[9] == 1);
@@ -621,14 +621,14 @@ int record_is_current_byte_one(void)
     return result;
 }
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 extern void *ref_L00_0038B848_00(void *arg);
 
 /* Returns 1 if the current record has bit 2 set in its flags, otherwise 0. */
 int record_is_current_flag_set(void)
 {
-    unsigned short *record = (unsigned short *)ref_L00_0038B848_00(D_L00_001BF218);
+    unsigned short *record = (unsigned short *)ref_L00_0038B848_00(g_hit_l00_result);
     if (record) {
         if (record[15] & 2) {
             return 1;
@@ -639,7 +639,7 @@ int record_is_current_flag_set(void)
 
 
 
-extern unsigned char D_001A7B2A __attribute__((sda));
+extern unsigned char g_hero_override_flag __attribute__((sda));
 
 /* Measured partial layouts; the original types and game roles are unknown. */
 typedef struct L00_0038BD00_Kind {
@@ -686,9 +686,9 @@ void moby_trigger_nearby_response(char *object)
     L00_0038BD00_Kind *kind;
 
     limit = 2.7f;
-    if (D_001A7B2A != 0)
+    if (g_hero_override_flag != 0)
         limit = 10.0f;
-    node = (L00_0038BD00_Node *)D_L00_001B1EA8;
+    node = (L00_0038BD00_Node *)g_moby_l00_list_head;
     if (node == 0)
         return;
     step = 0.01745329424738884f;
@@ -731,7 +731,7 @@ next:
     }
 }
 
-extern float D_00189EB8;
+extern float g_player_yaw;
 
 extern float mat_fast_helper_a(float first, float second);
 
@@ -748,7 +748,7 @@ void vec_scale_by_angle_limit(char *object)
 {
     float limit = 1.83259594440460205078125f;
     float base = mat_fast_helper_a(*(float *)object, *(float *)(object + 4));
-    float scaled = FastDiffRots(D_00189EB8, base);
+    float scaled = FastDiffRots(g_player_yaw, base);
     float angle;
 
     if (limit < scaled)
@@ -800,7 +800,7 @@ void part_spawn_big_explosion(char *object, char *direction, char *axis)
     int *child;
     int i, n, counter, asset1, asset2, life1, life2;
     float scale, length, twice, speed, force;
-    packet = D_L00_002A26A0;
+    packet = g_particle_packet_template;
     child = *(int **)(object + 0x68);
     scale = IntToFloat(V1306_FLAG) + 1.0f;
     FastVecScale(direction, direction, scale);
@@ -862,8 +862,8 @@ void part_spawn_big_explosion(char *object, char *direction, char *axis)
         force = scale;
         speed = scale * func_002A7878_1(8.0f, 10.0f);
         force *= limit;
-        first = D_L00_001AEFE0;
-        second = D_L00_001AEFF8;
+        first = g_big_explosion_table_a;
+        second = g_big_explosion_table_b;
         speed *= step;
         speed -= twice * step;
         asset1 = gfx_swap_packed_color_channels(first.entry[math_random_int_below(6)], V1306_FLAG);
@@ -892,12 +892,12 @@ void part_spawn_big_explosion(char *object, char *direction, char *axis)
     object[0xBC] = 0;
     if (V1306_FLAG) PlayMobySound(0,0,object);
     else PlayMobySound(0,0,object);
-    { V1439Camera *camera = &D_L00_001B8C80;
+    { V1439Camera *camera = &g_scalar_transition_state;
     if (length < 20.0f) camera->amount = 0.4f - length * 0.0175f;
     else camera->amount = 0.050000011920928955f;
     }
-    D_L00_001B8C80.duration=25;
-    D_L00_001B8C80.state=0;
+    g_scalar_transition_state.duration=25;
+    g_scalar_transition_state.state=0;
     moby_spawn_template_effect(&packet,object+0x10,0,0);
 }
 

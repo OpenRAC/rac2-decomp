@@ -52,10 +52,10 @@ typedef struct {
     u8 pad3C[4];
 } PlayerContactEntry;
 extern PlayerContactState g_hero_state;
-extern PlayerContactEntry D_L01_001C3B80[];
-extern s32 D_L01_001A8F40 __attribute__((sda));
+extern PlayerContactEntry g_player_contact_table[];
+extern s32 g_hero_l01_control_mode __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
 extern s32 FloatToInt(float);
@@ -64,13 +64,13 @@ extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
 extern s32 func_US2_L01_002BEEA8(unsigned long, unsigned long);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
-extern void func_US2_L00_002A4EF8(s32);
+extern void AdjustPlayerHealth_us2(s32);
 extern int hero_play_sound(s32, s32);
 extern void hero_flatten_push_vector(void *, s32, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-s32 func_US2_L01_002B3990(s32 arg0) {
+s32 hero_l01_apply_hazard_contact_us2(s32 arg0) {
     TI16 vec;
     PlayerContactEntry *e;
     u8 *moby;
@@ -86,7 +86,7 @@ s32 func_US2_L01_002B3990(s32 arg0) {
     if (g_hero_state.f1DC != 0) {
         return 0;
     }
-    if (D_L01_001A8F40 != 0) {
+    if (g_hero_l01_control_mode != 0) {
         return 0;
     }
     g_hero_state.f249C = 0;
@@ -94,7 +94,7 @@ s32 func_US2_L01_002B3990(s32 arg0) {
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
-    e = &D_L01_001C3B80[moby[0xA8]];
+    e = &g_player_contact_table[moby[0xA8]];
     if (e->f38 != moby) {
         return 0;
     }
@@ -102,7 +102,7 @@ s32 func_US2_L01_002B3990(s32 arg0) {
         return 0;
     }
     if (e->f2C != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
@@ -139,7 +139,7 @@ s32 func_US2_L01_002B3990(s32 arg0) {
             u8 *r = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
             if (r != 0) {
-                func_US2_L00_002A4EF8(FloatToInt(*(float *)(r + 0x2C)));
+                AdjustPlayerHealth_us2(FloatToInt(*(float *)(r + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
                 func_US2_L01_002BEEA8(0x16, 1);

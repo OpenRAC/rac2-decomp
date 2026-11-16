@@ -2,13 +2,13 @@
 
 #include "common.h"
 typedef int Snapshot128 __attribute__((mode(TI)));
-extern u8 D_L01_002A4D50[],g_hero_position[];
-extern float D_L01_001B0420 __attribute__((sda));
-extern float D_L01_001B0424 __attribute__((sda));
-extern float D_L01_001B0428 __attribute__((sda));
-extern float D_L01_001B042C __attribute__((sda));
-extern float D_L01_001B0430 __attribute__((sda));
-extern float D_L01_001B0434 __attribute__((sda));
+extern u8 g_str_water_floater_debug[],g_hero_position[];
+extern float g_water_floater_scale __attribute__((sda));
+extern float g_water_floater_angle_a __attribute__((sda));
+extern float g_water_floater_angle_b __attribute__((sda));
+extern float g_water_floater_speed __attribute__((sda));
+extern float g_water_floater_limit __attribute__((sda));
+extern float g_water_floater_push_radius __attribute__((sda));
 extern void STUB_printf(void *,int,int);
 extern float func_PAL_L01_003BEB40(void);
 extern float math_random_angle(void);
@@ -29,7 +29,7 @@ void func_PAL_L01_003D29A0(u8 *a0)
     float h, dist, delta;
 
     if (!p) {
-        STUB_printf(D_L01_002A4D50, *(s16 *)(a0 + 0xAA), *(s16 *)(a0 + 0xB2));
+        STUB_printf(g_str_water_floater_debug, *(s16 *)(a0 + 0xAA), *(s16 *)(a0 + 0xB2));
         return;
     }
     switch (a0[0x20]) {
@@ -47,19 +47,19 @@ void func_PAL_L01_003D29A0(u8 *a0)
         *(Snapshot128 *)snapshots[0] = *(Snapshot128 *)(a0 + 0x10);
         *(Snapshot128 *)snapshots[1] = *(Snapshot128 *)snapshots[0];
         h = func_PAL_L01_003BEB40();
-        moby_scale_owner_words_by_angles(a0, p + 0x20, p + 0x24, D_L01_001B0420,
-                      D_L01_001B0424 * 0.0003490659f,
-                      D_L01_001B0428 * 0.0003490659f);
+        moby_scale_owner_words_by_angles(a0, p + 0x20, p + 0x24, g_water_floater_scale,
+                      g_water_floater_angle_a * 0.0003490659f,
+                      g_water_floater_angle_b * 0.0003490659f);
         func_PAL_L01_003D2900((float *)(a0 + 0x10), (float *)(p + 0x10), *(float *)p,
-                          D_L01_001B042C * 0.00040000002f, D_L01_001B0430, 3.0f);
+                          g_water_floater_speed * 0.00040000002f, g_water_floater_limit, 3.0f);
         func_PAL_L01_003D2900((float *)(a0 + 0x14), (float *)(p + 0x14), *(float *)(p + 4),
-                          D_L01_001B042C * 0.00040000002f, D_L01_001B0430, 3.0f);
+                          g_water_floater_speed * 0.00040000002f, g_water_floater_limit, 3.0f);
         dist = vec_distance_xy(a0 + 0x10, g_hero_position);
-        if (dist < D_L01_001B0434 &&
+        if (dist < g_water_floater_push_radius &&
             *(float *)(g_hero_position + 8) < *(float *)(a0 + 0x18) + 0.8f) {
             FastVecSub(d, a0 + 0x10, g_hero_position);
             d[2] = 0;
-            vec_scale_to_length(d, d, (D_L01_001B0434 - dist) * 0.08f);
+            vec_scale_to_length(d, d, (g_water_floater_push_radius - dist) * 0.08f);
             FastVecAdd(a0 + 0x10, a0 + 0x10, d);
         }
         delta = h + *(float *)(p + 0x28) - *(float *)(a0 + 0x18);

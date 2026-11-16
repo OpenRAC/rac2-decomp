@@ -11,19 +11,19 @@ typedef struct { u16 count, pad; u32 time, levels; } SubtitleHistory;
 extern SubtitleHistory g_subtitle_history[];
 extern u32 g_current_map_index[] __attribute__((sda));
 extern u32 level_gp SDATA(D_001A79F0);
-extern u32 D_001A7390 __attribute__((sda));
-extern int D_L16_001A8F00[] __attribute__((sda));
-extern float D_L16_001A7CD8[] __attribute__((sda));
+extern u32 g_frame_counter __attribute__((sda));
+extern int g_snivelak_state[] __attribute__((sda));
+extern float g_hero_speed_param_a[] __attribute__((sda));
 extern float launch_gp SDATA(D_L16_001A7CD8);
-extern float D_L16_001A7CDC[] __attribute__((sda));
-extern u32 D_L16_001B2648 __attribute__((sda));
-extern u8 (*D_L16_001B2B1C[])[256] __attribute__((sda));
+extern float g_hero_speed_param_b[] __attribute__((sda));
+extern u32 g_frame_l16_counter __attribute__((sda));
+extern u8 (*g_moby_instance_table[])[256] __attribute__((sda));
 extern u8 (*objects_gp)[256] SDATA(D_L16_001B2B1C);
-extern u8 (*D_L16_001B2C0C)[128] __attribute__((sda));
-extern float D_L16_001B15B8 __attribute__((sda));
-extern float D_L16_001B15BC __attribute__((sda)),D_L16_001B15C0 __attribute__((sda));
-extern float D_L16_001B15C4 __attribute__((sda));
-extern Quad D_L16_001B15D0 __attribute__((sda));
+extern u8 (*g_beam_definition_table)[128] __attribute__((sda));
+extern float g_effect_float_param __attribute__((sda));
+extern float g_effect_field_a __attribute__((sda)),g_effect_field_b __attribute__((sda));
+extern float g_effect_angle_degrees __attribute__((sda));
+extern Quad g_effect_quad_pad __attribute__((sda));
 typedef struct { s32 targetIndex, objectIndex, pad8; float rate; float velocity[4], position[4]; s32 sound, pad34, active, pad3C; PoolRecord64 *effect; } LaunchState;
 extern void moby_mark_spawned(void *);
 extern float mat_fast_helper_a(float,float);
@@ -50,12 +50,12 @@ void UpdateTargetedHeroLauncher(u8 *object)
     u8 *target;
     PoolRecord64 *effect;
     int handle;
-    if (D_L16_001A8F00[0]==2) return;
+    if (g_snivelak_state[0]==2) return;
     switch (object[0x20]) {
     case 0:
-        if (level_gp==16) D_L16_001A7CDC[0]=D_L16_001B15B8;
+        if (level_gp==16) g_hero_speed_param_b[0]=g_effect_float_param;
         if (state->targetIndex!=-1) {
-            target=(u8 *)((state->targetIndex<<7)+(u32)D_L16_001B2C0C);
+            target=(u8 *)((state->targetIndex<<7)+(u32)g_beam_definition_table);
             F(object,0xF8)=mat_fast_helper_a(F(object,0x10)-F(target,0x30),F(object,0x14)-F(target,0x34));
         } else {
             if (state->objectIndex==-1) { moby_mark_spawned(object); return; }
@@ -71,7 +71,7 @@ void UpdateTargetedHeroLauncher(u8 *object)
         if (g_hero_state.owner==object) {
             moby_get_launch_target_pos(object,state->position);
             launch_gp=(state->position[2]-g_hero_state.height)*2.5f;
-            if (launch_gp<37.0f) D_L16_001A7CD8[0]=37.0f;
+            if (launch_gp<37.0f) g_hero_speed_param_a[0]=37.0f;
         }
         if (g_hero_state.mode==0x81) {
             if (g_hero_state.owner==object && g_hero_state.upward>0.0f) {
@@ -79,7 +79,7 @@ void UpdateTargetedHeroLauncher(u8 *object)
                 PlayMobySound(1,0,(char *)object);
                 if (g_current_map_index[0]==16) multiplier=0.3f;
                 distance=vec_distance_xy((u8 *)&g_hero_state+0x80,state->position);
-                rate=D_L16_001A7CDC[0]*(distance*0.00027777778f)*multiplier/D_L16_001A7CD8[0];
+                rate=g_hero_speed_param_b[0]*(distance*0.00027777778f)*multiplier/g_hero_speed_param_a[0];
                 value=square_root((rate+rate)*distance);
                 FastVecSub(difference,state->position,(u8 *)&g_hero_state+0x80);
                 difference[2]=0.0f;
@@ -88,7 +88,7 @@ void UpdateTargetedHeroLauncher(u8 *object)
                 state->rate=rate;
                 moby_set_state(object,2,-1);
             }
-        } else if ((D_L16_001B2648&15)==(((s32)object>>8)&15)) {
+        } else if ((g_frame_l16_counter&15)==(((s32)object>>8)&15)) {
             if (state->objectIndex!=-1 && (*(u16 *)(objects_gp[state->objectIndex]+0x34)&1)) moby_set_state(object,3,-1);
         }
         break;
@@ -114,10 +114,10 @@ void UpdateTargetedHeroLauncher(u8 *object)
                 state->effect=effect;
                 if (effect) {
                     state->active=1;
-                    qcopy(effect->pad32,&D_L16_001B15D0);
-                    effect->f0=D_L16_001B15BC;
-                    state->effect->f4=D_L16_001B15C0;
-                    state->effect->f12=D_L16_001B15C4*0.017453294f;
+                    qcopy(effect->pad32,&g_effect_quad_pad);
+                    effect->f0=g_effect_field_a;
+                    state->effect->f4=g_effect_field_b;
+                    state->effect->f12=g_effect_angle_degrees*0.017453294f;
                     state->effect->f30=1;
                     state->effect->f26=1;
                 }
@@ -132,7 +132,7 @@ void UpdateTargetedHeroLauncher(u8 *object)
         }
         break;
     case 3: {
-        u8 *fadeTarget=D_L16_001B2B1C[0][state->objectIndex];
+        u8 *fadeTarget=g_moby_instance_table[0][state->objectIndex];
         if ((*(u16 *)(fadeTarget+0x34)&1)) {
             if (object[0x23]) {
                 I(object,0x98)=0;
@@ -155,11 +155,11 @@ void UpdateTargetedHeroLauncher(u8 *object)
     if (object[0x31] && object[0x20]!=3) part_spawn_sparkle_in_triangle(object);
     if (g_current_map_index[0]==16 && vec_distance_squared_xy((u8 *)&g_hero_state+0x80,object+0x10)<9.0f) {
         if (g_subtitle_history[99].count!=0) {
-            if (D_001A7390-g_subtitle_history[99].time>1080 || g_subtitle_history[99].time==0) subtitle_request_voice_line(0xA0C,99);
-            else if (D_001A7390>g_subtitle_history[99].time) g_subtitle_history[99].time=D_001A7390;
+            if (g_frame_counter-g_subtitle_history[99].time>1080 || g_subtitle_history[99].time==0) subtitle_request_voice_line(0xA0C,99);
+            else if (g_frame_counter>g_subtitle_history[99].time) g_subtitle_history[99].time=g_frame_counter;
         } else {
             g_subtitle_history[99].count++;
-            if (g_subtitle_history[99].time<D_001A7390) g_subtitle_history[99].time=D_001A7390;
+            if (g_subtitle_history[99].time<g_frame_counter) g_subtitle_history[99].time=g_frame_counter;
             g_subtitle_history[99].levels=(g_subtitle_history[99].levels|(1U<<g_current_map_index[0]))|0x80000000U;
         }
     }

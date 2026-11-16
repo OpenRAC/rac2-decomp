@@ -7,7 +7,7 @@ extern int part_alloc_effect_slot(void *a0, void *a1, float f12, float f13, floa
 extern int part_l00_alloc_effect_slot_2(void *a0, float f12, float f13, float f14, float f15, float f16);
 extern float math_random_angle(void);
 extern void euler_rotation_basis(void *a0, void *a1);
-extern unsigned int D_L00_001AFDA0 __attribute__((sda));
+extern unsigned int g_effect_moby_count __attribute__((sda));
 
 /* Creates the level's own object, fills the header the object carries, copies the two
    16-byte records it is given into it, and lets the shared helpers set the rest up.
@@ -41,7 +41,7 @@ void *func_PAL_L00_003BECF0(char *a0, char *a1, char *a2, char *a3)
         *(int *)(sub + 0x54) = 0;
         *(int *)(sub + 0x58) = 0;
         *(unsigned char *)(node + 0x20) = 0;
-        D_L00_001AFDA0 = D_L00_001AFDA0 + 1;
+        g_effect_moby_count = g_effect_moby_count + 1;
         *(int *)(sub + 0x5C) = part_l00_alloc_effect_slot_2(p1, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
         *(float *)(node + 0xF0) = math_random_angle();
         *(float *)(node + 0xF4) = math_random_angle();

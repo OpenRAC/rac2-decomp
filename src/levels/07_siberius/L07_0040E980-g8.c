@@ -7,12 +7,12 @@ extern f32 fast_vec_dist(void *a, void *b);
 extern void ship_build_joint_pointers(u8 *a);
 extern void group_walk_entities(u8 *a);
 extern void boss_place_attached_parts(u8 *a);
-extern u8 *D_L07_001FDEC0[];
+extern u8 *g_path_l07_table[];
 extern u16 *g_moby_l07_group_lists[];
-extern f32 D_L07_001B1700 __attribute__((sda));
-extern f32 D_L07_001B1704 __attribute__((sda));
-extern f32 D_L07_001B1770[5] SDATA(D_L07_001B1770);
-extern s32 D_L07_001B22F8;
+extern f32 g_ship_chain_fast_scale __attribute__((sda));
+extern f32 g_ship_chain_slow_scale __attribute__((sda));
+extern f32 g_ship_chain_time_offsets[5] SDATA(D_L07_001B1770);
+extern s32 g_entity_group_count;
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it. */
 extern u8 *g_moby_l07_array[] __attribute__((sda));
@@ -41,10 +41,10 @@ void ship_start_chain(u8 *moby)
     u8 *member;
     u8 *member_vars;
 
-    base = D_L07_001FDEC0[*(s32 *)(state + 0x90)];
+    base = g_path_l07_table[*(s32 *)(state + 0x90)];
     inv = 1.0f / fast_vec_dist(base + 0x10, base + 0x20);
-    fast = inv * 0.016666668f * D_L07_001B1700;
-    slow = inv * 0.00027777778f * D_L07_001B1704;
+    fast = inv * 0.016666668f * g_ship_chain_fast_scale;
+    slow = inv * 0.00027777778f * g_ship_chain_slow_scale;
     *(s32 *)(state + 0x11C) = 0;
     *(u8 **)(state + 0xF4) = moby;
     *(s32 *)(state + 0x5C) |= 2;
@@ -59,7 +59,7 @@ void ship_start_chain(u8 *moby)
     if (moby[0x21] != 0xFF) {
         for (i = 1; i < 5; i++) {
             for (entry = g_moby_l07_group_lists[moby[0x21]];
-                 moby[0x21] != 0xFF && moby[0x21] <= D_L07_001B22F8 && entry != 0 &&
+                 moby[0x21] != 0xFF && moby[0x21] <= g_entity_group_count && entry != 0 &&
                  ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_moby_l07_group_lists[moby[0x21]]);
                  entry++) {
                 member = g_moby_l07_array[0] + ((*entry & 0x7FFF) << 8);
@@ -75,7 +75,7 @@ void ship_start_chain(u8 *moby)
                     *(s32 *)(member_vars + 0x5C) = 2;
                     *(TI128 *)(member_vars + 0x40) = *(TI128 *)(member + 0xF0);
                     ((SiberiusChain *)state)->times[i] =
-                        ((SiberiusChain *)state)->times[i - 1] + D_L07_001B1770[i];
+                        ((SiberiusChain *)state)->times[i - 1] + g_ship_chain_time_offsets[i];
                     ((SiberiusChain *)state)->ents[i] = member;
                     group_walk_entities(member);
                     boss_place_attached_parts(member);

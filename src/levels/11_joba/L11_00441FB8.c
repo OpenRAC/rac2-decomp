@@ -1,6 +1,6 @@
 #include "common.h"
 typedef struct { s32 field00; u8 remainder[12]; } JobaPolygonHeaderView;
-extern JobaPolygonHeaderView *D_L11_001FF580[];
+extern JobaPolygonHeaderView *g_path_l11_table[];
 extern u8 *arena_get_center_point(u8 *);
 extern s32 point_in_path_xy(float *, float *, s32);
 extern s32 coll_point_inside_record_volume(void *, s32);
@@ -28,7 +28,7 @@ s32 arena_is_target_outside(u8 *controller, u8 *target, s32 skip_outer_zone) {
     }
     if (result) return result;
     if (*(s16 *)(state + 0x1FA) == 2 || *(s16 *)(state + 0x1FA) == 4) {
-        u8 *poly = (u8 *)D_L11_001FF580[*(s32 *)(state + 0x1C8)];
+        u8 *poly = (u8 *)g_path_l11_table[*(s32 *)(state + 0x1C8)];
         if (*(float *)(target + 0x18) < ((float *)arena_get_center_point(controller))[2] + 0.5f)
             result = !point_in_path_xy((float *)(target + 0x10), (float *)(poly + 0x10), *(s32 *)poly);
     }

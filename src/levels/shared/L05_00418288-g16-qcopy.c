@@ -5,9 +5,9 @@
 typedef struct { float x, y, z; int flags; } Rotation;
 typedef struct { float x, y, z, w; } Vector;
 typedef struct { Vector rows[3]; } Matrix;
-extern int D_L05_001B0FA4 __attribute__((sda));
-extern char D_L05_001C7840[];
-extern Rotation D_L05_001B34E0;
+extern int g_wobbling_light_slot __attribute__((sda));
+extern char g_wobbling_light_table[];
+extern Rotation g_wobbling_light_rotation;
 extern Rotation D_L05_001B34E0_gp SDATA(D_L05_001B34E0);
 extern Vector g_light_spot_sum;
 extern float g_light_spot_count;
@@ -25,13 +25,13 @@ void wobbling_light_update(char *object)
 {
     Vector value;
     Matrix rotation;
-    char *entry = D_L05_001C7840 + D_L05_001B0FA4 * 32;
+    char *entry = g_wobbling_light_table + g_wobbling_light_slot * 32;
     char *position = object + 0x10;
     char *output = entry + 0x10;
-    D_L05_001B34E0.flags = 0;
+    g_wobbling_light_rotation.flags = 0;
     D_L05_001B34E0_gp.x = FastAddRotations(D_L05_001B34E0_gp.x, 0.1f);
-    D_L05_001B34E0.y = FastAddRotations(D_L05_001B34E0.y, 0.09f);
-    D_L05_001B34E0.z = FastAddRotations(D_L05_001B34E0.z, 0.11f);
+    g_wobbling_light_rotation.y = FastAddRotations(g_wobbling_light_rotation.y, 0.09f);
+    g_wobbling_light_rotation.z = FastAddRotations(g_wobbling_light_rotation.z, 0.11f);
     vec_clear_128(&value);
     value.x = 0.4f;
     euler_rotation_basis(&rotation, &D_L05_001B34E0_gp);

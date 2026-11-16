@@ -9,8 +9,8 @@ extern void FastVecSub();
 extern void FastVecScale(void *, void *, f32);
 extern f32 fast_vec_dist();
 extern void part_kill();
-extern f32 D_001AA364 __attribute__((sda));
-extern f32 D_001AA368 __attribute__((sda));
+extern f32 g_tether_scale_a __attribute__((sda));
+extern f32 g_tether_scale_b __attribute__((sda));
 
 void func_PAL_002C0078(s32 arg0) {
     s32 sp[4];
@@ -29,12 +29,12 @@ void func_PAL_002C0078(s32 arg0) {
     FastVecSub(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s3);
     temp_s1 = arg0 + 0x20;
     *(TI *)sp = sp10;
-    FastVecScale(sp, sp, (D_001AA364 - 1.0f) * 1.2f + 1.0f);
+    FastVecScale(sp, sp, (g_tether_scale_a - 1.0f) * 1.2f + 1.0f);
     FastVecAdd(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(arg0) + (0x10))) = sp10;
     FastVecSub(&sp10, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10, temp_s1);
     *(TI *)sp = sp10;
-    FastVecScale(sp, sp, (D_001AA368 - 1.0f) * 1.2f + 1.0f);
+    FastVecScale(sp, sp, (g_tether_scale_b - 1.0f) * 1.2f + 1.0f);
     FastVecAdd(&sp10, sp, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(arg0) + (0x20))) = sp10;
     if (fast_vec_dist(temp_s3, temp_s1) < 0.1f || fast_vec_dist(temp_s3, (*(s32 *)((s8 *)(arg0) + (0x30))) + 0x10) < 1.0f) {

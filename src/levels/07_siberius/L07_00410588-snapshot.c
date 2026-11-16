@@ -8,9 +8,9 @@ typedef struct {
     SibQuad rotation;
 } SibRecord128;
 
-extern SibRecord128 *D_L07_001B23CC __attribute__((sda));
-extern u8 *D_L07_001B2954 __attribute__((sda));
-extern u8 D_L07_00227E7F;
+extern SibRecord128 *g_shooter_mount_table __attribute__((sda));
+extern u8 *g_joint_record_table __attribute__((sda));
+extern u8 g_ship_joint_tag;
 extern void euler_rotation_basis(void *, void *);
 extern void BuildObjectAttachmentTransforms(void *, void *, int, int, int, int, int, int);
 
@@ -29,19 +29,19 @@ void ship_build_joint_pointers(u8 *moby)
     qcopy(&saved[0], moby + 0x10);
     qcopy(&saved[1], moby + 0xF0);
     index = *(int *)(vars + 0xC8);
-    records = D_L07_001B23CC;
+    records = g_shooter_mount_table;
     qcopy(moby + 0x10, &records[index].position);
     qcopy(moby + 0xF0, &records[index].rotation);
     euler_rotation_basis(moby + 0xC0, moby + 0xF0);
     BuildObjectAttachmentTransforms(moby, vars + 0x1B0, 0x40, -1, *(int *)(vars + 0xCC), -1, 7, 0);
     cursor = vars;
-    tag = D_L07_00227E7F;
+    tag = g_ship_joint_tag;
     end = cursor + 0x1400;
     count = 0;
     joint_out = cursor + 0x15B0;
     do {
         s16 id = *(s16 *)(cursor + 0x1F8);
-        u8 *table = D_L07_001B2954;
+        u8 *table = g_joint_record_table;
         if (table[(id << 5) + 0x1D] == tag) {
             *(u8 **)(cursor + 0x1F0) = joint_out;
             count++;

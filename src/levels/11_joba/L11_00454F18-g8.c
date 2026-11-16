@@ -60,21 +60,21 @@ typedef struct {
     ActorObject *attackTarget;
 } ActorPlayerBlock;
 extern ActorPlayerBlock g_hero_state;
-extern s32 D_L11_001B30C8[] __attribute__((sda));
+extern s32 g_arena_progress_level[] __attribute__((sda));
 extern ActorObject *g_moby_l11_table[] __attribute__((sda));
-extern s32 D_L11_001B35B8[] __attribute__((sda));
+extern s32 g_tribe_group_limit[] __attribute__((sda));
 extern u16 *g_group_id_lists[];
-extern float D_L11_001B1D60 SDATA(D_L11_001B1D60);
-extern s32 D_L11_001B1D64 SDATA(D_L11_001B1D64);
-extern float D_L11_001B1D6C SDATA(D_L11_001B1D6C);
-extern float D_L11_001B1D70 SDATA(D_L11_001B1D70);
-extern float D_L11_001B1D74 SDATA(D_L11_001B1D74);
-extern float D_L11_001B1D78 SDATA(D_L11_001B1D78);
-extern float D_L11_001B1D7C SDATA(D_L11_001B1D7C);
-extern float D_L11_001B1D80 SDATA(D_L11_001B1D80);
-extern float D_L11_001B1D84 SDATA(D_L11_001B1D84);
-extern float D_L11_001B1D88 SDATA(D_L11_001B1D88);
-extern float D_L11_001B1D8C SDATA(D_L11_001B1D8C);
+extern float g_fighter_action_distance SDATA(D_L11_001B1D60);
+extern s32 g_fighter_state_timeout SDATA(D_L11_001B1D64);
+extern float g_fighter_damage_radius SDATA(D_L11_001B1D6C);
+extern float g_fighter_damage_param_a SDATA(D_L11_001B1D70);
+extern float g_fighter_damage_param_b SDATA(D_L11_001B1D74);
+extern float g_fighter_hit_param_a SDATA(D_L11_001B1D78);
+extern float g_fighter_hit_param_b SDATA(D_L11_001B1D7C);
+extern float g_fighter_hit_param_c SDATA(D_L11_001B1D80);
+extern float g_fighter_hit_param_d SDATA(D_L11_001B1D84);
+extern float g_fighter_hit_param_e SDATA(D_L11_001B1D88);
+extern float g_fighter_hit_param_f SDATA(D_L11_001B1D8C);
 extern void moby_set_state(void *, int, int);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
@@ -204,7 +204,7 @@ void UpdateJobaCombatActor(ActorObject *actor)
             if (actor->nextAnimation != 2) anim_start_blended(actor, 2, 0, 10);
         }
         moby_l01_turn_toward_target(actor, target);
-        if (D_L11_001B1D60 < distance) fighter_choose_action(actor);
+        if (g_fighter_action_distance < distance) fighter_choose_action(actor);
         else if (distance < 2.7f) fighter_choose_action(actor);
         break;
     case 7:
@@ -213,10 +213,10 @@ void UpdateJobaCombatActor(ActorObject *actor)
             if (actor->nextAnimation != 3) anim_start_blended(actor, 3, 0, 10);
             actor->timer = 0;
         }
-        if (data->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
+        if (data->aimTarget == 0 && (g_arena_progress_level[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
             for (ids = g_group_id_lists[arena_get_group_index(actor->controller)];
                  (arena_get_group_index(actor->controller) & 0xFF) != 0xFF &&
-                 arena_get_group_index(actor->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 arena_get_group_index(actor->controller) <= g_tribe_group_limit[0] && ids != 0 &&
                  ((s16)ids[-1] >= 0 || ids == g_group_id_lists[arena_get_group_index(actor->controller)]); ids++) {
                 entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
@@ -236,10 +236,10 @@ void UpdateJobaCombatActor(ActorObject *actor)
             else joba_fighter_walk_dust(actor, target);
         }
         moby_transform_joint_to_world(actor, 1, scratch);
-        joba_damage_objects_in_radius(actor, (int)scratch, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
-                          D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(actor, (int)scratch, g_fighter_damage_radius, 0.0f, 100.0f, g_fighter_damage_param_a,
+                          g_fighter_hit_param_a, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (distance < 2.7f && delta < 0.3490659f) moby_set_state(actor, 11, -1);
-        if (D_L11_001B1D64 < actor->timer) moby_set_state(actor, 6, -1);
+        if (g_fighter_state_timeout < actor->timer) moby_set_state(actor, 6, -1);
         break;
     case 9:
         if (flag_set_first_pending(actor)) {
@@ -247,10 +247,10 @@ void UpdateJobaCombatActor(ActorObject *actor)
             data->step = 0.0069444445f;
             moby_set_controller_speed_limits(actor, 0.00666666683f, 0.200000018f, 0.000218166184f, 0.00639954163f);
         }
-        if (data->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
+        if (data->aimTarget == 0 && (g_arena_progress_level[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
             for (ids = g_group_id_lists[arena_get_group_index(actor->controller)];
                  (arena_get_group_index(actor->controller) & 0xFF) != 0xFF &&
-                 arena_get_group_index(actor->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 arena_get_group_index(actor->controller) <= g_tribe_group_limit[0] && ids != 0 &&
                  ((s16)ids[-1] >= 0 || ids == g_group_id_lists[arena_get_group_index(actor->controller)]); ids++) {
                 entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
@@ -276,8 +276,8 @@ void UpdateJobaCombatActor(ActorObject *actor)
             MobySpringTurn(actor, heading, 0.001f, 0.01f, &data->turnRate, 0.1f);
         }
         moby_transform_joint_to_world(actor, 1, scratch);
-        joba_damage_objects_in_radius(actor, (int)scratch, D_L11_001B1D6C, (float)data->contactDamage, 100.0f, D_L11_001B1D74,
-                          D_L11_001B1D7C, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(actor, (int)scratch, g_fighter_damage_radius, (float)data->contactDamage, 100.0f, g_fighter_damage_param_b,
+                          g_fighter_hit_param_b, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (g_hero_state.attackTarget == actor) moby_set_state(actor, 10, -1);
         if (0.38397247f < delta) moby_set_state(actor, 8, -1);
         break;
@@ -292,8 +292,8 @@ void UpdateJobaCombatActor(ActorObject *actor)
         FastVecAdd(scratch, actor->pos, scratch);
         moby_l01_turn_toward_target(actor, scratch);
         moby_transform_joint_to_world(actor, 1, hit);
-        joba_damage_objects_in_radius(actor, (int)hit, D_L11_001B1D6C, (float)data->contactDamage, 100.0f, D_L11_001B1D74,
-                          D_L11_001B1D7C, D_L11_001B1D84, D_L11_001B1D8C);
+        joba_damage_objects_in_radius(actor, (int)hit, g_fighter_damage_radius, (float)data->contactDamage, 100.0f, g_fighter_damage_param_b,
+                          g_fighter_hit_param_b, g_fighter_hit_param_d, g_fighter_hit_param_f);
         if (actor->animationFlags & 2) moby_set_state(actor, 8, -1);
         break;
     case 8:
@@ -307,8 +307,8 @@ void UpdateJobaCombatActor(ActorObject *actor)
         moby_l01_turn_toward_target(actor, scratch);
         MobySpringTurn(actor, heading, 0.001f, 0.01f, &data->turnRate, 0.1f);
         moby_transform_joint_to_world(actor, 1, hit);
-        joba_damage_objects_in_radius(actor, (int)hit, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
-                          D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
+        joba_damage_objects_in_radius(actor, (int)hit, g_fighter_damage_radius, 0.0f, 100.0f, g_fighter_damage_param_a,
+                          g_fighter_hit_param_a, g_fighter_hit_param_c, g_fighter_hit_param_e);
         if (actor->animationFlags & 2) fighter_choose_action(actor);
         break;
     case 11:

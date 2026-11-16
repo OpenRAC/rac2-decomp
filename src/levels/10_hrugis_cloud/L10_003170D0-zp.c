@@ -2,7 +2,7 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *D_001B251C[] __attribute__((sda));
+extern u8 *g_moby_pool_base[] __attribute__((sda));
 extern void hrugis_beam_init(u8 *);
 extern void DrawHrugisBeamEffect(u8 *);
 extern void moby_l00_update_empty_3(void);
@@ -56,7 +56,7 @@ void hrugis_beam_update(u8 *moby) {
         right = (f32 *)(moby + 0xD0);
         *(int *)(moby_get_motion_data(moby) + 0x14C) = 0;
         angle = func_00309B38(*(f32 *)(vars + 0x27C), 0.011635531f);
-        target = D_001B251C[0] + (*(int *)(vars + 0x260) << 8);
+        target = g_moby_pool_base[0] + (*(int *)(vars + 0x260) << 8);
         *(f32 *)(vars + 0x27C) = angle;
         moby_transform_joint_point(target, *(int *)(vars + 0x26C), joint_matrix);
         vec_scale_to_length(new_position, joint_matrix[1], 50.0f);

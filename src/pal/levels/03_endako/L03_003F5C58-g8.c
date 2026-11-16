@@ -52,20 +52,20 @@ extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void endako_boss_process_group(void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern float func_PAL_002AA108(void *, void *);
+extern float moby_update_aim_target_strength_pal(void *, void *);
 extern int PlayMobySound(int, int, void *);
 extern void func_PAL_002AC290(void *, void *);
 extern f32 ApproachValue(void *, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void func_PAL_003120C0(void);
+extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void moby_fade_out_update_pal(void);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
-extern void func_PAL_L03_003FB700(void *);
-extern u8 *D_L03_001B2A1C[] __attribute__((sda));
-extern u8 D_0019B2E8[] NOT_SDA;
+extern void endako_boss_play_voice_lines_pal(void *);
+extern u8 *g_moby_record_base[] __attribute__((sda));
+extern u8 g_moby_group_flags[] NOT_SDA;
 extern int g_current_map_index[] __attribute__((sda));
-extern u8 *D_L03_001FE700[] NOT_SDA;
-extern float D_L03_001B1070 __attribute__((sda));
+extern u8 *g_path_l03_entry_table[] NOT_SDA;
+extern float g_endako_boss_damage_scale __attribute__((sda));
 
 void func_PAL_L03_003F9DE0(u8 *entity) {
     DamageState *state = *(DamageState **)(entity + 0x68);
@@ -79,8 +79,8 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         state->timer48 = FloatToInt(30);
         state->timer4A = FloatToInt(32);
         state->hitMode = 1;
-        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->startRecord << 8), 1);
-        if (D_0019B2E8[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
+        moby_set_flag_bit(g_moby_record_base[0] + (state->startRecord << 8), 1);
+        if (g_moby_group_flags[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
             moby_mark_spawned(entity);
             return;
         }
@@ -110,7 +110,7 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         }
         state->flag30B = 1;
         state->active = 1;
-        path = (EntityPath *)D_L03_001FE700[state->path];
+        path = (EntityPath *)g_path_l03_entry_table[state->path];
         for (index = 0, count = 0; index < path->count; index++) {
             if (path->point[index][3] >= 0) {
                 state->entries[count] = index;
@@ -120,16 +120,16 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
                 }
             }
         }
-        moby_set_flag_bit(D_L03_001B2A1C[0] + (state->spawnRecord << 8), 1);
+        moby_set_flag_bit(g_moby_record_base[0] + (state->spawnRecord << 8), 1);
         endako_boss_process_group(entity);
     }
-    *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * D_L03_001B1070;
+    *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * g_endako_boss_damage_scale;
 
     hit = part_find_owned_effect_slot(entity, 0x10000, 0);
     if (hit && *(u8 **)(hit + 0x20) && *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0x9DF) {
         hit = 0;
     }
-    amount = func_PAL_002AA108(entity, hit);
+    amount = moby_update_aim_target_strength_pal(entity, hit);
     if (amount != 0 || state->hitMode == 2) {
         state->timer77 = 150;
         PlayMobySound(1, 0, entity);
@@ -153,9 +153,9 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
                         local.f[1] = -0.14000002f;
                     }
                     matrix_mul_vec3(&local, &local, entity + 0xC0);
-                    effect = func_PAL_002735D0(entity, 1, *(s16 *)(entity + 0xAA), i, entity + 0x10,
+                    effect = cam_moby_create_pal(entity, 1, *(s16 *)(entity + 0xAA), i, entity + 0x10,
                                            entity + 0xF0, &local, 255, 30, 15);
-                    *(void **)(effect + 0x64) = func_PAL_003120C0;
+                    *(void **)(effect + 0x64) = moby_fade_out_update_pal;
                     *(u16 *)(entity + 0x7C) &= ~bit;
                 }
                 state->stage++;
@@ -171,6 +171,6 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         weapon_select_aim_target(entity, -1, 0, 0, 16, 8);
     }
     state->hitMode = 1;
-    func_PAL_L03_003FB700(entity);
+    endako_boss_play_voice_lines_pal(entity);
     entity[0xA8] = 255;
 }

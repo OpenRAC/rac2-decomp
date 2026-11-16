@@ -17,7 +17,7 @@ extern char *CreateMoby(int);
 
 extern void func_002A0F48(void *);
 
-char *func_PAL_L02_00405E88(TI128 *a0, TI128 *a1, TI128 *a2, unsigned char a3,
+char *part_spawn_trail_effect_moby_pal(TI128 *a0, TI128 *a1, TI128 *a2, unsigned char a3,
                         unsigned char a4, unsigned char a5, float a6, float a7, float a8) {
     char *s0;
     char *v1;

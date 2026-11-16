@@ -8,12 +8,12 @@ int menu_always_return_true(void) {
 }
 
 
-extern void *D_001F2854;
-extern char D_00259458[];
+extern void *g_active_menu_object;
+extern char g_menu_page_known_screen[];
 
 /* Returns true when the current menu screen is the one at D_00259458. */
 int menu_is_known_screen_active(void) {
-    return D_001F2854 == D_00259458;
+    return g_active_menu_object == g_menu_page_known_screen;
 }
 
 

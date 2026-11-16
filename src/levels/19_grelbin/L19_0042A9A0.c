@@ -4,12 +4,12 @@ typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 typedef struct { u8 prefix[0x30]; int field30,field34,field38,field3c,field40,field44; } L19UtilityQueueView;
 extern int g_frame_l19_counter[] __attribute__((sda));
-extern int D_L19_001B2724[4] __attribute__((sda));
-extern int D_L19_001A8F00 __attribute__((sda));
+extern int g_glow_state_flags[4] __attribute__((sda));
+extern int g_hero_l19_mode __attribute__((sda));
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern u8 D_001A7A40[] __attribute__((sda));
-extern u32 D_00139800;
-extern L19UtilityQueueView D_L19_001BFC40;
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
+extern u32 g_glow_class_flags;
+extern L19UtilityQueueView g_request_l19_queue;
 typedef union { u8 b[0x2600]; s32 i[0x980]; f32 f[0x980]; Quadword q[0x260]; } Hero;
 extern u8 g_hero_state[];
 extern void mystic_glow_all(void);
@@ -53,14 +53,14 @@ void UpdateGrelbinCharacterLookAt(u8 *moby)
     switch (moby[0x20]) {
     case 0:
         text_sum_subtitle_lengths();
-        if (D_00139800 & 0x4000000) {
+        if (g_glow_class_flags & 0x4000000) {
             if (*(int *)(vars+0x124) != -1)
                 moby_mark_spawned(g_moby_l19_array + *(int *)(vars+0x124)*0x100);
             *(int *)(vars+0x124) = -1;
             moby_mark_spawned(moby);
             return;
         }
-        if (D_00139800 & 0x1000000) {
+        if (g_glow_class_flags & 0x1000000) {
             moby_mark_spawned(moby);
             return;
         }
@@ -70,20 +70,20 @@ void UpdateGrelbinCharacterLookAt(u8 *moby)
     case 1:
         if (hero_is_reachable_for_count(moby,10,2.5f)) {
             level_apply_index_for_key(moby);
-            if (req_push_queue((u8 *)&D_L19_001BFC40,0x98)) {
-                req_launch_queued(&D_L19_001BFC40);
+            if (req_push_queue((u8 *)&g_request_l19_queue,0x98)) {
+                req_launch_queued(&g_request_l19_queue);
                 moby_set_state(moby,2,-1);
             }
         }
         break;
     case 2:
-        D_L19_001B2724[1] = 1;
-        if (D_L19_001A8F00 == 2) {
+        g_glow_state_flags[1] = 1;
+        if (g_hero_l19_mode == 2) {
             moby[0x31]=0;
             *(u16 *)(moby+0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L19_001B2724[1] = 0;
+            g_glow_state_flags[1] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby+0x34) &= 0xfffe;
             moby_mark_spawned(moby);
@@ -139,7 +139,7 @@ void UpdateGrelbinCharacterLookAt(u8 *moby)
         *(float *)(vars+0x68)=yaw*0.6f;
         *(float *)(vars+0xe8)=yaw*0.4f;
     }
-    if (D_001A7A40[0]) *(float *)(vars+0x70)=1.9f;
+    if (g_unlocked_item_flags[0]) *(float *)(vars+0x70)=1.9f;
     moby_update_eased_node(moby,vars,0,rate,blend);
     moby_update_eased_node(moby,vars+0x80,1,rate,blend);
 }

@@ -27,18 +27,18 @@ typedef struct { float x,y; } MapCoordinates;
 /* These objects move between the boot and level placements (the levels read theirs
    from the bytes). The fallback position is two adjacent small-data floats. */
 extern MapEntryState g_map_overlay_state;
-extern MapEntry *D_00258C10[];
-extern MapTarget *D_001C1220[];
-extern MapParent *D_001B1A58;
-extern int D_001A9598 __attribute__((sda));
-extern int D_001A9DB0 __attribute__((sda));
-extern float D_001A9B20 __attribute__((sda));
-extern float D_001A9B24 __attribute__((sda));
-extern u8 D_001A7BE8[];
+extern MapEntry *g_map_selector_entries[];
+extern MapTarget *g_map_targets[];
+extern MapParent *g_menu_active_entries;
+extern int g_map_selector_locked __attribute__((sda));
+extern int g_map_selector_enabled __attribute__((sda));
+extern float g_map_fallback_x __attribute__((sda));
+extern float g_map_fallback_y __attribute__((sda));
+extern u8 g_map_unlocked_flags[];
 extern int g_current_map_index;
 typedef struct { u8 reserved00[0x80]; float x,y,z; } MapPlayerView;
 extern MapPlayerView g_hero_state;
-extern MapDefinition D_00139A28[];
+extern MapDefinition g_map_marker_table[];
 extern void map_convert_world_to_map_position(float,float,float *,float *,int);
 
 void func_0029DEA8(int selector,int update)
@@ -46,11 +46,11 @@ void func_0029DEA8(int selector,int update)
     float x,y,fallbackX,fallbackY;
     MapEntry *entry,*cursor;
     int offset,index,mapSelector;
-    if (selector<21 && D_001A7BE8[selector]) g_map_overlay_state.entries=D_00258C10[selector];
+    if (selector<21 && g_map_unlocked_flags[selector]) g_map_overlay_state.entries=g_map_selector_entries[selector];
     else g_map_overlay_state.entries=0;
     if (g_hero_state.z!=0.0f && selector==g_current_map_index && update) {
         mapSelector=selector+100;
-        if (!D_001A9598) mapSelector=selector;
+        if (!g_map_selector_locked) mapSelector=selector;
         map_convert_world_to_map_position(g_hero_state.x,g_hero_state.y,&x,&y,mapSelector);
         g_map_overlay_state.cachedX[selector]=(int)(x*4096.0f)<<16;
         g_map_overlay_state.cachedY[selector]=(int)(y*4096.0f)<<16;
@@ -62,9 +62,9 @@ void func_0029DEA8(int selector,int update)
     offset=0;
     while (!(g_map_overlay_state.entries[offset].flags&4)) {
         entry=&g_map_overlay_state.entries[offset];
-        if (D_001A9DB0) {
-            fallbackX=D_001A9B20;
-            fallbackY=D_001A9B24;
+        if (g_map_selector_enabled) {
+            fallbackX=g_map_fallback_x;
+            fallbackY=g_map_fallback_y;
             entry->x=fallbackX;
             entry->y=fallbackY;
         } else {
@@ -156,15 +156,15 @@ void func_0029DEA8(int selector,int update)
             else if (entry->key==-0x3DE) { entry->x=0.486f; entry->y=0.865f; }
             else if (entry->key==-0x3E3) { entry->x=0.405f; entry->y=0.081f; }
             else if (selector==g_current_map_index) {
-                if (D_001C1220[entry->key]) {
-                    map_convert_world_to_map_position(D_001C1220[entry->key]->x,D_001C1220[entry->key]->y,
+                if (g_map_targets[entry->key]) {
+                    map_convert_world_to_map_position(g_map_targets[entry->key]->x,g_map_targets[entry->key]->y,
                         &g_map_overlay_state.entries[offset].x,&g_map_overlay_state.entries[offset].y,selector);
-                    g_map_overlay_state.entries[offset].scale=D_001C1220[entry->key]->scale;
+                    g_map_overlay_state.entries[offset].scale=g_map_targets[entry->key]->scale;
                 }
             } else {
-                map_convert_world_to_map_position(D_00139A28[entry->key].x,D_00139A28[entry->key].y,
+                map_convert_world_to_map_position(g_map_marker_table[entry->key].x,g_map_marker_table[entry->key].y,
                     &g_map_overlay_state.entries[offset].x,&g_map_overlay_state.entries[offset].y,selector);
-                g_map_overlay_state.entries[offset].scale=D_00139A28[entry->key].z;
+                g_map_overlay_state.entries[offset].scale=g_map_marker_table[entry->key].z;
             }
         }
         offset++;
@@ -176,8 +176,8 @@ void func_0029DEA8(int selector,int update)
         (*(int *)((u8 *)cursor+0x24))=0;
         (*(short *)((u8 *)cursor+4))&=~0x10;
         if ((*(short *)((u8 *)cursor+2))==-1) (*(int *)((u8 *)cursor+0x24))=1;
-        else (*(int *)((u8 *)cursor+0x24))=D_001B1A58[(*(short *)((u8 *)cursor+2))].enabled==1;
-        if (((*(short *)((u8 *)cursor+4))&0x1000) && ((D_00139A28[(*(short *)cursor)].flags^1)&1)) (*(int *)((u8 *)cursor+0x24))=0;
+        else (*(int *)((u8 *)cursor+0x24))=g_menu_active_entries[(*(short *)((u8 *)cursor+2))].enabled==1;
+        if (((*(short *)((u8 *)cursor+4))&0x1000) && ((g_map_marker_table[(*(short *)cursor)].flags^1)&1)) (*(int *)((u8 *)cursor+0x24))=0;
         if (g_map_overlay_state.entries[index].state) g_map_overlay_state.entries[index].flags|=0x10;
         index++;
         } while (!(g_map_overlay_state.entries[index].flags&4));

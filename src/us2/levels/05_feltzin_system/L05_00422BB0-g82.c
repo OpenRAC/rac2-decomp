@@ -13,20 +13,20 @@ extern s32 level_get_saved_value(void);
 extern void entry_spawn_list_objects_with_flag(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
-extern void func_US2_L05_00422530(u8 *a0, s32 a1);
-extern s32 D_L05_001B1364 __attribute__((sda));
-extern s32 D_L05_00221D10[];
-extern s32 D_L05_001B2048;
-extern u8 *D_L05_001B2614;
+extern void UpdateFeltzinMissionReward_us2(u8 *a0, s32 a1);
+extern s32 g_feltzin_challenge_active __attribute__((sda));
+extern s32 g_feltzin_challenge_state[];
+extern s32 g_feltzin_mission_index;
+extern u8 *g_feltzin_enemy_table;
 
-void func_US2_L05_00422D38(u8 *arg0) {
+void feltzin_mission_three_update_us2(u8 *arg0) {
     s32 n;
     s32 count;
     u8 **p;
 
-    if (D_L05_001B1364 == 0) {
-        D_L05_00221D10[11] = 0;
-        D_L05_001B1364 = 1;
+    if (g_feltzin_challenge_active == 0) {
+        g_feltzin_challenge_state[11] = 0;
+        g_feltzin_challenge_active = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -37,14 +37,14 @@ void func_US2_L05_00422D38(u8 *arg0) {
             do {
                 if (*(s16 *)(*p + 0xAA) == 0xF73) {
                     entry_spawn_list_objects_with_flag(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)D_L05_001B2614 + (D_L05_00221D10[0] << 7) + 0x30, 64.0f);
+                    func_L05_0037CEE0(*p, (u8 *)g_feltzin_enemy_table + (g_feltzin_challenge_state[0] << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*p, (u8 *)g_feltzin_enemy_table + (g_feltzin_challenge_state[0] << 7) + 0x30, 64.0f);
                 }
                 n--;
                 p++;
             } while (n);
         }
     }
-    if (D_L05_00221D10[4] == 0 && D_L05_001B2048 >= 6)
-        func_US2_L05_00422530(arg0, 2);
+    if (g_feltzin_challenge_state[4] == 0 && g_feltzin_mission_index >= 6)
+        UpdateFeltzinMissionReward_us2(arg0, 2);
 }

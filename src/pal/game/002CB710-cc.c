@@ -2,25 +2,25 @@
 /* func_PAL_002CB710, the PAL copy of func_002CA8A8: the same C, where rename func_002DDEC8 becomes func_PAL_002DECA0; rename func_002CAB00 becomes func_PAL_002CB968; rename func_002CADB0 becomes func_PAL_002CBC18; rename func_002E4AC8 becomes func_PAL_002E5898; rename func_002CA5D0 becomes func_PAL_002CB410. */
 #include "common.h"
 
-extern int D_001B1598 MACRO_ADDR __attribute__((sda));
+extern int g_frame_counter_3 MACRO_ADDR __attribute__((sda));
 extern int g_screen_height MACRO_ADDR __attribute__((sda));
 /* Frozen Batch A A15-struct-pad-20; acknowledged claim 6d4515f9ca5619f8d02349c6c2ad116dc989f5a4c317c4d31105f9a9271aa080. */
 typedef unsigned char BatchA_A15_u8;
 
-extern BatchA_A15_u8 D_L15_001FF640[];
+extern BatchA_A15_u8 g_menu_block_fields[];
 
 /* Frozen Batch A A10-twin-base-32; acknowledged claim b588059f8808a6607867ee41ec367b24cfb85d2f4cc33273a4392842e34233d5. */
 typedef unsigned char BatchA_A10_u8;
 
-extern BatchA_A10_u8 D_L03_001FF8C0[];
+extern BatchA_A10_u8 g_menu_block_fields_a[];
 
-extern BatchA_A10_u8 D_L03_001FFAC0[];
+extern BatchA_A10_u8 g_menu_block_fields_b[];
 
 typedef int BatchA_A12_s32;
 
 typedef struct { BatchA_A12_s32 a; BatchA_A12_s32 b; } BatchA_A12_BatchA24;
 
-extern BatchA_A12_BatchA24 D_L08_001FF980;
+extern BatchA_A12_BatchA24 g_pause_menu_batch;
 
 /*
  * Disassembled at 0x002cd220
@@ -68,16 +68,16 @@ extern char g_pause_menu_state[];
 /* func_PAL_002CB968 is defined in 002CAB00-g8.c. */
 
 extern int request_begin_slot(int, int, int, int, void *);
-extern short D_0018A000[];
+extern short g_menu_command_flag[];
 /* The menu entries are 0x50 apart; D_001B1680 holds the selection and D_001A8B84
  * whether it is enabled. Both scalars and the enable flags are small data: the
  * -G0 compiler addresses them absolutely, and $gp-relative only in delay slots. */
 typedef struct { unsigned char value; } ResidentFlag_2CCF68;
-extern ResidentFlag_2CCF68 D_001A7BC9 __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCA __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCB __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCC __attribute__((sda));
-extern ResidentFlag_2CCF68 D_001A7BCE __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_a __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_b __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_c __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_d __attribute__((sda));
+extern ResidentFlag_2CCF68 g_unlock_flag_e __attribute__((sda));
 
 extern int menu_handle_step_simple(int);
 
@@ -95,8 +95,8 @@ typedef struct {
     int flags;
 } ToggleState_2CD4E0;
 
-extern MenuObject_2CD4E0 D_00259C78;
-extern ToggleState_2CD4E0 *D_00259C44;
+extern MenuObject_2CD4E0 g_menu_cursor_object;
+extern ToggleState_2CD4E0 *g_menu_flag_target;
 /* func_002C7748 is defined in 002C7748-create-g8.c. */
 
 /* func_002C7BB8 is defined in 002C7BB8.c. */
@@ -143,15 +143,15 @@ typedef struct {
 } PauseCardState;
 extern PauseCardState g_memcard_state;
 extern int g_save_menu_flags __attribute__((sda));
-extern int D_001B1684 __attribute__((sda));
-extern s32 D_001B18A4[] __attribute__((sda));
-extern void func_PAL_002DECA0(void);
+extern int g_load_progress_counter __attribute__((sda));
+extern s32 g_weapon_wheel_slot_seven[] __attribute__((sda));
+extern void process_unlock_code_input_pal(void);
 extern void menu_enter_pause_mode_two(void);
 extern void menu_enter_pause_mode_three(void);
 extern void menu_enter_pause_mode_four(void);
-extern void func_PAL_002CB968(void);
-extern void func_PAL_002CBC18(void);
-extern int func_PAL_002E5898(void);
+extern void menu_update_pause_widgets_pal(void);
+extern void menu_handle_pause_fade_timer_pal(void);
+extern int UpdateSoundVoices_pal(void);
 extern void moby_update_visible_objects(void);
 extern void func_PAL_002CB410(void);
 
@@ -162,24 +162,24 @@ void func_PAL_002CB710(void)
     if (((PauseState *)g_pause_menu_state)->timer) --((PauseState *)g_pause_menu_state)->timer;
     if (g_memcard_state.state < 3 && g_memcard_state.err < 0) ++((PauseState *)g_pause_menu_state)->card_error_frames;
     else ((PauseState *)g_pause_menu_state)->card_error_frames = 0;
-    func_PAL_002DECA0();
-    if ((g_save_menu_flags & 1) && ((PauseState *)g_pause_menu_state)->mode == 4 && D_001B1684 >= 8) {
+    process_unlock_code_input_pal();
+    if ((g_save_menu_flags & 1) && ((PauseState *)g_pause_menu_state)->mode == 4 && g_load_progress_counter >= 8) {
         if (!request_begin_slot(4, 1, 1, ((PauseState *)g_pause_menu_state)->arg, 0)) return;
     }
     switch (((PauseState *)g_pause_menu_state)->mode) {
     case 1: menu_enter_pause_mode_two(); break;
     case 2: menu_enter_pause_mode_three(); break;
     case 3: menu_enter_pause_mode_four(); break;
-    case 4: func_PAL_002CB968(); break;
+    case 4: menu_update_pause_widgets_pal(); break;
     case 5:
-        func_PAL_002CBC18();
-        func_PAL_002E5898();
-        D_0018A000[0] = 8;
-        D_001B18A4[1] = 0;
+        menu_handle_pause_fade_timer_pal();
+        UpdateSoundVoices_pal();
+        g_menu_command_flag[0] = 8;
+        g_weapon_wheel_slot_seven[1] = 0;
         return;
     }
     moby_update_visible_objects();
-    func_PAL_002E5898();
+    UpdateSoundVoices_pal();
     if (((PauseState *)g_pause_menu_state)->pending) func_PAL_002CB410();
 }
 
@@ -190,7 +190,7 @@ void menu_enter_pause_mode_three(void);
 
 void menu_enter_pause_mode_four(void);
 
-void func_PAL_002CBC18(void);
+void menu_handle_pause_fade_timer_pal(void);
 
 /* func_002CB820 reads $gp slots: it is defined in 002C7748-g8.c. */
 

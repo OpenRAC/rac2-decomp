@@ -7,7 +7,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B1564 __attribute__((sda));
+extern float g_gun_turn_speed_degrees __attribute__((sda));
 
 extern void moby_transform_joint_point(char *, int, char *);
 
@@ -46,7 +46,7 @@ void boss_turn_gun_toward_target(char *moby) {
         if (*(unsigned char *)(state + 0x431) == 0)
             AttachManipulator(moby, 0x22, state + 0x430);
         build_axis_rotation_quaternion(state + 0x440, 2, *(float *)(state + 0x570));
-        *(float *)(state + 0x570) = fast_subtract_rotations(*(float *)(state + 0x570), D_L23_001B1564 * 0.00029088825f);
+        *(float *)(state + 0x570) = fast_subtract_rotations(*(float *)(state + 0x570), g_gun_turn_speed_degrees * 0.00029088825f);
     } else if (*(int *)(state + 0x60C) != -1) {
         FastVecSub((char *)aimDir, state + 0x3F0, state + 0x3E0);
         vec_scale_to_length((char *)aimDir, (char *)aimDir, 10.0f);
@@ -60,9 +60,9 @@ void boss_turn_gun_toward_target(char *moby) {
             FastVecCross((char *)turnAxis, (char *)jointDir, (char *)aimDir);
             vec_scale_to_length((char *)upDir, state + 0x410, 1.0f);
             if (0.0f < FastVecDot((char *)turnAxis, (char *)upDir))
-                turnSpeed = D_L23_001B1564;
+                turnSpeed = g_gun_turn_speed_degrees;
             else
-                turnSpeed = -D_L23_001B1564;
+                turnSpeed = -g_gun_turn_speed_degrees;
             if (*(unsigned char *)(state + 0x431) == 0)
                 AttachManipulator(moby, 0x22, state + 0x430);
             build_axis_rotation_quaternion(state + 0x440, 2, *(float *)(state + 0x570));

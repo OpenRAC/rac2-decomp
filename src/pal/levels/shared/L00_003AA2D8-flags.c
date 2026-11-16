@@ -9,11 +9,11 @@ extern void beam_l00_effect_update(char *);
 extern void FastVecAdd(void *, void *, void *);
 extern void lerp_vector(void *, void *, void *, float);
 extern void func_PAL_L00_003ABDC8(void *, int);
-extern int func_PAL_L00_003AB850(char *, void *);
+extern int beam_test_segment_hit_pal(char *, void *);
 extern int FastDecTimer(void *);
 
 /* Advance a moving effect, clip its path and schedule its next update. */
-void func_PAL_L00_003AB5D0(char *moby)
+void moving_beam_update_pal(char *moby)
 {
     float previous[4], midpoint[4];
     char *state = *(char **)(moby + 0x68);
@@ -46,7 +46,7 @@ void func_PAL_L00_003AB5D0(char *moby)
     if (*(float *)(moby + 0x10) < 2.0f || *(float *)(moby + 0x10) > 1021.0f ||
         *(float *)(moby + 0x14) < 2.0f || *(float *)(moby + 0x14) > 1021.0f ||
         *(float *)(moby + 0x18) < 2.0f || *(float *)(moby + 0x18) > 1021.0f ||
-        func_PAL_L00_003AB850(moby, previous) || FastDecTimer(state + 0x10))
+        beam_test_segment_hit_pal(moby, previous) || FastDecTimer(state + 0x10))
         *(unsigned char *)(moby + 0x20) = 2;
     else
         beam_l00_effect_update(moby);

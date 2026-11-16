@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern int D_001B2758 MACRO_ADDR;
+extern int g_spark_slot_pool MACRO_ADDR;
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern void vec_clear_128(void *), gravity_get_dir_at_object(void *, void *, int);
 extern char *moby_get_private_value_0(void *);
@@ -11,7 +11,7 @@ extern void moby_set_controller_speed_limits(void *, float, float, float, float)
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_set_state(void *, int, int), anim_start_blended(void *, int, int, int);
-extern float D_001BAFA8;
+extern float g_coll_ground_height;
 
 typedef int TI128_00318340 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128_00318340 q[0x260]; } Hero_00318340;
@@ -19,8 +19,8 @@ extern u8 g_hero_state[];
 extern char g_hero_position[];
 extern u8 g_sound_state[];
 
-extern char D_001A8BD0[16] MACRO_ADDR;
-extern char D_001AFA80[];
+extern char g_default_effect_vector[16] MACRO_ADDR;
+extern char g_str_hover_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -495,7 +495,7 @@ void hover_enemy_init(char *self)
     qcopy(d+0x300,d+0x2F0);
     *(float *)(d+0x2F8)+=20.0f;
     if (CollLine(d+0x300,d+0x2F0,0,self,0))
-        *(float *)(d+0x2F8)=D_001BAFA8;
+        *(float *)(d+0x2F8)=g_coll_ground_height;
     *(int *)(d+0x168)|=4;
     *(u16 *)(self+0x34)|=0x100;
     *(float *)(d+0x140)=12.56637191772461f;
@@ -609,8 +609,8 @@ int group_is_moby_member(unsigned char *object) {
 typedef union { u8 b[0x2600]; float v[0x980][1]; } Hero_0031A718;
 
 extern u8 g_hero_state[];
-extern short *D_001EE5A0[];
-extern u8 *D_001B1B5C MACRO_ADDR;
+extern short *g_moby_group_lists[];
+extern u8 *g_moby_pool_start MACRO_ADDR;
 extern float fast_vec_dist(void *, void *);
 
 /* Picks the nearest live moby on the object's list (skipping 0x9B4 ones) that is closer than
@@ -623,11 +623,11 @@ void group_pick_nearest_target(u8 *self)
     float best;
 
     best = fast_vec_dist(self + 0x10, &((Hero_0031A718 *)g_hero_state)->b[0x80]);
-    if (self[0x21] == 0xFF && D_001EE5A0[self[0x21]] == 0 && *(int *)(vars + 0x350) == 0)
+    if (self[0x21] == 0xFF && g_moby_group_lists[self[0x21]] == 0 && *(int *)(vars + 0x350) == 0)
         return;
-    list = D_001EE5A0[self[0x21]];
+    list = g_moby_group_lists[self[0x21]];
     do {
-        moby = D_001B1B5C + ((*list & 0x7FFF) << 8);
+        moby = g_moby_pool_start + ((*list & 0x7FFF) << 8);
         if (*(s8 *)(moby + 0x20) >= 0 && *(s16 *)(moby + 0xAA) != 0x9B4 /* moby class 2484 */) {
             if (fast_vec_dist(self + 0x10, moby + 0x10) < best) {
                 *(u8 **)(vars + 0x30) = moby;
@@ -767,7 +767,7 @@ void gfx_record_trail_point(char *moby) {
 /* Starts a new spark on a free slot, flying toward the target with random spin and speed. */
 void spark_spawn_targeted(char *self, char *target, int count)
 {
-    int pool = D_001B2758;
+    int pool = g_spark_slot_pool;
     char *position = self + 0x10;
     char *target_position = target + 0x10;
     char *data = *(char **)(self + 0x68);
@@ -848,9 +848,9 @@ void spark_update_targeted(char *owner)
     int i;
 
     for (i = 0; i < 12; i++) {
-        if (((Slot31DEE8 *)D_001B2758)[i].owner != owner)
+        if (((Slot31DEE8 *)g_spark_slot_pool)[i].owner != owner)
             continue;
-        slot = &((Slot31DEE8 *)D_001B2758)[i];
+        slot = &((Slot31DEE8 *)g_spark_slot_pool)[i];
         qcopy(slot->start, owner + 0x10);
         if (slot->time) {
             slot->ang0[0] = FastAddRotations(slot->ang0[0], slot->rate0[0] * boost);

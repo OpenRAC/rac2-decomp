@@ -9,7 +9,7 @@ extern int FloatToInt(f32);
 
 extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 
-extern f32 D_L17_001B04B8 __attribute__((sda));
+extern f32 g_effect_spawner_seconds __attribute__((sda));
 
 /* Counts the record's own timer down once, then hands the sub-object's four packed
    colour bytes and the measured scale to the level's own setter. */
@@ -40,9 +40,9 @@ void func_PAL_L17_003D0990(s32 a0)
     packed |= p[1] << 8;
     packed |= p[0];
     f20 = *(f32 *)&p[4] * 210000.0f;
-    r = FloatToInt((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
+    r = FloatToInt((g_effect_spawner_seconds * 300.0f + 2.0f) * 0.16666667f);
     if (part_l17_spawn_fading(f20, obj, packed, r) != 0)
-        *(u16 *)(obj + 0x96) = FloatToInt((D_L17_001B04B8 * 300.0f + 2.0f) * 0.16666667f);
+        *(u16 *)(obj + 0x96) = FloatToInt((g_effect_spawner_seconds * 300.0f + 2.0f) * 0.16666667f);
     else
         *(u16 *)(obj + 0x96) = 1;
 }

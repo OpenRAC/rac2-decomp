@@ -14,10 +14,10 @@ typedef union L08Scratch {
 } L08Scratch;
 extern u8 g_hero_state[];
 extern u8 g_hero_position[];
-extern float D_L08_001B9D30[];
-extern Vec D_L08_001BFF60;
+extern float g_hero_l08_matrix[];
+extern Vec g_collision_l08_hit_point;
 extern void script_queue_keyed_request(void *, void *);
-extern int func_PAL_L08_0031ACF8(int, int, unsigned int);
+extern int level_set_game_state_pair_pal(int, int, unsigned int);
 extern void ref_L08_0041EA88_00(void *, int);
 extern void moby_mark_spawned(void *);
 extern void vec_scale_to_length(char *, char *, float);
@@ -33,7 +33,7 @@ void func_PAL_L08_00423D30(u8 *a0)
 
     s0 = *(u8 **)(a0 + 0x68);
     script_queue_keyed_request(*(void **)(s0 + 0x198), *(void **)(s0 + 0x1A0));
-    func_PAL_L08_0031ACF8(0, 0, 1);
+    level_set_game_state_pair_pal(0, 0, 1);
     r = g_hero_state;
     *(u8 *)(r + 0x22B5) = 0;
     ref_L08_0041EA88_00(0, 1);
@@ -45,16 +45,16 @@ void func_PAL_L08_00423D30(u8 *a0)
     *(u32 *)(s0 + 0x74) = 0;
     *(s16 *)(s0 + 0x88) = 0;
     *(u8 *)(s0 + 0x8A) = 0;
-    qcopy(&sc, D_L08_001B9D30);
+    qcopy(&sc, g_hero_l08_matrix);
     sc.s.scale = 0.0f;
     vec_scale_to_length((char *)&sc, (char *)&sc, 2.5f);
     sc.s.scale = 0.7f;
     FastVecAdd((char *)&sc, (char *)(a0 + 0x10), (char *)&sc);
     *(u32 *)(a0 + 0x98) = 0;
     if (CollLine(r + 0x80, (char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0) != 0) {
-        qcopy(&sc, &D_L08_001BFF60);
+        qcopy(&sc, &g_collision_l08_hit_point);
         if (coll_test_point((char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0.4f) != 0) {
-            qcopy(&sc, &D_L08_001BFF60);
+            qcopy(&sc, &g_collision_l08_hit_point);
         }
     }
     qcopy(g_hero_position, &sc);

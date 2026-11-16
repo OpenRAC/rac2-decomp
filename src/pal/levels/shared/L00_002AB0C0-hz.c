@@ -37,7 +37,7 @@ extern int moby_is_in_special_class_range(void *object);
 
 extern int hero_slot_item_id(int index);
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 #ifndef RAC2_T_HEROBLOCK_2AB1D8
 typedef struct {
@@ -70,7 +70,7 @@ typedef struct {
 extern FloatBlock_2ab1d8 D_L00_0025BE10_1;
 
 extern int hero_test_reach_blend(float *out, float scale, float amount);
-void func_PAL_L00_002AB0C0(void)
+void cam_update_blend_angles_pal(void)
 {
     float ret;
     float f1, f20, f21, f22;
@@ -90,8 +90,8 @@ void func_PAL_L00_002AB0C0(void)
     if (hero_test_reach_blend(0, D_00189E20_16.b22B8 != 0 ? 0.7f : 0.57f, 1.3f) == 0)
         return;
 
-    if (D_00189E20_16.b22B8 != 0 && D_L00_001BF218 != 0) {
-        if (moby_is_in_special_class_range(D_L00_001BF218) != 0)
+    if (D_00189E20_16.b22B8 != 0 && g_hit_l00_result != 0) {
+        if (moby_is_in_special_class_range(g_hit_l00_result) != 0)
             return;
     }
 

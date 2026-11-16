@@ -2,9 +2,9 @@
 
 #include "common.h"
 typedef struct BarlowUtilityQueueView BarlowUtilityQueueView;
-extern u8 D_001A7B00, D_001A7A40;
-extern u32 D_001397D0 NOT_SDA;
-extern u32 D_00138324 NOT_SDA;
+extern u8 g_inventory_have_flags, g_unlocked_item_flags;
+extern u32 g_object_state_flags_d NOT_SDA;
+extern u32 g_pad_held_flags NOT_SDA;
 extern u8 g_item_slot_to_record[];
 extern int g_player_bolts MACRO_ADDR;
 typedef struct {
@@ -12,23 +12,23 @@ typedef struct {
     u8 padA0[0x40]; float aim[4]; u8 padF0[0x20]; float velocity[4];
 } JobaPlayerView;
 extern JobaPlayerView g_hero_state;
-extern u8 D_00189F00[];
-extern u8 D_L11_001C0AC0[];
+extern u8 g_hero_target_point[];
+extern u8 g_request_l11_queue[];
 typedef struct {
     u8 pad[0x30];
     float position[4];
     u8 pad40[0x30];
     float rotation[4];
 } VendorRecord;
-extern VendorRecord *D_L11_001B368C[] MACRO_ADDR;
+extern VendorRecord *g_arena_camera_table[] MACRO_ADDR;
 typedef struct {
     u8 pad[0x80];
     int price;
     u8 tail[0x5C];
 } VendorOffer;
-extern VendorOffer D_L11_00279BA0[];
-extern volatile int D_L11_001B32E8[] MACRO_ADDR;
-extern int D_L11_001A8F00[] MACRO_ADDR;
+extern VendorOffer g_item_l11_record_table[];
+extern volatile int g_arena_script_flags[] MACRO_ADDR;
+extern int g_arena_state[] MACRO_ADDR;
 extern void moby_reset_matching_effects_alt(u8 *);
 extern void moby_set_state(u8 *, int, int);
 extern void moby_reset_vars_defaults(char *);
@@ -43,7 +43,7 @@ extern void text_print_localized_formatted(int, int, int);
 extern void level_apply_index_for_key(int);
 extern void moby_set_byte_on_group(int, int);
 extern void help_unlock_entry(int);
-extern void func_US2_002B1880(int, int);
+extern void value_set_entry_by_index_us2(int, int);
 extern int MemcardSave(int, int);
 extern void moby_mark_spawned(void *);
 extern int FastDecTimer(void *);
@@ -63,7 +63,7 @@ extern float fast_subtract_rotations(float, float);
 extern float vec_length_xy(void *);
 extern void moby_update_eased_node(char *, u8 *, char *, float, float);
 
-void func_US2_L11_00463368(u8 *object) {
+void UpdateJobaPurchaseController_us2(u8 *object) {
     float destination[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));
     float difference[4] __attribute__((aligned(16)));
@@ -74,80 +74,80 @@ void func_US2_L11_00463368(u8 *object) {
     moby_reset_matching_effects_alt(object);
     switch (object[0x20]) {
     case 0:
-        if (D_001A7B00) { moby_mark_spawned(object); return; }
-        if (D_001397D0 & 0x800) moby_set_state(object, 2, -1);
+        if (g_inventory_have_flags) { moby_mark_spawned(object); return; }
+        if (g_object_state_flags_d & 0x800) moby_set_state(object, 2, -1);
         else moby_set_state(object, 1, -1);
         moby_reset_vars_defaults((char *)object);
         break;
     case 1:
-        if (IsPointInCuboid((char *)g_hero_state.position, *(int *)(vars + 0x120)) && req_push_queue(D_L11_001C0AC0, 0x6B)) {
+        if (IsPointInCuboid((char *)g_hero_state.position, *(int *)(vars + 0x120)) && req_push_queue(g_request_l11_queue, 0x6B)) {
             level_apply_index_for_key((int)object);
-            req_launch_queued((BarlowUtilityQueueView *)D_L11_001C0AC0);
+            req_launch_queued((BarlowUtilityQueueView *)g_request_l11_queue);
             moby_set_state(object, 2, -1);
         }
         break;
     case 2:
-        D_L11_001B32E8[0] = 1;
-        if (D_L11_001A8F00[0] == 2) {
+        g_arena_script_flags[0] = 1;
+        if (g_arena_state[0] == 2) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
             VendorRecord *record;
-            D_L11_001B32E8[0] = 0;
-            record = (VendorRecord *)((u32)D_L11_001B368C[0] + *(int *)(vars + 0x120) * sizeof(VendorRecord));
+            g_arena_script_flags[0] = 0;
+            record = (VendorRecord *)((u32)g_arena_camera_table[0] + *(int *)(vars + 0x120) * sizeof(VendorRecord));
             hero_reset_position_and_direction(record->position, record->rotation, 0, 1);
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= 0xFFFE;
-            if (g_player_bolts < ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) moby_set_state(object, 3, -1);
+            if (g_player_bolts < ((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) moby_set_state(object, 3, -1);
             else moby_set_state(object, 4, -1);
         }
         break;
     case 3:
-        if (((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price < g_player_bolts) {
+        if (((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price < g_player_bolts) {
             moby_set_state(object, 4, -1);
         } else if (hero_is_reachable_for_count(object, 10, 2.5f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x130E, ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
+            text_print_localized_formatted(0x130E, ((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
             level_apply_index_for_key((int)object);
         }
         break;
     case 4:
-        if (g_player_bolts < ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) {
+        if (g_player_bolts < ((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price) {
             func_L00_0030C710(180);
             moby_set_state(object, 3, -1);
         } else if (hero_is_reachable_for_count(object, 10, 2.5f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x130D, ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
+            text_print_localized_formatted(0x130D, ((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price, -1);
             level_apply_index_for_key((int)object);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L11_001C0AC0, 0x6C)) {
-                req_launch_queued((BarlowUtilityQueueView *)D_L11_001C0AC0);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_request_l11_queue, 0x6C)) {
+                req_launch_queued((BarlowUtilityQueueView *)g_request_l11_queue);
                 moby_set_state(object, 5, -1);
             }
         }
         break;
     case 5:
-        D_L11_001B32E8[0] = 1;
-        if (D_L11_001A8F00[0] == 2) {
+        g_arena_script_flags[0] = 1;
+        if (g_arena_state[0] == 2) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
-            D_L11_001B32E8[0] = 0;
+            g_arena_script_flags[0] = 0;
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= 0xFFFE;
             if (object[0x21] != 0xFF) moby_set_byte_on_group(object[0x21], 1);
-            if (!D_001A7B00) {
-                g_player_bolts = g_player_bolts - ((VendorOffer *)((u32)D_L11_00279BA0 + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price;
+            if (!g_inventory_have_flags) {
+                g_player_bolts = g_player_bolts - ((VendorOffer *)((u32)g_item_l11_record_table + g_item_slot_to_record[8] * sizeof(VendorOffer)))->price;
                 func_L00_0030C710(180);
                 help_unlock_entry(8);
             }
             index = *(int *)(vars + 0x124);
             if (index != -1) {
-                VendorRecord *record = (VendorRecord *)((u32)D_L11_001B368C[0] + index * sizeof(VendorRecord));
+                VendorRecord *record = (VendorRecord *)((u32)g_arena_camera_table[0] + index * sizeof(VendorRecord));
                 hero_reset_position_and_direction(record->position, record->rotation, 0, 1);
             }
-            func_US2_002B1880(0x1230, -1);
+            value_set_entry_by_index_us2(0x1230, -1);
             MemcardSave(0, -1);
             moby_mark_spawned(object);
             return;
@@ -172,7 +172,7 @@ void func_US2_L11_00463368(u8 *object) {
             else math_fast_float_d(vars + 0x114);
         } else if (*(int *)(vars + 0x114)) {
             *(int *)(vars + 0x114) = 0;
-            qcopy(vars + 0x100, D_00189F00);
+            qcopy(vars + 0x100, g_hero_target_point);
         }
         if (math_fast_float_d(vars + 0x118)) {
             *(int *)(vars + 0x118) = FloatToInt(math_random_float_range(180.0f, 300.0f));
@@ -183,7 +183,7 @@ void func_US2_L11_00463368(u8 *object) {
             FastVecAdd((float *)(vars + 0x100), (float *)(vars + 0x100), (float *)(object + 0x10));
         }
         if (*(int *)(vars + 0x114)) {
-            qcopy(destination, D_00189F00);
+            qcopy(destination, g_hero_target_point);
             rate = 0.04f;
         } else qcopy(destination, vars + 0x100);
     }
@@ -201,7 +201,7 @@ void func_US2_L11_00463368(u8 *object) {
         *(float *)(vars + 0x68) = yaw * 0.6f;
         *(float *)(vars + 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40) *(float *)(vars + 0x70) = 2.75f;
+    if (g_unlocked_item_flags) *(float *)(vars + 0x70) = 2.75f;
     for (index = 0; index < 2; index++)
         moby_update_eased_node((char *)object, vars + index * 0x80, (char *)index, rate, 0.3f);
     return;

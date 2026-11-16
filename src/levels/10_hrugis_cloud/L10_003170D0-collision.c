@@ -51,7 +51,7 @@ extern s32 snd_play_from_class_bank(s32 index, s32 value, Moby *moby, s32 kind);
 
 /* Counted down by func_00282948 on each hit: class 0xF8E plays its hit sound when it has
    run out, and sets it to 10 to 20 again. */
-extern s32 D_L10_001B354C __attribute__((sda));
+extern s32 g_collision_effect_timer __attribute__((sda));
 
 /* Hit callback of the Hrugis controller: plays the moby's colour flash, takes the damage
    of the hit it took off its health (class 0xCBE only from a class 0xF93 moby) with a
@@ -85,9 +85,9 @@ s32 ProcessObjectCollisionDamage(Moby *moby, s32 keep)
         *health -= hit->damage;
         if (moby->oClass != 0xB73 /* moby class 2931 */ && moby->oClass != 0xF8E /* moby class 3982 */)
             snd_play_from_class_bank(0xD, 0, moby, 0xFBF);
-        if (math_fast_float_d(&D_L10_001B354C) != 0 && moby->oClass == 0xF8E /* moby class 3982 */) {
+        if (math_fast_float_d(&g_collision_effect_timer) != 0 && moby->oClass == 0xF8E /* moby class 3982 */) {
             snd_play_from_class_bank(3, 0, moby, 0xF8E);
-            D_L10_001B354C = FloatToInt(math_random_float_range(10.0f, 20.0f));
+            g_collision_effect_timer = FloatToInt(math_random_float_range(10.0f, 20.0f));
         }
         if (*health <= 0.0f) {
             *health = 0.0f;

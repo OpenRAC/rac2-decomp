@@ -16,22 +16,22 @@ extern void UpdateTwinRecordAnglesAndPositions(void *);
 extern void snd_stop_voice(s32);
 extern u8 g_sound_state[];
 extern u8 *g_active_attacker_robot NOT_SDA;
-extern s32 D_L11_001B30C8;
+extern s32 g_arena_progress_level;
 typedef struct { u8 pad[0x18]; u8 *hit; u8 pad1c[4]; f32 point[4]; } PathHit;
-extern PathHit D_L11_001C0D00;
-extern s32 D_L11_001B059C __attribute__((sda));
-extern s32 D_L11_001B05A4 __attribute__((sda));
-extern s32 D_L11_001B05A8 __attribute__((sda));
-extern s32 D_L11_001B05AC __attribute__((sda));
-extern s32 D_L11_001B05B0 __attribute__((sda));
-extern f32 D_L11_001B05EC __attribute__((sda));
-extern f32 D_L11_001B05F0 __attribute__((sda));
-extern f32 D_L11_001B0614 __attribute__((sda));
-extern f32 D_L11_001B0618 __attribute__((sda));
-extern f32 D_L11_001B061C __attribute__((sda));
-extern f32 D_L11_001B0620 __attribute__((sda));
-extern f32 D_L11_001B05F4 __attribute__((sda));
-extern f32 D_L11_001B05F8 __attribute__((sda));
+extern PathHit g_collision_l11_result;
+extern s32 g_joba_beam_repeat_count __attribute__((sda));
+extern s32 g_joba_beam_phase_frames_a __attribute__((sda));
+extern s32 g_joba_beam_phase_frames_b __attribute__((sda));
+extern s32 g_joba_beam_hit_frames __attribute__((sda));
+extern s32 g_joba_beam_phase_frames_c __attribute__((sda));
+extern f32 g_joba_beam_dir_min_angle_a __attribute__((sda));
+extern f32 g_joba_beam_dir_max_angle_a __attribute__((sda));
+extern f32 g_joba_beam_dir_min_angle_b __attribute__((sda));
+extern f32 g_joba_beam_dir_max_angle_b __attribute__((sda));
+extern f32 g_joba_beam_dir_min_c __attribute__((sda));
+extern f32 g_joba_beam_dir_max_c __attribute__((sda));
+extern f32 g_joba_beam_dir_min_b __attribute__((sda));
+extern f32 g_joba_beam_dir_max_b __attribute__((sda));
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
 #define U(p,o) (*(u16 *)((u8 *)(p)+(o)))
@@ -61,32 +61,32 @@ void func_PAL_L11_003F7778(u8 *object) {
             qcopy(data+0xB0+i*0xA0,starts[i^1]);
             coll_sweep_from_object(object,starts[0],0.2f,0x10001,data[0x34],1.0f,0,1,0);
             coll_sweep_from_object(object,starts[1],0.2f,0x10001,data[0x34],1.0f,0,1,0);
-            if (((PathState *)data)->timer[i]>D_L11_001B05A4) {
+            if (((PathState *)data)->timer[i]>g_joba_beam_phase_frames_a) {
                 u8 *path=data+0xA0+i*0xA0;
-                vec_random_direction(path+0x60,D_L11_001B0614*0.0003490659f,D_L11_001B0618*0.0003490659f);
-                vec_random_direction(path+0x70,D_L11_001B0614*0.0003490659f,D_L11_001B0618*0.0003490659f);
-                vec_random_direction(path+0x80,D_L11_001B061C,D_L11_001B0620);
-                vec_random_direction(path+0x90,D_L11_001B061C,D_L11_001B0620);
+                vec_random_direction(path+0x60,g_joba_beam_dir_min_angle_b*0.0003490659f,g_joba_beam_dir_max_angle_b*0.0003490659f);
+                vec_random_direction(path+0x70,g_joba_beam_dir_min_angle_b*0.0003490659f,g_joba_beam_dir_max_angle_b*0.0003490659f);
+                vec_random_direction(path+0x80,g_joba_beam_dir_min_c,g_joba_beam_dir_max_c);
+                vec_random_direction(path+0x90,g_joba_beam_dir_min_c,g_joba_beam_dir_max_c);
                 ((PathState *)data)->timer[i]=0;
                 ((PathState *)data)->state[i]=3;
                 ((PathState *)data)->repeat[i]=0;
                 qcopy(data+0x210+i*16,starts[i]);
                 qcopy(data+0xA0+i*0xA0,data+0x210+i*16);
                 if (joba_beam_pick_target_point(object,data+0x210+i*16,data+0x1F0+i*16))
-                    ((PathState *)data)->repeat[i]=D_L11_001B059C;
+                    ((PathState *)data)->repeat[i]=g_joba_beam_repeat_count;
             } else {
                 t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(D_L11_001B05A4);
+                t/=IntToFloat(g_joba_beam_phase_frames_a);
                 ((PathState *)data)->scale[i]=t;
             }
             break;
         case 2:
             coll_sweep_from_object(object,starts[i],0.2f,0x10001,data[0x34],1.0f,0,1,0);
-            if (((PathState *)data)->timer[i]<=((s32)(D_L11_001B05A8) * 5 + 2) / 6) {
+            if (((PathState *)data)->timer[i]<=((s32)(g_joba_beam_phase_frames_b) * 5 + 2) / 6) {
                 u8 *path;
                 s32 off;
                 t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(((s32)(D_L11_001B05A8) * 5 + 2) / 6);
+                t/=IntToFloat(((s32)(g_joba_beam_phase_frames_b) * 5 + 2) / 6);
                 off=i*0xA0;
                 path=data+0xA0+off;
                 F(data+off,0xB0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
@@ -99,16 +99,16 @@ void func_PAL_L11_003F7778(u8 *object) {
                 query.flags=3;
                 query.id=U(object,0xAA);
                 if (CollLine(path,path+0x10,0,object,&query)) {
-                    u8 *hit=D_L11_001C0D00.hit;
+                    u8 *hit=g_collision_l11_result.hit;
                     if (hit && H(hit,0xAA)!=0xC7D) {
                         u8 *snapshot;
                         func_PAL_L11_003F8E90(path+0x10,15);
                         qcopy(data+0x1F0+i*16,data+i*0xA0+0xB0);
                         ((PathState *)data)->timer[i]=0;
                         ((PathState *)data)->state[i]=4;
-                        snapshot=D_L11_001C0D00.hit;
+                        snapshot=g_collision_l11_result.hit;
                         ((PathState *)data)->hit[i]=snapshot;
-                        qcopy(data+i*0xA0+0xB0,D_L11_001C0D00.point);
+                        qcopy(data+i*0xA0+0xB0,g_collision_l11_result.point);
                         qcopy(data+0x230+i*16,snapshot+0x10);
                         if (g_active_attacker_robot==object) H(data,0x296)=1;
                     }
@@ -122,40 +122,40 @@ void func_PAL_L11_003F7778(u8 *object) {
             break;
         case 3: {
             u8 *hit;
-            if (((PathState *)data)->timer[i]<=((s32)(D_L11_001B05AC) * 5 + 2) / 6 && (hit=((PathState *)data)->hit[i]) && hit[0x20]!=0xFE && hit[0x20]!=0xFD) {
+            if (((PathState *)data)->timer[i]<=((s32)(g_joba_beam_hit_frames) * 5 + 2) / 6 && (hit=((PathState *)data)->hit[i]) && hit[0x20]!=0xFE && hit[0x20]!=0xFD) {
                 u8 *end;
                 FastVecSub(delta,hit+0x10,data+0x230+i*16);
                 end=data+i*0xA0+0xB0;
                 FastVecAdd(end,end,delta);
                 qcopy(data+0x230+i*16,((PathState *)data)->hit[i]+0x10);
-                if ((D_L11_001B30C8&15)==(((s32)object>>8)&15)) func_PAL_L11_003F8E90(end,1);
+                if ((g_arena_progress_level&15)==(((s32)object>>8)&15)) func_PAL_L11_003F8E90(end,1);
             } else {
                 ((PathState *)data)->timer[i]=0;
                 ((PathState *)data)->hit[i]=0;
-                ((PathState *)data)->repeat[i]=D_L11_001B059C;
+                ((PathState *)data)->repeat[i]=g_joba_beam_repeat_count;
                 ((PathState *)data)->state[i]=5;
             }
             break;
         }
         case 4:
-            if (((PathState *)data)->timer[i]<((s32)(D_L11_001B05B0) * 5 + 2) / 6) {
+            if (((PathState *)data)->timer[i]<((s32)(g_joba_beam_phase_frames_c) * 5 + 2) / 6) {
                 t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(((s32)(D_L11_001B05B0) * 5 + 2) / 6);
+                t/=IntToFloat(((s32)(g_joba_beam_phase_frames_c) * 5 + 2) / 6);
                 F(data+i*0xA0,0xA0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
                 F(data+i*0xA0,0xA4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*t;
                 F(data+i*0xA0,0xA8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*t;
-            } else if (((PathState *)data)->repeat[i]<D_L11_001B059C) {
+            } else if (((PathState *)data)->repeat[i]<g_joba_beam_repeat_count) {
                 u8 *path=data+0xA0+i*0xA0;
                 ((PathState *)data)->repeat[i]++;
-                vec_random_direction(path+0x60,D_L11_001B0614*0.0003490659f,D_L11_001B0618*0.0003490659f);
-                vec_random_direction(path+0x70,D_L11_001B0614*0.0003490659f,D_L11_001B0618*0.0003490659f);
-                vec_random_direction(path+0x80,D_L11_001B061C,D_L11_001B0620);
-                vec_random_direction(path+0x90,D_L11_001B061C,D_L11_001B0620);
+                vec_random_direction(path+0x60,g_joba_beam_dir_min_angle_b*0.0003490659f,g_joba_beam_dir_max_angle_b*0.0003490659f);
+                vec_random_direction(path+0x70,g_joba_beam_dir_min_angle_b*0.0003490659f,g_joba_beam_dir_max_angle_b*0.0003490659f);
+                vec_random_direction(path+0x80,g_joba_beam_dir_min_c,g_joba_beam_dir_max_c);
+                vec_random_direction(path+0x90,g_joba_beam_dir_min_c,g_joba_beam_dir_max_c);
                 ((PathState *)data)->timer[i]=0;
                 ((PathState *)data)->state[i]=3;
                 qcopy(data+0x210+i*16,data+0x1F0+i*16);
                 qcopy(data+0xA0+i*0xA0,data+0x210+i*16);
-                if (joba_beam_pick_target_point(object,data+0x210+i*16,data+0x1F0+i*16)) ((PathState *)data)->repeat[i]=D_L11_001B059C;
+                if (joba_beam_pick_target_point(object,data+0x210+i*16,data+0x1F0+i*16)) ((PathState *)data)->repeat[i]=g_joba_beam_repeat_count;
             } else {
                 s32 sound=((PathState *)data)->sound;
                 u8 *path;
@@ -167,10 +167,10 @@ void func_PAL_L11_003F7778(u8 *object) {
                 ((PathState *)data)->timer[i]=0;
                 ((PathState *)data)->state[i]=0;
                 path=data+0xA0+i*0xA0;
-                vec_random_direction(path+0x60,D_L11_001B05EC*0.0003490659f,D_L11_001B05F0*0.0003490659f);
-                vec_random_direction(path+0x70,D_L11_001B05EC*0.0003490659f,D_L11_001B05F0*0.0003490659f);
-                vec_random_direction(path+0x80,D_L11_001B05F4,D_L11_001B05F8);
-                vec_random_direction(path+0x90,D_L11_001B05F4,D_L11_001B05F8);
+                vec_random_direction(path+0x60,g_joba_beam_dir_min_angle_a*0.0003490659f,g_joba_beam_dir_max_angle_a*0.0003490659f);
+                vec_random_direction(path+0x70,g_joba_beam_dir_min_angle_a*0.0003490659f,g_joba_beam_dir_max_angle_a*0.0003490659f);
+                vec_random_direction(path+0x80,g_joba_beam_dir_min_b,g_joba_beam_dir_max_b);
+                vec_random_direction(path+0x90,g_joba_beam_dir_min_b,g_joba_beam_dir_max_b);
             }
             break;
         }

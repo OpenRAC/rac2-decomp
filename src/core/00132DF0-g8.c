@@ -7,12 +7,12 @@
    name: the batch tables are sized sda arrays ($gp addresses); the RPC client and
    its reply buffer are sda incomplete arrays, rebuilt at each use as retail does. */
 
-extern int D_001A74C4 __attribute__((sda));
-extern int D_001A7480 __attribute__((sda));
-extern int D_001A74F8 __attribute__((sda));
-extern int D_001A74C0 __attribute__((sda));
-extern int *D_001A74A0[2] __attribute__((sda));
-extern int D_001A74A8[2] __attribute__((sda));
+extern int g_snd_dma_busy __attribute__((sda));
+extern int g_snd_rpc_reply_ptr __attribute__((sda));
+extern int g_snd_quiet_flag __attribute__((sda));
+extern int g_snd_active_buffer_index __attribute__((sda));
+extern int *g_snd_command_buffers[2] __attribute__((sda));
+extern int g_snd_command_space_left[2] __attribute__((sda));
 
 typedef struct {
     int fn;
@@ -20,12 +20,12 @@ typedef struct {
     long data;
 } SndRingEntry;
 
-extern SndRingEntry *D_001A74B0[2] __attribute__((sda));
-extern int D_001A7040[] __attribute__((sda));
-extern int D_001A7080[] __attribute__((sda));
-extern char D_001A7578[];
-extern char D_001A78D0[];
-extern char D_0013BFF8[];
+extern SndRingEntry *g_snd_callback_tables[2] __attribute__((sda));
+extern int g_sound_rpc_client[] __attribute__((sda));
+extern int g_sound_rpc_reply[] __attribute__((sda));
+extern char g_str_snd_busy_message[];
+extern char g_str_snd_queue_wait[];
+extern char g_str_snd_queue_overflow[];
 
 extern void snd_prepare_reply_buffer(void *, int);
 extern int sif_rpc_is_handle_valid(void *);
@@ -46,45 +46,45 @@ void snd_queue_command(int command, int size, unsigned char *data, int callback,
     unsigned char *dest;
 
     held_flag = 0;
-    if (D_001A74C4 == 0 && D_001A7480 == 0 && size == 0 && callback == 0) {
-        snd_prepare_reply_buffer(D_001A7080, 1);
-        while (sif_rpc_is_handle_valid(D_001A7040) != 0) {
-            if (D_001A74F8 == 0)
-                printf(D_001A7578);
+    if (g_snd_dma_busy == 0 && g_snd_rpc_reply_ptr == 0 && size == 0 && callback == 0) {
+        snd_prepare_reply_buffer(g_sound_rpc_reply, 1);
+        while (sif_rpc_is_handle_valid(g_sound_rpc_client) != 0) {
+            if (g_snd_quiet_flag == 0)
+                printf(g_str_snd_busy_message);
             snd_Pump();
             FlushCache(0);
         }
-        sceSifCallRpc(D_001A7040, command, 1, 0, 0, D_001A7080, 0xC, 0, 0);
+        sceSifCallRpc(g_sound_rpc_client, command, 1, 0, 0, g_sound_rpc_reply, 0xC, 0, 0);
         return;
     }
     padded_size = size + 4;
     wait_count = 0;
     if (padded_size % 4 != 0)
         padded_size += 4 - padded_size % 4;
-    while (*D_001A74A0[D_001A74C0] == 0x100 || D_001A74A8[D_001A74C0] < padded_size) {
-        if (D_001A74C4 != 0) {
-            D_001A74C4 = 0;
+    while (*g_snd_command_buffers[g_snd_active_buffer_index] == 0x100 || g_snd_command_space_left[g_snd_active_buffer_index] < padded_size) {
+        if (g_snd_dma_busy != 0) {
+            g_snd_dma_busy = 0;
             held_flag = 1;
         }
         snd_Pump();
-        if (wait_count == 1 && D_001A74F8 == 0)
-            printf(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
+        if (wait_count == 1 && g_snd_quiet_flag == 0)
+            printf(g_str_snd_queue_overflow, g_snd_active_buffer_index, *g_snd_command_buffers[g_snd_active_buffer_index]);
         wait_count++;
     }
-    if (wait_count != 0 && D_001A74F8 == 0)
-        printf(D_001A78D0, wait_count);
+    if (wait_count != 0 && g_snd_quiet_flag == 0)
+        printf(g_str_snd_queue_wait, wait_count);
     if (held_flag != 0)
-        D_001A74C4 = 1;
-    dest = (unsigned char *)D_001A74A0[D_001A74C0] - (D_001A74A8[D_001A74C0] - 0x1000);
+        g_snd_dma_busy = 1;
+    dest = (unsigned char *)g_snd_command_buffers[g_snd_active_buffer_index] - (g_snd_command_space_left[g_snd_active_buffer_index] - 0x1000);
     *(short *)dest = command;
     dest += 2;
     *(short *)dest = size;
     dest += 2;
     for (i = 0; i < size; i++)
         dest[i] = data[i];
-    D_001A74A8[D_001A74C0] -= padded_size;
-    buf_idx = D_001A74C0;
-    D_001A74B0[buf_idx][*D_001A74A0[buf_idx]].fn = callback;
-    D_001A74B0[buf_idx][*D_001A74A0[buf_idx]].data = callback_data;
+    g_snd_command_space_left[g_snd_active_buffer_index] -= padded_size;
+    buf_idx = g_snd_active_buffer_index;
+    g_snd_callback_tables[buf_idx][*g_snd_command_buffers[buf_idx]].fn = callback;
+    g_snd_callback_tables[buf_idx][*g_snd_command_buffers[buf_idx]].data = callback_data;
     snd_commit_queued_command();
 }

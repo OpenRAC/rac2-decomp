@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern int D_L20_001A8F00;
+extern int g_hero_vehicle_mode;
 extern struct {
     u8 reserved[0x2D8];
     float height;
@@ -9,9 +9,9 @@ extern struct {
     u8 reserved[0x158];
     float yaw;
 } D_L20_001B9E80;
-extern u32 D_L20_001B2AC8;
-extern float D_L20_001B2420 __attribute__((sda));
-extern float D_L20_001B2430[4] SDATA(D_L20_001B2430);
+extern u32 g_frame_l20_counter;
+extern float g_turret_l20_shot_speed __attribute__((sda));
+extern float g_turret_l20_muzzle_offset[4] SDATA(D_L20_001B2430);
 
 extern void moby_mark_spawned(void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -49,7 +49,7 @@ void UpdateTargetedProjectileBursts(u8 *moby)
     float *aim;
     float angle, radius, savedHeight, distance;
     turret_update_health_aim((char *)moby);
-    if (D_L20_001A8F00 == 2) { moby_mark_spawned(moby); return; }
+    if (g_hero_vehicle_mode == 2) { moby_mark_spawned(moby); return; }
     switch (moby[0x20]) {
     case 2:
         if (flag_set_first_pending(moby)) *(int *)(state + 0x1b8) = PlayMobySound(0, 4, (char *)moby);
@@ -72,7 +72,7 @@ void UpdateTargetedProjectileBursts(u8 *moby)
                 *(u8 **)(state + 0x150) = selected;
                 qcopy(aim, selected + 0x10);
             }
-            angle = FastAddRotations(D_L20_001B9E80.yaw, math_random_signed_float_range(20.0f, 70.0f) * 0.017453294f);
+            angle = FastAddRotations(g_hero_l20_extra_state.yaw, math_random_signed_float_range(20.0f, 70.0f) * 0.017453294f);
             radius = math_random_float_range(5.0f, 15.0f);
             savedHeight = *(float *)(state + 0x198);
             *(float *)(state + 0x190) = math_fast_sin_or_cos_a(angle) * radius;
@@ -93,7 +93,7 @@ void UpdateTargetedProjectileBursts(u8 *moby)
             else *(float *)(state + 0x1b4) = -math_random_float_range(4.0f, 6.0f);
             PlayMobySound(1, 0, (char *)moby);
         }
-        if ((D_L20_001B2AC8 & 15) == (((int)moby >> 8) & 15)) {
+        if ((g_frame_l20_counter & 15) == (((int)moby >> 8) & 15)) {
             FastVecSub(target, state + 0x140, moby + 0x10);
             target[2] = 0.0f;
             distance = vec_length_xy(target) + *(float *)(state + 0x1b4);
@@ -102,10 +102,10 @@ void UpdateTargetedProjectileBursts(u8 *moby)
             FastVecAdd(target, target, moby + 0x10);
             target[2] = coll_probe_ground_height_below(target, 0, 0.5f);
             if (target[2] == 0.0f) target[2] = *(float *)(state + 0x148);
-            matrix_mul_vec3(origin, D_L20_001B2430, moby + 0xc0);
+            matrix_mul_vec3(origin, g_turret_l20_muzzle_offset, moby + 0xc0);
             FastVecAdd(origin, origin, moby + 0x10);
             FastVecSub(velocity, target, origin);
-            vec_scale_to_length(velocity, velocity, D_L20_001B2420 * 0.016666668f);
+            vec_scale_to_length(velocity, velocity, g_turret_l20_shot_speed * 0.016666668f);
             projectile_l20_spawn(moby, origin, velocity, (float)state[0x34]);
             ApproachValue((float *)(state + 0x1b4), 4.0f, 1.0f);
         }

@@ -51,9 +51,9 @@ extern SubtitleDiscToc g_copy_setup_data;
 extern unsigned char g_is_pal_video[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
-extern unsigned int D_00138320;
-extern unsigned int D_00138324;
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern unsigned int g_pad_pressed_flags;
+extern unsigned int g_pad_held_flags;
+extern unsigned int g_frame_counter[] __attribute__((sda));
 
 extern int math_fast_float_d(int *);
 extern void subtitle_init_state(void);
@@ -79,7 +79,7 @@ void func_PAL_00289AA8(void)
             g_subtitle_state.enabled = 1;
             g_subtitle_state.wait = 100;
         } else {
-            if (!g_subtitle_state.wait && (D_00138320 & 0xF000))
+            if (!g_subtitle_state.wait && (g_pad_pressed_flags & 0xF000))
                 g_subtitle_state.wait = 1;
             if (g_subtitle_state.wait) {
                 g_subtitle_state.wait++;
@@ -115,8 +115,8 @@ void func_PAL_00289AA8(void)
             if (g_subtitle_history[g_subtitle_state.selection].count < 65535)
                 g_subtitle_history[g_subtitle_state.selection].count++;
         }
-        if (((s32)(D_001A7390[0]) * 5 + 2) / 6 > g_subtitle_history[g_subtitle_state.selection].time)
-            g_subtitle_history[g_subtitle_state.selection].time = ((s32)(D_001A7390[0]) * 5 + 2) / 6;
+        if (((s32)(g_frame_counter[0]) * 5 + 2) / 6 > g_subtitle_history[g_subtitle_state.selection].time)
+            g_subtitle_history[g_subtitle_state.selection].time = ((s32)(g_frame_counter[0]) * 5 + 2) / 6;
         g_subtitle_state.entry = -1;
         g_subtitle_state.state = 0;
         g_subtitle_state.flag3A = 0;
@@ -140,7 +140,7 @@ void func_PAL_00289AA8(void)
                 g_music_state.key = g_subtitle_state.selection + 6000;
             }
         }
-        if (D_00138324 & 16) {
+        if (g_pad_held_flags & 16) {
             RECORD_SUBTITLE_TIME();
             g_subtitle_state.state = 7;
             g_subtitle_state.timer = 0;
@@ -158,7 +158,7 @@ void func_PAL_00289AA8(void)
         break;
     case 3:
         ForceClaimNotice(5, 0, 1);
-        if (D_00138324 & 16) {
+        if (g_pad_held_flags & 16) {
             RECORD_SUBTITLE_TIME();
             g_subtitle_state.state = 7;
             g_subtitle_state.timer = 0;
@@ -173,7 +173,7 @@ void func_PAL_00289AA8(void)
     case 4: {
         int subtitles;
         ForceClaimNotice(5, 0, 1);
-        if (D_00138324 & 16) {
+        if (g_pad_held_flags & 16) {
             RECORD_SUBTITLE_TIME();
             RECORD_SUBTITLE_LEVEL();
             g_subtitle_state.state = 6;
@@ -211,7 +211,7 @@ void func_PAL_00289AA8(void)
                 g_subtitle_entries[0][g_subtitle_state.entry].id != g_music_state.id - 6000)
                 goto close;
         }
-        if (!(D_00138324 & 16))
+        if (!(g_pad_held_flags & 16))
             return;
     close:
         RECORD_SUBTITLE_TIME();
@@ -220,7 +220,7 @@ void func_PAL_00289AA8(void)
         RECORD_SUBTITLE_LEVEL();
         break;
     case 6:
-        if (*(unsigned short *)&g_is_pal_video[4] && g_subtitle_state.timer < 4 && !(D_00138324 & 16))
+        if (*(unsigned short *)&g_is_pal_video[4] && g_subtitle_state.timer < 4 && !(g_pad_held_flags & 16))
             return;
         g_subtitle_state.state = 7;
         g_subtitle_state.timer = 0;

@@ -5,21 +5,21 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
 extern int g_hovering_object_count __attribute__((sda));
-extern float D_L02_001B2020 __attribute__((sda));
+extern float g_breakable_piece_speed_min __attribute__((sda));
 extern float D_L02_001B2020_1[8] __attribute__((sda));
-extern float D_L02_001B2040 __attribute__((sda));
+extern float g_breakable_piece_size_min __attribute__((sda));
 extern float D_L02_001B2040_1[4] __attribute__((sda));
 extern void moby_get_anim_entry_count(void *, void *, void *);
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_L00_003281C0(void *, int, float);
+extern void part_spawn_scaled_bolts_pal(void *, int, float);
 extern int PlayMobySound(int, int, void *);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern char *func_PAL_002735D0(char *, int, int, int, char *, char *, float *, float, float, int);
+extern char *cam_moby_create_pal(char *, int, int, int, char *, char *, float *, float, float, int);
 extern void func_PAL_L00_00328480(char *, char *, float, int, int, char *, float, int, int, float, float);
 extern void func_PAL_L02_004288E8(u8 *, float, float);
 
@@ -48,18 +48,18 @@ void func_PAL_L02_004285CC(u8 *a0) {
         *(u16 *)(a0 + 0x7C) = 0;
         *(int *)state = 0x64;
         *(int *)(a0 + 0x98) = 0;
-        func_PAL_L00_003281C0(a0, 1, 1.0f);
+        part_spawn_scaled_bolts_pal(a0, 1, 1.0f);
         moby_get_anim_entry_count(a0, &p28, &p2c);
         PlayMobySound(0, 0, a0);
         for (i = 0; i < 16; i++) {
             if ((p28 >> i) & 1) {
-                r1 = math_random_float_range(D_L02_001B2040, D_L02_001B2040_1[1]);
+                r1 = math_random_float_range(g_breakable_piece_size_min, D_L02_001B2040_1[1]);
                 r2 = math_random_float_range(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
-                v[0] = math_random_float_range(D_L02_001B2020, D_L02_001B2020_1[4]) * 0.020000001f;
+                v[0] = math_random_float_range(g_breakable_piece_speed_min, D_L02_001B2020_1[4]) * 0.020000001f;
                 v[1] = math_random_signed_float_range(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.020000001f;
                 v[2] = math_random_float_range(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.020000001f;
                 matrix_mul_vec3(v, v, a0 + 0xC0);
-                func_PAL_002735D0((char *)a0, 2, 0xD0D, i, (char *)(a0 + 0x10), (char *)(a0 + 0xF0), v, r2, r1, 0xFF);
+                cam_moby_create_pal((char *)a0, 2, 0xD0D, i, (char *)(a0 + 0x10), (char *)(a0 + 0xF0), v, r2, r1, 0xFF);
             }
         }
         *(TI128 *)v = 0;

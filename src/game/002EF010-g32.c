@@ -1,6 +1,6 @@
 #include "names.h"
-extern unsigned char D_001AD030[27] __attribute__((sda));
-extern unsigned char D_001AD04B[] __attribute__((sda));
+extern unsigned char g_cutscene_gap_sizes[27] __attribute__((sda));
+extern unsigned char g_cutscene_gap_ends[] __attribute__((sda));
 
 /* Turns a cutscene number into a compact index by skipping the unused numbers in between. Numbers outside the normal range are shifted down. */
 int cutscene_map_id_to_index(int cutscene_id)
@@ -11,7 +11,7 @@ int cutscene_map_id_to_index(int cutscene_id)
     int out_of_range = (unsigned int)(cutscene_id - 0x20) >= 0x91;
 
     if (!out_of_range) {
-        first_gap_end = D_001AD04B[0];
+        first_gap_end = g_cutscene_gap_ends[0];
         if (cutscene_id >= first_gap_end) {
             cutscene_id -= first_gap_end;
         } else {
@@ -19,7 +19,7 @@ int cutscene_map_id_to_index(int cutscene_id)
         next:
             i--;
             if (i >= 0) {
-                gap_size = D_001AD030[i];
+                gap_size = g_cutscene_gap_sizes[i];
                 if (cutscene_id < gap_size)
                     goto next;
                 cutscene_id -= gap_size;

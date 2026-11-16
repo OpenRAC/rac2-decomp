@@ -17,7 +17,7 @@ extern char ref_L00_003FE310_00[];
    fills the new record's short and byte fields; the level's own data address is then
    handed to the vector routine with the third argument and a scale of 1.5, and to the
    level-object starter with the second argument. */
-void func_PAL_L00_00402B98(void *a0, void *a1, void *a2)
+void part_spawn_muzzle_spark_burst_pal(void *a0, void *a1, void *a2)
 {
     char local[16];
     float f;
@@ -66,7 +66,7 @@ extern void func_002FDBD8_6(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisCon
                                     float *vector, int mode);
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_PAL_L00_00402D18(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void moby_draw_attached_effect_pal(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {

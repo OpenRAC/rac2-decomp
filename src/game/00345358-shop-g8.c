@@ -36,17 +36,17 @@ extern int *object_get_fourth_field(void *);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
-extern char D_001AE508[], D_001AE510[], D_001AE518[], D_001AE520[];
-extern char D_001AE528[], D_001AE530[], D_001AE538[], D_001ADF98[], D_001AE548[];
+extern char g_shop_cursor_pos[], g_shop_item_pos_a[], g_shop_item_pos_b[], g_shop_item_pos_c[];
+extern char g_str_shop_label_format[], g_str_shop_ammo_format[], g_str_shop_ammo_split_format[], g_str_count_format[], g_str_shop_max_ammo_format[];
 extern char ref_00346C60_00[];
-extern short D_00259F58[][5];
+extern short g_menu_item_table_first[][5];
 extern ItemRecord g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern unsigned char D_001A7B30[] MACRO_ADDR;
+extern unsigned char g_help_unlocked_flags[] MACRO_ADDR;
 extern int g_item_ammo_counts[];
 extern int g_selected_item_material __attribute__((sda));
-extern int D_001F2880[];
+extern int g_selection_grid_cursor[];
 
 /* Moves the cursor on the item grid, shows the name and ammo of the item under it and returns the choice when cross is pressed. */
 int UpdateItemGridMenu(ItemMenu *menu, int buttons)
@@ -91,11 +91,11 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
     memset(pos4C, 0, 8);
     memset(pos130, 0, 8);
     memset(pos98, 0, 8);
-    __builtin_memcpy(cursor, D_001AE508, 8);
+    __builtin_memcpy(cursor, g_shop_cursor_pos, 8);
     memset(pos17C, 0, 8);
-    __builtin_memcpy(pos210, D_001AE510, 8);
-    __builtin_memcpy(pos258, D_001AE518, 8);
-    __builtin_memcpy(pos2A0, D_001AE520, 8);
+    __builtin_memcpy(pos210, g_shop_item_pos_a, 8);
+    __builtin_memcpy(pos258, g_shop_item_pos_b, 8);
+    __builtin_memcpy(pos2A0, g_shop_item_pos_c, 8);
     if (old_selection != selection)
         math_ping_pong_blend_values(0, 0, 1, 0, 1);
     color = object_get_fourth_field((char *)menu + 0xE4);
@@ -113,12 +113,12 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
 
     g_selected_item_material = -1;
     if (selection >= 0) {
-        entry = D_00259F58[selection][3];
+        entry = g_menu_item_table_first[selection][3];
         item = g_item_slot_to_record[entry];
         initialRecord = &g_weapon_table[item];
         if (initialRecord->byte04) {
             g_item_owned_flags[entry] = 1;
-            D_001A7B30[entry] = 1;
+            g_help_unlocked_flags[entry] = 1;
         }
         if (g_item_owned_flags[entry]) {
             text = menu->detail;
@@ -128,22 +128,22 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
             ammo = g_item_ammo_counts[entry];
             maxAmmo = record->maxAmmo;
             if (record->usesAmmo) {
-                text += sprintf(text, D_001AE528, GetLocalizedString(0x2DC9));
+                text += sprintf(text, g_str_shop_label_format, GetLocalizedString(0x2DC9));
                 if (ammo < 1000)
-                    text += sprintf(text, D_001AE530, ammo);
+                    text += sprintf(text, g_str_shop_ammo_format, ammo);
                 else
-                    text += sprintf(text, D_001AE538, ammo / 1000, ammo % 1000);
+                    text += sprintf(text, g_str_shop_ammo_split_format, ammo / 1000, ammo % 1000);
                 if (maxAmmo < 1000)
-                    sprintf(text, D_001ADF98, maxAmmo);
+                    sprintf(text, g_str_count_format, maxAmmo);
                 else
-                    sprintf(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
+                    sprintf(text, g_str_shop_max_ammo_format, maxAmmo / 1000, maxAmmo % 1000);
             } else {
                 sprintf(text, ref_00346C60_00, GetLocalizedString(0x2DB9));
             }
             if (buttons & 0x40) {
                 result = selection;
                 snd_play_from_global_bank(4, 0, 0);
-                D_001F2880[0] = entry;
+                g_selection_grid_cursor[0] = entry;
             }
         } else {
             menu->detail[0] = 0;

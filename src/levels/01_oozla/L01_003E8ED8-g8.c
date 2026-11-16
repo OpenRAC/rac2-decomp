@@ -130,17 +130,17 @@ typedef struct {
 } HintFlags;
 extern OozlaSave g_subtitle_history;
 extern OozlaStats g_progress_statistics;
-extern HintScene D_L01_0027EAC8, g_music_state;
+extern HintScene g_hint_scene, g_music_state;
 /* The game's flag bytes. They are read as D[k], a small symbol plus an offset, which the backend
    keeps as one two-instruction load, tied to its register and out of delay slots. */
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
-extern unsigned char D_001A7BC8[] __attribute__((sda));
-extern s32 g_current_map_index MACRO_ADDR, D_001A7A00 MACRO_ADDR;
-extern HintFlags D_001395B8;
+extern unsigned char g_map_visited_flags[] __attribute__((sda));
+extern s32 g_current_map_index MACRO_ADDR, g_player_stats MACRO_ADDR;
+extern HintFlags g_game_flag_table;
 extern HintHero g_hero_state;
-extern u8 *D_L01_001B264C __attribute__((sda)), *g_moby_l01_table __attribute__((sda));
-extern HintMoby *D_L01_001B2568 __attribute__((sda));
-extern u32 D_001A7390 MACRO_ADDR;
+extern u8 *g_swamp_patrol_positions __attribute__((sda)), *g_moby_l01_table __attribute__((sda));
+extern HintMoby *g_hint_moby_list __attribute__((sda));
+extern u32 g_frame_counter MACRO_ADDR;
 extern s32 math_random_int_below(s32);
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 moby_is_state_one(void *);
@@ -181,8 +181,8 @@ void hint_message_controller_update(HintMoby *obj) {
             hints->initialFlag = 1;
         else
             hints->initialFlag = 0;
-        if (g_item_owned_flags[0x2e] && !D_001395B8.flag9b && hints->cameraIndex != -1) {
-            u8 *camera = D_L01_001B264C + (hints->cameraIndex << 7);
+        if (g_item_owned_flags[0x2e] && !g_game_flag_table.flag9b && hints->cameraIndex != -1) {
+            u8 *camera = g_swamp_patrol_positions + (hints->cameraIndex << 7);
             hero_reset_position_and_direction(camera + 0x30, camera + 0x70, 0, 1);
             state_set_flag_one();
         }
@@ -208,7 +208,7 @@ void hint_message_controller_update(HintMoby *obj) {
             }
         }
     }
-    if ((!g_progress_statistics.f6c || (u32)(D_001A7390 - g_progress_statistics.f70) > 108000U) &&
+    if ((!g_progress_statistics.f6c || (u32)(g_frame_counter - g_progress_statistics.f70) > 108000U) &&
         ((g_subtitle_history.f98 & (1U << g_current_map_index)) < 1U))
         subtitle_request_voice_line(0x9b5, 12);
     if (!g_subtitle_history.f9c && IsPointInCuboid(g_hero_state.position, hints->area[0]) && !g_progress_statistics.fc)
@@ -223,24 +223,24 @@ void hint_message_controller_update(HintMoby *obj) {
     if (IsPointInCuboid(g_hero_state.position, hints->area[4]))
         g_subtitle_history.fc0 = 0xffff;
     if (g_item_owned_flags[0x24] && IsPointInCuboid(g_hero_state.position, hints->repeatArea) && !g_subtitle_history.fc0) {
-        if (g_subtitle_history.fc4 + g_subtitle_history.fc2 >= D_001A7390 - 2U) {
+        if (g_subtitle_history.fc4 + g_subtitle_history.fc2 >= g_frame_counter - 2U) {
             g_subtitle_history.fc2++;
             if (g_subtitle_history.fc2 >= 180) {
                 subtitle_request_voice_line(0x9b9, 16);
                 g_subtitle_history.fc2 = 0;
             }
         } else {
-            if (g_subtitle_history.fc4 < D_001A7390)
-                g_subtitle_history.fc4 = D_001A7390;
+            if (g_subtitle_history.fc4 < g_frame_counter)
+                g_subtitle_history.fc4 = g_frame_counter;
             g_subtitle_history.fc2 = 0;
         }
     }
     if (g_item_owned_flags[0x2e] && IsPointInCuboid(g_hero_state.position, hints->lateArea) &&
-        (u32)(D_001A7390 - g_subtitle_history.fe8) > 3600U)
+        (u32)(g_frame_counter - g_subtitle_history.fe8) > 3600U)
         subtitle_request_voice_line(0x9bc, 19);
     if (IsPointInCuboid(g_hero_state.position, hints->completeArea0) ||
         IsPointInCuboid(g_hero_state.position, hints->completeArea1)) {
-        D_001395B8.flag9b = 1;
+        g_game_flag_table.flag9b = 1;
         g_subtitle_history.fe4 = 0xffff;
     }
     if (!g_subtitle_history.fb4 && IsPointInCuboid(g_hero_state.position, hints->area[3]) && g_progress_statistics.f18c < 100)
@@ -250,37 +250,37 @@ void hint_message_controller_update(HintMoby *obj) {
     if (!g_subtitle_history.fd8 && IsPointInCuboid(g_hero_state.position, hints->area[6]) && !g_progress_statistics.f0)
         subtitle_request_voice_line(0x9bb, 18);
     if (g_hero_state.weapon == 0x39 && IsPointInCuboid(g_hero_state.position, hints->weaponArea) &&
-        !g_subtitle_history.f2b8 && !D_001395B8.flags7b.bits.bit1)
+        !g_subtitle_history.f2b8 && !g_game_flag_table.flags7b.bits.bit1)
         g_progress_statistics.f1bc = 0;
     if (IsPointInCuboid(g_hero_state.position, hints->weaponArea) &&
-        (!g_progress_statistics.f1bc || (u32)(D_001A7390 - g_progress_statistics.f1c0) > 72000U) &&
+        (!g_progress_statistics.f1bc || (u32)(g_frame_counter - g_progress_statistics.f1c0) > 72000U) &&
         g_hero_state.weapon != 0x6f && g_hero_state.weapon != 0x39 &&
-        ((D_001395B8.flags7b.value ^ 1) & 1) && math_fast_float_d(&hints->messageTimer) &&
+        ((g_game_flag_table.flags7b.value ^ 1) & 1) && math_fast_float_d(&hints->messageTimer) &&
         g_subtitle_history.f2c0 >= 0)
         subtitle_request_voice_line(0x9e3, 0x3a);
     if (IsPointInCuboid(g_hero_state.position, hints->weaponArea) && g_hero_state.field220)
-        D_001395B8.flags7b.bits.bit1 = 1;
+        g_game_flag_table.flags7b.bits.bit1 = 1;
     if (IsPointInCuboid(g_hero_state.position, hints->exitArea))
-        D_001395B8.flags7b.bits.bit0 = 1;
+        g_game_flag_table.flags7b.bits.bit0 = 1;
     if (!IsPointInCuboid(g_hero_state.position, hints->departureArea))
         hints->departed = 1;
-    if (!D_001A7BC8[2] && hints->departed)
+    if (!g_map_visited_flags[2] && hints->departed)
         TriggerSubtitleInCuboid(0x9e4, 0x3b, 1, hints->messageArg, -1);
     if (!g_subtitle_history.f48) {
-        for (other = D_L01_001B2568; other; other = other->next) {
+        for (other = g_hint_moby_list; other; other = other->next) {
             if (other->oClass == 0x326 && fast_vec_dist(other->position, g_hero_state.position) < 10.0f &&
-                !D_L01_0027EAC8.key0 && D_L01_0027EAC8.key == -1 && !g_subtitle_history.f48 &&
+                !g_hint_scene.key0 && g_hint_scene.key == -1 && !g_subtitle_history.f48 &&
                 !moby_is_state_one(other)) {
-                if (g_hero_state.field24cc < D_001A7A00)
+                if (g_hero_state.field24cc < g_player_stats)
                     subtitle_request_voice_line(0x9af, 6);
                 else if (fast_vec_dist(other->position, g_hero_state.position) < 1.0f && !g_subtitle_history.f2e8)
                     subtitle_request_voice_line(0x9e7, 0x3e);
             }
         }
     }
-    if (level_get_table_entry_short(3) == 2 && level_get_table_entry_short(1) != 2 && !(D_001395B8.flags75 & 2) &&
+    if (level_get_table_entry_short(3) == 2 && level_get_table_entry_short(1) != 2 && !(g_game_flag_table.flags75 & 2) &&
         IsPointInCuboid(g_hero_state.position, hints->missionArea)) {
-        D_001395B8.flags75 |= 2;
+        g_game_flag_table.flags75 |= 2;
         hud_queue_hint_message(0xa3c, 0x93);
     }
     for (i = 0; i < 11; i++) {

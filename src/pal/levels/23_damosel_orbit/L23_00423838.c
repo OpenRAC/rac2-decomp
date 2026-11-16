@@ -12,7 +12,7 @@ extern void vec_scale_to_length(float *, float *, float);
 
 /* func_L23_0041E5B0 is defined in its dedicated source unit. */
 
-char *func_PAL_L23_00427920(char *pos, char *dir, float *damage) {
+char *directed_shot_create_pal(char *pos, char *dir, float *damage) {
     char axis[16];
     char scaled[16];
     char *obj;

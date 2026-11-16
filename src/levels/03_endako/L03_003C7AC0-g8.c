@@ -1,11 +1,11 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L03_001B01BC __attribute__((sda)),D_L03_001B01A4 __attribute__((sda)),D_L03_001B01B4 __attribute__((sda)),D_L03_001B01AC __attribute__((sda));
-extern float D_L03_001B01A8 __attribute__((sda)),D_L03_001B01B8 __attribute__((sda)),D_L03_001B01B0 __attribute__((sda));
-extern u8 D_L03_001B01D4 __attribute__((sda));
-extern float D_L03_001B9998 NOT_SDA, D_L03_001BFDE8 NOT_SDA;
+extern float g_held_platform_turn_degrees __attribute__((sda)),g_held_platform_move_scale __attribute__((sda)),g_held_platform_other_move_scale __attribute__((sda)),g_held_platform_special_move_scale __attribute__((sda));
+extern float g_held_platform_clamp_scale __attribute__((sda)),g_held_platform_other_clamp_scale __attribute__((sda)),g_held_platform_special_clamp_scale __attribute__((sda));
+extern u8 g_held_platform_state_byte __attribute__((sda));
+extern float g_hero_l03_aux_state NOT_SDA, g_collision_hit_height NOT_SDA;
 typedef struct { float vec[4]; char pad[0x2d4]; int mode; } PlayerState;
-extern PlayerState D_0018BDD0;
+extern PlayerState g_player_state;
 typedef struct { char pad[0x74]; u8 active; char pad75[0x13]; char *owner; } L03ControlEntry;
 extern u8 g_sound_state[];
 extern float FastAddRotations(float,float);
@@ -33,11 +33,11 @@ void held_platform_move_by_input(char *moby)
     int slot;
     if(*(u8 *)(moby+0x20)==2) {
         *(TI128 *)c=0;
-        c[2]=FastAddRotations(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
+        c[2]=FastAddRotations(g_hero_l03_aux_state,g_held_platform_turn_degrees*0.017453294f);
         *(TI128 *)(b)=*(TI128 *)(c);
         euler_rotation_basis(scratch.m,b);
-        qcopy(a,D_0018BDD0.vec);
-        if(FastVecLength(a)>0.0f && D_0018BDD0.mode==0x31) {
+        qcopy(a,g_player_state.vec);
+        if(FastVecLength(a)>0.0f && g_player_state.mode==0x31) {
             L03ControlEntry *control_entry=(L03ControlEntry *)(g_sound_state+*(int *)(vars+0x108)*0x70);
             if(control_entry->owner!=moby || !control_entry->active)
                 *(int *)(vars+0x108)=PlayMobySound(0,4,moby);
@@ -53,9 +53,9 @@ void held_platform_move_by_input(char *moby)
         matrix_mul_vec3(a,a,scratch.m);
         held_moby=*(char **)(vars+0xf0);
         if(held_moby) {
-            if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) FastVecScale(a,a,D_L03_001B01AC*(1.0f/60.0f));
-            else FastVecScale(a,a,D_L03_001B01B4*(1.0f/60.0f));
-        } else FastVecScale(a,a,D_L03_001B01A4*(1.0f/60.0f));
+            if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) FastVecScale(a,a,g_held_platform_special_move_scale*(1.0f/60.0f));
+            else FastVecScale(a,a,g_held_platform_other_move_scale*(1.0f/60.0f));
+        } else FastVecScale(a,a,g_held_platform_move_scale*(1.0f/60.0f));
     } else {
         slot=*(int *)(vars+0x108);
         if(slot!=-1) {
@@ -69,10 +69,10 @@ void held_platform_move_by_input(char *moby)
     b[2]=0;
     held_moby=*(char **)(vars+0xf0);
     if(held_moby) {
-        if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) vec_clamp_length(b,D_L03_001B01B0*0.000277777785f);
-        else vec_clamp_length(b,D_L03_001B01B8*0.000277777785f);
+        if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) vec_clamp_length(b,g_held_platform_special_clamp_scale*0.000277777785f);
+        else vec_clamp_length(b,g_held_platform_other_clamp_scale*0.000277777785f);
     } else {
-        vec_clamp_length(b,D_L03_001B01A8*0.000277777785f);
+        vec_clamp_length(b,g_held_platform_clamp_scale*0.000277777785f);
     }
     FastVecAdd(vars+0xe0,vars+0xe0,b);
     FastVecAdd(moby+0x10,moby+0x10,vars+0xe0);
@@ -82,7 +82,7 @@ void held_platform_move_by_input(char *moby)
     scratch.m[2]+=20.0f;
     qcopy(scratch.v.d,c);
     scratch.v.d[2]+=0.5f;
-    if(CollLine(scratch.v.d,scratch.m,2,moby,0)) *(float *)(vars+0xf4)=D_L03_001BFDE8;
+    if(CollLine(scratch.v.d,scratch.m,2,moby,0)) *(float *)(vars+0xf4)=g_collision_hit_height;
     moby_update_ground_check(moby);
-    *(u8 *)(moby+0xbd)=D_L03_001B01D4;
+    *(u8 *)(moby+0xbd)=g_held_platform_state_byte;
 }

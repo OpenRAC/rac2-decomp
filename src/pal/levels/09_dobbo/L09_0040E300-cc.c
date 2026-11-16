@@ -29,13 +29,13 @@ typedef struct DobboPath {
     char pad[12];
     float points[0][4];
 } DobboPath;
-extern DobboPath *D_L09_001FE6C0[];
+extern DobboPath *g_path_l09_table[];
 typedef struct DobboPathEffect {
     float dimensions[3];
     int flags;
     float position[4];
 } DobboPathEffect;
-extern DobboPathEffect D_L09_001C7B80[];
+extern DobboPathEffect g_sound_effect_table[];
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -64,7 +64,7 @@ void func_PAL_L09_0040E300(char *obj)
     switch (B(obj,0x20)) {
     case 0: {
         DobboPath *path;
-        path = D_L09_001FE6C0[I(d,0x260)];
+        path = g_path_l09_table[I(d,0x260)];
         I(d,0x268)=0;
         *(DobboPath **)(d+0x26c)=path;
         distance = fast_vec_dist(path->points[0],path->points[1]);
@@ -115,7 +115,7 @@ void func_PAL_L09_0040E300(char *obj)
             F(d,0x29c)+=((inverse*0.020000001f)*F(d,0x264)-F(d,0x29c))*0.05f;
         }
         F(d,0x268)+=F(d,0x29c);
-        effect=&D_L09_001C7B80[I(d,0x274)];
+        effect=&g_sound_effect_table[I(d,0x274)];
         qcopy(effect->position,obj+0x10);
         effect->position[3]=F(d,0x278);
         effect->dimensions[0]=F(d,0x27c);

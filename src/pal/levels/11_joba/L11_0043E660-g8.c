@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L11_001B12C8 __attribute__((sda));
+extern float g_rotor_timer_step __attribute__((sda));
 
 /* Bleeds the ten rotation timers the level keeps beside its state: each armed
    entry loses a sixtieth of the shared rate and clamps at zero, disarming. */
-void func_PAL_L11_0043EB58(char *obj)
+void rotor_tick_timers_pal(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     int i;
@@ -14,7 +14,7 @@ void func_PAL_L11_0043EB58(char *obj)
         u8 *armed = (u8 *)(state + 0x380 + i);
         f32 *timer = (f32 *)(state + 0x2F0 + 4 * i);
         if (*armed == 1) {
-            f32 left = *timer - D_L11_001B12C8 * 0.020000001f;
+            f32 left = *timer - g_rotor_timer_step * 0.020000001f;
             *timer = left;
             if (left < 0.0f) {
                 *timer = 0.0f;
@@ -25,7 +25,7 @@ void func_PAL_L11_0043EB58(char *obj)
 }
 
 extern int math_random_int_below(int);
-extern float D_L11_001B12C4 __attribute__((sda));
+extern float g_rotor_aim_motion_speed __attribute__((sda));
 extern int g_moby_l11_table;
 extern void FastVecSub(void *dst, void *a, void *b);
 extern void vec_scale_to_length(void *dst, void *src, float scale);
@@ -39,7 +39,7 @@ extern void InitializeRandomizedObjectMotion(void *a0, void *a1, float f0, float
    jitters the result by a random sixtieth and hands it to the level's own helper.
    The table base is read afresh for each of the three groups, which is how retail
    keeps it in the caller-saved registers. */
-void func_PAL_L11_0043E968(char *obj, int index, int flag)
+void rotor_aim_at_entry_pal(char *obj, int index, int flag)
 {
     char *state = *(char **)(obj + 0x68);
     char *base1;
@@ -69,7 +69,7 @@ void func_PAL_L11_0043E968(char *obj, int index, int flag)
         t = 0.0f;
 
     base2 = g_moby_l11_table;
-    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, D_L11_001B12C4 * (0.00040000002f), t);
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, g_rotor_aim_motion_speed * (0.00040000002f), t);
 
     base3 = g_moby_l11_table;
     /* The record's field at 0xB8 takes the object's own handle. */

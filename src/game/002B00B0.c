@@ -16,11 +16,11 @@ extern void func_00282CC0_35(char *target, char *first, char *local);
 
 extern int D_L00_001A8FF0_3 __attribute__((sda));
 
-extern int D_L00_001A8FF4 __attribute__((sda));
+extern int g_hero_action_blocked_flag __attribute__((sda));
 
-extern char D_L00_001B1B10[] __attribute__((sda));
+extern char g_camera_offset_vector[] __attribute__((sda));
 
-extern char D_L00_001A9000[] __attribute__((sda));
+extern char g_gravity_center_point[] __attribute__((sda));
 
 extern float func_00282E48_1(char *a, char *b);
 
@@ -63,7 +63,7 @@ typedef int s32;
 
 typedef unsigned char u8;
 
-extern u8 D_00139648;
+extern u8 g_save_baseline_count;
 
 extern unsigned char D_19B278[];
 
@@ -106,10 +106,10 @@ float gravity_get_center_distance(char *position)
 {
     float height;
 
-    if (D_L00_001A8FF4 == 0) {
-        height = func_00282E48_1(position, D_L00_001B1B10);
+    if (g_hero_action_blocked_flag == 0) {
+        height = func_00282E48_1(position, g_camera_offset_vector);
     } else {
-        height = 100.0f - func_00282E48_1(position, D_L00_001A9000);
+        height = 100.0f - func_00282E48_1(position, g_gravity_center_point);
     }
     return height;
 }
@@ -187,7 +187,7 @@ int gfx_blend_colors_by_cycle(int index, int count, int colorA, int colorB)
 }
 
 
-extern u8 D_001A7A47 __attribute__((sda));
+extern u8 g_smooth_value_flag __attribute__((sda));
 extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float f13);
 
 /* Stores the third argument (or 1.0f) in the object's float at 0x70, and, when the fifth argument
@@ -196,7 +196,7 @@ extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float 
 /* Sets a value on an object and, if asked, starts a short smooth change when it differs from the old value. */
 void value_set_and_smooth(void *owner, float *state, float value, int param, int startChange)
 {
-    if (D_001A7A47 != 0) {
+    if (g_smooth_value_flag != 0) {
         state[28] = value;
     } else {
         state[28] = 1.0f;
@@ -258,7 +258,7 @@ void part_spawn_masked_debris(char *moby, int partMask, float *baseVelocity,
 
 
 /* Returns a saved count byte used as a starting value. */
-s32 save_get_baseline_count(void) { return D_00139648; }
+s32 save_get_baseline_count(void) { return g_save_baseline_count; }
 
 extern int save_count_filled_slots(void);
 
@@ -311,7 +311,7 @@ int save_count_entries_above_threshold(void)
     return count;
 }
 
-extern u8 D_001A7A60[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] __attribute__((sda));
 
 /* Counts the non-zero bytes of a 32-byte table, and clamps the count to 0..30. */
 int save_count_nonzero_flags(void)
@@ -320,7 +320,7 @@ int save_count_nonzero_flags(void)
     int i;
 
     for (i = 0; i < 32; i++) {
-        if (D_001A7A60[i] != 0) {
+        if (g_item_enabled_flags[i] != 0) {
             count++;
         }
     }

@@ -32,7 +32,7 @@ typedef struct {
     float targetAngle;
 } Private8010;
 extern char *g_moby_l04_pool __attribute__((sda));
-extern char D_L04_001AFFE0[];
+extern char g_str_debug_stub_message[];
 extern unsigned char g_sound_state[];
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -151,7 +151,7 @@ void func_PAL_L04_003EBF44(char *o)
         }
         if (math_fast_float_d(&p->timer)) {
             if (++p->selected >= 4) {
-                STUB_printf(D_L04_001AFFE0);
+                STUB_printf(g_str_debug_stub_message);
                 p->selected = 0;
             }
             p->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);

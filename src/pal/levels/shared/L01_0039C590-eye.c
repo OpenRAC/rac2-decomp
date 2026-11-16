@@ -14,19 +14,19 @@ typedef struct {
     char p7[0x46]; int inputTimer;
 } PlayerStatePrefix;
 extern PlayerStatePrefix g_hero_state;
-extern u8 D_00139584[];
+extern u8 g_charged_beam_weapon_index[];
 extern unsigned int g_pad_state[];
 typedef struct { int mode; char pad[0x18]; float time; } Ctrl0F30;
-extern Ctrl0F30 D_L00_001B2840 __attribute__((sda));
-extern int D_L00_001AF5CC __attribute__((sda));
-extern float D_L00_001AF5D0 __attribute__((sda));
-extern float D_L00_001AF5D4 __attribute__((sda));
-extern float D_L00_001AF5D8 __attribute__((sda));
-extern float D_L00_001AF5DC __attribute__((sda));
-extern float D_L00_001AF5E0 __attribute__((sda));
-extern int D_L00_001AF5E4 __attribute__((sda));
-extern char *D_L00_001AF5E8 __attribute__((sda));
-extern int D_L00_001AF5EC __attribute__((sda));
+extern Ctrl0F30 g_charged_beam_state __attribute__((sda));
+extern int g_charged_beam_init_flag __attribute__((sda));
+extern float g_charge_increment __attribute__((sda));
+extern float g_charge_decrement __attribute__((sda));
+extern float g_charge_minimum __attribute__((sda));
+extern float g_charge_next_step __attribute__((sda));
+extern float g_charge_limit __attribute__((sda));
+extern int g_charged_beam_phase __attribute__((sda));
+extern char *g_charged_beam_effect_moby __attribute__((sda));
+extern int g_charged_beam_timer __attribute__((sda));
 typedef struct {
     float angle0[3], speed0[3], scale0[3];
     float angle1[3], speed1[3], scale1[3];
@@ -34,7 +34,7 @@ typedef struct {
     VectorBits output0, output1;
     char tail[16];
 } BeamOscillator;
-extern BeamOscillator D_L00_0023B510[4];
+extern BeamOscillator g_beam_oscillator_table[4];
 typedef struct { char prefix[0x54]; float rate; char tail[0x88]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern int math_fast_float_d(void *);
@@ -78,9 +78,9 @@ void func_PAL_L01_0039D1E8(char *moby)
         int i, handle;
         *(float *)state = 0.3666666746f;
         *(unsigned char *)(moby + 0x20) = 1;
-        D_L00_001B2840.time = -1.0f;
-        D_L00_001AF5E4 = 0;
-        D_L00_001AF5CC = 0;
+        g_charged_beam_state.time = -1.0f;
+        g_charged_beam_phase = 0;
+        g_charged_beam_init_flag = 0;
         if (*(unsigned char *)(moby + 0x43) || (*(unsigned char *)(moby + 0x60) & 2))
             func_PAL_002A7E68(moby, 1, 0, 0);
         *(int *)(state + 0xC) = 0;
@@ -90,7 +90,7 @@ void func_PAL_L01_0039D1E8(char *moby)
         *(int *)(state + 4) = handle;
         *(char **)(state + 8) = level_get_slot_body(*(short *)(moby + 0xAA), handle);
         for (i = 0; i < 4; i++) {
-            BeamOscillator *entry = &D_L00_0023B510[i];
+            BeamOscillator *entry = &g_beam_oscillator_table[i];
             entry->angle0[0] = 0.0f; entry->angle0[1] = 0.0f; entry->angle0[2] = 0.0f;
             entry->speed0[0] = math_random_signed_float_range(0.05f, 0.3f);
             entry->speed0[1] = math_random_signed_float_range(0.05f, 0.3f);
@@ -105,16 +105,16 @@ void func_PAL_L01_0039D1E8(char *moby)
             entry->scale1[0] = math_random_float_range(0.25f, 0.75f);
             entry->scale1[1] = math_random_float_range(0.25f, 0.75f);
             entry->scale1[2] = math_random_float_range(0.25f, 0.75f);
-            vec_clear_128(&D_L00_0023B510[i].output0);
-            vec_clear_128(&D_L00_0023B510[i].output1);
+            vec_clear_128(&g_beam_oscillator_table[i].output0);
+            vec_clear_128(&g_beam_oscillator_table[i].output1);
         }
         return;
     }
     case 1: {
-    D_L00_001B2840.time = -1.0f;
-    if (D_L00_001AF5CC == 0) {
+    g_charged_beam_state.time = -1.0f;
+    if (g_charged_beam_init_flag == 0) {
         *(int *)(state + 0xC) = 0;
-        D_L00_001AF5CC = 1;
+        g_charged_beam_init_flag = 1;
     }
     if (g_hero_state.mode == 1)
         func_PAL_L01_002BEC60(29, 1);
@@ -129,25 +129,25 @@ void func_PAL_L01_0039D1E8(char *moby)
     if (vec_fast_helper_b(state) && ready && !g_hero_state.blocked && (g_pad_state[0x68] & g_hero_state.buttons) &&
         !effect_is_count_two() && g_hero_state.inputTicks > 18) {
         if (weapon_spend_ammo(-1, 1)) {
-            D_L00_001B2840.mode = 1;
+            g_charged_beam_state.mode = 1;
             PlayMobySound(2, 0, moby);
             {
                 float cooldown;
-                switch (D_L00_001AF5E4) {
+                switch (g_charged_beam_phase) {
                 case 0: {
                     WeaponEntry *weapon;
                     int index;
-                    D_L00_001AF5E4 = 1;
-                    *(float *)(state + 0xC) = D_L00_001AF5D8;
-                    weapon = &g_weapon_l00_table[D_00139584[0]];
+                    g_charged_beam_phase = 1;
+                    *(float *)(state + 0xC) = g_charge_minimum;
+                    weapon = &g_weapon_l00_table[g_charged_beam_weapon_index[0]];
                     cooldown = 1.0f / weapon->rate;
                     break;
                 }
                 case 2: {
                     WeaponEntry *weapon;
                     int index;
-                    D_L00_001AF5E4 = 1;
-                    weapon = &g_weapon_l00_table[D_00139584[0]];
+                    g_charged_beam_phase = 1;
+                    weapon = &g_weapon_l00_table[g_charged_beam_weapon_index[0]];
                     cooldown = 1.0f / weapon->rate;
                     break;
                 }
@@ -156,18 +156,18 @@ void func_PAL_L01_0039D1E8(char *moby)
                 }
                 *(float *)state = cooldown;
             }
-        } else if ((g_pad_state[0x69] & g_hero_state.buttons) || D_L00_001B2840.mode == 1) {
+        } else if ((g_pad_state[0x69] & g_hero_state.buttons) || g_charged_beam_state.mode == 1) {
             PlayMobySound(6, 0, moby);
-            D_L00_001B2840.mode = 0;
+            g_charged_beam_state.mode = 0;
         }
     }
 updateCharge:
-    switch (D_L00_001AF5E4) {
+    switch (g_charged_beam_phase) {
     case 0: {
         float charge = *(float *)(state + 0xC);
-        float minimum = D_L00_001AF5D8;
+        float minimum = g_charge_minimum;
         if (charge < minimum) {
-            float next = charge + D_L00_001AF5DC;
+            float next = charge + g_charge_next_step;
             *(float *)(state + 0xC) = next;
             if (next > minimum)
                 *(float *)(state + 0xC) = minimum;
@@ -175,8 +175,8 @@ updateCharge:
         break;
     }
     case 1: {
-        float charge = *(float *)(state + 0xC) + D_L00_001AF5D0;
-        float limit = D_L00_001AF5E0;
+        float charge = *(float *)(state + 0xC) + g_charge_increment;
+        float limit = g_charge_limit;
         *(float *)(state + 0xC) = charge;
         if (charge > limit) {
             float speed;
@@ -189,21 +189,21 @@ updateCharge:
                 vec_scale_to_length(velocity, g_hero_state.facing, speed);
             if (g_hero_state.aimTarget)
                 vec_compute_object_to_target(g_hero_state.aimTarget, (char *)origin, (char *)velocity, 0.40000004f);
-            D_L00_001AF5E8 = func_PAL_L00_003BECF0(moby, (char *)*(int *)(state + 4), (char *)origin, (char *)velocity);
-            if (D_L00_001AF5E8)
-                *(char **)(D_L00_001AF5E8 + 0xB8) = moby;
-            D_L00_001AF5EC = 42;
-            D_L00_001AF5E4 = 2;
+            g_charged_beam_effect_moby = func_PAL_L00_003BECF0(moby, (char *)*(int *)(state + 4), (char *)origin, (char *)velocity);
+            if (g_charged_beam_effect_moby)
+                *(char **)(g_charged_beam_effect_moby + 0xB8) = moby;
+            g_charged_beam_timer = 42;
+            g_charged_beam_phase = 2;
         }
         break;
     }
     case 2: {
-        float charge = *(float *)(state + 0xC) - D_L00_001AF5D4;
-        float minimum = D_L00_001AF5D8;
+        float charge = *(float *)(state + 0xC) - g_charge_decrement;
+        float minimum = g_charge_minimum;
         *(float *)(state + 0xC) = charge;
         if (charge <= minimum) {
             *(float *)(state + 0xC) = minimum;
-            D_L00_001AF5E4 = 0;
+            g_charged_beam_phase = 0;
         }
     }
     }

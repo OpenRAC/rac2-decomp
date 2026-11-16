@@ -9,8 +9,8 @@ typedef struct {
     unsigned long long reserved, texture, state, primitive;
 } EffectQuad;
 extern unsigned int g_equipment_bits MACRO_ADDR;
-extern int D_001AC040[2] __attribute__((sda));
-extern EffectRow *D_001AC048[2] __attribute__((sda));
+extern int g_glow_quad_counts[2] __attribute__((sda));
+extern EffectRow *g_glow_quad_tables[2] __attribute__((sda));
 extern EffectRow corner_template[4] SDATA(D_001AC050);
 typedef struct { float u, v; } EffectUV;
 extern EffectUV uv_gp[4] SDATA(D_001ABFF0);
@@ -33,8 +33,8 @@ void part_draw_glow_quads(unsigned char *object)
     int i, j;
     unsigned int baseColor;
     int variant = (g_equipment_bits >> 4) & 1;
-    table = D_001AC048[variant];
-    count = D_001AC040[variant];
+    table = g_glow_quad_tables[variant];
+    count = g_glow_quad_counts[variant];
     quad.texture = GetEffectTextureDescriptor(5);
     quad.state = 0xFF9000000260ULL;
     quad.primitive = 0x8000000048ULL;

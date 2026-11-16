@@ -6,12 +6,12 @@ typedef union {
     ProjectileQuad q;
     float f[4];
 } ProjectileVector;
-extern float D_L05_001AFC28 __attribute__((sda));
-extern float D_L05_001AFC30 __attribute__((sda));
-extern float D_L05_001AFC4C __attribute__((sda));
-extern float D_L05_001AFC50 __attribute__((sda));
-extern char D_L05_001BFB30[], D_L05_001BFB20[];
-extern u8 *D_L05_001FF240[] NOT_SDA;
+extern float g_turn_rate __attribute__((sda));
+extern float g_turn_l05_limit __attribute__((sda));
+extern float g_collision_radius_normal __attribute__((sda));
+extern float g_collision_radius_alt __attribute__((sda));
+extern char g_projectile_pos_scratch[], g_projectile_target_pos[];
+extern u8 *g_particle_params_table[] NOT_SDA;
 extern char *moby_get_motion_data(void *);
 extern int FloatToInt(float);
 extern float FastVecLength(void *);
@@ -46,14 +46,14 @@ void func_PAL_L05_003D4868(char *obj)
             FastVecSub(data,*(char **)(data+0x10)+0x10,obj+0x10);
             vec_scale_to_length(data,data,length);
         } else {
-            float turn = D_L05_001AFC28;
+            float turn = g_turn_rate;
             if (*(int *)(data+0x24)) {
                 FastVecSub(&temp, *(char **)(data + 0x10) + 0x10, obj + 0x10);
                 length = FastVecLength(data);
                 vec_scale_to_length(data, &temp, length);
             } else {
                 moby_build_timer_vectors_from_matrix(obj + 0x10, data, *(char **)(data + 0x10),
-                                   data + 0x14, turn, D_L05_001AFC30, 0.0f);
+                                   data + 0x14, turn, g_turn_l05_limit, 0.0f);
             }
         }
         temp.q = 0;
@@ -80,9 +80,9 @@ void func_PAL_L05_003D4868(char *obj)
             *(float *)(obj+0x18)<2.0f || *(float *)(obj+0x18)>1021.0f) goto destroy;
         if (GetCollHitMaterial()!=6) {
             collision = 0;
-            if (coll_test_point(obj+0x10,16,*(void **)(data+0x20),*(int *)(data+0x24)?D_L05_001AFC50:D_L05_001AFC4C)) {
+            if (coll_test_point(obj+0x10,16,*(void **)(data+0x20),*(int *)(data+0x24)?g_collision_radius_alt:g_collision_radius_normal)) {
                 collision = 1;
-                qcopy(obj + 0x10, D_L05_001BFB30);
+                qcopy(obj + 0x10, g_projectile_pos_scratch);
             }
             if (collision || CollLine(&old,obj+0x10,16,*(void **)(data+0x20),0)) goto impact;
         }
@@ -92,7 +92,7 @@ impact:
     {
         func_PAL_L05_003D50B0(obj,data,obj+0x10);
         snd_play_from_class_bank(7,0,obj,0xfbf);
-        qcopy(obj+0x10,D_L05_001BFB20);
+        qcopy(obj+0x10,g_projectile_target_pos);
 destroy:
         moby_mark_spawned(obj);
         return;
@@ -111,15 +111,15 @@ emit:
         if (*(int *)(data+0x24)) {
             effect=part_spawn_trailing_spark(&temp,&velocity,0x4fff0040,0x1fff0040,8,1,30000.0f);
             if (effect)
-                effect[2] = D_L05_001FF240[97][7];
+                effect[2] = g_particle_params_table[97][7];
             effect=part_spawn_trailing_spark(&temp,&velocity,0x4fff2040,0x1fff2040,8,1,15000.0f);
         } else {
             effect=part_spawn_trailing_spark(&temp,&velocity,0x4f00ffff,0x1f00ffff,8,1,30000.0f);
             if (effect)
-                effect[2] = D_L05_001FF240[97][7];
+                effect[2] = g_particle_params_table[97][7];
             effect=part_spawn_trailing_spark(&temp,&velocity,0x4f20ffff,0x1f20ffff,8,1,15000.0f);
         }
         if (effect)
-            effect[2] = D_L05_001FF240[97][7];
+            effect[2] = g_particle_params_table[97][7];
     }
 }

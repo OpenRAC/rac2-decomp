@@ -30,11 +30,11 @@ typedef struct Actor {
 extern int math_random_int_below(int);
 extern Actor *CreateMoby(int);
 extern void set_moby_color(Actor *, int, int, int);
-extern char D_L10_002BABF0[];
+extern char g_cloud_start_points[];
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
-extern Actor *D_L10_001B1780 __attribute__((sda));
-extern Actor *D_L10_001B2528;
+extern Actor *g_cloud_boss_actor __attribute__((sda));
+extern Actor *g_cloud_object_list;
 
 /* Spawns one of three cloud classes (0x1315, 0x1328, 0x1327) at a random start point
    from D_L10_002BABF0, jittered by +-5 on each axis, with a random orientation and
@@ -59,7 +59,7 @@ Actor *func_PAL_L10_00433CD0(int arg)
         set_moby_color(p, 20, 20, 20);
         index = math_random_int_below(5);
         st->index = index;
-        qcopy(&p->pos, D_L10_002BABF0 + index * 16);
+        qcopy(&p->pos, g_cloud_start_points + index * 16);
         p->pos[0] += math_random_float_range(5.0f, -5.0f);
         p->pos[1] += math_random_float_range(5.0f, -5.0f);
         p->pos[2] += math_random_float_range(5.0f, -5.0f);
@@ -68,10 +68,10 @@ Actor *func_PAL_L10_00433CD0(int arg)
         p->rz = math_random_angle();
         st->timer = ((s32)(math_random_int_below(3600)) * 5 + 2) / 6;
         st->arg = arg;
-        if (!D_L10_001B1780) {
-            Actor *cur = D_L10_001B2528;
+        if (!g_cloud_boss_actor) {
+            Actor *cur = g_cloud_object_list;
             while (cur) {
-                if (cur->kind == 0xFBF) D_L10_001B1780 = cur;
+                if (cur->kind == 0xFBF) g_cloud_boss_actor = cur;
                 cur = cur->next;
             }
         }

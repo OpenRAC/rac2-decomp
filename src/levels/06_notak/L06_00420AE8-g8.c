@@ -9,7 +9,7 @@ extern int follower_init_and_check_hits(char *);
 extern int moby_dispatch_action_by_kind(char *, char *);
 /* Callers set a mode in $a1 after the four floats; each EE register bank keeps its order. */
 extern int actor_move_toward_goal(char *, float, float, float, float, int);
-extern char D_L06_001B0830[];
+extern char g_str_path_gunner_debug[];
 extern char *g_path_list[];
 
 extern void DrawPath(void *, int, unsigned int, int, int, float);
@@ -49,13 +49,13 @@ extern void moby_fade_out_update(void);
 extern void SetDeathBits(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void actor_tick_timers_spawn_dust(void *);
-extern char D_L06_001AC520[] MACRO_ADDR;
+extern char g_up_vector[] MACRO_ADDR;
 extern char g_hero_position[];
-extern char D_L06_001B9840[];
-extern char D_L06_001A8F20[] MACRO_ADDR;
+extern char g_hero_l06_position[];
+extern char g_effect_vector[] MACRO_ADDR;
 extern char g_sound_state[];
-extern char *D_L06_001B290C MACRO_ADDR;
-extern int D_L06_001B2348 MACRO_ADDR;
+extern char *g_region_table MACRO_ADDR;
+extern int g_game_l06_frame_counter MACRO_ADDR;
 
 typedef int L06Quad __attribute__((mode(TI)));
 
@@ -142,7 +142,7 @@ void path_gunner_update(char *moby)
         }
         switch ((unsigned char)moby[0x20]) {
         case 0:
-            STUB_printf(D_L06_001B0830);
+            STUB_printf(g_str_path_gunner_debug);
             break;
         case 2: {
             char *path;
@@ -180,7 +180,7 @@ void path_gunner_update(char *moby)
                     FastVecSub(basis.direction, path + ((node << 4) + 0x10), path + (node << 4));
                 else
                     FastVecSub(basis.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
-                up = D_L06_001AC520;
+                up = g_up_vector;
                 vec_scale_to_length(basis.direction, basis.direction, 1.0f);
                 qcopy(basis.up, up);
                 FastVecCross(basis.side, basis.direction, basis.up);
@@ -207,7 +207,7 @@ void path_gunner_update(char *moby)
                 yaw = mat_fast_helper_a(*(float *)(vars + 0x1C0) - *(float *)(moby + 0x10),
                                    *(float *)(vars + 0x1C4) - *(float *)(moby + 0x14));
                 if (vec_distance_xy(moby + 0x10, vars + 0x1C0) > 8.0f)
-                    yaw = FastAddRotations(yaw, math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L06_001B2348) * 0.02f)) * 0.7853982448577881f);
+                    yaw = FastAddRotations(yaw, math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_game_l06_frame_counter) * 0.02f)) * 0.7853982448577881f);
                 index = vec_find_point_nearest_wanted_distance(target, path, 0.0f);
                 if (actor_move_toward_goal(moby, 12.0f, 6.0f, yaw, 0.0f, 1)) {
                     int desired = index;
@@ -235,7 +235,7 @@ void path_gunner_update(char *moby)
                 else
                     FastVecSub(basis2.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
                 vec_scale_to_length(basis2.direction, basis2.direction, 1.0f);
-                qcopy(basis2.up, D_L06_001AC520);
+                qcopy(basis2.up, g_up_vector);
                 FastVecCross(basis2.side, basis2.direction, basis2.up);
                 offset[0] = 0.0f;
                 offset[2] = 0.0f;
@@ -255,7 +255,7 @@ void path_gunner_update(char *moby)
                 L06Basis basis;
                 float target[4], offset[4], velocity[4], acceleration[4], shot[4], joint[4];
                 float width, height, distance, phase;
-                char *record = D_L06_001B290C + (*(int *)(vars + 0x2A0) << 7);
+                char *record = g_region_table + (*(int *)(vars + 0x2A0) << 7);
                 FastVecSub(local, vars + 0x190, record + 0x30);
                 euler_rotation_basis(basis.direction, record + 0x70);
                 matrix_from_basis_rows(basis.inverse, basis.direction);
@@ -337,7 +337,7 @@ void path_gunner_update(char *moby)
             char *rec, *effect;
             int i;
             /* Retail reads sp+0x10 here without initializing it on this path. */
-            FastVecSub(direction, D_L06_001B9840, local);
+            FastVecSub(direction, g_hero_l06_position, local);
             vec_scale_to_length(direction, direction, 1.0f);
             part_spawn_blast_effect_moby(moby, moby + 0x10, direction, 5.0f);
             PlayMobySound(3, 0, moby);
@@ -350,7 +350,7 @@ void path_gunner_update(char *moby)
             for (i = 0; i < 6; ++i) {
                 vec_random_direction(velocity, 0.13333334028720856f, 0.20000001788139343f);
                 velocity[2] = math_fabs(velocity[2]) * 2.5f;
-                FastVecAdd(velocity, velocity, D_L06_001A8F20);
+                FastVecAdd(velocity, velocity, g_effect_vector);
                 effect = cam_moby_create(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, 30.0f, 15.0f);
                 *(void (**)(void))(effect + 0x64) = moby_fade_out_update;
             }

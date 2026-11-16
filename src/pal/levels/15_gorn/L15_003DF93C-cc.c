@@ -8,25 +8,25 @@ struct L02NearObject;
 struct L02GroupObject;
 extern char g_hero_state[] NOT_SDA;
 typedef struct { char pad[0x18]; char *hit; int count; } L02Collision;
-extern L02Collision D_L15_001BFC00;
-extern char *D_L15_001FE480[];
-extern int D_L15_001B2148[] __attribute__((sda));
+extern L02Collision g_hit_l15_result;
+extern char *g_path_l15_table[];
+extern int g_gorn_challenge_count[] __attribute__((sda));
 extern int func_PAL_L02_003D06F0(char *), moby_compute_aligned_direction(char *, void *);
 extern void func_PAL_L02_003D0C08(char *), turret_l02_aim_at_hero(char *), moby_set_random_spread_velocity(char *, void *), linked_effect_update(char *);
 extern void moby_delay_group_except_nearest(struct L02NearObject *), func_PAL_L02_003D13E8(struct L02GroupObject *), moby_teleport_to_new_pose(char *, void *, void *);
 extern u8 *moby_find_group_in_state_13(int);
-extern void moby_mark_spawned(void *), moby_set_state(u8 *, int, int), func_PAL_002A7E68(char *, int, int, int), func_PAL_002A7650(char *, void *, int);
+extern void moby_mark_spawned(void *), moby_set_state(u8 *, int, int), func_PAL_002A7E68(char *, int, int, int), SetDeathBits_pal(char *, void *, int);
 extern int flag_set_first_pending(u8 *), flag_set_second_pending(u8 *), math_random_int_below(int), math_random_int_range(int, int), FastDecTimer(short *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
 /* The retail wrapper forwards B50E0's GPR flags. */
-extern int func_PAL_L01_00323068(char *, char *), moby_start_effect_from_entry(int, float), func_PAL_L02_00333638(void *, void *, int, float, float, float), moby_check_target_point_from_offset(char *, void *);
+extern int moby_l01_turn_toward_target_pal(char *, char *), moby_start_effect_from_entry(int, float), moby_move_to_target_temp_limits_pal(void *, void *, int, float, float, float), moby_check_target_point_from_offset(char *, void *);
 extern float mat_fast_helper_a(float, float), FastDiffRots(float, float), fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), math_fabs(float), FastVecDot(void *, void *), moby_get_anim_value(char *);
-extern int CollLine(void *, void *, int, char *, void *), moby_is_in_special_class_range(char *), func_PAL_002AF6C0(char *, float), IsPointInCuboid(void *, int), func_PAL_002B6CD8(char *, char *), coll_check_object_inside_polygon(u8 *);
+extern int CollLine(void *, void *, int, char *, void *), moby_is_in_special_class_range(char *), func_PAL_002AF6C0(char *, float), IsPointInCuboid(void *, int), path_follow_nodes_pal(char *, char *), coll_check_object_inside_polygon(u8 *);
 extern int coll_test_hit_at_bone(float, float, float, void *, void *, int, int, int, int);
 extern void moby_transform_joint_point(char *, int, char *), moby_transform_joint_to_world(char *, int, char *), FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float), FastVecScale(void *, void *, float);
-extern void *func_PAL_L02_00405E88(void *, void *, void *, float, float, float, int, int, int);
+extern void *part_spawn_trail_effect_moby_pal(void *, void *, void *, float, float, float, int, int, int);
 /* Runs a ranged enemy's patrol, attack, group coordination and projectile states. */
 /* This is a view of observed fields, not the complete resident allocation. */
 typedef struct {
@@ -87,7 +87,7 @@ void func_PAL_L15_003DF93C(char *self) {
         flags = moby_dispatch_action_by_kind(self, state + 0x50);
         if (flags & 1) {
             *(u16 *)(*(char **)(state + 0x370) + 0x34) |= 0x41; *(u16 *)(*(char **)(state + 0x370) + 0x34) &= 0xEFFF; *(int *)(*(char **)(state + 0x370) + 0x98) = 0;
-            func_PAL_002A7650(self, 0, 3); part_queue_moby_for_glow(self, 0, linked_effect_update); return;
+            SetDeathBits_pal(self, 0, 3); part_queue_moby_for_glow(self, 0, linked_effect_update); return;
         }
         if (flags & 2) {
             *(int *)(state + 0x33C) = 0;
@@ -114,7 +114,7 @@ void func_PAL_L15_003DF93C(char *self) {
         if (flag_set_first_pending((u8 *)self)) {
             if (((u8 *)self)[0x43] != 5) func_PAL_002A7E68(self, 5, 0, 17); moby_set_random_spread_velocity(self, state + 0x350);
         }
-        if ((func_PAL_L01_00323068(self, state + 0x350) & 0x80) || *(u16 *)(self + 0x96) >= 151 || *(int *)(state + 0x180) >= 18) { moby_set_state((u8 *)self, 5, -1); break; }
+        if ((moby_l01_turn_toward_target_pal(self, state + 0x350) & 0x80) || *(u16 *)(self + 0x96) >= 151 || *(int *)(state + 0x180) >= 18) { moby_set_state((u8 *)self, 5, -1); break; }
         break;
     case 3:
         if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 9) func_PAL_002A7E68(self, 9, 0, 17);
@@ -136,7 +136,7 @@ void func_PAL_L15_003DF93C(char *self) {
             if (((u8 *)self)[0x43] != animation) func_PAL_002A7E68(self, animation, 0, 8);
         }
         angle = mat_fast_helper_a(*(float *)(state + 0x350) - *(float *)(self + 0x10), *(float *)(state + 0x354) - *(float *)(self + 0x14));
-        if ((func_PAL_L02_00333638(self, state + 0x350, 16, angle, -1, -1) & 0x80) || *(u16 *)(self + 0x96) >= 101) { moby_set_state((u8 *)self, 3, -1); break; }
+        if ((moby_move_to_target_temp_limits_pal(self, state + 0x350, 16, angle, -1, -1) & 0x80) || *(u16 *)(self + 0x96) >= 101) { moby_set_state((u8 *)self, 3, -1); break; }
         break;
     case 5:
         if (flag_set_first_pending((u8 *)self)) {
@@ -152,7 +152,7 @@ void func_PAL_L15_003DF93C(char *self) {
         break;
     case 6:
         if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 6) func_PAL_002A7E68(self, 6, 0, 12);
-        if ((func_PAL_L01_00323068(self, state + 0x340) & 0x80) || *(u16 *)(self + 0x96) >= 201) { moby_set_state((u8 *)self, 3, -1); break; }
+        if ((moby_l01_turn_toward_target_pal(self, state + 0x340) & 0x80) || *(u16 *)(self + 0x96) >= 201) { moby_set_state((u8 *)self, 3, -1); break; }
         break;
     case 9:
         if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 5) func_PAL_002A7E68(self, 5, 0, 8);
@@ -181,8 +181,8 @@ void func_PAL_L15_003DF93C(char *self) {
         if (!*(short *)(state + 0x378) && *(u16 *)(self + 0x96) > 12) {
             moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
             contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 16, self, 0);
-            if (contact && D_L15_001BFC00.hit && *(short *)(D_L15_001BFC00.hit + 0xAA) == 0xC1B) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
-            if (contact && (col = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
+            if (contact && g_hit_l15_result.hit && *(short *)(g_hit_l15_result.hit + 0xAA) == 0xC1B) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
+            if (contact && (col = &g_hit_l15_result)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
                 if (!col->hit || (!moby_is_in_special_class_range(col->hit) && (!*(char **)(col->hit + 0x24) || *(short *)(*(char **)(col->hit + 0x24) + 0x46) != 22))) break;
             }
             { moby_set_state((u8 *)self, 11, -1); break; }
@@ -198,7 +198,7 @@ void func_PAL_L15_003DF93C(char *self) {
             if (((u8 *)self)[0x43] != animation) func_PAL_002A7E68(self, animation, 0, 8);
         }
         angle = mat_fast_helper_a(*(float *)(state + 0x350) - *(float *)(self + 0x10), *(float *)(state + 0x354) - *(float *)(self + 0x14));
-        if ((func_PAL_L02_00333638(self, state + 0x350, 16, angle, -1, -1) & 0x80) || *(u16 *)(self + 0x96) > 100 || *(int *)(state + 0x180) >= 18) { moby_set_state((u8 *)self, 10, -1); break; }
+        if ((moby_move_to_target_temp_limits_pal(self, state + 0x350, 16, angle, -1, -1) & 0x80) || *(u16 *)(self + 0x96) > 100 || *(int *)(state + 0x180) >= 18) { moby_set_state((u8 *)self, 10, -1); break; }
         break;
     case 11:
         if (flag_set_first_pending((u8 *)self)) {
@@ -207,7 +207,7 @@ void func_PAL_L15_003DF93C(char *self) {
             qcopy(state + 0x360,state + 0x1F0); *(float *)(state + 0x368) += 0.5f;
         }
         turret_l02_aim_at_hero(self);
-        if ((D_L15_001B2148[0] & 15) == (((int)self >> 8) & 15))
+        if ((g_gorn_challenge_count[0] & 15) == (((int)self >> 8) & 15))
  func_PAL_L02_003D13E8((struct L02GroupObject *)self);
         if (func_PAL_002AF6C0(self, 5)) {
             moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
@@ -215,15 +215,15 @@ void func_PAL_L15_003DF93C(char *self) {
             FastVecScale(&work.aim.acceleration, &work.aim.velocity, 0.25f);
             power = (float)(u8)state[0x34];
             if (*(short *)(state + 0x380) >= 2)
-                func_PAL_L02_00405E88(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, power, power, 0.008f, 10, 30, 1);
+                part_spawn_trail_effect_moby_pal(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, power, power, 0.008f, 10, 30, 1);
             else
-                func_PAL_L02_00405E88(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, power, power, 0.008f, 30, 80, 1);
+                part_spawn_trail_effect_moby_pal(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, power, power, 0.008f, 30, 80, 1);
             break;
         }
         if (!(((u8 *)self)[0x60] & 2)) break;
         moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
         collision = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 0, self, 0);
-        if (FastDecTimer((short *)(state + 0x380)) || (collision && D_L15_001BFC00.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
+        if (FastDecTimer((short *)(state + 0x380)) || (collision && g_hit_l15_result.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
             *(short *)(state + 0x378) += 12; { if (!math_random_int_below(3)) moby_set_state((u8 *)self, 12, -1); else moby_set_state((u8 *)self, 13, -1); break; }
         } else {
             angle = mat_fast_helper_a(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
@@ -261,7 +261,7 @@ void func_PAL_L15_003DF93C(char *self) {
                 vec_scale_to_length(&work.aim.muzzle, work.aim.transform, 0.28000003f);
                 FastVecSub(&work.aim.velocity, g_hero_state + 0xE0, &work.aim.transform[3]); vec_scale_to_length(&work.aim.velocity, &work.aim.velocity, 1);
                 if (FastVecDot(&work.aim.velocity, work.aim.transform) < 0.2f) {
-                func_PAL_L02_00405E88(&work.aim.transform[3], &work.aim.muzzle, &work.aim.muzzle, 1.0f, 0.0f, 1.0f, 30, 80, 1);
+                part_spawn_trail_effect_moby_pal(&work.aim.transform[3], &work.aim.muzzle, &work.aim.muzzle, 1.0f, 0.0f, 1.0f, 30, 80, 1);
                     *(short *)(state + 0x378) = ((s32)(math_random_int_range(15, 30)) * 5 + 2) / 6;
                 }
             }
@@ -272,9 +272,9 @@ void func_PAL_L15_003DF93C(char *self) {
         if (IsPointInCuboid(&((L02_ResidentCombatPrefix *)g_hero_state)->position_80, *(int *)(state + 0x324)) || *(int *)(state + 0x204) == 1) { moby_set_state((u8 *)self, 18, -1); break; }
         break;
     case 18:
-        path = D_L15_001FE480[*(int *)(state + 0x320)];
+        path = g_path_l15_table[*(int *)(state + 0x320)];
         if (flag_set_first_pending((u8 *)self)) { if (((u8 *)self)[0x43] != 6) func_PAL_002A7E68(self, 6, 0, 17); coll_check_object_inside_polygon((u8 *)self); }
-        if (!(vec_distance_xy(self + 0x10, path + *(int *)path * 16) < *(float *)(state + 0x134)) && !func_PAL_002B6CD8(self, path)) break;
+        if (!(vec_distance_xy(self + 0x10, path + *(int *)path * 16) < *(float *)(state + 0x134)) && !path_follow_nodes_pal(self, path)) break;
 
         if (((u8 *)self)[0x43] != 2) {
             angle = mat_fast_helper_a(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
@@ -290,7 +290,7 @@ void func_PAL_L15_003DF93C(char *self) {
         break;
     case 22:
         if (flag_set_first_pending((u8 *)self)) { if (((u8 *)self)[0x43] != 6) func_PAL_002A7E68(self, 6, 0, 17); coll_check_object_inside_polygon((u8 *)self); }
-        if (func_PAL_L01_00323068(self, state + 0x340) & 0x80) { moby_set_state((u8 *)self, 1, 0); qcopy(state + 0x340,self + 0x10); }
+        if (moby_l01_turn_toward_target_pal(self, state + 0x340) & 0x80) { moby_set_state((u8 *)self, 1, 0); qcopy(state + 0x340,self + 0x10); }
         break;
     case 19:
         if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43]) func_PAL_002A7E68(self, 0, 0, 17);

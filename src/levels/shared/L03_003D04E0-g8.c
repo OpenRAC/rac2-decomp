@@ -2,9 +2,9 @@
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern int D_L03_001A8F00;
-extern char D_L03_001A8F20[] __attribute__((sda)), D_L03_001BFDE0[], g_sound_state[];
-extern float D_L03_001B0590 __attribute__((sda)), D_L03_001B0594 __attribute__((sda));
+extern int g_hero_l03_mode;
+extern char g_effect_descriptor_default[] __attribute__((sda)), g_collision_start_point[], g_sound_state[];
+extern float g_vars_drift_rate_a __attribute__((sda)), g_vars_drift_rate_b __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern int moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *);
 extern void FastVecSub(void *,void *,void *),vec_transform_by_object_or_given(void *,void *,void *,int);
@@ -25,7 +25,7 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
     char *vars = P(moby, 0x68), *position, *sound_slot;
     float angle, speed;
 
-    if (D_L03_001A8F00 == 2) {
+    if (g_hero_l03_mode == 2) {
         moby_mark_spawned(moby);
         return;
     }
@@ -52,7 +52,7 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
         qcopy(ray_start, position);
         qcopy(ray_end, position);
         ray_end[2] -= F(vars, 0x20) * 5.0f;
-        make_hit_descriptor(hit, moby, 0x10001, D_L03_001A8F20, (float)I(vars, 0x38));
+        make_hit_descriptor(hit, moby, 0x10001, g_effect_descriptor_default, (float)I(vars, 0x38));
         if (CollLine(ray_start, ray_end, 0, moby, hit) && !P(vars, 0x40)) {
             angle = math_random_angle();
             speed = math_random_float_range(0, 0.5f) * (1.0f / 60.0f);
@@ -60,7 +60,7 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
             spawn_vec[1] = math_fast_sin_or_cos_b(angle) * speed;
             spawn_vec[2] = 0;
             spawn_vec[2] = math_random_float_range(1, 2) * (1.0f / 60.0f);
-            part_spawn_emitter_pair(moby, D_L03_001BFDE0, spawn_vec);
+            part_spawn_emitter_pair(moby, g_collision_start_point, spawn_vec);
         }
         if (!P(vars, 0x40) && !math_random_int_below(2)) {
             qcopy(spawn_vec, position);
@@ -93,12 +93,12 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
         }
         break;
     }
-    F(vars, 0x2C) += D_L03_001B0590 * (1.0f / 60.0f);
+    F(vars, 0x2C) += g_vars_drift_rate_a * (1.0f / 60.0f);
     if (F(vars, 0x2C) > 1)
         F(vars, 0x2C) -= 1;
     else if (F(vars, 0x2C) < 1)
         F(vars, 0x2C) += 1;
-    F(vars, 0x30) += D_L03_001B0594 * (1.0f / 60.0f);
+    F(vars, 0x30) += g_vars_drift_rate_b * (1.0f / 60.0f);
     if (F(vars, 0x30) > 1)
         F(vars, 0x30) -= 1;
     gfx_add_draw_callback_first(gfx_l03_draw_glowing_beam, moby);

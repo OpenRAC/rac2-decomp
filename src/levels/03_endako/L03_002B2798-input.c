@@ -38,9 +38,9 @@ typedef struct {
 } PlayerInput;
 extern unsigned char g_hero_state[];
 #define PLAYER ((PlayerInput *)D_00189E20)
-extern unsigned char D_001A7B0B __attribute__((sda));
+extern unsigned char g_hero_input_enabled __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern int D_L03_001A9010 __attribute__((sda));
+extern int g_hero_special_flag __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern int hero_l03_enter_state(int, int);
 
@@ -65,7 +65,7 @@ void hero_handle_action_input(void)
     if (action == 2 && PLAYER->ground == 0 &&
         (PLAYER->lock == 0 || PLAYER->time < 2.5f)) {
         PLAYER->secondary = 1;
-        if (!PLAYER->state && D_001A7B0B)
+        if (!PLAYER->state && g_hero_input_enabled)
             PLAYER->allowed = 1;
     }
     if (action == 1) PLAYER->primary = 1;
@@ -77,7 +77,7 @@ void hero_handle_action_input(void)
         } else if (PLAYER->primary && active) {
             if (PLAYER->mode == 0x38 && !PLAYER->enabled) return;
             if (PLAYER->busy) hero_l03_enter_state(0x38, 1);
-            else if (g_current_map_index == 2 && D_L03_001A9010) hero_l03_enter_state(0x7d, 1);
+            else if (g_current_map_index == 2 && g_hero_special_flag) hero_l03_enter_state(0x7d, 1);
             else if (*(int *)(*(char **)(PLAYER->object + 0x24) + 0x1f0))
                 hero_l03_enter_state(0x79, 1);
             else hero_l03_enter_state(0x39, 1);

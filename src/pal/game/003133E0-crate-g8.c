@@ -60,8 +60,8 @@ extern void FastVecAdd(void *out, void *a, void *b);
 extern float math_fabs(float value);
 extern float ApproachValue(void *value, float target, float step);
 extern float FastVecLength(void *vector);
-extern void func_PAL_00313538(Moby *moby, int, int);
-extern void func_PAL_003133E0(Moby *moby);
+extern void DestroyCrate_pal(Moby *moby, int, int);
+extern void crate_drop_loot_pal(Moby *moby);
 extern int coll_apply_push_to_object(Moby *moby, void *attachment, void *position, void *rotation,
                           void *outPosition, void *outRotation);
 extern void mat_combine_and_store(void *, void *movement, void *previousRotation, void *rotation);
@@ -72,7 +72,7 @@ extern int CollLine(void *start, void *end, int, void *moby, int);
  * Moves a stack of crates once a frame, from the bottom crate up: breaks a crate the hero
  * touches from below, then lets each one ride what it is attached to, or fall until it lands
  * on the ground or on the crate below. */
-void func_PAL_00313A70(Moby *moby)
+void UpdateCrateStackMotion_pal(Moby *moby)
 {
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
@@ -118,8 +118,8 @@ void func_PAL_00313A70(Moby *moby)
             if (math_fabs(delta[0]) < 0.55f && math_fabs(delta[1]) < 0.55f &&
                 delta[2] < 0.0f && delta[2] > -(g_hero_state.f250 + g_hero_state.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
-                func_PAL_00313538(moby, moby->oClass == 0x1F9, 0);
-                func_PAL_003133E0(moby);
+                DestroyCrate_pal(moby, moby->oClass == 0x1F9, 0);
+                crate_drop_loot_pal(moby);
             }
 
             {

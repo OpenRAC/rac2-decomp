@@ -14,7 +14,7 @@ typedef struct {
     Quad normal;
 } CollisionView;
 
-extern unsigned char D_L03_001BFDD0[];
+extern unsigned char g_collision_view_buffer[];
 #define HIT ((CollisionView *)D_L03_001BFDD0)
 
 /* Field names follow RAC1's hero collision step (hero_collision.c). */
@@ -56,7 +56,7 @@ typedef struct {
 
 extern PlayerView g_hero_state;
 #define PLAYER (&D_00189E20)
-extern int D_L03_001A8FF0 __attribute__((sda));
+extern int g_hero_l03_block_flag __attribute__((sda));
 
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
@@ -105,7 +105,7 @@ int hero_l03_push_out_of_collision(int mode)
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_L03_001A8FF0) {
+            } else if (g_hero_l03_block_flag) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);

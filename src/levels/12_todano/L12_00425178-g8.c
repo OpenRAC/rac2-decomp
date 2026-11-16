@@ -2,8 +2,8 @@
 
 typedef int L12_25178Quad __attribute__((mode(TI)));
 
-extern s32 *D_L12_001FEAC0[];
-extern f32 D_L12_001B20CC __attribute__((sda));
+extern s32 *g_path_zone_table[];
+extern f32 g_wanderer_min_sight_dist __attribute__((sda));
 
 extern int math_random_int_below(int);
 extern float vec_distance_xy(void *, void *);
@@ -21,7 +21,7 @@ s32 path_pick_random_visible_point(u8 *object, s32 limit)
     f32 target[4] __attribute__((aligned(16)));
     f32 to[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(object + 0x68);
-    s32 *list = D_L12_001FEAC0[*(s32 *)(state + 0x298)];
+    s32 *list = g_path_zone_table[*(s32 *)(state + 0x298)];
     f32 dist;
     s32 steps;
     s32 current;
@@ -41,7 +41,7 @@ s32 path_pick_random_visible_point(u8 *object, s32 limit)
             dist = vec_distance_xy(to, target);
             steps = subtract_integer_with_clamp(pick - *(s32 *)(state + 0x2B4));
             current = subtract_integer_with_clamp(*(s32 *)(state + 0x2B0) - *(s32 *)(state + 0x2B4));
-            if (D_L12_001B20CC < dist && current < steps)
+            if (g_wanderer_min_sight_dist < dist && current < steps)
                 continue;
         }
         if (from[2] + 2.0f < to[2])

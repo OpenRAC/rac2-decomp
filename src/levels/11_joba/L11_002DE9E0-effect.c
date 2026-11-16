@@ -6,19 +6,19 @@ extern int snd_play_from_global_bank(int a0, unsigned int a1, void *a2);
 
 extern void value_set_entry_by_index(int a0, int a1);
 
-extern s32 D_L11_001B30C8;
+extern s32 g_arena_progress_level;
 
-extern s32 D_L11_001AED00 __attribute__((sda));
+extern s32 g_enemy_spawn_enabled __attribute__((sda));
 
-extern s32 D_L11_001AED04 __attribute__((sda));
+extern s32 g_active_rider_count __attribute__((sda));
 
-extern s32 D_L11_001AED08 __attribute__((sda));
+extern s32 g_creature_burst_count __attribute__((sda));
 
-extern s32 D_L11_001A903C;
+extern s32 g_level_progress_flag;
 
-extern u8 D_001A7A72 NOT_SDA;
+extern u8 g_level_progress_flag_a NOT_SDA;
 
-extern u8 D_001A7A74 NOT_SDA;
+extern u8 g_level_progress_flag_b NOT_SDA;
 
 /* Watches a few level counters and, once they pass their limits, switches on two one-time
    flags. */
@@ -31,26 +31,26 @@ void level_update_progress_flags(u8 *moby) {
         if (state < 2) {
             if (state == 0) {
                 self[0x30] = 0xFF;
-                D_L11_001AED08 = 0;
+                g_creature_burst_count = 0;
                 moby_set_state(self, 1, -1);
             }
         }
         return;
     }
-    enabled = D_L11_001AED00;
-    if (D_L11_001B30C8 >= 6 && D_L11_001AED04 == 0 &&
-        enabled != 0 && D_001A7A72 == 0) {
-        D_001A7A72 = 1;
+    enabled = g_enemy_spawn_enabled;
+    if (g_arena_progress_level >= 6 && g_active_rider_count == 0 &&
+        enabled != 0 && g_level_progress_flag_a == 0) {
+        g_level_progress_flag_a = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index(0x1233, -1);
-        D_L11_001A903C = 1;
+        g_level_progress_flag = 1;
     }
-    if (D_L11_001AED08 < 12)
+    if (g_creature_burst_count < 12)
         return;
-    if (D_001A7A74 != 0)
+    if (g_level_progress_flag_b != 0)
         return;
-    D_001A7A74 = 1;
+    g_level_progress_flag_b = 1;
     snd_play_from_global_bank(1, 0, 0);
     value_set_entry_by_index(0x1233, -1);
-    D_L11_001A903C = 1;
+    g_level_progress_flag = 1;
 }

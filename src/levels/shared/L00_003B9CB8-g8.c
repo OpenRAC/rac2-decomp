@@ -1,17 +1,17 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int D_L00_001AFDA0 __attribute__((sda));
+extern int g_effect_moby_count __attribute__((sda));
 
 /* Reads the small counter in the shared data area and reports whether it equals two. */
 int effect_is_count_two(void)
 {
-    return D_L00_001AFDA0 == 2;
+    return g_effect_moby_count == 2;
 }
 
-extern char D_L00_0023DDA0[] __attribute__((nosda));
+extern char g_spark_slot_records[] __attribute__((nosda));
 
-extern char D_L00_0023F060[] __attribute__((nosda));
+extern char g_orbit_spark_records[] __attribute__((nosda));
 
 /* Clears one word of each of the thirty 0xA0-byte records that start at D_L00_0023DDA0,
    then one word of each of the sixteen 0xB0-byte records at D_L00_0023F060, walking down
@@ -22,7 +22,7 @@ void effect_clear_slot_tables(void)
     char *record;
     int index;
 
-    base = D_L00_0023DDA0;
+    base = g_spark_slot_records;
     record = base + (0x1D * 0xA0 + 0x8C);
     index = 0x1D;
     do {
@@ -31,7 +31,7 @@ void effect_clear_slot_tables(void)
         record -= 0xA0;
     } while (index >= 0);
 
-    base = D_L00_0023F060;
+    base = g_orbit_spark_records;
     record = base + (0xF * 0xB0 + 0xA0);
     index = 0xF;
     do {
@@ -40,19 +40,19 @@ void effect_clear_slot_tables(void)
         record -= 0xB0;
     } while (index >= 0);
 
-    D_L00_001AFDA0 = 0;
+    g_effect_moby_count = 0;
 }
 
-extern int D_L04_001A8F00;
+extern int g_game_l04_mode;
 
-extern int D_L00_001AFF44 __attribute__((sda));
+extern int g_tesla_hit_counter __attribute__((sda));
 
-extern int D_L00_001AFF98 __attribute__((sda));
+extern int g_trail_owner __attribute__((sda));
 
 /* Clears the shared flag word this file's small-data area holds at 0x1AFF98. */
 void trail_effect_clear_pointer(void)
 {
-    D_L00_001AFF98 = 0;
+    g_trail_owner = 0;
 }
 
 extern char g_hero_moby[];
@@ -75,12 +75,12 @@ void trail_effect_update_draw(char *moby)
 {
     char *vars;
 
-    if (D_L04_001A8F00 != 0)
+    if (g_game_l04_mode != 0)
         return;
     vars = *(char **)(moby + 0x68);
     if (weapon_can_use_held(fade_get_value()) == 0)
         return;
-    if (D_L00_001AFF44 == 0x28)
+    if (g_tesla_hit_counter == 0x28)
         return;
     moby_transform_joint_to_world(*(char **)g_hero_moby, 0xA, vars + 0x30);
     electric_ribbons_update(moby);
@@ -105,7 +105,7 @@ extern char g_weapon_l00_table[];
 
 /* A float in the boot's small data: the sda attribute and this unit's -G8 make the
    reference to it $gp-relative, the way retail has it. */
-extern float D_001AFF08 __attribute__((sda));
+extern float g_moby_fire_shot_extra __attribute__((sda));
 
 extern void vec_scale_to_length(void *a0, void *a1, float f);
 
@@ -155,7 +155,7 @@ void moby_fire_shot(char *moby, char *shot)
         vec_compute_object_to_target(mode, shot, velocity, speed);
 
     value = FastVecLength(velocity);
-    extra = D_001AFF08;
+    extra = g_moby_fire_shot_extra;
     new_moby = SpawnProjectile(shot, velocity, moby, 0, value, second_value, extra);
     *(int *)vars = (int)new_moby;
     if (new_moby != 0) {
@@ -164,16 +164,16 @@ void moby_fire_shot(char *moby, char *shot)
 }
 
 typedef struct { float f[4]; } __attribute__((aligned(16))) UiHistoryPoint;
-extern int D_L00_001B2940[] MACRO_ADDR;
-extern UiHistoryPoint D_L00_0023FB80[][20];
-extern UiHistoryPoint D_L00_001B2900[] MACRO_ADDR;
-extern float D_L00_001AFF4C __attribute__((sda));
-extern int D_L00_001AFF50 __attribute__((sda));
-extern int D_L00_001AFF54 __attribute__((sda));
-extern int D_L00_001AFF58 __attribute__((sda));
-extern float D_L00_001AFF5C __attribute__((sda));
-extern float D_L00_001AFF60 __attribute__((sda));
-extern char D_L00_001FE940[] __attribute__((nosda));
+extern int g_trail_point_counts[] MACRO_ADDR;
+extern UiHistoryPoint g_effect_trail_histories[][20];
+extern UiHistoryPoint g_trail_up_vectors[] MACRO_ADDR;
+extern float g_trail_effect_length __attribute__((sda));
+extern int g_trail_color __attribute__((sda));
+extern int g_trail_color_head __attribute__((sda));
+extern int g_trail_color_tail __attribute__((sda));
+extern float g_trail_size_scale __attribute__((sda));
+extern float g_trail_param __attribute__((sda));
+extern char g_effect_definitions[] __attribute__((nosda));
 extern void FastVecAdd(void *, void *, void *);
 /* The second integer-bank input is forwarded as the axis vector pointer. */
 extern void math_build_axis_angle_quat(void *, void *, float);
@@ -215,53 +215,53 @@ void effect_draw_trails(char *owner)
         UiHistoryPoint *head, *tip;
         float length, limit;
         UiTrailParticle *effect;
-        D_L00_001B2940[i]++;
-        if (D_L00_001B2940[i] >= 20)
-            D_L00_001B2940[i] = 20;
-        last = D_L00_001B2940[i] - 1;
+        g_trail_point_counts[i]++;
+        if (g_trail_point_counts[i] >= 20)
+            g_trail_point_counts[i] = 20;
+        last = g_trail_point_counts[i] - 1;
         for (j = last; j > 0; j--) {
             int index = last - j;
             UiHistoryPoint *dst;
-            do { dst = &D_L00_0023FB80[0][j]; dst += i * 20; } while (0);
-            qcopy(dst, &D_L00_0023FB80[i][j - 1]);
+            do { dst = &g_effect_trail_histories[0][j]; dst += i * 20; } while (0);
+            qcopy(dst, &g_effect_trail_histories[i][j - 1]);
             FastVecAdd(&vertices[index], &origin, dst);
             vertices[index].f[3] = 0.05f;
         }
-        head = &D_L00_0023FB80[i][0];
-        math_build_axis_angle_quat(&change, &D_L00_001B2900[i], 0.10471976548433304f);
+        head = &g_effect_trail_histories[i][0];
+        math_build_axis_angle_quat(&change, &g_trail_up_vectors[i], 0.10471976548433304f);
         vec_rotate_by_quaternion(head, head, &change);
         vec_add_random_offset(head->f, 0.025f);
         length = FastVecLength(head);
-        limit = D_L00_001AFF4C * 1.1f;
+        limit = g_trail_effect_length * 1.1f;
         if (length > limit)
             FastVecScale(head, head, limit / length);
         else {
-            limit = D_L00_001AFF4C * 0.9f;
+            limit = g_trail_effect_length * 0.9f;
             if (length < limit)
                 FastVecScale(head, head, limit / length);
         }
-        FastVecAdd(&vertices[last], &origin, &D_L00_0023FB80[i][0]);
+        FastVecAdd(&vertices[last], &origin, &g_effect_trail_histories[i][0]);
         vertices[last].f[3] = 0.05f;
         {
-            int endpoint = D_L00_001B2940[i] - 1;
+            int endpoint = g_trail_point_counts[i] - 1;
             tip = vertices + endpoint;
         }
         effect = part_spawn_bluish_fade(tip, 2, 0, 1);
         if (effect != 0) {
-            char *tables = D_L00_001FE940;
-            effect->color = D_L00_001AFF50 | state->flags;
-            effect->size = D_L00_001AFF5C * 210000.0f;
+            char *tables = g_effect_definitions;
+            effect->color = g_trail_color | state->flags;
+            effect->size = g_trail_size_scale * 210000.0f;
             effect->texture = (*(char **)(tables + 0xF8))[1];
         }
         effect = part_spawn_bluish_fade(tip, 2, 0, 1);
         if (effect != 0) {
             effect->color = 0x407F7F7F;
-            effect->size = D_L00_001AFF5C * 31500.001953125f;
+            effect->size = g_trail_size_scale * 31500.001953125f;
         }
         ref_L00_003C4F78_00(vertices, 20, 14, 14,
-                          D_L00_001AFF54, D_L00_001AFF54 & 0xFFFFFF,
-                          D_L00_001AFF58 | state->flags, D_L00_001AFF58,
-                          0, D_L00_001B2940[i] - 1, D_L00_001B2940[i],
-                          0.02f, 0.07f, D_L00_001AFF60);
+                          g_trail_color_head, g_trail_color_head & 0xFFFFFF,
+                          g_trail_color_tail | state->flags, g_trail_color_tail,
+                          0, g_trail_point_counts[i] - 1, g_trail_point_counts[i],
+                          0.02f, 0.07f, g_trail_param);
     }
 }

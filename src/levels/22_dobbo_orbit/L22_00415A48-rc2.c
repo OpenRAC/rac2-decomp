@@ -26,7 +26,7 @@
 
 extern s32 ref_L22_00415A48_00(s32 *a, void *b);
 extern s32 ref_L22_00415A48_01(s32 a, s32 b);
-extern struct { s32 w0; s32 w1; s32 w2; } D_0018B6A8;
+extern struct { s32 w0; s32 w1; s32 w2; } g_timer_hud_words;
 
 /* Sets up a timer on first run, then resets it to 0x708 (1800 frames) and calls a helper when a condition is met. */
 void timer_trigger_update(void *moby) {
@@ -40,7 +40,7 @@ void timer_trigger_update(void *moby) {
         *vars = 0x708;
     }
     if ((*(u8 *)((s8 *)(moby) + (0x20))) == 1) {
-        hud_state = (void *) D_0018B6A8.w0;
+        hud_state = (void *) g_timer_hud_words.w0;
         if ((ref_L22_00415A48_00(vars, moby) != 0) && ((*(s32 *)((s8 *)(hud_state) + (8))) == 0)) {
             if ((*(s32 *)((s8 *)(hud_state) + (0xC))) == 0) {
                 ref_L22_00415A48_01(0x9FD, 0x54);

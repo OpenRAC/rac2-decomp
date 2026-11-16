@@ -5,9 +5,9 @@ extern void vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,
 extern void FastVecAdd(void *,void *,void *),transform_vector(void *,void *,void *);
 extern u64 GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *,int,int);
-extern float D_L11_001AEC88 __attribute__((sda)),D_L11_001AEC70 __attribute__((sda));
-extern float D_L11_001AEC8C MACRO_ADDR,D_L11_001AEC90 MACRO_ADDR;
-extern char D_L11_001BA8C0[],D_L11_001AA2D0[] __attribute__((sda));
+extern float g_quad_forward_target_length __attribute__((sda)),g_quad_forward_length __attribute__((sda));
+extern float g_quad_side_length MACRO_ADDR,g_quad_up_length MACRO_ADDR;
+extern char g_hero_l11_position[],g_facing_quad_corners[] __attribute__((sda));
 typedef struct { float v[4][4]; u32 color[4]; float uv[7]; float param; u64 prim,texture,reg,tag; } QuadDrawPacket11;
 /* Builds an oriented quad and submits it with texture IDs 11 and 6. */
 /* Draws a flat glowing square that faces the player, using two textures. */
@@ -15,17 +15,17 @@ void gfx_draw_facing_quad(u8 *moby) {
  struct { float forward[4],side[4],up[4],position[4],direction[4],offset[4]; QuadDrawPacket11 draw; } frame;
  u8 *vars=*(u8 **)(moby+0x68); int i; float *out,*corners; QuadDrawPacket11 *draw;
  qcopy(frame.direction,moby+0xe0);qcopy(frame.position,moby+0x10);
- corners=(float *)D_L11_001AA2D0;
- FastVecSub(frame.forward,D_L11_001BA8C0,frame.position);
+ corners=(float *)g_facing_quad_corners;
+ FastVecSub(frame.forward,g_hero_l11_position,frame.position);
  i=3;
  vec_scale_to_length(frame.forward,frame.forward,1.0f);
  FastVecCross(frame.side,frame.forward,frame.direction);
  vec_scale_to_length(frame.side,frame.side,1.0f);
  FastVecCross(frame.up,frame.side,frame.forward);
- vec_scale_to_length(frame.forward,frame.forward,D_L11_001AEC88);
- vec_scale_to_length(frame.side,frame.side,D_L11_001AEC8C);
- vec_scale_to_length(frame.up,frame.up,D_L11_001AEC90);
- FastVecScale(frame.offset,frame.forward,D_L11_001AEC70);
+ vec_scale_to_length(frame.forward,frame.forward,g_quad_forward_target_length);
+ vec_scale_to_length(frame.side,frame.side,g_quad_side_length);
+ vec_scale_to_length(frame.up,frame.up,g_quad_up_length);
+ FastVecScale(frame.offset,frame.forward,g_quad_forward_length);
  FastVecAdd(frame.position,frame.position,frame.offset);
  draw=&frame.draw;
  frame.draw.tag=0x8000000048ULL;

@@ -34,15 +34,15 @@ extern void moby_l14_set_state_value(void *, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void actor_update_walk_motion(void *);
 
-extern float D_L14_001B1924 __attribute__((sda));
-extern float D_L14_001B1928 __attribute__((sda));
-extern float D_L14_001B192C __attribute__((sda));
-extern float D_L14_001B1930 __attribute__((sda));
-extern int D_L14_001B20C8;
+extern float g_climbing_enemy_rate_a __attribute__((sda));
+extern float g_climbing_enemy_rate_b __attribute__((sda));
+extern float g_climbing_enemy_rate_c __attribute__((sda));
+extern float g_climbing_enemy_rate_d __attribute__((sda));
+extern int g_frame_tick_counter;
 extern u8 g_hero_state[];
 extern u8 *g_moby_l14_pool;
-extern int D_L14_001B1938[4];
-extern char *D_L14_001C39C0[];
+extern int g_climbing_enemy_choices[4];
+extern char *g_climbing_enemy_moby_list[];
 
 #define HERO ((Hero *)D_00189E20)
 #define D_00189EA0 (HERO->position)
@@ -71,10 +71,10 @@ void climbing_enemy_update(char *self)
         case 1:
             if (flag_set_second_pending(self))
                 moby_set_controller_speed_limits(self,
-                    D_L14_001B1924 * 0.0002777777845f,
-                    D_L14_001B1928 * 0.0166666675359f,
-                    D_L14_001B192C * 4.848137450608192e-06f,
-                    D_L14_001B1930 * 0.0002908882452175021f);
+                    g_climbing_enemy_rate_a * 0.0002777777845f,
+                    g_climbing_enemy_rate_b * 0.0166666675359f,
+                    g_climbing_enemy_rate_c * 4.848137450608192e-06f,
+                    g_climbing_enemy_rate_d * 0.0002908882452175021f);
             if (W(vars, 0x2F0) != 1) {
                 moby_set_state(self, 1, 0);
                 W(vars, 0x30C) = math_random_int_range(580, 600);
@@ -104,13 +104,13 @@ void climbing_enemy_update(char *self)
         if (flag_set_first_pending(self) && B(self, 0x43) != 6)
             anim_start_blended(self, 6, 0, 20);
         if (B(self, 0x60) & 2) {
-            __builtin_memcpy(scratch.choices, D_L14_001B1938, 16);
+            __builtin_memcpy(scratch.choices, g_climbing_enemy_choices, 16);
             if (B(self, 0x43) != scratch.choices[math_random_int_below(4)])
                 anim_start_blended(self, scratch.choices[math_random_int_below(4)], 0, 20);
         }
         if (W(vars, 0x2B8) != -1)
             moby_step_at_own_position(self);
-        if ((D_L14_001B20C8 & 15) == (((int)self >> 8) & 15)) {
+        if ((g_frame_tick_counter & 15) == (((int)self >> 8) & 15)) {
             if (W(vars, 0x2B8) == -1)
                 break;
             if (W(vars, 0x31C) && HERO->position[2] + 2.0f < F(self, 0x18) &&
@@ -177,7 +177,7 @@ void climbing_enemy_update(char *self)
             moby_transform_joint_to_world(self, 6, scratch.pos);
             result = coll_sweep_from_object(self, scratch.pos, 0.57f, 2.0f, 1, 2.0f, 0, 1, 0);
             for (i = 0; i < result; i++)
-                if (*(short *)(D_L14_001C39C0[i] + 0xAA) == MOBY_CLASS_GADGEBOT)
+                if (*(short *)(g_climbing_enemy_moby_list[i] + 0xAA) == MOBY_CLASS_GADGEBOT)
                     W(vars, 0x320) = 0;
         }
         break;

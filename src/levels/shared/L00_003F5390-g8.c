@@ -22,7 +22,7 @@ typedef struct {
 } HitRequest;
 extern unsigned char g_item_slot_to_record[];
 extern HitTuning g_weapon_l00_table[] __attribute__((nosda));
-extern int D_L00_001ADB2C;
+extern int g_active_tether_object;
 
 extern char *g_area_hit_targets[] __attribute__((nosda));
 extern void *SpawnExplosion(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
@@ -50,7 +50,7 @@ void ApplyAreaHitOrEmitParticles(char *object, HitVector *source)
     qcopy(&scratch.position, source);
     if (g_weapon_l00_table[g_item_slot_to_record[0x17]].enabled) {
         SpawnExplosion(object + 0x10, 1.0f, 20.0f, 1, 0x28, 0x14, 0x1E, 0x28, 0x32, 1,
-                      1, 1, 0, D_L00_001ADB2C);
+                      1, 1, 0, g_active_tether_object);
         scratch.u.request.flags = 0x810000;
         scratch.u.request.active = 1;
         scratch.u.request.owner = object;

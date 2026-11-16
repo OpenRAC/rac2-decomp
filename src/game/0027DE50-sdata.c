@@ -1,8 +1,8 @@
 #include "common.h"
 
 extern unsigned char *g_dma_packet_cursor __attribute__((sda));
-extern u64 D_001AC7E0[2];
-extern u64 D_001AC7F0[2];
+extern u64 g_rect_header_packet[2];
+extern u64 g_rect_vertex_header_packet[2];
 extern int g_screen_offset_y __attribute__((sda));
 extern int g_screen_offset_x __attribute__((sda));
 
@@ -19,7 +19,7 @@ void gfx_draw_colored_rectangle(int x0, int x1, int y0, int y1, u64 color)
         unsigned char *header_base = g_dma_packet_cursor;
         unsigned char *header = header_base + 0x10;
         g_dma_packet_cursor = header;
-        qcopy(header, D_001AC7E0);
+        qcopy(header, g_rect_header_packet);
         *(s16 *)(header_base + 0x10) = -32767;
     }
     {
@@ -33,7 +33,7 @@ void gfx_draw_colored_rectangle(int x0, int x1, int y0, int y1, u64 color)
         unsigned char *vertex_base = g_dma_packet_cursor;
         unsigned char *vertex_header = vertex_base + 0x10;
         g_dma_packet_cursor = vertex_header;
-        qcopy(vertex_header, D_001AC7F0);
+        qcopy(vertex_header, g_rect_vertex_header_packet);
         *(s16 *)(vertex_base + 0x10) = -32764;
     }
     x0 <<= 4;

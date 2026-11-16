@@ -1,15 +1,15 @@
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 struct Rac2Native_5f824a0e369ccf7b_src_record { u8 b0,b1,b2,b3; u16 s4,s6,s8,s10,s12; u8 e,f; };
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_00294900[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_blitz_gun_sound_records[];
 extern u8 g_item_slot_to_record[];
-extern float D_L00_001AF670[4] __attribute__((sda));
-extern unsigned int D_L00_001AF680 __attribute__((sda));
-extern unsigned int D_L00_001AF684 __attribute__((sda));
-extern unsigned int D_L00_001AF688 __attribute__((sda));
-extern unsigned int D_L00_001AF68C __attribute__((sda));
-extern unsigned int D_L00_001AF690 __attribute__((sda));
-extern int D_L00_001AF6B4 __attribute__((sda));
+extern float g_blitz_gun_euler_angles[4] __attribute__((sda));
+extern unsigned int g_blitz_startup_ticks __attribute__((sda));
+extern unsigned int g_blitz_delay_ticks_a __attribute__((sda));
+extern unsigned int g_blitz_delay_ticks_b __attribute__((sda));
+extern unsigned int g_blitz_cooldown_ticks_a __attribute__((sda));
+extern unsigned int g_blitz_cooldown_ticks_b __attribute__((sda));
+extern int g_blitz_ticks __attribute__((sda));
 typedef struct {
     char pad0[0x730];
     float a550[4];
@@ -44,7 +44,7 @@ extern InputView g_pad_state NOT_SDA;
 /* Only this measured prefix of the level's pulse-curve state is used here. */
 typedef struct { float start; int reserved,ticks,mode; float next; int reserved2,nextTicks; } PulseCurvePrefix;
 typedef struct { char pad[0x160]; PulseCurvePrefix pulse; } CameraView;
-extern CameraView D_L00_001B8C80 NOT_SDA;
+extern CameraView g_scalar_transition_state NOT_SDA;
 typedef struct { char p0[0x28]; unsigned int animation; char p1[0x28]; float rate; char p2[0x18]; float power; char tail[0x6C]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern char *g_area_hit_targets[];
@@ -137,23 +137,23 @@ void blitz_gun_update(char *moby)
                 WeaponEntry *weapon = g_weapon_l00_table + g_item_slot_to_record[0x1A];
                 if (*(u8 *)(g_hero_state.c0b0 + 0x43) == weapon->animation ||
                     g_hero_state.c0bc || g_hero_state.c30c) {
-                    unsigned short startup = D_L00_001AF680;
-                    unsigned short delay = D_L00_001AF688;
-                    unsigned short cooldown = D_L00_001AF690;
+                    unsigned short startup = g_blitz_startup_ticks;
+                    unsigned short delay = g_blitz_delay_ticks_b;
+                    unsigned short cooldown = g_blitz_cooldown_ticks_b;
                     *(short *)(state + 6) = startup;
                     *(short *)(state + 8) = delay;
                     *(short *)(state + 10) = cooldown;
                     *(int *)(state + 0x48) = 1;
                 } else {
-                    unsigned short delay = D_L00_001AF684;
-                    unsigned short cooldown = D_L00_001AF68C;
+                    unsigned short delay = g_blitz_delay_ticks_a;
+                    unsigned short cooldown = g_blitz_cooldown_ticks_a;
                     *(short *)(state + 6) = 2;
                     *(short *)(state + 8) = delay;
                     *(short *)(state + 10) = cooldown;
                     *(int *)(state + 0x48) = 0;
                 }
                 start_equipped_item_animation();
-                *(int *)(state + 0x4C) = slot_copy_records_to_free(D_L00_00294900);
+                *(int *)(state + 0x4C) = slot_copy_records_to_free(g_blitz_gun_sound_records);
                 *(u8 *)(moby + 0x20) = 2;
                 *(float *)(state + 0xC) = math_random_angle();
                 anim_start_blended(moby,2,0,0);
@@ -162,7 +162,7 @@ void blitz_gun_update(char *moby)
                 *(float *)(state + 0x28) = math_random_angle();
                 {
                     float phase = math_random_angle();
-                    int ticks = D_L00_001AF6B4;
+                    int ticks = g_blitz_ticks;
                     *(float *)(state + 0x2C) = phase;
                     *(int *)(state + 0x40) = ticks;
                     *(float *)(state + 0x44) = 1.0f / IntToFloat(ticks);
@@ -198,9 +198,9 @@ void blitz_gun_update(char *moby)
             ref_L00_003A53E8_00(beam_draw_ring_and_core,moby);
             PlayMobySound(0,0,moby);
             if (*(int *)(state + 0x48))
-                SetCameraPulse(&D_L00_001B8C80, 0.12f, 30);
+                SetCameraPulse(&g_scalar_transition_state, 0.12f, 30);
             else
-                SetCameraPulse(&D_L00_001B8C80, 0.06f, 30);
+                SetCameraPulse(&g_scalar_transition_state, 0.06f, 30);
             return;
         }
         *(u8 *)(moby + 0x20) = 6;
@@ -230,7 +230,7 @@ void blitz_gun_update(char *moby)
                 StartAttachedEffect(g_area_hit_targets[i],26,moby);
             }
         }
-        euler_to_matrix(matrix,D_L00_001AF670);
+        euler_to_matrix(matrix,g_blitz_gun_euler_angles);
         copy_matrix3x4(orientation,matrix);
         moby_transform_joint_to_world(moby,0,(char *)origin);
         if (g_hero_state.c30c == 1) {

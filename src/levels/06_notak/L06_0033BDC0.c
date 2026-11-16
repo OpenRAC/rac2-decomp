@@ -4,11 +4,11 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern char *g_hero_moby NOT_SDA;
-extern int D_L06_001AC790 __attribute__((sda));
-extern Collision D_L06_001BFC80;
-extern Material D_L06_0026C7F0[];
+extern int g_model_compare_value __attribute__((sda));
+extern Collision g_collision_l06_result;
+extern Material g_material_l06_table[];
 extern void FastVecAdd(void *, void *, void *);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecScale(void *, void *, float);
@@ -149,7 +149,7 @@ void falling_l06_object_update(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L06_0026C7F0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_material_l06_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -159,16 +159,16 @@ void falling_l06_object_update(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L06_001BFC80;
+        collision = &g_collision_l06_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L06_001BFC80;
+            reread = &g_collision_l06_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L06_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_model_compare_value && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -180,7 +180,7 @@ void falling_l06_object_update(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L06_001BFC80;
+            collision = &g_collision_l06_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
@@ -235,8 +235,8 @@ extern void hero_copy_field_to_moby(Moby *);
 extern void func_002A0F48(Moby *);
 extern MobyRecord *moby_get_private_value_0(Moby *);
 extern void STUB_printf(const char *, ...);
-extern char D_L06_001AF990[];
-extern int D_L06_001B2348[] __attribute__((sda));
+extern char g_str_falling_object_debug[];
+extern int g_game_l06_frame_counter[] __attribute__((sda));
 
 /* Allocate a child and initialize its rendering, health and parent linkage. */
 Moby *SpawnSpawnerChild(Moby *parent, Quad *position)
@@ -306,7 +306,7 @@ Moby *SpawnSpawnerChild(Moby *parent, Quad *position)
             record->value = (float)record->limit;
         }
     } else {
-        STUB_printf(D_L06_001AF990, parent->fB2, D_L06_001B2348[0]);
+        STUB_printf(g_str_falling_object_debug, parent->fB2, g_game_l06_frame_counter[0]);
     }
     return result;
 }
@@ -388,7 +388,7 @@ void flock_release_member(char *moby, char *vars)
 }
 
 
-extern int D_L06_001B3760[];
+extern int g_child_slot_used[];
 
 /* zeroes the six words a finished moby left behind */
 void moby_clear_shared_and_delete(char *moby)
@@ -397,7 +397,7 @@ void moby_clear_shared_and_delete(char *moby)
         int i;
 
         for (i = 5; i >= 0; i--)
-            D_L06_001B3760[i] = 0;
+            g_child_slot_used[i] = 0;
         moby_mark_spawned(moby);
     }
 }

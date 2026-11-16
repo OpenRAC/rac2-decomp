@@ -12,15 +12,15 @@ typedef struct {
 } Hero003E87D8;
 extern char g_hero_state[];
 extern char g_sound_state[];
-extern unsigned short D_0018CA6C NOT_SDA;
-extern float D_L02_001B0B80 __attribute__((sda));
-extern float D_L02_001B0B84 __attribute__((sda));
-extern float D_L02_001B0B88 __attribute__((sda));
-extern float D_L02_001B0B8C __attribute__((sda));
-extern float D_L02_001B0B90 __attribute__((sda));
-extern float D_L02_001B0B94 __attribute__((sda));
-extern float D_L02_001B0BA0 __attribute__((sda));
-extern float D_L02_001B0BF0[4] __attribute__((sda, aligned(16)));
+extern unsigned short g_tether_link_id NOT_SDA;
+extern float g_tether_capture_distance __attribute__((sda));
+extern float g_tether_distance_offset __attribute__((sda));
+extern float g_tether_turn_step __attribute__((sda));
+extern float g_tether_turn_limit __attribute__((sda));
+extern float g_tether_speed_base __attribute__((sda));
+extern float g_tether_speed_scale __attribute__((sda));
+extern float g_tether_break_separation __attribute__((sda));
+extern float g_tether_strand_params[4] __attribute__((sda, aligned(16)));
 extern float effectOffset003E87D8[4] SDATA(D_L02_001B0BF0);
 typedef struct { char pad[0x34]; unsigned short flags; } Actor003E87D8;
 extern void moby_set_state(void *, int, int);
@@ -75,7 +75,7 @@ void func_PAL_L02_003ECBC8(char *actor) {
         break;
     case 1:
         if ((*(unsigned short *)(target + 0x34) & 0x1000) && ((Hero003E87D8 *)g_hero_state)->captured == target &&
-            vec_distance_xy(target + 0x10, actor + 0x10) < D_L02_001B0B80) {
+            vec_distance_xy(target + 0x10, actor + 0x10) < g_tether_capture_distance) {
             moby_set_flag_bit(target, 1);
             vec_clear_128(state + 0x10);
             moby_set_state(actor, 2, -1);
@@ -91,20 +91,20 @@ void func_PAL_L02_003ECBC8(char *actor) {
                 *(float *)(target + 0x14) - *(float *)(actor + 0x14)), 3.1415927f);
             if (FastDiffRots(angle, *(float *)(actor + 0xF8)) > 1.5707964f)
                 angle = FastAddRotations(angle, 3.1415927f);
-            turnStep = D_L02_001B0B88 * 6.981318e-06f;
-            turnLimit = D_L02_001B0B8C * 0.0003490659f;
+            turnStep = g_tether_turn_step * 6.981318e-06f;
+            turnLimit = g_tether_turn_limit * 0.0003490659f;
             math_approach_target_with_direction_mode(actor + 0xF8, state + 0x40, 0, angle, turnStep, turnStep * 3.0f, turnLimit);
             func_PAL_L02_003ED0D8(actor);
             separation = vec_distance_xy(actor + 0x10, ((Hero003E87D8 *)g_hero_state)->position);
-            if (((Hero003E87D8 *)g_hero_state)->captured != target || separation > D_L02_001B0BA0) {
+            if (((Hero003E87D8 *)g_hero_state)->captured != target || separation > g_tether_break_separation) {
                 float distance, scaledDistance;
                 ((Hero003E87D8 *)g_hero_state)->captured = 0;
-                distance = fast_vec_dist(actor + 0x10, ((Hero003E87D8 *)g_hero_state)->position) - D_L02_001B0B84;
+                distance = fast_vec_dist(actor + 0x10, ((Hero003E87D8 *)g_hero_state)->position) - g_tether_distance_offset;
                 if (distance < 0.0f)
                     distance = 0.0f;
                 scaledDistance = distance * 0.020000001f;
                 ((Actor003E87D8 *)target)->flags &= 0xEFFF;
-                *(float *)(state + 0x44) = D_L02_001B0B90 * 0.020000001f + D_L02_001B0B94 * scaledDistance;
+                *(float *)(state + 0x44) = g_tether_speed_base * 0.020000001f + g_tether_speed_scale * scaledDistance;
                 PlayMobySound(0, 0, actor);
                 moby_set_state(actor, 3, -1);
             } else {
@@ -127,7 +127,7 @@ void func_PAL_L02_003ECBC8(char *actor) {
             moby_set_flag_bit(target, 0);
             if (*(short *)(target + 0xAA) == 0x9BC) {
                 path_enemy_start_fall(target, state + 0x10);
-                D_0018CA6C = 0xFFFF;
+                g_tether_link_id = 0xFFFF;
             } else {
                 platform_start_fall(target, state + 0x10);
             }
@@ -154,7 +154,7 @@ void func_PAL_L02_003ECBC8(char *actor) {
         matrix_mul_vec3(local, effectOffset003E87D8, actor + 0xC0);
         FastVecAdd(*(char **)(state + 0x54) + 0x10, local, actor + 0x10);
         *(float *)(*(char **)(state + 0x54) + 0xF8) = *(float *)(actor + 0xF8);
-        *(float *)(*(char **)(state + 0x54) + 0x2C) = *(float *)(*(char **)(*(char **)(state + 0x54) + 0x24) + 0x24) * D_L02_001B0BF0[3];
+        *(float *)(*(char **)(state + 0x54) + 0x2C) = *(float *)(*(char **)(*(char **)(state + 0x54) + 0x24) + 0x24) * g_tether_strand_params[3];
     }
     if (flag_is_third_pending_set(target))
         gfx_add_draw_callback_first(func_PAL_L02_003EDCE8, actor);

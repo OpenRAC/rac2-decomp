@@ -7,7 +7,7 @@ extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern int gfx_pack_color_floats(float, float, float, float);
-extern unsigned char *D_001F2574, *D_001F25A4;
+extern unsigned char *g_part_tex_flash, *g_part_tex_white_flash;
 extern void part_kill(char *);
 extern void FastVecAdd(char *, char *, char *);
 
@@ -121,14 +121,14 @@ extern void Fc10c1216_FUN_00282CC0(char *, char *, char *);
 
 extern void snd_start_music_stream(s32, s32, s32);
 
-extern short D_001A63D4;
+extern short g_request_prev_state;
 
 #define NOT_SDA __attribute__((section(".data")))
 
 extern short r1_D_001517F0 NOT_SDA;
 
 extern void STUB_printf(const char *, ...);
-extern char D_001AA220[];
+extern char g_str_request_result_message[];
 
 typedef struct {
     char pad00[0x2C];
@@ -151,16 +151,16 @@ typedef int TI __attribute__((mode(TI)));
 
 extern float coll_get_heightmap_height(TI *pos);
 extern int g_current_map_index MACRO_ADDR;
-extern float D_001B1DC0[] MACRO_ADDR;
+extern float g_particle_ground_vector[] MACRO_ADDR;
 
-extern unsigned char *D_001F2544;
+extern unsigned char *g_fading_texture_indices;
 
 extern void vec_transform_or_copy(char *, char *);
 
 /* func_002BB838 uses the profile in 002BB838-qcopy.c. */
 
 extern int FastTweenColor(int, int, float);
-extern unsigned char *D_001F2560;
+extern unsigned char *g_color_blend_textures;
 
 
 /* Stores the incoming handle into the record's first word and, for a non-negative index, into the next slot of a 112-byte-stride table, then either bumps a state short from 1 to 2 or passes three shorts and one word of a global block to a helper. */
@@ -216,7 +216,7 @@ void request_store_result_move_to_done(int result, long request_addr)
             old_state = request[5];
             if (old_state == 1) {
                 request[5] = 4;
-                if (request[8] != 0) D_001A63D4 = old_state;
+                if (request[8] != 0) g_request_prev_state = old_state;
             }
         } else {
             request[5] = 0;
@@ -268,7 +268,7 @@ void request_store_result_once(int value, long address)
     if (request == 0)
         return;
     if (*(unsigned int *)request != 0xFFFFFFFFU) {
-        STUB_printf(D_001AA220);
+        STUB_printf(g_str_request_result_message);
         return;
     }
     *(int *)request = value;
@@ -322,9 +322,9 @@ void ClearPadInput(u8 *pad) {
 /* Updates both controller ports. */
 void pad_poll_ports(void) {
     extern void poll_pad_device_state(void *);
-    extern State_2B8518 D_00138500;
+    extern State_2B8518 g_pad_device_state;
     poll_pad_device_state(&g_pad_state);
-    poll_pad_device_state(&D_00138500);
+    poll_pad_device_state(&g_pad_device_state);
 }
 
 /* Original assembly: a `j` with a trapping `addi $a1,$zero,0` in its delay slot; the compiler emits only addiu. */
@@ -378,17 +378,17 @@ void part_update_falling(char *particle)
     }
     old_x = (int)fields[8];
     old_y = (int)fields[9];
-    FastVecAdd((char *)step, (char *)motion, (char *)D_001B1DC0);
+    FastVecAdd((char *)step, (char *)motion, (char *)g_particle_ground_vector);
     FastVecAdd((char *)(fields + 8), (char *)(fields + 8), (char *)step);
     FastVecAdd((char *)(fields + 4), (char *)(fields + 4), (char *)step);
     if (*(short *)(particle + 0xA) != 2 && (old_x != (int)fields[8] || old_y != (int)fields[9])) {
         pos1 = *(TI *)(fields + 8);
         ground_height = coll_get_heightmap_height(&pos1);
-        if (ground_height >= D_001B1DC0[4]) {
+        if (ground_height >= g_particle_ground_vector[4]) {
             pos2 = *(TI *)(fields + 8);
             floor_height = coll_get_heightmap_height(&pos2);
         } else {
-            floor_height = D_001B1DC0[4];
+            floor_height = g_particle_ground_vector[4];
         }
         if (fields[10] < floor_height) {
             part_kill(particle);
@@ -396,7 +396,7 @@ void part_update_falling(char *particle)
         }
     }
     motion[2] -= 0.0027222223f;
-    motion[3] = floor_height + D_001B1DC0[2];
+    motion[3] = floor_height + g_particle_ground_vector[2];
 }
 
 /* Fades a particle in and out over its short life and steps through its texture frames. */
@@ -407,7 +407,7 @@ void part_update_fading_texture(char *particle)
     if (func_00282978_4(particle + 0xA)) {
         func_002B9180_8(particle);
     } else {
-        particle[2] = D_001F2544[(27 - *(short *)(particle + 0xA)) / 3];
+        particle[2] = g_fading_texture_indices[(27 - *(short *)(particle + 0xA)) / 3];
     }
 }
 
@@ -506,7 +506,7 @@ void part_update_color_blend(char *particle)
     if (*(short *)(head + 0xA) < 6) {
         *(int *)(head + 4) = (color & 0xFFFFFF) | (((int)(*(short *)(head + 0xA) * (color >> 24))) / 6 << 24);
     }
-    *(unsigned char *)(head + 2) = D_001F2560[((*(int *)(motion + 0x18) - *(short *)(head + 0xA)) * 10) / *(int *)(motion + 0x18)];
+    *(unsigned char *)(head + 2) = g_color_blend_textures[((*(int *)(motion + 0x18) - *(short *)(head + 0xA)) * 10) / *(int *)(motion + 0x18)];
 }
 
 /* decays a float field by 0.04 with a saturating early-out that consults a helper and returns; otherwise adds 12000 to a second field, nudges a third by 0.0484 while it stays below 0.225, merges two 255-scaled byte lanes into a header word, hands a sub-object to two helpers and decrements a byte counter */
@@ -556,7 +556,7 @@ char *part_spawn_flash(char *pos, int spin, int color, float spread, float low, 
         *(float *)(particle + 12) = size;
         particle[1] = 0;
         particle[8] = 0;
-        particle[2] = D_001F2574[0];
+        particle[2] = g_part_tex_flash[0];
         *(float *)(particle + 16) += math_random_signed_float_range(0.0f, spread);
         *(float *)(particle + 20) += math_random_signed_float_range(0.0f, spread);
         *(float *)(particle + 24) += math_random_signed_float_range(0.0f, spread);

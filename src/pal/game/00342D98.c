@@ -11,7 +11,7 @@ extern char *hud_construct_widget_base(char *);
 extern void *object_construct_derived_b(void *);
 extern void *object_construct_derived_c(void *);
 
-u8 *func_PAL_00342D98(u8 *self)
+u8 *small_menu_construct_pal(u8 *self)
 {
     object_construct_derived_a(self);
     object_construct_derived_a(self + 76);
@@ -39,7 +39,7 @@ extern void object_set_first_float4(void *, float, float, float, float);
    0x214: the buttons 0x1000 and 0x4000 step the row (0x208, wrapping at the row
    count at 0x210), 0x8000 and 0x2000 the column (0x204, wrapping at 0x20C). A
    step down is stored, read back and stored again after the wrap test. */
-int func_PAL_003430B0(char *self, unsigned int buttons, MenuEntry *table)
+int grid_menu_update_selection_pal(char *self, unsigned int buttons, MenuEntry *table)
 {
     float offset[2];
     memset(offset, 0, 8);
@@ -85,7 +85,7 @@ extern char *func_L00_0042C290_6(u8 *);
 extern unsigned long long func_00347EA0_1(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
-u8 *func_PAL_00343240(u8 *a0) {
+u8 *tab_menu_construct_pal(u8 *a0) {
     func_L00_0042BAD0_6(a0);
     func_L00_0042BAD0_6(a0 + 76);
     func_L00_0042BAD0_6(a0 + 152);
@@ -100,8 +100,8 @@ u8 *func_PAL_00343240(u8 *a0) {
 typedef int s32;
 
 /* stores three consecutive words; byte-identical across all 27 levels. */
-void func_PAL_003435C0(u8 *a0, s32 a1, s32 a2, s32 a3) { *(s32 *)(a0 + 0x310) = a1; *(s32 *)(a0 + 0x314) = a2; *(s32 *)(a0 + 0x318) = a3; }
+void tab_menu_set_tables_pal(u8 *a0, s32 a1, s32 a2, s32 a3) { *(s32 *)(a0 + 0x310) = a1; *(s32 *)(a0 + 0x314) = a2; *(s32 *)(a0 + 0x318) = a3; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_003435D0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x230) = a1; }
+void tab_menu_set_enabled_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x230) = a1; }
 

@@ -2,8 +2,8 @@
 
 #include "common.h"
 extern struct { char pad[0x80]; float pos[4]; char gap[0x2200]; int surface; } g_hero_state;
-extern int D_001AD7EC;
-extern int D_001A8CA0, D_001A8CA4;
+extern int g_turret_target_moby;
+extern int g_ground_check_inhibit, g_hero_effect_inhibit;
 extern struct { char pad[0x18]; int surface; int gap; float point[4]; } g_collision_hit;
 extern void copy_matrix_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
@@ -45,10 +45,10 @@ void func_PAL_L00_0040C8CC(char *object)
     char *position;
     float angle, choice;
     int hit;
-    if (AI_B(object,0x20) && D_001AD7EC) {
+    if (AI_B(object,0x20) && g_turret_target_moby) {
         copy_matrix_rotation(scratch,object+0xC0);
         mat_get_euler_angles(scratch,end);
-        moby_transform_point_and_rotation_by_parent(object,D_001AD7EC,object+0x10,end,object+0x10,offset);
+        moby_transform_point_and_rotation_by_parent(object,g_turret_target_moby,object+0x10,end,object+0x10,offset);
         euler_rotation_basis(object+0xC0,offset);
         qcopy(object+0xF0,offset);
     }
@@ -66,7 +66,7 @@ void func_PAL_L00_0040C8CC(char *object)
             if (choice>=0.0f && choice<25.0f) func_PAL_002A7E68(object,0,0,8);
             if (choice>=25.0f && choice<50.0f) func_PAL_002A7E68(object,4,0,8);
             if (choice>=50.0f && choice<75.0f) func_PAL_002A7E68(object,1,0,8);
-            if (choice>=75.0f && choice<100.0f && !D_001A8CA4 && !D_001A8CA0) {
+            if (choice>=75.0f && choice<100.0f && !g_hero_effect_inhibit && !g_ground_check_inhibit) {
                 *(AI_Quad *)scratch=*(AI_Quad *)(object+0x10);
                 AI_P(state,0x7C)=FindBestTargetByReach(scratch,1.5707964897155762f,999.0f,-1.0f,-1.0f);
                 if (AI_P(state,0x7C)) {
@@ -76,14 +76,14 @@ void func_PAL_L00_0040C8CC(char *object)
                 }
             }
         }
-        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2.0f && !D_001A8CA4 && !D_001A8CA0) {
+        if (vec_distance_xy(object+0x10,g_hero_state.pos)<2.0f && !g_hero_effect_inhibit && !g_ground_check_inhibit) {
             moby_set_state(object,2,-1);
             func_PAL_002A7E68(object,5,0,1);
             AI_F(object,0x48)=1.7f;
         }
         if (math_fast_float_d(state+0x70)) {
-            if (D_001A8CA4) return;
-            if (!D_001A8CA0) {
+            if (g_hero_effect_inhibit) return;
+            if (!g_ground_check_inhibit) {
                 if (math_random_int_below(2)) {
                     moby_set_state(object,5,-1);
                     AI_I(state,0x70)=((s32)(math_random_int_range(400,600)) * 5 + 2) / 6;
@@ -156,11 +156,11 @@ void func_PAL_L00_0040C8CC(char *object)
             if (g_collision_hit.surface!=g_hero_state.surface) qcopy(object+0x10,g_collision_hit.point);
         }
         hit=GetCollHitMaterial();
-        if (hit>0 && hit!=10 && !D_001A8CA4) {func_PAL_00334CB0(object);return;}
+        if (hit>0 && hit!=10 && !g_hero_effect_inhibit) {func_PAL_00334CB0(object);return;}
         moby_set_state(object,1,-1);
         break;
     }
-    if (!D_001A8CA4 && !D_001A8CA0) {
+    if (!g_hero_effect_inhibit && !g_ground_check_inhibit) {
         qcopy(scratch,object+0x10);
         scratch[2]+=0.5f;
         AI_F(object,0x18)=coll_probe_ground_height_below(scratch,0,0.5f);

@@ -1,8 +1,8 @@
 #include "common.h"
 typedef int quad __attribute__((mode(TI)));
-extern char D_L16_001BFF60[];
-extern f32 D_L16_001B1FF0 __attribute__((sda));
-extern f32 D_L16_001B1FF4 __attribute__((sda));
+extern char g_aim_target_position[];
+extern f32 g_shockwave_growth_rate __attribute__((sda));
+extern f32 g_shockwave_radius_limit __attribute__((sda));
 extern void FastVecAdd(char *, char *, char *);
 extern void part_spawn_score_particle(char *);
 extern s32 CollLine(char *, char *, s32, s32, s32);
@@ -29,7 +29,7 @@ void fragment_shockwave_update(char *self) {
         *(f32 *)(st + 8) -= *(f32 *)(st + 0x24);
         part_spawn_score_particle(self);
         if (CollLine(old, position, 0, *(s32 *)(self + 0xB8), 0)) {
-            qcopy(position ,D_L16_001BFF60);
+            qcopy(position ,g_aim_target_position);
             if (*(s32 *)(st + 0x20)) moby_set_state(self, 2, -1);
             else moby_set_state(self, 1, -1);
         }
@@ -53,8 +53,8 @@ void fragment_shockwave_update(char *self) {
         *(f32 *)(st + 0x34) += 0.06666667014360428f;
         if (*(f32 *)(st + 0x34) > 1.0f) *(f32 *)(st + 0x34) -= 1.0f;
         { f32 radius = *(f32 *)(st + 0x2C);
-          f32 growth = D_L16_001B1FF0 * 0.01666666753590107f;
-          f32 limit = D_L16_001B1FF4;
+          f32 growth = g_shockwave_growth_rate * 0.01666666753590107f;
+          f32 limit = g_shockwave_radius_limit;
           radius += growth;
           *(f32 *)(st + 0x2C) = radius;
         if (radius >= limit) ApproachValue((f32 *)(st + 0x30), 0.0f, 0.06666667014360428f);

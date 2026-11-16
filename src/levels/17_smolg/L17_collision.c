@@ -9,7 +9,7 @@ extern void transform_vector(void *, void *, void *);
 extern int coll_process_hit(void *, int, void *, int, float);
 extern void *func_001153D4(void *, const void *, unsigned int);
 extern void part_start_effect_default_table(void *, void *, int, void *, float);
-extern char *D_L17_001C4080[];
+extern char *g_moby_candidate_list[];
 
 /* Finds objects touching its box and hits each one (collision test for the box). */
 void coll_hit_mobys_inside_box(char *object, char *params) {
@@ -41,7 +41,7 @@ void coll_hit_mobys_inside_box(char *object, char *params) {
     {
         char *candidates[count];
 
-        func_001153D4(candidates, D_L17_001C4080, count * 4);
+        func_001153D4(candidates, g_moby_candidate_list, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
@@ -65,7 +65,7 @@ void coll_hit_mobys_inside_box(char *object, char *params) {
             {
                 int j;
                 for (j = 0; j < n; j++) {
-                    if (D_L17_001C4080[j] == candidate)
+                    if (g_moby_candidate_list[j] == candidate)
                         part_start_effect_default_table(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }
@@ -103,7 +103,7 @@ void coll_hit_mobys_inside_box_copy(char *object, char *params) {
     {
         char *candidates[count];
 
-        func_001153D4(candidates, D_L17_001C4080, count * 4);
+        func_001153D4(candidates, g_moby_candidate_list, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
@@ -127,7 +127,7 @@ void coll_hit_mobys_inside_box_copy(char *object, char *params) {
             {
                 int j;
                 for (j = 0; j < n; j++) {
-                    if (D_L17_001C4080[j] == candidate)
+                    if (g_moby_candidate_list[j] == candidate)
                         part_start_effect_default_table(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* -mno-split-addresses keeps the absolute factor load inside the loop.
  * The interleaved placement-call prototype preserves both EE argument banks.
  */
@@ -8,13 +9,13 @@ typedef int TI128 __attribute__((mode(TI)));
 
 /* the level's two blend words and the scale the placement call takes, all through $gp,
  * and the absolute factor the blend call takes. */
-extern f32 D_L22_001AFF58 __attribute__((sda));
+extern f32 g_spark_lane_weight_min __attribute__((sda));
 
-extern s32 D_L22_001AFF60 __attribute__((sda));
+extern s32 g_spark_lane_count_scale __attribute__((sda));
 
-extern f32 D_L22_001AFF64 __attribute__((sda));
+extern f32 g_spark_lane_quad_size __attribute__((sda));
 
-extern f32 D_L22_001AFF5C NOT_SDA;
+extern f32 g_spark_lane_weight_max NOT_SDA;
 
 extern void gfx_set_gs_register_constant(void);
 
@@ -50,13 +51,13 @@ void spark_lane_draw(u8 *moby) {
         *(TI128 *)v = *(TI128 *)w;
         matrix_mul_vec3(v, v, obj + 0xC0);
         FastVecAdd(v, v, obj + 0x10);
-        weight = math_lerp_float(D_L22_001AFF58, D_L22_001AFF5C, *(f32 *)(lane));
+        weight = math_lerp_float(g_spark_lane_weight_min, g_spark_lane_weight_max, *(f32 *)(lane));
         phase = *(f32 *)(lane);
         if (phase < 0.1f)
-            count = FloatToInt((f32)D_L22_001AFF60 * phase * 10.0f);
+            count = FloatToInt((f32)g_spark_lane_count_scale * phase * 10.0f);
         else
-            count = FloatToInt((f32)D_L22_001AFF60 * (1.0f - phase));
-        gfx_draw_billboard_quad_with_uv(v, weight, count, D_L22_001AFF64, 0.08f, 0);
+            count = FloatToInt((f32)g_spark_lane_count_scale * (1.0f - phase));
+        gfx_draw_billboard_quad_with_uv(v, weight, count, g_spark_lane_quad_size, 0.08f, 0);
         lane += 4;
     }
 }

@@ -23,8 +23,8 @@ struct SelectionState {
     char *target;
 };
 
-extern int D_001A8CA0 __attribute__((sda));
-extern short D_0018A168;
+extern int g_ground_check_inhibit __attribute__((sda));
+extern short g_hero_busy_flag;
 extern int g_current_map_index __attribute__((sda));
 extern struct SelectionState g_collision_hit;
 extern char *ref_002AF460_00[];
@@ -80,7 +80,7 @@ char *SelectBestTargetInCone(float *origin, float *direction, float angle, float
                 goto next;
         }
         *(TI128 *)pos = *(TI128 *)(node + 0x10);
-        if (D_001A8CA0 || D_0018A168) {
+        if (g_ground_check_inhibit || g_hero_busy_flag) {
             FastVecScale(offset, node + 0xE0, info[4]);
             FastVecAdd(pos, pos, offset);
         } else {
@@ -95,7 +95,7 @@ char *SelectBestTargetInCone(float *origin, float *direction, float angle, float
         horizontal = zero;
         elevation = horizontal;
         if (angle < 3.141593f || vertical < 3.141593f) {
-            if (!D_001A8CA0) {
+            if (!g_ground_check_inhibit) {
                 temp = mat_fast_helper_a(delta[0], delta[1]);
                 horizontal = FastDiffRots(temp, mat_fast_helper_a(direction[0], direction[1]));
                 limit = angle;

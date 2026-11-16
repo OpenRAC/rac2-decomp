@@ -3,9 +3,9 @@
 /* Own -G8 unit: func_L20_00442E68 reads D_L20_001B2FB8 through $gp, and the -G8 sibling
    L20_0043ECB0-g8.c is built with -mno-split-addresses, which this function does not want. */
 
-extern u16 *D_L20_001FBB20[];
-extern char *D_L20_001B2F9C[] __attribute__((sda));
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern u16 *g_group_l20_id_lists[];
+extern char *g_group_l20_member_table[] __attribute__((sda));
+extern int g_group_count __attribute__((sda));
 
 extern void moby_finish_release_child(char *);
 
@@ -22,12 +22,12 @@ void yeedil_boss_init_group(char *moby) {
     u16 *p;
     char *e;
 
-    for (p = D_L20_001FBB20[*(s32 *)(state + 0x218)];
-         (*(s32 *)(state + 0x218) & 0xFF) != 0xFF && *(s32 *)(state + 0x218) <= D_L20_001B2FB8 &&
+    for (p = g_group_l20_id_lists[*(s32 *)(state + 0x218)];
+         (*(s32 *)(state + 0x218) & 0xFF) != 0xFF && *(s32 *)(state + 0x218) <= g_group_count &&
          p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == D_L20_001FBB20[*(s32 *)(state + 0x218)]);
+         ((p != 0 && (s16)p[-1] >= 0) || p == g_group_l20_id_lists[*(s32 *)(state + 0x218)]);
          p++) {
-        e = D_L20_001B2F9C[0] + ((*p & 0x7FFF) << 8);
+        e = g_group_l20_member_table[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         *(u16 *)(e + 0x36) = 0x7F80;

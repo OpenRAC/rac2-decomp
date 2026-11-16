@@ -5,8 +5,8 @@
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 extern char *FindIntersectingGridPrimitive(Quad *, float);
-extern char *D_L00_001B1F94;
-extern char D_L00_001BF230[];
+extern char *g_collision_sphere_table;
+extern char g_collision_position[];
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void FastVecScale(void *, void *, float);
@@ -25,13 +25,13 @@ int coll_find_nearby_shape_points(Quad *src, float margin)
     temp.local = *src;
     hit = FindIntersectingGridPrimitive(&temp.local, margin);
     if (hit) {
-        record = D_L00_001B1F94;
+        record = g_collision_sphere_table;
         record += *(int *)(hit + 0x14) * 0x80;
         center = record + 0x30;
         FastVecSub(temp.delta, src, center);
         radius = FastVecLength(record);
         reciprocal = 1.0f / FastVecLength(temp.delta);
-        outer = D_L00_001BF230;
+        outer = g_collision_position;
         inner = outer - 0x10;
         FastVecScale(outer, temp.delta, (radius + margin) * reciprocal);
         FastVecScale(inner, temp.delta, radius * reciprocal);

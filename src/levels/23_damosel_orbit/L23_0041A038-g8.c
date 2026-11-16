@@ -4,23 +4,23 @@
  * copies under -G8. Take the persistent direction pointer after the query so
  * its earlier uses can share the block-local scratch register. */
 typedef int Quad __attribute__((mode(TI)));
-extern int D_L23_001B1438 __attribute__((sda));
-extern int D_L23_001B1440 __attribute__((sda));
-extern float D_L23_001B1448 __attribute__((sda));
-extern float D_L23_001B144C __attribute__((sda));
-extern float D_L23_001B1580 __attribute__((sda));
-extern float D_L23_001B1584 __attribute__((sda));
-extern float D_L23_001B1588 __attribute__((sda));
-extern float D_L23_001B158C __attribute__((sda));
-extern int D_L23_001B1648 __attribute__((sda));
-extern int D_L23_001B140C __attribute__((sda));
-extern int D_L23_001B36AC;
-extern Quad D_L23_001B3850 MACRO_ADDR;
-extern Quad D_L23_001B3870 MACRO_ADDR;
-extern float D_L23_001B3728;
-extern int D_L23_001B3784;
-extern char D_L23_001B3860[] MACRO_ADDR;
-extern char D_L23_001B36C0[] MACRO_ADDR;
+extern int g_shield_fade_state __attribute__((sda));
+extern int g_shield_fade_frames __attribute__((sda));
+extern float g_shield_fade_time_scale __attribute__((sda));
+extern float g_shield_fade_extra_scale __attribute__((sda));
+extern float g_boss_turn_speed_default __attribute__((sda));
+extern float g_boss_turn_speed_mode_sixteen __attribute__((sda));
+extern float g_boss_turn_speed_mode_thirteen __attribute__((sda));
+extern float g_boss_turn_speed_negative __attribute__((sda));
+extern int g_boss_half_time_frames __attribute__((sda));
+extern int g_boss_part_mode_flag __attribute__((sda));
+extern int g_enemy_relocate_count;
+extern Quad g_mothership_shot_origin MACRO_ADDR;
+extern Quad g_mothership_aim_direction MACRO_ADDR;
+extern float g_mothership_aim_dot;
+extern int g_mothership_line_clear;
+extern char g_boss_joint_world_pos[] MACRO_ADDR;
+extern char g_player_target_point[] MACRO_ADDR;
 extern char *g_hero_moby __attribute__((nosda));
 extern void vec_clear_128(Quad *);
 extern void moby_transform_joint_point(char *, int, char *);
@@ -51,28 +51,28 @@ int UpdateAimTurn(char *object, char *target) {
     ((unsigned char *)state)[0x473] = 1;
     *(Quad *)(state + 0x480) = local.zero;
     moby_transform_joint_point(object, 39, (char *)local.matrix);
-    qcopy(&D_L23_001B3850, &local.matrix[3]);
-    qcopy(&D_L23_001B3870, &local.matrix[0]);
-    if (D_L23_001B1438) return 0;
+    qcopy(&g_mothership_shot_origin, &local.matrix[3]);
+    qcopy(&g_mothership_aim_direction, &local.matrix[0]);
+    if (g_shield_fade_state) return 0;
     local.axis = 0;
     ((float *)&local.axis)[2] = 1.0f;
     ((float *)&local.axis)[3] = 1.0f;
     FastVecScale(state + 0x4A0, (char *)&local.axis,
-        (float)D_L23_001B1440 * D_L23_001B1448 * D_L23_001B144C);
+        (float)g_shield_fade_frames * g_shield_fade_time_scale * g_shield_fade_extra_scale);
     moby_transform_joint_to_world(object, 42, (char *)&local.axis);
     FastVecSub((char *)&local.direction, target, (char *)&local.axis);
     vec_scale_to_length((char *)&local.direction, (char *)&local.direction, 1.0f);
-    D_L23_001B3728 = FastVecDot((char *)&local.direction, (char *)&D_L23_001B3870);
-    D_L23_001B3784 = CollLine(D_L23_001B3860, D_L23_001B36C0, 16, g_hero_moby, 0) == 0;
+    g_mothership_aim_dot = FastVecDot((char *)&local.direction, (char *)&g_mothership_aim_direction);
+    g_mothership_line_clear = CollLine(g_boss_joint_world_pos, g_player_target_point, 16, g_hero_moby, 0) == 0;
     direction = (char *)&local.direction;
-    speed = D_L23_001B1580 * 0.00029088825f;
+    speed = g_boss_turn_speed_default * 0.00029088825f;
     if (((unsigned char *)state)[0x404] && ((unsigned char *)state)[0x405]) {
         mode = ((unsigned char *)object)[0x20];
-        if ((unsigned char)mode != 7 || D_L23_001B1648 / 2 < D_L23_001B36AC) {
-            if ((unsigned char)mode == 16) speed = D_L23_001B1584 * 0.00029088825f;
-            else if ((unsigned)(mode - 13) < 3) speed = D_L23_001B1588 * 0.00029088825f;
+        if ((unsigned char)mode != 7 || g_boss_half_time_frames / 2 < g_enemy_relocate_count) {
+            if ((unsigned char)mode == 16) speed = g_boss_turn_speed_mode_sixteen * 0.00029088825f;
+            else if ((unsigned)(mode - 13) < 3) speed = g_boss_turn_speed_mode_thirteen * 0.00029088825f;
         }
-        FastVecCross((char *)&local.cross, direction, (char *)&D_L23_001B3870);
+        FastVecCross((char *)&local.cross, direction, (char *)&g_mothership_aim_direction);
         dot = FastVecDot((char *)&local.cross, object + 0xD0);
         angle = math_fast_angle_helper(dot);
         math_fast_float_g(angle + 1.5707964f);
@@ -85,9 +85,9 @@ int UpdateAimTurn(char *object, char *target) {
         mothership_turn_joints(object, 1.0f, 1.0f);
         return 1;
     }
-    if ((unsigned)((unsigned char)object[0x20] - 13) < 2) D_L23_001B140C = 1;
+    if ((unsigned)((unsigned char)object[0x20] - 13) < 2) g_boss_part_mode_flag = 1;
     if (!((unsigned char *)state)[0x404]) {
-        *(float *)(state + 0x57C) = -(D_L23_001B158C * 0.00029088825f);
+        *(float *)(state + 0x57C) = -(g_boss_turn_speed_negative * 0.00029088825f);
         if (*(float *)(state + 0x578) > 0.0f) {
             *(float *)(state + 0x578) += *(float *)(state + 0x57C);
             if (((unsigned char *)state)[0x4B1] == 0) AttachManipulator((unsigned char *)object, 39, (unsigned char *)state + 0x4B0);

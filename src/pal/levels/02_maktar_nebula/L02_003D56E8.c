@@ -13,7 +13,7 @@ extern float FastDiffRots(float, float);
 extern int math_random_int_below(int);
 
 /* Picks the idle variant the actor should play, from its distance and heading. */
-int func_PAL_L02_003D56E8(char *object) {
+int armed_enemy_try_close_attack_pal(char *object) {
     char *state = *(char **)(object + 0x68);
     float dist;
     float ang;

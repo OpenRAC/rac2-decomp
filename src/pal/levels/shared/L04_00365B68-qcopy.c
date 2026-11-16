@@ -4,7 +4,7 @@
 extern char *part_alloc(int);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_L04_001FF390;
+extern unsigned char *g_spinning_particle_colors;
 
 char *func_PAL_L04_00365B68(void *position, void *velocity, int word, int color,
                            int index, float lifetime, float scale, float size)
@@ -17,7 +17,7 @@ char *func_PAL_L04_00365B68(void *position, void *velocity, int word, int color,
         particle[9] = FloatToInt(1.0f) + 0x40;
         particle[3] = 0x44;
         particle[1] = 0;
-        particle[2] = D_L04_001FF390[index];
+        particle[2] = g_spinning_particle_colors[index];
         *(int *)(particle + 4) = color;
         *(float *)(particle + 0xC) = lifetime * 210000.0f;
         particle[8] = (int)math_random_float_range(0.0f, 255.0f);

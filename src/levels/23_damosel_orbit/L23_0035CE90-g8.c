@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_L23_001AFAA0 __attribute__((sda));
+extern float g_tether_glow_angle_degrees __attribute__((sda));
 
-extern float D_L23_001B13C8 __attribute__((sda));
+extern float g_mothership_hit_damage_scale __attribute__((sda));
 
 extern void func_3242D0(int, int, int);
 
@@ -23,7 +23,7 @@ void tether_update_glow(char *moby) {
         func_31AF00(*(int *)(state + 0x2A0), 2, state + 0x370);
     func_2F8EA8(state + 0x380, 2, *(float *)(state + 0x3B0));
     *(float *)(state + 0x3B0) = func_2F91F0(*(float *)(state + 0x3B0),
-                                            D_L23_001AFAA0 * 0.000290888245f);
+                                            g_tether_glow_angle_degrees * 0.000290888245f);
 }
 
 /* Starts an object: sets its look and size according to its initial state, then runs the shared setup. */
@@ -41,7 +41,7 @@ void moby_init_look(char *moby) {
         func_3242D0(moby, 1, 0);
         *(unsigned short *)(moby + 0x34) |= 0x4000;
     } else if (kind == 1) {
-        float f = D_L23_001B13C8;
+        float f = g_mothership_hit_damage_scale;
 
         if (f != 0.0f) {
             *(float *)(state + 0x20) = f;
@@ -52,9 +52,9 @@ void moby_init_look(char *moby) {
     enemy_handle_hit_sparks(moby);
 }
 
-extern int D_L23_001B36B0;
+extern int g_selected_moby;
 
-extern float D_L23_001AFAB4 __attribute__((sda));
+extern float g_target_point_dot_threshold __attribute__((sda));
 
 extern char g_hero_position[];
 
@@ -71,11 +71,11 @@ int weapon_get_targetable_point(char *moby, float *outValue) {
     char *state = *(char **)(moby + 0x68);
     char dir[16];
 
-    if (*(unsigned char *)(moby + 0x20) == 8 && D_L23_001B36B0 == 0 &&
+    if (*(unsigned char *)(moby + 0x20) == 8 && g_selected_moby == 0 &&
         *(unsigned char *)(moby + 0x31) != 0 && *(short *)(state + 0x324) != 0) {
         FastVecSub(dir, moby + 0x10, g_hero_position);
         vec_scale_to_length(dir, dir, 1.0f);
-        if (FastVecDot(dir, (char *)(*(int *)(g_hero_position + 0x2210) + 0xC0)) <= D_L23_001AFAB4) {
+        if (FastVecDot(dir, (char *)(*(int *)(g_hero_position + 0x2210) + 0xC0)) <= g_target_point_dot_threshold) {
             *outValue = *(float *)(*(char **)(moby + 0x68) + 0x27C);
             return 1;
         }

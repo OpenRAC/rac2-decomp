@@ -14,11 +14,11 @@ typedef struct {
     float normal[4];
 } SweepHit;
 
-extern float D_001B096C __attribute__((sda));
-extern float D_001B0970 __attribute__((sda));
-extern float D_001B2830[4] __attribute__((sda));
-extern int D_001B2848;
-extern float D_001BAFB0[4];
+extern float g_ridden_vehicle_probe_lift __attribute__((sda));
+extern float g_ridden_vehicle_probe_radius __attribute__((sda));
+extern float g_vehicle_gravity_direction[4] __attribute__((sda));
+extern int g_vehicle_probe_skip;
+extern float g_coll_hit_point[4];
 extern SweepHit g_collision_hit;
 extern float math_fabs(float);
 extern void vec_clear_128(void *);
@@ -74,12 +74,12 @@ void func_US2_00330F90(char *object)
         if (!(radius <= zero)) negative = 0;
         vec_clear_128(sum);
         hits = 0;
-        lift = D_001B096C;
+        lift = g_ridden_vehicle_probe_lift;
         drop = -lift;
-        vec_scale_to_length(base, D_001B2830, drop);
+        vec_scale_to_length(base, g_vehicle_gravity_direction, drop);
         FastVecAdd(base, base, self + 0x10);
-        if (!D_001B2848 && coll_process_triangles(base, D_001B0970)) {
-            FastVecSub(axis, D_001BAFB0, base);
+        if (!g_vehicle_probe_skip && coll_process_triangles(base, g_ridden_vehicle_probe_radius)) {
+            FastVecSub(axis, g_coll_hit_point, base);
             FastVecAdd(self + 0x10, axis, self + 0x10);
         }
         for (i = 0; i < 32; i++) {
@@ -87,7 +87,7 @@ void func_US2_00330F90(char *object)
             last = 31;
             span = IntToFloat(last);
             angle = step / span;
-            vec_scale_to_length(axis, self + 0xD0, D_001B0970);
+            vec_scale_to_length(axis, self + 0xD0, g_ridden_vehicle_probe_radius);
             quarter = 1.57079637f;
             angle *= quarter;
             sine = math_fast_sin_or_cos_b(angle);
@@ -112,7 +112,7 @@ void func_US2_00330F90(char *object)
             if (hit) {
                 hits++;
                 down = -1.0f;
-                FastVecScale(opposite, D_001B2830, down);
+                FastVecScale(opposite, g_vehicle_gravity_direction, down);
                 unit = 0.0009765625f;
                 FastVecScale(normal, g_collision_hit.normal, unit);
                 one = 1.0f;

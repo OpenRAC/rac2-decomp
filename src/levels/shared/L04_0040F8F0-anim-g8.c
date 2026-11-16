@@ -35,7 +35,7 @@ typedef struct {
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 
-extern int D_L04_001B08F0 __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
 extern float mat_fast_helper_a(float,float);
 extern float FastAddRotations(float,float);
 extern void FastVecScale(void *,void *,float);
@@ -44,14 +44,14 @@ extern float math_fabs(float);
 extern float fast_subtract_rotations(float,float);
 extern float math_approach_with_velocity(void *,float,void *,float,float,float,int);
 extern char *g_moby_l04_pool;
-extern float D_0018C2D8 NOT_SDA;
-extern float D_00138288 NOT_SDA;
-extern float D_0018A138 NOT_SDA;
+extern float g_bike_speed_ratio NOT_SDA;
+extern float g_stick_axis_scaled NOT_SDA;
+extern float g_height_threshold NOT_SDA;
 /* Read as D_001A7A40[1]: an sda array at a nonzero offset is one unsplit lui+lbu pair. */
-extern unsigned char D_001A7A40[] __attribute__((sda));
-extern unsigned char D_00139605 NOT_SDA;
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
+extern unsigned char g_bike_variant_flag NOT_SDA;
 extern int g_race_time_ticks __attribute__((sda));
-extern Object1006 *D_L04_001B08F4 __attribute__((sda));
+extern Object1006 *g_race_bike_child_moby __attribute__((sda));
 extern void func_002A05A8(void *);
 extern void func_002A0F48(void *);
 extern void anim_start_blended(void *,int,int,int);
@@ -91,7 +91,7 @@ void racer_update_bike_animation(char *moby,char *vars) {
   if(target>1.0f) target=1.0f;
   if(target<-1.0f) target=-1.0f;
   target*=-0.52359885f;
-  if(B(moby,0x20)!=3 && D_0018C2D8<0.2f) target=0;
+  if(B(moby,0x20)!=3 && g_bike_speed_ratio<0.2f) target=0;
  }
  math_approach_with_velocity(moby+0xf0,target,vars+0x300,scale*0.035f,0.45f,scale*0.027634384f,0);
  obj=(Object1006 *)(g_moby_l04_pool+(I(vars,0x1dc)<<8));
@@ -115,7 +115,7 @@ void racer_update_bike_animation(char *moby,char *vars) {
    if(F(vars,0x30c)>0.33333334f) obj->animSpeed*=3.0f;
   }
   if(B(moby,0xbc)==5) {
-   F(vars,0x428)=D_00138288*-0.5f;
+   F(vars,0x428)=g_stick_axis_scaled*-0.5f;
    F(vars,0x424)=math_fabs(F(moby,0xf0))*-0.6f-F(moby,0xf4);
   } else { F(vars,0x424)=F(vars,0x428)=0; }
   if(P(vars,0x3b0) && g_race_time_ticks>=121) {
@@ -130,28 +130,28 @@ void racer_update_bike_animation(char *moby,char *vars) {
     if(I(vars,0x3b4)>=601) I(vars,0x3b4)=0;
    }
   }
-  if(D_001A7A40[1]) F(vars,0x430)=2.5f; else F(vars,0x430)=1.0f;
+  if(g_unlocked_item_flags[1]) F(vars,0x430)=2.5f; else F(vars,0x430)=1.0f;
   moby_update_eased_node(obj,vars+0x3c0,0,0.08f,0.5f);
-  if(!D_L04_001B08F4) {
-   if(D_00139605) D_L04_001B08F4=CreateMoby(0x12df /* moby class 4831 */); else D_L04_001B08F4=CreateMoby(0x50a /* moby class 1290 */);
-   if(D_L04_001B08F4) {
-    moby_init_child_from_parent(D_L04_001B08F4,obj);
-    D_L04_001B08F4->scale=D_L04_001B08F4->model->scale*0.25f;
-    D_L04_001B08F4->flags|=0x106;
+  if(!g_race_bike_child_moby) {
+   if(g_bike_variant_flag) g_race_bike_child_moby=CreateMoby(0x12df /* moby class 4831 */); else g_race_bike_child_moby=CreateMoby(0x50a /* moby class 1290 */);
+   if(g_race_bike_child_moby) {
+    moby_init_child_from_parent(g_race_bike_child_moby,obj);
+    g_race_bike_child_moby->scale=g_race_bike_child_moby->model->scale*0.25f;
+    g_race_bike_child_moby->flags|=0x106;
    }
   } else {
-   moby_copy_joint_transform_to_object(obj,D_L04_001B08F4,1,0);
+   moby_copy_joint_transform_to_object(obj,g_race_bike_child_moby,1,0);
    moby_transform_joint_point(obj,1,matrix);
    FastVecScale(v,matrix+8,-0.03f);
-   FastVecAdd((char *)D_L04_001B08F4+0x10,(char *)D_L04_001B08F4+0x10,v);
-   qcopy_nc((char *)D_L04_001B08F4+0xc0,matrix);
-   qcopy_nc((char *)D_L04_001B08F4+0xd0,matrix+4);
-   qcopy_nc((char *)D_L04_001B08F4+0xe0,matrix+8);
-   func_002A05A8(D_L04_001B08F4);func_002A0F48(D_L04_001B08F4);
+   FastVecAdd((char *)g_race_bike_child_moby+0x10,(char *)g_race_bike_child_moby+0x10,v);
+   qcopy_nc((char *)g_race_bike_child_moby+0xc0,matrix);
+   qcopy_nc((char *)g_race_bike_child_moby+0xd0,matrix+4);
+   qcopy_nc((char *)g_race_bike_child_moby+0xe0,matrix+8);
+   func_002A05A8(g_race_bike_child_moby);func_002A0F48(g_race_bike_child_moby);
   }
  }
-  if(D_L04_001B08F0) {
-   *(Quad1006 *)v=*(Quad1006 *)(moby+0x10);v[2]=D_0018A138;*(Quad1006 *)matrix=*(Quad1006 *)(moby+0x10);
+  if(g_race_bike_mode) {
+   *(Quad1006 *)v=*(Quad1006 *)(moby+0x10);v[2]=g_height_threshold;*(Quad1006 *)matrix=*(Quad1006 *)(moby+0x10);
    EmitTrailEffects(moby,matrix,vars+0x290,F(vars,0x30c)+F(vars,0x27c));
   }
   F(vars,0x6c0)=FastAddRotations(F(vars,0x6c0),(F(vars,0x30c)+F(vars,0x27c)*4.0f)*0.2f+0.01f);

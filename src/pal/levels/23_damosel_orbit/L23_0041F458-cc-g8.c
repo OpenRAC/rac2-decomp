@@ -13,29 +13,29 @@
 
 #include "common.h"
 
-extern float D_L23_001B3728 __attribute__((sda));
+extern float g_mothership_aim_dot __attribute__((sda));
 
-extern float D_L23_001B1454 __attribute__((sda));
+extern float g_mothership_fire_threshold __attribute__((sda));
 
-extern int D_L23_001B3784;
+extern int g_mothership_line_clear;
 
-extern char D_L23_001B3850[] MACRO_ADDR;
+extern char g_mothership_shot_origin[] MACRO_ADDR;
 
-extern char D_L23_001B3870[];
+extern char g_mothership_aim_direction[];
 
 extern void vec_scale_to_length(char *, char *, float);
 
 extern void FastVecSub(char *, char *, char *);
 
-extern char *func_PAL_L23_00427920(char *, char *, float *);
+extern char *directed_shot_create_pal(char *, char *, float *);
 
-extern unsigned char *func_PAL_L23_0042D620(char *, char *, char *, int, float);
+extern unsigned char *flying_shot_create_child_pal(char *, char *, char *, int, float);
 
 extern int snd_start_in_slot(int, int, int);
 
-extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, char *);
+extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float, float, int, int, int, char *);
 
-extern void func_PAL_L23_00420FF8(char *, float, float);
+extern void mothership_turn_joints_pal(char *, float, float);
 
 int func_PAL_L23_0041F458(char *arg0, char *arg1) {
     char *state = *(char **)(arg0 + 0x68);
@@ -45,7 +45,7 @@ int func_PAL_L23_0041F458(char *arg0, char *arg1) {
 
     if (kind != 0xF) {
         if (kind == 0x10 || kind == 0xC) {
-            if (D_L23_001B3784 == 0)
+            if (g_mothership_line_clear == 0)
                 return 0;
         } else
             return 0;
@@ -53,32 +53,32 @@ int func_PAL_L23_0041F458(char *arg0, char *arg1) {
         if ((*(unsigned short *)(arg0 + 0x96) & 3) != 2)
             return 1;
         do {
-            vec_scale_to_length((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.020000001f);
+            vec_scale_to_length((char *)vec, g_mothership_aim_direction, *(short *)(state + 0x33A) * 0.020000001f);
             tmp = *(float *)(state + 0x300) * 1.5f;
-            func_PAL_L23_00427920(D_L23_001B3850, (char *)vec, &tmp);
+            directed_shot_create_pal(g_mothership_shot_origin, (char *)vec, &tmp);
         } while (0);
         snd_start_in_slot(0x21, 0, 0);
         return 1;
     }
-    if (!(D_L23_001B3728 >= D_L23_001B1454))
+    if (!(g_mothership_aim_dot >= g_mothership_fire_threshold))
         return 1;
-    func_PAL_L23_00420FF8(arg0, 2.0f, 2.0f);
+    mothership_turn_joints_pal(arg0, 2.0f, 2.0f);
     if (*(unsigned char *)(arg0 + 0x20) == 0x10) {
         int m = *(short *)(state + 0x336);
         if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, arg1, D_L23_001B3850);
+        FastVecSub((char *)vec, arg1, g_mothership_shot_origin);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.020000001f);
-        func_PAL_L23_0042D620(arg0, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
-        func_PAL_L00_003FB330(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
+        flying_shot_create_child_pal(arg0, (char *)vec, g_mothership_shot_origin, 0, *(float *)(state + 0x304));
+        SpawnExplosion_pal(g_mothership_shot_origin, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
         snd_start_in_slot(0x1A, 0, 0);
     } else {
         int m = *(short *)(state + 0x334);
         if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, arg1, D_L23_001B3870);
+        FastVecSub((char *)vec, arg1, g_mothership_aim_direction);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.020000001f);
-        func_PAL_L23_00427920(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
+        directed_shot_create_pal(g_mothership_shot_origin, (char *)vec, (float *)(state + 0x300));
         snd_start_in_slot(0x21, 0, 0);
     }
     return 1;

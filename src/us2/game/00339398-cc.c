@@ -14,7 +14,7 @@ typedef unsigned int u32;
 /* Text box laid out by func_00337C10/func_00337E30: text at +0xA8, its line table at +0x1D8. */
 extern int sprintf(char *, char *, ...); /* formats into a buffer */
  /* screen size: [1] = height */
-extern void func_US2_00339398(char *, unsigned int, unsigned int, float, float, float, float);
+extern void text_box_draw_frame_us2(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields. */
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
@@ -24,7 +24,7 @@ extern void func_US2_00339398(char *, unsigned int, unsigned int, float, float, 
  /* memset */
  /* "aTxBrack" */
  /* "aTxTop" */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 /* Initialises a text panel: clears its state and, when a pool is given, takes four 16-byte
    cells from it with func_00336E40/func_00336DA8 (255,108 / colour 0x60442D00 / two cleared
@@ -43,7 +43,7 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 extern void UpdateViewContext(void);
 extern int object_get_stored_counter(void);
 extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, float, float, float);
@@ -52,13 +52,13 @@ extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, flo
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
    ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed
    from the frame's height, then from its width. Colour = alpha << 24 | color. */
-void func_US2_00339398(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right)
+void text_box_draw_frame_us2(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right)
 {
     ViewState *view;
     float saved, scale, uv, insetRight, insetLeft, border;
 
-    if (D_001A8CFC[0]) {
-        view = &D_001B9040;
+    if (g_resident_data_base[0]) {
+        view = &g_view_params;
         scale = 1.0f;
         saved = view->fB0;
         view->fB0 = 0.62f;

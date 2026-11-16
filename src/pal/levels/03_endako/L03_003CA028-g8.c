@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern f32 D_L03_001B0050 __attribute__((sda));
-extern f32 D_L03_001B0054 __attribute__((sda));
-extern f32 D_L03_001B0058[2] __attribute__((sda));
-extern char D_L03_00188660[];
+extern f32 g_rotor_spin_speed __attribute__((sda));
+extern f32 g_rotor_roll_speed __attribute__((sda));
+extern f32 g_rotor_speed_table[2] __attribute__((sda));
+extern char g_sound_l03_slot_table[];
 typedef struct { f32 scale; f32 spin; f32 wobble[2]; f32 roll; f32 fade; s32 slot; } SpinState;
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern f32  FastAddRotations(f32 a0, f32 a1);
@@ -30,12 +30,12 @@ void func_PAL_L03_003CA028(char *a0)
         break;
     case 1: {
         f32 k = 0.0003490659f;
-        f32 *c = D_L03_001B0058;
+        f32 *c = g_rotor_speed_table;
         f32 *p = s2->wobble;
         s32 i;
 
-        s2->spin = FastAddRotations(s2->spin, D_L03_001B0050 * k);
-        s2->roll = FastAddRotations(s2->roll, D_L03_001B0054 * k);
+        s2->spin = FastAddRotations(s2->spin, g_rotor_spin_speed * k);
+        s2->roll = FastAddRotations(s2->roll, g_rotor_roll_speed * k);
         for (i = 1; i >= 0; i--) {
             *p = FastAddRotations(*p, *c * 0.0003490659f);
             p++;
@@ -53,7 +53,7 @@ void func_PAL_L03_003CA028(char *a0)
     }
     }
     if (*(u8 *)(s1 + 0x20) == 1) {
-        char *p = D_L03_00188660 + s2->slot * 0x70;
+        char *p = g_sound_l03_slot_table + s2->slot * 0x70;
 
         if (*(char **)(p + 0x88) != s1 || *(u8 *)(p + 0x74) == 0)
             s2->slot = PlayMobySound(0, 4, s1);
@@ -61,7 +61,7 @@ void func_PAL_L03_003CA028(char *a0)
         s32 v = s2->slot;
 
         if (v != -1) {
-            char *p = D_L03_00188660 + v * 0x70;
+            char *p = g_sound_l03_slot_table + v * 0x70;
 
             if (*(char **)(p + 0x88) == s1 && *(u8 *)(p + 0x74) != 0)
                 snd_stop_voice(v);

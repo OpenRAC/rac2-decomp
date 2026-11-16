@@ -4,7 +4,7 @@
 
 typedef unsigned char u8;
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
 extern int hero_l07_enter_state(int, int);
@@ -72,7 +72,7 @@ void hero_queue_action_from_input(void)
     if (command == 2 && !g_hero_state.inputLock &&
         (!g_hero_state.jumpCount || g_hero_state.elapsed < 2.5f)) {
         g_hero_state.jumpPressed = 1;
-        if (!g_hero_state.mode && D_001A7B0B) g_hero_state.pendingJump = 1;
+        if (!g_hero_state.mode && g_hero_input_enabled) g_hero_state.pendingJump = 1;
     }
     if (command == 3) g_hero_state.jump = 1;
     if (command == 11) g_hero_state.cancel = 1;

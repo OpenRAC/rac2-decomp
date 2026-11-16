@@ -1,3 +1,4 @@
+#include "names.h"
 /*
  * A unit of its own because the moby pool and count are single-instruction macro loads of plain
  * scalars here (MACRO_ADDR), while L16_00403900.c declares the pool as an array. A fixed scalar
@@ -22,10 +23,10 @@ typedef struct GroupPart {
     void *bound;
 } GroupPart;
 
-extern u16 *D_L16_001FB660[];
-extern u8 *D_L16_001B2B1C MACRO_ADDR;
-extern s32 D_L16_001B2B38 MACRO_ADDR;
-extern u8 D_001395B8[];
+extern u16 *g_group_l16_id_lists[];
+extern u8 *g_moby_instance_table MACRO_ADDR;
+extern s32 g_group_id_limit MACRO_ADDR;
+extern u8 g_game_flag_table[];
 
 #define GROUP(off) (*(s32 *)(state + (off)))
 #define GROUP_HAS_ENTRY(entry, off)                                       \
@@ -45,7 +46,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
 
     if (enable) {
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x184)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x184)];
 
             while (GROUP_HAS_ENTRY(entry, 0x184)) {
                 part = GROUP_MOBY(*entry++);
@@ -60,7 +61,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
             }
         }
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x17c)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x17c)];
 
             while (GROUP_HAS_ENTRY(entry, 0x17c)) {
                 part = GROUP_MOBY(*entry);
@@ -71,7 +72,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
             }
         }
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x180)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x180)];
 
             while (GROUP_HAS_ENTRY(entry, 0x180)) {
                 part = GROUP_MOBY(*entry);
@@ -100,7 +101,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
         }
     } else {
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x184)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x184)];
 
             while (GROUP_HAS_ENTRY(entry, 0x184)) {
                 part = GROUP_MOBY(*entry++);
@@ -110,7 +111,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
             }
         }
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x17c)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x17c)];
 
             while (GROUP_HAS_ENTRY(entry, 0x17c)) {
                 part = GROUP_MOBY(*entry);
@@ -121,7 +122,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
             }
         }
         {
-            u16 *entry = D_L16_001FB660[GROUP(0x180)];
+            u16 *entry = g_group_l16_id_lists[GROUP(0x180)];
 
             while (GROUP_HAS_ENTRY(entry, 0x180)) {
                 part = GROUP_MOBY(*entry);
@@ -131,7 +132,7 @@ void SetMobyAndGroupsEnabled(u8 *self, s32 enable)
                 entry++;
             }
         }
-        if (!D_001395B8[0x83]) {
+        if (!g_game_flag_table[0x83]) {
             moby->bound = 0;
             moby->flags = (moby->flags | 0x41) & 0xefff;
             if (CHILD(0x1f0)) {

@@ -13,23 +13,23 @@ extern void moby_set_state(void *, int, int), func_PAL_002A7E68(void *, int, int
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float), math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern int moby_dispatch_action_by_kind(void *, void *), func_PAL_002AF6C0(void *, float);
 extern void matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void part_spawn_effect_burst(void *, int, int, int, int, int, int, void *);
 extern int PlayMobySound(int, int, void *);
-extern void snd_stop_voice(int), func_PAL_002A7650(void *, int, int), moby_mark_spawned(void *);
+extern void snd_stop_voice(int), SetDeathBits_pal(void *, int, int), moby_mark_spawned(void *);
 /* Integer and FP arguments retain their independent EE register-bank order. */
 extern f32 math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
 extern void moby_compute_local_point(void *, void *, float, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 extern char *func_PAL_L03_003D5A98(void *, void *, void *, int);
-extern u8 g_hero_position[], D_L03_00188660[];
-extern u8 D_L03_001A8F20[] __attribute__((sda));
-extern float D_L03_001B1BCC __attribute__((sda));
-extern float D_L03_001B1BD0 __attribute__((sda));
-extern float D_L03_001B1BD4 __attribute__((sda));
+extern u8 g_hero_position[], g_sound_l03_slot_table[];
+extern u8 g_effect_descriptor_default[] __attribute__((sda));
+extern float g_rivet_bot_helper_arg __attribute__((sda));
+extern float g_rivet_bot_second_value __attribute__((sda));
+extern float g_rivet_bot_shot_speed __attribute__((sda));
 /* The transform reads one complete vector; the file uses -G16 for its address. */
-extern u8 D_L03_001B1BE0[16] __attribute__((sda));
+extern u8 g_rivet_bot_spawn_offset[16] __attribute__((sda));
 
 /* Advance the path actor's behaviour, movement, animation and attack effects. */
 void func_PAL_L03_00422624(u8 *entity)
@@ -86,21 +86,21 @@ void func_PAL_L03_00422624(u8 *entity)
     case 3:
         flags = moby_dispatch_action_by_kind(entity, state + 0x50);
         if ((flags & 1) || (entity[0x43] == 8 && func_PAL_002AF6C0(entity, 8.0f))) {
-            matrix_mul_vec3(spawnPosition, D_L03_001B1BE0, entity + 0xC0);
+            matrix_mul_vec3(spawnPosition, g_rivet_bot_spawn_offset, entity + 0xC0);
             FastVecAdd(spawnPosition, spawnPosition, entity + 0x10);
-            func_PAL_002AD288(entity, spawnPosition, -1, 0.5f, 13.0f);
+            part_spawn_explosion_with_sparks_pal(entity, spawnPosition, -1, 0.5f, 13.0f);
             FastVecSub(targetPosition, entity + 0x10, g_hero_position);
             targetPosition[2] = 0;
             vec_scale_to_length(targetPosition, targetPosition, 0.120000005f);
-            part_spawn_effect_burst(entity, 0xA0D, 5, 0, 0, 0, 0, D_L03_001A8F20);
+            part_spawn_effect_burst(entity, 0xA0D, 5, 0, 0, 0, 0, g_effect_descriptor_default);
             PlayMobySound(6, 0, entity);
             if (*(int *)(state + 0x350) != -1) {
-                u8 *sound = D_L03_00188660 + *(int *)(state + 0x350) * 0x70;
+                u8 *sound = g_sound_l03_slot_table + *(int *)(state + 0x350) * 0x70;
                 if (*(u8 **)(sound + 0x88) == entity && sound[0x74])
                     snd_stop_voice(*(int *)(state + 0x350));
             }
             *(int *)(state + 0x350) = -1;
-            func_PAL_002A7650(entity, 0, 3);
+            SetDeathBits_pal(entity, 0, 3);
             moby_mark_spawned(entity);
             return;
         }
@@ -162,8 +162,8 @@ void func_PAL_L03_00422624(u8 *entity)
         }
         func_PAL_L03_00423128(entity);
         {
-            float first = mat_fast_helper_a(*(float *)(state + 0x33C), D_L03_001B1BCC);
-            float second = D_L03_001B1BD0;
+            float first = mat_fast_helper_a(*(float *)(state + 0x33C), g_rivet_bot_helper_arg);
+            float second = g_rivet_bot_second_value;
             float value;
 
             *(float *)(state + 0x280) = first;
@@ -187,7 +187,7 @@ void func_PAL_L03_00422624(u8 *entity)
 
             moby_compute_local_point(entity, target, *(float *)(state + 0x33C), spread, 0);
             FastVecSub(direction, targetPosition, spawnPosition);
-            vec_scale_to_length(direction, direction, D_L03_001B1BD4 * 0.020000001f);
+            vec_scale_to_length(direction, direction, g_rivet_bot_shot_speed * 0.020000001f);
             coll_sweep_from_object(entity, spawnPosition, 1, 0, 1, 0, 0.6660000085830688f, (float)state[0x34], 1.0f);
             func_PAL_L03_003D5A98(entity, spawnPosition, direction, state[0x34]);
             *(Quad *)effectPosition = 0;

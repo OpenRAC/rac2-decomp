@@ -17,8 +17,8 @@ extern ThrowHero g_hero_state;
 extern ThrowPad g_pad_state;
 typedef struct { char pad0[0x18]; unsigned char *moby; char pad1C[4]; float point[4]; } ThrowCollision;
 extern ThrowCollision g_collision_hit;
-extern char g_active_camera[], g_camera_eye_state[], D_001F1AF8[], g_weapon_table[];
-extern unsigned char D_0013958A;
+extern char g_active_camera[], g_camera_eye_state[], g_throw_moby_list[], g_weapon_table[];
+extern unsigned char g_throw_weapon_index;
 typedef struct { char pad[0x54]; float speed; char tail[0x88]; } ThrowClass;
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
@@ -171,7 +171,7 @@ void UpdateProjectileThrower(unsigned char *self)
                 if(self[0x43]!=3) anim_start_blended(self,3,0,2);
                 self[0x20]=3;
                 {
-                    ThrowClass *weapon = &((ThrowClass *)g_weapon_table)[D_0013958A];
+                    ThrowClass *weapon = &((ThrowClass *)g_weapon_table)[g_throw_weapon_index];
                     THROW_FLOAT(data,0x58) = 1.0f / weapon->speed;
                 }
             } else PlayMobySound(4,0,self);
@@ -184,7 +184,7 @@ void UpdateProjectileThrower(unsigned char *self)
         if(self[0x42]==self[0x43] && self[0x42]==3 && moby_get_anim_value(self)>=2.0f) {
             if(THROW_PTR(data,0x50)) {
                 thrown_item_launch(&launch,THROW_PTR(data,0x50),THROW_PTR(THROW_PTR(data,0x50),0x68));
-                AddMobyToIndexList(THROW_PTR(data,0x50),D_001F1AF8,0x3F);
+                AddMobyToIndexList(THROW_PTR(data,0x50),g_throw_moby_list,0x3F);
                 THROW_PTR(data,0x50)=0;
                 THROW_INT(data,0x54)=10;
             }

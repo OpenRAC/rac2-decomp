@@ -29,19 +29,19 @@ extern float math_ease_out_quad(float);
 extern float FastAddRotations(float, float);
 extern void draw_world_quad(void *, void *, int);
 extern RenderVec g_camera_l00_position;
-extern int D_L00_001B0D8C __attribute__((sda));
-extern int D_L00_001B0D90 __attribute__((sda));
-extern int D_L00_001B0D94 __attribute__((sda));
-extern int D_L00_001B0D98 __attribute__((sda));
-extern int D_L00_001B0D9C __attribute__((sda));
-extern int D_L00_001B0DA0 __attribute__((sda));
-extern unsigned int D_L00_001B0DA4 __attribute__((sda));
-extern float D_L00_001B0C94 __attribute__((sda));
+extern int g_ring_effect_flag_bits_a __attribute__((sda));
+extern int g_ring_effect_flag_bits_b __attribute__((sda));
+extern int g_ring_effect_flag_bits_c __attribute__((sda));
+extern int g_ring_effect_flag_bits_d __attribute__((sda));
+extern int g_ring_effect_flag_bits_e __attribute__((sda));
+extern int g_ring_effect_texture_id __attribute__((sda));
+extern unsigned int g_ring_l00_effect_color __attribute__((sda));
+extern float g_ring_effect_duration __attribute__((sda));
 /* 48 quads of a flat ring of 98 vertices: per corner a vertex index and an
    index into the angle table, which holds an angle and its step. */
-extern short D_L00_0029F8E0[][4][2];
-extern RenderVec D_L00_0029F2E0[];
-extern float D_L00_00254650[][2];
+extern short g_ring_effect_face_indices[][4][2];
+extern RenderVec g_ring_effect_vertices[];
+extern float g_ring_effect_angles[][2];
 
 /* Draws the object's ring facing the camera (D_L00_001B8DC0), scaled by its
    state's size, with each corner's UV taken from its screen position and
@@ -61,13 +61,13 @@ void gfx_draw_ring_effect(char *object)
     state = *(char **)(object + 0x68);
     up.word = 0;
     up.v[2] = 1.0f;
-    packet.tag[1] = GetEffectTextureDescriptor(D_L00_001B0DA0);
+    packet.tag[1] = GetEffectTextureDescriptor(g_ring_effect_texture_id);
     packet.tag[2] = 0xFF9000000260LL;
-    flags = (long long)D_L00_001B0D8C;
-    flags |= (long long)D_L00_001B0D90 << 2;
-    flags |= (long long)D_L00_001B0D94 << 4;
-    flags |= (long long)D_L00_001B0D98 << 6;
-    flags |= (long long)D_L00_001B0D9C << 32;
+    flags = (long long)g_ring_effect_flag_bits_a;
+    flags |= (long long)g_ring_effect_flag_bits_b << 2;
+    flags |= (long long)g_ring_effect_flag_bits_c << 4;
+    flags |= (long long)g_ring_effect_flag_bits_d << 6;
+    flags |= (long long)g_ring_effect_flag_bits_e << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
     FastVecSub(&matrix[0], &g_camera_l00_position, object + 0x10);
@@ -79,25 +79,25 @@ void gfx_draw_ring_effect(char *object)
     matrix[3].y = *(float *)(object + 0x14);
     matrix[3].z = *(float *)(object + 0x18);
     matrix[3].w = 1.0f;
-    packet.color[3] = D_L00_001B0DA4;
-    packet.color[2] = D_L00_001B0DA4;
-    packet.color[1] = D_L00_001B0DA4;
-    packet.color[0] = D_L00_001B0DA4;
+    packet.color[3] = g_ring_l00_effect_color;
+    packet.color[2] = g_ring_l00_effect_color;
+    packet.color[1] = g_ring_l00_effect_color;
+    packet.color[0] = g_ring_l00_effect_color;
     uv = &packet.uv[0][0];
     for (face = 0; face < 48; face++) {
         v = &packet.uv[0][1];
         u = uv;
         for (corner = 0; corner < 4; corner++) {
-            vtx = D_L00_0029F8E0[face][corner][0];
-            index = D_L00_0029F8E0[face][corner][1];
-            FastVecScale(&packet.vertex[corner], &D_L00_0029F2E0[vtx], *(float *)(state + 0x64) * 2.0f);
+            vtx = g_ring_effect_face_indices[face][corner][0];
+            index = g_ring_effect_face_indices[face][corner][1];
+            FastVecScale(&packet.vertex[corner], &g_ring_effect_vertices[vtx], *(float *)(state + 0x64) * 2.0f);
             transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
             gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
-            c = math_fast_sin_or_cos_a(D_L00_00254650[index][0]);
-            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x64) / D_L00_001B0C94) * 0.0125f);
+            c = math_fast_sin_or_cos_a(g_ring_effect_angles[index][0]);
+            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x64) / g_ring_effect_duration) * 0.0125f);
             *u += delta;
-            s = math_fast_sin_or_cos_b(D_L00_00254650[index][0]);
-            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x64) / D_L00_001B0C94) * 0.0125f);
+            s = math_fast_sin_or_cos_b(g_ring_effect_angles[index][0]);
+            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x64) / g_ring_effect_duration) * 0.0125f);
             delta = -s;
             delta *= scale;
             *v += delta;
@@ -111,5 +111,5 @@ void gfx_draw_ring_effect(char *object)
         draw_world_quad(&packet, 0, 0);
     }
     for (face = 0; face < 98; face++)
-        D_L00_00254650[face][0] = FastAddRotations(D_L00_00254650[face][0], D_L00_00254650[face][1]);
+        g_ring_effect_angles[face][0] = FastAddRotations(g_ring_effect_angles[face][0], g_ring_effect_angles[face][1]);
 }

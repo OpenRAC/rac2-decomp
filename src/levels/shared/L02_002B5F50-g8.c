@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern unsigned int D_L02_001A8F00;
+extern unsigned int g_arena_state_words;
 
 /* Report whether the resident flag word is still clear. */
 int level_is_resident_flag_clear(void) {
-    return D_L02_001A8F00 == 0;
+    return g_arena_state_words == 0;
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -26,13 +26,13 @@ typedef struct Ent {
 
 extern unsigned int g_entity_group_lists[];
 extern char *g_moby_l02_pool;
-extern int D_L02_001B35B8 __attribute__((sda));
-extern int D_L02_001A9048;
-extern float D_L02_001AEF50 __attribute__((sda));
-extern float D_L02_001AEE50[2] __attribute__((sda));
-extern float D_L02_001AEE48[2] __attribute__((sda));
-extern float D_L02_001AEE40[2] __attribute__((sda));
-extern int D_L02_001AEE70 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
+extern int g_destroyed_target_count;
+extern float g_target_spin_rate __attribute__((sda));
+extern float g_explode_piece_params_a[2] __attribute__((sda));
+extern float g_explode_piece_params_b[2] __attribute__((sda));
+extern float g_explode_piece_params_c[2] __attribute__((sda));
+extern int g_explode_color __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float x);
 extern float FastAddRotations(float a, float b);
 extern float fast_subtract_rotations(float a, float b);
@@ -60,7 +60,7 @@ void target_update_moving_on_path(unsigned char *moby) {
     float range = (float)*path;
     float step = *(float *)(vars + 0x14);
     int seg = *(short *)(vars + 0x70);
-    float rate = D_L02_001AEF50 * 0.00029088825f;
+    float rate = g_target_spin_rate * 0.00029088825f;
     unsigned short *q;
     unsigned char *target;
     unsigned char *targetVars;
@@ -68,7 +68,7 @@ void target_update_moving_on_path(unsigned char *moby) {
     float h;
 
     q = (unsigned short *)g_entity_group_lists[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L02_001B35B8 && q != 0 &&
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_group_max_index && q != 0 &&
            ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[moby[0x21]])) {
         target = (unsigned char *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
         if (target == 0)
@@ -95,9 +95,9 @@ void target_update_moving_on_path(unsigned char *moby) {
                 ((Ent *)target)->f31 = 0;
                 ((Ent *)target)->f34 |= 1;
                 ((Ent *)target)->f98 = 0;
-                D_L02_001A9048++;
-                part_explode_object_into_pieces(target, D_L02_001AEE50, D_L02_001AEE48, D_L02_001AEE40, 0x3F, 2,
-                                  D_L02_001AEE70, 0, 0xFFFF, 0xFF, 0);
+                g_destroyed_target_count++;
+                part_explode_object_into_pieces(target, g_explode_piece_params_a, g_explode_piece_params_b, g_explode_piece_params_c, 0x3F, 2,
+                                  g_explode_color, 0, 0xFFFF, 0xFF, 0);
                 dir.q = 0;
                 dir.f[2] = 0.05000000447f;
                 moby_compute_local_point((char *)target, pos, 0.0f, 0.0f, 0.0f);

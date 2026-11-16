@@ -6,16 +6,16 @@ extern unsigned char g_pad_state[];
 #define H ((Hero *)D_00189E20)
 #define PAD ((Hero *)D_00138180)
 
-extern u8 D_00139581[];
-extern u8 D_0013958D;
-extern int D_L00_001A8F00;
-extern int D_L00_001B2BE4;
-extern int D_L00_001B2BE8;
-extern float D_L00_001B0BF0[4] __attribute__((sda));
-extern u16 D_L00_001B0C00 __attribute__((sda));
-extern u16 D_L00_001B0C04 __attribute__((sda));
-extern u16 D_L00_001B0C08 __attribute__((sda));
-extern int D_L00_001B0C0C __attribute__((sda));
+extern u8 g_hoverbomb_weapon_index[];
+extern u8 g_bouncer_weapon_index;
+extern int g_game_l00_mode;
+extern int g_bouncer_timer;
+extern int g_tetrabomb_fire_held;
+extern float g_tetrabomb_gun_origin_offset[4] __attribute__((sda));
+extern u16 g_tetrabomb_gun_delay_first __attribute__((sda));
+extern u16 g_tetrabomb_gun_delay_next __attribute__((sda));
+extern u16 g_tetrabomb_gun_repeat __attribute__((sda));
+extern int g_spread_shot_count __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
 extern void moby_init_private_data(char *);
@@ -44,7 +44,7 @@ extern int coll_trace_projectile_to_impact(float, void *, void *, void *, void *
 extern void part_spawn_muzzle_spark_burst(void *, void *, void *);
 extern int bouncer_spawn_debris(int, int, int);
 struct Rac2Native_5f824a0e369ccf7b_src_record;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_0029F210;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_bouncer_sound_record;
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void slot_reset_active(void);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
@@ -76,7 +76,7 @@ void tetrabomb_gun_update(unsigned char *object) {
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 6, 0);
     if (state->repeat != 0 && FastDecTimer(&state->repeat)) cancel_hero_item_animation();
-    matrix_mul_vec3(origin, D_L00_001B0BF0, object + 0xC0);
+    matrix_mul_vec3(origin, g_tetrabomb_gun_origin_offset, object + 0xC0);
     FastVecAdd(origin, origin, object + 0x10);
     vec_fast_helper_b(&state->timer);
     allowed = 1;
@@ -91,23 +91,23 @@ void tetrabomb_gun_update(unsigned char *object) {
     } else H->i[2381] = 40;
     phase = (u8)object[0x20];
     if (phase == 1) {
-        if (D_L00_001A8F00 != 0 || !allowed || state->timer != 0.0f || H->b[8892] != 0 ||
+        if (g_game_l00_mode != 0 || !allowed || state->timer != 0.0f || H->b[8892] != 0 ||
             (u8)object[0x42] > 1 || !(PAD->u[104] & H->u[1164]) || H->i[1168] < 23) return;
         if (get_ammo(-1)) {
             weapon_spend_ammo(-1, 1);
-            D_L00_001B2BE8 = phase;
+            g_tetrabomb_fire_held = phase;
             if (H->i[2213] != 29) anim_start_blended_with_flags(object, 2, 0, 2, 0);
             PlayMobySound(0, 0, object);
             start_equipped_item_animation();
             object[0x20] = 2;
-            state->delay = D_L00_001B0C00;
-            state->repeat = D_L00_001B0C08;
+            state->delay = g_tetrabomb_gun_delay_first;
+            state->repeat = g_tetrabomb_gun_repeat;
             state->index = 0;
-        } else if ((PAD->u[105] & H->u[1164]) || D_L00_001B2BE8 == 1) {
+        } else if ((PAD->u[105] & H->u[1164]) || g_tetrabomb_fire_held == 1) {
             PlayMobySound(1, 0, object);
-            D_L00_001B2BE8 = 0;
+            g_tetrabomb_fire_held = 0;
         }
-        entry = g_weapon_l00_table + D_00139581[0];
+        entry = g_weapon_l00_table + g_hoverbomb_weapon_index[0];
         state->timer = 1.0f / entry->rate;
     } else if (phase == 2) {
         if (!FastDecTimer(&state->delay)) return;
@@ -115,11 +115,11 @@ void tetrabomb_gun_update(unsigned char *object) {
         part_spawn_linked_effect_with_sparks(object, origin, destination, state->index);
         index = state->index + 1;
         state->index = index;
-        if (index >= D_L00_001B0C0C) object[0x20] = 3;
-        else state->delay = D_L00_001B0C04;
+        if (index >= g_spread_shot_count) object[0x20] = 3;
+        else state->delay = g_tetrabomb_gun_delay_next;
     } else {
         any = 0;
-        count = D_L00_001B0C0C;
+        count = g_spread_shot_count;
         for (i = 0; i < count; i++) {
             list = state->list + i;
             member = *list;

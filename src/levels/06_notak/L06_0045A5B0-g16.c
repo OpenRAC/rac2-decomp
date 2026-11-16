@@ -10,15 +10,15 @@ typedef struct { Vector pos, v30, v40, v50; void *obj; int kind; } Hit;
 extern char g_hero_state[];
 extern char g_hero_position[];
 extern u8 *g_hero_moby __attribute__((nosda));
-extern s16 D_0018A16C __attribute__((nosda));
-extern int D_L06_001B2348[] __attribute__((sda));
-extern int D_L06_001B2FB8[] __attribute__((sda));
-extern u8 D_L06_001BFCA0[];
-extern char D_L06_001B1A68[], D_L06_001B1AA0[];
-extern u8 *D_L06_001B281C __attribute__((sda));
-extern int D_L06_001B2FB0 __attribute__((sda));
-extern u8 D_L06_001B1970[9] __attribute__((sda));
-extern u8 D_L06_001B1980[9] __attribute__((sda));
+extern s16 g_ray_hit_flag __attribute__((nosda));
+extern int g_game_l06_frame_counter[] __attribute__((sda));
+extern int g_ripple_l06_disturb_y[] __attribute__((sda));
+extern u8 g_trace_start_pos[];
+extern char g_str_actor_debug_a[], g_str_actor_debug_b[];
+extern u8 *g_moby_l06_table __attribute__((sda));
+extern int g_ripple_l06_disturb_x __attribute__((sda));
+extern u8 g_next_state_table[9] __attribute__((sda));
+extern u8 g_next_anim_table[9] __attribute__((sda));
 extern void STUB_printf(const char *, ...);
 extern int coll_test_point(void *, int, void *, float);
 extern int GetCollHitMaterial(void);
@@ -89,7 +89,7 @@ void UpdateMoby4070(u8 *self) {
         part_update_attached_scale(self, 0, vars + 0x140, 2.20000005f);
         if (B(self, 0x20) == 0) {
             if (spawn_record_resolve_links(self, vars) != 0) {
-                STUB_printf(D_L06_001B1A68, H(self, 0xB2));
+                STUB_printf(g_str_actor_debug_a, H(self, 0xB2));
                 moby_mark_spawned(self);
                 return;
             }
@@ -132,8 +132,8 @@ void UpdateMoby4070(u8 *self) {
         B(self, 0xBC) = new_mode;
         if (old_mode != (u8)new_mode) {
             table_idx = (u8)new_mode + old_mode * 3;
-            next_state = D_L06_001B1970[table_idx];
-            next_anim = D_L06_001B1980[table_idx];
+            next_state = g_next_state_table[table_idx];
+            next_anim = g_next_anim_table[table_idx];
         }
         moby_transform_joint_to_world(self, 0, vec_head.f);
         if (coll_test_point(vec_head.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
@@ -152,19 +152,19 @@ void UpdateMoby4070(u8 *self) {
                 float_a *= 2.0f;
             }
             self_pos_a = self + 0x10;
-            if (vec_distance_xy(self_pos_a, D_L06_001BFCA0) > 0.5f) {
-                float_b = vec_distance_xy(self_pos_a, D_L06_001BFCA0) * 2.0f;
+            if (vec_distance_xy(self_pos_a, g_trace_start_pos) > 0.5f) {
+                float_b = vec_distance_xy(self_pos_a, g_trace_start_pos) * 2.0f;
             } else {
                 float_b = 1.0f;
             }
-            if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && math_random_int_below(2) == 0) {
-                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), float_b, float_a);
+            if (g_game_l06_frame_counter[0] % 45 == H(self, 0xB2) && math_random_int_below(2) == 0) {
+                RippleDisturb(g_ripple_l06_disturb_x, g_ripple_l06_disturb_y[0], 1, F(self, 0x10), F(self, 0x14), float_b, float_a);
             }
-            if (D_L06_001B2348[0] % ((func_001163B0() & 7) + 0x14) == 0) {
+            if (g_game_l06_frame_counter[0] % ((func_001163B0() & 7) + 0x14) == 0) {
                 float_c = math_random_float_range(1.5f, 2.4000001f);
                 vec_head.f[0] += math_random_float_range(-0.150000006f, 0.150000006f);
                 vec_head.f[1] += math_random_float_range(-0.150000006f, 0.150000006f);
-                vec_head.f[2] = coll_get_ground_height_at_position(D_L06_001BFCA0, NULL);
+                vec_head.f[2] = coll_get_ground_height_at_position(g_trace_start_pos, NULL);
                 part_spawn_drifting(vec_head.f, NULL, -1, float_c, 5250.0f);
             }
         }
@@ -172,7 +172,7 @@ void UpdateMoby4070(u8 *self) {
             *(Quad *)g_hero_position = *(Quad *)(self + 0x10);
         }
         cur_index = W(vars, 0x108);
-        if (cur_index != -1 && B(*(u8 **)(D_L06_001B281C + (cur_index << 8) + 0x68), 0x14) != 0) {
+        if (cur_index != -1 && B(*(u8 **)(g_moby_l06_table + (cur_index << 8) + 0x68), 0x14) != 0) {
             if (B(self, 0x43) != 0xD) {
                 anim_start_blended(self, 0xD, 0, 0xA);
             }
@@ -180,11 +180,11 @@ void UpdateMoby4070(u8 *self) {
         }
         switch (B(self, 0x20)) {
         case 0:
-            STUB_printf(D_L06_001B1AA0);
+            STUB_printf(g_str_actor_debug_b);
             break;
         case 20:
             cur_index = W(vars, 0x108);
-            if (cur_index != -1 && B(*(u8 **)(D_L06_001B281C + (cur_index << 8) + 0x68), 0x14) == 0) {
+            if (cur_index != -1 && B(*(u8 **)(g_moby_l06_table + (cur_index << 8) + 0x68), 0x14) == 0) {
                 B(self, 0x20) = 0x15;
             }
             break;
@@ -304,7 +304,7 @@ void UpdateMoby4070(u8 *self) {
             }
             F(vars, 0x128) = hit.pos.f[2] - 0.25f;
             actor_apply_fall_move(self, vars, 0.010555556f, 0.0f, 0.633333385f);
-            if (ray_hit == 0 || D_0018A16C == 0) {
+            if (ray_hit == 0 || g_ray_hit_flag == 0) {
                 if (B(self, 0x43) != 1) {
                     anim_start_blended(self, 1, 0, 0xA);
                 }

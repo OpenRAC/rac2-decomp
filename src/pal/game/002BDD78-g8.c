@@ -10,21 +10,21 @@ extern int moby_forward_two_values_and_amount(int,int,float);
 extern void FastVecAdd(void *,void *,void *);
 extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
-extern float D_001B168C __attribute__((sda));
+extern float g_frame_time_scale __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern char g_camera_eye_state[];
 extern char *part_spawn_falling_drop(void *,void *,int,int,float,int,int);
 typedef struct { float v[4]; } GravityTable;
-extern GravityTable D_001AA350;
+extern GravityTable g_falling_drop_gravity;
 
-void func_PAL_002BDD78(char *p)
+void part_update_falling_drop_pal(char *p)
 {
  char *q=p+32,*pos;
  struct { Quad saved; GravityTable gravity; } local;
  float f,d,size;
  int color,alpha,other,kind;
- local.gravity=D_001AA350;
- if(*(short *)(q+26)==3 && D_001B168C>0.95f) FastDecTimer(p+10);
+ local.gravity=g_falling_drop_gravity;
+ if(*(short *)(q+26)==3 && g_frame_time_scale>0.95f) FastDecTimer(p+10);
  if(FastDecTimer(p+10)) {part_kill(p);return;}
  pos=p+16;
  f=IntToFloat(*(short *)(p+10));

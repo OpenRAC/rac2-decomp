@@ -3,10 +3,10 @@
 
 /* Own unit: -G8 for the small-data scale factors, -fno-sched-spec for the loop. */
 
-extern char D_L00_00254960[];
-extern char D_L00_001B2C00[] __attribute__((section(".sdata")));
-extern float D_L00_001B0CB0 __attribute__((sda));
-extern float D_L00_001B0CAC __attribute__((sda));
+extern char g_spider_ground_probe_offsets[];
+extern char g_global_object_vector[] __attribute__((section(".sdata")));
+extern float g_spider_bot_shadow_size __attribute__((sda));
+extern float g_spider_bot_probe_distance __attribute__((sda));
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -23,7 +23,7 @@ void spider_bot_build_ground_probe_points(char *object)
     char vectors[4][16] __attribute__((aligned(16)));
     char temp[16] __attribute__((aligned(16)));
     char sum[16] __attribute__((aligned(16)));
-    char *base = D_L00_00254960;
+    char *base = g_spider_ground_probe_offsets;
     char *out;
     char *pos;
     int i;
@@ -41,9 +41,9 @@ void spider_bot_build_ground_probe_points(char *object)
     for (i = 0; i < 8; i++) {
         if (i < 4)
             FastVecAdd(out, vectors[i >> 1], vectors[2 + (i & 1)]);
-        vec_scale_to_length(out, out, D_L00_001B0CB0);
+        vec_scale_to_length(out, out, g_spider_bot_shadow_size);
         FastVecAdd(out, out, pos);
-        vec_scale_to_length(temp, D_L00_001B2C00, -D_L00_001B0CAC);
+        vec_scale_to_length(temp, g_global_object_vector, -g_spider_bot_probe_distance);
         FastVecAdd(out, out, temp);
         out += 16;
         FastVecAdd(sum, temp, pos);

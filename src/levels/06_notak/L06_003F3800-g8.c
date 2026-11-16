@@ -8,11 +8,11 @@ extern int math_random_int_range(int, int);
 extern int FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
 extern int flock_count_members_find_free(void *, void *);
 extern char *g_path_list[];
-extern char *D_L06_001B290C __attribute__((sda));
-extern int D_L06_001B2348 __attribute__((sda));
+extern char *g_region_table __attribute__((sda));
+extern int g_game_l06_frame_counter __attribute__((sda));
 extern Vector g_hero_position;
-extern Vector D_L06_001B9840;
-extern char D_L06_001A8F20[] MACRO_ADDR;
+extern Vector g_hero_l06_position;
+extern char g_effect_vector[] MACRO_ADDR;
 extern float fast_vec_dist(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -63,7 +63,7 @@ void SpawnerMobyUpdate(char *moby)
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0: {
         char *child;
-        if (D_L06_001B2348) {
+        if (g_game_l06_frame_counter) {
             child = 0;
             while (!GetFirstMobyInGroup(&child, *(int *)(state + 0x84), 0, 0))
                 moby_mark_spawned(child);
@@ -114,7 +114,7 @@ void SpawnerMobyUpdate(char *moby)
             for (i = 0; i < 4; i++) {
                 int index = ((int *)(state + 0x90))[i];
                 if (index != -1) {
-                    char *candidate = D_L06_001B290C + index * 0x80;
+                    char *candidate = g_region_table + index * 0x80;
                     float current = fast_vec_dist(g_hero_position, candidate + 0x30);
                     if (current < nearest) {
                         region = candidate;
@@ -142,7 +142,7 @@ void SpawnerMobyUpdate(char *moby)
             for (i = 0; i < 4; i++) {
                 int k = (i + first) % 4;
                 if (((SpawnerSlots *)state)->regions[k] != -1) {
-                    region = D_L06_001B290C + ((SpawnerSlots *)state)->regions[k] * 0x80;
+                    region = g_region_table + ((SpawnerSlots *)state)->regions[k] * 0x80;
                     break;
                 }
             }
@@ -189,15 +189,15 @@ void SpawnerMobyUpdate(char *moby)
                       0x810001);
         snd_play_from_class_bank(1, 0, moby, 0x75D);
         part_spawn_flying_fragment(moby, 0x6C5, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
-                          D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
+                          g_effect_vector, g_effect_vector, g_effect_vector);
         part_spawn_flying_fragment(moby, 0x6C6, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
-                          D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
+                          g_effect_vector, g_effect_vector, g_effect_vector);
         part_spawn_flying_fragment(moby, 0x6C7, moby + 0x10, moby + 0xF0, 0, 0, 0.0f,
-                          D_L06_001A8F20, D_L06_001A8F20, D_L06_001A8F20);
+                          g_effect_vector, g_effect_vector, g_effect_vector);
         moby_mark_spawned(moby);
         return;
     }
-    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L06_001B9840) < 24.0f) {
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, g_hero_l06_position) < 24.0f) {
         moby_update_ground_check(moby);
         *(unsigned char *)(moby + 0x6F) = 0x16;
     }

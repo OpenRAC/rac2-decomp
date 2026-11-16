@@ -9,7 +9,7 @@ extern void transform_vector(void *, void *, void *);
 extern int coll_process_hit(void *, int, void *, int, float);
 extern void *func_001153D4(void *, const void *, unsigned int);
 extern void part_start_effect_default_table(void *, void *, int, void *, float);
-extern char *D_L06_001C3D00[];
+extern char *g_candidate_list[];
 
 /* Hits the nearby objects that touch a flat rectangle around this object. */
 void moby_hit_inside_rectangle(char *object, char *params) {
@@ -41,7 +41,7 @@ void moby_hit_inside_rectangle(char *object, char *params) {
     {
         char *candidates[count];
 
-        func_001153D4(candidates, D_L06_001C3D00, count * 4);
+        func_001153D4(candidates, g_candidate_list, count * 4);
         for (i = 0; i < count; i++) {
             candidate = candidates[i];
             if (!candidate || (u8)candidate[0x20] == 0xFE || (u8)candidate[0x20] == 0xFD)
@@ -65,7 +65,7 @@ void moby_hit_inside_rectangle(char *object, char *params) {
             {
                 int j;
                 for (j = 0; j < n; j++) {
-                    if (D_L06_001C3D00[j] == candidate)
+                    if (g_candidate_list[j] == candidate)
                         part_start_effect_default_table(candidate, object, 0x10001, point, *(float *)(params + 0x50));
                 }
             }

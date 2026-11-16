@@ -15,7 +15,7 @@ typedef float f32;
 /* 0x1AEFF0 + 0x39F0 : this symbol is written through $gp (gas emits the
  * gp-relative form because the store sits in the bc1f delay slot), so the
  * file has to be compiled with -G8 and the symbol marked sda. */
-extern float D_L20_001B29E0 __attribute__((sda));
+extern float g_hero_timer_trigger_a __attribute__((sda));
 
 /* 0x1AEFF0 + 0x39F0 again, under a second name: gcc must not see the two
  * stores as one dead store, and gas expands this one to lui $at / swc1. */
@@ -26,7 +26,7 @@ void moby_set_scaled_speed_capped(char *moby) {
     char *state = *(char **)(moby + 0x68);
     float scaledSpeed = *(float *)(state + 0xC) * 1.2f;
 
-    D_L20_001B29E0 = scaledSpeed;
+    g_hero_timer_trigger_a = scaledSpeed;
     if (scaledSpeed > 1.0f) {
         D_L20_001B29E0_1 = 1.0f;
     }
@@ -54,12 +54,12 @@ extern char *part_spawn_blast_effect_moby(char *, char *, char *, float);
 extern void SetDeathBits(char *, s32, s32);
 extern void moby_mark_spawned(char *);
 
-extern int D_L20_001A8F00;
-extern int D_L20_001BDCF0 __attribute__((nosda));
-extern int D_L20_001B2AC8;
-extern void *D_L20_001B9FC0[];
-extern float D_L20_001AED04 __attribute__((sda));
-extern float D_L20_001AED08 __attribute__((sda));
+extern int g_hero_vehicle_mode;
+extern int g_level_l20_progress_stage __attribute__((nosda));
+extern int g_frame_l20_counter;
+extern void *g_camera_l20_position[];
+extern float g_yeedil_enemy_speed __attribute__((sda));
+extern float g_yeedil_enemy_scale __attribute__((sda));
 
 /* Runs the per-frame states of this enemy: it picks its animation by state, spreads a trail effect while it walks, and removes itself when it dies. */
 void yeedil_enemy_update(char *moby)
@@ -71,7 +71,7 @@ void yeedil_enemy_update(char *moby)
 
     state = *(char **)(moby + 0x68);
     object_life_timer_update(moby);
-    if (D_L20_001A8F00 == 2 && D_L20_001BDCF0 >= 5) {
+    if (g_hero_vehicle_mode == 2 && g_level_l20_progress_stage >= 5) {
         moby_mark_spawned(moby);
         return;
     }
@@ -85,12 +85,12 @@ void yeedil_enemy_update(char *moby)
     case 3:
         if (flag_set_first_pending(moby) != 0 && *(u8 *)(moby + 0x43) != 1)
             anim_start_blended(moby, 1, 0, 0xF);
-        if ((D_L20_001B2AC8 & 0xF) == (((int)moby >> 8) & 0xF)) {
+        if ((g_frame_l20_counter & 0xF) == (((int)moby >> 8) & 0xF)) {
             moby_transform_joint_to_world(moby, 2, bufA);
             moby_transform_joint_point(moby, 2, bufB);
-            vec_scale_to_length(bufC, bufB, D_L20_001AED04 * 0.016666668f);
+            vec_scale_to_length(bufC, bufB, g_yeedil_enemy_speed * 0.016666668f);
             projectile_l09_spawn(bufA, moby, bufC, 1, 1, (float)*(u8 *)(state + 0x34),
-                              D_L20_001AED08, 1.0f, 1.0f);
+                              g_yeedil_enemy_scale, 1.0f, 1.0f);
         }
         if (*(u8 *)(moby + 0x31) == 0 || *(u16 *)(moby + 0x96) >= 0xB5)
             moby_set_state(moby, 2, -1);
@@ -102,7 +102,7 @@ void yeedil_enemy_update(char *moby)
             moby_set_state(moby, 2, -1);
         break;
     case 5:
-        FastVecSub(bufA, D_L20_001B9FC0, moby + 0x10);
+        FastVecSub(bufA, g_camera_l20_position, moby + 0x10);
         vec_scale_to_length(bufA, bufA, 1.0f);
         part_spawn_blast_effect_moby(moby, moby + 0x10, bufA, 0.0f);
         SetDeathBits(moby, 0, 3);
@@ -116,33 +116,33 @@ void yeedil_enemy_update(char *moby)
     trooper_aim_at_target(moby);
 }
 
-extern char *D_L20_001FBB20[];
+extern char *g_group_l20_id_lists[];
 
-extern int D_L20_001B2FB8;
+extern int g_group_count;
 
-extern char *D_L20_001B2F9C;
+extern char *g_group_l20_member_table;
 
-extern char *D_L20_001B308C __attribute__((sda));
+extern char *g_linked_moby_table __attribute__((sda));
 
 extern void func_0032F5B0(void *, int, int);
 
 /* Wakes every object of a group that is waiting in state 1 and starts it moving, and can store a new amount for it. */
 void group_activate_waiting_members(int group, float amount) {
-    char *idList = D_L20_001FBB20[group];
+    char *idList = g_group_l20_id_lists[group];
     int groupByte = group & 0xFF;
     float amountCopy = amount;
 
     if (groupByte == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < group) {
+    if (g_group_count < group) {
         goto end;
     }
     if (idList == 0) {
         goto end;
     }
     for (;;) {
-        char *member = (char *)D_L20_001B2F9C + ((*(u16 *)idList & 0x7FFF) << 8);
+        char *member = (char *)g_group_l20_member_table + ((*(u16 *)idList & 0x7FFF) << 8);
 
         if (member == 0) {
             goto end;
@@ -158,14 +158,14 @@ void group_activate_waiting_members(int group, float amount) {
             if (0.0f < amountCopy) {
                 char *memberVars = *(char **)(member + 0x68);
 
-                *(f32 *)((char *)D_L20_001B308C + 0x38 + (*(int *)(memberVars + 0x84) << 7)) = amountCopy;
+                *(f32 *)((char *)g_linked_moby_table + 0x38 + (*(int *)(memberVars + 0x84) << 7)) = amountCopy;
             }
         }
         idList += 2;
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < group) {
+        if (g_group_count < group) {
             goto end;
         }
         if (idList == 0) {
@@ -174,7 +174,7 @@ void group_activate_waiting_members(int group, float amount) {
         if (*(s16 *)(idList - 2) >= 0) {
             continue;
         }
-        if (idList == D_L20_001FBB20[group]) {
+        if (idList == g_group_l20_id_lists[group]) {
             continue;
         }
         break;
@@ -197,11 +197,11 @@ extern float IntToFloat(int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void electric_orb_draw(char *);
 
-extern int D_L20_001AEDA8 __attribute__((sda));
-extern int D_L20_001AED90 __attribute__((sda));
-extern int D_L20_001AED94;
-extern int D_L20_001AED98;
-extern int D_L20_001AED9C;
+extern int g_electric_orb_spin_rate __attribute__((sda));
+extern int g_electric_orb_color_a __attribute__((sda));
+extern int g_electric_orb_color_b;
+extern int g_electric_orb_color_c;
+extern int g_electric_orb_color_d;
 
 /* Makes a glowing orb pulse: it spins the angle, blends two colours with a wave and fades the colour, then queues the orb to be drawn. */
 void electric_orb_update(char *moby) {
@@ -215,15 +215,15 @@ void electric_orb_update(char *moby) {
         int blendColour, mixedColour, rgbPart, alphaPart;
 
         if (*(int *)(state + 0xC) != 0) {
-            newAngle = FastAddRotations(angle, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            newAngle = FastAddRotations(angle, (f32)g_electric_orb_spin_rate * 0.0002908882452f);
             *(f32 *)(state + 0x8) = newAngle;
             wave = math_fast_sin_or_cos_b(newAngle);
-            blendColour = FastTweenColor(wave * 0.5f + 0.5f, D_L20_001AED90, D_L20_001AED94);
+            blendColour = FastTweenColor(wave * 0.5f + 0.5f, g_electric_orb_color_a, g_electric_orb_color_b);
         } else {
-            newAngle = FastAddRotations(angle, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            newAngle = FastAddRotations(angle, (f32)g_electric_orb_spin_rate * 0.0002908882452f);
             *(f32 *)(state + 0x8) = newAngle;
             wave = math_fast_sin_or_cos_b(newAngle);
-            blendColour = FastTweenColor(wave * wave * 0.5f + 0.5f, D_L20_001AED98, D_L20_001AED9C);
+            blendColour = FastTweenColor(wave * wave * 0.5f + 0.5f, g_electric_orb_color_c, g_electric_orb_color_d);
         }
         mixedColour = FastTweenColor(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), blendColour);
         rgbPart = mixedColour & 0xFFFFFF;
@@ -248,10 +248,10 @@ extern int IsPointInCuboid(void *, int);
 extern void moby_set_group_enabled(int, int);
 
 extern char g_hero_state[] __attribute__((nosda));
-extern u8 D_0019B2E8[] __attribute__((nosda));
-extern u8 D_L20_001B2DE0[] __attribute__((nosda));
-extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021E340;
-extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
+extern u8 g_moby_group_flags[] __attribute__((nosda));
+extern u8 g_collectable_group_flags[] __attribute__((nosda));
+extern struct { u8 header[0x464]; u8 collected[0]; } g_collected_l20_flags;
+extern struct { u8 header[0x464]; u8 collected[0]; } g_collected_l20_flags_2;
 extern s32 g_current_map_index __attribute__((sda));
 
 /* Once its conditions are met, marks this collectable as picked up in the level save tables and then removes it or moves it to its next state. */
@@ -284,14 +284,14 @@ void collectable_update(char *moby) {
     if (nextState == 0xFF) {
         u8 group;
 
-        D_L20_0021E340.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
+        g_collected_l20_flags.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
         if (*(u8 *)(moby + 0xB0) == 0xFF) {
             goto record;
         }
         group = *(u8 *)(moby + 0xB0);
-        if (!(D_L20_001B2DE0[group] & 0x80) && (D_0019B2E8[group + (g_current_map_index << 4)] & 0x80)) {
+        if (!(g_collectable_group_flags[group] & 0x80) && (g_moby_group_flags[group + (g_current_map_index << 4)] & 0x80)) {
         record:
-            D_L20_0021EFB0.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
+            g_collected_l20_flags_2.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
         }
         moby_mark_spawned(moby);
         return;

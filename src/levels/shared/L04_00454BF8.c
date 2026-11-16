@@ -71,11 +71,11 @@ extern void FastVecSub(void *, void *, void *);
 extern void *part_spawn_effect_record(void *, int, float);
 extern int FastTweenColor(int, int, float);
 
-extern s32 D_L04_001A9018 __attribute__((sda));
-extern u16 **D_L04_001A9014 __attribute__((sda));
-extern u8 *D_L04_001B2B54 __attribute__((sda));
-extern Mtx_L04_00454BF8 *D_L04_001B2B5C __attribute__((sda));
-extern char D_L04_001B9680[];
+extern s32 g_light_group_count __attribute__((sda));
+extern u16 **g_light_id_lists __attribute__((sda));
+extern u8 *g_light_record_table __attribute__((sda));
+extern Mtx_L04_00454BF8 *g_light_matrix_table __attribute__((sda));
+extern char g_tether_zero_vec[];
 
 /* A light controller. State 0 checks its id list (released when the group is out of range or has
    no list), converts its record (bands scaled, colours packed, fade angles to radians, the three
@@ -129,7 +129,7 @@ void light_controller_update(u8 *self)
     switch (self[0x20]) {
     case 0:
         group = st->group;
-        if (group >= D_L04_001A9018 || group == -1 || D_L04_001A9014[group] == 0) {
+        if (group >= g_light_group_count || group == -1 || g_light_id_lists[group] == 0) {
             moby_mark_spawned(self);
             return;
         }
@@ -172,16 +172,16 @@ void light_controller_update(u8 *self)
         moby_set_state(self, 1, -1);
     case 1:
         st->time += st->step;
-        if (st->trigger != -1 && IsPointInCuboid(D_L04_001B9680, st->trigger) == 0)
+        if (st->trigger != -1 && IsPointInCuboid(g_tether_zero_vec, st->trigger) == 0)
             return;
-        for (p = D_L04_001A9014[st->group];
-             p != 0 && ((s16)p[-1] >= 0 || p == D_L04_001A9014[st->group]); p++) {
-            e = &D_L04_001B2B5C[*p & 0x7FFF];
+        for (p = g_light_id_lists[st->group];
+             p != 0 && ((s16)p[-1] >= 0 || p == g_light_id_lists[st->group]); p++) {
+            e = &g_light_matrix_table[*p & 0x7FFF];
             if (e == 0)
                 break;
-            vec_subtract_vec4(to_cam, D_L04_001B9680, e->pos);
+            vec_subtract_vec4(to_cam, g_tether_zero_vec, e->pos);
             blend = 0.0f;
-            light = D_L04_001B2B54 + ((*p & 0x7FFF) << 5);
+            light = g_light_record_table + ((*p & 0x7FFF) << 5);
             if (FastVecLength(to_cam) > 32.0f)
                 continue;
             switch (st->mode) {
@@ -251,7 +251,7 @@ void light_controller_update(u8 *self)
                 size = FastVecLength(e);
                 matrix_mul_vec3(spot, st->off2, e);
                 FastVecAdd(spot, spot, e->pos);
-                FastVecSub(pull, D_L04_001B9680, spot);
+                FastVecSub(pull, g_tether_zero_vec, spot);
                 vec_scale_to_length(pull, pull, st->reach * size);
                 FastVecAdd(spot, spot, pull);
                 part_spawn_effect_record(spot, glow, st->radius * size * 210000.0f);

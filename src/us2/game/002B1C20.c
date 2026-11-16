@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern unsigned char D_0019B278[28][4];
+extern unsigned char g_level_progress_flags[28][4];
 
 extern int func_US2_002B1C90(int index);
 
-extern int D_US2_00258CF0[21];
+extern int g_level_value_table[21];
 
 /* Sums the counts of every entry but 26, and clamps the total to 0..40. */
 int func_US2_002B1C20(void)
@@ -35,13 +36,13 @@ int func_US2_002B1C90(int index)
     int j;
 
     for (i = 0; i < 4; i++) {
-        if (D_0019B278[index][i] != 0) {
+        if (g_level_progress_flags[index][i] != 0) {
             count++;
         }
     }
     if (index == 2) {
         for (j = 0; j < 4; j++) {
-            if (D_0019B278[26][j] != 0) {
+            if (g_level_progress_flags[26][j] != 0) {
                 count++;
             }
         }
@@ -59,7 +60,7 @@ int func_US2_002B1C90(int index)
 int func_US2_002B1D18(unsigned int index)
 {
     if (index < 21) {
-        return D_US2_00258CF0[index];
+        return g_level_value_table[index];
     }
     return 0;
 }

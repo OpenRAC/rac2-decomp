@@ -22,7 +22,7 @@ typedef struct {
     u8 padBD[0x100 - 0xBD];
 } Ent;
 
-extern Ent *D_L08_001B29DC __attribute__((sda));
+extern Ent *g_moby_array __attribute__((sda));
 
 /* handle is valid and the entry's class byte is a live one */
 /* Tells whether the linked object is running (or when there is no link, says yes). */
@@ -32,7 +32,7 @@ s32 moby_l08_is_linked_running(s32 mobyIndex)
     s32 byteOffset;
 
     if (mobyIndex != -1) {
-        mobyTable = D_L08_001B29DC;
+        mobyTable = g_moby_array;
         byteOffset = mobyIndex << 8;
         return *(u8 *)((u8 *)mobyTable + byteOffset + 0x20) >= 3;
     }
@@ -47,7 +47,7 @@ s32 moby_l08_is_linked_running_2(s32 mobyIndex)
     s32 byteOffset;
 
     if (mobyIndex != -1) {
-        mobyTable = D_L08_001B29DC;
+        mobyTable = g_moby_array;
         byteOffset = mobyIndex << 8;
         return *(u8 *)((u8 *)mobyTable + byteOffset + 0x20) >= 3;
     }
@@ -62,7 +62,7 @@ s32 moby_l08_is_linked_gone(s32 mobyIndex)
     s32 gone;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         gone = 0;
         if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
         return gone;
@@ -78,7 +78,7 @@ s32 moby_l08_is_linked_gone_2(s32 mobyIndex)
     s32 gone;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         gone = 0;
         if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
         return gone;
@@ -94,7 +94,7 @@ s32 moby_l08_is_linked_gone_3(s32 mobyIndex)
     s32 gone;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         gone = 0;
         if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
         return gone;
@@ -110,7 +110,7 @@ s32 moby_l08_is_linked_gone_4(s32 mobyIndex)
     s32 gone;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         gone = 0;
         if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
         return gone;
@@ -127,7 +127,7 @@ s32 moby_l08_is_linked_running_or_gone(s32 mobyIndex)
     s32 ready;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         stateByte = linked->f20;
         ready = 0;
         if (stateByte >= 3u || linked == 0 || stateByte == 0xFE || stateByte == 0xFD) ready = 1;
@@ -145,7 +145,7 @@ s32 moby_l08_is_linked_running_or_gone_2(s32 mobyIndex)
     s32 ready;
 
     if (mobyIndex != -1) {
-        linked = D_L08_001B29DC + mobyIndex;
+        linked = g_moby_array + mobyIndex;
         stateByte = linked->f20;
         ready = 0;
         if (stateByte >= 3u || linked == 0 || stateByte == 0xFE || stateByte == 0xFD) ready = 1;

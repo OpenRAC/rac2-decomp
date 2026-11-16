@@ -3,23 +3,23 @@
 #include "common.h"
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 extern char g_hero_state[];
-extern char *D_L19_001B1EAC __attribute__((sda));
-extern float D_L19_001B1E94 __attribute__((sda));
-extern float D_L19_001B1E98 __attribute__((sda));
-extern float D_L19_001B1E9C __attribute__((sda));
-extern float D_L19_001B1EA4 __attribute__((sda));
-extern float D_L19_001B1EA8 __attribute__((sda));
-extern int D_L19_001B258C;
-extern char D_L19_001B9A40[];
+extern char *g_carried_marker_cam_slot __attribute__((sda));
+extern float g_carried_marker_radius __attribute__((sda));
+extern float g_carried_marker_override_x __attribute__((sda));
+extern float g_carried_marker_override_x_alt __attribute__((sda));
+extern float g_carried_marker_override_w __attribute__((sda));
+extern float g_carried_marker_override_z __attribute__((sda));
+extern int g_carried_marker_state;
+extern char g_hero_origin_vec[];
 extern int IsPointInCuboid(char *, int);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecAdd(float *, float *, char *);
-extern char *func_PAL_L00_002D7850(int);
+extern char *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(char *);
 extern void FastVecSub(char *, float *, char *);
 
 /* Per-frame update of the carried-object marker: arms it, tracks a linked flag, and while the hero is in state 0x31 places and sizes the marker from the grabbed object's bounds. */
-void func_PAL_L19_004281A8(char *obj) {
+void carried_marker_update_pal(char *obj) {
     float a[4];
     float b[4];
     char *hero_ptr;
@@ -28,16 +28,16 @@ void func_PAL_L19_004281A8(char *obj) {
 
     switch (FLD(obj, u8, 0x20)) {
     case 0:
-        D_L19_001B1EAC = 0;
+        g_carried_marker_cam_slot = 0;
         FLD(obj, u8, 0x20) = 1;
         FLD(obj, u8, 0x30) = 0xFF;
         return;
     case 1:
         if (link[0] != -1) {
-            if (IsPointInCuboid(D_L19_001B9A40, link[0]) != 0) {
-                D_L19_001B258C = 2;
-            } else if (D_L19_001B258C == 2) {
-                D_L19_001B258C = 0;
+            if (IsPointInCuboid(g_hero_origin_vec, link[0]) != 0) {
+                g_carried_marker_state = 2;
+            } else if (g_carried_marker_state == 2) {
+                g_carried_marker_state = 0;
             }
         }
         break;
@@ -45,41 +45,41 @@ void func_PAL_L19_004281A8(char *obj) {
         return;
     }
     if (FLD(g_hero_state, int, 0x2294) == 0x31 && (hero_ptr = FLD(g_hero_state, char *, 0x1830)) != 0) {
-        vec_build_spherical_offset(a, D_L19_001B1E94, FLD(hero_ptr, float, 0xF8), -FLD(hero_ptr, float, 0xF4) * 0.5f);
+        vec_build_spherical_offset(a, g_carried_marker_radius, FLD(hero_ptr, float, 0xF8), -FLD(hero_ptr, float, 0xF4) * 0.5f);
         FastVecAdd(b, a, FLD(g_hero_state, char *, 0x1830) + 0x10);
-        if (D_L19_001B1EAC == 0) {
-            D_L19_001B1EAC = func_PAL_L00_002D7850(5);
-            if (D_L19_001B1EAC == 0) {
+        if (g_carried_marker_cam_slot == 0) {
+            g_carried_marker_cam_slot = cam_alloc_override_slot_pal(5);
+            if (g_carried_marker_cam_slot == 0) {
                 return;
             }
         }
         if (FLD(FLD(g_hero_state, char *, 0x1830), s16, 0xAA) == 0x905) {
-            FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E98;
-            FLD(D_L19_001B1EAC, float, 0xC) = -1.0f;
-            FLD(D_L19_001B1EAC, float, 8) = -1.0f;
+            FLD(g_carried_marker_cam_slot, float, 0) = g_carried_marker_override_x;
+            FLD(g_carried_marker_cam_slot, float, 0xC) = -1.0f;
+            FLD(g_carried_marker_cam_slot, float, 8) = -1.0f;
         } else {
-            FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E9C;
-            FLD(D_L19_001B1EAC, float, 0xC) = D_L19_001B1EA4;
-            FLD(D_L19_001B1EAC, float, 8) = D_L19_001B1EA8;
+            FLD(g_carried_marker_cam_slot, float, 0) = g_carried_marker_override_x_alt;
+            FLD(g_carried_marker_cam_slot, float, 0xC) = g_carried_marker_override_w;
+            FLD(g_carried_marker_cam_slot, float, 8) = g_carried_marker_override_z;
         }
-        FLD(D_L19_001B1EAC, u8, 0x1F) = 1;
-        FastVecSub(D_L19_001B1EAC + 0x20, b, D_L19_001B9A40);
+        FLD(g_carried_marker_cam_slot, u8, 0x1F) = 1;
+        FastVecSub(g_carried_marker_cam_slot + 0x20, b, g_hero_origin_vec);
         return;
     }
-    if (D_L19_001B1EAC != 0) {
-        cam_end_override(D_L19_001B1EAC);
-        D_L19_001B1EAC = 0;
+    if (g_carried_marker_cam_slot != 0) {
+        cam_end_override(g_carried_marker_cam_slot);
+        g_carried_marker_cam_slot = 0;
     }
 }
 
-extern int D_L19_001A8F00 __attribute__((sda));
-extern u8 D_001A7BDC[] __attribute__((sda));
-extern int D_L19_001B2724[4] __attribute__((sda));
-extern char *D_L19_001B2B0C[] __attribute__((sda));
+extern int g_hero_l19_mode __attribute__((sda));
+extern u8 g_warp_trigger_flags[] __attribute__((sda));
+extern int g_glow_state_flags[4] __attribute__((sda));
+extern char *g_linked_object_table[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern char g_hero_position[];
-extern char D_L19_001BFC40[];
+extern char g_request_l19_queue[];
 extern void moby_reset_matching_effects(char *a0);
 extern void moby_mark_spawned(char *a0);
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
@@ -90,13 +90,13 @@ extern void level_apply_index_for_key(char *a0);
 extern s32 req_launch_queued(char *a0);
 extern s32 game_is_either_mode_two(void);
 extern void moby_mark_flag_and_append_to_list(s32 a0);
-extern void func_PAL_002AFC10(s32 a0);
-extern void func_PAL_L00_002B9CD8(char *a0, char *a1, s32 a2, s32 a3);
+extern void snd_play_indexed_pal(s32 a0);
+extern void hero_reset_position_and_direction_pal(char *a0, char *a1, s32 a2, s32 a3);
 extern void moby_mark_table_entry_flagged(s32 a0);
 extern void level_capture_checkpoint_state(char *a0, char *a1);
 extern int MemcardSave(s32 a0, s32 a1);
 
-void func_PAL_L19_00429220(char *a0)
+void warp_trigger_update_pal(char *a0)
 {
     char *s1 = *(char **)(a0 + 0x68);
     u8 id;
@@ -106,7 +106,7 @@ void func_PAL_L19_00429220(char *a0)
     case 0:
         *(s32 *)(a0 + 0x98) = 0;
         *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
-        if (D_001A7BDC[0] != 0) {
+        if (g_warp_trigger_flags[0] != 0) {
             moby_mark_spawned(a0);
         } else {
             moby_set_state(a0, 1, -1);
@@ -115,32 +115,32 @@ void func_PAL_L19_00429220(char *a0)
         break;
     case 1:
         if (IsPointInCuboid(g_hero_position, *(s32 *)(s1 + 0x120)) != 0) {
-            if (req_push_queue(D_L19_001BFC40, 0x96) != 0) {
-                req_push_queue(D_L19_001BFC40, 0x14);
-                req_push_queue(D_L19_001BFC40, 0x97);
+            if (req_push_queue(g_request_l19_queue, 0x96) != 0) {
+                req_push_queue(g_request_l19_queue, 0x14);
+                req_push_queue(g_request_l19_queue, 0x97);
                 level_apply_index_for_key(a0);
-                req_launch_queued(D_L19_001BFC40);
+                req_launch_queued(g_request_l19_queue);
                 moby_set_state(a0, 2, -1);
             }
         }
         break;
     case 2:
-        D_L19_001B2724[1] = 1;
-        if (D_L19_001A8F00 == 2) {
+        g_glow_state_flags[1] = 1;
+        if (g_hero_l19_mode == 2) {
             *(u8 *)(a0 + 0x31) = 0;
             *(u16 *)(a0 + 0x34) |= 1;
         }
         if (game_is_either_mode_two() == 0) {
-            D_L19_001B2724[1] = 0;
+            g_glow_state_flags[1] = 0;
             moby_mark_flag_and_append_to_list(0x14);
-            func_PAL_002AFC10(0x14);
-            func_PAL_L00_002B9CD8(D_L19_001B2B0C[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x30,
-                        D_L19_001B2B0C[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x70, 0, 1);
+            snd_play_indexed_pal(0x14);
+            hero_reset_position_and_direction_pal(g_linked_object_table[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x30,
+                        g_linked_object_table[0] + (*(s32 *)(s1 + 0x120) << 7) + 0x70, 0, 1);
             *(u16 *)(a0 + 0x34) &= 0xFFFE;
             *(u8 *)(a0 + 0x31) = 1;
             if (*(u8 *)(a0 + 0xB0) != 0xFF) {
                 id = *(u8 *)(a0 + 0xB0);
-                if ((D_0019B2E8[id + (g_current_map_index[0] << 4)] & 0x80) == 0)
+                if ((g_moby_group_flags[id + (g_current_map_index[0] << 4)] & 0x80) == 0)
                     moby_mark_table_entry_flagged(id);
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
                 MemcardSave(0, -1);

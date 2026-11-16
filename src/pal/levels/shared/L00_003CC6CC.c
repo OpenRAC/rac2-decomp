@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner {
@@ -15,7 +16,7 @@ extern void func_002FDBD8_3(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisCon
                                     float *vector, int mode);
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
-void func_PAL_L00_003CC908(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
+void owner_effect_draw_active_pal(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
     if (context->active_24 != 0) {

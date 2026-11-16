@@ -11,8 +11,8 @@ extern int FloatToInt(float);
 extern int FastTweenColor(int, int, float);
 extern float math_random_float_range(float, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
-extern int D_L02_001B2050[2] __attribute__((sda));
-extern int D_L02_001B2058[2] __attribute__((sda));
+extern int g_spark_burst_colors_a[2] __attribute__((sda));
+extern int g_spark_burst_colors_b[2] __attribute__((sda));
 
 /* func_PAL_L02_004288E8, the PAL copy of func_L02_00423838: the same C, where the three frame counts are
    scaled to 50 Hz and the downward pull per frame becomes 0.002f. */
@@ -49,8 +49,8 @@ void func_PAL_L02_004288E8(u8 *a0, float lo, float hi) {
         v60[2] = -k * (float)(a + b + c);
         FastVecAdd(v60, v60, v50);
         v60[3] = 0.01f;
-        c0 = FastTweenColor(D_L02_001B2050[0], D_L02_001B2050[1], math_random_float_range(0.0f, 1.0f));
-        c1 = FastTweenColor(D_L02_001B2058[0], D_L02_001B2058[1], math_random_float_range(0.0f, 1.0f));
+        c0 = FastTweenColor(g_spark_burst_colors_a[0], g_spark_burst_colors_a[1], math_random_float_range(0.0f, 1.0f));
+        c1 = FastTweenColor(g_spark_burst_colors_b[0], g_spark_burst_colors_b[1], math_random_float_range(0.0f, 1.0f));
         part_spawn_trail(v20, v50, v60, c0, c1, a, b, c, 0x1003C);
     } while (--i >= 0);
 }

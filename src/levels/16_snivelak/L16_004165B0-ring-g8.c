@@ -1,15 +1,16 @@
+#include "names.h"
 /* func_L16_0041F360: own -G8 unit (default game profile by name). */
 #include "common.h"
 
-extern f32 D_L16_001B2008 __attribute__((sda));
-extern u32 D_L16_001B2000 __attribute__((sda));
-extern s32 D_L16_001B1FF8 __attribute__((sda));
-extern u32 D_L16_001B2004[] MACRO_ADDR;
-extern s32 D_L16_001B1FFC[] MACRO_ADDR;
-extern f32 D_L16_001B200C[] MACRO_ADDR;
-extern f32 D_L16_001B2010[] MACRO_ADDR;
-extern f32 D_L16_001B2014[] MACRO_ADDR;
-extern char D_L16_001A8F20[] MACRO_ADDR;
+extern f32 g_ribbon_inner_uv_start __attribute__((sda));
+extern u32 g_ribbon_l16_inner_color __attribute__((sda));
+extern s32 g_ribbon_l16_param_a __attribute__((sda));
+extern u32 g_ribbon_l16_outer_color[] MACRO_ADDR;
+extern s32 g_ribbon_l16_param_b[] MACRO_ADDR;
+extern f32 g_ribbon_inner_uv_end[] MACRO_ADDR;
+extern f32 g_ribbon_outer_uv_start[] MACRO_ADDR;
+extern f32 g_ribbon_outer_uv_end[] MACRO_ADDR;
+extern char g_particle_template[] MACRO_ADDR;
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern void FastVecAdd(char *, char *, char *);

@@ -2,7 +2,7 @@
 #include "include_asm.h"
 typedef int Quad004475A0 __attribute__((mode(TI)));
 extern void security_robot_deactivate(char *);
-extern int D_L11_001A8FF4;
+extern int g_hero_l11_input_blocked;
 extern char g_hero_position[];
 extern char *g_active_attacker_robot NOT_SDA;
 extern void turret_enemy_update(char *);
@@ -63,7 +63,7 @@ void security_robot_update(char *self)
     int flags = 0, i;
     state=*(char **)(self+0x68);
     if (*(u8 *)(self+0x20)==1) return;
-    if (*(short *)(state+0x36E) && !D_L11_001A8FF4 &&
+    if (*(short *)(state+0x36E) && !g_hero_l11_input_blocked &&
         *(u8 *)(self+0x20)!=18 && *(u8 *)(self+0x20)!=17) return;
     turret_enemy_update(self);
     if (*(u8 *)(self+0x20)==1) return;

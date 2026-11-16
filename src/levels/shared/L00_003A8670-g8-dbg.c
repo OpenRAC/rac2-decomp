@@ -3,17 +3,17 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct { char pad[0x2294]; int level; } Context;
 extern char g_hero_state[];
-extern float D_L00_001AF718 __attribute__((sda));
-extern float D_L00_001AF71C __attribute__((sda));
-extern float D_L00_001AF724 __attribute__((sda));
-extern float D_L00_001AF728 __attribute__((sda));
-extern float D_L00_001AF72C __attribute__((sda));
-extern float D_L00_001AF730 __attribute__((sda));
-extern int D_L00_001AF734 __attribute__((sda));
-extern int D_L00_001AF738 __attribute__((sda));
-extern float D_L00_001AF73C __attribute__((sda));
-extern float D_L00_001AF740 __attribute__((sda));
-extern float D_L00_001AF744 __attribute__((sda));
+extern float g_beam_particle_spin_min __attribute__((sda));
+extern float g_beam_particle_spin_max __attribute__((sda));
+extern float g_beam_particle_scale_max __attribute__((sda));
+extern float g_beam_particle_scale_min __attribute__((sda));
+extern float g_beam_particle_speed_min __attribute__((sda));
+extern float g_beam_particle_speed_max __attribute__((sda));
+extern int g_beam_particle_duration_min __attribute__((sda));
+extern int g_beam_particle_duration_max __attribute__((sda));
+extern float g_beam_particle_drift_min __attribute__((sda));
+extern float g_beam_particle_drift_high_a __attribute__((sda));
+extern float g_beam_particle_drift_high_b __attribute__((sda));
 extern char *level_get_slot_body(int, int);
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float, float);
@@ -42,18 +42,18 @@ void beam_spawn_particle(TI128 *position, int index)
             entry->active = 1;
             qcopy(&entry->position, position);
             entry->angle = math_random_angle();
-            entry->spin = math_random_signed_float_range(D_L00_001AF718, D_L00_001AF71C) * 0.017453294f;
-            entry->scale = math_random_float_range(D_L00_001AF728, D_L00_001AF724);
-            entry->duration = math_random_int_range(D_L00_001AF734, D_L00_001AF738);
+            entry->spin = math_random_signed_float_range(g_beam_particle_spin_min, g_beam_particle_spin_max) * 0.017453294f;
+            entry->scale = math_random_float_range(g_beam_particle_scale_min, g_beam_particle_scale_max);
+            entry->duration = math_random_int_range(g_beam_particle_duration_min, g_beam_particle_duration_max);
             entry->reciprocal = 1.0f / IntToFloat(entry->duration);
             if (context->level == 29)
-                high = D_L00_001AF744;
+                high = g_beam_particle_drift_high_b;
             else
-                high = D_L00_001AF740;
-            entry->drift = math_random_float_range(D_L00_001AF73C, high) * 0.016666668f;
+                high = g_beam_particle_drift_high_a;
+            entry->drift = math_random_float_range(g_beam_particle_drift_min, high) * 0.016666668f;
             for (j = 0; j < 9; j++) {
                 ((BeamParticle *)base)[i].phase[j] = 0.0f;
-                ((BeamParticle *)base)[i].speed[j] = math_random_float_range(D_L00_001AF72C, D_L00_001AF730);
+                ((BeamParticle *)base)[i].speed[j] = math_random_float_range(g_beam_particle_speed_min, g_beam_particle_speed_max);
             }
             return;
         }

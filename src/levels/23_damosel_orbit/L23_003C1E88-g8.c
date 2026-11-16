@@ -1,22 +1,23 @@
+#include "names.h"
 /* Update the oscillating effect parameter and submit a complete 144-byte quad packet.
  */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001AFA18 __attribute__((sda));
-extern float D_L23_001AFA1C __attribute__((sda));
-extern float D_L23_001AFA20 __attribute__((sda));
-extern int D_L23_001AFA24 __attribute__((sda));
-extern int D_L23_001AFA28 __attribute__((sda));
-extern int D_L23_001AFA2C __attribute__((sda));
-extern int D_L23_001AFA30 __attribute__((sda));
-extern int D_L23_001AFA34 __attribute__((sda));
-extern int D_L23_001AFA38 __attribute__((sda));
-extern float D_L23_001AFA3C __attribute__((sda));
-extern float D_L23_001AFA40 __attribute__((sda));
-extern float D_L23_001AFA44 __attribute__((sda));
-extern int D_L23_001AFA48 __attribute__((sda));
+extern float g_beam_width __attribute__((sda));
+extern float g_beam_end_scale __attribute__((sda));
+extern float g_beam_pull_back __attribute__((sda));
+extern int g_beam_texture_id __attribute__((sda));
+extern int g_beam_gif_bits_base __attribute__((sda));
+extern int g_beam_gif_bits_a __attribute__((sda));
+extern int g_beam_gif_bits_b __attribute__((sda));
+extern int g_beam_gif_bits_c __attribute__((sda));
+extern int g_beam_level_limit __attribute__((sda));
+extern float g_beam_level_limit_alt __attribute__((sda));
+extern float g_beam_level_noise_min __attribute__((sda));
+extern float g_beam_level_noise_max __attribute__((sda));
+extern int g_beam_l23_color __attribute__((sda));
 
 extern char g_camera_l23_position[];
 
@@ -53,16 +54,16 @@ void gfx_draw_pulsing_beam(char *moby) {
     long long gif_bits;
 
     if (*(short *)(vars + 0x3BC) > 0) {
-        level = *(float *)(vars + 0x3B8) + math_random_float_range(D_L23_001AFA40, D_L23_001AFA44);
-        limit = D_L23_001AFA3C;
+        level = *(float *)(vars + 0x3B8) + math_random_float_range(g_beam_level_noise_min, g_beam_level_noise_max);
+        limit = g_beam_level_limit_alt;
         *(float *)(vars + 0x3B8) = level;
         if (limit < level) {
             *(float *)(vars + 0x3B8) = limit;
             *(short *)(vars + 0x3BC) = -1;
         }
     } else {
-        level = *(float *)(vars + 0x3B8) - math_random_float_range(D_L23_001AFA40, D_L23_001AFA44);
-        limit = (float)D_L23_001AFA38;
+        level = *(float *)(vars + 0x3B8) - math_random_float_range(g_beam_level_noise_min, g_beam_level_noise_max);
+        limit = (float)g_beam_level_limit;
         *(float *)(vars + 0x3B8) = level;
         if (level < limit) {
             *(float *)(vars + 0x3B8) = limit;
@@ -70,11 +71,11 @@ void gfx_draw_pulsing_beam(char *moby) {
         }
     }
     start_ptr = &start_point;
-    width = D_L23_001AFA18;
+    width = g_beam_width;
     qcopy(start_ptr, moby + 0x10);
     moby_pos = moby + 0x10;
     FastVecSub(&end_point, *(char **)(vars + 0x2A0) + 0x10, moby_pos);
-    FastVecScale(&end_point, &end_point, D_L23_001AFA1C);
+    FastVecScale(&end_point, &end_point, g_beam_end_scale);
     FastVecAdd(&end_point, &end_point, start_ptr);
     moby_forward = moby + 0xE0;
     forward_ptr = &forward;
@@ -82,15 +83,15 @@ void gfx_draw_pulsing_beam(char *moby) {
     FastVecSub(&to_camera, start_ptr, g_camera_l23_position);
     FastVecCross(&sideways, forward_ptr, &to_camera);
     vec_scale_to_length(&sideways, &sideways, width);
-    vec_scale_to_length(&pull_back, &to_camera, -D_L23_001AFA20);
+    vec_scale_to_length(&pull_back, &to_camera, -g_beam_pull_back);
     FastVecAdd(start_ptr, start_ptr, &pull_back);
     FastVecAdd(&end_point, &end_point, &pull_back);
     FastVecAdd(packet + 0x00, start_ptr, &sideways);
     FastVecSub(packet + 0x10, start_ptr, &sideways);
     FastVecAdd(packet + 0x20, &end_point, &sideways);
     FastVecSub(packet + 0x30, &end_point, &sideways);
-    tex_bits = GetEffectTextureDescriptor(D_L23_001AFA24);
-    color = D_L23_001AFA48;
+    tex_bits = GetEffectTextureDescriptor(g_beam_texture_id);
+    color = g_beam_l23_color;
     *(int *)(packet + 0x4C) = color;
     *(u64 *)(packet + 0x78) = tex_bits;
     *(unsigned long long *)(packet + 0x80) = 0xFF9000000260ULL;
@@ -99,10 +100,10 @@ void gfx_draw_pulsing_beam(char *moby) {
     *(int *)(packet + 0x44) = color;
     *(int *)(packet + 0x40) = color;
     VU1_addGSregister(0x47, 0x53001);
-    gif_bits = D_L23_001AFA28;
-    gif_bits |= (long long)D_L23_001AFA2C << 2;
-    gif_bits |= (long long)D_L23_001AFA30 << 4;
-    gif_bits |= (long long)D_L23_001AFA34 << 6;
+    gif_bits = g_beam_gif_bits_base;
+    gif_bits |= (long long)g_beam_gif_bits_a << 2;
+    gif_bits |= (long long)g_beam_gif_bits_b << 4;
+    gif_bits |= (long long)g_beam_gif_bits_c << 6;
     gif_bits |= (long long)(int)*(float *)(vars + 0x3B8) << 32;
     *(int *)(packet + 0x54) = 0;
     *(float *)(packet + 0x5C) = 1.0f;

@@ -9,7 +9,7 @@ extern void slot_add_value_clamped(int, int);
 extern void func_PAL_0029D5E8(int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
-extern int D_L05_001B1500 __attribute__((sda));
+extern int g_glow_ring_follow_moby __attribute__((sda));
 extern void func_PAL_L05_0042C2E8(char *);
 
 

@@ -40,7 +40,7 @@ typedef struct GrelbinMoby {
 extern int g_current_map_index __attribute__((sda));
 extern u8 g_hero_position[];
 typedef struct { u8 pad0[0x464]; u8 active[0]; } GrelbinEntityFlags;
-extern GrelbinEntityFlags D_L19_0021EA30;
+extern GrelbinEntityFlags g_trigger_active_table;
 extern GrelbinMoby *g_moby_l19_array __attribute__((sda));
 extern void moby_set_state(GrelbinMoby *,int,int);
 extern void moby_mark_spawned(GrelbinMoby *);
@@ -48,17 +48,17 @@ extern void *part_find_owned_effect_slot(GrelbinMoby *,int,int);
 extern GrelbinMoby *CreateMoby(int);
 extern void moby_init_child_from_parent(void *,void *);
 extern int CollLine(void *,void *,int,void *,int);
-extern u8 D_L19_001BFEC0[];
+extern u8 g_hit_matrix_buf[];
 extern void mat_align_to_dir(void *,void *,int);
 extern void moby_set_controller_speed_limits(void *,float,float,float,float);
-extern u8 D_0019B4A8[];
-extern void func_PAL_002A7650(void *,int,int);
+extern u8 g_moby_nibble_table[];
+extern void SetDeathBits_pal(void *,int,int);
 extern void func_002A0F48(void *);
 extern void hero_copy_field_to_moby(void *);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern void func_PAL_002AC3C0(void *,void *);
 extern int FastDecTimer(void *);
-extern float func_PAL_002AA108(void *,void *);
+extern float moby_update_aim_target_strength_pal(void *,void *);
 extern void func_PAL_002AC290(void *,void *);
 extern int g_active_yeti_count MACRO_ADDR;
 typedef struct {
@@ -71,7 +71,7 @@ typedef struct {
     int mode;
 } GrelbinPlayer;
 extern GrelbinPlayer g_hero_state;
-extern GrelbinMoby *D_L19_001B2A28 MACRO_ADDR;
+extern GrelbinMoby *g_leviathan_other_moby MACRO_ADDR;
 extern int weapon_select_aim_target(void *,int,float,int,float,int);
 extern float vec_distance_xy(void *,void *);
 typedef struct {
@@ -164,7 +164,7 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
             qcopy(top,obj->position); qcopy(bottom,obj->position);
             top[2]+=1.f; bottom[2]-=10.f;
             CollLine(top,bottom,2,obj,0);
-            mat_align_to_dir(state->source->transform,D_L19_001BFEC0,0);
+            mat_align_to_dir(state->source->transform,g_hit_matrix_buf,0);
         }
         {
         float half=0.5f;
@@ -186,8 +186,8 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     {
         u16 id=obj->uid;
         int value;
-        if (D_L19_0021EA30.active[(s16)id]) goto replace;
-        value=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+        if (g_trigger_active_table.active[(s16)id]) goto replace;
+        value=g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
         if ((id&1) ? ((value>>4)&7) : (value&7)) {
         replace:
         {
@@ -208,12 +208,12 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     if(state->phase==2) {
         u16 id;
         u8 *count;
-        func_PAL_002A7650(obj,0,3);
+        SetDeathBits_pal(obj,0,3);
         spawn=CreateMoby(0x1266);
         if(!spawn) goto success;
         id=obj->uid;
-        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
-        else { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
+        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if(((*count>>4)&7)!=7) *count+=16;}
+        else { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if((*count&7)!=7) *count+=1;}
         spawn->opacity=80;spawn->flags|=0x800;spawn->drawDistance=255;spawn->group=255;
         spawn->state=0;spawn->bBC=0;spawn->b31=1;
         qcopy(spawn->position,state->source->position);
@@ -234,7 +234,7 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
             if(source && obj->classId==source->classId) F(other,0x2C)=damage*state->damageScale;
         }
         {
-            float damage=func_PAL_002AA108(obj,other);
+            float damage=moby_update_aim_target_strength_pal(obj,other);
             obj->bA8=255;state->damageTimer=200;
             state->health-=damage;
         }
@@ -264,7 +264,7 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         }
     }
     if(g_hero_state.mode==49) qcopy(state->targetPosition,g_hero_state.position);
-    other=D_L19_001B2A28;
+    other=g_leviathan_other_moby;
     while(other) {
         if(((GrelbinMoby *)other)->classId==0x10D0 && obj->state!=4 && obj->state!=9 && obj->state!=8 && state->health>0.f) {
             if(obj->state==7 && obj->timer>=16) break;

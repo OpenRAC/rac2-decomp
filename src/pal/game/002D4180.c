@@ -9,12 +9,12 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029C8B0(int);
 
-int func_PAL_002D4180(void) {
+int menu_page_update_5_pal(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -43,7 +43,7 @@ extern void func_0029C8F0(void);
 extern void SetupGifPaging(long param_1);
 
 /* Implementation matching decompiled output */
-long func_PAL_002D4208(void)
+long menu_page_draw_8_pal(void)
 {
   SetupGifPaging(0);
   func_0029C8F0();
@@ -54,7 +54,7 @@ long func_PAL_002D4208(void)
 extern void func_0029C960(void);
 
 /* Candidate function: FUN_002d3390 */
-unsigned long long func_PAL_002D4308(void)
+unsigned long long menu_page_draw_9_pal(void)
 {
     SetupGifPaging(0);
     func_0029C960();
@@ -62,16 +62,16 @@ unsigned long long func_PAL_002D4308(void)
     return 0;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern float ref_L00_002D33C0_00[];
 extern void ref_L00_002D33C0_01(unsigned char *, float *);
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
-int func_PAL_002D4338(void)
+int menu_preview_helper_init_pal(void)
 {
-    if (D_001A8CFC[0] != 0)
-        ref_L00_002D33C0_01((unsigned char *)(D_001A8CFC[0] + 0x3F4A0), ref_L00_002D33C0_00);
+    if (g_resident_data_base[0] != 0)
+        ref_L00_002D33C0_01((unsigned char *)(g_resident_data_base[0] + 0x3F4A0), ref_L00_002D33C0_00);
     return 0;
 }
 
@@ -83,7 +83,7 @@ typedef struct {
 extern MenuGameState g_pad_state;
 extern int func_0029C5D0(int);
 
-int func_PAL_002D4378(void)
+int menu_page_update_pass_message_pal(void)
 {
     int flags = g_pad_state.flags;
     int result = 0;
@@ -108,7 +108,7 @@ return_value:
 
 extern void func_0029C5A0(void);
 
-int func_PAL_002D4400(void) {
+int menu_page_draw_10_pal(void) {
     SetupGifPaging(0);
     func_0029C5A0();
     DoGifPaging();

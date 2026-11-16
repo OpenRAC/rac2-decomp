@@ -13,7 +13,7 @@ typedef struct {
     int colorStart, color, colorEnd, unused70, state, kind;
     char *owner;
 } Effect;
-extern Effect *D_L00_001B2BB8 MACRO_ADDR;
+extern Effect *g_blast_l00_pool_2 MACRO_ADDR;
 extern void vec_clear_128(void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
@@ -37,7 +37,7 @@ void func_PAL_L00_003F4A00(char *owner)
     i = 0;
     vec_clear_128(&displacement);
     for (; i < 320; i++) {
-        record = (Effect *)(i * sizeof(Effect) + (unsigned int)D_L00_001B2BB8);
+        record = (Effect *)(i * sizeof(Effect) + (unsigned int)g_blast_l00_pool_2);
         if (record->owner == owner) {
             numerator = IntToFloat(record->remaining);
             denominator = IntToFloat(record->duration);

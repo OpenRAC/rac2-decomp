@@ -2,12 +2,12 @@
 
 /* Advances a falling object through impact, particle emission and fade-out. */
 typedef int Quad __attribute__((mode(TI)));
-extern int D_L00_001B0528 __attribute__((sda));
+extern int g_burst_projectile_initialized __attribute__((sda));
 typedef struct { char pad[0x34]; int owner; char tail[8]; } ParticleRecord;
-extern ParticleRecord D_L00_00247900[100];
+extern ParticleRecord g_particle_record_table[100];
 typedef struct { char pad[0x24]; int kind; char *owner; char tail[0x3C]; int active; } OwnerContext;
 extern OwnerContext g_music_state;
-extern char D_L00_001BF220[0x30];
+extern char g_hero_l00_position[0x30];
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern void FastVecScale(void *, void *, float);
@@ -35,13 +35,13 @@ void thrown_burst_projectile_update(char *self)
         *(unsigned char *)(self + 0x20) = 1;
         *(int *)(state + 0x48) = 0;
         {
-            int initialized = D_L00_001B0528;
+            int initialized = g_burst_projectile_initialized;
             *(int *)(state + 0x4C) = 0;
             *(int *)(state + 0x50) = 0;
             if (!initialized) {
                 int i;
-                for (i = 99; i >= 0; i--) D_L00_00247900[i].owner = 0;
-                D_L00_001B0528 = 1;
+                for (i = 99; i >= 0; i--) g_particle_record_table[i].owner = 0;
+                g_burst_projectile_initialized = 1;
             }
         }
         {
@@ -69,9 +69,9 @@ void thrown_burst_projectile_update(char *self)
             vec_clear_128(state);
             hero_check_hit_by_object(self);
             PlayMobySound(0, 0, self);
-            FastVecScale(state + 0x20, D_L00_001BF220 + 0x20, 0.0009765625f);
+            FastVecScale(state + 0x20, g_hero_l00_position + 0x20, 0.0009765625f);
             vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
-            *(Quad *)(state + 0x30) = *(Quad *)D_L00_001BF220;
+            *(Quad *)(state + 0x30) = *(Quad *)g_hero_l00_position;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
                 int i;

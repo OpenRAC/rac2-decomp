@@ -73,7 +73,7 @@ typedef struct {
     short h77C;
 } L14State_423000;
 
-void func_PAL_L14_00428558(char *a0)
+void actor_init_pal(char *a0)
 {
     L14State_423000 *s = *(L14State_423000 **)(a0 + 0x68);
     short n;

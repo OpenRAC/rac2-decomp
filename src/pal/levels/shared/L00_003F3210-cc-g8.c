@@ -9,12 +9,12 @@ extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x2290]; char *target; } Hero4BF0;
 extern Hero4BF0 g_hero_state;
 typedef struct { char pad[0x160]; float amount; int unused, timer, state; } Camera4BF0;
-extern Camera4BF0 D_L00_001B8C80;
-extern char *D_L00_001B2BB4 __attribute__((sda));
-extern char *D_L00_001B2BB8;
-extern int *D_L00_001B2BBC[] MACRO_ADDR;
-extern float D_L00_001B0830 __attribute__((sda));
-extern float D_L00_001B0834 __attribute__((sda));
+extern Camera4BF0 g_scalar_transition_state;
+extern char *g_blast_alloc_base __attribute__((sda));
+extern char *g_blast_l00_pool_2;
+extern int *g_blast_l00_ripple_particles_2[] MACRO_ADDR;
+extern float g_blast_scroll_u __attribute__((sda));
+extern float g_blast_scroll_v __attribute__((sda));
 extern char *D_L00_001B2BB4_1 MACRO_ADDR;
 extern char *g_area_hit_targets[];
 extern int save_is_record_value(short,int);
@@ -23,7 +23,7 @@ extern int AcquireEntitySlot(void *,int,void *);
 extern char *level_get_slot_body(short,int);
 extern int mem_align_up_sixteen(int);
 extern void part_spawn_trail_record(void *,int,void *,void *,float);
-extern void func_PAL_L00_003F38E0(void *,void *);
+extern void blast_spawn_burst_particles_pal(void *,void *);
 extern int math_fast_helper_a(void *,float);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
@@ -33,7 +33,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(float,void *,void *,int,void *);
 extern void QueueMobyImpact(void *,void *);
-extern int func_PAL_0032F0B8(void *,int,int);
+extern int StartAttachedEffect_pal(void *,int,int);
 extern int math_fast_float_d(void *);
 extern void effect_clear_records_and_flag(void);
 extern void moby_mark_spawned(void *);
@@ -41,7 +41,7 @@ extern void effect_update_owner_records(void *);
 extern void ref_L00_003EEE90_00(void (*)(void *),void *);
 extern void blast_run_effect_frame(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
-void func_PAL_L00_003F3210(char *object)
+void blast_l00_update_pal(char *object)
 {
     Vec4BF0 center, query, direction;
     struct { Vec4BF0 point; char pad[8]; unsigned char type, flags; short id; int unused; int active; } hit;
@@ -63,24 +63,24 @@ void func_PAL_L00_003F3210(char *object)
         data->count=111;
         data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=level_get_slot_body(*(short *)(object+0xAA),data->handle);
-        D_L00_001B2BB4=mem;
-        D_L00_001B2BB8=(char *)mem_align_up_sixteen((int)(mem+0x50));
-        D_L00_001B2BBC[0]=(int *)mem_align_up_sixteen((int)(D_L00_001B2BB8+0xA000));
+        g_blast_alloc_base=mem;
+        g_blast_l00_pool_2=(char *)mem_align_up_sixteen((int)(mem+0x50));
+        g_blast_l00_ripple_particles_2[0]=(int *)mem_align_up_sixteen((int)(g_blast_l00_pool_2+0xA000));
         i=0;
-        do { D_L00_001B2BBC[0][i]=0; i++; } while(i<144);
-        { char *p = D_L00_001B2BB8+319*128+124;
+        do { g_blast_l00_ripple_particles_2[0][i]=0; i++; } while(i<144);
+        { char *p = g_blast_l00_pool_2+319*128+124;
         for(i=319;i>=0;i--,p-=128) *(int *)p=0; }
         *(int *)(D_L00_001B2BB4_1+0x30)=0;
         qcopy(center,object+0x10);
         center[2]+=1.0f;
         part_spawn_trail_record(object,17,object+0x10,data,0.20000002f);
-        func_PAL_L00_003F38E0(object,object+0x10);
+        blast_spawn_burst_particles_pal(object,object+0x10);
         qcopy(query,center);
         query[3]=2.0f;
         if(math_fast_helper_a(query,100.0f)!=-1) {
-            D_L00_001B8C80.amount=0.45f;
-            D_L00_001B8C80.timer=33;
-            D_L00_001B8C80.state=0;
+            g_scalar_transition_state.amount=0.45f;
+            g_scalar_transition_state.timer=33;
+            g_scalar_transition_state.state=0;
         }
     }
     case 1: {
@@ -104,7 +104,7 @@ void func_PAL_L00_003F3210(char *object)
                 hit.point[3]=5627.925f;
                 hit.id=*(short *)(g_area_hit_targets[i]+0xAA);
                 QueueMobyImpact(g_area_hit_targets[i],&hit);
-                func_PAL_0032F0B8(g_area_hit_targets[i],42,*(int *)(object+0xB8));
+                StartAttachedEffect_pal(g_area_hit_targets[i],42,*(int *)(object+0xB8));
             }
         }
         if(math_fast_float_d(timer)) {
@@ -130,9 +130,9 @@ destroy:
         }
         break;
     }
-    D_L00_001B0834-=0.04f;
-    if(D_L00_001B0830 < -8.0f) D_L00_001B0830+=8.0f;
-    if(D_L00_001B0834 < -8.0f) D_L00_001B0834+=8.0f;
+    g_blast_scroll_v-=0.04f;
+    if(g_blast_scroll_u < -8.0f) g_blast_scroll_u+=8.0f;
+    if(g_blast_scroll_v < -8.0f) g_blast_scroll_v+=8.0f;
     effect_update_owner_records(object);
     ref_L00_003EEE90_00(blast_run_effect_frame,object);
 }

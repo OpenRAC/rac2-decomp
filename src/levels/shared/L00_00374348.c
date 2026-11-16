@@ -16,7 +16,7 @@ typedef struct {
 } PurchaseState;
 extern PurchaseState g_purchase_menu_model;
 typedef struct { int words[10]; } ResetRow;
-extern ResetRow D_L00_0028B380[15];
+extern ResetRow g_menu_reset_rows[15];
 
 /* The persistent save block. Retail reads the balance as an offset from this base: a load of
  * symbol+offset counts as two words, so it stays out of the delay slot of the branch before it. */
@@ -28,7 +28,7 @@ typedef struct {
 } PlayerProgress;
 extern PlayerProgress g_player_bolts __attribute__((sda));
 extern int g_pad_state[];
-extern int D_L00_001B25A4 __attribute__((sda));
+extern int g_previous_pad_pressed __attribute__((sda));
 extern int PlayMobySound(int, int, int);
 extern void shop_build_vendor_list_by_flags(void);
 extern void PrepareVendorSelectionPreview(void);
@@ -44,10 +44,10 @@ void UpdatePurchaseConfirmationDialog(int *result, int *unused)
         if (g_player_bolts.balance < cost) PlayMobySound(2, 17, model->owner);
         model->state = 2;
     } else if (model->state == 2) {
-        if ((g_pad_state[0x1C4 / 4] & 16) && !(D_L00_001B25A4 & 16)) {
+        if ((g_pad_state[0x1C4 / 4] & 16) && !(g_previous_pad_pressed & 16)) {
             *result = 0;
             g_purchase_menu_model.state = 3;
-        } else if ((g_pad_state[0x1C4 / 4] & 64) && !(D_L00_001B25A4 & 64)) {
+        } else if ((g_pad_state[0x1C4 / 4] & 64) && !(g_previous_pad_pressed & 64)) {
             *result = 1;
             g_purchase_menu_model.state = 3;
         }
@@ -56,7 +56,7 @@ void UpdatePurchaseConfirmationDialog(int *result, int *unused)
             if (g_player_bolts.balance >= cost) {
                 g_player_bolts.balance -= cost;
                 g_player_bolts.last_item = model->item_id;
-                D_L00_0028B380[g_purchase_menu_model.rows[index].item].words[6] = 1;
+                g_menu_reset_rows[g_purchase_menu_model.rows[index].item].words[6] = 1;
                 shop_build_vendor_list_by_flags();
                 if (model->limit < model->selected) model->selected = model->limit;
                 PlayMobySound(7, 17, model->owner);

@@ -4,8 +4,8 @@ extern char *CreateMoby(int);
 extern void vec_add_transformed_or_copy(char *,char *,char *);
 extern float mat_fast_helper_a(float,float);
 extern void func_002A0F48(char *);
-extern unsigned short D_L18_001B18FC __attribute__((sda));
-extern float D_L18_001B191C __attribute__((sda));
+extern unsigned short g_fireball_lifetime_frames __attribute__((sda));
+extern float g_fireball_size_factor __attribute__((sda));
 
 /* Creates a bouncing fireball (moby class 3998) at a position with a given direction, owner and strength, and returns it. */
 char *fireball_spawn(int owner, char *position, char *velocity, int value, float scale, float extra)
@@ -24,7 +24,7 @@ char *fireball_spawn(int owner, char *position, char *velocity, int value, float
         *(int *)(state + 0x24) = owner;
         *(TI128 *)(object + 0x10) = *(TI128 *)position;
         *(TI128 *)(state + 0x10) = *(TI128 *)velocity;
-        timer = D_L18_001B18FC;
+        timer = g_fireball_lifetime_frames;
         *(float *)(state + 0x1c) = scale;
         *(int *)(state + 0x20) = value;
         *(short *)(state + 0x28) = timer;
@@ -34,7 +34,7 @@ char *fireball_spawn(int owner, char *position, char *velocity, int value, float
         angle = mat_fast_helper_a(*(float *)velocity, *(float *)(velocity+4));
         *(float *)(object + 0xf8) = angle;
         *(float *)(state + 0x30) = extra;
-        size_factor = D_L18_001B191C;
+        size_factor = g_fireball_size_factor;
         *(float *)(object + 0x2c) = *(float *)(object + 0x2c) * size_factor;
         func_002A0F48(object);
     }
@@ -49,13 +49,13 @@ char *fireball_spawn(int owner, char *position, char *velocity, int value, float
 typedef union { int i; float f; } Word;
 #define R(p,o) (((Word *)((u8 *)(p)+(o)))->f)
 extern int g_current_map_index;
-extern u8 D_0019B2E8[], g_hero_position[];
+extern u8 g_moby_group_flags[], g_hero_position[];
 typedef struct { u8 prefix[0x464]; u8 flags[0]; } FlagTable;
-extern FlagTable D_L18_0021E7B0;
+extern FlagTable g_trigger_l18_flags;
 typedef struct { u8 prefix[0x30]; float position[4]; u8 middle[0x30]; float rotation[4]; } Transform;
 extern Transform *g_waypoint_table MACRO_ADDR;
 extern u8 *g_moby_l18_table;
-extern int D_L18_001B9A80 NOT_SDA;
+extern int g_hero_l18_attached_flag NOT_SDA;
 extern void moby_set_state(void *,int,int);
 extern int coll_point_inside_region(void *,int);
 extern void moby_mark_spawned(void *);
@@ -91,8 +91,8 @@ void triggered_l18_mover_update(u8 *obj)
         I(state,0x5C)|=1;
         *(TI128 *)(state+0x60) = *(TI128 *)(obj+0x10);
         *(TI128 *)(state+0x70) = *(TI128 *)(obj+0xF0);
-        if (D_L18_0021E7B0.flags[I(state,0x8C)] ||
-            (B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) ||
+        if (g_trigger_l18_flags.flags[I(state,0x8C)] ||
+            (B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) ||
             (I(state,0x98)!=-1 && coll_point_inside_region(g_hero_position,I(state,0x98)))) {
             qcopy_nc(obj+0x10,g_waypoint_table[I(state,0x80)].position);
             qcopy_nc(obj+0xF0,g_waypoint_table[I(state,0x80)].rotation);
@@ -105,7 +105,7 @@ void triggered_l18_mover_update(u8 *obj)
         if (!B(obj,0xBC) && !flag_is_third_pending_set(obj) && I(state,0x8C)!=-1 &&
             B(g_moby_l18_table+I(state,0x8C)*256,0x20)!=254 &&
             B(g_moby_l18_table+I(state,0x8C)*256,0x20)!=253 &&
-            !(B(obj,0xB0)!=255 && B(state,0x92) && (D_0019B2E8[B(obj,0xB0)+g_current_map_index*16]&128)) &&
+            !(B(obj,0xB0)!=255 && B(state,0x92) && (g_moby_group_flags[B(obj,0xB0)+g_current_map_index*16]&128)) &&
             (I(state,0x98)==-1 || !coll_point_inside_region(g_hero_position,I(state,0x98)))) goto effects;
         if (I(state,0x94)!=-1) B(g_moby_l18_table+I(state,0x94)*256,0xBC)=1;
         if (B(state,0x93)) moby_mark_table_entry_flagged(B(obj,0xB0));
@@ -143,7 +143,7 @@ void triggered_l18_mover_update(u8 *obj)
         break;
     case 3:
         if (I(state,0x94)!=-1 && B(g_moby_l18_table+I(state,0x94)*256,0xBC)) break;
-        if (B(state,0x90)) { D_L18_001B9A80=0; hero_detach_from_object(0); }
+        if (B(state,0x90)) { g_hero_l18_attached_flag=0; hero_detach_from_object(0); }
         H(obj,0x34)|=2;
         break;
     }

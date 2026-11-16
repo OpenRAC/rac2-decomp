@@ -1,5 +1,5 @@
 #include "common.h"
-extern int D_001A8FF4;
+extern int g_enemy_ai_frozen;
 extern char g_hero_position[];
 extern char *g_active_attacker_robot __attribute__((section(".data")));
 typedef int TIAfc8 __attribute__((mode(TI)));
@@ -57,11 +57,11 @@ void smasher_robot_update(char *object)
     int result, i;
     float *rotation;
     if (*(u8 *)(object + 0x20) == 1) return;
-    if (*(short *)(state + 0x4D2) && !D_001A8FF4 &&
+    if (*(short *)(state + 0x4D2) && !g_enemy_ai_frozen &&
         *(u8 *)(object + 0x20) != 11 && *(u8 *)(object + 0x20) != 10) return;
     smasher_robot_update_aim_and_init(object);
     if (*(u8 *)(object + 0x20) == 1) return;
-    if (*(short *)(state + 0x4D2) && !D_001A8FF4) return;
+    if (*(short *)(state + 0x4D2) && !g_enemy_ai_frozen) return;
     if (*(short *)(state + 0x4CA) == 0) {
         *(int *)(state + 0x490) = 0;
         if (*(u8 *)(object + 0x95) == 4) {

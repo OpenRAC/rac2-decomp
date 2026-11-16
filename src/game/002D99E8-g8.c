@@ -1,3 +1,4 @@
+#include "names.h"
 /* Menu list page: draws a title, then one text row per entry of the scratchpad list. The selected
  * row is highlighted and scrolled into view; a check box beside each row shows its mask bit.
  * `limit` is one local for both the text's x and the top bound: being set twice sends it to
@@ -12,8 +13,8 @@ typedef struct {
     int selected[29];             /* 0x30 */
     int scroll;                   /* 0xA4 */
 } Menu_002D99E8;
-extern int D_001AB910 __attribute__((sda));
-extern int D_001ABB28 __attribute__((sda));
+extern int g_pause_menu_busy_flag __attribute__((sda));
+extern int g_menu_flag_b __attribute__((sda));
 extern int g_map_overlay_state[];
 extern void SetupGifPaging(int);
 extern int menu_list_active_entries(int *, int *, int *, int);
@@ -45,7 +46,7 @@ int DrawMenuCheckList(Menu_002D99E8 *menu)
     count = menu_list_active_entries(list, &mask, 0, 0);
     VU1_addGSregister(0x42, 0x44);
     VU1_addGSregister(0x47, 0x10B);
-    if (!D_001AB910) {
+    if (!g_pause_menu_busy_flag) {
         x = menu->x;
         y = menu->y;
     }
@@ -58,7 +59,7 @@ int DrawMenuCheckList(Menu_002D99E8 *menu)
     initial.top = y;
     initial.left = x;
     draw = initial;
-    if (D_001ABB28)
+    if (g_menu_flag_b)
         gfx_draw_rounded_box(y, menu->height, x, menu->width, 64, 0x202020);
     for (i = 0; i < count; i++) {
         iconX = x + 4;

@@ -20,7 +20,7 @@ typedef struct {
     int duration;            
     int hit;                 
 } Slot3BBB68;
-extern Slot3BBB68 D_L00_0023DDA0[];
+extern Slot3BBB68 g_spark_slot_records[];
 typedef struct {
     char pad_00[0x74];
     float f74;
@@ -42,7 +42,7 @@ extern float IntToFloat(int ticks);
 extern int math_fast_float_d(void *timer);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
-extern int func_PAL_0032F0B8(char *target, int kind, int value);
+extern int StartAttachedEffect_pal(char *target, int kind, int value);
 extern int PlayMobySound(int index, int mode, char *object);
 extern void func_PAL_L00_003C11A0(void *pos, void *direction, int count, unsigned int color);
 static inline Class3BBB68 *Class3BBB68At(int index)
@@ -55,7 +55,7 @@ static inline Class3BBB68 *Class3BBB68At(int index)
    position towards it. When the approach timer expires and the target is still live, it
    sends one hit packet (func_002A8C00/func_002A8E20) and marks the record; when the life
    timer expires the record is released and the owner's count drops. */
-void func_PAL_L00_003BF7F8(char *owner)
+void effect_update_spark_slots_pal(char *owner)
 {
     float v[4];
     struct {
@@ -72,9 +72,9 @@ void func_PAL_L00_003BF7F8(char *owner)
     int i;
 
     for (i = 0; i < 30; i++) {
-        if (D_L00_0023DDA0[i].owner != owner)
+        if (g_spark_slot_records[i].owner != owner)
             continue;
-        slot = &D_L00_0023DDA0[i];
+        slot = &g_spark_slot_records[i];
         slot->start = *(Rac2TI128 *)(owner + 0x10);
         if (slot->time) {
             slot->ang0[0] = FastAddRotations(slot->ang0[0], slot->rate0[0] * 100.0f);
@@ -120,7 +120,7 @@ void func_PAL_L00_003BF7F8(char *owner)
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
             QueueMobyImpact(slot->target, &packet);
-            func_PAL_0032F0B8(slot->target, 0x3E, *(int *)(owner + 0xB8));
+            StartAttachedEffect_pal(slot->target, 0x3E, *(int *)(owner + 0xB8));
             PlayMobySound(1, 0, owner);
             vec_scale_to_length(v, v, -1.0f);
             func_PAL_L00_003C11A0(&slot->pos, v, 9, 0xFF0000);

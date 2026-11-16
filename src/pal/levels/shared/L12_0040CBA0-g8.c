@@ -8,15 +8,15 @@ extern u8 *CreateMoby(s32);
 extern void euler_rotation_basis(void *, void *);
 extern float math_random_float_range(float, float);
 extern u8 *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
-extern float D_L12_001B15B0 __attribute__((sda));
-extern s32 D_L12_001B1520 __attribute__((sda));
-extern s32 D_L12_001B1524 __attribute__((sda));
-extern u8 D_L12_001A8F20[] MACRO_ADDR;
+extern float g_blast_projectile_scale __attribute__((sda));
+extern s32 g_blast_ground_effect_type_a __attribute__((sda));
+extern s32 g_blast_ground_effect_type_b __attribute__((sda));
+extern u8 g_zero_l12_vec[] MACRO_ADDR;
 
 /* The func_L16_00413D10 spawner for the 0xEA5 object: places it at the position with the
    velocity, hands it to its owner, and starts two particle bursts on it. The burst table is a
    MACRO_ADDR object, so its lui/addiu pair is emitted again for each call. */
-u8 *func_PAL_L12_0040CBA0(u8 *owner, TI128 *velocity, TI128 *position, float speed)
+u8 *blast_projectile_spawn_pal(u8 *owner, TI128 *velocity, TI128 *position, float speed)
 {
     u8 *obj;
     u8 *state;
@@ -40,12 +40,12 @@ u8 *func_PAL_L12_0040CBA0(u8 *owner, TI128 *velocity, TI128 *position, float spe
         qcopy(obj + 0xF0, owner + 0xF0);
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         obj[0x23] = 128;
-        *(float *)(obj + 0x2C) = D_L12_001B15B0;
+        *(float *)(obj + 0x2C) = g_blast_projectile_scale;
         *(u16 *)(obj + 0x34) |= 0x100;
         *(s32 *)(state + 0x24) = 0;
         scale = math_random_float_range(8.0f, 10.0f);
-        part_spawn_ground_effect(pos, 12, D_L12_001B1520, 0, 10, D_L12_001A8F20, scale * 0.3f, scale, 0.0f, 0);
-        part_spawn_ground_effect(pos, 12, D_L12_001B1524, 1, -10, D_L12_001A8F20, scale * 0.04f, scale * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(pos, 12, g_blast_ground_effect_type_a, 0, 10, g_zero_l12_vec, scale * 0.3f, scale, 0.0f, 0);
+        part_spawn_ground_effect(pos, 12, g_blast_ground_effect_type_b, 1, -10, g_zero_l12_vec, scale * 0.04f, scale * 0.4f, 0.0f, 0);
     }
     return obj;
 }

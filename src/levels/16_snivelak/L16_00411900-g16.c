@@ -2,11 +2,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern u8 *D_L16_001B16C0 __attribute__((sda));
-extern float D_L16_001B1780 __attribute__((sda));
-extern float D_L16_001B1784 __attribute__((sda));
-extern float D_L16_001B1788 __attribute__((sda));
-extern float D_L16_001B1790[4] __attribute__((sda));
+extern u8 *g_snivelak_target __attribute__((sda));
+extern float g_snivelak_arm_spread_a __attribute__((sda));
+extern float g_snivelak_arm_spread_b __attribute__((sda));
+extern float g_snivelak_arm_shot_radius __attribute__((sda));
+extern float g_snivelak_child_template[4] __attribute__((sda));
 extern void moby_transform_joint_point(void *, s32, void *);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void vec_scale_to_length(void *, void *, float);
@@ -37,7 +37,7 @@ void snivelak_fire_arm_shot(u8 *moby)
     float zero;
     float degree;
     float spread;
-    if (D_L16_001B16C0) {
+    if (g_snivelak_target) {
         state = *(u8 **)(moby + 0x68);
         children = (u8 **)(state + 0x238);
         moby_transform_joint_point(*(u8 **)((u32)children + (*(s32 *)(state + 0x240) << 2)), 0, matrix);
@@ -46,24 +46,24 @@ void snivelak_fire_arm_shot(u8 *moby)
         *(TI128 *)origin = *(TI128 *)(matrix + 12);
         vec_scale_to_length(forward, matrix, 20.0f);
         FastVecAdd(forward, forward, origin);
-        *(TI128 *)hero = *(TI128 *)(D_L16_001B16C0 + 0x10);
+        *(TI128 *)hero = *(TI128 *)(g_snivelak_target + 0x10);
         hero[2] += 2.0f;
         zero = 0.0f;
         degree = 0.017453294f;
-        angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)(D_L16_001B16C0 + 0x10), *(float *)(moby + 0x14) - *(float *)(D_L16_001B16C0 + 0x14));
-        spread = math_random_signed_float_range(zero, D_L16_001B1780);
+        angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)(g_snivelak_target + 0x10), *(float *)(moby + 0x14) - *(float *)(g_snivelak_target + 0x14));
+        spread = math_random_signed_float_range(zero, g_snivelak_arm_spread_a);
         angle = FastAddRotations(angle, spread * degree);
-        spread = math_random_float_range(zero, D_L16_001B1784);
-        vec_build_spherical_offset(random, D_L16_001B1788, angle, spread * degree);
+        spread = math_random_float_range(zero, g_snivelak_arm_spread_b);
+        vec_build_spherical_offset(random, g_snivelak_arm_shot_radius, angle, spread * degree);
         FastVecAdd(random, random, hero);
         snivelak_spawn_shot_from_matrix(moby, origin, 180);
         index = (*(s32 *)(state + 0x240) + 1) & 1;
         *(s32 *)(state + 0x240) = index;
-        *(TI128 *)child = *(TI128 *)D_L16_001B1790;
+        *(TI128 *)child = *(TI128 *)g_snivelak_child_template;
         if (index) child[1] = -child[1];
         matrix_mul_vec3(child, child, *(u8 **)(state + 0x1F0) + 0xC0);
         FastVecAdd(child, child, *(u8 **)(state + 0x1F0) + 0x10);
-        *(TI128 *)target = *(TI128 *)(D_L16_001B16C0 + 0x10);
+        *(TI128 *)target = *(TI128 *)(g_snivelak_target + 0x10);
         target[2] += 4.0f;
         if (CollLine(child, target, 2, *(u8 **)(state + 0x1F0), 0))
             *(s32 *)(state + 0x240) = (*(s32 *)(state + 0x240) + 1) & 1;

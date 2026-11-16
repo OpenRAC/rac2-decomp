@@ -3,9 +3,9 @@
 extern s32 func_305EE8(s32 size);
 extern f32 func_310648(void);
 extern u32 g_pHeroMoby[];
-extern f32 D_L01_001B1A68 __attribute__((sda));
-extern f32 D_L01_001B1A6C __attribute__((sda));
-extern f32 D_L01_001B1A70 __attribute__((sda));
+extern f32 g_spin_rate_x __attribute__((sda));
+extern f32 g_spin_rate_y __attribute__((sda));
+extern f32 g_spin_rate_z __attribute__((sda));
 extern void gold_bolt_glow_init(void *a0);
 
 /* Spawns a gold bolt moby at a position, already in its idle state, with random spin angles.
@@ -34,9 +34,9 @@ void *SpawnGoldBolt(void *position, void *owner_a, void *owner_b, void *owner_c)
         value = func_310648();
         *(f32 *)(bolt + 0xF8) = value;
         value = func_310648();
-        spin_x = D_L01_001B1A68;
-        spin_y = D_L01_001B1A6C;
-        spin_z = D_L01_001B1A70;
+        spin_x = g_spin_rate_x;
+        spin_y = g_spin_rate_y;
+        spin_z = g_spin_rate_z;
         *(f32 *)(bolt + 0xFC) = value;
         *(u32 *)(vars + 8) = (u32)owner_c;
         *(u32 *)(vars + 4) = (u32)owner_b;

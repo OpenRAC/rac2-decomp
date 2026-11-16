@@ -9,7 +9,7 @@
 
 typedef unsigned char u8;
 
-extern float D_L02_001B2FE0 __attribute__((sda));
+extern float g_grab_highlight_level __attribute__((sda));
 
 /* Clamps the state's float at 0x3C to 0..1 and stores its complement. */
 void math_store_clamped_complement(u8 *object)
@@ -21,5 +21,5 @@ void math_store_clamped_complement(u8 *object)
         value = 1.0f;
     else if (value < 0.0f)
         value = 0.0f;
-    D_L02_001B2FE0 = 1.0f - value;
+    g_grab_highlight_level = 1.0f - value;
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_US2_L15_00432488, the v2.00 copy of func_L15_004307E0: the same C, where the first pass
    also stops the owner's sound and clears its slot id, then deletes D_L15_001B1584 and
    D_L15_001B1588 when their field 0x34 is set. The last stage drops the D_L15_001B1520 count,
@@ -10,21 +11,21 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; u8 *target; char pad1C[4]; Vector pos; } Hit;
 
-extern int D_L15_001B1534 __attribute__((sda));
-extern int D_L15_001B15BC __attribute__((sda));
-extern int D_L15_001B15D0 __attribute__((sda));
-extern int D_L15_001B15AC __attribute__((sda));
-extern float D_L15_001B1540[4] SDATA(D_L15_001B1540);
+extern int g_cutscene_l15_started_flag __attribute__((sda));
+extern int g_gorn_cutscene_started_flag __attribute__((sda));
+extern int g_gorn_cutscene_active_flag __attribute__((sda));
+extern int g_gorn_message_counter __attribute__((sda));
+extern float g_cutscene_l15_camera_rotation[4] SDATA(D_L15_001B1540);
 /* Retail takes the camera position's address $gp-relative and reaches its z absolutely. */
-extern float D_L15_001B1550[4] MACRO_ADDR;
+extern float g_cutscene_camera_pos[4] MACRO_ADDR;
 extern float camera_pos[4] SDATA(D_L15_001B1550);
-extern int D_L15_00221E3C NOT_SDA;
-extern u8 *D_L15_001B1584 __attribute__((sda));
-extern u8 *D_L15_001B1588 __attribute__((sda));
+extern int g_gorn_cutscene_basis_flag NOT_SDA;
+extern u8 *g_gorn_path_first_node __attribute__((sda));
+extern u8 *g_gorn_path_next_node __attribute__((sda));
 extern u8 g_sound_state[];
-extern int D_L15_001B2148;
-extern u8 *D_L15_001B261C;
-extern Hit D_L15_001BFC00;
+extern int g_gorn_challenge_count;
+extern u8 *g_moby_base;
+extern Hit g_hit_l15_result;
 
 extern void music_Unpause(void);
 extern void entry_init_all_registered(void);
@@ -48,7 +49,7 @@ extern void moby_mark_spawned(void *);
 extern void moby_set_flag_bit(void *, int);
 extern void hero_set_state_value_c(int);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_US2_L15_00432238(void *, int);
+extern void gorn_finish_challenge_stage_us2(void *, int);
 
 void func_US2_L15_00432488(u8 *self)
 {
@@ -58,10 +59,10 @@ void func_US2_L15_00432488(u8 *self)
     Vector basis[3];
     u8 *vars = *(u8 **)(self + 0x68);
 
-    if (D_L15_001B1534 == 0) {
+    if (g_cutscene_l15_started_flag == 0) {
         u8 **list;
         int i, count;
-        u8 *owner = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
+        u8 *owner = g_moby_base + (*(int *)(vars + 0x20) << 8);
         u8 *data = *(u8 **)(owner + 0x68);
         int id = *(int *)(data + 0x270);
 
@@ -73,8 +74,8 @@ void func_US2_L15_00432488(u8 *self)
         }
         *(int *)(data + 0x270) = -1;
         *(int *)(data + 0x14) = 0;
-        D_L15_00221E3C = 0;
-        D_L15_001B1534 = 1;
+        g_gorn_cutscene_basis_flag = 0;
+        g_cutscene_l15_started_flag = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -85,20 +86,20 @@ void func_US2_L15_00432488(u8 *self)
             if (*(short *)(list[i] + 0xAA) == 0x1211)
                 entry_spawn_list_objects_with_flag(list[i], 1);
         }
-        if (D_L15_001B1584 != 0 && *(unsigned short *)(D_L15_001B1584 + 0x34) != 0) {
-            moby_mark_spawned(D_L15_001B1584);
-            D_L15_001B1584 = 0;
+        if (g_gorn_path_first_node != 0 && *(unsigned short *)(g_gorn_path_first_node + 0x34) != 0) {
+            moby_mark_spawned(g_gorn_path_first_node);
+            g_gorn_path_first_node = 0;
         }
-        if (D_L15_001B1588 != 0 && *(unsigned short *)(D_L15_001B1588 + 0x34) != 0) {
-            moby_mark_spawned(D_L15_001B1588);
-            D_L15_001B1588 = 0;
+        if (g_gorn_path_next_node != 0 && *(unsigned short *)(g_gorn_path_next_node + 0x34) != 0) {
+            moby_mark_spawned(g_gorn_path_next_node);
+            g_gorn_path_next_node = 0;
         }
     }
     if (group_count_alive(level_find_object_by_class_id(0x1211)) != 0)
         return;
-    if (D_L15_001B2148 < 6)
+    if (g_gorn_challenge_count < 6)
         return;
-    if (D_L15_001B15BC == 0) {
+    if (g_gorn_cutscene_started_flag == 0) {
         u8 *obj;
         u8 *pos;
         float dist;
@@ -107,14 +108,14 @@ void func_US2_L15_00432488(u8 *self)
             return;
         *(int *)(vars + 0x6C) = 60;
         effect_remove_family_mobys();
-        obj = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
+        obj = g_moby_base + (*(int *)(vars + 0x20) << 8);
         pos = obj + 0x10;
         qcopy(camera_pos, pos);
         vec_scale_to_length(step, obj + 0xC0, 196.0f);
         dist = 25.0f;
         FastVecAdd(ahead, pos, step);
         if (CollLine(pos, ahead, 0, obj, 0) != 0) {
-            Hit *hit = &D_L15_001BFC00;
+            Hit *hit = &g_hit_l15_result;
 
             if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211)
                 dist = fast_vec_dist(hit->pos, pos);
@@ -125,28 +126,28 @@ void func_US2_L15_00432488(u8 *self)
             dist = dist * 0.5f;
         vec_scale_to_length(step, obj + 0xC0, dist);
         FastVecAdd(camera_pos, camera_pos, step);
-        D_L15_001B1550[2] -= 16.0f;
+        g_cutscene_camera_pos[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
         qcopy(basis[0], obj + 0xC0);
         qcopy(basis[2], up.f);
         FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
-        mat_get_euler_angles(basis, D_L15_001B1540);
-        ship_start_transition(camera_pos, D_L15_001B1540, 300);
+        mat_get_euler_angles(basis, g_cutscene_l15_camera_rotation);
+        ship_start_transition(camera_pos, g_cutscene_l15_camera_rotation, 300);
         self[0x20] = 3;
-        D_L15_001B15BC = 1;
-    } else if (D_L15_001B15D0 != 0) {
+        g_gorn_cutscene_started_flag = 1;
+    } else if (g_gorn_cutscene_active_flag != 0) {
         if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 10;
         moby_mark_flag_and_append_to_list(0x10);
-        moby_set_flag_bit(D_L15_001B261C + (*(int *)(vars + 0x28) << 8), 1);
-        D_L15_001B15AC = 0;
-        D_L15_001B15D0 = 0;
+        moby_set_flag_bit(g_moby_base + (*(int *)(vars + 0x28) << 8), 1);
+        g_gorn_message_counter = 0;
+        g_gorn_cutscene_active_flag = 0;
         hero_set_state_value_c(1);
     } else if (math_fast_float_d(vars + 0x6C) != 0) {
         entry_init_all_registered();
-        func_US2_L15_00432238(self, 0);
+        gorn_finish_challenge_stage_us2(self, 0);
     }
 }

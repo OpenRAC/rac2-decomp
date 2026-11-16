@@ -14,19 +14,19 @@ typedef struct {
     int unknown;
 } SaveRow;
 
-extern SaveRow D_00139410[];
+extern SaveRow g_save_slot_rows[];
 
 /* GP-relative layout coefficients of the save-slot panel. */
  /* line height */
  /* slot gap */
-extern int D_001ABC14[] MACRO_ADDR;
-extern int D_001ABC1C[] MACRO_ADDR;
+extern int g_save_slot_icon_y_table[] MACRO_ADDR;
+extern int g_save_slot_icon_size_table[] MACRO_ADDR;
 /* Format strings. */
-extern char D_001ABC28[] NOT_SDA;
-extern char D_001ABAF0[] NOT_SDA;
-extern char D_001ABB20[] NOT_SDA;
-extern char D_001ABC38[] NOT_SDA;
-extern char D_001ABC48[] NOT_SDA;
+extern char g_str_save_slot_time_fmt[] NOT_SDA;
+extern char g_str_save_slot_score_fmt[] NOT_SDA;
+extern char g_str_save_slot_thousands_fmt[] NOT_SDA;
+extern char g_str_save_slot_score_millions_fmt[] NOT_SDA;
+extern char g_str_save_slot_date_fmt[] NOT_SDA;
 
 /* The game state at D_001F2840, as far as the page menu uses it. */
 typedef struct {
@@ -76,15 +76,15 @@ typedef struct {
 extern char g_map_overlay_state[];
 extern char g_pad_state[];
 
-extern PagePreview D_0025A6E0;
-extern u8 D_0025E680[];
-extern u8 D_001A7BC8[] MACRO_ADDR;  /* page available, one byte per page */
-extern int D_00139768[];            /* flag bits: bit (n & 31) of word n >> 2 */
-extern int D_0025A620[];
-extern int D_001A7478;
+extern PagePreview g_page_preview;
+extern u8 g_level_page_root[];
+extern u8 g_map_visited_flags[] MACRO_ADDR;  /* page available, one byte per page */
+extern int g_request_flag_table[];            /* flag bits: bit (n & 31) of word n >> 2 */
+extern int g_level_page_entry_value[];
+extern int g_loader_state_word;
 extern int g_current_map_index __attribute__((sda));
-extern int D_001A72D4 __attribute__((sda));
-extern char D_001BAD40[];
+extern int g_vram_frame_base __attribute__((sda));
+extern char g_loader_movie[];
 
 extern int map_find_table_index(int);
 extern void map_set_current_and_refresh(int);
@@ -105,13 +105,13 @@ int func_PAL_002D82D8(PageMenu *menu)
             menu->selection[((PageMap *)g_map_overlay_state)->page] = -1;
         return 0;
     }
-    if ((((PagePad *)g_pad_state)->buttons & 0xD00) && !((PageRoot *)g_pause_menu_state)->lock && ((PageRoot *)g_pause_menu_state)->owner != D_0025E680)
+    if ((((PagePad *)g_pad_state)->buttons & 0xD00) && !((PageRoot *)g_pause_menu_state)->lock && ((PageRoot *)g_pause_menu_state)->owner != g_level_page_root)
         return 1;
 
     /* Next and previous available page. */
     if (((PagePad *)g_pad_state)->buttons & 8) {
         for (next = ((PageMap *)g_map_overlay_state)->page + 1; next < 28; next++) {
-            if (D_001A7BC8[next] || g_current_map_index == next) {
+            if (g_map_visited_flags[next] || g_current_map_index == next) {
                 if (map_find_table_index(next) < 0)
                     return 0;
                 map_set_current_and_refresh(next);
@@ -121,7 +121,7 @@ int func_PAL_002D82D8(PageMenu *menu)
     }
     if (((PagePad *)g_pad_state)->buttons & 4) {
         for (next = ((PageMap *)g_map_overlay_state)->page - 1; next >= 0; next--) {
-            if (D_001A7BC8[next] || g_current_map_index == next) {
+            if (g_map_visited_flags[next] || g_current_map_index == next) {
                 if (map_find_table_index(next) < 0)
                     return 0;
                 map_set_current_and_refresh(next);
@@ -157,18 +157,18 @@ int func_PAL_002D82D8(PageMenu *menu)
         }
         if ((buttons & 0x5000) || ((PageMap *)g_map_overlay_state)->page != previous) {
             int *entry;
-            D_0025A6E0.timer = -576;
+            g_page_preview.timer = -576;
             entry = &selections[((PageMap *)g_map_overlay_state)->page];
-            D_0025A6E0.item = ((int *)0x70000000)[*entry];
-            *D_0025A620 = ((int *)0x70000100)[*entry];
+            g_page_preview.item = ((int *)0x70000000)[*entry];
+            *g_level_page_entry_value = ((int *)0x70000100)[*entry];
         }
     } else {
-        D_0025A6E0.item = 0;
-        *D_0025A620 = -1;
+        g_page_preview.item = 0;
+        *g_level_page_entry_value = -1;
     }
 
     /* Back. */
-    if ((((PagePad *)g_pad_state)->buttons & 0x10) && ((PageRoot *)g_pause_menu_state)->owner != D_0025E680) {
+    if ((((PagePad *)g_pad_state)->buttons & 0x10) && ((PageRoot *)g_pause_menu_state)->owner != g_level_page_root) {
         int back = *(int *)(((PageRoot *)g_pause_menu_state)->owner + 0xE0);
         int status;
         if (back)
@@ -195,16 +195,16 @@ done:
         if (((PageMap *)g_map_overlay_state)->page >= 0) {
             unsigned int word = (unsigned)mapped >> 2;
             int bit = 1 << (mapped & 0x1F);
-            if (D_00139768[word] & bit) {
-                D_001A72D4 = ((PageRoot *)g_pause_menu_state)->saved;
+            if (g_request_flag_table[word] & bit) {
+                g_vram_frame_base = ((PageRoot *)g_pause_menu_state)->saved;
                 menu_restore_saved_screen_image(0);
-                ((PageRoot *)g_pause_menu_state)->savedMode = D_001A7478;
+                ((PageRoot *)g_pause_menu_state)->savedMode = g_loader_state_word;
                 ((PageRoot *)g_pause_menu_state)->savedOwner = ((PageRoot *)g_pause_menu_state)->owner;
                 ((PageRoot *)g_pause_menu_state)->page = ((PageMap *)g_map_overlay_state)->page;
                 ((PageRoot *)g_pause_menu_state)->savedCurrent = ((PageRoot *)g_pause_menu_state)->field8;
-                D_001A7478 = 2;
-                req_push_queue(D_001BAD40, mapped);
-                req_launch_queued(D_001BAD40);
+                g_loader_state_word = 2;
+                req_push_queue(g_loader_movie, mapped);
+                req_launch_queued(g_loader_movie);
                 return 1;
             }
         }

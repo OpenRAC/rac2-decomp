@@ -13,7 +13,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void matrix_mul_vec3(char *, char *, char *);
 extern void FastVecScale(char *, char *, float);
 
-void func_PAL_L20_004495C0(char *arg0, char *arg1, char *arg2, float *arg3) {
+void yeedil_boss_compute_shot_launch_pal(char *arg0, char *arg1, char *arg2, float *arg3) {
     char *state = *(char **)(arg0 + 0x68);
     L20_V4 v1;
     L20_V4 v2;

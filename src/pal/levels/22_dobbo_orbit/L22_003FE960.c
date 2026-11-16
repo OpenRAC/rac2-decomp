@@ -5,14 +5,14 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int s32;
-extern s32 D_L22_001B2128 __attribute__((sda));
-extern u8 D_L22_001A7A78 __attribute__((sda));
-extern s32 D_L22_001A903C __attribute__((sda));
-extern s32 D_L22_0018B6A8 __attribute__((sda));
+extern s32 g_trigger_event_list_head __attribute__((sda));
+extern u8 g_unused_level_byte __attribute__((sda));
+extern s32 g_trigger_event_flag __attribute__((sda));
+extern s32 g_unused_l22_level_word __attribute__((sda));
 extern s32 func_2F36F0(s32);
 extern void text_show_message_with_sound(s32, s32, s32);
 
-void func_PAL_L22_003FEA38(s32 a0) {
+void text_show_message_sound_clear_flag_pal(s32 a0) {
     s32 x = *(u32 *)(a0 + 0x68);
 
     text_show_message_with_sound(a0, x, x);

@@ -1,7 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_001AEF60 __attribute__((sda));
+extern int g_effect_init_flag __attribute__((sda));
 
 /* func_PAL_L03_0038E5C8, the PAL copy of func_L03_0038B4E8: the same C, with the three
    timers at 0x18, 0x1C and 0x20 scaled to 50 Hz. */
@@ -34,5 +35,5 @@ void func_PAL_L03_0038E5C8(unsigned char *a0) {
     *(int *)(p + 0x20) = (*(int *)(p + 0x20) * 5 + 2) / 6;
     *(int *)(p + 0xD8) = -1;
     *(int *)(p + 0xDC) = *(int *)(p + 0xDC) << 3;
-    D_001AEF60 = 0;
+    g_effect_init_flag = 0;
 }

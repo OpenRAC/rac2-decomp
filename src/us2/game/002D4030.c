@@ -9,12 +9,12 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029C990(int);
 
-int func_US2_002D4030(void) {
+int menu_page_update_4_us2(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -42,7 +42,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029C9D0(void);
 
-int func_US2_002D40B8(void) {
+int menu_page_draw_6_us2(void) {
     SetupGifPaging(0);
     func_0029C9D0();
     DoGifPaging();
@@ -52,9 +52,9 @@ int func_US2_002D40B8(void) {
 extern int func_0029C840(int);
 extern int menu_process_request(short, int, int *);
 
-int func_US2_002D40E8(void) {
+int menu_page_update_send_request_us2(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -82,7 +82,7 @@ return_value:
 
 extern void func_0029C880(void);
 
-int func_US2_002D4188(void) {
+int menu_page_draw_7_us2(void) {
     SetupGifPaging(0);
     func_0029C880();
     DoGifPaging();
@@ -91,9 +91,9 @@ int func_US2_002D4188(void) {
 
 extern int func_0029C8B0(int);
 
-int func_US2_002D41B8(void) {
+int menu_page_update_5_us2(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -116,7 +116,7 @@ return_value:
 extern void func_0029C8F0(void);
 
 /* Implementation matching decompiled output */
-long func_US2_002D4240(void)
+long menu_page_draw_8_us2(void)
 {
   SetupGifPaging(0);
   func_0029C8F0();

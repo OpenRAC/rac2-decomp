@@ -1,24 +1,25 @@
+#include "names.h"
 /* func_L09_003FA080 (levels 09 and 20): the -G8 sibling of L09_003F9468.c, for the $gp
  * scalars; the moby table word D_L09_001B285C is a MACRO_ADDR scalar (tied lui/lw) and
  * the table index is summed shift-first, as retail. */
 #include "common.h"
 
-extern int D_L09_001B10F4 __attribute__((sda));
-extern int D_L09_001B0F54 __attribute__((sda));
-extern int D_L09_001B0F58 __attribute__((sda));
-extern float D_L09_001B0F60 __attribute__((sda));
-extern int D_L09_001B2388 __attribute__((sda));
-extern float D_L09_001B0F2C __attribute__((sda));
-extern int D_L09_001B0F34 __attribute__((sda));
-extern int D_L09_001B0F38 __attribute__((sda));
-extern int D_L09_001B0F3C __attribute__((sda));
-extern u16 D_L09_001B0F40 __attribute__((sda));
-extern int D_L09_001B0F44 __attribute__((sda));
-extern int D_L09_001B0F48 __attribute__((sda));
-extern s32 D_L09_001B285C MACRO_ADDR;
-extern char *D_L09_001FE6C0[];
-extern char D_L09_001B10F8[];
-extern char D_L09_001B1128[];
+extern int g_trooper_debug_flag __attribute__((sda));
+extern int g_trooper_spawn_delay_min __attribute__((sda));
+extern int g_trooper_spawn_delay_max __attribute__((sda));
+extern float g_trooper_move_speed __attribute__((sda));
+extern int g_frame_l09_counter __attribute__((sda));
+extern float g_trooper_attack_range __attribute__((sda));
+extern int g_trooper_fire_chance __attribute__((sda));
+extern int g_trooper_frame_min __attribute__((sda));
+extern int g_trooper_frame_max __attribute__((sda));
+extern u16 g_trooper_anim_period __attribute__((sda));
+extern int g_trooper_timer_min __attribute__((sda));
+extern int g_trooper_timer_max __attribute__((sda));
+extern s32 g_moby_record_table MACRO_ADDR;
+extern char *g_path_l09_table[];
+extern char g_str_trooper_debug_anim[];
+extern char g_str_trooper_debug_msg[];
 
 extern void STUB_printf(const char *, ...);
 extern int FastDecTimer(void *);
@@ -67,7 +68,7 @@ void trooper_legs_update(char *self)
     char *vars;
     int state;
 
-    if (D_L09_001B10F4 != 0)
+    if (g_trooper_debug_flag != 0)
         return;
     if (moby_is_in_selected_zone(self + 0x10) == 0)
         return;
@@ -82,18 +83,18 @@ void trooper_legs_update(char *self)
 
     switch (*(u8 *)(self + 0x95)) {
     case 0:
-        STUB_printf(D_L09_001B10F8, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
+        STUB_printf(g_str_trooper_debug_anim, *(s16 *)(self + 0xB2), *(s16 *)(self + 0xAA));
         break;
     case 1: {
         int k;
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
         k = *(int *)(vars + 0x4B0);
-        if (k == -1 || ((u8 *)((k << 8) + D_L09_001B285C))[0x20] == 0xFE
-            || ((u8 *)((k << 8) + D_L09_001B285C))[0x20] == 0xFD) {
+        if (k == -1 || ((u8 *)((k << 8) + g_moby_record_table))[0x20] == 0xFE
+            || ((u8 *)((k << 8) + g_moby_record_table))[0x20] == 0xFD) {
             if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
                 *(int *)(vars + 0x2D8) = *(int *)(vars + 0x2D4);
                 if ((*(u8 *)(vars + 0x302) ^ 1) & 1) {
-                    *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+                    *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
                     moby_set_state(self, *(u8 *)(self + 0x20), 2);
                 } else {
                     enemy_set_animation_state(self, 0xC, 0, math_random_int_range(7, 0xC));
@@ -114,7 +115,7 @@ void trooper_legs_update(char *self)
             } else {
                 enemy_select_path(self, *(int *)(vars + 0x2B8), -1);
                 enemy_set_animation_state(self, 2, 0, 0xA);
-                *(float *)(self + 0x48) = D_L09_001B0F60;
+                *(float *)(self + 0x48) = g_trooper_move_speed;
                 moby_set_state(self, 4, 3);
             }
             if (*(u8 *)(vars + 0x302) & 2) {
@@ -126,15 +127,15 @@ void trooper_legs_update(char *self)
         *(float *)(vars + 0x2EC) = mat_fast_helper_a(*(float *)(*(char **)(vars + 0x200) + 0x10) - *(float *)(self + 0x10),
                                                  *(float *)(*(char **)(vars + 0x200) + 0x14) - *(float *)(self + 0x14));
         if (*(int *)(vars + 0x204) == 1)
-            *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
         break;
     case 4:
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
         if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
             enemy_select_path(self, *(int *)(vars + 0x2B8), -1);
-            *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
             enemy_set_animation_state(self, 2, 0, 0xA);
-            *(float *)(self + 0x48) = D_L09_001B0F60;
+            *(float *)(self + 0x48) = g_trooper_move_speed;
             moby_set_state(self, 4, 3);
         }
         break;
@@ -144,7 +145,7 @@ void trooper_legs_update(char *self)
         if (*(u8 *)(vars + 0x302) & 2) {
             enemy_set_animation_state(self, func_001163B0() & 1, 0, math_random_int_range(10, 20));
             shared_counter_release(self);
-            *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
             *(s16 *)(vars + 0x300) = 1;
             moby_set_state(self, *(u8 *)(self + 0x20), 2);
         }
@@ -158,7 +159,7 @@ void trooper_legs_update(char *self)
         *(float *)(vars + 0x2EC) = *(float *)(self + 0xF8);
         if (*(int *)(vars + 0x204) == 1 || *(s16 *)(vars + 0x2E0) != 0) {
             shared_counter_release(self);
-            *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
             enemy_set_animation_state(self, 3, 0, math_random_int_range(7, 0xC));
             moby_set_state(self, 5, 5);
         } else if (*(s16 *)(vars + 0x2E8) == 0) {
@@ -174,7 +175,7 @@ void trooper_legs_update(char *self)
         break;
     case 8:
         *(float *)(vars + 0x2EC) = FastAddRotations(*(float *)(vars + 0x2EC),
-            (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L09_001B2388) * 0.02f)) + 2.0f) * 0.023271061f);
+            (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_frame_l09_counter) * 0.02f)) + 2.0f) * 0.023271061f);
         break;
     case 9: {
         int flags;
@@ -191,7 +192,7 @@ void trooper_legs_update(char *self)
             moby_set_state(self, 0xF, -1);
         } else if (flags & 2) {
             shared_counter_release(self);
-            *(s16 *)(vars + 0x2E0) = math_random_int_range(D_L09_001B0F54, D_L09_001B0F58);
+            *(s16 *)(vars + 0x2E0) = math_random_int_range(g_trooper_spawn_delay_min, g_trooper_spawn_delay_max);
             if (*(u8 *)(self + 0x42) == 0xF || *(u8 *)(self + 0x43) == 0xF
                 || (*(int *)(vars + 0x2DC) != -1 && *(int *)(vars + 0x2DC) == *(int *)(vars + 0x2B0))
                 || *(int *)(vars + 0x428) != 0) {
@@ -233,7 +234,7 @@ void trooper_legs_update(char *self)
         break;
     case 4:
         if (*(int *)(vars + 0x2DC) != -1) {
-            char *p = D_L09_001FE6C0[*(int *)(vars + 0x2DC)] + *(s16 *)(vars + 0x1C8) * 0x10;
+            char *p = g_path_l09_table[*(int *)(vars + 0x2DC)] + *(s16 *)(vars + 0x1C8) * 0x10;
             moby_step_at_own_position_factor(self, mat_fast_helper_a(*(float *)(p + 0x10) - *(float *)(self + 0x10),
                                               *(float *)(p + 0x14) - *(float *)(self + 0x14)));
         }
@@ -289,7 +290,7 @@ void trooper_legs_update(char *self)
             near = 0;
         close = 1;
         lt = **(int **)(vars + 0x304) < *(int *)(vars + 0x2CC);
-        if (!(d < D_L09_001B0F2C))
+        if (!(d < g_trooper_attack_range))
             close = 0;
         got = 0;
         tried = 0;
@@ -298,7 +299,7 @@ void trooper_legs_update(char *self)
             *(int *)(vars + 0x4B4) = 0;
             *(int *)(vars + 0x138) |= 0x10;
         }
-        if (!close && near && lt && math_random_int_below(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
+        if (!close && near && lt && math_random_int_below(g_trooper_fire_chance - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
             tried = 1;
             got = enemy_check_line_of_sight(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
         }
@@ -308,7 +309,7 @@ void trooper_legs_update(char *self)
             *(int *)(vars + 0x138) &= ~0x10;
             shared_counter_acquire(self);
             enemy_set_animation_state(self, 8, 0, 7);
-            STUB_printf(D_L09_001B1128);
+            STUB_printf(g_str_trooper_debug_msg);
             moby_set_state(self, 0xA, -1);
         }
         if (tried && !got)
@@ -350,12 +351,12 @@ void trooper_legs_update(char *self)
             near = 0;
         close = 1;
         lt = **(int **)(vars + 0x304) < *(int *)(vars + 0x2CC);
-        if (!(d < D_L09_001B0F2C))
+        if (!(d < g_trooper_attack_range))
             close = 0;
         if (*(u8 *)(vars + 0x303) == 0) {
             int got = 0;
             int tried = 0;
-            if (!close && near && lt && math_random_int_below(D_L09_001B0F34 - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
+            if (!close && near && lt && math_random_int_below(g_trooper_fire_chance - 1) == 0 && *(s16 *)(vars + 0x2E6) == 0) {
                 tried = 1;
                 got = enemy_check_line_of_sight(self, 0, *(u8 *)(vars + 0x30C) != 0, 0);
             }
@@ -389,17 +390,17 @@ void trooper_legs_update(char *self)
                 enemy_set_animation_state(self, 0xA, 0, 0xA);
             else
                 enemy_set_animation_state(self, 0x13, 0, 0xC);
-            *(u16 *)(vars + 0x2E4) = D_L09_001B0F40;
+            *(u16 *)(vars + 0x2E4) = g_trooper_anim_period;
             moby_set_state(self, 0xB, -1);
         }
         break;
     case 11:
-        if (D_L09_001B0F3C < *(u16 *)(self + 0x96))
+        if (g_trooper_frame_max < *(u16 *)(self + 0x96))
             trooper_fire_arm_shot(self);
-        if ((D_L09_001B0F38 < *(u16 *)(self + 0x96)
-             && D_L09_001B0F2C < vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10))
+        if ((g_trooper_frame_min < *(u16 *)(self + 0x96)
+             && g_trooper_attack_range < vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10))
             || *(char **)(vars + 0x2F8) == 0) {
-            *(s16 *)(vars + 0x2E6) = math_random_int_range(D_L09_001B0F44, D_L09_001B0F48);
+            *(s16 *)(vars + 0x2E6) = math_random_int_range(g_trooper_timer_min, g_trooper_timer_max);
             shared_counter_release(self);
             enemy_set_animation_state(self, 0xC, 0, math_random_int_range(7, 0xC));
             if (*(int *)(vars + 0x428) != 0)

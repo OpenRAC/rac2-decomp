@@ -9,8 +9,8 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int g_map_overlay_state[];
 extern void map_empty_stub(void);
 extern char g_pad_state[];
-extern int D_001A95C0 __attribute__((sda));
-extern int D_001A95C4 __attribute__((sda));
+extern int g_map_pan_origin_x __attribute__((sda));
+extern int g_map_pan_origin_y __attribute__((sda));
 
 /* Map screen pan/zoom update: returns 1 (after func_002E5E58(0x13)) while the pad
    word +0x1C4 has 0x510 set, 0 when the map has nothing open (+0x24) or no slot
@@ -52,8 +52,8 @@ int map_update_overlay_pan_zoom(void)
     }
     {
         float curZoom = zoom[*(int *)(mapState + 0x234)];
-        int minX = (int)((float)(0x1000 - D_001A95C0 * 16) / curZoom) << 15;
-        int minY = (int)((float)(0xD00 - D_001A95C4 * 16) / curZoom) << 15;
+        int minX = (int)((float)(0x1000 - g_map_pan_origin_x * 16) / curZoom) << 15;
+        int minY = (int)((float)(0xD00 - g_map_pan_origin_y * 16) / curZoom) << 15;
         int maxX = 0x10000000 - minX;
         int maxY = 0x10000000 - minY;
 

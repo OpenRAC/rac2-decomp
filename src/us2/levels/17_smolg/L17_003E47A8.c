@@ -13,13 +13,13 @@
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 
-extern int D_L17_001CA140[];
-extern int D_L17_001A8F00 MACRO_ADDR;
+extern int g_grulch_disabled_flag[];
+extern int g_spark_effect_state MACRO_ADDR;
 extern int g_current_map_index __attribute__((sda));
 extern char *g_moby_l17_pool[] __attribute__((sda));
-extern float D_L17_001B0CAC SDATA(D_L17_001B0CAC);
-extern float D_L17_001B0CB0 SDATA(D_L17_001B0CB0);
-extern float D_L17_001B0CB4 SDATA(D_L17_001B0CB4);
+extern float g_grulch_near_distance SDATA(D_L17_001B0CAC);
+extern float g_grulch_approach_speed_a SDATA(D_L17_001B0CB0);
+extern float g_grulch_approach_speed_b SDATA(D_L17_001B0CB4);
 typedef struct { char pad[0x80]; float x,y; } L17HeroRecord;
 extern L17HeroRecord g_hero_state;
 extern void grulch_init_state_check_hits(char *);
@@ -69,9 +69,9 @@ void func_US2_L17_003E47A8(char *object)
     char *vars, *other;
     int flags;
     float angle;
-    if (D_L17_001CA140[0]) return;
+    if (g_grulch_disabled_flag[0]) return;
     vars=P(object,0x68);
-    if (D_L17_001A8F00==2) {
+    if (g_spark_effect_state==2) {
         if (!B(object,0x31)) return;
         I(vars,0x454)=1;
         I(object,0x98)=0;
@@ -197,7 +197,7 @@ restoreCollision:
         if(B(object,0x43)==0 && H(vars,0x400)!=0) {
             if(B(object,0x43)!=9) anim_start_blended(object,9,0,14);
         }
-        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),D_L17_001B0CB0*(1.0f/60.0f),0.0019444445f);
+        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_a*(1.0f/60.0f),0.0019444445f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0019444445f);
         if(B(object,0x43)==9) {
             F(object,0x48)=0.8f;
@@ -215,7 +215,7 @@ restoreCollision:
         if(B(object,0x43)!=9 && B(object,0x43)!=5 && B(object,0x43)!=4) {
             if(B(object,0x43)!=9) anim_start_blended(object,9,0,14);
         }
-        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),D_L17_001B0CB4*(1.0f/60.0f),0.0019444445f);
+        if(H(vars,0x400)>20) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_b*(1.0f/60.0f),0.0019444445f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0019444445f);
         if(B(object,0x43)==9) {
             if(H(vars,0x400)==0) {
@@ -238,7 +238,7 @@ restoreCollision:
     case 4:
         if(flag_set_first_pending(object)) I(vars,0x418)=math_random_int_range(80,100);
         F(object,0x48)=1.0f;
-        if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=D_L17_001B0CAC) {
+        if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=g_grulch_near_distance) {
             moby_set_state(object,5,2);
             if(B(object,0x43)!=6) anim_start_blended(object,6,2,6);
             F(vars,0x414)=0;
@@ -265,8 +265,8 @@ restoreCollision:
                     if(coll_sweep_from_object(object,1.0f,object+0x10,0x4000001,F(vars,0x430),1.0f,0,1,0)>0) I(vars,0x448)=1;
                     else I(vars,0x448)=0;
                 } else if(B(object,0x42)==6 && ((B(object,0x60)&2) || math_is_value_within_step(object,11.0f))) {
-                    if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>D_L17_001B0CAC) {
-                        if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>D_L17_001B0CAC) {
+                    if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>g_grulch_near_distance) {
+                        if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>g_grulch_near_distance) {
                             if(math_random_int_range(0,7)>0) {
                                 moby_set_state(object,11,2);
                                 if(B(object,0x43)!=7) anim_start_blended(object,7,0,14);

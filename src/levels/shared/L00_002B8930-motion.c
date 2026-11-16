@@ -1,6 +1,6 @@
 #include "common.h"
 extern char g_hero_state[];
-extern char D_L00_0025BE10[];
+extern char g_hero_item_attach_records[];
 typedef struct {
     char reserved000[0x174];
     float weight;
@@ -40,45 +40,45 @@ void UpdateHeroMotionResponseParameters(void)
         weight = PLAYER.weight * 19.999998f;
         negative = -turn;
         scaled = negative * 0.2f;
-        ((MotionPose *)D_L00_0025BE10)->f1240 = scaled;
+        ((MotionPose *)g_hero_item_attach_records)->f1240 = scaled;
         if (weight > 1.0f) weight = 1.0f;
         if (weight < 0.0f) weight = 0.0f;
-        ((MotionPose *)D_L00_0025BE10)->f10E8 = turn;
-        ((MotionPose *)D_L00_0025BE10)->f1240 = scaled * weight;
-        ((MotionPose *)D_L00_0025BE10)->f10E0 = negative * 0.35f;
-        ((MotionPose *)D_L00_0025BE10)->f1198 = turn * 1.35f;
-        ((MotionPose *)D_L00_0025BE10)->f1194 = math_fabs(turn) * 0.25f;
+        ((MotionPose *)g_hero_item_attach_records)->f10E8 = turn;
+        ((MotionPose *)g_hero_item_attach_records)->f1240 = scaled * weight;
+        ((MotionPose *)g_hero_item_attach_records)->f10E0 = negative * 0.35f;
+        ((MotionPose *)g_hero_item_attach_records)->f1198 = turn * 1.35f;
+        ((MotionPose *)g_hero_item_attach_records)->f1194 = math_fabs(turn) * 0.25f;
     } else if (PLAYER.mode == 75) {
         float turn, a, b, d, c;
         turn = PLAYER.y * 1.6f;
         if (turn > 1.25f) turn = 1.25f;
         else if (turn < -1.25f) turn = -1.25f;
         a = -turn * 0.52f;
-        ((MotionPose *)D_L00_0025BE10)->f1240 = a;
-        if (a > 0.28f) ((MotionPose *)D_L00_0025BE10)->f1240 = 0.28f;
-        else if (a < -0.28f) ((MotionPose *)D_L00_0025BE10)->f1240 = -0.28f;
+        ((MotionPose *)g_hero_item_attach_records)->f1240 = a;
+        if (a > 0.28f) ((MotionPose *)g_hero_item_attach_records)->f1240 = 0.28f;
+        else if (a < -0.28f) ((MotionPose *)g_hero_item_attach_records)->f1240 = -0.28f;
         b = turn * 1.7f;
-        ((MotionPose *)D_L00_0025BE10)->f1198 = b;
-        ((MotionPose *)D_L00_0025BE10)->f10E8 = turn * 0.58f;
-        if (b > 0.7f) ((MotionPose *)D_L00_0025BE10)->f1198 = 0.7f;
-        else if (b < -0.7f) ((MotionPose *)D_L00_0025BE10)->f1198 = -0.7f;
+        ((MotionPose *)g_hero_item_attach_records)->f1198 = b;
+        ((MotionPose *)g_hero_item_attach_records)->f10E8 = turn * 0.58f;
+        if (b > 0.7f) ((MotionPose *)g_hero_item_attach_records)->f1198 = 0.7f;
+        else if (b < -0.7f) ((MotionPose *)g_hero_item_attach_records)->f1198 = -0.7f;
         d = math_fabs(turn) * 0.2f;
-        ((MotionPose *)D_L00_0025BE10)->f1194 = d;
+        ((MotionPose *)g_hero_item_attach_records)->f1194 = d;
         c = 0.2f;
         if (c < d) goto store_clamp;
         c = -0.2f;
         if (d < c) {
         store_clamp:
-            ((MotionPose *)D_L00_0025BE10)->f1194 = c;
+            ((MotionPose *)g_hero_item_attach_records)->f1194 = c;
         }
-        ((MotionPose *)D_L00_0025BE10)->f1190 = math_fabs(turn) * 0.16f;
+        ((MotionPose *)g_hero_item_attach_records)->f1190 = math_fabs(turn) * 0.16f;
     } else if (PLAYER.submode == 2 || PLAYER.submode == 4) {
         float turn;
         turn = PLAYER.y;
         if (turn > 1.4f) turn = 1.4f;
         else if (turn < -1.4f) turn = -1.4f;
-        ((MotionPose *)D_L00_0025BE10)->f10E8 = turn * 0.29f;
-        ((MotionPose *)D_L00_0025BE10)->f1198 = turn * 0.87f;
+        ((MotionPose *)g_hero_item_attach_records)->f10E8 = turn * 0.29f;
+        ((MotionPose *)g_hero_item_attach_records)->f1198 = turn * 0.87f;
     }
 }
 

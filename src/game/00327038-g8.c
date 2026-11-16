@@ -20,7 +20,7 @@ void ring_update_if_below_threshold(char *a0)
 }
 
 extern int g_game_time;
-extern char *D_001B1B68;
+extern char *g_moby_list_head;
 extern float ref_L00_00327A60_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int pickup_start_fly_if_idle(void *, void *);
@@ -39,9 +39,9 @@ typedef struct {
 } Ref_L00_0032E4F0_Block;
 
 extern Ref_L00_0032E4F0_Block ref_L00_0032E4F0_00;
-extern float D_001B0870 __attribute__((sda));
-extern int D_001B0820 __attribute__((sda));
-extern int D_001B0824 __attribute__((sda));
+extern float g_cam_zoom_scale __attribute__((sda));
+extern int g_cam_zoom_effect_source __attribute__((sda));
+extern int g_cam_zoom_effect_target __attribute__((sda));
 extern float ref_L00_0032E4F0_04;
 extern void UpdateViewContext(void);
 
@@ -50,9 +50,9 @@ extern void UpdateViewContext(void);
 void cam_set_zoom_effect(float size)
 {
     Ref_L00_0032E4F0_Block *block = &ref_L00_0032E4F0_00;
-    float zoom = size * (D_001B0870 * 1024.0f);
+    float zoom = size * (g_cam_zoom_scale * 1024.0f);
 
-    D_001B0824 = D_001B0820;
+    g_cam_zoom_effect_target = g_cam_zoom_effect_source;
     block->field_228 = 255.0f;
     block->field_22C = 100.0f;
     block->field_21C = zoom;
@@ -69,7 +69,7 @@ void moby_notify_nearby_of_kind(char *object)
 {
     char *cursor;
     if (g_game_time & 1) {
-        cursor = D_001B1B68;
+        cursor = g_moby_list_head;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
             if (kind == 0xfe) return;

@@ -7,13 +7,13 @@ typedef struct {
     unsigned char pad34a[0x1f46]; char *object;
 } PlayerView;
 extern PlayerView g_hero_state;
-extern int D_L01_001A9030;
-extern int D_L01_001A9034 __attribute__((sda));
-extern float D_L01_001B0050 __attribute__((sda)),D_L01_001B0054 __attribute__((sda));
-extern char *D_L01_001FB3E0[];
+extern int g_hero_input_lock;
+extern int g_hero_input_lock_alt __attribute__((sda));
+extern float g_aim_target_angle_limit __attribute__((sda)),g_aim_l01_target_max_distance __attribute__((sda));
+extern char *g_target_lists[];
 extern Vec g_coll_line_hit_point;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; } Collision;
-extern Collision D_L01_001BF900;
+extern Collision g_collision_l01_hit;
 extern void FastVecScale(void *,void *,float),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern int CollLine(void *,void *,int,void *,void *);
 extern char *moby_get_private_value_0(char *);
@@ -28,7 +28,7 @@ char *hero_l01_find_aim_target(char *moby,Vec *origin,float *yaw,float *pitch) {
     Vec *start=&frame.origin;
     char *vars=*(char **)(moby+0x68),*selected,*candidate,*definition,*hit;
     Vec *pos; int disabled_count,index,accepted,visible,tries,i;
-    float best=D_L01_001B0054,heading,elevation,delta,distance,dot,length,angle,radius;
+    float best=g_aim_l01_target_max_distance,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
     selected=0;
@@ -38,7 +38,7 @@ char *hero_l01_find_aim_target(char *moby,Vec *origin,float *yaw,float *pitch) {
         return 0;
     }
     disabled_count=0; index=0;
-    while((candidate=D_L01_001FB3E0[index])!=0) {
+    while((candidate=g_target_lists[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
         if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
@@ -53,7 +53,7 @@ char *hero_l01_find_aim_target(char *moby,Vec *origin,float *yaw,float *pitch) {
         elevation=mat_fast_helper_a(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
         delta=FastDiffRots(*yaw,heading);
         distance=fast_vec_dist(start,&frame.target);
-        if(D_L01_001A9030 || g_hero_state.allowed || D_L01_001A9034) {
+        if(g_hero_input_lock || g_hero_state.allowed || g_hero_input_lock_alt) {
             if(distance<2.5f) {
             FastVecSub(&frame.ray,candidate+0x10,g_hero_state.object+0x10);
             dot=FastVecDot(&frame.ray,g_hero_state.object+0xE0);
@@ -73,23 +73,23 @@ char *hero_l01_find_aim_target(char *moby,Vec *origin,float *yaw,float *pitch) {
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
-        if((distance>best && candidate!=*(char **)(vars+0x10)) || distance>D_L01_001B0054) goto next;
+        if((distance>best && candidate!=*(char **)(vars+0x10)) || distance>g_aim_l01_target_max_distance) goto next;
         vec_build_spherical_offset(&frame.aim,distance,*yaw,*pitch+g_hero_state.pitch*0.5f);
         FastVecAdd(&frame.aim,&frame.aim,start);
         angle=fast_vec_dist(&frame.aim,&frame.target);
         angle=math_fast_angle_helper(angle/(distance+distance)); angle+=angle;
-        if(D_L01_001B0050*0.017453294f<angle && (definition=moby_get_private_value_0(candidate))!=0) {
+        if(g_aim_target_angle_limit*0.017453294f<angle && (definition=moby_get_private_value_0(candidate))!=0) {
             radius=IntToFloat((unsigned char)definition[10])*0.125f;
             length=math_fast_angle_helper(radius/distance);
             if(radius<distance) { angle-=length; if(angle<0.0f) angle=0.0f; }
         }
-        if(angle<D_L01_001B0050*0.017453294f) {
+        if(angle<g_aim_target_angle_limit*0.017453294f) {
             visible=1;
             qcopy(&frame.ray,start); tries=0;
             while(CollLine(&frame.ray,&frame.target,6,moby,0)) {
                 Collision *col;
                 if(++tries>6) break;
-                col=&D_L01_001BF900;
+                col=&g_collision_l01_hit;
                 hit=col->hit;
                 if(hit) {
                     if(*(short *)(hit+0xAA)==MOBY_CLASS_SHEEP || *(short *)(hit+0xAA)==MOBY_CLASS_DARK_SHEEP) {

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern int math_random_int_below(int);
@@ -17,13 +17,13 @@ extern float math_random_float_range(float, float);
 /* func_L06_00459620 is defined in L06_00458138-render-g8.c. */
 
 /* Emits paired particles with opposite spin and randomized velocities. */
-void func_PAL_L06_0045E948(float *pos, int count) {
+void part_emit_paired_spin_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L06_001B9840, pos);
+    FastVecSub(direction, (float *)g_hero_l06_position, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;

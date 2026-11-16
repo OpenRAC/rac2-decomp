@@ -12,7 +12,7 @@ typedef struct {
 } SoundState_2E48E8;
 
 extern u8 g_sound_state[];
-extern int D_001A7B98 __attribute__((sda));
+extern int g_audio_mode_option __attribute__((sda));
 extern int snd_StartSoundSystem(int);
 extern void snd_send_cmd11_one_value(int);
 extern void func_00132978(int, int);
@@ -42,7 +42,7 @@ void ResetSoundState(void)
         slot += 0x70;
     } while ((int)slot < (int)(g_sound_state + 0x16C0));
     snd_StartSoundSystem(2);
-    snd_send_cmd11_one_value(!D_001A7B98);
+    snd_send_cmd11_one_value(!g_audio_mode_option);
     func_00132978(0, 1);
     snd_send_cmd78(1, 24, 47);
     snd_send_cmd78(2, 24, 47);

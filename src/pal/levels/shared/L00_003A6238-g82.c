@@ -10,7 +10,7 @@ typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { char prefix[0x50]; float speed; char tail[0x8C]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern unsigned char g_item_slot_to_record[];
-extern int D_L00_001ADB2C;
+extern int g_active_tether_object;
 extern char *g_collision_result[];
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -23,7 +23,7 @@ extern void FastVecScale(void *, void *, float);
 extern char *func_PAL_L00_003AB368(void *, void *, int, int);
 extern int coll_process_hit(void *, int, void *, void *, float);
 extern int moby_is_in_special_class_range(char *);
-extern int func_PAL_L00_003AB850(char *, void *);
+extern int beam_test_segment_hit_pal(char *, void *);
 extern char *part_spawn_ground_effect(void *, int, unsigned int, int, int, float, float, void *, float, int);
 
 /* Aim and spawn a beam, then flash four layers around its muzzle. */
@@ -50,7 +50,7 @@ void func_PAL_L00_003A7140(char *moby)
     } else if (H->ptr[766]) {
         vec_compute_object_to_target(H->ptr[766], (char *)origin, (char *)velocity, speed);
     }
-    if (D_L00_001ADB2C) {
+    if (g_active_tether_object) {
         char *target = *(char **)(state + 0x30);
         if ((target && H->i[1344]) || (H->ptr[766] && !H->i[1344])) {
             if (target)
@@ -70,7 +70,7 @@ void func_PAL_L00_003A7140(char *moby)
     if (coll_process_hit(origin, 1, H->ptr[2212], 0, 1.0f) && g_collision_result[6]) {
         char *model = *(char **)(g_collision_result[6] + 0x24);
         if ((model && *(short *)(model + 0x46) == 5) || moby_is_in_special_class_range(g_collision_result[6]))
-            func_PAL_L00_003AB850(beam, g_collision_result[6] + 0x10);
+            beam_test_segment_hit_pal(beam, g_collision_result[6] + 0x10);
     }
     *(VectorBits *)targetPosition = 0;
     part_spawn_ground_effect(origin, 8, 0x4010FF10, 2, 1, 7.0f, 0.1f, targetPosition, 0.0f, 1);

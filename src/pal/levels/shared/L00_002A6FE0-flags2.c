@@ -11,7 +11,7 @@ extern char D_00189E20_2[];
 
 /* runs a three-float setup over two resident blocks when the mode is 124, then publishes a
    height once two resident flags are clear */
-void func_PAL_L00_002A75A0(void)
+void hero_update_model_wobble_pal(void)
 {
     char *base = D_00189E20_2;
 

@@ -1,10 +1,10 @@
 #include "common.h"
-extern char *D_L02_001B1190[] SDATA(D_L02_001B1190);
+extern char *g_arena_challenge_table_2[] SDATA(D_L02_001B1190);
 
 /* Checks whether the current wave is finished so the next one can begin. */
 int arena_l02_is_wave_complete(char *actor) {
     char *state = *(char **)(actor + 0x68);
-    char *challenge_row = D_L02_001B1190[*(short *)(state + 0x120)];
+    char *challenge_row = g_arena_challenge_table_2[*(short *)(state + 0x120)];
     char *wave_entry = *(char **)(challenge_row + 0x4) + *(short *)(state + 0x122) * 0x14;
     int ok;
 

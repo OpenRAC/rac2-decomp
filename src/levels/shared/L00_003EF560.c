@@ -4,10 +4,10 @@ typedef int BurstWord128 __attribute__((mode(TI)));
 typedef union { BurstWord128 word; float f[4]; } BurstVector;
 typedef struct { unsigned int values[6]; } BurstColors;
 extern BurstVector g_camera_l00_position __attribute__((nosda));
-extern BurstColors D_L00_001B0840 __attribute__((nosda));
-extern BurstColors D_L00_001B0858 __attribute__((nosda));
+extern BurstColors g_blast_burst_colors_a __attribute__((nosda));
+extern BurstColors g_blast_burst_colors_b __attribute__((nosda));
 typedef struct { char pad[0x20]; float x, y, z; } BurstLight;
-extern BurstLight D_L00_0029AEF0 __attribute__((nosda));
+extern BurstLight g_blast_burst_light __attribute__((nosda));
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern float math_random_float_range(float, float);
@@ -74,8 +74,8 @@ void blast_spawn_burst_particles(char *object, BurstVector *position) {
     do {
         j--;
         speed = math_random_float_range(8.0f, 10.0f) * 0.016666668f;
-        colorsA = D_L00_001B0840;
-        colorsB = D_L00_001B0858;
+        colorsA = g_blast_burst_colors_a;
+        colorsB = g_blast_burst_colors_b;
         pa = &colorsA.values[math_random_int_below(6)];
         pb = &colorsB.values[math_random_int_below(6)];
         lifetimeA = math_random_int_range(20, 40);
@@ -83,8 +83,8 @@ void blast_spawn_burst_particles(char *object, BurstVector *position) {
         part_spawn_firework_spark(position, vp, *pa, *pb, lifetimeA, lifetimeB, 0, 0,
                      600000.0f, speed * 1.5f);
     } while (j >= 0);
-    D_L00_0029AEF0.x = D_L00_0029AEF0.z = D_L00_0029AEF0.y = 40.0f;
-    moby_spawn_template_effect(&D_L00_0029AEF0, position, 0, 0);
+    g_blast_burst_light.x = g_blast_burst_light.z = g_blast_burst_light.y = 40.0f;
+    moby_spawn_template_effect(&g_blast_burst_light, position, 0, 0);
     base2 = object + 0xC0;
     k = 49;
     do {

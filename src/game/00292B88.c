@@ -7,9 +7,9 @@ typedef struct {
     short width, height, storage, base, first, second;
 } Texture_292B88;
 extern int log2dim(int value);
-extern int D_001A72F4 MACRO_ADDR;
-extern int D_001A7304 MACRO_ADDR;
-extern long D_001B19B0[];
+extern int g_vram_clut_third MACRO_ADDR;
+extern int g_vram_pixel_base MACRO_ADDR;
+extern long g_fallback_render_packet[];
 extern long D_001B19C8_1[];
 
 /* Fills the four A+D words of a texture's material from its header: a TEX1
@@ -29,16 +29,16 @@ void build_indexed_resident_render_packet(long *out, Texture_292B88 *texture,
     if (half_width <= 0) half_width = 1;
     log_width = log2dim(texture->width);
     log_height = log2dim(texture->height);
-    base = texture->base + (D_001A72F4 >> 8);
-    first = texture->first + (D_001A72F4 >> 8);
-    second = texture->second + (D_001A72F4 >> 8);
+    base = texture->base + (g_vram_clut_third >> 8);
+    first = texture->first + (g_vram_clut_third >> 8);
+    second = texture->second + (g_vram_clut_third >> 8);
     storage = texture->storage;
     if (mode >= 0) {
         if (!storage) {
             int pixels;
             long format, tex, sampler, flags, tex_address, filter_bits, high;
             pixels = texture->pixels;
-            pixels = (D_001A7304 + (pixels << 2)) >> 8;
+            pixels = (g_vram_pixel_base + (pixels << 2)) >> 8;
             filter_bits = (long)filter << 6;
             high = ((long)k << 32) | 0x20;
             flags = filter_bits | high;
@@ -75,7 +75,7 @@ void build_indexed_resident_render_packet(long *out, Texture_292B88 *texture,
             out[2] = other;
         }
     } else if (mode < -1) {
-        long *fallback = D_001B19B0;
+        long *fallback = g_fallback_render_packet;
         if (mode == -3) fallback = D_001B19C8_1;
         {
             long v = (long)filter << 6;

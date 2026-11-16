@@ -20,8 +20,8 @@ extern void transform_vector(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void draw_world_quad(void *, int, int);
-extern NotakVec D_L06_001B9840;
-extern char D_L06_001B1930 __attribute__((sda));
+extern NotakVec g_hero_l06_position;
+extern char g_glow_sprite_corners __attribute__((sda));
 
 /* Draws a small glowing sprite that always faces the camera at the object's position. */
 void gfx_l06_draw_facing_glow_sprite(char *obj) {
@@ -42,7 +42,7 @@ void gfx_l06_draw_facing_glow_sprite(char *obj) {
     color = (color & 0xFFFFFF) | ((u32)FloatToInt(IntToFloat(color >> 24)) << 24);
     *(NotakTI *)up = 0; up[2] = 1; up[3] = 1;
     packet.color[3] = color; packet.color[2] = color; packet.color[1] = color; packet.color[0] = color;
-    FastVecSub(dir, D_L06_001B9840, matrix[3]);
+    FastVecSub(dir, g_hero_l06_position, matrix[3]);
     vec_scale_to_length(matrix[0], dir, 1);
     FastVecCross(matrix[1], matrix[0], up);
     vec_scale_to_length(matrix[1], matrix[1], 1);
@@ -50,7 +50,7 @@ void gfx_l06_draw_facing_glow_sprite(char *obj) {
     FastVecScale(dir, matrix[0], 0.2f);
     FastVecAdd(matrix[3], matrix[3], dir);
     for (i = 0; i < 4; i++) {
-        FastVecScale(corner, &D_L06_001B1930 + i * 16, 0.2f);
+        FastVecScale(corner, &g_glow_sprite_corners + i * 16, 0.2f);
         transform_vector(packet.pos[i], corner, matrix);
     }
     draw_world_quad(&packet, 0, 0);

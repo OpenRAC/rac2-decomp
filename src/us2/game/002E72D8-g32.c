@@ -44,15 +44,15 @@ typedef struct {
 typedef int Quad __attribute__((mode(TI)));
 
 extern Object *g_equipment_pieces[];
-extern char D_00214970[], D_00214978[];
+extern char g_moby_sway_params[], g_moby_sway_state[];
 extern int g_current_game_mode[] __attribute__((sda));
 extern int D_001A8BB0_gp SDATA(D_001A8BB0);
 extern int g_current_map_index[] __attribute__((sda));
-extern float D_001ABF84 __attribute__((sda)), D_001ABF88 __attribute__((sda)), D_001ABF8C __attribute__((sda));
-extern char D_001ABF18[16] __attribute__((sda)), D_001ABF28[16] __attribute__((sda));
-extern char D_001ABF38[16] __attribute__((sda)), D_001ABF48[16] __attribute__((sda));
-extern char D_001ABF58[16] __attribute__((sda)), D_001ABF68[16] __attribute__((sda));
-extern char D_001ABF78[16] __attribute__((sda));
+extern float g_hover_height_offset __attribute__((sda)), g_hover_base_height __attribute__((sda)), g_hover_height_current __attribute__((sda));
+extern char g_controller_params_a[16] __attribute__((sda)), g_controller_params_b[16] __attribute__((sda));
+extern char g_controller_params_c[16] __attribute__((sda)), g_controller_params_d[16] __attribute__((sda));
+extern char g_controller_params_e[16] __attribute__((sda)), g_controller_params_f[16] __attribute__((sda));
+extern char g_controller_params_g[16] __attribute__((sda));
 extern HeroGlobals g_hero_state;
 
 
@@ -83,11 +83,11 @@ void func_US2_002E72D8(Object *object)
         if (!g_current_game_mode[0]) {
             float height = coll_probe_ground_height_below(object->position, 0, 0.5f);
             if (height != 0.0f)
-                object->position[2] = height + D_001ABF84;
-            D_001ABF88 = object->position[2];
+                object->position[2] = height + g_hover_height_offset;
+            g_hover_base_height = object->position[2];
         }
-        moby_init_controller_params(object, D_00214970, 0, 0, D_001ABF48, D_001ABF58, D_001ABF18, D_001ABF78,
-                      D_001ABF68, D_001ABF28, D_001ABF38);
+        moby_init_controller_params(object, g_moby_sway_params, 0, 0, g_controller_params_d, g_controller_params_e, g_controller_params_a, g_controller_params_g,
+                      g_controller_params_f, g_controller_params_b, g_controller_params_c);
     }
     target = 0;
     if (!g_current_game_mode[0]) {
@@ -118,9 +118,9 @@ void func_US2_002E72D8(Object *object)
             }
             object->blocked = blocked;
             if (object->blocked)
-                math_step_value_toward_target(D_00214978, &D_001ABF8C, D_001ABF88 + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                math_step_value_toward_target(g_moby_sway_state, &g_hover_height_current, g_hover_base_height + 0.75f, 0.00055555557f, 0.00055555557f, 0.0166666675f);
             else
-                math_step_value_toward_target(D_00214978, &D_001ABF8C, D_001ABF88, 0.00055555557f, 0.00055555557f, 0.0166666675f);
+                math_step_value_toward_target(g_moby_sway_state, &g_hover_height_current, g_hover_base_height, 0.00055555557f, 0.00055555557f, 0.0166666675f);
         }
     }
     moby_transform_joint_point(object, 1, matrix);
@@ -172,5 +172,5 @@ void func_US2_002E72D8(Object *object)
             g_equipment_pieces[i]->render = *(int *)(g_equipment_pieces[i]->model + 0x10);
     }
     if (!g_current_game_mode[0])
-        moby_update_sway(object, D_00214970, target);
+        moby_update_sway(object, g_moby_sway_params, target);
 }

@@ -3,7 +3,7 @@
 #include "common.h"
 extern void moby_set_state(void *, int, int);
 extern unsigned char g_sound_state[];
-extern int D_L02_001B3FD8 __attribute__((sda));
+extern int g_snd_emitter_cooldown __attribute__((sda));
 extern void platform_init(void *);
 extern void part_spawn_puff_at_moby(void *);
 extern void moby_push_nearby_sideways(void *);
@@ -18,7 +18,7 @@ extern int math_fast_float_d(void *);
 
 /* The level's own sound-emitter update: the kind byte at +0x20 of the object picks the
    work, the shared emitter table at D_00188660 holds the listeners. */
-void func_PAL_L02_003DACA8(char *a0)
+void snd_emitter_update_pal(char *a0)
 {
     char *s1 = a0;
     char *s2;
@@ -32,7 +32,7 @@ void func_PAL_L02_003DACA8(char *a0)
         if (*(int *)(s2 + 0xBC) == 0)
             return;
         moby_set_state(s1, 3, -1);
-        *(int *)(s2 + 0xB4) = D_L02_001B3FD8;
+        *(int *)(s2 + 0xB4) = g_snd_emitter_cooldown;
         break;
     case 1:
         moby_push_nearby_sideways(s1);
@@ -41,11 +41,11 @@ void func_PAL_L02_003DACA8(char *a0)
         if (*(int *)(s2 + 0xBC) != 0)
             return;
         moby_set_state(s1, 4, -1);
-        *(int *)(s2 + 0xB4) = D_L02_001B3FD8;
+        *(int *)(s2 + 0xB4) = g_snd_emitter_cooldown;
         break;
     case 3:
         multiply_matrix3x3(s1 + 0xC0, s2 + 0x80, s1 + 0xC0);
-        if (*(int *)(s2 + 0xB4) == D_L02_001B3FD8)
+        if (*(int *)(s2 + 0xB4) == g_snd_emitter_cooldown)
             PlayMobySound(1, 0, s1);
         copy_matrix_rotation(buf, s1 + 0xC0);
         mat_get_euler_angles((float *)buf, s1 + 0xF0);

@@ -22,13 +22,13 @@ typedef struct {
 extern unsigned char g_hero_state[];
 #define PLAYER ((PlayerInteractionView *)D_00189E20)
 
-extern int D_001B2088;
+extern int g_frame_counter_4;
 /* The same resident word has absolute and GP reads in the transition block. */
 extern int g_current_map_index __attribute__((section(".sdata")));
-extern unsigned char D_00138324[];
-extern float D_L01_001AEF30 __attribute__((sda));
-extern float D_L01_001AEF28 __attribute__((sda));
-extern float D_L01_001AEF2C __attribute__((sda));
+extern unsigned char g_pad_held_flags[];
+extern float g_vendor_glow_phase __attribute__((sda));
+extern float g_vendor_rotation_a __attribute__((sda));
+extern float g_vendor_rotation_b __attribute__((sda));
 
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fabs(float);
@@ -58,11 +58,11 @@ void megacorp_vendor_update(unsigned char *moby) {
     int i,canUse,show,accepted;
     float distance,height;
     float phase,amplitude;
-    D_L01_001AEF30+=0.05f;
-    if(D_L01_001AEF30>3.14f) D_L01_001AEF30=-3.14f;
+    g_vendor_glow_phase+=0.05f;
+    if(g_vendor_glow_phase>3.14f) g_vendor_glow_phase=-3.14f;
     glow_color=0x20100;logo_color=0x80F0F0B0;
     if(BI(vars,0x94)==2) {glow_color=0x101;logo_color=0x8080;}
-    BI(moby,0x78)=glow_color*((int)(math_fast_sin_or_cos_b(D_L01_001AEF30)*24.0f)+96)|0x80000000;
+    BI(moby,0x78)=glow_color*((int)(math_fast_sin_or_cos_b(g_vendor_glow_phase)*24.0f)+96)|0x80000000;
     if(BP(vars,0xC)) BI(BP(vars,0xC),0x78)=logo_color|0x80000000;
     if(BI(vars,0x94)==3) {
         BU(moby,0x34)|=1;moby[0x31]=0;BI(moby,0x98)=0;
@@ -86,7 +86,7 @@ case 0:
 case 1:
         if(BF(vars,0x90)>0) BF(vars,0x90)-=0.1f;
         if(BF(vars,0x90)<=0) BU(BP(vars,0xC),0x34)|=1;
-        if(!(D_001B2088&7)) {
+        if(!(g_frame_counter_4&7)) {
             hero=(unsigned char *)&PLAYER->x;
             if(vec_distance_xy(moby+0x10,hero)<=16.0f && math_fabs(BF(moby,0x18)-BF(hero,8))<=8.0f) {
                 moby[0x20]=2;BU(BP(vars,0xC),0x34)&=0xFFFE;
@@ -96,13 +96,13 @@ case 1:
         }
         if(BI(vars,0x94)==3) break;
         ref_L01_003808C0_00(DrawVendorEffects,moby);
-        build_axis_rotation_quaternion(vars+0x20,2,D_L01_001AEF28);
-        build_axis_rotation_quaternion(vars+0x60,2,D_L01_001AEF2C);
-        D_L01_001AEF28=FastAddRotations(D_L01_001AEF28,0.01f);
-        phase=FastAddRotations(D_L01_001AEF2C,-0.02f);
+        build_axis_rotation_quaternion(vars+0x20,2,g_vendor_rotation_a);
+        build_axis_rotation_quaternion(vars+0x60,2,g_vendor_rotation_b);
+        g_vendor_rotation_a=FastAddRotations(g_vendor_rotation_a,0.01f);
+        phase=FastAddRotations(g_vendor_rotation_b,-0.02f);
         child=BP(vars,0xC);
         amplitude=BF(vars,0x90)*BF(BP(child,0x24),0x24)*2.5f;
-        D_L01_001AEF2C=phase;
+        g_vendor_rotation_b=phase;
         BF(child,0x2C)=amplitude;
         func_002A0F48(BP(vars,0xC));
         break;
@@ -111,16 +111,16 @@ case 2:
         nearHero=(unsigned char *)&PLAYER->x;
         distance=vec_distance_xy(moby+0x10,nearHero);
         height=math_fabs(BF(moby,0x18)-BF(nearHero,8));
-        if(!(D_001B2088&7) && (distance>18.0f || height>10.0f)) {moby[0x20]=1;return;}
+        if(!(g_frame_counter_4&7) && (distance>18.0f || height>10.0f)) {moby[0x20]=1;return;}
         if(BI(vars,0x94)!=3) {
             ref_L01_003808C0_00(DrawVendorEffects,moby);
-            build_axis_rotation_quaternion(vars+0x20,2,D_L01_001AEF28);
-            build_axis_rotation_quaternion(vars+0x60,2,D_L01_001AEF2C);
-            D_L01_001AEF28=FastAddRotations(D_L01_001AEF28,0.01f);
-            phase=FastAddRotations(D_L01_001AEF2C,-0.02f);
+            build_axis_rotation_quaternion(vars+0x20,2,g_vendor_rotation_a);
+            build_axis_rotation_quaternion(vars+0x60,2,g_vendor_rotation_b);
+            g_vendor_rotation_a=FastAddRotations(g_vendor_rotation_a,0.01f);
+            phase=FastAddRotations(g_vendor_rotation_b,-0.02f);
             child=BP(vars,0xC);
             amplitude=BF(vars,0x90)*BF(BP(child,0x24),0x24)*2.5f;
-            D_L01_001AEF2C=phase;
+            g_vendor_rotation_b=phase;
             BF(child,0x2C)=amplitude;
             func_002A0F48(BP(vars,0xC));
         }
@@ -137,7 +137,7 @@ case 2:
             else if(BI(vars,0x94)==4) text=0x27FF;
             accepted=TryClaimNotice(1,text,1)!=0;
         }
-        if((BI(D_00138324,0)&16) && canUse && accepted) moby[0x20]=4;
+        if((BI(g_pad_held_flags,0)&16) && canUse && accepted) moby[0x20]=4;
         break;
 case 3:
         break;
@@ -148,13 +148,13 @@ case 4:
         }
         if(BI(vars,0x94)==3) break;
         ref_L01_003808C0_00(DrawVendorEffects,moby);
-        build_axis_rotation_quaternion(vars+0x20,2,D_L01_001AEF28);
-        build_axis_rotation_quaternion(vars+0x60,2,D_L01_001AEF2C);
-        D_L01_001AEF28=FastAddRotations(D_L01_001AEF28,0.01f);
-        phase=FastAddRotations(D_L01_001AEF2C,-0.02f);
+        build_axis_rotation_quaternion(vars+0x20,2,g_vendor_rotation_a);
+        build_axis_rotation_quaternion(vars+0x60,2,g_vendor_rotation_b);
+        g_vendor_rotation_a=FastAddRotations(g_vendor_rotation_a,0.01f);
+        phase=FastAddRotations(g_vendor_rotation_b,-0.02f);
         child=BP(vars,0xC);
         amplitude=BF(vars,0x90)*BF(BP(child,0x24),0x24)*2.5f;
-        D_L01_001AEF2C=phase;
+        g_vendor_rotation_b=phase;
         BF(child,0x2C)=amplitude;
         func_002A0F48(BP(vars,0xC));
         break;

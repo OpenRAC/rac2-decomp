@@ -5,9 +5,9 @@
  * (20 bytes, hence the assembler's -G32) and the current slot right after it,
  * bounded by the count at 0x001B38C0, read through the absolute macro form. */
 
-extern int D_L23_001B166C __attribute__((sda));
-extern int D_L23_001B1658 __attribute__((sda));
-extern int D_L23_001B38C0 MACRO_ADDR;
+extern int g_mothership_scan_slot_index __attribute__((sda));
+extern int g_mothership_scan_slots __attribute__((sda));
+extern int g_mothership_slot_count MACRO_ADDR;
 extern int *g_path_lists[];
 extern void func_0032A1C8(void *, void *, int);
 extern void func_002F3D60(void *, void *, float);
@@ -26,7 +26,7 @@ typedef struct ScanSub_00419970 {
  * the top of the rotated while loop, so cse1 does not merge the loop's table
  * base with the pre-test's and retail's separate loop copy is kept. */
 static inline int SlotAt(int i) {
-    return (&D_L23_001B1658)[i];
+    return (&g_mothership_scan_slots)[i];
 }
 
 /* Advances the current slot round-robin to the next one not yet spent (-1),
@@ -36,13 +36,13 @@ static inline int SlotAt(int i) {
 void mothership_advance_scan_slot(char *moby) {
     float start_a[4], start_b[4], end_a[4], end_b[4], side_b[4], side_a[4], span[4], start_dir[4], end_dir[4], scratch[4];
     char *vars;
-    int start_slot = D_L23_001B166C;
+    int start_slot = g_mothership_scan_slot_index;
     char *rec;
     vars = *(char **)(moby + 0x68);
-    while (SlotAt(D_L23_001B166C = (D_L23_001B166C + 1) % D_L23_001B38C0) == -1) {
-        if (start_slot == D_L23_001B166C) return;
+    while (SlotAt(g_mothership_scan_slot_index = (g_mothership_scan_slot_index + 1) % g_mothership_slot_count) == -1) {
+        if (start_slot == g_mothership_scan_slot_index) return;
     }
-    rec = (char *)g_path_lists[((ScanSub_00419970 *)vars)->record_ids[(&D_L23_001B1658)[D_L23_001B166C]]];
+    rec = (char *)g_path_lists[((ScanSub_00419970 *)vars)->record_ids[(&g_mothership_scan_slots)[g_mothership_scan_slot_index]]];
     qcopy_nc(start_a, rec + 16);
     qcopy_nc(end_a, rec + *(int *)rec * 16);
     qcopy_nc(start_b, rec + 16);
@@ -68,5 +68,5 @@ void mothership_advance_scan_slot(char *moby) {
     func_002F3A80(scratch, scratch, side_b);
     func_002F3A80(end_b, end_b, scratch);
     if (mothership_check_clear_path(moby, start_a, end_a) && mothership_check_clear_path(moby, start_b, end_b))
-        (&D_L23_001B1658)[D_L23_001B166C] = -1;
+        (&g_mothership_scan_slots)[g_mothership_scan_slot_index] = -1;
 }

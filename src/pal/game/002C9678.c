@@ -32,7 +32,7 @@ extern void part_kill(char *);
  * This particle view covers the complete 0x40-byte direct-access prefix.
  * The three velocity floats are copied to a complete local vector with w=0;
  * the adjacent packed color word is not misrepresented as a velocity w. */
-void func_PAL_002C9830(struct DriftParticle *particle)
+void part_update_drift_pal(struct DriftParticle *particle)
 {
     float velocity[4], change[4];
     struct DriftParameters *parameters = &particle->parameters;

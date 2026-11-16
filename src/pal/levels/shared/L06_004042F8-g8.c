@@ -5,10 +5,10 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef struct {
     char x[10];
 } Sequence;
-extern Sequence D_L06_001AF700;
+extern Sequence g_ribbon_sequence;
 extern int g_current_map_index;
-extern u8 D_0018C0D4 NOT_SDA;
-extern char D_L06_001B9840[];
+extern u8 g_screen_mode_flag NOT_SDA;
+extern char g_hero_l06_position[];
 typedef struct {
     u8 pad[0x74];
     u8 active;
@@ -50,13 +50,13 @@ typedef struct {
     char pad6C[0x8C];
     float angle;
 } Object;
-extern char D_L06_001AFFA0[], D_L06_001AFFE0[];
-extern Sequence D_L06_001B0000;
-extern float D_L06_001AFF20 __attribute__((sda));
+extern char g_str_ripple_error_a[], g_str_ripple_error_b[];
+extern Sequence g_ribbon_variant_sequence;
+extern float g_ripple_fade_duration __attribute__((sda));
 extern void func_PAL_L06_004046D8(void);
 
-extern char D_L06_001AF6A0[], D_L06_001AF6E0[];
-extern float D_L06_001AF620 __attribute__((sda));
+extern char g_str_ribbon_error_a[], g_str_ribbon_error_b[];
+extern float g_ribbon_duration __attribute__((sda));
 
 void func_PAL_L06_004042F8(char *obj) {
     Object *m = (Object *)obj;
@@ -68,19 +68,19 @@ void func_PAL_L06_004042F8(char *obj) {
         float f[4];
     } buffer;
     if (data->valid == -1) {
-        STUB_printf(D_L06_001AF6A0);
-        STUB_printf(D_L06_001AF6E0, *(short *)(obj + 0xB2));
+        STUB_printf(g_str_ribbon_error_a);
+        STUB_printf(g_str_ribbon_error_b, *(short *)(obj + 0xB2));
         moby_mark_spawned(obj);
     }
     switch (m->state) {
     case 0: {
         int i, j, k;
         float r;
-        if (g_current_map_index == 10 && D_0018C0D4 == 1) {
+        if (g_current_map_index == 10 && g_screen_mode_flag == 1) {
             moby_mark_spawned(obj);
             break;
         }
-        buffer.seq = D_L06_001AF700;
+        buffer.seq = g_ribbon_sequence;
         for (i = 0; i < 10; i++) {
             for (j = 0; j < math_random_int_below(9); j++) {
                 u8 b = buffer.seq.x[j + 1];
@@ -95,7 +95,7 @@ void func_PAL_L06_004042F8(char *obj) {
         m->state = 1;
         m->angle = r;
         data->effect = -1;
-        data->timer = ((s32)(FloatToInt(D_L06_001AF620 * 60.0f)) * 5 + 2) / 6;
+        data->timer = ((s32)(FloatToInt(g_ribbon_duration * 60.0f)) * 5 + 2) / 6;
         m->flags |= 0x41;
         break;
     }
@@ -107,7 +107,7 @@ void func_PAL_L06_004042F8(char *obj) {
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
         sphere[2] += h;
         sphere[3] = square_root(h * h + r * r);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
                 gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
         }
@@ -131,7 +131,7 @@ void func_PAL_L06_004042F8(char *obj) {
         buffer.q = *(Quad *)(obj + 0x10);
         buffer.f[2] += h;
         buffer.f[3] = square_root(h * h + r * r);
-        if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
+        if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
             gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
         break;

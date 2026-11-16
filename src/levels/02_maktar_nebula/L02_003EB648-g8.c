@@ -54,11 +54,11 @@ extern void elevator_l02_update();
 
 extern char g_sound_state[];
 
-extern char *D_L02_001B368C;
+extern char *g_matrix_l02_record_table;
 
-extern float D_L02_001B0DB8 __attribute__((sda));
+extern float g_platform_rider_amplitude __attribute__((sda));
 
-extern float D_L02_001B0DBC __attribute__((sda));
+extern float g_platform_rider_angle_speed __attribute__((sda));
 
 /* Attaches the actor to a moving surface, then makes it bob up and down on it
    and passes its movement on. */
@@ -79,13 +79,13 @@ void platform_rider_update(Actor *actor) {
             moby_set_state(actor, 3, -1);
             return;
         }
-        if (math_fabs(*(float *)((char *)((state->index << 7) + (int)D_L02_001B368C) + 0x28) - 2.0f) < 0.01f) {
+        if (math_fabs(*(float *)((char *)((state->index << 7) + (int)g_matrix_l02_record_table) + 0x28) - 2.0f) < 0.01f) {
             actor->update = (int)elevator_l02_update;
             return;
         }
         state->flags |= 0x10;
-        FastVecSub(offset, actor->pos, D_L02_001B368C + (state->index << 7) + 0x30);
-        matrix_mul_vec3(offset, offset, D_L02_001B368C + (state->index << 7) + 0x40);
+        FastVecSub(offset, actor->pos, g_matrix_l02_record_table + (state->index << 7) + 0x30);
+        matrix_mul_vec3(offset, offset, g_matrix_l02_record_table + (state->index << 7) + 0x40);
         state->angle = state->t * 6.2831855f - 3.1415927f;
         state->lx = offset[0];
         state->lz = offset[2];
@@ -93,8 +93,8 @@ void platform_rider_update(Actor *actor) {
         moby_set_state(actor, 2, -1);
         break;
     case 2:
-        state->angle = FastAddRotations(state->angle, D_L02_001B0DBC * 0.0002908882452175021f);
-        state->ly = D_L02_001B0DB8 * math_fast_sin_or_cos_b(state->angle);
+        state->angle = FastAddRotations(state->angle, g_platform_rider_angle_speed * 0.0002908882452175021f);
+        state->ly = g_platform_rider_amplitude * math_fast_sin_or_cos_b(state->angle);
         soundSlot = g_sound_state + state->slot * 0x70;
         if (*(int *)(soundSlot + 0x88) != (int)actor || *(unsigned char *)(soundSlot + 0x74) == 0)
             state->slot = PlayMobySound(0, 4, actor);
@@ -105,7 +105,7 @@ void platform_rider_update(Actor *actor) {
         localPoint[3] = 1.0f;
         quad = *(TI128 *)localPoint;
         *(TI128 *)offset = quad;
-        transform_vector(actor->pos, offset, D_L02_001B368C + (state->index << 7));
+        transform_vector(actor->pos, offset, g_matrix_l02_record_table + (state->index << 7));
         break;
     }
     FastVecSub(offset, actor->pos, prevPos);

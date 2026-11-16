@@ -15,8 +15,8 @@ typedef struct Gparticle {
     unsigned char f2;
 } Gparticle;
 
-extern Gf2540 D_001F2540;
-extern char D_001A8BD0[] __attribute__((sda));
+extern Gf2540 g_particle_texture_table;
+extern char g_default_effect_vector[] __attribute__((sda));
 
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -47,11 +47,11 @@ void SpawnRandomParticlePairs(TI128 *a0, void *velocity)
         pos[1] = base.v[1] + math_random_signed_float_range(0.005f, 0.035f);
         pos[2] = base.v[2] + math_random_signed_float_range(0.005f, 0.035f);
         rnd = math_random_int_below(0xFF);
-        p = part_spawn_gravity_fade(pos, D_001A8BD0, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
+        p = part_spawn_gravity_fade(pos, g_default_effect_vector, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
         if (p != 0)
-            p->f2 = D_001F2540.f16C[1];
-        p = part_spawn_gravity_fade(pos, D_001A8BD0, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
+            p->f2 = g_particle_texture_table.f16C[1];
+        p = part_spawn_gravity_fade(pos, g_default_effect_vector, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
         if (p != 0)
-            p->f2 = *D_001F2540.fD4;
+            p->f2 = *g_particle_texture_table.fD4;
     } while (i >= 0);
 }

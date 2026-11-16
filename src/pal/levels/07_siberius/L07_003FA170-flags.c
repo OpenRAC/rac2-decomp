@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef float Vector[4];
-extern void func_PAL_L07_003FAF68(u8 *);
+extern void fuse_tick_explode_pal(u8 *);
 extern void moby_set_state(u8 *, u8, s32);
 extern s32 flag_set_first_pending(u8 *);
 extern void func_PAL_002A7E68(void *, int, int, int);
@@ -12,20 +12,20 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern int PlayMobySound(int, int, char *);
 extern u8 *func_PAL_L03_003DDB50(void *, void *, void *, s32);
-extern f32 D_L07_001B0FA0 __attribute__((sda));
-extern s32 D_L07_001B0FA8 __attribute__((sda));
-extern Vector D_L07_001B0FB0 __attribute__((sda));
-extern f32 D_L07_001B0FC0 __attribute__((sda));
-extern s32 D_L07_001B1E08 __attribute__((nosda));
+extern f32 g_turret_yaw_rate __attribute__((sda));
+extern s32 g_turret_period __attribute__((sda));
+extern Vector g_turret_l07_muzzle_offset __attribute__((sda));
+extern f32 g_turret_l07_shot_speed __attribute__((sda));
+extern s32 g_frame_l07_counter __attribute__((nosda));
 
 /* Advances the dormant entity through initialization and its firing state. */
-void func_PAL_L07_003FAAD8(u8 *object)
+void siberius_turret_update_pal(u8 *object)
 {
     u8 *state;
     Vector position, velocity;
     if (object[0x20] == 1) return;
     state = *(u8 **)(object + 0x68);
-    func_PAL_L07_003FAF68(object);
+    fuse_tick_explode_pal(object);
     switch (object[0x20]) {
     case 0:
         *(f32 *)(state + 0x58) = *(f32 *)(object + 0x18);
@@ -47,13 +47,13 @@ void func_PAL_L07_003FAAD8(u8 *object)
         break;
     case 3: {
         s32 period, tick;
-        swing_update_yaw((s8 *)object, D_L07_001B0FA0 * 0.0003490659f);
-        period = D_L07_001B0FA8;
-        tick = D_L07_001B1E08;
+        swing_update_yaw((s8 *)object, g_turret_yaw_rate * 0.0003490659f);
+        period = g_turret_period;
+        tick = g_frame_l07_counter;
         if (tick % period == 0) {
-            matrix_mul_vec3(position, D_L07_001B0FB0, object + 0xC0);
+            matrix_mul_vec3(position, g_turret_l07_muzzle_offset, object + 0xC0);
             FastVecAdd(position, position, object + 0x10);
-            vec_scale_to_length(velocity, object + 0xC0, D_L07_001B0FC0 * 0.020000001f);
+            vec_scale_to_length(velocity, object + 0xC0, g_turret_l07_shot_speed * 0.020000001f);
             PlayMobySound(0, 0, (char *)object);
             func_PAL_L03_003DDB50(object, position, velocity, state[0x34]);
         }

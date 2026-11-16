@@ -1,10 +1,11 @@
+#include "names.h"
 /* State update: advances the spin and two wobble angles, fades out on its trigger and keeps the sound slot. */
 #include "common.h"
 
-extern f32 D_L03_001B0050 __attribute__((sda));
-extern f32 D_L03_001B0054 __attribute__((sda));
-extern f32 D_L03_001B0058[2] __attribute__((sda));
-extern char D_L03_00188660[];
+extern f32 g_rotor_spin_speed __attribute__((sda));
+extern f32 g_rotor_roll_speed __attribute__((sda));
+extern f32 g_rotor_speed_table[2] __attribute__((sda));
+extern char g_sound_l03_slot_table[];
 typedef struct { f32 scale; f32 spin; f32 wobble[2]; f32 roll; f32 fade; s32 slot; } SpinState;
 extern void moby_set_state(char *moby, s32 a1, s32 a2);
 extern f32  FastAddRotations(f32 moby, f32 a1);
@@ -31,12 +32,12 @@ void rotor_update(char *moby)
         break;
     case 1: {
         f32 angle_scale = 0.000290888245f;
-        f32 *speed_table = D_L03_001B0058;
+        f32 *speed_table = g_rotor_speed_table;
         f32 *wobble_angle = state->wobble;
         s32 i;
 
-        state->spin = FastAddRotations(state->spin, D_L03_001B0050 * angle_scale);
-        state->roll = FastAddRotations(state->roll, D_L03_001B0054 * angle_scale);
+        state->spin = FastAddRotations(state->spin, g_rotor_spin_speed * angle_scale);
+        state->roll = FastAddRotations(state->roll, g_rotor_roll_speed * angle_scale);
         for (i = 1; i >= 0; i--) {
             *wobble_angle = FastAddRotations(*wobble_angle, *speed_table * 0.000290888245f);
             wobble_angle++;
@@ -54,7 +55,7 @@ void rotor_update(char *moby)
     }
     }
     if (*(u8 *)(self + 0x20) == 1) {
-        char *sound_slot = D_L03_00188660 + state->slot * 0x70;
+        char *sound_slot = g_sound_l03_slot_table + state->slot * 0x70;
 
         if (*(char **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
             state->slot = PlayMobySound(0, 4, self);
@@ -62,7 +63,7 @@ void rotor_update(char *moby)
         s32 slot_index = state->slot;
 
         if (slot_index != -1) {
-            char *sound_slot = D_L03_00188660 + slot_index * 0x70;
+            char *sound_slot = g_sound_l03_slot_table + slot_index * 0x70;
 
             if (*(char **)(sound_slot + 0x88) == self && *(u8 *)(sound_slot + 0x74) != 0)
                 snd_stop_voice(slot_index);

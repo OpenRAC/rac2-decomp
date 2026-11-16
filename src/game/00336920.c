@@ -17,24 +17,24 @@ void hud_set_widget_value_pair(u8 *obj,s32 x,s32 y) {
 s32 hud_get_widget_value_int(u8 *obj) { return (s32)*(f32 *)(*(u8 **)(obj + 0x34)); }
 
 extern void *object_init_base(void *);
-extern char D_001ADA18[] __attribute__((sda));
+extern char g_hud_widget_table[] __attribute__((sda));
 
 /* Starts building a UI element and sets its type pointer. */
 char *hud_construct_widget_base(char *obj) {
     object_init_base(obj);
-    *(char **)(obj + 0x30) = D_001ADA18;
+    *(char **)(obj + 0x30) = g_hud_widget_table;
     return obj;
 }
 
 
 extern void object_alloc_float4_arrays(void *);
-extern unsigned char D_00263B50[];
+extern unsigned char g_font_glyphs_small[];
 
 /* Sets up a UI element: base setup, data pointer, flags and a default scale of 1. */
 void hud_init_widget_defaults(char *obj)
 {
     object_alloc_float4_arrays(obj);
-    *(char **)(obj + 0x34) = (char *)D_00263B50;
+    *(char **)(obj + 0x34) = (char *)g_font_glyphs_small;
     *(long long *)(obj + 0x38) = 1;
     *(int *)(obj + 0x40) = 0;
     **(float **)(obj + 4) = 1.0f;
@@ -42,12 +42,12 @@ void hud_init_widget_defaults(char *obj)
     *(int *)(obj + 0x44) = 1;
 }
 
-extern char D_001ADA18[] __attribute__((sda));
+extern char g_hud_widget_table[] __attribute__((sda));
 extern void object_destroy_array(void *);
 
 /* Sets the element type pointer and runs the shared base cleanup. */
 void hud_reset_widget_type_and_cleanup(char *obj) {
-    *(char **)(obj + 0x30) = D_001ADA18;
+    *(char **)(obj + 0x30) = g_hud_widget_table;
     object_destroy_array(obj);
 }
 

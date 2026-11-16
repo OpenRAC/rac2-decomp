@@ -5,8 +5,8 @@ extern int g_current_game_mode;
 extern int D_001A8BB0_gp SDATA(D_001A8BB0);
 extern short g_hero_moby_default[];
 /* Two GP-addressed tables: a 32-byte block copied into the packet, and four row vectors. */
-extern char D_001ABF90[32] SDATA(D_001ABF90);
-extern char D_001ABFB0[64] SDATA(D_001ABFB0);
+extern char g_ground_shadow_header[32] SDATA(D_001ABF90);
+extern char g_ground_shadow_matrix[64] SDATA(D_001ABFB0);
 
 typedef struct {
     float v[4];
@@ -53,7 +53,7 @@ void gfx_draw_ground_shadow(char *object)
     packet.tags[2] = 0xFF9000000260ULL;
     packet.tags[3] = 0x8000000044ULL;
     packet.tags[0] = 0;
-    mem_fast_helper_c(packet.block, D_001ABF90, 32);
+    mem_fast_helper_c(packet.block, g_ground_shadow_header, 32);
     FastVecScale(pos, object, 0.0009765625f);
     height = *(float *)(object + 24) + 0.1f;
     if (g_current_game_mode == 6 || g_current_game_mode == 0)
@@ -64,7 +64,7 @@ void gfx_draw_ground_shadow(char *object)
 
         packet.colors[i] = ((alpha >> 1) << 24) | 0x808080;
         row = &packet.rows[i];
-        matrix_mul_vec3(row, D_001ABFB0 + 16 * i, object + 192);
+        matrix_mul_vec3(row, g_ground_shadow_matrix + 16 * i, object + 192);
         FastVecAdd(row, row, point);
         row->v[2] = height;
     }

@@ -63,22 +63,22 @@ extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
 extern int g_item_ammo_counts[];
 extern int g_game_time;
-extern int D_001B275C;
-extern int D_001A8CA0;
+extern int g_pickup_time;
+extern int g_ground_check_inhibit;
 extern char g_hero_state[];
 extern PickupObject *g_hero_moby NOT_SDA;
 #define WEAPON(i) ((PickupWeapon *)(D_00239BA0 + D_00139568[i] * sizeof(PickupWeapon)))
 #define HERO ((PickupHero *)D_00189E20)
 extern void vec_store_helper(void *);
 extern void vec_clear_128(void *);
-extern int func_PAL_00273A10(void *);
+extern int cam_moby_update_pal(void *);
 extern float fast_vec_dist(void *, void *);
 extern int math_fast_float_d(void *);
 extern float math_fabs(float);
 extern float vec_distance_xy(void *, void *);
 extern float gravity_get_center_distance(void *);
 extern unsigned int stub_empty_8(int, int);
-extern void func_PAL_002B15B8(int, int, int);
+extern void value_forward_three_args_pal(int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int subtract_integer_with_clamp(int);
 extern int PlayMobySound(int, int, void *);
@@ -124,7 +124,7 @@ void func_PAL_00321298(PickupObject *object)
         }
 
         qcopy(old, data);
-        func_PAL_00273A10(object);
+        cam_moby_update_pal(object);
         changed = 0;
         if (fast_vec_dist(old, data) > data->speedLimit * 2.0f)
             changed = 1;
@@ -143,7 +143,7 @@ void func_PAL_00321298(PickupObject *object)
         }
         if (g_item_ammo_counts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
-        if (D_001A8CA0) {
+        if (g_ground_check_inhibit) {
             if (gravity_get_center_distance(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
@@ -161,7 +161,7 @@ void func_PAL_00321298(PickupObject *object)
             stub_empty_8(item, data->amount);
             if (g_item_ammo_counts[item] > previous) {
                 count = g_item_ammo_counts[item] - previous;
-                func_PAL_002B15B8(count == 1 ?
+                value_forward_three_args_pal(count == 1 ?
                     WEAPON(item)->messageOne :
                     WEAPON(item)->messageMany,
                     count, -1);
@@ -169,9 +169,9 @@ void func_PAL_00321298(PickupObject *object)
             moby_set_state(object, 2, -1);
             data->pull = 0.16000001f;
             vec_clear_128(data);
-            if (subtract_integer_with_clamp(g_game_time - D_001B275C) >= 9) {
+            if (subtract_integer_with_clamp(g_game_time - g_pickup_time) >= 9) {
                 PlayMobySound(0, 0, object);
-                D_001B275C = g_game_time;
+                g_pickup_time = g_game_time;
             }
         }
         break;

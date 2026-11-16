@@ -1,7 +1,7 @@
 #include "common.h"
 extern char g_hero_position[];
-extern char *D_L17_001B2D0C;
-extern float D_L17_001B03B0 __attribute__((sda));
+extern char *g_linked_moby_base;
+extern float g_platform_path_reach_dist __attribute__((sda));
 extern int func_003221C8(void *, int);
 extern float func_002EF0B0(void *, void *);
 extern float func_002EF4C8(float);
@@ -20,7 +20,7 @@ void platform_move_along_path_by_timer(char *moby, int *path, float duration) {
     if (*(int *)(vars + 0xCC) != -1 && *(int *)(vars + 0xAC) == 1 &&
         func_003221C8(g_hero_position, *(int *)(vars + 0xCC)) &&
         *(float *)(g_hero_position + 8) <= *(float *)(moby + 0x18) + 0.05f &&
-        func_002EF0B0(moby + 0x10, D_L17_001B2D0C + *(int *)(vars + 0xCC) * 128 + 0x30) <= D_L17_001B03B0) {
+        func_002EF0B0(moby + 0x10, g_linked_moby_base + *(int *)(vars + 0xCC) * 128 + 0x30) <= g_platform_path_reach_dist) {
         *(float *)(vars + 0x9C) -= 1.0f;
         goto done;
     }

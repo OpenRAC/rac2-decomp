@@ -5,7 +5,7 @@
    +0x154 is a 10-frame repeat delay. Reading the table field at each use gives retail's copy of
    the first table pointer. Its own unit: the nops before the divisions need -g. */
 extern char g_pad_state[];
-extern float D_001AE5F4 __attribute__((sda));
+extern float g_list_menu_input_threshold __attribute__((sda));
 extern float square_root(float);
 extern float mat_fast_helper_a(float, float);
 
@@ -34,7 +34,7 @@ int UpdateDirectionSelection(char *object)
         if (*(int *)(object + 0x150) == 0)
             *(int *)(object + 0x14C) = -1;
         oldSelection = *(int *)(object + 0x14C);
-        if (magnitude > D_001AE5F4) {
+        if (magnitude > g_list_menu_input_threshold) {
             while (RANGES[i][0] != 0.0f || RANGES[i][1] != 0.0f) {
                 if ((RANGES[i][0] < 0.0f) != (RANGES[i][1] >= 0.0f)) {
                     if (RANGES[i][0] <= angle && angle < RANGES[i][1]) {

@@ -2,11 +2,11 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L18_001B1B40[16] __attribute__((sda));
-extern int D_L18_001B1B30 __attribute__((sda));
-extern float D_L18_001B1B08[2] __attribute__((sda));
-extern float D_L18_001B1B00[2] __attribute__((sda));
-extern float D_L18_001B1B10[4] __attribute__((sda));
+extern float g_breakable_corner_table[16] __attribute__((sda));
+extern int g_breakable_piece_lifetime __attribute__((sda));
+extern float g_breakable_piece_spread_range[2] __attribute__((sda));
+extern float g_breakable_piece_speed_range[2] __attribute__((sda));
+extern float g_breakable_piece_offset[4] __attribute__((sda));
 
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
@@ -37,7 +37,7 @@ void breakable_l18_object_update(u8 *obj) {
         pos_a_cursor = pos_a;
         y_offset = 20;
         x_offset = 4;
-        corner = D_L18_001B1B40;
+        corner = g_breakable_corner_table;
         for (; i < 4; i++, y_offset -= 8, x_offset -= 8, corner += 4) {
             FastVecScale(offset, corner, *(float *)(obj + 0x2C));
             part_spawn_object_following_effect(offset, obj, 0x28808080, -1, 0, -1, 0, 0x60,
@@ -65,15 +65,15 @@ void breakable_l18_object_update(u8 *obj) {
             qcopy(pos_a, offset);
             FastVecSub(offset, offset, pos_b);
             FastVecAdd(pos_a, pos_a, pos_b);
-            part_explode_object_into_pieces(obj, offset, D_L18_001B1B08, D_L18_001B1B00,
-                             0xFFFF, -1, D_L18_001B1B30, 9, -128, 255, 0);
+            part_explode_object_into_pieces(obj, offset, g_breakable_piece_spread_range, g_breakable_piece_speed_range,
+                             0xFFFF, -1, g_breakable_piece_lifetime, 9, -128, 255, 0);
             moby_set_state(obj, 2, -1);
         }
         obj[0xA8] = 255;
         break;
     case 2:
-        part_explode_object_into_pieces(obj, D_L18_001B1B10, D_L18_001B1B08, D_L18_001B1B00,
-                         0xFFFF, 0, D_L18_001B1B30, 6, 0xFA7F, 255, 0);
+        part_explode_object_into_pieces(obj, g_breakable_piece_offset, g_breakable_piece_spread_range, g_breakable_piece_speed_range,
+                         0xFFFF, 0, g_breakable_piece_lifetime, 6, 0xFA7F, 255, 0);
         vec_local_offset_to_world(obj, offset, 0, 0, 20.f);
         SpawnExplosion(offset, 0, 5, 5, 5, 5, 5, 0, 1, 0, 1, 0,
                       *(float *)(obj + 0x2C) * 2.f, 20.f);

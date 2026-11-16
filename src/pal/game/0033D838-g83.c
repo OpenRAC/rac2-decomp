@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_PAL_0033CFD0(void *, float);
+extern void prompt_bar_set_spacing_pal(void *, float);
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern void func_PAL_0033CB00(void *, void *, void *);
+extern void prompt_bar_init_pal(void *, void *, void *);
 extern char *GetLocalizedString(int);
-extern void func_PAL_0033CF78(void *, int, int, int);
-extern void func_PAL_0033CF58(void *, float, float, float, float, float, float);
+extern void prompt_bar_set_texts_pal(void *, int, int, int);
+extern void prompt_bar_set_text_offsets_pal(void *, float, float, float, float, float, float);
 extern int func_PAL_0033EEF8(void *, int);
-extern int D_001ADE48[2] __attribute__((sda));
-extern char D_001ADC88[];
+extern int g_audio_menu_prompt_ids[2] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
 extern void object_init_derived_b(void *, int, int, void *, void *);
 extern void widget_set_pos_y(void *, int);
 extern void func_PAL_003388E8(void *, int);
@@ -40,13 +40,13 @@ void func_PAL_0033EC98(char *object, void *argument)
     child = object + 8;
     widget = object + 0x2DC;
     secondWidget = object + 0x324;
-    func_PAL_0033CB00(child, argument, D_001ADE48);
+    prompt_bar_init_pal(child, argument, g_audio_menu_prompt_ids);
     text = GetLocalizedString(0xBA8);
     second = GetLocalizedString(0xB5F);
-    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
-    func_PAL_0033CF58(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_PAL_0033CFD0(child, 0.67f);
-    table = D_001ADC88;
+    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_set_text_offsets_pal(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_pal(child, 0.67f);
+    table = g_circle_menu_icon_data;
     object_init_derived_b(widget, 150, 1, table, argument);
     widget_set_pos_y(widget, 16);
     func_PAL_003388E8(widget, 0x400);
@@ -68,9 +68,9 @@ void func_PAL_0033EC98(char *object, void *argument)
 }
 
 extern int func_PAL_00340348(void *, int);
-extern int D_001ADEC8[2] __attribute__((sda));
-extern void func_PAL_0034A090(void *, void *);
-extern void func_PAL_0034A2A0(void *, int, int);
+extern int g_list_page_prompt_ids[2] __attribute__((sda));
+extern void list_menu_reset_attach_items_pal(void *, void *);
+extern void menu_set_settings_pal(void *, int, int);
 extern void func_PAL_0034A2B0(void *, int);
 
 void func_PAL_00340158(char *object, void *argument)
@@ -91,36 +91,36 @@ void func_PAL_00340158(char *object, void *argument)
     (*(float **)(object + 0x3BC))[1] = 195.0f;
     child = object + 8;
     widget = object + 0x2E0;
-    func_PAL_0033CB00(child, argument, D_001ADEC8);
+    prompt_bar_init_pal(child, argument, g_list_page_prompt_ids);
     text = GetLocalizedString(0xBB1);
     second = GetLocalizedString(0xB86);
-    func_PAL_0033CF78(child, text, second, GetLocalizedString(0xB60));
-    func_PAL_0033CF58(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_PAL_0033CFD0(child, 0.4f);
+    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_set_text_offsets_pal(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_pal(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_PAL_0034A090(widget, argument);
-    func_PAL_0034A2A0(widget, -83, 32);
+    list_menu_reset_attach_items_pal(widget, argument);
+    menu_set_settings_pal(widget, -83, 32);
     func_PAL_0034A2B0(widget, 1);
     func_PAL_00340348(object, 0);
 }
 
-extern void func_PAL_0033CE70(char *);
-extern void func_PAL_0034A2E8(char *, int);
-extern void func_PAL_0034A300(char *);
-extern unsigned char D_001A7BB4;
-extern int D_001ADED8[2] __attribute__((sda));
+extern void prompt_bar_draw_pal(char *);
+extern void menu_set_field_bc_pal(char *, int);
+extern void option_list_draw_rows_pal(char *);
+extern unsigned char g_language;
+extern int g_list_page_field_table[2] __attribute__((sda));
 
 void func_PAL_00340418(char *object)
 {
     char *p;
-    func_PAL_0033CE70(object + 8);
+    prompt_bar_draw_pal(object + 8);
     p = object + 0x2E0;
-    func_PAL_0034A2E8(p, D_001ADED8[D_001A7BB4]);
-    func_PAL_0034A300(p);
+    menu_set_field_bc_pal(p, g_list_page_field_table[g_language]);
+    option_list_draw_rows_pal(p);
 }
 
 extern int func_PAL_003405B0(void *, int);
-extern int D_001ADEF0[2] __attribute__((sda));
+extern int g_simple_page_prompt_ids[2] __attribute__((sda));
 
 void func_PAL_003404B0(char *object, void *argument)
 {
@@ -139,22 +139,22 @@ void func_PAL_003404B0(char *object, void *argument)
     **(float **)(object + 0x2D8) = 255.0f;
     (*(float **)(object + 0x2D8))[1] = 208.0f;
     child = object + 8;
-    func_PAL_0033CB00(child, argument, D_001ADEF0);
+    prompt_bar_init_pal(child, argument, g_simple_page_prompt_ids);
     text = GetLocalizedString(0xC31);
-    func_PAL_0033CF78(child, text, 0, GetLocalizedString(0xB60));
-    func_PAL_0033CF58(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
+    prompt_bar_set_texts_pal(child, text, 0, GetLocalizedString(0xB60));
+    prompt_bar_set_text_offsets_pal(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
     func_PAL_003405B0(object, 0);
 }
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
-extern float D_L04_001AE1E0 __attribute__((sda));
-extern float D_L04_001AE1E8 __attribute__((sda));
-extern float D_L04_001AE1F0 __attribute__((sda));
-extern float D_L04_001AE1F8 __attribute__((sda));
-extern float D_L04_001AE1E4;
-extern float D_L04_001AE1EC;
-extern float D_L04_001AE1F4;
-extern float D_L04_001AE1FC;
+extern float g_info_panel_counter_x0 __attribute__((sda));
+extern float g_info_panel_counter_x1 __attribute__((sda));
+extern float g_info_panel_counter_x2 __attribute__((sda));
+extern float g_info_panel_counter_offset_x __attribute__((sda));
+extern float g_info_panel_counter_y0;
+extern float g_info_panel_counter_y1;
+extern float g_info_panel_counter_y2;
+extern float g_info_panel_counter_offset_y;
 struct pos {
     float x;
     float y;
@@ -164,12 +164,12 @@ void func_PAL_00340C88(char *self)
 {
     float zero = 0.0f;
 
-    object_set_first_float4(self + 1400, D_L04_001AE1F8 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1FC + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1136, D_L04_001AE1E0 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1E4 + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1224, D_L04_001AE1E8 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1EC + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1312, D_L04_001AE1F0 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1F4 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1400, g_info_panel_counter_offset_x + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_offset_y + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1136, g_info_panel_counter_x0 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y0 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1224, g_info_panel_counter_x1 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y1 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1312, g_info_panel_counter_x2 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y2 + (*(struct pos **)(self + 728))->y, zero, zero);
 }

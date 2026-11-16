@@ -9,16 +9,16 @@ extern void coll_find_ground_below_object(void *, void *, float);
 extern float moby_get_anim_value(char *);
 extern int hero_set_control_motion_and_step(char *, void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern int D_L07_001B1E08 __attribute__((sda));
+extern int g_frame_l07_counter __attribute__((sda));
 
-int func_PAL_L07_00324F58(unsigned char *object, float lower, float target, float upper)
+int hero_adjust_jump_speed_to_target_pal(unsigned char *object, float lower, float target, float upper)
 {
     float roots[2];
     char *control = (char *)moby_get_vars_word_18((unsigned int)object);
     float current;
     if (!control)
         return 0;
-    *(int *)(control + 0xbc) = D_L07_001B1E08;
+    *(int *)(control + 0xbc) = g_frame_l07_counter;
     if (!(*(int *)(control + 0x38) & 0x10))
         moby_start_effect_from_entry((int)object, mat_fast_helper_a(*(float *)(control + 0xa0), *(float *)(control + 0xa4)));
     coll_find_ground_below_object(object, control, 64.0f);

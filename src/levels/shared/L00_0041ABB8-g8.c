@@ -3,19 +3,19 @@
 
 typedef struct { int a, b; } PAIR8;
 
-extern PAIR8 D_L00_001B1458 __attribute__((nosda));
+extern PAIR8 g_debris_choice_pair __attribute__((nosda));
 
-extern int D_L00_001B1460 __attribute__((sda));
+extern int g_lava_gun_entry_effect_counter __attribute__((sda));
 
 extern void func_2EE0D0(void *dst);
 
 extern int func_3411A0(void *a0, void *a1, int a2, float f12);
 
 /* The level's literal pool, read through $gp. */
-extern float D_L00_001B151C __attribute__((sda));
-extern float D_L00_001B1520 __attribute__((sda));
-extern float D_L00_001B1524 __attribute__((sda));
-extern float D_L00_001B1528 __attribute__((sda));
+extern float g_weapon_anim_blend_a_end __attribute__((sda));
+extern float g_weapon_anim_blend_b_end __attribute__((sda));
+extern float g_weapon_anim_blend_a_start __attribute__((sda));
+extern float g_weapon_anim_blend_b_start __attribute__((sda));
 
 extern int FastDecTimer(short *p);
 
@@ -104,15 +104,15 @@ typedef struct {
     State *state;                 /* 0x70 */
 } StateOwner;
 
-extern float D_L00_001A8904;
-extern State *D_L00_001BB040 __attribute__((nosda));
-extern float D_L00_001B14F8 __attribute__((sda)), D_L00_001B14FC __attribute__((sda));
-extern float D_L00_001B14A0 __attribute__((sda)), D_L00_001B14A4 __attribute__((sda));
-extern unsigned short D_L00_001B1514 __attribute__((sda));
-extern float D_L00_001B14DC __attribute__((sda)), D_L00_001B14D4 __attribute__((sda));
-extern float D_L00_001B14D8 __attribute__((sda));
-extern int D_L00_001B1854 __attribute__((section(".sdata")));
-extern float D_L00_001B1510 __attribute__((sda));
+extern float g_cam_rotation_param;
+extern State *g_weapon_view_state __attribute__((nosda));
+extern float g_weapon_view_reset_param_a __attribute__((sda)), g_weapon_view_reset_param_b __attribute__((sda));
+extern float g_camera_default_view_x __attribute__((sda)), g_camera_default_view_y __attribute__((sda));
+extern unsigned short g_camera_default_angle_short __attribute__((sda));
+extern float g_camera_default_aim_c __attribute__((sda)), g_camera_default_aim_a __attribute__((sda));
+extern float g_camera_default_aim_b __attribute__((sda));
+extern int g_camera_default_tracker_word __attribute__((section(".sdata")));
+extern float g_camera_default_plane_param __attribute__((sda));
 extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
@@ -125,10 +125,10 @@ void lava_gun_spawn_entry_effect(char *object, void *entry)
     float scale;
 
     func_2EE0D0(local);
-    *(PAIR8 *)sel = D_L00_001B1458;
+    *(PAIR8 *)sel = g_debris_choice_pair;
     scale = *(float *)(state + 0x50) * 0.025f;
-    func_3411A0(entry, local, sel[D_L00_001B1460 % 2], scale);
-    D_L00_001B1460 = D_L00_001B1460 + 1;
+    func_3411A0(entry, local, sel[g_lava_gun_entry_effect_counter % 2], scale);
+    g_lava_gun_entry_effect_counter = g_lava_gun_entry_effect_counter + 1;
 }
 
 /* Updates the type byte and interpolates the two values passed to the helper. */
@@ -158,11 +158,11 @@ void weapon_update_anim_blend(char *moby, char *context)
         *(unsigned char *)(anim + 0xC4) == 6 ||
         *(unsigned char *)(anim + 0xC4) == 7 ||
         *(unsigned char *)(anim + 0xC4) == 1) {
-        valueA = D_L00_001B1524 + (D_L00_001B151C - D_L00_001B1524) * scale;
-        valueB = D_L00_001B1528 + (D_L00_001B1520 - D_L00_001B1528) * scale;
+        valueA = g_weapon_anim_blend_a_start + (g_weapon_anim_blend_a_end - g_weapon_anim_blend_a_start) * scale;
+        valueB = g_weapon_anim_blend_b_start + (g_weapon_anim_blend_b_end - g_weapon_anim_blend_b_start) * scale;
     } else {
-        valueA = D_L00_001B151C;
-        valueB = D_L00_001B1520;
+        valueA = g_weapon_anim_blend_a_end;
+        valueB = g_weapon_anim_blend_b_end;
     }
     valueC = 0.0f;
     cam_ease_vector_toward(moby, (float *)(anim + 0x90), local, valueA, valueB, valueC);
@@ -183,7 +183,7 @@ void weapon_reset_view_state(StateOwner *object)
     Sway *sway;
 
     temporary = (char *)&object->state->temp;
-    *(float *)(temporary + 0x14) = D_L00_001A8904;
+    *(float *)(temporary + 0x14) = g_cam_rotation_param;
     *(int *)(temporary + 0x1C) = 0;
     *(int *)(temporary + 0x20) = 0;
     *(int *)(temporary + 0x10) = 0;
@@ -191,20 +191,20 @@ void weapon_reset_view_state(StateOwner *object)
     state = object->state;
     motion = &state->motion;
     view = &state->view;
-    defaults = &D_L00_001BB040->motion;
-    defaultView = &D_L00_001BB040->view;
+    defaults = &g_weapon_view_state->motion;
+    defaultView = &g_weapon_view_state->view;
     if (motion->h3C)
         motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, motion->f40, motion->f48,
-                                    D_L00_001B14F8, *(float *)(temporary + 0x1C));
+                                    g_weapon_view_reset_param_a, *(float *)(temporary + 0x1C));
     else
         motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, defaults->f2C, motion->f48,
-                                    D_L00_001B14F8, *(float *)(temporary + 0x1C));
+                                    g_weapon_view_reset_param_a, *(float *)(temporary + 0x1C));
     if (motion->h3E)
         motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, motion->f4C, motion->f54,
-                                    D_L00_001B14FC, 0.0f);
+                                    g_weapon_view_reset_param_b, 0.0f);
     else
         motion->f30 = math_step_spring_damper_clamped(motion->v50, motion->f30, defaults->f30, motion->f54,
-                                    D_L00_001B14FC, 0.0f);
+                                    g_weapon_view_reset_param_b, 0.0f);
     if (view->hDA)
         view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
     else
@@ -231,26 +231,26 @@ void weapon_reset_view_state(StateOwner *object)
                       recoil->f34, recoil->f38, 1.0f);
     recoil->f2C = 0.0f;
 
-    viewDefaultX = D_L00_001B14A0;
-    viewDefaultY = D_L00_001B14A4;
+    viewDefaultX = g_camera_default_view_x;
+    viewDefaultY = g_camera_default_view_y;
     view->bD6 = 0;
     view->fDC = viewDefaultX;
     view->fE4 = viewDefaultY;
     view->fE0 = 0.2f;
     view->fE8 = 0.2f;
-    view->hEC = D_L00_001B1514;
+    view->hEC = g_camera_default_angle_short;
 
     aim = &object->state->aim;
-    aim0 = D_L00_001B14D4;
-    aim1 = D_L00_001B14D8;
-    aim2 = D_L00_001B14DC;
+    aim0 = g_camera_default_aim_a;
+    aim1 = g_camera_default_aim_b;
+    aim2 = g_camera_default_aim_c;
     aim->f3C = aim2;
     aim->f44 = aim0;
     aim->f40 = aim1;
-    aim->f48 = D_L00_001B1854;
+    aim->f48 = g_camera_default_tracker_word;
     aim->h4E = 0;
 
     sway = &object->state->sway;
-    sway->fC = D_L00_001B1510;
+    sway->fC = g_camera_default_plane_param;
     sway->h6 = 0;
 }

@@ -6,9 +6,9 @@ extern float fast_vec_dist(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
-extern int D_L02_001A9018 MACRO_ADDR;
-extern unsigned short **D_L02_001A9014 MACRO_ADDR;
-extern char *D_L02_001B3C1C[] __attribute__((sda));
+extern int g_record_list_count MACRO_ADDR;
+extern unsigned short **g_record_lists MACRO_ADDR;
+extern char *g_record_table[] __attribute__((sda));
 /* Looks through the nearby records for one very close to the object and, if found, remembers it and its position relative to the object. */
 void moby_find_nearby_record(char *object)
 {
@@ -25,13 +25,13 @@ void moby_find_nearby_record(char *object)
     matrix_from_basis_rows(frame.transposed, frame.rotation);
     copy_matrix3x4(frame.inverse, frame.transposed);
     index = *(int *)(state + 0xb0);
-    if (index != -1 && index < D_L02_001A9018) {
-        list = D_L02_001A9014[index];
+    if (index != -1 && index < g_record_list_count) {
+        list = g_record_lists[index];
         if (list) {
             entry = list;
             do {
                 int key = *entry & 0x7fff;
-                char *record = D_L02_001B3C1C[0] + key * 64;
+                char *record = g_record_table[0] + key * 64;
                 if (fast_vec_dist(object + 0x10, record + 0x30) < 1.0f) {
                     *(short *)(state + 0x78) = key;
                     state[0x7c] = 1;

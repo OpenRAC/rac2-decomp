@@ -11,12 +11,12 @@ extern void moby_set_state(char *, int, int);
 extern void anim_start_immediate(char *, int, int);
 extern int math_random_int_range(int, int);
 extern void func_002A0F48(void *);
-extern int func_PAL_L20_003A0E60(char *, int);
+extern int trooper_spawn_parts_pal(char *, int);
 extern void trooper_destroy_parts(char *);
 extern int moby_fuse_linked_objects(void *, void *, void *, L20_0039DCF8_Args, int);
 
 /* Sets up a spawned object at pos/rot; if it finds its slot it passes the three link words on. */
-int func_PAL_L20_003A0C40(char *obj, char *pos, char *rot)
+int trooper_init_spawned_pal(char *obj, char *pos, char *rot)
 {
     char *vars = *(char **)(obj + 0x68);
     u8 *bytes = (u8 *)(vars + 0x270);
@@ -38,7 +38,7 @@ int func_PAL_L20_003A0C40(char *obj, char *pos, char *rot)
     qcopy(obj + 0xF0, rot);
     *(u16 *)(obj + 0x7C) = 0xF;
     func_002A0F48(obj);
-    if (func_PAL_L20_003A0E60(obj, 1) == 0) {
+    if (trooper_spawn_parts_pal(obj, 1) == 0) {
         trooper_destroy_parts(obj);
         ret = 0;
     } else {

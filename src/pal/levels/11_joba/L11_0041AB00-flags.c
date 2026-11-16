@@ -4,13 +4,13 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern u8 g_sound_state[];
 extern u8 g_hero_position[];
-extern u8 D_0019B2E8[][16];
+extern u8 g_moby_group_flags[][16];
 extern s32 g_current_map_index[] __attribute__((sda));
-extern u8 *D_L11_001FF580[];
+extern u8 *g_path_l11_table[];
 extern s32 PlayMobySound(s32, s32, u8 *);
 extern void snd_stop_voice(s32);
 extern s32 hero_is_current_selected_id(u8 *);
-extern u8 *func_PAL_L00_002D7850(s32);
+extern u8 *cam_alloc_override_slot_pal(s32);
 extern void cam_end_override(u8 *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
@@ -20,7 +20,7 @@ extern f32 vec_distance_xy(void *, void *);
 extern void moby_set_byte_on_group(s32, s32);
 extern s32 IsPointInCuboid(void *, s32);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void func_PAL_L01_00322798(u8 *, void *, s32);
+extern void glow_flicker_update_pal(u8 *, void *, s32);
 
 /* Moves the entity along its path, managing its effect and sound during state changes. */
 void func_PAL_L11_0041AB00(u8 *object) {
@@ -47,7 +47,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
                 if (*(u8 **)(record + 0x88) != object || record[0x74] == 0)
                     *(s32 *)(state + 0x70) = PlayMobySound(0, 4, object);
             }
-            *(u8 **)(state + 0x68) = func_PAL_L00_002D7850(5);
+            *(u8 **)(state + 0x68) = cam_alloc_override_slot_pal(5);
             *(f32 *)(*(u8 **)(state + 0x68)) = 10.0f;
             *(s16 *)(*(u8 **)(state + 0x68) + 0x1A) = 1;
             *(s32 *)(*(u8 **)(state + 0x68) + 0x3C) = 1;
@@ -59,10 +59,10 @@ void func_PAL_L11_0041AB00(u8 *object) {
             }
             (*(u8 **)(state + 0x68))[0x1E] = 1;
             object[0x20] = 1;
-            if (D_0019B2E8[g_current_map_index[0]][object[0xB0]] & 0x80) {
+            if (g_moby_group_flags[g_current_map_index[0]][object[0xB0]] & 0x80) {
                 u8 *path;
                 cam_end_override(*(u8 **)(state + 0x68));
-                path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+                path = g_path_l11_table[*(s32 *)(state + 0x60)];
                 object[0x20] = 6;
                 *(s32 *)(state + 0x64) = *(s32 *)path - 1;
             }
@@ -77,7 +77,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
     }
     if (object[0x20] == 1) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
             if (!hero_is_current_selected_id(object)) {
                 object[0x20] = 2;
@@ -115,7 +115,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
     if (object[0x20] == 2) {
         u8 *path;
         if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 0x6C))) {
-            path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+            path = g_path_l11_table[*(s32 *)(state + 0x60)];
             moby_set_byte_on_group(object[0x21], 0);
             *(TI128 *)(position) = *(TI128 *)(path + 0x10);
             object[0x20] = 0;
@@ -131,7 +131,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
     }
     if (object[0x20] == 3) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) < 0) {
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
@@ -145,7 +145,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
     }
     if (object[0x20] == 5) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) < 0) {
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
@@ -165,7 +165,7 @@ void func_PAL_L11_0041AB00(u8 *object) {
     }
     if (object[0x20] == 6) {
         u8 *path;
-        path = D_L11_001FF580[*(s32 *)(state + 0x60)];
+        path = g_path_l11_table[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
             if (!hero_is_current_selected_id(object)) {
                 object[0x20] = 2;
@@ -188,5 +188,5 @@ void func_PAL_L11_0041AB00(u8 *object) {
     }
     FastVecSub(delta, position, previous);
     mat_combine_and_store(state + 0x20, delta, rotation, rotation);
-    func_PAL_L01_00322798(object, state + 0x74, object[0xBC]);
+    glow_flicker_update_pal(object, state + 0x74, object[0xBC]);
 }

@@ -6,7 +6,7 @@ typedef union { Quad bits; float f[4]; } Vector;
 extern int math_fast_float_d(int *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern Quad D_L00_001AECC0[4] SDATA(D_L00_001AECC0);
+extern Quad g_lens_flare_quads[4] SDATA(D_L00_001AECC0);
 
 void func_PAL_L00_00390728(char *object)
 {

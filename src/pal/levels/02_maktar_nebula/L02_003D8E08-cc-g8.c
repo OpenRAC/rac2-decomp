@@ -6,19 +6,19 @@ extern float vec_distance_xy(char *, void *);
 
 extern int math_random_int_below(int);
 
-extern float D_L02_001B02C0[4] SDATA(D_L02_001B02C0);
-extern float D_L02_001B0200[4] SDATA(D_L02_001B0200);
-extern char D_L02_001B0290[] SDATA(D_L02_001B0290);
-extern char D_L02_001B0230[] SDATA(D_L02_001B0230);
-extern char D_L02_001B0260[] SDATA(D_L02_001B0260);
-extern int D_L02_001B01B0 __attribute__((sda));
+extern float g_chainblade_debris_offset_a[4] SDATA(D_L02_001B02C0);
+extern float g_chainblade_debris_offset_b[4] SDATA(D_L02_001B0200);
+extern char g_chainblade_spawn_record_c[] SDATA(D_L02_001B0290);
+extern char g_chainblade_spawn_record_a[] SDATA(D_L02_001B0230);
+extern char g_chainblade_spawn_record_b[] SDATA(D_L02_001B0260);
+extern int g_chainblade_landing_point __attribute__((sda));
 
 int func_PAL_L02_003D8E08(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     short timer;
     int delta;
 
-    if (vec_distance_xy(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
+    if (vec_distance_xy(arg0 + 0x10, &g_chainblade_landing_point) > 18.0f) {
         return 0;
     }
     timer = *(short *)(state + 0x32E);

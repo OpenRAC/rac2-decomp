@@ -3,7 +3,7 @@
 
 typedef short s16;
 extern s16 moby_get_vars_counter(char *);
-extern char *D_L02_001B35A8 __attribute__((sda));
+extern char *g_moby_l02_list_head __attribute__((sda));
 extern void explosion_effect_update(char *);
 extern void moby_explode_and_hurt_nearby(char *);
 extern void moby_copy_sub_byte_40_to_25(char *);
@@ -16,10 +16,10 @@ extern void moby_mark_spawned(char *);
 
 /* Walks the list of objects at D_L02_001B35A8 (linked through +0x28) and hands each one to the
    handler of its kind, the half-word at +0xAA. */
-void func_PAL_L02_00405450(void) {
+void arena_notify_mobys_challenge_start_pal(void) {
     char *e;
 
-    for (e = D_L02_001B35A8; e != 0; e = *(char **)(e + 0x28)) {
+    for (e = g_moby_l02_list_head; e != 0; e = *(char **)(e + 0x28)) {
         switch (*(s16 *)(e + 0xAA)) {
         case 0xE7D:
             explosion_effect_update(e);

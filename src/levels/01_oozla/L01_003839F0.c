@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -12,9 +12,9 @@ typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L01_001AC810 __attribute__((sda));
-extern Collision D_L01_001BF900;
-extern Material D_L01_002637A0[];
+extern int g_debris_l01_model_id __attribute__((sda));
+extern Collision g_collision_l01_hit;
+extern Material g_action_table[];
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
@@ -58,7 +58,7 @@ void bouncing_l01_debris_update(char *object) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L01_002637A0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_action_table)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -68,16 +68,16 @@ void bouncing_l01_debris_update(char *object) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, object, &frame.packet)) {
-        collision = &D_L01_001BF900;
+        collision = &g_collision_l01_hit;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L01_001BF900;
+            reread = &g_collision_l01_hit;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L01_001AC810 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_debris_l01_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             object[0xBC] = 1;
             {
@@ -89,7 +89,7 @@ void bouncing_l01_debris_update(char *object) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L01_001BF900;
+            collision = &g_collision_l01_hit;
             if (collision->count <= 0)
                 goto finish;
             object[0xBC] = 1;

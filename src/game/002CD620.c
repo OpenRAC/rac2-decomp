@@ -74,7 +74,7 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 
 extern void weapon_menu_sync_slots(void);
 extern int func_0029CBE0(int);
@@ -82,7 +82,7 @@ extern int func_0029CBE0(int);
 /* Handles button input for a menu page: confirm picks the item (or fails if nothing is chosen), back closes the page. */
 int menu_handle_input_with_fallback(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value;
         weapon_menu_sync_slots();
@@ -124,11 +124,11 @@ typedef struct {
     int f58;
 } State_0025E2B8_002CD720;
 
-extern State_0025E2B8_002CD720 D_0025E2B8;
-extern char *D_0025E284;
-extern int D_0025E464;
-extern short D_001A63AC;
-extern char *D_001A8CFC[] __attribute__((sda));
+extern State_0025E2B8_002CD720 g_menu_highlight_state;
+extern char *g_menu_highlight_base;
+extern int g_menu_highlight_timer;
+extern short g_sequence_active_flag;
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int menu_get_setting_value(void);
 extern int func_0029C480(int);
 
@@ -146,7 +146,7 @@ int menu_handle_input_with_highlight(void) {
     int value;
 
     cursorBefore = menu_get_setting_value();
-    flags = D_00138344;
+    flags = g_menu_input_flags;
     if (flags & 0x10) {
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -162,27 +162,27 @@ int menu_handle_input_with_highlight(void) {
         func_0029C480(flags);
     }
 after_first:
-    if (D_001A8CFC[0] == 0)
+    if (g_resident_data_base[0] == 0)
         return result;
     cursorAfter = menu_get_setting_value();
-    if (cursorBefore == cursorAfter && D_001A63AC == 0 &&
-        ((D_0025E2B8.f50 == cursorBefore && D_0025E2B8.f44 == 2) ||
-         (D_0025E2B8.f54 == cursorBefore && D_0025E2B8.f44 == 4)))
-        *(int *)(D_0025E284 + 0x10) &= ~4;
+    if (cursorBefore == cursorAfter && g_sequence_active_flag == 0 &&
+        ((g_menu_highlight_state.f50 == cursorBefore && g_menu_highlight_state.f44 == 2) ||
+         (g_menu_highlight_state.f54 == cursorBefore && g_menu_highlight_state.f44 == 4)))
+        *(int *)(g_menu_highlight_base + 0x10) &= ~4;
     else
-        *(int *)(D_0025E284 + 0x10) |= 4;
+        *(int *)(g_menu_highlight_base + 0x10) |= 4;
     if (cursorAfter != cursorBefore)
-        D_0025E464 = -0x22C;
-    D_0025E2B8.f58 = menu_get_setting_value();
+        g_menu_highlight_timer = -0x22C;
+    g_menu_highlight_state.f58 = menu_get_setting_value();
     return result;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int grid_menu_get_selected_text_id(void *);
 
 /* Points the object at the menu panel data, if a panel exists. */
 int menu_set_object_panel_pointer(char *object) {
-    if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(D_001A8CFC[0] + 0x39F38);
+    if (g_resident_data_base[0] != 0)
+        *(void **)(object + 0x34) = grid_menu_get_selected_text_id(g_resident_data_base[0] + 0x39F38);
     return 0;
 }

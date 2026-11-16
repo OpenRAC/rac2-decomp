@@ -18,7 +18,7 @@ typedef struct {
     f32 vel[4];
 } Spark2C6EF0;
 
-extern u8 *D_001F26A8[];
+extern u8 *g_part_tex_spark_trail_table[];
 
 extern s32 FastDecTimer(s16 *);
 extern void FastVecAdd(void *, void *, void *);
@@ -43,7 +43,7 @@ void part_update_spark_trail(Spark2C6EF0 *e) {
         return;
     }
     pos = e->pos;
-    e->shade = D_001F26A8[0][math_random_int_below(2)];
+    e->shade = g_part_tex_spark_trail_table[0][math_random_int_below(2)];
     qcopy(old, pos);
     FastVecAdd(pos, pos, vel);
     FastVecSub(step, pos, old);

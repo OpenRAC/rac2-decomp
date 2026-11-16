@@ -9,8 +9,8 @@ typedef struct {
     int selected[29];              
     int scroll;                    
 } Menu_002D99E8;
-extern int D_001AB910 __attribute__((sda));
-extern int D_001ABB28 __attribute__((sda));
+extern int g_pause_menu_busy_flag __attribute__((sda));
+extern int g_menu_flag_b __attribute__((sda));
 extern int g_map_overlay_state[];
 extern void SetupGifPaging(int);
 extern int menu_list_active_entries(int *, int *, int *, int);
@@ -25,7 +25,7 @@ extern void DoGifPaging(void);
 extern void text_draw_window_medium(TextBox_002D99E8 *, int, signed char *, int);
 extern void DrawMenuCheckBox(int, int, int);
 
-int func_PAL_002DA708(Menu_002D99E8 *menu)
+int DrawMenuCheckList_pal(Menu_002D99E8 *menu)
 {
     TextBox_002D99E8 draw, initial;
     int mask;
@@ -42,7 +42,7 @@ int func_PAL_002DA708(Menu_002D99E8 *menu)
     count = menu_list_active_entries(list, &mask, 0, 0);
     VU1_addGSregister(0x42, 0x44);
     VU1_addGSregister(0x47, 0x10B);
-    if (!D_001AB910) {
+    if (!g_pause_menu_busy_flag) {
         x = menu->x;
         y = menu->y;
     }
@@ -55,7 +55,7 @@ int func_PAL_002DA708(Menu_002D99E8 *menu)
     initial.top = y;
     initial.left = x;
     draw = initial;
-    if (D_001ABB28)
+    if (g_menu_flag_b)
         gfx_draw_rounded_box(y, menu->height, x, menu->width, 64, 0x202020);
     for (i = 0; i < count; i++) {
         iconX = x + 4;

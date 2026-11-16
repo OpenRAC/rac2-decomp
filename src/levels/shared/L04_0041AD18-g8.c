@@ -2,12 +2,12 @@
 
 /* Advances a falling object through impact, particle emission and fade-out. */
 typedef int Quad __attribute__((mode(TI)));
-extern int D_L04_001B0BD8 __attribute__((sda));
+extern int g_debris_initialized __attribute__((sda));
 typedef struct { char pad[0x34]; int owner; char tail[8]; } ParticleRecord;
-extern ParticleRecord D_L04_00260620[100];
+extern ParticleRecord g_debris_particle_records[100];
 typedef struct { char pad[0x24]; int kind; char *owner; char tail[0x3C]; int active; } OwnerContext;
 extern OwnerContext g_music_state;
-extern char D_L04_001BFAE0[0x30];
+extern char g_spark_origin_quad[0x30];
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern void FastVecScale(void *, void *, float);
@@ -23,7 +23,7 @@ extern void part_spawn_white_flash(void *, void *, int, float);
 extern int math_fast_float_d(int *);
 extern void moby_mark_spawned(void *), part_update_orbiting_sparks(void *), part_update_object_particles(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern char D_L04_0041B540[];
+extern char g_debris_draw_callback_data[];
 /* Updates a falling piece of debris: it falls, bursts into sparks when it hits something, then fades and goes away. */
 void falling_l04_debris_update_2(char *self)
 {
@@ -35,13 +35,13 @@ void falling_l04_debris_update_2(char *self)
         *(unsigned char *)(self + 0x20) = 1;
         *(int *)(state + 0x48) = 0;
         {
-            int initialized = D_L04_001B0BD8;
+            int initialized = g_debris_initialized;
             *(int *)(state + 0x4C) = 0;
             *(int *)(state + 0x50) = 0;
             if (!initialized) {
                 int i;
-                for (i = 99; i >= 0; i--) D_L04_00260620[i].owner = 0;
-                D_L04_001B0BD8 = 1;
+                for (i = 99; i >= 0; i--) g_debris_particle_records[i].owner = 0;
+                g_debris_initialized = 1;
             }
         }
         {
@@ -69,9 +69,9 @@ void falling_l04_debris_update_2(char *self)
             vec_clear_128(state);
             hero_check_hit_by_object(self);
             PlayMobySound(0, 0, self);
-            FastVecScale(state + 0x20, D_L04_001BFAE0 + 0x20, 0.0009765625f);
+            FastVecScale(state + 0x20, g_spark_origin_quad + 0x20, 0.0009765625f);
             vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
-            *(Quad *)(state + 0x30) = *(Quad *)D_L04_001BFAE0;
+            *(Quad *)(state + 0x30) = *(Quad *)g_spark_origin_quad;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
                 int i;
@@ -112,5 +112,5 @@ void falling_l04_debris_update_2(char *self)
     }
     part_update_orbiting_sparks(self);
     part_update_object_particles(self);
-    gfx_add_draw_callback_third(D_L04_0041B540, self);
+    gfx_add_draw_callback_third(g_debris_draw_callback_data, self);
 }

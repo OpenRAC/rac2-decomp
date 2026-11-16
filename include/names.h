@@ -3,7 +3,8 @@
  * tools/names.py header from config/names.tsv; do not edit.
  *
  * Each name is a macro for the address-named symbol the build and
- * every tool use (func_<ADDR>, func_LNN_<ADDR>, D_<ADDR>): code may
+ * every tool use (func_<ADDR>, func_LNN_<ADDR>, D_<ADDR>, and a release's
+ * own func_PAL_..., func_US2_..., D_PAL_..., D_US2_...): code may
  * write either spelling and compiles to the same object. Definitions,
  * bodies, extern lines and prototypes use the readable name;
  * INCLUDE_ASM/ASM_FUNC lines, __asm__ labels and SDATA() keep the
@@ -41,6 +42,8 @@
 #include "names/level_25.h"
 #include "names/level_26.h"
 #include "names/level_30.h"
+#include "names/pal.h"
 #include "names/shared_levels.h"
+#include "names/us2.h"
 
 #endif /* NAMES_H */

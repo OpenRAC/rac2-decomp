@@ -14,12 +14,12 @@ extern int g_pad_state[];
 extern unsigned char g_item_slot_to_record[];
 extern EffectClassEntry g_weapon_l00_table[];
 extern EffectSoundSlot g_sound_state[];
-extern char *D_L00_001B1448 __attribute__((sda));
+extern char *g_lava_gun_particle_slots __attribute__((sda));
 extern char *g_lava_gun_ring_entries __attribute__((sda));
 extern char *g_lava_gun_beam_slots __attribute__((sda));
 extern char *g_area_hit_targets[];
-extern int D_L00_001A8FF0;
-extern int D_L00_001A8F00;
+extern int g_hero_locked_flag;
+extern int g_game_l00_mode;
 extern char ref_L00_00419C98_00[];
 extern void table_clear_entry_flag(int);
 extern int AcquireEntitySlot(char *, int, int *);
@@ -40,7 +40,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
-extern int func_PAL_0032F0B8(char *, int, char *);
+extern int StartAttachedEffect_pal(char *, int, char *);
 extern s32 func_PAL_L00_002C4480(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -49,9 +49,9 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void AppendVectorRingEntry(char *, char *, void *, int);
-extern void func_PAL_L00_0041F868(char *);
+extern void lava_gun_update_blobs_pal(char *);
 extern void lava_gun_update_ring_entries(char *);
-extern void func_PAL_L00_00420D90(char *);
+extern void part_l00_update_effect_slots_2_pal(char *);
 extern void ref_L00_00419C98_01(void *, char *);
 
 /* Initializes the effect tables on first update, processes nearby targets while active,
@@ -70,9 +70,9 @@ void func_PAL_L02_0044B234(char *object)
     if (!((unsigned char *)object)[0x20]) {
         *(int *)(state+0x34)=AcquireEntitySlot(object,0,&unused);
         g_lava_gun_beam_slots=level_get_slot_body(*(short *)(object+0xaa),*(int *)(state+0x34));
-        D_L00_001B1448=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_beam_slots+0x33e0);
-        g_lava_gun_ring_entries=(char *)mem_align_up_sixteen_alt((int)D_L00_001B1448+0x1f40);
-        for (i=124;i>=0;i--) ((EffectParticleSlot *)D_L00_001B1448)[i].active=1;
+        g_lava_gun_particle_slots=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_beam_slots+0x33e0);
+        g_lava_gun_ring_entries=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_particle_slots+0x1f40);
+        for (i=124;i>=0;i--) ((EffectParticleSlot *)g_lava_gun_particle_slots)[i].active=1;
         for (i=9;i>=0;i--) ((EffectLargeSlot *)g_lava_gun_beam_slots)[i].active=0;
         { int invalid=-1; for (i=34;i>=0;i--) ((EffectHandleSlot *)g_lava_gun_ring_entries)[i].handle=invalid; }
         *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; *(int *)(state+0x44)=0;
@@ -106,7 +106,7 @@ void func_PAL_L02_0044B234(char *object)
             packet.u.word=direction.word; packet.u.position[3]=5627.925f;
             packet.flags=1; packet.a=9; packet.b=1; packet.id=*(short *)(*target+0xaa);
             QueueMobyImpact(*target,&packet);
-            func_PAL_0032F0B8(*target,29,object); PlayMobySound(1,0,object);
+            StartAttachedEffect_pal(*target,29,object); PlayMobySound(1,0,object);
             }
             target++;
         } while (--remaining); }
@@ -127,7 +127,7 @@ void func_PAL_L02_0044B234(char *object)
     if (g_hero_state.p[0x1450/4]) {
         g_hero_state.p[0xbf8/4]=g_hero_state.p[0x1450/4];
         vec_compute_object_to_target(g_hero_state.p[0x1450/4],state,vector,*(float *)(state+0x50)*0.05f);
-        if (D_L00_001A8FF0) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
+        if (g_hero_locked_flag) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
         else vector[2]+=0.02f;
     }
     qcopy(state+0x10,state);
@@ -135,8 +135,8 @@ void func_PAL_L02_0044B234(char *object)
     if (*(float *)(state+0x50)!=0) AppendVectorRingEntry(object,state,vector,33);
     *(float *)(state+0x58)-=0.1f; if (*(float *)(state+0x58)<=-8) *(float *)(state+0x58)+=8;
     *(float *)(state+0x5c)-=0.025f; if (*(float *)(state+0x5c)<=-8) *(float *)(state+0x5c)+=8;
-    if (*(float *)(state+0x50)!=0) { func_PAL_L00_0041F868(object); lava_gun_update_ring_entries(object); }
+    if (*(float *)(state+0x50)!=0) { lava_gun_update_blobs_pal(object); lava_gun_update_ring_entries(object); }
     else { *(int *)(state+0x44)=0; *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; }
-    func_PAL_L00_00420D90(object);
-    if (D_L00_001A8F00!=2 && ((unsigned char *)object)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,object);
+    part_l00_update_effect_slots_2_pal(object);
+    if (g_game_l00_mode!=2 && ((unsigned char *)object)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,object);
 }

@@ -27,12 +27,12 @@ struct ProjectileObject {
     char padac[0x14]; float transform[12];
 };
 typedef struct { Vec from,to,velocity; ProjectileObject *object; int *filter; int mode; float radius,step,scale; int zero48,zero4c,flag; int surface; int flag58; float epsilon; } Sweep;
-extern int D_001AEC0C;
-extern float D_001AEC50 __attribute__((sda)), D_001AEC58 __attribute__((sda));
-extern ProjectileObject *D_001AD7EC;
-extern int D_0018C0B4 NOT_SDA;
+extern int g_megaturret_slot_counter;
+extern float g_megaturret_speed __attribute__((sda)), g_megaturret_sweep_step __attribute__((sda));
+extern ProjectileObject *g_turret_target_moby;
+extern int g_game_mode NOT_SDA;
 extern int g_surface_height_tiles __attribute__((sda));
-extern int D_001B22D8;
+extern int g_surface_box_count;
 typedef struct { int owners[64]; int active[64]; int extra[8]; int count, flag, limit; } ProjectileManager;
 extern ProjectileManager ref_00306A40_00;
 extern ProjectileObject *ref_00306A40_01[];
@@ -63,7 +63,7 @@ extern float moby_get_anim_value(void *);
 extern void megaturret_find_target(void *),megaturret_aim_at_target(void *),func_PAL_00308AB0(void *);
 extern int part_alloc_effect_slot(void *,int,float,float,float),slot_alloc_for_object(void *,int);
 extern void func_PAL_00308540(void *),func_PAL_003085D8(void *);
-extern void func_PAL_002AD288(void *,void *,int,float,float);
+extern void part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
 extern void slot_free(int),slot_list_remove(void *,int),moby_mark_spawned(void *);
 extern void matrix_mul_vec3(void *,void *,void *), part_advance_grow_effect_2(void *);
 extern int vec_fast_helper_b(void *);
@@ -90,9 +90,9 @@ void func_PAL_00307CE8(ProjectileObject *self)
     switch (self->state) {
     case 0:
         self->state = 1;
-        counter = D_001AEC0C;
+        counter = g_megaturret_slot_counter;
         child->slot = counter;
-        D_001AEC0C = (counter + 1) % 100;
+        g_megaturret_slot_counter = (counter + 1) % 100;
         self->collision = 0;
         /* fall through */
     case 1:
@@ -107,7 +107,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         qcopy(&old, &self->position);
         FastVecAdd(&self->position, &self->position, child);
         part_steer_effect_direction(child->flightEffect, child, 0);
-        vec_add_object_direction_scaled(&self->position, child, D_001AEC50 * 0.00040000002f);
+        vec_add_object_direction_scaled(&self->position, child, g_megaturret_speed * 0.00040000002f);
         vec_transform_or_copy(&self->position, &self->position);
         filter[0] = 0;
         filter[1] = 0xc5a;
@@ -118,7 +118,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         sweep.filter = filter;
         sweep.mode = 2;
         sweep.radius = 0.13f;
-        sweep.step = D_001AEC58;
+        sweep.step = g_megaturret_sweep_step;
         sweep.scale = 0.5555556f;
         sweep.zero48 = 0;
         sweep.zero4c = 0;
@@ -144,7 +144,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
                 child->velocity.z = -0.030000001f;
                 self->state = 7;
                 if (!sweep.surface) {
-                    RippleDisturb(g_surface_height_tiles, D_001B22D8, 1, self->position.x, self->position.y, 0.5f, -0.35f);
+                    RippleDisturb(g_surface_height_tiles, g_surface_box_count, 1, self->position.x, self->position.y, 0.5f, -0.35f);
                     hit = moby_spawn_scaled_effect(&self->position, 2.0f);
                     if (hit)
                         hit->field23 = 0x70;
@@ -163,9 +163,9 @@ void func_PAL_00307CE8(ProjectileObject *self)
                 }
             }
             table_clear_entry_flag(child->flightEffect);
-            ref_00306A40_01[child->slot] = D_001AD7EC;
-            if (D_001AD7EC) {
-                FastVecSub(&relative, &self->position, &D_001AD7EC->position);
+            ref_00306A40_01[child->slot] = g_turret_target_moby;
+            if (g_turret_target_moby) {
+                FastVecSub(&relative, &self->position, &g_turret_target_moby->position);
                 matrix_from_basis_rows(inverse, ref_00306A40_01[child->slot]->transform);
                 transform_vector(&relative, &relative, inverse);
                 {
@@ -232,7 +232,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         break;
     case 8:
         snd_play_from_class_bank(3, 0, self, 0x1367);
-        func_PAL_002AD288(self, &self->position, -1, 0.5f, 13.0f);
+        part_spawn_explosion_with_sparks_pal(self, &self->position, -1, 0.5f, 13.0f);
         self->state = 9;
         self->flags |= 0x41;
         break;
@@ -262,7 +262,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
     if (self->state == 3 || self->state == 4)
         part_advance_grow_effect_2(self);
     vec_fast_helper_b(&child->timer5c);
-    if (math_fast_float_d(&child->timer40) || D_0018C0B4 == 0x6f)
+    if (math_fast_float_d(&child->timer40) || g_game_mode == 0x6f)
         if (self->state != 9)
             self->state = 8;
     if (self->state == 3 || self->state == 4) {

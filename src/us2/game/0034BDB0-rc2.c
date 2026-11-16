@@ -11,8 +11,8 @@ extern u8 *menu_clear_sixteen_words();
 extern u8 *effect_clear_row_groups();
 extern char *meter_screen_init_parts();
 
-extern s8 D_001AD928[];
-extern s8 D_001AD908[];
+extern s8 g_meter_vtable_a[];
+extern s8 g_meter_vtable_b[];
 s32 func_US2_0034BDB0(s32 arg0) {
     s32 sp0;
     s32 sp4;
@@ -92,9 +92,9 @@ s32 func_US2_0034BDB0(s32 arg0) {
     effect_clear_row_groups(sp4);
     effect_clear_row_groups(sp30);
     object_init_type_pointer(sp8);
-    (*(s32 *)((s8 *)(arg0) + (0x1464))) = ((s32)D_001AD928);
+    (*(s32 *)((s8 *)(arg0) + (0x1464))) = ((s32)g_meter_vtable_a);
     object_init_type_pointer(sp10);
-    (*(s32 *)((s8 *)(arg0) + (0x1468))) = ((s32)D_001AD908);
+    (*(s32 *)((s8 *)(arg0) + (0x1468))) = ((s32)g_meter_vtable_b);
     menu_clear_sixteen_words(sp18);
     menu_clear_sixteen_words(sp24);
     return arg0;

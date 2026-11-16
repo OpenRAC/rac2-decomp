@@ -7,7 +7,7 @@ extern float math_spring_float_to_goal(float *, float, float *, float, float, fl
 extern int math_fast_float_d(int *);
 
 /* Walks the ten 0x530-byte records: spins the two direction vectors, then steps the fade state. */
-void func_PAL_L00_00420D90(void)
+void part_l00_update_effect_slots_2_pal(void)
 {
     int index, axis;
     char *record;

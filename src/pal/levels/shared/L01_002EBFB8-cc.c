@@ -9,7 +9,7 @@ typedef struct {
 } SubtitleHistory;
 
 extern SubtitleHistory g_subtitle_history[];
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern char g_hero_position[];
 extern int IsPointInCuboid(void *, int);
@@ -31,22 +31,22 @@ void func_PAL_L01_002EBFB8(int key, int selection, int mode, int area, int exclu
                 func_PAL_00289730(key, selection);
                 break;
             case 1:
-                if (((int)D_001A7390[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
+                if (((int)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
                     func_PAL_00289730(key, selection);
-                else if (g_subtitle_history[selection].time < ((int)D_001A7390[0] * 5 + 2) / 6)
-                    g_subtitle_history[selection].time = ((int)D_001A7390[0] * 5 + 2) / 6;
+                else if (g_subtitle_history[selection].time < ((int)g_frame_counter[0] * 5 + 2) / 6)
+                    g_subtitle_history[selection].time = ((int)g_frame_counter[0] * 5 + 2) / 6;
                 break;
             case 2:
                 if (g_subtitle_history[selection].count != 0) {
-                    if (((int)D_001A7390[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
+                    if (((int)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
                         func_PAL_00289730(key, selection);
-                    else if (g_subtitle_history[selection].time < ((int)D_001A7390[0] * 5 + 2) / 6)
-                        g_subtitle_history[selection].time = ((int)D_001A7390[0] * 5 + 2) / 6;
+                    else if (g_subtitle_history[selection].time < ((int)g_frame_counter[0] * 5 + 2) / 6)
+                        g_subtitle_history[selection].time = ((int)g_frame_counter[0] * 5 + 2) / 6;
                     break;
                 }
                 g_subtitle_history[selection].count++;
-                if (g_subtitle_history[selection].time < ((int)D_001A7390[0] * 5 + 2) / 6)
-                    g_subtitle_history[selection].time = ((int)D_001A7390[0] * 5 + 2) / 6;
+                if (g_subtitle_history[selection].time < ((int)g_frame_counter[0] * 5 + 2) / 6)
+                    g_subtitle_history[selection].time = ((int)g_frame_counter[0] * 5 + 2) / 6;
                 g_subtitle_history[selection].levels = (g_subtitle_history[selection].levels | (1 << g_current_map_index[0])) | 0x80000000;
                 break;
             case 3:

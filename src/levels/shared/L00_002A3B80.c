@@ -54,16 +54,16 @@ typedef struct {
 
 extern char g_hero_state[];
 extern int D_001A79F0_1[] __attribute__((sda));
-extern int D_001A7398[] __attribute__((sda));
-extern int D_001A7A00[] __attribute__((sda));
-extern unsigned char D_001A7AFA[] __attribute__((sda));
-extern Moby *D_L00_001B1E9C[] __attribute__((sda));
-extern Moby *D_L00_001B1EA0[] __attribute__((sda));
-extern int D_L00_001A8FF0[] __attribute__((sda));
-extern Quad D_L00_001BF220;
-extern Quad D_L00_001B1B10[] __attribute__((sda));
-extern char D_00152C70[];
-extern Record D_L00_0025BE10[];
+extern int g_menu_choice_table[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
+extern unsigned char g_barlow_hint_inside_flag[] __attribute__((sda));
+extern Moby *g_moby_array_base[] __attribute__((sda));
+extern Moby *g_moby_array_end_sentinel[] __attribute__((sda));
+extern int g_hero_locked_flag[] __attribute__((sda));
+extern Quad g_hero_l00_position;
+extern Quad g_camera_offset_vector[] __attribute__((sda));
+extern char g_hero_placement[];
+extern Record g_hero_item_attach_records[];
 
 extern void mem_clear(void *, int, int);
 extern void euler_rotation_basis(void *, void *);
@@ -92,8 +92,8 @@ void InitializeHero(void)
     for (i = 0; i < 7; i++)
         saved[i] = ((HeroState *)g_hero_state)->i[0x1248 / 4 + i * 0x14];
 
-    for (i = 0; &D_L00_001B1E9C[0][i] < D_L00_001B1EA0[0]; i++) {
-        actor = &D_L00_001B1E9C[0][i];
+    for (i = 0; &g_moby_array_base[0][i] < g_moby_array_end_sentinel[0]; i++) {
+        actor = &g_moby_array_base[0][i];
         if (actor->oclass == 0) {
             (((HeroState *)g_hero_state)->m[0x2290 / 4]) = actor;
             euler_rotation_basis(&actor->basis, &actor->axis);
@@ -102,7 +102,7 @@ void InitializeHero(void)
             FastVecAdd(&near, &near, &((HeroState *)g_hero_state)->q[8]);
             FastVecAdd(&far, &far, &((HeroState *)g_hero_state)->q[8]);
             if (CollLine(&near, &far, 2, (((HeroState *)g_hero_state)->m[0x2290 / 4]), 0) != 0)
-                qcopy(&((HeroState *)g_hero_state)->q[8], &D_L00_001BF220);
+                qcopy(&((HeroState *)g_hero_state)->q[8], &g_hero_l00_position);
             (((HeroState *)g_hero_state)->m[0x2290 / 4])->flags |= 2;
             ((HeroState *)g_hero_state)->m[0xC18 / 4] = (((HeroState *)g_hero_state)->m[0x2290 / 4]);
             ((HeroState *)g_hero_state)->f[0x98 / 4] = (((HeroState *)g_hero_state)->m[0x2290 / 4])->axis.f[2];
@@ -110,43 +110,43 @@ void InitializeHero(void)
             hero_l00_update_ground_contact();
             update_hero_moby();
             anim_start_object_at_frame(0, 0);
-            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)g_hero_state)->q[8]);
-            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)g_hero_state)->q[9]);
+            qcopy(&((Placement *)g_hero_placement)->pos, &((HeroState *)g_hero_state)->q[8]);
+            qcopy(&((Placement *)g_hero_placement)->rot, &((HeroState *)g_hero_state)->q[9]);
             break;
         }
     }
     if (D_001A79F0_1[0] == 1 || D_001A79F0_1[0] == 8)
         (((HeroState *)g_hero_state)->m[0x2290 / 4])->b7E |= 1;
     (((HeroState *)g_hero_state)->m[0x2290 / 4])->b62 = 0xFF;
-    if (D_001A7398[0] == 0)
-        D_001A7398[0] = 30;
+    if (g_menu_choice_table[0] == 0)
+        g_menu_choice_table[0] = 30;
 
     for (i = 0; i < 40; i++) {
-        D_L00_0025BE10[i].attached = 0;
-        vec_clear_128(&D_L00_0025BE10[i].rot_target);
-        vec_clear_128(&D_L00_0025BE10[i].rot);
-        vec_clear_128(&D_L00_0025BE10[i].rot_vel);
-        vec_clear_128(&D_L00_0025BE10[i].pos_target);
-        vec_clear_128(&D_L00_0025BE10[i].pos);
-        vec_clear_128(&D_L00_0025BE10[i].pos_vel);
+        g_hero_item_attach_records[i].attached = 0;
+        vec_clear_128(&g_hero_item_attach_records[i].rot_target);
+        vec_clear_128(&g_hero_item_attach_records[i].rot);
+        vec_clear_128(&g_hero_item_attach_records[i].rot_vel);
+        vec_clear_128(&g_hero_item_attach_records[i].pos_target);
+        vec_clear_128(&g_hero_item_attach_records[i].pos);
+        vec_clear_128(&g_hero_item_attach_records[i].pos_vel);
     }
     for (i = 0; i < 9; i++)
         ((HeroState *)g_hero_state)->i[0x242C / 4 + i] = -1;
     ((HeroState *)g_hero_state)->f[0x24A4 / 4] = 2.125f;
     ((HeroState *)g_hero_state)->f[0x24A8 / 4] = 1.25f;
-    if (D_001A7A00[0] == 0)
+    if (g_player_stats[0] == 0)
         hero_update_collection_progress();
     ((HeroState *)g_hero_state)->i[0x24D0 / 4] = 4;
-    ((HeroState *)g_hero_state)->i[0x24CC / 4] = D_001A7A00[0];
+    ((HeroState *)g_hero_state)->i[0x24CC / 4] = g_player_stats[0];
     ((HeroState *)g_hero_state)->h[0x24D4 / 2] = ((HeroState *)g_hero_state)->h[0x24CC / 2];
     ((HeroState *)g_hero_state)->i[0x11A0 / 4] = math_random_int_range(180, 300);
     ((HeroState *)g_hero_state)->f[0x11A4 / 4] = 0.007f;
     ((HeroState *)g_hero_state)->f[0x11A8 / 4] = 0.3f;
     ((HeroState *)g_hero_state)->f[0xEB0 / 4] = 0.97f;
-    if (D_L00_001A8FF0[0] != 0)
-        qcopy(&((HeroState *)g_hero_state)->q[0xB0 / 16], D_L00_001B1B10);
+    if (g_hero_locked_flag[0] != 0)
+        qcopy(&((HeroState *)g_hero_state)->q[0xB0 / 16], g_camera_offset_vector);
     ((HeroState *)g_hero_state)->i[0x18D4 / 4] = 0;
-    if (D_001A7AFA[0] == 0)
+    if (g_barlow_hint_inside_flag[0] == 0)
         ((HeroState *)g_hero_state)->h[0x24FC / 2] = 1;
 }
 
@@ -156,7 +156,7 @@ extern void hero_clear_queued_anim(void);
 extern int hero_l00_set_action(int, int);
 extern void trail_reset_slots(void);
 /* Incomplete sda array: retail clears this word as `lui $at; sw` (compiler-notes.md). */
-extern int D_001A73A0[] __attribute__((sda));
+extern int g_hero_aim_speed_start[] __attribute__((sda));
 
 /* Sets the hero's starting aim, speed and camera values when a level begins. */
 void hero_reset_start_aim_speed(void)
@@ -169,7 +169,7 @@ void hero_reset_start_aim_speed(void)
     *(float *)(base + 0x258) = 0.8f;
     *(float *)(base + 0x25C) = 0.7f;
     *(unsigned char *)(base + 0x24F0) = g_current_map_index == 0x1A;
-    D_001A73A0[0] = 0;
+    g_hero_aim_speed_start[0] = 0;
     *(int *)(base + 0x2294) = 0;
     *(float *)(base + 0xC24) = 1.0f;
     hero_clear_queued_anim();

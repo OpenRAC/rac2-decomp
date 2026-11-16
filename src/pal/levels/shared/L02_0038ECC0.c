@@ -6,7 +6,7 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 extern int g_current_map_index __attribute__((sda));
-extern float D_00189EA8;
+extern float g_hero_height_limit;
 extern u8 g_sound_state[];
 extern float g_camera_l02_position[4];
 extern int PlayMobySound(int, int, char *);
@@ -33,7 +33,7 @@ void func_PAL_L02_0038FDC0(char *object) {
         }
         *(u32 *)(object + 0x78) = FastTweenColor(*(u32 *)(object + 0x78), 0x50000046, 0.18f);
     }
-    if (g_current_map_index == 13 && D_00189EA8 > 89.0f)
+    if (g_current_map_index == 13 && g_hero_height_limit > 89.0f)
         return;
     kind = *(short *)(object + 0xAA);
     switch (kind) {

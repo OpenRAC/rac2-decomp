@@ -29,9 +29,9 @@ typedef struct {
 } CameraAngles;
 
 extern TargetState g_hero_state;
-extern int D_001B19C8;
-extern char *D_L00_001FACE0[];
-extern CameraAngles D_L00_0025BE10;
+extern int g_hero_tick_counter;
+extern char *g_target_l00_list[];
+extern CameraAngles g_hero_item_attach_records;
 
 extern char *moby_get_private_value_0(void *);
 extern float vec_distance_xy(void *, void *);
@@ -68,12 +68,12 @@ void UpdateHeroAutoAimAngles(void)
     if (!special) {
         if ((unsigned char)(g_hero_state.object)[0x43] == 81)
             return;
-        if (D_001B19C8 % 7 == 0) {
+        if (g_hero_tick_counter % 7 == 0) {
             bestScore = 100000000.0f;
             bestPriority = 0.0f;
-            obj = D_L00_001FACE0[0];
+            obj = g_target_l00_list[0];
             best = 0;
-            for (i = 0; obj != 0; obj = D_L00_001FACE0[++i]) {
+            for (i = 0; obj != 0; obj = g_target_l00_list[++i]) {
                 info = moby_get_private_value_0(obj);
                 if (!info)
                     continue;
@@ -153,15 +153,15 @@ void UpdateHeroAutoAimAngles(void)
         }
         if (special) {
             cam_set_limits_third(0.037f, 0.3f);
-            D_L00_0025BE10.yaw1c8 = yaw;
+            g_hero_item_attach_records.yaw1c8 = yaw;
             cam_set_limits_second(0.037f, 0.3f);
-            D_L00_0025BE10.pitch114 = pitch;
+            g_hero_item_attach_records.pitch114 = pitch;
         } else {
             cam_set_limits_fourth(0.021f, 0.27f);
-            D_L00_0025BE10.pitch274 = pitch;
-            D_L00_0025BE10.yaw278 = yaw * 0.7f;
+            g_hero_item_attach_records.pitch274 = pitch;
+            g_hero_item_attach_records.yaw278 = yaw * 0.7f;
             cam_set_limits_third(0.014f, 0.3f);
-            D_L00_0025BE10.yaw1c8 = D_L00_0025BE10.yaw278 * 0.55f;
+            g_hero_item_attach_records.yaw1c8 = g_hero_item_attach_records.yaw278 * 0.55f;
         }
     }
     g_hero_state.special = 0;

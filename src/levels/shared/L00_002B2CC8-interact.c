@@ -27,9 +27,9 @@ typedef struct {
 } Root;
 
 extern Root g_hero_state;
-extern char D_L00_001C3480[];
-extern int D_L00_001A8F00 __attribute__((sda));
-extern unsigned char D_001A7A33 __attribute__((sda));
+extern char g_grab_slot_table[];
+extern int g_game_l00_mode __attribute__((sda));
+extern unsigned char g_contact_hit_flag __attribute__((sda));
 extern unsigned char g_bolt_multiplier __attribute__((sda));
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
@@ -64,17 +64,17 @@ int hero_try_grab_object(int apply)
         return 0;
     if (g_hero_state.timer)
         return 0;
-    if (D_L00_001A8F00)
+    if (g_game_l00_mode)
         return 0;
     g_hero_state.contact = 0;
     target_moby = g_hero_state.moby;
     if ((unsigned char)target_moby[0xa8] == 255)
         return 0;
-    slot = D_L00_001C3480 + (unsigned char)target_moby[0xa8] * 64;
+    slot = g_grab_slot_table + (unsigned char)target_moby[0xa8] * 64;
     if (*(char **)(slot + 0x38) != target_moby || !(SI(0x24) & 9))
         return 0;
     if (SF(0x2c) != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !g_hero_state.vehicle_mode) {

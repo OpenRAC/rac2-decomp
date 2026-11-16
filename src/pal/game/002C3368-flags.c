@@ -18,7 +18,7 @@ typedef struct {
     float w;
 } Vec16_F5621621c;
 extern void moby_queue_knockback_for_nodes(void *a0, Vec16_F5621621c *src, int *p, int n, int t0, int t1, int t2, int t3, float f1, float f2, float f3);
-extern int D_001BF000[];
+extern int g_nearby_mobys[];
 extern float IntToFloat(int);
 
 /* Updates one object: it copies its vector into a local, adds the two motion
@@ -30,7 +30,7 @@ extern float IntToFloat(int);
    never reads them back. The words at offsets 0x20 and 0x34 are 32-bit in the
    object and the helpers take them as pointers, so they are cast on the way
    out. */
-void func_PAL_002C3368(char *obj)
+void part_update_trail_emitter_pal(char *obj)
 {
     char *motion = obj + 0x20;
     char *vec = obj + 0x10;
@@ -60,5 +60,5 @@ void func_PAL_002C3368(char *obj)
     count = coll_process_hit(0.15f, vec, 16, *(int *)(motion + 0x14), 0);
     local[1] = *(V4_Fc3cb9262 *)(obj + 0x10);
     moby_queue_knockback_for_nodes((void *)*(int *)(motion + 0x14), (Vec16_F5621621c *)&local[1],
-                   D_001BF000, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
+                   g_nearby_mobys, count, 0, 0x810001, 2, 1, 2.0f, 1.0f, 1.0f);
 }

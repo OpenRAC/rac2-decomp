@@ -18,9 +18,9 @@ struct L02NearObject;
 struct L02GroupObject;
 extern char g_hero_state[] NOT_SDA;
 typedef struct { char pad[0x18]; char *hit; int count; } L02Collision;
-extern L02Collision D_L15_001BFC00;
-extern char *D_L15_001FE480[];
-extern int D_L15_001B2148[] __attribute__((sda));
+extern L02Collision g_hit_l15_result;
+extern char *g_path_l15_table[];
+extern int g_gorn_challenge_count[] __attribute__((sda));
 extern int linked_child_update(char *), moby_compute_aligned_direction(char *, void *);
 extern void moby_update_glow_pulse_timers(char *), turret_l02_aim_at_hero(char *), moby_set_random_spread_velocity(char *, void *), linked_effect_update(char *);
 extern void moby_delay_group_except_nearest(struct L02NearObject *), moby_randomize_group_timers(struct L02GroupObject *), moby_teleport_to_new_pose(char *, void *, void *);
@@ -191,8 +191,8 @@ void ranged_l15_enemy_update(char *moby) {
         if (!*(short *)(vars + 0x378) && *(u16 *)(moby + 0x96) > 15) {
             moby_transform_joint_to_world(*(char **)(vars + 0x370), 0, (char *)&work.aim.muzzle);
             contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 16, moby, 0);
-            if (contact && D_L15_001BFC00.hit && *(short *)(D_L15_001BFC00.hit + 0xAA) == 0xC1B /* moby class 3099 */) { { moby_set_state((u8 *)moby, 13, -1); break; } break; }
-            if (contact && (hit_record = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(vars + 0x386)) {
+            if (contact && g_hit_l15_result.hit && *(short *)(g_hit_l15_result.hit + 0xAA) == 0xC1B /* moby class 3099 */) { { moby_set_state((u8 *)moby, 13, -1); break; } break; }
+            if (contact && (hit_record = &g_hit_l15_result)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(vars + 0x386)) {
                 if (!hit_record->hit || (!moby_is_in_special_class_range(hit_record->hit) && (!*(char **)(hit_record->hit + 0x24) || *(short *)(*(char **)(hit_record->hit + 0x24) + 0x46) != 22))) break;
             }
             { moby_set_state((u8 *)moby, 11, -1); break; }
@@ -217,7 +217,7 @@ void ranged_l15_enemy_update(char *moby) {
             qcopy(vars + 0x360,vars + 0x1F0); *(float *)(vars + 0x368) += 0.5f;
         }
         turret_l02_aim_at_hero(moby);
-        if ((D_L15_001B2148[0] & 15) == (((int)moby >> 8) & 15))
+        if ((g_gorn_challenge_count[0] & 15) == (((int)moby >> 8) & 15))
  moby_randomize_group_timers((struct L02GroupObject *)moby);
         if (math_is_value_within_step(moby, 5)) {
             moby_transform_joint_to_world(*(char **)(vars + 0x370), 0, (char *)&work.aim.muzzle);
@@ -233,7 +233,7 @@ void ranged_l15_enemy_update(char *moby) {
         if (!(((u8 *)moby)[0x60] & 2)) break;
         moby_transform_joint_to_world(*(char **)(vars + 0x370), 0, (char *)&work.aim.muzzle);
         collision = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 0, moby, 0);
-        if (FastDecTimer((short *)(vars + 0x380)) || (collision && D_L15_001BFC00.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
+        if (FastDecTimer((short *)(vars + 0x380)) || (collision && g_hit_l15_result.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
             *(short *)(vars + 0x378) += 15; { if (!math_random_int_below(3)) moby_set_state((u8 *)moby, 12, -1); else moby_set_state((u8 *)moby, 13, -1); break; }
         } else {
             angle = mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10), *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14));
@@ -282,7 +282,7 @@ void ranged_l15_enemy_update(char *moby) {
         if (IsPointInCuboid(&((L02_ResidentCombatPrefix *)g_hero_state)->position_80, *(int *)(vars + 0x324)) || *(int *)(vars + 0x204) == 1) { moby_set_state((u8 *)moby, 18, -1); break; }
         break;
     case 18:
-        path_data = D_L15_001FE480[*(int *)(vars + 0x320)];
+        path_data = g_path_l15_table[*(int *)(vars + 0x320)];
         if (flag_set_first_pending((u8 *)moby)) { if (((u8 *)moby)[0x43] != 6) anim_start_blended(moby, 6, 0, 20); coll_check_object_inside_polygon((u8 *)moby); }
         if (!(vec_distance_xy(moby + 0x10, path_data + *(int *)path_data * 16) < *(float *)(vars + 0x134)) && !path_follow_nodes(moby, path_data)) break;
 

@@ -14,11 +14,11 @@ typedef struct {
 } BeamState;
 extern char g_hero_state[] NOT_SDA, g_pad_state[] NOT_SDA;
 extern u8 g_sound_state[] NOT_SDA;
-extern float D_0025C64C NOT_SDA;
-extern float D_L00_001B8FF0[4][4];
+extern float g_beam_damping_factor NOT_SDA;
+extern float g_cam_follow_matrix[4][4];
 typedef struct { float color[4]; float pos[3]; float radius; } Light;
-extern Light D_L00_001C6F40[];
-extern int D_L00_001AF2E0 __attribute__((sda));
+extern Light g_light_table[];
+extern int g_tractor_beam_active __attribute__((sda));
 extern int gfx_add_point_light(void *, int, float, float);
 extern int math_fast_float_d(void *);
 extern void beam_draw_ribbons_level(void *);
@@ -43,7 +43,7 @@ void tractor_beam_update(u8 *actor) {
     int active;
     if ((((Pad *)g_pad_state)->u[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && !((Hero *)g_hero_state)->b[0x22BC])
         beam->length = 0.8f;
-    D_0025C64C = 0.9f;
+    g_beam_damping_factor = 0.9f;
     active = 0;
     if (((Hero *)g_hero_state)->i[0x5C0 / 4] && actor[0x20] != 4 && actor[0x20] && !((Hero *)g_hero_state)->b[0x22BC] && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F) {
       if (!beam->timer) {
@@ -56,12 +56,12 @@ void tractor_beam_update(u8 *actor) {
         beam->length += (12.0f - beam->length) * 0.07f;
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1) {
             offset.f[0] = 1.2f; offset.f[1] = 0; offset.f[2] = 0;
-            matrix_mul_vec3(&offset, &offset, D_L00_001B8FF0);
+            matrix_mul_vec3(&offset, &offset, g_cam_follow_matrix);
             beam->start.f[2] = offset.f[2] + *(float *)(actor + 0x18);
             beam->start.f[0] = offset.f[0] + ((Hero *)g_hero_state)->f[0x80 / 4];
             beam->start.f[1] = offset.f[1] + ((Hero *)g_hero_state)->f[0x84 / 4];
             offset.f[0] = beam->length; offset.f[1] = 0; offset.f[2] = 0;
-            matrix_mul_vec3(&offset, &offset, D_L00_001B8FF0);
+            matrix_mul_vec3(&offset, &offset, g_cam_follow_matrix);
             FastVecAdd(&beam->end, &beam->start, &offset);
         } else if (((Hero *)g_hero_state)->h[0x24EC / 2] == 1) {
             moby_transform_joint_to_world(actor, 0, (char *)&beam->start);
@@ -79,14 +79,14 @@ void tractor_beam_update(u8 *actor) {
     } else
         beam->target = 0;
     if (!active) {
-        D_L00_001AF2E0 = 1;
+        g_tractor_beam_active = 1;
         if (beam->fade > 0) beam->fade--;
     }
     switch (actor[0x20]) {
     case 0:
         beam->timer = 16;
         beam->light = gfx_add_point_light(&beam->start, 0, 0, 0);
-        D_L00_001AF2E0 = 1;
+        g_tractor_beam_active = 1;
         actor[0x20] = 1;
         beam->cooldown = 20; beam->target = 0; beam->sound = -1;
         PlayMobySound(1, 0, actor);
@@ -123,7 +123,7 @@ void tractor_beam_update(u8 *actor) {
         qzero_nc(&offset);
         offset.f[0] = 2; offset.f[2] = 2;
         matrix_mul_vec3(&offset, &offset, &((Hero *)g_hero_state)->b[0x730]);
-        lights = D_L00_001C6F40;
+        lights = g_light_table;
         lights[beam->light].pos[0] = ((Hero *)g_hero_state)->f[0x80 / 4] + offset.f[0];
         lights[beam->light].pos[1] = ((Hero *)g_hero_state)->f[0x84 / 4] + offset.f[1];
         lights[beam->light].pos[2] = ((Hero *)g_hero_state)->f[0x88 / 4] + offset.f[2];

@@ -6,10 +6,10 @@ typedef struct {
     s16 uid;
 } Moby430C80;
 
-extern s32 D_L15_001B1534 __attribute__((sda));
-extern s32 D_L15_00221E10[];
-extern u8 *D_L15_001B2714[] __attribute__((sda));
-extern s32 D_L15_001B2148[] __attribute__((sda));
+extern s32 g_cutscene_l15_started_flag __attribute__((sda));
+extern s32 g_gorn_challenge_vars[];
+extern u8 *g_scene_object_base[] __attribute__((sda));
+extern s32 g_gorn_challenge_count[] __attribute__((sda));
 
 extern void music_Unpause(void);
 extern s32 level_get_saved_value(void);
@@ -33,9 +33,9 @@ void scene_trigger_update(void *self) {
     s32 n;
     s32 i;
 
-    if (D_L15_001B1534 == 0) {
-        D_L15_001B1534 = 1;
-        D_L15_00221E10[0x2C / 4] = 0;
+    if (g_cutscene_l15_started_flag == 0) {
+        g_cutscene_l15_started_flag = 1;
+        g_gorn_challenge_vars[0x2C / 4] = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -44,8 +44,8 @@ void scene_trigger_update(void *self) {
         for (i = 0; i < n; i++) {
             if (list[i]->uid == 0x957 /* moby class 2391 */) {
                 entry_spawn_list_objects_with_flag(list[i], 1);
-                func_L05_0037CEE0(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
-                func_L05_0037D608(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
+                func_L05_0037CEE0(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
+                func_L05_0037D608(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
             }
         }
         obj = SpawnFreeLevelObjectById(0x1211 /* moby class 4625 */, 1);
@@ -54,7 +54,7 @@ void scene_trigger_update(void *self) {
             gorn_ship_start_falling(obj);
         }
     }
-    if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211 /* moby class 4625 */)) == 0 && D_L15_001B2148[0] >= 6) {
+    if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211 /* moby class 4625 */)) == 0 && g_gorn_challenge_count[0] >= 6) {
         gorn_finish_challenge_stage(self, 2);
     }
 }

@@ -1,6 +1,6 @@
 #include "common.h"
 typedef int TaboraReplacementQuad __attribute__((mode(TI)));
-extern char *D_L08_001B29DC SDATA(D_L08_001B29DC);
+extern char *g_moby_array SDATA(D_L08_001B29DC);
 extern void *CreateMoby(int);
 extern void func_002A0F48(void *), moby_mark_spawned(void *);
 
@@ -11,7 +11,7 @@ void moby_replace_tracked(char *object)
     char *source, *replacement;
     float scale, numerator, denominator, ratio;
     if (*(int *)(state + 0x2c) != -1) {
-        source = D_L08_001B29DC + *(int *)(state + 0x2c) * 256;
+        source = g_moby_array + *(int *)(state + 0x2c) * 256;
         replacement = CreateMoby(0x131d /* moby class 4893 */);
         scale = *(float *)(replacement + 0x2c);
         *(unsigned short *)(replacement + 0x32) = *(unsigned short *)(source + 0x32);
@@ -27,7 +27,7 @@ void moby_replace_tracked(char *object)
         *(TaboraReplacementQuad *)(replacement + 0x10) = *(TaboraReplacementQuad *)(source + 0x10);
         func_002A0F48(replacement);
         if (*(int *)(state + 0x2c) != -1)
-            moby_mark_spawned(D_L08_001B29DC + *(int *)(state + 0x2c) * 256);
+            moby_mark_spawned(g_moby_array + *(int *)(state + 0x2c) * 256);
         *(int *)(state + 0x2c) = -1;
     }
 }

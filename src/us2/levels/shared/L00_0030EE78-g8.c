@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 extern void UpdateBoltCounter(int);
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 
-void func_US2_L00_0030EE78(int argument)
+void hud_update_bolt_counter_if_enabled_us2(int argument)
 {
-    if (D_L00_001A904C != 0) {
+    if (g_bolt_counter_base != 0) {
         UpdateBoltCounter(argument);
     }
 }

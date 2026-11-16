@@ -6,16 +6,16 @@ extern char *part_spawn_object_following_effect(void *, void *, unsigned int, in
 extern void moby_set_state(char *, int, int);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern void moby_mark_spawned(char *);
-extern void func_PAL_L00_0032C328(char *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(char *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void moby_compute_local_point(char *, void *, float, float, float);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_PAL_L00_00328480(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
-extern float D_L06_001B1CB8 __attribute__((sda));
-extern float D_L06_001B1CB0 __attribute__((sda));
-extern float D_L06_001B1CC0 __attribute__((sda));
-extern float D_L06_001B1CE0 __attribute__((sda));
-extern float D_L06_001B1CE4, D_L06_001B1CE8;
+extern float g_spark_effect_param_b __attribute__((sda));
+extern float g_spark_effect_param_c __attribute__((sda));
+extern float g_spark_effect_param_a __attribute__((sda));
+extern float g_spark_local_offset_x __attribute__((sda));
+extern float g_spark_local_offset_y, g_spark_local_point_z;
 
 void func_PAL_L06_00468998(char *a0) {
     float pos[4], vel[4];
@@ -39,9 +39,9 @@ void func_PAL_L06_00468998(char *a0) {
         *(unsigned char *)(a0 + 0xA8) = 0xFF;
         break;
     case 2:
-        func_PAL_L00_0032C328(a0, &D_L06_001B1CC0, &D_L06_001B1CB8, &D_L06_001B1CB0, 0xFFFF, 0, -1, 6, 0xFF, 0xFF, 0);
-        moby_compute_local_point(a0, pos, D_L06_001B1CE0, D_L06_001B1CE4, D_L06_001B1CE8);
-        func_PAL_L00_003FB330(pos, 0, 5, 5, 5, 20, 5, 0, 1, 1, 1, 0, 1.0f, 20.0f);
+        part_explode_object_into_pieces_pal(a0, &g_spark_effect_param_a, &g_spark_effect_param_b, &g_spark_effect_param_c, 0xFFFF, 0, -1, 6, 0xFF, 0xFF, 0);
+        moby_compute_local_point(a0, pos, g_spark_local_offset_x, g_spark_local_offset_y, g_spark_local_point_z);
+        SpawnExplosion_pal(pos, 0, 5, 5, 5, 20, 5, 0, 1, 1, 1, 0, 1.0f, 20.0f);
         for (i = 0; i < 4; i++) {
             vel[0] = (i / 2 * 2 - 1) * 0.060000002f;
             vel[1] = (i % 2 * 2 - 1) * 0.060000002f;

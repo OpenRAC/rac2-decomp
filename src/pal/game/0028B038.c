@@ -24,10 +24,10 @@ typedef struct {
 extern CounterState g_bolt_counter_state __attribute__((sda));
 
 typedef struct { float value[7]; } CounterWidths;
-extern float D_001A8DE0[];
-extern char D_001A8E00[];
-extern unsigned char *D_001A8CFC __attribute__((sda));
-extern float D_001B23A4 __attribute__((sda));
+extern float g_bolt_counter_widths[];
+extern char g_str_bolt_counter_format[];
+extern unsigned char *g_resident_data_base __attribute__((sda));
+extern float g_hud_scale __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
@@ -36,7 +36,7 @@ extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, fl
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
 /* The display mode word beside the HUD scale. */
-extern int D_001B23A0 __attribute__((sda));
+extern int g_hud_mode __attribute__((sda));
 
 /* A HUD coordinate scaled for the display and rounded to a whole pixel; the display-mode test
    has no effect on the result (as func_00326A10). */
@@ -45,12 +45,12 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     float scaled = value * scale + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_001B23A0 == active)
+    if (result != 0 && g_hud_mode == active)
         scaled = 1.0f;
     return result;
 }
 
-void func_PAL_0028B038(void)
+void DrawBoltCounterDeltas_pal(void)
 {
     char text[16];
     unsigned char active;
@@ -70,7 +70,7 @@ void func_PAL_0028B038(void)
     secondY = 0;
     x = 0;
     firstY = 0;
-    widths = *(CounterWidths *)D_001A8DE0;
+    widths = *(CounterWidths *)g_bolt_counter_widths;
     scale = 0.0f;
     first = 0;
     second = 0;
@@ -135,18 +135,18 @@ void func_PAL_0028B038(void)
             break;
         }
         if (firstX) {
-            sprintf(text, D_001A8E00, g_bolt_counter_state.rows[i].value);
+            sprintf(text, g_str_bolt_counter_format, g_bolt_counter_state.rows[i].value);
             len = func_001157AC(text);
             if (len > 0) {
                 width = widths.value[len - 1];
                 active = one;
-                id = table_find_by_id(D_001A8CFC + 0x8710, 178);
+                id = table_find_by_id(g_resident_data_base + 0x8710, 178);
                 gfx_draw_scaled_object_two_axes((char *)id, first,
-                    (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, active), scale, scale, width);
-                id = table_find_by_id(D_001A8CFC + 0x8710, 179);
+                    (float)firstX, (float)hud_coord((float)firstY, g_hud_scale, 0.5f, active), scale, scale, width);
+                id = table_find_by_id(g_resident_data_base + 0x8710, 179);
                 gfx_draw_scaled_object_two_axes((char *)id, second,
-                    (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, active), scale, scale, width);
-                text_draw_right_aligned_small(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
+                    (float)secondX, (float)hud_coord((float)secondY, g_hud_scale, 0.5f, active), scale, scale, width);
+                text_draw_right_aligned_small(x, hud_coord((float)y, g_hud_scale, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }
     }

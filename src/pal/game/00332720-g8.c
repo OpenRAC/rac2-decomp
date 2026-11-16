@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "names.h"
 extern int g_game_time;
-extern char *D_001B1B68;
+extern char *g_moby_list_head;
 extern float ref_L00_00330BC0_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int pickup_start_fly_if_idle(void *, void *);
 
-void func_PAL_00332720(char *object)
+void moby_push_nearby_away_pal(char *object)
 {
     char *cursor;
     if (g_game_time & 1) {
-        cursor = D_001B1B68;
+        cursor = g_moby_list_head;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
             if (kind == 0xfe) return;

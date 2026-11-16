@@ -3,8 +3,8 @@
 #include "common.h"
 typedef union { struct { float x,y,z,w; } v; unsigned int quad __attribute__((mode(TI))); } V1078;
 typedef struct { unsigned char b[8]; } P1078;
-extern const P1078 D_L11_001B2930, D_L11_001B2938;
-extern const V1078 D_L11_001B2940[2];
+extern const P1078 g_spark_orb_table_a, g_spark_orb_table_b;
+extern const V1078 g_spark_orb_bounds[2];
 extern void gfx_draw_orbiting_sparks(char *);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -26,9 +26,9 @@ extern float fast_subtract_rotations(float,float);
 extern float math_random_signed_float_range(float,float);
 extern float fast_vec_dist(void *,void *);
 extern void *part_find_owned_effect_slot(void *,int,int);
-extern void func_PAL_L00_0032C328(void *,void *,void *,void *,int,int,int,int,int,int,int);
+extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,int,int,int,int,int,int,int);
 extern void func_PAL_L00_002ED7E8(void *,void *,float,void *,float,int,int,float,float,float);
-extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void part_kill(int);
 extern char *moby_l00_spawn_child(void *,int,int);
 extern int math_fast_float_d(void *);
@@ -39,14 +39,14 @@ extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void vec_random_direction(void *,float,float);
 
 void func_PAL_L11_00475BF0(char *obj) {
- P1078 p = D_L11_001B2930, q = D_L11_001B2938;
+ P1078 p = g_spark_orb_table_a, q = g_spark_orb_table_b;
  V1078 bounds[2], small, offset;
  V1078 temp, center, v, axis;
  char *data=*(char **)(obj+0x68);
  int sound=0x10eb;
  float height=18;
  int none=-1;
- bounds[0].quad=D_L11_001B2940[0].quad; bounds[1].quad=D_L11_001B2940[1].quad;
+ bounds[0].quad=g_spark_orb_bounds[0].quad; bounds[1].quad=g_spark_orb_bounds[1].quad;
  small.quad=0;small.v.z=0.14000002f;
  if(H(obj,0xaa)==0x118c) {height=21;sound=0x118d;}
  offset.quad=0;offset.v.z=height;
@@ -91,11 +91,11 @@ void func_PAL_L11_00475BF0(char *obj) {
  } B(obj,0xa8)=255; break;
  }
  case 2:
- func_PAL_L00_0032C328(obj,bounds,&q,&p,65535,0,-1,0,65535,255,0);
+ part_explode_object_into_pieces_pal(obj,bounds,&q,&p,65535,0,-1,0,65535,255,0);
  func_PAL_L00_002ED7E8(obj,&offset,0.1f,&small,0.18f,80,3,1,20,1);
  temp.quad=0;
  vec_local_offset_to_world(obj,&offset,0,0,18);
- func_PAL_002AC718(obj,&temp,&offset,0,0,10,3,5,0,1,9,0.5f,-1,0,0,0,none,0,0x810001);
+ SpawnExplosionEffects_pal(obj,&temp,&offset,0,0,10,3,5,0,1,9,0.5f,-1,0,0,0,none,0,0x810001);
  part_kill(I(data,4));part_kill(I(data,8));moby_l00_spawn_child(obj,sound,0);
  *(unsigned short *)(obj+0x34)|=1;I(obj,0x98)=0;B(obj,0x31)=0;
  I(data,0xc)=100; I(data,0x14)=500;moby_set_state(obj,3,-1);break;

@@ -6,9 +6,9 @@ extern u8 g_hero_state[];
 extern char g_hero_position[];
 extern u8 g_sound_state[];
 
-extern char D_L00_001A8F20[16] MACRO_ADDR;
-extern char *D_L00_001FDA80[];
-extern char D_L00_001AFDC0[];
+extern char g_default_vector[16] MACRO_ADDR;
+extern char *g_launch_path_table[];
+extern char g_str_shooting_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_add_draw_callback_third(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -233,7 +233,7 @@ void shooting_enemy_update(char *moby)
         } else if (diff12 > 0.05f) {
             math_step_value_toward_target(moby + 0x18, vars + 0x290, h12, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            STUB_printf(D_L00_001AFDC0, *(s32 *)(vars + 0x2C0));
+            STUB_printf(g_str_shooting_enemy_debug, *(s32 *)(vars + 0x2C0));
             moby_set_state(moby, 6, -1);
             if (*(u8 *)(moby + 0x43) != 0xE)
                 anim_start_blended(moby, 0xE, 0, 3);
@@ -323,7 +323,7 @@ void shooting_enemy_update(char *moby)
             }
             if (moby_is_target_outside_turn_limit(moby, 10.0f) != 0) {
                 FastVecSub(v40, pos, v0);
-                qcopy(v20, D_L00_001A8F20);
+                qcopy(v20, g_default_vector);
                 v20[0] = 1.0f;
                 matrix_mul_vec3(v20, v20, moby + 0xC0);
                 FastVecCross(v30, v20, v40);
@@ -370,7 +370,7 @@ void shooting_enemy_update(char *moby)
             if (IsPointInCuboid(g_hero_position, *(s32 *)(vars + 0x35C)) != 0)
                 *(s32 *)(vars + 0x37C) = 1;
         } else {
-            path = (s32 *)D_L00_001FDA80[*(s32 *)(vars + 0x370)];
+            path = (s32 *)g_launch_path_table[*(s32 *)(vars + 0x370)];
             math_step_value_toward_target(vars + 0x374, vars + 0x378, (f32)(*path - 1), 0.013888889f, 0.0013888889f, 0.33333334f);
             path_sample_position(path, 0, moby + 0x10, moby + 0xF0, 0, *(f32 *)(vars + 0x374));
             euler_rotation_basis(moby + 0xC0, moby + 0xF0);
@@ -416,7 +416,7 @@ void shooting_enemy_update(char *moby)
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(v0, D_L00_001A8F20, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(v0, g_default_vector, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }

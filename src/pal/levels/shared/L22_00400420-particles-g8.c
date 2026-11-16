@@ -13,8 +13,8 @@ typedef struct {
 
 extern int ref_L22_003FBBF0_00 __attribute__((sda));
 extern float ref_L22_003FBBF0_01 __attribute__((sda));
-extern u8 * D_L22_001B1D6C;
-extern u8 D_L22_00255820[], D_L22_002558A0[];
+extern u8 * g_effect_owner_moby;
+extern u8 g_effect_anchor_table[], g_effect_anchor_axes[];
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern void euler_rotation_basis(void *, void *);
@@ -34,15 +34,15 @@ void func_PAL_L22_00400420(u8 * obj) {
     for (i = 0; i < 4; i++)
         ctl->initialValues[i] = ((s32)(ref_L22_003FBBF0_00) * 5 + 2) / 6;
     for (i = 7; i >= 0; i--) ctl->particles[i] = 0;
-    if (D_L22_001B1D6C == 0) {
+    if (g_effect_owner_moby == 0) {
         u8 * x = obj + 0xC0, *y, *z = obj + 0xE0;
         u8 * v, *w;
         euler_rotation_basis(x, obj + 0xF0);
-        D_L22_001B1D6C = obj;
+        g_effect_owner_moby = obj;
         obj[0x30] = 255;
-        v = D_L22_00255820;
+        v = g_effect_anchor_table;
         vec_scale_to_length(v, x, ref_L22_003FBBF0_01);
-        w = D_L22_002558A0;
+        w = g_effect_anchor_axes;
         *(TI *)w = *(TI *)z;
         y = obj + 0xD0;
         vec_scale_to_length(v + 0x10, y, ref_L22_003FBBF0_01);

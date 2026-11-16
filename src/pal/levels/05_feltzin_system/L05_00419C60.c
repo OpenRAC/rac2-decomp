@@ -13,7 +13,7 @@ extern void moby_check_player_in_view_and_range(char *object, int a1, float a2);
 extern int moby_can_take_next_step(char *object);
 extern void func_PAL_L05_0037DE20(char *object);
 extern int math_fast_float_d(char *block);
-extern char *D_L05_001B251C __attribute__((sda));
+extern char *g_feltzin_target_mobys __attribute__((sda));
 extern char g_sound_state[];
 extern int snd_play_from_class_bank(int, int, char *, int);
 typedef struct {
@@ -23,14 +23,14 @@ typedef struct {
     char *target;
 } Target05;
 extern float fast_vec_dist(char *a, char *b);
-extern void func_PAL_L05_0041A480(char *obj);
-extern void func_PAL_L05_0041A580(char *object);
-extern void func_PAL_L05_0041A628(char *obj);
+extern void feltzin_enemy_init_position_pal(char *obj);
+extern void feltzin_enemy_fire_burst_shot_pal(char *object);
+extern void tail_trail_spawn_marks_a_pal(char *obj);
 
 /* Per-frame update. On the first frame it initializes the object; afterwards it points the record
    at moby state+0x260, renews the D_00188660 slot in state+0x270 near that target at random and the
    one in state+0x26C when the object no longer owns it. */
-void func_PAL_L05_0041A270(char *object)
+void feltzin_enemy_a_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     Target05 *r;
@@ -41,7 +41,7 @@ void func_PAL_L05_0041A270(char *object)
         *(unsigned char *)(object + 0x30) = 0xFF;
         if (state_get_stored_pointer_value(object) == 0)
             return;
-        func_PAL_L05_0041A480(object);
+        feltzin_enemy_init_position_pal(object);
         vec_clear_128(buf);
         if (*(int *)(state + 0x264) != 0)
             level_append_object(object, 0, 0, 0);
@@ -59,7 +59,7 @@ void func_PAL_L05_0041A270(char *object)
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
-                r->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
+                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
                 if (fast_vec_dist(r->target + 0x10, object + 0x10) < 10.0f) {
                     rec2 = g_sound_state + *(int *)(state + 0x270) * 0x70;
                     if (*(char **)(rec2 + 0x88) != object ||
@@ -71,11 +71,11 @@ void func_PAL_L05_0041A270(char *object)
                 }
             }
             if (r->x104 != 0)
-                func_PAL_L05_0041A580(object);
+                feltzin_enemy_fire_burst_shot_pal(object);
             if (moby_can_take_next_step(object) != 0)
                 func_PAL_L05_0037DE20(object);
             math_fast_float_d(state + 0x268);
-            func_PAL_L05_0041A628(object);
+            tail_trail_spawn_marks_a_pal(object);
         }
     }
     rec = g_sound_state + *(int *)(state + 0x26C) * 0x70;
@@ -91,10 +91,10 @@ extern float func_332C18(void);
 extern void func_33B330(char *dst, float a, float b, float c);
 extern char *func_379CA0(char *object);
 extern void func_37AEC0(char *object, int flag);
-extern int D_L05_00221D10[];
-extern char *D_L05_001B2614 __attribute__((sda));
+extern int g_feltzin_challenge_state[];
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
-void func_PAL_L05_0041A480(char *obj)
+void feltzin_enemy_init_position_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
@@ -104,7 +104,7 @@ void func_PAL_L05_0041A480(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 0x14;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(sub + 0x26C) = -1;
     *(int *)(sub + 0x270) = -1;
     *(float *)(sub + 0x180) = 20.0f;
@@ -121,7 +121,7 @@ extern void func_379FA0(char *object, int a1, int a2, int a3, float f0, float f1
                         float f3, int a8, int a9, int a10);
 
 /* Runs the object's pending effect when three guards clear, then marks the run. */
-void func_PAL_L05_0041A580(char *object)
+void feltzin_enemy_fire_burst_shot_pal(char *object)
 {
     char *s1 = *(char **)(object + 0x68);
     char *r;
@@ -142,12 +142,12 @@ void func_PAL_L05_0041A580(char *object)
 extern char *feltzin_helper_create(char *a0, int a1);
 extern void gfx_add_draw_callback_third(void *fn, char *object);
 extern void beam_clear_record_owners(void);
-extern void func_PAL_L05_0041AA78(char *obj);
-extern void func_PAL_L05_0041ABE8(char *object);
-extern void func_PAL_L05_0041ACA0(char *object);
-extern void func_PAL_L05_0041AE80(char *obj);
+extern void feltzin_enemy_init_with_helpers_pal(char *obj);
+extern void feltzin_enemy_fire_shot_pal(char *object);
+extern void tail_trail_spawn_marks_b_pal(char *object);
+extern void beam_update_records_pal(char *obj);
 extern void heavy_lancer_update(void);
-extern char D_L05_002659E0[];
+extern char g_beam_records[];
 
 /* func_L05_00415958 is defined in L05_00415958-qcopy.c. */
 
@@ -155,7 +155,7 @@ extern char D_L05_002659E0[];
    clears the owners of the 128 interpolation records; afterwards it creates the two
    func_L05_00416D68 children once, points the record at moby state+0x260, and renews the
    D_00188660 slot in state+0x274 when the object no longer owns it. */
-void func_PAL_L05_0041A808(char *object)
+void feltzin_enemy_b_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     Target05 *r;
@@ -166,7 +166,7 @@ void func_PAL_L05_0041A808(char *object)
         *(unsigned char *)(object + 0x30) = 0xFF;
         if (state_get_stored_pointer_value(object) == 0)
             return;
-        func_PAL_L05_0041AA78(object);
+        feltzin_enemy_init_with_helpers_pal(object);
         vec_clear_128(buf);
         if (*(int *)(state + 0x264) != 0) {
             char *base;
@@ -174,7 +174,7 @@ void func_PAL_L05_0041A808(char *object)
             int i;
 
             level_append_object(object, (int)beam_clear_record_owners, 0, 0);
-            base = D_L05_002659E0;
+            base = g_beam_records;
             p = (int *)(base + 0x27F0);
             i = 0x7F;
             do {
@@ -203,20 +203,20 @@ void func_PAL_L05_0041A808(char *object)
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
-                r->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
+                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
             }
             if (r->x108 != 0 && r->x104 != 0)
-                func_PAL_L05_0041ABE8(object);
+                feltzin_enemy_fire_shot_pal(object);
             if (moby_can_take_next_step(object) != 0)
                 func_PAL_L05_0037DE20(object);
             math_fast_float_d(state + 0x268);
-            func_PAL_L05_0041ACA0(object);
+            tail_trail_spawn_marks_b_pal(object);
         }
     }
     rec = g_sound_state + *(int *)(state + 0x274) * 0x70;
     if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
         *(int *)(state + 0x274) = snd_play_from_class_bank(1, 6, object, 0xF76);
-    func_PAL_L05_0041AE80(object);
+    beam_update_records_pal(object);
     gfx_add_draw_callback_third(heavy_lancer_update, object);
 }
 

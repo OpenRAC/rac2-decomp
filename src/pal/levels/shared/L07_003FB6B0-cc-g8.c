@@ -26,16 +26,16 @@ extern float math_random_float_range(float, float);
    second word (a symbol plus an offset) as two instructions, so that load stays out of the delay
    slot of func_002A7878's call and the first word's load fills it, in the $gp form the assembler
    gives a slot. */
-extern f32 D_L07_001B0FE8[2];
-extern f32 D_L07_001B0FF0 __attribute__((sda));
-extern f32 D_L07_001B0FF4;
-extern s32 D_L07_001B0FF8 __attribute__((sda));
-extern s32 D_L07_001B0FFC;
-extern s32 D_L07_001B1000 __attribute__((sda));
-extern s32 D_L07_001B1004;
-extern s32 D_L07_001B1008;
-extern s32 D_L07_001B100C;
-extern s32 D_L07_001B1010 __attribute__((sda));
+extern f32 g_puff_fall_speed_range[2];
+extern f32 g_puff_color_a __attribute__((sda));
+extern f32 g_puff_color_b;
+extern s32 g_puff_kind_a __attribute__((sda));
+extern s32 g_puff_kind_b;
+extern s32 g_puff_size_min_a __attribute__((sda));
+extern s32 g_puff_size_max_a;
+extern s32 g_puff_size_min_b;
+extern s32 g_puff_size_max_b;
+extern s32 g_puff_extra_count __attribute__((sda));
 
 /* Spawns a particle at the object's position (+0x10) with the first colour and size, then
    D_L07_001B1010 more, each at a point from func_002A7A00 added to that position and falling at
@@ -48,15 +48,15 @@ void func_PAL_L07_003FB6B0(u8 *a0)
     f32 pos[4];
     s32 i;
 
-    part_spawn_hero_relative(a0 + 0x10, vel, D_L07_001B0FF8, (u8)(((int)(math_random_int_range(D_L07_001B1000, D_L07_001B1004)) * 5 + 2) / 6),
-                  (u8)math_random_int_below(0xFF), 0, D_L07_001B0FF0);
+    part_spawn_hero_relative(a0 + 0x10, vel, g_puff_kind_a, (u8)(((int)(math_random_int_range(g_puff_size_min_a, g_puff_size_max_a)) * 5 + 2) / 6),
+                  (u8)math_random_int_below(0xFF), 0, g_puff_color_a);
     vec_clear_128(vel);
-    for (i = 0; i < D_L07_001B1010; i++) {
+    for (i = 0; i < g_puff_extra_count; i++) {
         vec_random_direction(pos, 0.0f, 0.5f);
         FastVecAdd(pos, pos, a0 + 0x10);
-        vel[2] = -(math_random_float_range(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.020000001f);
-        part_spawn_hero_relative(pos, vel, D_L07_001B0FFC, (u8)(((int)(math_random_int_range(D_L07_001B1008, D_L07_001B100C)) * 5 + 2) / 6),
-                      (u8)math_random_int_below(0xFF), 0, D_L07_001B0FF4);
+        vel[2] = -(math_random_float_range(g_puff_fall_speed_range[0], g_puff_fall_speed_range[1]) * 0.020000001f);
+        part_spawn_hero_relative(pos, vel, g_puff_kind_b, (u8)(((int)(math_random_int_range(g_puff_size_min_b, g_puff_size_max_b)) * 5 + 2) / 6),
+                      (u8)math_random_int_below(0xFF), 0, g_puff_color_b);
     }
 }
 

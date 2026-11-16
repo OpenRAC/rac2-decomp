@@ -2,19 +2,19 @@
 #include "names.h"
 
 extern int g_moby_l02_pool;
-extern int D_L02_001B03F0 __attribute__((sda));
+extern int g_brawler_target_position __attribute__((sda));
 typedef struct { char pad[0x160]; float amount; int pad2; int time; int phase; } Shake;
-extern Shake D_L02_001BA3C0;
+extern Shake g_hero_effect_state;
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float moby_get_anim_value(char *);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
-extern int func_PAL_002B5E30(char *, float);
+extern int moby_step_at_own_position_factor_pal(char *, float);
 extern float vec_step_toward_target_limited(void *, void *, float);
 extern int arena_get_state_word(void *);
 extern float *arena_get_camera_point(void *);
 extern int coll_point_inside_record_volume(void *, void *);
-extern int func_PAL_L01_00323068(char *, void *);
+extern int moby_l01_turn_toward_target_pal(char *, void *);
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern void euler_rotation_basis(void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -43,42 +43,42 @@ void func_PAL_L02_003DD890(char *self) {
     switch (mode) {
     case 0:
     if (*(unsigned char *)(self + 0x20) != 4)
-        func_PAL_002B5E30(self, *(float *)(self + 0xF8));
+        moby_step_at_own_position_factor_pal(self, *(float *)(self + 0xF8));
     else
-        vec_step_toward_target_limited(self + 0x10, &D_L02_001B03F0, 0.20000002f);
+        vec_step_toward_target_limited(self + 0x10, &g_brawler_target_position, 0.20000002f);
     break;
     case 1:
     if (coll_point_inside_record_volume(self + 0x10, arena_get_state_word(*(void **)(self + 0xB8))))
-        func_PAL_L01_00323068(self, target);
+        moby_l01_turn_toward_target_pal(self, target);
     else
-        func_PAL_L01_00323068(self, arena_get_camera_point(*(void **)(self + 0xB8)));
+        moby_l01_turn_toward_target_pal(self, arena_get_camera_point(*(void **)(self + 0xB8)));
     if ((frame > 0.0f && frame < 2.0f) || (frame > 15.0f && frame < 17.0f) ||
         (frame > 30.0f && frame < 32.0f) || (frame > 45.0f && frame < 47.0f)) {
-        D_L02_001BA3C0.amount = 0.05f;
-        D_L02_001BA3C0.time = 12;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.05f;
+        g_hero_effect_state.time = 12;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 2:
     if (frame > 12.0f && frame < 25.0f) {
         moby_transform_joint_to_world(self, 4, before);
-        func_PAL_002B5E30(self, heading);
+        moby_step_at_own_position_factor_pal(self, heading);
         euler_rotation_basis(self + 0xC0, self + 0xF0);
         moby_transform_joint_to_world(self, 4, after);
         FastVecSub(delta, before, after);
         FastVecAdd(self + 0x10, self + 0x10, delta);
     } else if (frame > 42.0f && frame < 55.0f) {
         moby_transform_joint_to_world(self, 8, before);
-        func_PAL_002B5E30(self, heading);
+        moby_step_at_own_position_factor_pal(self, heading);
         euler_rotation_basis(self + 0xC0, self + 0xF0);
         moby_transform_joint_to_world(self, 8, after);
         FastVecSub(delta, before, after);
         FastVecAdd(self + 0x10, self + 0x10, delta);
     }
     if ((frame > 0.0f && frame < 2.0f) || (frame > 29.0f && frame < 31.0f)) {
-        D_L02_001BA3C0.amount = 0.1f;
-        D_L02_001BA3C0.time = 12;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.1f;
+        g_hero_effect_state.time = 12;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 3:
@@ -91,16 +91,16 @@ void func_PAL_L02_003DD890(char *self) {
     break;
     case 5:
     if (frame > 3.0f && frame < 5.0f) {
-        D_L02_001BA3C0.amount = 0.4f;
-        D_L02_001BA3C0.time = 21;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.4f;
+        g_hero_effect_state.time = 21;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 6:
     if (frame > 20.0f && frame < 22.0f) {
-        D_L02_001BA3C0.amount = 0.2f;
-        D_L02_001BA3C0.time = 21;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.2f;
+        g_hero_effect_state.time = 21;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 7:
@@ -123,9 +123,9 @@ void func_PAL_L02_003DD890(char *self) {
     break;
     case 8:
     if (frame > 30.0f && frame < 32.0f) {
-        D_L02_001BA3C0.amount = 0.2f;
-        D_L02_001BA3C0.time = 21;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.2f;
+        g_hero_effect_state.time = 21;
+        g_hero_effect_state.phase = 0;
     }
     case 9:
         break;

@@ -31,7 +31,7 @@ extern void gfx_add_draw_callback_third(void (*f)(char *), char *arg);
 /* A lift that travels between its start height (0x68) and its target (0x64): state 0 sets it
    up, state 1 waits for the hero (or a trigger) and starts it with its travel sound, states 2
    and 3 ease it up and down and stop the sound on arrival. Riders follow its movement. */
-void func_PAL_L14_003E25F8(char *arg0)
+void lift_l14_update_pal(char *arg0)
 {
     Vec pos, rot, delta;
     char *state = *(char **)(arg0 + 0x68);

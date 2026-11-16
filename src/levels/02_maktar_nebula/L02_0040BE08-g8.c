@@ -10,16 +10,16 @@ typedef struct {
 } HeroBlock;
 extern HeroBlock g_hero_state;
 extern u8 *g_route_polygons[];
-extern float D_L02_001B1970 __attribute__((sda));
-extern float D_L02_001B1974[] __attribute__((sda));
-extern float D_L02_001B1978[] __attribute__((sda));
-extern float D_L02_001B1930 __attribute__((sda));
-extern float D_L02_001B1934 __attribute__((sda));
-extern float D_L02_001B1938 __attribute__((sda));
-extern float D_L02_001B193C __attribute__((sda));
-extern float D_L02_001B1940 __attribute__((sda));
-extern float D_L02_001B1944 __attribute__((sda));
-extern float D_L02_001B1948 __attribute__((sda));
+extern float g_blade_ball_turn_rate_x __attribute__((sda));
+extern float g_blade_ball_turn_rate_y[] __attribute__((sda));
+extern float g_blade_ball_turn_rate_z[] __attribute__((sda));
+extern float g_blade_ball_size_min __attribute__((sda));
+extern float g_blade_ball_size_max __attribute__((sda));
+extern float g_blade_ball_spread_min __attribute__((sda));
+extern float g_blade_ball_spread_max __attribute__((sda));
+extern float g_blade_ball_up_speed_min __attribute__((sda));
+extern float g_blade_ball_up_speed_max __attribute__((sda));
+extern float g_blade_ball_ground_effect_param __attribute__((sda));
 extern void blade_ball_update_common(u8 *);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
@@ -229,9 +229,9 @@ void blade_ball_update(u8 *object)
         }
         break;
     }
-    *(float *)(state + 0x170) = math_move_angle_toward_target(*(float *)(state + 0x170), D_L02_001B1970 * 0.00029088825f, 0.0625f);
-    *(float *)(state + 0x174) = math_move_angle_toward_target(*(float *)(state + 0x174), D_L02_001B1974[0] * 0.00029088825f, 0.0625f);
-    *(float *)(state + 0x178) = math_move_angle_toward_target(*(float *)(state + 0x178), D_L02_001B1978[0] * 0.00029088825f, 0.0625f);
+    *(float *)(state + 0x170) = math_move_angle_toward_target(*(float *)(state + 0x170), g_blade_ball_turn_rate_x * 0.00029088825f, 0.0625f);
+    *(float *)(state + 0x174) = math_move_angle_toward_target(*(float *)(state + 0x174), g_blade_ball_turn_rate_y[0] * 0.00029088825f, 0.0625f);
+    *(float *)(state + 0x178) = math_move_angle_toward_target(*(float *)(state + 0x178), g_blade_ball_turn_rate_z[0] * 0.00029088825f, 0.0625f);
     *(float *)(object + 0xF0) = FastAddRotations(*(float *)(object + 0xF0), *(float *)(state + 0x170));
     *(float *)(object + 0xF4) = FastAddRotations(*(float *)(object + 0xF4), *(float *)(state + 0x174));
     *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), *(float *)(state + 0x178));
@@ -247,12 +247,12 @@ void blade_ball_update(u8 *object)
             point.f[0] = *(float *)(object + 0x10) + math_random_float_range(-0.01f, 0.01f);
             point.f[1] = *(float *)(object + 0x14) + math_random_float_range(-0.01f, 0.01f);
             point.f[2] = *(float *)(object + 0x18) - 0.3f;
-            size = math_random_float_range(D_L02_001B1930, D_L02_001B1934);
+            size = math_random_float_range(g_blade_ball_size_min, g_blade_ball_size_max);
             side = math_random_int_below(2);
             if (!side) side--;
-            vec_random_direction(velocity.f, D_L02_001B1938 * 0.016666668f, D_L02_001B193C * 0.016666668f);
-            velocity.f[2] = math_random_float_range(D_L02_001B1940, D_L02_001B1944) * 0.016666668f;
-            part_spawn_ground_effect(size * 0.1f, size, D_L02_001B1948, &point, 60, 0x7F007F7F, 0, side, velocity.f, 0);
+            vec_random_direction(velocity.f, g_blade_ball_spread_min * 0.016666668f, g_blade_ball_spread_max * 0.016666668f);
+            velocity.f[2] = math_random_float_range(g_blade_ball_up_speed_min, g_blade_ball_up_speed_max) * 0.016666668f;
+            part_spawn_ground_effect(size * 0.1f, size, g_blade_ball_ground_effect_param, &point, 60, 0x7F007F7F, 0, side, velocity.f, 0);
         }
     }
     if (*(s32 *)(state + 0xE0) > 180) {

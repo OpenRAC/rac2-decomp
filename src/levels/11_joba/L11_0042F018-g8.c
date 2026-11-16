@@ -19,14 +19,14 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L11_001CAE40[];
-extern s32 *D_L11_001FF580[];
+extern s32 g_enemy_freeze_flag[];
+extern s32 *g_path_l11_table[];
 extern u8 *const g_moby_l11_table[] __attribute__((sda));
-extern u8 *D_L11_001B368C[] __attribute__((sda));
-extern s32 D_L11_001AED04[] __attribute__((sda));
-extern char D_L11_001A8F20[] __attribute__((sda));
-extern u8 D_L11_001C8A40[];
-extern TI128 D_L11_001C0D20;
+extern u8 *g_arena_camera_table[] __attribute__((sda));
+extern s32 g_active_rider_count[] __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
+extern u8 g_turret_beam_table[];
+extern TI128 g_aim_position;
 
 extern void saur_beast_update_base(u8 *);
 extern void saur_beast_step_timer_clear_flags(u8 *);
@@ -82,7 +82,7 @@ extern void anim_play_on_self_and_owner(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, 
 void saur_beast_update(u8 *saur) {
     u8 *data;
 
-    if (D_L11_001CAE40[0] != 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+    if (g_enemy_freeze_flag[0] != 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
         saur[0xBC] = 1;
         *(s32 *)(saur + 0x98) = 0;
         *(u16 *)(saur + 0x34) = (*(u16 *)(saur + 0x34) | 0x41) & 0xEFFF;
@@ -129,8 +129,8 @@ void saur_beast_update(u8 *saur) {
                 anim_play_on_self_and_owner(saur, 4, 3, 0, 0xC);
             }
         } else if (*(s32 *)(data + 0x2AC) != -1 &&
-                   point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
-                                 *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) != 0) {
+                   point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)g_path_l11_table[*(s32 *)(data + 0x2AC)] + 0x10,
+                                 *g_path_l11_table[*(s32 *)(data + 0x2AC)]) != 0) {
             anim_play_on_self_and_owner(saur, 6, 5, 0, 0xA);
             moby_set_controller_speed_limits(saur, 0.016666668f, 0.5f, 0.001163553f, 0.10471977f);
             *(f32 *)(data + 0x164) = 0.0055555557f;
@@ -161,8 +161,8 @@ void saur_beast_update(u8 *saur) {
         if (flag_set_second_pending(saur) != 0)
             moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
         if (*(s32 *)(data + 0x2AC) == -1 ||
-            point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
-                          *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) == 0) {
+            point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)g_path_l11_table[*(s32 *)(data + 0x2AC)] + 0x10,
+                          *g_path_l11_table[*(s32 *)(data + 0x2AC)]) == 0) {
             if ((u16)(*(s16 *)(data + 0x274) - 1) >= 2) {
                 if (saur[0x20] == 0x11 || saur[0x20] == 0x14 || saur[0x20] == 0x10) {
                 } else if (saur[0x20] == 0x13) {
@@ -176,7 +176,7 @@ void saur_beast_update(u8 *saur) {
                     anim_play_on_self_and_owner(saur, 3, 1, 0, 0xC);
                     moby_set_state(saur, 0xB, 1);
                     if (*(s32 *)(data + 0x2A4) != -1) {
-                        qcopy(data + 0x110, D_L11_001B368C[0] + (*(s32 *)(data + 0x2A4) << 7) + 0x30);
+                        qcopy(data + 0x110, g_arena_camera_table[0] + (*(s32 *)(data + 0x2A4) << 7) + 0x30);
                         if (*(f32 *)(data + 0x12C) == 0.0f)
                             *(f32 *)(data + 0x12C) = 4.0f;
                     }
@@ -209,7 +209,7 @@ void saur_beast_update(u8 *saur) {
 
         r = moby_dispatch_action_by_kind(saur, data + 0x60);
         if (r & 1) {
-            D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
+            g_active_rider_count[0] = g_active_rider_count[0] - 1;
             SetDeathBits(saur, 0, 3);
             part_queue_moby_for_glow(saur, 0, 0);
             return;
@@ -274,18 +274,18 @@ void saur_beast_update(u8 *saur) {
         break;
     }
     case 5:
-        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x29C)]) != 0) {
             moby_set_state(saur, 7, -1);
             anim_play_on_self_and_owner(saur, 4, 3, 0, 0xA);
-            path_set_follower_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 0, 1);
+            path_set_follower_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x29C)], 0, 1);
             *(s32 *)(data + 0x2C0) = 1;
         }
         break;
     case 6:
-        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x29C)]) != 0) {
             moby_set_state(saur, 7, -1);
             anim_play_on_self_and_owner(saur, 4, 3, 0, 0xA);
-            path_set_follower_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)], 1, 0);
+            path_set_follower_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x29C)], 1, 0);
             *(s32 *)(data + 0x2C0) = 0;
         }
         break;
@@ -296,7 +296,7 @@ void saur_beast_update(u8 *saur) {
         }
         break;
     case 13:
-        path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x2C4)]);
+        path_follow_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x2C4)]);
         break;
     case 11:
         math_fast_float_d(data + 0x28C);
@@ -474,7 +474,7 @@ void saur_beast_update(u8 *saur) {
         break;
     case 17:
         moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
-        if (path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x294)]) != 0) {
+        if (path_follow_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x294)]) != 0) {
             moby_set_state(saur, 0x18, -1);
             anim_play_on_self_and_owner(saur, 0xF, 4, 0, 0xA);
             moby_set_controller_speed_limits(saur, 0.0033333334f, 0.10000001f, 0.001163553f, 0.10471977f);
@@ -503,8 +503,8 @@ void saur_beast_update(u8 *saur) {
             n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
             *(f32 *)(data + 0x288) = g;
         }
         if (saur[0x60] & 2) {
@@ -590,7 +590,7 @@ void saur_beast_update(u8 *saur) {
                 k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
-                    l = D_L11_001C8A40 + (k << 5);
+                    l = g_turret_beam_table + (k << 5);
                     qcopy(l + 0x10, data + 0x230);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -620,7 +620,7 @@ void saur_beast_update(u8 *saur) {
                 k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
-                    l = D_L11_001C8A40 + (k << 5);
+                    l = g_turret_beam_table + (k << 5);
                     qcopy(l + 0x10, data + 0x230);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -649,8 +649,8 @@ void saur_beast_update(u8 *saur) {
                 n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, g_identity_l11_matrix, 0.0f, 0);
+                part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
                 *(f32 *)(data + 0x288) = *(f32 *)(data + 0x288) + 1.0f;
             }
         }
@@ -670,9 +670,9 @@ void saur_beast_update(u8 *saur) {
             *(u16 *)(req + 0x1A) = *(u16 *)(saur + 0xAA);
             FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
             if (CollLine(data + 0x230, data + 0x240, 0, saur, req) != 0) {
-                *(TI128 *)(data + 0x240) = D_L11_001C0D20;
+                *(TI128 *)(data + 0x240) = g_aim_position;
                 if (flag_is_third_pending_set(saur) == 0) {
-                    part_l04_spawn_paired_sparks(&D_L11_001C0D20, 6);
+                    part_l04_spawn_paired_sparks(&g_aim_position, 6);
                     moby_set_flag_bit(saur, 1);
                 }
             }
@@ -683,17 +683,17 @@ void saur_beast_update(u8 *saur) {
             qcopy(v30, data + 0x240);
             v30[2] -= 0.1f;
             f3 = f * 0.3f;
-            part_spawn_ground_effect(v30, 0x19, f3, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x19, f3, f, 0xFF000080, 0, n, g_identity_l11_matrix, 0.0f, 0);
             n = -n;
             f04 = f * 0.04f;
             f4 = f * 0.4f;
-            part_spawn_ground_effect(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x230, 0xA, f3, f, 0x80CA00CB, 0, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x230, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 0xA, f3, f, 0x80CA00CB, 0, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
             gfx_add_draw_callback_first(saur_beast_draw_beam, saur);
             if (*(s32 *)(data + 0x2B0) >= 0) {
-                l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
+                l = g_turret_beam_table + (*(s32 *)(data + 0x2B0) << 5);
                 qcopy(l + 0x10, data + 0x240);
                 *(f32 *)(l + 0x1C) = 5.0f;
                 *(f32 *)(l + 0) = 1.0f;
@@ -721,9 +721,9 @@ void saur_beast_update(u8 *saur) {
                 *(u16 *)(req + 0x1A) = *(u16 *)(saur + 0xAA);
                 FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
                 if (CollLine(data + 0x230, data + 0x240, 0, saur, req) != 0) {
-                    *(TI128 *)(data + 0x240) = D_L11_001C0D20;
+                    *(TI128 *)(data + 0x240) = g_aim_position;
                     if (flag_is_third_pending_set(saur) == 0) {
-                        part_l04_spawn_paired_sparks(&D_L11_001C0D20, 6);
+                        part_l04_spawn_paired_sparks(&g_aim_position, 6);
                         moby_set_flag_bit(saur, 1);
                     }
                 }
@@ -735,14 +735,14 @@ void saur_beast_update(u8 *saur) {
                     n = n - 1;
                 qcopy(v40, data + 0x240);
                 v40[2] -= 0.1f;
-                part_spawn_ground_effect(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, g_identity_l11_matrix, 0.0f, 0);
                 n = -n;
                 f4 = f * 0.4f;
-                part_spawn_ground_effect(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, g_identity_l11_matrix, 0.0f, 0);
                 gfx_add_draw_callback_first(saur_beast_draw_beam, saur);
                 if (*(s32 *)(data + 0x2B0) >= 0) {
-                    l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
+                    l = g_turret_beam_table + (*(s32 *)(data + 0x2B0) << 5);
                     qcopy(l + 0x10, data + 0x240);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -801,14 +801,14 @@ void saur_beast_update(u8 *saur) {
             }
         } else if (saur[0x43] == 0xE) {
             moby_set_controller_speed_limits(saur, 0.13333334f, 0.06666667f, 0.009696275f, 0.6981318f);
-            path_follow_nodes(saur, D_L11_001FF580[*(s32 *)(data + 0x29C)]);
+            path_follow_nodes(saur, g_path_l11_table[*(s32 *)(data + 0x29C)]);
         }
         break;
     }
     saur_beast_step_timer_clear_flags(saur);
     if (*(f32 *)(saur + 0x18) < 74.0f) {
         SetDeathBits(saur, 0, 3);
-        D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
+        g_active_rider_count[0] = g_active_rider_count[0] - 1;
         moby_mark_spawned(saur);
     }
 }

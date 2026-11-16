@@ -7,7 +7,7 @@ extern void anim_start_blended(void *, int, int, int);
 /* Routes the object the state word names to the mode the helper reports: the helper's value
    and the caller's index are handed over with the caller's float as an int, otherwise the
    object's own flag picks the fixed mode 7. Same two gates as its sibling below. */
-void func_PAL_L00_002D24D8(int a0, int a1, float f12)
+void hero_start_linked_object_anim_pal(int a0, int a1, float f12)
 {
     char *base = D_00189E20_2;
     int out;

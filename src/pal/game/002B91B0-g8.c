@@ -7,8 +7,8 @@ extern int pad_send_command(int socket, void *profile);
 extern int pad_read_record(int socket, void *data);
 extern int sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
 extern void ClearPadInput(void *pad);
-extern void func_PAL_002B94A8(void *pad, void *data, int size);
-extern int D_001A7428;
+extern void pad_decode_reading_pal(void *pad, void *data, int size);
+extern int g_pad_device_idle_flag;
 typedef struct {
     unsigned char pad0[0x180];
     unsigned char profile[4];
@@ -28,7 +28,7 @@ typedef struct {
 } PadPollState;
 extern PadPollState g_pad_state;
 
-void func_PAL_002B91B0(void *arg)
+void poll_pad_device_state_pal(void *arg)
 {
     PadPollState *p = arg;
     unsigned char buf[64];
@@ -84,7 +84,7 @@ void func_PAL_002B91B0(void *arg)
                 vibration = shifted | (p->vibration0 & 1);
             }
             sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
-            func_PAL_002B94A8(p, buf, n);
+            pad_decode_reading_pal(p, buf, n);
             break;
         case 2:
             ClearPadInput(p);
@@ -96,5 +96,5 @@ void func_PAL_002B91B0(void *arg)
     }
     p->vibration0 = 0;
     p->vibration1 = 0;
-    D_001A7428 = g_pad_state.device_state == 0;
+    g_pad_device_idle_flag = g_pad_state.device_state == 0;
 }

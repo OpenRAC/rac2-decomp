@@ -25,7 +25,7 @@
 #include "common.h"
 
 extern void text_box_draw_frame(char *, unsigned int, unsigned int, float, float, float, float);
-extern s32 D_001A8CFC;
+extern s32 g_resident_data_base;
 
 /* The renderer consumes all four FP bounds, unchanged by this setup. */
 /* Passes a screen rectangle (top, bottom, left, right) to the level object, if one is loaded. */
@@ -35,7 +35,7 @@ void level_set_rect(s32 arg0, s32 arg1, float top, float bottom, float left, flo
 
     a = arg0;
     b = arg1;
-    if (D_001A8CFC != 0) {
-        text_box_draw_frame((char *)(D_001A8CFC + 0x36F28), a, b, top, bottom, left, right);
+    if (g_resident_data_base != 0) {
+        text_box_draw_frame((char *)(g_resident_data_base + 0x36F28), a, b, top, bottom, left, right);
     }
 }

@@ -7,7 +7,7 @@ extern u8 g_music_state[];
 extern void snd_run_setup_sequence(void);
 extern void load_register_disc_read_callback(void);
 extern void STUB_printf(void *);
-extern char D_001AA198[];
+extern char g_str_sound_message[];
 
 /* Resident file-load state and three streaming channel records. */
 typedef struct {
@@ -22,7 +22,7 @@ void InitFileLoadSystem(void)
 {
     InitState *s;
     int mode;
-    STUB_printf(D_001AA198);
+    STUB_printf(g_str_sound_message);
     s = (InitState *)g_music_state;
     mode = -1;
     s->mode = mode;

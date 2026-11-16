@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_0018B060;
+extern int g_tether_fin_counter;
 extern void moby_mark_spawned(char *object);
 extern void offset_moby_class_point_pairs(char *object, int mode, int delta);
 extern float math_random_float_range(float low, float high);
@@ -28,7 +28,7 @@ void func_PAL_L00_00398568(char *object)
             *(unsigned short *)(object + 0x34) = bits;
         }
     }
-    if (D_0018B060 < 0x15)
+    if (g_tether_fin_counter < 0x15)
         *(unsigned short *)(object + 0x34) |= 0x41;
     {
         int current = *(int *)(s1 + 4);

@@ -13,7 +13,7 @@ typedef int s32;
 typedef float f32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern u16 *D_L12_001FB960[];
+extern u16 *g_moby_l12_group_lists[];
 
 /* The path-follower state of an entity: the record fields the nearest-entity hand-over touches. */
 typedef struct {
@@ -38,11 +38,11 @@ typedef struct {
 
 extern u8 *D_L12_001B2E9C_base[3] __asm__("D_L12_001B2E9C") __attribute__((sda));
 
-extern s32 D_L12_001B2EB8;
+extern s32 g_moby_l12_group_count;
 
 extern u16 D_L12_001B1840_h __asm__("D_L12_001B1840") __attribute__((sda));
 
-extern u8 *D_L12_001FEAC0[];
+extern u8 *g_path_zone_table[];
 
 extern f32 vec_distance_xy(void *a, void *b);
 
@@ -59,12 +59,12 @@ void path_hand_state_to_nearest(u8 *moby)
     f32 distance;
 
     if (state->f2C0 != -1) {
-        *(TI128 *)origin = *(TI128 *)(D_L12_001FEAC0[state->f2C0] + 0x10);
+        *(TI128 *)origin = *(TI128 *)(g_path_zone_table[state->f2C0] + 0x10);
         bestEntity = 0;
         bestDistance = 100000.0f;
-        for (entry = D_L12_001FB960[moby[0x21]];
-             moby[0x21] != 0xFF && moby[0x21] <= D_L12_001B2EB8 && entry != 0 &&
-             ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L12_001FB960[moby[0x21]]);
+        for (entry = g_moby_l12_group_lists[moby[0x21]];
+             moby[0x21] != 0xFF && moby[0x21] <= g_moby_l12_group_count && entry != 0 &&
+             ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_moby_l12_group_lists[moby[0x21]]);
              entry++) {
             entity = D_L12_001B2E9C_base[0] + ((*entry & 0x7FFF) << 8);
             if (entity == 0)

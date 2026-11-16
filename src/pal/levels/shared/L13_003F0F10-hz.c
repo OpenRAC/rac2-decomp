@@ -19,7 +19,7 @@ extern int func_PAL_002B1A50(void *, void *, int);
 extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_mark_spawned(void *);
 
 typedef struct {
@@ -36,7 +36,7 @@ typedef struct {
 } L13_CD48Vars;
 
 extern void level_list_add_key(Obj_389848 *object);
-void func_PAL_L13_003F0F10(unsigned char *m)
+void enemy_update_explode_pal(unsigned char *m)
 {
     L13_CD48Vars *v = *(L13_CD48Vars **)(m + 0x68);
     float p[4] __attribute__((aligned(16)));
@@ -60,7 +60,7 @@ void func_PAL_L13_003F0F10(unsigned char *m)
         FastVecAdd(p, a, p);
         vec_scale_to_length(b, m + 0xC0, 1.5f);
         FastVecAdd(p, b, p);
-        func_PAL_L00_003FB330(p, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
+        SpawnExplosion_pal(p, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
         moby_mark_spawned(m);
     }
 }

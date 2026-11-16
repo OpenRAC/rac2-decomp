@@ -17,10 +17,10 @@ typedef struct {
     unsigned short timers[4];
     unsigned char flags48, flags49;
 } BurstFlashTemplate;
-extern BurstPalette D_L00_001AA260[], D_L00_001AA278[];
+extern BurstPalette g_burst_palette_a[], g_burst_palette_b[];
 /* 312B70 reads the full external template through byte 0x49, including its
  * first 16-byte vector. Its complete owner remains incompletely bounded. */
-extern BurstFlashTemplate D_L00_00281760[] __attribute__((aligned(16)));
+extern BurstFlashTemplate g_burst_flash_template[] __attribute__((aligned(16)));
 extern void vec_clear_128(void *);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
@@ -47,8 +47,8 @@ void part_l00_spawn_explosion_burst(char *parent_obj, char *position, float scal
         int firstColor, secondColor, life, fadeLife;
         speed = math_random_float_range(8.0f, 10.0f) * 0.01666666753590107f;
         size = scale * 500000.0f;
-        first = D_L00_001AA260[0];
-        second = D_L00_001AA278[0];
+        first = g_burst_palette_a[0];
+        second = g_burst_palette_b[0];
         firstColor = gfx_swap_packed_color_channels(first.values[math_random_int_below(6)], 1);
         secondColor = gfx_swap_packed_color_channels(second.values[math_random_int_below(6)], 1);
         life = math_random_int_range(15, 20);
@@ -72,14 +72,14 @@ void part_l00_spawn_explosion_burst(char *parent_obj, char *position, float scal
     }
     if (flash_radius != 0.0f) {
         if (flash_radius > 0.0f) {
-            D_L00_00281760[0].radius[1] = flash_radius;
-            D_L00_00281760[0].radius[2] = flash_radius;
-            D_L00_00281760[0].radius[0] = flash_radius;
+            g_burst_flash_template[0].radius[1] = flash_radius;
+            g_burst_flash_template[0].radius[2] = flash_radius;
+            g_burst_flash_template[0].radius[0] = flash_radius;
         } else {
-            D_L00_00281760[0].radius[1] = 13.0f;
-            D_L00_00281760[0].radius[2] = 13.0f;
-            D_L00_00281760[0].radius[0] = 13.0f;
+            g_burst_flash_template[0].radius[1] = 13.0f;
+            g_burst_flash_template[0].radius[2] = 13.0f;
+            g_burst_flash_template[0].radius[0] = 13.0f;
         }
-        moby_spawn_template_effect((char *)D_L00_00281760, position, 0, 0);
+        moby_spawn_template_effect((char *)g_burst_flash_template, position, 0, 0);
     }
 }

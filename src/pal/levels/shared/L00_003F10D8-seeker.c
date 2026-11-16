@@ -29,9 +29,9 @@ extern B0714Entry g_weapon_l00_table[];
 extern char *g_hero_moby NOT_SDA;
 typedef struct { char pad[0x18]; char *target; char pad1[4]; float position[4]; } B0714Hit;
 extern B0714Hit g_collision_result;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern unsigned char *D_L00_001FEA14;
-extern unsigned char *D_L00_001FE9F4;
+extern char g_default_vector[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b;
+extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter __attribute__((sda));
 extern char homing_shot_draw_trail[];
 
@@ -117,10 +117,10 @@ target_done:
             *(int *)(state + 0x38) = 5;
         }
         work = math_random_int_below(255);
-        p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
-        p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
+        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (p) p[2] = *g_effect_param_pointer_b;
+        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (p) p[2] = *g_effect_param_pointer_b;
         work = (int)delta;
         FastVecSub((void *)work, obj + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.1f);
@@ -132,12 +132,12 @@ target_done:
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.05f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.05f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.05f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 12, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            part_spawn_gravity_fade(particle, g_default_vector, 12, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            p = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (p) p[2] = *D_L00_001FE9F4;
+            p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (p) p[2] = *g_effect_param_pointer_a;
         }
         ref_PAL_L00_003F1518_00(homing_shot_draw_trail, obj);
         break;

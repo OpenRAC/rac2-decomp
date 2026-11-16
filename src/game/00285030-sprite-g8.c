@@ -14,7 +14,7 @@ typedef struct { unsigned long lo : 9; unsigned long hi : 55; } TexBits;
 typedef struct { u8 p0[0x160]; s16 h160; s16 h162; s16 h164; s16 h166; u8 p168[4]; u16 h16C; s16 h16E; } DrawState;
 extern DrawState g_screen_adjust_offsets[];
 extern s32 g_dma_packet_cursor[] MACRO_ADDR;
-extern long D_001A7470;
+extern long g_quad_texture;
 extern void mem_fast_helper_b();
 extern int sceGsSetDefDrawEnv(void *, short, short, short, short, short);
 
@@ -37,7 +37,7 @@ void gfx_build_screen_sprite_packet(s32 tw, s32 th, s32 tbp, s32 mode) {
     tex |= (long)tw << 26;
     tex |= (long)th << 30;
     tex |= 0x8000UL << 19;
-    D_001A7470 = tex;
+    g_quad_texture = tex;
     mem_fast_helper_b(g_dma_packet_cursor[0], 0xF0);
     *(u32 *)(g_dma_packet_cursor[0] + 0) = 0x1000000E;
     *(u32 *)(g_dma_packet_cursor[0] + 4) = 0;

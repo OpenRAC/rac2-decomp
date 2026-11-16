@@ -51,12 +51,12 @@ extern void part_l14_spawn_flash(void *);
 
 /* The level's entity array, read as a bare symbol (lui/lw) as in the level's other units. */
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
-extern float D_00189EA8 NOT_SDA;
-extern FieldMob *D_0018A0B4 NOT_SDA;
-extern int D_L14_001B04C4 __attribute__((sda));
-extern int D_L14_001B04C8 __attribute__((sda));
-extern int D_L14_001B04CC __attribute__((sda));
-extern int D_L14_001B04D0 __attribute__((sda));
+extern float g_hero_height_limit NOT_SDA;
+extern FieldMob *g_field_mob_contact NOT_SDA;
+extern int g_emitter_color_blue __attribute__((sda));
+extern int g_emitter_color_green __attribute__((sda));
+extern int g_emitter_color_red __attribute__((sda));
+extern int g_emitter_emit_timer __attribute__((sda));
 
 /* Widening after the three high-channel terms preserves the color grouping. */
 
@@ -96,7 +96,7 @@ void UpdatePrisonEnergyField(FieldMob *self) {
             s->requested = 0;
             s->flags = 0;
             self->color = 0x80000080;
-            s->emitTimer = D_L14_001B04D0;
+            s->emitTimer = g_emitter_emit_timer;
             s->timer = s->closeTime;
             s->requested = 0;
         }
@@ -105,9 +105,9 @@ void UpdatePrisonEnergyField(FieldMob *self) {
         }
         if (math_fast_float_d(&s->emitTimer)) {
             part_l14_spawn_flash(self);
-            s->emitTimer = D_L14_001B04D0;
+            s->emitTimer = g_emitter_emit_timer;
         }
-        c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
+        c = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
         c = FastTweenColor(c, s->color, moby_get_state_progress(self));
         set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
         moby_copy_pos_rot(self, a, b);
@@ -121,7 +121,7 @@ void UpdatePrisonEnergyField(FieldMob *self) {
             self->animation = 0;
             self->flags |= 1;
         }
-        if (s->requested || (s->proximity && self->position[2] > D_00189EA8)) {
+        if (s->requested || (s->proximity && self->position[2] > g_hero_height_limit)) {
             moby_set_state(self, 2, -1);
         }
         break;
@@ -130,7 +130,7 @@ void UpdatePrisonEnergyField(FieldMob *self) {
             self->active = 1;
             self->flags = (self->flags | 0x100) & 0xFFFE;
             self->animation = *(int *)(self->model + 0x10);
-            s->emitTimer = D_L14_001B04D0;
+            s->emitTimer = g_emitter_emit_timer;
             s->timer = s->openTime;
         }
         if (math_fast_float_d(&s->timer)) {
@@ -138,9 +138,9 @@ void UpdatePrisonEnergyField(FieldMob *self) {
         }
         if (math_fast_float_d(&s->emitTimer)) {
             part_l14_spawn_flash(self);
-            s->emitTimer = D_L14_001B04D0;
+            s->emitTimer = g_emitter_emit_timer;
         }
-        c = (long long)(int)(0xFF000000 | (D_L14_001B04CC << 16) | (D_L14_001B04C8 << 8)) | D_L14_001B04C4;
+        c = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
         c = FastTweenColor(c, s->color, moby_get_state_progress(self));
         set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
         moby_copy_pos_rot(self, a, b);
@@ -159,13 +159,13 @@ void UpdatePrisonEnergyField(FieldMob *self) {
             s->timer = s->activeTime;
             self->color = 0x80008000;
         }
-        if ((hero_is_current_selected_id(self) && !s->contact) || (D_0018A0B4 == self && s->contact)) {
+        if ((hero_is_current_selected_id(self) && !s->contact) || (g_field_mob_contact == self && s->contact)) {
             e = s->linked;
             if (e != 0 && *(short *)(e + 0xAA) == 0xAFE /* moby class 2814 */) {
                 *(int *)(*(char **)(e + 0x68) + 0x80) = 1;
             }
         }
-        if (s->proximity && self->position[2] > D_00189EA8) {
+        if (s->proximity && self->position[2] > g_hero_height_limit) {
             s->timer = s->activeTime;
         }
         if (math_fast_float_d(&s->timer)) {

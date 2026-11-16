@@ -9,7 +9,7 @@ extern float mat_fast_helper_a(float, float);
 extern int func_PAL_L06_004245B0(char *);
 extern int moby_dispatch_action_by_kind(char *, char *);
 extern int func_PAL_L06_004248E8(char *, float, float, float, float, int);
-extern char D_L06_001B0830[];
+extern char g_str_path_gunner_debug[];
 extern char *g_path_list[];
 extern void DrawPath(void *, int, unsigned int, int, int, float);
 extern int vec_find_point_nearest_wanted_distance(void *, void *, float);
@@ -37,24 +37,24 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_transform_joint_point(void *, int, void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern float moby_get_anim_value(void *);
-extern void *func_PAL_00329890(void *, void *, void *, int, int, float);
+extern void *part_spawn_spinning_effect_moby_pal(void *, void *, void *, int, int, float);
 extern char *func_PAL_0032F3B8(void *, void *, void *, float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern void vec_random_direction(void *, float, float);
 extern float math_fabs(float);
-extern char *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
-extern void func_PAL_003120C0(void);
-extern void func_PAL_002A7650(void *, int, int);
+extern char *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, unsigned char, float, float);
+extern void moby_fade_out_update_pal(void);
+extern void SetDeathBits_pal(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void func_PAL_L06_004240F0(void *);
-extern char D_L06_001AC520[] MACRO_ADDR;
+extern char g_up_vector[] MACRO_ADDR;
 extern char g_hero_position[];
-extern char D_L06_001B9840[];
-extern char D_L06_001A8F20[] MACRO_ADDR;
+extern char g_hero_l06_position[];
+extern char g_effect_vector[] MACRO_ADDR;
 extern char g_sound_state[];
-extern char *D_L06_001B290C MACRO_ADDR;
-extern int D_L06_001B2348 MACRO_ADDR;
+extern char *g_region_table MACRO_ADDR;
+extern int g_game_l06_frame_counter MACRO_ADDR;
 typedef int L06Quad __attribute__((mode(TI)));
 typedef struct {
     int count;
@@ -135,7 +135,7 @@ void func_PAL_L06_00424E88(char *obj)
         }
         switch ((unsigned char)obj[0x20]) {
         case 0:
-            STUB_printf(D_L06_001B0830);
+            STUB_printf(g_str_path_gunner_debug);
             break;
         case 2: {
             char *path;
@@ -173,7 +173,7 @@ void func_PAL_L06_00424E88(char *obj)
                     FastVecSub(basis.direction, path + ((node << 4) + 0x10), path + (node << 4));
                 else
                     FastVecSub(basis.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
-                up = D_L06_001AC520;
+                up = g_up_vector;
                 vec_scale_to_length(basis.direction, basis.direction, 1.0f);
                 qcopy(basis.up, up);
                 FastVecCross(basis.side, basis.direction, basis.up);
@@ -200,7 +200,7 @@ void func_PAL_L06_00424E88(char *obj)
                 yaw = mat_fast_helper_a(*(float *)(st + 0x1C0) - *(float *)(obj + 0x10),
                                    *(float *)(st + 0x1C4) - *(float *)(obj + 0x14));
                 if (vec_distance_xy(obj + 0x10, st + 0x1C0) > 8.0f)
-                    yaw = FastAddRotations(yaw, math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L06_001B2348) * 0.02f)) * 0.7853982448577881f);
+                    yaw = FastAddRotations(yaw, math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_game_l06_frame_counter) * 0.02f)) * 0.7853982448577881f);
                 index = vec_find_point_nearest_wanted_distance(target, path, 0.0f);
                 if (func_PAL_L06_004248E8(obj, 12.0f, 6.0f, yaw, 0.0f, 1)) {
                     int desired = index;
@@ -228,7 +228,7 @@ void func_PAL_L06_00424E88(char *obj)
                 else
                     FastVecSub(basis2.direction, path + ((node << 4) + 0x20), path + ((node << 4) + 0x10));
                 vec_scale_to_length(basis2.direction, basis2.direction, 1.0f);
-                qcopy(basis2.up, D_L06_001AC520);
+                qcopy(basis2.up, g_up_vector);
                 FastVecCross(basis2.side, basis2.direction, basis2.up);
                 offset[0] = 0.0f;
                 offset[2] = 0.0f;
@@ -248,7 +248,7 @@ void func_PAL_L06_00424E88(char *obj)
                 L06Basis basis;
                 float target[4], offset[4], velocity[4], acceleration[4], shot[4], joint[4];
                 float width, height, distance, phase;
-                char *record = D_L06_001B290C + (*(int *)(st + 0x2A0) << 7);
+                char *record = g_region_table + (*(int *)(st + 0x2A0) << 7);
                 FastVecSub(local, st + 0x190, record + 0x30);
                 euler_rotation_basis(basis.direction, record + 0x70);
                 matrix_from_basis_rows(basis.inverse, basis.direction);
@@ -308,7 +308,7 @@ void func_PAL_L06_00424E88(char *obj)
                             if (phase < 4.4f) {
                                 FastVecSub(shot, st + 0x190, target);
                                 vec_scale_to_length(shot, shot, 0.40000004f);
-                                func_PAL_00329890(obj, shot, target, 0, 0, *(float *)(st + 0x2A8));
+                                part_spawn_spinning_effect_moby_pal(obj, shot, target, 0, 0, *(float *)(st + 0x2A8));
                                 *(float *)(st + 0x2AC) += 1.0f;
                             }
                         }
@@ -330,7 +330,7 @@ void func_PAL_L06_00424E88(char *obj)
             char *rec, *effect;
             int i;
             /* Retail reads sp+0x10 here without initializing it on this path. */
-            FastVecSub(direction, D_L06_001B9840, local);
+            FastVecSub(direction, g_hero_l06_position, local);
             vec_scale_to_length(direction, direction, 1.0f);
             func_PAL_0032F3B8(obj, obj + 0x10, direction, 5.0f);
             PlayMobySound(3, 0, obj);
@@ -343,11 +343,11 @@ void func_PAL_L06_00424E88(char *obj)
             for (i = 0; i < 6; ++i) {
                 vec_random_direction(velocity, 0.16000001f, 0.24000001f);
                 velocity[2] = math_fabs(velocity[2]) * 2.5f;
-                FastVecAdd(velocity, velocity, D_L06_001A8F20);
-                effect = func_PAL_002735D0(obj, 1, *(short *)(obj + 0xAA), i, obj + 0x10, obj + 0xF0, velocity, 255, 30.0f, 15.0f);
-                *(void (**)(void))(effect + 0x64) = func_PAL_003120C0;
+                FastVecAdd(velocity, velocity, g_effect_vector);
+                effect = cam_moby_create_pal(obj, 1, *(short *)(obj + 0xAA), i, obj + 0x10, obj + 0xF0, velocity, 255, 30.0f, 15.0f);
+                *(void (**)(void))(effect + 0x64) = moby_fade_out_update_pal;
             }
-            func_PAL_002A7650(obj, 0, 3);
+            SetDeathBits_pal(obj, 0, 3);
             moby_mark_spawned(obj);
             goto done;
         }

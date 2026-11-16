@@ -28,19 +28,19 @@ extern float math_random_signed_float_range(float, float);
 extern void *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 extern int moby_transform_point_and_rotation_by_parent(void *, int, void *, void *, void *, void *);
 extern int moby_get_parent_transformed_point(void *, int, void *, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int,
                           float, int, int, int, int, int);
 extern void moby_mark_spawned(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void part_spawn_bursts_at_moby(void *);
-extern int D_L00_001BF218 NOT_SDA;
-extern int D_L00_001B0518 __attribute__((sda));
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern int g_hit_l00_result NOT_SDA;
+extern int g_small_projectile_particle_color __attribute__((sda));
+extern char g_default_vector[] MACRO_ADDR;
 
 /* state 0: advances the object by its data's velocity; a collision deals damage and destroys it unless
    D_L00_001BF218 equals the data's type, otherwise it spawns three trail particles and grows its scale
    factor; state 1: spawns an explosion and deletes the object */
-void func_PAL_L00_003E3968(char *object)
+void small_projectile_update_pal(char *object)
 {
     float scale[4];
     float next[4];
@@ -63,8 +63,8 @@ void func_PAL_L00_003E3968(char *object)
         make_hit_descriptor(query, *(int *)(data + 0x10), 1, data, *(float *)(data + 0x14));
         *(unsigned short *)(query + 0x1a) = *(unsigned short *)(object + 0xaa);
         if (CollLine(object + 0x10, next, 0, object, query) || coll_test_point(object + 0x10, 0, object, 0.3f)) {
-            if (D_L00_001BF218) {
-                if (D_L00_001BF218 != *(int *)(data + 0x10)) {
+            if (g_hit_l00_result) {
+                if (g_hit_l00_result != *(int *)(data + 0x10)) {
                     coll_sweep_from_object(*(int *)(data + 0x10), 0.3f, object + 0x10, 0x10001, *(float *)(data + 0x14), 0, 0, 1, 0);
                     moby_set_state(object, 1, -1);
                     return;
@@ -84,7 +84,7 @@ void func_PAL_L00_003E3968(char *object)
         }
         size0 = math_random_float_range(1.0f, 1.5f) * (*(float *)(data + 0x20) * 210000.0f);
         spread = math_random_float_range(0.2f, 0.4f);
-        part_spawn_gravity_fade(object + 0x10, velocity, 5, D_L00_001B0518, 3, 0x4f, 0, size0,
+        part_spawn_gravity_fade(object + 0x10, velocity, 5, g_small_projectile_particle_color, 3, 0x4f, 0, size0,
                       spread * (*(float *)(data + 0x20) * 210000.0f), 0.0f, 0);
         qcopy(pos, object + 0x10);
         pos[0] += math_random_signed_float_range(0.0f, 0.15f);
@@ -92,14 +92,14 @@ void func_PAL_L00_003E3968(char *object)
         pos[2] += math_random_signed_float_range(0.0f, 0.15f);
         size1 = math_random_float_range(1.0f, 1.5f) * (*(float *)(data + 0x20) * 210000.0f);
         spread = math_random_float_range(0.1f, 0.3f);
-        part_spawn_gravity_fade(pos, velocity, 5, D_L00_001B0518, 7, 0x5f, 0, size1,
+        part_spawn_gravity_fade(pos, velocity, 5, g_small_projectile_particle_color, 7, 0x5f, 0, size1,
                       spread * (*(float *)(data + 0x20) * 210000.0f), 0.0f, 0);
         pos[0] += math_random_signed_float_range(0.0f, 0.15f);
         pos[1] += math_random_signed_float_range(0.0f, 0.15f);
         pos[2] += math_random_signed_float_range(0.0f, 0.15f);
         size2 = math_random_float_range(1.0f, 1.5f) * (*(float *)(data + 0x20) * 210000.0f);
         spread = math_random_float_range(0.2f, 0.4f);
-        part_spawn_gravity_fade(pos, velocity, 5, D_L00_001B0518, 12, 0x7f, 0, size2,
+        part_spawn_gravity_fade(pos, velocity, 5, g_small_projectile_particle_color, 12, 0x7f, 0, size2,
                       spread * (*(float *)(data + 0x20) * 210000.0f), 0.0f, 0);
         if (*(int *)(data + 0x24)) {
             moby_transform_point_and_rotation_by_parent(object, *(int *)(data + 0x24), object + 0x10, object + 0xf0, object + 0x10, object + 0xf0);
@@ -107,7 +107,7 @@ void func_PAL_L00_003E3968(char *object)
         }
         break;
     case 1:
-        func_PAL_002AC718(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
+        SpawnExplosionEffects_pal(object, g_default_vector, object + 0x10, 0.0f, 0.0f, 10, 0, 16, 0.0f, 0.0f, 9.0f, 1.0f, -1,
                       15.0f, 0, 9, -1, 0, 0x810001);
         moby_mark_spawned(object);
         return;

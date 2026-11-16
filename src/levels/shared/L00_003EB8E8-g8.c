@@ -4,20 +4,20 @@
  * and its small-data tuning values (-G8). */
 extern int vec_fast_helper_b(void *);
 extern int g_frame_l00_counter __attribute__((sda));
-extern float D_L00_001B0748 __attribute__((sda));
-extern float D_L00_001B074C __attribute__((sda));
-extern float D_L00_001B0750 __attribute__((sda));
-extern float D_L00_001B0754 __attribute__((sda));
-extern float D_L00_001B0758 __attribute__((sda));
+extern float g_homing_param __attribute__((sda));
+extern float g_homing_yaw_degrees __attribute__((sda));
+extern float g_homing_pitch_degrees __attribute__((sda));
+extern float g_homing_speed __attribute__((sda));
+extern float g_homing_target_height_offset __attribute__((sda));
 /* The unsized macro-address view keeps the absolute load tied to its address register. */
-extern int D_L00_001A8F00[] MACRO_ADDR;
-extern char D_L00_001B8FF0[];
+extern int g_game_l00_mode[] MACRO_ADDR;
+extern char g_cam_follow_matrix[];
 extern char g_hero_position[];
 extern char g_weapon_l00_table[][224];
 typedef struct { char pad[0x1F]; unsigned char selected; } Selection3EB8E8;
 extern Selection3EB8E8 g_item_slot_to_record;
-extern unsigned char *D_L00_001FEA14 NOT_SDA;
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b NOT_SDA;
+extern char g_default_vector[] __attribute__((sda));
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern char *moby_get_or_find_target(void *, void *, int, float, float, float, float, float);
 extern void anim_start_blended(char *, int, int, int);
@@ -55,9 +55,9 @@ void UpdateAutoTargetFire(char *self, State3EB8E8 *st)
         return;
     moby_transform_joint_to_world(self, 1, pos);
     st->phase ^= 1;
-    candidate = moby_get_or_find_target(pos, D_L00_001B8FF0, 0, D_L00_001B074C * 0.01745329424738884f,
-                            D_L00_001B0750 * 0.01745329424738884f, D_L00_001B0748,
-                            D_L00_001B074C * 0.01745329424738884f, D_L00_001B0750 * 0.01745329424738884f);
+    candidate = moby_get_or_find_target(pos, g_cam_follow_matrix, 0, g_homing_yaw_degrees * 0.01745329424738884f,
+                            g_homing_pitch_degrees * 0.01745329424738884f, g_homing_param,
+                            g_homing_yaw_degrees * 0.01745329424738884f, g_homing_pitch_degrees * 0.01745329424738884f);
     if (candidate) {
         if ((*(short *)(candidate + 0xAA) == MOBY_CLASS_RECEIVER_BOT || *(short *)(candidate + 0xAA) == 0xEC0 /* moby class 3776 */ || *(short *)(candidate + 0xAA) == 0xED4 /* moby class 3796 */) &&
             *(unsigned char *)(*(char **)(candidate + 0x68) + 0x3B1) == 255) {
@@ -73,24 +73,24 @@ void UpdateAutoTargetFire(char *self, State3EB8E8 *st)
             anim_start_blended(self, 2, 0, 5);
         FastVecSub(to_player, self + 0x10, g_hero_position);
         dot = FastVecDot(to_player, self + 0xE0);
-        if (D_L00_001A8F00[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
+        if (g_game_l00_mode[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
             *(unsigned char *)(self + 0x42) == 2 && dot > 1.1f) {
             qcopy_nc(target, candidate + 0x10);
             target_info = moby_get_private_value_0(candidate);
             if (target_info)
                 target[2] += *(float *)(target_info + 0x10);
             else
-                target[2] += D_L00_001B0758;
+                target[2] += g_homing_target_height_offset;
             spark_seed = math_random_int_below(255);
-            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x202080, spark_seed, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
+            spark = part_spawn_gravity_fade(pos, g_default_vector, 3, 0x202080, spark_seed, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
             if (spark)
-                spark[2] = *D_L00_001FEA14;
-            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x601080, (spark_seed + 128) % 255, 127, 16,
+                spark[2] = *g_effect_param_pointer_b;
+            spark = part_spawn_gravity_fade(pos, g_default_vector, 3, 0x601080, (spark_seed + 128) % 255, 127, 16,
                                  420000.0f, 420000.0f, 0.0f, 0);
             if (spark)
-                spark[2] = *D_L00_001FEA14;
+                spark[2] = *g_effect_param_pointer_b;
             FastVecSub(dir, target, pos);
-            vec_scale_to_length(dir, dir, D_L00_001B0754);
+            vec_scale_to_length(dir, dir, g_homing_speed);
             FastVecAdd(pos, pos, dir);
             homing_l00_shot_spawn(pos, self, candidate);
             PlayMobySound(0, 0, self);

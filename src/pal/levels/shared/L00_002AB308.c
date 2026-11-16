@@ -3,7 +3,7 @@
 
 
 extern unsigned char g_hero_state[];
-extern unsigned char D_L00_0025BE10[];
+extern unsigned char g_hero_item_attach_records[];
 extern int math_fast_float_d(int *);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
@@ -12,7 +12,7 @@ extern int math_random_int_range(int, int);
 /* Adapted from RAC1's hero_idle_and_animation.c (GPL-3.0).
  * Refreshes four idle rotation targets and copies them to their manipulators.
  */
-void func_PAL_L00_002AB830(void) {
+void UpdateHeroIdleRandomRotationTargets_pal(void) {
     char *base = (char *)g_hero_state;
     int *q;
     char *g;
@@ -23,7 +23,7 @@ void func_PAL_L00_002AB830(void) {
     if (*(unsigned char *)(*(int *)(base + 0x2290) + 0x43) != 0) return;
     q = (int *)(base + 0x11F0);
     g = base;
-    tbl = D_L00_0025BE10;
+    tbl = g_hero_item_attach_records;
     for (i = 0; i < 4; i++) {
         char *f;
         if (math_fast_float_d(&q[i])) {

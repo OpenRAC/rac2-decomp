@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_001B1B40 __attribute__((section(".sdata")));
-extern int D_001B1B44 __attribute__((section(".sdata")));
-extern unsigned char D_001CE4E0[];
-extern short D_001CE300[];
-extern char *D_001CDB80[];
-extern int D_001D0E00[];
+extern int g_class_cache_count __attribute__((section(".sdata")));
+extern int g_class_cache_next __attribute__((section(".sdata")));
+extern unsigned char g_class_slot_lookup[];
+extern short g_class_cache_ids[];
+extern char *g_class_cache_objects[];
+extern int g_class_cache_sizes[];
 extern void moby_queue_class_update(int, int);
 extern void tex_relocate_block(char *, int, int, int);
 
@@ -15,17 +15,17 @@ void load_register_class_cache_object(char *object, int mapBase, int mapEntries,
 {
     if (object == 0) {
         moby_queue_class_update(id, 1);
-        D_001CE4E0[id] = *(unsigned char *)&D_001B1B44;
-        D_001B1B44 = D_001B1B44 + 1;
+        g_class_slot_lookup[id] = *(unsigned char *)&g_class_cache_next;
+        g_class_cache_next = g_class_cache_next + 1;
     } else {
-        D_001CE300[D_001B1B40] = id;
-        D_001CE4E0[id] = *(unsigned char *)&D_001B1B40;
-        D_001CDB80[D_001B1B40] = object;
-        D_001D0E00[D_001B1B40] = (unsigned char)object[0x2D] << 10;
+        g_class_cache_ids[g_class_cache_count] = id;
+        g_class_slot_lookup[id] = *(unsigned char *)&g_class_cache_count;
+        g_class_cache_objects[g_class_cache_count] = object;
+        g_class_cache_sizes[g_class_cache_count] = (unsigned char)object[0x2D] << 10;
         if ((unsigned char)object[0x2D] == 255)
-            D_001D0E00[D_001B1B40] = 0x100000;
+            g_class_cache_sizes[g_class_cache_count] = 0x100000;
         moby_queue_class_update(id, 0);
-        ++D_001B1B40;
+        ++g_class_cache_count;
         tex_relocate_block(object, mapBase, mapEntries, id);
     }
 }
@@ -117,7 +117,7 @@ struct TransferState {
 
 extern struct TransferState g_scene_playback_state;
 extern struct RenderGlobals g_hero_state;
-extern struct Moby *D_001B159C __attribute__((sda));
+extern struct Moby *g_load_object_cursor __attribute__((sda));
 
 extern void FlushCache(int);
 extern int fast_decompress(int, int);
@@ -130,8 +130,8 @@ struct LoadSlots {
     int slot[4];
 };
 
-extern struct LoadSlots D_00152CD0;
-extern int D_001A933C __attribute__((sda));
+extern struct LoadSlots g_load_slots;
+extern int g_class_cache_slot __attribute__((sda));
 
 /* Release the slot the object holds: remember its entry in the table of the two
    slots, then clear the object's own reference to it. */
@@ -139,10 +139,10 @@ void load_release_class_cache_slot(int *entry, int doRelease)
 {
     if (doRelease != 0) {
         if (entry[1] >= 0) {
-            D_00152CD0.slot[entry[1]] = entry[0];
-            if (entry[1] != D_001A933C)
+            g_load_slots.slot[entry[1]] = entry[0];
+            if (entry[1] != g_class_cache_slot)
                 goto out;
-            D_001A933C = entry[1] ^ 1;
+            g_class_cache_slot = entry[1] ^ 1;
         }
     }
 out:
@@ -197,7 +197,7 @@ void load_relocate_world_object_parts(void)
         moby = g_scene_playback_state.slots[i];
         if (moby == 0) {
             if (classId == 0) {
-                moby = D_001B159C;
+                moby = g_load_object_cursor;
                 moby_init_instance(moby, 0);
             } else {
                 moby = CreateMoby(classId);

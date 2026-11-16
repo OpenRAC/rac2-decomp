@@ -4,14 +4,14 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char *g_moby_l02_pool __attribute__((sda));
 extern char *g_entity_group_lists[];
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 struct L02PairWordB {
     int a;
     int b;
 };
 
-extern struct L02PairWordB D_L02_001B00C8;
+extern struct L02PairWordB g_chickenbot_spark_params;
 
 extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
@@ -69,9 +69,9 @@ void chickenbot_emit_sparks(struct L02PushObject *a0)
     vec.x = 0.25f;
     vec.z = 0.1f;
     vec.w = 1.0f;
-    k = D_L02_001B00C8;
+    k = g_chickenbot_spark_params;
     p = (unsigned short *)g_entity_group_lists[a0->group];
-    while (a0->group != 0xFF && a0->group <= D_L02_001B35B8 && p != 0 &&
+    while (a0->group != 0xFF && a0->group <= g_group_max_index && p != 0 &&
            ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)g_entity_group_lists[a0->group])) {
         e = (struct L02PushEntity *)(g_moby_l02_pool + ((*p & 0x7FFF) << 8));
         if (e == 0)

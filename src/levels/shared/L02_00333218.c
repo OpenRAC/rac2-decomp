@@ -14,7 +14,7 @@ typedef struct {
     char gap[0x10];
     Vec4 normal;
 } Collision;
-extern Collision D_L02_001C0940;
+extern Collision g_collision_l02_result;
 
 /* Tests a sphere around an object against the level. On a hit it records what was hit, the hit point and pushes the object out. Returns 1 for a hit, 0 for none. */
 int coll_check_sphere_hit(char *object, char *record) {
@@ -32,9 +32,9 @@ int coll_check_sphere_hit(char *object, char *record) {
         result = 0;
         goto done;
     }
-    *(char **)(record + 0x84) = D_L02_001C0940.hit;
-    qcopy(record + 0x60, &D_L02_001C0940.point);
-    qcopy(&position, D_L02_001C0940.gap);
+    *(char **)(record + 0x84) = g_collision_l02_result.hit;
+    qcopy(record + 0x60, &g_collision_l02_result.point);
+    qcopy(&position, g_collision_l02_result.gap);
     FastVecSub((float *)origin, (float *)&position, (float *)&offset);
     result = 1;
 done:

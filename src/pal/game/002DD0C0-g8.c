@@ -24,10 +24,10 @@ typedef struct {
     int done;     /* 0x54: cleared and tested here, set elsewhere */
 } PageC3;
 
-extern u8 g_pad_state[], g_pause_menu_state[], D_00261A08[], D_00261AB8[], D_00261B78[];
-extern u8 D_001ABBA0[] SDATA(D_001ABBA0);
-extern u8 D_001ABBB8[] SDATA(D_001ABBB8);
-extern int D_0025ED8C[];
+extern u8 g_pad_state[], g_pause_menu_state[], g_dialog_menu_text_a[], g_dialog_menu_text_b[], g_dialog_menu_text_c[];
+extern u8 g_menu_text_a[] SDATA(D_001ABBA0);
+extern u8 g_menu_text_b[] SDATA(D_001ABBB8);
+extern int g_menu_text_id[];
 
 int func_PAL_002DD0C0(PageC3 *menu)
 {
@@ -64,8 +64,8 @@ back_done:
         ++menu->state;
         menu->timer = 150;
         menu->scroll = 0;
-        D_0025ED8C[0] = 0x1cf4;
-        menu->text = (int)D_00261A08;
+        g_menu_text_id[0] = 0x1cf4;
+        menu->text = (int)g_dialog_menu_text_a;
         break;
     case 1:
     case 5:
@@ -94,12 +94,12 @@ back_done:
         menu->state = 5;
         menu->timer = 150;
         menu->scroll = 0;
-        D_0025ED8C[0] = 0x1d44;
-        menu->text = (int)D_00261AB8;
+        g_menu_text_id[0] = 0x1d44;
+        menu->text = (int)g_dialog_menu_text_b;
         break;
     case 3:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x1d42;
+        g_menu_text_id[0] = 0x1d42;
         menu->text = 0x1d43;
         menu->timer = 200;
         menu->scroll = 0;
@@ -107,15 +107,15 @@ back_done:
         break;
     case 7:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x1d8c;
-        menu->text = (int)D_00261B78;
+        g_menu_text_id[0] = 0x1d8c;
+        menu->text = (int)g_dialog_menu_text_c;
         menu->timer = 200;
         ++menu->state;
         menu->scroll = 0;
         break;
     case 10:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0x1dbc;
+        g_menu_text_id[0] = 0x1dbc;
         menu->text = 0x1dbd;
         menu->timer = 200;
         menu->scroll = 0;
@@ -125,13 +125,13 @@ back_done:
         if (menu->timer) break;
         menu->scroll = 0;
         menu->timer = 150;
-        D_0025ED8C[0] = 0x1dbe;
-        menu->text = (int)D_001ABBA0;
+        g_menu_text_id[0] = 0x1dbe;
+        menu->text = (int)g_menu_text_a;
         menu->state = 12;
         break;
     case 14:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0;
+        g_menu_text_id[0] = 0;
         menu->text = 0x1dcf;
         menu->timer = 200;
         menu->scroll = 0;
@@ -141,13 +141,13 @@ back_done:
         if (menu->timer) break;
         menu->scroll = 0;
         menu->timer = 150;
-        D_0025ED8C[0] = 0x1dd1;
-        menu->text = (int)D_001ABBB8;
+        g_menu_text_id[0] = 0x1dd1;
+        menu->text = (int)g_menu_text_b;
         menu->state = 16;
         break;
     case 18:
         if (menu->timer) break;
-        D_0025ED8C[0] = 0;
+        g_menu_text_id[0] = 0;
         menu->timer = 250;
         menu->text = 0;
         ++menu->state;

@@ -27,7 +27,7 @@
 
 /* The resident table already holds the retail label addresses. The unused
  * label list keeps each C branch available; it is not read by the program. */
-extern void *D_L01_002A4420[];
+extern void *g_level_l01_pointer_table[];
 
 extern s32 ref_L08_00398A90_00 __attribute__((sda));
 extern s32 ref_L08_00398A90_01 __attribute__((sda));
@@ -52,7 +52,7 @@ void level_apply_table_entry(s8 *moby) {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_7, &&rc2_case_8, &&rc2_default, &&rc2_default, &&rc2_case_11, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_16, &&rc2_default, &&rc2_default, &&rc2_case_19};
     u32 rc2_selector = (u32)(idx);
     if (rc2_selector > 19U) goto rc2_default;
-goto *D_L01_002A4420[rc2_selector];
+goto *g_level_l01_pointer_table[rc2_selector];
 
     rc2_case_0:
         ref_L08_00398A90_06(4, (&ref_L08_00398A90_00)[*(s32 *)(vars + 0x10)], 1);

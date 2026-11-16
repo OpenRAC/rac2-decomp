@@ -6,15 +6,15 @@
  * the constant 1 before the destination, as retail has it. The clear address is an
  * integer sum so its operands come out in retail's order. */
 
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 
-extern int D_001F2848[];
+extern int g_menu_unlock_flags[];
 
-extern short D_0026185A[];
+extern short g_movie_availability_table[];
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 
 /* Marks each movie in the list as available if the player has seen it, or all of them when everything is unlocked. */
 int movie_list_update_availability(void)
@@ -29,12 +29,12 @@ int movie_list_update_availability(void)
     int clear_offset;
     int one;
 
-    if (D_001A8CFC == 0)
+    if (g_resident_data_base == 0)
         goto done;
-    D_001F2848[0] = 1;
-    entry_table = (char *)D_0026185A;
-    seen_mask = D_00139768;
-    all_unlocked = D_001A7A0A;
+    g_menu_unlock_flags[0] = 1;
+    entry_table = (char *)g_movie_availability_table;
+    seen_mask = g_request_flag_table;
+    all_unlocked = g_extras_unlocked_flag;
     clear_base = (int)entry_table + 2;
     one = 1;
     enabled_ptr = entry_table + 8;

@@ -76,18 +76,18 @@ typedef struct {
     u8 pad30[0x10];
     ShrubRenderGroupReference_04340 groups[1];
 } ShrubRenderClass_04340;
-extern ShrubRenderClass_04340 *D_L00_0021EA20[64];
-extern s16 D_L00_0021EB20[64];
-extern u8 D_L00_0021EBA0[0x400];
-extern s32 D_L00_002203A0[64];
-extern MaterialMap_04340 D_L00_002209A0[64];
-extern s32 D_L00_001B23F0 __attribute__((sda));
+extern ShrubRenderClass_04340 *g_shrub_l00_class_table[64];
+extern s16 g_shrub_class_ids[64];
+extern u8 g_shrub_slot_by_class[0x400];
+extern s32 g_shrub_fixed_thresholds[64];
+extern MaterialMap_04340 g_shrub_material_maps[64];
+extern s32 g_class_slot_counter __attribute__((sda));
 /* Keep the absolute allocation-base loads in their measured form in this G0 unit. */
-extern s32 D_001A72F4 __attribute__((sda));
-extern u64 D_L00_001C91C0[0x30];
+extern s32 g_vram_clut_third __attribute__((sda));
+extern u64 g_gs_register_packet[0x30];
 extern s32 FloatToInt(f32);
 extern s32 log2dim(s32);
-extern char D_L00_001A95A0[];
+extern char g_str_table_entry_format[];
 extern double __extendsfdf2(float);
 extern void STUB_printf(const char *, ...);
 
@@ -134,7 +134,7 @@ extern int load_start_disc_read(int value, char *target);
 
 extern s16 snd_pump_music_and_disc_read(int value);
 
-extern int D_L00_001BCAC0[];
+extern int g_tutorial_probe_context[];
 
 extern int g_copy_setup_data[];
 
@@ -184,17 +184,17 @@ extern int func_00338040_1(int a, int b, int c);
 
 extern void level_clear_pending_pointer(int);
 
-extern unsigned char *D_L05_001B2520 __attribute__((sda));
+extern unsigned char *g_record_pool_start __attribute__((sda));
 
-extern unsigned char *D_L05_001B2524 __attribute__((sda));
+extern unsigned char *g_record_pool_end __attribute__((sda));
 
-extern unsigned int D_L05_001B2048 __attribute__((sda));
+extern unsigned int g_feltzin_mission_index __attribute__((sda));
 
-extern unsigned int D_L05_001B2440 __attribute__((sda));
+extern unsigned int g_active_record_count __attribute__((sda));
 
-extern Slot0820eb11 D_L03_001D23C0[6];
+extern Slot0820eb11 g_moby_animation_slots[6];
 
-extern unsigned char D_L03_001CA5C0[];
+extern unsigned char g_moby_animation_buffers[];
 
 extern void func_00283658_1(char *a, char *b);
 
@@ -212,7 +212,7 @@ extern void CreatePointLight(unsigned long long);
 
 extern void func_002F0D00(void *, void *, int);
 
-extern unsigned char D_L00_001C7040[] __attribute__((nosda));
+extern unsigned char g_effect_slot_records[] __attribute__((nosda));
 
 extern int r1_D_0015EE84_m __asm__("r1_D_0015EE84") MACRO_ADDR;
 
@@ -324,7 +324,7 @@ void level_send_value_to_two_helpers(unsigned long long argument)
    them */
 void level_flush_table_entry_offsets(void)
 {
-    unsigned char *entry = D_L00_001C7040;
+    unsigned char *entry = g_effect_slot_records;
     int i;
     int base;
     short first;
@@ -386,12 +386,12 @@ typedef struct ObjectRenderClass_FF6A8 {
     u16 class_slot;
     f32 scale;
 } ObjectRenderClass_FF6A8;
-extern s32 D_L00_001B2510 __attribute__((sda));
-extern ObjectRenderClass_FF6A8 *D_L00_00226700[];
-extern s16 D_L00_00226900[];
-extern u8 D_L00_00226A00[];
-extern s32 D_L00_0022DA00[];
-extern MaterialMap_04340 D_L00_0022DE00[];
+extern s32 g_render_class_slot_count __attribute__((sda));
+extern ObjectRenderClass_FF6A8 *g_tie_class_table[];
+extern s16 g_tie_class_ids[];
+extern u8 g_tie_slot_by_class[];
+extern s32 g_tie_fixed_thresholds[];
+extern MaterialMap_04340 g_tie_material_maps[];
 
 /* Registers an object (TIE) render class: slot and id tables, its fixed distance threshold,
  * relocates its LOD tables and packets, copies its material map and rewrites each packet's
@@ -409,14 +409,14 @@ void RegisterObjectRenderClass(ObjectRenderClass_FF6A8 *render_class, ResidentRe
     u8 *slot_materials;
     ObjectRenderPacket_FF6A8 *packet, *packets;
 
-    D_L00_00226900[D_L00_001B2510] = class_id;
-    D_L00_00226A00[class_id] = D_L00_001B2510;
-    D_L00_00226700[D_L00_001B2510] = render_class;
-    render_class->class_slot = D_L00_001B2510;
+    g_tie_class_ids[g_render_class_slot_count] = class_id;
+    g_tie_slot_by_class[class_id] = g_render_class_slot_count;
+    g_tie_class_table[g_render_class_slot_count] = render_class;
+    render_class->class_slot = g_render_class_slot_count;
     fixed_threshold = FloatToInt(render_class->scale * 1024.0f);
-    slot = D_L00_001B2510;
-    D_L00_001B2510 = slot + 1;
-    D_L00_0022DA00[slot] = fixed_threshold;
+    slot = g_render_class_slot_count;
+    g_render_class_slot_count = slot + 1;
+    g_tie_fixed_thresholds[slot] = fixed_threshold;
     render_class->first_instance = 0;
     render_class->instance_count = 0;
     for (lod = 0; lod < 3; lod++) {
@@ -434,7 +434,7 @@ void RegisterObjectRenderClass(ObjectRenderClass_FF6A8 *render_class, ResidentRe
     render_class->unk34 = (u8 *)((s32)render_class->unk34 + (s32)render_class);
     packets = render_class->packets = (ObjectRenderPacket_FF6A8 *)((s32)render_class->packets + (s32)render_class);
     render_class->unk30 = 0;
-    slot_materials = (u8 *)&D_L00_0022DE00[D_L00_00226A00[class_id]];
+    slot_materials = (u8 *)&g_tie_material_maps[g_tie_slot_by_class[class_id]];
     qcopy(slot_materials, material_map);
     packet = packets;
     for (packet_index = 0; packet_index < render_class->packet_count; packet_index++, packet++) {
@@ -458,7 +458,7 @@ void RegisterObjectRenderClass(ObjectRenderClass_FF6A8 *render_class, ResidentRe
             if (width_units_128 <= 0) width_units_128 = 1;
             width_log2 = log2dim(width_bits >> 16);
             height_log2 = log2dim(texture->height);
-            gs_block_base = D_001A72F4 >> 8;
+            gs_block_base = g_vram_clut_third >> 8;
             mip_block_1 = texture->mip_block_offset_1 + gs_block_base;
             mip_block_0 = texture->mip_block_offset_0 + gs_block_base;
             width_bits = texture->clut_block_offset + gs_block_base;
@@ -472,9 +472,9 @@ void RegisterObjectRenderClass(ObjectRenderClass_FF6A8 *render_class, ResidentRe
             packet->miptbp1 = mip_word;
             packet->clamp.d = clamp_word;
         } else {
-            u64 template_tex0 = D_L00_001C91C0[material_index * 3];
-            u64 template_tex1 = D_L00_001C91C0[material_index * 3 + 1];
-            u64 template_mip = D_L00_001C91C0[material_index * 3 + 2];
+            u64 template_tex0 = g_gs_register_packet[material_index * 3];
+            u64 template_tex1 = g_gs_register_packet[material_index * 3 + 1];
+            u64 template_mip = g_gs_register_packet[material_index * 3 + 2];
             u64 draw_bits = ((u64)draw_shift << 6) | 0x20;
             u64 template_draw_word = (template_tex1 & 0x1C) | draw_bits | ((u64)draw_high << 32);
             u64 template_clamp_word = (u64)clamp_low | ((u64)clamp_shift << 2) | ((u64)material_index << 24);
@@ -502,13 +502,13 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
     ShrubRenderGroupHeader_04340 *group_header;
     ShrubRenderPacket_04340 *packet;
 
-    D_L00_0021EBA0[class_id] = D_L00_001B23F0;
-    D_L00_0021EB20[D_L00_001B23F0] = class_id;
-    D_L00_0021EA20[D_L00_001B23F0] = render_class;
-    render_class->class_slot = D_L00_001B23F0;
+    g_shrub_slot_by_class[class_id] = g_class_slot_counter;
+    g_shrub_class_ids[g_class_slot_counter] = class_id;
+    g_shrub_l00_class_table[g_class_slot_counter] = render_class;
+    render_class->class_slot = g_class_slot_counter;
     fixed_threshold = FloatToInt(render_class->scale * 1024.0f);
-    D_L00_002203A0[D_L00_001B23F0] = fixed_threshold;
-    D_L00_001B23F0++;
+    g_shrub_fixed_thresholds[g_class_slot_counter] = fixed_threshold;
+    g_class_slot_counter++;
     render_class->first_instance = 0;
     render_class->instance_count = 0;
     if (render_class->packed_geometry != 0) {
@@ -555,7 +555,7 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
             height_log2 = log2dim(mip_texture->height);
             draw_control_count = mip_texture->draw_control_count;
             texture_block = mip_texture->texture_block_offset;
-            gs_block_base = D_001A72F4 >> 8;
+            gs_block_base = g_vram_clut_third >> 8;
             palette_block = mip_texture->palette_block_offset + gs_block_base;
             mip_block_0 = mip_texture->mip_block_offset_0 + gs_block_base;
             mip_block_1 = mip_texture->mip_block_offset_1 + gs_block_base;
@@ -577,12 +577,12 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
             u64 draw_bits;
             u64 template_draw_word;
 
-            for (template_index = 0; D_L00_001C91C0[(template_index + 1) * 3] != 0; template_index++) {
+            for (template_index = 0; g_gs_register_packet[(template_index + 1) * 3] != 0; template_index++) {
             }
-            template_tex0 = D_L00_001C91C0[template_index * 3];
+            template_tex0 = g_gs_register_packet[template_index * 3];
             template_slot = template_index * 3;
-            template_tex1 = D_L00_001C91C0[template_slot + 1];
-            template_mip = D_L00_001C91C0[template_slot + 2];
+            template_tex1 = g_gs_register_packet[template_slot + 1];
+            template_mip = g_gs_register_packet[template_slot + 2];
             draw_bits = ((u64)material_shift << 6) | 0x20;
             template_draw_word = (template_tex1 & 0x1C) | draw_bits | ((u64)material_base << 32);
             mip_packet->tex0.d = template_tex0;
@@ -590,7 +590,7 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
             mip_packet->tex1.d = template_draw_word;
         }
     }
-    slot_materials = &D_L00_002209A0[D_L00_0021EBA0[class_id]];
+    slot_materials = &g_shrub_material_maps[g_shrub_slot_by_class[class_id]];
     qcopy(slot_materials, material_map);
     for (group_index = 0; group_index < render_class->group_count; group_index++) {
         group_header = &render_class->groups[group_index].group->group_header;
@@ -635,7 +635,7 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
                 }
                 width_log2 = log2dim(width_bits >> 16);
                 height_log2 = log2dim(texture->height);
-                gs_block_base = D_001A72F4 >> 8;
+                gs_block_base = g_vram_clut_third >> 8;
                 draw_control_count = texture->draw_control_count;
                 width_bits = texture->clut_block_offset + gs_block_base;
                 mip_block_0 = texture->mip_block_offset_0 + gs_block_base;
@@ -657,10 +657,10 @@ void RegisterShrubRenderClass(ShrubRenderClass_04340 *render_class, ResidentRend
                 u64 template_draw_word;
                 u64 template_clamp_word;
 
-                template_tex0 = D_L00_001C91C0[material_index * 3];
+                template_tex0 = g_gs_register_packet[material_index * 3];
                 template_index = material_index * 3;
-                template_tex1 = D_L00_001C91C0[template_index + 1];
-                template_mip = D_L00_001C91C0[template_index + 2];
+                template_tex1 = g_gs_register_packet[template_index + 1];
+                template_mip = g_gs_register_packet[template_index + 2];
                 draw_bits = ((u64)draw_shift << 6) | 0x20;
                 template_draw_word = (template_tex1 & 0x1C) | draw_bits | ((u64)draw_high << 32);
                 template_clamp_word = (u64)material_base | ((u64)material_shift << 2) | ((u64)material_index << 24);
@@ -720,7 +720,7 @@ void PrintMobyClassSizes(int *records, int count, int end)
     {
         int j;
         for (j = 0; j < n; j++)
-            STUB_printf(D_L00_001A95A0, FloatToInt(values[j].id), __extendsfdf2(values[j].weight));
+            STUB_printf(g_str_table_entry_format, FloatToInt(values[j].id), __extendsfdf2(values[j].weight));
     }
 }
 
@@ -733,7 +733,7 @@ void level_do_nothing_stub_b(void)
 
 /* func_L00_003032F0 is matched in L00_003032F0.c (built with -fno-gcse). */
 
-extern unsigned char D_L00_001C9340[];
+extern unsigned char g_tutorial_points[];
 
 extern int vec_fast_helper_f(void *, void *, void *);
 
@@ -741,7 +741,7 @@ extern int vec_fast_helper_f(void *, void *, void *);
    index of the first entry the shared test accepts, zero when none does. */
 int level_find_first_accepted_entry(unsigned char *object)
 {
-    unsigned char *data = D_L00_001C9340;
+    unsigned char *data = g_tutorial_points;
     int i = *(int *)(data + 0xC) - 1;
 
     if (i >= 0) {
@@ -770,7 +770,7 @@ int level_find_first_accepted_entry(unsigned char *object)
 int load_queue_level_data_chunk(int index)
 {
     int j = index + 1;
-    int *d = D_L00_001BCAC0;
+    int *d = g_tutorial_probe_context;
     int *b = g_copy_setup_data;
     int *t = (int *)((char *)b + 25416);
     int n = d[12] * 332;
@@ -840,8 +840,8 @@ typedef struct {
     Ent_308700 e[8];
 } Cache_308700;
 
-extern Cache_308700 D_L00_001C93A0;
-extern int D_L00_001B18D8[] __attribute__((sda));
+extern Cache_308700 g_format_root;
+extern int g_ring_animation_counter[] __attribute__((sda));
 extern void decode_map_rle_row(unsigned char *, int, unsigned char *, short *);
 
 /* Looks for a key in a small cache of eight entries. If it is missing, it loads it over the oldest entry. Then it moves the entry to the front and returns 1 if it had to load it. */
@@ -851,25 +851,25 @@ int level_lookup_cache_entry(int key)
     int best;
     int i;
 
-    if (D_L00_001C93A0.active == 0)
+    if (g_format_root.active == 0)
         return 0;
     do {
         found = 0;
         best = 0;
         for (i = 0; i < 8; ++i) {
-            if (D_L00_001C93A0.e[i].s.key == key)
+            if (g_format_root.e[i].s.key == key)
                 break;
-            if (D_L00_001C93A0.e[i].s.age < *(int *)((unsigned char *)&D_L00_001C93A0 + 0x34 + best * 16))
+            if (g_format_root.e[i].s.age < *(int *)((unsigned char *)&g_format_root + 0x34 + best * 16))
                 best = i;
         }
         do {
             if (i == 8) {
-                Cache_308700 *c = &D_L00_001C93A0;
+                Cache_308700 *c = &g_format_root;
                 unsigned char **dp = &c->e[0].s.data;
                 Ent_308700 *e;
                 Ent_308700 *e0;
                 int off = best << 4;
-                decode_map_rle_row(*(unsigned char **)((char *)dp + off), key, D_L00_001C93A0.base, c->info);
+                decode_map_rle_row(*(unsigned char **)((char *)dp + off), key, g_format_root.base, c->info);
                 e0 = c->e;
                 e = (Ent_308700 *)((char *)e0 + off);
                 e->s.key = key;
@@ -878,14 +878,14 @@ int level_lookup_cache_entry(int key)
             }
         } while (0);
         if (i != 0) {
-            Ent_308700 *base = D_L00_001C93A0.e;
+            Ent_308700 *base = g_format_root.e;
             Ent_308700 *other = base + i;
             Q128 tmp = other->q;
             other->q = base->q;
             base->q = tmp;
         }
     } while (0);
-    D_L00_001C93A0.e[0].s.age = D_L00_001B18D8[0];
+    g_format_root.e[0].s.age = g_ring_animation_counter[0];
     return found;
 }
 
@@ -1541,10 +1541,10 @@ void level_count_active_records(void)
     unsigned char *p;
     int seen = 0;
 
-    D_L05_001B2440 = 0;
-    for (p = D_L05_001B2520; p < D_L05_001B2524; p += 256) {
-        if ((p[32] >= 254 && *(unsigned int *)(p + 160) <= D_L05_001B2048) || seen) {
-            D_L05_001B2440++;
+    g_active_record_count = 0;
+    for (p = g_record_pool_start; p < g_record_pool_end; p += 256) {
+        if ((p[32] >= 254 && *(unsigned int *)(p + 160) <= g_feltzin_mission_index) || seen) {
+            g_active_record_count++;
             if (p[32] == 0xff)
                 seen = 1;
         }
@@ -1573,14 +1573,14 @@ Slot0820eb11 *allocate_moby_animation_slot(Ctx *ctx, int index)
     unsigned char *p;
 
     for (i = 0; i < 6; i++) {
-        if (D_L03_001D23C0[i].f04 == 0) {
+        if (g_moby_animation_slots[i].f04 == 0) {
             break;
         }
     }
-    slot = &D_L03_001D23C0[i];
+    slot = &g_moby_animation_slots[i];
     slot->f04 = 1;
     slot->f00 = index;
-    slot->f10 = (int)(D_L03_001CA5C0 + i * 5376);
+    slot->f10 = (int)(g_moby_animation_buffers + i * 5376);
     slot->f14 = (int)ctx->f24;
     p = (unsigned char *)*(unsigned int *)(ctx->f24->f1C + (short)index * 4 + 4);
     slot->f02 = p[2];

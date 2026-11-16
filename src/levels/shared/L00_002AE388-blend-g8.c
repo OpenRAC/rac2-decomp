@@ -48,13 +48,13 @@ extern struct {
  float f6d4;
  float f6d8;
 } D_L00_0025BE10;
-extern int D_L00_001A7D00[2] __attribute__((sda));
-extern unsigned char D_L00_001DA860[];
-extern int D_L00_001D9F00[];
+extern int g_hero_item_anim_ids[2] __attribute__((sda));
+extern unsigned char g_class_slot_indices[];
+extern int g_sound_bank_table[];
 typedef struct { char data[0x600]; } LargeBufferAED68;
 typedef struct { char data[0x400]; } SmallBufferAED68;
-extern LargeBufferAED68 D_L00_001B5C00[];
-extern SmallBufferAED68 D_L00_001B3400[];
+extern LargeBufferAED68 g_item_large_anim_buffers[];
+extern SmallBufferAED68 g_item_small_anim_buffers[];
 extern float ApproachValue(float *,float,float);
 extern void release_moby_animation_slot(void *,void *);
 extern SlotAED68 *allocate_moby_animation_slot(void *,int);
@@ -83,9 +83,9 @@ void update_hero_item_slot_animation_blends(void)
    if(enabled) {
     StateAED68 *h=&D_00189E20_26;
     if(!D_00189E20_26.slots[i]) {
-     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,D_L00_001A7D00[i]);
+     D_00189E20_26.slots[i]=allocate_moby_animation_slot(h->f2290,g_hero_item_anim_ids[i]);
      D_00189E20_26.slots[i]->opacity=0.0f;
-     D_00189E20_26.slots[i]->icon=D_L00_001D9F00[D_L00_001DA860[i+1]];
+     D_00189E20_26.slots[i]->icon=g_sound_bank_table[g_class_slot_indices[i+1]];
     }
    } else {
     StateAED68 *h=&D_00189E20_26;
@@ -109,9 +109,9 @@ void update_hero_item_slot_animation_blends(void)
   active=hero_get_item_aim_adjustment(state->f2290->modes[1],&amount);
   if(active || slot->active) {
    if(amount!=0.0f) {
-    D_L00_0025BE10.f6d4=0.05f; D_L00_0025BE10.f6d8=0.3f;
-    D_L00_0025BE10.f694=amount; D_L00_0025BE10.f5e4=amount;
-    D_L00_0025BE10.f624=0.05f; D_L00_0025BE10.f628=0.3f;
+    g_hero_item_attach_records.f6d4=0.05f; g_hero_item_attach_records.f6d8=0.3f;
+    g_hero_item_attach_records.f694=amount; g_hero_item_attach_records.f5e4=amount;
+    g_hero_item_attach_records.f624=0.05f; g_hero_item_attach_records.f628=0.3f;
    }
    if(active && (!slot->active || slot->modes[1])) {
      if(slot->modes[0]==slot->modes[1] || slot->progress>0.5f) { slot->modes[0]=slot->modes[1]; slot->ids[0]=slot->ids[1]; }
@@ -129,8 +129,8 @@ void update_hero_item_slot_animation_blends(void)
    } else slot->scale=1.0f;
    { int k;
    for(k=0;k<2;k++) {
-    if(slot->modes[k]<23) { slot->flags[k]=1; slot->buffers[k]=&D_L00_001B3400[i*2+k]; }
-    else { slot->flags[k]=0; slot->buffers[k]=&D_L00_001B5C00[i*2+k]; }
+    if(slot->modes[k]<23) { slot->flags[k]=1; slot->buffers[k]=&g_item_small_anim_buffers[i*2+k]; }
+    else { slot->flags[k]=0; slot->buffers[k]=&g_item_large_anim_buffers[i*2+k]; }
    }
    }
    AdvanceAndDecodeAnimationFrames(state->f2290,slot);
@@ -154,8 +154,8 @@ void update_hero_item_slot_animation_blends(void)
    }
    { int l;
    for(l=0;l<2;l++) {
-    if(slot->modes[l]<23) { slot->flags[l]=1; slot->buffers[l]=&D_L00_001B3400[i*2+l]; }
-    else { slot->flags[l]=0; slot->buffers[l]=&D_L00_001B5C00[i*2+l]; }
+    if(slot->modes[l]<23) { slot->flags[l]=1; slot->buffers[l]=&g_item_small_anim_buffers[i*2+l]; }
+    else { slot->flags[l]=0; slot->buffers[l]=&g_item_large_anim_buffers[i*2+l]; }
    }
    }
    AdvanceAndDecodeAnimationFrames(state->f2290,slot);

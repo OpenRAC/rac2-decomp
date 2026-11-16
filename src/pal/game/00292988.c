@@ -7,8 +7,8 @@
 extern int log2dim(int);
 typedef struct { long w[12]; } GsLoadImage __attribute__((aligned(16)));
 extern void gfx_wait_for_dma_status_bits(unsigned long);
-extern short func_PAL_002B8898(int);
-extern int func_PAL_002B8838(void *, int, int);
+extern short snd_pump_music_and_disc_read_pal(int);
+extern int load_read_disc_with_pause_pal(void *, int, int);
 extern int func_00126288(GsLoadImage *, short, short, short, short, short, short, short);
 extern void FlushCache(int);
 extern int sceGsExecLoadImage(GsLoadImage *, void *);
@@ -21,7 +21,7 @@ typedef struct {
     DiscPack packs[9];        /* 0x4F08 */
 } DiscToc;
 extern DiscToc g_copy_setup_data;
-extern unsigned long long D_001A72A0[] __attribute__((sda));
+extern unsigned long long g_tex_fill_table[] __attribute__((sda));
 
 #define LOAD_BUFFER (*(int **)0x001A7314)
 #define LOAD_COUNT (*(int *)0x001A7318)
@@ -53,7 +53,7 @@ typedef struct {
    D_001A72A0. The pack's first part then replaces the buffer's contents.
    The buffer, the count, the VRAM cursors and the flags are words addressed
    absolutely. */
-void func_PAL_00292988(int pack)
+void tex_load_pack_to_vram_pal(int pack)
 {
     GsLoadImage work;
     TextureRecord *record;
@@ -73,7 +73,7 @@ void func_PAL_00292988(int pack)
 
     gfx_wait_for_dma_status_bits(1);
     buffer = LOAD_BUFFER;
-    func_PAL_002B8898(1);
+    snd_pump_music_and_disc_read_pal(1);
 
     if (PACK_FLAG_6)
         pack = 6;
@@ -85,7 +85,7 @@ void func_PAL_00292988(int pack)
         pack = 5;
 
     cursor = buffer + 1;
-    func_PAL_002B8838(buffer, g_copy_setup_data.packs[pack].sector2 + g_copy_setup_data.base,
+    load_read_disc_with_pause_pal(buffer, g_copy_setup_data.packs[pack].sector2 + g_copy_setup_data.base,
                   g_copy_setup_data.packs[pack].size2);
 
     image_vram = IMAGE_VRAM;
@@ -116,11 +116,11 @@ void func_PAL_00292988(int pack)
         tag |= (unsigned long long)n << 30;
         f = ((unsigned long long)clut_page << 37) | 0x400000000ULL;
         tag |= f;
-        D_001A72A0[i] = tag | 0x8000000000000000ULL;
+        g_tex_fill_table[i] = tag | 0x8000000000000000ULL;
         image_vram += record->width * record->height * 4;
         cursor++;
     }
 
-    func_PAL_002B8838(buffer, g_copy_setup_data.packs[pack].sector + g_copy_setup_data.base,
+    load_read_disc_with_pause_pal(buffer, g_copy_setup_data.packs[pack].sector + g_copy_setup_data.base,
                   g_copy_setup_data.packs[pack].size);
 }

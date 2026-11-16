@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern f32 D_L05_001AEBE8 __attribute__((sda));
-extern f32 D_L05_001AEBE4 __attribute__((sda));
-extern f32 D_L05_001AEBE0 __attribute__((sda));
-extern f32 D_L05_001AEBDC __attribute__((sda));
+extern f32 g_homing_hit_value_b __attribute__((sda));
+extern f32 g_homing_hit_value_a __attribute__((sda));
+extern f32 g_homing_speed_alt __attribute__((sda));
+extern f32 g_homing_speed_normal __attribute__((sda));
 
 typedef struct { f32 a, b, c, d; } SpawnVector97F48;
 
@@ -30,9 +30,9 @@ void SubmitFlightStateHitRecord(s32 owner, char *state, char *position)
     t.s14 = 0x810000;
     t.s10 = owner;
     if (*(s32 *)(state + 0x24))
-        t.f1C = D_L05_001AEBE8;
+        t.f1C = g_homing_hit_value_b;
     else
-        t.f1C = D_L05_001AEBE4;
+        t.f1C = g_homing_hit_value_a;
     t.s20 = 1;
     qcopy(&t.v, state);
     vec_scale_to_length(&t, &t, 1.0f);
@@ -42,5 +42,5 @@ void SubmitFlightStateHitRecord(s32 owner, char *state, char *position)
     t.b19 = 2;
     t.h1A = id;
     coll_process_hit(position, 1, *(s32 *)(state + 0x20), &t,
-                  *(s32 *)(state + 0x24) ? D_L05_001AEBE0 : D_L05_001AEBDC);
+                  *(s32 *)(state + 0x24) ? g_homing_speed_alt : g_homing_speed_normal);
 }

@@ -16,22 +16,22 @@ typedef struct {
     f32 age;
 } Vars;
 
-extern u8 *D_L12_001B090C;
-extern u8 *D_L12_001B1360 MACRO_ADDR;
+extern u8 *g_tracked_object_ptr;
+extern u8 *g_second_tracked_object MACRO_ADDR;
 extern V g_hero_position;
-extern V D_L12_001A8F20 MACRO_ADDR;
-extern f32 D_L12_001B1C78 __attribute__((sda));
-extern f32 D_L12_001B1C7C __attribute__((sda));
-extern f32 D_L12_001B1C80 __attribute__((sda));
-extern f32 D_L12_001B1C84 __attribute__((sda));
-extern f32 D_L12_001B1C88 __attribute__((sda));
-extern s32 D_L12_001B1C94 __attribute__((sda));
-extern s32 D_L12_001B1C98 __attribute__((sda));
-extern f32 D_L12_001B1C9C __attribute__((sda));
-extern f32 D_L12_001B1CA0 __attribute__((sda));
-extern f32 D_L12_001B1CA4 __attribute__((sda));
-extern s32 D_L12_001B1CA8 __attribute__((sda));
-extern s32 D_L12_001B1CAC __attribute__((sda));
+extern V g_zero_l12_vec MACRO_ADDR;
+extern f32 g_ring_blast_start_radius __attribute__((sda));
+extern f32 g_ring_blast_hero_range __attribute__((sda));
+extern f32 g_ring_blast_max_radius __attribute__((sda));
+extern f32 g_ring_blast_duration_seconds __attribute__((sda));
+extern f32 g_ring_blast_expand_speed __attribute__((sda));
+extern s32 g_ring_blast_spark_color_a __attribute__((sda));
+extern s32 g_ring_blast_spark_color_b __attribute__((sda));
+extern f32 g_ring_blast_spark_size_min __attribute__((sda));
+extern f32 g_ring_blast_spark_size_max __attribute__((sda));
+extern f32 g_ring_blast_spark_angle_range __attribute__((sda));
+extern s32 g_ring_blast_spark_count __attribute__((sda));
+extern s32 g_ring_blast_spark_enabled __attribute__((sda));
 extern void DrawAnimatedRings(void *);
 extern s32 tracked_object_is_open(void);
 extern void tracked_moby_set_state(s32, s32);
@@ -87,14 +87,14 @@ void expanding_ring_blast_update(Obj *self)
         f32 distance;
         distance = 100000;
         if (tracked_object_is_open())
-            distance = fast_vec_dist(&self->position, D_L12_001B090C + 0x10);
+            distance = fast_vec_dist(&self->position, g_tracked_object_ptr + 0x10);
         else if (second_tracked_object_is_open())
-            distance = fast_vec_dist(&self->position, D_L12_001B1360 + 0x10);
-        if (vec_distance_xy(&self->position, &g_hero_position) < D_L12_001B1C7C ||
-           part_find_owned_effect_slot(self, 0x30000, 0) || distance < D_L12_001B1C7C * 0.5f) {
+            distance = fast_vec_dist(&self->position, g_second_tracked_object + 0x10);
+        if (vec_distance_xy(&self->position, &g_hero_position) < g_ring_blast_hero_range ||
+           part_find_owned_effect_slot(self, 0x30000, 0) || distance < g_ring_blast_hero_range * 0.5f) {
             self->state = 2;
-            vars->timer = FloatToInt(D_L12_001B1C84 * 60);
-            vars->radius = D_L12_001B1C78;
+            vars->timer = FloatToInt(g_ring_blast_duration_seconds * 60);
+            vars->radius = g_ring_blast_start_radius;
             vars->age = 0;
         }
         break;
@@ -106,12 +106,12 @@ void expanding_ring_blast_update(Obj *self)
         if (flag_set_first_pending(self))
             PlayMobySound(0, 0, self);
         gfx_add_draw_callback_first(DrawAnimatedRings, self);
-        vars->age += D_L12_001B1C88 * 0.016666668f;
+        vars->age += g_ring_blast_expand_speed * 0.016666668f;
         math_step_value_toward_target(&self->position.z, &vars->heightSpeed, vars->origin.z + 0.5f, 1, 0.008333334f, 1);
         ApproachValue(&vars->angularSpeed, 0.4188791f, 0.1f);
         self->rotation[2] = FastAddRotations(self->rotation[2], vars->angularSpeed);
-        step = D_L12_001B1C88 * 0.016666668f;
-        ratio = D_L12_001B1C80 / step;
+        step = g_ring_blast_expand_speed * 0.016666668f;
+        ratio = g_ring_blast_max_radius / step;
         angle = math_random_float_range(-15, 15) * 0.017453294f;
         sine = math_fast_sin_or_cos_b(angle);
         cosine = math_fast_sin_or_cos_a(angle);
@@ -120,19 +120,19 @@ void expanding_ring_blast_update(Obj *self)
         vec.y = math_fast_sin_or_cos_b(angle) * cosine;
         vec.z = sine;
         vec_scale_to_length(&vec, &vec, step);
-        color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, math_random_float_range(0, 1));
-        size = math_random_float_range(D_L12_001B1C9C, D_L12_001B1CA0);
+        color = FastTweenColor(g_ring_blast_spark_color_a, g_ring_blast_spark_color_b, math_random_float_range(0, 1));
+        size = math_random_float_range(g_ring_blast_spark_size_min, g_ring_blast_spark_size_max);
         life = FloatToInt(math_random_float_range(1, 1.5f) * 7) & 255;
         alpha = math_random_int_below(255) & 255;
         part_spawn_hero_relative(&self->position, &vec, color, size, life, alpha, 0);
         if (math_fast_float_d(&vars->timer)) {
             self->state = 3;
             vars->timer = 20;
-            for (i = 0; i < D_L12_001B1CA8; i++) {
+            for (i = 0; i < g_ring_blast_spark_count; i++) {
                 f32 angle, sine, cosine, size;
                 s32 color;
                 u8 life, alpha;
-                angle = math_random_float_range(-D_L12_001B1CA4, D_L12_001B1CA4) * 0.017453294f;
+                angle = math_random_float_range(-g_ring_blast_spark_angle_range, g_ring_blast_spark_angle_range) * 0.017453294f;
                 sine = math_fast_sin_or_cos_b(angle);
                 cosine = math_fast_sin_or_cos_a(angle);
                 angle = math_random_angle();
@@ -140,15 +140,15 @@ void expanding_ring_blast_update(Obj *self)
                 vec.y = math_fast_sin_or_cos_b(angle) * cosine;
                 vec.z = sine;
                 vec_scale_to_length(&vec, &vec, step);
-                color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, math_random_float_range(0, 1));
-                size = math_random_float_range(D_L12_001B1C9C, D_L12_001B1CA0);
+                color = FastTweenColor(g_ring_blast_spark_color_a, g_ring_blast_spark_color_b, math_random_float_range(0, 1));
+                size = math_random_float_range(g_ring_blast_spark_size_min, g_ring_blast_spark_size_max);
                 life = FloatToInt(ratio * math_random_float_range(1, 1.5f)) & 255;
                 alpha = math_random_int_below(255) & 255;
                 part_spawn_hero_relative(&self->position, &vec, color, size, life, alpha, 0);
             }
             vec_random_direction(&vec, 0.016666668f, 0.033333335f);
             vec.z = math_random_float_range(5, 8) * 0.016666668f;
-            part_spawn_flying_fragment(self, 0xFF6, &self->position, self->rotation, 0, 0, &vec, &D_L12_001A8F20, &D_L12_001A8F20, 0);
+            part_spawn_flying_fragment(self, 0xFF6, &self->position, self->rotation, 0, 0, &vec, &g_zero_l12_vec, &g_zero_l12_vec, 0);
         }
         break;
     }
@@ -157,8 +157,8 @@ void expanding_ring_blast_update(Obj *self)
         s32 i;
         self->flags = (self->flags | 0x41) & 0xEFFF;
         self->collision = 0;
-        if (D_L12_001B1C80 < vars->radius) {
-            if (D_L12_001B1CAC) {
+        if (g_ring_blast_max_radius < vars->radius) {
+            if (g_ring_blast_spark_enabled) {
                 self->flags = (self->flags & 0xEFBE) | 0x1000;
                 self->collision = *(s32 *)(self->classData + 0x10);
                 qcopy(&self->position, &vars->origin);
@@ -169,10 +169,10 @@ void expanding_ring_blast_update(Obj *self)
             break;
         }
         gfx_add_draw_callback_first(DrawAnimatedRings, self);
-        step = D_L12_001B1C88 * 0.016666668f;
+        step = g_ring_blast_expand_speed * 0.016666668f;
         vars->radius += step;
         vars->age += step;
-        make_hit_descriptor(damage, self, 0x10001, (f32)vars->damage, &D_L12_001A8F20);
+        make_hit_descriptor(damage, self, 0x10001, (f32)vars->damage, &g_zero_l12_vec);
         angle = 0;
         vec.x = math_fast_sin_or_cos_a(angle) * vars->radius;
         vec.y = math_fast_sin_or_cos_b(angle) * vars->radius;
@@ -188,9 +188,9 @@ void expanding_ring_blast_update(Obj *self)
             angle = FastAddRotations(angle, 0.52359885f);
             qcopy(&vec, &next);
         }
-        if (tracked_object_is_open() && fast_vec_dist(&self->position, D_L12_001B090C + 0x10) < vars->radius)
+        if (tracked_object_is_open() && fast_vec_dist(&self->position, g_tracked_object_ptr + 0x10) < vars->radius)
             tracked_moby_set_state(1, 0);
-        if (second_tracked_object_is_open() && fast_vec_dist(&self->position, D_L12_001B1360 + 0x10) < vars->radius)
+        if (second_tracked_object_is_open() && fast_vec_dist(&self->position, g_second_tracked_object + 0x10) < vars->radius)
             global_object_start(1, 0);
         break;
     }

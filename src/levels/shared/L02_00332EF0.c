@@ -3,7 +3,7 @@
 typedef int Quad_L02_00332EF0 __attribute__((mode(TI)));
 extern void coll_probe_ground_ahead(void *, void *);
 extern float fast_vec_dist(void *, void *);
-extern u8 D_L02_001B3210[] MACRO_ADDR;
+extern u8 g_arena_anchor_pos[] MACRO_ADDR;
 extern float math_facing_angle_from_vector(void *, void *, const void *);
 extern float vec_get_vertical_offset(void *, void *, void *);
 extern void vec_add_transformed_point(void *, void *, float, float, float);
@@ -42,7 +42,7 @@ void coll_update_ground_contact(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, 
 
     changed = 0;
     coll_probe_ground_ahead(self, ctl);
-    dist = fast_vec_dist(self->pos, D_L02_001B3210);
+    dist = fast_vec_dist(self->pos, g_arena_anchor_pos);
     if (dist < ctl->f90 - ctl->f08) {
         changed = 1;
         ctl->flags94 |= 2;
@@ -63,7 +63,7 @@ void coll_update_ground_contact(Self_L02_00332EF0 *self, Ctl_L02_00332EF0 *ctl, 
     if (changed) {
         *(Quad_L02_00332EF0 *)position = *(Quad_L02_00332EF0 *)newpos;
         coll_probe_ground_ahead(self, ctl);
-        dist = fast_vec_dist(position, D_L02_001B3210);
+        dist = fast_vec_dist(position, g_arena_anchor_pos);
     }
     if (dist <= ctl->f90 + 0.005f) {
         vec_get_vertical_offset(self, ctl->vA0, 0);

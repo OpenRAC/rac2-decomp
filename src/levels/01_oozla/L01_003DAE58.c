@@ -39,7 +39,7 @@ extern void MobySpringTurn(void *, f32, f32, f32, f32, void *);
 extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, s32);
 extern int coll_test_hit_at_bone(void *, s32, s32, s32, s32, s32, f32, f32, f32);
 extern u8 g_hero_state[];
-extern u8 D_L01_001AC5A0[] MACRO_ADDR;
+extern u8 g_monster_vector_template[] MACRO_ADDR;
 
 /* A 16-bit struct stays in HImode, so a local copy loads with lhu and tests with sll. */
 typedef struct { s16 value; } Timer16;
@@ -311,7 +311,7 @@ void muckdweller_update(u8 *obj)
 
             if (target && !level_has_pending_inner_flag(target)) {
                 v = pos;
-                qcopy(v, D_L01_001AC5A0);
+                qcopy(v, g_monster_vector_template);
             } else
                 vec_scale_to_length(pos, state + 0x210, 1);
             v = pos;

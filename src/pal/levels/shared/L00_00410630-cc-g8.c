@@ -10,7 +10,7 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; short h[0x1300]; int i[0x980]; float f[0x980]; char *ptr[0x980]; TI128 q[0x260]; } Hero;
 extern Hero g_hero_state;
 typedef union { unsigned char b[0x400]; short h[0x200]; int i[0x100]; float f[0x100]; char *p[0x100]; TI128 q[0x40]; } Blk;
-extern Blk D_0018BE30;
+extern Blk g_hero_aim_vector;
 extern Blk g_item_slot_to_record;
 typedef struct {
     unsigned char pad0[4];
@@ -21,16 +21,16 @@ typedef struct {
 } ClassEntry;
 extern ClassEntry g_weapon_l00_table[];
 extern Blk g_collision_result;
-extern Blk D_L00_001FE940;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern unsigned char *D_L00_001FE9F4[];
-extern float D_L00_001B1008 __attribute__((sda));
-extern float D_L00_001B1000 __attribute__((sda));
-extern int D_L00_001B0FE4 __attribute__((sda));
-extern int D_L00_001B0FEC __attribute__((sda));
-extern int D_L00_001B0FF0 __attribute__((sda));
-extern int D_L00_001B0FE8 __attribute__((sda));
-extern int D_L00_001B0FF4 __attribute__((sda));
+extern Blk g_effect_definitions;
+extern char g_default_vector[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_a[];
+extern float g_clank_zapper_aim_drop __attribute__((sda));
+extern float g_clank_zapper_cone_angle __attribute__((sda));
+extern int g_clank_zapper_timer __attribute__((sda));
+extern int g_clank_zapper_particle_param_a __attribute__((sda));
+extern int g_clank_zapper_particle_param_b __attribute__((sda));
+extern int g_clank_zapper_particle_kind __attribute__((sda));
+extern int g_clank_zapper_particle_color __attribute__((sda));
 extern int g_frame_l00_counter __attribute__((sda));
 
 extern void cam_compute_view_direction(void *, void *, int);
@@ -52,7 +52,7 @@ extern void gfx_free_point_light(int);
 extern void moby_mark_spawned(void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern int CollLine(void *, void *, int, int, void *);
-extern void func_PAL_L00_00411978(void *, int, int);
+extern void part_spawn_smoke_and_sparks_pal(void *, int, int);
 extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, float);
 extern char *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 extern void func_PAL_L00_0040FF58(void *);
@@ -131,11 +131,11 @@ void func_PAL_L00_00410630(BeamMoby *self)
         r = math_random_float_range(0.0f, -0.7853982448577881f);
     else
         r = math_random_float_range(0.0f, 0.7853982448577881f);
-    qcopy(vars->aim, &D_0018BE30);
-    vars->aim[2] -= D_L00_001B1008;
-    FastVecSub(vars->aim, vars->aim, &D_0018BE30);
+    qcopy(vars->aim, &g_hero_aim_vector);
+    vars->aim[2] -= g_clank_zapper_aim_drop;
+    FastVecSub(vars->aim, vars->aim, &g_hero_aim_vector);
     math_apply_axis_rotation_to_quat(vars->aim, vars->aim, dir, r);
-    FastVecAdd(vars->aim, &D_0018BE30, vars->aim);
+    FastVecAdd(vars->aim, &g_hero_aim_vector, vars->aim);
     t = vars->target;
     if (t != 0) {
         if (t->state == 0xFE) {
@@ -186,39 +186,39 @@ void func_PAL_L00_00410630(BeamMoby *self)
             hit.v[3] = 5627.9248046875f;
             hit.h1A = self->oClass;
         }
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        if (g_clank_zapper_cone_angle * 0.01745329424738884f < ang) {
             if (vars->enabled == 0)
                 { moby_mark_spawned(self); return; }
-            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+            if (CollLine(&g_hero_aim_vector, vars->end, 0, g_hero_aim_vector.i[0x280 / 4], &hit) == 0)
                 { moby_mark_spawned(self); return; }
             if (g_collision_result.i[0x1C / 4] > 0)
                 { moby_mark_spawned(self); return; }
             if (g_collision_result.p[0x18 / 4] == 0)
-                func_PAL_L00_00411978(&g_collision_result.b[0x20], 0xF, 1);
+                part_spawn_smoke_and_sparks_pal(&g_collision_result.b[0x20], 0xF, 1);
             else if (*(int *)(g_collision_result.p[0x18 / 4] + 0x98) != 0)
-                func_PAL_L00_00411978(&g_collision_result.b[0x20], 0xA, 1);
+                part_spawn_smoke_and_sparks_pal(&g_collision_result.b[0x20], 0xA, 1);
             snd_play_from_class_bank(0x15, 0, self, 0);
             self->state = 1;
             self->flags |= 0x41;
-            vars->timer = ((s32)(D_L00_001B0FE4) * 5 + 2) / 6;
+            vars->timer = ((s32)(g_clank_zapper_timer) * 5 + 2) / 6;
         } else {
-            if (CollLine(&D_0018BE30, vars->end, 0, D_0018BE30.i[0x280 / 4], &hit) == 0)
+            if (CollLine(&g_hero_aim_vector, vars->end, 0, g_hero_aim_vector.i[0x280 / 4], &hit) == 0)
                 { moby_mark_spawned(self); return; }
             if (g_collision_result.i[0x1C / 4] > 0)
                 { moby_mark_spawned(self); return; }
             if (g_collision_result.p[0x18 / 4] == 0)
-                func_PAL_L00_00411978(&g_collision_result.b[0x20], 0xF, 0);
+                part_spawn_smoke_and_sparks_pal(&g_collision_result.b[0x20], 0xF, 0);
             else if (*(int *)(g_collision_result.p[0x18 / 4] + 0x98) != 0)
-                func_PAL_L00_00411978(&g_collision_result.b[0x20], 0xA, 0);
+                part_spawn_smoke_and_sparks_pal(&g_collision_result.b[0x20], 0xA, 0);
             snd_play_from_class_bank(0x15, 0, self, 0);
             self->state = 1;
             self->flags |= 0x41;
-            vars->timer = ((s32)(D_L00_001B0FE4) * 5 + 2) / 6;
+            vars->timer = ((s32)(g_clank_zapper_timer) * 5 + 2) / 6;
         }
-        FastVecSub(v40, vars->end, &D_0018BE30);
+        FastVecSub(v40, vars->end, &g_hero_aim_vector);
         vec_scale_to_length(v40, v40, FastVecLength(v40) * 0.5f);
-        FastVecAdd(v40, &D_0018BE30, v40);
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        FastVecAdd(v40, &g_hero_aim_vector, v40);
+        if (g_clank_zapper_cone_angle * 0.01745329424738884f < ang) {
             if (vars->enabled == 0)
                 goto bounds;
             vars->effect = part_l00_alloc_effect_slot_2(v40, 10.0f, 0.0f, 1.0f, 0.1f, 0.1f);
@@ -234,7 +234,7 @@ void func_PAL_L00_00410630(BeamMoby *self)
             moby_mark_spawned(self);
             return;
         }
-        if (D_L00_001B1000 * 0.01745329424738884f < ang) {
+        if (g_clank_zapper_cone_angle * 0.01745329424738884f < ang) {
             if (vars->enabled != 0) {
                 for (i = 0; i < 10; i++) {
                     char *p;
@@ -248,14 +248,14 @@ void func_PAL_L00_00410630(BeamMoby *self)
                     FastVecAdd(v50, vars->right, v50);
                     n = math_random_int_below(0xFF);
                     s3 = math_random_float_range(0.35f, 0.5f);
-                    p = part_spawn_gravity_fade(v40, D_L00_001A8F20, ((s32)(D_L00_001B0FEC) * 5 + 2) / 6, D_L00_001B0FF0, n, 0x30, 0,
+                    p = part_spawn_gravity_fade(v40, g_default_vector, ((s32)(g_clank_zapper_particle_param_a) * 5 + 2) / 6, g_clank_zapper_particle_param_b, n, 0x30, 0,
                                       s3 * 210000.0f, s3 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[7];
-                    p = part_spawn_gravity_fade(v50, D_L00_001A8F20, ((s32)(D_L00_001B0FEC) * 5 + 2) / 6, D_L00_001B0FF0, n, 0x30, 0,
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[7];
+                    p = part_spawn_gravity_fade(v50, g_default_vector, ((s32)(g_clank_zapper_particle_param_a) * 5 + 2) / 6, g_clank_zapper_particle_param_b, n, 0x30, 0,
                                       s3 * 210000.0f, s3 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[7];
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[7];
                 }
                 {
                     int j;
@@ -276,27 +276,27 @@ void func_PAL_L00_00410630(BeamMoby *self)
                     v40[0] += math_random_signed_float_range(0.0f, 0.02f);
                     v40[1] += math_random_signed_float_range(0.0f, 0.02f);
                     v40[2] += math_random_signed_float_range(0.0f, 0.02f);
-                    p = part_spawn_gravity_fade(v40, D_L00_001A8F20, ((s32)(D_L00_001B0FE8) * 5 + 2) / 6, D_L00_001B0FF4, n2, 0x30, 0,
+                    p = part_spawn_gravity_fade(v40, g_default_vector, ((s32)(g_clank_zapper_particle_kind) * 5 + 2) / 6, g_clank_zapper_particle_color, n2, 0x30, 0,
                                       s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[6];
                     s6 *= 0.5f;
-                    p = part_spawn_gravity_fade(v40, D_L00_001A8F20, ((s32)(D_L00_001B0FE8) * 5 + 2) / 6, 0x808080, n2, 0x30, 0,
+                    p = part_spawn_gravity_fade(v40, g_default_vector, ((s32)(g_clank_zapper_particle_kind) * 5 + 2) / 6, 0x808080, n2, 0x30, 0,
                                       s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[6];
                     v50[0] += math_random_signed_float_range(0.0f, 0.02f);
                     v50[1] += math_random_signed_float_range(0.0f, 0.02f);
                     v50[2] += math_random_signed_float_range(0.0f, 0.02f);
-                    p = part_spawn_gravity_fade(v50, D_L00_001A8F20, ((s32)(D_L00_001B0FE8) * 5 + 2) / 6, D_L00_001B0FF4, n2, 0x30, 0,
+                    p = part_spawn_gravity_fade(v50, g_default_vector, ((s32)(g_clank_zapper_particle_kind) * 5 + 2) / 6, g_clank_zapper_particle_color, n2, 0x30, 0,
                                       s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[6];
                     s6 *= 0.5f;
-                    p = part_spawn_gravity_fade(v50, D_L00_001A8F20, ((s32)(D_L00_001B0FE8) * 5 + 2) / 6, 0x808080, n2, 0x30, 0,
+                    p = part_spawn_gravity_fade(v50, g_default_vector, ((s32)(g_clank_zapper_particle_kind) * 5 + 2) / 6, 0x808080, n2, 0x30, 0,
                                       s6 * 210000.0f, s6 * 42000.0f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = (D_L00_001FE940.p[0x184 / 4])[6];
+                        p[2] = (g_effect_definitions.p[0x184 / 4])[6];
                 }
                 }
                 if (vars->target != 0 && g_frame_l00_counter % 5 == 0) {
@@ -309,28 +309,28 @@ void func_PAL_L00_00410630(BeamMoby *self)
                     FastVecSub(v50, vars->end, vars->right);
                     vec_scale_to_length(v50, v50, s8 * FastVecLength(v50));
                     FastVecAdd(v50, vars->right, v50);
-                    p = part_spawn_gravity_fade(v40, D_L00_001A8F20, 0x19, 0x202080, 0, 0x40, 0,
+                    p = part_spawn_gravity_fade(v40, g_default_vector, 0x19, 0x202080, 0, 0x40, 0,
                                       2100.0f, 126000.0078125f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = *D_L00_001FE9F4[0];
-                    p = part_spawn_gravity_fade(v50, D_L00_001A8F20, 0x19, 0x202080, 0, 0x40, 0,
+                        p[2] = *g_effect_param_pointer_a[0];
+                    p = part_spawn_gravity_fade(v50, g_default_vector, 0x19, 0x202080, 0, 0x40, 0,
                                       2100.0f, 126000.0078125f, 0.0f, 0);
                     if (p != 0)
-                        p[2] = *D_L00_001FE9F4[0];
+                        p[2] = *g_effect_param_pointer_a[0];
                 }
             }
         } else {
             for (m = 0; m < 10; m++) {
                 char *p;
                 s9 = math_random_float_range(0.25f, 0.4f) * 210000.0f;
-                p = part_spawn_gravity_fade(&g_hero_state.b[0x2010], D_L00_001A8F20, 2, 0x108010, 2, 0x7F, 0x10,
+                p = part_spawn_gravity_fade(&g_hero_state.b[0x2010], g_default_vector, 2, 0x108010, 2, 0x7F, 0x10,
                                   s9, s9, 0.0f, 0);
                 if (p != 0)
-                    p[2] = *D_L00_001FE940.p[0x64 / 4];
-                p = part_spawn_gravity_fade(&g_hero_state.b[0x2010], D_L00_001A8F20, 2, 0x208020, -1, 0x7F, 0x10,
+                    p[2] = *g_effect_definitions.p[0x64 / 4];
+                p = part_spawn_gravity_fade(&g_hero_state.b[0x2010], g_default_vector, 2, 0x208020, -1, 0x7F, 0x10,
                                   s9, s9, 0.0f, 0);
                 if (p != 0)
-                    p[2] = *D_L00_001FE940.p[0x64 / 4];
+                    p[2] = *g_effect_definitions.p[0x64 / 4];
             }
         }
         func_PAL_L00_0040FF58(self);

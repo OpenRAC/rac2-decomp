@@ -10,7 +10,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
 
-extern int D_L00_001B0BB4 __attribute__((sda));
+extern int g_large_spark_trail_lifetime __attribute__((sda));
 
 /* The bodies the retail calls reach, at 0x3FD178, 0x2E6EF8 and 0x3FCDB0 in level 00. */
 extern void ref_L00_003FCA40_00(void *);
@@ -46,7 +46,7 @@ char *large_spark_trail_create(char *origin, char *direction, Quad_3fca40 *posit
         *(Quad_3fca40 *)position_ptr = *position;
         vec_scale_to_length(&local, velocity, -0.25f);
         FastVecAdd((char *)vars + 0x50, origin, &local);
-        lifetime = (int)D_L00_001B0BB4;
+        lifetime = (int)g_large_spark_trail_lifetime;
         *(int *)((char *)vars + 0x38) = lifetime;
         lifetime_float = IntToFloat(lifetime);
         *(int *)((char *)vars + 0x34) = owner;

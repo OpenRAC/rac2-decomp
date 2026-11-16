@@ -59,11 +59,11 @@ typedef struct {
 extern Hero g_hero_state;
 extern SoundRecord g_sound_state[];
 extern LiftPath *g_path_l17_table[];
-extern int D_00138324[];
-extern float D_L17_001B0220 __attribute__((sda));
-extern float D_L17_001B0228 __attribute__((sda));
-extern float D_L17_001B022C __attribute__((sda));
-extern float D_L17_001B0234 __attribute__((sda));
+extern int g_pad_held_flags[];
+extern float g_lift_speed __attribute__((sda));
+extern float g_lift_record_value_a __attribute__((sda));
+extern float g_lift_record_value_b __attribute__((sda));
+extern float g_lift_record_value_c __attribute__((sda));
 extern int flag_is_third_pending_set(void *);
 extern int flag_set_first_pending(void *);
 extern int hero_get_target_state_kind(void);
@@ -87,7 +87,7 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
    starts it while the hero stands on it, it eases to the other end with its
    travel sound, and while idle it jumps to the hero's end when the hero is more
    than 10 units above or below it. Riders follow its movement. */
-void func_US2_L17_003C48B0(Moby *moby)
+void UpdateSmolgPathLift_us2(Moby *moby)
 {
     Quad old;
     Quad delta;
@@ -107,20 +107,20 @@ void func_US2_L17_003C48B0(Moby *moby)
             if (vars->needsTrigger && !flag_is_third_pending_set(moby))
                 goto finish;
             TryClaimNotice(8, 0x12EC, 1);
-            if (D_00138324[0] & 0x10) {
+            if (g_pad_held_flags[0] & 0x10) {
                 if (!vars->atLast) {
                     moby_set_state(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
                     FastVecSub(velocity, &path->points[1], &path->points[0]);
-                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    vec_scale_to_length(velocity, velocity, g_lift_speed * 0.016666668f);
                 } else {
                     moby_set_state(moby, 5, -1);
                     velocity = &vars->velocity;
                     point = path->count - 2;
                     vars->point = point;
                     FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
-                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    vec_scale_to_length(velocity, velocity, g_lift_speed * 0.016666668f);
                 }
                 break;
             }
@@ -174,10 +174,10 @@ void func_US2_L17_003C48B0(Moby *moby)
                 vars->record = record;
                 if (record) {
                     vars->hasRecord = 1;
-                    record[0] = D_L17_001B0228;
-                    value = D_L17_001B022C;
+                    record[0] = g_lift_record_value_a;
+                    value = g_lift_record_value_b;
                     vars->record[1] = value;
-                    vars->record[3] = D_L17_001B0234;
+                    vars->record[3] = g_lift_record_value_c;
                 }
             }
         }
@@ -217,7 +217,7 @@ void func_US2_L17_003C48B0(Moby *moby)
             point = vars->point - 1;
             vars->point = point;
             FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
-            vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+            vec_scale_to_length(velocity, velocity, g_lift_speed * 0.016666668f);
         }
         break;
 
@@ -242,10 +242,10 @@ void func_US2_L17_003C48B0(Moby *moby)
                 vars->record = record;
                 if (record) {
                     vars->hasRecord = 1;
-                    record[0] = D_L17_001B0228;
-                    value = D_L17_001B022C;
+                    record[0] = g_lift_record_value_a;
+                    value = g_lift_record_value_b;
                     vars->record[1] = value;
-                    vars->record[3] = D_L17_001B0234;
+                    vars->record[3] = g_lift_record_value_c;
                 }
             }
         }

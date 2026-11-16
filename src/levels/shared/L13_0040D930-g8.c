@@ -13,9 +13,9 @@ extern void moby_mark_spawned(char *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void ref_L13_0040D930_01(void *, char *);
 extern void ref_L13_0040D930_00(void);
-extern float D_L13_001B12CC __attribute__((sda));
+extern float g_projectile_spin_speed __attribute__((sda));
 typedef struct { char pad[0x18]; char *hit; int flags; Quad normal; } HitResult;
-extern HitResult D_L13_001BFD00;
+extern HitResult g_collision_l13_result;
 /* Updates the flying projectile moby of class 3751: it moves forward, damages what it hits, and disappears after 240 frames or on impact. */
 void flying_projectile_update(char *obj)
 {
@@ -32,8 +32,8 @@ void flying_projectile_update(char *obj)
         make_hit_descriptor(v.collision, obj, 1, s, *(float *)(s + 0x14));
         *(unsigned short *)(v.collision + 0x1A) = *(unsigned short *)(obj + 0xAA);
         if (CollLine(obj + 0x10, &v.end, 0, obj, v.collision)) {
-            if (D_L13_001BFD00.hit) {
-                if (D_L13_001BFD00.hit != *(char **)(s + 0x10)) {
+            if (g_collision_l13_result.hit) {
+                if (g_collision_l13_result.hit != *(char **)(s + 0x10)) {
                     qcopy(&v.scaled, s);
                     FastVecScale(&v.scaled, &v.scaled, 2.0f);
                     ((float *)&v.scaled)[3] = 5627.9248046875f;
@@ -41,7 +41,7 @@ void flying_projectile_update(char *obj)
                     v.damage[0x19] = 1;
                     *(unsigned short *)(v.damage + 0x1A) = *(unsigned short *)(obj + 0xAA);
                     v.damage[0x18] = 0;
-                    coll_process_hit(&D_L13_001BFD00.normal, 0, obj, v.damage, 0.3f);
+                    coll_process_hit(&g_collision_l13_result.normal, 0, obj, v.damage, 0.3f);
                     moby_set_state(obj, 1, -1);
                     return;
                 }
@@ -53,7 +53,7 @@ void flying_projectile_update(char *obj)
                 v.damage[0x19] = 1;
                 *(unsigned short *)(v.damage + 0x1A) = *(unsigned short *)(obj + 0xAA);
                 v.damage[0x18] = 0;
-                coll_process_hit(&D_L13_001BFD00.normal, 0, obj, v.damage, 0.6f);
+                coll_process_hit(&g_collision_l13_result.normal, 0, obj, v.damage, 0.6f);
                 moby_set_state(obj, 1, -1);
                 return;
             }
@@ -67,7 +67,7 @@ void flying_projectile_update(char *obj)
         moby_mark_spawned(obj);
         return;
     }
-    math_apply_axis_rotation_to_quat(obj + 0xE0, obj + 0xE0, obj + 0xD0, D_L13_001B12CC * 0.01745329424738884f);
-    math_apply_axis_rotation_to_quat(obj + 0xC0, obj + 0xC0, obj + 0xD0, D_L13_001B12CC * 0.01745329424738884f);
+    math_apply_axis_rotation_to_quat(obj + 0xE0, obj + 0xE0, obj + 0xD0, g_projectile_spin_speed * 0.01745329424738884f);
+    math_apply_axis_rotation_to_quat(obj + 0xC0, obj + 0xC0, obj + 0xD0, g_projectile_spin_speed * 0.01745329424738884f);
     ref_L13_0040D930_01(ref_L13_0040D930_00, obj);
 }

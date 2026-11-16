@@ -18,9 +18,9 @@ extern void draw_world_quad(void *,void *,int);
 extern void gfx_draw_spark_streak(u8 *,void *);
 /* Observed target prefix: retail addresses its position at base + 0x140. */
 typedef struct { u8 reserved[0x140]; float position[4]; } FlareTargetView;
-extern FlareTargetView D_L02_001BA3C0 __attribute__((nosda));
-extern u32 D_L02_001B1FDC __attribute__((sda));
-extern u32 D_L02_001B1FE0 __attribute__((sda));
+extern FlareTargetView g_hero_effect_state __attribute__((nosda));
+extern u32 g_beam_spark_color __attribute__((sda));
+extern u32 g_spark_streak_inner_color __attribute__((sda));
 
 /* Draw a randomly displaced point on the beam, then its smaller inner glow. */
 void gfx_draw_beam_spark_point(u8 *object)
@@ -43,13 +43,13 @@ void gfx_draw_beam_spark_point(u8 *object)
     packet.reserved=0;
     packet.state=0x8000000040ULL | ((u64)(func_001163B0()%2+1)<<2);
     alpha=math_random_int_range(64,127);
-    color=D_L02_001B1FDC;
+    color=g_beam_spark_color;
     color&=0xFFFFFF;
     color+=alpha<<24;
     packet.color[3]=color; packet.color[2]=color; packet.color[1]=color; packet.color[0]=color;
     rotation[3]=0;
-    rotation[2]=mat_fast_helper_a(D_L02_001BA3C0.position[0]-position[0],D_L02_001BA3C0.position[1]-position[1]);
-    rotation[1]=-mat_fast_helper_a(vec_distance_xy(position,D_L02_001BA3C0.position),D_L02_001BA3C0.position[2]-position[2]);
+    rotation[2]=mat_fast_helper_a(g_hero_effect_state.position[0]-position[0],g_hero_effect_state.position[1]-position[1]);
+    rotation[1]=-mat_fast_helper_a(vec_distance_xy(position,g_hero_effect_state.position),g_hero_effect_state.position[2]-position[2]);
     rotation[0]=math_random_angle();
     euler_to_matrix(transform,rotation);
     transform[12]=position[0];transform[13]=position[1];transform[14]=position[2];transform[15]=1;
@@ -60,7 +60,7 @@ void gfx_draw_beam_spark_point(u8 *object)
     FastVecScale(packet.vertex[3],packet.vertex[3],size);
     draw_world_quad(&packet,transform,0);
     {
-        u32 innerColor=(D_L02_001B1FE0&0xFFFFFF)+(alpha<<24);
+        u32 innerColor=(g_spark_streak_inner_color&0xFFFFFF)+(alpha<<24);
         packet.color[3]=innerColor;packet.color[2]=innerColor;packet.color[1]=innerColor;packet.color[0]=innerColor;
     }
     FastVecScale(packet.vertex[0],packet.vertex[0],0.5f);

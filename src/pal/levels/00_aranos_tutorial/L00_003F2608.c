@@ -7,7 +7,7 @@ extern unsigned char *func_PAL_002BE9A8(void *, float, float, float, int, void *
 
 /* Spawns three particle bursts at the object. The second burst updates the first
  * particle's header, as retail does. */
-void func_PAL_L00_003F2608(unsigned char *p)
+void part_spawn_three_bursts_pal(unsigned char *p)
 {
     float vel[4], pos[4];
     float one = 1.0f;

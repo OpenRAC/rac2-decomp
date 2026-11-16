@@ -4,8 +4,8 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
 extern char g_hero_state[];
-extern float D_L02_001B0C10[2];
-extern float D_L02_001B0C18 __attribute__((sda));
+extern float g_tether_swing_tilts[2];
+extern float g_tether_swing_velocity_limit __attribute__((sda));
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern float FastAddRotations(float, float);
@@ -34,9 +34,9 @@ int func_PAL_L02_003ED2A0(char *arg0) {
     char *g;
 
     if (*(short *)(ent + 0xAA) == 0x9C8)
-        tilt = D_L02_001B0C10[1];
+        tilt = g_tether_swing_tilts[1];
     else
-        tilt = D_L02_001B0C10[0];
+        tilt = g_tether_swing_tilts[0];
     heading = *(float *)(arg0 + 0xF8);
     g = g_hero_state;
     if (FastDiffRots(*(float *)(arg0 + 0xF8),
@@ -47,7 +47,7 @@ int func_PAL_L02_003ED2A0(char *arg0) {
     vec_build_spherical_offset(v0, *(float *)(state + 0x44), heading, tilt * 0.01745329424738884f);
     epos = ent + 0x10;
     FastVecSub(v1, v0, pos);
-    vec_clamp_length(v1, D_L02_001B0C18 * 0.00040000002f);
+    vec_clamp_length(v1, g_tether_swing_velocity_limit * 0.00040000002f);
     FastVecAdd(pos, pos, v1);
     FastVecAdd(epos, epos, pos);
     FastVecSub(v2, epos, arg0 + 0x10);

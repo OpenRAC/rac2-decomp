@@ -11,7 +11,7 @@ typedef struct ParticleSettings {
     s32 frameCount;
     f32 speed;
 } ParticleSettings;
-extern ParticleSettings D_L11_001AECB8 __attribute__((sda));
+extern ParticleSettings g_burst_particle_settings __attribute__((sda));
 extern s32 math_random_int_below(s32);
 extern s32 math_random_int_range(s32, s32);
 extern void vec_add_random_offset(f32 *, f32);
@@ -28,6 +28,6 @@ void part_spawn_particle_burst(char *self) {
         *(Quad *)point = *(Quad *)(self + 0x10);
         vec_add_random_offset(point, 0.1f);
         vec_add_random_offset(direction, 0.0016666668f);
-        enemy_spawn_record(point, direction, &D_L11_001AECB8, (void *)1, math_random_int_range(-5, 5));
+        enemy_spawn_record(point, direction, &g_burst_particle_settings, (void *)1, math_random_int_range(-5, 5));
     }
 }

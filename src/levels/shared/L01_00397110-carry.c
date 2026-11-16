@@ -1,9 +1,9 @@
 #include "common.h"
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 extern void moby_increment_saved_switch_counter(char *), moby_hide_with_linked_parts(char *);
 extern void moby_set_state_in_list(int,int);
-extern struct { char pad[0x464]; unsigned char disabled[0]; } D_L01_0021E4B0;
+extern struct { char pad[0x464]; unsigned char disabled[0]; } g_level_save_state_backup;
 extern char g_hero_position[];
 typedef struct {
  char pad0[0x33C];
@@ -17,17 +17,17 @@ typedef struct {
  unsigned char mode;
 } CarryHero;
 extern CarryHero g_hero_state;
-extern unsigned char D_0019B2E8[];
-extern u8 D_001A7A00[] __attribute__((sda));
+extern unsigned char g_moby_group_flags[];
+extern u8 g_player_stats[] __attribute__((sda));
 extern int CarryLevelIndex SDATA(D_001A79F0);
-extern int D_L01_001A8FF4 MACRO_ADDR;
+extern int g_teleporter_timer MACRO_ADDR;
 extern int CarryMode SDATA(D_L01_001A8FF4) __attribute__((sda));
-extern int D_L01_001A8FF0 SDATA(D_L01_001A8FF0);
-extern int D_00138324;
+extern int g_teleporter_mode SDATA(D_L01_001A8FF0);
+extern int g_pad_held_flags;
 extern char *g_moby_l01_table MACRO_ADDR;
-extern float D_L01_001AF588 SDATA(D_L01_001AF588);
-extern float D_L01_001AF58C SDATA(D_L01_001AF58C);
-extern float D_L01_001AF590 SDATA(D_L01_001AF590);
+extern float g_teleporter_step_rate_a SDATA(D_L01_001AF588);
+extern float g_teleporter_step_rate_b SDATA(D_L01_001AF58C);
+extern float g_teleporter_step_rate_c SDATA(D_L01_001AF590);
 extern void DrawShrinkingMobyRings(char *);
 extern int IsPointInCuboid(void *, int);
 extern void moby_show_with_linked_parts(char *), level_apply_table_entry(char *), moby_position_carried_objects(char *);
@@ -63,9 +63,9 @@ void teleporter_l01_update(char *moby)
  char **p;
  float v[4];
  unsigned short flags = *(u16 *)(moby+0xB2);
- if (D_L01_0021E4B0.disabled[(short)flags]) goto completed;
+ if (g_level_save_state_backup.disabled[(short)flags]) goto completed;
  {
-  int saved_bits = (u8)D_0019B4A8[((short)flags>>1)+(g_current_map_index<<10)];
+  int saved_bits = (u8)g_moby_nibble_table[((short)flags>>1)+(g_current_map_index<<10)];
   if (flags&1) { if ((saved_bits>>4)&7) goto completed; }
   else if(saved_bits&7) goto completed;
   goto flags_checked;
@@ -79,7 +79,7 @@ flags_checked:
   if (*(u8 *)(moby+0x20)==5) moby_set_state(moby,1,-1);
  }
  if (vars->x3C) {
-  if (!D_001A7A00[0xA]) {
+  if (!g_player_stats[0xA]) {
    *(u16 *)(moby+0x34)|=0x41;
    *(int *)(moby+0x98)=0;
    return;
@@ -119,13 +119,13 @@ flags_checked:
   moby_set_state(moby,1,-1);
   
  case 1:
-  if(vars->unlock>=0 && !(D_0019B2E8[vars->unlock+(CarryLevelIndex<<4)]&0x80)) break;
+  if(vars->unlock>=0 && !(g_moby_group_flags[vars->unlock+(CarryLevelIndex<<4)]&0x80)) break;
   if(vars->target==-1 || g_hero_state.mode==2 || g_hero_state.linked!=moby || g_hero_state.control) break;
   if(vars->x50) {
    vars->x50=!g_hero_state.busy;
-   D_L01_001A8FF4=4; D_L01_001A8FF0=2;
+   g_teleporter_timer=4; g_teleporter_mode=2;
   } else level_apply_table_entry(moby);
-  if(!(D_00138324&0x10)) break;
+  if(!(g_pad_held_flags&0x10)) break;
   PlayMobySound(0,0,moby); moby_set_state(moby,2,-1);
   vars->x2C=0; vars->x30=-1; vars->x28=0;
   hero_start_target_state(moby+0x10,0,*(float *)(moby+0xF8));
@@ -133,9 +133,9 @@ flags_checked:
   break;
  case 7:
   if(vars->x20<1.0f) {
-   math_step_value_toward_target(&vars->x20,&vars->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x20,&vars->x28,1.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else if(vars->x24<1.0f) {
-   math_step_value_toward_target(&vars->x24,&vars->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x24,&vars->x2C,1.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else {
    PlayMobySound(1,0,moby); moby_set_state(moby,8,-1); vars->x34=0;
   }
@@ -146,11 +146,11 @@ flags_checked:
  case 2:
   result=hero_get_target_state_kind();
   if(vars->x20<1.0f) {
-   math_step_value_toward_target(&vars->x20,&vars->x28,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x20,&vars->x28,1.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else {
    int mode = CarryMode;
    if(vars->x24<1.0f) {
-   math_step_value_toward_target(&vars->x24,&vars->x2C,1.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x24,&vars->x2C,1.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else if(!(mode==4 && vars->x20>0.25f)) {
    if(result==2) { vars->x34=1.95f; moby_set_state(moby,3,-1); }
    else if(!result) moby_set_state(moby,4,-1);
@@ -186,9 +186,9 @@ flags_checked:
   if(vars->x34<1.95f) {
    gfx_add_draw_callback_first(DrawShrinkingMobyRings,moby); ApproachValue(&vars->x34,1.95f,0.06666667f);
   } else if(vars->x24>0) {
-   math_step_value_toward_target(&vars->x24,&vars->x28,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x24,&vars->x28,0.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else if(vars->x20>0) {
-   math_step_value_toward_target(&vars->x20,&vars->x2C,0.0f,D_L01_001AF588*0.0002777777845f,D_L01_001AF58C*0.0002777777845f,D_L01_001AF590*0.016666668f);
+   math_step_value_toward_target(&vars->x20,&vars->x2C,0.0f,g_teleporter_step_rate_a*0.0002777777845f,g_teleporter_step_rate_b*0.0002777777845f,g_teleporter_step_rate_c*0.016666668f);
   } else moby_set_state(moby,1,-1);
   moby_position_carried_objects(moby);
  }

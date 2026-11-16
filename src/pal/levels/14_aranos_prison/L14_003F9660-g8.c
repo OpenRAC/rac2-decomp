@@ -13,7 +13,7 @@ extern float math_fast_sin_or_cos_b(float a);
 extern int FastTweenColor(int a, int b, float c);
 
 /* Steps the owner's state block, then blends the two colours its state asks for. */
-void func_PAL_L14_0040E8C8(char *self)
+void pulsing_tint_update_pal(char *self)
 {
     char *v = *(char **)(self + 0x68);
     int c1 = 0x808C8C8C;

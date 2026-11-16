@@ -3,10 +3,10 @@
 extern char g_sound_state[];
 typedef struct { char pad[0x33c]; char *object; int active; } Player10608;
 extern Player10608 g_hero_state;
-extern char D_L09_001B17F8[];
-extern char *D_L09_001B294C;
-extern int D_L09_001BFE58 NOT_SDA;
-extern float D_L09_001B17F4 __attribute__((sda));
+extern char g_str_object_debug_state[];
+extern char *g_dobbo_point_table;
+extern int g_collision_hit_object NOT_SDA;
+extern float g_hit_test_radius __attribute__((sda));
 extern void STUB_printf(void *, int, int);
 extern void moby_set_state(void *, int, int);
 extern int flag_set_first_pending(void *);
@@ -46,7 +46,7 @@ void UpdateReturningWaypointMover(char *object)
         FLOAT(state,0x64) *= 0.0166666675f;
         FLOAT(object,0x2c) *= 1.75f;
         if (WORD(state,0x60) == -1)
-            STUB_printf(D_L09_001B17F8, HALF(object,0xaa), HALF(object,0xb2));
+            STUB_printf(g_str_object_debug_state, HALF(object,0xaa), HALF(object,0xb2));
         WORD(state,0x6c) = -1;
         moby_set_state(object,1,-1);
         break;
@@ -77,10 +77,10 @@ void UpdateReturningWaypointMover(char *object)
         slot = SLOT(WORD(state,0x6c));
         if (*(char **)(slot+0x88) != object || !BYTE(slot,0x74))
             WORD(state,0x6c) = PlayMobySound(0,4,object);
-        FastVecSub(delta,D_L09_001B294C+WORD(state,0x60)*0x80+0x30,object+0x10);
+        FastVecSub(delta,g_dobbo_point_table+WORD(state,0x60)*0x80+0x30,object+0x10);
         vec_scale_to_length(delta,delta,FLOAT(state,0x64));
         FastVecAdd(object+0x10,object+0x10,delta);
-        if (fast_vec_dist(object+0x10,D_L09_001B294C+WORD(state,0x60)*0x80+0x30)<=0.88f)
+        if (fast_vec_dist(object+0x10,g_dobbo_point_table+WORD(state,0x60)*0x80+0x30)<=0.88f)
             moby_set_state(object,3,-1);
         break;
     case 3:
@@ -106,7 +106,7 @@ void UpdateReturningWaypointMover(char *object)
             }
             WORD(state,0x6c) = -1;
         }
-        if (coll_test_point(object+0x10,0x10,object,D_L09_001B17F4) && D_L09_001BFE58)
+        if (coll_test_point(object+0x10,0x10,object,g_hit_test_radius) && g_collision_hit_object)
             break;
         if (SOUND_SLOT(WORD(state,0x6c))->owner != object || !SOUND_SLOT(WORD(state,0x6c))->active)
             WORD(state,0x6c) = PlayMobySound(0,4,object);

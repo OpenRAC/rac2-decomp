@@ -22,22 +22,22 @@ extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002A0F68(char *);
 extern void func_002A0F48(char *);
 extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, int);
-extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
+extern int g_l11_companion_record_index[] NOT_SDA __attribute__((sda));
 typedef struct { int unused; int flags; char pad[56]; } Entry61308;
-extern Entry61308 D_L11_002B6D40[];
+extern Entry61308 g_carrier_entry_table[];
 extern char *g_moby_l11_table[] NOT_SDA __attribute__((sda));
-extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
+extern char *g_arena_camera_table[] NOT_SDA __attribute__((sda));
 extern char g_hero_position[];
-extern float D_L11_001B2388 SDATA(D_L11_001B2388);
+extern float g_carrier_float_params SDATA(D_L11_001B2388);
 extern float D_L11_001B2388_block[] __asm__("D_L11_001B2388") __attribute__((sda));
-extern char D_L11_001B2378[] NOT_SDA __attribute__((sda));
-extern char D_L11_001B2368[] NOT_SDA __attribute__((sda));
-extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
+extern char g_carrier_particle_c[] NOT_SDA __attribute__((sda));
+extern char g_carrier_particle_b[] NOT_SDA __attribute__((sda));
+extern char g_carrier_particle_a[] SDATA(D_L11_001B2358);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
-void func_PAL_L11_00467118(char *p)
+void companion_carrier_update_pal(char *p)
 {
     float v[4], pos[4], dir[4], tmp[4];
     char *s = P(p,0x68);
@@ -55,7 +55,7 @@ void func_PAL_L11_00467118(char *p)
         moby_set_state(p,1,-1);
         break;
     case 1:
-        if ((D_L11_002B6D40[D_L11_001B089C[0]].flags&0x10) && !I(s,8)) {
+        if ((g_carrier_entry_table[g_l11_companion_record_index[0]].flags&0x10) && !I(s,8)) {
             H(p,0x34)|=0x41;
             H(P(s,0x10),0x34)|=0x41;
             I(p,0x98)=0;
@@ -81,10 +81,10 @@ void func_PAL_L11_00467118(char *p)
             tmp[1]=t+t-1.0f;
             t+=0.333f;
             *(TI128 *)dir=*(TI128 *)tmp;
-            transform_vector(dir,dir,D_L11_001B368C[0]+(I(s,4)<<7));
+            transform_vector(dir,dir,g_arena_camera_table[0]+(I(s,4)<<7));
             {
                 float high = D_L11_001B2388_block[1];
-                float low = D_L11_001B2388;
+                float low = g_carrier_float_params;
                 func_PAL_L11_003E0F10(p,v,dir,math_random_float_range(low,high)*0.00040000002f);
             }
         }
@@ -113,10 +113,10 @@ void func_PAL_L11_00467118(char *p)
         FastVecAdd(pos,p+0x10,v);
         v[0]=v[1]=0.0f;
         v[2]=-(math_random_float_range(2.25f,3.5f)*(0.020000001f));
-        part_spawn_object_relative_particle(p,pos,v,D_L11_001B2378,1);
+        part_spawn_object_relative_particle(p,pos,v,g_carrier_particle_c,1);
         v[2]=-(math_random_float_range(3.0f,5.0f)*(0.020000001f));
-        part_spawn_object_relative_particle(p,pos,v,D_L11_001B2368,1);
+        part_spawn_object_relative_particle(p,pos,v,g_carrier_particle_b,1);
         v[2]=-(math_random_float_range(4.0f,8.0f)*(0.020000001f));
-        part_spawn_object_relative_particle(p,pos,v,D_L11_001B2358,1);
+        part_spawn_object_relative_particle(p,pos,v,g_carrier_particle_a,1);
     }
 }

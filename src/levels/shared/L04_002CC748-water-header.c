@@ -8,8 +8,8 @@ extern int gfx_get_packed_header_block_count(const PackedHeaderCountView *);
 extern void water_select_table_slot(void *, int, int);
 extern void STUB_printf(void *, ...);
 extern void math_trap_always(void);
-extern char D_L04_001AD968[], D_L04_001AD998[], D_L04_002C9880[];
-extern char D_L04_001AD9B0[], D_L04_002C98D0[], D_L04_001AD9E0[];
+extern char g_str_water_header_msg[], g_str_water_header_fmt[], g_str_water_header_register[];
+extern char g_str_water_header_count_fmt[], g_str_water_header_register_b[], g_str_water_header_size_fmt[];
 extern void water_set_tag_bits(void *, int);
 typedef struct { int id; int offsets[2]; int size; } WaterHeaderSlot;
 /* Register a model header and initialize both alternating water buffers. */
@@ -25,14 +25,14 @@ int water_register_model_header(char *obj, int *count, int *used, WaterHeaderSlo
         }
     }
     if (!WPTR(obj, 0x98)) {
-        STUB_printf(D_L04_001AD968);
-        STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
+        STUB_printf(g_str_water_header_msg);
+        STUB_printf(g_str_water_header_fmt, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
         math_trap_always();
     }
     if (*count >= 6) {
-        STUB_printf(D_L04_002C9880);
-        STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
-        STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
+        STUB_printf(g_str_water_header_register);
+        STUB_printf(g_str_water_header_fmt, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
+        STUB_printf(g_str_water_header_count_fmt, *count, *used, 0x2000);
         math_trap_always();
     }
     i = *count;
@@ -40,9 +40,9 @@ int water_register_model_header(char *obj, int *count, int *used, WaterHeaderSlo
     size = gfx_get_packed_header_block_count((PackedHeaderCountView *)WPTR(obj, 0x98));
     twice = size * 2;
     if (*used + twice > 0x2000) {
-        STUB_printf(D_L04_002C98D0);
-        STUB_printf(D_L04_001AD9E0, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA), size);
-        STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
+        STUB_printf(g_str_water_header_register_b);
+        STUB_printf(g_str_water_header_size_fmt, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA), size);
+        STUB_printf(g_str_water_header_count_fmt, *count, *used, 0x2000);
         math_trap_always();
     }
     slots[i].id = WSHORT(obj, 0xAA);

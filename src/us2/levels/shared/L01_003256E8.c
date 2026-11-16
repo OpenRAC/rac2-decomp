@@ -3,7 +3,7 @@
 
 extern char *strncpy(char *dst, char *src, int len);
 extern void text_format_number_separators(char *dst, int x, int idx);
-extern unsigned char D_US2_001A7BBC MACRO_ADDR;
+extern unsigned char g_display_mode_index MACRO_ADDR;
 
 /* func_US2_L01_003256E8, the USA v2.00 copy of func_L01_00324410: the same C, where the
  * separator index 0 becomes the byte D_US2_001A7BBC. */
@@ -48,7 +48,7 @@ void func_US2_L01_003256E8(char *out, char *src, int *nums)
                 v = s[1] - '0';
                 s += 3;
             }
-            text_format_number_separators((char *)buf, tab[v], D_US2_001A7BBC);
+            text_format_number_separators((char *)buf, tab[v], g_display_mode_index);
             n = 0;
             if (*buf != 0) {
                 while (buf[n] != 0 && n < 32) {

@@ -9,10 +9,10 @@ typedef struct {
     char pad7c[0x19]; u8 destroyed; char pad96[2]; int collision;
     char pad9c[0x5C]; float angle; char padfc[4];
 } GateObject;
-extern short *D_L00_001FA920[];
-extern GateObject *D_L00_001B1E9C;
+extern short *g_turn_state_table[];
+extern GateObject *g_moby_array_base;
 extern char g_hero_position[];
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern char g_default_vector[] MACRO_ADDR;
 extern int moby_count_group_not_in_state(int,int);
 extern float vec_distance_xy(void *,void *);
 extern int IsPointInCuboid(void *,int);
@@ -37,9 +37,9 @@ void gate_l00_update(GateObject *gate)
     float vb[4] __attribute__((aligned(16)));
     float vc[4] __attribute__((aligned(16)));
     if(gate->state==0) {
-        if(D_L00_001FA920[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
-            GateObject *base=D_L00_001B1E9C;
-            short *p=D_L00_001FA920[context->group];
+        if(g_turn_state_table[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
+            GateObject *base=g_moby_array_base;
+            short *p=g_turn_state_table[context->group];
             do {
                 GateObject *o=base+(*p&0x7fff);
                 o->flags|=0x43;
@@ -52,9 +52,9 @@ void gate_l00_update(GateObject *gate)
             gate->state=1; gate->render_flags=0x24c102;
             if(gate->animation!=1) anim_start_blended(gate,1,0,0);
             gate->collision=0;
-            if(D_L00_001FA920[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
-                GateObject *base=D_L00_001B1E9C;
-                short *p=D_L00_001FA920[context->group];
+            if(g_turn_state_table[context->group] && moby_count_group_not_in_state(context->group,-1)>=2) {
+                GateObject *base=g_moby_array_base;
+                short *p=g_turn_state_table[context->group];
                 do {
                     GateObject *o=base+(*p&0x7fff);
                     o->flags&=0xffbc;
@@ -64,7 +64,7 @@ void gate_l00_update(GateObject *gate)
         } else if(IsPointInCuboid(g_hero_position,context->close_volume)) gate->state=5;
         for(i=0;i<4;i++) {
             if(context->child[i]!=-1) {
-                GateObject *o=D_L00_001B1E9C+context->child[i];
+                GateObject *o=g_moby_array_base+context->child[i];
                 if(o->destroyed || (s8)o->state<0) {
                     if(context->destroy_on_child) {
                         {
@@ -73,7 +73,7 @@ void gate_l00_update(GateObject *gate)
     PlayMobySound(2,0,gate);
     a[0]=math_fast_sin_or_cos_a(gate->angle-1.5707964897155762f)*0.3f;
     a[1]=math_fast_sin_or_cos_b(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
-    SpawnExplosionEffects(gate,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    SpawnExplosionEffects(gate,g_default_vector,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
     part_spawn_masked_debris(gate,255,a,3,6,3,6,255);
 
     moby_mark_spawned(gate);return;
@@ -103,7 +103,7 @@ void gate_l00_update(GateObject *gate)
         FastVecAdd(b,b,vb);FastVecAdd(c,c,vc);
         if(coll_test_point(a,0.6f,0,gate) || coll_test_point(b,0.68f,0,gate) || coll_test_point(c,0.68f,0,gate)) {
             PlayMobySound(2,0,gate);
-            SpawnExplosionEffects(gate,D_L00_001A8F20,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+            SpawnExplosionEffects(gate,g_default_vector,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
             {
     moby_mark_spawned(gate);return;
 }
@@ -115,7 +115,7 @@ void gate_l00_update(GateObject *gate)
     PlayMobySound(2,0,gate);
     a[0]=math_fast_sin_or_cos_a(gate->angle-1.5707964897155762f)*0.3f;
     a[1]=math_fast_sin_or_cos_b(gate->angle-1.5707964897155762f)*0.3f;a[2]=0;
-    SpawnExplosionEffects(gate,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    SpawnExplosionEffects(gate,g_default_vector,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
     part_spawn_masked_debris(gate,255,a,3,6,3,6,255);
     moby_mark_spawned(gate);return;
 closing:

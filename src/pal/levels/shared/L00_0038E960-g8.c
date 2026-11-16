@@ -16,12 +16,12 @@ extern float vec_length_xy(void *);
 extern float FastAddRotations(float,float);
 extern char *part_spawn_streak_effect(void *,void *);
 extern char *part_spawn_trailing_spark(void *,void *,unsigned int,unsigned int,int,int,float);
-extern void func_PAL_L00_0038E960(Vector4 *,int);
+extern void part_l00_spawn_spark_pairs_pal(Vector4 *,int);
 typedef struct { char pad[0x20]; Vector4 position; } CollisionResult;
 extern CollisionResult g_collision_result;
 extern Vector4 g_camera_l00_position;
 
-void func_PAL_L00_0038EB58(char *owner)
+void part_spawn_weapon_impact_sparks_pal(char *owner)
 {
     Vector4 velocity,position;
     float tilt,unusedHeading,angle;
@@ -44,5 +44,5 @@ void func_PAL_L00_0038EB58(char *owner)
         vec_build_spherical_offset(velocity.f,0.05f,FastAddRotations(math_random_signed_float_range(0,3.1415927f),tilt),angle);
         part_spawn_trailing_spark(&position,&velocity,0x4F007FFF,0x1FFFFFFF,math_random_int_range(8,17),1,20000);
     }
-    if(FIELD(short,FIELD(char *,owner,0x68),0x78)==43) func_PAL_L00_0038E960(&g_collision_result.position,10);
+    if(FIELD(short,FIELD(char *,owner,0x68),0x78)==43) part_l00_spawn_spark_pairs_pal(&g_collision_result.position,10);
 }

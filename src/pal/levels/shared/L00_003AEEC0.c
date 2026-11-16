@@ -4,16 +4,16 @@
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern char *func_PAL_002BE9A8(void *, int, void *, float, float, unsigned int, float, float, int);
-extern char D_L00_001A8F20[] __attribute__((section(".sdata")));
+extern char g_default_vector[] __attribute__((section(".sdata")));
 
-void func_PAL_L00_003AEEC0(void *unused, void *position)
+void seeker_spawn_impact_sparks_pal(void *unused, void *position)
 {
     int i, sign;
     char *p, *q;
     for (i=1; i>=0; i--) {
         int n=math_random_int_below(16);
         sign=math_random_int_below(2);
-        p=func_PAL_002BE9A8(position, sign ? -n : n, D_L00_001A8F20, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
+        p=func_PAL_002BE9A8(position, sign ? -n : n, g_default_vector, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
         q=p+32;
         if(p) {
             *(short *)(p+10)=8;
@@ -26,7 +26,7 @@ void func_PAL_L00_003AEEC0(void *unused, void *position)
     { int n=16;
     int j;
     for(j=0;j<2;j++) {
-        p=func_PAL_002BE9A8(position,n,D_L00_001A8F20,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
+        p=func_PAL_002BE9A8(position,n,g_default_vector,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
         n=-n;
         q=p+32;
         if(p) {
@@ -56,25 +56,25 @@ typedef struct {
     char pad4[0x24EC - 0x2298];
     short h24EC;
 } Res_189E20;
-extern unsigned char D_00139580[];
+extern unsigned char g_seeker_weapon_index[];
 extern AngleRecord_262570 g_weapon_l00_table[];
 extern Res_189E20 g_hero_state;
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
 extern char *func_PAL_L00_003ADC68(void *, void *, void *, void *);
 
-char *func_PAL_L00_003AF088(char *a0, char *a1) {
+char *hero_fire_effect_from_facing_pal(char *a0, char *a1) {
     float buf[4];
     float angle;
     AngleRecord_262570 *e;
     Res_189E20 *g;
     void *p;
 
-    e = &g_weapon_l00_table[D_00139580[0]];
+    e = &g_weapon_l00_table[g_seeker_weapon_index[0]];
     angle = e->angle * 0.020000001f;
     if (g_hero_state.i2294 == 0x1D) {
-        vec_scale_to_length(buf, D_L00_001B8FF0, angle);
+        vec_scale_to_length(buf, g_cam_follow_matrix, angle);
     } else if (g_hero_state.h24EC == 1) {
         vec_scale_to_length(buf, a1 + 0xD0, -angle);
     } else {

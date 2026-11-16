@@ -8,7 +8,7 @@ extern void SetDeathBits(char *a0, int a1, int a2);
 extern void gfx_update_color_fade(char *a0, char *a1);
 
 /* runs a moby's timer down and picks the dying or the revived path from what is left */
-void func_PAL_L06_003F6F58(char *a0, char *a1)
+void spawner_update_damage_timer_pal(char *a0, char *a1)
 {
     float t = moby_update_aim_target_strength(a0, part_find_owned_effect_slot(a0, 0xC30000, 0));
 

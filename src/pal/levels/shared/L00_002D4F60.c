@@ -3,10 +3,10 @@
 
 
 extern char g_hero_state[];
-extern int D_L00_001A8F00 __attribute__((sda));
-extern void func_PAL_L00_002AFAE8(void);
-extern void func_PAL_L00_002B0860(char *);
-extern void func_PAL_L00_002D4F60(void);
+extern int g_game_l00_mode __attribute__((sda));
+extern void SpawnHeroItemMobies_pal(void);
+extern void update_hero_item_mobys_pal(char *);
+extern void level_fade_glow_colors_pal(void);
 typedef struct {
     unsigned char pad0[0x1270];
     void *f1270;
@@ -24,24 +24,24 @@ typedef struct {
     unsigned char pad1[0x18C - 0x46];
     void *list[1];
 } Rec_1BCAC0;
-extern Rec_1BCAC0 D_L00_001BCAC0;
+extern Rec_1BCAC0 g_tutorial_probe_context;
 
 /* Set bit 0x800 on list objects of either supported kind, dispatch the level
    updates, then clear bit 0 on the six resident object slots. */
-void func_PAL_L00_002D5150(char *arg0)
+void level_update_glow_objects_pal(char *arg0)
 {
     int i;
     void *node;
     unsigned short v;
 
-    if (D_L00_001A8F00 != 2 && D_L00_001A8F00 != 6)
+    if (g_game_l00_mode != 2 && g_game_l00_mode != 6)
         return;
 
     if (((Base_2A *)g_hero_state)->f12C0 == 0)
-        func_PAL_L00_002AFAE8();
+        SpawnHeroItemMobies_pal();
 
-    for (i = 0; i < D_L00_001BCAC0.count; i++) {
-        node = D_L00_001BCAC0.list[i];
+    for (i = 0; i < g_tutorial_probe_context.count; i++) {
+        node = g_tutorial_probe_context.list[i];
         if (node != 0 && (*(short *)((char *)node + 0xAA) == 0x50A ||
                           *(short *)((char *)node + 0xAA) == 0xD54)) {
             v = *(unsigned short *)((char *)node + 0x34);
@@ -50,8 +50,8 @@ void func_PAL_L00_002D5150(char *arg0)
     }
 
     part_spawn_effect_from_record(arg0);
-    func_PAL_L00_002B0860(arg0);
-    func_PAL_L00_002D4F60();
+    update_hero_item_mobys_pal(arg0);
+    level_fade_glow_colors_pal();
 
     {
         void *node;
@@ -99,7 +99,7 @@ extern void update_hero_item_mobys(char *);
 /* One-shot spawn: arms the state word, and when the slot is free asks the allocator for a
    0x50A object, writes its flags, the packed constant at +0x38 and the level's tag, then runs
    the two level entry points on the argument. */
-void func_PAL_L00_002D52C0(char *arg0) {
+void level_spawn_glow_object_pal(char *arg0) {
     char *base = D_00189E20_4D98;
     char *node;
 

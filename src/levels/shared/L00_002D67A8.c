@@ -29,9 +29,9 @@ extern int D_0018C0B4_1;
 
 typedef unsigned int u32;
 
-extern u32 D_0018C0B4;
+extern u32 g_game_mode;
 
-extern u8 D_L24_001B8500[];
+extern u8 g_slot_entry_table[];
 
 /* Measured partial layouts; original type and game roles are unknown. */
 struct Rac2Native_5f824a0e369ccf7b_src_record {
@@ -62,7 +62,7 @@ struct Rac2Native_5f824a0e369ccf7b_dst_record {
     unsigned char f;
 };
 
-extern struct Rac2Native_5f824a0e369ccf7b_dst_record D_L04_001B94C0[8] __attribute__((nosda));
+extern struct Rac2Native_5f824a0e369ccf7b_dst_record g_free_slot_records[8] __attribute__((nosda));
 
 typedef struct {
     u8 field0;
@@ -72,7 +72,7 @@ typedef struct {
     u8 trailing[8];
 } ConditionalResetSlot;
 
-extern ConditionalResetSlot D_L00_001B8C00[8];
+extern ConditionalResetSlot g_wave_l00_channels[8];
 
 /* Filter primary or fallback object's class identifier by mode and signed selection */
 /* Checks if the tracked object is a certain kind of object, picked by the selection number. */
@@ -110,11 +110,11 @@ unsigned int level_return_zero(void)
 /* Reads one global number and returns it. */
 /* returns the resident 32-bit field at core address 0x0018c0b4 */
 u32 level_get_global_word(void) {
-    return D_0018C0B4;
+    return g_game_mode;
 }
 
 
-extern struct Rac2Native_5f824a0e369ccf7b_src_record *D_L00_0025E120[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record *g_queue_source_records[];
 
 int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src);
 
@@ -122,7 +122,7 @@ int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src
 int queue_copy_record_by_index(unsigned int index)
 {
     if (index < 0x62)
-        return slot_copy_records_to_free(D_L00_0025E120[index]);
+        return slot_copy_records_to_free(g_queue_source_records[index]);
     return -1;
 }
 
@@ -131,12 +131,12 @@ void slot_clear_active_bytes(void)
 {
     s32 i;
     for (i = 7; i >= 0; --i)
-        D_L00_001B8C00[i].field0 = 0;
+        g_wave_l00_channels[i].field0 = 0;
 }
 
 /* tests the byte at the indexed 16-byte table entry */
 s32 slot_is_entry_nonzero(s32 index) {
- return D_L24_001B8500[index*16]!=0;
+ return g_slot_entry_table[index*16]!=0;
 }
 
 /* Check space among eight destination records, copy bounded input records into inactive slots, adjust copied byte and halfword fields, and return a slot index or -1. */
@@ -151,7 +151,7 @@ int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src
 
     j = 0;
     for (i = 0; i < 8 && j < n; i++) {
-        if (D_L04_001B94C0[i].b0 == 0)
+        if (g_free_slot_records[i].b0 == 0)
             j++;
     }
 
@@ -160,22 +160,22 @@ int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src
 
     for (j = 0; j < n; j++) {
         i = 0;
-        while (i < 8 && D_L04_001B94C0[i].b0 != 0)
+        while (i < 8 && g_free_slot_records[i].b0 != 0)
             i++;
         if (i < 8) {
-            D_L04_001B94C0[i].b0 = src[j].b0;
-            D_L04_001B94C0[i].b1 = src[j].b1;
-            D_L04_001B94C0[i].b2 = src[j].b2;
-            D_L04_001B94C0[i].b3 = src[j].b3;
-            D_L04_001B94C0[i].s4 = src[j].s4;
-            D_L04_001B94C0[i].s6 = src[j].s6;
-            D_L04_001B94C0[i].s8 = src[j].s8;
-            D_L04_001B94C0[i].s10 = src[j].s10;
-            D_L04_001B94C0[i].s12 = src[j].s12;
-            D_L04_001B94C0[i].e = src[j].e - src[j].f;
-            D_L04_001B94C0[i].f = src[j].f;
-            if (D_L04_001B94C0[i].s10 + D_L04_001B94C0[i].s12 == 0)
-                D_L04_001B94C0[i].s10++;
+            g_free_slot_records[i].b0 = src[j].b0;
+            g_free_slot_records[i].b1 = src[j].b1;
+            g_free_slot_records[i].b2 = src[j].b2;
+            g_free_slot_records[i].b3 = src[j].b3;
+            g_free_slot_records[i].s4 = src[j].s4;
+            g_free_slot_records[i].s6 = src[j].s6;
+            g_free_slot_records[i].s8 = src[j].s8;
+            g_free_slot_records[i].s10 = src[j].s10;
+            g_free_slot_records[i].s12 = src[j].s12;
+            g_free_slot_records[i].e = src[j].e - src[j].f;
+            g_free_slot_records[i].f = src[j].f;
+            if (g_free_slot_records[i].s10 + g_free_slot_records[i].s12 == 0)
+                g_free_slot_records[i].s10++;
         }
     }
     return i;
@@ -183,7 +183,7 @@ int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *src
 
 /* For eight16-byte records, clear active byte1 and halfword6 only when active is nonzero */
 void slot_reset_active(void) {
-    ConditionalResetSlot *slot = D_L00_001B8C00;
+    ConditionalResetSlot *slot = g_wave_l00_channels;
     s32 remaining = 7;
     do {
         if (slot->active) {

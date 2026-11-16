@@ -9,7 +9,7 @@ extern float FastDiffRots(float, float);
 extern float vec_length_xy(void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern char *D_001BF000[];
+extern char *g_nearby_mobys[];
 
 /* Bends a direction away from or toward nearby objects in front, using the middle heading of those found; returns 1 if any were found. */
 int moby_steer_toward_nearby(char *object, float *direction, void *in_direction, float radius, float tolerance)
@@ -30,12 +30,12 @@ int moby_steer_toward_nearby(char *object, float *direction, void *in_direction,
     if (found) {
         kept = 0;
         for (i = 0; i < found && i < 16; i++) {
-            if (moby_is_in_special_class_range(D_001BF000[i]) ||
-                (*(char **)(D_001BF000[i] + 0x24) &&
-                 *(short *)(*(char **)(D_001BF000[i] + 0x24) + 0x46) == 22)) {
+            if (moby_is_in_special_class_range(g_nearby_mobys[i]) ||
+                (*(char **)(g_nearby_mobys[i] + 0x24) &&
+                 *(short *)(*(char **)(g_nearby_mobys[i] + 0x24) + 0x46) == 22)) {
                 radius = mat_fast_helper_a(
-                    *(float *)(D_001BF000[i] + 0x10) - *(float *)(object + 0x10),
-                    *(float *)(D_001BF000[i] + 0x14) - *(float *)(object + 0x14));
+                    *(float *)(g_nearby_mobys[i] + 0x10) - *(float *)(object + 0x10),
+                    *(float *)(g_nearby_mobys[i] + 0x14) - *(float *)(object + 0x14));
                 if (FastDiffRots(wanted_heading, radius) < tolerance)
                     headings[kept++] = radius;
             }

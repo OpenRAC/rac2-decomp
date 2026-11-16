@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L02_001B01B8;
+extern float g_chainblade_ground_height;
 typedef int Vector __attribute__((mode(TI)));
 extern float fast_vec_dist(void *, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -13,7 +13,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern float math_approach_target_with_direction_mode(void *, float, float, float, float, void *, int);
 
-int func_PAL_L02_003D9368(char *self) {
+int chainblade_move_to_throw_position_pal(char *self) {
     float position[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float *p = position;
@@ -27,12 +27,12 @@ int func_PAL_L02_003D9368(char *self) {
     distance = fast_vec_dist(position, *(char **)(state + 0x30C) + 0x10);
     sine = math_fast_sin_or_cos_a(angle);
     cosine = math_fast_sin_or_cos_b(angle);
-    height = D_L02_001B01B8 + distance * sine / cosine;
+    height = g_chainblade_ground_height + distance * sine / cosine;
     p[2] = height - 4.2f;
-    if (D_L02_001B01B8 + 5.0f < p[2])
+    if (g_chainblade_ground_height + 5.0f < p[2])
         return 0;
-    if (p[2] < D_L02_001B01B8 + 0.5f) {
-        float scale = 4.7f / (p[2] - D_L02_001B01B8 + 4.2f);
+    if (p[2] < g_chainblade_ground_height + 0.5f) {
+        float scale = 4.7f / (p[2] - g_chainblade_ground_height + 4.2f);
         FastVecSub(delta, self + 0x10, *(char **)(state + 0x30C) + 0x10);
         delta[2] = 0.0f;
         FastVecScale(delta, delta, scale);

@@ -20,9 +20,9 @@ typedef struct HeroView {
 } HeroView;
 extern HeroView g_hero_state;
 extern int g_current_map_index;
-extern int D_L01_001A9460 __attribute__((sda));
-extern int D_L01_001A9464 __attribute__((sda));
-extern int D_L01_001AF240;
+extern int g_oozla_intro_frame_start __attribute__((sda));
+extern int g_oozla_intro_frame_end __attribute__((sda));
+extern int g_oozla_intro_started;
 typedef struct SceneManager {
     char prefix[0x30];
     int mode;
@@ -32,8 +32,8 @@ typedef struct SceneManager {
     char gap46[0x146];
     char *entries[0];
 } SceneManager;
-extern SceneManager D_L01_001BD1C0;
-extern TrailCamera D_L01_001C5F90;
+extern SceneManager g_ship_trail_state;
+extern TrailCamera g_trail_camera;
 
 extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(char *);
@@ -59,8 +59,8 @@ void func_PAL_L01_002F3E90(void)
     Quadword angle;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L01_001BD1C0.count; ++i) {
-        actor = D_L01_001BD1C0.entries[i];
+    for (i = 0; i < g_ship_trail_state.count; ++i) {
+        actor = g_ship_trail_state.entries[i];
         if (actor && *(short *)(actor + 0xAA) == 0xE29) {
             *(unsigned short *)(actor + 0x34) |= 0x800;
         }
@@ -75,17 +75,17 @@ void func_PAL_L01_002F3E90(void)
     }
 
     if (g_current_map_index == 1) {
-        if (D_L01_001BD1C0.mode == 1) {
-            TrailCamera *camera = &D_L01_001C5F90;
-            g_hero_state.camera = D_L01_001BD1C0.entries[2];
-            trail = D_L01_001BD1C0.entries[3];
-            if (D_L01_001BD1C0.frame == (((int)(D_L01_001A9460) * 5 + 2) / 6)) {
+        if (g_ship_trail_state.mode == 1) {
+            TrailCamera *camera = &g_trail_camera;
+            g_hero_state.camera = g_ship_trail_state.entries[2];
+            trail = g_ship_trail_state.entries[3];
+            if (g_ship_trail_state.frame == (((int)(g_oozla_intro_frame_start) * 5 + 2) / 6)) {
                 mem_clear(camera, 0, sizeof(TrailCamera));
-                D_L01_001AF240 = 1;
+                g_oozla_intro_started = 1;
                 camera->distance = 0.8f;
             }
-            if ((((int)(D_L01_001A9460) * 5 + 2) / 6) < D_L01_001BD1C0.frame &&
-                D_L01_001BD1C0.frame < (((int)(D_L01_001A9464) * 5 + 2) / 6)) {
+            if ((((int)(g_oozla_intro_frame_start) * 5 + 2) / 6) < g_ship_trail_state.frame &&
+                g_ship_trail_state.frame < (((int)(g_oozla_intro_frame_end) * 5 + 2) / 6)) {
                 angle = 0;
                 ((float *)&angle)[2] = -0.13f;
                 euler_rotation_basis(g_hero_state.transform, &angle);
@@ -102,7 +102,7 @@ void func_PAL_L01_002F3E90(void)
                 g_hero_state.camera = 0;
             }
         }
-        if (D_L01_001BD1C0.mode == 3) {
+        if (g_ship_trail_state.mode == 3) {
             trail = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
             gfx_add_draw_callback_first(ship_build_trail_mesh, trail);
         }

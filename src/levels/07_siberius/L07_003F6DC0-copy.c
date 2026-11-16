@@ -1,8 +1,8 @@
 #include "common.h"
 typedef int SibQuad __attribute__((mode(TI)));
 typedef union { SibQuad quad; float value[4]; } SibVector;
-extern float D_L07_001B0FE0 __attribute__((sda));
-extern float D_L07_001B0FE4 __attribute__((sda));
+extern float g_bomb_rate __attribute__((sda));
+extern float g_bomb_elapsed_param __attribute__((sda));
 extern void FastVecSub(void *, void *, void *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void vec_scale_to_length(void *, void *, float);
@@ -22,8 +22,8 @@ void homing_bomb_move_to_target(u8 *self, float *target)
     float rate, elapsed;
     state = *(u8 **)(self + 0x68);
     FastVecSub(&offset, target, position);
-    rate = D_L07_001B0FE0 * (1.0f / 3600.0f);
-    elapsed = D_L07_001B0FE4 * (1.0f / 60.0f);
+    rate = g_bomb_rate * (1.0f / 3600.0f);
+    elapsed = g_bomb_elapsed_param * (1.0f / 60.0f);
     movement = state + 0x50;
     offset.value[2] = 0.0f;
     math_step_value_toward_target((float *)(self + 0x18), (float *)(state + 0x5C), *(float *)(state + 0x60), rate, rate, elapsed);

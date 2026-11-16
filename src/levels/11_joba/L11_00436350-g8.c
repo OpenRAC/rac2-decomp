@@ -1,6 +1,6 @@
 #include "common.h"
-extern int D_L11_001A8FF4 __attribute__((sda));
-extern char D_L11_001BA8C0[];
+extern int g_hero_l11_input_blocked __attribute__((sda));
+extern char g_hero_l11_position[];
 extern int FloatToInt(float);
 extern float math_random_float_range(float,float);
 extern int math_random_int_below(int);
@@ -93,9 +93,9 @@ void flying_enemy_hit_and_init(char *moby) {
             }
         }
     }
-    if(!F(vars,short,0x286) && F(moby,unsigned char,0x20)!=11 && !D_L11_001A8FF4) {
+    if(!F(vars,short,0x286) && F(moby,unsigned char,0x20)!=11 && !g_hero_l11_input_blocked) {
         F(moby,unsigned short,0x34)|=0x400;
-        if(F(moby,unsigned char,0x31) && fast_vec_dist(moby+0x10,D_L11_001BA8C0)<24.0f) {
+        if(F(moby,unsigned char,0x31) && fast_vec_dist(moby+0x10,g_hero_l11_position)<24.0f) {
             moby_update_ground_check(moby);
             F(moby,unsigned char,0x6F)=22;
         }

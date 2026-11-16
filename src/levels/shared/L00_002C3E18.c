@@ -17,7 +17,7 @@ typedef struct {
 } HeroSelectionState;
 extern HeroSelectionState g_hero_state;
 
-extern unsigned char *D_L00_001B1EA8 __attribute__((sda));
+extern unsigned char *g_moby_l00_list_head __attribute__((sda));
 extern float hero_score_target_by_heading(void *, int *, float, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
@@ -37,7 +37,7 @@ int hero_find_active_swingshot_node(void)
         best = 0;
         closest = 100000000.0f;
         g_hero_state.ready_aa8 = 0;
-        for (node = D_L00_001B1EA8; node; node = *(unsigned char **)(node + 0x28)) {
+        for (node = g_moby_l00_list_head; node; node = *(unsigned char **)(node + 0x28)) {
             char *data;
             float horizontal, vertical, heading, range, score;
             if (*(short *)(node + 0xAA) != MOBY_CLASS_SWINGSHOT_NODE) continue;

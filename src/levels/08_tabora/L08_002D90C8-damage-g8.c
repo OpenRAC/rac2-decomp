@@ -1,12 +1,12 @@
 #include "common.h"
 #define F(p,T,o) (*(T *)((char *)(p)+(o)))
-extern char D_L08_001B9B00[], D_0019B4A8[];
-extern char D_L08_001A8F20[] __attribute__((sda));
+extern char g_hero_position_vec[], g_moby_nibble_table[];
+extern char g_str_effect_name[] __attribute__((sda));
 /* GCC 2.9 uses a zero-length tail for the variable-sized flag table. */
-extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021EAF0;
+extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_b;
 extern int g_current_map_index;
-extern int D_L08_001A8F00 __attribute__((sda));
-extern float D_L08_001B02F0 __attribute__((sda)), D_L08_001B02F4 __attribute__((sda)), D_L08_001B02F8 __attribute__((sda));
+extern int g_cutscene_l08_active_flag __attribute__((sda));
+extern float g_crystal_shell_speed __attribute__((sda)), g_crystal_shell_random_low __attribute__((sda)), g_crystal_shell_random_high __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *), moby_mark_spawned(void *);
 extern int moby_is_in_selected_zone(void *),game_is_either_mode_two(void);
@@ -33,17 +33,17 @@ void crystal_shell_update_damage(char *o) {
     float target[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    if(F(o,u8,0x31) && fast_vec_dist(o+0x10,D_L08_001B9B00)<48.0f) {
+    if(F(o,u8,0x31) && fast_vec_dist(o+0x10,g_hero_position_vec)<48.0f) {
         moby_update_ground_check(o); F(o,u8,0x6F)=45;
     }
     if(F(o,u8,0xB0)!=255) {
         unsigned short index=F(o,u16,0xB2);
-        if(D_L08_0021EAF0.flags[(short)index]) {moby_mark_spawned(o);return;}
-        bits=F(D_0019B4A8,u8,((short)index>>1)+(g_current_map_index<<10));
+        if(g_moby_spawn_state_flags_b.flags[(short)index]) {moby_mark_spawned(o);return;}
+        bits=F(g_moby_nibble_table,u8,((short)index>>1)+(g_current_map_index<<10));
         if((index&1) ? ((bits>>4)&7) : (bits&7)) {moby_mark_spawned(o);return;}
     }
     if(!moby_is_in_selected_zone(o+0x10)) return;
-    if(D_L08_001A8F00==2) {F(o,u8,0x31)=0;F(o,u16,0x34)|=1;}
+    if(g_cutscene_l08_active_flag==2) {F(o,u8,0x31)=0;F(o,u16,0x34)|=1;}
     else {F(o,u8,0x31)=1;F(o,u16,0x34)&=0xFFFE;}
     if(game_is_either_mode_two())return;
     if(!F(o,u8,0x20)) {
@@ -65,8 +65,8 @@ void crystal_shell_update_damage(char *o) {
         anim_start_immediate(o,3,FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0))<16 ? FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0)) : 15);
         F(o,int,0x48)=0;
         z=F(o,float,0x48);
-        SpawnExplosionEffects(o,D_L08_001A8F20,at,z,z,4,2,5,2,1,9,1,-1,z,0,0,-1,0,0x810001);
-        part_spawn_effect_burst(o,-1,0,0x96D,1,3,0,D_L08_001A8F20);
+        SpawnExplosionEffects(o,g_str_effect_name,at,z,z,4,2,5,2,1,9,1,-1,z,0,0,-1,0,0x810001);
+        part_spawn_effect_burst(o,-1,0,0x96D,1,3,0,g_str_effect_name);
         sound=math_random_int_range(0,2);
         if(F(health,float,0)>z)PlayMobySound(sound,0,o);
     }
@@ -87,13 +87,13 @@ void crystal_shell_update_damage(char *o) {
             func_002A0F48(spawn);hero_copy_field_to_moby(spawn);
             F(F(spawn,char *,0x68),char *,4)=o;
             SpawnExplosionEffects(o,at,target,0,0,20,6,32,6,4,3,2,-1,20,1,3,-1,0,0x810001);
-            part_spawn_effect_burst(o,0x96D,3,0,0,0,0,D_L08_001A8F20);
+            part_spawn_effect_burst(o,0x96D,3,0,0,0,0,g_str_effect_name);
             PlayMobySound(3,0,o);
             angle=math_random_angle();
             n=0;
             do {
-                speed=D_L08_001B02F0*0.016666668f;
-                t=math_random_float_range(D_L08_001B02F4,D_L08_001B02F8);
+                speed=g_crystal_shell_speed*0.016666668f;
+                t=math_random_float_range(g_crystal_shell_random_low,g_crystal_shell_random_high);
                 --n;
                 vec_build_spherical_offset(velocity,speed,angle,t*0.017453294f);
                 angle+=2.0943954f;

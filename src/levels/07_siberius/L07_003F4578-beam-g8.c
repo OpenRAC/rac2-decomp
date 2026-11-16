@@ -19,20 +19,20 @@ extern s32 FastTweenColor(s32 from, s32 to, f32 t);
 extern void gfx_init_quad_packet_state(void *packet, s32 a, s32 b, s32 c);
 extern void draw_world_quad(void *packet, void *a, s32 b);
 extern void gfx_draw_billboard_quad(void *pos, s32 id, s32 color, s32 a, f32 size, f32 b, f32 rotation);
-extern u8 D_L07_001B9200[] NOT_SDA;
-extern s32 D_L07_001B0EB0 __attribute__((sda));
-extern s32 D_L07_001B0EA8 __attribute__((sda));
-extern s32 D_L07_001B0ED0 __attribute__((sda));
-extern s32 D_L07_001B0EAC[] __attribute__((sda));
-extern s32 D_L07_001B0ED4[] __attribute__((sda));
-extern f32 D_L07_001B0EB8 __attribute__((sda));
-extern f32 D_L07_001B0EC0 __attribute__((sda));
-extern f32 D_L07_001B0ED8 __attribute__((sda));
-extern f32 D_L07_001B0EDC __attribute__((sda));
-extern f32 D_L07_001B0EBC[] __attribute__((sda));
-extern f32 D_L07_001B0EC8[] __attribute__((sda));
-extern f32 D_L07_001B0EE0[] SDATA(D_L07_001B0EE0);
-extern f32 D_L07_001B0EE4[] __attribute__((sda));
+extern u8 g_hero_position_block[] NOT_SDA;
+extern s32 g_beam_texture_param __attribute__((sda));
+extern s32 g_beam_l07_core_color __attribute__((sda));
+extern s32 g_beam_l07_glow_color __attribute__((sda));
+extern s32 g_beam_color_pair[] __attribute__((sda));
+extern s32 g_beam_edge_color_pair[] __attribute__((sda));
+extern f32 g_beam_vertex_depth __attribute__((sda));
+extern f32 g_beam_segment_length __attribute__((sda));
+extern f32 g_beam_rotation_offset __attribute__((sda));
+extern f32 g_beam_rotation_rate __attribute__((sda));
+extern f32 g_beam_depth_pair[] __attribute__((sda));
+extern f32 g_beam_width_pair[] __attribute__((sda));
+extern f32 g_beam_l07_uv_u_table[] SDATA(D_L07_001B0EE0);
+extern f32 g_beam_l07_uv_v_table[] __attribute__((sda));
 
 #define F(p, o) (*(f32 *)((p) + (o)))
 
@@ -55,30 +55,30 @@ void DrawSegmentedBeam(u8 *moby)
 
     beam_get_end_points(moby, start, end);
     FastVecSub(delta, end, start);
-    FastVecSub(side, D_L07_001B9200, moby + 0x10);
+    FastVecSub(side, g_hero_position_block, moby + 0x10);
     FastVecCross(normal, side, delta);
     vec_scale_to_length(normal, normal, 1);
     qzero_nc(side);
     qcopy_nc(base, start);
     base[3] = 1;
-    gfx_init_quad_packet_state(&draw, D_L07_001B0EB0, 1, 128);
+    gfx_init_quad_packet_state(&draw, g_beam_texture_param, 1, 128);
     uvOffset = 0.0f;
-    color = FastTweenColor(D_L07_001B0EA8 & 0xffffff, D_L07_001B0EA8, F(vars, 0x24));
+    color = FastTweenColor(g_beam_l07_core_color & 0xffffff, g_beam_l07_core_color, F(vars, 0x24));
     {
         s32 i;
 
         for (i = 0; i < 4; i++) {
             struct Vec4 *v;
 
-            draw.uv[i][0] = D_L07_001B0EE0[i * 2] + uvOffset;
-            draw.uv[i][1] = D_L07_001B0EE4[i * 2];
+            draw.uv[i][0] = g_beam_l07_uv_u_table[i * 2] + uvOffset;
+            draw.uv[i][1] = g_beam_l07_uv_v_table[i * 2];
             qzero_nc(&draw.vertices[i]);
             v = &draw.vertices[i];
             if (i < 2)
                 v->x = 0;
             else
                 v->x = 1;
-            v->z = D_L07_001B0EB8;
+            v->z = g_beam_vertex_depth;
             if (!(i & 1))
                 v->z = -v->z;
             v->w = 1;
@@ -86,21 +86,21 @@ void DrawSegmentedBeam(u8 *moby)
         }
     }
     draw_world_quad(&draw, delta, 0);
-    color = FastTweenColor(D_L07_001B0EAC[0] & 0xffffff, D_L07_001B0EAC[0], F(vars, 0x24));
+    color = FastTweenColor(g_beam_color_pair[0] & 0xffffff, g_beam_color_pair[0], F(vars, 0x24));
     {
         s32 i;
 
         for (i = 0; i < 4; i++) {
             struct Vec4 *v = &draw.vertices[i];
 
-            v->z = D_L07_001B0EBC[0];
+            v->z = g_beam_depth_pair[0];
             if (!(i & 1))
-                v->z = -D_L07_001B0EBC[0];
+                v->z = -g_beam_depth_pair[0];
             draw.colors[i] = color;
         }
     }
     draw_world_quad(&draw, delta, 0);
-    length = FastVecLength(delta) / D_L07_001B0EC0;
+    length = FastVecLength(delta) / g_beam_segment_length;
     rotation = F(vars, 0x28);
     if (moby[0x20] == 0) {
         alpha = 1;
@@ -112,23 +112,23 @@ void DrawSegmentedBeam(u8 *moby)
         count = length + 1;
     }
     qcopy(current, base);
-    vec_scale_to_length(step, delta, D_L07_001B0EC0);
+    vec_scale_to_length(step, delta, g_beam_segment_length);
     for (i = 0; (f32)i < count; i++) {
         f32 *pos;
 
         /* The last point and odd points take the first width, even points the second. */
         if ((f32)i == count - 1)
-            width = D_L07_001B0EC8[0];
+            width = g_beam_width_pair[0];
         else if (i & 1)
-            width = D_L07_001B0EC8[0];
+            width = g_beam_width_pair[0];
         else
-            width = D_L07_001B0EC8[1];
-        color = FastTweenColor(D_L07_001B0ED0 & 0xffffff, D_L07_001B0ED0, alpha);
+            width = g_beam_width_pair[1];
+        color = FastTweenColor(g_beam_l07_glow_color & 0xffffff, g_beam_l07_glow_color, alpha);
         pos = current;
         gfx_draw_billboard_quad(pos, 49, color, 1, width, 0, rotation);
-        color = FastTweenColor(D_L07_001B0ED4[0] & 0xffffff, D_L07_001B0ED4[0], alpha);
-        gfx_draw_billboard_quad(pos, 49, color, 1, width, 0, FastAddRotations(rotation, D_L07_001B0ED8));
-        rotation = -FastAddRotations(rotation, D_L07_001B0EDC * 0.017453294f);
+        color = FastTweenColor(g_beam_edge_color_pair[0] & 0xffffff, g_beam_edge_color_pair[0], alpha);
+        gfx_draw_billboard_quad(pos, 49, color, 1, width, 0, FastAddRotations(rotation, g_beam_rotation_offset));
+        rotation = -FastAddRotations(rotation, g_beam_rotation_rate * 0.017453294f);
         if ((f32)i < length - 1)
             FastVecAdd(current, current, step);
         else

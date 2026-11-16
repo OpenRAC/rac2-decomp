@@ -24,9 +24,9 @@ void group_destroy_attached_parts(char *object, char *entries)
 }
 
 extern int g_game_time;
-extern char *D_001B1B5C;
-extern int D_001B1B78 MACRO_ADDR;
-extern unsigned short *D_001EE5A0[];
+extern char *g_moby_pool_start;
+extern int g_moby_group_count MACRO_ADDR;
+extern unsigned short *g_moby_group_lists[];
 extern void group_draw_joint_glows(char *);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 
@@ -42,11 +42,11 @@ void group_sync_counter(unsigned char *object, int *field)
             *field = g_game_time;
         } else {
             offset = (char *)field - *(char **)(object + 0x68);
-            for (p = D_001EE5A0[object[0x21]];
-                 object[0x21] != 0xFF && object[0x21] <= D_001B1B78 && p != 0 &&
-                 ((p != 0 && (short)p[-1] >= 0) || p == D_001EE5A0[object[0x21]]);
+            for (p = g_moby_group_lists[object[0x21]];
+                 object[0x21] != 0xFF && object[0x21] <= g_moby_group_count && p != 0 &&
+                 ((p != 0 && (short)p[-1] >= 0) || p == g_moby_group_lists[object[0x21]]);
                  p++) {
-                e = (unsigned char *)D_001B1B5C + ((*p & 0x7FFF) << 8);
+                e = (unsigned char *)g_moby_pool_start + ((*p & 0x7FFF) << 8);
                 if (e == 0)
                     break;
                 if (*(short *)(e + 0xAA) == *(short *)(object + 0xAA))

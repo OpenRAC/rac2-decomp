@@ -206,7 +206,7 @@ void vec_steer_toward_target(char *position, char *direction, char *target)
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern char *SpawnSpinningSparkParticle(void *, int, void *, float, float, unsigned int, float, float, int);
-extern char D_L00_001A8F20[] __attribute__((section(".sdata")));
+extern char g_default_vector[] __attribute__((section(".sdata")));
 /* Sprays a few sparks from a point when a seeker shot hits. */
 void seeker_spawn_impact_sparks(void *unused, void *position)
 {
@@ -215,7 +215,7 @@ void seeker_spawn_impact_sparks(void *unused, void *position)
     for (i=1; i>=0; i--) {
         int n=math_random_int_below(16);
         sign=math_random_int_below(2);
-        particle=SpawnSpinningSparkParticle(position, sign ? -n : n, D_L00_001A8F20, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
+        particle=SpawnSpinningSparkParticle(position, sign ? -n : n, g_default_vector, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
         payload=particle+32;
         if(particle) {
             *(short *)(particle+10)=10;
@@ -228,7 +228,7 @@ void seeker_spawn_impact_sparks(void *unused, void *position)
     { int n=16;
     int j;
     for(j=0;j<2;j++) {
-        particle=SpawnSpinningSparkParticle(position,n,D_L00_001A8F20,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
+        particle=SpawnSpinningSparkParticle(position,n,g_default_vector,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
         n=-n;
         payload=particle+32;
         if(particle) {
@@ -358,7 +358,7 @@ typedef struct {
     ArcVector normal;
 } ArcCollision;
 extern ArcHero g_hero_state;
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern ArcCollision g_collision_result;
 extern float g_camera_l00_position[];
 extern float mat_fast_helper_a(float, float);
@@ -390,7 +390,7 @@ int PredictMineImpact(char *motion, char *object, int mode)
 
     if (hero->state == 0x6F)
         return 0;
-    if (D_L00_001A8F00 != 0)
+    if (g_game_l00_mode != 0)
         return 0;
     qcopy(previous, object + 0x10);
     if (*(unsigned char *)(object + 0x20) == 1) {
@@ -481,7 +481,7 @@ typedef struct {
     unsigned char next[8];
 } PathNode;
 
-extern PathNode D_L00_0023BB78[];
+extern PathNode g_effect_path_node_table[];
 extern void func_002EDE60(void *dst, int value, int size);
 extern void func_002EDEB0(void *dst, void *src, int size);
 
@@ -495,7 +495,7 @@ int path_find_between_nodes(unsigned char from, unsigned char to, unsigned char 
     int best;
     int done;
 
-    if (D_L00_0023BB78[from].used == 0 || D_L00_0023BB78[to].used == 0)
+    if (g_effect_path_node_table[from].used == 0 || g_effect_path_node_table[to].used == 0)
         return 0;
     func_002EDE60(path, 0, 256);
     len = 0;
@@ -504,7 +504,7 @@ int path_find_between_nodes(unsigned char from, unsigned char to, unsigned char 
     done = 0;
     best = 0;
     do {
-        while (D_L00_0023BB78[cur].next[tried[cur]] == cur) {
+        while (g_effect_path_node_table[cur].next[tried[cur]] == cur) {
             tried[cur]++;
             if (tried[cur] == 8)
                 break;
@@ -518,7 +518,7 @@ int path_find_between_nodes(unsigned char from, unsigned char to, unsigned char 
                 cur = path[len];
             }
         } else {
-            next = D_L00_0023BB78[cur].next[tried[cur]];
+            next = g_effect_path_node_table[cur].next[tried[cur]];
             tried[cur]++;
             if (next == to) {
                 if (best < len + 2) {

@@ -3,21 +3,21 @@
 
 typedef int V4_L00_004170A8 __attribute__((mode(TI)));
 extern char g_spark_l00_records[];
-extern V4_L00_004170A8 D_L00_001BF220;
+extern V4_L00_004170A8 g_hero_l00_position;
 extern int math_fast_float_d(void *);
-extern void func_PAL_L00_0041C528(char *);
+extern void part_emit_spark_burst_at_moby_pal(char *);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
-extern void func_PAL_L00_0041CBB8(char *, void *, int);
+extern void spark_record_claim_pal(char *, void *, int);
 extern void spark_records_update(char *);
-extern void func_PAL_L00_0041C390(char *);
-extern void func_PAL_L00_0041C878(char *);
+extern void part_spawn_drifting_particles_pal(char *);
+extern void beam_glow_sprites_update_owned_pal(char *);
 extern void moby_mark_spawned(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
-void func_PAL_L00_0041C220(char *object)
+void spark_l00_effect_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     V4_L00_004170A8 local;
@@ -26,7 +26,7 @@ void func_PAL_L00_0041C220(char *object)
     char *p;
     if (math_fast_float_d(state) == 0) {
         if (*(int *)(state + 4) == 0)
-            func_PAL_L00_0041C528(object);
+            part_emit_spark_burst_at_moby_pal(object);
         if (*(int *)(state + 4) == 0) {
             a = math_random_angle();
             b = math_random_angle();
@@ -38,17 +38,17 @@ void func_PAL_L00_0041C220(char *object)
         }
         FastVecAdd(&local, &local, object + 0x10);
         if (CollLine(object + 0x10, &local, 0, object, 0) != 0)
-            local = D_L00_001BF220;
-        func_PAL_L00_0041CBB8(object, &local, 17);
+            local = g_hero_l00_position;
+        spark_record_claim_pal(object, &local, 17);
         spark_records_update(object);
-        ref_L00_004170A8_00(func_PAL_L00_0041C878, object);
+        ref_L00_004170A8_00(beam_glow_sprites_update_owned_pal, object);
     } else {
         p = g_spark_l00_records;
         p += 0x106C;
         for (i = 23; i >= 0; --i, p -= 0xB0)
             *(int *)p = 0;
         if (*(int *)(state + 4) == 0)
-            func_PAL_L00_0041C390(object);
+            part_spawn_drifting_particles_pal(object);
         moby_mark_spawned(object);
     }
 }
@@ -62,7 +62,7 @@ extern int math_random_int_range(int, int);
 extern void ref_L00_00417868_00(void *, void *, void *, void *, void *, float);
 extern void ref_L00_00417868_01(void *, int, void *, int);
 
-void func_PAL_L00_0041C9E0(char *object, char *state) {
+void lightning_bolt_build_jittered_b_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;
     int i;

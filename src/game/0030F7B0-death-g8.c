@@ -40,11 +40,11 @@ typedef struct {
 } CrateHit;
 
 extern int g_game_time;          /* the frame counter */
-extern int D_001B24AC, D_001B24B0;
-extern int D_001B1A80;
-extern int D_001AF0F8 __attribute__((sda)), D_001AF0FC __attribute__((sda));
+extern int g_death_time_a, g_death_time_b;
+extern int g_hero_health_percent;
+extern int g_nanotech_last_time __attribute__((sda)), g_nanotech_cooldown __attribute__((sda));
 extern char *g_hero_moby NOT_SDA; /* the hero */
-extern char *D_001AD7EC;
+extern char *g_turret_target_moby;
 
 extern int subtract_integer_with_clamp(int);
 extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
@@ -71,16 +71,16 @@ void DestroyCrate(CrateMoby *self, int explode, CrateHit *hit)
     CrateMoby *p;
     int i, amount, kind;
 
-    if (subtract_integer_with_clamp(g_game_time - D_001B24AC) >= 2) {
+    if (subtract_integer_with_clamp(g_game_time - g_death_time_a) >= 2) {
         switch (self->oClass) {
         case 0x1FA /* moby class 506 */: snd_play_from_class_bank(0, 0, (char *)self, 0x1F4); break;
         case MOBY_CLASS_AMMO_CRATE: snd_play_from_class_bank(1, 0, (char *)self, 0x1FF); break;
         default: PlayMobySound(0, 0, (char *)self); break;
         }
-        D_001B24AC = g_game_time;
+        g_death_time_a = g_game_time;
     }
-    if (subtract_integer_with_clamp(g_game_time - D_001B24B0) >= 2)
-        D_001B24B0 = g_game_time;
+    if (subtract_integer_with_clamp(g_game_time - g_death_time_b) >= 2)
+        g_death_time_b = g_game_time;
     if (vars->above) {
         vars->above->vars->below = vars->below;
         vars->above->vars->flags |= 0x24;
@@ -109,26 +109,26 @@ void DestroyCrate(CrateMoby *self, int explode, CrateHit *hit)
         qcopy(direction, hit->position);
     else
         FastVecSub(direction, self->position, g_hero_moby + 0x10);
-    if (subtract_integer_with_clamp(g_game_time - D_001AF0F8) >= 241) {
-        D_001AF0FC = 0;
-        D_001AF0F8 = g_game_time;
-    } else if (g_game_time != D_001AF0F8) {
-        math_step_int_toward_target(&D_001AF0FC, 0, subtract_integer_with_clamp(g_game_time - D_001AF0F8) >> 2);
-        D_001AF0F8 = g_game_time;
+    if (subtract_integer_with_clamp(g_game_time - g_nanotech_last_time) >= 241) {
+        g_nanotech_cooldown = 0;
+        g_nanotech_last_time = g_game_time;
+    } else if (g_game_time != g_nanotech_last_time) {
+        math_step_int_toward_target(&g_nanotech_cooldown, 0, subtract_integer_with_clamp(g_game_time - g_nanotech_last_time) >> 2);
+        g_nanotech_last_time = g_game_time;
     }
-    if (D_001B1A80 >= 251 && D_001AF0FC < 5)
+    if (g_hero_health_percent >= 251 && g_nanotech_cooldown < 5)
         amount = 4;
-    else if (D_001B1A80 >= 201 && D_001AF0FC < 10)
+    else if (g_hero_health_percent >= 201 && g_nanotech_cooldown < 10)
         amount = 3;
-    else if (D_001B1A80 >= 151 && D_001AF0FC < 15)
+    else if (g_hero_health_percent >= 151 && g_nanotech_cooldown < 15)
         amount = 2;
     else
-        amount = D_001B1A80 >= 101 && D_001AF0FC < 20;
+        amount = g_hero_health_percent >= 101 && g_nanotech_cooldown < 20;
     if (amount) {
         int type;
         kind = 0;
         type = self->oClass;
-        D_001AF0FC += amount;
+        g_nanotech_cooldown += amount;
         switch (type) {
         case MOBY_CLASS_CRATE: case MOBY_CLASS_AMMO_CRATE:
             switch (amount) {
@@ -145,7 +145,7 @@ void DestroyCrate(CrateMoby *self, int explode, CrateHit *hit)
         }
         if (kind) {
             qzero_nc(velocity);
-            if (vars->attachment && !D_001AD7EC)
+            if (vars->attachment && !g_turret_target_moby)
                 moby_transform_point_by_attachment((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
             part_spawn_masked_debris((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }

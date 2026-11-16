@@ -5,7 +5,7 @@
    gets no register, and reload builds the address beside the load. */
 
 extern int g_screen_width[] MACRO_ADDR;
-extern int D_L17_001AF52C[];
+extern int g_tile_grid_scroll[];
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern unsigned long GetEffectTextureDescriptor(int);
@@ -31,7 +31,7 @@ void gfx_draw_fading_tile_grid(char *moby) {
     rows = g_screen_width[1] / 32 + 1;
 
     for (i = 0; i < columns; i++) {
-        int *scroll_ptr = D_L17_001AF52C;
+        int *scroll_ptr = g_tile_grid_scroll;
         for (j = 0; j < rows; j++) {
             cell_pos[0] = (float)(i * 32);
             cell_pos[1] = (float)(j * 32);

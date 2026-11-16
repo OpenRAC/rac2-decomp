@@ -155,7 +155,7 @@ void brawler_head_react_hero_near(char *actor) {
 extern int flag_set_first_pending(char *);
 extern int math_fast_float_d(int *);
 extern int FloatToInt(float);
-extern int D_L02_002A53B0[3][9];
+extern int g_slot_reel_symbol_table[3][9];
 
 /* The actor's state, as far as this function goes: three tracks of nine positions each. */
 typedef struct {
@@ -206,7 +206,7 @@ void slot_machine_update_reels(char *actor) {
             st->pos[i] = st->pos[i] - st->speed[i];
             if (st->pos[i] < 0.0f)
                 st->pos[i] += 9.0f;
-            if (D_L02_002A53B0[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
+            if (g_slot_reel_symbol_table[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
                 if (st->pos[i] - (float)FloatToInt(st->pos[i]) < 0.2f)
                     st->mode[i] = 0;
             }
@@ -229,9 +229,9 @@ extern u8 *moby_create_effect_at_position(float *, int);
 extern void STUB_printf(const char *, ...);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void value_set_entry_by_index(int, int);
-extern char D_L02_001B09C8[];
+extern char g_str_slot_award[];
 extern int g_hovering_object_count __attribute__((sda));
-extern int D_L02_001A903C __attribute__((sda));
+extern int g_one_shot_flag __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
 extern void *D_L02_002A52D0[5];
 
@@ -246,7 +246,7 @@ typedef struct {
     char pad0[0x79];
     u8 once;
 } Global001A7A00;
-extern Global001A7A00 D_001A7A00 __attribute__((sda));
+extern Global001A7A00 g_player_stats __attribute__((sda));
 
 /* Re-arms the actor (func_002A7750 with 1), builds a random point near it (a, from
    func_L01_0031A278, plus the offset b from func_L02_0031E9E8) and acts on the mode at +0x5C of
@@ -292,15 +292,15 @@ c3:
 c4:
     PlayMobySound(2, 0x20, actor);
     moby_create_effect_at_position(point, 0);
-    STUB_printf(D_L02_001B09C8);
+    STUB_printf(g_str_slot_award);
     goto done;
 c5:
     PlayMobySound(2, 0x20, actor);
-    if (D_001A7A00.once == 0) {
-        D_001A7A00.once = 1;
+    if (g_player_stats.once == 0) {
+        g_player_stats.once = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index(0x1233, -1);
-        D_L02_001A903C = 1;
+        g_one_shot_flag = 1;
     }
     g_player_bolts += 300;
     goto done;
@@ -423,7 +423,7 @@ extern float fast_subtract_rotations(float, float);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 extern void set_follow_camera_orbit_clamp_mode(int);
 extern void cam_set_lock_flag(void);
-extern float D_L02_001B0E90 __attribute__((sda));
+extern float g_path_heading_easing_scale __attribute__((sda));
 extern char *g_route_polygons[];
 
 /* Updates the heading (float at +0x38 of the actor's state) from the path D_L02_001FF1C0[*state]:
@@ -481,7 +481,7 @@ void path_update_hero_heading(char *actor) {
     if (math_fabs(segment_angle) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
-        easing = scale * D_L02_001B0E90;
+        easing = scale * g_path_heading_easing_scale;
         math_approach_target_with_braking(state + 0x38, segment_angle, (easing + 0.5f) * 0.00027777778450399637f,
                       (easing + 0.5f) * 0.00027777778450399637f, easing * 0.01666666753590107f);
     }
@@ -531,7 +531,7 @@ extern void *part_find_owned_effect_slot(void *, int, int);
 extern int moby_apply_damage_to_object(void *, void *, int);
 extern void actor_tear_down(char *);
 extern void actor_update_loop_effect(char *);
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 
 /* The actor's state: only the words this function touches are named. */
 typedef struct {
@@ -623,7 +623,7 @@ void swaying_actor_update(char *actor) {
         }
     }
     vars->f4BC = FastAddRotations(vars->f4BC, vars->f4CC * 0.017453294f);
-    enemy_attach_turn_child_parts(vars->f4BC, actor, vars->x4C0, 1, D_L02_001A8F20);
+    enemy_attach_turn_child_parts(vars->f4BC, actor, vars->x4C0, 1, g_zero_l02_vector);
     group_sync_counter(actor, vars->x4DC);
     if (*(u8 *)(actor + 0x31) != 0 && *(u8 *)(actor + 0x20) >= 3) {
         char *contact = part_find_owned_effect_slot(actor, 0x10000, 1);
@@ -809,21 +809,21 @@ void actor_save_state_and_switch(char *actor) {
 
 /* func_L02_003F52B0 is defined in L02_003F52B0.c. */
 
-extern char *D_L02_001B3AF8 __attribute__((sda));
-extern char *D_L02_001B3AFC __attribute__((sda));
-extern u8 D_L02_00220730;
+extern char *g_actor_entry_table __attribute__((sda));
+extern char *g_actor_entry_table_end __attribute__((sda));
+extern u8 g_actor_match_key;
 
 /* Appends to the actor's list of 16-bit indices (at +0x40, count at +0x80, at most 0x20) the
    index of every 0x20-byte record of the table whose byte at +0x1A equals the current key. */
 void actor_collect_matching_indices(char *actor) {
     char *state = *(char **)(actor + 0x68);
     s16 *tbl = (s16 *)(state + 0x40);
-    u8 key = D_L02_00220730;
-    char *end = D_L02_001B3AFC;
+    u8 key = g_actor_match_key;
+    char *end = g_actor_entry_table_end;
     int i = 0;
     char *p;
 
-    for (p = D_L02_001B3AF8; p < end; p += 0x20, i++) {
+    for (p = g_actor_entry_table; p < end; p += 0x20, i++) {
         if (*(u8 *)(p + 0x1A) == key) {
             s16 *q = tbl + *(int *)(state + 0x80);
 

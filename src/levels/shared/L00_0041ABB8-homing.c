@@ -34,9 +34,9 @@ extern BEE58Entry g_weapon_l00_table[];
 extern char *g_hero_moby NOT_SDA;
 typedef struct { char pad[0x18]; char *target; char pad1[4]; float position[4]; } BEE58Hit;
 extern BEE58Hit g_collision_result;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern unsigned char *D_L00_001FEA14;
-extern unsigned char *D_L00_001FE9F4;
+extern char g_default_vector[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b;
+extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter MACRO_ADDR;
 extern void shot_update_and_draw_trail(void *);
 
@@ -126,13 +126,13 @@ target_done:
             *(int *)(state + 0x38) = 6;
         }
         work = math_random_int_below(255);
-        sprite = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (sprite) sprite[2] = *D_L00_001FEA14;
+        sprite = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (sprite) sprite[2] = *g_effect_param_pointer_b;
         work = (work + 128) % 255;
-        sprite = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (sprite) sprite[2] = *D_L00_001FEA14;
-        sprite = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
-        if (sprite) sprite[2] = *D_L00_001FEA14;
+        sprite = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (sprite) sprite[2] = *g_effect_param_pointer_b;
+        sprite = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
+        if (sprite) sprite[2] = *g_effect_param_pointer_b;
         work = (int)delta;
         FastVecSub((void *)work, obj + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.4f);
@@ -144,12 +144,12 @@ target_done:
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.1f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.1f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            part_spawn_gravity_fade(particle, g_default_vector, 15, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            sprite = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (sprite) sprite[2] = *D_L00_001FE9F4;
+            sprite = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (sprite) sprite[2] = *g_effect_param_pointer_a;
         }
         ref_L00_0041EE58_00(shot_update_and_draw_trail, obj);
         break;

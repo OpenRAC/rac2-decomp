@@ -19,7 +19,7 @@ typedef struct { char pad00[4]; unsigned char color; char pad05[0x37]; unsigned 
 extern ListState g_vendor_menu_state;
 extern unsigned char g_item_slot_to_record[];
 extern IconInfo g_weapon_table[];
-extern float D_001B2280[] MACRO_ADDR;
+extern float g_pal_aspect_scale[] MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR, g_screen_height MACRO_ADDR;
 extern void gfx_set_scissor_clamped(int,int,int,int);
@@ -30,7 +30,7 @@ extern unsigned int ui_get_item_color(int);
 extern void hud_draw_sprite_gradient(int,int,int,int,int,unsigned int *);
 extern char *GetLocalizedString(int);
 extern int text_run_helper_first_set(char *,int,float);
-extern void func_US2_002FA630(float,float,unsigned long,float,char *,int);
+extern void draw_large_text_edge_faded_us2(float,float,unsigned long,float,char *,int);
 
 #define screen_y(y) ((int)(D_001B2280[0] * (y) + 0.5f) + (D_001A7B90 ? 4 : 0))
 
@@ -40,7 +40,7 @@ void func_US2_002FAB0C(void)
     int i, index, y, icon, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
     double distance;
-    gfx_set_scissor_clamped(58,456,(int)(D_001B2280[0]*320.0f+0.5f),screen_y(388));
+    gfx_set_scissor_clamped(58,456,(int)(g_pal_aspect_scale[0]*320.0f+0.5f),screen_y(388));
     if (g_vendor_menu_state.scroll < 0) g_vendor_menu_state.scroll += 4;
     else if (g_vendor_menu_state.scroll > 0) g_vendor_menu_state.scroll -= 4;
     i = -5;
@@ -75,15 +75,15 @@ void func_US2_002FAB0C(void)
             alpha1 <<= 24;
             colors[2] = colors[0] = alpha0 | color;
             colors[3] = colors[1] = alpha1 | color;
-            hud_draw_sprite_gradient(icon,y+4,screen_y(329),40,(int)(D_001B2280[0]*40.0f+0.5f),colors);
+            hud_draw_sprite_gradient(icon,y+4,screen_y(329),40,(int)(g_pal_aspect_scale[0]*40.0f+0.5f),colors);
             if (g_vendor_menu_state.rows[index].owned) {
                 char *text = GetLocalizedString(0x30f5);
                 int tx = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
-                func_US2_002FA630((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded_us2((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             } else if (g_vendor_menu_state.rows[index].kind == 1) {
                 char *text = GetLocalizedString(0x2c5f);
                 int tx = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
-                func_US2_002FA630((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded_us2((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             }
         }
         i++;

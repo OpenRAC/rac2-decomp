@@ -27,7 +27,7 @@ extern int moby_decrement_top_byte(void *, int);
 
 /* Updates an attached spark and emits children; mode 1 orbits its owner.
  * The interleaved prototype preserves each EE argument register bank. */
-void func_PAL_002C4E10(char *p) {
+void part_update_attached_spark_emitter_pal(char *p) {
  char *q=p+32; float v[4], w[4], rot[4], mat[16]; char *child;
  if(*(short *)(q+28)==0) {
   if(moby_decrement_top_byte(p+4,*(short *)(q+26))) {part_kill(p);return;}

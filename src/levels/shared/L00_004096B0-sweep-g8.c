@@ -28,14 +28,14 @@ typedef union {
     CollisionImpact impact;
 } CollisionWorkspace;
 
-extern CollisionShape D_L00_001B0FC8;
-extern float D_L00_001B0FA0 __attribute__((sda));
-extern float D_L00_001B0FAC __attribute__((sda));
-extern float D_L00_001B0FBC __attribute__((sda));
-extern float D_L00_001B0FB0 __attribute__((sda));
-extern float D_L00_001B0FC0 __attribute__((sda));
-extern int D_L00_001ADB2C __attribute__((sda));
-extern int D_L00_001A8FF0, D_L00_001A8FF4;
+extern CollisionShape g_sweep_collision_shape;
+extern float g_sweep_bounce_factor __attribute__((sda));
+extern float g_sweep_radius_a __attribute__((sda));
+extern float g_sweep_radius_b __attribute__((sda));
+extern float g_sweep_fade_a __attribute__((sda));
+extern float g_sweep_fade_b __attribute__((sda));
+extern int g_active_tether_object __attribute__((sda));
+extern int g_hero_locked_flag, g_hero_action_blocked_flag;
 extern char *g_hero_moby NOT_SDA;
 extern char *g_area_hit_targets[];
 extern unsigned char g_item_slot_to_record[];
@@ -104,10 +104,10 @@ void UpdateBouncingBlastProjectile(char *object)
         /* Set here rather than at its use: sched1 issues this constant right after the call, which
            leaves the %hi of the copy below in $v1 and the list pointer in $a1. */
         min_facing = 1.5f;
-        shape[0] = D_L00_001B0FC8;
-        sweep_radius = D_L00_001B0FAC;
+        shape[0] = g_sweep_collision_shape;
+        sweep_radius = g_sweep_radius_a;
         if (*(int *)(state + 0x24) != 0)
-            sweep_radius = D_L00_001B0FBC;
+            sweep_radius = g_sweep_radius_b;
         qcopy(&query.previous, &previous);
         qcopy(&query.position, position);
         qcopy(&query.velocity, state);
@@ -115,7 +115,7 @@ void UpdateBouncingBlastProjectile(char *object)
         query.ignored = shape;
         query.ignoredCount = 3;
         query.minFacing = min_facing;
-        query.bounce = (D_L00_001B0FA0 - 1.0f) + 1.0f;
+        query.bounce = (g_sweep_bounce_factor - 1.0f) + 1.0f;
         query.moby = object;
         query.pad48 = 0;
         query.collisionFlags = 0;
@@ -154,7 +154,7 @@ void UpdateBouncingBlastProjectile(char *object)
                     char *description = moby_get_private_value_0(target);
                     float length, projection;
                     qcopy(&workspace.math.point, target + 0x10);
-                    if (D_L00_001A8FF0 != 0) {
+                    if (g_hero_locked_flag != 0) {
                         FastVecScale(&workspace.math.work, target + 0xE0,
                                       *(float *)(description + 0x10));
                         FastVecAdd(&workspace.math.point, &workspace.math.point, &workspace.math.work);
@@ -237,16 +237,16 @@ void UpdateBouncingBlastProjectile(char *object)
             blast_range = 0.6f;
             if (*(int *)(state + 0x24) != 0)
                 blast_range = 2.4f;
-            SpawnExplosion(object + 0x10, 0, 6, 5, 6, 8, 10, 0, 0, 0, 0, D_L00_001ADB2C,
+            SpawnExplosion(object + 0x10, 0, 6, 5, 6, 8, 10, 0, 0, 0, 0, g_active_tether_object,
                           blast_range, 20.0f);
             table_clear_entry_flag(*(int *)(state + 0x28));
             moby_mark_spawned(object);
             return;
         }
     }
-    fade = D_L00_001B0FB0;
+    fade = g_sweep_fade_a;
     if (*(int *)(state + 0x24) != 0)
-        fade = D_L00_001B0FC0;
-    if (D_L00_001A8FF0 == 0 && D_L00_001A8FF4 == 0)
+        fade = g_sweep_fade_b;
+    if (g_hero_locked_flag == 0 && g_hero_action_blocked_flag == 0)
         part_queue_ground_shadow(object, fade);
 }

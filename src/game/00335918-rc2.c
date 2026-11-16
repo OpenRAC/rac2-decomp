@@ -27,10 +27,10 @@
 
 extern void object_reset_type_and_free();
 
-extern s8 D_001AD988[];
+extern s8 g_object_cleanup_vtable_a[];
 
 /* Sets the object type pointer and runs the shared base cleanup. */
 void object_reset_type_and_cleanup_a(s32 *obj) {
-    obj[1] = (s32)D_001AD988;
+    obj[1] = (s32)g_object_cleanup_vtable_a;
     object_reset_type_and_free();
 }

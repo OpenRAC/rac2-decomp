@@ -32,7 +32,7 @@ typedef struct {
     ArcVector normal;
 } ArcCollision;
 extern ArcHero g_hero_state;
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern ArcCollision g_collision_result;
 extern float g_camera_l00_position[];
 extern float mat_fast_helper_a(float, float);
@@ -62,7 +62,7 @@ int func_PAL_L00_003B1D70(char *motion, char *object, int mode)
 
     if (hero->state == 0x6F)
         return 0;
-    if (D_L00_001A8F00 != 0)
+    if (g_game_l00_mode != 0)
         return 0;
     qcopy(previous, object + 0x10);
     if (*(unsigned char *)(object + 0x20) == 1) {

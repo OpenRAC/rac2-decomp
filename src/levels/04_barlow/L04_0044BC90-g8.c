@@ -10,10 +10,10 @@ extern void SpawnParticleBurst(void *, void *, void *, void *, void *, int, unsi
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
 extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_mark_spawned(void *);
-extern float D_L04_001B1830[] SDATA(D_L04_001B1830);
-extern float D_L04_001B1828[] SDATA(D_L04_001B1828);
-extern float D_L04_001B1820[] SDATA(D_L04_001B1820);
-extern int D_L04_001B1850 SDATA(D_L04_001B1850);
+extern float g_barlow_emitter_pieces_a[] SDATA(D_L04_001B1830);
+extern float g_barlow_emitter_pieces_b[] SDATA(D_L04_001B1828);
+extern float g_barlow_emitter_pieces_c[] SDATA(D_L04_001B1820);
+extern int g_barlow_emitter_pieces_param SDATA(D_L04_001B1850);
 
 /* Launches a burst of effects from the object: it spawns a stream, waits, then fires the main burst and removes itself. */
 void barlow_effect_emitter_update(unsigned char *object)
@@ -34,7 +34,7 @@ void barlow_effect_emitter_update(unsigned char *object)
         object[0xa8] = 255;
         break;
     case 2:
-        part_explode_object_into_pieces(object, D_L04_001B1830, D_L04_001B1828, D_L04_001B1820, 65535, 0, D_L04_001B1850, 8, 65535, 255, 0);
+        part_explode_object_into_pieces(object, g_barlow_emitter_pieces_a, g_barlow_emitter_pieces_b, g_barlow_emitter_pieces_c, 65535, 0, g_barlow_emitter_pieces_param, 8, 65535, 255, 0);
         min_offset.q = 0;
         max_offset.q = 0;
         lower.q = 0;

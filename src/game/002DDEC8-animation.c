@@ -20,11 +20,11 @@ typedef struct {
     AnimationMoby *moby;
 } AnimationStream;
 typedef struct { u8 pad[0x48]; u8 *tables[4]; } AnimationClass;
-extern short D_001A63AC;
-extern u8 D_001F291B;
-extern u8 D_001CEC85;
-extern AnimationClass *D_001CDB80[];
-extern u8 D_001A7A0A[] __attribute__((sda));
+extern short g_sequence_active_flag;
+extern u8 g_map_selection_flag;
+extern u8 g_streamed_anim_slot;
+extern AnimationClass *g_class_cache_objects[];
+extern u8 g_extras_unlocked_flag[] __attribute__((sda));
 typedef struct { u8 pad[0x6c]; short count; u8 pad6e[4]; short phase; } Dialogue;
 extern Dialogue g_music_state;
 extern int fast_decompress(void *, void *);
@@ -44,14 +44,14 @@ int update_streamed_moby_animation(AnimationStream *stream)
     Dialogue *dialogue;
     switch (stream->state) {
     case 0:
-        if (D_001A63AC != 0) break;
+        if (g_sequence_active_flag != 0) break;
         stream->state = 3;
         break;
     case 1:
-        if (D_001A63AC != 0) break;
-        D_001F291B = 0;
+        if (g_sequence_active_flag != 0) break;
+        g_map_selection_flag = 0;
         fast_decompress(stream->buffer + stream->offset, stream->buffer);
-        resource = &D_001CDB80[D_001CEC85];
+        resource = &g_class_cache_objects[g_streamed_anim_slot];
         header = stream->buffer;
         for (i = 0; i < 3; i++) {
             table = stream->buffer + *(int *)(header + (i << 3));
@@ -59,7 +59,7 @@ int update_streamed_moby_animation(AnimationStream *stream)
             relocate_asset_entry_pointers(*resource, i + 1);
         }
         stream->state = 2;
-        if (D_001A7A0A[0] == 0) stream->moby->state = 0;
+        if (g_extras_unlocked_flag[0] == 0) stream->moby->state = 0;
         else stream->moby->state = 4;
         stream->moby->counter = 0;
         break;
@@ -94,7 +94,7 @@ int update_streamed_moby_animation(AnimationStream *stream)
             moby->counter++;
             if (moby->counter > 240) moby->counter = 240;
             if (moby->counter < 240) return 0;
-            if (D_001A7A0A[0] == 0) moby->state = 0;
+            if (g_extras_unlocked_flag[0] == 0) moby->state = 0;
             else moby->state = 4;
             moby->counter = 0;
             break;

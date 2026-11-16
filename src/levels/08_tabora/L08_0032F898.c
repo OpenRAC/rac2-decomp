@@ -15,8 +15,8 @@ typedef struct {
 extern SelectState g_hero_state;
 /* A moby index list (count in element 0) and the moby array base: retail reads both
    through the absolute macro form, and the count through $gp in one delay slot. */
-extern short D_L08_001B2B30[] __attribute__((sda));
-extern char *D_L08_001B29DC[] __attribute__((sda));
+extern short g_active_moby_indices[] __attribute__((sda));
+extern char *g_moby_array[] __attribute__((sda));
 
 extern int func_L08_0032E920(void *, int, int, int, int);
 extern float vec_distance_xy(void *, void *);
@@ -44,8 +44,8 @@ int SelectNearestListedMoby(char *center, char *out_data, int plane_list_index, 
             result = 2;
         }
     }
-    for (i = 1; i <= D_L08_001B2B30[0]; i++) {
-        char *object = D_L08_001B29DC[0] + (D_L08_001B2B30[i] << 8);
+    for (i = 1; i <= g_active_moby_indices[0]; i++) {
+        char *object = g_moby_array[0] + (g_active_moby_indices[i] << 8);
         if (object && (*(short *)(object + 0xAA) == MOBY_CLASS_DECOY || *(short *)(object + 0xAA) == 0x76C /* moby class 1900 */ ||
                        *(short *)(object + 0xAA) == MOBY_CLASS_DARK_SHEEP) &&
             *(unsigned char *)(object + 0x20) != 0xFE && *(unsigned char *)(object + 0x20) != 0xFD &&

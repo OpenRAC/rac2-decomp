@@ -51,7 +51,7 @@ typedef struct {
     int control_mode;
 } MovementHero;
 #define MOVE_HERO (*(MovementHero *)&D_00189E20)
-extern void func_PAL_L00_002D4668(int, void *, void *);
+extern void UpdateHeroAttachment_pal(int, void *, void *);
 extern float cam_get_view_space_vector_length(void *);
 extern float cam_get_view_space_height(void *);
 extern void cam_set_view_space_vector_length(void *, void *, float);
@@ -62,15 +62,15 @@ extern float vec_length_xy(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern void hero_resolve_collision_with_rewind(void);
 extern void hero_l00_update_ground_contact(void);
-extern void func_PAL_L00_002B5178(void);
+extern void EaseHeroPositionToGoal_pal(void);
 extern float hero_get_speed_along_forward(void *);
 
 /* Apply the hero's velocity and surface motion, then measure resolved displacement. */
-void func_PAL_L00_002B5A88(void) {
+void ApplyHeroMotionAndResolveCollisions_pal(void) {
     float old[4], horizontal[4], flat[4];
 
     qcopy(old, &MOVE_HERO.position);
-    func_PAL_L00_002D4668(MOVE_HERO.collision_mode, &MOVE_HERO.surface_motion,
+    UpdateHeroAttachment_pal(MOVE_HERO.collision_mode, &MOVE_HERO.surface_motion,
                       &MOVE_HERO.rotation);
     if (MOVE_HERO.state == 0x14 || MOVE_HERO.state == 0x5B ||
         MOVE_HERO.state == 0x58 || MOVE_HERO.state == 0x81) {
@@ -112,7 +112,7 @@ integrate:
         hero_resolve_collision_with_rewind();
         hero_l00_update_ground_contact();
         FastVecSub((float *)&MOVE_HERO.displacement, (float *)&MOVE_HERO.position, old);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     } else {
         hero_l00_update_ground_contact();
     }
@@ -162,7 +162,7 @@ integrate:
         hero_resolve_collision_with_rewind();
         hero_l00_update_ground_contact();
         FastVecSub((float *)&MOVE_HERO.displacement, (float *)&MOVE_HERO.position, old);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     }
     FastVecSub((float *)&MOVE_HERO.surface_displacement, (float *)&MOVE_HERO.position,
                   horizontal);

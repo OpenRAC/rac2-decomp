@@ -6,7 +6,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern int FloatToInt(float);
 extern void vec_scale_to_length(char *, char *, float);
 extern int math_random_int_below(int);
-extern char D_L06_001B9840[];
+extern char g_hero_l06_position[];
 extern int math_random_int_below(int);
 extern float math_random_signed_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -14,13 +14,13 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 
-void func_PAL_L06_00423B78(float *pos, int count) {
+void part_spawn_colored_burst_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
     int sign;
     char *particle;
-    FastVecSub((char *)direction, (char *)D_L06_001B9840, (char *)pos);
+    FastVecSub((char *)direction, (char *)g_hero_l06_position, (char *)pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -51,7 +51,7 @@ extern void moby_set_state(char *, int, int);
 extern int math_fast_float_d(char *);
 extern void func_PAL_002A7E68(char *, int, int, int);
 
-void func_PAL_L06_00423E58(char *a0)
+void actor_choose_idle_anim_pal(char *a0)
 {
     char *o = *(char **)(a0 + 0x68);
 

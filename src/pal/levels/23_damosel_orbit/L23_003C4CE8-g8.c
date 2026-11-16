@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern int D_L23_001AFA64 __attribute__((sda));
+extern int g_child_orientation_timer __attribute__((sda));
 extern char g_hero_position[];
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
@@ -19,10 +19,10 @@ extern void mat_align_to_dir(void *, void *, void *);
 extern int FastDecTimer(short *);
 extern void FastVecSub(void *, void *, void *);
 
-extern float D_L23_001B36A4 MACRO_ADDR;
-extern int D_L23_001AFA54 __attribute__((sda));
-extern TI128 D_L23_001C0AA0[];
-extern char D_00189ED0[];
+extern float g_mothership_surface_radius MACRO_ADDR;
+extern int g_enemy_timer_base __attribute__((sda));
+extern TI128 g_coll_line_hit_point_2[];
+extern char g_camera_position[];
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -57,7 +57,7 @@ int func_PAL_L23_003C4CE8(char *obj) {
     matrix_mul_vec3(&loc[1], &loc[1], obj + 0xC0);
     FastVecAdd(&loc[1], &loc[1], obj + 0x10);
     if (CollLine(&loc[0], &loc[1], 0x12, 0, 0) != 0) {
-    pg = &D_L23_001C0AA0[2];
+    pg = &g_coll_line_hit_point_2[2];
     pl = &loc[2];
     qcopy(pl, pg);
     loc[5] = 0;
@@ -75,13 +75,13 @@ int func_PAL_L23_003C4CE8(char *obj) {
     ps = (TI128 *)(state + 0x2D0);
     FastVecAdd(ps, obj + 0x10, &loc[6]);
     pd = &loc[7];
-    FastVecSub(pd, ps, D_00189ED0);
-    vec_scale_to_length(pd, pd, D_L23_001B36A4);
-    FastVecAdd(pd, pd, D_00189ED0);
+    FastVecSub(pd, ps, g_camera_position);
+    vec_scale_to_length(pd, pd, g_mothership_surface_radius);
+    FastVecAdd(pd, pd, g_camera_position);
     qcopy(ps, pd);
-    r = D_L23_001AFA54;
+    r = g_enemy_timer_base;
     *(short *)(state + 0x26C) = 1;
-    *(unsigned short *)(state + 0x26E) = ((s32)(D_L23_001AFA54 + math_random_int_range(-r / 2, r / 2)) * 5 + 2) / 6;
+    *(unsigned short *)(state + 0x26E) = ((s32)(g_enemy_timer_base + math_random_int_range(-r / 2, r / 2)) * 5 + 2) / 6;
     vec_scale_to_length(pl, pl, 10.0f);
     FastVecAdd(pl, pl, pg);
     return 1;
@@ -121,14 +121,14 @@ void func_PAL_L23_003C4FC0(char *obj) {
         func_002A0F48(*(char **)(state + 0x2A0));
         FastVecScale(u, state + 0x280, -1.0f);
         mat_align_to_dir(*(char **)(state + 0x2A0) + 0xC0, u, 0);
-        *(short *)(state + 0x2A6) = ((s32)(D_L23_001AFA64) * 5 + 2) / 6;
+        *(short *)(state + 0x2A6) = ((s32)(g_child_orientation_timer) * 5 + 2) / 6;
         return;
     }
     {
         short v = *(short *)(state + 0x2A6);
 
         if (v != 0) {
-            if (v == ((s32)(D_L23_001AFA64) * 5 + 2) / 6)
+            if (v == ((s32)(g_child_orientation_timer) * 5 + 2) / 6)
                 *(int *)(state + 0x2AC) = 0;
             *v0 = 0;
             ((float *)v0)[0] = 1.0f;

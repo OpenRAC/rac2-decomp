@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *D_L08_001B29DC[] MACRO_ADDR;
+extern char *g_moby_array[] MACRO_ADDR;
 extern char g_hero_position[];
 
 /* A swinging camera target: unless it is still easing in, it either holds its rest
@@ -31,7 +31,7 @@ void UpdateTaboraSwingTarget(char *obj)
             r = 3.0f;
             *(float *)(vars + 0x180) = math_fast_sin_or_cos_a(math_random_float_range(lo, hi)) * r;
             c = math_fast_sin_or_cos_b(math_random_float_range(lo, hi));
-            anchor = D_L08_001B29DC[0] + (*(s32 *)(vars + 0x1E8) << 8) + 0x10;
+            anchor = g_moby_array[0] + (*(s32 *)(vars + 0x1E8) << 8) + 0x10;
             *(float *)(vars + 0x184) = c * r;
             *(float *)(vars + 0x188) = 0.0f;
             FastVecAdd(vars + 0x180, vars + 0x180, anchor);

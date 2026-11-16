@@ -52,10 +52,10 @@ typedef struct {
 
 extern MenuSystem g_pause_menu_state;
 extern PadState g_pad_state;
-extern int D_001AA440 __attribute__((sda));
+extern int g_label_default_color __attribute__((sda));
 extern int g_current_map_index;
 extern int g_save_menu_flags;
-extern int *D_001AA4F0;
+extern int *g_map_select_list;
 extern void map_set_current_and_refresh(int);
 extern void FadeToBlack(int);
 extern void menu_set_pause_scale_inverse(float);
@@ -96,8 +96,8 @@ int func_PAL_002D6A98(ListMenu *menu)
             entry = (ListEntry *)(i * sizeof(ListEntry) + (int)menu->entries);
             entry->fadeTimer = incrementTimer(entry->fadeTimer);
         } else {
-            if ((short)menu->entries[i].fadeTimer > ((s32)D_001AA440 * 5 + 2) / 6)
-                menu->entries[i].fadeTimer = ((s32)D_001AA440 * 5 + 2) / 6;
+            if ((short)menu->entries[i].fadeTimer > ((s32)g_label_default_color * 5 + 2) / 6)
+                menu->entries[i].fadeTimer = ((s32)g_label_default_color * 5 + 2) / 6;
             entry = (ListEntry *)(i * sizeof(ListEntry) + (int)menu->entries);
             entry->fadeTimer = decrementTimer(entry->fadeTimer);
         }
@@ -170,7 +170,7 @@ finish:
     if (menu->selected != previous || g_pause_menu_state.current->pendingFocus != 0) {
         snd_play_from_global_bank(3, 0, 0);
         if (menu->flags & 0x20)
-            map_set_current_and_refresh(D_001AA4F0[menu->selected]);
+            map_set_current_and_refresh(g_map_select_list[menu->selected]);
     }
     return 0;
 }

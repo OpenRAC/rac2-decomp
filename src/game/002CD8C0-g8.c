@@ -5,9 +5,9 @@ typedef struct { char prefix[0x14]; char *source; int value; char gap[0x118]; in
 
 typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 
-extern volatile unsigned char D_001A7A0A;
+extern volatile unsigned char g_extras_unlocked_flag;
 
 extern int ref_L00_002D1CB0_01;
 
@@ -25,13 +25,13 @@ extern int ref_L00_002D1CB0_07 __attribute__((sda));
 
 extern int ref_L00_002D1CB0_08 __attribute__((sda));
 
-extern int D_00138344[];
+extern int g_menu_input_flags[];
 
-extern int D_001ABA68 __attribute__((sda));
+extern int g_scroll_list_repeat_timer __attribute__((sda));
 
 extern SelectionCallback g_pause_menu_state;
 
-extern int D_0025CCE8[];
+extern int g_scroll_list_index_copy[];
 
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
@@ -48,8 +48,8 @@ extern void menu_start_action(int);
 /* Turns on a few menu setting flags when the panel exists and the matching options are set. */
 int menu_apply_setting_flags(void)
 {
-    if (D_001A8CFC != 0) {
-        if (D_001A7A0A != 0) {
+    if (g_resident_data_base != 0) {
+        if (g_extras_unlocked_flag != 0) {
             *(volatile int *)&ref_L00_002D1CB0_01 = 1;
             *(volatile int *)&ref_L00_002D1CB0_02 = 1;
         }
@@ -66,12 +66,12 @@ int menu_apply_setting_flags(void)
 /* Handles input for a scrolling list of seven entries: up and down move the choice with a click sound, confirm and back leave. */
 int menu_handle_scroll_list_input(void)
 {
-    int flags = D_00138344[0];
+    int flags = g_menu_input_flags[0];
     int result = 0;
     if (flags & 0x10) {
         int value;
         int status;
-        D_001ABA68 = 0;
+        g_scroll_list_repeat_timer = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -84,24 +84,24 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        D_001ABA68 = 0;
+        g_scroll_list_repeat_timer = 0;
         result = 1;
     } else if (flags & 0x8000) {
-        if (--D_001ABA68 >= 0)
+        if (--g_scroll_list_repeat_timer >= 0)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (D_001ABA68 < 0)
-            D_001ABA68 = 0;
+        if (g_scroll_list_repeat_timer < 0)
+            g_scroll_list_repeat_timer = 0;
     } else if (flags & 0x2000) {
-        if (++D_001ABA68 < 7)
+        if (++g_scroll_list_repeat_timer < 7)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
-        if (D_001ABA68 >= 7)
-            D_001ABA68 = 6;
+        if (g_scroll_list_repeat_timer >= 7)
+            g_scroll_list_repeat_timer = 6;
     }
-    D_0025CCE8[0] = D_001ABA68;
+    g_scroll_list_index_copy[0] = g_scroll_list_repeat_timer;
     return result;
 }
 
@@ -129,8 +129,8 @@ int menu_handle_input_send_selection(void)
         result = 1;
     } else {
         func_0029C4F0(flags);
-        if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3BE08);
+        if ((state->flags & 0x40) && g_resident_data_base != 0) {
+            char *data = tab_menu_get_selected_entry(g_resident_data_base + 0x3BE08);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
             menu_start_action((int)&message);
@@ -163,8 +163,8 @@ finish:
         result = 1;
     else {
         func_0029C560(flags);
-        if ((state->flags & 0x40) && D_001A8CFC != 0) {
-            char *data = tab_menu_get_selected_entry(D_001A8CFC + 0x3BE08);
+        if ((state->flags & 0x40) && g_resident_data_base != 0) {
+            char *data = tab_menu_get_selected_entry(g_resident_data_base + 0x3BE08);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
             if (message.value == 0)
@@ -175,16 +175,16 @@ finish:
     return result;
 }
 
-extern int D_001ABA28 __attribute__((sda));
-extern unsigned char D_001ABA30[8] __attribute__((sda));
-extern int D_001A7904 __attribute__((sda));
-extern short D_001A63AC[];
+extern int g_eight_entry_cursor __attribute__((sda));
+extern unsigned char g_special_item_collected_flags[8] __attribute__((sda));
+extern int g_arena_state_flag __attribute__((sda));
+extern short g_sequence_active_flag[];
 extern void data_set_small_value_and_refresh(int, int);
 
 typedef struct { char reserved00[0x10]; int flags; } FlagTarget;
 typedef struct { char reserved00[0x44]; int f44; int f48; int f4c; int f50; int f54; int f58; } MenuFields;
-extern FlagTarget *D_0025C540[];
-extern MenuFields D_0025C580;
+extern FlagTarget *g_eight_entry_flag_targets[];
+extern MenuFields g_eight_entry_menu_fields;
 extern int D_0026CD20[];
 
 /* Handles input for an eight entry menu: moves the choice, plays sounds, and starts the screen for the chosen entry if it is available. */
@@ -192,13 +192,13 @@ int menu_handle_eight_entry_input(void)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int old = D_001ABA28;
+    int old = g_eight_entry_cursor;
     int result = 0;
 
     if (flags & 0x10) {
         int value;
         int status;
-        D_001ABA28 = 0;
+        g_eight_entry_cursor = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
@@ -211,31 +211,31 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        D_001ABA28 = 0;
+        g_eight_entry_cursor = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (--D_001ABA28 < 0)
-                D_001ABA28 = 7;
+            if (--g_eight_entry_cursor < 0)
+                g_eight_entry_cursor = 7;
         } else if (flags & 0x4000) {
             snd_play_from_global_bank(3, 0, 0);
-            if (++D_001ABA28 >= 8)
-                D_001ABA28 = 0;
+            if (++g_eight_entry_cursor >= 8)
+                g_eight_entry_cursor = 0;
         }
         if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
-            if (D_001ABA30[D_001ABA28] != 0) {
+            if (g_special_item_collected_flags[g_eight_entry_cursor] != 0) {
                 snd_play_from_global_bank(4, 0, 0);
-                if ((unsigned)D_001ABA28 < 8)
-                    goto *D_0026CD20[D_001ABA28];
+                if ((unsigned)g_eight_entry_cursor < 8)
+                    goto *D_0026CD20[g_eight_entry_cursor];
                 goto cont;
-c0:            D_001A7904 = 2; data_set_small_value_and_refresh(2, 1); goto cont;
-c1:            D_001A7904 = 3; data_set_small_value_and_refresh(4, 1); goto cont;
-c2:            D_001A7904 = 3; data_set_small_value_and_refresh(11, 1); goto cont;
-c3:            D_001A7904 = 2; data_set_small_value_and_refresh(11, 1); goto cont;
-c4:            D_001A7904 = 1; data_set_small_value_and_refresh(26, 1); goto cont;
-c5:            D_001A7904 = 1; data_set_small_value_and_refresh(22, 1); goto cont;
-c6:            D_001A7904 = 1; data_set_small_value_and_refresh(23, 1); goto cont;
+c0:            g_arena_state_flag = 2; data_set_small_value_and_refresh(2, 1); goto cont;
+c1:            g_arena_state_flag = 3; data_set_small_value_and_refresh(4, 1); goto cont;
+c2:            g_arena_state_flag = 3; data_set_small_value_and_refresh(11, 1); goto cont;
+c3:            g_arena_state_flag = 2; data_set_small_value_and_refresh(11, 1); goto cont;
+c4:            g_arena_state_flag = 1; data_set_small_value_and_refresh(26, 1); goto cont;
+c5:            g_arena_state_flag = 1; data_set_small_value_and_refresh(22, 1); goto cont;
+c6:            g_arena_state_flag = 1; data_set_small_value_and_refresh(23, 1); goto cont;
 c7:            data_set_small_value_and_refresh(21, 1); goto cont;
             } else {
                 snd_play_from_global_bank(5, 0, 0);
@@ -243,20 +243,20 @@ c7:            data_set_small_value_and_refresh(21, 1); goto cont;
         }
 cont:
         {
-            MenuFields *menu = &D_0025C580;
-            menu->f58 = D_001ABA28;
-            if (D_001ABA30[D_001ABA28] != 0) {
-                if (old == D_001ABA28) {
-                    if (D_001A63AC[0] == 0) {
+            MenuFields *menu = &g_eight_entry_menu_fields;
+            menu->f58 = g_eight_entry_cursor;
+            if (g_special_item_collected_flags[g_eight_entry_cursor] != 0) {
+                if (old == g_eight_entry_cursor) {
+                    if (g_sequence_active_flag[0] == 0) {
                         if (menu->f50 == old && menu->f44 == 2) {
-                            D_0025C540[0]->flags &= -5;
+                            g_eight_entry_flag_targets[0]->flags &= -5;
                         } else if (menu->f54 == old && menu->f44 == 4) {
-                            D_0025C540[0]->flags &= -5;
+                            g_eight_entry_flag_targets[0]->flags &= -5;
                         }
                     }
                 }
             } else {
-                D_0025C540[0]->flags |= 4;
+                g_eight_entry_flag_targets[0]->flags |= 4;
             }
         }
     }

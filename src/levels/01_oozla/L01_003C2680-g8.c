@@ -37,12 +37,12 @@ extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
 extern void moby_init_controller_params(void *, void *, int, int, void *, int, int, int, void *, void *, int);
 extern void moby_update_sway(void *, void *, int);
-extern char D_L01_001B94C0[];
-extern float D_L01_001AFF6C __attribute__((sda));
-extern long long D_L01_001AFF60 __attribute__((sda));
-extern long long D_L01_001AFF50 __attribute__((sda));
-extern long long D_L01_001AFF40 __attribute__((sda));
-extern char D_L01_002A4C50[];
+extern char g_level_origin_vec[];
+extern float g_water_surface_height_offset __attribute__((sda));
+extern long long g_water_surface_param_b __attribute__((sda));
+extern long long g_water_surface_param_c __attribute__((sda));
+extern long long g_water_surface_param_a __attribute__((sda));
+extern char g_str_water_surface_debug[];
 
 /* Updates an object that sits on the water: it waits until water is present, then bobs along and reacts when the camera gets close. */
 void water_surface_update(L01_003C2680_OBJ *moby)
@@ -52,7 +52,7 @@ void water_surface_update(L01_003C2680_OBJ *moby)
     Quad frame[2];
 
     if (vars == 0) {
-        func_002A6CF0(D_L01_002A4C50, moby->fAA, moby->fB2);
+        func_002A6CF0(g_str_water_surface_debug, moby->fAA, moby->fB2);
         return;
     }
     qcopy(&frame[0], moby_bytes + 0x10);
@@ -67,12 +67,12 @@ void water_surface_update(L01_003C2680_OBJ *moby)
             qzero(&vars->f140);
             moby_set_state(moby, 1, -1);
         }
-        moby->f18 = moby->f18 + D_L01_001AFF6C;
-        moby_init_controller_params(moby, (char *)vars + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
+        moby->f18 = moby->f18 + g_water_surface_height_offset;
+        moby_init_controller_params(moby, (char *)vars + 0x60, 0, 0, &g_water_surface_param_a, 0, 0, 0, &g_water_surface_param_b, &g_water_surface_param_c, 0);
         return;
     case 1:
-        if (moby->f31 != 0 && vec_distance_xy(moby_bytes + 0x10, D_L01_001B94C0) < 32.0f) {
-            vars->f68 = level_get_water_height() + D_L01_001AFF6C;
+        if (moby->f31 != 0 && vec_distance_xy(moby_bytes + 0x10, g_level_origin_vec) < 32.0f) {
+            vars->f68 = level_get_water_height() + g_water_surface_height_offset;
             moby_update_sway(moby, (char *)vars + 0x60, 0);
         }
         return;

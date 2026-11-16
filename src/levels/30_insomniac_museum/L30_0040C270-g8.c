@@ -1,55 +1,55 @@
 #include "common.h"
 
-extern int D_L30_001B189C __attribute__((sda));
-extern int D_L30_001B186C __attribute__((sda));
-extern int D_L30_001B16C8 __attribute__((sda));
-extern int D_L30_001B16C4 __attribute__((sda));
-extern float D_L30_001B18A4 __attribute__((sda));
-extern float D_L30_001B18A0 __attribute__((sda));
-extern float D_L30_001B1898 __attribute__((sda));
-extern float D_L30_001B1894 __attribute__((sda));
-extern float D_L30_001B1890 __attribute__((sda));
-extern float D_L30_001B1874 __attribute__((sda));
-extern float D_L30_001B1870 __attribute__((sda));
-extern float D_L30_001B1868 __attribute__((sda));
-extern float D_L30_001B1864 __attribute__((sda));
-extern float D_L30_001B1860 __attribute__((sda));
-extern float D_L30_001B1804 __attribute__((sda));
-extern float D_L30_001B17F8 __attribute__((sda));
-extern float D_L30_001B17F4 __attribute__((sda));
-extern float D_L30_001B17F0 __attribute__((sda));
-extern float D_L30_001B17E4 __attribute__((sda));
-extern float D_L30_001B17AC __attribute__((sda));
-extern float D_L30_001B17A8 __attribute__((sda));
-extern float D_L30_001B17A4 __attribute__((sda));
-extern float D_L30_001B17A0 __attribute__((sda));
-extern float D_L30_001B1744 __attribute__((sda));
-extern float D_L30_001B1740 __attribute__((sda));
-extern float D_L30_001B173C __attribute__((sda));
-extern float D_L30_001B1738 __attribute__((sda));
-extern float D_L30_001B1734 __attribute__((sda));
-extern float D_L30_001B1730 __attribute__((sda));
-extern float D_L30_001B172C __attribute__((sda));
-extern float D_L30_001B1728 __attribute__((sda));
-extern float D_L30_001B1724 __attribute__((sda));
-extern float D_L30_001B1720 __attribute__((sda));
-extern float D_L30_001B171C __attribute__((sda));
-extern float D_L30_001B1718 __attribute__((sda));
-extern float D_L30_001B1714 __attribute__((sda));
-extern float D_L30_001B1710 __attribute__((sda));
-extern float D_L30_001B170C __attribute__((sda));
-extern float D_L30_001B1700 __attribute__((sda));
-extern float D_L30_001B16FC __attribute__((sda));
-extern float D_L30_001B16F8 __attribute__((sda));
-extern float D_L30_001B16F4 __attribute__((sda));
-extern float D_L30_001B16F0 __attribute__((sda));
-extern float D_L30_001B16EC __attribute__((sda));
-extern float D_L30_001B16E8 __attribute__((sda));
-extern float D_L30_001B16E4 __attribute__((sda));
-extern float D_L30_001B16C0 __attribute__((sda));
+extern int g_museum_dust_big_param_a __attribute__((sda));
+extern int g_museum_dust_param_a __attribute__((sda));
+extern int g_vehicle_jump_boost_window __attribute__((sda));
+extern int g_vehicle_jump_timer_max __attribute__((sda));
+extern float g_museum_dust_big_param_f __attribute__((sda));
+extern float g_museum_dust_big_param_e __attribute__((sda));
+extern float g_museum_dust_big_param_c __attribute__((sda));
+extern float g_museum_dust_big_param_b __attribute__((sda));
+extern float g_museum_dust_big_param_d __attribute__((sda));
+extern float g_museum_dust_param_f __attribute__((sda));
+extern float g_museum_dust_param_e __attribute__((sda));
+extern float g_museum_dust_param_c __attribute__((sda));
+extern float g_museum_dust_param_b __attribute__((sda));
+extern float g_museum_dust_param_d __attribute__((sda));
+extern float g_vehicle_strafe_scale __attribute__((sda));
+extern float g_vehicle_yaw_target_scale __attribute__((sda));
+extern float g_vehicle_steer_uncontrolled_bonus __attribute__((sda));
+extern float g_vehicle_lift_uncontrolled __attribute__((sda));
+extern float g_vehicle_throttle_speed_scale __attribute__((sda));
+extern float g_vehicle_l30_min_speed_2 __attribute__((sda));
+extern float g_vehicle_l30_ground_offset_2 __attribute__((sda));
+extern float g_vehicle_hit_param_c __attribute__((sda));
+extern float g_vehicle_hit_param_b __attribute__((sda));
+extern float g_vehicle_hit_param_a __attribute__((sda));
+extern float g_vehicle_brake_strength __attribute__((sda));
+extern float g_vehicle_l30_speed_limit_2 __attribute__((sda));
+extern float g_vehicle_steer_speed_blend __attribute__((sda));
+extern float g_vehicle_input_yaw_scale __attribute__((sda));
+extern float g_vehicle_pitch_follow_b __attribute__((sda));
+extern float g_vehicle_pitch_follow_a __attribute__((sda));
+extern float g_vehicle_roll_throttle_blend __attribute__((sda));
+extern float g_vehicle_steer_boost_scale __attribute__((sda));
+extern float g_vehicle_reverse_throttle_scale __attribute__((sda));
+extern float g_vehicle_roll_speed_scale __attribute__((sda));
+extern float g_vehicle_roll_follow __attribute__((sda));
+extern float g_vehicle_drag_scale_b __attribute__((sda));
+extern float g_vehicle_drag_scale_a __attribute__((sda));
+extern float g_vehicle_l30_gravity_2 __attribute__((sda));
+extern float g_vehicle_ground_probe_radius __attribute__((sda));
+extern float g_vehicle_l30_hover_spring_2 __attribute__((sda));
+extern float g_vehicle_lift_controlled __attribute__((sda));
+extern float g_vehicle_turn_speed __attribute__((sda));
+extern float g_vehicle_drive_scale __attribute__((sda));
+extern float g_vehicle_l30_vertical_damping_2 __attribute__((sda));
+extern float g_vehicle_drag_scale __attribute__((sda));
+extern float g_vehicle_steer_yaw_scale __attribute__((sda));
+extern float g_vehicle_jump_boost __attribute__((sda));
 typedef struct { float x,y,z,w; } MoveVec __attribute__((aligned(16)));
 extern int g_current_map_index;
-extern unsigned int D_00138320 NOT_SDA;
+extern unsigned int g_pad_pressed_flags NOT_SDA;
 extern void *g_hero_moby NOT_SDA;
 typedef struct {
     MoveVec velocity;
@@ -79,7 +79,7 @@ typedef struct {
     int count;
     MoveVec point, normal, surface;
 } MoveCollision;
-extern MoveCollision D_L30_001C0200;
+extern MoveCollision g_collision_l30_result;
 extern void hover_read_inputs_full(float *,float *,float *,float *,float *,float *);
 extern void part_spawn_museum_dust_burst(void *,void *,int,float,float,float,float,float,float);
 extern float FastVecLength(void *);
@@ -128,32 +128,32 @@ void UpdateHoverVehicleMotion(MoveObject *object,int input)
     in.strafe*=motion->control;
     in.jump*=motion->control;
     motion->throttle=in.throttle;
-    lift=D_L30_001B16F8*motion->control+D_L30_001B17F0*(1.0f-motion->control);
+    lift=g_vehicle_lift_controlled*motion->control+g_vehicle_lift_uncontrolled*(1.0f-motion->control);
     in.yaw*=0.017453294f;
-    in.yaw*=D_L30_001B1734;
+    in.yaw*=g_vehicle_input_yaw_scale;
     speed=FastVecLength(motion)*motion->control;
-    turnSpeed=D_L30_001B16F4*0.016666668f;
-    speedLimit=D_L30_001B173C*0.016666668f;
-    steeringDelta=in.steer*((speed<speedLimit?speed:speedLimit)/speedLimit*D_L30_001B1738+(1.0f-D_L30_001B1738)+D_L30_001B17F4*(1.0f-motion->control));
+    turnSpeed=g_vehicle_turn_speed*0.016666668f;
+    speedLimit=g_vehicle_l30_speed_limit_2*0.016666668f;
+    steeringDelta=in.steer*((speed<speedLimit?speed:speedLimit)/speedLimit*g_vehicle_steer_speed_blend+(1.0f-g_vehicle_steer_speed_blend)+g_vehicle_steer_uncontrolled_bonus*(1.0f-motion->control));
     steeringDelta*=0.00029088825f;
-    motion->yaw=FastAddRotations(motion->yaw,D_L30_001B16E4*steeringDelta);
+    motion->yaw=FastAddRotations(motion->yaw,g_vehicle_steer_yaw_scale*steeringDelta);
     steerRadians=in.steer*0.017453294f;
-    rollSpeed=D_L30_001B171C*steerRadians;
+    rollSpeed=g_vehicle_roll_speed_scale*steerRadians;
     rollSpeed*=motion->control;
-    targetRoll=rollSpeed*(D_L30_001B1728*in.throttle+(1.0f-D_L30_001B1728));
-    motion->roll+=(targetRoll-object->basis[3].x)*D_L30_001B1718;
+    targetRoll=rollSpeed*(g_vehicle_roll_throttle_blend*in.throttle+(1.0f-g_vehicle_roll_throttle_blend));
+    motion->roll+=(targetRoll-object->basis[3].x)*g_vehicle_roll_follow;
     frame.dir.x=math_fast_sin_or_cos_a(motion->yaw);
     frame.dir.y=math_fast_sin_or_cos_b(motion->yaw); frame.dir.z=0;
-    if(in.throttle<0) in.throttle*=D_L30_001B1720;
+    if(in.throttle<0) in.throttle*=g_vehicle_reverse_throttle_scale;
     sign=1.0f;
     if(in.throttle<0) sign=-1.0f;
     amplitude=math_fabs(in.steer); driveRatio=IntegerPower(2,(turnSpeed-speed)/turnSpeed);
-    steeringBoost=D_L30_001B1724*amplitude;
+    steeringBoost=g_vehicle_steer_boost_scale*amplitude;
     steeringBoost*=sign;
     drive=in.throttle+steeringBoost;
     drive*=0.00027777778f;
-    object->speed+=(in.throttle*D_L30_001B17E4-object->speed)*0.02f;
-    drive*=D_L30_001B16F0;
+    object->speed+=(in.throttle*g_vehicle_throttle_speed_scale-object->speed)*0.02f;
+    drive*=g_vehicle_drive_scale;
     acceleration=drive*driveRatio;
     FastVecAdd(&frame.old,&object->position,motion);
     height=coll_probe_ground_height_below(&frame.old,0,0.5f);
@@ -161,28 +161,28 @@ void UpdateHoverVehicleMotion(MoveObject *object,int input)
     if(GetCollHitMaterial()==1 || GetCollHitMaterial()==11) special=1;
     if(object->position.z<height+lift+0.3f && special) object->state=5;
     desiredHeight=height+lift;
-    if(D_L30_001B16C4-D_L30_001B16C8<motion->jumpTimer) motion->velocity.z+=D_L30_001B16C0*0.00027777778f;
-    else motion->velocity.z-=D_L30_001B170C*0.00027777778f;
+    if(g_vehicle_jump_timer_max-g_vehicle_jump_boost_window<motion->jumpTimer) motion->velocity.z+=g_vehicle_jump_boost*0.00027777778f;
+    else motion->velocity.z-=g_vehicle_l30_gravity_2*0.00027777778f;
     if(height!=0) {
         apply=1;
         if(desiredHeight<frame.old.z) {
             angleDelta=fast_subtract_rotations(in.yaw,motion->pitch);
-            motion->pitch=FastAddRotations(motion->pitch,angleDelta*D_L30_001B1730);
+            motion->pitch=FastAddRotations(motion->pitch,angleDelta*g_vehicle_pitch_follow_b);
             if(g_current_map_index==8) apply=0;
         } else {
-            if(motion->jumpTimer==0 && in.jump>0.2f) motion->jumpTimer=D_L30_001B16C4;
+            if(motion->jumpTimer==0 && in.jump>0.2f) motion->jumpTimer=g_vehicle_jump_timer_max;
             if(height>frame.old.z+0.1f || special) {
                 frame.old.z=height;
-                FastVecScale(motion,motion,D_L30_001B1714);
+                FastVecScale(motion,motion,g_vehicle_drag_scale_b);
             }
-            motion->velocity.z+=((desiredHeight-frame.old.z)*D_L30_001B16FC-motion->velocity.z)*D_L30_001B16FC;
+            motion->velocity.z+=((desiredHeight-frame.old.z)*g_vehicle_l30_hover_spring_2-motion->velocity.z)*g_vehicle_l30_hover_spring_2;
             if(in.brake>0) {
-                brakeScale=1.0f-D_L30_001B1740*in.brake;
+                brakeScale=1.0f-g_vehicle_brake_strength*in.brake;
                 motion->velocity.x*=brakeScale; motion->velocity.y*=brakeScale;
             }
             {
                 MoveVec *right=&frame.matrix[0], *up, *ahead=&frame.matrix[2];
-                vec_scale_to_length(ahead,&D_L30_001C0200.surface,1.0f);
+                vec_scale_to_length(ahead,&g_collision_l30_result.surface,1.0f);
                 up=&frame.matrix[1];
                 FastVecCross(up,&object->basis[0],ahead);
                 FastVecCross(right,up,ahead);
@@ -190,54 +190,54 @@ void UpdateHoverVehicleMotion(MoveObject *object,int input)
             qzero_nc(&frame.matrix[3]);
             mat_get_euler_angles(&frame.matrix[0],&frame.pos);
             yawHalf=in.yaw*0.5f;
-            targetAngle=FastAddRotations(-frame.pos.y,yawHalf*(D_L30_001B17F8*(motion->control+1.0f)));
+            targetAngle=FastAddRotations(-frame.pos.y,yawHalf*(g_vehicle_yaw_target_scale*(motion->control+1.0f)));
             angleDelta=fast_subtract_rotations(targetAngle,motion->pitch);
-            motion->pitch=FastAddRotations(motion->pitch,angleDelta*D_L30_001B172C);
-            FastVecScale(motion,motion,D_L30_001B16E8);
+            motion->pitch=FastAddRotations(motion->pitch,angleDelta*g_vehicle_pitch_follow_a);
+            FastVecScale(motion,motion,g_vehicle_drag_scale);
             matrix_from_basis_rows(frame.scratch.inverse,&object->basis[0]);
             transform_vector(motion,motion,frame.scratch.inverse);
-            motion->velocity.y*=D_L30_001B16EC;
+            motion->velocity.y*=g_vehicle_l30_vertical_damping_2;
             matrix_mul_vec3(motion,motion,&object->basis[0]);
         }
         if(apply) {
             vec_scale_to_length(&frame.accel,&object->basis[0],acceleration);
             strafeDelta=in.strafe*0.00027777778f;
-            strafeScale=D_L30_001B1804*strafeDelta;
+            strafeScale=g_vehicle_strafe_scale*strafeDelta;
             vec_scale_to_length(&frame.matrix[0],&object->basis[1],strafeScale*motion->control);
             FastVecAdd(&frame.accel,&frame.accel,&frame.matrix[0]);
             FastVecAdd(motion,motion,&frame.accel);
         }
     }
-    make_hit_descriptor(&frame.matrix[0],object,0x10000,motion,D_L30_001B17A0);
+    make_hit_descriptor(&frame.matrix[0],object,0x10000,motion,g_vehicle_hit_param_b);
     qcopy(&object->position,&frame.old);
     moby_transform_joint_to_world(object,0,&frame.matrix[3]);
-    frame.matrix[3].z+=D_L30_001B1700-D_L30_001B17F0;
+    frame.matrix[3].z+=g_vehicle_ground_probe_radius-g_vehicle_lift_uncontrolled;
     FastVecSub(&frame.pos,&object->position,&frame.matrix[3]);
-    if(coll_process_triangles(&frame.matrix[3],D_L30_001B1700) || coll_test_point(&frame.matrix[3],2,object,D_L30_001B1700)) {
+    if(coll_process_triangles(&frame.matrix[3],g_vehicle_ground_probe_radius) || coll_test_point(&frame.matrix[3],2,object,g_vehicle_ground_probe_radius)) {
         if(GetCollHitMaterial()==1 || GetCollHitMaterial()==11) object->state=5;
-        if(D_L30_001C0200.object!=g_hero_moby) {
-            D_L30_001C0200.normal.x-=frame.matrix[3].x; D_L30_001C0200.normal.y-=frame.matrix[3].y;
-            D_L30_001C0200.normal.x*=motion->control; D_L30_001C0200.normal.y*=motion->control;
-            D_L30_001C0200.normal.x+=frame.matrix[3].x; D_L30_001C0200.normal.y+=frame.matrix[3].y;
-            FastVecAdd(&object->position,&D_L30_001C0200.normal,&frame.pos);
-            FastVecCross(&frame.scratch.contact.normal,&D_L30_001C0200.surface,motion);
-            FastVecCross(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&D_L30_001C0200.surface);
+        if(g_collision_l30_result.object!=g_hero_moby) {
+            g_collision_l30_result.normal.x-=frame.matrix[3].x; g_collision_l30_result.normal.y-=frame.matrix[3].y;
+            g_collision_l30_result.normal.x*=motion->control; g_collision_l30_result.normal.y*=motion->control;
+            g_collision_l30_result.normal.x+=frame.matrix[3].x; g_collision_l30_result.normal.y+=frame.matrix[3].y;
+            FastVecAdd(&object->position,&g_collision_l30_result.normal,&frame.pos);
+            FastVecCross(&frame.scratch.contact.normal,&g_collision_l30_result.surface,motion);
+            FastVecCross(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&g_collision_l30_result.surface);
             vec_scale_to_length(&frame.scratch.contact.delta,&frame.scratch.contact.delta,1.0f);
             projection=FastVecDot(motion,&frame.scratch.contact.delta);
             vec_scale_to_length(motion,&frame.scratch.contact.delta,projection*motion->control);
-            FastVecScale(motion,motion,D_L30_001B1710);
+            FastVecScale(motion,motion,g_vehicle_drag_scale_a);
         }
     }
     if(object->state==3) {
-        if(motion->control<0.98f && (D_00138320&4))
-            part_spawn_museum_dust_burst(object,&D_L30_001C0200.point,D_L30_001B189C,D_L30_001B1894,D_L30_001B1898,D_L30_001B1890,D_L30_001B1890,D_L30_001B18A0,D_L30_001B18A4);
-        part_spawn_museum_dust_burst(object,&D_L30_001C0200.point,D_L30_001B186C,D_L30_001B1864,D_L30_001B1868,D_L30_001B1860,D_L30_001B1870,D_L30_001B1874,1.0f);
+        if(motion->control<0.98f && (g_pad_pressed_flags&4))
+            part_spawn_museum_dust_burst(object,&g_collision_l30_result.point,g_museum_dust_big_param_a,g_museum_dust_big_param_b,g_museum_dust_big_param_c,g_museum_dust_big_param_d,g_museum_dust_big_param_d,g_museum_dust_big_param_e,g_museum_dust_big_param_f);
+        part_spawn_museum_dust_burst(object,&g_collision_l30_result.point,g_museum_dust_param_a,g_museum_dust_param_b,g_museum_dust_param_c,g_museum_dust_param_d,g_museum_dust_param_e,g_museum_dust_param_f,1.0f);
     }
     moby_transform_joint_to_world(object,0,&frame.matrix[3]);
-    frame.matrix[3].z+=D_L30_001B17A8;
-    coll_process_hit(&frame.matrix[3],0,object,&frame.matrix[0],D_L30_001B1744);
-    if(FastVecLength(motion)>D_L30_001B17AC*0.016666668f) {
+    frame.matrix[3].z+=g_vehicle_l30_ground_offset_2;
+    coll_process_hit(&frame.matrix[3],0,object,&frame.matrix[0],g_vehicle_hit_param_a);
+    if(FastVecLength(motion)>g_vehicle_l30_min_speed_2*0.016666668f) {
         moby_transform_joint_to_world(object,1,&frame.scratch.contact.delta);
-        coll_process_hit(&frame.scratch.contact.delta,0,object,&frame.matrix[0],D_L30_001B17A4);
+        coll_process_hit(&frame.scratch.contact.delta,0,object,&frame.matrix[0],g_vehicle_hit_param_c);
     }
 }

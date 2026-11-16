@@ -72,10 +72,10 @@ char *func_US2_0033FF68(char *object)
 /* Fills func_00337210's 23-word descriptor in the order of func_00344F98, with the child at
    o + 0x17C set up by func_00336390 just before f[10] takes it. */
 typedef struct { unsigned int lo; unsigned int hi; } Word2_340498;
-extern const Word2_340498 D_001AE078;
-extern const Word2_340498 D_001AE080;
-extern const Word2_340498 D_001AE088;
-extern const Word2_340498 D_001AE090;
+extern const Word2_340498 g_radial_info_left_word_pair_a;
+extern const Word2_340498 g_radial_info_left_word_pair_b;
+extern const Word2_340498 g_radial_info_left_word_pair_c;
+extern const Word2_340498 g_radial_info_shared_word_pair;
 /* func_003407F8 follows the menu types below. */
 
 /* a menu's table entry: ten bytes, the value a signed short at offset six */

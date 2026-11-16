@@ -1,29 +1,29 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_US2_0033BF90(char *);
+extern void prompt_bar_draw_us2(char *);
 extern void func_US2_00348E58(char *, int);
 extern void func_US2_00348E70(char *);
-extern unsigned char D_001A7BB4;
-extern int D_001ADED8[2] __attribute__((sda));
+extern unsigned char g_language;
+extern int g_list_page_field_table[2] __attribute__((sda));
 
 void func_US2_0033F478(char *object)
 {
     char *p;
-    func_US2_0033BF90(object + 8);
+    prompt_bar_draw_us2(object + 8);
     p = object + 0x2E0;
-    func_US2_00348E58(p, D_001ADED8[D_001A7BB4]);
+    func_US2_00348E58(p, g_list_page_field_table[g_language]);
     func_US2_00348E70(p);
 }
 
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
-extern void func_US2_0033BC20(void *, void *, void *);
+extern void prompt_bar_init_us2(void *, void *, void *);
 extern char *GetLocalizedString(int);
-extern void func_US2_0033C098(void *, int, int, int);
-extern void func_US2_0033C078(void *, float, float, float, float, float, float);
+extern void prompt_bar_set_texts_us2(void *, int, int, int);
+extern void prompt_bar_set_text_offsets_us2(void *, float, float, float, float, float, float);
 extern int func_US2_0033F610(void *, int);
-extern int D_001ADEF0[2] __attribute__((sda));
+extern int g_simple_page_prompt_ids[2] __attribute__((sda));
 
 void func_US2_0033F510(char *object, void *argument)
 {
@@ -42,16 +42,16 @@ void func_US2_0033F510(char *object, void *argument)
     **(float **)(object + 0x2D8) = 255.0f;
     (*(float **)(object + 0x2D8))[1] = 208.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_001ADEF0);
+    prompt_bar_init_us2(child, argument, g_simple_page_prompt_ids);
     text = GetLocalizedString(0x2CB7);
-    func_US2_0033C098(child, text, 0, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
+    prompt_bar_set_texts_us2(child, text, 0, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
     func_US2_0033F610(object, 0);
 }
 
-extern void func_US2_0033C0F0(void *, float);
+extern void prompt_bar_set_spacing_us2(void *, float);
 extern int func_US2_0033F3F0(void *, int);
-extern int D_001ADEC8[2] __attribute__((sda));
+extern int g_list_page_prompt_ids[2] __attribute__((sda));
 extern void func_US2_00348BF8(void *, void *);
 extern void func_US2_00348E10(void *, int, int);
 extern void func_US2_00348E20(void *, int);
@@ -74,12 +74,12 @@ void func_US2_0033F200(char *object, void *argument)
     (*(float **)(object + 0x3BC))[1] = 195.0f;
     child = object + 8;
     widget = object + 0x2E0;
-    func_US2_0033BC20(child, argument, D_001ADEC8);
+    prompt_bar_init_us2(child, argument, g_list_page_prompt_ids);
     text = GetLocalizedString(0x2C36);
     second = GetLocalizedString(0x2C0B);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_00348BF8(widget, argument);
     func_US2_00348E10(widget, -83, 32);
@@ -88,9 +88,9 @@ void func_US2_0033F200(char *object, void *argument)
 }
 
 extern int func_US2_0033E8B0(void *, int);
-extern int D_001ADDE0[2] __attribute__((sda));
+extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
-extern int D_US2_001ADE60[2] __attribute__((sda));
+extern int g_child_param_pair_a[2] __attribute__((sda));
 
 void func_US2_0033E788(char *object, void *argument)
 {
@@ -109,12 +109,12 @@ void func_US2_0033E788(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001ADE60);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_a);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_0033E8B0(object, 0);
 }
@@ -123,7 +123,7 @@ void func_US2_0033E788(char *object, void *argument)
 
 extern int func_US2_0033EC80(void *, int);
 
-extern int D_US2_001ADE70[2] __attribute__((sda));
+extern int g_child_param_pair_b[2] __attribute__((sda));
 
 void func_US2_0033EB58(char *object, void *argument)
 {
@@ -142,12 +142,12 @@ void func_US2_0033EB58(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001ADE70);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_b);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.3f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.3f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_0033EC80(object, 0);
 }
@@ -156,7 +156,7 @@ void func_US2_0033EB58(char *object, void *argument)
 
 extern int func_US2_0033EF30(void *, int);
 
-extern int D_US2_001ADE80[2] __attribute__((sda));
+extern int g_child_param_pair_c[2] __attribute__((sda));
 
 void func_US2_0033EE08(char *object, void *argument)
 {
@@ -175,12 +175,12 @@ void func_US2_0033EE08(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001ADE80);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_c);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_0033EF30(object, 0);
 }
@@ -189,7 +189,7 @@ void func_US2_0033EE08(char *object, void *argument)
 
 extern int func_US2_0033F128(void *, int);
 
-extern int D_US2_001ADE90[2] __attribute__((sda));
+extern int g_child_param_pair_d[2] __attribute__((sda));
 
 void func_US2_0033F000(char *object, void *argument)
 {
@@ -208,74 +208,74 @@ void func_US2_0033F000(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    func_US2_0033BC20(child, argument, D_US2_001ADE90);
+    prompt_bar_init_us2(child, argument, g_child_param_pair_d);
     text = GetLocalizedString(0x2BF7);
     second = GetLocalizedString(0x2BE4);
-    func_US2_0033C098(child, text, second, GetLocalizedString(0x2BE5));
-    func_US2_0033C078(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_US2_0033C0F0(child, 0.4f);
+    prompt_bar_set_texts_us2(child, text, second, GetLocalizedString(0x2BE5));
+    prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
     func_US2_0033F128(object, 0);
 }
 
 
 
-extern void func_US2_0033BE70(void *);
+extern void prompt_bar_update_us2(void *);
 extern void menu_set_anchor_pos(void *, float, float);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void snd_send_cmd11_one_value(int);
 extern void meter_set_value(void *, int);
 extern void snd_set_default_group_volumes(void);
-extern unsigned char D_001A7B94[] __attribute__((sda));
-extern struct { int w0, w1, w2; } D_00138340;
-extern float D_L00_001AE198 __attribute__((sda));
-extern float D_L00_001AE1A0 __attribute__((sda));
-extern float D_L00_001AE19C, D_L00_001AE1A4;
+extern unsigned char g_subtitles_option[] __attribute__((sda));
+extern struct { int w0, w1, w2; } g_pad_menu_flags;
+extern float g_audio_menu_offset_a __attribute__((sda));
+extern float g_audio_menu_offset_c __attribute__((sda));
+extern float g_audio_menu_offset_b, g_audio_menu_offset_d;
 
-int func_US2_0033E070(char *object, int flags)
+int audio_menu_update_us2(char *object, int flags)
 {
     char *p = object + 8;
     float *vec;
 
-    func_US2_0033BE70(p);
+    prompt_bar_update_us2(p);
     vec = *(float **)(object + 0x36C);
     menu_set_anchor_pos(p, vec[0], vec[1]);
     vec = *(float **)(object + 0x36C);
-    object_set_first_float4(object + 0x2DC, vec[0] + D_L00_001AE198,
-                 vec[1] + D_L00_001AE19C, 0.0f, 0.0f);
+    object_set_first_float4(object + 0x2DC, vec[0] + g_audio_menu_offset_a,
+                 vec[1] + g_audio_menu_offset_b, 0.0f, 0.0f);
     vec = *(float **)(object + 0x36C);
-    object_set_first_float4(object + 0x324, vec[0] + D_L00_001AE1A0,
-                 vec[1] + D_L00_001AE1A4, 0.0f, 0.0f);
+    object_set_first_float4(object + 0x324, vec[0] + g_audio_menu_offset_c,
+                 vec[1] + g_audio_menu_offset_d, 0.0f, 0.0f);
     if (flags & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
         *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 2) % 3;
     } else if (flags & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
         *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 1) % 3;
-    } else if (D_00138340.w0 & 0x8000) {
+    } else if (g_pad_menu_flags.w0 & 0x8000) {
         switch (*(int *)(object + 0x2D8)) {
         case 0: {
-            int value = *(int *)(D_001A7B94 + 12) - 6;
-            *(int *)(D_001A7B94 + 12) = value < 0 ? 0 : value;
+            int value = *(int *)(g_subtitles_option + 12) - 6;
+            *(int *)(g_subtitles_option + 12) = value < 0 ? 0 : value;
             break;
         }
         case 1: {
-            int value = *(int *)(D_001A7B94 + 8) - 6;
-            *(int *)(D_001A7B94 + 8) = value < 0 ? 0 : value;
+            int value = *(int *)(g_subtitles_option + 8) - 6;
+            *(int *)(g_subtitles_option + 8) = value < 0 ? 0 : value;
             break;
         }
         }
-    } else if (D_00138340.w0 & 0x2000) {
+    } else if (g_pad_menu_flags.w0 & 0x2000) {
         switch (*(int *)(object + 0x2D8)) {
         case 0: {
-            int value = *(int *)(D_001A7B94 + 12) + 6;
-            *(int *)(D_001A7B94 + 12) = value > 1024 ? 1024 : value;
+            int value = *(int *)(g_subtitles_option + 12) + 6;
+            *(int *)(g_subtitles_option + 12) = value > 1024 ? 1024 : value;
             break;
         }
         case 1: {
-            int value = *(int *)(D_001A7B94 + 8) + 6;
-            *(int *)(D_001A7B94 + 8) = value > 1024 ? 1024 : value;
+            int value = *(int *)(g_subtitles_option + 8) + 6;
+            *(int *)(g_subtitles_option + 8) = value > 1024 ? 1024 : value;
             break;
         }
         }
@@ -283,15 +283,15 @@ int func_US2_0033E070(char *object, int flags)
         if (*(int *)(object + 0x2D8) == 2) {
             int value;
             snd_play_from_global_bank(4, 0, 0);
-            value = *(int *)(D_001A7B94 + 4) == 0;
-            *(int *)(D_001A7B94 + 4) = value;
+            value = *(int *)(g_subtitles_option + 4) == 0;
+            *(int *)(g_subtitles_option + 4) = value;
             snd_send_cmd11_one_value(!value);
         } else {
             snd_play_from_global_bank(5, 0, 0);
         }
     }
-    meter_set_value(object + 0x324, *(int *)(D_001A7B94 + 8));
-    meter_set_value(object + 0x2DC, *(int *)(D_001A7B94 + 12));
+    meter_set_value(object + 0x324, *(int *)(g_subtitles_option + 8));
+    meter_set_value(object + 0x2DC, *(int *)(g_subtitles_option + 12));
     snd_set_default_group_volumes();
     return (flags >> 6) & 1;
 }

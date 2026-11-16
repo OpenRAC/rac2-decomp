@@ -8,7 +8,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void part_kill(void *);
 extern int math_lerp_int_fraction(int, int, float);
 extern int FastDecTimer(short *);
-extern int D_001A8F00[] __attribute__((sda));
+extern int g_hero_mode_state[] __attribute__((sda));
 #define FI(p,o) (*(int *)((char *)(p)+(o)))
 #define FF(p,o) (*(float *)((char *)(p)+(o)))
 #define FS(p,o) (*(short *)((char *)(p)+(o)))
@@ -32,7 +32,7 @@ void part_update_parent_following_fade(char *p)
     FF(p, 32) = v[0];
     FF(q, 4) = v[1];
     FF(q, 8) = v[2];
-    if (!D_001A8F00[0]) {
+    if (!g_hero_mode_state[0]) {
         char *parent = *(char **)(q + 12);
 
         if (!parent)

@@ -9,7 +9,7 @@
 #include "common.h"
 
 extern u8 g_hero_state[];
-extern u8 D_001A7B0B __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
 extern void mem_fast_helper_b(void *, s32);
 extern float math_fabs(float);
@@ -41,7 +41,7 @@ void hero_refresh_action_triggers(void)
             u8 *m = g_hero_state;
             if (*(s16 *)(m + 0x1DE) == 0 && (*(s16 *)(m + 0x34C) == 0 || *(float *)(m + 0x31C) < 2.5f)) {
                 m[0x1497] = 1;
-                if (m[0x22B4] == 0 && D_001A7B0B != 0)
+                if (m[0x22B4] == 0 && g_hero_input_enabled != 0)
                     *(s16 *)(m + 0x348) = 1;
             }
         }

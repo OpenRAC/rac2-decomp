@@ -17,9 +17,9 @@ extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern char D_L04_001BFAE0[];
-extern char D_L04_001BFB00[];
-extern char D_L04_001A8F20[];
+extern char g_spark_origin_quad[];
+extern char g_scratch_direction_quad[];
+extern char g_effect_default_params[];
 extern void vec_fast_normalize(void *, void *, void *);
 extern float FastVecLength(void *);
 extern int math_random_int_range(int, int);
@@ -29,9 +29,9 @@ extern unsigned char *part_spawn_random_effect_record(void *, void *, int, float
 extern void moby_destroy_effects_with_burst(void *, int);
 extern void moby_mark_spawned(void *);
 extern float cubic_hermite_scalar(float, float, float, float, float);
-extern char D_L04_001B0448[];
-extern char D_L04_001B9680[];
-extern char D_L04_001B98D0[];
+extern char g_homing_turn_record[];
+extern char g_tether_zero_vec[];
+extern char g_homing_cross_vec[];
 extern float vec_distance_xy(void *, void *);
 extern int GetCollHitMaterial(void);
 extern float FastAddRotations(float, float);
@@ -43,7 +43,7 @@ typedef struct __attribute__((packed, aligned(4))) { long a; int b; } TurnRecord
 void homing_l04_shot_update(unsigned char *moby)
 {
     float prev_pos[4];
-    TurnRecord turn = *(TurnRecord *)D_L04_001B0448;
+    TurnRecord turn = *(TurnRecord *)g_homing_turn_record;
     SweepProbe probe;
     float delta[4], spark_dir[4], spark[4], velocity[4];
     unsigned char *vars = *(unsigned char **)(moby + 0x68), *particle;
@@ -53,7 +53,7 @@ void homing_l04_shot_update(unsigned char *moby)
     qcopy(prev_pos, (moby + 0x10));
     FastVecAdd(moby + 0x10, moby + 0x10, vars);
     if (*(float *)(moby + 0x10) < 0 || *(float *)(moby + 0x14) < 0 ||
-        *(float *)(moby + 0x18) < 0 || 64.0f < vec_distance_xy(moby + 0x10, D_L04_001B9680)) {
+        *(float *)(moby + 0x18) < 0 || 64.0f < vec_distance_xy(moby + 0x10, g_tether_zero_vec)) {
         moby_destroy_effects_with_burst(moby, 0);
         moby_mark_spawned(moby);
         return;
@@ -78,14 +78,14 @@ void homing_l04_shot_update(unsigned char *moby)
         if (!GetCollHitMaterial()) {
             if (*(int *)(vars + 0x10) >= 4) *(int *)(vars + 0x10) = 3;
         } else {
-            qcopy((moby + 0x10), D_L04_001BFAE0);
+            qcopy((moby + 0x10), g_spark_origin_quad);
             for (i = 4; i >= 0; i--) {
                 *(QuadWord *)spark_dir = 0;
                 spark_dir[0] = math_random_float_range(-1, 1);
                 spark_dir[1] = math_random_float_range(-1, 1);
                 spark_dir[2] = math_random_float_range(-1, 1);
                 *(QuadWord *)delta = *(QuadWord *)spark_dir;
-                vec_fast_normalize(spark_dir, vars, D_L04_001BFB00);
+                vec_fast_normalize(spark_dir, vars, g_scratch_direction_quad);
                 vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(spark_dir) * 0.5f);
                 FastVecAdd(spark_dir, spark_dir, delta);
                 vec_scale_to_length((char *)spark_dir, (char *)spark_dir, math_random_float_range(0.050000004f, 0.10000001f));
@@ -117,7 +117,7 @@ void homing_l04_shot_update(unsigned char *moby)
         }
     }
     if (math_random_int_below(5) == 0) {
-        FastVecCross(spark, delta, D_L04_001B98D0);
+        FastVecCross(spark, delta, g_homing_cross_vec);
         math_apply_axis_rotation_to_quat(spark, spark, delta, math_random_signed_float_range(0, 3.1415927f));
         length = FastVecLength(spark);
         if (length != 0) {

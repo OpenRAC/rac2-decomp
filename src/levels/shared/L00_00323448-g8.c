@@ -11,15 +11,15 @@ extern void copy_matrix3x4(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern int coll_find_closest_joint_record(void *, void *, int, void *, void *, void *, void *);
 extern int math_random_int_range(int, int);
-extern int D_L00_001B1EB8;
-extern short *D_L00_001FA920[];
-extern char *D_L00_001B1E9C;
-extern int D_L00_001A9018;
-extern short **D_L00_001A9014 __attribute__((sda));
-extern char *D_L00_001B251C;
-extern int D_L00_001A9020 __attribute__((sda));
-extern short **D_L00_001A901C;
-extern char *D_L00_001B2400;
+extern int g_moby_l00_group_count;
+extern short *g_turn_state_table[];
+extern char *g_moby_array_base;
+extern int g_tie_group_count;
+extern short **g_level_reloc_record __attribute__((sda));
+extern char *g_tie_matrix_table;
+extern int g_shrub_group_count __attribute__((sda));
+extern short **g_shrub_group_table;
+extern char *g_shrub_matrix_table;
 typedef struct {
     char transform[48];
     float position[4];
@@ -55,12 +55,12 @@ void BuildObjectAttachmentTransforms(char *object, B1320Entry *entries, int capa
     copy_matrix3x4(inverse, transpose);
     qcopy(work.matrix, object + 0x10);
     count = 0;
-    if (moby_group != -1 && moby_group < D_L00_001B1EB8 && D_L00_001FA920[moby_group]) {
+    if (moby_group != -1 && moby_group < g_moby_l00_group_count && g_turn_state_table[moby_group]) {
         char *moby_item;
-        short *moby_ids = D_L00_001FA920[moby_group];
+        short *moby_ids = g_turn_state_table[moby_group];
         do {
             int id = *moby_ids & 0x7FFF;
-            moby_item = D_L00_001B1E9C + id * 256;
+            moby_item = g_moby_array_base + id * 256;
             if (count >= capacity) goto finish;
             entries[count].index = id;
             entries[count].end = 2;
@@ -85,12 +85,12 @@ void BuildObjectAttachmentTransforms(char *object, B1320Entry *entries, int capa
     if (tie_group != -1) {
         phase = 0;
         if (period > 0) phase = math_random_int_range(0, period);
-        if (tie_group < D_L00_001A9018 && D_L00_001A9014[tie_group]) {
+        if (tie_group < g_tie_group_count && g_level_reloc_record[tie_group]) {
             char *tie_item;
-            short *tie_ids = D_L00_001A9014[tie_group];
+            short *tie_ids = g_level_reloc_record[tie_group];
             do {
                 int id = *tie_ids & 0x7FFF;
-                tie_item = D_L00_001B251C + id * 64;
+                tie_item = g_tie_matrix_table + id * 64;
                 if (count >= capacity) goto finish;
                 entries[count].type = 1;
                 entries[count].index = id;
@@ -119,12 +119,12 @@ void BuildObjectAttachmentTransforms(char *object, B1320Entry *entries, int capa
             } while (*tie_ids++ >= 0);
         }
     }
-    if (shrub_group != -1 && shrub_group < D_L00_001A9020 && D_L00_001A901C[shrub_group]) {
+    if (shrub_group != -1 && shrub_group < g_shrub_group_count && g_shrub_group_table[shrub_group]) {
         char *shrub_item;
-        short *shrub_ids = D_L00_001A901C[shrub_group];
+        short *shrub_ids = g_shrub_group_table[shrub_group];
         do {
             int id = *shrub_ids & 0x7FFF;
-            shrub_item = D_L00_001B2400 + id * 64;
+            shrub_item = g_shrub_matrix_table + id * 64;
             if (count >= capacity) goto finish;
             entries[count].type = 2;
             entries[count].end = 2;

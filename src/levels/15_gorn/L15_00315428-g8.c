@@ -4,12 +4,12 @@
 
 /* Small-data unit: the bodies whose state lives at $gp-relative offsets. */
 
-extern int D_L15_001B1530 __attribute__((sda));
-extern int D_L15_001B1534 __attribute__((sda));
-extern int D_L15_001B15C4 __attribute__((sda));
+extern int g_challenge_menu_choice __attribute__((sda));
+extern int g_cutscene_l15_started_flag __attribute__((sda));
+extern int g_gorn_enabled_flag __attribute__((sda));
 
-extern unsigned char D_L15_00221E10[];
-extern unsigned char D_L15_0029FD80[];
+extern unsigned char g_gorn_challenge_vars[];
+extern unsigned char g_weapon_l15_table[];
 
 extern int func_80381310(int a0);
 extern void func_80380770(int a0, void *a1);
@@ -20,11 +20,11 @@ extern void func_803807B0(void);
    the record the factory returned, then runs the three stage hooks. */
 /* func_L15_0042FD40 is defined in L15_0042FD40-g8.c. */
 
-extern int D_L15_001B1520 __attribute__((sda));
-extern int D_L15_001B1524;
-extern int D_L15_001B1528;
-extern int D_L15_001B152C;
-extern u8 D_L15_001395B8[];
+extern int g_challenge_completed_a __attribute__((sda));
+extern int g_challenge_completed_b;
+extern int g_challenge_completed_c;
+extern int g_challenge_completed_d;
+extern u8 g_sound_volume_slots[];
 
 /* Copies the four clamped channel bytes into the render block's colour slots. */
 
@@ -77,7 +77,7 @@ int moby_l15_apply_hit_damage(char *obj, int flag)
         if (*health_ptr <= 0.0f) {
             *health_ptr = 0.0f;
             part_spawn_shockwave_burst(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
-            if (D_L15_001B1520 == 0) {
+            if (g_challenge_completed_a == 0) {
                 func_L05_00421908(obj, 1, 0xF);
             } else {
                 func_L05_00421908(obj, 0, 0xF);

@@ -23,21 +23,21 @@ typedef union { TI128 quad; float f[4]; } ActorVector;
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; TI128 q[0x260]; } Hero;
 extern u8 g_hero_state[];
 typedef struct { u8 pad00[0x5C]; u8 *ids; } L11_Palette;
-extern L11_Palette D_L11_00200440;
-extern s32 D_L11_001A8FF4 __attribute__((sda));
-extern float D_L11_001B1D04 __attribute__((sda));
-extern float D_L11_001B1D08 __attribute__((sda));
-extern s32 D_L11_001B1D0C __attribute__((sda));
-extern u16 D_L11_001B1D10 __attribute__((sda));
-extern float D_L11_001B1D14 __attribute__((sda));
-extern float D_L11_001B1D18 __attribute__((sda));
-extern float D_L11_001B1D1C __attribute__((sda));
-extern float D_L11_001B1D20 __attribute__((sda));
-extern float D_L11_001B1D24 __attribute__((sda));
-extern u8 *D_L11_001C0D18[];
+extern L11_Palette g_flamethrower_palette;
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
+extern float g_flamethrower_range_min __attribute__((sda));
+extern float g_flamethrower_range_max __attribute__((sda));
+extern s32 g_flamethrower_fire_chance __attribute__((sda));
+extern u16 g_flamethrower_timer __attribute__((sda));
+extern float g_flamethrower_cone_deg __attribute__((sda));
+extern float g_flamethrower_attack_range __attribute__((sda));
+extern float g_flamethrower_far_range __attribute__((sda));
+extern float g_flamethrower_near_range __attribute__((sda));
+extern float g_flamethrower_min_range __attribute__((sda));
+extern u8 *g_hit_l11_result[];
 extern u8 *g_hero_moby __attribute__((nosda));
 extern u8 *g_active_attacker_robot __attribute__((nosda));
-extern char D_L11_001A8F20[] MACRO_ADDR;
+extern char g_identity_l11_matrix[] MACRO_ADDR;
 
 extern void turret_enemy_update_b(u8 *);
 extern void moby_set_state(u8 *, s32, s32);
@@ -120,10 +120,10 @@ void flamethrower_l11_robot_update(u8 *object)
     float range;
 
     state = *(u8 **)(object + 0x68);
-    if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !D_L11_001A8FF4 && object[0x20] != 12 && object[0x20] != 11))
+    if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !g_hero_l11_input_blocked && object[0x20] != 12 && object[0x20] != 11))
         return;
     turret_enemy_update_b(object);
-    if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !D_L11_001A8FF4))
+    if (object[0x20] == 1 || (*(s16 *)(state + 0x2D8) && !g_hero_l11_input_blocked))
         return;
     if (*(s16 *)(state + 0x2D2) == 0 && object[0x95] == 3) {
         moby_set_state(object, 4, 2);
@@ -217,23 +217,23 @@ void flamethrower_l11_robot_update(u8 *object)
             if (object[0x43] != 9) anim_start_blended(object, 9, 0, 15);
             *(u16 *)(state + 0x2D6) = 0;
         }
-        if (D_L11_001B1D24 < range)
+        if (g_flamethrower_min_range < range)
             turn(object, 0.0044444446f, 0.13333334f);
-        else if (range < D_L11_001B1D20)
+        else if (range < g_flamethrower_near_range)
             turn(object, 0.0011111111f, 0.033333335f);
-        if (object[0x42] != 12 && range < D_L11_001B1D18 && angle < 1.5707965f) {
+        if (object[0x42] != 12 && range < g_flamethrower_attack_range && angle < 1.5707965f) {
             if (object[0x43] != 12) anim_start_blended(object, 12, 0, 10);
-        } else if (object[0x42] == 12 && D_L11_001B1D1C < range) {
+        } else if (object[0x42] == 12 && g_flamethrower_far_range < range) {
             if (object[0x43] != 9) anim_start_blended(object, 9, 0, 15);
-        } else if (object[0x42] != 12 && D_L11_001B1D04 < range && range < D_L11_001B1D08 && !math_random_int_below(D_L11_001B1D0C)) {
+        } else if (object[0x42] != 12 && g_flamethrower_range_min < range && range < g_flamethrower_range_max && !math_random_int_below(g_flamethrower_fire_chance)) {
             if (FastDecTimer(state + 0x2D6) && object[0x31]) {
                 u8 *other;
                 s16 id;
                 if (!CollLine(pos, &target, 1, object, 0) ||
-                    ((other = D_L11_001C0D18[0]) != 0 && (id = *(s16 *)(other + 0xAA)) != 0xD98 /* moby class 3480 */ && id != 0xDCF /* moby class 3535 */ &&
+                    ((other = g_hit_l11_result[0]) != 0 && (id = *(s16 *)(other + 0xAA)) != 0xD98 /* moby class 3480 */ && id != 0xDCF /* moby class 3535 */ &&
                      id != 0xDF4 /* moby class 3572 */ && id != 0xDF7 /* moby class 3575 */ && id != 0xDF9 /* moby class 3577 */ && id != 0xD37 /* moby class 3383 */)) {
                     moby_set_state(object, 9, -1);
-                    *(u16 *)(state + 0x2D6) = D_L11_001B1D10;
+                    *(u16 *)(state + 0x2D6) = g_flamethrower_timer;
                 }
             }
         } else if (range > 2.8f) {
@@ -294,7 +294,7 @@ void flamethrower_l11_robot_update(u8 *object)
                     u8 *part = part_spawn_burst(&near_point, tmpl, 15, 60, 0x606060, 3,
                         105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
                     if (part) {
-                        part[2] = *D_L11_00200440.ids;
+                        part[2] = *g_flamethrower_palette.ids;
                         part[3] = 0x44;
                         if (math_random_int_range(0, 1)) {
                             u8 *tail;
@@ -318,7 +318,7 @@ void flamethrower_l11_robot_update(u8 *object)
             object[0xBC] = 0;
             if (object[0x43] != 7) anim_start_blended(object, 7, 0, 10);
         }
-        if (!object[0xBC] && angle < D_L11_001B1D14 * 0.017453294f) {
+        if (!object[0xBC] && angle < g_flamethrower_cone_deg * 0.017453294f) {
             object[0xBC] = 1;
             if (object[0x43] != 17) anim_start_blended(object, 17, 0, 10);
         } else if (*(s16 *)(state + 0x2D8))
@@ -345,7 +345,7 @@ void flamethrower_l11_robot_update(u8 *object)
                 moby_transform_joint_to_world(object, 4, &work[0]);
                 first = math_random_float_range(1.0f, 1.5f) * 210000.0f;
                 second = math_random_float_range(0.2f, 0.4f) * 210000.0f;
-                part_spawn_gravity_fade(&work[0], D_L11_001A8F20, 4, 0x808080, 9, 0x4F, 0, first, second, math_random_signed_float_range(0.0f, 0.1f), 0);
+                part_spawn_gravity_fade(&work[0], g_identity_l11_matrix, 4, 0x808080, 9, 0x4F, 0, first, second, math_random_signed_float_range(0.0f, 0.1f), 0);
             }
             if (object[0x60] & 2) {
                 if (g_active_attacker_robot == object || !math_random_int_below(6))

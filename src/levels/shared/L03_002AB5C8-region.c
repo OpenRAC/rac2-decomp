@@ -2,7 +2,7 @@
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) RegionPoint;
 typedef struct { int id; unsigned char links[4]; unsigned char edges[4]; int reserved; RegionPoint sphere; } RegionRecord;
 typedef struct { int count; int reserved[3]; RegionPoint points[0]; } RegionGeometry;
-extern float (*D_L03_001FE700[])[4];
+extern float (*g_path_l03_entry_table[])[4];
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void mem_fast_helper_b(void *, int);
@@ -61,8 +61,8 @@ int path_build_region_link_graph(void *unused, int *ids, RegionRecord *records, 
     for (i = 0; i < count; i++) {
         for (j = i + 1; j < count; j++) {
             if (path_find_touching_polygon_corners(records[i].id, records[j].id, &edgeA, &edgeB)) {
-                ((RegionGeometry *)D_L03_001FE700[records[i].id])->points[edgeA].w = 0;
-                ((RegionGeometry *)D_L03_001FE700[records[j].id])->points[edgeB].w = 0;
+                ((RegionGeometry *)g_path_l03_entry_table[records[i].id])->points[edgeA].w = 0;
+                ((RegionGeometry *)g_path_l03_entry_table[records[j].id])->points[edgeB].w = 0;
                 /* Entered at its test: loop.c leaves a loop entered from outside alone. */
                 k = 0;
                 goto find_source_link;
@@ -93,7 +93,7 @@ int path_build_region_link_graph(void *unused, int *ids, RegionRecord *records, 
     }
     { int i, j, k;
     for (i = 0; i < count; i++) {
-        geometry = (RegionGeometry *)D_L03_001FE700[records[i].id];
+        geometry = (RegionGeometry *)g_path_l03_entry_table[records[i].id];
         vec_clear_128(&center);
         for (j = 0; j < geometry->count; j++)
             FastVecAdd(&center, &center, &geometry->points[j]);

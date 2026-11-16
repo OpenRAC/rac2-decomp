@@ -23,7 +23,7 @@ extern float FastVecLength(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_angle_helper(float);
 extern float math_fast_sin_or_cos_a(float);
-extern char D_L15_001B97C0[];
+extern char g_camera_l15_position[];
 
 extern void DrawPath(char *, int, int, int, float, int);
 extern int follower_has_reached_target(char *);
@@ -41,14 +41,14 @@ typedef struct GornPath {
     int pad[3];
     GornPathPoint points[1];
 } GornPath;
-extern char *D_L15_001FE480[];
+extern char *g_path_l15_table[];
 extern void gorn_path_mover_init(char *);
 extern void path_start_following(void);
 
 /* ---- shared declarations ---- */
 
 extern char *moby_get_motion_data(unsigned char *owner);
-extern void func_PAL_L05_0037D610(char *object, int flag);
+extern void moby_init_spawned_sub_object_pal(char *object, int flag);
 extern void level_set_object_state_field(int arg0, int value);
 extern void gfx_add_draw_callback_second(void *, void *);
 extern void gfx_add_draw_callback_first(void *a0, void *a1);
@@ -62,7 +62,7 @@ extern void gfx_draw_colored_rectangle(int, int, int, int, long);
 extern int math_fast_float_d(void *);
 extern void DrawGornRibbon(void *, int, int, float, float, float, int, int, int);
 extern short g_screen_adjust_offsets[];
-extern char D_L15_00269FE0[];
+extern char g_part_channel_points[];
 
 /* func_L15_00432A60 is in L15_00432A60-ribbon.c. */
 
@@ -82,10 +82,10 @@ extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
 
-extern s32 D_L15_001AEE20[] __attribute__((sda));
-extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
-extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
-extern u8 D_L15_00188660[];
+extern s32 g_ship_damage_effect_count[] __attribute__((sda));
+extern s32 g_gorn_ship_damage_joints[] SDATA(D_L15_001B1780);
+extern s32 g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
+extern u8 g_ship_sound_slots[];
 extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -102,8 +102,8 @@ typedef struct GornEffectCamera {
     char pad00[0x140];
     float position[4];
 } GornEffectCamera;
-extern GornEffectCamera D_L15_001B9680;
-extern unsigned char *D_L15_001FF4AC;
+extern GornEffectCamera g_hero_l15_state_floats;
+extern unsigned char *g_particle_l15_byte_ptr;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -130,7 +130,7 @@ void func_PAL_L15_0043B0D8(char *object)
     char *position = object + 0x10;
     record = (char *)moby_get_motion_data((unsigned char *)object);
     *(int *)(record + 0x148) = FloatToInt(150.0f);
-    func_PAL_L05_0037D610(object, 1);
+    moby_init_spawned_sub_object_pal(object, 1);
     GF(0x180) = 150.0f;
     object[0x20] = 1;
     *(unsigned char *)(object + 0x30) = 255;
@@ -227,8 +227,8 @@ extern void SpawnSpaceProjectile(void *, int, int, float, int, float, float, flo
 
 /* func_L15_00438518 is in L15_00438518-g8.c. */
 
-extern int D_L15_001A8FF0[] __attribute__((sda));
-extern char D_00189ED0[];
+extern int g_tether_l15_active[] __attribute__((sda));
+extern char g_camera_position[];
 extern int math_random_int_below(int);
 extern int func_001163B0(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -239,11 +239,11 @@ extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsign
    through $gp in a branch delay slot and as a bare lui/lw elsewhere: `sda` arrays of unknown size
    give that), the base of the 64-byte records of the first walk, the base of the 32-byte records
    of the second, and the table that maps a record's byte at +0x1D to a class. */
-extern int D_L15_001A9018[] __attribute__((sda));
-extern unsigned short **D_L15_001A9014[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C9C[] __attribute__((sda));
-extern unsigned char *D_L15_001B2C94[] __attribute__((sda));
-extern short D_L15_00227500[];
+extern int g_gorn_group_count[] __attribute__((sda));
+extern unsigned short **g_gorn_group_paths[] __attribute__((sda));
+extern unsigned char *g_gorn_group_record_base[] __attribute__((sda));
+extern unsigned char *g_gorn_aim_record_base[] __attribute__((sda));
+extern short g_gorn_group_class_table[];
 
 extern float vec_distance_xy(void *, void *);
 extern float math_random_angle(void);

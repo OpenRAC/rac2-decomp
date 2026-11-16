@@ -10,10 +10,10 @@ typedef struct {
 } HeroD740;
 
 extern char *g_moby_l04_pool __attribute__((sda));
-extern char *D_L04_001B25CC[] __attribute__((sda));
+extern char *g_linked_record_table[] __attribute__((sda));
 extern char g_hero_position[], g_sound_state[];
-extern HeroD740 D_L04_001B9540;
-extern u8 D_0019B2E8[];
+extern HeroD740 g_hero_l04_state;
+extern u8 g_moby_group_flags[];
 extern char *g_hero_moby;
 extern int g_current_map_index __attribute__((sda));
 extern int moby_count_group_not_in_state(int, int);
@@ -25,10 +25,10 @@ extern void moby_mark_table_entry_flagged(unsigned int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern int snd_start_in_slot(int, int, void *);
 extern void moby_set_flag_bit(void *, int);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void snd_stop_voice(int);
 
-void func_PAL_L04_003F16D8(char *o)
+void linked_sequence_controller_update_pal(char *o)
 {
     char *p = *(char **)(o + 0x68);
 
@@ -54,7 +54,7 @@ void func_PAL_L04_003F16D8(char *o)
                 *(u8 *)(a + 0x20) = 2;
                 *(u8 *)(b + 0x20) = 2;
                 if (IsPointInCuboid(g_hero_position, *(int *)(p + 0x70)) &&
-                    !(D_0019B2E8[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
+                    !(g_moby_group_flags[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
                     cam_lock_entry(*(int *)(p + 0x10));
                     *(u8 *)(o + 0x20) = 2;
                     *(u8 *)(a + 0x20) = 3;
@@ -63,7 +63,7 @@ void func_PAL_L04_003F16D8(char *o)
             } else if (*(int *)(p + 0x18) == 1) {
                 char *a, *b;
 
-                if (!(D_0019B2E8[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
+                if (!(g_moby_group_flags[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
                     cam_lock_entry(*(int *)(p + 0x10));
                     *(u8 *)(o + 0x20) = 4;
                     a = g_moby_l04_pool + (*(int *)(p + 0x74) << 8);
@@ -71,7 +71,7 @@ void func_PAL_L04_003F16D8(char *o)
                     snd_play_from_class_bank(0, 0, a, 0xCE6);
                     *(u8 *)(a + 0x20) = 2;
                     *(u8 *)(b + 0x20) = 2;
-                    if (!(D_0019B2E8[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
+                    if (!(g_moby_group_flags[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
                         moby_mark_table_entry_flagged(*(u8 *)(o + 0xB0));
                         level_capture_checkpoint_state(o + 0x10, o + 0xF0);
                     }
@@ -79,7 +79,7 @@ void func_PAL_L04_003F16D8(char *o)
             }
         } else if (*(int *)(p + 0x18) == 0 &&
                    IsPointInCuboid(g_hero_position, *(int *)(p + 0x70)) &&
-                   !(D_0019B2E8[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
+                   !(g_moby_group_flags[*(u8 *)(o + 0xB0) + g_current_map_index * 16] & 128)) {
             cam_lock_entry(*(int *)(p + 0x10));
             *(u8 *)(o + 0x20) = 2;
         }
@@ -109,7 +109,7 @@ void func_PAL_L04_003F16D8(char *o)
                 }
             }
             {
-                char *a = D_L04_001B25CC[0] + (*(int *)(p + 0x14) << 7);
+                char *a = g_linked_record_table[0] + (*(int *)(p + 0x14) << 7);
 
                 qcopy(g_hero_position, a + 0x30);
                 qcopy(g_hero_position + 0x10, a + 0x70);
@@ -125,7 +125,7 @@ void func_PAL_L04_003F16D8(char *o)
 
         if (cam_is_trigger_ready(*(int *)(p + 0x10))) {
             {
-                char *record = D_L04_001B25CC[0] + (*(int *)(p + 0x14) << 7);
+                char *record = g_linked_record_table[0] + (*(int *)(p + 0x14) << 7);
 
                 qcopy(g_hero_position, record + 0x30);
                 record += 0x70;
@@ -135,9 +135,9 @@ void func_PAL_L04_003F16D8(char *o)
             b = g_moby_l04_pool + (*(int *)(p + 0x24) << 8);
             *(u8 *)(a + 0x95) = 4;
             *(u8 *)(a + 0x20) = 17;
-            if (!D_L04_001B9540.target) {
-                D_L04_001B9540.target = b;
-                D_L04_001B9540.timer = 0;
+            if (!g_hero_l04_state.target) {
+                g_hero_l04_state.target = b;
+                g_hero_l04_state.timer = 0;
             }
             *(int *)(a + 0x98) = *(int *)(*(char **)(a + 0x24) + 0x10);
             {
@@ -156,8 +156,8 @@ void func_PAL_L04_003F16D8(char *o)
         char *a;
 
         if (cam_is_trigger_ready(*(int *)(p + 0x10))) {
-            a = D_L04_001B25CC[0] + (*(int *)(p + 0x14) << 7);
-            func_PAL_L00_002B9CD8(a + 0x30, a + 0x70, 111, 1);
+            a = g_linked_record_table[0] + (*(int *)(p + 0x14) << 7);
+            hero_reset_position_and_direction_pal(a + 0x30, a + 0x70, 111, 1);
             *(u8 *)(o + 0x20) = 5;
             moby_set_flag_bit(o, 1);
         }

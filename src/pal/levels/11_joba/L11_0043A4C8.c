@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -12,16 +12,16 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 extern int FloatToInt(float);
 extern int FloatToInt(float);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern float math_random_float_range(float a, float b);
 
-void func_PAL_L11_0043A4C8(float *pos, int count) {
+void part_l11_spawn_impact_burst_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L11_001BA8C0, pos);
+    FastVecSub(direction, (float *)g_hero_l11_position, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;

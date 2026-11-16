@@ -7,7 +7,7 @@ extern int UpdateFourOptionMenuInput(int, int);
 /* Reads a bound global word; when it is non-zero it calls the object's handler with that value
  * plus a fixed base offset as the first argument and the function's own argument as the second,
  * returning the handler's result, otherwise returns 0. */
-int func_US2_L00_0030EA10(int argument)
+int module_l00_call_handler_with_arg_17_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -20,7 +20,7 @@ extern void four_option_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_US2_L00_0030EA50(void)
+void module_l00_call_handler_17_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -31,7 +31,7 @@ void func_US2_L00_0030EA50(void)
 extern int menu_handle_page_input_a(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EA80(int argument)
+int module_l00_call_handler_with_arg_18_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -44,7 +44,7 @@ extern void two_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_US2_L00_0030EAC0(void)
+void module_l00_call_handler_18_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -55,7 +55,7 @@ void func_US2_L00_0030EAC0(void)
 extern int menu_handle_page_input_b(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EAF0(int argument)
+int module_l00_call_handler_with_arg_19_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -68,7 +68,7 @@ extern void single_toggle_a_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_US2_L00_0030EB30(void)
+void module_l00_call_handler_19_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -79,7 +79,7 @@ void func_US2_L00_0030EB30(void)
 extern int screen_adjust_menu_update(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EB60(int argument)
+int module_l00_call_handler_with_arg_20_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -92,7 +92,7 @@ extern void onoff_menu_draw_with_help(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_US2_L00_0030EBA0(void)
+void level_l00_call_module_handler_us2(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -103,7 +103,7 @@ void func_US2_L00_0030EBA0(void)
 extern int onoff_menu_update(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030EBD0(int argument)
+int level_l00_call_module_handler_with_arg_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -116,7 +116,7 @@ extern void onoff_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_US2_L00_0030EC10(void)
+void level_l00_call_module_handler_2_us2(void)
 {
     int value = D_L00_001A904C_2;
 

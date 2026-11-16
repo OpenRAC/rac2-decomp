@@ -3,7 +3,7 @@ typedef int s128 __attribute__((mode(TI)));
 
 extern char g_hero_state[];
 extern char g_hero_position[];
-extern u8 D_001A7B0C __attribute__((sda));
+extern u8 g_hero_option_flag __attribute__((sda));
 extern s32 nearest_rail_point(void *, void *, void *, void *, void *, void *, void *, s32, s32);
 
 /* Finds a nearby grind rail and records its contact point and rail parameters. */
@@ -16,7 +16,7 @@ void FindGrindRail(void)
     s32 mode_value;
     float gap;
 
-    if (D_001A7B0C != 0) {
+    if (g_hero_option_flag != 0) {
         hero = g_hero_state;
         *(s32 *)(hero + 0x63C) = 0;
         if (*(short *)(hero + 0x1F4) == 0) {

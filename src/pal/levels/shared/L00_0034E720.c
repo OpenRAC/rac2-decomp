@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 typedef struct {
     char reserved00[0x14];
     char *source;
@@ -9,19 +9,19 @@ typedef struct {
     char reserved1c[0x118];
     int fallback;
 } CallbackStateL001FEC40;
-extern CallbackStateL001FEC40 D_L00_001FEC40;
+extern CallbackStateL001FEC40 g_pause_input_state;
 extern int module_l00_call_handler_with_arg_16(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
-int func_PAL_L00_0034E720(void)
+int pad_l00_update_input_callback_pal(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -41,7 +41,7 @@ extern void module_l00_call_handler_16(void);
 extern void func_0027C660_6(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_PAL_L00_0034E7A8(void)
+int level_l00_run_setup_return_zero_4_pal(void)
 {
     func_0027C540_6(0);
     module_l00_call_handler_16();

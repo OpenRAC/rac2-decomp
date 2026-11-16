@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern char *D_001A8CFC __attribute__((sda));
-extern char D_001AE710[];
-extern char D_001AE720[];
+extern char *g_resident_data_base __attribute__((sda));
+extern char g_records_widget_data_a[];
+extern char g_records_widget_data_b[];
 
 extern void *table_find_by_id(int, int);
 extern void object_init_derived_b(void *, int, int, void *, void *);
@@ -39,11 +39,11 @@ void records_screen_init(void *object, void *font_data, void *context)
     char *end = set->records + 0x750;
     void *colour;
 
-    set->f220C = table_find_by_id((int)D_001A8CFC + (int)record, 0x57);
-    set->f2210 = table_find_by_id((int)D_001A8CFC + (int)record, 0x58);
+    set->f220C = table_find_by_id((int)g_resident_data_base + (int)record, 0x57);
+    set->f2210 = table_find_by_id((int)g_resident_data_base + (int)record, 0x58);
     record = set->records;
     do {
-        object_init_derived_b(record, 0x20, 1, D_001AE710, context);
+        object_init_derived_b(record, 0x20, 1, g_records_widget_data_a, context);
         widget_set_pos_y(record, 5);
         meter_set_max(record, 0x64);
         meter_set_value(record, 0);
@@ -55,7 +55,7 @@ void records_screen_init(void *object, void *font_data, void *context)
     } while (record < end);
     record = set->f1D30;
     hud_ammo_bolt_init(set->f7A0, font_data, context);
-    object_init_derived_c(record, D_001AE720, context);
+    object_init_derived_c(record, g_records_widget_data_b, context);
     colour = object_get_fourth_field(record);
     *(float *)colour = 2155905152.0f;
     colour = object_get_field_b(record);

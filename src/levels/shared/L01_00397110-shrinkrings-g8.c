@@ -6,18 +6,18 @@ extern void FastVecSub(void *, void *, void *);
 typedef int TI __attribute__((mode(TI)));
 typedef float RingVec[4] __attribute__((aligned(16)));
 typedef struct {RingVec v[4]; unsigned c[4]; float uv[4][2]; long g[4];} RingQuad;
-extern int D_L01_001AF5D8 __attribute__((sda));
-extern int D_L01_001AF5DC __attribute__((sda));
-extern int D_L01_001AF5E0 __attribute__((sda));
-extern int D_L01_001AF5E4 __attribute__((sda));
-extern int D_L01_001AF5E8 __attribute__((sda));
-extern int D_L01_001AF5F0[] SDATA(D_L01_001AF5F0);
-extern float D_L01_001AF5F8[] SDATA(D_L01_001AF5F8);
-extern float D_L01_001AF618 __attribute__((sda));
-extern float D_L01_001AF620 __attribute__((sda));
-extern float D_L01_001AF5FC[] MACRO_ADDR;
-extern char D_00189F20[];
-extern float D_L01_001B1FA4;
+extern int g_shrink_ring_bits_a __attribute__((sda));
+extern int g_shrink_ring_bits_b __attribute__((sda));
+extern int g_shrink_ring_bits_c __attribute__((sda));
+extern int g_shrink_ring_bits_d __attribute__((sda));
+extern int g_shrink_ring_texture_id __attribute__((sda));
+extern int g_shrink_ring_color_table[] SDATA(D_L01_001AF5F0);
+extern float g_shrink_ring_u_table[] SDATA(D_L01_001AF5F8);
+extern float g_shrink_ring_base_height __attribute__((sda));
+extern float g_shrink_ring_height_offset __attribute__((sda));
+extern float g_shrink_ring_v_table[] MACRO_ADDR;
+extern char g_hero_vector_block[];
+extern float g_hero_l01_reach_timer_a;
 extern void copy_matrix_rotation(void *,void *);
 extern long GetEffectTextureDescriptor(int);
 extern void vec_clamp_length(void *,float);
@@ -41,11 +41,11 @@ void DrawShrinkingMobyRings(char *moby)
     copy_matrix_rotation(mat,moby+0xc0);
     qcopy(pos,moby+0x10);
     for(j=0;j<4;j++) {
-        q[j].g[1]=GetEffectTextureDescriptor(D_L01_001AF5E8);
+        q[j].g[1]=GetEffectTextureDescriptor(g_shrink_ring_texture_id);
         q[j].g[2]=0xFF9000000260L;
-        q[j].g[3]=(long)D_L01_001AF5D8|((long)D_L01_001AF5DC<<2);
-        q[j].g[3]|=(long)D_L01_001AF5E0<<4;
-        q[j].g[3]|=(long)D_L01_001AF5E4<<6;
+        q[j].g[3]=(long)g_shrink_ring_bits_a|((long)g_shrink_ring_bits_b<<2);
+        q[j].g[3]|=(long)g_shrink_ring_bits_c<<4;
+        q[j].g[3]|=(long)g_shrink_ring_bits_d<<6;
         q[j].g[3]|=0x8000L<<24;
         q[j].g[0]=0;
     }
@@ -55,13 +55,13 @@ void DrawShrinkingMobyRings(char *moby)
     if(F(vars,0x34)<1.15f) {
         float t, shrink;
         char *g;
-        FastVecSub(D_00189F20,moby+0x10,D_00189F20-0x80);
-        g=D_00189F20-0x100;
+        FastVecSub(g_hero_vector_block,moby+0x10,g_hero_vector_block-0x80);
+        g=g_hero_vector_block-0x100;
         I(g,0x108)=0;
-        vec_clamp_length(D_00189F20,0.01666666753590107f);
+        vec_clamp_length(g_hero_vector_block,0.01666666753590107f);
         shrink=F(vars,0x34);
         t=1.15f-shrink; if(t<0)t=0;
-        {float fade=(0.2f-shrink)*5; if(fade<0)fade=0; D_L01_001B1FA4=fade;}
+        {float fade=(0.2f-shrink)*5; if(fade<0)fade=0; g_hero_l01_reach_timer_a=fade;}
         half_height=t+0.1f;
         if(B(moby,0x20)!=7 && B(moby,0x20)!=8) {
             if(shrink<0.65f) {
@@ -78,9 +78,9 @@ void DrawShrinkingMobyRings(char *moby)
     for(i=0;i<4;i++) {
         for(k=0;k<4;k++) {
             unsigned c;
-            q[i].uv[k][0]=D_L01_001AF5F8[k*2];
-            q[i].uv[k][1]=D_L01_001AF5FC[k*2];
-            c=D_L01_001AF5F0[i!=0];
+            q[i].uv[k][0]=g_shrink_ring_u_table[k*2];
+            q[i].uv[k][1]=g_shrink_ring_v_table[k*2];
+            c=g_shrink_ring_color_table[i!=0];
             q[i].c[k]=c;
             q[i].c[k]=FastTweenColor(c&0xffffff,c,alpha);
             vec_store_helper(q[i].v[k]);
@@ -88,17 +88,17 @@ void DrawShrinkingMobyRings(char *moby)
             {float radius=F(vars,0x34); if(i)radius+=0.01f; q[i].v[k][0]=radius;}
             if(k&1) {
                 switch(i) {
-                case 0:row[i].v[0][2]+=D_L01_001AF618+half_height;break;
-                case 1:row[i].v[0][2]+=D_L01_001AF618+D_L01_001AF620;break;
-                case 2:row[i].v[0][2]+=(D_L01_001AF618-half_height*scale)+D_L01_001AF620;break;
-                case 3:row[i].v[0][2]+=(D_L01_001AF618+half_height*scale)+D_L01_001AF620;break;
+                case 0:row[i].v[0][2]+=g_shrink_ring_base_height+half_height;break;
+                case 1:row[i].v[0][2]+=g_shrink_ring_base_height+g_shrink_ring_height_offset;break;
+                case 2:row[i].v[0][2]+=(g_shrink_ring_base_height-half_height*scale)+g_shrink_ring_height_offset;break;
+                case 3:row[i].v[0][2]+=(g_shrink_ring_base_height+half_height*scale)+g_shrink_ring_height_offset;break;
                 }
             } else {
                 switch(i) {
-                case 0:row[i].v[0][2]+=D_L01_001AF618-half_height;break;
-                case 1:row[i].v[0][2]+=D_L01_001AF618-D_L01_001AF620;break;
-                case 2:row[i].v[0][2]+=(D_L01_001AF618-half_height*scale)-D_L01_001AF620;break;
-                case 3:row[i].v[0][2]+=(D_L01_001AF618+half_height*scale)-D_L01_001AF620;break;
+                case 0:row[i].v[0][2]+=g_shrink_ring_base_height-half_height;break;
+                case 1:row[i].v[0][2]+=g_shrink_ring_base_height-g_shrink_ring_height_offset;break;
+                case 2:row[i].v[0][2]+=(g_shrink_ring_base_height-half_height*scale)-g_shrink_ring_height_offset;break;
+                case 3:row[i].v[0][2]+=(g_shrink_ring_base_height+half_height*scale)-g_shrink_ring_height_offset;break;
                 }
             }
         }

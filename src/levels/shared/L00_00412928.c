@@ -11,8 +11,8 @@ typedef struct {
     long f70, f78, f80, flags;
 } RenderPacket;
 
-extern Vector D_0018A0E0;
-extern Vector D_L00_001AA310[4];
+extern Vector g_hero_state_block;
+extern Vector g_billboard_corner_table[4];
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -42,7 +42,7 @@ extern void SpawnBurstParticles(char *, char *);
 extern void part_spawn_explosion_burst_with_drift(char *, char *, char *);
 extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
 extern char ref_L00_004195C8_00[];
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
     short timer;
@@ -120,7 +120,7 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *part_l00_spawn_spinning(void *, void *, int);
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
 typedef struct { char pad[0x140]; float x, y; } CameraHead;
 extern float IntToFloat(int);
 extern int math_fast_float_d(void *);
@@ -162,7 +162,7 @@ extern void UpdateWaveLineEffect(char *);
 /* Preserve the object argument passed to the empty callback in retail. */
 extern void func_L00_00414018_1(char *);
 extern void snd_stop_voice(int);
-extern Vector128 D_L00_001BF220;
+extern Vector128 g_hero_l00_position;
 extern void part_emit_spark_burst_at_moby(char *);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
@@ -271,7 +271,7 @@ char *parented_explosion_spawn(float size, char *position, int trigger, int kind
         state = (ParentedSpawnState *)self->state;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        FastVecSub(direction, D_L00_001B8C80 + 0x140, object + 0x10);
+        FastVecSub(direction, g_scalar_transition_state + 0x140, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
@@ -302,16 +302,16 @@ char *parented_explosion_spawn(float size, char *position, int trigger, int kind
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (fast_vec_dist(position, D_L00_001B8C80 + 0x140) < 48.0f && trigger != 0) {
-                char *manager = D_L00_001B8C80;
+            if (fast_vec_dist(position, g_scalar_transition_state + 0x140) < 48.0f && trigger != 0) {
+                char *manager = g_scalar_transition_state;
                 *(int *)(manager + 0x16c) = 0;
                 *(int *)(manager + 0x168) = 20;
                 *(float *)(manager + 0x160) = 0.075f;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                if (1.5707964f - math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(difference, g_scalar_transition_state + 0x370)) < 0.45378566f)
                     state->flags = 1;
                 else
                     state->flags = 0;
@@ -376,9 +376,9 @@ void gfx_l00_draw_jittered_billboard_quad(Vector *position, float size, float of
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    FastVecSub((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
+    FastVecSub((char *)&frame.row[0], (char *)(g_scalar_transition_state + 0x140), (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
@@ -392,7 +392,7 @@ void gfx_l00_draw_jittered_billboard_quad(Vector *position, float size, float of
     {
         Vector *vertex = packet.vertex;
         int count;
-        corner = D_L00_001AA310;
+        corner = g_billboard_corner_table;
         count = 3;
         do {
             FastVecScale(vertex, corner, size);
@@ -476,7 +476,7 @@ char *explosion_spawn(float size, char *position, int trigger, int kind, int red
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = D_L00_001B8C80 + 0x140;
+        camera = g_scalar_transition_state + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -510,9 +510,9 @@ char *explosion_spawn(float size, char *position, int trigger, int kind, int red
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&g_scalar_transition_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else
@@ -575,9 +575,9 @@ void gfx_draw_jittered_billboard_quad_copy(Vector *position, float size, float o
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    FastVecSub((char *)&frame.row[0], (char *)(D_L00_001B8C80 + 0x140), (char *)&frame.position);
+    FastVecSub((char *)&frame.row[0], (char *)(g_scalar_transition_state + 0x140), (char *)&frame.position);
     vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&g_hero_state_block);
     vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
     FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
@@ -591,7 +591,7 @@ void gfx_draw_jittered_billboard_quad_copy(Vector *position, float size, float o
     {
         Vector *vertex = packet.vertex;
         int count;
-        corner = D_L00_001AA310;
+        corner = g_billboard_corner_table;
         count = 3;
         do {
             FastVecScale(vertex, corner, size);
@@ -675,7 +675,7 @@ char *spark_effect_spawn(Vector128 *position, int kind, char *parent)
         qcopy(first, position);
         *(float *)(object + 0x1c) = 1.0f;
         second = object + 0xc0;
-        FastVecSub(direction, D_L00_001B8C80 + 0x140, first);
+        FastVecSub(direction, g_scalar_transition_state + 0x140, first);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(first, (char *)up, 1);
         qcopy(second, direction);
@@ -701,8 +701,8 @@ void part_spawn_drifting_particles(char *object)
     int i;
 
     for (i = 24; i >= 0; i--) {
-        heading = mat_fast_helper_a(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
-                                ((CameraHead *)D_L00_001B8C80)->y - *(float *)(object + 0x14));
+        heading = mat_fast_helper_a(((CameraHead *)g_scalar_transition_state)->x - *(float *)(object + 0x10),
+                                ((CameraHead *)g_scalar_transition_state)->y - *(float *)(object + 0x14));
         speed = math_random_signed_float_range(1.0f, 2.0f);
         FloatToInt(speed);
         spawn[0] = *(float *)(object + 0x10) + math_random_signed_float_range(-0.25f, 0.25f);
@@ -714,7 +714,7 @@ void part_spawn_drifting_particles(char *object)
         spawn[4] = math_fast_sin_or_cos_a(angle) * 0.016666668f * speed;
         spawn[5] = math_fast_sin_or_cos_b(angle) * 0.016666668f * speed;
         spawn[6] = 0.075f;
-        part_l00_spawn_spinning(spawn, D_L00_001A8F20, 300);
+        part_l00_spawn_spinning(spawn, g_default_vector, 300);
     }
 }
 
@@ -849,7 +849,7 @@ char *blue_explosion_spawn(float size, char *position, int trigger, int kind, in
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = D_L00_001B8C80 + 0x140;
+        camera = g_scalar_transition_state + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -883,9 +883,9 @@ char *blue_explosion_spawn(float size, char *position, int trigger, int kind, in
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&g_scalar_transition_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

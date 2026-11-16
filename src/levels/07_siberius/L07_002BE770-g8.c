@@ -39,7 +39,7 @@ typedef struct {
     void *obj;
 } L07Base;
 
-extern L07Base D_L07_001BCF00;
+extern L07Base g_followed_points_state;
 
 /* The matrix the level object points at. */
 typedef struct {
@@ -49,10 +49,10 @@ typedef struct {
     s32 f68;
 } L07Mat;
 
-extern L07Mat D_L07_0027E8C0;
+extern L07Mat g_followed_points_matrix;
 
 /* The four records the engine reads through $gp. */
-extern int D_L07_001A93E0 __attribute__((sda));
+extern int g_followed_point_vec __attribute__((sda));
 
 /* The object the level object names. */
 typedef struct {
@@ -91,13 +91,13 @@ void moby_build_followed_points(void) {
 
     obj = 0;
     idx = -1;
-    switch (D_L07_001BCF00.type) {
+    switch (g_followed_points_state.type) {
     case 2:
-        obj = D_L07_001BCF00.obj;
+        obj = g_followed_points_state.obj;
         idx = 2;
         break;
     case 3:
-        obj = D_L07_001BCF00.obj;
+        obj = g_followed_points_state.obj;
         idx = 2;
         break;
     }
@@ -105,13 +105,13 @@ void moby_build_followed_points(void) {
         goto end;
     if (obj == 0)
         goto end;
-    if (D_L07_001BCF00.slot[idx] == 0)
+    if (g_followed_points_state.slot[idx] == 0)
         goto end;
 
-    g = &D_L07_0027E8C0;
-    D_L07_001BCF00.f50 = g;
+    g = &g_followed_points_matrix;
+    g_followed_points_state.f50 = g;
     p = &g->m[0];
-    q = (Vec2 *)&D_L07_001A93E0;
+    q = (Vec2 *)&g_followed_point_vec;
 
     vec_fast_to_int_helper((u8 *)((L07Obj *)obj)->f58 + 0x10, buf);
     quaternion_to_rotation_basis(buf, mat);
@@ -125,15 +125,15 @@ void moby_build_followed_points(void) {
         q++;
     }
 
-    ((L07Mat *)D_L07_001BCF00.f50)->f68 = D_L07_001BCF00.slot[idx];
+    ((L07Mat *)g_followed_points_state.f50)->f68 = g_followed_points_state.slot[idx];
 
 end:
-    if (D_L07_001BCF00.type == 2) {
-        if (D_L07_001BCF00.timer >= 0x62D)
-            D_L07_001BCF00.f50 = 0;
+    if (g_followed_points_state.type == 2) {
+        if (g_followed_points_state.timer >= 0x62D)
+            g_followed_points_state.f50 = 0;
     }
-    if (D_L07_001BCF00.type == 3) {
-        if (D_L07_001BCF00.timer < 0x50)
-            D_L07_001BCF00.f50 = 0;
+    if (g_followed_points_state.type == 3) {
+        if (g_followed_points_state.timer < 0x50)
+            g_followed_points_state.f50 = 0;
     }
 }

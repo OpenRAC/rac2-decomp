@@ -1,5 +1,5 @@
 #include "common.h"
-extern s32 D_L08_001B29DC[] MACRO_ADDR;
+extern s32 g_moby_array[] MACRO_ADDR;
 extern s32 moby_count_group_not_in_state(s32, s32);
 extern s32 GetFirstMobyInGroup(s32 *, s32, s32, s32);
 
@@ -14,7 +14,7 @@ s32 list_count_entries(s32 unused, u8 *obj)
     *(u8 *)(obj + 0x131) = total;
     found = 0;
     if (GetFirstMobyInGroup(&found, *(s32 *)(obj + 0x134), 1, 1) == 0 || GetFirstMobyInGroup(&found, *(s32 *)(obj + 0x138), 1, 1) == 0) {
-        slot = (found - D_L08_001B29DC[0]) >> 8;
+        slot = (found - g_moby_array[0]) >> 8;
     }
     return slot;
 }

@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char D_001ADBC8[];
-extern char D_US2_001ADF70[]; /* "%d/%d": sits where v1.01 has "%d" (D_001ADF98), but plain "%d" is elsewhere in v2.00 */
-extern int D_001ADF90 __attribute__((sda));
+extern char g_str_string_format[];
+extern char g_str_status_format[]; /* "%d/%d": sits where v1.01 has "%d" (D_001ADF98), but plain "%d" is elsewhere in v2.00 */
+extern int g_info_panel_counter_shift_x __attribute__((sda));
 extern char g_map_overlay_state[];
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
@@ -23,12 +23,12 @@ void func_US2_0033FDD8(char *self)
     char *base = g_map_overlay_state;
 
     if ((unsigned int)(*(int *)(base + 0x230) - 1) < 20) {
-        sprintf(self + 0x6C0, D_001ADBC8, GetLocalizedString(0x2C51));
+        sprintf(self + 0x6C0, g_str_string_format, GetLocalizedString(0x2C51));
         hud_set_widget_field_a(self + 0x470, 0);
         func_US2_003378A0(self + 0x470);
-        sprintf(self + 0x6C0, D_US2_001ADF70, func_US2_002B1C90(*(int *)(base + 0x230)),
+        sprintf(self + 0x6C0, g_str_status_format, func_US2_002B1C90(*(int *)(base + 0x230)),
                       func_US2_002B1D18(*(int *)(base + 0x230)));
-        object_set_first_float4(self + 0x470, object_get_first_field(self + 0x470)[0] + (float)D_001ADF90,
+        object_set_first_float4(self + 0x470, object_get_first_field(self + 0x470)[0] + (float)g_info_panel_counter_shift_x,
                       object_get_first_field(self + 0x470)[1], zero, zero);
         hud_set_widget_field_a(self + 0x470, 2);
         func_US2_003378A0(self + 0x470);

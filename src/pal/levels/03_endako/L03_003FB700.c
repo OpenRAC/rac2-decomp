@@ -6,11 +6,11 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int s32;
 extern u32 func_31CFF8(void *a, void *b, u32 c);
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_moby_record_base __attribute__((sda));
+extern u8 *g_entity_id_lists[];
 extern s32 moby_handle_request_slot_state(s32);
-extern u8 D_001A7B08[0x40] __attribute__((sda));
-extern s32 D_L03_001B2A38[] __attribute__((sda));
+extern u8 g_status_flag_b[0x40] __attribute__((sda));
+extern s32 g_object_group_count[] __attribute__((sda));
 typedef struct {
     u8 pad00[0x24];
     s32 key;
@@ -22,7 +22,7 @@ extern L03VoiceState g_music_state;
 
 /* Picks the free voice slot the entity asks for, unless the engine is busy
    or already holds that slot. */
-void func_PAL_L03_003FBA58(u8 *a0, s32 a1) {
+void endako_boss_start_voice_line_pal(u8 *a0, s32 a1) {
     L03VoiceState *st = &g_music_state;
     s32 sel = a1;
     u8 *a3 = *(u8 **)(a0 + 0x68);

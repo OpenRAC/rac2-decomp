@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern float D_L05_001B153C __attribute__((sda));
-extern float D_L05_001B1538 __attribute__((sda));
-extern float D_L05_001B1534 __attribute__((sda));
-extern float D_L05_001B1530 __attribute__((sda));
-extern char *D_L05_001BFB18 __attribute__((nosda));
+extern float g_impact_spark_scale_b __attribute__((sda));
+extern float g_impact_spark_scale_a __attribute__((sda));
+extern float g_projectile_hit_radius_alt __attribute__((sda));
+extern float g_projectile_hit_radius_normal __attribute__((sda));
+extern char *g_hit_l05_result __attribute__((nosda));
 extern void vec_scale_to_length(void *, void *, float);
 extern int coll_process_hit(void *, float, int, char *, void *);
 extern float math_random_signed_float_range(float, float);
@@ -41,9 +41,9 @@ void projectile_apply_impact_sparks(char *object, char *state, float *pos)
     p.flags = 0x810000;
     p.owner = object;
     if (*(int *)(state + 0x24))
-        p.scale = D_L05_001B153C;
+        p.scale = g_impact_spark_scale_b;
     else
-        p.scale = D_L05_001B1538;
+        p.scale = g_impact_spark_scale_a;
     p.one = 1;
     qcopy(&p.pos, state);
     vec_scale_to_length(&p, &p, 1.0f);
@@ -51,9 +51,9 @@ void projectile_apply_impact_sparks(char *object, char *state, float *pos)
     p.type = 3;
     p.subtype = 2;
     p.id = *(unsigned short *)(object + 0xAA);
-    coll_process_hit(pos, *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530,
+    coll_process_hit(pos, *(int *)(state + 0x24) ? g_projectile_hit_radius_alt : g_projectile_hit_radius_normal,
                   1, *(char **)(state + 0x20), &p);
-    if (D_L05_001BFB18 && *(short *)(D_L05_001BFB18 + 0xAA) == 0x956) {
+    if (g_hit_l05_result && *(short *)(g_hit_l05_result + 0xAA) == 0x956) {
         count = 20.0f;
         speed = 3.0f;
         spread = 2.0f;

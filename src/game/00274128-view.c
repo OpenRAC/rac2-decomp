@@ -1,7 +1,7 @@
 #include "common.h"
 /* Adapted from RAC1 gfx_build_view_matrices (GPL-3.0). */
 typedef struct { float f[0x50]; } SceneG;
-extern char D_001B5570[],D_001B9100[],D_001B92C0[];
+extern char g_camera_basis_vectors[],g_view_state_buffer[],g_view_matrix_buffer[];
 extern void multiply_matrix(void *,void *,void *);
 extern void scale_vector(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
@@ -15,11 +15,11 @@ void gfx_build_view_matrices(void) {
     float off_y;
     float off_z;
 
-    qcopy(m[0], D_001B5570);
-    qcopy(m[1], D_001B5570 + 0x10);
-    qcopy(m[2], D_001B5570 + 0x20);
-    view_matrix = (SceneG *)(D_001B5570 - 0x370);
-    view_state = D_001B9100;
+    qcopy(m[0], g_camera_basis_vectors);
+    qcopy(m[1], g_camera_basis_vectors + 0x10);
+    qcopy(m[2], g_camera_basis_vectors + 0x20);
+    view_matrix = (SceneG *)(g_camera_basis_vectors - 0x370);
+    view_state = g_view_state_buffer;
     view_floats = (float *)(view_state - 0xC0);
     view_matrix->f[0] = -m[1][0];
     *(int *)&view_matrix->f[0x30 / 4] = 0;
@@ -60,9 +60,9 @@ void gfx_build_view_matrices(void) {
     qcopy(&view_matrix->f[0x120 / 4], view_state + 0xA0);
     qcopy(&view_matrix->f[0x130 / 4], view_state + 0xB0);
     multiply_matrix(&view_matrix->f[0x100 / 4], &view_matrix->f[0x100 / 4], view_matrix);
-    qcopy(D_001B92C0, view_matrix);
-    qcopy(D_001B92C0 + 0x10, &view_matrix->f[0x10 / 4]);
-    qcopy(D_001B92C0 + 0x20, &view_matrix->f[0x20 / 4]);
-    FastVecScale(D_001B92C0 + 0x30, &view_matrix->f[0x140 / 4], 1024.0f);
-    *(float *)(D_001B92C0 + 0x3C) = 1024.0f;
+    qcopy(g_view_matrix_buffer, view_matrix);
+    qcopy(g_view_matrix_buffer + 0x10, &view_matrix->f[0x10 / 4]);
+    qcopy(g_view_matrix_buffer + 0x20, &view_matrix->f[0x20 / 4]);
+    FastVecScale(g_view_matrix_buffer + 0x30, &view_matrix->f[0x140 / 4], 1024.0f);
+    *(float *)(g_view_matrix_buffer + 0x3C) = 1024.0f;
 }

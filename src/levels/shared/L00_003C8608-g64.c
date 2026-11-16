@@ -1,3 +1,4 @@
+#include "names.h"
 /* The complete 64-byte corner table needs -G64 -Wa,-G64 for GP addressing.
  * Same packet and traversal as func_L00_00407C18, with this effect's data.
  */
@@ -8,14 +9,14 @@ typedef struct {
     float params[8];
     u64 regs[4];
 } DrawPacket8608;
-extern float D_L00_001B00A0[4][4] __attribute__((sda));
-extern float D_L00_001B00E0 __attribute__((sda));
-extern float D_L00_001B00E4 __attribute__((sda));
-extern float D_L00_001B00E8 __attribute__((sda));
-extern int D_L00_001B00EC __attribute__((sda));
-extern char D_L00_002403C0[];
+extern float g_quad_l00_corner_table[4][4] __attribute__((sda));
+extern float g_quad_inner_corner_scale __attribute__((sda));
+extern float g_quad_outer_corner_scale __attribute__((sda));
+extern float g_quad_offset_length __attribute__((sda));
+extern int g_quad_l00_color __attribute__((sda));
+extern char g_lightning_beam_points[];
 extern char g_camera_l00_position[];
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 extern u64 GetEffectTextureDescriptor(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -33,12 +34,12 @@ typedef struct {
     u64 regs[4];
 } DrawPacket83E0;
 extern int FloatToInt(float);
-extern unsigned int D_L00_001B003C __attribute__((sda));
-extern int D_L00_001B2AC0[] __attribute__((sda));
-extern float D_L00_001B2A90[] __attribute__((sda));
-extern float D_L00_001B2AB0[] __attribute__((sda));
-extern Vec83E0 D_L00_001B2A20[] __attribute__((sda));
-extern Vec83E0 D_L00_001B2A50[] __attribute__((sda));
+extern unsigned int g_lightning_spark_color __attribute__((sda));
+extern int g_lightning_spark_active[] __attribute__((sda));
+extern float g_lightning_spark_alphas[] __attribute__((sda));
+extern float g_lightning_spark_sizes[] __attribute__((sda));
+extern Vec83E0 g_lightning_spark_positions[] __attribute__((sda));
+extern Vec83E0 g_lightning_spark_directions[] __attribute__((sda));
 /* Two passes of a camera-facing quad placed from object + 0xD0 (scaled by D_L00_001B00E8) and
    D_L00_002403C0: first with colour D_L00_001B00EC and corner scale D_L00_001B00E0, then
    white with corner scale D_L00_001B00E4. */
@@ -55,22 +56,22 @@ void DrawBeamOriginCameraFacingQuads(char *object)
     packet.params[0] = 0; packet.params[1] = 0; packet.params[2] = 0; packet.params[3] = 1;
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
     packet.colours[0] = packet.colours[1] =
-        packet.colours[2] = packet.colours[3] = D_L00_001B00EC;
-    vec_scale_to_length(offset, object + 0xD0, D_L00_001B00E8);
-    FastVecAdd(basis[3], D_L00_002403C0, offset);
+        packet.colours[2] = packet.colours[3] = g_quad_l00_color;
+    vec_scale_to_length(offset, object + 0xD0, g_quad_offset_length);
+    FastVecAdd(basis[3], g_lightning_beam_points, offset);
     FastVecSub(offset, g_camera_l00_position, basis[3]);
     vec_scale_to_length(basis[0], offset, 1.0f);
-    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    FastVecCross(basis[1], basis[0], g_hero_state_block);
     vec_scale_to_length(basis[1], basis[1], -1.0f);
     FastVecCross(basis[2], basis[1], basis[0]);
     for (i = 3; i >= 0; i--) {
-        FastVecScale(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E0);
+        FastVecScale(vertex, g_quad_l00_corner_table[3 - i], g_quad_inner_corner_scale);
         transform_vector(packet.points[3 - i], vertex, basis);
     }
     draw_world_quad(&packet, 0, 0);
     packet.colours[3] = -1; packet.colours[2] = -1; packet.colours[1] = -1; packet.colours[0] = -1;
     for (i = 3; i >= 0; i--) {
-        FastVecScale(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E4);
+        FastVecScale(vertex, g_quad_l00_corner_table[3 - i], g_quad_outer_corner_scale);
         transform_vector(packet.points[3 - i], vertex, basis);
     }
     draw_world_quad(&packet, 0, 0);
@@ -92,23 +93,23 @@ void DrawLightningArcSparks2(void)
     packet.regs[1] = GetEffectTextureDescriptor(8);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
-    color = D_L00_001B003C & 0xFFFFFF;
+    color = g_lightning_spark_color & 0xFFFFFF;
     packet.regs[0] = 0;
     packet.params[0] = 0; packet.params[1] = 0; packet.params[2] = 0; packet.params[3] = 1;
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
     for (i = 0; i < 3; i++) {
-        if (D_L00_001B2AC0[i]) {
-            c = color | (FloatToInt(D_L00_001B2A90[i]) << 24);
+        if (g_lightning_spark_active[i]) {
+            c = color | (FloatToInt(g_lightning_spark_alphas[i]) << 24);
             packet.colours[0] = packet.colours[1] = packet.colours[2] = packet.colours[3] = c;
-            qcopy(&basis[3], &D_L00_001B2A20[i]);
-            qcopy(&basis[0], &D_L00_001B2A50[i]);
-            FastVecScale(&basis[2], D_0018A0E0, -1.0f);
+            qcopy(&basis[3], &g_lightning_spark_positions[i]);
+            qcopy(&basis[0], &g_lightning_spark_directions[i]);
+            FastVecScale(&basis[2], g_hero_state_block, -1.0f);
             FastVecCross(&basis[1], &basis[0], &basis[2]);
             vec_scale_to_length(&basis[1], &basis[1], 1.0f);
             FastVecCross(&basis[2], &basis[1], &basis[0]);
-            corner = (Vec83E0 *)D_L00_001B00A0;
+            corner = (Vec83E0 *)g_quad_l00_corner_table;
             for (j = 3; j >= 0; corner++, j--) {
-                FastVecScale(&vertex, corner, D_L00_001B2AB0[i]);
+                FastVecScale(&vertex, corner, g_lightning_spark_sizes[i]);
                 transform_vector(&packet.points[3 - j], &vertex, basis);
             }
             draw_world_quad(&packet, 0, 0);

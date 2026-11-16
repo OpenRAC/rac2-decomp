@@ -58,8 +58,8 @@ extern u32 g_arena_challenge_table __attribute__((sda));
 /* The group count once more, read bare (`lui`/`lw`) in these walks, under a second name: the
    scalar above is read through $gp. */
 extern s32 D_L11_001B35B8_1[] __attribute__((sda));
-extern f32 D_L11_001B1614 __attribute__((sda));
-extern f32 D_L11_001B1618 __attribute__((sda));
+extern f32 g_arena_spawn_time_scale __attribute__((sda));
+extern f32 g_arena_spawn_angle_scale __attribute__((sda));
 extern s32 moby_is_state_six(u8 *);
 extern s32 moby_is_state_one_cleared_vars(u8 *);
 extern s32 math_random_int_below(s32);
@@ -125,7 +125,7 @@ extern void teleporter_bind_captured_object(u8 *, u8 *, f32, f32);
    limit of the class record the state names (the halfword at 0x10, at 0x12 for the second
    group), hands the gathered entities, last first, to func_L02_00416720 together with entities
    of the group at state word 0x17C. */
-void func_PAL_L11_00448690(u8 *object) {
+void arena_assign_fighters_to_spawns_pal(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     JobaClassTableView *entry =
         ((JobaClassTableView **)&g_arena_challenge_table)[*(s16 *)(state + 0x1F0)];

@@ -14,21 +14,21 @@ typedef struct {
 typedef struct { float inner, outer; char pad[8]; V413 position; } Light413;
 typedef struct { char pad[0x98]; float angle; char gap[0x21F4]; int owner; char gap2[0x20]; unsigned char mode; } Player413;
 extern Player413 g_hero_state;
-extern int D_L22_001B1564 __attribute__((sda)), D_L22_001B1568 __attribute__((sda));
-extern int D_L22_001B155C __attribute__((sda)), D_L22_001B1560 __attribute__((sda));
-extern float D_L22_001B1544 __attribute__((sda)), D_L22_001B1548 __attribute__((sda));
-extern int D_L22_001A8FF0 MACRO_ADDR;
+extern int g_homing_handle_hero __attribute__((sda)), g_homing_handle_other __attribute__((sda));
+extern int g_homing_voice_player __attribute__((sda)), g_homing_voice_other __attribute__((sda));
+extern float g_homing_factor_normal __attribute__((sda)), g_homing_factor_charged __attribute__((sda));
+extern int g_hero_flag_a MACRO_ADDR;
 typedef struct { int enabled; unsigned int color; unsigned long long counter; } ChargeFx413;
-extern ChargeFx413 D_L22_001A8AC0[] __attribute__((sda));
-extern int D_L22_001A8AB0;
-extern int D_L22_001B1C48;
-extern float D_L22_001A93E4;
-extern char D_L22_001C4140[];
+extern ChargeFx413 g_charged_shot_screen_effect[] __attribute__((sda));
+extern int g_charged_shot_active;
+extern int g_frame_l22_counter;
+extern float g_homing_shot_knockback_value;
+extern char g_hit_l22_moby_list[];
 /* sda: one la macro per use, so its address is not kept across the loop. */
-extern char D_L22_001A8F20[] __attribute__((sda));
+extern char g_effect_position_params[] __attribute__((sda));
 /* Unsized view: read through a separate lui rather than the small-data lw macro. */
-extern unsigned char *D_L22_001FF82C[];
-extern Light413 D_L22_001C7E00[];
+extern unsigned char *g_spark_texture[];
+extern Light413 g_effect_l22_light_table[];
 extern float IntToFloat(int), math_random_float_range(float,float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float), math_random_int_range(int,int), math_random_int_below(int);
 extern void vec_scale_to_length(void*,void*,float), add_vectors(void*,void*,void*);
@@ -53,19 +53,19 @@ void UpdateChargedProjectile(unsigned char *obj)
 {
     struct { V413 velocity, random, position, scaled, matrix[3], rotation, normalized, temp; } frame;
     State413 *state;
-    int *handle = &D_L22_001B1568;
+    int *handle = &g_homing_handle_other;
     int i, j, hit, color;
     float radius, spread, fade, factor;
     char *particle, *sub;
-    if (*(int *)(obj+0xB8) == g_hero_state.owner) handle=&D_L22_001B1564;
+    if (*(int *)(obj+0xB8) == g_hero_state.owner) handle=&g_homing_handle_hero;
     state = *(State413 **)(obj+0x68);
     switch (obj[0x20]) {
     case 0: {
         float charge;
         if (state->triggered && (g_hero_state.mode==2 || !state->kind)) {
-            if (!state->charge && handle==&D_L22_001B1568) {
-                D_L22_001A8AC0[0].enabled=1;
-                D_L22_001A8AC0[0].color=0xFFFF00;
+            if (!state->charge && handle==&g_homing_handle_other) {
+                g_charged_shot_screen_effect[0].enabled=1;
+                g_charged_shot_screen_effect[0].color=0xFFFF00;
             }
             charge=IntToFloat(++state->charge)*0.033333335f;
             if (charge>1.0f) charge=1.0f;
@@ -91,49 +91,49 @@ void UpdateChargedProjectile(unsigned char *obj)
                 }
             }
             if (state->charge<50) {
-                int alpha=D_L22_001A8AC0[0].color>>24;
-                if (!D_L22_001A8AC0[0].counter && alpha==255) alpha=37;
+                int alpha=g_charged_shot_screen_effect[0].color>>24;
+                if (!g_charged_shot_screen_effect[0].counter && alpha==255) alpha=37;
                 if (alpha<36) alpha++; else alpha=37;
-                D_L22_001A8AC0[0].counter=0x1F00000042ULL;
-                D_L22_001A8AC0[0].color=(D_L22_001A8AC0[0].color&0xFFFF00)|(alpha<<24);
-            } else D_L22_001A8AC0[0].color |= 0xFF000000;
+                g_charged_shot_screen_effect[0].counter=0x1F00000042ULL;
+                g_charged_shot_screen_effect[0].color=(g_charged_shot_screen_effect[0].color&0xFFFF00)|(alpha<<24);
+            } else g_charged_shot_screen_effect[0].color |= 0xFF000000;
             if (state->light != -1) {
                 float light_charge;
                 float inner, outer;
-                D_L22_001C7E00[state->light].position.f.x=*(float *)(obj+0x10);
-                D_L22_001C7E00[state->light].position.f.y=*(float *)(obj+0x14);
-                D_L22_001C7E00[state->light].position.f.z=*(float *)(obj+0x18);
+                g_effect_l22_light_table[state->light].position.f.x=*(float *)(obj+0x10);
+                g_effect_l22_light_table[state->light].position.f.y=*(float *)(obj+0x14);
+                g_effect_l22_light_table[state->light].position.f.z=*(float *)(obj+0x18);
                 { int n=state->charge;
                 if (n>50) n=50;
                 if (n<0) n=0;
-                D_L22_001C7E00[state->light].position.f.w=IntToFloat(n)*0.14f; }
+                g_effect_l22_light_table[state->light].position.f.w=IntToFloat(n)*0.14f; }
                 light_charge=IntToFloat(state->charge)*0.033333335f;
                 if (light_charge>1) light_charge=1;
-                part_spawn_glow_record(&D_L22_001C7E00[state->light].position,
+                part_spawn_glow_record(&g_effect_l22_light_table[state->light].position,
                     math_random_int_range(15,47)&255,math_random_int_range(47,63)&255,math_random_int_range(63,127)&255,20,light_charge*840000.0f,0.0f);
-                D_L22_001C7E00[state->light].inner=math_random_float_range(D_L22_001C7E00[state->light].inner*0.8f,
-                    (D_L22_001C7E00[state->light].position.f.w+D_L22_001C7E00[state->light].position.f.w)*0.14285715f);
-                outer=D_L22_001C7E00[state->light].outer*0.8f;
-                inner=D_L22_001C7E00[state->light].inner;
-                D_L22_001C7E00[state->light].outer=math_random_float_range(inner < outer ? inner : outer,inner);
-            } else if (!(D_L22_001B1C48&3)) {
+                g_effect_l22_light_table[state->light].inner=math_random_float_range(g_effect_l22_light_table[state->light].inner*0.8f,
+                    (g_effect_l22_light_table[state->light].position.f.w+g_effect_l22_light_table[state->light].position.f.w)*0.14285715f);
+                outer=g_effect_l22_light_table[state->light].outer*0.8f;
+                inner=g_effect_l22_light_table[state->light].inner;
+                g_effect_l22_light_table[state->light].outer=math_random_float_range(inner < outer ? inner : outer,inner);
+            } else if (!(g_frame_l22_counter&3)) {
                 state->light=gfx_add_point_light(obj+0x10,0,0.0f,0.0f);
             }
         } else {
-            D_L22_001A8AB0=0;
-            D_L22_001A8AC0[0].enabled=0;
+            g_charged_shot_active=0;
+            g_charged_shot_screen_effect[0].enabled=0;
             state->charge=0;
             snd_start_in_slot(22,0,0);
             if (state->kind) {
-                if (D_L22_001B155C != -1) {
-                    snd_stop_voice(D_L22_001B155C);
-                    D_L22_001B155C=snd_start_in_slot(21,0,0);
+                if (g_homing_voice_player != -1) {
+                    snd_stop_voice(g_homing_voice_player);
+                    g_homing_voice_player=snd_start_in_slot(21,0,0);
                 }
-            } else if (D_L22_001B1560 != -1) {
-                snd_stop_voice(D_L22_001B1560);
-                D_L22_001B1560=snd_start_in_slot(21,0,0);
+            } else if (g_homing_voice_other != -1) {
+                snd_stop_voice(g_homing_voice_other);
+                g_homing_voice_other=snd_start_in_slot(21,0,0);
             }
-            if (!D_L22_001A8FF0) {
+            if (!g_hero_flag_a) {
                 state->velocity.f.x=math_fast_sin_or_cos_a(g_hero_state.angle)*0.6666667f;
                 state->velocity.f.y=math_fast_sin_or_cos_b(g_hero_state.angle)*0.6666667f;
                 state->velocity.f.z=0;
@@ -157,7 +157,7 @@ void UpdateChargedProjectile(unsigned char *obj)
         else vec_scale_to_length(&frame.scaled,obj+0xC0,extra);
         vec_scale_to_length(&frame.normalized,&frame.position,1.0f);
         FastVecCross(&frame.rotation,obj+0xE0,&frame.normalized);
-        if (state->kind) factor=D_L22_001B1548; else factor=D_L22_001B1544;
+        if (state->kind) factor=g_homing_factor_charged; else factor=g_homing_factor_normal;
         FastVecScale(&frame.rotation,&frame.rotation,factor);
         fade=FastVecLength(&frame.rotation);
         frame.rotation.f.w=-square_root(1.0f-fade*fade);
@@ -171,7 +171,7 @@ void UpdateChargedProjectile(unsigned char *obj)
         }
         state->velocity.q=frame.scaled.q;
         if (state->light!=-1) {
-            Light413 *lights = D_L22_001C7E00;
+            Light413 *lights = g_effect_l22_light_table;
             lights[state->light].position.f.w *= 0.39999998f;
             if (lights[state->light].position.f.w<0.0001f) {
                 gfx_free_point_light(state->light);
@@ -180,8 +180,8 @@ void UpdateChargedProjectile(unsigned char *obj)
         }
         if (state->age>=51 || g_hero_state.mode!=2) {
             if (*(int *)(obj+0xB8)==g_hero_state.owner) {
-                if(D_L22_001B155C!=-1) {snd_stop_voice(D_L22_001B155C);D_L22_001B155C=-1;}
-            } else if(D_L22_001B1560!=-1) {snd_stop_voice(D_L22_001B1560);D_L22_001B1560=-1;}
+                if(g_homing_voice_player!=-1) {snd_stop_voice(g_homing_voice_player);g_homing_voice_player=-1;}
+            } else if(g_homing_voice_other!=-1) {snd_stop_voice(g_homing_voice_other);g_homing_voice_other=-1;}
             moby_mark_spawned(*handle);
             *handle=0;
             return;
@@ -191,15 +191,15 @@ void UpdateChargedProjectile(unsigned char *obj)
                 *(float *)(obj+0x14)<2 || *(float *)(obj+0x14)>1021 ||
                 *(float *)(obj+0x18)<2 || *(float *)(obj+0x18)>1021) {
                 if (*(int *)(obj+0xB8)==g_hero_state.owner) {
-                    if(D_L22_001B155C!=-1) {snd_stop_voice(D_L22_001B155C);D_L22_001B155C=-1;}
-                } else if(D_L22_001B1560!=-1) {snd_stop_voice(D_L22_001B1560);D_L22_001B1560=-1;}
+                    if(g_homing_voice_player!=-1) {snd_stop_voice(g_homing_voice_player);g_homing_voice_player=-1;}
+                } else if(g_homing_voice_other!=-1) {snd_stop_voice(g_homing_voice_other);g_homing_voice_other=-1;}
                 moby_mark_spawned(*handle);
                 *handle=0;
                 return;
             } else if (state->kind) {
                 hit=coll_process_hit(obj+0x10,16,obj,0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
-                moby_queue_knockback_for_nodes(obj,&frame.position,D_L22_001C4140,hit,0,0x8B0000,2,1,D_L22_001A93E4,1.0f,1.0f);
+                moby_queue_knockback_for_nodes(obj,&frame.position,g_hit_l22_moby_list,hit,0,0x8B0000,2,1,g_homing_shot_knockback_value,1.0f,1.0f);
                 if (hit) SpawnExplosion(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1.0f,20.0f);
                 {
                 /* Block scopes keep these local to one basic block, as retail allocates them. */
@@ -220,7 +220,7 @@ void UpdateChargedProjectile(unsigned char *obj)
                 int g=math_random_int_range(47,63);
                 int r=math_random_int_range(15,47);
                 int high=(g<<8)|0x7F000000;
-                part_spawn_spark(obj+0x10,&frame.velocity,(b<<16)|high|r,0x4F7F4F2F,45,1,*D_L22_001FF82C[0],-1,0,210000.0f);
+                part_spawn_spark(obj+0x10,&frame.velocity,(b<<16)|high|r,0x4F7F4F2F,45,1,*g_spark_texture[0],-1,0,210000.0f);
                 }
                 }
                 i=5;
@@ -236,7 +236,7 @@ void UpdateChargedProjectile(unsigned char *obj)
                     } else --i;
                 } while(i>=0);
                 for(i=0;i<8;i++) {
-                    particle=part_spawn_short_lived(obj+0x10,D_L22_001A8F20,127,obj);
+                    particle=part_spawn_short_lived(obj+0x10,g_effect_position_params,127,obj);
                     if(particle) {
                         sub=particle+0x20;
                         if(i==2 && !math_random_int_below(8)) *(float *)(particle+12)=180000;
@@ -253,7 +253,7 @@ void UpdateChargedProjectile(unsigned char *obj)
             } else {
                 hit=coll_process_hit(obj+0x10,16,*(void **)(obj+0xB8),0,radius);
                 frame.position.q=((V413 *)(obj+0x10))->q;
-                moby_queue_knockback_for_nodes(obj,&frame.position,D_L22_001C4140,hit,0,0x8B0007,2,1,D_L22_001A93E4,1,1);
+                moby_queue_knockback_for_nodes(obj,&frame.position,g_hit_l22_moby_list,hit,0,0x8B0007,2,1,g_homing_shot_knockback_value,1,1);
                 if(hit) SpawnExplosion(obj+0x10,0,25,20,20,20,45,1,1,0,0,0,1,20);
                 {
                 float effect=spread*105000.0f;
@@ -273,13 +273,13 @@ void UpdateChargedProjectile(unsigned char *obj)
                 int g=math_random_int_range(31,47);
                 int b=math_random_int_range(63,127);
                 int high=(g<<8)|0x7F000000;
-                part_spawn_spark(obj+0x10,&frame.velocity,(r<<16)|high|b,0x4F1F1F7F,45,1,*D_L22_001FF82C[0],-1,0,210000);
+                part_spawn_spark(obj+0x10,&frame.velocity,(r<<16)|high|b,0x4F1F1F7F,45,1,*g_spark_texture[0],-1,0,210000);
                 }
             }
         }
     }
     }
-    if(D_L22_001A8FF0) {
+    if(g_hero_flag_a) {
         cam_compute_view_direction(obj+0x10,&state->orientation,0);
         vec_negate_and_forward(obj+0xC0,&state->orientation,0);
     }

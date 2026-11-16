@@ -29,37 +29,37 @@ extern void help_unlock_entry();
 extern s32 level_validate_item_list();
 extern void gfx_run_filter_over_all_slots(s32);
 extern s32 moby_handle_request_slot_state();
-extern volatile s32 D_001A7398;
-extern volatile s32 D_001A73A0;
+extern volatile s32 g_menu_choice_table;
+extern volatile s32 g_hero_aim_speed_start;
 extern s32 g_current_map_index __attribute__((sda));
-extern volatile u8 D_001A7AFE;
-extern volatile u8 D_001A7B16;
-extern volatile u8 D_001A7B22;
-extern volatile u8 D_001A7B27;
-extern volatile s8 D_001A7B36;
-extern volatile s8 D_001A7B68;
-extern volatile s8 D_001A7B69;
+extern volatile u8 g_starting_items_granted;
+extern volatile u8 g_start_grant_flag_a;
+extern volatile u8 g_start_grant_flag_b;
+extern volatile u8 g_start_grant_flag_c;
+extern volatile s8 g_start_grant_value;
+extern volatile s8 g_vendor_item_list;
+extern volatile s8 g_start_grant_value_next;
 
 /* Gives the starting items when the player does not have them yet, then checks the item list. */
 void level_grant_starting_items(void) {
-    if (D_001A7B16 == 0) {
+    if (g_start_grant_flag_a == 0) {
         help_unlock_entry(0x1E);
         moby_handle_request_slot_state(0x1E);
-        D_001A7B68 = 0x5E;
-        D_001A7398 = 0x1E;
+        g_vendor_item_list = 0x5E;
+        g_menu_choice_table = 0x1E;
     }
-    if (D_001A7B22 == 0) {
+    if (g_start_grant_flag_b == 0) {
         help_unlock_entry(0x2A);
         moby_handle_request_slot_state(0x2A);
-        D_001A7B69 = 0x6A;
+        g_start_grant_value_next = 0x6A;
     }
-    if (D_001A7B27 == 0) {
+    if (g_start_grant_flag_c == 0) {
         help_unlock_entry(0x2F);
-        D_001A73A0 = 0x2F;
+        g_hero_aim_speed_start = 0x2F;
     }
-    if (D_001A7AFE == 0) {
-        D_001A7B36 = 1;
-        D_001A7AFE = 1;
+    if (g_starting_items_granted == 0) {
+        g_start_grant_value = 1;
+        g_starting_items_granted = 1;
     }
     level_validate_item_list();
     gfx_run_filter_over_all_slots(g_current_map_index);

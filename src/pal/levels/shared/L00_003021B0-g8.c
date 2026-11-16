@@ -153,146 +153,146 @@ typedef struct Groups00618 {
 
 typedef struct { int offset; int size; } Blob00618;
 typedef struct { int p14; int i18; int p1C; int i20; } Reloc00618;
-extern Reloc00618 D_L00_001A9014 MACRO_ADDR;
-extern int D_L00_001B1AFC MACRO_ADDR;
-extern struct Groups00618 *D_L00_001B1B00 MACRO_ADDR;
-extern char *D_L00_001B1F84 MACRO_ADDR;   /* clip volumes, 0x90 bytes each */
-extern int D_L00_001B1F88 MACRO_ADDR;
-extern char *D_L00_001B1F8C MACRO_ADDR;   /* cuboids */
-extern int D_L00_001B1F90 MACRO_ADDR;
-extern char *D_L00_001B1F94 MACRO_ADDR;   /* spheres */
-extern int D_L00_001B1F98 MACRO_ADDR;
-extern char *D_L00_001B1F9C MACRO_ADDR;   /* cylinders */
-extern int D_L00_001B1FA0 MACRO_ADDR;
-extern int D_L00_001B1FA4 MACRO_ADDR;     /* path count */
-extern char *D_L00_001B1FA8 MACRO_ADDR;   /* path data */
+extern Reloc00618 g_level_reloc_record MACRO_ADDR;
+extern int g_region_members_table MACRO_ADDR;
+extern struct Groups00618 *g_region_group_table MACRO_ADDR;
+extern char *g_collision_pill_table MACRO_ADDR;   /* clip volumes, 0x90 bytes each */
+extern int g_collision_pill_count MACRO_ADDR;
+extern char *g_aranos_launch_poses MACRO_ADDR;   /* cuboids */
+extern int g_collision_sphere_count MACRO_ADDR;
+extern char *g_collision_sphere_table MACRO_ADDR;   /* spheres */
+extern int g_collision_cylinder_count MACRO_ADDR;
+extern char *g_collision_cylinder_table MACRO_ADDR;   /* cylinders */
+extern int g_collision_record_count MACRO_ADDR;
+extern int g_path_count MACRO_ADDR;     /* path count */
+extern char *g_path_data MACRO_ADDR;   /* path data */
 typedef struct { Vec00618 head; char *data; int i14; char pad18[8]; } Rail00618;   /* 0x20 */
-extern Rail00618 *D_L00_001B16C0 MACRO_ADDR;
-extern int D_L00_001B16C4 MACRO_ADDR;
-extern char *D_L00_001B20B0 MACRO_ADDR;
-extern int D_L00_001B20B4 MACRO_ADDR;
-extern int D_L00_001B20B8 MACRO_ADDR;
-extern int D_L00_001B20BC MACRO_ADDR;
+extern Rail00618 *g_rail_table MACRO_ADDR;
+extern int g_rail_count MACRO_ADDR;
+extern char *g_level_data_block_ptr MACRO_ADDR;
+extern int g_level_state_word_first MACRO_ADDR;
+extern int g_level_state_word_second MACRO_ADDR;
+extern int g_level_state_word_third MACRO_ADDR;
 
-extern LoadCtx00618 D_L00_001BF140;
+extern LoadCtx00618 g_level_load_context;
 extern Boot00618 g_copy_setup_data;
 typedef struct { int stage, busy; int *archive0; int archive1; } ArchiveLoad;
-extern ArchiveLoad D_001A7280 MACRO_ADDR;
+extern ArchiveLoad g_loader_archives MACRO_ADDR;
 extern char g_hero_state[];
-extern char D_L00_001B8C80[];
-extern char D_L00_001D1740[];
+extern char g_scalar_transition_state[];
+extern char g_level_clear_area_a[];
 extern int g_is_pal_video MACRO_ADDR;
-extern float D_001A790C MACRO_ADDR;
+extern float g_frame_rate_scale MACRO_ADDR;
 extern Coll00618 g_collision_result;
-extern char D_L00_001BF280[];
-extern char D_L00_001B1A80[];
-extern char D_L00_001DE860[];
-extern char D_L00_001FA860[];
-extern Cfg00618 D_L00_001BD2C0;
-extern unsigned char D_L00_001B1980 MACRO_ADDR;
-extern unsigned char D_L00_001B1981 MACRO_ADDR;
-extern unsigned char D_L00_001B1982 MACRO_ADDR;
-extern float D_L00_001B1984 MACRO_ADDR;
-extern float D_L00_001B1988 MACRO_ADDR;
-extern float D_L00_001B198C MACRO_ADDR;
-extern float D_L00_001B1990 MACRO_ADDR;
-extern int D_L00_001A8FF0 MACRO_ADDR;
-extern float D_L00_001B1AE8 MACRO_ADDR;
-extern float D_L00_001B1B10 MACRO_ADDR;
-extern float D_L00_001B1B14 MACRO_ADDR;
-extern float D_L00_001B1B18 MACRO_ADDR;
-extern float D_L00_001B1B1C MACRO_ADDR;
+extern char g_collision_result_pointer[];
+extern char g_collision_result_buffer[];
+extern char g_level_clear_area_b[];
+extern char g_level_clear_area_c[];
+extern Cfg00618 g_hud_float_params;
+extern unsigned char g_fog_color_r MACRO_ADDR;
+extern unsigned char g_fog_color_g MACRO_ADDR;
+extern unsigned char g_fog_color_b MACRO_ADDR;
+extern float g_fog_near MACRO_ADDR;
+extern float g_fog_far MACRO_ADDR;
+extern float g_fog_near_intensity MACRO_ADDR;
+extern float g_fog_far_intensity MACRO_ADDR;
+extern int g_hero_locked_flag MACRO_ADDR;
+extern float g_hero_proximity_threshold MACRO_ADDR;
+extern float g_camera_offset_vector MACRO_ADDR;
+extern float g_level_float_param_first MACRO_ADDR;
+extern float g_level_float_param_second MACRO_ADDR;
+extern float g_level_float_param_third MACRO_ADDR;
 extern Sel00618 g_hero_moby_default;
-extern Tutorial00618 D_L00_001C9340;
-extern int D_L00_001A8F0C MACRO_ADDR;
-extern int D_L00_001B20C0 MACRO_ADDR;
-extern float D_L00_001B2500 MACRO_ADDR;
-extern float D_L00_001B2408 MACRO_ADDR;
-extern int D_L00_001B1EB4 MACRO_ADDR;
-extern int D_L00_001B255C MACRO_ADDR;
-extern char D_00100AE0[];
-extern char D_L00_001C6F40[];
-extern char D_L00_001C7040[];
-extern char D_L00_001C6B40[];
-extern char D_L00_002A0ED0[];
-extern int D_L00_001B1CDC MACRO_ADDR;
-extern char D_L00_001C5940[];
-extern char D_L00_001C5B40[];
-extern int D_L00_001B24D4 MACRO_ADDR;
+extern Tutorial00618 g_tutorial_points;
+extern int g_level_reloc_word MACRO_ADDR;
+extern int g_light_distance_param MACRO_ADDR;
+extern float g_light_far_param MACRO_ADDR;
+extern float g_light_falloff_param MACRO_ADDR;
+extern int g_light_scale_first MACRO_ADDR;
+extern int g_light_scale_second MACRO_ADDR;
+extern char g_gfx_dma_chain_buffer[];
+extern char g_light_table[];
+extern char g_effect_slot_records[];
+extern char g_level_block_buffer[];
+extern char g_str_startup_message[];
+extern int g_level_entry_count MACRO_ADDR;
+extern char g_level_copy_buffer[];
+extern char g_level_entries_buffer[];
+extern int g_tfrag_count MACRO_ADDR;
 typedef struct { char pad00[0x36]; unsigned short h36; char pad38[2]; unsigned short h3A; char pad3C; unsigned char b3D; char pad3E[2]; } Tfrag00618;   /* 0x40 */
-extern char *D_L00_001B24D0 MACRO_ADDR;
+extern char *g_tfrag_render_data MACRO_ADDR;
 typedef struct { char pad00[0x2C]; int count; } TextHdr00618;
-extern TextHdr00618 D_L00_0027D848;
-extern unsigned char D_001A7BB2[] MACRO_ADDR; /* option bytes; [2] is the language */
+extern TextHdr00618 g_tutorial_prompt_state;
+extern unsigned char g_option_toggle_b[] MACRO_ADDR; /* option bytes; [2] is the language */
 typedef struct { int offset; int pad4[3]; } Text00618;
-extern Text00618 *D_L00_001B1B80 MACRO_ADDR;
-extern int D_L00_001B2520 MACRO_ADDR;
-extern Tie00618 *D_L00_001B2514 MACRO_ADDR;
-extern Tie00618 *D_L00_001B2518 MACRO_ADDR;
-extern Matrix00618 *D_L00_001B251C MACRO_ADDR;
-extern int D_L00_001B2524 MACRO_ADDR;
-extern int D_L00_001B2540 MACRO_ADDR;
-extern int D_L00_001B2544 MACRO_ADDR;
-extern int D_L00_001B2548 MACRO_ADDR;
-extern int D_L00_001B2510 MACRO_ADDR;
-extern TieClass00618 *D_L00_00226700[];
-extern unsigned char D_L00_00226A00[];
-extern Shrub00618 *D_L00_001B23F8 MACRO_ADDR;
-extern int D_L00_001B23F4 MACRO_ADDR;
-extern Matrix00618 *D_L00_001B2400 MACRO_ADDR;
-extern unsigned char *D_L00_001B2404 MACRO_ADDR;
-extern Shrub00618 *D_L00_001B23FC MACRO_ADDR;
-extern int D_L00_001ACE90[];
-extern ShrubClass00618 *D_L00_0021EA20[];
-extern unsigned char D_L00_0021EBA0[];
+extern Text00618 *g_level_text_table MACRO_ADDR;
+extern int g_tie_count MACRO_ADDR;
+extern Tie00618 *g_tie_table MACRO_ADDR;
+extern Tie00618 *g_tie_table_end MACRO_ADDR;
+extern Matrix00618 *g_tie_matrix_table MACRO_ADDR;
+extern int g_level_value_word MACRO_ADDR;
+extern int g_level_zero_word_first MACRO_ADDR;
+extern int g_level_zero_word_second MACRO_ADDR;
+extern int g_level_zero_word_third MACRO_ADDR;
+extern int g_render_class_slot_count MACRO_ADDR;
+extern TieClass00618 *g_tie_class_table[];
+extern unsigned char g_tie_slot_by_class[];
+extern Shrub00618 *g_shrub_table MACRO_ADDR;
+extern int g_shrub_count MACRO_ADDR;
+extern Matrix00618 *g_shrub_matrix_table MACRO_ADDR;
+extern unsigned char *g_shrub_data_table MACRO_ADDR;
+extern Shrub00618 *g_shrub_table_end MACRO_ADDR;
+extern int g_level_l00_pointer_table[];
+extern ShrubClass00618 *g_shrub_l00_class_table[];
+extern unsigned char g_shrub_slot_by_class[];
 typedef struct { float f0, f4, f8; int iC; float f10, f14, f18; int i1C; } Cam00618;
-extern Cam00618 *D_L00_001B1844 MACRO_ADDR;
-extern int D_L00_001B1848 MACRO_ADDR;
+extern Cam00618 *g_camera_def_table MACRO_ADDR;
+extern int g_camera_def_count MACRO_ADDR;
 extern Slots00618 g_sound_state;
-extern int D_L00_001C5480[][3];
-extern int D_L00_001C5540[][3];
-extern Moby00618 *D_L00_001B1E9C[] MACRO_ADDR; /* moby array start (array: in-struct for alias analysis) */
-extern Moby00618 *D_L00_001B18DC MACRO_ADDR;
-extern Moby00618 *D_L00_001B1EA0 MACRO_ADDR;
-extern Moby00618 *D_L00_001B1EA4 MACRO_ADDR;
-extern char *D_L00_001B1EAC MACRO_ADDR;
-extern short D_L00_001FB660[];
+extern int g_collectible_value_table[][3];
+extern int g_collectible_bonus_table[][3];
+extern Moby00618 *g_moby_array_base[] MACRO_ADDR; /* moby array start (array: in-struct for alias analysis) */
+extern Moby00618 *g_moby_list_tail MACRO_ADDR;
+extern Moby00618 *g_moby_array_end_sentinel MACRO_ADDR;
+extern Moby00618 *g_moby_array_last MACRO_ADDR;
+extern char *g_level_heap_block_ptr MACRO_ADDR;
+extern short g_moby_index_table[];
 extern int g_current_map_index MACRO_ADDR;
-extern unsigned char D_0019B2E8[];
-extern unsigned char D_0019B4A8[];
+extern unsigned char g_moby_group_flags[];
+extern unsigned char g_moby_nibble_table[];
 typedef struct { unsigned char pad[0x464]; unsigned char byUid[0]; } Progress00618;
-extern Progress00618 D_L00_0021DDB0;
-extern unsigned char D_L00_001B1CE0[] MACRO_ADDR;
-extern int D_L00_001FA920[];
-extern int D_L00_001B1EB8 MACRO_ADDR;
-extern char *D_L00_001FDA80[];
-extern char *D_L00_001B1880 MACRO_ADDR;
-extern char *D_L00_001B1CD8 MACRO_ADDR;
-extern int D_L00_001B1CD4 MACRO_ADDR;
-extern char *D_L00_001B1F40 MACRO_ADDR;
-extern int D_L00_001B1F10 MACRO_ADDR;
-extern char D_L00_001FE140[];
-extern int D_L00_001B1A40 MACRO_ADDR;
-extern int D_001B22A0[];
-extern int D_001B22B0 MACRO_ADDR;
-extern int D_L00_001B1A50 MACRO_ADDR;
-extern short D_L00_001FDE78 NOT_SDA;
-extern short D_L00_001FDEF8 NOT_SDA;
-extern short D_L00_001B1FB0 MACRO_ADDR;
-extern short D_L00_001B1FF0 MACRO_ADDR;
-extern short D_L00_001B2030 MACRO_ADDR;
-extern int D_L00_00220DA0[];
+extern Progress00618 g_controller_level_state;
+extern unsigned char g_class_l00_flags_table[] MACRO_ADDR;
+extern int g_turn_state_table[];
+extern int g_moby_l00_group_count MACRO_ADDR;
+extern char *g_launch_path_table[];
+extern char *g_collision_grid_data MACRO_ADDR;
+extern char *g_level_table_data MACRO_ADDR;
+extern int g_level_table_count MACRO_ADDR;
+extern char *g_env_preset_table MACRO_ADDR;
+extern int g_env_preset_count MACRO_ADDR;
+extern char g_level_clear_area_d[];
+extern int g_level_header_extra_ptr MACRO_ADDR;
+extern int g_packet_buffer_table[];
+extern int g_packet_buffer_size MACRO_ADDR;
+extern int g_aranos_launch_state MACRO_ADDR;
+extern short g_level_counter_a NOT_SDA;
+extern short g_moby_index_list_head NOT_SDA;
+extern short g_homing_moby_index_list MACRO_ADDR;
+extern short g_decoy_moby_index_list MACRO_ADDR;
+extern short g_dark_sheep_moby_index_list MACRO_ADDR;
+extern int g_launch_moby_list[];
 extern int g_frame_l00_counter MACRO_ADDR;
-extern int D_L00_001B1AEC MACRO_ADDR;
-extern int D_L00_001AA0F8 MACRO_ADDR;
-extern char D_L00_001A8A78[] __attribute__((sda));
-extern char D_L00_001A8A48[] __attribute__((sda));
-extern char *D_L00_001B18D0 MACRO_ADDR;
-extern char *D_L00_001A8AA8 MACRO_ADDR;
+extern int g_nanotech_ball_moby MACRO_ADDR;
+extern int g_render_state_word MACRO_ADDR;
+extern char g_level_blob_a[] __attribute__((sda));
+extern char g_level_l00_flag_word[] __attribute__((sda));
+extern char *g_setup_heap_pointer MACRO_ADDR;
+extern char *g_level_blob_ptr MACRO_ADDR;
 
-extern int func_PAL_002B8838(void *, int, int);
+extern int load_read_disc_with_pause_pal(void *, int, int);
 extern void FlushCache(int);
-extern int func_PAL_0029DE68(void *, void *);
+extern int fast_decompress_pal(void *, void *);
 extern void mem_clear(void *, int, int);
 extern void moby_clear_object_slots(void);
 extern void func_001163A0(int);
@@ -322,10 +322,10 @@ extern void gfx_pack_render_command_fields(void *, u64, u64, u64, u64);
 extern void level_store_value_in_table_slot(void *, int);
 extern Moby00618 *CreateMoby(int);
 extern void counter_clear_group(void);
-extern void func_PAL_L00_002A4788(void);
+extern void InitializeHero_pal(void);
 extern void hero_reset_start_aim_speed(void);
 extern void SetupLevelCameras(void);
-extern void func_PAL_00272208(void);
+extern void cam_update_state_pal(void);
 extern void pad_clear_port_state(void);
 extern void level_init_object_tables(void);
 extern void func_PAL_L00_00369AF8(void);
@@ -340,81 +340,81 @@ extern void pickup_update_interactive(unsigned char *);
 
 char *func_PAL_L00_003021B0(int reload)
 {
-    char *hdr = D_L00_001BF140.data;
-    char *heap = D_L00_001BF140.heap;
+    char *hdr = g_level_load_context.data;
+    char *heap = g_level_load_context.heap;
     float *startPos;
-    short *idx = D_L00_001FB660; /* moby index by file order, rebuilt at each use */
+    short *idx = g_moby_index_table; /* moby index by file order, rebuilt at each use */
     int tmp; /* scratch int: section 0x44's data base, a group's offset and end flag in the group loop */
     char *p;
 
     if (!reload) {
-        func_PAL_002B8838(heap, g_copy_setup_data.i52B8 + g_copy_setup_data.i529C, g_copy_setup_data.i52BC);
-        D_001A7280.archive1 = (int)heap;
+        load_read_disc_with_pause_pal(heap, g_copy_setup_data.i52B8 + g_copy_setup_data.i529C, g_copy_setup_data.i52BC);
+        g_loader_archives.archive1 = (int)heap;
     }
     FlushCache(0);
-    func_PAL_0029DE68((void *)D_001A7280.archive1, hdr);
+    fast_decompress_pal((void *)g_loader_archives.archive1, hdr);
     FlushCache(0);
     mem_clear(g_hero_state, 0, 0x2540);
-    mem_clear(D_L00_001B8C80, 0, 0x410);
-    mem_clear(D_L00_001D1740, 0, 0x180);
+    mem_clear(g_scalar_transition_state, 0, 0x410);
+    mem_clear(g_level_clear_area_a, 0, 0x180);
     moby_clear_object_slots();
     func_001163A0(1234);
     if (g_is_pal_video) {
-        if (D_001A790C == 1.0f)
+        if (g_frame_rate_scale == 1.0f)
             SetFrameTimingMode(1);
     } else {
-        if (D_001A790C != 1.0f)
+        if (g_frame_rate_scale != 1.0f)
             SetFrameTimingMode(0);
     }
-    g_collision_result.p4 = D_L00_001BF280;
-    g_collision_result.p8 = D_L00_001B1A80;
+    g_collision_result.p4 = g_collision_result_pointer;
+    g_collision_result.p8 = g_collision_result_buffer;
     g_collision_result.iC = 0;
     g_collision_result.i10 = 0;
     g_collision_result.i14 = 0;
-    mem_fast_helper_b(D_L00_001DE860, 0x1C000);
-    mem_fast_helper_b(D_L00_001FA860, 0xC0);
+    mem_fast_helper_b(g_level_clear_area_b, 0x1C000);
+    mem_fast_helper_b(g_level_clear_area_c, 0xC0);
 
     /* section 0: the level header */
     p = SECTION_00618(0);
-    D_L00_001BD2C0.i23C = *(int *)p;
+    g_hud_float_params.i23C = *(int *)p;
     p += 4;
-    D_L00_001BD2C0.i240 = *(int *)p;
+    g_hud_float_params.i240 = *(int *)p;
     p += 4;
-    D_L00_001BD2C0.i244 = *(int *)p;
+    g_hud_float_params.i244 = *(int *)p;
     p += 4;
-    D_L00_001B1980 = *(unsigned char *)p;
+    g_fog_color_r = *(unsigned char *)p;
     p += 4;
-    D_L00_001B1981 = *(unsigned char *)p;
+    g_fog_color_g = *(unsigned char *)p;
     p += 4;
-    D_L00_001B1982 = *(unsigned char *)p;
+    g_fog_color_b = *(unsigned char *)p;
     p += 4;
-    D_L00_001B1984 = *(float *)p;
-    D_L00_001B1988 = *(float *)(p + 4);
-    D_L00_001B198C = *(float *)(p + 8);
-    D_L00_001B1990 = *(float *)(p + 0xC);
-    D_L00_001B1AE8 = *(float *)(p + 0x10);
-    D_L00_001A8FF0 = 0;
+    g_fog_near = *(float *)p;
+    g_fog_far = *(float *)(p + 4);
+    g_fog_near_intensity = *(float *)(p + 8);
+    g_fog_far_intensity = *(float *)(p + 0xC);
+    g_hero_proximity_threshold = *(float *)(p + 0x10);
+    g_hero_locked_flag = 0;
     p += 0x14;
     if (*(int *)p) {
-        D_L00_001A8FF0 = 1;
-        D_L00_001B1B10 = *(float *)(p + 4);
-        D_L00_001B1B14 = *(float *)(p + 8);
-        D_L00_001B1B18 = *(float *)(p + 0xC);
-        D_L00_001B1B1C = 1.0f;
+        g_hero_locked_flag = 1;
+        g_camera_offset_vector = *(float *)(p + 4);
+        g_level_float_param_first = *(float *)(p + 8);
+        g_level_float_param_second = *(float *)(p + 0xC);
+        g_level_float_param_third = 1.0f;
     }
     startPos = (float *)(p + 0x10);
     p += 0x20;
     g_hero_moby_default.i40 = *(int *)p;
     g_hero_moby_default.i44 = *(int *)(p + 4);
     g_hero_moby_default.i48 = *(int *)(p + 8);
-    D_L00_001C9340.count = 0;
+    g_tutorial_points.count = 0;
     p += 0x10;
     if (*(int *)(p + 0xC)) {
         int i;
 
-        D_L00_001C9340.count = *(int *)(p + 0xC);
-        for (i = 0; i < D_L00_001C9340.count; i++) {
-            float *e = (float *)((char *)&D_L00_001C9340 + (i << 4));
+        g_tutorial_points.count = *(int *)(p + 0xC);
+        for (i = 0; i < g_tutorial_points.count; i++) {
+            float *e = (float *)((char *)&g_tutorial_points + (i << 4));
 
             e[8] = *(float *)p;
             e[9] = *(float *)(p + 4);
@@ -427,18 +427,18 @@ char *func_PAL_L00_003021B0(int reload)
     } else {
         p += 0x20;
     }
-    D_L00_001A8F0C = *(int *)p;
+    g_level_reloc_word = *(int *)p;
     gfx_apply_display_config();
-    D_L00_001B2500 = 983040.0f;
-    D_L00_001B2408 = 500.0f;
-    D_L00_001B255C = 0x3C0;
-    D_L00_001B1EB4 = 0x3C0;
-    D_L00_001B20C0 = 0x1F4000;
-    SetBackgroundColor(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
-    gfx_start_dma_channel0_and_wait(D_00100AE0);
-    mem_fast_helper_b(D_L00_001C6F40, 0x100);
-    mem_fast_helper_b(D_L00_001C7040, 0x180);
-    mem_fast_helper_b(D_L00_001C6B40, 0x400);
+    g_light_far_param = 983040.0f;
+    g_light_falloff_param = 500.0f;
+    g_light_scale_second = 0x3C0;
+    g_light_scale_first = 0x3C0;
+    g_light_distance_param = 0x1F4000;
+    SetBackgroundColor(g_hud_float_params.i23C, g_hud_float_params.i240, g_hud_float_params.i244);
+    gfx_start_dma_channel0_and_wait(g_gfx_dma_chain_buffer);
+    mem_fast_helper_b(g_light_table, 0x100);
+    mem_fast_helper_b(g_effect_slot_records, 0x180);
+    mem_fast_helper_b(g_level_block_buffer, 0x400);
 
     /* section 4: up to twelve 64-byte records */
     {
@@ -447,11 +447,11 @@ char *func_PAL_L00_003021B0(int reload)
 
         s += 0x10;
         if (n >= 12) {
-            STUB_printf(D_L00_002A0ED0);
+            STUB_printf(g_str_startup_message);
             n = 12;
         }
         if (n)
-            mem_copy_aligned(D_L00_001C6B40, s, n << 6);
+            mem_copy_aligned(g_level_block_buffer, s, n << 6);
     }
 
     /* section 0x84 */
@@ -460,16 +460,16 @@ char *func_PAL_L00_003021B0(int reload)
         int n = *(int *)s;
 
         s += 0x10;
-        D_L00_001B1CDC = n;
+        g_level_entry_count = n;
         if (n) {
             char *entries;
 
-            mem_copy_aligned(D_L00_001C5940, s, n << 4);
-            entries = D_L00_001C5B40;
-            mem_copy_aligned(entries, s + (D_L00_001B1CDC << 4), D_L00_001B1CDC << 7);
-            if (D_L00_001B1CDC > 0) {
+            mem_copy_aligned(g_level_copy_buffer, s, n << 4);
+            entries = g_level_entries_buffer;
+            mem_copy_aligned(entries, s + (g_level_entry_count << 4), g_level_entry_count << 7);
+            if (g_level_entry_count > 0) {
                 char *e = entries;
-                int left = D_L00_001B1CDC;
+                int left = g_level_entry_count;
 
                 do {
                     if (*(int *)(e + 0x48) < 0)
@@ -481,11 +481,11 @@ char *func_PAL_L00_003021B0(int reload)
             }
         }
     } else {
-        D_L00_001B1CDC = 0;
+        g_level_entry_count = 0;
     }
-    if (D_L00_001B24D4 > 0) {
-        char *e = D_L00_001B24D0 + 0x36;
-        int left = D_L00_001B24D4;
+    if (g_tfrag_count > 0) {
+        char *e = g_tfrag_render_data + 0x36;
+        int left = g_tfrag_count;
 
         do {
             *(unsigned short *)e = 0xFFFF;
@@ -495,11 +495,11 @@ char *func_PAL_L00_003021B0(int reload)
     {
         int i = 0;
 
-        while (i < D_L00_001B24D4) {
+        while (i < g_tfrag_count) {
             unsigned short *q = (unsigned short *)0x70003000;
             int k = 0;
 
-            while (k < 0x3FF && i < D_L00_001B24D4) {
+            while (k < 0x3FF && i < g_tfrag_count) {
                 *q++ = i;
                 k++;
                 i++;
@@ -508,32 +508,32 @@ char *func_PAL_L00_003021B0(int reload)
             func_002F0468((void *)0x70003000);
         }
     }
-    D_L00_001BF140.mark4C = heap;
+    g_level_load_context.mark4C = heap;
 
     /* section 0x10: the help text of the current language (D_001A7BB2[2]) */
     if (((int *)hdr)[0x10 / 4]) {
-        int lang = D_001A7BB2[2] * 4;
+        int lang = g_option_toggle_b[2] * 4;
         char *s = hdr + *(int *)(hdr + lang + 0x10);
         int size;
         int i;
 
-        D_L00_0027D848.count = *(int *)s;
+        g_tutorial_prompt_state.count = *(int *)s;
         s += 4;
         size = *(int *)s;
         s += 4;
-        D_L00_001B1B80 = (Text00618 *)heap;
+        g_level_text_table = (Text00618 *)heap;
         size += 3;
         size &= ~3;
         size -= 8;
         mem_copy_aligned(heap, s, size);
-        for (i = 0; i < D_L00_0027D848.count; i++) {
-            int delta = (int)D_L00_001B1B80 - 8;
+        for (i = 0; i < g_tutorial_prompt_state.count; i++) {
+            int delta = (int)g_level_text_table - 8;
 
-            D_L00_001B1B80[i].offset += delta;
+            g_level_text_table[i].offset += delta;
         }
         heap = ALIGN64_00618(heap + size);
     }
-    D_L00_001BF140.mark50 = heap;
+    g_level_load_context.mark50 = heap;
 
     /* section 0x34: the ties */
     {
@@ -544,41 +544,41 @@ char *func_PAL_L00_003021B0(int reload)
         int i;
 
         s += 0x10;
-        D_L00_001B2520 = n;
+        g_tie_count = n;
         if (n >= 0x1000)
-            D_L00_001B2520 = 0xFFF;
-        D_L00_001B2514 = (Tie00618 *)heap;
-        D_L00_001B2524 = D_L00_001BF140.i14;
-        heap += D_L00_001B2520 << 5;
-        D_L00_001B2540 = 0;
-        D_L00_001B2544 = 0;
-        D_L00_001B2548 = 0;
-        if (D_L00_001B2520)
-            mem_clear(D_L00_001B2514, 0, D_L00_001B2520 << 5);
+            g_tie_count = 0xFFF;
+        g_tie_table = (Tie00618 *)heap;
+        g_level_value_word = g_level_load_context.i14;
+        heap += g_tie_count << 5;
+        g_level_zero_word_first = 0;
+        g_level_zero_word_second = 0;
+        g_level_zero_word_third = 0;
+        if (g_tie_count)
+            mem_clear(g_tie_table, 0, g_tie_count << 5);
         heap = ALIGN64_00618(heap);
-        D_L00_001B251C = (Matrix00618 *)heap;
-        heap += D_L00_001B2520 << 6;
-        if (D_L00_001B2520)
-            mem_clear(D_L00_001B251C, 0, D_L00_001B2520 << 6);
+        g_tie_matrix_table = (Matrix00618 *)heap;
+        heap += g_tie_count << 6;
+        if (g_tie_count)
+            mem_clear(g_tie_matrix_table, 0, g_tie_count << 6);
         mark = heap;
         last = -1;
-        D_L00_001B2518 = D_L00_001B2514 + D_L00_001B2520;
-        for (i = 0; i < D_L00_001B2520; i++) {
-            Tie00618 *tie = D_L00_001B2514 + i;
-            Matrix00618 *m = D_L00_001B251C + i;
+        g_tie_table_end = g_tie_table + g_tie_count;
+        for (i = 0; i < g_tie_count; i++) {
+            Tie00618 *tie = g_tie_table + i;
+            Matrix00618 *m = g_tie_matrix_table + i;
             int draw;
             int occl;
             float scale;
 
-            tie->b1D = D_L00_00226A00[*(int *)s];
+            tie->b1D = g_tie_slot_by_class[*(int *)s];
             if (tie->b1D != last) {
-                D_L00_00226700[tie->b1D]->first = tie;
-                D_L00_00226700[tie->b1D]->h3E = 0;
-                D_L00_00226700[tie->b1D]->table = mark;
+                g_tie_class_table[tie->b1D]->first = tie;
+                g_tie_class_table[tie->b1D]->h3E = 0;
+                g_tie_class_table[tie->b1D]->table = mark;
                 last = tie->b1D;
             }
-            D_L00_00226700[tie->b1D]->h3E++;
-            mark += ((D_L00_00226700[tie->b1D]->h38 + 3) >> 1) << 2;
+            g_tie_class_table[tie->b1D]->h3E++;
+            mark += ((g_tie_class_table[tie->b1D]->h38 + 3) >> 1) << 2;
             draw = *(int *)(s + 4) >> 4;
             if (draw >= 0x100)
                 draw = 0xFF;
@@ -596,21 +596,21 @@ char *func_PAL_L00_003021B0(int reload)
             tie->h10 = occl;
             s += 0x50;
             tie->h12 = i;
-            m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            matrix_mul_vec3(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            m->row[3].f[3] = g_tie_class_table[tie->b1D]->f40;
+            matrix_mul_vec3(tie, &g_tie_class_table[tie->b1D]->sphere, m);
             scale = FastVecLength(&m->row[0]);
             scale = math_max_float(scale, FastVecLength(&m->row[1]));
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * math_max_float(scale, FastVecLength(&m->row[2]));
+            tie->bounds.f[3] = g_tie_class_table[tie->b1D]->sphere.f[3] * math_max_float(scale, FastVecLength(&m->row[2]));
             scale_vector(tie, tie, m->row[3].f[3]);
             FastVecAdd(tie, tie, &m->row[3]);
-            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[0]);
-            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[1]);
-            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[2]);
+            (g_tie_matrix_table + i)->row[0].f[3] = 1.0f / FastVecLength(&(g_tie_matrix_table + i)->row[0]);
+            (g_tie_matrix_table + i)->row[1].f[3] = 1.0f / FastVecLength(&(g_tie_matrix_table + i)->row[1]);
+            (g_tie_matrix_table + i)->row[2].f[3] = 1.0f / FastVecLength(&(g_tie_matrix_table + i)->row[2]);
             tie->h18 = *(unsigned short *)s;
             s += 0x10;
         }
-        if (D_L00_001B2510 >= 0x80)
-            D_L00_001B2510 = 0x7F;
+        if (g_render_class_slot_count >= 0x80)
+            g_render_class_slot_count = 0x7F;
         heap = ALIGN64_00618(mark);
     }
 
@@ -620,9 +620,9 @@ char *func_PAL_L00_003021B0(int reload)
         int idx = *s++;
 
         while (idx != -1) {
-            if (idx < D_L00_001B2520) {
-                Tie00618 *tie = D_L00_001B2514 + idx;
-                TieClass00618 *cls = D_L00_00226700[tie->b1D];
+            if (idx < g_tie_count) {
+                Tie00618 *tie = g_tie_table + idx;
+                TieClass00618 *cls = g_tie_class_table[tie->b1D];
 
                 mem_copy_aligned(cls->table + ((((cls->h38 + 3) >> 1) * (tie - cls->first)) << 2), s + 1, *s << 1);
             }
@@ -641,7 +641,7 @@ char *func_PAL_L00_003021B0(int reload)
 
         s += 2;
         offs = s;
-        D_L00_001A9014.p14 = (int)heap;
+        g_level_reloc_record.p14 = (int)heap;
         heap += n << 2;
         heap = ALIGN64_00618(heap);
         s += (n + 3) & ~3;
@@ -653,17 +653,17 @@ char *func_PAL_L00_003021B0(int reload)
 
             for (i = 0; i < n; i++) {
                 if (offs[i] != -1) {
-                    D_L00_001A9014.i18 = i + 1;
-                    ((int *)D_L00_001A9014.p14)[i] = (int)(base + offs[i]);
+                    g_level_reloc_record.i18 = i + 1;
+                    ((int *)g_level_reloc_record.p14)[i] = (int)(base + offs[i]);
                 } else {
-                    ((int *)D_L00_001A9014.p14)[i] = 0;
+                    ((int *)g_level_reloc_record.p14)[i] = 0;
                 }
             }
         }
         if (size)
             mem_fast_helper_c(base, (char *)(((int)s + 0xF) & ~0xF), size);
     }
-    D_L00_001BF140.mark54 = heap;
+    g_level_load_context.mark54 = heap;
 
     /* section 0x40: the shrubs */
     {
@@ -672,39 +672,39 @@ char *func_PAL_L00_003021B0(int reload)
         int last;
         int i;
 
-        D_L00_001B23F8 = (Shrub00618 *)heap;
+        g_shrub_table = (Shrub00618 *)heap;
         s += 0x10;
-        D_L00_001B23F4 = n;
+        g_shrub_count = n;
         heap += n << 5;
         if (n)
-            mem_clear(D_L00_001B23F8, 0, n << 5);
+            mem_clear(g_shrub_table, 0, n << 5);
         heap = ALIGN64_00618(heap);
-        D_L00_001B2400 = (Matrix00618 *)heap;
-        heap += D_L00_001B23F4 << 6;
-        if (D_L00_001B23F4)
-            mem_clear(D_L00_001B2400, 0, D_L00_001B23F4 << 6);
-        D_L00_001B2404 = (unsigned char *)heap;
-        heap += D_L00_001B23F4 * 0x60;
+        g_shrub_matrix_table = (Matrix00618 *)heap;
+        heap += g_shrub_count << 6;
+        if (g_shrub_count)
+            mem_clear(g_shrub_matrix_table, 0, g_shrub_count << 6);
+        g_shrub_data_table = (unsigned char *)heap;
+        heap += g_shrub_count * 0x60;
         heap = ALIGN64_00618(heap);
-        if (D_L00_001B23F4)
-            mem_clear(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
+        if (g_shrub_count)
+            mem_clear(g_shrub_data_table, 0, g_shrub_count * 0x60);
         last = -1;
-        D_L00_001ACE90[1] = (int)D_L00_001B2404;
-        D_L00_001B23FC = D_L00_001B23F8 + D_L00_001B23F4;
-        for (i = 0; i < D_L00_001B23F4; i++) {
-            int cls = D_L00_0021EBA0[*(int *)s];
-            Shrub00618 *shrub = D_L00_001B23F8 + i;
-            Matrix00618 *m = D_L00_001B2400 + i;
+        g_level_l00_pointer_table[1] = (int)g_shrub_data_table;
+        g_shrub_table_end = g_shrub_table + g_shrub_count;
+        for (i = 0; i < g_shrub_count; i++) {
+            int cls = g_shrub_slot_by_class[*(int *)s];
+            Shrub00618 *shrub = g_shrub_table + i;
+            Matrix00618 *m = g_shrub_matrix_table + i;
             float radius, a, b, scale;
             int w, h, r, g, bl;
 
             shrub->b1A = cls;
             if (cls != last) {
                 last = cls;
-                D_L00_0021EA20[cls]->first = shrub;
-                D_L00_0021EA20[cls]->h16 = 0;
+                g_shrub_l00_class_table[cls]->first = shrub;
+                g_shrub_l00_class_table[cls]->h16 = 0;
             }
-            D_L00_0021EA20[cls]->h16++;
+            g_shrub_l00_class_table[cls]->h16++;
             shrub->h18 = i;
             radius = *(float *)(s + 4);
             shrub->f10 = radius;
@@ -712,10 +712,10 @@ char *func_PAL_L00_003021B0(int reload)
                 shrub->f10 = 16.0f;
             shrub->b1B = 0;
             shrub->h1E = 0xFFFF;
-            if (D_L00_0021EA20[cls]->p1C) {
+            if (g_shrub_l00_class_table[cls]->p1C) {
                 float t;
 
-                shrub->b17 = FloatToInt(*D_L00_0021EA20[cls]->p1C);
+                shrub->b17 = FloatToInt(*g_shrub_l00_class_table[cls]->p1C);
                 t = IntToFloat(shrub->b17) + 24.0f;
                 if (shrub->f10 < t)
                     shrub->f10 = t;
@@ -725,7 +725,7 @@ char *func_PAL_L00_003021B0(int reload)
             qcopy(&m->row[2], s + 0x30);
             qcopy(&m->row[3], s + 0x40);
             s += 0x50;
-            m->row[3].f[3] = D_L00_0021EA20[cls]->f20;
+            m->row[3].f[3] = g_shrub_l00_class_table[cls]->f20;
             a = (FastVecLength(&m->row[0]) + FastVecLength(&m->row[1])) * 0.5f;
             b = FastVecLength(&m->row[2]);
             w = FloatToInt(a * 4096.0f);
@@ -745,10 +745,10 @@ char *func_PAL_L00_003021B0(int reload)
             m->row[0].i[3] = (bl << 16) | g | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
-            matrix_mul_vec3(shrub, D_L00_0021EA20[cls], m);
+            matrix_mul_vec3(shrub, g_shrub_l00_class_table[cls], m);
             scale = FastVecLength(&m->row[0]);
             scale = math_max_float(scale, FastVecLength(&m->row[1]));
-            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * math_max_float(scale, FastVecLength(&m->row[2]));
+            shrub->bounds.f[3] = g_shrub_l00_class_table[cls]->fC * math_max_float(scale, FastVecLength(&m->row[2]));
             scale_vector(shrub, shrub, m->row[3].f[3]);
             FastVecAdd(shrub, shrub, &m->row[3]);
         }
@@ -757,7 +757,7 @@ char *func_PAL_L00_003021B0(int reload)
         unsigned short *q = (unsigned short *)0x70000000;
         int i;
 
-        for (i = 0; i < D_L00_001B23F4; i++)
+        for (i = 0; i < g_shrub_count; i++)
             *q++ = i;
         *q = 0xFFFF;
         shrub_process_render_data((void *)0x70000000);
@@ -765,8 +765,8 @@ char *func_PAL_L00_003021B0(int reload)
     {
         int i;
 
-        for (i = 0; i < D_L00_001B23F4; i++) {
-            unsigned char *q = D_L00_001B2404 + i * 0x60;
+        for (i = 0; i < g_shrub_count; i++) {
+            unsigned char *q = g_shrub_data_table + i * 0x60;
             int r = 0;
             int g = 0;
             int b = 0;
@@ -782,7 +782,7 @@ char *func_PAL_L00_003021B0(int reload)
             g /= n;
             b /= n;
             r /= n;
-            *(int *)((char *)D_L00_001B2400 + i * 0x40 + 0x1C) = (b << 16) | (g << 8) | r;
+            *(int *)((char *)g_shrub_matrix_table + i * 0x40 + 0x1C) = (b << 16) | (g << 8) | r;
         }
     }
 
@@ -795,7 +795,7 @@ char *func_PAL_L00_003021B0(int reload)
 
         s += 2;
         offs = s;
-        D_L00_001A9014.p1C = (int)heap;
+        g_level_reloc_record.p1C = (int)heap;
         heap += n << 2;
         heap = ALIGN64_00618(heap);
         s += n;
@@ -807,10 +807,10 @@ char *func_PAL_L00_003021B0(int reload)
 
             for (i = 0; i < n; i++) {
                 if (offs[i] != -1) {
-                    D_L00_001A9014.i20 = i + 1;
-                    ((int *)D_L00_001A9014.p1C)[i] = tmp + offs[i];
+                    g_level_reloc_record.i20 = i + 1;
+                    ((int *)g_level_reloc_record.p1C)[i] = tmp + offs[i];
                 } else {
-                    ((int *)D_L00_001A9014.p1C)[i] = 0;
+                    ((int *)g_level_reloc_record.p1C)[i] = 0;
                 }
             }
         }
@@ -823,16 +823,16 @@ char *func_PAL_L00_003021B0(int reload)
         char *s = SECTION_00618(8);
         int n = *(int *)s;
 
-        D_L00_001B1844 = (Cam00618 *)heap;
+        g_camera_def_table = (Cam00618 *)heap;
         s += 0x10;
-        D_L00_001B1848 = n;
+        g_camera_def_count = n;
         heap += n << 5;
         if (n)
-            mem_clear(D_L00_001B1844, 0, n << 5);
+            mem_clear(g_camera_def_table, 0, n << 5);
         heap = ALIGN64_00618(heap);
-        if (D_L00_001B1848 > 0) {
-            Cam00618 *e = D_L00_001B1844;
-            int left = D_L00_001B1848;
+        if (g_camera_def_count > 0) {
+            Cam00618 *e = g_camera_def_table;
+            int left = g_camera_def_count;
 
         copy_record:
             e->iC = *(int *)s;
@@ -881,10 +881,10 @@ char *func_PAL_L00_003021B0(int reload)
     }
 
     /* section 0x4C: the mobys */
-    D_L00_001BF140.mark58 = heap;
+    g_level_load_context.mark58 = heap;
     {
         char *p = SECTION_00618(0x4C);
-        int levels = (int)D_0019B2E8;
+        int levels = (int)g_moby_group_flags;
         int n2;
         int count = 0;
         int n;
@@ -895,10 +895,10 @@ char *func_PAL_L00_003021B0(int reload)
         p += 4;
         n2 = *(int *)p;
         p += 0xC;
-        D_L00_001B1E9C[0] = (Moby00618 *)heap;
+        g_moby_array_base[0] = (Moby00618 *)heap;
         mem_clear(heap, 0, (n + n2) << 8);
-        mem_clear(D_L00_001C5480, 0, 0xC0);
-        mem_clear(D_L00_001C5540, 0, 0xC0);
+        mem_clear(g_collectible_value_table, 0, 0xC0);
+        mem_clear(g_collectible_bonus_table, 0, 0xC0);
         for (i = 0; i < n; i++) {
             int cls;
             int w2;
@@ -944,16 +944,16 @@ char *func_PAL_L00_003021B0(int reload)
                 if (*(int *)p == 0x1F5 || *(int *)p == 0x200) {
                     skip = w9 < lvl;
                 } else if (lvl < w9) {
-                    D_L00_001C5480[cls][w2] += x1;
-                    D_L00_001C5540[cls][w2] += b1;
+                    g_collectible_value_table[cls][w2] += x1;
+                    g_collectible_bonus_table[cls][w2] += b1;
                     skip = 1;
                 }
             }
             if (!skip && flags) {
-                if (D_L00_0021DDB0.byUid[uid]) {
+                if (g_controller_level_state.byUid[uid]) {
                     skip = 1;
                 } else if (flags & 3) {
-                    if (D_L00_001B1CE0[cls] & 0x80) {
+                    if (g_class_l00_flags_table[cls] & 0x80) {
                         if (flags & 2) {
                             int odd = uid & 1;
                             int c = SAVE_CELL_00618(uid);
@@ -1014,7 +1014,7 @@ char *func_PAL_L00_003021B0(int reload)
                 int upd;
 
                 idx[i] = count;
-                m = D_L00_001B1E9C[0] + count;
+                m = g_moby_array_base[0] + count;
                 func_PAL_0029FA60(m, *(int *)p);
                 p += 4;
                 m->hB2 = uid;
@@ -1083,20 +1083,20 @@ char *func_PAL_L00_003021B0(int reload)
             p = next;
         }
         {
-            Moby00618 *tail = D_L00_001B1E9C[0] + count;
+            Moby00618 *tail = g_moby_array_base[0] + count;
             int total = (count + n2) << 8;
 
-            D_L00_001B18DC = tail;
+            g_moby_list_tail = tail;
             func_PAL_0029FA60(tail, 0);
             heap += total;
             tail->state = 0xFD;
-            D_L00_001B1EA0 = D_L00_001B18DC + 1;
-            D_L00_001B1EA0->state = 0xFF;
-            D_L00_001B1EAC = heap;
+            g_moby_array_end_sentinel = g_moby_list_tail + 1;
+            g_moby_array_end_sentinel->state = 0xFF;
+            g_level_heap_block_ptr = heap;
             heap += n2 << 7;
             heap = ALIGN64_00618(heap);
-            D_L00_001BF140.mark5C = heap;
-            D_L00_001B1EA4 = (Moby00618 *)((char *)D_L00_001B1E9C[0] + total - 0x100);
+            g_level_load_context.mark5C = heap;
+            g_moby_array_last = (Moby00618 *)((char *)g_moby_array_base[0] + total - 0x100);
         }
     }
 
@@ -1107,16 +1107,16 @@ char *func_PAL_L00_003021B0(int reload)
         int i;
         Moby00618 *m;
 
-        for (i = 0; i < D_L00_001B1848; i++) {
-            int k = D_L00_001B1844[i].i1C;
+        for (i = 0; i < g_camera_def_count; i++) {
+            int k = g_camera_def_table[i].i1C;
 
             if (k < 0) {
-                D_L00_001B1844[i].i1C = 0;
+                g_camera_def_table[i].i1C = 0;
             } else {
                 int size = tbl[k].size;
                 char *src = pv + tbl[k].offset;
 
-                D_L00_001B1844[i].i1C = (int)heap;
+                g_camera_def_table[i].i1C = (int)heap;
                 mem_fast_helper_c(heap, src, size);
                 tbl[k].offset = (int)heap;
                 heap += size;
@@ -1137,7 +1137,7 @@ char *func_PAL_L00_003021B0(int reload)
                 heap += size;
             }
         }
-        for (m = D_L00_001B1E9C[0]; m != D_L00_001B1EA0; m++) {
+        for (m = g_moby_array_base[0]; m != g_moby_array_end_sentinel; m++) {
             if (m->oClass == 0) {
                 m->i68 = 0;
             } else {
@@ -1158,7 +1158,7 @@ char *func_PAL_L00_003021B0(int reload)
         }
         heap = ALIGN64_00618(heap);
     }
-    D_L00_001BF140.mark60 = heap;
+    g_level_load_context.mark60 = heap;
 
     /* section 0x58: moby references through the blob directory */
     if (((int *)hdr)[0x58 / 4]) {
@@ -1169,7 +1169,7 @@ char *func_PAL_L00_003021B0(int reload)
             int x = tbl[q[0]].offset;
             int off = q[1];
 
-            if (x >= D_L00_001BF140.i18) {
+            if (x >= g_level_load_context.i18) {
                 int *r = (int *)(x + off);
 
                 if (*r >= 0)
@@ -1188,7 +1188,7 @@ char *func_PAL_L00_003021B0(int reload)
             int x = tbl[q[0]].offset;
             int off = q[1];
 
-            if (x >= D_L00_001BF140.i18) {
+            if (x >= g_level_load_context.i18) {
                 int *r = (int *)(x + off);
 
                 *r += x;
@@ -1215,7 +1215,7 @@ char *func_PAL_L00_003021B0(int reload)
         heap = ALIGN64_00618(heap);
         if (size)
             mem_fast_helper_c(base, q, size);
-        mem_clear(D_L00_001FA920, 0, 0x3C0);
+        mem_clear(g_turn_state_table, 0, 0x3C0);
         for (i = 0; i < n; i++, offs++) {
             tmp = *offs;
             if (tmp >= 0) {
@@ -1223,10 +1223,10 @@ char *func_PAL_L00_003021B0(int reload)
                 unsigned short *src;
                 short *dst;
 
-                D_L00_001FA920[i] = g;
+                g_turn_state_table[i] = g;
                 src = (unsigned short *)g;
                 dst = (short *)src;
-                D_L00_001B1EB8 = i + 1;
+                g_moby_l00_group_count = i + 1;
                 do {
                     int id = *src;
                     short t;
@@ -1239,10 +1239,10 @@ char *func_PAL_L00_003021B0(int reload)
                     if (t >= 0)
                         *dst++ = t;
                     if (tmp) {
-                        if (D_L00_001FA920[i] < (int)dst)
+                        if (g_turn_state_table[i] < (int)dst)
                             dst[-1] |= 0x8000;
                         else
-                            D_L00_001FA920[i] = 0;
+                            g_turn_state_table[i] = 0;
                         break;
                     }
                     src++;
@@ -1275,7 +1275,7 @@ char *func_PAL_L00_003021B0(int reload)
             int hi = w >> 16;
             int x = tbl[w & 0xFFFF].offset;
 
-            if (x >= D_L00_001BF140.i18)
+            if (x >= g_level_load_context.i18)
                 *(int *)(x + hi) = (int)(base + *(int *)(q + 4));
             q += 8;
         }
@@ -1288,17 +1288,17 @@ char *func_PAL_L00_003021B0(int reload)
         int size;
         int i;
 
-        D_L00_001B1FA4 = *(int *)q;
+        g_path_count = *(int *)q;
         src = q + *(int *)(q + 4);
         size = *(int *)(q + 8);
-        D_L00_001B1FA8 = heap;
+        g_path_data = heap;
         heap += size;
         q += 0x10;
         heap = ALIGN64_00618(heap);
         if (size)
-            mem_fast_helper_c(D_L00_001B1FA8, src, size);
-        for (i = 0; i < D_L00_001B1FA4; i++) {
-            D_L00_001FDA80[i] = D_L00_001B1FA8 + *(int *)q;
+            mem_fast_helper_c(g_path_data, src, size);
+        for (i = 0; i < g_path_count; i++) {
+            g_launch_path_table[i] = g_path_data + *(int *)q;
             q += 4;
         }
     }
@@ -1313,15 +1313,15 @@ char *func_PAL_L00_003021B0(int reload)
         int i;
 
         n = *(int *)q;
-        D_L00_001B16C4 = n;
+        g_rail_count = n;
         src = q + *(int *)(q + 4);
         size = *(int *)(q + 8);
-        D_L00_001B16C0 = (Rail00618 *)heap;
+        g_rail_table = (Rail00618 *)heap;
         heap += n << 5;
         q += 0x10;
         heap = ALIGN64_00618(heap);
         if (n > 0) {
-            Rail00618 *e = D_L00_001B16C0;
+            Rail00618 *e = g_rail_table;
 
             i = n;
             do {
@@ -1337,8 +1337,8 @@ char *func_PAL_L00_003021B0(int reload)
         heap = ALIGN64_00618(heap);
         if (size)
             mem_fast_helper_c(copy, src, size);
-        for (i = 0; i < D_L00_001B16C4; i++) {
-            D_L00_001B16C0[i].data = copy + *(int *)q;
+        for (i = 0; i < g_rail_count; i++) {
+            g_rail_table[i].data = copy + *(int *)q;
             q += 4;
         }
     }
@@ -1349,15 +1349,15 @@ char *func_PAL_L00_003021B0(int reload)
         int n = *(int *)q;
         int i;
 
-        D_L00_001B1F84 = heap;
-        D_L00_001B1F88 = n;
+        g_collision_pill_table = heap;
+        g_collision_pill_count = n;
         q += 0x10;
         heap += n * 0x90;
         heap = ALIGN64_00618(heap);
         if (n)
-            mem_clear(D_L00_001B1F84, 0, n * 0x90);
-        for (i = 0; i < D_L00_001B1F88; i++) {
-            mem_copy_aligned(D_L00_001B1F84 + i * 0x90, q, 0x90);
+            mem_clear(g_collision_pill_table, 0, n * 0x90);
+        for (i = 0; i < g_collision_pill_count; i++) {
+            mem_copy_aligned(g_collision_pill_table + i * 0x90, q, 0x90);
             q += 0x80;
         }
     }
@@ -1368,15 +1368,15 @@ char *func_PAL_L00_003021B0(int reload)
         int n = *(int *)q;
         int i;
 
-        D_L00_001B1F8C = heap;
+        g_aranos_launch_poses = heap;
         q += 0x10;
-        D_L00_001B1F90 = n;
+        g_collision_sphere_count = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            mem_clear(D_L00_001B1F8C, 0, n << 7);
-        for (i = 0; i < D_L00_001B1F90; i++) {
-            mem_copy_aligned(D_L00_001B1F8C + (i << 7), q, 0x80);
+            mem_clear(g_aranos_launch_poses, 0, n << 7);
+        for (i = 0; i < g_collision_sphere_count; i++) {
+            mem_copy_aligned(g_aranos_launch_poses + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1385,15 +1385,15 @@ char *func_PAL_L00_003021B0(int reload)
         int n = *(int *)q;
         int i;
 
-        D_L00_001B1F94 = heap;
+        g_collision_sphere_table = heap;
         q += 0x10;
-        D_L00_001B1F98 = n;
+        g_collision_cylinder_count = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            mem_clear(D_L00_001B1F94, 0, n << 7);
-        for (i = 0; i < D_L00_001B1F98; i++) {
-            mem_copy_aligned(D_L00_001B1F94 + (i << 7), q, 0x80);
+            mem_clear(g_collision_sphere_table, 0, n << 7);
+        for (i = 0; i < g_collision_cylinder_count; i++) {
+            mem_copy_aligned(g_collision_sphere_table + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1402,15 +1402,15 @@ char *func_PAL_L00_003021B0(int reload)
         int n = *(int *)q;
         int i;
 
-        D_L00_001B1F9C = heap;
+        g_collision_cylinder_table = heap;
         q += 0x10;
-        D_L00_001B1FA0 = n;
+        g_collision_record_count = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            mem_clear(D_L00_001B1F9C, 0, n << 7);
-        for (i = 0; i < D_L00_001B1FA0; i++) {
-            mem_copy_aligned(D_L00_001B1F9C + (i << 7), q, 0x80);
+            mem_clear(g_collision_cylinder_table, 0, n << 7);
+        for (i = 0; i < g_collision_record_count; i++) {
+            mem_copy_aligned(g_collision_cylinder_table + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1420,11 +1420,11 @@ char *func_PAL_L00_003021B0(int reload)
         char *s = SECTION_00618(0x88);
         int size = *(int *)s;
 
-        D_L00_001B1880 = heap;
+        g_collision_grid_data = heap;
         s += 0x10;
         size += 0x4000;
         heap += size;
-        mem_copy_aligned(D_L00_001B1880, s, size);
+        mem_copy_aligned(g_collision_grid_data, s, size);
         heap = ALIGN64_00618(heap);
     }
 
@@ -1433,14 +1433,14 @@ char *func_PAL_L00_003021B0(int reload)
         char *s = SECTION_00618(0x80);
         int n = *(int *)s;
 
-        D_L00_001B1CD8 = heap;
+        g_level_table_data = heap;
         s += 0x10;
-        D_L00_001B1CD4 = n;
+        g_level_table_count = n;
         heap = (char *)(((int)heap + (n << 4) + 0x83F) & 0xFFFFFFC0u);
         if (n)
-            mem_copy_aligned(D_L00_001B1CD8, s, (n << 4) + 0x800);
+            mem_copy_aligned(g_level_table_data, s, (n << 4) + 0x800);
         else
-            mem_copy_aligned(D_L00_001B1CD8, s, 0x800);
+            mem_copy_aligned(g_level_table_data, s, 0x800);
     }
 
     /* section 0x8C */
@@ -1448,21 +1448,21 @@ char *func_PAL_L00_003021B0(int reload)
         char *s = SECTION_00618(0x8C);
         int n = *(int *)s;
 
-        D_L00_001B1F40 = heap;
+        g_env_preset_table = heap;
         s += 0x10;
-        D_L00_001B1F10 = n;
+        g_env_preset_count = n;
         heap += n << 5;
         heap = ALIGN64_00618(heap);
         if (n)
-            mem_copy_aligned(D_L00_001B1F40, s, n << 5);
+            mem_copy_aligned(g_env_preset_table, s, n << 5);
     }
-    D_L00_001B20B0 = heap;
-    D_L00_001BF140.mark64 = heap;
+    g_level_data_block_ptr = heap;
+    g_level_load_context.mark64 = heap;
     heap += 0x20000;
-    D_L00_001B20B8 = -1;
-    D_L00_001B20B4 = 0;
-    D_L00_001B20BC = 0;
-    mem_fast_helper_b(D_L00_001FE140, 0x200);
+    g_level_state_word_second = -1;
+    g_level_state_word_first = 0;
+    g_level_state_word_third = 0;
+    mem_fast_helper_b(g_level_clear_area_d, 0x200);
 
     if (g_current_map_index >= 0) {
         g_hero_moby_default.hero = 0;
@@ -1493,76 +1493,76 @@ char *func_PAL_L00_003021B0(int reload)
         int i;
 
         s = SECTION_00618(0x98);
-        D_L00_001B1B00 = (Groups00618 *)heap;
+        g_region_group_table = (Groups00618 *)heap;
         size = *(int *)s;
         heap += size;
-        mem_copy_aligned(D_L00_001B1B00, s + 4, size);
-        if (D_L00_001B1B00->p4)
-            D_L00_001B1B00->p4 += (int)D_L00_001B1B00;
+        mem_copy_aligned(g_region_group_table, s + 4, size);
+        if (g_region_group_table->p4)
+            g_region_group_table->p4 += (int)g_region_group_table;
         else
-            D_L00_001B1B00->p4 = 0;
-        if (D_L00_001B1B00->p8)
-            D_L00_001B1B00->p8 += (int)D_L00_001B1B00;
+            g_region_group_table->p4 = 0;
+        if (g_region_group_table->p8)
+            g_region_group_table->p8 += (int)g_region_group_table;
         else
-            D_L00_001B1B00->p8 = 0;
-        if (D_L00_001B1B00->pC)
-            D_L00_001B1B00->pC += (int)D_L00_001B1B00;
+            g_region_group_table->p8 = 0;
+        if (g_region_group_table->pC)
+            g_region_group_table->pC += (int)g_region_group_table;
         else
-            D_L00_001B1B00->pC = 0;
-        if (D_L00_001B1B00->p10)
-            D_L00_001B1B00->p10 += (int)D_L00_001B1B00;
+            g_region_group_table->pC = 0;
+        if (g_region_group_table->p10)
+            g_region_group_table->p10 += (int)g_region_group_table;
         else
-            D_L00_001B1B00->p10 = 0;
-        if (D_L00_001B1B00->p14)
-            D_L00_001B1B00->p14 += (int)D_L00_001B1B00;
+            g_region_group_table->p10 = 0;
+        if (g_region_group_table->p14)
+            g_region_group_table->p14 += (int)g_region_group_table;
         else
-            D_L00_001B1B00->p14 = 0;
-        for (i = 0; i < D_L00_001B1B00->count; i++) {
+            g_region_group_table->p14 = 0;
+        for (i = 0; i < g_region_group_table->count; i++) {
             GroupEntry00618 *e;
 
-            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            e = (GroupEntry00618 *)g_region_group_table + i;
             if (e[1].h0)
-                e[1].iC += (int)D_L00_001B1B00->p4;
+                e[1].iC += (int)g_region_group_table->p4;
             else
                 e[1].iC = 0;
-            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            e = (GroupEntry00618 *)g_region_group_table + i;
             if (e[1].h2)
-                e[1].i10 += (int)D_L00_001B1B00->p8;
+                e[1].i10 += (int)g_region_group_table->p8;
             else
                 e[1].i10 = 0;
-            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            e = (GroupEntry00618 *)g_region_group_table + i;
             if (e[1].h4)
-                e[1].i14 += (int)D_L00_001B1B00->pC;
+                e[1].i14 += (int)g_region_group_table->pC;
             else
                 e[1].i14 = 0;
-            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            e = (GroupEntry00618 *)g_region_group_table + i;
             if (e[1].h6)
-                e[1].i18 += (int)D_L00_001B1B00->p10;
+                e[1].i18 += (int)g_region_group_table->p10;
             else
                 e[1].i18 = 0;
-            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            e = (GroupEntry00618 *)g_region_group_table + i;
             if (e[1].h8)
-                e[1].i1C += (int)D_L00_001B1B00->p14;
+                e[1].i1C += (int)g_region_group_table->p14;
             else
                 e[1].i1C = 0;
         }
         {
             int bytes;
 
-            D_L00_001B1AFC = (int)heap;
-            bytes = D_L00_001B1B00->count * 0x1C;
+            g_region_members_table = (int)heap;
+            bytes = g_region_group_table->count * 0x1C;
             heap += bytes;
-            mem_clear((void *)D_L00_001B1AFC, 0, bytes);
+            mem_clear((void *)g_region_members_table, 0, bytes);
         }
         {
             int j;
 
-            for (j = 0; j < D_L00_001B1B00->count; j++)
-                *(int *)((j << 2) + D_L00_001B1AFC) = D_L00_001B1AFC + (D_L00_001B1B00->count << 2) + j * 0x18;
+            for (j = 0; j < g_region_group_table->count; j++)
+                *(int *)((j << 2) + g_region_members_table) = g_region_members_table + (g_region_group_table->count << 2) + j * 0x18;
         }
     }
 
-    if (D_L00_001B1A40 && ((int *)hdr)[0x90 / 4]) {
+    if (g_level_header_extra_ptr && ((int *)hdr)[0x90 / 4]) {
         int *q = (int *)SECTION_00618(0x90);
         int *q0;
         int n1;
@@ -1576,17 +1576,17 @@ char *func_PAL_L00_003021B0(int reload)
         n2 = q[1];
         n3 = q[2];
         q += 4;
-        if (D_L00_001C9340.count) {
+        if (g_tutorial_points.count) {
             q += n1 * 2;
-            if (D_L00_001C9340.i18 == n1)
+            if (g_tutorial_points.i18 == n1)
                 bad1 = 0;
-            D_L00_001C9340.i1C = bad1 == 0;
-        } else if (D_L00_001B24D4 == n1) {
+            g_tutorial_points.i1C = bad1 == 0;
+        } else if (g_tfrag_count == n1) {
             int i;
 
             bad1 = 0;
             for (i = 0; i < n1; i++) {
-                if (((Tfrag00618 *)D_L00_001B24D0)[i].b3D != q[1])
+                if (((Tfrag00618 *)g_tfrag_render_data)[i].b3D != q[1])
                     bad1 = 1;
                 q += 2;
             }
@@ -1594,14 +1594,14 @@ char *func_PAL_L00_003021B0(int reload)
             q += n1 * 2;
         }
         bad2 = 1;
-        if (D_L00_001B2518 - D_L00_001B2514 == n2) {
+        if (g_tie_table_end - g_tie_table == n2) {
             int i;
 
             bad2 = 0;
             for (i = 0; i < n2; i++) {
                 int id = (unsigned short)q[1];
 
-                if (D_L00_001B2514[i].h10 != id)
+                if (g_tie_table[i].h10 != id)
                     bad2 = 1;
                 q += 2;
             }
@@ -1613,13 +1613,13 @@ char *func_PAL_L00_003021B0(int reload)
             Moby00618 *m;
             int i;
 
-            table = (unsigned short *)(D_001B22A0[1] + D_001B22B0 - 0x10000);
+            table = (unsigned short *)(g_packet_buffer_table[1] + g_packet_buffer_size - 0x10000);
             mem_clear(table, -1, 0x10000);
             for (i = 0; i < n3; i++) {
                 if ((unsigned)(q[i * 2 + 1] + 0x4000) < 0x8000)
                     table[q[i * 2 + 1] + 0x4000] = q[i * 2];
             }
-            for (m = D_L00_001B1E9C[0]; m->state != 0xFF; m++) {
+            for (m = g_moby_array_base[0]; m->state != 0xFF; m++) {
                 if (m->h36 != 0x7F80) {
                     if ((unsigned)(m->hB2 + 0x4000) < 0x8000) {
                         short v = table[m->hB2 + 0x4000];
@@ -1635,23 +1635,23 @@ char *func_PAL_L00_003021B0(int reload)
             }
         }
         if (bad1) {
-            if (D_L00_001B24D4 > 0) {
-                unsigned short *e = (unsigned short *)(D_L00_001B24D0 + 0x3A);
-                int left = D_L00_001B24D4;
+            if (g_tfrag_count > 0) {
+                unsigned short *e = (unsigned short *)(g_tfrag_render_data + 0x3A);
+                int left = g_tfrag_count;
 
                 do {
                     *e = 0x7F80;
                     e = (unsigned short *)((char *)e + 0x40);
                 } while (--left);
             }
-        } else if (D_L00_001C9340.count) {
+        } else if (g_tutorial_points.count) {
             int i;
 
             q = q0 + 4;
             for (i = 0; i < n1; i++) {
                 int w = q[0];
 
-                D_L00_001C9340.bits[i] = ((w >> 3) << 8) | (1 << (w & 7));
+                g_tutorial_points.bits[i] = ((w >> 3) << 8) | (1 << (w & 7));
                 q += 2;
             }
         } else {
@@ -1661,7 +1661,7 @@ char *func_PAL_L00_003021B0(int reload)
             for (i = 0; i < n1; i++) {
                 int w = q[0];
 
-                ((Tfrag00618 *)D_L00_001B24D0)[i].h3A = ((w >> 3) << 8) | (1 << (w & 7));
+                ((Tfrag00618 *)g_tfrag_render_data)[i].h3A = ((w >> 3) << 8) | (1 << (w & 7));
                 q += 2;
             }
         }
@@ -1670,14 +1670,14 @@ char *func_PAL_L00_003021B0(int reload)
             Tie00618 *t;
             int i;
 
-            table = (unsigned short *)(D_001B22A0[1] + D_001B22B0 - 0x10000);
+            table = (unsigned short *)(g_packet_buffer_table[1] + g_packet_buffer_size - 0x10000);
             q = &q0[n1 * 2 + 4];
             mem_clear(table, 0xFFFEFFFE, 0x8000);
             for (i = 0; i < n2; i++) {
                 if ((unsigned)q[i * 2 + 1] < 0x4000)
                     table[q[i * 2 + 1]] = q[i * 2];
             }
-            for (t = D_L00_001B2514; t != D_L00_001B2518; t++) {
+            for (t = g_tie_table; t != g_tie_table_end; t++) {
                 int id = t->h10;
 
                 if ((unsigned)id < 0x4000) {
@@ -1698,36 +1698,36 @@ char *func_PAL_L00_003021B0(int reload)
             for (i = 0; i < n2; i++) {
                 int w = q[0];
 
-                D_L00_001B2514[i].h10 = ((w >> 3) << 8) | (1 << (w & 7));
+                g_tie_table[i].h10 = ((w >> 3) << 8) | (1 << (w & 7));
                 q += 2;
             }
         }
-        D_L00_001B1A50 = 2;
+        g_aranos_launch_state = 2;
     } else {
         Moby00618 *moby;
         Tie00618 *tie;
 
-        for (moby = D_L00_001B1E9C[0]; moby != D_L00_001B1EA4; moby++)
+        for (moby = g_moby_array_base[0]; moby != g_moby_array_last; moby++)
             moby->h36 = 0x7F80;
-        for (tie = D_L00_001B2514; tie != D_L00_001B2518; tie++)
+        for (tie = g_tie_table; tie != g_tie_table_end; tie++)
             tie->h10 = 0x7F80;
-        if (D_L00_001B24D4 > 0) {
-            unsigned short *e = (unsigned short *)(D_L00_001B24D0 + 0x3A);
-            int left = D_L00_001B24D4;
+        if (g_tfrag_count > 0) {
+            unsigned short *e = (unsigned short *)(g_tfrag_render_data + 0x3A);
+            int left = g_tfrag_count;
 
             do {
                 *e = 0x7F80;
                 e = (unsigned short *)((char *)e + 0x40);
             } while (--left);
         }
-        D_L00_001B1A50 = 0;
-        D_L00_001C9340.i1C = 0;
+        g_aranos_launch_state = 0;
+        g_tutorial_points.i1C = 0;
     }
     counter_clear_group();
-    func_PAL_L00_002A4788();
+    InitializeHero_pal();
     hero_reset_start_aim_speed();
     SetupLevelCameras();
-    func_PAL_00272208();
+    cam_update_state_pal();
     pad_clear_port_state();
     level_init_object_tables();
     func_PAL_L00_00369AF8();
@@ -1736,21 +1736,21 @@ char *func_PAL_L00_003021B0(int reload)
     level_l00_clear_counter_list_2();
     moby_clear_fading_list();
     gfx_enable_draw_flag();
-    D_L00_001FDE78 = 0;
-    D_L00_001FDEF8 = 0;
-    D_L00_001B1FB0 = 0;
-    D_L00_001B1FF0 = 0;
-    D_L00_001B2030 = 0;
+    g_level_counter_a = 0;
+    g_moby_index_list_head = 0;
+    g_homing_moby_index_list = 0;
+    g_decoy_moby_index_list = 0;
+    g_dark_sheep_moby_index_list = 0;
     sheep_clear_active_list();
     {
         int i;
 
         for (i = 0x13; i >= 0; i--)
-            D_L00_00220DA0[i] = 0;
+            g_launch_moby_list[i] = 0;
     }
     g_frame_l00_counter = 0;
-    D_L00_001B1AEC = 0;
-    D_L00_001AA0F8 = 0xE0;
+    g_nanotech_ball_moby = 0;
+    g_render_state_word = 0xE0;
     if (g_hero_moby_default.hero) {
         Moby00618 *m = g_hero_moby_default.hero;
         char *hero = g_hero_state;
@@ -1765,12 +1765,12 @@ char *func_PAL_L00_003021B0(int reload)
     case 7:
     case 8:
     case 10:
-        D_L00_001B18D0 = D_L00_001A8A78;
+        g_setup_heap_pointer = g_level_blob_a;
         break;
     default:
-        D_L00_001B18D0 = D_L00_001A8A48;
+        g_setup_heap_pointer = g_level_l00_flag_word;
         break;
     }
-    D_L00_001A8AA8 = D_L00_001B18D0;
+    g_level_blob_ptr = g_setup_heap_pointer;
     return heap;
 }

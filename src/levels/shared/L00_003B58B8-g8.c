@@ -9,10 +9,10 @@ extern PartialInput g_pad_state;
 typedef struct {unsigned char reserved[0x1FB0];float pitch,yaw;unsigned char middle[0x24B8-0x1FB8];float delta;} PartialRoot;
 extern PartialRoot g_hero_state;
 typedef struct { short vector[4]; int active; } PartialCameraLock;
-extern PartialCameraLock D_L00_001B1BE0 __attribute__((sda));
-extern int D_L00_001A8FF0;
-extern Vector D_L00_001B1B10 MACRO_ADDR;
-extern float D_L00_001AFA30 __attribute__((sda));
+extern PartialCameraLock g_partial_camera_lock __attribute__((sda));
+extern int g_hero_locked_flag;
+extern Vector g_camera_offset_vector MACRO_ADDR;
+extern float g_electrolyzer_turn_step __attribute__((sda));
 extern void moby_set_state(unsigned char *,int,int),cam_set_mode_state(int);
 extern void level_start_timed_object_once(void);
 extern s32 hero_l00_set_action(int,int);
@@ -42,7 +42,7 @@ void electrolyzer_update(unsigned char *object)
         if(g_pad_state.pressed&0x200) {cam_set_mode_state(0);hero_l00_set_action(0,1);moby_set_state(object,1,-1);}
         level_start_timed_object_once();
         object[0x31]=0;*(unsigned short *)(object+0x34)|=1;
-        D_L00_001B1BE0.active=1;
+        g_partial_camera_lock.active=1;
         ForceClaimNotice(6,0,1);
         qcopy(&position,&g_camera_l00_position.position);
         qcopy(&angles,&g_camera_l00_position.angles);
@@ -51,15 +51,15 @@ void electrolyzer_update(unsigned char *object)
         else if(g_pad_state.held&0x40)ApproachValue(state,0.6666667f,0.0019444445f);
         vec_scale_to_length(&movement,matrix,state[0]);
         FastVecAdd(&position,&position,&movement);
-        step=D_L00_001AFA30*0.0000048481375f;
+        step=g_electrolyzer_turn_step*0.0000048481375f;
         if(g_hero_state.delta>0.1f)step*=g_hero_state.delta;
         ApproachValue(state+1,-g_hero_state.pitch*0.052359886f,step);
         ApproachValue(state+2,-g_hero_state.yaw*0.052359886f,step);
         cam_compute_view_direction(&position,&forward,1);
         FastVecCross(&cross,matrix,&forward);
         pitch=state[2];
-        if(D_L00_001A8FF0) {
-            distance=fast_vec_dist(&position,&D_L00_001B1B10);
+        if(g_hero_locked_flag) {
+            distance=fast_vec_dist(&position,&g_camera_offset_vector);
             projection=math_fabs(FastVecDot(&forward,&movement));
             pitch=state[2]+mat_fast_helper_a(distance,state[0]-projection);
         }

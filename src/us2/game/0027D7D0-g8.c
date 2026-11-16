@@ -5,9 +5,9 @@
 typedef float FVec4[4] __attribute__((aligned(16)));
 typedef struct { FVec4 v; } FRow;
 typedef struct { FRow pos; FRow dir; } LightRec;
-extern float D_001A87A0 __attribute__((sda));
-extern LightRec D_001BA640[];
-extern int D_001B163C;
+extern float g_quad_uv_rows __attribute__((sda));
+extern LightRec g_light_records[];
+extern int g_ground_shadow_count;
 extern unsigned long func_US2_0027CED8(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void draw_world_quad(void *, int, int);
@@ -20,7 +20,7 @@ void func_US2_0027D7D0(void) {
     int i;
     int j;
 
-    if (D_001B163C == 0) {
+    if (g_ground_shadow_count == 0) {
         return;
     }
     pkt[1] = func_US2_0027CED8(0);
@@ -28,24 +28,24 @@ void func_US2_0027D7D0(void) {
     pkt[0] = 5;
     pkt[3] = 0x8000000044;
     for (j = 0; j < 4; j++) {
-        uv[j][0] = ((FRow *)&D_001A87A0)[j].v[2];
-        uv[j][1] = ((FRow *)&D_001A87A0)[j].v[3];
+        uv[j][0] = ((FRow *)&g_quad_uv_rows)[j].v[2];
+        uv[j][1] = ((FRow *)&g_quad_uv_rows)[j].v[3];
         colors[j] = 0x40808080;
     }
-    for (i = 0; i < D_001B163C; i++) {
+    for (i = 0; i < g_ground_shadow_count; i++) {
         float s;
         int k;
 
-        qcopy(&dir, &D_001BA640[i].dir);
+        qcopy(&dir, &g_light_records[i].dir);
         vec_scale_to_length(&dir, &dir, 1.0f);
-        s = D_001BA640[i].pos.v[3];
+        s = g_light_records[i].pos.v[3];
         for (k = 0; k < 4; k++) {
-            float cx = ((FRow *)&D_001A87A0)[k].v[0];
+            float cx = ((FRow *)&g_quad_uv_rows)[k].v[0];
             float vx = dir.v[0];
-            float cy = ((FRow *)&D_001A87A0)[k].v[1];
+            float cy = ((FRow *)&g_quad_uv_rows)[k].v[1];
             float d = cx * vx + cy * dir.v[1];
 
-            qcopy(&m[k], &D_001BA640[i].pos);
+            qcopy(&m[k], &g_light_records[i].pos);
             m[k].v[0] += (cx - vx * d) * s;
             m[k].v[1] += (cy - dir.v[1] * d) * s;
             m[k].v[2] -= dir.v[2] * d * s;

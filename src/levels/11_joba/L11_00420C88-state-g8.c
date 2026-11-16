@@ -20,14 +20,14 @@ typedef union { QuadWord word; float v[4]; } Vector;
 #define POINTER(p, o) (*(char **)((char *)(p) + (o)))
 #define QUAD(p, o) (*(QuadWord *)((char *)(p) + (o)))
 
-extern int D_L11_001AED04;
-extern int D_L11_001AED00 __attribute__((sda));
-extern int D_L11_001B30C8 __attribute__((sda));
+extern int g_active_rider_count;
+extern int g_enemy_spawn_enabled __attribute__((sda));
+extern int g_arena_progress_level __attribute__((sda));
 extern int g_moby_l11_table;
-extern int D_L11_001B35B8;
+extern int g_tribe_group_limit;
 extern unsigned short *g_group_id_lists[];
-extern Vector D_L11_001BA8C0;
-extern char D_L11_001B0FD8[], D_L11_002BACF0[];
+extern Vector g_hero_l11_position;
+extern char g_str_rider_debug_index[], g_str_debug_rider[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void STUB_printf(const char *, ...);
 extern int math_random_int_below(int);
@@ -46,7 +46,7 @@ extern void SetDeathBits(void *, int, int);
 
 
 struct family_27f9_object;
-extern int D_L11_001CAE40 __attribute__((nosda));
+extern int g_enemy_freeze_flag __attribute__((nosda));
 /* One hero-state object: retail retains its common base across cases. */
 typedef struct {
     unsigned char unknown0000[0x80];
@@ -60,8 +60,8 @@ typedef struct {
     int mode;
 } Hero20C88;
 extern Hero20C88 g_hero_state;
-extern char *D_L11_001FF580[];
-extern char D_L11_001B0FC8[];
+extern char *g_path_l11_table[];
+extern char g_str_tribesman_debug[];
 extern int joba_rider_update(unsigned char *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -144,7 +144,7 @@ void tribesman_l11_update(unsigned char *object)
     float old_z, distance, angle, other_angle, pitch, limit;
     int flags;
 
-    if (D_L11_001CAE40 != 0) return;
+    if (g_enemy_freeze_flag != 0) return;
     if (g_hero_state.mode == 0x6f && BYTE(object, 0x95) != 4) return;
     old_z = REAL(object, 0x18);
     state = POINTER(object, 0x68);
@@ -299,14 +299,14 @@ void tribesman_l11_update(unsigned char *object)
             moby_set_state(object, 0x1e, 2);
             node = 0;
             nearest = 0;
-            for (; node < WORD(D_L11_001FF580[WORD(state, 0x284)], 0); ++node) {
-                float d = vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x284)] + 0x10 + node * 0x10);
+            for (; node < WORD(g_path_l11_table[WORD(state, 0x284)], 0); ++node) {
+                float d = vec_distance_xy(((char *)object + 0x10), g_path_l11_table[WORD(state, 0x284)] + 0x10 + node * 0x10);
                 if (d < nearest_distance) {
                     nearest_distance = d;
                     nearest = node;
                 }
             }
-            path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x284)], -1, nearest);
+            path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x284)], -1, nearest);
         }
         if (WORD(state, 0x548) != -1) {
             linked = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
@@ -398,7 +398,7 @@ void tribesman_l11_update(unsigned char *object)
         }
         flags = moby_dispatch_action_by_kind(object, state + 0x60);
         if ((flags & 1) != 0) {
-            --D_L11_001AED04;
+            --g_active_rider_count;
             SetDeathBits(object, 0, 3);
             part_queue_moby_for_glow(object, 0, 0);
             return;
@@ -645,20 +645,20 @@ void tribesman_l11_update(unsigned char *object)
         }
         break;
     case 7:
-        if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x558)]) == 0) break;
+        if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x558)]) == 0) break;
         moby_set_state(object, 11, -1);
         PLAY(object, 0x18, 0, 20);
         if (BYTE(object, 0x95) == 1 && WORD(state, 0x56c) != -1) moby_set_state(object, 0x17, -1);
         break;
     case 8:
-        if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x574)]) != 0) {
+        if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x574)]) != 0) {
             moby_set_state(object, 11, -1);
             PLAY(object, 0x18, 0, 20);
         }
         break;
     case 9:
-        moby_l01_turn_toward_target((char *)object, D_L11_001FF580[WORD(state, 0x574)] + 0x10);
-        if (vec_distance_xy(((char *)object + 0x10), D_L11_001FF580[WORD(state, 0x574)] + 0x10) < 0.5f) {
+        moby_l01_turn_toward_target((char *)object, g_path_l11_table[WORD(state, 0x574)] + 0x10);
+        if (vec_distance_xy(((char *)object + 0x10), g_path_l11_table[WORD(state, 0x574)] + 0x10) < 0.5f) {
             PLAY(object, 0x25, 0, 10);
             moby_set_state(object, 10, -1);
         }
@@ -697,7 +697,7 @@ void tribesman_l11_update(unsigned char *object)
         break;
     case 14:
         moby_set_controller_speed_limits(object, 0.001527777873f, 0.04583333433f, 0.003781547071f, 0.2967060208f);
-        if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x54c)]) != 0) {
+        if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x54c)]) != 0) {
             moby_set_state(object, 0x11, -1);
             PLAY(object, 13, 0, 20);
         }
@@ -707,12 +707,12 @@ void tribesman_l11_update(unsigned char *object)
         float turned;
 
         moby_set_controller_speed_limits(object, 0.001527777873f, 0.04583333433f, 0.007563094143f, 0.5934120417f);
-        if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x54c)]) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x54c)];
+        if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x54c)]) != 0) {
+            path = g_path_l11_table[WORD(state, 0x54c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             if (math_random_int_below(5) == 1) {
                 PLAY(object, 0x19, 0, 15);
                 moby_set_state(object, 0x10, -1);
@@ -739,11 +739,11 @@ void tribesman_l11_update(unsigned char *object)
         break;
     case 17:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x54c)];
+            path = g_path_l11_table[WORD(state, 0x54c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
             moby_set_state(object, 14, -1);
             PLAY(object, 0x10, 0, 20);
         }
@@ -755,7 +755,7 @@ void tribesman_l11_update(unsigned char *object)
             PLAY(object, 0x17, 0, 20);
             moby_set_state(object, 0x14, -1);
             WORD(state, 0x178) |= 0x10;
-            if (WORD(state, 0x56c) != -1) QUAD(state, 0x110) = QUAD(D_L11_001FF580[WORD(state, 0x56c)], 0x10);
+            if (WORD(state, 0x56c) != -1) QUAD(state, 0x110) = QUAD(g_path_l11_table[WORD(state, 0x56c)], 0x10);
         }
         break;
     case 20:
@@ -773,18 +773,18 @@ void tribesman_l11_update(unsigned char *object)
         break;
     case 22:
         moby_set_controller_speed_limits(object, 0.001527777873f, 0.04583333433f, 0.003781547071f, 0.2967060208f);
-        if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x56c)]) != 0) {
+        if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x56c)]) != 0) {
             moby_set_state(object, 0x17, -1);
             PLAY(object, 0x18, 0, 20);
         }
         break;
     case 23:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            path = D_L11_001FF580[WORD(state, 0x56c)];
+            path = g_path_l11_table[WORD(state, 0x56c)];
             distance = vec_distance_xy(((char *)object + 0x10), path + 0x10);
             other_angle = vec_distance_xy(((char *)object + 0x10), path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
-            else path_set_follower_nodes(object, D_L11_001FF580[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
+            else path_set_follower_nodes(object, g_path_l11_table[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
             moby_set_state(object, 22, -1);
             PLAY(object, 0x10, 0, 20);
         }
@@ -815,7 +815,7 @@ void tribesman_l11_update(unsigned char *object)
         if (WORD(state, 0x528) == 0) {
             moby_turn_toward_target_and_step((char *)object, g_hero_state.position.v, REAL(state, 0x298));
         } else if (tribesman_turn_toward_point((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0 &&
-                   BYTE(object, 0x21) <= D_L11_001B35B8 && moby_count_group_not_in_state(BYTE(object, 0x21), -1) > 1) {
+                   BYTE(object, 0x21) <= g_tribe_group_limit && moby_count_group_not_in_state(BYTE(object, 0x21), -1) > 1) {
             unsigned short *ids;
             unsigned int id;
 
@@ -948,14 +948,14 @@ void tribesman_l11_update(unsigned char *object)
 
         if (WORD(state, 0x564) == -1) break;
         moby_set_controller_speed_limits(object, 0.00388888898f, 0.1166666746f, 0.001939254929f, 0.005817765370f);
-        node = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
+        node = g_path_l11_table[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
         mount = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
         moby_step_controller(object, ((char *)object + 0x10), mat_fast_helper_a(REAL(node, 0x10) - REAL(object, 0x10), REAL(node, 0x14) - REAL(object, 0x14)));
         REAL(object, 0x10) = REAL(mount, 0x10);
         REAL(object, 0x14) = REAL(mount, 0x14);
         REAL(object, 0x18) = REAL(mount, 0x18) + 1.5f;
         euler_rotation_basis(mount + 0xc0, object + 0xf0);
-        next = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
+        next = g_path_l11_table[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
         angle = mat_fast_helper_a(REAL(next, 0x10) - REAL(object, 0x10), REAL(next, 0x14) - REAL(object, 0x14));
         if (FastDiffRots(REAL(object, 0xf8), angle) <= 0.087266475f) {
             ++WORD(state, 0x568);
@@ -966,7 +966,7 @@ void tribesman_l11_update(unsigned char *object)
             }
         }
         if (WORD(state, 0x584) != 0) {
-            STUB_printf(D_L11_001B0FC8);
+            STUB_printf(g_str_tribesman_debug);
             PLAY(object, 0x20, 0, 5);
             anim_start_blended(mount, 1, 0, 5);
             WORD(state, 0x584) = 0;
@@ -1109,7 +1109,7 @@ void tribesman_l11_update(unsigned char *object)
             REAL(state, 0x164) = 0.0008333333535f;
         } else {
             REAL(state, 0x164) = 0.004166666884f;
-            if (path_follow_nodes((char *)object, D_L11_001FF580[WORD(state, 0x284)]) != 0) {
+            if (path_follow_nodes((char *)object, g_path_l11_table[WORD(state, 0x284)]) != 0) {
                 if (WORD(state, 0x294) == 1) {
                     PLAY(object, 15, 0, 10);
                     moby_set_state(object, 0x1c, 2);

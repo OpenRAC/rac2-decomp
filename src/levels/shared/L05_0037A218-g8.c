@@ -7,19 +7,19 @@ typedef struct {
     float rate,spin,life;
     u8 pad74[12];
 } L05Projectile;
-extern L05Projectile D_L05_00221DD0[];
-extern int D_L05_00221D10[];
-extern void *D_L05_00225DD0[];
-extern void (*D_L05_00225ED0[])(void *);
-extern int D_L05_001A8F00;
-extern int D_L05_001AC4D4 __attribute__((sda));
+extern L05Projectile g_projectile_table[];
+extern int g_feltzin_challenge_state[];
+extern void *g_level_object_list[];
+extern void (*g_level_object_callbacks[])(void *);
+extern int g_game_mode_a;
+extern int g_marker_sound_handle __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern u8 g_sound_state[];
 typedef struct { u8 pad[0x160]; float slow; int pad164,frames,flags; } L05ImpactState;
-extern L05ImpactState D_L05_001B9580;
+extern L05ImpactState g_hero_l05_state;
 typedef struct { int on; int pad; float pos[4]; } L05Hit;
-extern L05Hit D_L05_001BFB18;
-extern u8 D_L05_001A8F20[] MACRO_ADDR;
+extern L05Hit g_hit_l05_result;
+extern u8 g_effect_direction_vec[] MACRO_ADDR;
 extern int level_get_saved_value(void);
 extern char *moby_get_motion_data(u8 *);
 extern float math_random_float_range(float,float);
@@ -45,18 +45,18 @@ void UpdateSpaceProjectilePool(void *unused)
     L05Projectile *record; float *pos;
     int i,j;
     (void)unused;
-    if (D_L05_001A8F00 == 2) return;
+    if (g_game_mode_a == 2) return;
     for (i=0;i<level_get_saved_value();i++) {
-        if (D_L05_00225ED0[i]) D_L05_00225ED0[i](D_L05_00225DD0[i]);
+        if (g_level_object_callbacks[i]) g_level_object_callbacks[i](g_level_object_list[i]);
     }
     for (j=0;j<128;j++) {
-        unsigned int base = (unsigned int)D_L05_00221DD0;
+        unsigned int base = (unsigned int)g_projectile_table;
         unsigned int offset = j * sizeof(L05Projectile);
         record = (L05Projectile *)(base + offset);
         if (!record->object) continue;
         pos = record->position;
         state = (u8 *)moby_get_motion_data(record->object);
-        if (D_L05_00221D10[0x2C/4] == 1 || *(int *)(state+0x110) == 0 || record->distance >= 350.0f) {
+        if (g_feltzin_challenge_state[0x2C/4] == 1 || *(int *)(state+0x110) == 0 || record->distance >= 350.0f) {
             record->object = 0;
             continue;
         }
@@ -67,13 +67,13 @@ void UpdateSpaceProjectilePool(void *unused)
         FastVecAdd(record->previous,record->previous,step);
         record->distance += scale*speed;
         if (record->flags == 0 && record->mode && fast_vec_dist(record->position,*(u8 **)(state+0x120)+0x10) < record->rate) {
-            D_L05_001B9580.frames = 30;
-            D_L05_001B9580.slow = 0.05f;
-            D_L05_001B9580.flags = 0;
+            g_hero_l05_state.frames = 30;
+            g_hero_l05_state.slow = 0.05f;
+            g_hero_l05_state.flags = 0;
             if (math_random_int_below(6) && (target=*(u8 **)(state+0x120)) && *(s16 *)(target+0xAA) == 0xFBF) {
-                sound = g_sound_state+D_L05_001AC4D4*0x70;
+                sound = g_sound_state+g_marker_sound_handle*0x70;
                 if ((*(u8 **)(sound+0x88) != target || !sound[0x74]) && g_current_map_index != 10)
-                    D_L05_001AC4D4 = snd_play_from_class_bank(14,0,(char *)target,0xFBF);
+                    g_marker_sound_handle = snd_play_from_class_bank(14,0,(char *)target,0xFBF);
             }
             hero_apply_damage(1.0f);
             record->flags = 1;
@@ -83,9 +83,9 @@ void UpdateSpaceProjectilePool(void *unused)
             qcopy(check, pos);
             check[3] = 1.0f;
             if (math_fast_helper_a(check,256.0f) != -1 && CollLine(record->previous,record->position,0,0,0)) {
-                EmitParticlePairBurst(D_L05_001BFB18.pos,20,record->color,60);
-                if (D_L05_001BFB18.on)
-                    part_queue_impact_effect(*(u8 **)(state+0x120),record->object,0x10000,D_L05_001BFB18.pos,D_L05_001A8F20,0.25f);
+                EmitParticlePairBurst(g_hit_l05_result.pos,20,record->color,60);
+                if (g_hit_l05_result.on)
+                    part_queue_impact_effect(*(u8 **)(state+0x120),record->object,0x10000,g_hit_l05_result.pos,g_effect_direction_vec,0.25f);
                 record->object = 0;
             }
         }

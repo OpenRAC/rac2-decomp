@@ -11,8 +11,8 @@ typedef struct {
     VectorBits velocity, origin;
 } BeamState;
 extern WeaponEntry g_weapon_l00_table[];
-extern unsigned char D_0013957F[];
-extern unsigned int D_L00_001AF6D4 __attribute__((sda));
+extern unsigned char g_beam_weapon_index[];
+extern unsigned int g_beam_spawn_slot_counter __attribute__((sda));
 extern char g_camera_l00_position[];
 extern int save_is_record_value(int, int);
 extern char *CreateMoby(int);
@@ -48,7 +48,7 @@ char *beam_spawn_moving(void *position, void *velocity, int handle, int mode)
         *(unsigned char *)(moby + 0x20) = 0;
         state->mode = mode;
         vec_add_transformed_or_copy(state, velocity, position);
-        speed = (g_weapon_l00_table + D_0013957F[0])->speed * (1.0f / 60.0f);
+        speed = (g_weapon_l00_table + g_beam_weapon_index[0])->speed * (1.0f / 60.0f);
         state->frames = FloatToInt(128.0f / speed);
         state->rate = 1.0f / IntToFloat(state->frames);
         state->handle = handle;
@@ -56,10 +56,10 @@ char *beam_spawn_moving(void *position, void *velocity, int handle, int mode)
         cam_compute_view_direction(moby + 0x10, (char *)normal, 1);
         FastVecScale(normal, normal, -1.0f);
         moby_build_axis_vectors(moby, (char *)normal);
-        if (D_L00_001AF6D4 >= 4)
-            D_L00_001AF6D4 = 0;
-        state->slot = D_L00_001AF6D4;
-        D_L00_001AF6D4 = (int)(D_L00_001AF6D4 + 1) % 3;
+        if (g_beam_spawn_slot_counter >= 4)
+            g_beam_spawn_slot_counter = 0;
+        state->slot = g_beam_spawn_slot_counter;
+        g_beam_spawn_slot_counter = (int)(g_beam_spawn_slot_counter + 1) % 3;
         trail_store_sample(moby);
         if (mode == 1) {
             qcopy(&state->origin, g_camera_l00_position);

@@ -7,10 +7,10 @@ extern int math_random_int_below(int);
 extern int FloatToInt(float);
 /* Measured object flags are a 16-bit field at +0x34. */
 struct InitObjectFlags { char pad[0x34]; unsigned short flags; };
-extern float D_L11_001B133C __attribute__((sda));
-extern float D_L11_001B1340 __attribute__((sda));
-extern float D_L11_001B1344 __attribute__((sda));
-extern float D_L11_001B1348 __attribute__((sda));
+extern float g_l11_limit_min __attribute__((sda));
+extern float g_l11_limit_max __attribute__((sda));
+extern float g_l11_duration_min __attribute__((sda));
+extern float g_l11_duration_max __attribute__((sda));
 
 
 /* Starts a falling, tumbling drone: gives it a random spin, a launch velocity and gravity, and picks its timing from a blend value. */
@@ -47,8 +47,8 @@ void InitializeRandomizedObjectMotion(void *obj, void *velocity, float gravity, 
     *(float *)(state + 0x2D4) = angle;
     *(unsigned char *)(p + 0xA8) = 255;
     ((struct InitObjectFlags *)p)->flags &= 0xFEFF;
-    limit = D_L11_001B133C + (D_L11_001B1340 - D_L11_001B133C) * blend;
-    duration = D_L11_001B1344 + (D_L11_001B1348 - D_L11_001B1344) * blend;
+    limit = g_l11_limit_min + (g_l11_limit_max - g_l11_limit_min) * blend;
+    duration = g_l11_duration_min + (g_l11_duration_max - g_l11_duration_min) * blend;
     *(float *)(state + 0x2E0) = limit;
     *(int *)(state + 0x2E4) = FloatToInt(duration);
 }

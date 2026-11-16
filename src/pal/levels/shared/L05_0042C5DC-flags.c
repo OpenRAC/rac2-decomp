@@ -2,14 +2,14 @@
 #include "names.h"
 
 typedef int Quad __attribute__((mode(TI)));
-extern Quad D_L05_001BFB30;
-extern unsigned char D_L05_001FF240[];
+extern Quad g_projectile_pos_scratch;
+extern unsigned char g_particle_params_table[];
 extern void FastVecAdd(char *, char *, char *);
 extern int math_fast_float_d(int *);
 extern int GetCollHitMaterial(void);
 extern int coll_test_point(char *, int, float, char *);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void func_PAL_L05_0042D860(char *);
+extern void moby_explode_damage_nearby_pal(char *);
 extern void moby_mark_spawned(void *);
 extern void FastVecSub(char *, char *, char *);
 extern void FastVecScale(char *, char *, float);
@@ -40,12 +40,12 @@ void func_PAL_L05_0042D570(char *object) {
             contact = 0;
             if (coll_test_point(object + 16, 16, 1.0f, *(char **)(state + 0x20))) {
                 contact = 1;
-                *(Quad *)(object + 16) = D_L05_001BFB30;
+                *(Quad *)(object + 16) = g_projectile_pos_scratch;
             }
             if (!contact && !CollLine(&local.previous, object + 16, 16, *(char **)(state + 0x20), 0)) goto trail;
 
         }
-        func_PAL_L05_0042D860(object);
+        moby_explode_damage_nearby_pal(object);
     }
     moby_mark_spawned(object);
     return;
@@ -53,7 +53,7 @@ trail:
     local.point = local.previous;
     FastVecSub((char *)&local.step, object + 16, (char *)&local.previous);
     FastVecScale((char *)&local.step, (char *)&local.step, 0.333f);
-    textures = D_L05_001FF240;
+    textures = g_particle_params_table;
     i = 3;
     do {
         FastVecAdd((char *)&local.point, (char *)&local.point, (char *)&local.step);

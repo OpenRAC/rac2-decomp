@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern char D_L16_001B1B70[8] __attribute__((sda));
-extern char D_L16_001B1B68[8] __attribute__((sda));
-extern char D_L16_001B1B60[8] __attribute__((sda));
-extern s32 D_L16_001B1B90 __attribute__((sda));
+extern char g_destructible_burst_params_c[8] __attribute__((sda));
+extern char g_destructible_burst_params_b[8] __attribute__((sda));
+extern char g_destructible_burst_params_a[8] __attribute__((sda));
+extern s32 g_destructible_burst_group_bit __attribute__((sda));
 typedef struct { f32 x, y, z, w; } BurstPoint;
-extern BurstPoint D_L16_001B1BB0[];
+extern BurstPoint g_destructible_burst_points[];
 extern s32 math_fast_float_d(char *);
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, u32, s32);
@@ -36,13 +36,13 @@ void destructible_burst_update(char *self) {
         *(u8 *)(self + 0xA8) = 255;
         break;
     case 2:
-        part_explode_object_into_pieces(self, D_L16_001B1B70, D_L16_001B1B68, D_L16_001B1B60, 65535, 0, D_L16_001B1B90, 0, 65535, 255, 0);
+        part_explode_object_into_pieces(self, g_destructible_burst_params_c, g_destructible_burst_params_b, g_destructible_burst_params_a, 65535, 0, g_destructible_burst_group_bit, 0, 65535, 255, 0);
         for (i = 0; i < 3; i++) {
-            vec_local_offset_to_world(self, pos, D_L16_001B1BB0[i].x, D_L16_001B1BB0[i].y, D_L16_001B1BB0[i].z);
+            vec_local_offset_to_world(self, pos, g_destructible_burst_points[i].x, g_destructible_burst_points[i].y, g_destructible_burst_points[i].z);
             SpawnExplosion(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
         }
-        if (D_L16_001B1B90 >= 0) {
-            *(u16 *)(self + 0x7C) = (1 << D_L16_001B1B90) | 0x8000;
+        if (g_destructible_burst_group_bit >= 0) {
+            *(u16 *)(self + 0x7C) = (1 << g_destructible_burst_group_bit) | 0x8000;
             moby_set_state(self, 3, -1);
         } else moby_mark_spawned(self);
         break;

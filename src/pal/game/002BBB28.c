@@ -10,7 +10,7 @@ extern void Fe617c30b_FUN_002B9180(char *p);
 
 /* func_002BAE50 is matched in its own unit, src/game/002BAE50.c (default flags). */
 
-void func_PAL_002BBB28(char *a0)
+void part_update_scaling_pal(char *a0)
 {
     char *s0 = a0 + 32;
     int x;

@@ -16,7 +16,7 @@ extern int FloatToInt(float);
 /* Write the measured GS privileged 64-bit register configuration in order. */
 typedef unsigned long long GsRegisterValue;
 
-extern GsRegisterValue D_001A6488[3];
+extern GsRegisterValue g_gs_display_regs[3];
 
 /* Scalar GS setup wrapper; pinned standard integer arguments and helper calls. */
 extern void gfx_build_screen_sprite_packet(int width, int height, int address, int mode);
@@ -53,13 +53,13 @@ void menu_draw_pause_panels(int);
  */
 typedef void (*fn_t)(int);
 
-extern int D_L02_001B3078 __attribute__((sda));
+extern int g_final_l02_draw_callback_count __attribute__((sda));
 
    /* resident callback count */
-extern fn_t D_L02_001B3058[] __attribute__((sda));
+extern fn_t g_final_l02_draw_callbacks[] __attribute__((sda));
 
  /* callback table        */
-extern int D_L02_001B3068[] __attribute__((sda));
+extern int g_final_l02_draw_callback_args[] __attribute__((sda));
 
 extern int Ff67aa9df_D_001A7350 __attribute__((sda));
 
@@ -73,11 +73,11 @@ void ResetGsRegistersPr(void)
     GsRegisterValue framebuffer, display;
     GS_BGCOLOR = 0;
     GS_PMODE = 0xffa1;
-    GS_SMODE2 = D_001A6488[0];
-    framebuffer = D_001A6488[1];
+    GS_SMODE2 = g_gs_display_regs[0];
+    framebuffer = g_gs_display_regs[1];
     GS_DISPFB1 = framebuffer;
     GS_DISPFB2 = framebuffer;
-    display = D_001A6488[2];
+    display = g_gs_display_regs[2];
     GS_DISPLAY1 = display;
     GS_DISPLAY2 = display;
     GS_EXTWRITE = 0;
@@ -115,15 +115,15 @@ void gfx_call_sync_helper(void)
 void gfx_render_frame_all_layers(void) {
     extern void gfx_append_draw_list_buffer_tag(int);
     extern void RenderFrame(void);
-    extern int D_001B1594 __attribute__((sda));
+    extern int g_render_layer_flags __attribute__((sda));
     gfx_append_draw_list_buffer_tag(0);
-    D_001B1594 = 0x7F;
+    g_render_layer_flags = 0x7F;
     RenderFrame();
 }
 
 extern unsigned int menu_get_second_value(void);
 extern void gfx_append_draw_list_buffer_tag(int);
-extern int D_001B1594 __attribute__((sda));
+extern int g_render_layer_flags __attribute__((sda));
 extern void RenderFrame(void);
 extern void menu_draw_pause_panels(int);
 extern void menu_draw_message_panel(void);
@@ -133,7 +133,7 @@ void gfx_render_frame_extra_layers(void)
 {
     if (menu_get_second_value() == 1) {
         gfx_append_draw_list_buffer_tag(0);
-        D_001B1594 = 0x100FF;
+        g_render_layer_flags = 0x100FF;
         RenderFrame();
     } else if (menu_get_second_value() == 0) {
         menu_draw_pause_panels(1);
@@ -155,91 +155,91 @@ void gfx_call_frame_helper_zero(void)
 
 /* Defined in 0027C878-g8.c. */
 
-extern int D_001B1608[] __attribute__((sda));
-extern fn_t D_001B9E40[];
-extern int D_001B9F40[];
+extern int g_world_draw_callback_count[] __attribute__((sda));
+extern fn_t g_world_draw_callbacks[];
+extern int g_world_draw_callback_args[];
 
 /* Adds a draw callback and its argument to a list of up to 64. */
 void gfx_register_world_draw_callback(fn_t first, int second) {
-    int index = D_001B1608[0];
+    int index = g_world_draw_callback_count[0];
     if (index < 64) {
-        D_001B9E40[index] = first;
-        D_001B9F40[index] = second;
-        D_001B1608[0] = index + 1;
+        g_world_draw_callbacks[index] = first;
+        g_world_draw_callback_args[index] = second;
+        g_world_draw_callback_count[0] = index + 1;
     }
 }
 
 /* Calls every draw callback in that list, each with its own argument. */
 void gfx_run_world_draw_callbacks(void) {
     int index;
-    for (index = 0; index < D_001B1608[0]; ++index)
-        D_001B9E40[index](D_001B9F40[index]);
+    for (index = 0; index < g_world_draw_callback_count[0]; ++index)
+        g_world_draw_callbacks[index](g_world_draw_callback_args[index]);
 }
 
-extern int D_001B1610[] __attribute__((sda));
-extern fn_t D_001BA240[];
-extern int D_001BA340[];
+extern int g_early_draw_callback_count[] __attribute__((sda));
+extern fn_t g_early_draw_callbacks[];
+extern int g_early_draw_callback_args[];
 
 /* Adds a draw callback and its argument to a second list of up to 64. */
 void gfx_register_early_draw_callback(fn_t first, int second) {
-    int index = D_001B1610[0];
+    int index = g_early_draw_callback_count[0];
     if (index < 64) {
-        D_001BA240[index] = first;
-        D_001BA340[index] = second;
-        D_001B1610[0] = index + 1;
+        g_early_draw_callbacks[index] = first;
+        g_early_draw_callback_args[index] = second;
+        g_early_draw_callback_count[0] = index + 1;
     }
 }
 
 /* Calls every draw callback in the second list. */
 void gfx_run_early_draw_callbacks(void) {
     int index;
-    for (index = 0; index < D_001B1610[0]; ++index)
-        D_001BA240[index](D_001BA340[index]);
+    for (index = 0; index < g_early_draw_callback_count[0]; ++index)
+        g_early_draw_callbacks[index](g_early_draw_callback_args[index]);
 }
 
-extern int D_001B1614[] __attribute__((sda));
-extern fn_t D_001BA440[];
-extern int D_001BA540[];
+extern int g_late_draw_callback_count[] __attribute__((sda));
+extern fn_t g_late_draw_callbacks[];
+extern int g_late_draw_callback_args[];
 
 /* Calls every draw callback in a third list. */
 void gfx_run_late_draw_callbacks(void) {
     int index;
-    for (index = 0; index < D_001B1614[0]; ++index)
-        D_001BA440[index](D_001BA540[index]);
+    for (index = 0; index < g_late_draw_callback_count[0]; ++index)
+        g_late_draw_callbacks[index](g_late_draw_callback_args[index]);
 }
 
-extern int D_001B160C[] __attribute__((sda));
-extern fn_t D_001BA040[];
-extern int D_001BA140[];
+extern int g_overlay_draw_callback_count[] __attribute__((sda));
+extern fn_t g_overlay_draw_callbacks[];
+extern int g_overlay_draw_callback_args[];
 
 /* Adds a draw callback and its argument to a fourth list of up to 64. */
 void gfx_register_overlay_draw_callback(fn_t first, int second) {
-    int index = D_001B160C[0];
+    int index = g_overlay_draw_callback_count[0];
     if (index < 64) {
-        D_001BA040[index] = first;
-        D_001BA140[index] = second;
-        D_001B160C[0] = index + 1;
+        g_overlay_draw_callbacks[index] = first;
+        g_overlay_draw_callback_args[index] = second;
+        g_overlay_draw_callback_count[0] = index + 1;
     }
 }
 
 /* Calls every draw callback in the fourth list. */
 void gfx_run_overlay_draw_callbacks(void) {
     int index;
-    for (index = 0; index < D_001B160C[0]; ++index)
-        D_001BA040[index](D_001BA140[index]);
+    for (index = 0; index < g_overlay_draw_callback_count[0]; ++index)
+        g_overlay_draw_callbacks[index](g_overlay_draw_callback_args[index]);
 }
 
-extern int D_001B1638[] __attribute__((sda));
-extern fn_t D_001B1618[] __attribute__((sda));
-extern int D_001B1628[] __attribute__((sda));
+extern int g_final_draw_callback_count[] __attribute__((sda));
+extern fn_t g_final_draw_callbacks[] __attribute__((sda));
+extern int g_final_draw_callback_args[] __attribute__((sda));
 
 /* Adds a callback and its argument to a short list that holds only 4 entries. */
 void gfx_register_final_draw_callback(fn_t callback, int argument) {
-    int index = D_001B1638[0];
+    int index = g_final_draw_callback_count[0];
     if (index < 4) {
-        D_001B1618[index] = callback;
-        D_001B1628[index] = argument;
-        D_001B1638[0] = index + 1;
+        g_final_draw_callbacks[index] = callback;
+        g_final_draw_callback_args[index] = argument;
+        g_final_draw_callback_count[0] = index + 1;
     }
 }
 
@@ -249,8 +249,8 @@ void gfx_register_final_draw_callback(fn_t callback, int argument) {
 /* Calls every callback in the short list, each with its own argument. */
 void gfx_run_final_draw_callbacks(void) {
     int i;
-    for (i = 0; i < D_L02_001B3078; i++) {
-        D_L02_001B3058[i](D_L02_001B3068[i]);
+    for (i = 0; i < g_final_l02_draw_callback_count; i++) {
+        g_final_l02_draw_callbacks[i](g_final_l02_draw_callback_args[i]);
     }
 }
 
@@ -258,9 +258,9 @@ void gfx_run_final_draw_callbacks(void) {
 
 /* Defined in 0027D330-g8.c. */
 
-extern int D_L00_001BCAF4;
+extern int g_text_pulse_counter;
 
-extern unsigned char D_001A7BB1 __attribute__((sda));
+extern unsigned char g_display_mode_flag __attribute__((sda));
 
 extern float math_fast_sin_or_cos_a(float);
 
@@ -280,10 +280,10 @@ void text_draw_pulsing(void)
     int counter;
 
     y = 0x148;
-    if (D_001A7BB1) {
+    if (g_display_mode_flag) {
         y = 0x17C;
     }
-    counter = D_L00_001BCAF4;
+    counter = g_text_pulse_counter;
     wave = (float)(counter % 100) * 0.02f - 1.0f;
     if (wave < -1.0f) {
         wave = -1.0f;
@@ -305,10 +305,10 @@ void text_draw_pulsing(void)
 typedef struct { short start, end, text[6]; } SubtitleRecord;
 typedef struct { char pad[0x34]; int time; char gap[0x14]; unsigned char *subs; } SubtitleState;
 extern SubtitleState g_scene_playback_state;
-extern volatile unsigned char D_001A7BB4[] __attribute__((sda));
-extern unsigned char D_001A7B96[] __attribute__((sda));
+extern volatile unsigned char g_language[] __attribute__((sda));
+extern unsigned char g_toggle_option_b[] __attribute__((sda));
 extern int g_screen_width[] __attribute__((sda));
-extern unsigned char D_001A8998[];
+extern unsigned char g_str_pulsing_window_text[];
 extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, int);
 extern void text_draw_window_medium(unsigned short *, unsigned long, unsigned char *, int);
 extern void text_draw_medium(int, int, unsigned long, unsigned char *, int);
@@ -322,17 +322,17 @@ void DrawSubtitles(void)
     int idx;
     if (!g_scene_playback_state.subs) return;
     idx = 0;
-    if ((unsigned int)(D_001A7BB4[0] - 2) < 4) idx = D_001A7BB4[0] - 1;
+    if ((unsigned int)(g_language[0] - 2) < 4) idx = g_language[0] - 1;
     for (p = (SubtitleRecord *)g_scene_playback_state.subs; p->start >= 0; ++p) {
         if (g_scene_playback_state.time < p->start) continue;
         if (p->end < g_scene_playback_state.time) continue;
-        if (!D_001A7B96[0] && g_scene_playback_state.subs[p->text[idx]] != '*') continue;
+        if (!g_toggle_option_b[0] && g_scene_playback_state.subs[p->text[idx]] != '*') continue;
         if (g_scene_playback_state.subs[p->text[idx]] == '*') {
             int y = 0x40;
             int alpha = 0xB0000000;
             unsigned char *str;
             if (g_scene_playback_state.subs[p->text[idx] + 1] != '*') y = g_screen_width[1] - 0xC8;
-            else if (D_001A7BB1) y = 0x18;
+            else if (g_display_mode_flag) y = 0x18;
             if (p->end - g_scene_playback_state.time < 0x12)
                 alpha = (int)(p->end - (long)(g_scene_playback_state.time - 1)) << 27;
             else if (g_scene_playback_state.time - p->start < 0x12)
@@ -348,7 +348,7 @@ void DrawSubtitles(void)
             int hw, hh;
             int extent = g_screen_width[1];
             FontSetWindow(win, 0xC8, 0x1A4, 0x28, 0x1D8, 0x100,
-                          D_001A7BB1 ? extent - 0x36 : extent - 0x64, 0x12, 7);
+                          g_display_mode_flag ? extent - 0x36 : extent - 0x64, 0x12, 7);
             text_draw_window_medium(win, 0x80B0B0B0UL, &g_scene_playback_state.subs[p->text[idx]], -1);
             win[5] -= 4;
             w = win[6];
@@ -362,7 +362,7 @@ void DrawSubtitles(void)
             if (func_001157AC(&g_scene_playback_state.subs[p->text[idx]]) < 0x96)
                 text_draw_window_medium(win, 0x80B0B0B0UL, &g_scene_playback_state.subs[p->text[idx]], -1);
             else
-                text_draw_window_medium(win, 0x80B0B0B0UL, D_001A8998, -1);
+                text_draw_window_medium(win, 0x80B0B0B0UL, g_str_pulsing_window_text, -1);
             return;
         }
     }

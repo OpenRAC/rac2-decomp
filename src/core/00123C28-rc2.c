@@ -29,8 +29,8 @@ extern s32 func_001157AC(s32);
 extern unsigned char *eh_read_uleb128(s32, s32);
 extern unsigned char *eh_read_sleb128(s32, s32);
 
-extern s8 D_0013B060[];
-extern s8 D_0013B068[];
+extern s8 g_str_eh_cie_augmentation_a[];
+extern s8 g_str_eh_cie_augmentation_b[];
 
 typedef struct {
     s32 v;
@@ -45,12 +45,12 @@ s8 *eh_extract_cie_info(s32 fde, s32 info) {
 
     cie_ptr = (fde - *(s32 *)(fde + 4)) + 0xD;
     *(s32 *)info = cie_ptr;
-    if (func_00115544(cie_ptr, (s32) D_0013B060) != 0 && func_00115544(*(s32 *)info, (s32) D_0013B068) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
+    if (func_00115544(cie_ptr, (s32) g_str_eh_cie_augmentation_a) != 0 && func_00115544(*(s32 *)info, (s32) g_str_eh_cie_augmentation_b) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
         return 0;
     }
     aug_end = *(s32 *)info + func_001157AC(*(s32 *)info);
     read_ptr = aug_end + 1;
-    if (func_00115544(*(s32 *)info, (s32) D_0013B068) == 0) {
+    if (func_00115544(*(s32 *)info, (s32) g_str_eh_cie_augmentation_b) == 0) {
         *(s32 *)(info + 4) = ((UA32 *)read_ptr)->v;
         read_ptr = aug_end + 5;
     } else {

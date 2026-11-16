@@ -8,15 +8,15 @@ extern s32 func_310528(s32 a, s32 b);
 extern f32 func_2E3A48(f32 x);
 extern f32 func_2E3A60(f32 x);
 extern s32 coll_process_hit(f32 radius, void *pos, s32 flag, void *obj, s32 arg);
-extern u32 D_L01_001C3980[];
+extern u32 g_contact_moby_list[];
 extern void gfx_update_color_fade(void *, void *);
 extern int FastDecTimer(void *);
 extern s32 math_fast_float_d(void *);
 extern void value_set_and_smooth(void *, void *, s32, s32, f32);
-extern u8 *D_L01_001B1F04 __attribute__((sda));
+extern u8 *g_camera_path_configs __attribute__((sda));
 extern s32 cam_is_hero_in_trigger(void *);
 
-void func_PAL_L01_003E1DB0(u8 *a0)
+void muckdweller_tick_timers_pal(u8 *a0)
 {
     u32 v;
     u8 *p = *(u8 **)(a0 + 0x68);

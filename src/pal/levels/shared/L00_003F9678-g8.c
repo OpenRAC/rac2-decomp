@@ -23,9 +23,9 @@ typedef struct {
 } HitRequest;
 extern unsigned char g_item_slot_to_record[];
 extern HitTuning g_weapon_l00_table[] __attribute__((nosda));
-extern int D_L00_001ADB2C;
+extern int g_active_tether_object;
 extern char *g_area_hit_targets[] __attribute__((nosda));
-extern void *func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
+extern void *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
 extern int func_PAL_00335DD0(char *, int, int);
@@ -37,7 +37,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 /* Apply the configured area hit, or emit eight pairs of particles around the impact.
  * The hit request and particle vectors share one scratch area. Integer and FP
  * arguments retain the measured order within their independent EE register banks. */
-void func_PAL_L00_003F97D0(char *object, HitVector *source)
+void ApplyAreaHitOrEmitParticles_pal(char *object, HitVector *source)
 {
     char *state = *(char **)(object + 0x68);
     struct {
@@ -49,8 +49,8 @@ void func_PAL_L00_003F97D0(char *object, HitVector *source)
 
     qcopy(&scratch.position, source);
     if (g_weapon_l00_table[g_item_slot_to_record[0x17]].enabled) {
-        func_PAL_L00_003FB330(object + 0x10, 1.0f, 20.0f, 1, 0x28, 0x14, 0x1E, 0x28, 0x32, 1,
-                      1, 1, 0, D_L00_001ADB2C);
+        SpawnExplosion_pal(object + 0x10, 1.0f, 20.0f, 1, 0x28, 0x14, 0x1E, 0x28, 0x32, 1,
+                      1, 1, 0, g_active_tether_object);
         scratch.u.request.flags = 0x810000;
         scratch.u.request.active = 1;
         scratch.u.request.owner = object;

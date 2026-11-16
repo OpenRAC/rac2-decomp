@@ -20,7 +20,7 @@ extern float math_random_angle(void);
 
 
 
-void func_PAL_L00_003E05B0(char *object, int unused, char *pos, char *direction)
+void EmitRingAndDirectionalParticles_pal(char *object, int unused, char *pos, char *direction)
 {
     float a[4], b[4], c[4], d[4];
     struct C3PairGlobal colors;

@@ -14,7 +14,7 @@ typedef struct {
 } Shard_3B3158;
 
 extern char g_hero_state[];
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -44,8 +44,8 @@ void shard_projectile_update(char *obj)
     game = g_hero_state;
     if (CollLine(&from, obj + 0x10, 0, *(void **)(game + 0x2290), 0)
         || coll_test_point(obj + 0x10, 1, *(void **)(game + 0x2290), 0.3f)) {
-        qcopy(&at, D_L00_001BF220);
-        vec_fast_normalize(&dir, st, D_L00_001BF220 + 0x20);
+        qcopy(&at, g_hero_l00_position);
+        vec_fast_normalize(&dir, st, g_hero_l00_position + 0x20);
         vec_scale_to_length(&dir, &dir, 0.033333335f);
         SpawnExplosionEffects(obj, &dir, &at, 0.0f, 0.0f, 0, 0, 4, 0.0f, 0.0f, 9.0f, 0.4f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         shot_damage_around(obj, st, &at);

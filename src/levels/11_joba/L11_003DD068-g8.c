@@ -13,9 +13,9 @@ extern void vec_scale_to_length(f32 *dst, f32 *a, f32 len);
 
 extern f32 weapon_compute_shot_launch_speed(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
 
-extern f32 D_L11_001B016C __attribute__((sda));
+extern f32 g_bomb_velocity_scale __attribute__((sda));
 
-extern f32 D_L11_001B0168 __attribute__((sda));
+extern f32 g_bomb_speed __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -38,12 +38,12 @@ u8 *hoverbike_bomb_spawn(u8 *owner, u8 *start_pos, u8 *target_pos, f32 gravity) 
         v1 = *(u8 **)(bomb + 0x24);
         dst = (TI128 *)(bomb + 0x10);
 
-        *(f32 *)(bomb + 0x2C) = *(f32 *)(v1 + 0x24) * D_L11_001B016C;
+        *(f32 *)(bomb + 0x2C) = *(f32 *)(v1 + 0x24) * g_bomb_velocity_scale;
         *(u16 *)(bomb + 0x34) |= 0x5000;
         *dst = *(TI128 *)start;
         FastVecSub((f32 *)owner_or_vars, (f32 *)target, (f32 *)start);
         *(s32 *)(owner_or_vars + 0x8) = 0;
-        travel_time = FastVecLength((f32 *)owner_or_vars) / D_L11_001B0168;
+        travel_time = FastVecLength((f32 *)owner_or_vars) / g_bomb_speed;
         vec_scale_to_length((f32 *)owner_or_vars, (f32 *)owner_or_vars, travel_time);
         *(f32 *)(owner_or_vars + 0x8) = weapon_compute_shot_launch_speed((char *)start, (char *)target, 0, travel_time, -fall_rate);
         *(f32 *)(owner_or_vars + 0xC) = fall_rate;

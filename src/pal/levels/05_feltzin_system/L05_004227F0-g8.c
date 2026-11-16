@@ -7,62 +7,62 @@ typedef struct {
     char *object; int pad7C[5]; int mode; int pad94[2];
     int settings[4];
 } Control05;
-extern Control05 D_L05_00221D10;
+extern Control05 g_feltzin_challenge_state;
 typedef struct {
     int id, a4, a8, aC, a10;
     char pad14[0x28 - 0x14];
     int target; char pad2C[8]; int stage; char pad38[8];
     int warmup, delay, first, second, third, fourth, fifth, timeout;
 } State05;
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 extern char g_hero_state[];
-extern unsigned char D_L05_001B2000[] __attribute__((sda)), D_L05_001B2001[] __attribute__((sda)), D_L05_001B2002[] __attribute__((sda));
-extern float D_L05_001B2004[] __attribute__((sda)), D_L05_001B2008[] __attribute__((sda)), D_L05_001B200C[] __attribute__((sda)), D_L05_001B2010[] __attribute__((sda));
-extern int D_L05_001B2014[] __attribute__((sda));
-extern unsigned char D_L05_001B3558[] __attribute__((sda)), D_L05_001B3559[] __attribute__((sda)), D_L05_001B355A[] __attribute__((sda));
-extern float D_L05_001B355C[] __attribute__((sda)), D_L05_001B3560[] __attribute__((sda)), D_L05_001B3564[] __attribute__((sda)), D_L05_001B3568[] __attribute__((sda));
-extern int D_L05_001B356C[] __attribute__((sda)), D_L05_001B3554[] __attribute__((sda));
-extern int D_L05_001AA6A0[] __attribute__((sda)), D_L05_001AA6A8[] __attribute__((sda));
-extern int D_L05_001B1354[] __attribute__((sda)), D_L05_001B1358[] __attribute__((sda)), D_L05_001B135C[] __attribute__((sda));
-extern int D_L05_001A8F00[] __attribute__((sda));
-extern int D_L05_001A904C MACRO_ADDR;
-extern float D_L05_001B2D84[] __attribute__((sda));
-extern char *D_L05_001B251C[] __attribute__((sda));
+extern unsigned char g_ship_settings_byte_a[] __attribute__((sda)), g_ship_settings_byte_b[] __attribute__((sda)), g_ship_settings_byte_c[] __attribute__((sda));
+extern float g_ship_settings_float_c[] __attribute__((sda)), g_ship_settings_float_a[] __attribute__((sda)), g_ship_settings_float_d[] __attribute__((sda)), g_ship_settings_float_b[] __attribute__((sda));
+extern int g_ship_settings_word[] __attribute__((sda));
+extern unsigned char g_feltzin_record_flag_a[] __attribute__((sda)), g_feltzin_record_flag_b[] __attribute__((sda)), g_feltzin_record_flag_c[] __attribute__((sda));
+extern float g_feltzin_record_float_a[] __attribute__((sda)), g_feltzin_record_float_b[] __attribute__((sda)), g_feltzin_record_float_c[] __attribute__((sda)), g_feltzin_record_float_d[] __attribute__((sda));
+extern int g_feltzin_record_word[] __attribute__((sda)), g_feltzin_countdown[] __attribute__((sda));
+extern int g_feltzin_reset_callback[] __attribute__((sda)), g_feltzin_shutdown_callback[] __attribute__((sda));
+extern int g_feltzin_challenge_param_a[] __attribute__((sda)), g_feltzin_challenge_param_b[] __attribute__((sda)), g_feltzin_challenge_param_c[] __attribute__((sda));
+extern int g_game_mode_a[] __attribute__((sda));
+extern int g_feltzin_mission_data MACRO_ADDR;
+extern float g_screen_l05_scale[] __attribute__((sda));
+extern char *g_feltzin_target_mobys[] __attribute__((sda));
 extern void hero_set_state_value_a(int), hero_set_state_value_b(int), level_select_random_object(void);
 extern void level_store_pair_with_increment(int, int), moby_set_flag_bit(void *, int);
 extern int func_PAL_L00_002C4480(int, int);
 extern void hero_set_state_value_c(int);
-extern int func_PAL_L05_00423A68(void);
-extern void func_PAL_L05_0044BEB8(void);
+extern int LockedEntryMenuInput_pal(void);
+extern void ship_save_transform_state_pal(void);
 extern int func_PAL_00289730(int, int);
 extern int math_fast_float_d(void *);
 extern void func_PAL_L05_004262B0(void *), func_PAL_L05_00426658(void *);
-extern void func_PAL_L05_004267E0(void *), func_PAL_L05_00426930(void *);
-extern void func_PAL_0029C0F0(int, void *);
+extern void feltzin_mission_three_update_pal(void *), UpdateFeltzinGateCourse_pal(void *);
+extern void level_store_value_pair_pal(int, void *);
 extern int cam_is_mode_active(void);
-extern void func_PAL_L05_004253C8(void), func_PAL_L05_00425518(void);
+extern void feltzin_challenge_reset_free_records_pal(void), func_PAL_L05_00425518(void);
 extern s32 func_PAL_L05_00422CA8(void);
 extern int feltzin_target_damage(char *, int);
-extern int D_L05_001B1360 __attribute__((sda));
-extern int D_L05_001B13B0 __attribute__((sda));
-extern int D_L05_001B13E8 __attribute__((sda));
-extern int D_L05_001B13DC __attribute__((sda));
-extern int D_L05_001B1364 __attribute__((sda));
-extern int D_L05_001B13B4 __attribute__((sda));
-extern int D_L05_001B13B8 __attribute__((sda));
-extern int D_L05_001B13BC __attribute__((sda));
-extern int D_L05_001B1390 __attribute__((sda));
-extern int D_L05_001B1394 __attribute__((sda));
-extern int D_L05_001B1398 __attribute__((sda));
-extern int D_L05_001B13A8 __attribute__((sda));
-extern int D_L05_001B13AC __attribute__((sda));
-extern int D_L05_001B13D8 __attribute__((sda));
-extern int D_L05_001B1350 __attribute__((sda));
-extern int D_L05_001B13F4 __attribute__((sda));
-extern int D_L05_001B13D4 __attribute__((sda));
-extern int D_L05_001B13E0 __attribute__((sda));
-extern int D_L05_001B2048 __attribute__((sda));
-extern int D_L05_001B13F0 __attribute__((sda));
+extern int g_feltzin_menu_mode __attribute__((sda));
+extern int g_feltzin_controller_moby __attribute__((sda));
+extern int g_feltzin_needs_reset __attribute__((sda));
+extern int g_feltzin_active_slot_index __attribute__((sda));
+extern int g_feltzin_challenge_active __attribute__((sda));
+extern int g_feltzin_record_a __attribute__((sda));
+extern int g_feltzin_record_b __attribute__((sda));
+extern int g_feltzin_record_c __attribute__((sda));
+extern int g_feltzin_hud_sprite_a __attribute__((sda));
+extern int g_feltzin_hud_sprite_b __attribute__((sda));
+extern int g_feltzin_hud_sprite_c __attribute__((sda));
+extern int g_feltzin_intro_done __attribute__((sda));
+extern int g_feltzin_menu_opened __attribute__((sda));
+extern int g_feltzin_frame_counter __attribute__((sda));
+extern int g_feltzin_challenge_data __attribute__((sda));
+extern int g_feltzin_no_challenge_flag __attribute__((sda));
+extern int g_feltzin_init_flag_a __attribute__((sda));
+extern int g_feltzin_init_flag_b __attribute__((sda));
+extern int g_feltzin_mission_index __attribute__((sda));
+extern int g_feltzin_menu_started __attribute__((sda));
 /* func_PAL_L05_004227F0, the PAL copy of func_L05_0041DA20: the same C, where the frame counts are
    scaled to 50 Hz and the search for the first usable D_L05_002A1800 entry becomes D_L05_001B13DC = 1.
    The first frame resets the control record, the timers in the moby's state and the saved mode record,
@@ -78,60 +78,60 @@ void func_PAL_L05_004227F0(char *object)
         *(short *)(object + 0x32) = 0x1FF;
         *(unsigned char *)(object + 0x30) = 0xFF;
         object[0x20] = 1;
-        D_L05_00221D10.id = sub->id;
-        D_L05_00221D10.radius = 8.0f;
-        D_L05_001B1360 = -2;
-        D_L05_00221D10.enabled = 1;
-        D_L05_001B13B0 = (int)object;
-        D_L05_001B13DC = 1;
-        D_L05_001B1364 = 0;
-        D_L05_001B13B4 = 0;
-        D_L05_001B13B8 = 0;
-        D_L05_001B13BC = 0;
-        D_L05_001B1390 = 0;
-        D_L05_001B1394 = 0;
-        D_L05_001B1398 = 0;
-        D_L05_001B13A8 = 0;
-        D_L05_001B13AC = 0;
-        D_L05_001B13E8 = 1;
+        g_feltzin_challenge_state.id = sub->id;
+        g_feltzin_challenge_state.radius = 8.0f;
+        g_feltzin_menu_mode = -2;
+        g_feltzin_challenge_state.enabled = 1;
+        g_feltzin_controller_moby = (int)object;
+        g_feltzin_active_slot_index = 1;
+        g_feltzin_challenge_active = 0;
+        g_feltzin_record_a = 0;
+        g_feltzin_record_b = 0;
+        g_feltzin_record_c = 0;
+        g_feltzin_hud_sprite_a = 0;
+        g_feltzin_hud_sprite_b = 0;
+        g_feltzin_hud_sprite_c = 0;
+        g_feltzin_intro_done = 0;
+        g_feltzin_menu_opened = 0;
+        g_feltzin_needs_reset = 1;
         *(short *)(object + 0x32) = 0x1FF;
         *(unsigned char *)(object + 0x30) = 0xFF;
         object[0x20] = 1;
         sub->stage = 0;
-        D_L05_001B13D8 = 0;
+        g_feltzin_frame_counter = 0;
         sub->warmup = 4500; sub->delay = 6000;
         sub->first = 125; sub->second = 150;
         sub->third = 250; sub->fourth = 400;
         sub->fifth = 100; sub->timeout = 90000;
-        D_L05_001B3554[0] = 450;
-        D_L05_00221D10.callbacks[0] = func_PAL_L05_004253C8;
-        D_L05_00221D10.callbacks[1] = func_PAL_L05_00425518;
-        D_L05_00221D10.callbacks[2] = feltzin_target_damage;
-        D_L05_00221D10.object = object;
+        g_feltzin_countdown[0] = 450;
+        g_feltzin_challenge_state.callbacks[0] = feltzin_challenge_reset_free_records_pal;
+        g_feltzin_challenge_state.callbacks[1] = func_PAL_L05_00425518;
+        g_feltzin_challenge_state.callbacks[2] = feltzin_target_damage;
+        g_feltzin_challenge_state.object = object;
         hero_set_state_value_a(1);
         hero_set_state_value_b(0);
-        D_L05_001AA6A0[0] = (int)func_PAL_L05_004253C8;
-        D_L05_001AA6A8[0] = (int)func_PAL_L05_00425518;
-        D_L05_001B1350 = D_001395B8[0x61];
-        D_L05_001B1354[0] = D_001395B8[0x62];
-        D_L05_001B1358[0] = D_001395B8[0x63];
-        D_L05_001B135C[0] = D_001395B8[0x64];
-        if (!D_L05_001B1350) D_L05_001B13F4 = 1;
-        else D_L05_001B13F4 = 0;
+        g_feltzin_reset_callback[0] = (int)feltzin_challenge_reset_free_records_pal;
+        g_feltzin_shutdown_callback[0] = (int)func_PAL_L05_00425518;
+        g_feltzin_challenge_data = g_game_flag_table[0x61];
+        g_feltzin_challenge_param_a[0] = g_game_flag_table[0x62];
+        g_feltzin_challenge_param_b[0] = g_game_flag_table[0x63];
+        g_feltzin_challenge_param_c[0] = g_game_flag_table[0x64];
+        if (!g_feltzin_challenge_data) g_feltzin_no_challenge_flag = 1;
+        else g_feltzin_no_challenge_flag = 0;
         hero = g_hero_state;
-        D_L05_001B3558[0] = D_L05_001B2000[0];
-        D_L05_001B3559[0] = D_L05_001B2001[0];
-        D_L05_001B355A[0] = D_L05_001B2002[0];
-        D_L05_001B3560[0] = D_L05_001B2008[0];
-        D_L05_001B3568[0] = D_L05_001B2010[0];
-        D_L05_001B355C[0] = D_L05_001B2004[0];
-        D_L05_001B3564[0] = D_L05_001B200C[0];
-        D_L05_001B356C[0] = D_L05_001B2014[0];
-        D_L05_00221D10.mode = 4;
-        D_L05_00221D10.settings[0] = sub->a4;
-        D_L05_00221D10.settings[1] = sub->a8;
-        D_L05_00221D10.settings[2] = sub->aC;
-        D_L05_00221D10.settings[3] = sub->a10;
+        g_feltzin_record_flag_a[0] = g_ship_settings_byte_a[0];
+        g_feltzin_record_flag_b[0] = g_ship_settings_byte_b[0];
+        g_feltzin_record_flag_c[0] = g_ship_settings_byte_c[0];
+        g_feltzin_record_float_b[0] = g_ship_settings_float_a[0];
+        g_feltzin_record_float_d[0] = g_ship_settings_float_b[0];
+        g_feltzin_record_float_a[0] = g_ship_settings_float_c[0];
+        g_feltzin_record_float_c[0] = g_ship_settings_float_d[0];
+        g_feltzin_record_word[0] = g_ship_settings_word[0];
+        g_feltzin_challenge_state.mode = 4;
+        g_feltzin_challenge_state.settings[0] = sub->a4;
+        g_feltzin_challenge_state.settings[1] = sub->a8;
+        g_feltzin_challenge_state.settings[2] = sub->aC;
+        g_feltzin_challenge_state.settings[3] = sub->a10;
         p = *(char **)(hero + 0x2290);
         if (p)
             *(short *)(p+0x34) |= 0x41;
@@ -139,46 +139,46 @@ void func_PAL_L05_004227F0(char *object)
     case 1:
         one = 1;
         level_select_random_object();
-        level_store_pair_with_increment((int)(D_L05_001B2D84[0] * -230.0f + 0.5f), 2);
-        if (!D_L05_001B13D4) {
-            moby_set_flag_bit(D_L05_001B251C[0] + sub->target*256,1);
-            D_L05_001B13D4 = one;
-            D_L05_001B13D8 = 0;
+        level_store_pair_with_increment((int)(g_screen_l05_scale[0] * -230.0f + 0.5f), 2);
+        if (!g_feltzin_init_flag_a) {
+            moby_set_flag_bit(g_feltzin_target_mobys[0] + sub->target*256,1);
+            g_feltzin_init_flag_a = one;
+            g_feltzin_frame_counter = 0;
         }
-        if (D_L05_001B13D8++ < 5 || D_L05_001A8F00[0] == 2) break;
+        if (g_feltzin_frame_counter++ < 5 || g_game_mode_a[0] == 2) break;
         func_PAL_L00_002C4480(0x31,0);
-        if (D_L05_001B13E8) {
+        if (g_feltzin_needs_reset) {
             hero_set_state_value_c(1);
-            D_L05_001B1360 = func_PAL_L05_00423A68();
-            if (D_L05_001B1360 != -2) func_PAL_L05_0044BEB8();
+            g_feltzin_menu_mode = LockedEntryMenuInput_pal();
+            if (g_feltzin_menu_mode != -2) ship_save_transform_state_pal();
             break;
         }
-        if (!D_L05_001B13E0) {
+        if (!g_feltzin_init_flag_b) {
             func_PAL_00289730(0xA17,110);
-            D_L05_001B13E0 = one;
+            g_feltzin_init_flag_b = one;
         }
-        if (math_fast_float_d((char *)sub+0x54)) D_L05_00221D10.pending = 0;
-        else D_L05_00221D10.pending = one;
+        if (math_fast_float_d((char *)sub+0x54)) g_feltzin_challenge_state.pending = 0;
+        else g_feltzin_challenge_state.pending = one;
         hero_set_state_value_c(0);
-        if (D_L05_001B1360 != -2 && D_L05_001B2048 >= 3) {
-            switch (D_L05_001B1360) {
+        if (g_feltzin_menu_mode != -2 && g_feltzin_mission_index >= 3) {
+            switch (g_feltzin_menu_mode) {
             case 0: func_PAL_L05_004262B0(object); break;
             case 1: func_PAL_L05_00426658(object); break;
-            case 2: func_PAL_L05_004267E0(object); break;
-            case 3: func_PAL_L05_00426930(object); break;
+            case 2: feltzin_mission_three_update_pal(object); break;
+            case 3: UpdateFeltzinGateCourse_pal(object); break;
             }
         }
-        if (D_L05_001A904C && !D_L05_001B13A8 && !D_L05_001B13F0) {
-            func_PAL_0029C0F0(0,func_PAL_L05_00422CA8);
-            D_L05_001B13AC = 0;
-            D_L05_001B13A8 = 1;
+        if (g_feltzin_mission_data && !g_feltzin_intro_done && !g_feltzin_menu_started) {
+            level_store_value_pair_pal(0,func_PAL_L05_00422CA8);
+            g_feltzin_menu_opened = 0;
+            g_feltzin_intro_done = 1;
         }
         break;
     case 2: break;
     case 3:
         if (!cam_is_mode_active()) {
-            D_L05_00221D10.pending = 0;
-            D_L05_00221D10.count++;
+            g_feltzin_challenge_state.pending = 0;
+            g_feltzin_challenge_state.count++;
             object[0x20] = 1;
         }
         break;

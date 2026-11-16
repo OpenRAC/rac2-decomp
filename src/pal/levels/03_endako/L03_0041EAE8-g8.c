@@ -4,12 +4,12 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef signed int s32;
-extern u8 *D_L03_001B2A1C __attribute__((sda));
-extern s32 D_L03_001B108C __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
+extern s32 g_endako_boss_forced_behaviour __attribute__((sda));
 extern u8 *SpawnSpinningSparkParticle(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
 extern s32 flag_is_third_pending_set();
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_entity_id_lists[];
 typedef struct {
     u8 pad00[0x30];
     s32 field30;
@@ -18,13 +18,13 @@ typedef struct {
     u8 *field190;
     u8 *field194;
 } L03Block;
-extern L03Block D_L03_001BD680;
-extern s32 D_L03_001A8F00 __attribute__((sda));
+extern L03Block g_endako_state;
+extern s32 g_hero_l03_mode __attribute__((sda));
 extern void set_moby_color(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 moby_pack_handle(u8 *a0);
 extern void moby_set_light_color(u8 *a0, s32 a1);
 
-void func_PAL_L03_0041EAE8(u8 *entity) {
+void scripted_light_update_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 old, next, base, rem;
     s32 arg1, arg2, arg3;
@@ -35,18 +35,18 @@ void func_PAL_L03_0041EAE8(u8 *entity) {
         entity[0x20] = 1;
         return;
     case 1: {
-        s32 mode = D_L03_001A8F00;
+        s32 mode = g_hero_l03_mode;
 
         if (mode == 2) {
-            if (D_L03_001BD680.field30 == 5) {
-                if (D_L03_001BD680.field34 < 10) {
-                    *(u16 *)(D_L03_001BD680.field194 + 0x7C) = 0x3F;
+            if (g_endako_state.field30 == 5) {
+                if (g_endako_state.field34 < 10) {
+                    *(u16 *)(g_endako_state.field194 + 0x7C) = 0x3F;
                 }
             }
-            if (D_L03_001BD680.field30 == 7) {
-                u8 *obj = D_L03_001BD680.field190;
-                if (D_L03_001BD680.field34 < 0x376) goto other;
-                if (D_L03_001BD680.field34 >= 0x3B3) goto other;
+            if (g_endako_state.field30 == 7) {
+                u8 *obj = g_endako_state.field190;
+                if (g_endako_state.field34 < 0x376) goto other;
+                if (g_endako_state.field34 >= 0x3B3) goto other;
                 old = *(s32 *)state;
                 next = old + 1;
                 *(s32 *)state = next;
@@ -65,7 +65,7 @@ void func_PAL_L03_0041EAE8(u8 *entity) {
                 set_moby_color(obj, arg1, arg2, arg3);
                 return;
             other:
-                if (D_L03_001BD680.field34 < 0x395) {
+                if (g_endako_state.field34 < 0x395) {
                     *(s32 *)(state + 4) = moby_pack_handle(obj);
                 } else {
                     moby_set_light_color(obj, *(s32 *)(state + 4));

@@ -26,7 +26,7 @@
 #define H(p,o) (*(short *)((p)+(o)))
 typedef unsigned int AttackQuad __attribute__((mode(TI)));
 typedef struct { int v[5]; } AttackChoices;
-extern AttackChoices D_L04_001B0A10;
+extern AttackChoices g_attack_choices;
 extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } g_hero_state;
 typedef struct {
  unsigned char pad0[0x260]; int triggerList;
@@ -42,15 +42,15 @@ typedef struct {
 typedef struct { int unused, flags; unsigned char pad8[0x38]; } AttackSettings;
 extern AttackSettings g_race_challenge_table[];
 
-extern unsigned char *D_L04_001C3B40[];
+extern unsigned char *g_special_moby_list[];
 extern int g_current_race_index __attribute__((sda));
-extern int D_00138320 NOT_SDA,D_00138324 NOT_SDA;
+extern int g_pad_pressed_flags NOT_SDA,g_pad_held_flags NOT_SDA;
 extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int coll_process_hit(void *,float,int,void *,int);
 extern int moby_is_in_special_class_range(void *);
 extern void part_queue_impact_effect(void *,void *,int,void *,void *,float);
-extern void func_PAL_L04_00412AA0(void *);
+extern void racer_update_boost_pal(void *);
 extern int GetFirstMobyInGroup(void *,int,int,int);
 extern int GetNextMobyInGroup(void *,void *,int,int);
 extern void FastVecSub(void *,void *,void *);
@@ -73,16 +73,16 @@ void func_PAL_L04_00413590(unsigned char *m)
  AttackChoices choices;
  float origin[4],dir[4],delta[4],probe[4],temp[4];
  unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *p=*(AttackState **)(m+0x68); unsigned char *d; int count,i,state,choice;
- choices=D_L04_001B0A10;
+ choices=g_attack_choices;
  FastVecScale(probe,p->offset,3);
  FastVecAdd(probe,probe,((unsigned char *)&g_hero_state + 0xe0));
  count=coll_process_hit(probe,0.7f,0,g_hero_state.hero,0);
  if(count) {
   FastVecScale(delta,p->offset,7);
-  for(i=0;i<count;i++) if(moby_is_in_special_class_range(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85)
-   part_queue_impact_effect(D_L04_001C3B40[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
+  for(i=0;i<count;i++) if(moby_is_in_special_class_range(g_special_moby_list[i]) || H(g_special_moby_list[i],0xaa)==0x85)
+   part_queue_impact_effect(g_special_moby_list[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
  }
- func_PAL_L04_00412AA0(m);
+ racer_update_boost_pal(m);
  if((g_race_challenge_table[g_current_race_index].flags&1) && p->triggerList!=-1) {
   GetFirstMobyInGroup(&target,p->triggerList,0,0);
   while(target) {
@@ -109,7 +109,7 @@ void func_PAL_L04_00413590(unsigned char *m)
  switch(p->state) {
  case 0: break;
  case 1:
-  if(math_fast_float_d(&p->timer) && (D_00138320&5)) {
+  if(math_fast_float_d(&p->timer) && (g_pad_pressed_flags&5)) {
    p->timer=2;moby_transform_joint_to_world(m,((p->duration^1)&1),origin);
    if(p->elevated)vec_build_spherical_offset(dir,p->length+0.6f,F(m,0xf8),-p->tilt);
    else vec_build_spherical_offset(dir,p->length+0.6f,F(m,0xf8),-F(m,0xf4));
@@ -118,7 +118,7 @@ void func_PAL_L04_00413590(unsigned char *m)
   }return;
  case 2: {
   unsigned char *target; float tilt;
-  if(math_fast_float_d(&p->timer) && (D_00138324&5)) {
+  if(math_fast_float_d(&p->timer) && (g_pad_held_flags&5)) {
    yaw=0;extra=0;p->timer=25;moby_transform_joint_to_world(m,((p->duration^1)&1),origin);tilt=F(m,0xf8);
    if(p->elevated)vec_build_spherical_offset(dir,p->length+0.6f+p->height,tilt,yaw);
    else {vec_build_spherical_offset(dir,p->length+0.6f+p->height,tilt,-F(m,0xf4));yaw=F(m,0xf4);}
@@ -133,7 +133,7 @@ void func_PAL_L04_00413590(unsigned char *m)
    if(math_fast_float_d(&p->duration))p->state=0;
   }return; }
  case 3:
-  if(math_fast_float_d(&p->timer) && (D_00138324&5)) {
+  if(math_fast_float_d(&p->timer) && (g_pad_held_flags&5)) {
    p->timer=25;FastVecAdd(temp,m+16,p->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;func_PAL_L04_003FFF88(m,origin);
    if(math_fast_float_d(&p->duration))p->state=0;
   }

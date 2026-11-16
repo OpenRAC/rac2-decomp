@@ -9,7 +9,7 @@ extern void moby_transform_joint_to_world(void *, s32, void *);
 extern float math_random_float_range(float, float);
 extern char *part_spawn_spinning_fragment(void *, void *, void *, s32, float, float);
 
-void func_PAL_L16_00417020(u8 *owner)
+void snivelak_drop_falling_shot_pal(u8 *owner)
 {
     u8 *state = *(u8 **)(owner + 0x68);
     float point[4] __attribute__((aligned(16)));

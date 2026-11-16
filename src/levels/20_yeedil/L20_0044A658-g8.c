@@ -5,7 +5,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B2418 __attribute__((sda));
+extern float g_turret_health_aim_scale __attribute__((sda));
 
 extern u32 g_hero_state[] __attribute__((nosda));
 
@@ -35,7 +35,7 @@ void turret_update_health_aim(char *moby) {
         *(int *)(moby + 0x98) = 0;
         qcopy((state + 0x180), (moby + 0x10));
         *(float *)(moby + 0x2C) =
-            *(float *)(*(u32 *)(moby + 0x24) + 0x24) * D_L20_001B2418;
+            *(float *)(*(u32 *)(moby + 0x24) + 0x24) * g_turret_health_aim_scale;
         *(int *)(state + 0x1B8) = -1;
     }
     if (*(u8 *)(moby + 0x20) == 1) {

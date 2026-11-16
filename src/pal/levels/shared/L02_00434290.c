@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 extern void func_0031E6A0(void *, int, int);
@@ -7,7 +8,7 @@ extern void func_0031E3C0(void *, int, int, int);
 
 /* Restarts the record's resident effect once it has settled, picking the
    variant by the resident query and the record's own byte 0x43. */
-void func_PAL_L02_00434290(u8 *a0) {
+void moby_start_idle_anim_variant_pal(u8 *a0) {
     u8 *s0 = a0;
 
     if (*(u8 *)(s0 + 0x20) != 0)

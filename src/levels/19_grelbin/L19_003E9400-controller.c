@@ -1,14 +1,14 @@
 #include "common.h"
 extern u8 g_hero_position[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_001A7B2F[1] __attribute__((sda));
-extern unsigned int D_001A7390[1] __attribute__((sda));
-extern unsigned int D_0018CE48[1];
-extern u8 *D_L19_001B2B0C __attribute__((sda));
+extern u8 g_mover_trigger_flag[1] __attribute__((sda));
+extern unsigned int g_frame_counter[1] __attribute__((sda));
+extern unsigned int g_linked_mover_start_time[1];
+extern u8 *g_linked_object_table __attribute__((sda));
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern float D_L19_001B2628 __attribute__((sda));
-extern int D_L19_001C9FC0;
+extern float g_mover_current_value __attribute__((sda));
+extern int g_mover_var_index;
 extern int IsPointInCuboid(void *, int);
 extern void moby_set_state(void *, int, int);
 extern int subtitle_request_voice_line(int,int);
@@ -30,22 +30,22 @@ void linked_object_mover_update(u8 *moby)
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *linked_moby, *linked_vars;
     if (I(vars,0x38) > 0 && IsPointInCuboid(g_hero_position,I(vars,0x38))) {
-        D_L19_001B2628 = F((u8 *)((I(vars,0x38) << 7) + (int)D_L19_001B2B0C),0x38);
+        g_mover_current_value = F((u8 *)((I(vars,0x38) << 7) + (int)g_linked_object_table),0x38);
     } else {
-        if (*(float *)((int)vars + (D_L19_001C9FC0 << 2)) > 0.0f)
-            D_L19_001B2628 = *(float *)((int)vars + (D_L19_001C9FC0 << 2));
+        if (*(float *)((int)vars + (g_mover_var_index << 2)) > 0.0f)
+            g_mover_current_value = *(float *)((int)vars + (g_mover_var_index << 2));
     }
     switch (moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
-        I(vars,0x24) = (D_0019B2E8[I(vars,0x20) + g_current_map_index * 16] >> 7) ^ 1;
+        I(vars,0x24) = (g_moby_group_flags[I(vars,0x20) + g_current_map_index * 16] >> 7) ^ 1;
         moby_set_state(moby,1,-1);
         break;
     case 1:
-        if (!D_001A7B2F[0] && IsPointInCuboid(g_hero_position,I(vars,0x10)) &&
-            D_001A7390[0] - D_0018CE48[0] > 3600U)
+        if (!g_mover_trigger_flag[0] && IsPointInCuboid(g_hero_position,I(vars,0x10)) &&
+            g_frame_counter[0] - g_linked_mover_start_time[0] > 3600U)
             subtitle_request_voice_line(0xA12,0x69);
-        if (D_0019B2E8[I(vars,0x20) + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[I(vars,0x20) + g_current_map_index * 16] & 0x80) {
             if (I(vars,0x24)) moby_set_state(moby,2,-1);
         }
         break;

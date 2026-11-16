@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-int func_PAL_L18_003FB3D8(void *arg0) {
+int protopet_is_action_finished_pal(void *arg0) {
     int var_a2;
     void *temp_a1;
 

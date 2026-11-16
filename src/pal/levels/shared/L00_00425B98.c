@@ -54,9 +54,9 @@ typedef struct {
     MoveState *state;              
 } MoveObject;
 extern HeroMove g_hero_state;
-extern int D_L00_001A8FF0[] __attribute__((sda));
-extern CamMove D_L00_001B8E20;
-extern int D_L00_001B9084;
+extern int g_hero_locked_flag[] __attribute__((sda));
+extern CamMove g_camera_move_state;
+extern int g_coll_grid_limit;
 extern void FastVecAdd(void *dst, void *a, void *b);
 extern float FastVecDot(void *a, void *b);
 
@@ -65,11 +65,11 @@ extern float FastVecDot(void *a, void *b);
    last frame raises the step's height. Then the step's component along the axis at
    D_L00_001B8E20 + 0x30 goes to the view's vector at +0x10, and in hero states 11 and 12
    the off-axis part is cancelled again with the vector at +0x80 scaled by +0xA4. */
-void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
+void TranslateObjectAndView_pal(MoveObject *object, TI128 *input)
 {
     TI128 delta, projected, correction, remainder;
     TI128 *step = &delta;
-    CamMove *cam = &D_L00_001B8E20;
+    CamMove *cam = &g_camera_move_state;
     MoveState *state = object->state;
     MoveView *view = &state->view;
     GroundMoby *ground;
@@ -78,7 +78,7 @@ void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
     delta = *input;
     ground = g_hero_state.ground;
     if (ground != 0) {
-        if (D_L00_001A8FF0[0] == 0) {
+        if (g_hero_locked_flag[0] == 0) {
             if (g_hero_state.flag348 == 0) {
                 if (ground == view->ground) {
                     height = ground->height - view->groundHeight;
@@ -107,7 +107,7 @@ void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
     FastVecAdd(&view->v10, &view->v10, &projected);
     if (g_hero_state.flag348 == 0 &&
         !(g_hero_state.ground != 0 && g_hero_state.ground->type == 0x22D &&
-          D_L00_001B9084 < 26))
+          g_coll_grid_limit < 26))
         object->state->f1E0 = ((float *)step)[3];
     if ((unsigned int)(g_hero_state.state - 11) < 2) {
         MoveState *next = object->state;

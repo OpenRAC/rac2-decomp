@@ -3,7 +3,7 @@
 
 extern void part_spawn_glow_in_front(char *);
 
-void func_PAL_L00_003CE538(char *object)
+void effect_update_in_state_one_pal(char *object)
 {
     if (*(unsigned char *)(object + 0x20) == 1)
         part_spawn_glow_in_front(object);

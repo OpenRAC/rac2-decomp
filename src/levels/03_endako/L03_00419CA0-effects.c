@@ -16,12 +16,12 @@ extern void moby_mark_spawned(void *);
 
 /* At -G0, the assembler emits GP accesses in delay slots and absolute
  * accesses elsewhere for this counter. The settings below use explicit GP views. */
-extern int D_L03_001AEBF8 __attribute__((sda));
+extern int g_arc_effect_count __attribute__((sda));
 
-extern int D_L03_001B1AD0 SDATA(D_L03_001B1AD0) __attribute__((sda));
-extern float D_L03_001B1AB0[2] SDATA(D_L03_001B1AB0) __attribute__((sda));
-extern float D_L03_001B1AA8[2] SDATA(D_L03_001B1AA8) __attribute__((sda));
-extern float D_L03_001B1AA0[2] SDATA(D_L03_001B1AA0) __attribute__((sda));
+extern int g_breakable_flag_bit SDATA(D_L03_001B1AD0) __attribute__((sda));
+extern float g_breakable_piece_lifetimes[2] SDATA(D_L03_001B1AB0) __attribute__((sda));
+extern float g_breakable_piece_spin[2] SDATA(D_L03_001B1AA8) __attribute__((sda));
+extern float g_breakable_piece_speeds[2] SDATA(D_L03_001B1AA0) __attribute__((sda));
 
 /* Waits for a hit, then blows up with sparks and flying bits. */
 void endako_breakable_update(u8 *moby) {
@@ -37,18 +37,18 @@ void endako_breakable_update(u8 *moby) {
         part_spawn_object_following_effect(a, moby, 0x28208080, -1, 0, -1, 0, 0x60, 367500.0f, 0.0f);
         part_spawn_object_following_effect(a, moby, 0x20208080, -1, 1, -1, 0, 0x60, 325500.0f, 0.75f);
         if (*(int *)vars)
-            --D_L03_001AEBF8;
+            --g_arc_effect_count;
         moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !*(int *)vars) {
-            --D_L03_001AEBF8;
+            --g_arc_effect_count;
             moby_set_state(moby, 2, -1);
         }
         moby[0xA8] = 255;
         break;
     case 2:
-        part_explode_object_into_pieces(moby, D_L03_001B1AB0, D_L03_001B1AA8, D_L03_001B1AA0, 127, 0, D_L03_001B1AD0, 1, 65535, 255, 0);
+        part_explode_object_into_pieces(moby, g_breakable_piece_lifetimes, g_breakable_piece_spin, g_breakable_piece_speeds, 127, 0, g_breakable_flag_bit, 1, 65535, 255, 0);
         part_spawn_scaled_bolts(moby, 1, 3.0f);
         *(Quad *)b = zero;
         moby_compute_local_point(moby, a, 0, 0, *(float *)(moby+0x2C)*20.0f);
@@ -63,8 +63,8 @@ void endako_breakable_update(u8 *moby) {
             matrix_mul_vec3(d, d, moby+0xC0);
             SpawnTintedEffects(0.25f, moby, c, 6, 1, d, 0x50404040, 0, 5, 0.75f, 1.25f);
         }
-        if (D_L03_001B1AD0 >= 0) {
-            *(u16 *)(moby+0x7C)=(1<<D_L03_001B1AD0)|0x8000;
+        if (g_breakable_flag_bit >= 0) {
+            *(u16 *)(moby+0x7C)=(1<<g_breakable_flag_bit)|0x8000;
             moby_set_state(moby, 3, -1);
         } else {
             moby_mark_spawned(moby);

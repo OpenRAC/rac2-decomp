@@ -6,16 +6,16 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_spawn_spark_puff(void *);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L14_001AC790 __attribute__((sda));
-extern int D_L14_001B2D30 __attribute__((sda)), D_L14_001B2D38 __attribute__((sda));
-extern Collision D_L14_001BF940;
-extern Material D_L14_002686F0[];
+extern int g_debris_l14_model_ptr __attribute__((sda));
+extern int g_ripple_l14_x __attribute__((sda)), g_ripple_l14_y __attribute__((sda));
+extern Collision g_projectile_l14_collision;
+extern Material g_item_l14_materials[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -64,8 +64,8 @@ extern void func_2F5D68(void *dst, void *src, void *mtx);
 extern void func_3910E0(char *a0, char *a1, int a2, int a3, int t0, int t1, int t2,
                         float f12, float f13, float f14, float f15, float f16);
 
-extern char D_0018A0E0[];
-extern char D_L14_00237B00[];
+extern char g_hero_state_block[];
+extern char g_effect_entry_table_a[];
 
 /* func_L14_00304190 is defined in L14_00304190-zp.c (it clears a stack vector with por, which needs -frac2-zero-ti-por). */
 
@@ -141,7 +141,7 @@ void moby_pass_pos_rot_to_helper(char *moby, char *offset, char *extra) {
 /* Sets up four pairs of entries from two tables, using the settings stored in the object. */
 void part_setup_effect_entry_pairs(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    char *table_a = D_L14_00237B00;
+    char *table_a = g_effect_entry_table_a;
     char *table_b = table_a + 0x400;
     int i;
 
@@ -203,7 +203,7 @@ void debris_l14_update(unsigned char *moby) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L14_002686F0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l14_materials + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -215,14 +215,14 @@ void debris_l14_update(unsigned char *moby) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L14_001B2D30, D_L14_001B2D38, 1,
+            RippleDisturb(g_ripple_l14_x, g_ripple_l14_y, 1,
                 *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(moby + 0x10);
             frame.position.f[1] = *(float *)(moby + 0x14);
-            frame.position.f[2] = D_L14_001BF940.point.f[2];
+            frame.position.f[2] = g_projectile_l14_collision.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -242,16 +242,16 @@ void debris_l14_update(unsigned char *moby) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L14_001BF940;
+            Collision *collision = &g_projectile_l14_collision;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L14_001BF940;
+                reread = &g_projectile_l14_collision;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L14_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_debris_l14_model_ptr && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 moby[0xBC] = 1;
                 qcopy(moby + 0x10, &reread->point);
@@ -313,7 +313,7 @@ void projectile_l14_update(char *moby) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L14_002686F0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l14_materials)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -323,16 +323,16 @@ void projectile_l14_update(char *moby) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, moby, &frame.packet)) {
-        collision = &D_L14_001BF940;
+        collision = &g_projectile_l14_collision;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L14_001BF940;
+            reread = &g_projectile_l14_collision;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L14_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_debris_l14_model_ptr && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             moby[0xBC] = 1;
             {
@@ -344,7 +344,7 @@ void projectile_l14_update(char *moby) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L14_001BF940;
+            collision = &g_projectile_l14_collision;
             if (collision->count <= 0)
                 goto finish;
             moby[0xBC] = 1;
@@ -396,7 +396,7 @@ extern unsigned short *g_group_entity_lists[];
 
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 
 /* The twin of func_L14_003DF200 for the group word at +0x64: the same pass over the entities
    of the owner's group (not the states 0xFE and 0xFD, not the class 0xA59, accepted by
@@ -413,7 +413,7 @@ void lift_clamp_group_riders_wide(char *self) {
 
     matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = g_group_entity_lists[*(int *)(state + 0x64)];
-         (*(int *)(state + 0x64) & 0xFF) != 0xFF && *(int *)(state + 0x64) <= D_L14_001B25B8 &&
+         (*(int *)(state + 0x64) & 0xFF) != 0xFF && *(int *)(state + 0x64) <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x64)]);
          p++) {
         entity = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
@@ -678,7 +678,7 @@ extern unsigned short *g_group_entity_lists[];
 
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 
 /* For every entity of the owner's group (state word 0x68), other than the two states 0xFE and
    0xFD, that func_L14_003C9548 accepts: takes its offset from the owner in the owner's frame;
@@ -694,7 +694,7 @@ void lift_clamp_group_riders(char *self) {
 
     matrix_from_basis_rows(mtx, self + 0xC0);
     for (p = g_group_entity_lists[*(int *)(state + 0x68)];
-         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= D_L14_001B25B8 &&
+         (*(int *)(state + 0x68) & 0xFF) != 0xFF && *(int *)(state + 0x68) <= g_group_link_limit &&
          p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x68)]);
          p++) {
         entity = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
@@ -921,7 +921,7 @@ void keyed_group_update(unsigned char *self)
     switch (self[0x20]) {
     case 0:
         for (p = g_group_entity_lists[self[0x21]];
-             self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && p != 0 &&
+             self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && p != 0 &&
              ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self[0x21]]);
              p++) {
             entity = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
@@ -956,7 +956,7 @@ void keyed_group_update(unsigned char *self)
         if (FastDecTimer((char *)(state + 0x14)) != 0) {
             *(unsigned short *)(state + 0x14) = *(unsigned short *)(state + 0x34);
             for (p = g_group_entity_lists[self[0x21]];
-                 self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && p != 0 &&
+                 self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && p != 0 &&
                  ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self[0x21]]);
                  p++) {
                 entity = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
@@ -967,7 +967,7 @@ void keyed_group_update(unsigned char *self)
             }
         }
         for (q = g_group_entity_lists[self[0x21]];
-             self[0x21] != 0xFF && self[0x21] <= D_L14_001B25B8 && q != 0 &&
+             self[0x21] != 0xFF && self[0x21] <= g_group_link_limit && q != 0 &&
              ((q != 0 && (short)q[-1] >= 0) || q == g_group_entity_lists[self[0x21]]);
              q++) {
             entity = g_moby_l14_pool + ((*q & 0x7FFF) << 8);

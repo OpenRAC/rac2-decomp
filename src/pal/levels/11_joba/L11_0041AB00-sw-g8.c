@@ -4,8 +4,8 @@
 typedef int Vector128 __attribute__((mode(TI)));
 extern u8 *g_moby_l11_table;
 extern u8 g_sound_state[];
-extern Vector128 D_L11_001A8F20 __attribute__((sda));
-extern s32 D_L11_001B0D88 __attribute__((sda));
+extern Vector128 g_identity_l11_matrix __attribute__((sda));
+extern s32 g_pulsing_platform_linked_counter __attribute__((sda));
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern void vec_scale_to_length(void *, void *, f32);
@@ -26,7 +26,7 @@ void func_PAL_L11_0041B2E8(u8 *arg0) {
         *(u8 *)(entity + 0x20) = 1;
         *(f32 *)(state + 0x6C) = 3.1415927410125732f;
         *(s32 *)(state + 0x70) = 0;
-        D_L11_001B0D88 = 0;
+        g_pulsing_platform_linked_counter = 0;
         qcopy(state + 0x80, entity + 0x10);
         /* fall through */
     case 1: {
@@ -99,5 +99,5 @@ void func_PAL_L11_0041B2E8(u8 *arg0) {
         break;
     }
     }
-    mat_combine_and_store(state + 0x20, &D_L11_001A8F20, entity + 0xF0, entity + 0xF0);
+    mat_combine_and_store(state + 0x20, &g_identity_l11_matrix, entity + 0xF0, entity + 0xF0);
 }

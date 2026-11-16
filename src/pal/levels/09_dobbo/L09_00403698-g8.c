@@ -7,8 +7,8 @@ extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern float D_L09_001B13BC __attribute__((sda));
-extern char *D_L09_001FE6C0[];
+extern float g_dobbo_height_base_offset __attribute__((sda));
+extern char *g_path_l09_table[];
 typedef struct {
     char pad_0[0x28];
     signed char field_28;
@@ -94,7 +94,7 @@ void func_PAL_L09_00407C08(char *obj) {
     float value;
     int one;
     data->field_288 = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
-    value = data->field_288 + D_L09_001B13BC;
+    value = data->field_288 + g_dobbo_height_base_offset;
     data->field_294 = value;
     if (value < data->field_264) data->field_294 = data->field_264;
     data->field_274 = -1;
@@ -114,7 +114,7 @@ void func_PAL_L09_00407C08(char *obj) {
     data->field_78 = 0.012f;
     data->field_7C = data->field_74 = 0.006f;
     data->field_80 = 0.5f;
-    data->field_84 = D_L09_001B13BC;
+    data->field_84 = g_dobbo_height_base_offset;
     data->field_8C = 0.4f;
     data->field_C3 = data->field_C2 = data->field_BF = data->field_BE = data->field_BD = data->field_BC = -1;
     data->field_C6 = one;
@@ -139,7 +139,7 @@ void func_PAL_L09_00407C08(char *obj) {
     data->field_28C = data->field_240;
     data->field_30 = 0;
     if (data->field_250 != -1) {
-        qcopy(obj+0x10, D_L09_001FE6C0[data->field_250] + 0x10);
+        qcopy(obj+0x10, g_path_l09_table[data->field_250] + 0x10);
         moby_set_state(obj, 1, 0);
     } else moby_set_state(obj, 2, 2);
     if (*(unsigned char *)(obj+0x43)) func_PAL_002A7E68(obj, 0, 0, 1);
@@ -151,13 +151,13 @@ void func_PAL_L09_00407C08(char *obj) {
  * scaled to 50 Hz.
  */
 extern void vec_scale_to_length(float, void *, void *);
-extern float D_L09_001B11C0 __attribute__((sda));
-extern float D_L09_001B11D0 __attribute__((sda));
-extern s32 D_L09_001B1280 __attribute__((sda));
-extern s32 D_L09_001B11B8 __attribute__((sda));
-extern s32 D_L09_001B11C8 __attribute__((sda));
-extern s32 D_L09_001B11C4 __attribute__((sda));
-extern s32 D_L09_001B11CC __attribute__((sda));
+extern float g_dobbo_shot_speed __attribute__((sda));
+extern float g_dobbo_projectile_size __attribute__((sda));
+extern s32 g_dobbo_shot_interval __attribute__((sda));
+extern s32 g_dobbo_shot_sound __attribute__((sda));
+extern s32 g_dobbo_shot_cooldown __attribute__((sda));
+extern s32 g_dobbo_burst_count __attribute__((sda));
+extern s32 g_dobbo_shot_delay __attribute__((sda));
 extern float vec_distance_xy(char *a0, char *a1);
 extern void moby_transform_joint_point(char *a0, s32 a1, void *a2);
 extern void FastVecSub(float *a0, char *a1, float *a2);
@@ -180,21 +180,21 @@ void func_PAL_L09_00403698(char *a0) {
                 } else {
                     FastVecSub(va, s2 + 0x390, matrix + 12);
                 }
-                vec_scale_to_length(D_L09_001B11C0 * 0.020000001f, va, va);
-                projectile_l09_spawn(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
-                if (*(u8 *)(s2 + 0x42A) % D_L09_001B1280 == 0)
-                    PlayMobySound(D_L09_001B11B8, 0, a0);
+                vec_scale_to_length(g_dobbo_shot_speed * 0.020000001f, va, va);
+                projectile_l09_spawn(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), g_dobbo_projectile_size, 1.0f, 0.5f);
+                if (*(u8 *)(s2 + 0x42A) % g_dobbo_shot_interval == 0)
+                    PlayMobySound(g_dobbo_shot_sound, 0, a0);
                 *(u8 *)(s2 + 0x429) ^= 1;
                 *(u8 *)(s2 + 0x42A) += 1;
-                *(u8 *)(s2 + 0x428) = (D_L09_001B11C8 * 5 + 2) / 6;
-                if (D_L09_001B11C4 < *(u8 *)(s2 + 0x42A)) {
+                *(u8 *)(s2 + 0x428) = (g_dobbo_shot_cooldown * 5 + 2) / 6;
+                if (g_dobbo_burst_count < *(u8 *)(s2 + 0x42A)) {
                     *(u8 *)(s2 + 0x42A) = 0;
-                    *(u16 *)(s2 + 0x426) = (D_L09_001B11CC * 5 + 2) / 6;
+                    *(u16 *)(s2 + 0x426) = (g_dobbo_shot_delay * 5 + 2) / 6;
                 }
             }
         } else if (*(u8 *)(s2 + 0x428) == 0) {
             if (vec_fast_helper_a(s2 + 0x42A) == 0)
-                *(u8 *)(s2 + 0x428) = (D_L09_001B11C8 * 5 + 2) / 6;
+                *(u8 *)(s2 + 0x428) = (g_dobbo_shot_cooldown * 5 + 2) / 6;
         }
     }
 }

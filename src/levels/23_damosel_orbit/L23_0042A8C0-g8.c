@@ -15,55 +15,55 @@ typedef struct Edge_0042A8C0 {
 
 extern u8 *g_mothership_boss_moby MACRO_ADDR;
 
-extern float D_L23_001B1470 MACRO_ADDR;
+extern float g_mothership_scale_factor MACRO_ADDR;
 
-extern float D_L23_001B39D0 MACRO_ADDR;
+extern float g_star_quad_scale MACRO_ADDR;
 
-extern s32 D_L23_001B1694 MACRO_ADDR;
+extern s32 g_charged_l23_blast_timer MACRO_ADDR;
 
-extern s32 D_L23_001B3934 MACRO_ADDR;
+extern s32 g_effect_link_count MACRO_ADDR;
 
-extern s32 D_L23_001B3980[] MACRO_ADDR;
+extern s32 g_trail_effect_cursors[] MACRO_ADDR;
 
-extern s32 D_L23_0025E9D0[];
+extern s32 g_effect_link_table[];
 
-extern Edge_0042A8C0 D_L23_002A7A70[];
+extern Edge_0042A8C0 g_trail_edge_table[];
 
-extern float D_L23_002A6390[][4];
+extern float g_star_quad_vertices[][4];
 
-extern float D_L23_0025EC40[][4];
+extern float g_trail_ribbon_endpoints[][4];
 
-extern float D_L23_001B1C60 __attribute__((sda));
+extern float g_trail_speed_scale __attribute__((sda));
 
-extern s16 D_L23_001B1B96 __attribute__((sda));
+extern s16 g_effect_sound_handle_b __attribute__((sda));
 
-extern s32 D_L23_001B1B98 __attribute__((sda));
+extern s32 g_trail_spawn_index __attribute__((sda));
 
 extern s32 D_L23_001B1B98_2 __asm__("D_L23_001B1B98") __attribute__((sda));
 
-extern float D_L23_001B1C4C __attribute__((sda));
+extern float g_trail_size_a __attribute__((sda));
 
-extern float D_L23_001B1C50 __attribute__((sda));
+extern float g_trail_size_b __attribute__((sda));
 
-extern float D_L23_001B1C54 __attribute__((sda));
+extern float g_trail_size_c __attribute__((sda));
 
-extern float D_L23_001B1C0C __attribute__((sda));
+extern float g_trail_matrix_param __attribute__((sda));
 
-extern float D_L23_001B1C34 __attribute__((sda));
+extern float g_trail_effect_arg_a __attribute__((sda));
 
-extern s32 D_L23_001B1C44 __attribute__((sda));
+extern s32 g_trail_effect_arg_c __attribute__((sda));
 
-extern s32 D_L23_001B1C48 __attribute__((sda));
+extern s32 g_trail_effect_arg_d __attribute__((sda));
 
-extern s32 D_L23_001B1C40 __attribute__((sda));
+extern s32 g_trail_effect_arg_b __attribute__((sda));
 
-extern u8 D_L23_001B1C58 __attribute__((sda));
+extern u8 g_trail_effect_byte_a __attribute__((sda));
 
-extern u8 D_L23_001B1C5C __attribute__((sda));
+extern u8 g_trail_effect_byte_b __attribute__((sda));
 
-extern s16 D_L23_001B1C38 __attribute__((sda));
+extern s16 g_trail_effect_short_a __attribute__((sda));
 
-extern s16 D_L23_001B1C3C __attribute__((sda));
+extern s16 g_trail_effect_short_b __attribute__((sda));
 
 extern void gfx_free_point_light(s32);
 
@@ -110,26 +110,26 @@ void hero_spawn_trail_effect(u8 *moby) {
     u8 *hero;
 
     if (g_mothership_boss_moby != 0) {
-        D_L23_001B39D0 = D_L23_001B1470 * D_L23_001B1C60;
-        if (D_L23_001B1B96 != -1) {
-            gfx_free_point_light(D_L23_001B1B96);
+        g_star_quad_scale = g_mothership_scale_factor * g_trail_speed_scale;
+        if (g_effect_sound_handle_b != -1) {
+            gfx_free_point_light(g_effect_sound_handle_b);
         }
         FastVecScale(v60, g_mothership_boss_moby + 0xE0, 5.0f);
         FastVecAdd(v60, v60, g_mothership_boss_moby + 0x10);
         r1 = math_random_float_range(0.0f, 1.3f) + 1.3f;
         r2 = math_random_float_range(0.0f, 1.3f) + 1.3f;
         r3 = math_random_float_range(0.0f, 1.35f) + 1.6f;
-        D_L23_001B1B96 = part_l00_alloc_effect_slot_2(v60, 10.0f, 0.0f, r1, r2, r3);
+        g_effect_sound_handle_b = part_l00_alloc_effect_slot_2(v60, 10.0f, 0.0f, r1, r2, r3);
         if (mothership_is_blast_cooling_down() == 0) {
             flag = 0;
-            f21 = D_L23_001B1C4C - D_L23_001B1C4C * 0.5f;
-            f20 = D_L23_001B1C50 - D_L23_001B1C50 * 0.5f;
-            f22 = D_L23_001B1C54 * 0.5f;
+            f21 = g_trail_size_a - g_trail_size_a * 0.5f;
+            f20 = g_trail_size_b - g_trail_size_b * 0.5f;
+            f22 = g_trail_size_c * 0.5f;
         } else {
             flag = 1;
-            f21 = D_L23_001B1C4C;
-            f22 = D_L23_001B1C54 * 1.6f;
-            f20 = D_L23_001B1C50;
+            f21 = g_trail_size_a;
+            f22 = g_trail_size_c * 1.6f;
+            f20 = g_trail_size_b;
         }
         vars = *(u8 **)(moby + 0x68);
         hero = g_mothership_boss_moby;
@@ -137,7 +137,7 @@ void hero_spawn_trail_effect(u8 *moby) {
         qcopy_nc(m + 4, hero + 0xD0);
         qcopy_nc(m + 8, hero + 0xE0);
         qzero_nc(m + 12);
-        func_L03_002EFB60(m, m, D_L23_001B1C0C);
+        func_L03_002EFB60(m, m, g_trail_matrix_param);
         qcopy(m + 12, g_mothership_boss_moby + 0x10);
         m[15] = 1.0f;
         rot = m;
@@ -145,21 +145,21 @@ void hero_spawn_trail_effect(u8 *moby) {
         v70[2] = *(float *)vars;
         euler_rotation_basis(m80, v70);
         multiply_matrix3x3(rot, rot, m80);
-        D_L23_001B1B98 = D_L23_001B1B98 + 1;
-        D_L23_001B1B98_2 = D_L23_001B1B98 % 15;
-        if (D_L23_001B1694 < 0) {
-            if (D_L23_001B1694 >= -0x45) {
-                D_L23_001B3980[D_L23_001B1B98_2] = D_L23_001B3980[D_L23_001B1B98_2] + 1;
+        g_trail_spawn_index = g_trail_spawn_index + 1;
+        D_L23_001B1B98_2 = g_trail_spawn_index % 15;
+        if (g_charged_l23_blast_timer < 0) {
+            if (g_charged_l23_blast_timer >= -0x45) {
+                g_trail_effect_cursors[D_L23_001B1B98_2] = g_trail_effect_cursors[D_L23_001B1B98_2] + 1;
             }
         }
-        D_L23_001B3980[D_L23_001B1B98_2] = D_L23_001B3980[D_L23_001B1B98_2] % D_L23_001B3934;
-        e = D_L23_0025E9D0[D_L23_001B3980[D_L23_001B1B98_2]];
-        transform_vector(vB0, D_L23_002A6390[D_L23_002A7A70[e].a], m);
-        transform_vector(vC0, D_L23_002A6390[D_L23_002A7A70[e].b], m);
-        qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2], vB0);
-        qcopy_nc(D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1], vC0);
-        ribbon_trail_create(D_L23_0025EC40[D_L23_001B1B98_2 * 2], moby, D_L23_0025EC40[D_L23_001B1B98_2 * 2 + 1],
-                          D_L23_001B1C58, D_L23_001B1C5C, D_L23_001B1C38, D_L23_001B1C3C, f21, f20, f22,
-                          D_L23_001B1C34, D_L23_001B1C40, D_L23_001B1C44, flag, D_L23_001B1C48, 0);
+        g_trail_effect_cursors[D_L23_001B1B98_2] = g_trail_effect_cursors[D_L23_001B1B98_2] % g_effect_link_count;
+        e = g_effect_link_table[g_trail_effect_cursors[D_L23_001B1B98_2]];
+        transform_vector(vB0, g_star_quad_vertices[g_trail_edge_table[e].a], m);
+        transform_vector(vC0, g_star_quad_vertices[g_trail_edge_table[e].b], m);
+        qcopy_nc(g_trail_ribbon_endpoints[D_L23_001B1B98_2 * 2], vB0);
+        qcopy_nc(g_trail_ribbon_endpoints[D_L23_001B1B98_2 * 2 + 1], vC0);
+        ribbon_trail_create(g_trail_ribbon_endpoints[D_L23_001B1B98_2 * 2], moby, g_trail_ribbon_endpoints[D_L23_001B1B98_2 * 2 + 1],
+                          g_trail_effect_byte_a, g_trail_effect_byte_b, g_trail_effect_short_a, g_trail_effect_short_b, f21, f20, f22,
+                          g_trail_effect_arg_a, g_trail_effect_arg_b, g_trail_effect_arg_c, flag, g_trail_effect_arg_d, 0);
     }
 }

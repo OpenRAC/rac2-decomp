@@ -3,22 +3,22 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Tuning words read by func_PAL_L08_003D7F30. */
-extern float D_L08_001B0338 __attribute__((sda));
-extern float D_L08_001B033C __attribute__((sda));
-extern float D_L08_001B0340 __attribute__((sda));
-extern float D_L08_001B0344 __attribute__((sda));
-extern unsigned char D_L08_001B0348 __attribute__((sda));
-extern int D_L08_001B034C __attribute__((sda));
-extern int D_L08_001B0350 __attribute__((sda));
-extern float D_L08_001B0354 __attribute__((sda));
-extern float D_L08_001B0358 __attribute__((sda));
-extern int D_L08_001B035C __attribute__((sda));
-extern int D_L08_001B0360 __attribute__((sda));
-extern int D_L08_001B0368 __attribute__((sda));
-extern int D_L08_001B036C __attribute__((sda));
+extern float g_seesaw_spark_speed_min __attribute__((sda));
+extern float g_seesaw_spark_speed_max __attribute__((sda));
+extern float g_seesaw_step_speed_min __attribute__((sda));
+extern float g_seesaw_step_speed_max __attribute__((sda));
+extern unsigned char g_seesaw_spark_angle_byte __attribute__((sda));
+extern int g_seesaw_spark_color_a __attribute__((sda));
+extern int g_seesaw_spark_color_b __attribute__((sda));
+extern float g_seesaw_spark_size_a __attribute__((sda));
+extern float g_seesaw_spark_size_b __attribute__((sda));
+extern int g_seesaw_ring_color_start __attribute__((sda));
+extern int g_seesaw_ring_color_end __attribute__((sda));
+extern int g_seesaw_ring_fade_param __attribute__((sda));
+extern int g_seesaw_ring_size_param __attribute__((sda));
 /* The frame counter: absolute loads, $gp in a delay slot. */
-extern int D_L08_001B2508 MACRO_ADDR;
-extern char D_L08_001B9B00[];
+extern int g_frame_l08_counter MACRO_ADDR;
+extern char g_hero_position_vec[];
 
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int math_random_int_below(int);
@@ -49,32 +49,32 @@ void func_PAL_L08_003D7F30(char *obj)
 
     moby_transform_joint_to_world(obj, 0, &joint);
     if (math_random_int_below(4) == 0) {
-        vec_random_direction(&velocity, D_L08_001B0338 * 0.020000001f, D_L08_001B033C * 0.020000001f);
-        b = D_L08_001B0348;
-        part_spawn_hero_relative(&joint, &velocity, D_L08_001B034C, b, math_random_int_below(255), 0, D_L08_001B0354);
+        vec_random_direction(&velocity, g_seesaw_spark_speed_min * 0.020000001f, g_seesaw_spark_speed_max * 0.020000001f);
+        b = g_seesaw_spark_angle_byte;
+        part_spawn_hero_relative(&joint, &velocity, g_seesaw_spark_color_a, b, math_random_int_below(255), 0, g_seesaw_spark_size_a);
         for (count = 2; count >= 0; count--) {
-            vec_random_direction(&step, D_L08_001B0340 * 0.020000001f, D_L08_001B0344 * 0.020000001f);
+            vec_random_direction(&step, g_seesaw_step_speed_min * 0.020000001f, g_seesaw_step_speed_max * 0.020000001f);
             FastVecAdd(&velocity, &velocity, &step);
-            b = D_L08_001B0348;
-            part_spawn_hero_relative(&joint, &velocity, D_L08_001B0350, b, math_random_int_below(255), 0, D_L08_001B0358);
+            b = g_seesaw_spark_angle_byte;
+            part_spawn_hero_relative(&joint, &velocity, g_seesaw_spark_color_b, b, math_random_int_below(255), 0, g_seesaw_spark_size_b);
         }
     }
-    FastVecSub(&ring, D_L08_001B9B00, &joint);
+    FastVecSub(&ring, g_hero_position_vec, &joint);
     vec_scale_to_length(&ring, &ring, -0.3f);
     vec_scale_to_length(&ring_step, &ring, 0.1f);
     FastVecAdd(&ring, &ring, &joint);
     for (k = 0; k < 4; k++) {
         spacing = 20;
-        frame = D_L08_001B2508;
+        frame = g_frame_l08_counter;
         t = IntToFloat(((s32)0xFF * 5 + 2) / 6
                           - ((s32)((frame + k * spacing) & 0xFF) * 5 + 2) / 6);
-        color = FastTweenColor(D_L08_001B035C, D_L08_001B0360, math_fabs(0.5f - t * 0.004716981f));
-        b = D_L08_001B2508 & 0xFF;
+        color = FastTweenColor(g_seesaw_ring_color_start, g_seesaw_ring_color_end, math_fabs(0.5f - t * 0.004716981f));
+        b = g_frame_l08_counter & 0xFF;
         if (k & 2)
             b = b * 2;
         if (k & 1)
             b = 0xFF - b;
-        part_spawn_fading(&ring, color, b, D_L08_001B036C, D_L08_001B0368, 2, 0,
+        part_spawn_fading(&ring, color, b, g_seesaw_ring_size_param, g_seesaw_ring_fade_param, 2, 0,
                       (IntToFloat(k) + 3.0f)
                           * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
         FastVecAdd(&ring, &ring, &ring_step);

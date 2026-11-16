@@ -24,14 +24,14 @@ typedef struct {
     unsigned char pad18[0x24FC - 0x24BC]; short flag_24fc;
 } HeroActionState;
 extern HeroActionState g_hero_state;
-extern unsigned int D_00138320[];
+extern unsigned int g_pad_pressed_flags[];
 extern int ref_L00_002CA898_00(int, int);
 extern void hero_resolve_stick_direction(int, float);
-extern void func_PAL_L00_002D2668(int, int, float);
+extern void set_hero_animation_pal(int, int, float);
 extern void hero_select_anim_frame(int, int);
 extern int ref_L00_002CA898_01(int);
 extern void vec_clamp_length(void *, float);
-extern int D_L00_001A7DDC __attribute__((sda));
+extern int g_hero_landing_anim_id __attribute__((sda));
 
 void func_PAL_L00_002CAC40(void)
 {
@@ -41,9 +41,9 @@ void func_PAL_L00_002CAC40(void)
         return;
     }
     hero_resolve_stick_direction(0, 1.0f);
-    if (D_00138320[0] & 8) {
+    if (g_pad_pressed_flags[0] & 8) {
         ref_L00_002CA898_00(4, 0);
-        func_PAL_L00_002D2668(0xD, 2, -2.0f);
+        set_hero_animation_pal(0xD, 2, -2.0f);
         hero_select_anim_frame(3, 0x12);
         return;
     }
@@ -56,7 +56,7 @@ void func_PAL_L00_002CAC40(void)
             amount = 7;
             if (g_hero_state.level_49c > 4) amount = 12;
             g_hero_state.frame = 1;
-            func_PAL_L00_002D2668(4, D_L00_001A7DDC, (float)amount);
+            set_hero_animation_pal(4, g_hero_landing_anim_id, (float)amount);
             g_hero_state.flag_40e = 1;
         }
         return;
@@ -64,7 +64,7 @@ void func_PAL_L00_002CAC40(void)
     if ((0.060000002f < g_hero_state.speed_178 && g_hero_state.level_49c > 2) ||
         g_hero_state.mode == 0x10) {
         if (ref_L00_002CA898_00(3, 0)) {
-            func_PAL_L00_002D2668(5, 0, -1.0f);
+            set_hero_animation_pal(5, 0, -1.0f);
             vec_clamp_length(g_hero_state.velocity, 0.10000001f);
         }
         return;
@@ -72,8 +72,8 @@ void func_PAL_L00_002CAC40(void)
     if (g_hero_state.level_49c < 11 && (g_hero_state.flags_c28 & 2) == 0) return;
     if (!ref_L00_002CA898_00(0, 0)) return;
     if (ref_L00_002CA898_01(0) == 0x51) {
-        func_PAL_L00_002D2668(ref_L00_002CA898_01(0), 0, 12.0f);
+        set_hero_animation_pal(ref_L00_002CA898_01(0), 0, 12.0f);
     } else if (g_hero_state.flags_c28 & 2) {
-        func_PAL_L00_002D2668(ref_L00_002CA898_01(0), 0, -2.0f);
+        set_hero_animation_pal(ref_L00_002CA898_01(0), 0, -2.0f);
     }
 }

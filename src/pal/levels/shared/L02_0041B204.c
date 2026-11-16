@@ -14,10 +14,10 @@ extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern float FastAddRotations(float,float);
 
-extern struct { char pad[0x464]; u8 flags[0]; } D_L02_0021E880;
-extern struct { char pad[0x464]; u8 flags[0]; } D_L02_0021F4F0;
+extern struct { char pad[0x464]; u8 flags[0]; } g_level_active_flags;
+extern struct { char pad[0x464]; u8 flags[0]; } g_cell_flags;
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 
 void func_PAL_L02_0041B204(u8 *object)
 {
@@ -25,10 +25,10 @@ void func_PAL_L02_0041B204(u8 *object)
     if (state->child && moby_is_state_six(state->child)) {
         unsigned short id;
         u8 *bits;
-        D_L02_0021E880.flags[*(short *)(state->child+0xB2)]=0;
-        D_L02_0021F4F0.flags[*(short *)(state->child+0xB2)]=0;
+        g_level_active_flags.flags[*(short *)(state->child+0xB2)]=0;
+        g_cell_flags.flags[*(short *)(state->child+0xB2)]=0;
         id=*(unsigned short *)(state->child+0xB2);
-        bits=&D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)];
+        bits=&g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)];
         {
             u8 value=*bits;
             u8 low=value&0xF8;

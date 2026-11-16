@@ -1,8 +1,8 @@
 #include "common.h"
 
 extern void FastVecScale(void *, void *, float);
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern char D_L04_001B9680[];
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern char g_tether_zero_vec[];
 extern void transform_vector(void *, void *, void *);
 
 extern void FastVecSub(f32 *,f32 *,f32 *);
@@ -63,9 +63,9 @@ extern void hero_start_pose_offset(float, float, float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int GetCollHitMaterial(void);
 extern void hero_resolve_stick_direction(int, float);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
-extern unsigned char D_L00_001B8C80[];
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
+extern unsigned char g_scalar_transition_state[];
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -286,7 +286,7 @@ void hero_update_airborne_steering(void) {
             }
         }
         HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
-    } else if (HOP_PLAYER.state == 0x81 && !D_001A8FF0) {
+    } else if (HOP_PLAYER.state == 0x81 && !g_hero_height_zone_active) {
         hero_steer_heading(0, 0.04f, 0.2f, HOP_PLAYER.field494);
         HOP_PLAYER.ground_speed = 0.0f;
     } else {
@@ -318,7 +318,7 @@ void hero_update_airborne_steering(void) {
         hero_build_move_impulse(0.7f, 0.0f);
         qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
         rate = 0.0055555556900799274f;
-        if (HOP_PLAYER.target_speed < D_001A7DC0 * 0.0033333336468786f) {
+        if (HOP_PLAYER.target_speed < g_hero_airborne_speed_limit * 0.0033333336468786f) {
             if (HOP_PLAYER.control_mode == 2) {
                 float decel = HOP_PLAYER.fieldA84;
 
@@ -606,16 +606,16 @@ typedef struct {
     TblEntry entries[64];
     u32 count;
 } Tbl;
-extern Tbl D_L04_00231E00;
+extern Tbl g_water_splash_table;
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 typedef unsigned int B352Quad __attribute__((mode(TI)));
 typedef union { B352Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern int D_L04_001AC790 __attribute__((sda));
-extern Collision D_L04_001BFAC0;
+extern int g_debris_l04_model_id __attribute__((sda));
+extern Collision g_probe_hit;
 extern int CollLine(void *, void *, int, void *, void *);
 
 /* func_L04_003C3BA0 is matched in L04-particle-emitter-g8.c. */
@@ -641,40 +641,40 @@ typedef struct {
     f32 w;
 } L04SpawnRecord;
 
-extern L04SpawnRecord D_L04_0023BDD0[];
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern L04SpawnRecord g_particle_positions[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #ifndef MACRO_ADDR
 #define MACRO_ADDR __attribute__((section(".sdata")))
 #endif
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 
 /* A sixteen-byte record per spawn slot (L04SpawnRecord, above). */
 
-extern L04SpawnRecord D_L04_0023BDD0[];
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern L04SpawnRecord g_particle_positions[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
 /* adds VALUE to the running total and returns the total as it was before */

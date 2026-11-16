@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L30_001B2A68 __attribute__((sda));
-extern short D_0018A000;
+extern int g_museum_tweak_menu_active __attribute__((sda));
+extern short g_menu_command_flag;
 extern unsigned long long g_pad_state[];
-extern unsigned char D_L30_001B3D30[];
-extern void *D_L30_00260E30[];
-extern int D_L30_00260F30[][2];
+extern unsigned char g_tweak_item_types[];
+extern void *g_tweak_item_ptrs[];
+extern int g_tweak_item_ranges[][2];
 extern void func_2EDB20(void *, void *);
 extern void func_323FB0(void *, int, int);
 extern void museum_tweak_menu_draw(char *);
@@ -16,19 +16,19 @@ extern int func_32C070(void *);
 extern char *museum_tweak_menu_spawn(void *);
 extern void MuseumTweakMenuAddItem(void *, void *, void *, int, int, int);
 extern char g_hero_position[];
-extern long D_00138320;
-extern char D_L30_001B1E28[];
-extern char D_L30_001B1E30[];
-extern char D_L30_001B1E48[];
-extern char D_L30_001B1E60[];
-extern char D_L30_001B1E78[];
-extern char D_L30_001B1E90[];
-extern char D_L30_001B1EA0[];
-extern char D_L30_001B1EA8[];
-extern char D_L30_001B1EB0[];
-extern char D_L30_001B1EB8[];
-extern char D_L30_001B1ED0[];
-extern char D_L30_001B1EE0[];
+extern long g_pad_pressed_flags;
+extern char g_str_tweak_toggle_label[];
+extern char g_str_tweak_value_label_a[];
+extern char g_str_tweak_value_label_b[];
+extern char g_str_tweak_value_label_c[];
+extern char g_str_tweak_value_label_d[];
+extern char g_str_tweak_value_label_e[];
+extern char g_str_tweak_color_label_a[];
+extern char g_str_tweak_color_label_b[];
+extern char g_str_tweak_color_label_c[];
+extern char g_str_tweak_flag_label_a[];
+extern char g_str_tweak_flag_label_b[];
+extern char g_str_tweak_flag_label_c[];
 char *museum_explosion_spawn(void *, float, int, int, int, int, int, int, int, int, int, int);
 extern int math_random_int_range(int, int);
 extern void moby_set_state(void *, int, int);
@@ -36,24 +36,24 @@ extern int IsPointInCuboid(void *, int);
 extern int ForceClaimNotice(int, int, int);
 extern int flag_set_first_pending(void *);
 extern unsigned char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
-extern unsigned char *D_L30_001FF940[];
-extern char D_L30_001B2110[];
-extern char D_L30_001B2120[];
-extern char D_L30_001B2130[];
-extern char D_L30_001B2140[];
-extern char D_L30_001B2150[];
-extern char D_L30_001B2158[];
-extern char D_L30_001B2160[];
-extern char D_L30_001B2168[];
-extern char D_L30_001B2178[];
-extern char D_L30_001B2188[];
-extern char D_L30_001B2198[];
-extern char D_L30_001B21A8[];
-extern char D_L30_001B21B8[];
-extern char D_L30_001B21C0[];
-extern char D_L30_001B21D0[];
-extern char D_L30_001B21E0[];
-extern char D_L30_001B21F0[];
+extern unsigned char *g_particle_l30_texture_table[];
+extern char g_str_effect_pos_x[];
+extern char g_str_effect_pos_y[];
+extern char g_str_effect_pos_z[];
+extern char g_str_effect_scale[];
+extern char g_str_effect_color_red[];
+extern char g_str_effect_color_green[];
+extern char g_str_effect_color_blue[];
+extern char g_str_effect_offset[];
+extern char g_str_effect_alpha_a[];
+extern char g_str_effect_alpha_b[];
+extern char g_str_effect_size_a[];
+extern char g_str_effect_size_b[];
+extern char g_str_effect_gravity[];
+extern char g_str_effect_particle_type[];
+extern char g_str_effect_particle_frame[];
+extern char g_str_effect_angle_a[];
+extern char g_str_effect_angle_b[];
 typedef struct { char pad[0x4c]; short minimum, maximum; } MuseumParticleBounds;
 
 extern void VU1_addGSregister(int, int);
@@ -63,14 +63,14 @@ extern void gfx_l05_draw_jittered_billboard_quad(void *, int, float, float, floa
 
 extern void func_42C028(int);
 extern void func_316DB8(char *);
-extern int D_0018C0E8;
+extern int g_slot_index_first;
 
 /* Restores a saved setting and removes the helper object this object created. */
 void museum_effect_object_release(char *moby) {
     char *vars = *(char **)(moby + 0x68);
 
     func_42C028(3);
-    D_0018C0E8 = *(int *)(vars + 0x5C);
+    g_slot_index_first = *(int *)(vars + 0x5C);
     func_316DB8(*(char **)(vars + 0x50));
 }
 
@@ -79,8 +79,8 @@ void museum_effect_object_release(char *moby) {
 void museum_tweak_menu_update(char *moby) {
     int *vars = *(int **)(moby + 0x68);
     int step = 0;
-    D_L30_001B2A68 = 1;
-    D_0018A000 = 5;
+    g_museum_tweak_menu_active = 1;
+    g_menu_command_flag = 5;
     func_2EDB20(museum_tweak_menu_draw, moby);
     if (g_pad_state[0x1A0 / 8] & 0x9000000000ULL) {
         func_316DB8(moby);
@@ -99,36 +99,36 @@ void museum_tweak_menu_update(char *moby) {
     }
     if (step && *(unsigned short *)(moby + 0x96) >= 5) {
         *(unsigned short *)(moby + 0x96) = 0;
-        switch (D_L30_001B3D30[vars[0]]) {
+        switch (g_tweak_item_types[vars[0]]) {
         case 0: {
-            int value = *(int *)D_L30_00260E30[vars[0]];
+            int value = *(int *)g_tweak_item_ptrs[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
-            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
-            *(int *)D_L30_00260E30[vars[0]] = value;
+            if (value > g_tweak_item_ranges[vars[0]][1]) value = g_tweak_item_ranges[vars[0]][1];
+            else if (value < g_tweak_item_ranges[vars[0]][0]) value = g_tweak_item_ranges[vars[0]][0];
+            *(int *)g_tweak_item_ptrs[vars[0]] = value;
             break;
         }
         case 1: {
-            float value = *(float *)D_L30_00260E30[vars[0]] + step * 0.01f;
-            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
-            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
-            *(float *)D_L30_00260E30[vars[0]] = value;
+            float value = *(float *)g_tweak_item_ptrs[vars[0]] + step * 0.01f;
+            if (value > g_tweak_item_ranges[vars[0]][1]) value = g_tweak_item_ranges[vars[0]][1];
+            else if (value < g_tweak_item_ranges[vars[0]][0]) value = g_tweak_item_ranges[vars[0]][0];
+            *(float *)g_tweak_item_ptrs[vars[0]] = value;
             break;
         }
         case 2: {
-            unsigned char value = *(unsigned char *)D_L30_00260E30[vars[0]];
+            unsigned char value = *(unsigned char *)g_tweak_item_ptrs[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
-            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
-            *(unsigned char *)D_L30_00260E30[vars[0]] = value;
+            if (value > g_tweak_item_ranges[vars[0]][1]) value = g_tweak_item_ranges[vars[0]][1];
+            else if (value < g_tweak_item_ranges[vars[0]][0]) value = g_tweak_item_ranges[vars[0]][0];
+            *(unsigned char *)g_tweak_item_ptrs[vars[0]] = value;
             break;
         }
         case 3: {
-            short value = *(short *)D_L30_00260E30[vars[0]];
+            short value = *(short *)g_tweak_item_ptrs[vars[0]];
             value += step;
-            if (value > D_L30_00260F30[vars[0]][1]) value = D_L30_00260F30[vars[0]][1];
-            else if (value < D_L30_00260F30[vars[0]][0]) value = D_L30_00260F30[vars[0]][0];
-            *(short *)D_L30_00260E30[vars[0]] = value;
+            if (value > g_tweak_item_ranges[vars[0]][1]) value = g_tweak_item_ranges[vars[0]][1];
+            else if (value < g_tweak_item_ranges[vars[0]][0]) value = g_tweak_item_ranges[vars[0]][0];
+            *(short *)g_tweak_item_ptrs[vars[0]] = value;
             break;
         }
         }
@@ -155,7 +155,7 @@ void UpdateMuseumExplosionTester(char *moby) {
     case 1:
         if (*(int *)(vars + 0x3C) != -1 && func_326868(g_hero_position, *(int *)(vars + 0x3C))) {
             func_32B1B0(1, 0x27E6, 1);
-            buttons = D_00138320;
+            buttons = g_pad_pressed_flags;
             buttons &= 3;
             if (buttons == 3) func_320FD0(moby, 2, -1);
         }
@@ -163,18 +163,18 @@ void UpdateMuseumExplosionTester(char *moby) {
     case 2:
         if (func_32C070(moby)) {
             *(char **)(vars + 0x2C) = museum_tweak_menu_spawn(moby);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 4, D_L30_001B1E28, 1, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 12, D_L30_001B1E30, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 16, D_L30_001B1E48, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 20, D_L30_001B1E60, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 24, D_L30_001B1E78, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 28, D_L30_001B1E90, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 32, D_L30_001B1EA0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 36, D_L30_001B1EA8, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 40, D_L30_001B1EB0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 48, D_L30_001B1EB8, 0, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 52, D_L30_001B1ED0, 0, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 8, D_L30_001B1EE0, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 4, g_str_tweak_toggle_label, 1, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 12, g_str_tweak_value_label_a, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 16, g_str_tweak_value_label_b, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 20, g_str_tweak_value_label_c, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 24, g_str_tweak_value_label_d, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 28, g_str_tweak_value_label_e, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 32, g_str_tweak_color_label_a, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 36, g_str_tweak_color_label_b, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 40, g_str_tweak_color_label_c, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 48, g_str_tweak_flag_label_a, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 52, g_str_tweak_flag_label_b, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(vars + 0x2C), vars + 8, g_str_tweak_flag_label_c, 0, 0, 1);
 
         }
         func_32B1B0(1, 0, 1);
@@ -240,29 +240,29 @@ void UpdateMuseumParticleTester(char *moby) {
     case 1:
         if (*(int *)(vars + 0x48) != -1 && IsPointInCuboid(g_hero_position, *(int *)(vars + 0x48))) {
             ForceClaimNotice(1, 0x27E6, 1);
-            if ((D_00138320 & 3) == 3) moby_set_state(moby, 2, -1);
+            if ((g_pad_pressed_flags & 3) == 3) moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
         if (flag_set_first_pending(moby)) {
             *(char **)(vars + 0x3C) = museum_tweak_menu_spawn(moby);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x00, D_L30_001B2110, 1, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x04, D_L30_001B2120, 1, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x08, D_L30_001B2130, 1, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x10, D_L30_001B2140, 0, 1, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x14, D_L30_001B2150, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x18, D_L30_001B2158, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x1C, D_L30_001B2160, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x20, D_L30_001B2168, 0, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x24, D_L30_001B2178, 0, 0, 127);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x28, D_L30_001B2188, 0, 0, 127);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x2C, D_L30_001B2198, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x30, D_L30_001B21A8, 1, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x34, D_L30_001B21B8, 1, -1000, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x40, D_L30_001B21C0, 0, 0, 103);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x44, D_L30_001B21D0, 0, 0, 20);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4C, D_L30_001B21E0, 3, 0, 1000);
-            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4E, D_L30_001B21F0, 3, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x00, g_str_effect_pos_x, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x04, g_str_effect_pos_y, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x08, g_str_effect_pos_z, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x10, g_str_effect_scale, 0, 1, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x14, g_str_effect_color_red, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x18, g_str_effect_color_green, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x1C, g_str_effect_color_blue, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x20, g_str_effect_offset, 0, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x24, g_str_effect_alpha_a, 0, 0, 127);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x28, g_str_effect_alpha_b, 0, 0, 127);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x2C, g_str_effect_size_a, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x30, g_str_effect_size_b, 1, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x34, g_str_effect_gravity, 1, -1000, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x40, g_str_effect_particle_type, 0, 0, 103);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x44, g_str_effect_particle_frame, 0, 0, 20);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4C, g_str_effect_angle_a, 3, 0, 1000);
+            MuseumTweakMenuAddItem(*(char **)(vars + 0x3C), vars + 0x4E, g_str_effect_angle_b, 3, 0, 1000);
         }
         ForceClaimNotice(1, 0, 1);
         if (*(char **)(vars + 0x3C) == 0
@@ -285,7 +285,7 @@ void UpdateMuseumParticleTester(char *moby) {
                                  *(float *)(vars + 0x34), *(int *)(vars + 0x38));
         if (particle) {
             particle[9] = 0xFF;
-            particle[2] = D_L30_001FF940[*(int *)(vars + 0x40)][*(int *)(vars + 0x44)];
+            particle[2] = g_particle_l30_texture_table[*(int *)(vars + 0x40)][*(int *)(vars + 0x44)];
         }
     }
 }

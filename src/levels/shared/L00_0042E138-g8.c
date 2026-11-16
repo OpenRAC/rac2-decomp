@@ -17,7 +17,7 @@ extern void prompt_bar_set_spacing(void *object, float value);
 
 extern int menu_handle_page_input_c(char *object, int value);
 
-extern int D_L00_001AE1C8 __attribute__((sda));
+extern int g_prompt_bar_params_a __attribute__((sda));
 
 /* Builds a menu page: allocates its data, sets its colours, text and box, then shows the first choice. */
 void menu_build_page_a(char *object, int value)
@@ -39,7 +39,7 @@ void menu_build_page_a(char *object, int value)
     child = object + 8;
     ((float *) *(int *)(object + 0x2AC))[0] = 255.0f;
     ((float *) *(int *)(object + 0x2AC))[1] = 195.0f;
-    prompt_bar_init(child, value, &D_L00_001AE1C8);
+    prompt_bar_init(child, value, &g_prompt_bar_params_a);
     first = GetLocalizedString(0x2D61);
     second = GetLocalizedString(0x2D4E);
     prompt_bar_set_texts(child, first, second, GetLocalizedString(0x2D4F));

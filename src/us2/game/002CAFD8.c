@@ -16,10 +16,10 @@ typedef struct {
     char gap220[8];
     float f228, f22C;
 } ScreenState;
-extern ScreenState D_001B9040;
+extern ScreenState g_view_params;
 
 void func_US2_002CAFD8(void) {
-    ScreenState *view = &D_001B9040;
+    ScreenState *view = &g_view_params;
 
     view->f218 = 0.0f;
     view->f21C = 524288.0f;

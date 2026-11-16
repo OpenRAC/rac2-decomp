@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern float D_L02_001B038C __attribute__((sda));
-extern float D_L02_001B0388 __attribute__((sda));
+extern float g_sideways_push_hit_param __attribute__((sda));
+extern float g_sideways_push_length __attribute__((sda));
 extern char g_hero_state[];
-extern u8 *D_001C49C0[];
+extern u8 *g_moby_pointer_list_2[];
 
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -23,12 +23,12 @@ void moby_push_nearby_sideways(u8 *self)
     int i;
     char *game;
 
-    n = coll_process_hit(D_L02_001B038C, self + 0x10, 0, self, 0);
+    n = coll_process_hit(g_sideways_push_hit_param, self + 0x10, 0, self, 0);
     if (n == 0)
         return;
     for (i = 0; i < n; i++) {
         game = g_hero_state;
-        obj = D_001C49C0[i];
+        obj = g_moby_pointer_list_2[i];
         if (obj == *(u8 **)(game + 0x2290)) {
             qcopy(seen, game + 0x80);
             if (*(s32 *)(game + 0x340) == 0)
@@ -56,7 +56,7 @@ void moby_push_nearby_sideways(u8 *self)
         push[0] = -diff[1];
         push[1] = diff[0];
         push[2] = 0.0f;
-        vec_scale_to_length(push, push, D_L02_001B0388);
+        vec_scale_to_length(push, push, g_sideways_push_length);
         push[2] = 1.0f;
         push[3] = 5627.9248046875f;
         part_queue_impact_effect(obj, self, 0x10001, pos, push, (float)state[0x14]);

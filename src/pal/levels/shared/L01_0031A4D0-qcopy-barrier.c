@@ -4,7 +4,7 @@
 typedef int V4_002AE8C0 __attribute__((mode(TI)));
 extern int math_random_int_range(int, int);
 extern float math_random_signed_float_range(float, float);
-extern int func_PAL_L01_00323068(char *, float *);
+extern int moby_l01_turn_toward_target_pal(char *, float *);
 extern float coll_probe_ground_height_below(char *, int, float);
 extern float math_move_angle_toward_target(float, float, float);
 extern void StepAngleTowardTarget(float *, int, float, float);
@@ -20,7 +20,7 @@ typedef struct {
 extern GameState_189E20 g_hero_state;
 
 /* Hand-adapted from func_002AE8C0. */
-void func_PAL_L01_0031A4D0(char *obj, char *st, char *ctx)
+void enemy_update_wander_heading_pal(char *obj, char *st, char *ctx)
 {
     char *pos;
     float v[4];
@@ -44,7 +44,7 @@ void func_PAL_L01_0031A4D0(char *obj, char *st, char *ctx)
     v[0] = v[0] + math_fast_sin_or_cos_a(*(float *)(obj + 0xF8)) * 2.0f;
     v[1] = v[1] + math_fast_sin_or_cos_b(*(float *)(obj + 0xF8)) * 2.0f;
     *(float *)(ctx + 0x28) = f;
-    r = func_PAL_L01_00323068(obj, v);
+    r = moby_l01_turn_toward_target_pal(obj, v);
     *(float *)(obj + 0x18) = coll_probe_ground_height_below(pos, 0, 0.5f);
     f = vec_distance_xy(pos, st);
     if (r != 0 || *(float *)(st + 0x1C) < f) {

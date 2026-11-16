@@ -5,7 +5,7 @@
    arg there. The plain indexed loop is what gives retail its second walking
    pointer and the copy in the beqz delay slot. */
 #include "common.h"
-extern int *D_L00_001B2C30[] MACRO_ADDR;
+extern int *g_sheep_active_list[] MACRO_ADDR;
 extern int sheep_is_active_list_full(void);
 extern int math_random_int_below(int n);
 extern void func_L00_00403900(int *v);
@@ -17,13 +17,13 @@ void sheep_add_to_active_list(int *arg)
     if (sheep_is_active_list_full() == 0) {
         int i;
         for (i = 0; i < 16; i++) {
-            if (D_L00_001B2C30[i] == 0) {
-                D_L00_001B2C30[i] = arg;
+            if (g_sheep_active_list[i] == 0) {
+                g_sheep_active_list[i] = arg;
                 return;
             }
         }
     } else {
-        int **slot = &D_L00_001B2C30[math_random_int_below(16)];
+        int **slot = &g_sheep_active_list[math_random_int_below(16)];
         func_L00_00403900(*slot);
         func_L00_00403C68(*slot);
         *slot = arg;

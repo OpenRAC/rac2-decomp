@@ -11,7 +11,7 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Spawn six sparks along a segment centred on pos and running along direction. */
-void func_PAL_L00_00403480(void *unused, void *pos, void *direction)
+void part_spawn_sparks_along_segment_pal(void *unused, void *pos, void *direction)
 {
     float out[4], scaled[4], local[4];
     float length = FastVecLength(direction);

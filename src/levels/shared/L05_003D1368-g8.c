@@ -1,7 +1,7 @@
 #include "common.h"
-extern float D_L05_001AFC58 __attribute__((sda));
-extern float D_L05_001AFC54 __attribute__((sda));
-extern char D_L05_001BFB00[];
+extern float g_hit_damage_b __attribute__((sda));
+extern float g_hit_damage_a __attribute__((sda));
+extern char g_collision_l05_result[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void QueueMobyImpact(void *, void *);
 extern char *func_L05_003D1E60(void *, int, int);
@@ -33,13 +33,13 @@ void func_L05_003D1368(char *obj, char *input, float *output)
     hit.flags = 0x810000;
     hit.obj = obj;
     if (*(int *)(input + 0x24))
-        hit.damage = D_L05_001AFC58;
+        hit.damage = g_hit_damage_b;
     else
-        hit.damage = D_L05_001AFC54;
+        hit.damage = g_hit_damage_a;
     hit.one = 1;
     qcopy(hit.pos, input);
     vec_scale_to_length(&hit, &hit, 1.0f);
-    table = D_L05_001BFB00;
+    table = g_collision_l05_result;
     hit.pos[3] = 5627.9248046875f;
     hit.type = 3;
     hit.subtype = 2;

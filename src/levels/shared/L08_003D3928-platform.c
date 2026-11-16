@@ -4,7 +4,7 @@ typedef struct { u8 pad[0x88]; float z; u8 pad2[0x2b0]; int object; int state; }
 extern EHero g_hero_state;
 typedef struct { u8 pad[0x74]; u8 active; u8 pad2[0x13]; int object; } ESound;
 extern u8 g_sound_state[];
-extern u8 *D_L08_001B2ACC __attribute__((sda));
+extern u8 *g_collision_box_table __attribute__((sda));
 extern float math_fabs(float);
 extern int FloatToInt(float);
 extern void moby_set_state(void *, int, int);
@@ -34,14 +34,14 @@ void moving_platform_update(u8 *moby)
         platform->sound=-1;
         qcopy(&platform->pos,moby+0x10);
         qcopy(&platform->rot,moby+0xf0);
-        if(E_F((u8 *)platform,0x68)<E_F(D_L08_001B2ACC+platform->index*128,0x38)) platform->side=0; else platform->side=1;
+        if(E_F((u8 *)platform,0x68)<E_F(g_collision_box_table+platform->index*128,0x38)) platform->side=0; else platform->side=1;
         platform->progress=0;
         moby[0xbc]=0;
         moby_set_state(moby,1,-1);
         break;
     case 1:
         dist_to_start=math_fabs(E_F((u8 *)platform,0x68)-g_hero_state.z);
-        dist_to_end=math_fabs(E_F(D_L08_001B2ACC+platform->index*128,0x38)-g_hero_state.z);
+        dist_to_end=math_fabs(E_F(g_collision_box_table+platform->index*128,0x38)-g_hero_state.z);
         if (((!platform->trigger || FloatToInt(platform->progress)==platform->side) && g_hero_state.object==(int)moby && g_hero_state.state!=0) ||
             (platform->progress<0.1f && dist_to_end<dist_to_start) || (platform->progress>0.9f && dist_to_start<dist_to_end)) {
             moby[0xbc]^=1;
@@ -56,12 +56,12 @@ void moving_platform_update(u8 *moby)
         if(platform->progress>1.0f) platform->progress=1.0f;
         else if(platform->progress<0.0f) platform->progress=0.0f;
         blend=(1.0f-math_fast_sin_or_cos_a(platform->progress*3.141592741f))*0.5f;
-        FastVecSub(&delta,D_L08_001B2ACC+platform->index*128+0x30,&platform->pos);
+        FastVecSub(&delta,g_collision_box_table+platform->index*128+0x30,&platform->pos);
         FastVecScale(&delta,&delta,blend);
         FastVecAdd(moby+0x10,&platform->pos,&delta);
-        ((EMob*)moby)->rz=math_move_angle_toward_target(E_F((u8 *)platform,0x78),E_F(D_L08_001B2ACC+platform->index*128,0x78),blend);
-        ((EMob*)moby)->ry=math_move_angle_toward_target(E_F((u8 *)platform,0x74),E_F(D_L08_001B2ACC+platform->index*128,0x74),blend);
-        ((EMob*)moby)->rx=math_move_angle_toward_target(E_F(platform,0x70),E_F(D_L08_001B2ACC+platform->index*128,0x70),blend);
+        ((EMob*)moby)->rz=math_move_angle_toward_target(E_F((u8 *)platform,0x78),E_F(g_collision_box_table+platform->index*128,0x78),blend);
+        ((EMob*)moby)->ry=math_move_angle_toward_target(E_F((u8 *)platform,0x74),E_F(g_collision_box_table+platform->index*128,0x74),blend);
+        ((EMob*)moby)->rx=math_move_angle_toward_target(E_F(platform,0x70),E_F(g_collision_box_table+platform->index*128,0x70),blend);
         if(moby[0xbc] ? platform->progress>=1.0f : platform->progress<=0.0f) {
             int i=platform->sound;
             if(i!=-1 && ((ESound *)(g_sound_state+i*0x70))->object==(int)moby && ((ESound *)(g_sound_state+i*0x70))->active) snd_stop_voice(i);

@@ -3,7 +3,7 @@
 
 extern void gfx_flush_light_part_indices(int);
 
-extern short func_PAL_002B8898(int);
+extern short snd_pump_music_and_disc_read_pal(int);
 /* The disc table of contents: sectors are relative to base. */
 typedef struct { int sector, size, sector2, size2; } DiscPack;
 typedef struct { int sector, size; } DiscFile;
@@ -32,7 +32,7 @@ extern DiscToc g_copy_setup_data;
 /* The level archive load: stage, busy flag and the two archive buffers
    (archive0 is the level data D_001A7288 points at). */
 typedef struct { int stage, busy, archive0, archive1; } ArchiveLoad;
-extern ArchiveLoad D_001A7280 __attribute__((sda));
+extern ArchiveLoad g_loader_archives __attribute__((sda));
 /* The two sound bank statuses: -1 while a load is pending. */
 /* The class cache header: VRAM offsets of the slot's image (in words) and
    CLUT, the one material map entry and the slot. */
@@ -44,7 +44,7 @@ typedef struct {
     short map;                  /* 0x10 */
     short slot;                 /* 0x12 */
 } ClassCache;
-extern ClassCache D_00152CD0;
+extern ClassCache g_load_slots;
 /* A loaded class: the count of its 32-byte entries at 0x0D and the table of
    them at 0x28. */
 typedef struct {
@@ -60,8 +60,8 @@ typedef struct {
 /* The decode buffer; a texture part starts with a type word, has its width
    at 0x18 and its CLUT and pixels at 0x30 and 0x430. */
 typedef struct { int type; } DecodeHeader;
-extern DecodeHeader D_00178510;
-extern ClassData *D_001CDB80[];
+extern DecodeHeader g_decode_header;
+extern ClassData *g_class_cache_objects[];
 /* Frozen Batch A A02-list-add-88; acknowledged claim 38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f. */
 typedef int s32;
 
@@ -104,7 +104,7 @@ void gfx_flush_light_part_indices(int index);
 /* Texture ranges: the particle renderer (func_002B9420) hands this table to
    the toSPR DMA channel; C only ever writes it. */
 typedef struct { int a, b; } TextureRange;
-extern volatile TextureRange D_001F1F40[];
+extern volatile TextureRange g_texture_ranges[];
 
 /* Rebases the offset table of a loaded pack onto the copy of its data in
    D_001F2740, then fills the texture range table from count four-word list
@@ -193,7 +193,7 @@ extern PartsState parts_state __asm__("D_001B8840");
 extern int load_start_disc_read(int, int, int);
 extern void FadeToBlack(int);
 
-void func_PAL_002948A8(int index, int flag)
+void load_parts_set_from_disc_pal(int index, int flag)
 {
     PartEntry *r;
     int i;
@@ -201,11 +201,11 @@ void func_PAL_002948A8(int index, int flag)
     load_start_disc_read((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
                   parts_toc.files[index].size);
     if (flag != 0) {
-        func_PAL_002B8898(0);
+        snd_pump_music_and_disc_read_pal(0);
         FadeToBlack(flag);
     }
     parts_state.index = index;
-    func_PAL_002B8898(1);
+    snd_pump_music_and_disc_read_pal(1);
     for (i = 0, r = parts_state.rec; i < 0x46 && r->count != 0; i++, r++) {
         int offset = r->offset + 0x800;
         parts_state.parts[i] = (int)parts_state.rec + offset;

@@ -24,7 +24,7 @@ extern void actor_tear_down(char *);
 extern void flamethrower_robot_knock_out(char *);
 extern void blade_ball_explode(char *);
 extern char *g_moby_l02_pool __attribute__((section(".sdata")));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern s16 moby_get_vars_counter(char *);
 #define GROUP(off) (*(s32 *)(state + (off)))
 #define FOR_EACH_ID(p, off) \
@@ -37,13 +37,13 @@ extern void armed_enemy_drop_held_and_reset(char *, int, int);
 extern void moby_set_anim_type_three(char *, int, int);
 extern int coll_point_inside_record_volume(void *, int);
 extern void hero_record_play_counters(void);
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 
 /* Walks the entities of the group the object names (the group word is re-read for every
    test: the handlers may change it).  Each live, unflagged one that passes the screen
    against the two bounds is handed to the handler of its type.  Afterwards the follow-up is
    called unless the resident record passes the screen. */
-void func_PAL_L02_00400F20(char *a0) {
+void arena_update_group_enemies_pal(char *a0) {
     char *state = *(char **)(a0 + 0x68);
     u16 *p;
     char *e;
@@ -89,7 +89,7 @@ void func_PAL_L02_00400F20(char *a0) {
 
 
 extern void moby_set_state(char *, s32, s32);
-extern char *D_L02_001B368C __attribute__((sda));
+extern char *g_matrix_l02_record_table __attribute__((sda));
 extern int math_random_int_below(int);
 extern void cam_end_override(char *);
 extern void load_scene_chunk(int, int);
@@ -98,15 +98,15 @@ extern int arena_get_challenge_save_index(int);
 extern void hero_reset_position_and_direction(char *, float *, int, int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void script_queue_keyed_request(int, int);
-extern int D_L02_001CAA80;
-extern char *D_L02_001B369C __attribute__((sda));
-extern int D_L02_001AA1B0 __attribute__((sda));
+extern int g_arena_l02_active_flag;
+extern char *g_hero_position_records __attribute__((sda));
+extern int g_arena_challenge_index __attribute__((sda));
 
 /* Starts the actor: calls func_L02_00400650 with 0x25 plus a random pick below 2, sets state 1,
    releases the object held at +0xC0 and, by a per-slot flag, hands a vector whose third float
    is -1.59 or 2.16, with the matching 128-byte record, to func_L00_002B9D60; ends by setting
    D_L02_001AA1B0 to -1. */
-void func_PAL_L02_004011D8(char *a0) {
+void arena_cancel_challenge_menu_pal(char *a0) {
     char *s1 = *(char **)(a0 + 0x68);
     float v[4];
 
@@ -116,21 +116,21 @@ void func_PAL_L02_004011D8(char *a0) {
         cam_end_override(*(char **)(s1 + 0xC0));
         *(s32 *)(s1 + 0xC0) = 0;
     }
-    if (D_L02_001CAA80 != 0)
+    if (g_arena_l02_active_flag != 0)
         load_scene_chunk(0, *(s32 *)(s1 + 0x224));
     vec_clear_128(v);
-    if (D_001395B8[arena_get_challenge_save_index(0)] != 0) {
+    if (g_game_flag_table[arena_get_challenge_save_index(0)] != 0) {
         v[2] = -1.59f;
-        hero_reset_position_and_direction(D_L02_001B369C + *(s32 *)(s1 + 0x74) * 128 + 0x30, v, 0, 1);
+        hero_reset_position_and_direction(g_hero_position_records + *(s32 *)(s1 + 0x74) * 128 + 0x30, v, 0, 1);
     } else {
         v[2] = 2.16f;
-        hero_reset_position_and_direction(D_L02_001B368C + *(s32 *)(s1 + 0x78) * 128 + 0x30, v, 0, 1);
+        hero_reset_position_and_direction(g_matrix_l02_record_table + *(s32 *)(s1 + 0x78) * 128 + 0x30, v, 0, 1);
     }
     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
     arena_reset_group_enemies(a0);
     arena_match_active_count_a(a0, 0);
     arena_match_active_count_b(a0, 0);
     script_queue_keyed_request(*(s32 *)(s1 + 0x224), *(s32 *)(s1 + 0x22C));
-    D_L02_001AA1B0 = -1;
+    g_arena_challenge_index = -1;
 }
 

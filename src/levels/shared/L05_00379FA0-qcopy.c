@@ -12,7 +12,7 @@ typedef struct {
     u8 pad74[12];
 } L05Projectile;
 
-extern L05Projectile D_L05_00221DD0[];
+extern L05Projectile g_projectile_table[];
 extern u8 *func_L05_00379CA0(u8 *);
 extern void moby_transform_joint_to_world(u8 *, int, float *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -29,7 +29,7 @@ void SpawnSpaceProjectile(u8 *object, int color, int mode, float rate, int effec
                        float spin, float life, int emit, int joint, u8 *other)
 {
     float direction[4], point[4];
-    L05Projectile *base = D_L05_00221DD0;
+    L05Projectile *base = g_projectile_table;
     u8 *position = object + 0x10;
     L05Projectile *p;
     u8 *state;

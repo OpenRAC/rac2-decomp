@@ -34,7 +34,7 @@ extern ResidentState_Fd160fb9c D_00189E20_16;
 extern u8 D_00189E20_1[];
 
 /* Reads a resident mode word and the kind byte of a pointer field, then for kind 3, 4 or 20 tests two float thresholds through a predicate and triggers a four-argument action with selector zero or one. */
-void func_PAL_L00_002A62B0(void)
+void hero_check_targeting_triggers_pal(void)
 {
     int selector;
 

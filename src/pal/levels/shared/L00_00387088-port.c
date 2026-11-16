@@ -23,9 +23,9 @@ extern int slot_alloc_for_object(unsigned char *, unsigned int);
 extern int part_alloc_effect_slot(void *, void *, float, float, float);
 
 extern char *g_hero_moby[];
-extern unsigned char D_00139591[];
-extern int D_L00_001AEFA8 __attribute__((sda));
-extern int D_L00_001AEF48 __attribute__((sda));
+extern unsigned char g_miniturret_weapon_index[];
+extern int g_megaturret_shot_value __attribute__((sda));
+extern int g_miniturret_shot_value __attribute__((sda));
 
 typedef struct {
     char pad00[0x58];
@@ -80,13 +80,13 @@ extern void *sheep_board_create_child(void *, void *, void *, unsigned int);
 extern int PlayMobySound(int, int, char *);
 
 extern char g_camera_l00_position[];
-extern float D_L00_001AEDA0[2] __attribute__((sda));
-extern int D_L00_001AEDA8[2] __attribute__((sda));
-extern float D_L00_001AEDB0 __attribute__((sda));
-extern float D_L00_001AEDB4 __attribute__((sda));
-extern float D_L00_001AEDBC __attribute__((sda));
-extern int D_L00_001AEDD0[2] __attribute__((sda));
-extern Vector4 D_L00_001AEDC0 SDATA(D_L00_001AEDC0);
+extern float g_shot_scale_table[2] __attribute__((sda));
+extern int g_shot_light_colors[2] __attribute__((sda));
+extern float g_twin_guns_speed __attribute__((sda));
+extern float g_twin_guns_velocity_length __attribute__((sda));
+extern float g_twin_guns_step_rate __attribute__((sda));
+extern int g_goal_trail_flags[2] __attribute__((sda));
+extern Vector4 g_twin_guns_source_vector SDATA(D_L00_001AEDC0);
 extern int g_frame_l00_counter;
 
 /* Measured input fields; other fields are not yet identified. */
@@ -98,7 +98,7 @@ typedef struct {
     char pad120[0x80];
     int buttons;
 } PlayerControl;
-extern PlayerControl D_00138500, g_pad_state;
+extern PlayerControl g_pad_device_state, g_pad_state;
 
 typedef struct {
     Vector4 basis[2];
@@ -112,7 +112,7 @@ static inline int pad_buttons(int i)
 {
     if (i)
         return g_pad_state.buttons;
-    return D_00138500.buttons;
+    return g_pad_device_state.buttons;
 }
 
 /* Updates two objects held in the owner's work area: places them from their basis
@@ -134,24 +134,24 @@ void func_PAL_L00_00387088(char *owner)
         matrix_mul_vec3(work->objects[i] + 0x10, &work->basis[i], g_camera_l00_position + 0x230);
         FastVecAdd(work->objects[i] + 0x10, work->objects[i] + 0x10, g_camera_l00_position);
         FIELD(float, work->objects[i], 0x2C) =
-            FIELD(float, FIELD(char *, work->objects[i], 0x24), 0x24) * D_L00_001AEDA0[i];
-        moby_set_light_color(work->objects[i], D_L00_001AEDA8[i]);
+            FIELD(float, FIELD(char *, work->objects[i], 0x24), 0x24) * g_shot_scale_table[i];
+        moby_set_light_color(work->objects[i], g_shot_light_colors[i]);
         func_PAL_002A0F68(work->objects[i]);
         func_002A0F48(work->objects[i]);
     }
-    scale = D_L00_001AEDB0 * 0.020000001f;
-    step = D_L00_001AEDBC * 0.00040000002f;
-    source = &D_L00_001AEDC0;
+    scale = g_twin_guns_speed * 0.020000001f;
+    step = g_twin_guns_step_rate * 0.00040000002f;
+    source = &g_twin_guns_source_vector;
     for (i = 0; i < 2; ++i) {
         if (i)
             input = g_pad_state.axis;
         else
-            input = D_00138500.axis;
+            input = g_pad_device_state.axis;
         if (input == 0.0f) {
             if (i)
                 input = g_pad_state.positive - g_pad_state.negative;
             else
-                input = D_00138500.positive - D_00138500.negative;
+                input = g_pad_device_state.positive - g_pad_device_state.negative;
         }
         target = -input * scale;
         if (target != 0.0f)
@@ -168,7 +168,7 @@ void func_PAL_L00_00387088(char *owner)
             if (work->motion[i].f[2] < 0.0f)
                 work->motion[i].f[2] = 0.0f;
         }
-        if (math_fast_float_d(&D_L00_001AEDD0[i])) {
+        if (math_fast_float_d(&g_goal_trail_flags[i])) {
             FIELD(unsigned char, work->objects[i], 0x23) = 128;
         } else {
             phase = IntToFloat(g_frame_l00_counter % 50);
@@ -187,7 +187,7 @@ void func_PAL_L00_00387088(char *owner)
                 position.f[1] -= 0.05f;
             matrix_mul_vec3(&position, &position, work->objects[i] + 0xC0);
             FastVecAdd(&position, &position, work->objects[i] + 0x10);
-            vec_scale_to_length(&velocity, work->objects[i] + 0xC0, D_L00_001AEDB4 * 0.020000001f);
+            vec_scale_to_length(&velocity, work->objects[i] + 0xC0, g_twin_guns_velocity_length * 0.020000001f);
             sheep_board_create_child(work->objects[i], &position, &velocity, i);
             PlayMobySound(0, 0, work->objects[i]);
         }

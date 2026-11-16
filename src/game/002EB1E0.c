@@ -68,9 +68,9 @@ extern Game2EB1E0 D_00189E20_9;
 extern char g_pad_state[];
 #define INPUT ((Input2EB1E0 *)D_00138180)
 extern char D_001A63A8_3[];
-extern SceneActor *D_001B2148;
-extern Global001A7A00 D_001A7A00 MACRO_ADDR;
-extern int D_001A7478 MACRO_ADDR;
+extern SceneActor *g_transition_effect_list;
+extern Global001A7A00 g_player_stats MACRO_ADDR;
+extern int g_loader_state_word MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_requested_game_mode MACRO_ADDR;
@@ -127,7 +127,7 @@ int cutscene_update_scripted_actors(void)
     skip = 0;
     done = g_scene_playback_state.frame >= g_scene_playback_state.end;
     if (g_scene_playback_state.frame >= 18 && g_screen_fade == 0.0f) {
-        if ((D_001A7A00.x0A || D_001A7A00.x0B || D_001A7478 || g_current_map_index <= 0)
+        if ((g_player_stats.x0A || g_player_stats.x0B || g_loader_state_word || g_current_map_index <= 0)
             && (INPUT->buttons.words[1] & 0x800))
             skip = 1;
         else if ((INPUT->buttons.held & 0x8000000000FULL) == 0x8000000000FULL)
@@ -167,7 +167,7 @@ int cutscene_update_scripted_actors(void)
             if (type == 0xD54 /* moby class 3412 */) {
                 actor->flags = 8;
                 UpdateEquipmentPieces(actor);
-                if (!D_001B2148 || D_001B2148->type == type)
+                if (!g_transition_effect_list || g_transition_effect_list->type == type)
                     gfx_register_overlay_draw_callback(render_environment_mapped_object, actor);
             }
             actor->alpha = 255;

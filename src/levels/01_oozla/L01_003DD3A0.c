@@ -1,9 +1,9 @@
 #include "names.h"
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4]; } Vector;
-extern Vector D_L01_001B94C0;
+extern Vector g_level_origin_vec;
 extern struct { unsigned char prefix[0x80]; Vector position; } g_hero_state;
-extern int D_L01_001B2088 __attribute__((sda));
+extern int g_oozla_intro_stage __attribute__((sda));
 extern char *g_moby_l01_table __attribute__((sda));
 extern float fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), level_get_water_height(void);
 extern void moby_update_ground_check(void *), muckdweller_alert_group(int), part_spawn_moving_bubbles(void *);
@@ -19,7 +19,7 @@ void muckdweller_update_targeting(unsigned char *object)
     char *cursor;
     float nearest, distance, floor;
     *(float *)(object + 0x2c) = *(float *)(*(char **)(object + 0x24) + 0x24) * 1.5f;
-    if (object[0x31] && fast_vec_dist(object + 0x10, &D_L01_001B94C0) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, &g_level_origin_vec) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6f] = 0x16;
     }
@@ -38,8 +38,8 @@ void muckdweller_update_targeting(unsigned char *object)
         if (*(int *)(state + 0x3c0) != -1) *(int *)(state + 0x1fc) = *(int *)(state + 0x3c0);
         ((Vector *)(state + 0x390))->whole = ((Vector *)(*(char **)(state + 0x2f0) + 0x10))->whole;
     }
-    if (object[0x21] != 0xff && **(int **)(state + 0x3fc) != D_L01_001B2088) {
-        if (**(int **)(state + 0x400) != -1 && D_L01_001B2088 - 10 <= **(int **)(state + 0x3fc)) goto ground;
+    if (object[0x21] != 0xff && **(int **)(state + 0x3fc) != g_oozla_intro_stage) {
+        if (**(int **)(state + 0x400) != -1 && g_oozla_intro_stage - 10 <= **(int **)(state + 0x3fc)) goto ground;
         **(int **)(state + 0x400) = -1;
         nearest = 100000.0f;
         GetFirstMobyInGroup(&cursor, object[0x21], 0, 0);
@@ -53,7 +53,7 @@ void muckdweller_update_targeting(unsigned char *object)
             }
             GetNextMobyInGroup(&cursor, cursor, 0, 0);
         }
-        **(int **)(state + 0x3fc) = D_L01_001B2088;
+        **(int **)(state + 0x3fc) = g_oozla_intro_stage;
     }
 ground:
     if (object[0x31]) {

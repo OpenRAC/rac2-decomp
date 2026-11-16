@@ -4,7 +4,7 @@
 #include "common.h"
 
 extern s32 g_current_map_index MACRO_ADDR;
-extern s32 D_L01_001A8F40 __attribute__((sda));
+extern s32 g_hero_l01_control_mode __attribute__((sda));
 
 extern void moby_set_state(s8 *, s32, s32);
 extern void math_store_angle_update_result(s8 *, s8 *, s32, s32, f32);
@@ -24,7 +24,7 @@ void func_PAL_L01_00416484(s8 *arg0) {
             break;
         }
         if (s != 0) {
-            if (D_L01_001A8F40 == 2) {
+            if (g_hero_l01_control_mode == 2) {
                 math_store_angle_update_result(arg0, s + 0xC, 0x80AABED2, 0x80466464, 0.06632252f);
             } else {
                 math_store_angle_update_result(arg0, s + 0xC, 0x8096AAAA, 0x80466464, 0.04537857f);

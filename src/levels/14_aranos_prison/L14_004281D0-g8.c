@@ -91,11 +91,11 @@ extern int weapon_select_aim_target(char *self, int index, void *point, int forc
 extern void cam_compute_view_direction(char *a0, char *a1, int a2);
 
 extern int g_current_map_index[] __attribute__((sda));
-extern int D_L14_001A8FF0;
-extern float D_L14_001B18B0 __attribute__((sda));
-extern char *D_L14_001B2200[] __attribute__((sda));
-extern char D_L14_001B2210[] __attribute__((sda));
-extern char D_L14_001B9500[];
+extern int g_aim_l14_blocked_flag;
+extern float g_guard_frame_scale __attribute__((sda));
+extern char *g_guard_entry_tables[] __attribute__((sda));
+extern char g_guard_reference_point[] __attribute__((sda));
+extern char g_tether_l14_origin_vec[];
 
 /* Shared guard logic: sets up its stats on the first frame, then checks for the player getting close, damage and the path to the player. */
 void guard_update_common(char *self)
@@ -105,13 +105,13 @@ void guard_update_common(char *self)
 
     if (B(self, 0x20) == 0) {
         if (g_current_map_index[0] == 2 && F(self, 0x18) > 400.0f) {
-            if (D_L14_001A8FF0 == 0)
+            if (g_aim_l14_blocked_flag == 0)
                 return;
             coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
             vars->h338 = 1;
             W(self, 0x9C) = 3;
             UH(self, 0x34) |= 0x100;
-            vars->f90 = fast_vec_dist(self + 0x10, D_L14_001B2210) - 1.5f;
+            vars->f90 = fast_vec_dist(self + 0x10, g_guard_reference_point) - 1.5f;
         } else {
             W(self, 0x9C) = 12;
             vars->f90 = F(self, 0x18) - 1.0f;
@@ -121,7 +121,7 @@ void guard_update_common(char *self)
             return;
         }
         {
-            char *entry = D_L14_001B2200[0] + vars->i210 * 0x30;
+            char *entry = g_guard_entry_tables[0] + vars->i210 * 0x30;
             if (H(entry, 0x30) != 0) {
                 vars->i13C = vars->i218 = **(int **)(entry + 0x3C);
             } else {
@@ -153,7 +153,7 @@ void guard_update_common(char *self)
         vars->h1E2 = 120;
         vars->h1E4 = 180;
         vars->f1D4 = 3.0f;
-        vars->f1D0 = D_L14_001B18B0 * 0.01666666753590107f;
+        vars->f1D0 = g_guard_frame_scale * 0.01666666753590107f;
         vars->f328 = math_random_angle();
         if (vars->i214 != 0) {
             UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
@@ -170,7 +170,7 @@ void guard_update_common(char *self)
     }
 
     if (B(self, 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, D_L14_001B9500) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, g_tether_l14_origin_vec) < 24.0f) {
             moby_update_ground_check(self);
             B(self, 0x6F) = 22;
         }

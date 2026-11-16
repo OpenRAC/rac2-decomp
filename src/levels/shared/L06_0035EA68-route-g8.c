@@ -1,8 +1,8 @@
 #include "common.h"
 extern int g_current_map_index;
-extern u8 D_001A7B00;
-extern u8 D_0019B4A8[];
-extern u8 D_0019B2E8[];
+extern u8 g_inventory_have_flags;
+extern u8 g_moby_nibble_table[];
+extern u8 g_moby_group_flags[];
 typedef struct {
     char pad0[0x212];
     u16 action, mode;
@@ -13,16 +13,16 @@ typedef struct {
 } RouteHero;
 extern RouteHero g_hero_state;
 extern char g_hero_position[];
-extern int D_00138324 NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
 extern int currentLevelGp SDATA(D_001A79F0);
-extern int D_L06_001A8FB4 __attribute__((sda));
-extern int D_L06_001AF524 __attribute__((sda));
-extern float D_L06_001AF528 __attribute__((sda));
-extern float D_L06_001AF530 __attribute__((sda));
-extern float D_L06_001AF53C __attribute__((sda));
+extern int g_route_state_value __attribute__((sda));
+extern int g_route_l06_flag __attribute__((sda));
+extern float g_path_wait_seconds __attribute__((sda));
+extern float g_path_pitch_rate __attribute__((sda));
+extern float g_path_roll_rate __attribute__((sda));
 extern char *g_path_list[];
 typedef struct { char pad0[0x464]; u8 collected[1]; } RouteLevelState;
-extern RouteLevelState D_L06_0021E830;
+extern RouteLevelState g_level_collected_flags;
 extern void moby_mark_spawned(void *);
 extern int taxi_is_flying(void *);
 extern void table_set_entry_field(void *, int);
@@ -81,13 +81,13 @@ void UpdateRouteMoby(char *moby)
     Routes *st = *(Routes **)(moby+0x68);
     char *node;
     if (g_current_map_index == 11) {
-      if (!st->persistent && D_001A7B00) {
+      if (!st->persistent && g_inventory_have_flags) {
         moby_mark_spawned(moby);
         return;
       }
     }
     table_set_entry_field(moby,taxi_is_flying(moby));
-    if (D_L06_001AF524) {
+    if (g_route_l06_flag) {
         int i;
         for(i=0;i<I(g_path_list[st->approach[0]],0);i++)
             effect_create_timed(g_path_list[st->approach[0]]+16+i*16,moby,4,0x800000FF,127,2,255,0.333f);
@@ -128,8 +128,8 @@ void UpdateRouteMoby(char *moby)
         M->state=1; I(moby,0x98)=0;
         {
             u16 id=H(moby,0xB2);
-            if (!D_L06_0021E830.collected[(s16)id]) {
-                int bits=D_0019B4A8[((s16)id>>1)+(currentLevelGp<<10)];
+            if (!g_level_collected_flags.collected[(s16)id]) {
+                int bits=g_moby_nibble_table[((s16)id>>1)+(currentLevelGp<<10)];
                 if (!((id & 1) ? ((bits >> 4) & 7) != 0 : (bits & 7) != 0)) break;
             }
             moby_mark_spawned(moby); return;
@@ -137,7 +137,7 @@ void UpdateRouteMoby(char *moby)
     case 1: {
         int i;
         if (!st->enabled) break;
-        if (!(D_0019B2E8[B(moby,0xB0)+(currentLevelGp<<4)]&0x80)) break;
+        if (!(g_moby_group_flags[B(moby,0xB0)+(currentLevelGp<<4)]&0x80)) break;
         for(i=0;i<5;i++) {
             if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
             if(!IsPointInCuboid(g_hero_position,st->trigger[i]) && st->forcedRoute!=i) continue;
@@ -155,7 +155,7 @@ void UpdateRouteMoby(char *moby)
                 MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
-            st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
+            st->timer=g_path_wait_seconds*(1.0f/60); st->moving=1; st->forcedRoute=-1;
             break;
         }
         break;
@@ -168,11 +168,11 @@ void UpdateRouteMoby(char *moby)
     case 3: {
         int i;
         MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[M->route]],0x20)-F(moby,0x10),F(g_path_list[st->depart[M->route]],0x24)-F(moby,0x14)),0.000581776490435f,0.000581776490435f,0.0203621778637f);
-        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
-        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
+        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,g_path_pitch_rate*0.000004848137291264255f,g_path_pitch_rate*0.000004848137291264255f,0.20943954586982727f,0);
+        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,g_path_roll_rate*0.000004848137291264255f,g_path_roll_rate*0.000004848137291264255f,0.20943954586982727f,0);
         if(g_hero_state.attached==moby && !g_hero_state.animation) {
             hud_show_event_notice(moby,M->route);
-            if((D_00138324&16) && D_L06_001A8FB4==8) {
+            if((g_pad_held_flags&16) && g_route_state_value==8) {
                 st->timer=0; M->state=5; st->moving=1;
             }
         }
@@ -194,7 +194,7 @@ void UpdateRouteMoby(char *moby)
                 MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
-            st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
+            st->timer=g_path_wait_seconds*(1.0f/60); st->moving=1; st->forcedRoute=-1;
             break;
         }
         break;
@@ -210,8 +210,8 @@ void UpdateRouteMoby(char *moby)
         }
         break;
     case 6:
-        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
-        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
+        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,g_path_pitch_rate*0.000004848137291264255f,g_path_pitch_rate*0.000004848137291264255f,0.20943954586982727f,0);
+        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,g_path_roll_rate*0.000004848137291264255f,g_path_roll_rate*0.000004848137291264255f,0.20943954586982727f,0);
         if(st->back[M->route]!=-1 && fast_vec_dist(moby+0x10,g_hero_position)>15) {
             M->state=7; st->moving=1;
         } else if(st->back[M->route]==-1 && vec_distance_xy(moby+0x10,g_hero_position)>5) M->state=1;

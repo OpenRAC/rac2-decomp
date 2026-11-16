@@ -46,7 +46,7 @@ typedef struct TurretState {
 } TurretState;
 extern TurretObject *g_moby_l02_pool __attribute__((sda));
 extern int g_frame_l02_counter __attribute__((sda));
-extern float D_L02_001A8F20[4] __attribute__((sda));
+extern float g_zero_l02_vector[4] __attribute__((sda));
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
@@ -173,8 +173,8 @@ void func_PAL_L02_003DDFD0(TurretObject *self)
             else state->fireTimer = 50;
         }
     } else {
-        vec_step_toward_target_limited(state->leftJoint, D_L02_001A8F20, 0.01f);
-        vec_step_toward_target_limited(state->rightJoint, D_L02_001A8F20, 0.01f);
+        vec_step_toward_target_limited(state->leftJoint, g_zero_l02_vector, 0.01f);
+        vec_step_toward_target_limited(state->rightJoint, g_zero_l02_vector, 0.01f);
     }
     switch (PROXY[0x42]) {
     case 0:

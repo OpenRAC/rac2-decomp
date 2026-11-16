@@ -54,8 +54,8 @@ typedef struct {
 } PurchaseMenuState;
 extern PurchaseMenuState g_purchase_menu_model[];
 #define MENU ((char *)D_L00_0022F7C0)
-extern float D_L00_001AD570 __attribute__((sda));
-extern int D_L00_001B259C, D_L00_001B25A0, D_L00_001B25A4;
+extern float g_shop_blend_factor __attribute__((sda));
+extern int g_frame_counter_first, g_frame_counter_second, g_previous_pad_pressed;
 typedef struct {
     int pad[0x140 / 4];
     float x, y;
@@ -68,7 +68,7 @@ typedef struct {
     struct { int value; char pad[16]; } entries[0];
 } MenuResourceTable;
 extern MenuResourceTable g_copy_setup_data[];
-extern short D_00152CE4 NOT_SDA;
+extern short g_load_entry_index NOT_SDA;
 extern unsigned char g_item_slot_to_record[];
 typedef struct {
     char prefix[0x3C];
@@ -109,20 +109,20 @@ void UpdatePurchaseMenuAndPreview(void)
 
     switch (g_purchase_menu_model[0].f00) {
     case 0:
-        D_L00_001AD570 += 0.1f;
+        g_shop_blend_factor += 0.1f;
         module_l00_call_handler_with_arg_2(1);
-        if (D_L00_001AD570 >= 1.0f) {
+        if (g_shop_blend_factor >= 1.0f) {
             g_purchase_menu_model[0].f00 = 1;
-            D_L00_001AD570 = 1.0f;
+            g_shop_blend_factor = 1.0f;
             g_purchase_menu_model[0].f04 = 0;
         }
         break;
     case 2:
-        D_L00_001AD570 += 0.1f;
+        g_shop_blend_factor += 0.1f;
         module_l00_call_handler_with_arg_2(0);
-        if (D_L00_001AD570 < 1.0f)
+        if (g_shop_blend_factor < 1.0f)
             break;
-        D_L00_001AD570 = 1.0f;
+        g_shop_blend_factor = 1.0f;
         if (g_purchase_menu_model[0].f08) {
             g_purchase_menu_model[0].f08 = 0;
             if (g_purchase_menu_model[0].fa0 >= 0) {
@@ -132,7 +132,7 @@ void UpdatePurchaseMenuAndPreview(void)
                 snd_pump_music_and_disc_read(1);
                 SwitchCachedDiscAsset(item_id);
             } else {
-                D_00152CE4 = -1;
+                g_load_entry_index = -1;
             }
         }
         g_purchase_menu_model[0].f04 = 0;
@@ -154,13 +154,13 @@ void UpdatePurchaseMenuAndPreview(void)
         break;
     case 1:
         if (g_pad_state[0].held & 0x8000)
-            D_L00_001B259C++;
+            g_frame_counter_first++;
         else
-            D_L00_001B259C = 0;
+            g_frame_counter_first = 0;
         if (g_pad_state[0].held & 0x2000)
-            D_L00_001B25A0++;
+            g_frame_counter_second++;
         else
-            D_L00_001B25A0 = 0;
+            g_frame_counter_second = 0;
         if (g_purchase_menu_model[0].f90 == 0) {
             g_purchase_menu_model[0].f94 += 3;
             if (g_purchase_menu_model[0].f94 >= 128) {
@@ -237,7 +237,7 @@ void UpdatePurchaseMenuAndPreview(void)
         g_purchase_menu_model[0].f04++;
         menu_dispatch_by_mode();
         shop_dispatch_purchase_confirm();
-        D_L00_001B25A4 = g_pad_state[0].pressed;
+        g_previous_pad_pressed = g_pad_state[0].pressed;
         if (g_purchase_menu_model[0].f50 == 0 &&
             *(int *)(MENU + 0x144 + g_purchase_menu_model[0].f80 * 24) == 1) {
             module_l00_call_handler_with_arg_3(*(int *)(MENU + 0x140 + g_purchase_menu_model[0].f80 * 24));

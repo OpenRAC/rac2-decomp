@@ -25,7 +25,7 @@ extern void ref_L00_003E5340_00(float *, float *, int, int, int);
 /* Emits ten particles at POSITION: one thrown towards D_L00_001B8DC0 with a random spread, then
    nine at random upward angles turned by the object's matrix, about a third of them (rand() % 3
    == 0) in mode 1. */
-void func_PAL_L00_003E95C0(char *object, float *position)
+void part_spawn_blast_sparks_pal(char *object, float *position)
 {
     Vector delta, velocity, random;
     float distance;

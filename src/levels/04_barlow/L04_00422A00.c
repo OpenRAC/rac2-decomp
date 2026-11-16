@@ -10,8 +10,8 @@ typedef signed int s32;
 typedef float f32;
 
 
-extern u8 D_L04_001395C7;
-extern u8 D_L04_002CA518;
+extern u8 g_barlow_trigger_started;
+extern u8 g_barlow_start_trigger_data;
 
 extern void func_2CC1F0(void *a0);
 extern void func_30EA08(void *a0);
@@ -26,10 +26,10 @@ extern void func_40A090(int a0, u8 *a1, u8 *a2, u8 *a3, u8 *a4, u8 *a5);
 
 /* func_L04_00456628: the sda incomplete arrays keep retail's absolute macro loads
    (lui into the destination register); D_001A7B00 is the inventory have-flag table. */
-extern u8 D_001A7B00[] __attribute__((sda));
-extern u8 D_001395B8[];
-extern s32 D_L04_001B2008[] __attribute__((sda));
-extern u8 *D_L04_001B25CC[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
+extern u8 g_game_flag_table[];
+extern s32 g_game_tick_counter[] __attribute__((sda));
+extern u8 *g_linked_record_table[] __attribute__((sda));
 extern u8 g_hero_position[];
 extern void func_2DFC18(void *a0, void *a1, s32 a2, s32 a3);
 extern s32 func_342228(void *a0, void *a1);
@@ -43,10 +43,10 @@ extern void game_set_slowdown_factor(void);
 extern float math_spring_float_to_goal(float *a0, float *a1, float f12, float f13, float f14, float f15);
 extern int PlayMobySound(s32 a0, s32 a1, char *a2);
 
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_moby_l04_pool __attribute__((sda));
-extern u8 D_L04_001BF880[];
+extern u8 g_request_l04_queue[];
 
 typedef struct { u8 pad_0[0x20]; u8 flags; } FlareMoby;
 typedef struct {
@@ -58,8 +58,8 @@ typedef struct {
     int left, top, right, bottom;
 } ScreenExtent;
 extern LensFlare g_lens_flare;
-extern u8 D_L04_001B9680[];
-extern int D_L04_001B0D08;
+extern u8 g_tether_zero_vec[];
+extern int g_lens_l04_flare_base_size;
 extern ScreenExtent g_screen_width __attribute__((sda));
 extern f32 fast_vec_dist(void *, void *);
 extern f32 IntToFloat(int);
@@ -89,10 +89,10 @@ void gfx_l04_draw_lens_flare(u8 *object) {
     }
     if (g_lens_flare.intensity <= 0.0f)
         return;
-    dist = fast_vec_dist(D_L04_001B9680, vars + 0x30);
+    dist = fast_vec_dist(g_tether_zero_vec, vars + 0x30);
     ctr[0] = IntToFloat(g_screen_width.half_width);
     ctr[1] = IntToFloat(g_screen_width.half_height);
-    baseSize = &D_L04_001B0D08;
+    baseSize = &g_lens_l04_flare_base_size;
     gfx_project_world_point_to_screen(scr, vars + 0x30);
     scr[0] = (scr[0] - IntToFloat(g_screen_width.left)) * 0.0625f;
     scr[1] = (scr[1] - IntToFloat(g_screen_width.top)) * 0.0625f;
@@ -159,8 +159,8 @@ void barlow_lift_update(u8 *object) {
 struct BarlowEntry { u8 bytes[256]; };
 extern u8 g_hero_position[];
 extern u16 *g_moby_l04_group_lists[];
-extern u8 D_L04_001B1218[];
-extern u8 D_L04_001B1230[];
+extern u8 g_str_linked_groups_debug_a[];
+extern u8 g_str_linked_groups_debug_b[];
 extern int IsPointInCuboid(void *, int);
 extern int moby_count_group_not_in_state(int, int);
 extern void STUB_printf(const char *, ...);
@@ -188,7 +188,7 @@ void linked_groups_toggle(u8 *object) {
                 } while ((s16)*ids++ >= 0);
             }
         }
-        STUB_printf(D_L04_001B1218);
+        STUB_printf(g_str_linked_groups_debug_a);
         object[0x20] = 2;
     }
     if (object[0x20] == 2) {
@@ -211,7 +211,7 @@ void linked_groups_toggle(u8 *object) {
                 } while ((s16)*ids++ >= 0);
             }
         }
-        STUB_printf(D_L04_001B1230);
+        STUB_printf(g_str_linked_groups_debug_b);
         moby_mark_spawned(object);
     }
 }
@@ -220,56 +220,56 @@ void linked_groups_toggle(u8 *object) {
    retail's address forms). */
 extern void func_40A090(int a0, u8 *a1, u8 *a2, u8 *a3, u8 *a4, u8 *a5);
 
-extern u8 D_L04_001B12B0[] __attribute__((sda));
-extern u8 D_L04_001B12E8[] __attribute__((sda));
-extern u8 D_L04_001B1300[] __attribute__((sda));
-extern u8 D_L04_001B1330[] __attribute__((sda));
-extern u8 D_L04_001B1348[] __attribute__((sda));
-extern u8 D_L04_001B3280[] __attribute__((sda));
-extern u8 D_L04_001B32B0[] __attribute__((sda));
-extern u8 D_L04_001B32E0[] __attribute__((sda));
-extern u8 D_L04_001B3300[] __attribute__((sda));
-extern u8 D_L04_001B3320[] __attribute__((sda));
-extern u8 D_L04_001B3330[] __attribute__((sda));
-extern u8 D_L04_001B3360[] __attribute__((sda));
-extern u8 D_L04_001B3378[] __attribute__((sda));
-extern u8 D_L04_001B33A0[] __attribute__((sda));
-extern u8 D_L04_001B33B0[] __attribute__((sda));
-extern u8 D_L04_001B33B8[] __attribute__((sda));
-extern u8 D_L04_001B33D8[] __attribute__((sda));
-extern u8 D_L04_001B33E8[] __attribute__((sda));
-extern u8 D_L04_001B3418[] __attribute__((sda));
-extern u8 D_L04_001B3430[] __attribute__((sda));
-extern u8 D_L04_001B3458[] __attribute__((sda));
-extern u8 D_L04_001B3468[] __attribute__((sda));
-extern u8 D_L04_001B3470[] __attribute__((sda));
-extern u8 D_L04_001B3474[] __attribute__((sda));
-extern u8 D_L04_001B3478[] __attribute__((sda));
-extern u8 D_L04_001B347C[] __attribute__((sda));
-extern u8 D_L04_001B3480[] __attribute__((sda));
-extern u8 D_L04_001B3484[] __attribute__((sda));
-extern u8 D_L04_001B3488[] __attribute__((sda));
-extern u8 D_L04_0026D370[];
-extern u8 D_L04_0026D3E0[];
-extern u8 D_L04_0026D490[];
-extern u8 D_L04_0026D4F0[];
-extern u8 D_L04_002CA3E0[];
-extern u8 D_L04_002CA438[];
+extern u8 g_barlow_l04_path_points_a[] __attribute__((sda));
+extern u8 g_barlow_l04_path_points_b[] __attribute__((sda));
+extern u8 g_barlow_path_points_c[] __attribute__((sda));
+extern u8 g_barlow_path_points_d[] __attribute__((sda));
+extern u8 g_barlow_path_points_e[] __attribute__((sda));
+extern u8 g_barlow_l04_path_vectors_b[] __attribute__((sda));
+extern u8 g_barlow_l04_path_vectors_d[] __attribute__((sda));
+extern u8 g_barlow_path_vectors_e[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_a[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_b[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_c[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_d[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_e[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_f[] __attribute__((sda));
+extern u8 g_barlow_path_lengths_g[] __attribute__((sda));
+extern u8 g_barlow_path_starts_a[] __attribute__((sda));
+extern u8 g_barlow_path_starts_b[] __attribute__((sda));
+extern u8 g_barlow_path_starts_c[] __attribute__((sda));
+extern u8 g_barlow_path_starts_d[] __attribute__((sda));
+extern u8 g_barlow_path_starts_e[] __attribute__((sda));
+extern u8 g_barlow_path_starts_f[] __attribute__((sda));
+extern u8 g_barlow_path_starts_g[] __attribute__((sda));
+extern u8 g_barlow_path_total_a[] __attribute__((sda));
+extern u8 g_barlow_path_total_b[] __attribute__((sda));
+extern u8 g_barlow_path_total_c[] __attribute__((sda));
+extern u8 g_barlow_path_total_d[] __attribute__((sda));
+extern u8 g_barlow_path_total_e[] __attribute__((sda));
+extern u8 g_barlow_path_total_f[] __attribute__((sda));
+extern u8 g_barlow_path_total_g[] __attribute__((sda));
+extern u8 g_barlow_path_vectors_a[];
+extern u8 g_barlow_l04_path_vectors_b_2[];
+extern u8 g_barlow_path_vectors_c[];
+extern u8 g_barlow_l04_path_vectors_d_2[];
+extern u8 g_barlow_l04_path_points_a_2[];
+extern u8 g_barlow_l04_path_points_b_2[];
 
 extern void path_measure_segments(int, void *, void *, void *, void *, void *);
 
 /* Sets up the seven animation walk paths used by the Barlow cutscene. */
 void barlow_init_animation_paths(void) {
-    path_measure_segments(7, D_L04_001B12B0, D_L04_0026D370, D_L04_001B3300, D_L04_001B33B8, D_L04_001B3470);
-    path_measure_segments(3, D_L04_001B12E8, D_L04_001B3280, D_L04_001B3320, D_L04_001B33D8, D_L04_001B3474);
+    path_measure_segments(7, g_barlow_l04_path_points_a, g_barlow_path_vectors_a, g_barlow_path_lengths_a, g_barlow_path_starts_a, g_barlow_path_total_a);
+    path_measure_segments(3, g_barlow_l04_path_points_b, g_barlow_l04_path_vectors_b, g_barlow_path_lengths_b, g_barlow_path_starts_b, g_barlow_path_total_b);
     {
-        u8 *data = D_L04_002CA3E0;
-        path_measure_segments(11, data, D_L04_0026D3E0, D_L04_001B3330, D_L04_001B33E8, D_L04_001B3478);
+        u8 *data = g_barlow_l04_path_points_a_2;
+        path_measure_segments(11, data, g_barlow_l04_path_vectors_b_2, g_barlow_path_lengths_c, g_barlow_path_starts_c, g_barlow_path_total_c);
     }
-    path_measure_segments(6, D_L04_001B1300, D_L04_0026D490, D_L04_001B3360, D_L04_001B3418, D_L04_001B347C);
-    path_measure_segments(9, D_L04_002CA438, D_L04_0026D4F0, D_L04_001B3378, D_L04_001B3430, D_L04_001B3480);
-    path_measure_segments(3, D_L04_001B1330, D_L04_001B32B0, D_L04_001B33A0, D_L04_001B3458, D_L04_001B3484);
-    path_measure_segments(2, D_L04_001B1348, D_L04_001B32E0, D_L04_001B33B0, D_L04_001B3468, D_L04_001B3488);
+    path_measure_segments(6, g_barlow_path_points_c, g_barlow_path_vectors_c, g_barlow_path_lengths_d, g_barlow_path_starts_d, g_barlow_path_total_d);
+    path_measure_segments(9, g_barlow_l04_path_points_b_2, g_barlow_l04_path_vectors_d_2, g_barlow_path_lengths_e, g_barlow_path_starts_e, g_barlow_path_total_e);
+    path_measure_segments(3, g_barlow_path_points_d, g_barlow_l04_path_vectors_d, g_barlow_path_lengths_f, g_barlow_path_starts_f, g_barlow_path_total_f);
+    path_measure_segments(2, g_barlow_path_points_e, g_barlow_path_vectors_e, g_barlow_path_lengths_g, g_barlow_path_starts_g, g_barlow_path_total_g);
 }
 
 
@@ -279,8 +279,8 @@ void barlow_start_trigger_update(u8 *object) {
     if (object[0x20] != 0)
         return;
     if (func_34C4C8() != 0) {
-        func_2CC1F0(&D_L04_002CA518);
-        D_L04_001395C7 = 1;
+        func_2CC1F0(&g_barlow_start_trigger_data);
+        g_barlow_trigger_started = 1;
         func_33B9B0(object, 1, -1);
     }
 }
@@ -447,7 +447,7 @@ void barlow_encounter_trigger_update(u8 *object) {
     u32 *links = *(u32 **)(object + 0x68);
 
     if (object[0x20] == 0) {
-        if (D_0019B2E8[object[0xB0] + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[object[0xB0] + g_current_map_index * 16] & 0x80) {
             moby_mark_spawned(object);
             return;
         }
@@ -456,8 +456,8 @@ void barlow_encounter_trigger_update(u8 *object) {
     if (object[0x20] == 1) {
         if (flag_is_third_pending_set((u8 *)(g_moby_l04_pool + (*links << 8)))) {
             moby_mark_table_entry_flagged(object[0xB0]);
-            req_push_queue(D_L04_001BF880, 0x38);
-            req_launch_queued(D_L04_001BF880);
+            req_push_queue(g_request_l04_queue, 0x38);
+            req_launch_queued(g_request_l04_queue);
             game_set_slowdown_factor();
             moby_mark_spawned(object);
         }
@@ -473,10 +473,10 @@ void barlow_item_pickup_trigger_update(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     u8 *record;
     if (object[0x20] == 0) {
-        if (D_001A7B00[0x1F] != 0 && D_001395B8[0x12] == 0 && D_L04_001B2008[0] < 5) {
-            record = D_L04_001B25CC[0] + (*(s32 *)(vars + 4) << 7);
+        if (g_inventory_have_flags[0x1F] != 0 && g_game_flag_table[0x12] == 0 && g_game_tick_counter[0] < 5) {
+            record = g_linked_record_table[0] + (*(s32 *)(vars + 4) << 7);
             func_2DFC18(record + 0x30, record + 0x70, 0, 1);
-        } else if (D_001A7B00[0x1F] != 0 && D_001395B8[0x12] != 0) {
+        } else if (g_inventory_have_flags[0x1F] != 0 && g_game_flag_table[0x12] != 0) {
             func_3317E8(object);
             return;
         } else {
@@ -486,8 +486,8 @@ void barlow_item_pickup_trigger_update(u8 *object) {
     }
     if (object[0x20] == 1) {
         if (func_342228(g_hero_position, *(void **)vars) != 0) {
-            if (D_001A7B00[0x1F] != 0) {
-                D_001395B8[0x12] = 1;
+            if (g_inventory_have_flags[0x1F] != 0) {
+                g_game_flag_table[0x12] = 1;
                 func_3317E8(object);
             }
         }

@@ -10,9 +10,9 @@ typedef float f32;
 
 /* Both words are inside $gp's reach (0x1AEFF0 + 0x1934/0x1938), so they carry the
    small-data attribute the shared unit's -G0 file cannot use. */
-extern u32 D_L14_001B0924 __attribute__((sda));
+extern u32 g_fading_quad_color_a __attribute__((sda));
 
-extern u32 D_L14_001B0928 __attribute__((sda));
+extern u32 g_fading_quad_color_b __attribute__((sda));
 
 /* The float parameter is declared third: the ABI slots are the same (a0, a1, f12,
    a2, a3, t0) but the declaration's order is what puts retail's `lui $at,0x3F80;
@@ -23,5 +23,5 @@ extern void gfx_draw_fading_quads(char *a, char *b, f32 e, u32 c, u32 d, int f);
 /* Binds the object and its +0x10 companion to the two small-data words. */
 void moby_bind_small_data_words(char *moby)
 {
-    gfx_draw_fading_quads(moby, moby + 0x10, 1.0f, D_L14_001B0924, D_L14_001B0928, 0x40000000);
+    gfx_draw_fading_quads(moby, moby + 0x10, 1.0f, g_fading_quad_color_a, g_fading_quad_color_b, 0x40000000);
 }

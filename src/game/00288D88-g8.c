@@ -7,7 +7,7 @@ extern char g_hud_elements[];
 extern void hud_finish_element_setup(char *);
 
 /* The subtitle counters are small data reached through $gp in retail, so this unit is -G8. */
-extern int D_L00_001A9070[2] __attribute__((sda));
+extern int g_subtitle_y_by_video_mode[2] __attribute__((sda));
 
 typedef struct {
     int active;
@@ -28,7 +28,7 @@ typedef struct { int unk00; int unk04; int id; int unk0C; } TextEntry;
 
 extern SubtitleState g_subtitle_state;
 extern TextEntry *g_subtitle_entries;
-extern unsigned short D_001A7B94;
+extern unsigned short g_subtitles_option;
 extern int g_screen_height;
 extern int g_is_pal_video;
 extern void func_2E5E58(int, int, int);
@@ -45,7 +45,7 @@ void subtitle_init_state(void)
 
     g_subtitle_state.active = 1;
     g_subtitle_state.timer = 0;
-    if (D_001A7B94 != 0)
+    if (g_subtitles_option != 0)
         func_2E5E58(0, 1, 0);
     textId = g_subtitle_entries[g_subtitle_state.entryIndex].unk00;
     func_2802E0(metrics, 0xF0, 0x1E0, 0x2C, 0x1D4, 0x100, 0x168, 0x10, 7);
@@ -53,7 +53,7 @@ void subtitle_init_state(void)
     g_subtitle_state.halfWidth = ((short)metrics[6] >> 1) + 10;
     g_subtitle_state.halfHeight = ((short)metrics[7] >> 1) + 5;
     g_subtitle_state.x = 0x100;
-    g_subtitle_state.y = D_L00_001A9070[g_is_pal_video];
+    g_subtitle_state.y = g_subtitle_y_by_video_mode[g_is_pal_video];
     g_subtitle_state.boxHalfWidth = 8;
     g_subtitle_state.boxHalfHeight = 8;
     g_subtitle_state.unk48 = 0;
@@ -68,42 +68,42 @@ void subtitle_init_state(void)
 }
 
 extern char *ref_L00_0028B338_00 __attribute__((sda));
-extern int D_001A8D44 __attribute__((sda));
-extern char *D_001B1B5C;
-extern char *D_001B1B60;
-extern int D_001B1B64;
-extern int D_001B1B6C;
-extern char *D_001B18D8;
-extern char *D_001B18DC;
-extern int D_001B18E0;
-extern int D_001B18E4;
+extern int g_moby_context_state __attribute__((sda));
+extern char *g_moby_pool_start;
+extern char *g_moby_pool_end;
+extern int g_moby_context_aux;
+extern int g_moby_context_extra;
+extern char *g_moby_context_first;
+extern char *g_moby_context_second;
+extern int g_moby_context_third;
+extern int g_moby_context_fourth;
 
 /* Switches between two saved sets of buffer pointers when the requested index differs from the current one. */
 void select_moby_context(int requested)
 {
-    int state = D_001A8D44;
+    int state = g_moby_context_state;
     if (requested != state) {
         char *first;
         char *second;
         int third, fourth, active_fourth;
         char *active_first = ref_L00_0028B338_00;
         requested = state ^ 1;
-        first = *(char *volatile *)&D_001B18D8;
-        *(char *volatile *)&D_001B18D8 = active_first;
-        active_first = *(char *volatile *)&D_001B1B60;
-        second = *(char *volatile *)&D_001B18DC;
-        *(char *volatile *)&D_001B18DC = active_first;
-        active_first = (char *)*(volatile int *)&D_001B1B64;
-        third = *(volatile int *)&D_001B18E0;
-        active_fourth = *(volatile int *)&D_001B1B6C;
-        fourth = *(volatile int *)&D_001B18E4;
-        *(volatile int *)&D_001A8D44 = requested;
-        *(char *volatile *)&D_001B1B5C = first;
-        *(char *volatile *)&D_001B1B60 = second;
-        *(volatile int *)&D_001B1B64 = third;
-        *(volatile int *)&D_001B18E0 = (int)active_first;
-        *(volatile int *)&D_001B1B6C = fourth;
-        *(volatile int *)&D_001B18E4 = active_fourth;
+        first = *(char *volatile *)&g_moby_context_first;
+        *(char *volatile *)&g_moby_context_first = active_first;
+        active_first = *(char *volatile *)&g_moby_pool_end;
+        second = *(char *volatile *)&g_moby_context_second;
+        *(char *volatile *)&g_moby_context_second = active_first;
+        active_first = (char *)*(volatile int *)&g_moby_context_aux;
+        third = *(volatile int *)&g_moby_context_third;
+        active_fourth = *(volatile int *)&g_moby_context_extra;
+        fourth = *(volatile int *)&g_moby_context_fourth;
+        *(volatile int *)&g_moby_context_state = requested;
+        *(char *volatile *)&g_moby_pool_start = first;
+        *(char *volatile *)&g_moby_pool_end = second;
+        *(volatile int *)&g_moby_context_aux = third;
+        *(volatile int *)&g_moby_context_third = (int)active_first;
+        *(volatile int *)&g_moby_context_extra = fourth;
+        *(volatile int *)&g_moby_context_fourth = active_fourth;
     }
 }
 

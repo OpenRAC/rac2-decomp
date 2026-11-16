@@ -9,7 +9,7 @@ extern float square_root(float), fast_vec_dist(void *,void *), IntToFloat(int);
 extern void FastVecScale(void *,void *,float);
 extern int vec_fast_helper_a(void *);
 extern int math_random_int_range(int,int);
-extern float D_001B168C MACRO_ADDR;
+extern float g_frame_time_scale MACRO_ADDR;
 /* Updates a firework shell. It rises, splits into sparks near the end of its life, then flares and fades out. */
 void part_update_firework(char *particle)
 {
@@ -92,7 +92,7 @@ life=math_random_int_range((unsigned char)motion[0x1b]*2,(unsigned char)motion[0
         else if((unsigned char)particle[3]==0x48) *(short *)(particle+10)=0;
         else *(int *)(particle+4)=(*(int *)(particle+4)&0xffffff)|((*(short *)(particle+10)*15/i)<<24);
         remaining = (short *)(particle + 10);
-        if(D_001B168C>1.0f) FastDecTimer(remaining);
+        if(g_frame_time_scale>1.0f) FastDecTimer(remaining);
         if(FastDecTimer(remaining)) part_kill(particle);
     }
 }

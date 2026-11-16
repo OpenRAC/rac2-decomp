@@ -5,10 +5,10 @@ typedef unsigned short u16;
 typedef int s32;
 typedef short s16;
 
-extern s32 D_L02_001A9018;
-extern u16 **D_L02_001A9014;
-extern char *D_L02_001B3C1C;
-extern char D_L02_001B1510[8] __attribute__((sda));
+extern s32 g_record_list_count;
+extern u16 **g_record_lists;
+extern char *g_record_table;
+extern char g_record_glow_marker_vec[8] __attribute__((sda));
 extern char g_camera_l02_position[];
 
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -35,16 +35,16 @@ void gfx_draw_record_glow_markers(char *moby) {
 
     if (listIndex == -1)
         return;
-    if (listIndex >= D_L02_001A9018)
+    if (listIndex >= g_record_list_count)
         return;
-    listStart = D_L02_001A9014[listIndex];
+    listStart = g_record_lists[listIndex];
     if (listStart == 0)
         return;
     entry = listStart;
     do {
-        record = D_L02_001B3C1C + ((*entry & 0x7FFF) << 6);
+        record = g_record_table + ((*entry & 0x7FFF) << 6);
         *(TI128 *)v0 = *(TI128 *)(record + 0x30);
-        matrix_mul_vec3(v1, D_L02_001B1510, record);
+        matrix_mul_vec3(v1, g_record_glow_marker_vec, record);
         FastVecAdd(v0, v0, v1);
         FastVecSub(v2, g_camera_l02_position, v0);
         vec_scale_to_length(v2, v2, 1.0f);

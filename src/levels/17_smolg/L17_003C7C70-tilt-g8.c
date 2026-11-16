@@ -7,16 +7,16 @@
 /* The tuning value the first rate divides by is read-only here: as const its load carries no
    anti-dependences on the flag stores, so sched1 issues it after the 360.0f numerator, which
    lengthens that constant's life and leaves $f20 to the scale constant, as in retail. */
-extern const float D_L17_001B03B4 __attribute__((sda));
-extern float D_L17_001B03B8 __attribute__((sda));
-extern float D_L17_001B03BC __attribute__((sda));
-extern float D_L17_001B03C0 __attribute__((sda));
-extern float D_L17_001B03C4 __attribute__((sda));
-extern float D_L17_001B03C8 __attribute__((sda));
-extern float D_L17_001B03CC __attribute__((sda));
-extern float D_L17_001B03D0 __attribute__((sda));
-extern float D_L17_001B03D4 __attribute__((sda));
-extern float D_L17_001B03D8 __attribute__((sda));
+extern const float g_tilt_platform_period __attribute__((sda));
+extern float g_tilt_platform_amplitude __attribute__((sda));
+extern float g_tilt_platform_sway_amp __attribute__((sda));
+extern float g_tilt_platform_sway_period __attribute__((sda));
+extern float g_tilt_platform_tilt_period __attribute__((sda));
+extern float g_tilt_platform_hold_seconds __attribute__((sda));
+extern float g_tilt_platform_tilt_seconds __attribute__((sda));
+extern float g_tilt_platform_return_seconds __attribute__((sda));
+extern float g_tilt_platform_scale_a __attribute__((sda));
+extern float g_tilt_platform_drop_height __attribute__((sda));
 extern void math_update_wrapped_angle_offset(void *,void *,void *,float,float,float),moby_scale_owner_words_by_angles(void *,void *,void *,float,float,float);
 extern int hero_is_current_selected_id(void *),flag_set_first_pending(void *),math_fast_float_d(void *),FloatToInt(float);
 extern void moby_set_state(void *,int,int);
@@ -56,15 +56,15 @@ void tilting_platform_update(UpdateObject *moby)
     UpdateState *vars;
     float first_rate;
     float rate_scale = 0.000290888245f;
-    first_rate=360.0f/D_L17_001B03B4;
+    first_rate=360.0f/g_tilt_platform_period;
     *(Quad *)oldpos=moby->position.q;
     *(Quad *)oldrot=moby->rotation.q;
     vars=moby->state;
     vars->flags8c|=1;
     vars->flags3e|=8;
     moby->flags34|=0x20;
-    math_update_wrapped_angle_offset(moby,&vars->a0,&vars->a4,D_L17_001B03B8,first_rate*rate_scale,-1.0f);
-    moby_scale_owner_words_by_angles(moby,&vars->a8,&vars->ac,D_L17_001B03BC,(360.0f/D_L17_001B03C0)*rate_scale,(360.0f/D_L17_001B03C4)*rate_scale);
+    math_update_wrapped_angle_offset(moby,&vars->a0,&vars->a4,g_tilt_platform_amplitude,first_rate*rate_scale,-1.0f);
+    moby_scale_owner_words_by_angles(moby,&vars->a8,&vars->ac,g_tilt_platform_sway_amp,(360.0f/g_tilt_platform_sway_period)*rate_scale,(360.0f/g_tilt_platform_tilt_period)*rate_scale);
     switch(moby->mode) {
     case 0:
         vars->origin.q=*(Quad *)oldpos;
@@ -73,7 +73,7 @@ void tilting_platform_update(UpdateObject *moby)
     case 1:
         if(hero_is_current_selected_id(moby)) {
             moby_set_state(moby,2,-1);
-            vars->b0=FloatToInt(D_L17_001B03C8*60.0f);
+            vars->b0=FloatToInt(g_tilt_platform_hold_seconds*60.0f);
         }
         break;
     case 2: {
@@ -81,13 +81,13 @@ void tilting_platform_update(UpdateObject *moby)
         if(flag_set_first_pending(moby))PlayMobySound(0,0,moby);
         if(vars->b0==60)PlayMobySound(0,0,moby);
         if(math_fast_float_d(&vars->b0)) {
-            vars->b4=FloatToInt(D_L17_001B03CC*60.0f);
+            vars->b4=FloatToInt(g_tilt_platform_tilt_seconds*60.0f);
             moby->mode=3;
         } else {
             rot[0]=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(vars->b0)*0.75f))*0.017453294f;
             rot[1]=math_fast_sin_or_cos_a(math_wrap_angle_to_pi(IntToFloat(vars->b0)*0.89f))*0.017453294f;
-            if((float)vars->b4>D_L17_001B03C8*60.0f-30.0f) {
-                progress=IntToFloat(vars->b0)/(D_L17_001B03C8*60.0f-30.0f);
+            if((float)vars->b4>g_tilt_platform_hold_seconds*60.0f-30.0f) {
+                progress=IntToFloat(vars->b0)/(g_tilt_platform_hold_seconds*60.0f-30.0f);
                 moby->rotation.f[0]=moby->rotation.f[0]*progress+rot[0]*(1.0f-progress);
                 moby->rotation.f[1]=moby->rotation.f[1]*progress+rot[1]*(1.0f-progress);
             } else {
@@ -99,8 +99,8 @@ void tilting_platform_update(UpdateObject *moby)
     }
     case 3: {
         float progress,f,b,ax,ay;
-        progress=IntToFloat(vars->b4)/(D_L17_001B03CC*60.0f);
-        f=(1.0f-progress)*D_L17_001B03D4;
+        progress=IntToFloat(vars->b4)/(g_tilt_platform_tilt_seconds*60.0f);
+        f=(1.0f-progress)*g_tilt_platform_scale_a;
         moby->rotation.f[1]=0;
         moby->rotation.f[0]=(1.0f-progress)*1.57079649f;
         ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,moby->rotation.f[2]));
@@ -117,22 +117,22 @@ void tilting_platform_update(UpdateObject *moby)
         moby->position.f[1]=ay;
         f*=math_fast_sin_or_cos_a(moby->rotation.f[0]);
         moby->position.f[2]=vars->origin.f[2]-f;
-        moby->position.f[2]-=math_fast_sin_or_cos_a(progress*1.57079649f)*D_L17_001B03D8;
+        moby->position.f[2]-=math_fast_sin_or_cos_a(progress*1.57079649f)*g_tilt_platform_drop_height;
         vars->flags8c&=~1;
         vars->flags3e&=~8;
         moby->flags34&=~0x20;
         if(math_fast_float_d(&vars->b4)) {
             moby->mode=4;
-            vars->b8=FloatToInt(D_L17_001B03D0*60.0f);
+            vars->b8=FloatToInt(g_tilt_platform_return_seconds*60.0f);
         }
         break;
     }
     case 4: {
         float progress,f,b,c,ax,ay;
-        progress=IntToFloat(vars->b8)/(D_L17_001B03D0*60.0f);
+        progress=IntToFloat(vars->b8)/(g_tilt_platform_return_seconds*60.0f);
         *(Quad *)rot=moby->rotation.q;
         c=1.0f-progress;
-        f=(1.0f-c)*D_L17_001B03D4;
+        f=(1.0f-c)*g_tilt_platform_scale_a;
         moby->rotation.f[0]=math_fast_float_g((rot[0]*c+c*4.71238947f)+1.57079649f);
         moby->rotation.f[1]=rot[1]*c;
         ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,moby->rotation.f[2]));
@@ -149,7 +149,7 @@ void tilting_platform_update(UpdateObject *moby)
         moby->position.f[1]=ay;
         f*=math_fast_sin_or_cos_a(moby->rotation.f[0]);
         moby->position.f[2]=vars->origin.f[2]-f;
-        moby->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*D_L17_001B03D8;
+        moby->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*g_tilt_platform_drop_height;
         vars->flags8c&=~1;
         vars->flags3e&=~8;
         moby->flags34&=~0x20;

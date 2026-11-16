@@ -2,8 +2,8 @@
 extern int FloatToInt(float);
 extern int g_screen_offset_x[] __attribute__((sda)), g_screen_offset_y[] __attribute__((sda));
 typedef union { int *p; int address; } PacketCursor;
-extern PacketCursor D_L05_001B2C88[] __attribute__((sda));
-extern char D_L05_001ACA80[];
+extern PacketCursor g_dma_packet_cursor_2[] __attribute__((sda));
+extern char g_quad_copy_template[];
 /* RAC1 counterpart: append_subpixel_textured_screen_quad (src/game/draw.c). */
 void AppendSubpixelTexturedScreenQuad(float x, float y, float w, float h, int u, int v, int uw, int vh,
                    unsigned long rgba, unsigned long tex) {
@@ -17,15 +17,15 @@ void AppendSubpixelTexturedScreenQuad(float x, float y, float w, float h, int u,
     long *p;
     int *base;
 
-    D_L05_001B2C88[0].p[0] = 0x10000007;
-    D_L05_001B2C88[0].p[1] = 0;
-    D_L05_001B2C88[0].p[2] = 0;
-    D_L05_001B2C88[0].p[3] = 0x50000007;
-    base = D_L05_001B2C88[0].p;
-    D_L05_001B2C88[0].p = base + 4;
-    qcopy(base + 4, D_L05_001ACA80);
+    g_dma_packet_cursor_2[0].p[0] = 0x10000007;
+    g_dma_packet_cursor_2[0].p[1] = 0;
+    g_dma_packet_cursor_2[0].p[2] = 0;
+    g_dma_packet_cursor_2[0].p[3] = 0x50000007;
+    base = g_dma_packet_cursor_2[0].p;
+    g_dma_packet_cursor_2[0].p = base + 4;
+    qcopy(base + 4, g_quad_copy_template);
     p = (long *)(base + 8);
-    D_L05_001B2C88[0].p = base + 8;
+    g_dma_packet_cursor_2[0].p = base + 8;
     p[0] = tex;
     p[1] = 0x154;
     p[2] = rgba;
@@ -38,5 +38,5 @@ void AppendSubpixelTexturedScreenQuad(float x, float y, float w, float h, int u,
     p[9] = (vb << 20) + s1;
     p[10] = x1 | ((long)y1 << 16) | ((long)0xFFFFF0 << 32);
     p[11] = 0;
-    D_L05_001B2C88[0].p = (int *)((char *)D_L05_001B2C88[0].p + 0x60);
+    g_dma_packet_cursor_2[0].p = (int *)((char *)g_dma_packet_cursor_2[0].p + 0x60);
 }

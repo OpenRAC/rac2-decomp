@@ -30,10 +30,10 @@ extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);
 extern float FastAddRotations(float, float);
 extern void part_queue_ground_shadow(void *, float);
-extern float D_L00_001B0808;
-extern float D_L00_001B0828 __attribute__((sda));
-extern float D_L00_001B082C __attribute__((sda));
-extern unsigned char D_L00_001BF220[] __attribute__((nosda));
+extern float g_gravity_bomb_speed;
+extern float g_gravity_bomb_query_response __attribute__((sda));
+extern float g_gravity_bomb_query_friction __attribute__((sda));
+extern unsigned char g_hero_l00_position[] __attribute__((nosda));
 #define BF(p,o) (*(float *)((p)+(o)))
 #define BI(p,o) (*(int *)((p)+(o)))
 typedef struct {
@@ -44,7 +44,7 @@ typedef struct {
     BounceVector point, normal, offset;
 } BounceWorkspace;
 
-void func_PAL_L00_003F2CA0(unsigned char *object) {
+void gravity_bomb_projectile_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;
     int collision;
@@ -60,7 +60,7 @@ void func_PAL_L00_003F2CA0(unsigned char *object) {
         vec_transform_or_copy(object + 0x10, object + 0x10);
         shop_trigger_current_state_effect((int)state, (int)state);
         part_steer_effect_direction(BI(state, 0x34), state, 0);
-        vec_add_object_direction_scaled(object + 0x10, (float *)state, D_L00_001B0808 * 0.00040000002f);
+        vec_add_object_direction_scaled(object + 0x10, (float *)state, g_gravity_bomb_speed * 0.00040000002f);
         work.excluded[0] = 0;
         work.excluded[1] = 0xCE3;
         qcopy(&work.query.previous, &work.previous);
@@ -70,8 +70,8 @@ void func_PAL_L00_003F2CA0(unsigned char *object) {
         work.query.excluded = work.excluded;
         work.query.mode = 2;
         work.query.radius = 0.25f;
-        work.query.response = D_L00_001B0828;
-        work.query.friction = D_L00_001B082C;
+        work.query.response = g_gravity_bomb_query_response;
+        work.query.friction = g_gravity_bomb_query_friction;
         work.query.flags0 = 0;
         work.query.flags1 = 0;
         work.query.active = 0;
@@ -94,12 +94,12 @@ void func_PAL_L00_003F2CA0(unsigned char *object) {
                 FastVecScale(&work.normal, &work.normal, -3.0f);
                 FastVecAdd(&work.normal, &work.normal, &work.point);
                 object[0x20] = 2;
-                qcopy(object + 0x10, D_L00_001BF220);
-                qcopy(state + 0x20, D_L00_001BF220 + 0x20);
+                qcopy(object + 0x10, g_hero_l00_position);
+                qcopy(state + 0x20, g_hero_l00_position + 0x20);
                 vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
                 if (CollLine(&work.point, &work.normal, 6, work.query.hit, 0)) {
-                    qcopy(object + 0x10, D_L00_001BF220);
-                    qcopy(state + 0x20, D_L00_001BF220 + 0x20);
+                    qcopy(object + 0x10, g_hero_l00_position);
+                    qcopy(state + 0x20, g_hero_l00_position + 0x20);
                     vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
                 }
             }

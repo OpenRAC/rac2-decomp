@@ -33,9 +33,9 @@ extern SpawnObject003979B0 *CreateMoby(int);
 extern int FloatToInt(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
-extern float D_L05_001AEBC4 __attribute__((sda));
-extern float D_L05_001AEBD0 __attribute__((sda));
-extern int D_L05_001AEBCC __attribute__((sda));
+extern float g_effect_time_scale __attribute__((sda));
+extern float g_effect_count_divisor __attribute__((sda));
+extern int g_effect_state_value __attribute__((sda));
 
 /* Creates a small moving object at a position with a direction and sets up its speed, lifetime
    and orientation. */
@@ -58,16 +58,16 @@ SpawnObject003979B0 *func_L05_003979B0(float *pos, float *vec, int a2, SpawnObje
         obj->dist = 0xFF;
         st = obj->st;
         obj->drawDist = 0x1FF;
-        f20 = D_L05_001AEBC4 * (1.0f / 60.0f);
+        f20 = g_effect_time_scale * (1.0f / 60.0f);
         st->flag = flag;
         f21 = 1.0f;
-        count = FloatToInt(D_L05_001AEBD0);
+        count = FloatToInt(g_effect_count_divisor);
         st->count = count;
-        st->value = D_L05_001AEBCC;
+        st->value = g_effect_state_value;
         st->a2 = a2;
         st->a3 = (char *)a3;
         st->zero = 0;
-        st->rate = f21 / D_L05_001AEBD0;
+        st->rate = f21 / g_effect_count_divisor;
         qcopy(obj->pos, pos);
         obj->scale = obj->scale * 0.5f;
         vec_scale_to_length(st, vec, f20);

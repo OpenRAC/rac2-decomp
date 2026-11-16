@@ -67,7 +67,7 @@ typedef struct {
 } HeroView;
 
 extern HeroView g_hero_state;
-extern char D_001AFAE0[];
+extern char g_str_turret_ticks_debug[];
 
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_world_draw_callback(void (*)(Object *), Object *);
@@ -91,13 +91,13 @@ extern float math_spring_float_to_goal(s32, float, s32, float, float, float);
 extern float vec_spring_to_target(s32, s32, s32, float, float, float);
 extern float math_step_value_toward_target(float *, void *, float, float, float, float);
 extern void moby_scale_owner_words_by_angles(Object *, void *, void *, float, float, float);
-extern int func_PAL_002B27B8(Object *, void *);
+extern int moby_dispatch_action_by_kind_pal(Object *, void *);
 extern s32 flag_set_second_pending(Object *);
-extern int func_PAL_002B5BA8(Object *, float *, float);
-extern int func_PAL_002B5C98(Object *, void *, float);
+extern int moby_turn_toward_target_and_step_pal(Object *, float *, float);
+extern int moby_step_controller_pal(Object *, void *, float);
 extern void moby_set_controller_speed_limits(Object *, float, float, float, float);
 extern void func_PAL_0031D2E8(Object *);
-extern void func_PAL_0031DAB8(Object *);
+extern void three_part_turret_update_parts_pal(Object *);
 extern void three_part_turret_draw_effects(Object *);
 extern void gfx_record_trail_point(Object *);
 extern void gfx_draw_trail_ribbon(Object *);
@@ -164,7 +164,7 @@ void func_PAL_0031C1B8(Object *self)
         }
         break;
     case 5:
-        result = func_PAL_002B27B8(self, vars->dispatch);
+        result = moby_dispatch_action_by_kind_pal(self, vars->dispatch);
         if (result & 1) {
             moby_mark_spawned(vars->parts[0]);
             moby_mark_spawned(vars->parts[1]);
@@ -221,7 +221,7 @@ void func_PAL_0031C1B8(Object *self)
         if (self->pos[2] - ground > 0.05f) {
             math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.020000001f, 0.19600002f, 0.20000002f);
         } else {
-            STUB_printf(D_001AFAE0, vars->ticks);
+            STUB_printf(g_str_turret_ticks_debug, vars->ticks);
             moby_set_state(self, 8, -1);
             if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
         }
@@ -279,9 +279,9 @@ void func_PAL_0031C1B8(Object *self)
             if (self->animNext != 16) func_PAL_002A7E68(self, 16, 4, 2);
             vars->hold = 0;
         } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 2.8f) {
-            func_PAL_002B5BA8(self, g_hero_state.pos, vars->range);
+            moby_turn_toward_target_and_step_pal(self, g_hero_state.pos, vars->range);
         } else {
-            func_PAL_002B5C98(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
+            moby_step_controller_pal(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         }
         if (vec_distance_xy(self->pos, g_hero_state.pos) > 5.0f && self->anim == 8) {
             if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 3);
@@ -315,7 +315,7 @@ void func_PAL_0031C1B8(Object *self)
                 gfx_record_trail_point(self);
             }
         }
-        func_PAL_002B5C98(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
+        moby_step_controller_pal(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         break;
     case 14:
         if (self->flags & 2) {
@@ -338,6 +338,6 @@ void func_PAL_0031C1B8(Object *self)
         }
         break;
     }
-    func_PAL_0031DAB8(self);
+    three_part_turret_update_parts_pal(self);
     gfx_register_overlay_draw_callback(three_part_turret_draw_effects, self);
 }

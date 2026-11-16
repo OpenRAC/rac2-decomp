@@ -9,7 +9,7 @@ extern int func_0029CAE0(int);
 extern int func_00341E58(char *);
 extern void menu_start_action(int);
 
-int func_US2_002D6248(void)
+int menu_page_handle_input_close_us2(void)
 {
     int result = 0;
     int *state = g_pad_state;

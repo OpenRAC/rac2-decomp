@@ -20,24 +20,24 @@ extern struct {
 } D_00189E20;
 #define D_0018BDD0 D_00189E20.x
 #define D_0018BDD4 D_00189E20.y
-extern float D_L16_001B1B50 __attribute__((sda));
-extern float D_L16_001B1B10 __attribute__((sda));
-extern float D_L16_001B1B14[] MACRO_ADDR;
-extern float D_L16_001B1B18 __attribute__((sda));
-extern float D_L16_001B1B1C[] MACRO_ADDR;
-extern float D_L16_001B1B20 __attribute__((sda));
+extern float g_steering_filtered_turn __attribute__((sda));
+extern float g_steering_accel_rate __attribute__((sda));
+extern float g_steering_accel_rate_alt[] MACRO_ADDR;
+extern float g_steering_target_speed __attribute__((sda));
+extern float g_steering_target_speed_alt[] MACRO_ADDR;
+extern float g_steering_decel_rate __attribute__((sda));
 typedef struct {
     float lowAcceleration, highAcceleration, lowSpeed, highSpeed, deceleration;
 } SteeringRateSettings;
-extern SteeringRateSettings D_L16_001B1B28 MACRO_ADDR;
+extern SteeringRateSettings g_steering_rate_settings MACRO_ADDR;
 extern SteeringRateSettings smallRateSettings SDATA(D_L16_001B1B28);
-extern float D_L16_001B1B40 __attribute__((sda));
+extern float g_steering_limit_high_deg __attribute__((sda));
 typedef struct {
     float minAngle;
     char reserved[8];
     float filteredX, filteredY;
 } SteeringAngleSettings;
-extern SteeringAngleSettings D_L16_001B1B44 MACRO_ADDR;
+extern SteeringAngleSettings g_steering_angle_settings MACRO_ADDR;
 extern float math_fabs(float);
 extern float ApproachValue(float *, float, float);
 extern float FastAddRotations(float, float);
@@ -56,24 +56,24 @@ void func_PAL_L16_0041C470(char *object)
 
     qcopy(&local.position, (object + 0x10));
     qcopy(&local.angles, (object + 0xf0));
-    if (math_fabs(D_0018BDD0) < D_L16_001B1B50)
-        D_L16_001B1B50 = math_fabs(D_0018BDD0);
-    else if (D_L16_001B1B50 < -math_fabs(D_0018BDD0))
-        D_L16_001B1B50 = -math_fabs(D_0018BDD0);
-    if (math_fabs(D_0018BDD4) < D_L16_001B1B44.filteredY)
-        D_L16_001B1B44.filteredY = math_fabs(D_0018BDD4);
-    else if (D_L16_001B1B44.filteredY < -math_fabs(D_0018BDD4))
-        D_L16_001B1B44.filteredY = -math_fabs(D_0018BDD4);
-    ApproachValue(&D_L16_001B1B50, D_0018BDD0, 0.15f);
-    ApproachValue(&D_L16_001B1B44.filteredY, D_0018BDD4, 0.15f);
-    deceleration = D_L16_001B1B20*6.981318e-06f;
-    if (D_L16_001B1B50 != 0.0f) {
-        if (math_fabs(D_L16_001B1B50) >= 1.0f) {
-            acceleration = D_L16_001B1B14[0]*6.981318e-06f;
-            target = D_L16_001B1B1C[0]*((-D_L16_001B1B50)*0.0003490659f);
+    if (math_fabs(g_player_state) < g_steering_filtered_turn)
+        g_steering_filtered_turn = math_fabs(g_player_state);
+    else if (g_steering_filtered_turn < -math_fabs(g_player_state))
+        g_steering_filtered_turn = -math_fabs(g_player_state);
+    if (math_fabs(g_pad_stick_y) < g_steering_angle_settings.filteredY)
+        g_steering_angle_settings.filteredY = math_fabs(g_pad_stick_y);
+    else if (g_steering_angle_settings.filteredY < -math_fabs(g_pad_stick_y))
+        g_steering_angle_settings.filteredY = -math_fabs(g_pad_stick_y);
+    ApproachValue(&g_steering_filtered_turn, g_player_state, 0.15f);
+    ApproachValue(&g_steering_angle_settings.filteredY, g_pad_stick_y, 0.15f);
+    deceleration = g_steering_decel_rate*6.981318e-06f;
+    if (g_steering_filtered_turn != 0.0f) {
+        if (math_fabs(g_steering_filtered_turn) >= 1.0f) {
+            acceleration = g_steering_accel_rate_alt[0]*6.981318e-06f;
+            target = g_steering_target_speed_alt[0]*((-g_steering_filtered_turn)*0.0003490659f);
         } else {
-            acceleration = D_L16_001B1B10*(math_fabs(D_L16_001B1B50)*6.981318e-06f);
-            target = D_L16_001B1B18*((-D_L16_001B1B50)*0.0003490659f);
+            acceleration = g_steering_accel_rate*(math_fabs(g_steering_filtered_turn)*6.981318e-06f);
+            target = g_steering_target_speed*((-g_steering_filtered_turn)*0.0003490659f);
         }
     } else {
         acceleration = 0.0f;
@@ -88,16 +88,16 @@ void func_PAL_L16_0041C470(char *object)
             ApproachValue((float *)(state + 0x80), target, acceleration);
     }
     {
-        float inputY = D_L16_001B1B44.filteredY;
+        float inputY = g_steering_angle_settings.filteredY;
         deceleration = smallRateSettings.deceleration*6.981318e-06f;
         if (inputY != 0.0f) {
             if (math_fabs(inputY) >= 1.0f) {
-                float turn = -D_L16_001B1B44.filteredY;
-                acceleration = D_L16_001B1B28.highAcceleration*6.981318e-06f;
-                target = D_L16_001B1B28.highSpeed*(turn*0.0003490659f);
+                float turn = -g_steering_angle_settings.filteredY;
+                acceleration = g_steering_rate_settings.highAcceleration*6.981318e-06f;
+                target = g_steering_rate_settings.highSpeed*(turn*0.0003490659f);
             } else {
-                acceleration = smallRateSettings.lowAcceleration*(math_fabs(D_L16_001B1B44.filteredY)*6.981318e-06f);
-                target = smallRateSettings.lowSpeed*((-D_L16_001B1B44.filteredY)*0.0003490659f);
+                acceleration = smallRateSettings.lowAcceleration*(math_fabs(g_steering_angle_settings.filteredY)*6.981318e-06f);
+                target = smallRateSettings.lowSpeed*((-g_steering_angle_settings.filteredY)*0.0003490659f);
             }
         } else {
             acceleration = 0.0f;
@@ -115,8 +115,8 @@ void func_PAL_L16_0041C470(char *object)
     if (*(float *)(state + 0x80) != 0.0f)
         *(float *)(object + 0xf8) = FastAddRotations(*(float *)(object + 0xf8), *(float *)(state + 0x80));
     if (*(float *)(state + 0x84) != 0.0f) {
-        local.limits.high = D_L16_001B1B40*0.017453294f;
-        local.limits.low = D_L16_001B1B44.minAngle*0.017453294f;
+        local.limits.high = g_steering_limit_high_deg*0.017453294f;
+        local.limits.low = g_steering_angle_settings.minAngle*0.017453294f;
         local.work.bounds = local.limits;
         math_clamp_speed_to_braking_limit((float *)(state + 0x84), local.work.bounds.high - *(float *)(state + 0x90), deceleration);
         math_clamp_speed_to_braking_limit((float *)(state + 0x84), local.work.bounds.low - *(float *)(state + 0x90), deceleration);

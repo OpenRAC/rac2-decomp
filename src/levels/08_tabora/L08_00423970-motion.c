@@ -12,8 +12,8 @@ extern void moby_transform_joint_point(void *, int, void *);
 extern int CollLine(void *, void *, int, void *, void *);
 extern s32 TransitionTaboraSlot(void *, void *, void *);
 extern struct { char pad[0x1830]; char *object; char pad1834[0xA60]; int state; } g_hero_state;
-extern char *D_L08_001BFF58;
-extern volatile float D_L08_001B1D24[] __attribute__((sda));
+extern char *g_hero_moby_target;
+extern volatile float g_ground_probe_height_offset[] __attribute__((sda));
 
 /* Aims the Desert Dune Monster's sweeping attack at its target and hurts whatever it hits on the way. */
 void dune_monster_sweep_attack(char *actor) {
@@ -67,11 +67,11 @@ void dune_monster_sweep_attack(char *actor) {
         vec_scale_to_length(end, origin, distance + 1.0f);
         FastVecAdd(end, end, matrix + 12);
         if (g_hero_state.state != 0x31)
-            end[2] = start[2] = coll_probe_ground_height_below(vars + 0x140, 0.5f, 0) + D_L08_001B1D24[0];
+            end[2] = start[2] = coll_probe_ground_height_below(vars + 0x140, 0.5f, 0) + g_ground_probe_height_offset[0];
         else
-            end[2] = start[2] = coll_probe_ground_height_below(g_hero_state.object + 0x10, 0.5f, 0) + D_L08_001B1D24[0];
-        if (g_hero_state.object && D_L08_001BFF58 == g_hero_state.object)
-            end[2] = start[2] = *(float *)(D_L08_001BFF58 + 0x18) + D_L08_001B1D24[0];
+            end[2] = start[2] = coll_probe_ground_height_below(g_hero_state.object + 0x10, 0.5f, 0) + g_ground_probe_height_offset[0];
+        if (g_hero_state.object && g_hero_moby_target == g_hero_state.object)
+            end[2] = start[2] = *(float *)(g_hero_moby_target + 0x18) + g_ground_probe_height_offset[0];
         if (!CollLine(start, end, 0, actor, hit)) {
             start[2] -= 0.5f;
             end[2] -= 0.5f;

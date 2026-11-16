@@ -10,11 +10,11 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern int PlayMobySound(int, int, char *);
 extern u8 *spark_shot_spawn(void *, void *, void *, s32);
-extern f32 D_L07_001B0FA0 __attribute__((sda));
-extern s32 D_L07_001B0FA8 __attribute__((sda));
-extern Vector D_L07_001B0FB0 __attribute__((sda));
-extern f32 D_L07_001B0FC0 __attribute__((sda));
-extern s32 D_L07_001B1E08 __attribute__((nosda));
+extern f32 g_turret_yaw_rate __attribute__((sda));
+extern s32 g_turret_period __attribute__((sda));
+extern Vector g_turret_l07_muzzle_offset __attribute__((sda));
+extern f32 g_turret_l07_shot_speed __attribute__((sda));
+extern s32 g_frame_l07_counter __attribute__((nosda));
 
 /* Advances the dormant entity through initialization and its firing state. */
 /* Updates the turret: sets itself up, plays its shot animation, then fires a projectile at regular intervals. */
@@ -46,13 +46,13 @@ void siberius_turret_update(u8 *moby)
         break;
     case 3: {
         s32 period, tick;
-        swing_update_yaw((s8 *)moby, D_L07_001B0FA0 * 0.0002908882452175f);
-        period = D_L07_001B0FA8;
-        tick = D_L07_001B1E08;
+        swing_update_yaw((s8 *)moby, g_turret_yaw_rate * 0.0002908882452175f);
+        period = g_turret_period;
+        tick = g_frame_l07_counter;
         if (tick % period == 0) {
-            matrix_mul_vec3(position, D_L07_001B0FB0, moby + 0xC0);
+            matrix_mul_vec3(position, g_turret_l07_muzzle_offset, moby + 0xC0);
             FastVecAdd(position, position, moby + 0x10);
-            vec_scale_to_length(velocity, moby + 0xC0, D_L07_001B0FC0 * 0.0166666675359f);
+            vec_scale_to_length(velocity, moby + 0xC0, g_turret_l07_shot_speed * 0.0166666675359f);
             PlayMobySound(0, 0, (char *)moby);
             spark_shot_spawn(moby, position, velocity, state[0x34]);
         }

@@ -16,7 +16,7 @@ typedef struct {
     char reservedBD[0x100 - 0xBD];
 } YeedilObject;
 
-extern YeedilObject *D_L20_001B2F9C;
+extern YeedilObject *g_group_l20_member_table;
 extern YeedilObject *yeedilObjectsGp SDATA(D_L20_001B2F9C);
 extern struct {
     char reserved00[0x80];
@@ -69,7 +69,7 @@ void floor_l20_switch_update(unsigned char *object)
                     if (entry[4]) {
                         moby_set_flag_bit((unsigned char *)&yeedilObjectsGp[index], enabled);
                     } else {
-                        D_L20_001B2F9C[index].enabled = enabled;
+                        g_group_l20_member_table[index].enabled = enabled;
                     }
                 }
             }

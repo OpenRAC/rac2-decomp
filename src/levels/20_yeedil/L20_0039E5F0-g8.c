@@ -7,7 +7,7 @@ extern s32 weapon_select_aim_target(void *, s32, s32, float, float, s32);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern float moby_update_aim_target_strength(void *, int);
 
-extern const float D_L20_001AED00 __attribute__((sda));
+extern const float g_object_life_timer_scale __attribute__((sda));
 extern int g_pHeroMoby[];
 
 /* A countdown object: set up once, then it drains its timer by the animation's step
@@ -27,7 +27,7 @@ void object_life_timer_update(char *obj)
         moby_change_class_from_tables(obj, 0xCBC);
         *(u16 *)(obj + 0x32) = 0xFF;
         *(u16 *)(obj + 0x34) &= 0xFFFB;
-        *(f32 *)(obj + 0x2C) = *(f32 *)(*(char **)(obj + 0x24) + 0x24) * D_L20_001AED00;
+        *(f32 *)(obj + 0x2C) = *(f32 *)(*(char **)(obj + 0x24) + 0x24) * g_object_life_timer_scale;
         *(int *)(state + 0x190) = 1;
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;

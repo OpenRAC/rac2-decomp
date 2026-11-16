@@ -3,7 +3,7 @@
 #include "common.h"
 
 extern unsigned char *g_dma_packet_cursor __attribute__((sda));
-extern unsigned char D_PAL_001AC950[];
+extern unsigned char g_qcopy_source_block[];
 
 /* func_PAL_0026E780, PAL's own function, built like func_002FC518: appends a packet header for
    three quadwords to the buffer at D_001B22A8, the quadword at D_PAL_001AC950, and four doublewords.
@@ -21,7 +21,7 @@ void func_PAL_0026E780(void)
     *(unsigned int *)(g_dma_packet_cursor + 12) = 0x50000003u;
     g_dma_packet_cursor += 16;
     p = g_dma_packet_cursor;
-    qcopy(p, D_PAL_001AC950);
+    qcopy(p, g_qcopy_source_block);
     p += 16;
     g_dma_packet_cursor = p;
     *(unsigned long long *)(p + 0) = 0x101;
@@ -32,9 +32,9 @@ void func_PAL_0026E780(void)
 }
 
 typedef struct { char prefix[20]; int *data; } SplashState;
-extern char D_001BAEC0[];
-extern int D_001A72DC[] __attribute__((sda));
-extern int func_PAL_0029DE68(int, void *);
+extern char g_loader_memory[];
+extern int g_vram_display_address[] __attribute__((sda));
+extern int fast_decompress_pal(int, void *);
 extern void FlushCache(int);
 extern void gfx_reset_packet_buffer(void);
 extern long long tex_upload_blocks_return_setup(void *, int, int, int);
@@ -61,15 +61,15 @@ void func_PAL_0026E838(int arg)
     int *data;
     int count;
 
-    func_PAL_0029DE68(arg, ((SplashState *)D_001BAEC0)->data);
+    fast_decompress_pal(arg, ((SplashState *)g_loader_memory)->data);
     FlushCache(0);
     for (count = 0x80; count >= 0; count -= 2) {
         gfx_reset_packet_buffer();
         SetBackgroundColor(0, 0, 0);
         gfx_append_draw_list_header();
         gfx_append_draw_list_buffer_tag(0);
-        data = ((SplashState *)D_001BAEC0)->data;
-        tex_upload_blocks_return_setup(data + 4, D_001A72DC[0], data[0], data[1]);
+        data = ((SplashState *)g_loader_memory)->data;
+        tex_upload_blocks_return_setup(data + 4, g_vram_display_address[0], data[0], data[1]);
         gfx_write_clear_color_packets();
         gfx_set_clear_color_packet(0, 0, 0, count);
         PutDrawBufferSmall();
@@ -88,9 +88,9 @@ void func_PAL_0026E838(int arg)
 
 void func_PAL_0026E928(int arg)
 {
-    char *state = D_001BAEC0;
+    char *state = g_loader_memory;
     int *data;
-    func_PAL_0029DE68(arg, *(void **)(state + 20));
+    fast_decompress_pal(arg, *(void **)(state + 20));
     FlushCache(0);
     gfx_reset_packet_buffer();
     gfx_install_dma_handlers();
@@ -98,7 +98,7 @@ void func_PAL_0026E928(int arg)
     gfx_append_draw_list_header();
     gfx_append_draw_list_buffer_tag(0);
     data = *(int **)(state + 20);
-    tex_upload_blocks_return_setup(data + 4, D_001A72DC[0], data[0], data[1]);
+    tex_upload_blocks_return_setup(data + 4, g_vram_display_address[0], data[0], data[1]);
     gfx_write_clear_color_packets();
     PutDrawBufferSmall();
     gfx_queue_second_strip_packet();

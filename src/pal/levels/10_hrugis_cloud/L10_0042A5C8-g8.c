@@ -14,13 +14,13 @@
 
 typedef struct { u8 bytes[16]; } Block;
 
-extern u8 *D_L10_001B13F0 __attribute__((sda));
-extern int D_L10_001B3548 __attribute__((sda));
-extern int D_L10_001B3544 __attribute__((sda));
+extern u8 *g_hud_blink_moby __attribute__((sda));
+extern int g_hud_first_draw_done __attribute__((sda));
+extern int g_hud_last_map_value __attribute__((sda));
 /* The count shown beside the icon is the fourth word of this block. Read as an element, it stays a
    two-word load, which keeps it out of the timer test's delay slot as in retail. */
 extern int g_current_map_index[] __attribute__((sda));
-extern u8 *D_L10_001A904C;
+extern u8 *g_hud_sprite_table_base;
 /* The settings block; PAL's language byte is its member at 0x24. */
 typedef struct {
     u8 pad00[0x24];
@@ -29,14 +29,14 @@ typedef struct {
 } Settings;
 extern Settings g_is_pal_video __attribute__((sda));
 /* the selected kind, -2 for none */
-extern s32 D_L10_001B13A0 __attribute__((sda));
-extern int D_L10_001B14A8 __attribute__((sda)), D_L10_001B14B0 __attribute__((sda));
-extern int D_L10_001B14B8 __attribute__((sda)), D_L10_001B14C0 __attribute__((sda));
-extern int D_L10_001B14AC, D_L10_001B14B4, D_L10_001B14BC, D_L10_001B14C4;
-extern float D_L10_001B2D84;
-extern int D_L10_001B2D80;
-extern Block D_L10_001B1520;
-extern char D_L10_001B1530[] MACRO_ADDR;
+extern s32 g_selected_mission_kind __attribute__((sda));
+extern int g_hud_panel_first_x __attribute__((sda)), g_hud_icon_x __attribute__((sda));
+extern int g_hud_panel_second_x __attribute__((sda)), g_hud_panel_third_x __attribute__((sda));
+extern int g_hud_panel_first_y, g_hud_icon_y, g_hud_panel_second_y, g_hud_panel_third_y;
+extern float g_screen_l10_scale;
+extern int g_screen_layout_mode;
+extern Block g_hud_color_block_active;
+extern char g_str_hud_map_format[] MACRO_ADDR;
 extern void *table_find_by_id(void *, s32);
 /* (sprite, color, x, y, scale, alpha, angle) */
 extern void gfx_draw_scaled_object_two_axes(void *, u32, f32, f32, f32, f32, f32);
@@ -50,7 +50,7 @@ extern void text_draw_medium(s32, s32, u64, char *, s32);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L10_001B2D84 + 0.5f;
+    f32 scaled = value * g_screen_l10_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -63,7 +63,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
    which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L10_001B2D80;
+    int mode = g_screen_layout_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -101,23 +101,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 
 void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
 {
-    u8 *state = *(u8 **)(D_L10_001B13F0 + 0x68);
+    u8 *state = *(u8 **)(g_hud_blink_moby + 0x68);
     f32 fade;
     void *sprite;
     char text[128];
     Block color;
 
-    if (D_L10_001B3548 == 0) {
-        D_L10_001B3544 = g_current_map_index[3];
-        D_L10_001B3548 = 1;
+    if (g_hud_first_draw_done == 0) {
+        g_hud_last_map_value = g_current_map_index[3];
+        g_hud_first_draw_done = 1;
     }
-    if (D_L10_001A904C == 0)
+    if (g_hud_sprite_table_base == 0)
         return;
     if (first) {
-        HUD_SPRITE(0xBD, 0x60442D00, D_L10_001B14A8, D_L10_001B14AC, -1.0f, 1.0f, 0.0f);
-        HUD_SPRITE(0xBE, 0x55F0C070, D_L10_001B14A8, D_L10_001B14AC, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBD, 0x60442D00, g_hud_panel_first_x, g_hud_panel_first_y, -1.0f, 1.0f, 0.0f);
+        HUD_SPRITE(0xBE, 0x55F0C070, g_hud_panel_first_x, g_hud_panel_first_y, -1.0f, 1.0f, 0.0f);
     }
-    if (second && D_L10_001B3544 < g_current_map_index[3]) {
+    if (second && g_hud_last_map_value < g_current_map_index[3]) {
         if (math_fast_float_d(state + 0x4C) == 0) {
             if (*(s32 *)(state + 0x4C) >= 291) {
                 fade = IntToFloat(250 - *(s32 *)(state + 0x4C)) * 0.1f;
@@ -125,45 +125,45 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
                     fade = 1.0f;
                 else if (fade < 0.0f)
                     fade = 0.0f;
-                HUD_SPRITE(0xBF, 0x60442D00, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
-                HUD_SPRITE(0xC0, 0x55F0C070, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
+                HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
+                HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
             } else if (*(s32 *)(state + 0x4C) < 10) {
                 fade = IntToFloat(*(s32 *)(state + 0x4C)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
                     fade = 0.0f;
-                HUD_SPRITE(0xBF, 0x60442D00, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
-                HUD_SPRITE(0xC0, 0x55F0C070, D_L10_001B14B0, D_L10_001B14B4, fade, fade, 0.0f);
+                HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
+                HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
             } else {
                 s32 textX;
 
-                HUD_SPRITE(0xBF, 0x60442D00, D_L10_001B14B0, D_L10_001B14B4, 1.0f, 1.0f, 0.0f);
-                HUD_SPRITE(0xC0, 0x55F0C070, D_L10_001B14B0, D_L10_001B14B4, 1.0f, 1.0f, 0.0f);
-                color = D_L10_001B1520;
-                hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), D_L10_001B14B0 - 51,
-                              screen_coord(D_L10_001B2D80, (f32)(D_L10_001B14B4 - 13), 1.0f), 28, 28, &color);
-                sprintf(text, D_L10_001B1530, g_current_map_index[3]);
-                textX = D_L10_001B14B0 + 5;
-                text_draw_medium(textX, label_y((void *)textX, (f32)(D_L10_001B14B4 + 2), D_L10_001B2D84, 0.5f, 1),
+                HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_x, g_hud_icon_y, 1.0f, 1.0f, 0.0f);
+                HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_x, g_hud_icon_y, 1.0f, 1.0f, 0.0f);
+                color = g_hud_color_block_active;
+                hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), g_hud_icon_x - 51,
+                              screen_coord(g_screen_layout_mode, (f32)(g_hud_icon_y - 13), 1.0f), 28, 28, &color);
+                sprintf(text, g_str_hud_map_format, g_current_map_index[3]);
+                textX = g_hud_icon_x + 5;
+                text_draw_medium(textX, label_y((void *)textX, (f32)(g_hud_icon_y + 2), g_screen_l10_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {
-            D_L10_001B3544 = g_current_map_index[3];
+            g_hud_last_map_value = g_current_map_index[3];
             *(s32 *)(state + 0x4C) = 250;
         }
     }
     if (third) {
-        HUD_SPRITE(0xC1, 0x60442D00, D_L10_001B14B8, D_L10_001B14BC, 1.35f, 1.0f, 0.0f);
-        HUD_SPRITE(0xC2, 0x55F0C070, D_L10_001B14B8, D_L10_001B14BC, 1.35f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC1, 0x60442D00, g_hud_panel_second_x, g_hud_panel_second_y, 1.35f, 1.0f, 0.0f);
+        HUD_SPRITE(0xC2, 0x55F0C070, g_hud_panel_second_x, g_hud_panel_second_y, 1.35f, 1.0f, 0.0f);
     }
     if (fourth) {
-        if ((g_is_pal_video.language == 3 || g_is_pal_video.language == 4) && D_L10_001B13A0 == 2) {
+        if ((g_is_pal_video.language == 3 || g_is_pal_video.language == 4) && g_selected_mission_kind == 2) {
             LANGUAGE_SPRITE(0xC1, 0x60442D00);
             LANGUAGE_SPRITE(0xC2, 0x55F0C070);
         } else {
-            HUD_SPRITE(0xC1, 0x60442D00, D_L10_001B14C0, D_L10_001B14C4, 1.35f, 1.0f, 0.0f);
-            HUD_SPRITE(0xC2, 0x55F0C070, D_L10_001B14C0, D_L10_001B14C4, 1.35f, 1.0f, 0.0f);
+            HUD_SPRITE(0xC1, 0x60442D00, g_hud_panel_third_x, g_hud_panel_third_y, 1.35f, 1.0f, 0.0f);
+            HUD_SPRITE(0xC2, 0x55F0C070, g_hud_panel_third_x, g_hud_panel_third_y, 1.35f, 1.0f, 0.0f);
         }
     }
 }

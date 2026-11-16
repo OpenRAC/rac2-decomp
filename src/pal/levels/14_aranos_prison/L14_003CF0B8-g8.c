@@ -8,21 +8,21 @@ extern int flag_set_first_pending(void *);
 extern int flag_is_third_pending_set(void *);
 extern void moby_set_flag_bit(void *, int);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void func_PAL_L14_003CF468(void *);
-extern void func_PAL_L14_003CF6C8(void *);
+extern void lift_clamp_group_riders_wide_pal(void *);
+extern void UpdateLaunchVolume_pal(void *);
 extern void swing_apply_to_object(void *);
 extern int PlayMobySound(int, int, void *);
-extern char *D_0018A15C NOT_SDA;
-extern unsigned short D_0018CDD8 NOT_SDA;
-extern char D_L14_001A8F20[] __attribute__((sda));
-extern float D_L14_001AFEF8 __attribute__((sda));
-extern float D_L14_001AFEFC __attribute__((sda));
-extern float D_L14_001AFF00 __attribute__((sda));
-extern float D_L14_001AFF04 __attribute__((sda));
-extern float D_L14_001AFF08 __attribute__((sda));
-extern float D_L14_001AFF0C __attribute__((sda));
+extern char *g_platform_actor_ref NOT_SDA;
+extern unsigned short g_swing_id NOT_SDA;
+extern char g_identity_l14_matrix[] __attribute__((sda));
+extern float g_swing_angle_speed __attribute__((sda));
+extern float g_swing_start_angle __attribute__((sda));
+extern float g_swing_restitution __attribute__((sda));
+extern float g_swing_max_angle __attribute__((sda));
+extern float g_swing_stop_angle __attribute__((sda));
+extern float g_swing_offset __attribute__((sda));
 
-void func_PAL_L14_003CF0B8(char *self) {
+void swing_update_pal(char *self) {
  char *s = *(char **)(self+0x68);
  char *e;
  float b,delta,velocity,position,restitution;
@@ -31,7 +31,7 @@ void func_PAL_L14_003CF0B8(char *self) {
   moby_set_state(self,1,-1);
   *(int *)(s+0x5C) |= 1;
   qcopy(s+0x70,self+0x10);
-  *(float *)(s+0x78) += D_L14_001AFF0C;
+  *(float *)(s+0x78) += g_swing_offset;
   e=CreateMoby(0xF4D);
   if(e) {
    unsigned short flags,link;
@@ -47,36 +47,36 @@ void func_PAL_L14_003CF0B8(char *self) {
   }
   break;
  case 1:
-  if(flag_set_first_pending(self))mat_combine_and_store(s+0x20,D_L14_001A8F20,self+0xF0,self+0xF0);
-  if(D_0018A15C==self)func_PAL_L14_003CF468(self);
+  if(flag_set_first_pending(self))mat_combine_and_store(s+0x20,g_identity_l14_matrix,self+0xF0,self+0xF0);
+  if(g_platform_actor_ref==self)lift_clamp_group_riders_wide_pal(self);
   if(flag_is_third_pending_set(self)) {
    moby_set_state(self,2,-1);
    moby_set_flag_bit(self,0);
-   func_PAL_L14_003CF6C8(self);
+   UpdateLaunchVolume_pal(self);
   }
   break;
  case 2:
-  if(flag_set_first_pending(self))*(float *)(s+0x84)=D_L14_001AFEFC*0.0003490659f;
-  delta=D_L14_001AFEF8*6.981318e-06f;
+  if(flag_set_first_pending(self))*(float *)(s+0x84)=g_swing_start_angle*0.0003490659f;
+  delta=g_swing_angle_speed*6.981318e-06f;
   velocity=*(float *)(s+0x84)-delta;
-  b=D_L14_001AFF04*0.01745329424738884f;
+  b=g_swing_max_angle*0.01745329424738884f;
   position=*(float *)(s+0x80);
   position+=velocity;
   *(float *)(s+0x84)=velocity;
   *(float *)(s+0x80)=position;
   if(*(float *)(s+0x80)>b) {
-   restitution=D_L14_001AFF00;
+   restitution=g_swing_restitution;
    *(float *)(s+0x80)=b;
    *(float *)(s+0x84)*=restitution;
    PlayMobySound(0,0,self);
   } else if(*(float *)(s+0x80)<0.0f) {
-   restitution=D_L14_001AFF00;
+   restitution=g_swing_restitution;
    *(float *)(s+0x80)=0.0f;
    *(float *)(s+0x84)*=restitution;
    PlayMobySound(0,0,self);
-   if(*(float *)(s+0x84)<=D_L14_001AFF08*0.0003490659f)moby_set_state(self,1,-1);
+   if(*(float *)(s+0x84)<=g_swing_stop_angle*0.0003490659f)moby_set_state(self,1,-1);
   }
-  D_0018CDD8=-1;
+  g_swing_id=-1;
   swing_apply_to_object(self);
   break;
  }

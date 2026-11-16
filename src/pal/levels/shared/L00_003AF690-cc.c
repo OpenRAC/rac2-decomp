@@ -26,9 +26,9 @@ typedef struct {
 typedef struct { char pad[4]; unsigned char piercing; char pad5[0x6B]; float damage; char tail[0x6C]; } Material;
 
 extern Collision g_collision_result;
-extern Vector D_L00_0023B710[][4];
+extern Vector g_projectile_offset_points[][4];
 extern Material g_weapon_l00_table[];
-extern unsigned short D_L00_001B1FB0[] MACRO_ADDR;
+extern unsigned short g_homing_moby_index_list[] MACRO_ADDR;
 extern char g_camera_l00_position[];
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby;
@@ -61,11 +61,11 @@ extern int PlayMobySound(int, int, void *);
 extern void table_clear_entry_flag(int);
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
-extern void func_PAL_L00_003B00B8(char *, void *, char *);
+extern void homing_shot_spawn_explosion_pal(char *, void *, char *);
 extern void func_PAL_L00_003B0230(char *, void *);
 extern void moby_transform_offset_to_world(char *, void *);
 extern void shot_save_trail_transform(void);
-extern int func_PAL_0032F0B8(void *, int, int);
+extern int StartAttachedEffect_pal(void *, int, int);
 extern char *func_PAL_0032F3B8(char *, char *, void *, float);
 
 /* A homing shot: follows its target (turning at most as far as its speed allows), records
@@ -194,14 +194,14 @@ void func_PAL_L00_003AF690(char *object)
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f
         || *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
-        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        RemoveMobyFromIndexList(object, g_homing_moby_index_list);
         table_clear_entry_flag(*(int *)(state + 0x50));
         moby_mark_spawned(object);
         return;
     }
     moby_transform_offset_to_world(object, delta);
     {
-        Vector *trail = D_L00_0023B710[*(int *)(state + 0x2C)];
+        Vector *trail = g_projectile_offset_points[*(int *)(state + 0x2C)];
         int k;
 
         for (k = 3; k > 0; k--) {
@@ -249,9 +249,9 @@ void func_PAL_L00_003AF690(char *object)
                 qcopy(object + 0x10, hit->point);
                 owner = object;
                 if (g_weapon_l00_table[g_item_slot_to_record[0x1B]].piercing != 0) {
-                    func_PAL_0032F0B8(hit->hit, 0x45, *(int *)(object + 0xB8));
+                    StartAttachedEffect_pal(hit->hit, 0x45, *(int *)(object + 0xB8));
                 } else {
-                    func_PAL_0032F0B8(hit->hit, 0x1B, *(int *)(object + 0xB8));
+                    StartAttachedEffect_pal(hit->hit, 0x1B, *(int *)(object + 0xB8));
                 }
             }
         }
@@ -283,15 +283,15 @@ checked:
             spin = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         }
         func_PAL_0032F3B8(object, object + 0x10, normal, spin);
-        func_PAL_L00_003B00B8(object, up, owner);
+        homing_shot_spawn_explosion_pal(object, up, owner);
     }
-    RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+    RemoveMobyFromIndexList(object, g_homing_moby_index_list);
     table_clear_entry_flag(*(int *)(state + 0x50));
     moby_mark_spawned(object);
     return;
 far:
     if (FastDecTimer(state + 0x24) != 0 || vec_distance_xy(object + 0x10, g_hero_position) > 75.0f) {
-        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        RemoveMobyFromIndexList(object, g_homing_moby_index_list);
         table_clear_entry_flag(*(int *)(state + 0x50));
         moby_mark_spawned(object);
     }

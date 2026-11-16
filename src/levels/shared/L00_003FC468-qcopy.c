@@ -33,15 +33,15 @@ extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void draw_world_quad(void *, void *, int);
 extern char g_camera_l00_position[];
-extern float D_L00_001B0BB8 __attribute__((sda));
-extern float D_L00_001B0BBC __attribute__((sda));
-extern float D_L00_001B0BC0 __attribute__((sda));
-extern float D_L00_001B0BC4 __attribute__((sda));
-extern u32 D_L00_001B0BC8 __attribute__((sda));
-extern u32 D_L00_001B0BCC __attribute__((sda));
-extern u32 D_L00_001B0BD0 __attribute__((sda));
-extern u32 D_L00_001B0BD4 __attribute__((sda));
-extern u32 D_L00_001B0BD8 __attribute__((sda));
+extern float g_large_spark_ribbon_width_a __attribute__((sda));
+extern float g_large_spark_ribbon_width_b __attribute__((sda));
+extern float g_large_spark_ribbon_width_c __attribute__((sda));
+extern float g_large_spark_ribbon_width_d __attribute__((sda));
+extern u32 g_large_spark_ribbon_color_a __attribute__((sda));
+extern u32 g_large_spark_ribbon_color_b __attribute__((sda));
+extern u32 g_large_spark_ribbon_edge_color_a __attribute__((sda));
+extern u32 g_large_spark_ribbon_fade_color __attribute__((sda));
+extern u32 g_large_spark_ribbon_edge_color_b __attribute__((sda));
 
 /* Draw three bands of the emitter's camera-facing ribbon. */
 

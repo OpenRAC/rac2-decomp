@@ -24,14 +24,14 @@ typedef struct {
 } HudElem;
 typedef unsigned char u8;
 
-void func_PAL_0028C418(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A = 0; hud_init_counter_values((u8 *)a0); }
+void hud_init_counter_element_pal(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A = 0; hud_init_counter_values((u8 *)a0); }
 
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float square_root(float);
 extern int func_PAL_0028E800(void *);
 
-void func_PAL_0028C450(HudElem *p)
+void hud_update_counter_element_pal(HudElem *p)
 {
     unsigned char *c = p->cnt;
     int delta, limit, step;

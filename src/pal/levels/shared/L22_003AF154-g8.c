@@ -31,11 +31,11 @@ typedef char Impact_L09_003A01D8_extent[sizeof(Impact_L09_003A01D8) == 0x28 ? 1 
 #define F(p, o) (*(float *)((p) + (o)))
 #define P(p, o) (*(u8 **)((p) + (o)))
 
-extern float D_L09_001B2390 MACRO_ADDR;
-extern float D_L09_001B238C MACRO_ADDR;
-extern int D_L09_001B2388 MACRO_ADDR;
-extern u8 *D_L09_001BFE58 NOT_SDA;
-extern float D_L09_001A8F20[] MACRO_ADDR;
+extern float g_hero_busy_amount_b MACRO_ADDR;
+extern float g_hero_busy_amount_a MACRO_ADDR;
+extern int g_frame_l09_counter MACRO_ADDR;
+extern u8 *g_collision_hit_object NOT_SDA;
+extern float g_default_particle_vec[] MACRO_ADDR;
 extern float math_random_float_range(float lo, float hi);
 extern void vec_scale_to_length(void *dst, void *src, float scale);
 extern float FastAddRotations(float angle, float step);
@@ -56,7 +56,7 @@ extern int CollLine(void *from, void *to, int a2, void *object, Impact_L09_003A0
 extern int coll_test_point(void *position, int a1, void *object, float radius);
 extern int coll_process_hit(void *position, int a1, void *target, Impact_L09_003A01D8 *impact,
                          float scale);
-extern void func_PAL_002AC718(void *owner, void *direction, void *position, float radius, float damage,
+extern void SpawnExplosionEffects_pal(void *owner, void *direction, void *position, float radius, float damage,
                           int sparks, int flashes, int smoke, float glow, float white, float cutoff,
                           float scale, int sound, float blast, int shake, int debris, int quality,
                           int channels, int flags);
@@ -89,8 +89,8 @@ void func_PAL_L22_003AF154(u8 *object)
         return;
     F(object, 0xF0) = FastAddRotations(F(object, 0xF0), 0.12566373f);
     FastVecAdd(f.predicted, object + 0x10, state);
-    busy = D_L09_001B238C > 0.9f || D_L09_001B2390 > 0.9f;
-    if (!busy || !(D_L09_001B2388 & 1)) {
+    busy = g_hero_busy_amount_a > 0.9f || g_hero_busy_amount_b > 0.9f;
+    if (!busy || !(g_frame_l09_counter & 1)) {
         length = FastVecLength(state);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[0] = math_random_float_range(-1.0f, 1.0f);
@@ -126,7 +126,7 @@ void func_PAL_L22_003AF154(u8 *object)
     collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
     if (collision || coll_test_point(object + 0x10, 1, object, 0.3f)
         || math_fast_float_d(state + 0x38)) {
-        hit = D_L09_001BFE58;
+        hit = g_collision_hit_object;
         if (hit) {
             if (hit == P(state, 0x3C)) {
                 qcopy(object + 0x10, f.predicted);
@@ -136,12 +136,12 @@ void func_PAL_L22_003AF154(u8 *object)
                 coll_process_hit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
-            func_PAL_002AC718(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects_pal(object, g_default_particle_vec, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
                           0.666f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
             moby_mark_spawned(object);
         } else {
-            func_PAL_002AC718(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects_pal(object, g_default_particle_vec, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
                           0.5f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
             PlayMobySound(0, 0, object);
             moby_mark_spawned(object);

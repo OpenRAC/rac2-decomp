@@ -5,17 +5,17 @@ extern float math_fast_sin_or_cos_b(float);
 extern char *g_moby_l02_pool __attribute__((sda));
 extern char *g_entity_group_lists[];
 extern float FastAddRotations(float, float);
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 typedef int L02Word;
-extern L02Word D_L02_001B35B8 __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
+extern L02Word g_group_max_index __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 extern void chickenbot_emit_sparks(char *);
 extern int g_frame_l02_counter __attribute__((sda));
 struct L02PairWord {
     int a;
     int b;
 };
-extern struct L02PairWord D_L02_001B00C0;
+extern struct L02PairWord g_chickenbot_color_pair;
 extern float FastAddRotations(float, float);
 extern int FastTweenColor(int, int, float);
 extern void moby_transform_joint_point(char *, int, void *);
@@ -48,9 +48,9 @@ struct L02Kind330Object {
 /* Turns the object's angle and its mirrored scale into its word at +0x78; when the frame
    counter D_L02_001B30C8 differs from the object's word at +0x330, walks the object's group
    and refreshes every live entity of kind 0xA4E, then registers func_L02_003CEFD8. */
-void func_PAL_L02_003D2E28(struct L02Kind330Object *a0) {
+void chickenbot_update_group_pulse_color_pal(struct L02Kind330Object *a0) {
     struct L02Kind330 *o = a0->obj;
-    struct L02PairWord v = D_L02_001B00C0;
+    struct L02PairWord v = g_chickenbot_color_pair;
     float f;
     unsigned short *q;
     struct L02Kind330Entity *e;
@@ -63,7 +63,7 @@ void func_PAL_L02_003D2E28(struct L02Kind330Object *a0) {
     a0->f78 = FastTweenColor(v.a, v.b, o->f32C);
     if (o->f330 != g_frame_l02_counter) {
         for (q = (unsigned short *)g_entity_group_lists[a0->group];
-             a0->group != 0xFF && a0->group <= D_L02_001B35B8 && q != 0 &&
+             a0->group != 0xFF && a0->group <= g_group_max_index && q != 0 &&
              ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[a0->group]);
              q++) {
             e = (struct L02Kind330Entity *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));

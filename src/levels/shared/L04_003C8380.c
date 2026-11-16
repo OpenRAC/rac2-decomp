@@ -30,7 +30,7 @@ typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 
 /* func_L04_003C8380 is in L04_003C8380-stream.c. */
 
-extern char D_L04_001B9680[];
+extern char g_tether_zero_vec[];
 extern void vec_scale_to_length(char *, char *, float);
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
 extern float math_random_signed_float_range(float, float);
@@ -47,7 +47,7 @@ void part_l04_spawn_paired_sparks(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    FastVecSub(direction, (float *)g_tether_zero_vec, pos);
     vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
@@ -419,8 +419,8 @@ extern float FastVecDot(void *, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern void part_l04_spawn_burst(void *, void *, int, int);
-extern Collision D_L04_001BFAC0;
-extern CollisionHit D_L04_001BFAE0;
+extern Collision g_probe_hit;
+extern CollisionHit g_spark_origin_quad;
 
 /* Sweeps a projectile from *position by direction (a line probe over the whole move and,
    when that is clear, a 0.5 sphere probe every 0.49 units) and works out its response.
@@ -489,7 +489,7 @@ Moby *SweepProjectileCollision(Moby *projectile, ProjectileVars *vars, float *po
     }
 
     if (collided) {
-        collision = &D_L04_001BFAC0;
+        collision = &g_probe_hit;
         if (collision->moby) {
             if (collision->moby == vars->ignored)
                 goto done;
@@ -499,12 +499,12 @@ Moby *SweepProjectileCollision(Moby *projectile, ProjectileVars *vars, float *po
                 qcopy(pos, &projectile->position);
             else
                 qcopy(pos, &hitMoby->position);
-            FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+            FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
             vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
             result = projectile;
-            vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+            vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
             vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
-            vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+            vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
@@ -520,12 +520,12 @@ Moby *SweepProjectileCollision(Moby *projectile, ProjectileVars *vars, float *po
                 part_l04_spawn_burst(hitPoint, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
-                qcopy(pos, &D_L04_001BFAE0.point);
-                FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+                qcopy(pos, &g_spark_origin_quad.point);
+                FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
                 vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
-                vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+                vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
                 vec_scale_to_length((char *)response, (char *)response, 0.033333335f);
-                vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+                vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
             }
         }
     }
@@ -605,7 +605,7 @@ unsigned char *homing_rocket_spawn(unsigned char *owner, float *pos,
 
 extern int PlayMobySound(int, int, char *);
 
-extern unsigned char *D_L04_001C3B40[];
+extern unsigned char *g_special_moby_list[];
 extern float FastDiffRots(float, float);
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(char *, char *);
@@ -647,16 +647,16 @@ void moby_damage_in_firing_cone(unsigned char *m, void *vars)
     if (radius < 0.75f) radius = 0.75f;
     n = coll_process_hit(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
     for (count = 0; count < n; count++) {
-        if (D_L04_001C3B40[count] == *(unsigned char **)(v + 0x74)) continue;
+        if (g_special_moby_list[count] == *(unsigned char **)(v + 0x74)) continue;
         if (*(float *)(v + 0x7C) > 0) {
-            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
             if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, D_L04_001C3B40[count] + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
+            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, g_special_moby_list[count] + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x18) - *(float *)(m + 0x18));
             if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (fast_vec_dist((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)m + 0x10, (char *)g_special_moby_list[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
             impact.source = *(void **)(v + 0x74);
             impact.flags = 0x230000;
@@ -665,13 +665,13 @@ void moby_damage_in_firing_cone(unsigned char *m, void *vars)
             impact.objectClass = *(unsigned short *)(m + 0xAA);
             impact.strength = 1.0f;
             impact.unk20 = 0x230000;
-            angle = mat_fast_helper_a(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
             impact.vector[0] = math_fast_sin_or_cos_a(angle);
             impact.vector[1] = math_fast_sin_or_cos_b(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
-            QueueMobyImpact(D_L04_001C3B40[count], &impact);
+            QueueMobyImpact(g_special_moby_list[count], &impact);
             PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
         }
     }
@@ -689,7 +689,7 @@ void moby_damage_in_firing_cone(unsigned char *m, void *vars)
             add_vectors(ray[2], ray[1], m + 0x10);
             if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
                 vec_build_spherical_offset(ray[2], 0.33333334326744f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
-                part_l04_spawn_burst(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
+                part_l04_spawn_burst(&g_spark_origin_quad, ray[2], sparkKind, sparkArg);
             }
         }
     }
@@ -724,7 +724,7 @@ extern void gfx_add_draw_callback_second(void *, void *);
 extern void moby_damage_in_firing_cone(unsigned char *, void *);
 extern void DrawDomeEffect(void);
 extern unsigned char g_sound_state[];
-extern int D_L04_001B0488 __attribute__((sda));
+extern int g_shield_dome_sound_handle __attribute__((sda));
 
 /* Keeps the blast effect on its owner and damages nearby objects each frame until its short timer runs out. */
 void blast_effect_update(unsigned char *effect)
@@ -737,14 +737,14 @@ void blast_effect_update(unsigned char *effect)
     StepAngleTowardTarget(effect + 0xF8, 0, *(float *)(vars->owner + 0xF8), 0.026179943f);
     vars->age = vars->age + 1.0f;
     if (vars->timer != 0 && math_fast_float_d(&vars->timer) != 0) {
-        sound_slot = D_L04_001B0488;
+        sound_slot = g_shield_dome_sound_handle;
         if (sound_slot != -1) {
             sound_record = (L04_C678Slot *)(g_sound_state + sound_slot * 0x70);
             if (sound_record->owner == vars->owner && sound_record->active != 0) {
                 snd_stop_voice(sound_slot);
             }
         }
-        D_L04_001B0488 = -1;
+        g_shield_dome_sound_handle = -1;
         moby_mark_spawned(effect);
         return;
     }
@@ -900,7 +900,7 @@ done:
 
 extern float fast_vec_dist(char *arg0, char *arg1);
 
-extern char *D_001FE340[];
+extern char *g_race_route_table[];
 
 /* Works out the length of each leg of the racer's routes. */
 void racer_compute_route_lengths(char *racer) {
@@ -914,7 +914,7 @@ void racer_compute_route_lengths(char *racer) {
         slot = (int *)(vars + 0x54);
         for (i = 5; i >= 0; i--, slot++) {
             if (*slot != -1) {
-                route = D_001FE340[*slot];
+                route = g_race_route_table[*slot];
                 *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
             }
         }
@@ -927,13 +927,13 @@ void racer_compute_route_lengths(char *racer) {
         slot = (int *)(vars + 0x6C);
         for (i = 3; i >= 0; i--, slot++) {
             if (*slot != none) {
-                route = D_001FE340[*slot];
+                route = g_race_route_table[*slot];
                 *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
             }
         }
     }
     if (*(int *)(vars + 0x7C) != -1) {
-        route = D_001FE340[*(int *)(vars + 0x7C)];
+        route = g_race_route_table[*(int *)(vars + 0x7C)];
         *(float *)(route + 0x1C) = fast_vec_dist(route + 0x10, route + 0x20);
     }
 }

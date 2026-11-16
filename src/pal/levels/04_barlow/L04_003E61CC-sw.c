@@ -23,10 +23,10 @@ extern int weapon_select_aim_target(void *, int, float, float, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void object_set_linked_states(unsigned char *, int, int, int, int);
 extern void find_point_across_line(void *, void *);
-extern void func_PAL_L04_003E9100(unsigned char *);
+extern void object_release_linked_pal(unsigned char *);
 extern void moby_l04_set_group_alert_flag(void *);
-extern char *D_L04_001B25CC __attribute__((sda));
-extern char D_L04_001B9680[];
+extern char *g_linked_record_table __attribute__((sda));
+extern char g_tether_zero_vec[];
 
 int func_PAL_L04_003E8A70(unsigned char *moby)
 {
@@ -91,7 +91,7 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
             *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.4f;
             vars[0x306] = 0;
             *(TI128 *)(vars + 0x280) = *(TI128 *)(moby + 0x10) =
-                ((PositionRecord *)D_L04_001B25CC)[*(int *)(vars + 0x2F0)].position;
+                ((PositionRecord *)g_linked_record_table)[*(int *)(vars + 0x2F0)].position;
             object_set_linked_states(moby, 1, 1,
                 math_random_int_below(*(unsigned char *)(*(char **)(*(char **)(moby + 0x24) + 0x4C) + 0x10)), 8);
             *(short *)(vars + 0x300) = ((s32)(math_random_int_range(1200, 3000)) * 5 + 2) / 6;
@@ -105,12 +105,12 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
             *(float *)(moby + 0x48) = math_random_float_range(0.5f, scale);
         }
     }
-    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
     if (vars[0x2E] == 2) {
-        func_PAL_L04_003E9100(moby);
+        object_release_linked_pal(moby);
         return 1;
     }
     if (*(int *)(vars + 0x2F0) != -1) {

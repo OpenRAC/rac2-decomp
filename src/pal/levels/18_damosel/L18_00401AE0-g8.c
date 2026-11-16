@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L18_001B2348[] __attribute__((sda));
+extern int g_frame_l18_counter[] __attribute__((sda));
 extern u8 *g_moby_l18_table;
 extern u8 g_hero_position[];
 extern void vec_scale_to_length(void *,void *,float);
@@ -14,7 +14,7 @@ extern int door_check_close_condition(u8 *,u8 *);
 #define W(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 
-void func_PAL_L18_00401AE0(u8 *a) {
+void sliding_l18_door_update_pal(u8 *a) {
  u8 *s=*(u8 **)(a+0x68);
  switch(a[0x20]) {
  case 0:
@@ -31,7 +31,7 @@ void func_PAL_L18_00401AE0(u8 *a) {
   } else if(W(s,0x68)>0) {
    qcopy_nc(a+0x10,s+0x40); W(s,0x68)--;
   }
-  if(!(D_L18_001B2348[0]&15)) {
+  if(!(g_frame_l18_counter[0]&15)) {
    if(door_check_open_condition(a,W(s,0x70)!=-1?g_moby_l18_table+(W(s,0x70)<<8)+0x10:g_hero_position))
     moby_set_state(a,2,-1);
   }
@@ -41,7 +41,7 @@ void func_PAL_L18_00401AE0(u8 *a) {
   if(W(s,0x68)<W(s,0x6c)) {
    FastVecAdd(a+0x10,a+0x10,s+0x50); W(s,0x68)++;
   }
-  if(!(D_L18_001B2348[0]&15)) {
+  if(!(g_frame_l18_counter[0]&15)) {
    if(door_check_close_condition(a,W(s,0x70)!=-1?g_moby_l18_table+(W(s,0x70)<<8)+0x10:g_hero_position))
     moby_set_state(a,1,-1);
   }

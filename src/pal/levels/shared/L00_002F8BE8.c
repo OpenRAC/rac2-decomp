@@ -18,7 +18,7 @@ extern int r1_func_0011CC38();
 /* rac1-decomp src/core/00119D88.c: func_0011CCB0 */
 /* Returns its callee's value: retail keeps the frame and calls, and
    2.9-ee would tail-call it (a bare `j`) if it were void. */
-int func_PAL_L00_002F8C60(void) {
+int level_call_helper_a_pal(void) {
     return r1_func_0011CC38();
 }
 

@@ -55,12 +55,12 @@ typedef struct {
 typedef struct { u8 pad00[0x70]; float power; u8 pad74[0x6C]; } LevelClass;
 extern u32 g_pad_state[];
 extern u8 g_hero_state[], g_sound_state[], g_item_slot_to_record[];
-extern int D_L00_001B1A4C, D_L00_001B1BE8, D_L00_001ADB2C, D_L00_001A8FF0;
-extern int D_L00_001B1994 __attribute__((sda)), D_001A7428 __attribute__((sda));
-extern float D_L00_001AF0E0 __attribute__((sda)), D_L00_001AF0E4 __attribute__((sda)), D_L00_001AF0E8 __attribute__((sda));
-extern float D_L00_001AF0EC __attribute__((sda)), D_L00_001AF0F0 __attribute__((sda));
+extern int g_visibomb_phase_flag, g_cinematic_phase_flag, g_active_tether_object, g_hero_locked_flag;
+extern int g_visibomb_missile_active __attribute__((sda)), g_pad_device_idle_flag __attribute__((sda));
+extern float g_visibomb_pitch_scale __attribute__((sda)), g_visibomb_min_speed __attribute__((sda)), g_visibomb_max_speed __attribute__((sda));
+extern float g_visibomb_target_speed_blend __attribute__((sda)), g_visibomb_speed_blend __attribute__((sda));
 extern CollisionResult g_collision_result;
-extern Vector D_L00_001B8FF0;
+extern Vector g_cam_follow_matrix;
 extern LevelClass g_weapon_l00_table[];
 extern int g_area_hit_targets[];
 extern void level_start_timed_object_once(void);
@@ -93,33 +93,33 @@ void func_US2_L00_00392CE0(Moby *actor) {
     int timer, playerHit = 0, i, hits;
     blast.quad = 0; blastNormal.quad = 0;
     blast.f[2] = 0.13333334f; blastNormal.f[2] = 1;
-    D_L00_001B1A4C = 1; D_L00_001B1994 = 1;
-    level_start_timed_object_once(); D_L00_001B1BE8 = 1; ForceClaimNotice(6, 0, 1);
+    g_visibomb_phase_flag = 1; g_visibomb_missile_active = 1;
+    level_start_timed_object_once(); g_cinematic_phase_flag = 1; ForceClaimNotice(6, 0, 1);
     timer = --state->timer;
     if (timer < -99 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x16 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x39 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F ||
         ((Hero *)g_hero_state)->i[0x229C / 4] == 2 || ((Hero *)g_hero_state)->i[0x229C / 4] == 4 || ((Hero *)g_hero_state)->i[0x229C / 4] == 3 || ((Hero *)g_hero_state)->i[0x229C / 4] > 12 ||
         ((Hero *)g_hero_state)->i[0x229C / 4] == 7 || ((Hero *)g_hero_state)->i[0x229C / 4] == 10 || ((Hero *)g_hero_state)->i[0x229C / 4] == 16 || ((Hero *)g_hero_state)->i[0x229C / 4] == 5 ||
         ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x62 || ref_US2_L00_00392CE0_01 > 0.0f || !((Hero *)g_hero_state)->i[0x340 / 4] ||
-        ((mount = ((Hero *)g_hero_state)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E || mount->objectClass == 0x46F)) || D_001A7428) {
+        ((mount = ((Hero *)g_hero_state)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E || mount->objectClass == 0x46F)) || g_pad_device_idle_flag) {
         tether_release(actor, state); return;
     }
     if (timer < 0) {
-        if (D_L00_001ADB2C) { tether_release(actor, state); ((Hero *)g_hero_state)->h[0x1E0 / 2] = 12; return; }
+        if (g_active_tether_object) { tether_release(actor, state); ((Hero *)g_hero_state)->h[0x1E0 / 2] = 12; return; }
         if (state->attached) func_US2_L00_00429510(state->attached, actor);
         level_restore_lighting(actor, 0); tether_attach_to_parent(actor, state); return;
     }
-    desiredSpeed = D_L00_001AF0E4 * 0.016666668f;
-    if (g_pad_state[0x1A0 / 4] & 0x40) desiredSpeed = D_L00_001AF0E8 * 0.016666668f;
-    state->targetSpeed += (desiredSpeed - state->targetSpeed) * D_L00_001AF0EC;
-    state->speed += (state->targetSpeed - state->speed) * D_L00_001AF0F0;
-    if (state->speed > D_L00_001AF0E8 * 0.016666668f) state->speed = D_L00_001AF0E8 * 0.016666668f;
-    snd_set_voice_pitch_bend(state->sound, FloatToInt((state->targetSpeed - (D_L00_001AF0E4 * 0.016666668f) /
-                      (D_L00_001AF0E8 * 0.016666668f - D_L00_001AF0E4 * 0.016666668f)) * D_L00_001AF0E0));
+    desiredSpeed = g_visibomb_min_speed * 0.016666668f;
+    if (g_pad_state[0x1A0 / 4] & 0x40) desiredSpeed = g_visibomb_max_speed * 0.016666668f;
+    state->targetSpeed += (desiredSpeed - state->targetSpeed) * g_visibomb_target_speed_blend;
+    state->speed += (state->targetSpeed - state->speed) * g_visibomb_speed_blend;
+    if (state->speed > g_visibomb_max_speed * 0.016666668f) state->speed = g_visibomb_max_speed * 0.016666668f;
+    snd_set_voice_pitch_bend(state->sound, FloatToInt((state->targetSpeed - (g_visibomb_min_speed * 0.016666668f) /
+                      (g_visibomb_max_speed * 0.016666668f - g_visibomb_min_speed * 0.016666668f)) * g_visibomb_pitch_scale));
     if ((u32)(state->timer - 1) < 0xBB2) {
         float stickX = ((Hero *)g_hero_state)->f[0x1FB0 / 4], stickY = ((Hero *)g_hero_state)->f[0x1FB4 / 4];
         state->inputX += (stickX - state->inputX) * 0.1f;
         state->inputY += (stickY - state->inputY) * 0.1f;
-        if (D_L00_001A8FF0) {
+        if (g_hero_locked_flag) {
             actor->pitch = (state->inputX - actor->pitch) * 0.06f;
             actor->yaw = state->inputY * 0.012271847f;
             actor->roll = state->inputX * 0.012271847f;
@@ -146,7 +146,7 @@ void func_US2_L00_00392CE0(Moby *actor) {
             part_queue_ground_shadow(actor, 0.2f);
         }
     }
-    if (D_L00_001A8FF0) FastVecScale(&velocity, &actor->right, state->speed);
+    if (g_hero_locked_flag) FastVecScale(&velocity, &actor->right, state->speed);
     else vec_build_spherical_offset(velocity.f, state->speed, actor->roll, -actor->yaw);
     qcopy(&previous, &actor->position);
     FastVecAdd(&actor->position, &actor->position, velocity.f); vec_transform_or_copy(&actor->position, &actor->position);
@@ -178,7 +178,7 @@ void func_US2_L00_00392CE0(Moby *actor) {
     if (state->timer > 0xB90) ignore = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
     if (moby_find_accepting_table_object(&actor->position)) {
         actor->hit = 2;
-        qcopy(&contactEdge, &D_L00_001B8FF0);
+        qcopy(&contactEdge, &g_cam_follow_matrix);
         scratch.quad = 0; scratch.f[2] = 1; scratch.f[3] = 1;
         vec_fast_normalize(&blast, &velocity, &scratch); vec_scale_to_length(&blast, &blast, 0.033333335f);
         vec_scale_to_length(&blastNormal, &scratch, 1);
@@ -245,7 +245,7 @@ after_rebound:
         velocity.f[0] = 0; actor->hit = 0;
     }
     if (state->attached) func_US2_L00_00429510(state->attached, actor);
-    if (!D_L00_001A8FF0) return;
+    if (!g_hero_locked_flag) return;
     cam_compute_view_direction(&actor->position, &actor->forward, 1);
     FastVecCross(&scratch, &actor->right, &actor->forward); vec_scale_to_length(&actor->up, &scratch, 1);
     FastVecCross(&actor->forward, &actor->up, &actor->right);

@@ -17,23 +17,23 @@ typedef struct {
 } PathSettings;
 typedef struct { PathVec transform[4]; u8 pad40[0x30]; PathState *state; u8 pad74[0x10]; s16 config; } PathObject;
 typedef struct { u8 pad[0x1C]; PathSettings *settings; } PathConfig;
-extern PathConfig *D_L01_001B1F04;
-extern PathGlobals D_L01_001BD9C0;
-extern PathTransformGlobal D_L01_001B9380;
-extern PathRecord *D_L01_001FE180[];
-extern u8 *D_L01_001B264C __attribute__((sda));
+extern PathConfig *g_camera_path_configs;
+extern PathGlobals g_render_scales;
+extern PathTransformGlobal g_drive_settings;
+extern PathRecord *g_path_l01_table[];
+extern u8 *g_swamp_patrol_positions __attribute__((sda));
 extern f32 mat_fast_helper_a(f32,f32);
 extern f32 fast_vec_dist(void *,void *);
 extern f32 IntToFloat(s32);
 extern void vec_clear_128(void *);
 extern s32 func_PAL_L01_002BEC60(s32,s32);
-extern void func_PAL_L00_002B9CD8(void *,void *,s32,s32);
+extern void hero_reset_position_and_direction_pal(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
  * paths' segment lengths, primes both springs and copies the template transform. */
 void func_PAL_L01_00432064(void *arg) {
     PathVec orientation;
     PathObject *obj=arg;
-    PathSettings *settings=D_L01_001B1F04[obj->config].settings;
+    PathSettings *settings=g_camera_path_configs[obj->config].settings;
     PathMarks *marks;
     PathSpring *spring;
     PathMotion *motion;
@@ -54,12 +54,12 @@ void func_PAL_L01_00432064(void *arg) {
         marks->lengths[i]=0;
         marks->indices[i]=-1;
     }
-    factor=D_L01_001BD9C0.value;
+    factor=g_render_scales.value;
     scale=&obj->transform[3]; pos=&obj->transform[1]; angles=&obj->transform[2];
     marks->factor=mat_fast_helper_a(1.0f,factor)*2.0f;
     if(settings->positionPath>=0) {
         s32 i, marked=0; PathRecord *path;
-        path=D_L01_001FE180[settings->positionPath];
+        path=g_path_l01_table[settings->positionPath];
         for(i=0;i<path->count;i++) {
             if(path->points[i].f[3]>0) {
                 marks->lengths[marked]=path->points[i].f[3];
@@ -75,7 +75,7 @@ void func_PAL_L01_00432064(void *arg) {
         settings->speed=(motion->distance/IntToFloat(((s32)settings->duration * 5 + 2) / 6))*60.0f;
     if(settings->rotationPath>=0) {
         s32 i; PathRecord *path;
-        path=D_L01_001FE180[settings->rotationPath];
+        path=g_path_l01_table[settings->rotationPath];
         for(i=0;i<path->count;i++) {
             distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
@@ -88,7 +88,7 @@ void func_PAL_L01_00432064(void *arg) {
     spring=&obj->state->rotation;
     spring->stiffness=0.03f; spring->damping=0.2f;
     vec_clear_128(&spring->value);
-    { u8 *template=D_L01_001B9380.transform;
+    { u8 *template=g_drive_settings.transform;
     qcopy(scale,template+0x30);
     qcopy(obj,template);
     qcopy(pos,template+0x10);
@@ -96,8 +96,8 @@ void func_PAL_L01_00432064(void *arg) {
     { s32 cameraIndex=settings->camera;
     if(cameraIndex<0) func_PAL_L01_002BEC60(111,1);
     else {
-        u8 (*cameras)[128]=(void *)D_L01_001B264C;
+        u8 (*cameras)[128]=(void *)g_swamp_patrol_positions;
         orientation.q=0; orientation.f[3]=1;
-        func_PAL_L00_002B9CD8(cameras[cameraIndex]+0x30,&orientation,111,0);
+        hero_reset_position_and_direction_pal(cameras[cameraIndex]+0x30,&orientation,111,0);
     } }
 }

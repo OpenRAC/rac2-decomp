@@ -1,13 +1,13 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern short D_L00_001B2AE0[] __attribute__((sda));
-extern short D_L00_001B2AF0[] __attribute__((sda));
-extern short D_L00_001B2B00[] __attribute__((sda));
-extern short D_L00_001B2B10[] __attribute__((sda));
-extern char D_L00_00247310[];
-extern char D_L00_00247350[];
-extern char D_0018A580[];
+extern short g_lightning_arc_timers[] __attribute__((sda));
+extern short g_lightning_arc_alphas[] __attribute__((sda));
+extern short g_lightning_arc_periods[] __attribute__((sda));
+extern short g_lightning_arc_midpoints[] __attribute__((sda));
+extern char g_lightning_arc_points[];
+extern char g_lightning_l00_strip_points[];
+extern char g_strip_axis[];
 extern void FastVecScale(void *, void *, float);
 extern float math_random_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -29,41 +29,41 @@ void func_PAL_L00_003D6C38(void *object, void *position, int unused)
     float angle, t;
 
     for (k = 0; k < 4; k++)
-        D_L00_001B2AE0[k] = -1;
+        g_lightning_arc_timers[k] = -1;
 
-    D_L00_001B2B00[0] = 8;
-    D_L00_001B2B10[0] = 4;
-    D_L00_001B2B00[1] = 4;
-    D_L00_001B2B10[1] = 2;
-    D_L00_001B2B00[2] = 8;
-    D_L00_001B2B10[2] = 4;
-    D_L00_001B2B00[3] = 4;
-    D_L00_001B2B10[3] = 2;
-    D_L00_001B2B00[4] = 8;
-    D_L00_001B2B10[4] = 4;
-    D_L00_001B2B00[5] = 4;
-    D_L00_001B2B10[5] = 3;
+    g_lightning_arc_periods[0] = 8;
+    g_lightning_arc_midpoints[0] = 4;
+    g_lightning_arc_periods[1] = 4;
+    g_lightning_arc_midpoints[1] = 2;
+    g_lightning_arc_periods[2] = 8;
+    g_lightning_arc_midpoints[2] = 4;
+    g_lightning_arc_periods[3] = 4;
+    g_lightning_arc_midpoints[3] = 2;
+    g_lightning_arc_periods[4] = 8;
+    g_lightning_arc_midpoints[4] = 4;
+    g_lightning_arc_periods[5] = 4;
+    g_lightning_arc_midpoints[5] = 3;
 
     for (i = 4; i < 6; i++) {
-        D_L00_001B2AE0[i] = 7;
-        D_L00_001B2AF0[i] = 255;
+        g_lightning_arc_timers[i] = 7;
+        g_lightning_arc_alphas[i] = 255;
 
-        qcopy(D_L00_00247310 + i * 80, position);
-        FastVecScale(delta, D_0018A580, 32.0f);
-        math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 32, -(math_random_float_range(10.0f, 24.0f) * 0.017453294f));
+        qcopy(g_lightning_arc_points + i * 80, position);
+        FastVecScale(delta, g_strip_axis, 32.0f);
+        math_apply_axis_rotation_to_quat(delta, delta, g_strip_axis - 32, -(math_random_float_range(10.0f, 24.0f) * 0.017453294f));
         angle = math_random_float_range(22.0f, 30.0f) * 0.017453294f;
         if (i == 5)
-            math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 16, -angle);
+            math_apply_axis_rotation_to_quat(delta, delta, g_strip_axis - 16, -angle);
         else
-            math_apply_axis_rotation_to_quat(delta, delta, D_0018A580 - 16, angle);
+            math_apply_axis_rotation_to_quat(delta, delta, g_strip_axis - 16, angle);
 
         FastVecAdd(end, position, delta);
-        qcopy(D_L00_00247350 + i * 80, end);
+        qcopy(g_lightning_l00_strip_points + i * 80, end);
         for (j = 1; j < 4; j++) {
             t = IntToFloat(j) / IntToFloat(4);
-            lerp_vector(D_L00_00247310 + i * 80 + j * 16, position, end, t);
+            lerp_vector(g_lightning_arc_points + i * 80 + j * 16, position, end, t);
             vec_random_direction(jitter, t * 2.0f, t * 2.0f);
-            FastVecAdd(D_L00_00247310 + i * 80 + j * 16, D_L00_00247310 + i * 80 + j * 16, jitter);
+            FastVecAdd(g_lightning_arc_points + i * 80 + j * 16, g_lightning_arc_points + i * 80 + j * 16, jitter);
         }
     }
 }

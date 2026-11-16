@@ -5,11 +5,11 @@ extern void moby_set_state(u8 *, s32, s32);
 extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern s32 math_fast_float_d(void *);
-extern f32 D_L03_001B1650 __attribute__((sda));
-extern f32 D_L03_001B1654 __attribute__((sda));
-extern f32 D_L03_001B1658 __attribute__((sda));
+extern f32 g_slim_ship_speed __attribute__((sda));
+extern f32 g_slim_ship_turn_rate __attribute__((sda));
+extern f32 g_slim_ship_accel __attribute__((sda));
 
-void func_PAL_L03_0040E890(u8 *object)
+void slim_cognito_ship_update_pal(u8 *object)
 {
     u8 *vars = *(u8 **)(object + 0x68);
     switch (object[0x20]) {
@@ -21,8 +21,8 @@ void func_PAL_L03_0040E890(u8 *object)
         break;
     case 2:
         math_step_value_toward_target(object + 0x18, vars + 0x10, *(f32 *)(vars + 8), 0.0f,
-                     D_L03_001B1654 * 0.00040000002f,
-                     D_L03_001B1658 * 0.020000001f);
+                     g_slim_ship_turn_rate * 0.00040000002f,
+                     g_slim_ship_accel * 0.020000001f);
         if (*(f32 *)(object + 0x18) <= *(f32 *)(vars + 8)) {
             *(f32 *)(vars + 0x10) = 0.0f;
             if (math_fast_float_d(vars + 0x14) != 0)
@@ -31,8 +31,8 @@ void func_PAL_L03_0040E890(u8 *object)
         break;
     case 3:
         ApproachValue((f32 *)(vars + 0x10),
-                     D_L03_001B1658 * 0.020000001f,
-                     D_L03_001B1650 * 0.00040000002f);
+                     g_slim_ship_accel * 0.020000001f,
+                     g_slim_ship_speed * 0.00040000002f);
         *(f32 *)(object + 0x18) += *(f32 *)(vars + 0x10);
         if (object[0x31] == 0) {
             *(s32 *)(object + 0x98) = 0;

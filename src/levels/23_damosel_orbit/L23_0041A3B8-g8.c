@@ -13,15 +13,15 @@
 #include "common.h"
 
 
-extern float D_L23_001B3728 __attribute__((sda));
+extern float g_mothership_aim_dot __attribute__((sda));
 
-extern float D_L23_001B1454 __attribute__((sda));
+extern float g_mothership_fire_threshold __attribute__((sda));
 
-extern int D_L23_001B3784;
+extern int g_mothership_line_clear;
 
-extern char D_L23_001B3850[] MACRO_ADDR;
+extern char g_mothership_shot_origin[] MACRO_ADDR;
 
-extern char D_L23_001B3870[];
+extern char g_mothership_aim_direction[];
 
 extern void vec_scale_to_length(char *, char *, float);
 
@@ -46,7 +46,7 @@ int mothership_fire_weapon(char *moby, char *target_pos) {
 
     if (kind != 0xF) {
         if (kind == 0x10 || kind == 0xC) {
-            if (D_L23_001B3784 == 0)
+            if (g_mothership_line_clear == 0)
                 return 0;
         } else
             return 0;
@@ -54,32 +54,32 @@ int mothership_fire_weapon(char *moby, char *target_pos) {
         if ((*(unsigned short *)(moby + 0x96) & 3) != 2)
             return 1;
         do {
-            vec_scale_to_length((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.016666668f);
+            vec_scale_to_length((char *)vec, g_mothership_aim_direction, *(short *)(state + 0x33A) * 0.016666668f);
             tmp = *(float *)(state + 0x300) * 1.5f;
-            directed_shot_create(D_L23_001B3850, (char *)vec, &tmp);
+            directed_shot_create(g_mothership_shot_origin, (char *)vec, &tmp);
         } while (0);
         snd_start_in_slot(0x21, 0, 0);
         return 1;
     }
-    if (!(D_L23_001B3728 >= D_L23_001B1454))
+    if (!(g_mothership_aim_dot >= g_mothership_fire_threshold))
         return 1;
     mothership_turn_joints(moby, 2.0f, 2.0f);
     if (*(unsigned char *)(moby + 0x20) == 0x10) {
         int m = *(short *)(state + 0x336);
         if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, target_pos, D_L23_001B3850);
+        FastVecSub((char *)vec, target_pos, g_mothership_shot_origin);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
-        flying_shot_create_child(moby, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
-        SpawnExplosion(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
+        flying_shot_create_child(moby, (char *)vec, g_mothership_shot_origin, 0, *(float *)(state + 0x304));
+        SpawnExplosion(g_mothership_shot_origin, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
         snd_start_in_slot(0x1A, 0, 0);
     } else {
         int m = *(short *)(state + 0x334);
         if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, target_pos, D_L23_001B3870);
+        FastVecSub((char *)vec, target_pos, g_mothership_aim_direction);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
-        directed_shot_create(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
+        directed_shot_create(g_mothership_shot_origin, (char *)vec, (float *)(state + 0x300));
         snd_start_in_slot(0x21, 0, 0);
     }
     return 1;

@@ -9,8 +9,8 @@ typedef struct {
     float damage;
     int enabled;
 } L16Hit;
-extern float D_L16_001BFF80[4];
-extern u8 *D_L16_001BFF58;
+extern float g_projectile_hit_normal[4];
+extern u8 *g_aim_target_moby;
 extern int coll_sweep_from_object(void *,float,float *,int,float,float,int,int,int);
 extern void moby_set_state(u8 *,s32,s32);
 extern void FastVecScale(void *,void *,float);
@@ -60,7 +60,7 @@ void homing_l16_projectile_update(u8 *object)
         vec_scale_to_length(finish,object+0xE0,-3.0f);
         FastVecAdd(start,start,object+0x10);
         FastVecAdd(finish,finish,object+0x10);
-        if (CollLine(start,finish,2,object,0)) vec_scale_to_length(normal,D_L16_001BFF80,1.0f);
+        if (CollLine(start,finish,2,object,0)) vec_scale_to_length(normal,g_projectile_hit_normal,1.0f);
         else vec_scale_to_length(normal,object+0xE0,-1.0f);
         FastVecScale(normal,normal,-1.0f);
         vec_scale_to_length(state,state,1.0f);
@@ -82,8 +82,8 @@ void homing_l16_projectile_update(u8 *object)
         make_hit_descriptor((char *)&hit,(int)object,1,*(float *)(state+0x14),(Quad16 *)state);
         hit.oclass=*(u16 *)(object+0xAA);
         if (CollLine(object+0x10,destination,0,object,&hit) || coll_test_point(object+0x10,0,object,0.3f)) {
-            if (D_L16_001BFF58) {
-                if (D_L16_001BFF58 != *(u8 **)(state+0x10)) {
+            if (g_aim_target_moby) {
+                if (g_aim_target_moby != *(u8 **)(state+0x10)) {
                     qcopy(impact,state);
                     FastVecScale(impact,impact,1.5f);
                     impact[2]=1.0f;

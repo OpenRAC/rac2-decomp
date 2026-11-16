@@ -9,11 +9,11 @@ extern void *part_find_owned_effect_slot(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void *part_spawn_object_following_effect(float *, u8 *, int, int, int, int, int, int, float, float);
 extern void func_PAL_L00_002ED7E8(u8 *, float *, float *, int, int, float, float, float, float, float);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern char *moby_l00_spawn_child(u8 *, int, int);
-extern float D_L09_001B1CA0 __attribute__((sda));
-extern float D_L09_001B1CA8 __attribute__((sda));
-extern float D_L09_001B1CB0 __attribute__((sda));
+extern float g_effect_explode_params_c __attribute__((sda));
+extern float g_effect_explode_params_b __attribute__((sda));
+extern float g_effect_explode_params_a __attribute__((sda));
 
 /* Three-state effect object: spawns its first effect, waits for the hit, then fires the closing effects and retires itself. */
 void func_PAL_L09_00427350(u8 *self)
@@ -42,7 +42,7 @@ void func_PAL_L09_00427350(u8 *self)
         b.value[1] = -0.060000002f;
         b.value[2] = 0.020000001f;
         func_PAL_L00_002ED7E8(self, a.value, b.value, 25, 2, 0.2f, 0.10000001f, 1.5f, 6.0f, 0.8f);
-        func_PAL_L00_0032C328(self, &D_L09_001B1CB0, &D_L09_001B1CA8, &D_L09_001B1CA0,
+        part_explode_object_into_pieces_pal(self, &g_effect_explode_params_a, &g_effect_explode_params_b, &g_effect_explode_params_c,
                           0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
         moby_l00_spawn_child(self, 0x1299, 0);
         moby_mark_spawned(self);

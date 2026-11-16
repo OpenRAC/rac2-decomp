@@ -3,8 +3,8 @@
 #include "common.h"
 
 /* func_US2_002D6024, the v2.00 copy of func_002D53F0: a text draw whose y also moves in display mode 1. */
-extern float D_001B23A4[] __attribute__((sda));
-extern int D_001B23A0[] __attribute__((sda));
+extern float g_hud_scale[] __attribute__((sda));
+extern int g_hud_mode[] __attribute__((sda));
 extern void SetupGifPaging(long);
 extern void func_US2_0029D368(void);
 extern char *GetLocalizedString(s32);
@@ -13,8 +13,8 @@ extern void DoGifPaging(void);
 
 static __inline__ int scaled_screen_coord(float value, float offset)
 {
-    float scaled = value * D_001B23A4[0] + 0.5f;
-    if (D_001B23A0[0] == 1)
+    float scaled = value * g_hud_scale[0] + 0.5f;
+    if (g_hud_mode[0] == 1)
         return (int)(scaled + offset);
     return (int)scaled;
 }
@@ -31,33 +31,33 @@ int func_US2_002D6024(void)
     return 0;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_clear_counter(void);
-extern void func_US2_00342450(char *, char *, char *, char *);
-extern void func_US2_00342520(char *, int);
-extern char D_002615F8[], D_00261698[], D_00261750[];
+extern void tab_menu_set_tables_us2(char *, char *, char *, char *);
+extern void tab_menu_switch_tab_us2(char *, int);
+extern char g_extras_tab_table_a[], g_extras_tab_table_b[], g_extras_tab_table_c[];
 
 int func_US2_002D60E8(void)
 {
     menu_clear_counter();
-    if (D_001A8CFC[0] != 0) {
-        func_US2_00342450(D_001A8CFC[0] + 0x3C160, D_002615F8, D_00261698, D_00261750);
-        func_US2_00342520(D_001A8CFC[0] + 0x3C160, 1);
+    if (g_resident_data_base[0] != 0) {
+        tab_menu_set_tables_us2(g_resident_data_base[0] + 0x3C160, g_extras_tab_table_a, g_extras_tab_table_b, g_extras_tab_table_c);
+        tab_menu_switch_tab_us2(g_resident_data_base[0] + 0x3C160, 1);
     }
     return 0;
 }
 
 
-extern int D_00138344;
-extern int D_00138344;
+extern int g_menu_input_flags;
+extern int g_menu_input_flags;
 extern int func_US2_0029DD40(int);
 
 /* func_002D2918 is built from 002D2918-g8.c. */
 
 int func_US2_002D6158(void) {
-    func_US2_0029DD40(D_00138344);
+    func_US2_0029DD40(g_menu_input_flags);
     return 0;
 }
 
@@ -65,7 +65,7 @@ int func_US2_002D6158(void) {
 /* func_002D2918 is built from 002D2918-g8.c. */
 
 int func_US2_002D6180(void) {
-    func_US2_0029DD40(D_00138344);
+    func_US2_0029DD40(g_menu_input_flags);
     return 0;
 }
 

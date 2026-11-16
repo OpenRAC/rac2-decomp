@@ -52,18 +52,18 @@ typedef struct {
 } PreviewState;
 typedef struct { int ids[5]; } PreviewClasses;
 extern PreviewState g_vendor_menu_state;
-extern PreviewClasses D_001AD500;
-extern int D_001A7290[] MACRO_ADDR;
-extern int D_001AD250[] SDATA(D_001AD250);
-extern int D_001A8B00[] MACRO_ADDR;
+extern PreviewClasses g_preview_classes;
+extern int g_iop_block_table[] MACRO_ADDR;
+extern int g_shop_armor_text_ids[] SDATA(D_001AD250);
+extern int g_vendor_ammo_string_ids[] MACRO_ADDR;
 extern const int g_equipment_bits[] MACRO_ADDR;
-extern short D_001A8C20[] MACRO_ADDR, D_001A8C28[] MACRO_ADDR, D_001A8C30[] MACRO_ADDR, D_001A8C38[] MACRO_ADDR, D_001A8C40[] MACRO_ADDR, D_001A8C48[] MACRO_ADDR, D_001A8C50[] MACRO_ADDR, D_001A8C58[] MACRO_ADDR;
-extern float D_001B1390[] MACRO_ADDR;
+extern short g_robot_part_ids_a[] MACRO_ADDR, g_robot_part_ids_b[] MACRO_ADDR, g_robot_part_ids_c[] MACRO_ADDR, g_robot_part_ids_d[] MACRO_ADDR, g_robot_part_ids_e[] MACRO_ADDR, g_robot_part_ids_f[] MACRO_ADDR, g_robot_part_ids_g[] MACRO_ADDR, g_robot_part_ids_h[] MACRO_ADDR;
+extern float g_cutscene_scratch_a[] MACRO_ADDR;
 typedef struct { float m[16]; } PreviewTransform;
-extern PreviewTransform D_001B2980[];
-extern float D_001A7C94[] MACRO_ADDR;
-extern char D_001AD1D0[] SDATA(D_001AD1D0);
-extern unsigned char D_001A7BB1;
+extern PreviewTransform g_cutscene_scratch_state[];
+extern float g_preview_float_params[] MACRO_ADDR;
+extern char g_shop_preview_position[] SDATA(D_001AD1D0);
+extern unsigned char g_display_mode_flag;
 typedef struct { char pad[0x370]; float x, y; } PreviewCamera;
 extern PreviewCamera g_active_camera;
 extern int g_hero_moby_default[];
@@ -103,13 +103,13 @@ void PrepareVendorSelectionPreview(void)
     g_vendor_menu_state.objectCount = 1;
     if (mode == 3) {
         g_vendor_menu_state.objectCount = 0;
-        classes = D_001AD500;
+        classes = g_preview_classes;
         if (g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value == 0) {
             shop_set_message_text(((char *)GetLocalizedString(0x3188)));
         } else {
-            if (D_001A7290[0] != g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value)
+            if (g_iop_block_table[0] != g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value)
                 tex_load_level_pack((void *)g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value);
-            shop_set_message_text(((char *)GetLocalizedString(D_001AD250[g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value])));
+            shop_set_message_text(((char *)GetLocalizedString(g_shop_armor_text_ids[g_vendor_menu_state.rows.armor[g_vendor_menu_state.selected].value])));
         }
         facing = FastAddRotations(mat_fast_helper_a(g_active_camera.x, g_active_camera.y), 1.7453294f);
         while (classes.ids[g_vendor_menu_state.objectCount] >= 0) {
@@ -129,21 +129,21 @@ void PrepareVendorSelectionPreview(void)
             func_002A0F48(moby);
             moby->anim = 0; moby->anim2 = 0;
             update_moby_animation_state(moby);
-            if (D_001A7290[0]) moby->rotZ = facing;
-            if (D_001A7290[0] == 4 && moby->classId == 0x50A /* moby class 1290 */) moby->flags |= 1;
-            if (D_001A7290[0] >= 3 && moby->classId == 0xA73 /* moby class 2675 */) moby->flags |= 1;
+            if (g_iop_block_table[0]) moby->rotZ = facing;
+            if (g_iop_block_table[0] == 4 && moby->classId == 0x50A /* moby class 1290 */) moby->flags |= 1;
+            if (g_iop_block_table[0] >= 3 && moby->classId == 0xA73 /* moby class 2675 */) moby->flags |= 1;
             g_vendor_menu_state.objectCount++;
         }
-        mem_clear(D_001B1390, 0, 0x40);
-        AttachManipulator(g_vendor_menu_state.objects, 24, D_001B1390);
-        D_001B1390[10] = D_001A7C94[0];
-        D_001B1390[9] = D_001B1390[8] = D_001A7C94[0] * 0.97f;
-        if (D_001A7290[0] < 3) {
+        mem_clear(g_cutscene_scratch_a, 0, 0x40);
+        AttachManipulator(g_vendor_menu_state.objects, 24, g_cutscene_scratch_a);
+        g_cutscene_scratch_a[10] = g_preview_float_params[0];
+        g_cutscene_scratch_a[9] = g_cutscene_scratch_a[8] = g_preview_float_params[0] * 0.97f;
+        if (g_iop_block_table[0] < 3) {
             int i;
-            mem_clear(&D_001B2980[0], 0, 0x40);
-            mem_clear(&D_001B2980[1], 0, 0x40);
+            mem_clear(&g_cutscene_scratch_state[0], 0, 0x40);
+            mem_clear(&g_cutscene_scratch_state[1], 0, 0x40);
             for (i = 0; i < 2; i++) {
-                PreviewTransform *transform = &D_001B2980[i];
+                PreviewTransform *transform = &g_cutscene_scratch_state[i];
                 AttachManipulator(g_vendor_menu_state.objects, i + 22, transform);
                 transform->m[8] = 0.01f;
                 transform->m[9] = 0.01f;
@@ -181,26 +181,26 @@ void PrepareVendorSelectionPreview(void)
         int armor;
         g_vendor_menu_state.objectCount = 10;
         g_vendor_menu_state.equipment = (g_equipment_bits[0] & ~g_vendor_menu_state.rows.equipment[index].value) | g_vendor_menu_state.rows.equipment[index].unknown;
-        parts[0] = D_001A8C20[g_vendor_menu_state.equipment & 3] << 16;
+        parts[0] = g_robot_part_ids_a[g_vendor_menu_state.equipment & 3] << 16;
         if (g_vendor_menu_state.rows.equipment[index].value == 3) parts[0] |= 0x80000000;
-        parts[1] = D_001A8C28[(g_vendor_menu_state.equipment & 12) >> 2] << 16;
+        parts[1] = g_robot_part_ids_b[(g_vendor_menu_state.equipment & 12) >> 2] << 16;
         parts[2] = parts[1] | 0x8000;
         if (g_vendor_menu_state.rows.equipment[index].value == 12) { parts[1] |= 0x80000000; parts[2] |= 0x80000000; }
-        parts[3] = D_001A8C50[(g_vendor_menu_state.equipment & 0xC00) >> 10] << 16;
+        parts[3] = g_robot_part_ids_g[(g_vendor_menu_state.equipment & 0xC00) >> 10] << 16;
         parts[4] = parts[3] | 0x8000;
         if (g_vendor_menu_state.rows.equipment[index].value == 0xC00) { parts[3] |= 0x80000000; parts[4] |= 0x80000000; }
-        parts[5] = D_001A8C30[(g_vendor_menu_state.equipment & 0x30) >> 4] << 16;
+        parts[5] = g_robot_part_ids_c[(g_vendor_menu_state.equipment & 0x30) >> 4] << 16;
         if (g_vendor_menu_state.rows.equipment[index].value == 0x30) parts[5] |= 0x80000000;
-        parts[6] = D_001A8C38[(g_vendor_menu_state.equipment & 0x40) >> 6] << 16;
+        parts[6] = g_robot_part_ids_d[(g_vendor_menu_state.equipment & 0x40) >> 6] << 16;
         parts[7] = parts[6] | 0x8000;
         if (g_vendor_menu_state.rows.equipment[index].value == 0x40) { parts[6] |= 0x80000000; parts[7] |= 0x80000000; }
-        parts[8] = D_001A8C48[(g_vendor_menu_state.equipment & 0x200) >> 9] << 16;
+        parts[8] = g_robot_part_ids_f[(g_vendor_menu_state.equipment & 0x200) >> 9] << 16;
         parts[9] = parts[8] | 0x8000;
         if (g_vendor_menu_state.rows.equipment[index].value == 0x200) { parts[8] |= 0x80000000; parts[9] |= 0x80000000; }
         kind = (g_vendor_menu_state.equipment & 0x180) >> 7;
         if (kind) {
             int n = g_vendor_menu_state.objectCount;
-            parts[n] = parts[n + 1] = D_001A8C40[kind] << 16;
+            parts[n] = parts[n + 1] = g_robot_part_ids_e[kind] << 16;
             parts[n + 1] |= 0x8000;
             if (g_vendor_menu_state.rows.equipment[index].value == 0x180) {
                 parts[n] |= 0x80000000;
@@ -208,7 +208,7 @@ void PrepareVendorSelectionPreview(void)
             }
             g_vendor_menu_state.objectCount += 2;
         }
-        parts[g_vendor_menu_state.objectCount] = D_001A8C58[(g_vendor_menu_state.equipment & 0xC000) >> 14] << 16;
+        parts[g_vendor_menu_state.objectCount] = g_robot_part_ids_h[(g_vendor_menu_state.equipment & 0xC000) >> 14] << 16;
         if (g_vendor_menu_state.rows.equipment[index].value == 0xC000) parts[g_vendor_menu_state.objectCount] |= 0x80000000;
         g_vendor_menu_state.objectCount++;
         if (g_vendor_menu_state.equipment & 0x1000) {
@@ -279,8 +279,8 @@ void PrepareVendorSelectionPreview(void)
             moby->drawMask = 64; moby->color = 0x80808080; moby->flags = 0x2010;
             moby->render = 1; moby->opacity = 0; moby->unk23 = 0; moby->state = 0; moby->unk98 = 0; moby->unk7c = 1;
             g_vendor_menu_state.scale = 3.5f;
-            qcopy(g_vendor_menu_state.position, D_001AD1D0);
-            if (D_001A7BB1) g_vendor_menu_state.position[2] -= 0.55f;
+            qcopy(g_vendor_menu_state.position, g_shop_preview_position);
+            if (g_display_mode_flag) g_vendor_menu_state.position[2] -= 0.55f;
             moby->rotX = 0; moby->rotY = 0; moby->rotZ = 0;
             g_vendor_menu_state.field9c = 0;
             func_002A0F48(moby);
@@ -304,7 +304,7 @@ void PrepareVendorSelectionPreview(void)
         }
     } else if (mode == 1) {
         if (g_vendor_menu_state.count) {
-            shop_set_message_text(((char *)GetLocalizedString(D_001A8B00[g_vendor_menu_state.rows.ammo[g_vendor_menu_state.selected][0]])));
+            shop_set_message_text(((char *)GetLocalizedString(g_vendor_ammo_string_ids[g_vendor_menu_state.rows.ammo[g_vendor_menu_state.selected][0]])));
             snd_pump_music_and_disc_read(1);
             load_start_disc_entry_by_id(g_vendor_menu_state.rows.ammo[g_vendor_menu_state.selected][3], g_vendor_menu_state.buffer);
             g_vendor_menu_state.resourceActive = 1; g_vendor_menu_state.previous = g_vendor_menu_state.selected; g_vendor_menu_state.modelActive = 0;

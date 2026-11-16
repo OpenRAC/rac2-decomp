@@ -8,15 +8,15 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int hero_set_control_motion_and_step(void *, void *);
-extern u8 *D_L16_001B2C0C[] __attribute__((sda));
-extern u8 D_0013963B;
+extern u8 *g_beam_definition_table[] __attribute__((sda));
+extern u8 g_snivelak_boss_state;
 extern s32 math_fast_float_d(void *);
-extern u8 *D_L16_001FE7C0[];
+extern u8 *g_path_l16_table[];
 extern s32 FloatToInt(float);
 extern s32 moby_apply_damage_to_object(void *, void *, s32);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern s32 D_L16_001B2B38[] __attribute__((sda));
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern s32 g_group_id_limit[] __attribute__((sda));
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
 
@@ -27,7 +27,7 @@ s32 func_PAL_L16_004099C0(u8 *moby)
     float point[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
-    u8 *path = D_L16_001FE7C0[*(s32 *)(state + 0x294)];
+    u8 *path = g_path_l16_table[*(s32 *)(state + 0x294)];
 
     if (*(s32 *)(state + 0x2A4) >= *(s32 *)path)
         return 1;

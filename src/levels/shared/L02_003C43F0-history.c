@@ -27,7 +27,7 @@ extern void moby_forward_position_call(void *, void *, int);
 extern void moby_update_effect_by_class(char *);
 extern void SpawnActorPuff(void *);
 extern void part_spawn_trail_at_owner(void *);
-extern char *D_L02_001C0958;
+extern char *g_hit_l02_result;
 
 /* Update for a projectile moby. It flies along its direction, leaves a trail of points, hits things or leaves the map, then removes itself. */
 void projectile_l02_update(unsigned char *obj)
@@ -87,7 +87,7 @@ void projectile_l02_update(unsigned char *obj)
             *(int *)(vars + 0x7c) = PlayMobySound(0, 4, obj);
         }
         if (CollLine(&old, obj + 0x10, 0, *(int *)(obj + 0xb8), 0)) {
-            hit = D_L02_001C0958;
+            hit = g_hit_l02_result;
             if (hit) {
                 make_hit_descriptor(packet, obj, 0x10001, vars, *(float *)(vars + 0x6c));
                 packet[0x18] = 5;

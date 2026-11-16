@@ -58,17 +58,17 @@ typedef struct {
 
 extern unsigned int g_equipment_bits;
 /* Text ids per setting value. */
-extern short D_001A8C28[4];
-extern short D_001A8C30[4];
-extern short D_001A8C38[4];
-extern short D_001A8C40[4];
-extern short D_001A8C48[4];
-extern short D_001A8C50[4];
-extern short D_001A8C58[4];
+extern short g_robot_part_ids_b[4];
+extern short g_robot_part_ids_c[4];
+extern short g_robot_part_ids_d[4];
+extern short g_robot_part_ids_e[4];
+extern short g_robot_part_ids_f[4];
+extern short g_robot_part_ids_g[4];
+extern short g_robot_part_ids_h[4];
 
-extern const OptionPreset_002D4948 D_0026CFD0[21];
-extern Layout_002D4948 D_0025D478;
-extern int D_001ABA74 __attribute__((sda));
+extern const OptionPreset_002D4948 g_preview_choices[21];
+extern Layout_002D4948 g_preview_display;
+extern int g_preview_selection __attribute__((sda));
 extern char *menu_stream_chunk_claim_free(int);
 extern void moby_init_instance(MenuLine_002D4948 *, int);
 extern void gfx_pack_render_command_fields(MenuLine_002D4948 *, int, int, int, int);
@@ -97,41 +97,41 @@ int InitModelPreviewMenu(void)
     moby_init_instance(line, 0xD54);
     line->kind = 9;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x100);
-    moby_init_instance(line, D_001A8C28[a]);
+    moby_init_instance(line, g_robot_part_ids_b[a]);
     line->kind = 8;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x200);
-    moby_init_instance(line, D_001A8C28[a]);
+    moby_init_instance(line, g_robot_part_ids_b[a]);
     line->kind = 8;
     line->style |= 0x8000;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x300);
-    moby_init_instance(line, D_001A8C30[b]);
+    moby_init_instance(line, g_robot_part_ids_c[b]);
     line->kind = 0;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x400);
-    moby_init_instance(line, D_001A8C38[c]);
+    moby_init_instance(line, g_robot_part_ids_d[c]);
     line->kind = 1;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x500);
-    moby_init_instance(line, D_001A8C38[c]);
+    moby_init_instance(line, g_robot_part_ids_d[c]);
     line->kind = 1;
     line->style |= 0x8000;
     lineCount = 6;
-    if (D_001A8C40[d] != 0) {
+    if (g_robot_part_ids_e[d] != 0) {
         line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x600);
         lineCount = 7;
-        moby_init_instance(line, D_001A8C40[d]);
+        moby_init_instance(line, g_robot_part_ids_e[d]);
         line->kind = 2;
     }
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
-    moby_init_instance(line, D_001A8C48[e]);
+    moby_init_instance(line, g_robot_part_ids_f[e]);
     line->kind = kind3;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
-    moby_init_instance(line, D_001A8C48[e]);
+    moby_init_instance(line, g_robot_part_ids_f[e]);
     line->kind = kind3;
     line->style |= 0x8000;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
-    moby_init_instance(line, D_001A8C50[f]);
+    moby_init_instance(line, g_robot_part_ids_g[f]);
     line->kind = kind4;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
-    moby_init_instance(line, D_001A8C50[f]);
+    moby_init_instance(line, g_robot_part_ids_g[f]);
     line->kind = kind4;
     line->style |= 0x8000;
     if ((g_equipment_bits >> 12) & 1) {
@@ -146,7 +146,7 @@ int InitModelPreviewMenu(void)
     }
     if (g != 0) {
         line = (MenuLine_002D4948 *)(g_pause_menu_state.items + lineCount++ * 0x100);
-        moby_init_instance(line, D_001A8C58[g]);
+        moby_init_instance(line, g_robot_part_ids_h[g]);
         line->kind = 7;
     }
     for (i = 0; i < lineCount; i++) {
@@ -169,11 +169,11 @@ int InitModelPreviewMenu(void)
     }
     g_pause_menu_state.count = lineCount;
     g_pause_menu_state.timer = 300;
-    for (D_001ABA74 = 0; D_001ABA74 < 21; D_001ABA74++) {
-        if ((g_equipment_bits & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
+    for (g_preview_selection = 0; g_preview_selection < 21; g_preview_selection++) {
+        if ((g_equipment_bits & g_preview_choices[g_preview_selection].mask) == g_preview_choices[g_preview_selection].value) {
             break;
         }
     }
-    D_0025D478.w3C = -0x244;
+    g_preview_display.w3C = -0x244;
     return 0;
 }

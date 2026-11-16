@@ -18,10 +18,10 @@ typedef struct {
     float groundZ;
 } AmmoSpawnData;
 extern unsigned int stub_empty_19(int);
-extern int D_001A8CA0;
+extern int g_ground_check_inhibit;
 extern unsigned char g_item_slot_to_record[];
 extern AmmoSpawnWeapon g_weapon_table[];
-extern unsigned char D_001A7A0A;
+extern unsigned char g_extras_unlocked_flag;
 extern char D_00189E20_9[];
 extern float math_random_angle(void);
 extern float mat_fast_helper_a(float, float);
@@ -30,7 +30,7 @@ extern float vec_length_xy(float *);
 extern void vec_random_direction(float *, float, float);
 extern float math_random_float_range(float, float);
 extern void vec_transform_and_set_height(char *, float *, float *, int, float);
-extern char *func_PAL_002735D0(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
+extern char *cam_moby_create_pal(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
 extern void func_PAL_00321298(void *);
 extern float gravity_get_center_distance(float *);
 extern void func_002A0F48(void *);
@@ -38,7 +38,7 @@ extern void hero_copy_field_to_moby(char *);
 
 /* Spawns an ammo pickup (class 0xCDB, updated by func_PAL_00321298) for a weapon at a position;
    an amount of -1 takes the weapon's default, doubled while D_001A7A0A is set. */
-char *func_PAL_00321958(float *position, int weapon, int amount, int extra)
+char *SpawnWeaponAmmoPickup_pal(float *position, int weapon, int amount, int extra)
 {
     float rotation[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
@@ -57,7 +57,7 @@ char *func_PAL_00321958(float *position, int weapon, int amount, int extra)
     *(AmmoSpawnQuad *)velocity = 0;
     velocity[2] = math_random_angle();
     *(AmmoSpawnQuad *)rotation = *(AmmoSpawnQuad *)velocity;
-    if (D_001A8CA0) {
+    if (g_ground_check_inhibit) {
         cam_compute_view_direction(position, velocity, 1);
         rotation[1] = mat_fast_helper_a(velocity[2], vec_length_xy(velocity));
         rotation[2] = mat_fast_helper_a(velocity[0], velocity[1]);
@@ -68,7 +68,7 @@ char *func_PAL_00321958(float *position, int weapon, int amount, int extra)
                   math_random_float_range(4.0f, 8.0f) * (0.020000001f));
     spread = math_random_float_range(180.0f, 360.0f);
     speed = math_random_float_range(10.0f, 15.0f);
-    spawn = func_PAL_002735D0(*(char **)(hero + 0x2290), 2, 0xCDB, 0, position, rotation, velocity,
+    spawn = cam_moby_create_pal(*(char **)(hero + 0x2290), 2, 0xCDB, 0, position, rotation, velocity,
                           255, spread, speed);
     if (spawn) {
         spawn[0x20] = 1;
@@ -79,12 +79,12 @@ char *func_PAL_00321958(float *position, int weapon, int amount, int extra)
                 + slots[stub_empty_19(weapon)] * stride))->pickupAmount;
         else
             data->amount = amount;
-        if (D_001A7A0A)
+        if (g_extras_unlocked_flag)
             data->amount *= 2;
         data->weapon = weapon;
         data->f6C = (float)extra;
         data->f70 = 13;
-        if (D_001A8CA0)
+        if (g_ground_check_inhibit)
             data->groundZ = gravity_get_center_distance((float *)(spawn + 0x10));
         else
             data->groundZ = *(float *)(spawn + 0x18);

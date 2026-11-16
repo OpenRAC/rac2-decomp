@@ -16,10 +16,10 @@ extern void FastVecCross(void *, void *, void *);
 extern void FastVecScale(void *, void *, f32);
 extern f32 math_ease_out_quad(f32);
 extern f32 math_closest_point_on_segment(void *, void *, void *, void *);
-extern u8 *D_L10_001B2614 MACRO_ADDR;
-extern u8 D_L10_00221CD0[];
-extern f32 D_L10_001B0F4C NOT_SDA;
-extern s32 D_L10_001B0F44 __attribute__((sda));
+extern u8 *g_curve_point_records MACRO_ADDR;
+extern u8 g_mission_state[];
+extern f32 g_child_curve_distance NOT_SDA;
+extern s32 g_boss_flag_a __attribute__((sda));
 
 /* Creates a small flying object next to the nearest of four marked spots and sets up the
    curved path it will follow towards the player. */
@@ -39,10 +39,10 @@ void hrugis_launch_child_on_curve(u8 *moby) {
     if (((HrugisPathState *)vars)->child) return;
     record = SpawnFreeLevelObjectById(0xF8D, 1);
     ((HrugisPathState *)vars)->child = record;
-    distance = D_L10_001B0F4C;
+    distance = g_child_curve_distance;
     best = 0;
     for (index = (s32 *)(vars + 0x2A0), i = 3; i >= 0; i--, index++) {
-        record = D_L10_001B2614 + *index * 128;
+        record = g_curve_point_records + *index * 128;
         dist = fast_vec_dist(record + 0x30, moby + 0x10);
         if (dist < distance) {
             distance = dist;
@@ -50,7 +50,7 @@ void hrugis_launch_child_on_curve(u8 *moby) {
         }
     }
     if (!best) return;
-    target = D_L10_001B2614 + *(s32 *)D_L10_00221CD0 * 128;
+    target = g_curve_point_records + *(s32 *)g_mission_state * 128;
     childpos = ((HrugisPathState *)vars)->child + 0x10;
     qcopy(childpos, best + 0x30);
     FastVecSub(delta, target + 0x30, childpos);
@@ -84,5 +84,5 @@ void hrugis_launch_child_on_curve(u8 *moby) {
     FastVecAdd(vars + 0x270, scaled, vars + 0x270);
     *(s32 *)(vars + 0x2D4) = 0;
     *(f32 *)(vars + 0x2D8) = 0.011635531f;
-    D_L10_001B0F44 = 1;
+    g_boss_flag_a = 1;
 }

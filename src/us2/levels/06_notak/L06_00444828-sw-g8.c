@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L06_001B1090 __attribute__((sda));
-extern float D_L06_001B1094 __attribute__((sda));
-extern int D_L06_001B2348;
+extern float g_creature_wander_time_a __attribute__((sda));
+extern float g_creature_wander_time_b __attribute__((sda));
+extern int g_game_l06_frame_counter;
 extern void notak_enemy_update(char *);
 extern int flag_set_second_pending(char *);
 extern int flag_set_first_pending(char *);
@@ -24,7 +24,7 @@ extern int moby_count_group_side_from_object(char *, int, int);
 extern void actor_aim_head_at_hero(char *);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(char *, float);
-extern int func_US2_002AF9C8(char *, float);
+extern int math_is_value_within_step_us2(char *, float);
 extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
 extern void vec_scale_to_length(char *, char *, float);
 extern void actor_tick_timers_effects(char *);
@@ -35,7 +35,7 @@ extern void marker_update_pulse(char *);
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
 
-void func_US2_L06_00444828(char *obj)
+void wandering_l06_creature_update_us2(char *obj)
 {
     char *st = *(char **)(obj + 0x68);
     char tmp[16];
@@ -50,7 +50,7 @@ void func_US2_L06_00444828(char *obj)
             F(st,0x124) = 0.006666667f;
             F(st,0x134) = 0.5f;
         }
-        F(st,0x1D0) = D_L06_001B1094 * 0.016666667f;
+        F(st,0x1D0) = g_creature_wander_time_b * 0.016666667f;
         if (H(st,0x314) == 1) {
             if (math_random_int_below(5) == 0) {
                 moby_set_state(obj,5,2);
@@ -68,7 +68,7 @@ void func_US2_L06_00444828(char *obj)
             moby_set_controller_speed_limits(obj, 0.005f, 0.06666667f, 0.0034906589f, 0.41887909f);
             F(st,0x134) = 0.05f;
         }
-        F(st,0x1D0) = D_L06_001B1090 * 0.016666667f;
+        F(st,0x1D0) = g_creature_wander_time_a * 0.016666667f;
         if (H(st,0x314) == 1) moby_set_state(obj,6,2);
         else if (!H(st,0x310)) moby_set_state(obj,1,0);
         break;
@@ -78,7 +78,7 @@ void func_US2_L06_00444828(char *obj)
             F(st,0x124) = 0.006666667f;
             F(st,0x134) = 0.05f;
         }
-        F(st,0x1D0) = D_L06_001B1090 * 0.016666667f;
+        F(st,0x1D0) = g_creature_wander_time_a * 0.016666667f;
         if (H(st,0x314) == 1) break;
         else {
             moby_set_state(obj,3,1);
@@ -150,13 +150,13 @@ void func_US2_L06_00444828(char *obj)
             if (B(obj,0x43)!=8) anim_start_blended(obj,8,3,6);
         }
         moby_start_effect_from_entry(obj,F(st,0x320));
-        if (func_US2_002AF9C8(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)B(st,0x34),1.0f);
+        if (math_is_value_within_step_us2(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)B(st,0x34),1.0f);
         if (B(obj,0x60)&2) moby_set_state(obj,6,-1);
         break;
     case 10:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=10) anim_start_blended(obj,10,0,5);
-            I(st,0x1BC) = D_L06_001B2348;
+            I(st,0x1BC) = g_game_l06_frame_counter;
         }
         vec_scale_to_length(tmp,st+0x1A0,1.0f);
         actor_set_glow_effect(obj,tmp,0);

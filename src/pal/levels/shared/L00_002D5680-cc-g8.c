@@ -39,17 +39,17 @@ typedef struct { char pad[0x18]; char *object; char unused[4]; float position[4]
 extern AimInput g_pad_state;
 extern AimProbe g_collision_result;
 typedef struct { char pad[0x158]; float height; char pad15C[0x214]; HeroVector motion; } AimCamera;
-extern AimCamera D_L00_001B8C80;
-extern char D_L00_001B8FF0[];
-extern int D_001A7BA4, D_L00_001A8FF0;
-extern int D_L00_001A7CE8 __attribute__((sda));
-extern float D_L00_001A7F9C __attribute__((sda)), D_L00_001A7FA0 __attribute__((sda));
-extern float D_L00_001A7FA4 __attribute__((sda)), D_L00_001A7FA8 __attribute__((sda));
-extern float D_L00_001A7FAC __attribute__((sda)), D_L00_001A7FB0 __attribute__((sda));
-extern float D_L00_001A7FB4 __attribute__((sda)), D_L00_001A7FBC __attribute__((sda));
+extern AimCamera g_scalar_transition_state;
+extern char g_cam_follow_matrix[];
+extern int g_invert_aim_option, g_hero_locked_flag;
+extern int g_hero_aim_min_timer __attribute__((sda));
+extern float g_look_sensitivity_a __attribute__((sda)), g_look_sensitivity_b __attribute__((sda));
+extern float g_look_rate_scale_a __attribute__((sda)), g_look_rate_scale_b __attribute__((sda));
+extern float g_aim_rate_scale_a __attribute__((sda)), g_aim_rate_scale_b __attribute__((sda));
+extern float g_aim_correction_scale __attribute__((sda)), g_aim_damping_scale __attribute__((sda));
 extern int hero_is_action_allowed(void);
-extern int func_PAL_L00_002D6A08(float *, float *, float *);
-extern void func_PAL_L00_002D6AD8(void), func_PAL_L00_002D5E90(void);
+extern int hero_get_camera_params_pal(float *, float *, float *);
+extern void hero_update_camera_block_pal(void), func_PAL_L00_002D5E90(void);
 extern float FastVecLength(void *), vec_length_xy(void *), mat_fast_helper_a(float,float);
 extern void vec_scale_to_length(void *,void *,float), matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *);
@@ -84,19 +84,19 @@ void func_PAL_L00_002D5680(void)
             matrix_mul_vec3(aim, aim, aim - 0x14A0);
         yaw = mat_fast_helper_a(HF(0x14E0), HF(0x14E4));
         pitch = mat_fast_helper_a(vec_length_xy(aim), HF(0x14E8));
-        if (func_PAL_L00_002D6A08(&target, &probeRate, &probeLimit)) {
+        if (hero_get_camera_params_pal(&target, &probeRate, &probeLimit)) {
             math_approach_target_with_braking(-pitch, (float *)(aim + 0x10), probeRate, probeRate, probeLimit);
             value = fast_subtract_rotations(target, yaw);
             math_approach_target_with_braking(value, (float *)(aim + 0x14), probeRate, probeRate, probeLimit);
         } else {
             distance = 0.0f;
-            vec_scale_to_length(direction, D_L00_001B8FF0, 30.0f);
+            vec_scale_to_length(direction, g_cam_follow_matrix, 30.0f);
             hit = 0;
-            FastVecAdd(direction, direction, D_L00_001B8FF0 - 0x230);
-            if (CollLine(D_L00_001B8FF0 - 0x230, direction, 1, HI(0x2290), 0)) {
+            FastVecAdd(direction, direction, g_cam_follow_matrix - 0x230);
+            if (CollLine(g_cam_follow_matrix - 0x230, direction, 1, HI(0x2290), 0)) {
                 char *probeObject = g_collision_result.object;
                 if (probeObject && *(short *)(*(char **)(probeObject + 0x24) + 0x46) == 5) {
-                    distance = fast_vec_dist(D_L00_001B8FF0 - 0x230, g_collision_result.position);
+                    distance = fast_vec_dist(g_cam_follow_matrix - 0x230, g_collision_result.position);
                     hit = 1;
                 }
             }
@@ -106,43 +106,43 @@ void func_PAL_L00_002D5680(void)
                 if (yawScale > 0.6f) yawScale = 0.6f;
                 if (pitchScale > 0.6f) pitchScale = 0.6f;
             }
-            limit = -g_pad_state.pitch * 0.0003490659f * D_L00_001A7F9C * pitchScale;
-            rate = g_pad_state.yaw * 0.0003490659f * D_L00_001A7FA0 * yawScale;
-            if (D_001A7BA4) rate = -rate;
+            limit = -g_pad_state.pitch * 0.0003490659f * g_look_sensitivity_a * pitchScale;
+            rate = g_pad_state.yaw * 0.0003490659f * g_look_sensitivity_b * yawScale;
+            if (g_invert_aim_option) rate = -rate;
             if (hit) {
-                float cap = D_L00_001A7FA0 * 0.0003490659f;
+                float cap = g_look_sensitivity_b * 0.0003490659f;
                 cam_set_view_space_height(local, (char *)&g_hero_state + 0x120, 0.0f);
                 if (math_fabs(g_pad_state.pitch) < 1.0f) {
-                    float correction = FastVecDot(local, D_L00_001B8FF0 + 0x10);
-                    correction = -(correction / distance) * D_L00_001A7FB4;
+                    float correction = FastVecDot(local, g_cam_follow_matrix + 0x10);
+                    correction = -(correction / distance) * g_aim_correction_scale;
                     if (correction > cap) correction = cap;
                     else if (correction < -cap) correction = -cap;
                     if (g_pad_state.pitch == 0.0f) limit = correction;
-                    else { limit -= correction; limit *= D_L00_001A7FBC; limit += correction; }
+                    else { limit -= correction; limit *= g_aim_damping_scale; limit += correction; }
                 }
                 if (math_fabs(g_pad_state.yaw) < 1.0f) {
-                    float correction = FastVecDot(local, D_L00_001B8FF0 + 0x20);
-                    correction = (correction / distance) * D_L00_001A7FB4;
+                    float correction = FastVecDot(local, g_cam_follow_matrix + 0x20);
+                    correction = (correction / distance) * g_aim_correction_scale;
                     if (correction > cap) correction = cap;
                     else if (correction < -cap) correction = -cap;
                     if (g_pad_state.yaw == 0.0f) rate = correction;
-                    else { rate -= correction; rate *= D_L00_001A7FBC; rate += correction; }
+                    else { rate -= correction; rate *= g_aim_damping_scale; rate += correction; }
                 }
             }
             value = math_fabs(g_hero_state.pitchRate);
             if (math_fabs(rate) < value || g_hero_state.pitchRate * rate < 0.0f)
-                ApproachValue(&g_hero_state.pitchRate, rate, D_L00_001A7FB0 * 6.981318e-06f);
+                ApproachValue(&g_hero_state.pitchRate, rate, g_aim_rate_scale_b * 6.981318e-06f);
             else
-                ApproachValue(&g_hero_state.pitchRate, rate, D_L00_001A7FA8 * (yawScale * 6.981318e-06f));
+                ApproachValue(&g_hero_state.pitchRate, rate, g_look_rate_scale_b * (yawScale * 6.981318e-06f));
             value = math_fabs(g_hero_state.yawRate);
             if (math_fabs(limit) < value || g_hero_state.yawRate * limit < 0.0f)
-                ApproachValue(&g_hero_state.yawRate, limit, D_L00_001A7FAC * 6.981318e-06f);
+                ApproachValue(&g_hero_state.yawRate, limit, g_aim_rate_scale_a * 6.981318e-06f);
             else
-                ApproachValue(&g_hero_state.yawRate, limit, D_L00_001A7FA4 * (pitchScale * 6.981318e-06f));
+                ApproachValue(&g_hero_state.yawRate, limit, g_look_rate_scale_a * (pitchScale * 6.981318e-06f));
         }
         yaw = FastAddRotations(yaw, g_hero_state.yawRate);
         pitch = FastAddRotations(pitch, g_hero_state.pitchRate);
-        if (!D_L00_001A8FF0) yaw = FastAddRotations(yaw, g_hero_state.heading);
+        if (!g_hero_locked_flag) yaw = FastAddRotations(yaw, g_hero_state.heading);
         pitchBound = 1.483529999f;
         if (pitch > pitchBound) { pitch = pitchBound; g_hero_state.pitchRate = 0; }
         else if (pitch < -pitchBound) { g_hero_state.pitchRate = 0; pitch = -pitchBound; }
@@ -150,9 +150,9 @@ void func_PAL_L00_002D5680(void)
         vec_build_spherical_offset(aim, 1.0f, yaw, pitch);
         hero = aim - 0x14E0;
         if (g_hero_state.groundNormalZ > -0.99f) matrix_mul_vec3(aim, aim, hero);
-        func_PAL_L00_002D6AD8();
-        if (!func_PAL_L00_002D6A08(0, 0, 0)) {
-            AimCamera *camera = &D_L00_001B8C80;
+        hero_update_camera_block_pal();
+        if (!hero_get_camera_params_pal(0, 0, 0)) {
+            AimCamera *camera = &g_scalar_transition_state;
             *(short *)(hero + 0x1454) = 2;
             *(float *)(hero + 0x1A0) = camera->height;
             camera = (AimCamera *)((char *)camera + 0x370);
@@ -161,7 +161,7 @@ void func_PAL_L00_002D5680(void)
             hero_steer_heading(0, 0.053280003f, 0.36f, 0.24434614f);
         }
     }
-    if (hero_is_action_allowed() || ((g_hero_state.state == 1 || g_hero_state.state == 0x1D) && g_hero_state.timer >= (((int)(D_L00_001A7CE8) * 5 + 2) / 6))) {
+    if (hero_is_action_allowed() || ((g_hero_state.state == 1 || g_hero_state.state == 0x1D) && g_hero_state.timer >= (((int)(g_hero_aim_min_timer) * 5 + 2) / 6))) {
         if (!g_hero_state.active) {
             object = g_hero_state.targetObject;
             if (object && *(short *)(object + 0xAA) != 0x47) {

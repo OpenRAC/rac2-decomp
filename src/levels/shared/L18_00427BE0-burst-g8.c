@@ -1,11 +1,11 @@
 #include "common.h"
-extern float D_L18_001B1270 __attribute__((sda));
-extern u16 D_L18_001B1240 __attribute__((sda)), D_L18_001B1244 __attribute__((sda));
-extern u16 D_L18_001B1268 __attribute__((sda));
-extern u8 D_L18_001B1248 __attribute__((sda));
-extern int D_L18_001B124C __attribute__((sda)), D_L18_001B1250 __attribute__((sda));
-extern u32 D_00138320[];
-extern char D_L18_001B1360[];
+extern float g_shooter_attack_distance __attribute__((sda));
+extern u16 g_enemy_timer_reset_value __attribute__((sda)), g_shooter_cooldown_reset __attribute__((sda));
+extern u16 g_shooter_cooldown __attribute__((sda));
+extern u8 g_shooter_burst_count __attribute__((sda));
+extern int g_shooter_burst_delay_min __attribute__((sda)), g_shooter_burst_delay_max __attribute__((sda));
+extern u32 g_pad_pressed_flags[];
+extern char g_str_debug_stub[];
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
 extern int moby_step_at_own_position_factor(void *, float);
 extern int moby_step_at_own_position(void *);
@@ -25,11 +25,11 @@ int shooter_update_ranged_attack(u8 *object)
     switch (*(short *)(object + 0xAA)) {
     case 0xEC0 /* moby class 3776 */:
         if (object[0xBC] != 1) {
-            if (vec_distance_xy(object + 0x10, state + 0x220) < D_L18_001B1270)
+            if (vec_distance_xy(object + 0x10, state + 0x220) < g_shooter_attack_distance)
                 moby_step_at_own_position(object);
             else moby_l01_turn_toward_target(object, state + 0x220);
         } else {
-            if (D_00138320[1] & 0x80) *(u16 *)(state + 0x392) = D_L18_001B1240;
+            if (g_pad_pressed_flags[1] & 0x80) *(u16 *)(state + 0x392) = g_enemy_timer_reset_value;
             FastDecTimer((short *)(state + 0x392));
         }
         if (*(float *)(object + 0x18) < *(float *)(state + 0x90)) {
@@ -42,7 +42,7 @@ int shooter_update_ranged_attack(u8 *object)
             if (object[0xBC] != 1) {
                 moby_rebuild_scale_matrix(object);
                 changed = 1;
-                *(u16 *)(state + 0x396) = D_L18_001B1244;
+                *(u16 *)(state + 0x396) = g_shooter_cooldown_reset;
                 moby_start_or_forward_anim(object, 2, 0, 10.0f);
                 moby_set_state(object, 4, 6);
             } else changed = 1;
@@ -61,7 +61,7 @@ int shooter_update_ranged_attack(u8 *object)
                 moby_start_or_forward_anim(object, 11, 0, 10.0f);
                 *(float *)(object + 0x48) = 3.0f;
                 {
-                    u8 bursts = D_L18_001B1248;
+                    u8 bursts = g_shooter_burst_count;
                     *(short *)(state + 0x394) = 0;
                     state[0x39D] = bursts;
                 }
@@ -81,7 +81,7 @@ int shooter_update_ranged_attack(u8 *object)
             {
                 int controlled = object[0xBC];
                 if (controlled == 1) {
-                    changed = (D_00138320[0] & 0x80) ? changed : controlled;
+                    changed = (g_pad_pressed_flags[0] & 0x80) ? changed : controlled;
                 } else if (state[0x39D] == 0) moby_start_or_forward_anim(object, 12, 0, 10.0f);
             }
             break;
@@ -89,8 +89,8 @@ int shooter_update_ranged_attack(u8 *object)
             if (object[0x60] & 2) {
                 changed = 1;
                 {
-                    int delay = math_random_int_range(D_L18_001B124C, D_L18_001B1250);
-                    u16 cooldown = D_L18_001B1268;
+                    int delay = math_random_int_range(g_shooter_burst_delay_min, g_shooter_burst_delay_max);
+                    u16 cooldown = g_shooter_cooldown;
                     *(short *)(state + 0x396) = delay;
                     *(u16 *)(state + 0x392) = cooldown;
                 }
@@ -101,7 +101,7 @@ int shooter_update_ranged_attack(u8 *object)
         }
         break;
     default:
-        STUB_printf(D_L18_001B1360);
+        STUB_printf(g_str_debug_stub);
         break;
     }
     return changed;

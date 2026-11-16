@@ -5,7 +5,7 @@ typedef struct { int bolts; int counter; u8 suffix[0x38]; } PlayerStatBlock;
 extern PlayerStatBlock g_player_bolts __attribute__((sda));
 extern int g_homing_pickup_target __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
-extern unsigned short D_0018D030 __attribute__((nosda));
+extern unsigned short g_map_flag_word __attribute__((nosda));
 extern float fast_vec_dist(void *, void *);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern float FastAddRotations(float, float);
@@ -14,7 +14,7 @@ extern void moby_mark_spawned(void *);
 extern void func_PAL_L05_004212A8(char *);
 extern int func_PAL_00289730(int, int);
 extern char *GetLocalizedString(int);
-extern int func_PAL_L00_0030FBC0(int, int);
+extern int level_l00_call_module_handler_with_arg_9_pal(int, int);
 
 /* Flies the object at the cached class-0xFBF moby. On arrival it plays a sound, bumps the
    player-stat counter and deletes itself; until then it keeps turning. */
@@ -45,10 +45,10 @@ void func_PAL_L05_00420F94(char *object)
         }
         if (scale < 0.5f) {
             if (g_player_bolts.counter == 0) {
-                if (D_0018D030 == 0 && g_current_map_index[0] == 0x19)
+                if (g_map_flag_word == 0 && g_current_map_index[0] == 0x19)
                     func_PAL_00289730(0xA3B, 0x92);
             } else {
-                func_PAL_L00_0030FBC0(GetLocalizedString(0x1282), -1);
+                level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1282), -1);
             }
             snd_play_from_class_bank(0xC, 0, object, 0xFBF);
             g_player_bolts.counter = g_player_bolts.counter + 1;

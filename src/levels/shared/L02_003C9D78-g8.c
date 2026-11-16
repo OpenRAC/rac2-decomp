@@ -7,8 +7,8 @@ extern float ApproachValue(float *, float, float);
 extern void moby_set_light_color(void *, int);
 extern void moby_mark_spawned(void *);
 extern void gfx_add_draw_callback_first(void *, void *);
-extern float D_L02_001AFFB8 __attribute__((sda));
-extern float D_L02_001AFFBC[] __attribute__((sda));
+extern float g_glow_effect_params __attribute__((sda));
+extern float g_glow_approach_rate[] __attribute__((sda));
 extern void DrawEffectQuad(char *);
 
 /* Advance the two timers, initialize the effect once, and release four children. */
@@ -25,7 +25,7 @@ void UpdateTimedChildEffects(char *obj)
     case 1:
         one = 1.0f;
         if (*(float *)(sub + 8) < one) {
-            ApproachValue((float *)(sub + 8), one, D_L02_001AFFB8 * (1.0f / 60.0f));
+            ApproachValue((float *)(sub + 8), one, g_glow_effect_params * (1.0f / 60.0f));
             goto update;
         }
         list = (char **)(sub + 0x10);
@@ -36,7 +36,7 @@ void UpdateTimedChildEffects(char *obj)
             SpawnEffectParticleRing(obj);
         }
         moby_position_effect_children(obj);
-        ApproachValue((float *)(sub + 12), one, D_L02_001AFFBC[0] * (1.0f / 60.0f));
+        ApproachValue((float *)(sub + 12), one, g_glow_approach_rate[0] * (1.0f / 60.0f));
         goto update;
     cleanup:
         count = 3;

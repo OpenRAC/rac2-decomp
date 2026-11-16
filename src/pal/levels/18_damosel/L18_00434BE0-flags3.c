@@ -5,22 +5,22 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
 typedef int s32;
-extern u16 *D_L18_001FB320[];
+extern u16 *g_condition_target_lists[];
 extern u8 *g_moby_l18_table[] __attribute__((sda));
-extern s32 D_L18_001B2838[] __attribute__((sda));
+extern s32 g_max_l18_group_index[] __attribute__((sda));
 extern void moby_set_state(u8 *arg0, s32 arg1, s32 arg2);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern s32 func_PAL_002B1A50(u8 *, u8 *, s32);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern s32 math_random_int_below(s32);
-extern int func_PAL_002B3F18(u8 *, u8 *, u8 *);
+extern int part_spawn_damage_debris_pal(u8 *, u8 *, u8 *);
 extern u8 *CreateMoby(s32);
 extern void func_002A0F48(u8 *);
 extern void func_PAL_002A7E68(u8 *, s32, s32, s32);
 extern void get_moby_color(u8 *, s32 *, s32 *, s32 *);
 extern void set_moby_color(u8 *, s32, s32, s32);
 extern s32 weapon_select_aim_target(u8 *, s32, s32, s32, float, float);
-extern void func_PAL_L18_00437A28(u8 *);
+extern void extermibot_destroy_piece_and_parts_pal(u8 *);
 extern void extermibot_release_all_group_pieces(u8 *);
 extern void extermibot_set_anim_on_parts(u8 *, s32, s32, s32);
 extern s32 extermibot_is_in_attack_state(u8 *);
@@ -54,8 +54,8 @@ void func_PAL_L18_00435908(u8 *object)
         t20 = *(float *)(state + 0x20);
         if (*(u8 **)(state + 0x7C0) == 0) {
             if (t20 <= 0.0f) {
-                func_PAL_002A7650(object, 0, 3);
-                func_PAL_L18_00437A28(object);
+                SetDeathBits_pal(object, 0, 3);
+                extermibot_destroy_piece_and_parts_pal(object);
                 return;
             }
         }
@@ -72,11 +72,11 @@ void func_PAL_L18_00435908(u8 *object)
     }
     object[0xA8] = 0xFF;
     if (*(u8 **)(state + 0x188) != 0 && *(s16 *)(*(u8 **)(state + 0x188) + 0xAA) == 0xF59) {
-        func_PAL_002A7650(object, 0, 3);
-        func_PAL_L18_00437A28(object);
+        SetDeathBits_pal(object, 0, 3);
+        extermibot_destroy_piece_and_parts_pal(object);
     }
     if (*(u8 **)(state + 0x7C0) != 0) {
-        func_PAL_002B3F18(*(u8 **)(state + 0x7C0), *(u8 **)(*(u8 **)(state + 0x7C0) + 0x68) + 0x20, state + 0x20);
+        part_spawn_damage_debris_pal(*(u8 **)(state + 0x7C0), *(u8 **)(*(u8 **)(state + 0x7C0) + 0x68) + 0x20, state + 0x20);
         if (!(*(u16 *)(*(u8 **)(state + 0x7C0) + 0x7C) & 2) && *(u8 **)(state + 0x7C4) == 0) {
             u8 *v = CreateMoby(0xF0C);
             *(u8 **)(state + 0x7C4) = v;
@@ -93,7 +93,7 @@ void func_PAL_L18_00435908(u8 *object)
                 *(float *)(*(u8 **)(state + 0x7C4) + 0x2C) =
                     *(float *)(*(u8 **)(*(u8 **)(state + 0x7C4) + 0x24) + 0x24) * *(float *)(state + 0x7E8);
             } else {
-                func_PAL_L18_00437A28(object);
+                extermibot_destroy_piece_and_parts_pal(object);
             }
         }
         if (*(u8 **)(state + 0x7C0) != 0) {
@@ -107,9 +107,9 @@ void func_PAL_L18_00435908(u8 *object)
     }
     if (*(s16 *)(state + 0x7F4) != -1) {
         *(u16 *)(state + 0x7F6) = 0;
-        for (p = D_L18_001FB320[object[0x21]];
-             object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838[0] && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L18_001FB320[object[0x21]]);
+        for (p = g_condition_target_lists[object[0x21]];
+             object[0x21] != 0xFF && object[0x21] <= g_max_l18_group_index[0] && p != 0 &&
+             ((p != 0 && (s16)p[-1] >= 0) || p == g_condition_target_lists[object[0x21]]);
              p++) {
             e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
             if (e == 0)
@@ -122,12 +122,12 @@ void func_PAL_L18_00435908(u8 *object)
     }
     if (*(float *)(object + 0x18) < 90.0f ||
         (*(float *)(state + 0x800) != -1.0f && *(float *)(object + 0x18) < *(float *)(state + 0x800)))
-        func_PAL_L18_00437A28(object);
+        extermibot_destroy_piece_and_parts_pal(object);
     if (state[0x2E] == 2)
-        func_PAL_L18_00437A28(object);
+        extermibot_destroy_piece_and_parts_pal(object);
     if (*(float *)(state + 0x20) <= 0.0f) {
         if (object[0x20] != 0xD)
-            func_PAL_L18_00437A28(object);
+            extermibot_destroy_piece_and_parts_pal(object);
     }
     *(s32 *)(state + 0x79C) =
         weapon_select_aim_target(object, *(s32 *)(state + 0x790), 0, 0, *(float *)(state + 0x794), 0.0f);

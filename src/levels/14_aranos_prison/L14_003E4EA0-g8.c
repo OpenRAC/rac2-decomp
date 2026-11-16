@@ -14,10 +14,10 @@ typedef unsigned int u32;
 typedef signed short s16;
 typedef int s32;
 
-extern float D_L14_001B05C8 __attribute__((sda));
-extern float D_L14_001B05CC __attribute__((sda));
-extern float D_L14_001B05C0 __attribute__((sda));
-extern float D_L14_001B05C4 __attribute__((sda));
+extern float g_keyframe_blend_bias_a __attribute__((sda));
+extern float g_keyframe_blend_bias_b __attribute__((sda));
+extern float g_keyframe_blend_scale_a __attribute__((sda));
+extern float g_keyframe_blend_scale_b __attribute__((sda));
 extern float math_fabs(float);
 
 /* Blends two numbers on a linked object based on how far its position has moved between two key points. */
@@ -60,11 +60,11 @@ void moby_update_keyframe_span_blend(char *self)
     }
     keyStart = (float)*(s16 *)(state + (s16)keyIndex * 2);
     span = (float)(nextKey - *(s16 *)(state + (s16)keyIndex * 2));
-    ratioA = math_fabs((D_L14_001B05C8 - 1.0f) - (D_L14_001B05C8 + D_L14_001B05C8 - 2.0f) * ((float)(s16)position - keyStart) / span);
-    blendA = D_L14_001B05C8 - ratioA;
-    ratioB = math_fabs((D_L14_001B05CC - 1.0f) - (D_L14_001B05CC + D_L14_001B05CC - 2.0f) * ((float)*(s16 *)(state + 0x14) - keyStart) / span);
-    out0 = blendA * D_L14_001B05C0;
-    out1 = (D_L14_001B05CC - ratioB) * D_L14_001B05C4;
+    ratioA = math_fabs((g_keyframe_blend_bias_a - 1.0f) - (g_keyframe_blend_bias_a + g_keyframe_blend_bias_a - 2.0f) * ((float)(s16)position - keyStart) / span);
+    blendA = g_keyframe_blend_bias_a - ratioA;
+    ratioB = math_fabs((g_keyframe_blend_bias_b - 1.0f) - (g_keyframe_blend_bias_b + g_keyframe_blend_bias_b - 2.0f) * ((float)*(s16 *)(state + 0x14) - keyStart) / span);
+    out0 = blendA * g_keyframe_blend_scale_a;
+    out1 = (g_keyframe_blend_bias_b - ratioB) * g_keyframe_blend_scale_b;
     *(float *)(linkedVars + 0x40) = out0;
     *(float *)(linkedVars + 0x44) = out1;
 }

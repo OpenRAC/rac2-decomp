@@ -5,7 +5,7 @@ extern unsigned char g_hero_state[];
 #define H ((Hero *)D_00189E20)
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 position,angles,delta,step; } RotatingMoverWorkspace;
-extern char *D_L16_001B2B1C MACRO_ADDR;
+extern char *g_moby_instance_table MACRO_ADDR;
 extern char g_sound_state[];
 extern float fast_subtract_rotations(float,float);
 extern float FastAddRotations(float,float);
@@ -32,7 +32,7 @@ void rotating_platform_update(char *object)
             *(unsigned short *)(object+0x34)=(*(unsigned short *)(object+0x34)|0x41)&0xefff;
         }
     }
-    if(*(unsigned char *)(object+0x20)==1 && *(unsigned char *)(D_L16_001B2B1C+(*(int *)(state+0x6c)<<8)+0x20)==2) object[0x20]=2;
+    if(*(unsigned char *)(object+0x20)==1 && *(unsigned char *)(g_moby_instance_table+(*(int *)(state+0x6c)<<8)+0x20)==2) object[0x20]=2;
     if(*(unsigned char *)(object+0x20)==2) {
         if(*(int *)(state+0x68)==0) {
             if(*(short *)(object+0xaa)==0x10fe) {
@@ -49,7 +49,7 @@ void rotating_platform_update(char *object)
                 *(float *)(object+0xf8)=fast_subtract_rotations(*(float *)(object+0xf8),0.0045378562063f);
                 vec_scale_to_length(&local.step,object+0xc0,0.04333333299f);
                 FastVecAdd(object+0x10,&local.step,object+0x10);
-                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10);
+                FastVecAdd(g_moby_instance_table+*(int *)(state+0x6c)*0x100+0x10,&local.step,g_moby_instance_table+*(int *)(state+0x6c)*0x100+0x10);
                 sound=g_sound_state+0x70**(int *)(state+0x70);
                 if((*(char **)(sound+0x88))!=object || (*(unsigned char *)(sound+0x74))==0) *(int *)(state+0x70)=PlayMobySound(0,4,object);
             }
@@ -71,7 +71,7 @@ void rotating_platform_update(char *object)
                 vec_scale_to_length(&local.step,object+0xc0,-1.0f);
                 vec_scale_to_length(&local.step,&local.step,0.04333333299f);
                 FastVecAdd(object+0x10,&local.step,object+0x10);
-                FastVecAdd(D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10,&local.step,D_L16_001B2B1C+*(int *)(state+0x6c)*0x100+0x10);
+                FastVecAdd(g_moby_instance_table+*(int *)(state+0x6c)*0x100+0x10,&local.step,g_moby_instance_table+*(int *)(state+0x6c)*0x100+0x10);
             }
         }
     }

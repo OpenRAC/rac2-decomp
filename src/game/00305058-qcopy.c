@@ -4,7 +4,7 @@ typedef float V4_F305058[4] __attribute__((aligned(16)));
 
 extern u8 g_item_slot_to_record[];
 extern char g_weapon_table[];
-extern s32 D_001AEC08 __attribute__((sda));
+extern s32 g_miniturret_shot_param __attribute__((sda));
 
 extern void moby_transform_joint_to_world(char *, s32, void *);
 extern void moby_get_facing_direction(char *, void *);
@@ -49,7 +49,7 @@ void miniturret_fire_shot(char *moby)
                 vec_add_transformed_or_copy(shot_velocity, shot_velocity, muzzle_pos);
                 part_add_trail_entry(moby, shot_velocity);
                 PlayMobySound(0, 0, moby);
-                *(s32 *)(vars + 0x40) = D_001AEC08;
+                *(s32 *)(vars + 0x40) = g_miniturret_shot_param;
                 *(s32 *)(vars + 0x44) = 6;
                 if (--*(s32 *)(vars + 0x60) <= 0)
                     *(u8 *)(moby + 0x20) = 8;

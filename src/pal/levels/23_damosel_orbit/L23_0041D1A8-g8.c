@@ -8,15 +8,15 @@
  */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B15B4 __attribute__((sda));
+extern float g_gun_direction_scale __attribute__((sda));
 
-extern TI128 D_L23_001B3800 __attribute__((sda));
+extern TI128 g_gun_joint_position __attribute__((sda));
 
-extern char D_L23_001B3810[16] __attribute__((sda));
+extern char g_gun_aim_offset[16] __attribute__((sda));
 
-extern int D_L23_001B37F0;
+extern int g_gun_trail_effect_a;
 
-extern char *D_L23_00259560[];
+extern char *g_mothership_crowd_mobys[];
 
 extern void moby_transform_joint_to_world(char *, int, char *);
 
@@ -28,17 +28,17 @@ extern void FastVecAdd(char *, char *, char *);
 
 extern void FastVecSub(char *, char *, char *);
 
-extern int D_L23_001B164C __attribute__((sda));
+extern int g_boss_part_index __attribute__((sda));
 
-extern int D_L23_001B163C __attribute__((sda));
+extern int g_gun_state_value_a __attribute__((sda));
 
-extern int D_L23_001B1640 __attribute__((sda));
+extern int g_gun_state_value_b __attribute__((sda));
 
-extern float D_L23_001B15A8 __attribute__((sda));
+extern float g_gun_shot_param_float __attribute__((sda));
 
-extern short D_L23_001B15AC __attribute__((sda));
+extern short g_gun_shot_param_short_a __attribute__((sda));
 
-extern short D_L23_001B15B0 __attribute__((sda));
+extern short g_gun_shot_param_short_b __attribute__((sda));
 
 extern void mothership_project_point_onto_surface(char *, float);
 
@@ -51,7 +51,7 @@ extern void *ribbon_trail_create(char *, float, char *, float, char *, float, un
 
 void func_PAL_L23_0041D1A8(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
-    char *obj = D_L23_00259560[D_L23_001B164C];
+    char *obj = g_mothership_crowd_mobys[g_boss_part_index];
     char *p16;
     float B[4];
     float A[4];
@@ -62,13 +62,13 @@ void func_PAL_L23_0041D1A8(char *arg0) {
 
     type = *(unsigned char *)(arg0 + 0x20);
     if (type == 0xC || type == 0x10)
-        *(int *)(state + 0x598) = (((int)(D_L23_001B1640) * 5 + 2) / 6);
+        *(int *)(state + 0x598) = (((int)(g_gun_state_value_b) * 5 + 2) / 6);
     else
-        *(int *)(state + 0x598) = (((int)(D_L23_001B163C) * 5 + 2) / 6);
+        *(int *)(state + 0x598) = (((int)(g_gun_state_value_a) * 5 + 2) / 6);
     *(int *)(state + 0x59C) = (int)obj;
     *(int *)(state + 0x590) = *(int *)(state + 0x590) - 1;
     moby_transform_joint_to_world(arg0, *(int *)(state + 0x594) + 0x1E, (char *)A);
-    D_L23_001B3800 = *(TI128 *)A;
+    g_gun_joint_position = *(TI128 *)A;
     moby_transform_joint_point(arg0, *(int *)(state + 0x594) + 0x1E, (char *)M);
     FastVecScale((char *)B, (char *)(M + 8), -16.0f);
     *(TI128 *)C = *(TI128 *)A;
@@ -84,13 +84,13 @@ void func_PAL_L23_0041D1A8(char *arg0) {
         *(TI128 *)(obj + 0xE0) = *(TI128 *)(arg0 + 0xE0);
         *(TI128 *)p16 = *(TI128 *)A;
     }
-    FastVecScale(D_L23_001B3810, arg0 + 0xE0, D_L23_001B15B4);
-    FastVecAdd(D_L23_001B3810, D_L23_001B3810, p16);
-    if (D_L23_001B37F0 == 0)
-        D_L23_001B37F0 = (int)ribbon_trail_create((char *)&D_L23_001B3800, 1.7f, arg0, 1.9f, D_L23_001B3810, 0.5f, 0x32,
-                                                D_L23_001B15A8, 0x46, D_L23_001B15AC, D_L23_001B15B0,
+    FastVecScale(g_gun_aim_offset, arg0 + 0xE0, g_gun_direction_scale);
+    FastVecAdd(g_gun_aim_offset, g_gun_aim_offset, p16);
+    if (g_gun_trail_effect_a == 0)
+        g_gun_trail_effect_a = (int)ribbon_trail_create((char *)&g_gun_joint_position, 1.7f, arg0, 1.9f, g_gun_aim_offset, 0.5f, 0x32,
+                                                g_gun_shot_param_float, 0x46, g_gun_shot_param_short_a, g_gun_shot_param_short_b,
                                                 0xF7F0F, 0x2F00, 1, -1, 1);
     moby_set_state(obj, 1, 0);
     PlayMobySound(4, 0, arg0);
-    D_L23_001B164C = (D_L23_001B164C + 1) % 25;
+    g_boss_part_index = (g_boss_part_index + 1) % 25;
 }

@@ -8,7 +8,7 @@ typedef struct {
     u64 primitive, texture, tag, blend;
 } OverlayPacket;
 typedef char PacketExtent[sizeof(OverlayPacket) == 0x90 ? 1 : -1];
-extern float D_L09_001B9A00[];
+extern float g_camera_l09_position[];
 /* This consumer reads four complete rows; the external owner extent stays open. */
 extern float D_L09_001B1240_gp[][4] SDATA(D_L09_001B1240);
 extern u64 GetEffectTextureDescriptor(int);
@@ -38,7 +38,7 @@ void target_marker_draw(unsigned char *object)
     packet.primitive = 0;
     VU1_addGSregister(0x4A, 0);
     VU1_addGSregister(0x47, 0x51001);
-    FastVecSub(direction, D_L09_001B9A00, position);
+    FastVecSub(direction, g_camera_l09_position, position);
     distance = FastVecLength(direction);
     if (distance > 0.0f) {
         radius = *(float *)(state + 0x438);

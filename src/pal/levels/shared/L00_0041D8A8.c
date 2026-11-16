@@ -11,7 +11,7 @@ extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
 extern void func_PAL_L00_0041DBF0(char *, char *);
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
     short timer;
@@ -59,7 +59,7 @@ char *func_PAL_L00_0041D8A8(float size, char *position, int trigger, int kind, i
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = D_L00_001B8C80 + 0x140;
+        camera = g_scalar_transition_state + 0x140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -93,9 +93,9 @@ char *func_PAL_L00_0041D8A8(float size, char *position, int trigger, int kind, i
                 *(volatile int *)(manager + 0x168) = 33;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, g_scalar_transition_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

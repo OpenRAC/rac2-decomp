@@ -60,7 +60,7 @@ extern void ref_L00_002AEB18_1(int,void *);
 extern void ref_L00_002AEB18_2(int,void *,int,int,int,int);
 extern void ref_L00_002AEB18_3(int,void *);
 extern float ApproachValue(float *,float,float);
-extern char D_L00_001B5000[];
+extern char g_hero_status_overlay_buffer[];
 /* Shows or hides a small icon over the hero, picking the picture by what the hero is doing, and fades it. */
 void hero_update_status_icon_overlay(void)
 {
@@ -106,8 +106,8 @@ void hero_update_status_icon_overlay(void)
     if(!enabled) return;
     {
         ApproachValue((float *)(overlay+8),opacity,0.05f);
-        P(D_00189E20_26.overlay,0x38)=D_L00_001B5000;
-        P(D_00189E20_26.overlay,0x3c)=D_L00_001B5000+0x600;
+        P(D_00189E20_26.overlay,0x38)=g_hero_status_overlay_buffer;
+        P(D_00189E20_26.overlay,0x3c)=g_hero_status_overlay_buffer+0x600;
         if((unsigned char)D_00189E20_26.overlay[0x23]!=id)
             ref_L00_002AEB18_2(D_00189E20_26.resource,D_00189E20_26.overlay,id,0,8,1);
         else ref_L00_002AEB18_3(D_00189E20_26.resource,D_00189E20_26.overlay);

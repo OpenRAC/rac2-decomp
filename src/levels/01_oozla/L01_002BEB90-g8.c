@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L01_001B2088 __attribute__((sda));
+extern int g_oozla_intro_stage __attribute__((sda));
 
-extern int D_L01_001AEC38 __attribute__((sda));
+extern int g_oozla_intro_timer __attribute__((sda));
 
-extern unsigned char D_L01_001A7A6F;
+extern unsigned char g_level_l01_byte_flag;
 
-extern int D_L01_001A907C;
+extern int g_flying_path_mode;
 
 extern void func_3558E0(int, int, int);
 
@@ -15,7 +15,7 @@ extern void func_31BEC0(int, int);
 
 /* Fires the Oozla intro once the level's mode and counter allow it. */
 
-extern int D_L01_001A79F0;
+extern int g_level_group_index;
 
 extern void *tv_screen_find_nearest(float, float, float);
 
@@ -25,9 +25,9 @@ extern void FastVecScale(void *, void *, float);
 
 extern void FastVecAdd(void *, void *, void *);
 
-extern char D_L01_0027F810[];
+extern char g_ship_trail_mesh[];
 
-extern int D_001A9420 __attribute__((sda));
+extern int g_ship_trail_constants __attribute__((sda));
 
 typedef struct {
     char pad0[0x30];
@@ -39,7 +39,7 @@ typedef struct {
     int *entries[4];
 } L01_002F2098_STATE;
 
-extern L01_002F2098_STATE D_L01_001BD1C0;
+extern L01_002F2098_STATE g_ship_trail_state;
 
 /* Builds the ship's four trail slices for the level's current colour. */
 void ship_build_trail_slices(void)
@@ -51,20 +51,20 @@ void ship_build_trail_slices(void)
     char *q;
     int i;
 
-    if (D_L01_001A79F0 != 1)
+    if (g_level_group_index != 1)
         return;
 
     index = -1;
     obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
-    if (D_L01_001BD1C0.mode == 3)
+    if (g_ship_trail_state.mode == 3)
         index = 1;
     if (index != -1 && obj != 0) {
-        if (D_L01_001BD1C0.entries[index] != 0) {
+        if (g_ship_trail_state.entries[index] != 0) {
             char *d = obj + 0x10;
             char *c = obj + 0xC0;
-            D_L01_001BD1C0.mesh = (int)D_L01_0027F810;
-            p = (char *)D_L01_0027F810 + 0x20;
-            q = (char *)&D_001A9420;
+            g_ship_trail_state.mesh = (int)g_ship_trail_mesh;
+            p = (char *)g_ship_trail_mesh + 0x20;
+            q = (char *)&g_ship_trail_constants;
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
@@ -74,9 +74,9 @@ void ship_build_trail_slices(void)
                 p += 0x10;
                 q += 0x10;
             }
-            *(int *)(D_L01_001BD1C0.mesh + 0x68) = D_L01_001BD1C0.entries[index];
+            *(int *)(g_ship_trail_state.mesh + 0x68) = g_ship_trail_state.entries[index];
         }
     }
-    if (D_L01_001BD1C0.count >= 0x5D7)
-        D_L01_001BD1C0.mesh = 0;
+    if (g_ship_trail_state.count >= 0x5D7)
+        g_ship_trail_state.mesh = 0;
 }

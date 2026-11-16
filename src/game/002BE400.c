@@ -21,8 +21,8 @@ extern int FastDecTimer(short *);
 extern void part_kill(void *);
 extern int gfx_pack_color_floats(float, float, float, float);
 extern int g_hero_moby;
-extern Vec4_BE400 D_001BAFA0;
-extern int D_001A8CA0 __attribute__((sda));
+extern Vec4_BE400 g_coll_hit_position;
+extern int g_ground_check_inhibit __attribute__((sda));
 
 void UpdateCollidingParticle(Particle_BE400 *particle)
 {
@@ -50,12 +50,12 @@ void UpdateCollidingParticle(Particle_BE400 *particle)
     collisionPosition = position;
     if (state->motion.x != 0.0f || state->motion.y != 0.0f || state->motion.z != 0.0f) {
         if (CollLine(collisionPosition, &next, 2, g_hero_moby, 0)) {
-            particle->position = *(TI128_BE400 *)&D_001BAFA0;
+            particle->position = *(TI128_BE400 *)&g_coll_hit_position;
             vec_clear_128(&state->motion);
             particle->size += particle->size;
         } else {
             particle->position = *(TI128_BE400 *)&next;
-            if (D_001A8CA0) {
+            if (g_ground_check_inhibit) {
                 float scale;
                 direction = &correction;
                 cam_compute_view_direction((char *)collisionPosition, (char *)direction, 0);

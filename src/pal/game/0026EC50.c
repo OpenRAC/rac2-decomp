@@ -1,6 +1,7 @@
 #include "include_asm.h"
+#include "names.h"
 
-unsigned int func_PAL_0026F580(void)
+unsigned int stub_empty_2_pal(void)
 {
     return 0;
 }

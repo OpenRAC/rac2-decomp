@@ -17,7 +17,7 @@ extern void FastVecSub(void *out, void *a, void *b);
 extern void vec_scale_to_length(void *out, void *a, float scale);
 extern void FastVecAdd(void *out, void *a, void *b);
 extern char g_camera_eye_state[];
-extern unsigned char *D_001F25B4;
+extern unsigned char *g_part_tex_joint_glow_table;
 
 #define SIZE   (*(float *)(p + 0xC))
 #define ALPHA  (*(float *)(q + 4))
@@ -53,7 +53,7 @@ void part_update_joint_glow(char *p)
     }
     SPIN += 0.001f;
     p[8] = FloatToInt(SPIN * 255.0f);
-    p[2] = D_001F25B4[FRAME];
+    p[2] = g_part_tex_joint_glow_table[FRAME];
     if (SIZE <= 159600.0f || SPEED > 0.0f)
         ALPHA += SPEED;
     if (SIZE <= 159600.0f) {

@@ -8,11 +8,11 @@ typedef struct { V1306TI q[5]; } __attribute__((aligned(16))) V1306Packet;
 typedef struct { char pad[4]; unsigned char flag; char mid[107]; float f70; char tail[108]; } V1306Material;
 extern unsigned char g_item_slot_to_record[];
 extern V1306Material g_weapon_l00_table[];
-extern V1306Packet D_L00_002A26A0;
-extern V1306Table D_L00_001AEFE0, D_L00_001AEFF8;
+extern V1306Packet g_particle_packet_template;
+extern V1306Table g_big_explosion_table_a, g_big_explosion_table_b;
 extern char g_camera_l00_position[], g_area_hit_targets[];
 typedef struct { char pad[0x160]; float amount; int unused, duration, state; } V1439Camera;
-extern V1439Camera D_L00_001B8C80;
+extern V1439Camera g_scalar_transition_state;
 extern float IntToFloat(int);
 extern void FastVecScale(char *, char *, float);
 extern void FastVecSub(char *, char *, char *);
@@ -58,14 +58,14 @@ typedef struct {
     QwenRecovery_4ecc6b5a4034_u8 tail[8];
 } QwenRecovery_4ecc6b5a4034_ExtraResetRecord164;
 
-extern QwenRecovery_4ecc6b5a4034_ExtraResetRecord164 D_L00_002372C0[100];
+extern QwenRecovery_4ecc6b5a4034_ExtraResetRecord164 g_extra_reset_records[100];
 
-extern QwenRecovery_4ecc6b5a4034_u32 D_L00_00238580[139];
+extern QwenRecovery_4ecc6b5a4034_u32 g_state_reset_words_a[139];
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_03c444112283bc5f_u32;
 
-extern Rac2Native_03c444112283bc5f_u32 D_L00_00238DF0[139];
+extern Rac2Native_03c444112283bc5f_u32 g_state_reset_words_b[139];
 
 /* Level object-update walk: one pass over the object list the game exposes at
  * D_L00_001B1EA8, with a per-class dispatch. */
@@ -77,7 +77,7 @@ typedef unsigned int L00_0037F7E8_u32;
  * its value is read from the retail bytes at every place. */
 extern L00_0037F7E8_u8 *func_002A08A0(void);
 
-extern L00_0037F7E8_u8 *D_L00_001B1EA8 __attribute__((sda));
+extern L00_0037F7E8_u8 *g_moby_l00_list_head __attribute__((sda));
 
 extern L00_0037F7E8_u32 g_save_menu_flags __attribute__((sda));
 
@@ -95,7 +95,7 @@ typedef struct {
     int best;
 } L00_0037FE08_Pool;
 
-extern L00_0037FE08_Pool D_L00_00231540;
+extern L00_0037FE08_Pool g_moby_pool_entries;
 
 /* Keep the pool entry nearest to the fixed origin: the count is re-read every
  * pass, so the loop bound stays live in memory. */
@@ -135,11 +135,11 @@ extern L00_0037FE08_Pool D_L00_00231540;
 /* shared native body of family a04928c6 */
 /* func_L00_0038AAD0 is defined in L00_0038AAD0.c. */
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 extern void *ref_L00_0038B848_00(void *arg);
 
-extern void *D_L00_001BF218;
+extern void *g_hit_l00_result;
 
 extern void *ref_L00_0038B848_00(void *arg);
 
@@ -171,7 +171,7 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
     int *child;
     int i, n, counter, asset1, asset2, life1, life2;
     float scale, length, twice, speed, force;
-    packet = D_L00_002A26A0;
+    packet = g_particle_packet_template;
     child = *(int **)(object + 0x68);
     scale = IntToFloat(V1306_FLAG) + 1.0f;
     FastVecScale(direction, direction, scale);
@@ -233,8 +233,8 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
         force = scale;
         speed = scale * math_random_float_range(8.0f, 10.0f);
         force *= limit;
-        first = D_L00_001AEFE0;
-        second = D_L00_001AEFF8;
+        first = g_big_explosion_table_a;
+        second = g_big_explosion_table_b;
         speed *= step;
         speed -= twice * step;
         asset1 = gfx_swap_packed_color_channels(first.entry[math_random_int_below(6)], V1306_FLAG);
@@ -263,12 +263,12 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
     object[0xBC] = 0;
     if (V1306_FLAG) PlayMobySound(0,0,object);
     else PlayMobySound(0,0,object);
-    { V1439Camera *camera = &D_L00_001B8C80;
+    { V1439Camera *camera = &g_scalar_transition_state;
     if (length < 20.0f) camera->amount = 0.4f - length * 0.0175f;
     else camera->amount = 0.050000011920928955f;
     }
-    D_L00_001B8C80.duration=21;
-    D_L00_001B8C80.state=0;
+    g_scalar_transition_state.duration=21;
+    g_scalar_transition_state.state=0;
     moby_spawn_template_effect(&packet,object+0x10,0,0);
 }
 

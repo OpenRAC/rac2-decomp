@@ -10,7 +10,7 @@ extern float math_random_float_range(float a, float b);
 extern int math_random_int_below(int a);
 extern void *part_spawn_drifting(char *a0, int a1, int a2, float f12, float f13);
 extern float FastVecLength(void *a0);
-extern f32 D_L01_001AFE18[];
+extern f32 g_water_l01_height[];
 
 /* Same body as func_L01_003B4480, with this function's own callees. */
 /* Makes bubbles while the object moves and spawns a splash when it is fast enough. */
@@ -33,7 +33,7 @@ void part_spawn_moving_bubbles(u8 *moby)
             vec_add_random_offset(bubble_pos, 0.1f);
             bubble_pos[2] = level_get_water_height();
             size = math_random_float_range(0.2f, 2.0f);
-            part_spawn_drifting((char *)bubble_pos, (int)D_L01_001AFE18,
+            part_spawn_drifting((char *)bubble_pos, (int)g_water_l01_height,
                           (int)((((u32)math_random_int_below(6) + 0x14) << 24) | 0x5060), size, 10000.0f);
             i--;
         }

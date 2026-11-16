@@ -10,7 +10,7 @@ extern float math_random_float_range(float a, float b);
 extern int math_random_int_below(int a);
 extern void *part_spawn_drifting(char *a0, int a1, int a2, float f12, float f13);
 extern float FastVecLength(void *a0);
-extern f32 D_L01_001AFE18[];
+extern f32 g_water_l01_height[];
 
 /* Same body as func_L01_003B4480, with this function's own callees. */
 void func_PAL_L01_003E05D0(u8 *arg0)
@@ -32,7 +32,7 @@ void func_PAL_L01_003E05D0(u8 *arg0)
             vec_add_random_offset(v, 0.1f);
             v[2] = func_PAL_L01_003BEB40();
             f = math_random_float_range(0.2f, 2.0f);
-            part_spawn_drifting((char *)v, (int)D_L01_001AFE18,
+            part_spawn_drifting((char *)v, (int)g_water_l01_height,
                           (int)((((u32)math_random_int_below(6) + 0x14) << 24) | 0x5060), f, 1.2e+04f);
             i--;
         }

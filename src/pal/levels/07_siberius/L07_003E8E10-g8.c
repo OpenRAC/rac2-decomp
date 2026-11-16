@@ -32,12 +32,12 @@ extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
 extern void *part_spawn_hero_relative(void *, void *, int, float, int, int, int);
 struct Collision1310 { char pad[0x18]; void *object; };
-extern struct Collision1310 D_L07_001BF640;
+extern struct Collision1310 g_collision_l07_result;
 extern char g_hero_position[];
-extern float D_L07_001B0A50 __attribute__((sda));
-extern int D_L07_001B0A48[] __attribute__((sda));
+extern float g_sender_delta_param __attribute__((sda));
+extern int g_sender_color_pair[] __attribute__((sda));
 extern int D_L07_001B0A48_gp[] SDATA(D_L07_001B0A48);
-extern float D_L07_001B0A40[] __attribute__((sda));
+extern float g_sender_size_range[] __attribute__((sda));
 
 /* Update the launcher state, dispatch its target effect and emit particles. */
 void func_PAL_L07_003E8E10(unsigned char *o)
@@ -55,7 +55,7 @@ void func_PAL_L07_003E8E10(unsigned char *o)
     int color, life;
     switch (o[0x20]) {
     case 0:
-        D_L07_001BF640.object=0;
+        g_collision_l07_result.object=0;
         coll_get_ground_distance_below(o+0x10,o,o+0x10);
         {
             float height = *(float *)(o + 0x18);
@@ -63,8 +63,8 @@ void func_PAL_L07_003E8E10(unsigned char *o)
             *(float *)(o + 0x18) = height;
         }
         *(int *)(p+0x20)=-1;
-        if (D_L07_001BF640.object && moby_get_private_value_2(D_L07_001BF640.object))
-            *(int *)(p+0x10)=(int)D_L07_001BF640.object;
+        if (g_collision_l07_result.object && moby_get_private_value_2(g_collision_l07_result.object))
+            *(int *)(p+0x10)=(int)g_collision_l07_result.object;
         moby_set_state(o,1,-1);
         break;
     case 1:
@@ -91,7 +91,7 @@ void func_PAL_L07_003E8E10(unsigned char *o)
         }
         ApproachValue(p+0x18,1.0f,0.060000002f);
         {
-            float delta = D_L07_001B0A50;
+            float delta = g_sender_delta_param;
             delta = turn * delta;
             *(float *)(p + 0x1C) = FastAddRotations(*(float *)(p + 0x1C), delta);
         }
@@ -107,8 +107,8 @@ void func_PAL_L07_003E8E10(unsigned char *o)
             c[1]=math_fast_sin_or_cos_b(angle)*0.4f;
             c[2]=0;
             FastVecAdd(c,c,o+0x10);
-            size=math_random_float_range(D_L07_001B0A40[0],D_L07_001B0A40[1]);
-            color=FastTweenColor(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],math_random_float_range(0,1));
+            size=math_random_float_range(g_sender_size_range[0],g_sender_size_range[1]);
+            color=FastTweenColor(D_L07_001B0A48_gp[0],g_sender_color_pair[1],math_random_float_range(0,1));
             speed=math_random_float_range(1,2);
             life=((s32)(math_random_int_range(30,60)) * 5 + 2) / 6;
             qcopy(d,b);

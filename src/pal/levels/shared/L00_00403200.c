@@ -48,12 +48,12 @@ extern void func_PAL_L00_004040D8(char *arg);
 extern void func_PAL_L00_004041C0(char *arg);
 extern float vec_distance_xy(char *arg, char *table);
 extern float math_fabs(float value);
-extern void func_PAL_002B1588(int arg, int value);
+extern void value_set_entry_by_index_pal(int arg, int value);
 extern void help_unlock_entry(int arg);
 extern int moby_handle_request_slot_state(int arg);
 extern void moby_mark_spawned(char *arg);
 extern char D_00189EA0_2[];
-extern unsigned char D_001A7B2E __attribute__((sda));
+extern unsigned char g_action_flag __attribute__((sda));
 extern void func_002E6EF8(void (*f)(char *), char *arg);
 
 /* two-state update on a record: state 0 marks a byte with 255 and either runs a shared two-call teardown when a global latch byte is set and a sub-object field is non-zero, or plays a mode/value pair plus a call; state 1 runs a setup call and two float queries against a stored table and, when both are below 2.0, plays three fixed calls and either tears down or writes 120 into a sub-object field */
@@ -65,7 +65,7 @@ void func_PAL_L00_004043A0(char *arg)
     switch (state) {
     case 0:
         *(unsigned char *)(arg + 48) = 255;
-        if (D_001A7B2E != 0 && object[17] != 0) {
+        if (g_action_flag != 0 && object[17] != 0) {
             moby_mark_spawned((char *)object[17]);
             moby_mark_spawned(arg);
             return;
@@ -78,7 +78,7 @@ void func_PAL_L00_004043A0(char *arg)
         func_PAL_L00_004041C0(arg);
         if (vec_distance_xy(arg + 16, D_00189EA0_2) < 2.0f) {
             if (math_fabs(*(float *)(arg + 24) - *(float *)(D_00189EA0_2 + 8)) < 2.0f) {
-                func_PAL_002B1588(4658, -1);
+                value_set_entry_by_index_pal(4658, -1);
                 help_unlock_entry(54);
                 moby_handle_request_slot_state(54);
                 if (object[17] != 0) {

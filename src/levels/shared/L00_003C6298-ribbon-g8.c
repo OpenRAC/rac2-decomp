@@ -29,11 +29,11 @@ extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern float FastVecLength(void *);
-extern float D_L00_001B007C __attribute__((sda));
-extern float D_L00_001B0064 __attribute__((sda));
-extern int D_L00_001B0094 __attribute__((sda));
-extern int D_L00_001B0098 __attribute__((sda));
-extern int D_L00_001B0070 __attribute__((sda));
+extern float g_ribbon_core_scroll_u __attribute__((sda));
+extern float g_ribbon_width_scale __attribute__((sda));
+extern int g_ribbon_l00_core_texture_2 __attribute__((sda));
+extern int g_ribbon_l00_halo_texture_2 __attribute__((sda));
+extern int g_ribbon_l00_core_color_3 __attribute__((sda));
 
 /* Draws the narrow ribbon and its camera-facing halo along the point chain.
  * The core takes its colour from D_L00_001B0070 with alpha coreAlpha; the halo
@@ -47,8 +47,8 @@ void DrawScrollingRibbonColored(Vector *points, int coreAlpha, int haloAlpha, fl
     int i;
     int coreColor, haloColor;
 
-    core.texture = GetEffectTextureDescriptor(D_L00_001B0094);
-    coreColor = D_L00_001B0070 | (coreAlpha << 24);
+    core.texture = GetEffectTextureDescriptor(g_ribbon_l00_core_texture_2);
+    coreColor = g_ribbon_l00_core_color_3 | (coreAlpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
     core.primitive = 0;
@@ -57,7 +57,7 @@ void DrawScrollingRibbonColored(Vector *points, int coreAlpha, int haloAlpha, fl
     core.color[1] = coreColor;
     core.color[0] = coreColor;
 
-    halo.texture = GetEffectTextureDescriptor(D_L00_001B0098);
+    halo.texture = GetEffectTextureDescriptor(g_ribbon_l00_halo_texture_2);
     haloColor = haloRgb | (haloAlpha << 24);
     halo.flags = core.flags;
     halo.mode = core.mode;
@@ -75,13 +75,13 @@ void DrawScrollingRibbonColored(Vector *points, int coreAlpha, int haloAlpha, fl
     halo.uv[6] = 1;
     halo.uv[7] = 1;
 
-    core.uv[0] = D_L00_001B007C;
+    core.uv[0] = g_ribbon_core_scroll_u;
     core.uv[1] = 0;
-    core.uv[2] = D_L00_001B007C;
+    core.uv[2] = g_ribbon_core_scroll_u;
     core.uv[3] = 1;
-    core.uv[4] = D_L00_001B007C + 1.0f;
+    core.uv[4] = g_ribbon_core_scroll_u + 1.0f;
     core.uv[5] = 0;
-    core.uv[6] = D_L00_001B007C + 1.0f;
+    core.uv[6] = g_ribbon_core_scroll_u + 1.0f;
     core.uv[7] = 1;
 
     FastVecSub(&eye, points, g_camera_l00_position);
@@ -90,7 +90,7 @@ void DrawScrollingRibbonColored(Vector *points, int coreAlpha, int haloAlpha, fl
     initialLength = FastVecLength(&normal);
     if (initialLength != 0)
         initialLength = 1.0f / initialLength;
-    FastVecScale(&normal, &normal, D_L00_001B0064 * initialLength);
+    FastVecScale(&normal, &normal, g_ribbon_width_scale * initialLength);
     FastVecAdd(&core.vertex[0], points, &normal);
     FastVecSub(&core.vertex[1], points, &normal);
 
@@ -101,15 +101,15 @@ void DrawScrollingRibbonColored(Vector *points, int coreAlpha, int haloAlpha, fl
         length = FastVecLength(&normal);
         if (length != 0)
             length = 1.0f / length;
-        FastVecScale(&normal, &normal, D_L00_001B0064 * length);
+        FastVecScale(&normal, &normal, g_ribbon_width_scale * length);
         FastVecAdd(&core.vertex[2], points + i, &normal);
         FastVecSub(&core.vertex[3], points + i, &normal);
         if (i == 1) {
-            core.color[1] = D_L00_001B0070;
-            core.color[0] = D_L00_001B0070;
+            core.color[1] = g_ribbon_l00_core_color_3;
+            core.color[0] = g_ribbon_l00_core_color_3;
         } else if (i == count - 2) {
-            core.color[3] = D_L00_001B0070;
-            core.color[2] = D_L00_001B0070;
+            core.color[3] = g_ribbon_l00_core_color_3;
+            core.color[2] = g_ribbon_l00_core_color_3;
         } else if (i == 2) {
             core.color[1] = coreColor;
             core.color[0] = coreColor;

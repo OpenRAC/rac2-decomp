@@ -5,12 +5,12 @@
  * word, read with the lw macro, and both early exits share the one return. */
 typedef unsigned short u16;
 
-extern u16 *D_001B188C __attribute__((sda));
+extern u16 *g_hud_element_table __attribute__((sda));
 
 /* Finds the position of the entry with this id in the 8-byte entry table and returns it. */
 int hud_find_entry_index(int value)
 {
-    u16 *table = D_001B188C;
+    u16 *table = g_hud_element_table;
     int count = 0;
 
     if (table[0] != 0xFFFF && table[0] != value) {

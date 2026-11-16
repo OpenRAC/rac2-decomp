@@ -39,11 +39,11 @@ typedef struct {
 typedef unsigned long long u64;
 
 
-extern unsigned int D_L09_001FE6C0[];
+extern unsigned int g_path_l09_table[];
 
-extern unsigned int D_L09_001FB560[];
+extern unsigned int g_track_entry_table[];
 
-extern char *D_L09_001B285C __attribute__((sda));
+extern char *g_moby_record_table __attribute__((sda));
 
 extern int moby_get_kind_slot(u8 *object);
 
@@ -79,7 +79,7 @@ extern float fast_subtract_rotations(float a, float b);
 
 extern void gfx_add_draw_callback_first(char *table, char *object);
 
-extern char D_L09_003AEF78[];
+extern char g_projectile_draw_callback[];
 
 extern void sprite_reset_large_record(void *p);
 
@@ -101,7 +101,7 @@ extern void draw_world_quad(void *dst, void *src, int flag);
 
 extern char D_L09_001BF98C0[];
 
-extern char D_L09_001B98C0[];
+extern char g_hero_l09_aux_state[];
 
 extern void func_003AEFD0(void *out);
 
@@ -158,7 +158,7 @@ extern float fast_vec_dist(char *a, char *b);
 
 extern void moby_update_ground_check(void *object);
 
-extern char D_L09_001B9A00[];
+extern char g_camera_l09_position[];
 
 extern int math_fast_float_d(void *a0);
 
@@ -201,7 +201,7 @@ int path_check_entry_for_moby(char *object, int index)
 
     if (index == -1)
         return 0;
-    entry = D_L09_001FE6C0[index];
+    entry = g_path_l09_table[index];
     if (entry == 0)
         return 0;
     return path_follow_nodes(object, entry);
@@ -214,7 +214,7 @@ int path_apply_entry_to_moby(char *object, int index, int count, int value)
 
     if (index == -1)
         return 0;
-    entry = D_L09_001FE6C0[index];
+    entry = g_path_l09_table[index];
     if (entry == 0)
         return 0;
     return path_set_follower_nodes(object, (void *)entry, count, value);
@@ -232,7 +232,7 @@ int path_measure_moby_against_entry(char *object, int index, float base)
 
     if (index == -1)
         return -1;
-    entry = D_L09_001FE6C0[index];
+    entry = g_path_l09_table[index];
     if (entry == 0)
         return -1;
     return vec_find_point_nearest_wanted_distance(object, (char *)entry, base);
@@ -245,7 +245,7 @@ float path_get_entry_length(int index)
 
     if (index == -1)
         return -1.0f;
-    entry = D_L09_001FE6C0[index];
+    entry = g_path_l09_table[index];
     if (entry == 0)
         return -1.0f;
     return path_l01_compute_segment_lengths((void *)entry);
@@ -258,7 +258,7 @@ int path_step_along_entry(char *object, int index, void *out, int current, int d
 
     if (index == -1)
         return -1;
-    entry = D_L09_001FE6C0[index];
+    entry = g_path_l09_table[index];
     if (entry == 0)
         return -1;
     return AdvancePointAlongPolyline(object, entry, out, current, direction, step);
@@ -305,7 +305,7 @@ void projectile_update_orientation(char *object)
     FastVecAdd(basis, position, basis);
     FastVecAdd(vars + 0x20, position, vars + 0x20);
     *(float *)(vars + 0x5C) = fast_subtract_rotations(*(float *)(vars + 0x5C), 0.3141593039035797f);
-    gfx_add_draw_callback_first(D_L09_003AEF78, object);
+    gfx_add_draw_callback_first(g_projectile_draw_callback, object);
 }
 
 /* func_L09_003AF060 is defined in L09_003AF060.c. */
@@ -373,7 +373,7 @@ void part_spawn_targeted_trail_sparks(char *object)
     color = math_random_int_range(0x40, 0x7F) << 24;
     local.v220 = 0.0f;
     local.k0 = local.k1 = local.k2 = local.k3 = color + 0x103080;
-    data = D_L09_001B98C0;     /* the level's target point: three floats at +0x140 */
+    data = g_hero_l09_aux_state;     /* the level's target point: three floats at +0x140 */
     local.f216 = mat_fast_helper_a(*(float *)(data + 0x140) - pos[0],
                                *(float *)(data + 0x144) - pos[1]);
     len = func_00282E80_1(pos, data + 0x140);
@@ -421,7 +421,7 @@ int path_advance_index_and_move(char *object, int index) {
 
     *(short *)(frame + 0x118) =
         func_L09_0033E8B0_1(object, index, buf, value, dir, *(float *)(frame + 0x78) * 10.0f);
-    base = D_L09_001FE6C0[index];
+    base = g_path_l09_table[index];
     off = (*(short *)(frame + 0x11A) << 4) + 0x10;
     distance = func_00282E48_2(object + 0x10, base + off);
     return path_move_moby_turn_speed(object, buf, distance);
@@ -432,7 +432,7 @@ int path_advance_index_and_move(char *object, int index) {
 /* Starts the object moving along the level table entry for an index. Returns the current point, or -1 if there is no entry. */
 int path_start_moby_on_entry(char *object, int index, int value)
 {
-    unsigned int entry = D_L09_001FE6C0[index];
+    unsigned int entry = g_path_l09_table[index];
     char *vars = *(char **)(object + 0x68);
     int result;
 
@@ -479,7 +479,7 @@ void moby_destroy_with_explosion(char *object)
 void trooper_torso_update(char *object)
 {
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 24.0f) {
+        if (fast_vec_dist(object + 0x10, g_camera_l09_position) < 24.0f) {
             moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 0x16;
         }
@@ -617,7 +617,7 @@ int path_is_entry_reachable(char *object, int index) {
     if (entry == 0 && index != -1) {
         int off = (*(short *)(frame + 0x1CA) << 4) + 0x10;
 
-        if (vec_distance_xy(object + 0x10, D_L09_001FE6C0[index] + off) <
+        if (vec_distance_xy(object + 0x10, g_path_l09_table[index] + off) <
             *(float *)(frame + 0x134))
             entry = 1;
     }
@@ -638,12 +638,12 @@ void trooper_flag_legs_in_group(char *unused, int index)
 
     if (index == 0xFF)
         return;
-    entry = D_L09_001FB560[index];
+    entry = g_track_entry_table[index];
     if (entry == 0)
         return;
     idList = (unsigned short *)entry;
     do {
-        char *target = D_L09_001B285C + ((idList[0] & 0x7FFF) << 8);
+        char *target = g_moby_record_table + ((idList[0] & 0x7FFF) << 8);
 
         if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS)
             *(unsigned char *)(*(int *)(target + 0x68) + 0x2EA) = 1;

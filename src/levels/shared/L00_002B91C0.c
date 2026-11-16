@@ -45,7 +45,7 @@ typedef struct {
 
 extern ResidentState_F41eb487e D_00189E20_5;
 
-extern char D_00189F80[];
+extern char g_hero_shrink_vector[];
 
 extern float func_L00_002D3A58_1(void *p);
 
@@ -73,7 +73,7 @@ extern float func_00282E20_3(void *p);
 
 extern char  D_L00_001B8C80_2[];
 
-extern char  D_L00_001BF220[];
+extern char  g_hero_l00_position[];
 
 extern char  D_00189E20_21[];
 
@@ -123,7 +123,7 @@ extern float FastVecDot(void *, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float math_fabs(float);
-extern int D_00138354;
+extern int g_hero_state_flags;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
 void hero_update_lean_reference(void)
@@ -169,7 +169,7 @@ void hero_update_lean_reference(void)
 /* reads a scalar through DATA0 and, when it exceeds 0.001f, re-normalises the vector at DATA0 (and DATA0-112) from the elapsed float, clamping the amount at zero; otherwise it runs the plain refresh entry point. */
 void hero_shrink_vector_by_amount(float a0)
 {
-    char *p = D_00189F80;
+    char *p = g_hero_shrink_vector;
     float x = a0;
     float r = func_L00_002D3A58_1(p);
     float d;
@@ -220,7 +220,7 @@ void hero_steer_reference_point(void)
     if (x < 0.0f) x = 0.0f;
     limit = D_00189E20_9598.f1b0 * 0.00068055559f;
     limit += x * 0.00055555557f;
-    if (D_00138354) limit = 0.00030555556f;
+    if (g_hero_state_flags) limit = 0.00030555556f;
     if (D_00189E20_9598.f2294 == 19 && D_00189E20_9598.f1b8 < 15 && D_00189E20_9598.f170 < 0.050000004f)
         limit = 0.0030555557f;
     if (D_00189E20_9598.f170 > 0.09833333641290665f) limit = 0.0036111111f;
@@ -265,7 +265,7 @@ void hero_steer_reference_point(void)
 /* The resident block the slot table lives in, and the two vector helpers. */
 extern char D_00189E20_2[];
 
-extern char D_00189E60[];
+extern char g_hero_direction_matrix[];
 
 extern void transform_vector(void *a0, void *a1, void *a2);
 
@@ -278,7 +278,7 @@ float hero_get_direction_angle_delta(void *a0, int selector)
 {
     float v[4];
 
-    transform_vector(v, a0, D_00189E60);
+    transform_vector(v, a0, g_hero_direction_matrix);
     return math_shortest_angle_delta(mat_fast_helper_a(v[0], v[1]), selector, 0.0f);
 }
 
@@ -354,7 +354,7 @@ void UpdateDelayedSounds(void)
 
 extern char g_hero_position[];
 
-extern int D_L00_001B9080;
+extern int g_hero_ledge_move_flag;
 
 extern void func_00283410_1(void *a, void *b);
 
@@ -431,9 +431,9 @@ void hero_reset_position_and_direction(void *position, void *direction, int soun
     anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
     if (res->i229C == 0x11)
-        D_L00_001B9080 = 1;
+        g_hero_ledge_move_flag = 1;
     else
-        D_L00_001B9080 = 0;
+        g_hero_ledge_move_flag = 0;
 
     hero_l00_update_ground_contact();
 
@@ -463,7 +463,7 @@ int hero_probe_ground_slope_ahead(void)
     res = D_00189E20_21;
     if (func_002761F8_1(base + 320, buf, 4, *(int *)(res + 8848), 0)) {
         func_L00_002D36E0_1(buf + 16, 1, 0.5f, 0.0f, 0.5f);
-        func_00282CF0_8(buf + 32, D_L00_001BF220, buf + 16);
+        func_00282CF0_8(buf + 32, g_hero_l00_position, buf + 16);
         v = func_00283248_5(*(float *)(buf + 32), *(float *)(buf + 36));
         *(float *)(res + 3076) = v;
         v = func_00282E20_3(buf + 32);

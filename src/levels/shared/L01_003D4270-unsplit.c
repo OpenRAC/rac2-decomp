@@ -32,10 +32,10 @@ typedef struct TriggerData {
 } TriggerData;
 
 extern char g_hero_position[];
-extern Row *D_L01_001B264C[] __attribute__((sda));
+extern Row *g_swamp_patrol_positions[] __attribute__((sda));
 extern Row *ref_L01_003D4270_00 __attribute__((sda));
-extern char *D_L01_001FE180[];
-extern char D_L01_001B94C0[];
+extern char *g_path_l01_table[];
+extern char g_level_origin_vec[];
 
 extern int IsPointInCuboid(void *, int);
 extern int moby_count_group_not_in_state(int, int);
@@ -107,19 +107,19 @@ void trigger_area_effect_update(char *moby)
                 if (trigger->b49)
                     created->pos = ref_L01_003D4270_00[trigger->anchor].q0;
                 else {
-                    FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, g_hero_position);
+                    FastVecSub(pos, &g_swamp_patrol_positions[0][trigger->anchor].centre, g_hero_position);
                     created->pos = *(Quad *)(pos);
                 }
             }
         } else if (active && !trigger->state && trigger->target != -1) {
-            char *camera = D_L01_001FE180[trigger->target];
+            char *camera = g_path_l01_table[trigger->target];
 
             *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
             rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
             rot[1] = -mat_fast_helper_a(vec_distance_xy(camera + 0x10, pos), pos[2] - F(camera, 0x18));
             rot[0] = 0;
-            SetCamera5Pose(D_L01_001B94C0, D_L01_001B94C0 + 0x10, 3, 120, 0);
+            SetCamera5Pose(g_level_origin_vec, g_level_origin_vec + 0x10, 3, 120, 0);
             object_copy_vector_to_selected(camera + 0x10);
             cam_set_state_rotation(rot);
             trigger->state = 1;
@@ -130,7 +130,7 @@ void trigger_area_effect_update(char *moby)
                 trigger->state = 2;
                 SetCamera5Mode(1, 0);
             }
-            camera = D_L01_001FE180[trigger->target];
+            camera = g_path_l01_table[trigger->target];
             *(Quad *)(pos) = *(Quad *)(g_hero_position);
             pos[2] += 1.25f;
             rot[2] = mat_fast_helper_a(pos[0] - F(camera, 0x10), pos[1] - F(camera, 0x14));
@@ -146,7 +146,7 @@ void trigger_area_effect_update(char *moby)
             if (trigger->b49)
                 pool->pos = ref_L01_003D4270_00[trigger->anchor].q0;
             else {
-                FastVecSub(pos, &D_L01_001B264C[0][trigger->anchor].centre, g_hero_position);
+                FastVecSub(pos, &g_swamp_patrol_positions[0][trigger->anchor].centre, g_hero_position);
                 pool->pos = *(Quad *)(pos);
             }
         }

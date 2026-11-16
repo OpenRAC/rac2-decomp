@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 D_001395B8[];
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern u8 *D_L16_001B16C0 __attribute__((sda));
-extern int D_L16_001B16C4 __attribute__((sda));
+extern u8 g_game_flag_table[];
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern u8 *g_snivelak_target __attribute__((sda));
+extern int g_snivelak_divisor __attribute__((sda));
 extern u8 g_sound_state[];
 extern void SetMobyAndGroupsEnabled(u8 *, int);
 extern void moby_mark_spawned(void *);
@@ -20,14 +20,14 @@ extern void snivelak_clean_up_arena_mobys(u8 *);
 extern void *part_find_owned_effect_slot(void *, unsigned int, int);
 extern float math_interpolate_between_limits(int, int, float, float);
 extern void func_PAL_002AC290(int, char *);
-extern float func_PAL_002AA108(u8 *, void *);
+extern float moby_update_aim_target_strength_pal(u8 *, void *);
 extern float ApproachValue(float *, float, float);
 extern void snd_stop_voice(int);
-extern void func_PAL_L16_00417C58(u8 *);
+extern void snivelak_play_voice_cues_pal(u8 *);
 extern int weapon_select_aim_target(u8 *, int, void *, void *, float, float);
 
 /* Initializes the boss hierarchy and applies damage, phase changes and speech. */
-void func_PAL_L16_00415760(u8 *moby)
+void UpdateSnivelakBossDamage_pal(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *child, *attacker, *damage;
@@ -36,9 +36,9 @@ void func_PAL_L16_00415760(u8 *moby)
     int i, threshold, sound;
     float quantum, amount, divisor;
     if (!moby[0x20]) {
-        if (D_001395B8[0x83] == 2) {
+        if (g_game_flag_table[0x83] == 2) {
             SetMobyAndGroupsEnabled(moby, 0);
-            moby_mark_spawned(D_L16_001B2B1C[0] + *(int *)(state + 0x174) * 256);
+            moby_mark_spawned(g_moby_instance_table[0] + *(int *)(state + 0x174) * 256);
             moby_mark_spawned(moby);
             return;
         }
@@ -48,7 +48,7 @@ void func_PAL_L16_00415760(u8 *moby)
         }
         speech = state + 0x310;
         state[0x2e] = 1;
-        divisor = IntToFloat(D_L16_001B16C4);
+        divisor = IntToFloat(g_snivelak_divisor);
         quantum = (float)*(short *)(state + 0x24);
         quantum /= divisor;
         threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
@@ -64,9 +64,9 @@ void func_PAL_L16_00415760(u8 *moby)
         }
         {
             int bodyIndex = *(int *)(state + 0x174);
-            u8 *pool = D_L16_001B2B1C[0];
+            u8 *pool = g_moby_instance_table[0];
             float initialHeight = *(float *)(moby + 0x18);
-            D_L16_001B16C0 = 0;
+            g_snivelak_target = 0;
             *(float *)(state + 0x264) = initialHeight;
             *(u8 **)(state + 0x1f0) = pool + bodyIndex * 256;
         }
@@ -81,7 +81,7 @@ void func_PAL_L16_00415760(u8 *moby)
         snivelak_copy_position_pair_after_setup(moby);
         moby_set_state(moby, 1, 0);
         anim_play_on_self_or_child(moby, 0, 0, 0.0f);
-        if (D_001395B8[0x83] == 1) {
+        if (g_game_flag_table[0x83] == 1) {
             snivelak_clean_up_arena_mobys(moby);
             SetMobyAndGroupsEnabled(moby, 1);
         } else SetMobyAndGroupsEnabled(moby, 0);
@@ -100,10 +100,10 @@ void func_PAL_L16_00415760(u8 *moby)
             if (*(short *)(attacker + 0xaa) == 0x5c9) *(float *)(damage + 0x2c) *= 0.05f;
         }
         else func_PAL_002AC290((int)moby, (char *)(state + 0x50));
-        amount = func_PAL_002AA108(moby, damage);
+        amount = moby_update_aim_target_strength_pal(moby, damage);
         ApproachValue((float *)(state + 0x20), 0.0f, amount);
-        if (D_L16_001B16C0 && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
-            divisor = IntToFloat(D_L16_001B16C4);
+        if (g_snivelak_target && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
+            divisor = IntToFloat(g_snivelak_divisor);
             quantum = (float)*(short *)(state + 0x24);
             quantum /= divisor;
             threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
@@ -116,7 +116,7 @@ void func_PAL_L16_00415760(u8 *moby)
                 if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) snd_stop_voice(sound);
             }
             {
-                u8 *target = D_L16_001B16C0;
+                u8 *target = g_snivelak_target;
                 *(int *)(state + 0x368) = -1;
                 *(u8 **)(state + 0x24c) = target;
             }
@@ -130,7 +130,7 @@ void func_PAL_L16_00415760(u8 *moby)
             moby_set_state(moby, 17, 5);
         }
     }
-    func_PAL_L16_00417C58(moby);
+    snivelak_play_voice_cues_pal(moby);
     moby[0xa8] = 255;
     (*(u8 **)(state + 0x1f0))[0xa8] = 255;
     (*(u8 **)(state + 0x238))[0xa8] = 255;

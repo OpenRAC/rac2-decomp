@@ -156,9 +156,9 @@ extern void func_0027C660_1(void);
 /* Frozen Batch A A03-counter-mod50-80; acknowledged claim b5e8cf533fd3cee3cb2dcdd0bf7be9549f6cc39cd932c589176487a8b170abee. */
 typedef int BatchA_A03_s32;
 
-extern BatchA_A03_s32 D_L00_001A8FE0[] __attribute__((sda));
+extern BatchA_A03_s32 g_call_counter[] __attribute__((sda));
 
-extern BatchA_A03_s32 D_001A7BC0[] __attribute__((sda));
+extern BatchA_A03_s32 g_frame_counter_2[] __attribute__((sda));
 
 extern BatchA_A03_s32 D_001A7B90_1[] __attribute__((sda));
 
@@ -528,7 +528,7 @@ int return_l00_zero_9(void) {
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 
 extern int module_l00_call_handler_with_arg_15(int a);
 
@@ -550,7 +550,7 @@ extern int module_l00_call_handler_with_arg_9(int a);
 /* Runs an update step using the saved input state and returns zero. */
 int pad_run_input_update_return_zero(void)
 {
-    module_l00_call_handler_with_arg_15(D_00138344);
+    module_l00_call_handler_with_arg_15(g_menu_input_flags);
     return 0;
 }
 
@@ -573,7 +573,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 
-extern CallbackStateL001FEC40 D_L00_001FEC40;
+extern CallbackStateL001FEC40 g_pause_input_state;
 
 extern int module_l00_call_handler_with_arg_16(int);
 
@@ -582,12 +582,12 @@ extern int module_l00_call_handler_with_arg_16(int);
 int pad_l00_update_input_callback(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -623,11 +623,11 @@ int pad_update_input_callback_with_request(void)
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
 
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -678,12 +678,12 @@ extern int module_l00_call_handler_with_arg_18(int);
 int pad_l00_update_input_callback_2(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -715,12 +715,12 @@ extern int module_l00_call_handler_with_arg_19(int);
 int pad_l00_update_input_callback_3(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -750,12 +750,12 @@ extern int level_l00_call_module_handler_with_arg_4(int);
 int pad_l00_update_input_callback_4(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -788,12 +788,12 @@ extern int level_l00_call_module_handler_with_arg_3(int);
 int pad_l00_update_input_callback_5(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -838,12 +838,12 @@ extern int level_l00_call_module_handler_with_arg(int);
 int pad_l00_update_input_callback_6(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -877,11 +877,11 @@ int input_l00_callback_send_request(void)
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
 
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -940,14 +940,14 @@ int table_store_entry_in_object(int *obj)
 /* Runs an update step using the saved input state and returns zero. */
 int input_l00_update_return_zero(void)
 {
-    level_l00_call_module_handler_with_arg_11(D_00138344);
+    level_l00_call_module_handler_with_arg_11(g_menu_input_flags);
     return 0;
 }
 
 /* Runs an update step using the saved input state and returns zero. */
 int input_l00_update_return_zero_2(void)
 {
-    level_l00_call_module_handler_with_arg_11(D_00138344);
+    level_l00_call_module_handler_with_arg_11(g_menu_input_flags);
     return 0;
 }
 
@@ -987,11 +987,11 @@ int input_l00_callback_send_request_2(void)
     int flags = state[0x1C4 / 4];
 
     if (flags & 0x10) {
-        int value = *(int *)(D_L00_001FEC40.source + 0xE0);
+        int value = *(int *)(g_pause_input_state.source + 0xE0);
 
         if (value != 0)
-            D_L00_001FEC40.value = value;
-        else if (D_L00_001FEC40.fallback == 0) {
+            g_pause_input_state.value = value;
+        else if (g_pause_input_state.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -1030,7 +1030,7 @@ int setup_l00_run_three_return_zero_6(void)
 /* Runs an update step using the saved input state and returns zero. */
 int input_l00_update_return_zero_3(void)
 {
-    module_l00_call_handler_with_arg_9(D_00138344);
+    module_l00_call_handler_with_arg_9(g_menu_input_flags);
     return 0;
 }
 
@@ -1046,11 +1046,11 @@ int setup_l00_run_three_return_zero_7(void)
     return 0;
 }
 
-extern int D_L00_001C95D4;
+extern int g_level_reset_value;
 
 /* Resets a global value to minus one. */
 int state_l00_reset_to_minus_one(void) {
-    D_L00_001C95D4 = -1;
+    g_level_reset_value = -1;
     return 0;
 }
 
@@ -1072,11 +1072,11 @@ int setup_l00_run_three_return_zero_8(void)
 }
 
 
-extern int D_L00_001C95D4;
+extern int g_level_reset_value;
 
 /* Resets a global value to minus one. */
 int state_l00_reset_to_minus_one_2(void) {
-    D_L00_001C95D4 = -1;
+    g_level_reset_value = -1;
     return 0;
 }
 
@@ -1091,12 +1091,12 @@ unsigned int stub_l00_return_zero_3(void)
 /* Counts calls and gives the counter a small bump every 50th call. */
 void counter_count_calls_bump(void)
 {
-    if (D_L00_001A8FE0[0] == 0) {
-        BatchA_A03_s32 counter = D_001A7BC0[0] + 1;
-        D_001A7BC0[0] = counter;
+    if (g_call_counter[0] == 0) {
+        BatchA_A03_s32 counter = g_frame_counter_2[0] + 1;
+        g_frame_counter_2[0] = counter;
         if (counter % 50 == 0) {
             if (D_001A7B90_1[0]) {
-                D_001A7BC0[0] = counter + 10;
+                g_frame_counter_2[0] = counter + 10;
             }
         }
     }
@@ -1113,29 +1113,29 @@ int stub_l00_return_one(void) {
 
 extern void mem_clear(unsigned int *dst, unsigned int val, int size);
 
-extern char D_L00_0021D140[];
-extern char D_L00_0021DDB0[];
-extern char D_L00_001B2370[] __attribute__((sda));
+extern char g_level_work_area[];
+extern char g_controller_level_state[];
+extern char g_work_area_clear_buffer[] __attribute__((sda));
 
 /* Zeroes the three measured work areas, the two 0xC70-byte ones and a 0x40-byte one. */
 /* Clears three work memory areas to zero. */
 void mem_clear_work_areas(void)
 {
-    mem_clear((unsigned int *)D_L00_0021D140, 0, 0xC70);
-    mem_clear((unsigned int *)D_L00_0021DDB0, 0, 0xC70);
-    mem_clear((unsigned int *)D_L00_001B2370, 0, 0x40);
+    mem_clear((unsigned int *)g_level_work_area, 0, 0xC70);
+    mem_clear((unsigned int *)g_controller_level_state, 0, 0xC70);
+    mem_clear((unsigned int *)g_work_area_clear_buffer, 0, 0x40);
 }
 
 
-extern char *D_L00_001B1E9C __attribute__((sda));
-extern char *D_L00_001B1EA0 __attribute__((sda));
+extern char *g_moby_array_base __attribute__((sda));
+extern char *g_moby_array_end_sentinel __attribute__((sda));
 
 /* Walks the 0x100-byte records between the two list bounds and returns the first whose 16-bit key at 0xB2 matches, or null. */
 /* Searches the record list for the entry with a matching id and returns it, or null. */
 char *record_find_by_id(int a0, int key)
 {
     char *cur;
-    for (cur = D_L00_001B1E9C; cur != D_L00_001B1EA0; cur += 0x100) {
+    for (cur = g_moby_array_base; cur != g_moby_array_end_sentinel; cur += 0x100) {
         if (*(short *)(cur + 0xB2) == key)
             return cur;
     }

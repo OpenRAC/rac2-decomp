@@ -23,13 +23,13 @@ extern int flag_set_first_pending(char *);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_L01_002E2968(void *, void *, int, int, int, float, float, float);
+extern void part_l01_spawn_spark_burst_pal(void *, void *, int, int, int, float, float, float);
 extern int PlayMobySound(int, int, char *);
 extern char *moby_l00_spawn_child(char *, int, int);
-extern void func_PAL_L00_0032C328(char *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(char *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void moby_mark_spawned(char *);
 extern void vec_local_offset_to_world(char *, void *, float, float, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float,
                           float, float, int, float, int, int, int, int, int);
 
 extern char g_hero_position[];
@@ -37,17 +37,17 @@ extern char g_hero_position[];
 extern float D_L03_001B0AE0_1[] MACRO_ADDR;
 extern float D_L03_001B0AE8_1[] MACRO_ADDR;
 extern float D_L03_001B0B30_1[] MACRO_ADDR;
-extern float D_L03_001B0AE0 __attribute__((sda));
-extern float D_L03_001B0AE8 __attribute__((sda));
-extern float D_L03_001B0AF0 __attribute__((sda));
-extern float D_L03_001B0AF4 __attribute__((sda));
-extern float D_L03_001B0AF8 __attribute__((sda));
-extern float D_L03_001B0B30 __attribute__((sda));
+extern float g_floater_sway_range_a __attribute__((sda));
+extern float g_floater_sway_range_b __attribute__((sda));
+extern float g_floater_tilt_amount_x __attribute__((sda));
+extern float g_floater_tilt_amount_y __attribute__((sda));
+extern float g_floater_matrix_scale __attribute__((sda));
+extern float g_floater_local_offset __attribute__((sda));
 extern char D_L03_001B0B10_GP[] SDATA(D_L03_001B0B10);
 extern char D_L03_001B0B08_GP[] SDATA(D_L03_001B0B08);
 extern char D_L03_001B0B00_GP[] SDATA(D_L03_001B0B00);
-extern char D_L03_001A8F20[] __attribute__((sda));
-extern int D_L03_001B0B40 __attribute__((sda));
+extern char g_effect_descriptor_default[] __attribute__((sda));
+extern int g_floater_effect_arg __attribute__((sda));
 
 void func_PAL_L03_003E61B0(char *obj)
 {
@@ -69,9 +69,9 @@ void func_PAL_L03_003E61B0(char *obj)
         *(float *)(vars + 0x10) = math_random_angle();
         *(float *)(vars + 0x14) = math_random_angle();
         *(float *)(vars + 0x18) =
-            math_random_signed_float_range(D_L03_001B0AE0, D_L03_001B0AE0_1[1]) * 0.0003490659f;
+            math_random_signed_float_range(g_floater_sway_range_a, D_L03_001B0AE0_1[1]) * 0.0003490659f;
         *(float *)(vars + 0x1C) =
-            math_random_signed_float_range(D_L03_001B0AE8, D_L03_001B0AE8_1[1]) * 0.0003490659f;
+            math_random_signed_float_range(g_floater_sway_range_b, D_L03_001B0AE8_1[1]) * 0.0003490659f;
         *(float *)(vars + 0x3C) = 0.12566373f;
         *(float *)(vars + 0x38) = 0.0025132746f;
         moby_set_state(obj, 1, -1);
@@ -82,14 +82,14 @@ void func_PAL_L03_003E61B0(char *obj)
             break;
         *(float *)(vars + 0x10) = FastAddRotations(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
         *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
-        *(float *)(obj + 0xF0) = D_L03_001B0AF0 * math_fast_sin_or_cos_b(*(float *)(vars + 0x10));
-        *(float *)(obj + 0xF4) = D_L03_001B0AF4 * math_fast_sin_or_cos_b(*(float *)(vars + 0x14));
+        *(float *)(obj + 0xF0) = g_floater_tilt_amount_x * math_fast_sin_or_cos_b(*(float *)(vars + 0x10));
+        *(float *)(obj + 0xF4) = g_floater_tilt_amount_y * math_fast_sin_or_cos_b(*(float *)(vars + 0x14));
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
         *(Quad *)v = *(Quad *)angles;
         euler_rotation_basis(mat, v);
-        FastVecScale(obj + 0x10, mat + 0x10, D_L03_001B0AF8);
+        FastVecScale(obj + 0x10, mat + 0x10, g_floater_matrix_scale);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
             char *p = part_find_owned_effect_slot(obj, 0x4010000, 0);
@@ -126,7 +126,7 @@ void func_PAL_L03_003E61B0(char *obj)
         *(Quad *)v = 0;
         v[2] = 0.080000006f;
         if (!math_random_int_below(2))
-            func_PAL_L01_002E2968(obj + 0x10, v, 1, 0x40202020, 1, 0.008f, 0.9f, 1.02f);
+            part_l01_spawn_spark_burst_pal(obj + 0x10, v, 1, 0x40202020, 1, 0.008f, 0.9f, 1.02f);
         *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.25132746f);
         FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x20);
         {
@@ -145,12 +145,12 @@ void func_PAL_L03_003E61B0(char *obj)
         PlayMobySound(0, 0, obj);
         p = moby_l00_spawn_child(obj, 0x113D, *(u8 *)(obj + 0x30));
         if (p) {
-            func_PAL_L00_0032C328(p, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
-                              D_L03_001B0B40, 6, 65535, 255, 0);
+            part_explode_object_into_pieces_pal(p, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
+                              g_floater_effect_arg, 6, 65535, 255, 0);
             moby_mark_spawned(p);
         }
-        vec_local_offset_to_world(obj, v, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        func_PAL_002AC718(obj, D_L03_001A8F20, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        vec_local_offset_to_world(obj, v, g_floater_local_offset, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
+        SpawnExplosionEffects_pal(obj, g_effect_descriptor_default, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         moby_mark_spawned(obj);
         break;

@@ -14,7 +14,7 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_set_widget_field_b(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern int UpdateMenuChoiceListWidgets(void *, int);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern char ref_003486A8_00[];
 extern char ref_003486A8_01[];
 extern char ref_003486A8_02[];
@@ -75,12 +75,12 @@ void menu_page_construct_with_rows(char *menu, void *data)
     *(int *)object_get_fourth_field((u8 *)menu + 0xE4) = 0x70FFFEED;
     *(int *)object_get_fourth_field((u8 *)menu + 0x17C) = 0x60442D00;
     *(int *)object_get_fourth_field((u8 *)menu + 0x1C8) = 0x55F0C070;
-    object_set_helper_result(menu + 0x0, D_001A8CFC[0] + 0x8710, 28);
-    object_set_helper_result(menu + 0x130, D_001A8CFC[0] + 0x8710, 29);
-    object_set_helper_result(menu + 0x4C, D_001A8CFC[0] + 0x8710, 30);
-    object_set_helper_result(menu + 0x98, D_001A8CFC[0] + 0x8710, 31);
-    object_set_helper_result(menu + 0xE4, D_001A8CFC[0] + 0x8710, 32);
-    object_set_helper_result(menu + 0x17C, D_001A8CFC[0] + 0x8710, 115);
-    object_set_helper_result(menu + 0x1C8, D_001A8CFC[0] + 0x8710, 116);
+    object_set_helper_result(menu + 0x0, g_resident_data_base[0] + 0x8710, 28);
+    object_set_helper_result(menu + 0x130, g_resident_data_base[0] + 0x8710, 29);
+    object_set_helper_result(menu + 0x4C, g_resident_data_base[0] + 0x8710, 30);
+    object_set_helper_result(menu + 0x98, g_resident_data_base[0] + 0x8710, 31);
+    object_set_helper_result(menu + 0xE4, g_resident_data_base[0] + 0x8710, 32);
+    object_set_helper_result(menu + 0x17C, g_resident_data_base[0] + 0x8710, 115);
+    object_set_helper_result(menu + 0x1C8, g_resident_data_base[0] + 0x8710, 116);
     UpdateMenuChoiceListWidgets(menu, 0);
 }

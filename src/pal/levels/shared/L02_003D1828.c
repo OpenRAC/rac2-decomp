@@ -3,10 +3,10 @@
 
 extern char *g_moby_l02_pool __attribute__((sda));
 extern char *g_entity_group_lists[];
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 typedef int L02Word;
-extern L02Word D_L02_001B35B8 __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
+extern L02Word g_group_max_index __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 /* Sets every entity of the object's group to state 1 with a 0xB4 timer. */
 void func_PAL_L02_003D1828(unsigned char *arg0) {
@@ -16,7 +16,7 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
     if (arg0[0x21] == 0xFF)
         return;
     q = (unsigned short *)g_entity_group_lists[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
+    while (arg0[0x21] != 0xFF && arg0[0x21] <= g_group_max_index && q != 0 &&
            ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[arg0[0x21]])) {
         char *o;
 
@@ -34,15 +34,15 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
 extern int moby_aim_at_target_offset(char *, char *);
 extern int moby_l01_turn_toward_target(char *, char *);
 extern int moby_turn_toward_target_and_step(char *, float *, float);
-extern int D_L02_001A8FF0 __attribute__((sda));
+extern int g_tether_lock_active __attribute__((sda));
 
 /* Runs the kind's entry hook: the first when the level flag is set, the second when the third
    argument is clear, the third with the object's own angle otherwise. */
-int func_PAL_L02_003D2898(char *a0, char *a1, int a2) {
+int moby_run_entry_hook_by_mode_pal(char *a0, char *a1, int a2) {
     char *p = *(char **)(a0 + 0x68);
     int result;
 
-    if (D_L02_001A8FF0)
+    if (g_tether_lock_active)
         result = moby_aim_at_target_offset(a0, a1);
     else if (a2 == 0)
         result = moby_l01_turn_toward_target(a0, a1);

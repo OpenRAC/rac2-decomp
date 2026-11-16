@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { float x, y, z, w; } V4_F213135aa;
 extern float F213135aa_FUN_002A7878(float a, float b);
@@ -9,7 +10,7 @@ extern void F213135aa_FUN_00282DD8(char *a, char *b, char *c);
 extern void F213135aa_FUN_002AB668(char *a, char *b, float f);
 extern V4_F213135aa ref_00302DA0_04[];
 
-int func_PAL_003033A8(char *obj, char *obj2, float x, float y)
+int pickup_start_fly_to_target_pal(char *obj, char *obj2, float x, float y)
 {
     V4_F213135aa m0, m1, m2;
     char *s1;

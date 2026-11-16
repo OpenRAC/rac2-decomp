@@ -8,14 +8,14 @@ extern float math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 typedef unsigned int Quad37DA58 __attribute__((mode(TI)));
-extern char D_L05_001B96C0[];
+extern char g_origin_vec[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern unsigned char *D_L05_001FF240[];
+extern unsigned char *g_particle_params_table[];
 
 void func_PAL_L05_00380258(float *position, int count, int color, int duration)
 {
@@ -26,7 +26,7 @@ void func_PAL_L05_00380258(float *position, int count, int color, int duration)
     *(Quad37DA58 *)axis = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
-    FastVecSub(direction, D_L05_001B96C0, position);
+    FastVecSub(direction, g_origin_vec, position);
     vec_scale_to_length(half, direction, 0.5f);
     direction[2] = 0;
     for (i = 0; i < count; i++) {
@@ -43,12 +43,12 @@ void func_PAL_L05_00380258(float *position, int count, int color, int duration)
         position[2] += math_random_signed_float_range(0, 0.15f);
         particle = part_spawn_ground_effect(position, ((s32)duration * 5 + 2) / 6, size * 0.1f, size, color, 0, sign, velocity, 0, 0.0028800003f);
         if (particle) {
-            particle[2] = D_L05_001FF240[0x61][6];
+            particle[2] = g_particle_params_table[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
         }
         particle = part_spawn_ground_effect(position, ((s32)duration * 5 + 2) / 6, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.0028800003f);
         if (particle) {
-            particle[2] = D_L05_001FF240[0x61][6];
+            particle[2] = g_particle_params_table[0x61][6];
             particle[9] = FloatToInt(4.0f) + 0x70;
         }
     }

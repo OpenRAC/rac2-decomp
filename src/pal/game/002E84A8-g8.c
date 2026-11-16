@@ -18,8 +18,8 @@ extern void vec_clear_128(void *);
 extern void part_draw_sprite_trail(void *, void *, int, float, float, float, unsigned int);
 extern void part_update_effect_records(void *);
 extern void part_add_effect_record(void *, void *);
-extern float D_001AC090 __attribute__((sda));
-extern float D_001B2150[4];
+extern float g_engine_flame_offsets __attribute__((sda));
+extern float g_engine_flame_velocity[4];
 extern char g_scene_playback_state[];
 typedef struct {
  float pos[4], velocity[4];
@@ -53,7 +53,7 @@ void func_PAL_002E84A8(void *object, int index, int alternate)
  vec_copy_helper_b(combined, first, second);
  quaternion_to_rotation_basis(combined, matrix);
  multiply_matrix3x3(matrix, o + 0xc0, matrix);
- entry = &D_001AC090 + index * 4;
+ entry = &g_engine_flame_offsets + index * 4;
  matrix_mul_vec3(pos, entry, matrix);
  FastVecAdd(pos, pos, o + 0x10);
  strength = (float)*(unsigned char *)(o + 0x95) * (entry[3] * (1.0f / 128.0f));
@@ -86,7 +86,7 @@ void func_PAL_002E84A8(void *object, int index, int alternate)
  effect.pos[1] += math_random_float_range(-0.025f, 0.025f);
  effect.pos[2] += math_random_float_range(-0.025f, 0.025f);
  vec_clear_128(effect.velocity);
- qcopy(effect.velocity, D_001B2150);
+ qcopy(effect.velocity, g_engine_flame_velocity);
  effect.rotation = math_random_angle();
  effect.angle = math_random_float_range(90.0f, 180.0f) * 0.0003490659f;
  effect.first = effect.last = ((s32)(math_random_int_range(70, 90)) * 5 + 2) / 6;

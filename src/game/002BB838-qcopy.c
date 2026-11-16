@@ -11,7 +11,7 @@
 extern void *part_alloc(int kind);
 extern int FloatToInt(float f);
 extern float IntToFloat(int n);
-extern unsigned char *D_001F2560;
+extern unsigned char *g_color_blend_textures;
 
 typedef int TI128_002BB838 __attribute__((mode(TI)));
 
@@ -36,7 +36,7 @@ void part_spawn_color_blend(void *position, void *velocity, int color, int endCo
     *(unsigned char *)((char *)particle + 1) = 0;
     *(int *)((char *)particle + 0xC) = 0;
     *(unsigned char *)((char *)particle + 8) = 0;
-    *(unsigned char *)((char *)particle + 2) = *D_001F2560;
+    *(unsigned char *)((char *)particle + 2) = *g_color_blend_textures;
     *(TI128_002BB838 *)motion = *(TI128_002BB838 *)velocity;
     *(short *)((char *)particle + 0xA) = life;
     *(int *)(motion + 0x18) = life;

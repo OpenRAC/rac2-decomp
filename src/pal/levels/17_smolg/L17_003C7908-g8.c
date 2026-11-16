@@ -3,7 +3,7 @@
 /* func_PAL_L17_003C7908, the PAL copy of func_L17_003C3AF0: the same C, where the period
    D * 60 becomes the 50 Hz (D * 300 + 2) / 6. */
 
-extern float D_L17_001B0240 __attribute__((sda));
+extern float g_anchor_move_seconds __attribute__((sda));
 
 extern void FastVecSub(float *, float *, float *);
 
@@ -36,7 +36,7 @@ void func_PAL_L17_003C7908(char *a0, char *a1, char *a2)
     s3 = *(char **)(s2 + 0x68);
     f12 = *(f32 *)(s3 + 0xA8);
     f12 = f12 * 3.1415929f;
-    f12 = f12 / ((D_L17_001B0240 * 300.0f + 2.0f) * 0.16666667f);
+    f12 = f12 / ((g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f);
     f0 = math_fast_sin_or_cos_a(f12);
     f21 = 1.0f - f0;
     f21 = f21 * 0.5f;

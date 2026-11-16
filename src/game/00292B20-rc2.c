@@ -25,8 +25,8 @@
  */
 #include "common.h"
 
-extern s32 D_001A7288 __attribute__((sda));
-extern s32  D_001B1888[] __attribute__((sda));
+extern s32 g_level_data_ptr __attribute__((sda));
+extern s32  g_hud_group_size_table[] __attribute__((sda));
 
 extern s32 fast_decompress();
 
@@ -39,10 +39,10 @@ void hud_unpack_bank_data(s32 bank_index, s32 target) {
 
     aligned_target = (target + 0xF) & 0xFFFFFFF0;
     if (aligned_target != 0) {
-        root = D_001A7288;
+        root = g_level_data_ptr;
         entry_base = root + (bank_index * 8);
         fast_decompress((*(s32 *)((char *)(entry_base) + (0x20))) + root, aligned_target);
     }
-    bank_base = D_001B1888[0] + (bank_index * 4);
+    bank_base = g_hud_group_size_table[0] + (bank_index * 4);
     (*(s32 *)((char *)(bank_base) + (0x74))) = 0;
 }

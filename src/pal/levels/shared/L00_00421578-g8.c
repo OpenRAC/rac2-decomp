@@ -37,7 +37,7 @@ extern LevelClass g_weapon_l00_table[];
 extern void *g_hero_moby __attribute__((nosda));
 extern CollResult g_collision_result __attribute__((aligned(16)));
 extern char g_camera_l00_position[];
-extern f32 D_L00_001B1470 __attribute__((sda));
+extern f32 g_guided_rocket_turn_rate __attribute__((sda));
 extern u8 *level_get_slot_body(int id, int index);
 extern int *level_get_slot_header(int id, int index);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -66,7 +66,7 @@ extern char *SelectBestTargetInCone(void *, void *, int *, float, float, int, in
 extern int CollLine(void *, void *, int, void *, void *);
 extern void func_PAL_L00_00423418(void *, int, int);
 extern int PlayMobySound(int, int, void *);
-extern int func_PAL_0032F0B8(char *, int, int);
+extern int StartAttachedEffect_pal(char *, int, int);
 extern char *func_PAL_L00_00421578(int, void *, int, int, int, int);
 extern float missile_steer_toward_target(char *, void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
@@ -76,9 +76,9 @@ extern void level_release_slot_list(void *);
 extern void moby_update_transform_history_followers(void *, int);
 extern void snd_stop_voice(int);
 extern int snd_is_voice_playing_for_owner(void *, int);
-extern void func_PAL_002AD288(void *, void *, int, float, float);
+extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
 extern void ref_L00_0041CB80_00(void *, void *);
-extern void func_PAL_L00_00423778(void *);
+extern void rocket_draw_trail_pal(void *);
 extern int FastTweenColor(int, int, float);
 extern void copy_matrix_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
@@ -271,9 +271,9 @@ void func_PAL_L00_00421E28(char *m)
                     *(u8 *)(m + 0x20) = 1;
                 }
                 if (g_weapon_l00_table[g_item_slot_to_record[0x16]].b4 != 0) {
-                    func_PAL_0032F0B8(g_collision_result.moby, 0x41, *(int *)(m + 0xB8));
+                    StartAttachedEffect_pal(g_collision_result.moby, 0x41, *(int *)(m + 0xB8));
                 } else {
-                    func_PAL_0032F0B8(g_collision_result.moby, 0x16, *(int *)(m + 0xB8));
+                    StartAttachedEffect_pal(g_collision_result.moby, 0x16, *(int *)(m + 0xB8));
                 }
             } else {
                 PlayMobySound(2, 0, m);
@@ -445,9 +445,9 @@ void func_PAL_L00_00421E28(char *m)
                     *(f32 *)(((char **)segs)[*(int *)(pv + 0x30)] + j6 * 16 + 0xC) = 0.15f;
                 }
             }
-            ref_L00_0041CB80_00(func_PAL_L00_00423778, m);
+            ref_L00_0041CB80_00(rocket_draw_trail_pal, m);
         }
-        *(f32 *)(pv + 0x64) = FastAddRotations(*(f32 *)(pv + 0x64), D_L00_001B1470 * 0.0003490659f);
+        *(f32 *)(pv + 0x64) = FastAddRotations(*(f32 *)(pv + 0x64), g_guided_rocket_turn_rate * 0.0003490659f);
         glow = math_fast_sin_or_cos_b(*(f32 *)(pv + 0x64)) * 0.5f + 0.5f;
         if (g_weapon_l00_table[g_item_slot_to_record[0x16]].b4 != 0) {
             if (*(char **)(pv + 0x68) != 0) {
@@ -484,7 +484,7 @@ void func_PAL_L00_00421E28(char *m)
             }
         }
         *(int *)(pv + 0x38) = -1;
-        func_PAL_002AD288(m, m + 0x10, -1, 0.5f, 5.0f);
+        part_spawn_explosion_with_sparks_pal(m, m + 0x10, -1, 0.5f, 5.0f);
         table_clear_entry_flag(*(int *)(pv + 0x6C));
         moby_mark_spawned(m);
         break;

@@ -6,7 +6,7 @@
  * Their own unit for -G8. */
 #include "common.h"
 
-extern int D_L10_00221CFC __attribute__((section(".data")));
+extern int g_mission_progress_flag __attribute__((section(".data")));
 extern int g_mission_initialized __attribute__((sda));
 extern void music_Unpause(void);
 extern void entry_init_all_registered(void);
@@ -16,30 +16,30 @@ extern int level_get_saved_value(void);
 extern void cloud_destroy_leftover_objects(void);
 extern void cloud_spawn_objects(int, int);
 extern void hero_set_state_value_c(int);
-extern int D_L10_001B13F8 __attribute__((sda));
-extern int D_L10_001B13FC __attribute__((sda));
-extern int D_L10_001B1444 __attribute__((sda));
-extern int D_L10_001B1424 __attribute__((sda));
-extern char *D_L10_001B251C;
+extern int g_hud_blink_timer_first __attribute__((sda));
+extern int g_hud_blink_timer_second __attribute__((sda));
+extern int g_no_first_completion_flag __attribute__((sda));
+extern int g_state_frame_count __attribute__((sda));
+extern char *g_moby_base_table;
 extern void *CreateEnergyStrip(void *, void *, int, int, int, int, int, int, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern void moby_set_flag_bit(void *, int);
 extern void moby_mark_flag_and_append_to_list(int);
 
 typedef struct { int idx; u8 pad[0x28]; int f2C; } G221CD0;
-extern G221CD0 D_L10_00221CD0;
-extern u8 *D_001B2614;
+extern G221CD0 g_mission_state;
+extern u8 *g_spot_record_table;
 extern void entry_spawn_list_objects_with_flag(void *, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
 extern void hrugis_set_group_states(void *);
 extern void *level_find_object_by_class_id(int);
 extern int group_count_alive(void *);
-extern void func_US2_L10_00425A78(void *, int);
+extern void hrugis_finish_mission_reward_us2(void *, int);
 extern int list_count_ready_objects(void *);
 extern void FadeToBlack(int);
 extern void hrugis_reset_mission_state(void *);
-extern void *D_L10_001B1400 __attribute__((sda)), *D_L10_001B1404 __attribute__((sda));
+extern void *g_gate_first __attribute__((sda)), *g_gate_second __attribute__((sda));
 extern void moby_mark_spawned(void *);
 
 void func_US2_L10_00425CD8(char *object)
@@ -52,10 +52,10 @@ void func_US2_L10_00425CD8(char *object)
     if (!g_mission_initialized) {
         typedef int Quad __attribute__((mode(TI)));
         union { Quad q; float f[4]; } av, bv;
-        D_L10_00221CFC = 0;
+        g_mission_progress_flag = 0;
         g_mission_initialized = 1;
-        D_L10_001B13F8 = 0;
-        D_L10_001B13FC = 0;
+        g_hud_blink_timer_first = 0;
+        g_hud_blink_timer_second = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -70,32 +70,32 @@ void func_US2_L10_00425CD8(char *object)
         av.f[0] = 469.63f; av.f[1] = 407.93f; av.f[2] = 502.79f;
         bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
         CreateEnergyStrip(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
-        if (D_L10_001B1400) {
-            moby_mark_spawned(D_L10_001B1400);
-            D_L10_001B1400 = 0;
+        if (g_gate_first) {
+            moby_mark_spawned(g_gate_first);
+            g_gate_first = 0;
         }
-        if (D_L10_001B1404) {
-            moby_mark_spawned(D_L10_001B1404);
-            D_L10_001B1404 = 0;
+        if (g_gate_second) {
+            moby_mark_spawned(g_gate_second);
+            g_gate_second = 0;
         }
     }
     p = level_find_object_by_class_id(0xF85);
     result = p ? group_count_alive(p) : 0;
     if (!result) {
         entry_init_all_registered();
-        if (D_L10_001B1444) {
+        if (g_no_first_completion_flag) {
             if (math_fast_float_d(st + 0x58)) {
                 *(int *)(st + 0x58) = 10;
                 moby_mark_flag_and_append_to_list(12);
-                moby_set_flag_bit(D_L10_001B251C + *(int *)(st + 0x2C) * 256,1);
-                D_L10_001B1424 = 0;
-                D_L10_001B1444 = 0;
+                moby_set_flag_bit(g_moby_base_table + *(int *)(st + 0x2C) * 256,1);
+                g_state_frame_count = 0;
+                g_no_first_completion_flag = 0;
                 hero_set_state_value_c(1);
             }
         } else if (math_fast_float_d(st + 0x58)) {
-            func_US2_L10_00425A78(object,0);
-            D_L10_001B13F8 = 0;
-            D_L10_001B13FC = 0;
+            hrugis_finish_mission_reward_us2(object,0);
+            g_hud_blink_timer_first = 0;
+            g_hud_blink_timer_second = 0;
         }
     }
 }
@@ -110,7 +110,7 @@ void func_US2_L10_00425F48(u8 *a0) {
 
     if (g_mission_initialized == 0) {
         g_mission_initialized = 1;
-        D_L10_00221CD0.f2C = 0;
+        g_mission_state.f2C = 0;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -124,27 +124,27 @@ void func_US2_L10_00425F48(u8 *a0) {
                 break;
             case 0xF93:
                 entry_spawn_list_objects_with_flag(o, 1);
-                func_L05_0037CEE0(p[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
-                func_L05_0037D608(p[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
+                func_L05_0037CEE0(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                func_L05_0037D608(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
                 hrugis_set_group_states(p[i]);
                 break;
             }
         }
         cloud_destroy_leftover_objects();
         cloud_spawn_objects(0x2D, 12);
-        if (D_L10_001B1400) {
-            moby_mark_spawned(D_L10_001B1400);
-            D_L10_001B1400 = 0;
+        if (g_gate_first) {
+            moby_mark_spawned(g_gate_first);
+            g_gate_first = 0;
         }
-        if (D_L10_001B1404) {
-            moby_mark_spawned(D_L10_001B1404);
-            D_L10_001B1404 = 0;
+        if (g_gate_second) {
+            moby_mark_spawned(g_gate_second);
+            g_gate_second = 0;
         }
     }
     v = level_find_object_by_class_id(0xF93);
     r = v ? group_count_alive(v) : 0;
     if (r == 0) {
-        func_US2_L10_00425A78(a0, 1);
+        hrugis_finish_mission_reward_us2(a0, 1);
     }
     if (list_count_ready_objects(level_find_object_by_class_id(0xCBE)) == 0) {
         FadeToBlack(0x1E);

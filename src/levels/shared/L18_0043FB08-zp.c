@@ -20,11 +20,11 @@ typedef struct {
     f32 dir[4];
 } Moby43FB08;
 
-extern s32 D_L18_001B1CB0[2] __attribute__((sda));
-extern s32 D_L18_001B1CB8[2] __attribute__((sda));
-extern s32 D_L18_001B1CE0 __attribute__((sda));
-extern s32 D_L18_001B1CE4 __attribute__((sda));
-extern s32 D_L18_001B1CE8 __attribute__((sda));
+extern s32 g_debris2_piece_speed_range[2] __attribute__((sda));
+extern s32 g_debris2_piece_spread_range[2] __attribute__((sda));
+extern s32 g_debris2_piece_lifetime_a __attribute__((sda));
+extern s32 g_debris2_piece_flags __attribute__((sda));
+extern s32 g_debris2_piece_lifetime_b __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -56,8 +56,8 @@ void breakable_l18_debris_update_2(Moby43FB08 *self) {
             qcopy(hi, lo);
             FastVecSub(lo, lo, ext);
             FastVecAdd(hi, hi, ext);
-            part_explode_object_into_pieces(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
-                              D_L18_001B1CE0, 9, D_L18_001B1CE8, 0xFF, 0);
+            part_explode_object_into_pieces(self, lo, g_debris2_piece_spread_range, g_debris2_piece_speed_range, g_debris2_piece_flags, -1,
+                              g_debris2_piece_lifetime_a, 9, g_debris2_piece_lifetime_b, 0xFF, 0);
             snd_play_from_class_bank(0, 0, self, self->uid);
             moby_mark_spawned(self);
         } else {

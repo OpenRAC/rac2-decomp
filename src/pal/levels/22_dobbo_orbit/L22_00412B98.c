@@ -5,7 +5,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecCross(void *, void *, void *);
 extern u8 *g_hero_moby;
-extern u8 D_L22_001A7A78 __attribute__((sda));
+extern u8 g_unused_level_byte __attribute__((sda));
 extern f32 func_2F4AD0(f32, f32);
 typedef struct {
     float vel[4];
@@ -33,13 +33,13 @@ extern void cam_compute_view_direction(void *, void *, int);
 extern TrailMoby0040DE00 *CreateMoby(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
-extern u8 *D_L22_001AF314[] __attribute__((sda));
-extern f32 D_L22_001B2A98 __attribute__((sda));
+extern u8 *g_space_ship_owner_moby[] __attribute__((sda));
+extern f32 g_space_ship_param_y __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, f32);
 extern u8 *g_hero_moby;
 extern void vec_scale_to_length(void *, void *, f32);
 
-TrailMoby0040DE00 *func_PAL_L22_00412B98(float *pos, float *vel, float *scale)
+TrailMoby0040DE00 *part_spawn_trail_effect_pal(float *pos, float *vel, float *scale)
 {
     float ref[4];
     float scaled[4];
@@ -76,18 +76,18 @@ extern s32 PlayMobySound(s32 a0, s32 a1, char *a2);
 extern int math_random_int_below(int);
 extern int CollLine(void *, void *, int, void *, int);
 extern void QueueMobyImpact(void *, void *);
-extern s32 D_L22_001B2128 __attribute__((sda));
-extern s32 D_L22_001A903C __attribute__((sda));
-extern s32 D_L22_0018B6A8 __attribute__((sda));
+extern s32 g_trigger_event_list_head __attribute__((sda));
+extern s32 g_trigger_event_flag __attribute__((sda));
+extern s32 g_unused_l22_level_word __attribute__((sda));
 extern s32 func_2F36F0(s32);
 typedef struct { u8 pad[0x18]; u8 *target; } G1C00C0;
-extern G1C00C0 D_001C00C0;
+extern G1C00C0 g_projectile_hit_info;
 extern int CollLine(void *, void *, int, void *, int);
 extern void make_hit_descriptor(void *, void *, int, void *, f32);
 extern void QueueMobyImpact(void *, void *);
-extern void func_PAL_L22_00413048(void *, s32, s32);
+extern void part_start_random_scale_effect_pal(void *, s32, s32);
 
-void func_PAL_L22_00412CC0(u8 *a0, u8 *a1) {
+void projectile_check_hit_explode_pal(u8 *a0, u8 *a1) {
     u8 *s0 = *(u8 **)(a0 + 0x68);
     u8 vec[16] __attribute__((aligned(16)));
     u8 ev[0x30] __attribute__((aligned(16)));
@@ -97,7 +97,7 @@ void func_PAL_L22_00412CC0(u8 *a0, u8 *a1) {
     if (CollLine(a1, a0 + 0x10, 0, a0, 0) == 0) {
         return;
     }
-    target = D_001C00C0.target;
+    target = g_projectile_hit_info.target;
     if (target == 0) {
         return;
     }
@@ -115,11 +115,11 @@ void func_PAL_L22_00412CC0(u8 *a0, u8 *a1) {
     ev[0x18] = 5;
     ev[0x19] = 3;
     *(u16 *)(ev + 0x1A) = *(u16 *)(a0 + 0xAA);
-    QueueMobyImpact(D_001C00C0.target, ev);
-    func_PAL_L22_00413048(a0 + 0x10, 10, 1);
-    if (D_001C00C0.target == 0) {
+    QueueMobyImpact(g_projectile_hit_info.target, ev);
+    part_start_random_scale_effect_pal(a0 + 0x10, 10, 1);
+    if (g_projectile_hit_info.target == 0) {
         qcopy(buf, a0 + 0x10);
-        func_PAL_L22_00413048(buf, 15, 0);
+        part_start_random_scale_effect_pal(buf, 15, 0);
     }
     a0[0x20] = 2;
 }

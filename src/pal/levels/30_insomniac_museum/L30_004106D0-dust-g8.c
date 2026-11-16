@@ -1,20 +1,20 @@
 #include "common.h"
 
 extern int g_current_map_index MACRO_ADDR;
-extern int D_L30_001B1820[] SDATA(D_L30_001B1820);
-extern int D_L30_001B1824[] SDATA(D_L30_001B1824);
-extern int D_L30_001B18B8[] SDATA(D_L30_001B18B8);
-extern int D_L30_001B18BC[] SDATA(D_L30_001B18BC);
-extern float D_L30_001B1858[] SDATA(D_L30_001B1858);
-extern float D_L30_001B185C[] SDATA(D_L30_001B185C);
-extern float D_L30_001B18AC[] SDATA(D_L30_001B18AC);
-extern float D_L30_001B18B0[] SDATA(D_L30_001B18B0);
-extern float D_L30_001B1828[] SDATA(D_L30_001B1828);
-extern float D_L30_001B182C[] SDATA(D_L30_001B182C);
-extern float D_L30_001B1830[] SDATA(D_L30_001B1830);
-extern float D_L30_001B1834[] SDATA(D_L30_001B1834);
-extern float D_L30_001B1838[] SDATA(D_L30_001B1838);
-extern float D_L30_001B183C[] SDATA(D_L30_001B183C);
+extern int g_museum_dust_start_a[] SDATA(D_L30_001B1820);
+extern int g_museum_dust_end_a[] SDATA(D_L30_001B1824);
+extern int g_museum_dust_start_b[] SDATA(D_L30_001B18B8);
+extern int g_museum_dust_end_b[] SDATA(D_L30_001B18BC);
+extern float g_museum_dust_range_divisor[] SDATA(D_L30_001B1858);
+extern float g_museum_dust_rise_divisor[] SDATA(D_L30_001B185C);
+extern float g_museum_dust_motion_z_scale[] SDATA(D_L30_001B18AC);
+extern float g_museum_dust_offset_z[] SDATA(D_L30_001B18B0);
+extern float g_museum_dust_range_a_min[] SDATA(D_L30_001B1828);
+extern float g_museum_dust_range_a_max[] SDATA(D_L30_001B182C);
+extern float g_museum_dust_range_b_min[] SDATA(D_L30_001B1830);
+extern float g_museum_dust_range_b_max[] SDATA(D_L30_001B1834);
+extern float g_museum_dust_range_c_min[] SDATA(D_L30_001B1838);
+extern float g_museum_dust_range_c_max[] SDATA(D_L30_001B183C);
 extern int GetCollHitMaterial(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -50,14 +50,14 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
 
     if (g_current_map_index == 21 || g_current_map_index == 30) {
         start = 0x30301010;
-        end = D_L30_001B1824[0];
+        end = g_museum_dust_end_a[0];
     } else {
-        start = D_L30_001B1820[0];
-        end = D_L30_001B1824[0];
+        start = g_museum_dust_start_a[0];
+        end = g_museum_dust_end_a[0];
     }
     if (!GetCollHitMaterial()) {
-        start = D_L30_001B18B8[0];
-        end = D_L30_001B18BC[0];
+        start = g_museum_dust_start_b[0];
+        end = g_museum_dust_end_b[0];
     }
     {
         int i;
@@ -72,20 +72,20 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
             matrix_mul_vec3(offset, offset, m + 0xC0);
             {
                 float range = speed * ((maxRadius - FastVecLength(offset)) * 0.020000001f) / maxRadius;
-                vec_scale_to_length(velocity, offset, math_random_float_range(range / D_L30_001B1858[0], range));
+                vec_scale_to_length(velocity, offset, math_random_float_range(range / g_museum_dust_range_divisor[0], range));
             }
             qcopy(motion, vars);
-            motion[2] *= D_L30_001B18AC[0];
+            motion[2] *= g_museum_dust_motion_z_scale[0];
             FastVecAdd(velocity, velocity, motion);
-            velocity[2] += math_random_float_range(rise / D_L30_001B185C[0], rise) * 0.020000001f;
+            velocity[2] += math_random_float_range(rise / g_museum_dust_rise_divisor[0], rise) * 0.020000001f;
             vzero(accel);
             FastVecAdd(offset, offset, position);
-            offset[2] += D_L30_001B18B0[0];
+            offset[2] += g_museum_dust_offset_z[0];
             velocity[3] = size;
             accel[3] = endSize;
-            a = FloatToInt((math_random_float_range(D_L30_001B1828[0], D_L30_001B182C[0]) * 5.0f + 2.0f) * 0.16666667f);
-            b = FloatToInt((math_random_float_range(D_L30_001B1830[0], D_L30_001B1834[0]) * 5.0f + 2.0f) * 0.16666667f);
-            c = FloatToInt((math_random_float_range(D_L30_001B1838[0], D_L30_001B183C[0]) * 5.0f + 2.0f) * 0.16666667f);
+            a = FloatToInt((math_random_float_range(g_museum_dust_range_a_min[0], g_museum_dust_range_a_max[0]) * 5.0f + 2.0f) * 0.16666667f);
+            b = FloatToInt((math_random_float_range(g_museum_dust_range_b_min[0], g_museum_dust_range_b_max[0]) * 5.0f + 2.0f) * 0.16666667f);
+            c = FloatToInt((math_random_float_range(g_museum_dust_range_c_min[0], g_museum_dust_range_c_max[0]) * 5.0f + 2.0f) * 0.16666667f);
             particle = part_spawn_trail(offset, velocity, accel, start, end, a, b, c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;

@@ -5,9 +5,9 @@ extern void moby_set_state(void *, int, int);
 extern void moby_set_animation_and_speed(void *, int, int, int);
 
 /* Small data reached through $gp: these are only one instruction at -G8. */
-extern int D_L01_001AFED4 __attribute__((sda));
-extern int D_L01_001AFED8 __attribute__((sda));
-extern int D_L01_001AFEDC __attribute__((sda));
+extern int g_swamp_monster_attack_b_value __attribute__((sda));
+extern int g_swamp_monster_attack_c_value __attribute__((sda));
+extern int g_swamp_monster_grab_value __attribute__((sda));
 
 typedef struct L01_003C0760_OWNED {
     char pad0[0x2DC];
@@ -29,7 +29,7 @@ void func_PAL_L01_003C45C8(L01_003C0760_OBJ *a0)
 
     moby_set_animation_and_speed(p, 8, 0, r);
     moby_set_state(p, 3, 3);
-    q->f2DC = (D_L01_001AFED4 * 5 + 2) / 6;
+    q->f2DC = (g_swamp_monster_attack_b_value * 5 + 2) / 6;
 }
 
 typedef struct L01_003C07C8_OWNED {
@@ -52,7 +52,7 @@ void func_PAL_L01_003C4650(L01_003C07C8_OBJ *a0)
 
     moby_set_animation_and_speed(p, 13, 0, r);
     moby_set_state(p, 2, 3);
-    q->f2DA = (D_L01_001AFED8 * 5 + 2) / 6;
+    q->f2DA = (g_swamp_monster_attack_c_value * 5 + 2) / 6;
 }
 
 typedef struct L01_003C0830_OWNED {
@@ -78,5 +78,5 @@ void func_PAL_L01_003C46D8(L01_003C0830_OBJ *a0)
     moby_set_animation_and_speed(p, 14, 0, r);
     moby_set_state(p, 4, 3);
     p->f9C = p->f9C | 0x30;
-    q->f2DE = (D_L01_001AFEDC * 5 + 2) / 6;
+    q->f2DE = (g_swamp_monster_grab_value * 5 + 2) / 6;
 }

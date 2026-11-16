@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     float f0;
     float f4;
@@ -20,11 +21,11 @@ typedef struct {
     int f56;
     int f60;
 } PoolRecord64;
-extern PoolRecord64 D_L16_001BC730[];
+extern PoolRecord64 g_cam_l16_override_slots[];
 
-PoolRecord64 *func_PAL_L00_002D7850(int a)
+PoolRecord64 *cam_alloc_override_slot_pal(int a)
 {
-    PoolRecord64 *p = D_L16_001BC730;
+    PoolRecord64 *p = g_cam_l16_override_slots;
     int i;
 
     for (i = 0; i < 32; i++) {

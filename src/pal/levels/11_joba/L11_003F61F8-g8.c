@@ -17,26 +17,26 @@ extern f32 moby_get_anim_value(void *);
 extern s32 math_random_int_below(s32);
 extern void joba_enemy_return_state(void *), joba_enemy_choose_attack_state(void *), joba_enemy_enter_hit_reaction(void *);
 extern void joba_enemy_reset(void *), joba_enemy_set_counters_one(void *), joba_enemy_set_counters_two(void *), joba_enemy_clear_counters(void *);
-extern int func_PAL_L11_00446380(s32, void *);
+extern int arena_launch_fighter_toward_target_pal(s32, void *);
 extern s32 arena_get_fighter_count(s32);
-extern void func_PAL_L02_004009A0(void *, s32, s32);
-extern char *func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern void moby_set_anim_type_three_pal(void *, s32, s32);
+extern char *SpawnExplosion_pal(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 extern int snd_play_from_class_bank(s32, s32, void *, s32);
-extern u8 D_L11_00189EA0[];
-extern f32 D_L11_001B0548 __attribute__((sda));
-extern f32 D_L11_001B054C __attribute__((sda));
-extern f32 D_L11_001B0558 __attribute__((sda));
-extern s32 D_L11_001B055C __attribute__((sda));
-extern s32 D_L11_001B0560 __attribute__((sda));
-extern f32 D_L11_001B0564 __attribute__((sda));
-extern f32 D_L11_001B0568 __attribute__((sda));
-extern s32 D_L11_001B056C __attribute__((sda));
-extern f32 D_L11_001B0574 __attribute__((sda));
-extern f32 D_L11_001B0578 __attribute__((sda));
-extern f32 D_L11_001B0570 __attribute__((sda));
-extern s32 D_L11_001B057C __attribute__((sda));
-extern f32 D_L11_001B0580 __attribute__((sda));
-extern f32 D_L11_001B0588 __attribute__((sda));
+extern u8 g_hero_l11_state_data[];
+extern f32 g_joba_attack_min_value __attribute__((sda));
+extern f32 g_joba_attack_max_value __attribute__((sda));
+extern f32 g_joba_orbit_radius __attribute__((sda));
+extern s32 g_joba_slam_frame_period __attribute__((sda));
+extern s32 g_joba_charge_frame_limit __attribute__((sda));
+extern f32 g_joba_push_length __attribute__((sda));
+extern f32 g_joba_height_offset __attribute__((sda));
+extern s32 g_joba_max_fighter_count __attribute__((sda));
+extern f32 g_joba_state_value_a __attribute__((sda));
+extern f32 g_joba_state_value_b __attribute__((sda));
+extern f32 g_joba_damage_threshold __attribute__((sda));
+extern s32 g_joba_move_frame_count __attribute__((sda));
+extern f32 g_joba_move_distance __attribute__((sda));
+extern f32 g_joba_height_tolerance __attribute__((sda));
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 #define W(p,o) (*(s32 *)((u8 *)(p)+(o)))
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
@@ -83,31 +83,31 @@ void func_PAL_L11_003F61F8(u8 *self) {
                 self[0xBC] = 1;
                 if (self[0x95] == 1) SetAnimation(self,1,0,8);
                 else SetAnimation(self,2,0,8);
-                F(self,0x48) = D_L11_001B0578;
+                F(self,0x48) = g_joba_state_value_b;
             } else {
                 self[0xBC] = 0;
                 if (self[0x95] == 1) SetAnimation(self,2,0,8);
                 else SetAnimation(self,1,0,8);
-                F(self,0x48) = D_L11_001B0578;
+                F(self,0x48) = g_joba_state_value_b;
             }
         }
-        if (math_fabs(F(D_L11_00189EA0,8) - F(self,0x18)) < D_L11_001B0588) moby_set_state(self,5,-1);
-        else if (b > D_L11_001B0548 && b < D_L11_001B054C) joba_enemy_choose_attack_state(self);
+        if (math_fabs(F(g_hero_l11_state_data,8) - F(self,0x18)) < g_joba_height_tolerance) moby_set_state(self,5,-1);
+        else if (b > g_joba_attack_min_value && b < g_joba_attack_max_value) joba_enemy_choose_attack_state(self);
         break;
     case 5:
         if (flag_set_first_pending(self)) {
             self[0xBC]=0; SetAnimation(self,9,0,8);
             vec_clear_128(state+0x1E0);
-            if (self[0x95] == 2) F(state,0x1E8)=D_L11_001B0580 / (f32)((D_L11_001B057C * 5 + 2) / 6);
-            else F(state,0x1E8)=-D_L11_001B0580 / (f32)((D_L11_001B057C * 5 + 2) / 6);
-            F(state,0x270)=3.1415927410125732f / (f32)((D_L11_001B057C * 5 + 2) / 6);
+            if (self[0x95] == 2) F(state,0x1E8)=g_joba_move_distance / (f32)((g_joba_move_frame_count * 5 + 2) / 6);
+            else F(state,0x1E8)=-g_joba_move_distance / (f32)((g_joba_move_frame_count * 5 + 2) / 6);
+            F(state,0x270)=3.1415927410125732f / (f32)((g_joba_move_frame_count * 5 + 2) / 6);
             H(state,0x298)=0;
         } else if (self[0xBC] == 0) {
             if (self[0x60]&2) { self[0xBC]=1; SetAnimation(self,10,0,0); }
         } else if (self[0xBC] == 1) {
-            if (U(self,0x96) > ((D_L11_001B057C >> 1) * 5 + 2) / 6) self[0xBC]=2;
+            if (U(self,0x96) > ((g_joba_move_frame_count >> 1) * 5 + 2) / 6) self[0xBC]=2;
         } else if (self[0xBC] == 2) {
-            if (U(self,0x96) > ((D_L11_001B057C - 10) * 5 + 2) / 6) {
+            if (U(self,0x96) > ((g_joba_move_frame_count - 10) * 5 + 2) / 6) {
                 self[0xBC]=3; SetAnimation(self,9,4,0); F(self,0x48)=-1;
             }
         } else if (self[0xBC] == 3) {
@@ -120,7 +120,7 @@ void func_PAL_L11_003F61F8(u8 *self) {
         mat_build_direction_roll(vector,self+0xE0,F(state,0x270));
         copy_matrix3x4(matrix,vector);
         multiply_matrix3x3(self+0xC0,matrix,self+0xC0);
-        amplitude=D_L11_001B0558*(1-(H(state,0x298)*2.0f)/IntToFloat(D_L11_001B057C))*(1-(H(state,0x298)*2.0f)/IntToFloat(D_L11_001B057C));
+        amplitude=g_joba_orbit_radius*(1-(H(state,0x298)*2.0f)/IntToFloat(g_joba_move_frame_count))*(1-(H(state,0x298)*2.0f)/IntToFloat(g_joba_move_frame_count));
         F(self,0x10)=amplitude*math_fast_sin_or_cos_a(F(state,0x250))+arena_get_center_point(W(self,0xB8))[0];
         F(self,0x14)=amplitude*math_fast_sin_or_cos_b(F(state,0x250))+arena_get_center_point(W(self,0xB8))[1];
         U(state,0x298)++;
@@ -142,26 +142,26 @@ void func_PAL_L11_003F61F8(u8 *self) {
         if (flag_set_first_pending(self)) { SetAnimation(self,4,0,8); self[0xBC]=0; joba_enemy_set_counters_one(self); }
         switch (self[0xBC]) {
         case 0:
-            if (self[0x60]&2) { SetAnimation(self,5,0,8); self[0xBC]=1; U(self,0x96)=(D_L11_001B055C * 5 + 2) / 6 - 1; }
+            if (self[0x60]&2) { SetAnimation(self,5,0,8); self[0xBC]=1; U(self,0x96)=(g_joba_slam_frame_period * 5 + 2) / 6 - 1; }
             break;
         case 1:
-            if (U(self,0x96) % ((D_L11_001B055C * 5 + 2) / 6) == 0) {
+            if (U(self,0x96) % ((g_joba_slam_frame_period * 5 + 2) / 6) == 0) {
                 u8 *v=vector;
                 u8 *position=self+0x10;
                 pos=arena_get_center_point(W(self,0xB8));
                 FastVecSub(v,position,pos);
                 W(vector,8)=0;
-                vec_scale_to_length(v,v,D_L11_001B0564);
+                vec_scale_to_length(v,v,g_joba_push_length);
                 pos=arena_get_center_point(W(self,0xB8));
                 FastVecAdd(v,v,pos);
-                if (self[0x95]==2) F(vector,8)=F(self,0x18)+D_L11_001B0568;
-                else if (self[0x95]==1) F(vector,8)=F(self,0x18)-D_L11_001B0568;
-                func_PAL_L11_00446380(W(self,0xB8),vector);
+                if (self[0x95]==2) F(vector,8)=F(self,0x18)+g_joba_height_offset;
+                else if (self[0x95]==1) F(vector,8)=F(self,0x18)-g_joba_height_offset;
+                arena_launch_fighter_toward_target_pal(W(self,0xB8),vector);
             }
-            if (arena_get_fighter_count(W(self,0xB8)) >= D_L11_001B056C || U(self,0x96)>(D_L11_001B0560 * 5 + 2) / 6) {
+            if (arena_get_fighter_count(W(self,0xB8)) >= g_joba_max_fighter_count || U(self,0x96)>(g_joba_charge_frame_limit * 5 + 2) / 6) {
                 SetAnimation(self,6,0,8); self[0xBC]=2;
             }
-            if (math_fabs(F(D_L11_00189EA0,8)-F(self,0x18)) < D_L11_001B0588) moby_set_state(self,5,-1);
+            if (math_fabs(F(g_hero_l11_state_data,8)-F(self,0x18)) < g_joba_height_tolerance) moby_set_state(self,5,-1);
             break;
         case 2:
             if (self[0x60]&2) joba_enemy_return_state(self);
@@ -190,7 +190,7 @@ void func_PAL_L11_003F61F8(u8 *self) {
             FastVecSub(state+0x1E0,pos,self+0x10);
             W(state,0x1E8)=0;
             vec_scale_to_length(state+0x1E0,state+0x1E0,0.20000002f);
-            F(self,0x48)=D_L11_001B0574;
+            F(self,0x48)=g_joba_state_value_a;
             joba_enemy_clear_counters(self);
             U(self,0x34)&=0xEFFF;
         }
@@ -198,9 +198,9 @@ void func_PAL_L11_003F61F8(u8 *self) {
         FastVecAdd(self+0x10,self+0x10,state+0x1E0);
         pos=arena_get_center_point(W(self,0xB8));
         if (F(self,0x18)<pos[2]+5 || !math_random_int_below(0x1C2) || U(self,0x96)>=301) {
-            func_PAL_L02_004009A0(self,0,-1);
+            moby_set_anim_type_three_pal(self,0,-1);
             joba_enemy_reset(self);
-            func_PAL_L00_003FB330(self+0x10,0,25,15,30,20,30,0,3,0,1,1,0,0);
+            SpawnExplosion_pal(self+0x10,0,25,15,30,20,30,0,3,0,1,1,0,0);
             snd_play_from_class_bank(0,0,self,0xDF7);
         }
         break;

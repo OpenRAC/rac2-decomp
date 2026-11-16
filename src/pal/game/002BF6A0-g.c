@@ -18,8 +18,8 @@ struct ChainParticle {
     Vector position;
     ChainParticleDynamics dynamics;
 };
-extern Vector D_001BAFB0, D_001BAFC0;
-extern struct { float matrix[4][4]; char unknown40[0x40]; Vector origin; } D_001B52C0;
+extern Vector g_coll_hit_point, g_coll_hit_normal;
+extern struct { float matrix[4][4]; char unknown40[0x40]; Vector origin; } g_particle_view_transform;
 extern void vec_clear_128(Quad *), FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float), FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float), vec_fast_normalize(void *, void *, void *), transform_vector(void *, void *, void *), part_kill(void *);
 extern float FastVecLength(void *), math_fabs(float), mat_fast_helper_a(float, float);
@@ -69,12 +69,12 @@ void func_PAL_002BFB58(ChainParticle *particle) {
                 FastVecAdd(&point, &force, &dynamics->previous->position);
             }
             if (coll_test_point(&point, 0, 0, 0.15f)) {
-                if (!dynamics->collided) qcopy(&point,&D_001BAFB0);
+                if (!dynamics->collided) qcopy(&point,&g_coll_hit_point);
                 else qcopy(&point,&particle->position);
                 dynamics->collided = 1;
             } else dynamics->collided = 0;
             if (dynamics->collided) {
-                vec_fast_normalize(velocity, velocity, &D_001BAFC0);
+                vec_fast_normalize(velocity, velocity, &g_coll_hit_normal);
                 FastVecScale(velocity, velocity, 0.95f);
             } else {
                 FastVecSub(&delta, &point, &particle->position);
@@ -97,12 +97,12 @@ void func_PAL_002BFB58(ChainParticle *particle) {
     }
     attachment = dynamics->previous;
     if (attachment) {
-        FastVecSub(&point, &attachment->position, &D_001B52C0.origin);
-        transform_vector(&point, &point, D_001B52C0.matrix);
+        FastVecSub(&point, &attachment->position, &g_particle_view_transform.origin);
+        transform_vector(&point, &point, g_particle_view_transform.matrix);
         step = 1.0f / point.f[3];
         FastVecScale(&point, &point, step);
-        FastVecSub(&delta, &particle->position, &D_001B52C0.origin);
-        transform_vector(&delta, &delta, D_001B52C0.matrix);
+        FastVecSub(&delta, &particle->position, &g_particle_view_transform.origin);
+        transform_vector(&delta, &delta, g_particle_view_transform.matrix);
         step = 1.0f / delta.f[3];
         FastVecScale(&delta, &delta, step);
         FastVecSub(&point, &point, &delta);

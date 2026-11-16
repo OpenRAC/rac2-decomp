@@ -13,7 +13,7 @@ typedef struct {
     Vars31A848 *vars;
 } Moby31A848;
 
-extern TI D_001A8BD0 MACRO_ADDR;
+extern TI g_default_effect_vector MACRO_ADDR;
 
 extern float math_fabs(float);
 extern void FastVecSub(void *, void *, void *);
@@ -35,7 +35,7 @@ int moby_is_target_outside_turn_limit(Moby31A848 *self, float limit) {
         return 1;
     }
     ref_L00_003BFC98_00(self, fwd, 1);
-    qcopy(up, &D_001A8BD0);
+    qcopy(up, &g_default_effect_vector);
     up[0] = 1.0f;
     matrix_mul_vec3(up, up, (u8 *)self + 0xC0);
     FastVecSub(dir, vars->target + 0x10, (u8 *)self + 0x10);

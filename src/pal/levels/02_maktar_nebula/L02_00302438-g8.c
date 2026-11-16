@@ -13,10 +13,10 @@ extern void DrawQuadWithRotatedUVs(void *, int, int, unsigned int, int);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern int math_random_int_range(int, int);
-extern L02_Table10 D_L02_001A9460;
-extern float D_L02_001B2FE4;
-extern L02_Clock D_L02_001BE200;
-extern char D_L02_001A9420[8] __attribute__((sda));
+extern L02_Table10 g_intro_frame_table;
+extern float g_intro_overlay_value;
+extern L02_Clock g_mob_list;
+extern char g_intro_overlay_quad[8] __attribute__((sda));
 
 /* The callback func_L02_00300CE8 queues while the game state is 2. It reads the frame counter at +0x34
    of D_L02_001BE200 (read afresh in every test, as retail does) and
@@ -32,7 +32,7 @@ extern char D_L02_001A9420[8] __attribute__((sda));
    The unit is built with -g: the line label that then precedes the first div.s (the scheduler moves the
    next line's `li` above it) makes the assembler pad it with the two nops retail has, and the second
    div.s, which has no label in front of it, stays unpadded. */
-void func_PAL_L02_00302438(void *unused) {
+void cutscene_draw_intro_overlays_pal(void *unused) {
     L02_Table10 tab;
     int k, n, alpha, id, id2, extra;
     float frac;
@@ -40,20 +40,20 @@ void func_PAL_L02_00302438(void *unused) {
     if (g_current_map_index == 2) {
         int first_end = 0x102, second_end = 0x13D, third_end = 0x14D;
 
-        tab = D_L02_001A9460;
-        if (D_L02_001BE200.time >= 0xDE) {
-            if (D_L02_001BE200.time < 0xE8) {
-                k = D_L02_001BE200.time - 0xDE;
+        tab = g_intro_frame_table;
+        if (g_mob_list.time >= 0xDE) {
+            if (g_mob_list.time < 0xE8) {
+                k = g_mob_list.time - 0xDE;
                 if (k < 10)
-                    D_L02_001B2FE4 = tab.v[k];
+                    g_intro_overlay_value = tab.v[k];
             }
         }
         id = -1;
         id2 = -1;
         alpha = 0x80;
         extra = 0;
-        if (D_L02_001BE200.time > 0 && D_L02_001BE200.time <= first_end) {
-            n = D_L02_001BE200.time - 0xE1;
+        if (g_mob_list.time > 0 && g_mob_list.time <= first_end) {
+            n = g_mob_list.time - 0xE1;
             id = 0x46;
             if (n > 0) {
                 id = 0x47;
@@ -62,13 +62,13 @@ void func_PAL_L02_00302438(void *unused) {
                 id2 = 0x46;
                 alpha = FloatToInt(frac * 127.0f);
             }
-        } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
+        } else if (g_mob_list.time > first_end && g_mob_list.time <= second_end) {
             id = 0x47;
-        } else if (D_L02_001BE200.time > second_end && D_L02_001BE200.time < third_end) {
+        } else if (g_mob_list.time > second_end && g_mob_list.time < third_end) {
             extra = math_random_int_range(0, 3);
             id = 0x49;
-        } else if (D_L02_001BE200.time > third_end && D_L02_001BE200.time < 0x16C) {
-            n = D_L02_001BE200.time - 0x15C;
+        } else if (g_mob_list.time > third_end && g_mob_list.time < 0x16C) {
+            n = g_mob_list.time - 0x15C;
             id = 0x48;
             if (n > 0) {
                 frac = IntToFloat(n);
@@ -80,10 +80,10 @@ void func_PAL_L02_00302438(void *unused) {
         }
         if (id != -1) {
             if (id2 == -1 || id == id2) {
-                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                DrawQuadWithRotatedUVs(D_L02_001A9420, id, 0, (alpha << 24) | 0x808080, extra);
-                DrawQuadWithRotatedUVs(D_L02_001A9420, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

@@ -1,5 +1,5 @@
 #include "common.h"
-extern int D_L18_001B2348[] __attribute__((sda));
+extern int g_frame_l18_counter[] __attribute__((sda));
 extern u8 *g_moby_l18_table;
 extern u8 g_hero_position[];
 extern void vec_scale_to_length(void *,void *,float);
@@ -30,7 +30,7 @@ void sliding_l18_door_update(u8 *moby) {
   } else if(W(vars,0x68)>0) {
    qcopy_nc(moby+0x10,vars+0x40); W(vars,0x68)--;
   }
-  if(!(D_L18_001B2348[0]&15)) {
+  if(!(g_frame_l18_counter[0]&15)) {
    if(door_check_open_condition(moby,W(vars,0x70)!=-1?g_moby_l18_table+(W(vars,0x70)<<8)+0x10:g_hero_position))
     moby_set_state(moby,2,-1);
   }
@@ -40,7 +40,7 @@ void sliding_l18_door_update(u8 *moby) {
   if(W(vars,0x68)<W(vars,0x6c)) {
    FastVecAdd(moby+0x10,moby+0x10,vars+0x50); W(vars,0x68)++;
   }
-  if(!(D_L18_001B2348[0]&15)) {
+  if(!(g_frame_l18_counter[0]&15)) {
    if(door_check_close_condition(moby,W(vars,0x70)!=-1?g_moby_l18_table+(W(vars,0x70)<<8)+0x10:g_hero_position))
     moby_set_state(moby,1,-1);
   }

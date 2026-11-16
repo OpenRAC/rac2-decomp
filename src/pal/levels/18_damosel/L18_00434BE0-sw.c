@@ -13,26 +13,26 @@ extern void vec_clear_128(void *);
 extern void vec_add_random_offset(void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void protopet_launch_shot(void *, void *, void *);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int projectile_compute_flight_time(float, float, float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
 extern float math_fast_float_g(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
-extern float D_L18_001B1530 __attribute__((sda));
-extern float D_L18_001B1534 __attribute__((sda));
-extern float D_L18_001B1538 __attribute__((sda));
-extern float D_L18_001B153C __attribute__((sda));
-extern float D_L18_001B1540 __attribute__((sda));
-extern float D_L18_001B1544 __attribute__((sda));
-extern float D_L18_001B1548 __attribute__((sda));
-extern int D_L18_001B154C __attribute__((sda));
-extern float D_L18_001B1550 __attribute__((sda));
-extern int D_L18_001B1554 __attribute__((sda));
-extern float D_L18_001B1558 __attribute__((sda));
-extern float D_L18_001B155C __attribute__((sda));
-extern u8 D_L18_001B1560[16] __attribute__((sda));
+extern float g_leader_vertical_speed_max __attribute__((sda));
+extern float g_debris_angle_x_max_deg __attribute__((sda));
+extern float g_debris_angle_y_max_deg __attribute__((sda));
+extern float g_debris_launch_speed_z __attribute__((sda));
+extern float g_debris_velocity_jitter __attribute__((sda));
+extern float g_debris_vertical_speed_min __attribute__((sda));
+extern float g_debris_vertical_speed_max __attribute__((sda));
+extern int g_debris_angle_random_limit __attribute__((sda));
+extern float g_debris_wave_scale __attribute__((sda));
+extern int g_debris_wave_period __attribute__((sda));
+extern float g_debris_wave_amplitude __attribute__((sda));
+extern float g_debris_l18_gravity __attribute__((sda));
+extern u8 g_debris_spawn_offset[16] __attribute__((sda));
 typedef struct {
     float angles[4];
     int firstId,  secondId,  group;
@@ -78,15 +78,15 @@ void func_PAL_L18_00434BE0(u8 *a)
             object->rotation[1] = 0;
             zero = object->rotation[0];
             object->position[2] = s->restHeight;
-            s->verticalSpeed += math_random_float_range(zero, D_L18_001B1530 * 0.020000001f);
-            s->angles[0] = math_random_float_range(zero, D_L18_001B1534 * 0.0003490659f);
-            s->angles[1] = math_random_float_range(zero, D_L18_001B1538 * 0.0003490659f);
+            s->verticalSpeed += math_random_float_range(zero, g_leader_vertical_speed_max * 0.020000001f);
+            s->angles[0] = math_random_float_range(zero, g_debris_angle_x_max_deg * 0.0003490659f);
+            s->angles[1] = math_random_float_range(zero, g_debris_angle_y_max_deg * 0.0003490659f);
             object->position[2] = s->restHeight;
             PlayMobySound(0, 0, a);
         }
         if (object->position[2] >= s->restHeight) {
             object->position[2] += s->verticalSpeed;
-            s->verticalSpeed -= D_L18_001B155C * 0.00040000002f;
+            s->verticalSpeed -= g_debris_l18_gravity * 0.00040000002f;
             if (s->verticalSpeed > 0) {
                 object->rotation[0] = FastAddRotations(s->angles[0], object->rotation[0]);
                 object->rotation[1] = FastAddRotations(s->angles[1], object->rotation[1]);
@@ -113,28 +113,28 @@ void func_PAL_L18_00434BE0(u8 *a)
                 p = protopet_count_group(s->group, &count);
                 if (p) {
                     vec_clear_128(velocity);
-                    velocity[2] = D_L18_001B153C * 0.020000001f;
-                    vec_add_random_offset(velocity, D_L18_001B1540 * 0.020000001f);
-                    FastVecAdd(position, a + 0x10, D_L18_001B1560);
+                    velocity[2] = g_debris_launch_speed_z * 0.020000001f;
+                    vec_add_random_offset(velocity, g_debris_velocity_jitter * 0.020000001f);
+                    FastVecAdd(position, a + 0x10, g_debris_spawn_offset);
                     protopet_launch_shot(p, position, velocity);
                     *(u8 **)(p + 0xB8) = a;
                 }
             }
             if (i) {
-                func_PAL_L00_003FB330(a + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
+                SpawnExplosion_pal(a + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
                               1.0f, 20.0f, 1, 1, 0, 0);
                 PlayMobySound(0, 0, a);
-                s->verticalSpeed += math_random_float_range(D_L18_001B1544, D_L18_001B1548) * 0.020000001f;
+                s->verticalSpeed += math_random_float_range(g_debris_vertical_speed_min, g_debris_vertical_speed_max) * 0.020000001f;
                 duration = (float)projectile_compute_flight_time(object->position[2], s->restHeight,
-                                                   s->verticalSpeed, D_L18_001B155C * 0.00040000002f);
-                s->angles[0] = (float)math_random_int_below(D_L18_001B154C) * 6.28318548f / duration;
-                s->angles[1] = (float)math_random_int_below(D_L18_001B154C) * 6.28318548f / duration;
-                s->angles[2] = (float)math_random_int_below(D_L18_001B154C) * 6.28318548f / duration;
+                                                   s->verticalSpeed, g_debris_l18_gravity * 0.00040000002f);
+                s->angles[0] = (float)math_random_int_below(g_debris_angle_random_limit) * 6.28318548f / duration;
+                s->angles[1] = (float)math_random_int_below(g_debris_angle_random_limit) * 6.28318548f / duration;
+                s->angles[2] = (float)math_random_int_below(g_debris_angle_random_limit) * 6.28318548f / duration;
             }
         }
         if (object->position[2] >= s->restHeight) {
             object->position[2] += s->verticalSpeed;
-            s->verticalSpeed -= D_L18_001B155C * 0.00040000002f;
+            s->verticalSpeed -= g_debris_l18_gravity * 0.00040000002f;
             object->rotation[0] = FastAddRotations(s->angles[0], object->rotation[0]);
             object->rotation[1] = FastAddRotations(s->angles[1], object->rotation[1]);
             object->rotation[2] = FastAddRotations(s->angles[2], object->rotation[2]);
@@ -147,8 +147,8 @@ void func_PAL_L18_00434BE0(u8 *a)
             vec_clear_128(s);
             vec_clear_128(a + 0xF0);
             object->position[2] = s->restHeight;
-            s->period = IntToFloat(D_L18_001B1554);
-            s->amplitude = D_L18_001B1558;
+            s->period = IntToFloat(g_debris_wave_period);
+            s->amplitude = g_debris_wave_amplitude;
             PlayMobySound(0, 0, a);
         }
         if (s->amplitude >= 0.1f) {
@@ -156,8 +156,8 @@ void func_PAL_L18_00434BE0(u8 *a)
                 IntToFloat(object->timer) * 6.28318548f / s->period));
             object->rotation[1] = s->amplitude * math_fast_sin_or_cos_a(math_fast_float_g(
                 IntToFloat(object->timer) * 6.28318548f / s->period));
-            s->amplitude *= D_L18_001B1550;
-            s->period *= D_L18_001B1550;
+            s->amplitude *= g_debris_wave_scale;
+            s->period *= g_debris_wave_scale;
         } else {
             object->rotation[0] = object->rotation[1] = object->rotation[2] = 0.0f;
             moby_set_state(a, 5, -1);

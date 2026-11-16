@@ -19,15 +19,15 @@ typedef struct {
 typedef struct { unsigned char bytes[16]; } MenuCorners;
 
 extern MenuEntryState g_pause_menu_state;
-extern PreviewChoice D_0026CFD0[];
+extern PreviewChoice g_preview_choices[];
 extern unsigned int g_equipment_bits[] __attribute__((sda));
-extern int D_001ABA74 __attribute__((sda));
-extern int D_001ABA80 __attribute__((sda));
+extern int g_preview_selection __attribute__((sda));
+extern int g_ui_screen_height_param __attribute__((sda));
 extern int g_screen_width[] __attribute__((sda)), g_screen_height[] __attribute__((sda));
-extern float D_001B2688[] __attribute__((sda));
-extern MenuCorners D_001ABA78;
-extern char D_001ABC78[];
-extern char *D_001A8CFC[] __attribute__((sda));
+extern float g_ui_float_params[] __attribute__((sda));
+extern MenuCorners g_options_menu_corners;
+extern char g_str_scaled_object_format[];
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
@@ -49,12 +49,12 @@ extern void SetupGifPaging(int), DoGifPaging(void);
 
 static __inline__ void draw_logo(int id, int color, float zero)
 {
-    gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC[0] + 0x8710, id), color, (float)(g_screen_width[0] / 2), (float)(D_001ABA80 / 2), 1.0f, D_001B2688[0], zero);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, id), color, (float)(g_screen_width[0] / 2), (float)(g_ui_screen_height_param / 2), 1.0f, g_ui_float_params[0], zero);
 }
 
 int func_PAL_002D4EA0(void)
 {
-    MenuCorners corners = D_001ABA78;
+    MenuCorners corners = g_options_menu_corners;
     char text[32];
     int color = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
@@ -78,16 +78,16 @@ int func_PAL_002D4EA0(void)
     hud_draw_sprite(GetIconFrame(0xEAA8, 1), 402, 50, 89, 115, 64);
     text_draw_centered_medium(445, 116, 0x80F0F0F0ULL, GetLocalizedString(0x13DB), -1);
     text_draw_centered_medium(445, 134, 0x80F0F0F0ULL, GetLocalizedString(0x13DC), -1);
-    fmt = D_001ABC78;
+    fmt = g_str_scaled_object_format;
     sprintf(text, fmt, GetLocalizedString(0x13DC));
     text_draw_centered_small(159, 18, 0x80F0F0F0ULL, text, -1);
     text_draw_centered_medium(445, 187, 0x80F0F0F0ULL, GetLocalizedString(0xB60), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
-        index = D_001ABA74 - i;
+        index = g_preview_selection - i;
         if (index >= 0 && index < 12) {
             while (index >= 0) {
-                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
                     break;
                 index--;
                 i++;
@@ -100,10 +100,10 @@ int func_PAL_002D4EA0(void)
     }
     x = 291;
     for (i = 1; i < 12; i++) {
-        index = D_001ABA74 + i;
+        index = g_preview_selection + i;
         if (index >= 0 && index < 12) {
             while (index < 12) {
-                if ((g_equipment_bits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
                     break;
                 index++;
                 i++;

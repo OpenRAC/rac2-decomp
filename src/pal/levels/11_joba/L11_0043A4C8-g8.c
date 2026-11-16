@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L11_001A8FF4 __attribute__((sda));
-extern char D_L11_001BA8C0[];
+extern int g_hero_l11_input_blocked __attribute__((sda));
+extern char g_hero_l11_position[];
 extern int FloatToInt(float);
 extern float math_random_float_range(float,float);
 extern int math_random_int_below(int);
-extern void func_PAL_L11_0043BFF8(char *);
+extern void enemy_reset_to_idle_pal(char *);
 extern char *part_find_owned_effect_slot(char *,int,int);
 extern char *arena_get_center_point(int);
 extern void FastVecSub(float *,const float *,const float *);
@@ -26,7 +26,7 @@ extern void moby_update_ground_check(char *);
 #define F(p,t,o) (*(t *)((char *)(p)+(o)))
 
 /* Initializes the object, adjusts hit velocity, and keeps active movement near its target. */
-void func_PAL_L11_0043B8D0(char *p) {
+void flying_enemy_hit_and_init_pal(char *p) {
     char *s=F(p,char *,0x68), *hit;
     float v[4], angle, z;
     if (F(p,unsigned char,0x20)==0) {
@@ -53,7 +53,7 @@ void func_PAL_L11_0043B8D0(char *p) {
         F(s,float,0x130)=0.523598849773407f;
         F(s,float,0x12C)=0.004f;
         F(s,unsigned char,0x28)=3;
-        func_PAL_L11_0043BFF8(p);
+        enemy_reset_to_idle_pal(p);
     }
     if(F(p,unsigned char,0x95)>=2) {
         hit=part_find_owned_effect_slot(p,0x10000,1);
@@ -96,12 +96,12 @@ void func_PAL_L11_0043B8D0(char *p) {
             }
         }
     }
-    if(!F(s,short,0x286) && F(p,unsigned char,0x20)!=11 && !D_L11_001A8FF4) {
+    if(!F(s,short,0x286) && F(p,unsigned char,0x20)!=11 && !g_hero_l11_input_blocked) {
         F(p,unsigned short,0x34)|=0x400;
-        if(F(p,unsigned char,0x31) && fast_vec_dist(p+0x10,D_L11_001BA8C0)<24.0f) {
+        if(F(p,unsigned char,0x31) && fast_vec_dist(p+0x10,g_hero_l11_position)<24.0f) {
             moby_update_ground_check(p);
             F(p,unsigned char,0x6F)=22;
         }
     } else F(p,unsigned short,0x34)&=0xFBFF;
-    if(F(p,unsigned char,0x20)>=2 && F(s,unsigned char,0x2E)==2) func_PAL_L11_0043BFF8(p);
+    if(F(p,unsigned char,0x20)>=2 && F(s,unsigned char,0x2E)==2) enemy_reset_to_idle_pal(p);
 }

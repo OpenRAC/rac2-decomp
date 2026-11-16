@@ -22,8 +22,8 @@ typedef struct {
     int f24CC;
 } L01_003BBF68_HERO;
 extern L01_003BBF68_HERO g_hero_state;
-extern float D_L01_001AFE2C __attribute__((sda));
-extern float D_L01_001AFE28 __attribute__((sda));
+extern float g_grabber_field_value __attribute__((sda));
+extern float g_grabber_scale_factor __attribute__((sda));
 extern float moby_get_anim_value(void *);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
@@ -86,7 +86,7 @@ void hero_grabber_update(char *moby)
             if (*(unsigned char *)(moby + 0x43) != 2) anim_start_blended(moby, 2, 0, 6);
             if (g_hero_state.obj == moby && g_hero_state.active)
                 *(int *)(vars + 0x78) = queue_copy_record_by_index(5);
-            *(float *)(moby + 0x48) = D_L01_001AFE2C;
+            *(float *)(moby + 0x48) = g_grabber_field_value;
         }
         break;
     case 3:
@@ -150,7 +150,7 @@ void hero_grabber_update(char *moby)
         }
         break;
     }
-    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L01_001AFE28;
+    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * g_grabber_scale_factor;
     *(unsigned char *)(moby + 0xA8) = 255;
     *(float *)(vars + 0x74) = frame;
 }

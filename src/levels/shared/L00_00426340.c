@@ -2,10 +2,10 @@
 
 typedef int InitQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0xB0]; float scale; } PathView;
-extern PathView D_L00_001BD2C0;
-extern u8 *D_L00_001FDA80[];
+extern PathView g_hud_float_params;
+extern u8 *g_launch_path_table[];
 typedef struct { u8 pad[0x194]; InitQuad *transform; } PathCamera;
-extern PathCamera D_L00_001B8C80;
+extern PathCamera g_scalar_transition_state;
 extern float mat_fast_helper_a(float x, float y);
 extern void vec_clear_128(InitQuad *v);
 extern int hero_l00_set_action(int event, int value);
@@ -50,7 +50,7 @@ extern float math_blend_scalar_toward_target(float, float, float);
 extern float cubic_hermite_scalar(float, float, float, float, float);
 extern float math_step_spring_damper_clamped(char *, float, float, float, float, float);
 extern float math_step_spring_damper_stored(char *, float, float, float, float, float);
-extern float D_L00_001B8DD8;
+extern float g_camera_target_rotation;
 
 
 /* Measured child block reached at owner->sub + 0x40. */
@@ -133,17 +133,17 @@ extern void cam_build_basis_from_hero(char *);
 
 #define SDA_OBJ __attribute__((section(".sdata")))
 
-extern char *D_L00_001B1844 SDA_OBJ;
+extern char *g_camera_def_table SDA_OBJ;
 
 extern char *g_follow_camera_object;
 
-extern char D_L00_001ADD98[] SDA_OBJ;
+extern char g_cam_object_table_a[] SDA_OBJ;
 
-extern char D_L00_001ADD38[] SDA_OBJ;
+extern char g_cam_object_table_b[] SDA_OBJ;
 
-extern char D_L00_001ADD78[] SDA_OBJ;
+extern char g_cam_object_table_c[] SDA_OBJ;
 
-extern char D_L00_001ADD58[] SDA_OBJ;
+extern char g_cam_object_table_d[] SDA_OBJ;
 
 typedef struct Rac2Native_6af85cabb56d3b41_SmallConditional52Global {
     unsigned char unknown_00[0x2290];
@@ -215,7 +215,7 @@ void cam_reset_mode_state(char *camera)
     *(int *)(vars + 0x14) = 0;
     *(int *)(vars + 0x18) = 0;
     cam_build_basis_from_hero(camera);
-    entry = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+    entry = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 0x20 + 0x1C);
     *(short *)(entry + 0x26) = 0;
     *(short *)(camera + 0x7E) = 0;
 }
@@ -254,7 +254,7 @@ void cam_flag_entry_for_hero_mode(void)
     char *entry;
 
     if (mode == 4 || mode == 0x51) {
-        entry = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+        entry = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 0x20 + 0x1C);
         *(short *)(entry + 0x26) = 1;
     }
 }
@@ -396,7 +396,7 @@ void UpdateCameraTransition(char *object)
                    IntToFloat(*(int *)(transition + 4));
         cam_compute_direction_angles(saved + 0xE8, target, g_hero_position);
         x = fast_subtract_rotations(*(float *)(transition + 8), *(float *)(transition + 0x1C));
-        y = fast_subtract_rotations(*(float *)(target + 0x18), D_L00_001B8DD8);
+        y = fast_subtract_rotations(*(float *)(target + 0x18), g_camera_target_rotation);
         if ((x > 0.3490659f && y < -0.3490659f) ||
             (x < -0.3490659f && y > 0.3490659f)) {
             float zero = 0.0f;
@@ -657,7 +657,7 @@ int cam_is_hero_in_trigger(char *camera, char *unused)
 
 void InitPathMotion(u8 *object)
 {
-    PathConfig *data = *(PathConfig **)(D_L00_001B1844 + *(short *)(object + 0x84) * 32 + 0x1c);
+    PathConfig *data = *(PathConfig **)(g_camera_def_table + *(short *)(object + 0x84) * 32 + 0x1c);
     MotionPrefix *motion;
     u8 *pathState;
     float *weights = data->weights;
@@ -682,10 +682,10 @@ void InitPathMotion(u8 *object)
         }
     }
     accepted = 0;
-    *(float *)(pathState + 0x30) = mat_fast_helper_a(1.0f, D_L00_001BD2C0.scale) * 2.0f;
+    *(float *)(pathState + 0x30) = mat_fast_helper_a(1.0f, g_hud_float_params.scale) * 2.0f;
     if (data->initialized == 0 && data->pathIndex >= 0) {
         int i;
-        u8 *path = D_L00_001FDA80[data->pathIndex];
+        u8 *path = g_launch_path_table[data->pathIndex];
         for (i = 0; i < *(int *)path; i++) {
             float weight = *(float *)(path + (i << 4) + 0x1C);
             if (weight > 0.0f) {
@@ -705,7 +705,7 @@ void InitPathMotion(u8 *object)
         data->speed = (motion->distance / IntToFloat(data->duration)) * 60.0f;
     if (data->secondPathIndex >= 0) {
         int i;
-        u8 *path = D_L00_001FDA80[data->secondPathIndex];
+        u8 *path = g_launch_path_table[data->secondPathIndex];
         for (i = 0; i < *(int *)path; i++) {
             int byteOffset = i * 16;
             distance = fast_vec_dist((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
@@ -724,7 +724,7 @@ void InitPathMotion(u8 *object)
     *(float *)(saved + 0x24) = 0.2f;
     vec_clear_128((InitQuad *)(saved + 0x30));
     }
-    transform = D_L00_001B8C80.transform;
+    transform = g_scalar_transition_state.transform;
     qcopy(object + 0x30, transform + 3);
     qcopy(object, transform);
     qcopy(object + 0x10, transform + 1);
@@ -734,14 +734,14 @@ void InitPathMotion(u8 *object)
     data->initialized = 1;
 }
 
-extern int D_0018C0BC;
-extern int D_0018C0B4;
+extern int g_hero_mode;
+extern int g_game_mode;
 extern int cam_is_hero_in_trigger(char *, char *);
 
 /* Decides whether this camera should take over, stay as it is, or give up control. */
 int cam_decide_takeover(char *camera, char *other)
 {
-    char *entry = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+    char *entry = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 0x20 + 0x1C);
 
     if (*(unsigned char *)(entry + 0x39) != 0) {
         return -1;
@@ -756,10 +756,10 @@ int cam_decide_takeover(char *camera, char *other)
     if (cam_is_hero_in_trigger(camera, other) == 0) {
         return 0;
     }
-    if (*(int *)(entry + 0x48) >= 0 && D_0018C0BC != *(int *)(entry + 0x48)) {
+    if (*(int *)(entry + 0x48) >= 0 && g_hero_mode != *(int *)(entry + 0x48)) {
         return 0;
     }
-    if (*(int *)(entry + 0x44) >= 0 && D_0018C0B4 != *(int *)(entry + 0x44)) {
+    if (*(int *)(entry + 0x44) >= 0 && g_game_mode != *(int *)(entry + 0x44)) {
         return 0;
     }
     return 1;
@@ -774,7 +774,7 @@ void cam_mode_noop_d(void)
 
 /* func_L00_00429F68 is defined in L00_00429F68.c. */
 
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 
 extern int cam_test_trigger_volumes(char *);
 
@@ -787,12 +787,12 @@ extern void UpdateVolumeAimCamera(char *);
 /* Updates the camera entry and resets it when the trigger is no longer valid. */
 int cam_update_entry_reset(char *camera)
 {
-    char *entry = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+    char *entry = *(char **)(g_camera_def_table + *(short *)(camera + 0x84) * 0x20 + 0x1C);
 
     if (*(short *)(entry + 0x26) != 0) {
         return 0;
     }
-    if (D_L00_001A8F00 != 0) {
+    if (g_game_l00_mode != 0) {
         if (cam_test_trigger_volumes(camera) != 0) {
             *(short *)(entry + 0x26) = 0;
             *(int *)(entry + 0x20) = 0;
@@ -816,7 +816,7 @@ void cam_callback_noop_c(void) {}
 /* Resets the camera entry so it is no longer active. */
 void cam_reset_entry(int index)
 {
-    char *entry = *(char **)(D_L00_001B1844 + index * 0x20 + 0x1C);
+    char *entry = *(char **)(g_camera_def_table + index * 0x20 + 0x1C);
 
     *(short *)(entry + 0x26) = 0;
     *(int *)(entry + 0x20) = 0;
@@ -849,7 +849,7 @@ extern float r1_func_001F9B88(float);
 extern float r1_func_001FA888(int);
 extern int r1_func_001FA898(float);
 extern void r1_func_L01_002A2C90(int a, int b, int c, int d, int e);
-extern char D_00189003[];
+extern char g_reverb_box_data[];
 
 
 /* rac1-decomp src/overlays/shared/music_box_voices.c: func_L00_0042B038 */
@@ -858,7 +858,7 @@ void snd_update_reverb_box(char *moby) {
     float local_pos[4];
     float box_pos[4];
     unsigned char *sound_data = *(unsigned char **)(moby + 8);
-    r1_func_001F9BF0(local_pos, D_00189003 + 0xE9D, moby + 0x40);
+    r1_func_001F9BF0(local_pos, g_reverb_box_data + 0xE9D, moby + 0x40);
     local_pos[3] = 0;
     r1_func_001F9EC0(box_pos, local_pos, moby + 0x50);
     if (r1_func_001F9B88(box_pos[0]) <= 1.0f && r1_func_001F9B88(box_pos[1]) <= 1.0f && r1_func_001F9B88(box_pos[2]) <= 1.0f) {
@@ -884,7 +884,7 @@ void snd_update_reverb_box(char *moby) {
 char *cam_init_object_table_a(char *object)
 {
     object_init_base(object);
-    *(char **)(object + 0x30) = D_L00_001ADD98;
+    *(char **)(object + 0x30) = g_cam_object_table_a;
     return object;
 }
 
@@ -893,7 +893,7 @@ char *cam_init_object_table_a(char *object)
 char *cam_init_object_table_b(char *object)
 {
     object_init_base(object);
-    *(char **)(object + 0x30) = D_L00_001ADD38;
+    *(char **)(object + 0x30) = g_cam_object_table_b;
     return object;
 }
 
@@ -901,7 +901,7 @@ char *cam_init_object_table_b(char *object)
 char *cam_init_object_table_c(char *object)
 {
     object_init_base(object);
-    *(char **)(object + 0x30) = D_L00_001ADD78;
+    *(char **)(object + 0x30) = g_cam_object_table_c;
     return object;
 }
 
@@ -910,7 +910,7 @@ char *cam_init_object_table_c(char *object)
 char *cam_init_object_table_d(char *object)
 {
     object_init_base(object);
-    *(char **)(object + 0x30) = D_L00_001ADD58;
+    *(char **)(object + 0x30) = g_cam_object_table_d;
     return object;
 }
 

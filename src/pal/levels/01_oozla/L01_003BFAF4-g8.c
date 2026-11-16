@@ -23,8 +23,8 @@ typedef struct {
     int f24CC;
 } L01_003BBF68_HERO;
 extern L01_003BBF68_HERO g_hero_state;
-extern float D_L01_001AFE2C __attribute__((sda));
-extern float D_L01_001AFE28 __attribute__((sda));
+extern float g_grabber_field_value __attribute__((sda));
+extern float g_grabber_scale_factor __attribute__((sda));
 extern float moby_get_anim_value(void *);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
@@ -34,12 +34,12 @@ extern void slot_reset_active(int);
 extern int math_fast_float_d(void *);
 extern int PlayMobySound(int, int, void *);
 extern int math_random_int_below(int);
-extern void func_PAL_L00_002B3000(void);
+extern void hero_record_play_counters_pal(void);
 extern void part_init_effect_record(void *, void *, int, float);
 extern void QueueMobyImpact(int, void *);
 extern void hero_start_move_state_walk_or_run(int);
 extern s32 func_PAL_L01_002BEC60(int, int);
-extern void func_PAL_L00_002D2668(int, int, float);
+extern void set_hero_animation_pal(int, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_clamp_length(void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -86,7 +86,7 @@ void func_PAL_L01_003BFAF4(char *obj)
             if (*(unsigned char *)(obj + 0x43) != 2) func_PAL_002A7E68(obj, 2, 0, 5);
             if (g_hero_state.obj == obj && g_hero_state.active)
                 *(int *)(s + 0x78) = queue_copy_record_by_index(5);
-            *(float *)(obj + 0x48) = D_L01_001AFE2C;
+            *(float *)(obj + 0x48) = g_grabber_field_value;
         }
         break;
     case 3:
@@ -111,7 +111,7 @@ void func_PAL_L01_003BFAF4(char *obj)
         if (*(int *)(s + 0x68) && !math_random_int_below(11)) *(int *)(s + 0x78) = queue_copy_record_by_index(5);
         if (*(float *)(s + 0x74) < 46.0f && frame > 46.0f) {
             if (*(int *)(s + 0x68)) {
-                if (g_hero_state.f24CC < 2) func_PAL_L00_002B3000();
+                if (g_hero_state.f24CC < 2) hero_record_play_counters_pal();
                 else {
                     part_init_effect_record(scratch.query, obj, 1, (float)*(unsigned char *)(s + 0x34));
                     QueueMobyImpact(g_hero_state.query, scratch.query);
@@ -134,7 +134,7 @@ void func_PAL_L01_003BFAF4(char *obj)
         } else if (*(int *)(s + 0x68)) {
             if (g_hero_state.action != 111) {
                 func_PAL_L01_002BEC60(111, 1);
-                func_PAL_L00_002D2668(10, 0, 8.0f);
+                set_hero_animation_pal(10, 0, 8.0f);
             }
             g_hero_state.control = 2;
             qcopy(scratch.vec.pos, obj + 0x10);
@@ -150,7 +150,7 @@ void func_PAL_L01_003BFAF4(char *obj)
         }
         break;
     }
-    *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * D_L01_001AFE28;
+    *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * g_grabber_scale_factor;
     *(unsigned char *)(obj + 0xA8) = 255;
     *(float *)(s + 0x74) = frame;
 }

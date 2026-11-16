@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_L04_001AE440 __attribute__((sda));
+extern float g_menu_list_row_offset_x __attribute__((sda));
 
-extern float D_L04_001AE444;
+extern float g_menu_list_row_offset_y;
 
-extern float D_L04_001AE448 __attribute__((sda));
+extern float g_menu_list_row_height __attribute__((sda));
 
 extern void func_00335E38_5(void *, float, float, float, float);
 
@@ -22,8 +22,8 @@ void menu_list_draw_rows(int *menu)
         float *origin = (float *)menu[96];
         int labelId;
 
-        func_00335E38_5(menu + 76, origin[0] + D_L04_001AE440,
-                (origin[1] + D_L04_001AE444) + D_L04_001AE448 * (float)row, 0.0f, 0.0f);
+        func_00335E38_5(menu + 76, origin[0] + g_menu_list_row_offset_x,
+                (origin[1] + g_menu_list_row_offset_y) + g_menu_list_row_height * (float)row, 0.0f, 0.0f);
         if (row == 3)
             labelId = 0xEA9E;
         else

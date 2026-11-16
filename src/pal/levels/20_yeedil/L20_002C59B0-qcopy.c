@@ -2,11 +2,11 @@
 
 #include "common.h"
 extern u8 g_hero_state[];
-extern u8 D_L20_001B5600[], D_L20_001B5C00[];
-extern s32 D_L20_001A8F00[] __attribute__((sda));
+extern u8 g_anim_entry_buffer_low[], g_anim_entry_buffer_high[];
+extern s32 g_hero_vehicle_mode[] __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern char *moby_get_private_value_0(u8 *);
-extern void func_PAL_0029C0F0(s32, s32);
+extern void level_store_value_pair_pal(s32, s32);
 extern void hero_reset_speeds_and_vectors(void);
 extern void attachment_reset_all(void);
 extern void func_PAL_0028C778(u8 *);
@@ -25,7 +25,7 @@ extern s32 func_PAL_L20_002D7920(s32, s32);
    The state-1 block and the rest each take the hero block's address on their own: retail
    rebuilds it from the %hi kept in $s2.  D_L20_001A8F00 is declared as an sda array, as in
    the sibling, which gives retail's lui + lw into the same register. */
-void func_PAL_L20_002C59B0(s32 keep)
+void hero_exit_vehicle_mode_pal(s32 keep)
 {
     u8 *hero = g_hero_state;
     u8 *base;
@@ -56,7 +56,7 @@ void func_PAL_L20_002C59B0(s32 keep)
         qcopy((base + 0x80), (object + 0x10));
         qcopy((base + 0x90), (object + 0xF0));
         *(s32 *)(base + 0x24CC) = *(s16 *)(base + 0x24D4);
-        if (!keep) func_PAL_0029C0F0(0, 0);
+        if (!keep) level_store_value_pair_pal(0, 0);
         hero_reset_speeds_and_vectors();
         *(s16 *)(base + 0x34E) = 1;
         *(s32 *)(base + 0x3A4) &= ~1;
@@ -80,14 +80,14 @@ void func_PAL_L20_002C59B0(s32 keep)
     hero_clear_queued_anim();
     current = *(u8 **)(g_hero_state + 0x2290);
     if (current[0x42] != 255) {
-        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)D_L20_001B5600);
+        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)g_anim_entry_buffer_low);
         *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x58) = value;
     }
     current = *(u8 **)(g_hero_state + 0x2290);
-    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)D_L20_001B5C00);
+    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)g_anim_entry_buffer_high);
     *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x5C) = value;
     if (*(s32 *)(g_hero_state + 0x2294) != 0x61) goto reset;
-    switch (D_L20_001A8F00[0]) {
+    switch (g_hero_vehicle_mode[0]) {
     case 2:
     case 6:
         goto done;

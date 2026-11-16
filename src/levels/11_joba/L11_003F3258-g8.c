@@ -7,8 +7,8 @@ extern void vec_add_random_offset(float *, float), vec_scale_to_length(void *, c
 extern void FastVecAdd(void *, const void *, const void *);
 extern void *arena_get_center_point(void *);
 extern unsigned char g_hero_position[] NOT_SDA;
-extern float D_L11_001B0590[] SDATA(D_L11_001B0590);
-extern float D_L11_001B0558[] SDATA(D_L11_001B0558);
+extern float g_joba_beam_target_params[] SDATA(D_L11_001B0590);
+extern float g_joba_orbit_radius[] SDATA(D_L11_001B0558);
 
 /* Picks a new beam target point near the given point and pulls it toward the arena centre. Returns 1 when the point was already close enough. */
 int joba_beam_pick_target_point(char *object, float *from, float *to)
@@ -25,9 +25,9 @@ int joba_beam_pick_target_point(char *object, float *from, float *to)
     /* The subtraction writes all 16 bytes, preserving the initialized input W. */
     FastVecSub(delta, to, from);
     result = 0;
-    radius = D_L11_001B0590[0] + math_random_float_range(-D_L11_001B0590[1], D_L11_001B0590[1]);
+    radius = g_joba_beam_target_params[0] + math_random_float_range(-g_joba_beam_target_params[1], g_joba_beam_target_params[1]);
     if (radius * radius < vec_fast_helper_c(from, to)) {
-        vec_add_random_offset(delta, D_L11_001B0590[2]);
+        vec_add_random_offset(delta, g_joba_beam_target_params[2]);
         vec_scale_to_length(delta, delta, radius);
         FastVecAdd(to, from, delta);
     } else {
@@ -37,7 +37,7 @@ int joba_beam_pick_target_point(char *object, float *from, float *to)
     height = to[2];
     FastVecSub(radial, to, arena_get_center_point(*(void **)(object + 0xb8)));
     radial[2] = 0.0f;
-    vec_scale_to_length(radial, radial, D_L11_001B0558[0] - factor);
+    vec_scale_to_length(radial, radial, g_joba_orbit_radius[0] - factor);
     FastVecAdd(to, arena_get_center_point(*(void **)(object + 0xb8)), radial);
     to[2] = height;
     return result;

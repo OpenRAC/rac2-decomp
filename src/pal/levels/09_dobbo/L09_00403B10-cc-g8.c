@@ -12,17 +12,17 @@ typedef struct {
     char pad2c[0xC];
     float high;
 } DobboUpdateGate;
-extern DobboUpdateGate D_L09_001C9F80;
+extern DobboUpdateGate g_dobbo_limits;
 extern char g_sound_state[];
 extern char g_hero_state[];
-extern char D_L09_001A8F20[] __attribute__((sda));
-extern char *D_L09_001B11B4 __attribute__((sda));
-extern char *D_L09_001B11BC __attribute__((sda));
-extern int D_L09_001B2388[] __attribute__((sda));
-extern char D_L09_001BFE60[];
-extern char *D_L09_001C3EC0[];
-extern char *D_L09_001FE6C0[];
-extern void func_PAL_L09_00403220(char *);
+extern char g_default_particle_vec[] __attribute__((sda));
+extern char *g_patrol_drone_sound_primary __attribute__((sda));
+extern char *g_patrol_drone_sound_secondary __attribute__((sda));
+extern int g_frame_l09_counter[] __attribute__((sda));
+extern char g_collision_l09_hit_point[];
+extern char *g_impact_l09_moby_table[];
+extern char *g_path_l09_table[];
+extern void patrol_drone_init_pal(char *);
 extern void gfx_update_color_pulse_table(char *);
 extern void child_objects_draw(char *);
 extern void record_release_rebuild_effect(char *);
@@ -33,7 +33,7 @@ extern void func_PAL_L09_00403900(char *);
 extern int aim_update_at_target(char *, int);
 extern void sub_object_ramp_channels(char *);
 extern void path_move_moby_smooth(char *);
-extern void func_PAL_L09_00402A88(char *);
+extern void sub_object_update_turn_ramps_pal(char *);
 extern void moby_rebuild_frame_if_visible(char *);
 extern void gfx_queue_draw_callback(void (*)(char *), char *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
@@ -54,7 +54,7 @@ extern int path_push_point_away(int, void *, void *, float);
 extern int find_nearest_path_point(void *, void *, void *, void *, void *, int, float, float, float);
 extern int math_fast_helper_a(void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern float math_random_float_range(float, float);
@@ -67,7 +67,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_fabs(float);
 extern int FastDecTimer(void *);
 extern int coll_test_point(void *, int, void *, float);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
@@ -87,18 +87,18 @@ void func_PAL_L09_00403B10(char *obj)
 {
     float a[4], b[4], previous[4];
     char *data = P(obj, 0x68);
-    if (D_L09_001C9F80.active) {
-        if (F(obj, 0x18) < D_L09_001C9F80.low && D_L09_001C9F80.state == 1) return;
-        if (D_L09_001C9F80.low < F(obj, 0x18) && D_L09_001C9F80.state == 0) return;
-        if (D_L09_001C9F80.active == 2) {
-            if (D_L09_001C9F80.high < F(obj, 0x18) && D_L09_001C9F80.state == 1) return;
-            if (F(obj, 0x18) < D_L09_001C9F80.high && D_L09_001C9F80.state == 2) return;
+    if (g_dobbo_limits.active) {
+        if (F(obj, 0x18) < g_dobbo_limits.low && g_dobbo_limits.state == 1) return;
+        if (g_dobbo_limits.low < F(obj, 0x18) && g_dobbo_limits.state == 0) return;
+        if (g_dobbo_limits.active == 2) {
+            if (g_dobbo_limits.high < F(obj, 0x18) && g_dobbo_limits.state == 1) return;
+            if (F(obj, 0x18) < g_dobbo_limits.high && g_dobbo_limits.state == 2) return;
         }
     }
-    if (B(obj, 0x20) == 0) func_PAL_L09_00403220(obj);
+    if (B(obj, 0x20) == 0) patrol_drone_init_pal(obj);
     if (B(data, 0x2E) == 2) {
         I(data, 0x42C) = 0;
-        func_PAL_002A7650(obj, 0, 3);
+        SetDeathBits_pal(obj, 0, 3);
         moby_mark_spawned(obj);
         return;
     }
@@ -119,7 +119,7 @@ void func_PAL_L09_00403B10(char *obj)
             {
                 char *entry = (char *)((int)g_sound_state + I(data, 0x3F0) * 0x70);
                 if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                    I(data, 0x3F0) = PlayMobySound(D_L09_001B11B4, 4, obj);
+                    I(data, 0x3F0) = PlayMobySound(g_patrol_drone_sound_primary, 4, obj);
             }
             if (B(data, 0x440)) {
                 B(data, 0x440) = 0;
@@ -137,7 +137,7 @@ void func_PAL_L09_00403B10(char *obj)
                 {
                     char *entry = (char *)((int)g_sound_state + I(data, 0x3F0) * 0x70);
                     if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                        I(data, 0x3F0) = PlayMobySound(D_L09_001B11BC, 4, obj);
+                        I(data, 0x3F0) = PlayMobySound(g_patrol_drone_sound_secondary, 4, obj);
                 }
                 H(data, 0x412) = 500;
             }
@@ -146,7 +146,7 @@ void func_PAL_L09_00403B10(char *obj)
             live = aim_update_at_target(obj, 1);
             sub_object_ramp_channels(obj);
             path_move_moby_smooth(obj);
-            func_PAL_L09_00402A88(obj);
+            sub_object_update_turn_ramps_pal(obj);
             if (live) {
                 lerp_vector(a, data + 0x330, data + 0x370, 0.5f);
                 qcopy(b, data + 0x330);
@@ -154,7 +154,7 @@ void func_PAL_L09_00403B10(char *obj)
                 if (!count) count = coll_process_hit(b, 0, 0, 0, F(data, 0x434) * 0.9f);
                 if (count) {
                     for (i = 0; i < count; i++) {
-                        char *candidate = D_L09_001C3EC0[i];
+                        char *candidate = g_impact_l09_moby_table[i];
                         char *hero = g_hero_state;
                         if (candidate != P(hero, 0x2290)) {
                             int first = 0xCB;
@@ -165,7 +165,7 @@ void func_PAL_L09_00403B10(char *obj)
                         }
                         {
                             group_flag_peers(obj);
-                            candidate = D_L09_001C3EC0[i];
+                            candidate = g_impact_l09_moby_table[i];
                             P(data, 0x3AC) = candidate;
                             I(data, 0x44C) = H(candidate, 0xAA);
                             moby_set_state(obj, 3, -1);
@@ -182,10 +182,10 @@ void func_PAL_L09_00403B10(char *obj)
                             {
                                 char *entry = (char *)((int)g_sound_state + I(data, 0x3F0) * 0x70);
                                 if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                                    I(data, 0x3F0) = PlayMobySound(D_L09_001B11BC, 4, obj);
+                                    I(data, 0x3F0) = PlayMobySound(g_patrol_drone_sound_secondary, 4, obj);
                             }
                             H(data, 0x412) = 500;
-                            if (D_L09_001C3EC0[i] != P(hero, 0x2290)) break;
+                            if (g_impact_l09_moby_table[i] != P(hero, 0x2290)) break;
                         }
                     }
                 }
@@ -226,10 +226,10 @@ void func_PAL_L09_00403B10(char *obj)
                 a[2] += 0.5f;
                 qcopy(b, a);
                 b[2] -= 4.0f;
-                if (CollLine(a, b, 0x12, 0, 0)) qcopy(a, D_L09_001BFE60);
+                if (CollLine(a, b, 0x12, 0, 0)) qcopy(a, g_collision_l09_hit_point);
                 else a[2] -= 0.5f;
                 qcopy(previous, data + 0x390);
-                phase = IntToFloat(D_L09_001B2388[0]) + H(obj, 0xB2) * 36;
+                phase = IntToFloat(g_frame_l09_counter[0]) + H(obj, 0xB2) * 36;
                 angle1 = math_wrap_angle_to_pi(phase * 0.025f);
                 angle2 = math_wrap_angle_to_pi(phase * 0.016666668f);
                 step1 = math_fast_sin_or_cos_b(angle1) + 1.5f;
@@ -251,7 +251,7 @@ void func_PAL_L09_00403B10(char *obj)
                 if (replacement && B(replacement, 0x20) != 0xFE && B(replacement, 0x20) != 0xFD)
                     I(data, 0x44C) = H(replacement, 0xAA);
             }
-            find_nearest_path_point(D_L09_001FE6C0[I(data, 0x314)], data + 0x390, a,
+            find_nearest_path_point(g_path_l09_table[I(data, 0x314)], data + 0x390, a,
                              data + 0x324, data + 0x3EC, 1, 20.0f, 5.0f, 0.0f);
             path_move_moby_smooth(obj);
             qcopy(a, obj + 0x10);
@@ -264,7 +264,7 @@ void func_PAL_L09_00403B10(char *obj)
                 dst[1] = b[1];
                 dst[2] = b[2];
                 I(data, 0x42C) |= 8;
-                func_PAL_L09_00402A88(obj);
+                sub_object_update_turn_ramps_pal(obj);
             }
             if (I(data, 0x154) != 1) {
                 if (H(data, 0x412) == 0) {
@@ -282,7 +282,7 @@ void func_PAL_L09_00403B10(char *obj)
                     {
                         char *entry = (char *)((int)g_sound_state + I(data, 0x3F0) * 0x70);
                         if (P(entry, 0x88) != obj || !B(entry, 0x74))
-                            I(data, 0x3F0) = PlayMobySound(D_L09_001B11B4, 4, obj);
+                            I(data, 0x3F0) = PlayMobySound(g_patrol_drone_sound_primary, 4, obj);
                     }
                 }
             }
@@ -305,7 +305,7 @@ void func_PAL_L09_00403B10(char *obj)
                 }
             }
             I(data, 0x3F0) = -1;
-            func_PAL_002AC718(obj, data + 0x400, obj + 0x10, 0.0f, 0.0f, 5, 2, 4,
+            SpawnExplosionEffects_pal(obj, data + 0x400, obj + 0x10, 0.0f, 0.0f, 5, 2, 4,
                          4.0f, 2.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
             FastVecSub(a, obj + 0x10, (g_hero_state + 0x80));
             a[2] = 0.0f;
@@ -313,7 +313,7 @@ void func_PAL_L09_00403B10(char *obj)
             FastVecCross(b, g_hero_state + 0x2C0, a);
             math_apply_axis_rotation_to_quat(data + 0x400, a, g_hero_state + 0x2C0, math_random_signed_float_range(0.698131799697876f, 1.2217305898666382f));
             F(data, 0x408) = math_random_float_range(0.120000005f,0.24000001f);
-            func_PAL_002B15D8(obj, 3.0f, 0x7F, 6.0f, 3.0f, D_L09_001A8F20, 6.0f, 0xFF);
+            func_PAL_002B15D8(obj, 3.0f, 0x7F, 6.0f, 3.0f, g_default_particle_vec, 6.0f, 0xFF);
             F(obj, 0x2C) *= 0.1f;
             F(data, 0x280) = 1e+01f;
             F(data, 0x414) = math_random_signed_float_range(0.0f, 0.087266475f);
@@ -343,13 +343,13 @@ void func_PAL_L09_00403B10(char *obj)
                 return;
             }
             if (FastDecTimer(data + 0x410) || coll_test_point(obj + 0x10, 0, obj, 0.5f)) {
-                func_PAL_002AC718(obj, data + 0x400, obj + 0x10, 2.0f, 1.0f, 5, 2, 4,
+                SpawnExplosionEffects_pal(obj, data + 0x400, obj + 0x10, 2.0f, 1.0f, 5, 2, 4,
                              2.0f, 1.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
-                func_PAL_002A7650(obj, 0, 3);
+                SetDeathBits_pal(obj, 0, 3);
                 moby_mark_spawned(obj);
                 return;
             }
-            part_spawn_trailing_spark(obj + 0x10, D_L09_001A8F20, 0x4F007FFF, 0x1FFFFFFF,
+            part_spawn_trailing_spark(obj + 0x10, g_default_particle_vec, 0x4F007FFF, 0x1FFFFFFF,
                          math_random_int_range(8, 17), 1, 60000.0f);
             for (i = -2; i < 0; i++) {
                 int spin = math_random_int_below(6);
@@ -361,7 +361,7 @@ void func_PAL_L09_00403B10(char *obj)
                 colour = math_random_int_range(0x30, 0xFF);
                 tint = (colour << 8) | 0x60000000;
                 colour = colour | ((colour << 16) | tint);
-                particle = func_PAL_002BE9A8(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, D_L09_001A8F20,
+                particle = func_PAL_002BE9A8(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, g_default_particle_vec,
                                        energy, colour, 0);
                 if (particle) {
                     char *extra = particle + 0x20;

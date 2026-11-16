@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-extern f32  D_L03_001B0340 __attribute__((sda));
+extern f32  g_fan_rotation_rate __attribute__((sda));
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern s32  func_31BA30(s32 a0, s32 a1);
 extern s32  func_31B9F0(s32 a0);
@@ -24,7 +24,7 @@ void fan_l03_update(char *moby)
         break;
     case 1:
         *(f32 *)(moby + 0xF8) = func_2F0000(*(f32 *)(moby + 0xF8),
-            D_L03_001B0340 * 0.000290888245f * (f32)(*(u8 *)(moby + 0xBC) - 15));
+            g_fan_rotation_rate * 0.000290888245f * (f32)(*(u8 *)(moby + 0xBC) - 15));
         break;
     }
 }
@@ -40,8 +40,8 @@ extern void func_32AA20(char *a0, char *a1);
 extern f32  func_2EF670(f32 a0, f32 a1);
 extern f32  func_2EF110(f32 *a0);
 
-extern f32 D_L03_001B0350[] SDATA(D_L03_001B0350);
-extern f32 D_L03_001B0648 __attribute__((sda));
+extern f32 g_fan_float_table[] SDATA(D_L03_001B0350);
+extern f32 g_trail_projectile_scale __attribute__((sda));
 
 /* case 0 makes the object opaque and moves it to state 1; case 1 scrolls the three
    offsets in its vars by the table's rates per frame (wrapping below -1) and queues
@@ -60,7 +60,7 @@ void UpdateThreeScrollOffsets(char *moby)
         break;
     case 1: {
         f32 *dst = (f32 *)vars;
-        f32 *src = &D_L03_001B0350[0];
+        f32 *src = &g_fan_float_table[0];
         s32 i;
 
         for (i = 2; i >= 0; i--) {
@@ -105,8 +105,8 @@ typedef struct {
 /* The object pointer is small data (the retail reaches it through $gp in
    ordinary flow, not only in a delay slot), the state word is not: the retail
    reads it with an absolute lui/%lo pair and clears it from a delay slot. */
-extern L03_003D21F8_Obj *D_L03_001B0670 __attribute__((sda));
-extern u32 D_L03_001B3458;
+extern L03_003D21F8_Obj *g_camera_override_slot __attribute__((sda));
+extern u32 g_shared_record_pending;
 extern void *cam_alloc_override_slot(s32 size);
 
 extern void FastVecSub(void *, void *, void *);
@@ -117,10 +117,10 @@ extern s32  flag_is_third_pending_set(char *a0);
 extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
 extern void snd_stop_voice(s32 a0);
 extern void moby_set_state_in_list(int a0, int a1);
-extern u8  *D_L03_001B2A1C;
+extern u8  *g_moby_record_base;
 extern u8   g_sound_state[];
-extern s32  D_L03_001B0438 __attribute__((sda));
-extern f32  D_L03_001B043C __attribute__((sda));
+extern s32  g_ant_bridge_divisor __attribute__((sda));
+extern f32  g_ant_bridge_angle_limit __attribute__((sda));
 
 /* The actor's per-frame update: state 0 spawns it and aims, state 2 looks the
    target up, states 3 and 4 turn it by a rate that decays; every other state
@@ -138,7 +138,7 @@ void ant_bridge_update(char *moby)
         if (*(s32 *)(vars + 0x70) != -1) {
             moby_set_state(self, 2, -1);
             offset = vars + 0x60;
-            FastVecSub(offset, D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10, self + 0x10);
+            FastVecSub(offset, g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100 + 0x10, self + 0x10);
             *(s32 *)(vars + 0x7C) = -1;
             *(s32 *)(vars + 0x78) = 0;
             matrix_from_basis_rows(buf, self + 0xC0);
@@ -150,7 +150,7 @@ void ant_bridge_update(char *moby)
     case 2: {
         char *sound_slot;
 
-        if (flag_is_third_pending_set(D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100) == 0) {
+        if (flag_is_third_pending_set(g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100) == 0) {
             break;
         }
         sound_slot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
@@ -168,7 +168,7 @@ void ant_bridge_update(char *moby)
         f32 rate;
 
         *(f32 *)(vars + 0x74) = *(f32 *)(vars + 0x74)
-            + (*(f32 *)(self + 0xF4) / (f32)D_L03_001B0438 + 9.69627508e-05f);
+            + (*(f32 *)(self + 0xF4) / (f32)g_ant_bridge_divisor + 9.69627508e-05f);
         angle = *(f32 *)(self + 0xF4) + *(f32 *)(vars + 0x74);
         *(f32 *)(self + 0xF4) = angle;
         if (1.69646013f < angle) {
@@ -192,7 +192,7 @@ void ant_bridge_update(char *moby)
                 moby_set_state(self, 5, -1);
             }
         }
-        anchor_pos = D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
+        anchor_pos = g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
         matrix_mul_vec3(anchor_pos, vars + 0x60, self + 0xC0);
         FastVecAdd(anchor_pos, anchor_pos, self + 0x10);
         break;
@@ -202,9 +202,9 @@ void ant_bridge_update(char *moby)
         f32 angle;
         f32 rate;
 
-        limit = D_L03_001B043C * 3.14159274f;
+        limit = g_ant_bridge_angle_limit * 3.14159274f;
         *(f32 *)(vars + 0x74) = *(f32 *)(vars + 0x74)
-            + (*(f32 *)(self + 0xF4) / (f32)D_L03_001B0438 + 9.69627508e-05f);
+            + (*(f32 *)(self + 0xF4) / (f32)g_ant_bridge_divisor + 9.69627508e-05f);
         angle = *(f32 *)(self + 0xF4) + *(f32 *)(vars + 0x74);
         *(f32 *)(self + 0xF4) = angle;
         if (limit < angle) {
@@ -231,39 +231,39 @@ void shared_record_reset_update(char *moby)
 
     switch (*(u8 *)(self + 0x20)) {
     case 0:
-        D_L03_001B0670 = cam_alloc_override_slot(4);
+        g_camera_override_slot = cam_alloc_override_slot(4);
         moby_set_state(self, 1, -1);
         *(u8 *)(self + 0x30) = 0xFF;
         break;
     case 1: {
-        u32 pending = D_L03_001B3458;
+        u32 pending = g_shared_record_pending;
 
         if (pending == 0) {
-            D_L03_001B0670->f00 = -1.0f;
-            D_L03_001B0670->f04 = -1.0f;
-            D_L03_001B0670->f08 = -1.0f;
-            D_L03_001B0670->f0C = -1.0f;
-            D_L03_001B0670->f10 = -1.0f;
-            D_L03_001B0670->f14 = -1.0f;
-            D_L03_001B0670->b18 = 0;
-            D_L03_001B0670->b19 = 0;
-            D_L03_001B0670->h1A = 0;
-            D_L03_001B0670->b1E = 0;
-            D_L03_001B0670->b1F = 0;
-            D_L03_001B0670->h30 = 0;
-            D_L03_001B0670->i34 = 6;
-            D_L03_001B0670->h32 = 120;
+            g_camera_override_slot->f00 = -1.0f;
+            g_camera_override_slot->f04 = -1.0f;
+            g_camera_override_slot->f08 = -1.0f;
+            g_camera_override_slot->f0C = -1.0f;
+            g_camera_override_slot->f10 = -1.0f;
+            g_camera_override_slot->f14 = -1.0f;
+            g_camera_override_slot->b18 = 0;
+            g_camera_override_slot->b19 = 0;
+            g_camera_override_slot->h1A = 0;
+            g_camera_override_slot->b1E = 0;
+            g_camera_override_slot->b1F = 0;
+            g_camera_override_slot->h30 = 0;
+            g_camera_override_slot->i34 = 6;
+            g_camera_override_slot->h32 = 120;
         } else {
-            D_L03_001B3458 = 0;
+            g_shared_record_pending = 0;
         }
         break;
     }
     }
 }
 
-extern s32  D_L03_001B0674 __attribute__((sda));
+extern s32  g_camera_trigger_active __attribute__((sda));
 extern char g_hero_position[];
-extern char D_L03_001B9980[];
+extern char g_camera_pose_buffer[];
 
 typedef struct {
     s32 index;
@@ -278,7 +278,7 @@ typedef struct {
     u8 pad04[0xC];
 } L03_22C8Entry;
 
-extern L03_22C8Entry *D_L03_001FE700[];
+extern L03_22C8Entry *g_path_l03_entry_table[];
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void moby_mark_spawned(char *a0);
 extern s32  point_in_path_xy(char *a0, void *a1, u32 a2);
@@ -306,7 +306,7 @@ void camera_trigger_area_update(char *moby)
     f32 one;
     f32 turn_rate;
 
-    if (D_L03_001B0674 != 0) {
+    if (g_camera_trigger_active != 0) {
         return;
     }
     switch (*(u8 *)(moby + 0x20)) {
@@ -317,8 +317,8 @@ void camera_trigger_area_update(char *moby)
         }
         break;
     case 1:
-        if (point_in_path_xy(g_hero_position, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) != 0) {
-            SetCamera5Pose(D_L03_001B9980, D_L03_001B9980 + 0x10, 1, 0, 0);
+        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[vars->index] + 0x10), g_path_l03_entry_table[vars->index]->field00) != 0) {
+            SetCamera5Pose(g_camera_pose_buffer, g_camera_pose_buffer + 0x10, 1, 0, 0);
             moby_set_state(moby, 2, -1);
         }
         break;
@@ -326,17 +326,17 @@ void camera_trigger_area_update(char *moby)
         follow_rate = 0.0027777778450399637f;
         cam_compute_aim_and_angles(moby, target_pos, target_angles);
         one = 1.0f;
-        FastVecSub(offset, target_pos, D_L03_001B9980);
+        FastVecSub(offset, target_pos, g_camera_pose_buffer);
         turn_rate = 0.0008726647356525064f;
         len = FastVecLength(offset);
         math_approach_target_with_braking(&vars->f18, len, follow_rate, follow_rate, one);
         vec_scale_to_length(offset, offset, vars->f18);
-        FastVecAdd(D_L03_001B9980, offset, D_L03_001B9980);
-        object_copy_vector_to_selected(D_L03_001B9980);
-        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x14, &vars->f1C, target_angles[1], turn_rate, turn_rate, one, 0);
-        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x18, &vars->f20, target_angles[2], turn_rate, turn_rate, one, 0);
-        cam_set_state_rotation(D_L03_001B9980 + 0x10);
-        if (point_in_path_xy(g_hero_position, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) == 0) {
+        FastVecAdd(g_camera_pose_buffer, offset, g_camera_pose_buffer);
+        object_copy_vector_to_selected(g_camera_pose_buffer);
+        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x14, &vars->f1C, target_angles[1], turn_rate, turn_rate, one, 0);
+        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x18, &vars->f20, target_angles[2], turn_rate, turn_rate, one, 0);
+        cam_set_state_rotation(g_camera_pose_buffer + 0x10);
+        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[vars->index] + 0x10), g_path_l03_entry_table[vars->index]->field00) == 0) {
             cam_set_mode_state(1);
             moby_set_state(moby, 1, -1);
         }

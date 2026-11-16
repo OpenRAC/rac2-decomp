@@ -1,9 +1,10 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_0018C0B4;
+extern int g_game_mode;
 
 int func_US2_L00_002D6C98(void) {
-    int value = D_0018C0B4;
+    int value = g_game_mode;
     int result = 0;
 
     if (value <= 100) {

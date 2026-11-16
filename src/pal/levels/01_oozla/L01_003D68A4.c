@@ -21,9 +21,9 @@ extern PoolRecord64 *cam_alloc_override_slot(int);
 extern void cam_end_override(unsigned char *);
 extern unsigned char *moby_l01_spawn_child(unsigned char *, LaunchVector *, LaunchVector *, int, int);
 extern unsigned char *g_moby_l01_table __attribute__((sda));
-extern unsigned char *D_L01_001B264C __attribute__((sda));
-extern char D_L01_001B0548[], D_L01_001B0580[];
-extern int D_L01_00297BF0[];
+extern unsigned char *g_swamp_patrol_positions __attribute__((sda));
+extern char g_str_launcher_debug_format[], g_str_launcher_debug_format_alt[];
+extern int g_launcher_command_table[];
 extern unsigned char g_hero_position[];
 typedef struct { int delay, startId, endId, unused; int first[2], second[2]; int p20, p24, timer, duration; short selection, mode; PoolRecord64 *pool; int event, command; } LaunchState;
 #define FIELD(o) (*(int *)(data + (o)))
@@ -41,11 +41,11 @@ void func_PAL_L01_003D6A78(unsigned char *self)
         POOL = 0;
         for (i = 0; i < 2; i++) {
             if (state->first[i] == -1) {
-                STUB_printf(D_L01_001B0548, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                STUB_printf(g_str_launcher_debug_format, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
                 moby_set_state(self, 4, -1);
             }
             if (state->second[i] == -1) {
-                STUB_printf(D_L01_001B0580, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
+                STUB_printf(g_str_launcher_debug_format_alt, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
                 moby_set_state(self, 4, -1);
             }
         }
@@ -63,14 +63,14 @@ void func_PAL_L01_003D6A78(unsigned char *self)
         break;
     case 2:
         if (math_fast_float_d((int *)(data + 0x28))) {
-            command = D_L01_00297BF0[FIELD(0x3c)];
+            command = g_launcher_command_table[FIELD(0x3c)];
             switch (command) {
             case 0: HALF(0x30) = 0; HALF(0x32) = 0; break;
             case 1: HALF(0x30) = 1; HALF(0x32) = 1; break;
             case 2: HALF(0x32) = 1; HALF(0x30) = 0; break;
             }
             {
-                unsigned char *base = D_L01_001B264C;
+                unsigned char *base = g_swamp_patrol_positions;
                 int index;
                 int selection = HALF(0x30);
                 FIELD(0x3c)++;

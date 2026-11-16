@@ -17,7 +17,7 @@ typedef struct {
     float age;
 } L04_DomeVars;
 
-extern int D_L04_001B2008 MACRO_ADDR;
+extern int g_game_tick_counter MACRO_ADDR;
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 extern float math_fast_sin_or_cos_a(float);
@@ -45,7 +45,7 @@ void func_PAL_L04_00400108(unsigned char *m)
     union { QuadWord q; float f[4]; } rotation;
     L04_DomeVars *p = *(L04_DomeVars **)(m + 0x68);
     float radius = p->radius * p->age;
-    float phase = fast_fmod(IntToFloat(D_L04_001B2008), 25.333334f) * (1.0f / 25.333334f);
+    float phase = fast_fmod(IntToFloat(g_game_tick_counter), 25.333334f) * (1.0f / 25.333334f);
     int i, j, k, l;
 
     rotation.q = *(QuadWord *)(m + 0xF0);

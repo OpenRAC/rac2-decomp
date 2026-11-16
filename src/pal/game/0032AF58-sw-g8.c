@@ -5,7 +5,7 @@ typedef int EffectVector __attribute__((mode(TI)));
 typedef struct { char pad[0x10]; EffectVector position; } EffectObject;
 typedef struct { char pad[0x24]; int kind; char *object; char pad2[0x3C]; int active; } EffectWorld;
 extern EffectWorld g_music_state;
-extern float D_001B0228 SDATA(D_001B0228);
+extern float g_falling_chunk_random_range SDATA(D_001B0228);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(float *, float *, float);
@@ -18,10 +18,10 @@ extern int math_random_int_range(int, int);
 extern char *func_PAL_002C84A8(void *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern int moby_place_at_collision_point_mirror(void *, void *);
-extern void func_PAL_0032B730(void *);
+extern void hero_check_under_falling_object_pal(void *);
 extern void part_spawn_ground_impact_effect(void *);
 extern int SampleSurfaceHeightMap(void *, void *, float, float, float);
-extern void func_PAL_0032B650(void *);
+extern void part_emit_spark_burst_pal(void *);
 extern int PlayMobySound(int, int, void *);
 extern void *func_PAL_002C0428(void *, void *, float, float);
 extern int math_fast_float_d(void *);
@@ -29,7 +29,7 @@ extern void moby_mark_spawned(void *);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_PAL_0032B920(void);
 
-void func_PAL_0032AF58(char *self)
+void falling_chunk_update_pal(char *self)
 {
     float old[4] __attribute__((aligned(16)));
     float hit[4], zero[4], random[4];
@@ -58,15 +58,15 @@ void func_PAL_0032AF58(char *self)
         coll_get_ground_height_at_position(self + 0x10, hit);
         vec_clear_128(zero);
         for (i=7;i>=0;i--) {
-            random[0]=math_random_signed_float_range(0, D_001B0228);
-            random[1]=math_random_signed_float_range(0, D_001B0228);
-            random[2]=math_random_signed_float_range(0, D_001B0228);
+            random[0]=math_random_signed_float_range(0, g_falling_chunk_random_range);
+            random[1]=math_random_signed_float_range(0, g_falling_chunk_random_range);
+            random[2]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             FastVecAdd(random, random, self + 0x10);
             func_PAL_002C84A8(random, state, math_random_int_range(20, 40));
         }
         fast_vec_dist(old, self + 0x10);
         if (moby_place_at_collision_point_mirror(self, old)) {
-            func_PAL_0032B730(self);
+            hero_check_under_falling_object_pal(self);
             if (*(int *)(state + 0x38)==2) self[0x20]=2;
             else {
                 if (*(int *)(state + 0x38)) {
@@ -75,7 +75,7 @@ void func_PAL_0032AF58(char *self)
                     part_spawn_ground_impact_effect(velocity);
                     *(float *)(self + 0x18)-=1;
                     SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
-                    if (!*(int *)(state + 0x44)) func_PAL_0032B650(self);
+                    if (!*(int *)(state + 0x44)) part_emit_spark_burst_pal(self);
                 }
                 self[0x20]=3;
                 *(int *)(state + 0x34)=67;
@@ -88,7 +88,7 @@ void func_PAL_0032AF58(char *self)
         *(float *)(state + 8)-=0.0044f;
         *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
         *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        func_PAL_0032B730(self);
+        hero_check_under_falling_object_pal(self);
         if (*(int *)(state + 0x38)==1) {
             PlayMobySound(0, 0, self);
             self[0x20]=3;
@@ -98,7 +98,7 @@ void func_PAL_0032AF58(char *self)
             part_spawn_ground_impact_effect(position);
             *(float *)(self + 0x18)-=1;
             SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
-            if (!*(int *)(state + 0x44)) func_PAL_0032B650(self);
+            if (!*(int *)(state + 0x44)) part_emit_spark_burst_pal(self);
         }
         break;
     case 3: {

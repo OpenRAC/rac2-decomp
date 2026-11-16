@@ -3,21 +3,21 @@
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
 
-extern float D_L04_001AE540 __attribute__((sda));
+extern float g_grid_menu_first_offset_x __attribute__((sda));
 
-extern float D_L04_001AE548 __attribute__((sda));
+extern float g_grid_menu_second_offset_x __attribute__((sda));
 
-extern float D_L04_001AE550 __attribute__((sda));
+extern float g_grid_menu_third_offset_x __attribute__((sda));
 
-extern float D_L04_001AE558 __attribute__((sda));
+extern float g_grid_menu_fourth_offset_x __attribute__((sda));
 
-extern float D_L04_001AE544;
+extern float g_grid_menu_first_offset_y;
 
-extern float D_L04_001AE54C;
+extern float g_grid_menu_second_offset_y;
 
-extern float D_L04_001AE554;
+extern float g_grid_menu_third_offset_y;
 
-extern float D_L04_001AE55C;
+extern float g_grid_menu_fourth_offset_y;
 
 struct pos54dfe946 {
     float x;
@@ -29,14 +29,14 @@ void grid_menu_reposition_widgets(char *menu)
 {
     float zero = 0.0f;
 
-    object_set_first_float4(menu + 808, D_L04_001AE540 + (*(struct pos54dfe946 **)(menu + 1072))->x,
-            D_L04_001AE544 + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    object_set_first_float4(menu + 880, D_L04_001AE548 + (*(struct pos54dfe946 **)(menu + 1072))->x,
-            D_L04_001AE54C + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    object_set_first_float4(menu + 952, D_L04_001AE550 + (*(struct pos54dfe946 **)(menu + 1072))->x,
-            D_L04_001AE554 + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
-    object_set_first_float4(menu + 736, D_L04_001AE558 + (*(struct pos54dfe946 **)(menu + 1072))->x,
-            D_L04_001AE55C + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
+    object_set_first_float4(menu + 808, g_grid_menu_first_offset_x + (*(struct pos54dfe946 **)(menu + 1072))->x,
+            g_grid_menu_first_offset_y + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
+    object_set_first_float4(menu + 880, g_grid_menu_second_offset_x + (*(struct pos54dfe946 **)(menu + 1072))->x,
+            g_grid_menu_second_offset_y + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
+    object_set_first_float4(menu + 952, g_grid_menu_third_offset_x + (*(struct pos54dfe946 **)(menu + 1072))->x,
+            g_grid_menu_third_offset_y + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
+    object_set_first_float4(menu + 736, g_grid_menu_fourth_offset_x + (*(struct pos54dfe946 **)(menu + 1072))->x,
+            g_grid_menu_fourth_offset_y + (*(struct pos54dfe946 **)(menu + 1072))->y, zero, zero);
 }
 
 /* These four fill func_00337210's 23-word descriptor, defaults first. f[21] defaults to 1
@@ -44,14 +44,14 @@ void grid_menu_reposition_widgets(char *menu)
    store; here the store is dead and goes, and the later f[22] = 1 reuses its register. */
 extern void DrawItemGrid(int *);
 
-extern char D_0025E328[];
-extern int D_001AE304 __attribute__((sda));
-extern int D_001AE308 __attribute__((sda));
-extern int D_001AE310 __attribute__((sda));
-extern int D_001AE318 __attribute__((sda));
-extern int D_001AE320 __attribute__((sda));
-extern int D_001AE328 __attribute__((sda));
-extern int D_001AE330 __attribute__((sda));
+extern char g_help_pending_entries[];
+extern int g_item_grid_third_mode_desc_a __attribute__((sda));
+extern int g_item_grid_third_mode_desc_b __attribute__((sda));
+extern int g_item_grid_third_mode_desc_c __attribute__((sda));
+extern int g_item_grid_third_mode_desc_d __attribute__((sda));
+extern int g_item_grid_third_mode_desc_e __attribute__((sda));
+extern int g_item_grid_third_mode_desc_f __attribute__((sda));
+extern int g_item_grid_third_mode_desc_g __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the third mode of the menu and draws it. */
 void item_grid_draw_third_mode(char *menu)
@@ -69,31 +69,31 @@ void item_grid_draw_third_mode(char *menu)
     f[21] = *(int *)(menu + 0x448) == 2;
     f[3] = *(int *)(menu + 0x43C);
     f[4] = *(int *)(menu + 0x440);
-    f[9] = (int)&D_001AE330;
-    f[1] = D_001AE304;
-    f[2] = D_001AE308;
-    f[0] = (int)D_0025E328;
+    f[9] = (int)&g_item_grid_third_mode_desc_g;
+    f[1] = g_item_grid_third_mode_desc_a;
+    f[2] = g_item_grid_third_mode_desc_b;
+    f[0] = (int)g_help_pending_entries;
     f[17] = (int)(menu + 0x210);
     f[10] = (int)(menu + 0x130);
     f[12] = (int)(menu + 0x17C);
     f[15] = (int)(menu + 0x258);
     f[18] = *(int *)(menu + 0x430);
-    f[8] = (int)&D_001AE328;
-    f[7] = (int)&D_001AE320;
-    f[6] = (int)&D_001AE318;
-    f[5] = (int)&D_001AE310;
+    f[8] = (int)&g_item_grid_third_mode_desc_f;
+    f[7] = (int)&g_item_grid_third_mode_desc_e;
+    f[6] = (int)&g_item_grid_third_mode_desc_d;
+    f[5] = (int)&g_item_grid_third_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
-extern char D_001AA830[];
-extern int D_001AE338 __attribute__((sda));
-extern int D_001AE33C __attribute__((sda));
-extern int D_001AE340 __attribute__((sda));
-extern int D_001AE348 __attribute__((sda));
-extern int D_001AE350 __attribute__((sda));
-extern int D_001AE358 __attribute__((sda));
-extern int D_001AE360 __attribute__((sda));
+extern char g_item_grid_second_mode_desc[];
+extern int g_item_grid_second_mode_desc_a __attribute__((sda));
+extern int g_item_grid_second_mode_desc_b __attribute__((sda));
+extern int g_item_grid_second_mode_desc_c __attribute__((sda));
+extern int g_item_grid_second_mode_desc_d __attribute__((sda));
+extern int g_item_grid_second_mode_desc_e __attribute__((sda));
+extern int g_item_grid_second_mode_desc_f __attribute__((sda));
+extern int g_item_grid_second_mode_desc_g __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the second mode of the menu and draws it. */
 void item_grid_draw_second_mode(char *menu)
@@ -111,31 +111,31 @@ void item_grid_draw_second_mode(char *menu)
     f[21] = *(int *)(menu + 0x448) == 1;
     f[3] = *(int *)(menu + 0x43C);
     f[4] = *(int *)(menu + 0x440);
-    f[9] = (int)&D_001AE360;
-    f[1] = D_001AE338;
-    f[2] = D_001AE33C;
-    f[0] = (int)D_001AA830;
+    f[9] = (int)&g_item_grid_second_mode_desc_g;
+    f[1] = g_item_grid_second_mode_desc_a;
+    f[2] = g_item_grid_second_mode_desc_b;
+    f[0] = (int)g_item_grid_second_mode_desc;
     f[17] = (int)(menu + 0x210);
     f[10] = (int)(menu + 0x130);
     f[12] = (int)(menu + 0x17C);
     f[15] = (int)(menu + 0x258);
     f[18] = *(int *)(menu + 0x430);
-    f[8] = (int)&D_001AE358;
-    f[7] = (int)&D_001AE350;
-    f[6] = (int)&D_001AE348;
-    f[5] = (int)&D_001AE340;
+    f[8] = (int)&g_item_grid_second_mode_desc_f;
+    f[7] = (int)&g_item_grid_second_mode_desc_e;
+    f[6] = (int)&g_item_grid_second_mode_desc_d;
+    f[5] = (int)&g_item_grid_second_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
-extern char D_001AA870[];
-extern int D_001AE368 __attribute__((sda));
-extern int D_001AE36C __attribute__((sda));
-extern int D_001AE370 __attribute__((sda));
-extern int D_001AE378 __attribute__((sda));
-extern int D_001AE380 __attribute__((sda));
-extern int D_001AE388 __attribute__((sda));
-extern int D_001AE390 __attribute__((sda));
+extern char g_item_grid_fourth_mode_desc[];
+extern int g_item_grid_fourth_mode_desc_a __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_b __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_c __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_d __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_e __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_f __attribute__((sda));
+extern int g_item_grid_fourth_mode_desc_g __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the fourth mode of the menu and draws it. */
 void item_grid_draw_fourth_mode(char *menu)
@@ -153,31 +153,31 @@ void item_grid_draw_fourth_mode(char *menu)
     f[21] = *(int *)(menu + 0x448) == 3;
     f[3] = *(int *)(menu + 0x43C);
     f[4] = *(int *)(menu + 0x440);
-    f[9] = (int)&D_001AE390;
-    f[1] = D_001AE368;
-    f[2] = D_001AE36C;
-    f[0] = (int)D_001AA870;
+    f[9] = (int)&g_item_grid_fourth_mode_desc_g;
+    f[1] = g_item_grid_fourth_mode_desc_a;
+    f[2] = g_item_grid_fourth_mode_desc_b;
+    f[0] = (int)g_item_grid_fourth_mode_desc;
     f[17] = (int)(menu + 0x210);
     f[10] = (int)(menu + 0x130);
     f[12] = (int)(menu + 0x17C);
     f[15] = (int)(menu + 0x258);
     f[18] = *(int *)(menu + 0x430);
-    f[8] = (int)&D_001AE388;
-    f[7] = (int)&D_001AE380;
-    f[6] = (int)&D_001AE378;
-    f[5] = (int)&D_001AE370;
+    f[8] = (int)&g_item_grid_fourth_mode_desc_f;
+    f[7] = (int)&g_item_grid_fourth_mode_desc_e;
+    f[6] = (int)&g_item_grid_fourth_mode_desc_d;
+    f[5] = (int)&g_item_grid_fourth_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
-extern char D_001AA810[];
-extern int D_001AE398 __attribute__((sda));
-extern int D_001AE39C __attribute__((sda));
-extern int D_001AE3A0 __attribute__((sda));
-extern int D_001AE3A8 __attribute__((sda));
-extern int D_001AE3B0 __attribute__((sda));
-extern int D_001AE3B8 __attribute__((sda));
-extern int D_001AE3C0 __attribute__((sda));
+extern char g_grid_menu_selection_rows[];
+extern int g_item_grid_first_mode_desc_a __attribute__((sda));
+extern int g_item_grid_first_mode_desc_b __attribute__((sda));
+extern int g_item_grid_first_mode_desc_c __attribute__((sda));
+extern int g_item_grid_first_mode_desc_d __attribute__((sda));
+extern int g_item_grid_first_mode_desc_e __attribute__((sda));
+extern int g_item_grid_first_mode_desc_f __attribute__((sda));
+extern int g_item_grid_first_mode_desc_g __attribute__((sda));
 
 /* Fills in the drawing settings for the item grid in the first mode of the menu and draws it. */
 void item_grid_draw_first_mode(char *menu)
@@ -195,19 +195,19 @@ void item_grid_draw_first_mode(char *menu)
     f[21] = *(int *)(menu + 0x448) == 0;
     f[3] = *(int *)(menu + 0x43C);
     f[4] = *(int *)(menu + 0x440);
-    f[9] = (int)&D_001AE3C0;
-    f[1] = D_001AE398;
-    f[2] = D_001AE39C;
-    f[0] = (int)D_001AA810;
+    f[9] = (int)&g_item_grid_first_mode_desc_g;
+    f[1] = g_item_grid_first_mode_desc_a;
+    f[2] = g_item_grid_first_mode_desc_b;
+    f[0] = (int)g_grid_menu_selection_rows;
     f[17] = (int)(menu + 0x210);
     f[10] = (int)(menu + 0x130);
     f[12] = (int)(menu + 0x17C);
     f[15] = (int)(menu + 0x258);
     f[18] = *(int *)(menu + 0x430);
-    f[8] = (int)&D_001AE3B8;
-    f[7] = (int)&D_001AE3B0;
-    f[6] = (int)&D_001AE3A8;
-    f[5] = (int)&D_001AE3A0;
+    f[8] = (int)&g_item_grid_first_mode_desc_f;
+    f[7] = (int)&g_item_grid_first_mode_desc_e;
+    f[6] = (int)&g_item_grid_first_mode_desc_d;
+    f[5] = (int)&g_item_grid_first_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }

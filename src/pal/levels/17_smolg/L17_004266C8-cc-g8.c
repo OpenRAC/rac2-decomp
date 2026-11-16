@@ -8,7 +8,7 @@ extern int FloatToInt(f32);
 
 extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 
-extern f32 D_L17_001B04B8 __attribute__((sda));
+extern f32 g_effect_spawner_seconds __attribute__((sda));
 
 extern void moby_set_state(void *, s32, s32);
 
@@ -20,13 +20,13 @@ extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32,
 
 extern void moby_mark_spawned(void *);
 
-extern s32 D_L17_001B1E00 __attribute__((sda));
+extern s32 g_hit_burst_piece_param __attribute__((sda));
 
-extern s32 D_L17_001B1DE0 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_c __attribute__((sda));
 
-extern s32 D_L17_001B1DD8 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_b __attribute__((sda));
 
-extern s32 D_L17_001B1DD0 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 
 /* Counts the record's own timer down once, then hands the sub-object's four packed
    colour bytes and the measured scale to the level's own setter. */
@@ -131,10 +131,10 @@ typedef struct {
     s32 i450;
 } L17Vars;
 
-extern float D_L17_001B0CA8 __attribute__((sda));
-extern u8 D_L17_001B0CB8[4] __attribute__((sda));
-extern u8 D_L17_001B9BC0[];
-extern char D_L17_001B0CC8[]; /* "returned null\n" */
+extern float g_grulch_frame_scalar __attribute__((sda));
+extern u8 g_grulch_init_bytes[4] __attribute__((sda));
+extern u8 g_tether_origin_pos[];
+extern char g_str_returned_null[]; /* "returned null\n" */
 extern u8 *g_hero_moby NOT_SDA;
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void MoveCtl_Init(void *);
@@ -171,15 +171,15 @@ extern L17Player g_hero_state;
 
 /* The level's save record: one collected flag per object id from 0x464. */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } L17SaveState;
-extern L17SaveState D_L17_0021EBB0;
+extern L17SaveState g_level_l17_save_state;
 
 /* The current level, read with the lw macro: absolute in ordinary flow, $gp in a
    delay slot. */
 extern s32 g_current_map_index MACRO_ADDR;
 /* Per-level save nibbles, 0x400 bytes a level, two object ids a byte. */
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 /* Per-level object flags, 16 bytes a level. */
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 
 /* Paths: a count, then 16-byte points from 0x10. */
 extern u8 *g_path_l17_table[];
@@ -227,7 +227,7 @@ typedef struct { u8 header[0x10]; f32 x, y, z, w; } L17PathPoint;
    targets it in state 0 or, with the trigger set, the flag becomes set. Activating sets
    the lit colour, plays sound 0 (from state 1 only) and clears the w of every point of
    its path that equals the marker. */
-void func_PAL_L17_004266C8(u8 *obj)
+void switch_l17_update_pal(u8 *obj)
 {
     L17SwitchVars *vars = *(L17SwitchVars **)(obj + 0x68);
     s32 shade;
@@ -239,7 +239,7 @@ void func_PAL_L17_004266C8(u8 *obj)
         vars->phase = math_random_angle();
         level = g_current_map_index;
         *(f32 *)(obj + 0x18) -= 0.35f;
-        if (D_0019B2E8[obj[0xB0] + level * 16] & 0x80) {
+        if (g_moby_group_flags[obj[0xB0] + level * 16] & 0x80) {
             obj[0xBC] = 2;
             *(u32 *)(obj + 0x78) = 0x80208020;
             obj[0x20] = 2;
@@ -268,7 +268,7 @@ void func_PAL_L17_004266C8(u8 *obj)
             *(u32 *)(obj + 0x78) = ((shade << 16) | green) | shade;
         }
         if ((g_hero_state.target == obj && !g_hero_state.state)
-            || (vars->trigger && (D_0019B2E8[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
+            || (vars->trigger && (g_moby_group_flags[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
             obj[0x20] = 2;
             obj[0xBC] = 1;
             *(u32 *)(obj + 0x78) = 0x80208020;

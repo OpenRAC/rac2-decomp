@@ -2,13 +2,13 @@
 
 #include "common.h"
 extern float FastDiffRots(float, float);
-extern int func_PAL_002B5E30(u8 *, float);
-extern int func_PAL_002B5E10(u8 *);
+extern int moby_step_at_own_position_factor_pal(u8 *, float);
+extern int moby_step_at_own_position_pal(u8 *);
 extern float math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
 extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
                               float, float);
-extern int func_PAL_002B5C98(u8 *, void *, float);
-extern int func_PAL_002B5BA8(u8 *, void *, float);
+extern int moby_step_controller_pal(u8 *, void *, float);
+extern int moby_turn_toward_target_and_step_pal(u8 *, void *, float);
 #define W(p, o) (*(int *)((p) + (o)))
 #define H(p, o) (*(s16 *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
@@ -30,17 +30,17 @@ void func_PAL_L18_004370E8(u8 *a) {
     case 10: case 11: case 12: case 13: case 14: case 15:
         if (H(s, 0x808) == 1) {
             if (FastDiffRots(F(s, 0x7A4), F(a, 0xF8)) > 0.6108652949333191f) {
-                func_PAL_002B5E30(a, F(s, 0x7A4));
+                moby_step_at_own_position_factor_pal(a, F(s, 0x7A4));
             } else {
                 if (P(s, 0x7C0))
                     math_approach_target_with_direction_mode(P(s, 0x7C0) + 0xF8, F(s, 0x7A4), s + 0x7CC,
                                   0.010053098f, 0.010053098f,
                                   0.25132746f, 0);
-                func_PAL_002B5E10(a);
+                moby_step_at_own_position_pal(a);
             }
         } else {
-            if (H(s, 0x808) == 2) func_PAL_002B5E30(a, F(s, 0x7A4));
-            else func_PAL_002B5E10(a);
+            if (H(s, 0x808) == 2) moby_step_at_own_position_factor_pal(a, F(s, 0x7A4));
+            else moby_step_at_own_position_pal(a);
             if (P(s, 0x7C0))
                 math_approach_target_with_direction_mode(P(s, 0x7C0) + 0xF8, F(a, 0xF8), s + 0x7CC,
                               0.010053098f, 0.010053098f,
@@ -51,9 +51,9 @@ void func_PAL_L18_004370E8(u8 *a) {
         if (W(s, 0x7D4) != -1) {
             ComputeRegionRouteHeading(a + 0x10, s + 0x750, s + 0x7DC, s + 0x210, W(s, 0x780),
                               s + 0x78C, s + 0x7D8, 0.0f, 0.4f);
-            func_PAL_002B5C98(a, s + 0x750, F(s, 0x7DC));
+            moby_step_controller_pal(a, s + 0x750, F(s, 0x7DC));
         } else {
-            func_PAL_002B5BA8(a, s + 0x750, F(s, 0x7A0));
+            moby_turn_toward_target_and_step_pal(a, s + 0x750, F(s, 0x7A0));
         }
         if (P(s, 0x7C0)) {
             if (H(s, 0x808) == 1 &&

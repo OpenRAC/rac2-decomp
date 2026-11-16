@@ -2,28 +2,28 @@
 
 #include "common.h"
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 extern char g_hero_position[];
 extern void FastVecSub(f32 *, const f32 *, const f32 *);
 extern void vec_transform_and_set_height(char *, char *, char *, char *, f32);
 extern void vec_scale_to_length(f32 *, f32 *, f32);
 extern void func_PAL_002B15D8(void *, s32, void *, f32, f32, f32, f32, s32);
-extern s32 *D_L12_001FEAC0[];
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
+extern s32 *g_path_zone_table[];
 extern s32 CollLine(void *from, void *to, s32 mode, void *self, s32 flags);
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern char g_hero_position[];
 extern f32 math_fabs(f32);
 extern f32 vec_distance_xy(void *, void *);
 extern s32 math_random_int_range(s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
-extern s32 D_L12_001B20C0 __attribute__((sda));
-extern u8 D_001395DB;
+extern s32 g_spark_timer_min __attribute__((sda));
+extern u8 g_zone_event_flag;
 extern s32 math_random_int_below(s32);
 extern s32 FloatToInt(f32);
 extern u8 *SpawnSpinningSparkParticle(void *, f32, f32, f32, s32, void *, f32, u32, s32);
 
-void func_PAL_L12_00423C50(u8 *a0) {
+void linked_moby_trigger_burst_pal(u8 *a0) {
     u8 *self = a0;
     f32 buf[4];
     u16 f;
@@ -35,13 +35,13 @@ void func_PAL_L12_00423C50(u8 *a0) {
 
     f = *(u16 *)(self + 0xB2);
     if (f & 1) {
-        u8 *p = (u8 *)(((s16)f >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *p = (u8 *)(((s16)f >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 c = *p;
 
         if (((c >> 4) & 7) != 7)
             *p = c + 0x10;
     } else {
-        u8 *p = (u8 *)(((s16)f >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *p = (u8 *)(((s16)f >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 c = *p;
 
         if ((c & 7) != 7)

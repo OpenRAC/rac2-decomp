@@ -1,11 +1,11 @@
 #include "common.h"
 extern char *D_L20_001B2F9C_1 __attribute__((sda));
 
-extern float D_L20_001B2ACC __attribute__((sda));
+extern float g_burst_trigger_progress __attribute__((sda));
 
 /* Retail materializes this vector address independently for the two effect
  * constructors. The two symbol views preserve those separate lifetimes. */
-extern char D_L20_001A8F20[];
+extern char g_effect_color_table[];
 extern char D_L20_001A8F20_1[];
 
 extern void *part_find_owned_effect_slot(char *, int, int);
@@ -76,8 +76,8 @@ void triggered_l20_burst_update(char *moby_arg) {
         zero = 0.0f;
         size = 3.0f;
         vec_local_offset_to_world(moby, (char *)effect_pos, zero, zero, size);
-        if (*(u8 *)(moby + 0x31) != 0 && D_L20_001B2ACC < 0.9f) {
-            SpawnExplosionEffects(moby, D_L20_001A8F20, effect_pos, zero, zero, 10, 3, 16,
+        if (*(u8 *)(moby + 0x31) != 0 && g_burst_trigger_progress < 0.9f) {
+            SpawnExplosionEffects(moby, g_effect_color_table, effect_pos, zero, zero, 10, 3, 16,
                           1.0f, 0.5f, 9.0f, *(f32 *)(moby + 0x2C) * 1.3f, -1, 15.0f,
                           0, 1, -1, 0, 0);
             part_spawn_masked_debris(moby, 1, (float *)D_L20_001A8F20_1, size, 6.0f, size, 6.0f, 0xFF);

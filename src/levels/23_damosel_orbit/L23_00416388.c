@@ -221,9 +221,9 @@ void mothership_relatch_second_measure(char *moby, float *newMeasure) {
 /* func_L23_0041C7D8 is matched in L23_00416388-g8.c */
 
 /* The same table and counters func_L23_0041CCC0 clears below, declared the same way. */
-extern s32 D_L23_001B3744 __attribute__((sda));
+extern s32 g_effect_pool_total __attribute__((sda));
 
-extern s32 D_L23_001B3738[3] __attribute__((sda));
+extern s32 g_effect_pool_counts[3] __attribute__((sda));
 
 extern s32 g_effect_pools[3][60];
 
@@ -273,8 +273,8 @@ s32 part_spawn_effect_in_free_slot(char *obj, TI128 *pos, s32 type, s32 effectAr
         }
         slot = (char *)g_effect_pools[type][i];
         if (slot != 0) {
-            D_L23_001B3744++;
-            D_L23_001B3738[type]++;
+            g_effect_pool_total++;
+            g_effect_pool_counts[type]++;
             *(TI128 *)(slot + 0x10) = *(TI128 *)saved;
         }
     }
@@ -285,11 +285,11 @@ s32 part_spawn_effect_in_free_slot(char *obj, TI128 *pos, s32 type, s32 effectAr
 
 /* The two sda declarations give retail's bare-symbol forms in this -G0 unit: the store through
  * $at and the unsplit address pair of the small array. */
-extern s32 D_L23_001B3744 __attribute__((sda));
+extern s32 g_effect_pool_total __attribute__((sda));
 
-extern s32 D_L23_001B3738[3] __attribute__((sda));
+extern s32 g_effect_pool_counts[3] __attribute__((sda));
 
-extern s32 D_L23_001B1FA0[4];
+extern s32 g_effect_pool_limits[4];
 
 extern s32 g_effect_pools[3][60];
 
@@ -301,19 +301,19 @@ void part_reset_effect_pools(char *moby) {
     char *state = *(char **)(moby + 0x68);
     s32 i, j;
 
-    D_L23_001B3744 = 0;
+    g_effect_pool_total = 0;
     for (i = 0; i < 3; i++) {
         s32 *row;
 
-        D_L23_001B3738[i] = 0;
+        g_effect_pool_counts[i] = 0;
         row = g_effect_pools[i];
         for (j = 0x31; j >= 0; j--)
             row[j] = 0;
     }
-    D_L23_001B1FA0[3] = *(s16 *)(state + 0x2FE);
-    D_L23_001B1FA0[2] = *(s16 *)(state + 0x2FA);
-    D_L23_001B1FA0[0] = 0;
-    D_L23_001B1FA0[1] = 0;
+    g_effect_pool_limits[3] = *(s16 *)(state + 0x2FE);
+    g_effect_pool_limits[2] = *(s16 *)(state + 0x2FA);
+    g_effect_pool_limits[0] = 0;
+    g_effect_pool_limits[1] = 0;
 }
 
 /* func_L23_0041CD58 is matched in L23_0041CD58-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */

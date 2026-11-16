@@ -28,7 +28,7 @@
 #define NULL 0
 #endif
 
-extern struct Gl { s32 w0; s32 w1; s32 w2; } D_0018A160;
+extern struct Gl { s32 w0; s32 w1; s32 w2; } g_controller_active;
 extern s32 ref_L17_003C5B68_00 __attribute__((sda));
 
 /* Tells whether a ride platform can start moving now. Returns 1 for a class 0x920 platform, or
@@ -43,7 +43,7 @@ s32 ride_platform_can_start(void *moby) {
     s32 trigger_state;
     void *trigger;
 
-    if (D_0018A160.w0 == 0) {
+    if (g_controller_active.w0 == 0) {
         return 0;
     }
     class_id = (*(s16 *)((char *)(moby) + (0xAA)));

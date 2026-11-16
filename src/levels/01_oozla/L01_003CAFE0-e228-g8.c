@@ -5,7 +5,7 @@ extern void anim_start_blended(void *,int,int,int);
 extern u8 *D_L01_001B255C_base[] __asm__("D_L01_001B255C") __attribute__((sda));
 extern void swamp_monster_init_linked_body_part(u8 *);
 extern void swamp_monster_spawn_splash(u8 *, int, int, int);
-extern u8 *D_L01_001FE180[];
+extern u8 *g_path_l01_table[];
 extern int math_random_int_below(int);
 extern void script_queue_keyed_request(int,int);
 extern void moby_set_state(u8 *,int,int);
@@ -95,10 +95,10 @@ void swamp_monster_eye_update(u8 *moby)
         break;
     case 6:
         FastVecAdd(offset,moby+0x10,state+0x90);
-        if (point_in_path_xy(offset,D_L01_001FE180[*(int *)(state+0xA8)]+0x10,*(int *)D_L01_001FE180[*(int *)(state+0xA8)]))
+        if (point_in_path_xy(offset,g_path_l01_table[*(int *)(state+0xA8)]+0x10,*(int *)g_path_l01_table[*(int *)(state+0xA8)]))
             qcopy(moby+0x10,offset);
         else {
-            math_closest_point_on_polygon_edge(moby+0x10,offset,D_L01_001FE180[*(int *)(state+0xA8)]+0x10,*(int *)D_L01_001FE180[*(int *)(state+0xA8)]);
+            math_closest_point_on_polygon_edge(moby+0x10,offset,g_path_l01_table[*(int *)(state+0xA8)]+0x10,*(int *)g_path_l01_table[*(int *)(state+0xA8)]);
             FastVecSub(step,state+0x60,moby+0x10);
             vec_scale_to_length(step,step,0.033333335f);
             FastVecAdd(moby+0x10,moby+0x10,step);

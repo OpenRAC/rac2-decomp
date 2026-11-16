@@ -16,7 +16,7 @@ extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
 extern int func_0029C5D0(int);
 
-int func_US2_002D43B0(void)
+int menu_page_update_pass_message_us2(void)
 {
     int flags = g_pad_state.flags;
     int result = 0;

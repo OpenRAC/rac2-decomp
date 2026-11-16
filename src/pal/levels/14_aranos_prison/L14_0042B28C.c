@@ -3,7 +3,7 @@
 
 /* func_PAL_L14_0042BC18, the PAL copy of func_L14_004265B8: the same C, where the fade length 0x7D
    becomes 0x68 and both timers take the 50 Hz scale, the fade timer first. */
-extern char *D_L14_001B268C __attribute__((sda));
+extern char *g_platform_projection_table __attribute__((sda));
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
 typedef int PrisonQword __attribute__((mode(TI)));
 typedef struct {
@@ -42,31 +42,31 @@ typedef struct {
     int target;                 /* 0x98 */
 } PrisonLiftEntity;
 
-extern int D_L14_001FF4A4;
-extern char D_L14_001B17A0[];
-extern u8 D_0019B2E8[];
+extern int g_lift_l14_scene_flag;
+extern char g_lift_module_handler_arg[];
+extern u8 g_moby_group_flags[];
 extern char g_hero_position[];
 extern u8 g_hero_state[];
 extern int g_current_map_index __attribute__((sda));
-extern int D_001A7A00 __attribute__((sda));
-extern int D_001A8F00 __attribute__((sda));
-extern int D_L14_001A8FB0 __attribute__((sda));
-extern int D_L14_001A8FB4 __attribute__((sda));
+extern int g_player_stats __attribute__((sda));
+extern int g_hero_mode_state __attribute__((sda));
+extern int g_lift_scene_mode __attribute__((sda));
+extern int g_lift_scene_count __attribute__((sda));
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
-extern unsigned char D_001A7B30[] __attribute__((sda));
-extern short D_001A63F0[];
-extern int D_00138324;
-extern u8 D_001395E1;
+extern unsigned char g_help_unlocked_flags[] __attribute__((sda));
+extern short g_current_music_id[];
+extern int g_pad_held_flags;
+extern u8 g_lift_scene_flag;
 
 extern int IsPointInCuboid(void *, int);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void moby_activate_group_entities(void *);
 extern void moby_set_flag_bit(void *, int);
 extern int level_l00_call_module_handler_with_arg_10(int, int);
 extern int flag_set_first_pending(void *);
-extern void func_PAL_L00_002B2958(int, int, void *);
+extern void SetHeroMode_pal(int, int, void *);
 extern void script_queue_keyed_request(int, int);
-extern void func_PAL_L14_0042C4E8(void *);
+extern void part_update_slot_triggered_record_pal(void *);
 extern int guard_is_defeated(void *);
 extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(void *, void *);
@@ -93,17 +93,17 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
     case 0:
         moby[0x30] = 0xFF;
         state->fadeLength = 0x68;
-        if (D_0019B2E8[state->text5C + g_current_map_index * 16] & 0x80) {
+        if (g_moby_group_flags[state->text5C + g_current_map_index * 16] & 0x80) {
             if (IsPointInCuboid(g_hero_position, state->enterTrigger)) {
-                func_PAL_L00_002B9CD8(D_L14_001B268C + state->doorCamera * 128 + 0x30,
-                                  D_L14_001B268C + state->doorCamera * 128 + 0x70, 0, 1);
+                hero_reset_position_and_direction_pal(g_platform_projection_table + state->doorCamera * 128 + 0x30,
+                                  g_platform_projection_table + state->doorCamera * 128 + 0x70, 0, 1);
                 *(short *)(g_hero_position + 0x247C) = 0;
                 g_item_owned_flags[2] = 1;
-                D_001A7B30[2] = 1;
+                g_help_unlocked_flags[2] = 1;
                 g_item_owned_flags[3] = 1;
-                D_001A7B30[3] = 1;
+                g_help_unlocked_flags[3] = 1;
             }
-            if (D_0019B2E8[state->zone60 + g_current_map_index * 16] & 0x80) {
+            if (g_moby_group_flags[state->zone60 + g_current_map_index * 16] & 0x80) {
                 moby_activate_group_entities(moby);
                 moby_set_flag_bit(g_moby_l14_pool + state->door * 256, 1);
             }
@@ -111,18 +111,18 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
         } else {
             *(short *)(g_hero_position + 0x247C) = 1;
             g_item_owned_flags[2] = 0;
-            D_001A7B30[2] = 0;
+            g_help_unlocked_flags[2] = 0;
             g_item_owned_flags[3] = 0;
-            D_001A7B30[3] = 0;
-            if (D_0019B2E8[state->text58 + g_current_map_index * 16] & 0x80) {
+            g_help_unlocked_flags[3] = 0;
+            if (g_moby_group_flags[state->text58 + g_current_map_index * 16] & 0x80) {
                 moby_activate_group_entities(moby);
                 moby_set_state(moby, 5, -1);
-            } else if (D_0019B2E8[state->text64 + g_current_map_index * 16] & 0x80) {
+            } else if (g_moby_group_flags[state->text64 + g_current_map_index * 16] & 0x80) {
                 moby_activate_group_entities(moby);
                 moby_set_state(moby, 4, -1);
-            } else if (D_0019B2E8[state->text54 + g_current_map_index * 16] & 0x80) {
+            } else if (g_moby_group_flags[state->text54 + g_current_map_index * 16] & 0x80) {
                 moby_set_state(moby, 3, -1);
-            } else if (D_L14_001FF4A4 != 0) {
+            } else if (g_lift_l14_scene_flag != 0) {
                 moby_set_state(moby, 1, -1);
             } else {
                 moby_set_state(moby, 2, -1);
@@ -131,24 +131,24 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
         break;
     case 1:
         if (IsPointInCuboid(g_hero_position, state->enterTrigger)) {
-            level_l00_call_module_handler_with_arg_10((int)D_L14_001B17A0, 1);
-            D_L14_001A8FB0 = 2;
-            D_L14_001A8FB4 = 8;
-            if (D_00138324 & 0x10)
+            level_l00_call_module_handler_with_arg_10((int)g_lift_module_handler_arg, 1);
+            g_lift_scene_mode = 2;
+            g_lift_scene_count = 8;
+            if (g_pad_held_flags & 0x10)
                 moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
         if (flag_set_first_pending(moby)) {
             unsigned char *liftNow = g_moby_l14_pool + state->lift * 256;
-            func_PAL_L00_002B9CD8(liftNow + 0x10, liftNow + 0xF0, 0x6F, 1);
-            func_PAL_L00_002B2958(1, 0x3F, liftNow);
-            if (D_001A63F0[0] != state->music7C)
+            hero_reset_position_and_direction_pal(liftNow + 0x10, liftNow + 0xF0, 0x6F, 1);
+            SetHeroMode_pal(1, 0x3F, liftNow);
+            if (g_current_music_id[0] != state->music7C)
                 script_queue_keyed_request(state->music7C, state->music88);
         }
-        func_PAL_L14_0042C4E8(moby);
+        part_update_slot_triggered_record_pal(moby);
         if (guard_is_defeated(guard)) {
-            D_001395E1 = 1;
+            g_lift_scene_flag = 1;
             moby_mark_table_entry_flagged(state->text54);
             level_capture_checkpoint_state(moby + 0xF0, moby + 0xF0);
             state->nextState = 3;
@@ -158,10 +158,10 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
     case 3:
         if (flag_set_first_pending(moby)) {
             hero_reset_carried_objects(0);
-            func_PAL_L00_002B9CD8(moby + 0x10, moby + 0xF0, 0, 1);
+            hero_reset_position_and_direction_pal(moby + 0x10, moby + 0xF0, 0, 1);
             moby_activate_group_entities(moby);
-            *(int *)(g_hero_state + 0x24CC) = D_001A7A00;
-            if (D_001A63F0[0] != state->music80)
+            *(int *)(g_hero_state + 0x24CC) = g_player_stats;
+            if (g_current_music_id[0] != state->music80)
                 script_queue_keyed_request(state->music80, state->music88);
         }
         if (lift_is_moving(g_moby_l14_pool + state->panel * 256)) {
@@ -180,12 +180,12 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
             beam = (PrisonLiftEntity *)(g_moby_l14_pool + state->beam * 256);
             beam->target = 0;
             beam->flags = (beam->flags | 0x41) & ~0x1000;
-            func_PAL_L00_002B9CD8(guard + 0x10, guard + 0xF0, 0x6F, 1);
-            func_PAL_L00_002B2958(1, 0x3F, lift);
-            if (D_001A63F0[0] != state->music7C)
+            hero_reset_position_and_direction_pal(guard + 0x10, guard + 0xF0, 0x6F, 1);
+            SetHeroMode_pal(1, 0x3F, lift);
+            if (g_current_music_id[0] != state->music7C)
                 script_queue_keyed_request(state->music7C, state->music88);
         }
-        func_PAL_L14_0042C4E8(moby);
+        part_update_slot_triggered_record_pal(moby);
         if (IsPointInCuboid(g_hero_position, state->exitTrigger)) {
             moby_mark_table_entry_flagged(state->text58);
             level_capture_checkpoint_state(&pos, panel + 0xF0);
@@ -200,23 +200,23 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
             beam = (PrisonLiftEntity *)(g_moby_l14_pool + state->beam * 256);
             beam->flags = (beam->flags & ~0x41) | 0x1000;
             beam->target = *(int *)(beam->info + 0x10);
-            qcopy(&pos, D_L14_001B268C + state->gateCamera * 128 + 0x30);
+            qcopy(&pos, g_platform_projection_table + state->gateCamera * 128 + 0x30);
             if (g_hero_state[0x22B4] == 1)
                 hero_reset_carried_objects(0);
-            func_PAL_L00_002B9CD8(&pos, D_L14_001B268C + state->gateCamera * 128 + 0x70, 0, 1);
+            hero_reset_position_and_direction_pal(&pos, g_platform_projection_table + state->gateCamera * 128 + 0x70, 0, 1);
             lift_set_moving_state(panel);
-            *(int *)(g_hero_state + 0x24CC) = D_001A7A00;
-            if (D_001A63F0[0] != state->music80)
+            *(int *)(g_hero_state + 0x24CC) = g_player_stats;
+            if (g_current_music_id[0] != state->music80)
                 script_queue_keyed_request(state->music80, state->music88);
         }
-        if (D_001A8F00 != 2 && g_moby_l14_pool[state->switchEntity * 256 + 0x20] > 0x80) {
+        if (g_hero_mode_state != 2 && g_moby_l14_pool[state->switchEntity * 256 + 0x20] > 0x80) {
             moby_mark_table_entry_flagged(state->text5C);
-            level_capture_checkpoint_state(D_L14_001B268C + state->doorCamera * 128 + 0x30,
-                          D_L14_001B268C + state->doorCamera * 128 + 0x70);
+            level_capture_checkpoint_state(g_platform_projection_table + state->doorCamera * 128 + 0x30,
+                          g_platform_projection_table + state->doorCamera * 128 + 0x70);
             g_item_owned_flags[2] = 1;
-            D_001A7B30[2] = 1;
+            g_help_unlocked_flags[2] = 1;
             g_item_owned_flags[3] = 1;
-            D_001A7B30[3] = 1;
+            g_help_unlocked_flags[3] = 1;
             *(short *)(g_hero_position + 0x247C) = 0;
             moby_set_state(moby, 7, -1);
         }
@@ -233,7 +233,7 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
     case 7:
         if (flag_set_first_pending(moby))
             state->frames = 0;
-        if (D_001A8F00 != 2 && state->frames >= 6 && D_001A63F0[0] != state->music84)
+        if (g_hero_mode_state != 2 && state->frames >= 6 && g_current_music_id[0] != state->music84)
             script_queue_keyed_request(state->music84, state->music88);
         state->frames++;
         break;

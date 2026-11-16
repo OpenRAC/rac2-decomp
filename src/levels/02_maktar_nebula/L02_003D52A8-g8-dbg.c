@@ -2,7 +2,7 @@
 /* func_L02_003D52A8 in its own unit (flags in config/cflags.txt: -O2 -G8 -ffunction-sections -g). */
 #include "common.h"
 
-extern float D_L02_001B01B8;
+extern float g_chainblade_ground_height;
 typedef int Vector __attribute__((mode(TI)));
 extern float fast_vec_dist(void *, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -30,12 +30,12 @@ int chainblade_move_to_throw_position(char *self) {
     distance = fast_vec_dist(goal_position, *(char **)(state + 0x30C) + 0x10);
     sine = math_fast_sin_or_cos_a(angle);
     cosine = math_fast_sin_or_cos_b(angle);
-    height = D_L02_001B01B8 + distance * sine / cosine;
+    height = g_chainblade_ground_height + distance * sine / cosine;
     goal[2] = height - 4.2f;
-    if (D_L02_001B01B8 + 5.0f < goal[2])
+    if (g_chainblade_ground_height + 5.0f < goal[2])
         return 0;
-    if (goal[2] < D_L02_001B01B8 + 0.5f) {
-        float scale = 4.7f / (goal[2] - D_L02_001B01B8 + 4.2f);
+    if (goal[2] < g_chainblade_ground_height + 0.5f) {
+        float scale = 4.7f / (goal[2] - g_chainblade_ground_height + 4.2f);
         FastVecSub(delta, self + 0x10, *(char **)(state + 0x30C) + 0x10);
         delta[2] = 0.0f;
         FastVecScale(delta, delta, scale);

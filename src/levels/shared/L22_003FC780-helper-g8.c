@@ -4,7 +4,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char *CreateMoby(int);
 extern void set_identity_rotation_rows(void *);
-extern int D_L22_001AF37C;
+extern int g_linked_object_spawn_counter;
 
 /* Creates a moby of class 3643 linked to the owner at the given position, with a size scale; a nonzero flag gives it a staggered timer. */
 char *linked_scaled_object_spawn_spin_shrink(char *owner, TI128 *pos, int staggered, f32 scale) {
@@ -13,8 +13,8 @@ char *linked_scaled_object_spawn_spin_shrink(char *owner, TI128 *pos, int stagge
         u8 *ctl = *(u8 **)(created + 0x68);
         *(short *)(ctl + 0x2A) = staggered;
         if ((short)staggered != 0) {
-            int counter = D_L22_001AF37C;
-            D_L22_001AF37C = counter + 1;
+            int counter = g_linked_object_spawn_counter;
+            g_linked_object_spawn_counter = counter + 1;
             *(u16 *)(created + 0x96) = (counter + 2) % 31;
         }
         *(u16 *)(created + 0x34) |= 0x108;

@@ -30,7 +30,7 @@ typedef struct ViBuf {
 } ViBuf;
 
 extern void mpeg_set_debug_value(char *);
-extern char D_001AE848[];
+extern char g_str_mpeg_buf_add_dma[];
 extern void mpeg_start_dma4(unsigned int);
 extern int mpeg_vibuf_addr_to_slot(ViBuf *, unsigned int);
 extern void scTag2(unsigned long *, unsigned long, unsigned long, unsigned long);
@@ -55,7 +55,7 @@ int viBufAddDMA(ViBuf *vb) {
 
     WaitSema(vb->sema);
     if (vb->f44 == 0) {
-        mpeg_set_debug_value(D_001AE848);
+        mpeg_set_debug_value(g_str_mpeg_buf_add_dma);
         return 0;
     }
     mpeg_start_dma4(5);

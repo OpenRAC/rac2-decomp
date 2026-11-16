@@ -36,7 +36,7 @@ typedef struct GornPath {
     int pad[3];
     GornPathPoint points[1];
 } GornPath;
-extern char *D_L15_001FE480[];
+extern char *g_path_l15_table[];
 extern void func_PAL_L15_0043C8B8(char *);
 extern void func_PAL_L15_0043C978(void);
 extern char *moby_get_motion_data(unsigned char *owner);
@@ -46,9 +46,9 @@ extern float math_random_float_range(float, float);
 extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern int math_random_int_below(int);
-extern s32 D_L15_001AEE20[] __attribute__((sda));
-extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
-extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
+extern s32 g_ship_damage_effect_count[] __attribute__((sda));
+extern s32 g_gorn_ship_damage_joints[] SDATA(D_L15_001B1780);
+extern s32 g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
 extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -85,7 +85,7 @@ void func_PAL_L15_0043C6A0(char *object) {
 
         DrawPath(mover, *(int *)(state + 0x268), 0x8000FF00, 0x81, 0.75f, 1);
         owner = (char *)moby_get_motion_data(mover);
-        path = (GornPath *)D_L15_001FE480[*(int *)(state + 0x268)];
+        path = (GornPath *)g_path_l15_table[*(int *)(state + 0x268)];
         if (follower_has_reached_target(mover) != 0) {
             index = *(int *)(state + 0x26C);
             *(int *)(state + 0x26C) = index + 1;
@@ -119,7 +119,7 @@ void func_PAL_L15_0043C6A0(char *object) {
 
 
 extern void gorn_path_mover_init(char *);
-extern void func_PAL_L05_0037D610(char *object, int flag);
+extern void moby_init_spawned_sub_object_pal(char *object, int flag);
 extern void level_set_object_state_field(int arg0, int value);
 
 void func_PAL_L15_0043C8B8(char *a0) {
@@ -128,7 +128,7 @@ void func_PAL_L15_0043C8B8(char *a0) {
     char *s2 = (char *)moby_get_motion_data((unsigned char *)a0);
 
     *(int *)(s2 + 0x148) = 100;
-    func_PAL_L05_0037D610(s0, 1);
+    moby_init_spawned_sub_object_pal(s0, 1);
     *(float *)(s1 + 0x180) = 100.0f;
     *(unsigned char *)(s0 + 0x20) = 1;
     *(unsigned char *)(s0 + 0x30) = 0xFF;

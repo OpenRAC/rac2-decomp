@@ -3,59 +3,59 @@
 #include "common.h"
 extern f32 func_2E5318(f32 a, f32 b);
 extern f32 func_2E4918(f32 a, f32 b);
-extern f32 D_L07_001B0F84 __attribute__((sda));
+extern f32 g_unused_float_param __attribute__((sda));
 extern u8 *g_moby_l07_array __attribute__((sda));
 extern u8 *func_2CD050(s32 a);
 extern s32 func_312FA8(u8 *a, s32 b, s32 c);
 extern f32 func_313008(u8 *a, s32 b);
-extern f32 D_L07_001B10B8 __attribute__((sda));
-extern f32 D_L07_001B10BC __attribute__((sda));
-extern u32 D_L07_001B10C0 __attribute__((sda));
-extern f32 D_L07_001B0FD0 __attribute__((sda));
-extern f32 D_L07_001B0E98 __attribute__((sda));
-extern f32 D_L07_001B0E9C __attribute__((sda));
-extern f32 D_L07_001B0EA0 __attribute__((sda));
+extern f32 g_boss_cam_distance __attribute__((sda));
+extern f32 g_boss_cam_height __attribute__((sda));
+extern u32 g_boss_screen_color __attribute__((sda));
+extern f32 g_bomb_scale __attribute__((sda));
+extern f32 g_beam_fade_in_rate __attribute__((sda));
+extern f32 g_beam_fade_out_rate __attribute__((sda));
+extern f32 g_beam_spin_rate __attribute__((sda));
 extern f32 ApproachValue(f32 *value, f32 target, f32 step);
 extern f32 FastAddRotations(f32 a, f32 b);
 extern s32 coll_cast_object_line(void *a, void *b, void *c, s32 d, f32 e, f32 f, s32 g, s32 h, s32 i);
-extern f32 D_L07_001B173C;
-extern u8 D_L07_001B1730 __attribute__((sda));
-extern u8 *D_L07_001B2954;
-extern u8 *D_L07_001B295C;
-extern s32 D_L07_001B1E90;
+extern f32 g_hero_reset_offset_z;
+extern u8 g_hero_l07_reset_position __attribute__((sda));
+extern u8 *g_joint_record_table;
+extern u8 *g_matrix_l07_record_table;
+extern s32 g_ship_phase_state;
 extern void follow_camera_set_distance(s32, f32, f32);
 extern void follow_camera_set_height(f32, f32);
-extern u8 *func_PAL_L00_002D7850(s32);
+extern u8 *cam_alloc_override_slot_pal(s32);
 typedef struct { f32 x, y; u8 pad08[0x2C]; u32 color; } Effect;
 typedef struct { u8 pad[0x450]; Effect *effect; } EffectState;
 extern f32 func_2E49C8(f32 a, f32 b);
 extern f32 func_2E5360(f32 a, f32 b);
-extern f32 D_L07_001B17D4 __attribute__((sda));
-extern f32 D_L07_001B17D8 __attribute__((sda));
-extern u8 *D_L07_001B9250 __attribute__((nosda));
-extern u8 *D_L07_001ADAAC MACRO_ADDR;
-extern u8 D_L07_001B31A9;
+extern f32 g_aim_yaw_turn_accel __attribute__((sda));
+extern f32 g_aim_yaw_max_turn_speed __attribute__((sda));
+extern u8 *g_world_info __attribute__((nosda));
+extern u8 *g_snowfall_target_moby MACRO_ADDR;
+extern u8 g_aim_yaw_init_flag;
 extern u8 g_hero_state[];
-extern u32 D_L07_001B1E08 MACRO_ADDR;
+extern u32 g_frame_l07_counter MACRO_ADDR;
 extern f32 fast_vec_dist(u8 *a, u8 *b);
-extern f32 D_L07_001B0FD0 __attribute__((sda));
-extern u8 *D_L07_001C36C0[];
+extern f32 g_bomb_scale __attribute__((sda));
+extern u8 *g_hit_object_list[];
 
-void func_PAL_L07_003FCFE0(u8 *a0)
+void boss_setup_screen_effect_pal(u8 *a0)
 {
     EffectState *s1 = *(EffectState **)(a0 + 0x68);
 
-    follow_camera_set_distance(0, D_L07_001B10B8, 0.003f);
-    follow_camera_set_height(D_L07_001B10BC, 0.003f);
+    follow_camera_set_distance(0, g_boss_cam_distance, 0.003f);
+    follow_camera_set_height(g_boss_cam_height, 0.003f);
     if (*(u8 *)(a0 + 0x95) != 0) {
         if (s1->effect == 0)
-            s1->effect = (Effect *)func_PAL_L00_002D7850(5);
+            s1->effect = (Effect *)cam_alloc_override_slot_pal(5);
         {
-            f32 x = D_L07_001B10B8;
-            f32 y = D_L07_001B10BC;
+            f32 x = g_boss_cam_distance;
+            f32 y = g_boss_cam_height;
             u32 z;
             s1->effect->x = x;
-            z = D_L07_001B10C0;
+            z = g_boss_screen_color;
             s1->effect->y = y;
             s1->effect->color = z;
         }

@@ -4,11 +4,11 @@
    that function as assembly at an address of its own, and a call within one object can only
    reach the object's own copy. */
 
-extern char D_L02_001B11D0[8] __attribute__((sda));
-extern char D_L02_001B11E0[8] __attribute__((sda));
+extern char g_cutscene_camera_position[8] __attribute__((sda));
+extern char g_cutscene_l02_camera_rotation[8] __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern char g_camera_l02_position[];
-extern int D_L02_001B32E8;
+extern int g_hero_at_console_flag;
 extern void moby_set_state(char *, int, int);
 extern void cutscene_setup_camera(char *);
 
@@ -17,15 +17,15 @@ extern void cutscene_setup_camera(char *);
    updated; otherwise func_L02_003FD770 runs unless the object's state half-word is 5. */
 /* Checks whether the hero has reached the arena's control spot and, if so, opens the challenge menu. */
 void arena_check_hero_at_console(char *actor) {
-    D_L02_001B32E8 = 1;
-    if (fast_vec_dist(g_camera_l02_position, D_L02_001B11D0) < 0.0001f) {
+    g_hero_at_console_flag = 1;
+    if (fast_vec_dist(g_camera_l02_position, g_cutscene_camera_position) < 0.0001f) {
         if (*(unsigned char *)(actor + 0x20) == 4)
             moby_set_state(actor, 7, -1);
         else if (*(unsigned char *)(actor + 0x20) == 5)
             moby_set_state(actor, 6, -1);
         SetCamera5Mode(1, 0);
-        object_copy_vector_to_selected(D_L02_001B11D0);
-        cam_set_state_rotation(D_L02_001B11E0);
+        object_copy_vector_to_selected(g_cutscene_camera_position);
+        cam_set_state_rotation(g_cutscene_l02_camera_rotation);
     } else if (*(short *)(*(char **)(g_camera_l02_position + 0x50) + 0x86) != 5) {
         cutscene_setup_camera(actor);
     }

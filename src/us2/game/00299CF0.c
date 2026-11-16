@@ -63,34 +63,34 @@ typedef struct McChunk_298F00 {
 } McChunk_298F00;
 
 extern McState_298F00 g_memcard_state;
-extern McDirEntry_298F00 D_001C5280[];
-extern char D_001C52A0[];
-extern char D_001A7930[];
-extern char D_001A7948[];
-extern char D_001A7960[];
-extern char D_001A7975[];
-extern char D_001A7980[];
-extern char D_001A7995[];
-extern char D_001A79A0[];
-extern char D_001A79B5[];
-extern char D_001A79D0[];
+extern McDirEntry_298F00 g_memcard_dir_entries[];
+extern char g_memcard_save_name[];
+extern char g_save_name_source[];
+extern char g_save_name_title[];
+extern char g_save_name_header[];
+extern char g_str_save_icon_normal[];
+extern char g_save_name_icon[];
+extern char g_str_save_icon_copy[];
+extern char g_save_name_data[];
+extern char g_str_save_icon_delete[];
+extern char g_save_name_format[];
 extern s32 g_current_map_index __attribute__((sda));
-extern char D_001A9988[];
-extern char D_001A9990[];
-extern char D_001A9998[];
-extern char D_001A99A0[];
-extern char D_001A99B0[];
-extern char D_001A99C8[];
-extern char D_001A99E8[];
-extern char D_001A9A08[];
-extern char D_001A2BA8[];
-extern s32 D_001A2BB0[];
-extern char D_001A53A8[];
-extern int D_00256138[];
-extern int D_00256368[];
-extern s16 D_001A63AC;
-extern s32 D_001A7A00[] __attribute__((sda));
-extern s32 D_0014B884;
+extern char g_str_memcard_magic_a[];
+extern char g_str_memcard_magic_b[];
+extern char g_str_memcard_name_format[];
+extern char g_str_memcard_name_message[];
+extern char g_str_memcard_dir_message[];
+extern char g_str_memcard_slot_format_a[];
+extern char g_str_memcard_slot_format_b[];
+extern char g_str_memcard_slot_format_c[];
+extern char g_memcard_save_buffer[];
+extern s32 g_memcard_checked_block[];
+extern char g_memcard_slot_buffer[];
+extern int g_save_record_layout_main[];
+extern int g_save_record_layout_slot[];
+extern s16 g_sequence_active_flag;
+extern s32 g_player_stats[] __attribute__((sda));
+extern s32 g_mc_chunk_size_shift;
 extern struct { u8 pad[0x32C]; s32 x32C; u8 pad330[0x10]; s32 x340; s32 x344; } g_copy_setup_data;
 
 
@@ -121,7 +121,7 @@ extern void save_reset_slot_ids(void);
 extern int sceMcSeek(int, int, int);
 extern int save_verify_block_checksum(void *);
 
-void func_US2_00299CF0(void)
+void mc_update_state_us2(void)
 {
     union {
         char name[0x40];
@@ -240,7 +240,7 @@ void func_US2_00299CF0(void)
 
     case 7:
         if (func_00127E48(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot,
-                          D_001A7948, 0, 11, D_001C5280) == 0) {
+                          g_save_name_title, 0, 11, g_memcard_dir_entries) == 0) {
             g_memcard_state.sub = 0;
             g_memcard_state.state = 8;
         }
@@ -261,15 +261,15 @@ void func_US2_00299CF0(void)
                 icon2 = 0;
                 blocks = 0;
                 for (i = 0; i < g_memcard_state.result; i++) {
-                    McDirEntry_298F00 *entry = &D_001C5280[i];
-                    char *filename = (char *)((s32)D_001C5280 + i * 64 + 32);
+                    McDirEntry_298F00 *entry = &g_memcard_dir_entries[i];
+                    char *filename = (char *)((s32)g_memcard_dir_entries + i * 64 + 32);
                     s32 slot;
                     blocks += (entry->size + 1023U) >> 10;
-                    if (func_00115544(filename, D_001A7975) == 0) icon0 = 1;
-                    if (func_00115544(filename, D_001A7995) == 0) icon1 = 1;
-                    if (func_00115544(filename, D_001A79B5) == 0) icon2 = 1;
-                    if (func_001158F8(filename, D_001A9988, 4) == 0 &&
-                        func_001158F8(filename + 5, D_001A9990, 4) == 0) {
+                    if (func_00115544(filename, g_str_save_icon_normal) == 0) icon0 = 1;
+                    if (func_00115544(filename, g_str_save_icon_copy) == 0) icon1 = 1;
+                    if (func_00115544(filename, g_str_save_icon_delete) == 0) icon2 = 1;
+                    if (func_001158F8(filename, g_str_memcard_magic_a, 4) == 0 &&
+                        func_001158F8(filename + 5, g_str_memcard_magic_b, 4) == 0) {
                         slot = (u8)entry->name[4] - '0';
                         if (slot < 0) continue;
                         if (slot < 4) workspace.directory.seen[slot] = 1;
@@ -304,7 +304,7 @@ void func_US2_00299CF0(void)
             }
             break;
         case 1:
-            sprintf(workspace.directory.name, D_001A79D0, 0);
+            sprintf(workspace.directory.name, g_save_name_format, 0);
             if (sceMcOpen(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.directory.name, 1) == 0) {
                 g_memcard_state.sub++;
             }
@@ -343,10 +343,10 @@ void func_US2_00299CF0(void)
         case 4:
             if (g_memcard_state.result == g_memcard_state.size) {
                 g_memcard_state.card[g_memcard_state.cur].x24 = 0;
-                if (g_memcard_state.card[g_memcard_state.cur].x28 != memcard_GetDataSize(D_00256138)) {
+                if (g_memcard_state.card[g_memcard_state.cur].x28 != memcard_GetDataSize(g_save_record_layout_main)) {
                     g_memcard_state.card[g_memcard_state.cur].x24++;
                 }
-                if (g_memcard_state.card[g_memcard_state.cur].x2C != memcard_GetDataSize(D_00256368)) {
+                if (g_memcard_state.card[g_memcard_state.cur].x2C != memcard_GetDataSize(g_save_record_layout_slot)) {
                     g_memcard_state.card[g_memcard_state.cur].x24++;
                 }
                 g_memcard_state.busy = 0;
@@ -406,7 +406,7 @@ void func_US2_00299CF0(void)
             g_memcard_state.busy = 0;
             break;
         case 1:
-            if (sceMcMkdir(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, D_001A7930) == 0) {
+            if (sceMcMkdir(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, g_save_name_source) == 0) {
                 g_memcard_state.sub = 2;
             }
             break;
@@ -437,7 +437,7 @@ void func_US2_00299CF0(void)
             break;
         }
         case 4:
-            if (D_001A63AC == 0) {
+            if (g_sequence_active_flag == 0) {
                 g_memcard_state.sub = 5;
             }
             g_memcard_state.busy = 0;
@@ -448,16 +448,16 @@ void func_US2_00299CF0(void)
         case 18:
             switch (g_memcard_state.sub) {
             case 5:
-                strcpy(workspace.name, D_001A7960);
+                strcpy(workspace.name, g_save_name_header);
                 break;
             case 9:
-                strcpy(workspace.name, D_001A7980);
+                strcpy(workspace.name, g_save_name_icon);
                 break;
             case 18:
-                strcpy(workspace.name, D_001A79A0);
+                strcpy(workspace.name, g_save_name_data);
                 break;
             case 13:
-                sprintf(workspace.name, D_001A79D0, g_memcard_state.card[g_memcard_state.cur].status);
+                sprintf(workspace.name, g_save_name_format, g_memcard_state.card[g_memcard_state.cur].status);
                 break;
             }
             if (sceMcOpen(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.name, 0x203) == 0) {
@@ -475,7 +475,7 @@ void func_US2_00299CF0(void)
                 if (g_memcard_state.fd < 0) {
                     g_memcard_state.fd = g_memcard_state.result;
                 }
-                mem_compute_sized_offset(D_0014B884 << 11, &chunk);
+                mem_compute_sized_offset(g_mc_chunk_size_shift << 11, &chunk);
                 switch (g_memcard_state.sub) {
                 case 6:
                     g_memcard_state.size = 0x3C4;
@@ -490,8 +490,8 @@ void func_US2_00299CF0(void)
                     g_memcard_state.buf = &g_current_map_index;
                     break;
                 case 14: {
-                    s32 n = memcard_GetDataSize(D_00256138);
-                    g_memcard_state.size = n + memcard_GetDataSize(D_00256368) * 0x1C + 8;
+                    s32 n = memcard_GetDataSize(g_save_record_layout_main);
+                    g_memcard_state.size = n + memcard_GetDataSize(g_save_record_layout_slot) * 0x1C + 8;
                     g_memcard_state.buf = (u8 *)chunk + chunk->x10;
                     break;
                 }
@@ -563,8 +563,8 @@ void func_US2_00299CF0(void)
             g_memcard_state.busy = 0;
             break;
         case 21:
-            g_memcard_state.card[g_memcard_state.cur].x28 = memcard_GetDataSize(D_00256138);
-            g_memcard_state.card[g_memcard_state.cur].x2C = memcard_GetDataSize(D_00256368);
+            g_memcard_state.card[g_memcard_state.cur].x28 = memcard_GetDataSize(g_save_record_layout_main);
+            g_memcard_state.card[g_memcard_state.cur].x2C = memcard_GetDataSize(g_save_record_layout_slot);
             g_memcard_state.card[g_memcard_state.cur].status = -1;
             g_memcard_state.card[g_memcard_state.cur].x24 = 0;
             g_memcard_state.state = 0;
@@ -580,14 +580,14 @@ void func_US2_00299CF0(void)
     case 12:
         switch (g_memcard_state.sub) {
         case 0:
-            if (func_00127E48(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, D_001A7948, 0, 1, D_001C5280) == 0) {
+            if (func_00127E48(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, g_save_name_title, 0, 1, g_memcard_dir_entries) == 0) {
                 g_memcard_state.sub = 1;
             }
             break;
         case 1:
             if (g_memcard_state.result == 1) {
-                sprintf(workspace.name, D_001A9998, D_001A7930, D_001C52A0);
-                STUB_printf(D_001A99A0, workspace.name);
+                sprintf(workspace.name, g_str_memcard_name_format, g_save_name_source, g_memcard_save_name);
+                STUB_printf(g_str_memcard_name_message, workspace.name);
                 if (sceMcDelete(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.name) == 0) {
                     g_memcard_state.sub = 2;
                 }
@@ -612,13 +612,13 @@ void func_US2_00299CF0(void)
             }
             break;
         case 2:
-            if (func_00127E48(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, D_001A7948, 1, 1, D_001C5280) == 0) {
+            if (func_00127E48(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, g_save_name_title, 1, 1, g_memcard_dir_entries) == 0) {
                 g_memcard_state.sub = 1;
             }
             break;
         case 3:
-            if (sceMcDelete(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, D_001A7930) == 0) {
-                STUB_printf(D_001A99B0, D_001A7930);
+            if (sceMcDelete(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, g_save_name_source) == 0) {
+                STUB_printf(g_str_memcard_dir_message, g_save_name_source);
                 g_memcard_state.sub = 4;
             }
             break;
@@ -677,9 +677,9 @@ void func_US2_00299CF0(void)
         switch (g_memcard_state.sub) {
         case 0:
             if (g_memcard_state.state == 23) {
-                sprintf(workspace.name, D_001A79D0, g_memcard_state.card[g_memcard_state.cur].tries);
+                sprintf(workspace.name, g_save_name_format, g_memcard_state.card[g_memcard_state.cur].tries);
             } else {
-                sprintf(workspace.name, D_001A79D0, g_memcard_state.card[g_memcard_state.cur].status);
+                sprintf(workspace.name, g_save_name_format, g_memcard_state.card[g_memcard_state.cur].status);
             }
             if (sceMcOpen(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.name, 1) == 0) {
                 g_memcard_state.sub++;
@@ -751,17 +751,17 @@ void func_US2_00299CF0(void)
             if (g_memcard_state.size > 0x2800) {
                 math_trap_always();
             }
-            if (sceMcRead(g_memcard_state.fd, D_001A2BA8, g_memcard_state.size) == 0) {
+            if (sceMcRead(g_memcard_state.fd, g_memcard_save_buffer, g_memcard_state.size) == 0) {
                 g_memcard_state.sub = 5;
             }
             break;
         case 5:
             if (g_memcard_state.result == g_memcard_state.size) {
                 if (g_memcard_state.state == 23) {
-                    FillSaveSlotInfo(D_001A2BA8, g_memcard_state.cur, g_memcard_state.card[g_memcard_state.cur].tries);
+                    FillSaveSlotInfo(g_memcard_save_buffer, g_memcard_state.cur, g_memcard_state.card[g_memcard_state.cur].tries);
                     g_memcard_state.sub = 8;
                 } else {
-                    g_memcard_state.card[g_memcard_state.cur].x24 = MemcardRestoreData(D_001A2BA8, 0, D_00256138);
+                    g_memcard_state.card[g_memcard_state.cur].x24 = MemcardRestoreData(g_memcard_save_buffer, 0, g_save_record_layout_main);
                     g_memcard_state.sub = 6;
                 }
                 g_memcard_state.busy = 0;
@@ -797,13 +797,13 @@ void func_US2_00299CF0(void)
             if (g_memcard_state.size > 0x1000) {
                 math_trap_always();
             }
-            if (sceMcRead(g_memcard_state.fd, D_001A53A8, g_memcard_state.size) == 0) {
+            if (sceMcRead(g_memcard_state.fd, g_memcard_slot_buffer, g_memcard_state.size) == 0) {
                 g_memcard_state.sub = 7;
             }
             break;
         case 7:
             if (g_memcard_state.result == g_memcard_state.size) {
-                g_memcard_state.card[g_memcard_state.cur].x24 += MemcardRestoreData(D_001A53A8, g_memcard_state.index, D_00256368);
+                g_memcard_state.card[g_memcard_state.cur].x24 += MemcardRestoreData(g_memcard_slot_buffer, g_memcard_state.index, g_save_record_layout_slot);
                 if (++g_memcard_state.index < 0x1C) {
                     g_memcard_state.sub = 6;
                 } else {
@@ -874,7 +874,7 @@ void func_US2_00299CF0(void)
     case 16:
         switch (g_memcard_state.sub) {
         case 0:
-            sprintf(workspace.name, D_001A79D0, g_memcard_state.card[g_memcard_state.cur].status);
+            sprintf(workspace.name, g_save_name_format, g_memcard_state.card[g_memcard_state.cur].status);
             if (sceMcOpen(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.name, 2) == 0) {
                 g_memcard_state.sub = 1;
             }
@@ -919,12 +919,12 @@ void func_US2_00299CF0(void)
             }
             break;
         case 4:
-            if (sceMcWrite(g_memcard_state.fd, D_001A2BA8, memcard_GetDataSize(D_00256138)) == 0) {
+            if (sceMcWrite(g_memcard_state.fd, g_memcard_save_buffer, memcard_GetDataSize(g_save_record_layout_main)) == 0) {
                 g_memcard_state.sub = 5;
             }
             break;
         case 5:
-            if (g_memcard_state.result == memcard_GetDataSize(D_00256138)) {
+            if (g_memcard_state.result == memcard_GetDataSize(g_save_record_layout_main)) {
                 g_memcard_state.sub = 6;
                 break;
             }
@@ -970,12 +970,12 @@ void func_US2_00299CF0(void)
             }
             break;
         case 8:
-            if (sceMcWrite(g_memcard_state.fd, D_001A53A8, memcard_GetDataSize(D_00256368)) == 0) {
+            if (sceMcWrite(g_memcard_state.fd, g_memcard_slot_buffer, memcard_GetDataSize(g_save_record_layout_slot)) == 0) {
                 g_memcard_state.sub = 9;
             }
             break;
         case 9:
-            if (g_memcard_state.result == memcard_GetDataSize(D_00256368)) {
+            if (g_memcard_state.result == memcard_GetDataSize(g_save_record_layout_slot)) {
                 g_memcard_state.sub = 10;
                 break;
             }
@@ -1027,9 +1027,9 @@ void func_US2_00299CF0(void)
     }
 
     case 18:
-        if (D_001A63AC == 0) {
+        if (g_sequence_active_flag == 0) {
             McChunk_298F00 *chunk;
-            mem_compute_sized_offset(D_0014B884 << 11, &chunk);
+            mem_compute_sized_offset(g_mc_chunk_size_shift << 11, &chunk);
             g_memcard_state.sub = 19;
             g_memcard_state.buf = (u8 *)chunk + chunk->x10;
         }
@@ -1057,7 +1057,7 @@ void func_US2_00299CF0(void)
     case 20:
         switch (g_memcard_state.sub) {
         case 0:
-            sprintf(workspace.name, D_001A79D0, g_memcard_state.card[g_memcard_state.cur].status);
+            sprintf(workspace.name, g_save_name_format, g_memcard_state.card[g_memcard_state.cur].status);
             if (sceMcOpen(g_memcard_state.card[g_memcard_state.cur].port, g_memcard_state.card[g_memcard_state.cur].slot, workspace.name, 2) == 0) {
                 g_memcard_state.sub = 1;
             }
@@ -1067,8 +1067,8 @@ void func_US2_00299CF0(void)
                 s32 n;
 
                 g_memcard_state.fd = g_memcard_state.result;
-                n = memcard_GetDataSize(D_00256138);
-                g_memcard_state.size = n + memcard_GetDataSize(D_00256368) * 0x1C + 8;
+                n = memcard_GetDataSize(g_save_record_layout_main);
+                g_memcard_state.size = n + memcard_GetDataSize(g_save_record_layout_slot) * 0x1C + 8;
                 if (sceMcWrite(g_memcard_state.fd, g_memcard_state.buf, g_memcard_state.size) == 0) {
                     g_memcard_state.sub = 2;
                 }
@@ -1128,13 +1128,13 @@ void func_US2_00299CF0(void)
     case 25:
         switch (g_memcard_state.sub / 5) {
         case 0:
-            sprintf(workspace.name, D_001A99C8, g_memcard_state.sub % 5);
+            sprintf(workspace.name, g_str_memcard_slot_format_a, g_memcard_state.sub % 5);
             break;
         case 1:
-            sprintf(workspace.name, D_001A99E8, g_memcard_state.sub % 5);
+            sprintf(workspace.name, g_str_memcard_slot_format_b, g_memcard_state.sub % 5);
             break;
         case 2:
-            sprintf(workspace.name, D_001A9A08, g_memcard_state.sub % 5);
+            sprintf(workspace.name, g_str_memcard_slot_format_c, g_memcard_state.sub % 5);
             break;
         case 3:
             workspace.name[0] = 0;
@@ -1155,7 +1155,7 @@ void func_US2_00299CF0(void)
     case 26:
         if (g_memcard_state.result >= 0) {
             g_memcard_state.fd = g_memcard_state.result;
-            if (sceMcRead(g_memcard_state.result, D_001A2BA8, 0x2800) == 0)
+            if (sceMcRead(g_memcard_state.result, g_memcard_save_buffer, 0x2800) == 0)
                 g_memcard_state.state = 27;
         } else {
             g_memcard_state.state = 25;
@@ -1168,10 +1168,10 @@ void func_US2_00299CF0(void)
         if (g_memcard_state.result >= 0x2800) {
             if (sceMcClose(g_memcard_state.fd) != 0)
                 break;
-            if (save_verify_block_checksum(D_001A2BB0) != 0) {
-                s32 *p = D_001A2BB0 + 2;
+            if (save_verify_block_checksum(g_memcard_checked_block) != 0) {
+                s32 *p = g_memcard_checked_block + 2;
                 if (*p != -1) {
-                    s32 flags = D_001A7A00[8];
+                    s32 flags = g_player_stats[8];
                     do {
                         if (p[0] == 0xA) {
                             u8 *b = (u8 *)(p + 2);
@@ -1201,7 +1201,7 @@ void func_US2_00299CF0(void)
                         }
                         p = (s32 *)((u8 *)p + (((p[1] + 3) / 4) * 4 + 8));
                     } while (*p != -1);
-                    D_001A7A00[8] = flags;
+                    g_player_stats[8] = flags;
                 }
             }
             g_memcard_state.sub++;

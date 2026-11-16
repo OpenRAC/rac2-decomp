@@ -5,7 +5,7 @@
 extern float moby_get_anim_value(void *);
 extern float math_round_to_decimal_places(int, float);
 
-int func_US2_002AF9C8(char *object, float threshold)
+int math_is_value_within_step_us2(char *object, float threshold)
 {
     float current = math_round_to_decimal_places(4, moby_get_anim_value(object));
     float difference = current - threshold;

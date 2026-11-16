@@ -11,8 +11,8 @@ typedef struct {
 } State_2B8548;
 
 extern State_2B8548 g_pad_state;
-extern State_2B8548 D_00138500;
-extern int D_001B1D70[2] __attribute__((sda));
+extern State_2B8548 g_pad_device_state;
+extern int g_pad_port_request_block[2] __attribute__((sda));
 
 extern int sceDbcInit(void *);
 extern int pad_init_socket_table(int);
@@ -21,19 +21,19 @@ extern int scePad2CreateSocket(void *, char *);
 /* Sets up both controller ports at start-up. */
 void pad_init_ports(void *padInfo)
 {
-    int *requestBlock = D_001B1D70;
+    int *requestBlock = g_pad_port_request_block;
     int portMode = 2;
 
     sceDbcInit(padInfo);
     pad_init_socket_table(0);
-    D_001B1D70[0] = portMode;
-    D_001B1D70[1] = 0;
+    g_pad_port_request_block[0] = portMode;
+    g_pad_port_request_block[1] = 0;
     g_pad_state.f194 = scePad2CreateSocket(requestBlock, (char *)&g_pad_state);
     g_pad_state.f198 = 0;
     g_pad_state.f19C = 0;
-    D_001B1D70[0] = portMode;
-    D_001B1D70[1] = 1;
-    D_00138500.f194 = scePad2CreateSocket(requestBlock, (char *)&D_00138500);
-    D_00138500.f198 = 0;
-    D_00138500.f19C = 0;
+    g_pad_port_request_block[0] = portMode;
+    g_pad_port_request_block[1] = 1;
+    g_pad_device_state.f194 = scePad2CreateSocket(requestBlock, (char *)&g_pad_device_state);
+    g_pad_device_state.f198 = 0;
+    g_pad_device_state.f19C = 0;
 }

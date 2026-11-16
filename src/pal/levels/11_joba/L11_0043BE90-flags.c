@@ -11,7 +11,7 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void moby_set_state(void *, int, int);
 
-void func_PAL_L11_0043BE90(char *object, int mode, int active) {
+void enemy_init_state_pal(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     unsigned short flags;
     char *definition;

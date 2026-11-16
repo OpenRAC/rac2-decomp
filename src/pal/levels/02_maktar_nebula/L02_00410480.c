@@ -10,15 +10,15 @@ extern void set_moby_color(void *, void *, void *, void *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern u8 D_001A7BCB __attribute__((sda));
-extern u8 D_L02_001395B8[];
-extern u8 D_L02_001C0700[];
-extern u8 D_0019B2E8[];
-extern u16 D_0018CFDC;
-extern u8 D_0019B4A8[];
+extern u8 g_unlock_flag_c __attribute__((sda));
+extern u8 g_message_sequence_flags[];
+extern u8 g_message_queue[];
+extern u8 g_moby_group_flags[];
+extern u16 g_beam_emitter_id;
+extern u8 g_moby_nibble_table[];
 
 /* brings the actor into its armed state */
-void func_PAL_L02_00410480(u8 *a0, int a1) {
+void flamethrower_robot_wake_pal(u8 *a0, int a1) {
     u8 *s0 = *(u8 **)(a0 + 0x68);
     int one = 1;
     u32 v;
@@ -47,7 +47,7 @@ void func_PAL_L02_00410480(u8 *a0, int a1) {
 }
 
 
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float,
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void vec_random_direction(void *, float, float);
@@ -57,14 +57,14 @@ extern void func_PAL_002A0F68(void *);
 extern void flamethrower_robot_knock_out(u8 *);
 
 /* arms the actor: its two effect tracks, then the shared state resets */
-void func_PAL_L02_00410598(u8 *a0) {
+void flamethrower_robot_knock_out_pal(u8 *a0) {
     u8 *s1 = *(u8 **)(a0 + 0x68);
     float buf[3];
 
     *(u16 *)(s1 + 0x2E2) = 0;
     *(u32 *)(s1 + 0x2D4) = 0;
     if (a0[0x31]) {
-        func_PAL_L00_003FB330(a0 + 0x10, 0, 5, 5, 0x19, 0x14, 0xA, 1, 0.5f, 0.0f,
+        SpawnExplosion_pal(a0 + 0x10, 0, 5, 5, 0x19, 0x14, 0xA, 1, 0.5f, 0.0f,
                       1, 0, 0, 0);
         snd_play_from_class_bank(0, 0, a0, 0xC3E);
         vec_random_direction(buf, 0.10000001f, 0.14000002f);

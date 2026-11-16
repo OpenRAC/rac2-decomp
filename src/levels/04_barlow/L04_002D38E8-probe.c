@@ -62,11 +62,11 @@ typedef struct {
 } ProbeHit;
 
 extern ProbeHero g_hero_state;
-extern unsigned char D_L04_001BFAC0[];
+extern unsigned char g_probe_hit[];
 #define hit ((ProbeHit *)D_L04_001BFAC0)
 extern int g_current_map_index __attribute__((sda));
-extern int D_L04_001A8FF0 __attribute__((sda));
-extern int D_L04_001A8FF4 __attribute__((sda));
+extern int g_hero_l04_lock_flag_a __attribute__((sda));
+extern int g_hero_l04_lock_flag_b __attribute__((sda));
 extern int D_L04_001A8FF0_gp SDATA(D_L04_001A8FF0);
 
 extern float math_fabs(float);
@@ -178,7 +178,7 @@ void Hero_ProbeGround(void)
     if (hit->count > 0) {
         qcopy(g_hero_state.groundPoint, hit->point);
         g_hero_state.groundZ = hit->point[2];
-        if (D_L04_001A8FF0) {
+        if (g_hero_l04_lock_flag_a) {
             g_hero_state.groundZ = gravity_get_center_distance(hit->point);
         }
         g_hero_state.groundDistance = fast_vec_dist(g_hero_state.position, g_hero_state.groundPoint);
@@ -214,7 +214,7 @@ tail:
         g_hero_state.gravityDir[2] = -1;
         break;
     case 1:
-        if (D_L04_001A8FF4) {
+        if (g_hero_l04_lock_flag_b) {
             vec_compute_flat_direction_from_point(g_hero_state.position, g_hero_state.gravityDir, 0);
         } else if (g_hero_state.f2fc != 0.0f) {
             ApproachValue(&g_hero_state.f2fc, 0.0f, 1.0f);

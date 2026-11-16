@@ -4,7 +4,7 @@
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 extern char g_hero_state[];
 extern int ref_L04_00418A58_01;
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 extern int ref_L04_00418A58_04[];
 extern int ref_L04_00418A58_00 __attribute__((sda));
 extern u8 *ref_L04_00418A58_11 __attribute__((sda));
@@ -26,7 +26,7 @@ void func_PAL_L04_0041D5F0(char *obj, char *aux) {
     int i;
     int none;
 
-    if (ref_L04_00418A58_00 != 0 && ref_L04_00418A58_01 < 10 && (D_00138320[0] & 0x40)) {
+    if (ref_L04_00418A58_00 != 0 && ref_L04_00418A58_01 < 10 && (g_pad_pressed_flags[0] & 0x40)) {
         FLD(aux, int, 0x278) = 200;
         FLD(aux, int, 0x650) = 200;
         if (ref_L04_00418A58_02(obj, FLD(aux, int, 0x714)) == 0) {

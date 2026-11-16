@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecScale(void *, void *, float);
 extern void part_spawn_spark_puff(void *);
@@ -13,10 +13,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L17_001AC790 __attribute__((sda));
-extern int D_L17_001B33B0 __attribute__((sda)), D_L17_001B33B8 __attribute__((sda));
-extern Collision D_L17_001C0000;
-extern Material D_L17_00263470[];
+extern int g_projectile_model_id __attribute__((sda));
+extern int g_splash_ripple_param_a __attribute__((sda)), g_splash_ripple_param_b __attribute__((sda));
+extern Collision g_collision_l17_result;
+extern Material g_item_l17_material_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -40,14 +40,14 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
 
 /* Read once as a GP macro load in a delay slot and otherwise as lui/lw, as at -G0 in retail. */
-extern int D_L17_001A8F00 __attribute__((sda));
+extern int g_spark_effect_state __attribute__((sda));
 typedef struct { char pad[0x30]; int phase, frame; char gap[0x15C]; char *actor; } CutsceneState;
-extern CutsceneState D_L17_001BD8C0;
+extern CutsceneState g_cutscene_l17_state;
 typedef struct EffectMoby {
     char pad0[0x28]; struct EffectMoby *next; char pad1[8]; unsigned short flags;
     char pad2[0x62]; int unknown; char pad3[0xE]; short classId;
 } EffectMoby;
-extern EffectMoby *D_L17_001B2C28 __attribute__((sda));
+extern EffectMoby *g_effect_moby_list __attribute__((sda));
 extern void moby_transform_joint_to_world(void *, int, void *);
 typedef struct { char pad0[4]; int state; char pad1[2]; unsigned char opacity, age; } EffectTail;
 typedef struct { char pad0[8]; unsigned char color, size; short life; char pad1[0x14]; EffectTail tail; } CutsceneParticle;
@@ -65,9 +65,9 @@ extern char g_hero_state[];
 
 extern char g_path_l17_table[];
 
-extern char D_L17_00296F80[];
+extern char g_path_point_template[];
 
-extern char D_L17_00296FF0[];
+extern char g_path_transform_template[];
 
 extern void matrix_mul_vec3(void *, void *, void *);
 
@@ -186,22 +186,22 @@ void cutscene_update_spark_effects(unsigned char *self) {
         self[0x20] = 1;
         break;
     case 1:
-        if (D_L17_001A8F00 != 2)
+        if (g_spark_effect_state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 6) {
+        if (g_cutscene_l17_state.phase == 6) {
             EffectMoby *effect_moby;
-            for (effect_moby = D_L17_001B2C28; effect_moby; effect_moby = effect_moby->next) {
+            for (effect_moby = g_effect_moby_list; effect_moby; effect_moby = effect_moby->next) {
                 if (effect_moby->classId == MOBY_CLASS_GRULCH || effect_moby->classId == 0x1249) {
                     effect_moby->unknown = 0;
                     effect_moby->flags = (effect_moby->flags | 0x43) & 0xEFFF;
                 }
             }
         }
-        state = D_L17_001A8F00;
+        state = g_spark_effect_state;
         if (state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 4 && (unsigned)(D_L17_001BD8C0.frame - 301) < 59) {
-            obj = D_L17_001BD8C0.actor;
+        if (g_cutscene_l17_state.phase == 4 && (unsigned)(g_cutscene_l17_state.frame - 301) < 59) {
+            obj = g_cutscene_l17_state.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
@@ -229,13 +229,13 @@ void cutscene_update_spark_effects(unsigned char *self) {
                     detail->opacity = 127;
                     detail->age = (unsigned char)first->life;
                 }
-                state = D_L17_001A8F00;
+                state = g_spark_effect_state;
             }
         }
         if (state != 2)
             break;
-        if (D_L17_001BD8C0.phase == 5 && D_L17_001BD8C0.frame >= 531) {
-            obj = D_L17_001BD8C0.actor;
+        if (g_cutscene_l17_state.phase == 5 && g_cutscene_l17_state.frame >= 531) {
+            obj = g_cutscene_l17_state.actor;
             if (*(short *)(obj + 0xAA) == 0x125E) {
                 moby_transform_joint_to_world(obj, 0, &point);
                 vec_scale_to_length(&velocity, obj + 0xE0, -0.05f);
@@ -305,7 +305,7 @@ void splash_projectile_update(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L17_00263470 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l17_material_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -317,14 +317,14 @@ void splash_projectile_update(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L17_001B33B0, D_L17_001B33B8, 1,
+            RippleDisturb(g_splash_ripple_param_a, g_splash_ripple_param_b, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L17_001C0000.point.f[2];
+            frame.position.f[2] = g_collision_l17_result.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -344,16 +344,16 @@ void splash_projectile_update(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L17_001C0000;
+            Collision *collision = &g_collision_l17_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L17_001C0000;
+                reread = &g_collision_l17_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L17_001AC790 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == g_projectile_model_id && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -417,7 +417,7 @@ void aging_projectile_update(char *obj) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L17_00263470)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l17_material_table)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -427,16 +427,16 @@ void aging_projectile_update(char *obj) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L17_001C0000;
+        collision = &g_collision_l17_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L17_001C0000;
+            reread = &g_collision_l17_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L17_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_projectile_model_id && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -448,7 +448,7 @@ void aging_projectile_update(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L17_001C0000;
+            collision = &g_collision_l17_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
@@ -510,7 +510,7 @@ void platform_attach_path_to_lift(char *moby)
         return;
     matrix = moby + 0xC0;
     position = moby + 0x10;
-    template = D_L17_00296F80;
+    template = g_path_point_template;
     point = path_ref + 0x10;
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(point, template, matrix);
@@ -608,7 +608,7 @@ void platform_attach_path_to_transform(char *moby)
         return;
     matrix = moby + 0xC0;
     position = moby + 0x10;
-    template = D_L17_00296FF0;
+    template = g_path_transform_template;
     point = path_ref + 0x10;
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(point, template, matrix);

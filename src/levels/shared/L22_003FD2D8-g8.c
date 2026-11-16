@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern char g_hero_state[], D_L22_001C00E0[];
-extern float D_L22_001AF380;
-extern float D_L22_001AF308;
+extern char g_hero_state[], g_spawn_point[];
+extern float g_pickup_pull_distance;
+extern float g_enemy_random_scale;
 extern float D_L22_001AF308_gp SDATA(D_L22_001AF308);
-extern float D_L22_001B0D44 __attribute__((sda));
-extern float D_L22_001B0D48 __attribute__((sda));
-extern float D_L22_001B0D58 __attribute__((sda));
-extern int D_L22_001B0D54 __attribute__((sda));
+extern float g_spin_effect_rate __attribute__((sda));
+extern float g_spin_effect_offset_a __attribute__((sda));
+extern float g_spin_effect_offset_b __attribute__((sda));
+extern int g_spin_effect_spark_count __attribute__((sda));
 extern char *ref_L22_003FD2D8_00 __attribute__((sda));
 extern void euler_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
@@ -42,7 +42,7 @@ void spinning_effect_update_alt(char *o) {
         snd_start_in_slot(18, 0, 0);
     if (*(u8 *)(o + 0x31)) {
         float player_distance = fast_vec_dist(g_hero_state + 0x80, o + 0x10);
-        float threshold = D_L22_001AF380;
+        float threshold = g_pickup_pull_distance;
         *(float *)(ctl + 0x44) = player_distance;
         if (player_distance >= threshold)
             *(u8 *)(o + 0x23) = 127;
@@ -66,32 +66,32 @@ void spinning_effect_update_alt(char *o) {
         if (*(u8 *)(o + 0x23) >= 11 && *(u8 *)(o + 0x20) == 16) {
             switch (*(u16 *)(o + 0x96) & 3) {
             case 0:
-                FastVecScale(scratch.early.a, o + 0xc0, -D_L22_001B0D58);
+                FastVecScale(scratch.early.a, o + 0xc0, -g_spin_effect_offset_b);
                 FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xd0, -D_L22_001B0D48);
+                FastVecScale(scratch.early.b, o + 0xd0, -g_spin_effect_offset_a);
                 break;
             case 1:
-                FastVecScale(scratch.early.a, o + 0xc0, D_L22_001B0D58);
+                FastVecScale(scratch.early.a, o + 0xc0, g_spin_effect_offset_b);
                 FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xd0, D_L22_001B0D48);
+                FastVecScale(scratch.early.b, o + 0xd0, g_spin_effect_offset_a);
                 break;
             case 2:
-                FastVecScale(scratch.early.a, o + 0xd0, D_L22_001B0D58);
+                FastVecScale(scratch.early.a, o + 0xd0, g_spin_effect_offset_b);
                 FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xc0, D_L22_001B0D48);
+                FastVecScale(scratch.early.b, o + 0xc0, g_spin_effect_offset_a);
                 break;
             case 3:
-                FastVecScale(scratch.early.a, o + 0xd0, -D_L22_001B0D58);
+                FastVecScale(scratch.early.a, o + 0xd0, -g_spin_effect_offset_b);
                 FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xc0, -D_L22_001B0D48);
+                FastVecScale(scratch.early.b, o + 0xc0, -g_spin_effect_offset_a);
                 break;
             }
-            part_emit_spark_burst_alt(scratch.early.a, scratch.early.b, D_L22_001B0D54, 0);
+            part_emit_spark_burst_alt(scratch.early.a, scratch.early.b, g_spin_effect_spark_count, 0);
         }
         step = 0.02222222276031971f;
         set_identity_rotation_rows(scratch.early.scale);
         scratch.early.scale[0] = scratch.early.scale[5] = scratch.early.scale[10] =
-            (45.0f - (float)*(u16 *)(o + 0x96) * step) * (D_L22_001B0D44 * step);
+            (45.0f - (float)*(u16 *)(o + 0x96) * step) * (g_spin_effect_rate * step);
         multiply_matrix3x3(scratch.early.matrix, scratch.early.scale, scratch.early.matrix);
         multiply_matrix3x3(o + 0xc0, o + 0xc0, scratch.early.matrix);
         if (*(u16 *)(o + 0x96) >= 46) {
@@ -128,7 +128,7 @@ void spinning_effect_update_alt(char *o) {
             char *dir = o + 0xc0 + math_random_int_below(2) * 16;
             float f;
             if (math_random_int_below(2)) f = D_L22_001AF308_gp;
-            else f = -D_L22_001AF308;
+            else f = -g_enemy_random_scale;
             FastVecScale(random, dir, f);
             FastVecAdd(o + 0x10, o + 0x10, scratch.late.random);
         }
@@ -138,7 +138,7 @@ void spinning_effect_update_alt(char *o) {
         FastVecAdd(scratch.late.a, scratch.late.a, o + 0x10);
         FastVecAdd(scratch.late.b, scratch.late.b, o + 0x10);
         if (CollLine(scratch.late.b, scratch.late.a, 18, 0, 0))
-            qcopy(o + 0x10, D_L22_001C00E0);
+            qcopy(o + 0x10, g_spawn_point);
         *(short *)(ctl + 0x2a) = 0;
     }
 }

@@ -83,22 +83,22 @@ typedef struct Runtime {
 typedef struct { char pad[4]; u8 active; char rest[219]; } Material;
 typedef struct { char pad[0x74]; u8 active; char gap[0x13]; Object *owner; } Slot;
 
-extern int D_L00_001A8F00 __attribute__((sda));
-extern int D_L00_001B0768 __attribute__((sda));
-extern int D_L00_001B075C __attribute__((sda));
-extern unsigned char D_00139587[];
+extern int g_game_l00_mode __attribute__((sda));
+extern int g_synthenoid_fade_frames __attribute__((sda));
+extern int g_synthenoid_state_value __attribute__((sda));
+extern unsigned char g_kilonoid_weapon_index[];
 extern Material g_weapon_l00_table[];
 extern Runtime g_hero_state;
 extern char g_sound_state[];
 extern void *g_hero_moby NOT_SDA;
 extern int g_current_map_index __attribute__((sda));
-extern int D_L00_001A8FF0[] MACRO_ADDR;
-extern int D_L00_001ADB2C __attribute__((sda));
+extern int g_hero_locked_flag[] MACRO_ADDR;
+extern int g_active_tether_object __attribute__((sda));
 extern int g_synthenoid_slots[4] __attribute__((sda));
-extern int D_L00_001B076C __attribute__((sda)), D_L00_001B0770 __attribute__((sda));
-extern float D_L00_001B0774 __attribute__((sda)), D_L00_001B0778 __attribute__((sda));
-extern float D_L00_001B077C __attribute__((sda)), D_L00_001B0784 __attribute__((sda));
-extern int D_L00_001B0780 __attribute__((sda));
+extern int g_synthenoid_id_min __attribute__((sda)), g_synthenoid_id_max __attribute__((sda));
+extern float g_synthenoid_random_offset __attribute__((sda)), g_synthenoid_scale_min __attribute__((sda));
+extern float g_synthenoid_scale_max __attribute__((sda)), g_synthenoid_effect_size __attribute__((sda));
+extern int g_synthenoid_color_alpha __attribute__((sda));
 extern char *kilonoid_spawn(void *, void *);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
@@ -145,17 +145,17 @@ void synthenoid_update(Object *object)
     state = object->state;
     if (!state)
         return;
-    if (D_L00_001A8F00) {
+    if (g_game_l00_mode) {
         state->disabled = 1;
         object->flags |= 0x41;
         return;
     }
     if (state->disabled == 1)
         object->flags &= 0xFFBE;
-    if (((Material *)(D_00139587[0] * 224 + (char *)g_weapon_l00_table))->active &&
+    if (((Material *)(g_kilonoid_weapon_index[0] * 224 + (char *)g_weapon_l00_table))->active &&
         object->mode != 2 && kilonoid_spawn(g_hero_moby, &object->position)) {
         qzero(&state->velocity);
-        state->timer = D_L00_001B0768;
+        state->timer = g_synthenoid_fade_frames;
         if (state->slot != -1) {
             entry = (Slot *)(g_sound_state + state->slot * 112);
             if (entry->owner == object && entry->active)
@@ -182,7 +182,7 @@ void synthenoid_update(Object *object)
         object->color2 = 255;
         state->count = 0;
         state->value30 = 0;
-        state->value2c = D_L00_001B075C;
+        state->value2c = g_synthenoid_state_value;
         qcopy(&state->last_position, &g_hero_state.player);
         entry = (Slot *)(g_sound_state + state->slot * 112);
         if (entry->owner != object || !entry->active) {
@@ -246,7 +246,7 @@ void synthenoid_update(Object *object)
             synthenoid_update_movement(object, state);
         } else {
             qzero(&state->velocity);
-            state->timer = D_L00_001B0768;
+            state->timer = g_synthenoid_fade_frames;
             if (state->slot != -1) {
                 Slot *entry = (Slot *)(g_sound_state + state->slot * 112);
                 if (entry->owner == object && entry->active)
@@ -283,7 +283,7 @@ void synthenoid_update(Object *object)
         }
         matrix.q = 0;
         qcopy(&vector, &object->position);
-        vec_add_random_offset(&vector, D_L00_001B0774);
+        vec_add_random_offset(&vector, g_synthenoid_random_offset);
         {
             int red = (func_001163B0() + 0x30) & 0x3F;
             int green = (func_001163B0() + 0x20) & 0x3F;
@@ -295,22 +295,22 @@ void synthenoid_update(Object *object)
 
             red |= green << 8;
             red |= blue << 16;
-            color = red | (D_L00_001B0780 << 24);
+            color = red | (g_synthenoid_color_alpha << 24);
             direction = func_001163B0() % 2;
             if (state->timer & 1)
                 direction = -direction;
-            id = math_random_int_range(D_L00_001B076C, D_L00_001B0770);
-            scale = math_random_float_range(D_L00_001B0778, D_L00_001B077C);
+            id = math_random_int_range(g_synthenoid_id_min, g_synthenoid_id_max);
+            scale = math_random_float_range(g_synthenoid_scale_min, g_synthenoid_scale_max);
             part_spawn_ground_effect(&vector, id, color, 2, direction, &matrix, 0,
-                          scale, 0.001f, D_L00_001B0784 * 0.0002777777845f);
+                          scale, 0.001f, g_synthenoid_effect_size * 0.0002777777845f);
         }
         object->flags |= 0x200;
-        object->alpha -= 128 / D_L00_001B0768;
+        object->alpha -= 128 / g_synthenoid_fade_frames;
         object->angle_z = FastAddRotations(object->angle_z, 0.41887909f);
         break;
     }
     if (object->mode) {
-        if (!D_L00_001ADB2C) {
+        if (!g_active_tether_object) {
             if (g_hero_state.mode == 39) {
                 FastVecAdd(&object->position, &object->position, &g_hero_state.movement);
             } else {
@@ -320,7 +320,7 @@ void synthenoid_update(Object *object)
             }
         }
         vec_transform_or_copy(&object->position, &object->position);
-        if (!D_L00_001A8FF0[0])
+        if (!g_hero_locked_flag[0])
             part_queue_ground_shadow(object, 0.3f);
         synthenoid_emit_exhaust(object, state);
     }

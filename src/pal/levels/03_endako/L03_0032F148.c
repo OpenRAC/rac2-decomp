@@ -9,7 +9,7 @@ extern int math_random_int_range(int a0, int a1);
 extern int moby_move_to_target_temp_limits(char *a0, char *a1, float f12, char *a2, float f13, float f14);
 
 /* Aim the record at the shape the caller found. */
-int func_PAL_L03_0032F148(char *self, float *target, char *third, float amount, float f13, float f14)
+int enemy_aim_toward_target_pal(char *self, float *target, char *third, float amount, float f13, float f14)
 {
     char *data = (char *)moby_get_vars_word_18(self);
     float angle;

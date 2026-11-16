@@ -6,8 +6,8 @@ extern void dobbo_update_spin_direction(char *);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
-extern float D_L09_001B15A8 __attribute__((sda));
-extern float D_L09_001B15AC __attribute__((sda));
+extern float g_door_slide_speed __attribute__((sda));
+extern float g_door_slide_accel __attribute__((sda));
 extern char g_sound_state[];
 typedef struct { float value[2]; float rate[2]; } DobboDoorMotion;
 /* Per-frame update of the sliding double door (moby class 3680): it opens, stays open for a while and closes again. */
@@ -37,8 +37,8 @@ void sliding_l09_door_update(char *obj) {
             *(int *)(data+0x1C) = PlayMobySound(0,4,obj);
         }
         next = (*(int *)(data+0x14)+1)&1;
-        speed = D_L09_001B15A8 * 0.000277777785f;
-        accel = D_L09_001B15AC * 0.000277777785f;
+        speed = g_door_slide_speed * 0.000277777785f;
+        accel = g_door_slide_accel * 0.000277777785f;
         if (((DobboDoorMotion *)data)->value[*(int *)(data+0x14)] < 1.0f)
             math_step_value_toward_target(&((DobboDoorMotion *)data)->value[*(int *)(data+0x14)],(float *)(data+8)+*(int *)(data+0x14),1.0f,speed,accel,1.0f);
         if (((DobboDoorMotion *)data)->value[*(int *)(data+0x14)] > 0.6f)
@@ -56,8 +56,8 @@ void sliding_l09_door_update(char *obj) {
         break;
     case 4:
         next4 = (*(int *)(data+0x14)+1)&1;
-        speed4 = D_L09_001B15A8 * 0.000277777785f;
-        accel4 = D_L09_001B15AC * 0.000277777785f;
+        speed4 = g_door_slide_speed * 0.000277777785f;
+        accel4 = g_door_slide_accel * 0.000277777785f;
         if (((DobboDoorMotion *)data)->value[next4] > 0.2f)
             math_step_value_toward_target(&((DobboDoorMotion *)data)->value[next4],(float *)(data+8)+*(int *)(data+0x14),0.2f,speed4,accel4,1.0f);
         if (((DobboDoorMotion *)data)->value[next4] < 0.6f)

@@ -3,7 +3,7 @@
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int UpdateMissionSelectionMenu(void);
 extern unsigned int menu_get_saved_state(void);
 extern void level_run_update(void);
@@ -34,26 +34,26 @@ void level_run_callbacks(void)
     if (ref_L00_0030CDB0_00[0] != 0)
         return;
 
-    if (D_001A8CFC[0] == 0)
+    if (g_resident_data_base[0] == 0)
         goto states;
     UpdateMissionSelectionMenu();
-    fn = (Fn)((Sub *)(D_001A8CFC[0] + 0x38000))->cb2;
+    fn = (Fn)((Sub *)(g_resident_data_base[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)
             return;
     }
     result = 0;
     for (i = 0; i < 4; i++) {
-        sub = (Sub *)(D_001A8CFC[0] + 0x38000);
+        sub = (Sub *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot[i].cb != 0)
-            result |= ((Fn *)(D_001A8CFC[0] + 0x3F370))[i * 2]();
+            result |= ((Fn *)(g_resident_data_base[0] + 0x3F370))[i * 2]();
     }
     if (result != 0)
         return;
     for (i = 0; i < 2; i++) {
-        sub = (Sub *)(D_001A8CFC[0] + 0x38000);
+        sub = (Sub *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot2[i].cb != 0)
-            result |= ((Fn *)(D_001A8CFC[0] + 0x3F390))[i * 2]();
+            result |= ((Fn *)(g_resident_data_base[0] + 0x3F390))[i * 2]();
     }
     if (result != 0)
         return;
@@ -64,7 +64,7 @@ states:
                 return;
         }
     }
-    g = D_001A8CFC[0];
+    g = g_resident_data_base[0];
     if (g != 0) {
         char *b = g + 0x38000;
         g = (char *)((Sub *)b)->cb1;
@@ -115,27 +115,27 @@ void level_run_callbacks_and_draw(void)
     if (ref_L00_0030CFE0_00[0] != 0)
         return;
 
-    if (D_001A8CFC[0] == 0)
+    if (g_resident_data_base[0] == 0)
         goto states;
 
     hud_update_letterbox_bars();
     result = 0;
     func_0029BEB8();
 
-    fn = (Cb)((SubBf *)(D_001A8CFC[0] + 0x38000))->cb2;
+    fn = (Cb)((SubBf *)(g_resident_data_base[0] + 0x38000))->cb2;
     if (fn != 0)
         result = fn() != 0;
 
     for (i = 0; i < 4; i++) {
-        sub = (SubBf *)(D_001A8CFC[0] + 0x38000);
+        sub = (SubBf *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot[i].cb != 0)
-            result |= ((Cb)((FnBf *)(D_001A8CFC[0] + 0x3F370))[i].fn)();
+            result |= ((Cb)((FnBf *)(g_resident_data_base[0] + 0x3F370))[i].fn)();
     }
 
     for (i = 0; i < 2; i++) {
-        sub = (SubBf *)(D_001A8CFC[0] + 0x38000);
+        sub = (SubBf *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot2[i].cb != 0)
-            result |= ((Cb)((FnBf *)(D_001A8CFC[0] + 0x3F390))[i].fn)();
+            result |= ((Cb)((FnBf *)(g_resident_data_base[0] + 0x3F390))[i].fn)();
     }
 
     if (result != 0)
@@ -149,7 +149,7 @@ states:
         }
     }
 
-    g = D_001A8CFC[0];
+    g = g_resident_data_base[0];
     if (g != 0) {
         char *b = g + 0x38000;
         g = (char *)((SubBf *)b)->cb1;
@@ -180,10 +180,10 @@ typedef struct Entry29D830 {
 } Entry29D830;
 typedef struct { char pad[0x230]; int index; } Base29D830;
 extern Base29D830 g_map_overlay_state;
-extern Entry29D830 *D_00258BA0[];
+extern Entry29D830 *g_map_entry_lists[];
 typedef struct { int unused; int count; Entry29D830 *list; } State29D830;
-extern State29D830 D_001B1A50[] __attribute__((sda));
-extern unsigned char D_001A7BE8[] MACRO_ADDR;
+extern State29D830 g_menu_entry_list_state[] __attribute__((sda));
+extern unsigned char g_map_unlocked_flags[] MACRO_ADDR;
 extern int func_0029D9D0(int, int);
 
 /* Updates the state of each entry in the current list, runs their checks, and returns 1 when none are still pending. */
@@ -191,12 +191,12 @@ int menu_update_entry_states(void)
 {
     Entry29D830 *e;
 
-    D_001B1A50[0].list = D_00258BA0[g_map_overlay_state.index];
-    if (D_001B1A50[0].list == 0)
+    g_menu_entry_list_state[0].list = g_map_entry_lists[g_map_overlay_state.index];
+    if (g_menu_entry_list_state[0].list == 0)
         return 0;
-    e = D_001B1A50[0].list;
+    e = g_menu_entry_list_state[0].list;
     for (; e->id != 0; e++) {
-        if ((e->flags & 4) && D_001A7BE8[g_map_overlay_state.index] == 0) {
+        if ((e->flags & 4) && g_map_unlocked_flags[g_map_overlay_state.index] == 0) {
             e->state = 0;
             continue;
         }
@@ -207,14 +207,14 @@ int menu_update_entry_states(void)
         else
             e->state = 2;
     }
-    for (e = D_001B1A50[0].list; e->id != 0; e++) {
+    for (e = g_menu_entry_list_state[0].list; e->id != 0; e++) {
         if (e->fn != 0)
             e->result = e->fn(e->arg);
     }
-    D_001B1A50[0].count = 0;
-    for (e = D_001B1A50[0].list; e->id != 0; e++) {
+    g_menu_entry_list_state[0].count = 0;
+    for (e = g_menu_entry_list_state[0].list; e->id != 0; e++) {
         if (e->state == 1 && (e->flags & 2) == 0)
-            D_001B1A50[0].count++;
+            g_menu_entry_list_state[0].count++;
     }
-    return D_001B1A50[0].count == 0;
+    return g_menu_entry_list_state[0].count == 0;
 }

@@ -6,7 +6,7 @@ typedef union {
     TI128 q;
     float f[4];
 } L20_0039BB18_V4;
-extern float D_L20_001AEC68 __attribute__((sda));
+extern float g_glow_trail_drift __attribute__((sda));
 extern int math_fast_float_d(int *);
 extern float vec_distance_xy(void *, void *);
 extern float ApproachValue(float *, float, float);
@@ -64,7 +64,7 @@ pathA:
         ApproachValue((float *)s0, 1.0f, 0.020000001f);
     }
 
-    g = D_L20_001AEC68;
+    g = g_glow_trail_drift;
     {
         float v = *(float *)(s0 + 0xC) + g * 0.020000001f;
         *(float *)(s0 + 0xC) = v;

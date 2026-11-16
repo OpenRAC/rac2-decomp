@@ -31,11 +31,11 @@ extern void vec_scale_to_length(void *, void *, float);
 extern char *part_spawn_blast_effect_moby(char *, void *, void *, float);
 
 extern char g_hero_position[];
-extern char D_L07_001B9200[];
-extern int D_L07_001B0C50 __attribute__((sda));
+extern char g_hero_position_block[];
+extern int g_launcher_launch_offset __attribute__((sda));
 extern unsigned short *g_moby_l07_group_lists[];
 extern char *g_moby_l07_array[] __attribute__((sda));
-extern int D_L07_001B22F8[] __attribute__((sda));
+extern int g_entity_group_count[] __attribute__((sda));
 extern void *D_L07_002A3380[];
 
 typedef struct {
@@ -129,11 +129,11 @@ c3: {
     distance = SteerTowardTarget(moby);
     if (distance < 3.0f) {
         if (vars->ids[vars->idx] != -1) {
-            matrix_mul_vec3(launchPos, &D_L07_001B0C50, moby + 0xC0);
+            matrix_mul_vec3(launchPos, &g_launcher_launch_offset, moby + 0xC0);
             FastVecAdd(launchPos, launchPos, moby + 0x10);
             for (p = g_moby_l07_group_lists[vars->ids[vars->idx]];
                  (vars->ids[vars->idx] & 0xFF) != 0xFF &&
-                 vars->ids[vars->idx] <= D_L07_001B22F8[0] && p != 0 &&
+                 vars->ids[vars->idx] <= g_entity_group_count[0] && p != 0 &&
                  ((short)p[-1] >= 0 || p == g_moby_l07_group_lists[vars->ids[vars->idx]]);
                  p++) {
                 member = g_moby_l07_array[0] + ((*p & 0x7FFF) << 8);
@@ -186,7 +186,7 @@ tail:
         *(unsigned char *)(moby + 0xA8) = 0xFF;
         if (vars->f20 == 0.0f) {
             part_spawn_masked_debris(moby, 0x7F7, vars->b60, 0xFF, 5.0f, 10.0f, 5.0f, 10.0f);
-            FastVecSub(awayDir, D_L07_001B9200, moby + 0x10);
+            FastVecSub(awayDir, g_hero_position_block, moby + 0x10);
             vec_scale_to_length(awayDir, awayDir, 1.0f);
             part_spawn_blast_effect_moby(moby, moby + 0x10, awayDir, 0.0f);
             PlayMobySound(2, 0, moby);

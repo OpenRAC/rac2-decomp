@@ -1,9 +1,10 @@
+#include "names.h"
 /* func_PAL_L00_0039C438, the PAL copy of func_0030ECC8: the same C, with PAL's callee names and
  * the 50 Hz values: per-frame rates and speeds scaled by 6/5 or (6/5)^2, timers by 5/6, 30.0f
  * becoming 25.0f and 1.2f becoming 1.24f. The modulus % 60 stays. */
 #include "common.h"
 typedef float VecE[4] __attribute__((aligned(16)));
-extern VecE D_001BAFB0, D_001BAFA0;
+extern VecE g_coll_hit_point, g_coll_hit_position;
 typedef struct {
     u8 pad00[0x80]; VecE position; u8 pad90[0x50]; VecE pickup_target;
     u8 padF0[0x2290-0xF0]; void *moby;
@@ -20,7 +21,7 @@ extern u8 g_item_slot_to_record[];
 extern s32 g_item_ammo_counts[];
 extern void *g_hero_moby NOT_SDA;
 extern s32 g_game_time[] __attribute__((sda));
-extern s32 D_001B24A8[] __attribute__((sda));
+extern s32 g_ammo_pickup_time[] __attribute__((sda));
 extern s32 D_001B24A8_gp SDATA(D_001B24A8);
 extern s32 math_fast_float_d(s32 *);
 extern u32 weapon_add_ammo(s32, s32);
@@ -30,7 +31,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern void func_PAL_002B15B8(s32, s32, s32);
+extern void value_forward_three_args_pal(s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern f32 FastVecLength(void *);
 extern f32 math_fabs(f32);
@@ -45,7 +46,7 @@ extern s32 subtract_integer_with_clamp(s32);
 #define EF(p, n) (*(f32 *)((u8 *)(p) + (n)))
 #define EI(p, n) (*(s32 *)((u8 *)(p) + (n)))
 
-void func_PAL_L00_0039C438(u8 *object)
+void ammo_pickup_update_pal(u8 *object)
 {
     VecE start, next;
     f32 alpha;
@@ -56,7 +57,7 @@ void func_PAL_L00_0039C438(u8 *object)
             qcopy(start, object+0x10);
             start[2] += 0.5f;
             if (coll_test_point(start,2,0,0.4f)) {
-                qcopy(object+0x10,D_001BAFB0);
+                qcopy(object+0x10,g_coll_hit_point);
                 EF(object,0x18) -= 0.5f;
             }
         }
@@ -67,7 +68,7 @@ void func_PAL_L00_0039C438(u8 *object)
         start[2] += 0.1f;
         if (CollLine(start,next,2,0,0)) {
             vec_clear_128(state+0x10);
-            qcopy(object+0x10,D_001BAFA0);
+            qcopy(object+0x10,g_coll_hit_position);
         } else qcopy(object+0x10,next);
     }
     switch (object[0x20]) {
@@ -105,12 +106,12 @@ void func_PAL_L00_0039C438(u8 *object)
                 difference=current-old;
                 if (difference==1) sound=defs[mapping[sound_item]].sound_single;
                 else sound=defs[mapping[sound_item]].sound_multiple;
-                func_PAL_002B15B8(sound,difference,-1);
+                value_forward_three_args_pal(sound,difference,-1);
             }
             object[0x20]=2;
             EF(object,0x2C)*=1.24f;
             vec_clear_128(state+0x10);
-            elapsed=g_game_time[0]-D_001B24A8[0];
+            elapsed=g_game_time[0]-g_ammo_pickup_time[0];
             EF(state,0x24)=0.16000001f;
             if (subtract_integer_with_clamp(elapsed)>=9) {
                 snd_play_from_class_bank(0,0,object,0xD5);

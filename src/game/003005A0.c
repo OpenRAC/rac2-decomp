@@ -9,12 +9,12 @@ typedef struct {
 } OBJ_Fd7eaf5bf;
 #endif
 
-extern OBJ_Fd7eaf5bf *D_L00_001ADB2C __attribute__((sda));
+extern OBJ_Fd7eaf5bf *g_active_tether_object __attribute__((sda));
 
 /* Tells which of four related objects is current (0 to 3), or -1 if none. */
 int moby_get_current_variant_index(void)
 {
-    OBJ_Fd7eaf5bf *p = D_L00_001ADB2C;
+    OBJ_Fd7eaf5bf *p = g_active_tether_object;
 
     if (p) {
         switch (p->kind) {

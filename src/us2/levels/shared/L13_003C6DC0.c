@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern char g_hero_state[];
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 extern int FloatToInt(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void moby_set_state(char *, int, int);
@@ -37,7 +37,7 @@ void func_US2_L13_003C6DC0(char *obj)
         }
         hero = g_hero_state;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
-            if (D_001A7A40[0xC0] != 0) {
+            if (g_unlocked_item_flags[0xC0] != 0) {
                 ForceClaimNotice(0xC, 0x1349, 1);
                 *(short *)(hero + 0x1F2) = 0xA;
                 turn = *(float *)(rig + 0xC);
@@ -62,7 +62,7 @@ void func_US2_L13_003C6DC0(char *obj)
             glow = 0x80;
         else if (glow < 0x20)
             glow = 0x20;
-        if (D_001A7A40[0xC0] != 0)
+        if (g_unlocked_item_flags[0xC0] != 0)
             *(int *)(obj + 0x78) = (glow << 8) | 0x80000000;
         else
             *(int *)(obj + 0x78) = glow | 0x80000000;

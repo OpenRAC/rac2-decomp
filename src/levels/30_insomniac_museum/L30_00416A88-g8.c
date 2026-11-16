@@ -1,6 +1,6 @@
 #include "common.h"
-extern float D_L30_001B1F04 __attribute__((sda));
-extern char *D_L30_001C0218 NOT_SDA;
+extern float g_beam_l30_spin_degrees __attribute__((sda));
+extern char *g_hit_l30_result NOT_SDA;
 extern int coll_sweep_from_object(void *, float, void *, float, int, float, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -39,8 +39,8 @@ void UpdateMuseumProjectile(char *moby) {
             if (CollLine(moby + 0x10, pos, 0, moby, &packet) || coll_test_point(moby + 0x10, 0, moby, 0.3f)) {
                 /* Two full copies of the response: cross-jumping merges their tails after reload,
                    and each copy's velocity pointer stays local to its block, in $s0. */
-                if (D_L30_001C0218) {
-                    if (D_L30_001C0218 == *(char **)(vars + 0x10)) goto move; /* An owner hit continues normal movement. */
+                if (g_hit_l30_result) {
+                    if (g_hit_l30_result == *(char **)(vars + 0x10)) goto move; /* An owner hit continues normal movement. */
                     qcopy(&velocity, vars);
                     FastVecScale(&velocity, &velocity, 1.5f);
                     velocity.f[2] = 1.0f;
@@ -77,7 +77,7 @@ move:
             return;
         }
     }
-    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
-    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, D_L30_001B1F04 * 0.01745329424738884f);
+    math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, g_beam_l30_spin_degrees * 0.01745329424738884f);
+    math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, g_beam_l30_spin_degrees * 0.01745329424738884f);
     gfx_queue_draw_callback(func_L30_00416FB0, moby);
 }

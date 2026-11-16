@@ -9,12 +9,12 @@ extern void FastVecAdd(void *,void *,void *);
 extern void destructible_update(void *,void *);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *);
-extern int D_L08_001B2508;
-extern u8 D_L08_001B9B00[];
-extern u8 *D_L08_001FE7C0[];
-extern u8 *D_L08_001B2ACC __attribute__((sda));
-extern float D_L08_001B0B5C __attribute__((sda));
-extern u8 D_L08_001AC5E0[] MACRO_ADDR;
+extern int g_frame_l08_counter;
+extern u8 g_hero_position_vec[];
+extern u8 *g_path_list_table[];
+extern u8 *g_collision_box_table __attribute__((sda));
+extern float g_spawner_speed_divisor __attribute__((sda));
+extern u8 g_normalize_length_vec[] MACRO_ADDR;
 extern void moby_mark_spawned(void *);
 extern int GetFirstMobyInGroup(void **,int,int,int);
 extern int FastDecTimer(void *);
@@ -49,12 +49,12 @@ void spawner_l08_update(u8 *moby)
     void *path_arg,*target_pos;
     int path_flag,target_id;
     destructible_update(moby,vars);
-    if(moby[0x31] && fast_vec_dist(moby+0x10,D_L08_001B9B00)<24.0f) {
+    if(moby[0x31] && fast_vec_dist(moby+0x10,g_hero_position_vec)<24.0f) {
         moby_update_ground_check(moby);moby[0x6f]=0x16;
     }
     switch(moby[0x20]) {
     case 0:
-        if(D_L08_001B2508) {
+        if(g_frame_l08_counter) {
             int i;
             found_child=0;
             for(i=0;i<2;i++) {
@@ -69,7 +69,7 @@ void spawner_l08_update(u8 *moby)
         if(!math_random_int_below(7)) {
             path_arg=0;path_flag=0;target_pos=0;target_id=0;
             if(E_I(vars,0x124)!=-1) {path_arg=vars+0x124;path_flag=1;}
-            if(E_I(vars,0x128)!=-1) {u8 *target=D_L08_001FE7C0[E_I(vars,0x128)];target_id=E_I(target,0);target_pos=target+0x10;}
+            if(E_I(vars,0x128)!=-1) {u8 *target=g_path_list_table[E_I(vars,0x128)];target_id=E_I(target,0);target_pos=target+0x10;}
             FindHeroOrMobyTarget(moby,vars+0xc0,path_arg,path_flag,target_pos,target_id,E_F(vars,0x120));
         } else {
             u8 *target=*(u8 **)(vars+0x100);
@@ -99,7 +99,7 @@ void spawner_l08_update(u8 *moby)
             best=100000.0f;
             for(i=0;i<4;i++) {
                 if(((FVars *)vars)->targets[i]!=-1) {
-                    u8 *target=D_L08_001B2ACC+((FVars *)vars)->targets[i]*128;
+                    u8 *target=g_collision_box_table+((FVars *)vars)->targets[i]*128;
                     distance=fast_vec_dist(g_hero_position,target+0x30);
                     if(distance<best) {chosen_target=target;best=distance;}
                 }
@@ -117,7 +117,7 @@ void spawner_l08_update(u8 *moby)
             for(i=0;i<4;i++) {
                 int slot=(i+start_slot)%4;
                 if(((FVars *)vars)->targets[slot]!=-1) {
-                    chosen_target=D_L08_001B2ACC+((FVars *)vars)->targets[slot]*128;
+                    chosen_target=g_collision_box_table+((FVars *)vars)->targets[slot]*128;
                     break;
                 }
             }
@@ -136,7 +136,7 @@ void spawner_l08_update(u8 *moby)
         {float height=coll_probe_ground_height_below(&frame.target,0,0.5f);
         if(height!=0.0f) E_F(&frame.target,8)=height;}
         FastVecSub(&frame.direction,&frame.target,(moby+0x10));
-        speed=FastVecLength(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? FastVecLength(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
+        speed=FastVecLength(&frame.direction)/g_spawner_speed_divisor<0.08000000566f ? FastVecLength(&frame.direction)/g_spawner_speed_divisor : 0.08000000566f;
         vec_scale_to_length(&frame.direction,&frame.direction,speed);
         moby_transform_joint_to_world(moby,0,&frame.velocity);
         vec_scale_to_length(&frame.step,&frame.direction,0.05f);
@@ -157,7 +157,7 @@ void spawner_l08_update(u8 *moby)
         break;
     case 4:
         if(mine_fall(moby,vars+0x60)&0x40) {
-            vec_scale_to_length(&frame.target,D_L08_001AC5E0,0.1666666716f);
+            vec_scale_to_length(&frame.target,g_normalize_length_vec,0.1666666716f);
             SpawnExplosionEffects(moby,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
             moby_mark_spawned(moby);
         }

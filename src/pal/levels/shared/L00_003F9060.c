@@ -11,12 +11,12 @@ extern void vaporizer_update_passes(char *);
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
 extern void lerp_vector(void *, void *, void *, float);
-extern void func_PAL_L00_003F9B90(char *, void *);
+extern void vaporizer_add_chain_joint_pal(char *, void *);
 extern void func_PAL_L00_003FAD60(char *, void *);
-extern int func_PAL_L00_003F9678(char *, void *);
+extern int vaporizer_bolt_test_hit_pal(char *, void *);
 extern int math_fast_float_d(void *);
 
-void func_PAL_L00_003F9308(unsigned char *object) {
+void vaporizer_bolt_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     MovingEffectVector previous, point;
     int i;
@@ -43,7 +43,7 @@ void func_PAL_L00_003F9308(unsigned char *object) {
         object[0x20] = 1;
     for (i = 0; i < 4; i++) {
         lerp_vector(&point, &previous, position, IntToFloat(i) * 0.25f);
-        func_PAL_L00_003F9B90(object, &point);
+        vaporizer_add_chain_joint_pal(object, &point);
     }
     func_PAL_L00_003FAD60(object, position);
     lerp_vector(&point, &previous, position, 0.5f);
@@ -61,7 +61,7 @@ void func_PAL_L00_003F9308(unsigned char *object) {
             if (*(float *)(object + 0x18) > hi) *(float *)(object + 0x18) = hi;
         }
         object[0x20] = 2;
-    } else if (func_PAL_L00_003F9678(object, &previous) || math_fast_float_d(state + 0x10)) {
+    } else if (vaporizer_bolt_test_hit_pal(object, &previous) || math_fast_float_d(state + 0x10)) {
         object[0x20] = 2;
     } else {
         vaporizer_update_passes(object);

@@ -7,7 +7,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
-extern unsigned char *D_L00_001FEAD8;
+extern unsigned char *g_spinning_effect_byte;
 
 unsigned char *func_PAL_L00_00342480(Quadword *position, Quadword *velocity, int lifetime) {
     unsigned char *particle = part_alloc(0x66);
@@ -17,7 +17,7 @@ unsigned char *func_PAL_L00_00342480(Quadword *position, Quadword *velocity, int
         particle[9] = FloatToInt(2.0f) + 0x40;
         particle[3] = 0x44;
         particle[1] = 0;
-        particle[2] = *D_L00_001FEAD8;
+        particle[2] = *g_spinning_effect_byte;
         *(float *)(particle + 0xC) = math_random_float_range(0.03f, 0.175f) * 210000.0f;
         particle[8] = math_random_int_below(255);
         *(short *)(particle + 0xA) = (((int)(lifetime) * 5 + 2) / 6);

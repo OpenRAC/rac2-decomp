@@ -26,19 +26,19 @@ typedef struct {
 } PickupPlayer;
 extern char g_hero_state[];
 #define PLAYER ((PickupPlayer *)D_00189E20)
-extern int D_L00_001A8FF0[] __attribute__((sda));
+extern int g_hero_locked_flag[] __attribute__((sda));
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern int D_L00_001B2ADC[] MACRO_ADDR;
+extern int g_sound_last_frame[] MACRO_ADDR;
 extern void *g_hero_moby NOT_SDA;
 extern void vec_store_helper(void *);
-extern s32 func_PAL_00273A10(void *);
+extern s32 cam_moby_update_pal(void *);
 extern float fast_vec_dist(void *,void *);
 extern int math_fast_float_d(void *);
 extern float math_fabs(float);
 extern float vec_distance_xy(void *,void *);
 extern float gravity_get_center_distance(void *);
 extern int weapon_add_ammo(int,int);
-extern void func_PAL_L00_003282B0(int,int,int);
+extern void part_reset_effects_pal(int,int,int);
 extern void moby_set_state(void *,int,int);
 extern void vec_clear_128(void *);
 extern int subtract_integer_with_clamp(int);
@@ -56,7 +56,7 @@ extern void quaternion_to_rotation_basis(void *,void *);
 extern void multiply_matrix3x3(void *,void *,void *);
 extern int vec_fast_helper_d(void *,void *);
 
-void func_PAL_L00_003D51C0(char *m)
+void AmmoPickupUpdate_pal(char *m)
 {
     char *d=*(char **)(m+0x68);
     PickupResource *e;
@@ -84,7 +84,7 @@ void func_PAL_L00_003D51C0(char *m)
             qzero(d);vec_store_helper(d+0x10);B(d,0x5c)=0;
         }
         qcopy(a,d);
-        func_PAL_00273A10(m);
+        cam_moby_update_pal(m);
         changed=0;
         if(fast_vec_dist(a,d)>F(d,0x48)*2.0f)changed=1;
         yes=1;
@@ -100,7 +100,7 @@ void func_PAL_L00_003D51C0(char *m)
         }
         if(g_item_ammo_counts[I(d,0x68)] >=
            ((PickupResource *)(g_item_slot_to_record[I(d,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)yes=0;
-        if(D_L00_001A8FF0[0]) {
+        if(g_hero_locked_flag[0]) {
             if(gravity_get_center_distance(m+0x10)<F(d,0x78)-2.0f)goto force_pickup;
         } else if(F(m,0x18)<F(d,0x78)-2.0f)goto force_pickup;
         if(!PLAYER->override)goto check_enabled;
@@ -120,13 +120,13 @@ check_enabled:
                     e=&g_weapon_l00_table[g_item_slot_to_record[i]];
                     sound=e->multiple_sound;
                 }
-                func_PAL_L00_003282B0(sound,delta,-1);
+                part_reset_effects_pal(sound,delta,-1);
             }
             moby_set_state(m,2,-1);
             F(d,0x74)=0.16000001f;
             vec_clear_128(d);
-            if(subtract_integer_with_clamp(g_frame_l00_counter[0]-D_L00_001B2ADC[0])>8) {
-                PlayMobySound(0,0,m);D_L00_001B2ADC[0]=g_frame_l00_counter[0];
+            if(subtract_integer_with_clamp(g_frame_l00_counter[0]-g_sound_last_frame[0])>8) {
+                PlayMobySound(0,0,m);g_sound_last_frame[0]=g_frame_l00_counter[0];
             }
         }
         break;

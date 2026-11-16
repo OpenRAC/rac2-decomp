@@ -7,10 +7,10 @@ typedef struct {
     unsigned char pad34a[0x1f46]; char *object;
 } PlayerView;
 extern PlayerView g_hero_state;
-extern int D_L00_001A8FF0;
-extern float D_L00_001B0E34 __attribute__((sda)),D_L00_001B0E38 __attribute__((sda));
-extern char *D_L00_001FACE0[],*D_L00_001BF218[];
-extern Vec D_L00_001BF220;
+extern int g_hero_locked_flag;
+extern float g_sheepinator_target_cone_angle __attribute__((sda)),g_sheepinator_beam_range __attribute__((sda));
+extern char *g_target_l00_list[],*g_hit_l00_result[];
+extern Vec g_hero_l00_position;
 extern void FastVecScale(void *,void *,float),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern int CollLine(void *,void *,int,void *,void *);
 extern char *moby_get_private_value_0(char *);
@@ -25,17 +25,17 @@ char *sheepinator_find_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     Vec *start=&frame.origin;
     char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
     Vec *pos; int index,accepted,visible;
-    float best=D_L00_001B0E38,heading,elevation,delta,distance,dot,length,angle,radius;
+    float best=g_sheepinator_beam_range,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
     selected=0;
     FastVecAdd(&frame.player,g_hero_state.object+0x10,&frame.offset);
     if(CollLine(&frame.player,start,6,g_hero_state.object,0)) {
-        qcopy(start,&D_L00_001BF220);
+        qcopy(start,&g_hero_l00_position);
         return 0;
     }
     index=0;
-    while((candidate=D_L00_001FACE0[index])!=0) {
+    while((candidate=g_target_l00_list[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
         if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
@@ -50,7 +50,7 @@ char *sheepinator_find_target(char *obj,Vec *origin,float *yaw,float *pitch) {
         elevation=mat_fast_helper_a(vec_distance_xy(start,&frame.target),frame.target.f[2]-start->f[2]);
         delta=FastDiffRots(*yaw,heading);
         distance=fast_vec_dist(start,&frame.target);
-        if(D_L00_001A8FF0 || g_hero_state.allowed) {
+        if(g_hero_locked_flag || g_hero_state.allowed) {
             if(distance<2.5f) {
             FastVecSub(&frame.ray,pos,g_hero_state.object+0x10);
             dot=FastVecDot(&frame.ray,g_hero_state.object+0xE0);
@@ -70,20 +70,20 @@ char *sheepinator_find_target(char *obj,Vec *origin,float *yaw,float *pitch) {
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
-        if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>D_L00_001B0E38) goto next;
+        if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>g_sheepinator_beam_range) goto next;
         vec_build_spherical_offset(&frame.aim,distance,*yaw,*pitch+g_hero_state.pitch*0.5f);
         FastVecAdd(&frame.aim,&frame.aim,start);
         angle=fast_vec_dist(&frame.aim,&frame.target);
         angle=math_fast_angle_helper(angle/(distance+distance)); angle+=angle;
-        if(D_L00_001B0E34*0.017453294f<angle && (definition=moby_get_private_value_0(candidate))!=0) {
+        if(g_sheepinator_target_cone_angle*0.017453294f<angle && (definition=moby_get_private_value_0(candidate))!=0) {
             radius=IntToFloat((unsigned char)definition[10])*0.125f;
             length=math_fast_angle_helper(radius/distance);
             if(radius<distance) { angle-=length; if(angle<0.0f) angle=0.0f; }
         }
-        if(angle<D_L00_001B0E34*0.017453294f) {
+        if(angle<g_sheepinator_target_cone_angle*0.017453294f) {
             visible=1;
             if(CollLine(start,&frame.target,6,obj,0)) {
-                hit=D_L00_001BF218[0];
+                hit=g_hit_l00_result[0];
                 if(!hit || hit!=candidate) visible=0;
             }
             if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(ctx+0x10)) break; }

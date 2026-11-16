@@ -11,7 +11,7 @@ typedef float f32;
 /* Level 08 data.  tools/build.py binds D_L08_XXXXXXXX at its address in level 08, and the
    `sda` declaration is what makes cc1 emit the one-instruction form the assembler can turn
    into `lw $v,offs($gp)` at a site inside a `.set nomacro` region (a compiler delay slot). */
-extern s32 D_L08_001B29DC __attribute__((sda));
+extern s32 g_moby_array __attribute__((sda));
 
 extern char *func_32A170(s32 a, s32 b, s32 c);
 extern void func_328A38(s32 a, s32 b);
@@ -67,7 +67,7 @@ s32 moby_handle_is_gone(s32 handle) {
     s32 table;
     s32 offset;
     s32 entry;
-    table = D_L08_001B29DC;
+    table = g_moby_array;
     if (handle != -1) {
         offset = handle << 8;
         entry = table + offset;
@@ -87,7 +87,7 @@ s32 moby_handle_is_past_early_state(s32 handle) {
     u8 state;
     if (handle != -1) {
         offset = handle << 8;
-        entry = D_L08_001B29DC;
+        entry = g_moby_array;
         entry = entry + offset;
         state = *(u8 *)(entry + 0x20);
         handle = 0;
@@ -143,7 +143,7 @@ extern void FastVecCross(void *, void *, void *);
 extern f32 FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern s32 math_closest_point_on_polygon_edge(void *, void *, void *, s32);
-extern int *D_L08_001FE7C0[];
+extern int *g_path_list_table[];
 
 /* The actor's per-frame world transform: the record's own position goes through the
    model's matrix, is scaled, and is folded into the model; when the actor names a part,
@@ -165,7 +165,7 @@ void creature_compute_aim_point(char *moby) {
         offset[2] = 0.0f;
         FastVecAdd(vars + 0x180, offset, vars + 0x120);
     } else {
-        s32 base = D_L08_001B29DC + (idx << 8);
+        s32 base = g_moby_array + (idx << 8);
 
         FastVecSub(offset, (char *)base + 0x10, vars + 0x120);
         offset[2] = 0.0f;
@@ -185,7 +185,7 @@ void creature_compute_aim_point(char *moby) {
     }
     idx = *(s32 *)(vars + 0x1E4);
     if (idx != -1) {
-        int *list = D_L08_001FE7C0[idx];
+        int *list = g_path_list_table[idx];
 
         math_closest_point_on_polygon_edge(vars + 0x180, vars + 0x180, (char *)list + 0x10, *list);
     }
@@ -259,8 +259,8 @@ void creature_update_hit_reaction(char *moby) {
 
 
 extern s32 g_beam_slot_state[];
-extern s32 D_L08_001B39E0[];
-extern s32 D_L08_001B39F0[];
+extern s32 g_beam_start_light_ids[];
+extern s32 g_beam_end_light_ids[];
 extern s32 g_beam_slot_key[];
 extern void gfx_free_point_light(s32 a0);
 

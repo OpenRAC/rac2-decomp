@@ -1,10 +1,10 @@
 #include "common.h"
-extern float D_L00_001B2868 __attribute__((section(".data")));
-extern float D_L00_001B286C __attribute__((section(".data")));
-extern float D_L00_001B2870 __attribute__((section(".data")));
+extern float g_lancer_horizontal_arc __attribute__((section(".data")));
+extern float g_lancer_range __attribute__((section(".data")));
+extern float g_lancer_vertical_arc __attribute__((section(".data")));
 extern float ref_L00_003A7AF0_00 __attribute__((sda));
-extern int D_L00_001AF6C4 __attribute__((sda));
-extern int D_L00_001AF6CC __attribute__((sda));
+extern int g_lancer_state_int __attribute__((sda));
+extern int g_other_weapon_state_int __attribute__((sda));
 extern int AcquireEntitySlot(char *, int, void *);
 extern char *level_get_slot_body(int, int);
 extern char *mem_round_up_to_16(int);
@@ -31,9 +31,9 @@ void lancer_init(char *object)
     *(int *)(state + 48) = 0;
     *(int *)(state + 60) = -1;
     if (*(short *)(object + 0xAA) == MOBY_CLASS_LANCER)
-        *(int *)(state + 52) = D_L00_001AF6C4;
+        *(int *)(state + 52) = g_lancer_state_int;
     else
-        *(int *)(state + 52) = D_L00_001AF6CC;
+        *(int *)(state + 52) = g_other_weapon_state_int;
     *(unsigned int *)(object + 0x78) = 0xFF0020FF;
     index = AcquireEntitySlot(object, 0, local);
     *(short *)(state + 18) = index;
@@ -46,13 +46,13 @@ void lancer_init(char *object)
         }
     }
     kind = *(short *)(object + 0xAA);
-    D_L00_001B2868 = 0.104719766f;
+    g_lancer_horizontal_arc = 0.104719766f;
     range = 30.0f;
     if (kind == MOBY_CLASS_LANCER) {
         range = 20.0f;
-        D_L00_001B286C = range;
+        g_lancer_range = range;
     } else {
         ref_L00_003A7AF0_00 = range;
     }
-    D_L00_001B2870 = 0.104719766f;
+    g_lancer_vertical_arc = 0.104719766f;
 }

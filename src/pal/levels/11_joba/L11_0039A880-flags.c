@@ -12,13 +12,13 @@ typedef struct ParticleSettings {
     s32 frameCount;
     f32 speed;
 } ParticleSettings;
-extern ParticleSettings D_L18_001B0730 __attribute__((sda));
+extern ParticleSettings g_spray_particle_settings __attribute__((sda));
 extern s32 math_random_int_below(s32);
 extern s32 math_random_int_range(s32, s32);
 extern void vec_add_random_offset(f32 *, f32);
 extern void *enemy_spawn_record(void *, void *, void *, void *, int);
 
-void func_PAL_L11_0039A880(char *self) {
+void part_spawn_particle_burst_pal(char *self) {
     f32 point[4];
     f32 direction[4];
     s32 count, i;
@@ -28,6 +28,6 @@ void func_PAL_L11_0039A880(char *self) {
         *(Quad *)point = *(Quad *)(self + 0x10);
         vec_add_random_offset(point, 0.1f);
         vec_add_random_offset(direction, 0.002f);
-        enemy_spawn_record(point, direction, &D_L18_001B0730, (void *)1, math_random_int_range(-5, 5));
+        enemy_spawn_record(point, direction, &g_spray_particle_settings, (void *)1, math_random_int_range(-5, 5));
     }
 }

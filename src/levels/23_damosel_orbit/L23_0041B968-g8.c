@@ -10,7 +10,7 @@
 
 extern char *g_mothership_boss_moby __attribute__((sda));
 
-extern float D_L23_001B13CC __attribute__((nosda));
+extern float g_mothership_hit_damage_floor __attribute__((nosda));
 
 /* Stores the index of the live slot with the greatest measure above the threshold (or -1). */
 void boss_pick_strongest_generator(void) {
@@ -29,7 +29,7 @@ void boss_pick_strongest_generator(void) {
         if (m != 0) {
             float v = *(float *)(*(char **)(m + 0x68) + 0x20);
 
-            if (D_L23_001B13CC < v && best < v) {
+            if (g_mothership_hit_damage_floor < v && best < v) {
                 best = v;
                 index = i;
             }

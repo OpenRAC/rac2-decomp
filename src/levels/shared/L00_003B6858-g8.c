@@ -2,11 +2,11 @@
 
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { char *objects[2]; char pad08[8]; Quad positions[2]; Quad velocity[2]; char pad50[0x18]; int seed; } PairState;
-extern Quad D_L00_001AFA70[2] SDATA(D_L00_001AFA70);
-extern Quad D_L00_001AFA50[2] SDATA(D_L00_001AFA50);
-extern float D_L00_001AFAA0[2] __attribute__((sda));
-extern float D_L00_001AFA90[2] SDATA(D_L00_001AFA90);
-extern int D_L00_001AFA98[2] SDATA(D_L00_001AFA98);
+extern Quad g_pair_game_effect_sources[2] SDATA(D_L00_001AFA70);
+extern Quad g_pair_game_effect_positions[2] SDATA(D_L00_001AFA50);
+extern float g_pair_game_effect_rates[2] __attribute__((sda));
+extern float g_pair_game_effect_scales[2] SDATA(D_L00_001AFA90);
+extern int g_pair_game_effect_materials[2] SDATA(D_L00_001AFA98);
 extern int math_random_int_below(int);
 extern char *CreateMoby(int);
 extern void moby_init_child_from_parent(char *,int);
@@ -25,11 +25,11 @@ int InitializePairedObjects(char *object)
     slot=state->objects;
     velocity=state->velocity;
     state->seed=math_random_int_below(255);
-    material=D_L00_001AFA98;
-    scale=D_L00_001AFA90;
-    rate=D_L00_001AFAA0;
-    position=D_L00_001AFA50;
-    source=D_L00_001AFA70;
+    material=g_pair_game_effect_materials;
+    scale=g_pair_game_effect_scales;
+    rate=g_pair_game_effect_rates;
+    position=g_pair_game_effect_positions;
+    source=g_pair_game_effect_sources;
     out=state->positions;
     do {
         *slot=CreateMoby(i?MOBY_CLASS_SHEEP:MOBY_CLASS_DARK_SHEEP);

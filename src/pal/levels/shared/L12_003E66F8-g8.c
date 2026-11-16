@@ -7,7 +7,7 @@
 #define W(p, o) (*(int *)((char *)(p) + (o)))
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
-extern char D_L12_001B9E00[];
+extern char g_hero_prev_position[];
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_mark_spawned(void *);
@@ -26,13 +26,13 @@ extern int flag_set_first_pending(void *);
 extern int flag_set_second_pending(void *);
 extern int flag_is_third_pending_set(void *);
 extern int CollLine(void *, void *, int, int, int);
-extern char *D_L12_001FEAC0[];
-extern char D_L12_001B0B70[];
-extern unsigned short D_L12_001B0B00 __attribute__((sda));
-extern float D_L12_001B0B68 __attribute__((sda));
-extern float D_L12_001B0B64 __attribute__((sda));
-extern int D_L12_001B29C8 __attribute__((sda));
-extern char *D_L12_001C0258 NOT_SDA;
+extern char *g_path_zone_table[];
+extern char g_str_debug_robot_guard_init[];
+extern unsigned short g_robot_guard_init_value __attribute__((sda));
+extern float g_robot_guard_spawn_height __attribute__((sda));
+extern float g_robot_guard_smooth_value __attribute__((sda));
+extern int g_frame_l12_counter __attribute__((sda));
+extern char *g_hit_l12_result NOT_SDA;
 extern char *g_hero_moby NOT_SDA;
 
 void func_PAL_L12_003E7E08(char *obj) {
@@ -82,15 +82,15 @@ void func_PAL_L12_003E7E08(char *obj) {
             func_PAL_002A7E68(obj, 0, 0, 0);
         W(s, 0x154) = W(s, 0x150);
         if (W(s, 0x164) == -1)
-            qcopy(obj + 0x10, D_L12_001FEAC0[W(s, 0x158)] + 0x10);
+            qcopy(obj + 0x10, g_path_zone_table[W(s, 0x158)] + 0x10);
         else
-            qcopy(obj + 0x10, D_L12_001FEAC0[W(s, 0x164)] + 0x10);
+            qcopy(obj + 0x10, g_path_zone_table[W(s, 0x164)] + 0x10);
         if (W(s, 0x164) != -1)
             moby_set_state(obj, 2, 7);
         if (P(s, 0x294))
             W(P(s, 0x294), 0) = -1;
     }
-    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, D_L12_001B9E00) < 24.0f) {
+    if (B(obj, 0x31) && fast_vec_dist(obj + 0x10, g_hero_prev_position) < 24.0f) {
         moby_update_ground_check(obj);
         B(obj, 0x6F) = 22;
     }
@@ -101,7 +101,7 @@ void func_PAL_L12_003E7E08(char *obj) {
     result = func_PAL_002B1A50(obj, s + 0x60, 0);
     if (result) {
         if (result == 4) {
-            STUB_printf(D_L12_001B0B70);
+            STUB_printf(g_str_debug_robot_guard_init);
             W(s, 0x278) = 5;
         } else
             W(s, 0x278) = 1;
@@ -109,7 +109,7 @@ void func_PAL_L12_003E7E08(char *obj) {
         B(obj, 0x95) = oldanim;
         flag_set_first_pending(obj);
         flag_set_second_pending(obj);
-        H(s, 0x26) = D_L12_001B0B00;
+        H(s, 0x26) = g_robot_guard_init_value;
         H(s, 0x274) = 125;
     }
     if (FastDecTimer(s + 0x274)) {
@@ -122,25 +122,25 @@ void func_PAL_L12_003E7E08(char *obj) {
     W(s, 0x270) = W(s, 0x140);
     if (P(s, 0x140) && vec_distance_xy(P(s, 0x140) + 0x10, obj + 0x10) < 16.0f) {
         qcopy(pos, obj + 0x10);
-        pos[2] += D_L12_001B0B68;
-        if (!CollLine(pos, s + 0x130, 16, 0, 0) || D_L12_001C0258 == g_hero_moby) {
+        pos[2] += g_robot_guard_spawn_height;
+        if (!CollLine(pos, s + 0x130, 16, 0, 0) || g_hit_l12_result == g_hero_moby) {
             if (H(s, 0x276) != 1)
                 H(s, 0x276) = 1;
         }
     }
     if (B(obj, 0x31)) {
-        angle = IntToFloat(D_L12_001B29C8 % 50);
+        angle = IntToFloat(g_frame_l12_counter % 50);
         angle = angle * 6.2831854820251465f / IntToFloat(50) - 3.1415927410125732f;
         W(obj, 0x78) = PulseColor(0x80808080, 0x80303030, angle);
     }
-    func_PAL_002B14F8(obj, s + 0x2B0, 1, 1, D_L12_001B0B64);
+    func_PAL_002B14F8(obj, s + 0x2B0, 1, 1, g_robot_guard_smooth_value);
 }
 
 /* func_PAL_L12_003E66F8, the PAL copy of func_L12_003E2448: the same C, where the word read of
    D_L12_001B0B0C (a `lhu` in USA) takes the 50 Hz scale. */
-extern int D_L12_001B0B0C __attribute__((sda));
+extern int g_moby_init_state_value __attribute__((sda));
 
 void func_PAL_L12_003E66F8(unsigned char *a0) {
     *(unsigned char *)(a0 + 0x95) = 9;
-    *(unsigned short *)(*(unsigned int *)(a0 + 0x68) + 0x29E) = ((s32)(D_L12_001B0B0C) * 5 + 2) / 6;
+    *(unsigned short *)(*(unsigned int *)(a0 + 0x68) + 0x29E) = ((s32)(g_moby_init_state_value) * 5 + 2) / 6;
 }

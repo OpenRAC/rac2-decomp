@@ -7,7 +7,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void cam_compute_view_direction(char *, char *, int);
 extern void FastVecCross(void *, void *, void *);
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
     short timer;
@@ -34,9 +34,9 @@ typedef struct SpawnObject {
     char pad6c[0x54];
     float forward[4], right[4], up[4];
 } SpawnObject;
-extern Vector128 D_L00_001BF220;
+extern Vector128 g_hero_l00_position;
 
-char *func_PAL_L00_0041C0E0(Vector128 *position, int kind, char *parent)
+char *spark_effect_spawn_pal(Vector128 *position, int kind, char *parent)
 {
     Vector128 direction[1], up[1];
     char *object = CreateMoby(0x139E);
@@ -52,7 +52,7 @@ char *func_PAL_L00_0041C0E0(Vector128 *position, int kind, char *parent)
         qcopy(first, position);
         *(float *)(object + 0x1c) = 1.0f;
         second = object + 0xc0;
-        FastVecSub(direction, D_L00_001B8C80 + 0x140, first);
+        FastVecSub(direction, g_scalar_transition_state + 0x140, first);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(first, (char *)up, 1);
         qcopy(second, direction);
@@ -77,12 +77,12 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern unsigned char *func_PAL_L00_00342480(void *, void *, int);
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
 typedef struct { char pad[0x140]; float x, y; } CameraHead;
 extern void part_spawn_drifting_particles(char *);
 
 /* Spawns 25 particles around the object, each drifting away from the camera at a random angle. */
-void func_PAL_L00_0041C390(char *object)
+void part_spawn_drifting_particles_pal(char *object)
 {
     float spawn[8];
     float heading, angle, speed;
@@ -90,8 +90,8 @@ void func_PAL_L00_0041C390(char *object)
     int i;
 
     for (i = 24; i >= 0; i--) {
-        heading = mat_fast_helper_a(((CameraHead *)D_L00_001B8C80)->x - *(float *)(object + 0x10),
-                                ((CameraHead *)D_L00_001B8C80)->y - *(float *)(object + 0x14));
+        heading = mat_fast_helper_a(((CameraHead *)g_scalar_transition_state)->x - *(float *)(object + 0x10),
+                                ((CameraHead *)g_scalar_transition_state)->y - *(float *)(object + 0x14));
         speed = math_random_signed_float_range(1.0f, 2.0f);
         FloatToInt(speed);
         spawn[0] = *(float *)(object + 0x10) + math_random_signed_float_range(-0.25f, 0.25f);
@@ -103,7 +103,7 @@ void func_PAL_L00_0041C390(char *object)
         spawn[4] = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
         spawn[5] = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
         spawn[6] = 0.09f;
-        func_PAL_L00_00342480(spawn, D_L00_001A8F20, 250);
+        func_PAL_L00_00342480(spawn, g_default_vector, 250);
     }
 }
 

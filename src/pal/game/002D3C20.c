@@ -2,8 +2,8 @@
 #include "common.h"
 
 /* func_PAL_002D3C20, the PAL copy of func_002D2CE8: the same C, where D_001A7390 is scaled to 50 Hz in both maximum tests and their stores. */
-extern unsigned int D_00138344;
-extern unsigned int D_001A7390 __attribute__((sda));
+extern unsigned int g_menu_input_flags;
+extern unsigned int g_frame_counter __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern char g_pause_menu_state[];
 typedef struct {
@@ -19,13 +19,13 @@ extern int func_PAL_0029D088(int);
 int func_PAL_002D3C20(void)
 {
     int result = 0;
-    unsigned int flags = D_00138344;
+    unsigned int flags = g_menu_input_flags;
     if (flags & 0x10) {
         Statistics_2D2CE8 *stats = &g_progress_statistics;
         char *root;
         int value, status;
         if (stats->count < 0xffff) stats->count++;
-        if (((s32)D_001A7390 * 5 + 2) / 6 > stats->maximum) stats->maximum = ((s32)D_001A7390 * 5 + 2) / 6;
+        if (((s32)g_frame_counter * 5 + 2) / 6 > stats->maximum) stats->maximum = ((s32)g_frame_counter * 5 + 2) / 6;
         stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         root = g_pause_menu_state;
         value = *(int *)(*(char **)(root + 0x14) + 0xe0);
@@ -43,7 +43,7 @@ finish:
     if (flags & 0x900) {
         Statistics_2D2CE8 *stats = &g_progress_statistics;
         if (stats->count < 0xffff) stats->count++;
-        if (((s32)D_001A7390 * 5 + 2) / 6 > stats->maximum) stats->maximum = ((s32)D_001A7390 * 5 + 2) / 6;
+        if (((s32)g_frame_counter * 5 + 2) / 6 > stats->maximum) stats->maximum = ((s32)g_frame_counter * 5 + 2) / 6;
         stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         result = 1;
     } else func_PAL_0029D088(flags);

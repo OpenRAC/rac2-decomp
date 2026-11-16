@@ -8,10 +8,10 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L01_001AFE44 __attribute__((sda));
-extern s32 D_L01_001AFE48 __attribute__((sda));
-extern s32 D_L01_001A8F40 __attribute__((sda));
-extern u8 *D_L01_001BF918[];
+extern s32 g_firefly_random_min __attribute__((sda));
+extern s32 g_firefly_random_max __attribute__((sda));
+extern s32 g_hero_l01_control_mode __attribute__((sda));
+extern u8 *g_hit_l01_result[];
 
 extern s32 func_002D4CE0(void *, s32, u8 *, f32);
 extern s32 func_002E30E0(void *);
@@ -40,7 +40,7 @@ extern s32 func_0031D548(u8 *, void *);
 extern void func_003258B8(s32);
 extern void func_PAL_L01_003C0D50(u8 *, void *, s32, f32, f32, f32, f32, f32, f32);
 extern void func_003BD410(u8 *);
-extern void func_PAL_L01_003C12C8(u8 *);
+extern void mutant_firefly_init_pal(u8 *);
 extern void func_003BDB28(u8 *);
 extern void func_003BDBB0(u8 *);
 extern void func_003BDBE8(u8 *);
@@ -87,7 +87,7 @@ void func_PAL_L01_003C2688(u8 *moby)
     }
     switch (moby[0x20]) {
     case 0:
-        func_PAL_L01_003C12C8(moby);
+        mutant_firefly_init_pal(moby);
         break;
     case 1:
         *(f32 *)(data + 0x22C) = 0;
@@ -105,7 +105,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         if (hit) {
             moby[0x30] = data[0x200];
             qzero(data + 0x1F0);
-            *(s32 *)(data + 0x230) = func_00310528(D_L01_001AFE44, D_L01_001AFE48);
+            *(s32 *)(data + 0x230) = func_00310528(g_firefly_random_min, g_firefly_random_max);
             func_00310418(moby, 3, -1);
         }
         break;
@@ -162,7 +162,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         *(f32 *)(data + 0x1F8) -= 0.00392f;
         *(f32 *)(moby + 0x18) += 0.3f;
         if (func_002D4CE0(pos, 0, moby, 0.3f) != 0 &&
-            (D_L01_001BF918[0] == 0 || *(s16 *)(D_L01_001BF918[0] + 0xAA) != 0x945)) {
+            (g_hit_l01_result[0] == 0 || *(s16 *)(g_hit_l01_result[0] + 0xAA) != 0x945)) {
             if (moby[0x43] != 3) {
                 func_00310138(moby, 3, 0, 3);
             }
@@ -294,7 +294,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         *(s32 *)(data + 0x29C) = *(s32 *)(data + 0x298);
         if (*(s32 *)(data + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
             ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
-            D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+            g_hero_l01_control_mode == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             *(s32 *)(data + 0x114) = 0;
             if (*(s32 *)(data + 0x238) == 0) {
                 *(f32 *)(data + 0x22C) = 0;
@@ -379,7 +379,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         near = func_003165E8(moby + 0x10, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0;
         if (*(s32 *)(data + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
             ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
-            !near || D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+            !near || g_hero_l01_control_mode == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             if (*(s32 *)(data + 0x238) != 0) {
                 func_003BDBB0(moby);
                 *(s32 *)(data + 0x230) = 0;

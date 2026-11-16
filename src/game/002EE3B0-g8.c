@@ -2,9 +2,9 @@
 
 extern char *moby_get_motion_data(unsigned char *);
 extern int follower_get_state(unsigned char *);
-extern float D_001AC248 __attribute__((sda));
-extern float D_001AC240 __attribute__((sda));
-extern float D_001AC244 __attribute__((sda));
+extern float g_follower_height_scale __attribute__((sda));
+extern float g_follower_pull_speed __attribute__((sda));
+extern float g_follower_max_scale __attribute__((sda));
 
 /* Loads the follow speed, pull and range settings that match the follower's current state. */
 void follower_load_tuning_for_state(unsigned char *owner)
@@ -19,53 +19,53 @@ void follower_load_tuning_for_state(unsigned char *owner)
     else
         state = follower_get_state(owner);
     if (state == 3) {
-        D_001AC248 = 0.416666687f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.416666687f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 1) {
-        D_001AC248 = 0.400000036f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.400000036f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 13) {
-        D_001AC248 = 0.400000036f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.400000036f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 2) {
-        D_001AC248 = 0.13333334f;
-        D_001AC240 = 0.005f;
-        D_001AC244 = 0.025f;
+        g_follower_height_scale = 0.13333334f;
+        g_follower_pull_speed = 0.005f;
+        g_follower_max_scale = 0.025f;
     } else if (state == 5) {
-        D_001AC248 = 0.416666687f;
-        D_001AC240 = 0.04f;
-        D_001AC244 = 0.2f;
+        g_follower_height_scale = 0.416666687f;
+        g_follower_pull_speed = 0.04f;
+        g_follower_max_scale = 0.2f;
     } else if (state == 6) {
-        D_001AC248 = 0.366666675f;
-        D_001AC240 = 0.03f;
-        D_001AC244 = 0.15f;
+        g_follower_height_scale = 0.366666675f;
+        g_follower_pull_speed = 0.03f;
+        g_follower_max_scale = 0.15f;
     } else if (state == 4) {
-        D_001AC248 = 0.5f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.5f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 8) {
-        D_001AC248 = 0.416666687f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.416666687f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 7) {
-        D_001AC248 = 0.166666672f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.166666672f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 11) {
-        D_001AC248 = 0.5f;
-        D_001AC240 = 0.02f;
-        D_001AC244 = 0.1f;
+        g_follower_height_scale = 0.5f;
+        g_follower_pull_speed = 0.02f;
+        g_follower_max_scale = 0.1f;
     } else if (state == 12) {
         float *duration = *(float **)(object + 0x154);
-        D_001AC248 = duration ? *duration * (1.0f / 60.0f) : 0.166666672f;
-        D_001AC240 = 0.005f;
-        D_001AC244 = 0.025f;
+        g_follower_height_scale = duration ? *duration * (1.0f / 60.0f) : 0.166666672f;
+        g_follower_pull_speed = 0.005f;
+        g_follower_max_scale = 0.025f;
     }
     if (*(int *)(object + 0x108) && state != 11 && state != 2 && state != 12) {
-        D_001AC240 *= 0.7f;
-        D_001AC244 *= 0.7f;
+        g_follower_pull_speed *= 0.7f;
+        g_follower_max_scale *= 0.7f;
     }
 }

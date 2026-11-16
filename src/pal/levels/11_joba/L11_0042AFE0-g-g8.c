@@ -20,16 +20,16 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *p
 
 extern char g_hero_state[];
 extern u8 *const g_moby_l11_table[] __attribute__((sda));
-extern u8 *D_L11_001B368C[] __attribute__((sda));
+extern u8 *g_arena_camera_table[] __attribute__((sda));
 extern void *g_group_id_lists[];
-extern s32 *D_L11_001FF580[];
-extern s32 D_L11_001CAE40[];
-extern s32 D_L11_001AED04[] __attribute__((sda));
-extern s32 D_L11_001B35B8 __attribute__((sda));
-extern s32 D_L11_001B0FEC __attribute__((sda));
-extern s32 D_L11_001B0FF8 __attribute__((sda));
-extern f32 D_L11_001B0FFC __attribute__((sda));
-extern char D_L11_001A8F20[] __attribute__((sda));
+extern s32 *g_path_l11_table[];
+extern s32 g_enemy_freeze_flag[];
+extern s32 g_active_rider_count[] __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
+extern s32 g_tribe_fighter_spark_color_a __attribute__((sda));
+extern s32 g_tribe_fighter_spark_color_b __attribute__((sda));
+extern f32 g_tribe_fighter_spark_frame_scale __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
 
 extern void func_PAL_002A7E68(u8 *a0, u32 a1, u32 a2, u32 a3);
 extern void moby_transform_joint_to_world(u32 a0, s32 a1, f32 *a2);
@@ -49,11 +49,11 @@ extern s32 math_random_int_below(s32);
 extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
 extern s32 moby_count_group_not_in_state(s32, s32);
 extern u8 *moby_find_linked_object(u8 *);
-extern s32 func_PAL_002B5C98(u8 *, void *, f32);
-extern s32 func_PAL_002B6CD8(u8 *, void *);
+extern s32 moby_step_controller_pal(u8 *, void *, f32);
+extern s32 path_follow_nodes_pal(u8 *, void *);
 extern s32 path_set_follower_nodes(u8 *, void *, s32, s32);
-extern int func_PAL_L01_00323068(u8 *, void *);
-extern s32 func_PAL_002B5BA8(u8 *, void *, f32);
+extern int moby_l01_turn_toward_target_pal(u8 *, void *);
+extern s32 moby_turn_toward_target_and_step_pal(u8 *, void *, f32);
 extern f32 vec_spring_to_target(void *, void *, void *, f32, f32, f32);
 extern void euler_rotation_basis(void *, void *);
 extern f32 math_spring_float_to_goal(void *, void *, f32, f32, f32, f32);
@@ -68,10 +68,10 @@ extern int coll_sweep_from_object(void *, void *, s32, f32, f32, f32, s32, s32, 
 extern s32 flag_set_second_pending(u8 *);
 extern void moby_mark_spawned(void *);
 extern s32 moby_dispatch_action_by_kind(u8 *, void *);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern void part_queue_moby_for_glow(u8 *, s32, void *);
 extern void moby_copy_joint_transform_to_object(u8 *, void *, s32, s32);
-extern void func_PAL_002AD288(u8 *, void *, f32, f32, s32);
+extern void part_spawn_explosion_with_sparks_pal(u8 *, void *, f32, f32, s32);
 extern s32 tribesman_tick_linked_clock(u8 *);
 extern u8 *CreateMoby(s32);
 extern void func_002A0F48(void *);
@@ -146,7 +146,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
     f32 a2_29;
     s32 n2_29;
 
-    if (D_L11_001CAE40[0] != 0)
+    if (g_enemy_freeze_flag[0] != 0)
         return;
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F && arg0[0x95] != 4)
         return;
@@ -254,15 +254,15 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
                 moby_set_state(arg0, 0x1A, 2);
                 i1_1 = 0;
                 best1_1 = 0;
-                for (; i1_1 < *D_L11_001FF580[*(s32 *)(data + 0x284)]; ) {
-                    f1_1 = vec_distance_xy(arg0 + 0x10, (u8 *)D_L11_001FF580[*(s32 *)(data + 0x284)] + 0x10 + i1_1 * 0x10);
+                for (; i1_1 < *g_path_l11_table[*(s32 *)(data + 0x284)]; ) {
+                    f1_1 = vec_distance_xy(arg0 + 0x10, (u8 *)g_path_l11_table[*(s32 *)(data + 0x284)] + 0x10 + i1_1 * 0x10);
                     if (f1_1 < d1_1) {
                         d1_1 = f1_1;
                         best1_1 = i1_1;
                     }
                     i1_1++;
                 }
-                path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x284)], -1, best1_1);
+                path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x284)], -1, best1_1);
             }
             if (*(s32 *)(data + 0x548) != -1) {
                 if (arg0[0x43] != 3)
@@ -313,13 +313,13 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 4:
         if (*(f32 *)(data + 0x20) > 0.0f)
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                            ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         r1_4 = moby_dispatch_action_by_kind(arg0, data + 0x60);
         if (r1_4 & 1) {
             moby_mark_spawned(*(u8 **)(data + 0x278));
-            D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
-            func_PAL_002A7650(arg0, 0, 3);
+            g_active_rider_count[0] = g_active_rider_count[0] - 1;
+            SetDeathBits_pal(arg0, 0, 3);
             part_queue_moby_for_glow(arg0, 0, 0);
             return;
         }
@@ -383,13 +383,13 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         qcopy(q1_5 + 0x10, arg0 + 0x10);
         *(f32 *)(q1_5 + 0x18) = *(f32 *)(q1_5 + 0x18) + 0.65f;
         if (*(s32 *)(data + 0x26C) == 0) {
-            func_PAL_002AD288(arg0, *(u8 **)(data + 0x278) + 0x10, 0.5f, 3.0f, -1);
+            part_spawn_explosion_with_sparks_pal(arg0, *(u8 **)(data + 0x278) + 0x10, 0.5f, 3.0f, -1);
             moby_mark_spawned(*(u8 **)(data + 0x278));
             moby_mark_spawned(*(u8 **)(data + 0x280));
             *(s32 *)(*(u8 **)(*(u8 **)(data + 0x274) + 0x68) + 0x27C) = 0;
             moby_set_state(arg0, 2, 6);
         } else if (tribesman_tick_linked_clock(arg0) != 0) {
-            func_PAL_002AD288(arg0, *(u8 **)(data + 0x278) + 0x10, 0.5f, 3.0f, -1);
+            part_spawn_explosion_with_sparks_pal(arg0, *(u8 **)(data + 0x278) + 0x10, 0.5f, 3.0f, -1);
             moby_mark_spawned(*(u8 **)(data + 0x278));
             moby_mark_spawned(*(u8 **)(data + 0x280));
             *(s32 *)(*(u8 **)(*(u8 **)(data + 0x274) + 0x68) + 0x27C) = 0;
@@ -425,7 +425,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         p1_7 = g_moby_l11_table[0] + (*(s32 *)(data + 0x548) << 8);
         q1_7 = *(u8 **)(p1_7 + 0x68);
         if (arg0[0x20] != 0x22) {
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                            ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
             a1_7 = mat_fast_helper_a(vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0xD0 / 4]),
                                  ((Hero *)g_hero_state)->f[0xD8 / 4] - *(f32 *)(arg0 + 0x18));
@@ -549,7 +549,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         }
         break;
     case 7:
-        if (func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x558)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x558)]) != 0) {
             moby_set_state(arg0, 8, -1);
             if (arg0[0x43] != 9)
                 func_PAL_002A7E68(arg0, 9, 0, 0x11);
@@ -573,7 +573,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         }
         break;
     case 10:
-        func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)(*(u8 **)(data + 0x55C) + 0x10) - *(f32 *)(arg0 + 0x10),
+        moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)(*(u8 **)(data + 0x55C) + 0x10) - *(f32 *)(arg0 + 0x10),
                                                        *(f32 *)(*(u8 **)(data + 0x55C) + 0x14) - *(f32 *)(arg0 + 0x14)));
         if (FastDiffRots(*(f32 *)(arg0 + 0xF8), mat_fast_helper_a(*(f32 *)(*(u8 **)(data + 0x55C) + 0x10) - *(f32 *)(arg0 + 0x10),
                                                               *(f32 *)(*(u8 **)(data + 0x55C) + 0x14) - *(f32 *)(arg0 + 0x14))) < 0.087266475f)
@@ -581,7 +581,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 11:
         moby_set_controller_speed_limits(arg0, 0.0022f, 0.055000003f, 0.005445428f, 0.35604724f);
-        if (func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x54C)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x54C)]) != 0) {
             moby_set_state(arg0, 0xC, -1);
             if (arg0[0x43] != 1)
                 func_PAL_002A7E68(arg0, 1, 0, 0x11);
@@ -589,12 +589,12 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 12:
         if (arg0[0x60] & 2) {
-            path2_12 = D_L11_001FF580[*(s32 *)(data + 0x54C)];
+            path2_12 = g_path_l11_table[*(s32 *)(data + 0x54C)];
             d2_12 = vec_distance_xy(arg0 + 0x10, path2_12 + 4);
             if (vec_distance_xy(arg0 + 0x10, (u8 *)path2_12 + *path2_12 * 0x10) < d2_12)
-                path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x54C)], 0, *path2_12 - 1);
+                path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x54C)], 0, *path2_12 - 1);
             else
-                path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x54C)], *path2_12 - 1, 0);
+                path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x54C)], *path2_12 - 1, 0);
             moby_set_state(arg0, 0xB, -1);
             if (arg0[0x43] != 4)
                 func_PAL_002A7E68(arg0, 4, 0, 0x11);
@@ -610,7 +610,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         }
         break;
     case 15:
-        func_PAL_L01_00323068(arg0, data + 0x110);
+        moby_l01_turn_toward_target_pal(arg0, data + 0x110);
         if (vec_distance_xy(arg0 + 0x10, data + 0x110) < 2.0f) {
             moby_set_state(arg0, 0x10, -1);
             if (arg0[0x43] != 9)
@@ -619,7 +619,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 17:
         moby_set_controller_speed_limits(arg0, 0.0022f, 0.055000003f, 0.005445428f, 0.35604724f);
-        if (func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x56C)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x56C)]) != 0) {
             moby_set_state(arg0, 0x12, -1);
             if (arg0[0x43] != 9)
                 func_PAL_002A7E68(arg0, 9, 0, 0x11);
@@ -627,12 +627,12 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 18:
         if (arg0[0x60] & 2) {
-            path2_18 = D_L11_001FF580[*(s32 *)(data + 0x56C)];
+            path2_18 = g_path_l11_table[*(s32 *)(data + 0x56C)];
             d2_18 = vec_distance_xy(arg0 + 0x10, path2_18 + 4);
             if (vec_distance_xy(arg0 + 0x10, (u8 *)path2_18 + *path2_18 * 0x10) < d2_18)
-                path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x56C)], 0, *path2_18 - 1);
+                path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x56C)], 0, *path2_18 - 1);
             else
-                path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x56C)], *path2_18 - 1, 0);
+                path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x56C)], *path2_18 - 1, 0);
             moby_set_state(arg0, 0x11, -1);
             if (arg0[0x43] != 4)
                 func_PAL_002A7E68(arg0, 4, 0, 0x11);
@@ -649,12 +649,12 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             moby_set_controller_speed_limits(arg0, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
             moby_set_state(arg0, 0x1C, 2);
         } else if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 3.5f) {
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                            ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         } else if (*(s32 *)(data + 0x528) != 0) {
             if (func_PAL_L11_0042F390(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(arg0 + 0xF8), 7.0f, 0.25f, *(f32 *)(data + 0x298)) != 0) {
                 c2_23 = arg0[0x21];
-                if (D_L11_001B35B8 >= c2_23 && moby_count_group_not_in_state(c2_23, -1) >= 2) {
+                if (g_tribe_group_limit >= c2_23 && moby_count_group_not_in_state(c2_23, -1) >= 2) {
                     base2_23 = g_moby_l11_table[0];
                     list2_23 = g_group_id_lists[arg0[0x21]];
                     do {
@@ -675,14 +675,14 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
                 }
             }
         } else {
-            func_PAL_002B5BA8(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
+            moby_turn_toward_target_and_step_pal(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
         }
         break;
     case 24:
         *(s32 *)(data + 0x290) = 0;
         moby_set_controller_speed_limits(arg0, 0.0056000003f, 0.14000002f, 0.004886923f, 0.33510327f);
-        *(TI128 *)v0 = *(TI128 *)&D_L11_001B368C[0][(*(s32 *)(data + 0x57C) << 7) + 0x30];
-        func_PAL_L01_00323068(arg0, v0);
+        *(TI128 *)v0 = *(TI128 *)&g_arena_camera_table[0][(*(s32 *)(data + 0x57C) << 7) + 0x30];
+        moby_l01_turn_toward_target_pal(arg0, v0);
         if (vec_distance_xy(arg0 + 0x10, v0) < 1.5f) {
             if (arg0[0x43] != 0x12)
                 func_PAL_002A7E68(arg0, 0x12, 0, 0xD);
@@ -704,7 +704,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             euler_rotation_basis(p2_25 + 0xC0, p2_25 + 0xF0);
             *(f32 *)(p2_25 + 0x18) = *(f32 *)(p2_25 + 0x18) + ((*(f32 *)(q2_25 + 0x5C) - 1.2f) - *(f32 *)(p2_25 + 0x18)) * 0.11f;
         }
-        func_PAL_L01_00323068(arg0, p2_25 + 0x10);
+        moby_l01_turn_toward_target_pal(arg0, p2_25 + 0x10);
         if (vec_distance_xy(arg0 + 0x10, p2_25 + 0x10) < 1.5f && p2_25[0x20] != 5) {
             p2_25[0x20] = 6;
             *(f32 *)(arg0 + 0x10) = *(f32 *)(p2_25 + 0x10);
@@ -764,15 +764,15 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 34:
         if (*(s32 *)(data + 0x564) != -1) {
-            path2_34 = (s32 *)((u8 *)D_L11_001FF580[*(s32 *)(data + 0x564)] + *(s32 *)(data + 0x568) * 0x10);
+            path2_34 = (s32 *)((u8 *)g_path_l11_table[*(s32 *)(data + 0x564)] + *(s32 *)(data + 0x568) * 0x10);
             p2_34 = g_moby_l11_table[0] + (*(s32 *)(data + 0x548) << 8);
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)((u8 *)path2_34 + 0x10) - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(*(f32 *)((u8 *)path2_34 + 0x10) - *(f32 *)(arg0 + 0x10),
                                                            *(f32 *)((u8 *)path2_34 + 0x14) - *(f32 *)(arg0 + 0x14)));
             *(f32 *)(arg0 + 0x10) = *(f32 *)(p2_34 + 0x10);
             *(f32 *)(arg0 + 0x14) = *(f32 *)(p2_34 + 0x14);
             *(f32 *)(arg0 + 0x18) = *(f32 *)(p2_34 + 0x18) + 1.5f;
             euler_rotation_basis(p2_34 + 0xC0, arg0 + 0xF0);
-            pathb2_34 = (s32 *)((u8 *)D_L11_001FF580[*(s32 *)(data + 0x564)] + *(s32 *)(data + 0x568) * 0x10);
+            pathb2_34 = (s32 *)((u8 *)g_path_l11_table[*(s32 *)(data + 0x564)] + *(s32 *)(data + 0x568) * 0x10);
             if (mat_fast_helper_a(*(f32 *)((u8 *)pathb2_34 + 0x10) - *(f32 *)(arg0 + 0x10),
                               *(f32 *)((u8 *)pathb2_34 + 0x14) - *(f32 *)(arg0 + 0x14)) <= 0.6108653f) {
                 if (++*(s32 *)(data + 0x568) >= 2)
@@ -782,7 +782,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         break;
     case 19:
         *(s32 *)(data + 0x290) = 0;
-        func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+        moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                        ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         if (*(s32 *)(data + 0x294) == 0) {
             *(s32 *)(data + 0x290) = 1;
@@ -824,7 +824,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
                 moby_set_state(arg0, 0x14, -1);
             }
         } else {
-            func_PAL_002B5BA8(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
+            moby_turn_toward_target_and_step_pal(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
         }
         if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 8.0f) {
             if (arg0[0x43] != 0x11)
@@ -841,7 +841,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             moby_set_controller_speed_limits(arg0, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
             moby_set_state(arg0, 0x1C, 2);
         } else if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 3.5f) {
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                            ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         } else if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) > 6.0f) {
             moby_set_controller_speed_limits(arg0, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
@@ -850,7 +850,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             moby_set_state(arg0, 0x17, -1);
         } else {
             moby_set_controller_speed_limits(arg0, 0.00080000004f, 0.020000001f, 0.0016755164f, 0.12566373f);
-            func_PAL_002B5BA8(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
+            moby_turn_toward_target_and_step_pal(arg0, &((Hero *)g_hero_state)->f[0x80 / 4], *(f32 *)(data + 0x298));
         }
         break;
     case 26:
@@ -863,7 +863,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             *(f32 *)(data + 0x164) = 0.0012f;
         } else {
             *(f32 *)(data + 0x164) = 0.006f;
-            if (func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x284)]) != 0) {
+            if (path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x284)]) != 0) {
                 if (*(s32 *)(data + 0x294) == 1) {
                     if (arg0[0x43] != 3)
                         func_PAL_002A7E68(arg0, 3, 0, 0x8);
@@ -891,7 +891,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             moby_set_controller_speed_limits(arg0, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
             moby_set_state(arg0, 0x1C, 2);
         }
-        func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+        moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                        ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         if (arg0[0x42] == 0x12) {
             a2_27 = moby_get_anim_value(arg0);
@@ -901,11 +901,11 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             v10[2] = 0.0f;
             FastVecAdd(v0, v0, v10);
             v0[2] = v0[2] - 0.05f;
-            f2_27 = math_random_float_range(0.2f, 0.9f) * (a2_27 / D_L11_001B0FFC);
+            f2_27 = math_random_float_range(0.2f, 0.9f) * (a2_27 / g_tribe_fighter_spark_frame_scale);
             n2_27 = math_random_int_below(2);
             if (n2_27 == 0) n2_27 = n2_27 - 1;
-            part_spawn_ground_effect(v0, 2, D_L11_001B0FEC, 0, n2_27, D_L11_001A8F20, f2_27 * 0.3f, f2_27, 0.0f, 0);
-            part_spawn_ground_effect(v0, 2, D_L11_001B0FF8, 1, -n2_27, D_L11_001A8F20, f2_27 * 0.04f, f2_27 * 0.4f, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, g_tribe_fighter_spark_color_a, 0, n2_27, g_identity_l11_matrix, f2_27 * 0.3f, f2_27, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, g_tribe_fighter_spark_color_b, 1, -n2_27, g_identity_l11_matrix, f2_27 * 0.04f, f2_27 * 0.4f, 0.0f, 0);
             *(f32 *)(data + 0x574) = *(f32 *)(data + 0x574) + 1.0f;
         }
         if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 3.5f) {
@@ -916,7 +916,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         }
         break;
     case 28:
-        func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+        moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                        ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         *(s32 *)(data + 0x290) = 0;
         if (func_PAL_002AF6C0(arg0, 1.0f) != 0 || func_PAL_002AF6C0(arg0, 7.0f) != 0 || func_PAL_002AF6C0(arg0, 14.0f) != 0) {
@@ -972,7 +972,7 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
         }
         break;
     case 29:
-        func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+        moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                        ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         *(s32 *)(data + 0x290) = 0;
         if (arg0[0x42] == 5 && moby_get_anim_value(arg0) < 14.0f) {
@@ -983,11 +983,11 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
             v10[2] = 0.0f;
             FastVecAdd(v0, v0, v10);
             v0[2] = v0[2] - 0.05f;
-            f2_29 = math_random_float_range(0.2f, 0.9f) * (a2_29 / D_L11_001B0FFC);
+            f2_29 = math_random_float_range(0.2f, 0.9f) * (a2_29 / g_tribe_fighter_spark_frame_scale);
             n2_29 = math_random_int_below(2);
             if (n2_29 == 0) n2_29 = n2_29 - 1;
-            part_spawn_ground_effect(v0, 2, D_L11_001B0FEC, 0, n2_29, D_L11_001A8F20, f2_29 * 0.3f, f2_29, 0.0f, 0);
-            part_spawn_ground_effect(v0, 2, D_L11_001B0FF8, 1, -n2_29, D_L11_001A8F20, f2_29 * 0.04f, f2_29 * 0.4f, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, g_tribe_fighter_spark_color_a, 0, n2_29, g_identity_l11_matrix, f2_29 * 0.3f, f2_29, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, g_tribe_fighter_spark_color_b, 1, -n2_29, g_identity_l11_matrix, f2_29 * 0.04f, f2_29 * 0.4f, 0.0f, 0);
             *(f32 *)(data + 0x574) = *(f32 *)(data + 0x574) + 1.0f;
         }
         if (func_PAL_002AF6C0(arg0, 12.0f) != 0) {
@@ -1056,8 +1056,8 @@ void func_PAL_L11_0042AFE0(u8 *arg0) {
                     func_PAL_002A7E68(arg0, 3, 0, 0x8);
                 moby_set_state(arg0, 0x17, -1);
             }
-            *(TI128 *)v0 = *(TI128 *)&D_L11_001B368C[0][(*(s32 *)(data + 0x57C) << 7) + 0x30];
-            func_PAL_L01_00323068(arg0, v0);
+            *(TI128 *)v0 = *(TI128 *)&g_arena_camera_table[0][(*(s32 *)(data + 0x57C) << 7) + 0x30];
+            moby_l01_turn_toward_target_pal(arg0, v0);
             if (vec_distance_xy(arg0 + 0x10, v0) < 1.5f) {
                 if (*(s32 *)(data + 0x5B4) != 0) {
                     if (arg0[0x43] != 0x12)

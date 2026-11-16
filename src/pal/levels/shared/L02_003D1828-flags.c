@@ -5,15 +5,15 @@ extern void moby_mark_spawned(void *);
 extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int D_L02_001A8FF0 __attribute__((sda));
+extern int g_tether_lock_active __attribute__((sda));
 extern char g_camera_l02_position[];
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");
 extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern int g_current_map_index[] __attribute__((sda));
-extern char *D_L02_001B3200 __attribute__((sda));
-extern char D_L02_001B3210[] __attribute__((sda));
+extern char *g_enemy_init_table __attribute__((sda));
+extern char g_arena_anchor_pos[] __attribute__((sda));
 extern float coll_get_ground_distance_below(void *, void *, void *);
 extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
@@ -27,12 +27,12 @@ void func_PAL_L02_003D24B8(char *obj) {
     int hit;
     if (*(unsigned char *)(obj + 0x20) == 0) {
         if (g_current_map_index[0] == 26) {
-            if (D_L02_001A8FF0 == 0) return;
+            if (g_tether_lock_active == 0) return;
             coll_get_ground_distance_below(obj + 0x10, obj, obj + 0x10);
             *(short *)(d + 0x338) = 1;
             *(int *)(obj + 0x9c) = 3;
             *(unsigned short *)(obj + 0x34) |= 0x100;
-            *(float *)(d + 0x90) = fast_vec_dist(obj + 0x10, D_L02_001B3210) - 1.5f;
+            *(float *)(d + 0x90) = fast_vec_dist(obj + 0x10, g_arena_anchor_pos) - 1.5f;
         } else {
             *(int *)(obj + 0x9c) = 12;
             *(float *)(d + 0x90) = *(float *)(obj + 0x18) - 1.0f;
@@ -41,7 +41,7 @@ void func_PAL_L02_003D24B8(char *obj) {
             moby_mark_spawned(obj);
             return;
         }
-        entry = D_L02_001B3200 + *(int *)(d + 0x210) * 0x30;
+        entry = g_enemy_init_table + *(int *)(d + 0x210) * 0x30;
         if (*(short *)(entry + 0x30)) {
             *(int *)(d + 0x13c) = *(int *)(d + 0x218) = **(int **)(entry + 0x3c);
         } else *(int *)(d + 0x218) = -1;
@@ -103,7 +103,7 @@ extern void func_PAL_002B14F8(void *, void *, int, float, int);
 
 /* Clears the two angle words at +0x310 and +0x312 and counts up the +0x96 word, then runs the
    two placement helpers on the sub-object at +0x260. */
-void func_PAL_L02_003D28F0(char *a0) {
+void moby_reset_turn_place_pal(char *a0) {
     char *p = *(char **)(a0 + 0x68);
     char *q;
     unsigned short n;

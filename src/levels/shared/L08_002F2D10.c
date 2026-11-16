@@ -74,7 +74,7 @@ extern void *SpawnJointFollowParticle(void *, float, int, int, int);
 extern void func_002A0F48(void *);
 
 
-extern f32 D_L08_001BE0B0;
+extern f32 g_saved_hold_float;
 extern void UpdateViewContext();
 
 extern int r1_D_0015F564_002F2D10 MACRO_ADDR;
@@ -107,7 +107,7 @@ void gfx_queue_draw_callback(DrawCallback_r002F2D10 fn, void *arg) {
 extern int text_run_helper_first_set(u8 *, int, float);
 extern u64 GetEffectTextureDescriptor(int);
 extern void FontPrintScaled(float, float, u64, u8 *, int, float, u64, u8 *);
-extern u8 D_L08_00296CD0[];
+extern u8 g_font_print_data[];
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
  * the text is drawn with font texture 1. func_0027F640 is declared with its
@@ -120,27 +120,27 @@ void DrawCenteredScaledText(int x, int y, u64 color, u8 *text, int length, float
     fx = x - (text_run_helper_first_set(text, length, scale) >> 1);
     fy = y;
     texture = GetEffectTextureDescriptor(1);
-    FontPrintScaled(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
+    FontPrintScaled(fx, fy, color, text, length, scale, texture, g_font_print_data);
 }
 
 /* Sets the saved float to 0.62 and runs the update that uses it. */
 void hero_set_saved_float_and_update(void) {
-    D_L08_001BE0B0 = 0.62f;
+    g_saved_hold_float = 0.62f;
     UpdateViewContext();
 }
 
 extern void LoadPackSingleTexture();
 extern void gfx_send_gs_register_packet();
 extern void load_copy_header_relocate_pointers();
-extern u8 D_L08_001DB5E7;
-extern s32 D_L08_001DAC40[];
-extern s32 D_L08_001BFEF4;
+extern u8 g_screen_update_index;
+extern s32 g_screen_update_headers[];
+extern s32 g_screen_update_param;
 
 /* Runs three screen-related update steps in a row for the same value. */
 void gfx_run_screen_update_steps(s32 value) {
     LoadPackSingleTexture(value);
     gfx_send_gs_register_packet(value);
-    load_copy_header_relocate_pointers(D_L08_001DAC40[D_L08_001DB5E7], D_L08_001BFEF4);
+    load_copy_header_relocate_pointers(g_screen_update_headers[g_screen_update_index], g_screen_update_param);
 }
 
 /* Raises a number to a whole-number power (at least 1). */
@@ -156,16 +156,16 @@ f32 IntegerPower(s32 power, f32 base) {
     return result;
 }
 
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
 
 /* Counts the 0x100-byte records between the two pointers whose halfword at +0xAA equals A0
    and whose byte at +0x20 is neither 0xFE nor 0xFD. */
 s32 moby_count_of_class(s32 classId) {
-    u8 *moby = D_L08_001B29DC;
+    u8 *moby = g_moby_array;
     s32 count = 0;
 
-    for (; moby < D_L08_001B29E0; moby += 0x100) {
+    for (; moby < g_moby_array_end; moby += 0x100) {
         if (moby != 0 && *(s16 *)(moby + 0xAA) == classId) {
             if (*(u8 *)(moby + 0x20) != 0xFE) {
                 if (*(u8 *)(moby + 0x20) != 0xFD)
@@ -212,24 +212,24 @@ void moby_set_visibility_flags(void *moby_arg, s32 hide_mode, s32 active_mode, s
     }
 }
 
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern void moby_set_visibility_flags(void *, s32, s32, s32);
 
 /* Changes the flags of the object with the given index in the object list; does nothing for -1. */
 void moby_set_flags_by_index(s32 index, s32 hide_mode, s32 active_mode, s32 collision_mode) {
     if (index == -1)
         return;
-    moby_set_visibility_flags(D_L08_001B29DC + (index << 8), hide_mode, active_mode, collision_mode);
+    moby_set_visibility_flags(g_moby_array + (index << 8), hide_mode, active_mode, collision_mode);
 }
 
 /* Runs func_L08_00328B80 on every object named by entry a0 of the 0x1FB660 table: a u16
    list whose low 15 bits select the object and whose high bit ends the walk. The list
    pointer is read under two names (the guard keeps the fresh load, the walk needs a
    callee-saved register across the call). */
-extern u32 D_L08_001FB660[];
+extern u32 g_moby_l08_group_lists[];
 
 void moby_set_group_flags(s32 group_index, s32 hide_mode, s32 active_mode, s32 collision_mode) {
-    u16 *list = (u16 *)D_L08_001FB660[group_index];
+    u16 *list = (u16 *)g_moby_l08_group_lists[group_index];
 
     if (list != 0) {
         u16 *entry = list;
@@ -461,7 +461,7 @@ finish:
 }
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern Material ref_L08_0039E000_00[];
 extern Collision ref_L08_0039E000_01;
 extern int ref_L08_0039E000_02 __attribute__((sda));
@@ -504,7 +504,7 @@ void bouncing_l08_projectile_update(char *moby) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + ref_L08_0039E000_00)->material;
+    frame.packet.material = (g_bouncing_weapon_index + ref_L08_0039E000_00)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;

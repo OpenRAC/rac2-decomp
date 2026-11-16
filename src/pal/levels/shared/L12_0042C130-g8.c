@@ -7,12 +7,12 @@
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern int D_L12_001A79F0[3] __attribute__((sda));
-extern int D_L12_001A8FF0 __attribute__((sda));
-extern char *D_L12_001B2B00[3] __attribute__((sda));
-extern char D_L12_001B2B10[16] __attribute__((sda));
-extern char D_L12_001B9E00[];
-extern float D_L12_001B21C0 __attribute__((sda));
+extern int g_robot_kill_counter[3] __attribute__((sda));
+extern int g_hero_l12_lock_flag __attribute__((sda));
+extern char *g_hopping_enemy_vertex_table[3] __attribute__((sda));
+extern char g_hopping_enemy_target_pos[16] __attribute__((sda));
+extern char g_hero_prev_position[];
+extern float g_hopping_enemy_hop_rate __attribute__((sda));
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern float coll_get_ground_distance_below(void *, void *, void *);
@@ -88,19 +88,19 @@ void func_PAL_L12_0042CD98(char *obj) {
     int result;
 
     if (!B(obj,0x20)) {
-        if (D_L12_001A79F0[0] == 2 && F(obj,0x18) > 400.0f) {
-            if (!D_L12_001A8FF0) return;
+        if (g_robot_kill_counter[0] == 2 && F(obj,0x18) > 400.0f) {
+            if (!g_hero_l12_lock_flag) return;
             coll_get_ground_distance_below(obj+0x10,obj,obj+0x10);
             s->f358=1;
             W(obj,0x9C)=3;
             U(obj,0x34)|=0x100;
-            s->f90=fast_vec_dist(obj+0x10,D_L12_001B2B10)-1.5f;
+            s->f90=fast_vec_dist(obj+0x10,g_hopping_enemy_target_pos)-1.5f;
         } else {
             W(obj,0x9C)=12;
             s->f90=F(obj,0x18)-1.0f;
         }
         if (s->f230==-1) { moby_mark_spawned(obj); return; }
-        { char *v=D_L12_001B2B00[0]+s->f230*0x30;
+        { char *v=g_hopping_enemy_vertex_table[0]+s->f230*0x30;
         if (H(v,0x30)) {
             s->f238=W(P(v,0x3C),0);
             s->f13C=s->f238;
@@ -112,7 +112,7 @@ void func_PAL_L12_0042CD98(char *obj) {
         s->f60=11; s->f98=3;
         s->f80=0.2f; s->f84=0.2f; s->f8C=0.4f;
         if(s->f230!=-1) {
-            char *v=D_L12_001B2B00[0]+(s->f230*0x30+0x20);
+            char *v=g_hopping_enemy_vertex_table[0]+(s->f230*0x30+0x20);
             if(v && H(v,0x10)>0) s->fCC=W(P(v,0x1C),0);
         }
         s->f28=3;
@@ -127,7 +127,7 @@ void func_PAL_L12_0042CD98(char *obj) {
         { float angle=math_random_signed_float_range(18.0f,22.0f);
         s->f1E8=7; s->f1E9=6; s->f1E2=100; s->f1E4=150;
         s->f1DC=angle*0.01745329424738884f;
-        s->f1D4=3.0f; s->f1D0=D_L12_001B21C0*0.020000001f; }
+        s->f1D4=3.0f; s->f1D0=g_hopping_enemy_hop_rate*0.020000001f; }
         s->f348=math_random_angle();
         if(s->f234) {
             W(obj,0x98)=0; U(obj,0x34)=(U(obj,0x34)|0x41)&0xEFFF;
@@ -139,7 +139,7 @@ void func_PAL_L12_0042CD98(char *obj) {
         }
         qcopy((char *)s+0x300,obj+0x10);
     }
-    if(B(obj,0x31) && fast_vec_dist(obj+0x10,D_L12_001B9E00)<24.0f) {
+    if(B(obj,0x31) && fast_vec_dist(obj+0x10,g_hero_prev_position)<24.0f) {
         moby_update_ground_check(obj); B(obj,0x6F)=22;
     }
     result=func_PAL_002B1A50(obj,(char *)s+0x50,0);

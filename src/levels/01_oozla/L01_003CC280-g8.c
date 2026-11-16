@@ -4,12 +4,12 @@ extern void swamp_monster_release_attack_slot(u8 *);
 extern s32 FloatToInt(f32);
 extern void moby_set_state(u8 *, s32, s32);
 extern u8 *g_moby_l01_table;
-extern s32 D_L01_001B2578[] __attribute__((sda));
+extern s32 g_swamp_monster_thresholds[] __attribute__((sda));
 extern u8 *D_L01_001B255C_base[] __asm__("D_L01_001B255C") __attribute__((sda));
-extern u16 *D_L01_001FB020[];
-extern u8 g_hero_position[], D_L01_001B94C0[];
-extern u8 D_L01_001AFE18[] __attribute__((sda));
-extern f32 D_L01_001B2F40;
+extern u16 *g_group_list_table[];
+extern u8 g_hero_position[], g_level_origin_vec[];
+extern u8 g_water_l01_height[] __attribute__((sda));
+extern f32 g_angle_limit_radians;
 extern u8 *part_find_owned_effect_slot(void *, s32, s32);
 extern f32 moby_update_aim_target_strength(void *, void *);
 extern u8 *moby_get_private_value_0(void *);
@@ -54,9 +54,9 @@ void UpdateOozlaLinkedGroupDamage(u8 *moby)
                 if (moby[0x21] != 0xFF) {
                     class_id = *(u16 *)(*(u8 **)(attacker + 0x20) + 0xAA);
                     hit_duration = (class_id == 0xCE4 /* moby class 3300 */ || class_id == 0xCE5 /* moby class 3301 */) ? 60 : 0;
-                    for (member_list = D_L01_001FB020[moby[0x21]];
-                         moby[0x21] != 0xFF && moby[0x21] <= D_L01_001B2578[0] && member_list &&
-                         ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == D_L01_001FB020[moby[0x21]]); member_list++) {
+                    for (member_list = g_group_list_table[moby[0x21]];
+                         moby[0x21] != 0xFF && moby[0x21] <= g_swamp_monster_thresholds[0] && member_list &&
+                         ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == g_group_list_table[moby[0x21]]); member_list++) {
                         group_member = g_moby_l01_table + ((*member_list & 0x7FFF) << 8);
                         if (!group_member)
                             break;
@@ -134,16 +134,16 @@ void UpdateOozlaLinkedGroupDamage(u8 *moby)
         ((f32 *)pos)[2] = level_get_water_height();
         damage = math_random_float_range(0.5f, 3.0f);
         particle_color = ((math_random_int_below(6) + 20) << 24) | 0x5060;
-        part_spawn_drifting(&pos, D_L01_001AFE18, particle_color, damage, 12000.0f);
+        part_spawn_drifting(&pos, g_water_l01_height, particle_color, damage, 12000.0f);
     }
     weapon_select_aim_target(moby, *(s32 *)(state + 0xF0), 0, moby[0x95] < 5, 0.0f, 0.0f);
     other_state = moby[0x31];
-    if (other_state && fast_vec_dist(moby + 0x10, D_L01_001B94C0) < 48.0f) {
+    if (other_state && fast_vec_dist(moby + 0x10, g_level_origin_vec) < 48.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 45;
     }
     *(f32 *)(moby + 0x74) = 1.0f;
     *(f32 *)(moby + 0x70) = 109.0f - *(f32 *)(moby + 0x18);
     if (moby[0x95] >= 3 && moby[0x95] <= 7)
-        D_L01_001B2F40 = 0.20943953f;
+        g_angle_limit_radians = 0.20943953f;
 }

@@ -26,7 +26,7 @@
 
 extern s8 g_hero_position[];
 extern s8 ref_L04_00441100_00[];
-extern s8 D_001395C8;
+extern s8 g_barlow_trigger_flag;
 extern s32 ref_L04_00441100_01(s8 *, s32);
 extern void ref_L04_00441100_02(s8 *);
 extern void ref_L04_00441100_03(s8 *, s32, s32);
@@ -41,7 +41,7 @@ void barlow_proximity_trigger_update(s8 *object) {
         linked_id = *links;
         if (linked_id != -1 && ref_L04_00441100_01(g_hero_position, linked_id) != 0) {
             ref_L04_00441100_02(ref_L04_00441100_00);
-            D_001395C8 = 1;
+            g_barlow_trigger_flag = 1;
             ref_L04_00441100_03(object, 1, -1);
         }
     }

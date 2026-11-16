@@ -18,8 +18,8 @@ void cam_end_override(u8 *object) {
 }
 
 
-extern char D_L00_001B8C80[];
-extern float D_L00_001BD370;
+extern char g_scalar_transition_state[];
+extern float g_fast_math_ratio;
 extern float math_fast_sin_or_cos_b(f32);
 extern float math_fast_sin_or_cos_a(f32);
 extern void UpdateViewContext(void);
@@ -27,7 +27,7 @@ extern void UpdateViewContext(void);
 /* Initialize the shared blend fields and the quotient of the two helper results. */
 /* Sets up the starting camera blend values when a level begins. */
 void cam_l00_init_blend_values(void) {
-    u8 *camState = (u8 *)D_L00_001B8C80;
+    u8 *camState = (u8 *)g_scalar_transition_state;
     float blendValue = 1.1243411f;
     float angle = 0.56217057f;
     float first, second;
@@ -37,7 +37,7 @@ void cam_l00_init_blend_values(void) {
     *(float *)(camState + 0x3D8) = blendValue;
     first = math_fast_sin_or_cos_b(angle);
     second = math_fast_sin_or_cos_a(angle);
-    D_L00_001BD370 = first / second;
+    g_fast_math_ratio = first / second;
     UpdateViewContext();
     *(float *)(camState + 0x3DC) = 0.005f;
     *(float *)(camState + 0x3E0) = 0.2f;

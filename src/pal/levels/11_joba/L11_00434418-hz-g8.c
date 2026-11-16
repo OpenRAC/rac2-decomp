@@ -9,14 +9,14 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 
 extern char g_hero_state[];
-extern s32 D_L11_001CAE40[];
-extern s32 *D_L11_001FF580[];
+extern s32 g_enemy_freeze_flag[];
+extern s32 *g_path_l11_table[];
 extern u8 *const g_moby_l11_table[] __attribute__((sda));
-extern u8 *D_L11_001B368C[] __attribute__((sda));
-extern s32 D_L11_001AED04[] __attribute__((sda));
-extern char D_L11_001A8F20[] __attribute__((sda));
-extern u8 D_L11_001C8A40[];
-extern TI128 D_L11_001C0D20;
+extern u8 *g_arena_camera_table[] __attribute__((sda));
+extern s32 g_active_rider_count[] __attribute__((sda));
+extern char g_identity_l11_matrix[] __attribute__((sda));
+extern u8 g_turret_beam_table[];
+extern TI128 g_aim_position;
 
 extern void func_PAL_L11_00436D20(u8 *);
 extern void saur_beast_step_timer_clear_flags(u8 *);
@@ -30,20 +30,20 @@ extern s32 math_random_int_range(s32, s32);
 extern s32 math_random_int_below(s32);
 extern s32 point_in_path_xy(void *, void *, s32);
 extern s32 moby_dispatch_action_by_kind(u8 *, void *);
-extern void func_PAL_002A7650(u8 *, s32, s32);
+extern void SetDeathBits_pal(u8 *, s32, s32);
 extern void part_queue_moby_for_glow(u8 *, s32, void *);
 extern void moby_mark_spawned(void *);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_fast_float_d(void *);
 extern f32 ApproachValue(f32 *, f32, f32);
-extern void func_PAL_002AF420(u8 *, void *, f32, f32);
-extern s32 func_PAL_002B6CD8(u8 *, void *);
+extern void moby_wander_around_home_point_pal(u8 *, void *, f32, f32);
+extern s32 path_follow_nodes_pal(u8 *, void *);
 extern s32 path_set_follower_nodes(u8 *, void *, s32, s32);
 extern f32 moby_turn_toward_position(u8 *, void *, void *, f32, f32, f32);
 extern f32 vec_distance_xy(void *, void *);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
-extern s32 func_PAL_L01_00323068(u8 *, void *);
+extern s32 moby_l01_turn_toward_target_pal(u8 *, void *);
 extern void moby_transform_joint_to_world(u32 a0, s32 a1, f32 *a2);
 extern f32 math_fast_sin_or_cos_a(f32 a0);
 extern f32 math_fast_sin_or_cos_b(f32 a0);
@@ -53,7 +53,7 @@ extern s32 coll_process_hit(void *, f32, s32, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern s32 func_PAL_L02_00333638(u8 *, void *, f32, s32, f32, f32);
+extern s32 moby_move_to_target_temp_limits_pal(u8 *, void *, f32, s32, f32, f32);
 extern f32 moby_get_anim_value(u8 *);
 extern void *part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
 extern s32 coll_test_hit_at_bone(void *, f32, f32, s32, s32, f32, s32, s32, s32);
@@ -61,16 +61,16 @@ extern void moby_set_flag_bit(u8 *, s32);
 extern s32 part_l00_alloc_effect_slot_2(void *, f32, f32, f32, f32, f32);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 flag_is_third_pending_set(u8 *);
-extern void func_PAL_L04_003E96E0(void *, s32);
+extern void part_l04_spawn_paired_sparks_pal(void *, s32);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void gfx_free_point_light(s32);
-extern s32 func_PAL_002B5C98(u8 *, void *, f32);
+extern s32 moby_step_controller_pal(u8 *, void *, f32);
 extern void anim_play_on_self_and_owner(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 
 void func_PAL_L11_00434418(u8 *arg0) {
     u8 *data;
 
-    if (D_L11_001CAE40[0] != 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+    if (g_enemy_freeze_flag[0] != 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
         arg0[0xBC] = 1;
         *(s32 *)(arg0 + 0x98) = 0;
         *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
@@ -117,8 +117,8 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 anim_play_on_self_and_owner(arg0, 4, 3, 0, 0xA);
             }
         } else if (*(s32 *)(data + 0x2AC) != -1 &&
-                   point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
-                                 *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) != 0) {
+                   point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)g_path_l11_table[*(s32 *)(data + 0x2AC)] + 0x10,
+                                 *g_path_l11_table[*(s32 *)(data + 0x2AC)]) != 0) {
             anim_play_on_self_and_owner(arg0, 6, 5, 0, 8);
             moby_set_controller_speed_limits(arg0, 0.024f, 0.6f, 0.0016755164f, 0.12566373f);
             *(f32 *)(data + 0x164) = 0.008f;
@@ -149,8 +149,8 @@ void func_PAL_L11_00434418(u8 *arg0) {
         if (flag_set_second_pending(arg0) != 0)
             moby_set_controller_speed_limits(arg0, 0.0048f, 0.120000005f, 0.0016755164f, 0.12566373f);
         if (*(s32 *)(data + 0x2AC) == -1 ||
-            point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)D_L11_001FF580[*(s32 *)(data + 0x2AC)] + 0x10,
-                          *D_L11_001FF580[*(s32 *)(data + 0x2AC)]) == 0) {
+            point_in_path_xy(&((Hero *)g_hero_state)->f[0x80 / 4], (u8 *)g_path_l11_table[*(s32 *)(data + 0x2AC)] + 0x10,
+                          *g_path_l11_table[*(s32 *)(data + 0x2AC)]) == 0) {
             if ((u16)(*(s16 *)(data + 0x274) - 1) >= 2) {
                 if (arg0[0x20] == 0x11 || arg0[0x20] == 0x14 || arg0[0x20] == 0x10) {
                 } else if (arg0[0x20] == 0x13) {
@@ -164,7 +164,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
                     anim_play_on_self_and_owner(arg0, 3, 1, 0, 0xA);
                     moby_set_state(arg0, 0xB, 1);
                     if (*(s32 *)(data + 0x2A4) != -1) {
-                        qcopy(data + 0x110, D_L11_001B368C[0] + (*(s32 *)(data + 0x2A4) << 7) + 0x30);
+                        qcopy(data + 0x110, g_arena_camera_table[0] + (*(s32 *)(data + 0x2A4) << 7) + 0x30);
                         if (*(f32 *)(data + 0x12C) == 0.0f)
                             *(f32 *)(data + 0x12C) = 4.0f;
                     }
@@ -197,8 +197,8 @@ void func_PAL_L11_00434418(u8 *arg0) {
 
         r = moby_dispatch_action_by_kind(arg0, data + 0x60);
         if (r & 1) {
-            D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
-            func_PAL_002A7650(arg0, 0, 3);
+            g_active_rider_count[0] = g_active_rider_count[0] - 1;
+            SetDeathBits_pal(arg0, 0, 3);
             part_queue_moby_for_glow(arg0, 0, 0);
             return;
         }
@@ -238,7 +238,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
                     if (math_random_int_below(2) == 1)
                         anim_play_on_self_and_owner(arg0, 0, 0, 0, 0xA);
                 }
-                func_PAL_002AF420(arg0, data + 0x110, 0.35f, 0.25f);
+                moby_wander_around_home_point_pal(arg0, data + 0x110, 0.35f, 0.25f);
             } else if (arg0[0x43] < 2 && (arg0[0x60] & 2)) {
                 *(s32 *)(data + 0x28C) = math_random_int_range(0x64, 0x247);
                 anim_play_on_self_and_owner(arg0, 5, 4, 0, 0xA);
@@ -262,18 +262,18 @@ void func_PAL_L11_00434418(u8 *arg0) {
         break;
     }
     case 5:
-        if (*(s32 *)(data + 0x29C) != -1 && func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x29C)]) != 0) {
             moby_set_state(arg0, 7, -1);
             anim_play_on_self_and_owner(arg0, 4, 3, 0, 8);
-            path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x29C)], 0, 1);
+            path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x29C)], 0, 1);
             *(s32 *)(data + 0x2C0) = 1;
         }
         break;
     case 6:
-        if (*(s32 *)(data + 0x29C) != -1 && func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x29C)]) != 0) {
+        if (*(s32 *)(data + 0x29C) != -1 && path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x29C)]) != 0) {
             moby_set_state(arg0, 7, -1);
             anim_play_on_self_and_owner(arg0, 4, 3, 0, 8);
-            path_set_follower_nodes(arg0, D_L11_001FF580[*(s32 *)(data + 0x29C)], 1, 0);
+            path_set_follower_nodes(arg0, g_path_l11_table[*(s32 *)(data + 0x29C)], 1, 0);
             *(s32 *)(data + 0x2C0) = 0;
         }
         break;
@@ -284,7 +284,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
         }
         break;
     case 13:
-        func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x2C4)]);
+        path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x2C4)]);
         break;
     case 11:
         math_fast_float_d(data + 0x28C);
@@ -298,7 +298,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 if (math_random_int_below(2) == 1)
                     anim_play_on_self_and_owner(arg0, 4, 3, 0, 0xA);
             }
-            func_PAL_002AF420(arg0, data + 0x110, 0.35f, 0.25f);
+            moby_wander_around_home_point_pal(arg0, data + 0x110, 0.35f, 0.25f);
         } else if ((u8)(arg0[0x43] - 3) < 2 && (arg0[0x60] & 2)) {
             *(s32 *)(data + 0x28C) = math_random_int_range(0x64, 0x247);
             anim_play_on_self_and_owner(arg0, 6, 5, 0, 0xA);
@@ -349,7 +349,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
     case 19: {
         *(f32 *)(data + 0x164) = 0.010000001f;
         moby_set_controller_speed_limits(arg0, 0.0096f, 0.24000001f, 0.0016755164f, 0.12566373f);
-        func_PAL_L01_00323068(arg0, &((Hero *)g_hero_state)->f[0x80 / 4]);
+        moby_l01_turn_toward_target_pal(arg0, &((Hero *)g_hero_state)->f[0x80 / 4]);
         moby_turn_toward_position(arg0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], data + 0x284, 0.001f, 0.01f, 0.1f);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (vec_distance_xy(arg0 + 0x10, &((Hero *)g_hero_state)->f[0x80 / 4]) < 2.1f) {
@@ -389,7 +389,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
         off[1] = math_fast_sin_or_cos_b(*(f32 *)(arg0 + 0xF8)) * 4.0f;
         off[2] = 0.0f;
         FastVecAdd(off, p, off);
-        func_PAL_L01_00323068(arg0, &((Hero *)g_hero_state)->f[0x80 / 4]);
+        moby_l01_turn_toward_target_pal(arg0, &((Hero *)g_hero_state)->f[0x80 / 4]);
         *(s32 *)(data + 0x280) = *(s32 *)(data + 0x280) + 1;
         if (arg0[0x60] & 2) {
             anim_play_on_self_and_owner(arg0, 2, 2, 0, 8);
@@ -430,7 +430,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
 
         vec_scale_to_length(v, arg0 + 0xC0, -5.5f);
         FastVecAdd(v, v, arg0 + 0x10);
-        func_PAL_L02_00333638(arg0, v, mat_fast_helper_a(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
+        moby_move_to_target_temp_limits_pal(arg0, v, mat_fast_helper_a(v[0] - *(f32 *)(arg0 + 0x10), v[1] - *(f32 *)(arg0 + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x65) {
             *(f32 *)(data + 0x164) = 0.0012f;
@@ -462,7 +462,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
         break;
     case 17:
         moby_set_controller_speed_limits(arg0, 0.0048f, 0.120000005f, 0.0016755164f, 0.12566373f);
-        if (func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x294)]) != 0) {
+        if (path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x294)]) != 0) {
             moby_set_state(arg0, 0x18, -1);
             anim_play_on_self_and_owner(arg0, 0xF, 4, 0, 8);
             moby_set_controller_speed_limits(arg0, 0.0048f, 0.120000005f, 0.0016755164f, 0.12566373f);
@@ -491,8 +491,8 @@ void func_PAL_L11_00434418(u8 *arg0) {
             n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
             *(f32 *)(data + 0x288) = g;
         }
         if (arg0[0x60] & 2) {
@@ -578,7 +578,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
-                    l = D_L11_001C8A40 + (k << 5);
+                    l = g_turret_beam_table + (k << 5);
                     qcopy(l + 0x10, data + 0x230);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -608,7 +608,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2B0) = k;
                 if (k >= 0) {
-                    l = D_L11_001C8A40 + (k << 5);
+                    l = g_turret_beam_table + (k << 5);
                     qcopy(l + 0x10, data + 0x230);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -637,8 +637,8 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_identity_l11_matrix, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
                 *(f32 *)(data + 0x288) = *(f32 *)(data + 0x288) + 1.0f;
             }
         }
@@ -658,9 +658,9 @@ void func_PAL_L11_00434418(u8 *arg0) {
             *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
             FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
             if (CollLine(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
-                *(TI128 *)(data + 0x240) = D_L11_001C0D20;
+                *(TI128 *)(data + 0x240) = g_aim_position;
                 if (flag_is_third_pending_set(arg0) == 0) {
-                    func_PAL_L04_003E96E0(&D_L11_001C0D20, 6);
+                    part_l04_spawn_paired_sparks_pal(&g_aim_position, 6);
                     moby_set_flag_bit(arg0, 1);
                 }
             }
@@ -671,17 +671,17 @@ void func_PAL_L11_00434418(u8 *arg0) {
             qcopy(v30, data + 0x240);
             v30[2] -= 0.1f;
             f3 = f * 0.3f;
-            part_spawn_ground_effect(v30, 0x15, f3, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x15, f3, f, 0xFF000080, 0, n, g_identity_l11_matrix, 0.0f, 0);
             n = -n;
             f04 = f * 0.04f;
             f4 = f * 0.4f;
-            part_spawn_ground_effect(v30, 4, f04, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v30, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x230, 8, f3, f, 0x80CA00CB, 0, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x230, 8, f04, f4, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 4, f04, f4, 0x7F6F6FFF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 8, f3, f, 0x80CA00CB, 0, n, g_identity_l11_matrix, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x230, 8, f04, f4, 0x7F6F6FFF, 1, -n, g_identity_l11_matrix, 0.0f, 0);
             gfx_add_draw_callback_first(saur_beast_draw_beam, arg0);
             if (*(s32 *)(data + 0x2B0) >= 0) {
-                l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
+                l = g_turret_beam_table + (*(s32 *)(data + 0x2B0) << 5);
                 qcopy(l + 0x10, data + 0x240);
                 *(f32 *)(l + 0x1C) = 5.0f;
                 *(f32 *)(l + 0) = 1.0f;
@@ -709,9 +709,9 @@ void func_PAL_L11_00434418(u8 *arg0) {
                 *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
                 FastVecAdd(data + 0x240, data + 0x230, data + 0x240);
                 if (CollLine(data + 0x230, data + 0x240, 0, arg0, req) != 0) {
-                    *(TI128 *)(data + 0x240) = D_L11_001C0D20;
+                    *(TI128 *)(data + 0x240) = g_aim_position;
                     if (flag_is_third_pending_set(arg0) == 0) {
-                        func_PAL_L04_003E96E0(&D_L11_001C0D20, 6);
+                        part_l04_spawn_paired_sparks_pal(&g_aim_position, 6);
                         moby_set_flag_bit(arg0, 1);
                     }
                 }
@@ -723,14 +723,14 @@ void func_PAL_L11_00434418(u8 *arg0) {
                     n = n - 1;
                 qcopy(v40, data + 0x240);
                 v40[2] -= 0.1f;
-                part_spawn_ground_effect(v40, 0x15, f * 0.3f, f, 0xFF000080, 0, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x15, f * 0.3f, f, 0xFF000080, 0, n, g_identity_l11_matrix, 0.0f, 0);
                 n = -n;
                 f4 = f * 0.4f;
-                part_spawn_ground_effect(v40, 4, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L11_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v40, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 4, f * 0.04f, f4, 0x7F6F6FFF, 1, n, g_identity_l11_matrix, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x11, f4, f * 0.2f, 0xFF4080FF, 1, n, g_identity_l11_matrix, 0.0f, 0);
                 gfx_add_draw_callback_first(saur_beast_draw_beam, arg0);
                 if (*(s32 *)(data + 0x2B0) >= 0) {
-                    l = D_L11_001C8A40 + (*(s32 *)(data + 0x2B0) << 5);
+                    l = g_turret_beam_table + (*(s32 *)(data + 0x2B0) << 5);
                     qcopy(l + 0x10, data + 0x240);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -774,7 +774,7 @@ void func_PAL_L11_00434418(u8 *arg0) {
             anim_play_on_self_and_owner(arg0, 9, 6, 0, 8);
             moby_set_state(arg0, 0x12, -1);
         } else {
-            func_PAL_002B5C98(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
+            moby_step_controller_pal(arg0, arg0 + 0x10, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(arg0 + 0x10),
                                                            ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(arg0 + 0x14)));
         }
         break;
@@ -789,14 +789,14 @@ void func_PAL_L11_00434418(u8 *arg0) {
             }
         } else if (arg0[0x43] == 0xE) {
             moby_set_controller_speed_limits(arg0, 0.16000001f, 0.080000006f, 0.013962637f, 0.8377582f);
-            func_PAL_002B6CD8(arg0, D_L11_001FF580[*(s32 *)(data + 0x29C)]);
+            path_follow_nodes_pal(arg0, g_path_l11_table[*(s32 *)(data + 0x29C)]);
         }
         break;
     }
     saur_beast_step_timer_clear_flags(arg0);
     if (*(f32 *)(arg0 + 0x18) < 74.0f) {
-        func_PAL_002A7650(arg0, 0, 3);
-        D_L11_001AED04[0] = D_L11_001AED04[0] - 1;
+        SetDeathBits_pal(arg0, 0, 3);
+        g_active_rider_count[0] = g_active_rider_count[0] - 1;
         moby_mark_spawned(arg0);
     }
 }

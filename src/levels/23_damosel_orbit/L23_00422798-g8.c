@@ -13,29 +13,29 @@ typedef int s32;
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B1908 __attribute__((sda));
+extern float g_energy_effect_base_size __attribute__((sda));
 
-extern float D_L23_001B190C __attribute__((sda));
+extern float g_energy_effect_length_scale __attribute__((sda));
 
-extern float D_L23_001B18E0 __attribute__((sda));
+extern float g_energy_effect_scroll_limit __attribute__((sda));
 
-extern u32 D_L23_001B18E4 __attribute__((sda));
+extern u32 g_energy_effect_tex_a __attribute__((sda));
 
-extern u32 D_L23_001B18E8 __attribute__((sda));
+extern u32 g_energy_effect_tex_b __attribute__((sda));
 
-extern u32 D_L23_001B18EC __attribute__((sda));
+extern u32 g_energy_effect_tex_c __attribute__((sda));
 
-extern u32 D_L23_001B18F0 __attribute__((sda));
+extern u32 g_energy_effect_quad_a_color __attribute__((sda));
 
-extern s32 D_L23_001B18F4 __attribute__((sda));
+extern s32 g_energy_effect_quad_a_texture __attribute__((sda));
 
-extern u32 D_L23_001B18F8 __attribute__((sda));
+extern u32 g_energy_effect_quad_b_color __attribute__((sda));
 
-extern s32 D_L23_001B18FC __attribute__((sda));
+extern s32 g_energy_effect_quad_b_texture __attribute__((sda));
 
-extern u32 D_L23_001B1900 __attribute__((sda));
+extern u32 g_energy_effect_quad_c_color __attribute__((sda));
 
-extern s32 D_L23_001B1904 __attribute__((sda));
+extern s32 g_energy_effect_quad_c_texture __attribute__((sda));
 
 extern float FastVecLength(void *);
 
@@ -64,17 +64,17 @@ void energy_effect_update_scrolling(u8 *obj) {
         *(float *)(vars + 0x14) = phase + 8.0f;
     }
     scrollStep = FastVecLength(vars);
-    size = D_L23_001B1908 * 0.2f;
+    size = g_energy_effect_base_size * 0.2f;
     *(float *)(vars + 0x18) = *(float *)(vars + 0x18) + scrollStep;
-    gfx_draw_billboard_quad(obj + 0x10, 0x31, D_L23_001B18E4, 1, size, 0.0f, math_random_angle());
-    gfx_draw_billboard_quad(obj + 0x10, 0x31, D_L23_001B18E8, 1, D_L23_001B1908 * 0.1f, 0.0f, math_random_angle());
-    gfx_draw_billboard_quad(obj + 0x10, 0x2F, D_L23_001B18EC, 1, D_L23_001B1908 * 0.05f, 0.0f, math_random_angle());
-    if (*(float *)(vars + 0x18) > D_L23_001B18E0) {
-        DrawOrientedQuadsAtPoints(obj, direction, 1, D_L23_001B18F0, D_L23_001B18F4, 0x17, D_L23_001B1908 * 0.02f,
-                          D_L23_001B190C * D_L23_001B1908, *(float *)(vars + 0x14));
-        DrawOrientedQuadsAtPoints(obj, direction, 1, D_L23_001B18F8, D_L23_001B18FC, 0x17, D_L23_001B1908 * 0.07f,
-                          D_L23_001B190C * D_L23_001B1908, *(float *)(vars + 0x14));
-        DrawOrientedQuadsAtPoints(obj, direction, 1, D_L23_001B1900, D_L23_001B1904, 0x17, D_L23_001B1908 * 0.07f,
-                          D_L23_001B190C * D_L23_001B1908, *(float *)(vars + 0x14));
+    gfx_draw_billboard_quad(obj + 0x10, 0x31, g_energy_effect_tex_a, 1, size, 0.0f, math_random_angle());
+    gfx_draw_billboard_quad(obj + 0x10, 0x31, g_energy_effect_tex_b, 1, g_energy_effect_base_size * 0.1f, 0.0f, math_random_angle());
+    gfx_draw_billboard_quad(obj + 0x10, 0x2F, g_energy_effect_tex_c, 1, g_energy_effect_base_size * 0.05f, 0.0f, math_random_angle());
+    if (*(float *)(vars + 0x18) > g_energy_effect_scroll_limit) {
+        DrawOrientedQuadsAtPoints(obj, direction, 1, g_energy_effect_quad_a_color, g_energy_effect_quad_a_texture, 0x17, g_energy_effect_base_size * 0.02f,
+                          g_energy_effect_length_scale * g_energy_effect_base_size, *(float *)(vars + 0x14));
+        DrawOrientedQuadsAtPoints(obj, direction, 1, g_energy_effect_quad_b_color, g_energy_effect_quad_b_texture, 0x17, g_energy_effect_base_size * 0.07f,
+                          g_energy_effect_length_scale * g_energy_effect_base_size, *(float *)(vars + 0x14));
+        DrawOrientedQuadsAtPoints(obj, direction, 1, g_energy_effect_quad_c_color, g_energy_effect_quad_c_texture, 0x17, g_energy_effect_base_size * 0.07f,
+                          g_energy_effect_length_scale * g_energy_effect_base_size, *(float *)(vars + 0x14));
     }
 }

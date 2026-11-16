@@ -21,7 +21,7 @@ extern float math_lerp_float(float a, float b, float t);
 extern void *part_spawn_spinning_particle(void *position, void *velocity, int color, int value, float life, int size,
                                int extra, float rotation, int texture, int flags, int weight);
 extern char g_sound_state[];
-extern char D_L14_001A8F20[] __attribute__((sda));
+extern char g_identity_l14_matrix[] __attribute__((sda));
 
 /* The state block of a particle emitter. */
 typedef struct {
@@ -114,8 +114,8 @@ void func_PAL_L14_003E8608(char *self)
                 char *src = self + 0x10;
 
                 qcopy(&pos, src);
-                qcopy(&vel, D_L14_001A8F20);
-                qcopy(&tmp, D_L14_001A8F20);
+                qcopy(&vel, g_identity_l14_matrix);
+                qcopy(&tmp, g_identity_l14_matrix);
                 tmp.f[0] += 1.1f;
                 matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
                 FastVecAdd(&pos, &pos, &tmp);
@@ -165,8 +165,8 @@ void func_PAL_L14_003E8608(char *self)
                 float life;
 
                 qcopy(&pos, self + 0x10);
-                qcopy(&vel, D_L14_001A8F20);
-                qcopy(&tmp, D_L14_001A8F20);
+                qcopy(&vel, g_identity_l14_matrix);
+                qcopy(&tmp, g_identity_l14_matrix);
                 tmp.f[0] += 1.1f;
                 matrix_mul_vec3(&tmp, &tmp, self + 0xC0);
                 FastVecAdd(&pos, &pos, &tmp);

@@ -4,8 +4,8 @@
 #include "common.h"
 
 extern char *g_movie_player_state[] __attribute__((sda));
-extern int D_001A7478[] __attribute__((sda));
-extern int D_001A7A00[] __attribute__((sda));
+extern int g_loader_state_word[] __attribute__((sda));
+extern int g_player_stats[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 typedef struct { char pad[0x1a0]; union { unsigned long long held; int words[2]; } buttons; } MoviePad;
 extern MoviePad g_pad_state;
@@ -60,11 +60,11 @@ int read_mpeg(char *vd, char *rb, int *file) {
 
         pad_poll_ports();
         if (g_pad_state.buttons.words[0] == 0) armed = 1;
-        if (armed && (n = D_001A7478[0]) != 3) {
+        if (armed && (n = g_loader_state_word[0]) != 3) {
             if (n == 2 && g_pad_state.buttons.words[0] != 0 &&
                 g_pad_state.buttons.words[1] == 0) {
                 hit = 1;
-            } else if (((D_001A7A00[2] & 0xffff0000) || D_001A7478[0] != 0 ||
+            } else if (((g_player_stats[2] & 0xffff0000) || g_loader_state_word[0] != 0 ||
                         g_current_map_index[0] <= 0) && (g_pad_state.buttons.words[1] & 0x800)) {
                 hit = 1;
             } else if ((g_pad_state.buttons.held & 0x8000000000FULL) == 0x8000000000FULL) {

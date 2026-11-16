@@ -5,7 +5,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0
 extern u8 g_hero_state[];
 /* Movement constants (floats at 0x1A7DB0, +4 and +0x10 are read in retail); an sdata
    aggregate read at an offset, so the address is the assembler macro, never split. */
-extern float D_001A7DB0[] MACRO_ADDR;
+extern float g_hero_speed_params[] MACRO_ADDR;
 extern void hero_resolve_stick_direction(int, float);
 
 #define H ((Hero *)D_00189E20)
@@ -15,7 +15,7 @@ void hero_update_target_speed(void)
 {
     hero_resolve_stick_direction(0, 1.0f);
     if (0.0f < H->f[0x1B0 / 4]) {
-        H->f[0x1B0 / 4] = D_001A7DB0[4] * (H->f[0x24B8 / 4] * 0.016666668f);
+        H->f[0x1B0 / 4] = g_hero_speed_params[4] * (H->f[0x24B8 / 4] * 0.016666668f);
     }
     if (H->i[0x2294 / 4] == 0x70) {
         H->f[0x1B0 / 4] = H->f[0x1B0 / 4] * 0.8f;

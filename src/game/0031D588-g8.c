@@ -8,14 +8,14 @@ typedef struct { char pad[112]; float value; char tail[108]; } DamageClass;
 typedef struct { char pad[0x2290]; char *player; } PlayerRef;
 typedef struct { char pad[132]; int value; } SoundRecord;
 
-extern char D_001BF000[];
-extern const QueryParams D_001AFE00;
+extern char g_nearby_mobys[];
+extern const QueryParams g_shot_query_params;
 extern char g_item_slot_to_record[];
-extern char D_001BAFA0[];
+extern char g_coll_hit_position[];
 extern char g_sound_state[];
 extern char g_hero_state[];
 extern char g_weapon_table[];
-extern int D_001AFDF4 SDATA(D_001AFDF4);
+extern int g_shot_moby_initialized SDATA(D_001AFDF4);
 
 extern void vec_transform_or_copy(void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
@@ -75,7 +75,7 @@ void shot_moby_update(char *self)
         snd_set_voice_pitch_bend(*(int *)(state + 0x20), *(int *)(state + 0x24) + math_random_int_range(-200, 200));
         n = coll_process_hit(self + 0x10, 0, self, 0, 0.45f);
         for (i = 0; i < n; i++) {
-            obj = ((Candidate *)D_001BF000)[i].item;
+            obj = ((Candidate *)g_nearby_mobys)[i].item;
             data = moby_get_private_value_0(obj);
             if (*(short *)(obj + 0xAA) == MOBY_CLASS_PLASMA_COIL || obj == ((PlayerRef *)g_hero_state)->player
                 || !(*(short *)(obj + 0x34) & 0x1000))
@@ -109,8 +109,8 @@ void shot_moby_update(char *self)
             else
                 hit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
             if (hit == 1) {
-                qcopy(self + 0x10, D_001BAFA0);
-                FastVecScale(temp.v, D_001BAFA0 + 0x20, 0.0009765625f);
+                qcopy(self + 0x10, g_coll_hit_position);
+                FastVecScale(temp.v, g_coll_hit_position + 0x20, 0.0009765625f);
                 vec_scale_to_length(temp.v, temp.v, 0.1f);
                 FastVecAdd(self + 0x10, temp.v, self + 0x10);
                 *(int *)(state + 0x10) = 15;
@@ -135,7 +135,7 @@ void shot_moby_update(char *self)
         }
         if (math_fast_float_d(state + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
-            temp.params = D_001AFE00;
+            temp.params = g_shot_query_params;
             event.query.exclude = (QueryExclude){*(char **)(state + 0x38), 0};
             SelectBestTargetInCone(self + 0x10, self + 0xC0, 6.2831855f, 6.2831855f, &count,
                           event.query.targets, 3, &event.query.exclude,
@@ -153,8 +153,8 @@ void shot_moby_update(char *self)
     case 4: {
         char *info;
         if (*(char **)(state + 0x38)) {
-            if (!D_001AFDF4) {
-                D_001AFDF4 = 1;
+            if (!g_shot_moby_initialized) {
+                g_shot_moby_initialized = 1;
                 PlayMobySound(3, 0, self);
             }
             info = moby_get_private_value_0(*(char **)(state + 0x38));

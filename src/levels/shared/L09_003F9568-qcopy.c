@@ -7,7 +7,7 @@ typedef signed short s16;
 typedef signed int s32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern s32 *D_L09_001FE6C0[];
+extern s32 *g_path_l09_table[];
 
 typedef struct {
     char pad0[0x10];
@@ -35,7 +35,7 @@ typedef struct {
     T3F9568_Owned *f68;
 } T3F9568_Obj;
 
-extern char D_L09_001BFE58[];
+extern char g_collision_hit_object[];
 extern s32 CollLine(void *, void *, int, void *, int);
 extern s32 coll_test_point(void *, int, void *, float);
 
@@ -52,7 +52,7 @@ s32 enemy_check_line_of_sight(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoi
         return 1;
     pos[0] = *(TI128 *)((char *)moby + 0x10);
     if (fromPathPoint != 0 && vars->f2DC != -1 && vars->f1CA != -1)
-        pos[0] = *(TI128 *)((char *)D_L09_001FE6C0[vars->f2DC] + vars->f1CA * 16 + 0x10);
+        pos[0] = *(TI128 *)((char *)g_path_l09_table[vars->f2DC] + vars->f1CA * 16 + 0x10);
     if (lowShot != 0)
         ((float *)pos)[2] += 1.0f;
     else
@@ -60,12 +60,12 @@ s32 enemy_check_line_of_sight(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoi
     aim[0] = vars->f200->f10;
     blocked = 0;
     ((float *)aim)[2] += 1.18f;
-    if (CollLine(pos, aim, 0, moby, 0) == 0 || *(T3F9568_Hit **)D_L09_001BFE58 == (T3F9568_Hit *)vars->f200)
+    if (CollLine(pos, aim, 0, moby, 0) == 0 || *(T3F9568_Hit **)g_collision_hit_object == (T3F9568_Hit *)vars->f200)
         blocked = 1;
     if (checkSolid != 0 && blocked == 0) {
-        probe[0] = *(TI128 *)(D_L09_001BFE58 + 8);
+        probe[0] = *(TI128 *)(g_collision_hit_object + 8);
         if (coll_test_point(probe, 1, moby, 0.5f) != 0) {
-            T3F9568_Hit *hit = *(T3F9568_Hit **)D_L09_001BFE58;
+            T3F9568_Hit *hit = *(T3F9568_Hit **)g_collision_hit_object;
             if (hit == 0 || hit->f24 == 0 || *(s16 *)(hit->f24 + 0x46) != 5)
                 blocked = 1;
         }

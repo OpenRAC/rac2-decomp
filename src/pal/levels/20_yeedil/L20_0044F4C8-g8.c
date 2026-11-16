@@ -4,15 +4,15 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-extern int D_L20_001A8F00;
-extern char *D_0018A3E0 __attribute__((nosda));
-extern float D_L20_001B23E0 __attribute__((sda));
-extern float D_L20_001B23E4 __attribute__((sda));
-extern int D_L20_001B2AC8;
+extern int g_hero_vehicle_mode;
+extern char *g_target_moby __attribute__((nosda));
+extern float g_pop_target_param_a __attribute__((sda));
+extern float g_pop_target_param_b __attribute__((sda));
+extern int g_frame_l20_counter;
 extern void moby_reset_to_idle(char *);
 extern void moby_vanish_with_effect(char *);
 extern void path_follow_pop_on_touch(char *);
-extern void func_PAL_L01_0031C9C0(void *, void *, float, float, float, int);
+extern void pushable_moby_update_pal(void *, void *, float, float, float, int);
 extern float coll_probe_ground_height_below(char *, int, float);
 extern float math_fabs(float);
 extern int math_fast_float_d(int *);
@@ -33,11 +33,11 @@ typedef struct {
     u32 xAC;
 } State;
 
-void func_PAL_L20_0044F4C8(char *arg0) {
+void pop_target_update_pal(char *arg0) {
     State *state = *(State **)(arg0 + 0x68);
     int mode;
 
-    if (D_L20_001A8F00 == 2 && *(u8 *)(arg0 + 0x20) != 1) {
+    if (g_hero_vehicle_mode == 2 && *(u8 *)(arg0 + 0x20) != 1) {
         moby_reset_to_idle(arg0);
     }
     mode = *(u8 *)(arg0 + 0x20);
@@ -46,20 +46,20 @@ void func_PAL_L20_0044F4C8(char *arg0) {
         state->x20 = 1.0f;
         state->x24 = 1;
         state->x70 |= 6;
-        state->x84 = D_L20_001B23E0;
-        state->x88 = D_L20_001B23E4;
+        state->x84 = g_pop_target_param_a;
+        state->x88 = g_pop_target_param_b;
         moby_reset_to_idle(arg0);
         return;
     case 1:
         return;
     case 2:
-        func_PAL_L01_0031C9C0(arg0, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
+        pushable_moby_update_pal(arg0, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
         break;
     }
-    if (D_0018A3E0 == arg0) {
+    if (g_target_moby == arg0) {
         state->xAC = 1;
     }
-    if (((D_L20_001B2AC8 & 0xF) == (((int)arg0 >> 8) & 0xF)
+    if (((g_frame_l20_counter & 0xF) == (((int)arg0 >> 8) & 0xF)
          && 5.0f < math_fabs(*(float *)(arg0 + 0x18)
                                  - coll_probe_ground_height_below(arg0 + 0x10, 0, 0.5f)))
         || (state->xAC != 0 && math_fast_float_d(&state->xA8) != 0)) {

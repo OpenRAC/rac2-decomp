@@ -6,7 +6,7 @@ extern float FastVecDot(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int FloatToInt(float);
-extern unsigned char *D_L01_001FF164;
+extern unsigned char *g_burst_particle_color_table;
 extern char *strncpy(char *, char *, int);
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
@@ -28,7 +28,7 @@ extern void *func_00325768(int);
 extern int func_002E45B8(float);
 extern float func_00310580(float, float);
 extern void func_002E3738(void *, void *, float);
-extern unsigned char *D_L01_001FF040;
+extern unsigned char *g_particle_l01_texture_table;
 
 typedef int MotionQuad __attribute__((mode(TI)));
 typedef union { float v[4]; MotionQuad q; } MotionVec;
@@ -64,9 +64,9 @@ typedef struct {
 extern MotionCollision motionCollision __asm__("D_L01_001BF900");
 
 extern char g_sound_state[];
-extern int D_L01_001B2088[] __attribute__((sda));
-extern MotionPath *D_L01_001B264C[] __attribute__((sda));
-extern float D_L01_001BF928;
+extern int g_oozla_intro_stage[] __attribute__((sda));
+extern MotionPath *g_swamp_patrol_positions[] __attribute__((sda));
+extern float g_ground_l01_height;
 extern void lerp_vector(void *, void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
@@ -87,21 +87,21 @@ typedef int ClosestPointQuad __attribute__((mode(TI)));
 
 typedef struct { char *p[6]; } Sep6;
 
-extern Sep6 D_L01_001AA550;
+extern Sep6 g_number_separators;
 
-extern char D_L01_001AA568[];
+extern char g_str_number_format_millions[];
 
-extern char D_L01_001AA578[];
+extern char g_str_number_format_thousands[];
 
-extern char D_L01_001AA588[];
+extern char g_str_number_format_plain[];
 
 extern int func_00115DA8_2(char *dst, char *fmt, ...);
 
-extern char D_L01_00189E20[];
+extern char g_hero_l01_state_block[];
 
-extern char D_L01_002637A0[];
+extern char g_action_table[];
 
-extern s32 D_L01_001A8F40[] __attribute__((sda));
+extern s32 g_hero_l01_control_mode[] __attribute__((sda));
 
 extern char D_L01_00189E20_sda[] __attribute__((sda));
 
@@ -131,21 +131,21 @@ extern void func_002AB328(void);
 
 extern void func_0030F444(int a0);
 
-extern char D_L01_00189E20[];
+extern char g_hero_l01_state_block[];
 
 extern void func_002A8EE0(int a0, int a1);
 
-extern char D_L01_00139568[];
+extern char g_weapon_id_table[];
 
-extern unsigned char D_0018C0D4[];
+extern unsigned char g_screen_mode_flag[];
 
 extern void func_002BEB90(unsigned long, unsigned long);
 
 extern void *g_hero_moby;
 
-extern float D_L01_00189F90;
+extern float g_hero_move_speed_threshold;
 
-extern unsigned short *D_L01_001FB020[];
+extern unsigned short *g_group_list_table[];
 
 extern unsigned short *r1_D_L01_001ABFC0[];
 
@@ -153,7 +153,7 @@ extern char *r1_D_L01_00160058 MACRO_ADDR;
 
 extern int r1_D_L01_00160058_m __asm__("r1_D_L01_00160058") MACRO_ADDR;
 
-extern char *D_L01_001FE180[];
+extern char *g_path_l01_table[];
 
 typedef struct {
     int path;
@@ -166,11 +166,11 @@ typedef struct {
 
 typedef struct { char prefix[0x2290]; void *moby; } ProbeHero;
 typedef struct { char pad[0x18]; void *moby; int count; char gap[0x20]; float normal[4]; } ProbeResult;
-extern ProbeResult D_L01_001BF900;
+extern ProbeResult g_collision_l01_hit;
 
-extern char D_L01_00189F10[];
+extern char g_hero_l01_velocity[];
 
-extern int D_L01_001BF91C;
+extern int g_collision_hit_count;
 
 extern float cam_get_view_space_vector_length(void *);
 
@@ -188,7 +188,7 @@ extern int GetCollHitMaterial(void);
 
 extern float cam_get_view_space_angle(void *);
 
-extern char D_L01_001B94C0[];
+extern char g_level_origin_vec[];
 
 extern char g_hero_position[];
 
@@ -233,26 +233,26 @@ extern char *func_00321F08(int a0);
 extern void func_003140B0(char *a0, char *a1, int a2, float f12, float f13,
                           float f14, float f15);
 
-extern char D_00139A28[];
+extern char g_map_marker_table[];
 
 
-extern int D_L01_001A79F0;
+extern int g_level_group_index;
 
-extern int D_L01_0028EA50[];
+extern int g_pair_table_group_offsets[];
 
-extern int D_L01_001C5D20[];
+extern int g_pair_table_keys[];
 
 extern void func_002A6CF0(int a0);
 
 extern float func_002E3618(void *a0, void *a1);
 
-extern unsigned char D_L01_001AA6F8[];
+extern unsigned char g_path_segment_data[];
 
 extern char g_sound_state[];
 
 extern int func_003711D8(int a0);
 
-extern unsigned char D_L01_001395B8[];
+extern unsigned char g_level_flag_table[];
 
 extern void func_003907B8(int a0, int a1, int a2);
 
@@ -266,7 +266,7 @@ void hero_update_subsystems(void) {
     func_002ADDC8();
     func_002C37C8();
     func_002AEB80();
-    hero = D_L01_00189E20;
+    hero = g_hero_l01_state_block;
     if (*(unsigned char *)(hero + 0x22B4) != 0) {
         func_002B9878();
         func_002A7740();
@@ -284,15 +284,15 @@ void hero_update_subsystems(void) {
 
 /* Starts the effect of the equipped weapon when that weapon has one and the hero holds a target. */
 void weapon_update_equipped_effect(void) {
-    char *hero = D_L01_00189E20;
+    char *hero = g_hero_l01_state_block;
     int i = *(int *)(hero + 0x1248);
     unsigned char weaponId;
     unsigned char *weapon_entry;
 
     if (i < 0)
         return;
-    weaponId = *(unsigned char *)(D_L01_00139568 + i);
-    weapon_entry = (unsigned char *)D_L01_002637A0 + weaponId * 0xE0;
+    weaponId = *(unsigned char *)(g_weapon_id_table + i);
+    weapon_entry = (unsigned char *)g_action_table + weaponId * 0xE0;
     if (weapon_entry[4] == 0)
         return;
     if (*(int *)(hero + 0x1220) == 0)
@@ -471,7 +471,7 @@ fail:
 typedef int HeroQuad __attribute__((mode(TI)));
 extern char g_hero_state[];
 extern unsigned char g_item_slot_to_record[];
-extern char D_L01_001B7B00[];
+extern char g_hero_attached_moby_buffers[];
 extern int get_ammo(int);
 extern int hero_slot_item_id(int);
 extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
@@ -573,11 +573,11 @@ void hero_update_attached_mobys(void)
         Moby **slot = &player->attached[i];
 
         if (*slot) {
-            (*slot)->buffer0 = D_L01_001B7B00 + i * 0xC00;
-            (*slot)->buffer1 = D_L01_001B7B00 + 0x600 + i * 0xC00;
+            (*slot)->buffer0 = g_hero_attached_moby_buffers + i * 0xC00;
+            (*slot)->buffer1 = g_hero_attached_moby_buffers + 0x600 + i * 0xC00;
             weaponId = hero_slot_item_id(0);
             if (weaponId == player->weaponId) {
-                weapon = &((WeaponInfo *)D_L01_002637A0)[g_item_slot_to_record[weaponId]];
+                weapon = &((WeaponInfo *)g_action_table)[g_item_slot_to_record[weaponId]];
                 animation = weapon->animation;
                 if (player->state == 12)
                     animation = weapon->altAnimation;
@@ -699,7 +699,7 @@ void ClipHeroVelocityAgainstWall(int force)
     float height, radius, slope;
     int material;
     char *base;
-    char *velocity = D_L01_00189F10;
+    char *velocity = g_hero_l01_velocity;
 
     if (cam_get_view_space_vector_length(velocity) < 0.0016666668f)
         return;
@@ -724,29 +724,29 @@ void ClipHeroVelocityAgainstWall(int force)
     material = -1;
     FastVecAdd(farEndpoint, farEndpoint, lowOrigin);
     {
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF91C > 0)
+        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_hit_count > 0)
             material = GetCollHitMaterial();
     }
     slope = 0;
     {
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && D_L01_001BF900.count > 0)
-            slope = cam_get_view_space_angle(D_L01_001BF900.normal);
+        if (CollLine(origin, endpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_l01_hit.count > 0)
+            slope = cam_get_view_space_angle(g_collision_l01_hit.normal);
     }
     if (slope >= 0.8726647f || material == 8 || material == 12) {
         float dot;
-        char *hero = D_L01_00189E20;
+        char *hero = g_hero_l01_state_block;
 
-        *(void **)(hero + 0x270) = D_L01_001BF900.moby;
-        cam_set_view_space_height(D_L01_001BF900.normal, D_L01_001BF900.normal, 0);
-        vec_scale_to_length(D_L01_001BF900.normal, D_L01_001BF900.normal, 1);
-        dot = FastVecDot(D_L01_001BF900.normal, hero + 0xF0);
+        *(void **)(hero + 0x270) = g_collision_l01_hit.moby;
+        cam_set_view_space_height(g_collision_l01_hit.normal, g_collision_l01_hit.normal, 0);
+        vec_scale_to_length(g_collision_l01_hit.normal, g_collision_l01_hit.normal, 1);
+        dot = FastVecDot(g_collision_l01_hit.normal, hero + 0xF0);
         if (dot < 0) {
-            FastVecScale(D_L01_001BF900.normal, D_L01_001BF900.normal, -dot);
-            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L01_001BF900.normal);
+            FastVecScale(g_collision_l01_hit.normal, g_collision_l01_hit.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, g_collision_l01_hit.normal);
         }
     }
 }
@@ -762,7 +762,7 @@ void hero_start_move_state_walk_or_run(unsigned long alternate) {
     unsigned long mode = 1;
     if (alternate)
         mode = 2;
-    if (D_0018C0D4[0] == 0)
+    if (g_screen_mode_flag[0] == 0)
         func_002BEB90(0, mode);
 }
 
@@ -780,7 +780,7 @@ void hero_clear_moby_flag(void) {
 
 /* Puts the hero into one of two move states depending on a speed value. */
 void hero_set_move_state_by_speed(void) {
-    if (D_L01_00189F90 < 0.045f)
+    if (g_hero_move_speed_threshold < 0.045f)
         func_002BEB90(0, 1);
     else
         func_002BEB90(3, 1);
@@ -920,7 +920,7 @@ void moby_reset_vars_defaults(char *vars) {
 /* Tests a point against four shapes in turn and says which one it is inside of, or 0 if none. */
 int coll_test_point_against_shapes(char *point, int shape_index, char *shape_b, char *shape_c, char *shape_d) {
     if (shape_index >= 0) {
-        char *shape = D_L01_001FE180[shape_index];
+        char *shape = g_path_l01_table[shape_index];
         if (func_311B48(point, shape + 0x10, *(int *)shape))
             return 1;
     }
@@ -976,7 +976,7 @@ void pushable_moby_update(char *moby, MotionState *state, int path, float height
     MotionVec old, start, delta, turn, target, change, samples[8], matrix[3], actual;
     float speed, gain, limit, accel, ground;
     int i, handle;
-    int phase = D_L01_001B2088[0];
+    int phase = g_oozla_intro_stage[0];
 
     if ((phase & 15) == (((int)moby >> 8) & 15)) {
         float dist = fast_vec_dist(&motionHero.position, moby + 0x10);
@@ -998,9 +998,9 @@ void pushable_moby_update(char *moby, MotionState *state, int path, float height
         }
         FastVecSub(&delta, moby + 0x10, &motionHero.position);
         if (state->frame != -1 && IsPointInCuboid(moby + 0x10, state->frame)) {
-            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
+            matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].inverse);
             delta.v[1] = 0;
-            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
+            matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].forward);
         }
         gain = 4.0f;
         if (state->gain != 0) {
@@ -1047,7 +1047,7 @@ void pushable_moby_update(char *moby, MotionState *state, int path, float height
             delta.v[2] -= 1;
             ground = 0;
             if (CollLine(&start, &delta, 16, moby, 0)) {
-                ground = D_L01_001BF928;
+                ground = g_ground_l01_height;
             }
             if (*(float *)(moby + 0x18) < ground) {
                 *(float *)(moby + 0x18) = ground;
@@ -1146,7 +1146,7 @@ int moby_push_out_of_wall(void *moby, void *unused, void *from, void *to) {
 
     if (CollLine(from, to, 0x10, moby, 0) == 0)
         goto fail;
-    hit = (char *)&D_L01_001BF900;
+    hit = (char *)&g_collision_l01_hit;
     hit_moby = *(char **)(hit + 0x18);
     if (hit_moby != 0) {
         hit_class = *(short *)(hit_moby + 0xAA);
@@ -1222,10 +1222,10 @@ typedef struct L01Group {
     L01Thing *items[1];     /* bounded by count */
 } L01Group;
 
-extern L01Group D_L01_001BD1C0;
-extern u8 D_001A7A40[] __attribute__((sda));
-extern u8 D_L01_001B1E60[] __attribute__((sda));
-extern f32 D_L01_001B1E80[] __attribute__((sda));
+extern L01Group g_ship_trail_state;
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
+extern u8 g_effect_match_flags[] __attribute__((sda));
+extern f32 g_effect_match_values[] __attribute__((sda));
 extern void AttachManipulator(u8 *p, int a1, u8 *a2);
 
 /* Starts an effect on every thing in the group that has the wanted kind. */
@@ -1235,23 +1235,23 @@ void part_spawn_effect_on_matching_things(L01Thing *entry, s32 effect_id, s32 id
     s32 wanted;
     s32 i;
 
-    if (D_L01_001A8F40[0] != 2)
+    if (g_hero_l01_control_mode[0] != 2)
         return;
-    if (D_001A7A40[0] == 0)
+    if (g_unlocked_item_flags[0] == 0)
         return;
     wanted = entry->kind;
     if (id != -1)
         wanted = id;
-    for (i = 0; i < D_L01_001BD1C0.count; i++) {
-        thing = D_L01_001BD1C0.items[i];
+    for (i = 0; i < g_ship_trail_state.count; i++) {
+        thing = g_ship_trail_state.items[i];
         if (thing->kind != wanted)
             continue;
-        if (D_L01_001B1E60[1] != 0)
+        if (g_effect_match_flags[1] != 0)
             continue;
-        AttachManipulator((u8 *)thing, effect_id, D_L01_001B1E60);
-        D_L01_001B1E80[0] = value;
-        D_L01_001B1E80[1] = value;
-        D_L01_001B1E80[2] = value;
+        AttachManipulator((u8 *)thing, effect_id, g_effect_match_flags);
+        g_effect_match_values[0] = value;
+        g_effect_match_values[1] = value;
+        g_effect_match_values[2] = value;
     }
 }
 
@@ -1279,17 +1279,17 @@ int moby_start_effect_from_entry(int moby, float value) {
 void text_format_number_separators(char *dst, int number, int idx)
 {
     Sep6 separators;
-    separators = D_L01_001AA550;
+    separators = g_number_separators;
     if (number > 999999) {
         int millions = number / 1000000;
         int remainder = number % 1000000;
-        func_00115DA8_2(dst, D_L01_001AA568, millions, separators.p[idx % 6], remainder / 1000,
+        func_00115DA8_2(dst, g_str_number_format_millions, millions, separators.p[idx % 6], remainder / 1000,
                           separators.p[idx % 6], remainder % 1000);
     } else if (number >= 1000)
-        func_00115DA8_2(dst, D_L01_001AA578, number / 1000,
+        func_00115DA8_2(dst, g_str_number_format_thousands, number / 1000,
                           separators.p[idx % 6], number % 1000);
     else
-        func_00115DA8_2(dst, D_L01_001AA588, number);
+        func_00115DA8_2(dst, g_str_number_format_plain, number);
 }
 
 
@@ -1363,7 +1363,7 @@ void text_expand_number_template(char *out, char *src, int *nums)
 
 /* Marks an entry of the table as used if it is not already. */
 void level_mark_table_entry_used(int index) {
-    char *table = D_00139A28;
+    char *table = g_map_marker_table;
     char *entry;
     table = table + 0xC;
     entry = table + index * 16;
@@ -1375,14 +1375,14 @@ void level_mark_table_entry_used(int index) {
 
 /* Scans the half-open span of the pair table for the caller's key. */
 int level_find_key_in_pair_table(int key) {
- unsigned group=(unsigned)D_L01_001A79F0;
+ unsigned group=(unsigned)g_level_group_index;
  int i;
  int end;
  if(group>=0x13) return 0;
- i=D_L01_0028EA50[group];
- end=D_L01_0028EA50[group+1];
+ i=g_pair_table_group_offsets[group];
+ end=g_pair_table_group_offsets[group+1];
  while(i<end) {
-  if(D_L01_001C5D20[i]==key) return i;
+  if(g_pair_table_keys[i]==key) return i;
   i++;
  }
  return -1;
@@ -1455,7 +1455,7 @@ void SpawnSpanParticle(float *pos, int kind, float *vec, float scale)
         p->f9 = func_002E45B8(4.0f) + 0x60;
         p->f3 = 0x44;
         p->f1 = 3;
-        p->texture = D_L01_001FF040[texture];
+        p->texture = g_particle_l01_texture_table[texture];
         p->start.q = *(ClosestPointQuad *)pos;
         func_002E3470(end, pos, scaled);
         p->end.q = *(ClosestPointQuad *)end;
@@ -1471,7 +1471,7 @@ typedef struct { unsigned char b0, b1, b2, b3; int color; unsigned char seed, al
 extern Particle331CA0 *part_alloc(int kind);
 extern float math_random_float_range(float low, float high);
 extern int FloatToInt(float value);
-extern unsigned char *D_L01_001FF164;
+extern unsigned char *g_burst_particle_color_table;
 
 /* Spawns the burst particle of the given kind at position, carrying the velocity and the size scale in its payload. */
 void part_l01_spawn_burst_2(Quad331CA0 *position, int kind, Quad331CA0 *velocity, float scale)
@@ -1501,7 +1501,7 @@ void part_l01_spawn_burst_2(Quad331CA0 *position, int kind, Quad331CA0 *velocity
         p->alpha = FloatToInt(4.0f) + 0x20;
         p->b1 = 0;
         p->b3 = 0x48;
-        p->b2 = D_L01_001FF164[kind];
+        p->b2 = g_burst_particle_color_table[kind];
         p->life = life * 210000.0f;
         p->seed = math_random_float_range(0.0f, 360.0f);
         p->position.q = *position;
@@ -1526,7 +1526,7 @@ float path_l01_compute_segment_lengths(unsigned char *table) {
     records = table;
     total = 0.0f;
     if (records == 0) {
-        func_002A6CF0((int)D_L01_001AA6F8);
+        func_002A6CF0((int)g_path_segment_data);
         return -1.0f;
     }
     count = *(int *)records;
@@ -1619,7 +1619,7 @@ int snd_set_slot_field(int index, int value) {
 void level_set_bit_in_flag_table(int key, int bit) {
     int slot = func_003711D8(key);
     if (slot >= 0)
-        D_L01_001395B8[slot] |= (unsigned char)(1 << bit);
+        g_level_flag_table[slot] |= (unsigned char)(1 << bit);
 }
 
 /* func_L01_003801B8 is in L01_003801B8-g8.c for its GP accesses. */
@@ -1690,7 +1690,7 @@ void ApplySpatialTriggerObjectSettings(int index, TriggerSettings *settings, int
 
 /* Applies a trigger's settings to every moby in a list of moby indices. */
 void moby_apply_trigger_settings_to_list(int trigger, int settings, int list_index, int active) {
-    unsigned short *cursor = D_L01_001FB020[list_index];
+    unsigned short *cursor = g_group_list_table[list_index];
     if (cursor != 0) {
         do {
             func_003907B8(*cursor & 0x7FFF, settings, active);
@@ -1716,7 +1716,7 @@ void UpdateSpatialTrigger(char *object)
     settings = *(SpatialTriggerSettings **)(object + 0x68);
     *(unsigned char *)(object + 0x30) = 0xFF;
     if (settings->switches[2])
-        qcopy(&point, D_L01_001B94C0);
+        qcopy(&point, g_level_origin_vec);
     else
         qcopy(&point, g_hero_position);
     forced = *(unsigned char *)(object + 0x95);
@@ -1725,7 +1725,7 @@ void UpdateSpatialTrigger(char *object)
             flag = 1;
         if (!flag) {
             if (settings->path != -1) {
-                path = D_L01_001FE180[settings->path];
+                path = g_path_l01_table[settings->path];
                 flag = point_in_path_xy((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
             }
         }
@@ -1800,19 +1800,19 @@ void part_flash_matching_things(void)
     L01Thing *e;
     s32 i;
 
-    if (D_L01_001A8F40[0] != 2)
+    if (g_hero_l01_control_mode[0] != 2)
         return;
-    if (D_001A7A40[0] == 0)
+    if (g_unlocked_item_flags[0] == 0)
         return;
-    for (i = 0; i < D_L01_001BD1C0.count; i++) {
-        e = D_L01_001BD1C0.items[i];
+    for (i = 0; i < g_ship_trail_state.count; i++) {
+        e = g_ship_trail_state.items[i];
         if (e->kind != 0x398 /* moby class 920 */ && e->kind != 0x1BF /* moby class 447 */)
             continue;
-        if (D_L01_001B1E60[1] != 0)
+        if (g_effect_match_flags[1] != 0)
             continue;
-        AttachManipulator((u8 *)e, 0, D_L01_001B1E60);
-        D_L01_001B1E80[0] = 2.1f;
-        D_L01_001B1E80[1] = 2.1f;
-        D_L01_001B1E80[2] = 2.1f;
+        AttachManipulator((u8 *)e, 0, g_effect_match_flags);
+        g_effect_match_values[0] = 2.1f;
+        g_effect_match_values[1] = 2.1f;
+        g_effect_match_values[2] = 2.1f;
     }
 }

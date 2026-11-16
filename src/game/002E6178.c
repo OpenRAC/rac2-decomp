@@ -18,8 +18,8 @@ extern EquipPiece *CreateMoby(int);
 extern void hero_destroy_equipment_pieces(void);
 extern EquipPiece *g_hero_moby_default;
 extern unsigned int g_equipment_bits MACRO_ADDR;
-extern short D_001A8C28[] MACRO_ADDR, D_001A8C30[] MACRO_ADDR, D_001A8C38[] MACRO_ADDR, D_001A8C40[] MACRO_ADDR;
-extern short D_001A8C48[] MACRO_ADDR, D_001A8C50[] MACRO_ADDR, D_001A8C58[] MACRO_ADDR;
+extern short g_robot_part_ids_b[] MACRO_ADDR, g_robot_part_ids_c[] MACRO_ADDR, g_robot_part_ids_d[] MACRO_ADDR, g_robot_part_ids_e[] MACRO_ADDR;
+extern short g_robot_part_ids_f[] MACRO_ADDR, g_robot_part_ids_g[] MACRO_ADDR, g_robot_part_ids_h[] MACRO_ADDR;
 extern EquipPiece *g_equipment_pieces[];
 
 /* Spawns the hero's equipment pieces from the equipment bits and flags them. */
@@ -46,31 +46,31 @@ void SpawnEquipmentPieces(EquipPiece *base)
     partD = (equipment >> 9) & 1;
     partE = (equipment >> 10) & 3;
     partF = (equipment >> 14) & 3;
-    parts[0] = CreateMoby(D_001A8C28[chassis]);
-    parts[1] = CreateMoby(D_001A8C28[chassis]);
+    parts[0] = CreateMoby(g_robot_part_ids_b[chassis]);
+    parts[1] = CreateMoby(g_robot_part_ids_b[chassis]);
     parts[1]->flags |= 0x8000;
-    parts[2] = CreateMoby(D_001A8C30[partA]);
-    parts[3] = CreateMoby(D_001A8C38[partB]);
-    parts[4] = CreateMoby(D_001A8C38[partB]);
+    parts[2] = CreateMoby(g_robot_part_ids_c[partA]);
+    parts[3] = CreateMoby(g_robot_part_ids_d[partB]);
+    parts[4] = CreateMoby(g_robot_part_ids_d[partB]);
     parts[4]->flags |= 0x8000;
-    if (D_001A8C40[partC]) {
-        parts[5] = CreateMoby(D_001A8C40[partC]);
-        parts[6] = CreateMoby(D_001A8C40[partC]);
+    if (g_robot_part_ids_e[partC]) {
+        parts[5] = CreateMoby(g_robot_part_ids_e[partC]);
+        parts[6] = CreateMoby(g_robot_part_ids_e[partC]);
         count = 7;
         parts[6]->flags |= 0x8000;
     }
-    parts[count++] = CreateMoby(D_001A8C48[partD]);
-    piece = parts[count++] = CreateMoby(D_001A8C48[partD]);
+    parts[count++] = CreateMoby(g_robot_part_ids_f[partD]);
+    piece = parts[count++] = CreateMoby(g_robot_part_ids_f[partD]);
     piece->flags |= 0x8000;
-    parts[count++] = CreateMoby(D_001A8C50[partE]);
-    piece = parts[count++] = CreateMoby(D_001A8C50[partE]);
+    parts[count++] = CreateMoby(g_robot_part_ids_g[partE]);
+    piece = parts[count++] = CreateMoby(g_robot_part_ids_g[partE]);
     piece->flags |= 0x8000;
     if ((g_equipment_bits >> 12) & 1)
         parts[count++] = CreateMoby(0x10E2 /* moby class 4322 */);
     if ((g_equipment_bits >> 13) & 1)
         parts[count++] = CreateMoby(0x10E4 /* moby class 4324 */);
     if (partF)
-        parts[count] = CreateMoby(D_001A8C58[partF]);
+        parts[count] = CreateMoby(g_robot_part_ids_h[partF]);
     if (*parts) {
         p = parts;
         do {

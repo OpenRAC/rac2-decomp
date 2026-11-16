@@ -16,10 +16,10 @@ extern void SetDeathBits(void *, int, int);
 extern void moby_mark_spawned(void *);
 
 extern char *g_moby_l14_pool;
-extern char *D_L14_001B268C;
-extern int D_L14_001B16B4 __attribute__((sda));
-extern int D_L14_001B16B8 __attribute__((sda));
-extern int D_L14_001B16BC __attribute__((sda));
+extern char *g_platform_projection_table;
+extern int g_enemy_random_timer_max __attribute__((sda));
+extern int g_enemy_random_timer_period __attribute__((sda));
+extern int g_enemy_random_chance_range __attribute__((sda));
 extern char g_hero_position[];
 
 /* Updates the actor's animation, movement phases and hit response. */
@@ -56,13 +56,13 @@ void UpdatePrisonActorState(char *self)
             if (*(unsigned char *)(self + 0x43) != 1)
                 anim_start_blended(self, 1, 0, 10);
             *(unsigned char *)(self + 0xBC) = 0;
-            *(unsigned short *)(self + 0x96) = math_random_int_below(D_L14_001B16B4 >> 1);
+            *(unsigned short *)(self + 0x96) = math_random_int_below(g_enemy_random_timer_max >> 1);
         } else {
             qcopy_nc(target, (void *)((*(int *)(state + 0x748) << 8) + (unsigned int)g_moby_l14_pool + 0x10));
             target[2] += 0.3f;
             actor_aim_at_target(self, g_moby_l14_pool + (*(int *)(state + 0x748) << 8) + 0x10);
-            if (*(unsigned char *)(self + 0xBC) == 0 && *(unsigned short *)(self + 0x96) > D_L14_001B16B4) {
-                *(unsigned short *)(self + 0x96) = math_random_int_below(D_L14_001B16B4 >> 1);
+            if (*(unsigned char *)(self + 0xBC) == 0 && *(unsigned short *)(self + 0x96) > g_enemy_random_timer_max) {
+                *(unsigned short *)(self + 0x96) = math_random_int_below(g_enemy_random_timer_max >> 1);
                 if (math_random_int_below(5) != 0 && *(unsigned char *)(self + 0x43) != 5)
                     anim_start_blended(self, 5, 0, 10);
             }
@@ -84,7 +84,7 @@ void UpdatePrisonActorState(char *self)
             }
         }
         if (*(int *)(state + 0x764) != -1)
-            actor_aim_at_target(self, D_L14_001B268C + (*(int *)(state + 0x764) << 7) + 0x30);
+            actor_aim_at_target(self, g_platform_projection_table + (*(int *)(state + 0x764) << 7) + 0x30);
         if (*(unsigned char *)(self + 0x60) & 2)
             moby_set_state(self, 5, 2);
         break;
@@ -111,7 +111,7 @@ void UpdatePrisonActorState(char *self)
                 }
             } else if (*(unsigned char *)(self + 0xBC) == 1) {
                 path_advance(self, state + 0x700, *(int *)(state + 0x734), state + 0x770, *(short *)(state + 0x77C), 1.0f);
-                if (*(unsigned short *)(self + 0x96) % D_L14_001B16B8 == 0 && math_random_int_below(D_L14_001B16BC) == 0) {
+                if (*(unsigned short *)(self + 0x96) % g_enemy_random_timer_period == 0 && math_random_int_below(g_enemy_random_chance_range) == 0) {
                     *(unsigned char *)(self + 0xBC) = 2;
                     if (*(unsigned char *)(self + 0x43) != math_random_int_below(2) + 12)
                         anim_start_blended(self, math_random_int_below(2) + 12, 0, 10);

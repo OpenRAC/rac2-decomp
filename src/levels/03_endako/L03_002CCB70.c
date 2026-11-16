@@ -1,7 +1,7 @@
 #include "common.h"
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_spawn_spark_puff(void *);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -13,10 +13,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L03_001AC7D0 __attribute__((sda));
-extern int D_L03_001B31B0 __attribute__((sda)), D_L03_001B31B8 __attribute__((sda));
-extern Collision D_L03_001BFDC0;
-extern Material D_L03_00266DA0[];
+extern int g_flying_model_id __attribute__((sda));
+extern int g_ripple_param_a __attribute__((sda)), g_ripple_param_b __attribute__((sda));
+extern Collision g_hero_ground_collision;
+extern Material g_item_l03_record_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -52,9 +52,9 @@ extern int CollLine(void *, void *, int, void *, int);
 extern float cam_get_view_space_angle(void *);
 extern float cam_get_view_space_height(void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern char D_L03_001BFE00[];
+extern char g_collision_direction[];
 
-extern char D_L03_001BFDE0[];
+extern char g_collision_start_point[];
 typedef int MotionQuad __attribute__((mode(TI)));
 
 /* The level's runtime block: its mode word and timer, and a counted list of objects. */
@@ -68,12 +68,12 @@ typedef struct {
     u8 *objects[0];
 } EndakoState;
 
-extern EndakoState D_L03_001BD680;
+extern EndakoState g_endako_state;
 extern s32 g_current_map_index __attribute__((sda));
-extern f32 D_L03_001A9420 SDATA(D_L03_001A9420);
-extern s32 D_L03_001A9424 SDATA(D_L03_001A9424);
+extern f32 g_object_scale SDATA(D_L03_001A9420);
+extern s32 g_object_timer SDATA(D_L03_001A9424);
 /* Four rows of three quadwords, filled from twelve joints of one object. */
-extern Quad D_L03_001C64A0[][3];
+extern Quad g_joint_world_matrices[][3];
 extern void anim_start_startup_animations(void);
 extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(void *, void *, u32, u32, f32);
@@ -99,8 +99,8 @@ float hero_solve_motion_collision_time(float time, float acceleration, float hei
             coll_push_vector_from_negative_axes(direction, end);
             qcopy(direction, pos);
             if (CollLine(direction, end, 0xD22, 0, 0)) {
-                if (cam_get_view_space_angle(D_L03_001BFE00) <= 0.8726647f)
-                    height = *(float *)(D_L03_001BFE00 - 0x18);
+                if (cam_get_view_space_angle(g_collision_direction) <= 0.8726647f)
+                    height = *(float *)(g_collision_direction - 0x18);
             }
         }
         if (height > 0.0f) {
@@ -132,7 +132,7 @@ float hero_solve_motion_collision_time(float time, float acceleration, float hei
             half = acceleration * -0.5f;
             speed = cam_get_view_space_height(velocity) - half;
             position = cam_get_view_space_height(pos);
-            position -= cam_get_view_space_height(D_L03_001BFDE0);
+            position -= cam_get_view_space_height(g_collision_start_point);
             if (math_solve_quadratic(&root1a, &root1b, half, speed, position) > 0
                     && root1a > 0.0f)
                 return root1a;
@@ -158,7 +158,7 @@ float hero_solve_motion_collision_time(float time, float acceleration, float hei
             half = acceleration * -0.5f;
             speed = cam_get_view_space_height(velocity) - half;
             position = cam_get_view_space_height(pos);
-            position -= cam_get_view_space_height(D_L03_001BFDE0);
+            position -= cam_get_view_space_height(g_collision_start_point);
             if (math_solve_quadratic(&root2a, &root2b, half, speed, position) > 0
                     && root2a > 0.0f)
                 return root2a;
@@ -178,8 +178,8 @@ void level_update_objects(void)
     Quad a, b;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L03_001BD680.count; i++) {
-        object = D_L03_001BD680.objects[i];
+    for (i = 0; i < g_endako_state.count; i++) {
+        object = g_endako_state.objects[i];
         if (object != 0 && *(s16 *)(object + 0xAA) == 0xE29 /* moby class 3625 */)
             *(u16 *)(object + 0x34) |= 0x800;
         if (*(s16 *)(object + 0xAA) == 0xD54 /* moby class 3412 */)
@@ -192,10 +192,10 @@ void level_update_objects(void)
     }
     if (g_current_map_index != 3)
         return;
-    state = &D_L03_001BD680;
+    state = &g_endako_state;
     if (state->mode < 3) {
         u8 *main_object = state->objects[1];
-        *(f32 *)(main_object + 0x2C) = *(f32 *)(*(u8 **)(main_object + 0x24) + 0x24) * D_L03_001A9420;
+        *(f32 *)(main_object + 0x2C) = *(f32 *)(*(u8 **)(main_object + 0x24) + 0x24) * g_object_scale;
     }
     if (state->mode == 6)
         EmitScaledObjectParticles(state->objects[1]);
@@ -205,13 +205,13 @@ void level_update_objects(void)
         u8 *target;
         s32 row, col, k;
 
-        D_L03_001A9424 = state->timer;
+        g_object_timer = state->timer;
         target = state->objects[2];
         for (row = 0; row < 4; row++)
             for (col = 0; col < 3; col++)
-                moby_transform_joint_to_world(target, row * 3 + col, &D_L03_001C64A0[row][col]);
+                moby_transform_joint_to_world(target, row * 3 + col, &g_joint_world_matrices[row][col]);
         for (k = 0; k < 4; k++) {
-            Quad (*rows)[3] = D_L03_001C64A0;
+            Quad (*rows)[3] = g_joint_world_matrices;
             qcopy(&a, &rows[k][0]);
             qcopy(&b, &rows[k][1]);
             qcopy(&a, &rows[k][0]);
@@ -220,12 +220,12 @@ void level_update_objects(void)
     }
 }
 
-extern u8 *D_L03_001B2918;
+extern u8 *g_level_entry_list;
 
 /* Counts the entries in the level list that are type 1 and not yet switched off. Returns 1 when there is no list. */
 s32 level_count_active_entries(void)
 {
-    u8 *list = D_L03_001B2918;
+    u8 *list = g_level_entry_list;
     u8 *entry;
     s32 count = 0;
 
@@ -316,7 +316,7 @@ void flying_object_update_splash(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L03_00266DA0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l03_record_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -328,14 +328,14 @@ void flying_object_update_splash(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L03_001B31B0, D_L03_001B31B8, 1,
+            RippleDisturb(g_ripple_param_a, g_ripple_param_b, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L03_001BFDC0.point.f[2];
+            frame.position.f[2] = g_hero_ground_collision.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -355,16 +355,16 @@ void flying_object_update_splash(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L03_001BFDC0;
+            Collision *collision = &g_hero_ground_collision;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L03_001BFDC0;
+                reread = &g_hero_ground_collision;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L03_001AC7D0 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_flying_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -426,7 +426,7 @@ void flying_object_update_bounce(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L03_00266DA0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l03_record_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -436,16 +436,16 @@ void flying_object_update_bounce(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L03_001BFDC0;
+        collision = &g_hero_ground_collision;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L03_001BFDC0;
+            reread = &g_hero_ground_collision;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L03_001AC7D0 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_flying_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -457,7 +457,7 @@ void flying_object_update_bounce(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L03_001BFDC0;
+            collision = &g_hero_ground_collision;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

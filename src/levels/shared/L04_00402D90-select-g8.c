@@ -5,12 +5,12 @@
 #define PTR_AT(p,o) (((struct { char pad[o]; char *v; } *)(p))->v)
 #define U16_AT(p,o) (((struct { char pad[o]; unsigned short v; } *)(p))->v)
 
-extern int D_L04_001B0978 __attribute__((sda)), g_selected_race_index __attribute__((sda)), g_current_race_index __attribute__((sda));
+extern int g_race_select_initialized __attribute__((sda)), g_selected_race_index __attribute__((sda)), g_current_race_index __attribute__((sda));
 /* The flag at +0x14 is element 5, as in L04_00412308-g8.c; the offset form keeps
    retail's two-word $at store, which never takes a call's delay slot. */
-extern int D_L04_001A8ED0[] MACRO_ADDR;
+extern int g_race_state_flags[] MACRO_ADDR;
 extern char g_hero_state[] NOT_SDA, g_pad_state[] NOT_SDA;
-extern char *g_moby_l04_pool, *D_L04_001B08F4 __attribute__((sda));
+extern char *g_moby_l04_pool, *g_race_bike_child_moby __attribute__((sda));
 /* Five 64-byte entries; a set bit 28 in flags lets the entry be chosen. The
    entries are members of one object, so the row address adds base first. */
 typedef struct { int head; int flags; char rest[56]; } SelectEntry;
@@ -32,19 +32,19 @@ void UpdateRaceSelectionMenu(char *controller, char *vars)
     int done = 0;
     int *slot, i;
     char *obj, *extra, *child, *base;
-    if (!D_L04_001B0978) {
-        D_L04_001A8ED0[5] = 1;
+    if (!g_race_select_initialized) {
+        g_race_state_flags[5] = 1;
         snd_send_cmd22(0x5d); music_Pause(0); snd_Pump();
-        D_L04_001A8ED0[0] = 1;
+        g_race_state_flags[0] = 1;
         racer_reset_state(controller,0);
         g_selected_race_index = g_current_race_index;
-        D_L04_001B0978 = 1;
+        g_race_select_initialized = 1;
     }
     if (S32_AT(g_hero_state,0x2294) != 0x31) hero_l04_enter_state(0x31,1);
     U16_AT(controller,0x34) |= 0x41;
     if (S32_AT(vars,0x1dc) != -1) {
         obj = g_moby_l04_pool + (S32_AT(vars,0x1dc) << 8);
-        extra = D_L04_001B08F4;
+        extra = g_race_bike_child_moby;
         U16_AT(obj,0x34) |= 0x41;
         if (extra) U16_AT(extra,0x34) |= 0x41;
     }
@@ -84,6 +84,6 @@ void UpdateRaceSelectionMenu(char *controller, char *vars)
     }
     if (done) {
         snd_send_cmd23(0x5d);music_Unpause();snd_Pump();
-        D_L04_001A8ED0[5]=0;D_L04_001A8ED0[0]=0;D_L04_001B0978=0;
+        g_race_state_flags[5]=0;g_race_state_flags[0]=0;g_race_select_initialized=0;
     }
 }

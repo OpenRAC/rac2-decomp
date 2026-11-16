@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L05_003D15E8, in a unit of its own (default flags), where its callees are external. The
    sub-object's fields are struct members, so its stores do not order the object table's load
    (retail loads the table pointer before the index). */
@@ -17,7 +18,7 @@ struct Sub_003D15E8 {
 };
 
 /* The table of live objects, 0x100 bytes each. */
-extern char *D_L05_001B251C MACRO_ADDR;
+extern char *g_feltzin_target_mobys MACRO_ADDR;
 /* The sound records, 0x70 bytes each. */
 extern char g_sound_state[];
 
@@ -79,7 +80,7 @@ void func_L05_003D15E8(char *obj)
     if (mode == one) {
         if (*(int *)(state + 0x260) != -1) {
             sub->targetMode = mode;
-            sub->target = D_L05_001B251C + (*(int *)(state + 0x260) << 8);
+            sub->target = g_feltzin_target_mobys + (*(int *)(state + 0x260) << 8);
             if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
                 char *sound1 = g_sound_state + *(int *)(state + 0x2f4) * 0x70;
 

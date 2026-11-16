@@ -3,15 +3,15 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern int D_L03_001AEBF8;
-extern int D_L03_001B1B50 __attribute__((sda));
-extern float D_L03_001B1B30[8] SDATA(D_L03_001B1B30) __attribute__((sda)), D_L03_001B1B28[2] SDATA(D_L03_001B1B28) __attribute__((sda)), D_L03_001B1B20[2] SDATA(D_L03_001B1B20) __attribute__((sda));
+extern int g_arc_effect_count;
+extern int g_explode_skip_flag __attribute__((sda));
+extern float g_explode_piece_lifetimes[8] SDATA(D_L03_001B1B30) __attribute__((sda)), g_explode_piece_spin[2] SDATA(D_L03_001B1B28) __attribute__((sda)), g_explode_piece_speeds[2] SDATA(D_L03_001B1B20) __attribute__((sda));
 extern void FastVecScale(void *,void *,float);
 extern void *part_spawn_object_following_effect(void *,void *,int,float,int,int,float,int,int,int);
 extern void *part_find_owned_effect_slot(void *,u32,int);
 extern void moby_set_state(void *,int,int);
-extern void func_PAL_L00_0032C328(void *,float *,float *,float *,int,int,int,int,int,u8,void *);
-extern void *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern void part_explode_object_into_pieces_pal(void *,float *,float *,float *,int,int,int,int,int,u8,void *);
+extern void *SpawnExplosion_pal(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int PlayMobySound(int,int,void *);
 extern char *moby_l00_spawn_child(void *,int,int);
 extern int flag_set_first_pending(void *);
@@ -21,7 +21,7 @@ extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 typedef struct { int enabled; void *handle; int timer; } DestructionState;
 
-void func_PAL_L03_0041F7A8(u8 *e) {
+void UpdateDestructibleObjectEffects_pal(u8 *e) {
     DestructionState *s=*(DestructionState **)(e+0x68);
     Vec pos, a,b,c,d,f,g,h,i,j,k,l,m;
     pos.q=0; pos.f[2]=-8.0f;
@@ -30,19 +30,19 @@ void func_PAL_L03_0041F7A8(u8 *e) {
         FastVecScale(&pos,&pos,*(float *)(e+0x2c));
         s->handle=part_spawn_object_following_effect(&pos,e,0x40202080,*(float *)(e+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
         moby_set_state(e,1,-1);
-        if (s->enabled) D_L03_001AEBF8--;
+        if (s->enabled) g_arc_effect_count--;
         break;
     case 1:
         if(part_find_owned_effect_slot(e,0x4010000,0) && !s->enabled) {
-            D_L03_001AEBF8--; moby_set_state(e,2,-1);
+            g_arc_effect_count--; moby_set_state(e,2,-1);
         }
         e[0xa8]=255;
         break;
     case 2: {
-        int skip = D_L03_001B1B50;
-        func_PAL_L00_0032C328(e,D_L03_001B1B30,D_L03_001B1B28,D_L03_001B1B20,63,0,skip,0,65535,255,0);
+        int skip = g_explode_skip_flag;
+        part_explode_object_into_pieces_pal(e,g_explode_piece_lifetimes,g_explode_piece_spin,g_explode_piece_speeds,63,0,skip,0,65535,255,0);
         PlayMobySound(0,0,e);
-        func_PAL_L00_003FB330(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
+        SpawnExplosion_pal(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
         { u16 *flags=(u16 *)(e+0x34);
           *flags |= 0x41;
           s->timer=25; }

@@ -8,12 +8,12 @@ extern int CollLine(void *from, void *to, int mode, int filter, void *hit);
 extern int coll_test_point(float radius, void *pos, int mode, int filter);
 extern int PlayMobySound(int a, int b, void *object);
 extern int FloatToInt(float x);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                           int, float, int, int, int, int, int);
 extern int coll_process_hit(void *pos, int kind, int filter, void *hit, float amount);
 extern int math_fast_float_d(void *timer);
 extern void moby_mark_spawned(void *object);
-extern void func_PAL_L09_003B26B8(void *object);
+extern void projectile_update_orientation_pal(void *object);
 #define I(p, o) (*(int *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
 #define B(p, o) (*(unsigned char *)((p) + (o)))
@@ -60,7 +60,7 @@ void func_PAL_L16_003AC4A8(char *object)
             r = FloatToInt(F(data, 0x50) * 5.0f);
             g = FloatToInt(F(data, 0x50) * 4.0f);
             b = FloatToInt(F(data, 0x50) * 10.0f);
-            func_PAL_002AC718(object, data + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+            SpawnExplosionEffects_pal(object, data + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
                           -1, 0.0f, 0, 1, -1, 0, 0x810001);
             coll_process_hit(object + 0x10, 16, I(data, 0x40), &hit, 1.0f);
             moby_mark_spawned(object);
@@ -73,7 +73,7 @@ void func_PAL_L16_003AC4A8(char *object)
         r = FloatToInt(F(data, 0x50) * 5.0f);
         g = FloatToInt(F(data, 0x50) * 4.0f);
         b = FloatToInt(F(data, 0x50) * 10.0f);
-        func_PAL_002AC718(object, data + 0x30, 0, 2.0f, F(data, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+        SpawnExplosionEffects_pal(object, data + 0x30, 0, 2.0f, F(data, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
                       -1, 0.0f, 0, 1, -1, 0, 0x810001);
         moby_mark_spawned(object);
         return;
@@ -83,6 +83,6 @@ void func_PAL_L16_003AC4A8(char *object)
         moby_mark_spawned(object);
         return;
     }
-    func_PAL_L09_003B26B8(object);
+    projectile_update_orientation_pal(object);
 }
 

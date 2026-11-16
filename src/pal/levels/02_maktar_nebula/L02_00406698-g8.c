@@ -4,18 +4,18 @@ typedef unsigned int u32;
 typedef int s32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_L02_001B1730[8] __attribute__((sda));
-extern float D_L02_001B1750 __attribute__((sda));
-extern float D_L02_001B1754;
-extern u32 D_L02_001B1758 __attribute__((sda));
-extern u32 D_L02_001B175C;
-extern u32 D_L02_001B1760;
-extern u32 D_L02_001B1764;
-extern u32 D_L02_001B1768;
-extern u32 D_L02_001B176C;
-extern u32 D_L02_001B1770 __attribute__((sda));
-extern u32 D_L02_001B1774;
-extern u32 D_L02_001B1778;
+extern char g_spark_burst_vectors[8] __attribute__((sda));
+extern float g_spark_burst_speed_min __attribute__((sda));
+extern float g_spark_burst_speed_max;
+extern u32 g_spark_burst_a_word0 __attribute__((sda));
+extern u32 g_spark_burst_a_word1;
+extern u32 g_spark_burst_b_word0;
+extern u32 g_spark_burst_b_word1;
+extern u32 g_spark_burst_c_word0;
+extern u32 g_spark_burst_c_word1;
+extern u32 g_spark_burst_a_color __attribute__((sda));
+extern u32 g_spark_burst_b_color;
+extern u32 g_spark_burst_c_color;
 extern s32 g_frame_l02_counter;
 
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -33,7 +33,7 @@ void func_PAL_L02_00406698(char *a0, char *a1) {
     float v1[4];
     float v2[4];
     float *w = v1;
-    char *p = D_L02_001B1730;
+    char *p = g_spark_burst_vectors;
     s32 i;
     float f;
 
@@ -41,16 +41,16 @@ void func_PAL_L02_00406698(char *a0, char *a1) {
         matrix_mul_vec3(v0, p, a0 + 0xC0);
         FastVecAdd(v0, v0, a0 + 0x10);
         *(TI128 *)v2 = 0;
-        f = math_random_float_range(D_L02_001B1750, D_L02_001B1754);
+        f = math_random_float_range(g_spark_burst_speed_min, g_spark_burst_speed_max);
         v2[2] = -(f * 0.020000001f);
         *(TI128 *)v1 = *(TI128 *)v2;
         FastVecAdd(v1, v1, a1);
         if (g_frame_l02_counter & 1) {
-            part_spawn_scaling(v0, w, D_L02_001B1758, D_L02_001B175C, ((s32)math_random_int_range(0x12, 0x16) * 5 + 2) / 6, D_L02_001B1770, -10, 1);
+            part_spawn_scaling(v0, w, g_spark_burst_a_word0, g_spark_burst_a_word1, ((s32)math_random_int_range(0x12, 0x16) * 5 + 2) / 6, g_spark_burst_a_color, -10, 1);
         } else {
-            part_spawn_scaling(v0, w, D_L02_001B1760, D_L02_001B1764, ((s32)math_random_int_range(0x14, 0x18) * 5 + 2) / 6, D_L02_001B1774, -10, 1);
+            part_spawn_scaling(v0, w, g_spark_burst_b_word0, g_spark_burst_b_word1, ((s32)math_random_int_range(0x14, 0x18) * 5 + 2) / 6, g_spark_burst_b_color, -10, 1);
         }
-        part_spawn_scaling(v0, w, D_L02_001B1768, D_L02_001B176C, ((s32)math_random_int_range(0xA, 0xF) * 5 + 2) / 6, D_L02_001B1778, -10, 1);
+        part_spawn_scaling(v0, w, g_spark_burst_c_word0, g_spark_burst_c_word1, ((s32)math_random_int_range(0xA, 0xF) * 5 + 2) / 6, g_spark_burst_c_color, -10, 1);
         p += 0x10;
     }
 }

@@ -15,18 +15,18 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4;
 
 /* the globals it arms, and the list it fills */
-extern s16 D_L23_001B1B94 __attribute__((sda));
-extern s16 D_L23_001B1B96 __attribute__((sda));
-extern s32 D_L23_001B1B98 __attribute__((sda));
-extern s32 D_L23_001B3934[4] __attribute__((sda));
-extern s32 D_L23_001B3938[4] __attribute__((sda));
+extern s16 g_effect_sound_handle_a __attribute__((sda));
+extern s16 g_effect_sound_handle_b __attribute__((sda));
+extern s32 g_trail_spawn_index __attribute__((sda));
+extern s32 g_effect_link_count[4] __attribute__((sda));
+extern s32 g_effect_link_cursor[4] __attribute__((sda));
 extern s32 D_L23_001B3934_2[4] __attribute__((sda)); /* the same word as D_L23_001B3934 */
-extern s32 D_L23_001B3980[16] __attribute__((sda));
-extern float D_L23_002A7170[][4];
-extern s32 D_L23_0025E8B0[];
+extern s32 g_trail_effect_cursors[16] __attribute__((sda));
+extern float g_trail_ribbon_dirs[][4];
+extern s32 g_effect_link_active_flags[];
 typedef struct { s16 a; s16 b; s32 c; } Edge; /* 8 bytes; the array is walked through an s16 cast */
-extern Edge D_L23_002A7A74[];
-extern s32 D_L23_0025E9D0[];
+extern Edge g_effect_link_edges[];
+extern s32 g_effect_link_table[];
 extern void moby_set_state(void *, s32, s32);
 
 /* arms the object once: clears the list, builds the 500/500/575 start position and the 16 slots
@@ -40,10 +40,10 @@ void effect_controller_init_link_table(u8 *obj) {
 
     if (obj[0x20] == 0) {
         D_L23_001B3934_2[0] = 0;
-        D_L23_001B1B96 = -1;
-        D_L23_001B1B94 = -1;
-        D_L23_001B1B98 = 0;
-        D_L23_001B3938[0] = 0;
+        g_effect_sound_handle_b = -1;
+        g_effect_sound_handle_a = -1;
+        g_trail_spawn_index = 0;
+        g_effect_link_cursor[0] = 0;
         *(s16 *)(obj + 0x32) = 0x50;
         obj[0x30] = 0xFF;
         payload[0] = 0;
@@ -56,35 +56,35 @@ void effect_controller_init_link_table(u8 *obj) {
         *(TI128 *)(obj + 0x10) = v.q;
         moby_set_state(obj, 1, 0);
         for (i = 0; i < 0x48; i++) {
-            float *p = D_L23_002A7170[i];
+            float *p = g_trail_ribbon_dirs[i];
 
             if (0.0f < p[2]) {
-                D_L23_0025E8B0[i] = 1;
+                g_effect_link_active_flags[i] = 1;
                 for (j = 0; j < 0x9C; j++) {
-                    if (((s16 *)D_L23_002A7A74)[j * 4] == i || ((s16 *)D_L23_002A7A74)[j * 4 + 1] == i) {
-                        n = D_L23_001B3934[0];
+                    if (((s16 *)g_effect_link_edges)[j * 4] == i || ((s16 *)g_effect_link_edges)[j * 4 + 1] == i) {
+                        n = g_effect_link_count[0];
                         found = 0;
                         for (k = 0; k < n; k++) {
-                            if (D_L23_0025E9D0[k] == j) {
+                            if (g_effect_link_table[k] == j) {
                                 found = 1;
                                 break;
                             }
                         }
                         if (!found) {
-                            D_L23_0025E9D0[D_L23_001B3934[0]] = j;
-                            D_L23_001B3934_2[0] = D_L23_001B3934[0] + 1;
+                            g_effect_link_table[g_effect_link_count[0]] = j;
+                            D_L23_001B3934_2[0] = g_effect_link_count[0] + 1;
                         }
                     }
                 }
             } else {
-                D_L23_0025E8B0[i] = 0;
+                g_effect_link_active_flags[i] = 0;
             }
         }
         {
             s32 count = D_L23_001B3934_2[0];
 
             for (m = 0; m < 16; m++) {
-                D_L23_001B3980[m] = (m * count) / 16;
+                g_trail_effect_cursors[m] = (m * count) / 16;
             }
         }
     }

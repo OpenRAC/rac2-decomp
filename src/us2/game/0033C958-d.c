@@ -8,9 +8,9 @@ extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
 extern int single_toggle_a_update(void *, int);
-extern int D_001ADE78[2] __attribute__((sda));
+extern int g_single_toggle_a_prompt_ids[2] __attribute__((sda));
 
-void func_US2_0033E4C0(char *object, void *argument)
+void single_toggle_a_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -27,7 +27,7 @@ void func_US2_0033E4C0(char *object, void *argument)
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init(child, argument, D_001ADE78);
+    prompt_bar_init(child, argument, g_single_toggle_a_prompt_ids);
     text = GetLocalizedString(0x2C2F);
     second = GetLocalizedString(0x2BE4);
     prompt_bar_set_texts(child, text, second, GetLocalizedString(0x2BE5));

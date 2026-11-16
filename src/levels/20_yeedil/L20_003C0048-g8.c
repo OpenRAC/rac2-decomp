@@ -16,9 +16,9 @@ extern void level_capture_checkpoint_state(void *, void *);
 extern void group_lower_save_heights(void *);
 extern void cam_lock_entry(s32);
 
-extern char *D_L20_001B2F9C;
-extern u8 D_0019B4A8[] NOT_SDA;
-extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
+extern char *g_group_l20_member_table;
+extern u8 g_moby_nibble_table[] NOT_SDA;
+extern struct { u8 header[0x464]; u8 collected[0]; } g_collected_l20_flags_2;
 extern char g_hero_state[];
 extern s32 g_current_map_index[] __attribute__((sda));
 
@@ -52,11 +52,11 @@ void scripted_pickup_update(ScriptMoby *self) {
             break;
         }
         uid = self->uid;
-        if (D_L20_0021EFB0.collected[(s16)uid]) {
+        if (g_collected_l20_flags_2.collected[(s16)uid]) {
             self->mode = 3;
             break;
         }
-        bits = D_0019B4A8[((s16)uid >> 1) + (g_current_map_index[0] << 10)];
+        bits = g_moby_nibble_table[((s16)uid >> 1) + (g_current_map_index[0] << 10)];
         if ((uid & 1) ? (bits >> 4) & 7 : bits & 7) {
             self->mode = 3;
             break;
@@ -68,7 +68,7 @@ void scripted_pickup_update(ScriptMoby *self) {
     case 1: {
         u16 uid;
 
-        if (*(u8 *)((state->target << 8) + (s32)D_L20_001B2F9C + 0x20) == state->expectedState) {
+        if (*(u8 *)((state->target << 8) + (s32)g_group_l20_member_table + 0x20) == state->expectedState) {
             uid = self->uid;
         } else {
             if (!state->flag15 || !flag_is_third_pending_set(self))
@@ -76,12 +76,12 @@ void scripted_pickup_update(ScriptMoby *self) {
             uid = self->uid;
         }
         if (uid & 1) {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+            u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if (((*entry >> 4) & 7) != 7)
                 *entry += 0x10;
         } else {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
+            u8 *entry = g_moby_nibble_table + (((s16)uid >> 1) + (g_current_map_index[0] << 10));
 
             if ((*entry & 7) != 7)
                 ++*entry;

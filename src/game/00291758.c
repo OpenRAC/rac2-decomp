@@ -2,16 +2,16 @@
 #include "names.h"
 
 typedef struct { unsigned char count[4]; int groups, runs; } RenderHeader;
-extern int D_001BAEC0[];
+extern int g_loader_memory[];
 extern void tex_draw_batches(int *, char *, unsigned char *, int);
 
-extern int *D_001A7288 __attribute__((section(".sdata")));
-extern char D_01FF7FF0[];
+extern int *g_level_data_ptr __attribute__((section(".sdata")));
+extern char g_load_memory_ceiling[];
 extern int load_read_disc_sectors_blocking(int, int, int);
 
-extern int D_001B1DA4 __attribute__((sda));
-extern char D_001F2740[];
-extern int D_001F2540[];
+extern int g_tex_pack_range_index __attribute__((sda));
+extern char g_tex_pack_data_buffer[];
+extern int g_particle_texture_table[];
 extern int log2dim(int);
 extern void mem_copy_aligned(void *, void *, int);
 
@@ -55,7 +55,7 @@ typedef struct {
     DiscFile archive1;        /* 0x52B8 */
 } DiscToc;
 extern DiscToc g_copy_setup_data;
-extern unsigned long long D_001A72A0[] __attribute__((sda));
+extern unsigned long long g_tex_fill_table[] __attribute__((sda));
 
 extern void snd_clear_flag_and_update(void);
 extern int snd_Pump(void);
@@ -69,17 +69,17 @@ extern void snd_load_bank_entry(int);
 extern void func_00132828(void);
 /* As in RAC1: the disc wait-frame count, a flag set once the load has
    been stepped back, and a mode word that is 1 until then. */
-extern int D_001A7430 __attribute__((sda));
-extern int D_001A7434 __attribute__((sda));
-extern int D_001A7900 __attribute__((sda));
+extern int g_cd_error_retry_count __attribute__((sda));
+extern int g_cd_error_seen __attribute__((sda));
+extern int g_load_read_mode __attribute__((sda));
 /* The level archive load: stage, busy flag and the two archive buffers
    (archive0 is the level data D_001A7288 points at). */
 typedef struct { int stage, busy, archive0, archive1; } ArchiveLoad;
-extern ArchiveLoad D_001A7280 __attribute__((sda));
-extern int D_001BAF2C;
-extern short D_00152C2C[];
+extern ArchiveLoad g_loader_archives __attribute__((sda));
+extern int g_archive_end_address;
+extern short g_load_header_flag[];
 /* The two sound bank statuses: -1 while a load is pending. */
-extern unsigned int D_00189E00, D_00189E04;
+extern unsigned int g_load_relocate_a, g_load_relocate_b;
 
 /* The class cache header: VRAM offsets of the slot's image (in words) and
    CLUT, the one material map entry and the slot. */
@@ -91,7 +91,7 @@ typedef struct {
     short map;                  /* 0x10 */
     short slot;                 /* 0x12 */
 } ClassCache;
-extern ClassCache D_00152CD0;
+extern ClassCache g_load_slots;
 /* A loaded class: the count of its 32-byte entries at 0x0D and the table of
    them at 0x28. */
 typedef struct {
@@ -107,17 +107,17 @@ typedef struct {
 /* The decode buffer; a texture part starts with a type word, has its width
    at 0x18 and its CLUT and pixels at 0x30 and 0x430. */
 typedef struct { int type; } DecodeHeader;
-extern DecodeHeader D_00178510;
-extern int D_00178528;
-extern char D_00178540[];
-extern char D_00178940[];
-extern char D_001A9340[];
-extern int D_001A72F4 __attribute__((sda));
-extern int D_001A7304 __attribute__((sda));
-extern int D_001B1B40 __attribute__((sda));
-extern int D_001D0E00[];
-extern ClassData *D_001CDB80[];
-extern unsigned char D_001CE4E0[];
+extern DecodeHeader g_decode_header;
+extern int g_decoded_image_width;
+extern char g_decoded_image_buffer[];
+extern char g_decoded_pixels[];
+extern char g_str_class_cache_format[];
+extern int g_vram_clut_third __attribute__((sda));
+extern int g_vram_pixel_base __attribute__((sda));
+extern int g_class_cache_count __attribute__((sda));
+extern int g_class_cache_sizes[];
+extern ClassData *g_class_cache_objects[];
+extern unsigned char g_class_slot_lookup[];
 extern int fast_decompress(void *, void *);
 extern void load_register_class_cache_object(void *, void *, void *, int);
 extern int func_001337F0(void);
@@ -207,7 +207,7 @@ void gfx_flush_light_part_indices(int index)
 /* Texture ranges: the particle renderer (func_002B9420) hands this table to
    the toSPR DMA channel; C only ever writes it. */
 typedef struct { int a, b; } TextureRange;
-extern volatile TextureRange D_001F1F40[];
+extern volatile TextureRange g_texture_ranges[];
 
 /* Rebases the offset table of a loaded pack onto the copy of its data in
    D_001F2740, then fills the texture range table from count four-word list
@@ -222,19 +222,19 @@ void tex_rebase_pack_fill_ranges(int *hdr, int base, int *list, int count)
 
     for (i = 0; i < n; i++, entry++) {
         if (*entry == 0)
-            D_001F2540[i] = (int)D_001F2740;
+            g_particle_texture_table[i] = (int)g_tex_pack_data_buffer;
         else
-            D_001F2540[i] = *entry - (data_off - (int)D_001F2740);
+            g_particle_texture_table[i] = *entry - (data_off - (int)g_tex_pack_data_buffer);
     }
-    mem_copy_aligned(D_001F2740, (char *)hdr + data_off, data_size);
-    for (D_001B1DA4 = 0; D_001B1DA4 < count; D_001B1DA4++) {
+    mem_copy_aligned(g_tex_pack_data_buffer, (char *)hdr + data_off, data_size);
+    for (g_tex_pack_range_index = 0; g_tex_pack_range_index < count; g_tex_pack_range_index++) {
         int src_page = base + *list++;
         int src_offset = *list++;
         int dst_page = base + *list++;
         int dst_size = *list++;
 
-        D_001F1F40[D_001B1DA4].a = (src_page << 4) + src_offset;
-        D_001F1F40[D_001B1DA4].b = (dst_page << 4) + log2dim(dst_size);
+        g_texture_ranges[g_tex_pack_range_index].a = (src_page << 4) + src_offset;
+        g_texture_ranges[g_tex_pack_range_index].b = (dst_page << 4) + log2dim(dst_size);
     }
 }
 
@@ -338,7 +338,7 @@ void tex_load_pack_to_vram(int pack)
         tag |= (unsigned long long)n << 30;
         f = ((unsigned long long)clut_page << 37) | 0x400000000ULL;
         tag |= f;
-        D_001A72A0[i] = tag | 0x8000000000000000ULL;
+        g_tex_fill_table[i] = tag | 0x8000000000000000ULL;
         image_vram += record->width * record->height * 4;
         cursor++;
     }
@@ -350,16 +350,16 @@ void tex_load_pack_to_vram(int pack)
 
 extern void tex_load_pack_to_vram(int);
 extern void tex_build_draw_packets(void *);
-extern u8 *D_L03_001DAB80[];
+extern u8 *g_object_l03_pointer_table[];
 extern void load_copy_header_relocate_pointers(u8 *, u8 *);
-extern unsigned char *D_001BAF38;
+extern unsigned char *g_level_pack_data;
 
 /* Loads the texture pack of a level and its draw packets, then remembers the level number. */
 void tex_load_level_pack(void *level)
 {
     tex_load_pack_to_vram(level);
     tex_build_draw_packets(level);
-    load_copy_header_relocate_pointers((u8 *)D_L03_001DAB80[0], D_001BAF38);
+    load_copy_header_relocate_pointers((u8 *)g_object_l03_pointer_table[0], g_level_pack_data);
     *(int *)0x001A7290 = (int)level;
 }
 
@@ -373,10 +373,10 @@ typedef struct { char p0[0x3e24]; int base; char p1[0x48f0-0x3e28]; UploadPair e
 extern UploadTable upload_table __asm__("D_0014B540");
 typedef struct { char p0[0x30]; int index; char p1[4]; long word; } UploadState;
 extern UploadState g_hero_moby_default;
-extern int D_001B22A0[];
-extern int D_001B22B4[] __attribute__((sda));
-extern int D_001A72F0[] __attribute__((sda));
-extern int D_001A7300[] __attribute__((sda));
+extern int g_packet_buffer_table[];
+extern int g_packet_buffer_index[] __attribute__((sda));
+extern int g_vram_clut_second[] __attribute__((sda));
+extern int g_vram_level_image_address[] __attribute__((sda));
 
 /* Reads entry index of the disc table into the free one of the two buffers at
    D_001B22A0, uploads its 16x16 CLUT (at +0x20) and 8-bit image (at +0x420, width
@@ -394,12 +394,12 @@ void LoadDiscTableTexture(int index)
     state = &g_hero_moby_default;
     state->index = index;
     gfx_wait_for_dma_status_bits(1);
-    base = (char *)D_001B22A0[1 - D_001B22B4[0]];
+    base = (char *)g_packet_buffer_table[1 - g_packet_buffer_index[0]];
     snd_pump_music_and_disc_read(1);
     clut = base + 0x20;
     table = &upload_table;
     load_read_disc_with_pause(base, table->entries[index].off + table->base, table->entries[index].size);
-    func_00126288(&packet, D_001A72F0[0] >> 8, 1, 0, 0, 0, 16, 16);
+    func_00126288(&packet, g_vram_clut_second[0] >> 8, 1, 0, 0, 0, 16, 16);
     FlushCache(0);
     sceGsExecLoadImage(&packet, clut);
     gfx_wait_paths_idle(0, 0);
@@ -407,19 +407,19 @@ void LoadDiscTableTexture(int index)
     width = *(int *)(base + 8) >> 6;
     if (width < 1)
         width = 1;
-    func_00126288(&packet, D_001A7300[0] >> 8, width, 27, 0, 0, *(short *)(base + 8), *(short *)(base + 12));
+    func_00126288(&packet, g_vram_level_image_address[0] >> 8, width, 27, 0, 0, *(short *)(base + 8), *(short *)(base + 12));
     FlushCache(0);
     sceGsExecLoadImage(&packet, base + 0x420);
     gfx_wait_paths_idle(0, 0);
     {
         long image, tex, format, clut_base, word;
 
-        image = (long)D_001A7300[0] >> 8;
+        image = (long)g_vram_level_image_address[0] >> 8;
         tex = image | ((long)width << 14);
         format = ((long)log << 26) | 0x1b00000L;
         tex |= format;
         tex |= (long)log << 30;
-        clut_base = (((long)D_001A72F0[0] >> 8) << 37) | 0x400000000L;
+        clut_base = (((long)g_vram_clut_second[0] >> 8) << 37) | 0x400000000L;
         word = tex | clut_base;
         word |= 0x8000000000000000UL;
         state->word = word;
@@ -515,7 +515,7 @@ void tex_relocate_render_groups(RenderHeader *base, char *textures, unsigned cha
         int n = count;
         do {
             int off = p[0];
-            if (off < D_001BAEC0[2]) {
+            if (off < g_loader_memory[2]) {
                 p[0] = off + (int)base;
                 p[2] += (int)base;
             }
@@ -566,11 +566,11 @@ int LoadLevelChunkFromDisc(void)
     DiscToc *toc = &g_copy_setup_data;
     int sectors = toc->level.size;
     int bytes = ((sectors << 11) + 0x1057) & 0xFFFFF000;
-    int addr = ((int)D_01FF7FF0 - bytes) & -16;
+    int addr = ((int)g_load_memory_ceiling - bytes) & -16;
 
-    D_001A7288 = (int *)addr;
+    g_level_data_ptr = (int *)addr;
     *(unsigned int *)addr = 0x60;
-    load_read_disc_sectors_blocking((int)D_001A7288 + *D_001A7288, toc->level.sector + toc->level_base, toc->level.size);
+    load_read_disc_sectors_blocking((int)g_level_data_ptr + *g_level_data_ptr, toc->level.sector + toc->level_base, toc->level.size);
     return 1;
 }
 
@@ -587,60 +587,60 @@ int ServiceLevelArchiveLoad(void)
     snd_clear_flag_and_update();
     snd_Pump();
     if (snd_CheckLoadInProgress(1)) {
-        ++D_001A7430;
-        if (D_001A7900 == 1 && D_001A7430 > 720) {
-            D_001A7434 = 1;
-            D_001A7900 = 0;
-            if (D_001A7280.stage < 3)
-                D_001A7280.stage--;
+        ++g_cd_error_retry_count;
+        if (g_load_read_mode == 1 && g_cd_error_retry_count > 720) {
+            g_cd_error_seen = 1;
+            g_load_read_mode = 0;
+            if (g_loader_archives.stage < 3)
+                g_loader_archives.stage--;
             snd_run_handler_or_send_cmd37();
         }
         return 0;
     }
-    if (sceCdGetError() && !D_001A7434) {
-        D_001A7434 = 1;
-        D_001A7900 = 0;
-        if (D_001A7280.stage < 3)
-            D_001A7280.stage--;
+    if (sceCdGetError() && !g_cd_error_seen) {
+        g_cd_error_seen = 1;
+        g_load_read_mode = 0;
+        if (g_loader_archives.stage < 3)
+            g_loader_archives.stage--;
     }
-    switch (D_001A7280.stage) {
+    switch (g_loader_archives.stage) {
     case 0: {
         DiscToc *toc = &g_copy_setup_data;
         unsigned int bytes;
 
         bytes = ((toc->archive1.size << 11) + 4095) & 0xFFFFF000;
-        D_001A7280.archive1 = D_001BAF2C - bytes;
+        g_loader_archives.archive1 = g_archive_end_address - bytes;
         bytes = ((toc->archive0.size << 11) + 4095) & 0xFFFFF000;
-        D_001A7280.archive0 = D_001A7280.archive1 - bytes;
-        D_00152C2C[0] = 0;
-        load_read_disc_sectors_blocking(D_001A7280.archive0, toc->archive0.sector + toc->archive_base, toc->archive0.size);
-        D_001A7280.stage++;
+        g_loader_archives.archive0 = g_loader_archives.archive1 - bytes;
+        g_load_header_flag[0] = 0;
+        load_read_disc_sectors_blocking(g_loader_archives.archive0, toc->archive0.sector + toc->archive_base, toc->archive0.size);
+        g_loader_archives.stage++;
         break;
     }
     case 1:
-        load_read_disc_sectors_blocking(D_001A7280.archive1, g_copy_setup_data.archive1.sector + g_copy_setup_data.archive_base,
+        load_read_disc_sectors_blocking(g_loader_archives.archive1, g_copy_setup_data.archive1.sector + g_copy_setup_data.archive_base,
                       g_copy_setup_data.archive1.size);
-        D_001A7280.stage++;
+        g_loader_archives.stage++;
         break;
     case 2:
-        if (D_001A7280.busy)
+        if (g_loader_archives.busy)
             return 0;
         snd_print_status();
         snd_load_first_bank();
-        D_001A7280.stage++;
+        g_loader_archives.stage++;
         break;
     case 3:
         snd_Pump();
-        if (D_00189E00 != -1)
-            D_001A7280.stage++;
+        if (g_load_relocate_a != -1)
+            g_loader_archives.stage++;
         break;
     case 4:
         snd_load_bank_entry(0);
-        D_001A7280.stage++;
+        g_loader_archives.stage++;
         break;
     case 5:
         snd_Pump();
-        if (D_00189E04 != -1) {
+        if (g_load_relocate_b != -1) {
             func_00132828();
             return 1;
         }
@@ -817,23 +817,23 @@ void load_cached_moby_class(int id, int index, int *data)
         char *src = (char *)data + data[2] - (g_copy_setup_data.slots[index].sector << 11);
 
         FlushCache(0);
-        fast_decompress(src, &D_00178510);
+        fast_decompress(src, &g_decode_header);
         FlushCache(0);
-        if (D_00178510.type == 1) {
+        if (g_decode_header.type == 1) {
             int tbw, width, offset;
             char *pixels;
 
-            func_00126288(&work.image, (D_001A72F4 >> 8) + D_00152CD0.clut_offset, 1, 0, 0, 0, 16, 16);
+            func_00126288(&work.image, (g_vram_clut_third >> 8) + g_load_slots.clut_offset, 1, 0, 0, 0, 16, 16);
             FlushCache(0);
-            sceGsExecLoadImage(&work.image, D_00178540);
+            sceGsExecLoadImage(&work.image, g_decoded_image_buffer);
             gfx_wait_paths_idle(0, 0);
-            offset = D_00152CD0.image_offset << 2;
-            width = D_00178528;
+            offset = g_load_slots.image_offset << 2;
+            width = g_decoded_image_width;
             tbw = width >> 6;
-            pixels = D_00178940;
+            pixels = g_decoded_pixels;
             if (tbw < 1)
                 tbw = 1;
-            func_00126288(&work.image, (D_001A7304 + offset) >> 8, tbw, 0x1B, 0, 0, width, width);
+            func_00126288(&work.image, (g_vram_pixel_base + offset) >> 8, tbw, 0x1B, 0, 0, width, width);
             FlushCache(0);
             sceGsExecLoadImage(&work.image, pixels);
             gfx_wait_paths_idle(0, 0);
@@ -843,25 +843,25 @@ void load_cached_moby_class(int id, int index, int *data)
         char *src = (char *)data + data[0] - (g_copy_setup_data.slots[index].sector << 11);
 
         FlushCache(0);
-        fast_decompress(src, &D_00178510);
+        fast_decompress(src, &g_decode_header);
         FlushCache(0);
     }
     {
-        ClassCache *cache = &D_00152CD0;
-        DecodeHeader *decoded = &D_00178510;
+        ClassCache *cache = &g_load_slots;
+        DecodeHeader *decoded = &g_decode_header;
 
-        saved = D_001B1B40;
+        saved = g_class_cache_count;
         work.map[0] = cache->map;
-        D_001B1B40 = cache->slot;
+        g_class_cache_count = cache->slot;
         load_register_class_cache_object(decoded, (char *)cache - (cache->map << 4), work.map, id);
-        D_001D0E00[cache->slot] = 0xFFF00000;
-        loaded = D_001CDB80[D_001CE4E0[id]];
-        D_001B1B40 = saved;
+        g_class_cache_sizes[cache->slot] = 0xFFF00000;
+        loaded = g_class_cache_objects[g_class_slot_lookup[id]];
+        g_class_cache_count = saved;
     }
     for (i = 0; i < loaded->entry_count; i++)
         loaded->entries[i].f1C = 4;
     {
-        char *format = D_001A9340;
+        char *format = g_str_class_cache_format;
         int first = func_001337F0();
         int second = func_00133820();
 

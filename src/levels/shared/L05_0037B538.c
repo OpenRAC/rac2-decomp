@@ -12,8 +12,8 @@ typedef struct {
     float position[4];
     float normal[4];
 } CollisionResultView;
-extern CollisionResultView D_L05_001BFB00;
-extern int (*D_L05_00221D64)(u8 *, void *);
+extern CollisionResultView g_collision_l05_result;
+extern int (*g_collision_hit_callback)(u8 *, void *);
 
 /* Checks if the object hit the world, remembers where and which way it hit, then runs the optional extra hit callback. */
 int moby_process_collision_hit(u8 *object, void *context, int keepPosition, int skipCollision)
@@ -21,18 +21,18 @@ int moby_process_collision_hit(u8 *object, void *context, int keepPosition, int 
     char *vars = (char *)moby_get_motion_data(object);
     char *position;
     if (!skipCollision && coll_test_point(position = (char *)object + 0x10, 0, object, *(float *)(object + 0xC) * 0.0009765599970705807f)) {
-        if (D_L05_001BFB00.flags == 0 || !keepPosition)
-            qcopy(position, D_L05_001BFB00.position);
-        if (D_L05_001BFB00.count > 0) {
+        if (g_collision_l05_result.flags == 0 || !keepPosition)
+            qcopy(position, g_collision_l05_result.position);
+        if (g_collision_l05_result.count > 0) {
             char *normal = vars + 0xD0;
             ++*(int *)(vars + 0x15C);
-            FastVecScale(normal, D_L05_001BFB00.normal, 0.0009765599970705807f);
+            FastVecScale(normal, g_collision_l05_result.normal, 0.0009765599970705807f);
             vec_scale_to_length(normal, normal, 1.0f);
         }
     } else {
         *(int *)(vars + 0x15C) = 0;
     }
-    if (D_L05_00221D64 != 0)
-        return D_L05_00221D64(object, context);
+    if (g_collision_hit_callback != 0)
+        return g_collision_hit_callback(object, context);
     return 0;
 }

@@ -2,22 +2,22 @@
 #include "names.h"
 
 typedef struct { int items[21]; } Table_002AF0A8;
-extern const Table_002AF0A8 D_0026CB30;
-extern void func_US2_002B1880(int, int);
+extern const Table_002AF0A8 g_snd_indexed_table;
+extern void value_set_entry_by_index_us2(int, int);
 extern int ForceClaimNotice(int, int, int);
 
 /* Plays the entry of the 21-entry table the clamped index picks; entry 3 goes through the
    other player. */
-void func_US2_002AFF10(int index)
+void snd_play_indexed_us2(int index)
 {
-    Table_002AF0A8 table = D_0026CB30;
+    Table_002AF0A8 table = g_snd_indexed_table;
 
     if (index < 0)
         index = 0;
     if (index > 20)
         index = 20;
     if (index == 3)
-        func_US2_002B1880(table.items[3], 0xF0);
+        value_set_entry_by_index_us2(table.items[3], 0xF0);
     else
         ForceClaimNotice(8, table.items[index], 0xB4);
 }

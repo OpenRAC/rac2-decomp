@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L20_001B2AC8 __attribute__((sda));
-extern int func_PAL_L20_003A0E60(char *, int);
-extern void func_PAL_L20_003A07C8(char *);
+extern int g_frame_l20_counter __attribute__((sda));
+extern int trooper_spawn_parts_pal(char *, int);
+extern void SpawnHealthThresholdEffects_pal(char *);
 extern void trooper_count_closer_mates(char *);
 extern float fast_subtract_rotations(float, float);
 extern float math_approach_target_with_direction_mode(char *, char *, float, float, float, float, int);
@@ -17,7 +17,7 @@ extern f32 vec_distance_xy(void *, void *);
 extern s32 path_check_entry_for_moby(char *, s32);
 extern f32 vec_distance_xy(void *, void *);
 
-void func_PAL_L20_003A06F8(char *arg0) {
+void trooper_update_body_pal(char *arg0) {
     char *s0 = arg0;
     char *s1;
     f32 c;
@@ -26,9 +26,9 @@ void func_PAL_L20_003A06F8(char *arg0) {
     u16 v2;
 
     s1 = *(char **)(s0 + 0x68);
-    func_PAL_L20_003A0E60(s0, 0);
-    func_PAL_L20_003A07C8(s0);
-    if ((D_L20_001B2AC8 & 7) == (((s32)s0 >> 8) & 7)) {
+    trooper_spawn_parts_pal(s0, 0);
+    SpawnHealthThresholdEffects_pal(s0);
+    if ((g_frame_l20_counter & 7) == (((s32)s0 >> 8) & 7)) {
         trooper_count_closer_mates(s0);
     }
     c = 0.013962637f;

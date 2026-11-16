@@ -13,14 +13,14 @@ typedef unsigned int u32;
 
 /* Text box laid out by func_00337C10/func_00337E30: text at +0xA8, its line table at +0x1D8. */
 extern int sprintf(char *, char *, ...); /* formats into a buffer */
-extern char D_001ADB58[], D_001ADB68[], D_001ADB78[], D_001ADB90[];
-extern char D_001ADBB0[], D_001ADBB8[], D_001ADBC8[];
+extern char g_str_framed_box_fmt_single_spaced[], g_str_framed_box_fmt_double_spaced[], g_str_framed_box_fmt_single_plain[], g_str_framed_box_fmt_double_plain[];
+extern char g_str_framed_box_fmt_single_short[], g_str_framed_box_fmt_double_short[], g_str_string_format[];
 extern int g_screen_width[] __attribute__((sda)); /* screen size: [1] = height */
 extern void text_draw_window_small(unsigned short *layout, unsigned long style, unsigned char *text, int length);
 extern void text_draw_window_medium(unsigned short *layout, unsigned long style, unsigned char *text, int length);
 extern void text_draw_window_large(unsigned short *layout, unsigned long style, unsigned char *text, int length);
 extern void gfx_draw_rounded_box(int top, int bottom, int left, int right, int alpha, int color);
-extern void func_PAL_0033A248(char *, unsigned int, unsigned int, float, float, float, float);
+extern void text_box_draw_frame_pal(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields. */
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
@@ -42,7 +42,7 @@ extern void func_PAL_0033A248(char *, unsigned int, unsigned int, float, float, 
 /* Formats text (with up to three extra strings) into a buffer, lays it out in the box with the
    font routine chosen by mode, optionally centres the box vertically on the screen, then draws a
    padded backing rectangle and frame behind it and lays the text out again on top. */
-void func_PAL_00339E38(void *object, short *box, int style, char *text, int mode,
+void text_draw_framed_box_pal(void *object, short *box, int style, char *text, int mode,
                    int center, int length, int single, char *first, char *second, int third)
 {
     char buffer[768];
@@ -55,18 +55,18 @@ void func_PAL_00339E38(void *object, short *box, int style, char *text, int mode
     if (first) {
         if (second) {
             if (third) {
-                if (single) sprintf(buffer, D_001ADB58, text, 1, first, 1, second);
-                else sprintf(buffer, D_001ADB68, text, 1, 1, first, 1, second);
+                if (single) sprintf(buffer, g_str_framed_box_fmt_single_spaced, text, 1, first, 1, second);
+                else sprintf(buffer, g_str_framed_box_fmt_double_spaced, text, 1, 1, first, 1, second);
             } else {
-                if (single) sprintf(buffer, D_001ADB78, text, 1, first, second);
-                else sprintf(buffer, D_001ADB90, text, 1, 1, first, second);
+                if (single) sprintf(buffer, g_str_framed_box_fmt_single_plain, text, 1, first, second);
+                else sprintf(buffer, g_str_framed_box_fmt_double_plain, text, 1, 1, first, second);
             }
         } else {
-            if (single) sprintf(buffer, D_001ADBB0, text, 1, first);
-            else sprintf(buffer, D_001ADBB8, text, 1, 1, first);
+            if (single) sprintf(buffer, g_str_framed_box_fmt_single_short, text, 1, first);
+            else sprintf(buffer, g_str_framed_box_fmt_double_short, text, 1, 1, first);
         }
     } else {
-        sprintf(buffer, D_001ADBC8, text);
+        sprintf(buffer, g_str_string_format, text);
     }
     box[9] |= 4;
     switch (mode) {
@@ -98,7 +98,7 @@ void func_PAL_00339E38(void *object, short *box, int style, char *text, int mode
     right = x + halfWidth;
     bottom = y + halfHeight;
     gfx_draw_rounded_box(top, bottom, left, right, 96, 0x60442D00);
-    func_PAL_0033A248(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
+    text_box_draw_frame_pal(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
     switch (mode) {
     case 0: text_draw_window_medium(box, style, buffer, length); break;
     case 1: text_draw_window_small(box, style, buffer, length); break;
@@ -112,12 +112,12 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 /* Draws a frame when the level object exists: with the view scale at +0xB0 of D_001B9040
    set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
    ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed
    from the frame's height, then from its width. Colour = alpha << 24 | color. */
-void func_PAL_0033A248(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right);
+void text_box_draw_frame_pal(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right);
 
 extern int sprintf(char *, char *, ...);
 

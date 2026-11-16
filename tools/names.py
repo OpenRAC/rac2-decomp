@@ -36,12 +36,12 @@ TABLE = ROOT / "config/names.tsv"
 LOCAL = ROOT / "config/names_local.tsv"
 HEADER = ROOT / "include/names.h"
 TIERS = ("recovered", "descriptive", "candidate")
-SYMBOL = re.compile(r"^(func_(?:L\d{2}_)?[0-9A-F]{8}|D_(?:L\d{2}_)?[0-9A-F]{8})$")
+SYMBOL = re.compile(r"^((?:func|D)_(?:(?:PAL|US2)_)?(?:L\d{2}_)?[0-9A-F]{8})$")
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 COLUMNS = ("symbol", "name", "tier", "source", "evidence", "alts")
 LOCAL_SOURCE = "config/names_local.tsv"
 TABLE_HEAD = ("# Readable names; see docs/contributing/names.md. tools/names.py local merges\n"
-              "# config/names_local.tsv into it. Columns:\n"
+              "# config/names_local.tsv into it (a local row's evidence stays there). Columns:\n"
               "# symbol\tname\ttier\tsource\tevidence\talternatives\n")
 
 
@@ -81,8 +81,10 @@ def merge_local(rows: list[dict]) -> list[dict]:
         if holder.get(name, sym) != sym:
             warn(f"{LOCAL.name}: {name} for {sym} is taken by {holder[name]}")
             continue
+        # The evidence stays in names_local.tsv (lookup reads it there): the table
+        # would otherwise carry every local row's text twice.
         new = {"symbol": sym, "name": name, "tier": "descriptive", "source": LOCAL_SOURCE,
-               "evidence": evidence, "alts": ""}
+               "evidence": "", "alts": ""}
         if old:
             alts = [a for a in old["alts"].split(",") if a] + [old["name"]]
             new["alts"] = ",".join(dict.fromkeys(a for a in alts if a != name))
@@ -166,6 +168,9 @@ def header_rows(rows=None):
 
 def part_of(symbol: str) -> str:
     """Which file of include/names/ a symbol's name goes in."""
+    rel = re.match(r"(?:func|D)_(PAL|US2)_", symbol)
+    if rel:
+        return rel.group(1).lower()
     m = re.match(r"(?:func|D)_L(\d\d)_", symbol)
     if not m:
         return "executable"
@@ -191,7 +196,8 @@ def render_header(parts) -> str:
         " * tools/names.py header from config/names.tsv; do not edit.",
         " *",
         " * Each name is a macro for the address-named symbol the build and",
-        " * every tool use (func_<ADDR>, func_LNN_<ADDR>, D_<ADDR>): code may",
+        " * every tool use (func_<ADDR>, func_LNN_<ADDR>, D_<ADDR>, and a release's",
+        " * own func_PAL_..., func_US2_..., D_PAL_..., D_US2_...): code may",
         " * write either spelling and compiles to the same object. Definitions,",
         " * bodies, extern lines and prototypes use the readable name;",
         " * INCLUDE_ASM/ASM_FUNC lines, __asm__ labels and SDATA() keep the",
@@ -364,7 +370,7 @@ def logical_line_is_preprocessor(text: str, line_start: int) -> bool:
     return text[start:start + 200].lstrip(" \t").startswith("#")
 
 
-DEF_LINE = re.compile(r"^(?!extern\b)([A-Za-z_][^;\n]*?\b)(func_(?:L\d\d_)?[0-9A-Fa-f]{8})(\s*\()")
+DEF_LINE = re.compile(r"^(?!extern\b)([A-Za-z_][^;\n]*?\b)(func_(?:(?:PAL|US2)_)?(?:L\d\d_)?[0-9A-Fa-f]{8})(\s*\()")
 
 
 def apply_defs() -> None:
@@ -453,6 +459,10 @@ def rename() -> None:
 
 def lookup(args) -> None:
     rows = read_table()
+    local_evidence = {sym: evidence for sym, _, evidence, _ in read_local()}
+    for r in rows:
+        if r["source"] == LOCAL_SOURCE and not r["evidence"]:
+            r["evidence"] = local_evidence.get(r["symbol"], "")
     for a in args:
         hits = [r for r in rows if a in (r["symbol"], r["name"]) or a in r["alts"].split(",")]
         if not hits:

@@ -26,8 +26,8 @@ char pad24b4[128];
 int field2534;
 } HeroView;
 extern HeroView g_hero_state;
-extern unsigned int D_00138320;
-extern unsigned char D_0013957E;
+extern unsigned int g_pad_pressed_flags;
+extern unsigned char g_chopper_weapon_index;
 typedef struct { char pad[0x54]; float rate; char rest[0x88]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern void weapon_update_target_lock(void *), weapon_release_shot_slots(void);
@@ -95,16 +95,16 @@ void chopper_update(unsigned char *object)
         } else g_hero_state.field2534=40;
         if(object[0x20]==1) {
             if(vec_fast_helper_b((float *)(ctx+0xC)) && allowed &&
-               (D_00138320 & g_hero_state.field1230) && g_hero_state.field1240>=23 &&
+               (g_pad_pressed_flags & g_hero_state.field1230) && g_hero_state.field1240>=23 &&
                (g_hero_state.field1500 || g_hero_state.field2294==1 || g_hero_state.field2294==29) && get_ammo(22)) {
-                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
+                { WeaponEntry *w=&g_weapon_l00_table[g_chopper_weapon_index];
                 F(ctx,0xC)=1.0f/w->rate; }
                 triggered=1;
             }
             secondary=0;
             if(g_hero_state.field2294==0x83 && !g_hero_state.fieldc2c && math_is_below_plane_within_depth(33.0f)) secondary=get_ammo(22)!=0;
             if(g_hero_state.field229c==4 && allowed && !g_hero_state.field49c &&
-               F(ctx,0xC)==0.0f && (D_00138320&0x20) && g_hero_state.field1240>=23 && get_ammo(22)) {
+               F(ctx,0xC)==0.0f && (g_pad_pressed_flags&0x20) && g_hero_state.field1240>=23 && get_ammo(22)) {
                 start_equipped_item_animation();
                 other=*(char **)((char *)&g_hero_state+0xE98);
                 if(other) {
@@ -112,7 +112,7 @@ void chopper_update(unsigned char *object)
                     initialize_moby_animation_blend(g_hero_state.field2290,other,g_hero_state.field24b0,1,1,1);
                 }
                 object[0x20]=2;
-                { WeaponEntry *w=&g_weapon_l00_table[D_0013957E];
+                { WeaponEntry *w=&g_weapon_l00_table[g_chopper_weapon_index];
                 F(ctx,0xC)=1.0f/w->rate; }
                 I(ctx,0x10)=8;
             }

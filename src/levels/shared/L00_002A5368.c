@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern u8 D_L24_0025B710[];
+extern u8 g_attachment_records[];
 
 extern void attachment_update_record(u8 *);
 
@@ -14,7 +14,7 @@ typedef long Rac2Native_6b0741c38bf00fee_s64;
 
 typedef unsigned long Rac2Native_6b0741c38bf00fee_u64;
 
-extern Rac2Native_6b0741c38bf00fee_u8 D_0018B2BC[];
+extern Rac2Native_6b0741c38bf00fee_u8 g_footstep_effect_ids[];
 
 extern void func_L00_002A61C8_1(Rac2Native_6b0741c38bf00fee_u64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s64, Rac2Native_6b0741c38bf00fee_s32);
 
@@ -28,7 +28,7 @@ extern void vec_clear_128(void *);
 
 /* calls the measured element helper over a 0x1b80-byte array in 0xb0-byte steps */
 void attachment_update_all(void) {
- u8 *p=D_L24_0025B710;
+ u8 *p=g_attachment_records;
  u8 *end=p+0x1b80;
  do {attachment_update_record(p);p+=0xb0;}while((s32)p<(s32)end);
 }
@@ -128,7 +128,7 @@ void hero_update_held_object(void) {
 
 /* passes the measured byte and constants to two callees */
 void hero_play_footstep_effect(void) {
- func_L00_002A61C8_1(D_0018B2BC[1],0,1,0x32);
+ func_L00_002A61C8_1(g_footstep_effect_ids[1],0,1,0x32);
  hero_queue_delayed_event(0x16,7,0);
 }
 

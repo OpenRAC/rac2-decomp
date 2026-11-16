@@ -4,11 +4,11 @@
  * the qualified copy, expression-order and unsplit-GCSE profiles. */
 typedef unsigned int KilonoidQuad __attribute__((mode(TI)));
 
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern int D_L00_001ADB2C __attribute__((sda));
-extern int D_L00_001B0264 __attribute__((sda)), D_L00_001B0270 __attribute__((sda)), D_L00_001B0274 __attribute__((sda)), D_L00_001B0278 __attribute__((sda)), D_L00_001B0288 __attribute__((sda));
-extern float D_L00_001B027C __attribute__((sda)), D_L00_001B0280 __attribute__((sda)), D_L00_001B0284 __attribute__((sda)), D_L00_001B028C __attribute__((sda));
+extern int g_active_tether_object __attribute__((sda));
+extern int g_kilonoid_state_value __attribute__((sda)), g_kilonoid_fade_frames __attribute__((sda)), g_kilonoid_random_min __attribute__((sda)), g_kilonoid_random_max __attribute__((sda)), g_kilonoid_color_alpha __attribute__((sda));
+extern float g_kilonoid_vector_scale __attribute__((sda)), g_kilonoid_float_min __attribute__((sda)), g_kilonoid_float_max __attribute__((sda)), g_kilonoid_effect_size __attribute__((sda));
 /* The creator scans four pointer slots (003D3E54: index < 4). */
 extern unsigned char *g_kilonoid_slots[4] __attribute__((sda));
 typedef struct {
@@ -91,7 +91,7 @@ void kilonoid_update(unsigned char *object)
     state = *(char **)(object+0x68);
     if (!state)
         return;
-    if (D_L00_001A8F00) {
+    if (g_game_l00_mode) {
         *(short *)(state+0x46) = 1;
         ((KilonoidObjectView *)object)->flags |= 0x41;
         return;
@@ -110,7 +110,7 @@ void kilonoid_update(unsigned char *object)
         *(short *)(object+0x32) = 255;
         state[0x25] = 0;
         *(int *)(state+0x30) = 0;
-        *(int *)(state+0x2c) = D_L00_001B0264;
+        *(int *)(state+0x2c) = g_kilonoid_state_value;
         *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)g_hero_state.position;
         {
             unsigned char *current = g_sound_state + (signed char)state[0x27] * 0x70;
@@ -163,7 +163,7 @@ void kilonoid_update(unsigned char *object)
             ref_L00_003D4A20_10(object, state);
         } else {
             qzero_nc(state+0x10);
-            *(int *)(state+0x20) = D_L00_001B0270;
+            *(int *)(state+0x20) = g_kilonoid_fade_frames;
             ReleaseSound((signed char)state[0x27], object);
             state[0x27] = -1;
             ref_L00_003D4A20_01(2, 0, object);
@@ -188,27 +188,27 @@ destroy:
         }
         zero = 0;
         qcopy(temp, object+0x10);
-        ref_L00_003D4A20_14(temp, D_L00_001B027C);
+        ref_L00_003D4A20_14(temp, g_kilonoid_vector_scale);
         r = (func_001163B0()+48)&63;
         g = (func_001163B0()+32)&63;
         b = func_001163B0()&47;
         r |= g << 8;
         r |= b << 16;
-        color = r | (D_L00_001B0288 << 24);
+        color = r | (g_kilonoid_color_alpha << 24);
         flip = func_001163B0()%2;
         if (*(int *)(state+0x20)&1) flip = -flip;
-        n = ref_L00_003D4A20_07(D_L00_001B0274, D_L00_001B0278);
-        f = ref_L00_003D4A20_08(D_L00_001B0280, D_L00_001B0284);
-        ref_L00_003D4A20_15(temp, n, color, 2, flip, &zero, 0, f, 0.001f, D_L00_001B028C*0.00027777778f);
+        n = ref_L00_003D4A20_07(g_kilonoid_random_min, g_kilonoid_random_max);
+        f = ref_L00_003D4A20_08(g_kilonoid_float_min, g_kilonoid_float_max);
+        ref_L00_003D4A20_15(temp, n, color, 2, flip, &zero, 0, f, 0.001f, g_kilonoid_effect_size*0.00027777778f);
         ((KilonoidObjectView *)object)->flags |= 0x200;
-        object[0x23] -= 128/D_L00_001B0270;
+        object[0x23] -= 128/g_kilonoid_fade_frames;
         *(float *)(object+0xf8) = ref_L00_003D4A20_16(*(float *)(object+0xf8), 0.41887909f);
         break;
     }
     if (!object[0x20]) goto basis;
     {
         unsigned char *position = object+0x10;
-        if (!D_L00_001ADB2C) {
+        if (!g_active_tether_object) {
             if (g_hero_state.state == 39) ref_L00_003D4A20_05(position, position, g_hero_state.displacement);
             else {
                 ref_L00_003D4A20_05(temp, position, g_hero_state.velocity);

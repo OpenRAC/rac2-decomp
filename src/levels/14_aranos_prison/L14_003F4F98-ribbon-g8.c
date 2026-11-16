@@ -1,11 +1,11 @@
 #include "common.h"
 /* Adapted from RAC1 draw_scrolling_ribbon_colored (OpenRAC, GPL-3.0). */
-extern int D_L14_001B16A8 __attribute__((sda));
-extern int D_L14_001B16AC __attribute__((sda));
-extern int D_L14_001B1680 __attribute__((sda));
-extern int D_L14_001B1684 __attribute__((sda));
-extern float D_L14_001B1678 __attribute__((sda));
-extern char D_L14_001B9500[];
+extern int g_ribbon_l14_core_texture __attribute__((sda));
+extern int g_ribbon_l14_halo_texture __attribute__((sda));
+extern int g_ribbon_l14_core_color __attribute__((sda));
+extern int g_ribbon_l14_halo_color __attribute__((sda));
+extern float g_ribbon_l14_uv_scroll __attribute__((sda));
+extern char g_tether_l14_origin_vec[];
 extern long GetEffectTextureDescriptor(int);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
@@ -45,12 +45,12 @@ extern void gfx_add_draw_callback_third(void (*callback)(char *), void *object);
 extern void gfx_draw_ribbon_pair(char *object);
 extern int gfx_add_point_light(float *position, float range, float radius, int color);
 
-extern int D_L14_001B1618 __attribute__((sda));
-extern float D_L14_001B1688 __attribute__((sda));
-extern float D_L14_001B168C __attribute__((sda));
+extern int g_ribbon_l14_segment_count __attribute__((sda));
+extern float g_ribbon_l14_core_width __attribute__((sda));
+extern float g_ribbon_l14_halo_width __attribute__((sda));
 
-extern char *D_L14_001FE1C0[];
-extern char D_L14_002594F0[][0x280];
+extern char *g_effect_path_table[];
+extern char g_ribbon_buffers[][0x280];
 
 /* Moves the ribbon's head to the object's position, eases its height and adds it to the
    head; when the state is dirty, refreshes the newest four points of the ribbon's row from
@@ -72,15 +72,15 @@ void ribbon_update(char *self)
     FastVecAdd(&st->next, &st->pos, v);
     /* The new head is copied back into v as well; v is not used again. */
     qcopy(v, &st->next);
-    D_L14_001B1618 = 20;
+    g_ribbon_l14_segment_count = 20;
     ResetBoltPointsToLine(self);
 
     if (st->dirty != 0) {
         part_rebuild_lightning_bolt(self);
-        count = D_L14_001B1618;
-        src = D_L14_001FE1C0[st->shape];
+        count = g_ribbon_l14_segment_count;
+        src = g_effect_path_table[st->shape];
         for (i = count - 4; i < count; i++) {
-            qcopy_nc(&D_L14_002594F0[st->row][i * 16], src + i * 16 + 0x10);
+            qcopy_nc(&g_ribbon_buffers[st->row][i * 16], src + i * 16 + 0x10);
         }
         gfx_add_draw_callback_third(gfx_draw_ribbon_pair, self);
     }
@@ -89,11 +89,11 @@ void ribbon_update(char *self)
         st->dirty = 0;
         st->handle = gfx_add_point_light((float *)&st->pos, 0.0f, 0.0f, 0);
         *(unsigned char *)(self + 0x20) = 1;
-        st->count = D_L14_001B1618;
-        st->coreColor = D_L14_001B1680;
-        st->haloColor = D_L14_001B1684;
-        st->f40 = D_L14_001B1688;
-        st->f44 = D_L14_001B168C;
+        st->count = g_ribbon_l14_segment_count;
+        st->coreColor = g_ribbon_l14_core_color;
+        st->haloColor = g_ribbon_l14_halo_color;
+        st->f40 = g_ribbon_l14_core_width;
+        st->f44 = g_ribbon_l14_halo_width;
         st->mode = -1;
     }
 }
@@ -111,7 +111,7 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
     /* Each pass declares its own zero constant; one shared constant changes the code. */
     const float zero = 0.0f;
     RibbonOwnerState *state = *(RibbonOwnerState **)(object + 0x68);
-    long texture = GetEffectTextureDescriptor(D_L14_001B16A8);
+    long texture = GetEffectTextureDescriptor(g_ribbon_l14_core_texture);
 
     core.flags = 0x8000000048L;
     core.mode = 0xFF9000000260L;
@@ -122,7 +122,7 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
     core.color[2] = coreColor;
     core.color[1] = coreColor;
     core.color[0] = coreColor;
-    halo.texture = GetEffectTextureDescriptor(D_L14_001B16AC);
+    halo.texture = GetEffectTextureDescriptor(g_ribbon_l14_halo_texture);
     haloColor = state->haloColor | (outerAlpha << 24);
     halo.flags = core.flags;
     halo.mode = core.mode;
@@ -140,17 +140,17 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
     halo.uv[5] = zero;
     halo.uv[6] = 1.0f;
     halo.uv[7] = 1.0f;
-    core.uv[0] = D_L14_001B1678;
+    core.uv[0] = g_ribbon_l14_uv_scroll;
     core.uv[1] = zero;
-    core.uv[2] = D_L14_001B1678;
+    core.uv[2] = g_ribbon_l14_uv_scroll;
     core.uv[3] = 1.0f;
-    core.uv[4] = D_L14_001B1678 + 1.0f;
+    core.uv[4] = g_ribbon_l14_uv_scroll + 1.0f;
     core.uv[5] = zero;
-    core.uv[6] = D_L14_001B1678 + 1.0f;
+    core.uv[6] = g_ribbon_l14_uv_scroll + 1.0f;
     core.uv[7] = 1.0f;
 
     /* First core segment. */
-    FastVecSub(eye, points, D_L14_001B9500);
+    FastVecSub(eye, points, g_tether_l14_origin_vec);
     FastVecSub(tangent, &points[1], points);
     FastVecCross(normal, tangent, eye);
     initialLength = FastVecLength(normal);
@@ -162,7 +162,7 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
 
     for (i = 1; i < count - 1; i++) {
         float coreZero = 0.0f;
-        FastVecSub(eye, &points[i], D_L14_001B9500);
+        FastVecSub(eye, &points[i], g_tether_l14_origin_vec);
         FastVecSub(tangent, &points[i + 1], &points[i]);
         FastVecCross(normal, tangent, eye);
         length = FastVecLength(normal);
@@ -172,11 +172,11 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
         FastVecAdd(coreVertices[2], &points[i], normal);
         FastVecSub(coreVertices[3], &points[i], normal);
         if (i == 1) {
-            core.color[1] = D_L14_001B1680;
-            core.color[0] = D_L14_001B1680;
+            core.color[1] = g_ribbon_l14_core_color;
+            core.color[0] = g_ribbon_l14_core_color;
         } else if (i == count - 2) {
-            core.color[3] = D_L14_001B1680;
-            core.color[2] = D_L14_001B1680;
+            core.color[3] = g_ribbon_l14_core_color;
+            core.color[2] = g_ribbon_l14_core_color;
         } else if (i == 2) {
             core.color[1] = coreColor;
             core.color[0] = coreColor;
@@ -189,8 +189,8 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
     /* The halo omits the final core segment. */
     for (i = 0; i < count - 2; i++) {
         float haloZero = 0.0f;
-        FastVecSub(firstRay, &points[i], D_L14_001B9500);
-        FastVecSub(lastRay, &points[i + 1], D_L14_001B9500);
+        FastVecSub(firstRay, &points[i], g_tether_l14_origin_vec);
+        FastVecSub(lastRay, &points[i + 1], g_tether_l14_origin_vec);
         firstLength = FastVecLength(firstRay);
         lastLength = FastVecLength(lastRay);
         if (lastLength < firstLength) {
@@ -204,13 +204,13 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
             else
                 FastVecScale(firstRay, firstRay, lastLength / firstLength);
         }
-        FastVecAdd(first, D_L14_001B9500, firstRay);
-        FastVecAdd(last, D_L14_001B9500, lastRay);
+        FastVecAdd(first, g_tether_l14_origin_vec, firstRay);
+        FastVecAdd(last, g_tether_l14_origin_vec, lastRay);
         FastVecSub(tangent, last, first);
         FastVecScale(extension, tangent, extend);
         FastVecSub(first, first, extension);
         FastVecAdd(last, last, extension);
-        FastVecSub(toEye, D_L14_001B9500, first);
+        FastVecSub(toEye, g_tether_l14_origin_vec, first);
         FastVecCross(normal, toEye, tangent);
         haloLength = FastVecLength(normal);
         if (haloLength != haloZero)
@@ -221,11 +221,11 @@ void DrawPrisonScrollingRibbonWithHalo(char *object, RibbonPoint *points, int al
         FastVecAdd(haloVertices[2], last, widthVector);
         FastVecSub(haloVertices[3], last, widthVector);
         if (i == 0) {
-            halo.color[1] = D_L14_001B1684;
-            halo.color[0] = D_L14_001B1684;
+            halo.color[1] = g_ribbon_l14_halo_color;
+            halo.color[0] = g_ribbon_l14_halo_color;
         } else if (i == count - 3) {
-            halo.color[3] = D_L14_001B1684;
-            halo.color[2] = D_L14_001B1684;
+            halo.color[3] = g_ribbon_l14_halo_color;
+            halo.color[2] = g_ribbon_l14_halo_color;
         } else if (i == 1) {
             halo.color[1] = haloColor;
             halo.color[0] = haloColor;

@@ -1,10 +1,11 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_0026F608(void)
+void stub_empty_19_pal(void)
 {
 }
 
-void func_PAL_0026F620(void)
+void stub_empty_21_pal(void)
 {
 }
 

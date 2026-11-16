@@ -10,12 +10,12 @@ extern Shop_002F9198 g_vendor_menu_state;
 /* One font glyph: its texture cell, its top offset and its advance. */
 typedef struct { u8 u, v; signed char top, adv; } Glyph_002F97A0;
 
-extern Glyph_002F97A0 D_00263EF0[];
+extern Glyph_002F97A0 g_font_glyphs_medium[];
 extern u64 GetEffectTextureDescriptor(int);
 extern float IntToFloat(int);
 extern void EmitTexturedRectangle(float, float, float, float, int, int, int, int, u32 *, u64);
 
-void func_US2_002FA630(u64 color, u8 *text, int limit, float x, float y, float scale)
+void draw_large_text_edge_faded_us2(u64 color, u8 *text, int limit, float x, float y, float scale)
 {
     u32 colors[4];
     u32 gray[4];
@@ -39,7 +39,7 @@ void func_US2_002FA630(u64 color, u8 *text, int limit, float x, float y, float s
 
     texture = GetEffectTextureDescriptor(2);
     size = scale * 16.0f;
-    glyphs = D_00263EF0;
+    glyphs = g_font_glyphs_medium;
     color &= 0xFFFFFF;
     if (limit == 0 || *text == 0)
         return;

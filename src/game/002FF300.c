@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *D_001B2348 __attribute__((sda));
+extern char *g_effect_object __attribute__((sda));
 extern void moby_init_with_private_data(char *, int);
 extern void anim_start_immediate(char *, int, int);
 extern void func_002A0F48(char *);
@@ -10,7 +10,7 @@ extern void func_002A0F48(char *);
 char *part_init_shared_effect_object(int mode, int variant)
 {
     char *object;
-    object = D_001B2348;
+    object = g_effect_object;
     moby_init_with_private_data(object, mode);
     *(unsigned short *)(object + 0x34) &= 0xFFBC;
     *(unsigned char *)(object + 0x30) = 0xFF;

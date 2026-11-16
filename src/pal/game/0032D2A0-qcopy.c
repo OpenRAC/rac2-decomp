@@ -11,7 +11,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void gfx_draw_beam_ribbon(void *, int, void *, int);
 
-void func_PAL_0032D408(char *object, char *state) {
+void gfx_draw_lightning_bolt_variant_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;
     int i;

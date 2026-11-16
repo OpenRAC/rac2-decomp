@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_001AFC6C;
+extern s32 g_explosion_particle_trim;
 extern s32 g_001AFC6C __attribute__((sda));
-extern f32 D_001B0A80 __attribute__((sda));
-extern f32 D_001B0A84 __attribute__((sda));
+extern f32 g_explosion_speed_a __attribute__((sda));
+extern f32 g_explosion_speed_b __attribute__((sda));
 extern s8 g_active_camera[];
 struct Vec4 { f32 x; f32 y; f32 z; f32 w; };
 struct Obj { s8 pad[0x10]; struct Vec4 pos; };
@@ -51,7 +51,7 @@ void func_PAL_00333CD8(struct Obj *arg0)
     f32 d80;
 
     i = 0;
-    if (0x21 - D_001AFC6C > 0) {
+    if (0x21 - g_explosion_particle_trim > 0) {
         do {
             i++;
             ra = math_random_float_range(0.0f, 0.3700000047683716f);
@@ -67,10 +67,10 @@ void func_PAL_00333CD8(struct Obj *arg0)
             vec_build_spherical_offset(&b, re, rf, rg);
             rh = math_random_int_range(0x19, 0x2F);
             func_PAL_002BE880(&a, &b, 0x4F20507F, 0x102F, rh, 150000.0f);
-        } while (i < 0x21 - D_001AFC6C);
+        } while (i < 0x21 - g_explosion_particle_trim);
     }
     j = 0;
-    if (0x32 - D_001AFC6C > 0) {
+    if (0x32 - g_explosion_particle_trim > 0) {
         tb = (struct Tab *)g_active_camera;
         do {
             j++;
@@ -82,19 +82,19 @@ void func_PAL_00333CD8(struct Obj *arg0)
             b.y = arg0->pos.y + r4;
             r5 = math_random_signed_float_range(0.0f, 0.15000000596046448f);
             b.z = arg0->pos.z + r5;
-            d80 = D_001B0A80;
+            d80 = g_explosion_speed_a;
             r6 = math_random_signed_float_range(0.0f, -1.5707964897155762f);
             p2 = FastAddRotations(p1, r6);
             pa = math_fast_sin_or_cos_a(p2);
             a.x = pa * 0.020000001f * d80;
             pb = math_fast_sin_or_cos_b(p2);
             a.y = pb * 0.020000001f * d80;
-            d80 = D_001B0A84;
+            d80 = g_explosion_speed_b;
             a.z = d80 * 0.020000001f;
             func_PAL_002C8BD0(&b, &a, 0xFA);
-        } while (j < 0x32 - D_001AFC6C);
+        } while (j < 0x32 - g_explosion_particle_trim);
     }
-    g_001AFC6C = D_001AFC6C - 1;
+    g_001AFC6C = g_explosion_particle_trim - 1;
     moby_release_slot_by_id(arg0);
     moby_mark_spawned(arg0);
 }

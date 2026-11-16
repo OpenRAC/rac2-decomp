@@ -18,7 +18,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern void moby_mark_spawned(void *);
-extern char *D_L00_001B05DC __attribute__((sda));
+extern char *g_mini_nuke_blast_moby __attribute__((sda));
 extern char g_hero_moby[];
 
 /* Creates the Mini-Nuke blast object at a position, turns it to face along the given direction, and replaces any earlier blast. */
@@ -53,9 +53,9 @@ char *mini_nuke_blast_create(TI128 *position, TI128 *direction)
         *(float *)((char *)&local.v0 + 12) = math_fast_sin_or_cos_a(half);
         quaternion_to_rotation_basis(&local.v0, &local.v3);
         multiply_matrix3x3(basis, &local.v3, basis);
-        if (D_L00_001B05DC != 0)
-            moby_mark_spawned(D_L00_001B05DC);
-        D_L00_001B05DC = blast;
+        if (g_mini_nuke_blast_moby != 0)
+            moby_mark_spawned(g_mini_nuke_blast_moby);
+        g_mini_nuke_blast_moby = blast;
     }
     return blast;
 }

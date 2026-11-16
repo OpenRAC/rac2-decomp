@@ -11,10 +11,10 @@ typedef struct {
     f32 f20;
 } FollowVars;
 extern char g_hero_state[];
-extern u32 D_00138320;
+extern u32 g_pad_pressed_flags;
 extern unsigned int shop_get_entry_for_state(int);
 extern unsigned int func_PAL_L22_002C99C8(int, int);
-extern void func_PAL_L00_002D2668(int, int, float);
+extern void set_hero_animation_pal(int, int, float);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void gfx_add_draw_callback_first(void (*)(char *), char *);
@@ -26,7 +26,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int PlayMobySound(int, int, char *);
-extern s32 func_PAL_00311D98(s32 arg0, f32 fparg0);
+extern s32 swingshot_hook_spawn_pal(s32 arg0, f32 fparg0);
 extern void DrawWavyLinkStrip(char *);
 
 void func_PAL_L22_0039EBE4(u8 *self)
@@ -44,7 +44,7 @@ void func_PAL_L22_0039EBE4(u8 *self)
         return;
     vars = 0;
     if (data->target == 0) {
-        data->target = (u8 *)func_PAL_00311D98((s32)self, 0.96000004f);
+        data->target = (u8 *)swingshot_hook_spawn_pal((s32)self, 0.96000004f);
         if (data->target == 0)
             goto have;
     }
@@ -132,7 +132,7 @@ have:
                 func_PAL_L22_002C99C8(6, 1);
             } else {
                 func_PAL_L22_002C99C8(0, 0);
-                func_PAL_L00_002D2668(shop_get_entry_for_state(0), 0, 12.0f);
+                set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
             }
             self[0x20] = 6;
         } else if (dist < fast_vec_dist(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10)) {
@@ -169,10 +169,10 @@ have:
             if (data->f20 < 0.16800001f) {
                 ((Hero *)g_hero_state)->i[0x684 / 4] = 0;
                 if (data->target != 0 && fast_vec_dist(data->target + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) > 3.5f) {
-                    if ((D_00138320 & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
+                    if ((g_pad_pressed_flags & ((Hero *)g_hero_state)->u[0x1230 / 4]) == 0) {
                         ((Hero *)g_hero_state)->i[0xAC8 / 4] = 1;
                         func_PAL_L22_002C99C8(0, 0);
-                        func_PAL_L00_002D2668(shop_get_entry_for_state(0), 0, 12.0f);
+                        set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
                         self[0x20] = 6;
                     } else {
                         PlayMobySound(2, 0, (char *)self);
@@ -304,7 +304,7 @@ have:
                 func_PAL_L22_002C99C8(6, 1);
             } else {
                 func_PAL_L22_002C99C8(0, 0);
-                func_PAL_L00_002D2668(shop_get_entry_for_state(0), 0, 12.0f);
+                set_hero_animation_pal(shop_get_entry_for_state(0), 0, 12.0f);
             }
             self[0x20] = 0x13;
         } else {

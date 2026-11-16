@@ -22,11 +22,11 @@ typedef struct V2 {
     float x;
     float y;
 } V2;
-extern V2 D_L00_001AFBC8;
+extern V2 g_helper_hit_position;
 extern void func_37CB80(void *, void *, float, void *);
 extern NODE *func_3100D8();
 
-void func_PAL_L00_003BBD00(NODE *a0)
+void helper_update_hit_test_pal(NODE *a0)
 {
     NODE *o = a0->f68;
 
@@ -35,7 +35,7 @@ void func_PAL_L00_003BBD00(NODE *a0)
     if (o->f2C == 0) {
         func_37CB80(o, (char *)o + 0x10, 1.0f, 0);
     } else {
-        V2 v = D_L00_001AFBC8;
+        V2 v = g_helper_hit_position;
 
         func_37CB80(o, (char *)o + 0x10, 1.0f, &v);
     }

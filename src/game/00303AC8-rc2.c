@@ -24,8 +24,8 @@
  */
 #include "common.h"
 
-extern s8 D_00222AE0[];
-extern s8 D_002222E0[];
+extern s8 g_surface_grid_points[];
+extern s8 g_surface_grid_noise_table[];
 extern s8 g_hero_position[];
 extern s32 IsPointInCuboid(s32 noise_ptr, s32 index);
 
@@ -44,10 +44,10 @@ void surface_grid_update_heights(void *object) {
     index = (*(s32 *)((s8 *)(state) + (0x44)));
     if (index != -1 && IsPointInCuboid((s32)g_hero_position, index) != 0 && !((*(u32 *)((s8 *)(state) + (0x4C))) & 4)) {
         table_offset = (*(s32 *)((s8 *)(state) + (0x40))) << 10;
-        table_ptr = (s8 *)D_00222AE0;
+        table_ptr = (s8 *)g_surface_grid_points;
         table_ptr += 8;
         height_ptr = table_ptr + table_offset;
-        noise_ptr = D_002222E0;
+        noise_ptr = g_surface_grid_noise_table;
         for (index = 0; index < 0x40; index++) {
             *(f32 *)height_ptr = (*(f32 *)((s8 *)(state) + (0x70))) + (*(f32 *)((s8 *)(state) + (4)));
             flags = (*(s32 *)((s8 *)(state) + (0x4C)));

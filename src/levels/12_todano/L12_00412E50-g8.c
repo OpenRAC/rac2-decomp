@@ -1,12 +1,12 @@
 #include "common.h"
 
 /* The two rate pairs the state table selects and the four scales the emitter applies. */
-extern f32 D_L12_001B17F4 __attribute__((sda));
-extern f32 D_L12_001B17F8 __attribute__((sda));
-extern f32 D_L12_001B17FC __attribute__((sda));
-extern f32 D_L12_001B1800 __attribute__((sda));
-extern f32 D_L12_001B1804 __attribute__((sda));
-extern f32 D_L12_001B1808 __attribute__((sda));
+extern f32 g_guard_anim_rate_a __attribute__((sda));
+extern f32 g_guard_anim_rate_b __attribute__((sda));
+extern f32 g_guard_switch_rate_a __attribute__((sda));
+extern f32 g_guard_switch_rate_b __attribute__((sda));
+extern f32 g_guard_anim_rate_c __attribute__((sda));
+extern f32 g_guard_anim_rate_d __attribute__((sda));
 
 extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
 extern void anim_start_blended(void *, s32, s32, s32);
@@ -47,19 +47,19 @@ void guard_switch_animation(u8 *moby, s32 anim_id, s32 anim_flags, s32 blend_fra
     u8 *owner;
 
     if (anim_id == 12) {
-        rate0 = D_L12_001B17F4;
-        rate1 = D_L12_001B17F8;
-        rate2 = D_L12_001B1804;
-        rate3 = D_L12_001B1808;
+        rate0 = g_guard_anim_rate_a;
+        rate1 = g_guard_anim_rate_b;
+        rate2 = g_guard_anim_rate_c;
+        rate3 = g_guard_anim_rate_d;
         moby_set_controller_speed_limits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
             rate2 * 4.8481375e-06f,
             rate3 * 0.00029088824f);
         vars->field_118 = vars->field_118 * 2.0f;
     } else {
-        rate0 = D_L12_001B17FC;
-        rate1 = D_L12_001B1800;
-        rate2 = D_L12_001B1804;
-        rate3 = D_L12_001B1808;
+        rate0 = g_guard_switch_rate_a;
+        rate1 = g_guard_switch_rate_b;
+        rate2 = g_guard_anim_rate_c;
+        rate3 = g_guard_anim_rate_d;
         moby_set_controller_speed_limits(moby, rate0 * 0.00027777778f, rate1 * 0.016666668f,
             rate2 * 4.8481375e-06f,
             rate3 * 0.00029088824f);

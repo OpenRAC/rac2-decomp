@@ -9,7 +9,7 @@ extern char g_pause_menu_state[];
 extern int g_pad_state[];
 extern float g_screen_fade __attribute__((sda));
 extern unsigned char D_001B1F10_sda __attribute__((sda));
-extern unsigned char D_001B1F10;
+extern unsigned char g_render_flag_byte;
 extern void snd_play_menu_sound_if_enabled(int, int);
 extern int request_begin_slot(int, int, int, int, int);
 extern void FadeToBlack(int);
@@ -80,7 +80,7 @@ finish:
             } else {
                 FadeToBlack(4);
                 object->timer = 0x10;
-                D_001B1F10_sda = !D_001B1F10;
+                D_001B1F10_sda = !g_render_flag_byte;
             }
         } else if (object->list[object->cursor].toggle) {
             *object->list[object->cursor].toggle = !*object->list[object->cursor].toggle;

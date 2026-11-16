@@ -1,11 +1,11 @@
 #include "common.h"
 
 /* Dobbo data reached through $gp in ordinary flow: this unit is assembled with -G8. */
-extern f32 D_L09_001B1830 __attribute__((sda));
-extern f32 D_L09_001B1834 __attribute__((sda));
-extern f32 D_L09_001B1838 __attribute__((sda));
-extern f32 D_L09_001B183C __attribute__((sda));
-extern f32 D_L09_001B1840 __attribute__((sda));
+extern f32 g_part_pitch_speed __attribute__((sda));
+extern f32 g_part_pitch_limit __attribute__((sda));
+extern f32 g_part_yaw_speed __attribute__((sda));
+extern f32 g_part_yaw_limit_min __attribute__((sda));
+extern f32 g_part_yaw_limit_max __attribute__((sda));
 
 extern void func_31F728(char *moby, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14);
 
@@ -17,10 +17,10 @@ void parts_turn_to_target_angles(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
 
-    func_31F728(moby, (f32 *)(vars + 0x74), (f32 *)(vars + 0x70), D_L09_001B1830,
-                D_L09_001B1834 * 0.000290888245f, -1.0f);
-    func_31F7E0(moby, (f32 *)(vars + 0x78), (f32 *)(vars + 0x7C), D_L09_001B1838,
-                D_L09_001B183C * 0.000290888245f, D_L09_001B1840 * 0.000290888245f);
+    func_31F728(moby, (f32 *)(vars + 0x74), (f32 *)(vars + 0x70), g_part_pitch_speed,
+                g_part_pitch_limit * 0.000290888245f, -1.0f);
+    func_31F7E0(moby, (f32 *)(vars + 0x78), (f32 *)(vars + 0x7C), g_part_yaw_speed,
+                g_part_yaw_limit_min * 0.000290888245f, g_part_yaw_limit_max * 0.000290888245f);
 }
 
 extern int PlayMobySound(int, int, void *);
@@ -39,12 +39,12 @@ typedef struct {
 extern TriggerPlayer g_hero_state;
 extern int g_current_map_index __attribute__((sda));
 /* Flag bytes indexed by level * 16 + owner; 3-bit counters indexed by level * 1024, two per byte. */
-extern u8 D_0019B2E8[];
-extern u8 D_0019B4A8[];
+extern u8 g_moby_group_flags[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 pad[0x464]; u8 spent[0]; } TriggerCellFlags;
-extern TriggerCellFlags D_L09_0021E9F0;
-extern char *D_L09_001B0834;
-extern char *D_L09_001B1648;
+extern TriggerCellFlags g_dobbo_flags;
+extern char *g_floor_l09_switch_player;
+extern char *g_floor_l09_switch_player_2;
 
 typedef struct TriggerState { float angle; int enabled; } TriggerState;
 typedef struct {
@@ -90,12 +90,12 @@ void floor_l09_switch_update(TriggerObject *obj)
         if (g_hero_state.standing != (char *)obj || g_hero_state.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
             level = g_current_map_index;
-            if (!(D_0019B2E8[obj->owner + level * 16] & 0x80) || s->enabled) {
+            if (!(g_moby_group_flags[obj->owner + level * 16] & 0x80) || s->enabled) {
                 int id;
                 if (!s->enabled) return;
                 id = obj->id;
-                if (!D_L09_0021E9F0.spent[(short)id]) {
-                    int count = D_0019B4A8[((short)id >> 1) + (level << 10)];
+                if (!g_dobbo_flags.spent[(short)id]) {
+                    int count = g_moby_nibble_table[((short)id >> 1) + (level << 10)];
                     if (id & 1) {
                         if (((count >> 4) & 7) != 0) goto activate;
                         goto proximity;
@@ -112,18 +112,18 @@ activate:
             PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
             } else {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                 if ((*counts & 7) != 7) ++*counts;
             }
         }
 proximity:
         if (s->enabled) {
-            player = D_L09_001B0834;
+            player = g_floor_l09_switch_player;
             if (!player) {
-                player = D_L09_001B1648;
+                player = g_floor_l09_switch_player_2;
                 if (!player) return;
             }
             /* Retail fills this raised copy but measures from the position itself. */
@@ -132,10 +132,10 @@ proximity:
             if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                    u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
                 } else {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (g_current_map_index << 10)];
+                    u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
                 obj->status = 2;

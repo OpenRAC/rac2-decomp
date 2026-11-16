@@ -1,16 +1,16 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L02_001B0A18[] __attribute__((sda));
+extern float g_slot_effect_rate_range[] __attribute__((sda));
 typedef union { u8 b[0x200]; u32 w[0x80]; } GameFlags;
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 #define FLAG (((GameFlags *)D_001395B8)->b[0x8F])
-extern int D_L02_001B0938[] __attribute__((sda));
-extern char D_L02_001B0978[], D_L02_001B09A8[];
+extern int g_slot_machine_prize_weights[] __attribute__((sda));
+extern char g_str_slot_debug_a[], g_str_slot_debug_b[];
 extern char g_sound_state[];
 typedef union { u8 b[0x2600]; f32 f[0x980]; } Hero;
 extern u8 g_hero_state[];
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 extern int g_hovering_object_count, g_player_bolts;
 extern void gfx_add_draw_callback_first(void (*)(char *), void *);
 extern void DrawScrollingTileBands(char *);
@@ -22,13 +22,13 @@ extern void func_L00_0030C710(int);
 extern void STUB_printf(char *, ...);
 extern int func_PAL_002AF6C0(char *, float);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L02_003EB998(void *), func_PAL_L02_003EBBD0(void *), snd_stop_voice(int);
+extern void func_PAL_L02_003EB998(void *), slot_machine_award_prize_pal(void *), snd_stop_voice(int);
 extern void anim_start_immediate(void *, int, int);
 extern void func_PAL_L02_003EB760(void *);
 extern void moby_compute_local_point(void *, void *, float, float, float);
 extern void part_init_effect_record(void *, void *, int, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern char *moby_find_group_in_state_13(int);
 extern void moby_teleport_to_new_pose(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -71,7 +71,7 @@ void func_PAL_L02_003EB160(char *actor) {
     setup->reel[1] = zero;
     setup->reel[0] = zero;
     rate = (float *)(state + 0x84);
-    for (i = 2; i >= 0; i--) *rate++ = math_random_float_range(D_L02_001B0A18[0], D_L02_001B0A18[1]) * 0.020000001f;
+    for (i = 2; i >= 0; i--) *rate++ = math_random_float_range(g_slot_effect_rate_range[0], g_slot_effect_rate_range[1]) * 0.020000001f;
     if (math_random_int_below(2)) *(unsigned short *)(actor + 0x34) |= 0x8000;
     else *(unsigned short *)(actor + 0x34) &= 0x7FFF;
     *(unsigned short *)(actor + 0x34) |= 0x4000;
@@ -81,12 +81,12 @@ void func_PAL_L02_003EB160(char *actor) {
         if (*(unsigned char *)(actor + 0x43) != 1) func_PAL_002A7E68(actor, 1, 0, 1);
         func_L00_0030C710(0xC8);
         if (FLAG < 0x7F) FLAG++;
-        if (FLAG > 0x24 && D_L02_001B0938[5] < 30) {
-            D_L02_001B0938[5] += 40;
-            D_L02_001B0938[1] -= 40;
-            STUB_printf(D_L02_001B0978);
+        if (FLAG > 0x24 && g_slot_machine_prize_weights[5] < 30) {
+            g_slot_machine_prize_weights[5] += 40;
+            g_slot_machine_prize_weights[1] -= 40;
+            STUB_printf(g_str_slot_debug_a);
         }
-        STUB_printf(D_L02_001B09A8, FLAG);
+        STUB_printf(g_str_slot_debug_b, FLAG);
     }
     if (*(unsigned char *)(actor + 0x43) == 1) {
         if (*(unsigned char *)(actor + 0x60) & 2) {
@@ -114,7 +114,7 @@ void func_PAL_L02_003EB160(char *actor) {
         }
         *(int *)(state + 0x54) = -1;
     }
-    func_PAL_L02_003EBBD0(actor);
+    slot_machine_award_prize_pal(actor);
         break;
     case 5:
     {
@@ -137,13 +137,13 @@ void func_PAL_L02_003EB160(char *actor) {
         hit.flags = 1;
         hit.sourceClass = ((SlotActor003E6D70 *)actor)->classId;
         coll_process_hit(point, 16, actor, &hit, 4.0f);
-        func_PAL_L00_003FB330(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
+        SpawnExplosion_pal(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
         if (*(int *)(state + 0x58)) {
             for (i = 0; i < 2; i++) {
                 char *prize = moby_find_group_in_state_13(*(int *)(state + 0x58));
                 if (prize) {
                     moby_compute_local_point(actor, prizePoint, 0.5f, (float)i * 0.9f - 0.45f, 0.0f);
-                    moby_teleport_to_new_pose(prize, prizePoint, D_L02_001A8F20);
+                    moby_teleport_to_new_pose(prize, prizePoint, g_zero_l02_vector);
                     *(float *)(prize + 0xF8) = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(float *)(prize + 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - *(float *)(prize + 0x14));
                 }
             }

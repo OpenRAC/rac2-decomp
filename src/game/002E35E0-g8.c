@@ -11,7 +11,7 @@ extern char ref_L00_002E35E0_01[] __attribute__((sda));
 extern char ref_L00_002E35E0_02[] __attribute__((sda));
 extern char ref_L00_002E35E0_03[] __attribute__((sda));
 extern float ref_L00_002E35E0_04 __attribute__((sda));
-extern int D_001A72E0;
+extern int g_vram_zbuffer_address;
 extern void gfx_resident_table_reset(void);
 extern void set_identity_matrix(void *);
 extern void vec_clear_128(void *);
@@ -56,5 +56,5 @@ void cam_build_view_transforms(void)
     }
     gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
-    VU1_addGSregister(0x4E, 0x1000000 | (D_001A72E0 >> 13));
+    VU1_addGSregister(0x4E, 0x1000000 | (g_vram_zbuffer_address >> 13));
 }

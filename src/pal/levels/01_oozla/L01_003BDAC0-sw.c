@@ -35,15 +35,15 @@ typedef struct {
     int active;
 } HeroView;
 extern HeroView g_hero_state;
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index MACRO_ADDR;
-extern char *D_L01_001FE180[];
+extern char *g_path_l01_table[];
 extern char *g_moby_l01_table __attribute__((sda));
-extern float D_L01_001AFE18[] __attribute__((sda));
-extern float D_L01_002A48B0[], D_L01_002A45D0[];
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L01_00297300;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L01_00297380;
-extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L01_00297400;
+extern float g_water_l01_height[] __attribute__((sda));
+extern float g_ferry_height_offsets_alt[], g_ferry_height_offsets[];
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_a;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_b;
+extern struct Rac2Native_5f824a0e369ccf7b_src_record g_ferry_src_record_c;
 extern float func_PAL_L01_003BEB40(void);
 extern int func_001163B0(void);
 extern void func_PAL_002A7E68(unsigned char *, int, int, int);
@@ -77,7 +77,7 @@ extern char *part_spawn_drifting(void *, float, float, void *, int);
 extern void path_sample_position(void *, int, void *, void *, int, float);
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern void slot_reset_active(int);
-extern PoolRecord64 *func_PAL_L00_002D7850(int);
+extern PoolRecord64 *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(unsigned char *);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -95,8 +95,8 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
 {
     Vector old_position, old_rotation, direction, target, velocity;
     char *context = P(object, 0x68);
-    char *outbound = D_L01_001FE180[I(context, 0x290)];
-    char *inbound = D_L01_001FE180[I(context, 0x294)];
+    char *outbound = g_path_l01_table[I(context, 0x290)];
+    char *inbound = g_path_l01_table[I(context, 0x294)];
     char *hit, *child, *other;
     float surface;
     int i, index;
@@ -140,7 +140,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
         ready = 1;
         for (i = 0; i < 5; ++i) {
             index = I(context, 0x2DC + 4*i);
-            if (index != -1 && !(D_0019B2E8[index + bank] & 0x80)) ready = 0;
+            if (index != -1 && !(g_moby_group_flags[index + bank] & 0x80)) ready = 0;
         }
         if (ready) {
             object[0x31] = 1;
@@ -155,7 +155,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
         int i;
         hit = part_find_owned_effect_slot(object, 0x10000, 0);
         if (hit && (!P(hit, 0x20) || H(P(hit, 0x20), 0xAA) != 0xCE7)) {
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) slot_copy_records_to_free(&D_L01_00297300);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) slot_copy_records_to_free(&g_ferry_src_record_a);
             if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 5, 3);
             moby_set_state(object, 3, -1);
         } else {
@@ -182,7 +182,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
                 F(object, 0x48) = math_random_float_range(0.8f, 1.2f);
             }
             if (g_hero_state.interaction == (char *)object && g_hero_state.active) {
-                slot_copy_records_to_free(&D_L01_00297300);
+                slot_copy_records_to_free(&g_ferry_src_record_a);
                 if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 5, 3);
                 moby_set_state(object, 3, -1);
             }
@@ -192,7 +192,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
     }
     case 3:
         if (object[0x60] & 2) {
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) I(context, 0x2F0) = slot_copy_records_to_free(&D_L01_00297380);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) I(context, 0x2F0) = slot_copy_records_to_free(&g_ferry_src_record_b);
             if (object[0x43] != 3) func_PAL_002A7E68(object, 3, 0, 6);
             F(context, 0x2CC) = F(context, 0x2D0) = 10.0f;
             moby_set_state(object, 4, -1);
@@ -243,13 +243,13 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
             velocity.v[2] = surface;
             rate = math_random_float_range(2.0f, 3.0f);
             i = math_random_int_below(6);
-            child = part_spawn_drifting(&velocity, rate, 15600.001f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
+            child = part_spawn_drifting(&velocity, rate, 15600.001f, g_water_l01_height, ((u32)(i+20)<<24)|0x5060U);
             if (child) child[9] = FloatToInt(16.0f)+32;
         }
         if ((float)(I(outbound, 0)-1) <= F(context, 0x2B0)) {
             slot_reset_active(I(context, 0x2F0));
             I(context, 0x2F0) = -1;
-            if (g_hero_state.interaction == (char *)object && g_hero_state.active) slot_copy_records_to_free(&D_L01_00297400);
+            if (g_hero_state.interaction == (char *)object && g_hero_state.active) slot_copy_records_to_free(&g_ferry_src_record_c);
             if (object[0x43] != 6) func_PAL_002A7E68(object, 6, 0, 10);
             U(object, 0x96) = 0;
             object[0x20] = 5;
@@ -271,7 +271,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
         }
         if (target.v[3] == 12345.0f) {
             if (!P(context, 0x2AC)) {
-                P(context, 0x2AC) = (char *)func_PAL_L00_002D7850(5);
+                P(context, 0x2AC) = (char *)cam_alloc_override_slot_pal(5);
                 if (!P(context, 0x2AC)) break;
             }
             child = P(context, 0x2AC);
@@ -300,15 +300,15 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
         math_approach_target_with_braking(context+0x2C4, rate, 0.0024f, 0.0024f, 0.120000005f);
         vec_clamp_length(velocity.v, F(context, 0x2C4));
         FastVecAdd(object+0x10, object+0x10, &velocity);
-        if (object[0x20] == 5) F(object, 0x18) = F(outbound, 0x18) + D_L01_002A48B0[U(object, 0x96)];
-        else F(object, 0x18) = F(outbound, 0x18) + D_L01_002A45D0[U(object, 0x96)];
+        if (object[0x20] == 5) F(object, 0x18) = F(outbound, 0x18) + g_ferry_height_offsets_alt[U(object, 0x96)];
+        else F(object, 0x18) = F(outbound, 0x18) + g_ferry_height_offsets[U(object, 0x96)];
         if (U(object, 0x96) < 180) {
             U(object, 0x96)++;
             if (!math_random_int_below(8)) {
                 vec_add_random_offset(target.v, 0.01f);
                 target.v[2] = surface;
                 rate = math_random_float_range(0.02f, 0.1f); i = math_random_int_below(6);
-                part_spawn_drifting(&target, rate, 9.6e+03f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
+                part_spawn_drifting(&target, rate, 9.6e+03f, g_water_l01_height, ((u32)(i+20)<<24)|0x5060U);
             }
         } else {
             if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 10);
@@ -322,7 +322,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
             qcopy(&target, object+0x10);
             vec_add_random_offset(target.v, 0.5f); target.v[2] = surface;
             rate = math_random_float_range(2.0f, 3.0f); i = math_random_int_below(6);
-            child = part_spawn_drifting(&target, rate, 15600.001f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
+            child = part_spawn_drifting(&target, rate, 15600.001f, g_water_l01_height, ((u32)(i+20)<<24)|0x5060U);
             if (child) child[9] = FloatToInt(16.0f)+32;
         }
         if (P(context, 0x2AC)) { cam_end_override(P(context, 0x2AC)); P(context, 0x2AC) = 0; }
@@ -350,7 +350,7 @@ void func_PAL_L01_003BDAC0(unsigned char *object)
         for (i = 0; i < 3; ++i) moby_update_eased_node(object, context+0x90+i*0x80, i, 0.028800001f, 0.43200004f);
         if (object[0x20] != 6 && object[0x20] != 0 && !math_random_int_below(49)) {
             rate = math_random_float_range(3.0f, 5.0f); i = math_random_int_below(6);
-            child = part_spawn_drifting(object+0x10, rate, 15600.001f, D_L01_001AFE18, ((u32)(i+20)<<24)|0x5060U);
+            child = part_spawn_drifting(object+0x10, rate, 15600.001f, g_water_l01_height, ((u32)(i+20)<<24)|0x5060U);
             if (child) child[9] = FloatToInt(16.0f)+32;
         }
         FastVecSub(&direction, object+0x10, &old_position);

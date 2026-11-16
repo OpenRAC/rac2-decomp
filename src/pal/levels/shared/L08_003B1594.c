@@ -34,18 +34,18 @@ extern Moby_L08_003B2DB0 *CreateMoby(int);
 extern float fast_vec_dist(void *, void *);
 extern void *SpawnJointFollowParticle(void *, float, int, int, int);
 extern void func_002A0F48(void *);
-extern f32 D_L08_001BE0B0;
-extern u8 D_L08_00296CD0[];
-extern u8 D_L08_001DB5E7;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
+extern f32 g_saved_hold_float;
+extern u8 g_font_print_data[];
+extern u8 g_screen_update_index;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(void *);
 extern u8 *g_hero_moby;
 extern void func_002A0F48();
 
-Moby_L08_003B2DB0 *func_PAL_L08_003B6448(int owner, float *pos, float *dir, int life)
+Moby_L08_003B2DB0 *SpawnDirectedEffectObject_pal(int owner, float *pos, float *dir, int life)
 {
     float p[4] __attribute__((aligned(16)));
     float d[4] __attribute__((aligned(16)));

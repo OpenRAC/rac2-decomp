@@ -8,9 +8,9 @@
 extern void func_PAL_002AC3C0(void *,void *);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern int FastDecTimer(void *);
-extern float func_PAL_002AA108(void *,void *);
-extern int func_PAL_002B3F18(void *,void *,void *);
-extern char *D_001B1B5C;
+extern float moby_update_aim_target_strength_pal(void *,void *);
+extern int part_spawn_damage_debris_pal(void *,void *,void *);
+extern char *g_moby_pool_start;
 typedef struct { int frame; } DamageClock;
 extern DamageClock g_game_time;
 extern int D_001B1688_1;
@@ -23,7 +23,7 @@ extern void FastVecSub(void *,void *,void *);
 extern char g_hero_position[];
 extern void vec_transform_and_scale(void *,void *,void *,int,float);
 extern void FastVecScale(void *,void *,float);
-extern int func_PAL_002B1EE8(void *,void *,void *,int);
+extern int moby_start_hit_reaction_pal(void *,void *,void *,int);
 extern void moby_set_state(void *,int,int);
 
 int func_PAL_002B1A50(char *object,char *state,int special)
@@ -47,13 +47,13 @@ int func_PAL_002B1A50(char *object,char *state,int special)
             F(hit,0x2c)=original*F(state,0xa8);
         if (special) F(hit,0x2c)*=F(state,0xac);
     }
-    damage=func_PAL_002AA108(object,hit);
+    damage=moby_update_aim_target_strength_pal(object,hit);
     U(object,0xa8)=255;
     F(health,0)-=damage;
-    if (callback) func_PAL_002B3F18(object,callback,health);
+    if (callback) part_spawn_damage_debris_pal(object,callback,health);
     if (damage==0.0f) return 0;
     H(state,0x70)=-1;
-    if (hit && P(hit,0x20)) H(state,0x70)=(P(hit,0x20)-D_001B1B5C)>>8;
+    if (hit && P(hit,0x20)) H(state,0x70)=(P(hit,0x20)-g_moby_pool_start)>>8;
     kind=U(health,0x17);
     if (damage*((DamageClass *)(g_item_slot_to_record[kind]*224+(char *)g_weapon_table))->scale>=H(health,4)*F(state,0x58)) timeout=90;
     else timeout=300;
@@ -82,7 +82,7 @@ int func_PAL_002B1A50(char *object,char *state,int special)
         vector[2]=1.0f;
         vector[3]=5627.925f;
     }
-    if (func_PAL_002B1EE8(object,state,vector,result)) {
+    if (moby_start_hit_reaction_pal(object,state,vector,result)) {
         I(state,0x44)=D_001B1688_1;
         if (I(state,0x48)!=-1) moby_set_state(object,U(state,0x10),I(state,0x48));
         else moby_set_state(object,U(state,0x10),-1);

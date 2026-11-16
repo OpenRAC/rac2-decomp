@@ -2,15 +2,15 @@
 
 typedef int Vector __attribute__((mode(TI)));
 extern int g_blade_trail_count __attribute__((sda));
-extern float D_L02_001B0338 __attribute__((sda));
-extern float D_L02_001B033C __attribute__((sda));
-extern float D_L02_001B0340 __attribute__((sda));
-extern float D_L02_001B0350 __attribute__((sda));
-extern float D_L02_001B0354;
-extern float D_L02_001B0358;
-extern float D_L02_001B0360 __attribute__((sda));
-extern float D_L02_001B0364;
-extern float D_L02_001B0368;
+extern float g_trail_sample_unit_x __attribute__((sda));
+extern float g_trail_sample_unit_y __attribute__((sda));
+extern float g_trail_sample_unit_z __attribute__((sda));
+extern float g_trail_end_state_x __attribute__((sda));
+extern float g_trail_end_state_y;
+extern float g_trail_end_state_z;
+extern float g_trail_origin_state_x __attribute__((sda));
+extern float g_trail_origin_state_y;
+extern float g_trail_origin_state_z;
 extern Vector g_blade_trail_end_points[];
 extern Vector g_blade_trail_base_points[];
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -50,19 +50,19 @@ void chainblade_record_trail_sample(char *self, int joint) {
         if (error > 0.01f) {
             do {
                 int next;
-                error = math_fabs(math_step_value_toward_target(previous_end, &D_L02_001B0350, endpoint[0],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
-                error += math_fabs(math_step_value_toward_target(previous_end + 1, &D_L02_001B0354, endpoint[1],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
-                error += math_fabs(math_step_value_toward_target(previous_end + 2, &D_L02_001B0358, endpoint[2],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
+                error = math_fabs(math_step_value_toward_target(previous_end, &g_trail_end_state_x, endpoint[0],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
+                error += math_fabs(math_step_value_toward_target(previous_end + 1, &g_trail_end_state_y, endpoint[1],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
+                error += math_fabs(math_step_value_toward_target(previous_end + 2, &g_trail_end_state_z, endpoint[2],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
                 qcopy_nc(g_blade_trail_end_points + 1 + g_blade_trail_count, previous_end);
-                error += math_fabs(math_step_value_toward_target(previous_origin, &D_L02_001B0360, origin[0],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
-                error += math_fabs(math_step_value_toward_target(previous_origin + 1, &D_L02_001B0364, origin[1],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
-                error += math_fabs(math_step_value_toward_target(previous_origin + 2, &D_L02_001B0368, origin[2],
-                    D_L02_001B0338 * 0.00027777778f, D_L02_001B033C * 0.00027777778f, D_L02_001B0340 * 0.016666668f));
+                error += math_fabs(math_step_value_toward_target(previous_origin, &g_trail_origin_state_x, origin[0],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
+                error += math_fabs(math_step_value_toward_target(previous_origin + 1, &g_trail_origin_state_y, origin[1],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
+                error += math_fabs(math_step_value_toward_target(previous_origin + 2, &g_trail_origin_state_z, origin[2],
+                    g_trail_sample_unit_x * 0.00027777778f, g_trail_sample_unit_y * 0.00027777778f, g_trail_sample_unit_z * 0.016666668f));
                 qcopy_nc(g_blade_trail_base_points + 1 + g_blade_trail_count, previous_origin);
                 next = g_blade_trail_count;
                 if (next >= 50)

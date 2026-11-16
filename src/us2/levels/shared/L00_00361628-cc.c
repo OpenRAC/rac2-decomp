@@ -5,7 +5,7 @@
 /* Layouts measured from the selected-item panel. */
 typedef struct { unsigned int word[4]; } PanelColors;
 typedef struct { int price; int pad[3]; unsigned char *name; int pad2[2]; } ShopItem;
-extern PanelColors D_L00_001AD768;
+extern PanelColors g_menu_panel_colors;
 typedef struct { char prefix[0x144]; ShopItem items[0]; } ShopModel;
 extern ShopModel g_purchase_menu_model;
 typedef struct {
@@ -13,7 +13,7 @@ typedef struct {
     int value;
 } Entry32fd6f60;
 
-extern Entry32fd6f60 D_L07_002A4100[];
+extern Entry32fd6f60 g_level_entry_table[];
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_acdcf1600d770d3b_ScalarConfigure116State {
@@ -36,23 +36,23 @@ extern Rac2Native_acdcf1600d770d3b_ScalarConfigure116State D_00188660_2[];
  * argument; the record's index word is written at 126 and the value word at 140. */
 /* Builds a slot index out of three weight/kind arguments and fills the same 112-byte record as
  * above; the record's value word comes from the fifth argument, the helper's from the sixth. */
-extern Entry32fd6f60 D_L00_002A3B00[];
+extern Entry32fd6f60 g_sound_lookup_table[];
 
 /* Table search: walks the 8-byte records of D_L00_002A3B00 until the key is
  * found or the -1 terminator is met, and stores the record's index and value. */
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 typedef void (*DrawCallback)(void *);
-extern int D_L00_001A8F00 __attribute__((sda));
-extern char *D_L00_00220DA0[];
-extern short D_L00_001A8F80[2] MACRO_ADDR;
+extern int g_game_l00_mode __attribute__((sda));
+extern char *g_launch_moby_list[];
+extern short g_pickup_key_ids[2] MACRO_ADDR;
 extern unsigned int g_equipment_bits __attribute__((sda));
 extern Vector g_camera_l00_position;
 extern char g_hero_position[];
 
-extern unsigned int D_00138324;
+extern unsigned int g_pad_held_flags;
 extern char g_hero_moby_default[];
-extern int D_L00_001B1AE0 __attribute__((sda));
+extern int g_pickup_request_pending __attribute__((sda));
 extern void func_US2_002E72D8(void *);
 /* func_L00_002E6EF8 in level 0; its address differs in levels 8, 9, 19 and 30. */
 extern void ref_L00_003603C0_00(DrawCallback, void *);
@@ -89,13 +89,13 @@ void func_US2_L00_00361628(unsigned char *object) {
     char *spawn;
     unsigned int shade;
     int available;
-    if (!D_L00_001A8F00) func_US2_002E72D8(object);
+    if (!g_game_l00_mode) func_US2_002E72D8(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
-        key = D_L00_001A8F80[(g_equipment_bits >> 4) & 1];
-        for (index = 0; D_L00_00220DA0[index]; index++) {
-            slot = D_L00_00220DA0 + index;
-            if (*(short *)(D_L00_00220DA0[index] + 0xAA) == key) {
+        key = g_pickup_key_ids[(g_equipment_bits >> 4) & 1];
+        for (index = 0; g_launch_moby_list[index]; index++) {
+            slot = g_launch_moby_list + index;
+            if (*(short *)(g_launch_moby_list[index] + 0xAA) == key) {
                 shade = (int)(math_fast_sin_or_cos_a(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;
@@ -118,7 +118,7 @@ void func_US2_L00_00361628(unsigned char *object) {
     if (*(unsigned short *)(object + 0x34) & 1) *(short *)(private + 0xC) = 0;
     if (*(short *)(private + 0xC)) {
         available = TryClaimNotice(2, 0x12ea, 1) != 0;
-        if ((D_00138324 & 0x10) && available) {
+        if ((g_pad_held_flags & 0x10) && available) {
             offset.q = 0;
             angles.q = 0;
             offset.f[0] = 1.48f;
@@ -135,7 +135,7 @@ void func_US2_L00_00361628(unsigned char *object) {
             qcopy(spawn + 0x10, &angles);
             level_release_matching_resource(2);
             *(short *)(spawn - 0x4A) = 0;
-            D_L00_001B1AE0 = 1;
+            g_pickup_request_pending = 1;
         }
     }
 }

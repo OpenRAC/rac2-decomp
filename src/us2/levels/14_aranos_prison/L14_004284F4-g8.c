@@ -29,13 +29,13 @@ typedef struct PrisonLightState {
 /* A sound slot as seen from D_00188660 plus 0x70 per slot number. */
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
 extern char g_sound_state[];
-extern unsigned char D_0018C0D4 NOT_SDA;
-extern int D_L14_001B20C8;
-extern int D_L14_001B17C0 SDATA(D_L14_001B17C0);
-extern float D_L14_001B17C4 SDATA(D_L14_001B17C4);
-extern float D_L14_001B17C8 SDATA(D_L14_001B17C8);
-extern float D_L14_001B17D0 SDATA(D_L14_001B17D0);
-extern float D_L14_001B17D4 MACRO_ADDR;
+extern unsigned char g_screen_mode_flag NOT_SDA;
+extern int g_frame_tick_counter;
+extern int g_searchlight_period SDATA(D_L14_001B17C0);
+extern float g_searchlight_level_scale SDATA(D_L14_001B17C4);
+extern float g_searchlight_level_offset SDATA(D_L14_001B17C8);
+extern float g_searchlight_approach_rate SDATA(D_L14_001B17D0);
+extern float g_searchlight_decay_rate MACRO_ADDR;
 
 extern void moby_set_state(void *self, int state, int mode);
 extern void *part_find_owned_effect_slot(void *a0, int a1, int a2);
@@ -47,7 +47,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern float ApproachValue(float *, float, float);
 extern void moby_mark_spawned(void *a0);
 extern char *GetLocalizedString(int);
-extern void func_US2_L00_0030EFB8(void *, int);
+extern void level_l00_call_module_handler_with_arg_9_us2(void *, int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void part_spawn_spark_side(void *);
 
@@ -65,26 +65,26 @@ void func_US2_L14_004284F4(PrisonLight *object)
         state->sound = -1;
         break;
     case 1:
-        if (D_0018C0D4 != 1)
+        if (g_screen_mode_flag != 1)
             break;
         if (object->update)
             part_spawn_spark_side(object);
         if (part_find_owned_effect_slot(object, 0x10000, 0) || flag_is_third_pending_set(object)) {
-            func_US2_L00_0030EFB8(GetLocalizedString(0x2F53), 240);
+            level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x2F53), 240);
             moby_set_state(object, 2, -1);
         }
         if (((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner != object || !((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
             state->sound = PlayMobySound(0, 4, object);
         break;
     case 2:
-        ticks = D_L14_001B20C8;
-        period = D_L14_001B17C0;
+        ticks = g_frame_tick_counter;
+        period = g_searchlight_period;
         angle = IntToFloat(ticks % period);
         denominator = IntToFloat(period);
         angle *= 6.2831855f;
         angle /= denominator;
         angle = math_fast_sin_or_cos_b(angle - 3.1415927f);
-        ApproachValue(&state->level, D_L14_001B17C4 * angle + D_L14_001B17C8, D_L14_001B17D0 * 0.016666668f);
+        ApproachValue(&state->level, g_searchlight_level_scale * angle + g_searchlight_level_offset, g_searchlight_approach_rate * 0.016666668f);
         gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
         counter = object->frames;
         previous = counter++;
@@ -94,8 +94,8 @@ void func_US2_L14_004284F4(PrisonLight *object)
         if (state->sound != -1 && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner == object && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
             snd_stop_voice(state->sound);
         state->sound = -1;
-        if (!D_0018C0D4) {
-            func_US2_L00_0030EFB8(GetLocalizedString(0x2F54), 240);
+        if (!g_screen_mode_flag) {
+            level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x2F54), 240);
             flags = object->flags;
             object->pending = 0;
             flags |= 0x41;
@@ -106,7 +106,7 @@ void func_US2_L14_004284F4(PrisonLight *object)
         break;
     case 3:
         gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
-        ApproachValue(&state->level, 0.0f, D_L14_001B17D4 * 0.016666668f);
+        ApproachValue(&state->level, 0.0f, g_searchlight_decay_rate * 0.016666668f);
         if (state->level == 0.0f)
             moby_mark_spawned(object);
         break;

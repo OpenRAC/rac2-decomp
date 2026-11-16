@@ -26,7 +26,7 @@ typedef struct {
     Puff2BDBC0 p;
 } Effect2BDBC0;
 
-extern u8 *D_001F2598[];
+extern u8 *g_part_tex_growing_puff_table[];
 
 extern Effect2BDBC0 *part_alloc(int);
 extern int FloatToInt(float);
@@ -49,7 +49,7 @@ void part_spawn_growing_puff(void *pos, void *dir, u32 color, s32 flags, s32 fra
         effect->f3 = 0x44;
         effect->size = size * 0.2f;
         effect->f8 = func_001163B0();
-        effect->f2 = *D_001F2598[0];
+        effect->f2 = *g_part_tex_growing_puff_table[0];
         effect->frames = frames;
         puff->frames = frames;
         life_frames = IntToFloat(frames);

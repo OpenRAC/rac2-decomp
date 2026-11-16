@@ -1,30 +1,30 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L01_001FE180[];
+extern char *g_path_l01_table[];
 extern float math_random_float_range(float, float);
 extern int func_001163B0(void);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
-extern int D_L01_001B2088;
+extern int g_oozla_intro_stage;
 typedef struct {
     char pad[0x2C];
     float radius;
 } L01RadiusRecord;
-extern L01RadiusRecord *D_L01_001B21C0;
-extern char D_L01_001AFE38[] SDATA(D_L01_001AFE38);
+extern L01RadiusRecord *g_firefly_radius_record;
+extern char g_str_firefly_default[] SDATA(D_L01_001AFE38);
 extern void moby_update_floor_and_ceiling_heights(void *);
 extern int FloatToInt(float);
 extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_state(void *, int, int);
 
-void func_PAL_L01_003C12C8(char *obj)
+void mutant_firefly_init_pal(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     float value;
     L01RadiusRecord *record;
 
-    if (!D_L01_001B2088) **(int **)(state + 0x250) = 0;
+    if (!g_oozla_intro_stage) **(int **)(state + 0x250) = 0;
     qcopy(state + 0x1D0, obj + 0x10);
     moby_update_floor_and_ceiling_heights(obj);
     value = 0.0f;
@@ -32,20 +32,20 @@ void func_PAL_L01_003C12C8(char *obj)
     *(unsigned char *)(state + 0x4A) = FloatToInt(4.0f);
     *(unsigned char *)(state + 0x200) = *(unsigned char *)(obj + 0x30);
     if (*(int *)(state + 0x294) != -1) {
-        record = D_L01_001B21C0;
+        record = g_firefly_radius_record;
         record += *(int *)(state + 0x294);
         value = record->radius;
     }
     if (value > 0.0f) *(unsigned char *)(obj + 0x30) = FloatToInt(value + 2.0f);
     *(unsigned char *)(state + 0x200) = *(unsigned char *)(state + 0x201) = *(unsigned char *)(obj + 0x30);
     if (*(int *)(state + 0x298) != -1) {
-        record = D_L01_001B21C0;
+        record = g_firefly_radius_record;
         record += *(int *)(state + 0x298);
         value = record->radius;
     }
     if (value > 0.0f) *(unsigned char *)(state + 0x200) = FloatToInt(value + 2.0f);
-    if (*(int *)(state + 0x210) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(state + 0x210)]);
-    if (*(int *)(state + 0x214) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(state + 0x214)]);
+    if (*(int *)(state + 0x210) != -1) path_l01_compute_segment_lengths(g_path_l01_table[*(int *)(state + 0x210)]);
+    if (*(int *)(state + 0x214) != -1) path_l01_compute_segment_lengths(g_path_l01_table[*(int *)(state + 0x214)]);
     *(char **)(state + 0x10) = state + 0x50;
     *(unsigned char *)(state + 0x60) = 9;
     *(float *)(state + 0x80) = 0.3f;
@@ -68,7 +68,7 @@ void func_PAL_L01_003C12C8(char *obj)
     *(float *)(state + 0x260) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0003490659f;
     *(float *)(state + 0x264) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0003490659f;
     *(float *)(state + 0x268) = math_random_float_range(-3.1415927f, 3.1415927f) * 0.0003490659f;
-    *(void **)(state + 0x190) = D_L01_001AFE38;
+    *(void **)(state + 0x190) = g_str_firefly_default;
     *(float *)(state + 0x1C0) = *(float *)(*(char **)(obj + 0x24) + 0x24);
     *(float *)(state + 0x1B0) = *(float *)(state + 0x30);
     *(short *)(state + 0x202) = -1;

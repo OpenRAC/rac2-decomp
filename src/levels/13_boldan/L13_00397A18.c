@@ -5,12 +5,12 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern char *g_hero_moby NOT_SDA;
 /* Keep the model load as one macro instruction, as in retail. */
-extern int D_L13_001AC790 __attribute__((sda));
-extern Collision D_L13_001BFD00;
-extern Material D_L13_0026D270[];
+extern int g_shot_l13_model_id __attribute__((sda));
+extern Collision g_collision_l13_result;
+extern Material g_weapon_l13_table[];
 extern void FastVecAdd(char *, char *, char *);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecScale(void *, void *, float);
@@ -57,7 +57,7 @@ void bouncing_l13_shot_update(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L13_0026D270)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_weapon_l13_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -67,16 +67,16 @@ void bouncing_l13_shot_update(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L13_001BFD00;
+        collision = &g_collision_l13_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L13_001BFD00;
+            reread = &g_collision_l13_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L13_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == g_shot_l13_model_id && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -88,7 +88,7 @@ void bouncing_l13_shot_update(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L13_001BFD00;
+            collision = &g_collision_l13_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

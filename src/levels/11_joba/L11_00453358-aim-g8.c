@@ -35,12 +35,12 @@ typedef struct {
 /* Encoded entity id lists per group, the entity pool pointer and the group count. */
 extern u16 *g_group_id_lists[];
 extern Entity *g_moby_l11_table[] __attribute__((sda));
-extern s32 D_L11_001B35B8 __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
 
 /* Range, cone angle and turn angle (degrees) of this variant. */
-extern float D_L11_001B1D94 __attribute__((sda));
-extern float D_L11_001B1D98 __attribute__((sda));
-extern float D_L11_001B1D9C __attribute__((sda));
+extern float g_joba_aim_range __attribute__((sda));
+extern float g_joba_aim_cone_deg __attribute__((sda));
+extern float g_joba_aim_turn_deg __attribute__((sda));
 
 extern int math_fast_helper_a(void *vec, float radius);
 extern float vec_distance_xy(void *, void *);
@@ -78,7 +78,7 @@ s32 joba_turn_toward_group_entity(AimObject *obj)
         return 0;
 
     for (ids = g_group_id_lists[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && ids != 0 &&
+         (state->group & 0xFF) != 0xFF && state->group <= g_tribe_group_limit && ids != 0 &&
          ((ids != 0 && (s16)ids[-1] >= 0) || ids == g_group_id_lists[state->group]);
          ids++) {
         entity = g_moby_l11_table[0] + (*ids & 0x7FFF);
@@ -86,18 +86,18 @@ s32 joba_turn_toward_group_entity(AimObject *obj)
             return 0;
         if (!moby_get_busy_flag(entity))
             continue;
-        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1D94))
+        if (!(vec_distance_xy(obj->position, entity->position) < g_joba_aim_range))
             continue;
 
         angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
-        if (!(FastDiffRots(obj->heading, angle) < D_L11_001B1D98 * 0.017453294f))
+        if (!(FastDiffRots(obj->heading, angle) < g_joba_aim_cone_deg * 0.017453294f))
             continue;
         if (ids == 0)
             return 0;
 
         FastVecSub(vec, obj->position, entity->position);
-        turn = D_L11_001B1D9C * 0.017453294f;
+        turn = g_joba_aim_turn_deg * 0.017453294f;
         angle = mat_fast_helper_a(entity->position[0] - obj->position[0],
                               entity->position[1] - obj->position[1]);
         math_apply_axis_rotation_to_quat(vec, vec, obj->axis,

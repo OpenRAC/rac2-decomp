@@ -10,9 +10,9 @@ typedef struct {
     float tex1[4];
     unsigned long long primitive, texture, mode, flags;
 } StripPacket __attribute__((aligned(16)));
-extern StripGeometry D_L02_002A52F0;
-extern int D_L02_002A53B0[3][9];
-extern int D_L02_001B0A00[] MACRO_ADDR;
+extern StripGeometry g_slot_strip_geometry;
+extern int g_slot_reel_symbol_table[3][9];
+extern int g_effect_texture_ids[] MACRO_ADDR;
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern int FloatToInt(float);
 extern void lerp_vector(void *, void *, void *, float);
@@ -27,7 +27,7 @@ void DrawScrollingTileBands(char *actor) {
     float flip;
     float sample[4] __attribute__((aligned(16)));
     int band, piece;
-    geometry = D_L02_002A52F0;
+    geometry = g_slot_strip_geometry;
     state = *(char **)(actor + 0x68);
     flip = 0.0f;
     if (*(unsigned short *)(actor + 0x34) & 0x8000) flip = 1.0f;
@@ -57,8 +57,8 @@ void DrawScrollingTileBands(char *actor) {
             tile = FloatToInt((scroll + (float)piece - 1.0f) + 9.0f) % 9;
             last = first + 0.43094158f;
             {
-                int idx = D_L02_002A53B0[band][tile];
-                packet.texture = GetEffectTextureDescriptor(D_L02_001B0A00[idx]);
+                int idx = g_slot_reel_symbol_table[band][tile];
+                packet.texture = GetEffectTextureDescriptor(g_effect_texture_ids[idx]);
             }
             texFirst = 0.0f;
             texLast = 1.0f;

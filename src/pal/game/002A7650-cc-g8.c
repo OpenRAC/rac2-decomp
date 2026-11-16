@@ -31,35 +31,35 @@ typedef struct {
     short id, bolts;
     unsigned short count;
 } RewardMoby;
-extern int D_001A9E70 __attribute__((sda));
+extern int g_reward_slot_index __attribute__((sda));
 extern int g_current_map_index;
-extern short D_001A86E6 __attribute__((sda));
-extern RewardMoby *D_001B1D30[2];
+extern short g_default_base_reward __attribute__((sda));
+extern RewardMoby *g_reward_moby_slots[2];
 typedef struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2204]; int state; unsigned char pad2298[0x1C]; unsigned char mode; unsigned char pad22B5[13]; unsigned char option; } PlayerReward;
 extern PlayerReward g_hero_state;
 typedef struct { unsigned char pad[12]; int earned, reserve, extra; unsigned char pad18[26]; unsigned char multiplier; } RewardState;
-extern RewardState D_001A7A00 MACRO_ADDR;
-extern int D_00188610[];
-extern short D_001A86C0[] MACRO_ADDR, D_001A8698[] MACRO_ADDR;
-extern unsigned char D_0019B4A8[];
-extern char D_001A9E78[];
-extern char D_001A8690[] MACRO_ADDR, D_001A8688[] MACRO_ADDR, D_001A8680[] MACRO_ADDR, D_001A8678[] MACRO_ADDR;
-extern int D_001F1B78[][56], D_00139868[];
-extern short D_001A86E8;
+extern RewardState g_player_stats MACRO_ADDR;
+extern int g_reward_counts[];
+extern short g_base_reward_table[] MACRO_ADDR, g_reward_cap_table[] MACRO_ADDR;
+extern unsigned char g_moby_nibble_table[];
+extern char g_str_reward_debug_format[];
+extern char g_reward_scale_table_b[] MACRO_ADDR, g_reward_scale_table_a[] MACRO_ADDR, g_bolt_scale_table_b[] MACRO_ADDR, g_bolt_scale_table_a[] MACRO_ADDR;
+extern int g_reward_weight_table[][56], g_help_entry_state[];
+extern short g_map_two_base_reward;
 typedef struct { u8 prefix[0x464]; u8 collected[0]; } BoltCollectionTable;
-extern BoltCollectionTable D_00210D40, D_002119B0;
-extern unsigned char D_001B19A0[] MACRO_ADDR, D_0019B2E8[] MACRO_ADDR;
-extern int D_001B1A80;
-extern void func_PAL_002A74D8(RewardMoby *, int);
+extern BoltCollectionTable g_bolt_collection_table, g_bolt_collection_checkpoint;
+extern unsigned char g_render_command_flags[] MACRO_ADDR, g_moby_group_flags[] MACRO_ADDR;
+extern int g_hero_health_percent;
+extern void moby_count_kill_or_event_pal(RewardMoby *, int);
 extern void STUB_printf(char *, int, int, int);
 extern int stat_scale_by_nibble_lookup(char *, int, int);
 extern char *moby_get_private_value_0(RewardMoby *);
-extern void func_PAL_0029C0B8(int);
+extern void level_forward_value_b_pal(int);
 extern float fast_vec_dist(void *, void *);
 extern int FloatToInt(float);
-extern void func_PAL_002AE6D8(RewardMoby *, int, int, int, int, int, float);
+extern void moby_spawn_bolt_pickups_pal(RewardMoby *, int, int, int, int, int, float);
 
-void func_PAL_002A7650(RewardMoby *p, int flags, int arg)
+void SetDeathBits_pal(RewardMoby *p, int flags, int arg)
 {
     int multiplier;
     int slot, bonus, reward, extra, i, j, total;
@@ -71,79 +71,79 @@ void func_PAL_002A7650(RewardMoby *p, int flags, int arg)
     p->kills++;
     multiplier = 1;
     if (p->mclass && p->mclass->kind == 5) {
-        if (D_001A7A00.multiplier) multiplier = D_001A7A00.multiplier;
-        func_PAL_002A74D8(p, 0);
+        if (g_player_stats.multiplier) multiplier = g_player_stats.multiplier;
+        moby_count_kill_or_event_pal(p, 0);
     }
     count = p->count;
-    for (slot = 1; slot >= 0; slot--) if (p == D_001B1D30[slot]) break;
-    if ((count || D_001A9E70 != -1) && (unsigned)(g_hero_state.mode - 1) >= 2) {
-        bonus = (D_001A7A00.reserve + 49) / 50;
-        if (D_001A9E70 != -1 && slot < 0) {
-            unsigned short base = D_001A86C0[D_001A9E70];
+    for (slot = 1; slot >= 0; slot--) if (p == g_reward_moby_slots[slot]) break;
+    if ((count || g_reward_slot_index != -1) && (unsigned)(g_hero_state.mode - 1) >= 2) {
+        bonus = (g_player_stats.reserve + 49) / 50;
+        if (g_reward_slot_index != -1 && slot < 0) {
+            unsigned short base = g_base_reward_table[g_reward_slot_index];
             reward = (short)base;
-            if (D_00188610[D_001A9E70] * 2 > D_001A8698[D_001A9E70])
-                reward = (short)base * D_001A8698[D_001A9E70] / (D_00188610[D_001A9E70] * 2);
+            if (g_reward_counts[g_reward_slot_index] * 2 > g_reward_cap_table[g_reward_slot_index])
+                reward = (short)base * g_reward_cap_table[g_reward_slot_index] / (g_reward_counts[g_reward_slot_index] * 2);
             if (!reward) reward = 1;
-            STUB_printf(D_001A9E78, D_001A9E70, (short)base, reward);
+            STUB_printf(g_str_reward_debug_format, g_reward_slot_index, (short)base, reward);
         } else {
-            int n = D_0019B4A8[(p->id >> 1) + (g_current_map_index << 10)];
-            if (((unsigned short)p->id & 1) ? (n >> 4) & 8 : n & 8) reward = stat_scale_by_nibble_lookup(D_001A8690, (short)count, p->id);
-            else reward = stat_scale_by_nibble_lookup(D_001A8688, (short)count, p->id);
+            int n = g_moby_nibble_table[(p->id >> 1) + (g_current_map_index << 10)];
+            if (((unsigned short)p->id & 1) ? (n >> 4) & 8 : n & 8) reward = stat_scale_by_nibble_lookup(g_reward_scale_table_b, (short)count, p->id);
+            else reward = stat_scale_by_nibble_lookup(g_reward_scale_table_a, (short)count, p->id);
         }
         info = moby_get_private_value_0(p);
         if (info && (unsigned char)info[0x17] != 255) {
             if (slot >= 0) {
                 total = 0;
-                for (i = 0; i < 56; i++) total += D_001F1B78[slot][i];
+                for (i = 0; i < 56; i++) total += g_reward_weight_table[slot][i];
                 if (total) {
-                    for (j = 0; j < 56; j++) D_00139868[j] += D_001F1B78[slot][j] * (reward + bonus) / total;
+                    for (j = 0; j < 56; j++) g_help_entry_state[j] += g_reward_weight_table[slot][j] * (reward + bonus) / total;
                 }
-                D_001B1D30[slot] = 0;
-            } else D_00139868[(unsigned char)info[0x17]] += reward + bonus;
+                g_reward_moby_slots[slot] = 0;
+            } else g_help_entry_state[(unsigned char)info[0x17]] += reward + bonus;
         }
-        D_001A7A00.reserve -= bonus;
-        D_001A7A00.earned += reward + bonus;
-        func_PAL_0029C0B8(600);
+        g_player_stats.reserve -= bonus;
+        g_player_stats.earned += reward + bonus;
+        level_forward_value_b_pal(600);
     }
-    extra = (D_001A7A00.extra + 49) / 50;
-    D_001A7A00.extra -= extra;
-    if (D_001A9E70 != -1) {
+    extra = (g_player_stats.extra + 49) / 50;
+    g_player_stats.extra -= extra;
+    if (g_reward_slot_index != -1) {
         int base;
-        if (g_current_map_index == 2) base = D_001A86E8;
-        else base = D_001A86E6;
+        if (g_current_map_index == 2) base = g_map_two_base_reward;
+        else base = g_default_base_reward;
         bolts = base;
         if (slot >= 0) bolts *= 10.0f;
     } else {
-        int n = D_0019B4A8[(p->id >> 1) + (g_current_map_index << 10)];
-        if (((unsigned short)p->id & 1) ? (n >> 4) & 8 : n & 8) bolts = stat_scale_by_nibble_lookup(D_001A8680, p->bolts, p->id);
-        else bolts = stat_scale_by_nibble_lookup(D_001A8678, p->bolts, p->id);
+        int n = g_moby_nibble_table[(p->id >> 1) + (g_current_map_index << 10)];
+        if (((unsigned short)p->id & 1) ? (n >> 4) & 8 : n & 8) bolts = stat_scale_by_nibble_lookup(g_bolt_scale_table_b, p->bolts, p->id);
+        else bolts = stat_scale_by_nibble_lookup(g_bolt_scale_table_a, p->bolts, p->id);
     }
     if (p->id >= 0 && !(p->flags & 0x80)) {
         unsigned short id;
-        if (D_001A9E70 != -1) D_00188610[D_001A9E70]++;
+        if (g_reward_slot_index != -1) g_reward_counts[g_reward_slot_index]++;
         id = (unsigned short)p->id;
         if (id & 1) {
-            unsigned char *bits = D_0019B4A8 + (((short)id >> 1) + (g_current_map_index << 10));
+            unsigned char *bits = g_moby_nibble_table + (((short)id >> 1) + (g_current_map_index << 10));
             if (((*bits >> 4) & 7) != 7) *bits += 16;
         } else {
-            unsigned char *bits = D_0019B4A8 + (((short)id >> 1) + (g_current_map_index << 10));
+            unsigned char *bits = g_moby_nibble_table + (((short)id >> 1) + (g_current_map_index << 10));
             if ((*bits & 7) != 7) *bits += 1;
         }
-        D_00210D40.collected[p->id] = p->owner + 2;
+        g_bolt_collection_table.collected[p->id] = p->owner + 2;
         {
             int k = p->owner;
-            if (k == 255 || (!(D_001B19A0[k & 0xFF] & 0x80) && (D_0019B2E8[(k & 0xFF) + (g_current_map_index << 4)] & 0x80)))
-                D_002119B0.collected[p->id] = k + 2;
+            if (k == 255 || (!(g_render_command_flags[k & 0xFF] & 0x80) && (g_moby_group_flags[(k & 0xFF) + (g_current_map_index << 4)] & 0x80)))
+                g_bolt_collection_checkpoint.collected[p->id] = k + 2;
         }
     }
-    if (D_001A9E70 == -1) bolts *= multiplier;
+    if (g_reward_slot_index == -1) bolts *= multiplier;
     bolts += extra;
     dropflags = flags & 0x100 ? 5 : 1;
     if (g_hero_state.option || (flags & 0x200)) dropflags |= 2;
     if (g_hero_state.state == 16 && fast_vec_dist(g_hero_state.position, p->position) < 4.0f) dropflags |= 2;
     if (flags & 0x400) dropflags |= 0x10;
     dropflags |= 8;
-    if (D_001B1A80 <= 99) dropflags |= 2;
+    if (g_hero_health_percent <= 99) dropflags |= 2;
     if (bolts < 0.0f) bolts = 0.0f;
     if (bolts > 0.0f) {
         int spread = 0;
@@ -153,7 +153,7 @@ void func_PAL_002A7650(RewardMoby *p, int flags, int arg)
             int n = FloatToInt(bolts);
             int hi = n + spread;
             n -= spread;
-            func_PAL_002AE6D8(p, n, hi, dropflags, -1, arg, 0.0f);
+            moby_spawn_bolt_pickups_pal(p, n, hi, dropflags, -1, arg, 0.0f);
         }
     }
 }

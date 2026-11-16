@@ -22,8 +22,8 @@ extern char *part_spawn_burst(void *pos, void *vel, int life, int alpha, unsigne
                            float a, float b, float c, float d, float e);
 extern char *part_spawn_spark(void *pos, void *vel, unsigned int colour, int a, int life, int b, int c,
                            int d, int e, float f);
-extern Vec D_0018A0E0;
-extern char D_L00_001FE940[];
+extern Vec g_hero_state_block;
+extern char g_effect_definitions[];
 
 /* The alpha is chosen through an out parameter: until purge_addressof the
    variable is a memory reference, so the branch survives cse1 and jump.c only
@@ -56,11 +56,11 @@ void part_spawn_spark_trail_between_points(char *obj, Vec *a, Vec *b)
     FastVecSub(&step, from, to);
     scale = IntToFloat(count);
     vec_scale_to_length(&step, &step, length / scale);
-    tbl = D_L00_001FE940;
+    tbl = g_effect_definitions;
     if (count > 0) do {
         n = FloatToInt(math_random_signed_float_range(1.0f, 3.0f));
         drift = -(math_random_float_range(0.1f, 0.2f) * 0.016666668f);
-        FastVecScale(&vel, &D_0018A0E0, drift);
+        FastVecScale(&vel, &g_hero_state_block, drift);
         life = math_random_int_range(30, 45);
         speed = -math_random_float_range(500.0f, 1000.0f);
         pickSegmentAlpha(&alpha);
@@ -84,7 +84,7 @@ void part_spawn_spark_trail_between_points(char *obj, Vec *a, Vec *b)
         puff = part_spawn_spark(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
         if (puff) {
             *(float *)(puff + 44) = 0.0016666667f;
-            puff[2] = **(unsigned char **)(D_L00_001FE940 + 212);
+            puff[2] = **(unsigned char **)(g_effect_definitions + 212);
         }
     }
 }

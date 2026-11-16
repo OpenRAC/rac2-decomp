@@ -9,7 +9,7 @@ extern void slot_add_value_clamped(int, int);
 extern void func_PAL_0029D5E8(int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
-extern int D_L05_001B1500 __attribute__((sda));
+extern int g_glow_ring_follow_moby __attribute__((sda));
 extern void func_PAL_L05_0042BD38(char *);
 
 /* Same shape as func_L05_004260B8, on its own data slot and with its own tail. */
@@ -18,11 +18,11 @@ void func_PAL_L05_0042BA94(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001B1500 != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001B1500 + 0x10), object + 0x10);
+    if (g_glow_ring_follow_moby != 0) {
+        scale = fast_vec_dist((void *)(g_glow_ring_follow_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_follow_moby + 0x10), state + 0x40,
                          0.012800001f, 0.0048f, 1.2800001f);
             goto check_scale;
         }
@@ -37,7 +37,7 @@ void func_PAL_L05_0042BA94(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_follow_moby + 0x10), state + 0x40,
                          0.008f, 0.0024f, 0.6f);
         }
 check_scale:

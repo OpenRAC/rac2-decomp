@@ -5,8 +5,8 @@ typedef struct { float pad[32]; float x, y, z; } Target;
 extern Target g_hero_state;
 extern u8 g_hero_position[];
 extern u8 g_sound_state[];
-extern float D_L12_001AFC70 __attribute__((sda));
-extern float D_L12_001AFC74 __attribute__((sda));
+extern float g_tracking_head_value __attribute__((sda));
+extern float g_tracking_head_max_yaw __attribute__((sda));
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -23,7 +23,7 @@ extern int PlayMobySound(int, int, void *);
 extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 
-void func_PAL_L12_003C21C8(u8 *o) {
+void hero_tracking_head_update_pal(u8 *o) {
     u8 *d = *(u8 **)(o + 0x68);
     float yaw = 0, pitch = 0;
     float acceleration, damping;
@@ -78,7 +78,7 @@ void func_PAL_L12_003C21C8(u8 *o) {
         moby_mark_spawned(o);
         return;
     }
-    if (math_fabs(fast_subtract_rotations(yaw, *(float *)(d + 0x100))) > D_L12_001AFC74 * 0.017453294f) {
+    if (math_fabs(fast_subtract_rotations(yaw, *(float *)(d + 0x100))) > g_tracking_head_max_yaw * 0.017453294f) {
         u8 *effect = g_sound_state + *(int *)(d + 0x114) * 0x70;
 
         if (*(u8 **)(effect + 0x88) != o || !effect[0x74])
@@ -107,5 +107,5 @@ void func_PAL_L12_003C21C8(u8 *o) {
     moby_update_eased_node(o, d, 0, acceleration, damping);
     moby_update_eased_node(o, d + 0x80, 1, acceleration, damping);
     func_002A0F48(o);
-    *(float *)(o + 0xC) = D_L12_001AFC70;
+    *(float *)(o + 0xC) = g_tracking_head_value;
 }

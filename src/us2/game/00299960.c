@@ -1,20 +1,21 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_001A8A5C __attribute__((sda));
+extern int g_menu_mode __attribute__((sda));
 
-extern int D_US2_001B19BC __attribute__((sda));
+extern int g_pending_request_flag __attribute__((sda));
 
 int func_US2_00299960(void) {
-    return D_US2_001B19BC;
+    return g_pending_request_flag;
 }
 
 
 
 
 int func_US2_00299968(void) {
-    int value = D_US2_001B19BC;
+    int value = g_pending_request_flag;
 
-    D_US2_001B19BC = 0;
+    g_pending_request_flag = 0;
     return value != 0;
 }
 

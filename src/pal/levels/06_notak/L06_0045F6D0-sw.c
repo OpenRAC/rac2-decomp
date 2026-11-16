@@ -9,15 +9,15 @@ typedef struct { Vector pos, v30, v40, v50; void *obj; int kind; } Hit;
 extern char g_hero_state[];
 extern char g_hero_position[];
 extern u8 *g_hero_moby __attribute__((nosda));
-extern s16 D_0018A16C __attribute__((nosda));
-extern int D_L06_001B2348[] __attribute__((sda));
-extern int D_L06_001B2FB8[] __attribute__((sda));
-extern u8 D_L06_001BFCA0[];
-extern char D_L06_001B1A68[], D_L06_001B1AA0[];
-extern u8 *D_L06_001B281C __attribute__((sda));
-extern int D_L06_001B2FB0 __attribute__((sda));
-extern u8 D_L06_001B1970[9] __attribute__((sda));
-extern u8 D_L06_001B1980[9] __attribute__((sda));
+extern s16 g_ray_hit_flag __attribute__((nosda));
+extern int g_game_l06_frame_counter[] __attribute__((sda));
+extern int g_ripple_l06_disturb_y[] __attribute__((sda));
+extern u8 g_trace_start_pos[];
+extern char g_str_actor_debug_a[], g_str_actor_debug_b[];
+extern u8 *g_moby_l06_table __attribute__((sda));
+extern int g_ripple_l06_disturb_x __attribute__((sda));
+extern u8 g_next_state_table[9] __attribute__((sda));
+extern u8 g_next_anim_table[9] __attribute__((sda));
 extern void STUB_printf(const char *, ...);
 extern int coll_test_point(void *, int, void *, float);
 extern int GetCollHitMaterial(void);
@@ -40,7 +40,7 @@ extern int moby_move_over_ground(void *, void *, void *, float, float, float, fl
 extern int point_in_path_xy(void *, void *, int);
 extern float coll_get_ground_height_at_position(void *, void *);
 extern void func_PAL_002AC3C0(void *, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int IsPointInCuboid(void *, int);
 extern void *part_spawn_drifting(void *, void *, int, float, float);
 extern int PlayMobySound(int, int, void *);
@@ -57,9 +57,9 @@ extern int actor_classify_headroom(void *, void *);
 extern void actor_start_size_anim(void *, void *);
 extern int spawn_record_resolve_links(void *, void *);
 extern void actor_choose_free_heading(void *, void *);
-extern void func_PAL_L06_0045F1F0(void *, void *, float, float, float);
+extern void actor_apply_fall_move_pal(void *, void *, float, float, float);
 extern int actor_adjust_speed_facing(void *, void *, float, float, float, float, float, float, float);
-extern void func_PAL_L06_0045F3F8(void *, void *, int, int, float, float, float, float, float, int, int, int, void *);
+extern void actor_try_pickup_transition_pal(void *, void *, int, int, float, float, float, float, float, int, int, int, void *);
 extern int actor_probe_hits_target(void *, void *, float);
 extern int group_is_member_in_state_range(void *, int, int);
 #define B(p, o) (*(u8 *)((u8 *)(p) + (o)))
@@ -68,7 +68,7 @@ extern int group_is_member_in_state_range(void *, int, int);
 #define W(p, o) (*(int *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
 
-void func_PAL_L06_0045F6D0(u8 *self) {
+void UpdateMoby4070_pal(u8 *self) {
     Hit hit;
     Vector v70, v80, v90, vA0, vB0, vC0;
     u8 *s6;
@@ -86,7 +86,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
         part_update_attached_scale(self, 0, s6 + 0x140, 2.20000005f);
         if (B(self, 0x20) == 0) {
             if (spawn_record_resolve_links(self, s6) != 0) {
-                STUB_printf(D_L06_001B1A68, H(self, 0xB2));
+                STUB_printf(g_str_actor_debug_a, H(self, 0xB2));
                 moby_mark_spawned(self);
                 return;
             }
@@ -129,8 +129,8 @@ void func_PAL_L06_0045F6D0(u8 *self) {
         B(self, 0xBC) = nw;
         if (old != (u8)nw) {
             st = (u8)nw + old * 3;
-            s7 = D_L06_001B1970[st];
-            s4 = D_L06_001B1980[st];
+            s7 = g_next_state_table[st];
+            s4 = g_next_anim_table[st];
         }
         moby_transform_joint_to_world(self, 0, v70.f);
         if (coll_test_point(v70.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
@@ -149,19 +149,19 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 f20 *= 2.0f;
             }
             p1 = self + 0x10;
-            if (vec_distance_xy(p1, D_L06_001BFCA0) > 0.5f) {
-                f21 = vec_distance_xy(p1, D_L06_001BFCA0) * 2.0f;
+            if (vec_distance_xy(p1, g_trace_start_pos) > 0.5f) {
+                f21 = vec_distance_xy(p1, g_trace_start_pos) * 2.0f;
             } else {
                 f21 = 1.0f;
             }
-            if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && math_random_int_below(2) == 0) {
-                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), f21, f20);
+            if (g_game_l06_frame_counter[0] % 45 == H(self, 0xB2) && math_random_int_below(2) == 0) {
+                RippleDisturb(g_ripple_l06_disturb_x, g_ripple_l06_disturb_y[0], 1, F(self, 0x10), F(self, 0x14), f21, f20);
             }
-            if (D_L06_001B2348[0] % ((func_001163B0() & 7) + 0x14) == 0) {
+            if (g_game_l06_frame_counter[0] % ((func_001163B0() & 7) + 0x14) == 0) {
                 f22 = math_random_float_range(1.5f, 2.4000001f);
                 v70.f[0] += math_random_float_range(-0.150000006f, 0.150000006f);
                 v70.f[1] += math_random_float_range(-0.150000006f, 0.150000006f);
-                v70.f[2] = coll_get_ground_height_at_position(D_L06_001BFCA0, NULL);
+                v70.f[2] = coll_get_ground_height_at_position(g_trace_start_pos, NULL);
                 part_spawn_drifting(v70.f, NULL, -1, f22, 5250.0f);
             }
         }
@@ -169,7 +169,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
             *(Quad *)g_hero_position = *(Quad *)(self + 0x10);
         }
         cur = W(s6, 0x108);
-        if (cur != -1 && B(*(u8 **)(D_L06_001B281C + (cur << 8) + 0x68), 0x14) != 0) {
+        if (cur != -1 && B(*(u8 **)(g_moby_l06_table + (cur << 8) + 0x68), 0x14) != 0) {
             if (B(self, 0x43) != 0xD) {
                 func_PAL_002A7E68(self, 0xD, 0, 0xA);
             }
@@ -177,11 +177,11 @@ void func_PAL_L06_0045F6D0(u8 *self) {
         }
         switch (B(self, 0x20)) {
         case 0:
-            STUB_printf(D_L06_001B1AA0);
+            STUB_printf(g_str_actor_debug_b);
             break;
         case 20:
             cur = W(s6, 0x108);
-            if (cur != -1 && B(*(u8 **)(D_L06_001B281C + (cur << 8) + 0x68), 0x14) == 0) {
+            if (cur != -1 && B(*(u8 **)(g_moby_l06_table + (cur << 8) + 0x68), 0x14) == 0) {
                 B(self, 0x20) = 0x15;
             }
             break;
@@ -193,7 +193,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 UH(self, 0x96) = 0;
                 B(self, 0x20) = 1;
             } else {
-                func_PAL_L06_0045F1F0(self, s6, 0.006f, 0.020000001f, 0.16000001f);
+                actor_apply_fall_move_pal(self, s6, 0.006f, 0.020000001f, 0.16000001f);
                 UH(self, 0x96) = UH(self, 0x96) + 1;
             }
             break;
@@ -222,7 +222,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 B(self, 0x20) = 2;
             }
             FastVecScale(s6 + 0xC0, s6 + 0xC0, 0.94f);
-            func_PAL_L06_0045F1F0(self, s6, 0.006f, 0.020000001f, 0.16000001f);
+            actor_apply_fall_move_pal(self, s6, 0.006f, 0.020000001f, 0.16000001f);
             if (s7 != 0xFF) {
                 if (B(self, 0x43) != s4) {
                     func_PAL_002A7E68(self, s4, 0, 6);
@@ -267,7 +267,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
             }
-            func_PAL_L06_0045F1F0(self, s6, 0.006f, 0.020000001f, 0.16000001f);
+            actor_apply_fall_move_pal(self, s6, 0.006f, 0.020000001f, 0.16000001f);
             if (s7 != 0xFF) {
                 if (B(self, 0x43) != s4) {
                     func_PAL_002A7E68(self, s4, 0, 6);
@@ -300,8 +300,8 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 qcopy(s6 + 0xF0, p4);
             }
             F(s6, 0x128) = hit.pos.f[2] - 0.25f;
-            func_PAL_L06_0045F1F0(self, s6, 0.0152f, 0.0f, 0.76000005f);
-            if (s2 == 0 || D_0018A16C == 0) {
+            actor_apply_fall_move_pal(self, s6, 0.0152f, 0.0f, 0.76000005f);
+            if (s2 == 0 || g_ray_hit_flag == 0) {
                 if (B(self, 0x43) != 1) {
                     func_PAL_002A7E68(self, 1, 0, 0xA);
                 }
@@ -342,7 +342,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
         case 6:
             actor_choose_free_heading(self, s6);
             actor_adjust_speed_facing(self, s6, F(s6, 0x12C), 0.209439531f, 0.0024f, 0.52359885f, 0.0016000001f, 0.14000002f, 0.060000002f);
-            func_PAL_L06_0045F1F0(self, s6, 0.0048f, 0.020000001f, 0.14000002f);
+            actor_apply_fall_move_pal(self, s6, 0.0048f, 0.020000001f, 0.14000002f);
             MobySpringTurn(self, F(s6, 0x12C), s6 + 0x110, 0.00062831864f, 0.0012566373f, 0.062831864f);
             F(self, 0xF4) = math_turn_angle_toward_target(s6 + 0x114, F(self, 0xF4), 0.0f, 0.00062831864f, 0.0012566373f, 0.062831864f);
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
@@ -442,7 +442,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
                 }
                 B(self, 0x20) = 8;
             }
-            func_PAL_L06_0045F3F8(self, s6, 0xA, 5, 17.0f, 20.0f, 1.0f, 1.0f, 1.0f, 4, 4, 0xB, hit.obj);
+            actor_try_pickup_transition_pal(self, s6, 0xA, 5, 17.0f, 20.0f, 1.0f, 1.0f, 1.0f, 4, 4, 0xB, hit.obj);
             if (B(self, 0x60) & 2) {
                 if (B(self, 0x43) != 4) {
                     func_PAL_002A7E68(self, 4, 0, 0xA);
@@ -474,7 +474,7 @@ void func_PAL_L06_0045F6D0(u8 *self) {
             break;
         case 14:
             if (func_PAL_L06_00360A78(self, s6 + 0x60) & (B(self, 0x60) & 2)) {
-                func_PAL_002AC718(self, s6 + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
+                SpawnExplosionEffects_pal(self, s6 + 0xC0, NULL, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, -1, 7.0f, 0, 1, -1, 0, 0x810001);
                 moby_mark_spawned(self);
                 return;
             }

@@ -14,8 +14,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(Packet *, s32, s32);
 extern u8 g_camera_eye_state[];
-extern u8 D_0018A0E0[];
-extern f32 D_001A9FD0[][4];
+extern u8 g_hero_state_block[];
+extern f32 g_billboard_quad_corners[][4];
 
 /* Draws a camera-facing textured square at a position, with size, offset and an optional spin. */
 void gfx_draw_billboard_quad(void *position, s32 texture, u32 color, s32 kind,
@@ -39,7 +39,7 @@ void gfx_draw_billboard_quad(void *position, s32 texture, u32 color, s32 kind,
     qcopy(&frame.position, position);
     FastVecSub(&frame.basis[0], g_camera_eye_state, &frame.position);
     vec_scale_to_length(&frame.basis[0], &frame.basis[0], 1.0f);
-    FastVecCross(&frame.basis[1], &frame.basis[0], D_0018A0E0);
+    FastVecCross(&frame.basis[1], &frame.basis[0], g_hero_state_block);
     vec_scale_to_length(&frame.basis[1], &frame.basis[1], 1.0f);
     FastVecCross(&frame.basis[2], &frame.basis[1], &frame.basis[0]);
     if (angle != 0.0f) {
@@ -52,7 +52,7 @@ void gfx_draw_billboard_quad(void *position, s32 texture, u32 color, s32 kind,
     FastVecAdd(&frame.position, &frame.position, &frame.euler);
     for (i = 3; i >= 0; i--) {
         s32 row = 3 - i;
-        FastVecScale(frame.packet.matrix + row * 4, D_001A9FD0[row], scale);
+        FastVecScale(frame.packet.matrix + row * 4, g_billboard_quad_corners[row], scale);
         transform_vector(frame.packet.matrix + row * 4, frame.packet.matrix + row * 4, frame.basis);
     }
     draw_world_quad(&frame.packet, 0, 0);

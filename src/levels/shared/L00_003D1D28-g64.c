@@ -43,24 +43,24 @@ typedef struct { u8 pad0[0x28]; int id; u8 pad2C[0x28]; float rate; u8 pad58[0x1
 extern u8 g_hero_state[];
 extern u8 g_pad_state[];
 extern u8 g_item_slot_to_record[];
-extern u8 D_001395AC NOT_SDA;
-extern float D_0018A580[4] NOT_SDA;
+extern u8 g_hero_weapon_id_index NOT_SDA;
+extern float g_strip_axis[4] NOT_SDA;
 extern WeaponEntry g_weapon_l00_table[];
-extern u8 D_L00_00296120[];
-extern u8 D_L00_001A8F20[] MACRO_ADDR;
+extern u8 g_effect_handle_records[];
+extern u8 g_default_vector[] MACRO_ADDR;
 typedef struct { u8 pad[0x160]; float f160; int pad164; int i168; int i16C; float f170; int pad174; int i178; } Shake;
-extern Shake D_L00_001B8C80;
+extern Shake g_scalar_transition_state;
 extern u8 *g_area_hit_targets[];
-extern float D_L00_001B0190[16] __attribute__((sda));
-extern u16 D_L00_001B01E8 __attribute__((sda));
-extern u16 D_L00_001B01EC __attribute__((sda));
-extern int D_L00_001B020C __attribute__((sda));
-extern u16 D_L00_001B0214 __attribute__((sda));
-extern int D_L00_001B021C __attribute__((sda));
-extern float D_L00_001B0220 __attribute__((sda));
-extern float D_L00_001B0224 __attribute__((sda));
-extern float D_L00_001B0228 __attribute__((sda));
-extern int D_L00_001B0238 __attribute__((sda));
+extern float g_euler_rotation_params[16] __attribute__((sda));
+extern u16 g_effect_state_param_a __attribute__((sda));
+extern u16 g_effect_state_param_b __attribute__((sda));
+extern int g_effect_timer_limit_a __attribute__((sda));
+extern u16 g_effect_state_param_c __attribute__((sda));
+extern int g_effect_timer_limit_b __attribute__((sda));
+extern float g_effect_local_pos_x __attribute__((sda));
+extern float g_local_pos_y_offset __attribute__((sda));
+extern float g_local_pos_z_offset __attribute__((sda));
+extern int g_effect_state_param __attribute__((sda));
 
 extern s32 FastDecTimer(s16 *);
 extern int math_fast_float_d(void *);
@@ -101,11 +101,11 @@ extern int weapon_fire_damage_ray(u8 *, void *, void *, Hit *);
 
 static inline void SetShake(float amount)
 {
-    D_L00_001B8C80.f160 = amount;
-    D_L00_001B8C80.i168 = 30;
-    D_L00_001B8C80.f170 = amount;
-    D_L00_001B8C80.i178 = 30;
-    D_L00_001B8C80.i16C = 0;
+    g_scalar_transition_state.f160 = amount;
+    g_scalar_transition_state.i168 = 30;
+    g_scalar_transition_state.f170 = amount;
+    g_scalar_transition_state.i178 = 30;
+    g_scalar_transition_state.i16C = 0;
 }
 
 /* Per-frame update of the Blitz Cannon weapon (moby class 2801). It charges while fire is held, flashes and shakes the screen on firing, then hits nearby enemies and sends out 20 random damage bolts. */
@@ -164,27 +164,27 @@ void UpdateSpreadWeapon(u8 *self)
         }
         if (self[0x20] == 1 && ((Hero *)g_hero_state)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 0x17 && ready) {
             if ((((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && weapon_spend_ammo(-1, 1)) {
-                if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + D_001395AC * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
+                if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_hero_weapon_id_index * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
                     st->t40 = 1;
-                    st->t6 = D_L00_001B01E8;
+                    st->t6 = g_effect_state_param_a;
                 } else {
                     st->t40 = 0;
                     st->t6 = 2;
                 }
                 start_equipped_item_animation();
-                st->handle = slot_copy_records_to_free(D_L00_00296120);
+                st->handle = slot_copy_records_to_free(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
-                st->t4C = D_L00_001B0238;
+                st->t4C = g_effect_state_param;
                 self[0x20] = 2;
                 st->fC = math_random_angle();
-                st->t8 = D_L00_001B01EC;
+                st->t8 = g_effect_state_param_b;
                 st->f20 = 1.0f / IntToFloat(st->t8);
-                st->tA = D_L00_001B0214;
+                st->tA = g_effect_state_param_c;
                 st->t8 += 2;
                 st->f24 = 1.0f / IntToFloat(st->tA);
-                st->t28 = D_L00_001B020C;
+                st->t28 = g_effect_timer_limit_a;
                 st->f2C = 1.0f / IntToFloat(st->t28);
-                st->t44 = D_L00_001B021C;
+                st->t44 = g_effect_timer_limit_b;
                 st->f48 = 1.0f / IntToFloat(st->t44);
                 st->t44 += 2;
             } else if (((Hero *)g_pad_state)->i[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) {
@@ -212,25 +212,25 @@ void UpdateSpreadWeapon(u8 *self)
             if (FastDecTimer(&shot_state->t6)) {
                 if (cannon[0x20] == 2) {
                     cannon[0x20] = 3;
-                    qcopy(shot_state->q30, D_0018A580);
-                    local_pos[0] = D_L00_001B0220;
-                    local_pos[1] = D_L00_001B0224 - 0.25f;
-                    local_pos[2] = D_L00_001B0228;
+                    qcopy(shot_state->q30, g_strip_axis);
+                    local_pos[0] = g_effect_local_pos_x;
+                    local_pos[1] = g_local_pos_y_offset - 0.25f;
+                    local_pos[2] = g_local_pos_z_offset;
                     local_pos[3] = 1.0f;
                     matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
                     FastVecAdd(world_pos, world_pos, cannon + 0x10);
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, g_default_vector, 0, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, g_default_vector, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, g_default_vector, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
@@ -238,22 +238,22 @@ void UpdateSpreadWeapon(u8 *self)
                     matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
                     FastVecAdd(world_pos, world_pos, cannon + 0x10);
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, g_default_vector, 0, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, g_default_vector, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, g_default_vector, variant, 0, 6, 0);
                         if (flash)
                             *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     local_pos[2] = 0.0f;
-                    local_pos[1] = D_L00_001B0224;
+                    local_pos[1] = g_local_pos_y_offset;
                     matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
                     FastVecAdd(shot_state->v10, world_pos, cannon + 0x10);
                     InitEffectStrips(cannon, shot_state->v10, 0);
@@ -304,7 +304,7 @@ void UpdateSpreadWeapon(u8 *self)
                             StartAttachedEffect(g_area_hit_targets[nearby_index], 0x44, cannon);
                         }
                     }
-                    euler_to_matrix(mtx, D_L00_001B0190);
+                    euler_to_matrix(mtx, g_euler_rotation_params);
                     copy_matrix3x4(inv, mtx);
                     moby_transform_joint_to_world(cannon, 0, origin);
                     if (((Hero *)g_hero_state)->h[0x24EC / 2] == 1) {

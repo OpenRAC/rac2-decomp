@@ -2,7 +2,7 @@
 /* func_PAL_L00_002B3000, the PAL copy of func_L00_002B30E8: the same C. */
 
 extern void UpdateHeroSlotCallbacks(void);
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 #ifndef RAC2_T_ROW_F3392E4BC
 #define RAC2_T_ROW_F3392E4BC
 #endif
@@ -95,13 +95,13 @@ typedef struct {
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
 extern unsigned char g_item_slot_to_record[];
-extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
     char padA2[14];
 } HeroItemEase;
-extern HeroItemEase D_0018B9A0[];
+extern HeroItemEase g_hero_item_ease_table[];
 typedef struct {
     char pad0[0x14];
     int object;
@@ -160,7 +160,7 @@ extern D00189E20_Overlay g_hero_state;
  * argument out of the range only return. */
 /* Read through its macro symbol: the copy reorg puts in a branch delay slot assembles
  * $gp-relative, the one in ordinary flow as lui/lw. */
-extern int D_L00_001B18D8[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda));
 
 /* Per-frame pass over the seven 80-byte slots at +0x1220: an empty slot is released; in
  * state 2 a slot counts a tick, is released and, for a flagged entry whose animation set
@@ -187,11 +187,11 @@ typedef struct {
 } HeroSlotState;
 
 extern int g_current_map_index[] __attribute__((sda));
-extern int D_001A73D8[] __attribute__((sda));
-extern int D_001A73E0[] __attribute__((sda));
-extern int D_0013A148[];
-extern unsigned char D_0019B2E8[][16];
-extern int D_001A24A8[][16];
+extern int g_play_counter_total[] __attribute__((sda));
+extern int g_slot_play_counters[] __attribute__((sda));
+extern int g_map_play_counts[];
+extern unsigned char g_moby_group_flags[][16];
+extern int g_play_counters[][16];
 extern void level_clear_entry_top_bits(void);
 extern void FadeToBlack(int);
 
@@ -199,13 +199,13 @@ extern void FadeToBlack(int);
  * per-level per-slot counter (only once the counter at D_L00_001B19C8 reaches 900, or 1800 in modes 0x74 and 0x79,
  * and while the slot's 0x80 flag is clear) and a 16-entry counter; always bumps the per-slot counter, calls
  * func_0027D330(0x10) and sets the byte at 0x22C1. */
-void func_PAL_L00_002B3000(void)
+void hero_record_play_counters_pal(void)
 {
     int threshold;
     int mode;
 
-    D_0013A148[g_current_map_index[0]]++;
-    D_001A73D8[0]++;
+    g_map_play_counts[g_current_map_index[0]]++;
+    g_play_counter_total[0]++;
     level_clear_entry_top_bits();
     if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
         mode = ((HeroSlotState *)D_00189E20_1)->mode;
@@ -216,18 +216,18 @@ void func_PAL_L00_002B3000(void)
         if (g_frame_l00_counter[0] >= threshold) {
             int level = g_current_map_index[0];
             int slot = ((HeroSlotState *)D_00189E20_1)->slot;
-            if ((D_0019B2E8[level][slot] & 0x80) == 0)
-                D_001A24A8[level][slot & 0xF]++;
+            if ((g_moby_group_flags[level][slot] & 0x80) == 0)
+                g_play_counters[level][slot & 0xF]++;
         }
-        D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
+        g_slot_play_counters[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
     }
-    D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot]++;
+    g_slot_play_counters[((HeroSlotState *)D_00189E20_1)->slot]++;
     FadeToBlack(0xd);
     ((HeroSlotState *)D_00189E20_1)->visited = 1;
 }
 
 /* tests the signed short identifier at offset 0xaa of a nonnull object against 71 */
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 
 /* func_L00_002B32F8 is in L00_002B32F8-hero.c. */
 

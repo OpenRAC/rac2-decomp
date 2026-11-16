@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int D_L20_001B2FB8[] __attribute__((sda));
-extern char *D_L20_001B2F9C[] __attribute__((sda));
-extern char *D_L20_001FBB20[];
-extern int D_L20_001B2440 __attribute__((sda));
+extern int g_group_count[] __attribute__((sda));
+extern char *g_group_l20_member_table[] __attribute__((sda));
+extern char *g_group_l20_id_lists[];
+extern int g_turret_light_color __attribute__((sda));
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_light_color(void *, int);
 extern int math_random_int_below(int);
@@ -15,21 +15,21 @@ extern void FastVecAdd(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_angle(void);
 
-char *func_PAL_L20_004508B0(int arg0, int arg1, float *arg2, float *arg3) {
-    char *idp = D_L20_001FBB20[arg1];
+char *turret_spawn_from_group_pal(int arg0, int arg1, float *arg2, float *arg3) {
+    char *idp = g_group_l20_id_lists[arg1];
     char *found = 0;
 
     if ((arg1 & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8[0] < arg1) {
+    if (g_group_count[0] < arg1) {
         goto end;
     }
     if (idp == 0) {
         goto end;
     }
     for (;;) {
-        char *moby = D_L20_001B2F9C[0] + ((*(u16 *)idp & 0x7FFF) << 8);
+        char *moby = g_group_l20_member_table[0] + ((*(u16 *)idp & 0x7FFF) << 8);
 
         if (moby == 0) {
             goto end;
@@ -42,7 +42,7 @@ char *func_PAL_L20_004508B0(int arg0, int arg1, float *arg2, float *arg3) {
         if ((arg1 & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8[0] < arg1) {
+        if (g_group_count[0] < arg1) {
             goto end;
         }
         if (idp == 0) {
@@ -51,7 +51,7 @@ char *func_PAL_L20_004508B0(int arg0, int arg1, float *arg2, float *arg3) {
         if (*(s16 *)(idp - 2) >= 0) {
             continue;
         }
-        if (idp == D_L20_001FBB20[arg1]) {
+        if (idp == g_group_l20_id_lists[arg1]) {
             continue;
         }
         break;
@@ -64,7 +64,7 @@ end:
         *(u16 *)(found + 0x34) = (*(u16 *)(found + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(found + 0x98) = *(int *)(*(char **)(found + 0x24) + 0x10);
         func_PAL_002A7E68(found, 0, 0, 0xC);
-        moby_set_light_color(found, D_L20_001B2440);
+        moby_set_light_color(found, g_turret_light_color);
         if (math_random_int_below(2) != 0) {
             *(u16 *)(found + 0x34) |= 0x8000;
         } else {

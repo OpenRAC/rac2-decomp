@@ -12,7 +12,7 @@ extern int math_random_int_below(int);
 extern int path_build_route_nodes(u8 *, int, u8 *, int);
 extern void moby_set_state(u8 *, int, int);
 typedef struct { float value[16]; } __attribute__((packed)) InitValues;
-extern InitValues D_L18_001B1570;
+extern InitValues g_extermibot_part_init_values;
 #define W(p, o) (*(int *)((p) + (o)))
 #define H(p, o) (*(short *)((p) + (o)))
 #define U(p, o) (*(unsigned short *)((p) + (o)))
@@ -58,7 +58,7 @@ void func_PAL_L18_004352C8(u8 *a) {
     moby_transform_joint_to_world((int)a, 0, pos);
     qcopy_nc(CHILD(0x7C0) + 0x10, pos);
     qcopy_nc(CHILD(0x7C0) + 0xF0, a + 0xF0);
-    values = D_L18_001B1570;
+    values = g_extermibot_part_init_values;
     {
         float *v;
         i = 0;

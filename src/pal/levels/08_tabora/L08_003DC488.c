@@ -14,7 +14,7 @@ extern void moby_set_state(void *, int, int);
 extern int func_001163B0(void);
 extern void FastVecAdd(void *, void *, void *);
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 
 typedef int InitVector __attribute__((mode(TI)));
 typedef struct {
@@ -26,12 +26,12 @@ typedef struct {
     char pad2C[12];
     float f38;
 } InitContext;
-extern InitContext D_L08_001CA080;
+extern InitContext g_init_context;
 typedef struct {
     u8 pad0[0x464];
     u8 flags[0];
 } InitFlags;
-extern InitFlags D_L08_0021EAF0;
+extern InitFlags g_moby_spawn_state_flags_b;
 typedef struct {
     u8 pad0[0xB0];
     u8 fB0;
@@ -39,8 +39,8 @@ typedef struct {
     u16 fB2;
     u8 tail[0x4C];
 } InitEntry;
-extern u32 D_L08_001B29DC __attribute__((sda));
-extern void *D_L08_001FE7BC __attribute__((section(".data")));
+extern u32 g_moby_array __attribute__((sda));
+extern void *g_path_segment_list __attribute__((section(".data")));
 
 typedef struct {
     u8 pad0[0x10];
@@ -150,29 +150,29 @@ void func_PAL_L08_003DC488(InitObject *object)
     s->f48 = FloatToInt(15.0f);
     s->f4A = FloatToInt(9.6f);
     s->f29 = 1;
-    if (D_L08_001CA080.fC) {
-        if (object->f18 < D_L08_001CA080.f28 && D_L08_001CA080.f0 == 1)
+    if (g_init_context.fC) {
+        if (object->f18 < g_init_context.f28 && g_init_context.f0 == 1)
             return;
-        if (object->f18 > D_L08_001CA080.f28 && D_L08_001CA080.f0 == 0)
+        if (object->f18 > g_init_context.f28 && g_init_context.f0 == 0)
             return;
-        if (D_L08_001CA080.fC == 2) {
-            if (object->f18 > D_L08_001CA080.f38 && D_L08_001CA080.f0 == 1)
+        if (g_init_context.fC == 2) {
+            if (object->f18 > g_init_context.f38 && g_init_context.f0 == 1)
                 return;
-            if (object->f18 < D_L08_001CA080.f38 && D_L08_001CA080.f0 == 2)
+            if (object->f18 < g_init_context.f38 && g_init_context.f0 == 2)
                 return;
         }
     }
     handle = s->f404;
     if (handle != -1) {
         /* Entries are 0x100 bytes; the global holds their base address. */
-        handle = D_L08_001B29DC + (handle << 8);
+        handle = g_moby_array + (handle << 8);
         if (((InitEntry *)handle)->fB0 != 255) {
             flag = ((InitEntry *)handle)->fB2;
-            if (D_L08_0021EAF0.flags[(short)flag] ||
-                ((bits = (u8)D_0019B4A8[((short)flag >> 1) + (g_current_map_index << 10)]),
+            if (g_moby_spawn_state_flags_b.flags[(short)flag] ||
+                ((bits = (u8)g_moby_nibble_table[((short)flag >> 1) + (g_current_map_index << 10)]),
                  (flag & 1) ? (bits >> 4) & 7 : bits & 7)) {
                 unsigned short objectFlag = object->fB2;
-                bits = (u8)D_0019B4A8[((short)objectFlag >> 1) + (g_current_map_index << 10)];
+                bits = (u8)g_moby_nibble_table[((short)objectFlag >> 1) + (g_current_map_index << 10)];
                 if ((objectFlag & 1) ? (bits >> 4) & 7 : bits & 7) {
                     moby_mark_spawned(object);
                     return;
@@ -193,7 +193,7 @@ void func_PAL_L08_003DC488(InitObject *object)
     if (value > 0)
         s->f408 = FloatToInt(value + 2.0f);
     if (s->f428 == -1)
-        path_l01_compute_segment_lengths(D_L08_001FE7BC);
+        path_l01_compute_segment_lengths(g_path_segment_list);
     s->f88 = 0;
     s->f6A = 0;
     s->f98 = -1;

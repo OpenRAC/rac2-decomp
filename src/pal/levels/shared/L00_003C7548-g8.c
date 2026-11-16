@@ -2,18 +2,18 @@
 
 #include "common.h"
 typedef int UiQuadword __attribute__((mode(TI)));
-extern char *D_L00_001AFF98 __attribute__((sda));
-extern unsigned char D_L00_001DB2BC[];
-extern char *D_L00_001D9F00[];
+extern char *g_trail_owner __attribute__((sda));
+extern unsigned char g_voice_bank_index[];
+extern char *g_sound_bank_table[];
 extern UiQuadword g_hero_position[];
-extern int D_L00_001B2940[] MACRO_ADDR;
-extern int D_L00_001B2950[] MACRO_ADDR;
-extern short D_L00_001B2990[] MACRO_ADDR;
-extern UiQuadword D_L00_001B2900 MACRO_ADDR, D_L00_001B2910 MACRO_ADDR, D_L00_001B2920 MACRO_ADDR,
+extern int g_trail_point_counts[] MACRO_ADDR;
+extern int g_tesla_barrier_effects[] MACRO_ADDR;
+extern short g_tesla_ribbon_ids[] MACRO_ADDR;
+extern UiQuadword g_trail_up_vectors MACRO_ADDR, g_trail_forward_vectors MACRO_ADDR, g_trail_side_vectors MACRO_ADDR,
     D_L00_001B2930 MACRO_ADDR;
-extern float D_L00_001AFF4C __attribute__((sda));
-extern float D_L00_001B29D4 __attribute__((sda));
-extern char D_L00_0023FB80[];
+extern float g_trail_effect_length __attribute__((sda));
+extern float g_electric_ribbon_alpha_scale __attribute__((sda));
+extern char g_effect_trail_histories[];
 extern int weapon_spend_ammo(int, int);
 extern int AllocateSoundVoice(void *, int, int, void *, int);
 extern unsigned char *CreateMoby(int);
@@ -61,13 +61,13 @@ unsigned char *func_PAL_L00_003C77F0(int mode)
     short *entries;
     int *words;
 
-    if (D_L00_001AFF98 != 0) {
-        AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28) + 0x80,
+    if (g_trail_owner != 0) {
+        AllocateSoundVoice(*(char **)(g_sound_bank_table[g_voice_bank_index[0]] + 0x28) + 0x80,
                       0, 0, g_hero_position, 0x400);
         return 0;
     }
     if (weapon_spend_ammo(45, 1) == 0) {
-        AllocateSoundVoice(*(char **)(D_L00_001D9F00[D_L00_001DB2BC[0]] + 0x28),
+        AllocateSoundVoice(*(char **)(g_sound_bank_table[g_voice_bank_index[0]] + 0x28),
                       0, 0, g_hero_position, 0x400);
         return 0;
     }
@@ -75,7 +75,7 @@ unsigned char *func_PAL_L00_003C77F0(int mode)
     owner = (Owner3A *)CreateMoby(mode ? 0x1192 : 0xA5C);
     if (owner != 0) {
         state = owner->state;
-        D_L00_001AFF98 = (char *)owner;
+        g_trail_owner = (char *)owner;
         owner->flags |= 0x41;
         owner->group = 0xFF;
         owner->status = 1;
@@ -88,33 +88,33 @@ unsigned char *func_PAL_L00_003C77F0(int mode)
             int n;
 
             for (n = 3; n >= 0; n--)
-                D_L00_001B2940[n] = 0;
+                g_trail_point_counts[n] = 0;
         }
-        vec_scale_to_length(D_L00_0023FB80, owner->forward, D_L00_001AFF4C);
-        qcopy(&D_L00_001B2900, up);
-        vec_scale_to_length(D_L00_0023FB80 + 0x140, side, D_L00_001AFF4C);
-        qcopy(&D_L00_001B2910, owner->forward);
-        vec_scale_to_length(D_L00_0023FB80 + 0x280, up, D_L00_001AFF4C);
-        qcopy(&D_L00_001B2920, side);
-        FastVecAdd(D_L00_0023FB80 + 0x3C0, owner->forward, up);
+        vec_scale_to_length(g_effect_trail_histories, owner->forward, g_trail_effect_length);
+        qcopy(&g_trail_up_vectors, up);
+        vec_scale_to_length(g_effect_trail_histories + 0x140, side, g_trail_effect_length);
+        qcopy(&g_trail_forward_vectors, owner->forward);
+        vec_scale_to_length(g_effect_trail_histories + 0x280, up, g_trail_effect_length);
+        qcopy(&g_trail_side_vectors, side);
+        FastVecAdd(g_effect_trail_histories + 0x3C0, owner->forward, up);
         entries = state->entries;
-        vec_scale_to_length(D_L00_0023FB80 + 0x3C0, D_L00_0023FB80 + 0x3C0, D_L00_001AFF4C);
+        vec_scale_to_length(g_effect_trail_histories + 0x3C0, g_effect_trail_histories + 0x3C0, g_trail_effect_length);
         words = state->words;
-        FastVecCross(&D_L00_001B2930, D_L00_0023FB80 + 0x3C0, side);
+        FastVecCross(&g_trail_cross_vector, g_effect_trail_histories + 0x3C0, side);
 
         {
             int n;
 
             for (n = 7; n >= 0; n--)
-                D_L00_001B2950[n] = 0;
+                g_tesla_barrier_effects[n] = 0;
         }
         {
             int n;
 
             for (n = 4; n >= 0; n--)
-                D_L00_001B2990[n] = 0;
+                g_tesla_ribbon_ids[n] = 0;
         }
-        D_L00_001B29D4 = 1.0f;
+        g_electric_ribbon_alpha_scale = 1.0f;
 
         fade_set_level(mode);
         state->f00 = fade_get_value();

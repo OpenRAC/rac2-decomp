@@ -3,8 +3,8 @@
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { Vector128 position,angles,delta; } MovingPathWorkspace;
-extern char *D_L16_001FE7C0[];
-extern char D_L16_002A4570[];
+extern char *g_path_l16_table[];
+extern char g_str_path_missing_warning[];
 extern float g_hero_state[];
 extern void STUB_printf(const char *,...);
 extern void moby_set_state(unsigned char *,int,int);
@@ -16,7 +16,7 @@ extern float vec_distance_xy(void *,void *);
 extern float math_fabs(float);
 extern void mat_combine_and_store(void *,void *,void *,void *);
 
-void func_PAL_L16_0041DC38(char *object)
+void path_l16_follower_update_pal(char *object)
 {
     MovingPathWorkspace local;
     char *state=*(char **)(object+0x68);
@@ -28,11 +28,11 @@ void func_PAL_L16_0041DC38(char *object)
     case 0: {
         char *initialPath;
         index=*(int *)(state+0x60);
-        initialPath=D_L16_001FE7C0[index];
+        initialPath=g_path_l16_table[index];
         qcopy((object+0x10),(initialPath+0x10));
         *(int *)(state+0x6c)=0;
         *(float *)(state+0x68)*=0.020000001f;
-        if(index==-1) STUB_printf(D_L16_002A4570,*(short *)(object+0xaa),*(short *)(object+0xb2));
+        if(index==-1) STUB_printf(g_str_path_missing_warning,*(short *)(object+0xaa),*(short *)(object+0xb2));
         moby_set_state((unsigned char *)object,1,-1);
         break;
     }
@@ -40,7 +40,7 @@ void func_PAL_L16_0041DC38(char *object)
         if(*(unsigned char *)(object+0xbc)!=0) moby_set_state((unsigned char *)object,2,-1);
         break;
     case 2:
-        path=D_L16_001FE7C0[*(int *)(state+0x60)];
+        path=g_path_l16_table[*(int *)(state+0x60)];
         point=path+0x20+*(int *)(state+0x6c)*0x10;
         FastVecSub(&local.delta,point,object+0x10);
         vec_scale_to_length(&local.delta,&local.delta,*(float *)(state+0x68));
@@ -52,7 +52,7 @@ void func_PAL_L16_0041DC38(char *object)
         if(*(int *)(state+0x64)<=*(unsigned short *)(object+0x96)) moby_set_state((unsigned char *)object,4,-1);
         break;
     case 4:
-        path=D_L16_001FE7C0[*(int *)(state+0x60)];
+        path=g_path_l16_table[*(int *)(state+0x60)];
 
         if(g_hero_state[34]<*(float *)(object+0x18)) {
             if(vec_distance_xy(object+0x10,g_hero_state+32)<3.0f && math_fabs(*(float *)(object+0x18)-g_hero_state[34])<2.5f) goto skipMovement;

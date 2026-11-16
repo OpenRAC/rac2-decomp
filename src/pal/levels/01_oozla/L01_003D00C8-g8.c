@@ -23,11 +23,11 @@ extern s32 FloatToInt(f32);
 extern float path_l01_compute_segment_lengths(u32);
 extern void anim_start_immediate(u8 *, s32, s32);
 extern void moby_set_state(u8 *, s32, s32);
-extern int D_L01_001B2088[] __attribute__((sda));
-extern u32 D_L01_001FE180[];
+extern int g_oozla_intro_stage[] __attribute__((sda));
+extern u32 g_path_l01_table[];
 extern u8 *g_moby_l01_table MACRO_ADDR;
 
-void func_PAL_L01_003D00C8(u8 *a0)
+void swamp_monster_arm_init_pal(u8 *a0)
 {
     OozlaSpawnState *p = *(OozlaSpawnState **)(a0 + 0x68);
 
@@ -36,7 +36,7 @@ void func_PAL_L01_003D00C8(u8 *a0)
     p->field29 = 1;
     *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.5f;
     qcopy(p->field80, a0 + 0x10);
-    if (!D_L01_001B2088[0] && a0[0x21] != 255)
+    if (!g_oozla_intro_stage[0] && a0[0x21] != 255)
         *p->fieldd8 = 0;
     p->field30 = 2.0f;
     p->field2a = 8;
@@ -44,7 +44,7 @@ void func_PAL_L01_003D00C8(u8 *a0)
     p->field2e = 3;
     p->fieldbc = 0;
     if (p->fieldb8 != -1)
-        path_l01_compute_segment_lengths(D_L01_001FE180[p->fieldb8]);
+        path_l01_compute_segment_lengths(g_path_l01_table[p->fieldb8]);
     p->fieldf0 = p->fielde8;
     if (p->fielddd)
         *(u16 *)(a0 + 0x34) |= 0x8000;

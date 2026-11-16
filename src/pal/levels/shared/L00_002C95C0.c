@@ -40,7 +40,7 @@ typedef struct {
 /* func_L00_002C8E10 is built in its dedicated G8 unit. */
 
 /* Drives one effect state: branches on several resource fields, decays and integrates two float components through three float helpers, and writes back the summed value. */
-void func_PAL_L00_002C95C0(void)
+void hero_update_height_offset_pal(void)
 {
     f32 old, v, r, sum;
 
@@ -96,13 +96,13 @@ extern s32 hero_l00_set_action(int a0, int a1);
 extern int PadPressedWithin(int, int, int *);
 extern int hero_get_step_offset_from_direction(void);
 extern int pad_presses_within_frames(int, int, int, int);
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 
 /* Looks the object up in the shared table and stops when the lookup fails; otherwise the state
  * machine's offset advances the object and a second lookup asks for a transition when it
  * succeeds.  A set state word, a timer past 0.9 and a state other than the idle one ask for the
  * same transition, and a zero second argument asks for it with another code. */
-int func_PAL_L00_002CA360(int arg0, int arg1)
+int hero_try_start_move_from_buffer_pal(int arg0, int arg1)
 {
     int index;
     int r;
@@ -111,7 +111,7 @@ int func_PAL_L00_002CA360(int arg0, int arg1)
     if (PadPressedWithin(0x40, arg0, &index) == 0)
         return 0;
     r = hero_get_step_offset_from_direction();
-    if ((D_00138320[0] & 8) && r > 0) {
+    if ((g_pad_pressed_flags[0] & 8) && r > 0) {
         if (pad_presses_within_frames(0x40, 0x1F000, arg0 + r, r) != 0) {
             hero_l00_set_action(0xB, 1);
             return 1;

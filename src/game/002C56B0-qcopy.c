@@ -36,7 +36,7 @@ extern int func_001163B0(void);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern unsigned char *D_001F2628;
+extern unsigned char *g_part_tex_burst_ember_table;
 
 /* Spawns a debris particle at position: mode 0 sits still for life frames, mode 1
    flies off at a random speed and direction for life1 frames. */
@@ -56,7 +56,7 @@ Particle_002C56B0 *part_spawn_debris_two_mode(TI128 *position, unsigned char byt
         p->unk09 = FloatToInt(0.0f) + 0x70;
         p->unk01 = 0;
         p->unk03 = 0x44;
-        p->unk02 = D_001F2628[func_001163B0() & 7];
+        p->unk02 = g_part_tex_burst_ember_table[func_001163B0() & 7];
         p->size = 21000.0f;
         p->unk08 = func_001163B0();
         m->mode = mode;

@@ -34,7 +34,7 @@ extern void *D_L00_002A00A0[31];
 /* Dispatches on the argument through the level's table: the five listed cases write
  * 0x46 at +0x1FC and 3 at +0x24F4 of the resident block, the other twenty-six and every
  * argument out of the range only return. */
-void func_PAL_L00_002B1200(int a0)
+void hero_start_timed_state_for_mode_pal(int a0)
 {
     /* Keeps the two arms alive: the addresses land in the discarded .data. */
     static void *cases[31] = {
@@ -58,9 +58,9 @@ ret:
 
 extern void UpdateHeroSlotCallbacks(void);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
-extern void func_PAL_L00_002B1248(int);
-extern int D_L00_001B18D8[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
+extern void ApplyHeroEquipmentRequest_pal(int);
+extern int g_ring_animation_counter[] __attribute__((sda));
 
 /* Per-frame pass over the seven 80-byte slots at +0x1220: an empty slot is released; in
  * state 2 a slot counts a tick, is released and, for a flagged entry whose animation set
@@ -68,7 +68,7 @@ extern int D_L00_001B18D8[] __attribute__((sda));
  * flagged entry) are reinstalled with the shared value plus 2.  The entry's update
  * callback then runs, except for slot 6, a 253/254 sentinel entry, or slot 0 while the
  * block's word at +0x1500 is set and its mode at +0x1248 is not 10. */
-void func_PAL_L00_002B1E88(void)
+void UpdateHeroSlotCallbacks_pal(void)
 {
     int i;
 
@@ -82,7 +82,7 @@ void func_PAL_L00_002B1E88(void)
             switch (*(int *)(slot + 0x1244)) {
             case 2:
                 ++*(int *)(slot + 0x1240);
-                func_PAL_L00_002B1248(i);
+                ApplyHeroEquipmentRequest_pal(i);
                 if ((entry[0x60] & 2) && entry[0x43] == 0
                     && (*(u8 **)(entry + 0x24))[0xC] >= 2)
                     func_PAL_002A7E68(entry, 1, 0, 2);
@@ -90,7 +90,7 @@ void func_PAL_L00_002B1E88(void)
             case 3:
                 ++slot[0x123B];
                 if ((entry[0x60] & 2) || i == 1 || i == 0)
-                    hero_release_item_slot(i, D_L00_001B18D8[0] + 2);
+                    hero_release_item_slot(i, g_ring_animation_counter[0] + 2);
                 break;
             }
             {
@@ -106,13 +106,13 @@ void func_PAL_L00_002B1E88(void)
                     callback((char *)entry);
             }
         } else {
-            func_PAL_L00_002B1248(i);
+            ApplyHeroEquipmentRequest_pal(i);
         }
     }
 }
 
-extern void func_PAL_L00_002AF6C0(void);
-extern void func_PAL_L00_002B1E88(void);
+extern void cancel_hero_item_animation_pal(void);
+extern void UpdateHeroSlotCallbacks_pal(void);
 extern int hud_set_slot_contents(int, int, char *, char *, char *, int, int);
 extern void level_release_slot_list(char *);
 extern void hero_set_objects_flag_bit(void);
@@ -123,23 +123,23 @@ extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
 extern int func_PAL_L00_002C4480(int, int);
 extern int level_run_slot_callback(int);
-extern int D_00138320[];
-extern char D_L00_002F8588[];
-extern char D_L00_002F85D0[];
-extern char D_L00_002F8AD8[];
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
+extern char g_str_timed_state_text_a[];
+extern char g_str_timed_state_text_b[];
+extern char g_str_timed_state_text_c[];
+extern int g_pad_pressed_flags[];
 
 /* Reset the hero update state, install the requested mode and object, and update the mode-one counters. */
-void func_PAL_L00_002B2958(int mode, int value, char *object)
+void SetHeroMode_pal(int mode, int value, char *object)
 {
     char *p;
     char *current;
     int count;
 
-    func_PAL_L00_002AF6C0();
+    cancel_hero_item_animation_pal();
     p = (char *)D_00189E20_1;
     p[0x22B6] = 1;
-    func_PAL_L00_002B1E88();
+    UpdateHeroSlotCallbacks_pal();
     *(int *)(p + 0x2290) = *(int *)(p + 0xC18);
     level_release_slot_list(p + 0x18E0);
     level_release_slot_list(p + 0x1A30);
@@ -155,9 +155,9 @@ void func_PAL_L00_002B2958(int mode, int value, char *object)
         q[0x22B4] = (char)mode;
         *(int *)(q + 0xC14) = (int)object;
         *(int *)(q + 0x2290) = (int)object;
-        if ((unsigned char)mode == 1 && (D_00138320[0] & 0x10) != 0) {
-            hud_set_slot_contents(0x23, 0, D_L00_002F8588,
-                             D_L00_002F85D0, D_L00_002F8AD8, 0, 0);
+        if ((unsigned char)mode == 1 && (g_pad_pressed_flags[0] & 0x10) != 0) {
+            hud_set_slot_contents(0x23, 0, g_str_timed_state_text_a,
+                             g_str_timed_state_text_b, g_str_timed_state_text_c, 0, 0);
             level_run_slot_callback(3);
         }
         {

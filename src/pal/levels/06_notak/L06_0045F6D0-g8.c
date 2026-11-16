@@ -7,17 +7,17 @@ extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_below(int);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_L06_00380B10(void *, void *, int, float, float);
-extern float D_L06_001B1AC0 __attribute__((sda));
-extern float D_L06_001B1AC4 __attribute__((sda));
-extern float D_L06_001B1AC8 __attribute__((sda));
-extern float D_L06_001B1ACC __attribute__((sda));
-extern float D_L06_001B1AD0 __attribute__((sda));
-extern float D_L06_001B1AD4 __attribute__((sda));
-extern float D_L06_001B1AD8 __attribute__((sda));
-extern float D_L06_001B1ADC __attribute__((sda));
-extern int D_L06_001B1AE0 __attribute__((sda));
-extern int D_L06_001B1AE4 __attribute__((sda));
-extern int D_L06_001B1AE8 __attribute__((sda));
+extern float g_facing_speed_a_min __attribute__((sda));
+extern float g_facing_speed_a_max __attribute__((sda));
+extern float g_facing_lift_a_min __attribute__((sda));
+extern float g_facing_lift_a_max __attribute__((sda));
+extern float g_facing_speed_b_min __attribute__((sda));
+extern float g_facing_speed_b_max __attribute__((sda));
+extern float g_facing_lift_b_min __attribute__((sda));
+extern float g_facing_lift_b_max __attribute__((sda));
+extern int g_facing_effect_kind_a __attribute__((sda));
+extern int g_facing_effect_kind_b __attribute__((sda));
+extern int g_facing_effect_odds __attribute__((sda));
 
 void func_PAL_L06_00461850(char *a0) {
     float velocity[4], pos[4], offset[4];
@@ -29,32 +29,32 @@ void func_PAL_L06_00461850(char *a0) {
     offset[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * 1.5f;
     offset[2] = 0;
     FastVecAdd(pos, pos, offset);
-    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.020000001f, D_L06_001B1AC4 * 0.020000001f);
-    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.020000001f, D_L06_001B1AC4 * 0.020000001f);
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_a_min * 0.020000001f, g_facing_speed_a_max * 0.020000001f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_a_min * 0.020000001f, g_facing_speed_a_max * 0.020000001f);
     velocity[2] = 0;
-    velocity[2] = math_random_float_range(D_L06_001B1AC8 * 0.020000001f, D_L06_001B1ACC * 0.020000001f);
-    func_PAL_L06_00380B10(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    func_PAL_L06_00380B10(pos, velocity, D_L06_001B1AE4, 0.5f, 50.4f);
-    if (math_random_int_below(D_L06_001B1AE8) != 1) {
-    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.020000001f, D_L06_001B1AC4 * 0.020000001f);
-    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AC0 * 0.020000001f, D_L06_001B1AC4 * 0.020000001f);
+    velocity[2] = math_random_float_range(g_facing_lift_a_min * 0.020000001f, g_facing_lift_a_max * 0.020000001f);
+    func_PAL_L06_00380B10(pos, velocity, g_facing_effect_kind_b, 0.5f, 50.4f);
+    func_PAL_L06_00380B10(pos, velocity, g_facing_effect_kind_b, 0.5f, 50.4f);
+    if (math_random_int_below(g_facing_effect_odds) != 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_a_min * 0.020000001f, g_facing_speed_a_max * 0.020000001f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_a_min * 0.020000001f, g_facing_speed_a_max * 0.020000001f);
     velocity[2] = 0;
-    velocity[2] = math_random_float_range(D_L06_001B1AC8 * 0.020000001f, D_L06_001B1ACC * 0.020000001f);
-        func_PAL_L06_00380B10(pos, velocity, D_L06_001B1AE0, 0.5f, 50.4f);
+    velocity[2] = math_random_float_range(g_facing_lift_a_min * 0.020000001f, g_facing_lift_a_max * 0.020000001f);
+        func_PAL_L06_00380B10(pos, velocity, g_facing_effect_kind_a, 0.5f, 50.4f);
     }
-    if (math_random_int_below(D_L06_001B1AE8) != 1) {
-    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.020000001f, D_L06_001B1AD4 * 0.020000001f);
-    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.020000001f, D_L06_001B1AD4 * 0.020000001f);
+    if (math_random_int_below(g_facing_effect_odds) != 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_b_min * 0.020000001f, g_facing_speed_b_max * 0.020000001f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_b_min * 0.020000001f, g_facing_speed_b_max * 0.020000001f);
     velocity[2] = 0;
-    velocity[2] = math_random_float_range(D_L06_001B1AD8 * 0.020000001f, 0.036000002f);
-        func_PAL_L06_00380B10(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = math_random_float_range(g_facing_lift_b_min * 0.020000001f, 0.036000002f);
+        func_PAL_L06_00380B10(pos, velocity, g_facing_effect_kind_a, 0.75f, 50.4f);
     }
-    if (math_random_int_below(D_L06_001B1AE8) == 1) {
-    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.020000001f, D_L06_001B1AD4 * 0.020000001f);
-    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(D_L06_001B1AD0 * 0.020000001f, D_L06_001B1AD4 * 0.020000001f);
+    if (math_random_int_below(g_facing_effect_odds) == 1) {
+    velocity[0] = math_fast_sin_or_cos_a(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_b_min * 0.020000001f, g_facing_speed_b_max * 0.020000001f);
+    velocity[1] = math_fast_sin_or_cos_b(*(float *)(a0 + 0xF8)) * math_random_float_range(g_facing_speed_b_min * 0.020000001f, g_facing_speed_b_max * 0.020000001f);
     velocity[2] = 0;
-    velocity[2] = math_random_float_range(D_L06_001B1AD8 * 0.020000001f, D_L06_001B1ADC * 0.020000001f);
-        func_PAL_L06_00380B10(pos, velocity, D_L06_001B1AE0, 0.75f, 50.4f);
+    velocity[2] = math_random_float_range(g_facing_lift_b_min * 0.020000001f, g_facing_lift_b_max * 0.020000001f);
+        func_PAL_L06_00380B10(pos, velocity, g_facing_effect_kind_a, 0.75f, 50.4f);
     }
 }
 
@@ -68,17 +68,17 @@ extern void FastVecAdd(void *,void *,void *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void moby_mark_spawned(char *);
 extern void *part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
-extern void func_PAL_L00_0032C328(void *,void *,void *,void *,int,int,int,int,int,int,int);
-extern void func_PAL_L00_003281C0(char *,int,float);
+extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,int,int,int,int,int,int,int);
+extern void part_spawn_scaled_bolts_pal(char *,int,float);
 extern void moby_compute_local_point(char *,void *,float,float,float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void func_PAL_L00_00328480(char *,void *,int,float,int,void *,float,unsigned int,float,float,int);
-extern char D_L06_001B1C08[] SDATA(D_L06_001B1C08);
-extern char D_L06_001B1C00[] SDATA(D_L06_001B1C00);
-extern char D_L06_001B1C10[] SDATA(D_L06_001B1C10);
-extern char D_L06_001A8F20[] MACRO_ADDR;
-extern int D_L06_001B1C30 __attribute__((sda));
+extern char g_debris_param_b[] SDATA(D_L06_001B1C08);
+extern char g_debris_param_c[] SDATA(D_L06_001B1C00);
+extern char g_debris_param_a[] SDATA(D_L06_001B1C10);
+extern char g_effect_vector[] MACRO_ADDR;
+extern int g_debris_piece_color __attribute__((sda));
 
 void func_PAL_L06_00467544(char *obj)
 {
@@ -107,18 +107,18 @@ void func_PAL_L06_00467544(char *obj)
             qcopy(c, b);
             FastVecSub(b, b, a);
             FastVecAdd(c, c, a);
-            func_PAL_L00_0032C328(obj, b, D_L06_001B1C08, D_L06_001B1C00,
-                             65535, -1, D_L06_001B1C30, 9, state, 255, 0);
+            part_explode_object_into_pieces_pal(obj, b, g_debris_param_b, g_debris_param_c,
+                             65535, -1, g_debris_piece_color, 9, state, 255, 0);
             moby_set_state(obj, 2, -1);
         }
         ((unsigned char *)obj)[0xA8] = 255;
         break;
     case 2:
-        func_PAL_L00_0032C328(obj, D_L06_001B1C10, D_L06_001B1C08, D_L06_001B1C00,
-                         65535, 0, D_L06_001B1C30, 7, 62, 255, 0);
-        func_PAL_L00_003281C0(obj, 1, pos[2] * 0.33333334f);
+        part_explode_object_into_pieces_pal(obj, g_debris_param_a, g_debris_param_b, g_debris_param_c,
+                         65535, 0, g_debris_piece_color, 7, 62, 255, 0);
+        part_spawn_scaled_bolts_pal(obj, 1, pos[2] * 0.33333334f);
         moby_compute_local_point(obj, a, pos[0], pos[1], pos[2]);
-        func_PAL_002AC718(obj, D_L06_001A8F20, a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
+        SpawnExplosionEffects_pal(obj, g_effect_vector, a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
                       -1, 0, 0, 0, -1, 0, 0x810001);
         for (i = 0; i < 4; i++) {
             b[0] = (i / 2 * 2 - 1) * 0.020000001f;

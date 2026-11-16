@@ -47,14 +47,14 @@ extern int mpeg_vibuf_add_timestamp(void *, Transfer_3518F0 *, int);
    the packet.  The two addresses are turned into 32-bit engine addresses. */
 typedef struct { char tag[4]; } Header_351960;
 
-extern Header_351960 D_001AE860;
+extern Header_351960 g_mpeg_packet_header;
 
 /* These wrappers have different targets in the level programs. */
 extern void mpeg_vobuf_reset(u8 *);
-extern int func_US2_00352868(void *);
+extern int mpeg_dec_run_loop_us2(void *);
 extern void STUB_printf();
-extern char D_001AE868[];
-extern char D_001AE880[];
+extern char g_str_mpeg_dec_loop_message[];
+extern char g_str_mpeg_dec_loop_debug[];
 extern int mpeg_read_indirect_word(void *);
 extern void sceMpegReset(void *);
 extern int mpeg_set_output_buffer(void *, void *, int);
@@ -62,9 +62,9 @@ extern void mpeg_start_decoder_dma(void);
 extern void mpeg_set_debug_value(char *);
 extern void *mpeg_vobuf_get_next_frame(char *);
 extern void mpeg_vobuf_advance_write(u8 *);
-extern void func_US2_00350B60(void *, void *, int, int, int);
+extern void mpeg_build_frame_packet_us2(void *, void *, int, int, int);
 
-int func_US2_00352868(void *p)
+int mpeg_dec_run_loop_us2(void *p)
 {
     int *object = p;
     int result = 1;
@@ -74,18 +74,18 @@ int func_US2_00352868(void *p)
     while (mpeg_read_indirect_word(object) == 0) {
         if (videoDecGetState((u8 *)object) == 1) {
             result = -1;
-            STUB_printf(D_001AE868);
+            STUB_printf(g_str_mpeg_dec_loop_message);
             break;
         }
         while ((packet = mpeg_vobuf_get_next_frame(g_movie_player_state[0] + 0xD9168)) == 0)
             mpeg_start_decoder_dma();
         if (mpeg_set_output_buffer(object, packet, 0x340) < 0)
-            mpeg_set_debug_value(D_001AE880);
+            mpeg_set_debug_value(g_str_mpeg_dec_loop_debug);
         if (object[2] == 0) {
             int a = object[0];
             int b = object[1];
             for (i = 0; i < *(int *)(g_movie_player_state[0] + 0xD9178); i++)
-                func_US2_00350B60(*(char **)(g_movie_player_state[0] + 0xD916C) + i * 0x138C0 + 0x40,
+                mpeg_build_frame_packet_us2(*(char **)(g_movie_player_state[0] + 0xD916C) + i * 0x138C0 + 0x40,
                               *(char **)(g_movie_player_state[0] + 0xD9168) + i * 0xD0000, a, b, i);
         }
         mpeg_vobuf_advance_write((u8 *)(g_movie_player_state[0] + 0xD9168));

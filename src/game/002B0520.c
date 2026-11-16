@@ -3,13 +3,13 @@
 
 typedef int TI __attribute__((mode(TI)));
 
-extern u8 *D_001B1A20 MACRO_ADDR;
-extern f32 D_001B19E0[] __attribute__((sda));
-extern f32 D_001B1A10 MACRO_ADDR;
-extern f32 D_001B1A14 MACRO_ADDR;
-extern f32 D_001B1A18 MACRO_ADDR;
-extern s32 D_001A91C0 MACRO_ADDR;
-extern s32 D_001C4F40;
+extern u8 *g_heightmap_data MACRO_ADDR;
+extern f32 g_heightmap_origin[] __attribute__((sda));
+extern f32 g_heightmap_cell_width MACRO_ADDR;
+extern f32 g_heightmap_cell_depth MACRO_ADDR;
+extern f32 g_heightmap_height_scale MACRO_ADDR;
+extern s32 g_heightmap_cache_key MACRO_ADDR;
+extern s32 g_map_mode;
 
 extern void FastVecSub(void *, void *, void *);
 extern float IntToFloat(int);
@@ -23,20 +23,20 @@ float coll_get_heightmap_height(TI *position) {
     u8 height_byte;
 
     *(TI *)world_pos = *position;
-    if (D_001B1A20 == 0) {
+    if (g_heightmap_data == 0) {
         return 0.0f;
     }
-    FastVecSub(rel, world_pos, D_001B19E0);
-    rel[0] = rel[0] / D_001B1A10;
-    rel[1] = rel[1] / D_001B1A14;
-    if (rel[0] < 0.0f || 256.0f < rel[0] || rel[1] < 0.0f || 256.0f < rel[1] || D_001A91C0 != D_001C4F40) {
+    FastVecSub(rel, world_pos, g_heightmap_origin);
+    rel[0] = rel[0] / g_heightmap_cell_width;
+    rel[1] = rel[1] / g_heightmap_cell_depth;
+    if (rel[0] < 0.0f || 256.0f < rel[0] || rel[1] < 0.0f || 256.0f < rel[1] || g_heightmap_cache_key != g_map_mode) {
         return 1023.0f;
     }
     cell_index = FloatToInt(rel[1]) << 8;
     cell_index += FloatToInt(rel[0]);
-    height_byte = D_001B1A20[cell_index];
+    height_byte = g_heightmap_data[cell_index];
     if (height_byte == 0xFF) {
         return 1023.0f;
     }
-    return IntToFloat(height_byte) * D_001B1A18 + D_001B19E0[2];
+    return IntToFloat(height_byte) * g_heightmap_height_scale + g_heightmap_origin[2];
 }

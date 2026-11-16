@@ -21,7 +21,7 @@ extern unsigned char *moby_get_or_find_target(void *,void *,int,float,float,floa
 extern float fast_vec_dist(void *,void *),math_fabs(float);
 extern void hud_add_moby_marker(void *,unsigned int,void *,int,int,int,float,float,float);
 
-void func_PAL_L00_003B9C00(unsigned char *object)
+void weapon_update_target_lock_pal(unsigned char *object)
 {
     Vector point,projection,facing;
     char *context=*(char **)(object+0x68);

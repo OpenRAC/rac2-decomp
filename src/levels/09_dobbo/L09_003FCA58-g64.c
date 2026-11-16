@@ -11,8 +11,8 @@ typedef struct {
     float uv[4][2];
     unsigned long long flags, texture, mode, blend;
 } GlowPacket;
-extern GlowVector D_L09_00255F40[][4], D_L09_00256410[], D_L09_001B1150[4] __attribute__((sda));
-extern GlowVector D_L09_001B9A00[], D_0018A0E0[];
+extern GlowVector g_sound_slot_origins[][4], g_sound_slot_target_positions[], g_glow_corner_table[4] __attribute__((sda));
+extern GlowVector g_camera_l09_position[], g_hero_state_block[];
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -33,11 +33,11 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
     float scale;
     int i;
     GlowVector *corner, *vertex;
-    qcopy(&position, &D_L09_00255F40[slot][0]);
+    qcopy(&position, &g_sound_slot_origins[slot][0]);
     position.f[3] = 1.0f;
-    FastVecSub(&basis[0], D_L09_001B9A00, &position);
+    FastVecSub(&basis[0], g_camera_l09_position, &position);
     vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-    FastVecCross(&basis[1], &basis[0], D_0018A0E0);
+    FastVecCross(&basis[1], &basis[0], g_hero_state_block);
     vec_scale_to_length(&basis[1], &basis[1], -1.0f);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     packet.texture = GetEffectTextureDescriptor(11);
@@ -59,7 +59,7 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
         jitter.f[2] = 0.025f;
     }
     for (i = 0; i < 4; i++) {
-        FastVecScale(&packet.vertex[i], &D_L09_001B1150[i], scale);
+        FastVecScale(&packet.vertex[i], &g_glow_corner_table[i], scale);
         transform_vector(&packet.vertex[i], &packet.vertex[i], basis);
         FastVecAdd(&packet.vertex[i], &packet.vertex[i], &jitter);
     }
@@ -70,7 +70,7 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
     {
         int j;
         vertex = packet.vertex;
-        for (corner = D_L09_001B1150, j = 3; j >= 0; j--) {
+        for (corner = g_glow_corner_table, j = 3; j >= 0; j--) {
             FastVecScale(vertex, corner, scale * 3.0f);
             corner++;
             transform_vector(vertex, vertex, basis);
@@ -78,10 +78,10 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
         }
     }
     draw_world_quad(&packet, 0, 0);
-    qcopy(&position, &D_L09_00256410[slot]);
-    FastVecSub(&basis[0], D_L09_001B9A00, &position);
+    qcopy(&position, &g_sound_slot_target_positions[slot]);
+    FastVecSub(&basis[0], g_camera_l09_position, &position);
     vec_scale_to_length(&basis[0], &basis[0], 1.0f);
-    FastVecCross(&basis[1], &basis[0], D_0018A0E0);
+    FastVecCross(&basis[1], &basis[0], g_hero_state_block);
     vec_scale_to_length(&basis[1], &basis[1], -1.0f);
     FastVecCross(&basis[2], &basis[1], &basis[0]);
     scale = math_random_float_range(0.3f, 0.325f);
@@ -91,7 +91,7 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = color;
     {
         int j;
-        corner = D_L09_001B1150;
+        corner = g_glow_corner_table;
         vertex = packet.vertex;
         for (j = 3; j >= 0; j--) {
             FastVecScale(vertex, corner, scale);
@@ -107,7 +107,7 @@ void DrawDobboPairedGlowQuads(void *unused, int slot, int alpha)
     {
         int j;
         vertex = packet.vertex;
-        for (corner = D_L09_001B1150, j = 3; j >= 0; j--) {
+        for (corner = g_glow_corner_table, j = 3; j >= 0; j--) {
             FastVecScale(vertex, corner, scale * 3.0f);
             corner++;
             transform_vector(vertex, vertex, basis);

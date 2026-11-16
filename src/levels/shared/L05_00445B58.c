@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern unsigned char *D_L05_001B9710;
+extern unsigned char *g_hero_l05_moby;
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
@@ -8,7 +8,7 @@ extern void FastVecCross(void *, void *, void *);
 /* When the camera is in the right mode, puts it at the given spot and turns it to look at the target. */
 void ship_point_camera_at_target(void *target, void *position)
 {
-    unsigned char *camera = D_L05_001B9710;
+    unsigned char *camera = g_hero_l05_moby;
     float up[4];
     if (*(short *)(camera + 0x86) == 25) {
         qcopy(camera + 0x30, position);

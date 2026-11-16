@@ -22,12 +22,12 @@ extern void group_destroy_attached_parts(void *,void *);
 extern void part_spawn_explosion_with_sparks(void *,void *,int,float,float);
 extern void SetDeathBits(void *,int,int);
 extern void enemy_destroy_child_cleanup_b(void *);
-extern float D_001BAFA8 NOT_SDA;
-extern int D_001B1B78 MACRO_ADDR;
-extern char *D_001B1B5C MACRO_ADDR;
-extern char *D_001B1C4C MACRO_ADDR;
+extern float g_coll_ground_height NOT_SDA;
+extern int g_moby_group_count MACRO_ADDR;
+extern char *g_moby_pool_start MACRO_ADDR;
+extern char *g_vec_record_table MACRO_ADDR;
 extern char g_camera_eye_state[];
-extern unsigned short *D_001EE5A0[];
+extern unsigned short *g_moby_group_lists[];
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
@@ -69,7 +69,7 @@ int group_enemy_init_update(char *self)
         moby_transform_joint_to_world(self,3,vars+0x300);
         F(vars,0x308)+=20.0f;
         moby_transform_joint_to_world(self,3,vars+0x310);
-        if(CollLine(vars+0x310,vars+0x300,0,self,0)) F(vars,0x308)=D_001BAFA8;
+        if(CollLine(vars+0x310,vars+0x300,0,self,0)) F(vars,0x308)=g_coll_ground_height;
         if(!I(vars,0x27C) && I(vars,0x288)==-1) {
             F(self,0x18)=coll_probe_ground_height_below(self+0x10,0,0.5f);
             moby_set_state(self,1,0);
@@ -94,7 +94,7 @@ int group_enemy_init_update(char *self)
         }
         if(I(vars,0x288)!=-1) {
             moby_set_state(self,2,0);
-            qcopy(vars+0x300,D_001B1C4C+(I(vars,0x288)<<7)+0x30);
+            qcopy(vars+0x300,g_vec_record_table+(I(vars,0x288)<<7)+0x30);
             B(self,0x30)=128;
         }
         enemy_spawn_child_parts(self,vars+0x2A0,0,2);
@@ -109,10 +109,10 @@ int group_enemy_init_update(char *self)
         F(vars,0x30)=0.5f;
         if(result==5) { I(vars,0xF0)=0; F(vars,0xF4)=0.8377582f; }
         group_alert_peers_type_b(self);
-        if((result==4 || result==5 || changed) && B(self,0x21)<=D_001B1B78 && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+        if((result==4 || result==5 || changed) && B(self,0x21)<=g_moby_group_count && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
+            list=g_moby_group_lists[B(self,0x21)];
             for (;;) {
-                peer_obj=D_001B1B5C+((*list&0x7FFF)<<8);
+                peer_obj=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if (*(short *)(peer_obj+0xAA)==0xB0A) {
                     peer_vars=P(peer_obj,0x68);
                     if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; break; }
@@ -126,12 +126,12 @@ int group_enemy_init_update(char *self)
         }
     }
     qcopy(pos,self+0x10);
-    if(F(self,0x18)-coll_probe_ground_height_below(pos,0,0.5f)>20.0f && B(self,0x21)<=D_001B1B78 && !I(vars,0x2C8)) {
+    if(F(self,0x18)-coll_probe_ground_height_below(pos,0,0.5f)>20.0f && B(self,0x21)<=g_moby_group_count && !I(vars,0x2C8)) {
         I(vars,0x2C8)=1;
         if(moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
-            list=D_001EE5A0[B(self,0x21)];
+            list=g_moby_group_lists[B(self,0x21)];
             for (;;) {
-                peer_obj=D_001B1B5C+((*list&0x7FFF)<<8);
+                peer_obj=g_moby_pool_start+((*list&0x7FFF)<<8);
                 if (*(short *)(peer_obj+0xAA)==0xB0A) {
                     peer_vars=P(peer_obj,0x68);
                     if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; break; }

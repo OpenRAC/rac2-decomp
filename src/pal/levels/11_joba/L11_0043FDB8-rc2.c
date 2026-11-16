@@ -20,7 +20,7 @@ extern void ref_L11_0043A810_12(void *, s32, void *);
 extern void ref_L11_0043A810_13(void *, void *);
 extern void ref_L11_0043A810_14(s32, void *, f32);
 
-void func_PAL_L11_0043FDB8(void *arg0) {
+void drone_aim_head_at_hero_pal(void *arg0) {
     Fr fr;
     s8 *s1;
     s8 *s0;

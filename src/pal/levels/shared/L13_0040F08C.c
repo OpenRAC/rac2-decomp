@@ -20,12 +20,12 @@ extern void copy_matrix3x4(char *,void *);
 extern void moby_mark_spawned(char *);
 extern int func_PAL_002B1A50(char *,char *,int);
 extern int weapon_select_aim_target(char *,int,float,float,int,int);
-extern void func_PAL_002A7650(char *,int,int);
+extern void SetDeathBits_pal(char *,int,int);
 extern void guard_alt_alert_nearby(u8 *);
-extern char D_L13_001B98C0[];
+extern char g_camera_l13_position[];
 extern char *CreateMoby(int);
 extern float fast_vec_dist(void *, void *);
-extern u8 *D_L13_001B291C __attribute__((section(".sdata")));
+extern u8 *g_object_table_base __attribute__((section(".sdata")));
 
 int func_PAL_L13_00410C98(char *obj) {
     char mat[0x40] __attribute__((aligned(16)));
@@ -76,7 +76,7 @@ int func_PAL_L13_00410C98(char *obj) {
         }
         B(s,0x29)=1; B(s,0x48)=FloatToInt(17.0f); B(s,0x4a)=FloatToInt(12.0f);
     }
-    if (B(obj,0x31) && fast_vec_dist(obj+0x10,D_L13_001B98C0)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
+    if (B(obj,0x31) && fast_vec_dist(obj+0x10,g_camera_l13_position)<24.0f) { moby_update_ground_check(obj); B(obj,0x6f)=22; }
     if (P(s,0x25c) && S(P(s,0x25c),0xaa)==0xea9) {
         moby_transform_joint_point(obj,0,mat); copy_matrix3x4(P(s,0x25c)+0xc0,mat); qcopy(P(s,0x25c)+0x10,mat+0x30);
     }
@@ -91,7 +91,7 @@ int func_PAL_L13_00410C98(char *obj) {
     I(s,0x254)=weapon_select_aim_target(obj,I(s,0x234),F(s,0x23c),0.0f,0,0);
     if (F(obj,0x18)<89.0f || (I(s,0x2a8) && F(obj,0x18)<98.0f)) {
         if (P(s,0x25c) && S(P(s,0x25c),0xaa)==0xea9) moby_mark_spawned(P(s,0x25c));
-        I(s,0x20)=0; func_PAL_002A7650(obj,0,3); return 1;
+        I(s,0x20)=0; SetDeathBits_pal(obj,0,3); return 1;
     }
     return 0;
 }

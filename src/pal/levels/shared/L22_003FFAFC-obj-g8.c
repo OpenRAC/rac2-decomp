@@ -31,7 +31,7 @@ extern const f32 ref_L22_003FB310_07;
 extern u8 ref_L22_003FB310_08[];
 extern u8 * ref_L22_003FB310_09;
 extern void func_PAL_L22_004001E8(void *, void *, int, int);
-extern void func_PAL_L22_00400890(void *);
+extern void part_update_effect_particles_pal(void *);
 
 void func_PAL_L22_003FFAFC(u8 *obj) {
     f32 axis[4] __attribute__((aligned(16)));
@@ -67,7 +67,7 @@ void func_PAL_L22_003FFAFC(u8 *obj) {
         euler_rotation_basis(scratch.transform.mat, rot);
         multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         vec_negate_and_forward(obj + 0xC0, axis, 0);
-        func_PAL_L22_00400890(obj);
+        part_update_effect_particles_pal(obj);
     } else {
         qzero_nc(rot);
         rot[2] = ((37.0f - (f32)*(u16 *)(obj + 0x96)) * 22.0f + 155.0f) * 0.0003490659f;

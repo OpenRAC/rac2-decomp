@@ -14,7 +14,7 @@ struct Camera98 {
     char pad170[0x200];
     float forward[4];
 };
-extern struct Camera98 D_L05_001B9580;
+extern struct Camera98 g_hero_l05_state;
 extern void func_306660(void *, void *, void *);
 extern void func_3068F8(void *, void *, float);
 extern void func_33C3F8(void *, void *, int);
@@ -39,7 +39,7 @@ char *func_L05_00398F18(void *position, int shake, int a2, int a3, int a4, int a
         obj[0x20] = 0;
         qcopy(obj + 0x10, position);
         *(float *)(obj + 0x1c) = 1.0f;
-        func_306660(direction, D_L05_001B9580.position, obj + 0x10);
+        func_306660(direction, g_hero_l05_state.position, obj + 0x10);
         func_3068F8(direction, direction, 1.0f);
         func_33C3F8(obj + 0x10, normal, 1);
         qcopy(obj + 0xc0, direction);
@@ -62,16 +62,16 @@ char *func_L05_00398F18(void *position, int shake, int a2, int a3, int a4, int a
         if (func_307840(sphere, 128.0f) == 1) {
             state->delay = 10;
             state->fade = 0.1f;
-            if (func_3067D8(position, D_L05_001B9580.position) < 48.0f && shake) {
-                char *camera = (char *)&D_L05_001B9580;
+            if (func_3067D8(position, g_hero_l05_state.position) < 48.0f && shake) {
+                char *camera = (char *)&g_hero_l05_state;
                 *(int *)(camera + 0x16c) = 0;
                 *(int *)(camera + 0x168) = 40;
                 *(float *)(camera + 0x160) = 0.075f;
             }
             if (state->visible) {
-                func_306660(delta, obj + 0x10, D_L05_001B9580.position);
+                func_306660(delta, obj + 0x10, g_hero_l05_state.position);
                 func_3068F8(delta, delta, 1.0f);
-                if (1.57079637f - func_306C38(func_306720(delta, D_L05_001B9580.forward)) < 0.45378566f)
+                if (1.57079637f - func_306C38(func_306720(delta, g_hero_l05_state.forward)) < 0.45378566f)
                     state->visible = 1;
                 else
                     state->visible = 0;

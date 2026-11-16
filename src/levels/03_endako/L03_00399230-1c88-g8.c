@@ -36,17 +36,17 @@ extern char g_hero_position[];
 extern float D_L03_001B0AE0_1[] MACRO_ADDR;
 extern float D_L03_001B0AE8_1[] MACRO_ADDR;
 extern float D_L03_001B0B30_1[] MACRO_ADDR;
-extern float D_L03_001B0AE0 __attribute__((sda));
-extern float D_L03_001B0AE8 __attribute__((sda));
-extern float D_L03_001B0AF0 __attribute__((sda));
-extern float D_L03_001B0AF4 __attribute__((sda));
-extern float D_L03_001B0AF8 __attribute__((sda));
-extern float D_L03_001B0B30 __attribute__((sda));
+extern float g_floater_sway_range_a __attribute__((sda));
+extern float g_floater_sway_range_b __attribute__((sda));
+extern float g_floater_tilt_amount_x __attribute__((sda));
+extern float g_floater_tilt_amount_y __attribute__((sda));
+extern float g_floater_matrix_scale __attribute__((sda));
+extern float g_floater_local_offset __attribute__((sda));
 extern char D_L03_001B0B10_GP[] SDATA(D_L03_001B0B10);
 extern char D_L03_001B0B08_GP[] SDATA(D_L03_001B0B08);
 extern char D_L03_001B0B00_GP[] SDATA(D_L03_001B0B00);
-extern char D_L03_001A8F20[] __attribute__((sda));
-extern int D_L03_001B0B40 __attribute__((sda));
+extern char g_effect_descriptor_default[] __attribute__((sda));
+extern int g_floater_effect_arg __attribute__((sda));
 
 /* Updates a floating object that sways in the air, drifts toward something that touches it, then flies off, plays an effect and disappears. */
 void swaying_floater_update(char *obj)
@@ -69,9 +69,9 @@ void swaying_floater_update(char *obj)
         *(float *)(vars + 0x10) = math_random_angle();
         *(float *)(vars + 0x14) = math_random_angle();
         *(float *)(vars + 0x18) =
-            math_random_signed_float_range(D_L03_001B0AE0, D_L03_001B0AE0_1[1]) * 0.0002908882452175021f;
+            math_random_signed_float_range(g_floater_sway_range_a, D_L03_001B0AE0_1[1]) * 0.0002908882452175021f;
         *(float *)(vars + 0x1C) =
-            math_random_signed_float_range(D_L03_001B0AE8, D_L03_001B0AE8_1[1]) * 0.0002908882452175021f;
+            math_random_signed_float_range(g_floater_sway_range_b, D_L03_001B0AE8_1[1]) * 0.0002908882452175021f;
         *(float *)(vars + 0x3C) = 0.10471977f;
         *(float *)(vars + 0x38) = 0.0017453294713050127f;
         moby_set_state(obj, 1, -1);
@@ -82,14 +82,14 @@ void swaying_floater_update(char *obj)
             break;
         *(float *)(vars + 0x10) = FastAddRotations(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
         *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
-        *(float *)(obj + 0xF0) = D_L03_001B0AF0 * math_fast_sin_or_cos_b(*(float *)(vars + 0x10));
-        *(float *)(obj + 0xF4) = D_L03_001B0AF4 * math_fast_sin_or_cos_b(*(float *)(vars + 0x14));
+        *(float *)(obj + 0xF0) = g_floater_tilt_amount_x * math_fast_sin_or_cos_b(*(float *)(vars + 0x10));
+        *(float *)(obj + 0xF4) = g_floater_tilt_amount_y * math_fast_sin_or_cos_b(*(float *)(vars + 0x14));
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
         *(Quad *)tmp_vec = *(Quad *)angles;
         euler_rotation_basis(matrix, tmp_vec);
-        FastVecScale(obj + 0x10, matrix + 0x10, D_L03_001B0AF8);
+        FastVecScale(obj + 0x10, matrix + 0x10, g_floater_matrix_scale);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
             char *hit = part_find_owned_effect_slot(obj, 0x4010000, 0);
@@ -146,11 +146,11 @@ void swaying_floater_update(char *obj)
         effect = moby_l00_spawn_child(obj, 0x113D, *(u8 *)(obj + 0x30));
         if (effect) {
             part_explode_object_into_pieces(effect, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
-                              D_L03_001B0B40, 6, 65535, 255, 0);
+                              g_floater_effect_arg, 6, 65535, 255, 0);
             moby_mark_spawned(effect);
         }
-        vec_local_offset_to_world(obj, tmp_vec, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        SpawnExplosionEffects(obj, D_L03_001A8F20, tmp_vec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        vec_local_offset_to_world(obj, tmp_vec, g_floater_local_offset, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
+        SpawnExplosionEffects(obj, g_effect_descriptor_default, tmp_vec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         moby_mark_spawned(obj);
         break;

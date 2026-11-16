@@ -7,8 +7,8 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern char g_follow_camera_object[];
 extern char D_L00_001BF220_1[];
-extern char D_L00_001BF230[];
-extern const float D_L00_001B14D0 __attribute__((sda));
+extern char g_collision_position[];
+extern const float g_cam_collision_base_radius __attribute__((sda));
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -40,7 +40,7 @@ void *cam_follow_probe_collision(char *object)
     *(short *)(controller + 0x38) = 2;
     hero_state = *(void **)(*(char **)g_follow_camera_object + 0x70);
     target = *(void **)(controller + 0x48);
-    threshold = D_L00_001B14D0 + *(float *)((char *)hero_state + 0x234) * *(float *)((char *)hero_state + 0x22C) *
+    threshold = g_cam_collision_base_radius + *(float *)((char *)hero_state + 0x234) * *(float *)((char *)hero_state + 0x22C) *
               (*(float *)((char *)hero_state + 0x230) - 1.0f);
     while (i < 3) {
         if (coll_find_nearby_shape_points(&probe_point, threshold))
@@ -60,7 +60,7 @@ void *cam_follow_probe_collision(char *object)
             else
                 *(short *)(controller + 0x38) = 0;
         }
-        qcopy(&probe_point, D_L00_001BF230);
+        qcopy(&probe_point, g_collision_position);
         i++;
     }
     result = cam_follow_constrain_distance(object, &probe_point, found_first, found_second);

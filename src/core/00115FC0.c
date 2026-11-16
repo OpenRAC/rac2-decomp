@@ -45,11 +45,11 @@ typedef enum { COPY_A, COPY_J, COPY_J2, MAKE_A, MAKE_J, NOOP, EMPTY, ERROR } JIS
 #define _iseucjp(c) ((c) >= 0xa1 && (c) <= 0xfe)
 #define _isjis(c) ((c) >= 0x21 && (c) <= 0x7e)
 
-extern JIS_STATE D_00133E80[JIS_S_NUM][JIS_C_NUM];
-extern JIS_ACTION D_00134030[JIS_S_NUM][JIS_C_NUM];
-extern const char D_0013A3A0[];
-extern const char D_0013A3A8[];
-extern const char D_0013A3B0[];
+extern JIS_STATE g_jis_state_table[JIS_S_NUM][JIS_C_NUM];
+extern JIS_ACTION g_jis_action_table[JIS_S_NUM][JIS_C_NUM];
+extern const char g_str_locale_name_c[];
+extern const char g_str_locale_name_posix[];
+extern const char g_str_locale_name_empty[];
 
 extern unsigned int strlen(const char *);
 
@@ -68,7 +68,7 @@ int MultibyteToWideCharReentrant(MbtowcReent *r, int *pwc, const char *s, unsign
 
     if (r->_current_locale == 0 || (strlen(r->_current_locale) <= 1)) {
         /* fall-through */
-    } else if (!strcmp(r->_current_locale, D_0013A3A0)) {
+    } else if (!strcmp(r->_current_locale, g_str_locale_name_c)) {
         int char1 = *t;
         if (s == 0)
             return 0; /* not state-dependent */
@@ -82,7 +82,7 @@ int MultibyteToWideCharReentrant(MbtowcReent *r, int *pwc, const char *s, unsign
             } else
                 return -1;
         }
-    } else if (!strcmp(r->_current_locale, D_0013A3A8)) {
+    } else if (!strcmp(r->_current_locale, g_str_locale_name_posix)) {
         int char1 = *t;
         if (s == 0)
             return 0; /* not state-dependent */
@@ -96,7 +96,7 @@ int MultibyteToWideCharReentrant(MbtowcReent *r, int *pwc, const char *s, unsign
             } else
                 return -1;
         }
-    } else if (!strcmp(r->_current_locale, D_0013A3B0)) {
+    } else if (!strcmp(r->_current_locale, g_str_locale_name_empty)) {
         JIS_STATE curr_state;
         JIS_ACTION action;
         JIS_CHAR_TYPE ch;
@@ -142,8 +142,8 @@ int MultibyteToWideCharReentrant(MbtowcReent *r, int *pwc, const char *s, unsign
                     ch = OTHER;
             }
 
-            action = D_00134030[curr_state][ch];
-            curr_state = D_00133E80[curr_state][ch];
+            action = g_jis_action_table[curr_state][ch];
+            curr_state = g_jis_state_table[curr_state][ch];
 
             switch (action) {
             case NOOP:

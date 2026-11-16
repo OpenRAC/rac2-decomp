@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char g_active_camera[], D_001B5490[], g_hero_state[];
+extern char g_active_camera[], g_camera_mode_state[], g_hero_state[];
 extern void vec_scale_to_length(float *, float *, float);
 extern void cam_compute_aim_angles(float *, float *, float *, float *, float *, float *);
 extern void mat_transform_via_copy(void *, void *);
@@ -50,7 +50,7 @@ void func_PAL_00270D50(char *from)
             moby_restore_vectors();
         }
     }
-    *(short *)D_001B5490 = 3;
+    *(short *)g_camera_mode_state = 3;
     r[2] = r[3];
     if (r[2] == 0) {
         unsigned char *l = r + 0x10;

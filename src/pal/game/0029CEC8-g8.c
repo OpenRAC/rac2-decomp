@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern void tab_menu_draw(void *);
 
 void func_PAL_0029CEC8(void) {
-    if (D_001A8CFC != 0)
-        tab_menu_draw(D_001A8CFC + 0x3C210);
+    if (g_resident_data_base != 0)
+        tab_menu_draw(g_resident_data_base + 0x3C210);
 }

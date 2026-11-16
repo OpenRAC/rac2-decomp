@@ -8,22 +8,22 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L03_001B2A38 __attribute__((sda));
-extern unsigned char *D_L03_001B2A1C MACRO_ADDR;
-extern unsigned short *D_L03_001FB5A0[];
+extern int g_object_group_count __attribute__((sda));
+extern unsigned char *g_moby_record_base MACRO_ADDR;
+extern unsigned short *g_entity_id_lists[];
 
 extern void moby_transform_joint_point(char *, int, char *);
 extern void transform_vector(void *, void *, void *);
 extern void gfx_l00_draw_billboard_quad(void *, int, float, float);
 
-extern int D_L03_001AFF60[6] __attribute__((sda));
-extern int D_L03_001AFF78[4] __attribute__((sda));
-extern int D_L03_001AFF88[4] __attribute__((sda));
-extern int D_L03_001AFF98[6] __attribute__((sda));
-extern TI128 D_L03_001AFFB0[3] __attribute__((sda));
-extern TI128 D_L03_001AFFE0[3] __attribute__((sda));
-extern TI128 D_L03_001B0010[3] __attribute__((sda));
-extern TI128 D_L03_0029A880[5];
+extern int g_attachment_bone_ids_a[6] __attribute__((sda));
+extern int g_attachment_bone_ids_b[4] __attribute__((sda));
+extern int g_attachment_bone_ids_c[4] __attribute__((sda));
+extern int g_attachment_bone_ids_d[6] __attribute__((sda));
+extern TI128 g_attachment_offsets_a[3] __attribute__((sda));
+extern TI128 g_attachment_offsets_b[3] __attribute__((sda));
+extern TI128 g_attachment_offsets_c[3] __attribute__((sda));
+extern TI128 g_attachment_point_offsets[5];
 
 
 /* Visits the objects in a group and spawns an effect at each of their fixed attachment points. */
@@ -39,11 +39,11 @@ void part_spawn_at_attachment_points(unsigned char *object) {
     float point[4] __attribute__((aligned(16)));
     float *vp;
 
-    for (id_list = D_L03_001FB5A0[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && id_list != 0 &&
-         ((id_list != 0 && (short)id_list[-1] >= 0) || id_list == D_L03_001FB5A0[object[0x21]]);
+    for (id_list = g_entity_id_lists[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= g_object_group_count && id_list != 0 &&
+         ((id_list != 0 && (short)id_list[-1] >= 0) || id_list == g_entity_id_lists[object[0x21]]);
          id_list++) {
-        entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
+        entity = g_moby_record_base + ((*id_list & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (entity[0x31] == 0)
@@ -54,23 +54,23 @@ void part_spawn_at_attachment_points(unsigned char *object) {
             continue;
         switch (*(short *)(entity + 0xAA)) {
         case 0x940: /* Bridgebot */
-            bone_ids = D_L03_001AFF88;
-            offsets = D_L03_001AFFE0;
+            bone_ids = g_attachment_bone_ids_c;
+            offsets = g_attachment_offsets_b;
             count = 3;
             break;
         case 0x93C: /* moby class 2364 */
-            bone_ids = D_L03_001AFF78;
-            offsets = D_L03_001AFFB0;
+            bone_ids = g_attachment_bone_ids_b;
+            offsets = g_attachment_offsets_a;
             count = 3;
             break;
         case 0x964: /* Gadgebot */
-            bone_ids = D_L03_001AFF60;
-            offsets = D_L03_0029A880;
+            bone_ids = g_attachment_bone_ids_a;
+            offsets = g_attachment_point_offsets;
             count = 5;
             break;
         default:
-            bone_ids = D_L03_001AFF98;
-            offsets = D_L03_001B0010;
+            bone_ids = g_attachment_bone_ids_d;
+            offsets = g_attachment_offsets_c;
             count = 3;
             break;
         }

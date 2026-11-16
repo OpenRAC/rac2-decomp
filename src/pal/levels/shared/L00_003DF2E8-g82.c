@@ -28,7 +28,7 @@ extern int ref_L00_003DBF50_16(char *, float, float, float, int);
 /* Spawns moby class 0xB2E at pos for parent and sets its state up (the three shared buffers
  * on first use), hands dir to the target record at D_00189E20 + 0xBF8 when there is one,
  * and passes dir with a random spread and a random speed through ref_L00_003DBF50_15. */
-char *func_PAL_L00_003E0120(char *parent, int arg, char *pos, char *dir)
+char *projectile_spawn_small_pal(char *parent, int arg, char *pos, char *dir)
 {
     float velocity[4];
     char *object = ref_L00_003DBF50_00(0xb2e);

@@ -26,7 +26,7 @@
 
 extern s32 g_current_map_index;
 extern s32 ref_L01_00367F78_00 __attribute__((sda));
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 
 /* Sets a bit in the saved data for each slot from 1 to 4 that matches the current level. */
 void save_mark_matching_level_slots(void) {
@@ -36,7 +36,7 @@ void save_mark_matching_level_slots(void) {
     u32 slot_index;
     u32 one;
 
-    save_data = D_001395B8;
+    save_data = g_game_flag_table;
     level_id = g_current_map_index;
     slot_index = 1;
     one = 1;

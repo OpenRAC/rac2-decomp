@@ -6,13 +6,13 @@ typedef signed int s32;
 typedef float f32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern s32 D_L18_001B2348 __attribute__((sda));
-extern s32 D_L18_001B1C28 __attribute__((sda));
-extern s32 D_L18_001B1C2C __attribute__((sda));
-extern s32 D_L18_001B1C30 __attribute__((sda));
-extern s32 D_L18_001B1C34 __attribute__((sda));
-extern f32 D_L18_001B1C38 __attribute__((sda));
-extern f32 D_L18_001B1C3C __attribute__((sda));
+extern s32 g_frame_l18_counter __attribute__((sda));
+extern s32 g_banner_x __attribute__((sda));
+extern s32 g_banner_y __attribute__((sda));
+extern s32 g_banner_pulse_color_a __attribute__((sda));
+extern s32 g_banner_pulse_color_b __attribute__((sda));
+extern f32 g_banner_angle_offset_base __attribute__((sda));
+extern f32 g_banner_angle_speed_deg __attribute__((sda));
 extern char g_camera_l18_position[];
 
 extern f32 math_random_angle(void);
@@ -56,17 +56,17 @@ void banner_update(u8 *obj) {
     }
     if (obj[0x31] != 0) {
         period = 60;
-        phase = IntToFloat(D_L18_001B2348 % period);
+        phase = IntToFloat(g_frame_l18_counter % period);
         rise = IntToFloat(60);
         phase = phase * 6.2831855f;
         phase = phase / rise;
         phase = phase - 3.1415927f;
         rise = math_fast_sin_or_cos_a(phase);
-        x = D_L18_001B1C28;
-        y = D_L18_001B1C2C;
+        x = g_banner_x;
+        y = g_banner_y;
         *(f32 *)(state + 0x158) = rise * 0.5f + 0.5f;
         a = PulseColor(x, y, phase);
-        b = PulseColor(D_L18_001B1C30, D_L18_001B1C34, phase);
+        b = PulseColor(g_banner_pulse_color_a, g_banner_pulse_color_b, phase);
         FastVecSub(buf, g_camera_l18_position, obj + 0x10);
         vec_scale_to_length(buf, buf, 1.0f);
         rise = math_fabs(FastVecDot(buf, obj + 0xC0));
@@ -78,5 +78,5 @@ void banner_update(u8 *obj) {
         gfx_add_draw_callback_first(probe_place_at_height, obj);
         gfx_add_draw_callback_first(part_emit_fade_burst, obj);
     }
-    math_update_wrapped_angle_offset(obj, (f32 *)(state + 0x150), (f32 *)(state + 0x154), D_L18_001B1C38, D_L18_001B1C3C * 0.00029088824f, *(f32 *)(state + 0x148));
+    math_update_wrapped_angle_offset(obj, (f32 *)(state + 0x150), (f32 *)(state + 0x154), g_banner_angle_offset_base, g_banner_angle_speed_deg * 0.00029088824f, *(f32 *)(state + 0x148));
 }

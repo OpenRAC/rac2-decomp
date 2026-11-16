@@ -112,12 +112,12 @@ char *radial_menu_construct(char *object)
 /* Fills func_00337210's 23-word descriptor in the order of func_00344F98, with the child at
    o + 0x17C set up by func_00336390 just before f[10] takes it. */
 typedef struct { unsigned int lo; unsigned int hi; } Word2_340498;
-extern const Word2_340498 D_001AE078;
-extern const Word2_340498 D_001AE080;
-extern const Word2_340498 D_001AE088;
-extern const Word2_340498 D_001AE090;
-extern char D_00259F58[];
-extern char *D_001A8CFC __attribute__((sda));
+extern const Word2_340498 g_radial_info_left_word_pair_a;
+extern const Word2_340498 g_radial_info_left_word_pair_b;
+extern const Word2_340498 g_radial_info_left_word_pair_c;
+extern const Word2_340498 g_radial_info_shared_word_pair;
+extern char g_menu_item_table_first[];
+extern char *g_resident_data_base __attribute__((sda));
 extern void object_set_helper_result(void *, void *, int);
 extern void DrawItemGrid(int *);
 
@@ -126,11 +126,11 @@ static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
 /* Draws the item description panel on the left side of the radial menu. */
 void radial_menu_draw_info_left(char *menu)
 {
-    Word2_340498 q0 = D_001AE078;
-    Word2_340498 q1 = D_001AE080;
-    Word2_340498 q2 = D_001AE078;
-    Word2_340498 q3 = D_001AE088;
-    Word2_340498 q4 = D_001AE090;
+    Word2_340498 q0 = g_radial_info_left_word_pair_a;
+    Word2_340498 q1 = g_radial_info_left_word_pair_b;
+    Word2_340498 q2 = g_radial_info_left_word_pair_a;
+    Word2_340498 q3 = g_radial_info_left_word_pair_c;
+    Word2_340498 q4 = g_radial_info_shared_word_pair;
     int descriptor[23];
     char *child;
 
@@ -143,12 +143,12 @@ void radial_menu_draw_info_left(char *menu)
     descriptor[9] = (int)&q4;
     descriptor[1] = 4;
     descriptor[2] = 6;
-    descriptor[0] = (int)D_00259F58;
+    descriptor[0] = (int)g_menu_item_table_first;
     descriptor[17] = (int)(menu + 0x870);
     descriptor[13] = (int)(menu + 0x260);
     descriptor[14] = 0;
     child = menu + 0x17C;
-    object_set_helper_result(child, D_001A8CFC + 0x8710, 0x23);
+    object_set_helper_result(child, g_resident_data_base + 0x8710, 0x23);
     descriptor[10] = (int)child;
     descriptor[12] = (int)(menu + 0x214);
     descriptor[11] = (int)(menu + 0x98);
@@ -163,21 +163,21 @@ void radial_menu_draw_info_left(char *menu)
 }
 
 
-extern const Word2_340498 D_001AE098;
-extern const Word2_340498 D_001AE0A0;
-extern const Word2_340498 D_001AE0A8;
-extern const Word2_340498 D_001AE0B0;
-extern char D_00259CE0[];
+extern const Word2_340498 g_radial_info_second_word_pair_a;
+extern const Word2_340498 g_radial_info_second_word_pair_b;
+extern const Word2_340498 g_radial_info_second_word_pair_c;
+extern const Word2_340498 g_info_word_pair_page;
+extern char g_menu_item_table_second[];
 
 /* Draws the item description panel shown when the menu is on its second page. */
 void radial_menu_draw_info_second(char *menu)
 {
-    Word2_340498 q0 = D_001AE098;
-    Word2_340498 q1 = D_001AE0A0;
-    Word2_340498 q2 = D_001AE098;
-    Word2_340498 q3 = D_001AE0A8;
-    Word2_340498 q4 = D_001AE090;
-    Word2_340498 q5 = D_001AE0B0;
+    Word2_340498 q0 = g_radial_info_second_word_pair_a;
+    Word2_340498 q1 = g_radial_info_second_word_pair_b;
+    Word2_340498 q2 = g_radial_info_second_word_pair_a;
+    Word2_340498 q3 = g_radial_info_second_word_pair_c;
+    Word2_340498 q4 = g_radial_info_shared_word_pair;
+    Word2_340498 q5 = g_info_word_pair_page;
     int descriptor[23];
     char *child;
     initDescriptor_340498(descriptor);
@@ -192,9 +192,9 @@ void radial_menu_draw_info_second(char *menu)
     descriptor[13] = 0;
     descriptor[1] = 3;
     descriptor[2] = 2;
-    descriptor[0] = (int)D_00259CE0;
+    descriptor[0] = (int)g_menu_item_table_second;
     descriptor[17] = (int)(menu + 0x870);
-    object_set_helper_result(child, D_001A8CFC + 0x8710, 0x5D);
+    object_set_helper_result(child, g_resident_data_base + 0x8710, 0x5D);
     descriptor[10] = (int)child;
     descriptor[12] = (int)(menu + 0x214);
     descriptor[15] = (int)(menu + 0x7D0);

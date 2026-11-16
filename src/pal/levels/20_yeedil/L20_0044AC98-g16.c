@@ -35,18 +35,18 @@ extern void part_spawn_masked_debris(void *, int, void *, float, float, float, f
 extern void SetDeathBits(void *, int, int);
 extern void moby_mark_spawned(void *);
 
-extern float D_L20_001B2260 __attribute__((sda));
-extern float D_L20_001B2264 __attribute__((sda));
-extern float D_L20_001B2268 __attribute__((sda));
-extern float D_L20_001B226C __attribute__((sda));
-extern float D_L20_001B2270 __attribute__((sda));
-extern float D_L20_001B227C __attribute__((sda));
-extern int D_L20_001B2280 __attribute__((sda));
-extern int D_L20_001B2284 __attribute__((sda));
-extern float D_L20_001B2290[4] __attribute__((sda));
-extern float D_L20_001B22A0[4] __attribute__((sda));
+extern float g_launch_platform_lift_max __attribute__((sda));
+extern float g_launch_platform_spin_x_max __attribute__((sda));
+extern float g_launch_platform_spin_y_max __attribute__((sda));
+extern float g_launch_platform_jitter __attribute__((sda));
+extern float g_launch_platform_speed __attribute__((sda));
+extern float g_launch_platform_gravity __attribute__((sda));
+extern int g_launch_platform_spawn_min __attribute__((sda));
+extern int g_launch_platform_spawn_max __attribute__((sda));
+extern float g_launch_platform_spawn_offset[4] __attribute__((sda));
+extern float g_launch_platform_direction[4] __attribute__((sda));
 extern u8 g_hero_position[];
-extern u8 D_L20_001A8F20[] MACRO_ADDR;
+extern u8 g_effect_color_table[] MACRO_ADDR;
 
 typedef struct {
     u8 pad00[0x20];
@@ -146,9 +146,9 @@ void func_PAL_L20_0044AC98(PlatformObject *self) {
             self->rotation[1] = 0;
             zero = self->rotation[0];
             self->position[2] = s->restHeight;
-            s->verticalSpeed += math_random_float_range(zero, D_L20_001B2260 * 0.020000001f);
-            s->spinX = math_random_float_range(zero, D_L20_001B2264 * 0.0003490659f);
-            s->spinY = math_random_float_range(zero, D_L20_001B2268 * 0.0003490659f);
+            s->verticalSpeed += math_random_float_range(zero, g_launch_platform_lift_max * 0.020000001f);
+            s->spinX = math_random_float_range(zero, g_launch_platform_spin_x_max * 0.0003490659f);
+            s->spinY = math_random_float_range(zero, g_launch_platform_spin_y_max * 0.0003490659f);
             self->position[2] = s->restHeight;
         }
         {
@@ -160,7 +160,7 @@ void func_PAL_L20_0044AC98(PlatformObject *self) {
         }
         if (self->position[2] >= s->restHeight) {
             self->position[2] += s->verticalSpeed;
-            s->verticalSpeed -= D_L20_001B227C * 0.00040000002f;
+            s->verticalSpeed -= g_launch_platform_gravity * 0.00040000002f;
             if (s->verticalSpeed > 0.0f) {
                 self->rotation[0] = FastAddRotations(s->spinX, self->rotation[0]);
                 self->rotation[1] = FastAddRotations(s->spinY, self->rotation[1]);
@@ -175,19 +175,19 @@ void func_PAL_L20_0044AC98(PlatformObject *self) {
     case 3:
         count = 0;
         for (p = protopet_count_group(s->group, &count); p != 0; p = protopet_count_group(s->group, &count)) {
-            vec_scale_to_length(velocity, D_L20_001B22A0, D_L20_001B2270 * 0.020000001f);
+            vec_scale_to_length(velocity, g_launch_platform_direction, g_launch_platform_speed * 0.020000001f);
             matrix_mul_vec3(velocity, velocity, self->matrix);
-            vec_add_random_offset(velocity, D_L20_001B226C * 0.020000001f);
-            matrix_mul_vec3(position, D_L20_001B2290, self->matrix);
+            vec_add_random_offset(velocity, g_launch_platform_jitter * 0.020000001f);
+            matrix_mul_vec3(position, g_launch_platform_spawn_offset, self->matrix);
             FastVecAdd(position, position, self->position);
             vec_scale_to_length(offset, velocity, 0.3f);
             add_vectors(tip, position, offset);
             protopet_launch_shot(p, position, velocity);
             *(PlatformObject **)(p + 0xB8) = self;
-            s->spawnTimer = ((s32)math_random_int_range(D_L20_001B2280, D_L20_001B2284) * 5 + 2) / 6;
+            s->spawnTimer = ((s32)math_random_int_range(g_launch_platform_spawn_min, g_launch_platform_spawn_max) * 5 + 2) / 6;
         }
         SpawnExplosion(self->position, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-        part_spawn_masked_debris(self, 0x1FF, D_L20_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        part_spawn_masked_debris(self, 0x1FF, g_effect_color_table, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         PlayMobySound(1, 0, self);
         SetDeathBits(self, 0, 3);
         moby_mark_spawned(self);

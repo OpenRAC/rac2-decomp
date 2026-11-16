@@ -8,9 +8,9 @@
 
 typedef int TI16 __attribute__((mode(TI)));
 
-extern float D_L23_001AFA10 __attribute__((sda));
+extern float g_enemy_snap_anim_blend __attribute__((sda));
 
-extern TI16 D_L23_001C0AA0;
+extern TI16 g_coll_line_hit_point_2;
 
 extern void moby_play_anim_and_link(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5);
 
@@ -25,7 +25,7 @@ void enemy_snap_to_ground(char *mobyOrProbeEnd, int snapToGround) {
     TI16 *probeStartPtr;
 
     if ((unsigned char)(*(unsigned char *)(mobyOrProbeEnd + 0x43) - 5) >= 2 && *(unsigned char *)(mobyOrProbeEnd + 0x20) != 2)
-        moby_play_anim_and_link(mobyOrProbeEnd, 5, 0, 6, 1, D_L23_001AFA10);
+        moby_play_anim_and_link(mobyOrProbeEnd, 5, 0, 6, 1, g_enemy_snap_anim_blend);
     if (snapToGround != 0) {
         TI16 *posPtr = (TI16 *)(mobyOrProbeEnd + 0x10);
 
@@ -37,6 +37,6 @@ void enemy_snap_to_ground(char *mobyOrProbeEnd, int snapToGround) {
         mothership_project_point_onto_surface((TI16 *)mobyOrProbeEnd, -2.0f);
         mothership_project_point_onto_surface(probeStartPtr, 0.1f);
         if (CollLine((TI16 *)mobyOrProbeEnd, probeStartPtr, 0x12, 0, 0) != 0)
-            *posPtr = D_L23_001C0AA0;
+            *posPtr = g_coll_line_hit_point_2;
     }
 }

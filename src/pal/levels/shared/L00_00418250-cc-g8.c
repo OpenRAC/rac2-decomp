@@ -42,20 +42,20 @@ typedef struct {
     Vec pos;
 } BoltState;
 
-extern unsigned char D_00139595[];
+extern unsigned char g_wave_line_weapon_index[];
 extern HitRecord g_weapon_l00_table[];
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern char g_default_vector[] MACRO_ADDR;
 extern char ref_L00_00413358_00[];
-extern float D_L00_001B1390 __attribute__((sda));
-extern float D_L00_001B1394 __attribute__((sda));
-extern float D_L00_001B1398 __attribute__((sda));
-extern float D_L00_001B13A0 __attribute__((sda));
-extern float D_L00_001B13A8 __attribute__((sda));
-extern float D_L00_001B13AC __attribute__((sda));
-extern float D_L00_001B13B4 __attribute__((sda));
-extern float D_L00_001B13B8 __attribute__((sda));
-extern float D_L00_001B13BC __attribute__((sda));
-extern float D_L00_001B13C0 __attribute__((sda));
+extern float g_wave_ribbon_noise_min __attribute__((sda));
+extern float g_wave_ribbon_noise_max __attribute__((sda));
+extern float g_wave_ribbon_base_amplitude __attribute__((sda));
+extern float g_wave_ribbon_phase1_speed __attribute__((sda));
+extern float g_wave_ribbon_phase2_step __attribute__((sda));
+extern float g_wave_ribbon_rate_scale __attribute__((sda));
+extern float g_wave_ribbon_phase3_step __attribute__((sda));
+extern float g_wave_ribbon_phase3_spread __attribute__((sda));
+extern float g_wave_ribbon_wave_amplitude __attribute__((sda));
+extern float g_wave_ribbon_wave_gain __attribute__((sda));
 
 extern float fast_vec_dist(void *a, void *b);
 extern float math_fast_sin_or_cos_b(float angle);
@@ -94,7 +94,7 @@ void func_PAL_L00_00418250(char *object)
             scratch.packet.flags = 0x810000;
             scratch.packet.enabled = 1;
             scratch.packet.owner = object;
-            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)g_weapon_l00_table))->scale;
+            scratch.packet.scale = ((HitRecord *)(g_wave_line_weapon_index[0] * sizeof(HitRecord) + (int)g_weapon_l00_table))->scale;
             FastVecSub(&scratch, &state->pos, object + 0x10);
             vec_scale_to_length(&scratch, &scratch, 1);
             scratch.vector.f[3] = 5627.925f;
@@ -110,20 +110,20 @@ void func_PAL_L00_00418250(char *object)
     point10 = point10 / IntToFloat(5);
     ratio = distance + (0.01f - distance) * point10;
     spacing = ratio / IntToFloat(10);
-    state->phase1 = FastAddRotations(state->phase1, D_L00_001B13A0 * step);
-    state->phase2 = fast_subtract_rotations(state->phase2, D_L00_001B13A8);
-    state->phase3 = FastAddRotations(state->phase3, D_L00_001B13B4);
+    state->phase1 = FastAddRotations(state->phase1, g_wave_ribbon_phase1_speed * step);
+    state->phase2 = fast_subtract_rotations(state->phase2, g_wave_ribbon_phase2_step);
+    state->phase3 = FastAddRotations(state->phase3, g_wave_ribbon_phase3_step);
     step = (360 / IntToFloat(10)) * step;
 
     for (i10 = 0; i10 < 10; i10++) {
         point10 = IntToFloat(i10);
         IntToFloat(10);
-        amp10 = D_L00_001B1398;
+        amp10 = g_wave_ribbon_base_amplitude;
         if (i10 == 0 || i10 == 9) {
             amp10 = 0;
         } else {
             amp10 *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase1 + point10 * step));
-            amp10 += math_random_signed_float_range(0, D_L00_001B1394);
+            amp10 += math_random_signed_float_range(0, g_wave_ribbon_noise_max);
         }
         state->line[i10].f[2] = amp10;
         state->line[i10].f[1] = 0.0f;
@@ -133,13 +133,13 @@ void func_PAL_L00_00418250(char *object)
 
     for (i19 = 0; i19 < 19; i19++) {
         point19 = IntToFloat(i19);
-        rate19 = point19 * D_L00_001B13AC;
+        rate19 = point19 * g_wave_ribbon_rate_scale;
         state->wave[i19].f[2] = 0.0f;
         phase19 = math_wrap_angle_to_pi(state->phase2 + rate19);
-        wave19 = D_L00_001B13BC * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * D_L00_001B13B8));
-        amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(D_L00_001B1390, D_L00_001B1394);
+        wave19 = g_wave_ribbon_wave_amplitude * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * g_wave_ribbon_phase3_spread));
+        amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(g_wave_ribbon_noise_min, g_wave_ribbon_noise_max);
         state->wave[i19].f[2] += amp19;
-        state->wave[i19].f[1] = D_L00_001B13C0 * math_fast_sin_or_cos_a(phase19);
+        state->wave[i19].f[1] = g_wave_ribbon_wave_gain * math_fast_sin_or_cos_a(phase19);
         state->wave[i19].f[0] = spacing * point19;
         state->wave[i19].f[3] = 1;
     }
@@ -168,6 +168,6 @@ void func_PAL_L00_00418250(char *object)
             sign = -sign;
         }
         burst = math_random_float_range(0.15f, 3);
-        part_spawn_ground_effect(&state->pos, 10, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
+        part_spawn_ground_effect(&state->pos, 10, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, g_default_vector, 0, 0);
     }
 }

@@ -21,15 +21,15 @@ extern int snd_play_from_class_bank(s32, s32, void *, s32);
 extern s32 math_random_int_below(s32);
 extern void func_PAL_L07_003F8CB0(u8 *);
 extern void gfx_add_draw_callback_first(void (*)(u8 *), u8 *);
-extern u8 D_L07_001BF660[];
-extern f32 D_L07_001B0E3C __attribute__((sda)), D_L07_001B0E40 __attribute__((sda));
-extern f32 D_L07_001B0E44 __attribute__((sda)), D_L07_001B0E48 __attribute__((sda));
-extern f32 D_L07_001B0E4C __attribute__((sda));
-extern s32 D_L07_001B0E50 __attribute__((sda));
-extern u32 D_L07_001B0E58 __attribute__((sda));
-extern s32 D_L07_001B0E70[] MACRO_ADDR;
+extern u8 g_hit_position[];
+extern f32 g_trail_axis_turn_rate __attribute__((sda)), g_trail_growth_rate __attribute__((sda));
+extern f32 g_trail_growth_limit __attribute__((sda)), g_trail_fade_rate __attribute__((sda));
+extern f32 g_trail_jitter_step __attribute__((sda));
+extern s32 g_trail_particle_count __attribute__((sda));
+extern u32 g_trail_particle_color __attribute__((sda));
+extern s32 g_trail_size_range[] MACRO_ADDR;
 extern s32 D_L07_001B0E70_gp SDATA(D_L07_001B0E70);
-extern f32 D_L07_001B0E78[] MACRO_ADDR;
+extern f32 g_trail_life_range[] MACRO_ADDR;
 extern f32 D_L07_001B0E78_gp SDATA(D_L07_001B0E78);
 
 /* The state block at object + 0x68; only the fields this function touches are named. */
@@ -55,7 +55,7 @@ void func_PAL_L07_003F85AC(u8 *object)
         if (trail->attachment) matrix_mul_vec3(&direction, trail->direction, trail->attachment + 0xC0);
         else qcopy(&direction, trail->direction);
         FastVecCross(&axis, &up, &direction);
-        vec_set_direction_with_complement(&axis, &axis, D_L07_001B0E3C * 0.0003490659f);
+        vec_set_direction_with_complement(&axis, &axis, g_trail_axis_turn_rate * 0.0003490659f);
         quaternion_to_rotation_basis(&axis, rotation);
         multiply_matrix3x3(object + 0xC0, rotation, object + 0xC0);
         qcopy(&previous, object + 0x10);
@@ -72,20 +72,20 @@ void func_PAL_L07_003F85AC(u8 *object)
             qcopy(&origin, &previous);
         }
         magnitude = FastVecLength(&displacement);
-        for (i = 0; i < D_L07_001B0E50; i++) {
-            size = (math_random_int_range(D_L07_001B0E70_gp, D_L07_001B0E70[1]) * 5 + 2) / 6;
+        for (i = 0; i < g_trail_particle_count; i++) {
+            size = (math_random_int_range(D_L07_001B0E70_gp, g_trail_size_range[1]) * 5 + 2) / 6;
             count = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
-            life = math_random_float_range(D_L07_001B0E78_gp, D_L07_001B0E78[1]) * 210000.0f;
+            life = math_random_float_range(D_L07_001B0E78_gp, g_trail_life_range[1]) * 210000.0f;
             speed.f[0] = magnitude;
             ApproachValue(speed.f, 0.0f, math_random_float_range(2.0f, 6.0f) * 0.020000001f);
             vec_scale_to_length(&velocity, &displacement, speed.f[0]);
             lerp_vector(&point, object + 0x10, &origin, math_random_float_range(0.0f, 1.0f));
-            color = D_L07_001B0E58;
+            color = g_trail_particle_color;
             func_PAL_002C23B8(&point, &velocity, size, (s32)color >> 24, color & 0xFFFFFF, count,
                          life, 500.0f, 1.0f, 0.0f, 1.0f);
         }
         if (CollLine(&previous, object + 0x10, 2, object, 0)) {
-            qcopy(object + 0x10, D_L07_001BF660);
+            qcopy(object + 0x10, g_hit_position);
             moby_set_state(object, 1, -1);
         } else {
             unsigned int timer = *(u16 *)(object + 0x96);
@@ -102,16 +102,16 @@ void func_PAL_L07_003F85AC(u8 *object)
             *(f32 *)(object + 0x18) += 0.333f;
             trail->growth = 0.1f;
             trail->strength = 1.0f;
-            if (math_random_int_below(2)) step = -D_L07_001B0E4C * 0.020000001f;
-            else step = D_L07_001B0E4C * 0.020000001f;
+            if (math_random_int_below(2)) step = -g_trail_jitter_step * 0.020000001f;
+            else step = g_trail_jitter_step * 0.020000001f;
             trail->phase_step = step;
             trail->phase = math_random_float_range(0.0f, 1.0f);
         }
         if (trail->attachment)
             moby_transform_point_and_rotation_by_parent(object, trail->attachment, object + 0x10, object + 0xF0, object + 0x10, object + 0xF0);
-        trail->growth += D_L07_001B0E40 * 0.020000001f;
-        if (trail->growth >= D_L07_001B0E44) {
-            ApproachValue(&trail->strength, 0.0f, D_L07_001B0E48 * 0.020000001f);
+        trail->growth += g_trail_growth_rate * 0.020000001f;
+        if (trail->growth >= g_trail_growth_limit) {
+            ApproachValue(&trail->strength, 0.0f, g_trail_fade_rate * 0.020000001f);
             if (trail->strength <= 0.0f) { moby_mark_spawned((int)object); return; }
         }
         trail->phase += trail->phase_step;

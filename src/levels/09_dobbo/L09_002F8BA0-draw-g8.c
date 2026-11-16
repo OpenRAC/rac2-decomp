@@ -1,9 +1,9 @@
 #include "common.h"
 extern int g_current_map_index[3] __attribute__((sda));
 typedef struct { char pad[0x34]; int frame; } DrawState;
-extern DrawState D_L09_001BD700;
-extern float D_L09_001A93E0 __attribute__((sda));
-extern float D_L09_001A9420[4][4] MACRO_ADDR;
+extern DrawState g_glow_context;
+extern float g_glow_rotation __attribute__((sda));
+extern float g_glow_quad_matrix[4][4] MACRO_ADDR;
 extern void euler_rotation_basis(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -29,18 +29,18 @@ void gfx_draw_state_nine_pulsing_quad(char *moby)
         return;
 
     id = -1;
-    if ((unsigned int)(D_L09_001BD700.frame - 2) <= 998)
+    if ((unsigned int)(g_glow_context.frame - 2) <= 998)
         id = 0x47;
     if (id == -1)
         return;
 
     qzero_nc(rot);
-    rot[2] = D_L09_001A93E0;
+    rot[2] = g_glow_rotation;
     euler_rotation_basis(mat, rot);
     vec_scale_to_length(offset, mat, 0.05f);
     first = corners[0];
     dest = first;
-    src = D_L09_001A9420[0];
+    src = g_glow_quad_matrix[0];
     for (i = 3; i >= 0; --i) {
         matrix_mul_vec3(dest, src, mat);
         src -= 4;
@@ -49,7 +49,7 @@ void gfx_draw_state_nine_pulsing_quad(char *moby)
         dest += 4;
     }
 
-    phase = D_L09_001BD700.frame % 120;
+    phase = g_glow_context.frame % 120;
     {
         float denom = IntToFloat(120);
         float angle = (float)phase * 6.283186f;

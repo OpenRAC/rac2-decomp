@@ -3,15 +3,15 @@
 
 
 extern void gfx_append_draw_list_buffer_tag(int);
-extern int D_001B1594 __attribute__((sda));
+extern int g_render_layer_flags __attribute__((sda));
 extern void RenderFrame(void);
 
-void func_PAL_0027C968(void) {
+void gfx_render_frame_all_layers_pal(void) {
     extern void gfx_append_draw_list_buffer_tag(int);
     extern void RenderFrame(void);
-    extern int D_001B1594 __attribute__((sda));
+    extern int g_render_layer_flags __attribute__((sda));
     gfx_append_draw_list_buffer_tag(0);
-    D_001B1594 = 0x7F;
+    g_render_layer_flags = 0x7F;
     RenderFrame();
 }
 
@@ -20,11 +20,11 @@ extern unsigned int menu_get_second_value(void);
 extern void menu_draw_pause_panels(int);
 extern void menu_draw_message_panel(void);
 
-void func_PAL_0027C990(void)
+void gfx_render_frame_extra_layers_pal(void)
 {
     if (menu_get_second_value() == 1) {
         gfx_append_draw_list_buffer_tag(0);
-        D_001B1594 = 0x100FF;
+        g_render_layer_flags = 0x100FF;
         RenderFrame();
     } else if (menu_get_second_value() == 0) {
         menu_draw_pause_panels(1);
@@ -32,7 +32,7 @@ void func_PAL_0027C990(void)
     menu_draw_message_panel();
 }
 
-void func_PAL_0027CA08(void)
+void gfx_call_frame_helper_zero_pal(void)
 {
   menu_draw_pause_panels(0);
   return;

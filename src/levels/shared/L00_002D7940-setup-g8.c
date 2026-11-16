@@ -42,13 +42,13 @@ typedef struct {
     char pad90[8]; float yaw;
     char pad9c[0x2290-0x9c]; char *object;
 } CameraHero9E;
-extern CameraState9E D_L00_001B8C80;
-extern CameraSlot9E D_L00_001B91D0[];
-extern int D_L00_001BB930[];
+extern CameraState9E g_scalar_transition_state;
+extern CameraSlot9E g_camera_slot_table[];
+extern int g_camera_slot_flags[];
 extern CameraHero9E g_hero_state;
-extern float D_001A8900 __attribute__((sda));
-extern int D_L00_001B1840 MACRO_ADDR, D_L00_001B1848 MACRO_ADDR;
-extern CameraDef9E *D_L00_001B1844 MACRO_ADDR;
+extern float g_menu_scale_value __attribute__((sda));
+extern int g_camera_def_cursor MACRO_ADDR, g_camera_def_count MACRO_ADDR;
+extern CameraDef9E *g_camera_def_table MACRO_ADDR;
 extern void cam_l00_init_blend_values(void), cam_reset_default(void);
 extern int cam_clear_override_slots(void);
 extern int cam_find_entry_index(int);
@@ -62,7 +62,7 @@ extern void func_L00_002EE0D0(void *);
    first, which is the operand order retail's addu has without RAC1's -fno-force-mem. */
 /* Resets all level cameras when a level starts. */
 void SetupLevelCameras(void) {
-    CameraState9E *cam_state = &D_L00_001B8C80;
+    CameraState9E *cam_state = &g_scalar_transition_state;
     CameraState9E *cam_state2;
     CameraFollow9E *follow;
     CameraVec9E *up;
@@ -70,19 +70,19 @@ void SetupLevelCameras(void) {
     int i,slot_index;
     cam_state->frames=0;
     cam_state->underwater=0;
-    D_001A8900=0.85f;
-    D_L00_001B1840=0;
+    g_menu_scale_value=0.85f;
+    g_camera_def_cursor=0;
     for(slot_index=0;slot_index<48;slot_index++) {
-        D_L00_001B91D0[slot_index].hard_cut=0;
-        D_L00_001BB930[slot_index]=0;
+        g_camera_slot_table[slot_index].hard_cut=0;
+        g_camera_slot_flags[slot_index]=0;
     }
     cam_clear_override_slots();
     cam_l00_init_blend_values();
-    cam_state2=&D_L00_001B8C80;
+    cam_state2=&g_scalar_transition_state;
     cam_state2->previous=0;
     cam_state2->blend.phase=0;
     qzero_nc(&cam_state2->clear);
-    follow=&D_L00_001B8C80.follow;
+    follow=&g_scalar_transition_state.follow;
     hero=&g_hero_state;
     up=&follow->up;
     func_L00_002EE3D0(up,hero->object+0xe0,1.0f);
@@ -104,11 +104,11 @@ void SetupLevelCameras(void) {
         follow->yaw0=yaw;
     }
     i=0;
-    if(D_L00_001B1848>0) do {
+    if(g_camera_def_count>0) do {
         int off=i*32;
-        CameraDef9E *source=(CameraDef9E *)(off+(int)D_L00_001B1844);
+        CameraDef9E *source=(CameraDef9E *)(off+(int)g_camera_def_table);
         CameraInfo9E *object=source->info;
-        CameraSlot9E *entry=&D_L00_001B91D0[i];
+        CameraSlot9E *entry=&g_camera_slot_table[i];
         int id;
         entry->index=i;
         object->slot=entry;
@@ -123,14 +123,14 @@ void SetupLevelCameras(void) {
         entry->priority=object->priority;
         entry->activation=object->activation;
         id=source->id;
-        D_L00_001BB930[i]=1;
+        g_camera_slot_flags[i]=1;
         entry->id=id;
         entry->type=cam_find_entry_index((short)id);
         i++;
-    } while(i<D_L00_001B1848);
+    } while(i<g_camera_def_count);
     cam_reset_default();
     {
-        CameraBlend9E *b=&D_L00_001B8C80.blend;
+        CameraBlend9E *b=&g_scalar_transition_state.blend;
         int *u=b->unknown;
         b->phase=0;
         u[0]=0;

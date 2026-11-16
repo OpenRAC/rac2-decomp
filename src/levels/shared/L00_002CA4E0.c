@@ -20,7 +20,7 @@ typedef struct {
 } HeroChoiceState;
 extern HeroChoiceState g_hero_state;
 extern int g_current_map_index __attribute__((sda));
-extern int D_001A7398 __attribute__((sda));
+extern int g_menu_choice_table __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 typedef struct { unsigned char pad0[4]; unsigned char active; unsigned char pad1[0xE0 - 5]; } MappedClassEntry;
 extern MappedClassEntry g_weapon_l00_table[];
@@ -30,8 +30,8 @@ typedef struct {
     unsigned char pad2[4]; int inactive;
     unsigned char pad3[12];
 } ChoiceRecord;
-extern ChoiceRecord D_L00_0025BC00[4];
-extern int D_L00_0025BDB0;
+extern ChoiceRecord g_hero_idle_choice_table[4];
+extern int g_hero_idle_block_flag;
 extern int hero_slot_item_id(int);
 extern int CollLine(void *, void *, int, void *, int);
 extern float math_random_float_range(float, float);
@@ -47,11 +47,11 @@ int hero_choose_idle_anim(int *selected)
     if (g_hero_state.gate != 0) return 0;
     if (g_hero_state.state == 1) {
         *selected = 3;
-        if (D_L00_0025BDB0 != 0) return 0;
+        if (g_hero_idle_block_flag != 0) return 0;
         if ((g_hero_state.flags & 2) == 0) return 0;
         return math_random_float_range(0.0f, 1.0f) < 0.33f;
     }
-    entry = D_L00_0025BC00;
+    entry = g_hero_idle_choice_table;
     for (index = 0; index < 4; index++, entry++) {
         float zero = 0.0f;
         int area;
@@ -76,7 +76,7 @@ int hero_choose_idle_anim(int *selected)
         int *p = choices;
         index = count;
         do {
-            ChoiceRecord *r = (ChoiceRecord *)((char *)D_L00_0025BC00 + *p * size);
+            ChoiceRecord *r = (ChoiceRecord *)((char *)g_hero_idle_choice_table + *p * size);
             sum += 1.0f / (float)(int)(r->weight * 60.0f);
             p++;
         } while (--index != 0);
@@ -89,7 +89,7 @@ int hero_choose_idle_anim(int *selected)
         int size;
         int *cursor;
         one = 1.0f;
-        table = D_L00_0025BC00;
+        table = g_hero_idle_choice_table;
         size = sizeof(ChoiceRecord);
         rate = 60.0f;
         cursor = choices;
@@ -99,7 +99,7 @@ int hero_choose_idle_anim(int *selected)
             sum -= one / (float)(int)(*(float *)((char *)table + choice * size + 0x58) * rate);
             if (sum < draw) break;
         }
-        if (D_001A7398 == 30 && (g_weapon_l00_table + g_item_slot_to_record[30])->active == 0) {
+        if (g_menu_choice_table == 30 && (g_weapon_l00_table + g_item_slot_to_record[30])->active == 0) {
             if (*selected == 1) *selected = 0x91;
             else if (*selected == 2) *selected = 0x92;
         }

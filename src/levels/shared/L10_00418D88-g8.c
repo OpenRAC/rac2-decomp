@@ -6,8 +6,8 @@ typedef unsigned char u8;
 typedef short s16;
 typedef int s32;
 extern char g_sound_state[];
-extern u8 *D_L10_001B251C __attribute__((sda));
-extern u8 *D_L10_001C3B40[];
+extern u8 *g_moby_base_table __attribute__((sda));
+extern u8 *g_flying_enemy_targets[];
 extern char ref_L10_00418D88_00[];
 extern char *moby_get_motion_data(u8 *);
 extern void *state_get_stored_pointer_value(void);
@@ -60,7 +60,7 @@ void flying_l10_enemy_update(u8 *self) {
             moby_check_player_in_view_and_range(self, 0, 176.0f);
             if (*(int *)(state + 0x260) != -1) {
                 motion->f11C = 1;
-                motion->f120 = D_L10_001B251C + (*(int *)(state + 0x260) << 8);
+                motion->f120 = g_moby_base_table + (*(int *)(state + 0x260) << 8);
             }
             if (motion->f108 && motion->f104) lightning_object_update_state(self);
             if (moby_can_take_next_step((char *)self)) moby_start_movement_state((char *)self);
@@ -82,7 +82,7 @@ void flying_l10_enemy_update(u8 *self) {
         if (!current || !motion->f120) {
             count = coll_process_hit(self + 0x10, 0, self, 0, 80.0f);
             for (i = 0; i < count; i++) {
-                target = D_L10_001C3B40[i];
+                target = g_flying_enemy_targets[i];
                 if (*(s16 *)(target + 0xAA) == 0xCBE /* moby class 3262 */) {
                     otherMotion = (Motion *)moby_get_motion_data(target);
                     if (otherMotion->f110) {

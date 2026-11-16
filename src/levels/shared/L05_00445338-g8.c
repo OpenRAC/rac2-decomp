@@ -35,18 +35,18 @@ typedef struct {
     float extra;
 } ImpactRequest;
 
-extern char *D_L05_001B1EC4;
-extern Moby *D_L05_001B251C;
+extern char *g_path_l05_entry_table;
+extern Moby *g_feltzin_target_mobys;
 extern int g_current_map_index MACRO_ADDR;
-extern Collision D_L05_001BFB00;
-extern char D_L05_002B8770[];
-extern int D_L05_001B2048;
-extern float D_L05_001B1C10 __attribute__((sda));
-extern float D_L05_001B1C14 __attribute__((sda));
-extern float D_L05_001B1C18 __attribute__((sda));
-extern float D_L05_001B1C1C __attribute__((sda));
-extern float D_L05_001B1C20 __attribute__((sda));
-extern int D_L05_001B1AE4 __attribute__((sda));
+extern Collision g_collision_l05_result;
+extern char g_slot_record_source[];
+extern int g_feltzin_mission_index;
+extern float g_ship_hit_value __attribute__((sda));
+extern float g_ship_hit_event_amount __attribute__((sda));
+extern float g_ship_hit_damage __attribute__((sda));
+extern float g_ship_beam_step_distance __attribute__((sda));
+extern float g_ship_up_offset __attribute__((sda));
+extern int g_ship_record_word __attribute__((sda));
 
 extern int math_fast_float_d(void *);
 extern int coll_test_point(void *, int, void *, float);
@@ -88,74 +88,74 @@ void ResolveLinkedMobyMovementCollisions(char *obj, void *target)
         ImpactRequest message;
         float rotation[3][4];
     } event;
-    char *record = *(char **)(D_L05_001B1EC4 + *(short *)(obj + 0x84) * 32 + 0x1C);
-    Moby *moby = &D_L05_001B251C[*(int *)(record + 0x20)];
+    char *record = *(char **)(g_path_l05_entry_table + *(short *)(obj + 0x84) * 32 + 0x1C);
+    Moby *moby = &g_feltzin_target_mobys[*(int *)(record + 0x20)];
     float distance, divisor;
     int count, i;
 
     math_fast_float_d(record + 0x58);
     if (g_current_map_index == 10 && coll_test_point(moby->position, 16, moby, 0.5f) &&
-        D_L05_001BFB00.object &&
-        *(short *)(D_L05_001BFB00.object + 0xAA) == 0xF86 /* moby class 3974 */) {
+        g_collision_l05_result.object &&
+        *(short *)(g_collision_l05_result.object + 0xAA) == 0xF86 /* moby class 3974 */) {
         hero_apply_damage(1000);
         ship_start_crash_recovery(obj);
         return;
     }
     FastVecSub(delta, moby->position, target);
     distance = FastVecLength(delta);
-    if (distance <= D_L05_001B1C1C) {
+    if (distance <= g_ship_beam_step_distance) {
         count = 2;
         divisor = 2;
     } else {
         if (distance > 30)
             return;
-        count = FloatToInt(distance / D_L05_001B1C1C) + 2;
+        count = FloatToInt(distance / g_ship_beam_step_distance) + 2;
         divisor = IntToFloat(count);
     }
     FastVecScale(step, delta, 1.0f / divisor);
-    FastVecScale(offset, moby->up, D_L05_001B1C20);
+    FastVecScale(offset, moby->up, g_ship_up_offset);
     FastVecAdd(pos, target, offset);
     for (i = 0; i < count; i++) {
         float *direction;
 
         FastVecAdd(pos, pos, step);
-        if (!coll_test_point(pos, 16, moby, D_L05_001B1C1C) || GetCollHitMaterial() == 6)
+        if (!coll_test_point(pos, 16, moby, g_ship_beam_step_distance) || GetCollHitMaterial() == 6)
             continue;
 
-        if (D_L05_001BFB00.object && !level_has_pending_inner_flag(D_L05_001BFB00.object)) {
-            if (D_L05_001BFB00.object) {
-                char *link = *(char **)(D_L05_001BFB00.object + 0x24);
+        if (g_collision_l05_result.object && !level_has_pending_inner_flag(g_collision_l05_result.object)) {
+            if (g_collision_l05_result.object) {
+                char *link = *(char **)(g_collision_l05_result.object + 0x24);
 
                 if (link && *(short *)(link + 0x46) == 11) {
-                    FastVecSub(dir, moby->position, D_L05_001BFB00.object + 0x10);
+                    FastVecSub(dir, moby->position, g_collision_l05_result.object + 0x10);
                     vec_scale_to_length(dir, dir, 1);
-                    qcopy(hit, D_L05_001BFB00.object + 0x10);
+                    qcopy(hit, g_collision_l05_result.object + 0x10);
                     direction = dir;
                     goto impact;
                 }
             }
-            if (D_L05_001BFB00.object && g_current_map_index == 10 &&
-                *(short *)(D_L05_001BFB00.object + 0xAA) == 0x1315 /* moby class 4885 */)
+            if (g_collision_l05_result.object && g_current_map_index == 10 &&
+                *(short *)(g_collision_l05_result.object + 0xAA) == 0x1315 /* moby class 4885 */)
                 return;
             {
-                int kind = *(short *)(D_L05_001BFB00.object + 0xAA);
+                int kind = *(short *)(g_collision_l05_result.object + 0xAA);
 
                 if (kind == 0x1327 /* moby class 4903 */)
                     return;
                 if (kind == 0x1328 /* moby class 4904 */)
                     return;
             }
-            FastVecSub(move, D_L05_001BFB00.position, pos);
+            FastVecSub(move, g_collision_l05_result.position, pos);
             FastVecAdd(moby->position, moby->position, move);
             FastVecAdd(obj + 0x30, obj + 0x30, move);
-            qcopy(pos, D_L05_001BFB00.position);
+            qcopy(pos, g_collision_l05_result.position);
             {
                 float facing;
 
-                if (*(unsigned short *)(D_L05_001BFB00.object + 0x34) & 0x100) {
-                    facing = FastVecDot(D_L05_001BFB00.object + 0xC0, moby->forward);
+                if (*(unsigned short *)(g_collision_l05_result.object + 0x34) & 0x100) {
+                    facing = FastVecDot(g_collision_l05_result.object + 0xC0, moby->forward);
                 } else {
-                    euler_rotation_basis(event.rotation, D_L05_001BFB00.object + 0xF0);
+                    euler_rotation_basis(event.rotation, g_collision_l05_result.object + 0xF0);
                     facing = FastVecDot(event.rotation, moby->forward);
                 }
                 if (facing > 0)
@@ -163,42 +163,42 @@ void ResolveLinkedMobyMovementCollisions(char *obj, void *target)
             }
             if (!*(int *)(record + 0x58)) {
                 event.message.flags = 0x10000;
-                event.message.amount = D_L05_001B1C14;
+                event.message.amount = g_ship_hit_event_amount;
                 event.message.enabled = 1;
                 event.message.object = moby;
-                FastVecSub(&event.message, D_L05_001BFB00.object + 0x10, moby->position);
+                FastVecSub(&event.message, g_collision_l05_result.object + 0x10, moby->position);
                 vec_scale_to_length(&event.message, &event.message, 1);
                 event.message.value = 5627.925f;
                 event.message.a = 1;
                 event.message.b = 1;
                 event.message.type = moby->type;
-                QueueMobyImpact(D_L05_001BFB00.object, &event.message);
-                hero_apply_damage(D_L05_001B1C18);
-                *(int *)(record + 0x58) = D_L05_001B1AE4;
+                QueueMobyImpact(g_collision_l05_result.object, &event.message);
+                hero_apply_damage(g_ship_hit_damage);
+                *(int *)(record + 0x58) = g_ship_record_word;
             }
-            slot_copy_records_to_free(D_L05_002B8770);
-            qcopy(moby->state + 0x90, D_L05_001BFB00.hit);
+            slot_copy_records_to_free(g_slot_record_source);
+            qcopy(moby->state + 0x90, g_collision_l05_result.hit);
             gfx_add_draw_callback_third(part_spawn_impact_trail, moby);
             continue;
         }
-        FastVecScale(dir, D_L05_001BFB00.normal, 0.0009765625f);
+        FastVecScale(dir, g_collision_l05_result.normal, 0.0009765625f);
         vec_scale_to_length(dir, dir, 1);
-        qcopy(hit, D_L05_001BFB00.hit);
+        qcopy(hit, g_collision_l05_result.hit);
         direction = dir;
 impact:
         if (math_fabs(FastVecDot(direction, moby->forward)) > 0.75f) {
             ship_start_crash_recovery(obj);
             continue;
         }
-        FastVecScale(D_L05_001BFB00.position, direction, D_L05_001B1C1C);
-        FastVecAdd(D_L05_001BFB00.position, D_L05_001BFB00.hit, D_L05_001BFB00.position);
-        FastVecSub(move, D_L05_001BFB00.position, pos);
+        FastVecScale(g_collision_l05_result.position, direction, g_ship_beam_step_distance);
+        FastVecAdd(g_collision_l05_result.position, g_collision_l05_result.hit, g_collision_l05_result.position);
+        FastVecSub(move, g_collision_l05_result.position, pos);
         FastVecAdd(moby->position, moby->position, move);
         FastVecAdd(obj + 0x30, obj + 0x30, move);
-        qcopy(pos, D_L05_001BFB00.position);
-        slot_copy_records_to_free(D_L05_002B8770);
-        if (!(D_L05_001B2048 & 3)) {
-            float value = D_L05_001B1C10;
+        qcopy(pos, g_collision_l05_result.position);
+        slot_copy_records_to_free(g_slot_record_source);
+        if (!(g_feltzin_mission_index & 3)) {
+            float value = g_ship_hit_value;
 
             if (hero_is_state_flag_set())
                 value += value;
@@ -207,8 +207,8 @@ impact:
         {
             char *state = moby->state;
 
-            FastVecScale(move, direction, D_L05_001B1C1C * 0.8f);
-            FastVecAdd(state + 0x90, move, D_L05_001BFB00.hit);
+            FastVecScale(move, direction, g_ship_beam_step_distance * 0.8f);
+            FastVecAdd(state + 0x90, move, g_collision_l05_result.hit);
         }
         gfx_add_draw_callback_third(part_spawn_impact_trail, moby);
         if (fast_vec_dist(target, moby->position) < 0.1f)

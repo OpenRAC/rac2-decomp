@@ -8,7 +8,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 /* The two bodies below have more than one copy in the levels, and which copy this
    program calls changes from one program to the next: the retail's call is read from
@@ -58,14 +58,14 @@ void gfx_draw_aimed_sprite(char *position, int colorRgb, int alpha, char *textur
     *(long long *)(drawPacket + 120) = textureReg;
 
     aim[3] = 0.0f;
-    aim[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(position + 0),
-                            D_L00_001B8C80.y_144 - *(float *)(position + 4));
-    aim[1] = -mat_fast_helper_a(vec_distance_xy(position, &D_L00_001B8C80.x_140),
-                             D_L00_001B8C80.z_148 - *(float *)(position + 8));
+    aim[2] = mat_fast_helper_a(g_scalar_transition_state.x_140 - *(float *)(position + 0),
+                            g_scalar_transition_state.y_144 - *(float *)(position + 4));
+    aim[1] = -mat_fast_helper_a(vec_distance_xy(position, &g_scalar_transition_state.x_140),
+                             g_scalar_transition_state.z_148 - *(float *)(position + 8));
     aim[0] = roll;
 
     euler_to_matrix(orientation, aim);
-    FastVecSub(towardAim, &D_L00_001B8C80.x_140, position);
+    FastVecSub(towardAim, &g_scalar_transition_state.x_140, position);
     vec_scale_to_length(towardAim, towardAim, offsetScale);
 
     orientation[12] = *(float *)(position + 0) + towardAim[0];

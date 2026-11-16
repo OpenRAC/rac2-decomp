@@ -3,14 +3,14 @@
 #include "common.h"
 extern char g_sound_state[];
 extern char g_camera_l00_position[];
-extern char *D_L00_001B19EC __attribute__((section(".sdata")));
+extern char *g_slot_table __attribute__((section(".sdata")));
 extern float fast_vec_dist(char *, char *);
 extern int math_fast_float_d(int *);
 extern int snd_start_from_table_entry(int, int, char *, int);
 extern int math_random_int_below(int);
 extern void snd_stop_voice(int);
 
-void func_PAL_L00_00430188(char *self) {
+void snd_update_emitter_proximity_pal(char *self) {
     int *sub = *(int **)(self + 8);
     unsigned int flags;
     float distance;
@@ -19,7 +19,7 @@ void func_PAL_L00_00430188(char *self) {
     if (distance < *(float *)(self + 0xc)) {
         char *slot;
         flags = 0;
-        if (*(u8 *)(D_L00_001B19EC + sub[0] * 32 + 0x18)) flags |= 4;
+        if (*(u8 *)(g_slot_table + sub[0] * 32 + 0x18)) flags |= 4;
         slot = g_sound_state + sub[4] * 0x70;
         if (*(char **)(slot + 0x8c) == self && *(u8 *)(slot + 0x74)) return;
         if (math_fast_float_d(sub + 3)) {

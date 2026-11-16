@@ -11,18 +11,18 @@ void swamp_beast_alert_group(u8 *arg0);
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_001A7A60[] MACRO_ADDR;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern float fast_vec_dist(void *,void *);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern void moby_set_state(void *,int,int);
 #define P(p,o) (*(int **)((u8 *)(p)+(o)))
 #define C(p,o) (*(u8 **)((u8 *)(p)+(o)))
 typedef int OozlaQuad __attribute__((mode(TI)));
-extern float D_L01_001B94C0[];
+extern float g_level_origin_vec[];
 typedef struct { u8 pad[0x2290]; u8 *target; } OozlaHero;
 extern OozlaHero g_hero_state;
 extern float g_hero_position[];
-extern int D_L01_001B2088 MACRO_ADDR;
+extern int g_oozla_intro_stage MACRO_ADDR;
 extern void moby_update_ground_check(void *);
 extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern float vec_distance_xy(void *,void *);
@@ -33,7 +33,7 @@ extern float mat_fast_helper_a(float,float);
 extern float fast_subtract_rotations(float,float);
 extern void moby_update_eased_node(void *,void *,int,float,float);
 extern int math_random_int_below(int);
-extern void func_PAL_L01_003B7FC0(void *);
+extern void swamp_beast_spawn_bubbles_pal(void *);
 extern int GetFirstMobyInGroup(void *,int,int,int);
 extern int GetNextMobyInGroup(void *,void *,int,int);
 void func_PAL_L01_003B8F28(u8 *object)
@@ -44,7 +44,7 @@ void func_PAL_L01_003B8F28(u8 *object)
     u8 *state = C(object,0x68);
     u8 *target, *detail;
     float angle, distance, best;
-    if (object[0x31] && fast_vec_dist(object+0x10,D_L01_001B94C0) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object+0x10,g_level_origin_vec) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 22;
     }
@@ -84,10 +84,10 @@ void func_PAL_L01_003B8F28(u8 *object)
         F(state,0x2B8) = fast_subtract_rotations(angle,F(object,0xF8));
         moby_update_eased_node(object,state+0x250,4,0.0432f,0.43200004f);
         if (F(object,0x18) <= func_PAL_L01_003BEB40()+0.3f && (object[0x95] >= 2 || math_random_int_below(9) == 0))
-            func_PAL_L01_003B7FC0(object);
+            swamp_beast_spawn_bubbles_pal(object);
     }
-    if (object[0x21] != 255 && *P(state,0x368) != D_L01_001B2088) {
-        if (*P(state,0x36C) == -1 || *P(state,0x368) < D_L01_001B2088-10) {
+    if (object[0x21] != 255 && *P(state,0x368) != g_oozla_intro_stage) {
+        if (*P(state,0x36C) == -1 || *P(state,0x368) < g_oozla_intro_stage-10) {
             *P(state,0x36C) = -1;
             *P(state,0x370) = -1;
             best = 100000.0f;
@@ -103,7 +103,7 @@ void func_PAL_L01_003B8F28(u8 *object)
                 }
                 GetNextMobyInGroup(&iterator,iterator,0,0);
             }
-            *P(state,0x368) = D_L01_001B2088;
+            *P(state,0x368) = g_oozla_intro_stage;
         }
     }
 }

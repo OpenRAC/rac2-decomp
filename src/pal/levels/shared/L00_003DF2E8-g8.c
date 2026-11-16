@@ -22,14 +22,14 @@ typedef struct {
     int count;
     char pad24[12];
 } HitInfo;
-extern unsigned char D_00139585 __attribute__((nosda));
+extern unsigned char g_hit_scale_weapon_index __attribute__((nosda));
 extern char g_weapon_l00_table[];
 extern CollisionResult g_collision_result;
-extern struct { Vec position; Vec unk; Vec normal; } D_L00_001BF220;
-extern Vec D_L00_001BF240;
+extern struct { Vec position; Vec unk; Vec normal; } g_hero_l00_position;
+extern Vec g_hero_l00_velocity;
 extern char *g_hero_moby __attribute__((nosda));
-extern float D_L00_001B03E4 __attribute__((sda));
-extern float D_L00_001A8F20;
+extern float g_direction_step_scale __attribute__((sda));
+extern float g_default_vector;
 extern void vec_transform_or_copy(void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
 extern void table_clear_entry_flag(int);
@@ -53,8 +53,8 @@ extern int coll_test_point(void *, int, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
-extern int func_PAL_0032F0B8(void *, int, int);
-extern void func_PAL_L00_003E05B0(char *, int, void *, void *, float);
+extern int StartAttachedEffect_pal(void *, int, int);
+extern void EmitRingAndDirectionalParticles_pal(char *, int, void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
@@ -70,7 +70,7 @@ extern void ref_L00_003DB118_00(void *, void *);
 extern void part_l00_update_burst_effect();
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L00_003DF2E8(char *self)
+void UpdateCollidingTrailProjectile_pal(char *self)
 {
     Vec ray;
     Vec scale3;
@@ -105,7 +105,7 @@ void func_PAL_L00_003DF2E8(char *self)
         timer = pv + 0x60;
         part_steer_effect_direction(*(int *)(pv + 0x78), pv, 0);
         FastVecAdd(self + 0x10, self + 0x10, pv);
-        vec_add_object_direction_scaled(self + 0x10, pv, D_L00_001B03E4 * 0.00040000002f);
+        vec_add_object_direction_scaled(self + 0x10, pv, g_direction_step_scale * 0.00040000002f);
         for (i = 3; i > 0; i--) {
             lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
         }
@@ -152,7 +152,7 @@ void func_PAL_L00_003DF2E8(char *self)
                     FastVecSub(a30, obj + 0x10, hero + 0x10);
                     vec_scale_to_length(a30, a30, 1.0f);
                     vec_scale_to_length(&hit, &hit, 0.14000002f);
-                    make_hit_descriptor(&hit, self, 0x910000, a30, ((TableEntry *)g_weapon_l00_table)[D_00139585].scale);
+                    make_hit_descriptor(&hit, self, 0x910000, a30, ((TableEntry *)g_weapon_l00_table)[g_hit_scale_weapon_index].scale);
                     {
                     Quad hitPosition = *(Quad *)a30;
                     hit.kind = 5;
@@ -163,7 +163,7 @@ void func_PAL_L00_003DF2E8(char *self)
                     hit.type = *(unsigned short *)(col->object + 0xAA);
                     QueueMobyImpact(col->object, &hit);
                     }
-                    func_PAL_0032F0B8(col->object, 0x3F, *(int *)(self + 0xB8));
+                    StartAttachedEffect_pal(col->object, 0x3F, *(int *)(self + 0xB8));
                     *(Quad *)a40 = *(Quad *)(col->object + 0x10);
                     a40[2] = a40[2] + 5.0f;
                     *(Quad *)a30 = *(Quad *)a40;
@@ -174,7 +174,7 @@ void func_PAL_L00_003DF2E8(char *self)
                     *(Quad *)(pv + 0x50) = col->normal.q;
                     *(int *)(pv + 0x7C) = 1;
                     for (i = 0; i < 3; i++) {
-                        vec_scale_to_length(spark, &D_L00_001BF240, math_random_float_range(0.20000002f, 0.40000004f));
+                        vec_scale_to_length(spark, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                         spark[0] += math_random_float_range(-0.15f, 0.15f);
                         spark[1] += math_random_float_range(-0.15f, 0.15f);
                         spark[2] += math_random_float_range(-0.15f, 0.15f);
@@ -182,12 +182,12 @@ void func_PAL_L00_003DF2E8(char *self)
                         func_PAL_002BEF58(self + 0x10, spark, 0, -1.0f);
                     }
                 } else {
-                    *(Quad *)(self + 0x10) = D_L00_001BF220.position.q;
+                    *(Quad *)(self + 0x10) = g_hero_l00_position.position.q;
                     *(unsigned char *)(self + 0x20) = 2;
                     *(unsigned short *)(self + 0x34) |= 0x41;
-                    *(Quad *)(pv + 0x50) = D_L00_001BF220.normal.q;
+                    *(Quad *)(pv + 0x50) = g_hero_l00_position.normal.q;
                     for (i = 0; i < 6; i++) {
-                        vec_scale_to_length(a30, &D_L00_001BF240, math_random_float_range(0.20000002f, 0.40000004f));
+                        vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                         a30[0] += math_random_float_range(-0.15f, 0.15f);
                         a30[1] += math_random_float_range(-0.15f, 0.15f);
                         a30[2] += math_random_float_range(-0.15f, 0.15f);
@@ -201,7 +201,7 @@ void func_PAL_L00_003DF2E8(char *self)
                 *(unsigned short *)(self + 0x34) |= 0x41;
                 *(Quad *)(pv + 0x50) = col->normal.q;
                 for (i = 0; i < 6; i++) {
-                    vec_scale_to_length(a30, &D_L00_001BF240, math_random_float_range(0.20000002f, 0.40000004f));
+                    vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                     a30[0] += math_random_float_range(-0.15f, 0.15f);
                     a30[1] += math_random_float_range(-0.15f, 0.15f);
                     a30[2] += math_random_float_range(-0.15f, 0.15f);
@@ -210,7 +210,7 @@ void func_PAL_L00_003DF2E8(char *self)
                 }
             }
             *(int *)(pv + 0x60) = 12;
-            func_PAL_L00_003E05B0(self, 12, self + 0x10, &D_L00_001BF240, 0.10000001f);
+            EmitRingAndDirectionalParticles_pal(self, 12, self + 0x10, &g_hero_l00_velocity, 0.10000001f);
         }
         }
         }
@@ -249,7 +249,7 @@ void func_PAL_L00_003DF2E8(char *self)
     if (*(unsigned char *)(self + 0x20) == 1) {
         for (i = 0; i < 4; i++) {
             int n = math_random_int_below(5);
-            p = func_PAL_002BE9A8(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 210000.0f, 0x7F204080, 1);
+            p = func_PAL_002BE9A8(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 210000.0f, 0x7F204080, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 4;
@@ -261,7 +261,7 @@ void func_PAL_L00_003DF2E8(char *self)
         }
         for (i = 0; i < 3; i++) {
             int n = math_random_int_below(3);
-            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 157500.0f, 0x7F4080FF, 1);
+            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 157500.0f, 0x7F4080FF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
@@ -273,7 +273,7 @@ void func_PAL_L00_003DF2E8(char *self)
         }
         for (i = 0; i < 2; i++) {
             int n = math_random_int_below(3);
-            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &D_L00_001A8F20, 105000.0f, 0x7FFFFFFF, 1);
+            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 105000.0f, 0x7FFFFFFF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;

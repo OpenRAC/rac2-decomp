@@ -105,27 +105,27 @@ void mpeg_call_handler_with_callback(void *mpeg) {
     r1_func_00114438(mpeg, r1_func_00113968);
 }
 extern void mpeg_report_error_fixed_a(void *arg0);
-extern char D_0013BE88[];
+extern char g_str_mpeg_error_a[];
 
 /* Reports a fixed video error message. */
 void mpeg_report_error_fixed_a(void *decoder) {
-    mpeg_report_error(decoder, D_0013BE88);
+    mpeg_report_error(decoder, g_str_mpeg_error_a);
 }
 
 extern void mpeg_report_error_fixed_b(void *arg0);
-extern char D_0013BEA0[];
+extern char g_str_mpeg_error_b[];
 
 /* Reports a fixed video error message. */
 void mpeg_report_error_fixed_b(void *decoder) {
-    mpeg_report_error(decoder, D_0013BEA0);
+    mpeg_report_error(decoder, g_str_mpeg_error_b);
 }
 
 extern void mpeg_report_error_fixed_c(void *arg0);
-extern char D_0013BED8[];
+extern char g_str_mpeg_error_c[];
 
 /* Reports a fixed video error message. */
 void mpeg_report_error_fixed_c(void *decoder) {
-    mpeg_report_error(decoder, D_0013BED8);
+    mpeg_report_error(decoder, g_str_mpeg_error_c);
 }
 
 

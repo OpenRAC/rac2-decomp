@@ -2,9 +2,9 @@
 
 extern char g_hero_state[];
 extern char g_camera_l00_position[];
-extern char D_L00_002563A0[];
-extern float D_L00_001B1000 __attribute__((sda));
-extern float D_L00_001B0FF8 __attribute__((sda));
+extern char g_lightning_strand_points[];
+extern float g_clank_zapper_cone_angle __attribute__((sda));
+extern float g_clank_zapper_normal_length __attribute__((sda));
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern void gfx_init_quad_packet_state(void *, int, int, int);
@@ -35,7 +35,7 @@ void DrawBeamSegmentsOrRibbons(char *object)
                                *(float *)(target + 0x14) - *(float *)(globals + 0x84));
 
     angle = FastDiffRots(angle, *(float *)(globals + 0x98));
-    if (D_L00_001B1000 * 0.017453294f < angle) {
+    if (g_clank_zapper_cone_angle * 0.017453294f < angle) {
         if (*(int *)(state + 0x1c)) {
             gfx_init_quad_packet_state(packet, 0x17, 1, 0x80);
             position = object + 0x10;
@@ -58,7 +58,7 @@ void DrawBeamSegmentsOrRibbons(char *object)
             FastVecSub(delta, start, end);
             FastVecSub(camera, position, g_camera_l00_position);
             FastVecCross(normal, camera, delta);
-            vec_scale_to_length(normal, normal, D_L00_001B0FF8);
+            vec_scale_to_length(normal, normal, g_clank_zapper_normal_length);
             FastVecAdd(packet, start, normal);
             FastVecSub(packet + 0x10, start, normal);
             FastVecAdd(packet + 0x20, end, normal);
@@ -68,7 +68,7 @@ void DrawBeamSegmentsOrRibbons(char *object)
             FastVecSub(delta, start, third);
             FastVecSub(camera, position, g_camera_l00_position);
             FastVecCross(normal, camera, delta);
-            vec_scale_to_length(normal, normal, D_L00_001B0FF8);
+            vec_scale_to_length(normal, normal, g_clank_zapper_normal_length);
             FastVecAdd(packet, start, normal);
             FastVecSub(packet + 0x10, start, normal);
             FastVecAdd(packet + 0x20, third, normal);
@@ -77,14 +77,14 @@ void DrawBeamSegmentsOrRibbons(char *object)
             draw_world_quad(packet, 0, 0);
         }
     } else if (*(int *)(state + 0x1c)) {
-        DrawRibbonWithHalo(D_L00_002563A0, 70, 70, 0.2f, 0.35f, 0.2f, 10, 0x7f7f7f, 0x10ff10);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0xa0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0x140, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0x1e0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(g_lightning_strand_points, 70, 70, 0.2f, 0.35f, 0.2f, 10, 0x7f7f7f, 0x10ff10);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0xa0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0x140, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0x1e0, 32, 32, 0.1f, 0.19f, 0.2f, 10, 0x7f7f7f, 0xff1010);
     } else {
-        DrawRibbonWithHalo(D_L00_002563A0, 50, 50, 0.07f, 0.15f, 0.2f, 10, 0x7f7f7f, 0x20ff20);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0xa0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0x140, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
-        DrawRibbonWithHalo(D_L00_002563A0 + 0x1e0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(g_lightning_strand_points, 50, 50, 0.07f, 0.15f, 0.2f, 10, 0x7f7f7f, 0x20ff20);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0xa0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0x140, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
+        DrawRibbonWithHalo(g_lightning_strand_points + 0x1e0, 15, 15, 0.03f, 0.09f, 0.2f, 10, 0x7f7f7f, 0x10ffff);
     }
 }

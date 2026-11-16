@@ -69,7 +69,7 @@ typedef struct {
 } HeroTimerState;
 
 extern HeroTimerState g_hero_state;
-extern int D_L22_001B1C48;
+extern int g_frame_l22_counter;
 
 #define BS(p, o) (*(short *)((p)+(o)))
 #define BU(p, o) (*(unsigned short *)((p)+(o)))
@@ -84,12 +84,12 @@ typedef struct {
 } TimerPadState;
 
 extern TimerPadState g_pad_state;
-extern unsigned char *D_L22_001FBBA0[];
-extern unsigned char D_L22_0025DCE0[];
+extern unsigned char *g_nearby_l22_moby_list[];
+extern unsigned char g_hero_l22_timer_records[];
 extern int D_L22_001A8F00_abs __asm__("D_L22_001A8F00");
-extern float D_L22_001B1B60, D_L22_001B1B64;
+extern float g_hero_reach_timer_left, g_hero_reach_timer_right;
 /* The equipment flag at 0x1A7AFF: a small-data object at a nonzero offset, length 2 for reorg. */
-extern unsigned char D_001A7A70[] __attribute__((sda));
+extern unsigned char g_hero_event_flags[] __attribute__((sda));
 extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
@@ -170,23 +170,23 @@ void hero_update_timers_and_reach(void) {
     if (g_hero_state.field_1454) g_hero_state.field_1E8 = 0;
     else g_hero_state.field_1E8++;
     if (!D_L22_001A8F00_abs) {
-        if (D_L22_001B1B60>0) g_hero_state.field_22A++;
+        if (g_hero_reach_timer_left>0) g_hero_state.field_22A++;
         else g_hero_state.field_22A = 0;
         if (g_hero_state.field_22A>120) {
-            D_L22_001B1B60 = 0;
+            g_hero_reach_timer_left = 0;
             g_hero_state.field_22A = 0;
         }
-        if (D_L22_001B1B64>0) g_hero_state.field_228++;
+        if (g_hero_reach_timer_right>0) g_hero_state.field_228++;
         else g_hero_state.field_228 = 0;
         if (g_hero_state.field_228>120) {
             g_hero_state.field_228 = 0;
-            D_L22_001B1B64 = 0;
+            g_hero_reach_timer_right = 0;
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(nearby_moby = D_L22_001FBBA0[i]) != 0;i++) {
+        for (i = 0;(nearby_moby = g_nearby_l22_moby_list[i]) != 0;i++) {
             if (moby_is_in_special_class_range(nearby_moby) || (nearby_moby && BP(nearby_moby, 0x24) && BS(BP(nearby_moby, 0x24), 0x46) == 22)) {
-                if ((D_L22_001B1C48&7) == (((int)nearby_moby>>8)&7) || !math_random_int_below(4)) {
+                if ((g_frame_l22_counter&7) == (((int)nearby_moby>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_state+0x80;
                     moby_pos = nearby_moby+0x10;
                     if (fast_vec_dist(hero, moby_pos)<15.37f) {
@@ -198,7 +198,7 @@ void hero_update_timers_and_reach(void) {
             }
         }
     }
-    for (i = 0;i<4;i++) math_fast_float_d(D_L22_0025DCE0+i*0x70);
+    for (i = 0;i<4;i++) math_fast_float_d(g_hero_l22_timer_records+i*0x70);
     g_hero_state.current_path_dist = 9999.0f;
     if (g_hero_state.field_34E && cam_get_view_space_height(((unsigned char *)&g_hero_state)+0xF0)<0) {
         if (g_hero_state.pos_history_count != 32) goto history_done;
@@ -226,7 +226,7 @@ history_done:
     case 2: hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 4.0f); break;
     default: hero_build_relative_point((unsigned char *)&g_hero_state+0xE0, 1, 0, 0, 0.7f); break;
     }
-    if (!(D_L22_001B1C48&3)) {
+    if (!(g_frame_l22_counter&3)) {
         switch (g_hero_state.mode) {
         case 1:
             g_hero_state.reach_distance = 2.125f;
@@ -237,7 +237,7 @@ history_done:
             g_hero_state.reach_height = 3;
             break;
         default:
-            if (D_001A7A70[0x8F]) {
+            if (g_hero_event_flags[0x8F]) {
                 g_hero_state.reach_distance = 14;
                 g_hero_state.reach_height = 4.5f;
             }

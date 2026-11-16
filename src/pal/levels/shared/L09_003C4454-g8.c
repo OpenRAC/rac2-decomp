@@ -20,8 +20,8 @@ typedef struct {
 } HeroState;
 extern HeroState g_hero_state;
 extern s32 g_current_map_index;
-extern float D_L06_001B0090 __attribute__((sda));
-extern float D_L06_001B9858 NOT_SDA;
+extern float g_lift_path_offset __attribute__((sda));
+extern float g_hero_lift_angle NOT_SDA;
 extern s32 FloatToInt(float);
 extern void moby_mark_spawned(void *);
 extern s32 math_random_int_below(s32);
@@ -39,10 +39,10 @@ extern float FastAddRotations(float,float);
 extern void euler_rotation_basis(void *,void *);
 extern s32 PlayMobySound(s32,s32,void *);
 extern void func_PAL_L06_00407B38(void *,void *);
-extern void func_PAL_L00_002B9CD8(void *,void *,s32,s32);
+extern void hero_reset_position_and_direction_pal(void *,void *,s32,s32);
 extern s32 point_in_path_xy(void *,void *,s32);
 extern s32 flag_set_first_pending(void *);
-extern void func_PAL_L00_002B3000(void);
+extern void hero_record_play_counters_pal(void);
 typedef struct {
     char p0[0x48];
     u8 timerA;
@@ -92,7 +92,7 @@ void func_PAL_L09_003C4454(char *obj)
             data->point = math_random_int_below(I(g_path_list[data->path],0));
             data->timeout = 500;
             if (B(obj,0x43) != 1) func_PAL_002A7E68(obj,1,0,8);
-            F(obj,0x18) = F(g_path_list[data->path],0x18) - D_L06_001B0090;
+            F(obj,0x18) = F(g_path_list[data->path],0x18) - g_lift_path_offset;
             data->pathZ = F(obj,0x18);
             B(obj,0x20) = 1;
         }
@@ -112,10 +112,10 @@ void func_PAL_L09_003C4454(char *obj)
         if (math_fabs(g_hero_state.height-data->homeZ)<0.8f && g_hero_state.action==18 && !IsPointInCuboid((char *)&g_hero_state+0x80,data->range)) {
             if (data->wait == 0) {
                 F(obj,0xF4) = -1.5533431768417358f;
-                F(obj,0xF8) = FastAddRotations(D_L06_001B9858,1.5707964897155762f);
+                F(obj,0xF8) = FastAddRotations(g_hero_lift_angle,1.5707964897155762f);
                 euler_rotation_basis(obj+0xC0,obj+0xF0);
                 qcopy(obj+0x10,(char *)&g_hero_state+0x80);
-                vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+                vec_scale_to_length(pos,obj+0xE0,g_lift_path_offset);
                 FastVecSub(obj+0x10,obj+0x10,pos);
                 data->speed = 0.16000001f;
                 H(obj,0x34) &= 0xFFFE;
@@ -125,7 +125,7 @@ void func_PAL_L09_003C4454(char *obj)
                 qcopy(step,(char *)&g_hero_state+0x80);
                 step[2] = g_hero_state.height;
                 func_PAL_L06_00407B38(obj,step);
-                func_PAL_L00_002B9CD8((char *)&g_hero_state+0x80,(char *)&g_hero_state+0x90,111,0);
+                hero_reset_position_and_direction_pal((char *)&g_hero_state+0x80,(char *)&g_hero_state+0x90,111,0);
                 g_hero_state.flag = 1;
             }
         } else if (g_hero_state.mode!=18) {
@@ -150,10 +150,10 @@ void func_PAL_L09_003C4454(char *obj)
                 data->speed -= 0.008f;
         }
         if (data->speed<0.040000003f) {
-            vec_scale_to_length(pos,obj+0xE0,D_L06_001B0090);
+            vec_scale_to_length(pos,obj+0xE0,g_lift_path_offset);
             math_approach_target_with_direction_mode((float *)(obj+0xF4),1.5533431768417358f,0.005026549f,0.005026549f,0.5026549f,&data->turn,0);
             euler_rotation_basis(obj+0xC0,obj+0xF0);
-            vec_scale_to_length(step,obj+0xE0,D_L06_001B0090);
+            vec_scale_to_length(step,obj+0xE0,g_lift_path_offset);
             FastVecSub(delta,step,pos);
             FastVecSub(obj+0x10,obj+0x10,delta);
         }
@@ -162,7 +162,7 @@ void func_PAL_L09_003C4454(char *obj)
             pos[2]=g_hero_state.height;
             func_PAL_L06_00407B38(obj,pos);
         }
-        if (data->speed<0.0f && F(obj,0x18)<data->homeZ) func_PAL_L00_002B3000();
+        if (data->speed<0.0f && F(obj,0x18)<data->homeZ) hero_record_play_counters_pal();
         if ((B(obj,0x60)&2) && B(obj,0x43)!=1) func_PAL_002A7E68(obj,1,0,8);
         break;
     }

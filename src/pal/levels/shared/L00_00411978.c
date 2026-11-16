@@ -16,10 +16,10 @@ extern char *func_PAL_002BE9A8(char *p, float fa, float fb, float fc, float fd, 
 extern char *func_PAL_002C23B8(float *out, float *dir, int a, int b, unsigned int color, int id,
                             float fa, float fb, float fc, float fd, float fe);
 extern char g_camera_l00_position[];
-extern char D_0018A0E0[];
-extern char D_001FE940[];
+extern char g_hero_state_block[];
+extern char g_part_resident_buffer[];
 
-void func_PAL_L00_00411978(float *p, int unused, int flag)
+void part_spawn_smoke_and_sparks_pal(float *p, int unused, int flag)
 {
     float v[4];
     float dir[4];
@@ -46,7 +46,7 @@ void func_PAL_L00_00411978(float *p, int unused, int flag)
 
     for (i = 19; i >= 0; i--) {
         f = math_random_float_range(0.2f, 3.0f);
-        FastVecScale((char *)dir, D_0018A0E0, -(f * 0.020000001f));
+        FastVecScale((char *)dir, g_hero_state_block, -(f * 0.020000001f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         f = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         out[0] = p[0] + math_random_signed_float_range(0.0f, 0.2f);
@@ -73,7 +73,7 @@ void func_PAL_L00_00411978(float *p, int unused, int flag)
         r = func_PAL_002C23B8(out, dir, 25, 127, color, id,
                           math_random_float_range(0.25f, 0.7f) * 210000.0f, 500.0f, 1.0f, 0.0f, 0.0f);
         if (r != 0) {
-            char *tbl = D_001FE940;
+            char *tbl = g_part_resident_buffer;
             *(unsigned char *)(r + 2) = *(unsigned char *)(*(char **)(tbl + 0x184) + 6);
         }
     }

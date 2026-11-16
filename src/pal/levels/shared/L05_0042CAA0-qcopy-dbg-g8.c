@@ -7,16 +7,16 @@ extern char *CreateMoby(int);
 extern int FloatToInt(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
-extern float D_L05_001B154C __attribute__((sda));
-extern float D_L05_001B1550 __attribute__((sda));
-extern int D_L05_001B1554 __attribute__((sda));
-extern float D_L05_001B155C __attribute__((sda));
-extern float D_L05_001B1560 __attribute__((sda));
-extern float D_L05_001B1514 __attribute__((sda));
-extern float D_L05_001B1518 __attribute__((sda));
-extern int D_L05_001B151C __attribute__((sda));
-extern float D_L05_001B1524 __attribute__((sda));
-extern float D_L05_001B1528 __attribute__((sda));
+extern float g_projectile_l05_frame_time_normal __attribute__((sda));
+extern float g_projectile_l05_frame_time_alt __attribute__((sda));
+extern int g_projectile_l05_spawn_var __attribute__((sda));
+extern float g_projectile_l05_travel_time_normal __attribute__((sda));
+extern float g_projectile_l05_travel_time_alt __attribute__((sda));
+extern float g_projectile_frame_time_normal __attribute__((sda));
+extern float g_projectile_frame_time_alt __attribute__((sda));
+extern int g_projectile_spawn_var __attribute__((sda));
+extern float g_projectile_travel_time_normal __attribute__((sda));
+extern float g_projectile_travel_time_alt __attribute__((sda));
 
 char *func_PAL_L05_0042CAA0(char *pos, char *vec, int a2, char *a3, int flag, int a5)
 {
@@ -35,11 +35,11 @@ char *func_PAL_L05_0042CAA0(char *pos, char *vec, int a2, char *a3, int flag, in
         *(unsigned char *)(obj + 0x31) = 1;
         *(unsigned char *)(obj + 0x20) = 1;
         *(int *)(st + 0x24) = flag;
-        f22 = (flag ? D_L05_001B1518 : D_L05_001B1514) * 0.020000001f;
-        f21 = (flag ? D_L05_001B1528 : D_L05_001B1524) / f22;
+        f22 = (flag ? g_projectile_frame_time_alt : g_projectile_frame_time_normal) * 0.020000001f;
+        f21 = (flag ? g_projectile_travel_time_alt : g_projectile_travel_time_normal) / f22;
         f20 = 1.0f;
         count = FloatToInt(f21);
-        frames = D_L05_001B151C;
+        frames = g_projectile_spawn_var;
         *(int *)(st + 0x18) = count;
         *(int *)(st + 0x10) = a2;
         *(char **)(st + 0x20) = a3;
@@ -75,11 +75,11 @@ char *func_PAL_L05_0042D3B8(char *pos, char *vec, int a2, char *a3, int flag)
         *(unsigned char *)(obj + 0x31) = 1;
         *(unsigned char *)(obj + 0x20) = 1;
         *(int *)(st + 0x24) = flag;
-        f22 = (flag ? D_L05_001B1550 : D_L05_001B154C) * 0.020000001f;
-        f21 = (flag ? D_L05_001B1560 : D_L05_001B155C) / f22;
+        f22 = (flag ? g_projectile_l05_frame_time_alt : g_projectile_l05_frame_time_normal) * 0.020000001f;
+        f21 = (flag ? g_projectile_l05_travel_time_alt : g_projectile_l05_travel_time_normal) / f22;
         f20 = 1.0f;
         count = FloatToInt(f21);
-        frames = D_L05_001B1554;
+        frames = g_projectile_l05_spawn_var;
         *(int *)(st + 0x18) = count;
         *(int *)(st + 0x10) = a2;
         *(char **)(st + 0x20) = a3;

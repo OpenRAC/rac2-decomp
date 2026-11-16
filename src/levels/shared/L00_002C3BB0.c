@@ -17,7 +17,7 @@ typedef struct {
 } HeroSelectionState;
 extern HeroSelectionState g_hero_state;
 
-extern unsigned char *D_L00_001B1EA8 __attribute__((sda));
+extern unsigned char *g_moby_l00_list_head __attribute__((sda));
 extern float hero_score_target_by_heading(void *, int *, float, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
@@ -27,7 +27,7 @@ extern int CollLine(void *, void *, int, void *, int);
 /* Finds the nearest Swingshot Node in front of the hero and notes whether the hero can grab it. */
 void hero_find_swingshot_node_in_front(void)
 {
-    unsigned char *node = D_L00_001B1EA8;
+    unsigned char *node = g_moby_l00_list_head;
     unsigned char *best = 0;
     float closest = 100000000.0f;
     float first[4], second[4];

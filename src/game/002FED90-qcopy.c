@@ -19,7 +19,7 @@ typedef struct {
     char *owner;
 } EffectSlot;
 
-extern EffectSlot D_002212E0[];
+extern EffectSlot g_effect_slot_table[];
 extern char g_hero_state[];
 extern void cam_compute_view_direction(void *, void *, int);
 
@@ -27,7 +27,7 @@ extern void cam_compute_view_direction(void *, void *, int);
 int part_alloc_effect_slot(char *obj, Quad *src, float x, float y, float z)
 {
     int i = 0;
-    EffectSlot *e = D_002212E0;
+    EffectSlot *e = g_effect_slot_table;
     Quad *pos;
     Quad v;
     char *h;

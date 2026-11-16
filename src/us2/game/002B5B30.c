@@ -1,11 +1,12 @@
 #include "include_asm.h"
+#include "names.h"
 
-extern int D_001A8A5C __attribute__((sda));
+extern int g_menu_mode __attribute__((sda));
 
-extern int D_US2_001A8BB4 __attribute__((sda));
+extern int g_global_int_value_a __attribute__((sda));
 
 int func_US2_002B5B30(void) {
-    return D_US2_001A8BB4;
+    return g_global_int_value_a;
 }
 
 

@@ -16,7 +16,7 @@ extern void shop_choose_item_colors(int, unsigned int *, unsigned int *, unsigne
 extern char *GetLocalizedString(int);
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 typedef struct {
     int exists, unknown4, textId;
     char pad0C[48];
@@ -28,8 +28,8 @@ typedef struct {
 extern GridWeapon g_weapon_table[];
 typedef struct { char pad[0x40]; int item[4]; } GridEquipped;
 extern GridEquipped g_pause_menu_state;
-extern int D_00139868[];
-extern int D_001ADB18[4], D_001ADB28[2];
+extern int g_help_entry_state[];
+extern int g_grid_labels[4], g_grid_offset[2];
 
 typedef struct { int value[4]; } GridLabels;
 typedef struct { int x, y; } GridOffset;
@@ -103,7 +103,7 @@ void DrawItemGrid(Grid *grid)
                 POSITION(grid->sprite, grid->iconStep, grid->iconOrigin, col, row);
             } else if (g_item_owned_flags[grid->cells[index].item] || grid->cells[index].item == 7 ||
                        (grid->cells[index].item == 55 &&
-                        (D_001395B8[0x84] || D_001395B8[0x86] || D_001395B8[0x89]))) {
+                        (g_game_flag_table[0x84] || g_game_flag_table[0x86] || g_game_flag_table[0x89]))) {
                 POSITION(grid->sprite, grid->iconStep, grid->iconOrigin, col, row);
                 object_set_flag_value(grid->sprite, 1);
                 *(int *)object_get_fourth_field(grid->sprite) = 0x60F0F0B0;
@@ -136,9 +136,9 @@ void DrawItemGrid(Grid *grid)
                     if (hud_get_widget_value_int(grid->sprite) == WEAPON(49)->icon)
                         hud_set_widget_field_b((int)grid->label, GetLocalizedString(WEAPON(49)->textId));
                     if (hud_get_widget_value_int(grid->sprite) == WEAPON(55)->icon && !g_item_owned_flags[55]) {
-                        count = !!D_001395B8[0x84] + !!D_001395B8[0x86] + !!D_001395B8[0x89];
+                        count = !!g_game_flag_table[0x84] + !!g_game_flag_table[0x86] + !!g_game_flag_table[0x89];
                         if (count > 0) {
-                            GridLabels labels = *(GridLabels *)D_001ADB18;
+                            GridLabels labels = *(GridLabels *)g_grid_labels;
                             hud_set_widget_field_b((int)grid->label, GetLocalizedString(labels.value[count]));
                         }
                     }
@@ -151,10 +151,10 @@ void DrawItemGrid(Grid *grid)
                     if (WEAPON(grid->cells[index].item)->icon == 0xEA7E) {
                         *(int *)object_get_fourth_field(grid->sprite) = disabledColor;
                     } else {
-                        GridOffset offset = *(GridOffset *)D_001ADB28;
+                        GridOffset offset = *(GridOffset *)g_grid_offset;
                         unsigned int a, b, color;
                         meter_set_max(grid->meter, WEAPON(grid->cells[index].item)->maxExperience);
-                        meter_set_value(grid->meter, D_00139868[grid->cells[index].item] >> 5);
+                        meter_set_value(grid->meter, g_help_entry_state[grid->cells[index].item] >> 5);
                         object_set_first_float4(grid->meter,
                             ((grid->iconStep[0] * (float)col + grid->iconOrigin[0]) + (float)offset.x) + grid->origin[0],
                             ((grid->iconStep[1] * (float)row + grid->iconOrigin[1]) + (float)offset.y) + grid->origin[1], 0.0f, 0.0f);

@@ -3,13 +3,13 @@
 #include "common.h"
 typedef unsigned int UpdateQuad __attribute__((mode(TI)));
 typedef union { UpdateQuad q; float f[4]; } UpdateVec;
-extern int D_L17_001B2748 MACRO_ADDR;
-extern int D_L17_001C0018 NOT_SDA;
-extern float D_L17_001B0390 __attribute__((sda));
-extern UpdateVec D_L17_001B0380 __attribute__((sda));
+extern int g_flash_frame_counter MACRO_ADDR;
+extern int g_aim_hit_result NOT_SDA;
+extern float g_falling_object_rate __attribute__((sda));
+extern UpdateVec g_falling_object_vec __attribute__((sda));
 extern char g_hero_position[];
 extern void *g_hero_moby NOT_SDA;
-extern char D_L17_001A8F20[] __attribute__((sda));
+extern char g_effect_color_params[] __attribute__((sda));
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int platform_is_player_inside_footprint(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -33,25 +33,25 @@ void func_PAL_L17_003CB334(char *self) {
     if (*(unsigned char *)(self + 0x20) == 0) {
         if (*(int *)(data + 0x90) != -1) {
             ground = coll_probe_ground_height_below(position, 0, 0.5f);
-            *(int *)(data + 0x9C) = D_L17_001C0018;
+            *(int *)(data + 0x9C) = g_aim_hit_result;
             if (ground < *(float *)(self + 0x18)) {
-                *(float *)(data + 0x98) += D_L17_001B0390 * 0.00040000002f;
+                *(float *)(data + 0x98) += g_falling_object_rate * 0.00040000002f;
                 *(float *)(self + 0x18) -= *(float *)(data + 0x98);
             } else {
                 *(int *)(data + 0x98) = 0;
                 *(float *)(self + 0x18) = ground;
             }
             if (platform_is_player_inside_footprint(self)) {
-                matrix_mul_vec3(&delta, &D_L17_001B0380, self + 0xC0);
+                matrix_mul_vec3(&delta, &g_falling_object_vec, self + 0xC0);
                 make_hit_descriptor(collision, self, 0x10001, &delta, 2.0f);
                 QueueMobyImpact(g_hero_moby, collision);
             }
         }
     }
-    if (D_L17_001B2748 >= 31) {
+    if (g_flash_frame_counter >= 31) {
         if (*(int *)(data + 0xA4) == 0 && *(int *)(data + 0xA8) >= 43 &&
             fast_vec_dist(position, g_hero_position) < 15.0f && *(unsigned char *)(self + 0x20) == 0) {
-            part_spawn_effect_burst(self, 0x931, 0, 0x931, 4, 6, 0, D_L17_001A8F20);
+            part_spawn_effect_burst(self, 0x931, 0, 0x931, 4, 6, 0, g_effect_color_params);
             PlayMobySound(0, 0, self);
             *(unsigned char *)(self + 0x20) = 1;
             *(int *)(self + 0x98) = 0;

@@ -10,8 +10,8 @@ extern void FastVecScale(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern void transform_vector(char *, char *, char *);
 extern void draw_world_quad(char *, char *, int);
-extern char D_001B8DC0[];
-extern float D_001AA310[16] SDATA(D_001AA310);
+extern char g_camera_position_vec[];
+extern float g_billboard_quad_table[16] SDATA(D_001AA310);
 
 /* Draws a single camera-facing quad of the given color near a position. */
 void gfx_l00_draw_billboard_quad(char *source, int color, float alpha, float distance)
@@ -41,7 +41,7 @@ void gfx_l00_draw_billboard_quad(char *source, int color, float alpha, float dis
     *(float *)(work + 0x68) = 1.0f;
     *(float *)(work + 0x6C) = 1.0f;
     qcopy(position, source);
-    FastVecSub(basis, D_001B8DC0, position);
+    FastVecSub(basis, g_camera_position_vec, position);
     vec_scale_to_length(1.0f, basis, basis);
     FastVecCross(basis + 0x10, basis, (char *)up);
     vec_scale_to_length(1.0f, basis + 0x10, basis + 0x10);
@@ -52,7 +52,7 @@ void gfx_l00_draw_billboard_quad(char *source, int color, float alpha, float dis
     *(int *)(work + 0x48) = color;
     *(int *)(work + 0x44) = color;
     *(int *)(work + 0x40) = color;
-    table = (char *)D_001AA310;
+    table = (char *)g_billboard_quad_table;
     p = work;
     for (i = 3; i >= 0; i--) {
         FastVecScale(p, table, alpha);

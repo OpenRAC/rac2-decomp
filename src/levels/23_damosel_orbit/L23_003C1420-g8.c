@@ -1,13 +1,14 @@
+#include "names.h"
 /* Casts the ray ahead of the object and, on a hit, places the follow point against the surface. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L23_001B36A4 MACRO_ADDR;
-extern int D_L23_001AFA54 __attribute__((sda));
+extern float g_mothership_surface_radius MACRO_ADDR;
+extern int g_enemy_timer_base __attribute__((sda));
 
-extern TI128 D_L23_001C0AA0[];
-extern char D_00189ED0[];
+extern TI128 g_coll_line_hit_point_2[];
+extern char g_camera_position[];
 
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
@@ -46,7 +47,7 @@ int enemy_probe_ahead_point(char *moby) {
     matrix_mul_vec3(&loc[1], &loc[1], moby + 0xC0);
     FastVecAdd(&loc[1], &loc[1], moby + 0x10);
     if (CollLine(&loc[0], &loc[1], 0x12, 0, 0) != 0) {
-    hit_info = &D_L23_001C0AA0[2];
+    hit_info = &g_coll_line_hit_point_2[2];
     hit_normal = &loc[2];
     qcopy(hit_normal, hit_info);
     loc[5] = 0;
@@ -64,13 +65,13 @@ int enemy_probe_ahead_point(char *moby) {
     follow_point = (TI128 *)(vars + 0x2D0);
     FastVecAdd(follow_point, moby + 0x10, &loc[6]);
     clamped_point = &loc[7];
-    FastVecSub(clamped_point, follow_point, D_00189ED0);
-    vec_scale_to_length(clamped_point, clamped_point, D_L23_001B36A4);
-    FastVecAdd(clamped_point, clamped_point, D_00189ED0);
+    FastVecSub(clamped_point, follow_point, g_camera_position);
+    vec_scale_to_length(clamped_point, clamped_point, g_mothership_surface_radius);
+    FastVecAdd(clamped_point, clamped_point, g_camera_position);
     qcopy(follow_point, clamped_point);
-    value = D_L23_001AFA54;
+    value = g_enemy_timer_base;
     *(short *)(vars + 0x26C) = 1;
-    *(unsigned short *)(vars + 0x26E) = (unsigned short)D_L23_001AFA54 + math_random_int_range(-value / 2, value / 2);
+    *(unsigned short *)(vars + 0x26E) = (unsigned short)g_enemy_timer_base + math_random_int_range(-value / 2, value / 2);
     vec_scale_to_length(hit_normal, hit_normal, 10.0f);
     FastVecAdd(hit_normal, hit_normal, hit_info);
     return 1;

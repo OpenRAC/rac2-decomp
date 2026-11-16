@@ -5,7 +5,7 @@ typedef unsigned int u32;
 typedef short s16;
 
 extern int D_L02_gp10B0 __attribute__((sda));
-extern unsigned int D_001B00A4 __attribute__((nosda));
+extern unsigned int g_path_enemy_refresh_range __attribute__((nosda));
 
 extern int func_002F1BE0(void *);
 extern s16 func_0031E7B0(int, unsigned int);
@@ -16,7 +16,7 @@ void path_enemy_refresh_timer(char *self) {
     char *state = *(char **)(self + 0x68);
 
     if (func_002F1BE0(state + 0x3B4) != 0) {
-        *(s16 *)(state + 0x3B4) = func_0031E7B0(D_L02_gp10B0, D_001B00A4);
+        *(s16 *)(state + 0x3B4) = func_0031E7B0(D_L02_gp10B0, g_path_enemy_refresh_range);
         func_00366B30(1, 0, self);
     }
 }

@@ -9,11 +9,11 @@ extern void moby_compute_local_point(char *, void *, float, float, float);
 extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void SpawnTintedEffects(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
-extern float D_L06_001B1CB8 __attribute__((sda));
-extern float D_L06_001B1CB0 __attribute__((sda));
-extern float D_L06_001B1CC0 __attribute__((sda));
-extern float D_L06_001B1CE0 __attribute__((sda));
-extern float D_L06_001B1CE4, D_L06_001B1CE8;
+extern float g_spark_effect_param_b __attribute__((sda));
+extern float g_spark_effect_param_c __attribute__((sda));
+extern float g_spark_effect_param_a __attribute__((sda));
+extern float g_spark_local_offset_x __attribute__((sda));
+extern float g_spark_local_offset_y, g_spark_local_point_z;
 /* Updates a Notak effect object: it waits for a trigger, then sprays sparks and particles and removes itself. */
 void spark_l06_effect_update(char *moby) {
     float pos[4], vel[4];
@@ -37,8 +37,8 @@ void spark_l06_effect_update(char *moby) {
         *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     case 2:
-        part_explode_object_into_pieces(moby, &D_L06_001B1CC0, &D_L06_001B1CB8, &D_L06_001B1CB0, 0xFFFF, 0, -1, 6, 0xFF, 0xFF, 0);
-        moby_compute_local_point(moby, pos, D_L06_001B1CE0, D_L06_001B1CE4, D_L06_001B1CE8);
+        part_explode_object_into_pieces(moby, &g_spark_effect_param_a, &g_spark_effect_param_b, &g_spark_effect_param_c, 0xFFFF, 0, -1, 6, 0xFF, 0xFF, 0);
+        moby_compute_local_point(moby, pos, g_spark_local_offset_x, g_spark_local_offset_y, g_spark_local_point_z);
         SpawnExplosion(pos, 0, 5, 5, 5, 20, 5, 0, 1, 1, 1, 0, 1.0f, 20.0f);
         for (i = 0; i < 4; i++) {
             vel[0] = (i / 2 * 2 - 1) * 0.05000000447f;

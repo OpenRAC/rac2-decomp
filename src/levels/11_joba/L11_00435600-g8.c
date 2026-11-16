@@ -9,9 +9,9 @@ typedef int Quad __attribute__((mode(TI)));
 #define I(p,n) (*(int *)((char *)(p)+(n)))
 #define F(p,n) (*(float *)((char *)(p)+(n)))
 #define P(p,n) (*(char **)((char *)(p)+(n)))
-extern int D_L11_001A8FF4 __attribute__((sda));
+extern int g_hero_l11_input_blocked __attribute__((sda));
 extern char g_hero_position[];
-extern char *D_L11_001C0D18 NOT_SDA;
+extern char *g_hit_l11_result NOT_SDA;
 extern char *g_active_attacker_robot NOT_SDA;
 extern void flying_enemy_hit_and_init(char *),enemy_count_frames_draw_glow(char *),enemy_reset_to_idle(char *);
 extern void enemy_pick_random_home_spot(char *,char *);
@@ -51,10 +51,10 @@ void flying_l11_enemy_update(char *moby)
     int i,flags,clear;
     float *spin;
     if (B(moby,0x20)==1) return;
-    if (H(vars,0x286) && !D_L11_001A8FF4 && B(moby,0x20)!=11 && B(moby,0x20)!=10) return;
+    if (H(vars,0x286) && !g_hero_l11_input_blocked && B(moby,0x20)!=11 && B(moby,0x20)!=10) return;
     flying_enemy_hit_and_init(moby);
     if (B(moby,0x20)==1) return;
-    if (H(vars,0x286) && !D_L11_001A8FF4) return;
+    if (H(vars,0x286) && !g_hero_l11_input_blocked) return;
     if (!H(vars,0x282)) {
         I(vars,0x270)=0;
         if (B(moby,0x95)==3) {
@@ -129,7 +129,7 @@ void flying_l11_enemy_update(char *moby)
         vec_scale_to_length(zero,moby+0xE0,F(vars,0x104)+F(vars,0x100));
         FastVecAdd(delta,moby+0x10,zero);
         clear=1;
-        if (coll_test_point(delta,5,moby,F(vars,0x100)) && D_L11_001C0D18 && H(D_L11_001C0D18,0xAA)==MOBY_CLASS_ARACHNOID) clear=0;
+        if (coll_test_point(delta,5,moby,F(vars,0x100)) && g_hit_l11_result && H(g_hit_l11_result,0xAA)==MOBY_CLASS_ARACHNOID) clear=0;
         if (clear) {
             I(moby,0x98)=I(P(moby,0x24),0x10);
             moby_set_state(moby,5,2);

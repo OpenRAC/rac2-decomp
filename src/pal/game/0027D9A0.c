@@ -1,14 +1,14 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_L00_001BCAF4;
-extern unsigned char D_001A7BB1 __attribute__((sda));
+extern int g_text_pulse_counter;
+extern unsigned char g_display_mode_flag __attribute__((sda));
 extern float math_fast_sin_or_cos_a(float);
 extern int FastTweenColor(float, int, int);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
-void func_PAL_0027D9A0(void)
+void text_draw_pulsing_pal(void)
 {
     int y;
     long style;
@@ -17,10 +17,10 @@ void func_PAL_0027D9A0(void)
     int v;
 
     y = 0x148;
-    if (D_001A7BB1) {
+    if (g_display_mode_flag) {
         y = 0x17C;
     }
-    v = D_L00_001BCAF4;
+    v = g_text_pulse_counter;
     f = (float)(v % 100) * 0.02f - 1.0f;
     if (f < -1.0f) {
         f = -1.0f;

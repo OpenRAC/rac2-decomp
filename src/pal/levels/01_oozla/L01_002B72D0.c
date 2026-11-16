@@ -36,14 +36,14 @@ typedef struct DriveVelocityView {
     DriveVector velocity;
     unsigned char pad10[0xC4 - 0x10]; float targetSpeed;
 } DriveVelocityView;
-extern DriveVelocityView D_00189F10;
-extern int D_L01_001A9030 MACRO_ADDR;
-extern float D_L01_001A7DC0 MACRO_ADDR;
+extern DriveVelocityView g_drive_velocity_view;
+extern int g_hero_input_lock MACRO_ADDR;
+extern float g_hero_l01_speed_threshold MACRO_ADDR;
 typedef struct DriveSettings {
     unsigned char pad0[0x158]; float heading;
     unsigned char pad15C[0x370 - 0x15C]; DriveVector direction;
 } DriveSettings;
-extern DriveSettings D_L01_001B9380;
+extern DriveSettings g_drive_settings;
 extern void hero_build_move_impulse(float, float);
 extern void hero_approach_speed(float, float);
 extern void hero_steer_heading(int, float, float, float);
@@ -83,8 +83,8 @@ void func_PAL_L01_002B72D0(void)
         else speed = 0.07000001f;
         hero->speed = speed;
         hero_approach_speed(0.0176f, 0.018000001f);
-        cam_set_view_space_vector_length(&D_00189F10.velocity, &D_00189F10.velocity, 0.0f);
-        cam_offset_point_by_side_direction((DriveVector *)(&D_00189F10.velocity), (DriveVector *)(&D_00189F10.velocity), D_00189F10.targetSpeed);
+        cam_set_view_space_vector_length(&g_drive_velocity_view.velocity, &g_drive_velocity_view.velocity, 0.0f);
+        cam_offset_point_by_side_direction((DriveVector *)(&g_drive_velocity_view.velocity), (DriveVector *)(&g_drive_velocity_view.velocity), g_drive_velocity_view.targetSpeed);
     } else if (state == 27) {
         if (g_hero_state.frame > 33) {
             hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.30019668f);
@@ -154,15 +154,15 @@ void func_PAL_L01_002B72D0(void)
             }
         }
         g_hero_state.targetSpeed = g_hero_state.planarDistance;
-    } else if (state == 129 && D_L01_001A9030 == 0) {
+    } else if (state == 129 && g_hero_input_lock == 0) {
         hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
         g_hero_state.targetSpeed = 0.0f;
     } else {
         oldHeading = g_hero_state.heading;
         qcopy(&local, &g_hero_state.direction);
         if (g_hero_state.overrideDirection != 0) {
-            g_hero_state.heading = D_L01_001B9380.heading;
-            qcopy(&g_hero_state.direction, &D_L01_001B9380.direction);
+            g_hero_state.heading = g_drive_settings.heading;
+            qcopy(&g_hero_state.direction, &g_drive_settings.direction);
         }
         hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
         if (g_hero_state.overrideDirection != 0) {
@@ -175,7 +175,7 @@ void func_PAL_L01_002B72D0(void)
         qcopy(&g_hero_state.pendingResult, &g_hero_state.pending);
         {
             float damping = 0.008f;
-            if (g_hero_state.speed < D_L01_001A7DC0 * 0.004f) {
+            if (g_hero_state.speed < g_hero_l01_speed_threshold * 0.004f) {
                 if (g_hero_state.mode == 2) {
                     float rate = g_hero_state.pendingDamping;
                     smoothed = cam_get_view_space_vector_length((char *)&g_hero_state.velocity);

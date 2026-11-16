@@ -7,7 +7,7 @@ s32 linked_moby_is_finished(u8 *self) {
     return *(u8 *)(self + 0x20) == 3;
 }
 extern int g_current_map_index __attribute__((sda));
-extern char D_0019B4A8[];
+extern char g_moby_nibble_table[];
 extern char g_hero_position[];
 extern void FastVecSub(f32 *, const f32 *, const f32 *);
 extern void vec_transform_and_set_height(char *, char *, char *, char *, f32);
@@ -27,13 +27,13 @@ void linked_moby_trigger_burst(u8 *moby) {
 
     raw_id = *(u16 *)(self + 0xB2);
     if (raw_id & 1) {
-        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 packed = *counter;
 
         if (((packed >> 4) & 7) != 7)
             *counter = packed + 0x10;
     } else {
-        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
         u8 packed = *counter;
 
         if ((packed & 7) != 7)
@@ -60,10 +60,10 @@ void linked_moby_trigger_burst(u8 *moby) {
 
 /* func_L12_00424370 is defined in L12_00424370-g8.c. */
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 typedef int L12_25070Quad __attribute__((mode(TI)));
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern s32 CollLine(void *from, void *to, s32 mode, void *self, s32 flags);
 
 /* Picks the first point of the object's list (D_L12_001FEAC0, chosen by the state's +0x298)
@@ -75,7 +75,7 @@ s32 path_find_visible_point(u8 *object)
     f32 from[4] __attribute__((aligned(16)));
     f32 to[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(object + 0x68);
-    s32 *list = D_L12_001FEAC0[*(s32 *)(state + 0x298)];
+    s32 *list = g_path_zone_table[*(s32 *)(state + 0x298)];
     s32 i;
 
     qcopy(from, object + 0x10);
@@ -93,7 +93,7 @@ s32 path_find_visible_point(u8 *object)
 
 /* func_L12_00425178 is defined in L12_00425178-g8.c. */
 
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern char g_hero_position[];
 extern f32 math_fabs(f32);
 extern f32 vec_distance_xy(void *, void *);
@@ -102,7 +102,7 @@ extern f32 vec_distance_xy(void *, void *);
 void path_find_nearby_point_at_hero_height(u8 *self) {
     u8 *state = *(u8 **)(self + 0x68);
     s32 i = *(s32 *)(state + 0x2B4) + 1;
-    u32 *entry = D_L12_001FEAC0[*(s32 *)(state + 0x298)];
+    u32 *entry = g_path_zone_table[*(s32 *)(state + 0x298)];
 
     while (i < *(s32 *)entry) {
         if (math_fabs(*(f32 *)((u8 *)entry + (i * 16 + 0x18)) - *(f32 *)((u8 *)entry + 0x18)) < 2.0f) {
@@ -116,9 +116,9 @@ void path_find_nearby_point_at_hero_height(u8 *self) {
 extern int math_fast_float_d(void *);
 extern s32 math_random_int_range(s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
-extern s32 D_L12_001B20C0 __attribute__((sda));
+extern s32 g_spark_timer_min __attribute__((sda));
 
-extern u8 D_001395DB;
+extern u8 g_zone_event_flag;
 extern int IsPointInCuboid(void *, int);
 extern void func_L12_0031E1D0(u8 *, s32, s32);
 
@@ -131,7 +131,7 @@ void zone_event_trigger_update(u8 *moby) {
         vars = *(s32 **)(self + 0x68);
         if (*vars != -1) {
             if (IsPointInCuboid(g_hero_position, *vars) != 0) {
-                D_001395DB = 1;
+                g_zone_event_flag = 1;
                 func_L12_0031E1D0(self, 1, -1);
             }
         }

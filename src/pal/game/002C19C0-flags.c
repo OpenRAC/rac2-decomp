@@ -10,7 +10,7 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_001F2570;
+extern unsigned char *g_part_tex_smoke_table;
 void part_kill(void *);
 int FastDecTimer(short *);
 extern float IntToFloat(int v);
@@ -67,7 +67,7 @@ void func_PAL_002C1B50(FadeSplitParticle *m) {
         m->pos.f[1] += math_random_float_range(nr, r);
         m->pos.f[2] += math_random_float_range(nr, r);
     }
-    tab = D_001F2570;
+    tab = g_part_tex_smoke_table;
     { int index = m->b2 - tab[0];
     m->b2 = tab[(m->hA + e->h16 + index) & 7]; }
     FastVecAdd((char *)&v, (char *)&m->pos, (char *)e);

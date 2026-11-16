@@ -12,8 +12,8 @@ typedef struct {
     float field24;
 } Impact;
 typedef char ImpactExtentCheck[sizeof(Impact) == 0x28 ? 1 : -1];
-extern unsigned char *D_L05_001FB5E0[];
-extern float D_L05_001B1578 SDATA(D_L05_001B1578);
+extern unsigned char *g_target_l05_list[];
+extern float g_moby_explode_damage_radius SDATA(D_L05_001B1578);
 extern void vec_scale_to_length(void *, void *, float);
 extern void QueueMobyImpact(void *, Impact *);
 extern void *part_spawn_limited_blast(void *, void *, int, int, int, int, int, int,
@@ -37,7 +37,7 @@ void moby_explode_damage_nearby(unsigned char *object)
     impact.kind = 3;
     impact.mode = 2;
     impact.object_class = *(u16 *)(object + 0xAA);
-    for (i = 0; (target = D_L05_001FB5E0[i]) != 0; i++) {
+    for (i = 0; (target = g_target_l05_list[i]) != 0; i++) {
         if (target[0x31] != 0 && target != 0 && target[0x20] != 0xFE &&
             target[0x20] != 0xFD && *(s16 *)(target + 0xAA) != 0xCBE &&
             *(s16 *)(target + 0xAA) != 0x110A)
@@ -45,5 +45,5 @@ void moby_explode_damage_nearby(unsigned char *object)
     }
     part_spawn_limited_blast(object + 0x10, object, 0, 50, 30, 30, 30, 40,
                       1, 1, 1, 1, 67, 4.0f);
-    coll_process_hit(object + 0x10, 1, *(int *)(state + 0x20), &impact, D_L05_001B1578);
+    coll_process_hit(object + 0x10, 1, *(int *)(state + 0x20), &impact, g_moby_explode_damage_radius);
 }

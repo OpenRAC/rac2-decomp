@@ -29,8 +29,8 @@ extern int weapon_spend_ammo(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void *projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
-extern float D_L00_001B12C0[4][4] __attribute__((sda));
-extern int D_L00_001B2D58 __attribute__((nosda));
+extern float g_sequenced_child_offset_table[4][4] __attribute__((sda));
+extern int g_sequenced_child_flag __attribute__((nosda));
 
 /* Spawns the next piece of a timed sequence at a spot picked from a table, then counts the sequence down. Ends the sequence when nothing more can be spawned. */
 void sequenced_child_spawn(Obj_410508 *self)
@@ -51,7 +51,7 @@ void sequenced_child_spawn(Obj_410508 *self)
     if (spinSign == 0.0f)
         spinSign = -1.0f;
     vars->n = step - 1;
-    matrix_mul_vec3(offset, D_L00_001B12C0[step], self->mtx);
+    matrix_mul_vec3(offset, g_sequenced_child_offset_table[step], self->mtx);
     FastVecAdd(spawnPos, self->pos, offset);
     if (vars->n == -1) {
         if (vars->count0 != 0) {
@@ -63,7 +63,7 @@ void sequenced_child_spawn(Obj_410508 *self)
     if (child != 0) {
         Sub_410508 *childVars;
         weapon_spend_ammo(-1, 1);
-        D_L00_001B2D58 = 1;
+        g_sequenced_child_flag = 1;
         child->owner = self;
         childVars = child->node;
         {

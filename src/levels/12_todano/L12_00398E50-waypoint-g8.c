@@ -38,14 +38,14 @@ extern f32 mat_fast_helper_a(f32,f32);
 extern f32 vec_length_xy(void *);
 extern int moby_step_at_own_position_factor(void *,f32);
 extern void vec_scale_to_length(void *,void *,f32);
-extern s32 D_L12_001B09F0 __attribute__((sda));
-extern s32 D_L12_001B09F4 __attribute__((sda));
-extern PathWaypoint *D_L12_001B2F8C MACRO_ADDR;
-extern s32 D_L12_001B2E9C MACRO_ADDR;
+extern s32 g_tourist_hit_count __attribute__((sda));
+extern s32 g_tourist_wait_counter __attribute__((sda));
+extern PathWaypoint *g_path_waypoint_table MACRO_ADDR;
+extern s32 g_moby_list_start MACRO_ADDR;
 /* Per-entry flag table; other code indexes it too. An element access keeps the
  * store two words long, so it stays out of the call's delay slot, as in retail. */
-extern u8 D_001A7A60[] MACRO_ADDR;
-extern s32 D_L12_001A903C;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
+extern s32 g_tourist_active_flag;
 #define ANIM(o,n,t) { if ((o)[0x43]!=(n)) func_002A7470(o,n,0,t); }
 #define REST(o) { I(o,0x98)=0; U(o,0x34)=(U(o,0x34)|0x41)&0xEFFF; }
 /* Space Tourist (moby class 3000) update. Waypoint-following state machine for a level 12 object: walks a path of 0x80-byte
@@ -61,14 +61,14 @@ void space_l12_tourist_update(u8 *creature) {
     if (creature[0x95]==3) {
         hit=moby_dispatch_action_by_kind(creature,vars+0x60);
         if (hit&1) {
-            D_L12_001B09F0++;
-            if (D_L12_001B09F0==50) subtitle_request_voice_line(0xA2D,0x84);
-            else if (D_L12_001B09F0==100) subtitle_request_voice_line(0xA2E,0x85);
-            else if (D_L12_001B09F0==150) subtitle_request_voice_line(0xA2F,0x86);
-            else if (D_L12_001B09F0==200) subtitle_request_voice_line(0xA30,0x87);
+            g_tourist_hit_count++;
+            if (g_tourist_hit_count==50) subtitle_request_voice_line(0xA2D,0x84);
+            else if (g_tourist_hit_count==100) subtitle_request_voice_line(0xA2E,0x85);
+            else if (g_tourist_hit_count==150) subtitle_request_voice_line(0xA2F,0x86);
+            else if (g_tourist_hit_count==200) subtitle_request_voice_line(0xA30,0x87);
             moby_set_state(creature,1,0);
             ANIM(creature,4,20);
-            D_L12_001B09F4++;
+            g_tourist_wait_counter++;
             part_spawn_explosion_with_sparks(creature,creature+0x10,-1,1.0f,0.0f);
             SetDeathBits(creature,0,3);
             H(vars,0x98)=0;
@@ -79,7 +79,7 @@ void space_l12_tourist_update(u8 *creature) {
 states:
     switch(creature[0x20]) {
     case 2:
-        D_L12_001B09F4=0;
+        g_tourist_wait_counter=0;
         I(vars,0x7B8)=0;
         FastVecSub(step,vars+0x740,creature+0x10);
         speed=0.10000000894069672f;
@@ -89,8 +89,8 @@ states:
         goto add;
     case 3: {
         WaypointPath *path=(WaypointPath *)(vars+0x518);
-        matrix_mul_vec3(step,vars+0x770,&D_L12_001B2F8C[path->points[I(vars,0x794)]]);
-        FastVecAdd(step,step,D_L12_001B2F8C[path->points[I(vars,0x794)]].position);
+        matrix_mul_vec3(step,vars+0x770,&g_path_waypoint_table[path->points[I(vars,0x794)]]);
+        FastVecAdd(step,step,g_path_waypoint_table[path->points[I(vars,0x794)]].position);
         ComputeRegionRouteHeading(creature+0x10,step,&angle,vars+0x110,I(vars,0x790),0.0f,F(vars,0x7A4),vars+0x79C,vars+0x7A0);
         if (I(vars,0x540) && I(vars,0x540)==I(vars,0x794)-1) {
             speed=0.05000000447034836f;
@@ -136,13 +136,13 @@ states:
     case 4: {
         if (I(vars,0x794)!=I(vars,0x798) && math_fast_float_d(vars+0x7A8)) {
             if (I(vars,0x798)>=6) {
-                if (!D_L12_001B09F4 && !D_001A7A60[10]) {
-                    D_001A7A60[10]=1;
+                if (!g_tourist_wait_counter && !g_item_enabled_flags[10]) {
+                    g_item_enabled_flags[10]=1;
                     snd_play_from_global_bank(1,0,0);
                     value_set_entry_by_index(0x1233,-1);
-                    D_L12_001A903C=1;
+                    g_tourist_active_flag=1;
                 }
-                gate_compute_sight_points((PathTarget *)(D_L12_001B2E9C+(I(vars,0x514)<<8)),vars+0x740,vars+0x750);
+                gate_compute_sight_points((PathTarget *)(g_moby_list_start+(I(vars,0x514)<<8)),vars+0x740,vars+0x750);
                 moby_set_state(creature,5,-1);
                 ANIM(creature,4,20);
             } else {
@@ -155,9 +155,9 @@ states:
         }
         if (U(creature,0x96)<2 || math_fast_float_d(vars+0x7BC)) {
             if ((u32)(I(vars,0x794)-1)<4 && (U(creature,0x96)<2 || math_random_int_below(2))) {
-                qcopy(vars+0x780,D_L12_001B2F8C[I(vars+((u32)(I(vars,0x794)-1)<<2),0x530)].position);
+                qcopy(vars+0x780,g_path_waypoint_table[I(vars+((u32)(I(vars,0x794)-1)<<2),0x530)].position);
             } else {
-                target=(PathTarget *)((I(vars,0x548)<<8)+D_L12_001B2E9C);
+                target=(PathTarget *)((I(vars,0x548)<<8)+g_moby_list_start);
                 if ((target->flags^1)&1) { qcopy(vars+0x780,target->position); F(vars,0x788)+=0.5f; }
                 else {
                     f32 randomYaw=math_random_angle();

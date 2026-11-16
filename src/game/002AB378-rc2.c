@@ -29,11 +29,11 @@ extern f32 square_root(f32);
 struct Ord3 {
     s32 w[3];
 };
-extern struct Ord3 D_001A9EA0;
+extern struct Ord3 g_quat_next_axis_table;
 
 /* Turns a rotation matrix into a quaternion. */
 void mat_to_quaternion(f32 *quat, f32 *matrix) {
-    struct Ord3 next_axis = D_001A9EA0;
+    struct Ord3 next_axis = g_quat_next_axis_table;
     f32 m[3][3];
     f32 trace;
     f32 scale;

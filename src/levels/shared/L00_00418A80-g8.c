@@ -2,22 +2,22 @@
 
 typedef unsigned int EffectQuad __attribute__((mode(TI)));
 typedef union { EffectQuad word; float v[4]; } EffectVector;
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern char g_default_vector[] MACRO_ADDR;
 typedef struct {
     char pad[0x140];
     float position[4];
 } EffectCamera;
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct {
     char pad[0xD4];
     unsigned char *smoke;
     char padD8[0x98];
     unsigned char *flash;
 } EffectTextures;
-extern char D_L00_001FE940[];
-extern float D_L00_001B1438 __attribute__((sda));
-extern float D_L00_001B143C __attribute__((sda));
-extern int D_L00_001B1440 __attribute__((sda));
+extern char g_effect_definitions[];
+extern float g_particle_effect_size_scale __attribute__((sda));
+extern float g_particle_effect_speed_scale __attribute__((sda));
+extern int g_particle_effect_texture __attribute__((sda));
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
@@ -66,21 +66,21 @@ void SpawnBurstParticles(char *object, char *unused)
             FastVecScale(&position, &self->forward, 0.5f);
             qcopy(&velocity, &self->position);
             FastVecAdd(&velocity, &velocity, &position);
-            size = D_L00_001B1438 * state->scale * 210000.0f;
-            speed = D_L00_001B143C * state->scale * 210000.0f;
-            particle = part_spawn_gravity_fade(&velocity, D_L00_001A8F20, D_L00_001B1440, 0xF78E38, 0, 100, 0, size, speed, 0.0f, 0);
-            if (particle) particle[2] = (((EffectTextures *)D_L00_001FE940)->flash)[0];
-            particle = part_spawn_gravity_fade(&velocity, D_L00_001A8F20, D_L00_001B1440, 0xF7, 0, 100, 0, size, speed, 0.0f, 0);
-            if (particle) particle[2] = (((EffectTextures *)D_L00_001FE940)->flash)[0];
+            size = g_particle_effect_size_scale * state->scale * 210000.0f;
+            speed = g_particle_effect_speed_scale * state->scale * 210000.0f;
+            particle = part_spawn_gravity_fade(&velocity, g_default_vector, g_particle_effect_texture, 0xF78E38, 0, 100, 0, size, speed, 0.0f, 0);
+            if (particle) particle[2] = (((EffectTextures *)g_effect_definitions)->flash)[0];
+            particle = part_spawn_gravity_fade(&velocity, g_default_vector, g_particle_effect_texture, 0xF7, 0, 100, 0, size, speed, 0.0f, 0);
+            if (particle) particle[2] = (((EffectTextures *)g_effect_definitions)->flash)[0];
             for (j = 0; j < 2; j++) {
                 char *particle;
-                particle = part_spawn_gravity_fade(&velocity, D_L00_001A8F20, D_L00_001B1440, 0xF78E38, 0, 127, 0, size, speed, 0.0f, 0);
-                if (particle) particle[2] = (((EffectTextures *)D_L00_001FE940)->flash)[5];
+                particle = part_spawn_gravity_fade(&velocity, g_default_vector, g_particle_effect_texture, 0xF78E38, 0, 127, 0, size, speed, 0.0f, 0);
+                if (particle) particle[2] = (((EffectTextures *)g_effect_definitions)->flash)[5];
             }
             for (j = 0; j < 2; j++) {
                 char *particle;
-                particle = part_spawn_gravity_fade(&velocity, D_L00_001A8F20, D_L00_001B1440, 0xF78E38, 0, 127, 0, size, speed, 0.0f, 0);
-                if (particle) particle[2] = (((EffectTextures *)D_L00_001FE940)->flash)[6];
+                particle = part_spawn_gravity_fade(&velocity, g_default_vector, g_particle_effect_texture, 0xF78E38, 0, 127, 0, size, speed, 0.0f, 0);
+                if (particle) particle[2] = (((EffectTextures *)g_effect_definitions)->flash)[6];
             }
         }
     }
@@ -88,8 +88,8 @@ void SpawnBurstParticles(char *object, char *unused)
         char *particle;
         float size, speed, angle, dir;
         int turn, life;
-        angle = mat_fast_helper_a(((EffectCamera *)D_L00_001B8C80)->position[0] - self->position.v[0],
-                               ((EffectCamera *)D_L00_001B8C80)->position[1] - self->position.v[1]);
+        angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                               ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
         turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
         position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -105,13 +105,13 @@ void SpawnBurstParticles(char *object, char *unused)
         velocity.v[2] = speed * 0.01666666753590107f;
         part_spawn_fading_drift(&position, &velocity, life, 0xF78E38, turn, 127, 127, size * 210000.0f, state->scale * 2100.0f, 0.004055555909872055f, 1);
         particle = part_spawn_fading_drift(&position, &velocity, life, 0xF71E00, turn * -2, 48, 48, size * 1260000.0f, state->scale * 4200.0f, 0.004055555909872055f, 0);
-        if (particle) particle[2] = (((EffectTextures *)D_L00_001FE940)->smoke)[0];
+        if (particle) particle[2] = (((EffectTextures *)g_effect_definitions)->smoke)[0];
     }
     for (i = 0; i < state->largeCount; i++) {
         float size, speed, angle, dir;
         int turn, life;
-        angle = mat_fast_helper_a(((EffectCamera *)D_L00_001B8C80)->position[0] - self->position.v[0],
-                               ((EffectCamera *)D_L00_001B8C80)->position[1] - self->position.v[1]);
+        angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                               ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
         turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
         position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -130,8 +130,8 @@ void SpawnBurstParticles(char *object, char *unused)
     for (i = 0; i < state->smallCount; i++) {
         float size, speed, angle, dir;
         int turn, life;
-        angle = mat_fast_helper_a(((EffectCamera *)D_L00_001B8C80)->position[0] - self->position.v[0],
-                               ((EffectCamera *)D_L00_001B8C80)->position[1] - self->position.v[1]);
+        angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                               ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
         turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
         position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
@@ -153,8 +153,8 @@ void SpawnBurstParticles(char *object, char *unused)
         position.word = velocity.word;
         part_spawn_shockwave_ring(object, &self->position, &position, 16, 0, 0, 255, 40, state->scale * 3.5f);
     }
-    heading = mat_fast_helper_a(((EffectCamera *)D_L00_001B8C80)->position[0] - self->position.v[0],
-                           ((EffectCamera *)D_L00_001B8C80)->position[1] - self->position.v[1]);
+    heading = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                           ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
     sign = 1;
     for (i = 0; i < state->smokeCount; i++) {
         char *particle;

@@ -28,7 +28,7 @@ typedef struct {
     char *objects[5];
     char *emitters[2];
 } State;
-extern State D_L12_001BDB00;
+extern State g_trail_slice_state;
 
 typedef struct {
     char p[0x140];
@@ -42,23 +42,23 @@ typedef struct {
     char p5[0x1E4];
     V rot;
 } Scene;
-extern Scene D_L12_001B9CC0;
+extern Scene g_hero_state_copy_a;
 
-extern char *D_L12_001B2E9C[] __attribute__((sda));
-extern char *D_L12_001B2EA4[] __attribute__((sda));
-extern int D_L12_001B29C8[] __attribute__((sda));
+extern char *g_moby_list_start[] __attribute__((sda));
+extern char *g_moby_list_end_alt[] __attribute__((sda));
+extern int g_frame_l12_counter[] __attribute__((sda));
 extern int g_current_map_index;
-extern float D_L12_001A93E0 __attribute__((sda));
-extern float D_L12_001A93E4[] __attribute__((sda));
-extern int D_L12_001A93E8 __attribute__((sda));
-extern int D_L12_001A9400 __attribute__((sda));
-extern int D_L12_001A93EC[] __attribute__((sda));
-extern int D_L12_001A93F0[] __attribute__((sda));
-extern int D_L12_001A93F4[] __attribute__((sda));
-extern int D_L12_001A93F8[] __attribute__((sda));
-extern int D_L12_001A93FC[] __attribute__((sda));
-extern int D_L12_001A9408[] __attribute__((sda));
-extern int D_L12_001A9404[] __attribute__((sda));
+extern float g_scene_random_min __attribute__((sda));
+extern float g_scene_random_max[] __attribute__((sda));
+extern int g_scene_spawn_param_a __attribute__((sda));
+extern int g_scene_spawn_param_g __attribute__((sda));
+extern int g_scene_spawn_param_b[] __attribute__((sda));
+extern int g_scene_spawn_param_c[] __attribute__((sda));
+extern int g_scene_spawn_param_d[] __attribute__((sda));
+extern int g_scene_spawn_param_e[] __attribute__((sda));
+extern int g_scene_spawn_param_f[] __attribute__((sda));
+extern int g_scene_spawn_param_i[] __attribute__((sda));
+extern int g_scene_spawn_param_h[] __attribute__((sda));
 
 extern void anim_start_startup_animations(void);
 extern void func_US2_002E72D8(void *);
@@ -90,8 +90,8 @@ void func_US2_L12_00300ED0(void)
     char **entries;
 
     anim_start_startup_animations();
-    for (i = 0; i < D_L12_001BDB00.count; i++) {
-        char *slot = (char *)&D_L12_001BDB00 + i * 4;
+    for (i = 0; i < g_trail_slice_state.count; i++) {
+        char *slot = (char *)&g_trail_slice_state + i * 4;
 
         obj = *(char **)(slot + 0x18C);
         if (obj && *(short *)(obj + 0xAA) == 0xE29) {
@@ -109,7 +109,7 @@ void func_US2_L12_00300ED0(void)
     }
     gfx_add_draw_callback_first(todano_refresh_scene_tuning, 0);
 
-    st = &D_L12_001BDB00;
+    st = &g_trail_slice_state;
     if (st->mode != 5) {
         return;
     }
@@ -122,23 +122,23 @@ void func_US2_L12_00300ED0(void)
         moby_transform_joint_to_world(emitter, 5, &b);
         lerp_vector(&a, &a, &b, 0.5f);
         d.q = 0;
-        d.f[2] = -(math_random_float_range(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
+        d.f[2] = -(math_random_float_range(g_scene_random_min, g_scene_random_max[0]) * 0.016666668f);
         c.q = d.q;
-        if (D_L12_001B29C8[0] & 1) {
-            part_spawn_scaling(&a, velocity, D_L12_001A93E8, D_L12_001A93EC[0], math_random_int_range(18, 22),
-                          D_L12_001A9400, -10, 1);
+        if (g_frame_l12_counter[0] & 1) {
+            part_spawn_scaling(&a, velocity, g_scene_spawn_param_a, g_scene_spawn_param_b[0], math_random_int_range(18, 22),
+                          g_scene_spawn_param_g, -10, 1);
         } else {
-            part_spawn_scaling(&a, velocity, D_L12_001A93F0[0], D_L12_001A93F4[0], math_random_int_range(20, 24),
-                          D_L12_001A9404[0], -10, 1);
+            part_spawn_scaling(&a, velocity, g_scene_spawn_param_c[0], g_scene_spawn_param_d[0], math_random_int_range(20, 24),
+                          g_scene_spawn_param_h[0], -10, 1);
         }
         entries++;
-        part_spawn_scaling(&a, velocity, D_L12_001A93F8[0], D_L12_001A93FC[0], math_random_int_range(10, 15),
-                      D_L12_001A9408[0], -10, 1);
+        part_spawn_scaling(&a, velocity, g_scene_spawn_param_e[0], g_scene_spawn_param_f[0], math_random_int_range(10, 15),
+                      g_scene_spawn_param_i[0], -10, 1);
     }
 
-    switch (D_L12_001BDB00.event) {
+    switch (g_trail_slice_state.event) {
     case 2:
-        for (obj = D_L12_001B2E9C[0]; obj < D_L12_001B2EA4[0]; obj += 0x100) {
+        for (obj = g_moby_list_start[0]; obj < g_moby_list_end_alt[0]; obj += 0x100) {
             int cls = *(short *)(obj + 0xAA);
             if (cls == 0x11EB || cls == 0x1F5 || cls == 0x326) {
                 moby_mark_spawned(obj);
@@ -146,31 +146,31 @@ void func_US2_L12_00300ED0(void)
         }
         break;
     case 0x603:
-        D_L12_001B9CC0.fade = 0.5f;
-        D_L12_001B9CC0.time = 45;
-        D_L12_001B9CC0.flag = 0;
-        moby_transform_joint_to_world(D_L12_001BDB00.objects[4], 0, &a);
+        g_hero_state_copy_a.fade = 0.5f;
+        g_hero_state_copy_a.time = 45;
+        g_hero_state_copy_a.flag = 0;
+        moby_transform_joint_to_world(g_trail_slice_state.objects[4], 0, &a);
         SpawnExplosion(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
-        D_L12_001B9CC0.fade = 0.5f;
-        D_L12_001B9CC0.time = 60;
-        D_L12_001B9CC0.flag = 0;
-        vec_scale_to_length(&a, &D_L12_001B9CC0.rot, 4.0f);
-        FastVecAdd(&a, &a, &D_L12_001B9CC0.pos);
-        vec_scale_to_length(&b, &D_L12_001B9CC0.rot, -1.0f);
-        part_spawn_blast_effect_moby(D_L12_001BDB00.objects[2], &a, &b, 0.0f);
+        g_hero_state_copy_a.fade = 0.5f;
+        g_hero_state_copy_a.time = 60;
+        g_hero_state_copy_a.flag = 0;
+        vec_scale_to_length(&a, &g_hero_state_copy_a.rot, 4.0f);
+        FastVecAdd(&a, &a, &g_hero_state_copy_a.pos);
+        vec_scale_to_length(&b, &g_hero_state_copy_a.rot, -1.0f);
+        part_spawn_blast_effect_moby(g_trail_slice_state.objects[2], &a, &b, 0.0f);
         break;
     case 0x8D2:
-        D_L12_001B9CC0.fade = 0.5f;
+        g_hero_state_copy_a.fade = 0.5f;
         a.q = 0;
         a.f[0] = 4.0f;
         a.f[1] = -1.0f;
         a.f[2] = 1.0f;
-        D_L12_001B9CC0.time = 45;
-        D_L12_001B9CC0.flag = 0;
-        matrix_mul_vec3(&a, &a, &D_L12_001B9CC0.rot);
-        FastVecAdd(&a, &a, &D_L12_001B9CC0.pos);
+        g_hero_state_copy_a.time = 45;
+        g_hero_state_copy_a.flag = 0;
+        matrix_mul_vec3(&a, &a, &g_hero_state_copy_a.rot);
+        FastVecAdd(&a, &a, &g_hero_state_copy_a.pos);
         SpawnExplosion(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         for (k = 24; k >= 0; k--) {
             qcopy(&b, &a);

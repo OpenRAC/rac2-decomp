@@ -26,7 +26,7 @@
 #include "common.h"
 
 extern s8 g_hero_state[];
-extern s8 D_0018A070[];
+extern s8 g_hero_camera_block[];
 extern f32 ref_L04_002D9780_00(void *, void *, void *, s32);
 extern void ref_L04_002D9780_01(void *, f32, f32);
 extern void ref_L04_002D9780_02(void *, void *, f32, f32, f32, f32);
@@ -78,7 +78,7 @@ void hero_update_turn_tilt_speeds(void) {
     }
     hero_b = g_hero_state;
     if ((*(u8 *)((char *)(hero_b) + (0x287))) == 0 || (*(s32 *)((char *)(hero_b) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(hero_b) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(hero_b) + (0x22B4))) == 0 && (*(f32 *)((char *)(hero_b) + (0x254))) < 0.53f) || (*(s32 *)((char *)(hero_b) + (0x229C))) == 0x11 || (*(u8 *)((char *)(hero_b) + (0x1494))) != 0 || ((probe_value = ref_L04_002D9780_00(hero_b + 0x240, hero_b + 0x80, hero, state_b)), ((*(f32 *)((char *)(hero_b) + (0x264))) * 0.5f) < probe_value)) {
-        cam_block = D_0018A070;
+        cam_block = g_hero_camera_block;
         hero_base = cam_block - 0x250;
         ref_L04_002D9780_01(cam_block, (*(f32 *)((char *)(hero_base) + (0x258))), 0.02f);
         ref_L04_002D9780_01(cam_block + 4, (*(f32 *)((char *)(hero_base) + (0x25C))), 0.02f);

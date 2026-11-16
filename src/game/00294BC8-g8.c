@@ -6,9 +6,9 @@
 
 extern int g_current_map_index;
 
-extern int D_001C4F40 __attribute__((nosda));
+extern int g_map_mode __attribute__((nosda));
 
-extern int D_001A9428 __attribute__((sda));
+extern int g_map_coefficient_table __attribute__((sda));
 
 typedef struct {
     int field00;
@@ -17,15 +17,15 @@ typedef struct {
     int field0c;
 } Quad16;
 
-extern Quad16 D_00255ED0[];
+extern Quad16 g_map_coefficient_table_2[];
 
 /* Returns the map scaling values for a level; on level 20 it picks one of two special sets. */
 float *map_get_coefficients(int levelIndex)
 {
     if (g_current_map_index == 20) {
-        int value = D_001C4F40;
+        int value = g_map_mode;
 
-        return (int)((char *)&D_001A9428 + (value % 2) * 16);
+        return (int)((char *)&g_map_coefficient_table + (value % 2) * 16);
     }
-    return (int)&D_00255ED0[levelIndex];
+    return (int)&g_map_coefficient_table_2[levelIndex];
 }

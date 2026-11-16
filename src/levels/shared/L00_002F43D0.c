@@ -5,10 +5,10 @@
    through the destination register, never in a delay slot. -G0 splits the address into a
    high-part register of its own; the flag would change the other bodies of the old unit. */
 
-extern u8 D_001A7A0A;
+extern u8 g_extras_unlocked_flag;
 
 /* Resident byte, below the level's own region so the same address holds in every program. */
 unsigned char level_get_resident_byte(void)
 {
-    return D_001A7A0A;
+    return g_extras_unlocked_flag;
 }

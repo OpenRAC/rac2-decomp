@@ -1,19 +1,19 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
-extern int D_001A8F00[] __attribute__((sda));
-extern unsigned char D_001A7A33 MACRO_ADDR;
+extern float g_water_tile_half_x MACRO_ADDR, g_water_tile_half_y MACRO_ADDR;
+extern int g_hero_mode_state[] __attribute__((sda));
+extern unsigned char g_contact_hit_flag MACRO_ADDR;
 extern unsigned char g_bolt_multiplier MACRO_ADDR;
-extern char D_L04_001C3D40[];
+extern char g_surface_table[];
 extern float fade_get_value(void);
-extern float func_PAL_L00_00381328(float);
+extern float fade_reduce_value_pal(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
 extern s32 func_PAL_L04_002E7DA8(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
-extern void func_PAL_L00_002A4D58(int);
+extern void AdjustPlayerHealth_pal(int);
 extern int hero_play_sound(int,int);
 extern void hero_flatten_push_vector(void *,int,float,float);
 extern void cam_scale_view_space_height(void *,void *,float);
@@ -36,8 +36,8 @@ extern u32 FastDecTimer(u8 *);
 extern void FastVecAdd(void *, void *, void *);
 extern int FloatToInt(float);
 extern float FastVecDot(void *, void *);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -71,42 +71,42 @@ extern s32 FloatToInt(f32);
 extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
 extern void FastVecAdd(void *, void *, void *);
-extern f32 D_002A7A40[];
-extern f32 D_002A7BC0[];
-extern s32 D_002A7D90[];
+extern f32 g_water_texture_coords[];
+extern f32 g_water_base_texture_coords[];
+extern s32 g_water_scroll_flags[];
 extern f32 func_30F3A0(f32 x);
 extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
 extern u32 FastDecTimer(u8 *ptr);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern s32 D_L04_001B2E70 MACRO_ADDR;
-extern u16 D_L04_001B2E74 MACRO_ADDR;
+extern s32 g_particle_life_step MACRO_ADDR;
+extern u16 g_particle_life_reload MACRO_ADDR;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern f32 D_L04_0023CA50[];
-extern f32 D_L04_0023CD70[];
-extern f32 D_L04_0023D220[];
-extern f32 D_L04_0023D540[];
-extern u8 D_L04_0023D158[];
-extern u16 D_L04_0023D860[];
-extern u16 D_L04_0023D9F0[];
-extern u16 D_L04_0023DB80[];
-extern s32 D_L04_001B2E70;
-extern u16 D_L04_001B2E74;
+extern f32 g_particle_speeds[];
+extern f32 g_particle_sizes[];
+extern f32 g_particle_uv_offsets[];
+extern f32 g_particle_life_rates[];
+extern u8 g_particle_sprite_flags[];
+extern u16 g_particle_fade_in_timers[];
+extern u16 g_particle_fade_out_timers[];
+extern u16 g_particle_delay_timers[];
+extern s32 g_particle_life_step;
+extern u16 g_particle_life_reload;
 extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
-extern u32 D_L04_001B2E84 __attribute__((sda));
+extern u32 g_running_total __attribute__((sda));
 
 /* Check the hero's surface contact and optionally apply its movement impulse. */
-int func_PAL_L04_002D9150(int update) {
+int hero_check_surface_contact_pal(int update) {
     char *entry, *m;
     HopVector delta;
     int special;
@@ -116,19 +116,19 @@ int func_PAL_L04_002D9150(int update) {
     if (GROUND_HERO.i[0x229C / 4] == 7) return 0;
     if (GROUND_HERO.i[0x2294 / 4] == 0x31) return 0;
     if (GROUND_HERO.h[0x1DC / 2]) return 0;
-    if (D_001A8F00[0]) return 0;
+    if (g_hero_mode_state[0]) return 0;
     GROUND_HERO.i[0x249C / 4] = 0;
     m = GROUND_HERO.p[0x2290 / 4];
     if (AB(m, 0xA8) == 255) return 0;
-    entry = D_L04_001C3D40 + AB(m, 0xA8) * 64;
+    entry = g_surface_table + AB(m, 0xA8) * 64;
     if (AP(entry, 0x38) != m) return 0;
     if (!(AI(entry, 0x24) & 9)) return 0;
     if (AF(entry, 0x2C) != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !GROUND_HERO.b[0x22B4]) {
-        AF(entry, 0x2C) = func_PAL_L00_00381328(AF(entry, 0x2C));
+        AF(entry, 0x2C) = fade_reduce_value_pal(AF(entry, 0x2C));
         if (AF(entry, 0x2C) == 0.0f) return 0;
     }
     GROUND_HERO.p[0x249C / 4] = AP(entry, 0x20);
@@ -154,7 +154,7 @@ int func_PAL_L04_002D9150(int update) {
              GROUND_HERO.i[0x2294 / 4] == 0x1D || GROUND_HERO.i[0x1500 / 4]) &&
             !(AI(entry, 0x24) & 8)) {
             char *m = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
-            if (m) func_PAL_L00_002A4D58(FloatToInt(AF(m, 0x2C)));
+            if (m) AdjustPlayerHealth_pal(FloatToInt(AF(m, 0x2C)));
             if (!GROUND_HERO.i[0x24CC / 4]) func_PAL_L04_002E7DA8(0x16, 1);
             GROUND_HERO.h[0x1DC / 2] = 0x40;
             if (!GROUND_HERO.h[0x21C / 2]) GROUND_HERO.h[0x21C / 2] = 0xF;

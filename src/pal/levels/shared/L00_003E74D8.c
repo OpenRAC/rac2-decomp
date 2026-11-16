@@ -4,8 +4,8 @@
 extern void FastVecScale(void *, void *, float);
 extern float IntToFloat(int);
 extern int FloatToInt(float value);
-extern char D_0018A0E0[];
-extern unsigned char *D_L00_001FEA14;
+extern char g_hero_state_block[];
+extern unsigned char *g_effect_param_pointer_b;
 extern char g_camera_l00_position[];
 extern char D_L00_001A8F20_1[] __attribute__((sda));
 extern void FastVecSub(char *, char *, char *);
@@ -30,7 +30,7 @@ extern int math_random_int_below(int);
 #include "common.h"
 
 /* Emit twenty paired particles around a position, optionally adding two final flashes. */
-void func_PAL_L00_003E74D8(float *pos, int unused, int extra)
+void part_l00_spawn_spark_burst_3_pal(float *pos, int unused, int extra)
 {
     float v[4], dir[4], out[4];
     float angle, speed, scale, mag, direction;
@@ -39,7 +39,7 @@ void func_PAL_L00_003E74D8(float *pos, int unused, int extra)
     FastVecSub((char *)v, g_camera_l00_position, (char *)pos);
     angle = mat_fast_helper_a(v[0], v[1]);
     for (i = 19; i >= 0; i--) {
-        FastVecScale(dir, D_0018A0E0, -(math_random_float_range(0.2f, 3.0f) * 0.020000001f));
+        FastVecScale(dir, g_hero_state_block, -(math_random_float_range(0.2f, 3.0f) * 0.020000001f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         speed = math_random_float_range(0.3f, 0.75f) * 210000.0f;
         out[0] = pos[0] + math_random_signed_float_range(0.0f, 0.2f);
@@ -71,9 +71,9 @@ void func_PAL_L00_003E74D8(float *pos, int unused, int extra)
         speed = 525000.0f;
         n = math_random_int_below(255);
         last = func_PAL_002C23B8(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, n, speed, 0.0f, 1.0f, 0.0f, 1.0f);
-        if (last) last[2] = *D_L00_001FEA14;
+        if (last) last[2] = *g_effect_param_pointer_b;
         last = func_PAL_002C23B8(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, (n + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
-        if (last) last[2] = *D_L00_001FEA14;
+        if (last) last[2] = *g_effect_param_pointer_b;
     }
 }
 

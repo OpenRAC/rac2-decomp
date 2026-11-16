@@ -9,54 +9,54 @@ typedef int Quad __attribute__((mode(TI)));
 extern char g_hero_state[];
 typedef struct { char pad[0x74]; unsigned char active; char pad2[0x13]; char *owner; } SoundSlot;
 extern SoundSlot g_sound_state[];
-extern int D_00138320 NOT_SDA;
-extern int D_00138324 NOT_SDA;
+extern int g_pad_pressed_flags NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
 extern int g_current_map_index MACRO_ADDR;
-extern int D_001A7904 MACRO_ADDR;
+extern int g_arena_state_flag MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
-extern int D_L04_001A7CD0 MACRO_ADDR;
-extern float D_L04_001A7CCC MACRO_ADDR;
-extern int D_L04_001A7CD4 MACRO_ADDR;
-extern int D_L04_001A8ED0 MACRO_ADDR;
+extern int g_race_init_flag MACRO_ADDR;
+extern float g_race_float_param MACRO_ADDR;
+extern int g_race_state_value MACRO_ADDR;
+extern int g_race_state_flags MACRO_ADDR;
 /* The race flag words; [5] is the flag func_L04_00402D90 sets. */
 extern int D_L04_001A8ED0_flags[] __asm__("D_L04_001A8ED0") MACRO_ADDR;
-extern int D_L04_001A8F00 MACRO_ADDR;
-extern int D_L04_001A8F08 MACRO_ADDR;
+extern int g_game_l04_mode MACRO_ADDR;
+extern int g_game_mode_alt MACRO_ADDR;
 extern int g_current_lap MACRO_ADDR;
 extern int g_race_time_ticks MACRO_ADDR;
-extern void *D_L04_001AA6A0 MACRO_ADDR;
-extern void *D_L04_001AA6A4 MACRO_ADDR;
-extern void *D_L04_001AA6A8 MACRO_ADDR;
-extern void *D_L04_001AA6AC MACRO_ADDR;
-extern u8 *D_L04_001B08F4 __attribute__((sda));
-extern int D_L04_001B08F0 __attribute__((sda));
-extern int D_L04_001B08F8 __attribute__((sda));
-extern int D_L04_001B08FC __attribute__((sda));
-extern int D_L04_001B0900 __attribute__((sda));
-extern int D_L04_001B0908 __attribute__((sda));
+extern void *g_race_callback_a MACRO_ADDR;
+extern void *g_race_callback_b MACRO_ADDR;
+extern void *g_race_callback_c MACRO_ADDR;
+extern void *g_race_callback_d MACRO_ADDR;
+extern u8 *g_race_bike_child_moby __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
+extern int g_race_extra_ticks __attribute__((sda));
+extern int g_race_voice_busy_flag __attribute__((sda));
+extern int g_race_voice_state __attribute__((sda));
+extern int g_race_state_request __attribute__((sda));
 extern int g_current_race_index __attribute__((sda));
 /* D_L04_001B0910 in Barlow; in Joba that name is bound to another variable. */
 extern int ref_L04_00419918_01 __attribute__((sda));
-extern u8 *D_L04_001B0914 __attribute__((sda));
-extern int D_L04_001B0918 __attribute__((sda));
-extern int D_L04_001B091C __attribute__((sda));
-extern int D_L04_001B0924 __attribute__((sda));
-extern int D_L04_001B092C __attribute__((sda));
-extern int D_L04_001B0930 __attribute__((sda));
-extern int D_L04_001B0934 __attribute__((sda));
-extern int D_L04_001B0938 __attribute__((sda));
-extern int D_L04_001B0BBC __attribute__((sda));
-extern int D_L04_001B0BC0 __attribute__((sda));
-extern float D_L04_001B1F20 __attribute__((sda));
-extern int D_L04_001B2008 __attribute__((sda));
+extern u8 *g_race_controller __attribute__((sda));
+extern int g_race_progress_counter __attribute__((sda));
+extern int g_race_banner_timer __attribute__((sda));
+extern int g_race_voice_pending __attribute__((sda));
+extern int g_race_mode_active_flag __attribute__((sda));
+extern int g_race_l04_state_flag_c_2 __attribute__((sda));
+extern int g_race_state_flag_d __attribute__((sda));
+extern int g_race_trick_state __attribute__((sda));
+extern int g_level_l04_event_flag __attribute__((sda));
+extern int g_race_mode_started_flag __attribute__((sda));
+extern float g_level_float_setting __attribute__((sda));
+extern int g_game_tick_counter __attribute__((sda));
 extern u8 *g_moby_l04_pool MACRO_ADDR;
-extern u8 *D_L04_001B25CC MACRO_ADDR;
-extern int D_L04_001B31D4 MACRO_ADDR;
-extern char D_L04_001B31A0[] MACRO_ADDR;
-extern char D_L04_001B9540[];
-extern char D_L04_001B9680[];
-extern Quad D_L04_001BFAF0;
-extern float D_L04_001BDC30 NOT_SDA;
+extern u8 *g_linked_record_table MACRO_ADDR;
+extern int g_race_warning_stage MACRO_ADDR;
+extern char g_route_frame_delta[] MACRO_ADDR;
+extern char g_hero_l04_state[];
+extern char g_tether_zero_vec[];
+extern Quad g_collision_quad;
+extern float g_projection_scale_float NOT_SDA;
 extern void hero_record_play_counters(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern int hero_l04_enter_state(int, int);
@@ -156,20 +156,20 @@ void UpdateHoverbikeRace(u8 *self)
     int id;
     float d;
 
-    if (self[0x31] != 0 && fast_vec_dist(self + 0x10, D_L04_001B9680) < 24.0f) {
+    if (self[0x31] != 0 && fast_vec_dist(self + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(self);
         self[0x6F] = 22;
     }
-    if ((D_L04_001A8F08 == 2 || D_L04_001A8F00 == 2) && D_L04_001B0BC0 == 0 && g_current_map_index != 11) {
+    if ((g_game_mode_alt == 2 || g_game_l04_mode == 2) && g_race_mode_started_flag == 0 && g_current_map_index != 11) {
         H(self, 0x34) = (H(self, 0x34) | 0x41) & ~0x1000;
         I(self, 0x98) = 0;
-        D_L04_001B0BC0 = 1;
+        g_race_mode_started_flag = 1;
         return;
     }
-    if (D_L04_001A8F08 != 2 && D_L04_001A8F00 != 2 && D_L04_001B0BC0 != 0) {
+    if (g_game_mode_alt != 2 && g_game_l04_mode != 2 && g_race_mode_started_flag != 0) {
         H(self, 0x34) = (H(self, 0x34) & ~0x41) | 0x1000;
         I(self, 0x98) = I(P(self, 0x24), 0x10);
-        D_L04_001B0BC0 = 0;
+        g_race_mode_started_flag = 0;
     }
     switch (self[0x20]) {
     case 0:
@@ -180,25 +180,25 @@ void UpdateHoverbikeRace(u8 *self)
         I(s, 0x328) = -1;
         I(s, 0x330) = -1;
         I(s, 0x334) = -1;
-        D_L04_001AA6A0 = race_set_state_flags_a;
-        D_L04_001AA6A4 = ref_L04_00419918_00;
-        D_L04_001AA6A8 = race_set_state_flags_c;
-        D_L04_001AA6AC = ref_L04_00419918_00;
-        set_identity_rotation_rows(D_L04_001B31A0);
-        D_L04_001B0914 = self;
+        g_race_callback_a = race_set_state_flags_a;
+        g_race_callback_b = ref_L04_00419918_00;
+        g_race_callback_c = race_set_state_flags_c;
+        g_race_callback_d = ref_L04_00419918_00;
+        set_identity_rotation_rows(g_route_frame_delta);
+        g_race_controller = self;
         barlow_init_animation_paths();
         self[0x30] = 0x40;
         H(self, 0x32) = 0x40;
         self[0x20] = 1;
         race_recompute_branch_route_links(self);
         H(self, 0x34) |= 0x400;
-        if (D_001A7904 == 3) {
-            D_L04_001B08FC = 1;
+        if (g_arena_state_flag == 3) {
+            g_race_voice_busy_flag = 1;
             hero_reset_position_and_direction(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70, 0, 1);
-            D_001A7904 = 0;
+            g_arena_state_flag = 0;
             state_set_flag_one();
         } else {
-            D_L04_001B08FC = 0;
+            g_race_voice_busy_flag = 0;
         }
         Q(s, 0x2D0) = Q(self, 0x10);
         Q(s, 0x2E0) = Q(self, 0xF0);
@@ -254,7 +254,7 @@ void UpdateHoverbikeRace(u8 *self)
         }
         return;
     case 1:
-        flag = D_L04_001B08FC != 0;
+        flag = g_race_voice_busy_flag != 0;
         if (I(s, 0x238) == -1 || flag_is_third_pending_set(MOBY(I(s, 0x238))) != 0) {
             math_step_angle_offset(self, s, 0.02f, 0.00029f);
             flag = 1;
@@ -275,22 +275,22 @@ void UpdateHoverbikeRace(u8 *self)
             }
         }
         d = fast_vec_dist(g_hero_state + 0x80, self + 0x10);
-        if (D_L04_001B08FC == 0) {
-            if (!flag || !(d < 5.5f) || D_L04_001B2008 < 4) {
+        if (g_race_voice_busy_flag == 0) {
+            if (!flag || !(d < 5.5f) || g_game_tick_counter < 4) {
                 return;
             }
             if (I(g_hero_state, 0x229C) == 0x1F || I(g_hero_state, 0x2294) == 0x1D
                 || I(g_hero_state, 0x2294) == 0x1C || I(g_hero_state, 0x2294) == 1
-                || D_L04_001A8F00 == 2 || D_L04_001A8F08 == 2) {
+                || g_game_l04_mode == 2 || g_game_mode_alt == 2) {
                 return;
             }
-            if (D_L04_001B0924 == 0 && snd_is_voice_playing_for_owner(self, I(s, 0x330)) == 0) {
+            if (g_race_voice_pending == 0 && snd_is_voice_playing_for_owner(self, I(s, 0x330)) == 0) {
                 I(s, 0x330) = snd_start_in_slot(g_current_map_index == 4 ? 0x16 : 0x1A, 5, self);
                 snd_set_slot_field(I(s, 0x330), FloatToInt(IntToFloat(0x400) * 0.75f));
             }
         }
         TryClaimNotice(4, 0x27A1, 1);
-        if (D_L04_001B08FC == 0 && D_L04_001B0924 == 0 && !(D_00138324 & 0x10)) {
+        if (g_race_voice_busy_flag == 0 && g_race_voice_pending == 0 && !(g_pad_held_flags & 0x10)) {
             return;
         }
         {
@@ -336,7 +336,7 @@ void UpdateHoverbikeRace(u8 *self)
             I(s, 0x270) = 0;
             g_current_lap = 0;
             g_race_time_ticks = 0;
-            D_L04_001B0918 = 0;
+            g_race_progress_counter = 0;
             I(s, 0x31C) = 0;
         }
         H(self, 0x34) |= 0x41;
@@ -348,19 +348,19 @@ void UpdateHoverbikeRace(u8 *self)
             }
             if (m != 0) {
                 H(m, 0x34) |= 0x41;
-                if (D_L04_001B08F4 != 0) {
-                    H(D_L04_001B08F4, 0x34) |= 0x41;
+                if (g_race_bike_child_moby != 0) {
+                    H(g_race_bike_child_moby, 0x34) |= 0x41;
                 }
             }
         }
         self[0x20] = 2;
-        if (D_L04_001B0924 != 0) {
+        if (g_race_voice_pending != 0) {
             self[0xBC] = 2;
         } else {
             level_store_value_pair(0, race_draw_results_panel);
             self[0xBC] = 0;
         }
-        D_L04_001B08FC = 0;
+        g_race_voice_busy_flag = 0;
         I(s, 0x394) = 150;
         self[0x30] = 0xFF;
         level_release_matching_resource(4);
@@ -376,20 +376,20 @@ void UpdateHoverbikeRace(u8 *self)
             F(self, 0x2C) = F(P(self, 0x24), 0x24) * ratio;
             return;
         }
-        if (D_L04_001B0908 != 0) {
-            D_L04_001A8ED0 = 2;
+        if (g_race_state_request != 0) {
+            g_race_state_flags = 2;
             UpdateSoundVoices();
             FadeToBlack(0x10);
-            if (D_L04_001B0908 == 2) {
+            if (g_race_state_request == 2) {
                 race_reset_controller(self, 1);
             } else {
                 race_reset_controller(self, 0);
             }
-            D_L04_001B0908 = 0;
+            g_race_state_request = 0;
             return;
         }
         if (ref_L04_00419918_01 != 0) {
-            D_L04_001A8ED0 = 1;
+            g_race_state_flags = 1;
             H(self, 0x34) &= ~0x41;
             racer_release_link_state(self, s);
             I(s, 0x320) = -1;
@@ -399,27 +399,27 @@ void UpdateHoverbikeRace(u8 *self)
         }
         switch (self[0xBC]) {
         case 0:
-            D_L04_001B0BBC = 0;
+            g_level_l04_event_flag = 0;
             UpdateRaceSelectionMenu(self, s);
             level_store_value_pair(0, race_draw_results_panel);
             return;
         case 1:
             hoverbike_update_rider_entry_state(self, s);
-            if (*(u8 *)&D_00138324 != 0) {
+            if (*(u8 *)&g_pad_held_flags != 0) {
                 snd_play_from_global_bank(4, 0, 0);
                 self[0xBC] = 3;
             }
             return;
         case 2:
-            D_L04_001A8ED0 = 0;
+            g_race_state_flags = 0;
             o = 0;
             if (I(s, 0x1DC) != -1) {
                 o = MOBY(I(s, 0x1DC));
             }
             if (o != 0) {
                 H(o, 0x34) &= ~0x41;
-                if (D_L04_001B08F4 != 0) {
-                    H(D_L04_001B08F4, 0x34) &= ~0x41;
+                if (g_race_bike_child_moby != 0) {
+                    H(g_race_bike_child_moby, 0x34) &= ~0x41;
                 }
                 Q(o, 0x10) = Q(self, 0x10);
                 Q(o, 0xF0) = Q(self, 0xF0);
@@ -429,42 +429,42 @@ void UpdateHoverbikeRace(u8 *self)
                 func_002A0F48(o);
             }
             H(self, 0x34) &= ~0x41;
-            D_L04_001B091C = 0;
-            D_L04_001B31D4 = 0;
+            g_race_banner_timer = 0;
+            g_race_warning_stage = 0;
             level_store_value_pair(0, hud_draw_race_ruler);
-            D_L04_001B0930 = 0;
-            D_L04_001B0938 = 0;
+            g_race_l04_state_flag_c_2 = 0;
+            g_race_trick_state = 0;
             trail_clear_by_owner(0);
-            D_L04_001B08F0 = 0;
+            g_race_bike_mode = 0;
             hoverbike_init_race_course(self);
             g_hero_state[0x22B5] = 1;
             I(P(g_hero_state, 0x2290), 0x98) = 0;
-            if (D_L04_001B0924 != 0) {
+            if (g_race_voice_pending != 0) {
                 self[0xBC] = 1;
                 H(self, 0x96) = 120;
-                D_L04_001B0924 = 0;
+                g_race_voice_pending = 0;
                 return;
             }
             self[0xBC] = 3;
         case 3:
-            D_L04_001B092C = 0;
+            g_race_mode_active_flag = 0;
             racer_activate_linked(self);
             part_refresh_active_records(self);
             self[0xBC] = 4;
         case 4:
             hoverbike_update_rider_entry_state(self, s);
-            if (I(s, 0x394) < 120 && D_L04_001B31D4 == 0) {
+            if (I(s, 0x394) < 120 && g_race_warning_stage == 0) {
                 PlayMobySound(0xD, 0, self);
-                D_L04_001B31D4++;
-            } else if (I(s, 0x394) < 90 && D_L04_001B31D4 == 1) {
+                g_race_warning_stage++;
+            } else if (I(s, 0x394) < 90 && g_race_warning_stage == 1) {
                 PlayMobySound(0xD, 0, self);
-                D_L04_001B31D4++;
-            } else if (I(s, 0x394) < 60 && D_L04_001B31D4 == 2) {
+                g_race_warning_stage++;
+            } else if (I(s, 0x394) < 60 && g_race_warning_stage == 2) {
                 PlayMobySound(0xD, 0, self);
-                D_L04_001B31D4++;
-            } else if (I(s, 0x394) < 30 && D_L04_001B31D4 == 3) {
+                g_race_warning_stage++;
+            } else if (I(s, 0x394) < 30 && g_race_warning_stage == 3) {
                 PlayMobySound(0xD, 0, self);
-                D_L04_001B31D4++;
+                g_race_warning_stage++;
             }
             math_fast_float_d(s + 0x394);
             if (I(s, 0x394) != 0) {
@@ -472,17 +472,17 @@ void UpdateHoverbikeRace(u8 *self)
             }
             PlayMobySound(0xE, 0, self);
             self[0xBC] = 5;
-            if (D_00138320 & 0x40) {
-                D_L04_001B0930 = 0;
+            if (g_pad_pressed_flags & 0x40) {
+                g_race_l04_state_flag_c_2 = 0;
             } else {
-                D_L04_001B0930 = 1;
+                g_race_l04_state_flag_c_2 = 1;
             }
             return;
         case 5:
             hoverbike_update_rider_entry_state(self, s);
-            if (D_L04_001B0934 != 0) {
+            if (g_race_state_flag_d != 0) {
                 subtitle_request_voice_line(0xA26, 0x7D);
-                D_L04_001B0934 = 0;
+                g_race_state_flag_d = 0;
             }
             if (race_update_player_progress(self, s) != 0) {
                 return;
@@ -494,13 +494,13 @@ void UpdateHoverbikeRace(u8 *self)
                 self[0xBC] = 6;
                 H(self, 0x96) = 1;
             }
-            if (D_L04_001B0900 == 0) {
+            if (g_race_voice_state == 0) {
                 return;
             }
             FadeToBlack(0x10);
             race_reset_controller(self, 1);
             I(s, 0x340) = 0;
-            D_L04_001B0900 = 0;
+            g_race_voice_state = 0;
             return;
         case 6:
             if (P(s, 0x4C4) != 0) {
@@ -521,8 +521,8 @@ void UpdateHoverbikeRace(u8 *self)
             racer_release_sound_handles(self, s);
             if (o != 0) {
                 H(o, 0x34) |= 0x41;
-                if (D_L04_001B08F4 != 0) {
-                    H(D_L04_001B08F4, 0x34) |= 0x41;
+                if (g_race_bike_child_moby != 0) {
+                    H(g_race_bike_child_moby, 0x34) |= 0x41;
                 }
                 F(o, 0x2C) = F(P(o, 0x24), 0x24) * 0.25f;
                 H(o, 0x32) = 0x7F;
@@ -550,10 +550,10 @@ void UpdateHoverbikeRace(u8 *self)
                 Q(a, 0) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(b, 0) = Q(NODE(I(s, 0x198)), 0x70);
             }
-            D_L04_001B1F20 = 1.0f;
+            g_level_float_setting = 1.0f;
             cam_set_transition_frames(10.0f);
             if (coll_test_point(a, 4, self, F(s, 0x20)) != 0) {
-                Q(a, 0) = D_L04_001BFAF0;
+                Q(a, 0) = g_collision_quad;
             }
             racer_reset_state(self, 1);
             trail_clear_by_owner(self);
@@ -577,8 +577,8 @@ void UpdateHoverbikeRace(u8 *self)
                 func_002A05A8(o);
                 func_002A0F48(o);
                 H(o, 0x34) &= ~0x41;
-                if (D_L04_001B08F4 != 0) {
-                    H(D_L04_001B08F4, 0x34) &= ~0x41;
+                if (g_race_bike_child_moby != 0) {
+                    H(g_race_bike_child_moby, 0x34) &= ~0x41;
                 }
             }
             self[0xBC] = 5;
@@ -588,9 +588,9 @@ void UpdateHoverbikeRace(u8 *self)
         }
         return;
     case 3:
-        D_L04_001A8ED0 = 1;
+        g_race_state_flags = 1;
         hoverbike_update_rider_entry_state(self, s);
-        D_L04_001B08F8++;
+        g_race_extra_ticks++;
         if (F(self, 0x18) < F(s, 0x26C) || racer_is_in_jump_window(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
             float ahead, along;
             int node = FindNearestRoutePointIndex(self, P(s, 0x6D0), 1);
@@ -598,7 +598,7 @@ void UpdateHoverbikeRace(u8 *self)
             /* The path's points are 16-byte records from +0x10. */
             Q(self, 0x10) = Q(((Vector *)P(s, 0x6D0))[node], 0x10);
             along = IntToFloat(node) * F(P(s, 0x6D0), 0x1C);
-            if (D_L04_001B08F0 != 0) {
+            if (g_race_bike_mode != 0) {
                 ahead = along + 15.0f;
             } else {
                 ahead = along + 5.0f;
@@ -609,15 +609,15 @@ void UpdateHoverbikeRace(u8 *self)
         }
         level_store_value_pair(0, DrawRaceStandingsHud);
         math_fast_float_d(s + 0x398);
-        if (D_L04_001A7CD0 == 0) {
-            if (I(s, 0x398) > 0 || !(D_00138324 & 0x10)) {
+        if (g_race_init_flag == 0) {
+            if (I(s, 0x398) > 0 || !(g_pad_held_flags & 0x10)) {
                 return;
             }
-            D_L04_001A7CD0 = 1;
-            D_L04_001A7CCC = 0.05f;
-            D_L04_001A7CD4 = 0;
+            g_race_init_flag = 1;
+            g_race_float_param = 0.05f;
+            g_race_state_value = 0;
         }
-        if (D_L04_001A7CD4 != 1) {
+        if (g_race_state_value != 1) {
             return;
         }
         snd_send_cmd23(0x5D);
@@ -628,22 +628,22 @@ void UpdateHoverbikeRace(u8 *self)
         script_queue_keyed_request(I(s, 0x488), -1);
         return;
     case 4:
-        D_L04_001A8ED0 = 1;
-        I(D_L04_001B9540, 0x160) = 0;
-        I(D_L04_001B9540, 0x168) = 0;
-        I(D_L04_001B9540, 0x180) = 0;
-        I(D_L04_001B9540, 0x188) = 0;
-        I(D_L04_001B9540, 0x16C) = 0;
-        if (D_L04_001A7CD0 == 0) {
-            D_L04_001A7CD0 = 1;
-            D_L04_001A7CCC = 0.05f;
-            D_L04_001A7CD4 = 0;
+        g_race_state_flags = 1;
+        I(g_hero_l04_state, 0x160) = 0;
+        I(g_hero_l04_state, 0x168) = 0;
+        I(g_hero_l04_state, 0x180) = 0;
+        I(g_hero_l04_state, 0x188) = 0;
+        I(g_hero_l04_state, 0x16C) = 0;
+        if (g_race_init_flag == 0) {
+            g_race_init_flag = 1;
+            g_race_float_param = 0.05f;
+            g_race_state_value = 0;
         }
-        if ((unsigned int)(D_L04_001A7CD4 - 1) >= 2) {
+        if ((unsigned int)(g_race_state_value - 1) >= 2) {
             return;
         }
         part_refresh_active_records(self);
-        D_L04_001A8ED0 = 0;
+        g_race_state_flags = 0;
         H(self, 0x34) &= ~0x41;
         level_store_value_pair(0, 0);
         if (I(s, 0x19C) != -1) {
@@ -655,15 +655,15 @@ void UpdateHoverbikeRace(u8 *self)
                     path = I(s, 0x484);
                 }
                 Q(a, 0) = Q(NODE(I(s, 0x19C)), 0x70);
-                if (D_L04_001B0BBC != 0) {
+                if (g_level_l04_event_flag != 0) {
                     a[2] = 0.92f;
                 }
                 if (I(s, 0x320) == 1 && g_current_race_index == 0) {
                     g_current_race_index = I(s, 0x320);
                 }
-                if (D_L04_001B08F4 != 0) {
-                    moby_mark_spawned(D_L04_001B08F4);
-                    D_L04_001B08F4 = 0;
+                if (g_race_bike_child_moby != 0) {
+                    moby_mark_spawned(g_race_bike_child_moby);
+                    g_race_bike_child_moby = 0;
                 }
                 bike = P(g_hero_state, 0x2290);
                 g_hero_state[0x22B5] = 0;
@@ -682,7 +682,7 @@ void UpdateHoverbikeRace(u8 *self)
                 {
                     float q = math_fast_sin_or_cos_b(0.56217057f) / math_fast_sin_or_cos_a(0.56217057f);
 
-                    D_L04_001BDC30 = q;
+                    g_projection_scale_float = q;
                 }
                 UpdateViewContext();
                 for (k = 0; k < 21; k++) {
@@ -710,7 +710,7 @@ void UpdateHoverbikeRace(u8 *self)
             race_reset_controller(self, 1);
         } else {
             race_reset_controller(self, 1);
-            D_L04_001B0900 = 0;
+            g_race_voice_state = 0;
         }
         return;
     }

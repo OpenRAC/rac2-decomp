@@ -6,29 +6,29 @@ typedef union { Quad q; float f[4]; } Vec;
 #define U(p,o) (*(u16 *)((u8 *)(p)+(o)))
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define P(p,o) (*(u8 **)((u8 *)(p)+(o)))
-extern float D_L03_001B1BA4 SDATA(D_L03_001B1BA4) __attribute__((sda));
-extern float D_L03_001B1BA0 SDATA(D_L03_001B1BA0) __attribute__((sda));
-extern float D_L03_001B1B90 SDATA(D_L03_001B1B90) __attribute__((sda));
-extern float D_L03_001B1B98 SDATA(D_L03_001B1B98) __attribute__((sda));
-extern float D_L03_001B1BB0[4] SDATA(D_L03_001B1BB0) __attribute__((sda));
+extern float g_sweeper_bot_speed_fast SDATA(D_L03_001B1BA4) __attribute__((sda));
+extern float g_sweeper_bot_speed_slow SDATA(D_L03_001B1BA0) __attribute__((sda));
+extern float g_sweeper_bot_idle_scale SDATA(D_L03_001B1B90) __attribute__((sda));
+extern float g_sweeper_bot_turn_range SDATA(D_L03_001B1B98) __attribute__((sda));
+extern float g_sweeper_bot_local_offset[4] SDATA(D_L03_001B1BB0) __attribute__((sda));
 typedef struct {
     u8 pad00[0x80]; float position[4];
     u8 pad90[0x17A0]; u8 *target;
     u8 pad1834[0xA60]; int state;
 } Player;
 extern Player g_hero_state;
-extern u8 D_L03_001B9980[];
-extern u8 D_L03_001A8F20[] NOT_SDA __attribute__((sda));
+extern u8 g_camera_pose_buffer[];
+extern u8 g_effect_descriptor_default[] NOT_SDA __attribute__((sda));
 /* Two bounds of the spin-angle range, with an absolute view of its upper bound. */
 extern float D_L03_001B1B98_abs[] __asm__("D_L03_001B1B98") __attribute__((sda));
-extern int D_L03_001A9044;
-extern int D_L03_001A903C[] __attribute__((sda));
+extern int g_bot_hit_count;
+extern int g_bot_hit_flag[] __attribute__((sda));
 /* The 32 skill-point flags scanned by func_002B0E90. */
-extern u8 D_001A7A60[32] __attribute__((sda));
+extern u8 g_item_enabled_flags[32] __attribute__((sda));
 /* The same path-table pointer is read absolutely and through GP. */
-extern u8 *D_L03_001B2B0C[] __attribute__((sda));
+extern u8 *g_linked_effect_records[] __attribute__((sda));
 extern u8 *D_L03_001B2B0C_gp SDATA(D_L03_001B2B0C) __attribute__((sda));
-extern u8 *D_L03_001BFDD8 NOT_SDA;
+extern u8 *g_collision_hit_result NOT_SDA;
 extern void sweeper_bot_update_core(void *);
 extern int IsPointInCuboid(void *,int);
 extern void moby_set_state(void *,int,int);
@@ -72,12 +72,12 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
     float speed,scale,angle;
     int hit;
     sweeper_bot_update_core(moby);
-    speed=I(vars,0x29c) ? D_L03_001B1BA4 : D_L03_001B1BA0;
-    scale=I(vars,0x29c) ? 1.0f : D_L03_001B1B90;
+    speed=I(vars,0x29c) ? g_sweeper_bot_speed_fast : g_sweeper_bot_speed_slow;
+    scale=I(vars,0x29c) ? 1.0f : g_sweeper_bot_idle_scale;
     switch(moby[0x95]) {
     case 0:
         if(I(vars,0x2a8)!=-1) {
-            hit=IsPointInCuboid(D_L03_001B9980,I(vars,0x2a8));
+            hit=IsPointInCuboid(g_camera_pose_buffer,I(vars,0x2a8));
             if(!hit) { moby[0x31]=0; U(moby,0x34)|=1; return; }
             moby[0x31]=1; U(moby,0x34)&=0xfffe;
         }
@@ -97,7 +97,7 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
         } else if(vec_distance_xy(moby+0x10,g_hero_state.position)>24.0f && H(vars,0x2d0)==0) moby_set_state(moby,1,0);
         break;
     case 2:
-        if(flag_set_second_pending(moby)) { float upper=D_L03_001B1B98_abs[1]; F(vars,0x2e0)=math_random_signed_float_range(D_L03_001B1B98,upper)*0.017453294f; }
+        if(flag_set_second_pending(moby)) { float upper=D_L03_001B1B98_abs[1]; F(vars,0x2e0)=math_random_signed_float_range(g_sweeper_bot_turn_range,upper)*0.017453294f; }
         if(I(vars,0x204)!=1) {
             moby_set_state(moby,3,1);
             if(moby[0x43]) anim_start_blended(moby,0,0,10);
@@ -107,18 +107,18 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
     case 3:
         hit=moby_dispatch_action_by_kind(moby,vars+0x140);
         if(hit&1) {
-            matrix_mul_vec3(&a,D_L03_001B1BB0,moby+0xc0);
+            matrix_mul_vec3(&a,g_sweeper_bot_local_offset,moby+0xc0);
             FastVecAdd(&a,&a,moby+0x10);
             PlayMobySound(2,0,moby);
             part_spawn_explosion_with_sparks(moby,&a,-1,0.333f,0.0f);
             FastVecSub(&b,moby+0x10,g_hero_state.position);
             b.f[2]=0;
             vec_scale_to_length(&b,&b,0.10000001f);
-            part_spawn_masked_debris(moby,31,D_L03_001A8F20,3.0f,6.0f,3.0f,6.0f,255);
+            part_spawn_masked_debris(moby,31,g_effect_descriptor_default,3.0f,6.0f,3.0f,6.0f,255);
             if(g_hero_state.state==49) {
-                D_L03_001A9044=D_L03_001A9044+1;
-                if(D_L03_001A9044>=10 && !D_001A7A60[28]) {
-                    D_001A7A60[28]=1; snd_play_from_global_bank(1,0,0); value_set_entry_by_index(0x1233,-1); D_L03_001A903C[0]=1;
+                g_bot_hit_count=g_bot_hit_count+1;
+                if(g_bot_hit_count>=10 && !g_item_enabled_flags[28]) {
+                    g_item_enabled_flags[28]=1; snd_play_from_global_bank(1,0,0); value_set_entry_by_index(0x1233,-1); g_bot_hit_flag[0]=1;
                 }
             }
             SetDeathBits(moby,0,3);
@@ -133,7 +133,7 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
     }
     switch(moby[0x20]) {
     case 1:
-        if(moby[0x31] && U(moby,0x96)>10 && vec_distance_xy(moby+0x10,D_L03_001B9980)<50.0f) {
+        if(moby[0x31] && U(moby,0x96)>10 && vec_distance_xy(moby+0x10,g_camera_pose_buffer)<50.0f) {
             speed=math_random_float_range(2.0f,5.0f); angle=math_random_angle();
             F(vars,0x2c0)=math_fast_sin_or_cos_a(angle)*speed;
             F(vars,0x2c4)=math_fast_sin_or_cos_b(angle)*speed; I(vars,0x2c8)=0;
@@ -218,13 +218,13 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
                 a.f[2]=coll_probe_ground_height_below(&a,0,0.5f); qcopy(&b,&a);
                 b.f[2]+=F(vars,0x50)+0.1f;
                 coll_test_point(&b,0,moby,F(vars,0x50));
-                if(!D_L03_001BFDD8 || H(D_L03_001BFDD8,0xaa)!=MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
+                if(!g_collision_hit_result || H(g_collision_hit_result,0xaa)!=MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
                     moby_set_flag_bit(moby,0); I(vars,0x8c)=-1; sweeper_bot_reset_delays(moby);moby_set_state(moby,9,-1);
                     U(moby,0x34)=(U(moby,0x34)&0xffbe)|0x1000; I(moby,0x98)=I(P(moby,0x24),0x10);
                     if(moby[0x43])anim_start_blended(moby,0,0,0);
                     H(vars,0x178)=0;
                     coll_sweep_from_object(moby,&b,0x10001,0,1,0,F(vars,0x50),2.0f,1.0f);
-                    moby_fuse_linked_objects(moby,&a,D_L03_001B2B0C[0]+I(vars,0x2a0)*128+0x70,0,0);
+                    moby_fuse_linked_objects(moby,&a,g_linked_effect_records[0]+I(vars,0x2a0)*128+0x70,0,0);
                 } else {I(vars,0x2d8)=math_random_int_range(10,20);}
             } else if(vec_distance_xy(g_hero_state.position,vars+0x2b0)>5.0f) {
                 moby_set_flag_bit(moby,0);sweeper_bot_reset_delays(moby); H(vars,0x178)=0;F(vars,0x20)=(float)H(vars,0x24);
@@ -239,7 +239,7 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
     case 9:
         if(!I(vars,0x2ac)) {PlayMobySound(3,0,moby);I(vars,0x2ac)=1;}
         a.q=0;a.f[0]=6.0f;a.f[3]=1.0f;
-        transform_vector(&a,&a,D_L03_001B2B0C[0]+I(vars,0x2a0)*128);
+        transform_vector(&a,&a,g_linked_effect_records[0]+I(vars,0x2a0)*128);
         moby_l01_turn_toward_target(moby,&a);
         if(path_check_point_reached(moby)) {I(vars,0x8c)=I(vars,0x290);moby_set_state(moby,5,2);}
         break;

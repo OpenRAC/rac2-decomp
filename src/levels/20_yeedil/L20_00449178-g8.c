@@ -9,25 +9,25 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B23E8 __attribute__((sda));
+extern float g_path_movement_seconds __attribute__((sda));
 
-extern float D_L20_001B23EC __attribute__((sda));
+extern float g_vanish_sweep_radius __attribute__((sda));
 
-extern float D_L20_001B23F0 __attribute__((sda));
+extern float g_pop_touch_radius __attribute__((sda));
 
-extern float D_L20_001B23F8 __attribute__((sda));
+extern float g_yeedil_projectile_radius __attribute__((sda));
 
-extern float D_L20_001B2410 __attribute__((sda));
+extern float g_turret_bob_amplitude __attribute__((sda));
 
-extern float D_L20_001B2414 __attribute__((sda));
+extern float g_turret_bob_phase __attribute__((sda));
 
-extern float D_L20_001B241C __attribute__((sda));
+extern float g_turret_bob_amount __attribute__((sda));
 
-extern float D_L20_001B2450 __attribute__((sda));
+extern float g_turret_small_turn_step __attribute__((sda));
 
-extern float D_L20_001B2454 __attribute__((sda));
+extern float g_turret_turn_step __attribute__((sda));
 
-extern int D_L20_001B2AC8 __attribute__((sda));
+extern int g_frame_l20_counter __attribute__((sda));
 
 extern void moby_set_state(char *, int, int);
 
@@ -74,7 +74,7 @@ extern int coll_process_hit(float f, char *a, int b, char *c, int d);
 
 extern void moby_local_to_world_point(char *arg0, char *arg1);
 
-extern char D_L20_001B9FC0[] __attribute__((nosda));
+extern char g_camera_l20_position[] __attribute__((nosda));
 
 /* Turns the turret to face its target and eases its yaw and pitch toward the aimed angles. */
 void turret_turn_toward_target(char *moby) {
@@ -82,8 +82,8 @@ void turret_turn_toward_target(char *moby) {
     char *angles = moby + 0xF8;
     float deltaX = *(float *)(state + 0x140) - *(float *)(moby + 0x10);
     float deltaY = *(float *)(state + 0x144) - *(float *)(moby + 0x14);
-    float smallStep = D_L20_001B2450 * 4.84813745e-06f;
-    float turnStep = D_L20_001B2454 * 0.000290888245f;
+    float smallStep = g_turret_small_turn_step * 4.84813745e-06f;
+    float turnStep = g_turret_turn_step * 0.000290888245f;
     float heading;
 
     heading = mat_fast_helper_a(deltaX, deltaY);
@@ -99,10 +99,10 @@ void turret_turn_toward_target(char *moby) {
 void moby_vanish_with_effect(char *moby) {
     TI128 offset;
 
-    FastVecSub(&offset, D_L20_001B9FC0, moby + 0x10);
+    FastVecSub(&offset, g_camera_l20_position, moby + 0x10);
     vec_scale_to_length(&offset, &offset, 1.0f);
     part_spawn_blast_effect_moby(moby, moby + 0x10, &offset, *(float *)(moby + 0x18) - 0.5f);
-    coll_sweep_from_object(moby, moby + 0x10, 0x10000, 0, 6.0f, D_L20_001B23EC, 2.0f,
+    coll_sweep_from_object(moby, moby + 0x10, 0x10000, 0, 6.0f, g_vanish_sweep_radius, 2.0f,
                   1, 0);
     *(int *)(moby + 0x98) = 0;
     *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
@@ -151,7 +151,7 @@ char *yeedil_projectile_spawn(char *template, char *position, char *direction, f
         ((Moby449FD0 *)projectile)->state = 1;
         ((Moby449FD0 *)projectile)->flags |= 0x100;
         ((Moby449FD0 *)projectile)->scale =
-            *(float *)(((Moby449FD0 *)projectile)->pClass + 0x24) * D_L20_001B23F8;
+            *(float *)(((Moby449FD0 *)projectile)->pClass + 0x24) * g_yeedil_projectile_radius;
         state = ((Moby449FD0 *)projectile)->pVars;
         qcopy(state, direction);
         *(float *)(state + 0x14) = speed * 0.016666668f;

@@ -11,7 +11,7 @@ extern int FastDecTimer(void *a0);
 
 extern void moby_mark_spawned(void *a0);
 
-extern u32 D_L01_001BF918[];
+extern u32 g_hit_l01_result[];
 
 extern u32 g_pHeroMoby[];
 
@@ -22,22 +22,22 @@ extern s32 func_355780(u32 a0, u32 a1, void *a2);
 
 extern void moby_set_state(void *a0, s32 a1, s32 a2);
 extern u8 *D_L01_001B255C_sda[] __attribute__((sda));
-extern u8 *D_L01_001FE180[];
+extern u8 *g_path_l01_table[];
 
 extern u8 *g_moby_l01_table __attribute__((sda));
 
-extern u32 D_L01_001FFE80[];
+extern u32 g_level_l01_word_table[];
 
 /* func_L01_003CEDA0: scalar `sda` declarations under -G0 give retail's absolute accesses and
    its $gp loads in delay slots. */
-extern u8 D_001A7B1C __attribute__((sda));
+extern u8 g_swamp_cutscene_flag __attribute__((sda));
 extern u8 g_subtitle_history[];
-extern u8 D_L01_001BF6C0[];
-extern u8 *D_L01_001B264C __attribute__((sda));
-extern int D_L01_001A8F40 __attribute__((sda));
-extern int D_L01_001A900C __attribute__((sda));
-extern float D_L01_001B1FA0 __attribute__((sda));
-extern u32 D_001A7390 __attribute__((sda));
+extern u8 g_cutscene_vars[];
+extern u8 *g_swamp_patrol_positions __attribute__((sda));
+extern int g_hero_l01_control_mode __attribute__((sda));
+extern int g_cutscene_flag __attribute__((sda));
+extern float g_hero_l01_reach_timer_b __attribute__((sda));
+extern u32 g_frame_counter __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern int IsPointInCuboid(void *, int);
 extern int req_push_queue(void *, int);
@@ -99,7 +99,7 @@ void swamp_monster_test_attack_segment_hits_hero(u8 *moby, u32 segment_start, u3
 
     if (func_3120A8(attacker, segment_start, segment_end, 0x04000009, 0, 1, 1, (f32)width, 1.0f) == 0)
         return;
-    if (D_L01_001BF918[0] != g_pHeroMoby[0])
+    if (g_hit_l01_result[0] != g_pHeroMoby[0])
         return;
     if (*sound_flag == 0)
         return;
@@ -153,7 +153,7 @@ s32 swamp_monster_sync_linked_parts_health(u8 *moby)
             moby_set_state(moby, 0, 6);
         }
         qcopy(vars + 0x80, part_vars + 0x60);
-        path_table = D_L01_001FE180[*(s32 *)(vars + 0xA8)];
+        path_table = g_path_l01_table[*(s32 *)(vars + 0xA8)];
         math_closest_point_on_polygon_edge(vars + 0x70, part_vars + 0x60, path_table + 0x10, *(s32 *)path_table);
     }
     return *(s32 *)(vars + 0xBC);
@@ -191,7 +191,7 @@ void swamp_monster_init_linked_body_part(u8 *moby)
         }
     }
     if (*(s32 *)(vars + 0xA8) != -1)
-        path_l01_compute_segment_lengths(D_L01_001FE180[*(s32 *)(vars + 0xA8)]);
+        path_l01_compute_segment_lengths(g_path_l01_table[*(s32 *)(vars + 0xA8)]);
     if (*(u32 *)(vars + 0xAC) != 0) {
         *(u16 *)(moby + 0x34) &= 0xEFFF;
         anim_start_immediate(moby, 0, 0);
@@ -220,8 +220,8 @@ void swamp_monster_release_timers(u8 *moby)
 /* The group count and the entity base, read as bare symbols (`sda` arrays of unknown size: the
    assembler makes the loads $gp ones in a branch delay slot); the base takes a second name
    because D_L01_001B255C is declared above with its pointer type. */
-extern s32 D_L01_001B2578[] __attribute__((sda));
-extern u16 *D_L01_001FB020[];
+extern s32 g_swamp_monster_thresholds[] __attribute__((sda));
+extern u16 *g_group_list_table[];
 extern u8 g_hero_position[];
 
 extern void *part_find_owned_effect_slot(void *, s32, s32);
@@ -266,9 +266,9 @@ void swamp_monster_apply_damage(u8 *moby)
             if (moby[0x21] != 0xFF && *(s32 *)(state + 0xA0) != -1) {
                 class_id = *(u16 *)(*(u8 **)(hit_source + 0x20) + 0xAA);
                 hit_duration = (class_id == 0xCE4 /* moby class 3300 */ || class_id == 0xCE5 /* moby class 3301 */) ? 60 : 0;
-                for (member_list = D_L01_001FB020[moby[0x21]];
-                     moby[0x21] != 0xFF && moby[0x21] <= D_L01_001B2578[0] && member_list != 0 &&
-                     ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == D_L01_001FB020[moby[0x21]]);
+                for (member_list = g_group_list_table[moby[0x21]];
+                     moby[0x21] != 0xFF && moby[0x21] <= g_swamp_monster_thresholds[0] && member_list != 0 &&
+                     ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == g_group_list_table[moby[0x21]]);
                      member_list++) {
                     group_member = D_L01_001B255C_sda[0] + ((*member_list & 0x7FFF) << 8);
                     if (group_member == 0)
@@ -340,7 +340,7 @@ void cutscene_trigger_update(u8 *moby)
 
     switch (moby[0x20]) {
     case 0:
-        if (D_001A7B1C) {
+        if (g_swamp_cutscene_flag) {
             moby_mark_spawned(moby);
             break;
         }
@@ -351,7 +351,7 @@ void cutscene_trigger_update(u8 *moby)
     case 1:
         *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), 0.078539826f);
         if (IsPointInCuboid(g_hero_position, *(int *)(vars + 4))) {
-            vars = D_L01_001BF6C0;
+            vars = g_cutscene_vars;
             if (req_push_queue(vars, 0x26)) {
                 req_launch_queued(vars);
                 moby_set_state(moby, 2, -1);
@@ -361,7 +361,7 @@ void cutscene_trigger_update(u8 *moby)
             part_spawn_sparkles_and_glow_rings(moby);
         break;
     case 2:
-        screen_mode = D_L01_001A8F40;
+        screen_mode = g_hero_l01_control_mode;
         (*(u16 *)(moby + 0x96))++;
         if (screen_mode == 2) {
             moby[0x31] = 0;
@@ -369,9 +369,9 @@ void cutscene_trigger_update(u8 *moby)
         }
         if (game_is_either_mode_two())
             break;
-        anchor = D_L01_001B264C + (*(int *)(vars + 8) << 7);
-        D_L01_001A900C = 0;
-        D_L01_001B1FA0 = 0;
+        anchor = g_swamp_patrol_positions + (*(int *)(vars + 8) << 7);
+        g_cutscene_flag = 0;
+        g_hero_l01_reach_timer_b = 0;
         hero_reset_position_and_direction(anchor + 0x30, anchor + 0x70, 0x6F, 1);
         help_unlock_entry(0x24);
         moby_handle_request_slot_state(0x24);
@@ -387,7 +387,7 @@ void cutscene_trigger_update(u8 *moby)
             if (!*(u16 *)(vars + 0xC0)) {
                 u16 elapsed = *(u16 *)(vars + 0xC2);
                 u32 start = *(u32 *)(vars + 0xC4);
-                u32 now = D_001A7390;
+                u32 now = g_frame_counter;
 
                 if (start + elapsed >= now - 2) {
                     *(u16 *)(vars + 0xC2) = ++elapsed;

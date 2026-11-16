@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int module_l00_call_handler_with_arg_15(int a);
 
-int func_US2_L00_0034D3F8(void)
+int pad_run_input_update_return_zero_us2(void)
 {
-    module_l00_call_handler_with_arg_15(D_00138344);
+    module_l00_call_handler_with_arg_15(g_menu_input_flags);
     return 0;
 }
 

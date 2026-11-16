@@ -13,11 +13,11 @@ extern int CollLine(void *, void *, int, void *, int);
 extern int math_fast_helper_a(void *, float);
 extern void func_PAL_0032F7C8(void *, void *);
 extern char g_camera_eye_state[];
-extern float D_001B081C __attribute__((sda));
-extern int D_001B0750 __attribute__((sda)), D_001B0778 __attribute__((sda));
-extern int D_001B0754 __attribute__((sda)), D_001B077C __attribute__((sda));
-extern int D_001B0828 __attribute__((sda)), D_001B082C __attribute__((sda));
-extern int D_001B0834 __attribute__((sda)), D_001B0838 __attribute__((sda));
+extern float g_blast_moby_height_limit __attribute__((sda));
+extern int g_blast_moby_first_id_a __attribute__((sda)), g_blast_moby_second_id __attribute__((sda));
+extern int g_blast_moby_first_id_b __attribute__((sda)), g_blast_moby_first_id_c __attribute__((sda));
+extern int g_blast_moby_state_short_a __attribute__((sda)), g_blast_moby_state_short_b __attribute__((sda));
+extern int g_blast_moby_state_word __attribute__((sda)), g_blast_moby_extra_word __attribute__((sda));
 char *func_PAL_0032F3B8(int unused, float *position, float *direction, float height)
 {
     float basis[4], offset[4], sphere[4];
@@ -40,7 +40,7 @@ char *func_PAL_0032F3B8(int unused, float *position, float *direction, float hei
         FastVecScale(offset, self + 0xC0, 0.5f);
         FastVecAdd(self + 0x10, self + 0x10, offset);
         if (height != 0.0f) {
-            if (D_001B081C * 1.5f <= *(float *)(self + 0x18) - height) height = 0.0f;
+            if (g_blast_moby_height_limit * 1.5f <= *(float *)(self + 0x18) - height) height = 0.0f;
         }
         *(float *)(state + 0x18) = height;
         *(float *)(state + 0) = math_random_angle();
@@ -49,27 +49,27 @@ char *func_PAL_0032F3B8(int unused, float *position, float *direction, float hei
         *(float *)(state + 12) = math_random_angle();
         *(float *)(state + 16) = math_random_angle();
         *(float *)(state + 20) = math_random_angle();
-        *(short *)(state + 0x1C) = ((s32)(D_001B0750) * 5 + 2) / 6;
-        *(short *)(state + 0x1E) = ((s32)(D_001B0778) * 5 + 2) / 6;
+        *(short *)(state + 0x1C) = ((s32)(g_blast_moby_first_id_a) * 5 + 2) / 6;
+        *(short *)(state + 0x1E) = ((s32)(g_blast_moby_second_id) * 5 + 2) / 6;
         *(float *)(state + 0x20) = 1.0f / IntToFloat(*(short *)(state + 0x1C));
         *(float *)(state + 0x24) = 1.0f / IntToFloat(*(short *)(state + 0x1E));
-        *(short *)(state + 0x28) = *(short *)(state + 0x1C) - ((s32)(D_001B0754) * 5 + 2) / 6;
+        *(short *)(state + 0x28) = *(short *)(state + 0x1C) - ((s32)(g_blast_moby_first_id_b) * 5 + 2) / 6;
         *(float *)(state + 0x2C) = 1.0f / IntToFloat(*(short *)(state + 0x28));
-        *(short *)(state + 0x2A) = *(short *)(state + 0x1E) - ((s32)(D_001B077C) * 5 + 2) / 6;
+        *(short *)(state + 0x2A) = *(short *)(state + 0x1E) - ((s32)(g_blast_moby_first_id_c) * 5 + 2) / 6;
         *(float *)(state + 0x30) = 1.0f / IntToFloat(*(short *)(state + 0x2A));
         if (CollLine(self + 0x10, g_camera_eye_state, 18, 0, 0)) {
             *(short *)(state + 0x36) = 0;
         } else {
-            *(short *)(state + 0x36) = (((int)(D_001B0828) * 5 + 2) / 6);
+            *(short *)(state + 0x36) = (((int)(g_blast_moby_state_short_a) * 5 + 2) / 6);
             *(float *)(state + 0x38) = 1.0f / IntToFloat(*(short *)(state + 0x36));
             qcopy(sphere, self + 0x10);
             sphere[3] = 1.0f;
             if (math_fast_helper_a(sphere, 128.0f) == 1) {
-                *(short *)(state + 0x34) = (((int)(D_001B082C) * 5 + 2) / 6);
+                *(short *)(state + 0x34) = (((int)(g_blast_moby_state_short_b) * 5 + 2) / 6);
                 *(float *)(state + 0x3C) = 1.0f / IntToFloat(*(short *)(state + 0x34));
-                *(int *)(state + 0x40) = (((int)(D_001B0834) * 5 + 2) / 6);
+                *(int *)(state + 0x40) = (((int)(g_blast_moby_state_word) * 5 + 2) / 6);
                 *(float *)(state + 0x44) = 1.0f / IntToFloat(*(int *)(state + 0x40));
-                extra = (((int)(D_001B0838) * 5 + 2) / 6);
+                extra = (((int)(g_blast_moby_extra_word) * 5 + 2) / 6);
                 *(int *)(state + 0x40) += extra;
             } else {
                 *(short *)(state + 0x34) = 0;

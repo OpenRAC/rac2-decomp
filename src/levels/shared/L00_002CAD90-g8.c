@@ -6,9 +6,9 @@ typedef struct {
     unsigned char b;
 } TableEntry;
 
-extern TableEntry D_L00_001A7D60[] SDATA(D_L00_001A7D60);
-extern TableEntry D_L00_001A7D48[] SDATA(D_L00_001A7D48);
-extern TableEntry D_L00_001A7D78[] SDATA(D_L00_001A7D78);
+extern TableEntry g_linked_anim_pair_table_b[] SDATA(D_L00_001A7D60);
+extern TableEntry g_linked_anim_pair_table_a[] SDATA(D_L00_001A7D48);
+extern TableEntry g_linked_anim_pair_table_c[] SDATA(D_L00_001A7D78);
 
 extern int hero_slot_item_id(int);
 
@@ -19,13 +19,13 @@ int FindSlotTableKey(int id, int *out)
     int index;
 
     if (hero_slot_item_id(3) == 2)
-        table = D_L00_001A7D60;
+        table = g_linked_anim_pair_table_b;
     else if (hero_slot_item_id(3) == 3)
-        table = D_L00_001A7D48;
+        table = g_linked_anim_pair_table_a;
     else if ((hero_slot_item_id(3) ^ 4) != 0)
         table = 0;
     else
-        table = D_L00_001A7D78;
+        table = g_linked_anim_pair_table_c;
 
     if (table) {
         for (index = 0; table[index].key != -1; index++) {

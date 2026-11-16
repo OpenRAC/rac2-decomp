@@ -14,10 +14,10 @@ extern void euler_to_matrix(char *, char *);
 extern void copy_matrix3x4(char *, char *);
 extern void math_build_axis_angle_quat(char *, char *, float);
 extern void vec_rotate_by_quaternion(char *, char *, char *);
-extern int D_L00_001A8FF0[] MACRO_ADDR;
-extern float D_L00_001B1624 __attribute__((sda));
-extern float D_L00_001B1628 __attribute__((sda));
-extern float D_L00_001B162C __attribute__((sda));
+extern int g_hero_locked_flag[] MACRO_ADDR;
+extern float g_cam_step_scale_a __attribute__((sda));
+extern float g_cam_step_scale_b __attribute__((sda));
+extern float g_cam_step_rotation_degrees __attribute__((sda));
 
 /* Steps the object's five parameters at +0x50..+0x60 towards the state's targets through
    two per-parameter helpers (the first target adjusted by the focus block's +0x18), then
@@ -66,18 +66,18 @@ void cam_step_toward_goal(char *object)
     } else {
         qcopy_nc(focus, state + 0x80);
     }
-    if (D_L00_001A8FF0[0] && *(char **)(focus + 0x44)) {
+    if (g_hero_locked_flag[0] && *(char **)(focus + 0x44)) {
         char *owner;
 
-        FastVecScale(scaled0, *(char **)(focus + 0x44) + 0xE0, D_L00_001B1624);
+        FastVecScale(scaled0, *(char **)(focus + 0x44) + 0xE0, g_cam_step_scale_a);
         FastVecAdd(object + 0x30, *(char **)(focus + 0x44) + 0x10, scaled0);
-        FastVecScale(scaled1, *(char **)(focus + 0x44) + 0xC0, D_L00_001B1628);
+        FastVecScale(scaled1, *(char **)(focus + 0x44) + 0xC0, g_cam_step_scale_b);
         FastVecAdd(object + 0x30, object + 0x30, scaled1);
         owner = *(char **)(focus + 0x44);
         qcopy(object, owner + 0xC0);
         qcopy(object + 0x10, owner + 0xD0);
         qcopy(object + 0x20, owner + 0xE0);
-        math_build_axis_angle_quat(rotation, object + 0x10, D_L00_001B162C * 0.01745329424738884f);
+        math_build_axis_angle_quat(rotation, object + 0x10, g_cam_step_rotation_degrees * 0.01745329424738884f);
         vec_rotate_by_quaternion(object, object, rotation);
         vec_rotate_by_quaternion(object + 0x20, object + 0x20, rotation);
     } else {

@@ -7,7 +7,7 @@ extern int math_fast_float_d(void *);
 extern void moby_set_byte_on_group(int, int);
 extern void gfx_free_point_light(int);
 typedef struct { char pad[0x30]; float position[4]; char rest[0x40]; } L01_003C9D00_PATH;
-extern L01_003C9D00_PATH *D_L01_001B264C;
+extern L01_003C9D00_PATH *g_swamp_patrol_positions;
 extern char g_dynamic_light_table[];
 extern float fast_vec_dist(void *);
 extern void moby_set_state(void *, int, int);
@@ -32,7 +32,7 @@ void scrolling_ribbon_update(char *moby)
         *(float *)(vars + 0x74) = 0.0f;
         *(int *)(moby + 0x98) = 0;
         qcopy(vars + 0x80, moby + 0x10);
-        *(float *)(vars + 0x98) = fast_vec_dist(D_L01_001B264C[*(int *)(vars + 0x94)].position);
+        *(float *)(vars + 0x98) = fast_vec_dist(g_swamp_patrol_positions[*(int *)(vars + 0x94)].position);
         moby_set_state(moby, 1, -1);
         break;
     case 1:
@@ -50,7 +50,7 @@ void scrolling_ribbon_update(char *moby)
             vec_scale_to_length(vec, moby + 0xC0, blend * 10.0f);
             FastVecSub(moby + 0x10, vars + 0x80, vec);
         } else {
-            FastVecSub(vec, D_L01_001B264C[*(int *)(vars + 0x94)].position, vars + 0x80);
+            FastVecSub(vec, g_swamp_patrol_positions[*(int *)(vars + 0x94)].position, vars + 0x80);
             vec_scale_to_length(vec, vec, *(float *)(vars + 0x98) * blend);
             FastVecAdd(moby + 0x10, vars + 0x80, vec);
         }
@@ -72,7 +72,7 @@ void scrolling_ribbon_update(char *moby)
             vec_scale_to_length(vec, moby + 0xC0, blend * 10.0f);
             FastVecSub(moby + 0x10, vars + 0x80, vec);
         } else {
-            FastVecSub(vec, D_L01_001B264C[*(int *)(vars + 0x94)].position, vars + 0x80);
+            FastVecSub(vec, g_swamp_patrol_positions[*(int *)(vars + 0x94)].position, vars + 0x80);
             vec_scale_to_length(vec, vec, *(float *)(vars + 0x98) * blend);
             FastVecAdd(moby + 0x10, vars + 0x80, vec);
         }

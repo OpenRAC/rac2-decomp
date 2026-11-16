@@ -18,7 +18,7 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(void *, int, int);
-extern BillboardBatchVec D_L00_001AA310[4] __attribute__((sda));
+extern BillboardBatchVec g_billboard_corner_table[4] __attribute__((sda));
 extern BillboardBatchVec g_camera_l00_position NOT_SDA;
 
 /* Draws offset camera-facing quads, reusing the packet while its color is unchanged. */
@@ -62,7 +62,7 @@ void DrawOffsetBillboardBatch(int count, BillboardBatchVec *positions, int *colo
             color = colors[i];
         }
         dst = packet.vertex;
-        src = D_L00_001AA310;
+        src = g_billboard_corner_table;
         for (j = 3; j >= 0; --j) {
             FastVecScale(dst, src, size);
             ++src;

@@ -39,8 +39,8 @@ typedef struct {
 
 /* -G8 is required for the movement-mode flag at D_001A8FF0. */
 extern Hero g_hero_state;
-extern char D_L04_001BFAF0[];
-extern int D_001A8FF0 MACRO_ADDR;
+extern char g_collision_quad[];
+extern int g_hero_height_zone_active MACRO_ADDR;
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
 extern float FastVecDot(void *, void *);
@@ -88,7 +88,7 @@ int ResolveHeroPositionCollisions(int reason)
                 cam_offset_point_in_view_space(move, move, 5.0f);
             } else if (g_hero_state.f22C3 == 1 || g_hero_state.f218) {
                 hero_build_relative_point(move, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_001A8FF0) {
+            } else if (g_hero_height_zone_active) {
                 cam_offset_point_in_view_space(move, move, 0.77f);
             } else {
                 hero_build_relative_point(move, 0, 0.0f, 0.0f, g_hero_state.f254);
@@ -124,7 +124,7 @@ int ResolveHeroPositionCollisions(int reason)
         }
 
         {
-            char *collision = D_L04_001BFAF0;
+            char *collision = g_collision_quad;
 
             qcopy(g_hero_state.position, collision);
             qcopy(g_hero_state.contact_a, collision + 0x10);

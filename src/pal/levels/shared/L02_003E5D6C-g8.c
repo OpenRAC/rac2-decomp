@@ -4,30 +4,30 @@
    Multi-stage switch: hero target clear keeps the candidate pointer a named local, read after its index. */
 #include "common.h"
 typedef struct { char pad[0x464]; unsigned char flags[0]; } L02E1A40Progress;
-extern L02E1A40Progress D_L02_0021F4F0;
-extern unsigned char D_0019B4A8[];
+extern L02E1A40Progress g_cell_flags;
+extern unsigned char g_moby_nibble_table[];
 extern int g_current_map_index[] __attribute__((sda));
 extern int currentLevel_gp SDATA(D_001A79F0);
 typedef struct L02E1A40Object L02E1A40Object;
 extern L02E1A40Object *g_moby_l02_pool[] __attribute__((sda));
 extern L02E1A40Object *entityPool_gp SDATA(D_L02_001B359C);
-extern char *D_0018A15C[];
+extern char *g_platform_actor_ref[];
 
 typedef struct {
     char pad0[0x24]; int message; int timer;
     char pad1[0x3c]; int disabled; short f6c; char pad2[4]; short f72;
 } L02E1A40Hud;
 extern L02E1A40Hud g_music_state;
-extern float D_L02_001B0760 SDATA(D_L02_001B0760);
-extern float D_L02_001B0764 SDATA(D_L02_001B0764);
-extern float D_L02_001B0768 SDATA(D_L02_001B0768);
+extern float g_pickup_spin_speed SDATA(D_L02_001B0760);
+extern float g_pickup_second_spin_speed SDATA(D_L02_001B0764);
+extern float g_pickup_sparkle_size_range SDATA(D_L02_001B0768);
 extern float D_L02_001B0768_abs[] __asm__("D_L02_001B0768") __attribute__((sda));
-extern int D_L02_001B0770 SDATA(D_L02_001B0770);
+extern int g_pickup_sparkle_color_pair SDATA(D_L02_001B0770);
 extern int D_L02_001B0770_abs[] __asm__("D_L02_001B0770") __attribute__((sda));
-extern int D_L02_001B0778 SDATA(D_L02_001B0778);
-extern int D_L02_001B0780 SDATA(D_L02_001B0780);
+extern int g_pickup_init_done SDATA(D_L02_001B0778);
+extern int g_pickup_color_a SDATA(D_L02_001B0780);
 extern int D_L02_001B0780_abs[] __asm__("D_L02_001B0780") __attribute__((sda));
-extern int D_L02_001B0788 SDATA(D_L02_001B0788);
+extern int g_pickup_color_b SDATA(D_L02_001B0788);
 extern int D_L02_001B0788_abs[] __asm__("D_L02_001B0788") __attribute__((sda));
 extern int g_frame_l02_counter[] __attribute__((sda));
 extern void moby_set_flag_bit(void *,int);
@@ -84,8 +84,8 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
     case 0:
         d->f38=0; d->f3c=0; d->count=0;
         index=obj->index;
-        if(D_L02_0021F4F0.flags[(short)index] ||
-           ((initialPacked=D_0019B4A8[((short)index>>1)+(g_current_map_index[0]<<10)]),
+        if(g_cell_flags.flags[(short)index] ||
+           ((initialPacked=g_moby_nibble_table[((short)index>>1)+(g_current_map_index[0]<<10)]),
             (index&1) ? ((initialPacked>>4)&7) : (initialPacked&7))) {
             moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
             moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
@@ -94,7 +94,7 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
         } else moby_set_state(obj,1,-1);
         break;
     case 1:
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
         if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.040000003f);
         if(obj->active && !math_random_int_below(5)) {
@@ -104,8 +104,8 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
             pos[2]=0;
             FastVecAdd(pos,pos,obj->position);
             pos[2]+=0.1f;
-            size=math_random_float_range(D_L02_001B0768,D_L02_001B0768_abs[1]);
-            color=FastTweenColor(D_L02_001B0770,D_L02_001B0770_abs[1],math_random_float_range(0,1));
+            size=math_random_float_range(g_pickup_sparkle_size_range,D_L02_001B0768_abs[1]);
+            color=FastTweenColor(g_pickup_sparkle_color_pair,D_L02_001B0770_abs[1],math_random_float_range(0,1));
             speed=math_random_float_range(1,2);
             duration=math_random_int_range(60,180);
             duration=(duration*5+2)/6;
@@ -113,10 +113,10 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
             vel[2]=speed/IntToFloat(duration);
             part_spawn_hero_relative(pos,vel,color,size,(unsigned char)duration,(unsigned char)math_random_int_below(255),0);
         }
-        if(D_0018A15C[0]==(char *)obj) {
+        if(g_platform_actor_ref[0]==(char *)obj) {
             moby_set_state(obj,2,-1);
-            if(!D_L02_001B0778) {
-                D_L02_001B0778=1;
+            if(!g_pickup_init_done) {
+                g_pickup_init_done=1;
                 hero_start_target_state(obj->position,1,obj->radius);
             }
         } else {
@@ -128,7 +128,7 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
     case 2:
         if(flag_set_first_pending(obj)) {
             PlayMobySound(1,0,(char *)obj);
-            d->color0=D_L02_001B0780;
+            d->color0=g_pickup_color_a;
             d->color1=D_L02_001B0780_abs[1];
             d->fade=0;d->alpha=0;
             value_set_entry_by_index(4893,180);
@@ -138,9 +138,9 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
                 g_music_state.message=(message0&0x3fff)+2000;
             }
         }
-        if(D_0018A15C[0]!=(char *)obj) moby_set_state(obj,1,-1);
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
-        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0003490659f);
+        if(g_platform_actor_ref[0]!=(char *)obj) moby_set_state(obj,1,-1);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
+        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0003490659f);
         frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
@@ -150,7 +150,7 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
     case 3:
         if(flag_set_first_pending(obj)) {
             I(d,0x40)++;
-            d->color0=D_L02_001B0788;
+            d->color0=g_pickup_color_b;
             d->color1=D_L02_001B0788_abs[1];
             d->fade=0;d->alpha=0;
             value_set_entry_by_index(4894,180);
@@ -166,8 +166,8 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
             moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
             moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
         }
-        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0003490659f);
-        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0003490659f);
+        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
+        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0003490659f);
         frame=g_frame_l02_counter[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
@@ -180,11 +180,11 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
         if(d->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {
-                save=&D_0019B4A8[((short)completedIndex>>1)+(currentLevel_gp<<10)];
+                save=&g_moby_nibble_table[((short)completedIndex>>1)+(currentLevel_gp<<10)];
                 savedByte=*save;
                 if(((savedByte>>4)&7)!=7) *save=savedByte+16;
             } else {
-                save=&D_0019B4A8[((short)completedIndex>>1)+(currentLevel_gp<<10)];
+                save=&g_moby_nibble_table[((short)completedIndex>>1)+(currentLevel_gp<<10)];
                 savedByte=*save;
                 if((savedByte&7)!=7) *save=savedByte+1;
             }

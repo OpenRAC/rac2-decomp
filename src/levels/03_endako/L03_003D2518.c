@@ -4,8 +4,8 @@ typedef int L03_2518Quad __attribute__((mode(TI)));
 
 extern char g_hero_position[];
 /* The camera's 128-byte matrices, reloaded through an absolute macro access each time. */
-extern char *D_L03_001B2B0C[] __attribute__((sda));
-extern char D_L03_001B9980[];
+extern char *g_linked_effect_records[] __attribute__((sda));
+extern char g_camera_pose_buffer[];
 
 extern void FastVecSub(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -25,9 +25,9 @@ void cam_compute_aim_and_angles(u8 *self, f32 *aim, f32 *angles)
     f32 near;
     f32 x;
 
-    FastVecSub(rel, g_hero_position, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x30);
-    matrix_mul_vec3(rel, rel, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128 + 0x40);
-    near = 0.5f - vec_distance_xy(g_hero_position, D_L03_001B9980) * 0.0625f;
+    FastVecSub(rel, g_hero_position, g_linked_effect_records[0] + *(s32 *)(state + 4) * 128 + 0x30);
+    matrix_mul_vec3(rel, rel, g_linked_effect_records[0] + *(s32 *)(state + 4) * 128 + 0x40);
+    near = 0.5f - vec_distance_xy(g_hero_position, g_camera_pose_buffer) * 0.0625f;
     if (near < 0.0f)
         near = 0.0f;
     x = rel[0] - near;
@@ -38,7 +38,7 @@ void cam_compute_aim_and_angles(u8 *self, f32 *aim, f32 *angles)
     *(L03_2518Quad *)tilt = 0;
     tilt[0] = x;
     tilt[3] = 1.0f;
-    transform_vector(aim, tilt, D_L03_001B2B0C[0] + *(s32 *)(state + 4) * 128);
+    transform_vector(aim, tilt, g_linked_effect_records[0] + *(s32 *)(state + 4) * 128);
     vec_clear_128(angles);
     qcopy(rel, g_hero_position);
     rel[2] = *(f32 *)(self + 0x18);

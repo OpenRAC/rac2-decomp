@@ -1,9 +1,10 @@
+#include "names.h"
 /* Initializes the movement state, full position and sixteen-byte zeroed vector. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L20_001B23E8 __attribute__((sda));
+extern float g_path_movement_seconds __attribute__((sda));
 
 extern void moby_set_state(char *, int, int);
 
@@ -12,7 +13,7 @@ void moby_start_path_movement(char *moby, char *path, char *start_pos)
 {
     char *state = *(char **)(moby + 0x68);
 
-    *(s32 *)(state + 0xA8) = (s32)(D_L20_001B23E8 * 60.0f);
+    *(s32 *)(state + 0xA8) = (s32)(g_path_movement_seconds * 60.0f);
     *(char **)(state + 0xA4) = path;
     *(s32 *)(state + 0xAC) = 0;
     *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;

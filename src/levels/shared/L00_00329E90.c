@@ -8,8 +8,8 @@ typedef struct Slot_00329E90 {
     char pad[0xA430 - 8];
 } Slot_00329E90;
 
-extern Slot_00329E90 D_L00_00268E20[];
-extern int D_L00_001A902C[] __attribute__((sda));
+extern Slot_00329E90 g_level_slot_table[];
+extern int g_double_buffer_index[] __attribute__((sda));
 
 /* Finds or frees one of the two slots for this entity and returns its number; tells the caller if the slot was already its own. */
 int AcquireEntitySlot(char *entity, void (*callback)(Slot_00329E90 *), int *out) {
@@ -17,24 +17,24 @@ int AcquireEntitySlot(char *entity, void (*callback)(Slot_00329E90 *), int *out)
     Slot_00329E90 *rec;
 
     for (tries = 0; tries < 2; tries++) {
-        g = D_L00_001A902C[0];
-        id = D_L00_00268E20[g].id;
+        g = g_double_buffer_index[0];
+        id = g_level_slot_table[g].id;
         if (id == -1 || id == *(short *)(entity + 0xAA)) {
             *out = id != -1;
-            D_L00_00268E20[g].id = *(short *)(entity + 0xAA);
-            D_L00_00268E20[g].callback = callback;
-            D_L00_001A902C[0] = (D_L00_001A902C[0] + 1) % 2;
+            g_level_slot_table[g].id = *(short *)(entity + 0xAA);
+            g_level_slot_table[g].callback = callback;
+            g_double_buffer_index[0] = (g_double_buffer_index[0] + 1) % 2;
             return g;
         }
-        D_L00_001A902C[0] = (g + 1) % 2;
+        g_double_buffer_index[0] = (g + 1) % 2;
     }
-    rec = &D_L00_00268E20[D_L00_001A902C[0]];
+    rec = &g_level_slot_table[g_double_buffer_index[0]];
     if (rec->callback != 0)
         rec->callback(rec);
-    last = D_L00_001A902C[0];
+    last = g_double_buffer_index[0];
     *out = 0;
-    D_L00_00268E20[last].id = *(short *)(entity + 0xAA);
-    D_L00_00268E20[last].callback = callback;
-    D_L00_001A902C[0] = (D_L00_001A902C[0] + 1) % 2;
+    g_level_slot_table[last].id = *(short *)(entity + 0xAA);
+    g_level_slot_table[last].callback = callback;
+    g_double_buffer_index[0] = (g_double_buffer_index[0] + 1) % 2;
     return last;
 }

@@ -1,15 +1,15 @@
 #include "common.h"
 typedef int quad __attribute__((mode(TI)));
 typedef union { quad q; struct { f32 x, y, z, w; } v; } RingPoint;
-extern f32 D_L16_001B2008 __attribute__((sda));
-extern u32 D_L16_001B2000 __attribute__((sda));
-extern s32 D_L16_001B1FF8 __attribute__((sda));
-extern u32 D_L16_001B2004[] MACRO_ADDR;
-extern s32 D_L16_001B1FFC[] MACRO_ADDR;
-extern f32 D_L16_001B200C[] MACRO_ADDR;
-extern f32 D_L16_001B2010[] MACRO_ADDR;
-extern f32 D_L16_001B2014[] MACRO_ADDR;
-extern RingPoint D_L16_001A8F20 MACRO_ADDR;
+extern f32 g_ribbon_inner_uv_start __attribute__((sda));
+extern u32 g_ribbon_l16_inner_color __attribute__((sda));
+extern s32 g_ribbon_l16_param_a __attribute__((sda));
+extern u32 g_ribbon_l16_outer_color[] MACRO_ADDR;
+extern s32 g_ribbon_l16_param_b[] MACRO_ADDR;
+extern f32 g_ribbon_inner_uv_end[] MACRO_ADDR;
+extern f32 g_ribbon_outer_uv_start[] MACRO_ADDR;
+extern f32 g_ribbon_outer_uv_end[] MACRO_ADDR;
+extern RingPoint g_particle_template MACRO_ADDR;
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern void FastVecAdd(char *, char *, char *);
@@ -36,21 +36,21 @@ void SweepAndDrawRibbonRing(char *self) {
         point->v.y = math_fast_sin_or_cos_b(angle) * *(f32 *)(st + 0x2C);
         point->v.z = 0;
         FastVecAdd((char *)point, (char *)point, self + 0x10);
-        point->v.w = D_L16_001B2008;
+        point->v.w = g_ribbon_inner_uv_start;
     }
     qcopy(&points[32], &points[0]);
     for (j = 0; j < 32; j++) {
-        make_hit_descriptor(collision, self, 1, (char *)&D_L16_001A8F20, *(f32 *)(st + 0x28));
+        make_hit_descriptor(collision, self, 1, (char *)&g_particle_template, *(f32 *)(st + 0x28));
         collision[24] = 0;
         collision[25] = 1;
         *(u16 *)(collision + 26) = *(u16 *)(self + 0xAA);
         CollLine((char *)&points[j], (char *)&points[j + 1], 9, self, collision);
     }
-    inner = FastTweenColor(D_L16_001B2000 & 0xFFFFFF, D_L16_001B2000, *(f32 *)(st + 0x30));
-    outer = FastTweenColor(D_L16_001B2004[0] & 0xFFFFFF, D_L16_001B2004[0], *(f32 *)(st + 0x30));
-    DrawTwoLayerPolylineRibbon((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
-                      D_L16_001B2008, D_L16_001B200C[0], *(f32 *)(st + 0x34));
-    for (k = 31; k >= 0; k--) points[k].v.w = D_L16_001B2010[0];
-    DrawTwoLayerPolylineRibbon((char *)points, D_L16_001B1FF8, D_L16_001B1FFC[0], 33, inner, outer,
-                      D_L16_001B2010[0], D_L16_001B2014[0], -*(f32 *)(st + 0x34));
+    inner = FastTweenColor(g_ribbon_l16_inner_color & 0xFFFFFF, g_ribbon_l16_inner_color, *(f32 *)(st + 0x30));
+    outer = FastTweenColor(g_ribbon_l16_outer_color[0] & 0xFFFFFF, g_ribbon_l16_outer_color[0], *(f32 *)(st + 0x30));
+    DrawTwoLayerPolylineRibbon((char *)points, g_ribbon_l16_param_a, g_ribbon_l16_param_b[0], 33, inner, outer,
+                      g_ribbon_inner_uv_start, g_ribbon_inner_uv_end[0], *(f32 *)(st + 0x34));
+    for (k = 31; k >= 0; k--) points[k].v.w = g_ribbon_outer_uv_start[0];
+    DrawTwoLayerPolylineRibbon((char *)points, g_ribbon_l16_param_a, g_ribbon_l16_param_b[0], 33, inner, outer,
+                      g_ribbon_outer_uv_start[0], g_ribbon_outer_uv_end[0], -*(f32 *)(st + 0x34));
 }

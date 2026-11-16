@@ -51,12 +51,12 @@ extern int menu_draw_two_line_panel(void);
 extern Hero6A28 g_hero_state;
 extern char g_hero_position[];
 /* Entity pool base (256-byte entries): absolute and $gp-relative views. */
-extern char *D_L03_001B2A1C MACRO_ADDR;
+extern char *g_moby_record_base MACRO_ADDR;
 extern char *D_L03_001B2A1C_GP SDATA(D_L03_001B2A1C);
-extern char *D_0018B650 NOT_SDA;
-extern int D_00138324 NOT_SDA;
-extern AimState6A28 D_L03_001B9840;
-extern char D_L03_003C7010[];
+extern char *g_held_object_ptr NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
+extern AimState6A28 g_hero_l03_state_alias;
+extern char g_str_camera_console_entry[];
 
 /* Updates a camera console. When the player stands in front of it and presses the button, the view switches to a remote camera, and it switches back on the next press. */
 void camera_console_update(char *obj)
@@ -96,7 +96,7 @@ void camera_console_update(char *obj)
                     break;
                 }
                 TryClaimNotice(8, 0x27A8, 1);
-                if (hero_is_allowed_for_mode(8) && (D_00138324 & 0x10)) {
+                if (hero_is_allowed_for_mode(8) && (g_pad_held_flags & 0x10)) {
                     moby_set_state(obj, 3, -1);
                     *(Quad *)position = 0;
                     position[0] = 2.0f;
@@ -105,10 +105,10 @@ void camera_console_update(char *obj)
                     vec_clear_128(rotation);
                     rotation[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
                     hero_reset_position_and_direction(position, rotation, 0x31, 1);
-                    D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
+                    g_held_object_ptr = g_moby_record_base + (*(int *)vars << 8);
                     camera_select_remote_view(obj, camera_pos, camera_rot);
                     SetCamera5Pose(camera_pos, camera_rot, 1, 0, 0);
-                    console_start_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
+                    console_start_remote_view(g_moby_record_base + (*(int *)vars << 8));
                 }
             }
         }
@@ -116,14 +116,14 @@ void camera_console_update(char *obj)
 
     case 3:
         g_hero_state.mode = 5;
-        if (D_00138324 & 0x10) {
+        if (g_pad_held_flags & 0x10) {
             cam_set_mode_state(0);
             hero_reset_position_and_direction(g_hero_state.position, g_hero_state.rotation, 0, 1);
             g_hero_state.field1830 = 0;
-            console_end_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
-            D_L03_001B9840.f = 64.42f;
-            D_L03_001B9840.b1 = 1;
-            D_L03_001B9840.b0 = 0;
+            console_end_remote_view(g_moby_record_base + (*(int *)vars << 8));
+            g_hero_l03_state_alias.f = 64.42f;
+            g_hero_l03_state_alias.b1 = 1;
+            g_hero_l03_state_alias.b0 = 0;
             moby_set_state(obj, 2, -1);
             level_clear_table_entry(0);
         } else {
@@ -135,7 +135,7 @@ void camera_console_update(char *obj)
                 if (*(int *)(vars + 0x20) != -1)
                     moby_set_flag_bit(D_L03_001B2A1C_GP + (*(int *)(vars + 0x20) << 8), 1);
             }
-            level_set_table_entry(D_L03_003C7010, menu_draw_two_line_panel, 0);
+            level_set_table_entry(g_str_camera_console_entry, menu_draw_two_line_panel, 0);
         }
         break;
     }

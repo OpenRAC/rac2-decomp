@@ -14,7 +14,7 @@ void func_US2_L00_0030F228(void)
 extern int popup_update_position(int, int);
 
 /* Same bound-global dispatch as its neighbours, with its own base offset and handler. */
-int func_US2_L00_0030F258(int argument)
+int level_l00_call_module_handler_with_arg_11_us2(int argument)
 {
     int value = D_L00_001A904C_2;
 

@@ -12,11 +12,11 @@ typedef float f32;
 /* These bodies reach D_L03_001B2A1C with `lw $a2,0x3A2C($gp)`, which only a
  * -G8 unit emits; the same symbol is reached with an absolute `lui`/`lw` pair
  * inside func_L03_003F66D8 and func_L03_0041D128, so those stay in the -G0 file. */
-extern u8 *D_L03_001B2A1C __attribute__((sda));
+extern u8 *g_moby_record_base __attribute__((sda));
 
 /* The two words the entity's state is chosen by, both reached through $gp. */
-extern s32 D_L03_001B108C __attribute__((sda));
-extern u32 D_L03_001B1058 __attribute__((sda));
+extern s32 g_endako_boss_forced_behaviour __attribute__((sda));
+extern u32 g_endako_boss_initial_timer __attribute__((sda));
 
 extern void moby_set_state(void *entity, int a, int b);
 extern int math_random_int_below(int id);
@@ -33,11 +33,11 @@ extern int FloatToInt(float f);
 extern void value_set_and_smooth(void *entity, float *target, float f, int a, int b);
 
 /* The level's own float, reached through $gp. */
-extern float D_L03_001B1BF0 __attribute__((sda));
+extern float g_particle_fire_blend_scale __attribute__((sda));
 
 /* Two more of the level's floats, at +0x2C10 and +0x2C14 from $gp. */
-extern f32 D_L03_001B1C00 __attribute__((sda));
-extern f32 D_L03_001B1C04 __attribute__((sda));
+extern f32 g_robot_speed_scale __attribute__((sda));
+extern f32 g_robot_turn_scale __attribute__((sda));
 
 extern void hero_copy_field_to_moby(u8 *a0);
 extern s32 flag_is_third_pending_set();
@@ -52,7 +52,7 @@ typedef struct {
 } ParticleSetup;
 
 /* The stream table itself is `lui $v0,0x20 ; addiu $v0,$v0,-0x4A60` (absolute). */
-extern u8 *D_L03_001FB5A0[];
+extern u8 *g_entity_id_lists[];
 
 /* Picks the entity's next behaviour.  A global word chooses it when it is not
  * negative; else the state's own counters do, each one running down as it is
@@ -61,8 +61,8 @@ void boss_choose_next_behaviour(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     s32 sel;
 
-    if (D_L03_001B108C >= 0) {
-        sel = D_L03_001B108C;
+    if (g_endako_boss_forced_behaviour >= 0) {
+        sel = g_endako_boss_forced_behaviour;
     } else if (state[0x30A] != 0) {
         state[0x30A]--;
         sel = 1;
@@ -95,7 +95,7 @@ void boss_choose_next_behaviour(u8 *entity) {
         state[0x309] = math_random_int_below(2) + 1;
         break;
     case 2:
-        *(u32 *)(state + 0x2E4) = D_L03_001B1058;
+        *(u32 *)(state + 0x2E4) = g_endako_boss_initial_timer;
         moby_set_state(entity, 12, 5);
         state[0x309] = 1;
         break;
@@ -111,11 +111,11 @@ void sweeper_bot_mark_stream(u8 *entity) {
 
     if (entity[0x21] == 0xFF)
         return;
-    list = D_L03_001FB5A0[entity[0x21]];
+    list = g_entity_id_lists[entity[0x21]];
     if (list == 0)
         return;
     p = list;
-    base = D_L03_001B2A1C;
+    base = g_moby_record_base;
     for (;;) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
@@ -141,11 +141,11 @@ void rivet_bot_mark_stream(u8 *entity) {
     *(short *)(state + 0x330) = 0xF0;
     if (entity[0x21] == 0xFF)
         return;
-    list = D_L03_001FB5A0[entity[0x21]];
+    list = g_entity_id_lists[entity[0x21]];
     if (list == 0)
         return;
     p = list;
-    base = D_L03_001B2A1C;
+    base = g_moby_record_base;
     for (;;) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
@@ -187,7 +187,7 @@ void part_fire_blend_particles(u8 *entity) {
     if (timer <= 0xFFFE)
         *(u16 *)(entity + 0x96) = timer + 1;
     vec_transform_by_object_or_given(entity, buf, state + 0x1A0, 0);
-    f = buf[1] * D_L03_001B1BF0;
+    f = buf[1] * g_particle_fire_blend_scale;
     *(float *)(entity + 0xF0) = f;
     /* The four words the engine reads the particle's setup from, in the order the
      * original stores them. */
@@ -238,8 +238,8 @@ s32 entity_prepare_shot(u8 *entity) {
 
     if (flag_is_third_pending_set() == 0) {
         entity[0xA8] = 0xFF;
-        f1 = D_L03_001B1C00 * 0.00027777778450399637f;
-        f0 = D_L03_001B1C04 * 0.016666668f;
+        f1 = g_robot_speed_scale * 0.00027777778450399637f;
+        f0 = g_robot_turn_scale * 0.016666668f;
         v0 = *(s16 *)(state + 0x24);
         *(u16 *)(state + 0x98) = 0;
         *(f32 *)(state + 0x138) = f0;
@@ -267,10 +267,10 @@ typedef struct {
     u8 *field194;
 } L03Block;
 
-extern L03Block D_L03_001BD680;
+extern L03Block g_endako_state;
 
 /* The level's mode word, reached through $gp. */
-extern s32 D_L03_001A8F00 __attribute__((sda));
+extern s32 g_hero_l03_mode __attribute__((sda));
 
 extern void func_3133D0(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 func_3240F0(u8 *a0);
@@ -288,18 +288,18 @@ void scripted_light_update(u8 *entity) {
         entity[0x20] = 1;
         return;
     case 1: {
-        s32 mode = D_L03_001A8F00;
+        s32 mode = g_hero_l03_mode;
 
         if (mode == 2) {
-            if (D_L03_001BD680.field30 == 5) {
-                if (D_L03_001BD680.field34 < 10) {
-                    *(u16 *)(D_L03_001BD680.field194 + 0x7C) = 0x3F;
+            if (g_endako_state.field30 == 5) {
+                if (g_endako_state.field34 < 10) {
+                    *(u16 *)(g_endako_state.field194 + 0x7C) = 0x3F;
                 }
             }
-            if (D_L03_001BD680.field30 == 7) {
-                u8 *obj = D_L03_001BD680.field190;
-                if (D_L03_001BD680.field34 < 0x427) goto other;
-                if (D_L03_001BD680.field34 >= 0x471) goto other;
+            if (g_endako_state.field30 == 7) {
+                u8 *obj = g_endako_state.field190;
+                if (g_endako_state.field34 < 0x427) goto other;
+                if (g_endako_state.field34 >= 0x471) goto other;
                 old = *(s32 *)state;
                 next = old + 1;
                 *(s32 *)state = next;
@@ -318,7 +318,7 @@ void scripted_light_update(u8 *entity) {
                 func_3133D0(obj, arg1, arg2, arg3);
                 return;
             other:
-                if (D_L03_001BD680.field34 < 0x44C) {
+                if (g_endako_state.field34 < 0x44C) {
                     *(s32 *)(state + 4) = func_3240F0(obj);
                 } else {
                     func_324138(obj, *(s32 *)(state + 4));

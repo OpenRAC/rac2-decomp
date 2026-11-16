@@ -28,13 +28,13 @@
 extern void object_destroy_array(void *, s32);
 extern void pool_free_cell(s32, s32);
 
-extern s8 D_001ADA38[];
+extern s8 g_object_derived_table_c[];
 
 /* Sets the object type pointer, releases the attached data when it is not in use and runs the shared base cleanup. */
 void object_release_unused_data_cleanup(void *obj, s32 flags) {
     s32 attached;
 
-    (*(s32 *)((char *)(obj) + (0x30))) = (s32)D_001ADA38;
+    (*(s32 *)((char *)(obj) + (0x30))) = (s32)g_object_derived_table_c;
     attached = (*(s32 *)((char *)(obj) + (0x2C)));
     if ((attached != 0) && ((*(s32 *)((char *)(obj) + (0x38))) == 0)) {
         pool_free_cell(attached, (*(s32 *)((char *)(obj) + (0x34))));

@@ -3,7 +3,7 @@
 #include "common.h"
 extern s32 FloatToInt(f32 a0);
 extern u8 *g_moby_l11_table;
-extern u8 D_L11_00188660[];
+extern u8 g_sound_l11_slot_table[];
 extern void *g_group_id_lists[];
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_a(f32);
@@ -11,7 +11,7 @@ extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 extern s32 PlayMobySound(s32, s32, u8 *);
 extern void snd_stop_voice(s32);
-extern s32 D_L11_001B0808 __attribute__((sda));
+extern s32 g_pulsing_platform_trigger_counter __attribute__((sda));
 
 /* Once the linked object is in state 2 and the shared step counter is in phase, moves the object
    through one cycle along its vector from its start position, keeping its sound playing; when its
@@ -34,13 +34,13 @@ void func_PAL_L11_003FC090(u8 *arg0) {
         *(u8 *)(self+0x20) = 1;
         *(f32 *)(vars+0xC) = 3.1415927410125732f;
         *(s32 *)(vars+0x10) = 0;
-        D_L11_001B0808 = 0;
+        g_pulsing_platform_trigger_counter = 0;
         qcopy(vars+0x20,self+0x10);
         *(s32 *)(vars+0x1C) = 0;
         /* fall through */
     case 1:
         if (*(s32 *)vars && *(u8 *)(target+0x20) == 2 &&
-            D_L11_001B0808 == FloatToInt(*(f32 *)(vars+4)*15.0f)) {
+            g_pulsing_platform_trigger_counter == FloatToInt(*(f32 *)(vars+4)*15.0f)) {
             *(u8 *)(self+0x20) = 2;
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             *(s32 *)(vars+0x10) = 0;
@@ -51,14 +51,14 @@ void func_PAL_L11_003FC090(u8 *arg0) {
         *(f32 *)(vars+0x10) += 0.062831864f;
         *(f32 *)(vars+0xC) = FastAddRotations(*(f32 *)(vars+0xC),0.062831864f);
         handle = *(s32 *)(vars+0x30);
-        entry = D_L11_00188660 + handle * 0x70;
+        entry = g_sound_l11_slot_table + handle * 0x70;
         if (*(u8 **)(entry+0x88) != self || !*(u8 *)(entry+0x74))
             *(s32 *)(vars+0x30) = PlayMobySound(0,4,self);
         if (*(f32 *)(vars+0x10) >= 6.2831854820251465f) {
             if (*(u8 *)(target+0x20) != 2) {
                 *(u8 *)(self+0x20) = 1;
                 if (*(s32 *)(vars+0x30) != -1) {
-                    u8 *sound = D_L11_00188660 + *(s32 *)(vars+0x30)*0x70;
+                    u8 *sound = g_sound_l11_slot_table + *(s32 *)(vars+0x30)*0x70;
                     if (*(u8 **)(sound+0x88) == self && *(u8 *)(sound+0x74))
                         snd_stop_voice(*(s32 *)(vars+0x30));
                 }
@@ -108,8 +108,8 @@ void func_PAL_L11_003FC090(u8 *arg0) {
                 } while (*list++ >= 0);
                 *(u8 *)(self+0x20) = 4;
             }
-            if (++D_L11_001B0808 > 104) D_L11_001B0808 = 0;
-        } else D_L11_001B0808 = 0;
+            if (++g_pulsing_platform_trigger_counter > 104) g_pulsing_platform_trigger_counter = 0;
+        } else g_pulsing_platform_trigger_counter = 0;
     }
 }
 
@@ -117,13 +117,13 @@ extern void func_PAL_L01_002EBFB8(s32, s32, s32, s32, s32);
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 math_fast_float_d(void *);
 extern s32 func_PAL_00289730(s32, s32);
-extern u16 D_0018CD60 NOT_SDA;
-extern u16 D_00194158 NOT_SDA;
-extern u16 D_0018D048 NOT_SDA;
-extern s32 D_L11_001B30C8 __attribute__((sda));
+extern u16 g_level_id_word NOT_SDA;
+extern u16 g_level_flag_word NOT_SDA;
+extern u16 g_arena_flag_word NOT_SDA;
+extern s32 g_arena_progress_level __attribute__((sda));
 extern u8 g_hero_position[];
-extern u8 D_001A7B00[0x38] __attribute__((sda));
-extern s32 D_L11_001A9010[] __attribute__((sda));
+extern u8 g_inventory_have_flags[0x38] __attribute__((sda));
+extern s32 g_arena_l11_active_flag[] __attribute__((sda));
 
 /* Queues Joba subtitles when inventory and cuboid gates permit, with retry timers. */
 void func_PAL_L11_00417778(u8 *object) {
@@ -138,25 +138,25 @@ void func_PAL_L11_00417778(u8 *object) {
     if (*(u8 *)(object + 0x20) != 1) {
         return;
     }
-    if (D_001A7B00[0]) {
+    if (g_inventory_have_flags[0]) {
         func_PAL_L01_002EBFB8(0x9FF, 0x56, 3, *(s32 *)(state + 0x4), -1);
     }
-    if (D_L11_001A9010[0] != 0 && D_L11_001B30C8 >= 3) {
-        D_0018CD60 = 0xFFFF;
+    if (g_arena_l11_active_flag[0] != 0 && g_arena_progress_level >= 3) {
+        g_level_id_word = 0xFFFF;
     }
     if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 0x0)) != 0) {
         if (math_fast_float_d(state + 0x8) != 0) {
-            if (D_00194158 == 0) {
+            if (g_level_flag_word == 0) {
                 func_PAL_00289730(0xA00, 0x57);
                 *(s32 *)(state + 0x8) = 0x15E;
             }
         }
     }
-    if (D_001A7B00[0x2E]) {
+    if (g_inventory_have_flags[0x2E]) {
         func_PAL_L01_002EBFB8(0xA03, 0x5A, 0, *(s32 *)(state + 0xC), -1);
     }
-    if (D_001A7B00[0xB]) {
-        if (D_0018D048 == 0) {
+    if (g_inventory_have_flags[0xB]) {
+        if (g_arena_flag_word == 0) {
             if (math_fast_float_d(state + 0x10) != 0) {
                 func_PAL_00289730(0xA3D, 0x94);
             }

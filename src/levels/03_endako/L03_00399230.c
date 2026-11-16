@@ -13,24 +13,24 @@ extern void part_emit_debris_burst(char *a0);
 extern void func_31B920(char *a0, s32 a1, s32 a2);
 extern f32  func_31BAE8(f32 a0, f32 a1);
 extern f32  func_2F0000(f32 a0, f32 a1);
-extern char D_L03_00188660[];
+extern char g_sound_l03_slot_table[];
 extern s32  func_312898(s32 a0, s32 a1, void *a2);
 extern void func_2EEFE0(char *a0, char *a1, void *a2);
-extern u8  *D_L03_001B2A1C;
+extern u8  *g_moby_record_base;
 extern f32  D_00189E20_19;
-extern u8   D_001395BF;
+extern u8   g_clank_scene_done_flag;
 extern void func_2BEE78(char *a0, char *a1, s32 a2, s32 a3);
 extern void func_2B8300(s32 a0, s32 a1, char *a2);
 extern void func_43B870(s32 a0);
 extern void func_32F140(s32 a0, s32 a1);
 extern char D_00189E20_11[];
-extern u8   D_001395C0;
-extern u8   D_001A7AFA;
-extern u8   D_001A7B32;
-extern u8   D_001A7AFB;
-extern u8   D_001A7B33;
-extern u8   D_001A7AFC;
-extern u8   D_001A7B34;
+extern u8   g_remote_view_done_flag;
+extern u8   g_barlow_hint_inside_flag;
+extern u8   g_unused_byte_c;
+extern u8   g_unused_byte_a;
+extern u8   g_unused_byte_d;
+extern u8   g_unused_byte_b;
+extern u8   g_unused_byte_e;
 extern void func_2B8510(s32 a0);
 extern void func_313378(s32 a0);
 extern void func_359FD0(char *a0, char *a1);
@@ -152,7 +152,7 @@ void ant_ring_update(char *moby)
         s32 active = *(s32 *)vars;
 
         if (active != 0) {
-            char *sound_slot = D_L03_00188660 + *(s32 *)(vars + 8) * 0x70;
+            char *sound_slot = g_sound_l03_slot_table + *(s32 *)(vars + 8) * 0x70;
 
             if (*(char **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
                 *(s32 *)(vars + 8) = func_360A80(0, 4, self);
@@ -259,7 +259,7 @@ void console_remote_view_cleanup(char *moby)
     hero = D_00189E20_11;
     *(u16 *)(hero + 0x24FC) = 0;
     func_313378(*(u8 *)(self + 0xB0));
-    D_001395C0 = 1;
+    g_remote_view_done_flag = 1;
     /* Resident bytes shared by all programs, written at their constant addresses
        (retail's lui $at,0x1A; sb form), as in 0033CB18.c. */
     *(u8 *)0x001A7B32 = 1;

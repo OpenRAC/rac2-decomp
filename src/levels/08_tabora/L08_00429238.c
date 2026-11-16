@@ -1,13 +1,13 @@
 #include "common.h"
 extern s32 g_beam_slot_state[] MACRO_ADDR;
-extern s32 D_L08_001B39B0[] MACRO_ADDR;
-extern s32 D_L08_001B39C0[] MACRO_ADDR;
-extern s32 D_L08_001B39D0[] MACRO_ADDR;
-extern s32 D_L08_001B39E0[] MACRO_ADDR;
-extern s32 D_L08_001B39F0[] MACRO_ADDR;
-extern s32 D_L08_001B3A00[] MACRO_ADDR;
-extern s32 D_L08_001B3A10[] MACRO_ADDR;
-extern s32 D_L08_001B3A20[] MACRO_ADDR;
+extern s32 g_beam_wave_angles[] MACRO_ADDR;
+extern s32 g_beam_twist_angles[] MACRO_ADDR;
+extern s32 g_beam_sway_angles[] MACRO_ADDR;
+extern s32 g_beam_start_light_ids[] MACRO_ADDR;
+extern s32 g_beam_end_light_ids[] MACRO_ADDR;
+extern s32 g_beam_light_masks[] MACRO_ADDR;
+extern s32 g_beam_modes[] MACRO_ADDR;
+extern s32 g_beam_phases[] MACRO_ADDR;
 extern s32 g_beam_slot_key[] MACRO_ADDR;
 
 /* Reserves a free beam slot for the given key and sets it up. Returns 0 if all slots are taken. */
@@ -23,14 +23,14 @@ s32 ClaimTaboraSlot(s32 key, s32 light_mask, s32 mode) {
     for (j = 0; j < 3; j++) {
         if (g_beam_slot_key[j] == 0) {
             g_beam_slot_key[j] = key;
-            D_L08_001B39B0[j] = 0;
-            D_L08_001B39C0[j] = 0;
-            D_L08_001B39D0[j] = 0;
-            D_L08_001B39E0[j] = -1;
-            D_L08_001B39F0[j] = -1;
-            D_L08_001B3A00[j] = light_mask;
-            D_L08_001B3A10[j] = mode;
-            D_L08_001B3A20[j] = 0;
+            g_beam_wave_angles[j] = 0;
+            g_beam_twist_angles[j] = 0;
+            g_beam_sway_angles[j] = 0;
+            g_beam_start_light_ids[j] = -1;
+            g_beam_end_light_ids[j] = -1;
+            g_beam_light_masks[j] = light_mask;
+            g_beam_modes[j] = mode;
+            g_beam_phases[j] = 0;
             g_beam_slot_state[j] = 1;
             return 1;
         }

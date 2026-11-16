@@ -77,7 +77,7 @@ extern s32 sceSifDmaStat(s32);
 
 extern s32 snd_send_cmd5a(s32, s32);
 
-extern volatile unsigned int D_L00_001AEB10 __attribute__((sda));
+extern volatile unsigned int g_mpeg_field_flag __attribute__((sda));
 
 typedef struct { int pos; int used; int size; } Ring;
 
@@ -86,7 +86,7 @@ extern void table_relocate_entries(void *);
 extern void pool_init_cells(void *, int, void *, int);
 extern int load_read_disc_with_pause(void *, void *, int);
 extern void *memset(void *, int, int);
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x1348]; char *data; int size; } InitData;
 extern InitData g_copy_setup_data;
 extern char *menu_init_seven_labels(void *);
@@ -332,7 +332,7 @@ char *menu_system_init(char *object)
     title_screen_destroy(part30);
     size = 0x3F490;
     end = object + size;
-    D_001A8CFC[0] = object;
+    g_resident_data_base[0] = object;
     *(char **)object = (char *)(((int)end + 3) & -4);
     *(int *)(object + 0x3F348) = size;
     load_read_disc_with_pause(object + 0x8710, g_copy_setup_data.data + g_copy_setup_data.offset, g_copy_setup_data.size);
@@ -479,23 +479,23 @@ void menu_attach_slot_packets(char *obj)
 
 extern volatile int g_screen_offset_x __attribute__((sda));
 extern volatile int g_screen_offset_y __attribute__((sda));
-extern char D_L00_001AC820[];
-extern char *D_L00_001B2608[] __attribute__((sda));
+extern char g_shadowed_sprite_packet[];
+extern char *g_render_list_tail[] __attribute__((sda));
 extern void mem_fast_helper_c(void *, void *, int);
 extern void tex_upload_object_textures(void *, int);
 /* Draws a menu sprite twice, first shifted for a shadow, then in place. */
 void gfx_draw_shadowed_sprite(void *unused, char *object)
 {
-    char *packet = D_L00_001AC820;
+    char *packet = g_shadowed_sprite_packet;
     *(int *)(packet + 0x20) = g_screen_offset_x + *(short *)(object + 0xB4);
     *(int *)(packet + 0x24) = g_screen_offset_y + *(short *)(object + 0xB6);
-    mem_fast_helper_c(D_L00_001B2608[0], packet, 48);
-    D_L00_001B2608[0] += 48;
+    mem_fast_helper_c(g_render_list_tail[0], packet, 48);
+    g_render_list_tail[0] += 48;
     tex_upload_object_textures(object, 1);
     *(int *)(packet + 0x20) = g_screen_offset_x;
     *(int *)(packet + 0x24) = g_screen_offset_y;
-    mem_fast_helper_c(D_L00_001B2608[0], packet, 48);
-    D_L00_001B2608[0] += 48;
+    mem_fast_helper_c(g_render_list_tail[0], packet, 48);
+    g_render_list_tail[0] += 48;
 }
 
 
@@ -518,12 +518,12 @@ int mpeg_is_audio_buffer_full(void) {
 
 /* func_0034F408 is in 0034CEA0-movie-init.c. */
 
-extern char D_001AE820[];
+extern char g_str_mpeg_debug_value[];
 extern void STUB_printf(void *, int);
 
 /* Passes a number on to a debug print helper. */
 void mpeg_set_debug_value(int value) {
-    STUB_printf(D_001AE820, value);
+    STUB_printf(g_str_mpeg_debug_value, value);
 }
 
 extern char *g_movie_player_state[] __attribute__((sda));
@@ -623,7 +623,7 @@ void mpeg_send_audio_block_to_spu(u8 *a0, s32 a1, s32 a2, s32 a3) {
 }
 
 /* sendADPCM(_AudioDec *) */
-extern s32 D_001B23D4 __attribute__((section(".sdata")));
+extern s32 g_movie_audio_buffer __attribute__((section(".sdata")));
 extern s32 snd_send_cmd5b(void);
 
 /* Feeds the movie sound data to the sound chip in blocks, one per channel. */
@@ -654,7 +654,7 @@ void mpeg_send_audio_blocks(void *object) {
             count = 0;
             src = (u8 *)o[13] + (o[14] - o[15] + o[16]) % o[16];
             src += i * o[7];
-            dst = (u8 *)D_001B23D4;
+            dst = (u8 *)g_movie_audio_buffer;
             do {
                 s32 k;
                 for (k = 0; k < o[7]; k++) {
@@ -664,13 +664,13 @@ void mpeg_send_audio_blocks(void *object) {
                 src += o[7] * (o[6] - 1);
             } while (count < 0x400);
             if (o[24] + 0x400 == 0x1000)
-                ((u8 *)D_001B23D4)[0x3F1] = 3;
+                ((u8 *)g_movie_audio_buffer)[0x3F1] = 3;
             if (o[24] == 0) {
-                u8 *p = (u8 *)D_001B23D4;
+                u8 *p = (u8 *)g_movie_audio_buffer;
                 p[1] = 6;
                 p[0x11] = 2;
             }
-            mpeg_send_audio_block_to_spu((u8 *)o, D_001B23D4, 0x400, (i << 12) + o[24]);
+            mpeg_send_audio_block_to_spu((u8 *)o, g_movie_audio_buffer, 0x400, (i << 12) + o[24]);
         }
         t = next;
         o[15] -= o[6] * 1024;
@@ -687,20 +687,20 @@ void mpeg_send_audio_blocks(void *object) {
 
 extern int sceGsSyncV(int);
 extern int g_widescreen_flag __attribute__((sda));
-extern volatile int D_001AE7D0[] __attribute__((sda));
-extern volatile int D_001AE7D4[] __attribute__((sda));
+extern volatile int g_mpeg_field_wait_flag[] __attribute__((sda));
+extern volatile int g_mpeg_vblank_count[] __attribute__((sda));
 
 /* Waits for the right screen field, then lets the movie start showing frames. */
 void mpeg_wait_for_field_start(int value)
 {
     while (sceGsSyncV(0) == value && g_widescreen_flag == 0) {}
-    D_001AE7D0[0] = 1;
-    D_001AE7D4[0] = 0;
+    g_mpeg_field_wait_flag[0] = 1;
+    g_mpeg_vblank_count[0] = 0;
 }
 
 /* A19-sda-scalar-store-16 freshly exact-verified under family reservation */
 /* Clears a movie flag. */
-void mpeg_clear_flag(void) { D_L00_001AEB10 = 0; }
+void mpeg_clear_flag(void) { g_mpeg_field_flag = 0; }
 
 /* func_00350240 is in 0034CEA0-g8.c. */
 

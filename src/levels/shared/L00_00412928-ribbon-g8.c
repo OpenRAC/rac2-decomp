@@ -16,12 +16,12 @@ typedef struct {
 
 typedef struct { Vec row[3], pos; } Frame;
 
-extern unsigned D_L00_001B1380 __attribute__((sda));
-extern float D_L00_001B1384 __attribute__((sda));
-extern float D_L00_001B1388 __attribute__((sda));
-extern float D_L00_001B138C __attribute__((sda));
-extern int D_L00_001B13D0 __attribute__((sda));
-extern char D_L00_001B8C80[];
+extern unsigned g_wave_line_color __attribute__((sda));
+extern float g_wave_line_width_max __attribute__((sda));
+extern float g_wave_ribbon_width_start __attribute__((sda));
+extern float g_wave_ribbon_outline_scale __attribute__((sda));
+extern int g_wave_ribbon_second_alpha __attribute__((sda));
+extern char g_scalar_transition_state[];
 
 extern long GetEffectTextureDescriptor(int id);
 extern void FastVecSub(void *dst, void *a, void *b);
@@ -49,7 +49,7 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
     outer.tag3 = 0x8000000048ULL;
     outer.tag2 = 0xff9000000260ULL;
     outer.color[0] = outer.color[1] = outer.color[2] = outer.color[3] =
-        (D_L00_001B1380 & 0xffffff) | ((unsigned)alpha << 24);
+        (g_wave_line_color & 0xffffff) | ((unsigned)alpha << 24);
     outer.tag0 = 0;
     inner.texture = GetEffectTextureDescriptor(0xe);
     inner.color[0] = inner.color[1] = inner.color[2] = inner.color[3] =
@@ -75,10 +75,10 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
     outer.uv[3][1] = 1;
     size.q = 0;
     size.f[3] = 1;
-    size.f[2] = D_L00_001B1388;
+    size.f[2] = g_wave_ribbon_width_start;
     size2.q = 0;
     size2.f[3] = 1;
-    size2.f[2] = D_L00_001B1388 * D_L00_001B138C;
+    size2.f[2] = g_wave_ribbon_width_start * g_wave_ribbon_outline_scale;
 
     FastVecSub(&dir, state + 0x30, object + 0x10);
     vec_scale_to_length(&dir, &dir, 1);
@@ -96,7 +96,7 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
     transform_vector(&second, &points[1], &frame);
     FastVecSub(&segment.row[0], &second, &first);
     vec_scale_to_length(&segment.row[0], &segment.row[0], 1);
-    FastVecSub(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
+    FastVecSub(&segment.row[1], g_scalar_transition_state + 0x140, &first);
     FastVecCross(&segment.row[2], &segment.row[1], &segment.row[0]);
     vec_scale_to_length(&segment.row[2], &segment.row[2], 1);
     FastVecCross(&segment.row[1], &segment.row[0], &segment.row[2]);
@@ -118,7 +118,7 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
             transform_vector(&second, &points[i + 1], &frame);
             FastVecSub(&segment.row[0], &second, &first);
             vec_scale_to_length(&segment.row[0], &segment.row[0], 1);
-            FastVecSub(&segment.row[1], D_L00_001B8C80 + 0x140, &first);
+            FastVecSub(&segment.row[1], g_scalar_transition_state + 0x140, &first);
             FastVecCross(&segment.row[2], &segment.row[1], &segment.row[0]);
             vec_scale_to_length(&segment.row[2], &segment.row[2], 1);
             FastVecCross(&segment.row[1], &segment.row[0], &segment.row[2]);
@@ -129,7 +129,7 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
         transform_vector(&inner.v[2], &inner.v[2], &segment);
         transform_vector(&inner.v[3], &inner.v[3], &segment);
 
-        if (i == 1 && D_L00_001B13D0 == alpha2) {
+        if (i == 1 && g_wave_ribbon_second_alpha == alpha2) {
             /* Fade the ribbon's first edge out (alpha 0) for this draw only. */
             unsigned color, color2;
 
@@ -141,7 +141,7 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
             draw_world_quad(&inner, 0, 0);
             outer.color[0] = outer.color[1] = outer.color[2] = outer.color[3] = color;
             inner.color[0] = inner.color[1] = inner.color[2] = inner.color[3] = color2;
-        } else if (i == count - 2 && D_L00_001B13D0 == alpha2) {
+        } else if (i == count - 2 && g_wave_ribbon_second_alpha == alpha2) {
             /* Likewise its last edge. */
             unsigned color, color2;
 
@@ -165,8 +165,8 @@ void wave_line_draw_ribbon(char *object, Vec *points, int alpha, int alpha2, int
         progress = IntToFloat(i);
         progress /= IntToFloat(count);
         width = cubic_hermite_scalar(-1, 0, 1, 0, progress);
-        size.f[2] = D_L00_001B1388 + (D_L00_001B1384 - D_L00_001B1388) * width;
-        size2.f[2] = size.f[2] * D_L00_001B138C;
+        size.f[2] = g_wave_ribbon_width_start + (g_wave_line_width_max - g_wave_ribbon_width_start) * width;
+        size2.f[2] = size.f[2] * g_wave_ribbon_outline_scale;
         outer.uv[0][0] = *(float *)(state + 0x14);
         outer.uv[0][1] = 0;
         outer.uv[1][0] = *(float *)(state + 0x14);
@@ -208,20 +208,20 @@ typedef struct {
     Vec pos;
 } BoltState;
 
-extern unsigned char D_00139595[];
+extern unsigned char g_wave_line_weapon_index[];
 extern HitRecord g_weapon_l00_table[];
-extern char D_L00_001A8F20[] MACRO_ADDR;
+extern char g_default_vector[] MACRO_ADDR;
 extern char ref_L00_00413358_00[];
-extern float D_L00_001B1390 __attribute__((sda));
-extern float D_L00_001B1394 __attribute__((sda));
-extern float D_L00_001B1398 __attribute__((sda));
-extern float D_L00_001B13A0 __attribute__((sda));
-extern float D_L00_001B13A8 __attribute__((sda));
-extern float D_L00_001B13AC __attribute__((sda));
-extern float D_L00_001B13B4 __attribute__((sda));
-extern float D_L00_001B13B8 __attribute__((sda));
-extern float D_L00_001B13BC __attribute__((sda));
-extern float D_L00_001B13C0 __attribute__((sda));
+extern float g_wave_ribbon_noise_min __attribute__((sda));
+extern float g_wave_ribbon_noise_max __attribute__((sda));
+extern float g_wave_ribbon_base_amplitude __attribute__((sda));
+extern float g_wave_ribbon_phase1_speed __attribute__((sda));
+extern float g_wave_ribbon_phase2_step __attribute__((sda));
+extern float g_wave_ribbon_rate_scale __attribute__((sda));
+extern float g_wave_ribbon_phase3_step __attribute__((sda));
+extern float g_wave_ribbon_phase3_spread __attribute__((sda));
+extern float g_wave_ribbon_wave_amplitude __attribute__((sda));
+extern float g_wave_ribbon_wave_gain __attribute__((sda));
 
 extern float fast_vec_dist(void *a, void *b);
 extern float math_fast_sin_or_cos_b(float angle);
@@ -260,7 +260,7 @@ void UpdateWaveLineEffect(char *object)
             scratch.packet.flags = 0x810000;
             scratch.packet.enabled = 1;
             scratch.packet.owner = object;
-            scratch.packet.scale = ((HitRecord *)(D_00139595[0] * sizeof(HitRecord) + (int)g_weapon_l00_table))->scale;
+            scratch.packet.scale = ((HitRecord *)(g_wave_line_weapon_index[0] * sizeof(HitRecord) + (int)g_weapon_l00_table))->scale;
             FastVecSub(&scratch, &state->pos, object + 0x10);
             vec_scale_to_length(&scratch, &scratch, 1);
             scratch.vector.f[3] = 5627.925f;
@@ -276,20 +276,20 @@ void UpdateWaveLineEffect(char *object)
     point10 = point10 / IntToFloat(6);
     ratio = distance + (0.01f - distance) * point10;
     spacing = ratio / IntToFloat(10);
-    state->phase1 = FastAddRotations(state->phase1, D_L00_001B13A0 * step);
-    state->phase2 = fast_subtract_rotations(state->phase2, D_L00_001B13A8);
-    state->phase3 = FastAddRotations(state->phase3, D_L00_001B13B4);
+    state->phase1 = FastAddRotations(state->phase1, g_wave_ribbon_phase1_speed * step);
+    state->phase2 = fast_subtract_rotations(state->phase2, g_wave_ribbon_phase2_step);
+    state->phase3 = FastAddRotations(state->phase3, g_wave_ribbon_phase3_step);
     step = (360 / IntToFloat(10)) * step;
 
     for (line_idx = 0; line_idx < 10; line_idx++) {
         point10 = IntToFloat(line_idx);
         IntToFloat(10);
-        amp10 = D_L00_001B1398;
+        amp10 = g_wave_ribbon_base_amplitude;
         if (line_idx == 0 || line_idx == 9) {
             amp10 = 0;
         } else {
             amp10 *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase1 + point10 * step));
-            amp10 += math_random_signed_float_range(0, D_L00_001B1394);
+            amp10 += math_random_signed_float_range(0, g_wave_ribbon_noise_max);
         }
         state->line[line_idx].f[2] = amp10;
         state->line[line_idx].f[1] = 0.0f;
@@ -299,13 +299,13 @@ void UpdateWaveLineEffect(char *object)
 
     for (wave_idx = 0; wave_idx < 19; wave_idx++) {
         point19 = IntToFloat(wave_idx);
-        rate19 = point19 * D_L00_001B13AC;
+        rate19 = point19 * g_wave_ribbon_rate_scale;
         state->wave[wave_idx].f[2] = 0.0f;
         phase19 = math_wrap_angle_to_pi(state->phase2 + rate19);
-        wave19 = D_L00_001B13BC * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * D_L00_001B13B8));
-        amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(D_L00_001B1390, D_L00_001B1394);
+        wave19 = g_wave_ribbon_wave_amplitude * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * g_wave_ribbon_phase3_spread));
+        amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(g_wave_ribbon_noise_min, g_wave_ribbon_noise_max);
         state->wave[wave_idx].f[2] += amp19;
-        state->wave[wave_idx].f[1] = D_L00_001B13C0 * math_fast_sin_or_cos_a(phase19);
+        state->wave[wave_idx].f[1] = g_wave_ribbon_wave_gain * math_fast_sin_or_cos_a(phase19);
         state->wave[wave_idx].f[0] = spacing * point19;
         state->wave[wave_idx].f[3] = 1;
     }
@@ -334,6 +334,6 @@ void UpdateWaveLineEffect(char *object)
             sign = -sign;
         }
         burst = math_random_float_range(0.15f, 3);
-        part_spawn_ground_effect(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, D_L00_001A8F20, 0, 0);
+        part_spawn_ground_effect(&state->pos, 12, state->color | 0x7F000000, 0, burst * 0.1f, burst, sign, g_default_vector, 0, 0);
     }
 }

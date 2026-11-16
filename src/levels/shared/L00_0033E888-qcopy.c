@@ -14,7 +14,7 @@ extern Particle *part_alloc(int);
 extern int FloatToInt(float);
 extern int func_001163B0(void);
 extern float IntToFloat(int);
-extern unsigned char *D_L00_001FEAAC;
+extern unsigned char *g_spinning_particle_bytes;
 
 /* Creates a spinning particle with a position, speed, color, size and life. It does nothing if the size is zero. */
 Particle *part_spawn_spinning_particle(float life,float rotation,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
@@ -32,7 +32,7 @@ Particle *part_spawn_spinning_particle(float life,float rotation,Quad *position,
         p->b1=0;
         p->life=life;
         p->seed=func_001163B0();
-        if(texture==-1) p->b2=*D_L00_001FEAAC; else p->b2=D_L00_001FEAAC[texture];
+        if(texture==-1) p->b2=*g_spinning_particle_bytes; else p->b2=g_spinning_particle_bytes[texture];
         out=p->payload;
         p->size=size;
         *(short *)((char*)out+0x18)=size;

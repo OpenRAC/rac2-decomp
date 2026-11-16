@@ -19,7 +19,7 @@ extern int math_random_int_below(int);
 extern void ref_L03_003C4BD8_00(unsigned char *, void *);
 
 /* The position the tilt is measured from: a four-float vector in the boot's resident data. */
-extern char D_L00_00189F00[];
+extern char g_zero_l00_vector[];
 
 void func_PAL_L03_003C8BE8(unsigned char *a0) {
     unsigned char *s0 = *(unsigned char **)(a0 + 0x68);
@@ -47,7 +47,7 @@ void func_PAL_L03_003C8BE8(unsigned char *a0) {
     }
 
     if (*(int *)(s0 + 0x390) != 0) {
-        ref_L03_003C4BD8_00(a0, D_L00_00189F00);
+        ref_L03_003C4BD8_00(a0, g_zero_l00_vector);
     } else {
         u = *(float *)(s0 + 0x38C);
         v = *(float *)(s0 + 0x388);

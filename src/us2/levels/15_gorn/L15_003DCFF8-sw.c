@@ -7,9 +7,9 @@ struct L02NearObject;
 struct L02GroupObject;
 extern char g_hero_state[] NOT_SDA;
 typedef struct { char pad[0x18]; char *hit; int count; } L02Collision;
-extern L02Collision D_L15_001BFC00;
-extern char *D_L15_001FE480[];
-extern int D_L15_001B2148[] __attribute__((sda));
+extern L02Collision g_hit_l15_result;
+extern char *g_path_l15_table[];
+extern int g_gorn_challenge_count[] __attribute__((sda));
 extern int linked_child_update(char *), moby_compute_aligned_direction(char *, void *);
 extern void moby_update_glow_pulse_timers(char *), turret_l02_aim_at_hero(char *), moby_set_random_spread_velocity(char *, void *), linked_effect_update(char *);
 extern void moby_delay_group_except_nearest(struct L02NearObject *), moby_randomize_group_timers(struct L02GroupObject *), moby_teleport_to_new_pose(char *, void *, void *);
@@ -21,7 +21,7 @@ extern int moby_dispatch_action_by_kind(void *, void *);
 extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
 extern int moby_l01_turn_toward_target(char *, char *), moby_start_effect_from_entry(int, float), moby_move_to_target_temp_limits(void *, void *, int, float, float, float), moby_check_target_point_from_offset(char *, void *);
 extern float mat_fast_helper_a(float, float), FastDiffRots(float, float), fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), math_fabs(float), FastVecDot(void *, void *), moby_get_anim_value(char *);
-extern int CollLine(void *, void *, int, char *, void *), moby_is_in_special_class_range(char *), func_US2_002AF9C8(char *, float), IsPointInCuboid(void *, int), path_follow_nodes(char *, char *), coll_check_object_inside_polygon(u8 *);
+extern int CollLine(void *, void *, int, char *, void *), moby_is_in_special_class_range(char *), math_is_value_within_step_us2(char *, float), IsPointInCuboid(void *, int), path_follow_nodes(char *, char *), coll_check_object_inside_polygon(u8 *);
 extern int coll_test_hit_at_bone(float, float, float, void *, void *, int, int, int, int);
 extern void moby_transform_joint_point(char *, int, char *), moby_transform_joint_to_world(char *, int, char *), FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float), FastVecScale(void *, void *, float);
 extern void *part_spawn_trail_effect_moby(void *, void *, void *, float, float, float, int, int, int);
@@ -31,7 +31,7 @@ typedef struct {
     u8 gap_22a0[0x1FC]; char *pointer_249c;
 } L02_ResidentCombatPrefix;
 
-void func_US2_L15_003DCFF8(char *self) {
+void ranged_l15_enemy_update_us2(char *self) {
     /* One frame area, two layouts: the aiming states and the case-21 hand-off. */
     union {
         struct { Vector muzzle, velocity, acceleration, transform[4]; } aim;
@@ -178,8 +178,8 @@ void func_US2_L15_003DCFF8(char *self) {
         if (!*(short *)(state + 0x378) && *(u16 *)(self + 0x96) > 15) {
             moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
             contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 16, self, 0);
-            if (contact && D_L15_001BFC00.hit && *(short *)(D_L15_001BFC00.hit + 0xAA) == 0xC1B) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
-            if (contact && (col = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
+            if (contact && g_hit_l15_result.hit && *(short *)(g_hit_l15_result.hit + 0xAA) == 0xC1B) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
+            if (contact && (col = &g_hit_l15_result)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
                 if (!col->hit || (!moby_is_in_special_class_range(col->hit) && (!*(char **)(col->hit + 0x24) || *(short *)(*(char **)(col->hit + 0x24) + 0x46) != 22))) break;
             }
             { moby_set_state((u8 *)self, 11, -1); break; }
@@ -204,9 +204,9 @@ void func_US2_L15_003DCFF8(char *self) {
             qcopy(state + 0x360,state + 0x1F0); *(float *)(state + 0x368) += 0.5f;
         }
         turret_l02_aim_at_hero(self);
-        if ((D_L15_001B2148[0] & 15) == (((int)self >> 8) & 15))
+        if ((g_gorn_challenge_count[0] & 15) == (((int)self >> 8) & 15))
  moby_randomize_group_timers((struct L02GroupObject *)self);
-        if (func_US2_002AF9C8(self, 5)) {
+        if (math_is_value_within_step_us2(self, 5)) {
             moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
             FastVecSub(&work.aim.velocity, state + 0x360, &work.aim.muzzle); vec_scale_to_length(&work.aim.velocity, &work.aim.velocity, 0.23333334922790527f);
             FastVecScale(&work.aim.acceleration, &work.aim.velocity, 0.25f);
@@ -220,7 +220,7 @@ void func_US2_L15_003DCFF8(char *self) {
         if (!(((u8 *)self)[0x60] & 2)) break;
         moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
         collision = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 0, self, 0);
-        if (FastDecTimer((short *)(state + 0x380)) || (collision && D_L15_001BFC00.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
+        if (FastDecTimer((short *)(state + 0x380)) || (collision && g_hit_l15_result.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
             *(short *)(state + 0x378) += 15; { if (!math_random_int_below(3)) moby_set_state((u8 *)self, 12, -1); else moby_set_state((u8 *)self, 13, -1); break; }
         } else {
             angle = mat_fast_helper_a(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));
@@ -269,7 +269,7 @@ void func_US2_L15_003DCFF8(char *self) {
         if (IsPointInCuboid(&((L02_ResidentCombatPrefix *)g_hero_state)->position_80, *(int *)(state + 0x324)) || *(int *)(state + 0x204) == 1) { moby_set_state((u8 *)self, 18, -1); break; }
         break;
     case 18:
-        path = D_L15_001FE480[*(int *)(state + 0x320)];
+        path = g_path_l15_table[*(int *)(state + 0x320)];
         if (flag_set_first_pending((u8 *)self)) { if (((u8 *)self)[0x43] != 6) anim_start_blended(self, 6, 0, 20); coll_check_object_inside_polygon((u8 *)self); }
         if (!(vec_distance_xy(self + 0x10, path + *(int *)path * 16) < *(float *)(state + 0x134)) && !path_follow_nodes(self, path)) break;
 
@@ -306,7 +306,7 @@ void func_US2_L15_003DCFF8(char *self) {
     case 21:
         if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 10) anim_start_blended(self, 10, 0, 10);
         *(float *)(state + 0x278) = *(float *)(state + 0x37C);
-        if (func_US2_002AF9C8(self, 5)) {
+        if (math_is_value_within_step_us2(self, 5)) {
             if ((other = (char *)moby_find_group_in_state_13(*(int *)(state + 0x328))) != 0) {
                 moby_transform_joint_point(*(char **)(state + 0x370), 0, (char *)work.relay.frame);
                 vec_scale_to_length(&work.relay.direction, work.relay.frame, 0.23333334922790527f);

@@ -4,7 +4,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern float fast_vec_dist(char *, char *);
-extern int *D_L22_001FE940[];
+extern int *g_ship_path_table[];
 extern int list_is_key_missing(int);
 
 /* Finds the lane point closest to a position and copies it to the output. */
@@ -15,7 +15,7 @@ void lane_find_nearest_point(char *obj, char *out, char *pos, int flag) {
 
     for (i = 0; i < 0x20; i++) {
         if (flag == 0 || list_is_key_missing(i) != 0) {
-            int *list = D_L22_001FE940[*(int *)(slots + (i << 2))];
+            int *list = g_ship_path_table[*(int *)(slots + (i << 2))];
             int j;
 
             for (j = 0; j < *list; j++) {

@@ -2,14 +2,14 @@
 
 #include "common.h"
 extern int math_random_int_below(int);
-extern int D_001AF0FC __attribute__((sda));
+extern int g_nanotech_cooldown __attribute__((sda));
 extern void func_US2_002A7AA8(void *, int, int);
 extern int PickAmmoDropItem(void *, int *);
-extern char *func_US2_003210E0(void *, int, int, int);
+extern char *SpawnWeaponAmmoPickup_us2(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
  * halfword at +0xB4 before handing it to the state helper. */
-void func_US2_00312D68(unsigned char *self)
+void crate_drop_loot_us2(unsigned char *self)
 {
     unsigned char *data = *(unsigned char **)(self + 0x68);
     int item = *(short *)(data + 0xC6) == 0;
@@ -18,9 +18,9 @@ void func_US2_00312D68(unsigned char *self)
     if (*(short *)(self + 0xAA) == 0x1F5 || *(short *)(self + 0xAA) == 0x200)
         item = 0;
     if (item) {
-        if (D_001AF0FC >= 21)
+        if (g_nanotech_cooldown >= 21)
             i = 0;
-        else if (D_001AF0FC >= 11)
+        else if (g_nanotech_cooldown >= 11)
             i = 1;
         else
             i = 2;
@@ -56,7 +56,7 @@ void func_US2_00312D68(unsigned char *self)
             if (n > 0) {
                 i = n;
                 do {
-                    func_US2_003210E0(self + 0x10, item, -1, 0);
+                    SpawnWeaponAmmoPickup_us2(self + 0x10, item, -1, 0);
                     --i;
                 } while (i);
             }

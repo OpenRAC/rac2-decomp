@@ -21,7 +21,7 @@ typedef struct {
 } L17Player;
 
 extern L17Player g_hero_state;
-extern f32 D_L17_001B04BC SDATA(D_L17_001B04BC);
+extern f32 g_fan_var_value SDATA(D_L17_001B04BC);
 /* `sda` on an array of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui $r` / `lw $r,%lo($r)`), as retail has it in this -G0 unit; the limit
    word is loaded in a branch delay slot, so there it becomes the `$gp` form. The pool base is
@@ -42,8 +42,8 @@ extern u8 *D_L17_001B2C1C_base[] __asm__("D_L17_001B2C1C") __attribute__((sda));
 /* func_L17_0041EAA8 is defined in L17_003C7C70-g8.c. */
 
 typedef struct { unsigned char pad[0x464]; unsigned char flags[0]; } PickupFlags;
-extern PickupFlags D_L17_0021EBB0;
-extern unsigned char D_0019B4A8[], D_0013963C, D_001395B8[];
+extern PickupFlags g_level_l17_save_state;
+extern unsigned char g_moby_nibble_table[], g_grulch_reachable_flag, g_game_flag_table[];
 extern int g_current_map_index SDATA(D_001A79F0);
 typedef struct { unsigned char pad[0x20]; unsigned char state; unsigned char rest[0xDF]; } Entity;
 extern Entity *entity_base_ptr __asm__("D_L17_001B2C1C") __attribute__((sda));
@@ -54,12 +54,12 @@ extern int math_random_int_below(int);
 extern void vec_build_spherical_offset(void *,float,float,float);
 extern void *part_spawn_ground_effect(void *,int,unsigned,int,int,void *,float,float,float,int);
 extern float vec_distance_xy(void *,void *);
-extern void moby_set_flag_bit(void *,int),moby_set_state(void *,int,int),moby_mark_spawned(void *),func_US2_002B1880(int,int);
+extern void moby_set_flag_bit(void *,int),moby_set_state(void *,int,int),moby_mark_spawned(void *),value_set_entry_by_index_us2(int,int);
 extern int func_US2_00289840(int,int);
 /* Spins and sparkles an uncollected pickup; when the player comes within 1.5 units it bumps the
    pickup's saved count and triggers its linked entity, and when inactive it removes itself once
    that entity dies. */
-void func_US2_L17_004203E8(unsigned char *o)
+void UpdateProximityPickup_us2(unsigned char *o)
 {
     int *s=*(int **)(o+0x68);
     unsigned short id;
@@ -71,9 +71,9 @@ void func_US2_L17_004203E8(unsigned char *o)
     float pos[4] __attribute__((aligned(16)));
     if(o[0x20]!=0) goto inactive;
     id=*(unsigned short *)(o+0xb2);
-    if(D_L17_0021EBB0.flags[(short)id]!=0) goto remove_self;
+    if(g_level_l17_save_state.flags[(short)id]!=0) goto remove_self;
     {
-        bits=D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)];
+        bits=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)];
         if(id&1) bits=(bits>>4)&7; else bits=bits&7;
         if(bits) goto remove_self;
         position=o+0x10;
@@ -97,13 +97,13 @@ void func_US2_L17_004203E8(unsigned char *o)
             if(vec_distance_xy(position,g_hero_position)<1.5f) {
                 unsigned short pickupId;
                 unsigned char *counter;
-                D_0013963C=1;
+                g_grulch_reachable_flag=1;
                 pickupId=*(unsigned short *)(o+0xb2);
                 if(pickupId&1) {
-                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if(((*counter>>4)&7)!=7)*counter+=16;
                 } else {
-                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+D_0019B4A8;
+                    counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if((*counter&7)!=7)++*counter;
                 }
                 if(*(int *)s!=-1) {
@@ -128,9 +128,9 @@ inactive:
     }
 dead:
     {
-        func_US2_002B1880(0x1292,0x78);
-        count=D_001395B8[0x86]?1:2;
-        if(D_001395B8[0x89])--count;
+        value_set_entry_by_index_us2(0x1292,0x78);
+        count=g_game_flag_table[0x86]?1:2;
+        if(g_game_flag_table[0x89])--count;
         if(count>0)func_US2_00289840(0xa0f,0x66);else func_US2_00289840(0xa10,0x67);
         moby_mark_spawned(o);
     }

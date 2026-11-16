@@ -2,16 +2,16 @@
 
 
 #include "common.h"
-extern s32 *D_L12_001FEAC0[];
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
+extern s32 *g_path_zone_table[];
 extern s32 CollLine(void *from, void *to, s32 mode, void *self, s32 flags);
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern f32 math_fabs(f32);
 extern f32 vec_distance_xy(void *, void *);
 extern s32 math_random_int_range(s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
-extern s32 D_L12_001B20C0 __attribute__((sda));
-extern u8 D_001395DB;
+extern s32 g_spark_timer_min __attribute__((sda));
+extern u8 g_zone_event_flag;
 extern s32 math_random_int_below(s32);
 extern s32 FloatToInt(f32);
 extern void math_random_planar_offset(f32 *, f32);

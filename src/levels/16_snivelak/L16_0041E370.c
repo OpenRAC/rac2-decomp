@@ -6,7 +6,7 @@ typedef int s32;
 typedef float f32;
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, u32, s32);
-extern char D_L16_001A8F20[] __attribute__((sda));
+extern char g_particle_template[] __attribute__((sda));
 extern void part_spawn_masked_debris(f32, f32, f32, f32, char *, s32, char *, s32);
 extern int PlayMobySound(s32, s32, char *);
 extern void part_spawn_scaled_bolts(char *, s32, f32);
@@ -30,7 +30,7 @@ void triggered_l16_burst_update(char *self) {
         *(u8 *)(self + 0xA8) = 255;
         break;
     case 2:
-        part_spawn_masked_debris(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, D_L16_001A8F20, 255);
+        part_spawn_masked_debris(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, g_particle_template, 255);
         PlayMobySound(0, 0, self);
         part_spawn_scaled_bolts(self, 1, 0.0f);
         *(effect_quad *)direction = 0;

@@ -89,7 +89,7 @@ extern float FastVecDot(void *, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float math_fabs(float);
-extern int D_00138354;
+extern int g_hero_state_flags;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
 /* reads a scalar through DATA0 and, when it exceeds 0.001f, re-normalises the vector at DATA0 (and DATA0-112) from the elapsed float, clamping the amount at zero; otherwise it runs the plain refresh entry point. */
@@ -126,7 +126,7 @@ void func_PAL_L00_002B9508(void)
     if (x < 0.0f) x = 0.0f;
     limit = D_00189E20_9598.f1b0 * 0.00098f;
     limit += x * 0.00080000004f;
-    if (D_00138354) limit = 0.00044000003f;
+    if (g_hero_state_flags) limit = 0.00044000003f;
     if (D_00189E20_9598.f2294 == 19 && D_00189E20_9598.f1b8 < 12 && D_00189E20_9598.f170 < 0.060000002f)
         limit = 0.0044f;
     if (D_00189E20_9598.f170 > 0.11800001f) limit = 0.0052000005f;

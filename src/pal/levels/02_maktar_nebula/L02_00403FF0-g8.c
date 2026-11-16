@@ -11,31 +11,31 @@ extern void text_draw_window_large(char *, long long, char *, int);
 extern void text_draw_window_small(char *, long long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int arena_get_challenge_save_index(int);
-extern unsigned char D_001395B8[0x100];
-extern unsigned char D_PAL_001A7C3C;
-extern int D_PAL_L02_001B14D0[2] __attribute__((sda));
-extern float D_PAL_L02_001B14C8 __attribute__((sda));
-extern int D_PAL_L02_001B14CC __attribute__((sda));
-extern int D_PAL_L02_001B14E8 __attribute__((sda));
-extern int D_PAL_L02_001B14EC __attribute__((sda));
-extern int D_PAL_L02_001B14F0 __attribute__((sda));
-extern int D_PAL_L02_001B14F4 __attribute__((sda));
-extern int D_PAL_L02_001B14F8 __attribute__((sda));
-extern int D_PAL_L02_001B14FC __attribute__((sda));
-extern int D_PAL_L02_001B1500 __attribute__((sda));
-extern int D_PAL_L02_001B1508 __attribute__((sda));
-extern int D_PAL_L02_001B1518 __attribute__((sda));
-extern int D_PAL_L02_001B150C;
-extern int D_PAL_L02_001B1510;
-extern int D_PAL_L02_001B1514;
-extern float D_PAL_L02_001B3EA4;
-extern int D_PAL_L02_001B3EA0;
-extern char D_PAL_L02_001B1258[];
-extern char D_PAL_L02_0028E790[];
+extern unsigned char g_game_flag_table[0x100];
+extern unsigned char g_pal_region_mode;
+extern int g_text_l02_x_by_mode[2] __attribute__((sda));
+extern float g_text_l02_print_scale __attribute__((sda));
+extern int g_text_l02_print_color __attribute__((sda));
+extern int g_text_l02_window_coord_a __attribute__((sda));
+extern int g_text_l02_window_large_param __attribute__((sda));
+extern int g_font_l02_window_flags_a __attribute__((sda));
+extern int g_text_l02_window_coord_b __attribute__((sda));
+extern int g_text_l02_window_small_param __attribute__((sda));
+extern int g_font_l02_window_flags_b __attribute__((sda));
+extern int g_text_l02_window_coord_c __attribute__((sda));
+extern int g_text_l02_window_coord_d __attribute__((sda));
+extern int g_font_l02_window_param_c __attribute__((sda));
+extern int g_text_l02_window_coord_e;
+extern int g_font_l02_window_param_a;
+extern int g_font_l02_window_param_b;
+extern float g_text_l02_layout_scale;
+extern int g_text_l02_layout_mode;
+extern char g_str_level_debug_format[];
+extern char g_str_l02_effect_texture[];
 
 static __inline__ int scaled_coord(int value, float scale, float half, int active)
 {
-    int mode = D_PAL_L02_001B3EA0;
+    int mode = g_text_l02_layout_mode;
     float scaled = (float)value * scale + half;
     int result = (int)scaled;
 
@@ -62,79 +62,79 @@ void func_PAL_L02_00403FF0(char *a0) {
     state = *(char **)(a0 + 0x68);
     text = (char *)GetLocalizedString(0xE6A);
     one = 1;
-    s = D_PAL_L02_001B3EA4;
-    x = (float)D_PAL_L02_001B14D0[D_PAL_001A7C3C];
-    r0 = scaled_coord(D_PAL_L02_001B14E8, s, half, one);
-    FontPrintScaled(x, (float)r0, D_PAL_L02_001B14CC, text, D_PAL_L02_001B14C8, -1,
-                  GetEffectTextureDescriptor(1), D_PAL_L02_0028E790);
-    s = D_PAL_L02_001B3EA4;
-    r1 = scaled_coord(D_PAL_L02_001B1508, s, half, one);
-    r2 = scaled_coord(D_PAL_L02_001B150C, s, half, one);
-    r3 = scaled_coord(D_PAL_L02_001B14F4, s, half, one);
-    FontSetWindow(buf1, r1, r2, D_PAL_L02_001B1510, D_PAL_L02_001B1514, D_PAL_L02_001B14F0, r3,
-                  D_PAL_L02_001B1518, 3);
-    if (*(short *)(state + 0x118) == 0 && D_001395B8[arena_get_challenge_save_index(0)] < 2) {
+    s = g_text_l02_layout_scale;
+    x = (float)g_text_l02_x_by_mode[g_pal_region_mode];
+    r0 = scaled_coord(g_text_l02_window_coord_a, s, half, one);
+    FontPrintScaled(x, (float)r0, g_text_l02_print_color, text, g_text_l02_print_scale, -1,
+                  GetEffectTextureDescriptor(1), g_str_l02_effect_texture);
+    s = g_text_l02_layout_scale;
+    r1 = scaled_coord(g_text_l02_window_coord_d, s, half, one);
+    r2 = scaled_coord(g_text_l02_window_coord_e, s, half, one);
+    r3 = scaled_coord(g_text_l02_window_coord_b, s, half, one);
+    FontSetWindow(buf1, r1, r2, g_font_l02_window_param_a, g_font_l02_window_param_b, g_font_l02_window_flags_a, r3,
+                  g_font_l02_window_param_c, 3);
+    if (*(short *)(state + 0x118) == 0 && g_game_flag_table[arena_get_challenge_save_index(0)] < 2) {
         text = (char *)GetLocalizedString(0xE6B);
-        text_draw_window_large(buf1, D_PAL_L02_001B14EC, text, func_001157AC(text));
+        text_draw_window_large(buf1, g_text_l02_window_large_param, text, func_001157AC(text));
     } else {
         text = (char *)GetLocalizedString(0xE87);
         msg = (char *)GetLocalizedString(0xE83);
-        sprintf(buf2, D_PAL_L02_001B1258, text, *(int *)(state + 0x110), msg);
-        text_draw_window_large(buf1, D_PAL_L02_001B14EC, buf2, func_001157AC(buf2));
+        sprintf(buf2, g_str_level_debug_format, text, *(int *)(state + 0x110), msg);
+        text_draw_window_large(buf1, g_text_l02_window_large_param, buf2, func_001157AC(buf2));
     }
     text = (char *)GetLocalizedString(0xE6C);
     {
         float half = 0.5f;
         int one = 1;
 
-        s = D_PAL_L02_001B3EA4;
-        r1 = scaled_coord(D_PAL_L02_001B1508, s, half, one);
-        r2 = scaled_coord(D_PAL_L02_001B150C, s, half, one);
-        r3 = scaled_coord(D_PAL_L02_001B1500, s, half, one);
-        FontSetWindow(buf1, r1, r2, D_PAL_L02_001B1510, D_PAL_L02_001B1514, D_PAL_L02_001B14FC, r3,
-                      D_PAL_L02_001B1518, 3);
+        s = g_text_l02_layout_scale;
+        r1 = scaled_coord(g_text_l02_window_coord_d, s, half, one);
+        r2 = scaled_coord(g_text_l02_window_coord_e, s, half, one);
+        r3 = scaled_coord(g_text_l02_window_coord_c, s, half, one);
+        FontSetWindow(buf1, r1, r2, g_font_l02_window_param_a, g_font_l02_window_param_b, g_font_l02_window_flags_b, r3,
+                      g_font_l02_window_param_c, 3);
     }
-    text_draw_window_small(buf1, D_PAL_L02_001B14F8, text, func_001157AC(text));
+    text_draw_window_small(buf1, g_text_l02_window_small_param, text, func_001157AC(text));
 }
 
 extern void moby_set_state(char *, int, int);
-extern char *D_L02_001B1190[] __attribute__((sda));
+extern char *g_arena_challenge_table_2[] __attribute__((sda));
 typedef unsigned char u8;
 typedef short s16;
 typedef int s32;
-extern char *D_L02_001B1190[2] __attribute__((sda));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern char *g_arena_challenge_table_2[2] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern s32 moby_is_state_six(char *);
 extern s32 moby_is_state_one_cleared_vars(char *);
 extern s32 math_random_int_below(s32);
 extern s32 moby_has_free_child_slot_state2(char *);
 extern s32 arena_is_entity_far_from_hero(char *);
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 extern int arena_get_challenge_save_index(int);
 extern int arena_start_announcer_message(char *, int);
 extern s32 g_frame_l02_counter;
 extern s32 math_random_int_range(s32, s32);
-extern s32 D_0018C2EC __attribute__((nosda));
+extern s32 g_request_enabled_flag __attribute__((nosda));
 extern s32 arena_start_announcer_message(char *, s32);
-extern s32 D_0018C0B4 __attribute__((nosda));
-extern u8 D_001395B8[];
+extern s32 g_game_mode __attribute__((nosda));
+extern u8 g_game_flag_table[];
 extern u8 g_item_slot_to_record[];
 typedef struct {
     char pad0[4];
     u8 f4;
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
-extern L02_003FF9A0_Rec D_L02_00264A70[];
+extern L02_003FF9A0_Rec g_material_l02_table[];
 extern s32 func_PAL_L00_002C4480(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_save_index(s32);
 extern s32 flag_is_byte_set(void);
-extern void func_PAL_L02_004011D8(char *);
+extern void arena_cancel_challenge_menu_pal(char *);
 extern void func_PAL_L02_00403FF0(char *);
 extern void gfx_add_draw_callback_first(void *, void *);
-extern const s32 D_L02_001B1524 __attribute__((sda));
-extern s32 D_L02_001B1530 __attribute__((sda));
-extern s32 D_001A7A00;
+extern const s32 g_actor_idle_message_count_limit __attribute__((sda));
+extern s32 g_actor_message_delay_base __attribute__((sda));
+extern s32 g_player_stats;
 extern s32 math_fast_float_d(void *);
 
 /* Calls func_PAL_L00_002C4480(0x6F, 1) unless D_0018C0B4 already is 0x6F.  When the input test
@@ -150,31 +150,31 @@ void func_PAL_L02_004042C0(char *a0) {
     s32 i;
     L02_003FF9A0_Rec *r;
 
-    if (D_0018C0B4 != 0x6F)
+    if (g_game_mode != 0x6F)
         func_PAL_L00_002C4480(0x6F, 1);
     if (PadPressedWithin(0x40, 0x32, 0) != 0) {
         moby_set_state(a0, 7, -1);
         for (i = *(s16 *)(state + 0x118) + 1; i < 0xE; i++) {
-            if (D_001395B8[arena_get_challenge_save_index(*(s32 *)(D_L02_001B1190[i] + 8))] == 0)
+            if (g_game_flag_table[arena_get_challenge_save_index(*(s32 *)(g_arena_challenge_table_2[i] + 8))] == 0)
                 continue;
             if (i >= 0xC && flag_is_byte_set() == 0)
                 continue;
             if (i == 7) {
-                r = &D_L02_00264A70[g_item_slot_to_record[0x1E]];
+                r = &g_material_l02_table[g_item_slot_to_record[0x1E]];
                 if (r->f4 == 0)
                     continue;
             }
             if (i == 8) {
-                r = &D_L02_00264A70[g_item_slot_to_record[0x2A]];
+                r = &g_material_l02_table[g_item_slot_to_record[0x2A]];
                 if (r->f4 == 0)
                     continue;
             }
             *(s16 *)(state + 0x118) = i;
-            D_001395B8[0x3C] = *(u8 *)(state + 0x118);
+            g_game_flag_table[0x3C] = *(u8 *)(state + 0x118);
             return;
         }
     } else if (PadPressedWithin(0x10, 0x32, 0) != 0) {
-        func_PAL_L02_004011D8(a0);
+        arena_cancel_challenge_menu_pal(a0);
     } else {
         gfx_add_draw_callback_first(func_PAL_L02_00403FF0, a0);
     }

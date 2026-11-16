@@ -1,5 +1,5 @@
 #include "common.h"
-extern int D_L16_001B1C38 __attribute__((sda));
+extern int g_ground_strip_texture_id __attribute__((sda));
 extern float math_random_signed_float_range(float,float);
 extern int FloatToInt(float);
 extern long long GetEffectTextureDescriptor(int);
@@ -56,7 +56,7 @@ void part_draw_ground_strip(char *moby, char *hit_point, float unused_scale, int
     fr.rec.f[6] = *(float *)(vars + 0x10) + 1.0f;
     fr.rec.f[7] = 1.0f;
 
-    texture_id = GetEffectTextureDescriptor(D_L16_001B1C38);
+    texture_id = GetEffectTextureDescriptor(g_ground_strip_texture_id);
     fr.rec.r = texture_id;
     fr.rec.s = 280993940374112LL;
     fr.t = 0x8000000048LL;

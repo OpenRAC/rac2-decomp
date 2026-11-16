@@ -10,7 +10,7 @@ extern f32 math_fast_sin_or_cos_b(f32 a0);
 
 extern f32 FastAddRotations(f32 a0, f32 a1);
 
-extern f32 D_L11_001B05DC __attribute__((sda));
+extern f32 g_joba_beam_center_length __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -31,7 +31,7 @@ void UpdateTwinRecordAnglesAndPositions(u8 *moby_arg) {
         {
             u8 *flagRecord = vars + i * 2;
             if (*(s16 *)(flagRecord + 0x278) != 1) {
-                vec_scale_to_length(center, (f32 *)(moby + 0xE0), D_L11_001B05DC);
+                vec_scale_to_length(center, (f32 *)(moby + 0xE0), g_joba_beam_center_length);
             }
         }
         next_index = i + 1;

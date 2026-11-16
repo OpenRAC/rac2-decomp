@@ -3,23 +3,23 @@
 #include "common.h"
 typedef int BurstQuad __attribute__((mode(TI)));
 typedef union { BurstQuad q; f32 f[4]; } BurstVec;
-extern s32 D_L01_001B19B0 __attribute__((sda));
-extern u8 D_L01_001B1990[8] __attribute__((sda));
-extern u8 D_L01_001B1988[8] __attribute__((sda));
-extern u8 D_L01_001B1980[8] __attribute__((sda));
+extern s32 g_spark_burst_flag_bit __attribute__((sda));
+extern u8 g_spark_piece_params_a[8] __attribute__((sda));
+extern u8 g_spark_piece_params_b[8] __attribute__((sda));
+extern u8 g_spark_piece_params_c[8] __attribute__((sda));
 extern void *part_spawn_object_following_effect(void *,void *,s32,s32,s32,s32,s32,s32,f32,f32);
 extern void moby_set_state(void *,s32,s32);
 extern void *part_find_owned_effect_slot(void *,s32,s32);
-extern void func_PAL_L00_0032C328(void *,void *,void *,void *,s32,s32,s32,s32,s32,s32,s32);
-extern void func_PAL_L00_003281C0(void *,s32,f32);
+extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,s32,s32,s32,s32,s32,s32,s32);
+extern void part_spawn_scaled_bolts_pal(void *,s32,f32);
 extern void moby_compute_local_point(void *,void *,f32,f32,f32);
-extern char *func_PAL_L00_003FB330(void *,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,f32,f32);
-extern void func_PAL_002AC718(void *,void *,void *,f32,f32,s32,s32,s32,f32,f32,f32,f32,s32,f32,s32,s32,s32,s32,s32);
+extern char *SpawnExplosion_pal(void *,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,s32,f32,f32);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,f32,f32,s32,s32,s32,f32,f32,f32,f32,s32,f32,s32,s32,s32,s32,s32);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void func_PAL_L00_00328480(void *,void *,f32,s32,s32,void *,f32,u32,s32,f32,f32);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L01_00418328(void *arg) {
+void spark_l01_burst_update_pal(void *arg) {
     BurstVec offset, tmp, up;
     f32 direction[4] __attribute__((aligned(16)));
     u8 *obj=arg;
@@ -39,12 +39,12 @@ void func_PAL_L01_00418328(void *arg) {
         obj[0xA8]=255;
         break;
     case 2:
-        func_PAL_L00_0032C328(obj,D_L01_001B1990,D_L01_001B1988,D_L01_001B1980,65535,0,D_L01_001B19B0,1,0xC7F,255,0);
-        func_PAL_L00_003281C0(obj,3,1.1f);
+        part_explode_object_into_pieces_pal(obj,g_spark_piece_params_a,g_spark_piece_params_b,g_spark_piece_params_c,65535,0,g_spark_burst_flag_bit,1,0xC7F,255,0);
+        part_spawn_scaled_bolts_pal(obj,3,1.1f);
         up.q=0; up.f[2]=0.20000002f;
         moby_compute_local_point(obj,&tmp,offset.f[0],offset.f[1],offset.f[2]);
-        func_PAL_L00_003FB330(&tmp,0,2,2,2,2,2,0,1,0,0,0,*(f32 *)(obj+0x2C),20.0f);
-        func_PAL_002AC718(obj,&up,&tmp,0,0,20,1,1,0,0,9.0f,0.75f,-1,0,0,0,-1,0,0x810001);
+        SpawnExplosion_pal(&tmp,0,2,2,2,2,2,0,1,0,0,0,*(f32 *)(obj+0x2C),20.0f);
+        SpawnExplosionEffects_pal(obj,&up,&tmp,0,0,20,1,1,0,0,9.0f,0.75f,-1,0,0,0,-1,0,0x810001);
         for(i=0;i<4;i++) {
             direction[0]=(i/2*2-1)*(0.040000003f);
             direction[1]=(i%2*2-1)*(0.040000003f);
@@ -52,8 +52,8 @@ void func_PAL_L01_00418328(void *arg) {
             matrix_mul_vec3(direction,direction,obj+0xC0);
             func_PAL_L00_00328480(obj,&tmp,0.25f,3,1,direction,5.0f,0x4080FF00,0,0.75f,1.25f);
         }
-        if(D_L01_001B19B0>=0) {
-            *(u16 *)(obj+0x7C)=(1<<D_L01_001B19B0)|0x8000;
+        if(g_spark_burst_flag_bit>=0) {
+            *(u16 *)(obj+0x7C)=(1<<g_spark_burst_flag_bit)|0x8000;
             moby_set_state(obj,3,-1);
         } else moby_mark_spawned(obj);
         break;

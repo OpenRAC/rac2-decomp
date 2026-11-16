@@ -4,8 +4,8 @@ typedef float Vector[4] __attribute__((aligned(16)));
 extern char g_sound_state[];
 typedef struct { unsigned char prefix[0x80]; Vector position; } PlayerPosition;
 extern PlayerPosition g_hero_state;
-extern char *D_L06_001BFC98;
-extern int D_L06_001B2348 MACRO_ADDR;
+extern char *g_hit_l06_result;
+extern int g_game_l06_frame_counter MACRO_ADDR;
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
 extern int hero_is_current_selected_id(void *);
@@ -74,7 +74,7 @@ void rising_l06_platform_update(char *moby)
     }
     if (coll_test_point(moby + 0x10, 1, moby, 2.1f) &&
         !(*(float *)(moby + 0x18) <= g_hero_state.position[2]) &&
-        (!D_L06_001BFC98 || *(short *)(D_L06_001BFC98 + 0xAA) != 0xEA3 /* moby class 3747 */))
+        (!g_hit_l06_result || *(short *)(g_hit_l06_result + 0xAA) != 0xEA3 /* moby class 3747 */))
         goto stop;
     {
         char *sound = g_sound_state + *(int *)(state + 0xB0) * 0x70;
@@ -117,7 +117,7 @@ stop:
     *(int *)(state + 0xB0) = -1;
     }
 done:
-    time = (float)D_L06_001B2348 * (1.0f / 60.0f);
+    time = (float)g_game_l06_frame_counter * (1.0f / 60.0f);
     phase = (int)time;
     wave = time - (float)phase;
     if (!(phase & 1))

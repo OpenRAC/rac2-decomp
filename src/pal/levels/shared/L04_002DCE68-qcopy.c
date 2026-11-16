@@ -25,9 +25,9 @@ extern void cam_offset_point_by_side_direction(void *, void *, float);
 extern float cam_get_view_space_vector_length(void *);
 extern void cam_set_view_space_height(void *, void *, float);
 extern void cam_set_view_space_vector_length(void *, void *, float);
-extern int D_001A8FF0 MACRO_ADDR;
-extern float D_001A7DC0 MACRO_ADDR;
-extern unsigned char D_L04_001B9540[];
+extern int g_hero_height_zone_active MACRO_ADDR;
+extern float g_hero_airborne_speed_limit MACRO_ADDR;
+extern unsigned char g_hero_l04_state[];
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
@@ -210,7 +210,7 @@ void func_PAL_L04_002DCE68(void) {
             }
         }
         (*(HopPlayer *)&g_hero_state).ground_speed = (*(HopPlayer *)&g_hero_state).flat_speed;
-    } else if ((*(HopPlayer *)&g_hero_state).state == 0x81 && !D_001A8FF0) {
+    } else if ((*(HopPlayer *)&g_hero_state).state == 0x81 && !g_hero_height_zone_active) {
         hero_steer_heading(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&g_hero_state).field494);
         (*(HopPlayer *)&g_hero_state).ground_speed = 0.0f;
     } else {
@@ -228,8 +228,8 @@ void func_PAL_L04_002DCE68(void) {
 
             qcopy(probe_start, (*(HopPlayer *)&g_hero_state).move_dir.f);
             if ((*(HopPlayer *)&g_hero_state).field1454) {
-                (*(HopPlayer *)&g_hero_state).move_yaw = (*(HopSavedState *)D_L04_001B9540).yaw;
-                qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopSavedState *)D_L04_001B9540).direction.f);
+                (*(HopPlayer *)&g_hero_state).move_yaw = (*(HopSavedState *)g_hero_l04_state).yaw;
+                qcopy((*(HopPlayer *)&g_hero_state).move_dir.f, (*(HopSavedState *)g_hero_l04_state).direction.f);
             }
             hero_steer_heading(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&g_hero_state).field494);
             if ((*(HopPlayer *)&g_hero_state).field1454) {
@@ -242,7 +242,7 @@ void func_PAL_L04_002DCE68(void) {
         hero_build_move_impulse(0.7f, 0.0f);
         qcopy((*(HopPlayer *)&g_hero_state).momentum.f, (*(HopPlayer *)&g_hero_state).move_impulse.f);
         rate = 0.008f;
-        if ((*(HopPlayer *)&g_hero_state).target_speed < D_001A7DC0 * 0.004f) {
+        if ((*(HopPlayer *)&g_hero_state).target_speed < g_hero_airborne_speed_limit * 0.004f) {
             if ((*(HopPlayer *)&g_hero_state).control_mode == 2) {
                 float decel = (*(HopPlayer *)&g_hero_state).fieldA84;
 

@@ -2,13 +2,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; f32 f[4]; } BarlowVector;
-extern u8 D_L04_001BF880[];
-extern int D_L04_001A8F00;
+extern u8 g_request_l04_queue[];
+extern int g_game_l04_mode;
 /* Shared conversation flags, as in func_L04_00439950. */
-extern int D_L04_001B2224[] __attribute__((sda));
+extern int g_cutscene_flags[] __attribute__((sda));
 typedef union { u8 b[0x2600]; s32 i[0x980]; f32 f[0x980]; TI128 q[0x260]; } Hero;
 extern u8 g_hero_state[];
-extern u8 D_001A7A40;
+extern u8 g_unlocked_item_flags;
 extern void moby_reset_vars_defaults(void *);
 extern int hero_is_reachable_for_count(void *, int, f32);
 /* Interface assumption: retain the incoming owner/key in a0. The current
@@ -34,11 +34,11 @@ extern void FastVecSub(void *, void *, void *);
 extern f32 fast_subtract_rotations(f32, f32);
 extern f32 vec_length_xy(void *);
 extern void moby_update_eased_node(void *, void *, int, f32, f32);
-extern u32 D_0013979C __attribute__((nosda));
-extern u8 D_001A7BCD;
-extern u8 D_00139605 __attribute__((nosda));
+extern u32 g_object_state_flags_a __attribute__((nosda));
+extern u8 g_level_event_flag_3;
+extern u8 g_bike_variant_flag __attribute__((nosda));
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern void moby_reset_matching_effects(void *);
 extern void level_set_flag(void);
 extern void game_set_slowdown_factor(void);
@@ -63,31 +63,31 @@ void UpdateBarlowConversationNpc(u8 *object) {
     state = object[0x20];
     switch (state) {
     case 0:
-    if (D_001A7BCD) {
+    if (g_level_event_flag_3) {
         moby_mark_spawned(object);
         return;
     }
     moby_reset_vars_defaults(object);
-    if (D_0013979C & 0x800000) moby_set_state(object, 3, -1);
+    if (g_object_state_flags_a & 0x800000) moby_set_state(object, 3, -1);
     else moby_set_state(object, 1, -1);
     goto stateDone;
     case 1:
     if (hero_is_reachable_for_count(object, 10, 4.0f)) {
         level_apply_index_for_key((int)object);
-        if (req_push_queue(D_L04_001BF880, 0x37)) {
-            req_launch_queued(D_L04_001BF880);
+        if (req_push_queue(g_request_l04_queue, 0x37)) {
+            req_launch_queued(g_request_l04_queue);
             moby_set_state(object, 2, -1);
         }
     }
     goto stateDone;
     case 2:
-    D_L04_001B2224[1] = 1;
-    if (D_L04_001A8F00 == 2) {
+    g_cutscene_flags[1] = 1;
+    if (g_game_l04_mode == 2) {
         object[0x31] = 0;
         *(u16 *)(object + 0x34) |= 1;
     }
     if (!game_is_either_mode_two()) {
-        D_L04_001B2224[1] = 0;
+        g_cutscene_flags[1] = 0;
         object[0x31] = 1;
         *(u16 *)(object + 0x34) &= ~1;
         level_set_flag();
@@ -95,25 +95,25 @@ void UpdateBarlowConversationNpc(u8 *object) {
     }
     goto stateDone;
     case 3:
-    if (D_00139605 && hero_is_reachable_for_count(object, 10, 2.5f)) {
+    if (g_bike_variant_flag && hero_is_reachable_for_count(object, 10, 2.5f)) {
         level_apply_index_for_key((int)object);
-        if (req_push_queue(D_L04_001BF880, 0x39)) {
-            req_push_queue(D_L04_001BF880, 5);
-            req_push_queue(D_L04_001BF880, 0x3A);
-            req_launch_queued(D_L04_001BF880);
+        if (req_push_queue(g_request_l04_queue, 0x39)) {
+            req_push_queue(g_request_l04_queue, 5);
+            req_push_queue(g_request_l04_queue, 0x3A);
+            req_launch_queued(g_request_l04_queue);
             game_set_slowdown_factor();
             moby_set_state(object, 4, -1);
         }
     }
     goto stateDone;
     case 4:
-    D_L04_001B2224[1] = 1;
-    if (D_L04_001A8F00 == 2) {
+    g_cutscene_flags[1] = 1;
+    if (g_game_l04_mode == 2) {
         object[0x31] = 0;
         *(u16 *)(object + 0x34) |= 1;
     }
     if (!game_is_either_mode_two()) {
-        D_L04_001B2224[1] = 0;
+        g_cutscene_flags[1] = 0;
         object[0x31] = 1;
         *(u16 *)(object + 0x34) &= ~1;
         moby_mark_flag_and_append_to_list(5);
@@ -121,7 +121,7 @@ void UpdateBarlowConversationNpc(u8 *object) {
         snd_play_indexed(5);
         if (object[0xB0] != 0xFF) {
             int channel = object[0xB0];
-            if (!(D_0019B2E8[channel + g_current_map_index * 16] & 0x80))
+            if (!(g_moby_group_flags[channel + g_current_map_index * 16] & 0x80))
                 moby_mark_table_entry_flagged(channel);
             level_capture_checkpoint_state(&((Hero *)g_hero_state)->q[0x80 / 16], &((Hero *)g_hero_state)->q[0x90 / 16]);
         } else {
@@ -185,7 +185,7 @@ stateDone:
         *(f32 *)(data + 0x68) = yaw * 0.6f;
         *(f32 *)(data + 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40)
+    if (g_unlocked_item_flags)
         *(f32 *)(data + 0x70) = 2.75f;
     moby_update_eased_node(object, data, 0, rate, blend);
     moby_update_eased_node(object, data + 0x80, 1, rate, blend);

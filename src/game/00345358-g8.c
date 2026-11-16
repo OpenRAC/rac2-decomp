@@ -6,21 +6,21 @@
    unit where the small data comes out $gp-relative. */
 extern void DrawItemGrid(int *);
 
-extern char D_001AA898[];
+extern char g_item_grid_second_mode_rows[];
 
-extern int D_001AE4A0 __attribute__((sda));
+extern int g_item_grid_build_second_desc_a __attribute__((sda));
 
-extern int D_001AE4A4 __attribute__((sda));
+extern int g_item_grid_build_second_desc_b __attribute__((sda));
 
-extern int D_001AE4A8 __attribute__((sda));
+extern int g_item_grid_build_second_desc_c __attribute__((sda));
 
-extern int D_001AE4B0 __attribute__((sda));
+extern int g_item_grid_build_second_desc_d __attribute__((sda));
 
-extern int D_001AE4B8 __attribute__((sda));
+extern int g_item_grid_build_second_desc_e __attribute__((sda));
 
-extern int D_001AE4C0 __attribute__((sda));
+extern int g_item_grid_build_second_desc_f __attribute__((sda));
 
-extern int D_001AE4C8 __attribute__((sda));
+extern int g_item_grid_build_second_desc_g __attribute__((sda));
 
 /* Fills in the draw descriptor for the item grid, in mode 1, and hands it to the grid drawer. */
 void item_grid_build_descriptor_second_mode(char *menu)
@@ -37,38 +37,38 @@ void item_grid_build_descriptor_second_mode(char *menu)
     desc[3] = *(int *)(menu + 0x48C);
     desc[4] = *(int *)(menu + 0x490);
     desc[16] = (int)(menu + 0x448);
-    desc[9] = (int)&D_001AE4C8;
-    desc[1] = D_001AE4A0;
-    desc[2] = D_001AE4A4;
-    desc[0] = (int)D_001AA898;
+    desc[9] = (int)&g_item_grid_build_second_desc_g;
+    desc[1] = g_item_grid_build_second_desc_a;
+    desc[2] = g_item_grid_build_second_desc_b;
+    desc[0] = (int)g_item_grid_second_mode_rows;
     desc[17] = (int)(menu + 0x210);
     desc[10] = (int)(menu + 0x130);
     desc[12] = (int)(menu + 0x17C);
     desc[15] = (int)(menu + 0x258);
     desc[18] = *(int *)(menu + 0x400);
-    desc[8] = (int)&D_001AE4C0;
-    desc[7] = (int)&D_001AE4B8;
-    desc[6] = (int)&D_001AE4B0;
-    desc[5] = (int)&D_001AE4A8;
+    desc[8] = (int)&g_item_grid_build_second_desc_f;
+    desc[7] = (int)&g_item_grid_build_second_desc_e;
+    desc[6] = (int)&g_item_grid_build_second_desc_d;
+    desc[5] = (int)&g_item_grid_build_second_desc_c;
     desc[22] = 1;
     DrawItemGrid(desc);
 }
 
-extern char D_001AA7D8[];
+extern char g_selection_menu_rows[];
 
-extern int D_001AE470 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_a __attribute__((sda));
 
-extern int D_001AE474 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_b __attribute__((sda));
 
-extern int D_001AE478 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_c __attribute__((sda));
 
-extern int D_001AE480 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_d __attribute__((sda));
 
-extern int D_001AE488 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_e __attribute__((sda));
 
-extern int D_001AE490 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_f __attribute__((sda));
 
-extern int D_001AE498 __attribute__((sda));
+extern int g_item_grid_build_fourth_desc_g __attribute__((sda));
 
 /* Fills in the draw descriptor for the item grid, in mode 3, and hands it to the grid drawer. */
 void item_grid_build_descriptor_fourth_mode(char *menu)
@@ -84,20 +84,20 @@ void item_grid_build_descriptor_fourth_mode(char *menu)
     desc[3] = *(int *)(menu + 0x48C);
     desc[4] = *(int *)(menu + 0x490);
     desc[16] = (int)(menu + 0x448);
-    desc[9] = (int)&D_001AE498;
+    desc[9] = (int)&g_item_grid_build_fourth_desc_g;
     desc[14] = 3;
-    desc[1] = D_001AE470;
-    desc[2] = D_001AE474;
-    desc[0] = (int)D_001AA7D8;
+    desc[1] = g_item_grid_build_fourth_desc_a;
+    desc[2] = g_item_grid_build_fourth_desc_b;
+    desc[0] = (int)g_selection_menu_rows;
     desc[17] = (int)(menu + 0x210);
     desc[10] = (int)(menu + 0x130);
     desc[12] = (int)(menu + 0x17C);
     desc[15] = (int)(menu + 0x258);
     desc[18] = *(int *)(menu + 0x400);
-    desc[8] = (int)&D_001AE490;
-    desc[7] = (int)&D_001AE488;
-    desc[6] = (int)&D_001AE480;
-    desc[5] = (int)&D_001AE478;
+    desc[8] = (int)&g_item_grid_build_fourth_desc_f;
+    desc[7] = (int)&g_item_grid_build_fourth_desc_e;
+    desc[6] = (int)&g_item_grid_build_fourth_desc_d;
+    desc[5] = (int)&g_item_grid_build_fourth_desc_c;
     desc[22] = 1;
     DrawItemGrid(desc);
 }
@@ -113,9 +113,9 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
-extern int D_001F2880[];
+extern int g_selection_grid_cursor[];
 extern int g_selected_item_material __attribute__((sda));
-extern SelectionEntry D_00259CE0[];
+extern SelectionEntry g_menu_item_table_second[];
 
 /* Moves the cursor on a small selection grid with the pad and lets the player pick an item they own. */
 void selection_grid_handle_input(SelectionOwner *owner, int buttons)
@@ -157,16 +157,16 @@ void selection_grid_handle_input(SelectionOwner *owner, int buttons)
         else
             owner->column = owner->column > 2 ? 1 : owner->column;
     } else if (buttons & 0x40) {
-        int id = D_00259CE0[owner->column + owner->row * 3].v[3];
+        int id = g_menu_item_table_second[owner->column + owner->row * 3].v[3];
         if (id && g_item_owned_flags[id]) {
             snd_play_from_global_bank(4, 0, 0);
-            D_001F2880[0] = id;
+            g_selection_grid_cursor[0] = id;
             owner->selected = id;
         } else
             snd_play_from_global_bank(5, 0, 0);
     }
     {
-        int id = D_00259CE0[owner->column + owner->row * 3].v[3];
+        int id = g_menu_item_table_second[owner->column + owner->row * 3].v[3];
         owner->selected = id;
         if (id && g_item_owned_flags[id])
             g_selected_item_material = ((SelectionMaterial *)(g_weapon_table + g_item_slot_to_record[id] * 0xE0))->material;
@@ -182,15 +182,15 @@ extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void gfx_draw_screen_element_stored(char *);
 extern float *object_get_first_field(char *);
 extern int *object_get_fourth_field(char *);
-extern float D_001AE5F0 __attribute__((sda));
-extern float D_001B23A4[] MACRO_ADDR;
+extern float g_list_menu_label_y __attribute__((sda));
+extern float g_hud_scale[] MACRO_ADDR;
 extern int g_screen_height[] MACRO_ADDR;
-extern float D_001AE5D0 __attribute__((sda));
-extern float D_001AE5D4[] MACRO_ADDR;
-extern float D_001AE5D8 __attribute__((sda));
-extern float D_001AE5E0 __attribute__((sda));
-extern float D_001AE5E4[] MACRO_ADDR;
-extern float D_001AE5E8 __attribute__((sda));
+extern float g_centered_rows_rect_x_offset __attribute__((sda));
+extern float g_centered_rows_rect_y_base[] MACRO_ADDR;
+extern float g_centered_rows_rect_y_step __attribute__((sda));
+extern float g_centered_rows_alt_x_offset __attribute__((sda));
+extern float g_centered_rows_alt_y_base[] MACRO_ADDR;
+extern float g_centered_rows_alt_y_step __attribute__((sda));
 
 typedef struct { float x, y, w, h; } ListRect;
 typedef struct {
@@ -217,7 +217,7 @@ typedef struct {
     int alignment;
 } ListSlot;
 
-extern int D_001B23A0;
+extern int g_hud_mode;
 
 /* label_y, the HUD label idiom (the shared definition in src/levels/15_gorn/L15_00431590-g8.c, its
    mode word the boot's D_001B23A0). Its tests do not change the result: flow deletes their stores
@@ -225,7 +225,7 @@ extern int D_001B23A0;
    they end. Here it rounds the list row spacing. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_001B23A0;
+    int mode = g_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -256,7 +256,7 @@ void list_menu_draw_centered_rows(char *rawMenu)
         gfx_draw_screen_element_stored(rawMenu + 0xE4);
         rowCount = menu->count;
         half = (float)rowCount * 0.5f;
-        spacing = label_y(rawMenu, D_001AE5F0, D_001B23A4[0], 0.5f, 1);
+        spacing = label_y(rawMenu, g_list_menu_label_y, g_hud_scale[0], 0.5f, 1);
         spacingF = (float)spacing;
         halfHeight = g_screen_height[0] >> 1;
         startY = (int)((float)halfHeight - spacingF * half);
@@ -269,19 +269,19 @@ void list_menu_draw_centered_rows(char *rawMenu)
             if (i == 7 && !menu->showSpecial)
                 continue;
             rect = (ListRect *)((float *)object_get_first_field(rawMenu + 0x17C));
-            rect->x = D_001AE5D0 + menu->origin->x;
-            rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
+            rect->x = g_centered_rows_rect_x_offset + menu->origin->x;
+            rect->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)startY;
             rowColor = i == menu->selected ? color : 0x55F0C070;
             *((int *)object_get_fourth_field(rawMenu + 0x1C8)) = rowColor;
             gfx_draw_screen_element_stored(rawMenu + 0x17C);
             rect = (ListRect *)((float *)object_get_first_field(rawMenu + 0x1C8));
-            rect->x = D_001AE5D0 + menu->origin->x;
-            rect->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)startY;
+            rect->x = g_centered_rows_rect_x_offset + menu->origin->x;
+            rect->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)startY;
             gfx_draw_screen_element_stored(rawMenu + 0x1C8);
             slot = (char *)&((ListSlot *)(rawMenu + 0x218))[i];
             rect = (ListRect *)((float *)object_get_first_field(slot));
-            rect->x = D_001AE5E0 + menu->origin->x;
-            rect->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)startY;
+            rect->x = g_centered_rows_alt_x_offset + menu->origin->x;
+            rect->y = (g_centered_rows_alt_y_base[0] + (float)i * g_centered_rows_alt_y_step) + (float)startY;
             vtable = *(ListVtable **)(rawMenu + i * 72 + 0x248);
             spacing = vtable->offset;
             vtable->call(slot + spacing);

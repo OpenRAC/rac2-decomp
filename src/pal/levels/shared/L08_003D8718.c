@@ -5,7 +5,7 @@ extern void moby_mark_spawned(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void *func_PAL_L08_003B6448(void *, void *, void *, int);
+extern void *SpawnDirectedEffectObject_pal(void *, void *, void *, int);
 extern float math_random_float_range(float, float);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -13,12 +13,12 @@ extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_range(int, int);
 extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 D_001A7A40[] __attribute__((sda));
-extern u8 D_L08_001B22E0[] __attribute__((sda));
-extern u8 D_001A7A00[] __attribute__((sda));
-extern u8 D_L08_001A7C80[] __attribute__((sda));
-extern u8 D_001395B8[];
-extern u8 D_L08_001BFD00[];
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
+extern u8 g_mystic_manipulator_data[] __attribute__((sda));
+extern u8 g_player_stats[] __attribute__((sda));
+extern u8 g_mystic_state[] __attribute__((sda));
+extern u8 g_game_flag_table[];
+extern u8 g_request_l08_queue[];
 
 void func_PAL_L08_003D8718(u8 *self)
 {
@@ -39,7 +39,7 @@ void func_PAL_L08_003D8718(u8 *self)
         if (self[0x43] != 1) func_PAL_002A7E68(self, 1, 0, 0);
         vec_build_spherical_offset(direction, 1.2f, *(float *)(self+0xF8), -*(float *)(self+0xF4));
         moby_transform_joint_to_world(self, 0, position);
-        func_PAL_L08_003B6448(self, position, direction, 0x4B);
+        SpawnDirectedEffectObject_pal(self, position, direction, 0x4B);
         i = 4;
         do {
             *(TI128 *)random = 0;

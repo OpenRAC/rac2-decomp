@@ -63,8 +63,8 @@ extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
 extern int g_item_ammo_counts[];
 extern int g_game_time;
-extern int D_001B275C;
-extern int D_001A8CA0;
+extern int g_pickup_time;
+extern int g_ground_check_inhibit;
 extern char g_hero_state[];
 extern PickupObject *g_hero_moby NOT_SDA;
 #define WEAPON(i) ((PickupWeapon *)(D_00239BA0 + D_00139568[i] * sizeof(PickupWeapon)))
@@ -78,7 +78,7 @@ extern float math_fabs(float);
 extern float vec_distance_xy(void *, void *);
 extern float gravity_get_center_distance(void *);
 extern unsigned int weapon_add_ammo(int, int);
-extern void func_US2_L00_00327478(int, int, int);
+extern void part_reset_effects_us2(int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int subtract_integer_with_clamp(int);
 extern int PlayMobySound(int, int, void *);
@@ -97,7 +97,7 @@ extern int vec_fast_helper_d(void *, void *);
 typedef int PickupVectorBits __attribute__((mode(TI)));
 
 /* Award ammo on collection, then move and rotate the pickup into the hero. */
-void func_US2_L00_003D26A8(PickupObject *object)
+void AmmoPickupUpdate_us2(PickupObject *object)
 {
     float old[4], move[4], delta[4], angle[4];
     float before[4], after[4], offset[4], pivot[4], rotation[12];
@@ -143,7 +143,7 @@ void func_US2_L00_003D26A8(PickupObject *object)
         }
         if (g_item_ammo_counts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
-        if (D_001A8CA0) {
+        if (g_ground_check_inhibit) {
             if (gravity_get_center_distance(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
@@ -161,7 +161,7 @@ void func_US2_L00_003D26A8(PickupObject *object)
             weapon_add_ammo(item, data->amount);
             if (g_item_ammo_counts[item] > previous) {
                 count = g_item_ammo_counts[item] - previous;
-                func_US2_L00_00327478(count == 1 ?
+                part_reset_effects_us2(count == 1 ?
                     WEAPON(item)->messageOne :
                     WEAPON(item)->messageMany,
                     count, -1);
@@ -169,9 +169,9 @@ void func_US2_L00_003D26A8(PickupObject *object)
             moby_set_state(object, 2, -1);
             data->pull = 1.0f / 7.5f;
             vec_clear_128(data);
-            if (subtract_integer_with_clamp(g_game_time - D_001B275C) >= 11) {
+            if (subtract_integer_with_clamp(g_game_time - g_pickup_time) >= 11) {
                 PlayMobySound(0, 0, object);
-                D_001B275C = g_game_time;
+                g_pickup_time = g_game_time;
             }
         }
         break;

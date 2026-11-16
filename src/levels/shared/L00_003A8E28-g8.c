@@ -4,17 +4,17 @@
 /* Small-data sibling of L00_003A8E28.c: the body below reaches the level's
    globals through $gp (the file gets -G8 by its name, see config/cflags.txt). */
 
-extern char D_L00_0023BB78[];
+extern char g_effect_path_node_table[];
 
-extern unsigned char D_L00_001AF810 __attribute__((sda));
+extern unsigned char g_trail_slot_head __attribute__((sda));
 
-extern unsigned char D_L00_001AF811 __attribute__((sda));
+extern unsigned char g_trail_slot_tail __attribute__((sda));
 
 extern void func_2EDE88();
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L00_001AF7A4 __attribute__((sda));
+extern float g_moby_offset_x __attribute__((sda));
 
 extern void matrix_mul_vec3(void *, void *, void *);
 
@@ -28,7 +28,7 @@ void moby_transform_offset_to_world(char *moby, char *out)
     TI128 zero = 0;
 
     *(TI128 *)offset = zero;
-    offset[0] = D_L00_001AF7A4;
+    offset[0] = g_moby_offset_x;
     offset[3] = 1.0f;
     *(TI128 *)rotated = *(TI128 *)offset;
     matrix_mul_vec3(rotated, rotated, moby + 0xC0);
@@ -38,9 +38,9 @@ void moby_transform_offset_to_world(char *moby, char *out)
 /* Resets the two slot cursors, then releases the 256-entry slot table. */
 void trail_reset_slots(void)
 {
-    D_L00_001AF811 = 0;
-    D_L00_001AF810 = 0;
-    func_2EDE88(D_L00_0023BB78, 0x1C00);
+    g_trail_slot_tail = 0;
+    g_trail_slot_head = 0;
+    func_2EDE88(g_effect_path_node_table, 0x1C00);
 }
 
 typedef int Qword __attribute__((mode(TI)));
@@ -71,9 +71,9 @@ typedef struct {
     TrailSource *source;
 } TrailActor;
 
-extern float D_L00_001AF760 __attribute__((sda));
-extern float D_L00_001AF798 __attribute__((sda));
-extern float D_L00_001AF774 __attribute__((sda));
+extern float g_trail_time_step __attribute__((sda));
+extern float g_trail_u_scroll_step __attribute__((sda));
+extern float g_trail_rotation_rate __attribute__((sda));
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 extern int ref_L00_003A9000_00(void *);
@@ -96,20 +96,20 @@ int trail_update_slot(TrailActor *self)
         return 0;
     }
     qcopy_nc(&slots[source->index].b, &self->pos);
-    slots[source->index].t += D_L00_001AF760;
+    slots[source->index].t += g_trail_time_step;
     if (slots[source->index].t >= 4.0f)
         slots[source->index].t -= 4.0f;
-    slots[source->index].u += D_L00_001AF798;
+    slots[source->index].u += g_trail_u_scroll_step;
     if (slots[source->index].u >= 4.0f)
         slots[source->index].u -= 4.0f;
-    func_2EE3D0(rot, source, D_L00_001AF774 * 0.016666668f);
+    func_2EE3D0(rot, source, g_trail_rotation_rate * 0.016666668f);
     func_2EE108(&slots[source->index], &slots[source->index], rot);
     func_2EE108(&slots[source->index].a, &slots[source->index].a, rot);
     return 1;
 }
 
-extern short D_L00_001AF82C __attribute__((sda));
-extern unsigned char D_L00_001AF830 __attribute__((sda));
+extern short g_fireboot_debris_count_base __attribute__((sda));
+extern unsigned char g_fireboot_debris_kind_base __attribute__((sda));
 extern int g_frame_l00_counter MACRO_ADDR;
 /* One 28-byte entry of the slot table (layout as in L00_003B0CE8-g8.c): used holds the frame it was taken. */
 typedef struct { unsigned char pad0[0xC]; int used; unsigned char pad10[4]; unsigned char id[8]; } SlotEntry1270;
@@ -123,9 +123,9 @@ typedef struct {
     char *moby;
 } HeroL00;
 extern HeroL00 g_hero_state;
-extern int D_00138320 NOT_SDA;
-extern float D_L00_001AF838[4];
-extern float D_L00_001AF848[4];
+extern int g_pad_pressed_flags NOT_SDA;
+extern float g_fireboot_trail_params_a[4];
+extern float g_fireboot_trail_params_b[4];
 extern void node_free_slot(int);
 extern char *RecordHeroTrailNode(void *);
 extern int func_001163B0(void);
@@ -145,11 +145,11 @@ void fireboot_weapon_update(char *moby)
     unsigned char slot;
     char *entry;
 
-    while (!stop && D_L00_001AF811 != D_L00_001AF810) {
-        if (g_frame_l00_counter - ((SlotEntry1270 *)D_L00_0023BB78)[D_L00_001AF811].used < 480)
+    while (!stop && g_trail_slot_tail != g_trail_slot_head) {
+        if (g_frame_l00_counter - ((SlotEntry1270 *)g_effect_path_node_table)[g_trail_slot_tail].used < 480)
             stop = 1;
         else
-            node_free_slot(D_L00_001AF811);
+            node_free_slot(g_trail_slot_tail);
     }
     switch ((unsigned char)moby[0x20]) {
     case 0:
@@ -159,24 +159,24 @@ void fireboot_weapon_update(char *moby)
         moby[0x20] = 2;
         break;
     case 2:
-        if (D_00138320 & g_hero_state.buttons) {
+        if (g_pad_pressed_flags & g_hero_state.buttons) {
             entry = RecordHeroTrailNode(g_hero_state.position);
             if (entry) {
-                slot = D_L00_001AF810 - 1;
-                random = D_L00_001AF82C + (func_001163B0() & 7);
-                result = part_spawn_debris_two_mode(g_hero_state.position, slot, 0, random, 1, (unsigned char)(D_L00_001AF830 + (func_001163B0() & 3)), moby, 1, 1);
+                slot = g_trail_slot_head - 1;
+                random = g_fireboot_debris_count_base + (func_001163B0() & 7);
+                result = part_spawn_debris_two_mode(g_hero_state.position, slot, 0, random, 1, (unsigned char)(g_fireboot_debris_kind_base + (func_001163B0() & 3)), moby, 1, 1);
                 *(int *)(entry + 0x10) = result;
             } else {
-                random2 = D_L00_001AF82C + (func_001163B0() & 7);
-                part_spawn_debris_two_mode(g_hero_state.position, 0, 1, random2, 1, (unsigned char)(D_L00_001AF830 + (func_001163B0() & 3)), moby, 1, 1);
+                random2 = g_fireboot_debris_count_base + (func_001163B0() & 7);
+                part_spawn_debris_two_mode(g_hero_state.position, 0, 1, random2, 1, (unsigned char)(g_fireboot_debris_kind_base + (func_001163B0() & 3)), moby, 1, 1);
             }
         }
         break;
     }
-    ref_L00_003B1270_0(0x41, 0x41, 0x80000000, D_L00_001AF838, D_L00_001AF810);
-    ref_L00_003B1270_0(0x40, 0x40, 0x80F0F0F0, D_L00_001AF838, D_L00_001AF810);
-    ref_L00_003B1270_0(0x41, 0x51, 0x80000000, D_L00_001AF848, D_L00_001AF811);
-    ref_L00_003B1270_0(0x40, 0x50, 0x80F0F0F0, D_L00_001AF848, D_L00_001AF811);
+    ref_L00_003B1270_0(0x41, 0x41, 0x80000000, g_fireboot_trail_params_a, g_trail_slot_head);
+    ref_L00_003B1270_0(0x40, 0x40, 0x80F0F0F0, g_fireboot_trail_params_a, g_trail_slot_head);
+    ref_L00_003B1270_0(0x41, 0x51, 0x80000000, g_fireboot_trail_params_b, g_trail_slot_tail);
+    ref_L00_003B1270_0(0x40, 0x50, 0x80F0F0F0, g_fireboot_trail_params_b, g_trail_slot_tail);
 }
 
 /* Moby index list: entry 0 is the count, entries 1..count index the 256-byte moby array. */

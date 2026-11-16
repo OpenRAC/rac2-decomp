@@ -166,7 +166,7 @@ typedef struct {
 
 extern Persistent_F882f1178 D_00189E20_11;
 
-extern int D_L00_001A8F00 __attribute__((sda));
+extern int g_game_l00_mode __attribute__((sda));
 
 extern float func_00283B98_4(float, float);
 
@@ -405,13 +405,13 @@ typedef struct {
 } Entry_262570;
 #endif
 
-extern unsigned char D_L00_00139568[];
+extern unsigned char g_weapon_ammo_type_table[];
 
 extern Entry_262570 g_weapon_l00_table[];
 
-extern int D_L00_00139688[];
+extern int g_weapon_ammo_counts[];
 
-extern int D_0018B068;
+extern int g_weapon_slot;
 
 /* Spends the given amount of ammo for a weapon slot if there is enough. Returns 1 on success and 0 if there is not enough. */
 int weapon_spend_ammo(int slot_index, int cost)
@@ -422,16 +422,16 @@ int weapon_spend_ammo(int slot_index, int cost)
     int current;
 
     if (slot == -1)
-        slot = D_0018B068;
-    type_index = D_L00_00139568[slot];
+        slot = g_weapon_slot;
+    type_index = g_weapon_ammo_type_table[slot];
 
     entry = &g_weapon_l00_table[type_index];
     if (entry->f8E == 0)
         return 1;
-    current = D_L00_00139688[slot];
+    current = g_weapon_ammo_counts[slot];
     if (current < cost)
         return 0;
-    D_L00_00139688[slot] = current - cost;
+    g_weapon_ammo_counts[slot] = current - cost;
     return 1;
 }
 
@@ -447,7 +447,7 @@ unsigned long math_l00_return_argument_2(unsigned long param_1)
 }
 
 
-extern unsigned char D_L00_00139568[];
+extern unsigned char g_weapon_ammo_type_table[];
 
 #ifndef RAC2_T_ENTRY_262570
 #define RAC2_T_ENTRY_262570
@@ -460,9 +460,9 @@ typedef struct {
 
 extern Entry_262570 g_weapon_l00_table[];
 
-extern int D_L00_00139688[];
+extern int g_weapon_ammo_counts[];
 
-extern int D_0018B068;
+extern int g_weapon_slot;
 
 /* Returns how much ammo a weapon slot has, or 1 if that weapon has no ammo limit. */
 int get_ammo(int slot_index)
@@ -472,13 +472,13 @@ int get_ammo(int slot_index)
     Entry_262570 *entry;
 
     if (slot == -1)
-        slot = D_0018B068;
-    type_index = D_L00_00139568[slot];
+        slot = g_weapon_slot;
+    type_index = g_weapon_ammo_type_table[slot];
 
     entry = &g_weapon_l00_table[type_index];
     if (entry->f8E == 0)
         return 1;
-    return D_L00_00139688[slot];
+    return g_weapon_ammo_counts[slot];
 }
 
 extern s32 hero_l00_set_action(int, int);
@@ -499,12 +499,12 @@ void hero_start_target_state(V4_F6a70b950 *vec, int mode, float time)
         hero_l00_set_action(98, 2);
 }
 
-extern int D_0018C0B4;
+extern int g_game_mode;
 
 /* Returns 1 or 2 depending on which of hero states 98 to 100 is running, otherwise 0. */
 int hero_get_target_state_kind(void)
 {
-    switch (D_0018C0B4) {
+    switch (g_game_mode) {
     case 98:
     case 99:
         return 1;
@@ -733,7 +733,7 @@ void level_fade_glow_colors(void)
     }
     node = (Node_F882f1178 *)D_00189E20_11.p1364;
     if (node != 0) {
-        if (D_L00_001A8F00 != 2) {
+        if (g_game_l00_mode != 2) {
             float angle;
             int target_color;
 
@@ -751,7 +751,7 @@ void level_fade_glow_colors(void)
         }
     }
     if (D_00189E20_11.p1368 != 0) {
-        if (D_L00_001A8F00 == 2)
+        if (g_game_l00_mode == 2)
             math_store_angle_update_result((int)D_00189E20_11.p1368, &D_00189E20_11.f2514, 0xdcdcdc, 0x323232,
                     0.026179943233728409f);
         else
@@ -808,9 +808,9 @@ void level_spawn_glow_object(char *object) {
 
 /* func_L00_002D5940 is in L00_002D3798-g8.c (-G8). */
 
-extern short D_L00_00262260[];
+extern short g_glow_object_limit_pairs[];
 
-extern int D_001A7A0C __attribute__((sda));
+extern int g_experience_points __attribute__((sda));
 
 /* Walks the halfword pairs of the table at D_L00_00262260 (a negative first half ends it, and
    so do 77 pairs): the first half of each pair is added to a running sum while the sum stays
@@ -822,10 +822,10 @@ extern int D_001A7A0C __attribute__((sda));
 int math_sum_table_entries_under_limit(int *last_sum_out, int *total_out, int *bonus_out) {
     int sum = 0;
     int i = 0;
-    short *second = &D_L00_00262260[1];
+    short *second = &g_glow_object_limit_pairs[1];
     short *first = second - 1;
 
-    for (; i < 77 && *first >= 0 && (sum += *first) <= (D_001A7A0C >> 5);
+    for (; i < 77 && *first >= 0 && (sum += *first) <= (g_experience_points >> 5);
          i++, second += 2, first += 2) {
         *bonus_out += *second;
         *last_sum_out = sum;
@@ -833,7 +833,7 @@ int math_sum_table_entries_under_limit(int *last_sum_out, int *total_out, int *b
     *total_out = sum;
 }
 
-extern int D_001A7908 __attribute__((sda));
+extern int g_menu_toggle_option __attribute__((sda));
 extern char *g_follow_camera_object;
 extern unsigned char g_hero_state[];
 
@@ -842,9 +842,9 @@ int hero_is_action_allowed(void)
 {
     int value;
 
-    if (D_001A7908 == 0)
+    if (g_menu_toggle_option == 0)
         return 0;
-    value = D_L00_001A8F00;
+    value = g_game_l00_mode;
     if (value == 2 || value == 6)
         return 0;
     if (g_follow_camera_object != 0 && *(short *)(g_follow_camera_object + 0x86) == 5)

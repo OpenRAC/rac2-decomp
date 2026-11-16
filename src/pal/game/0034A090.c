@@ -4,9 +4,9 @@
 extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
 extern void hud_init_widget_defaults(void *, void *, void *);
-extern char D_001AE5A8[];
+extern char g_list_menu_attach_widget_defaults[];
 
-void func_PAL_0034A090(char *object, void *data)
+void list_menu_reset_attach_items_pal(char *object, void *data)
 {
     int *position;
     *(int *)(object + 0x60) = 0;
@@ -17,7 +17,7 @@ void func_PAL_0034A090(char *object, void *data)
         *(int **)(object + 0x5C) = position;
         position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
     }
-    hud_init_widget_defaults(object, D_001AE5A8, data);
+    hud_init_widget_defaults(object, g_list_menu_attach_widget_defaults, data);
     *(int *)(object + 0xAC) = 0x70FFFEED;
     *(int *)(object + 0xB0) = 0x80F0F0F0;
     *(int *)(object + 0xB4) = 0x80808080;

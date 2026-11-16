@@ -16,8 +16,8 @@ extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(void *, int, int);
 extern float IntToFloat(int);
-extern float D_L11_001B05E0 __attribute__((sda));
-extern float D_L11_001BA8C0[];
+extern float g_joba_beam_uv_step __attribute__((sda));
+extern float g_hero_l11_position[];
 
 /* Draws a glowing beam as two overlapping textured strips that follow a list of points. */
 void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int color2, float width, float scale) {
@@ -64,9 +64,9 @@ void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int
     second.uv[0][1] = 0;
     second.uv[1][0] = 0;
     second.uv[1][1] = 1;
-    second.uv[2][0] = D_L11_001B05E0;
+    second.uv[2][0] = g_joba_beam_uv_step;
     second.uv[2][1] = 0;
-    second.uv[3][0] = D_L11_001B05E0;
+    second.uv[3][0] = g_joba_beam_uv_step;
     second.uv[3][1] = 1;
     horizontal[3] = 1;
     vertical[3] = 1;
@@ -74,7 +74,7 @@ void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int
     vertical[2] = horizontal[2]*scale;
     FastVecSub(direction, initialNext, points);
     vec_scale_to_length(direction, direction, 1.0f);
-    FastVecSub(facing, D_L11_001BA8C0, points);
+    FastVecSub(facing, g_hero_l11_position, points);
     FastVecCross(side, facing, direction);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(facing, direction, side);
@@ -94,7 +94,7 @@ void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int
         FastVecScale(second.pos[3], second.pos[2], -1.0f);
         FastVecSub(direction, points[i+1], points[i]);
         vec_scale_to_length(direction, direction, 1.0f);
-        FastVecSub(facing, D_L11_001BA8C0, points[i]);
+        FastVecSub(facing, g_hero_l11_position, points[i]);
         FastVecCross(side, facing, direction);
         vec_scale_to_length(side, side, 1.0f);
         FastVecCross(facing, direction, side);
@@ -124,8 +124,8 @@ void DrawDualQuadStrip(float (*points)[4], int count, int blend, int color1, int
         }
         draw_world_quad(&first, 0, 0);
         draw_world_quad(&second, 0, 0);
-        u = D_L11_001B05E0*IntToFloat(i);
-        next = u+D_L11_001B05E0;
+        u = g_joba_beam_uv_step*IntToFloat(i);
+        next = u+g_joba_beam_uv_step;
         if (u >= 1.0f) {
             u -= 1.0f;
             next -= 1.0f;

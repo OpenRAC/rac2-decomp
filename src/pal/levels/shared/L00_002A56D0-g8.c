@@ -4,8 +4,8 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 extern char D_00189E20_2[];
 extern char g_hero_position[];
-extern float D_L00_001A7CF8 __attribute__((sda));
-extern float D_L00_0025CFEC __attribute__((nosda));
+extern float g_glow_scale __attribute__((sda));
+extern float g_hero_frame_float __attribute__((nosda));
 extern void func_2D24E8(void);
 extern void func_2B36E0(void);
 extern void func_2ACA08(void);
@@ -30,7 +30,7 @@ extern void func_319684(void *a0);
    byte is 1, then that byte gates the sub-updates twice more and gates the arms block, which
    republishes the ambient float and hands an armed record to a helper before clearing it.
    The closing tail always runs, from the hero position block. */
-void func_PAL_L00_002A6468(void)
+void hero_l00_update_frame_pal(void)
 {
     char *base;
     char *hero;
@@ -62,7 +62,7 @@ void func_PAL_L00_002A6468(void)
     if (*(u8 *)(base + 0x22B4) == 1) {
         int record;
 
-        D_L00_0025CFEC = D_L00_001A7CF8;
+        g_hero_frame_float = g_glow_scale;
         func_2A5840();
         func_2A5CB0();
         func_2A6008();

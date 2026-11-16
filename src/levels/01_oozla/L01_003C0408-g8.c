@@ -28,8 +28,8 @@ typedef struct {
 
 /* The table pointer, read with retail's absolute macro load at each use
    (docs/build/compiler-notes.md, incomplete sda array read as element 0). */
-extern L01ArenaRow *D_L01_001B264C[] __attribute__((sda));
-extern float D_L01_001AFED0 __attribute__((sda));
+extern L01ArenaRow *g_swamp_patrol_positions[] __attribute__((sda));
+extern float g_swamp_monster_arena_turn_angle __attribute__((sda));
 
 /* The hero's position at +0x80; the owner stays an incomplete byte array. */
 typedef struct {
@@ -47,23 +47,23 @@ float swamp_monster_move_around_arena(u8 *moby)
     if (*(int *)(vars + 0x124) == 1) {
         distance = vec_distance_xy(moby + 0x10, *(u8 **)(vars + 0x120) + 0x10);
         angle = mat_fast_helper_a(
-            *(float *)(moby + 0x10) - D_L01_001B264C[0][*(int *)(vars + 0x2CC)].centre[0],
-            *(float *)(moby + 0x14) - D_L01_001B264C[0][*(int *)(vars + 0x2CC)].centre[1]);
+            *(float *)(moby + 0x10) - g_swamp_patrol_positions[0][*(int *)(vars + 0x2CC)].centre[0],
+            *(float *)(moby + 0x14) - g_swamp_patrol_positions[0][*(int *)(vars + 0x2CC)].centre[1]);
         delta = fast_subtract_rotations(
             mat_fast_helper_a(
-                *(float *)(*(u8 **)(vars + 0x120) + 0x10) - D_L01_001B264C[0][*(int *)(vars + 0x2CC)].centre[0],
-                *(float *)(*(u8 **)(vars + 0x120) + 0x14) - D_L01_001B264C[0][*(int *)(vars + 0x2CC)].centre[1]),
+                *(float *)(*(u8 **)(vars + 0x120) + 0x10) - g_swamp_patrol_positions[0][*(int *)(vars + 0x2CC)].centre[0],
+                *(float *)(*(u8 **)(vars + 0x120) + 0x14) - g_swamp_patrol_positions[0][*(int *)(vars + 0x2CC)].centre[1]),
             angle);
         magnitude = math_fabs(delta);
         if (distance > *(float *)(vars + 0x2EC)) {
             if (moby[0x43] != vars[0x2E1])
                 moby_set_animation_and_speed(moby, vars[0x2E1], 0, 20);
-            if (magnitude < D_L01_001AFED0 * 0.017453294f) {
+            if (magnitude < g_swamp_monster_arena_turn_angle * 0.017453294f) {
                 qcopy(vars + 0x2A0, *(u8 **)(vars + 0x120) + 0x10);
             } else {
                 delta = delta / magnitude;
                 delta = delta * 0.087266474f;
-                qcopy(vars + 0x2A0, D_L01_001B264C[0][*(int *)(vars + 0x2CC)].centre);
+                qcopy(vars + 0x2A0, g_swamp_patrol_positions[0][*(int *)(vars + 0x2CC)].centre);
                 *(float *)(vars + 0x2A0) += math_fast_sin_or_cos_a(FastAddRotations(angle, delta)) * 38.0f;
                 *(float *)(vars + 0x2A4) += math_fast_sin_or_cos_b(FastAddRotations(angle, delta)) * 38.0f;
             }

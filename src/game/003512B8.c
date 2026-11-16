@@ -193,7 +193,7 @@ typedef struct { char tag[4]; } Header_351960;
 
 typedef struct { Header_351960 header; char body[12]; } Packet_351960;
 
-extern Header_351960 D_001AE860;
+extern Header_351960 g_mpeg_packet_header;
 
 extern s32 mpeg_copy_split_buffer(u32 first_address, s32 first_count, u32 second_address,
                          s32 second_count, u32 packet, s32 header_size, s32 unused1,
@@ -210,7 +210,7 @@ s32 mpeg_dec_send_packet(u8 *decoder)
     s32 first_address, first_count, second_address, second_count;
     s32 result;
 
-    packet.header = D_001AE860;
+    packet.header = g_mpeg_packet_header;
     ref_L00_00351960_00(decoder, &first_address, &first_count, &second_address, &second_count);
     if (first_count + second_count < 4) {
         return 0;
@@ -250,8 +250,8 @@ void mpeg_dec_start(unsigned char *object)
 
 
 extern void STUB_printf();
-extern char D_001AE868[];
-extern char D_001AE880[];
+extern char g_str_mpeg_dec_loop_message[];
+extern char g_str_mpeg_dec_loop_debug[];
 extern int mpeg_read_indirect_word(void *);
 extern void sceMpegReset(void *);
 extern int func_0012F950(void *, void *, int);
@@ -272,13 +272,13 @@ int mpeg_dec_run_loop(void *decoder)
     while (mpeg_read_indirect_word(object) == 0) {
         if (videoDecGetState((u8 *)object) == 1) {
             result = -1;
-            STUB_printf(D_001AE868);
+            STUB_printf(g_str_mpeg_dec_loop_message);
             break;
         }
         while ((packet = mpeg_vobuf_get_next_frame(g_movie_player_state[0] + 0xD9168)) == 0)
             mpeg_start_decoder_dma();
         if (func_0012F950(object, packet, 0x340) < 0)
-            mpeg_set_debug_value(D_001AE880);
+            mpeg_set_debug_value(g_str_mpeg_dec_loop_debug);
         if (object[2] == 0) {
             int a = object[0];
             int b = object[1];
@@ -293,12 +293,12 @@ int mpeg_dec_run_loop(void *decoder)
     return result;
 }
 
-extern char D_001AE8A8[];
+extern char g_str_mpeg_dec_message[];
 extern void STUB_printf(void *, int);
 
 /* Prints a message about the video decoder. */
 int mpeg_dec_print_message(void *unusedArg, int *object) {
-    STUB_printf(D_001AE8A8, object[1]);
+    STUB_printf(g_str_mpeg_dec_message, object[1]);
     return 1;
 }
 

@@ -8,10 +8,10 @@
  */
 #include "common.h"
 
-extern u16 *D_L20_001FBB20[];
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern u16 *g_group_l20_id_lists[];
+extern int g_group_count __attribute__((sda));
 typedef u8 ActorSlot[0x100];
-extern ActorSlot *D_L20_001B2F9C __attribute__((sda));
+extern ActorSlot *g_group_l20_member_table __attribute__((sda));
 typedef struct { u8 prefix[0x80]; float position[4]; } ResidentPoseView;
 extern ResidentPoseView g_hero_state;
 extern float mat_fast_helper_a(float, float);
@@ -33,11 +33,11 @@ u8 *ActivateGroupMemberAt(int group, const float position[4], const float veloci
     u8 *state;
     u16 flags;
 
-    for (entry = D_L20_001FBB20[group];
-         (u8)group != 0xFF && group <= D_L20_001B2FB8 && entry != 0 &&
-         ((s16)entry[-1] >= 0 || entry == D_L20_001FBB20[group]);
+    for (entry = g_group_l20_id_lists[group];
+         (u8)group != 0xFF && group <= g_group_count && entry != 0 &&
+         ((s16)entry[-1] >= 0 || entry == g_group_l20_id_lists[group]);
          ++entry) {
-        actor = D_L20_001B2F9C[*entry & 0x7FFF];
+        actor = g_group_l20_member_table[*entry & 0x7FFF];
         if (actor == 0)
             break;
         if (actor[0x20] == 6) {

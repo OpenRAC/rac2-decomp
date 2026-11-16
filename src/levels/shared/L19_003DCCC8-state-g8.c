@@ -27,13 +27,13 @@ extern void SetDeathBits(u8 *, int, int);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void moby_mark_spawned(u8 *);
 extern void protopet_reset_to_start_anim(u8 *);
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 extern u8 g_hero_position[];
-extern u8 D_L19_001A8F20[] __attribute__((sda));
-extern u16 *D_L19_001FB5A0[];
+extern u8 g_particle_effect_template[] __attribute__((sda));
+extern u16 *g_group_ptr_table[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
-extern int D_L19_001B2A38 __attribute__((sda));
-extern u8 *D_L19_001B2B0C[] __attribute__((sda));
+extern int g_max_l19_group_index __attribute__((sda));
+extern u8 *g_linked_object_table[] __attribute__((sda));
 
 typedef struct { u8 pad[0x30]; u8 pos[0x10]; u8 rest[0x40]; } TargetRecord;
 
@@ -88,7 +88,7 @@ void flying_enemy_update_state(u8 *object)
         break;
     case 5:
         if (flag_set_first_pending(object)) {
-            if (WORD(state, 0x714) == -1 || D_0018C0B4 == 0x6F) {
+            if (WORD(state, 0x714) == -1 || g_game_mode == 0x6F) {
                 goto enter_pause;
             }
             object[0xBC] = 0;
@@ -98,7 +98,7 @@ void flying_enemy_update_state(u8 *object)
             HALF(state, 0x760) = path_measure_moby_against_entry(object+0x10, WORD(state, 0x714), 0.0f);
         } else if (object[0xBC] == 0) {
             path_advance_waypoint_index(object, state+0x700, WORD(state, 0x714), 4.0f, (s16 *)(state+0x760), HALF(state, 0x76C));
-            if (D_0018C0B4 == 0x6F || (UHALF(object, 0x96) % 180 == 0 && math_random_int_below(4) == 0)) {
+            if (g_game_mode == 0x6F || (UHALF(object, 0x96) % 180 == 0 && math_random_int_below(4) == 0)) {
 enter_pause:
                 object[0xBC] = 1;
                 if (object[0x43] != math_random_int_below(2) + 4)
@@ -157,9 +157,9 @@ enter_pause:
             if (object[0x43] != math_random_int_below(2)+6)
                 anim_start_blended(object, math_random_int_below(2)+6, 0, 10);
             best = 1000.0f;
-            for (list_entry=D_L19_001FB5A0[WORD(state, 0x74C)];
-                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=D_L19_001B2A38 && list_entry &&
-                 ((list_entry != 0 && (s16)list_entry[-1]>=0) || list_entry==D_L19_001FB5A0[WORD(state, 0x74C)]); list_entry++) {
+            for (list_entry=g_group_ptr_table[WORD(state, 0x74C)];
+                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=g_max_l19_group_index && list_entry &&
+                 ((list_entry != 0 && (s16)list_entry[-1]>=0) || list_entry==g_group_ptr_table[WORD(state, 0x74C)]); list_entry++) {
                 entity=g_moby_l19_array[0]+((*list_entry&0x7FFF)<<8);
                 if (!entity) break;
                 distance=vec_distance_squared_xy(object+0x10, entity+0x10);
@@ -183,7 +183,7 @@ enter_pause:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2)+6)
                 anim_start_blended(object, math_random_int_below(2)+6, 0, 10);
-            qcopy(state+0x700, ((TargetRecord *)D_L19_001B2B0C[0])[WORD(state, 0x744)].pos);
+            qcopy(state+0x700, ((TargetRecord *)g_linked_object_table[0])[WORD(state, 0x744)].pos);
         }
         HALF(state, 0x76A)=1;
         if (vec_distance_squared_xy(object+0x10, state+0x700)<0.25f)
@@ -194,7 +194,7 @@ enter_pause:
         if ((object[0x42]==9 && math_random_int_below(30)==0) || (hit&1)) {
                 if (object[0x94]==6) protopet_increment_counter(WORD(object, 0xB8));
                 SetDeathBits(object, 0, 3);
-                SpawnExplosionEffects(object, D_L19_001A8F20, object+0x10, 0.0f, 0.0f, 20, 0, 10,
+                SpawnExplosionEffects(object, g_particle_effect_template, object+0x10, 0.0f, 0.0f, 20, 0, 10,
                              0.0f, 0.0f, 9.0f, 1.0f, -1, 3.0f, 1, 5, -1, 0, 0x810001);
                 if (HALF(state, 0x76E)>=4) moby_mark_spawned(object);
                 else { HALF(state, 0x76E)++; protopet_reset_to_start_anim(object); }

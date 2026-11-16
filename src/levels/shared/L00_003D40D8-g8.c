@@ -4,22 +4,22 @@
  * (config/cflags.txt). */
 extern int ref_L00_003D40D8_00(float *);
 extern int g_frame_l00_counter __attribute__((sda));
-extern float D_L00_001B0250 __attribute__((sda));
-extern float D_L00_001B0254 __attribute__((sda));
-extern float D_L00_001B0258 __attribute__((sda));
-extern float D_L00_001B025C __attribute__((sda));
-extern float D_L00_001B0260 __attribute__((sda));
-extern int D_L00_001B029C __attribute__((sda));
-extern float D_L00_001B02A0 __attribute__((sda));
-extern float D_L00_001B02A4 __attribute__((sda));
-extern float D_L00_001B02A8 __attribute__((sda));
-extern char D_L00_001B8FF0[];
+extern float g_kilonoid_shot_float_param __attribute__((sda));
+extern float g_kilonoid_aim_yaw_degrees __attribute__((sda));
+extern float g_kilonoid_aim_pitch_degrees __attribute__((sda));
+extern float g_kilonoid_shot_velocity_scale __attribute__((sda));
+extern float g_kilonoid_target_height_offset __attribute__((sda));
+extern int g_kilonoid_shot_sound_id __attribute__((sda));
+extern float g_kilonoid_shot_speed __attribute__((sda));
+extern float g_kilonoid_projectile_speed __attribute__((sda));
+extern float g_kilonoid_projectile_param __attribute__((sda));
+extern char g_cam_follow_matrix[];
 extern char g_hero_position[];                       /* the hero's position */
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
 extern char g_weapon_l00_table[];                   /* weapon table, 0xE0 bytes per entry */
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern unsigned char D_00139587 __attribute__((nosda)); /* weapon index of slot 0x1F */
-extern unsigned char *D_L00_001FEA14 __attribute__((nosda));
+extern int g_game_l00_mode MACRO_ADDR;
+extern unsigned char g_kilonoid_weapon_index __attribute__((nosda)); /* weapon index of slot 0x1F */
+extern unsigned char *g_effect_param_pointer_b __attribute__((nosda));
 extern void ref_L00_003D40D8_01(char *,int,float *);
 extern char *ref_L00_003D40D8_02(float *,char *,int,float,float,float,float,float);
 extern void ref_L00_003D40D8_03(char *,int,int,int);
@@ -63,10 +63,10 @@ void kilonoid_fire_shot(unsigned char *moby, EffectLauncherState *state)
         return;
     ref_L00_003D40D8_01(moby, 1, pos);
     state->alternate ^= 1;
-    obj = ref_L00_003D40D8_02(pos, D_L00_001B8FF0, 0,
-                              D_L00_001B0254 * 0.017453294f, D_L00_001B0258 * 0.017453294f,
-                              D_L00_001B0250,
-                              D_L00_001B0254 * 0.017453294f, D_L00_001B0258 * 0.017453294f);
+    obj = ref_L00_003D40D8_02(pos, g_cam_follow_matrix, 0,
+                              g_kilonoid_aim_yaw_degrees * 0.017453294f, g_kilonoid_aim_pitch_degrees * 0.017453294f,
+                              g_kilonoid_shot_float_param,
+                              g_kilonoid_aim_yaw_degrees * 0.017453294f, g_kilonoid_aim_pitch_degrees * 0.017453294f);
     if (obj) {
         if ((*(short *)(obj + 0xaa) == MOBY_CLASS_RECEIVER_BOT || *(short *)(obj + 0xaa) == 0xec0 /* moby class 3776 */
              || *(short *)(obj + 0xaa) == 0xed4 /* moby class 3796 */)
@@ -83,7 +83,7 @@ void kilonoid_fire_shot(unsigned char *moby, EffectLauncherState *state)
             ref_L00_003D40D8_03(moby, 2, 0, 5);
         ref_L00_003D40D8_04(delta, moby + 0x10, g_hero_position);
         angle = ref_L00_003D40D8_05(delta, moby + 0xe0);
-        if (D_L00_001A8F00 == 2 || moby[0x42] != moby[0x43] || (unsigned char)moby[0x42] != 2
+        if (g_game_l00_mode == 2 || moby[0x42] != moby[0x43] || (unsigned char)moby[0x42] != 2
             || !(angle > 1.1f))
             return;
         qcopy(target, obj + 0x10);
@@ -93,47 +93,47 @@ void kilonoid_fire_shot(unsigned char *moby, EffectLauncherState *state)
             if (v)
                 target[2] += *(float *)(v + 0x10);
             else
-                target[2] += D_L00_001B0260;
+                target[2] += g_kilonoid_target_height_offset;
         }
         hue = ref_L00_003D40D8_07(255);
         {
-            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x202080, hue, 127, 16,
+            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 3, 0x202080, hue, 127, 16,
                                                420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
-                result[2] = *D_L00_001FEA14;
+                result[2] = *g_effect_param_pointer_b;
         }
         {
-            char *result = ref_L00_003D40D8_08(pos, D_L00_001A8F20, 3, 0x601080, (hue + 128) % 255,
+            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 3, 0x601080, (hue + 128) % 255,
                                                127, 16, 420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
-                result[2] = *D_L00_001FEA14;
+                result[2] = *g_effect_param_pointer_b;
         }
         ref_L00_003D40D8_04(step, target, pos);
-        ref_L00_003D40D8_09(step, step, D_L00_001B025C);
+        ref_L00_003D40D8_09(step, step, g_kilonoid_shot_velocity_scale);
         ref_L00_003D40D8_10(pos, pos, step);
-        if (state->charges && !ref_L00_003D40D8_07(D_L00_001B029C)) {
+        if (state->charges && !ref_L00_003D40D8_07(g_kilonoid_shot_sound_id)) {
             float f;
             char *result;
 
             if (--state->charges < 0)
                 state->charges = 0;
-            f = ref_L00_003D40D8_11(pos, target, 0, D_L00_001B02A0 * 0.016666668f,
-                                    -(D_L00_001B02A4 * 0.00027777778f));
+            f = ref_L00_003D40D8_11(pos, target, 0, g_kilonoid_shot_speed * 0.016666668f,
+                                    -(g_kilonoid_projectile_speed * 0.00027777778f));
             ref_L00_003D40D8_04(velocity, target, pos);
             velocity[2] = 0;
-            ref_L00_003D40D8_09(velocity, velocity, D_L00_001B02A0 * 0.016666668f);
+            ref_L00_003D40D8_09(velocity, velocity, g_kilonoid_shot_speed * 0.016666668f);
             velocity[2] = f;
-            result = ref_L00_003D40D8_12(moby, pos, velocity, 180, D_L00_001B02A4 * 0.00027777778f);
+            result = ref_L00_003D40D8_12(moby, pos, velocity, 180, g_kilonoid_projectile_speed * 0.00027777778f);
             ref_L00_003D40D8_13(3, 0, moby);
-            *(float *)(result + 0x2c) = D_L00_001B02A8;
+            *(float *)(result + 0x2c) = g_kilonoid_projectile_param;
         } else {
             ref_L00_003D40D8_14(pos, moby, obj);
             ref_L00_003D40D8_13(0, 0, moby);
         }
         {
-            char *v = g_weapon_l00_table + D_00139587 * 0xe0;
+            char *v = g_weapon_l00_table + g_kilonoid_weapon_index * 0xe0;
             float f = ref_L00_003D40D8_15(0.0f, 0.17f);
             float delay = 1.0f / *(float *)(v + 0x54);
 

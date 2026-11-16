@@ -17,12 +17,12 @@ extern float IntToFloat(int n);
 extern int FastTweenColor(int from, int to, float t);
 extern int FastDecTimer(void *timer);
 extern void part_kill(char *particle);
-extern float D_001AA348 __attribute__((sda));
-extern float D_001AA34C __attribute__((sda));
-extern float D_001AA33C __attribute__((sda));
-extern float D_001AA338 __attribute__((sda));
-extern float D_001AA31C __attribute__((sda));
-extern float D_001AA318 __attribute__((sda));
+extern float g_drift_decel_param __attribute__((sda));
+extern float g_drift_rise_param __attribute__((sda));
+extern float g_drift_scale_start_b __attribute__((sda));
+extern float g_drift_scale_end_b __attribute__((sda));
+extern float g_drift_scale_start_a __attribute__((sda));
+extern float g_drift_scale_end_a __attribute__((sda));
 
 #define LERP(lo, hi, t) (((hi) - (lo)) * (t) + (lo))
 
@@ -34,16 +34,16 @@ void part_update_drifting(char *particle)
     particle[8] = (unsigned char)particle[8] + (unsigned char)motion[0x1E];
     FastVecAdd(particle + 0x10, particle + 0x10, motion);
     speed = -FastVecLength(motion);
-    math_step_value_toward_target(particle + 0x30, &speed, 0.0f, 0.0f, D_001AA348 * 0.00027777778f, speed);
+    math_step_value_toward_target(particle + 0x30, &speed, 0.0f, 0.0f, g_drift_decel_param * 0.00027777778f, speed);
     vec_scale_to_length(motion, motion, -speed);
-    *(float *)(particle + 0x18) += D_001AA34C * 0.016666667f;
+    *(float *)(particle + 0x18) += g_drift_rise_param * 0.016666667f;
     life_left = IntToFloat(*(short *)(particle + 0xA));
     max_life = IntToFloat((unsigned char)motion[0x1D]);
     life_fraction = life_left / max_life;
     if (motion[0x1F] & 1)
-        *(float *)(particle + 0xC) = LERP(D_001AA33C, D_001AA338, life_fraction) * 210000.0f;
+        *(float *)(particle + 0xC) = LERP(g_drift_scale_start_b, g_drift_scale_end_b, life_fraction) * 210000.0f;
     else
-        *(float *)(particle + 0xC) = LERP(D_001AA31C, D_001AA318, life_fraction) * 210000.0f;
+        *(float *)(particle + 0xC) = LERP(g_drift_scale_start_a, g_drift_scale_end_a, life_fraction) * 210000.0f;
     *(int *)(particle + 4) = FastTweenColor(*(int *)(motion + 0x18), *(int *)(motion + 0x14), life_fraction);
     if (*(short *)(particle + 0xA) < 15) {
         life_left = IntToFloat(*(short *)(particle + 0xA));

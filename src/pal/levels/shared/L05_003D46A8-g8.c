@@ -5,12 +5,12 @@ extern unsigned char *CreateMoby(int type);
 extern int FloatToInt(float value);
 extern void vec_scale_to_length(void *out, void *in, float scale);
 extern void FastVecCross(void *out, void *a, void *b);
-extern float D_L05_001AFC34 __attribute__((sda));
-extern float D_L05_001AFC38 __attribute__((sda));
-extern float D_L05_001AFC3C __attribute__((sda));
-extern float D_L05_001AFC40 __attribute__((sda));
-extern float D_L05_001AFC44 __attribute__((sda));
-extern float D_L05_001AFC48 __attribute__((sda));
+extern float g_projectile_speed_normal __attribute__((sda));
+extern float g_projectile_speed_alt __attribute__((sda));
+extern float g_projectile_range_normal __attribute__((sda));
+extern float g_projectile_range_alt __attribute__((sda));
+extern float g_projectile_scale_a __attribute__((sda));
+extern float g_projectile_scale_b __attribute__((sda));
 
 unsigned char *func_PAL_L05_003D46A8(void *position, void *direction, int value, char *owner, int kind)
 {
@@ -30,18 +30,18 @@ unsigned char *func_PAL_L05_003D46A8(void *position, void *direction, int value,
         *(unsigned short *)(object + 0x32) = 511;
         object[0x31] = 1;
         object[0x20] = 1;
-        speed = (kind ? D_L05_001AFC38 : D_L05_001AFC34) * 0.020000001f;
+        speed = (kind ? g_projectile_speed_alt : g_projectile_speed_normal) * 0.020000001f;
         *(int *)(state + 0x24) = kind;
-        duration = (kind ? D_L05_001AFC40 : D_L05_001AFC3C) / speed;
+        duration = (kind ? g_projectile_range_alt : g_projectile_range_normal) / speed;
         *(int *)(state + 0x18) = FloatToInt(duration);
         *(float *)(state + 0x1C) = 1.0f / duration;
         *(int *)(state + 0x10) = value;
         *(char **)(state + 0x20) = owner;
         *(int *)(state + 0x14) = 0;
         if (kind)
-            *(float *)(object + 0x2C) *= D_L05_001AFC48;
+            *(float *)(object + 0x2C) *= g_projectile_scale_b;
         else
-            *(float *)(object + 0x2C) *= D_L05_001AFC44;
+            *(float *)(object + 0x2C) *= g_projectile_scale_a;
         *(unsigned short *)(object + 0x34) |= 0x100;
         qcopy(object + 0x10, position);
         vec_scale_to_length(state, direction, speed);

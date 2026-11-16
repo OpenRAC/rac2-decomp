@@ -77,11 +77,11 @@ extern void Fc936841d_FUN_00282CC0(char *target, char *first, char *local);
 
 extern NativeObjectSearchRecord32 g_health_l00_drain_slots[];
 
-extern unsigned char *D_001BAF98[];
+extern unsigned char *g_hit_result[];
 
 extern char g_music_state[];
 
-extern char D_001B01F0[];
+extern char g_str_hero_hit_by_object_debug[];
 
 extern int snd_resume_music_stream(void);
 
@@ -97,9 +97,9 @@ extern char g_spark_records[];
 
 extern void matrix_mul_vec3(void *, void *, void *);
 
-extern char D_L00_00252C40[][16];
+extern char g_random_direction_table[][16];
 
-extern char D_L00_00189F00[];
+extern char g_zero_l00_vector[];
 
 extern float math_random_float_range(float, float);
 
@@ -144,7 +144,7 @@ extern void draw_world_quad(char *pkt, float *matrix, int mode);
 /* Checks the player and records in the owner whether he can be hurt; if he can, raises his hit counter. */
 void hero_check_hit_by_object(char *self)
 {
-    unsigned char *player = D_001BAF98[0];
+    unsigned char *player = g_hit_result[0];
     char *vars = *(char **)(self + 0x68);
     unsigned char *player_vars;
     char *game_state;
@@ -170,7 +170,7 @@ void hero_check_hit_by_object(char *self)
             *(int *)(vars + 0x54) = 1;
         }
     } else {
-        STUB_printf(D_001B01F0, *(short *)(player + 0xAA));
+        STUB_printf(g_str_hero_hit_by_object_debug, *(short *)(player + 0xAA));
     }
 }
 
@@ -446,12 +446,12 @@ void part_emit_spark_burst(char *self)
 }
 
 /* Format string for the missing-state message. */
-extern char D_001B0238[];
+extern char g_str_hero_under_falling_debug[];
 /* Retail reads these two words with the assembler's lui/lw macro (the destination register
    as the address temporary): cc1 emits `lw reg,sym` for an sda symbol, and the assembler,
    with no small-data threshold here, expands it into lui/lw. */
 extern int g_surface_height_tiles[] __attribute__((sda));
-extern int D_001B22D8[] __attribute__((sda));
+extern int g_surface_box_count[] __attribute__((sda));
 
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
@@ -460,7 +460,7 @@ extern int stub_empty_30(void);
 /* Checks whether the player is under the falling object and, if so, hurts him or locks on to him. */
 void hero_check_under_falling_object(char *self)
 {
-    unsigned char *hero_slot = D_001BAF98[0];
+    unsigned char *hero_slot = g_hit_result[0];
     char *vars = *(char **)(self + 0x68);
     unsigned char *player;
     unsigned char *player_vars;
@@ -494,7 +494,7 @@ void hero_check_under_falling_object(char *self)
                     return;
                 }
                 if (player_vars[0x14] == 0) {
-                    RippleDisturb(g_surface_height_tiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
+                    RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
                     if (stub_empty_30() == 0) {
                         player[0xBC] += 1;
                         if (player[0xBC] >= 25) {
@@ -511,7 +511,7 @@ void hero_check_under_falling_object(char *self)
                 *(int *)(vars + 0x44) = 1;
             }
         } else {
-            STUB_printf(D_001B0238, *(short *)(player + 0xAA));
+            STUB_printf(g_str_hero_under_falling_debug, *(short *)(player + 0xAA));
         }
         *(int *)(vars + 0x38) = 1;
     } else {
@@ -528,13 +528,13 @@ void moby_do_nothing(void)
 void math_init_random_direction_table(void)
 {
     int i;
-    char *entry = (char *)D_L00_00252C40;
+    char *entry = (char *)g_random_direction_table;
     for (i = 49; i >= 0; i--) {
         float length = math_random_float_range(0.01f, 7.0f);
         float yaw = math_random_angle();
         float pitch = math_random_float_range(0.0f, 3.1415927f);
         vec_build_spherical_offset(entry, length, yaw, pitch);
-        FastVecAdd(entry, entry, D_L00_00189F00);
+        FastVecAdd(entry, entry, g_zero_l00_vector);
         entry += 16;
     }
 }

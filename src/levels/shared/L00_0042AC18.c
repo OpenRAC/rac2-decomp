@@ -1,7 +1,7 @@
 #include "common.h"
 extern char g_sound_state[];
 extern char g_camera_l00_position[];
-extern char *D_L00_001B19EC __attribute__((section(".sdata")));
+extern char *g_slot_table __attribute__((section(".sdata")));
 extern float fast_vec_dist(char *, char *);
 extern int math_fast_float_d(int *);
 extern int snd_start_from_table_entry(int, int, char *, int);
@@ -17,7 +17,7 @@ void snd_update_emitter_proximity(char *emitter) {
     if (distance < *(float *)(emitter + 0xc)) {
         char *sound_slot;
         flags = 0;
-        if (*(u8 *)(D_L00_001B19EC + state[0] * 32 + 0x18)) flags |= 4;
+        if (*(u8 *)(g_slot_table + state[0] * 32 + 0x18)) flags |= 4;
         sound_slot = g_sound_state + state[4] * 0x70;
         if (*(char **)(sound_slot + 0x8c) == emitter && *(u8 *)(sound_slot + 0x74)) return;
         if (math_fast_float_d(state + 3)) {

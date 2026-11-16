@@ -4,8 +4,8 @@
 typedef struct { char pad[0xB0]; float effect_position[4]; } EffectPositionView;
 extern EffectPositionView g_hero_state;
 /* Keep the destination address as the assembler's absolute-address macro. */
-extern char D_L02_001B3210[] __attribute__((sda));
-extern char *D_L02_001AD410 __attribute__((sda));
+extern char g_arena_anchor_pos[] __attribute__((sda));
+extern char *g_actor_shared_state __attribute__((sda));
 extern void actor_collect_matching_indices(char *);
 extern void sway_update_pieces(char *);
 extern void actor_advance_cycle_timer(char *);
@@ -26,11 +26,11 @@ void camera_point_actor_update(char *moby) {
         hero_block->effect_position[2] = 500.0f;
         hero_block->effect_position[3] = 1.0f;
         source = hero_block->effect_position;
-        dest = D_L02_001B3210;
+        dest = g_arena_anchor_pos;
         qcopy(dest, source);
         *(u8 *)(moby + 0x30) = 0xFF;
         actor_collect_matching_indices(moby);
-        set_scale_matrix(D_L02_001AD410 + 0x40, 1.0f);
+        set_scale_matrix(g_actor_shared_state + 0x40, 1.0f);
         moby_set_state(moby, 1, -1);
         break;
     }

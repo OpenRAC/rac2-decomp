@@ -4,7 +4,7 @@ typedef unsigned int PreviewQuad __attribute__((mode(TI)));
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, unused;
 } PreviewChoice;
-extern PreviewChoice D_0026CFD0[];
+extern PreviewChoice g_preview_choices[];
 typedef struct {
     char pad0[0x140];
     float analogX, analogY;
@@ -32,9 +32,9 @@ typedef struct {
 
 extern InputState g_pad_state;
 extern PreviewState g_pause_menu_state;
-extern PreviewDisplay D_0025D478;
+extern PreviewDisplay g_preview_display;
 typedef struct { int selection; } PreviewSelection;
-extern PreviewSelection D_001ABA74 __attribute__((sda));
+extern PreviewSelection g_preview_selection __attribute__((sda));
 extern unsigned int g_equipment_bits;
 extern int snd_play_from_global_bank(int, int, int);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
@@ -46,7 +46,7 @@ extern void func_002A0F48(void *);
 /* Lets the player move through the model preview list with left and right, turns the shown model toward a set angle (or by the stick) and highlights the matching part. */
 int UpdateModelPreviewMenu(void)
 {
-    int result = 0, flags = g_pad_state.flags, old_selection = D_001ABA74.selection;
+    int result = 0, flags = g_pad_state.flags, old_selection = g_preview_selection.selection;
     int i, color, type;
     float dx, dy;
     union { unsigned int q __attribute__((mode(TI))); float f[4]; } pos;
@@ -63,33 +63,33 @@ callback_done:
     if (flags & 0x8000) {
         int selection;
         for (;;) {
-            selection = --D_001ABA74.selection;
+            selection = --g_preview_selection.selection;
             if (selection < 0) goto previous_failed;
-            if ((g_equipment_bits & D_0026CFD0[selection].selectionMask) == D_0026CFD0[selection].requiredBits) break;
+            if ((g_equipment_bits & g_preview_choices[selection].selectionMask) == g_preview_choices[selection].requiredBits) break;
         }
         snd_play_from_global_bank(3, 0, 0);
         goto previous_done;
 previous_failed:
-        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = old_selection;
+        snd_play_from_global_bank(5, 0, 0); g_preview_selection.selection = old_selection;
 previous_done:
-        if (D_001ABA74.selection < 0) D_001ABA74.selection = 0;
+        if (g_preview_selection.selection < 0) g_preview_selection.selection = 0;
     }
     if (g_pad_state.flags & 0x2000) {
         int selection;
         for (;;) {
-            selection = ++D_001ABA74.selection;
+            selection = ++g_preview_selection.selection;
             if (selection >= 13) goto next_failed;
-            if ((g_equipment_bits & D_0026CFD0[selection].selectionMask) == D_0026CFD0[selection].requiredBits) break;
+            if ((g_equipment_bits & g_preview_choices[selection].selectionMask) == g_preview_choices[selection].requiredBits) break;
         }
         snd_play_from_global_bank(3, 0, 0);
         goto next_done;
 next_failed:
-        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = old_selection;
+        snd_play_from_global_bank(5, 0, 0); g_preview_selection.selection = old_selection;
 next_done:
-        if (D_001ABA74.selection >= 13) D_001ABA74.selection = 12;
+        if (g_preview_selection.selection >= 13) g_preview_selection.selection = 12;
     }
     {
-        int choice = D_0026CFD0[D_001ABA74.selection].selectionMask;
+        int choice = g_preview_choices[g_preview_selection.selection].selectionMask;
         if (choice == 0xc00 || choice == 0x200 || choice == 0x40) goto default_rotation;
         else if (choice == 0x30 || choice == 0x2000) {
             g_pause_menu_state.x = -0.01605300046503544f;
@@ -113,15 +113,15 @@ default_rotation:
             g_pause_menu_state.z = -2.782352924346924f;
         }
     }
-    if (old_selection != D_001ABA74.selection) {
+    if (old_selection != g_preview_selection.selection) {
         g_pause_menu_state.timer = 0;
         math_ping_pong_blend_values(-1, 0xff606060, 30, 1, 1);
-        D_0025D478.timer = -580;
+        g_preview_display.timer = -580;
     }
     dx = g_pad_state.analogX * 0.02f;
     dy = g_pad_state.analogY * 0.02f;
     pos.q = 0;
-    D_0025D478.choice = D_0026CFD0[D_001ABA74.selection].displayChoice;
+    g_preview_display.choice = g_preview_choices[g_preview_selection.selection].displayChoice;
     pos.f[0] = 270.0f;
     pos.f[1] = 257.0f;
     pos.f[2] = 65.0f;
@@ -140,14 +140,14 @@ default_rotation:
         }
         type = ((unsigned char *)preview_obj)[0xbc];
         F(preview_obj, 0x2c) = F(*(char **)(preview_obj + 0x24), 0x24);
-        if ((type == 0 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x30) ||
-            (type == 1 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x40) ||
-            (type == 2 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x180) ||
-            (type == 3 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x200) ||
-            (type == 4 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0xc00) ||
-            (type == 5 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x1000) ||
-            (type == 6 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x2000) ||
-            (type == 7 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0xc000))
+        if ((type == 0 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x30) ||
+            (type == 1 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x40) ||
+            (type == 2 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x180) ||
+            (type == 3 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x200) ||
+            (type == 4 && g_preview_choices[g_preview_selection.selection].selectionMask == 0xc00) ||
+            (type == 5 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x1000) ||
+            (type == 6 && g_preview_choices[g_preview_selection.selection].selectionMask == 0x2000) ||
+            (type == 7 && g_preview_choices[g_preview_selection.selection].selectionMask == 0xc000))
             gfx_pack_render_command_fields(preview_obj, color, 14, 14, 0);
         else gfx_pack_render_command_fields(preview_obj, 0x202020, 14, 14, 0);
         func_002A0F48(preview_obj);

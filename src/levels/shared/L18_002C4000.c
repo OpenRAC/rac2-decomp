@@ -22,10 +22,10 @@ typedef int BatchA_A09_s32;
 extern void func_00335668(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
 
 
-extern BatchA_A18_u8 D_0018C0D4;
+extern BatchA_A18_u8 g_screen_mode_flag;
 
 /* func_L18_002D0C00 */
-extern s32 D_L18_001AFBB0 MACRO_ADDR;
+extern s32 g_hero_frozen_flag MACRO_ADDR;
 extern u8 g_hero_state[];
 typedef struct {
     u8 reserved000[0x80];
@@ -62,7 +62,7 @@ extern void hero_update_timers_reach(void);
 /* func_L18_002D1998 */
 /* Partial probe-collision record: only the hit object, hit count and surface normal are modeled. */
 typedef struct { u8 prefix[0x18]; s32 object; s32 count; u8 gap[0x20]; float normal[4]; } MotionCollision;
-extern MotionCollision D_L18_001BFC00;
+extern MotionCollision g_hero_ground_hit;
 extern float cam_get_view_space_vector_length(void *);
 /* func_L00_002D36E0(float *out, s32 flag, float x, float y, float z) elsewhere: this typed
    interleaving keeps both EE argument banks unchanged and gives retail's argument setup order. */
@@ -91,7 +91,7 @@ void hero_update_frame_input(void)
     u8 *snapshot;
     u8 *positions;
     s32 index;
-    s32 active = D_L18_001AFBB0;
+    s32 active = g_hero_frozen_flag;
     if (active) {
         hero_reset_speeds_and_vectors();
         return;
@@ -169,22 +169,22 @@ void ClipHeroVelocityAtWall(s32 force)
     FastVecAdd(lowerEnd, lowerEnd, lowerStart);
     {
         u8 *hero = g_hero_state;
-        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) material = GetCollHitMaterial();
+        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) material = GetCollHitMaterial();
     }
     angle = 0.0f;
     {
         u8 *hero = g_hero_state;
-        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && D_L18_001BFC00.count > 0) angle = cam_get_view_space_angle(D_L18_001BFC00.normal);
+        if (CollLine(start, end, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) angle = cam_get_view_space_angle(g_hero_ground_hit.normal);
     }
     if (angle >= 0.8726647f || material == 8 || material == 12) {
         u8 *hero = g_hero_state;
-        *(s32 *)(hero + 0x270) = D_L18_001BFC00.object;
-        cam_set_view_space_height(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 0.0f);
-        vec_scale_to_length(D_L18_001BFC00.normal, D_L18_001BFC00.normal, 1.0f);
-        dot = FastVecDot(D_L18_001BFC00.normal, hero + 0xF0);
+        *(s32 *)(hero + 0x270) = g_hero_ground_hit.object;
+        cam_set_view_space_height(g_hero_ground_hit.normal, g_hero_ground_hit.normal, 0.0f);
+        vec_scale_to_length(g_hero_ground_hit.normal, g_hero_ground_hit.normal, 1.0f);
+        dot = FastVecDot(g_hero_ground_hit.normal, hero + 0xF0);
         if (dot < 0.0f) {
-            FastVecScale(D_L18_001BFC00.normal, D_L18_001BFC00.normal, -dot);
-            FastVecAdd(hero + 0xF0, hero + 0xF0, D_L18_001BFC00.normal);
+            FastVecScale(g_hero_ground_hit.normal, g_hero_ground_hit.normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, g_hero_ground_hit.normal);
         }
     }
 }
@@ -195,7 +195,7 @@ extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 /* Starts a sound or effect that depends on the current level mode, with a short or long version. */
 void snd_start_mode_sound(BatchA_A18_s32 a0) {
     BatchA_A18_s32 e = a0 ? 2 : 1;
-    switch (D_0018C0D4) {
+    switch (g_screen_mode_flag) {
     case 0:
         ref_L18_002E4090_00(0, e);
         break;
@@ -210,11 +210,11 @@ void snd_start_mode_sound(BatchA_A18_s32 a0) {
 /* func_L18_002F1098 is matched in its own unit, L18_002F1098-g8.c. */
 
 extern int text_measure_width_scaled(void *a0, void *a1, const char *a2);
-extern char D_L18_00296510[];
+extern char g_str_font_texture[];
 
 /* Draws a fixed text string for the caller. */
 int text_draw_fixed(void *a0, void *a1) {
-    return text_measure_width_scaled(a0, a1, D_L18_00296510);
+    return text_measure_width_scaled(a0, a1, g_str_font_texture);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
@@ -237,14 +237,14 @@ BatchA_A18_s32 moby_set_table_entry_byte(BatchA_A18_u8 *s, BatchA_A18_s32 a1, Ba
 }
 
 extern BatchA_A18_s32 point_in_path_xy(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2);
-extern BatchA_A18_s32 D_001FE480[];
+extern BatchA_A18_s32 g_path_pointer_table[];
 
 /* hands the slot's payload to its handler; the slot table entry holds count then payload */
 /* Looks up a table entry and hands its data to a handler, or returns the default value if there is none. */
 BatchA_A18_s32 moby_run_slot_handler(BatchA_A18_s32 a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2) {
     BatchA_A18_u8 *p;
     if (a1 != -1) {
-        p = (BatchA_A18_u8 *)D_001FE480[a1];
+        p = (BatchA_A18_u8 *)g_path_pointer_table[a1];
         if (p != 0) {
             if (*(BatchA_A18_s32 *)p != 0) {
                 return point_in_path_xy(a0, (BatchA_A18_s32)(p + 0x10), *(BatchA_A18_s32 *)p);
@@ -257,14 +257,14 @@ BatchA_A18_s32 moby_run_slot_handler(BatchA_A18_s32 a0, BatchA_A18_s32 a1, Batch
 /* func_L18_0035D238 is defined in L18_0035D238.c. */
 
 extern float path_find_best_point(void *a0, void *a1, void *a2, char *a3, float f12);
-extern BatchA_A18_s32 D_001FE480[];
+extern BatchA_A18_s32 g_path_pointer_table[];
 
 /* Looks up a path by number and finds the best point on it; returns -1 if there is no path. */
 float path_find_best_point_by_id(void *a0, void *a1, void *a2, BatchA_A18_s32 a3, float f12) {
     if (a3 == -1) {
         return -1.0f;
     }
-    a3 = D_001FE480[a3];
+    a3 = g_path_pointer_table[a3];
     if (a3 == 0) {
         return -1.0f;
     }
@@ -473,9 +473,9 @@ void protopet_reset_to_idle(BatchA_A18_u8 *a0) {
 /* The group id lists, the entity bank base and the resident group count. The two scalars are
    `sda` arrays of unknown size: cc1 emits the one-instruction load, which the assembler
    expands absolute (`lui`/`lw`) as retail has it in this -G0 unit. */
-extern unsigned short *D_L18_001FB320[];
+extern unsigned short *g_condition_target_lists[];
 extern char *g_moby_l18_table[] __attribute__((sda));
-extern int D_L18_001B2838[] __attribute__((sda));
+extern int g_max_l18_group_index[] __attribute__((sda));
 
 /* Counts the entities of kind 0xB69 in state 1 that the group's id list names, stores the count
    through a1 and returns the last of them (0 when there is none). Retail compares the state with
@@ -490,9 +490,9 @@ u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1) {
     if (a0 == -1)
         return 0;
     last = 0;
-    for (entry = D_L18_001FB320[a0];
-         (a0 & 0xFF) != 0xFF && a0 <= D_L18_001B2838[0] && entry != 0 &&
-         ((short)entry[-1] >= 0 || entry == D_L18_001FB320[a0]);
+    for (entry = g_condition_target_lists[a0];
+         (a0 & 0xFF) != 0xFF && a0 <= g_max_l18_group_index[0] && entry != 0 &&
+         ((short)entry[-1] >= 0 || entry == g_condition_target_lists[a0]);
          entry++) {
         entity = (unsigned char *)(g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8));
         if (entity == 0)
@@ -686,9 +686,9 @@ void protopet_wake_group_members(unsigned char *a0) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (entry = D_L18_001FB320[L18_GroupId(vars, i)];
-             (L18_GroupId(vars, i) & 0xFF) != 0xFF && L18_GroupId(vars, i) <= D_L18_001B2838[0] &&
-             entry != 0 && ((short)entry[-1] >= 0 || entry == D_L18_001FB320[L18_GroupId(vars, i)]);
+        for (entry = g_condition_target_lists[L18_GroupId(vars, i)];
+             (L18_GroupId(vars, i) & 0xFF) != 0xFF && L18_GroupId(vars, i) <= g_max_l18_group_index[0] &&
+             entry != 0 && ((short)entry[-1] >= 0 || entry == g_condition_target_lists[L18_GroupId(vars, i)]);
              entry++) {
             entity = (unsigned char *)(g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8));
             if (entity == 0)
@@ -793,9 +793,9 @@ void protopet_reset_group_members(unsigned char *a0) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (entry = D_L18_001FB320[L18_GroupId(vars, i)];
+        for (entry = g_condition_target_lists[L18_GroupId(vars, i)];
              (L18_GroupId(vars, i) & 0xFF) != 0xFF && L18_GroupId(vars, i) <= D_L18_001B2838_1[0] &&
-             entry != 0 && ((short)entry[-1] >= 0 || entry == D_L18_001FB320[L18_GroupId(vars, i)]);
+             entry != 0 && ((short)entry[-1] >= 0 || entry == g_condition_target_lists[L18_GroupId(vars, i)]);
              entry++) {
             entity = (unsigned char *)(D_L18_001B281C_1[0] + ((*entry & 0x7FFF) << 8));
             if (entity == 0)
@@ -844,11 +844,11 @@ int SelectGroupMembersAndTarget(char *owner, int slot) {
     memset(secondary, 0, 8);
     {
         unsigned short *entry;
-        for (entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)];
+        for (entry = g_condition_target_lists[L18_SelectionGroupId(state, slot, 0)];
              (L18_SelectionGroupId(state, slot, 0) & 0xff) != 0xff &&
-             L18_SelectionGroupId(state, slot, 0) <= D_L18_001B2838[0] && entry != 0 &&
+             L18_SelectionGroupId(state, slot, 0) <= g_max_l18_group_index[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
-              entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0)]); entry++) {
+              entry == g_condition_target_lists[L18_SelectionGroupId(state, slot, 0)]); entry++) {
             entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (entity != 0 && *(unsigned char *)(entity + 0x20) != 0xfe &&
@@ -863,11 +863,11 @@ int SelectGroupMembersAndTarget(char *owner, int slot) {
     for (i = 0; i < 1; i++) {
         {
             unsigned short *entry;
-            for (entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x20)];
+            for (entry = g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x20)];
                  (L18_SelectionGroupId(state, slot, 0x20) & 0xff) != 0xff &&
-                 L18_SelectionGroupId(state, slot, 0x20) <= D_L18_001B2838[0] && entry != 0 &&
+                 L18_SelectionGroupId(state, slot, 0x20) <= g_max_l18_group_index[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
-                  entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x20)]); entry++) {
+                  entry == g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x20)]); entry++) {
                 entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
                 if (entity != secondary[0] && entity != 0 &&
@@ -883,11 +883,11 @@ int SelectGroupMembersAndTarget(char *owner, int slot) {
     if (secondary[0] == 0) return 0;
     {
         unsigned short *entry;
-        for (entity = 0, entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)];
+        for (entity = 0, entry = g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x10)];
              (L18_SelectionGroupId(state, slot, 0x10) & 0xff) != 0xff &&
-             L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
+             L18_SelectionGroupId(state, slot, 0x10) <= g_max_l18_group_index[0] && entry != 0 &&
              ((short)entry[-1] >= 0 ||
-              entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
+              entry == g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
             entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
             if (entity == 0) break;
             if (*(unsigned char *)(entity + 0x31) != 0 &&
@@ -901,11 +901,11 @@ int SelectGroupMembersAndTarget(char *owner, int slot) {
     if (selected == 0) {
         {
             unsigned short *entry;
-            for (entity = 0, entry = D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)];
+            for (entity = 0, entry = g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x10)];
                  (L18_SelectionGroupId(state, slot, 0x10) & 0xff) != 0xff &&
-                 L18_SelectionGroupId(state, slot, 0x10) <= D_L18_001B2838[0] && entry != 0 &&
+                 L18_SelectionGroupId(state, slot, 0x10) <= g_max_l18_group_index[0] && entry != 0 &&
                  ((short)entry[-1] >= 0 ||
-                  entry == D_L18_001FB320[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
+                  entry == g_condition_target_lists[L18_SelectionGroupId(state, slot, 0x10)]); entry++) {
                 entity = g_moby_l18_table[0] + (*entry & 0x7fff) * 0x100;
                 if (entity == 0) break;
                 if (moby_is_state_two((unsigned char *)entity) == 0) {

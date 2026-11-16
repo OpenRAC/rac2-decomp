@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern int D_L18_001B0580 __attribute__((sda));
-extern float D_L18_001B0584 __attribute__((sda));
-extern int D_L18_001B0588 __attribute__((sda));
+extern int g_platform_move_frames __attribute__((sda));
+extern float g_platform_move_distance __attribute__((sda));
+extern int g_platform_wait_frames __attribute__((sda));
 extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -19,7 +19,7 @@ void sliding_l18_platform_update(u8 *moby) {
     switch (moby[0x20]) {
     case 0:
         qcopy_nc(vars, moby + 0x10);
-        vec_scale_to_length(vars + 0x10, moby + 0xC0, D_L18_001B0584 / D_L18_001B0580);
+        vec_scale_to_length(vars + 0x10, moby + 0xC0, g_platform_move_distance / g_platform_move_frames);
         moby_set_state(moby, 1, -1);
         *(int *)(vars + 0x20) = 0;
         break;
@@ -41,7 +41,7 @@ void sliding_l18_platform_update(u8 *moby) {
     case 2:
         if (flag_set_first_pending(moby))
             snd_play_from_class_bank(0, 0, moby, 0x1152);
-        if (*(int *)(vars + 0x20) < D_L18_001B0580) {
+        if (*(int *)(vars + 0x20) < g_platform_move_frames) {
             FastVecAdd(moby + 0x10, moby + 0x10, vars + 0x10);
             FastVecSub(g_moby_l18_table[0] + (*(int *)(vars + 0x24) << 8) + 0x10,
                          g_moby_l18_table[0] + (*(int *)(vars + 0x24) << 8) + 0x10,
@@ -50,7 +50,7 @@ void sliding_l18_platform_update(u8 *moby) {
         }
         if (*(int *)(vars + 0x28))
             part_spawn_trail_particles(moby);
-        if (D_L18_001B0588 < *(u16 *)(moby + 0x96))
+        if (g_platform_wait_frames < *(u16 *)(moby + 0x96))
             moby_set_state(moby, 1, -1);
         break;
     }

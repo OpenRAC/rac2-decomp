@@ -2,7 +2,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_L01_001AF628 __attribute__((sda));
+extern float g_vendor_logo_spin_speed __attribute__((sda));
 
 extern float FastAddRotations(float, float);
 
@@ -26,7 +26,7 @@ void megacorp_vendor_logo_update(char *moby)
         AttachManipulator(moby, 1, moby_vars);
         break;
     case 1: {
-        float spin_step = D_L01_001AF628 * 0.000290888245f;
+        float spin_step = g_vendor_logo_spin_speed * 0.000290888245f;
 
         *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), spin_step);
         *(float *)(moby_vars + 0x40) = FastAddRotations(*(float *)(moby_vars + 0x40), spin_step * -2.0f);
@@ -38,15 +38,15 @@ void megacorp_vendor_logo_update(char *moby)
 
 /* spins the moby's wheels down and leans them, then steps the frame counter */
 
-extern float D_L01_001AF50C __attribute__((sda));
+extern float g_collectible_height_scale __attribute__((sda));
 
-extern float D_L01_001AF510 __attribute__((sda));
+extern float g_bob_base_height __attribute__((sda));
 
-extern float D_L01_001AF514 __attribute__((sda));
+extern float g_bob_l01_amplitude __attribute__((sda));
 
-extern float D_L01_001AF528 __attribute__((sda));
+extern float g_bolt_bob_spin_speed __attribute__((sda));
 
-extern int D_L01_001AF54C __attribute__((sda));
+extern int g_sparkle_chance __attribute__((sda));
 
 extern float func_002E3A60(float);
 
@@ -128,23 +128,23 @@ void moby_position_carried_objects(Moby_00398938 *moby)
     }
 }
 
-extern float D_L01_001B1A9C __attribute__((sda));
+extern float g_sparkle_drift_a_min __attribute__((sda));
 
-extern float D_L01_001B1AA0 __attribute__((sda));
+extern float g_sparkle_drift_a_max __attribute__((sda));
 
-extern float D_L01_001B1AA4 __attribute__((sda));
+extern float g_sparkle_drift_b_min __attribute__((sda));
 
-extern float D_L01_001B1AA8 __attribute__((sda));
+extern float g_sparkle_drift_b_max __attribute__((sda));
 
-extern unsigned char D_L01_001B1AAC __attribute__((sda));
+extern unsigned char g_sparkle_l01_alpha_2 __attribute__((sda));
 
-extern int D_L01_001B1AB0 __attribute__((sda));
+extern int g_sparkle_particle_type_a __attribute__((sda));
 
-extern int D_L01_001B1AB4 __attribute__((sda));
+extern int g_sparkle_particle_type_b __attribute__((sda));
 
-extern float D_L01_001B1AB8 __attribute__((sda));
+extern float g_sparkle_scale_a __attribute__((sda));
 
-extern float D_L01_001B1ABC __attribute__((sda));
+extern float g_sparkle_scale_b __attribute__((sda));
 
 
 extern void FastVecScale(void *, void *, float);
@@ -173,20 +173,20 @@ void part_spawn_sparkle_drift(char *moby)
         moby_transform_joint_to_world(moby, 0, &spark_pos);
     }
     i = 2;
-    vec_random_direction(&drift_a, D_L01_001B1A9C * 0.016666668f, D_L01_001B1AA0 * 0.016666668f);
-    alpha = D_L01_001B1AAC;
-    part_spawn_hero_relative(&spark_pos, &drift_a, D_L01_001B1AB0, alpha, math_random_int_below(255), 0, D_L01_001B1AB8);
+    vec_random_direction(&drift_a, g_sparkle_drift_a_min * 0.016666668f, g_sparkle_drift_a_max * 0.016666668f);
+    alpha = g_sparkle_l01_alpha_2;
+    part_spawn_hero_relative(&spark_pos, &drift_a, g_sparkle_particle_type_a, alpha, math_random_int_below(255), 0, g_sparkle_scale_a);
     do {
         i--;
-        vec_random_direction(&drift_b, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
+        vec_random_direction(&drift_b, g_sparkle_drift_b_min * 0.016666668f, g_sparkle_drift_b_max * 0.016666668f);
         FastVecAdd(&drift_a, &drift_a, &drift_b);
-        alpha = D_L01_001B1AAC;
-        part_spawn_hero_relative(&spark_pos, &drift_a, D_L01_001B1AB4, alpha, math_random_int_below(255), 0, D_L01_001B1ABC);
+        alpha = g_sparkle_l01_alpha_2;
+        part_spawn_hero_relative(&spark_pos, &drift_a, g_sparkle_particle_type_b, alpha, math_random_int_below(255), 0, g_sparkle_scale_b);
     } while (i >= 0);
 }
 
 /* Same body as func_L01_00417090, with this function's own callees. */
-extern float D_00189F08 __attribute__((nosda));
+extern float g_ground_height __attribute__((nosda));
 
 extern float ref_L01_00397EB0_00 __attribute__((sda));
 extern float ref_L01_00397EB0_01 __attribute__((sda));
@@ -208,7 +208,7 @@ void part_spawn_sparkle_trail_above_ground(char *moby)
         FastVecScale(&spark_pos, moby, 0.0009765625f);
     } else {
         moby_transform_joint_to_world(moby, 0, &spark_pos);
-        if (((float *)&spark_pos)[2] < D_00189F08) return;
+        if (((float *)&spark_pos)[2] < g_ground_height) return;
     }
     i = 2;
     vec_random_direction(&drift_a, ref_L01_00397EB0_00 * 0.016666668f, ref_L01_00397EB0_01 * 0.016666668f);
@@ -224,17 +224,17 @@ void part_spawn_sparkle_trail_above_ground(char *moby)
 }
 
 
-extern float D_L01_001AF638 __attribute__((sda));
+extern float g_wind_min_count __attribute__((sda));
 
-extern float D_L01_001AF63C __attribute__((sda));
+extern float g_wind_max_count __attribute__((sda));
 
-extern float D_L01_001B2EF0 __attribute__((sda));
+extern float g_wind_x __attribute__((sda));
 
-extern float D_L01_001B2F00 __attribute__((sda));
+extern float g_wind_change_delay __attribute__((sda));
 
-extern float D_001B2EF4 __attribute__((nosda));
+extern float g_level_float_param_2 __attribute__((nosda));
 
-extern int D_001B2F04 __attribute__((nosda));
+extern int g_level_int_param __attribute__((nosda));
 
 extern float func_00310580(float, float);
 
@@ -308,9 +308,9 @@ extern void anim_start_immediate(char *, int, int);
 
 extern int math_fast_float_d(char *);
 
-extern const int D_L01_001B0D10 __attribute__((sda));
+extern const int g_flashing_ring_color_a __attribute__((sda));
 
-extern const int D_L01_001B0D14 __attribute__((sda));
+extern const int g_flashing_ring_color_b __attribute__((sda));
 
 /* brings the ring out of the ground, then lets it spin and hand itself over */
 /* Updates a ring moby: it lifts out of the ground, flashes between two colors while active, then resets. */
@@ -346,17 +346,17 @@ void flashing_ring_update(char *moby)
             *(int *)(moby_vars + 0xC) = *(int *)(moby_vars + 0x4);
         } else {
             *(unsigned char *)(moby + 0x20) = 2;
-            *(int *)(moby + 0x78) = D_L01_001B0D14;
+            *(int *)(moby + 0x78) = g_flashing_ring_color_b;
             *(int *)(moby_vars + 0xC) = 0;
         }
         break;
     case 2:
         if (*(int *)(moby_vars + 0x0) != 0) {
             if (math_fast_float_d(moby_vars + 0x10) != 0) {
-                if (*(int *)(moby + 0x78) == D_L01_001B0D10)
-                    *(int *)(moby + 0x78) = D_L01_001B0D14;
+                if (*(int *)(moby + 0x78) == g_flashing_ring_color_a)
+                    *(int *)(moby + 0x78) = g_flashing_ring_color_b;
                 else
-                    *(int *)(moby + 0x78) = D_L01_001B0D10;
+                    *(int *)(moby + 0x78) = g_flashing_ring_color_a;
                 *(int *)(moby_vars + 0x10) = 10;
             }
             if (math_fast_float_d(moby_vars + 0xC) != 0)
@@ -372,7 +372,7 @@ void flashing_ring_update(char *moby)
             *(unsigned short *)(moby + 0x34) |= 0x1000;
             anim_start_immediate(moby, 3, 0);
             *(unsigned char *)(moby + 0x20) = 1;
-            *(int *)(moby + 0x78) = D_L01_001B0D10;
+            *(int *)(moby + 0x78) = g_flashing_ring_color_a;
         }
         break;
     }
@@ -400,11 +400,11 @@ extern int PlayMobySound(int, int, void *);
 extern char *spider_bot_spawn(void *, void *);
 extern void ref_L01_003B2598_00(void (*)(void *), void *);
 extern void helper_update_hit_test(void *);
-extern char *D_L01_001AFCE0 __attribute__((sda));
-extern int D_L01_001A8F40 MACRO_ADDR;
-extern int D_L01_001A8F48 MACRO_ADDR;
-extern int D_L01_001A9034 MACRO_ADDR;
-extern int D_00138324 NOT_SDA;
+extern char *g_spiderbot_glove_target __attribute__((sda));
+extern int g_hero_l01_control_mode MACRO_ADDR;
+extern int g_hero_aux_mode MACRO_ADDR;
+extern int g_hero_input_lock_alt MACRO_ADDR;
+extern int g_pad_held_flags NOT_SDA;
 
 /* Updates the Spiderbot Glove pickup: checks that the hero may use it, lets the hero grab it with the button, and plays its use effect. */
 void spiderbot_glove_update(char *moby) {
@@ -420,7 +420,7 @@ void spiderbot_glove_update(char *moby) {
         char *hero = g_hero_state;
 
         if (*(int *)(hero + 0x1244) == 3)
-            D_L01_001AFCE0 = 0;
+            g_spiderbot_glove_target = 0;
         moby_transform_joint_to_world(moby, 0, pos);
         *(int *)(moby_vars + 0x2C) = 0;
         sweep = sweep_storage;
@@ -429,9 +429,9 @@ void spiderbot_glove_update(char *moby) {
     }
     *(int *)(moby_vars + 0x24) = coll_trace_projectile_to_impact(pos, sweep, moby_vars, moby_vars + 0x10, moby, &hit, &aux, 0.003055555745959282f);
     result = weapon_get_group(aux);
-    if (D_L01_001A8F40 || D_L01_001A8F48 != -2)
+    if (g_hero_l01_control_mode || g_hero_aux_mode != -2)
         *(int *)(moby_vars + 0x2C) = 1;
-    if (D_L01_001A9034 && *(float *)(moby_vars + 8) < 462.42999267578125f)
+    if (g_hero_input_lock_alt && *(float *)(moby_vars + 8) < 462.42999267578125f)
         *(int *)(moby_vars + 0x2C) = 1;
     if (result || !*(int *)(moby_vars + 0x24) || !*(int *)(moby_vars + 0x28))
         goto blocked;
@@ -466,7 +466,7 @@ timer:
     }
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        D_L01_001AFCE0 = moby;
+        g_spiderbot_glove_target = moby;
         *(unsigned char *)(moby + 0x20) = 1;
         *(int *)(moby_vars + 0x28) = 1;
         *(int *)(moby_vars + 0x24) = 0;
@@ -474,7 +474,7 @@ timer:
     case 1: {
         char *hero = g_hero_state;
 
-        if ((D_00138324 & *(int *)(hero + 0x1230)) && !*(unsigned char *)(hero + 0x22BC) &&
+        if ((g_pad_held_flags & *(int *)(hero + 0x1230)) && !*(unsigned char *)(hero + 0x22BC) &&
             !*(int *)(moby_vars + 0x2C) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(hero + 0x1E0) = 120;

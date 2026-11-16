@@ -57,26 +57,26 @@ typedef struct {
     u8 pad3c[4];
 } ContactEntry;
 extern PlayerInputView g_hero_state;
-extern ContactEntry D_L11_001C4F80[];
-extern int D_L11_001A8F00 __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern ContactEntry g_contact_table[];
+extern int g_arena_state __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 extern int func_PAL_L11_002D9038(int, int);
 extern float fade_get_value(void);
-extern float func_PAL_L00_00381328(float);
+extern float fade_reduce_value_pal(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void hero_build_relative_point(float *, int, float, float, float);
 extern void *part_find_owned_effect_slot(void *, unsigned int, int);
 extern int FloatToInt(float);
-extern void func_PAL_L00_002A4D58(long);
+extern void AdjustPlayerHealth_pal(long);
 extern int hero_play_sound(int, int);
 extern void hero_flatten_push_vector(int, int, float, float);
 extern void cam_scale_view_space_height(char *, char *, float);
 
-int func_PAL_L11_002CB0C8(long apply)
+int hero_handle_contact_hit_pal(long apply)
 {
     Vector direction;
     ContactEntry *entry;
@@ -85,18 +85,18 @@ int func_PAL_L11_002CB0C8(long apply)
     if (g_hero_state.movement == 20 || g_hero_state.movement == 7) return 0;
     if (g_hero_state.state == 0x31) return 0;
     if (g_hero_state.timer) return 0;
-    if (D_L11_001A8F00) return 0;
+    if (g_arena_state) return 0;
     g_hero_state.contact = 0;
     object = g_hero_state.object;
     if (object[0xA8] == 0xff) return 0;
-    entry = &D_L11_001C4F80[object[0xA8]];
+    entry = &g_contact_table[object[0xA8]];
     if (entry->owner != object) return 0;
     if (!(entry->flags & 9)) return 0;
     if (entry->strength != 0.0f) {
-        D_001A7A33 = 0; g_bolt_multiplier = 1;
+        g_contact_hit_flag = 0; g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !g_hero_state.mode) {
-        entry->strength = func_PAL_L00_00381328(entry->strength);
+        entry->strength = fade_reduce_value_pal(entry->strength);
         if (entry->strength == 0.0f) return 0;
     }
     g_hero_state.contact = entry->object;
@@ -117,7 +117,7 @@ int func_PAL_L11_002CB0C8(long apply)
         }
         if ((g_hero_state.state == 1 || g_hero_state.state == 0x1d || g_hero_state.interrupted) && !(entry->flags & 8)) {
             u8 *hit = part_find_owned_effect_slot(g_hero_state.object, 1, 0);
-            if (hit) func_PAL_L00_002A4D58(FloatToInt(*(float *)(hit+0x2c)));
+            if (hit) AdjustPlayerHealth_pal(FloatToInt(*(float *)(hit+0x2c)));
             if (!g_hero_state.health) func_PAL_L11_002D9038(0x16, 1);
             g_hero_state.timer = 0x40;
             if (!g_hero_state.soundTimer) g_hero_state.soundTimer = 0xF;

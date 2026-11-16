@@ -80,12 +80,12 @@ typedef struct {
 } L00_DispatchRecord;
 
 /* The shared class table: a 0x14-byte record per type index, its entries at +0x8. */
-extern L00_DispatchRecord D_002A3A00[];
+extern L00_DispatchRecord g_moby_class_dispatch_table[];
 
 /* Calls the object's class entry 2 for the type index in its +0x8C halfword. */
 /* Runs the object's type-specific update step, if its type has one. */
 void moby_call_class_update(char *object) {
-    L00_Dispatch callback = D_002A3A00[*(short *)(object + 0x8C)].entries[2];
+    L00_Dispatch callback = g_moby_class_dispatch_table[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
         callback(object);
 }
@@ -93,7 +93,7 @@ void moby_call_class_update(char *object) {
 /* Calls the object's class entry 4 for the type index in its +0x8C halfword. */
 /* Runs the object's type-specific cleanup step, if its type has one. */
 void moby_call_class_cleanup(char *object) {
-    L00_Dispatch callback = D_002A3A00[*(short *)(object + 0x8C)].entries[4];
+    L00_Dispatch callback = g_moby_class_dispatch_table[*(short *)(object + 0x8C)].entries[4];
     if (callback != 0)
         callback(object);
 }
@@ -221,8 +221,8 @@ typedef struct {
     int anchor;
 } TextContextPrefix;
 
-extern TextGroup D_L00_001BC588[];
-extern char D_L00_001BC200[];
+extern TextGroup g_fading_text_layouts[];
+extern char g_fading_text_style[];
 extern int g_screen_width MACRO_ADDR;
 extern int AdvanceGroupedTableOffset(int, int *, int *);
 extern int text_find_level_by_key(int);
@@ -240,19 +240,19 @@ void text_draw_caption_line(int row, float alpha)
     TextContextPrefix *context;
     int origin;
     if (!AdvanceGroupedTableOffset(row, &group, &index)) return;
-    text = (unsigned char *)text_find_level_by_key(D_L00_001BC588[group].firstKey + index);
+    text = (unsigned char *)text_find_level_by_key(g_fading_text_layouts[group].firstKey + index);
     if (!text) return;
-    context = (TextContextPrefix *)D_L00_001BC200;
-    origin = D_L00_001BC588[context->group].origin + row * D_L00_001BC588[context->group].step;
-    gfx_draw_colored_rectangle(origin + 2, origin + D_L00_001BC588[context->group].step - 2,
+    context = (TextContextPrefix *)g_fading_text_style;
+    origin = g_fading_text_layouts[context->group].origin + row * g_fading_text_layouts[context->group].step;
+    gfx_draw_colored_rectangle(origin + 2, origin + g_fading_text_layouts[context->group].step - 2,
         0, g_screen_width, (unsigned long long)((int)(alpha * 96.0f) << 24));
-    FontSetWindow(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
+    FontSetWindow(layout, origin, origin + g_fading_text_layouts[context->group].step, 0,
         g_screen_width, g_screen_width / 2 + 2,
-        origin + D_L00_001BC588[context->group].step / 2 + 1, context->anchor, 3);
+        origin + g_fading_text_layouts[context->group].step / 2 + 1, context->anchor, 3);
     text_draw_window_small(layout, 0x80000000UL, text, -1);
-    FontSetWindow(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
+    FontSetWindow(layout, origin, origin + g_fading_text_layouts[context->group].step, 0,
         g_screen_width, g_screen_width / 2,
-        origin + D_L00_001BC588[context->group].step / 2, context->anchor, 3);
+        origin + g_fading_text_layouts[context->group].step / 2, context->anchor, 3);
     text_draw_window_small(layout, 0xFFFFFFFFUL, text, -1);
 }
 
@@ -260,24 +260,24 @@ void text_draw_caption_line(int row, float alpha)
 /* Draws the current caption text with a shaded bar fading out above it. */
 void text_draw_caption_bars(void)
 {
-    int text = text_find_level_by_key(D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].key);
+    int text = text_find_level_by_key(g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].key);
     unsigned short layout[12];
     int i, y, bottom;
 
     if (text) {
-        FontSetWindow(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
+        FontSetWindow(layout, 0, g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].origin, 0,
             g_screen_width, g_screen_width / 2,
-            D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
+            g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].width, 18, 1);
         text_draw_window_small(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
-        bottom = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 2;
-        y = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 4;
+        bottom = g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].origin - 2;
+        y = g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].origin - 4;
         for (i = 0; i < 6; i++) {
             gfx_draw_colored_rectangle(bottom - y, bottom, -g_screen_width, g_screen_width * 2, 0x18000000);
             y = y * 5 / 6;
         }
-        FontSetWindow(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
+        FontSetWindow(layout, 0, g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].origin, 0,
             g_screen_width, g_screen_width / 2,
-            D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
+            g_fading_text_layouts[((TextContextPrefix *)g_fading_text_style)->group].width, 18, 1);
         text_draw_window_small(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
     }
 }
@@ -337,15 +337,15 @@ s32 math_blend_quadratic_to_int(f32 a,f32 b,f32 t) {
 }
 
 /* A .sdata flag the compiler addresses through the assembler macro (lui + lbu in one register). */
-extern unsigned char D_L00_001A7A0A __attribute__((section(".sdata")));
+extern unsigned char g_weighted_taps_skip_flag __attribute__((section(".sdata")));
 typedef struct {
     u8 row;
     u8 col;
     short weight;
 } WeightTap;
 
-extern WeightTap D_L00_0025EDE0[][16][10];
-extern int D_L00_001A24A8[][16];
+extern WeightTap g_weight_tap_table[][16][10];
+extern int g_tap_weight_grid[][16];
 
 /* Adds up ten weighted values from a table for a pair of indices, or returns 0 if out of range. */
 int math_sum_weighted_table_taps(int a, int b)
@@ -354,14 +354,14 @@ int math_sum_weighted_table_taps(int a, int b)
     int sum;
     int n;
 
-    if (D_L00_001A7A0A != 0 || a >= 21)
+    if (g_weighted_taps_skip_flag != 0 || a >= 21)
         return 0;
     if (b >= 16)
         return 0;
-    tap = D_L00_0025EDE0[a][b];
+    tap = g_weight_tap_table[a][b];
     sum = 0;
     for (n = 9; n >= 0; n--) {
-        sum += tap->weight * D_L00_001A24A8[tap->row][tap->col];
+        sum += tap->weight * g_tap_weight_grid[tap->row][tap->col];
         tap++;
     }
     return sum;

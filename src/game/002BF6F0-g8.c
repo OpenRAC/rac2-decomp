@@ -2,10 +2,10 @@
 extern int FastDecTimer(short *);
 extern void func_00282CC0_17(char *, char *, char *);
 extern void part_kill(void *);
-extern unsigned char *D_001F2608[];
-extern float D_001AA384 __attribute__((sda));
-extern float D_L00_001AA708 __attribute__((sda));
-extern float D_L00_001AA704 __attribute__((sda));
+extern unsigned char *g_part_tex_spinning_fall_table[];
+extern float g_falling_spin_param __attribute__((sda));
+extern float g_spark_random_range __attribute__((sda));
+extern float g_spark_pull_base __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
@@ -25,13 +25,13 @@ void part_update_spinning_fall(char *self)
         *(float *)(state + 8) -= *(float *)(state + 24);
     func_00282CC0_17(self + 16, self + 16, state);
     self[8] = (unsigned char)self[8] + *(unsigned char *)(state + 20);
-    if ((unsigned char)self[2] == D_001F2608[0][0])
-        *(float *)(self + 12) += D_001AA384 * 3500.000244140625f;
+    if ((unsigned char)self[2] == g_part_tex_spinning_fall_table[0][0])
+        *(float *)(self + 12) += g_falling_spin_param * 3500.000244140625f;
     if (*(float *)(self + 24) < *(float *)(state + 16))
         part_kill(self);
 }
 
-extern float D_001AA380 __attribute__((sda));
+extern float g_bounded_fade_offset __attribute__((sda));
 
 /* Moves a particle inside a fixed box and fades it out in steps. It disappears when it leaves the box or has faded away. */
 void part_update_bounded_fade(char *self)
@@ -47,7 +47,7 @@ void part_update_bounded_fade(char *self)
     *(float *)(self + 0x0C) += *(float *)(motion + 0x10);
     *(unsigned char *)(self + 8) += 1;
     if (*(float **)(motion + 0x14))
-        *(float *)(self + 0x18) = **(float **)(motion + 0x14) + D_001AA380;
+        *(float *)(self + 0x18) = **(float **)(motion + 0x14) + g_bounded_fade_offset;
     if (--*(short *)(self + 0xA) == 0) {
         *(int *)(self + 4) -= 0x01000000;
         *(short *)(self + 0xA) = 4;
@@ -56,7 +56,7 @@ void part_update_bounded_fade(char *self)
         part_kill(self);
 }
 
-extern int D_001AA39C __attribute__((sda));
+extern int g_bounce_split_chance __attribute__((sda));
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
@@ -74,7 +74,7 @@ void part_update_bouncing_split(char *self)
     func_00282CC0_17(position, position, motion);
     *(unsigned char *)(self + 8) += 2;
     if (*(float *)(self + 0x18) < *(float *)(motion + 0x10)) {
-        if (math_random_int_below(D_001AA39C - 1) == 0) {
+        if (math_random_int_below(g_bounce_split_chance - 1) == 0) {
             *(float *)(self + 0x18) = *(float *)(motion + 0x10);
             *(float *)(self + 0x20) *= math_random_float_range(1.0f, 3.5f);
             *(float *)(motion + 4) *= math_random_float_range(1.0f, 3.5f);
@@ -112,8 +112,8 @@ void part_update_spark_emitting(char *self)
     float newZ;
     float growth;
 
-    value = math_random_float_range(-D_L00_001AA708, D_L00_001AA708);
-    pull = D_L00_001AA704 + value;
+    value = math_random_float_range(-g_spark_random_range, g_spark_random_range);
+    pull = g_spark_pull_base + value;
     growth = *(float *)(motion + 0x10) + 0.0075f;
     newZ = *(float *)(motion + 8) - pull;
     value = *(float *)(motion + 0x14) * growth * 210000.0f;

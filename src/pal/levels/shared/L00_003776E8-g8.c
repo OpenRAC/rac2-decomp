@@ -56,8 +56,8 @@ typedef struct {
     char rest[0x684];
 } PurchaseMenuState;
 extern PurchaseMenuState g_purchase_menu_model[];
-extern float D_L00_001AD570 __attribute__((sda));
-extern int D_L00_001B259C, D_L00_001B25A0, D_L00_001B25A4;
+extern float g_shop_blend_factor __attribute__((sda));
+extern int g_frame_counter_first, g_frame_counter_second, g_previous_pad_pressed;
 typedef struct {
     int pad[0x140 / 4];
     float x, y;
@@ -70,7 +70,7 @@ typedef struct {
     struct { int value; char pad[16]; } entries[0];
 } MenuResourceTable;
 extern MenuResourceTable g_copy_setup_data[];
-extern short D_00152CE4 NOT_SDA;
+extern short g_load_entry_index NOT_SDA;
 extern unsigned char g_item_slot_to_record[];
 typedef struct {
     char prefix[0x3C];
@@ -79,15 +79,15 @@ typedef struct {
 } MenuShopClass;
 extern char g_weapon_l00_table[];
 extern void module_l00_call_handler_with_arg_2(int);
-extern s16 func_PAL_002B8898(int);
+extern s16 snd_pump_music_and_disc_read_pal(int);
 extern int ForceClaimNotice(int, int, int);
 extern void LoadClassIntoFreeCacheSlot(int);
-extern void func_PAL_00295298(int);
+extern void SwitchCachedDiscAsset_pal(int);
 extern void game_reset_frame_counters(void),moby_update_visible_objects(void),snd_run_callbacks(void);
-extern void func_PAL_L00_002A6CB8(void);
-extern void part_update_all(void),UpdateLightingEnvironment(void),func_PAL_002F6208(void);
+extern void hero_l00_update_frame_2_pal(void);
+extern void part_update_all(void),UpdateLightingEnvironment(void),game_update_idle_frame_counters_pal(void);
 extern int request_end_slot(int,int);
-extern int func_PAL_0028E9B8(int);
+extern int hud_update_record_timers_pal(int);
 extern void object_copy_vector_to_selected(void *),cam_set_state_rotation(void *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
@@ -96,10 +96,10 @@ extern float FastAddRotations(float,float);
 extern void func_002A0F48(void *);
 extern void FastVecScale(void *,void *,float);
 extern void BindVendorPreviewModel(void),func_PAL_002FC1D0(void);
-extern void func_PAL_L00_00377668(void),func_PAL_L00_003771D8(void);
+extern void menu_dispatch_by_mode_pal(void),shop_dispatch_purchase_confirm_pal(void);
 extern void module_l00_call_handler_with_arg_3(int),module_l00_call_handler_with_arg(int,int),func_L00_0030C710(int);
 extern void level_run_callbacks(void);
-extern s32 func_PAL_002E5898(void);
+extern s32 UpdateSoundVoices_pal(void);
 #define MF(o) (*(float *)(m + (o)))
 /* Advances the purchase menu and its model previews, then runs the shared update. */
 void func_PAL_L00_003776E8(void)
@@ -113,31 +113,31 @@ void func_PAL_L00_003776E8(void)
     ForceClaimNotice(6, 0, 1);
     switch (g_purchase_menu_model[0].f00) {
     case 0:
-        func_PAL_002B8898(1);
-        D_L00_001AD570 += 0.1f;
+        snd_pump_music_and_disc_read_pal(1);
+        g_shop_blend_factor += 0.1f;
         module_l00_call_handler_with_arg_2(1);
-        if (D_L00_001AD570 >= 1.0f) {
+        if (g_shop_blend_factor >= 1.0f) {
             g_purchase_menu_model[0].f00 = 1;
-            D_L00_001AD570 = 1.0f;
+            g_shop_blend_factor = 1.0f;
             g_purchase_menu_model[0].f04 = 0;
         }
         break;
     case 2:
-        D_L00_001AD570 += 0.1f;
+        g_shop_blend_factor += 0.1f;
         module_l00_call_handler_with_arg_2(0);
-        if (D_L00_001AD570 < 1.0f)
+        if (g_shop_blend_factor < 1.0f)
             break;
-        D_L00_001AD570 = 1.0f;
+        g_shop_blend_factor = 1.0f;
         if (g_purchase_menu_model[0].f08) {
             g_purchase_menu_model[0].f08 = 0;
             if (g_purchase_menu_model[0].fa0 >= 0) {
                 v = g_copy_setup_data[0].entries[g_purchase_menu_model[0].fa0].value;
-                func_PAL_002B8898(1);
+                snd_pump_music_and_disc_read_pal(1);
                 LoadClassIntoFreeCacheSlot(v);
-                func_PAL_002B8898(1);
-                func_PAL_00295298(v);
+                snd_pump_music_and_disc_read_pal(1);
+                SwitchCachedDiscAsset_pal(v);
             } else {
-                D_00152CE4 = -1;
+                g_load_entry_index = -1;
             }
         }
         g_purchase_menu_model[0].f04 = 0;
@@ -145,27 +145,27 @@ void func_PAL_L00_003776E8(void)
             game_reset_frame_counters();
             moby_update_visible_objects();
             snd_run_callbacks();
-            func_PAL_L00_002A6CB8();
+            hero_l00_update_frame_2_pal();
             part_update_all();
         }
         request_end_slot(0, 0);
-        func_PAL_0028E9B8(1);
+        hud_update_record_timers_pal(1);
         if (!g_purchase_menu_model[0].f60) {
             object_copy_vector_to_selected(((char *)g_purchase_menu_model) + 0xD0);
             cam_set_state_rotation(((char *)g_purchase_menu_model) + 0xE0);
         }
         UpdateLightingEnvironment();
-        func_PAL_002F6208();
+        game_update_idle_frame_counters_pal();
         break;
     case 1:
         if (g_pad_state[0].held & 0x8000)
-            D_L00_001B259C++;
+            g_frame_counter_first++;
         else
-            D_L00_001B259C = 0;
+            g_frame_counter_first = 0;
         if (g_pad_state[0].held & 0x2000)
-            D_L00_001B25A0++;
+            g_frame_counter_second++;
         else
-            D_L00_001B25A0 = 0;
+            g_frame_counter_second = 0;
         if (g_purchase_menu_model[0].f90 == 0) {
             g_purchase_menu_model[0].f94 += 3;
             if (g_purchase_menu_model[0].f94 >= 128) {
@@ -240,9 +240,9 @@ void func_PAL_L00_003776E8(void)
                  g_purchase_menu_model[0].f6c == 0)
             func_PAL_002FC1D0();
         g_purchase_menu_model[0].f04++;
-        func_PAL_L00_00377668();
-        func_PAL_L00_003771D8();
-        D_L00_001B25A4 = g_pad_state[0].pressed;
+        menu_dispatch_by_mode_pal();
+        shop_dispatch_purchase_confirm_pal();
+        g_previous_pad_pressed = g_pad_state[0].pressed;
         if (g_purchase_menu_model[0].f50 == 0 &&
             *(int *)(((char *)g_purchase_menu_model) + 0x144 + g_purchase_menu_model[0].f80 * 24) == 1) {
             module_l00_call_handler_with_arg_3(*(int *)(((char *)g_purchase_menu_model) + 0x140 + g_purchase_menu_model[0].f80 * 24));
@@ -254,11 +254,11 @@ void func_PAL_L00_003776E8(void)
         } else {
             module_l00_call_handler_with_arg_3(0);
         }
-        func_PAL_0028E9B8(1);
+        hud_update_record_timers_pal(1);
         if (g_purchase_menu_model[0].f50 != 2)
             func_L00_0030C710(150);
         level_run_callbacks();
         break;
     }
-    func_PAL_002E5898();
+    UpdateSoundVoices_pal();
 }

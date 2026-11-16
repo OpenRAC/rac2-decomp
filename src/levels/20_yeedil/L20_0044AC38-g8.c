@@ -10,10 +10,10 @@
    table address in one register for the whole walk. */
 #include "common.h"
 
-extern int D_L20_001B2FB8[] __attribute__((sda));
-extern char *D_L20_001B2F9C[] __attribute__((sda));
-extern char *D_L20_001FBB20[];
-extern int D_L20_001B2440 __attribute__((sda));
+extern int g_group_count[] __attribute__((sda));
+extern char *g_group_l20_member_table[] __attribute__((sda));
+extern char *g_group_l20_id_lists[];
+extern int g_turret_light_color __attribute__((sda));
 
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_light_color(void *, int);
@@ -27,20 +27,20 @@ extern float math_random_angle(void);
 
 /* Wakes an idle turret from a group of objects, places it at a position facing a direction, and returns it (or null if none is free). */
 char *turret_spawn_from_group(int parent, int group_index, float *position, float *direction) {
-    char *idp = D_L20_001FBB20[group_index];
+    char *idp = g_group_l20_id_lists[group_index];
     char *found = 0;
 
     if ((group_index & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8[0] < group_index) {
+    if (g_group_count[0] < group_index) {
         goto end;
     }
     if (idp == 0) {
         goto end;
     }
     for (;;) {
-        char *moby = D_L20_001B2F9C[0] + ((*(u16 *)idp & 0x7FFF) << 8);
+        char *moby = g_group_l20_member_table[0] + ((*(u16 *)idp & 0x7FFF) << 8);
 
         if (moby == 0) {
             goto end;
@@ -53,7 +53,7 @@ char *turret_spawn_from_group(int parent, int group_index, float *position, floa
         if ((group_index & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8[0] < group_index) {
+        if (g_group_count[0] < group_index) {
             goto end;
         }
         if (idp == 0) {
@@ -62,7 +62,7 @@ char *turret_spawn_from_group(int parent, int group_index, float *position, floa
         if (*(s16 *)(idp - 2) >= 0) {
             continue;
         }
-        if (idp == D_L20_001FBB20[group_index]) {
+        if (idp == g_group_l20_id_lists[group_index]) {
             continue;
         }
         break;
@@ -75,7 +75,7 @@ end:
         *(u16 *)(found + 0x34) = (*(u16 *)(found + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(found + 0x98) = *(int *)(*(char **)(found + 0x24) + 0x10);
         anim_start_blended(found, 0, 0, 0xF);
-        moby_set_light_color(found, D_L20_001B2440);
+        moby_set_light_color(found, g_turret_light_color);
         if (math_random_int_below(2) != 0) {
             *(u16 *)(found + 0x34) |= 0x8000;
         } else {

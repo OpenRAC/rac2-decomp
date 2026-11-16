@@ -8,7 +8,7 @@ extern void Fa2a84657_FUN_002B9180(unsigned char *p);
 
 /* func_002C1FC0 is defined in 002BF6F0-g8.c. */
 
-void func_PAL_002C2D90(unsigned char *p)
+void part_update_drifting_fade_pal(unsigned char *p)
 {
     float tmp[4];
     char *v;

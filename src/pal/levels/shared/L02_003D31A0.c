@@ -16,13 +16,13 @@ typedef struct {
     s32 a;
     s32 b;
 } L02Range_CF1B8;
-extern L02Pair_CF1B8 D_L02_001B00D0;
-extern L02Pair_CF1B8 D_L02_001B00D8;
-extern L02Range_CF1B8 D_L02_001B00E0;
+extern L02Pair_CF1B8 g_puff_speed_pair;
+extern L02Pair_CF1B8 g_puff_size_pair;
+extern L02Range_CF1B8 g_puff_kind_range;
 typedef struct {
     L02Range_CF1B8 r[2];
 } L02Ranges_CF1B8;
-extern L02Ranges_CF1B8 D_L02_001B00E8;
+extern L02Ranges_CF1B8 g_puff_count_ranges;
 extern void vec_clear_128(void *);
 extern int math_random_int_below(int);
 extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
@@ -30,10 +30,10 @@ extern void vec_random_direction(void *, float, float);
 
 void func_PAL_L02_003D31A0(u8 *self)
 {
-    L02Pair_CF1B8 speed = D_L02_001B00D0;
-    L02Pair_CF1B8 size = D_L02_001B00D8;
-    L02Range_CF1B8 kind = D_L02_001B00E0;
-    L02Ranges_CF1B8 count = D_L02_001B00E8;
+    L02Pair_CF1B8 speed = g_puff_speed_pair;
+    L02Pair_CF1B8 size = g_puff_size_pair;
+    L02Range_CF1B8 kind = g_puff_kind_range;
+    L02Ranges_CF1B8 count = g_puff_count_ranges;
     f32 vel[4] __attribute__((aligned(16)));
     f32 pos[4] __attribute__((aligned(16)));
     s32 i;

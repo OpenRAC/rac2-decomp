@@ -22,7 +22,7 @@ typedef struct {
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 
-extern int D_L04_001B08F0 __attribute__((sda));
+extern int g_race_bike_mode __attribute__((sda));
 extern int g_current_lap;
 /* Route selection takes the object only; it reads its own state pointer. */
 extern void func_PAL_L04_00417578(void *);
@@ -44,11 +44,11 @@ extern void add_vectors(void *,void *,void *);
 void func_PAL_L04_00417CB0(char *m,RouteState1006 *s) {
  int old,i; float d,t; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
  func_PAL_L04_00417578(m);
- s->progress=UpdateNearestRoutePoint(m,s,&s->pathIndex,&s->pointIndex,g_current_lap,D_L04_001B08F0);
+ s->progress=UpdateNearestRoutePoint(m,s,&s->pathIndex,&s->pointIndex,g_current_lap,g_race_bike_mode);
  old=s->routeIndex;
  d=vec_distance_xy(&s->routePos[0],m+0x10);
- if (D_L04_001B08F0 ? d<20.0f : d<5.0f) {
-  s->distance+=(D_L04_001B08F0 ? 20.0f:5.0f)-d;
+ if (g_race_bike_mode ? d<20.0f : d<5.0f) {
+  s->distance+=(g_race_bike_mode ? 20.0f:5.0f)-d;
   if (s->distance>s->route->points[0][3]*IntToFloat(s->route->count))
    s->distance-=s->route->points[0][3]*IntToFloat(s->route->count);
   anim_sample_key_track(s->distance,s->route->points[0][3],s->route,&s->routeIndex,&s->fraction,s->routePos);
@@ -59,7 +59,7 @@ void func_PAL_L04_00417CB0(char *m,RouteState1006 *s) {
   t=mat_fast_helper_a(s->routePos[0]-F(m,0x10),s->routePos[1]-F(m,0x14));
   if(FastDiffRots(F(m,0xf8),t)>1.0471977f) {
    t=IntToFloat(FindNearestRoutePointIndex(m,s->route,0))*s->route->points[0][3];
-   s->distance=t+(D_L04_001B08F0?20.0f:5.0f);
+   s->distance=t+(g_race_bike_mode?20.0f:5.0f);
    anim_sample_key_track(s->distance,s->route->points[0][3],s->route,&s->routeIndex,&s->fraction,s->routePos);
   }
  }

@@ -2,9 +2,9 @@
 #include "names.h"
 
 typedef struct { int ids[2]; } SolTextPair;
-extern SolTextPair D_L00_001AE110;
-extern char D_L00_001AE118[];
-extern void func_PAL_0033CE70(void *);
+extern SolTextPair g_toggle_menu_text_pair;
+extern char g_str_toggle_menu_format[];
+extern void prompt_bar_draw_pal(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
@@ -16,9 +16,9 @@ void func_PAL_0033E248(char *object)
     char *first;
     char *second;
     char *format;
-    func_PAL_0033CE70(object + 8);
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    prompt_bar_draw_pal(object + 8);
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x10FC);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x1A7C39 != 0]);
     sprintf(buffer, format, first, second);
@@ -32,20 +32,20 @@ void func_PAL_0033FBE0(char *object)
     char *first;
     char *second;
     char *format;
-    func_PAL_0033CE70(object + 8);
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    prompt_bar_draw_pal(object + 8);
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0xBAB);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x1A7C3A != 0]);
     sprintf(buffer, format, first, second);
     text_draw_centered_small(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
 }
 
-extern void *func_PAL_0033CA78(void *);
+extern void *prompt_bar_destroy_pal(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_PAL_00340118(char *object) {
-    func_PAL_0033CA78(object + 0x8);
+    prompt_bar_destroy_pal(object + 0x8);
     menu_pass_through_handle(object + 0x2E0);
     return object;
 }
@@ -53,28 +53,28 @@ void *func_PAL_00340118(char *object) {
 extern void *hud_construct_widget_base(void *);
 
 void *func_PAL_00340470(char *object) {
-    func_PAL_0033CA78(object + 0x8);
+    prompt_bar_destroy_pal(object + 0x8);
     hud_construct_widget_base(object + 0x2E0);
     return object;
 }
 
 void func_PAL_00340310(unsigned char *owner, float *records)
 {
-    extern void func_PAL_0034A230(unsigned char *, float *);
-    func_PAL_0034A230(owner + 0x2E0, records);
+    extern void menu_set_entry_table_pal(unsigned char *, float *);
+    menu_set_entry_table_pal(owner + 0x2E0, records);
     *(float **)(owner + 0x3B8) = records;
 }
 
-extern void func_PAL_0033CD50(char *);
+extern void prompt_bar_update_pal(char *);
 extern void menu_set_anchor_pos(char *, float, float);
-extern void func_PAL_0033CD50(char *p);
+extern void prompt_bar_update_pal(char *p);
 extern void menu_set_anchor_pos(char *p, float x, float y);
 
 int func_PAL_003405B0(char *object, int flags)
 {
     char *p = object + 8;
     float *v;
-    func_PAL_0033CD50(p);
+    prompt_bar_update_pal(p);
     v = *(float **)(object + 0x2D8);
     menu_set_anchor_pos(p, v[0], v[1]);
     return (flags >> 6) & 1;
@@ -98,15 +98,15 @@ extern int *object_get_fourth_field(char *);
 extern float *object_get_first_field(char *);
 extern void gfx_draw_screen_line(int, int, int, int, unsigned long long, int);
 extern Row_0033B910 g_map_spot_table[];
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern unsigned char D_001A7BE8[] MACRO_ADDR;
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern unsigned char g_map_unlocked_flags[] MACRO_ADDR;
 extern char g_map_overlay_state[];
 static __inline__ void SetColor_0033B910(char *w, int c)
 {
     *object_get_fourth_field(w) = c;
 }
 
-void func_PAL_0033D838(char *obj)
+void map_screen_draw_pal(char *obj)
 {
     int i;
     char *base;
@@ -123,11 +123,11 @@ void func_PAL_0033D838(char *obj)
                       (float)g_map_spot_table[i].y + (*(float **)(obj + 0x1C8))[1], 0.0f, 0.0f);
         hud_set_widget_value_pair(obj + 0x31C, 0xE99E, g_map_spot_table[i].text);
         object_set_second_float4(obj + 0x31C, g_map_spot_table[i].scale, g_map_spot_table[i].scale, 0.0f, 0.0f);
-        if (D_001A7BE8[i] == 0)
+        if (g_map_unlocked_flags[i] == 0)
             SetColor_0033B910(obj + 0x31C, 0x70A0C0C0);
         else
             SetColor_0033B910(obj + 0x31C, 0x7029A1FF);
-        if (D_001A7BC8[i] != 0)
+        if (g_map_visited_flags[i] != 0)
             hud_draw_colored_quad_widget(obj + 0x31C);
     }
     base = g_map_overlay_state;

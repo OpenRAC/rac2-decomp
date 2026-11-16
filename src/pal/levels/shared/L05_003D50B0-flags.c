@@ -2,13 +2,13 @@
 
 #include "common.h"
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 extern float math_random_float_range(float, float);
 extern char *moby_get_motion_data(char *);
 extern void FastVecAdd(void *, void *, void *);
-extern int D_L05_00221D10[];
-extern char *D_L05_001B2614 __attribute__((sda));
-extern void func_PAL_L05_0037D610(char *, int);
+extern int g_feltzin_challenge_state[];
+extern char *g_feltzin_enemy_table __attribute__((sda));
+extern void moby_init_spawned_sub_object_pal(char *, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 
@@ -16,7 +16,7 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 
 /* func_L05_003D15E8 is in L05_003D15E8.c. */
 
-void func_PAL_L05_003D5628(char *obj)
+void moby_init_state_and_position_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
@@ -25,8 +25,8 @@ void func_PAL_L05_003D5628(char *obj)
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(moby_get_motion_data(obj) + 0x148) = 5;
-    func_PAL_L05_0037D610(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    moby_init_spawned_sub_object_pal(obj, 1);
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(float *)(sub + 0x180) = 5.0f;
     *(int *)(sub + 0x2F0) = -1;
     *(int *)(sub + 0x2F4) = -1;

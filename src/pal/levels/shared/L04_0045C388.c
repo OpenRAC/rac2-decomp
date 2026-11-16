@@ -3,12 +3,12 @@
 
 extern void moby_set_state(char *a0, int a1, int a2);
 extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
-extern void func_PAL_L00_003281C0(char *a0, int a1, float f12);
+extern void part_spawn_scaled_bolts_pal(char *a0, int a1, float f12);
 extern int PlayMobySound(int a0, int a1, char *a2);
 extern void debris_spawn_ring(char *a0, int a1, float f12, float f13, float f14, float f15);
 extern void moby_mark_spawned(char *a0);
 
-void func_PAL_L04_0045C388(char *s0)
+void triggered_effect_update_pal(char *s0)
 {
     char *s1 = *(char **)(s0 + 0x68);
 
@@ -22,7 +22,7 @@ void func_PAL_L04_0045C388(char *s0)
         *(unsigned char *)(s0 + 0xA8) = 0xFF;
         break;
     case 2:
-        func_PAL_L00_003281C0(s0, 1, 0.0f);
+        part_spawn_scaled_bolts_pal(s0, 1, 0.0f);
         PlayMobySound(0, 0, s0);
         debris_spawn_ring(s0, 0x1E, 0.4f, 4.4f, 1.0f, 0.10000001f);
         moby_mark_spawned(s0);

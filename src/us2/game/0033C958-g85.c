@@ -2,14 +2,14 @@
 #include "names.h"
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
-extern float D_L04_001AE1E0 __attribute__((sda));
-extern float D_L04_001AE1E8 __attribute__((sda));
-extern float D_L04_001AE1F0 __attribute__((sda));
-extern float D_L04_001AE1F8 __attribute__((sda));
-extern float D_L04_001AE1E4;
-extern float D_L04_001AE1EC;
-extern float D_L04_001AE1F4;
-extern float D_L04_001AE1FC;
+extern float g_info_panel_counter_x0 __attribute__((sda));
+extern float g_info_panel_counter_x1 __attribute__((sda));
+extern float g_info_panel_counter_x2 __attribute__((sda));
+extern float g_info_panel_counter_offset_x __attribute__((sda));
+extern float g_info_panel_counter_y0;
+extern float g_info_panel_counter_y1;
+extern float g_info_panel_counter_y2;
+extern float g_info_panel_counter_offset_y;
 struct pos {
     float x;
     float y;
@@ -19,12 +19,12 @@ void func_US2_0033FCE8(char *self)
 {
     float zero = 0.0f;
 
-    object_set_first_float4(self + 1400, D_L04_001AE1F8 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1FC + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1136, D_L04_001AE1E0 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1E4 + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1224, D_L04_001AE1E8 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1EC + (*(struct pos **)(self + 728))->y, zero, zero);
-    object_set_first_float4(self + 1312, D_L04_001AE1F0 + (*(struct pos **)(self + 728))->x,
-            D_L04_001AE1F4 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1400, g_info_panel_counter_offset_x + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_offset_y + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1136, g_info_panel_counter_x0 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y0 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1224, g_info_panel_counter_x1 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y1 + (*(struct pos **)(self + 728))->y, zero, zero);
+    object_set_first_float4(self + 1312, g_info_panel_counter_x2 + (*(struct pos **)(self + 728))->x,
+            g_info_panel_counter_y2 + (*(struct pos **)(self + 728))->y, zero, zero);
 }

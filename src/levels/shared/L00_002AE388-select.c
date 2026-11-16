@@ -1,8 +1,8 @@
 #include "common.h"
 
 extern unsigned char D_00189E20_26[];
-extern char *D_L00_001FACE0[];
-extern unsigned char D_L00_001B8FF0[];
+extern char *g_target_l00_list[];
+extern unsigned char g_cam_follow_matrix[];
 
 extern float hero_score_target_by_heading(char *, float, float, float, float, int *);
 extern float hero_score_target_by_aim_axis(char *, void *, float, float, float, int *, void *);
@@ -25,9 +25,9 @@ char *SelectBestEligibleTarget(void *axis, int type, int occlusion, float range,
     float score, bestScore = 100000000.0f;
 
     if (D_00189E20_26[0x22c3])
-        matrix_from_basis_rows(matrix, D_L00_001B8FF0);
+        matrix_from_basis_rows(matrix, g_cam_follow_matrix);
 
-    for (index = 0; (object = D_L00_001FACE0[index]) != 0; index++) {
+    for (index = 0; (object = g_target_l00_list[index]) != 0; index++) {
         if (type != -1 && *(short *)(*(char **)(object + 0x24) + 0x46) != type)
             continue;
         if (type == 5) {

@@ -4,21 +4,21 @@
 /* Built with -G8: the spawn counter at 0x1AC4D8 and the object table base at 0x1B251C are
    reached through $gp in retail, so those two bodies live here. */
 
-extern int D_L05_001AC4D8 __attribute__((sda));
+extern int g_level_object_count __attribute__((sda));
 
-extern char *D_L05_001B251C;
+extern char *g_feltzin_target_mobys;
 
-extern int D_L05_00225DD0[];
+extern int g_level_object_list[];
 
-extern int D_L05_00225E50[];
+extern int g_level_object_data[];
 
-extern int D_L05_00225F50[];
+extern int g_level_object_extras[];
 
-extern char *D_L05_001B2528 __attribute__((nosda));
+extern char *g_moby_l05_list_head __attribute__((nosda));
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
-extern int D_L05_001FB220[];
+extern int g_spawn_list_table[];
 
 extern char *moby_get_motion_data(char *object);
 
@@ -41,10 +41,10 @@ void entry_init_all_registered(void)
 {
     int i;
 
-    for (i = 0; i < D_L05_001AC4D8; i++)
-        entry_spawn_list_objects(D_L05_00225DD0[i]);
-    D_L05_00221D10[4] = 0;
-    D_L05_00221D10[3] = 0;
+    for (i = 0; i < g_level_object_count; i++)
+        entry_spawn_list_objects(g_level_object_list[i]);
+    g_feltzin_challenge_state[4] = 0;
+    g_feltzin_challenge_state[3] = 0;
     effect_remove_family_mobys();
 }
 
@@ -58,29 +58,29 @@ void entry_spawn_list_objects(int entry)
     unsigned short *p;
     int off;
 
-    if (D_L05_001FB220[obj[0x21]] == 0)
+    if (g_spawn_list_table[obj[0x21]] == 0)
         return;
 
     count = level_get_saved_value();
     for (i = 0; i < count; i++) {
-        char *e = (char *)D_L05_00225DD0[i];
+        char *e = (char *)g_level_object_list[i];
 
         if (*(short *)(e + 0xAA) == *(short *)(obj + 0xAA)) {
-            void (*fn)(char *) = (void (*)(char *))D_L05_00225F50[i];
+            void (*fn)(char *) = (void (*)(char *))g_level_object_extras[i];
 
             if (fn != 0)
                 fn(e);
         }
     }
 
-    p = (unsigned short *)D_L05_001FB220[obj[0x21]];
+    p = (unsigned short *)g_spawn_list_table[obj[0x21]];
     do {
         char *base;
 
         off = (p[0] & 0x7FFF) << 8;
-        base = D_L05_001B251C;
+        base = g_feltzin_target_mobys;
         if (moby_get_motion_data(base + off) != 0) {
-            base = D_L05_001B251C;
+            base = g_feltzin_target_mobys;
             moby_reset_action_state(base + off);
         }
     } while (*(short *)p++ >= 0);
@@ -97,29 +97,29 @@ void entry_spawn_list_objects_with_flag(char *object, int handler)
     unsigned short *p;
     int off;
 
-    if (D_L05_001FB220[obj[0x21]] == 0)
+    if (g_spawn_list_table[obj[0x21]] == 0)
         return;
 
     count = level_get_saved_value();
     for (i = 0; i < count; i++) {
-        char *e = (char *)D_L05_00225DD0[i];
+        char *e = (char *)g_level_object_list[i];
 
         if (*(short *)(e + 0xAA) == *(short *)(obj + 0xAA)) {
-            void (*fn)(char *) = (void (*)(char *))D_L05_00225E50[i];
+            void (*fn)(char *) = (void (*)(char *))g_level_object_data[i];
 
             if (fn != 0)
                 fn(e);
         }
     }
 
-    p = (unsigned short *)D_L05_001FB220[obj[0x21]];
+    p = (unsigned short *)g_spawn_list_table[obj[0x21]];
     do {
         char *base;
 
         off = (p[0] & 0x7FFF) << 8;
-        base = D_L05_001B251C;
+        base = g_feltzin_target_mobys;
         if (moby_get_motion_data(base + off) != 0) {
-            base = D_L05_001B251C;
+            base = g_feltzin_target_mobys;
             moby_init_spawned_sub_object(base + off, handler);
         }
     } while (*(short *)p++ >= 0);
@@ -135,19 +135,19 @@ char *SpawnFreeLevelObjectById(int id, int flag)
     int i;
     char *spawned = 0;
 
-    for (i = 0; i < D_L05_001AC4D8; i++) {
-        char *obj = (char *)D_L05_00225DD0[i];
+    for (i = 0; i < g_level_object_count; i++) {
+        char *obj = (char *)g_level_object_list[i];
         if (*(short *)(obj + 0xAA) == id) {
             short *entry;
-            int list = D_L05_001FB220[*(unsigned char *)(obj + 0x21)];
+            int list = g_spawn_list_table[*(unsigned char *)(obj + 0x21)];
             if (list == 0)
                 return 0;
             entry = (short *)list;
             do {
                 unsigned int offset = (*entry & 0x7FFF) << 8;
-                char *v = (char *)moby_get_motion_data(D_L05_001B251C + offset);
+                char *v = (char *)moby_get_motion_data(g_feltzin_target_mobys + offset);
                 if (v != 0 && *(int *)(v + 0x110) == 0) {
-                    spawned = D_L05_001B251C + offset;
+                    spawned = g_feltzin_target_mobys + offset;
                     moby_init_spawned_sub_object(spawned, flag);
                     break;
                 }

@@ -8,11 +8,11 @@ extern int PulseColor(int, int, float);
 extern int FastDecTimer(void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void func_PAL_002B14F8(void *, float *, float, int, int);
-extern float D_L02_001B00BC __attribute__((sda));
-extern float D_L02_001B00B8 __attribute__((sda));
-extern int D_L02_001B00B0[] __attribute__((sda));
-extern int D_L02_001B00A8[] __attribute__((sda));
-extern int D_L02_001A8F00[] __attribute__((sda));
+extern float g_glow_pulse_rate_b __attribute__((sda));
+extern float g_glow_pulse_rate_a __attribute__((sda));
+extern int g_glow_tween_colors[] __attribute__((sda));
+extern int g_glow_pulse_colors[] __attribute__((sda));
+extern int g_arena_state_words[] __attribute__((sda));
 extern char g_hero_state[];
 
 void func_PAL_L02_003D0C08(unsigned char *object)
@@ -20,16 +20,16 @@ void func_PAL_L02_003D0C08(unsigned char *object)
     char *state = *(char **)(object + 0x68);
     float phase;
     if (object[0x31]) {
-        *(float *)(state + 0x38c) = FastAddRotations(*(float *)(state + 0x38c), D_L02_001B00BC * 0.0003490659f);
+        *(float *)(state + 0x38c) = FastAddRotations(*(float *)(state + 0x38c), g_glow_pulse_rate_b * 0.0003490659f);
         phase = math_fast_sin_or_cos_b(*(float *)(state + 0x38c)) * 4.0f + 4.0f;
         if (phase > 1.0f)
             phase = 1.0f;
         else if (phase < 0.0f)
             phase = 0.0f;
-        *(int *)(object + 0x78) = FastTweenColor(D_L02_001B00B0[0], D_L02_001B00B0[1], phase);
+        *(int *)(object + 0x78) = FastTweenColor(g_glow_tween_colors[0], g_glow_tween_colors[1], phase);
         if (*(char **)(state + 0x370)) {
-            *(float *)(state + 0x388) = FastAddRotations(*(float *)(state + 0x388), D_L02_001B00B8 * 0.0003490659f);
-            *(int *)(*(char **)(state + 0x370) + 0x78) = PulseColor(D_L02_001B00A8[0], D_L02_001B00A8[1], *(float *)(state + 0x388));
+            *(float *)(state + 0x388) = FastAddRotations(*(float *)(state + 0x388), g_glow_pulse_rate_a * 0.0003490659f);
+            *(int *)(*(char **)(state + 0x370) + 0x78) = PulseColor(g_glow_pulse_colors[0], g_glow_pulse_colors[1], *(float *)(state + 0x388));
         }
     }
     FastDecTimer(state + 0x386);
@@ -38,7 +38,7 @@ void func_PAL_L02_003D0C08(unsigned char *object)
     FastDecTimer(state + 0x378);
     if (*(unsigned short *)(object + 0x96) < 65535)
         ++*(unsigned short *)(object + 0x96);
-    if (D_L02_001A8F00[0] != 2 || *(int *)(g_hero_state + 0x2294) == 0x6f)
+    if (g_arena_state_words[0] != 2 || *(int *)(g_hero_state + 0x2294) == 0x6f)
         *(short *)(state + 0x386) = 0;
     moby_update_eased_node(object, state + 0x210, 1, 0.0432f, 0.43200004f);
     moby_update_eased_node(object, state + 0x290, 2, 0.0432f, 0.43200004f);

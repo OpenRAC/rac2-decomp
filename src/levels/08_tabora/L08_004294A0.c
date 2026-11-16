@@ -2,8 +2,8 @@
 
 extern s32 g_beam_slot_state[] MACRO_ADDR;
 extern s32 g_beam_slot_key[] MACRO_ADDR;
-extern char D_L08_001B3A40[] MACRO_ADDR;
-extern char D_L08_002603E0[];
+extern char g_beam_targets[] MACRO_ADDR;
+extern char g_slot_pane_matrices[];
 
 extern void mem_fast_helper_c(void *a, void *b, s32 c);
 
@@ -17,8 +17,8 @@ s32 TransitionTaboraSlot(s32 key, void *transform, char *target)
             s32 state = g_beam_slot_state[i];
             if (state == 1) g_beam_slot_state[i] = 2;
             else if (state == 4) g_beam_slot_state[i] = 3;
-            mem_fast_helper_c(D_L08_002603E0 + i * 0x40, transform, 0x40);
-            qcopy(D_L08_001B3A40 + i * 0x10, target);
+            mem_fast_helper_c(g_slot_pane_matrices + i * 0x40, transform, 0x40);
+            qcopy(g_beam_targets + i * 0x10, target);
             return 1;
         }
     }

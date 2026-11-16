@@ -9,11 +9,11 @@ typedef struct {
     int f3C;
 } Entry_r002F46C8;
 
-extern Entry_r002F46C8 D_L00_0027D848[];
+extern Entry_r002F46C8 g_tutorial_prompt_state[];
 
 extern char g_subtitle_history[];
 
-extern short D_L00_0027D880[];
+extern short g_level_second_table[];
 
 extern void func_2F4490(int, int);
 
@@ -41,7 +41,7 @@ void level_clear_entry_top_bits(void) {
 
 /* Sets the first entry of a level table to zero. */
 void level_clear_second_table_entry(void) {
-    D_L00_0027D880[0] = 0;
+    g_level_second_table[0] = 0;
 }
 
 /* Does nothing. */
@@ -62,7 +62,7 @@ void level_spawn_on_second_mode(int mode) {
 
 
 typedef struct { unsigned int fields[25]; int key; unsigned int busy; int tail[9]; } UpdateRecord_2F7298;
-extern UpdateRecord_2F7298 D_L00_0027DD00[13];
+extern UpdateRecord_2F7298 g_update_record_table[13];
 
 /* The func_0028B6C8 table search: raises a free record's peak to VALUE; 1 when the key is
    missing or the record busy. */
@@ -70,11 +70,11 @@ int level_raise_record_peak(int key, int value)
 {
     int i;
     for (i = 0; i < 13; i++) {
-        if (D_L00_0027DD00[i].key == key) break;
+        if (g_update_record_table[i].key == key) break;
     }
     if (i < 13) {
-        if (D_L00_0027DD00[i].busy == 0) {
-            UpdateRecord_2F7298 *r = &D_L00_0027DD00[i];
+        if (g_update_record_table[i].busy == 0) {
+            UpdateRecord_2F7298 *r = &g_update_record_table[i];
             int peak = r->tail[4];
             if (value >= peak)
                 peak = value;

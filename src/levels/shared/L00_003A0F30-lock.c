@@ -50,14 +50,14 @@ typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
 extern u8 g_hero_state[], g_item_slot_to_record[];
 extern Vector g_hero_position;
 extern u32 g_pad_state[];
-extern int D_L00_001A8F00 MACRO_ADDR;
-extern int D_L00_001B2864 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
+extern int g_minirocket_fire_held MACRO_ADDR;
 extern float g_camera_l00_position[];
 extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
-extern MuzzleLight D_L00_001C6F40[];
-extern WeaponEntry D_00262570[];
-extern u8 D_00294880[];
+extern MuzzleLight g_light_table[];
+extern WeaponEntry g_weapon_table_2[];
+extern u8 g_minirocket_sound_records[];
 
 extern void EmitLayeredSparks(void *);
 extern int vec_fast_helper_b(void *);
@@ -196,12 +196,12 @@ void minirocket_tube_update(Moby *moby)
     else
         ((Hero *)g_hero_state)->i[0x2534 / 4] = 0x28;
 
-    if (D_L00_001A8F00 != 2 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 && moby->animation < 2 &&
+    if (g_game_l00_mode != 2 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 && moby->animation < 2 &&
         (g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 23 && ready) {
         if (moby->nextAnimation == 0)
             anim_start_blended(moby, 1, 0, 4);
         if (weapon_spend_ammo(-1, 1)) {
-            D_L00_001B2864 = 1;
+            g_minirocket_fire_held = 1;
             if (candidate == 0) {
                 int count, i;
                 FastVecScale(&muzzle, &moby->forward, -1.0f);
@@ -248,14 +248,14 @@ void minirocket_tube_update(Moby *moby)
             else
                 start_equipped_item_animation();
             anim_start_blended(moby, 2, 0, 0);
-            vars->sound = slot_copy_records_to_free(D_00294880);
+            vars->sound = slot_copy_records_to_free(g_minirocket_sound_records);
             {
-                WeaponEntry *weapon = D_00262570 + g_item_slot_to_record[0x1B];
+                WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];
                 vars->cooldown = 1.0f / weapon->rate;
             }
-        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || D_L00_001B2864 == 1) {
+        } else if ((g_pad_state[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) || g_minirocket_fire_held == 1) {
             PlayMobySound(1, 0, moby);
-            D_L00_001B2864 = 0;
+            g_minirocket_fire_held = 0;
         }
         if (!((g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && get_ammo(-1) && ((Hero *)g_hero_state)->b[0x22B8]) &&
             vars->sound >= 0) {
@@ -296,7 +296,7 @@ void minirocket_tube_update(Moby *moby)
         if (vars->light == -1) {
             vars->light = part_l00_alloc_effect_slot_2(pos, 8.0f, 0.0f, alpha, width, power);
         } else {
-            MuzzleLight *light = &D_L00_001C6F40[vars->light];
+            MuzzleLight *light = &g_light_table[vars->light];
             qcopy(&light->position, pos);
             light->position.f[3] = 8.0f;
             light->radius = alpha;

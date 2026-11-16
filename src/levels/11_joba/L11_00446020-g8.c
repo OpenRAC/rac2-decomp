@@ -2,7 +2,7 @@
 
 typedef struct { char pad[0x2A0]; short counters[17]; } JobaCounters46020;
 extern int g_hero_state[];
-extern float D_L11_001B1870 __attribute__((sda));
+extern float g_boss_action_hero_threshold __attribute__((sda));
 extern int math_random_int_below(int);
 extern int arena_queue_voice_line(char *, int);
 
@@ -24,7 +24,7 @@ void joba_boss_pick_action_by_target(char *moby) {
                     }
                 }
                 if (*(short *)(state + 0x2BE) == 0) {
-                    if ((float)g_hero_state[0x933] < D_L11_001B1870) {
+                    if ((float)g_hero_state[0x933] < g_boss_action_hero_threshold) {
                         action = 0xF;
                     }
                 }
@@ -45,7 +45,7 @@ void joba_boss_pick_action_by_target(char *moby) {
                 }
             }
             if (*(short *)(state + 0x2B0) == 0) {
-                if ((float)g_hero_state[0x933] < D_L11_001B1870) {
+                if ((float)g_hero_state[0x933] < g_boss_action_hero_threshold) {
                     action = 8;
                 }
             }

@@ -13,33 +13,33 @@ typedef struct {
     int c[8];
 } GroupTable;
 
-extern int D_001B1888[];
-extern int D_001B1894[];
-extern int D_001B1898[];
+extern int g_hud_group_size_table[];
+extern int g_hud_group_entries_a[];
+extern int g_hud_group_entries_b[];
 
 void hud_unlink_bank_group(int group) {
-    int group_size = ((GroupTable *)D_001B1888[0])->c[group];
+    int group_size = ((GroupTable *)g_hud_group_size_table[0])->c[group];
     int i;
     int end;
     int start;
     int entry;
 
     if (group == 0) {
-        for (entry = 0; entry < ((GroupTable *)D_001B1888[0])->b[0]; entry++) {
-            *(s16 *)(entry * 8 + D_001B1894[0] + 4) = 0;
+        for (entry = 0; entry < ((GroupTable *)g_hud_group_size_table[0])->b[0]; entry++) {
+            *(s16 *)(entry * 8 + g_hud_group_entries_a[0] + 4) = 0;
         }
     }
-    start = group != 0 ? ((GroupTable *)D_001B1888[0])->a[group - 1] : 0;
-    end = ((GroupTable *)D_001B1888[0])->a[group];
+    start = group != 0 ? ((GroupTable *)g_hud_group_size_table[0])->a[group - 1] : 0;
+    end = ((GroupTable *)g_hud_group_size_table[0])->a[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1898[0]) -= group_size;
-        *(int *)(i * 8 + D_001B1898[0]) |= 0x80000000;
+        *(int *)(i * 8 + g_hud_group_entries_b[0]) -= group_size;
+        *(int *)(i * 8 + g_hud_group_entries_b[0]) |= 0x80000000;
     }
-    start = group != 0 ? ((GroupTable *)D_001B1888[0])->b[group - 1] : 0;
-    end = ((GroupTable *)D_001B1888[0])->b[group];
+    start = group != 0 ? ((GroupTable *)g_hud_group_size_table[0])->b[group - 1] : 0;
+    end = ((GroupTable *)g_hud_group_size_table[0])->b[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1894[0]) -= group_size;
-        *(int *)(i * 8 + D_001B1894[0]) |= 0x80000000;
+        *(int *)(i * 8 + g_hud_group_entries_a[0]) -= group_size;
+        *(int *)(i * 8 + g_hud_group_entries_a[0]) |= 0x80000000;
     }
-    ((GroupTable *)D_001B1888[0])->c[group] = 0;
+    ((GroupTable *)g_hud_group_size_table[0])->c[group] = 0;
 }

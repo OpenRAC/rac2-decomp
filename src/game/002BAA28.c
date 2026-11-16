@@ -30,8 +30,8 @@ extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern void vec_pack_direction(float *, int *);
 extern void vec_decode_byte_color(void *, void *);
-extern u8 *D_001F2540[];
-extern u8 *D_001F259C;
+extern u8 *g_particle_texture_table[];
+extern u8 *g_part_tex_trail;
 
 Particle *part_spawn_trail(void *position, float *from, float *to, int startColor, int endColor, int kind, int duration, int size, int flags)
 {
@@ -47,9 +47,9 @@ Particle *part_spawn_trail(void *position, float *from, float *to, int startColo
         particle->mode = 0x44;
         particle->alpha = FloatToInt(math_random_float_range(particle->phase, 255.0f));
         if (flags == -1) {
-            particle->texture = *D_001F259C;
+            particle->texture = *g_part_tex_trail;
         } else {
-            particle->texture = *D_001F2540[flags & 0xFFFF];
+            particle->texture = *g_particle_texture_table[flags & 0xFFFF];
             if (flags & 0x10000)
                 particle->mode = 0x48;
         }

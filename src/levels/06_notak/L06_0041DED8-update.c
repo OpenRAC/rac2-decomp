@@ -27,12 +27,12 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int coll_test_point(char *, int, char *, float);
-extern char *D_L06_001BFC98;
+extern char *g_hit_l06_result;
 extern float vec_distance_xy(char *, char *);
 extern float math_random_signed_float_range(float, float);
 extern int math_is_value_within_step(char *, float);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern void *D_L06_001B3760[6];
+extern void *g_child_slot_used[6];
 extern void part_spawn_colored_burst(float *, int);
 extern char *moby_spawn_child_in_slot(char *, float *, float *, int, float);
 extern void lerp_vector(void *, void *, void *, float);
@@ -220,7 +220,7 @@ void patrol_shooter_update(char *moby)
             target[2] = 0.0f;
             FastVecAdd((char *)pos, (char *)target, (char *)pos);
             if (coll_test_point((char *)pos, 0, moby, 0.5f)) {
-                char *hit_moby = D_L06_001BFC98;
+                char *hit_moby = g_hit_l06_result;
                 if (hit_moby && *(short *)(hit_moby + 0xAA) == 0xFDC /* moby class 4060 */)
                     part_emit_spark_burst_remove(hit_moby);
             }
@@ -318,7 +318,7 @@ void patrol_shooter_update(char *moby)
             vec_scale_to_length((char *)direction, (char *)direction, 0.1666666716337204f);
             *(int *)(vars + 0x498) = -1;
             for (i = 0; i < 6; i++) {
-                if (!D_L06_001B3760[i]) {
+                if (!g_child_slot_used[i]) {
                     *(int *)(vars + 0x498) = i;
                     break;
                 }

@@ -9,7 +9,7 @@ extern int hero_l22_set_action(int mode, int flag);
 /* func_L22_002A8B98 is defined in L22_002A8B98-init.c. */
 
 extern float ApproachValue(float *, float, float);
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 /* the two calls whose targets differ between levels 22 and 23 */
 typedef struct {
     int unk0;
@@ -54,7 +54,7 @@ typedef struct {
    or in, and creates it when it is allowed and absent. */
 #undef HERO
 
-extern int D_00138320;
+extern int g_pad_pressed_flags;
 
 extern void func_PAL_L22_002B7B08(void);
 

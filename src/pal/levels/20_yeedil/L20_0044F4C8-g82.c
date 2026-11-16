@@ -1,14 +1,14 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L20_001B23E8 __attribute__((sda));
+extern float g_path_movement_seconds __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 
-void func_PAL_L20_0044F660(char *arg0, char *arg1, char *arg2)
+void moby_start_path_movement_pal(char *arg0, char *arg1, char *arg2)
 {
     char *state = *(char **)(arg0 + 0x68);
 
-    *(s32 *)(state + 0xA8) = (s32)(D_L20_001B23E8 * 5e+01f);
+    *(s32 *)(state + 0xA8) = (s32)(g_path_movement_seconds * 5e+01f);
     *(char **)(state + 0xA4) = arg1;
     *(s32 *)(state + 0xAC) = 0;
     *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) & 0xFFBE) | 0x1000;

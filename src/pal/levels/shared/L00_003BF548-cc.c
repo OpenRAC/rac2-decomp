@@ -5,7 +5,7 @@
 extern void euler_rotation_basis(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 typedef struct { float x, y, z; int unused; float position[4]; } EffectLightRecord;
-extern EffectLightRecord D_L00_001C6F40[];
+extern EffectLightRecord g_light_table[];
 extern void part_l00_spawn_spark_burst_2(float *, float *, int, int);
 extern void spark_spawn_orbit(char *, char *);
 
@@ -17,7 +17,7 @@ typedef struct {
     float z_148;
 } L00AimVector;
 
-extern L00AimVector D_L00_001B8C80;
+extern L00AimVector g_scalar_transition_state;
 
 /* The 128-bit unit four of these bodies copy whole. */
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -33,7 +33,7 @@ extern L00AimVector D_L00_001B8C80;
 /* Integrates motion, reflects a collision, updates the light and emits trail slots. */
 /* Opens the block, lays seven oriented sprites over it from two helper draws and the shared
    colour word, then runs the two slot-table passes and closes the block. */
-extern int D_L00_0023DDA0[];
+extern int g_spark_slot_records[];
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void vec_clear_128(void *);
@@ -45,9 +45,9 @@ extern void FastVecScale(void *, void *, float);
    counts it in self's data, copies self's position, draws three triples from the ranges
    below, stores count, target and the timer, and starts it at target (offset through
    func_L00_003252A8 when func_002AB1F0 finds target's info). */
-void func_PAL_L00_003BF548(char *self, char *target, int count)
+void spark_spawn_orbiting_record_pal(char *self, char *target, int count)
 {
-    char *pool = (char *)D_L00_0023DDA0;
+    char *pool = (char *)g_spark_slot_records;
     char *position = self + 0x10;
     char *target_position = target + 0x10;
     char *data = *(char **)(self + 0x68);
@@ -139,7 +139,7 @@ typedef struct Rac2Native_003BC998_Slot {
     unsigned char tail_A4[0xC];
 } Rac2Native_003BC998_Slot;
 
-extern Rac2Native_003BC998_Slot D_L00_0023F060[];
+extern Rac2Native_003BC998_Slot g_orbit_spark_records[];
 
 /* Claims the first free record of the sixteen 0xB0-byte records at D_L00_0023F060, keeps the
    owner's pointer in it and fills the drawn values. The base and the output pointer are kept

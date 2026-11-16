@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern int D_L14_001B17D8 __attribute__((sda));
-extern int D_L14_001B17DC;
-extern int D_001A72E0;
+extern int g_searchlight_glow_color_a __attribute__((sda));
+extern int g_searchlight_glow_color_b;
+extern int g_vram_zbuffer_address;
 
 extern int FastTweenColor(int a, int b, float c);
 extern void func_385CB8(unsigned int reg, unsigned long value);
@@ -15,14 +15,14 @@ void searchlight_draw_glow(char *self)
     int blend_color;
 
     state = *(char **)(self + 0x68);
-    blend_color = FastTweenColor(D_L14_001B17D8, D_L14_001B17DC, *(float *)state);
+    blend_color = FastTweenColor(g_searchlight_glow_color_a, g_searchlight_glow_color_b, *(float *)state);
     func_385CB8(0x42, 0x8000000044UL);
     func_3030C0(0, 0, 600, 500, blend_color, 0);
-    func_385CB8(0x4E, 0x1000000UL | (D_001A72E0 >> 13));
+    func_385CB8(0x4E, 0x1000000UL | (g_vram_zbuffer_address >> 13));
 }
 
-extern float D_L14_001B17B8 __attribute__((sda));
-extern float D_L14_001B17BC __attribute__((sda));
+extern float g_searchlight_effect_x __attribute__((sda));
+extern float g_searchlight_effect_y __attribute__((sda));
 
 extern char g_hero_position[];
 
@@ -51,8 +51,8 @@ void part_update_slot_triggered_record(char *self)
             if (*(EffectPair **)(state + 0x14) == 0) {
                 *(EffectPair **)(state + 0x14) = cam_alloc_override_slot(5);
             }
-            (*(EffectPair **)(state + 0x14))->x = D_L14_001B17B8;
-            (*(EffectPair **)(state + 0x14))->y = D_L14_001B17BC;
+            (*(EffectPair **)(state + 0x14))->x = g_searchlight_effect_x;
+            (*(EffectPair **)(state + 0x14))->y = g_searchlight_effect_y;
             return;
         }
     }
@@ -89,14 +89,14 @@ typedef struct PrisonLightState {
 /* A sound slot as seen from D_00188660 plus 0x70 per slot number. */
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
 extern char g_sound_state[];
-extern unsigned char D_0018C0D4 NOT_SDA;
-extern char D_L14_001B17E0[], D_L14_001B1800[];
-extern int D_L14_001B20C8;
-extern int D_L14_001B17C0 SDATA(D_L14_001B17C0);
-extern float D_L14_001B17C4 SDATA(D_L14_001B17C4);
-extern float D_L14_001B17C8 SDATA(D_L14_001B17C8);
-extern float D_L14_001B17D0 SDATA(D_L14_001B17D0);
-extern float D_L14_001B17D4 MACRO_ADDR;
+extern unsigned char g_screen_mode_flag NOT_SDA;
+extern char g_searchlight_handler_data_a[], g_searchlight_handler_data_b[];
+extern int g_frame_tick_counter;
+extern int g_searchlight_period SDATA(D_L14_001B17C0);
+extern float g_searchlight_level_scale SDATA(D_L14_001B17C4);
+extern float g_searchlight_level_offset SDATA(D_L14_001B17C8);
+extern float g_searchlight_approach_rate SDATA(D_L14_001B17D0);
+extern float g_searchlight_decay_rate MACRO_ADDR;
 
 extern void moby_set_state(void *self, int state, int mode);
 extern void *part_find_owned_effect_slot(void *a0, int a1, int a2);
@@ -127,26 +127,26 @@ void searchlight_update(PrisonLight *object)
         state->sound = -1;
         break;
     case 1:
-        if (D_0018C0D4 != 1)
+        if (g_screen_mode_flag != 1)
             break;
         if (object->update)
             part_spawn_spark_side(object);
         if (part_find_owned_effect_slot(object, 0x10000, 0) || flag_is_third_pending_set(object)) {
-            level_l00_call_module_handler_with_arg_9((int)D_L14_001B17E0, 240);
+            level_l00_call_module_handler_with_arg_9((int)g_searchlight_handler_data_a, 240);
             moby_set_state(object, 2, -1);
         }
         if (((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner != object || !((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
             state->sound = PlayMobySound(0, 4, object);
         break;
     case 2:
-        ticks = D_L14_001B20C8;
-        period = D_L14_001B17C0;
+        ticks = g_frame_tick_counter;
+        period = g_searchlight_period;
         angle = IntToFloat(ticks % period);
         denominator = IntToFloat(period);
         angle *= 6.2831855f;
         angle /= denominator;
         angle = math_fast_sin_or_cos_b(angle - 3.1415927f);
-        ApproachValue(&state->level, D_L14_001B17C4 * angle + D_L14_001B17C8, D_L14_001B17D0 * 0.016666668f);
+        ApproachValue(&state->level, g_searchlight_level_scale * angle + g_searchlight_level_offset, g_searchlight_approach_rate * 0.016666668f);
         gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
         counter = object->frames;
         previous = counter++;
@@ -156,8 +156,8 @@ void searchlight_update(PrisonLight *object)
         if (state->sound != -1 && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner == object && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
             snd_stop_voice(state->sound);
         state->sound = -1;
-        if (!D_0018C0D4) {
-            level_l00_call_module_handler_with_arg_9((int)D_L14_001B1800, 240);
+        if (!g_screen_mode_flag) {
+            level_l00_call_module_handler_with_arg_9((int)g_searchlight_handler_data_b, 240);
             flags = object->flags;
             object->pending = 0;
             flags |= 0x41;
@@ -168,14 +168,14 @@ void searchlight_update(PrisonLight *object)
         break;
     case 3:
         gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
-        ApproachValue(&state->level, 0.0f, D_L14_001B17D4 * 0.016666668f);
+        ApproachValue(&state->level, 0.0f, g_searchlight_decay_rate * 0.016666668f);
         if (state->level == 0.0f)
             moby_mark_spawned(object);
         break;
     }
 }
 
-extern float D_L14_001B16B0 __attribute__((sda));
+extern float g_protopet_distance_threshold __attribute__((sda));
 extern int moby_apply_damage_to_object(char *a0, char *a1, int a2);
 extern void part_spawn_explosion_with_sparks(char *a0, char *a1, float f12, float f13, int a2);
 extern void SetDeathBits(char *a0, int a1, int a2);
@@ -205,38 +205,38 @@ void protopet_holder_update(char *moby)
         part_spawn_explosion_with_sparks(moby_alias, moby_alias + 0x10, 1.0f, 13.0f, -1);
         SetDeathBits(moby_alias, 0, 3);
         moby_mark_spawned(moby_alias);
-    } else if (*(float *)(moby_alias + 0x18) < D_L14_001B16B0) {
+    } else if (*(float *)(moby_alias + 0x18) < g_protopet_distance_threshold) {
         SetDeathBits(moby_alias, 0, 3);
         moby_mark_spawned(moby_alias);
     }
 }
 
-extern float D_L14_001B1678 __attribute__((sda));
-extern float D_L14_001B167C __attribute__((sda));
-extern int D_L14_001B1660 __attribute__((sda));
-extern int D_L14_001B1668 __attribute__((sda));
-extern int D_L14_001B1690 __attribute__((sda));
-extern int D_L14_001B1694 __attribute__((sda));
-extern float D_L14_001B1698 __attribute__((sda));
-extern float D_L14_001B169C __attribute__((sda));
-extern float D_L14_001B16A0 __attribute__((sda));
-extern float D_L14_001B16A4 __attribute__((sda));
-extern char D_L14_002594F0[][0x280];
+extern float g_ribbon_l14_uv_scroll __attribute__((sda));
+extern float g_ribbon_scroll_speed __attribute__((sda));
+extern int g_ribbon_l14_draw_param_a __attribute__((sda));
+extern int g_ribbon_l14_draw_param_b __attribute__((sda));
+extern int g_ribbon_pair_color_a __attribute__((sda));
+extern int g_ribbon_pair_color_b __attribute__((sda));
+extern float g_ribbon_fade_start __attribute__((sda));
+extern float g_ribbon_fade_end __attribute__((sda));
+extern float g_ribbon_end_scale __attribute__((sda));
+extern float g_ribbon_fade_rate __attribute__((sda));
+extern char g_ribbon_buffers[][0x280];
 extern void DrawPrisonScrollingRibbonWithHalo(char *, char *, int, int, int, float, float, float);
 
 /* Draws the two glowing ribbons of the moby, scrolling the texture a little each frame. */
 void gfx_draw_ribbon_pair(char *object) {
     char *state = *(char **)(object + 0x68);
 
-    D_L14_001B1678 -= D_L14_001B167C;
-    if (D_L14_001B1678 <= -8.0f)
-        D_L14_001B1678 += 8.0f;
-    DrawPrisonScrollingRibbonWithHalo(object, D_L14_002594F0[*(int *)(state + 0x38)],
-        D_L14_001B1660, D_L14_001B1668, *(int *)(state + 0x2C) - 2,
-        *(float *)(state + 0x40), *(float *)(state + 0x44), D_L14_001B16A0);
-    DrawPrisonScrollingRibbonWithHalo(object, D_L14_002594F0[*(int *)(state + 0x38)] + 0x140,
-        D_L14_001B1690, D_L14_001B1694, *(int *)(state + 0x2C),
-        D_L14_001B1698, D_L14_001B169C, D_L14_001B16A4);
+    g_ribbon_l14_uv_scroll -= g_ribbon_scroll_speed;
+    if (g_ribbon_l14_uv_scroll <= -8.0f)
+        g_ribbon_l14_uv_scroll += 8.0f;
+    DrawPrisonScrollingRibbonWithHalo(object, g_ribbon_buffers[*(int *)(state + 0x38)],
+        g_ribbon_l14_draw_param_a, g_ribbon_l14_draw_param_b, *(int *)(state + 0x2C) - 2,
+        *(float *)(state + 0x40), *(float *)(state + 0x44), g_ribbon_end_scale);
+    DrawPrisonScrollingRibbonWithHalo(object, g_ribbon_buffers[*(int *)(state + 0x38)] + 0x140,
+        g_ribbon_pair_color_a, g_ribbon_pair_color_b, *(int *)(state + 0x2C),
+        g_ribbon_fade_start, g_ribbon_fade_end, g_ribbon_fade_rate);
 }
 
 extern int g_moby_l14_pool __attribute__((sda));
@@ -289,7 +289,7 @@ void pulsing_tint_update(char *self)
    func_L14_00409B20. D_L14_001B25B8 is a plain int: its `.extern` comes last in the file, which
    leaves a load in a branch delay slot on $gp and every other load on `lui`/`lw`. */
 extern unsigned short *g_group_entity_lists[];
-extern int D_L14_001B25B8;
+extern int g_group_link_limit;
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
 
 /* Sets the flag bit (+0xBE, 4) of every entity in the id list the state's group word names,
@@ -302,7 +302,7 @@ void moby_activate_group_entities(char *self)
 
     if (state != 0 && *(int *)(state + 0x38) != -1) {
         for (p = g_group_entity_lists[*(int *)(state + 0x38)];
-             (*(int *)(state + 0x38) & 0xFF) != 0xFF && *(int *)(state + 0x38) <= D_L14_001B25B8 &&
+             (*(int *)(state + 0x38) & 0xFF) != 0xFF && *(int *)(state + 0x38) <= g_group_link_limit &&
              p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x38)]);
              p++) {
             e = D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8);
@@ -347,7 +347,7 @@ typedef struct {
 } L14ColorPair;
 
 extern void group_marker_draw(L14Obj *);
-extern L14ColorPair D_L14_001B18C0[];
+extern L14ColorPair g_group_marker_colors[];
 extern void moby_transform_joint_point(void *moby, int joint, void *out);
 
 /* Advances the owner's pulse (the angle, then the blend it gives), tints the owner with the
@@ -357,7 +357,7 @@ extern void moby_transform_joint_point(void *moby, int joint, void *out);
 void group_marker_update_pulse(L14Obj *self)
 {
     L14Cfg *state = self->cfg;
-    L14ColorPair colors = D_L14_001B18C0[0];
+    L14ColorPair colors = g_group_marker_colors[0];
     unsigned short *p;
     L14Obj *e;
     L14Cfg *s0;
@@ -369,9 +369,9 @@ void group_marker_update_pulse(L14Obj *self)
     blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     state->blend = blend;
     self->tint = FastTweenColor(colors.a, colors.b, blend);
-    if (state->stamp != D_L14_001B20C8) {
+    if (state->stamp != g_frame_tick_counter) {
         for (p = g_group_entity_lists[self->group];
-             self->group != 0xFF && self->group <= D_L14_001B25B8 && p != 0 &&
+             self->group != 0xFF && self->group <= g_group_link_limit && p != 0 &&
              ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self->group]);
              p++) {
             e = (L14Obj *)(D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8));
@@ -384,7 +384,7 @@ void group_marker_update_pulse(L14Obj *self)
                         if (e->kind != 0xFD) {
                             s0 = e->cfg;
                             moby_transform_joint_point(e, 0, &s0->vec);
-                            s0->stamp = D_L14_001B20C8;
+                            s0->stamp = g_frame_tick_counter;
                         }
                     }
                 }
@@ -397,8 +397,8 @@ void group_marker_update_pulse(L14Obj *self)
 /* D_L14_001B18D0 is only used for its address, taken through $gp. D_L14_001B18E0 is one 8-byte
    object: its first word is loaded in a branch delay slot (so on $gp), its second as a bare
    symbol, which is how retail loads the two colours. */
-extern int D_L14_001B18D0 __attribute__((sda));
-extern int D_L14_001B18E0[2];
+extern int g_group_marker_scale_vec __attribute__((sda));
+extern int g_group_marker_tween_colors[2];
 extern void FastVecScale(void *out, void *in, float scale);
 extern void transform_vector(void *a, void *b, void *c);
 extern void gfx_l00_draw_billboard_quad(void *buf, int color, float f12, float f13);
@@ -419,7 +419,7 @@ void group_marker_draw(L14Obj *self)
     q = g_group_entity_lists[self->group];
     if (q == 0)
         return;
-    for (p = q; self->group != 0xFF && self->group <= D_L14_001B25B8 && p != 0 &&
+    for (p = q; self->group != 0xFF && self->group <= g_group_link_limit && p != 0 &&
                 ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self->group]);
          p++) {
         e = (L14Obj *)(D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8));
@@ -430,10 +430,10 @@ void group_marker_draw(L14Obj *self)
                 if (e->kind != 0xFE) {
                     if (e->kind != 0xFD) {
                         s0 = e->cfg;
-                        FastVecScale(buf, &D_L14_001B18D0, s0->scale);
+                        FastVecScale(buf, &g_group_marker_scale_vec, s0->scale);
                         transform_vector(buf, buf, &s0->vec);
                         gfx_l00_draw_billboard_quad(buf,
-                                          FastTweenColor(D_L14_001B18E0[0], D_L14_001B18E0[1],
+                                          FastTweenColor(g_group_marker_tween_colors[0], g_group_marker_tween_colors[1],
                                                         s0->blend),
                                           s0->scale * 0.2f, 0.08f);
                     }

@@ -3,9 +3,9 @@
 
 extern char g_hero_state[];
 typedef union { unsigned char b[0x2600]; int i[0x980]; } Hero;
-extern float D_00138280 NOT_SDA;
-extern float D_L00_001B14B4 __attribute__((sda));
-extern float D_L00_001B14C8 __attribute__((sda));
+extern float g_stick_axis_x NOT_SDA;
+extern float g_cam_follow_distance_margin __attribute__((sda));
+extern float g_cam_follow_min_distance __attribute__((sda));
 extern float FastVecLength(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -29,8 +29,8 @@ int cam_follow_constrain_distance(char *object, void *input, int constrained, in
     }
     length = FastVecLength(vector);
     if (((Hero *)g_hero_state)->b[0x22B4] != 2) {
-        if (math_fabs(D_00138280) > 0.05f && preserve) {
-            length -= D_L00_001B14B4;
+        if (math_fabs(g_stick_axis_x) > 0.05f && preserve) {
+            length -= g_cam_follow_distance_margin;
             *(short *)(controller + 0x34) = 0x884;
         }
     }
@@ -41,14 +41,14 @@ int cam_follow_constrain_distance(char *object, void *input, int constrained, in
             return preserve;
         }
     }
-    limit = D_L00_001B14C8;
+    limit = g_cam_follow_min_distance;
     if (length < limit) {
         if (length <= 0.0001f) {
             vec_scale_to_length(vector, *(char **)(transform + 0xC0) + 0xC0, -limit);
-            length = D_L00_001B14C8;
+            length = g_cam_follow_min_distance;
         } else {
             FastVecScale(vector, vector, limit / length);
-            length = D_L00_001B14C8;
+            length = g_cam_follow_min_distance;
         }
     }
     *(float *)(controller + 0x30) = *(float *)(vector + 0x2C) - length;

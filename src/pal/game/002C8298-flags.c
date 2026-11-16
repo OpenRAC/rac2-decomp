@@ -7,7 +7,7 @@ extern int Fc3cb9262_FUN_00283CF0(float f);
 extern int Fc3cb9262_FUN_00282978(char *a);
 extern void Fc3cb9262_FUN_002B9180(char *a);
 
-void func_PAL_002C8298(char *a0)
+void part_update_growing_falling_pal(char *a0)
 {
     V4_Fc3cb9262 buf;
     char *s0 = a0 + 32;

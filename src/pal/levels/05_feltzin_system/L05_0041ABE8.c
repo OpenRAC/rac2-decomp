@@ -8,7 +8,7 @@ extern void func_379FA0(char *object, int a1, int a2, int a3, float f0, float f1
                         float f3, int a8, int a9, int a10);
 
 /* Spawns the object's effect after three guards, then runs the follow-up by kind. */
-void func_PAL_L05_0041ABE8(char *object)
+void feltzin_enemy_fire_shot_pal(char *object)
 {
     char *s1 = *(char **)(object + 0x68);
     char *r;

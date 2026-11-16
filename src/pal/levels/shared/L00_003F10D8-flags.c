@@ -10,10 +10,10 @@ extern ProjectileOwner g_hero_state;
 extern void FastVecScale(char *, char *, float);
 extern float math_random_angle(void);
 extern char *CreateMoby(int);
-extern unsigned char D_00139587;
+extern unsigned char g_kilonoid_weapon_index;
 typedef struct { char pad[0x50]; float speed; char rest[0x8C]; } ProjectileTuning;
 extern ProjectileTuning g_weapon_l00_table[];
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -41,7 +41,7 @@ char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
         *(char **)(object+0xB8) = source;
         object[0x20] = 0;
         state = *(char **)(object+0x68);
-        speed = (*(ProjectileTuning *)(D_00139587 * 224 + (char *)g_weapon_l00_table)).speed * 0.020000001f;
+        speed = (*(ProjectileTuning *)(g_kilonoid_weapon_index * 224 + (char *)g_weapon_l00_table)).speed * 0.020000001f;
         if (g_hero_state.mode==29 && (*(unsigned short *)(g_hero_state.camera+0x34)&1)) {
             qcopy(object+0x10,g_camera_l00_position);
             FastVecScale((char *)&a,g_camera_l00_position+0x250,-0.5f);
@@ -52,7 +52,7 @@ char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
             FastVecAdd(object+0x10,object+0x10,&c);
             FastVecScale((char *)&d,g_camera_l00_position+0x230,20.0f);
             FastVecAdd(&d,g_camera_l00_position,&d);
-            if(CollLine(g_camera_l00_position,&d,0,g_hero_state.camera,0)) qcopy(&d,D_L00_001BF220);
+            if(CollLine(g_camera_l00_position,&d,0,g_hero_state.camera,0)) qcopy(&d,g_hero_l00_position);
             FastVecSub(state+0x20,&d,object+0x10);
             vec_scale_to_length(state+0x20,state+0x20,speed);
         } else {

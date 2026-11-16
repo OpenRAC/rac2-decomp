@@ -13,14 +13,14 @@ typedef struct { char pad0[0x148]; float x, y; char pad150[0x70]; int held, pres
 extern RadialInput g_pad_state;
 typedef struct { char pad0[0x24E4]; int choice; } RadialState;
 extern RadialState g_hero_state;
-extern short D_001B189C, D_001B18A0, D_001B18A2, D_001B18A4;
+extern short g_weapon_wheel_slot_state, g_weapon_wheel_slot_six, g_weapon_wheel_slot_five, g_weapon_wheel_slot_seven;
 extern int g_radial_slot_count __attribute__((sda));
 extern int g_radial_menu_page_index;
 extern int **g_radial_menu_pages;
-extern int D_001A8DB0[] __attribute__((sda));
-extern unsigned char D_001A7BB3;
-extern int D_001B18FC, D_001B18F8, D_001B1598;
-extern int D_001B1900 __attribute__((sda));
+extern int g_radial_default_choices[] __attribute__((sda));
+extern unsigned char g_weapon_wheel_enabled;
+extern int g_weapon_wheel_state, g_weapon_wheel_open_frame, g_frame_counter_3;
+extern int g_weapon_wheel_selected __attribute__((sda));
 typedef struct { char pad[0x64]; int handle; char pad68[4]; int timer; unsigned char fade[4]; int selected, state, timeout; } Selector;
 
 void func_PAL_0028D738(Selector *object)
@@ -40,7 +40,7 @@ void func_PAL_0028D738(Selector *object)
         y /= magnitude;
     }
     angle = mat_fast_helper_a(x, y);
-    if ((object->state >> 24) == 0 && D_001B189C) {
+    if ((object->state >> 24) == 0 && g_weapon_wheel_slot_state) {
         if (g_pad_state.pressed & 0xF000) goto reset_selection;
         if (magnitude < 0.5f) goto reset_selection;
         --object->state;
@@ -62,16 +62,16 @@ reset_selection:
         } else if (g_pad_state.pressed & 0xF000) {
             choice = old;
             if (g_pad_state.pressed & 0x1000) {
-                choice = choice == -1 ? D_001A8DB0[4] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 4];
+                choice = choice == -1 ? g_radial_default_choices[4] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 4];
             }
             if (g_pad_state.pressed & 0x4000) {
-                choice = choice == -1 ? D_001A8DB0[5] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 5];
+                choice = choice == -1 ? g_radial_default_choices[5] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 5];
             }
             if (g_pad_state.pressed & 0x8000) {
-                choice = choice == -1 ? D_001A8DB0[2] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 2];
+                choice = choice == -1 ? g_radial_default_choices[2] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 2];
             }
             if (g_pad_state.pressed & 0x2000) {
-                choice = choice == -1 ? D_001A8DB0[3] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 3];
+                choice = choice == -1 ? g_radial_default_choices[3] : g_radial_menu_pages[g_radial_menu_page_index][choice * 7 + 3];
             }
             object->selected = choice;
         }
@@ -87,20 +87,20 @@ reset_selection:
             if (current == -1) g_hero_state.choice = 0;
             else g_hero_state.choice = g_radial_menu_pages[g_radial_menu_page_index][current * 7 + 6];
         }
-        if (D_001A7BB3) menu_advance_state_in_mode_seven();
+        if (g_weapon_wheel_enabled) menu_advance_state_in_mode_seven();
         if (*fade) --*fade;
     } else if (*fade < 8) ++*fade;
-    if (g_hero_state.choice == 6 && !D_001B18A0)
+    if (g_hero_state.choice == 6 && !g_weapon_wheel_slot_six)
         g_hero_state.choice = 0;
-    if (g_hero_state.choice == 7 && !D_001B18A4)
+    if (g_hero_state.choice == 7 && !g_weapon_wheel_slot_seven)
         g_hero_state.choice = 0;
-    if (g_hero_state.choice == 5 && !D_001B18A2)
+    if (g_hero_state.choice == 5 && !g_weapon_wheel_slot_five)
         g_hero_state.choice = 0;
     if (!*fade) {
-        D_001B1900 = object->selected;
-        D_001B18FC = object->state;
+        g_weapon_wheel_selected = object->selected;
+        g_weapon_wheel_state = object->state;
         hud_close_element_by_key(object->handle);
         object->timer = -6;
-        D_001B18F8 = D_001B1598;
+        g_weapon_wheel_open_frame = g_frame_counter_3;
     }
 }

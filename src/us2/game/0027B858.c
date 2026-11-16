@@ -19,7 +19,7 @@ typedef struct {
     char gap220[8];
     float f228, f22C;
 } ScreenState;
-extern ScreenState D_001B9040;
+extern ScreenState g_view_params;
 
 typedef struct {
     int width, height, half_width, half_height;
@@ -31,7 +31,7 @@ extern ScreenDimensions g_screen_adjust_offsets;
 
 void func_US2_0027B858(int width, int height, float scale, float a, float b, float c, float d)
 {
-    ScreenState *context = &D_001B9040;
+    ScreenState *context = &g_view_params;
     int halfW = width >> 1;
     int halfH = height >> 1;
     float halfHeight;
@@ -60,7 +60,7 @@ void func_US2_0027B858(int width, int height, float scale, float a, float b, flo
 void func_US2_0027B988(void)
 {
     ScreenDimensions *dimensions = &g_screen_adjust_offsets;
-    ScreenState *view = &D_001B9040;
+    ScreenState *view = &g_view_params;
     short width = dimensions->width;
     short height = dimensions->height;
     int half_width = width >> 1;

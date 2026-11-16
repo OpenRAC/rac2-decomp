@@ -36,19 +36,19 @@ extern int math_fast_float_d(char *);
 extern void table_clear_entry_flag(int);
 extern void ref_L08_0039DBE8_05(void *, void *, void *);
 extern void FastVecAdd(char *, char *, char *);
-extern u8 D_L08_00296CD0[];
-extern u8 D_L08_001DB5E7;
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u8 *D_L08_001B29E0 __attribute__((sda));
-extern u8 *D_L08_001B29DC __attribute__((sda));
-extern u32 D_L08_001FB660[];
+extern u8 g_font_print_data[];
+extern u8 g_screen_update_index;
+extern u8 *g_moby_array __attribute__((sda));
+extern u8 *g_moby_array_end __attribute__((sda));
+extern u8 *g_moby_array __attribute__((sda));
+extern u32 g_moby_l08_group_lists[];
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern Material ref_L08_0039E000_00[];
 extern Collision ref_L08_0039E000_01;
 extern u8 *g_hero_moby;
 
-void func_US2_L16_00389470(unsigned char *obj) {
+void thrown_l08_projectile_update_us2(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -160,7 +160,7 @@ finish:
 }
 
 
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern int ref_L08_0039E000_02 __attribute__((sda));
 extern void ref_L08_0039E000_03(void *);
 extern void ref_L08_0039E000_04(void *, void *, void *);
@@ -168,7 +168,7 @@ extern void ref_L08_0039E000_05(void *, void *, void *);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecScale(void *, void *, float);
 
-void func_US2_L16_00389888(char *obj) {
+void bouncing_l08_projectile_update_us2(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -200,7 +200,7 @@ void func_US2_L16_00389888(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + ref_L08_0039E000_00)->material;
+    frame.packet.material = (g_bouncing_weapon_index + ref_L08_0039E000_00)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;

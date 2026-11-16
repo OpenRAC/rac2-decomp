@@ -14,7 +14,7 @@ typedef struct {
     u8 pad2298[0x1C]; u8 field22B4;
 } SurfacePlayer;
 extern SurfacePlayer g_hero_state;
-extern char D_001A8BD0[] __attribute__((sda));
+extern char g_default_effect_vector[] __attribute__((sda));
 typedef struct {
     u8 pad000[0x140]; float position[4];
     u8 pad150[0x3C8 - 0x150]; float heightOffset;
@@ -38,7 +38,7 @@ extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int
 
 
 /* Resolve the player onto the surface grid and blend their height into it. */
-void func_US2_00303B98(char *object)
+void surface_grid_update_us2(char *object)
 {
     char *state=*(char **)(object+0x68);
     float center, ceiling, blend;
@@ -59,7 +59,7 @@ void func_US2_00303B98(char *object)
             (player->state!=0x39 || *(int *)(*(char **)(player->field2290+0x24)+0x1f0)) &&
             player->state!=0x7a) {
             if (player->state==0x31) {
-                SpawnExplosionEffects(player->field1830, D_001A8BD0, 0, 0.0f, 0.0f, 10, 3, 16,
+                SpawnExplosionEffects(player->field1830, g_default_effect_vector, 0, 0.0f, 0.0f, 10, 3, 16,
                     4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x00810001);
                 ref_00302DA0_00(0x88,0,0.0f);
                 player->field1830=0;

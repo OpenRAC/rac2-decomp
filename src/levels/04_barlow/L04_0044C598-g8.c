@@ -11,10 +11,10 @@ typedef int Quad __attribute__((mode(TI)));
 #define HALF(p,o) (*(short *)((char *)(p)+(o)))
 #define UHALF(p,o) (*(u16 *)((char *)(p)+(o)))
 typedef struct { u8 pad0[0xAA]; s16 oclass; u8 padAC[0xF8 - 0xAC]; float rotz; u8 padFC[0x100 - 0xFC]; } Moby;
-extern int D_L04_001C9C00[];
+extern int g_barlow_state_flags[];
 extern int g_current_map_index __attribute__((sda));
 extern char *g_moby_l04_pool[] __attribute__((sda));
-extern float D_L04_001B1874 __attribute__((sda)), D_L04_001B1878 __attribute__((sda));
+extern float g_hound_chase_range __attribute__((sda)), g_hound_move_speed __attribute__((sda));
 extern void barlow_enemy_update_common(char *);
 extern void moby_set_state(void *,int,int);
 extern void anim_start_blended(void *,int,int,int);
@@ -53,7 +53,7 @@ void gadgetron_hound_update(u8 *object)
     unsigned int flags;
     int kind, choice, state;
     float delay;
-    if (D_L04_001C9C00[0]) return;
+    if (g_barlow_state_flags[0]) return;
     vars=*(char **)(object+0x68);
     barlow_enemy_update_common(object);
     kind=(u8)object[0x95];
@@ -150,7 +150,7 @@ heightCheck:
         FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) anim_start_blended(object,7,0,14);
         if (HALF(vars,0x300)>=21)
-            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),g_hound_move_speed*0.01666666753590107f,0.0019444444915279746f);
         else
             ApproachValue((float *)(vars+0x124),0.0f,0.0019444444915279746f);
         if(object[0x43]==7) {
@@ -171,7 +171,7 @@ heightCheck:
         FastDecTimer((short *)(vars+0x300));
         if(object[0x43]==0 && HALF(vars,0x300)) anim_start_blended(object,7,0,14);
         if (HALF(vars,0x300)>=21)
-            ApproachValue((float *)(vars+0x124),D_L04_001B1878*0.01666666753590107f,0.0019444444915279746f);
+            ApproachValue((float *)(vars+0x124),g_hound_move_speed*0.01666666753590107f,0.0019444444915279746f);
         else
             ApproachValue((float *)(vars+0x124),0.0f,0.0019444444915279746f);
         if(object[0x43]==7) {
@@ -191,7 +191,7 @@ heightCheck:
         break;
     case 4:
         FLOAT(object,0x48)=1.0f;
-        if(vec_distance_xy(object+0x10,vars+0x240)<=D_L04_001B1874) {
+        if(vec_distance_xy(object+0x10,vars+0x240)<=g_hound_chase_range) {
             moby_set_state(object,5,2);
             if(object[0x43]!=8) anim_start_blended(object,8,2,6);
             FLOAT(vars,0x314)=0.0f;
@@ -211,7 +211,7 @@ heightCheck:
             break;
         }
         if(object[0x42]!=8) break;
-        if((object[0x60]&2) && vec_distance_xy(object+0x10,vars+0x240)>D_L04_001B1874) {
+        if((object[0x60]&2) && vec_distance_xy(object+0x10,vars+0x240)>g_hound_chase_range) {
             moby_set_state(object,4,2);
             if(object[0x43]!=7) anim_start_blended(object,7,0,6);
         }

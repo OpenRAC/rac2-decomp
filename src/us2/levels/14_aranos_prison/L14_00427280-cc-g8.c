@@ -9,19 +9,19 @@ typedef union { Q q; float f[4]; } V;
 #define H(p, o) (*(u16 *)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
 
-extern u8 D_001A7AFF MACRO_ADDR, D_001A7B28[] MACRO_ADDR, D_001A7B61 MACRO_ADDR;
-extern u8 D_L14_001A7C88[] MACRO_ADDR, D_001A7A40 MACRO_ADDR;
-extern s32 D_L14_001B22E4[] MACRO_ADDR;
+extern u8 g_item_seller_busy MACRO_ADDR, g_item_seller_flags[] MACRO_ADDR, g_item_seller_done_flag MACRO_ADDR;
+extern u8 g_shop_flags[] MACRO_ADDR, g_unlocked_item_flags MACRO_ADDR;
+extern s32 g_seller_state_words[] MACRO_ADDR;
 
-extern s32 D_00138324 NOT_SDA;
+extern s32 g_pad_held_flags NOT_SDA;
 extern s32 g_player_bolts MACRO_ADDR; /* the player's bolts */
-extern s32 D_L14_001A8F00 MACRO_ADDR;
-extern u8 D_L14_001BF700[];
-extern char D_00139768[];
+extern s32 g_shop_mode MACRO_ADDR;
+extern u8 g_item_request_queue[];
+extern char g_request_flag_table[];
 
 typedef struct { char pad[0x28]; s32 lo; s32 hi; } PriceTable;
-extern PriceTable D_L14_00291850;
-extern s32 D_L14_00291878 NOT_SDA, D_L14_0029187C NOT_SDA;
+extern PriceTable g_item_l14_price_table;
+extern s32 g_item_price_low NOT_SDA, g_item_price_high NOT_SDA;
 #define PRICE_LT(m) (D_L14_001A7C88[7] ? (m) < D_L14_0029187C : (m) < D_L14_00291878)
 
 typedef struct { char pad[0x80]; char obj[0x60]; V pos; } HeroRecord;
@@ -55,7 +55,7 @@ static inline void update_joint(s32 obj, s32 joint, s32 index, float speed, floa
     moby_update_eased_node(obj, joint, index, speed, rate);
 }
 
-void func_US2_L14_00427280(s32 obj) {
+void item_seller_update_us2(s32 obj) {
     V target, raised, delta;
     s32 data = I(obj, 0x68), p;
     float speed, yaw, pitch, ang;
@@ -64,7 +64,7 @@ void func_US2_L14_00427280(s32 obj) {
     switch (B(obj, 0x20)) {
     case 0:
         I(data, 0x120) = 0;
-        if (D_001A7AFF || D_001A7B28[1] || (p = (s32)D_00139768, I(p, 0x7C) < 0)) {
+        if (g_item_seller_busy || g_item_seller_flags[1] || (p = (s32)g_request_flag_table, I(p, 0x7C) < 0)) {
             moby_mark_spawned(obj);
             return;
         }
@@ -78,21 +78,21 @@ void func_US2_L14_00427280(s32 obj) {
     case 1:
         if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
             level_apply_index_for_key(obj);
-            if (req_push_queue(D_L14_001BF700, 0x7E)) {
-                req_launch_queued(D_L14_001BF700);
+            if (req_push_queue(g_item_request_queue, 0x7E)) {
+                req_launch_queued(g_item_request_queue);
                 moby_set_state(obj, 2, -1);
             }
         }
         break;
     case 2:
-        D_L14_001B22E4[1] = 1;
-        if (D_L14_001A8F00 == 2) {
+        g_seller_state_words[1] = 1;
+        if (g_shop_mode == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
             F(obj, 0xf8) = FastAddRotations(F(obj, 0xf8), 3.1415927f);
-            D_L14_001B22E4[1] = 0;
+            g_seller_state_words[1] = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
             if (moby_get_or_create_linked(obj)) {
@@ -108,21 +108,21 @@ void func_US2_L14_00427280(s32 obj) {
     case 3:
         {
             s32 bolts = g_player_bolts;
-            if (D_L14_001A7C88[7] ? D_L14_00291850.hi <= bolts : D_L14_00291850.lo <= bolts) {
+            if (g_shop_flags[7] ? g_item_l14_price_table.hi <= bolts : g_item_l14_price_table.lo <= bolts) {
                 moby_set_state(obj, 4, -1);
                 break;
             }
         }
         if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x1327, D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
+            text_print_localized_formatted(0x1327, g_shop_flags[7] ? g_item_l14_price_table.hi : g_item_l14_price_table.lo, -1);
             level_apply_index_for_key(obj);
         }
         break;
     case 4:
         {
             s32 bolts = g_player_bolts;
-            if (D_L14_001A7C88[7] ? bolts < D_L14_00291850.hi : bolts < D_L14_00291850.lo) {
+            if (g_shop_flags[7] ? bolts < g_item_l14_price_table.hi : bolts < g_item_l14_price_table.lo) {
                 func_L00_0030C710(180);
                 moby_set_state(obj, 3, -1);
                 break;
@@ -130,32 +130,32 @@ void func_US2_L14_00427280(s32 obj) {
         }
         if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x1328, D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
+            text_print_localized_formatted(0x1328, g_shop_flags[7] ? g_item_l14_price_table.hi : g_item_l14_price_table.lo, -1);
             level_apply_index_for_key(obj);
-            if (D_00138324 & 0x10) {
+            if (g_pad_held_flags & 0x10) {
                 {
                     s32 bolts = g_player_bolts;
-                    g_player_bolts = bolts - (D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo);
+                    g_player_bolts = bolts - (g_shop_flags[7] ? g_item_l14_price_table.hi : g_item_l14_price_table.lo);
                 }
-                if (req_push_queue(D_L14_001BF700, 0x7f)) {
-                    req_launch_queued(D_L14_001BF700);
+                if (req_push_queue(g_item_request_queue, 0x7f)) {
+                    req_launch_queued(g_item_request_queue);
                     moby_set_state(obj, 5, -1);
                 }
             }
         }
         break;
     case 5:
-        D_L14_001B22E4[1] = 1;
-        if (D_L14_001A8F00 == 2) {
+        g_seller_state_words[1] = 1;
+        if (g_shop_mode == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
-        if (I(data, 0x120) && D_L14_001A8F00 == 2) {
+        if (I(data, 0x120) && g_shop_mode == 2) {
             H(I(data, 0x120), 0x34) |= 1;
             B(I(data, 0x120), 0x31) = 0;
         }
         if (!game_is_either_mode_two()) {
-            D_L14_001B22E4[1] = 0;
+            g_seller_state_words[1] = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
             if (B(obj, 0x21) != 0xff) moby_set_byte_on_group(B(obj, 0x21), 1);
@@ -163,9 +163,9 @@ void func_US2_L14_00427280(s32 obj) {
                 moby_mark_spawned(I(data, 0x120));
                 I(data, 0x120) = 0;
             }
-            if (!D_001A7B28[1]) {
-                D_001A7B28[1] = 1;
-                D_001A7B61 = 1;
+            if (!g_item_seller_flags[1]) {
+                g_item_seller_flags[1] = 1;
+                g_item_seller_done_flag = 1;
             }
             MemcardSave(0, -1);
             F(obj, 0xf8) = FastAddRotations(F(obj, 0xf8), 3.1415927f);
@@ -218,7 +218,7 @@ void func_US2_L14_00427280(s32 obj) {
     F(data, 0x68) = yaw * .5f;
     F(data, 0xe8) = yaw * .3f;
     if (I(data, 0x120)) moby_copy_joint_transform_to_object(obj, I(data, 0x120), 2, 0);
-    if (D_001A7A40) F(data, 0x70) = 2.75f;
+    if (g_unlocked_item_flags) F(data, 0x70) = 2.75f;
     update_joint(obj, data, 0, speed, .3f);
     update_joint(obj, data + 0x80, 1, speed, .3f);
 }

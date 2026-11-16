@@ -1,14 +1,14 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int D_L05_001B0F50 __attribute__((sda));
+extern int g_route_l05_flag __attribute__((sda));
 
 /* Resets the object's counters and a global flag to zero. */
 void func_L05_00417730(char *object)
 {
     char *state = *(char **)(object + 0x68);
 
-    D_L05_001B0F50 = 0;
+    g_route_l05_flag = 0;
     *(int *)(state + 0x1BC) = 0;
     *(int *)(state + 0x1B8) = 0;
 }
@@ -21,7 +21,7 @@ extern void FastVecAdd(void *a, void *b, void *c);
 
 extern int part_l00_alloc_effect_slot_2(void *p, float, float, float, float, float);
 
-extern int D_L05_001B0FA4 __attribute__((sda));
+extern int g_wobbling_light_slot __attribute__((sda));
 
 /* Starts a light effect a few units in front of the object. */
 void func_L05_00418200(char *object)
@@ -34,7 +34,7 @@ void func_L05_00418200(char *object)
     local[2] = one;
     matrix_mul_vec3(local, local, object + 0xC0);
     FastVecAdd(local, local, object + 0x10);
-    D_L05_001B0FA4 = part_l00_alloc_effect_slot_2(local, 0.0f, 0.0f, 0.0f, one, 0.0f);
+    g_wobbling_light_slot = part_l00_alloc_effect_slot_2(local, 0.0f, 0.0f, 0.0f, one, 0.0f);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -45,13 +45,13 @@ extern void func_3065F8(int);
 
 extern float func_332C18(void);
 
-extern int D_L05_001D1348 __attribute__((sda));
+extern int g_level_int_flag __attribute__((sda));
 
-extern int D_L05_001B14FC __attribute__((sda));
+extern int g_glow_effect_target_moby __attribute__((sda));
 
-extern int D_L05_001B1504 __attribute__((sda));
+extern int g_glow_ring_draw_target_moby __attribute__((sda));
 
-extern int D_L05_001B2528 __attribute__((nosda));
+extern int g_moby_l05_list_head __attribute__((nosda));
 
 extern void func_41D728(int);
 
@@ -83,11 +83,11 @@ void func_L05_004260B8(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001B14FC != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001B14FC + 0x10), object + 0x10);
+    if (g_glow_effect_target_moby != 0) {
+        scale = fast_vec_dist((void *)(g_glow_effect_target_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_effect_target_moby + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -102,7 +102,7 @@ void func_L05_004260B8(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_effect_target_moby + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:
@@ -118,11 +118,11 @@ check_scale:
     glow_ring_draw_sprites(object);
 }
 
-extern int D_L05_001B1500 __attribute__((sda));
+extern int g_glow_ring_follow_moby __attribute__((sda));
 
 extern void glow_l05_ring_draw(char *);
 
-extern int D_L05_001B1348 __attribute__((sda));
+extern int g_glow_ring_target_moby __attribute__((sda));
 
 extern void glow_l05_ring_draw_3(char *);
 
@@ -132,11 +132,11 @@ void func_L05_0041D570(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001B1348 != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001B1348 + 0x10), object + 0x10);
+    if (g_glow_ring_target_moby != 0) {
+        scale = fast_vec_dist((void *)(g_glow_ring_target_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_target_moby + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -151,7 +151,7 @@ void func_L05_0041D570(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_target_moby + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
     check_scale:
@@ -174,11 +174,11 @@ void func_L05_00426658(char *object)
     char *state = *(char **)(object + 0x68);
     float scale;
 
-    if (D_L05_001B1500 != 0) {
-        scale = fast_vec_dist((void *)(D_L05_001B1500 + 0x10), object + 0x10);
+    if (g_glow_ring_follow_moby != 0) {
+        scale = fast_vec_dist((void *)(g_glow_ring_follow_moby + 0x10), object + 0x10);
 
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_follow_moby + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -193,7 +193,7 @@ void func_L05_00426658(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            vec_spring_to_target(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_follow_moby + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:
@@ -219,15 +219,15 @@ void func_L05_00426BE0(char *object)
     char *state = *(char **)(object + 0x68);
     float distance;
 
-    if (D_L05_001B1504 != 0) {
+    if (g_glow_ring_draw_target_moby != 0) {
         char *pos = object + 0x10;
         char *aim;
         float scaled;
         float capped;
 
-        distance = fast_vec_dist((char *)D_L05_001B1504 + 0x10, pos);
+        distance = fast_vec_dist((char *)g_glow_ring_draw_target_moby + 0x10, pos);
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+            vec_spring_to_target(pos, (char *)g_glow_ring_draw_target_moby + 0x10, state + 0x40,
                           0.008888889f, 0.0033333333f, 1.0666667f);
         } else {
             if (distance < 60.0f) {
@@ -237,7 +237,7 @@ void func_L05_00426BE0(char *object)
                 capped = *(float *)(aim + 0x24) * 0.3f;
                 if (capped > scaled)
                     *(float *)(object + 0x2C) = capped;
-                vec_spring_to_target(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+                vec_spring_to_target(pos, (char *)g_glow_ring_draw_target_moby + 0x10, state + 0x40,
                               0.0055555556f, 0.0016666667f, 0.5f);
             }
         }
@@ -274,9 +274,9 @@ extern void QueueMobyImpact(void *, Impact *);
 extern void light_spot_add_nearby_object(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void gfx_draw_energy_blast(void *);
-extern char D_L05_001BFB20[], D_L05_001B9580[];
-extern u8 *D_L05_001C3B80[];
-extern float D_L05_001B104C __attribute__((sda));
+extern char g_projectile_target_pos[], g_hero_l05_state[];
+extern u8 *g_nearby_l05_mobys[];
+extern float g_equipment_trigger_radius __attribute__((sda));
 
 void UpdateFeltzinProjectile(u8 *actor)
 {
@@ -302,7 +302,7 @@ void UpdateFeltzinProjectile(u8 *actor)
         }
     }
     if (*(int *)(state + 0x38) != 0) {
-        if (vec_distance_xy(actor + 0x10, D_L05_001B9580 + 0x140) < 2.0f) {
+        if (vec_distance_xy(actor + 0x10, g_hero_l05_state + 0x140) < 2.0f) {
             moby_mark_spawned(actor);
             return;
         }
@@ -327,16 +327,16 @@ void UpdateFeltzinProjectile(u8 *actor)
     if (CollLine(&previous, actor + 0x10, 0, *(void **)(state + 4), &impact) != 0 &&
         GetCollHitMaterial() != 6) {
         snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
-        part_spawn_sprite_pair_burst(D_L05_001BFB20, 20, *(u32 *)(state + 0x24), actor);
+        part_spawn_sprite_pair_burst(g_projectile_target_pos, 20, *(u32 *)(state + 0x24), actor);
         moby_mark_spawned(actor);
         return;
     }
     if (*(s16 *)(*(u8 **)(state + 4) + 0xAA) != 0xFBF) {
-        coll_project_point_on_segment(&point, &previous, actor + 0x10, D_L05_001B9580 + 0x140);
-        if (fast_vec_dist(&point, D_L05_001B9580 + 0x140) < D_L05_001B104C) {
+        coll_project_point_on_segment(&point, &previous, actor + 0x10, g_hero_l05_state + 0x140);
+        if (fast_vec_dist(&point, g_hero_l05_state + 0x140) < g_equipment_trigger_radius) {
             snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
             {
-                char *camera = D_L05_001B9580;
+                char *camera = g_hero_l05_state;
                 *(int *)(camera + 0x16C) = 0;
                 *(int *)(camera + 0x168) = 30;
                 *(float *)(camera + 0x160) = 0.05f;
@@ -355,12 +355,12 @@ destroy:
     count = coll_process_hit(&point, 1, *(void **)(state + 4), 0, FastVecLength(&delta));
     if (count != 0) {
         for (i = 0; i < count; i++) {
-            coll_project_point_on_segment(&closest, &previous, actor + 0x10, D_L05_001C3B80[i] + 0x10);
-            FastVecSub(&delta, D_L05_001C3B80[i] + 0x10, &closest);
+            coll_project_point_on_segment(&closest, &previous, actor + 0x10, g_nearby_l05_mobys[i] + 0x10);
+            FastVecSub(&delta, g_nearby_l05_mobys[i] + 0x10, &closest);
             if (FastVecLength(&delta) < *(float *)(state + 0x3C)) {
                 snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
                 part_spawn_sprite_pair_burst(&closest, 20, *(u32 *)(state + 0x24), actor);
-                QueueMobyImpact(D_L05_001C3B80[i], &impact);
+                QueueMobyImpact(g_nearby_l05_mobys[i], &impact);
                 goto destroy;
             }
         }
@@ -378,10 +378,10 @@ extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_trailing_spark(void *, void *, int, int, int, int, float);
-extern float D_L05_001B1534 __attribute__((sda));
-extern float D_L05_001B1530 __attribute__((sda));
-extern char D_L05_001BFB30[], D_L05_001BFB00[];
-extern u8 *D_L05_001FF240[] NOT_SDA;
+extern float g_projectile_hit_radius_alt __attribute__((sda));
+extern float g_projectile_hit_radius_normal __attribute__((sda));
+extern char g_projectile_pos_scratch[], g_collision_l05_result[];
+extern u8 *g_particle_params_table[] NOT_SDA;
 
 typedef struct { char pad[0x18]; char *hit; int count; int point[4]; } Collision;
 
@@ -434,13 +434,13 @@ void UpdateProjectile(char *object)
     }
     if (math_fast_float_d(state + 0x28)) {
         hit = 0;
-        radius = *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530;
+        radius = *(int *)(state + 0x24) ? g_projectile_hit_radius_alt : g_projectile_hit_radius_normal;
         if (coll_test_point(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
-            qcopy(object + 0x10, D_L05_001BFB30);
+            qcopy(object + 0x10, g_projectile_pos_scratch);
         }
         if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
-            collision = (Collision *)D_L05_001BFB00;
+            collision = (Collision *)g_collision_l05_result;
             if (collision->hit) {
                 snd_play_from_class_bank(7, 0, object, 0xFBF);
                 qcopy(object + 0x10, &collision->point);
@@ -459,11 +459,11 @@ void UpdateProjectile(char *object)
             radius = 1.5f;
         if (coll_test_point(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
-            qcopy(object + 0x10, D_L05_001BFB30);
+            qcopy(object + 0x10, g_projectile_pos_scratch);
         }
         if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
             snd_play_from_class_bank(7, 0, object, 0xFBF);
-            qcopy(object + 0x10, &((Collision *)D_L05_001BFB00)->point);
+            qcopy(object + 0x10, &((Collision *)g_collision_l05_result)->point);
             projectile_apply_impact_sparks(object, state, object + 0x10);
             ShotEndFlight(object, state);
             return;
@@ -480,15 +480,15 @@ void UpdateProjectile(char *object)
         if (*(int *)(state + 0x24)) {
             particle = part_spawn_trailing_spark(pos, random, 0x4FFF0040, 0x1FFF0040, 10, 1, 30000.0f);
             if (particle)
-                particle[2] = D_L05_001FF240[97][7];
+                particle[2] = g_particle_params_table[97][7];
             particle = part_spawn_trailing_spark(pos, random, 0x4FFF2040, 0x1FFF2040, 10, 1, 15000.0f);
         } else {
             particle = part_spawn_trailing_spark(pos, random, 0x4F00FF20, 0x1F00FF20, 10, 1, 30000.0f);
             if (particle)
-                particle[2] = D_L05_001FF240[97][7];
+                particle[2] = g_particle_params_table[97][7];
             particle = part_spawn_trailing_spark(pos, random, 0x4F20FF20, 0x1F20FF20, 10, 1, 15000.0f);
         }
         if (particle)
-            particle[2] = D_L05_001FF240[97][7];
+            particle[2] = g_particle_params_table[97][7];
     }
 }

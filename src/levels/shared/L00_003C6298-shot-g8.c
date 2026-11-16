@@ -9,13 +9,13 @@ typedef struct { char pad[0x2290]; char *player; } PlayerRef;
 typedef struct { char pad[132]; int value; } SoundRecord;
 
 extern char g_area_hit_targets[];
-extern const QueryParams D_L00_001B0140;
+extern const QueryParams g_thrown_shot_query_params;
 extern char g_item_slot_to_record[];
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 extern char g_sound_state[];
 extern char g_hero_state[];
 extern char g_weapon_l00_table[];
-extern int D_L00_001B0134 SDATA(D_L00_001B0134);
+extern int g_thrown_shot_initialized SDATA(D_L00_001B0134);
 
 extern void vec_transform_or_copy(void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
@@ -109,8 +109,8 @@ void thrown_shot_update(char *self)
             else
                 did_hit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
             if (did_hit == 1) {
-                qcopy(self + 0x10, D_L00_001BF220);
-                FastVecScale(scratch.v, D_L00_001BF220 + 0x20, 0.0009765625f);
+                qcopy(self + 0x10, g_hero_l00_position);
+                FastVecScale(scratch.v, g_hero_l00_position + 0x20, 0.0009765625f);
                 vec_scale_to_length(scratch.v, scratch.v, 0.1f);
                 FastVecAdd(self + 0x10, scratch.v, self + 0x10);
                 *(int *)(vars + 0x10) = 15;
@@ -135,7 +135,7 @@ void thrown_shot_update(char *self)
         }
         if (math_fast_float_d(vars + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
-            scratch.params = D_L00_001B0140;
+            scratch.params = g_thrown_shot_query_params;
             message.query.exclude = (QueryExclude){*(char **)(vars + 0x38), 0};
             SelectBestTargetInCone(self + 0x10, self + 0xC0, 6.2831855f, 6.2831855f, &count,
                           message.query.targets, 3, &message.query.exclude,
@@ -153,8 +153,8 @@ void thrown_shot_update(char *self)
     case 4: {
         char *hit_info;
         if (*(char **)(vars + 0x38)) {
-            if (!D_L00_001B0134) {
-                D_L00_001B0134 = 1;
+            if (!g_thrown_shot_initialized) {
+                g_thrown_shot_initialized = 1;
                 PlayMobySound(3, 0, self);
             }
             hit_info = moby_get_private_value_0(*(char **)(vars + 0x38));

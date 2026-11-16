@@ -5,7 +5,7 @@
    by 6/5), where the entry count goes from 80 to 79 and the freed last slot, entries + 79 * 0x50,
    keeps the object's height, which replaces -1.0f as func_002AEE70's last argument. */
 
-extern int D_L00_001C9340;
+extern int g_tutorial_points;
 
 extern void BuildObjectAttachmentTransforms(char *, void *, int, int, int, int, int, int);
 
@@ -47,7 +47,7 @@ typedef struct {
     float height;
 } L00_003EB0C0_State;
 
-void func_PAL_L00_003EF3D8(char *self)
+void rotating_parts_update_pal(char *self)
 {
     float angles[4];
     char mat[48];
@@ -81,7 +81,7 @@ void func_PAL_L00_003EF3D8(char *self)
         self[0x20] = 1;
         break;
     case 1:
-        if (D_L00_001C9340 != st->level)
+        if (g_tutorial_points != st->level)
             break;
         if (st->firstStep > 0.0f)
             math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,

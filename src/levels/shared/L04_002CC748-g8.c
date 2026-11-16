@@ -14,10 +14,10 @@ typedef short s16;
 
 typedef float f32;
 
-extern f32 D_L04_001AD840 __attribute__((sda));
-extern f32 D_L04_001AD844;
-extern u8 D_L04_001B9540[];
-extern u8 D_L04_001B9680[];
+extern f32 g_water_ripple_offset_x __attribute__((sda));
+extern f32 g_water_ripple_offset_y;
+extern u8 g_hero_l04_state[];
+extern u8 g_tether_zero_vec[];
 
 extern s32 func_310060(f32 *vec, f32 angle);
 extern f32 func_30EF70(f32 *vec, void *mat);
@@ -45,16 +45,16 @@ void water_update_ripple_patches(u8 *moby) {
         return;
     offset = i * 0x1190;
     for (; i < *(s32 *)(moby + 0x4); i++, offset += 0x1190) {
-        table = D_L04_001B9540;
+        table = g_hero_l04_state;
         nearby = 1;
         *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x8) =
             *(f32 *)(*(u32 *)(moby + 0x28) + 0x18);
-        pos[0] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x0) + D_L04_001AD840 * 0.5f;
-        pos[1] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x4) + D_L04_001AD844 * 0.5f;
+        pos[0] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x0) + g_water_ripple_offset_x * 0.5f;
+        pos[1] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x4) + g_water_ripple_offset_y * 0.5f;
         pos[2] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x8);
         pos[3] = 22.6f;
         if (func_310060(pos, 71.5f) == -1 ||
-            func_30EF70(pos, D_L04_001B9680) > 71.5f)
+            func_30EF70(pos, g_tether_zero_vec) > 71.5f)
             nearby = 0;
         *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x4C) =
             1.0f - func_30FF88(*(s16 *)(vars + 0x16)) / func_30FF88(60);

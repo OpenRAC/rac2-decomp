@@ -9,12 +9,12 @@ extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
 extern unsigned char g_item_slot_to_record[];
 extern MaterialRecord g_weapon_table[];
 extern int g_selected_item_material __attribute__((sda));
-extern SelectionEntry D_001AA898[];
+extern SelectionEntry g_item_grid_second_mode_rows[];
 extern EquipmentState g_pause_menu_state;
 
 #define MATERIAL(id) ((MaterialRecord *)(D_00139568[id]*224 + (char *)D_00239BA0))->material
 
-void func_PAL_00347EB0(SelectionOwner *o, int buttons)
+void HandleColumnSelectionInput_pal(SelectionOwner *o, int buttons)
 {
     int id, column;
 
@@ -48,7 +48,7 @@ void func_PAL_00347EB0(SelectionOwner *o, int buttons)
         if (column >= 3)
             o->column = 0;
     } else if (buttons & 0x40) {
-        id = D_001AA898[o->column].v[3];
+        id = g_item_grid_second_mode_rows[o->column].v[3];
         if (id != 0 && g_item_owned_flags[id] != 0) {
             snd_play_from_global_bank(4, 0, 0);
             g_selected_item_material = MATERIAL(o->selected);
@@ -61,7 +61,7 @@ void func_PAL_00347EB0(SelectionOwner *o, int buttons)
         }
     }
     {
-        int selected = D_001AA898[o->column].v[3];
+        int selected = g_item_grid_second_mode_rows[o->column].v[3];
         o->selected = selected;
         if (selected != 0 && g_item_owned_flags[selected] != 0)
             g_selected_item_material = MATERIAL(selected);

@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "common.h"
-extern f32 D_L09_001B13F0 __attribute__((sda));
-extern f32 D_L09_001B13F4 __attribute__((sda));
-extern s32 D_L09_001A79F0 __attribute__((sda));
-extern s32 D_L09_001A9040 __attribute__((sda));
-extern char *D_L09_001B285C __attribute__((sda));
+extern f32 g_dobbo_fast_move_speed __attribute__((sda));
+extern f32 g_dobbo_slow_move_speed __attribute__((sda));
+extern s32 g_release_effect_state __attribute__((sda));
+extern s32 g_release_busy_flag __attribute__((sda));
+extern char *g_moby_record_table __attribute__((sda));
 extern s32 func_323340(char *a0, char *a1, s32 a2);
 extern int moby_is_hero_or_special(char *a0);
 extern s32 g_current_map_index;
@@ -15,18 +15,18 @@ extern s32 moby_apply_damage_to_object(char *a0, char *a1, s32 a2);
 extern void dobbo_alert_wandering_group(char *a0);
 extern void dobbo_destroy_with_debris(char *a0);
 extern s32 weapon_select_aim_target(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
-extern char D_L09_001B9A00[];
-extern s32 D_L09_001B2878;
+extern char g_camera_l09_position[];
+extern s32 g_max_l09_group_id;
 extern u8 *D_L09_001B285C_1;
-extern s32 D_L09_001B1420[2];
+extern s32 g_dobbo_glow_colors[2];
 extern s32 FastTweenColor(s32, s32, f32);
-extern s32 D_L09_001B2388;
+extern s32 g_frame_l09_counter;
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 
 /* Releases the record the sub-object holds once the resident mode word says 9, then
    rebuilds the sub-object's effect. */
-void func_PAL_L09_00409DC8(char *a0) {
+void dobbo_update_release_record_pal(char *a0) {
     char *s0 = a0;
     char *s1 = *(char **)(s0 + 0x68);
     s32 s2;
@@ -36,7 +36,7 @@ void func_PAL_L09_00409DC8(char *a0) {
         dobbo_wandering_init_vars();
     }
     if (*(u8 *)(s0 + 0x31) != 0) {
-        if (fast_vec_dist(s0 + 0x10, D_L09_001B9A00) < 24.0f) {
+        if (fast_vec_dist(s0 + 0x10, g_camera_l09_position) < 24.0f) {
             moby_update_ground_check(s0);
             *(u8 *)(s0 + 0x6F) = 0x16;
         }
@@ -45,8 +45,8 @@ void func_PAL_L09_00409DC8(char *a0) {
     if (g_current_map_index == 9) {
         idx = *(s16 *)(s1 + 0xC0);
         if (idx != -1) {
-            if (moby_is_hero_or_special(D_L09_001B285C + (idx << 8)) == 0) {
-                D_L09_001A9040 = 0;
+            if (moby_is_hero_or_special(g_moby_record_table + (idx << 8)) == 0) {
+                g_release_busy_flag = 0;
             }
             *(s16 *)(s1 + 0xC0) = -1;
         }
@@ -62,7 +62,7 @@ void func_PAL_L09_00409DC8(char *a0) {
     }
 }
 
-extern float D_L09_001B13F4 __attribute__((sda));
+extern float g_dobbo_slow_move_speed __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
 extern float math_random_signed_float_range(float, float);
@@ -155,7 +155,7 @@ void func_PAL_L09_00409BC0(char *obj)
     rec->f_1E4 = 0x96;
     rec->f_13C = rec->f_234;
     rec->f_1D4 = 1.75f;
-    rec->f_1D0 = D_L09_001B13F4 * 0.020000001f;
+    rec->f_1D0 = g_dobbo_slow_move_speed * 0.020000001f;
     rec->f_348 = math_random_angle();
     moby_set_state(obj, 1, 0);
     if (*(u8 *)(obj + 0x43) != 0)

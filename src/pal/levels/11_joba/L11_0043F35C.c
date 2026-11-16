@@ -7,12 +7,12 @@ extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_L11_004400D0(char *);
+extern void drone_kill_with_effects_pal(char *);
 extern int func_PAL_002B1A50(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 
 void func_PAL_L11_0043F9A8(char *object) {
     char *state = *(char **)(object + 0x68);
@@ -42,17 +42,17 @@ void func_PAL_L11_0043F9A8(char *object) {
         if (*(unsigned char *)(object + 0x43) != 1)
             func_PAL_002A7E68(object, 1, 0, 0);
         moby_set_state(object, 1, -1);
-        func_PAL_L11_004400D0(object);
+        drone_kill_with_effects_pal(object);
     }
     if (*(unsigned char *)(object + 0x20) >= 4)
         func_PAL_002B1A50(object, state + 0x170, 0);
     if (*(unsigned char *)(object + 0x20) >= 3 &&
         *(unsigned char *)(state + 0x2E) == 2)
-        func_PAL_L11_004400D0(object);
+        drone_kill_with_effects_pal(object);
     *(int *)(state + 0x2D8) = weapon_select_aim_target(object, *(int *)(state + 0x2E8),
                                          0, 0, 255.0f, 255.0f);
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 48.0f) {
+        if (fast_vec_dist(object + 0x10, g_hero_l11_position) < 48.0f) {
             moby_update_ground_check(object);
             *(unsigned char *)(object + 0x6F) = 45;
         }

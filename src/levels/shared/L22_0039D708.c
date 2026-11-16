@@ -15,7 +15,7 @@ typedef union F32Bits {
     unsigned int u;
 } F32Bits;
 
-extern Rec_003A2D58 *D_L22_001FE940[];
+extern Rec_003A2D58 *g_ship_path_table[];
 
 /* func_L22_0039D708 is defined in L22_0039D708-main-g8.c. */
 
@@ -99,7 +99,7 @@ void WalkPathUpdate(char *obj) {
     case 1: {
         Path_2160 *rec;
         lane_store_nearest_point_as_current(obj, 1);
-        rec = (Path_2160 *)D_L22_001FE940[st->paths[st->path]];
+        rec = (Path_2160 *)g_ship_path_table[st->paths[st->path]];
         qcopy_nc(point, rec + (st->point + 1));
         st->state = 2;
         distance = func_002F3C40(rec + (st->point + 1), st->target);
@@ -143,13 +143,13 @@ void WalkPathUpdate(char *obj) {
             if (func_002F3C40((obj + 0x10), st->waypoint) < 2.0f) {
                 next = st->point + st->direction;
                 if (next < 0) {
-                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)D_L22_001FE940[st->paths[st->path]])->points[0].f[3]);
+                    WalkPathPickNext(obj, 1, 0, ((PathData_2160 *)g_ship_path_table[st->paths[st->path]])->points[0].f[3]);
                 } else {
-                    PathData_2160 *end = (PathData_2160 *)D_L22_001FE940[st->paths[st->path]];
+                    PathData_2160 *end = (PathData_2160 *)g_ship_path_table[st->paths[st->path]];
                     if (next >= end->count) WalkPathPickNext(obj, 1, 0, end->points[end->count - 1].f[3]);
                     else st->point = next;
                 }
-                qcopy(st->waypoint, (Path_2160 *)D_L22_001FE940[st->paths[st->path]] + (st->point + 1));
+                qcopy(st->waypoint, (Path_2160 *)g_ship_path_table[st->paths[st->path]] + (st->point + 1));
                 arena_push_point_out(st->waypoint, 0.0f);
             }
             qcopy(target, st->waypoint);
@@ -250,9 +250,9 @@ int lane_get_entry_end(char *obj, int lane_slot, int bit) {
     int *slot = (int *)(lane_ids + lane_slot * 4);
     Rec_003A2D58 *rec;
     int last_point;
-    rec = D_L22_001FE940[*slot];
+    rec = g_ship_path_table[*slot];
     if (math_get_float_bit(bit, rec->angle) != 0) return 0;
-    rec = D_L22_001FE940[*slot];
+    rec = g_ship_path_table[*slot];
     last_point = rec->count - 1;
     rec = (Rec_003A2D58 *)((char *)rec + last_point * 16);
     math_get_float_bit(bit, rec->angle);
@@ -321,7 +321,7 @@ void WalkPathPickNext(char *obj, int mode, int filter, float bits) {
     for (i = 0; i < count; i++) {
         id = ids[i];
         ends[i].value = lane_get_entry_end(obj, id, *(short *)(p + 0x354));
-        rec = (char *)D_L22_001FE940[((struct PathIds *)p)->ids[id]];
+        rec = (char *)g_ship_path_table[((struct PathIds *)p)->ids[id]];
         if (!ends[i].value) points[i] = rec + *(int *)rec * 16;
         else points[i] = rec + 16;
     }
@@ -410,7 +410,7 @@ typedef struct PathRec_003A36A0 {
     int pad[3];
     Quad_003A2780 pts[1];
 } PathRec_003A36A0;
-extern Quad_003A2780 D_L22_001C00E0;
+extern Quad_003A2780 g_spawn_point;
 extern void pickup_reset_tables(char *);
 extern int math_random_int_below(int);
 extern void *memset(void *, int, unsigned int);
@@ -440,7 +440,7 @@ void pickup_spawn_initial(char *obj) {
     memset(v.selected, -1, 28);
     for (i = 0; i < 32; i++) {
         v.cumulative[i] = total;
-        total += D_L22_001FE940[st->ids[i]]->count - 1;
+        total += g_ship_path_table[st->ids[i]]->count - 1;
     }
     for (i = 0; i < 7; i++) {
         duplicate = 1;
@@ -457,12 +457,12 @@ void pickup_spawn_initial(char *obj) {
         v.selected[i] = chosen;
         for (j = 0; j < 32; j = next) {
             if (j == 31) {
-                qcopy_nc(&v.point, (char *)((chosen - v.cumulative[31]) * 16 + (int)D_L22_001FE940[st->ids[31]]) + 16);
+                qcopy_nc(&v.point, (char *)((chosen - v.cumulative[31]) * 16 + (int)g_ship_path_table[st->ids[31]]) + 16);
                 break;
             }
             next = j + 1;
             if (chosen >= v.cumulative[j] && chosen < v.cumulative[next]) {
-                qcopy_nc(&v.point, (char *)((chosen - v.cumulative[j]) * 16 + (int)D_L22_001FE940[st->ids[j]]) + 16);
+                qcopy_nc(&v.point, (char *)((chosen - v.cumulative[j]) * 16 + (int)g_ship_path_table[st->ids[j]]) + 16);
                 break;
             }
         }
@@ -471,7 +471,7 @@ void pickup_spawn_initial(char *obj) {
             SpawnRandomKindAt(&v.point, 0);
         }
     }
-    rec = (PathRec_003A36A0 *)D_L22_001FE940[st->other_id];
+    rec = (PathRec_003A36A0 *)g_ship_path_table[st->other_id];
     n = rec->count;
     for (i = 0, spawned = 0; i < n && spawned < 27; i++) {
         unused = i % 3;
@@ -482,7 +482,7 @@ void pickup_spawn_initial(char *obj) {
         FastVecAdd(&v.point, &v.point, pt);
         FastVecAdd(&v.low, &v.low, pt);
         if (CollLine(&v.low, &v.point, 0x12, 0, 0)) {
-            SpawnRandomKindAt(&D_L22_001C00E0, 1);
+            SpawnRandomKindAt(&g_spawn_point, 1);
             spawned++;
         }
     }
@@ -503,7 +503,7 @@ typedef struct Ctl_003A47E8 {
     int f8;
 } Ctl_003A47E8;
 
-extern Ctl_003A47E8 *D_L22_001B2AB4[1] __attribute__((sda));
+extern Ctl_003A47E8 *g_space_ship_pickup_slots[1] __attribute__((sda));
 extern void func_00316B30(void *, int, void *);
 extern void func_0039CDC0(void *, void *, int, int, int);
 
@@ -512,23 +512,23 @@ extern void func_0039CDC0(void *, void *, int, int, int);
 void space_ship_run_attached_part_effect(char *obj, int flags, int a2, int a3, int a4) {
     char *vars = *(char **)(obj + 0x68);
     char point[16];
-    if (D_L22_001B2AB4[0]->f8 == 0) return;
+    if (g_space_ship_pickup_slots[0]->f8 == 0) return;
     if (flags & 1) {
         func_00316B30(*(void **)(vars + 0x440), 3, point);
         func_0039CDC0(*(void **)(vars + 0x440), point, a2, a3,
-                      a4 != 0 || D_L22_001B2AB4[0]->f0 != 0);
+                      a4 != 0 || g_space_ship_pickup_slots[0]->f0 != 0);
     }
     if (flags & 2) {
         func_00316B30(*(void **)(vars + 0x440), 4, point);
         func_0039CDC0(*(void **)(vars + 0x440), point, a2, a3,
-                      a4 != 0 || D_L22_001B2AB4[0]->f0 != 0);
+                      a4 != 0 || g_space_ship_pickup_slots[0]->f0 != 0);
     }
-    D_L22_001B2AB4[0]->f8 = D_L22_001B2AB4[0]->f8 - 1;
+    g_space_ship_pickup_slots[0]->f8 = g_space_ship_pickup_slots[0]->f8 - 1;
 }
 
 /* func_L22_003A4938 is defined in L22_0039D708-scan.c. */
 
-extern float D_L22_001B2AA4 __attribute__((sda));
+extern float g_planet_radius __attribute__((sda));
 extern char *g_hero_moby;
 extern void func_002F3AB0(void *, void *, void *);
 extern void func_002F3D60(void *, void *, float);
@@ -546,8 +546,8 @@ void lane_find_point_ahead_of_ship(char *obj) {
     char aim[16];
     char *vars = *(char **)(obj + 0x68);
     func_002F3AB0(ahead, obj + 0x10, vars + 0x3F0);
-    func_002F3D60(ahead, ahead, D_L22_001B2AA4 * 4.0f);
-    func_002F3AF0(back, g_hero_moby + 0xE0, -D_L22_001B2AA4 * 4.0f);
+    func_002F3D60(ahead, ahead, g_planet_radius * 4.0f);
+    func_002F3AF0(back, g_hero_moby + 0xE0, -g_planet_radius * 4.0f);
     func_002F3A80(aim, ahead, back);
     func_002F3AF0(aim, aim, 0.5f);
     func_002F3A80(aim, aim, vars + 0x3F0);

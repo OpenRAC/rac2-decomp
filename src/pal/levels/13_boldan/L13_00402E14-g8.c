@@ -19,7 +19,7 @@ typedef struct {
     int collision;
     u8 pad9C[0x100-0x9C];
 } ClockMoby;
-extern ClockMoby *D_L13_001B291C NOT_SDA;
+extern ClockMoby *g_object_table_base NOT_SDA;
 extern u8 *D_L13_001B291C_gp SDATA(D_L13_001B291C);
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define P(p,o) (*(u8 **)((u8 *)(p)+(o)))
@@ -29,7 +29,7 @@ extern u8 *D_L13_001B291C_gp SDATA(D_L13_001B291C);
 /* Initialize the clock from the console RTC, then advance its hands and hourly sound.
  * The GP view and ordinary view refer to the same moby-array pointer.
  */
-void func_PAL_L13_0040B090(u8 *m) {
+void UpdateBoldanClock_pal(u8 *m) {
     u8 *d=P(m,0x68), *a;
     u8 time[16];
     int slo, mlo, hlo, sec, min, hour, t;
@@ -80,7 +80,7 @@ void func_PAL_L13_0040B090(u8 *m) {
         if(h>12.0f) h-=12.0f;
         t=FloatToInt(h);
         if(t==0 || t==2 || t==4 || t==6 || t==8 || t==10 || t==12) {
-            ClockMoby *a=&D_L13_001B291C[I(d,0x28)];
+            ClockMoby *a=&g_object_table_base[I(d,0x28)];
             int collision;
 
             a->flags=(a->flags&0xFFBE)|0x1000;
@@ -88,7 +88,7 @@ void func_PAL_L13_0040B090(u8 *m) {
             a->flags&=0xFFFD;
             a->collision=collision;
         } else {
-            ClockMoby *a=&D_L13_001B291C[I(d,0x28)];
+            ClockMoby *a=&g_object_table_base[I(d,0x28)];
             a->collision=0; a->flags=(a->flags&0xEFFF)|0x43;
         }
         if(hour==3) {

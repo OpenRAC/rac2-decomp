@@ -21,40 +21,40 @@ typedef struct {
 } VehicleHeroState;
 extern VehicleHeroState g_hero_state;
 extern struct { char pad[0x1A0]; int held, pressed; } g_pad_state;
-extern int D_00138324;
-extern int D_L30_001A8F00 __attribute__((sda));
-extern int D_L30_001B18A8 __attribute__((sda));
-extern float D_L30_001B179C __attribute__((sda));
-extern float D_L30_001B17B0 __attribute__((sda));
-extern float D_L30_001B16CC __attribute__((sda));
-extern float D_L30_001B16D0 __attribute__((sda));
-extern float D_L30_001B16D4 __attribute__((sda));
-extern float D_L30_001B16D8 __attribute__((sda));
-extern float D_L30_001B16DC __attribute__((sda));
-extern float D_L30_001B16E0 __attribute__((sda));
-extern float D_L30_001B17E8 __attribute__((sda));
-extern float D_L30_001B17EC __attribute__((sda));
-extern float D_L30_001B17B8 __attribute__((sda));
-extern float D_L30_001B16F4 __attribute__((sda));
-extern int D_L30_001B1780 __attribute__((sda));
-extern int D_L30_001B180C __attribute__((sda));
-extern int D_L30_001B1704 __attribute__((sda));
-extern int D_L30_001B1708 __attribute__((sda));
-extern char *D_L30_001B17B4 __attribute__((sda));
-extern char *D_L30_001B1808 __attribute__((sda));
-extern char *D_L30_001B27C4;
+extern int g_pad_held_flags;
+extern int g_museum_effect_mode __attribute__((sda));
+extern int g_vehicle_hit_timer_reset __attribute__((sda));
+extern float g_vehicle_damage_scale __attribute__((sda));
+extern float g_vehicle_max_health __attribute__((sda));
+extern float g_vehicle_near_distance __attribute__((sda));
+extern float g_vehicle_l30_bob_amplitude_2 __attribute__((sda));
+extern float g_vehicle_scale_factor __attribute__((sda));
+extern float g_vehicle_roll_rate __attribute__((sda));
+extern float g_vehicle_yaw_rate __attribute__((sda));
+extern float g_vehicle_pitch_rate __attribute__((sda));
+extern float g_vehicle_throttle_decay __attribute__((sda));
+extern float g_vehicle_throttle_gain __attribute__((sda));
+extern float g_vehicle_hero_height_offset __attribute__((sda));
+extern float g_vehicle_turn_speed __attribute__((sda));
+extern int g_effect_texture_offset __attribute__((sda));
+extern int g_gauge_palette_loaded __attribute__((sda));
+extern int g_vehicle_animation_id __attribute__((sda));
+extern int g_vehicle_prev_animation_id __attribute__((sda));
+extern char *g_vehicle_joint_index __attribute__((sda));
+extern char *g_gauge_palette_ptr __attribute__((sda));
+extern char *g_class_palette_data;
 extern void DrawMuseumStatusGauge(char *);
-extern unsigned short D_L30_001BE9C0[][8];
-extern char D_L30_0025CEB0[], D_L30_001B9DC0[];
+extern unsigned short g_palette_row_table[][8];
+extern char g_palette_copy[], g_camera_l30_position[];
 extern char *part_find_owned_effect_slot(char *,int,int);
 extern void func_PAL_002AC290(char *,void *), func_PAL_002AC3C0(char *,void *);
 extern float vec_length_xy(void *), func_002A0558(char *,char *), FastAddRotations(float,float), math_fast_sin_or_cos_b(float), fast_vec_dist(void *,void *);
 extern int TryClaimNotice(int,int,int), math_random_int_below(int), flag_set_first_pending(char *);
 extern int func_PAL_L00_002C4480(int,int);
-extern void func_PAL_L30_00411310(char *,int), func_PAL_L00_002D2668(int,int,float), moby_mark_in_range(char *);
+extern void func_PAL_L30_00411310(char *,int), set_hero_animation_pal(int,int,float), moby_mark_in_range(char *);
 extern void moby_set_state(char *,int,int), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
 extern void moby_transform_joint_to_world(char *,int,void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void moby_scale_owner_words_by_angles(char *,void *,void *,float,float,float);
 extern void *memcpy(void *,const void *,unsigned int);
 typedef struct {
@@ -77,9 +77,9 @@ typedef struct {
 static __inline__ float initial_health(void)
 {
     float health;
-    if (D_L30_001A8F00)
+    if (g_museum_effect_mode)
         health = 1.0f;
-    health = D_L30_001B17B0;
+    health = g_vehicle_max_health;
     return health;
 }
 
@@ -101,24 +101,24 @@ void func_PAL_L30_00410A38(MuseumVehicle *obj) {
                 g_hero_state.health=s->health;
                 if (s->health<=0.0f) obj->state=5;
                 s->lastHit=P(hit,0x20);
-                s->hitTimer=((s32)(D_L30_001B18A8) * 5 + 2) / 6;
+                s->hitTimer=((s32)(g_vehicle_hit_timer_reset) * 5 + 2) / 6;
             }
         }
         obj->hitFlag=0xFF;
     } else s->height=obj->position[2];
     func_PAL_002AC3C0(obj,&s->flash);
 
-    obj->damage=F(obj->classData,0x24)*D_L30_001B179C;
-    if (g_hero_state.vehicle==obj) g_hero_state.healthPercent=(int)(g_hero_state.health/D_L30_001B17B0*200.0f);
+    obj->damage=F(obj->classData,0x24)*g_vehicle_damage_scale;
+    if (g_hero_state.vehicle==obj) g_hero_state.healthPercent=(int)(g_hero_state.health/g_vehicle_max_health*200.0f);
     activate=0;
     switch (obj->state) {
     case 0: {
         char *palette; int copied;
-        palette=D_L30_001B27C4+((PaletteRow *)((s->classIndex+D_L30_001B1780)*16+(char *)D_L30_001BE9C0))->offset*16;
-        D_L30_001B1808=palette;copied=D_L30_001B180C;
+        palette=g_class_palette_data+((PaletteRow *)((s->classIndex+g_effect_texture_offset)*16+(char *)g_palette_row_table))->offset*16;
+        g_gauge_palette_ptr=palette;copied=g_gauge_palette_loaded;
         s->alpha=255; s->flags=0;
-        if (!copied) memcpy(D_L30_0025CEB0,palette,0x400);
-        D_L30_001B180C=1;
+        if (!copied) memcpy(g_palette_copy,palette,0x400);
+        g_gauge_palette_loaded=1;
         qcopy(&s->spawn,obj->position); qzero_nc(s);
         g_hero_state.maxHealth=g_hero_state.health=s->health=initial_health();
         obj->state=1;
@@ -129,24 +129,24 @@ void func_PAL_L30_00410A38(MuseumVehicle *obj) {
         if (g_hero_state.state==28 || g_hero_state.state==22 || g_hero_state.state==57 || g_hero_state.state==111 ||
             g_hero_state.mode==2 || g_hero_state.mode==4 || g_hero_state.mode==3 || g_hero_state.mode>=13 ||
             g_hero_state.mode==7 || g_hero_state.mode==10 || g_hero_state.mode==16 || g_hero_state.mode==5 || g_hero_state.state==98 ||
-            g_hero_state.heroHealth<=0 || D_L30_001A8F00 || !g_hero_state.groundFlag) break;
+            g_hero_state.heroHealth<=0 || g_museum_effect_mode || !g_hero_state.groundFlag) break;
         if (g_hero_state.ground && (*(short *)(g_hero_state.ground+0xAA)==0x13E || *(short *)(g_hero_state.ground+0xAA)==0x46F)) break;
-        if (func_002A0558(obj,g_hero_state.hero)<D_L30_001B16CC && g_hero_state.state!=49) {
+        if (func_002A0558(obj,g_hero_state.hero)<g_vehicle_near_distance && g_hero_state.state!=49) {
             int v=TryClaimNotice(7,0x12ea,1)!=0;
             if (g_pad_state.pressed&16) activate=v;
         }
         if (activate) {
-            func_PAL_L00_002C4480(49,0);func_PAL_L00_002D2668(D_L30_001B1704,0,15.0f);
+            func_PAL_L00_002C4480(49,0);set_hero_animation_pal(g_vehicle_animation_id,0,15.0f);
             qcopy(g_hero_state.rotation,obj->rotation);qcopy(g_hero_state.position,obj->position);
             g_hero_state.vehicle=obj;obj->state=3;obj->flags=0;I(g_hero_state.hero,0x9C)=-1;
         }
         break;
     case 3:
         if (g_pad_state.held&4) {
-            s->power.throttle-=D_L30_001B17E8*1.2f;
+            s->power.throttle-=g_vehicle_throttle_decay*1.2f;
             if (!math_random_int_below(9) || (g_pad_state.pressed&4)) moby_mark_in_range(obj);
-        } else s->power.throttle+=D_L30_001B17EC*1.2f;
-        if (D_L30_001B1708!=D_L30_001B1704 && D_L30_001B1704!=-1) func_PAL_L00_002D2668(D_L30_001B1704,0,15.0f);
+        } else s->power.throttle+=g_vehicle_throttle_gain*1.2f;
+        if (g_vehicle_prev_animation_id!=g_vehicle_animation_id && g_vehicle_animation_id!=-1) set_hero_animation_pal(g_vehicle_animation_id,0,15.0f);
         func_PAL_L30_00411310(obj,1);
         if (s->power.throttle>1.0f) s->power.throttle=1.0f; else if (s->power.throttle<0.0f) s->power.throttle=0.0f;
         if (g_hero_state.vehicle==obj) {
@@ -167,23 +167,23 @@ void func_PAL_L30_00410A38(MuseumVehicle *obj) {
     case 5:
         obj->flags=I(obj->classData,0x10);I(g_hero_state.hero,0x9C)=0;
         func_PAL_L00_002C4480(0,1);moby_transform_joint_to_world(obj,0,pos);
-        func_PAL_002AC718(obj,s,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
+        SpawnExplosionEffects_pal(obj,s,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         qcopy(obj->position,&s->spawn);g_hero_state.vehicleId=-1;g_hero_state.vehicle=0;obj->state=0;
         break;
     }
     scaled=s->power.throttle;
     k=0.0003490659f;
-    scaled=D_L30_001B16D4*(scaled*k);
+    scaled=g_vehicle_scale_factor*(scaled*k);
     s->height=obj->position[2];
     s->phase=FastAddRotations(s->phase,scaled);
-    bob=math_fast_sin_or_cos_b(s->phase)*D_L30_001B16D0*s->power.throttle;
-    rollRate=D_L30_001B16D8; yawRate=D_L30_001B16DC; pitchRate=D_L30_001B16E0;
+    bob=math_fast_sin_or_cos_b(s->phase)*g_vehicle_l30_bob_amplitude_2*s->power.throttle;
+    rollRate=g_vehicle_roll_rate; yawRate=g_vehicle_yaw_rate; pitchRate=g_vehicle_pitch_rate;
     s->bob=bob;
     obj->position[2]+=s->bob*s->power.throttle;
     moby_scale_owner_words_by_angles(obj,&s->yawRate,&s->pitchRate,rollRate*0.017453294f,yawRate*(s->power.throttle*k),pitchRate*(s->power.throttle*k));
     obj->rotation[2]=s->roll;obj->rotation[0]=FastAddRotations(obj->rotation[0],s->pitch);obj->rotation[1]=FastAddRotations(obj->rotation[1],s->yaw);
-    if (obj->state==3) {moby_transform_joint_to_world(obj,(int)D_L30_001B17B4,g_hero_state.position);{char *h=(char *)&g_hero_state;F(h,0x88)+=D_L30_001B17B8;}qcopy(g_hero_state.rotation,obj->rotation);
+    if (obj->state==3) {moby_transform_joint_to_world(obj,(int)g_vehicle_joint_index,g_hero_state.position);{char *h=(char *)&g_hero_state;F(h,0x88)+=g_vehicle_hero_height_offset;}qcopy(g_hero_state.rotation,obj->rotation);
         gfx_add_draw_callback_third(DrawMuseumStatusGauge,obj);
     }
-    if (obj->visible && fast_vec_dist(obj->position,D_L30_001B9DC0)<64.0f) {moby_update_ground_check(obj);obj->delay=60;}
+    if (obj->visible && fast_vec_dist(obj->position,g_camera_l30_position)<64.0f) {moby_update_ground_check(obj);obj->delay=60;}
 }

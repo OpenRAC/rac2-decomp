@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern float D_L00_001AFFA4 MACRO_ADDR;
+extern float g_aim_target_range MACRO_ADDR;
 extern int math_fast_float_d(int *);
 extern void moby_mark_spawned(void *);
 extern void vec_clear_128(Quad *);
@@ -11,11 +11,11 @@ extern void FastVecAdd(void *, void *, void *);
 extern int FloatToInt(float);
 
 /* Moves the child down its owner's local axis, fading it near the end of its life. */
-void func_PAL_L00_003A1B30(char *actor) {
+void sheepinator_trail_update_pal(char *actor) {
     char *state = *(char **)(actor + 0x68);
     char *owner, *ownerState;
-    *(float *)(state + 4) += (D_L00_001AFFA4 + D_L00_001AFFA4) * 0.020000001f;
-    if (math_fast_float_d((int *)(state + 8)) || D_L00_001AFFA4 * 1.1f <= *(float *)(state + 4)) {
+    *(float *)(state + 4) += (g_aim_target_range + g_aim_target_range) * 0.020000001f;
+    if (math_fast_float_d((int *)(state + 8)) || g_aim_target_range * 1.1f <= *(float *)(state + 4)) {
         moby_mark_spawned(actor);
         return;
     }
@@ -30,7 +30,7 @@ void func_PAL_L00_003A1B30(char *actor) {
     matrix_mul_vec3(actor + 0x10, actor + 0x10, *(char **)state + 0xC0);
     FastVecAdd(actor + 0x10, actor + 0x10, ownerState);
     *(Quad *)(actor + 0xF0) = *(Quad *)(*(char **)state + 0xF0);
-    if (*(float *)(state + 4) > D_L00_001AFFA4)
-        *(unsigned char *)(actor + 0x23) = FloatToInt((1.0f - (*(float *)(state + 4) - D_L00_001AFFA4) * 10.0f) * 127.0f);
-    *(float *)(actor + 0x2C) = *(float *)(state + 0xC) * 0.1f + (*(float *)(state + 0xC) * *(float *)(state + 4)) / D_L00_001AFFA4;
+    if (*(float *)(state + 4) > g_aim_target_range)
+        *(unsigned char *)(actor + 0x23) = FloatToInt((1.0f - (*(float *)(state + 4) - g_aim_target_range) * 10.0f) * 127.0f);
+    *(float *)(actor + 0x2C) = *(float *)(state + 0xC) * 0.1f + (*(float *)(state + 0xC) * *(float *)(state + 4)) / g_aim_target_range;
 }

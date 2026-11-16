@@ -10,21 +10,21 @@ typedef int s32;
 
 extern char g_hero_state[];
 extern char g_subtitle_history[];
-extern unsigned char D_0013965E __attribute__((nosda));
+extern unsigned char g_hero_frame_flag __attribute__((nosda));
 extern int g_current_map_index;
-extern int D_L18_001AFBB0;
+extern int g_hero_frozen_flag;
 extern int D_L18_001AFBB0_sda __attribute__((sda));
 extern int D_001A7390_sda __attribute__((sda));
 
 extern void func_PAL_L00_002D29E8(void);
-extern void func_PAL_L18_002D0AF8(void);
+extern void hero_update_frame_input_pal(void);
 extern void ref_L18_002C41F0_00(void);
 extern int FastDecTimer(int a0);
 extern void ref_L18_002C41F0_01(int a0, int a1);
 extern int func_PAL_00289730(int a0, int a1);
 extern void ref_L18_002C41F0_02(void);
 extern void RebuildRegionObjectMembership(void);
-extern void func_PAL_L00_002B9C20(void);
+extern void UpdateDelayedSounds_pal(void);
 extern void attachment_update_all(void);
 extern void hero_update_moby_from_hero(void);
 extern void gfx_fade_screen_effect(void);
@@ -41,12 +41,12 @@ void func_PAL_L18_002C4000(void)
     char *blk;
 
     func_PAL_L00_002D29E8();
-    func_PAL_L18_002D0AF8();
+    hero_update_frame_input_pal();
     ref_L18_002C41F0_00();
 
     base = g_hero_state;
     if (*(u8 *)(base + 0x22B4) == 4) {
-        if (D_L18_001AFBB0 == 0) {
+        if (g_hero_frozen_flag == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
@@ -54,7 +54,7 @@ void func_PAL_L18_002C4000(void)
                         ref_L18_002C41F0_01(0x91, 1);
                     }
                     if (g_current_map_index == 0x14) {
-                        if (D_0013965E == 0) {
+                        if (g_hero_frame_flag == 0) {
                             blk = g_subtitle_history;
                             if (((s32)D_001A7390_sda * 5 + 2) / 6 - *(unsigned int *)(blk + 0x7900) >= 0x97) {
                                 if (func_PAL_00289730(0xA15, 0x6C) != 0) {
@@ -76,7 +76,7 @@ void func_PAL_L18_002C4000(void)
     RebuildRegionObjectMembership();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    func_PAL_L00_002B9C20();
+    UpdateDelayedSounds_pal();
     attachment_update_all();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;

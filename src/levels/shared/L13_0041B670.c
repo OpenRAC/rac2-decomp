@@ -20,9 +20,9 @@ extern void func_0032F620(int, int, int);
 
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) PathPoint;
 typedef struct { int count; int reserved[3]; PathPoint point[0]; } CameraPath;
-extern char *D_L13_001B22C4[] __attribute__((sda));
-extern char *D_L13_001B9914;
-extern CameraPath *D_L13_001FE580[];
+extern char *g_cam_settings_table[] __attribute__((sda));
+extern char *g_camera_path_source;
+extern CameraPath *g_guard_path_table[];
 extern float g_hero_position[4];
 extern float fast_vec_dist(void *, void *);
 extern int find_nearest_path_point(void *, void *, void *, int *, float *, int, float, float, float);
@@ -40,15 +40,15 @@ void cam_path_start(char *camera) {
     int segment;
     float fraction;
     char *source;
-    char *settings = *(char **)(D_L13_001B22C4[0] + *(short *)(camera + 0x84) * 32 + 0x1C);
-    source = D_L13_001B9914;
+    char *settings = *(char **)(g_cam_settings_table[0] + *(short *)(camera + 0x84) * 32 + 0x1C);
+    source = g_camera_path_source;
     qcopy(camera + 0x30, source + 0x30);
     qcopy(camera, source);
     qcopy(camera + 0x10, source + 0x10);
     qcopy(camera + 0x20, source + 0x20);
     qcopy(camera + 0x40, camera);
     if (*(int *)(settings + 0x20) >= 0) {
-        CameraPath *path = D_L13_001FE580[*(int *)(settings + 0x20)];
+        CameraPath *path = g_guard_path_table[*(int *)(settings + 0x20)];
         int i;
         for (i = 0; i < path->count; i++) {
             path->point[i].w = fast_vec_dist(&path->point[i], &path->point[(i + 1) % path->count]);
@@ -56,7 +56,7 @@ void cam_path_start(char *camera) {
     }
     *(short *)(settings + 0x36) = 0;
     if (*(int *)(settings + 0x30) == 3) {
-        CameraPath *path = D_L13_001FE580[*(int *)(settings + 0x20)];
+        CameraPath *path = g_guard_path_table[*(int *)(settings + 0x20)];
         segment = 0;
         fraction = 0.0f;
         if (find_nearest_path_point(path, g_hero_position, projected, &segment, &fraction, 0, 20.0f, 1.0f, 0.0f)) {

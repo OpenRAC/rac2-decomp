@@ -32,7 +32,7 @@ extern int PlayMobySound(int index, int a1, char *a2);
    sound and moves out along its +0xE0 direction over half a turn (pi/120 a frame); when the
    parent leaves 2 it does the same back, only while D_00189EA0 is more than 6 away, and at a
    full turn returns to its saved position and waits again. */
-void func_PAL_L11_0043A7A8(char *p)
+void sliding_part_update_pal(char *p)
 {
     char *state = *(char **)(p + 0x68);
     char *parent = (char *)(g_moby_l11_table + (*(int *)(state + 8) << 8));

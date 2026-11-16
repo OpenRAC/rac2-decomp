@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L00_001B1844 __attribute__((section(".sdata")));
+extern char *g_camera_def_table __attribute__((section(".sdata")));
 extern char *g_follow_camera_object;
 extern char g_hero_position[];
 extern float math_fabs(float);
@@ -10,20 +10,20 @@ extern int IsPointInCuboid(char *, int);
 extern int coll_point_inside_record_volume(char *, int);
 extern int coll_is_point_inside_unit_sphere(char *, int);
 typedef struct { char pad[0x30]; char pos[16]; char rest[0x40]; } Entry_b0898;
-extern Entry_b0898 *D_L00_001B1F8C __attribute__((section(".sdata")));
+extern Entry_b0898 *g_aranos_launch_poses __attribute__((section(".sdata")));
 typedef struct {
  char pad[0x80]; char position[16]; char pad90[0x174-0x90]; float speed; char pad178[0x2294-0x178]; int mode;
  char pad2298[0x22B4-0x2298]; unsigned char flag;
 } Global_b0898;
 extern Global_b0898 D_00189E20_b0898;
 
-int func_PAL_L00_0042F238(char *a)
+int cam_test_trigger_volumes_pal(char *a)
 {
     char *owner = g_follow_camera_object;
     char *sub = *(char **)(owner + 0x70);
     char *move = sub + 0x160;
     char *rot = sub + 0x1C0;
-    char *p = *(char **)(D_L00_001B1844 + *(short *)(a + 0x84) * 32 + 28);
+    char *p = *(char **)(g_camera_def_table + *(short *)(a + 0x84) * 32 + 28);
     unsigned int mode;
     if (*(short *)(owner + 0x86) != 0) return 0;
     mode = D_00189E20_b0898.flag - 1U < 2U;
@@ -35,15 +35,15 @@ int func_PAL_L00_0042F238(char *a)
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.020000001f) return 0;
     if (*(int *)(p + 0xC) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
         if (IsPointInCuboid(g_hero_position, *(int *)(p + 0xC))) return 1;
     }
     if (*(int *)(p + 0x10) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
         if (coll_point_inside_record_volume(g_hero_position, *(int *)(p + 0x10))) return 1;
     }
     if (*(int *)(p + 8) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 8)].pos) < 3.0f) return 1;
         if (coll_is_point_inside_unit_sphere(g_hero_position, *(int *)(p + 8))) return 1;
     }
     *(short *)(p + 0x26) = 1;
@@ -73,33 +73,33 @@ extern void FastVecScale(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern int cam_claim_request_slot(char *);
 extern int cam_release_request_slot(char *);
-extern int func_PAL_L00_0042F238(char *);
-extern int D_00138320;
+extern int cam_test_trigger_volumes_pal(char *);
+extern int g_pad_pressed_flags;
 extern void follow_camera_set_distance(int, float, float);
 extern void cam_set_snap_flag(void);
 extern void follow_camera_set_height(float, float);
 extern void cam_set_aim_offset_target(int, float, float);
 extern void cam_set_tuning_value(float);
 extern void set_follow_camera_orbit_clamp_mode(int);
-extern void func_PAL_L00_00429FC8(float, float, float);
+extern void cam_set_turn_limits_pal(float, float, float);
 
 /* Initializes and updates the aim - camera volume, including follow - camera offsets. */
-void func_PAL_L00_0042F4B8(char *camera)
+void UpdateVolumeAimCamera_pal(char *camera)
 {
     float position[4] __attribute__((aligned(16)));
     char to_position[16] __attribute__((aligned(16)));
     char gravity_offset[16] __attribute__((aligned(16)));
     char horizontal[16] __attribute__((aligned(16)));
-    char *params = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84)*32 + 0x1C);
+    char *params = *(char **)(g_camera_def_table + *(short *)(camera + 0x84)*32 + 0x1C);
     char *camera_position, *state, *reset, *tail, *follow, *snap, *rig;
     float yaw, height, tangent, pitch;
-    if (func_PAL_L00_0042F238(camera)) {
+    if (cam_test_trigger_volumes_pal(camera)) {
         if (cam_claim_request_slot(camera)<=0) {
             if (*(int *)(params + 0x20)) *(short *)(params + 0x26) = 1;
             *(int *)(params + 0x20) = 0;
             return;
         }
-        if (!(D_00138320&4)) goto run;
+        if (!(g_pad_pressed_flags&4)) goto run;
     }
     if (*(int *)(params + 0x20)) *(short *)(params + 0x26) = 1;
     *(int *)(params + 0x20) = 0;
@@ -108,18 +108,18 @@ void func_PAL_L00_0042F4B8(char *camera)
 run:
     if (*(int *)(params + 0x20)<2) {
         if (*(float *)(params + 0x2C)==0.0f && *(float *)(params + 0x30)==0.0f) {
-            char *table = D_L00_001B1844;
+            char *table = g_camera_def_table;
             *(float *)(params + 0x2C) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x14);
             *(float *)(params + 0x30) = *(float *)(table + *(short *)(camera + 0x84)*32 + 0x18);
         }
         yaw = mat_fast_helper_a(
-            D_00189E20_6.position[0] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0],
-            D_00189E20_6.position[1] - ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1]);
+            D_00189E20_6.position[0] - ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[0],
+            D_00189E20_6.position[1] - ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[1]);
         if (FastDiffRots(*(float *)(params + 0x30), yaw)>0.03490658849477768f)
             *(float *)(params + 0x44) = fast_subtract_rotations(*(float *)(params + 0x30), yaw);
-        position[0] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[0];
-        position[1] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[1];
-        position[2] = ((Row_429F68 *)D_L00_001B1844)[*(short *)(camera + 0x84)].position[2];
+        position[0] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[0];
+        position[1] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[1];
+        position[2] = ((Row_429F68 *)g_camera_def_table)[*(short *)(camera + 0x84)].position[2];
         position[3] = 0.0f;
         FastVecSub(to_position, (char *)position, (char *)D_00189E20_6.position);
         height = FastVecDot(to_position, (char *)D_00189E20_6.axis);
@@ -181,38 +181,38 @@ run:
     if (*(float *)(params + 0x40)!=0.0f) cam_set_aim_offset_target(0, *(float *)(params + 0x40), 0.005f);
     if (*(float *)(params + 0x28)!=0.0f) cam_set_tuning_value(*(float *)(params + 0x28)*0.01745329424738884f);
     if (*(short *)(params + 0x24)==0) set_follow_camera_orbit_clamp_mode(0);
-    if (*(float *)(params + 0x44)!=0.0f) func_PAL_L00_00429FC8(*(float *)(params + 0x44), 60.0f, 60.0f);
+    if (*(float *)(params + 0x44)!=0.0f) cam_set_turn_limits_pal(*(float *)(params + 0x44), 60.0f, 60.0f);
 }
 
 
 #define SDA_OBJ __attribute__((section(".sdata")))
-extern char *D_L00_001B1844 SDA_OBJ;
-extern char D_L00_001ADD98[] SDA_OBJ;
-extern char D_L00_001ADD38[] SDA_OBJ;
-extern char D_L00_001ADD78[] SDA_OBJ;
-extern char D_L00_001ADD58[] SDA_OBJ;
-extern int D_L00_001A8F00 __attribute__((sda));
-extern void func_PAL_L00_0042F4B8(char *);
+extern char *g_camera_def_table SDA_OBJ;
+extern char g_cam_object_table_a[] SDA_OBJ;
+extern char g_cam_object_table_b[] SDA_OBJ;
+extern char g_cam_object_table_c[] SDA_OBJ;
+extern char g_cam_object_table_d[] SDA_OBJ;
+extern int g_game_l00_mode __attribute__((sda));
+extern void UpdateVolumeAimCamera_pal(char *);
 
 /* Looks the owner's table entry up (index half-word at +0x84, 0x20 bytes per entry, the
    entry's own pointer at +0x1C) and clears its flag half-word at +0x26 and its word at
    +0x20, but only when the entry is still idle, the global gate allows it and the extra
    check accepts the owner. */
-int func_PAL_L00_0042F9B0(char *a0)
+int cam_update_entry_reset_pal(char *a0)
 {
-    char *p = *(char **)(D_L00_001B1844 + *(short *)(a0 + 0x84) * 0x20 + 0x1C);
+    char *p = *(char **)(g_camera_def_table + *(short *)(a0 + 0x84) * 0x20 + 0x1C);
 
     if (*(short *)(p + 0x26) != 0) {
         return 0;
     }
-    if (D_L00_001A8F00 != 0) {
-        if (func_PAL_L00_0042F238(a0) != 0) {
+    if (g_game_l00_mode != 0) {
+        if (cam_test_trigger_volumes_pal(a0) != 0) {
             *(short *)(p + 0x26) = 0;
             *(int *)(p + 0x20) = 0;
             return 0;
         }
     }
-    func_PAL_L00_0042F4B8(a0);
+    UpdateVolumeAimCamera_pal(a0);
     return 0;
 }
 

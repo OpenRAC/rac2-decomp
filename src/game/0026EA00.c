@@ -13,9 +13,9 @@ typedef struct {
     float interpolation[16];
     float scale[16];
 } MarkerStateView;
-extern MarkerStateView D_001B5640;
+extern MarkerStateView g_marker_state;
 extern MarkerVector g_camera_eye_state;
-extern int D_001A7348[] __attribute__((sda));
+extern int g_reticle_screen_params[] __attribute__((sda));
 extern float fast_vec_dist(MarkerVector *, MarkerVector *);
 extern float IntToFloat(int);
 extern void gfx_project_world_point_to_screen(MarkerVector *, MarkerVector *);
@@ -36,9 +36,9 @@ extern int FloatToInt(float);
    0x1B2180, call each entry while the resident count at 0x1B21C0 says there is
    one, then clear the count.  Small-data profile: the count is a 4-byte scalar,
    so cc1 prints the bare-symbol macro and gas expands every site on its own. */
-extern int D_L06_001B21C0 __attribute__((sda));
+extern int g_delayed_call_count __attribute__((sda));
 
-extern void (*D_L06_001B2180[])(void);
+extern void (*g_delayed_call_list[])(void);
 
 extern float math_fabs(float t);
 
@@ -54,7 +54,7 @@ typedef unsigned short u16;
 
 typedef struct {u8 prefix[0x190];u8 *object;} NativeObjectRefView;
 
-extern NativeObjectRefView D_L24_001B8580;
+extern NativeObjectRefView g_hero_object_ref;
 
 extern void func_00282CF0_9(float *p);
 
@@ -90,8 +90,8 @@ extern int Fdb046c5d_FUN_002E5F00(int, void *);
 
 extern char Fdb046c5d_D_001BAFC0[];
 
-extern char D_001BAEC0[];
-extern int D_001A72DC[] __attribute__((sda));
+extern char g_loader_memory[];
+extern int g_vram_display_address[] __attribute__((sda));
 extern int fast_decompress(int, void *);
 extern void FlushCache(int);
 extern void gfx_reset_packet_buffer(void);
@@ -115,7 +115,7 @@ extern void gfx_remove_dma_handlers(void);
 /* Draws one loading or splash screen frame by decompressing the image and sending it to the screen. */
 void gfx_draw_splash_screen_frame(int arg)
 {
-    char *state = D_001BAEC0;
+    char *state = g_loader_memory;
     int *data;
     fast_decompress(arg, *(void **)(state + 20));
     FlushCache(0);
@@ -125,7 +125,7 @@ void gfx_draw_splash_screen_frame(int arg)
     gfx_append_draw_list_header();
     gfx_append_draw_list_buffer_tag(0);
     data = *(int **)(state + 20);
-    tex_upload_blocks_return_setup(data + 4, D_001A72DC[0], data[0], data[1]);
+    tex_upload_blocks_return_setup(data + 4, g_vram_display_address[0], data[0], data[1]);
     gfx_write_clear_color_packets();
     PutDrawBufferSmall();
     gfx_queue_second_strip_packet();
@@ -446,9 +446,9 @@ void LoadPifAsPSMT8H(char *pifData, unsigned long long *out, int tbp, int cbp)
 
 typedef struct { char pad[0x32C]; int base; int offset; int count; } Table26FE48;
 extern Table26FE48 g_copy_setup_data;
-extern char D_001C5540[];
-extern int D_001A730C __attribute__((sda));
-extern unsigned long long D_001A7468 __attribute__((sda));
+extern char g_setup_entry_buffer[];
+extern int g_pif_vram_address __attribute__((sda));
+extern unsigned long long g_disc_table_pif_word __attribute__((sda));
 extern int load_read_disc_with_pause(char *, int, int);
 extern void LoadPifAsPSMT8H(char *, unsigned long long *, int, int);
 
@@ -456,10 +456,10 @@ extern void LoadPifAsPSMT8H(char *, unsigned long long *, int, int);
 void tex_load_pif_from_disc_table(void)
 {
     unsigned long long local[4];
-    char *data = D_001C5540;
+    char *data = g_setup_entry_buffer;
     load_read_disc_with_pause(data, g_copy_setup_data.offset + g_copy_setup_data.base, g_copy_setup_data.count);
-    LoadPifAsPSMT8H(data, local, D_001A730C, 0x3FFC00);
-    *(volatile unsigned long long *)&D_001A7468 = local[0];
+    LoadPifAsPSMT8H(data, local, g_pif_vram_address, 0x3FFC00);
+    *(volatile unsigned long long *)&g_disc_table_pif_word = local[0];
 }
 
 /* Empty replacement for printf. */
@@ -483,7 +483,7 @@ typedef struct {
 } F270018Aim;
 
 extern F270018Aim g_active_camera;
-extern float D_001B90F0[];
+extern float g_fov_tangent[];
 extern float math_step_spring_damper_stored(char *, float, float, float, float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
@@ -521,23 +521,23 @@ void cam_update_fov_transition(void) {
             break;
         }
         half = g_active_camera.f3D8 * 0.5f;
-        D_001B90F0[0] = math_fast_sin_or_cos_b(half) / math_fast_sin_or_cos_a(half);
+        g_fov_tangent[0] = math_fast_sin_or_cos_b(half) / math_fast_sin_or_cos_a(half);
         UpdateViewContext();
     }
 }
 
 
 extern void mem_fast_helper_c(void *, void *, int);
-extern char *D_001B5390;
-extern char D_001B7550[];
-extern char D_001B7C30[];
+extern char *g_camera_state_ptr;
+extern char g_camera_working_data[];
+extern char g_camera_work_buffer[];
 
 /* Copies the current camera data into the working copy and links the second block to it. */
 void cam_copy_working_data(void)
 {
-    mem_fast_helper_c(D_001B7550, D_001B5390, 0xA0);
-    mem_fast_helper_c(D_001B7C30, D_001B7C30 - 0x500, 0x280);
-    *(char **)(D_001B7550 + 0x70) = D_001B7C30;
+    mem_fast_helper_c(g_camera_working_data, g_camera_state_ptr, 0xA0);
+    mem_fast_helper_c(g_camera_work_buffer, g_camera_work_buffer - 0x500, 0x280);
+    *(char **)(g_camera_working_data + 0x70) = g_camera_work_buffer;
 }
 
 /* shared native body of family 34e74db3063e7a24 */
@@ -546,14 +546,14 @@ void script_run_delayed_call_list(void)
 {
     int i;
 
-    for (i = 0; i < D_L06_001B21C0; i++) {
-        D_L06_001B2180[i]();
+    for (i = 0; i < g_delayed_call_count; i++) {
+        g_delayed_call_list[i]();
     }
 
-    D_L06_001B21C0 = 0;
+    g_delayed_call_count = 0;
 }
 
-extern char D_001B5750[];
+extern char g_camera_records[];
 
 /* Finds the record whose halfword at 0x86 equals the argument, in the table of
    0xA0-byte records that starts at 0x1B5750, and returns it; returns 0 once
@@ -561,7 +561,7 @@ extern char D_001B5750[];
    comparison is the signed one the retail does (slt, not sltu). */
 char *moby_find_record_by_handle_id(int recordId)
 {
-    char *record = D_001B5750;
+    char *record = g_camera_records;
     int limit = (int)record + 0x1E00;
 
     for (;;) {
@@ -637,18 +637,18 @@ float math_step_spring_damper_stored(char *obj, float current, float target, flo
 /* sets the referenced object halfword at 0x7e and clears its byte at 0x7d */
 /* Marks the current object as hidden by setting one flag and clearing another. */
 void moby_clear_visible_flags(void) {
- *(u16 *)(D_L24_001B8580.object+0x7e)=1;
- D_L24_001B8580.object[0x7d]=0;
+ *(u16 *)(g_hero_object_ref.object+0x7e)=1;
+ g_hero_object_ref.object[0x7d]=0;
 }
 
-extern char D_001B53A0[];
+extern char g_camera_follow_state[];
 extern void *moby_place_fixed_id_object(void *);
 extern void moby_mark_spawned(void *);
 
 /* Starts or stops an effect on an object depending on whether a value in the object is zero. */
 void moby_toggle_effect(char *p)
 {
-    char *base = D_001B53A0;
+    char *base = g_camera_follow_state;
     if (*(short *)(p + 0x86) == 0) {
         if (*(void **)(base + 0xC4) == 0)
             *(void **)(base + 0xC4) = moby_place_fixed_id_object(base - 0x60);
@@ -662,11 +662,11 @@ void moby_toggle_effect(char *p)
 
 typedef void (*ObjectDispatch)(void *);
 typedef struct { ObjectDispatch entries[5]; } ObjectDispatchRecord;
-extern ObjectDispatchRecord D_0026E900[];
+extern ObjectDispatchRecord g_object_dispatch_table[];
 
 /* Calls the second handler for an object, based on its type. */
 void moby_call_handler_second(char *object) {
-    ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[2];
+    ObjectDispatch callback = g_object_dispatch_table[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
         callback(object);
 }
@@ -677,7 +677,7 @@ void moby_call_handler_second(char *object) {
 
 /* Calls the fourth handler for an object, based on its type. */
 void moby_call_handler_fourth(char *object) {
-    ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[4];
+    ObjectDispatch callback = g_object_dispatch_table[*(short *)(object + 0x8C)].entries[4];
     if (callback != 0)
         callback(object);
 }
@@ -775,43 +775,43 @@ typedef struct {
     float target2;
     int timer2;
 } ScalarTransitionView;
-extern ScalarTransitionView D_L00_001B8C80;
-extern float D_L00_001B18E0 __attribute__((sda));
+extern ScalarTransitionView g_scalar_transition_state;
+extern float g_hero_scalar_transition_value __attribute__((sda));
 extern float ApproachValue(float *, float, float);
 extern int math_fast_float_d(void *);
 
 void cam_update_scalar_transition(void)
 {
-    ScalarTransitionView *state = &D_L00_001B8C80;
+    ScalarTransitionView *state = &g_scalar_transition_state;
 
     if (state->step != 0.0f) {
-        ApproachValue(&D_L00_001B18E0,
+        ApproachValue(&g_hero_scalar_transition_value,
                      state->target, state->step);
-        if (D_L00_001B18E0 == state->target) {
+        if (g_hero_scalar_transition_value == state->target) {
             if (math_fast_float_d(&state->timer) == 1)
                 state->target = 0.0f;
         }
-        if (D_L00_001B8C80.target <= 0.0f && D_L00_001B18E0 <= 0.0f)
-            D_L00_001B8C80.step = 0.0f;
+        if (g_scalar_transition_state.target <= 0.0f && g_hero_scalar_transition_value <= 0.0f)
+            g_scalar_transition_state.step = 0.0f;
     }
 }
 
 /* Advances the second shared scalar towards its stored target and updates its timer. */
-extern float D_L00_001B18E4 __attribute__((sda));
+extern float g_hero_second_scalar_transition_value __attribute__((sda));
 
 void cam_update_second_scalar_transition(void)
 {
-    if (D_L00_001B8C80.step2 != 0.0f) {
-        if (D_L00_001B8C80.target2 != 0.0f)
-            ApproachValue(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.step2);
+    if (g_scalar_transition_state.step2 != 0.0f) {
+        if (g_scalar_transition_state.target2 != 0.0f)
+            ApproachValue(&g_hero_second_scalar_transition_value, g_scalar_transition_state.target2, g_scalar_transition_state.step2);
         else
-            ApproachValue(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.rate2);
-        if (D_L00_001B18E4 == D_L00_001B8C80.target2) {
-            if (math_fast_float_d(&D_L00_001B8C80.timer2) == 1)
-                D_L00_001B8C80.target2 = 0.0f;
+            ApproachValue(&g_hero_second_scalar_transition_value, g_scalar_transition_state.target2, g_scalar_transition_state.rate2);
+        if (g_hero_second_scalar_transition_value == g_scalar_transition_state.target2) {
+            if (math_fast_float_d(&g_scalar_transition_state.timer2) == 1)
+                g_scalar_transition_state.target2 = 0.0f;
         }
-        if (D_L00_001B8C80.target2 <= 0.0f && D_L00_001B18E4 <= 0.0f)
-            D_L00_001B8C80.step2 = 0.0f;
+        if (g_scalar_transition_state.target2 <= 0.0f && g_hero_second_scalar_transition_value <= 0.0f)
+            g_scalar_transition_state.step2 = 0.0f;
     }
 }
 
@@ -845,28 +845,28 @@ void DrawLensFlare(void)
     float distance;
     int i;
 
-    if (D_001B5640.active != 1 || (D_001B5640.target[0x20] & 0x80)) {
-        D_001B5640.active = 0;
+    if (g_marker_state.active != 1 || (g_marker_state.target[0x20] & 0x80)) {
+        g_marker_state.active = 0;
         return;
     }
-    if (D_001B5640.timer <= 0.0f) return;
-    distance = fast_vec_dist(&g_camera_eye_state, (MarkerVector *)(D_001B5640.target + 0x10));
-    centre[0] = IntToFloat(D_001A7348[0]);
-    centre[1] = IntToFloat(D_001A7348[1]);
-    gfx_project_world_point_to_screen(&projected, (MarkerVector *)(D_001B5640.target + 0x10));
-    projected.x = (projected.x - IntToFloat(D_001A7348[2])) * 0.0625f;
-    projected.y = (projected.y - IntToFloat(D_001A7348[3])) * 0.0625f;
+    if (g_marker_state.timer <= 0.0f) return;
+    distance = fast_vec_dist(&g_camera_eye_state, (MarkerVector *)(g_marker_state.target + 0x10));
+    centre[0] = IntToFloat(g_reticle_screen_params[0]);
+    centre[1] = IntToFloat(g_reticle_screen_params[1]);
+    gfx_project_world_point_to_screen(&projected, (MarkerVector *)(g_marker_state.target + 0x10));
+    projected.x = (projected.x - IntToFloat(g_reticle_screen_params[2])) * 0.0625f;
+    projected.y = (projected.y - IntToFloat(g_reticle_screen_params[3])) * 0.0625f;
     delta[0] = centre[0] - projected.x;
     delta[1] = centre[1] - projected.y;
     for (i = 0; i < 16; ++i) {
-        long texture = GetEffectTextureDescriptor(D_001B5640.texture[i] + 6);
+        long texture = GetEffectTextureDescriptor(g_marker_state.texture[i] + 6);
         int width = i ? 32 : 64;
         int size, x, y;
         float fade = distance - 5.0f;
         float fade_x, fade_y, radius;
         unsigned int colour;
-        scaled[0] = delta[0] * D_001B5640.interpolation[i];
-        scaled[1] = delta[1] * D_001B5640.interpolation[i];
+        scaled[0] = delta[0] * g_marker_state.interpolation[i];
+        scaled[1] = delta[1] * g_marker_state.interpolation[i];
         point[0] = centre[0] + scaled[0];
         point[1] = centre[1] + scaled[1];
         if (fade > 1.0f) fade = 1.0f;
@@ -878,15 +878,15 @@ void DrawLensFlare(void)
         if (fade_y > 1.0f) fade_y = 1.0f;
         else if (fade_y < 0.0f) fade_y = 0.0f;
         fade *= fade_x * fade_y;
-        colour = (FloatToInt(fade * (float)D_001B5640.alpha[i]) << 24) |
-                 (D_001B5640.colour[i] & 0xFFFFFF);
-        size = FloatToInt((float)width * D_001B5640.scale[i]);
+        colour = (FloatToInt(fade * (float)g_marker_state.alpha[i]) << 24) |
+                 (g_marker_state.colour[i] & 0xFFFFFF);
+        size = FloatToInt((float)width * g_marker_state.scale[i]);
         radius = (float)(size >> 1);
         x = FloatToInt(point[0] - radius);
         y = FloatToInt(point[1] - radius);
         DrawTexturedQuad(x, y, size, size, 0, 0, width, width, (int)colour, texture);
     }
-    D_001B5640.timer = 0.0f;
+    g_marker_state.timer = 0.0f;
 }
 
 
@@ -917,11 +917,11 @@ typedef struct {
     u8 r, g, b, pad3;
     float f[4];
 } FogPresetView;
-extern CameraEnvironmentRegion D_001C1740[];
+extern CameraEnvironmentRegion g_camera_env_regions[];
 #ifndef MACRO_ADDR
 #define MACRO_ADDR __attribute__((section(".sdata")))
 #endif
-extern FogPresetView D_001B1640 MACRO_ADDR;
+extern FogPresetView g_fog_color MACRO_ADDR;
 extern int func_002A6640(void *, float *, int *);
 extern int FloatToInt(float);
 
@@ -943,7 +943,7 @@ void gfx_blend_fog_from_cam_region(void *position)
 
     if (func_002A6640(position, &blend, &region_index) == 0)
         return;
-    region = &D_001C1740[region_index];
+    region = &g_camera_env_regions[region_index];
     if (!(region->flags & 2))
         return;
     positive_weight = FloatToInt(blend * 255.0f);
@@ -959,13 +959,13 @@ void gfx_blend_fog_from_cam_region(void *position)
     negative_blue = (negative_color >> 16) & 0xFF;
     red = (int)(positive_red + negative_red) >> 8;
     green = (int)(positive_green + negative_green) >> 8;
-    D_001B1640.b = (int)(positive_blue * positive_weight + negative_blue * negative_weight) >> 8;
-    D_001B1640.r = red;
-    D_001B1640.g = green;
-    D_001B1640.f[0] = (region->positive_depth_start * blend + region->negative_depth_start * inverse_blend) * 1024.0f;
-    D_001B1640.f[1] = (region->positive_depth_end * blend + region->negative_depth_end * inverse_blend) * 1024.0f;
-    D_001B1640.f[2] = 255.0f - (region->positive_value_start * blend + region->negative_value_start * inverse_blend) * 255.0f;
-    D_001B1640.f[3] = 255.0f - (region->positive_value_end * blend + region->negative_value_end * inverse_blend) * 255.0f;
+    g_fog_color.b = (int)(positive_blue * positive_weight + negative_blue * negative_weight) >> 8;
+    g_fog_color.r = red;
+    g_fog_color.g = green;
+    g_fog_color.f[0] = (region->positive_depth_start * blend + region->negative_depth_start * inverse_blend) * 1024.0f;
+    g_fog_color.f[1] = (region->positive_depth_end * blend + region->negative_depth_end * inverse_blend) * 1024.0f;
+    g_fog_color.f[2] = 255.0f - (region->positive_value_start * blend + region->negative_value_start * inverse_blend) * 255.0f;
+    g_fog_color.f[3] = 255.0f - (region->positive_value_end * blend + region->negative_value_end * inverse_blend) * 255.0f;
 }
 
 /* func_00273730 is in 00273730.c. */

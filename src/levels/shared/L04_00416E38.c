@@ -4,8 +4,8 @@
    gives retail's registers for x4 and y4. */
 #include "common.h"
 
-extern float D_L04_001B2D44 __attribute__((sda));
-extern int D_L04_001B2D40 __attribute__((sda));
+extern float g_race_hud_layout_scale __attribute__((sda));
+extern int g_race_hud_mode __attribute__((sda));
 extern int g_screen_width __attribute__((sda));
 extern void gfx_draw_rounded_box(int, int, int, int, int, int);
 extern void level_set_rect(float, float, float, float, int, int);
@@ -18,7 +18,7 @@ extern int text_draw_centered_medium(int, int, unsigned long long, char *, int);
    src/game/002D2188-g8.c). */
 static __inline__ int menu_coord(float value, float scale, float half, int active)
 {
-    int mode = D_L04_001B2D40;
+    int mode = g_race_hud_mode;
     float scaled = scale * value + half;
     int result = (int)scaled;
 
@@ -33,7 +33,7 @@ static __inline__ int menu_coord(float value, float scale, float half, int activ
    end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L04_001B2D40;
+    int mode = g_race_hud_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -57,20 +57,20 @@ void menu_draw_box_two_labels(void) {
     half = 0.5f;
     on = 1;
     kx = 263.0f;
-    s = D_L04_001B2D44;
+    s = g_race_hud_layout_scale;
     x1 = menu_coord(kx, s, half, on);
     ky = 371.0f;
     y1 = menu_coord(ky, s, half, on);
     gfx_draw_rounded_box(x1, y1, 130, 384, 96, 0x60442D00);
-    s = D_L04_001B2D44;
+    s = g_race_hud_layout_scale;
     level_set_rect((float)menu_coord(kx, s, half, on), (float)menu_coord(ky, s, half, on),
                   130.0f, 384.0f, 96, 0x55F0C070);
-    s = D_L04_001B2D44;
+    s = g_race_hud_layout_scale;
     x3 = menu_coord(222.0f, s, half, on);
     y3 = label_y((void *)x3, 479.0f, s, half, 1);
     FontSetWindow(box, x3, y3, 44, 468, 256, 299, 16, 3);
     text_draw_window_medium(box, (int)0x80F0F0F0, GetLocalizedString(0xA41), -1);
     x4 = g_screen_width / 2;
-    y4 = label_y((void *)x4, 349.0f, D_L04_001B2D44, half, 1);
+    y4 = label_y((void *)x4, 349.0f, g_race_hud_layout_scale, half, 1);
     text_draw_centered_medium(x4, y4, (int)0x80F0F0F0, GetLocalizedString(0x2F2C), -1);
 }

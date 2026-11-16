@@ -6,7 +6,7 @@ extern void STUB_printf(const char *,...);
 extern void FastVecSub(float *,float *,float *);
 extern float vec_length_xy(float *);
 extern int IsPointInCollisionPrimitive(float *,float *,float);
-extern char D_L00_001A8988[];
+extern char g_str_debug_grid_message[];
 typedef struct CollisionPrimitive {
     float position[3], radius;
     char rest[32];
@@ -19,7 +19,7 @@ typedef struct CollisionCell {
 } CollisionCell;
 
 /* The grid base pointer uses the measured absolute macro-address form. */
-extern char *D_L00_001B1880[] __attribute__((sda));
+extern char *g_collision_grid_data[] __attribute__((sda));
 
 /* Returns the first cell primitive intersecting the position and radius. */
 /* Looks up the collision grid cell at a position and returns the first shape that touches it. */
@@ -33,13 +33,13 @@ float *FindIntersectingGridPrimitive(float radius, Quad *position)
     x = FloatToInt(point[0] * 0.0625f);
     y = FloatToInt(point[1] * 0.0625f);
     if (x < 0 || y < 0 || x > 64 || y > 64) {
-        STUB_printf(D_L00_001A8988);
+        STUB_printf(g_str_debug_grid_message);
     } else {
-        int cell = ((int *)D_L00_001B1880[0])[y * 64 + x];
+        int cell = ((int *)g_collision_grid_data[0])[y * 64 + x];
         int i;
         if (!cell)
             return 0;
-        cell += (int)D_L00_001B1880[0];
+        cell += (int)g_collision_grid_data[0];
         for (i = 0; i < ((CollisionCell *)cell)->count; i++) {
             CollisionPrimitive *primitive = &((CollisionCell *)cell)->primitives[i];
             float limit;

@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern void FastVecAdd(char *, char *, char *);
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
@@ -15,9 +15,9 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L05_001AC790 __attribute__((sda));
-extern int D_L05_001B2CB0 __attribute__((sda)), D_L05_001B2CB8 __attribute__((sda));
-extern Material D_L05_00278A70[];
+extern int g_bouncing_shot_model_id __attribute__((sda));
+extern int g_ripple_l05_x __attribute__((sda)), g_ripple_l05_y __attribute__((sda));
+extern Material g_item_l05_slot_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -119,10 +119,10 @@ extern void func_2FF698(void *fn, char *object);
 
 extern void blast_call_helper_no_args(void);
 
-extern char D_L05_002681E0[];
+extern char g_beam_owned_records[];
 
 /* sda: one absolute `lw` macro load at -G0, as in retail. */
-extern char *D_L05_001B251C __attribute__((sda));
+extern char *g_feltzin_target_mobys __attribute__((sda));
 
 extern void beam_fire_burst(char *object);
 
@@ -158,15 +158,15 @@ extern void func_329960(char *object, int a1, char *out);
 
 extern void func_37AC80(float value);
 
-extern char D_L05_001BFB00[];
+extern char g_collision_l05_result[];
 
-extern char D_L05_001B9580[];
+extern char g_hero_l05_state[];
 
-extern char D_L05_002659E0[];
+extern char g_beam_records[];
 
-extern int D_L05_00221D10[];
+extern int g_feltzin_challenge_state[];
 
-extern char *D_L05_001B2614 __attribute__((sda));
+extern char *g_feltzin_enemy_table __attribute__((sda));
 
 
 extern void anim_start_startup_animations(void);
@@ -188,8 +188,8 @@ typedef struct {
     char gap2[0x146];
     char *objects[3];
 } Scene05;
-extern Scene05 D_L05_001BD3C0;
-extern char D_L05_00294A90[];
+extern Scene05 g_scene_objects;
+extern char g_scene_spawn_entries[];
 extern int g_current_map_index __attribute__((sda));
 
 
@@ -204,8 +204,8 @@ void feltzin_init_scene_objects(void)
     int i;
     char *obj;
     anim_start_startup_animations();
-    for (i = 0; i < D_L05_001BD3C0.count; i++) {
-        char *current = D_L05_001BD3C0.objects[i];
+    for (i = 0; i < g_scene_objects.count; i++) {
+        char *current = g_scene_objects.objects[i];
         if (current && *(short *)(current + 0xAA) == 0xE29 /* moby class 3625 */)
             *(unsigned short *)(current + 0x34) |= 0x800;
         if (*(short *)(current + 0xAA) == 0xD54 /* moby class 3412 */) UpdateEquipmentPieces(current);
@@ -214,9 +214,9 @@ void feltzin_init_scene_objects(void)
             if (state) math_store_angle_update_result(current, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
         }
     }
-    if (g_current_map_index != 5 || D_L05_001BD3C0.mode) return;
-    obj = D_L05_001BD3C0.objects[2];
-    if (D_L05_001BD3C0.timer == 0x62) {
+    if (g_current_map_index != 5 || g_scene_objects.mode) return;
+    obj = g_scene_objects.objects[2];
+    if (g_scene_objects.timer == 0x62) {
         vec_fast_to_int_helper(*(char **)(obj + 0x58) + 0x10, (char *)scratch.matrix);
         quaternion_to_rotation_basis((char *)scratch.matrix, obj + 0xC0);
         moby_compute_local_point(obj, (char *)pos, 4.0f, 3.0f, 5.0f);
@@ -224,11 +224,11 @@ void feltzin_init_scene_objects(void)
         moby_compute_local_point(obj, (char *)pos, 9.0f, 4.0f, 4.0f);
         part_spawn_shockwave_burst((char *)pos, 35, 50, 30, 30, 30, 50, 1, 1, 1, 1, 1.0f);
     }
-    if ((unsigned int)(D_L05_001BD3C0.timer - 0x29) < 0x72 && !math_random_int_below(4)) {
+    if ((unsigned int)(g_scene_objects.timer - 0x29) < 0x72 && !math_random_int_below(4)) {
         float sign = 1.0f;
         float *entry;
         if (math_random_int_below(2)) sign = -1.0f;
-        entry = (float *)(D_L05_00294A90 + math_random_int_below(3) * 32);
+        entry = (float *)(g_scene_spawn_entries + math_random_int_below(3) * 32);
         moby_compute_local_point(obj, (char *)pos, entry[0], entry[1], entry[2]);
         moby_compute_local_point(obj, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
         scratch.vectors.dest[0] += math_random_signed_float_range(0.5f, 1.5f);
@@ -279,7 +279,7 @@ void bouncing_l05_shot_update(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L05_00278A70 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l05_slot_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -291,14 +291,14 @@ void bouncing_l05_shot_update(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(vars + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L05_001B2CB0, D_L05_001B2CB8, 1,
+            RippleDisturb(g_ripple_l05_x, g_ripple_l05_y, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(vars + 0x14) = 1;
             vec_clear_128(vars);
             *(float *)(vars + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = ((Collision *)D_L05_001BFB00)->point.f[2];
+            frame.position.f[2] = ((Collision *)g_collision_l05_result)->point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -318,16 +318,16 @@ void bouncing_l05_shot_update(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = ((Collision *)D_L05_001BFB00);
+            Collision *collision = ((Collision *)g_collision_l05_result);
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
-                reread = ((Collision *)D_L05_001BFB00);
+                reread = ((Collision *)g_collision_l05_result);
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L05_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_bouncing_shot_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -388,7 +388,7 @@ void bouncing_shot_update_with_limit(char *obj) {
     if (*(int *)(vars + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L05_00278A70)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l05_slot_table)->material;
     qcopy(&frame.packet.vector, vars);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -398,16 +398,16 @@ void bouncing_shot_update_with_limit(char *obj) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = ((Collision *)D_L05_001BFB00);
+        collision = ((Collision *)g_collision_l05_result);
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
-            reread = ((Collision *)D_L05_001BFB00);
+            reread = ((Collision *)g_collision_l05_result);
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L05_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_bouncing_shot_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -419,7 +419,7 @@ void bouncing_shot_update_with_limit(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = ((Collision *)D_L05_001BFB00);
+            collision = ((Collision *)g_collision_l05_result);
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
@@ -478,7 +478,7 @@ void feltzin_enemy_a_update(char *object)
         if (info->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 info->has_target = 1;
-                info->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
+                info->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
                 if (func_3067D8(info->target + 0x10, object + 0x10) < 10.0f) {
                     rec2 = g_sound_state + *(int *)(state + 0x270) * 0x70;
                     if (*(char **)(rec2 + 0x88) != object ||
@@ -513,7 +513,7 @@ void feltzin_enemy_init_position(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 0x14;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(state + 0x26C) = -1;
     *(int *)(state + 0x270) = -1;
     *(float *)(state + 0x180) = 20.0f;
@@ -569,7 +569,7 @@ void feltzin_enemy_b_update(char *object)
             int i;
 
             func_379E60(object, (int)beam_clear_record_owners, 0, 0);
-            base = D_L05_002659E0;
+            base = g_beam_records;
             p = (int *)(base + 0x27F0);
             i = 0x7F;
             do {
@@ -598,7 +598,7 @@ void feltzin_enemy_b_update(char *object)
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
-                r->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
+                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
             }
             if (r->x108 != 0 && r->x104 != 0)
                 feltzin_enemy_fire_shot(object);
@@ -618,7 +618,7 @@ void feltzin_enemy_b_update(char *object)
 /* Clears one int field of each of 128 strided records. */
 void beam_clear_record_owners(void)
 {
-    char *base = D_L05_002659E0;
+    char *base = g_beam_records;
     int *p = (int *)(base + 0x27F0);
     int i = 0x7F;
 
@@ -642,7 +642,7 @@ void feltzin_enemy_init_with_helpers(char *obj)
     info = func_379CA0(obj);
     *(int *)(info + 0x148) = 5;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(state + 0x274) = -1;
     *(float *)(state + 0x180) = 5.0f;
     *(int *)(state + 0x268) = 0;
@@ -742,7 +742,7 @@ void feltzin_helper_check_hit_attach(char *object, char *arg1)
     func_306660(buf2, buf, object + 0x10);
     if (func_2F6C50(arg1, buf, 0, object, 0) == 0)
         return;
-    base = D_L05_001BFB00;
+    base = g_collision_l05_result;
     value = *(int *)(base + 0x18);
     if (value == 0)
         return;
@@ -751,7 +751,7 @@ void feltzin_helper_check_hit_attach(char *object, char *arg1)
     func_306630(object + 0x10, buf2, base + 0x20);
     func_37AC80(2.0f);
     {
-        char *state = D_L05_001B9580;
+        char *state = g_hero_l05_state;
 
         *(float *)(state + 0x160) = 0.05f;
         *(int *)(state + 0x168) = 0x1E;
@@ -793,7 +793,7 @@ void feltzin_enemy_c_update(char *object)
             int i;
 
             func_379E60(object, 0, 0, 0);
-            base = D_L05_002681E0;
+            base = g_beam_owned_records;
             p = (int *)(base + 0x27F0);
             i = 0x7F;
             do {
@@ -816,7 +816,7 @@ void feltzin_enemy_c_update(char *object)
         if (r->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
                 r->has_target = 1;
-                r->target = D_L05_001B251C + *(int *)(state + 0x260) * 256;
+                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
             }
             if (r->x108 != 0 && r->x104 != 0)
                 beam_fire_burst(object);
@@ -843,7 +843,7 @@ void feltzin_enemy_init_position_fast(char *obj)
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 5;
     func_37AEC0(obj, 1);
-    table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
+    table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
     *(int *)(state + 0x268) = 0;
     *(float *)(state + 0x180) = 5.0f;
     *(float *)(obj + 0x2C) = 0.08f;

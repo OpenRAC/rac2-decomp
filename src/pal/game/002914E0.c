@@ -4,8 +4,8 @@
 
 /* func_PAL_002914E0, the PAL copy of func_00290C60 (RAC1's InitOnce): the same C, where D_001A7B90 is
    set to 1 and a switch on sceScfGetLanguage's result picks the game language first, as in RAC1. */
-extern char D_001BAEC0[];
-extern char D_02000000[];
+extern char g_loader_memory[];
+extern char g_ram_end[];
 extern char ref_L00_00290B48_00[];
 extern int iop_send_block(int source, int destination, int length);
 extern void InitMemSlots(void);
@@ -40,7 +40,7 @@ extern void save_build_file_names(void *);
 extern void gfx_start_dma_channel0_and_wait(void *);
 /* Takes an address in retail's call, though its body (src/core/001339F0.c) never reads it. */
 extern void load_default_copy_setup(void *);
-extern int func_PAL_0029DE68(void *, void *);
+extern int fast_decompress_pal(void *, void *);
 extern int iop_remote_cmd_send3(int, int, int);
 extern int iop_remote_cmd_send1(int);
 extern void iop_init_remote_buffer_server(void);
@@ -57,22 +57,22 @@ extern void mem_clear(void *, int, int);
 extern int func_00126288(void *, int, int, int, int, int, int, int);
 extern int sceGsExecLoadImage(void *, void *);
 extern int gfx_wait_paths_idle(int, int);
-extern void func_PAL_0026FCB8(void);
+extern void tex_load_pif_from_disc_table_pal(void);
 extern void req_reset_queue(void *);
 
-extern char D_001A9048[];   /* path of the IOP reboot image */
-extern char D_001A9060[];   /* "Rebooted IOP" */
-extern char D_001A9070[];   /* "loaded irx modules" */
-extern char D_PAL_001A9138[];   /* "Unsupported language" */
-extern char D_0010E9E0[];
-extern char D_001BB000[];
-extern char D_001BAD40[];
+extern char g_str_iop_reboot_image[];   /* path of the IOP reboot image */
+extern char g_str_rebooted_iop[];   /* "Rebooted IOP" */
+extern char g_str_loaded_irx_modules[];   /* "loaded irx modules" */
+extern char g_str_stub_printf[];   /* "Unsupported language" */
+extern char g_iop_send_dma_block[];
+extern char g_gs_transfer_buffer[];
+extern char g_loader_movie[];
 extern int g_widescreen_flag[] __attribute__((sda));
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int D_001A7290[] __attribute__((sda));
-extern int D_001A72F8 __attribute__((sda));
-extern int D_001A72FC __attribute__((sda));
+extern int g_iop_block_table[] __attribute__((sda));
+extern int g_vram_iop_offset __attribute__((sda));
+extern int g_vram_image_address __attribute__((sda));
 extern int g_hero_moby_default[];
 
 typedef struct {
@@ -97,7 +97,7 @@ void func_PAL_002914E0(void)
     func_00124418();
     sceDmaReset(1);
     g_widescreen_flag[0] = 0;
-    D_001A7BB0[1] = 0;
+    g_language_settings[1] = 0;
     gfx_update_display_mode_from_screen_type();
     func_0029D050();
     SetPalMode(1);
@@ -111,11 +111,11 @@ void func_PAL_002914E0(void)
     gfx_write_clear_color_packets();
     sceCdInit(0);
     sce_cd_disk_ready(0);
-    while (!sceSifRebootIop(D_001A9048)) {
+    while (!sceSifRebootIop(g_str_iop_reboot_image)) {
     }
     while (!iop_is_reset_done()) {
     }
-    STUB_printf(D_001A9060);
+    STUB_printf(g_str_rebooted_iop);
     sceSifInitRpc(0);
     DIntr();
     func_0011E7A0();
@@ -129,13 +129,13 @@ void func_PAL_002914E0(void)
     FlushCache(0);
     g_is_pal_video = 1;
     save_build_file_names(buffer);
-    gfx_start_dma_channel0_and_wait(D_0010E9E0);
-    load_default_copy_setup(D_02000000 - 0xFE8C);
+    gfx_start_dma_channel0_and_wait(g_iop_send_dma_block);
+    load_default_copy_setup(g_ram_end - 0xFE8C);
     image = (char *)((((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF) + 0x2C0000);
-    scratch = D_02000000 - 0x8000 - (g_copy_setup_data.count << 11);
+    scratch = g_ram_end - 0x8000 - (g_copy_setup_data.count << 11);
     load_start_request(g_copy_setup_data.offset + g_copy_setup_data.base, g_copy_setup_data.count, scratch);
     FlushCache(0);
-    func_PAL_0029DE68(scratch, image);
+    fast_decompress_pal(scratch, image);
     FlushCache(0);
     handle = iop_remote_cmd_send3(1, 0x55730, 0);
     iop_send_block(*(int *)(image + 0x50) + (int)image, *(int *)(image + 0x54), handle);
@@ -149,21 +149,21 @@ void func_PAL_002914E0(void)
     iop_send_block(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
     iop_send_block(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
     iop_remote_cmd_send1(handle);
-    STUB_printf(D_001A9070);
+    STUB_printf(g_str_loaded_irx_modules);
     iop_init_remote_buffer_server();
     sce_cd_disk_ready(0);
     pad_init_ports();
-    state = (int *)D_001BAEC0;
-    D_001A7290[0] = -1;
-    D_001A7290[12] = -1;
-    D_001A72F8 = 0;
-    D_001A72FC = 0x60000;
-    D_001A7290[28] = 0x70000;
-    D_001A7290[29] = 0xB0000;
-    D_001A7290[30] = 0x140000;
-    D_001A7290[31] = 0x1D0000;
-    D_001A7290[32] = 0x1E0000;
-    D_001A7290[1] = state[0x78 / 4];
+    state = (int *)g_loader_memory;
+    g_iop_block_table[0] = -1;
+    g_iop_block_table[12] = -1;
+    g_vram_iop_offset = 0;
+    g_vram_image_address = 0x60000;
+    g_iop_block_table[28] = 0x70000;
+    g_iop_block_table[29] = 0xB0000;
+    g_iop_block_table[30] = 0x140000;
+    g_iop_block_table[31] = 0x1D0000;
+    g_iop_block_table[32] = 0x1E0000;
+    g_iop_block_table[1] = state[0x78 / 4];
     g_hero_moby_default[12] = -1;
     g_hero_moby_default[6] = -1;
     sce_cd_disk_ready(0);
@@ -178,43 +178,43 @@ void func_PAL_002914E0(void)
     lang = func_PAL_00131620();
     switch (lang) {
     case 2:
-        D_001A7BB0[4] = 2;
+        g_language_settings[4] = 2;
         break;
     case 4:
-        D_001A7BB0[4] = 3;
+        g_language_settings[4] = 3;
         break;
     case 3:
-        D_001A7BB0[4] = 4;
+        g_language_settings[4] = 4;
         break;
     case 5:
-        D_001A7BB0[4] = 5;
+        g_language_settings[4] = 5;
         break;
     default:
-        STUB_printf(D_PAL_001A9138);
+        STUB_printf(g_str_stub_printf);
         /* fallthrough */
     case 1:
-        D_001A7BB0[4] = 0;
+        g_language_settings[4] = 0;
         break;
     }
     mode = console_get_region();
     switch (mode) {
     case 1:
-        D_001A7BB0[1] = mode;
+        g_language_settings[1] = mode;
         break;
     case 0:
     case 2:
-        D_001A7BB0[1] = 0;
+        g_language_settings[1] = 0;
         break;
     }
-    mem_clear(D_001BB000, 0x80808080, 0x100);
+    mem_clear(g_gs_transfer_buffer, 0x80808080, 0x100);
     func_00126288(buffer, 0x3FFB, 1, 0, 0, 0, 8, 8);
     FlushCache(0);
-    sceGsExecLoadImage(buffer, D_001BB000);
+    sceGsExecLoadImage(buffer, g_gs_transfer_buffer);
     gfx_wait_paths_idle(0, 0);
-    func_PAL_0026FCB8();
+    tex_load_pif_from_disc_table_pal();
     T1_MODE = 0x82;
     T1_COUNT = 0;
-    req_reset_queue(D_001BAD40);
+    req_reset_queue(g_loader_movie);
 }
 
 void gfx_call_sync_helper(void);

@@ -11,7 +11,7 @@ extern void AttachManipulator(char *a0, int a1, char *a2);
 extern void vec_random_direction(void *a0, float f12, float f13);
 extern void func_PAL_002B15D8(char *a0, int a1, void *a2, float f12, float f13, float f14,
                               float f15, int a3);
-extern void func_PAL_L02_004009A0(char *a0, int a1, int a2);
+extern void moby_set_anim_type_three_pal(char *a0, int a1, int a2);
 extern void part_queue_moby_for_glow(char *a0, int a1, char *a2);
 void security_robot_deactivate(char *a0);
 
@@ -50,7 +50,7 @@ void func_PAL_L11_0044F420(char *a0, int a1, int a2)
     *(u16 *)(a0 + 0x34) &= ~0x1000;
     *(s32 *)(a0 + 0x98) = 0;
     if (a1 == 0)
-        func_PAL_L02_004009A0(a0, 0, -1);
+        moby_set_anim_type_three_pal(a0, 0, -1);
     if (a2 == 0)
         part_queue_moby_for_glow(a0, 0, (char *)security_robot_deactivate);
     else

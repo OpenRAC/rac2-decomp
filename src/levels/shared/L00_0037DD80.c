@@ -17,7 +17,7 @@ typedef struct {
 
 extern u8 g_owner_key_table[];
 
-extern u8 D_L00_001B26B4[];
+extern u8 g_fade_timer[];
 
 extern int math_fast_float_d(void *p);
 

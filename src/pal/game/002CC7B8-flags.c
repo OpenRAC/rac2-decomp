@@ -36,11 +36,11 @@ struct S18A000 {
     s16 a;
     s8 pad[10];
 };
-extern struct S18A000 D_0018A000;
-extern s32 D_001AA420;
-extern s32 D_001AA428;
-extern s8 D_0025BA90[];
-extern s32 D_PAL_001F2A34[];
+extern struct S18A000 g_menu_command_flag;
+extern s32 g_menu_action_callback_a;
+extern s32 g_menu_action_callback_b;
+extern s8 g_menu_request_screen_data[];
+extern s32 g_pal_flag_words[];
 extern void select_moby_context(s32);
 extern void func_PAL_002B5570(s32);
 extern s32 request_begin_slot(s32, s32, s32, s32, s32);
@@ -57,34 +57,34 @@ s32 func_PAL_002CC7B8(s32 arg0) {
 goto *D_0026CCE0[rc2_selector];
 
     rc2_case_0:
-        D_0018A000.a = 8;
+        g_menu_command_flag.a = 8;
         r = 1;
         goto rc2_switch_end;
     rc2_case_1:
         r = 1;
-        D_0018A000.a = 8;
-        if (D_001AA420 != 0) {
+        g_menu_command_flag.a = 8;
+        if (g_menu_action_callback_a != 0) {
             select_moby_context(0);
-            ((void (*)(s32))D_001AA420)(0);
+            ((void (*)(s32))g_menu_action_callback_a)(0);
             select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_2:
         r = 1;
-        D_0018A000.a = 8;
-        if (D_001AA428 != 0) {
+        g_menu_command_flag.a = 8;
+        if (g_menu_action_callback_b != 0) {
             select_moby_context(0);
-            ((void (*)(s32))D_001AA428)(0);
+            ((void (*)(s32))g_menu_action_callback_b)(0);
             select_moby_context(1);
         }
         goto rc2_switch_end;
     rc2_case_3:
-        r = func_PAL_002D6710(3, D_0025BA90);
+        r = func_PAL_002D6710(3, g_menu_request_screen_data);
         goto rc2_switch_end;
     rc2_case_4:
         if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
             func_PAL_002B5570(3);
-            D_PAL_001F2A34[0] = 1;
+            g_pal_flag_words[0] = 1;
             r = 1;
         }
         goto rc2_switch_end;

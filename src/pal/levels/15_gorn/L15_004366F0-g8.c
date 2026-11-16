@@ -11,12 +11,12 @@ extern void entry_init_all_registered(void);
 extern void hero_set_state_value_a(s32 a0);
 extern u8 **level_get_object_list(void);
 extern s32 level_get_saved_value(void);
-extern void func_PAL_L05_0037D9D0(u8 *a0, s32 a1);
+extern void entry_spawn_list_objects_with_flag_pal(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
 extern void func_PAL_L15_00436118(u8 *a0, s32 a1);
 
-extern s32 D_L15_001B1534 __attribute__((sda));
+extern s32 g_cutscene_l15_started_flag __attribute__((sda));
 typedef struct StageState {
     s32 initial;
     s32 pad04[3];
@@ -24,11 +24,11 @@ typedef struct StageState {
     s32 pad14[6];
     s32 timer;
 } StageState;
-extern char *D_L15_001B1584 __attribute__((sda));
-extern char *D_L15_001B1588 __attribute__((sda));
-extern StageState D_L15_00221E10;
-extern s32 D_L15_001B2148;
-extern u8 *D_L15_001B2714;
+extern char *g_gorn_path_first_node __attribute__((sda));
+extern char *g_gorn_path_next_node __attribute__((sda));
+extern StageState g_gorn_challenge_vars;
+extern s32 g_gorn_challenge_count;
+extern u8 *g_scene_object_base;
 
 /* Applies both material passes to matching objects once, then advances the stage. */
 void func_PAL_L15_004366F0(u8 *arg0) {
@@ -36,9 +36,9 @@ void func_PAL_L15_004366F0(u8 *arg0) {
     s32 count;
     u8 **p;
 
-    if (D_L15_001B1534 == 0) {
-        D_L15_00221E10.timer = 0;
-        D_L15_001B1534 = 1;
+    if (g_cutscene_l15_started_flag == 0) {
+        g_gorn_challenge_vars.timer = 0;
+        g_cutscene_l15_started_flag = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -48,23 +48,23 @@ void func_PAL_L15_004366F0(u8 *arg0) {
             n = count;
             do {
                 if (*(s16 *)(*p + 0xAA) == 0xF93) {
-                    func_PAL_L05_0037D9D0(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
+                    entry_spawn_list_objects_with_flag_pal(*p, 1);
+                    func_L05_0037CEE0(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
                 }
                 n--;
                 p++;
             } while (n);
         }
-        if (D_L15_001B1584 != 0) {
-            moby_mark_spawned(D_L15_001B1584);
-            D_L15_001B1584 = 0;
+        if (g_gorn_path_first_node != 0) {
+            moby_mark_spawned(g_gorn_path_first_node);
+            g_gorn_path_first_node = 0;
         }
-        if (D_L15_001B1588 != 0) {
-            moby_mark_spawned(D_L15_001B1588);
-            D_L15_001B1588 = 0;
+        if (g_gorn_path_next_node != 0) {
+            moby_mark_spawned(g_gorn_path_next_node);
+            g_gorn_path_next_node = 0;
         }
     }
-    if (D_L15_00221E10.active == 0 && D_L15_001B2148 >= 6)
+    if (g_gorn_challenge_vars.active == 0 && g_gorn_challenge_count >= 6)
         func_PAL_L15_00436118(arg0, 1);
 }

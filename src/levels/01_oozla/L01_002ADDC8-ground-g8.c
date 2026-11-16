@@ -70,11 +70,11 @@ typedef struct {
     u8 pad30[0x40 - 0x30];
     Vec4 normal;                    /* 0x40 */
 } CollisionHit;
-extern CollisionHit D_L01_001BF900;
+extern CollisionHit g_collision_l01_hit;
 
 extern int g_current_map_index;
-extern int D_L01_001A9030 MACRO_ADDR;
-extern int D_L01_001A9034;
+extern int g_hero_input_lock MACRO_ADDR;
+extern int g_hero_input_lock_alt;
 
 extern int hero_is_in_special_kind_or_mode(void);
 extern void vec_clear_128(void *);
@@ -144,14 +144,14 @@ void UpdateOozlaHeroGroundContacts(void)
     if (CollLine(&rayStart, &rayEnd, 2, g_hero_state.moby, 0) == 0)
         goto probed;
     g_hero_state.groundSoundClass = func_L00_002E2048();
-    if (D_L01_001BF900.moby != 0)
+    if (g_collision_l01_hit.moby != 0)
         g_hero_state.groundSoundClass = 0;
-    if (g_current_map_index == 7 && D_L01_001BF900.moby != 0)
+    if (g_current_map_index == 7 && g_collision_l01_hit.moby != 0)
         g_hero_state.groundSoundClass = 1;
     g_hero_state.groundType = GetCollHitMaterial();
     if (g_hero_state.groundType == 0) {
         /* Water: note the surface, then look for the floor below it. */
-        g_hero_state.waterSurfaceZ = coll_get_ground_height_at_position(&D_L01_001BF900.point, &g_hero_state.waterNormal);
+        g_hero_state.waterSurfaceZ = coll_get_ground_height_at_position(&g_collision_l01_hit.point, &g_hero_state.waterNormal);
         if (g_hero_state.position.f[2] < g_hero_state.waterSurfaceZ && g_hero_state.inWaterFrames <= 0)
             g_hero_state.inWaterFrames = 1;
         if (CollLine(&rayStart, &rayEnd, 0x24, g_hero_state.moby, 0) == 0)
@@ -159,35 +159,35 @@ void UpdateOozlaHeroGroundContacts(void)
         g_hero_state.groundSoundClass = func_L00_002E2048();
     }
     if (g_hero_state.groundType == 3) {
-        g_hero_state.sinkSurfaceZ = D_L01_001BF900.point.f[2];
-        rayStart.f[2] = D_L01_001BF900.point.f[2] - 0.01f;
+        g_hero_state.sinkSurfaceZ = g_collision_l01_hit.point.f[2];
+        rayStart.f[2] = g_collision_l01_hit.point.f[2] - 0.01f;
         if (CollLine(&rayStart, &rayEnd, 4, g_hero_state.moby, 0) == 0)
             goto probed;
     }
     if (g_hero_state.groundType == 0xB) {
-        g_hero_state.sinkSurfaceZ = D_L01_001BF900.point.f[2];
+        g_hero_state.sinkSurfaceZ = g_collision_l01_hit.point.f[2];
         goto probed;
     }
-    if (D_L01_001BF900.moby != 0) {
-        if (moby_is_in_special_class_range(D_L01_001BF900.moby))
+    if (g_collision_l01_hit.moby != 0) {
+        if (moby_is_in_special_class_range(g_collision_l01_hit.moby))
             g_hero_state.onFlaggedGroundMoby = 1;
-        info = moby_get_private_value_0(D_L01_001BF900.moby);
+        info = moby_get_private_value_0(g_collision_l01_hit.moby);
         if (info != 0 && (*(u16 *)(info + 0x1E) & 8))
             g_hero_state.onFlaggedGroundMoby = 1;
-        info = moby_get_private_value_2(D_L01_001BF900.moby);
+        info = moby_get_private_value_2(g_collision_l01_hit.moby);
         if (info != 0 && (*(int *)(info + 0x3C) & 8))
             g_hero_state.onFlaggedGroundMoby = 1;
     }
-    if (D_L01_001BF900.count > 0) {
-        qcopy(&g_hero_state.groundPoint, &D_L01_001BF900.point);
-        g_hero_state.groundZ.f = D_L01_001BF900.point.f[2];
-        if (D_L01_001A9030)
-            g_hero_state.groundZ.f = gravity_get_center_distance(&D_L01_001BF900.point);
+    if (g_collision_l01_hit.count > 0) {
+        qcopy(&g_hero_state.groundPoint, &g_collision_l01_hit.point);
+        g_hero_state.groundZ.f = g_collision_l01_hit.point.f[2];
+        if (g_hero_input_lock)
+            g_hero_state.groundZ.f = gravity_get_center_distance(&g_collision_l01_hit.point);
         g_hero_state.groundDistance = fast_vec_dist(&g_hero_state.position, &g_hero_state.groundPoint);
-        g_hero_state.groundMoby = D_L01_001BF900.moby;
-        func_001290E0(&g_hero_state.groundNormal, &D_L01_001BF900.normal);
-        g_hero_state.groundSlope.f = cam_get_view_space_angle(&D_L01_001BF900.normal);
-        g_hero_state.downhillYaw = mat_fast_helper_a(D_L01_001BF900.normal.f[0], D_L01_001BF900.normal.f[1]);
+        g_hero_state.groundMoby = g_collision_l01_hit.moby;
+        func_001290E0(&g_hero_state.groundNormal, &g_collision_l01_hit.normal);
+        g_hero_state.groundSlope.f = cam_get_view_space_angle(&g_collision_l01_hit.normal);
+        g_hero_state.downhillYaw = mat_fast_helper_a(g_collision_l01_hit.normal.f[0], g_collision_l01_hit.normal.f[1]);
         FastVecSub(&work, &g_hero_state.groundPoint, &g_hero_state.position);
         if (0.0f < FastVecDot(&work, &g_hero_state.groundNormal))
             g_hero_state.groundDistance = -g_hero_state.groundDistance;
@@ -195,7 +195,7 @@ void UpdateOozlaHeroGroundContacts(void)
             g_hero_state.framesOffGround.s = 0;
             if (g_hero_state.groundSlope.f <= 0.87266469f || g_hero_state.gravityMode != 0) {
                 g_hero_state.airFrames.s = 0;
-                g_hero_state.lastLandedMoby = D_L01_001BF900.moby;
+                g_hero_state.lastLandedMoby = g_collision_l01_hit.moby;
             }
         }
     }
@@ -218,7 +218,7 @@ probed:
         g_hero_state.gravityDir.f[2] = -1.0f;
         break;
     case 1:
-        if (D_L01_001A9034) {
+        if (g_hero_input_lock_alt) {
             vec_compute_flat_direction_from_point(&g_hero_state.position, &g_hero_state.gravityDir, 0);
         } else if (g_hero_state.gravityOverride.f[3] != 0.0f) {
             ApproachValue(&g_hero_state.gravityOverride.f[3], 0.0f, 1.0f);
@@ -265,14 +265,14 @@ probed:
         hero_build_relative_offset(&sideStart, 0.2f, angle, 0.45f, 1);
         hero_build_relative_offset(&sideEnd, 0.2f, angle, -0.45f, 1);
         if (CollLine(&sideStart, &sideEnd, 0x22, g_hero_state.moby, 0)) {
-            if (D_L01_001A9030)
-                g_hero_state.sideHeight.f[side] = gravity_get_center_distance(&D_L01_001BF900.point) -
+            if (g_hero_input_lock)
+                g_hero_state.sideHeight.f[side] = gravity_get_center_distance(&g_collision_l01_hit.point) -
                                                 gravity_get_center_distance(&g_hero_state.groundPoint);
             else
-                g_hero_state.sideHeight.f[side] = D_L01_001BF900.point.f[2] - g_hero_state.groundZ.f;
+                g_hero_state.sideHeight.f[side] = g_collision_l01_hit.point.f[2] - g_hero_state.groundZ.f;
             if (0.4f < math_fabs(g_hero_state.sideHeight.f[side]))
                 g_hero_state.sideHeight.f[side] = 0.0f;
-            func_001290E0(&sideNormal, &D_L01_001BF900.normal);
+            func_001290E0(&sideNormal, &g_collision_l01_hit.normal);
             hero_compute_angles_to_local_dir(&sideNormal, &sideAngles);
             if (-0.785398244f < sideAngles.f[1] && sideAngles.f[1] < 0.785398244f)
                 g_hero_state.sideTiltY.f[side] = sideAngles.f[1];

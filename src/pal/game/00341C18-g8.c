@@ -3,13 +3,13 @@
 
 typedef struct { float x, y; } Pair;
 typedef struct { int value; } MenuColor;
-extern Pair D_001AE048[], D_001AE050[], D_001AE058[], D_001AE060[], D_001AE068[], D_001AE070[];
+extern Pair g_radial_menu_pos_first[], g_radial_menu_pos_second[], g_radial_menu_pos_third[], g_radial_menu_pos_fourth[], g_radial_menu_pos_fifth[], g_radial_menu_cursor_pos[];
 typedef struct { int value; char pad[20]; int id; } Item;
 typedef struct { Item *items; } Items;
 extern Items *g_radial_menu_pages;
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern unsigned char g_item_slot_to_record[];
-extern int D_00139868[];
+extern int g_help_entry_state[];
 extern char g_weapon_table[];
 extern struct { char pad[0x1C4]; int buttons; } g_pad_state;
 extern void *memset(void *, int, unsigned int);
@@ -39,11 +39,11 @@ int func_PAL_00341C18(char *self, int buttons)
     memset(&b,0,8);
     memset(&c,0,8);
     memset(&d,0,8);
-    e = D_001AE048[0];
-    f = D_001AE050[0];
-    g = D_001AE058[0];
-    h = D_001AE060[0];
-    j = D_001AE068[0];
+    e = g_radial_menu_pos_first[0];
+    f = g_radial_menu_pos_second[0];
+    g = g_radial_menu_pos_third[0];
+    h = g_radial_menu_pos_fourth[0];
+    j = g_radial_menu_pos_fifth[0];
     object_set_first_float4(self + 0x0, a.x + (*(Pair **)(self+0x80C))->x, a.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x4C, d.x + (*(Pair **)(self+0x80C))->x, d.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0xE4, b.x + (*(Pair **)(self+0x80C))->x, b.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
@@ -53,7 +53,7 @@ int func_PAL_00341C18(char *self, int buttons)
     object_set_first_float4(self + 0x930, f.x + (*(Pair **)(self+0x80C))->x, f.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x988, h.x + (*(Pair **)(self+0x80C))->x, h.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x9E0, j.x + (*(Pair **)(self+0x80C))->x, j.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    k=D_001AE070[0];
+    k=g_radial_menu_cursor_pos[0];
     object_set_first_float4(self + 0x2A8, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x2F4, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x5A0, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
@@ -68,7 +68,7 @@ int func_PAL_00341C18(char *self, int buttons)
                 object_set_flag_value(child,1);
                 hud_set_widget_value_pair(child,g_radial_menu_pages->items[i].value,0);
             }
-            bar=menu_return_object_unchanged(D_001A8CFC+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
             object_set_flag_value(bar,0);
             firstColor.value = 0;
             secondColor.value = 0;
@@ -78,7 +78,7 @@ int func_PAL_00341C18(char *self, int buttons)
                 int *primary = object_get_fourth_field(child);
                 *primary = (*primary & 0xFF000000) | (textColor.value & 0xFFFFFF);
             }
-            bar=menu_return_object_unchanged(D_001A8CFC+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
             object_set_flag_value(bar,1);
             object_set_first_pair(bar,firstColor.value,secondColor.value);
             func_PAL_003388E8(bar,100);
@@ -93,7 +93,7 @@ int func_PAL_00341C18(char *self, int buttons)
                         *secondary = (*secondary & 0xFF000000) | (textColor.value & 0xFFFFFF);
                     }
                     if (*(int *)(g_weapon_table+g_item_slot_to_record[g_radial_menu_pages->items[i].id]*224+0x6C)>0)
-                        meter_set_value(bar,D_00139868[g_radial_menu_pages->items[i].id]>>5);
+                        meter_set_value(bar,g_help_entry_state[g_radial_menu_pages->items[i].id]>>5);
                 }
             }
         }

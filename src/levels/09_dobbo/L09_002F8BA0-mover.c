@@ -11,9 +11,9 @@ typedef struct {
     unsigned char padding[0x464];
     unsigned char active[0];
 } DobboFlags;
-extern DobboFlags D_L09_0021E9F0;
+extern DobboFlags g_dobbo_flags;
 /* One 1 KB table per planet, a 3-bit count in each nibble; the low bit of the number picks it. */
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
 
 /* The level's target points: retail indexes these records with a 0x80-byte stride. */
@@ -23,7 +23,7 @@ typedef struct {
     char pad40[0x30];
     float rot[4];
 } DobboPoint;
-extern DobboPoint *D_L09_001B294C MACRO_ADDR;
+extern DobboPoint *g_dobbo_point_table MACRO_ADDR;
 
 /* The mover's own variables: where it started, which point it goes to and how far it is. */
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
     char padBD[0x33];
     float rot[4];           /* 0xF0 */
 } DobboMoby;
-extern DobboMoby *D_L09_001B285C MACRO_ADDR; /* the level's mobys, 0x100 bytes each */
+extern DobboMoby *g_moby_record_table MACRO_ADDR; /* the level's mobys, 0x100 bytes each */
 
 extern void moby_set_state(void *, int, int);
 extern void FastVecSub(void *, void *, void *), FastVecScale(void *, void *, float), FastVecAdd(void *, void *, void *);
@@ -85,11 +85,11 @@ void target_mover_update(DobboMoby *moby) {
         qcopy_nc(vars->rot, moby->rot);
         id = moby->uid;
         /* The byte is read once, ahead of the odd/even test, and each arm tests its own nibble. */
-        if (D_L09_0021E9F0.active[(s16)id]
-            || (bits = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)],
+        if (g_dobbo_flags.active[(s16)id]
+            || (bits = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)],
                 (id & 1) ? ((bits >> 4) & 7) : (bits & 7))) {
-            qcopy_nc(moby->pos, D_L09_001B294C[vars->point].pos);
-            qcopy_nc(moby->rot, D_L09_001B294C[vars->point].rot);
+            qcopy_nc(moby->pos, g_dobbo_point_table[vars->point].pos);
+            qcopy_nc(moby->rot, g_dobbo_point_table[vars->point].rot);
             moby->flags |= 2;
             moby_set_state(moby, 3, -1);
         } else {
@@ -99,21 +99,21 @@ void target_mover_update(DobboMoby *moby) {
     case 1:
         if (vars->trigger == -1)
             break;
-        if (D_L09_001B285C[vars->trigger].state == 0xFE)
+        if (g_moby_record_table[vars->trigger].state == 0xFE)
             break;
-        if (D_L09_001B285C[vars->trigger].state == 0xFD)
+        if (g_moby_record_table[vars->trigger].state == 0xFD)
             break;
-        if (D_L09_001B285C[vars->trigger].armed == 0)
+        if (g_moby_record_table[vars->trigger].armed == 0)
             break;
         if (vars->link != -1)
-            D_L09_001B285C[vars->link].armed = moby->state;
+            g_moby_record_table[vars->link].armed = moby->state;
         id2 = moby->uid;
         if (id2 & 1) {
-            if (((D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] >> 4) & 7) != 7)
-                D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] += 0x10;
+            if (((g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] >> 4) & 7) != 7)
+                g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] += 0x10;
         } else {
-            if ((D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] & 7) != 7)
-                D_0019B4A8[((s16)id2 >> 1) + (g_current_map_index << 10)] += 1;
+            if ((g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] & 7) != 7)
+                g_moby_nibble_table[((s16)id2 >> 1) + (g_current_map_index << 10)] += 1;
         }
         moby_set_state(moby, 2, -1);
         break;
@@ -122,17 +122,17 @@ void target_mover_update(DobboMoby *moby) {
         if (vars->t > 1.0f)
             vars->t = 1.0f;
         blend = (1.0f - math_fast_sin_or_cos_a(vars->t * 3.14159274f)) * 0.5f;
-        FastVecSub(v, D_L09_001B294C[vars->point].pos, vars->pos);
+        FastVecSub(v, g_dobbo_point_table[vars->point].pos, vars->pos);
         FastVecScale(v, v, blend);
         FastVecAdd(moby->pos, vars->pos, v);
-        moby->rot[2] = math_move_angle_toward_target(vars->rot[2], D_L09_001B294C[vars->point].rot[2], blend);
-        moby->rot[1] = math_move_angle_toward_target(vars->rot[1], D_L09_001B294C[vars->point].rot[1], blend);
-        moby->rot[0] = math_move_angle_toward_target(vars->rot[0], D_L09_001B294C[vars->point].rot[0], blend);
+        moby->rot[2] = math_move_angle_toward_target(vars->rot[2], g_dobbo_point_table[vars->point].rot[2], blend);
+        moby->rot[1] = math_move_angle_toward_target(vars->rot[1], g_dobbo_point_table[vars->point].rot[1], blend);
+        moby->rot[0] = math_move_angle_toward_target(vars->rot[0], g_dobbo_point_table[vars->point].rot[0], blend);
         if (vars->t >= 1.0f)
             moby_set_state(moby, 3, -1);
         break;
     case 3:
-        if (vars->link == -1 || D_L09_001B285C[vars->link].armed == 0)
+        if (vars->link == -1 || g_moby_record_table[vars->link].armed == 0)
             moby->flags |= 2;
         break;
     }

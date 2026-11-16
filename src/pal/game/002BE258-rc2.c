@@ -43,7 +43,7 @@ extern f32 mat_get_product_element(f32 *, s8 *, f32 *, s32);
 extern s32 FastDecTimer(s8 *);
 extern void part_kill(Obj *);
 
-void func_PAL_002BE258(Obj *o)
+void part_update_bouncing_fade_pal(Obj *o)
 {
     Sub *s = &o->sub;
     Fr fr;

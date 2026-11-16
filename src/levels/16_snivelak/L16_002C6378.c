@@ -15,7 +15,7 @@ typedef struct {
     s32 i280;
 } T_001B99C0;
 
-extern T_001B99C0 D_L16_001B99C0;
+extern T_001B99C0 g_snivelak_hero_state;
 
 extern void anim_start_blended(void *, s32, s32, s32);
 

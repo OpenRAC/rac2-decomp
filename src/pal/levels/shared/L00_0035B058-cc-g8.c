@@ -18,7 +18,7 @@ typedef struct {
     unsigned char field68, field69, field6A, field6B;
 } GameState;
 extern GameState g_sound_state;
-extern unsigned short D_001A63F0[];
+extern unsigned short g_current_music_id[];
 typedef struct {
     int active, reserved04[3];
     Quadword position, rotation;
@@ -31,60 +31,60 @@ typedef struct {
     unsigned short fieldC64, reservedC66;
     int fieldC68, reservedC6C;
 } SavedState;
-extern SavedState D_L00_0021DDB0;
-extern unsigned char D_L00_0021D140[0xC70];
-extern int D_L00_001C9340[];
-extern unsigned char D_L00_001B1980[] __attribute__((sda));
-extern unsigned char D_L00_001B1981[] __attribute__((sda));
-extern unsigned char D_L00_001B1982[] __attribute__((sda));
-extern float D_L00_001B1984[] __attribute__((sda));
-extern float D_L00_001B1988[] __attribute__((sda));
-extern float D_L00_001B198C[] __attribute__((sda));
-extern float D_L00_001B1990;
-extern unsigned char *D_L00_001B1E9C[] __attribute__((sda));
-extern unsigned char *D_L00_001B1EA0[] __attribute__((sda));
+extern SavedState g_controller_level_state;
+extern unsigned char g_level_work_area[0xC70];
+extern int g_tutorial_points[];
+extern unsigned char g_fog_color_r[] __attribute__((sda));
+extern unsigned char g_fog_color_g[] __attribute__((sda));
+extern unsigned char g_fog_color_b[] __attribute__((sda));
+extern float g_fog_near[] __attribute__((sda));
+extern float g_fog_far[] __attribute__((sda));
+extern float g_fog_near_intensity[] __attribute__((sda));
+extern float g_fog_far_intensity;
+extern unsigned char *g_moby_array_base[] __attribute__((sda));
+extern unsigned char *g_moby_array_end_sentinel[] __attribute__((sda));
 extern void mem_clear(void *, int, unsigned int);
 extern void mem_copy_aligned(void *, const void *, unsigned int);
-extern void func_PAL_L00_00305110(int, int);
+extern void load_scene_chunk_pal(int, int);
 extern void math_trap_always(void);
-extern void func_PAL_L00_002B2958(int, int, void *);
+extern void SetHeroMode_pal(int, int, void *);
 extern void func_002A0F48(void *);
 extern void euler_rotation_basis(void *, const void *);
 extern void cam_reset_default(void);
 extern void level_apply_data_blocks(void);
 
-void func_PAL_L00_0035B058(void) {
+void RestoreSavedHeroState_pal(void) {
     unsigned char *entity;
     int kind;
     int i;
     g_hero_state.state = 15;
-    if (D_L00_0021DDB0.active == 0) {
-        mem_clear(D_L00_0021D140, 0, 0xC70);
+    if (g_controller_level_state.active == 0) {
+        mem_clear(g_level_work_area, 0, 0xC70);
         return;
     }
-    mem_copy_aligned(D_L00_0021D140, &D_L00_0021DDB0, 0xC70);
-    qcopy(&g_hero_state.position, &D_L00_0021DDB0.position);
-    qcopy(&g_hero_state.rotation, &D_L00_0021DDB0.rotation);
-    *(int *)(g_hero_state.moby + 0x38) = D_L00_0021DDB0.field30;
-    *(int *)(g_hero_state.moby + 0x3C) = D_L00_0021DDB0.field34;
-    g_sound_state.field64 = D_L00_0021DDB0.field38;
-    g_sound_state.field68 = D_L00_0021DDB0.field3C;
-    g_sound_state.field69 = D_L00_0021DDB0.field3D;
-    g_sound_state.field6A = D_L00_0021DDB0.field3E;
+    mem_copy_aligned(g_level_work_area, &g_controller_level_state, 0xC70);
+    qcopy(&g_hero_state.position, &g_controller_level_state.position);
+    qcopy(&g_hero_state.rotation, &g_controller_level_state.rotation);
+    *(int *)(g_hero_state.moby + 0x38) = g_controller_level_state.field30;
+    *(int *)(g_hero_state.moby + 0x3C) = g_controller_level_state.field34;
+    g_sound_state.field64 = g_controller_level_state.field38;
+    g_sound_state.field68 = g_controller_level_state.field3C;
+    g_sound_state.field69 = g_controller_level_state.field3D;
+    g_sound_state.field6A = g_controller_level_state.field3E;
     g_sound_state.field6B |= 7;
-    D_001A63F0[0] = D_L00_0021DDB0.fieldC64;
-    if (D_L00_001C9340[0] != D_L00_0021DDB0.fieldC68)
-        func_PAL_L00_00305110(D_L00_0021DDB0.fieldC68, *(int *)&D_L00_0021DDB0.fieldC64);
-    D_L00_001B1980[0] = D_L00_0021DDB0.field3F;
-    D_L00_001B1981[0] = D_L00_0021DDB0.field40;
-    D_L00_001B1982[0] = D_L00_0021DDB0.field41;
-    D_L00_001B1984[0] = D_L00_0021DDB0.field44;
-    D_L00_001B1988[0] = D_L00_0021DDB0.field48;
-    D_L00_001B198C[0] = D_L00_0021DDB0.field4C;
-    D_L00_001B1990 = D_L00_0021DDB0.field50;
-    if (D_L00_0021DDB0.field54 != 0 && D_L00_0021DDB0.field54 != 3) {
+    g_current_music_id[0] = g_controller_level_state.fieldC64;
+    if (g_tutorial_points[0] != g_controller_level_state.fieldC68)
+        load_scene_chunk_pal(g_controller_level_state.fieldC68, *(int *)&g_controller_level_state.fieldC64);
+    g_fog_color_r[0] = g_controller_level_state.field3F;
+    g_fog_color_g[0] = g_controller_level_state.field40;
+    g_fog_color_b[0] = g_controller_level_state.field41;
+    g_fog_near[0] = g_controller_level_state.field44;
+    g_fog_far[0] = g_controller_level_state.field48;
+    g_fog_near_intensity[0] = g_controller_level_state.field4C;
+    g_fog_far_intensity = g_controller_level_state.field50;
+    if (g_controller_level_state.field54 != 0 && g_controller_level_state.field54 != 3) {
         kind = 0;
-        switch (D_L00_0021DDB0.field54) {
+        switch (g_controller_level_state.field54) {
         case 1:
             kind = 0x57;
             break;
@@ -94,9 +94,9 @@ void func_PAL_L00_0035B058(void) {
         default:
             math_trap_always();
         }
-        for (i = 0; (entity = D_L00_001B1E9C[0] + (i << 8)) < D_L00_001B1EA0[0]; i++) {
+        for (i = 0; (entity = g_moby_array_base[0] + (i << 8)) < g_moby_array_end_sentinel[0]; i++) {
             if (*(short *)(entity + 0xAA) == kind) {
-                func_PAL_L00_002B2958(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
+                SetHeroMode_pal(g_controller_level_state.field54, g_controller_level_state.field5C, entity);
                 break;
             }
         }

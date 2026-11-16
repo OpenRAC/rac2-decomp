@@ -3,7 +3,7 @@
 
 typedef int TI __attribute__((mode(TI)));
 
-extern int D_001B53A0[];
+extern int g_camera_follow_state[];
 
 extern TI hero_copy_vector_to_out(int, TI *);
 extern void FastVecAdd(void *, void *, void *);
@@ -19,7 +19,7 @@ float cam_compute_signed_angle_to_point(u8 *moby, float distance) {
     float offset[4] __attribute__((aligned(16)));
     float to_point[4] __attribute__((aligned(16)));
     float projected[4] __attribute__((aligned(16)));
-    int *camera = D_001B53A0;
+    int *camera = g_camera_follow_state;
     float along_dot;
     float side_dot;
     float length;

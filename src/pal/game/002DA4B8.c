@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void F70997ba9_FUN_002FC560(int a, int b);
 extern void F70997ba9_FUN_0027C540(int a);
@@ -9,7 +10,7 @@ extern void F70997ba9_FUN_0027F5B8(int a, int b, long c, void *d, int e);
 extern void F70997ba9_FUN_0027F110(void);
 extern void F70997ba9_FUN_0027C660(void);
 
-int func_PAL_002DA4B8(int *arg0)
+int menu_label_column_draw_pal(int *arg0)
 {
     int min;
     int v;

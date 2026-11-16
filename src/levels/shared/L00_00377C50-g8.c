@@ -11,7 +11,7 @@ typedef struct {u8 pad[0x88]; unsigned short price; u8 pad2[4]; unsigned short l
 extern ActionClass g_weapon_l00_table[];
 extern int g_player_bolts;
 extern int g_is_pal_video;
-extern float D_L00_001B25E0;
+extern float g_menu_slide_scale;
 extern char *GetLocalizedString(int id);
 extern int GetSelectedShopItemPrice(void);
 extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text, int length);

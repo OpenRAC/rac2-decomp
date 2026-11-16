@@ -8,7 +8,7 @@
 extern int ref_L00_002FC058_00 __attribute__((sda));
 extern int ref_L00_002FC058_01 __attribute__((sda));
 extern int ref_L00_002FC058_02 __attribute__((sda));
-extern char D_00138320[];
+extern char g_pad_pressed_flags[];
 
 extern int level_get_flag_d(void);
 extern void level_clear_flag_e(void);
@@ -29,11 +29,11 @@ void level_update_countdown_state_machine(void)
             level_clear_flag_e();
             level_clear_flag_f();
         } else if (ref_L00_002FC058_02 == 0) {
-            if (*(int *)D_00138320 & 0x10)
+            if (*(int *)g_pad_pressed_flags & 0x10)
                 ref_L00_002FC058_00++;
             else
                 ref_L00_002FC058_00 = 0;
-        } else if ((*(int *)D_00138320 & 0x10) == 0) {
+        } else if ((*(int *)g_pad_pressed_flags & 0x10) == 0) {
             ref_L00_002FC058_00 = 0;
         }
         break;

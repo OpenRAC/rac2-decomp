@@ -28,7 +28,7 @@ extern void euler_to_matrix(void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L00_002A74C0(void)
+void hero_update_model_tilt_pal(void)
 {
     Owner_002A75D8 *o = &g_hero_state;
     float v[4];

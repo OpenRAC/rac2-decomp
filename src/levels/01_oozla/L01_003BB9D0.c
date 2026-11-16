@@ -6,7 +6,7 @@ extern float vec_distance_xy(void *, void *);
 extern int math_random_int_below(int);
 extern s32 math_closest_point_on_polygon_edge(void *, void *,void *,int);
 extern int CollLine(void *, void *, int, void *, int);
-extern char *D_L01_001FE180[];
+extern char *g_path_l01_table[];
 extern char g_coll_line_hit_point[];
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -204,14 +204,14 @@ void moby_choose_wander_destination(void *object)
                 qcopy(vars + 0x1E0, vars + 0x1D0);
                 *(float *)(vars + 0x1E8) += 1.7f;
             }
-            math_closest_point_on_polygon_edge(vars + 0x1E0, vars + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
+            math_closest_point_on_polygon_edge(vars + 0x1E0, vars + 0x1E0, g_path_l01_table[index] + 0x10, *(int *)g_path_l01_table[index]);
         } else {
             *(float *)(vars + 0x1E0) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * 1.2f;
             *(float *)(vars + 0x1E4) = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * 1.2f;
             *(int *)(vars + 0x1E8) = 0;
             FastVecAdd(vars + 0x1E0, vars + 0x1E0, g_hero_position);
             *(float *)(vars + 0x1E8) += 1.7f;
-            math_closest_point_on_polygon_edge(vars + 0x1E0, vars + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
+            math_closest_point_on_polygon_edge(vars + 0x1E0, vars + 0x1E0, g_path_l01_table[index] + 0x10, *(int *)g_path_l01_table[index]);
         }
         if ((*(int *)(vars + 0x23C) && vec_distance_xy(vars + 0x1E0, g_hero_position) < 3.0f) || vec_distance_xy(vars + 0x1E0, moby + 0x10) < 0.5f) {
             offset = math_random_float_range(3.0f, 5.0f);

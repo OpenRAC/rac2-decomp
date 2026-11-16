@@ -4,9 +4,9 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef struct { int a, b, c, d; } __attribute__((aligned(16))) Quad16;
 typedef union { TI128 q; float f[4]; } EffectVector;
 struct CollisionFilter { Quad16 direction; int owner, mode; u16 unknown18, objectType; float radius; int active; };
-extern char *D_L11_001C0D18 NOT_SDA;
-extern int D_L11_001B1CE4 __attribute__((sda));
-extern u32 D_L11_001B1CE0 __attribute__((sda));
+extern char *g_hit_l11_result NOT_SDA;
+extern int g_glow_flare_disabled __attribute__((sda));
+extern u32 g_shot_light_sprite __attribute__((sda));
 extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 extern void moby_set_state(u8 *, u8, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -41,7 +41,7 @@ void shot_l11_update(u8 *object) {
         make_hit_descriptor((char *)&filter, (int)object, 1, *(float *)(vars + 0x14), (Quad16 *)vars);
         filter.objectType = *(u16 *)(object + 0xAA);
         if (CollLine(object + 0x10, &destination, 0, object, &filter) || coll_test_point(object + 0x10, 0, object, 0.3f)) {
-            if (!D_L11_001C0D18 || D_L11_001C0D18 != *(char **)(vars + 0x10)) {
+            if (!g_hit_l11_result || g_hit_l11_result != *(char **)(vars + 0x10)) {
                 coll_sweep_from_object(object, 0.6f, (float *)(object + 0x10), 0x10001, *(float *)(vars + 0x14), 0.0f, 0, 1, 0);
                 moby_set_state(object, 1, -1);
                 return;
@@ -49,17 +49,17 @@ void shot_l11_update(u8 *object) {
         }
         qcopy(object + 0x10, &destination);
         FastVecScale(&backward, vars, -0.5f);
-        if (D_L11_001B1CE4) {
+        if (g_glow_flare_disabled) {
             vec_scale_to_length(&light, vars, 0.5f);
             FastVecAdd(&light, object + 0x10, &light);
             size = math_random_float_range(1.2f, 1.45f) * 210000.0f;
             growth = math_random_float_range(0.1f, 0.2f);
-            part_spawn_gravity_fade(&light, &backward, 2, D_L11_001B1CE0, 3, 127, 47, size, growth * 210000.0f, 0.0f, 0);
+            part_spawn_gravity_fade(&light, &backward, 2, g_shot_light_sprite, 3, 127, 47, size, growth * 210000.0f, 0.0f, 0);
             vec_scale_to_length(&light, vars, -0.03f);
             FastVecAdd(&light, object + 0x10, &light);
             size2 = math_random_float_range(0.7f, 0.9f) * 210000.0f;
             growth2 = math_random_float_range(0.1f, 0.3f);
-            part_spawn_gravity_fade(&light, &backward, 2, D_L11_001B1CE0, 7, 127, 47, size2, growth2 * 210000.0f, 0.0f, 0);
+            part_spawn_gravity_fade(&light, &backward, 2, g_shot_light_sprite, 7, 127, 47, size2, growth2 * 210000.0f, 0.0f, 0);
         }
         break;
     case 1:

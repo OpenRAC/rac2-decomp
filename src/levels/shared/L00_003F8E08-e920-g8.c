@@ -18,12 +18,12 @@ typedef struct {
     u8 pad1504[0x24EC - 0x1504];
     s16 state;
 } Hero_L00_003FE920;
-extern u8 D_00139581[];
+extern u8 g_hoverbomb_weapon_index[];
 extern TableEntry_L00_003FE920 g_weapon_l00_table[];
 extern Hero_L00_003FE920 g_hero_state;
-extern u8 D_L00_001B9010[];
-extern int D_L00_001B0C0C __attribute__((sda));
-extern float D_L00_001B0C10 __attribute__((sda));
+extern u8 g_scratch_vec_secondary[];
+extern int g_spread_shot_count __attribute__((sda));
+extern float g_spread_shot_angle __attribute__((sda));
 
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_compute_aim_direction(void *, void *, float, float, float);
@@ -45,7 +45,7 @@ void weapon_compute_spread_shot_velocity(u8 *obj, u8 *out, int mode, u8 *flag)
     Hero_L00_003FE920 *h = &g_hero_state;
 
     {
-        int index = D_00139581[0];
+        int index = g_hoverbomb_weapon_index[0];
         TableEntry_L00_003FE920 *entry = g_weapon_l00_table + index;
 
         factor = entry->scale * 0.016666668f;
@@ -59,7 +59,7 @@ void weapon_compute_spread_shot_velocity(u8 *obj, u8 *out, int mode, u8 *flag)
         qcopy(axis, h->vec750);
         if (h->optional != 0) {
             math_compute_aim_direction(out, flag, factor, 32.0f, 0.6981318f);
-            qcopy(axis, D_L00_001B9010);
+            qcopy(axis, g_scratch_vec_secondary);
         }
     }
 
@@ -67,13 +67,13 @@ void weapon_compute_spread_shot_velocity(u8 *obj, u8 *out, int mode, u8 *flag)
         vec_compute_object_to_target(g_hero_state.effect, flag, out, factor);
 
     factor = IntToFloat(mode);
-    denom = IntToFloat(D_L00_001B0C0C - 1);
+    denom = IntToFloat(g_spread_shot_count - 1);
     factor = factor / denom;
-    spread = ((D_L00_001B0C10 * 0.017453294f) * 2.0f) * factor;
+    spread = ((g_spread_shot_angle * 0.017453294f) * 2.0f) * factor;
     if (mode != 2) {
         float *rot = rotation;
 
-        angle = FastAddRotations(-(D_L00_001B0C10 * 0.017453294f), spread);
+        angle = FastAddRotations(-(g_spread_shot_angle * 0.017453294f), spread);
         math_build_axis_angle_quat(angle, rot, axis);
         vec_rotate_by_quaternion(out, out, rot);
     }

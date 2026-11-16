@@ -2,9 +2,9 @@
 /* func_L02_003D9728: state handler of a Maktar walker: ten-state switch, footstep and
  * impact camera shakes (D_L02_001BA3C0), beam pursuit. */
 extern int g_moby_l02_pool;
-extern int D_L02_001B03F0 __attribute__((sda));
+extern int g_brawler_target_position __attribute__((sda));
 typedef struct { char pad[0x160]; float amount; int pad2; int time; int phase; } Shake;
-extern Shake D_L02_001BA3C0;
+extern Shake g_hero_effect_state;
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float moby_get_anim_value(char *);
@@ -46,7 +46,7 @@ void walker_boss_update_movement_shake(char *moby) {
     if (*(unsigned char *)(moby + 0x20) != 4)
         moby_step_at_own_position_factor(moby, *(float *)(moby + 0xF8));
     else
-        vec_step_toward_target_limited(moby + 0x10, &D_L02_001B03F0, 0.16666667f);
+        vec_step_toward_target_limited(moby + 0x10, &g_brawler_target_position, 0.16666667f);
     break;
     case 1:
     if (coll_point_inside_record_volume(moby + 0x10, arena_get_state_word(*(void **)(moby + 0xB8))))
@@ -55,9 +55,9 @@ void walker_boss_update_movement_shake(char *moby) {
         moby_l01_turn_toward_target(moby, arena_get_camera_point(*(void **)(moby + 0xB8)));
     if ((animFrame > 0.0f && animFrame < 2.0f) || (animFrame > 15.0f && animFrame < 17.0f) ||
         (animFrame > 30.0f && animFrame < 32.0f) || (animFrame > 45.0f && animFrame < 47.0f)) {
-        D_L02_001BA3C0.amount = 0.05f;
-        D_L02_001BA3C0.time = 15;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.05f;
+        g_hero_effect_state.time = 15;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 2:
@@ -77,9 +77,9 @@ void walker_boss_update_movement_shake(char *moby) {
         FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
     }
     if ((animFrame > 0.0f && animFrame < 2.0f) || (animFrame > 29.0f && animFrame < 31.0f)) {
-        D_L02_001BA3C0.amount = 0.1f;
-        D_L02_001BA3C0.time = 15;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.1f;
+        g_hero_effect_state.time = 15;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 3:
@@ -92,16 +92,16 @@ void walker_boss_update_movement_shake(char *moby) {
     break;
     case 5:
     if (animFrame > 3.0f && animFrame < 5.0f) {
-        D_L02_001BA3C0.amount = 0.4f;
-        D_L02_001BA3C0.time = 25;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.4f;
+        g_hero_effect_state.time = 25;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 6:
     if (animFrame > 20.0f && animFrame < 22.0f) {
-        D_L02_001BA3C0.amount = 0.2f;
-        D_L02_001BA3C0.time = 25;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.2f;
+        g_hero_effect_state.time = 25;
+        g_hero_effect_state.phase = 0;
     }
     break;
     case 7:
@@ -124,9 +124,9 @@ void walker_boss_update_movement_shake(char *moby) {
     break;
     case 8:
     if (animFrame > 30.0f && animFrame < 32.0f) {
-        D_L02_001BA3C0.amount = 0.2f;
-        D_L02_001BA3C0.time = 25;
-        D_L02_001BA3C0.phase = 0;
+        g_hero_effect_state.amount = 0.2f;
+        g_hero_effect_state.time = 25;
+        g_hero_effect_state.phase = 0;
     }
     case 9:
         break;

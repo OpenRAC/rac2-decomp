@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern char D_L12_001FEAC0[];
+extern char g_path_zone_table[];
 
 extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern int moby_step_controller(char *a, char *b, f32 c);
@@ -13,7 +13,7 @@ s32 AimAtPathCursorAndAdvance(char *obj)
 {
     char *moby = obj;
     char *vars = *(char **)(moby + 0x68);
-    char *tbl = D_L12_001FEAC0;
+    char *tbl = g_path_zone_table;
     s32 path = *(s32 *)(tbl + *(s32 *)(vars + 0x110) * 4);
     s32 point_offset = *(s32 *)(vars + 0x224) << 4;
     char *source = (char *)point_offset;

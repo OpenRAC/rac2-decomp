@@ -42,10 +42,10 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
-extern Rec_42A520 *D_L00_001B1844;
-extern float D_L00_001B163C __attribute__((sda));
-extern float D_L00_001B1640 __attribute__((sda));
-extern int D_L00_001B164C __attribute__((sda));
+extern Rec_42A520 *g_camera_def_table;
+extern float g_cam_trigger_model_param_a __attribute__((sda));
+extern float g_cam_trigger_model_param_b __attribute__((sda));
+extern int g_cam_trigger_model_flags __attribute__((sda));
 
 void func_PAL_L00_0042FA70(Self_42A520 *self)
 {
@@ -56,11 +56,11 @@ void func_PAL_L00_0042FA70(Self_42A520 *self)
     Ent_42A520 *e;
     Model_42A520 *m;
 
-    e = D_L00_001B1844[self->idx].ent;
-    e->f28 = D_L00_001B163C;
-    e->f2C = D_L00_001B1640;
-    e->f30 = math_fabs(D_L00_001B163C);
-    e->f34 = D_L00_001B1640;
+    e = g_camera_def_table[self->idx].ent;
+    e->f28 = g_cam_trigger_model_param_a;
+    e->f2C = g_cam_trigger_model_param_b;
+    e->f30 = math_fabs(g_cam_trigger_model_param_a);
+    e->f34 = g_cam_trigger_model_param_b;
     m = e->model;
     *(TI128 *)e->v60 = *(TI128 *)m->mE0;
     vec_scale_to_length(m0, m->mC0, e->f28);
@@ -76,5 +76,5 @@ void func_PAL_L00_0042FA70(Self_42A520 *self)
     FastVecCross(self->m10, self->m0, v);
     vec_scale_to_length(self->m10, self->m10, 1.0f);
     FastVecCross(self->m20, self->m10, self->m0);
-    e->f24 = (((int)(D_L00_001B164C) * 5 + 2) / 6);
+    e->f24 = (((int)(g_cam_trigger_model_flags) * 5 + 2) / 6);
 }

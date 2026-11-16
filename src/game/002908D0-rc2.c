@@ -25,8 +25,8 @@
 #include "common.h"
 
 extern s32 help_is_id_in_mapping_table(s32 a0);
-extern s8 D_001A7B68[];
-extern s8 D_001A7B88[];
+extern s8 g_vendor_item_list[];
+extern s8 g_item_list_end[];
 
 /* Walks the item list, clears every entry that is not allowed, and tells whether all were fine. */
 s32 level_validate_item_list(void) {
@@ -37,8 +37,8 @@ s32 level_validate_item_list(void) {
     s32 item_id;
 
     s32 skip_id = 0x1E;
-    entry = (s32)D_001A7B68;
-    list_end = (s32)D_001A7B88;
+    entry = (s32)g_vendor_item_list;
+    list_end = (s32)g_item_list_end;
     all_valid = 1;
     do {
         raw = *(u8 *)entry;

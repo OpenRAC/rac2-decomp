@@ -10,8 +10,8 @@
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 extern u8 *g_moby_l17_pool;
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
-extern u8 D_L17_001B20F0[],D_L17_001B2120[],D_L17_001B2150[];
+extern u8 g_moby_group_flags[];
+extern u8 g_str_linked_group_debug_a[],g_str_linked_group_debug_b[],g_str_linked_group_debug_c[];
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void STUB_printf(void *,...);
@@ -27,7 +27,7 @@ void linked_moby_group_update(u8 *obj)
     u8 *target=0,*other,*vars=*(u8 **)(obj+0x68);
     Link *links=(Link *)(vars+0x18),*link;
     if(I(vars,0x10)!=-1) target=g_moby_l17_pool+I(vars,0x10)*256;
-    if(obj[0xB0]!=255 && (D_0019B2E8[obj[0xB0]+g_current_map_index*16]&0x80)) goto dispatch;
+    if(obj[0xB0]!=255 && (g_moby_group_flags[obj[0xB0]+g_current_map_index*16]&0x80)) goto dispatch;
     if(obj[0x20]!=0) {
         int j;
         for(j=0;j<5;j++) {
@@ -49,12 +49,12 @@ dispatch:
             else if(I(vars,8)&0x40) qcopy_nc(target+0x10,obj+0x10);
             if(I(vars,8)&0x20) qcopy_nc(obj+0xF0,target+0xF0);
             else if(I(vars,8)&0x80) qcopy_nc(target+0xF0,obj+0xF0);
-        } else STUB_printf(D_L17_001B20F0);
+        } else STUB_printf(g_str_linked_group_debug_a);
         for(i=0,link=links;i<5;i++,link++) {
             if(link->index!=-1) {
                 link->uid=H(g_moby_l17_pool+link->index*256,0xAA);
-                STUB_printf(D_L17_001B2120,(obj-g_moby_l17_pool)>>8,i,link->index,(int)link->uid);
-            } else STUB_printf(D_L17_001B2150,(obj-g_moby_l17_pool)>>8,i);
+                STUB_printf(g_str_linked_group_debug_b,(obj-g_moby_l17_pool)>>8,i,link->index,(int)link->uid);
+            } else STUB_printf(g_str_linked_group_debug_c,(obj-g_moby_l17_pool)>>8,i);
         }
         F(obj,0x2C)=(F(vars,0)<F(vars,4)?F(vars,4):F(vars,0))*F(*(u8 **)(obj+0x24),0x24);
         obj[0x20]=1;

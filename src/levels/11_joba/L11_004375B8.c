@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern int g_moby_l11_table __attribute__((sda));
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
@@ -10,7 +10,7 @@ extern void moby_set_state(void *, int, int);
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern float moby_update_aim_target_strength(char *, char *);
 extern void gfx_start_color_fade(char *, char *);
-extern int D_L11_001FFA78[];
+extern int g_enemy_damage_accum[];
 extern void part_spawn_blast_burst(char *, char *);
 extern void rotor_aim_at_entry(char *, int, int);
 extern void chain_creature_clear_sound_flags(char *);
@@ -51,7 +51,7 @@ void chain_creature_update_damage(char *obj)
                 hit=part_find_owned_effect_slot(CHILD(obj,i),0x10000,0);
                 damage=moby_update_aim_target_strength(obj,hit);
                 if (damage!=0.0f) {
-                    D_L11_001FFA78[*(unsigned char *)(vars+0x37)]+=(int)(damage*32.0f);
+                    g_enemy_damage_accum[*(unsigned char *)(vars+0x37)]+=(int)(damage*32.0f);
                     gfx_start_color_fade(CHILD(obj,i),vars+0x70);
                     if (*(float *)(hit+0x2C)>3.0f) {
                         scale=damage*0.125f;
@@ -82,7 +82,7 @@ void chain_creature_update_damage(char *obj)
         damage=moby_update_aim_target_strength(obj,hit);
         if (damage!=0.0f) {
             gfx_start_color_fade(obj,vars+0x70);
-            D_L11_001FFA78[*(unsigned char *)(vars+0x37)]+=(int)(damage*32.0f);
+            g_enemy_damage_accum[*(unsigned char *)(vars+0x37)]+=(int)(damage*32.0f);
             if (*(float *)(hit+0x2C)>3.0f) {
                 scale=damage*0.125f;
                 if (scale>1.0f) scale=1.0f;
@@ -109,7 +109,7 @@ void chain_creature_update_damage(char *obj)
     if (*(unsigned char *)(obj+0x20)>=2 && *(unsigned char *)(vars+0x2E)==2) {
         *(float *)(vars+0x20)=0;
         chain_creature_clear_sound_flags(obj);
-        FastVecSub(direction,(float *)D_L11_001BA8C0,(float *)(obj+0x10));
+        FastVecSub(direction,(float *)g_hero_l11_position,(float *)(obj+0x10));
         vec_scale_to_length((char *)direction,(char *)direction,0.5f);
         qcopy(v,vars+0x100);
         part_spawn_blast_burst(obj,(char *)v);
@@ -127,7 +127,7 @@ void chain_creature_update_damage(char *obj)
         }
     }
     *(int *)(vars+0x328)=weapon_select_aim_target(obj,*(int *)(vars+0x36C),0,0,255,255);
-    if (*(unsigned char *)(obj+0x31) && fast_vec_dist(obj+0x10,D_L11_001BA8C0)<48.0f) {
+    if (*(unsigned char *)(obj+0x31) && fast_vec_dist(obj+0x10,g_hero_l11_position)<48.0f) {
         moby_update_ground_check(obj);
         *(unsigned char *)(obj+0x6F)=45;
     }

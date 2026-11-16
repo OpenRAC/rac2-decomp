@@ -1,8 +1,8 @@
 #include "names.h"
 /* Draws the active menu, including eight widgets of each virtual-draw layout.
  * This unit disables GCSE to retain the two loops' separate cursor setup. */
-extern int D_00138344[];
-extern char *D_001A8CFC[] __attribute__((sda));
+extern int g_menu_input_flags[];
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern int *object_get_fourth_field(void *);
 extern float *object_get_second_field(void *);
@@ -26,7 +26,7 @@ void radial_menu_draw(char *self)
     float *pos;
     int *color;
     if (*(int *)(self+0xA58)) {
-        if (D_00138344[0]&0xF000) math_ping_pong_blend_values(0,0,1,1,1);
+        if (g_menu_input_flags[0]&0xF000) math_ping_pong_blend_values(0,0,1,1,1);
         widget214=self+0x214; widget2A8=self+0x2A8; widget2F4=self+0x2F4;
         color=object_get_fourth_field(widget214);
         cursorWidget=self+0x5A0;
@@ -62,6 +62,6 @@ void radial_menu_draw(char *self)
         }
         gfx_draw_screen_element_stored(cursorWidget);
         *object_get_fourth_field(cursorWidget)=0x80FFDE8D;
-        radial_menu_layout_items(D_001A8CFC[0]+0x36F28,0xF3,0x2B,0x70);
+        radial_menu_layout_items(g_resident_data_base[0]+0x36F28,0xF3,0x2B,0x70);
     }
 }

@@ -17,10 +17,10 @@ typedef struct {
     short h24EC;
 } Res_189E20;
 
-extern unsigned char D_00139580[];
+extern unsigned char g_seeker_weapon_index[];
 extern AngleRecord_262570 g_weapon_l00_table[];
 extern Res_189E20 g_hero_state;
-extern char D_L00_001B8FF0[];
+extern char g_cam_follow_matrix[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
 extern char *effect_spawn_owned_moby(void *, void *, void *, void *);
@@ -33,10 +33,10 @@ char *hero_fire_effect_from_facing(char *position, char *moby) {
     Res_189E20 *hero;
     void *owner;
 
-    timing = &g_weapon_l00_table[D_00139580[0]];
+    timing = &g_weapon_l00_table[g_seeker_weapon_index[0]];
     angle = timing->angle * 0.01666666753590107f;
     if (g_hero_state.i2294 == 0x1D) {
-        vec_scale_to_length(velocity, D_L00_001B8FF0, angle);
+        vec_scale_to_length(velocity, g_cam_follow_matrix, angle);
     } else if (g_hero_state.h24EC == 1) {
         vec_scale_to_length(velocity, moby + 0xD0, -angle);
     } else {

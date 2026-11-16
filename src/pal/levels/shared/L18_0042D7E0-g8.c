@@ -2,22 +2,22 @@
 extern u8 *g_moby_l18_table MACRO_ADDR;
 extern int ref_L18_00428AE8_00 __attribute__((sda));
 typedef union { u8 b[0x100]; s16 h[0x80]; int i[0x40]; float f[0x40]; } Obj;
-extern int D_L18_001B1240 __attribute__((sda));
-extern int D_L18_001B1264 __attribute__((sda));
+extern int g_enemy_timer_reset_value __attribute__((sda));
+extern int g_receiver_wander_timer __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern void add_vectors(void *, void *, void *);
-extern int func_PAL_L01_00323068(void *, void *);
-extern int func_PAL_002B5BA8(void *, void *, float);
-extern void func_PAL_L01_0031A4D0(void *, void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
+extern int moby_turn_toward_target_and_step_pal(void *, void *, float);
+extern void enemy_update_wander_heading_pal(void *, void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int ref_L18_00428AE8_01(void *, int);
 extern int moby_set_anim(void *, int, int);
 extern int moby_toggle_anim_helper(void *);
-extern void func_PAL_L18_0042BA90(void *, int, int, float);
+extern void moby_start_or_forward_anim_pal(void *, int, int, float);
 extern void moby_set_state(void *, int, int);
 extern int func_PAL_L18_0042CD70(void *);
 extern int func_001163B0(void);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 /* func_PAL_L18_0042D7E0, the PAL copy of func_L18_00428AE8: the same C, with both reloads of the timer
    scaled to 50 Hz. */
 void func_PAL_L18_0042D7E0(u8 *o) {
@@ -41,7 +41,7 @@ void func_PAL_L18_0042D7E0(u8 *o) {
         old2 = *(float *)(s+0x10C);
         *(float *)(s+0x110) = 3.1415927f;
         *(float *)(s+0x10C) = 0.5f;
-        func_PAL_L01_00323068(o,a);
+        moby_l01_turn_toward_target_pal(o,a);
         *(float *)(s+0x128) *= 0.1f;
         *(float *)(s+0x120) *= 0.1f;
         *(float *)(s+0x110) = old1;
@@ -54,14 +54,14 @@ void func_PAL_L18_0042D7E0(u8 *o) {
                 case 5:
                     if (s[0x399] & 2) s[0x399] = 0;
                     moby_set_anim(o, *(int *)(s+0x374), -1);
-                    *(u16 *)(s+0x392) = (D_L18_001B1240 * 5 + 2) / 6;
-                    func_PAL_L18_0042BA90(o,2,0,10.0f);
+                    *(u16 *)(s+0x392) = (g_enemy_timer_reset_value * 5 + 2) / 6;
+                    moby_start_or_forward_anim_pal(o,2,0,10.0f);
                     moby_set_state(o,4,6);
                     break;
                 case 6:
                     if (moby_toggle_anim_helper(o)) {
-                        *(u16 *)(s+0x392) = (D_L18_001B1240 * 5 + 2) / 6;
-                        func_PAL_L18_0042BA90(o,2,0,10.0f);
+                        *(u16 *)(s+0x392) = (g_enemy_timer_reset_value * 5 + 2) / 6;
+                        moby_start_or_forward_anim_pal(o,2,0,10.0f);
                         moby_set_state(o,4,6);
                     }
                     if (*(s16 *)(o+0xAA) != 0xEC0) func_PAL_L18_0042CD70(o);
@@ -69,7 +69,7 @@ void func_PAL_L18_0042D7E0(u8 *o) {
                 case 2:
                     moby_toggle_anim_helper(o);
                     if (o[0x60] & 2) {
-                        func_PAL_L18_0042BA90(o,func_001163B0() & 1,0,10.0f);
+                        moby_start_or_forward_anim_pal(o,func_001163B0() & 1,0,10.0f);
                         moby_set_state(o,2,-1);
                     }
                     break;
@@ -84,22 +84,22 @@ void func_PAL_L18_0042D7E0(u8 *o) {
                 goto restore;
 
         } else if (o[0x95] == 6) {
-            if (o[0x20] == o[0x95]) func_PAL_L01_00323068(o,s+0x220);
+            if (o[0x20] == o[0x95]) moby_l01_turn_toward_target_pal(o,s+0x220);
             else {
-                func_PAL_002B5BA8(o,s+0x220,0.0f);
+                moby_turn_toward_target_and_step_pal(o,s+0x220,0.0f);
                 func_PAL_L18_0042CD70(o);
             }
         } else {
 wander:
-            func_PAL_L01_0031A4D0(o,s+0x1F0,s+0x100);
+            enemy_update_wander_heading_pal(o,s+0x1F0,s+0x100);
             if (*(s16 *)(s+0x392) == 0) {
-                *(u16 *)(s+0x392) = (D_L18_001B1264 * 5 + 2) / 6;
-                func_PAL_L18_0042BA90(o,func_001163B0() & 1,0,10.0f);
+                *(u16 *)(s+0x392) = (g_receiver_wander_timer * 5 + 2) / 6;
+                moby_start_or_forward_anim_pal(o,func_001163B0() & 1,0,10.0f);
                 moby_set_state(o,2,-1);
             }
         }
         if (*(float *)(o+0x18) < *(float *)(s+0x90)) {
-            func_PAL_002A7650(o,0,3);
+            SetDeathBits_pal(o,0,3);
             moby_set_state(o,12,10);
         }
 restore:

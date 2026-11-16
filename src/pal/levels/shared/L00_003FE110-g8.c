@@ -30,20 +30,20 @@ extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void *part_spawn_spinning_particle(void *, void *, unsigned, unsigned, float, int, int, int, int, int, float);
 extern char *SpawnSpinningSparkParticle(float, float, void *, int, void *, unsigned, int, float, float);
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern float D_L00_001B0AA0 __attribute__((sda));
-extern float D_L00_001B0AB4 __attribute__((sda));
-extern float D_L00_001B0AAC __attribute__((sda));
-extern float D_L00_001B0AB0 __attribute__((sda));
-extern int D_L00_001B0AB8 __attribute__((sda));
-extern int D_L00_001B0B64 __attribute__((sda));
-extern int D_L00_001B0AF0 __attribute__((sda));
-extern int D_L00_001B0AF4 __attribute__((sda));
-extern float D_L00_001B0B04 __attribute__((sda));
-extern float D_L00_001B0B08 __attribute__((sda));
-extern float D_L00_001B0AD8 __attribute__((sda));
-extern float D_L00_001B0B58 __attribute__((sda));
-extern float D_L00_001B0B5C __attribute__((sda));
+extern char g_default_vector[] __attribute__((sda));
+extern float g_effect_spin_speed_a __attribute__((sda));
+extern float g_effect_spin_speed_b __attribute__((sda));
+extern float g_effect_spin_speed_c __attribute__((sda));
+extern float g_effect_spin_speed_d __attribute__((sda));
+extern int g_effect_timer_limit __attribute__((sda));
+extern int g_screen_fade_timer __attribute__((sda));
+extern int g_effect_id_min __attribute__((sda));
+extern int g_effect_id_max __attribute__((sda));
+extern float g_effect_dir_speed_min __attribute__((sda));
+extern float g_effect_dir_speed_max __attribute__((sda));
+extern float g_effect_trail_speed_scale __attribute__((sda));
+extern float g_glow_radius_max __attribute__((sda));
+extern float g_glow_radius_min __attribute__((sda));
 
 typedef int EffectQuad __attribute__((mode(TI)));
 
@@ -84,38 +84,38 @@ void func_PAL_L00_003FE110(Emitter *self)
 
     vec_transform_or_copy(self->pos, self->pos);
     func_PAL_L00_004007B0();
-    state->angles[0] = FastAddRotations(state->angles[0], D_L00_001B0AA0 * 0.01745329424738884f);
-    state->angles[1] = FastAddRotations(state->angles[1], D_L00_001B0AB4 * 0.01745329424738884f);
+    state->angles[0] = FastAddRotations(state->angles[0], g_effect_spin_speed_a * 0.01745329424738884f);
+    state->angles[1] = FastAddRotations(state->angles[1], g_effect_spin_speed_b * 0.01745329424738884f);
     state->angles[2] = FastAddRotations(state->angles[2], 0.00436332356184721f);
     state->angles[3] = FastAddRotations(state->angles[3], -0.00436332356184721f);
-    state->angles[4] = FastAddRotations(state->angles[4], D_L00_001B0AAC * 0.01745329424738884f);
-    state->angles[5] = FastAddRotations(state->angles[5], D_L00_001B0AB0 * 0.01745329424738884f);
+    state->angles[4] = FastAddRotations(state->angles[4], g_effect_spin_speed_c * 0.01745329424738884f);
+    state->angles[5] = FastAddRotations(state->angles[5], g_effect_spin_speed_d * 0.01745329424738884f);
     FastDecTimer(&state->timer2);
     FastDecTimer(&state->timer3);
     math_fast_float_d(&state->f40);
     if (FastDecTimer(&state->timer1) && state->timer2 == 0) {
-        if (!D_L00_001B0B64)
+        if (!g_screen_fade_timer)
             moby_mark_spawned(self);
         return;
     }
 
     gfx_register_final_draw_callback((void *)func_PAL_L00_003FF050, self);
 
-    if (state->timer2 >= ((D_L00_001B0AB8 - 6) * 5 + 2) / 6) {
+    if (state->timer2 >= ((g_effect_timer_limit - 6) * 5 + 2) / 6) {
         for (i = 0; i < 20; i++) {
             float angle1, angle2;
             int id;
 
-            FastVecScale(a, self->dirC0, math_random_float_range(D_L00_001B0B04, D_L00_001B0B08) * 0.020000001f);
+            FastVecScale(a, self->dirC0, math_random_float_range(g_effect_dir_speed_min, g_effect_dir_speed_max) * 0.020000001f);
             angle1 = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
             angle2 = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
             math_build_axis_angle_quat(c, self->dirD0, angle1);
             vec_rotate_by_quaternion(b, a, c);
             math_build_axis_angle_quat(c, self->dirC0, angle2);
             vec_rotate_by_quaternion(b, b, c);
-            id = (math_random_int_range(D_L00_001B0AF0, D_L00_001B0AF4) * 5 + 2) / 6;
+            id = (math_random_int_range(g_effect_id_min, g_effect_id_max) * 5 + 2) / 6;
             vec_add_transformed_or_copy(b, b, self->pos);
-            part_spawn_trail_2(self->pos, b, id, D_L00_001B0AD8 * 0.00040000002f);
+            part_spawn_trail_2(self->pos, b, id, g_effect_trail_speed_scale * 0.00040000002f);
         }
     }
 
@@ -136,7 +136,7 @@ void func_PAL_L00_003FE110(Emitter *self)
     }
 
     x = IntToFloat(state->timer2);
-    radius = (D_L00_001B0B5C + (D_L00_001B0B58 - D_L00_001B0B5C) * (x * state->scale)) * 1.5f;
+    radius = (g_glow_radius_min + (g_glow_radius_max - g_glow_radius_min) * (x * state->scale)) * 1.5f;
     height = state->height;
     y = self->pos[2] - height;
     if (y > 0.0f && y < radius && state->timer2 >= 22) {
@@ -168,7 +168,7 @@ void func_PAL_L00_003FE110(Emitter *self)
             if (math_random_int_below(2))
                 id = -id;
             speed = math_random_float_range(0.2f, 1.5f) * 210000.0f;
-            spark = SpawnSpinningSparkParticle(0.3f, 1.0f, d, id, D_L00_001A8F20, 0x7F204080, 1, 0.9f, speed);
+            spark = SpawnSpinningSparkParticle(0.3f, 1.0f, d, id, g_default_vector, 0x7F204080, 1, 0.9f, speed);
             FastVecAdd(d, d, f);
             if (spark) {
                 char *ext = spark + 0x20;

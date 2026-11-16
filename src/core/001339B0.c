@@ -5,13 +5,13 @@
    0x001A7200/0x001A7208/0x001A7210; retail reaches the last one $gp-relative
    because its store lands in the jr delay slot (0x001A7210 = $gp - 0x7DE0).
    0x10000800 is T1_COUNT. */
-extern long D_001A7200 NOT_SDA;
-extern long D_001A7208 NOT_SDA;
-extern long D_001A7210 MACRO_ADDR;
+extern long g_timer_base_count NOT_SDA;
+extern long g_vsync_count NOT_SDA;
+extern long g_timer_total_count MACRO_ADDR;
 
 /* Runs every vertical sync and updates the timer counters. */
 int timer_update_vsync_counters(void) {
-    D_001A7208++;
-    D_001A7210 = D_001A7200 + (unsigned int)((int)T1_COUNT);
+    g_vsync_count++;
+    g_timer_total_count = g_timer_base_count + (unsigned int)((int)T1_COUNT);
     return 0;
 }

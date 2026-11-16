@@ -77,15 +77,15 @@ typedef struct { u8 prefix[0x18]; u8 *object; } CollisionQueryPrefix;
 extern u8 g_hero_state[];
 #define HERO_TARGET ((HeroTargetPrefix *)D_00189E20)
 /* Mixed absolute/GP reads of the same mutable frame counter. */
-extern int D_L01_001B2088 MACRO_ADDR;
-extern int D_L01_001AFDB0 __attribute__((sda));
+extern int g_oozla_intro_stage MACRO_ADDR;
+extern int g_swamp_beast_anim_blend_frames __attribute__((sda));
 extern u8 *g_moby_l01_table __attribute__((sda));
 /* 128-byte destination records with a 16-byte position at +0x30. */
 typedef struct { u8 prefix[0x30]; float position[4]; u8 rest[0x40]; } DestinationRecord;
-extern DestinationRecord *D_L01_001B264C MACRO_ADDR;
-extern u8 D_L01_001BF900[];
+extern DestinationRecord *g_swamp_patrol_positions MACRO_ADDR;
+extern u8 g_collision_l01_hit[];
 #define COLLISION_QUERY ((CollisionQueryPrefix *)D_L01_001BF900)
-extern u8 D_L01_001AC5A0[] MACRO_ADDR;
+extern u8 g_monster_vector_template[] MACRO_ADDR;
 
 #define STATE_INT(o) (((int *)state)[(o)/4])
 #define STATE_UINT(o) (((unsigned int *)state)[(o)/4])
@@ -232,7 +232,7 @@ pursuit_wait:
     }
     goto pursuit_done;
 pursuit_weave:
-    weave=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
+    weave=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_oozla_intro_stage)*0.01163553074002266f))*0.8726646900177002f;
     if (vec_distance_xy(object+0x10,state+0x230)<4.75f) weave=0.0f;
     swamp_beast_move_with_speed(object,state+0x2E0,&weave);
     part_spawn_surface_particles((char *)object,1,-1.0f);
@@ -242,7 +242,7 @@ pursuit_weave:
             if (FastDiffRots(*(float *)(object+0xF8),angle)<0.174532949924469f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
-                if (object[0x43]!=10) anim_start_blended(object,10,D_L01_001AFDB0,math_random_int_range(16,22));
+                if (object[0x43]!=10) anim_start_blended(object,10,g_swamp_beast_anim_blend_frames,math_random_int_range(16,22));
                 moby_set_state(object,1,4);
             }
         }
@@ -253,7 +253,7 @@ pursuit_straight:
         int destination=STATE_INT(0x310);
         straight=0.0f;
         if (destination==-1) swamp_beast_move_with_speed(object,state+0x2D0,&straight);
-        else swamp_beast_move_with_speed(object,D_L01_001B264C[destination].position,&straight);
+        else swamp_beast_move_with_speed(object,g_swamp_patrol_positions[destination].position,&straight);
     }
     part_spawn_surface_particles((char *)object,1,-1.0f);
     if ((object[0x60]&2) && (*(u64 *)(state+0x1A0)&0x18000000000ULL)!=0x10000000000ULL) {
@@ -275,8 +275,8 @@ pursuit_group:
         g_moby_l01_table[STATE_INT(0x38C)*256+0xBC])) moby_set_state(object,7,-1);
     goto pursuit_done;
 pursuit_leave:
-    pursuit=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(D_L01_001B2088)*0.01163553074002266f))*0.8726646900177002f;
-    qcopy(state+0x2E0, D_L01_001B264C[STATE_INT(0x380)].position);
+    pursuit=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(g_oozla_intro_stage)*0.01163553074002266f))*0.8726646900177002f;
+    qcopy(state+0x2E0, g_swamp_patrol_positions[STATE_INT(0x380)].position);
     swamp_beast_move_with_speed(object,state+0x2E0,&pursuit);
     part_spawn_surface_particles((char *)object,1,-1.0f);
     if ((STATE_UINT(0x1A4)&0x80) && !object[0x31]) {
@@ -337,7 +337,7 @@ pursuit_distance:
             if (FastDiffRots(*(float *)(object+0xF8),angle)<0.523598849773407f) {
                 qzero(state+0x1B0);
                 state[0x35C]=0;
-                if (object[0x43]!=10) anim_start_blended(object,10,D_L01_001AFDB0,math_random_int_range(8,12));
+                if (object[0x43]!=10) anim_start_blended(object,10,g_swamp_beast_anim_blend_frames,math_random_int_range(8,12));
                 moby_set_state(object,1,4);
             } else {
                 float *heading=(float *)(object+0xF8);
@@ -427,7 +427,7 @@ phase_done:
 
             if (target && !level_has_pending_inner_flag((char *)target)) {
                 v = &local.target;
-                qcopy(v, D_L01_001AC5A0);
+                qcopy(v, g_monster_vector_template);
             } else
                 vec_scale_to_length(&local.target,state+0x160,1.0f);
             v = &local.target;

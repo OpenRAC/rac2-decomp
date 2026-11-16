@@ -3,7 +3,7 @@
 
 
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L00_001AF7A4 __attribute__((sda));
+extern float g_moby_offset_x __attribute__((sda));
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 

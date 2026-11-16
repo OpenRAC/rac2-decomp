@@ -19,17 +19,17 @@ extern void water_fill_grid_points(void *);
 extern void water_scroll_texture_coords(void *);
 extern u64 GetEffectTextureDescriptor(int);
 extern void water_cull_and_submit_tile(void *,int,int);
-extern char D_L04_001B9680[];
-extern union { u32 *words; char *bytes; } D_L04_001B2C48 MACRO_ADDR;
-extern int D_L04_001ADA30 __attribute__((sda));
-extern int D_L04_001ADA34 __attribute__((sda));
-extern int D_L04_001AD820 __attribute__((sda));
-extern int D_L04_001AD82C __attribute__((sda));
-extern int D_L04_001AD884 __attribute__((sda));
-extern int D_L04_001AD888 __attribute__((sda));
-extern int D_L04_001AD88C __attribute__((sda));
-extern int D_L04_001AD890 __attribute__((sda));
-extern float D_L04_001AD848, D_L04_001AD84C;
+extern char g_tether_zero_vec[];
+extern union { u32 *words; char *bytes; } g_water_dma_packet_ptr MACRO_ADDR;
+extern int g_water_color_a __attribute__((sda));
+extern int g_water_color_b __attribute__((sda));
+extern int g_water_tween_color __attribute__((sda));
+extern int g_water_grid_index __attribute__((sda));
+extern int g_water_texture_id __attribute__((sda));
+extern int g_water_second_texture_id __attribute__((sda));
+extern int g_water_l04_second_alpha __attribute__((sda));
+extern int g_water_alpha_index __attribute__((sda));
+extern float g_water_tile_half_x, g_water_tile_half_y;
 typedef struct {
     f32 position[3];
     u8 pad0C[8];
@@ -90,12 +90,12 @@ void render_water_grids(WaterGrid *water_grid, s32 count) {
         water_grid->scroll1 = scroll1;
         water_grid->uv2 = uv2;
         water_grid->uv3 = uv3;
-        D_L04_001AD820=FastTweenColor(D_L04_001ADA30,D_L04_001ADA34,blend);
-        x_offset = water_grid->position[0] + D_L04_001AD848;
-        x_end = water_grid->position[0] - D_L04_001AD848;
+        g_water_tween_color=FastTweenColor(g_water_color_a,g_water_color_b,blend);
+        x_offset = water_grid->position[0] + g_water_tile_half_x;
+        x_end = water_grid->position[0] - g_water_tile_half_x;
         corners[0][0] = x_offset;
-        y_offset = water_grid->position[1] + D_L04_001AD84C;
-        y_end = water_grid->position[1] - D_L04_001AD84C;
+        y_offset = water_grid->position[1] + g_water_tile_half_y;
+        y_end = water_grid->position[1] - g_water_tile_half_y;
         corners[0][1] = y_offset;
         z = water_grid->position[2];
         corners[0][2] = z;
@@ -115,11 +115,11 @@ void render_water_grids(WaterGrid *water_grid, s32 count) {
         near_bits = 0;
         far_bits = 0;
         for (j = 0; j < 4; j++) {
-            FastVecSub(near_clip, corners[j], D_L04_001B9680);
+            FastVecSub(near_clip, corners[j], g_tether_zero_vec);
             FastVecScale(far_clip, near_clip, 1024.0f);
             FastVecScale(near_clip, near_clip, 1024.0f);
-            transform_vector(far_clip, far_clip, D_L04_001B9680 - 0x80);
-            transform_vector(near_clip, near_clip, D_L04_001B9680 - 0x40);
+            transform_vector(far_clip, far_clip, g_tether_zero_vec - 0x80);
+            transform_vector(near_clip, near_clip, g_tether_zero_vec - 0x40);
             far_bits = (far_bits << 8) | is_vector_outside_clip(far_clip);
             near_bits = (near_bits << 8) | is_vector_outside_clip(near_clip);
         }
@@ -130,7 +130,7 @@ void render_water_grids(WaterGrid *water_grid, s32 count) {
         if ((near_bits & 0x20202020) == 0x20202020) goto next_entity;
 
         twice=blend+blend;
-        ripple_heights_to_scratchpad((void *)0x70000000, (u8 *)water_grid + ((*(s32 *)&D_L04_001AD82C) * 0x5c0 + 0x50));
+        ripple_heights_to_scratchpad((void *)0x70000000, (u8 *)water_grid + ((*(s32 *)&g_water_grid_index) * 0x5c0 + 0x50));
         water_submit_patch_at_pos(water_grid);
         water_fill_grid_points(water_grid);
         water_scroll_texture_coords(water_grid);
@@ -161,19 +161,19 @@ void render_water_grids(WaterGrid *water_grid, s32 count) {
         interpolated_alpha = alpha + (v-alpha)*blend;
         lower = 1.0f-twice;
         upper = twice-1.0f;
-        D_L04_001B2C48.words[0] = 0x10000005;
-        D_L04_001B2C48.words[1] = 0;
-        D_L04_001B2C48.words[2] = 0x11000000;
-        D_L04_001B2C48.words[3] = 0x50000005;
+        g_water_dma_packet_ptr.words[0] = 0x10000005;
+        g_water_dma_packet_ptr.words[1] = 0;
+        g_water_dma_packet_ptr.words[2] = 0x11000000;
+        g_water_dma_packet_ptr.words[3] = 0x50000005;
         reverse = water_grid->reverse;
-        D_L04_001B2C48.bytes += 16;
+        g_water_dma_packet_ptr.bytes += 16;
         if (reverse) {
             if (twice<=1.0f) { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=FloatToInt(lower*70.0f); }
             else { ref_L04_003A21F8_01.b=2; ref_L04_003A21F8_01.alpha=FloatToInt(upper*170.5f); }
         } else if (twice>=1.0f) { n=2; ref_L04_003A21F8_01.b=n; ref_L04_003A21F8_01.alpha=FloatToInt(upper*170.0f); }
         else { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=FloatToInt(lower*70.0f); }
         alpha_index=FloatToInt(interpolated_alpha);
-        data = (u64 *)D_L04_001B2C48.words;
+        data = (u64 *)g_water_dma_packet_ptr.words;
         data[0] = 0x4000000000008001ULL;
         data[1] = 0xeeee;
         state0 = (u64)ref_L04_003A21F8_00.a;
@@ -197,12 +197,12 @@ void render_water_grids(WaterGrid *water_grid, s32 count) {
         {
             u32 texture_id = water_grid->texture0;
             u32 second_texture_id = water_grid->texture1;
-            D_L04_001B2C48.words = (u32 *)(data + 10);
-            (*(u32 *)&D_L04_001AD884) = texture_id;
-            (*(u32 *)&D_L04_001AD888) = second_texture_id;
+            g_water_dma_packet_ptr.words = (u32 *)(data + 10);
+            (*(u32 *)&g_water_texture_id) = texture_id;
+            (*(u32 *)&g_water_second_texture_id) = second_texture_id;
         }
-        (*(u32 *)&D_L04_001AD88C) = water_grid->alpha2;
-        (*(u32 *)&D_L04_001AD890) = alpha_index;
+        (*(u32 *)&g_water_l04_second_alpha) = water_grid->alpha2;
+        (*(u32 *)&g_water_alpha_index) = alpha_index;
         for (index = 0; index < 16; index++, mask = (s32)mask >> 1) {
             if (mask & 1) water_cull_and_submit_tile(water_grid, index, mode);
         }
@@ -210,11 +210,11 @@ next_entity:
         i++;
         water_grid++;
     } while (i < count);
-    D_L04_001B2C48.words[0] = 0x10000000;
-    D_L04_001B2C48.words[1] = 0;
-    D_L04_001B2C48.words[2] = 0x13000000;
-    D_L04_001B2C48.words[3] = 0;
-    D_L04_001B2C48.bytes += 16;
+    g_water_dma_packet_ptr.words[0] = 0x10000000;
+    g_water_dma_packet_ptr.words[1] = 0;
+    g_water_dma_packet_ptr.words[2] = 0x13000000;
+    g_water_dma_packet_ptr.words[3] = 0;
+    g_water_dma_packet_ptr.bytes += 16;
     VU1_addGSregister(0x47,0x5360B);
     VU1_addGSregister(0x48,0x5360B);
 }

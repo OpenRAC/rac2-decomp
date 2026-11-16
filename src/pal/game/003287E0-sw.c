@@ -1,15 +1,15 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_0022AFA0[8][4];
-extern float D_0022B020[8][4];
-extern float D_001B27B0[4] __attribute__((sda));
-extern float D_001BAFA0[4];
-extern float D_001BAFC0[4] __attribute__((sda));
-extern int D_001B27C4;
-extern float D_001B0108 __attribute__((sda));
-extern float D_001B0134 __attribute__((sda));
-extern float D_001B0130 __attribute__((sda));
+extern float g_vehicle_probe_vectors[8][4];
+extern float g_vehicle_ground_points[8][4];
+extern float g_gravity_direction[4] __attribute__((sda));
+extern float g_coll_hit_position[4];
+extern float g_coll_hit_normal[4] __attribute__((sda));
+extern int g_ground_align_override;
+extern float g_vehicle_probe_lift __attribute__((sda));
+extern float g_vehicle_ground_angle_scale __attribute__((sda));
+extern float g_vehicle_ground_lerp_rate __attribute__((sda));
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -34,9 +34,9 @@ extern void multiply_matrix3x3(void *, void *, void *);
    third row (+0xE0) follows the mean normal of the kept points and eases
    the position (+0x10) toward their centre along D_001B27B0. Without any
    hit it sets state 4 and a velocity along the first row. */
-void func_PAL_00328B28(char *object)
+void vehicle_align_to_ground_surface_pal(char *object)
 {
-    float (*probes)[4] = D_0022AFA0;
+    float (*probes)[4] = g_vehicle_probe_vectors;
     float edges[8][4];
     float offset[4], center[4], normal[4];
     char *state = *(char **)(object + 0x68);
@@ -52,8 +52,8 @@ void func_PAL_00328B28(char *object)
     vec_clear_128(center);
     hit = 0;
     vec_clear_128(normal);
-    vec_scale_to_length(offset, D_001B27B0, D_001B0108 + D_001B0108);
-    points = D_0022B020;
+    vec_scale_to_length(offset, g_gravity_direction, g_vehicle_probe_lift + g_vehicle_probe_lift);
+    points = g_vehicle_ground_points;
     out = points;
     count = 0;
     for (i = 0; i < 8; i++) {
@@ -66,13 +66,13 @@ void func_PAL_00328B28(char *object)
                 *(int *)(state + 0x20) = 8;
                 continue;
             }
-            FastVecScale(b, D_001BAFC0, 0.0009765625f);
+            FastVecScale(b, g_coll_hit_normal, 0.0009765625f);
             vec_scale_to_length(b, b, 1.0f);
-            vec_scale_to_length(c, D_001B27B0, -1.0f);
-            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || D_001B27C4) {
-                qcopy(out, D_001BAFA0);
+            vec_scale_to_length(c, g_gravity_direction, -1.0f);
+            if (subtract_integer_with_clamp(FastVecDot(b, c) > 0.5f) || g_ground_align_override) {
+                qcopy(out, g_coll_hit_position);
                 ++out;
-                FastVecAdd(center, center, D_001BAFA0);
+                FastVecAdd(center, center, g_coll_hit_position);
                 ++count;
             }
         }
@@ -105,16 +105,16 @@ void func_PAL_00328B28(char *object)
             vec_scale_to_length(c, moby + 0xE0, 1.0f);
             vec_scale_to_length(b, a, 1.0f);
             FastVecCross(axis, c, b);
-            angle = FastVecDot(c, b) * (D_001B0134 * 0.5f);
+            angle = FastVecDot(c, b) * (g_vehicle_ground_angle_scale * 0.5f);
             FastVecScale(b, axis, math_fast_sin_or_cos_b(angle));
             b[3] = math_fast_sin_or_cos_a(angle);
             quaternion_to_rotation_basis(b, matrix);
             multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
             FastVecScale(center, center, inv);
             FastVecSub(target, center, moby + 0x10);
-            FastVecScale(target, D_001B27B0, FastVecDot(target, D_001B27B0));
+            FastVecScale(target, g_gravity_direction, FastVecDot(target, g_gravity_direction));
             FastVecAdd(target, target, moby + 0x10);
-            lerp_vector(moby + 0x10, moby + 0x10, target, D_001B0130);
+            lerp_vector(moby + 0x10, moby + 0x10, target, g_vehicle_ground_lerp_rate);
         }
         vec_scale_to_length(a, moby + 0xE0, 0.15f);
         FastVecAdd(a, moby + 0x10, a);

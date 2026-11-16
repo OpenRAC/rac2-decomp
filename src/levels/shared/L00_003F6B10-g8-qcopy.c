@@ -9,14 +9,14 @@ typedef struct {
     float rate, angle, unused1C, widthEnd, widthStart, heightEnd, heightStart;
     float phase, step, widthModulation, heightModulation;
 } Particle;
-extern int D_L00_001B09F0 __attribute__((sda));
-extern float D_L00_001B09E4 __attribute__((sda));
-extern int D_L00_001B09E8 __attribute__((sda));
-extern int D_L00_001B09EC __attribute__((sda));
-extern int D_L00_001A8FF0;
-extern int D_0018C0B4 NOT_SDA;
+extern int g_vaporizer_spark_alpha __attribute__((sda));
+extern float g_vaporizer_spark_blend_scale __attribute__((sda));
+extern int g_vaporizer_spark_color_end __attribute__((sda));
+extern int g_vaporizer_spark_color_start __attribute__((sda));
+extern int g_hero_locked_flag;
+extern int g_game_mode NOT_SDA;
 extern Vector g_camera_l00_position;
-extern Vector D_L00_001AA310[4];
+extern Vector g_billboard_corner_table[4];
 extern char *level_get_slot_body(int, int);
 extern char *level_get_slot_header(int, int);
 extern float IntToFloat(int);
@@ -54,8 +54,8 @@ void vaporizer_bolt_draw_sparks(char *object)
     up.q = 0;
     up.f.z = 1.0f;
     up.f.w = 1.0f;
-    alpha = IntToFloat(D_L00_001B09F0);
-    if (D_0018C0B4 == 29)
+    alpha = IntToFloat(g_vaporizer_spark_alpha);
+    if (g_game_mode == 29)
         alpha *= 0.5f;
     gfx_init_quad_packet_state(&packet, 0x36, 0, 0x80);
     packet.uv[0] = 0.0f;
@@ -72,9 +72,9 @@ void vaporizer_bolt_draw_sparks(char *object)
         if (particle->active != 0) {
             t = (float)particle->age * particle->rate;
             alphaByte = FloatToInt(alpha * t) << 24;
-            blend = math_wrap_angle_to_pi(t * 3.1415927f * D_L00_001B09E4);
+            blend = math_wrap_angle_to_pi(t * 3.1415927f * g_vaporizer_spark_blend_scale);
             blend = math_fabs(math_fast_sin_or_cos_b(blend));
-            color = alphaByte | FastTweenColor(D_L00_001B09EC, D_L00_001B09E8, blend);
+            color = alphaByte | FastTweenColor(g_vaporizer_spark_color_start, g_vaporizer_spark_color_end, blend);
             packet.colors[3] = color;
             packet.colors[2] = color;
             packet.colors[1] = color;
@@ -89,7 +89,7 @@ void vaporizer_bolt_draw_sparks(char *object)
             matrix[3].q = particle->position.q;
             FastVecSub(&matrix[0], &g_camera_l00_position, &matrix[3]);
             vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
-            if (D_L00_001A8FF0 != 0)
+            if (g_hero_locked_flag != 0)
                 cam_compute_view_direction((char *)&matrix[3], (char *)&up, 1);
             sizeX = width + pulseX;
             height = height + pulseY;
@@ -103,9 +103,9 @@ void vaporizer_bolt_draw_sparks(char *object)
             rotationCos = math_fast_sin_or_cos_a(particle->angle);
             rotationSin = math_fast_sin_or_cos_b(particle->angle);
             for (j = 0; j < 4; j++) {
-                point.f.y = D_L00_001AA310[j].f.y * sizeX;
-                point.f.x = D_L00_001AA310[j].f.x;
-                point.f.z = D_L00_001AA310[j].f.z * height;
+                point.f.y = g_billboard_corner_table[j].f.y * sizeX;
+                point.f.x = g_billboard_corner_table[j].f.x;
+                point.f.z = g_billboard_corner_table[j].f.z * height;
                 rotated.f.y = point.f.y * rotationCos - point.f.z * rotationSin;
                 rotated.f.z = point.f.y * rotationSin + point.f.z * rotationCos;
                 rotated.f.x = point.f.x;

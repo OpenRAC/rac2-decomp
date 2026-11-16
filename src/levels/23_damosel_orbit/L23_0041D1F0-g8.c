@@ -3,19 +3,19 @@
 
 extern char g_hero_state[];
 
-extern int D_L23_001B374C __attribute__((sda));
+extern int g_boss_hud_stat_index __attribute__((sda));
 
 extern int D_L23_001B374C_2;
 
-extern int D_L23_001B3750 __attribute__((sda));
+extern int g_boss_hud_stat_value __attribute__((sda));
 
 extern int D_L23_001B3750_2;
 
-extern int D_L23_001B3754;
+extern int g_boss_hud_display_timer;
 
-extern int D_L23_001B14A4 __attribute__((sda));
+extern int g_boss_stat_step_value __attribute__((sda));
 
-extern char D_L23_001B1F90[];
+extern char g_hud_counters[];
 
 /* Raises one of three level values by its step and clamps it to its limit. Retail reads the
  * entry word again after the stores to the globals; built with -fno-gcse, as here, this cc1
@@ -23,7 +23,7 @@ extern char D_L23_001B1F90[];
  * $gp and through $at are retail's two forms of the same globals. */
 int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
     char *state = *(char **)(obj + 0x68);
-    char *entry = D_L23_001B1F90 + flag * 16;
+    char *entry = g_hud_counters + flag * 16;
     int result = 0;
 
     switch (mode) {
@@ -36,7 +36,7 @@ int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
                 if (*(short *)(state + 0x2F4) < *(int *)(g + 0x1874))
                     *(int *)(g + 0x1874) = *(short *)(state + 0x2F4);
                 result = 1;
-                D_L23_001B374C = 0;
+                g_boss_hud_stat_index = 0;
             }
         } else {
             float lim = (float)*(short *)(state + 0x24);
@@ -52,7 +52,7 @@ int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
     case 1:
         if (*(int *)(entry + 8) < *(short *)(state + 0x2FA)) {
             if (*(short *)(state + 0x2FA) < *(int *)(entry + 8) + *(short *)(state + 0x2F8))
-                D_L23_001B3750 = *(short *)(state + 0x2FA) - *(int *)(entry + 8);
+                g_boss_hud_stat_value = *(short *)(state + 0x2FA) - *(int *)(entry + 8);
             else
                 D_L23_001B3750_2 = *(short *)(state + 0x2F8);
             *(int *)(entry + 8) = *(int *)(entry + 8) + *(short *)(state + 0x2F8);
@@ -60,7 +60,7 @@ int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
                 *(int *)(entry + 8) = *(short *)(state + 0x2FA);
             result = 1;
             if (flag)
-                D_L23_001B374C = 1;
+                g_boss_hud_stat_index = 1;
         }
         break;
     case 2:
@@ -75,6 +75,6 @@ int boss_raise_stat_by_step(char *obj, int unused, int mode, int flag) {
         break;
     }
     if (result)
-        D_L23_001B3754 = D_L23_001B14A4;
+        g_boss_hud_display_timer = g_boss_stat_step_value;
     return result;
 }

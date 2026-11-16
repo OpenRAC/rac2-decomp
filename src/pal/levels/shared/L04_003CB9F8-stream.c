@@ -41,7 +41,7 @@ extern void set_moby_color(void *moby, int r, int g, int b);
    moves every child 1/12 unit on, wrapping from the end back to the start, and as a child
    travels it shrinks, fades in over the first quarter of the way and out over the last,
    and turns from yellow (252 + 2g, 224g, 6g with g = (1 - t)^4) to red. */
-void func_PAL_L04_003CB9F8(Moby *moby)
+void UpdateChildMobyStream_pal(Moby *moby)
 {
     StreamVars *vars = moby->vars;
     Moby **children;

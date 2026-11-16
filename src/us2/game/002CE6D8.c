@@ -29,7 +29,7 @@ void DoGifPaging(void);
 
 /* External functions declared with exact aliases from task.externals */
 
-long long func_US2_002CE878(void)
+long long menu_draw_screen_via_helper_us2(void)
 {
     SetupGifPaging(0LL);
     func_0029C450();

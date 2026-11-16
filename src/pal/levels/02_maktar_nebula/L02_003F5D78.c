@@ -5,10 +5,10 @@ extern void moby_set_state(char *, int, int);
 extern void moby_set_state();
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern void set_moby_color(void *, u8, u8, u8);
-extern u8 D_L02_00220730;
+extern u8 g_actor_match_key;
 
 /* Sets the actor up: re-registers its sub-objects and arms its effects. */
-void func_PAL_L02_003F5D78(char *arg0, int arg1) {
+void actor_revive_pal(char *arg0, int arg1) {
     char *state = *(char **)(arg0 + 0x68);
     int i;
 
@@ -56,11 +56,11 @@ extern void vec_random_direction(char *, float, float);
 extern void func_PAL_002B15D8(char *, int, char *, float, float, float, float, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void IncrementMaktarTypeCounter(int, int);
-extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Tears the actor down: stops its effect, clears its sub-objects, resets flags. */
-void func_PAL_L02_003F5EB0(char *arg0) {
+void actor_tear_down_pal(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     char buffer[0x10];
     int i;
@@ -72,7 +72,7 @@ void func_PAL_L02_003F5EB0(char *arg0) {
     *(unsigned char *)(state + 0x7A) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
     if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        func_PAL_L00_003FB330(arg0 + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
+        SpawnExplosion_pal(arg0 + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
         snd_play_from_class_bank(0, 0, arg0, 0xC3E);
         vec_random_direction(buffer, 0.040000003f, 0.10000001f);
         FastVecAdd(buffer, buffer, state + 0xE0);

@@ -3,7 +3,7 @@
 
 extern char *g_moby_l01_table __attribute__((sda));
 
-extern u16 *D_L01_001FB020[];
+extern u16 *g_group_list_table[];
 
 /* Raises the measured flag on every record of the table the object's selector names. */
 /* Sets a flag on every Mutant Muckdweller in this object's group. */
@@ -14,7 +14,7 @@ void muckdweller_alert_group(s32 moby) {
 
     if (*(u8 *)(moby + 0x21) == 0xFF)
         return;
-    group_list = D_L01_001FB020[*(u8 *)(moby + 0x21)];
+    group_list = g_group_list_table[*(u8 *)(moby + 0x21)];
     if (group_list == 0)
         return;
     member = group_list;
@@ -33,7 +33,7 @@ void muckdweller_alert_group(s32 moby) {
 
 typedef unsigned int TI128 __attribute__((mode(TI)));
 
-extern u8 *D_L01_001B264C __attribute__((sda));
+extern u8 *g_swamp_patrol_positions __attribute__((sda));
 
 extern char g_hero_position[];
 
@@ -53,7 +53,7 @@ void muckdweller_find_farthest_anchor(u8 *moby, u8 *out) {
         s32 index = *index_ptr;
 
         if (index != -1) {
-            u8 *base = D_L01_001B264C;
+            u8 *base = g_swamp_patrol_positions;
 
             qcopy_nc(&point, base + index * 128 + 0x30);
             distance = vec_distance_xy(&point, g_hero_position);
@@ -89,22 +89,22 @@ typedef struct {
 } UpdateHero;
 extern UpdateHero g_hero_state NOT_SDA;
 typedef int UpdateQuad __attribute__((mode(TI)));
-extern f32 D_L01_001B1B28 __attribute__((sda));
-extern f32 D_L01_001B1B2C __attribute__((sda));
-extern f32 D_L01_001B1B30 __attribute__((sda));
-extern f32 D_L01_001B1B34 __attribute__((sda));
-extern f32 D_L01_001B1B38 __attribute__((sda));
-extern f32 D_L01_001B1B3C __attribute__((sda));
-extern f32 D_L01_001B1B40 __attribute__((sda));
-extern f32 D_L01_001B1B44 __attribute__((sda));
-extern f32 D_L01_001B1B48 __attribute__((sda));
-extern f32 D_L01_001B1B4C __attribute__((sda));
-extern f32 D_L01_001B1B50 __attribute__((sda));
-extern f32 D_L01_001B1B54 __attribute__((sda));
-extern f32 D_L01_001B1B58 __attribute__((sda));
-extern f32 D_L01_001B1B5C __attribute__((sda));
-extern f32 D_L01_001B1B60 __attribute__((sda));
-extern f32 D_L01_001B1B64 __attribute__((sda));
+extern f32 g_muckdweller_ease_offset __attribute__((sda));
+extern f32 g_muckdweller_back_speed __attribute__((sda));
+extern f32 g_muckdweller_forward_speed __attribute__((sda));
+extern f32 g_muckdweller_unused_float_a __attribute__((sda));
+extern f32 g_muckdweller_unused_float_b __attribute__((sda));
+extern f32 g_muckdweller_scale_param __attribute__((sda));
+extern f32 g_muckdweller_angle_x_degrees __attribute__((sda));
+extern f32 g_muckdweller_angle_y_degrees __attribute__((sda));
+extern f32 g_muckdweller_tilt_gain __attribute__((sda));
+extern f32 g_muckdweller_side_gain __attribute__((sda));
+extern f32 g_muckdweller_approach_accel_a __attribute__((sda));
+extern f32 g_muckdweller_approach_accel_b __attribute__((sda));
+extern f32 g_muckdweller_approach_accel_c __attribute__((sda));
+extern f32 g_muckdweller_settle_accel_a __attribute__((sda));
+extern f32 g_muckdweller_settle_accel_b __attribute__((sda));
+extern f32 g_muckdweller_settle_accel_c __attribute__((sda));
 typedef struct {
  u8 pad0[0x60];
  f32 field60;
@@ -160,7 +160,7 @@ void UpdateOozlaTiltingLift(Object0041C970 *obj) {
    p->field7C=math_random_angle();
    p->field6C=obj->position[2]-height0;
    p->field60=p->field6C;
-   p->field64=p->field6C-D_L01_001B1B28;
+   p->field64=p->field6C-g_muckdweller_ease_offset;
    p->field68=0;
    qcopy((u8 *)p+0x80,obj->rotation);
    qzero((u8 *)p+0x90);
@@ -177,18 +177,18 @@ void UpdateOozlaTiltingLift(Object0041C970 *obj) {
   if((g_hero_state.platform==obj && !g_hero_state.flag34E) || trigger) {
    if(trigger) obj->collisionFlags=0;
    else obj->collisionFlags=obj->classData->flags;
-   x=math_ease_out_quad((p->field6C-p->field64)/D_L01_001B1B28);
+   x=math_ease_out_quad((p->field6C-p->field64)/g_muckdweller_ease_offset);
    timestep=0.01666666753590107f;
-   p->field68=-(D_L01_001B1B2C*timestep)*x;
+   p->field68=-(g_muckdweller_back_speed*timestep)*x;
   } else {
    obj->collisionFlags=obj->classData->flags;
-   x=math_ease_out_quad((D_L01_001B1B28-(p->field6C-p->field64))/D_L01_001B1B28);
+   x=math_ease_out_quad((g_muckdweller_ease_offset-(p->field6C-p->field64))/g_muckdweller_ease_offset);
    timestep=0.01666666753590107f;
-   p->field68=D_L01_001B1B30*(x*timestep);
+   p->field68=g_muckdweller_forward_speed*(x*timestep);
   }
   p->field6C+=p->field68;
   obj->position[2]=height1+p->field6C;
-  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,D_L01_001B1B3C,D_L01_001B1B40*0.0002908882452175021f,D_L01_001B1B44*0.0002908882452175021f);
+  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0002908882452175021f,g_muckdweller_angle_y_degrees*0.0002908882452175021f);
   FastVecSub(delta,obj->position,oldpos);
   mat_combine_and_store((u8 *)p+0x20,delta,oldrot,obj->rotation);
   break;
@@ -201,19 +201,19 @@ void UpdateOozlaTiltingLift(Object0041C970 *obj) {
   if(!g_hero_state.flag34E && g_hero_state.platform==obj) {
    FastVecSub(local,g_hero_state.position,obj->position);
    x=FastVecDot(local,obj->matrix);
-   y=-D_L01_001B1B48 * FastVecDot(local,obj->matrix+4);
-   scaledX=D_L01_001B1B4C*x;
+   y=-g_muckdweller_tilt_gain * FastVecDot(local,obj->matrix+4);
+   scaledX=g_muckdweller_side_gain*x;
    *(UpdateQuad *)oldstate=*(UpdateQuad *)((u8 *)p+0x80);
    *(UpdateQuad *)current=*(UpdateQuad *)(obj->position);
-   math_approach_with_velocity((u8 *)p+0x80,y,(u8 *)p+0x90,D_L01_001B1B50,D_L01_001B1B54,D_L01_001B1B58,0);
-   math_approach_with_velocity((u8 *)p+0x84,scaledX,(u8 *)p+0x94,D_L01_001B1B50,D_L01_001B1B54,D_L01_001B1B58,0);
+   math_approach_with_velocity((u8 *)p+0x80,y,(u8 *)p+0x90,g_muckdweller_approach_accel_a,g_muckdweller_approach_accel_b,g_muckdweller_approach_accel_c,0);
+   math_approach_with_velocity((u8 *)p+0x84,scaledX,(u8 *)p+0x94,g_muckdweller_approach_accel_a,g_muckdweller_approach_accel_b,g_muckdweller_approach_accel_c,0);
    mat_transform_offset_two_matrices(g_hero_state.position,out,obj->position,oldstate,(u8 *)p+0x80);
   } else {
-   math_approach_with_velocity((u8 *)p+0x80,0.0f,(u8 *)p+0x90,D_L01_001B1B5C,D_L01_001B1B60,D_L01_001B1B64,0);
-   math_approach_with_velocity((u8 *)p+0x84,0.0f,(u8 *)p+0x94,D_L01_001B1B5C,D_L01_001B1B60,D_L01_001B1B64,0);
+   math_approach_with_velocity((u8 *)p+0x80,0.0f,(u8 *)p+0x90,g_muckdweller_settle_accel_a,g_muckdweller_settle_accel_b,g_muckdweller_settle_accel_c,0);
+   math_approach_with_velocity((u8 *)p+0x84,0.0f,(u8 *)p+0x94,g_muckdweller_settle_accel_a,g_muckdweller_settle_accel_b,g_muckdweller_settle_accel_c,0);
   }
   obj->position[2]=height2+p->field6C;
-  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,D_L01_001B1B3C,D_L01_001B1B40*0.0002908882452175021f,D_L01_001B1B44*0.0002908882452175021f);
+  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0002908882452175021f,g_muckdweller_angle_y_degrees*0.0002908882452175021f);
   obj->rotation[0]=FastAddRotations(p->field80,obj->rotation[0]);
   obj->rotation[1]=FastAddRotations(p->field84,obj->rotation[1]);
   FastVecSub(delta,obj->position,oldpos);
@@ -228,8 +228,8 @@ extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 extern s32 math_random_int_range(s32, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
-extern u8 *D_L01_001FE180[] NOT_SDA;
-extern u8 D_L01_001B0900[] SDATA(D_L01_001B0900);
+extern u8 *g_path_l01_table[] NOT_SDA;
+extern u8 g_muckdweller_init_data[] SDATA(D_L01_001B0900);
 
 /* Sets up the Muckdweller when it appears: its speeds, timers and path points, and its first animation. */
 void muckdweller_init(u8 *obj) {
@@ -266,11 +266,11 @@ void muckdweller_init(u8 *obj) {
     *(TI128 *)(vars + 0x3A0) = *(TI128 *)(obj + 0x10);
     *(s16 *)(vars + 0x3D8) = 0;
     if (*(s32 *)(vars + 0x3C0) != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[*(s32 *)(vars + 0x3C0)]);
+        path_l01_compute_segment_lengths(g_path_l01_table[*(s32 *)(vars + 0x3C0)]);
     }
     idx = *(s32 *)(vars + 0x3BC);
     if (idx != -1) {
-        path_l01_compute_segment_lengths(D_L01_001FE180[idx]);
+        path_l01_compute_segment_lengths(g_path_l01_table[idx]);
     }
     qcopy(vars + 0x2B0, obj + 0x10);
     *(f32 *)(vars + 0x2C0) = 0.3f;
@@ -290,7 +290,7 @@ void muckdweller_init(u8 *obj) {
     moby_set_controller_speed_limits(obj, 0.002222222276031971f, 0.06666667014360428f, 0.0021331803873181343f, 0.19198624789714813f);
     *(f32 *)(vars + 0xF0) = *(f32 *)(obj + 0x2C);
     *(f32 *)(vars + 0xE0) = *(f32 *)(vars + 0x30);
-    *(void **)(vars + 0xC0) = D_L01_001B0900;
+    *(void **)(vars + 0xC0) = g_muckdweller_init_data;
     *(s32 *)(obj + 0xF4) = 0;
     *(s32 *)(obj + 0xF0) = 0;
     qzero_nc(vars + 0x210);

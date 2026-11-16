@@ -8,7 +8,7 @@ extern int func_337518(int a0, char *a1, int a2);
 
 extern void func_42DF10(void *a0);
 
-extern void *D_L10_001ADE90 __attribute__((sda));
+extern void *g_level_global_pointer __attribute__((sda));
 
 extern int func_32AC10(int a0);
 
@@ -38,10 +38,10 @@ void cloud_spawn_objects(int count, void *arg) {
 
 /* Returns the pointer kept in a level global. */
 void *level_get_global_pointer(void) {
-    return D_L10_001ADE90;
+    return g_level_global_pointer;
 }
 
-extern char *D_L10_001B2528;
+extern char *g_cloud_object_list;
 extern void func_32AF78(void *a0);
 
 

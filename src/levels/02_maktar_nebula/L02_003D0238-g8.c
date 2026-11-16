@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern int D_L02_001B0138 __attribute__((sda));
-extern int D_L02_001B013C NOT_SDA;
+extern int g_platform_pulse_colors __attribute__((sda));
+extern int g_platform_pulse_color_end NOT_SDA;
 extern int PulseColor(int, int, float);
 extern void moby_set_state(char *, int, int);
 extern void moby_set_flag_bit(char *, int);
@@ -13,7 +13,7 @@ void platform_respawn_timed(char *self)
     char *state = *(char **)(self + 0x68);
 
     *(int *)(state + 0xD8) = 0;
-    *(int *)(self + 0x78) = PulseColor(D_L02_001B0138, D_L02_001B013C, *(float *)(state + 0xD8));
+    *(int *)(self + 0x78) = PulseColor(g_platform_pulse_colors, g_platform_pulse_color_end, *(float *)(state + 0xD8));
     moby_set_state(self, 1, -1);
     qcopy(self + 0x10, state + 0xA0);
     qcopy(state + 0x60, state + 0xA0);

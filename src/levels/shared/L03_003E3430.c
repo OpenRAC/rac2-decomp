@@ -1,5 +1,5 @@
 #include "common.h"
-extern float D_L03_0029BBF0[][4], D_L03_001B9BC0[][4];
+extern float g_puzzle_node_directions[][4], g_path_puzzle_stick_axes[][4];
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float FastVecDot(void *, void *), mat_fast_helper_a(float,float), fast_subtract_rotations(float,float);
 /* Picks which node the puzzle moves to next from the nodes that are open, preferring the one that turns furthest around. */
@@ -14,19 +14,19 @@ void path_puzzle_choose_next_node(u8 *moby) {
  case 0: *(short *)(vars+0x52)=*(unsigned short *)(vars+0x50); break;
  case 1: *(short *)(vars+0x52)=vars[0x40];break;
  default: {
- matrix_mul_vec3(v,D_L03_0029BBF0[*(short *)(vars+0x52)],moby+0xC0);
+ matrix_mul_vec3(v,g_puzzle_node_directions[*(short *)(vars+0x52)],moby+0xC0);
  score=-10.0f;
- x=FastVecDot(v,D_L03_001B9BC0[0]);
+ x=FastVecDot(v,g_path_puzzle_stick_axes[0]);
  best=-1;
- y=FastVecDot(v,D_L03_001B9BC0[1]);
+ y=FastVecDot(v,g_path_puzzle_stick_axes[1]);
  angle=mat_fast_helper_a(x,y);
  for(i=0;i<count;i++) {
  if(*(vars+i+0x40)==*(short *)(vars+0x52))continue;
  if(*(vars+i+0x40)==255)break;
  {u8 *base=vars+0x40; u8 *entry=base+i; float delta;
- matrix_mul_vec3(v,D_L03_0029BBF0[*entry],moby+0xC0);
- x=FastVecDot(v,D_L03_001B9BC0[0]);
- y=FastVecDot(v,D_L03_001B9BC0[1]);
+ matrix_mul_vec3(v,g_puzzle_node_directions[*entry],moby+0xC0);
+ x=FastVecDot(v,g_path_puzzle_stick_axes[0]);
+ y=FastVecDot(v,g_path_puzzle_stick_axes[1]);
  delta=fast_subtract_rotations(mat_fast_helper_a(x,y),angle);
  if(delta>0.0f)delta-=6.2831854820251465f;
  if(delta>score){score=delta;best=*entry;}

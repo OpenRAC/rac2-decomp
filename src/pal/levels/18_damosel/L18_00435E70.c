@@ -13,7 +13,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
@@ -22,22 +22,22 @@ extern int coll_test_hit_at_bone(void *, float, float, int, int, float, int, int
 extern float ApproachValue(void *, float, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int moby_aim_move_record_at_target(void *, void *, float, float);
-extern int func_PAL_L07_00324F58(void *, float, float, float);
+extern int hero_adjust_jump_speed_to_target_pal(void *, float, float, float);
 extern void extermibot_set_aim_toward_point(void *, void *, int);
 extern int extermibot_is_position_short(void *, void *);
 extern float extermibot_get_position_length_offset(void *, void *);
 extern float extermibot_get_turn_angle_to_point(void *, void *);
 extern int extermibot_is_path_to_point_clear(void *, void *);
-extern int func_PAL_L18_00437760(void *);
+extern int extermibot_is_cooldown_finished_pal(void *);
 extern int extermibot_is_facing_point(void *, void *);
 extern int extermibot_find_nearest_protopet(void *);
-extern void func_PAL_L18_00437988(void *);
-extern void func_PAL_L18_004379D8(void *);
-extern void func_PAL_L18_00437A28(void *);
+extern void extermibot_set_slow_limits_pal(void *);
+extern void extermibot_set_fast_limits_pal(void *);
+extern void extermibot_destroy_piece_and_parts_pal(void *);
 extern void extermibot_set_anim_on_parts(void *, int, int, int);
-extern void func_PAL_L18_00438248(void *);
+extern void extermibot_fire_shot_at_target_pal(void *);
 extern void extermibot_start_attack_timer(void *);
 extern void extermibot_clear_attack_counters(void *);
 
@@ -74,8 +74,8 @@ void func_PAL_L18_00435E70(u8 *self)
                 *(int *)(vars + 0x138) |= 2;
                 if (*(u8 **)(vars + 0x7EC) != 0)
                     *(int *)(*(u8 **)(vars + 0x7EC) + 0x98) = 0;
-                if (func_PAL_L07_00324F58(self, 11.0f, 18.0f, 27.0f) != 0) {
-                    func_PAL_L18_004379D8(self);
+                if (hero_adjust_jump_speed_to_target_pal(self, 11.0f, 18.0f, 27.0f) != 0) {
+                    extermibot_set_fast_limits_pal(self);
                     extermibot_set_anim_on_parts(self, 9, 0, 8);
                     *(float *)(vars + 0x134) = 0.2f;
                     if (*(int *)(vars + 0x7D0) != -1) {
@@ -132,15 +132,15 @@ void func_PAL_L18_00435E70(u8 *self)
             *(float *)(vars + 0x134) = 2.0f;
             switch (self[0x42]) {
             case 8:
-                func_PAL_L18_00437988(self);
+                extermibot_set_slow_limits_pal(self);
                 self[0xBC] = 1;
                 break;
             case 9:
-                func_PAL_L18_004379D8(self);
+                extermibot_set_fast_limits_pal(self);
                 self[0xBC] = 2;
                 break;
             default:
-                func_PAL_L18_00437988(self);
+                extermibot_set_slow_limits_pal(self);
                 self[0xBC] = 1;
                 extermibot_set_anim_on_parts(self, 8, 0, 8);
                 break;
@@ -159,13 +159,13 @@ void func_PAL_L18_00435E70(u8 *self)
         fr = moby_get_anim_value(self);
         if (self[0xBC] == 2) {
             if (extermibot_get_position_length_offset(self, vars + 0x750) < 4.0f && (self[0x60] & 2)) {
-                func_PAL_L18_00437988(self);
+                extermibot_set_slow_limits_pal(self);
                 self[0xBC] = 1;
                 extermibot_set_anim_on_parts(self, 8, 0, 8);
             }
         } else if (self[0xBC] == 1) {
             if (extermibot_get_position_length_offset(self, vars + 0x750) > 7.0f && fr > 4.0f && fr < 9.0f) {
-                func_PAL_L18_004379D8(self);
+                extermibot_set_fast_limits_pal(self);
                 self[0xBC] = 2;
                 extermibot_set_anim_on_parts(self, 9, 6, 8);
             }
@@ -177,7 +177,7 @@ void func_PAL_L18_00435E70(u8 *self)
             }
         } else {
             if ((self[0x60] & 2) && *(u16 *)(self + 0x96) >= 101) {
-                func_PAL_L18_00437988(self);
+                extermibot_set_slow_limits_pal(self);
                 self[0xBC] = 1;
                 extermibot_set_anim_on_parts(self, 8, 0, 8);
             }
@@ -215,7 +215,7 @@ void func_PAL_L18_00435E70(u8 *self)
         } else if (extermibot_is_position_short(self, *(u8 **)(vars + 0x7B8) + 0x10) != 0) {
             *(u8 **)(vars + 0x7BC) = *(u8 **)(vars + 0x7B8);
             moby_set_state(self, 0xB, -1);
-        } else if (func_PAL_L18_00437760(self) != 0) {
+        } else if (extermibot_is_cooldown_finished_pal(self) != 0) {
             *(u8 **)(vars + 0x7BC) = *(u8 **)(vars + 0x7B8);
             moby_set_state(self, 0xA, -1);
         }
@@ -236,7 +236,7 @@ void func_PAL_L18_00435E70(u8 *self)
                    || extermibot_is_path_to_point_clear(self, p) == 0) {
             *(u8 **)(vars + 0x7BC) = 0;
             moby_set_state(self, 9, -1);
-        } else if (func_PAL_L18_00437760(self) != 0) {
+        } else if (extermibot_is_cooldown_finished_pal(self) != 0) {
             *(u8 **)(vars + 0x7BC) = 0;
             moby_set_state(self, 0xA, -1);
         }
@@ -300,7 +300,7 @@ void func_PAL_L18_00435E70(u8 *self)
             if (*(s16 *)(vars + 0x7FC) != 0) {
                 if (fr < 2.0f && *(s16 *)(vars + 0x806) == 0) {
                     qcopy(vars + 0x760, v);
-                    func_PAL_L18_00438248(self);
+                    extermibot_fire_shot_at_target_pal(self);
                     *(s16 *)(vars + 0x806) = 1;
                 }
             } else if (fr < 5.0f && *(s16 *)(vars + 0x806) == 0) {
@@ -314,7 +314,7 @@ void func_PAL_L18_00435E70(u8 *self)
                         self[0x94] = s;
                         break;
                     }
-                    if (func_PAL_L18_00437760(self) != 0 && extermibot_get_position_length_offset(self, v) < 0.0f
+                    if (extermibot_is_cooldown_finished_pal(self) != 0 && extermibot_get_position_length_offset(self, v) < 0.0f
                         && extermibot_is_facing_point(self, v) != 0) {
                         self[0xBC] = 2;
                         if (*(s16 *)(vars + 0x7FC) != 0) {
@@ -383,8 +383,8 @@ void func_PAL_L18_00435E70(u8 *self)
         flags = moby_dispatch_action_by_kind(self, vars + 0x50);
         fr = moby_get_anim_value(self);
         if (*(u16 *)(self + 0x96) >= 151 || (flags & 1)) {
-            func_PAL_002A7650(self, 0, 3);
-            func_PAL_L18_00437A28(self);
+            SetDeathBits_pal(self, 0, 3);
+            extermibot_destroy_piece_and_parts_pal(self);
         } else if ((self[0x42] == 0x10 && fr > 27.0f) || (self[0x42] == 0x11 && fr > 47.0f) || (flags & 2)) {
             if (*(u8 **)(vars + 0x7C0) != 0) {
                 if (extermibot_is_position_short(self, vars + 0x1F0) != 0) {
@@ -416,7 +416,7 @@ void func_PAL_L18_00435E70(u8 *self)
                 *(s16 *)(vars + 0x80A) = 500;
             if (*(u8 **)(vars + 0x7C0) != 0) {
                 moby_transform_joint_to_world(self, 0, v);
-                func_PAL_L00_003FB330(v, 1, 10, 30, 0, 10, 45, 1, 0.5f, 20.0f, 0, 0, 0, 0);
+                SpawnExplosion_pal(v, 1, 10, 30, 0, 10, 45, 1, 0.5f, 20.0f, 0, 0, 0, 0);
                 moby_mark_spawned(*(u8 **)(vars + 0x7C0));
                 *(u8 **)(vars + 0x7C0) = 0;
             }
@@ -435,8 +435,8 @@ void func_PAL_L18_00435E70(u8 *self)
             if (extermibot_is_position_short(self, vars + 0x1F0) != 0) {
                 moby_set_state(self, 0xB, -1);
             } else if (FastDecTimer(vars + 0x80A) != 0) {
-                func_PAL_002A7650(self, 0, 3);
-                func_PAL_L18_00437A28(self);
+                SetDeathBits_pal(self, 0, 3);
+                extermibot_destroy_piece_and_parts_pal(self);
             }
         }
         break;

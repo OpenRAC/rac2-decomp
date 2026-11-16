@@ -6,14 +6,14 @@ extern double ref_L12_00420838_01 __attribute__((sda));
 extern double ref_L12_00420838_02 __attribute__((sda));
 extern void moby_set_state(unsigned char *, int, int);
 extern void *part_find_owned_effect_slot(unsigned char *, int, int);
-extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
+extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern int ref_L12_00420838_03 __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
 extern char *moby_l00_spawn_child(void *, int, int);
 extern void moby_mark_spawned(void *);
 
 /* Hand-adapted from func_L12_00388090. */
-void func_PAL_L12_00425BE0(unsigned char *a0) {
+void hit_l12_flash_update_pal(unsigned char *a0) {
     unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
 
     switch (a0[0x20]) {
@@ -28,7 +28,7 @@ void func_PAL_L12_00425BE0(unsigned char *a0) {
         a0[0xA8] = 0xFF;
         break;
     case 2:
-        func_PAL_L00_0032C328(a0, &ref_L12_00420838_02, &ref_L12_00420838_01, &ref_L12_00420838_00, 0xFFFF, 0, ref_L12_00420838_03, 0,
+        part_explode_object_into_pieces_pal(a0, &ref_L12_00420838_02, &ref_L12_00420838_01, &ref_L12_00420838_00, 0xFFFF, 0, ref_L12_00420838_03, 0,
                     0xFFFF, 0xFF, 0);
         moby_l00_spawn_child(a0, 0x110D, 0);
         moby_mark_spawned(a0);

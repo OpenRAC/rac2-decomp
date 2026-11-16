@@ -56,52 +56,52 @@ typedef struct { char pad[0x17b4]; unsigned int soundState; } SoundState;
 typedef struct { char pad[0x28]; int left, right; } BankVolume;
 
 extern float g_screen_fade __attribute__((sda));
-extern int D_001B22B0 __attribute__((sda));
-extern int D_001B15A4 __attribute__((sda));
-extern int D_001A72F4 __attribute__((sda));
-extern int D_001A72D4 __attribute__((sda));
-extern int D_001A72D0 __attribute__((sda));
-extern int D_001B1B4C __attribute__((sda));
-extern int D_001B1B40 __attribute__((sda));
-extern int D_001A7290 __attribute__((sda));
-extern short D_001A7A18 __attribute__((sda));
-extern char *D_001B1604 __attribute__((sda));
-extern int D_001B1B5C __attribute__((sda));
-extern int D_001B1B6C __attribute__((sda));
-extern int D_001B1D98 __attribute__((sda));
-extern int D_001B1D90 __attribute__((sda));
-extern int D_001B1D94 __attribute__((sda));
-extern int D_001B159C __attribute__((sda));
-extern int D_001B1B74 __attribute__((sda));
-extern unsigned char *D_001B1B60 __attribute__((sda));
-extern unsigned char *D_001B1B64 __attribute__((sda));
-extern int D_001B1D9C __attribute__((sda));
-extern int D_001B1DA0 __attribute__((sda));
-extern int D_001B2130[] __attribute__((sda));
-extern int D_001B2134[] __attribute__((sda));
-extern int D_001B2138[] __attribute__((sda));
-extern int D_001B213C[] __attribute__((sda));
-extern int D_001B2140[] __attribute__((sda));
-extern int D_001ABEC0[] SDATA(D_001ABEC0);
+extern int g_packet_buffer_size __attribute__((sda));
+extern int g_screen_flash_alpha __attribute__((sda));
+extern int g_vram_clut_third __attribute__((sda));
+extern int g_vram_frame_base __attribute__((sda));
+extern int g_vram_cursor __attribute__((sda));
+extern int g_class_count __attribute__((sda));
+extern int g_class_cache_count __attribute__((sda));
+extern int g_iop_block_table __attribute__((sda));
+extern short g_current_texture_pack __attribute__((sda));
+extern char *g_texture_data_base __attribute__((sda));
+extern int g_moby_pool_start __attribute__((sda));
+extern int g_moby_context_extra __attribute__((sda));
+extern int g_level_load_word_b __attribute__((sda));
+extern int g_particle_pool_base __attribute__((sda));
+extern int g_level_load_word_a __attribute__((sda));
+extern int g_load_object_cursor __attribute__((sda));
+extern int g_moby_max_count __attribute__((sda));
+extern unsigned char *g_moby_pool_end __attribute__((sda));
+extern unsigned char *g_moby_context_aux __attribute__((sda));
+extern int g_level_load_word_c __attribute__((sda));
+extern int g_display_buffer_size __attribute__((sda));
+extern int g_scene_sound_block_a[] __attribute__((sda));
+extern int g_scene_sound_block_b[] __attribute__((sda));
+extern int g_scene_sound_block_c[] __attribute__((sda));
+extern int g_scene_sound_block_d[] __attribute__((sda));
+extern int g_scene_sound_block_e[] __attribute__((sda));
+extern int g_transition_matrix_init[] SDATA(D_001ABEC0);
 
 extern char g_copy_setup_data[];
 extern char g_sound_state[];
-extern char D_001A91E0[];
-extern char D_001B1740[];
-extern char D_001C2740[], D_001C2B40[], D_001C2C40[];
-extern unsigned long long D_001C4DC0[];
-extern char *D_001CDB80[];
-extern short D_001CE300[];
-extern char D_001CE4E0[];
-extern int D_001D0600[];
-extern int D_001D0E00[];
-extern char D_001D1580[];
-extern char D_001F1D40[];
+extern char g_tex_block_reloc_state[];
+extern char g_guard_word_block[];
+extern char g_light_environment[], g_dynamic_lights[], g_dynamic_light_states[];
+extern unsigned long long g_tex_draw_packets[];
+extern char *g_class_cache_objects[];
+extern short g_class_cache_ids[];
+extern char g_class_slot_lookup[];
+extern int g_texture_entry_addresses[];
+extern int g_class_cache_sizes[];
+extern char g_class_cache_flags[];
+extern char g_load_state_block[];
 
 extern void InitMemSlots(), mem_clear(), gfx_init_view_context(), UpdateViewContext(), gfx_reset_packet_buffer();
 extern void FadeToBlack(), UploadTextureImages(), RelocateSkyDefinition(), load_register_class_cache_object(), tex_build_draw_packets();
 extern void mem_fast_helper_b(), mem_fast_helper_c(), func_PAL_0029FA60(), counter_clear_group(), load_init_random_scene();
-extern int func_PAL_0029DE68(), log2dim();
+extern int fast_decompress_pal(), log2dim();
 extern int load_read_disc_sectors_blocking(int, int, int);
 extern int snd_CheckLoadInProgress(int);
 extern void snd_send_cmd8(void);
@@ -111,7 +111,7 @@ extern void func_00291DE0(void *, int);
 extern void tex_rebase_pack_fill_ranges(void *, int, void *, int);
 extern void load_run_async_and_wait(void *, int *);
 
-void func_PAL_002EBA30(void)
+void InitializeLevelRuntime_pal(void)
 {
     char *base, *records, *p;
     unsigned char *entry;
@@ -125,18 +125,18 @@ void func_PAL_002EBA30(void)
     loadState.mode = 2;
     loadState.selected = -1;
     g_screen_fade = 1.0f;
-    D_001B22B0 = 0x100000;
+    g_packet_buffer_size = 0x100000;
     loadEngine.x = 0;
     loadEngine.y = 0;
     loadEngine.flag = 0;
-    D_001B15A4 = 0;
+    g_screen_flash_alpha = 0;
     InitMemSlots();
-    D_001A72D0 = D_001A72F4;
-    D_001A72D4 = D_001A72F4;
-    mem_clear(D_001B1740, 0x87654321, 16);
-    mem_clear(D_001CE4E0, -1, 0x2000);
-    mem_clear(D_001D1580, -1, 0xf00);
-    mem_clear(D_001D0E00, 0, 0xf0);
+    g_vram_cursor = g_vram_clut_third;
+    g_vram_frame_base = g_vram_clut_third;
+    mem_clear(g_guard_word_block, 0x87654321, 16);
+    mem_clear(g_class_slot_lookup, -1, 0x2000);
+    mem_clear(g_class_cache_flags, -1, 0xf00);
+    mem_clear(g_class_cache_sizes, 0, 0xf0);
     gfx_init_view_context();
     UpdateViewContext();
     gfx_reset_packet_buffer();
@@ -153,7 +153,7 @@ void func_PAL_002EBA30(void)
     FadeToBlack(5);
     snd_CheckLoadInProgress(0);
     FlushCache(0);
-    size = func_PAL_0029DE68((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
+    size = fast_decompress_pal((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
     FlushCache(0);
 
     header = loadBuffers.header;
@@ -162,22 +162,22 @@ void func_PAL_002EBA30(void)
     base = (char *)header + header->data;
     records = base + header->classData;
     textures = (TextureRecord *)((char *)header + header->classes);
-    D_001B1B4C = header->classCount;
-    for (i = 0; i < D_001B1B4C; i++)
-        D_001D0600[i] = (int)records + textures[i].offset + (log2dim(textures[i].dimension) << 28);
+    g_class_count = header->classCount;
+    for (i = 0; i < g_class_count; i++)
+        g_texture_entry_addresses[i] = (int)records + textures[i].offset + (log2dim(textures[i].dimension) << 28);
 
     RelocateSkyDefinition(base + header->sky);
     moby = (MobyRecord *)((char *)header + header->mobys);
-    D_001B1B40 = 0;
+    g_class_cache_count = 0;
     for (j = 0; j < header->mobyCount; j++, moby++) {
         char *object = moby->offset ? base + moby->offset : 0;
 
         if (moby->special) {
-            D_001C4DC0[0] = loadState.packet;
-            D_001C4DC0[1] = 0xFFA0000000E0ULL;
-            D_001C4DC0[2] = 0x0040000400004000ULL;
-            load_register_class_cache_object(object, 0, D_001A91E0, moby->id);
-            D_001D0E00[D_001B1B40 - 1] = 0xfffc0000;
+            g_tex_draw_packets[0] = loadState.packet;
+            g_tex_draw_packets[1] = 0xFFA0000000E0ULL;
+            g_tex_draw_packets[2] = 0x0040000400004000ULL;
+            load_register_class_cache_object(object, 0, g_tex_block_reloc_state, moby->id);
+            g_class_cache_sizes[g_class_cache_count - 1] = 0xfffc0000;
         } else
             load_register_class_cache_object(object, (char *)header + header->classes, moby->map, moby->id);
     }
@@ -185,23 +185,23 @@ void func_PAL_002EBA30(void)
     /* The HUD class (id 0xd54) takes the next class slot. The slot is read back
      * from loadState.count after the count was bumped, as retail does. */
     {
-        int n = D_001B1B40;
+        int n = g_class_cache_count;
 
         loadState.count = n;
         n++;
-        D_001B1B40 = n;
-        D_001CDB80[loadState.count] = loadBuffers.uiClass;
-        D_001CE300[loadState.count] = 0xd54;
-        D_001CE4E0[0xd54] = loadState.count;
-        D_001D0E00[loadState.count] = 0xfffc0000;
-        loadBuffers.firstClass = D_001CDB80[0];
+        g_class_cache_count = n;
+        g_class_cache_objects[loadState.count] = loadBuffers.uiClass;
+        g_class_cache_ids[loadState.count] = 0xd54;
+        g_class_slot_lookup[0xd54] = loadState.count;
+        g_class_cache_sizes[loadState.count] = 0xfffc0000;
+        loadBuffers.firstClass = g_class_cache_objects[0];
     }
-    if (D_001A7290 != D_001A7A18)
-        tex_build_draw_packets(D_001A7A18);
-    load_copy_header_relocate_pointers((void *)D_001CDB80[0], (void *)loadBuffers.uiInfo);
-    D_001D0E00[0] = 0xfffc0000;
+    if (g_iop_block_table != g_current_texture_pack)
+        tex_build_draw_packets(g_current_texture_pack);
+    load_copy_header_relocate_pointers((void *)g_class_cache_objects[0], (void *)loadBuffers.uiInfo);
+    g_class_cache_sizes[0] = 0xfffc0000;
 
-    D_001B1604 = base + header->textureData;
+    g_texture_data_base = base + header->textureData;
     func_00291DE0((char *)header + header->points, header->pointCount);
     {
         int partData = (int)base + header->partData;
@@ -212,30 +212,30 @@ void func_PAL_002EBA30(void)
 
     p = (char *)loadBuffers.header + size;
     loadBuffers.end = p;
-    mem_fast_helper_b(D_001C2B40, 0x100);
-    mem_fast_helper_b(D_001C2C40, 0x180);
-    mem_fast_helper_b(D_001C2740, 0x400);
-    mem_fast_helper_c(D_001C2740, D_001ABEC0, 0x40);
-    D_001B1B5C = (int)p;
+    mem_fast_helper_b(g_dynamic_lights, 0x100);
+    mem_fast_helper_b(g_dynamic_light_states, 0x180);
+    mem_fast_helper_b(g_light_environment, 0x400);
+    mem_fast_helper_c(g_light_environment, g_transition_matrix_init, 0x40);
+    g_moby_pool_start = (int)p;
     mem_clear(p, 0, 0x4000);
     p += 0x4000;
-    entry = (unsigned char *)D_001B1B5C;
-    D_001B159C = (int)entry;
+    entry = (unsigned char *)g_moby_pool_start;
+    g_load_object_cursor = (int)entry;
     func_PAL_0029FA60(entry, 0);
     entry[0x20] = 0xfd;
-    D_001B1B60 = (unsigned char *)D_001B159C + 0x100;
-    D_001B1B60[0x20] = 0xff;
-    D_001B1B6C = (int)p;
+    g_moby_pool_end = (unsigned char *)g_load_object_cursor + 0x100;
+    g_moby_pool_end[0x20] = 0xff;
+    g_moby_context_extra = (int)p;
     p += 0x2000;
-    D_001B1D98 = -1;
-    D_001B1D90 = (int)p;
-    D_001B1B64 = D_001B1B60 + 0x3f00;
-    D_001B1D94 = 0;
-    D_001B1D9C = 0;
-    mem_fast_helper_b(D_001F1D40, 0x200);
+    g_level_load_word_b = -1;
+    g_particle_pool_base = (int)p;
+    g_moby_context_aux = g_moby_pool_end + 0x3f00;
+    g_level_load_word_a = 0;
+    g_level_load_word_c = 0;
+    mem_fast_helper_b(g_load_state_block, 0x200);
     counter_clear_group();
-    D_001B1B74 = 0x3c0;
-    D_001B1DA0 = 0x1f4000;
+    g_moby_max_count = 0x3c0;
+    g_display_buffer_size = 0x1f4000;
     load_init_random_scene();
     {
         SoundState *sound = (SoundState *)g_sound_state;
@@ -259,10 +259,10 @@ void func_PAL_002EBA30(void)
     bank->left = 0xc000;
     bank->right = 0xc000;
     FlushCache(0);
-    load_run_async_and_wait(base + header->sound[4], &D_001B2140[0]);
-    load_run_async_and_wait(base + header->sound[2], &D_001B2138[0]);
-    load_run_async_and_wait(base + header->sound[3], &D_001B213C[0]);
-    load_run_async_and_wait(base + header->sound[1], &D_001B2134[0]);
-    load_run_async_and_wait(base + header->sound[0], &D_001B2130[0]);
+    load_run_async_and_wait(base + header->sound[4], &g_scene_sound_block_e[0]);
+    load_run_async_and_wait(base + header->sound[2], &g_scene_sound_block_c[0]);
+    load_run_async_and_wait(base + header->sound[3], &g_scene_sound_block_d[0]);
+    load_run_async_and_wait(base + header->sound[1], &g_scene_sound_block_b[0]);
+    load_run_async_and_wait(base + header->sound[0], &g_scene_sound_block_a[0]);
     snd_send_cmd8();
 }

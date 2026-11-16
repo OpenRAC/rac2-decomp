@@ -16,7 +16,7 @@ typedef signed int s32;
 /* Reports zero after handing the level's measured list to the shared test. */
 extern void target_lock_on_update(void *);
 
-extern u8 D_L18_002571A0[];
+extern u8 g_receiver_flag_buffer[];
 extern void func_3DB8F8(void *, void *);
 extern char ref_L18_002571A0_00[];
 
@@ -50,23 +50,23 @@ s32 enemy_get_kind_index(u8 *moby) {
    the two silent classes alone and renewing the shared slot for anything else. */
 extern void STUB_printf(void *);
 
-extern u16 D_L18_001B1240 __attribute__((sda));
+extern u16 g_enemy_timer_reset_value __attribute__((sda));
 
-extern u8 D_L18_001B1360[];
+extern u8 g_str_debug_stub[];
 
 /* Resets the enemy's timer from a shared value for the first kind, and does nothing for two other kinds. */
 void enemy_reset_timer_by_kind(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
     switch (*(s16 *)(moby + 0xAA)) {
         case 0xEC0 /* moby class 3776 */:
-            *(u16 *)(state + 0x392) = D_L18_001B1240;
+            *(u16 *)(state + 0x392) = g_enemy_timer_reset_value;
             break;
         case 0xED4 /* moby class 3796 */:
             break;
         case MOBY_CLASS_RECEIVER_BOT:
             break;
         default:
-            STUB_printf(D_L18_001B1360);
+            STUB_printf(g_str_debug_stub);
             break;
     }
 }
@@ -93,9 +93,9 @@ typedef float f32;
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern s32 D_L18_001B2348;
+extern s32 g_frame_l18_counter;
 
-extern u8 D_L18_002BD9B0[];
+extern u8 g_emitter_offset_vectors[];
 
 extern s32 math_random_int_below(s32);
 

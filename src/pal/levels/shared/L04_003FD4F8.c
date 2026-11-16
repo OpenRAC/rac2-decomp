@@ -101,8 +101,8 @@ extern float FastVecDot(void *, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
 extern void func_PAL_L04_00410678(void *, void *, int, int);
-extern Collision D_L04_001BFAC0;
-extern CollisionHit D_L04_001BFAE0;
+extern Collision g_probe_hit;
+extern CollisionHit g_spark_origin_quad;
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 
@@ -173,7 +173,7 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
     }
 
     if (collided) {
-        collision = &D_L04_001BFAC0;
+        collision = &g_probe_hit;
         if (collision->moby) {
             if (collision->moby == vars->ignored)
                 goto done;
@@ -183,12 +183,12 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
                 qcopy(pos, &projectile->position);
             else
                 qcopy(pos, &hitMoby->position);
-            FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+            FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
             vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
             result = projectile;
-            vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+            vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
             vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
-            vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+            vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
@@ -204,12 +204,12 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
                 func_PAL_L04_00410678(hitPoint, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
-                qcopy(pos, &D_L04_001BFAE0.point);
-                FastVecSub(hitDelta, &D_L04_001BFAE0.f30, &D_L04_001BFAE0.f40);
+                qcopy(pos, &g_spark_origin_quad.point);
+                FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
                 vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
-                vec_fast_normalize(response, direction, &D_L04_001BFAE0.normal);
+                vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
                 vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
-                vec_scale_to_length((char *)hitNormal, (char *)&D_L04_001BFAE0.normal, 1);
+                vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
             }
         }
     }
@@ -314,7 +314,7 @@ extern void gfx_add_draw_callback_second(void *, void *);
 extern void func_PAL_L04_003FFB98(unsigned char *, L04_C678Vars *);
 extern void func_PAL_L04_00400108(void);
 extern unsigned char g_sound_state[];
-extern int D_L04_001B0488 __attribute__((sda));
+extern int g_shield_dome_sound_handle __attribute__((sda));
 
 void func_PAL_L04_00400888(unsigned char *m)
 {
@@ -326,14 +326,14 @@ void func_PAL_L04_00400888(unsigned char *m)
     StepAngleTowardTarget(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.031415932f);
     v->age = v->age + 1.0f;
     if (v->timer != 0 && math_fast_float_d(&v->timer) != 0) {
-        s = D_L04_001B0488;
+        s = g_shield_dome_sound_handle;
         if (s != -1) {
             e = (L04_C678Slot *)(g_sound_state + s * 0x70);
             if (e->owner == v->owner && e->active != 0) {
                 snd_stop_voice(s);
             }
         }
-        D_L04_001B0488 = -1;
+        g_shield_dome_sound_handle = -1;
         moby_mark_spawned(m);
         return;
     }

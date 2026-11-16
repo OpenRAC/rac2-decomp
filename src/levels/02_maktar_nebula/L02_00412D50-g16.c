@@ -28,10 +28,10 @@ typedef struct {
     u8 padC0[12];
     float speed;
 } LiftState;
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 typedef struct { u8 bytes[0x70]; } LiftSoundStride;
 extern LiftSoundStride g_sound_state[];
-extern u8 D_001A7B00[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
 extern s32 g_current_map_index[] MACRO_ADDR;
 typedef struct {
     LiftVector axes[3];
@@ -39,14 +39,14 @@ typedef struct {
     u8 pad40[0x30];
     LiftVector rotation;
 } LiftNode;
-extern LiftNode *D_L02_001B368C MACRO_ADDR;
+extern LiftNode *g_matrix_l02_record_table MACRO_ADDR;
 extern s32 g_frame_l02_counter[] MACRO_ADDR;
-extern float D_L02_001B2FE0[] MACRO_ADDR;
-extern float D_L02_001B1C50 __attribute__((sda));
-extern float D_L02_001B1C54 __attribute__((sda));
-extern LiftVector D_L02_001B1C60 __attribute__((sda));
-extern float D_L02_001B1C6C[] MACRO_ADDR;
-extern char D_L02_001B1C70[];
+extern float g_grab_highlight_level[] MACRO_ADDR;
+extern float g_lift_target_speed __attribute__((sda));
+extern float g_lift_accel_step __attribute__((sda));
+extern LiftVector g_lift_probe_offset __attribute__((sda));
+extern float g_lift_sweep_radius[] MACRO_ADDR;
+extern char g_str_lift_distance[];
 extern u8 g_camera_l02_position[];
 extern void math_trap_always(void);
 extern void moby_set_state(u8 *, s32, s32);
@@ -122,7 +122,7 @@ void lift_l02_update(u8 *object)
         if (state->cameras[0] == -1 || state->cameras[1] == -1)
             math_trap_always();
         if (state->flag != -1) {
-            if (D_001A7B00[0x1E]) {
+            if (g_inventory_have_flags[0x1E]) {
                 moby_mark_spawned(object);
                 return;
             }
@@ -137,12 +137,12 @@ void lift_l02_update(u8 *object)
         if (object[0x43] != 2)
             anim_start_blended(object, 2, 0, 1);
         index = state->stops[0];
-        qcopy_nc(&state->position, &D_L02_001B368C[index].position);
-        qcopy_nc(&state->rotation, &D_L02_001B368C[index].rotation);
+        qcopy_nc(&state->position, &g_matrix_l02_record_table[index].position);
+        qcopy_nc(&state->rotation, &g_matrix_l02_record_table[index].rotation);
         break;
     }
     case 4:
-        if (D_0019B2E8[state->flag + (g_current_map_index[0] << 4)] & 0x80) {
+        if (g_moby_group_flags[state->flag + (g_current_map_index[0] << 4)] & 0x80) {
             scale_vector(&delta, object, 0.0009765625f);
             if (math_fast_helper_a(&delta, 64.0f) == -1) {
                 s16 flags = (*(u16 *)(object + 0x34) & 0xFFBE) | 0x1000;
@@ -154,7 +154,7 @@ void lift_l02_update(u8 *object)
         break;
     case 1: {
         LiftNode *record;
-        if (state->flag != -1 && D_001A7B00[0x1E]) {
+        if (state->flag != -1 && g_inventory_have_flags[0x1E]) {
             moby_mark_spawned(object);
             return;
         }
@@ -169,23 +169,23 @@ void lift_l02_update(u8 *object)
             distance = vec_length_xy(&aim);
             vec_transform_by_object_or_given((char *)object, (char *)&delta, (char *)&delta, 0);
             if (delta.f[2] < -0.6f) {
-                STUB_printf(D_L02_001B1C70, __extendsfdf2(distance));
+                STUB_printf(g_str_lift_distance, __extendsfdf2(distance));
                 hero_l00_set_action(0x6F, 1);
                 moby_set_state(object, 2, -1);
             }
         } else if ((g_frame_l02_counter[0] & 0x3F) == 0) {
             float current;
             side = (state->side + 1) & 1;
-            record = &D_L02_001B368C[state->stops[side]];
+            record = &g_matrix_l02_record_table[state->stops[side]];
             distance = vec_distance_xy(g_hero_state.position, &record->position);
-            record = &D_L02_001B368C[state->stops[state->side]];
+            record = &g_matrix_l02_record_table[state->stops[state->side]];
             current = vec_distance_xy(g_hero_state.position, &record->position);
             if (distance < current) {
                 s32 index;
                 state->side = side;
                 index = state->stops[side];
-                qcopy_nc(&state->position, &D_L02_001B368C[index].position);
-                qcopy_nc(&state->rotation, &D_L02_001B368C[index].rotation);
+                qcopy_nc(&state->position, &g_matrix_l02_record_table[index].position);
+                qcopy_nc(&state->rotation, &g_matrix_l02_record_table[index].rotation);
                 qcopy_nc((object + 0x10), (&state->position));
                 qcopy_nc((object + 0xF0), (&state->rotation));
             }
@@ -213,7 +213,7 @@ void lift_l02_update(u8 *object)
             if (object[0x43])
                 anim_start_blended(object, 0, 0, 45);
         }
-        ApproachValue(&state->speed, D_L02_001B1C50 * 0.016666668f, D_L02_001B1C54 * 0.00027777778f);
+        ApproachValue(&state->speed, g_lift_target_speed * 0.016666668f, g_lift_accel_step * 0.00027777778f);
         vec_scale_to_length(&delta, object + 0xC0, state->speed);
         delta.f[2] = 0.0f;
         FastVecAdd(&state->position, &state->position, &delta);
@@ -221,12 +221,12 @@ void lift_l02_update(u8 *object)
         count = 2;
         layer = 0x10000;
         do {
-            qcopy_nc(&point, &D_L02_001B1C60);
+            qcopy_nc(&point, &g_lift_probe_offset);
             if (i)
                 point.f[1] = -point.f[1];
             matrix_mul_vec3(&point, &point, object + 0xC0);
             FastVecAdd(&point, &point, object + 0x10);
-            coll_sweep_from_object(object, &point, layer, D_L02_001B1C6C[0], 1.0f, 1.0f, 0, 1, 0);
+            coll_sweep_from_object(object, &point, layer, g_lift_sweep_radius[0], 1.0f, 1.0f, 0, 1, 0);
         } while (++i < count);
         qcopy_nc(&point, g_camera_l02_position);
         point.f[2] += 0.016666668f;
@@ -246,7 +246,7 @@ void lift_l02_update(u8 *object)
                 *(u16 *)(object + 0x96) = stored;
             }
             if (previous >= 121)
-                ApproachValue(&D_L02_001B2FE0[0], 1.0f, 0.033333335f);
+                ApproachValue(&g_grab_highlight_level[0], 1.0f, 0.033333335f);
             else {
                 s32 slot;
                 u8 *sound_record;
@@ -258,7 +258,7 @@ void lift_l02_update(u8 *object)
                     state->sound = PlayMobySound(0, 4, (char *)object);
             }
         }
-        if (D_L02_001B2FE0[0] >= 1.0f) {
+        if (g_grab_highlight_level[0] >= 1.0f) {
             s32 slot;
             hero_l00_set_action(0, 1);
             slot = state->sound;
@@ -273,11 +273,11 @@ void lift_l02_update(u8 *object)
             state->side = (state->side + 1) & 1;
             {
                 s32 index = state->stops[state->side];
-                qcopy_nc(&state->position, &D_L02_001B368C[index].position);
-                qcopy_nc(&state->rotation, &D_L02_001B368C[index].rotation);
+                qcopy_nc(&state->position, &g_matrix_l02_record_table[index].position);
+                qcopy_nc(&state->rotation, &g_matrix_l02_record_table[index].rotation);
             }
             euler_rotation_basis(object + 0xC0, &state->rotation);
-            record = &D_L02_001B368C[state->launch_nodes[state->side]];
+            record = &g_matrix_l02_record_table[state->launch_nodes[state->side]];
             FastVecScale(&launch, record, -0.9f);
             FastVecAdd(&launch, &launch, &record->position);
             qcopy_nc(&rotation, (&record->rotation));
@@ -290,8 +290,8 @@ void lift_l02_update(u8 *object)
         break;
     }
     case 3:
-        ApproachValue(&D_L02_001B2FE0[0], 0.0f, 0.033333335f);
-        if (D_L02_001B2FE0[0] <= 0.0f) {
+        ApproachValue(&g_grab_highlight_level[0], 0.0f, 0.033333335f);
+        if (g_grab_highlight_level[0] <= 0.0f) {
             state->speed = 0.0f;
             moby_set_state(object, 1, -1);
         }

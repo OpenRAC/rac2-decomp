@@ -16,37 +16,37 @@ extern void vec_build_spherical_offset(void *,float,float,float);
 extern int gfx_swap_packed_color_channels(int,int);
 extern char *func_PAL_002BD790(void *,void *,int,int,int,int,int,int,int,float);
 extern void gfx_add_draw_callback_third(void *,void *),DrawAnimatedMeshAndGlowEffect(void);
-extern int D_L05_001B3000[] __attribute__((sda));
-extern char D_L05_001B96C0[],D_L05_001B98F0[],D_L05_0024D020[];
-extern float D_L05_001AFC94 __attribute__((sda));
+extern int g_effect_timers[] __attribute__((sda));
+extern char g_origin_vec[],g_unit_dir_vec[],g_emitter_group_positions[];
+extern float g_effect_scale_base __attribute__((sda));
 void func_PAL_L05_003D5D90(char *obj)
 {
  BurstVector v,small,offset,pos,velocity;
  char *s=*(char **)(obj+0x68);
- int *timers=D_L05_001B3000;
+ int *timers=g_effect_timers;
  int color1,color2,duration;
  float scale,a,b;
  if (*(unsigned char *)(obj+0x20)==0) {
   func_PAL_L05_003D7130(obj);*(unsigned char *)(obj+0x20)=1;
   timers[*(int *)s]=4;
-  if(fast_vec_dist(obj+0x10,D_L05_001B96C0)>200.0f) *(float *)(s+4)=4;
-  else if(fast_vec_dist(obj+0x10,D_L05_001B96C0)>100.0f) *(float *)(s+4)=2;
-  else if(fast_vec_dist(obj+0x10,D_L05_001B96C0)>25.0f) *(float *)(s+4)=1;
-  else if(fast_vec_dist(obj+0x10,D_L05_001B96C0)>0.0f) *(float *)(s+4)=0.5f;
+  if(fast_vec_dist(obj+0x10,g_origin_vec)>200.0f) *(float *)(s+4)=4;
+  else if(fast_vec_dist(obj+0x10,g_origin_vec)>100.0f) *(float *)(s+4)=2;
+  else if(fast_vec_dist(obj+0x10,g_origin_vec)>25.0f) *(float *)(s+4)=1;
+  else if(fast_vec_dist(obj+0x10,g_origin_vec)>0.0f) *(float *)(s+4)=0.5f;
   snd_play_from_class_bank(10,0,obj,0xFBF);
  }
- if(!math_fast_float_d(&D_L05_001B3000[*(int *)s]) && !*(int *)(s+8)) {
+ if(!math_fast_float_d(&g_effect_timers[*(int *)s]) && !*(int *)(s+8)) {
   int i;
   void *smallp=&small,*posp=&pos;
   for(i=0;i<4;i++) {
    int j;
    char *effect,*record;
    float lim;
-   scale=D_L05_001AFC94*8.0f;
-   qcopy(&v,D_L05_0024D020+*(int *)s*64+i*16);
+   scale=g_effect_scale_base*8.0f;
+   qcopy(&v,g_emitter_group_positions+*(int *)s*64+i*16);
    v.f[0]+=0.1f;
-   vec_scale_to_length(smallp,D_L05_001B98F0,0.24000001f);
-   vec_scale_to_length(&offset,D_L05_001B98F0,0.5f);
+   vec_scale_to_length(smallp,g_unit_dir_vec,0.24000001f);
+   vec_scale_to_length(&offset,g_unit_dir_vec,0.5f);
    FastVecAdd(&v,&v,&offset);
    scale*=3.0f;
    lim=10.0f;

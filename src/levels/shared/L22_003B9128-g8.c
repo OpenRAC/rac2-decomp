@@ -12,7 +12,7 @@ extern int ref_L22_003B8FE8_00 __attribute__((sda));
 extern int ref_L22_003B8FE8_01 __attribute__((sda));
 
 /* a plain small extern: $gp in a delay slot, absolute where it stays */
-extern s32 D_L22_001A8FF0;
+extern s32 g_hero_flag_a;
 
 extern u8 *keyed_object_create(u8 *arg0, TI128 *arg1);
 
@@ -21,17 +21,17 @@ typedef union { u8 b[0x100]; TI128 q[0x10]; } Hero;
 extern u8 g_hero_state[];
 
 /* the two handles the new object's sound slots get, one per key */
-extern s32 D_L22_001AFA00 __attribute__((sda));
+extern s32 g_charge_voice_player __attribute__((sda));
 
-extern s32 D_L22_001AFA04 __attribute__((sda));
+extern s32 g_charge_voice_other __attribute__((sda));
 
 /* the object the alternate key aims at */
 extern u8 *ref_L22_003B9128_00;
 
 /* the facing and range limits of the alternate key's aim */
-extern float D_L22_001AF9E4 __attribute__((sda));
+extern float g_keyed_object_dot_limit __attribute__((sda));
 
-extern float D_L22_001AF9E8 __attribute__((sda));
+extern float g_keyed_object_dist_limit __attribute__((sda));
 
 extern s32 snd_start_in_slot(s32, s32, s32);
 
@@ -72,9 +72,9 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 is_alternate) {
     if (*slot == 0) {
         keyed_object_create(owner, &local);
         if (is_alternate != 0) {
-            D_L22_001AFA00 = snd_start_in_slot(0x14, 0, 0);
+            g_charge_voice_player = snd_start_in_slot(0x14, 0, 0);
         } else {
-            D_L22_001AFA04 = snd_start_in_slot(0x14, 0, 0);
+            g_charge_voice_other = snd_start_in_slot(0x14, 0, 0);
         }
         found = (u8 *)*slot;
         if (found == 0) {
@@ -85,7 +85,7 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 is_alternate) {
         if (*(s16 *)(obj + 0xAA) != 0x5F3 /* moby class 1523 */) {
             return;
         }
-        if (D_L22_001A8FF0 != 0) {
+        if (g_hero_flag_a != 0) {
             target = ref_L22_003B9128_00;
             if (target == 0) {
                 *(s32 *)(payload + 0x48) = 0;
@@ -111,9 +111,9 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 is_alternate) {
                 dot = FastVecDot(payload + 0x50, &facing);
                 if (is_alternate != 0) {
                     dist = fast_vec_dist(target + 0x10, &((Hero *)g_hero_state)->q[8]);
-                    if (dot < D_L22_001AF9E4) {
+                    if (dot < g_keyed_object_dot_limit) {
                         *(s32 *)(payload + 0x44) = 0;
-                    } else if (D_L22_001AF9E8 < dist) {
+                    } else if (g_keyed_object_dist_limit < dist) {
                         *(s32 *)(payload + 0x44) = 0;
                     } else {
                         *(s16 *)(payload + 0x42) = 1;

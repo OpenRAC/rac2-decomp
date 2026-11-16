@@ -4,12 +4,12 @@
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
 extern void FastVecAdd(void *, void *, void *), vec_clear_128(void *);
-extern void FadeToBlack(int), hero_reset_for_area_start(int), func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void FadeToBlack(int), hero_reset_for_area_start(int), hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void SetCamera5Pose(void *, void *, int, int, int), object_copy_vector_to_selected(void *), cam_set_state_rotation(void *);
-extern void func_PAL_002A7E68(void *, int, int, int), func_PAL_L00_002D2668(int, int, float);
-extern unsigned char D_001A7A45;
-extern int D_L01_001B1FA8;
+extern void func_PAL_002A7E68(void *, int, int, int), set_hero_animation_pal(int, int, float);
+extern unsigned char g_state_flag_c;
+extern int g_camera_lock_flag;
 typedef struct {
     char pad[0x80];
     float pos[4];
@@ -32,7 +32,7 @@ void func_PAL_L01_0039A520(unsigned char *m) {
     b[2] = FastAddRotations(*(float *)(p + 0x1C), 3.1415929794311523f);
     FadeToBlack(8);
     if (g_hero_state.state == 3) hero_reset_for_area_start(0);
-    func_PAL_L00_002B9CD8(a, b, 0x6F, 0);
+    hero_reset_position_and_direction_pal(a, b, 0x6F, 0);
     PlayMobySound(0, 0, m);
     c[0] = math_fast_sin_or_cos_a(*(float *)(p + 0x1C))*1.25f;
     c[1] = math_fast_sin_or_cos_b(*(float *)(p + 0x1C))*1.25f;
@@ -49,10 +49,10 @@ void func_PAL_L01_0039A520(unsigned char *m) {
     qcopy_nc(m + 0x10, g_hero_state.pos);
     qcopy_nc(m + 0xF0, g_hero_state.rot);
     if (m[0x43] != 1) func_PAL_002A7E68(m, 1, 0, 0);
-    func_PAL_L00_002D2668(0x7B, 0, 0.0f);
-    if (D_001A7A45) *(unsigned short *)(m + 0x34) |= 0x8000;
+    set_hero_animation_pal(0x7B, 0, 0.0f);
+    if (g_state_flag_c) *(unsigned short *)(m + 0x34) |= 0x8000;
     g_hero_state.flag = 1;
-    D_L01_001B1FA8 = 1;
+    g_camera_lock_flag = 1;
     m[0x20] = 2;
     *(int *)(p + 0x6C) = 50;
 }
@@ -86,12 +86,12 @@ typedef struct {
     f32 fF8;
     f32 fFC;
 } Obj_397870;
-extern void func_PAL_L01_0039B2D0(Obj_397870 *a0);
-extern float D_L01_001AF50C __attribute__((sda));
-extern float D_L01_001AF510 __attribute__((sda));
-extern float D_L01_001AF514 __attribute__((sda));
-extern float D_L01_001AF528 __attribute__((sda));
-extern int D_L01_001AF54C __attribute__((sda));
+extern void part_spawn_sparkle_trail_above_ground_pal(Obj_397870 *a0);
+extern float g_collectible_height_scale __attribute__((sda));
+extern float g_bob_base_height __attribute__((sda));
+extern float g_bob_l01_amplitude __attribute__((sda));
+extern float g_bolt_bob_spin_speed __attribute__((sda));
+extern int g_sparkle_chance __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
@@ -102,18 +102,18 @@ void func_PAL_L01_0039AC80(Obj_397870 *a0)
     State_397870 *s1 = a0->st;
     float f;
 
-    a0->f2C = a0->cls->f24 * D_L01_001AF50C;
+    a0->f2C = a0->cls->f24 * g_collectible_height_scale;
 
     if (a0->b20 == 1) {
         f = math_fast_sin_or_cos_b(a0->fFC);
-        a0->f18 = s1->f18 + D_L01_001AF510 + D_L01_001AF514 * f;
+        a0->f18 = s1->f18 + g_bob_base_height + g_bob_l01_amplitude * f;
         a0->fF0 = FastAddRotations(a0->fF0, s1->f68);
         a0->fF4 = FastAddRotations(a0->fF4, s1->f64);
         a0->fF8 = FastAddRotations(a0->fF8, s1->f60);
-        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * D_L01_001AF528);
+        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * g_bolt_bob_spin_speed);
     }
 
     func_PAL_L01_0039AE48(a0);
-    if (math_random_int_below(D_L01_001AF54C) == 0)
-        func_PAL_L01_0039B2D0(a0);
+    if (math_random_int_below(g_sparkle_chance) == 0)
+        part_spawn_sparkle_trail_above_ground_pal(a0);
 }

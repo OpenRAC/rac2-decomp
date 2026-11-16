@@ -6,7 +6,7 @@ extern void DoGifPaging(void);
 extern void level_l00_call_module_handler_6(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_US2_L00_0034FD48(void)
+int setup_l00_run_three_return_zero_6_us2(void)
 {
     SetupGifPaging(0);
     level_l00_call_module_handler_6();
@@ -14,12 +14,12 @@ int func_US2_L00_0034FD48(void)
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int module_l00_call_handler_with_arg_9(int a);
 
-int func_US2_L00_0034FDD0(void)
+int input_l00_update_return_zero_3_us2(void)
 {
-    module_l00_call_handler_with_arg_9(D_00138344);
+    module_l00_call_handler_with_arg_9(g_menu_input_flags);
     return 0;
 }
 

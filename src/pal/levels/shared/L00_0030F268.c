@@ -6,7 +6,7 @@ extern void list_screen_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F268(void)
+void module_l00_call_handler_8_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -18,7 +18,7 @@ extern void map_screen_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F298(void)
+void module_l00_call_handler_9_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -26,7 +26,7 @@ void func_PAL_L00_0030F298(void)
         map_screen_draw(value + 0x3B7A8);
 }
 
-extern int func_PAL_0033D468(int, int);
+extern int map_screen_update_layout_pal(int, int);
 
 /* func_PAL_L00_0030F2C8, the PAL copy of func_L00_0030D478: the same C, where the offset 0x3B490
  * becomes 0x3B7A8 and the callee func_0033B540 becomes func_PAL_0033D468. */
@@ -35,7 +35,7 @@ int func_PAL_L00_0030F2C8(int a0)
     int v = D_L00_001A904C_2;
 
     if (v != 0) {
-        return func_PAL_0033D468(v + 0x3B7A8, a0);
+        return map_screen_update_layout_pal(v + 0x3B7A8, a0);
     }
     return 0;
 }

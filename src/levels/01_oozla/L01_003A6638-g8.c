@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L01_003A6638: the update of a moby steered with the stick, by its state byte at +0x20.
  * State 0 copies the yaw at +0x18 to +0x44 and starts animation 1. State 1 turns and moves the
  * moby, probes the move with collision lines and slides along what they hit; on Circle it spawns
@@ -9,29 +10,29 @@
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 typedef int OozlaQuad __attribute__((mode(TI)));
-extern float D_L01_001AF870 __attribute__((sda));
-extern float D_L01_001AF874 __attribute__((sda));
-extern int D_L01_001AF878 __attribute__((sda));
-extern float D_L01_001AF87C __attribute__((sda));
-extern float D_L01_001AF880 __attribute__((sda));
-extern float D_L01_001AF894 __attribute__((sda));
-extern float D_L01_001AF898 __attribute__((sda));
-extern float D_L01_001AF89C __attribute__((sda));
-extern float D_L01_001AF8A0 __attribute__((sda));
-extern float D_L01_001AF8A8 __attribute__((sda));
-extern float D_L01_001AF8AC __attribute__((sda));
-extern float D_L01_001AF8B0 __attribute__((sda));
-extern float D_L01_001AF8BC __attribute__((sda));
-extern float D_L01_001AF8C0 __attribute__((sda));
-extern float D_L01_001AC580[] MACRO_ADDR;
+extern float g_hover_turn_rate_scale __attribute__((sda));
+extern float g_hover_collision_radius __attribute__((sda));
+extern int g_hover_state_flags __attribute__((sda));
+extern float g_moby_probe_length __attribute__((sda));
+extern float g_hover_vertical_smoothing __attribute__((sda));
+extern float g_hover_adjust_length __attribute__((sda));
+extern float g_hover_edge_length_a __attribute__((sda));
+extern float g_hover_edge_length_b __attribute__((sda));
+extern float g_hover_path_length __attribute__((sda));
+extern float g_hover_offset_length __attribute__((sda));
+extern float g_hover_shift_speed __attribute__((sda));
+extern float g_hover_max_step_speed __attribute__((sda));
+extern float g_hover_push_strength __attribute__((sda));
+extern float g_hover_max_angle_degrees __attribute__((sda));
+extern float g_debris_velocity_vector[] MACRO_ADDR;
 extern u8 g_item_slot_to_record[];
 extern char g_pad_state[];
 typedef struct { u8 pad[0x1A4]; u32 flags; } OozlaInput;
 typedef struct { u8 pad[0x50]; float speed; u8 gap[0x1C]; float material; u8 tail[0x6C]; } OozlaMaterial;
-extern OozlaMaterial D_L01_002637A0[];
-extern u8 D_L01_001BF900[];
-extern u8 D_L01_001C3980[];
-extern int D_L01_001A8A44;
+extern OozlaMaterial g_action_table[];
+extern u8 g_collision_l01_hit[];
+extern u8 g_contact_moby_list[];
+extern int g_hero_misc_flag;
 extern void anim_start_blended(void *,int,int,int);
 extern void hero_get_clamped_stick_tilt(float *,float *);
 extern float FastAddRotations(float,float);
@@ -104,12 +105,12 @@ void UpdateSteeredMoby(u8 *object)
                 float start[4], angles[4], finish[4], shift[4], offset[4], hit[4], normal[4], force[4], adjustment[4], edge[4];
 
                 hero_get_clamped_stick_tilt(&horizontal,&vertical);
-                F(state,0x18) = F(state,0x44) = FastAddRotations(F(state,0x44),D_L01_001AF870*(horizontal*0.00029088825f));
-                maximum = ((OozlaMaterial *)((u32)D_L01_002637A0 + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->speed*0.016666668f;
-                F(state,0x4C) += (vertical*maximum-F(state,0x4C))*D_L01_001AF880;
+                F(state,0x18) = F(state,0x44) = FastAddRotations(F(state,0x44),g_hover_turn_rate_scale*(horizontal*0.00029088825f));
+                maximum = ((OozlaMaterial *)((u32)g_action_table + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->speed*0.016666668f;
+                F(state,0x4C) += (vertical*maximum-F(state,0x4C))*g_hover_vertical_smoothing;
                 speed = F(state,0x4C)/maximum;
                 F(object,0x48) = speed+speed+horizontal;
-                vec_scale_to_length(velocity,D_L01_001AC580,F(state,0x4C));
+                vec_scale_to_length(velocity,g_debris_velocity_vector,F(state,0x4C));
                 matrix_mul_vec3(velocity,velocity,object+0xC0);
                 velocity[2] += F(state,0x54);
                 FastVecAdd(position,object+0x10,velocity);
@@ -119,7 +120,7 @@ void UpdateSteeredMoby(u8 *object)
                 else F(state,0x4C) = FastVecLength(velocity);
                 gfx_draw_vehicle_beam(object,state);
                 *(OozlaQuad *)angles = 0;
-                angles[2] = D_L01_001AF870*(horizontal*0.00029088825f);
+                angles[2] = g_hover_turn_rate_scale*(horizontal*0.00029088825f);
                 *(OozlaQuad *)start = *(OozlaQuad *)angles;
                 qzero_nc(rotation);
                 qzero_nc(basis[0]);
@@ -127,38 +128,38 @@ void UpdateSteeredMoby(u8 *object)
                 euler_to_matrix(rotation,start);
                 progress = 0.0f;
                 collision = 0;
-                while (progress <= D_L01_001AF8A0 && !collision) {
+                while (progress <= g_hover_path_length && !collision) {
                     sign = vertical < 0.0f ? -1.0f : 1.0f;
-                    vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                    vec_scale_to_length(angles,object+0xE0,g_moby_probe_length);
                     FastVecAdd(angles,angles,object+0x10);
-                    vec_scale_to_length(shift,object+0xC0,D_L01_001AF8AC*progress*sign);
+                    vec_scale_to_length(shift,object+0xC0,g_hover_shift_speed*progress*sign);
                     FastVecAdd(angles,angles,shift);
-                    vec_scale_to_length(offset,object+0xE0,D_L01_001AF8A8);
+                    vec_scale_to_length(offset,object+0xE0,g_hover_offset_length);
                     FastVecSub(finish,object+0x10,offset);
                     FastVecScale(normal,velocity,math_fabs(vertical));
-                    half = D_L01_001AF8A0*0.5f;
-                    FastVecScale(shift,normal,(D_L01_001AF8BC*(half-progress))/half);
+                    half = g_hover_path_length*0.5f;
+                    FastVecScale(shift,normal,(g_hover_push_strength*(half-progress))/half);
                     FastVecAdd(finish,finish,shift);
                     collision = CollLine(angles,finish,lineFlags,object,linePacket);
                     progress += 1.0f;
                 }
                 if (collision) {
-                    qcopy(hit, (D_L01_001BF900+0x20));
+                    qcopy(hit, (g_collision_l01_hit+0x20));
                     vec_scale_to_length(normal,object+0xE0,1.0f);
-                    vec_scale_to_length(force,D_L01_001BF900+0x40,1.0f);
+                    vec_scale_to_length(force,g_collision_l01_hit+0x40,1.0f);
                     angle = 1.5707964f-math_fast_angle_helper(FastVecDot(normal,force));
-                    if (D_L01_001AF8C0*0.017453294f < angle) {
+                    if (g_hover_max_angle_degrees*0.017453294f < angle) {
                         qcopy((object+0x10), previous);
                     } else {
-                        vec_scale_to_length(adjustment,D_L01_001BF900+0x40,D_L01_001AF894);
-                        vec_scale_to_length(angles,object+0xE0,D_L01_001AF87C);
+                        vec_scale_to_length(adjustment,g_collision_l01_hit+0x40,g_hover_adjust_length);
+                        vec_scale_to_length(angles,object+0xE0,g_moby_probe_length);
                         FastVecSub(finish,object+0x10,angles);
                         FastVecAdd(angles,angles,object+0x10);
                         if (CollLine(angles,finish,lineFlags,object,linePacket)) {
-                            vec_scale_to_length(edge,D_L01_001BF900+0x40,D_L01_001AF898);
+                            vec_scale_to_length(edge,g_collision_l01_hit+0x40,g_hover_edge_length_a);
                             FastVecAdd(adjustment,adjustment,edge);
                         }
-                        vec_scale_to_length(edge,object+0xE0,D_L01_001AF89C);
+                        vec_scale_to_length(edge,object+0xE0,g_hover_edge_length_b);
                         FastVecAdd(adjustment,adjustment,edge);
                         copy_matrix_rotation(basis[0],object+0xC0);
                         vec_scale_to_length(basis[2],adjustment,-1.0f);
@@ -168,8 +169,8 @@ void UpdateSteeredMoby(u8 *object)
                         mat_get_euler_angles(matrix,object+0xF0);
                         FastVecSub(edge,hit,object+0x10);
                         vec_scale_to_length(edge,edge,
-                            D_L01_001AF8B0*0.016666668f < FastVecLength(edge)
-                            ? D_L01_001AF8B0*0.016666668f : FastVecLength(edge));
+                            g_hover_max_step_speed*0.016666668f < FastVecLength(edge)
+                            ? g_hover_max_step_speed*0.016666668f : FastVecLength(edge));
                         FastVecAdd(object+0x10,object+0x10,edge);
                         F(state,0x54) = 0.0f;
                     }
@@ -194,13 +195,13 @@ void UpdateSteeredMoby(u8 *object)
             FastVecAdd(object+0x10,previous,displacement);
             if (((OozlaInput *)g_pad_state)->flags & detonate) {
                 SpawnExplosionEffects((char *)object,velocity,explosionAt,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
-                count = coll_process_hit(object+0x10,sphereFlags,object,sphereHit,D_L01_001AF874);
+                count = coll_process_hit(object+0x10,sphereFlags,object,sphereHit,g_hover_collision_radius);
                 *(OozlaQuad *)center = *(OozlaQuad *)(object+0x10);
-                moby_queue_knockback_for_nodes(object,center,D_L01_001C3980,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)D_L01_002637A0 + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
-                I(state,0x40) = D_L01_001AF878;
+                moby_queue_knockback_for_nodes(object,center,g_contact_moby_list,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)g_action_table + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
+                I(state,0x40) = g_hover_state_flags;
                 I(object,0x98) = 0;
                 *(u16 *)(object+0x34) = (*(u16 *)(object+0x34) | 0x41)&0xEFFF;
-                D_L01_001A8A44 = 0;
+                g_hero_misc_flag = 0;
                 object[0x20] = 2;
             }
         }
@@ -218,5 +219,5 @@ void UpdateSteeredMoby(u8 *object)
         }
         break;
     }
-    part_queue_ground_shadow(object,D_L01_001AF87C);
+    part_queue_ground_shadow(object,g_moby_probe_length);
 }

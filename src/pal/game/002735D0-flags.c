@@ -13,11 +13,11 @@ extern void vec_random_direction(void *, float, float);
 extern float square_root(float);
 extern void update_moby_animation_state(void *);
 extern void func_PAL_002A0F68(void *);
-extern void func_PAL_00273818(void *, int, int, void *, void *, float, unsigned char);
-extern void func_PAL_003120C0(void);
+extern void cam_moby_init_tracking_pal(void *, int, int, void *, void *, float, unsigned char);
+extern void moby_fade_out_update_pal(void);
 
 /* Creates a camera object, inherits the parent's settings and initializes tracking. */
-char *func_PAL_002735D0(char *parent, int mode, int type, int index,
+char *cam_moby_create_pal(char *parent, int mode, int type, int index,
                   void *position, void *rotation, void *target,
                   unsigned char tag, float spread, float speed)
 {
@@ -68,12 +68,12 @@ char *func_PAL_002735D0(char *parent, int mode, int type, int index,
             *(int *)(obj + 0x44) = 0;
             func_PAL_002A0F68(obj);
         }
-        func_PAL_00273818(obj, mode, index, target, vector, speed, tag);
+        cam_moby_init_tracking_pal(obj, mode, index, target, vector, speed, tag);
         if (*(unsigned short *)(obj + 0x7c) & 0x8000) {
             if (*(unsigned short *)(obj + 0x34) & 0x10)
                 *(unsigned short *)(obj + 0x34) &= ~0x10;
         }
-        *(void (**)(void))(obj + 0x64) = func_PAL_003120C0;
+        *(void (**)(void))(obj + 0x64) = moby_fade_out_update_pal;
     }
     return obj;
 }

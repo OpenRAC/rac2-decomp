@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00131DE8 (snd_StartSoundSystem): binds the two sound RPC servers, waits for them and sends
  * the init request. A game-compiler unit of its own (00131780.c is an SDK unit). The last stores
  * before the request's jal are the plain payload stores and then the volatile D_001A7110 store;
@@ -9,21 +10,21 @@
  * originally from Lombyte; declarations and the eight-byte init payload
  * follow the RAC2 retail caller and RPC consumers.
  */
-extern u8 D_00146CC0[], D_00147CC0[];
-extern u8 D_00148CC0[], D_00149CC0[], D_0014ACC0[], D_0014B100[];
-extern u8 *D_001A74A0[] SDATA(D_001A74A0) __attribute__((sda));
+extern u8 g_snd_command_buffer0[], g_snd_command_buffer1[];
+extern u8 g_snd_buffer_a[], g_snd_buffer_b[], g_snd_buffer_c[], g_snd_buffer_d[];
+extern u8 *g_snd_command_buffers[] SDATA(D_001A74A0) __attribute__((sda));
 extern u8 *D_001A74A0_pair[] __asm__("D_001A74A0") __attribute__((sda));
-extern u8 *D_001A74B0[] SDATA(D_001A74B0) __attribute__((sda));
+extern u8 *g_snd_callback_tables[] SDATA(D_001A74B0) __attribute__((sda));
 extern u8 *D_001A74B0_pair[] __asm__("D_001A74B0") __attribute__((sda));
-extern u8 *D_001A74B8[] SDATA(D_001A74B8) __attribute__((sda));
+extern u8 *g_snd_reply_buffers[] SDATA(D_001A74B8) __attribute__((sda));
 extern u8 *D_001A74B8_pair[] __asm__("D_001A74B8") __attribute__((sda));
-extern int D_001A74F8[] SDATA(D_001A74F8) __attribute__((sda));
-extern int D_001A74C8[] SDATA(D_001A74C8) __attribute__((sda));
-extern int D_001A74D0[] SDATA(D_001A74D0) __attribute__((sda));
-extern int D_001A74A8[] SDATA(D_001A74A8) __attribute__((sda));
-extern int D_001A74AC[] __attribute__((sda));
-extern long D_001A74D8[] __attribute__((sda));
-extern int D_001A7180[] __attribute__((sda));
+extern int g_snd_quiet_flag[] SDATA(D_001A74F8) __attribute__((sda));
+extern int g_snd_cd_read_active[] SDATA(D_001A74C8) __attribute__((sda));
+extern int g_snd_cd_read_callback[] SDATA(D_001A74D0) __attribute__((sda));
+extern int g_snd_command_space_left[] SDATA(D_001A74A8) __attribute__((sda));
+extern int g_snd_command_space_extra[] __attribute__((sda));
+extern long g_snd_cd_read_callback_arg[] __attribute__((sda));
+extern int g_bank_rpc_result[] __attribute__((sda));
 typedef struct {
     void *paddr;
     unsigned int pid;
@@ -39,8 +40,8 @@ typedef struct {
     void *para;
     void *serve;
 } SifClientData;
-extern SifClientData D_001A7040 __attribute__((sda));
-extern SifClientData D_001A7140 __attribute__((sda));
+extern SifClientData g_sound_rpc_client __attribute__((sda));
+extern SifClientData g_bank_rpc_client __attribute__((sda));
 /* The CD read status block at 0x001A7100..0x001A713F (RAC1's CdSafeState: count at 0,
  * error at 0x10) is written by the IOP, so its fields are volatile. RAC2's retail EE
  * code shows that second writer (no IOP code is read):
@@ -55,9 +56,9 @@ extern SifClientData D_001A7140 __attribute__((sda));
  *   the cached lines unwritten is only right for memory another bus master writes.
  * _sceSDC (0x0011B328) and _sceIDC (0x0011B458) are symbol_addrs' digest-matched SDK
  * names (USA v1.01 addresses). 001334B8-g8.c declares the same two fields volatile. */
-extern volatile int D_001A7100[] __attribute__((sda));
-extern volatile int D_001A7110[] __attribute__((sda));
-extern char D_001A7500[], D_001A7528[];
+extern volatile int g_cd_read_count[] __attribute__((sda));
+extern volatile int g_cd_read_error[] __attribute__((sda));
+extern char g_str_snd_error_format[], g_str_snd_source_file[];
 
 extern void sceSifInitRpc(int);
 extern int sceSifBindRpc(void *, int, int);
@@ -75,29 +76,29 @@ int snd_StartSoundSystem(int options)
         int *read_active;
         int options;
     } init;
-    u8 *const command_buffer1 = D_00147CC0;
-    u8 *const command_buffer0 = D_00146CC0;
+    u8 *const command_buffer1 = g_snd_command_buffer1;
+    u8 *const command_buffer0 = g_snd_command_buffer0;
 
-    D_001A74A0[0] = command_buffer0;
+    g_snd_command_buffers[0] = command_buffer0;
     D_001A74A0_pair[1] = command_buffer1;
-    D_001A74B8[0] = D_0014ACC0;
-    D_001A74B8_pair[1] = D_0014B100;
-    D_001A74B0[0] = D_00148CC0;
-    D_001A74B0_pair[1] = D_00149CC0;
+    g_snd_reply_buffers[0] = g_snd_buffer_c;
+    D_001A74B8_pair[1] = g_snd_buffer_d;
+    g_snd_callback_tables[0] = g_snd_buffer_a;
+    D_001A74B0_pair[1] = g_snd_buffer_b;
     if (options & 2)
-        D_001A74F8[0] = 1;
+        g_snd_quiet_flag[0] = 1;
     else
-        D_001A74F8[0] = 0;
+        g_snd_quiet_flag[0] = 0;
     sceSifInitRpc(0);
 
     for (;;) {
-        bind_result = sceSifBindRpc(&D_001A7040, 0x123456, 0);
+        bind_result = sceSifBindRpc(&g_sound_rpc_client, 0x123456, 0);
         if (bind_result < 0) {
-            printf(D_001A7500, D_001A7528, 0xB1);
+            printf(g_str_snd_error_format, g_str_snd_source_file, 0xB1);
             for (;;) {}
         }
         delay = 9999;
-        server = D_001A7040.serve;
+        server = g_sound_rpc_client.serve;
         do {
             delay--;
         } while (delay != -1);
@@ -105,31 +106,31 @@ int snd_StartSoundSystem(int options)
             break;
     }
 
-    D_001A74C8[0] = 0;
-    D_001A74D0[0] = 0;
-    D_001A74D8[0] = 0;
-    D_001A7180[0] = 0;
+    g_snd_cd_read_active[0] = 0;
+    g_snd_cd_read_callback[0] = 0;
+    g_snd_cd_read_callback_arg[0] = 0;
+    g_bank_rpc_result[0] = 0;
 
     do {
-        bind_result = sceSifBindRpc(&D_001A7140, 0x123457, 0);
+        bind_result = sceSifBindRpc(&g_bank_rpc_client, 0x123457, 0);
         if (bind_result < 0) {
-            printf(D_001A7500, D_001A7528, 0xC6);
+            printf(g_str_snd_error_format, g_str_snd_source_file, 0xC6);
             for (;;) {}
         }
         delay = 9999;
-        server1 = D_001A7140.serve;
+        server1 = g_bank_rpc_client.serve;
         do {
             delay--;
         } while (delay != -1);
     } while (server1 == 0);
 
-    D_001A7100[0] = 0;
-    *(int *)D_00146CC0 = 0;
-    *(int *)D_00147CC0 = 0;
-    D_001A74A8[0] = 0xFFC;
-    D_001A74AC[0] = 0xFFC;
-    init.read_active = D_001A7100;
+    g_cd_read_count[0] = 0;
+    *(int *)g_snd_command_buffer0 = 0;
+    *(int *)g_snd_command_buffer1 = 0;
+    g_snd_command_space_left[0] = 0xFFC;
+    g_snd_command_space_extra[0] = 0xFFC;
+    init.read_active = g_cd_read_count;
     init.options = options;
-    D_001A7110[0] = 0;
+    g_cd_read_error[0] = 0;
     return snd_SendCommandSync(0, 8, &init);
 }

@@ -6,11 +6,11 @@
 
 typedef int UpdateQuad __attribute__((mode(TI)));
 typedef float L04_EE090Vec[4] __attribute__((aligned(16)));
-extern int D_L04_001B2008 MACRO_ADDR;
-extern L04_EE090Vec D_L04_001B9680, g_hero_position;
-extern unsigned char D_L04_001A8F20[] MACRO_ADDR;
+extern int g_game_tick_counter MACRO_ADDR;
+extern L04_EE090Vec g_tether_zero_vec, g_hero_position;
+extern unsigned char g_effect_default_params[] MACRO_ADDR;
 /* Table of 0x80-byte target records; targets[] below holds indices into it. */
-extern unsigned char *D_L04_001B25CC __attribute__((sda));
+extern unsigned char *g_linked_record_table __attribute__((sda));
 extern unsigned char *g_route_path_table[];
 extern void moby_start_timed_effect(unsigned char *, unsigned char *);
 extern int moby_count_slot_objects_find_free(unsigned char *, unsigned char *);
@@ -40,8 +40,8 @@ extern void vec_random_direction(void *, float, float);
 extern void *level_build_spawn_record(void *, void *, void *, void *, void *, void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int PlayMobySound(int, int, void *);
-extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern void func_PAL_002A7650(void *, int, int);
+extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern void SetDeathBits_pal(void *, int, int);
 
 typedef struct {
     char pad0[0x20];
@@ -81,7 +81,7 @@ void func_PAL_L04_003F2028(unsigned char *m)
     float scale, z;
 
     moby_start_timed_effect(m, (unsigned char *)p);
-    if (m[0x31] && fast_vec_dist(m + 0x10, D_L04_001B9680) < 24.0f) {
+    if (m[0x31] && fast_vec_dist(m + 0x10, g_tether_zero_vec) < 24.0f) {
         moby_update_ground_check(m);
         m[0x6F] = 22;
     }
@@ -90,7 +90,7 @@ void func_PAL_L04_003F2028(unsigned char *m)
         p->active = 1;
         p->speed = 1.0f;
         p->shots = 0;
-        if (D_L04_001B2008) {
+        if (g_game_tick_counter) {
             cursor = 0;
             count = 0;
             while (!GetFirstMobyInGroup(&cursor, p->group, 0, 0)) {
@@ -150,7 +150,7 @@ void func_PAL_L04_003F2028(unsigned char *m)
             for (i = 0; i < 4; i++) {
                 int id = ((int *)((unsigned char *)p + 0x90))[i];
                 if (id != -1) {
-                    unsigned char *q = D_L04_001B25CC + id * 128;
+                    unsigned char *q = g_linked_record_table + id * 128;
                     distance = fast_vec_dist(g_hero_position, q + 0x30);
                     if (distance < best) {
                         chosen = q;
@@ -177,7 +177,7 @@ void func_PAL_L04_003F2028(unsigned char *m)
             for (i = 0; i < 4; i++) {
                 int k = (i + start) % 4;
                 if (p->targets[k] != -1) {
-                    chosen = D_L04_001B25CC + p->targets[k] * 128;
+                    chosen = g_linked_record_table + p->targets[k] * 128;
                     break;
                 }
             }
@@ -216,7 +216,7 @@ void func_PAL_L04_003F2028(unsigned char *m)
         rotation[2] += 1.0f;
         *(UpdateQuad *)velocity = 0;
         velocity[2] = 3.0f;
-        level_build_spawn_record(child, rotation, velocity, position, velocity, D_L04_001A8F20, 50, 0, 0);
+        level_build_spawn_record(child, rotation, velocity, position, velocity, g_effect_default_params, 50, 0, 0);
         p->timer = ((s32)(p->delay) * 5 + 2) / 6;
         p->fired++;
         if (++p->shots >= 19)
@@ -227,10 +227,10 @@ void func_PAL_L04_003F2028(unsigned char *m)
         break;
     }
     case 2:
-        func_PAL_L00_003FB330(m + 0x10, 0, 25, 20, 20, 20, 20, 0, 1, 0, 0, 0, 0.75f, 20.0f);
+        SpawnExplosion_pal(m + 0x10, 0, 25, 20, 20, 20, 20, 0, 1, 0, 0, 0, 0.75f, 20.0f);
         p->speed = 0;
         PlayMobySound(1, 0, m);
-        func_PAL_002A7650(m, 0, 3);
+        SetDeathBits_pal(m, 0, 3);
         moby_mark_spawned(m);
         break;
     }

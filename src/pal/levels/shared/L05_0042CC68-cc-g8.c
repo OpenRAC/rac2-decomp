@@ -23,10 +23,10 @@ extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_trailing_spark(void *, void *, int, int, int, int, float);
-extern float D_L05_001B1534 __attribute__((sda));
-extern float D_L05_001B1530 __attribute__((sda));
-extern char D_L05_001BFB30[], D_L05_001BFB00[];
-extern u8 *D_L05_001FF240[] NOT_SDA;
+extern float g_projectile_hit_radius_alt __attribute__((sda));
+extern float g_projectile_hit_radius_normal __attribute__((sda));
+extern char g_projectile_pos_scratch[], g_collision_l05_result[];
+extern u8 *g_particle_params_table[] NOT_SDA;
 
 typedef struct { char pad[0x18]; char *hit; int count; int point[4]; } Collision;
 
@@ -79,13 +79,13 @@ void func_PAL_L05_0042CC68(char *object)
     }
     if (math_fast_float_d(state + 0x28)) {
         hit = 0;
-        radius = *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530;
+        radius = *(int *)(state + 0x24) ? g_projectile_hit_radius_alt : g_projectile_hit_radius_normal;
         if (coll_test_point(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
-            qcopy(object + 0x10, D_L05_001BFB30);
+            qcopy(object + 0x10, g_projectile_pos_scratch);
         }
         if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
-            collision = (Collision *)D_L05_001BFB00;
+            collision = (Collision *)g_collision_l05_result;
             if (collision->hit) {
                 snd_play_from_class_bank(7, 0, object, 0xFBF);
                 qcopy(object + 0x10, &collision->point);
@@ -104,11 +104,11 @@ void func_PAL_L05_0042CC68(char *object)
             radius = 1.5f;
         if (coll_test_point(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
-            qcopy(object + 0x10, D_L05_001BFB30);
+            qcopy(object + 0x10, g_projectile_pos_scratch);
         }
         if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
             snd_play_from_class_bank(7, 0, object, 0xFBF);
-            qcopy(object + 0x10, &((Collision *)D_L05_001BFB00)->point);
+            qcopy(object + 0x10, &((Collision *)g_collision_l05_result)->point);
             func_PAL_L05_0042D118(object, state, object + 0x10);
             ShotEndFlight(object, state);
             return;
@@ -125,15 +125,15 @@ void func_PAL_L05_0042CC68(char *object)
         if (*(int *)(state + 0x24)) {
             particle = part_spawn_trailing_spark(pos, random, 0x4FFF0040, 0x1FFF0040, 8, 1, 30000.0f);
             if (particle)
-                particle[2] = D_L05_001FF240[97][7];
+                particle[2] = g_particle_params_table[97][7];
             particle = part_spawn_trailing_spark(pos, random, 0x4FFF2040, 0x1FFF2040, 8, 1, 15000.0f);
         } else {
             particle = part_spawn_trailing_spark(pos, random, 0x4F00FF20, 0x1F00FF20, 8, 1, 30000.0f);
             if (particle)
-                particle[2] = D_L05_001FF240[97][7];
+                particle[2] = g_particle_params_table[97][7];
             particle = part_spawn_trailing_spark(pos, random, 0x4F20FF20, 0x1F20FF20, 8, 1, 15000.0f);
         }
         if (particle)
-            particle[2] = D_L05_001FF240[97][7];
+            particle[2] = g_particle_params_table[97][7];
     }
 }

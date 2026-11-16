@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L02_003FE8B8: draws the level's six HUD text boxes (layout table scaled by D_L02_001B3E04
  * and rounded), then per mode (data + 0x120 == 3, 5, 12, else) the titles, the time or count
  * through sprintf (func_00115DA8), and the boss bar (func_L02_003FE768). Twin of
@@ -13,69 +14,69 @@ typedef struct {
     u16 w[12];
 } Rect;
 
-extern s32 D_L02_001A904C[] __attribute__((sda));
-extern f32 D_L02_001B3E04;
+extern s32 g_arena_menu_base[] __attribute__((sda));
+extern f32 g_hud_label_scale;
 typedef struct {
     u8 pad[0xB0];
     f32 text_scale;
 } HudRenderState;
-extern u8 D_L02_001BEA00[];
-extern char D_L02_001B1428[];
-extern char D_L02_001B1430[];
-extern s16 *D_L02_001B1190[] SDATA(D_L02_001B1190);
-extern s32 D_L02_001B1358 __attribute__((sda));
+extern u8 g_hud_l02_render_state[];
+extern char g_str_hud_number_format[];
+extern char g_str_hud_round_name_format[];
+extern s16 *g_arena_challenge_table_2[] SDATA(D_L02_001B1190);
+extern s32 g_hud_text_color __attribute__((sda));
 
-extern s32 D_L02_001B13D8 __attribute__((sda));
-extern s32 D_L02_001B13DC __attribute__((sda));
-extern s32 D_L02_001B13E0 __attribute__((sda));
-extern s32 D_L02_001B13E4[] __attribute__((sda));
-extern s32 D_L02_001B13E8[] __attribute__((sda));
-extern s32 D_L02_001B13EC[] __attribute__((sda));
-extern s32 D_L02_001B13C0 __attribute__((sda));
-extern s32 D_L02_001B13C4 __attribute__((sda));
-extern s32 D_L02_001B13C8 __attribute__((sda));
-extern s32 D_L02_001B13CC[] __attribute__((sda));
-extern s32 D_L02_001B13D0[] __attribute__((sda));
-extern s32 D_L02_001B13D4[] __attribute__((sda));
-extern s32 D_L02_001B1378 __attribute__((sda));
-extern s32 D_L02_001B137C __attribute__((sda));
-extern s32 D_L02_001B1380 __attribute__((sda));
-extern s32 D_L02_001B1384[] __attribute__((sda));
-extern s32 D_L02_001B1388[] __attribute__((sda));
-extern s32 D_L02_001B138C[] __attribute__((sda));
-extern s32 D_L02_001B135C __attribute__((sda));
-extern s32 D_L02_001B1360 __attribute__((sda));
-extern s32 D_L02_001B1368 __attribute__((sda));
-extern s32 D_L02_001B136C[] __attribute__((sda));
-extern s32 D_L02_001B1370[] __attribute__((sda));
-extern s32 D_L02_001B1374[] __attribute__((sda));
-extern s32 D_L02_001B13A8 __attribute__((sda));
-extern s32 D_L02_001B13AC __attribute__((sda));
-extern s32 D_L02_001B13B0 __attribute__((sda));
-extern s32 D_L02_001B13B4[] __attribute__((sda));
-extern s32 D_L02_001B13B8[] __attribute__((sda));
-extern s32 D_L02_001B13BC[] __attribute__((sda));
-extern s32 D_L02_001B1390 __attribute__((sda));
-extern s32 D_L02_001B1394 __attribute__((sda));
-extern s32 D_L02_001B1398 __attribute__((sda));
-extern s32 D_L02_001B139C[] __attribute__((sda));
-extern s32 D_L02_001B13A0[] __attribute__((sda));
-extern s32 D_L02_001B13A4[] __attribute__((sda));
+extern s32 g_hud_panel_d_window_height __attribute__((sda));
+extern s32 g_hud_panel_d_height __attribute__((sda));
+extern s32 g_hud_panel_d_pos_x __attribute__((sda));
+extern s32 g_hud_panel_d_pos_y[] __attribute__((sda));
+extern s32 g_hud_panel_d_window_left[] __attribute__((sda));
+extern s32 g_hud_panel_d_window_right[] __attribute__((sda));
+extern s32 g_hud_panel_c_window_height __attribute__((sda));
+extern s32 g_hud_panel_c_height __attribute__((sda));
+extern s32 g_hud_panel_c_pos_x __attribute__((sda));
+extern s32 g_hud_panel_c_pos_y[] __attribute__((sda));
+extern s32 g_hud_panel_c_window_left[] __attribute__((sda));
+extern s32 g_hud_panel_c_window_right[] __attribute__((sda));
+extern s32 g_hud_window_b_height __attribute__((sda));
+extern s32 g_hud_window_b_box_height __attribute__((sda));
+extern s32 g_hud_window_b_x __attribute__((sda));
+extern s32 g_hud_window_b_y[] __attribute__((sda));
+extern s32 g_hud_window_b_left[] __attribute__((sda));
+extern s32 g_hud_window_b_top[] __attribute__((sda));
+extern s32 g_hud_window_a_height __attribute__((sda));
+extern s32 g_hud_window_a_box_height __attribute__((sda));
+extern s32 g_hud_window_a_x __attribute__((sda));
+extern s32 g_hud_window_a_y[] __attribute__((sda));
+extern s32 g_hud_window_a_left[] __attribute__((sda));
+extern s32 g_hud_window_a_top[] __attribute__((sda));
+extern s32 g_hud_panel_b_window_height __attribute__((sda));
+extern s32 g_hud_panel_b_text_y __attribute__((sda));
+extern s32 g_hud_panel_b_pos_x __attribute__((sda));
+extern s32 g_hud_panel_b_pos_y[] __attribute__((sda));
+extern s32 g_hud_panel_b_window_left[] __attribute__((sda));
+extern s32 g_hud_panel_b_window_right[] __attribute__((sda));
+extern s32 g_hud_window_c_height __attribute__((sda));
+extern s32 g_hud_window_c_box_height __attribute__((sda));
+extern s32 g_hud_window_c_x __attribute__((sda));
+extern s32 g_hud_window_c_y[] __attribute__((sda));
+extern s32 g_hud_panel_a_window_left[] __attribute__((sda));
+extern s32 g_hud_panel_a_window_right[] __attribute__((sda));
 
-extern s32 D_L02_001B13F0 __attribute__((sda));
-extern s32 D_L02_001B13F4 __attribute__((sda));
-extern s32 D_L02_001B13F8 __attribute__((sda));
-extern s32 D_L02_001B13FC __attribute__((sda));
-extern s32 D_L02_001B1400 __attribute__((sda));
-extern f32 D_L02_001B1404 __attribute__((sda));
-extern f32 D_L02_001B1408 __attribute__((sda));
-extern f32 D_L02_001B140C __attribute__((sda));
-extern f32 D_L02_001B1410 __attribute__((sda));
-extern f32 D_L02_001B1414 __attribute__((sda));
-extern f32 D_L02_001B1418 __attribute__((sda));
-extern f32 D_L02_001B141C __attribute__((sda));
-extern s32 D_L02_001B1420 __attribute__((sda));
-extern s32 D_L02_001B1424 __attribute__((sda));
+extern s32 g_hud_label_a_word0 __attribute__((sda));
+extern s32 g_hud_label_a_word1 __attribute__((sda));
+extern s32 g_hud_label_a_word2 __attribute__((sda));
+extern s32 g_hud_label_b_word0 __attribute__((sda));
+extern s32 g_hud_label_b_word1 __attribute__((sda));
+extern f32 g_hud_label_unit_float __attribute__((sda));
+extern f32 g_hud_label_c_float0 __attribute__((sda));
+extern f32 g_hud_label_c_float1 __attribute__((sda));
+extern f32 g_hud_label_d_float0 __attribute__((sda));
+extern f32 g_hud_label_d_float1 __attribute__((sda));
+extern f32 g_hud_label_e_float0 __attribute__((sda));
+extern f32 g_hud_label_e_float1 __attribute__((sda));
+extern s32 g_hud_label_color_a __attribute__((sda));
+extern s32 g_hud_label_color_b __attribute__((sda));
 
 extern void UpdateViewContext(void);
 extern void text_draw_window_small(Rect *, u64, char *, s32);
@@ -114,10 +115,10 @@ extern s32 sprintf(char *, char *, ...);
             { s32 c = D_L02_001B1358; s32 n = func_001157AC(buf); fn((r), c, buf, n); }
 #define sprintf_n func_00115DA8
 
-extern int D_L02_001B3E00;
+extern int g_hud_l02_mode;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L02_001B3E00;
+    int mode = g_hud_l02_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -135,7 +136,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 /* label_y4: label_y with the mode test before the rounding and dead stores to value. */
 static __inline__ int label_y4(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L02_001B3E00;
+    int mode = g_hud_l02_mode;
     float scaled = value * scale + half;
     int result;
     void *copy;
@@ -149,7 +150,7 @@ static __inline__ int label_y4(void *handle, float value, float scale, float hal
 
 static __inline__ int hud_coord(float value, float scale, float half)
 {
-    int mode = D_L02_001B3E00;
+    int mode = g_hud_l02_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     int copy;
@@ -192,70 +193,70 @@ void DrawMaktarChallengeHud(u8 *moby)
     s32 three2;
     s32 three3;
 
-    if (D_L02_001A904C[0] == 0) {
+    if (g_arena_menu_base[0] == 0) {
         return;
     }
     gfx_append_draw_list_packet_c();
     one = 1;
     half = 0.5f;
     data = *(u8 **)(moby + 0x68);
-    x = hud_coord((f32)D_L02_001B13E0, D_L02_001B3E04, half);
-    y = hud_coord((f32)D_L02_001B13E4[0], D_L02_001B3E04, half);
-    h = hud_coord((f32)D_L02_001B13DC, D_L02_001B3E04, half);
+    x = hud_coord((f32)g_hud_panel_d_pos_x, g_hud_label_scale, half);
+    y = hud_coord((f32)g_hud_panel_d_pos_y[0], g_hud_label_scale, half);
+    h = hud_coord((f32)g_hud_panel_d_height, g_hud_label_scale, half);
     three = 3;
-    FontSetWindow(&r50, x, y, D_L02_001B13E8[0], D_L02_001B13EC[0], D_L02_001B13D8, h, 0, three);
-    x = hud_coord((f32)D_L02_001B13C8, D_L02_001B3E04, half);
-    do { y = hud_coord((f32)D_L02_001B13CC[0], D_L02_001B3E04, half); } while (0);
-    h = hud_coord((f32)D_L02_001B13C4, D_L02_001B3E04, half);
-    FontSetWindow(&r70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, three);
-    x = hud_coord((f32)D_L02_001B1380, D_L02_001B3E04, half);
+    FontSetWindow(&r50, x, y, g_hud_panel_d_window_left[0], g_hud_panel_d_window_right[0], g_hud_panel_d_window_height, h, 0, three);
+    x = hud_coord((f32)g_hud_panel_c_pos_x, g_hud_label_scale, half);
+    do { y = hud_coord((f32)g_hud_panel_c_pos_y[0], g_hud_label_scale, half); } while (0);
+    h = hud_coord((f32)g_hud_panel_c_height, g_hud_label_scale, half);
+    FontSetWindow(&r70, x, y, g_hud_panel_c_window_left[0], g_hud_panel_c_window_right[0], g_hud_panel_c_window_height, h, 0, three);
+    x = hud_coord((f32)g_hud_window_b_x, g_hud_label_scale, half);
     k2 = 1;
     k3 = 1;
-    do { t = (f32)D_L02_001B1384[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    h = hud_coord((f32)D_L02_001B137C, D_L02_001B3E04, half);
-    FontSetWindow(&r90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, three);
+    do { t = (f32)g_hud_window_b_y[0] * g_hud_label_scale + half; y = t; } while (0);
+    h = hud_coord((f32)g_hud_window_b_box_height, g_hud_label_scale, half);
+    FontSetWindow(&r90, x, y, g_hud_window_b_left[0], g_hud_window_b_top[0], g_hud_window_b_height, h, 0, three);
     three2 = 3;
-    x = hud_coord((f32)D_L02_001B1368, D_L02_001B3E04, half);
-    do { t = (f32)D_L02_001B136C[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    do { h = hud_coord((f32)D_L02_001B1360, D_L02_001B3E04, half); } while (0);
-    FontSetWindow(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, three);
-    x = hud_coord((f32)D_L02_001B13B0, D_L02_001B3E04, half);
-    do { t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + half; y = t; } while (0);
+    x = hud_coord((f32)g_hud_window_a_x, g_hud_label_scale, half);
+    do { t = (f32)g_hud_window_a_y[0] * g_hud_label_scale + half; y = t; } while (0);
+    do { h = hud_coord((f32)g_hud_window_a_box_height, g_hud_label_scale, half); } while (0);
+    FontSetWindow(&rB0, x, y, g_hud_window_a_left[0], g_hud_window_a_top[0], g_hud_window_a_height, h, 0, three);
+    x = hud_coord((f32)g_hud_panel_b_pos_x, g_hud_label_scale, half);
+    do { t = (f32)g_hud_panel_b_pos_y[0] * g_hud_label_scale + half; y = t; } while (0);
     three3 = 3;
-    FontSetWindow(&rF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half), 0, three3);
-    x = hud_coord((f32)D_L02_001B1398, D_L02_001B3E04, half);
-    do { t = (f32)D_L02_001B139C[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    FontSetWindow(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half), 0, three2);
-    save = ((HudRenderState *)D_L02_001BEA00)->text_scale;
-    ((HudRenderState *)D_L02_001BEA00)->text_scale = 0.62f;
+    FontSetWindow(&rF0, x, y, g_hud_panel_b_window_left[0], g_hud_panel_b_window_right[0], g_hud_panel_b_window_height, hud_coord((f32)g_hud_panel_b_text_y, g_hud_label_scale, half), 0, three3);
+    x = hud_coord((f32)g_hud_window_c_x, g_hud_label_scale, half);
+    do { t = (f32)g_hud_window_c_y[0] * g_hud_label_scale + half; y = t; } while (0);
+    FontSetWindow(&rD0, x, y, g_hud_panel_a_window_left[0], g_hud_panel_a_window_right[0], g_hud_window_c_height, hud_coord((f32)g_hud_window_c_box_height, g_hud_label_scale, half), 0, three2);
+    save = ((HudRenderState *)g_hud_l02_render_state)->text_scale;
+    ((HudRenderState *)g_hud_l02_render_state)->text_scale = 0.62f;
     UpdateViewContext();
     if (*(s16 *)(data + 0x120) == three2) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
-        sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
+        sprintf_n(buf, g_str_hud_number_format, 0x1E - *(s32 *)(data + 0xD4) / 60);
         DRAWBUF(text_draw_window_large, &r90);
         DRAW(text_draw_window_small, &rB0, GetLocalizedString(0x2F63));
         LABEL(k2, one);
         SUM();
-        sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
+        sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         DRAW(text_draw_window_small, &r70, GetLocalizedString(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 5) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
-        sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
+        sprintf_n(buf, g_str_hud_number_format, 0x3C - *(s32 *)(data + 0xD4) / 60);
         DRAWBUF(text_draw_window_large, &r90);
         DRAW(text_draw_window_small, &rB0, GetLocalizedString(0x2F63));
         LABEL(k2, one);
         SUM();
-        sprintf(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
+        sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         DRAW(text_draw_window_small, &r70, GetLocalizedString(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 0xC) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         n = 120 - *(s32 *)(data + 0xD4) / 60;
-        sprintf(buf, D_L02_001B1428, n);
+        sprintf(buf, g_str_hud_number_format, n);
         if (n >= 100) {
             DRAWBUF(text_draw_window_small, &r90);
         } else {
@@ -272,25 +273,25 @@ void DrawMaktarChallengeHud(u8 *moby)
             case MOBY_CLASS_CHAINBLADE:
                 pv = *(u8 **)(obj + 0x68);
                 hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
-                LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
+                LBL4(0x51, g_hud_label_a_word0, g_hud_label_a_word1, g_hud_label_a_word2, g_hud_label_unit_float, 1.0f, 2.0f, half, k3);
                 break;
             case MOBY_CLASS_B2_BRAWLER_LEGS:
                 pv = *(u8 **)(obj + 0x68);
                 hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
-                LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k2);
+                LBL4(0x51, g_hud_label_a_word0, g_hud_label_a_word1, g_hud_label_a_word2, g_hud_label_unit_float, 1.0f, 1.0f, half, k2);
                 break;
             }
         }
         {
         s32 ofs = 0x8710;
-        LBL0(0x4E, D_L02_001B1424, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f, 0.5f, 1);
-        LBL0(0x4F, D_L02_001B1420, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f, 0.5f, 1);
+        LBL0(0x4E, g_hud_label_color_b, g_hud_label_e_float0, g_hud_label_e_float1, -1.0f, g_hud_label_unit_float, 0.0f, 0.5f, 1);
+        LBL0(0x4F, g_hud_label_color_a, g_hud_label_e_float0, g_hud_label_e_float1, -1.0f, g_hud_label_unit_float, 0.0f, 0.5f, 1);
         }
-        sprintf(buf, D_L02_001B1430, *(s16 *)(data + 0x122) + 1, *D_L02_001B1190[*(s16 *)(data + 0x120)]);
+        sprintf(buf, g_str_hud_round_name_format, *(s16 *)(data + 0x122) + 1, *g_arena_challenge_table_2[*(s16 *)(data + 0x120)]);
         DRAWBUF(text_draw_window_large, &rF0);
         DRAW(text_draw_window_small, &rD0, GetLocalizedString(0x2F60));
     }
     VU1_addGSregister(0x47, 0x5360B);
-    ((HudRenderState *)D_L02_001BEA00)->text_scale = save;
+    ((HudRenderState *)g_hud_l02_render_state)->text_scale = save;
     UpdateViewContext();
 }

@@ -12,13 +12,13 @@ extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern void enemy_spawn_child_parts(void *, void *, int, int);
-extern void func_PAL_003273B8(float, void *, void *, int, void *);
+extern void enemy_attach_turn_child_parts_pal(float, void *, void *, int, void *);
 extern void group_sync_counter(void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int func_PAL_002B1A50(void *, void *, int);
-extern void func_PAL_L02_003F5EB0(char *);
+extern void actor_tear_down_pal(char *);
 extern void actor_update_loop_effect(char *);
-extern char D_L02_001A8F20[] __attribute__((sda));
+extern char g_zero_l02_vector[] __attribute__((sda));
 typedef struct {
     u8 pad0[0x18];
     char *p18;
@@ -62,7 +62,7 @@ typedef struct {
     u8 x4DC[0xE];
     short s4EA;
 } St003F1298;
-extern u8 D_L02_00220730;
+extern u8 g_actor_match_key;
 
 /* Update with a lazy start: the first call (state byte +0x20 still 0) sets the actor up (a random
    sway angle of 15 to 40 degrees, either sign, two random bytes from 15 and 12, its speed and
@@ -70,7 +70,7 @@ extern u8 D_L02_00220730;
    the player is within 24 units, turns the angle by the rate at +0x4CC, updates the effect,
    and for a visible actor of state 3 or more looks for the object of class 0xA03 / 0xB89 that
    it is attached to and releases it. */
-void func_PAL_L02_003F5860(char *arg0) {
+void swaying_actor_update_pal(char *arg0) {
     St003F1298 *s = *(St003F1298 **)(arg0 + 0x68);
     float f;
 
@@ -100,7 +100,7 @@ void func_PAL_L02_003F5860(char *arg0) {
         s->b2E = 1;
         enemy_spawn_child_parts(arg0, s->x4C0, 0, 1);
         s->s4EA = 0;
-        func_PAL_L02_003F5EB0(arg0);
+        actor_tear_down_pal(arg0);
     }
     if (*(u8 *)(arg0 + 0x31) != 0) {
         if (fast_vec_dist(arg0 + 0x10, &g_camera_l02_position) < 24.0f) {
@@ -109,7 +109,7 @@ void func_PAL_L02_003F5860(char *arg0) {
         }
     }
     s->f4BC = FastAddRotations(s->f4BC, s->f4CC * 0.017453294f);
-    func_PAL_003273B8(s->f4BC, arg0, s->x4C0, 1, D_L02_001A8F20);
+    enemy_attach_turn_child_parts_pal(s->f4BC, arg0, s->x4C0, 1, g_zero_l02_vector);
     group_sync_counter(arg0, s->x4DC);
     if (*(u8 *)(arg0 + 0x31) != 0 && *(u8 *)(arg0 + 0x20) >= 3) {
         char *t = part_find_owned_effect_slot(arg0, 0x10000, 1);
@@ -123,7 +123,7 @@ void func_PAL_L02_003F5860(char *arg0) {
             s->fF4 = 1.0053098f;
         }
         if (*(u8 *)(arg0 + 0x20) >= 2 && s->b2E == 2)
-            func_PAL_L02_003F5EB0(arg0);
+            actor_tear_down_pal(arg0);
         actor_update_loop_effect(arg0);
     }
 }

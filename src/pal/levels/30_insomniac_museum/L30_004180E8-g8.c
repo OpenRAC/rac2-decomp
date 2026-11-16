@@ -9,10 +9,10 @@
    puts retail's two-nop floor in front of each div.s (docs/build/compiler-notes.md, "Division/root
    scheduling and padding"), and -G8 is the template's flag. */
 
-extern u8 *D_L12_001B2E9C[3] __attribute__((sda)); /* entity base, read bare (lui/lw) */
-extern s16 *D_L12_001FB960[];
-extern int D_L12_001B29C8;
-extern char D_L12_001B2040[], D_L12_001B2070[];
+extern u8 *g_moby_list_start[3] __attribute__((sda)); /* entity base, read bare (lui/lw) */
+extern s16 *g_moby_l12_group_lists[];
+extern int g_frame_l12_counter;
+extern char g_str_pulsing_light_debug_a[], g_str_pulsing_light_debug_b[];
 extern void STUB_printf(void *, int);
 extern void func_L12_0031E1D0(void *, int, int);
 extern int moby_count_group_not_in_state(int, int);
@@ -21,7 +21,7 @@ extern int PulseColor(int, int, float);
 
 static inline int pulse_colour(int *vars) {
     int period = ((s32)(vars[8]) * 5 + 2) / 6;
-    float phase = IntToFloat(D_L12_001B29C8 % period) * 6.2831855f / IntToFloat(period) - 3.1415927f;
+    float phase = IntToFloat(g_frame_l12_counter % period) * 6.2831855f / IntToFloat(period) - 3.1415927f;
 
     return PulseColor(vars[10], vars[11], phase);
 }
@@ -58,18 +58,18 @@ void func_PAL_L30_004180E8(u8 *obj) {
             } while (1);
         }
         if (vars[9]) {
-            STUB_printf(D_L12_001B2040, *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_pulsing_light_debug_a, *(s16 *)(obj + 0xB2));
             func_L12_0031E1D0(obj, 2, -1);
         } else {
-            STUB_printf(D_L12_001B2070, *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_pulsing_light_debug_b, *(s16 *)(obj + 0xB2));
             func_L12_0031E1D0(obj, 1, -1);
         }
         break;
     case 1:
         if (moby_count_group_not_in_state(obj[0x21], -1) >= 2) {
-            ids = D_L12_001FB960[obj[0x21]];
+            ids = g_moby_l12_group_lists[obj[0x21]];
             do {
-                member = D_L12_001B2E9C[0] + ((*(u16 *)ids & 0x7FFF) << 8);
+                member = g_moby_list_start[0] + ((*(u16 *)ids & 0x7FFF) << 8);
                 if (member[0x31]) {
                     *(int *)(member + 0x78) = pulse_colour(vars);
                 }
@@ -77,7 +77,7 @@ void func_PAL_L30_004180E8(u8 *obj) {
         }
     case 2:
         for (i = 0; i < vars[9]; i++) {
-            u8 *target = D_L12_001B2E9C[0] + (vars[12 + i] << 8);
+            u8 *target = g_moby_list_start[0] + (vars[12 + i] << 8);
             if (target[0x31]) {
                 *(int *)(target + 0x78) = pulse_colour(vars);
             }

@@ -31,11 +31,11 @@ struct L12Settings {
 };
 
 /* Level data. */
-extern s32 D_L12_001B2E9C __attribute__((sda));
-extern s32 D_L12_001A8FF0 __attribute__((sda));
-extern u8 D_L12_001A63A8[];
-extern u8 D_L12_001FEAC0[];
-extern s16 *D_L12_001FB960[];
+extern s32 g_moby_list_start __attribute__((sda));
+extern s32 g_hero_l12_lock_flag __attribute__((sda));
+extern u8 g_path_shooter_state[];
+extern u8 g_path_zone_table[];
+extern s16 *g_moby_l12_group_lists[];
 
 extern void func_331870();
 extern void func_32F848();
@@ -55,7 +55,7 @@ extern float vec_distance_squared_xy(void *, void *);
 /* Picks which path point the enemy should walk to next: the one it is on, the nearest one, or the nearest one it can see. */
 void enemy_choose_nearest_visible_path_point(s32 moby) {
     u8 *state = *(u8 **)(moby + 0x68);
-    u8 *path = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(state + 0x158) << 2));
+    u8 *path = *(u8 **)(g_path_zone_table + (*(s32 *)(state + 0x158) << 2));
     s32 i;
     s32 bestIdx;
     f32 best;
@@ -122,7 +122,7 @@ void group_try_claim_attack_slot(s32 moby) {
     s32 ownerIndex = *(s32 *)(*(u32 *)(vars + 0x294));
 
     if (ownerIndex != -1) {
-        s32 mobyBase = D_L12_001B2E9C;
+        s32 mobyBase = g_moby_list_start;
         u8 *owner = (u8 *)((u32)mobyBase + (ownerIndex << 8));
 
         if (owner != 0) {
@@ -138,7 +138,7 @@ void group_try_claim_attack_slot(s32 moby) {
     }
     func_L12_0031E1D0(mobyAlias, 0xF, 5);
     {
-        s32 selfIndex = (mobyAlias - D_L12_001B2E9C) >> 8;
+        s32 selfIndex = (mobyAlias - g_moby_list_start) >> 8;
 
         *(u16 *)(vars + 0x29C) = 0x12C;
         *(s32 *)(*(u32 *)(vars + 0x294)) = selfIndex;
@@ -149,7 +149,7 @@ void group_try_claim_attack_slot(s32 moby) {
 void group_release_attack_slot(s32 moby) {
     s32 *slot = *(s32 **)(*(u32 *)(moby + 0x68) + 0x294);
 
-    if (*slot == ((moby - D_L12_001B2E9C) >> 8))
+    if (*slot == ((moby - g_moby_list_start) >> 8))
         *slot = -1;
 }
 
@@ -159,7 +159,7 @@ void group_release_attack_slot(s32 moby) {
 
 /* Turns two of the object's flags on or off, and sets its colour/direction bytes, from the settings given by a trigger. */
 void trigger_apply_settings_to_object(int index, struct L12Settings *settings, int enable) {
-    u8 *obj = (u8 *)(D_L12_001B2E9C + (index << 8));
+    u8 *obj = (u8 *)(g_moby_list_start + (index << 8));
 
     if (!obj)
         return;
@@ -206,7 +206,7 @@ void trigger_apply_settings_to_object(int index, struct L12Settings *settings, i
 
 /* Applies a trigger's settings to every object in one group list. */
 void trigger_apply_settings_to_group(s32 a0, s32 settings, s32 groupId, s32 enable) {
-    s16 *ids = D_L12_001FB960[groupId];
+    s16 *ids = g_moby_l12_group_lists[groupId];
 
     if (ids != 0) {
         do {
@@ -241,12 +241,12 @@ void enemy_tick_timers_age(s32 moby) {
 
 /* Adds one to a counter on every Space Tourist in the group. */
 void tourist_increment_counters(s32 groupId) {
-    s16 *ids = D_L12_001FB960[groupId];
+    s16 *ids = g_moby_l12_group_lists[groupId];
     s32 mobyBase;
 
     if (ids == 0)
         return;
-    mobyBase = D_L12_001B2E9C;
+    mobyBase = g_moby_list_start;
     do {
         u32 offset = (*(u16 *)ids & 0x7FFF) << 8;
 
@@ -287,11 +287,11 @@ void hopping_enemy_alert_group(s32 moby) {
 
     if (*(u8 *)(moby + 0x21) == 0xFF)
         return;
-    idList = D_L12_001FB960[*(u8 *)(moby + 0x21)];
+    idList = g_moby_l12_group_lists[*(u8 *)(moby + 0x21)];
     if (idList == 0)
         return;
     ids = idList;
-    mobyBase = D_L12_001B2E9C;
+    mobyBase = g_moby_list_start;
     do {
         u32 offset = (*(u16 *)ids & 0x7FFF) << 8;
 
@@ -320,7 +320,7 @@ void hopping_enemy_play_death_blast(char *obj) {
     FastVecSub(dir, obj + 0x10, g_hero_position);
     vec_transform_and_set_height(obj, dir, dir, 0, 0.0f);
     vec_scale_to_length(dir, dir, 0.10000000894069672f);
-    color = D_L12_001A8FF0 ? math_random_int_below(0xFF) : 0xFF;
+    color = g_hero_l12_lock_flag ? math_random_int_below(0xFF) : 0xFF;
     part_spawn_masked_debris(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
     moby_mark_spawned(obj);
 }

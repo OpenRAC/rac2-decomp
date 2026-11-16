@@ -1,12 +1,12 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern f32 D_L12_001B17F4 __attribute__((sda));
-extern f32 D_L12_001B17F8 __attribute__((sda));
-extern f32 D_L12_001B17FC __attribute__((sda));
-extern f32 D_L12_001B1800 __attribute__((sda));
-extern f32 D_L12_001B1804 __attribute__((sda));
-extern f32 D_L12_001B1808 __attribute__((sda));
+extern f32 g_guard_anim_rate_a __attribute__((sda));
+extern f32 g_guard_anim_rate_b __attribute__((sda));
+extern f32 g_guard_switch_rate_a __attribute__((sda));
+extern f32 g_guard_switch_rate_b __attribute__((sda));
+extern f32 g_guard_anim_rate_c __attribute__((sda));
+extern f32 g_guard_anim_rate_d __attribute__((sda));
 extern void moby_set_controller_speed_limits(u8 *, f32, f32, f32, f32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 typedef struct StateData {
@@ -39,25 +39,25 @@ typedef struct StateData {
 
 /* Fires the object's emitter for the new state, doubles the object's rate, arms the two
    animation tables the state selects and hands the state to both owners. */
-void func_PAL_L12_00417C90(u8 *a0, s32 a1, s32 a2, s32 a3) {
+void guard_switch_animation_pal(u8 *a0, s32 a1, s32 a2, s32 a3) {
     StateData *q = *(StateData **)(a0 + 0x68);
     f32 f0, f1, f2, f3;
     u8 *owner;
 
     if (a1 == 12) {
-        f0 = D_L12_001B17F4;
-        f1 = D_L12_001B17F8;
-        f2 = D_L12_001B1804;
-        f3 = D_L12_001B1808;
+        f0 = g_guard_anim_rate_a;
+        f1 = g_guard_anim_rate_b;
+        f2 = g_guard_anim_rate_c;
+        f3 = g_guard_anim_rate_d;
         moby_set_controller_speed_limits(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
             f2 * 6.981318e-06f,
             f3 * 0.0003490659f);
         q->field_118 = q->field_118 * 2.0f;
     } else {
-        f0 = D_L12_001B17FC;
-        f1 = D_L12_001B1800;
-        f2 = D_L12_001B1804;
-        f3 = D_L12_001B1808;
+        f0 = g_guard_switch_rate_a;
+        f1 = g_guard_switch_rate_b;
+        f2 = g_guard_anim_rate_c;
+        f3 = g_guard_anim_rate_d;
         moby_set_controller_speed_limits(a0, f0 * 0.00040000002f, f1 * 0.020000001f,
             f2 * 6.981318e-06f,
             f3 * 0.0003490659f);

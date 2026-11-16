@@ -9,11 +9,11 @@ extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32,
                               s32, s32, s32);
 extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
                           s32, s32, s32, s32);
-extern float D_L18_001B1D30 __attribute__((sda));
-extern float D_L18_001B1D38 __attribute__((sda));
-extern float D_L18_001B1D40 __attribute__((sda));
+extern float g_item_piece_offset __attribute__((sda));
+extern float g_item_piece_speed_range __attribute__((sda));
+extern float g_item_piece_spread_range __attribute__((sda));
 
-void func_PAL_L18_004467F8(u8 *s0) {
+void breakable_item_update_pal(u8 *s0) {
     s32 state = s0[0x20];
     u8 *s1 = *(u8 **)(s0 + 0x68);
     s32 one = 1;
@@ -29,8 +29,8 @@ void func_PAL_L18_004467F8(u8 *s0) {
         break;
     case 2: {
         s32 v = 0xFFFF;
-        part_explode_object_into_pieces(s0, &D_L18_001B1D40, &D_L18_001B1D38,
-                          &D_L18_001B1D30, 0xFFFF, 0, -1, 0, v, 0xFF, 0);
+        part_explode_object_into_pieces(s0, &g_item_piece_spread_range, &g_item_piece_speed_range,
+                          &g_item_piece_offset, 0xFFFF, 0, -1, 0, v, 0xFF, 0);
         SpawnExplosion(s0 + 0x10, 0, 5, 5, 5, 5, 5, 0,
                       *(float *)(s0 + 0x2C) * 10.0f, 20.0f, one, 0, one, 0);
         moby_mark_spawned(s0);

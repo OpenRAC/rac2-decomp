@@ -27,12 +27,12 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int coll_test_point(char *, int, char *, float);
-extern char *D_L06_001BFC98;
+extern char *g_hit_l06_result;
 extern float vec_distance_xy(char *, char *);
 extern float math_random_signed_float_range(float, float);
-extern int func_US2_002AF9C8(char *, float);
+extern int math_is_value_within_step_us2(char *, float);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern void *D_L06_001B3760[6];
+extern void *g_child_slot_used[6];
 extern void part_spawn_colored_burst(float *, int);
 extern char *moby_spawn_child_in_slot(char *, float *, float *, int, float);
 extern void lerp_vector(void *, void *, void *, float);
@@ -41,7 +41,7 @@ extern int coll_sweep_from_object(char *, void *, int, int, int, int, float, flo
 extern void actor_aim_body_at_target(char *);
 
 /* Updates the actor's alert mode, movement and attack animation states. */
-void func_US2_L06_0041F460(char *obj)
+void patrol_shooter_update_us2(char *obj)
 {
     char *st = *(char **)(obj + 0x68);
     int *sequence;
@@ -220,7 +220,7 @@ void func_US2_L06_0041F460(char *obj)
             target[2] = 0.0f;
             FastVecAdd((char *)pos, (char *)target, (char *)pos);
             if (coll_test_point((char *)pos, 0, obj, 0.5f)) {
-                char *hit_obj = D_L06_001BFC98;
+                char *hit_obj = g_hit_l06_result;
                 if (hit_obj && *(short *)(hit_obj + 0xAA) == 0xFDC)
                     part_emit_spark_burst_remove(hit_obj);
             }
@@ -311,14 +311,14 @@ void func_US2_L06_0041F460(char *obj)
                 anim_start_blended(obj, 10, 0, math_random_int_range(10, 30));
             st[0x48] = FloatToInt(20.0f);
             st[0x4A] = FloatToInt(8.0f);
-        } else if (func_US2_002AF9C8(obj, 2.0f)) {
+        } else if (math_is_value_within_step_us2(obj, 2.0f)) {
             moby_transform_joint_to_world(obj, 0, pos);
             qcopy(target, st + 0x200);
             FastVecSub((char *)direction, (char *)target, (char *)pos);
             vec_scale_to_length((char *)direction, (char *)direction, 0.1666666716337204f);
             *(int *)(st + 0x498) = -1;
             for (i = 0; i < 6; i++) {
-                if (!D_L06_001B3760[i]) {
+                if (!g_child_slot_used[i]) {
                     *(int *)(st + 0x498) = i;
                     break;
                 }

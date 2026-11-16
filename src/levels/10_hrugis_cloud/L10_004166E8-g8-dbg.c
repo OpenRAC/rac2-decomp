@@ -48,11 +48,11 @@ extern void moby_transform_joint_to_world(u8 *,s32,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void *CreateEnergyStrip(void *,void *,s32,s32,u32,u32,f32,s32,s32,f32,f32,f32);
 extern void moby_reset_action_state(u8 *);
-extern u8 *D_001B251C MACRO_ADDR;
-extern f32 D_L10_001B0F40 __attribute__((sda));
-extern s32 D_L10_001B0F44 __attribute__((sda));
-extern s32 D_L10_001B0F48 __attribute__((sda));
-extern f32 D_L10_001B34D8 MACRO_ADDR;
+extern u8 *g_moby_pool_base MACRO_ADDR;
+extern f32 g_boss_time_limit __attribute__((sda));
+extern s32 g_boss_flag_a __attribute__((sda));
+extern s32 g_boss_flag_b __attribute__((sda));
+extern f32 g_boss_step_rate MACRO_ADDR;
 /* Update of the Hrugis boss moby. It floats and bobs, carries two objects and throws out
    smoke. When it is hit it drops them and sends a child flying along a curve at the player,
    then waits for it to land. */
@@ -83,22 +83,22 @@ void hrugis_boss_update(u8 *moby) {
         hrugis_boss_init(moby);
         if (*(s32 *)(vars + 0x2B4))
             level_append_object(moby, hrugis_init_group_states, 0, hrugis_release_group_effects);
-        D_L10_001B0F44 = 0;
-        D_L10_001B0F48 = 0;
-        D_L10_001B34D8 = 1.0f / (D_L10_001B0F40 * 60.0f);
+        g_boss_flag_a = 0;
+        g_boss_flag_b = 0;
+        g_boss_step_rate = 1.0f / (g_boss_time_limit * 60.0f);
         break;
     case 1:
         if (!*(u8 **)(vars + 0x2C0))
             *(u8 **)(vars + 0x2C0) = SpawnAttachedObject(moby, 1);
         if (!*(u8 **)(vars + 0x2C4))
             *(u8 **)(vars + 0x2C4) = SpawnAttachedObject(moby, 0);
-        D_L10_001B0F40 = IntToFloat(hrugis_get_boss_difficulty()) * 2.5f + 30.0f;
-        if (D_L10_001B0F40 > 60.0f)
-            D_L10_001B0F40 = 60.0f;
+        g_boss_time_limit = IntToFloat(hrugis_get_boss_difficulty()) * 2.5f + 30.0f;
+        if (g_boss_time_limit > 60.0f)
+            g_boss_time_limit = 60.0f;
         info = moby_get_motion_data(moby);
         if (*(s32 *)(vars + 0x2B0) != -1) {
             *(s32 *)(info + 0x11C) = 1;
-            bank = D_001B251C;
+            bank = g_moby_pool_base;
             *(u8 **)(info + 0x120) = bank + (*(s32 *)(vars + 0x2B0) << 8);
         }
         hrugis_update_sway_speed(moby);
@@ -155,7 +155,7 @@ void hrugis_boss_update(u8 *moby) {
             }
             *(f32 *)(vars + 0x2D4) += *(f32 *)(vars + 0x2D8);
             if (*(f32 *)(vars + 0x2D4) > 3.1415927f) {
-                t = D_L10_001B34D8;
+                t = g_boss_step_rate;
                 *(f32 *)(vars + 0x2D4) = 3.1415927f;
                 *(f32 *)(vars + 0x2E0) += t;
             }
@@ -198,7 +198,7 @@ void hrugis_boss_update(u8 *moby) {
                 *(u8 **)(vars + 0x2C8) = 0;
                 info = moby_get_motion_data(moby);
                 ((Vec4 *)(vars + 0x180))->f[0] = (f32)*(s32 *)(info + 0x148);
-                D_L10_001B0F48 = 1;
+                g_boss_flag_b = 1;
             }
         } else if (math_fast_float_d(vars + 0x2DC)) {
             hrugis_launch_child_on_curve(moby);

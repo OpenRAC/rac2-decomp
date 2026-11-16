@@ -20,14 +20,14 @@ extern float D_L00_001B0668_gp SDATA(D_L00_001B0668);
 extern float D_L00_001B0670_gp SDATA(D_L00_001B0670);
 extern float D_L00_001B0680_gp SDATA(D_L00_001B0680);
 extern int D_L00_001B0690_gp SDATA(D_L00_001B0690);
-extern float D_L00_001B066C __attribute__((sda));
-extern float D_L00_001B0674 __attribute__((sda));
-extern float D_L00_001B0678 NOT_SDA;
-extern float D_L00_001B067C __attribute__((sda));
-extern float D_L00_001B0684 __attribute__((sda));
-extern float D_L00_001B0688 __attribute__((sda));
-extern float D_L00_001B068C __attribute__((sda));
-extern int D_L00_001B0694 __attribute__((sda));
+extern float g_trail_size_max __attribute__((sda));
+extern float g_trail_l00_speed_max __attribute__((sda));
+extern float g_trail_speed_alt_min NOT_SDA;
+extern float g_trail_speed_alt_max __attribute__((sda));
+extern float g_trail_from_height_max __attribute__((sda));
+extern float g_trail_to_height_min __attribute__((sda));
+extern float g_trail_to_height_max __attribute__((sda));
+extern int g_trail_duration_max __attribute__((sda));
 
 /* The sampler clamps n to its limit and writes only output[0..n-1]. The
  * constructor consumes all four floats from each endpoint, including size w.
@@ -52,25 +52,25 @@ void func_PAL_L00_003EC0E0(unsigned char *object, const unsigned char *info, flo
     count = coll_scatter_points_in_shapes(D_L00_001B0660_gp, (char *)object, 32, points, model[0x19]);
     for (i = 0; i < count; i++) {
         angle = math_random_angle();
-        speed = math_random_float_range(D_L00_001B0670_gp, D_L00_001B0674) * 0.020000001f;
+        speed = math_random_float_range(D_L00_001B0670_gp, g_trail_l00_speed_max) * 0.020000001f;
         from[0] = math_fast_sin_or_cos_a(angle) * speed;
         from[1] = math_fast_sin_or_cos_b(angle) * speed;
         from[2] = 0.0f;
-        from[2] = math_random_float_range(D_L00_001B0680_gp, D_L00_001B0684) * 0.020000001f;
+        from[2] = math_random_float_range(D_L00_001B0680_gp, g_trail_from_height_max) * 0.020000001f;
         from[3] = math_random_float_range(0.1f, 0.2f);
         angle = FastAddRotations(angle, math_random_float_range(120.0f, 240.0f) * 0.01745329424738884f);
-        speed = math_random_float_range(D_L00_001B0678, D_L00_001B067C) * 0.020000001f;
+        speed = math_random_float_range(g_trail_speed_alt_min, g_trail_speed_alt_max) * 0.020000001f;
         to[0] = math_fast_sin_or_cos_a(angle) * speed;
         to[1] = math_fast_sin_or_cos_b(angle) * speed;
         to[2] = 0.0f;
-        to[2] = math_random_float_range(D_L00_001B0688, D_L00_001B068C) * 0.020000001f;
+        to[2] = math_random_float_range(g_trail_to_height_min, g_trail_to_height_max) * 0.020000001f;
         to[3] = math_random_float_range(0.1f, 0.2f);
-        size = math_random_float_range(D_L00_001B0668_gp, D_L00_001B066C);
+        size = math_random_float_range(D_L00_001B0668_gp, g_trail_size_max);
         to[3] = from[3] = size;
         original = *(const u32 *)info;
         color = (int)FastTweenColor((original & 0xFFFFFF) | 0x10000000, original, opacity);
         end_color = *(const int *)(info + 8);
-        duration = (((int)(math_random_int_range(D_L00_001B0690_gp, D_L00_001B0694)) * 5 + 2) / 6);
+        duration = (((int)(math_random_int_range(D_L00_001B0690_gp, g_trail_duration_max)) * 5 + 2) / 6);
         part_spawn_trail(&points[i], from, to, color, end_color, 4, duration, 8, D_L00_001B0664_gp);
     }
 }

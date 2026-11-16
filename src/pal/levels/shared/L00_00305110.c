@@ -5,14 +5,14 @@
 
 extern int load_start_disc_read(int value, char *target);
 extern short snd_pump_music_and_disc_read(int value);
-extern int D_L00_001BCAC0[];
+extern int g_tutorial_probe_context[];
 extern int g_copy_setup_data[];
 
 /* Reads a record count from a per-level data root, indexes a fixed 332-byte-stride table with it, and when the int after position index is greater than the one at position index calls two helpers with the entry value added to a per-level base; returns 1. */
-int func_PAL_L00_003062B0(int index)
+int load_queue_level_data_chunk_pal(int index)
 {
     int j = index + 1;
-    int *d = D_L00_001BCAC0;
+    int *d = g_tutorial_probe_context;
     int *b = g_copy_setup_data;
     int *t = (int *)((char *)b + 25416);
     int n = d[12] * 332;

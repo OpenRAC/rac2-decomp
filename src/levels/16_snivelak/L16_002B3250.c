@@ -55,10 +55,10 @@ typedef struct {
 } PlayerContactEntry;
 
 extern PlayerContactState g_hero_state;
-extern PlayerContactEntry D_L16_001C41C0[];
-extern s32 D_L16_001A8F00 __attribute__((sda));
+extern PlayerContactEntry g_contact_reaction_table[];
+extern s32 g_snivelak_state __attribute__((sda));
 extern u8 g_bolt_multiplier __attribute__((sda));
-extern u8 D_001A7A33 __attribute__((sda));
+extern u8 g_contact_hit_flag __attribute__((sda));
 
 extern float fade_get_value(void);
 extern float fade_reduce_value(float);
@@ -91,7 +91,7 @@ s32 hero_handle_contact_reaction(s32 apply_reaction) {
     if (g_hero_state.f1DC != 0) {
         return 0;
     }
-    if (D_L16_001A8F00 != 0) {
+    if (g_snivelak_state != 0) {
         return 0;
     }
     g_hero_state.f249C = 0;
@@ -99,7 +99,7 @@ s32 hero_handle_contact_reaction(s32 apply_reaction) {
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
-    entry = &D_L16_001C41C0[moby[0xA8]];
+    entry = &g_contact_reaction_table[moby[0xA8]];
     if (entry->f38 != moby) {
         return 0;
     }
@@ -107,7 +107,7 @@ s32 hero_handle_contact_reaction(s32 apply_reaction) {
         return 0;
     }
     if (entry->f2C != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {

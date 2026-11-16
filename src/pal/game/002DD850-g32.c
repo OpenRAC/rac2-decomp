@@ -15,21 +15,21 @@ typedef struct { char p00[0x12C]; int f12c; char p130[0x40]; int f170; } SaveScr
 extern MenuRoot g_pause_menu_state;
 extern PadState g_pad_state;
 extern SaveState g_memcard_state;
-extern SaveScreen D_0025E870;
-extern int D_0025E9E0[];
-extern char *D_001A8CFC;
+extern SaveScreen g_save_screen;
+extern int g_save_menu_cursor[];
+extern char *g_resident_data_base;
 extern int g_save_menu_flags;
 extern int g_save_menu_screen;
-extern int D_001A8C88;
+extern int g_menu_panel_active;
 extern int g_current_map_index;
 extern int g_player_bolts;
-extern int D_001A7BC0;
-extern unsigned char D_001A7A0A;
-extern Stamp D_001A7360;
-extern int D_001A7C08;
-extern char D_00260EE8[];
-extern char D_0025DA38[];
-extern void func_PAL_0033B6B8(char *, int);
+extern int g_frame_counter_2;
+extern unsigned char g_extras_unlocked_flag;
+extern Stamp g_cd_clock_buffer;
+extern int g_save_slot_cursor;
+extern char g_save_slot_screen_alt[];
+extern char g_save_slot_screen[];
+extern void popup_set_row_pal(char *, int);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
 extern int func_PAL_002D6710(int, char *);
@@ -47,9 +47,9 @@ int func_PAL_002DD850(SaveMenu *menu)
 
     if (*(SaveMenu **)(g_pause_menu_state.owner + 0xE8) != menu)
         return 0;
-    if (D_001A8CFC != 0)
-        func_PAL_0033B6B8(D_001A8CFC + 0x3CF50, menu->cursor);
-    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&D_0025E870 && D_0025E870.f12c != 0)
+    if (g_resident_data_base != 0)
+        popup_set_row_pal(g_resident_data_base + 0x3CF50, menu->cursor);
+    if (menu->stage == 0 && g_pause_menu_state.screen == (char *)&g_save_screen && g_save_screen.f12c != 0)
         menu->stage = 1;
     if (menu->stage == 1) {
         save_start_to_slot(menu->f48, menu->cursor);
@@ -79,12 +79,12 @@ int func_PAL_002DD850(SaveMenu *menu)
             g_memcard_state.f17c = 1;
             g_memcard_state.slots[g_memcard_state.slot].balance = g_player_bolts;
             g_memcard_state.slots[g_memcard_state.slot].status = g_current_map_index;
-            g_memcard_state.slots[g_memcard_state.slot].ticks = D_001A7BC0;
+            g_memcard_state.slots[g_memcard_state.slot].ticks = g_frame_counter_2;
             {
                 Stamp *stamp = &g_memcard_state.slots[g_memcard_state.slot].stamp;
-                *stamp = D_001A7360;
+                *stamp = g_cd_clock_buffer;
             }
-            g_memcard_state.slots[g_memcard_state.slot].level = D_001A7A0A;
+            g_memcard_state.slots[g_memcard_state.slot].level = g_extras_unlocked_flag;
         }
     }
     if ((g_pad_state.flags & 0x900) && g_pause_menu_state.fallback == 0)
@@ -103,7 +103,7 @@ finish:
         return status;
     }
     if (g_save_menu_screen == 9)
-        func_PAL_002D6710(4, D_001A8C88 ? D_00260EE8 : D_0025DA38);
+        func_PAL_002D6710(4, g_menu_panel_active ? g_save_slot_screen_alt : g_save_slot_screen);
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)
             request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);
@@ -133,20 +133,20 @@ done:
         buttons = g_pad_state.alt;
     else
         buttons = g_pad_state.flags;
-    menu->cursor = D_001A7C08;
-    if ((buttons & 0x1000) && D_001A7C08 != 0)
-        menu->cursor = D_001A7C08 - 1;
+    menu->cursor = g_save_slot_cursor;
+    if ((buttons & 0x1000) && g_save_slot_cursor != 0)
+        menu->cursor = g_save_slot_cursor - 1;
     if ((buttons & 0x4000) && menu->cursor < 3)
         menu->cursor = menu->cursor + 1;
-    D_001A7C08 = menu->cursor;
+    g_save_slot_cursor = menu->cursor;
     if (buttons & 0x40) {
         SaveState *save = &g_memcard_state;
         if (save->mode == 2) {
             snd_play_from_global_bank(4, 0, 0);
             if (save->slots[menu->cursor].status != -1) {
                 g_pause_menu_state.fe4 = 0;
-                g_pause_menu_state.value = (int)&D_0025E870;
-                D_0025E9E0[0] = menu->cursor;
+                g_pause_menu_state.value = (int)&g_save_screen;
+                g_save_menu_cursor[0] = menu->cursor;
             } else
                 menu->stage = 1;
         }

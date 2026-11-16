@@ -17,12 +17,12 @@ extern void draw_world_quad(void *, int, int);
 extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float,float);
 typedef struct { char pad[0x150]; short width, height; } Screen;
 extern Screen g_screen_adjust_offsets;
-extern char D_L05_001B96C0[];
-extern char D_0018A0E0[];
-extern float D_L05_001B3580[] __attribute__((sda));
-extern int D_L05_001B3598[] __attribute__((sda));
-extern char D_L05_001AA250[];
-extern float D_L05_001B1580 __attribute__((sda));
+extern char g_origin_vec[];
+extern char g_hero_state_block[];
+extern float g_expanding_effect_scales[] __attribute__((sda));
+extern int g_expanding_effect_alphas[] __attribute__((sda));
+extern char g_ground_quad_vertices[];
+extern float g_pickup_vertex_scale __attribute__((sda));
 /* Draws the slot effect, with an optional screen fade and flash quad, then
    expands its billboards while reducing the slot alpha. */
 void DrawExpandingBillboardEffect(char *obj)
@@ -50,9 +50,9 @@ void DrawExpandingBillboardEffect(char *obj)
             p.color[0]=p.color[1]=p.color[2]=p.color[3]=color;
             p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
             p.uv[2][0]=1; p.uv[2][1]=0; p.uv[3][0]=1; p.uv[3][1]=1;
-            FastVecSub(v.b,obj+0x10,D_L05_001B96C0);
+            FastVecSub(v.b,obj+0x10,g_origin_vec);
             vec_scale_to_length(v.c,v.b,0.1f);
-            FastVecAdd(v.d,D_L05_001B96C0,v.c);
+            FastVecAdd(v.d,g_origin_vec,v.c);
             FastVecCross(v.e,v.b,v.a); vec_scale_to_length(v.e,v.e,0.075f);
             FastVecCross(v.f,v.e,v.b); vec_scale_to_length(v.f,v.f,0.075f);
             FastVecAdd(v.g,v.d,v.f);
@@ -65,29 +65,29 @@ void DrawExpandingBillboardEffect(char *obj)
     {
         float size = *(float *)(s + 0x40) * 4.0f;
 
-        gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0x804040,1,D_L05_001B3580[*(int *)(s+0x3c)]*size,0.08f,0);
+        gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(g_expanding_effect_alphas[*(int *)(s+0x3c)]<<24)|0x804040,1,g_expanding_effect_scales[*(int *)(s+0x3c)]*size,0.08f,0);
     }
-    gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(D_L05_001B3598[*(int *)(s+0x3c)]<<24)|0xc84064,1,D_L05_001B3580[*(int *)(s+0x3c)]*(*(float *)(s+0x40)*8.0f),0.08f,0);
+    gfx_draw_billboard_quad(obj+0x10,*(int *)(s+0x48),(g_expanding_effect_alphas[*(int *)(s+0x3c)]<<24)|0xc84064,1,g_expanding_effect_scales[*(int *)(s+0x3c)]*(*(float *)(s+0x40)*8.0f),0.08f,0);
     gfx_init_quad_packet_state(&p,*(int *)(s+0x48),1,128);
     p.color[0]=p.color[1]=p.color[2]=p.color[3]=0x7f0000ff;
     p.uv[0][0]=0; p.uv[0][1]=0; p.uv[1][0]=0; p.uv[1][1]=1;
     p.uv[2][0]=1; p.uv[2][1]=0; p.uv[3][0]=1; p.uv[3][1]=1;
     qcopy(v.d,obj+0x10);
-    FastVecSub(v.a,D_L05_001B96C0,v.d); vec_scale_to_length(v.a,v.a,1);
-    FastVecCross(v.b,v.a,D_0018A0E0); vec_scale_to_length(v.b,v.b,1);
+    FastVecSub(v.a,g_origin_vec,v.d); vec_scale_to_length(v.a,v.a,1);
+    FastVecCross(v.b,v.a,g_hero_state_block); vec_scale_to_length(v.b,v.b,1);
     FastVecCross(v.c,v.b,v.a);
     *(QW *)v.f = 0;
     v.f[2] = *(float *)(s + 0x44) * 0.017453294f;
     *(QW *)v.e = *(QW *)v.f;
     euler_rotation_basis(v.matrix,v.e); multiply_matrix3x3(v.a,v.a,v.matrix);
     for(i=0;i<4;i++) {
-        FastVecScale(p.vertex[i],D_L05_001AA250+i*16,(D_L05_001B1580*D_L05_001B3580[*(int *)(s+0x3c)])**(float *)(s+0x40));
+        FastVecScale(p.vertex[i],g_ground_quad_vertices+i*16,(g_pickup_vertex_scale*g_expanding_effect_scales[*(int *)(s+0x3c)])**(float *)(s+0x40));
         transform_vector(p.vertex[i],p.vertex[i],v.a);
         p.color[i]=i<=1?0x70804040:0x50204090;
     }
-    p.tail[3]=((unsigned long long)D_L05_001B3598[*(int *)(s+0x3c)]<<32)|0x68;
+    p.tail[3]=((unsigned long long)g_expanding_effect_alphas[*(int *)(s+0x3c)]<<32)|0x68;
     draw_world_quad(&p,0,0);
-    D_L05_001B3580[*(int *)(s+0x3c)]+=0.3f;
-    D_L05_001B3598[*(int *)(s+0x3c)]-=4;
-    if(D_L05_001B3598[*(int *)(s+0x3c)]<0) D_L05_001B3598[*(int *)(s+0x3c)]=0;
+    g_expanding_effect_scales[*(int *)(s+0x3c)]+=0.3f;
+    g_expanding_effect_alphas[*(int *)(s+0x3c)]-=4;
+    if(g_expanding_effect_alphas[*(int *)(s+0x3c)]<0) g_expanding_effect_alphas[*(int *)(s+0x3c)]=0;
 }

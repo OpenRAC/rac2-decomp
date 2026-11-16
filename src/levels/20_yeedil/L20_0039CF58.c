@@ -28,8 +28,8 @@ extern void vec_scale_to_length(void *, const void *, float);
 extern int PlayMobySound(int, int, char *);
 extern unsigned char *moby_spawn_aimed_effect(void *, void *, void *, float);
 extern void trooper_update_body(char *);
-extern int D_L20_001A8F00[] __attribute__((sda));
-extern int D_L20_001BDCF0;
+extern int g_hero_vehicle_mode[] __attribute__((sda));
+extern int g_level_l20_progress_stage;
 
 /* Per-frame update of the Megacorp trooper: it picks a target, walks, turns and shoots, and breaks apart when it is hit. */
 void trooper_update(unsigned char *object) {
@@ -45,8 +45,8 @@ void trooper_update(unsigned char *object) {
         if (initial) *(int *)(initial + 0x98) = 0;
     }
     trooper_setup_stats_target(object);
-    if (D_L20_001A8F00[0] == 2) {
-        if (D_L20_001BDCF0 < 5) return;
+    if (g_hero_vehicle_mode[0] == 2) {
+        if (g_level_l20_progress_stage < 5) return;
         child = *(unsigned char **)(state + 0x258);
         if (child) moby_mark_spawned(child);
         child = *(unsigned char **)(state + 0x25C);

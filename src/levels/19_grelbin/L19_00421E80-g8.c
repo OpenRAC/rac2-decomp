@@ -3,7 +3,7 @@ typedef unsigned char u8;
 /* The resident position is copied as a complete 16-byte vector elsewhere. */
 extern float g_hero_position[4];
 typedef struct { u8 prefix[0x160]; float strength; u8 unknown164[4]; int ticks,mode; } CameraShakeView;
-extern CameraShakeView D_L19_001B9900;
+extern CameraShakeView g_hero_l19_state_block;
 extern void moby_set_state(u8 *,u8,int);
 extern int IsPointInCuboid(void *,int);
 extern int flag_set_first_pending(u8 *);
@@ -59,9 +59,9 @@ void rise_slam_object_update(u8 *moby)
     case 4:
         if (flag_set_first_pending(moby)) {
             PlayMobySound(1,0,(char *)moby);
-            D_L19_001B9900.strength=1.0f;
-            D_L19_001B9900.ticks=20;
-            D_L19_001B9900.mode=0;
+            g_hero_l19_state_block.strength=1.0f;
+            g_hero_l19_state_block.ticks=20;
+            g_hero_l19_state_block.mode=0;
         }
         if (math_fabs((*(float *)(moby+0x18)-*(float *)(vars+8))+*(float *)(vars+0x28))<0.03f)
             moby_set_state(moby,5,-1);

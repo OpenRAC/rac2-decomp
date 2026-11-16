@@ -23,14 +23,14 @@ extern void moby_mark_table_entry_flagged(int);
 extern void moby_set_state(void *, int, int);
 extern int IsPointInCuboid(void *, int);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_US2_002AFF10(int);
+extern void snd_play_indexed_us2(int);
 extern int flag_is_third_pending_set(void *);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 typedef struct {
     char pad0[0x80]; char body[0x2294 - 0x80];
     int mode; char pad2298[0x24CC - 0x2298];
@@ -38,16 +38,16 @@ typedef struct {
 } HeroView;
 extern HeroView g_hero_state;
 extern char g_hero_position[];
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index;
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern int D_L02_001A8F00;
-extern char D_L02_001B2860[];
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
+extern int g_arena_state_words;
+extern char g_str_l02_trigger_zone_debug[];
 extern int g_frame_l02_counter;
-extern char *D_L02_001B368C;
-extern char D_L02_001C0700[];
-extern short **D_L02_002A2200[];
-extern char D_L02_002A5FB0[];
+extern char *g_matrix_l02_record_table;
+extern char g_message_queue[];
+extern short **g_zone_trigger_event_lists[];
+extern char g_str_zone_trigger_event_debug[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -67,8 +67,8 @@ void func_US2_L02_0043B510(Thing *m)
 
     switch (m->state) {
     case 0:
-        if ((p->item != -1 && D_001A7BC8[p->item] != 0)
-            || (m->group != 0xFF && (D_0019B2E8[m->group + g_current_map_index * 16] & 0x80))) {
+        if ((p->item != -1 && g_map_visited_flags[p->item] != 0)
+            || (m->group != 0xFF && (g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80))) {
             moby_mark_spawned(m);
             break;
         }
@@ -87,24 +87,24 @@ void func_US2_L02_0043B510(Thing *m)
             break;
         if (g_hero_state.health <= 0)
             break;
-        if (D_L02_001A8F00 != 0)
+        if (g_arena_state_words != 0)
             break;
         if (p->msg != -1 && IsPointInCuboid(g_hero_state.body, p->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L02_002A2200[g_current_map_index] != 0 && D_L02_002A2200[g_current_map_index][p->idx] != 0) {
-            for (i = 0; D_L02_002A2200[g_current_map_index][p->idx][i] != -1; i++) {
-                int e = D_L02_002A2200[g_current_map_index][p->idx][i];
+        if (g_zone_trigger_event_lists[g_current_map_index] != 0 && g_zone_trigger_event_lists[g_current_map_index][p->idx] != 0) {
+            for (i = 0; g_zone_trigger_event_lists[g_current_map_index][p->idx][i] != -1; i++) {
+                int e = g_zone_trigger_event_lists[g_current_map_index][p->idx][i];
 
                 missing = 0;
                 if (p->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
-                    if (D_00139768[(unsigned int)e >> 2] & bit)
+                    if (g_request_flag_table[(unsigned int)e >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L02_001C0700, e) == 0 && i == 0) {
-                    STUB_printf(D_L02_002A5FB0, m->id, m->oclass, g_current_map_index, p->idx, e);
+                if (req_push_queue(g_message_queue, e) == 0 && i == 0) {
+                    STUB_printf(g_str_zone_trigger_event_debug, m->id, m->oclass, g_current_map_index, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,7 +116,7 @@ void func_US2_L02_0043B510(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(D_L02_001B2860, g_current_map_index, p->idx);
+                STUB_printf(g_str_l02_trigger_zone_debug, g_current_map_index, p->idx);
         } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
@@ -124,7 +124,7 @@ void func_US2_L02_0043B510(Thing *m)
             break;
         }
         p->tail.b.had = 1;
-        req_launch_queued(D_L02_001C0700);
+        req_launch_queued(g_message_queue);
         if (g_frame_l02_counter < 5 || (g_current_map_index == 6 && p->idx == 0))
             game_set_slowdown_factor();
         moby_set_state(m, 3, -1);
@@ -132,7 +132,7 @@ void func_US2_L02_0043B510(Thing *m)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (p->link != -1) {
-                char *o = D_L02_001B368C + (p->link << 7);
+                char *o = g_matrix_l02_record_table + (p->link << 7);
                 hero_reset_position_and_direction(o + 0x30, o + 0x70, 0, 1);
             }
             moby_set_state(m, 4, -1);
@@ -147,16 +147,16 @@ void func_US2_L02_0043B510(Thing *m)
         if (p->item != -1) {
             moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
-                func_US2_002AFF10(p->item);
+                snd_play_indexed_us2(p->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             notify = 1;
         }
         if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L02_001B368C + (p->link << 7);
+                char *o = g_matrix_l02_record_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(m->pos, m->dir);
@@ -171,16 +171,16 @@ void func_US2_L02_0043B510(Thing *m)
         if (p->item != -1) {
             moby_mark_flag_and_append_to_list(p->item);
             if (p->item != 0x18)
-                func_US2_002AFF10(p->item);
+                snd_play_indexed_us2(p->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             played = 1;
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L02_001B368C + (p->link << 7);
+                char *o = g_matrix_l02_record_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);

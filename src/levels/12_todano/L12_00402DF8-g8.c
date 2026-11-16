@@ -8,24 +8,24 @@ extern void value_set_entry_by_index(int, int);
 extern void help_unlock_entry(int);
 extern void moby_set_flag_bit(void *, int);
 extern int moby_handle_request_slot_state(int);
-extern float D_L12_001B12B0 __attribute__((sda));
-extern float D_L12_001B12B4 __attribute__((sda));
-extern float D_L12_001B12B8 __attribute__((sda));
-extern float D_L12_001B12BC __attribute__((sda));
-extern float D_L12_001B12C0 __attribute__((sda));
+extern float g_collectible_angle_offset __attribute__((sda));
+extern float g_collectible_spin_speed __attribute__((sda));
+extern float g_collectible_tilt_x __attribute__((sda));
+extern float g_collectible_tilt_y __attribute__((sda));
+extern float g_todano_spin_degrees __attribute__((sda));
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 D_L12_001B3C1C[] MACRO_ADDR;
-extern u8 D_L12_001B3C20[] MACRO_ADDR;
-extern u8 D_0019B4A8[];
+extern u8 g_collectible_angle_state_a[] MACRO_ADDR;
+extern u8 g_collectible_angle_state_b[] MACRO_ADDR;
+extern u8 g_moby_nibble_table[];
 extern u8 g_hero_position[];
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 
 typedef struct {
     u8 pad[0x464];
     u8 flags[0];
 } TodanoObjectFlags;
 
-extern TodanoObjectFlags D_L12_0021EDF0;
+extern TodanoObjectFlags g_object_flags;
 
 /* Each object has a three-bit counter in one half of a packed byte. */
 #define OBJECT_COUNTERS(o) \
@@ -53,14 +53,14 @@ void collectible_update_todano(u8 *object) {
     TodanoObjectFlags *flag_table;
 
     if (object[0x20]) return;
-    ((TodanoRotation *)object)->rx = D_L12_001B12B8 * 0.0174532942f;
-    ((TodanoRotation *)object)->ry = D_L12_001B12BC * 0.0174532942f;
-    ((TodanoRotation *)object)->rz = D_L12_001B12C0 * 0.0174532942f;
-    math_update_wrapped_angle_offset(object, D_L12_001B3C1C, D_L12_001B3C20, D_L12_001B12B0, D_L12_001B12B4 * 0.00029088825f, 0.0f);
+    ((TodanoRotation *)object)->rx = g_collectible_tilt_x * 0.0174532942f;
+    ((TodanoRotation *)object)->ry = g_collectible_tilt_y * 0.0174532942f;
+    ((TodanoRotation *)object)->rz = g_todano_spin_degrees * 0.0174532942f;
+    math_update_wrapped_angle_offset(object, g_collectible_angle_state_a, g_collectible_angle_state_b, g_collectible_angle_offset, g_collectible_spin_speed * 0.00029088825f, 0.0f);
     flag_index = *(u16 *)(object + 0xB2);
-    flag_table = &D_L12_0021EDF0;
+    flag_table = &g_object_flags;
     if (flag_table->flags[(s16)flag_index]) goto kill;
-    counter_bits = (u8)D_0019B4A8[((s16)flag_index >> 1) + (g_current_map_index << 10)];
+    counter_bits = (u8)g_moby_nibble_table[((s16)flag_index >> 1) + (g_current_map_index << 10)];
     if (flag_index & 1) {
         if ((counter_bits >> 4) & 7) goto kill;
     } else if (counter_bits & 7) {
@@ -77,7 +77,7 @@ update:
     if (vec_distance_xy(object + 0x10, g_hero_position) < 1.5f) {
         value_set_entry_by_index(0x1246, 0x1F4);
         help_unlock_entry(0x10);
-        moby_set_flag_bit(D_L12_001B2E9C + (*(s32 *)state << 8), 1);
+        moby_set_flag_bit(g_moby_list_start + (*(s32 *)state << 8), 1);
         moby_handle_request_slot_state(0x10);
         INCREMENT_OBJECT_COUNTER(object);
         moby_mark_spawned(object);

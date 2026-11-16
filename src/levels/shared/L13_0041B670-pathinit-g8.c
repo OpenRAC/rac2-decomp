@@ -6,9 +6,9 @@ typedef struct { float a, b; char pad[8]; float c; } PathLimits;
 typedef struct { int a, b, c, d, enabled; } PathFlags;
 /* A fixed sixteen-byte header followed by a variable number of vector records. */
 typedef struct { int count; int reserved[3]; float point[0][4]; } CameraPath;
-extern char *D_L13_001B22C4;
-extern char *D_L13_001B2140;
-extern CameraPath *D_L13_001FE580[];
+extern char *g_cam_settings_table;
+extern char *g_cam_route_table;
+extern CameraPath *g_guard_path_table[];
 extern void vec_clear_128(Quad *);
 extern int find_nearest_path_point(void *, void *, void *, int *, float *, int, float, float, float);
 extern int FloatToInt(float);
@@ -19,7 +19,7 @@ void cam_path_init(char *camera) {
     int segment;
     float fraction;
     char *status;
-    char *settings = *(char **)(D_L13_001B22C4 + *(short *)(camera + 0x84) * 32 + 0x1C);
+    char *settings = *(char **)(g_cam_settings_table + *(short *)(camera + 0x84) * 32 + 0x1C);
     CameraPath *first;
     CameraPath *route;
     CameraPath *other;
@@ -86,10 +86,10 @@ void cam_path_init(char *camera) {
         flags->enabled = 1;
     }
     if (*(int *)(settings + 0x30) == 2 && *(short *)(settings + 0x34) == 0) {
-        route = D_L13_001FE580[*(int *)(settings + 0x20)];
-        other_route = *(CameraPath **)(D_L13_001B2140 + *(int *)(settings + 0x24) * 32 + 0x10);
-        first = D_L13_001FE580[*(int *)(settings + 0x28)];
-        other = D_L13_001FE580[*(int *)(settings + 0x2C)];
+        route = g_guard_path_table[*(int *)(settings + 0x20)];
+        other_route = *(CameraPath **)(g_cam_route_table + *(int *)(settings + 0x24) * 32 + 0x10);
+        first = g_guard_path_table[*(int *)(settings + 0x28)];
+        other = g_guard_path_table[*(int *)(settings + 0x2C)];
         *(short *)(settings + 0x34) = 1;
         for (i = 0; i < first->count; i++) {
             find_nearest_path_point(route, first->point[i], projected, &segment, &fraction, 0, 20.0f, 5.0f, 0.0f);

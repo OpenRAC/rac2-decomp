@@ -8,16 +8,16 @@ typedef struct {
 } DispatchContext;
 typedef unsigned long DispatchFlags;
 typedef struct { u8 prefix[0x160]; float amount; int reserved164; int kind; int detail; } EffectTuning;
-extern EffectTuning D_L02_001BA3C0;
+extern EffectTuning g_hero_effect_state;
 #define EFFECT (&D_L02_001BA3C0)
-extern float D_L02_001B3F58 __attribute__((sda));
-extern float D_L02_001B01B0[4];
+extern float g_chainblade_angle_step __attribute__((sda));
+extern float g_chainblade_landing_point[4];
 extern float arenaPosition[4] SDATA(D_L02_001B01B0);
-extern float D_L02_001B01C0[4] __attribute__((sda));
-extern float D_L02_001B01D0[4] __attribute__((sda));
-extern int D_L02_001B01E0 __attribute__((sda));
-extern int D_L02_001A903C;
-extern unsigned char D_001A7A60[] MACRO_ADDR;
+extern float g_chainblade_start_waypoint[4] __attribute__((sda));
+extern float g_chainblade_alt_waypoint[4] __attribute__((sda));
+extern int g_chainblade_story_active __attribute__((sda));
+extern int g_one_shot_flag;
+extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
 typedef struct { u8 prefix[0x80]; float position[4]; u8 reserved90[0x240C]; char *lockTarget; } HeroPositionView;
 extern HeroPositionView g_hero_state;
 extern void chainblade_handle_hits(char *);
@@ -52,7 +52,7 @@ extern int chainblade_is_helper_ready(char *);
 extern DispatchFlags moby_dispatch_action_by_kind(void *, DispatchContext *);
 extern void moby_set_anim_type_three(void *, int, int);
 extern int snd_play_from_global_bank(int, int, void *);
-extern void func_US2_002B1880(int, int);
+extern void value_set_entry_by_index_us2(int, int);
 extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
 extern void chainblade_reset_to_idle(char *);
 extern int moby_step_at_own_position_factor(u8 *, float);
@@ -72,7 +72,7 @@ extern void chainblade_update_effects_timers(char *);
 #define SET_MODE(m,r) func_002A7750((u8 *)self,(m),(r))
 
 /* Drive the large Maktar sentry's locomotion and paired throw sequences. */
-void func_US2_L02_003D4348(char *self)
+void chainblade_update_us2(char *self)
 {
     char *state=*(char **)(self+0x68);
     float target[4] __attribute__((aligned(16)));
@@ -82,7 +82,7 @@ void func_US2_L02_003D4348(char *self)
     DispatchFlags events, animFlags;
     unsigned char flags;
 
-    D_L02_001B3F58=0.7853981633974483f;
+    g_chainblade_angle_step=0.7853981633974483f;
     chainblade_handle_hits(self);
     qcopy(target, P(0x30C)+0x10);
     distance=vec_distance_xy(self+0x10,target);
@@ -102,8 +102,8 @@ void func_US2_L02_003D4348(char *self)
             B(0x70)=18; W(0xA8)=4; B(0xD6)=1; W(0x148)|=4;
             F(0x30)=5.0f; W(0x14C)=-1;
         }
-        if (*(float *)(self+0x18)<D_L02_001B01B0[2]-1.0f)
-            *(float *)(self+0x18)=D_L02_001B01B0[2]-1.0f;
+        if (*(float *)(self+0x18)<g_chainblade_landing_point[2]-1.0f)
+            *(float *)(self+0x18)=g_chainblade_landing_point[2]-1.0f;
     break;
     case 3:
     case 4:
@@ -113,14 +113,14 @@ void func_US2_L02_003D4348(char *self)
     case 1: return;
     case 2:
         if (flag_set_first_pending((u8 *)self)) {
-            D_L02_001B01E0=1; *(unsigned short *)(self+0x96)=0;
+            g_chainblade_story_active=1; *(unsigned short *)(self+0x96)=0;
             if (*(u8 *)(self+0x43)) anim_start_blended(self,0,0,10);
         }
         if (*(unsigned short *)(self+0x96)>120) {
             if (*(u8 *)(self+0x42)!=9) {
                 if (*(u8 *)(self+0x43)!=9) anim_start_blended(self,9,0,10);
                 *(u8 *)(self+0x95)=2; qcopy(state+0x2D0, self+0x10);
-                qcopy(((WaypointView *)state)->waypoint, D_L02_001B01D0);
+                qcopy(((WaypointView *)state)->waypoint, g_chainblade_alt_waypoint);
             } else {
                 chainblade_step_follow_point(self); *(Quadword *)position=*(Quadword *)(state+0x2D0);
                 chainblade_steer_toward(self,(Quadword *)position,
@@ -137,7 +137,7 @@ void func_US2_L02_003D4348(char *self)
             scale=0.017453294f;
             value*=scale;
             if (math_random_int_below(2)) value=-value;
-            F(0x308)=value; qcopy(((WaypointView *)state)->waypoint, D_L02_001B01C0);
+            F(0x308)=value; qcopy(((WaypointView *)state)->waypoint, g_chainblade_start_waypoint);
             chainblade_clear_phase_flag(self); brawler_advance_damage_stage(P(0x310));
             arena_set_current_boss(*(char **)(self+0xB8),P(0x310));
         }
@@ -200,10 +200,10 @@ void func_US2_L02_003D4348(char *self)
             moby_set_anim_type_three(self,0,-1); *(int *)(self+0x98)=*(int *)(*(char **)(self+0x24)+0x10);
         }
         if (*(unsigned short *)(self+0x96)>60) {
-            int storyActive = D_L02_001B01E0;
+            int storyActive = g_chainblade_story_active;
             *(float *)(self+0x48)=1.0f;
-            if (storyActive && !D_001A7A60[1]) {
-                D_001A7A60[1]=1; snd_play_from_global_bank(1,0,0); func_US2_002B1880(0x1233,-1); D_L02_001A903C=1;
+            if (storyActive && !g_item_enabled_flags[1]) {
+                g_item_enabled_flags[1]=1; snd_play_from_global_bank(1,0,0); value_set_entry_by_index_us2(0x1233,-1); g_one_shot_flag=1;
             }
             part_queue_moby_for_glow(self,0,chainblade_reset_to_idle);
             if (P(0x310) && (u8)P(0x310)[0x20]!=254 && (u8)P(0x310)[0x20]!=253 && (u8)P(0x310)[0x20]>2) {
@@ -346,14 +346,14 @@ void func_US2_L02_003D4348(char *self)
             if (*(u8 *)(self+0x43)!=9) anim_start_blended(self,9,0,10);
             chainblade_end_chain_throw(self);
         }
-        if (*(float *)(self+0x18)<D_L02_001B01B0[2]+1.0f && *(float *)(self+0x18)>D_L02_001B01B0[2]) {
+        if (*(float *)(self+0x18)<g_chainblade_landing_point[2]+1.0f && *(float *)(self+0x18)>g_chainblade_landing_point[2]) {
             if (*(u8 *)(self+0x42)!=18 && *(u8 *)(self+0x43)!=18) anim_start_blended(self,18,0,10);
             moby_step_at_own_position_factor((u8 *)self,yaw);
         } else {
-            qcopy_nc(position,self+0x10); position[2]=D_L02_001B01B0[2];
+            qcopy_nc(position,self+0x10); position[2]=g_chainblade_landing_point[2];
             chainblade_steer_toward(self,(Quadword *)position,yaw,0.0f);
         }
-        if (*(u8 *)(self+0x42)==18 && (H(0x1D0)!=0 || *(float *)(self+0x18)<D_L02_001B01B0[2]+0.2f)) {
+        if (*(u8 *)(self+0x42)==18 && (H(0x1D0)!=0 || *(float *)(self+0x18)<g_chainblade_landing_point[2]+0.2f)) {
             if (H(0x32C)) { anim_start_blended(self,4,0,3); B(0x7A)=0; SET_MODE(8,3); }
             else SET_MODE(6,1);
             if (*(u8 *)(self+0x42)==18 && frame>8.0f && frame<10.0f) {

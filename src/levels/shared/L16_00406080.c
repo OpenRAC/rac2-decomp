@@ -18,7 +18,7 @@ typedef struct CamMgr_00435CE8 {
     u8 pad150[0x40];
     Cam_00435CE8 *cam;
 } CamMgr_00435CE8;
-extern CamMgr_00435CE8 D_L16_001B99C0;
+extern CamMgr_00435CE8 g_snivelak_hero_state;
 typedef struct SpawnState {
     short life;
     short timer;
@@ -58,7 +58,7 @@ char *part_create_flash(float size, char *position, int trigger, int kind, int r
         object[0x20] = 0;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        camera = (char *)D_L16_001B99C0.f140;
+        camera = (char *)g_snivelak_hero_state.f140;
         FastVecSub(direction, camera, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
@@ -92,9 +92,9 @@ char *part_create_flash(float size, char *position, int trigger, int kind, int r
                 *(volatile int *)(manager + 0x168) = 40;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L16_001B99C0.f140);
+                FastVecSub(difference, object + 0x10, g_snivelak_hero_state.f140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&D_L16_001B99C0 + 0x370));
+                angle = math_fast_angle_helper(FastVecDot(difference, (char *)&g_snivelak_hero_state + 0x370));
                 if (1.5707963705f - angle < 0.4537856579f)
                     state->flags = 1;
                 else

@@ -29,7 +29,7 @@ extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void stub_empty_14(void *, void *, int, int);
 
-extern unsigned int D_00139768[];
+extern unsigned int g_request_flag_table[];
 typedef struct {
     char pad0[0x80]; char body[0x2294 - 0x80];
     int mode; char pad2298[0x24CC - 0x2298];
@@ -37,16 +37,16 @@ typedef struct {
 } HeroView;
 extern HeroView g_hero_state;
 extern char g_hero_position[];
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern int g_current_map_index;
-extern unsigned char D_001A7BC8[] MACRO_ADDR;
+extern unsigned char g_map_visited_flags[] MACRO_ADDR;
 extern int g_current_game_mode;
-extern char D_001B0ED0[];
+extern char g_str_item_reward_trigger_debug[];
 extern int g_game_time;
-extern char *D_001B1C4C;
-extern char D_001BAD40[];
-extern short **D_0026C320[];
-extern char D_0026E6A0[];
+extern char *g_vec_record_table;
+extern char g_loader_movie[];
+extern short **g_item_reward_tables[];
+extern char g_str_reward_trigger_debug[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -67,8 +67,8 @@ void item_reward_trigger_update(Thing *m)
 
     switch (m->state) {
     case 0:
-        if ((p->item != -1 && D_001A7BC8[p->item] != 0)
-            || (m->group != 0xFF && (D_0019B2E8[m->group + g_current_map_index * 16] & 0x80))) {
+        if ((p->item != -1 && g_map_visited_flags[p->item] != 0)
+            || (m->group != 0xFF && (g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80))) {
             moby_mark_spawned(m);
             break;
         }
@@ -93,18 +93,18 @@ void item_reward_trigger_update(Thing *m)
             break;
         fail = 1;
         missing = 1;
-        if (D_0026C320[g_current_map_index] != 0 && D_0026C320[g_current_map_index][p->idx] != 0) {
-            for (i = 0; D_0026C320[g_current_map_index][p->idx][i] != -1; i++) {
-                int e = D_0026C320[g_current_map_index][p->idx][i];
+        if (g_item_reward_tables[g_current_map_index] != 0 && g_item_reward_tables[g_current_map_index][p->idx] != 0) {
+            for (i = 0; g_item_reward_tables[g_current_map_index][p->idx][i] != -1; i++) {
+                int e = g_item_reward_tables[g_current_map_index][p->idx][i];
 
                 missing = 0;
                 if (p->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
-                    if (D_00139768[(unsigned int)e >> 2] & bit)
+                    if (g_request_flag_table[(unsigned int)e >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_001BAD40, e) == 0 && i == 0) {
-                    STUB_printf(D_0026E6A0, m->id, m->oclass, g_current_map_index, p->idx, e);
+                if (req_push_queue(g_loader_movie, e) == 0 && i == 0) {
+                    STUB_printf(g_str_reward_trigger_debug, m->id, m->oclass, g_current_map_index, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -117,14 +117,14 @@ void item_reward_trigger_update(Thing *m)
                 played = p->item + 1;
         }
         if (missing != 0)
-            STUB_printf(D_001B0ED0, g_current_map_index, p->idx);
+            STUB_printf(g_str_item_reward_trigger_debug, g_current_map_index, p->idx);
         if (fail != 0) {
             p->tail.b.had = 0;
             moby_set_state(m, 4, -1);
             break;
         }
         p->tail.b.had = 1;
-        req_launch_queued(D_001BAD40);
+        req_launch_queued(g_loader_movie);
         if (g_game_time < 5 || (g_current_map_index == 6 && p->idx == 0))
             game_set_slowdown_factor();
         moby_set_state(m, 3, -1);
@@ -132,7 +132,7 @@ void item_reward_trigger_update(Thing *m)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (p->link != -1) {
-                char *o = D_001B1C4C + (p->link << 7);
+                char *o = g_vec_record_table + (p->link << 7);
                 stub_empty_14(o + 0x30, o + 0x70, 0, 1);
             }
             moby_set_state(m, 4, -1);
@@ -150,13 +150,13 @@ void item_reward_trigger_update(Thing *m)
                 snd_play_indexed(p->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             notify = 1;
         }
         if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_001B1C4C + (p->link << 7);
+                char *o = g_vec_record_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(m->pos, m->dir);
@@ -174,13 +174,13 @@ void item_reward_trigger_update(Thing *m)
                 snd_play_indexed(p->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + g_current_map_index * 16] & 0x80)) {
+        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
             moby_mark_table_entry_flagged(m->group);
             played = 1;
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_001B1C4C + (p->link << 7);
+                char *o = g_vec_record_table + (p->link << 7);
                 level_capture_checkpoint_state(o + 0x30, o + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);

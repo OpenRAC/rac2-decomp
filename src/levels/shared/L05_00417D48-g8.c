@@ -4,18 +4,18 @@ extern void func_L05_00418200(void *);
 extern void vec_clear_128(char *);
 extern unsigned int g_equipment_bits MACRO_ADDR;
 /* A pointer table whose slot 0 holds the active object (L30_003B3F70-g8.c also reads it as an array). */
-extern void *D_0018B650[] __attribute__((nosda));
+extern void *g_held_object_ptr[] __attribute__((nosda));
 extern char g_light_spot_sum[] MACRO_ADDR;
-extern char D_L05_001B3510[] MACRO_ADDR;
+extern char g_light_spot_position[] MACRO_ADDR;
 extern float g_light_spot_count;
 /* Model ids per equipment selector, one 4-entry table per D_001A7AF0 bit field. */
-extern short D_L05_001A8F70[] MACRO_ADDR;
-extern short D_L05_001A8F78[] MACRO_ADDR;
-extern short D_L05_001A8F80[] MACRO_ADDR;
-extern short D_L05_001A8F88[] MACRO_ADDR;
-extern short D_L05_001A8F90[] MACRO_ADDR;
-extern short D_L05_001A8F98[] MACRO_ADDR;
-extern short D_L05_001A8FA0[] MACRO_ADDR;
+extern short g_equipment_part_class_a[] MACRO_ADDR;
+extern short g_equipment_part_class_b[] MACRO_ADDR;
+extern short g_equipment_part_class_c[] MACRO_ADDR;
+extern short g_equipment_part_class_d[] MACRO_ADDR;
+extern short g_equipment_part_class_e[] MACRO_ADDR;
+extern short g_equipment_part_class_f[] MACRO_ADDR;
+extern short g_equipment_part_class_g[] MACRO_ADDR;
 extern char *equipment_spawn_part_moby(void *, float, int, int);
 extern char *CreateTransformClone(void *, float);
 extern int table_find_last_used_entry(int);
@@ -119,37 +119,37 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
         object->modeBits |= 0x100;
         func_L05_00418200(object);
         vec_clear_128(g_light_spot_sum);
-        D_0018B650[0] = object;
+        g_held_object_ptr[0] = object;
         selector = g_equipment_bits & 3;
         g_light_spot_count = 0;
         object->modeBits |= 0x41;
-        vars->f40 = equipment_spawn_part_moby(object, 0.05f, 0, D_L05_001A8F70[selector]);
+        vars->f40 = equipment_spawn_part_moby(object, 0.05f, 0, g_equipment_part_class_a[selector]);
         if (vars->f40) *(int *)(vars->f40 + 0x98) = 0;
         selector = (g_equipment_bits >> 2) & 3;
-        part_class = D_L05_001A8F78[selector];
+        part_class = g_equipment_part_class_b[selector];
         vars->f44 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
         vars->f48 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f44) *(int *)(vars->f44 + 0x98) = 0;
         if (vars->f48) *(int *)(vars->f48 + 0x98) = 0;
         selector = (g_equipment_bits >> 4) & 3;
-        vars->f4C = equipment_spawn_part_moby(object, 0.05f, 0, D_L05_001A8F80[selector]);
+        vars->f4C = equipment_spawn_part_moby(object, 0.05f, 0, g_equipment_part_class_c[selector]);
         if (vars->f4C) *(int *)(vars->f4C + 0x98) = 0;
         vars->f50 = CreateTransformClone(object, 0.05f);
         selector = (g_equipment_bits >> 6) & 1;
-        part_class = D_L05_001A8F88[selector];
+        part_class = g_equipment_part_class_d[selector];
         vars->fAC = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
         vars->f1F0 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->fAC) *(int *)(vars->fAC + 0x98) = 0;
         if (vars->f1F0) *(int *)(vars->f1F0 + 0x98) = 0;
         selector = (g_equipment_bits >> 9) & 1;
-        part_class = D_L05_001A8F98[selector];
+        part_class = g_equipment_part_class_f[selector];
         vars->f1F4 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
         vars->f1F8 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f1F4) *(int *)(vars->f1F4 + 0x98) = 0;
         if (vars->f1F8) *(int *)(vars->f1F8 + 0x98) = 0;
         if (table_find_last_used_entry(3)) {
             selector = (g_equipment_bits >> 7) & 3;
-            part_class = D_L05_001A8F90[selector];
+            part_class = g_equipment_part_class_e[selector];
             if (part_class) {
                 vars->f1FC = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
                 vars->f200 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
@@ -158,7 +158,7 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
             }
         }
         selector = (g_equipment_bits >> 10) & 3;
-        part_class = D_L05_001A8FA0[selector];
+        part_class = g_equipment_part_class_g[selector];
         vars->f204 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
         vars->f208 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f204) *(int *)(vars->f204 + 0x98) = 0;
@@ -183,7 +183,7 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
         }
         if (!snd_is_voice_playing_for_owner(object, vars->f30)) vars->f30 = PlayMobySound(0, 4, object);
         wobbling_light_update(object);
-        qcopy(D_L05_001B3510, object->pos);
+        qcopy(g_light_spot_position, object->pos);
         load_forward_resident_address(object);
         break;
     }

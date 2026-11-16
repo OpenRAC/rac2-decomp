@@ -1,22 +1,22 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern char *D_L12_001FEAC0[];
-extern float D_L12_001B0B14 SDATA(D_L12_001B0B14);
-extern float D_L12_001B0A54 SDATA(D_L12_001B0A54);
-extern char D_L12_001B0B18[];
-extern int func_PAL_L01_00323068(void *, void *);
+extern char *g_path_zone_table[];
+extern float g_enemy_height_limit SDATA(D_L12_001B0B14);
+extern float g_robot_guard_climb_speed SDATA(D_L12_001B0A54);
+extern char g_str_debug_ground_height[];
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern void StepAngleTowardTarget(void *, float, float, int);
 extern float coll_probe_ground_height_below(float, void *, int);
 extern double __extendsfdf2(float);
 extern void STUB_printf(const char *, ...);
 
-void func_PAL_L12_003E63A0(char *object)
+void enemy_move_along_path_keep_height_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float oldHeight = *(float *)(object + 0x18);
-    char *path = D_L12_001FEAC0[*(int *)(state + 0x158)];
+    char *path = g_path_zone_table[*(int *)(state + 0x158)];
     int flags;
     float ground;
     float probeRadius;
@@ -24,7 +24,7 @@ void func_PAL_L12_003E63A0(char *object)
     char *position;
 
     *(int *)(state + 0x218) = 0;
-    flags = func_PAL_L01_00323068(object, path + ((*(int *)(state + 0x264) << 4) + 0x10));
+    flags = moby_l01_turn_toward_target_pal(object, path + ((*(int *)(state + 0x264) << 4) + 0x10));
     if (*(u8 *)(object + 0x95) == 6) {
         char *target = *(char **)(state + 0x270);
         float angle = mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
@@ -35,12 +35,12 @@ void func_PAL_L12_003E63A0(char *object)
     position = object + 0x10;
     ground = coll_probe_ground_height_below(probeRadius, position, 0);
     if (flags & 0x20) {
-        if (*(int *)(state + 0x248) == 0 || *(float *)(object + 0x18) - ground > D_L12_001B0B14) {
+        if (*(int *)(state + 0x248) == 0 || *(float *)(object + 0x18) - ground > g_enemy_height_limit) {
             *(float *)(object + 0x18) = oldHeight;
         } else if (*(float *)(object + 0x18) < *(float *)(state + 0x2A8)) {
             *(float *)(object + 0x18) = *(float *)(state + 0x2A8);
         } else {
-            char *sink = D_L12_001B0B18;
+            char *sink = g_str_debug_ground_height;
             float floor = coll_probe_ground_height_below(probeRadius, position, 0);
             double heightDifference = __extendsfdf2(*(float *)(object + 0x18) - floor);
             STUB_printf(sink, heightDifference, *(short *)(object + 0xB2));
@@ -50,7 +50,7 @@ void func_PAL_L12_003E63A0(char *object)
     if (*(float *)(object + 0x18) < targetHeight) {
         targetHeight -= *(float *)(object + 0x18);
         if (targetHeight > 0.8f) {
-            *(float *)(object + 0x18) += D_L12_001B0A54 * 0.020000001f;
+            *(float *)(object + 0x18) += g_robot_guard_climb_speed * 0.020000001f;
             if (*(float *)(object + 0x18) < ground)
                 *(float *)(object + 0x18) = ground;
         }
@@ -59,7 +59,7 @@ void func_PAL_L12_003E63A0(char *object)
     if (*(float *)(object + 0x18) > targetHeight) {
         targetHeight -= *(float *)(object + 0x18);
         if (targetHeight < -0.8f) {
-            *(float *)(object + 0x18) -= D_L12_001B0A54 * 0.020000001f;
+            *(float *)(object + 0x18) -= g_robot_guard_climb_speed * 0.020000001f;
             if (*(float *)(object + 0x18) < ground)
                 *(float *)(object + 0x18) = ground;
         }

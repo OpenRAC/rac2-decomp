@@ -27,7 +27,7 @@
 #include "common.h"
 
 extern s8 g_hero_state[];
-extern s8 D_0018A070[];
+extern s8 g_hero_camera_block[];
 extern f32 ref_L04_002D9780_00(void *, void *, void *, s32);
 extern void ref_L04_002D9780_01(void *, f32, f32);
 extern void ref_L04_002D9780_02(void *, void *, f32, f32, f32, f32);
@@ -78,7 +78,7 @@ void func_PAL_L04_002D9718(void) {
     }
     p = g_hero_state;
     if ((*(u8 *)((char *)(p) + (0x287))) == 0 || (*(s32 *)((char *)(p) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(p) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(p) + (0x22B4))) == 0 && (*(f32 *)((char *)(p) + (0x254))) < 0.53f) || (*(s32 *)((char *)(p) + (0x229C))) == 0x11 || (*(u8 *)((char *)(p) + (0x1494))) != 0 || ((r = ref_L04_002D9780_00(p + 0x240, p + 0x80, b, a3)), ((*(f32 *)((char *)(p) + (0x264))) * 0.5f) < r)) {
-        d = D_0018A070;
+        d = g_hero_camera_block;
         bb = d - 0x250;
         ref_L04_002D9780_01(d, (*(f32 *)((char *)(bb) + (0x258))), 0.024f);
         ref_L04_002D9780_01(d + 4, (*(f32 *)((char *)(bb) + (0x25C))), 0.024f);

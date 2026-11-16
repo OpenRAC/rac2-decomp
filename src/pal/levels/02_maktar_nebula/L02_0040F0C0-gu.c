@@ -14,31 +14,31 @@ typedef struct {
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; TI128 q[0x260]; } Hero;
 extern u8 g_hero_state[];
 typedef struct { u8 pad00[0x5C]; u8 *ids; } L02_Palette;
-extern L02_Palette D_L02_00200080;
+extern L02_Palette g_chain_link_palette;
 extern void func_PAL_L02_0040FD10(u8 *);
 extern void moby_set_state(u8 *, u8, s32);
 extern s32 math_random_int_below(s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
-extern int func_PAL_L01_00323068(char *, char *);
+extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern char *arena_get_camera_point(char *);
 extern void robot_pick_random_walk_target(u8 *, void *);
 extern void flamethrower_robot_save_state_turn(u8 *);
 extern float FastDiffRots(float, float);
 extern s32 moby_dispatch_action_by_kind(void *, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *);
-extern void func_PAL_L02_004009A0(void *, s32, s32);
-extern void func_PAL_L02_00410598(u8 *);
+extern void moby_set_anim_type_three_pal(void *, s32, s32);
+extern void flamethrower_robot_knock_out_pal(u8 *);
 extern s32 flag_set_first_pending(u8 *);
 extern s32 flag_set_second_pending(u8 *);
 extern s32 arena_get_state_word(char *);
 extern s32 coll_point_inside_record_volume(void *, s32);
 extern s32 cam_hook_return_minus_one(char *);
-extern int func_PAL_002B5E30(void *, float);
-extern s32 func_PAL_002B5BA8(char *, float *, float);
-extern s32 func_PAL_002B5C98(void *, void *, float);
-extern s32 func_PAL_L02_004107F0(u8 *);
+extern int moby_step_at_own_position_factor_pal(void *, float);
+extern s32 moby_turn_toward_target_and_step_pal(char *, float *, float);
+extern s32 moby_step_controller_pal(void *, void *, float);
+extern s32 robot_turn_toward_target_pal(u8 *);
 extern s32 math_fast_helper_a(void *, float);
 extern void moby_transform_joint_point(char *, s32, char *);
 extern void moby_transform_joint_to_world(char *, s32, char *);
@@ -131,14 +131,14 @@ void func_PAL_L02_0040F0C0(u8 *object)
         if (!object[0xBC] && vec_distance_xy(object + 0x10, goal) < 0.5f)
             object[0xBC] = 1;
         else
-            func_PAL_L01_00323068((char *)object, (char *)goal);
+            moby_l01_turn_toward_target_pal((char *)object, (char *)goal);
         break;
     }
     case 4: {
         s32 flags = moby_dispatch_action_by_kind(object, (Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *)(state + 0x50));
         if ((object[0x42] == 16 && math_random_int_below(30) == 0) || (flags & 1)) {
-            func_PAL_L02_004009A0(object, 0, -1);
-            func_PAL_L02_00410598(object);
+            moby_set_anim_type_three_pal(object, 0, -1);
+            flamethrower_robot_knock_out_pal(object);
         } else if (flags & 2)
             moby_set_state(object, 7, 3);
     }
@@ -159,7 +159,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
                 moby_set_state(object, 4, 2);
                 *(s32 *)(state + 0x13C) = cam_hook_return_minus_one(*(char **)(object + 0xB8));
             }
-            func_PAL_L01_00323068((char *)object, arena_get_camera_point(*(char **)(object + 0xB8)));
+            moby_l01_turn_toward_target_pal((char *)object, arena_get_camera_point(*(char **)(object + 0xB8)));
         }
         break;
     case 6:
@@ -167,7 +167,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
             if (object[0x43] != 9) func_PAL_002A7E68(object, 9, 0, 8);
             moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f, 0.005026549f, 0.5026549f);
         }
-        func_PAL_002B5E30(object, heading);
+        moby_step_at_own_position_factor_pal(object, heading);
         /* Fall through: both states leave when the movement flag is set. */
     case 5:
         if (object[0x60] & 2)
@@ -183,11 +183,11 @@ void func_PAL_L02_0040F0C0(u8 *object)
             if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 8);
             moby_set_controller_speed_limits(object, 0.0016000001f, 0.040000003f, 0.0008377582f, 0.062831864f);
         } else if (vec_distance_xy(object + 0x10, &((Hero *)g_hero_state)->q[8]) > 2.8f) {
-            if (!func_PAL_L02_004107F0(object))
-                func_PAL_002B5BA8((char *)object, target.f, *(float *)(state + 0x2D8));
+            if (!robot_turn_toward_target_pal(object))
+                moby_turn_toward_target_and_step_pal((char *)object, target.f, *(float *)(state + 0x2D8));
         } else {
             angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(object + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(object + 0x14));
-            func_PAL_002B5C98(object, object + 0x10, angle);
+            moby_step_controller_pal(object, object + 0x10, angle);
         }
         angle = mat_fast_helper_a(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
         if (FastDiffRots(*(float *)(object + 0xF8), angle) > 2.7925272f)
@@ -238,7 +238,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
                     u8 *part = func_PAL_002C23B8(&near_point, tmpl, 12, 60, 0x606060, 3,
                         105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
                     if (part) {
-                        part[2] = *D_L02_00200080.ids;
+                        part[2] = *g_chain_link_palette.ids;
                         part[3] = 0x44;
                         if (math_random_int_range(0, 1)) {
                             u8 *tail;

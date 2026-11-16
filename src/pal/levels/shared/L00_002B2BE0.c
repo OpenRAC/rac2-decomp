@@ -27,19 +27,19 @@ typedef struct {
     int f24cc;
 } Root;
 extern Root g_hero_state;
-extern char D_L00_001C3480[];
-extern int D_L00_001A8F00 __attribute__((sda));
-extern unsigned char D_001A7A33 __attribute__((sda));
+extern char g_grab_slot_table[];
+extern int g_game_l00_mode __attribute__((sda));
+extern unsigned char g_contact_hit_flag __attribute__((sda));
 extern unsigned char g_bolt_multiplier __attribute__((sda));
 extern float fade_get_value(void);
-extern float func_PAL_L00_00381328(float);
+extern float fade_reduce_value_pal(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, int, float, float, float);
 extern void ref_L00_002B2CC8_0(int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int FloatToInt(float);
-extern void func_PAL_L00_002A4D58(int);
+extern void AdjustPlayerHealth_pal(int);
 extern int hero_play_sound(int, int);
 extern void hero_flatten_push_vector(void *, int, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
@@ -47,7 +47,7 @@ extern void FastVecAdd(void *, void *, void *);
 #define SI(o) (*(int *)(slot + (o)))
 #define SF(o) (*(float *)(slot + (o)))
 
-int func_PAL_L00_002B2BE0(int apply)
+int hero_try_grab_object_pal(int apply)
 {
     float v[4] __attribute__((aligned(16)));
     char *obj, *slot, *p;
@@ -62,21 +62,21 @@ int func_PAL_L00_002B2BE0(int apply)
         return 0;
     if (g_hero_state.f1dc)
         return 0;
-    if (D_L00_001A8F00)
+    if (g_game_l00_mode)
         return 0;
     g_hero_state.f249c = 0;
     obj = g_hero_state.f2290;
     if ((unsigned char)obj[0xa8] == 255)
         return 0;
-    slot = D_L00_001C3480 + (unsigned char)obj[0xa8] * 64;
+    slot = g_grab_slot_table + (unsigned char)obj[0xa8] * 64;
     if (*(char **)(slot + 0x38) != obj || !(SI(0x24) & 9))
         return 0;
     if (SF(0x2c) != 0.0f) {
-        D_001A7A33 = 0;
+        g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !g_hero_state.f22b4) {
-        SF(0x2c) = func_PAL_L00_00381328(SF(0x2c));
+        SF(0x2c) = fade_reduce_value_pal(SF(0x2c));
         if (SF(0x2c) == 0.0f)
             return 0;
     }
@@ -111,7 +111,7 @@ int func_PAL_L00_002B2BE0(int apply)
             !(SI(0x24) & 8)) {
             p = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
             if (p)
-                func_PAL_L00_002A4D58(FloatToInt(*(float *)(p + 0x2c)));
+                AdjustPlayerHealth_pal(FloatToInt(*(float *)(p + 0x2c)));
             if (!g_hero_state.f24cc)
                 ref_L00_002B2CC8_0(22, 1);
             g_hero_state.f1dc = 64;

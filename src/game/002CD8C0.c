@@ -30,7 +30,7 @@ extern int F750245c6_D_001A7340 __attribute__((sda));
 
 extern void F750245c6_FUN_0028FC48(int a, int b, int c, int d, char *e, int f);
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 extern void tab_menu_set_enabled(void *, int);
 
@@ -38,37 +38,37 @@ extern void tab_menu_set_tables(char *, char *, char *, char *);
 
 extern void tab_menu_switch_tab(char *, int);
 
-extern char D_002615F8[];
+extern char g_extras_tab_table_a[];
 
-extern char D_00261698[];
+extern char g_extras_tab_table_b[];
 
-extern char D_00261750[];
+extern char g_extras_tab_table_c[];
 
-extern int D_001AB9B0 __attribute__((sda));
+extern int g_item_list_cursor __attribute__((sda));
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
 extern void *tab_menu_get_selected_value(void *);
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 
-extern int D_0025CADC;
+extern int g_menu_scroll_timer;
 
 extern CallbackState g_pause_menu_state;
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 
-extern int D_001A7908 __attribute__((sda));
+extern int g_menu_toggle_option __attribute__((sda));
 
 extern CallbackToggleState g_hero_state;
 
-extern float D_0018B300[];
+extern float g_camera_look_vector[];
 
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 extern void vec_scale_to_length(void *, void *, float);
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 
 extern int func_0029C640(int);
 
@@ -122,17 +122,17 @@ long long menu_draw_screen_via_helper(void)
 }
 
 /* Sets up the menu list widget and hands the object its text-list pointer. */
-int menu_init_list_object(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { tab_menu_set_enabled(root+0x3BE08,1); *(void **)((char *)object+0x34)=tab_menu_get_selected_value(D_001A8CFC[0]+0x3BE08); } return 0; }
+int menu_init_list_object(void *object) { char *root=g_resident_data_base[0]; if (root != 0) { tab_menu_set_enabled(root+0x3BE08,1); *(void **)((char *)object+0x34)=tab_menu_get_selected_value(g_resident_data_base[0]+0x3BE08); } return 0; }
 
 /* func_002CDA20 is defined in 002CDA20.c. */
 
 /* Builds the three-entry Extras menu list and selects its first entry. */
 int menu_build_extras_list(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        tab_menu_set_enabled(D_001A8CFC[0] + 0x3BE08, 1);
-        tab_menu_set_tables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        tab_menu_switch_tab(D_001A8CFC[0] + 0x3BE08, 0);
+    if (g_resident_data_base[0] != 0) {
+        tab_menu_set_enabled(g_resident_data_base[0] + 0x3BE08, 1);
+        tab_menu_set_tables(g_resident_data_base[0] + 0x3BE08, g_extras_tab_table_a, g_extras_tab_table_b, g_extras_tab_table_c);
+        tab_menu_switch_tab(g_resident_data_base[0] + 0x3BE08, 0);
     }
     return 0;
 }
@@ -143,7 +143,7 @@ int menu_build_extras_list(void)
 
 /* Marks the menu cursor as reset. */
 int menu_reset_cursor_flag(void) {
-    D_001AB9B0 = 1;
+    g_item_list_cursor = 1;
     return 0;
 }
 
@@ -172,8 +172,8 @@ void menu_draw_text_highlight_frame(int textWidth, char *color)
 
 /* Gives the object its text-list pointer when the menu list exists. */
 int menu_assign_list_text_pointer(char *object) {
-    if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = tab_menu_get_selected_value(D_001A8CFC[0] + 0x3BE08);
+    if (g_resident_data_base[0] != 0)
+        *(void **)(object + 0x34) = tab_menu_get_selected_value(g_resident_data_base[0] + 0x3BE08);
     return 0;
 }
 
@@ -211,40 +211,40 @@ int menu_noop_callback_c(void) {
 
 /* func_002D1228 is built from 002D1228-g8.c. */
 
-extern int D_001A7A00[] __attribute__((sda));
-extern unsigned char D_001A7BB0[] __attribute__((sda));
-extern unsigned char D_001395E9;
-extern unsigned char D_001395B8[];
+extern int g_player_stats[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
+extern unsigned char g_special_items_flag;
+extern unsigned char g_game_flag_table[];
 extern int D_001AA438 __asm__("D_001AA438__gp") __attribute__((section(".sdata")));
 extern unsigned char D_001ABA30 __asm__("D_001ABA30__gp") __attribute__((section(".sdata")));
-extern unsigned char D_001ABA31[] __attribute__((sda));
-extern unsigned char D_001ABA32[] __attribute__((sda));
-extern unsigned char D_001ABA33[] __attribute__((sda));
-extern unsigned char D_001ABA34[] __attribute__((sda));
-extern unsigned char D_001ABA35[] __attribute__((sda));
-extern unsigned char D_001ABA36[] __attribute__((sda));
-extern unsigned char D_001ABA37[] __attribute__((sda));
+extern unsigned char g_special_item_collected_b[] __attribute__((sda));
+extern unsigned char g_special_item_collected_c[] __attribute__((sda));
+extern unsigned char g_special_item_collected_d[] __attribute__((sda));
+extern unsigned char g_special_item_collected_e[] __attribute__((sda));
+extern unsigned char g_special_item_collected_f[] __attribute__((sda));
+extern unsigned char g_special_item_collected_g[] __attribute__((sda));
+extern unsigned char g_special_item_collected_h[] __attribute__((sda));
 
 /* Remembers which special items the player has just collected by setting their flags. */
 int menu_record_collected_special_items(void)
 {
-    if (D_001A8CFC[0] != 0 && ((unsigned char *)D_001A7A00)[0xA] != 0) {
-        if (D_001A7BB0[0x3A] != 0 && D_001395E9 != 0)
-            D_001ABA30 = 1;
-        if (D_001A7BB0[0x3C] != 0 && (D_001395B8[0x4D] != 0 || D_001395B8[0x52] != 0))
-            D_001ABA31[0] = 1;
-        if (D_001A7BB0[0x43] != 0 && (D_001395B8[0x57] != 0 || D_001395B8[0x5C] != 0))
-            D_001ABA32[0] = 1;
-        if (D_001A7BB0[0x43] != 0 && D_001395B8[0x3D] != 0)
-            D_001ABA33[0] = 1;
-        if (D_001A7BB0[0x52] != 0)
-            D_001ABA34[0] = 1;
-        if (D_001A7BB0[0x4E] != 0)
-            D_001ABA35[0] = 1;
-        if (D_001A7BB0[0x4F] != 0)
-            D_001ABA36[0] = 1;
-        if (D_001AA438 != 0)
-            D_001ABA37[0] = 1;
+    if (g_resident_data_base[0] != 0 && ((unsigned char *)g_player_stats)[0xA] != 0) {
+        if (g_language_settings[0x3A] != 0 && g_special_items_flag != 0)
+            g_special_item_collected_flags = 1;
+        if (g_language_settings[0x3C] != 0 && (g_game_flag_table[0x4D] != 0 || g_game_flag_table[0x52] != 0))
+            g_special_item_collected_b[0] = 1;
+        if (g_language_settings[0x43] != 0 && (g_game_flag_table[0x57] != 0 || g_game_flag_table[0x5C] != 0))
+            g_special_item_collected_c[0] = 1;
+        if (g_language_settings[0x43] != 0 && g_game_flag_table[0x3D] != 0)
+            g_special_item_collected_d[0] = 1;
+        if (g_language_settings[0x52] != 0)
+            g_special_item_collected_e[0] = 1;
+        if (g_language_settings[0x4E] != 0)
+            g_special_item_collected_f[0] = 1;
+        if (g_language_settings[0x4F] != 0)
+            g_special_item_collected_g[0] = 1;
+        if (g_special_items_unlock_flag != 0)
+            g_special_item_collected_h[0] = 1;
     }
     return 0;
 }
@@ -266,7 +266,7 @@ int menu_noop_callback_d(void) {
 
 /* Sets the menu scroll timer back to its start value. */
 int menu_reset_scroll_timer(void) {
-    if (D_001A8CFC[0] != 0) D_0025CADC = -300;
+    if (g_resident_data_base[0] != 0) g_menu_scroll_timer = -300;
     return 0;
 }
 
@@ -282,7 +282,7 @@ int menu_noop_callback_e(void) {
 int menu_handle_page_toggle_input(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -299,15 +299,15 @@ return_value:
         result = 1;
     else if (flags & 0x40) {
         snd_play_from_global_bank(4, 0, 0);
-        switch (D_001A7908) {
+        switch (g_menu_toggle_option) {
         default:
-            D_001A7908 = 0;
+            g_menu_toggle_option = 0;
             g_hero_state.second = 0;
             g_hero_state.first = 0;
             break;
         case 0:
-            D_001A7908 = 1;
-            vec_scale_to_length(D_0018B300, (char *)D_0018B300 - 0x14E0, 1.0f);
+            g_menu_toggle_option = 1;
+            vec_scale_to_length(g_camera_look_vector, (char *)g_camera_look_vector - 0x14E0, 1.0f);
             break;
         }
     }
@@ -318,7 +318,7 @@ return_value:
 
 /* Passes the current pad buttons to the menu update helper. */
 int menu_forward_pad_buttons(void) {
-    func_0029C640(D_00138344);
+    func_0029C640(g_menu_input_flags);
     return 0;
 }
 
@@ -333,7 +333,7 @@ int menu_draw_screen_via_helper_b(void) {
 /* Handles menu input: closes on cancel, otherwise passes the buttons on to the page handler. */
 int menu_handle_page_input(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)

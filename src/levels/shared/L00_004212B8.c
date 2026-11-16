@@ -40,36 +40,36 @@ extern void hero_copy_vector_to_out(void *, void *);
 extern int cam_resolve_position(void *, int);
 extern float cam_compute_signed_angle_to_point(void *, float);
 extern void cam_compute_offset(void *, int, float);
-extern int D_L00_001A8FF0 MACRO_ADDR;
-extern float D_L00_001B1500 __attribute__((sda));
-extern float D_L00_001B1504 __attribute__((sda));
-extern u16 D_L00_001B1518 __attribute__((sda));
-extern u16 D_L00_001B1530 __attribute__((sda));
-extern u16 D_L00_001B1534 __attribute__((sda));
-extern u16 D_L00_001B1548 __attribute__((sda));
-extern float D_L00_001B154C __attribute__((sda));
-extern u16 D_L00_001B1560 __attribute__((sda));
-extern float D_L00_001B1574 __attribute__((sda));
-extern char D_L00_001B8E20[];
+extern int g_hero_locked_flag MACRO_ADDR;
+extern float g_cam_follow_distance_max __attribute__((sda));
+extern float g_cam_follow_distance_min __attribute__((sda));
+extern u16 g_camera_default_frame_count __attribute__((sda));
+extern u16 g_weapon_anim_ctrl2_frames __attribute__((sda));
+extern u16 g_weapon_aim_in_frames __attribute__((sda));
+extern u16 g_weapon_anim_return_frames __attribute__((sda));
+extern float g_weapon_aim15_level __attribute__((sda));
+extern u16 g_weapon_anim_timer2_frames __attribute__((sda));
+extern float g_cam_follow_lerp_factor __attribute__((sda));
+extern char g_camera_move_state[];
 #define HERO ((Hero *)D_00189E20)
 /* Works out where the follow camera wants to be this frame, depending on its mode and what the hero is doing, and writes the result to out. */
 void cam_follow_compute_position(char *moby, void *out)
 {
     float position[4], scratch[4];
     Ctl *settings = (Ctl *)(*(char **)(moby + 0x70) + 0x60);
-    char *cam = D_L00_001B8E20;
+    char *cam = g_camera_move_state;
     char *axis;
     char *work;
     int use;
     float d;
-    if (HERO->h[0x348 / 2] != 0 || D_L00_001A8FF0 != 0 || (settings->hEE != 0 && HERO->h[0x34E / 2] != 0)) {
+    if (HERO->h[0x348 / 2] != 0 || g_hero_locked_flag != 0 || (settings->hEE != 0 && HERO->h[0x34E / 2] != 0)) {
         settings->hEC = 0xF;
         settings->fD6 = 1;
         settings->hEE = 1;
         FastVecScale(settings->a10, cam + 0x30, FastVecDot(settings, cam + 0x30));
         qcopy(settings->a20, settings->a10);
         if ((u32)(settings->st - 5) < 3 || settings->st == 3)
-            cam_compute_offset(settings->a30, 1, D_L00_001B154C * 0.5f);
+            cam_compute_offset(settings->a30, 1, g_weapon_aim15_level * 0.5f);
     } else {
         short st = settings->hEE;
         if (st == 1) {
@@ -77,7 +77,7 @@ void cam_follow_compute_position(char *moby, void *out)
             FastVecScale(settings->a10, cam + 0x30, FastVecDot(settings, cam + 0x30));
             qcopy(settings->a20, settings->a10);
             if ((u32)(settings->st - 5) < 3 || settings->st == 3)
-                cam_compute_offset(settings->a30, 1, D_L00_001B154C * 0.5f);
+                cam_compute_offset(settings->a30, 1, g_weapon_aim15_level * 0.5f);
             r = IntToFloat(settings->hD8);
             r = r / IntToFloat(0xF);
             settings->hD8 = FloatToInt(IntToFloat(settings->hEC) * r);
@@ -87,7 +87,7 @@ void cam_follow_compute_position(char *moby, void *out)
                 FastVecScale(settings->a10, cam + 0x30, FastVecDot(settings, cam + 0x30));
                 qcopy(settings->a20, settings->a10);
                 if ((u32)(settings->st - 5) < 3 || settings->st == 3)
-                    cam_compute_offset(settings->a30, 1, D_L00_001B154C * 0.5f);
+                    cam_compute_offset(settings->a30, 1, g_weapon_aim15_level * 0.5f);
                 settings->hEE = settings->hEE + 1;
                 if (settings->hEE >= 0x10)
                     settings->hEE = 0;
@@ -107,7 +107,7 @@ void cam_follow_compute_position(char *moby, void *out)
                 char *o;
                 u16 frames;
                 qcopy(moby + 0x40, moby);
-                frames = D_L00_001B1518;
+                frames = g_camera_default_frame_count;
                 o = *(char **)(moby + 0x70);
                 { char *m = o + 0x20;
                 *(s16 *)m = frames;
@@ -122,11 +122,11 @@ void cam_follow_compute_position(char *moby, void *out)
                 u16 frames;
                 if (HERO->i[0x2294 / 4] != 0x11) {
                     d = cam_compute_signed_angle_to_point(moby, settings->rB0);
-                    if (!(d < D_L00_001B1504) && !(D_L00_001B1500 < d))
+                    if (!(d < g_cam_follow_distance_min) && !(g_cam_follow_distance_max < d))
                         goto next;
                 }
                 settings->st = 1;
-                frames = D_L00_001B1530;
+                frames = g_weapon_anim_ctrl2_frames;
                 settings->tC6 = frames;
                 settings->invC8 = 1.0f / IntToFloat((s16)frames);
             }
@@ -167,19 +167,19 @@ void cam_follow_compute_position(char *moby, void *out)
                 if (FastDecTimer(&settings->tD4) != 0) {
                     if (settings->st == 9) {
                         settings->st = 0xA;
-                        settings->tD4 = D_L00_001B1560;
+                        settings->tD4 = g_weapon_anim_timer2_frames;
                         qcopy(settings->a20, settings->a10);
                         FastVecScale(work, axis, settings->rD0);
                         FastVecSub(settings->a30, settings->a20, work);
                     } else if (settings->st == 6) {
                         settings->st = 7;
-                        settings->tD4 = D_L00_001B1534;
+                        settings->tD4 = g_weapon_aim_in_frames;
                         qcopy(settings->a30, settings->a20);
                         qcopy(settings->a20, settings->a10);
                     } else {
                         u16 frames;
                         settings->st = 4;
-                        frames = D_L00_001B1548;
+                        frames = g_weapon_anim_return_frames;
                         settings->tC6 = frames;
                         settings->invC8 = 1.0f / IntToFloat((s16)frames);
                     }
@@ -197,7 +197,7 @@ void cam_follow_compute_position(char *moby, void *out)
         case 10:
             FastVecScale(out, axis, FastVecDot(position, axis));
             FastVecSub(settings, position, out);
-            lerp_vector(out, out, settings->a20, D_L00_001B1574);
+            lerp_vector(out, out, settings->a20, g_cam_follow_lerp_factor);
             break;
         default:
             FastVecScale(out, axis, FastVecDot(position, axis));

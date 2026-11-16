@@ -13,7 +13,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
-extern float D_L01_001AFE30 __attribute__((sda));
+extern float g_debris_drift_scale __attribute__((sda));
 extern char g_coll_line_hit_point[];
 
 void func_PAL_L01_003C0A98(char *obj)
@@ -50,7 +50,7 @@ void func_PAL_L01_003C0A98(char *obj)
     *(float *)(obj + 0xF0) += (*(float *)(s + 0x44) - *(float *)(obj + 0xF0)) * 0.02f;
     if (*(unsigned char *)(obj + 0x20) != 2) {
         tilt = math_fast_sin_or_cos_a(*(float *)(s + 0x40)) * 0.17453295f;
-        scale = D_L01_001AFE30;
+        scale = g_debris_drift_scale;
         *(float *)(obj + 0xF4) = tilt;
         saved = *(float *)(s + 8);
         *(float *)(s + 8) = 0.0f;

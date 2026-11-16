@@ -30,8 +30,8 @@ typedef struct {
 
 extern unsigned char g_item_slot_to_record[];
 extern StateAF3D8 D_00189E20_26;
-extern int D_L00_001A7D00[2] __attribute__((sda));
-extern BufferAF3D8 D_L00_001B7400[];
+extern int g_hero_item_anim_ids[2] __attribute__((sda));
+extern BufferAF3D8 g_item_matrix_buffers[];
 extern char g_weapon_l00_table[];
 extern int hero_slot_item_id(int);
 extern char *ref_L00_002AF3D8_0(int, int);
@@ -58,13 +58,13 @@ void hero_create_item_slot_objects(int inhibit, int request)
         if (i == 1 && D_00189E20_26.mode != 2)
             break;
 
-        object = ref_L00_002AF3D8_0(D_00189E20_26.resource, D_L00_001A7D00[i]);
+        object = ref_L00_002AF3D8_0(D_00189E20_26.resource, g_hero_item_anim_ids[i]);
         D_00189E20_26.objects[i] = object;
         if (object) {
             D_00189E20_26.pending = 0;
             *(int *)(object + 8) = 0;
-            *(char **)(object + 56) = D_L00_001B7400[i].first;
-            *(char **)(object + 60) = D_L00_001B7400[i].second;
+            *(char **)(object + 56) = g_item_matrix_buffers[i].first;
+            *(char **)(object + 60) = g_item_matrix_buffers[i].second;
             ref_L00_002AF3D8_1(D_00189E20_26.resource, object, id, 0, 15, 1);
             *(float *)(object + 40) = 1.0f;
         }

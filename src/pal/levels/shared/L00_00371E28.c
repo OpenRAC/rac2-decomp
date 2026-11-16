@@ -20,7 +20,7 @@ extern void subtitle_update_state_machine(void);
 
 /* Runs the level's tick chain once: the three-argument engine reset, a gate on the resident
  * word and the boot flag, then the subsystem updates and the resident object's callback. */
-void func_PAL_L00_00372508(void)
+void level_run_frame_update_chain_pal(void)
 {
     L00_0036FA68_Object *object;
 

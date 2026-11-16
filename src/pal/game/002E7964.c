@@ -5,14 +5,14 @@
 
 extern char D_00189E20_9[];
 extern char D_001A63A8_3[];
-extern short D_00152C2A;
+extern short g_scene_reset_flag;
 extern void func_002B72E8_1();
 extern int UpdateSoundVoices();
 extern void subtitle_clear_state();
 extern void level_transition_scene_start();
 
 /* One-shot init: raises an int flag, forces a state word outside {6,7} to 5, runs three calls, then clears a 16-bit global. */
-void func_PAL_002E7E00(void)
+void scene_reset_state_on_start_pal(void)
 {
     char *p = D_00189E20_9;
     char *q;
@@ -31,6 +31,6 @@ void func_PAL_002E7E00(void)
     UpdateSoundVoices();
     subtitle_clear_state();
     level_transition_scene_start(0);
-    D_00152C2A = 0;
+    g_scene_reset_flag = 0;
 }
 

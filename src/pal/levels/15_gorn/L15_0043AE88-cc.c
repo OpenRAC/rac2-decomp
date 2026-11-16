@@ -21,8 +21,8 @@ extern void gorn_ship_spawn_damage_effects(void *);
 extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
-extern s32 D_L15_001B1780[] SDATA(D_L15_001B1780);
-extern s32 D_L15_001B17B0[] SDATA(D_L15_001B17B0);
+extern s32 g_gorn_ship_damage_joints[] SDATA(D_L15_001B1780);
+extern s32 g_gorn_ship_part_joints[] SDATA(D_L15_001B17B0);
 extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
@@ -35,8 +35,8 @@ typedef struct GornEffectCamera {
     char pad00[0x140];
     float position[4];
 } GornEffectCamera;
-extern GornEffectCamera D_L15_001B9680;
-extern unsigned char *D_L15_001FF4AC;
+extern GornEffectCamera g_hero_l15_state_floats;
+extern unsigned char *g_particle_l15_byte_ptr;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -56,8 +56,8 @@ void func_PAL_L15_0043AE88(char *object, int joint, int unused, float radius) {
     unsigned char *data;
 
     moby_transform_joint_to_world(object, joint, initial);
-    heading = mat_fast_helper_a(D_L15_001B9680.position[0] - *(float *)(object + 0x10),
-                            D_L15_001B9680.position[1] - *(float *)(object + 0x14));
+    heading = mat_fast_helper_a(g_hero_l15_state_floats.position[0] - *(float *)(object + 0x10),
+                            g_hero_l15_state_floats.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);
@@ -77,7 +77,7 @@ void func_PAL_L15_0043AE88(char *object, int joint, int unused, float radius) {
         *(int *)(data + 4) = 3;
         data[0xA] = 0x7F;
         data[0xB] = particle[0xA];
-        particle[2] = *D_L15_001FF4AC;
+        particle[2] = *g_particle_l15_byte_ptr;
     }
 }
 

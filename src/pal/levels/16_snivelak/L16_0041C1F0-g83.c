@@ -4,16 +4,16 @@
 typedef union { u8 b[0x2600]; s32 i[0x980]; f32 f[0x980]; char *ptr[0x980]; } Hero;
 extern f32 D_L16_001B1AD0_gp[][4] SDATA(D_L16_001B1AD0);
 extern f32 D_L16_001B1AF0_gp[] SDATA(D_L16_001B1AF0);
-extern f32 D_L16_001B1AF0[] MACRO_ADDR;
-extern f32 D_L16_001B1B00 __attribute__((sda));
-extern f32 D_L16_001B1B04 __attribute__((sda));
-extern s32 D_L16_001B1B08 __attribute__((sda));
-extern u32 D_00138320 __attribute__((nosda));
-extern u8 D_001A7A0A[] __attribute__((sda));
+extern f32 g_turret_aim_params[] MACRO_ADDR;
+extern f32 g_turret_aim_velocity_scale __attribute__((sda));
+extern f32 g_turret_aim_speed __attribute__((sda));
+extern s32 g_turret_aim_init_word __attribute__((sda));
+extern u32 g_pad_pressed_flags __attribute__((nosda));
+extern u8 g_extras_unlocked_flag[] __attribute__((sda));
 extern char g_hero_state[];
-extern char D_L16_001B9B00[];
-extern char *D_L16_001BFF58 __attribute__((nosda));
-extern char D_L16_001BFF60[];
+extern char g_scene_origin_transform[];
+extern char *g_aim_target_moby __attribute__((nosda));
+extern char g_aim_target_position[];
 extern s32 math_fast_float_d(char *);
 extern void matrix_mul_vec3(char *, f32 *, char *);
 extern void FastVecAdd(char *, char *, char *);
@@ -21,7 +21,7 @@ extern void vec_scale_to_length(char *, char *, f32);
 extern s32 coll_process_hit(char *, s32, char *, s32, f32);
 extern s32 CollLine(char *, char *, s32, char *, s32);
 extern void FastVecSub(char *, char *, char *);
-extern char *func_PAL_L13_00412518(char *, char *, char *, s32, f32);
+extern char *SpawnEA7Moby_pal(char *, char *, char *, s32, f32);
 
 /* Once the refire timer runs out while a fire button is held: places the alternating muzzle
    and the aim point in the turret's frame, aims at the hit of a ray (or the camera-line
@@ -32,27 +32,27 @@ void func_PAL_L16_0041C1F0(char *self) {
     f32 speed;
 
     if (!math_fast_float_d(st + 0x8C)) return;
-    if (!(D_00138320 & 0xA0)) return;
+    if (!(g_pad_pressed_flags & 0xA0)) return;
     matrix_mul_vec3(muzzle, D_L16_001B1AD0_gp[*(s32 *)(st + 0x88)], self + 0xC0);
     FastVecAdd(muzzle, muzzle, self + 0x10);
     matrix_mul_vec3(aim, D_L16_001B1AF0_gp, self + 0xC0);
     FastVecAdd(aim, aim, self + 0x10);
-    vec_scale_to_length(near, D_L16_001B9B00 + 0x230, 2.0f);
-    FastVecAdd(near, near, D_L16_001B9B00);
-    vec_scale_to_length(far, D_L16_001B9B00 + 0x230, 120.0f);
-    FastVecAdd(far, far, D_L16_001B9B00);
+    vec_scale_to_length(near, g_scene_origin_transform + 0x230, 2.0f);
+    FastVecAdd(near, near, g_scene_origin_transform);
+    vec_scale_to_length(far, g_scene_origin_transform + 0x230, 120.0f);
+    FastVecAdd(far, far, g_scene_origin_transform);
     *(s32 *)(self + 0x98) = 0;
-    if (coll_process_hit(aim, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0, D_L16_001B1AF0[3]) && D_L16_001BFF58)
-        FastVecSub(velocity, D_L16_001BFF58 + 0x10, muzzle);
+    if (coll_process_hit(aim, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0, g_turret_aim_params[3]) && g_aim_target_moby)
+        FastVecSub(velocity, g_aim_target_moby + 0x10, muzzle);
     else if (CollLine(near, far, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0))
-        FastVecSub(velocity, D_L16_001BFF60, muzzle);
+        FastVecSub(velocity, g_aim_target_position, muzzle);
     else
         FastVecSub(velocity, far, muzzle);
-    vec_scale_to_length(velocity, velocity, D_L16_001B1B00 * 0.020000001f);
-    speed = D_L16_001B1B04;
+    vec_scale_to_length(velocity, velocity, g_turret_aim_velocity_scale * 0.020000001f);
+    speed = g_turret_aim_speed;
     *(s32 *)(self + 0x98) = *(s32 *)(*(char **)(self + 0x24) + 0x10);
-    if (D_001A7A0A[0]) speed *= 5.0f;
-    func_PAL_L13_00412518(self, velocity, muzzle, 0, speed);
-    *(s32 *)(st + 0x8C) = ((s32)(D_L16_001B1B08) * 5 + 2) / 6;
+    if (g_extras_unlocked_flag[0]) speed *= 5.0f;
+    SpawnEA7Moby_pal(self, velocity, muzzle, 0, speed);
+    *(s32 *)(st + 0x8C) = ((s32)(g_turret_aim_init_word) * 5 + 2) / 6;
     *(s32 *)(st + 0x88) = (*(s32 *)(st + 0x88) + 1) & 1;
 }

@@ -1,8 +1,8 @@
 #include "common.h"
-extern float D_L19_001B1D5C __attribute__((sda));
-extern float D_L19_001B1D60 __attribute__((sda));
-extern float D_L19_001B1D64 __attribute__((sda));
-extern float D_L19_001B1D68 __attribute__((sda));
+extern float g_lift_travel_height __attribute__((sda));
+extern float g_lift_rise_frames __attribute__((sda));
+extern float g_lift_lower_frames __attribute__((sda));
+extern float g_lift_trigger_distance __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float vec_distance_xy(void *, void *);
@@ -22,7 +22,7 @@ void func_PAL_L19_00423BC8(u8 *obj)
         s->angle = *(float *)(obj + 0xF8);
         s->height = *(float *)(obj + 0x18);
         angle = FastAddRotations(*(float *)(obj + 0xF8), 3.1415927f);
-        height = *(float *)(obj + 0x18) - D_L19_001B1D5C;
+        height = *(float *)(obj + 0x18) - g_lift_travel_height;
         *(float *)(obj + 0xF8) = angle;
         *(float *)(obj + 0x18) = height;
         moby_set_state(obj, 1, -1);
@@ -36,7 +36,7 @@ void func_PAL_L19_00423BC8(u8 *obj)
         break;
     case 2:
         if (flag_set_first_pending(obj)) PlayMobySound(0, 0, obj);
-        s->time += 1.0f / ((D_L19_001B1D60 * 5.0f + 2.0f) * 0.16666667f);
+        s->time += 1.0f / ((g_lift_rise_frames * 5.0f + 2.0f) * 0.16666667f);
         if (s->time > 1.0f) {
             s->time = 0;
             *(float *)(obj + 0x18) = s->height;
@@ -46,11 +46,11 @@ void func_PAL_L19_00423BC8(u8 *obj)
             float f = (math_fast_sin_or_cos_a(s->time * 3.1415927f) + 1.0f) * 0.5f;
             if (f > 1.0f) f = 1.0f;
             else if (f < 0.0f) f = 0.0f;
-            *(float *)(obj + 0x18) = s->height - f * D_L19_001B1D5C;
+            *(float *)(obj + 0x18) = s->height - f * g_lift_travel_height;
         }
         break;
     case 3:
-        s->time += 1.0f / ((D_L19_001B1D64 * 5.0f + 2.0f) * 0.16666667f);
+        s->time += 1.0f / ((g_lift_lower_frames * 5.0f + 2.0f) * 0.16666667f);
         if (s->time > 1.0f) {
             s->time = 0;
             *(float *)(obj + 0xF8) = s->angle;
@@ -63,7 +63,7 @@ void func_PAL_L19_00423BC8(u8 *obj)
         break;
     case 4:
         if (!s->other || s->other[0x20] == 0xFE || s->other[0x20] == 0xFD ||
-            vec_distance_xy(obj + 0x10, s->other + 0x10) > D_L19_001B1D68) {
+            vec_distance_xy(obj + 0x10, s->other + 0x10) > g_lift_trigger_distance) {
             obj[0xBC] = 3;
             s->other = 0;
             s->time = 1.0f;
@@ -72,7 +72,7 @@ void func_PAL_L19_00423BC8(u8 *obj)
         break;
     case 5:
         if (flag_set_first_pending(obj)) PlayMobySound(1, 0, obj);
-        s->time -= 1.0f / ((D_L19_001B1D64 * 5.0f + 2.0f) * 0.16666667f);
+        s->time -= 1.0f / ((g_lift_lower_frames * 5.0f + 2.0f) * 0.16666667f);
         if (s->time <= 0.0f) {
             s->time = 1.0f;
             *(float *)(obj + 0xF8) = FastAddRotations(s->angle, 3.1415927f);
@@ -83,9 +83,9 @@ void func_PAL_L19_00423BC8(u8 *obj)
         }
         break;
     case 6:
-        s->time -= 1.0f / ((D_L19_001B1D60 * 5.0f + 2.0f) * 0.16666667f);
+        s->time -= 1.0f / ((g_lift_rise_frames * 5.0f + 2.0f) * 0.16666667f);
         if (s->time <= 0.0f) {
-            float height = s->height - D_L19_001B1D5C;
+            float height = s->height - g_lift_travel_height;
             s->time = 0;
             obj[0xBC] = 0;
             *(float *)(obj + 0x18) = height;
@@ -94,7 +94,7 @@ void func_PAL_L19_00423BC8(u8 *obj)
             float f = (math_fast_sin_or_cos_a(s->time * 3.1415927f) + 1.0f) * 0.5f;
             if (f > 1.0f) f = 1.0f;
             else if (f < 0.0f) f = 0.0f;
-            *(float *)(obj + 0x18) = s->height - f * D_L19_001B1D5C;
+            *(float *)(obj + 0x18) = s->height - f * g_lift_travel_height;
         }
         break;
     }

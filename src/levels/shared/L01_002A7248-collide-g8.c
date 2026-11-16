@@ -49,8 +49,8 @@ typedef struct {
 } CollideHit;
 
 extern CollideHero g_hero_state;
-extern CollideHit D_L01_001BF900;
-extern int D_L01_001A9030 MACRO_ADDR;
+extern CollideHit g_collision_l01_hit;
+extern int g_hero_input_lock MACRO_ADDR;
 
 extern void func_002E3438(void *);
 extern void func_002CA1C0(void);
@@ -93,7 +93,7 @@ int Camera_ResolveBlockedView(int arg)
                 func_002C9020(offset, offset, 5.0f);
             else if (g_hero_state.gravity_mode == 1 || g_hero_state.mode)
                 func_002C8E60(offset, 0, 0.0f, 0.0f, 0.6f);
-            else if (D_L01_001A9030)
+            else if (g_hero_input_lock)
                 func_002C9020(offset, offset, 0.77f);
             else
                 func_002C8E60(offset, 0, 0.0f, 0.0f, g_hero_state.capsule_bottom);
@@ -123,11 +123,11 @@ int Camera_ResolveBlockedView(int arg)
         }
         if (!hit)
             break;
-        qcopy(g_hero_state.pos, D_L01_001BF900.pos);
-        qcopy(g_hero_state.wall_normal, D_L01_001BF900.normal);
-        qcopy(g_hero_state.wall_point, D_L01_001BF900.point);
+        qcopy(g_hero_state.pos, g_collision_l01_hit.pos);
+        qcopy(g_hero_state.wall_normal, g_collision_l01_hit.normal);
+        qcopy(g_hero_state.wall_point, g_collision_l01_hit.point);
         p->wall_hit = 1;
-        p->hit_moby = D_L01_001BF900.moby;
+        p->hit_moby = g_collision_l01_hit.moby;
     }
     func_002E34A0(g_hero_state.pos, g_hero_state.pos, offset);
     func_002E34A0(delta, g_hero_state.pos, old);

@@ -6,7 +6,7 @@
 
 extern char g_pad_state[];
 extern char g_hero_state[];
-extern int D_L01_001A8F40 MACRO_ADDR;
+extern int g_hero_l01_control_mode MACRO_ADDR;
 extern char g_hero_position[];
 
 extern void hero_update_subsystems(void);
@@ -14,7 +14,7 @@ extern void func_2C7CA8(void);
 extern void UpdateHeroInputAndHistory(void);
 extern void hero_read_input_command_flags(void);
 extern int ProbeLedgeGrab(char *a0, char *a1, char *a2);
-extern void func_US2_L01_002C3B08(void);
+extern void hero_l01_update_state_transitions_us2(void);
 extern void func_2C8628(void);
 extern void hero_clear_objects_flag_bit(void);
 extern void func_2AEB80(void);
@@ -37,8 +37,8 @@ extern void hero_update_items_frame(void);
 extern int hero_is_action_allowed(void);
 extern void func_2A9520(void);
 extern void func_2A9310(void);
-extern void func_US2_L00_002A67F8(void);
-extern void func_US2_L00_002D6258(void);
+extern void hero_update_stat_trackers_us2(void);
+extern void hero_update_collection_progress_us2(void);
 extern void hero_check_targeting_triggers(void);
 extern void UpdateHeroAimAndTransitions(void);
 extern int hero_is_in_swing_or_grind_mode(void);
@@ -86,8 +86,8 @@ void func_US2_L01_002A8D48(void) {
     UpdateHeroInputAndHistory();
     hero_read_input_command_flags();
     ProbeLedgeGrab(p + 0x80, p + 0x90, p + 0x550);
-    func_US2_L01_002C3B08();
-    if (D_L01_001A8F40 == 2 || D_L01_001A8F40 == 6) {
+    hero_l01_update_state_transitions_us2();
+    if (g_hero_l01_control_mode == 2 || g_hero_l01_control_mode == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
             func_2C8628();
         else
@@ -130,8 +130,8 @@ void func_US2_L01_002A8D48(void) {
     }
     func_2A9520();
     func_2A9310();
-    func_US2_L00_002A67F8();
-    func_US2_L00_002D6258();
+    hero_update_stat_trackers_us2();
+    hero_update_collection_progress_us2();
     hero_check_targeting_triggers();
     UpdateHeroAimAndTransitions();
     {

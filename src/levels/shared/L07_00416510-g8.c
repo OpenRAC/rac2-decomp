@@ -32,13 +32,13 @@ extern UpdateInput g_pad_state;
 typedef struct { unsigned char pad[0x1D]; unsigned char material; } UpdateSettings;
 extern UpdateSettings g_item_slot_to_record;
 extern unsigned char g_sound_state[] NOT_SDA;
-extern UpdateMaterial D_L07_002628A0[] NOT_SDA;
-extern unsigned char *D_L07_001C36C0[];
-extern unsigned char *D_L07_001B18B8 __attribute__((sda));
-extern unsigned char *D_L07_001B18BC __attribute__((sda));
-extern unsigned char *D_L07_001B18C0 __attribute__((sda));
-extern int D_L07_001A8FF0;
-extern int D_L07_001A8F00;
+extern UpdateMaterial g_weapon_record_table[] NOT_SDA;
+extern unsigned char *g_hit_object_list[];
+extern unsigned char *g_update_point_list __attribute__((sda));
+extern unsigned char *g_update_arc_list __attribute__((sda));
+extern unsigned char *g_update_beam_list __attribute__((sda));
+extern int g_hero_l07_lock_flag;
+extern int g_game_l07_mode_state;
 extern void table_clear_entry_flag(int);
 extern int AcquireEntitySlot(void *, int, void *);
 extern unsigned char *level_get_slot_body(int, int);
@@ -90,9 +90,9 @@ void UpdateHeldBeamWeapon(unsigned char *object)
     int count;
     unsigned char **targets;
 
-    if (g_hero_state.mode == 3 && D_L07_001B18BC) {
+    if (g_hero_state.mode == 3 && g_update_arc_list) {
         for (; i < 35; i++) {
-            unsigned char *entry = D_L07_001B18BC + i * 0x40;
+            unsigned char *entry = g_update_arc_list + i * 0x40;
             if (UI(entry, 0x38) >= 0) {
                 table_clear_entry_flag(UI(entry, 0x38));
                 UI(entry, 0x38) = -1;
@@ -101,18 +101,18 @@ void UpdateHeldBeamWeapon(unsigned char *object)
     }
     if (object[0x20] == 0) {
         UI(data, 0x34) = AcquireEntitySlot(object, 0, &scratch);
-        D_L07_001B18C0 = level_get_slot_body(*(short *)(object + 0xAA), UI(data, 0x34));
-        D_L07_001B18B8 = mem_align_up_sixteen_alt(D_L07_001B18C0 + 0x33E0);
-        D_L07_001B18BC = mem_align_up_sixteen_alt(D_L07_001B18B8 + 0x1F40);
+        g_update_beam_list = level_get_slot_body(*(short *)(object + 0xAA), UI(data, 0x34));
+        g_update_point_list = mem_align_up_sixteen_alt(g_update_beam_list + 0x33E0);
+        g_update_arc_list = mem_align_up_sixteen_alt(g_update_point_list + 0x1F40);
         for (i = 124; i >= 0; i--)
-            ((UpdatePoint *)D_L07_001B18B8)[i].active = 1;
+            ((UpdatePoint *)g_update_point_list)[i].active = 1;
         for (i = 9; i >= 0; i--)
-            ((UpdateBeam *)D_L07_001B18C0)[i].active = 0;
+            ((UpdateBeam *)g_update_beam_list)[i].active = 0;
         {
             int inactive = -1;
             i = 34;
             do {
-                ((UpdateArc *)D_L07_001B18BC)[i].sound = inactive;
+                ((UpdateArc *)g_update_arc_list)[i].sound = inactive;
             } while (--i >= 0);
         }
         UI(data, 0x3C) = 0;
@@ -153,7 +153,7 @@ void UpdateHeldBeamWeapon(unsigned char *object)
         count = coll_process_hit(0.5f, data, 16, object, 0);
         if (count > 0) {
             int remaining;
-            targets = D_L07_001C36C0;
+            targets = g_hit_object_list;
             remaining = count;
             do {
                 if (*targets != g_hero_state.object) {
@@ -161,7 +161,7 @@ void UpdateHeldBeamWeapon(unsigned char *object)
                     vec_scale_to_length(&delta, &delta, 1.0f);
                     vec_scale_to_length(&request, &request, 1.0f);
                     make_hit_descriptor(&request, object, 0x910000,
-                        ((UpdateMaterial *)((unsigned int)D_L07_002628A0 + g_item_slot_to_record.material * sizeof(UpdateMaterial)))->value, &delta);
+                        ((UpdateMaterial *)((unsigned int)g_weapon_record_table + g_item_slot_to_record.material * sizeof(UpdateMaterial)))->value, &delta);
                     request.position.q = delta.q;
                     request.enabled = 1;
                     request.position.f[3] = 5627.925f;
@@ -195,7 +195,7 @@ void UpdateHeldBeamWeapon(unsigned char *object)
     if (g_hero_state.view) {
         g_hero_state.camera = g_hero_state.view;
         vec_compute_object_to_target(g_hero_state.view, data, &vector, UF(data, 0x50) * 0.05f);
-        if (D_L07_001A8FF0) {
+        if (g_hero_l07_lock_flag) {
             FastVecScale(&delta, object + 0xE0, 0.02f);
             FastVecAdd(&vector, &vector, &delta);
         } else vector.f[2] += 0.02f;
@@ -218,6 +218,6 @@ void UpdateHeldBeamWeapon(unsigned char *object)
         UI(data, 0x40) = 0;
     }
     part_l00_update_effect_slots_2(object);
-    if (D_L07_001A8F00 != 2 && object[0x31])
+    if (g_game_l07_mode_state != 2 && object[0x31])
         gfx_add_draw_callback_third(ref_L07_00416510_00, object);
 }

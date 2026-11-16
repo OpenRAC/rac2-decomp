@@ -9,9 +9,9 @@ extern BatchA_A16_u8 BatchA_A16_BatchA_D001A7A0A[] __attribute__((sda));
 /* Returns 1 when a flag byte is set. */
 int flag_is_byte_set(void) { return BatchA_A16_BatchA_D001A7A0A[0] != 0; }
 
-extern int D_001A7B8C __attribute__((sda));
+extern int g_flag_word __attribute__((sda));
 
 /* Clears a flag word. */
 void flag_clear_word(void) {
-    D_001A7B8C = 0;
+    g_flag_word = 0;
 }

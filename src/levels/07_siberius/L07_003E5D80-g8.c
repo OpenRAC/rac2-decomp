@@ -15,7 +15,7 @@ extern void moby_set_state(u8 *, int, int);
 extern void moby_mark_spawned(void *);
 extern u8 g_sound_state[];
 extern u8 g_hero_position[];
-extern float D_L07_001B0AAC __attribute__((sda));
+extern float g_death_explosion_scale __attribute__((sda));
 
 /* Handles the entity's death: stops its sound, spawns an explosion and flying pickups, then
    respawns it with one life fewer or removes it. */
@@ -46,7 +46,7 @@ void entity_handle_death_or_respawn(u8 *obj) {
     burst_pos.q = 0;
     burst_pos.f[2] = 0.5f;
     FastVecAdd(&burst_pos, &burst_pos, pos);
-    SpawnExplosion(&burst_pos, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(vars + 0x260));
+    SpawnExplosion(&burst_pos, 0, 0, 0, 0, 0x14, 0x2D, 1, g_death_explosion_scale, 20.0f, 1, 0, 0, *(s32 *)(vars + 0x260));
     FastVecSub(impulse, pos, g_hero_position);
     impulse[2] = 0.0f;
     vec_fast_normalize_helper(impulse, impulse, 0.06666667f);

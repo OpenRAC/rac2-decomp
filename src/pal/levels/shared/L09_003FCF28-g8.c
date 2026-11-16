@@ -1,18 +1,19 @@
+#include "names.h"
 /* func_PAL_L09_003FCF28, the PAL copy of func_L09_003F8598: the same C, where the frame count stored at 0x2E0 is scaled for 50 Hz. */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L09_001B2878 __attribute__((sda));
+extern int g_max_l09_group_id __attribute__((sda));
 
 /* An absolute view of the canonical pool pointer; its extent stays unknown. */
 extern unsigned char *D_L09_001B285C_base[] __asm__("D_L09_001B285C") __attribute__((sda));
 
-extern unsigned short *D_L09_001FB560[];
+extern unsigned short *g_track_entry_table[];
 
-extern unsigned char *D_L09_001FE6C0[];
+extern unsigned char *g_path_l09_table[];
 
-extern int D_L09_001B0F58 __attribute__((sda));
+extern int g_trooper_spawn_delay_max __attribute__((sda));
 
 extern float vec_distance_xy(void *, void *);
 
@@ -38,13 +39,13 @@ void func_PAL_L09_003FCF28(unsigned char *object) {
     target_index = *(int *)(source_data + 0x2C0);
     if (target_index == -1)
         return;
-    qcopy(&position, D_L09_001FE6C0[target_index] + 0x10);
-    list = D_L09_001FB560[object[0x21]];
+    qcopy(&position, g_path_l09_table[target_index] + 0x10);
+    list = g_track_entry_table[object[0x21]];
     best = 0;
     best_distance = 100000.0f;
     for (;
-         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && list != 0 &&
-         ((list != 0 && (short)list[-1] >= 0) || list == D_L09_001FB560[object[0x21]]);
+         object[0x21] != 0xFF && object[0x21] <= g_max_l09_group_id && list != 0 &&
+         ((list != 0 && (short)list[-1] >= 0) || list == g_track_entry_table[object[0x21]]);
          list++) {
         pool = D_L09_001B285C_base[0];
         candidate = pool + ((*list & 0x7FFF) << 8);
@@ -72,7 +73,7 @@ void func_PAL_L09_003FCF28(unsigned char *object) {
     }
     if (best != 0) {
         best_data = *(unsigned char **)(best + 0x68);
-        frame = D_L09_001B0F58;
+        frame = g_trooper_spawn_delay_max;
         *(int *)(best_data + 0x2B0) = *(int *)(source_data + 0x2B0);
         *(int *)(best_data + 0x2B4) = *(int *)(source_data + 0x2B4);
         *(int *)(best_data + 0x2B8) = *(int *)(source_data + 0x2B8);

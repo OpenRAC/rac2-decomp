@@ -10,9 +10,9 @@ typedef struct { u8 pad0[0x1bc]; float scale; } JobaState461E8;
 #define SCALE(p) (((JobaState461E8 *)(p))->scale)
 extern JobaRecord461E8 *g_moby_l11_table __attribute__((section(".sdata")));
 extern JobaRecord461E8 *D_L11_001B359C_GP SDATA(D_L11_001B359C);
-extern u8 *D_L11_001FF580[];
-extern float D_L11_001B187C __attribute__((sda)), D_L11_001B1880 __attribute__((sda));
-extern float D_L11_001B1884 __attribute__((sda)), D_L11_001B1888 __attribute__((sda));
+extern u8 *g_path_l11_table[];
+extern float g_ribbon_scale_target_a __attribute__((sda)), g_ribbon_scale_target_b __attribute__((sda));
+extern float g_ribbon_scale_approach_rate __attribute__((sda)), g_ribbon_phase_speed __attribute__((sda));
 extern void set_identity_rotation_rows(void *);
 extern float ApproachValue(float *,float,float);
 extern float math_fabs(float);
@@ -21,7 +21,7 @@ extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern float math_random_float_range(float,float);
-void func_PAL_L11_0044BC30(u8 *object)
+void joba_update_ribbon_scale_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object+0x68);
     float previous = SCALE(state);
@@ -32,32 +32,32 @@ void func_PAL_L11_0044BC30(u8 *object)
         u8 *dst, *src;
         set_identity_rotation_rows((u8 *)&g_moby_l11_table[I32(state,0x1b8)]+0xc0);
         previous=1.0f;
-        dst=D_L11_001FF580[I32(state,0x1c8)];
-        src=D_L11_001FF580[I32(state,0x1cc)];
+        dst=g_path_l11_table[I32(state,0x1c8)];
+        src=g_path_l11_table[I32(state,0x1cc)];
         for(i=0;i<I32(dst,0);i++) qcopy_nc(dst+16+i*16,src+16+i*16);
         g_moby_l11_table[I32(state,0x1b8)].flags&=0xfffe;
         g_moby_l11_table[I32(state,0x1b8)].enabled=1;
         g_moby_l11_table[I32(state,0x1b8)].mask=255;
-        SCALE(state)=D_L11_001B187C;
+        SCALE(state)=g_ribbon_scale_target_a;
         F32(state,0xd4)=0.5f;
         S16(state,0x1fa)=2;
         I32(state,0xd0)=0;
         /* Initialization deliberately advances the new animation immediately. */
     }
     case 2:
-        ApproachValue(&SCALE(state),D_L11_001B1880,D_L11_001B1884);
-        if (math_fabs(SCALE(state)-D_L11_001B1880)<0.01f) S16(state,0x1fa)=3;
+        ApproachValue(&SCALE(state),g_ribbon_scale_target_b,g_ribbon_scale_approach_rate);
+        if (math_fabs(SCALE(state)-g_ribbon_scale_target_b)<0.01f) S16(state,0x1fa)=3;
         break;
     case 4:
-        ApproachValue(&SCALE(state),D_L11_001B187C,D_L11_001B1884);
-        if (math_fabs(SCALE(state)-D_L11_001B187C)<0.01f) {
+        ApproachValue(&SCALE(state),g_ribbon_scale_target_a,g_ribbon_scale_approach_rate);
+        if (math_fabs(SCALE(state)-g_ribbon_scale_target_a)<0.01f) {
             D_L11_001B359C_GP[I32(state,0x1b8)].flags|=1;
             D_L11_001B359C_GP[I32(state,0x1b8)].enabled=0;
             S16(state,0x1fa)=0;
         }
         break;
     case 5:
-        SCALE(state)=D_L11_001B187C;
+        SCALE(state)=g_ribbon_scale_target_a;
         g_moby_l11_table[I32(state,0x1b8)].flags|=1;
         g_moby_l11_table[I32(state,0x1b8)].enabled=0;
         S16(state,0x1fa)=0;
@@ -66,7 +66,7 @@ void func_PAL_L11_0044BC30(u8 *object)
     if (previous != SCALE(state)) {
         int i;
         u8 *dst, *vertex;
-        dst=D_L11_001FF580[I32(state,0x1c8)];
+        dst=g_path_l11_table[I32(state,0x1c8)];
         for (i=0;i<I32(dst,0);i++) {
             vertex=dst+16+i*16;
             FastVecSub(vector,vertex,(u8 *)&g_moby_l11_table[I32(state,0x1b8)]+16);
@@ -83,7 +83,7 @@ void func_PAL_L11_0044BC30(u8 *object)
         float *weight = (float *)(state + 0xD8);
         for(;i<2;i++) {
             float *phase_row = phase + i;
-            *phase_row+=D_L11_001B1888*0.020000001f;
+            *phase_row+=g_ribbon_phase_speed*0.020000001f;
             if (*phase_row>1.0f) {
                 float random;
                 float *weight_row;

@@ -10,7 +10,7 @@ typedef int Quad __attribute__((mode(TI)));
 typedef unsigned long long Mask;
 extern int *g_path_lists[];
 extern Mask g_path_end_masks[][2];
-extern float D_L23_001B1410 __attribute__((sda));
+extern float g_boss_drift_active_flag __attribute__((sda));
 extern void mothership_project_point_onto_surface(char *, float);
 extern int mothership_check_clear_path(char *, char *, char *);
 extern void mothership_pick_nearest_path_point(char *, int);
@@ -127,5 +127,5 @@ void FollowWaypointPath(char *object, float height) {
     mothership_disable_part_flags(object);
     moby_copy_vector_to_child(object, &local.point);
     mothership_restore_part_flags(object);
-    D_L23_001B1410 = 1.0f;
+    g_boss_drift_active_flag = 1.0f;
 }

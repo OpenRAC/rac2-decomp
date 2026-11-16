@@ -1,10 +1,10 @@
 #include "common.h"
 
 /* The gate's word at $gp-0x2B14 is a small index into a table of live sub-objects. */
-extern int D_L05_001AC4DC __attribute__((sda));
+extern int g_level_random_object_index __attribute__((sda));
 
-extern char D_L05_00221D10[];
-extern char D_L05_00225DD0[];
+extern char g_feltzin_challenge_state[];
+extern char g_level_object_list[];
 
 extern char *func_379CA0(char *object);
 extern int func_37CDB0(char *object);
@@ -14,7 +14,7 @@ extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 
 /* The reach table the object's id indexes, at $gp+0xB78. */
-extern float D_L05_001AFB68 __attribute__((sda));
+extern float g_shot_reach_table __attribute__((sda));
 
 extern int g_current_map_index;
 
@@ -34,14 +34,14 @@ int moby_can_take_next_step(char *a0)
 {
     char *object = a0;
     char *sub = func_379CA0(a0);
-    char *gate = D_L05_00221D10;
+    char *gate = g_feltzin_challenge_state;
     int ready = 1;
 
     if (*(int *)(gate + 0x2C) == 1)
         return 0;
     if (sub == 0)
         return 0;
-    if (*(short *)(object + 0xAA) != *(short *)(((char **)D_L05_00225DD0)[D_L05_001AC4DC] + 0xAA))
+    if (*(short *)(object + 0xAA) != *(short *)(((char **)g_level_object_list)[g_level_random_object_index] + 0xAA))
         return 0;
     if (*(int *)(sub + 0x118) == 1)
         return 0;
@@ -73,7 +73,7 @@ void moby_randomize_reach_and_angles(char *obj)
     f21 = 0.0f;
     f20 = 0.01745329424738884f;
     f22 = 1.0f;
-    f1 = *(float *)(s0 + 0x2C) * *(float *)((char *)&D_L05_001AFB68 + 4 * idx);
+    f1 = *(float *)(s0 + 0x2C) * *(float *)((char *)&g_shot_reach_table + 4 * idx);
     *(float *)(s0 + 0x2C) = f1;
     f0 = math_random_angle();
     *(float *)(s0 + 0xF0) = f0;
@@ -128,7 +128,7 @@ typedef struct {
     int f168;
     int f16C;
 } ShakeCamera_003CFAB8;
-extern ShakeCamera_003CFAB8 D_L05_001B9580;
+extern ShakeCamera_003CFAB8 g_hero_l05_state;
 
 /* When the camera is within the object's reach and the object is not class 0x956, passes the
  * camera position to func_L05_003CFB90, calls func_002E5DA0 and starts a camera shake (weaker
@@ -136,19 +136,19 @@ extern ShakeCamera_003CFAB8 D_L05_001B9580;
  * shares them after scheduling. */
 void cam_shake_if_object_near(char *obj)
 {
-    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * moby_class_id_to_table_index(*(short *)(obj + 0xAA)));
+    float reach = *(float *)((char *)&g_shot_reach_table + 4 * moby_class_id_to_table_index(*(short *)(obj + 0xAA)));
 
-    if (fast_vec_dist(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
-        func_L05_003CFB90(obj, (char *)D_L05_001B9580.f140);
+    if (fast_vec_dist(obj + 0x10, g_hero_l05_state.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
+        func_L05_003CFB90(obj, (char *)g_hero_l05_state.f140);
         snd_play_from_class_bank(7, 0, obj, 0xFBF);
         if (*(short *)(obj + 0xAA) == 0x955) {
-            D_L05_001B9580.f160 = 0.05f;
-            D_L05_001B9580.f168 = 0x1E;
-            D_L05_001B9580.f16C = 0;
+            g_hero_l05_state.f160 = 0.05f;
+            g_hero_l05_state.f168 = 0x1E;
+            g_hero_l05_state.f16C = 0;
         } else {
-            D_L05_001B9580.f160 = 0.15f;
-            D_L05_001B9580.f168 = 0x3C;
-            D_L05_001B9580.f16C = 0;
+            g_hero_l05_state.f160 = 0.15f;
+            g_hero_l05_state.f168 = 0x3C;
+            g_hero_l05_state.f16C = 0;
         }
     }
 }
@@ -176,13 +176,13 @@ typedef struct {
     int one;
 } HitRecord97B30;
 
-extern Record233560 D_L05_00233560[24];
-extern char D_L05_001BFB20[];
-extern char D_L05_001BFB30[];
-extern float D_L05_001AEBE8 __attribute__((sda));
-extern float D_L05_001AEBE4 __attribute__((sda));
-extern float D_L05_001AEBE0 __attribute__((sda));
-extern float D_L05_001AEBDC __attribute__((sda));
+extern Record233560 g_effect_records[24];
+extern char g_projectile_target_pos[];
+extern char g_projectile_pos_scratch[];
+extern float g_homing_hit_value_b __attribute__((sda));
+extern float g_homing_hit_value_a __attribute__((sda));
+extern float g_homing_speed_alt __attribute__((sda));
+extern float g_homing_speed_normal __attribute__((sda));
 
 extern void FastVecAdd(void *, void *, void *);
 extern float FastVecLength(void *);
@@ -230,7 +230,7 @@ void homing_l05_projectile_update(char *obj)
 
     if (math_fast_float_d(state + 0x18)) {
         for (i = 0; i < 24; i++)
-            D_L05_00233560[i].owner = 0;
+            g_effect_records[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
         moby_mark_spawned(obj);
         return;
@@ -239,7 +239,7 @@ void homing_l05_projectile_update(char *obj)
         *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
         *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
         for (i = 0; i < 24; i++)
-            D_L05_00233560[i].owner = 0;
+            g_effect_records[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
         moby_mark_spawned(obj);
         return;
@@ -249,7 +249,7 @@ void homing_l05_projectile_update(char *obj)
         vec_build_spherical_offset(target, 21.0f, math_random_angle(), math_random_angle());
         FastVecAdd(target, target, obj + 0x10);
         if (CollLine(obj + 0x10, target, 0, obj, 0))
-            qcopy(target, D_L05_001BFB20);
+            qcopy(target, g_projectile_target_pos);
         func_L05_00398378(obj, target, 1);
         record_animate_owned(obj);
         gfx_add_draw_callback_third(record_update_owned_effects, obj);
@@ -257,9 +257,9 @@ void homing_l05_projectile_update(char *obj)
         hit.owner = obj;
         hit.flags = 0x810000;
         if (*(int *)(state + 0x24))
-            hit.value = D_L05_001AEBE8;
+            hit.value = g_homing_hit_value_b;
         else
-            hit.value = D_L05_001AEBE4;
+            hit.value = g_homing_hit_value_a;
         hit.one = 1;
         qcopy(hit.v, state);
         vec_scale_to_length(hit.v, hit.v, 1.0f);
@@ -268,9 +268,9 @@ void homing_l05_projectile_update(char *obj)
         hit.mode = 2;
         hit.id = *(unsigned short *)(obj + 0xAA);
         if (*(int *)(state + 0x24))
-            speed = D_L05_001AEBE0;
+            speed = g_homing_speed_alt;
         else
-            speed = D_L05_001AEBDC;
+            speed = g_homing_speed_normal;
         coll_process_hit(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
     }
 
@@ -278,10 +278,10 @@ void homing_l05_projectile_update(char *obj)
         collided = 0;
         if (coll_test_point(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
             collided = 1;
-            qcopy(obj + 0x10, D_L05_001BFB30);
+            qcopy(obj + 0x10, g_projectile_pos_scratch);
         }
         if (collided || CollLine(old, obj + 0x10, 16, *(void **)(state + 0x20), 0)) {
-            qcopy(obj + 0x10, D_L05_001BFB20);
+            qcopy(obj + 0x10, g_projectile_target_pos);
             SubmitFlightStateHitRecord(obj, state, obj + 0x10);
             if (*(int *)(state + 0x24))
                 part_spawn_shockwave_burst(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);

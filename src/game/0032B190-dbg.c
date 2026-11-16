@@ -14,7 +14,7 @@ extern void DrawQuadFaces(void *);
 extern void part_draw_ring_piece_flashes(void *);
 extern void part_draw_trail_nodes(void *);
 extern short g_screen_adjust_offsets[];
-extern unsigned long D_001B2810[] __attribute__((sda));
+extern unsigned long g_screen_fade_texture_desc[] __attribute__((sda));
 
 /* Per-frame screen fade of the object: while it is in state 2 (and stays there
    after func_0032C2E8) the white overlay fades in over 60 frames, otherwise it
@@ -26,7 +26,7 @@ void gfx_update_screen_fade(unsigned char *object)
     float t;
     int v;
 
-    D_001B2810[0] = GetEffectTextureDescriptor(-1);
+    g_screen_fade_texture_desc[0] = GetEffectTextureDescriptor(-1);
     state = object[0x20];
     if (state == 2) {
         DrawQuadFaces(object);

@@ -2,13 +2,13 @@
 #include "names.h"
 
 
-extern float D_L06_001B234C __attribute__((sda));
-extern float D_001B2350 __attribute__((sda));
+extern float g_spark_burst_threshold __attribute__((sda));
+extern float g_level_float_param __attribute__((sda));
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern void part_l01_spawn_ring_of_sparks(char *, int, float, float, float, float);
 extern int PlayMobySound(int, int, char *);
 
-void func_PAL_L06_00460E58(char *a0)
+void burst_on_hit_update_pal(char *a0)
 {
     char *p;
     int n;
@@ -21,7 +21,7 @@ void func_PAL_L06_00460E58(char *a0)
     p = (char *)part_find_owned_effect_slot(a0, 0x4010000, 0);
     if (p != 0 && *(short *)(*(char **)(p + 0x20) + 0xAA) != 0xFE5) {
         n = 3;
-        if (D_L06_001B234C < 0.8999999761581421f && D_001B2350 < 0.8999999761581421f)
+        if (g_spark_burst_threshold < 0.8999999761581421f && g_level_float_param < 0.8999999761581421f)
             n = 0xE;
 
         part_l01_spawn_ring_of_sparks(a0, n, 0.0f, 3.263000011444092f, 1.9739999771118164f,
@@ -42,7 +42,7 @@ extern void moby_set_state(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void flying_fragment_update(unsigned char *);
 
-void func_PAL_L06_00461470(unsigned char *a0)
+void flying_fragment_update_pal(unsigned char *a0)
 {
     switch (a0[0x20]) {
     case 0:
@@ -66,15 +66,15 @@ typedef unsigned int NotakQuad __attribute__((mode(TI)));
 extern char g_sound_state[];
 extern char g_hero_position[];
 /* Keep this absolute address as one assembler macro under -G0. */
-extern char D_L06_001A8F20[] __attribute__((sda));
+extern char g_effect_vector[] __attribute__((sda));
 extern int func_0035CBA0(char *, int, int);
 extern void moby_set_byte_on_group(int, int);
 extern int func_003A0948(int, int, char *);
 extern void FastVecAdd(void *, void *, void *);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int,
                                    float, float, int, int, int, int);
 extern void func_PAL_002B15D8(char *, int, void *, int, float, float, float, float);
-extern void func_PAL_L00_003281C0(char *, int, float);
+extern void part_spawn_scaled_bolts_pal(char *, int, float);
 extern void func_00350388(char *);
 extern int math_random_int_range(int, int);
 extern float vec_distance_xy(void *, void *);
@@ -102,9 +102,9 @@ void func_PAL_L06_00461504(char *a0)
         *(NotakQuad *)pos = 0;
         pos[2] = 1.0f;
         FastVecAdd(pos, pos, a0 + 0x10);
-        func_PAL_L00_003FB330(pos, 1, 25, 20, 20, 20, 45, 1, 1.25f, 20.0f, 1, 1, 0, 0);
-        func_PAL_002B15D8(a0, 0x7F, D_L06_001A8F20, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_PAL_L00_003281C0(a0, 1, 0.0f);
+        SpawnExplosion_pal(pos, 1, 25, 20, 20, 20, 45, 1, 1.25f, 20.0f, 1, 1, 0, 0);
+        func_PAL_002B15D8(a0, 0x7F, g_effect_vector, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_scaled_bolts_pal(a0, 1, 0.0f);
         func_00350388(a0);
     }
     switch (*(unsigned char *)(a0 + 0x20)) {

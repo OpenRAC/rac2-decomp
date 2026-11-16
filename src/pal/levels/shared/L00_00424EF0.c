@@ -20,7 +20,7 @@ extern void *func_PAL_002C23B8(float *out, float *in, int a2, int a3, unsigned i
    `size` is written but never read: that second reference to 210000.0f is what
    makes the compiler hold the constant in a saved float register ($f29) instead
    of rematerialising it at the call, which is what the retail does. */
-void func_PAL_L00_004253C0(float *pos)
+void rocket_spawn_smoke_burst_pal(float *pos)
 {
     float v[4];
     float dir[4];

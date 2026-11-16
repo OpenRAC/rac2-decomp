@@ -3,10 +3,10 @@
 
 /* Own unit: -G8 for the small-data scale factors, -fno-sched-spec for the loop. */
 
-extern char D_00237700[];
-extern char D_001B2830[] __attribute__((section(".sdata")));
-extern float D_001B0970 __attribute__((sda));
-extern float D_001B096C __attribute__((sda));
+extern char g_vehicle_probe_vectors_b[];
+extern char g_vehicle_gravity_direction[] __attribute__((section(".sdata")));
+extern float g_ridden_vehicle_probe_radius __attribute__((sda));
+extern float g_ridden_vehicle_probe_lift __attribute__((sda));
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -22,7 +22,7 @@ void BuildObjectBasisVectors(char *object)
     char vectors[4][16] __attribute__((aligned(16)));
     char temp[16] __attribute__((aligned(16)));
     char sum[16] __attribute__((aligned(16)));
-    char *base = D_00237700;
+    char *base = g_vehicle_probe_vectors_b;
     char *out;
     char *pos;
     int i;
@@ -40,9 +40,9 @@ void BuildObjectBasisVectors(char *object)
     for (i = 0; i < 8; i++) {
         if (i < 4)
             FastVecAdd(out, vectors[i >> 1], vectors[2 + (i & 1)]);
-        vec_scale_to_length(out, out, D_001B0970);
+        vec_scale_to_length(out, out, g_ridden_vehicle_probe_radius);
         FastVecAdd(out, out, pos);
-        vec_scale_to_length(temp, D_001B2830, -D_001B096C);
+        vec_scale_to_length(temp, g_vehicle_gravity_direction, -g_ridden_vehicle_probe_lift);
         FastVecAdd(out, out, temp);
         out += 16;
         FastVecAdd(sum, temp, pos);

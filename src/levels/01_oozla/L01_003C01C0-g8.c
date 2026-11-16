@@ -34,10 +34,10 @@ extern void FastVecSub(void *, void *, void *);
 extern float IntToFloat(int);
 extern void hud_start_overlay(int, int, float);
 extern char *g_moby_l01_table __attribute__((sda));
-extern char *D_L01_001B264C __attribute__((sda));
-extern float D_L01_001AFEE0 __attribute__((sda));
-extern float D_L01_001AFEE4 __attribute__((sda));
-extern float D_L01_001AFEE8 __attribute__((sda));
+extern char *g_swamp_patrol_positions __attribute__((sda));
+extern float g_swamp_monster_hit_angle __attribute__((sda));
+extern float g_swamp_monster_hit_value_a __attribute__((sda));
+extern float g_swamp_monster_hit_value_b __attribute__((sda));
 extern char g_hero_position[];
 
 /* Handles damage taken by the Swamp Monster II and moves its linked parts with it. */
@@ -64,7 +64,7 @@ void swamp_monster_update_hit_reaction(F003C01C0obj *moby)
                 g_moby_l01_table[vars->f2f8 * 256 + 0xbc] = 1;
                 if (vars->f2fc != -1) {
                     int index = vars->f2fc;
-                    char *base = D_L01_001B264C;
+                    char *base = g_swamp_patrol_positions;
 
                     /* Copying position leaves the separate transform row intact. */
                     qcopy_nc((char *)moby + 0x10, base + index * 128 + 0x30);
@@ -82,12 +82,12 @@ void swamp_monster_update_hit_reaction(F003C01C0obj *moby)
                      (char *)moby + 0x10, g_hero_position);
         (*(char **)((char *)vars + 0x2e4))[0x1f] = 1;
         *(float *)(*(char **)((char *)vars + 0x2e4) + 0x10) =
-            D_L01_001AFEE0 * 0.017453294f;
+            g_swamp_monster_hit_angle * 0.017453294f;
         if (vars->f2f4 || (moby->f95 == 3 && moby->f20 == 2)) {
-            *(float *)*(char **)((char *)vars + 0x2e4) = D_L01_001AFEE8;
+            *(float *)*(char **)((char *)vars + 0x2e4) = g_swamp_monster_hit_value_b;
             *(int *)(*(char **)((char *)vars + 0x2e4) + 0x34) = 6;
         } else {
-            *(float *)*(char **)((char *)vars + 0x2e4) = D_L01_001AFEE4;
+            *(float *)*(char **)((char *)vars + 0x2e4) = g_swamp_monster_hit_value_a;
             *(int *)(*(char **)((char *)vars + 0x2e4) + 0x34) = 3;
         }
     }

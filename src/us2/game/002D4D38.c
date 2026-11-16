@@ -11,7 +11,7 @@ extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
-extern PreviewChoice D_0026CFD0[];
+extern PreviewChoice g_preview_choices[];
 
 /* func_US2_002D4D38, the USA v2.00 copy of func_002D3D88: the same C, without the display scaling. */
 void func_US2_002D4D38(int index, int x)
@@ -25,7 +25,7 @@ void func_US2_002D4D38(int index, int x)
     int baseColor = 0xf0f0b0;
     double distance;
 
-    texture = GetIconFrame(0xea97, D_0026CFD0[index].icon);
+    texture = GetIconFrame(0xea97, g_preview_choices[index].icon);
     distance = __extendsfdf2(256.0f - (float)left);
     if (__cmpdf2(distance, 0.0) < 0)
         distance = __subdf3(0.0, distance);

@@ -4,14 +4,14 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern u8 *D_L19_001B2B0C;
+extern u8 *g_linked_object_table;
 extern int g_current_map_index[] MACRO_ADDR;
 extern int D_001A79F0_gp SDATA(D_001A79F0);
-extern u8 D_0019B2E8[], D_0019B4A8[];
+extern u8 g_moby_group_flags[], g_moby_nibble_table[];
 typedef struct { u8 pad[0x464]; u8 slot[0]; } SlotTable;
-extern SlotTable D_L19_0021EA30;
+extern SlotTable g_trigger_active_table;
 #define D_L19_0021EE94 D_L19_0021EA30.slot
-extern int D_L19_001B9D00 NOT_SDA;
+extern int g_hero_l19_attached_flag NOT_SDA;
 typedef struct {
     u8 pad00[0x80]; Vector position, rotation;
     u8 padA0[0x60]; Vector relative;
@@ -35,13 +35,13 @@ extern PlatformPlayer g_hero_state;
 #define D_00189EB0 D_00189E20.rotation
 #define D_00189F20 D_00189E20.relative
 #define D_00189F28 D_00189E20.relative.f[2]
-extern float D_L19_001B1BD0 __attribute__((sda));
-extern float D_L19_001B1BE0 __attribute__((sda));
-extern float D_L19_001B1BE4 __attribute__((sda));
-extern float D_L19_001B1BE8 __attribute__((sda));
-extern float D_L19_001B1BEC __attribute__((sda));
-extern float D_L19_001B1BF0 __attribute__((sda));
-extern float D_L19_001B1BF4 __attribute__((sda));
+extern float g_platform_sound_gain __attribute__((sda));
+extern float g_platform_vec_a_x __attribute__((sda));
+extern float g_platform_vec_a_y __attribute__((sda));
+extern float g_platform_vec_a_z __attribute__((sda));
+extern float g_platform_vec_b_x __attribute__((sda));
+extern float g_platform_vec_b_y __attribute__((sda));
+extern float g_platform_vec_b_z __attribute__((sda));
 extern float math_random_angle(void);
 extern void moby_set_state(void *, u8, int);
 extern int flag_is_third_pending_set(void *);
@@ -60,7 +60,7 @@ extern float math_approach_with_velocity(float *, float *, int, float, float, fl
 extern void moby_scale_owner_words_by_angles(float *, float *, float *, float, float, float);
 extern void mat_transform_offset_two_matrices(void *, void *, void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void func_US2_L18_002D0050(int);
+extern void hero_detach_from_object_us2(int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void part_spawn_masked_debris(char *, int, void *, float, float, float, float, u8);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
@@ -101,7 +101,7 @@ typedef struct {
     Vector forward, right, up, rotation;
 } PlatformActor;
 
-void func_US2_L19_004168B8(PlatformActor *actor)
+void UpdateTriggeredTiltingPlatform_us2(PlatformActor *actor)
 {
     PlatformState *state = actor->vars;
     Vector old_position, old_rotation, temp, origin, point, camera_out;
@@ -126,14 +126,14 @@ void func_US2_L19_004168B8(PlatformActor *actor)
         qcopy(&state->startPosition, &actor->position);
         qcopy(&state->startRotation, &actor->rotation);
         if (state->notify && actor->gateId != 0xff &&
-                (D_0019B2E8[actor->gateId + D_001A79F0_gp * 16] & 0x80))
+                (g_moby_group_flags[actor->gateId + D_001A79F0_gp * 16] & 0x80))
             goto active;
         if (D_L19_0021EE94[state->trigger])
             goto active;
         if (!state->gate) goto inactive_actor;
         id = actor->packedGate;
         if (D_L19_0021EE94[(short)id]) goto active;
-        index = D_0019B4A8[((int)(id << 16) >> 17) + g_current_map_index[0] * 0x400];
+        index = g_moby_nibble_table[((int)(id << 16) >> 17) + g_current_map_index[0] * 0x400];
         if (id & 1) {
             if ((index >> 4) & 7) goto active;
             goto inactive_actor;
@@ -141,8 +141,8 @@ void func_US2_L19_004168B8(PlatformActor *actor)
 active:
         if (actor->gateId != 0xff && state->gate)
             ADVANCE_GATE();
-        qcopy_nc(&actor->position, D_L19_001B2B0C + state->destination * 0x80 + 0x30);
-        qcopy_nc(&actor->rotation, D_L19_001B2B0C + state->destination * 0x80 + 0x70);
+        qcopy_nc(&actor->position, g_linked_object_table + state->destination * 0x80 + 0x30);
+        qcopy_nc(&actor->rotation, g_linked_object_table + state->destination * 0x80 + 0x70);
         moby_set_state(actor, 4, -1);
         goto initialized;
 inactive_actor:
@@ -195,15 +195,15 @@ initialized:
         if (progress > 1.0f)
             state->progress = 1.0f;
         blend = (1.0f - math_fast_sin_or_cos_a(state->progress * 3.1415927f)) * 0.5f;
-        FastVecSub(&temp, D_L19_001B2B0C + state->destination * 0x80 + 0x30, &state->startPosition);
+        FastVecSub(&temp, g_linked_object_table + state->destination * 0x80 + 0x30, &state->startPosition);
         FastVecScale(&temp, &temp, blend);
         old_z = actor->position.f[2];
         FastVecAdd(&actor->position, &state->startPosition, &temp);
         state->height = actor->position.f[2];
         actor->position.f[2] = old_z;
-        actor->rotation.f[2] = math_move_angle_toward_target(state->startRotation.f[2], F(D_L19_001B2B0C + state->destination * 0x80, 0x78), blend);
-        actor->rotation.f[1] = math_move_angle_toward_target(state->startRotation.f[1], F(D_L19_001B2B0C + state->destination * 0x80, 0x74), blend);
-        actor->rotation.f[0] = math_move_angle_toward_target(state->startRotation.f[0], F(D_L19_001B2B0C + state->destination * 0x80, 0x70), blend);
+        actor->rotation.f[2] = math_move_angle_toward_target(state->startRotation.f[2], F(g_linked_object_table + state->destination * 0x80, 0x78), blend);
+        actor->rotation.f[1] = math_move_angle_toward_target(state->startRotation.f[1], F(g_linked_object_table + state->destination * 0x80, 0x74), blend);
+        actor->rotation.f[0] = math_move_angle_toward_target(state->startRotation.f[0], F(g_linked_object_table + state->destination * 0x80, 0x70), blend);
         if (state->progress >= 1.0f) {
             moby_set_state(actor, 3, -1);
             goto finish_transition;
@@ -213,20 +213,20 @@ initialized:
 finish_transition:
         if (state->linkedActor == -1 || !g_moby_l19_array[state->linkedActor * 0x100 + 0xbc]) {
             if (state->playerOnly) {
-                D_L19_001B9D00 = 0;
-                func_US2_L18_002D0050(0);
+                g_hero_l19_attached_flag = 0;
+                hero_detach_from_object_us2(0);
             }
             if (state->notify) {
-                if (D_0018C0D4) {
-                    saved_mode = D_0018C0D4;
+                if (g_screen_mode_flag) {
+                    saved_mode = g_screen_mode_flag;
                     saved_player = g_hero_moby;
-                    D_0018C0D4 = 0;
-                    g_hero_moby = D_0018AA38;
-                    level_capture_checkpoint_state(D_0018AA38 + 0x10, D_0018AA38 + 0xf0);
-                    D_0018C0D4 = saved_mode;
+                    g_screen_mode_flag = 0;
+                    g_hero_moby = g_platform_hero_actor;
+                    level_capture_checkpoint_state(g_platform_hero_actor + 0x10, g_platform_hero_actor + 0xf0);
+                    g_screen_mode_flag = saved_mode;
                     g_hero_moby = saved_player;
                 } else
-                    level_capture_checkpoint_state(&g_hero_position, &D_00189EB0);
+                    level_capture_checkpoint_state(&g_hero_position, &g_hero_turn_rotation);
             }
             moby_set_state(actor, 4, -1);
         }
@@ -242,32 +242,32 @@ finish_transition:
     state->velocity = (state->velocity + (height - actor->position.f[2]) * 0.005f) * 0.98f;
     actor->position.f[2] += state->velocity;
     if (actor->state) {
-        if ((!D_0018A16E && D_0018A15C == (u8 *)actor) || (D_0018A398 && D_0018A3A8 == (u8 *)actor)) {
+        if ((!g_platform_mode && g_platform_actor_ref == (u8 *)actor) || (g_alternate_active && g_alternate_platform == (u8 *)actor)) {
             if (!state->carryingPlayer)
                 state->velocity -= 1.0f / 60.0f;
             state->carryingPlayer = 1;
             FastVecSub(&temp, &g_hero_position, &actor->position);
             forward_dot = FastVecDot(&temp, &actor->forward);
             right_dot = FastVecDot(&temp, &actor->right);
-            gain = D_L19_001B1BD0;
+            gain = g_platform_sound_gain;
             origin.q = state->tilt.q;
             point.q = actor->position.q;
             target_y = gain * forward_dot;
             target_x = -gain;
             target_x *= right_dot;
             math_approach_with_velocity((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, target_x,
-                D_L19_001B1BE0, D_L19_001B1BE4, D_L19_001B1BE8);
+                g_platform_vec_a_x, g_platform_vec_a_y, g_platform_vec_a_z);
             math_approach_with_velocity((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, target_y,
-                D_L19_001B1BE0, D_L19_001B1BE4, D_L19_001B1BE8);
+                g_platform_vec_a_x, g_platform_vec_a_y, g_platform_vec_a_z);
             mat_transform_offset_two_matrices(&g_hero_position, &camera_out, &actor->position, &origin, &state->tilt);
-            FastVecSub(&D_00189F20, &camera_out, &g_hero_position);
-            D_00189F28 += actor->position.f[2] - point.f[2];
+            FastVecSub(&g_hero_vector_block, &camera_out, &g_hero_position);
+            g_platform_relative_z += actor->position.f[2] - point.f[2];
         } else {
             state->carryingPlayer = 0;
             math_approach_with_velocity((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, 0.0f,
-                D_L19_001B1BEC, D_L19_001B1BF0, D_L19_001B1BF4);
+                g_platform_vec_b_x, g_platform_vec_b_y, g_platform_vec_b_z);
             math_approach_with_velocity((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, 0.0f,
-                D_L19_001B1BEC, D_L19_001B1BF0, D_L19_001B1BF4);
+                g_platform_vec_b_x, g_platform_vec_b_y, g_platform_vec_b_z);
         }
         moby_scale_owner_words_by_angles((float *)actor, (float *)(&state->yaw), (float *)(&state->yawVelocity),
             0.02007128857076168f, 0.007272206246852875f, 0.009017535485327244f);

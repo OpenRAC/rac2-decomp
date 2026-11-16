@@ -1,16 +1,16 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void list_menu_set_enabled(char *, int);
 extern void list_menu_set_record_table(char *, char *);
-extern char D_00261590[];
+extern char g_list_menu_record_table_second[];
 
-int func_US2_002D6508(void)
+int menu_page_text_init_second_us2(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        list_menu_set_enabled(D_001A8CFC[0] + 0x3E760, 1);
-        list_menu_set_record_table(D_001A8CFC[0] + 0x3E760, D_00261590);
+    if (g_resident_data_base[0] != 0) {
+        list_menu_set_enabled(g_resident_data_base[0] + 0x3E760, 1);
+        list_menu_set_record_table(g_resident_data_base[0] + 0x3E760, g_list_menu_record_table_second);
     }
     return 0;
 }

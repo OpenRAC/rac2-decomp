@@ -1,11 +1,11 @@
 #include "common.h"
 
-extern u8 D_001A7BD0[] __attribute__((sda));
+extern u8 g_moby_update_inhibit_flag[] __attribute__((sda));
 extern char g_hero_position[];
-extern s32 D_L07_001B1048 __attribute__((sda));
-extern s32 D_L07_001B104C __attribute__((sda));
-extern f32 D_L07_001B1050 __attribute__((sda));
-extern s32 D_L07_001FE3B8[] NOT_SDA;
+extern s32 g_boss_counter __attribute__((sda));
+extern s32 g_boss_active_flag __attribute__((sda));
+extern f32 g_boss_default_param __attribute__((sda));
+extern s32 g_boss_hit_counters[] NOT_SDA;
 
 extern void moby_set_state(void *, s32, s32);
 extern void moby_mark_spawned(void *);
@@ -33,7 +33,7 @@ void UpdatePhasedDamageState(u8 *moby)
     f32 damage, scale;
 
     if (moby[0x20] == 0) {
-        if (D_001A7BD0[0]) {
+        if (g_moby_update_inhibit_flag[0]) {
             moby_set_state(moby, 1, 2);
             moby_mark_spawned(moby);
             return;
@@ -63,24 +63,24 @@ void UpdatePhasedDamageState(u8 *moby)
             F(vars, 0x20) *= scale;
         }
         {
-            s32 active = D_L07_001B104C;
+            s32 active = g_boss_active_flag;
 
             H(*(u8 **)(moby + 0x24), 0x46) = 5;
             U(moby, 0x34) |= 0x5000;
             if (active)
-                D_L07_001B1048++;
+                g_boss_counter++;
         }
-        D_L07_001B104C = 0;
+        g_boss_active_flag = 0;
         moby_set_state(moby, 1, 2);
         boss_reset_with_children(moby);
     }
-    F(vars, 0x30) = D_L07_001B1050;
+    F(vars, 0x30) = g_boss_default_param;
     damage = moby_update_aim_target_strength(moby, part_find_owned_effect_slot(moby, 0x10000, 0));
     if ((I(vars, 0x420) >= 3 || (u32)(moby[0x20] - 10) >= 5) &&
         (damage != 0.0f || vars[0x2E] == 2)) {
         s32 amount = (s32)(damage * 32.0f);
 
-        D_L07_001FE3B8[vars[0x37]] += amount;
+        g_boss_hit_counters[vars[0x37]] += amount;
         vars[0x167] = 150;
         gfx_start_color_fade(moby, vars + 0x160, amount);
         if (I(vars, 0x420) < 2)

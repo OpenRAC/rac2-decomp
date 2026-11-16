@@ -4,8 +4,8 @@ typedef union { Quad q; float f[4]; } Vector;
 extern char g_hero_state[];
 typedef union { u8 b[0x2600]; short h[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; Quad q[0x260]; } Hero;
 #define H ((Hero *)D_00189E20)
-extern int D_001A8CA0 __attribute__((sda)), D_001A8CA4;
-extern unsigned int D_00138320 __attribute__((section(".data")));
+extern int g_ground_check_inhibit __attribute__((sda)), g_hero_effect_inhibit;
+extern unsigned int g_pad_pressed_flags __attribute__((section(".data")));
 extern float g_camera_eye_state[];
 #define CAMERA_BASIS (&D_001B5340[0x230 / 4])
 extern void FastVecScale(void *,void *,float);
@@ -51,13 +51,13 @@ void CalculateAimedLaunchVelocity(Vector *output, Vector *origin, char *targetOb
         qcopy(sourceBasis+8,&H->q[0x750/16]);
     }
     output->f[0]=1.0f; output->f[1]=0.0f; output->f[2]=0.0f; output->f[3]=0.0f;
-    if(H->h[0x348/2]!=0 && D_001A8CA4==0)
+    if(H->h[0x348/2]!=0 && g_hero_effect_inhibit==0)
         FastVecScale(&normal,H->ptr[0x2290/4]+0xe0,-1.0f);
     else cam_compute_view_direction((char *)&sourcePosition,(char *)&normal,0);
     reach=maximum;
     if(!targetObject) {
         if(H->i[0x2294/4]==1) stub_empty_8(29,1);
-        if((D_00138320&4)!=0 && H->b[0x22bc]==0) {
+        if((g_pad_pressed_flags&4)!=0 && H->b[0x22bc]==0) {
             vec_scale_to_length(&forward,CAMERA_BASIS,1.0f);
             projection=FastVecDot(&forward,&normal);
             FastVecScale(&temporary,&normal,projection);
@@ -93,7 +93,7 @@ void CalculateAimedLaunchVelocity(Vector *output, Vector *origin, char *targetOb
     } else {
         if((unsigned)(*(unsigned short *)(targetObject+0xaa)-0xa8d /* Swamp Monster I Arm or Eye */)<=1 &&
             (targetData=(float *)moby_get_private_value_0((u8 *)targetObject))!=0 && targetData[0]>0.0f) {
-            if(D_001A8CA0!=0 || H->h[0x348/2]!=0) {
+            if(g_ground_check_inhibit!=0 || H->h[0x348/2]!=0) {
                 FastVecScale(&quaternion,targetObject+0xe0,targetData[4]);
                 FastVecAdd(&target,targetObject+0x10,&quaternion);
             } else {

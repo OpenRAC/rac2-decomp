@@ -2,7 +2,7 @@
 extern char g_hero_state[];
 extern int g_current_map_index;
 extern int g_frame_l00_counter;
-extern char D_L00_001BF228[];
+extern char g_hero_ground_height[];
 extern float math_fabs(float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int CollLine(void *, void *, int, void *, int);
@@ -63,7 +63,7 @@ int hero_check_fall_transition(void)
             if (CollLine(start, end, 2, *(void **)(resident + 0x2290), 0)) {
                 *(short *)(resident + 0x1490) = GetCollHitMaterial();
                 if (*(short *)(resident + 0x1490) == 0) {
-                    start[2] = *(float *)D_L00_001BF228 - 0.01f;
+                    start[2] = *(float *)g_hero_ground_height - 0.01f;
                     if (!CollLine(start, end, 2, *(void **)(resident + 0x2290), 0)) {
                         if (*(int *)(resident + 0x229C) == 0x14 || *(int *)(resident + 0x24CC) == 0)
                             hero_l00_set_action(0x67, 1);

@@ -8,12 +8,12 @@ extern int track_count_entries(unsigned char *);
 extern void moby_mark_spawned(unsigned char *);
 extern void path_measure_start_followers(unsigned char *);
 extern int PlayMobySound(void *, int, unsigned char *);
-extern unsigned char *D_L09_001B11B4 __attribute__((sda));
-extern unsigned char *D_L09_001FE6C0[];
+extern unsigned char *g_patrol_drone_sound_primary __attribute__((sda));
+extern unsigned char *g_path_l09_table[];
 extern unsigned char g_sound_state[];
 
 /* Initializes the record channels and selects its initial track state. */
-void func_PAL_L09_00403220(unsigned char *obj) {
+void patrol_drone_init_pal(unsigned char *obj) {
  unsigned char *s = *(unsigned char **)(obj+0x68);
  moby_get_private_value_0(obj)[14] = 1;
  s[0x170]=2; *(int *)(s+0x1A8)=2; s[0x171]=1; s[0x172]=1; s[0x176]=1; s[0x177]=1;
@@ -31,10 +31,10 @@ void func_PAL_L09_00403220(unsigned char *obj) {
   s[0x48]=FloatToInt(17.0f); s[0x4A]=FloatToInt(6.0f);
   *(short *)(s+0x424)=track_count_entries(obj);
  } else {
-  if (*(int *)(s+0x314)==-1 || !*(int *)D_L09_001FE6C0[*(int *)(s+0x314)] || *(int *)(s+0x318)==-1 || !*(int *)D_L09_001FE6C0[*(int *)(s+0x318)]) {moby_mark_spawned(obj);return;}
+  if (*(int *)(s+0x314)==-1 || !*(int *)g_path_l09_table[*(int *)(s+0x314)] || *(int *)(s+0x318)==-1 || !*(int *)g_path_l09_table[*(int *)(s+0x318)]) {moby_mark_spawned(obj);return;}
   s[0x28]=3;
-  qcopy_nc(obj+0x10,D_L09_001FE6C0[*(int *)(s+0x314)]+0x10);
-  qcopy_nc(s+0x390,D_L09_001FE6C0[*(int *)(s+0x318)]+0x10);
+  qcopy_nc(obj+0x10,g_path_l09_table[*(int *)(s+0x314)]+0x10);
+  qcopy_nc(s+0x390,g_path_l09_table[*(int *)(s+0x318)]+0x10);
   path_measure_start_followers(obj);
   *(short *)(s+0x328)=1; *(float *)(s+0x43C)=-1.0f;
   *(float *)(s+0x380)=*(float *)(s+0x3B4)=*(float *)(s+0x3B8)=
@@ -45,7 +45,7 @@ void func_PAL_L09_00403220(unsigned char *obj) {
   *(float *)(s+0x3E8)=*(float *)(s+0x3E4)=*(float *)(s+0x3D8)=0.0f;
   moby_set_state(obj,1,-1);
   {unsigned char *r=g_sound_state+*(int *)(s+0x3F0)*0x70;
-   if (*(unsigned char **)(r+0x88)!=obj || !r[0x74]) *(int *)(s+0x3F0)=PlayMobySound(D_L09_001B11B4,4,obj);
+   if (*(unsigned char **)(r+0x88)!=obj || !r[0x74]) *(int *)(s+0x3F0)=PlayMobySound(g_patrol_drone_sound_primary,4,obj);
   }
  }
 }

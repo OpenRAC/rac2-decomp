@@ -11,7 +11,7 @@ extern void ref_L09_003F0378_06(void *, void *);
 extern void ref_L09_003F0378_07(void *, s32);
 extern void ref_L09_003F0378_08(void *, s32, s32, s32, f32, f32);
 
-void func_PAL_L09_003F49E8(void *arg0) {
+void dobbo_handle_damage_pal(void *arg0) {
     void *temp_s2;
     s32 temp_s0;
     s32 func_result;

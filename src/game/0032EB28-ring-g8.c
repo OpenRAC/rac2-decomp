@@ -27,18 +27,18 @@ extern float math_ease_out_quad(float);
 extern float FastAddRotations(float, float);
 extern void draw_world_quad(void *, void *, int);
 extern RenderVec g_camera_eye_state;
-extern int D_001B0A4C __attribute__((sda));
-extern int D_001B0A50 __attribute__((sda));
-extern int D_001B0A54 __attribute__((sda));
-extern int D_001B0A58 __attribute__((sda));
-extern int D_001B0A5C __attribute__((sda));
-extern int D_001B0A60 __attribute__((sda));
-extern unsigned int D_001B0A64 __attribute__((sda));
-extern float D_001B0954 __attribute__((sda));
+extern int g_shockwave_ring_bits_base __attribute__((sda));
+extern int g_shockwave_ring_bits_mid_a __attribute__((sda));
+extern int g_shockwave_ring_bits_mid_b __attribute__((sda));
+extern int g_shockwave_ring_bits_mid_c __attribute__((sda));
+extern int g_shockwave_ring_bits_high __attribute__((sda));
+extern int g_shockwave_ring_texture_id __attribute__((sda));
+extern unsigned int g_shockwave_ring_color __attribute__((sda));
+extern float g_shockwave_ring_duration __attribute__((sda));
 /* 48 quads of a flat ring of 98 vertices: per corner a vertex index and an
    index into the angle table, which holds an angle and its step. */
-extern short D_0026C020[][4][2];
-extern RenderVec D_0026BA20[];
+extern short g_shockwave_ring_faces[][4][2];
+extern RenderVec g_shockwave_ring_vertices[];
 extern float g_ring_angle_table[][2];
 
 /* Draws the object's ring facing the camera (D_001B5340), scaled by its
@@ -59,13 +59,13 @@ void gfx_draw_shockwave_ring(char *object)
     state = *(char **)(object + 0x68);
     up.word = 0;
     up.v[2] = 1.0f;
-    packet.tag[1] = GetEffectTextureDescriptor(D_001B0A60);
+    packet.tag[1] = GetEffectTextureDescriptor(g_shockwave_ring_texture_id);
     packet.tag[2] = 0xFF9000000260LL;
-    flags = (long long)D_001B0A4C;
-    flags |= (long long)D_001B0A50 << 2;
-    flags |= (long long)D_001B0A54 << 4;
-    flags |= (long long)D_001B0A58 << 6;
-    flags |= (long long)D_001B0A5C << 32;
+    flags = (long long)g_shockwave_ring_bits_base;
+    flags |= (long long)g_shockwave_ring_bits_mid_a << 2;
+    flags |= (long long)g_shockwave_ring_bits_mid_b << 4;
+    flags |= (long long)g_shockwave_ring_bits_mid_c << 6;
+    flags |= (long long)g_shockwave_ring_bits_high << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
     FastVecSub(&matrix[0], &g_camera_eye_state, object + 0x10);
@@ -77,25 +77,25 @@ void gfx_draw_shockwave_ring(char *object)
     matrix[3].y = *(float *)(object + 0x14);
     matrix[3].z = *(float *)(object + 0x18);
     matrix[3].w = 1.0f;
-    packet.color[3] = D_001B0A64;
-    packet.color[2] = D_001B0A64;
-    packet.color[1] = D_001B0A64;
-    packet.color[0] = D_001B0A64;
+    packet.color[3] = g_shockwave_ring_color;
+    packet.color[2] = g_shockwave_ring_color;
+    packet.color[1] = g_shockwave_ring_color;
+    packet.color[0] = g_shockwave_ring_color;
     uv = &packet.uv[0][0];
     for (face = 0; face < 48; face++) {
         v = &packet.uv[0][1];
         u = uv;
         for (corner = 0; corner < 4; corner++) {
-            vtx = D_0026C020[face][corner][0];
-            index = D_0026C020[face][corner][1];
-            FastVecScale(&packet.vertex[corner], &D_0026BA20[vtx], *(float *)(state + 0x64) * 2.0f);
+            vtx = g_shockwave_ring_faces[face][corner][0];
+            index = g_shockwave_ring_faces[face][corner][1];
+            FastVecScale(&packet.vertex[corner], &g_shockwave_ring_vertices[vtx], *(float *)(state + 0x64) * 2.0f);
             transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
             gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
             c = math_fast_sin_or_cos_a(g_ring_angle_table[index][0]);
-            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x64) / D_001B0954) * 0.0125f);
+            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x64) / g_shockwave_ring_duration) * 0.0125f);
             *u += delta;
             s = math_fast_sin_or_cos_b(g_ring_angle_table[index][0]);
-            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x64) / D_001B0954) * 0.0125f);
+            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x64) / g_shockwave_ring_duration) * 0.0125f);
             delta = -s;
             delta *= scale;
             *v += delta;

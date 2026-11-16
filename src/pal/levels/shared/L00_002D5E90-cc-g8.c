@@ -60,14 +60,14 @@ typedef struct {
 } Hero5940;
 
 extern Hero5940 g_hero_state;
-extern char D_L00_001B8FF0[], g_camera_l00_position[], D_L00_001BF220[];
-extern Quad5940 D_L00_001B8DD0;
+extern char g_cam_follow_matrix[], g_camera_l00_position[], g_hero_l00_position[];
+extern Quad5940 g_hero_saved_vector;
 /* Incomplete sda arrays are read with the assembler's lui/load macro, as in retail. */
-extern unsigned char D_001A7A44[] __attribute__((sda));
+extern unsigned char g_cheat_flags[] __attribute__((sda));
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern float D_L00_001A7FE4[] __attribute__((sda));
-extern const float D_L00_001A7FE0 __attribute__((sda));
-extern float D_L00_001A7CE0 __attribute__((sda)), D_L00_001A7CE4 __attribute__((sda));
+extern float g_turn_rate_table[] __attribute__((sda));
+extern const float g_turn_rate_scale __attribute__((sda));
+extern float g_hero_item_time_scale __attribute__((sda)), g_hero_item_step_scale __attribute__((sda));
 
 extern int hero_is_slot_item_wrench(int);
 extern void func_002A0F48(void *);
@@ -119,19 +119,19 @@ void func_PAL_L00_002D5E90(void) {
     }
 
     mount = level_get_table_entry_address(g_hero_state.weapon);
-    copy_matrix_rotation(m, D_L00_001B8FF0);
-    qcopy_nc(&m[12], D_L00_001B8FF0 - 0x230);
+    copy_matrix_rotation(m, g_cam_follow_matrix);
+    qcopy_nc(&m[12], g_cam_follow_matrix - 0x230);
     m[15] = 1.0f;
     qcopy_nc(offset, mount);
     offset[0] += g_hero_state.offset;
-    if (D_001A7A44[0] && !hero_is_action_allowed())
+    if (g_cheat_flags[0] && !hero_is_action_allowed())
         offset[1] = -offset[1];
 
     /* Turn rate in degrees per second (FE4 while moving, FE0 otherwise) to radians per frame. */
     if (g_hero_state.speed > 0.02f)
-        turn = D_L00_001A7FE4[0] * 0.0003490659f;
+        turn = g_turn_rate_table[0] * 0.0003490659f;
     else
-        turn = D_L00_001A7FE0 * 0.0003490659f;
+        turn = g_turn_rate_scale * 0.0003490659f;
     ApproachValue(&g_hero_state.angleVelocity, turn, 0.010053098f);
     g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_hero_state.angleVelocity);
     offset[2] += math_fast_sin_or_cos_b(g_hero_state.angle) * 0.02f;
@@ -146,8 +146,8 @@ void func_PAL_L00_002D5E90(void) {
 
     if (g_hero_state.blend < 1.0f) {
         math_step_value_toward_target(&g_hero_state.blend, &g_hero_state.blendVelocity, 1.0f,
-                      D_L00_001A7CE0 * 0.020000001f, D_L00_001A7CE4 * 0.00040000002f,
-                      D_L00_001A7CE0 * 0.020000001f);
+                      g_hero_item_time_scale * 0.020000001f, g_hero_item_step_scale * 0.00040000002f,
+                      g_hero_item_time_scale * 0.020000001f);
         matrix_mul_vec3(temp, g_hero_state.transitionPos, &g_hero_state);
         FastVecAdd(temp, temp, g_hero_state.position);
         lerp_vector(obj->position, temp, obj->position, g_hero_state.blend);
@@ -167,7 +167,7 @@ void func_PAL_L00_002D5E90(void) {
         vec_scale_to_length(a, obj->rotMatrix[1], height * -1.2f);
         FastVecAdd(a, a, temp);
         if (CollLine(g_camera_l00_position, a, 0, g_hero_state.owner, 0)) {
-            target = (g_hero_state.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
+            target = (g_hero_state.offset - height) + fast_vec_dist(g_hero_l00_position, temp);
             g_hero_state.offsetTarget = target;
             if (target > 0.0f)
                 g_hero_state.offsetTarget = 0.0f;
@@ -182,7 +182,7 @@ void func_PAL_L00_002D5E90(void) {
                   0.006f, 0.006f, 0.10000001f);
     copy_matrix3x4(g_hero_state.transform, m);
     qcopy_nc(&g_hero_state.vector760, m);
-    qcopy_nc(&g_hero_state.vector770, &D_L00_001B8DD0);
+    qcopy_nc(&g_hero_state.vector770, &g_hero_saved_vector);
 
     state = hero_is_action_allowed();
     if (state)

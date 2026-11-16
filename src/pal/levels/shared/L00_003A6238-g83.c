@@ -6,10 +6,10 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0
 #define PAD ((Hero *)D_00138180)
 extern u8 g_hero_state[];
 extern u8 g_pad_state[];
-extern float D_L00_001AF624 __attribute__((sda));
-extern float D_L00_0025C64C NOT_SDA;
-extern int D_L00_001B2860;
-extern unsigned char D_00139580[];
+extern float g_seeker_gun_speed_scale __attribute__((sda));
+extern float g_weapon_effect_scale NOT_SDA;
+extern int g_seeker_gun_fire_held;
+extern unsigned char g_seeker_weapon_index[];
 typedef struct { char prefix[0x54]; float fireRate; char tail[0x88]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
@@ -22,7 +22,7 @@ extern int vec_fast_helper_b(void *);
 extern int weapon_spend_ammo(int, int);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern int PlayMobySound(int, int, char *);
-extern char *func_PAL_L00_003AF088(void *, void *);
+extern char *hero_fire_effect_from_facing_pal(void *, void *);
 
 /* Update the firing effect and its input-controlled cooldown. */
 void func_PAL_L00_003A7518(char *moby)
@@ -36,8 +36,8 @@ void func_PAL_L00_003A7518(char *moby)
         (*(unsigned char *)(moby + 0x60) & 2))
         anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     ReleaseDeadOrExpiredSlots(H->ptr[0x2290 / 4]);
-    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L00_001AF624;
-    D_L00_0025C64C = 0.1f;
+    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * g_seeker_gun_speed_scale;
+    g_weapon_effect_scale = 0.1f;
     if (H->i[0x2294 / 4] == 1)
         func_PAL_L00_002C4480(29, 1);
     if (H->i[0x2294 / 4] == 29) {
@@ -60,19 +60,19 @@ void func_PAL_L00_003A7518(char *moby)
         (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] > 18 && ready) {
         if (weapon_spend_ammo(-1, 1)) {
             char *effect;
-            D_L00_001B2860 = 1;
+            g_seeker_gun_fire_held = 1;
             moby_transform_joint_to_world(moby, 0, (char *)position);
             PlayMobySound(1, 0, moby);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
-            effect = func_PAL_L00_003AF088(position, moby);
+            effect = hero_fire_effect_from_facing_pal(position, moby);
             if (effect)
                 *(char **)(effect + 0xB8) = moby;
-        } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L00_001B2860 == 1) {
+        } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || g_seeker_gun_fire_held == 1) {
             PlayMobySound(0, 0, moby);
-            D_L00_001B2860 = 0;
+            g_seeker_gun_fire_held = 0;
         }
         {
-            WeaponEntry *entry = &g_weapon_l00_table[D_00139580[0]];
+            WeaponEntry *entry = &g_weapon_l00_table[g_seeker_weapon_index[0]];
             *cooldown = 1.0f / entry->fireRate;
         }
     }

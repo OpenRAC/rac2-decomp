@@ -6,7 +6,7 @@
 #include "common.h"
 
 extern char g_hero_state[];
-extern int D_L03_001A8F00 MACRO_ADDR;
+extern int g_hero_l03_mode MACRO_ADDR;
 extern char g_hero_position[];
 
 extern void ref_L03_002AD540_00(void);
@@ -65,7 +65,7 @@ void level_update_frame(void) {
     ref_L03_002AD540_03(resident + 0x80, resident + 0x90, resident + 0x550);
     ref_L03_002AD540_04();
     ref_L03_002AD540_05();
-    if (D_L03_001A8F00 == 2 || D_L03_001A8F00 == 6) {
+    if (g_hero_l03_mode == 2 || g_hero_l03_mode == 6) {
         if (*(unsigned char *)(resident + 0x22B5) != 0)
             hero_set_objects_flag_bit();
         else

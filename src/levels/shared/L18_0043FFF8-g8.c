@@ -9,7 +9,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecLength(void *);
 extern int FloatToInt(float);
 extern int PlayMobySound(int, int, char *);
-extern char D_0018A0E0[];
+extern char g_hero_state_block[];
 
 /* Creates a streaking projectile that flies along a direction with a trail, and tells the Receiver Bot owner that it fired. */
 char *receiver_bot_spawn_streak_projectile(void *position, char *owner, float *direction,
@@ -38,7 +38,7 @@ char *receiver_bot_spawn_streak_projectile(void *position, char *owner, float *d
         *(char **)(state + 0x30) = part_spawn_sized(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
         *(float *)(state + 0x1c) = y;
         qcopy(object + 0xc0, state);
-        FastVecCross(object + 0xd0, object + 0xc0, D_0018A0E0);
+        FastVecCross(object + 0xd0, object + 0xc0, g_hero_state_block);
         vec_scale_to_length(object + 0xd0, object + 0xd0, -1.0f);
         FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
         angle = FastVecLength(direction);

@@ -8,21 +8,21 @@ typedef struct {
     int state;
 } ResidentWaterView;
 extern ResidentWaterView g_hero_state;
-extern int D_L20_001B2330[] SDATA(D_L20_001B2330);
-extern u16 D_L20_001B2338[] SDATA(D_L20_001B2338);
-extern int D_L20_001B2344 __attribute__((sda));
-extern int D_L20_001B2348 __attribute__((sda));
-extern u8 *D_L20_001B2F9C __attribute__((sda));
-extern u8 D_L20_002AB980[];
-extern u8 D_L20_0025DD00[];
-extern int D_L20_0025DD60[];
+extern int g_water_patch_slot_counts[] SDATA(D_L20_001B2330);
+extern u16 g_water_patch_masks[] SDATA(D_L20_001B2338);
+extern int g_water_patch_slot_count __attribute__((sda));
+extern int g_water_patch_used __attribute__((sda));
+extern u8 *g_group_l20_member_table __attribute__((sda));
+extern u8 g_water_tile_grid[];
+extern u8 g_water_patch_parameters[];
+extern int g_water_patch_buffer[];
 typedef struct { int id, offsets[2], size; } WaterHeaderSlot;
-extern WaterHeaderSlot D_L20_002B22E0[];
+extern WaterHeaderSlot g_water_header_slots[];
 extern void level_start_fixed_effect(void);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
-extern void func_PAL_L04_003A47C0(u8 *);
+extern void water_init_object_pal(u8 *);
 extern void water_add_splash_entry(u32, float);
-extern void func_PAL_L04_003A49E0(char *);
+extern void water_update_controller_pal(char *);
 extern void water_advance_controller_state(u8 *);
 extern void water_update_ripple_patches(u8 *);
 extern void moby_set_flag_bit(void *, int);
@@ -40,7 +40,7 @@ typedef struct {
     void (*enqueue)(void (*)(void *), void *);
 } WaterContext;
 
-void func_PAL_L20_0044D2D0(u8 *object)
+void water_patch_update_pal(u8 *object)
 {
     WaterContext context;
     u8 *state;
@@ -59,27 +59,27 @@ void func_PAL_L20_0044D2D0(u8 *object)
         return;
     count = 1;
     if (*(int *)(state + 0x18) != -1)
-        count = D_L20_001B2330[*(int *)(state + 0x18)];
+        count = g_water_patch_slot_counts[*(int *)(state + 0x18)];
     count += *(int *)(state + 0x10);
     context.count = 6;
     context.activeCount = count;
-    context.slotCount = &D_L20_001B2344;
-    context.used = &D_L20_001B2348;
-    context.tiles = D_L20_002AB980;
-    context.parameters = D_L20_0025DD00;
-    context.masks = D_L20_001B2338;
-    context.counts = D_L20_001B2330;
-    context.buffer = D_L20_0025DD60;
-    context.slots = D_L20_002B22E0;
+    context.slotCount = &g_water_patch_slot_count;
+    context.used = &g_water_patch_used;
+    context.tiles = g_water_tile_grid;
+    context.parameters = g_water_patch_parameters;
+    context.masks = g_water_patch_masks;
+    context.counts = g_water_patch_slot_counts;
+    context.buffer = g_water_patch_buffer;
+    context.slots = g_water_header_slots;
     context.owner = object;
     context.draw = level_start_fixed_effect;
     context.enqueue = gfx_add_draw_callback_third;
     switch (object[0x20]) {
     case 0:
-        func_PAL_L04_003A47C0((u8 *)&context);
+        water_init_object_pal((u8 *)&context);
         water_add_splash_entry((u32)object, *(float *)(state + 0x28));
     case 1:
-        func_PAL_L04_003A49E0((char *)&context);
+        water_update_controller_pal((char *)&context);
         break;
     case 2:
         absent = -1;
@@ -87,7 +87,7 @@ void func_PAL_L20_0044D2D0(u8 *object)
         child = (int *)(state + 0x30);
         for (remaining = 3; remaining >= 0; --remaining, ++child) {
             if (*child != absent)
-                moby_set_flag_bit(D_L20_001B2F9C + (*child << 8), state[0x14]);
+                moby_set_flag_bit(g_group_l20_member_table + (*child << 8), state[0x14]);
         }
         break;
     }

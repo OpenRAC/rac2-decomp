@@ -3,16 +3,16 @@
 #include "common.h"
 extern char *part_find_owned_effect_slot(char *, unsigned int, int);
 extern int moby_class_id_to_table_index(int);
-extern float D_L05_001AFB68[] SDATA(D_L05_001AFB68);
-extern int D_L05_001AFB80[] SDATA(D_L05_001AFB80);
-extern int D_L05_001AFB98[] SDATA(D_L05_001AFB98);
-extern int D_L05_001AFBB0[] SDATA(D_L05_001AFBB0);
-extern int D_L05_001AFBC8[] SDATA(D_L05_001AFBC8);
-extern float D_L05_001AFBDC __attribute__((sda));
-extern float D_L05_001AFBE0 __attribute__((sda));
-extern float D_L05_001AFBE8 __attribute__((sda));
-extern float D_L05_001AFBEC __attribute__((sda));
-extern char D_L05_001B96C0[];
+extern float g_shot_reach_table[] SDATA(D_L05_001AFB68);
+extern int g_burst_kind_table[] SDATA(D_L05_001AFB80);
+extern int g_burst_inner_count_table[] SDATA(D_L05_001AFB98);
+extern int g_burst_particle_count_table[] SDATA(D_L05_001AFBB0);
+extern int g_burst_outer_count_table[] SDATA(D_L05_001AFBC8);
+extern float g_burst_speed_size __attribute__((sda));
+extern float g_burst_offset_length __attribute__((sda));
+extern float g_burst_angle_rate __attribute__((sda));
+extern float g_burst_spread_scale __attribute__((sda));
+extern char g_origin_vec[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
@@ -46,21 +46,21 @@ int func_PAL_L05_003D3098(char *obj)
         if ((unsigned char)r[0x28] != 1 || (short)id != 0x956) {
             index = moby_class_id_to_table_index((short)id);
             {
-                int kind = D_L05_001AFB80[index];
+                int kind = g_burst_kind_table[index];
 
-                radius = D_L05_001AFB68[index] * 0.5f;
-                speed = D_L05_001AFBDC * 0.020000001f;
+                radius = g_shot_reach_table[index] * 0.5f;
+                speed = g_burst_speed_size * 0.020000001f;
                 if ((unsigned char)r[0x28] == 0)
                     speed *= 3.0f;
                 vec_scale_to_length(base, r + 0x10, speed);
                 if ((unsigned char)r[0x28] != 0 && math_random_int_below(4) == 0) {
-                    FastVecSub(offset, obj + 0x10, D_L05_001B96C0);
-                    FastVecCross(center, offset, D_L05_001B96C0 + 0x250);
+                    FastVecSub(offset, obj + 0x10, g_origin_vec);
+                    FastVecCross(center, offset, g_origin_vec + 0x250);
                     math_apply_axis_rotation_to_quat(offset, center, offset, math_random_angle());
-                    vec_scale_to_length(offset, offset, D_L05_001AFBE0 * 0.020000001f);
+                    vec_scale_to_length(offset, offset, g_burst_offset_length * 0.020000001f);
                     FastVecAdd(base, base, offset);
                 }
-                for (i = 0; i < D_L05_001AFBC8[index]; i++) {
+                for (i = 0; i < g_burst_outer_count_table[index]; i++) {
                     char *p, *s;
                     float size, a, b;
 
@@ -70,7 +70,7 @@ int func_PAL_L05_003D3098(char *obj)
                     p = func_L05_003CEFA0(obj, pos, kind);
                     if (p) {
                         s = *(char **)(p + 0x68);
-                        size = D_L05_001AFBDC * 0.010000001f;
+                        size = g_burst_speed_size * 0.010000001f;
                         a = math_random_angle();
                         b = math_random_angle();
                         vec_build_spherical_offset(center, size, a, b);
@@ -82,12 +82,12 @@ int func_PAL_L05_003D3098(char *obj)
             {
                 int kind = 0x955;
 
-                size = D_L05_001AFBDC * 0.010000001f;
+                size = g_burst_speed_size * 0.010000001f;
                 if (*(short *)(obj + 0xaa) == 0x956) {
                     size += size;
                     kind = 0x971;
                 }
-                for (j = 0; j < D_L05_001AFB98[index]; j++) {
+                for (j = 0; j < g_burst_inner_count_table[index]; j++) {
                     pos[0] = *(float *)(obj + 0x10) + math_random_signed_float_range(0.0f, radius);
                     pos[1] = *(float *)(obj + 0x14) + math_random_signed_float_range(0.0f, radius);
                     pos[2] = *(float *)(obj + 0x18) + math_random_signed_float_range(0.0f, radius);
@@ -108,13 +108,13 @@ int func_PAL_L05_003D3098(char *obj)
                     }
                 }
             }
-            spread = D_L05_001AFB68[index] * D_L05_001AFBEC;
-            angle = D_L05_001AFBE8 * 0.020000001f;
-            count = (float)D_L05_001AFBB0[index];
+            spread = g_shot_reach_table[index] * g_burst_spread_scale;
+            angle = g_burst_angle_rate * 0.020000001f;
+            count = (float)g_burst_particle_count_table[index];
             qcopy(center, obj + 0x10);
             if ((unsigned char)r[0x28] == 0) {
-                vec_scale_to_length(base, D_L05_001B96C0 + 0x230, speed * 0.5f);
-                vec_scale_to_length(vel, D_L05_001B96C0 + 0x230, 0.5f);
+                vec_scale_to_length(base, g_origin_vec + 0x230, speed * 0.5f);
+                vec_scale_to_length(vel, g_origin_vec + 0x230, 0.5f);
                 FastVecAdd(center, center, vel);
                 angle = 0.060000002f;
                 if (*(short *)(obj + 0xaa) == 0x955) {

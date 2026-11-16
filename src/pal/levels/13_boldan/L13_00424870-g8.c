@@ -15,7 +15,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int coll_test_point(void *,int,void *,float);
 extern void make_hit_descriptor(char *,int,int,float,Quad16 *);
-extern void func_PAL_L00_002B3000(void);
+extern void hero_record_play_counters_pal(void);
 extern void scale_vector(void *,void *,float);
 extern float FastAddRotations(float,float);
 extern float math_random_signed_float_range(float,float);
@@ -23,11 +23,11 @@ extern void gfx_add_draw_callback_first(void (*)(void *),void *);
 extern void gfx_draw_pulsing_glow_strip(void *);
 extern float ApproachValue(float *,float,float);
 extern int g_current_map_index;
-extern char *D_L13_001BFD18 NOT_SDA;
-extern Quad16 D_L13_001A8F20 MACRO_ADDR;
-extern float D_L13_001B1A30 __attribute__((sda));
-extern float D_L13_001B1A34 __attribute__((sda));
-extern float D_L13_001B1A38 __attribute__((sda));
+extern char *g_hit_l13_result NOT_SDA;
+extern Quad16 g_default_l13_effect_vector MACRO_ADDR;
+extern float g_marker_rotation_speed __attribute__((sda));
+extern float g_marker_l13_rise_speed __attribute__((sda));
+extern float g_marker_value_speed __attribute__((sda));
 
 void func_PAL_L13_00424870(char *object)
 {
@@ -54,10 +54,10 @@ active:
         qcopy(&local.position,&H->q[8]);
         vec_scale_to_length(&local.offset,H->ptr[2212]+0xe0,0.75f);
         FastVecAdd(&local.position,&local.position,&local.offset);
-        if (coll_test_point(&local.position,0,H->ptr[2212],0.5f)!=0 && D_L13_001BFD18!=0 && D_L13_001BFD18==object) {
-            make_hit_descriptor((char *)&local.request,(int)object,1,100.0f,&D_L13_001A8F20);
+        if (coll_test_point(&local.position,0,H->ptr[2212],0.5f)!=0 && g_hit_l13_result!=0 && g_hit_l13_result==object) {
+            make_hit_descriptor((char *)&local.request,(int)object,1,100.0f,&g_default_l13_effect_vector);
             local.request.id=*(unsigned short *)(object+0xaa);
-            func_PAL_L00_002B3000();
+            hero_record_play_counters_pal();
         }
         if (H->ptr[207]!=0 && H->ptr[207]==object && H->i[208]!=0) {
             ((float *)&local.direction)[0]=0.0f;
@@ -67,17 +67,17 @@ active:
             vec_scale_to_length(&local.direction,&local.direction,10.0f);
             make_hit_descriptor((char *)&local.request,(int)object,1,10.0f,(Quad16 *)&local.direction);
             local.request.id=*(unsigned short *)(object+0xaa);
-            func_PAL_L00_002B3000();
+            hero_record_play_counters_pal();
         }
     }
 common:
     if (state[0]!=0.0f) {
         scale_vector(&local.position,object,0.0009765625f);
-        state[8]=FastAddRotations(state[8],D_L13_001B1A30*0.0003490659f);
-        state[3]+=(D_L13_001B1A34+math_random_signed_float_range(0.25f,0.5f))*0.020000001f;
+        state[8]=FastAddRotations(state[8],g_marker_rotation_speed*0.0003490659f);
+        state[3]+=(g_marker_l13_rise_speed+math_random_signed_float_range(0.25f,0.5f))*0.020000001f;
         if (state[3]>1.0f) state[3]-=1.0f;
         for(i=1;i<=2;i++) {
-            value=state[i]+D_L13_001B1A38*0.020000001f;
+            value=state[i]+g_marker_value_speed*0.020000001f;
             state[i]=value;
             if(value>1.0f) state[i]=value-1.0f;
         }

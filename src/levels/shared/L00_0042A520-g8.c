@@ -42,10 +42,10 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
-extern Rec_42A520 *D_L00_001B1844;
-extern float D_L00_001B163C __attribute__((sda));
-extern float D_L00_001B1640 __attribute__((sda));
-extern int D_L00_001B164C __attribute__((sda));
+extern Rec_42A520 *g_camera_def_table;
+extern float g_cam_trigger_model_param_a __attribute__((sda));
+extern float g_cam_trigger_model_param_b __attribute__((sda));
+extern int g_cam_trigger_model_flags __attribute__((sda));
 
 /* Sets the camera's position and direction from the trigger's model and fixed offsets. */
 void cam_set_from_trigger_model(Self_42A520 *self)
@@ -57,11 +57,11 @@ void cam_set_from_trigger_model(Self_42A520 *self)
     Ent_42A520 *entry;
     Model_42A520 *model;
 
-    entry = D_L00_001B1844[self->idx].ent;
-    entry->f28 = D_L00_001B163C;
-    entry->f2C = D_L00_001B1640;
-    entry->f30 = math_fabs(D_L00_001B163C);
-    entry->f34 = D_L00_001B1640;
+    entry = g_camera_def_table[self->idx].ent;
+    entry->f28 = g_cam_trigger_model_param_a;
+    entry->f2C = g_cam_trigger_model_param_b;
+    entry->f30 = math_fabs(g_cam_trigger_model_param_a);
+    entry->f34 = g_cam_trigger_model_param_b;
     model = entry->model;
     *(TI128 *)entry->v60 = *(TI128 *)model->mE0;
     vec_scale_to_length(m0, model->mC0, entry->f28);
@@ -77,5 +77,5 @@ void cam_set_from_trigger_model(Self_42A520 *self)
     FastVecCross(self->m10, self->m0, v);
     vec_scale_to_length(self->m10, self->m10, 1.0f);
     FastVecCross(self->m20, self->m10, self->m0);
-    entry->f24 = D_L00_001B164C;
+    entry->f24 = g_cam_trigger_model_flags;
 }

@@ -1,21 +1,21 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 extern void UpdateBoltCounter(int);
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 
-void func_PAL_L00_0030FA80(int argument)
+void hud_update_bolt_counter_if_enabled_pal(int argument)
 {
-    if (D_L00_001A904C != 0) {
+    if (g_bolt_counter_base != 0) {
         UpdateBoltCounter(argument);
     }
 }
 
 extern void DrawBoltCounterDeltas(int);
 
-void func_PAL_L00_0030FAA8(int argument)
+void hud_draw_bolt_counter_deltas_if_enabled_pal(int argument)
 {
-    if (D_L00_001A904C != 0) {
+    if (g_bolt_counter_base != 0) {
         DrawBoltCounterDeltas(argument);
     }
 }

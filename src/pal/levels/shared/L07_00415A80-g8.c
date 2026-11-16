@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "common.h"
-extern f32 D_L07_001B0FE8[2];
-extern f32 D_L07_001B0FF0 __attribute__((sda));
-extern f32 D_L07_001B0FF4;
-extern s32 D_L07_001B0FF8 __attribute__((sda));
-extern s32 D_L07_001B0FFC;
-extern s32 D_L07_001B1000 __attribute__((sda));
-extern s32 D_L07_001B1004;
-extern s32 D_L07_001B1008;
-extern s32 D_L07_001B100C;
-extern s32 D_L07_001B1010 __attribute__((sda));
+extern f32 g_puff_fall_speed_range[2];
+extern f32 g_puff_color_a __attribute__((sda));
+extern f32 g_puff_color_b;
+extern s32 g_puff_kind_a __attribute__((sda));
+extern s32 g_puff_kind_b;
+extern s32 g_puff_size_min_a __attribute__((sda));
+extern s32 g_puff_size_max_a;
+extern s32 g_puff_size_min_b;
+extern s32 g_puff_size_max_b;
+extern s32 g_puff_extra_count __attribute__((sda));
 extern void moby_set_state(u8 *a0, u8 a1, s32 a2);
 extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 extern int PlayMobySound(int index, int a1, char *a2);
@@ -22,7 +22,7 @@ extern f32 ref_L07_00410B48_02[2] __attribute__((sda));
 
 /* The state byte at 0x20 picks the path: 0 clears the moby list of class 1, 1 asks the
    spawner and marks the object, 2 replaces the moby and runs the level's setup. */
-void func_PAL_L07_00415A80(u8 *a0)
+void effect_l07_spawner_update_pal(u8 *a0)
 {
     u8 *s0 = a0;
     u8 *s1 = *(u8 **)(s0 + 0x68);

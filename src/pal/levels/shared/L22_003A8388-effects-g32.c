@@ -17,7 +17,7 @@ typedef struct {
     float acceleration;
 } ParticleSettings;
 extern ParticleSettings ref_L22_003A5BD8_11 __attribute__((sda)), ref_L22_003A5BD8_12 __attribute__((sda)), ref_L22_003A5BD8_13 __attribute__((sda));
-extern u8 D_L22_001B9C80[];
+extern u8 g_tether_origin[];
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float FastVecLength(void *, void *), math_random_float_range(float, float);
 extern int math_random_int_below(int);
@@ -56,7 +56,7 @@ void func_PAL_L22_003A8F68(u8 * obj, int index, int flip) {
     }
     transform_vector(pos, a, x);
     FastVecAdd(pos, pos, p);
-    FastVecSub(tmp, D_L22_001B9C80, pos);
+    FastVecSub(tmp, g_tether_origin, pos);
     tmp[2] = 0.0f;
     vec_scale_to_length(tmp, tmp, ref_L22_003A5BD8_02);
     FastVecAdd(pos, pos, tmp);

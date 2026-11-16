@@ -42,7 +42,7 @@ extern void snd_play_menu_sound_if_enabled(int, int);
 int menu_process_request(short param_1, int param_2, int *param_3);
 
 /* func_002D7AC8: owner ABI/declaration review retained. */
-extern int D_001C51D4;
+extern int g_menu_choice;
 
 extern void F70997ba9_FUN_002FC560(int a, int b);
 
@@ -88,9 +88,9 @@ extern void DrawRotatedSprite(float, float, float, float, float, int, int, int);
 
 extern void func_0027C660_1(void);
 
-extern signed char D_L01_001ABE90[];
+extern signed char g_menu_arrow_offset_a[];
 
-extern signed char D_L01_001ABE98[];
+extern signed char g_menu_arrow_offset_b[];
 
 extern void menu_stream_chunk_table_init(int);
 
@@ -126,7 +126,7 @@ typedef struct { char pad[0xDB]; unsigned char active; char padDC[0x118 - 0xDC];
 extern Mode2D6E78 g_music_state;
 extern Map2D6E78 g_map_overlay_state;
 extern State2D6E78 g_pause_menu_state;
-extern unsigned char D_001F291B;
+extern unsigned char g_map_selection_flag;
 extern void load_request_disc_read_break(void);
 
 /* Cancels a pending map choice by flipping its flag back and clearing the selection. */
@@ -136,7 +136,7 @@ int menu_cancel_map_selection(void)
         Map2D6E78 *map = &g_map_overlay_state;
         int index = map->selected;
         if (index != -1) {
-            D_001F291B = 0;
+            g_map_selection_flag = 0;
             map->flags[index] ^= 0x1000;
             map->selected = -1;
         }
@@ -157,10 +157,10 @@ int menu_cancel_map_selection(void)
 
 extern int menu_update_entry_states(int *);
 extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
-extern int D_001C51D0;
+extern int g_selected_map_index;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
-extern Base2D75E8 D_0025A6E0;
-extern int D_0025A620[];
+extern Base2D75E8 g_page_preview;
+extern int g_level_page_entry_value[];
 
 /* Sets up a preview of the selected entry by loading its two data words from the tables. */
 int menu_preview_entry_init(int *object)
@@ -169,12 +169,12 @@ int menu_preview_entry_init(int *object)
     *(int *)((char *)object + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
     {
         char *base = (char *)object + 0x30;
-        int index = D_001C51D0;
+        int index = g_selected_map_index;
 
         if (*(int *)(base + (index << 2)) != -1) {
-            D_0025A6E0.f3C = -0x240;
-            D_0025A6E0.f34 = *(int *)(0x70000000 + 4 * *(int *)(base + (index << 2)));
-            *(int *)D_0025A620 = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
+            g_page_preview.f3C = -0x240;
+            g_page_preview.f34 = *(int *)(0x70000000 + 4 * *(int *)(base + (index << 2)));
+            *(int *)g_level_page_entry_value = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
         }
     }
     *(int *)((char *)object + 0xA4) = 0;
@@ -185,7 +185,7 @@ int menu_preview_entry_init(int *object)
 /* Clears the saved selection by setting it to -1. */
 int menu_clear_saved_selection(void)
 {
-    D_001C51D4 = -1;
+    g_menu_choice = -1;
     return 0;
 }
 
@@ -195,12 +195,12 @@ int menu_run_reset_step(void) {
     return 0;
 }
 
-extern int D_001A7BA0[] __attribute__((sda));
-extern int D_001886B0[];
+extern int g_effects_volume[] __attribute__((sda));
+extern int g_menu_settings_values[];
 
 /* Copies one saved value into the settings table. */
 int menu_copy_settings_value(void) {
-    D_001886B0[0] = D_001A7BA0[0];
+    g_menu_settings_values[0] = g_effects_volume[0];
     return 0;
 }
 
@@ -222,7 +222,7 @@ typedef struct {
     char pad14[0x28 - 0x14];
 } Settings2D7B18;
 extern Settings2D7B18 g_is_pal_video __attribute__((sda));
-extern int *D_001AA4F0 __attribute__((sda));
+extern int *g_map_select_list __attribute__((sda));
 extern void map_set_current_and_refresh(int);
 extern void snd_set_default_group_volumes(void);
 extern void snd_send_cmd11_one_value(int);
@@ -260,7 +260,7 @@ back_done:
     if (menu->selection != previous || ((CtxB6 *)&g_pause_menu_state)->owner->pendingFocus != 0) {
         snd_play_menu_sound_if_enabled(1, 0x11);
         if (menu->flags & 0x20)
-            map_set_current_and_refresh(D_001AA4F0[menu->selection]);
+            map_set_current_and_refresh(g_map_select_list[menu->selection]);
     }
 
     old_slider1 = g_is_pal_video.slider1;
@@ -309,8 +309,8 @@ typedef struct { char pad0[0x36C]; int offset; char pad370[0x16B0 - 0x370]; int 
 typedef struct { unsigned int key; unsigned int flags; } Slot2D81B0;
 extern Stream2D81B0 g_copy_setup_data;
 #define MACRO_ADDR __attribute__((section(".sdata")))
-extern Slot2D81B0 D_001B1F50[] MACRO_ADDR;
-extern int D_001F2958;
+extern Slot2D81B0 g_menu_chunk_table[] MACRO_ADDR;
+extern int g_block_load_disc_handle;
 
 /* Halves the stream length while it marks the slots whose key is older than the clock and
    (outside the mode) asks for the next block; the result picks state 1 or 3. */
@@ -326,8 +326,8 @@ int menu_block_load_start(char *object)
     *(int *)(object + 0x38) = 0;
     length = g_copy_setup_data.length;
     g_copy_setup_data.length = length / 2;
-    flags = &D_001B1F50[0].flags;
-    key = &D_001B1F50[0].key;
+    flags = &g_menu_chunk_table[0].flags;
+    key = &g_menu_chunk_table[0].key;
     for (i = 0; i < 5; i++) {
         if (*key != 0 && *key < g_pause_menu_state.limit)
             *flags |= 2;
@@ -336,7 +336,7 @@ int menu_block_load_start(char *object)
     }
     *(int *)(object + 0x50) = 0;
     if (g_music_state.mode == 0) {
-        if (load_start_disc_read(D_001F2958, g_copy_setup_data.start + g_copy_setup_data.offset, g_copy_setup_data.length) != 0)
+        if (load_start_disc_read(g_block_load_disc_handle, g_copy_setup_data.start + g_copy_setup_data.offset, g_copy_setup_data.length) != 0)
             *(int *)(object + 0x50) = 1;
         else
             *(int *)(object + 0x50) = 3;
@@ -346,28 +346,28 @@ int menu_block_load_start(char *object)
     return 0;
 }
 
-extern short D_001A63AC;
+extern short g_sequence_active_flag;
 extern void load_request_disc_read_break(void);
 extern int g_subtitle_entries __attribute__((sda));
-extern int D_00254EA4;
+extern int g_block_load_object_word;
 
 /* Finishes the loader: stops a running read, then stores the loaded block values. */
 int menu_block_load_finish(char *object)
 {
-    if (D_001A63AC != 0 && *(int *)(object + 0x50) == 1)
+    if (g_sequence_active_flag != 0 && *(int *)(object + 0x50) == 1)
         load_request_disc_read_break();
     menu_stream_chunk_table_init(1);
     {
         int value = *(int *)(object + 0x54);
         if (value != 0) {
-            D_00254EA4 = *(int *)(object + 0x38);
+            g_block_load_object_word = *(int *)(object + 0x38);
             g_subtitle_entries = value;
         }
     }
     return 0;
 }
 
-extern unsigned char D_001A7BB4 __attribute__((sda));
+extern unsigned char g_language __attribute__((sda));
 extern int g_subtitle_state[];
 extern int load_start_disc_read(int, int, int);
 extern void mem_copy_aligned(void *, void *, int);
@@ -392,19 +392,19 @@ int menu_block_loader_update(char *object)
     case 2:
         break;
     case 0:
-        if (D_001A63AC == 0) {
+        if (g_sequence_active_flag == 0) {
             Stream2D81B0 *stream = &g_copy_setup_data;
 
-            if (load_start_disc_read(D_001F2958, stream->start + stream->offset, stream->length))
+            if (load_start_disc_read(g_block_load_disc_handle, stream->start + stream->offset, stream->length))
                 loader->state = 1;
             else
                 loader->state = 3;
         }
         break;
     case 1:
-        if (D_001A63AC == 0) {
+        if (g_sequence_active_flag == 0) {
             char *data = g_pause_menu_state.loaded;
-            int *header = (int *)(data + ((int *)data)[D_001A7BB4]);
+            int *header = (int *)(data + ((int *)data)[g_language]);
             int count = *header++;
             int size = *header++;
             char *base;
@@ -431,9 +431,9 @@ int menu_block_loader_update(char *object)
 
 /* func_002D89D8 is defined in 002D5E98-listbox.c. */
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
-extern int D_00139868[];
+extern int g_help_entry_state[];
 extern unsigned char g_weapon_table[];
 typedef struct { unsigned char reserved[0x6C]; int handle; } WidgetClass2D8EC0;
 extern void *menu_return_object_unchanged(void *);
@@ -445,14 +445,14 @@ extern void radial_menu_place_item(char *, int, int, int, int);
 void menu_row_icon_draw(char *source, short *row, int first, int second, int x, int y)
 {
     int index = second * *(int *)(source + 0x44) + first;
-    unsigned char *widget = (unsigned char *)menu_return_object_unchanged(D_001A8CFC[0] + 0x36F28) + index * 0x48;
+    unsigned char *widget = (unsigned char *)menu_return_object_unchanged(g_resident_data_base[0] + 0x36F28) + index * 0x48;
     object_set_flag_value(widget, 0);
     if (((WidgetClass2D8EC0 *)(g_item_slot_to_record[row[3]] * 0xE0 + (unsigned int)g_weapon_table))->handle != 0) {
         object_set_flag_value(widget, 1);
-        meter_set_value((char *)widget, D_00139868[row[3]] >> 5);
+        meter_set_value((char *)widget, g_help_entry_state[row[3]] >> 5);
         meter_set_max(widget, ((WidgetClass2D8EC0 *)(g_item_slot_to_record[row[3]] * 0xE0 + (unsigned int)g_weapon_table))->handle);
     }
-    radial_menu_place_item(D_001A8CFC[0] + 0x36F28, index, x, y, 0x80);
+    radial_menu_place_item(g_resident_data_base[0] + 0x36F28, index, x, y, 0x80);
 }
 
 
@@ -492,7 +492,7 @@ typedef struct {
     unsigned char used[0x18];
 } EffectSlots_2D9600;
 
-extern int D_00261920[];
+extern int g_effect_slot_flags[];
 
 extern void hud_add_to_active_total(char *, int);
 
@@ -508,7 +508,7 @@ int part_update_effect_slots(EffectSlots_2D9600 *o)
             continue;
         if (o->used[i] != 0)
             continue;
-        if (D_00261920[i] == 0)
+        if (g_effect_slot_flags[i] == 0)
             continue;
         if (i == 7
             && *(short *)(o->entries[7] + 0xAA) == 0x4A
@@ -604,7 +604,7 @@ typedef struct {
 } ScreenPos_2DA118;
 
 extern ScreenPos_2DA118 g_screen_adjust_offsets;
-extern unsigned long long D_001C5208;
+extern unsigned long long g_menu_image_texture;
 
 typedef struct {
     char pad[0x34];
@@ -649,10 +649,10 @@ int menu_fading_image_draw(Object_2DA118 *object)
             }
         }
         color = (shade << 24) | 0x808080;
-        DrawTexturedQuad(0, 0, g_screen_adjust_offsets.x, g_screen_adjust_offsets.y, 0, 0, object->width, object->height, color, D_001C5208);
+        DrawTexturedQuad(0, 0, g_screen_adjust_offsets.x, g_screen_adjust_offsets.y, 0, 0, object->width, object->height, color, g_menu_image_texture);
     } else {
         color = 0x80808080ULL;
-        DrawTexturedQuad(0, 0, g_screen_adjust_offsets.x, g_screen_adjust_offsets.y, 0, 0, object->width, object->height, color, D_001C5208);
+        DrawTexturedQuad(0, 0, g_screen_adjust_offsets.x, g_screen_adjust_offsets.y, 0, 0, object->width, object->height, color, g_menu_image_texture);
     }
     return 0x10;
 }
@@ -745,7 +745,7 @@ typedef struct {
 #define Menu_2DA9A8 (*(Menu2DA9A8 *)&D_001F2840)
 
 extern unsigned char g_item_owned_flags[];
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 extern int request_is_current_slot(int);
 extern char *GetLocalizedString(int);
 extern void SetupGifPaging(int);
@@ -799,7 +799,7 @@ int menu_panel_draw(MenuPanel2DA9A8 *menu)
             short id = row->id;
             if (!g_item_owned_flags[id]) return 1;
         }
-        if (row->type == 1 && !D_001395B8[row->id]) return 1;
+        if (row->type == 1 && !g_game_flag_table[row->id]) return 1;
     }
     SetupGifPaging(0);
     if (menu->mode < 4) texture = load_texture_file(menu->texture[0]);
@@ -832,15 +832,15 @@ int menu_stream_reads_update(Handles_2DCB28 *object)
     switch (object->state) {
     case 0:
         if (object->first != 0) {
-            if (D_001A63AC != 0)
+            if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&g_copy_setup_data;
                 int offset = reads->offset;
 
                 if (load_start_disc_read(object->first,
-                                  reads->first[D_001A7BB4 % 5].start + offset,
-                                  reads->first[D_001A7BB4 % 5].length) != 0)
+                                  reads->first[g_language % 5].start + offset,
+                                  reads->first[g_language % 5].length) != 0)
                     object->state++;
                 else
                     object->state = -1;
@@ -848,21 +848,21 @@ int menu_stream_reads_update(Handles_2DCB28 *object)
         }
         break;
     case 1:
-        if (D_001A63AC != 0)
+        if (g_sequence_active_flag != 0)
             break;
         object->state = 2;
         break;
     case 2:
         if (object->second != 0) {
-            if (D_001A63AC != 0)
+            if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&g_copy_setup_data;
                 int offset = reads->offset;
 
                 if (load_start_disc_read(object->second,
-                                  reads->second[D_001A7BB4 % 5].start + offset,
-                                  reads->second[D_001A7BB4 % 5].length) != 0)
+                                  reads->second[g_language % 5].start + offset,
+                                  reads->second[g_language % 5].length) != 0)
                     object->state++;
                 else
                     object->state = -1;
@@ -870,7 +870,7 @@ int menu_stream_reads_update(Handles_2DCB28 *object)
         }
         break;
     case 3:
-        if (D_001A63AC != 0)
+        if (g_sequence_active_flag != 0)
             break;
         object->state = 4;
         break;
@@ -890,11 +890,11 @@ typedef struct {
     char pad270[8];
     unsigned long long tex1;
 } Dialog2DAF68;
-extern char *D_001F2854;
-extern char D_0025E680[];
-extern int D_00261998[];
+extern char *g_active_menu_object;
+extern char g_level_page_root[];
+extern int g_dialog_style_table[];
 /* The frame counter as an incomplete sda array: retail's tied absolute macro load. */
-extern int D_001B1598[] __attribute__((sda));
+extern int g_frame_counter_3[] __attribute__((sda));
 extern void VU1_addGSregister(int, unsigned long long);
 extern void hud_draw_sprite_region(unsigned long long, int, int, int, int, int, int, int, int, int);
 
@@ -920,7 +920,7 @@ int DrawMenuPreviewImage(void)
     if (page >= 21 && page != 24)
         return 0;
 
-    if (D_001F2854 == D_0025E680) {
+    if (g_active_menu_object == g_level_page_root) {
         inset[1] = 50;
         inset[2] = 38;
         inset[3] = 25;
@@ -940,8 +940,8 @@ int DrawMenuPreviewImage(void)
         height = 140;
     }
     dialog = (Dialog2DAF68 *)&g_map_overlay_state;
-    style = D_00261998[dialog->image];
-    scroll = (D_001B1598[0] + dialog->image * 0x2AB) % 2048;
+    style = g_dialog_style_table[dialog->image];
+    scroll = (g_frame_counter_3[0] + dialog->image * 0x2AB) % 2048;
     border = inset[style];
 
     VU1_addGSregister(0x47, 0);
@@ -1028,11 +1028,11 @@ back_done:
 /* Switches the menu draw hook to a different handler when flag 0x40 of the game flags is set. */
 int menu_select_draw_hook(void)
 {
-    extern s32 D_00138344;
-    extern s32 D_001F2858;
+    extern s32 g_menu_input_flags;
+    extern s32 g_menu_select_draw_hook;
     extern void func_0025E680(void);
-    if (D_00138344 & 0x40)
-        D_001F2858 = (s32)func_0025E680;
+    if (g_menu_input_flags & 0x40)
+        g_menu_select_draw_hook = (s32)func_0025E680;
     return 0;
 }
 
@@ -1041,11 +1041,11 @@ extern void subtitle_empty_a(int, int, int, int);
 /* Sets the screen clip box to the rectangle stored in the object. */
 int menu_set_clip_rect(char *p) { int x = *(int *)(p + 0x18); int y = *(int *)(p + 0x1C); int w = *(int *)(p + 0x20); int h = *(int *)(p + 0x24); subtitle_empty_a(x, x + w, y, y + h); return 2; }
 
-extern char *D_001F2854;
+extern char *g_active_menu_object;
 
 /* Clears the menu lock flag and creates a new handle for the object. */
 int menu_lock_handle_init(char *object) {
-    *(int *)(D_001F2854 + 0x12C) = 0;
+    *(int *)(g_active_menu_object + 0x12C) = 0;
     *(int *)(object + 0x54) = menu_stream_chunk_claim_free(0);
     return 0;
 }
@@ -1060,7 +1060,7 @@ undefined8 menu_convert_object_handle(int object)
 }
 
 extern int g_save_menu_screen __attribute__((sda));
-extern unsigned int D_00138344;
+extern unsigned int g_menu_input_flags;
 typedef struct { char reserved00[0x14]; char *object; int value; char reserved1C[0xC8]; int clear; } SceneState;
 extern SceneState ref_L00_002DBB78_00;
 /* Updates the menu value from its owner and sets or clears the lock flag when certain buttons are held. */
@@ -1071,7 +1071,7 @@ int menu_lock_flag_update(void)
         return 0;
     }
     {
-        unsigned int flags = D_00138344;
+        unsigned int flags = g_menu_input_flags;
         if (flags & 0x20) {
             ref_L00_002DBB78_00.clear = 0;
             ref_L00_002DBB78_00.value = *(int *)(ref_L00_002DBB78_00.object + 0xE0);
@@ -1104,7 +1104,7 @@ int menu_pick_random_table_entry(char *object) {
 }
 
 extern int g_pad_state[];
-extern int D_001F2974;
+extern int g_menu_list_busy_flag;
 extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Handles input for a list of 30 entries: close, back, and moving up or down with wrap-around. */
@@ -1115,7 +1115,7 @@ int menu_list_update_long(char *object)
         int *state = g_pad_state;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
-        if (D_001F2974 == 0)
+        if (g_menu_list_busy_flag == 0)
             return 1;
     }
 proceed:
@@ -1156,7 +1156,7 @@ finish:
 
 
 extern int g_pad_state[];
-extern int D_001F2974;
+extern int g_menu_list_busy_flag;
 extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Handles input for a list of 12 entries: close, back, and stepping forward or back with wrap-around. */
@@ -1167,7 +1167,7 @@ int menu_list_update_short(char *object)
         int *state = g_pad_state;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
-        if (D_001F2974 == 0)
+        if (g_menu_list_busy_flag == 0)
             return 1;
     }
 proceed:
@@ -1213,12 +1213,12 @@ int menu_side_arrow_draw(char *object)
 
     func_0027C540_1(0);
     if (*(int *)(object + 56) != 0) {
-        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)D_L01_001ABE90;
+        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)g_menu_arrow_offset_a;
         text_draw_small(4, *(int *)(object + 36) / 2 - 8, 0x80FFA888, local, -1);
         y = (float)(*(int *)(object + 36) * 8);
         DrawRotatedSprite(640.0f, y, 128.0f, 256.0f, 0.0f, 32, 16, GetFrameTexture(GetIconFrame(0xE99D, 6)));
     } else {
-        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)D_L01_001ABE98;
+        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)g_menu_arrow_offset_b;
         text_draw_small(*(int *)(object + 32) - 24, *(int *)(object + 36) / 2 - 8, 0x80FFA888, local, -1);
         y = (float)(*(int *)(object + 36) * 8);
         DrawRotatedSprite(192.0f, y, 128.0f, 256.0f, 3.1415927f, 32, 16, GetFrameTexture(GetIconFrame(0xE99D, 6)));

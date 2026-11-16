@@ -1,21 +1,21 @@
 #include "include_asm.h"
 #include "common.h"
-extern u8 D_L03_001A8F20[] MACRO_ADDR;
+extern u8 g_effect_descriptor_default[] MACRO_ADDR;
 extern int FastTweenColor(int, int, float);
 typedef struct { float v[4]; } __attribute__((aligned(16))) VecF720;
 typedef struct { VecF720 v[4]; int color[4]; float uv[4][2]; u64 r70, tex, r80, r88; } QuadF720;
-extern float D_L03_001B1C10[4] __attribute__((sda));
-extern float D_L03_001B1C20[4] __attribute__((sda));
-extern VecF720 D_L03_001BFDE0, D_L03_001B9980;
-extern int D_L03_001B1C78[2] __attribute__((sda));
-extern int D_L03_001B1C80 __attribute__((sda)), D_L03_001B1C84 __attribute__((sda));
-extern int D_L03_001B1C88 __attribute__((sda));
-extern float D_L03_001B1C90 __attribute__((sda));
-extern float D_L03_001B1C98[2] __attribute__((sda));
-extern float D_L03_001B1CA0[8] __attribute__((sda));
-extern float D_L03_001B1CA4[] MACRO_ADDR;
-extern int D_L03_001B1CC0[2] __attribute__((sda));
-extern int g_frame_l03_counter, D_L03_001B1C8C;
+extern float g_laser_bot_beam_origin[4] __attribute__((sda));
+extern float g_laser_bot_beam_end[4] __attribute__((sda));
+extern VecF720 g_collision_start_point, g_camera_pose_buffer;
+extern int g_laser_beam_textures[2] __attribute__((sda));
+extern int g_laser_beam_draw_bits_a __attribute__((sda)), g_laser_beam_draw_bits_b __attribute__((sda));
+extern int g_laser_beam_color_start __attribute__((sda));
+extern float g_laser_beam_alpha_step __attribute__((sda));
+extern float g_laser_beam_widths[2] __attribute__((sda));
+extern float g_laser_beam_uvs[8] __attribute__((sda));
+extern float g_laser_beam_uv_v[] MACRO_ADDR;
+extern int g_laser_beam_colors[2] __attribute__((sda));
+extern int g_frame_l03_counter, g_laser_beam_color_end;
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -38,10 +38,10 @@ void DrawBeamQuadsAndRingTrail(u8 *obj)
     int j, k, n, c, trail, mask;
     float alpha, scale, w;
 
-    D_L03_001B1C20[0] = *(float *)(state + 0x33C);
-    matrix_mul_vec3(&start, &D_L03_001B1C10, obj + 0xC0);
+    g_laser_bot_beam_end[0] = *(float *)(state + 0x33C);
+    matrix_mul_vec3(&start, &g_laser_bot_beam_origin, obj + 0xC0);
     FastVecAdd(&start, &start, obj + 0x10);
-    matrix_mul_vec3(&end, &D_L03_001B1C20, obj + 0xC0);
+    matrix_mul_vec3(&end, &g_laser_bot_beam_end, obj + 0xC0);
     FastVecAdd(&end, &end, obj + 0x10);
     {
         VecF720 *verts = q[0].v;
@@ -49,26 +49,26 @@ void DrawBeamQuadsAndRingTrail(u8 *obj)
 
         mask = 1;
         if (obj[0x95] == 2) mask = 0x10001;
-        make_hit_descriptor(hit, obj, mask, &D_L03_001A8F20, (float)state[0x34]);
+        make_hit_descriptor(hit, obj, mask, &g_effect_descriptor_default, (float)state[0x34]);
         {
             int found = CollLine(&start, &end, 0, obj, hit);
             QuadF720 *quads = q;
 
-            if (found) qcopy(&end, &D_L03_001BFDE0);
+            if (found) qcopy(&end, &g_collision_start_point);
             scale = 1.0f;
-            FastVecSub(&delta, &D_L03_001B9980, &start);
+            FastVecSub(&delta, &g_camera_pose_buffer, &start);
             FastVecSub(&side, &end, &start);
             FastVecCross(&cross, &side, &delta);
             vec_scale_to_length(&cross, &cross, scale);
             for (i = 0; i < 2; i++) {
                 for (j = 0; j < 4; j++) {
                     w = 1.0f;
-                    q[i].color[j] = FastTweenColor(D_L03_001B1CC0[i] & 0xFF000000,
-                                                 D_L03_001B1CC0[i], *(float *)(state + 0x330));
-                    q[i].uv[j][0] = D_L03_001B1CA0[j * 2];
-                    q[i].uv[j][1] = D_L03_001B1CA4[j * 2];
-                    if (j & 1) FastVecScale(&q[i].v[j], &cross, D_L03_001B1C98[i]);
-                    else FastVecScale(&q[i].v[j], &cross, -D_L03_001B1C98[i]);
+                    q[i].color[j] = FastTweenColor(g_laser_beam_colors[i] & 0xFF000000,
+                                                 g_laser_beam_colors[i], *(float *)(state + 0x330));
+                    q[i].uv[j][0] = g_laser_beam_uvs[j * 2];
+                    q[i].uv[j][1] = g_laser_beam_uv_v[j * 2];
+                    if (j & 1) FastVecScale(&q[i].v[j], &cross, g_laser_beam_widths[i]);
+                    else FastVecScale(&q[i].v[j], &cross, -g_laser_beam_widths[i]);
                     if (j < 2) {
                         FastVecAdd(&q[i].v[j], &q[i].v[j], &start);
                     } else {
@@ -76,9 +76,9 @@ void DrawBeamQuadsAndRingTrail(u8 *obj)
                     }
                     q[i].v[j].v[3] = w;
                 }
-                q[i].tex = GetEffectTextureDescriptor(D_L03_001B1C78[i]);
+                q[i].tex = GetEffectTextureDescriptor(g_laser_beam_textures[i]);
                 q[i].r80 = 0xFF9000000260ULL;
-                q[i].r88 = ((u64)D_L03_001B1C80 << 2) | ((u64)D_L03_001B1C84 << 6) | 0x8000000000ULL;
+                q[i].r88 = ((u64)g_laser_beam_draw_bits_a << 2) | ((u64)g_laser_beam_draw_bits_b << 6) | 0x8000000000ULL;
                 q[i].r70 = 0;
             }
             draw_world_quad(&q[0], 0, 1);
@@ -86,9 +86,9 @@ void DrawBeamQuadsAndRingTrail(u8 *obj)
             for (n = 3, j = 0; n >= 0; n--, j++) { q[0].uv[j][0] = .5f; q[0].uv[j][1] = .5f; }
             alpha = .1f;
             if (g_frame_l03_counter & 1) alpha = 0;
-            c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha);
+            c = FastTweenColor(g_laser_beam_color_start, g_laser_beam_color_end, alpha);
             q[0].color[0] = q[0].color[1] = c;
-            c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha + D_L03_001B1C90);
+            c = FastTweenColor(g_laser_beam_color_start, g_laser_beam_color_end, alpha + g_laser_beam_alpha_step);
             q[0].color[2] = q[0].color[3] = c;
             {
                 int span = *(s16 *)(state + 0x336) - 4;
@@ -102,10 +102,10 @@ void DrawBeamQuadsAndRingTrail(u8 *obj)
                 qcopy(&verts[2], state + 0x2A0 + k * 32);
                 qcopy(&verts[3], state + 0x2B0 + k * 32);
                 draw_world_quad(&q[0], 0, 1);
-                alpha += D_L03_001B1C90;
-                c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha);
+                alpha += g_laser_beam_alpha_step;
+                c = FastTweenColor(g_laser_beam_color_start, g_laser_beam_color_end, alpha);
                 q[0].color[0] = q[0].color[1] = c;
-                c = FastTweenColor(D_L03_001B1C88, D_L03_001B1C8C, alpha + D_L03_001B1C90);
+                c = FastTweenColor(g_laser_beam_color_start, g_laser_beam_color_end, alpha + g_laser_beam_alpha_step);
                 q[0].color[2] = q[0].color[3] = c;
             }
             qcopy(&q[0].v[0], state + 0x2A0 + k * 32);
@@ -131,17 +131,17 @@ extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
 extern void fading_effect_update(void);
 extern void ScatterObjectPieces(void *, void *, void *, void *, int, int, int, int, int, int, void *);
 typedef struct { u8 pad[0x120]; int entries[10]; int count; int active; } EntryGroup;
-extern u8 D_L03_00259A30[];
+extern u8 g_barrel_entry_groups[];
 typedef struct { u8 header[0x464]; u8 entries[0]; } TriggerTable;
-extern TriggerTable D_L03_0021EA30;
-extern u8 D_0019B4A8[];
+extern TriggerTable g_trigger_l03_flags;
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index __attribute__((sda));
 typedef struct { unsigned short key; char reserved02[10]; } SelectorRow;
 extern SelectorRow g_subtitle_history[];
-extern int D_L03_001B2A38;
-extern u8 *D_L03_001B2A1C;
-extern u16 *D_L03_001FB5A0[];
-extern float D_L03_001B1DA0[2] __attribute__((sda)), D_L03_001B1DA8[2] __attribute__((sda)), D_L03_001B1DB0[2] __attribute__((sda));
+extern int g_object_group_count;
+extern u8 *g_moby_record_base;
+extern u16 *g_entity_id_lists[];
+extern float g_barrier_piece_speeds[2] __attribute__((sda)), g_barrier_piece_spin[2] __attribute__((sda)), g_barrier_piece_lifetimes[2] __attribute__((sda));
 /* A four-state object. State 0 clears the 16 entry groups, then removes the object when its trigger
    entry is set or its 3-bit counter in the level's save bits (high nibble for an odd id, low nibble
    for an even one) is nonzero; otherwise it moves to state 1. State 1 waits for a hit from an object
@@ -168,16 +168,16 @@ void endako_exploding_barrier_update(u8 *obj)
         int group;
 
         for (group = 0; group < 16; group++) {
-            for (j = 0; j < ((EntryGroup *)(D_L03_00259A30 + group * 0x150))->count; j++)
-                if (((EntryGroup *)(D_L03_00259A30 + group * 0x150))->entries[j])
-                    ((EntryGroup *)(D_L03_00259A30 + group * 0x150))->entries[j] = 0;
-            ((EntryGroup *)(D_L03_00259A30 + group * 0x150))->active = 0;
+            for (j = 0; j < ((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->count; j++)
+                if (((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->entries[j])
+                    ((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->entries[j] = 0;
+            ((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->active = 0;
         }
         index = *(s16 *)(obj + 0xB2);
-        if (D_L03_0021EA30.entries[index]) {
+        if (g_trigger_l03_flags.entries[index]) {
             moby_mark_spawned(obj);
         } else {
-            bits = D_0019B4A8[(index >> 1) + (g_current_map_index << 10)];
+            bits = g_moby_nibble_table[(index >> 1) + (g_current_map_index << 10)];
             if (*(u16 *)(obj + 0xB2) & 1) {
                 if ((bits >> 4) & 7) moby_mark_spawned(obj);
                 else moby_set_state(obj, 1, -1);
@@ -192,10 +192,10 @@ void endako_exploding_barrier_update(u8 *obj)
         hit = part_find_owned_effect_slot(obj, 0x10000, 0);
         if (hit && (other = *(u8 **)(hit + 0x20)) && *(s16 *)(other + 0xAA) == 0xCFC /* moby class 3324 */ &&
             *(float *)(obj + 0x18) <= *(float *)(other + 0x18) + 0.5f) {
-            for (p = D_L03_001FB5A0[obj[0x21]];
-                 obj[0x21] != 0xFF && obj[0x21] <= D_L03_001B2A38 && p != 0 &&
-                 ((p != 0 && (s16)p[-1] >= 0) || p == D_L03_001FB5A0[obj[0x21]]); p++) {
-                other = D_L03_001B2A1C + ((*p & 0x7FFF) << 8);
+            for (p = g_entity_id_lists[obj[0x21]];
+                 obj[0x21] != 0xFF && obj[0x21] <= g_object_group_count && p != 0 &&
+                 ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[obj[0x21]]); p++) {
+                other = g_moby_record_base + ((*p & 0x7FFF) << 8);
                 if (!other) break;
                 moby_set_state(other, 2, -1);
             }
@@ -226,19 +226,19 @@ void endako_exploding_barrier_update(u8 *obj)
             SpawnExplosion(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, i == 0, 0);
         }
         if (*(u16 *)(obj + 0xB2) & 1) {
-            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
+            counter = g_moby_nibble_table + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = D_0019B4A8 + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
+            counter = g_moby_nibble_table + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
             if ((*counter & 7) != 7) *counter += 1;
         }
         rows = g_subtitle_history;
         rows[60].key = 0xFFFF;
         if (*(int *)state)
-            ScatterObjectPieces(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
+            ScatterObjectPieces(obj, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, fading_effect_update);
         else
-            ScatterObjectPieces(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
+            ScatterObjectPieces(obj, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, 0);
         moby_mark_spawned(obj);
         break;

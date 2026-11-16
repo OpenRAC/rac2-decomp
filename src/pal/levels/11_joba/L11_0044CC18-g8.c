@@ -15,12 +15,12 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern char *func_PAL_L11_00465B28(void *, void *, void *, float, float, float, float);
+extern char *joba_swirl_effect_create_pal(void *, void *, void *, float, float, float, float);
 extern TI128 g_hero_position;
-extern s32 D_L11_001B19A8 __attribute__((sda));
-extern s32 D_L11_001B19AC __attribute__((sda));
-extern float D_L11_001B19B0 __attribute__((sda));
-extern float D_L11_001B19B4 __attribute__((sda));
+extern s32 g_timed_effect_duration __attribute__((sda));
+extern s32 g_timed_effect_chance __attribute__((sda));
+extern float g_timed_effect_gravity __attribute__((sda));
+extern float g_timed_effect_radius __attribute__((sda));
 
 typedef struct JobObject JobObject;
 
@@ -50,28 +50,28 @@ void func_PAL_L11_0044CC18(JobObject *object)
     u16 timer;
 
     if (FastDecTimer(&state->spawnTimer)) {
-        timer = (D_L11_001B19A8 * 5 + 2) / 6;
-        chance = D_L11_001B19AC;
+        timer = (g_timed_effect_duration * 5 + 2) / 6;
+        chance = g_timed_effect_chance;
         state->spawnTimer = timer;
         if (!math_random_int_below(chance)) {
             qcopy(position, &g_hero_position);
             FastVecSub(velocity, position, arena_get_center_point(object));
             velocity[2] = 0;
-            vec_scale_to_length(velocity, velocity, D_L11_001B19B4);
+            vec_scale_to_length(velocity, velocity, g_timed_effect_radius);
             FastVecAdd(position, velocity, arena_get_center_point(object));
             position[2] += 5.0f;
         } else {
             angle = math_random_float_range(-3.1415927410125732f, 3.1415927410125732f);
             base = arena_get_center_point(object);
-            position[0] = base[0] + D_L11_001B19B4 * math_fast_sin_or_cos_a(angle);
+            position[0] = base[0] + g_timed_effect_radius * math_fast_sin_or_cos_a(angle);
             base = arena_get_center_point(object);
-            position[1] = base[1] + D_L11_001B19B4 * math_fast_sin_or_cos_b(angle);
+            position[1] = base[1] + g_timed_effect_radius * math_fast_sin_or_cos_b(angle);
             position[2] = arena_get_center_point(object)[2] + 5.0f;
         }
         *(TI128 *)acceleration = 0;
-        acceleration[2] = D_L11_001B19B0 * 0.020000001f;
+        acceleration[2] = g_timed_effect_gravity * 0.020000001f;
         *(TI128 *)velocity = *(TI128 *)acceleration;
-        func_PAL_L11_00465B28(object, velocity, position, state->health, (float)state->f34, 1.0f,
+        joba_swirl_effect_create_pal(object, velocity, position, state->health, (float)state->f34, 1.0f,
                           550.0f);
     }
 }

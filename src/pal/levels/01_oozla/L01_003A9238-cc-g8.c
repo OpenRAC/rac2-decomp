@@ -8,13 +8,13 @@ extern void FastVecAdd(char *, char *, char *);
 
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
-extern void *D_L01_001FE180[];
-extern float D_L01_001AF85C __attribute__((sda));
-extern float D_L01_001AF860 __attribute__((sda));
-extern int D_L01_001AF864 __attribute__((sda));
+extern void *g_path_l01_table[];
+extern float g_flying_target_speed_scale __attribute__((sda));
+extern float g_flying_target_damping __attribute__((sda));
+extern int g_flying_target_tick_count __attribute__((sda));
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_001A7A60[] MACRO_ADDR;
-extern int D_L01_001A907C;
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
+extern int g_flying_path_mode;
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *,void *);
 extern float math_fabs(float);
@@ -23,33 +23,33 @@ extern void func_PAL_002A7E68(void *,int,int,int);
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern int snd_play_from_global_bank(int,int,int);
-extern void func_PAL_002B1588(int,int);
+extern void value_set_entry_by_index_pal(int,int);
 extern int flag_set_first_pending(void *);
-extern void func_PAL_002AD288(void *,void *,int,float,float);
+extern void part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
 extern int PlayMobySound(int,int,void *);
 extern float FastAddRotations(float,float);
 extern float coll_probe_ground_height_below(void *,int,float);
 extern void moby_set_state(void *,int,int);
-extern void func_PAL_L01_003A96A8(void *);
-extern void func_PAL_L00_003281C0(void *,int,float);
+extern void OozlaSpawnSplashParticles_pal(void *);
+extern void part_spawn_scaled_bolts_pal(void *,int,float);
 extern int math_fast_float_d(void *);
-void func_PAL_L01_003A9238(u8 *object)
+void path_flying_target_update_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
-    u8 *path = D_L01_001FE180[I(state,0x50)];
+    u8 *path = g_path_l01_table[I(state,0x50)];
     float first, last, oldHeight;
     int mode, count;
     switch (object[0x20]) {
     case 0:
         if (I(state,0x50) == -1) { moby_mark_spawned(object); return; }
-        D_L01_001AF864 = 0;
+        g_flying_target_tick_count = 0;
         first = fast_vec_dist(path + 0x10,path + 0x20);
         last = fast_vec_dist(path + 0x10,path + I(path,0)*16);
-        F(state,0x74) = (D_L01_001AF85C * 0.020000001f) / first;
+        F(state,0x74) = (g_flying_target_speed_scale * 0.020000001f) / first;
         I(state,0x70) = math_fabs(first-last) < 0.1f;
         F(state,0x5C) = F(state,0x58) * I(path,0);
         object[0x20] = 1;
-        F(object,0x2C) *= D_L01_001AF860;
+        F(object,0x2C) *= g_flying_target_damping;
         object[0x30] = 255;
     case 1:
         oldHeight = F(object,0x18);
@@ -64,21 +64,21 @@ void func_PAL_L01_003A9238(u8 *object)
             } else if (object[0x43] != 1) func_PAL_002A7E68(object,1,0,10);
         }
         if (!part_find_owned_effect_slot(object,0x10000,0)) return;
-        F(state,0x60) = D_L01_001AF85C * 0.010000001f;
+        F(state,0x60) = g_flying_target_speed_scale * 0.010000001f;
         matrix_mul_vec3(state+0x60,state+0x60,object+0xC0);
-        count = D_L01_001AF864 + 1;
+        count = g_flying_target_tick_count + 1;
         F(state,0x68) = -0.060000002f;
-        if ((D_L01_001AF864 = count) > 3 && (mode = g_current_map_index) == 1 && !D_001A7A60[13]) {
-            D_001A7A60[13] = 1;
+        if ((g_flying_target_tick_count = count) > 3 && (mode = g_current_map_index) == 1 && !g_item_enabled_flags[13]) {
+            g_item_enabled_flags[13] = 1;
             snd_play_from_global_bank(1,0,0);
-            func_PAL_002B1588(0x1233,-1);
-            D_L01_001A907C = mode;
+            value_set_entry_by_index_pal(0x1233,-1);
+            g_flying_path_mode = mode;
         }
         moby_set_state(object,2,-1);
         break;
     case 2:
         if (flag_set_first_pending(object)) {
-            func_PAL_002AD288(object,object+0x10,-1,0.5f,13.0f);
+            part_spawn_explosion_with_sparks_pal(object,object+0x10,-1,0.5f,13.0f);
             PlayMobySound(0,0,object);
         }
         F(object,0x48) = 0.5f;
@@ -94,9 +94,9 @@ void func_PAL_L01_003A9238(u8 *object)
         break;
     case 3:
         if (flag_set_first_pending(object)) {
-            func_PAL_L01_003A96A8(object);
+            OozlaSpawnSplashParticles_pal(object);
             PlayMobySound(1,0,object);
-            func_PAL_L00_003281C0(object,1,0.0f);
+            part_spawn_scaled_bolts_pal(object,1,0.0f);
         }
         F(object,0x18) += F(state,0x68);
         if (math_fast_float_d(state+0x78)) moby_mark_spawned(object);
@@ -108,4 +108,4 @@ void func_PAL_L01_003A9238(u8 *object)
 
 typedef struct { u8 pad[0x2290]; u8 *target; } OozlaHero;
 extern OozlaHero g_hero_state;
-extern int D_L01_001B2088 MACRO_ADDR;
+extern int g_oozla_intro_stage MACRO_ADDR;

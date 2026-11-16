@@ -26,11 +26,11 @@ typedef struct {
 } PreviewState;
 extern PreviewCameraPrefix g_active_camera;
 extern PreviewState g_object_preview_state __attribute__((sda));
-extern float D_001AD808 SDATA(D_001AD808) __attribute__((sda));
-extern float D_001AD80C SDATA(D_001AD80C) __attribute__((sda));
-extern float D_001AD810 SDATA(D_001AD810) __attribute__((sda));
-extern float D_001AD814 SDATA(D_001AD814) __attribute__((sda));
-extern float D_001AD818 SDATA(D_001AD818) __attribute__((sda));
+extern float g_preview_basis_scale_a SDATA(D_001AD808) __attribute__((sda));
+extern float g_preview_basis_scale_b SDATA(D_001AD80C) __attribute__((sda));
+extern float g_preview_basis_scale_c SDATA(D_001AD810) __attribute__((sda));
+extern float g_preview_basis_scale_d SDATA(D_001AD814) __attribute__((sda));
+extern float g_preview_basis_scale_e SDATA(D_001AD818) __attribute__((sda));
 typedef struct {
     float velocity[3], gravity, size_delta;
     unsigned char alpha_delta, phase_delta;
@@ -46,9 +46,9 @@ typedef struct {
     float size, position[4];
     ParticleContext_C65A0 context;
 } Particle_C65A0;
-extern float D_001AD81C SDATA(D_001AD81C) __attribute__((sda));
-extern float D_001A8BD0[] MACRO_ADDR;
-extern unsigned char *D_001F2614;
+extern float g_preview_size_scale SDATA(D_001AD81C) __attribute__((sda));
+extern float g_default_effect_vector[] MACRO_ADDR;
+extern unsigned char *g_part_tex_ground_effect;
 extern float IntToFloat(int);
 extern void lerp_vector(float *, float *, float *, float);
 extern int FloatToInt(float);
@@ -58,7 +58,7 @@ extern Particle_C65A0 *part_spawn_gravity_fade(const float *, const float *, int
 /* Emits three particles between 0.1 and 9 units in front of the camera,
    at the point the preview timer has reached; their phase advances once
    per call. */
-void func_PAL_00300EA8(void)
+void EmitParticlesBeforeCamera_pal(void)
 {
     float offset[3] __attribute__((aligned(16)));
     float farPoint[3] __attribute__((aligned(16)));
@@ -74,25 +74,25 @@ void func_PAL_00300EA8(void)
     FastVecAdd(nearPoint, g_active_camera.position, offset);
     interpolation = IntToFloat(g_object_preview_state.frames) * g_object_preview_state.rate;
     lerp_vector(position, nearPoint, farPoint, interpolation);
-    size = D_001AD81C * 210000.0f;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 3, 0xFF2020, phase, 127, 127,
+    size = g_preview_size_scale * 210000.0f;
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 3, 0xFF2020, phase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     secondPhase = (phase + 128) % 255;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 3, 0xFF2020, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 3, 0xFF2020, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     size *= 0.5f;
-    particle = part_spawn_gravity_fade(position, D_001A8BD0, 3, 0xFFFFFF, secondPhase, 127, 127,
+    particle = part_spawn_gravity_fade(position, g_default_effect_vector, 3, 0xFFFFFF, secondPhase, 127, 127,
                             size, size, 0.0f, 0);
     if (particle) {
-        particle->shade = *D_001F2614;
+        particle->shade = *g_part_tex_ground_effect;
         particle->variation = FloatToInt(0.4f) + 64;
     }
     g_object_preview_state.phase++;

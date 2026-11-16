@@ -17,7 +17,7 @@ extern void *func_32F2B0(void *);
 extern void func_32F7A8(void *, void *, void *, void *, s32);
 extern void *func_332F58(s32);
 
-extern u8 *D_001FF814;
+extern u8 *g_part_glow_record_byte;
 
 /* func_L22_002D0C98 is in the sibling file L22_002D0C98-decider.c (its own profile). */
 
@@ -79,7 +79,7 @@ void part_spawn_glow_record(TI128 *source, u8 red, u8 green, u8 blue, s32 handle
     *(f32 *)(record + 0xC) = value;
     record[0x1] = 0;
     record[0x8] = 0;
-    record[0x2] = *D_001FF814;
+    record[0x2] = *g_part_glow_record_byte;
     *(s32 *)(record + 0x20) = handle;
     *(f32 *)(pair + 0x4) = scale / func_2F4BD0(handle);
 }

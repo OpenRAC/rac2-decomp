@@ -10,9 +10,9 @@ extern int CollLine(void *a, void *b, int mode, void *self, int flag);
 
 extern char g_hero_position[];
 
-extern int D_L14_001BF958;
+extern int g_tether_l14_hit_result;
 
-extern char *D_L14_001FE1C0[];
+extern char *g_effect_path_table[];
 extern f32 vec_distance_xy(char *, char *);
 
 
@@ -20,7 +20,7 @@ extern f32 vec_distance_xy(char *, char *);
 
 /* Follows a path: when the object is close to the current point it moves to the next (or previous) point, and returns 0 when the path ends. */
 s32 path_advance(char *self, char *point, s32 route, s16 *index, s32 reverse, f32 radius) {
-    char *path = D_L14_001FE1C0[route];
+    char *path = g_effect_path_table[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
         if (vec_distance_xy(self + 16, point) < radius) --*index;

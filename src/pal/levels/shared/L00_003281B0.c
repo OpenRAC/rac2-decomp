@@ -3,11 +3,11 @@
 #include "common.h"
 extern u8 g_hero_position[];
 extern u32 g_current_map_index MACRO_ADDR;
-extern s32 D_002A0D50[];
+extern s32 g_bolt_amount_by_level[];
 extern f32 fast_vec_dist(u8 *, u8 *);
-extern void func_PAL_L00_00323918(u8 *, s32, s32, s32, s32, s32, f32);
+extern void part_spawn_bolt_pickups_pal(u8 *, s32, s32, s32, s32, s32, f32);
 
-void func_PAL_L00_003281C0(u8 *a0, s32 a1, f32 f12) {
+void part_spawn_scaled_bolts_pal(u8 *a0, s32 a1, f32 f12) {
     s32 mode = 1;
     u32 i;
     s32 v;
@@ -17,14 +17,14 @@ void func_PAL_L00_003281C0(u8 *a0, s32 a1, f32 f12) {
     i = g_current_map_index;
     if (i > 25)
         i = 25;
-    v = D_002A0D50[i] * a1 - 1;
-    func_PAL_L00_00323918(a0, v, v, mode, -1, 0, f12);
+    v = g_bolt_amount_by_level[i] * a1 - 1;
+    part_spawn_bolt_pickups_pal(a0, v, v, mode, -1, 0, f12);
 }
 
 
 extern void func_0029CC50(void);
 
-void func_PAL_L00_003282B0(void)
+void part_reset_effects_pal(void)
 {
     func_0029CC50();
 }
@@ -36,8 +36,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_random_angle(void);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
-extern char *func_PAL_002735D0(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
-extern void func_PAL_L00_0039E608(char *);
+extern char *cam_moby_create_pal(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
+extern void glow_fade_update_pal(char *);
 extern void set_moby_color(char *, unsigned long, unsigned long, unsigned long);
 
 /* Spawn count effects around origin, tinted by color (0xAABBGGRR). */
@@ -66,10 +66,10 @@ void func_PAL_L00_00328480(char *owner, void *origin, int count, int mode,
         kind = mode ? 2 : 1;
         variant = math_random_int_below(4);
         life = math_random_float_range(10.0f, 20.0f);
-        effect = func_PAL_002735D0(owner, kind, 0x43e, variant, &position, &rotation, &velocity,
+        effect = cam_moby_create_pal(owner, kind, 0x43e, variant, &position, &rotation, &velocity,
                                0xff, 180.0f, life);
         if (effect != 0) {
-            *(void (**)(char *))(effect + 0x64) = func_PAL_L00_0039E608;
+            *(void (**)(char *))(effect + 0x64) = glow_fade_update_pal;
             r = color & 0xff;
             t = (unsigned int)color >> 24;
             *(float *)(effect + 0x2c) = *(float *)(*(char **)(effect + 0x24) + 0x24)

@@ -7,12 +7,12 @@ extern s32 IsPointInCuboid(void *point, s32 index);
 extern s32 snd_play_from_global_bank(s32 index, s32 value, void *object);
 extern void value_set_entry_by_index(s32 first, s32 second);
 
-extern u16 D_0018CF40;
-extern u8 D_001A7AFD[] __attribute__((sda));
-extern u8 D_001A7A60[] MACRO_ADDR;
+extern u16 g_two_step_trigger_flag;
+extern u8 g_map_overlay_flag[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern u8 g_hero_position[];
 extern u8 g_hero_state[];
-extern u32 D_L18_001A903C[] __attribute__((sda));
+extern u32 g_two_step_trigger_step[] __attribute__((sda));
 
 typedef int u128 __attribute__((mode(TI)));
 
@@ -23,7 +23,7 @@ extern void moby_mark_spawned(char *);
 extern void FastVecAdd(void *, void *, void *);
 extern int coll_sweep_from_object(char *, void *, float, float, float, int, int, int, int);
 extern void gfx_add_draw_callback_third(void *, char *);
-extern char D_L18_003F9018[];
+extern char g_robot_draw_callback[];
 
 extern void func_3F7CD8(s32);
 extern void func_3F7EF8(s32);
@@ -43,7 +43,7 @@ extern s32 func_001163B0(void);
 extern s32 FloatToInt(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern u8 *D_L18_001FF4D4;
+extern u8 *g_orbiting_effect_type_table;
 
 /* func_L18_002E68B0 is in the sibling file L18_002E68B0-decider.c (its own profile). */
 
@@ -61,7 +61,7 @@ char *part_create_orbiting_effect(char *center, float radius, float angle, float
     if (record != 0) {
         *(u8 *)(record + 3) = (flag != 0) ? 0x48 : 0x44;
         *(u8 *)(record + 1) = 0;
-        *(u8 *)(record + 2) = D_L18_001FF4D4[type_index];
+        *(u8 *)(record + 2) = g_orbiting_effect_type_table[type_index];
         *(u8 *)(record + 8) = func_001163B0();
         *(u8 *)(record + 9) = FloatToInt(1.0f) + 0x40;
         *(u32 *)(record + 4) = owner;
@@ -113,9 +113,9 @@ void two_step_hero_trigger_update(u8 *moby) {
         *(u16 *)(vars + 0xC) = 0;
         moby[0x20] = 1;
     }
-    if (D_0018CF40 != 0)
+    if (g_two_step_trigger_flag != 0)
         goto after;
-    if (D_001A7AFD[0] != 0) {
+    if (g_map_overlay_flag[0] != 0) {
         if (FastDecTimer((s16 *)(vars + 0xE)) != 0)
             subtitle_request_voice_line(0xA27, 0x7E);
     }
@@ -138,11 +138,11 @@ after:
         if (*(u32 *)(hero + 0x2294) == 0x3E) {
             *(u32 *)(vars + 8) = 0;
         } else if (IsPointInCuboid(hero + 0x80, *(u32 *)(vars + 4)) != 0) {
-            if (D_001A7A60[7] == 0) {
-                D_001A7A60[7] = step;
+            if (g_item_enabled_flags[7] == 0) {
+                g_item_enabled_flags[7] = step;
                 snd_play_from_global_bank(1, 0, 0);
                 value_set_entry_by_index(0x1233, -1);
-                D_L18_001A903C[0] = step;
+                g_two_step_trigger_step[0] = step;
             }
         }
         break;
@@ -257,5 +257,5 @@ void robot_handle_hits(char *moby)
     *(u128 *)offset_temp = *(u128 *)offset;
     FastVecAdd(world_pos, moby + 0x10, offset_temp);
     coll_sweep_from_object(moby, world_pos, *(float *)(vars + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
-    if (*(unsigned char *)(moby + 0x20) >= 2) gfx_add_draw_callback_third(D_L18_003F9018, moby);
+    if (*(unsigned char *)(moby + 0x20) >= 2) gfx_add_draw_callback_third(g_robot_draw_callback, moby);
 }

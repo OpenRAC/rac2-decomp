@@ -7,19 +7,19 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void vec_add_random_offset(void *,float);
 extern int math_random_int_below(int);
 extern void *enemy_spawn_record(void *,void *,void *,int,int);
-extern float D_L18_001B1460 __attribute__((sda));
-extern short D_L18_001B14E8 __attribute__((sda));
-extern short D_L18_001B14B8 __attribute__((sda));
-extern float D_L18_001B1510 __attribute__((sda));
-extern float D_L18_001B1514 __attribute__((sda));
-extern float D_L18_001B151C __attribute__((sda));
-extern int D_L18_001B1518 __attribute__((sda));
-extern float D_L18_001B14A0 __attribute__((sda));
-extern float D_L18_001B14A4 __attribute__((sda));
-extern float D_L18_001B14AC __attribute__((sda));
-extern int D_L18_001B14A8 __attribute__((sda));
-extern u8 D_L18_001B14F8[16] __attribute__((sda));
-extern u8 D_L18_001B14C8[16] __attribute__((sda));
+extern float g_leader_exhaust_speed __attribute__((sda));
+extern short g_exhaust_drift_scale_alt __attribute__((sda));
+extern short g_exhaust_drift_scale __attribute__((sda));
+extern float g_exhaust_alt_speed_base __attribute__((sda));
+extern float g_exhaust_alt_speed_random __attribute__((sda));
+extern float g_exhaust_alt_jitter __attribute__((sda));
+extern int g_exhaust_alt_count __attribute__((sda));
+extern float g_exhaust_speed_base __attribute__((sda));
+extern float g_exhaust_speed_random __attribute__((sda));
+extern float g_exhaust_position_jitter __attribute__((sda));
+extern int g_exhaust_count_scale __attribute__((sda));
+extern u8 g_exhaust_particle_settings_alt[16] __attribute__((sda));
+extern u8 g_exhaust_particle_settings[16] __attribute__((sda));
 /* Sprays two kinds of exhaust particles from a spot on the object; the faster it
    moves, the more it makes. */
 void part_l18_spawn_exhaust(u8 *moby,void *offset) {
@@ -30,21 +30,21 @@ void part_l18_spawn_exhaust(u8 *moby,void *offset) {
  FastVecAdd(position,moby+0x10,position);
  qcopy(direction,moby+0xc0);
  speed=FastVecLength(*(u8 **)(moby+0x68)+0x80);
- { float r=math_random_float_range(0.0f,0.1f); speed*=5.0f; speed/=D_L18_001B1460*0.0166666675f; speed+=r; }
+ { float r=math_random_float_range(0.0f,0.1f); speed*=5.0f; speed/=g_leader_exhaust_speed*0.0166666675f; speed+=r; }
  if(speed>1.0f) speed=1.0f;
  else if(speed<0.0f) speed=0.0f;
- vec_scale_to_length(drift,direction,-D_L18_001B14E8*0.0002f);
- for(i=0;i<D_L18_001B1518;i++) {
-  vec_scale_to_length(velocity,direction,-((D_L18_001B1510+math_random_float_range(0.0f,speed*D_L18_001B1514))*0.0166666675f));
-  vec_add_random_offset(position,D_L18_001B151C);
+ vec_scale_to_length(drift,direction,-g_exhaust_drift_scale_alt*0.0002f);
+ for(i=0;i<g_exhaust_alt_count;i++) {
+  vec_scale_to_length(velocity,direction,-((g_exhaust_alt_speed_base+math_random_float_range(0.0f,speed*g_exhaust_alt_speed_random))*0.0166666675f));
+  vec_add_random_offset(position,g_exhaust_alt_jitter);
   FastVecAdd(position,position,drift);
-  enemy_spawn_record(position,velocity,D_L18_001B14F8,math_random_int_below(2),1);
+  enemy_spawn_record(position,velocity,g_exhaust_particle_settings_alt,math_random_int_below(2),1);
  }
- vec_scale_to_length(drift,direction,-D_L18_001B14B8*0.0002f);
- for(i=0;(float)i<speed*(float)D_L18_001B14A8+2.0f;i++) {
-  vec_scale_to_length(velocity,direction,-((D_L18_001B14A0+math_random_float_range(0.0f,speed*D_L18_001B14A4))*0.0166666675f));
-  vec_add_random_offset(position,D_L18_001B14AC);
+ vec_scale_to_length(drift,direction,-g_exhaust_drift_scale*0.0002f);
+ for(i=0;(float)i<speed*(float)g_exhaust_count_scale+2.0f;i++) {
+  vec_scale_to_length(velocity,direction,-((g_exhaust_speed_base+math_random_float_range(0.0f,speed*g_exhaust_speed_random))*0.0166666675f));
+  vec_add_random_offset(position,g_exhaust_position_jitter);
   FastVecAdd(position,position,drift);
-  enemy_spawn_record(position,velocity,D_L18_001B14C8,math_random_int_below(2),1);
+  enemy_spawn_record(position,velocity,g_exhaust_particle_settings,math_random_int_below(2),1);
  }
 }

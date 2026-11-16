@@ -19,15 +19,15 @@ extern SceneContextEnd D_001A63A8_3;
 typedef struct { char pad[0x12C0]; SceneObject *object; } SceneEndRoot;
 extern SceneEndRoot D_00189E20_9;
 typedef struct { char pad[0xB0]; float fade; } SceneFade;
-extern SceneFade D_001B9040;
+extern SceneFade g_view_params;
 typedef struct { char pad[0xFC]; SceneObject *object; } SceneOwnerEnd;
 extern SceneOwnerEnd g_pause_menu_state;
 /* Read at an offset from an earlier small-data name (as in 002F5220-g8.c), so
    retail never puts the load in a delay slot. */
 typedef struct { int unk0; SceneObject *moby; void *data; } SceneTalkEnd;
-extern SceneTalkEnd D_001B178C MACRO_ADDR;
-extern int D_001B15A8 __attribute__((section(".sdata")));
-extern int D_001B15AC __attribute__((section(".sdata")));
+extern SceneTalkEnd g_dialogue_talk_state MACRO_ADDR;
+extern int g_cutscene_active_flag __attribute__((section(".sdata")));
+extern int g_cutscene_letterbox_progress __attribute__((section(".sdata")));
 extern float g_screen_fade __attribute__((sda));
 extern void FadeToBlack(int);
 extern s32 UpdateSoundVoices(void);
@@ -56,9 +56,9 @@ void cutscene_end_scripted(void)
         UpdateSoundVoices(); sceGsSyncV(0);
     }
     while (snd_Pump()) {}
-    D_001B9040.fade = 0.63f;
-    D_001B15A8 = 0;
-    D_001B15AC = 0;
+    g_view_params.fade = 0.63f;
+    g_cutscene_active_flag = 0;
+    g_cutscene_letterbox_progress = 0;
     g_screen_fade = 0.0f;
     UpdateViewContext();
     for (i = 0; i < g_scene_playback_state.count; i++) {
@@ -73,7 +73,7 @@ void cutscene_end_scripted(void)
     }
     { SceneEndRoot *owner = &D_00189E20_9;
     if (owner->object) { moby_mark_spawned(owner->object); owner->object = 0; } }
-    if (D_001B178C.moby) D_001B178C.moby->flags34 &= ~1;
+    if (g_dialogue_talk_state.moby) g_dialogue_talk_state.moby->flags34 &= ~1;
     obj = g_pause_menu_state.object;
     if (obj) { obj->flags34 &= ~1; g_pause_menu_state.object = 0; }
 }

@@ -31,63 +31,63 @@ typedef struct {
     char *player;
     int field2294;
 } ResidentHeroView;
-extern u8 *D_L23_00259560[];
-extern float D_L23_001B36A0[] __attribute__((sda));
-extern float D_L23_001B36A4[] __attribute__((sda));
-extern int D_L23_001B36AC[] __attribute__((sda));
-extern int D_L23_001B3710[] __attribute__((sda));
-extern int D_L23_001B3714[] __attribute__((sda));
-extern int D_L23_001B3718[] __attribute__((sda));
-extern float D_L23_001B36C0[4] __attribute__((sda));
-extern float D_L23_001B36D0[4] __attribute__((sda));
-extern float D_L23_001B3760[4] __attribute__((sda));
-extern float D_L23_001B3770[4] __attribute__((sda));
-extern float D_L23_001B3860[4] __attribute__((sda));
-extern float D_L23_001B3880[4] __attribute__((sda));
+extern u8 *g_mothership_crowd_mobys[];
+extern float g_mothership_height_thresholds[] __attribute__((sda));
+extern float g_mothership_surface_radius[] __attribute__((sda));
+extern int g_enemy_relocate_count[] __attribute__((sda));
+extern int g_boss_player_above_flag[] __attribute__((sda));
+extern int g_boss_fight_timer[] __attribute__((sda));
+extern int g_boss_camera_timer[] __attribute__((sda));
+extern float g_player_target_point[4] __attribute__((sda));
+extern float g_boss_hit_point[4] __attribute__((sda));
+extern float g_boss_target_pos_a[4] __attribute__((sda));
+extern float g_boss_target_pos_b[4] __attribute__((sda));
+extern float g_boss_joint_world_pos[4] __attribute__((sda));
+extern float g_boss_blended_world_pos[4] __attribute__((sda));
 extern float g_camera_l23_position[];
-extern Quad D_L23_001BA870[] NOT_SDA;
-extern Quad D_L23_001C87C0 NOT_SDA;
-extern Quad D_L23_001C87D0 NOT_SDA;
-extern float D_L23_001B13D8 __attribute__((sda));
-extern float D_L23_001B13DC __attribute__((sda));
-extern float D_L23_001B13E0 __attribute__((sda));
-extern int D_L23_001B13E4 __attribute__((sda));
-extern int D_L23_001B13EC __attribute__((sda));
-extern int D_L23_001B140C __attribute__((sda));
-extern float D_L23_001B1410 __attribute__((sda));
-extern float D_L23_001B1420 __attribute__((sda));
-extern int D_L23_001B1424 __attribute__((sda));
-extern int D_L23_001B1428 __attribute__((sda));
-extern int D_L23_001B142C __attribute__((sda));
-extern int D_L23_001B1430 __attribute__((sda));
+extern Quad g_boss_part_transform_rows[] NOT_SDA;
+extern Quad g_light_effect_table NOT_SDA;
+extern Quad g_boss_part_zero_quad NOT_SDA;
+extern float g_boss_part_back_offset_scale __attribute__((sda));
+extern float g_boss_part_surface_radius_a __attribute__((sda));
+extern float g_boss_part_back_offset_scale_b __attribute__((sda));
+extern int g_boss_fade_duration_frames __attribute__((sda));
+extern int g_boss_part_was_active __attribute__((sda));
+extern int g_boss_part_mode_flag __attribute__((sda));
+extern float g_boss_drift_active_flag __attribute__((sda));
+extern float g_boss_part_third_position_scale __attribute__((sda));
+extern int g_boss_part_age_counter __attribute__((sda));
+extern int g_boss_part_timer_default __attribute__((sda));
+extern int g_boss_part_timer __attribute__((sda));
+extern int g_counter_effect_active __attribute__((sda));
 extern u8 *g_mothership_boss_moby __attribute__((sda));
-extern float D_L23_001B1488 __attribute__((sda));
-extern float D_L23_001B148C __attribute__((sda));
-extern float D_L23_001B1494 __attribute__((sda));
-extern float D_L23_001B1498 __attribute__((sda));
-extern float D_L23_001B14C4 __attribute__((sda));
-extern float D_L23_001B14C8 __attribute__((sda));
-extern float D_L23_001B14CC __attribute__((sda));
-extern float D_L23_001B14D0 __attribute__((sda));
-extern float D_L23_001B14D4 __attribute__((sda));
-extern int D_L23_001B14D8 __attribute__((sda));
-extern float D_L23_001B14E0 __attribute__((sda));
-extern float D_L23_001B14E4 __attribute__((sda));
-extern int D_L23_001B14EC __attribute__((sda));
-extern int D_L23_001B14F8 __attribute__((sda));
-extern float D_L23_001B1500 __attribute__((sda));
-extern int D_L23_001B15BC __attribute__((sda));
-extern float D_L23_001B1600 __attribute__((sda));
-extern float D_L23_001B1604 __attribute__((sda));
-extern float D_L23_001B1634 __attribute__((sda));
-extern int D_L23_001B1638 __attribute__((sda));
-extern int D_L23_001B1648 __attribute__((sda));
-extern int D_L23_001B164C __attribute__((sda));
-extern float D_L23_001B168C __attribute__((sda));
-extern int D_L23_001B1694 __attribute__((sda));
-extern float D_L23_001B36FC __attribute__((sda));
-extern int D_L23_001B3758[] __attribute__((sda));
-extern int D_L23_001B3780 __attribute__((sda));
+extern float g_boss_hero_offset_scale_a __attribute__((sda));
+extern float g_boss_hero_offset_scale_b __attribute__((sda));
+extern float g_boss_first_measure_a __attribute__((sda));
+extern float g_boss_first_measure_b __attribute__((sda));
+extern float g_boss_second_measure_a __attribute__((sda));
+extern float g_boss_second_measure_b __attribute__((sda));
+extern float g_boss_second_measure_limit __attribute__((sda));
+extern float g_boss_surface_height __attribute__((sda));
+extern float g_boss_second_measure_c __attribute__((sda));
+extern int g_boss_part_enable_value __attribute__((sda));
+extern float g_boss_timer_base_value __attribute__((sda));
+extern float g_boss_timer_value __attribute__((sda));
+extern int g_boss_part_phase_value __attribute__((sda));
+extern int g_boss_part_age_limit __attribute__((sda));
+extern float g_boss_arena_radius __attribute__((sda));
+extern int g_boss_part_sound_voice __attribute__((sda));
+extern float g_boss_joint_vec_scale __attribute__((sda));
+extern float g_boss_blend_position_length __attribute__((sda));
+extern float g_boss_timer_mode_limit __attribute__((sda));
+extern int g_boss_part_cooldown_frames __attribute__((sda));
+extern int g_boss_half_time_frames __attribute__((sda));
+extern int g_boss_part_index __attribute__((sda));
+extern float g_boss_blast_range __attribute__((sda));
+extern int g_charged_l23_blast_timer __attribute__((sda));
+extern float g_mothership_max_health __attribute__((sda));
+extern int g_boss_part_hit_counter[] __attribute__((sda));
+extern int g_boss_player_seen_flag __attribute__((sda));
 
 extern int math_fast_float_d(char *);
 extern void FastVecScale(char *, char *, float);
@@ -108,7 +108,7 @@ extern void mat_get_euler_angles(float *, float *);
 extern int PlayMobySound(int, int, char *);
 extern void snd_stop_voice(int);
 extern int moby_dispatch_action_by_kind(void *, DispatchContext *);
-extern void func_PAL_L00_002AF6C0(void);
+extern void cancel_hero_item_animation_pal(void);
 extern void release_moby_animation_slot(LvlSlotCtx *, LvlSlotNode **);
 extern void moby_store_position_private(u8 *, void *);
 extern int player_slot_has_object(unsigned int);
@@ -116,7 +116,7 @@ extern int charged_shot_get_for_owner(int);
 extern void charged_shot_release(int, int);
 extern int queue_copy_record_by_index(unsigned int);
 extern int moby_check_target_point_from_offset(char *, void *);
-extern void func_PAL_L23_004207B8(char *);
+extern void boss_turn_gun_toward_target_pal(char *);
 extern void mothership_project_point_onto_surface(char *, float);
 extern void mothership_update_gun_pick_target(char *);
 extern void mothership_tick_timers(char *);
@@ -126,15 +126,15 @@ extern void mothership_mark_held(char *);
 extern void mothership_set_timer_value(float);
 extern void mothership_disable_part_flags(char *);
 extern void mothership_free_effect_handles(void);
-extern void func_PAL_L23_004206A8(char *);
+extern void mothership_spring_second_measure_pal(char *);
 extern void mothership_clear_measure_flags(char *);
-extern void func_PAL_L23_00420578(char *);
+extern void mothership_ease_value_to_target_pal(char *);
 extern void mothership_release_effect_handles(char *);
 /* Action-helper inputs were checked against retail. Their discarded result
    declarations remain hypotheses where no deliberate result bank is observable. */
 extern void func_PAL_L23_0041C820(u8 *);
 extern void func_PAL_L23_0041D1A8(char *);
-extern void func_PAL_L23_0041D738(char *, float);
+extern void FollowWaypointPath_pal(char *, float);
 extern void func_PAL_L23_0041EDC8(char *);
 extern int func_PAL_L23_0041F0D8(char *, char *);
 extern int func_PAL_L23_0041F458(char *, char *);
@@ -146,10 +146,10 @@ extern void func_PAL_L23_004225D0(char *);
 extern void object_copy_vector_to_selected(char *);
 extern void cam_set_state_rotation(char *);
 extern void SetCamera5Pose(char *, char *, int, int, void *);
-extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
+extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern void FadeToBlack(int);
 extern void moby_copy_joint_transform_to_object(u8 *, char *, int, int);
-extern void func_PAL_L00_002B9CD8(char *, char *, int, int);
+extern void hero_reset_position_and_direction_pal(char *, char *, int, int);
 extern int func_PAL_L22_002C99C8(int, int);
 extern char *effect_create_attached(char *, char *);
 extern void build_axis_rotation_quaternion(char *, int, float);
@@ -184,32 +184,32 @@ void func_PAL_L23_0041B350(u8 *object)
     int wasActive;
 
     func_PAL_L23_0041C820(object);
-    if (D_L23_001B1424 > 200)
+    if (g_boss_part_age_counter > 200)
         return;
-    D_L23_001B1410 = 0.0f;
-    math_fast_float_d((char *)D_L23_001B3714);
+    g_boss_drift_active_flag = 0.0f;
+    math_fast_float_d((char *)g_boss_fight_timer);
     wasActive = S32(0x604);
-    D_L23_001B13EC = wasActive != 0;
+    g_boss_part_was_active = wasActive != 0;
     if (!wasActive && S32(0x60c) != -1)
-        D_L23_001B1430 = 1;
+        g_counter_effect_active = 1;
     else
-        D_L23_001B1430 = 0;
+        g_counter_effect_active = 0;
     if (!g_mothership_boss_moby)
         return;
-    func_PAL_L23_004207B8((char *)object);
+    boss_turn_gun_toward_target_pal((char *)object);
     S32(0x604) = 0;
-    FastVecScale((char *)D_L23_001B36C0, (((ResidentHeroView *)g_hero_state)->player) + 0xe0, D_L23_001B1488);
-    FastVecAdd((char *)D_L23_001B36C0, (char *)D_L23_001B36C0, ((char *)((ResidentHeroView *)g_hero_state)->position));
-    FastVecScale((char *)D_L23_001B36D0, (((ResidentHeroView *)g_hero_state)->player) + 0xe0, D_L23_001B148C);
-    FastVecAdd((char *)D_L23_001B36D0, (char *)D_L23_001B36D0, ((char *)((ResidentHeroView *)g_hero_state)->position));
+    FastVecScale((char *)g_player_target_point, (((ResidentHeroView *)g_hero_state)->player) + 0xe0, g_boss_hero_offset_scale_a);
+    FastVecAdd((char *)g_player_target_point, (char *)g_player_target_point, ((char *)((ResidentHeroView *)g_hero_state)->position));
+    FastVecScale((char *)g_boss_hit_point, (((ResidentHeroView *)g_hero_state)->player) + 0xe0, g_boss_hero_offset_scale_b);
+    FastVecAdd((char *)g_boss_hit_point, (char *)g_boss_hit_point, ((char *)((ResidentHeroView *)g_hero_state)->position));
     qcopy(state+(0x3f0),((char *)((ResidentHeroView *)g_hero_state)->position));
     mothership_project_point_onto_surface(state + 0x3f0, 0.0f);
     qcopy(state+(0x3e0),object + 0x10);
     mothership_project_point_onto_surface(state + 0x3e0, 0.0f);
     {
-        float playerHeight = gravity_get_center_distance(((char *)((ResidentHeroView *)g_hero_state)->position)) - D_L23_001B36A4[0];
+        float playerHeight = gravity_get_center_distance(((char *)((ResidentHeroView *)g_hero_state)->position)) - g_mothership_surface_radius[0];
         SF(0x5c0) = playerHeight;
-        D_L23_001B3710[0] = SF(0x588) < playerHeight;
+        g_boss_player_above_flag[0] = SF(0x588) < playerHeight;
     }
     FastVecSub(direction, state + 0x3f0, state + 0x3e0);
     SF(0x5b8) = FastVecLength(direction);
@@ -217,29 +217,29 @@ void func_PAL_L23_0041B350(u8 *object)
     SF(0x5bc) = fast_vec_dist(((char *)object + 0x10), ((char *)((ResidentHeroView *)g_hero_state)->position));
     moby_transform_joint_to_world((char *)object, 0x2a, jointOffset);
     moby_transform_joint_point((char *)object, 0x27, (char *)jointMatrix);
-    FastVecScale((char *)D_L23_001B3860, (char *)jointMatrix, D_L23_001B1600);
-    FastVecAdd((char *)D_L23_001B3860, (char *)D_L23_001B3860, jointOffset);
+    FastVecScale((char *)g_boss_joint_world_pos, (char *)jointMatrix, g_boss_joint_vec_scale);
+    FastVecAdd((char *)g_boss_joint_world_pos, (char *)g_boss_joint_world_pos, jointOffset);
     jointPosition = (char *)jointMatrix + 0x30;
-    FastVecSub(blendedPosition, (char *)D_L23_001B36C0, jointPosition);
-    vec_scale_to_length(blendedPosition, blendedPosition, D_L23_001B1604);
-    FastVecAdd((char *)D_L23_001B3880, jointPosition, blendedPosition);
+    FastVecSub(blendedPosition, (char *)g_player_target_point, jointPosition);
+    vec_scale_to_length(blendedPosition, blendedPosition, g_boss_blend_position_length);
+    FastVecAdd((char *)g_boss_blended_world_pos, jointPosition, blendedPosition);
     SB(0x404) = 0;
-    if (SF(0x5bc) < D_L23_001B1634)
-        SB(0x404) = !CollLine(D_L23_001B3880, D_L23_001B36C0, 0x10, (((ResidentHeroView *)g_hero_state)->player), 0);
-    if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0])) {
-        math_fast_float_d((char *)&D_L23_001B142C);
+    if (SF(0x5bc) < g_boss_timer_mode_limit)
+        SB(0x404) = !CollLine(g_boss_blended_world_pos, g_player_target_point, 0x10, (((ResidentHeroView *)g_hero_state)->player), 0);
+    if (!(g_boss_half_time_frames / 2 < g_enemy_relocate_count[0])) {
+        math_fast_float_d((char *)&g_boss_part_timer);
         if (object[0x20] == 7 &&
-            (!SB(0x404) || !object[0x31] || D_L23_001B14E0 + 40.0f < SF(0x5bc)) &&
-            !D_L23_001B142C && !S32(0x590)) {
-            D_L23_001B142C = D_L23_001B1428;
-            moby_set_state(D_L23_00259560[D_L23_001B164C], 6, 0);
-            D_L23_001B164C = (D_L23_001B164C + 1) % 25;
+            (!SB(0x404) || !object[0x31] || g_boss_timer_base_value + 40.0f < SF(0x5bc)) &&
+            !g_boss_part_timer && !S32(0x590)) {
+            g_boss_part_timer = g_boss_part_timer_default;
+            moby_set_state(g_mothership_crowd_mobys[g_boss_part_index], 6, 0);
+            g_boss_part_index = (g_boss_part_index + 1) % 25;
         }
     }
     SB(0x405) = 0;
     mode = object[0x20];
-    if (mode != 4 && (SF(0x5bc) < D_L23_001B1634 || mode == 16) &&
-        (SF(0x5b8) >= D_L23_001B168C || SF(0x5c0) <= SF(0x588)))
+    if (mode != 4 && (SF(0x5bc) < g_boss_timer_mode_limit || mode == 16) &&
+        (SF(0x5b8) >= g_boss_blast_range || SF(0x5c0) <= SF(0x588)))
         SB(0x405) = moby_check_target_point_from_offset((char *)object, g_hero_position);
     mode = object[0x20];
     switch (mode) {
@@ -269,40 +269,40 @@ state4:
     ((ResidentHeroView *)g_hero_state)->state1e0 = 8;
     if (flag_set_first_pending(object)) {
         mothership_free_effect_handles();
-        FadeToBlack(D_L23_001B13E4);
+        FadeToBlack(g_boss_fade_duration_frames);
     } else {
         char transform[64] __attribute__((aligned(16)));
         char secondPosition[16] __attribute__((aligned(16)));
         char thirdPosition[16] __attribute__((aligned(16)));
 
-        if (D_L23_001B13E4 / 2 < AGE) {
+        if (g_boss_fade_duration_frames / 2 < AGE) {
             func_PAL_L23_004225D0((char *)object);
-        } else if (AGE == D_L23_001B13E4 / 2 - 4) {
+        } else if (AGE == g_boss_fade_duration_frames / 2 - 4) {
             FadeToBlack(1);
-            qcopy(transform+0x00,&D_L23_001BA870[0]);
-            qcopy(transform+0x10,&D_L23_001BA870[1]);
-            qcopy(transform+0x20,&D_L23_001BA870[2]);
+            qcopy(transform+0x00,&g_boss_part_transform_rows[0]);
+            qcopy(transform+0x10,&g_boss_part_transform_rows[1]);
+            qcopy(transform+0x20,&g_boss_part_transform_rows[2]);
             qzero_nc(transform + 0x30);
             mat_get_euler_angles((float *)transform, (float *)localPosition);
             SetCamera5Pose((char *)g_camera_l23_position, localPosition, 1, 0, 0);
-        } else if (D_L23_001B13E4 / 2 - 4 < AGE) {
+        } else if (g_boss_fade_duration_frames / 2 - 4 < AGE) {
             FadeToBlack(1);
             qcopy((transform + 0x00) ,(object + 0xc0));
             qcopy((transform + 0x10) ,(object + 0xd0));
             qcopy((transform + 0x20) ,(object + 0xe0));
             qzero_nc(transform + 0x30);
             mat_get_euler_angles((float *)transform, (float *)localPosition);
-            FastVecScale(secondPosition, (char *)object + 0xc0, -D_L23_001B13E0);
+            FastVecScale(secondPosition, (char *)object + 0xc0, -g_boss_part_back_offset_scale_b);
             FastVecAdd(secondPosition, secondPosition, ((char *)object + 0x10));
             mothership_project_point_onto_surface(secondPosition, 0.0f);
-            func_PAL_L00_002B9CD8(secondPosition, localPosition, 0x6f, 0);
+            hero_reset_position_and_direction_pal(secondPosition, localPosition, 0x6f, 0);
             cam_set_state_rotation(localPosition);
-            FastVecScale(thirdPosition, (char *)object + 0xc0, -D_L23_001B13D8);
+            FastVecScale(thirdPosition, (char *)object + 0xc0, -g_boss_part_back_offset_scale);
             FastVecAdd(thirdPosition, thirdPosition, ((char *)object + 0x10));
-            mothership_project_point_onto_surface(thirdPosition, D_L23_001B13DC);
+            mothership_project_point_onto_surface(thirdPosition, g_boss_part_surface_radius_a);
             object_copy_vector_to_selected(thirdPosition);
-            qzero(&D_L23_001C87D0);
-            qzero(&D_L23_001C87C0);
+            qzero(&g_boss_part_zero_quad);
+            qzero(&g_light_effect_table);
         } else {
             FadeToBlack(1);
         }
@@ -311,8 +311,8 @@ state4:
     return;
 state2:
     if (flag_set_first_pending(object)) {
-        mothership_relatch_first_measure((char *)object, &D_L23_001B1498);
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14D0);
+        mothership_relatch_first_measure((char *)object, &g_boss_first_measure_b);
+        mothership_relatch_second_measure((char *)object, &g_boss_surface_height);
         if (!SB(0x4b1))
             AttachManipulator(object, 0x27, (u8 *)state + 0x4b0);
         SF(0x578) = 1.4726215600967407f;
@@ -320,57 +320,57 @@ state2:
     }
     goto state_default;
 state3:
-    qcopy(state+(0x3d0),D_L23_001B3760);
+    qcopy(state+(0x3d0),g_boss_target_pos_a);
     SP(0x400) = state + 0x3d0;
-    func_PAL_L23_0041D738((char *)object, SF(0x588));
+    FollowWaypointPath_pal((char *)object, SF(0x588));
     mothership_release_effect_handles((char *)object);
     moby_set_state(object, 7, 1);
     goto state_default;
 state1:
     mothership_mark_held((char *)object);
     if (flag_set_first_pending(object)) {
-        SP(0x400) = (char *)D_L23_001B3760;
-        mothership_relatch_first_measure((char *)object, &D_L23_001B1498);
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14C4);
+        SP(0x400) = (char *)g_boss_target_pos_a;
+        mothership_relatch_first_measure((char *)object, &g_boss_first_measure_b);
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_a);
     }
-    if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3760) < 10.0f)
+    if (fast_vec_dist(state + 0x3e0, (char *)g_boss_target_pos_a) < 10.0f)
         moby_set_state(object, 3, 0);
     else
-        func_PAL_L23_0041D738((char *)object, SF(0x588));
+        FollowWaypointPath_pal((char *)object, SF(0x588));
     goto state_default;
 state7:
     mothership_mark_held((char *)object);
     math_fast_float_d(state + 0x608);
     if (flag_set_first_pending(object)) {
-        mothership_relatch_first_measure((char *)object, &D_L23_001B1494);
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14C4);
-        mothership_set_timer_value(D_L23_001B14E0 + math_random_float_range(5.0f, 45.0f));
+        mothership_relatch_first_measure((char *)object, &g_boss_first_measure_a);
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_a);
+        mothership_set_timer_value(g_boss_timer_base_value + math_random_float_range(5.0f, 45.0f));
     }
     if (S32(0x60c) == -1) {
         moby_set_state(object, 6, 1);
         goto state_default;
     }
-    if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0]) && !S32(0x608)) {
-        if (D_L23_001B3758[0] % 3 == 2)
-            mothership_set_timer_value(D_L23_001B14E0);
+    if (!(g_boss_half_time_frames / 2 < g_enemy_relocate_count[0]) && !S32(0x608)) {
+        if (g_boss_part_hit_counter[0] % 3 == 2)
+            mothership_set_timer_value(g_boss_timer_base_value);
         else
-            mothership_set_timer_value(D_L23_001B14E0 + math_random_float_range(25.0f, 55.0f));
+            mothership_set_timer_value(g_boss_timer_base_value + math_random_float_range(25.0f, 55.0f));
         moby_set_state(object, 8, 1);
-        ++D_L23_001B3758[0];
+        ++g_boss_part_hit_counter[0];
     } else {
         boss_drift_along_path((char *)object);
         if (AGE % 480 == 0) {
-            if (D_L23_001B36AC[0] < 4)
-                mothership_set_timer_value(D_L23_001B14E0 + 60.0f);
+            if (g_enemy_relocate_count[0] < 4)
+                mothership_set_timer_value(g_boss_timer_base_value + 60.0f);
             else
-                mothership_set_timer_value(D_L23_001B14E0 + math_random_float_range(-4.0f, 80.0f));
+                mothership_set_timer_value(g_boss_timer_base_value + math_random_float_range(-4.0f, 80.0f));
         }
     }
     goto state_default;
 state8:
     mothership_mark_held((char *)object);
     flag_set_first_pending(object);
-    if (D_L23_001B14E4 - 6.0f <= SF(0x5b8) && SF(0x5b8) <= D_L23_001B14E4 + 6.0f)
+    if (g_boss_timer_value - 6.0f <= SF(0x5b8) && SF(0x5b8) <= g_boss_timer_value + 6.0f)
         moby_set_state(object, 9, 1);
     else
         boss_drift_along_path((char *)object);
@@ -378,25 +378,25 @@ state8:
 state9:
     if (flag_set_first_pending(object)) {
         boss_drift_along_path((char *)object);
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14C8);
-        S32(0x598) = ((s32)D_L23_001B14EC * 5 + 2) / 6;
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_b);
+        S32(0x598) = ((s32)g_boss_part_phase_value * 5 + 2) / 6;
         PlayMobySound(6, 0, (char *)object);
     } else if (S32(0x5d8)) {
         if (S32(0x598) <= 0) {
             moby_set_state(object, 10, 1);
         } else {
-            if (S32(0x598) == ((s32)D_L23_001B14EC * 5 + 2) / 6) {
+            if (S32(0x598) == ((s32)g_boss_part_phase_value * 5 + 2) / 6) {
                 int next;
                 int i;
                 PlayMobySound(0, 0, (char *)object);
-                next = D_L23_001B164C;
+                next = g_boss_part_index;
                 for (i = 0; i < 4; ++i) {
                     char jointVector[16] __attribute__((aligned(16)));
                     float matrix[16] __attribute__((aligned(16)));
                     char thirdPosition[16] __attribute__((aligned(16)));
                     char extraPosition[16] __attribute__((aligned(16)));
 
-                    enemy = (char *)D_L23_00259560[next];
+                    enemy = (char *)g_mothership_crowd_mobys[next];
                     moby_set_state((u8 *)enemy, 2, 0);
                     next = (next + 1) % 25;
                     moby_transform_joint_to_world((char *)object, i + 30, jointVector);
@@ -405,7 +405,7 @@ state9:
                     qcopy_nc(extraPosition, jointVector);
                     mothership_project_point_onto_surface(extraPosition, 0.0f);
                     FastVecSub(thirdPosition, extraPosition, state + 0x3e0);
-                    FastVecScale(thirdPosition, thirdPosition, D_L23_001B1420);
+                    FastVecScale(thirdPosition, thirdPosition, g_boss_part_third_position_scale);
                     FastVecAdd(localPosition, localPosition, thirdPosition);
                     FastVecAdd(jointVector, state + 0x3e0, localPosition);
                     mothership_project_point_onto_surface(jointVector, 0.0f);
@@ -423,8 +423,8 @@ state10:
     if (S32(0x60c) == -1)
         mothership_mark_held((char *)object);
     if (flag_set_first_pending(object))
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14C4);
-    if (SF(0x588) > D_L23_001B14CC) {
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_a);
+    if (SF(0x588) > g_boss_second_measure_limit) {
         int enable;
         int i;
         char **children;
@@ -432,7 +432,7 @@ state10:
         S32(0x598) = 0;
         S32(0x590) = 4;
         moby_set_state(object, 11, 1);
-        enable = D_L23_001B14D8;
+        enable = g_boss_part_enable_value;
         links = (char **)(state + 0x358);
         children = (char **)(state + 0x36c);
         for (i = 0; i < 5; ++i) {
@@ -453,7 +453,7 @@ state10:
     goto state_default;
 state11:
     if (flag_set_first_pending(object))
-        mothership_set_timer_value(D_L23_001B14E0);
+        mothership_set_timer_value(g_boss_timer_base_value);
     if (S32(0x60c) == -1)
         mothership_mark_held((char *)object);
     if (S32(0x5d8) && !S32(0x598) && !S32(0x590)) {
@@ -465,11 +465,11 @@ state11:
                 FLAGS(*children) |= 0x41;
             }
         }
-        S32(0x608) = D_L23_001B1638;
+        S32(0x608) = g_boss_part_cooldown_frames;
         if (object[0x31] && SB(0x404)) {
             moby_set_state(object, 13, 2);
-            D_L23_001B15BC = PlayMobySound(8, 4, (char *)object);
-            D_L23_001B140C = 0;
+            g_boss_part_sound_voice = PlayMobySound(8, 4, (char *)object);
+            g_boss_part_mode_flag = 0;
         } else {
             moby_set_state(object, 7, 1);
         }
@@ -494,9 +494,9 @@ state15:
     mothership_mark_held((char *)object);
     flag_set_first_pending(object);
     if (AGE >= 33) {
-        if (D_L23_001B15BC != -1) {
-            snd_stop_voice(D_L23_001B15BC);
-            D_L23_001B15BC = -1;
+        if (g_boss_part_sound_voice != -1) {
+            snd_stop_voice(g_boss_part_sound_voice);
+            g_boss_part_sound_voice = -1;
         }
         moby_set_state(object, 7, 1);
     }
@@ -504,26 +504,26 @@ state15:
 state12:
     if (!S32(0x598) && !S32(0x590)) {
         moby_set_state(object, 16, 2);
-        S32(0x608) = D_L23_001B1638;
+        S32(0x608) = g_boss_part_cooldown_frames;
     } else if (S32(0x590) && !S32(0x598)) {
         func_PAL_L23_0041D1A8((char *)object);
     }
     goto state_default;
 state19:
     if (flag_set_first_pending(object)) {
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14D4);
-    } else if (AGE > ((s32)D_L23_001B14F8 * 5 + 2) / 6) {
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_c);
+    } else if (AGE > ((s32)g_boss_part_age_limit * 5 + 2) / 6) {
         moby_set_state(object, 7, 0);
     }
-    if (SF(0x588) > D_L23_001B36A0[0])
+    if (SF(0x588) > g_mothership_height_thresholds[0])
         boss_drift_along_path((char *)object);
     goto state_default;
 state5:
     if (flag_set_first_pending(object)) {
-        SP(0x400) = (char *)D_L23_001B3770;
-        mothership_relatch_first_measure((char *)object, &D_L23_001B1494);
-    } else if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3770) > 1.0f) {
-        func_PAL_L23_0041D738((char *)object, SF(0x588));
+        SP(0x400) = (char *)g_boss_target_pos_b;
+        mothership_relatch_first_measure((char *)object, &g_boss_first_measure_a);
+    } else if (fast_vec_dist(state + 0x3e0, (char *)g_boss_target_pos_b) > 1.0f) {
+        FollowWaypointPath_pal((char *)object, SF(0x588));
     } else {
         moby_set_state(object, 17, 2);
     }
@@ -531,36 +531,36 @@ state5:
 state6:
     mothership_mark_held((char *)object);
     if (flag_set_first_pending(object)) {
-        SP(0x400) = (char *)D_L23_001B3760;
-        mothership_relatch_first_measure((char *)object, &D_L23_001B1494);
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14C4);
-    } else if (fast_vec_dist(state + 0x3e0, (char *)D_L23_001B3760) > 1.0f) {
-        func_PAL_L23_0041D738((char *)object, SF(0x588));
+        SP(0x400) = (char *)g_boss_target_pos_a;
+        mothership_relatch_first_measure((char *)object, &g_boss_first_measure_a);
+        mothership_relatch_second_measure((char *)object, &g_boss_second_measure_a);
+    } else if (fast_vec_dist(state + 0x3e0, (char *)g_boss_target_pos_a) > 1.0f) {
+        FollowWaypointPath_pal((char *)object, SF(0x588));
     } else {
         moby_set_state(object, 16, 2);
     }
     goto state_default;
 state16:
     if (flag_set_first_pending(object))
-        mothership_relatch_second_measure((char *)object, &D_L23_001B14D0);
-    if (D_L23_001B1500 + D_L23_001B1500 * 0.6200000047683716f < SF(0x5b8)) {
+        mothership_relatch_second_measure((char *)object, &g_boss_surface_height);
+    if (g_boss_arena_radius + g_boss_arena_radius * 0.6200000047683716f < SF(0x5b8)) {
         mothership_release_effect_handles((char *)object);
         if (!S32(0x5b0)) {
             math_fast_float_d(state + 0x608);
-            if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0]) && !S32(0x608)) {
+            if (!(g_boss_half_time_frames / 2 < g_enemy_relocate_count[0]) && !S32(0x608)) {
                 moby_set_state(object, 12, 2);
                 S32(0x598) = 0;
                 S32(0x590) = 4;
             }
         }
-    } else if (!D_L23_001B3780) {
-        if (*(float *)(*(char **)(SP(0x610) + 0x68) + 0x20) < D_L23_001B36FC ||
-            SF(0x5b8) < D_L23_001B1500 * 0.5f) {
+    } else if (!g_boss_player_seen_flag) {
+        if (*(float *)(*(char **)(SP(0x610) + 0x68) + 0x20) < g_mothership_max_health ||
+            SF(0x5b8) < g_boss_arena_radius * 0.5f) {
             func_PAL_L23_0041F840((char *)object);
-            D_L23_001B3780 = 1;
+            g_boss_player_seen_flag = 1;
         } else {
             math_fast_float_d(state + 0x608);
-            if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0]) && !S32(0x608)) {
+            if (!(g_boss_half_time_frames / 2 < g_enemy_relocate_count[0]) && !S32(0x608)) {
                 moby_set_state(object, 12, 2);
                 S32(0x598) = 0;
                 S32(0x590) = 4;
@@ -575,11 +575,11 @@ state20:
     if (moby_dispatch_action_by_kind(object, (DispatchContext *)(state + 0x140)) & 1) {
         moby_set_state(object, 4, 0);
         ((ResidentHeroView *)g_hero_state)->field2294 = 0;
-        func_PAL_L00_002AF6C0();
+        cancel_hero_item_animation_pal();
         release_moby_animation_slot((LvlSlotCtx *)(((ResidentHeroView *)g_hero_state)->player), &((ResidentHeroView *)g_hero_state)->slotList);
         ((ResidentHeroView *)g_hero_state)->slotCount = 0;
         func_PAL_L22_002C99C8(0, 1);
-        D_L23_001B1694 = 0;
+        g_charged_l23_blast_timer = 0;
         return;
     }
 state_default:
@@ -623,7 +623,7 @@ state_default:
         FLAGS(SP(0x614)) |= 0x100;
     }
     func_PAL_L23_0041EDC8((char *)object);
-    qcopy(localPosition ,D_L23_001B36C0);
+    qcopy(localPosition ,g_player_target_point);
     func_PAL_L23_0041F0D8((char *)object, localPosition);
     func_PAL_L23_0041F458((char *)object, localPosition);
     func_PAL_L23_004211C8((char *)object);
@@ -631,22 +631,22 @@ state_default:
         SP(0x40c) = effect_create_attached((char *)object, ((char *)object + 0x10));
     else
         moby_store_position_private((u8 *)SP(0x40c), ((char *)object + 0x10));
-    func_PAL_L23_004206A8((char *)object);
-    if (D_L23_001B1410 != 0.0f)
-        func_PAL_L23_00420578((char *)object);
+    mothership_spring_second_measure_pal((char *)object);
+    if (g_boss_drift_active_flag != 0.0f)
+        mothership_ease_value_to_target_pal((char *)object);
     else
         mothership_clear_measure_flags((char *)object);
-    if (player_slot_has_object((unsigned int)(((ResidentHeroView *)g_hero_state)->player)) && D_L23_001B3780 &&
-        (object[0x20] == 16 || object[0x20] == 12) && D_L23_001B1500 < SF(0x5bc)) {
+    if (player_slot_has_object((unsigned int)(((ResidentHeroView *)g_hero_state)->player)) && g_boss_player_seen_flag &&
+        (object[0x20] == 16 || object[0x20] == 12) && g_boss_arena_radius < SF(0x5bc)) {
         char *attachment = (char *)charged_shot_get_for_owner((int)(((ResidentHeroView *)g_hero_state)->player)) + 0x10;
-        height = gravity_get_center_distance(attachment) - D_L23_001B36A4[0];
-        distance = fast_vec_dist(attachment, (char *)D_L23_001B3760);
-        if (distance < D_L23_001B1500 * 0.6f && height < D_L23_001B14D0 - 2.0f) {
-            func_PAL_L00_003FB330(attachment, 0, 15, 10, 15, 15, 15, 1, 2.0f, 20.0f, 0, 0, 0, 0);
+        height = gravity_get_center_distance(attachment) - g_mothership_surface_radius[0];
+        distance = fast_vec_dist(attachment, (char *)g_boss_target_pos_a);
+        if (distance < g_boss_arena_radius * 0.6f && height < g_boss_surface_height - 2.0f) {
+            SpawnExplosion_pal(attachment, 0, 15, 10, 15, 15, 15, 1, 2.0f, 20.0f, 0, 0, 0, 0);
             charged_shot_release((int)(((ResidentHeroView *)g_hero_state)->player), 1);
         }
     }
-    math_fast_float_d((char *)&D_L23_001B3718[0]);
-    if (D_L23_001B3718[0])
+    math_fast_float_d((char *)&g_boss_camera_timer[0]);
+    if (g_boss_camera_timer[0])
         queue_copy_record_by_index(0x2b);
 }

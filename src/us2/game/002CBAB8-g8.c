@@ -2,11 +2,11 @@
 #include "names.h"
 
 extern char g_pause_menu_state[];
-extern int D_001AB7A4 __attribute__((sda));
-extern char D_0025A190[];
-extern char D_00259198[];
+extern int g_pause_widgets_active __attribute__((sda));
+extern char g_pause_page_b[];
+extern char g_menu_widget_b[];
 extern int menu_clear_saved_selection(int, int);
-extern int func_US2_002CCAA0(void);
+extern int menu_update_page_input_us2(void);
 extern void menu_refresh_unlock_icon_states(void);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 typedef struct Widget_2CAB00 {
@@ -28,14 +28,14 @@ typedef struct {
     char *previous;
 } State_2CAB00;
 
-void func_US2_002CBAB8(void)
+void menu_update_pause_widgets_us2(void)
 {
     Widget_2CAB00 **widgets = (Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xEC);
     Widget_2CAB00 *w;
     int i, openIndex, closeIndex;
-    if (D_001AB7A4) {
-        if (!((State_2CAB00 *)g_pause_menu_state)->count && ((State_2CAB00 *)g_pause_menu_state)->source == D_0025A190) menu_clear_saved_selection(0, 0);
-        if (func_US2_002CCAA0()) {
+    if (g_pause_widgets_active) {
+        if (!((State_2CAB00 *)g_pause_menu_state)->count && ((State_2CAB00 *)g_pause_menu_state)->source == g_pause_page_b) menu_clear_saved_selection(0, 0);
+        if (menu_update_page_input_us2()) {
             if (!((State_2CAB00 *)g_pause_menu_state)->count) ((State_2CAB00 *)g_pause_menu_state)->count = 1;
             return;
         }
@@ -49,7 +49,7 @@ void func_US2_002CBAB8(void)
     }
     for (i = 0; i < 14; i++) {
         if (widgets && widgets[i] && widgets[i]->update) {
-            if ((char *)widgets[i] == D_00259198) menu_refresh_unlock_icon_states();
+            if ((char *)widgets[i] == g_menu_widget_b) menu_refresh_unlock_icon_states();
             if (widgets[i]->update(widgets[i])) ((State_2CAB00 *)g_pause_menu_state)->status = ((State_2CAB00 *)g_pause_menu_state)->value == 4 ? 2 : 1;
         }
     }

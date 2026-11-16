@@ -31,8 +31,8 @@ extern void FastVecSub();
 extern void FastVecScale(void *, void *, f32);
 extern f32 fast_vec_dist();
 extern void part_kill();
-extern f32 D_001AA364 __attribute__((sda));
-extern f32 D_001AA368 __attribute__((sda));
+extern f32 g_tether_scale_a __attribute__((sda));
+extern f32 g_tether_scale_b __attribute__((sda));
 
 /* Pulls two points of an effect towards the object it is tied to. It disappears when that object is gone or the points get too close. */
 void part_update_tethered(s32 effect) {
@@ -52,12 +52,12 @@ void part_update_tethered(s32 effect) {
     FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, point_a);
     point_b = effect + 0x20;
     *(TI *)scaled = result;
-    FastVecScale(scaled, scaled, (D_001AA364 - 1.0f) + 1.0f);
+    FastVecScale(scaled, scaled, (g_tether_scale_a - 1.0f) + 1.0f);
     FastVecAdd(&result, scaled, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(effect) + (0x10))) = result;
     FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, point_b);
     *(TI *)scaled = result;
-    FastVecScale(scaled, scaled, (D_001AA368 - 1.0f) + 1.0f);
+    FastVecScale(scaled, scaled, (g_tether_scale_b - 1.0f) + 1.0f);
     FastVecAdd(&result, scaled, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(effect) + (0x20))) = result;
     if (fast_vec_dist(point_a, point_b) < 0.1f || fast_vec_dist(point_a, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10) < 1.0f) {

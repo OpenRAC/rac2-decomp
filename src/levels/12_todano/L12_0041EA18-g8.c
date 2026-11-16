@@ -2,13 +2,13 @@
 
 /* Position snapshots, height interpolation and the attached movement sound. */
 typedef int LiftQuad __attribute__((mode(TI)));
-extern u8 *D_L12_001B2F8C MACRO_ADDR;
+extern u8 *g_path_waypoint_table MACRO_ADDR;
 typedef struct {
     u8 pad[0x80]; f32 position[4];
     u8 pad90[0x33c - 0x90]; u8 *standing; s32 flags;
 } LiftPlayer;
 extern LiftPlayer g_hero_state;
-extern int D_00138324 NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
 typedef struct { u8 pad[0x74]; u8 active; u8 pad75[0x13]; u8 *owner; } LiftSound;
 extern u8 g_sound_state[];
 extern void moby_set_state(u8 *object, int animation, int frame);
@@ -43,14 +43,14 @@ void UpdateTodanoLift(u8 *object)
     case 1:
         if (!flag_is_third_pending_set(object)) break;
         if (*(int *)(data + 0x68))
-            target = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
+            target = *(float *)(g_path_waypoint_table + *(int *)(data + 0x60) * 128 + 0x38);
         else
             target = *(float *)(data + 0x78);
         if (math_fabs(target - *(float *)(object + 0x18)) < 2.0f) {
-            reference = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
+            reference = *(float *)(g_path_waypoint_table + *(int *)(data + 0x60) * 128 + 0x38);
             if (g_hero_state.standing == object && g_hero_state.flags) {
                 TryClaimNotice(8, 0x279a, 1);
-                if (D_00138324 & 0x10)
+                if (g_pad_held_flags & 0x10)
                     *(int *)(data + 0x68) = (*(int *)(data + 0x68) + 1) & 1;
             } else if (*(int *)(data + 0x68)) {
                 if (math_fabs(g_hero_state.position[2] - *(float *)(data + 0x78)) < 4.0f &&

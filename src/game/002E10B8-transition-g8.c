@@ -55,16 +55,16 @@ typedef struct {
 
 extern TransitionContext g_hero_moby_default;
 extern TransitionScene g_scene_playback_state;
-extern TransitionArchive D_001BAEC0;
+extern TransitionArchive g_loader_memory;
 extern TransitionState g_music_state;
 extern TransitionGlobals g_hero_state;
-extern char D_001B1390[] MACRO_ADDR;
-extern char D_001B2980[];
-extern char D_001B13D0[] MACRO_ADDR;
-extern int D_001B22B0;
+extern char g_cutscene_scratch_a[] MACRO_ADDR;
+extern char g_cutscene_scratch_state[];
+extern char g_cutscene_scratch_b[] MACRO_ADDR;
+extern int g_packet_buffer_size;
 extern float g_screen_fade;
-extern int D_001B15A4 __attribute__((sda));
-extern TransitionMoby *D_001B1B60;
+extern int g_screen_flash_alpha __attribute__((sda));
+extern TransitionMoby *g_moby_pool_end;
 
 extern void mem_clear(void *, int, int);
 extern void gfx_select_packet_buffer_setup(void);
@@ -92,24 +92,24 @@ void level_transition_scene_start(int mode)
     g_hero_moby_default.field8 = 0;
     g_hero_moby_default.slot = -1;
     mem_clear(&g_scene_playback_state, 0, 0x1D0);
-    mem_clear(&D_001B1390, 0, 0x40);
-    mem_clear(D_001B2980, 0, 0x40);
-    mem_clear(D_001B2980 + 0x40, 0, 0x40);
-    mem_clear(&D_001B13D0, 0, 0x40);
+    mem_clear(&g_cutscene_scratch_a, 0, 0x40);
+    mem_clear(g_cutscene_scratch_state, 0, 0x40);
+    mem_clear(g_cutscene_scratch_state + 0x40, 0, 0x40);
+    mem_clear(&g_cutscene_scratch_b, 0, 0x40);
     gfx_select_packet_buffer_setup();
 
-    offset = D_001B22B0 - 0x60000;
-    g_scene_playback_state.start = D_001BAEC0.start + offset;
-    g_scene_playback_state.end = D_001BAEC0.end + offset;
+    offset = g_packet_buffer_size - 0x60000;
+    g_scene_playback_state.start = g_loader_memory.start + offset;
+    g_scene_playback_state.end = g_loader_memory.end + offset;
     g_screen_fade = 1.0f;
-    D_001B22B0 = offset;
-    D_001B15A4 = 0;
+    g_packet_buffer_size = offset;
+    g_screen_flash_alpha = 0;
     stub_empty_8(0x61, 2);
     g_hero_state.flag = 1;
     stub_empty_3();
 
     object = g_hero_moby_default.object;
-    p = D_001B1B60;
+    p = g_moby_pool_end;
     object->flags |= 1;
     for (; p->status != 255; p++) {
         if (!(p->status & 0x80) && (p->type == 0x4A /* moby class 74 */ || p->type == MOBY_CLASS_DECOY))

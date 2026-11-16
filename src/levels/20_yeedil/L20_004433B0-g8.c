@@ -4,9 +4,9 @@ extern int moby_is_first_state(char *);
 extern unsigned int moby_get_targeted_flag(char *);
 extern int moby_is_state_six(char *);
 extern float vec_distance_xy(void *, void *);
-extern char *D_L20_001B2F9C;
-extern unsigned short *D_L20_001FBB20[];
-extern int D_L20_001B2FB8 __attribute__((sda));
+extern char *g_group_l20_member_table;
+extern unsigned short *g_group_l20_id_lists[];
+extern int g_group_count __attribute__((sda));
 
 /* Returns the object at state+0x238 unless func_L03_003CA138 or func_L20_00449AD8 rejects
    it; then the member of the group at state+0x218 nearest to this object (within 200,
@@ -16,7 +16,7 @@ extern int D_L20_001B2FB8 __attribute__((sda));
 char *yeedil_boss_find_group_target(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    char *candidate = D_L20_001B2F9C + (*(int *)(state + 0x238) << 8);
+    char *candidate = g_group_l20_member_table + (*(int *)(state + 0x238) << 8);
     char *best;
     unsigned short *p;
     char *e;
@@ -27,11 +27,11 @@ char *yeedil_boss_find_group_target(char *object)
     }
     best = 0;
     closest = 200.0f;
-    for (p = D_L20_001FBB20[*(int *)(state + 0x218)];
-         (*(int *)(state + 0x218) & 0xFF) != 0xFF && *(int *)(state + 0x218) <= D_L20_001B2FB8 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L20_001FBB20[*(int *)(state + 0x218)]);
+    for (p = g_group_l20_id_lists[*(int *)(state + 0x218)];
+         (*(int *)(state + 0x218) & 0xFF) != 0xFF && *(int *)(state + 0x218) <= g_group_count && p != 0 &&
+         ((p != 0 && (short)p[-1] >= 0) || p == g_group_l20_id_lists[*(int *)(state + 0x218)]);
          p++) {
-        e = D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
+        e = g_group_l20_member_table + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
         if (!moby_is_state_six(e)) {

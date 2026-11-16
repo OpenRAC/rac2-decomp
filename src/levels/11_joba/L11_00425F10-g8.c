@@ -5,21 +5,21 @@ extern void *g_group_id_lists[];
 /* Reached with `lw $a2,0x45AC($gp)`, so this unit is built -G8. */
 extern u8 *g_moby_l11_table;
 
-extern s32 D_L11_001AED04;
+extern s32 g_active_rider_count;
 extern f32 coll_probe_ground_height_below(void *, s32, f32);
 extern s32 FloatToInt(f32);
 extern s32 path_build_route_nodes(void *, s32, void *, s32);
 extern void STUB_printf(void *, ...);
-extern char D_L11_001B1008[];
+extern char g_str_jobian_lieutenant_debug[];
 extern f32 math_random_signed_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
 extern void moby_set_flag_bit(void *, s32);
 /* Void: no direct call reads $v0, and a void definition matches every place. */
 extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 
-extern char D_L11_002BADF8[];
-extern char D_L11_001BA8C0[];
-extern s32 D_L11_001AED00, D_L11_001B35B8, D_L11_001B30C8;
+extern char g_str_debug_lieutenant[];
+extern char g_hero_l11_position[];
+extern s32 g_enemy_spawn_enabled, g_tribe_group_limit, g_arena_progress_level;
 extern u8 *CreateMoby(s32);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *, s32, s32);
@@ -52,7 +52,7 @@ s32 jobian_lieutenant_update(u8 *object) {
     u8 *data = *(u8 **)(object + 0x68);
     if (object[0x20] == 0) {
         object[0x30] = 0x80;
-        D_L11_001AED04++;
+        g_active_rider_count++;
         *(s32 *)(data + 0x5B0) = 0;
         *(void **)(data + 0x18) = data + 0x140;
         *(f32 *)(object + 0x18) = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
@@ -63,7 +63,7 @@ s32 jobian_lieutenant_update(u8 *object) {
         data[0x4A] = FloatToInt(14.0f);
         if (*(s32 *)(data + 0x528)) {
             *(s32 *)(data + 0x520) = path_build_route_nodes(object, *(s32 *)(data + 0x524), data + 0x320, 16);
-            STUB_printf(D_L11_001B1008, *(s32 *)(data + 0x520));
+            STUB_printf(g_str_jobian_lieutenant_debug, *(s32 *)(data + 0x520));
         }
         if (*(f32 *)(data + 0x298) == 0.0f)
             *(f32 *)(data + 0x298) = math_random_signed_float_range(15.0f, 25.0f) * 0.01745329424738884f;
@@ -140,7 +140,7 @@ s32 jobian_lieutenant_update(u8 *object) {
                 moby_copy_joint_transform_to_object(object, *(u8 **)(data + 0x278), 1, 0);
                 *(s32 *)(data + 0x290) = 0;
             } else {
-                STUB_printf(D_L11_002BADF8);
+                STUB_printf(g_str_debug_lieutenant);
                 *(s32 *)(data + 0x26C) = 0;
                 moby_set_state(object, 4, 0);
                 return 1;
@@ -187,7 +187,7 @@ s32 jobian_lieutenant_update(u8 *object) {
         *(f32 *)(data + 0x12C) = 8.0f;
         *(f32 *)(data + 0x130) = 10.0f;
     }
-    if (object[0x31] && fast_vec_dist(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+    if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_l11_position) < 24.0f) {
         moby_update_ground_check(object);
         object[0x6F] = 22;
     }
@@ -233,7 +233,7 @@ s32 jobian_lieutenant_update(u8 *object) {
         if (attacker) {
             s32 cls = *(s16 *)(attacker + 0xAA);
             if (cls != 0x47 /* moby class 71 */ && cls != 0xDD9 /* moby class 3545 */ && cls != 0xD1B /* moby class 3355 */ && cls != 0xCE7 /* moby class 3303 */ && cls != MOBY_CLASS_JOBIAN_SAUR_BEAST && cls != 0)
-                D_L11_001AED00 = 0;
+                g_enemy_spawn_enabled = 0;
         }
         if (object[0xBC] == 1)
             (g_moby_l11_table + (*(s32 *)(data + 0x548) << 8))[0x20] = 4;
@@ -255,7 +255,7 @@ s32 jobian_lieutenant_update(u8 *object) {
         data[0x57] = 0xD2;
         gfx_start_color_fade(object, data + 0x50);
         if (object[0x95] != 2) MarkGroupClassCF5CF6Members(object);
-        if ((u32)(damage - 4) < 2 && D_L11_001B35B8 >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
+        if ((u32)(damage - 4) < 2 && g_tribe_group_limit >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
             ids = g_group_id_lists[object[0x21]];
             do {
                 u8 *entry = g_moby_l11_table + ((*ids & 0x7FFF) << 8);
@@ -272,10 +272,10 @@ s32 jobian_lieutenant_update(u8 *object) {
         *(f32 *)(object + 0x18) -= 0.313333333f;
         if (*(f32 *)(object + 0x18) < floor) *(f32 *)(object + 0x18) = floor;
     }
-    if (*(f32 *)(object + 0x18) < 61.0f && D_L11_001B30C8 >= 6) {
+    if (*(f32 *)(object + 0x18) < 61.0f && g_arena_progress_level >= 6) {
         moby_mark_spawned(*(void **)(data + 0x278));
         SetDeathBits(object, 0, 3);
-        if (D_L11_001B35B8 >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
+        if (g_tribe_group_limit >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
             u16 *deathIds = g_group_id_lists[object[0x21]];
             do {
                 u8 *entry = g_moby_l11_table + ((*deathIds & 0x7FFF) << 8);
@@ -290,7 +290,7 @@ s32 jobian_lieutenant_update(u8 *object) {
             moby_mark_spawned(*(void **)(data + 0x29C));
             *(void **)(data + 0x29C) = 0;
         }
-        D_L11_001AED04--;
+        g_active_rider_count--;
         return 1;
     }
     return 0;
@@ -343,10 +343,10 @@ extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 /* The two uv columns: macro-addressed tables, so each base is one la. */
-extern float D_L11_001B1138[] __attribute__((sda));
-extern float D_L11_001B113C[] __attribute__((sda));
+extern float g_saur_beast_beam_uv_u[] __attribute__((sda));
+extern float g_saur_beast_beam_uv_v[] __attribute__((sda));
 
 /* The quad between the two end points at +0x230 and +0x240: each side
    is pulled a tenth of the way toward the level's anchor, then the four
@@ -360,8 +360,8 @@ void saur_beast_draw_beam_quad(char *obj, void *q)
     quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
     FastVecSub(quad_frame.c, vars + 0x230, vars + 0x240);
-    FastVecSub(quad_frame.a, vars + 0x230, D_L11_001BA8C0);
-    FastVecSub(quad_frame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecSub(quad_frame.a, vars + 0x230, g_hero_l11_position);
+    FastVecSub(quad_frame.b, vars + 0x240, g_hero_l11_position);
     FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
     vec_scale_to_length(quad_frame.a, quad_frame.a, 0.1f);
     FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
@@ -372,8 +372,8 @@ void saur_beast_draw_beam_quad(char *obj, void *q)
     quad_frame.quad.primitive = 0;
     quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = 0x2F0000FF;
     for (i = 0; i < 4; i++) {
-        quad_frame.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        quad_frame.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quad_frame.quad.uv[i][0] = g_saur_beast_beam_uv_u[i * 2];
+        quad_frame.quad.uv[i][1] = g_saur_beast_beam_uv_v[i * 2];
     }
     FastVecSub(&quad_frame.corner, vars + 0x230, quad_frame.a);
     quad_frame.quad.position[0] = quad_frame.corner;
@@ -386,10 +386,10 @@ void saur_beast_draw_beam_quad(char *obj, void *q)
     draw_world_quad(&quad_frame.quad, 0, 0);
 }
 
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 /* The two uv columns: macro-addressed tables, so each base is one la. */
-extern float D_L11_001B1138[] __attribute__((sda));
-extern float D_L11_001B113C[] __attribute__((sda));
+extern float g_saur_beast_beam_uv_u[] __attribute__((sda));
+extern float g_saur_beast_beam_uv_v[] __attribute__((sda));
 
 /* The quad between the two end points at +0x230 and +0x240: each side
    is pulled a twentieth of the way toward the level's anchor, then the four
@@ -403,8 +403,8 @@ void saur_beast_draw_beam_quad_overlay(char *obj, void *q)
     quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
     FastVecSub(quad_frame.c, vars + 0x230, vars + 0x240);
-    FastVecSub(quad_frame.a, vars + 0x230, D_L11_001BA8C0);
-    FastVecSub(quad_frame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecSub(quad_frame.a, vars + 0x230, g_hero_l11_position);
+    FastVecSub(quad_frame.b, vars + 0x240, g_hero_l11_position);
     FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
     vec_scale_to_length(quad_frame.a, quad_frame.a, 0.05f);
     FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
@@ -415,8 +415,8 @@ void saur_beast_draw_beam_quad_overlay(char *obj, void *q)
     quad_frame.quad.primitive = 0;
     quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = 0x2FFFFFFF;
     for (i = 0; i < 4; i++) {
-        quad_frame.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        quad_frame.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quad_frame.quad.uv[i][0] = g_saur_beast_beam_uv_u[i * 2];
+        quad_frame.quad.uv[i][1] = g_saur_beast_beam_uv_v[i * 2];
     }
     FastVecSub(&quad_frame.corner, vars + 0x230, quad_frame.a);
     quad_frame.quad.position[0] = quad_frame.corner;

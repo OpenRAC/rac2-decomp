@@ -15,7 +15,7 @@ typedef struct {
     char pad28[8];
 } Ring_0031E560;
 
-extern Ring_0031E560 *D_001B2754[] __attribute__((sda));
+extern Ring_0031E560 *g_glow_ring_entries[] __attribute__((sda));
 extern float IntToFloat(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
@@ -36,7 +36,7 @@ void glow_ring_emit_beams(char *object)
     int i;
 
     for (i = 0; i < 64; i++) {
-        e = (Ring_0031E560 *)(i * 0x30 + (int)D_001B2754[0]);
+        e = (Ring_0031E560 *)(i * 0x30 + (int)g_glow_ring_entries[0]);
         if (e->owner != object)
             continue;
         e->angle = 6.2831855f - IntToFloat(e->step) * 6.2831855f / IntToFloat(e->steps - 1);

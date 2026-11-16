@@ -10,19 +10,19 @@ extern int flag_set_first_pending(void *);
 extern char *museum_tweak_menu_spawn(void *);
 extern void MuseumTweakMenuAddItem(void *, void *, void *, int, int, int);
 extern char g_hero_position[];
-extern long D_00138320;
-extern char D_L30_001B1E28[];
-extern char D_L30_001B1E30[];
-extern char D_L30_001B1E48[];
-extern char D_L30_001B1E60[];
-extern char D_L30_001B1E78[];
-extern char D_L30_001B1E90[];
-extern char D_L30_001B1EA0[];
-extern char D_L30_001B1EA8[];
-extern char D_L30_001B1EB0[];
-extern char D_L30_001B1EB8[];
-extern char D_L30_001B1ED0[];
-extern char D_L30_001B1EE0[];
+extern long g_pad_pressed_flags;
+extern char g_str_tweak_toggle_label[];
+extern char g_str_tweak_value_label_a[];
+extern char g_str_tweak_value_label_b[];
+extern char g_str_tweak_value_label_c[];
+extern char g_str_tweak_value_label_d[];
+extern char g_str_tweak_value_label_e[];
+extern char g_str_tweak_color_label_a[];
+extern char g_str_tweak_color_label_b[];
+extern char g_str_tweak_color_label_c[];
+extern char g_str_tweak_flag_label_a[];
+extern char g_str_tweak_flag_label_b[];
+extern char g_str_tweak_flag_label_c[];
 char *func_PAL_L30_0041A748(void *, float, int, int, int, int, int, int, int, int, int, int);
 
 /* func_L30_00413528 is defined in L30_00413528.c. */
@@ -42,7 +42,7 @@ void func_PAL_L30_0041A400(char *obj) {
     case 1:
         if (*(int *)(st + 0x3C) != -1 && IsPointInCuboid(g_hero_position, *(int *)(st + 0x3C))) {
             ForceClaimNotice(1, 0x1338, 1);
-            buttons = D_00138320;
+            buttons = g_pad_pressed_flags;
             buttons &= 3;
             if (buttons == 3) moby_set_state(obj, 2, -1);
         }
@@ -50,18 +50,18 @@ void func_PAL_L30_0041A400(char *obj) {
     case 2:
         if (flag_set_first_pending(obj)) {
             *(char **)(st + 0x2C) = museum_tweak_menu_spawn(obj);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 4, D_L30_001B1E28, 1, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 12, D_L30_001B1E30, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 16, D_L30_001B1E48, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 20, D_L30_001B1E60, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 24, D_L30_001B1E78, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 28, D_L30_001B1E90, 0, 0, 50);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 32, D_L30_001B1EA0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 36, D_L30_001B1EA8, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 40, D_L30_001B1EB0, 0, 0, 255);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 48, D_L30_001B1EB8, 0, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 52, D_L30_001B1ED0, 0, 0, 1);
-            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 8, D_L30_001B1EE0, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 4, g_str_tweak_toggle_label, 1, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 12, g_str_tweak_value_label_a, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 16, g_str_tweak_value_label_b, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 20, g_str_tweak_value_label_c, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 24, g_str_tweak_value_label_d, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 28, g_str_tweak_value_label_e, 0, 0, 50);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 32, g_str_tweak_color_label_a, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 36, g_str_tweak_color_label_b, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 40, g_str_tweak_color_label_c, 0, 0, 255);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 48, g_str_tweak_flag_label_a, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 52, g_str_tweak_flag_label_b, 0, 0, 1);
+            MuseumTweakMenuAddItem(*(void **)(st + 0x2C), st + 8, g_str_tweak_flag_label_c, 0, 0, 1);
 
         }
         ForceClaimNotice(1, 0, 1);
@@ -123,7 +123,7 @@ char *func_PAL_L30_0041A748(void *pos, float scale, int shake, int a2, int a3, i
         *(unsigned char *)(obj + 0x20) = 0;
         qcopy(obj + 0x10, pos);
         *(float *)(obj + 0x1C) = 1.0f;
-        FastVecSub(direction, D_L30_001B9C80.position, obj + 0x10);
+        FastVecSub(direction, g_camera_l30_state.position, obj + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(obj + 0x10, normal, 1);
         qcopy(obj + 0xC0, direction);
@@ -149,15 +149,15 @@ char *func_PAL_L30_0041A748(void *pos, float scale, int shake, int a2, int a3, i
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             st->duration = 8;
             st->strength = 0.125f;
-            if (fast_vec_dist(pos, D_L30_001B9C80.position) < 48.0f && shake) {
-                D_L30_001B9C80.shakeTimer = 0;
-                D_L30_001B9C80.shakeDuration = 33;
-                D_L30_001B9C80.shakeStrength = 0.075f;
+            if (fast_vec_dist(pos, g_camera_l30_state.position) < 48.0f && shake) {
+                g_camera_l30_state.shakeTimer = 0;
+                g_camera_l30_state.shakeDuration = 33;
+                g_camera_l30_state.shakeStrength = 0.075f;
             }
             if (st->sound) {
-                FastVecSub(towardPlayer, obj + 0x10, D_L30_001B9C80.position);
+                FastVecSub(towardPlayer, obj + 0x10, g_camera_l30_state.position);
                 vec_scale_to_length(towardPlayer, towardPlayer, 1.0f);
-                if (1.5707963705062866f - math_fast_angle_helper(FastVecDot(towardPlayer, D_L30_001B9C80.forward)) < 0.45378565788269043f)
+                if (1.5707963705062866f - math_fast_angle_helper(FastVecDot(towardPlayer, g_camera_l30_state.forward)) < 0.45378565788269043f)
                     st->sound = 1;
                 else
                     st->sound = 0;

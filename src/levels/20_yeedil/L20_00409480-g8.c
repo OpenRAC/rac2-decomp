@@ -5,11 +5,11 @@
    D_L20_001FBB20[arg0] lands in $a1 instead of $v1, and the loads of D_L20_001B2FB8
    come out split instead of absolute). */
 
-extern char *D_L20_001FBB20[];
+extern char *g_group_l20_id_lists[];
 
-extern int D_L20_001B2FB8;
+extern int g_group_count;
 
-extern char *D_L20_001B2F9C;
+extern char *g_group_l20_member_table;
 
 extern void shared_counter_release(char *);
 
@@ -19,21 +19,21 @@ extern void moby_mark_spawned(void *);
 
 /* Destroys every Megacorp Trooper Legs object in the given group. */
 void trooper_legs_destroy_group(s32 group) {
-    char *id_list = D_L20_001FBB20[group];
+    char *id_list = g_group_l20_id_lists[group];
     s32 group_byte = group & 0xFF;
     char *member;
 
     if (group_byte == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < group) {
+    if (g_group_count < group) {
         goto end;
     }
     if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        member = D_L20_001B2F9C + ((*(u16 *)id_list & 0x7FFF) << 8);
+        member = g_group_l20_member_table + ((*(u16 *)id_list & 0x7FFF) << 8);
 
         if (member == 0) {
             goto end;
@@ -52,7 +52,7 @@ void trooper_legs_destroy_group(s32 group) {
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < group) {
+        if (g_group_count < group) {
             goto end;
         }
         if (id_list == 0) {
@@ -61,7 +61,7 @@ void trooper_legs_destroy_group(s32 group) {
         if (*(s16 *)(id_list - 2) >= 0) {
             continue;
         }
-        if (id_list == D_L20_001FBB20[group]) {
+        if (id_list == g_group_l20_id_lists[group]) {
             continue;
         }
         break;

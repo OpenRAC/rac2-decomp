@@ -1,7 +1,7 @@
 #include "common.h"
 extern char g_hero_position[];
 extern char *g_path_l17_table[];
-extern float D_L17_001B0344 __attribute__((sda));
+extern float g_platform_move_speed __attribute__((sda));
 extern int func_003221C8(void *, int);
 extern float func_002EF0B0(void *, void *);
 extern float func_002EF590(float, float);
@@ -56,7 +56,7 @@ void ride_platform_select_entry(char *self) {
             moby->choice = i;
             moby->state = 2;
             moby->timer = 0x80;
-            data->cooldown = D_L17_001B0344 * 0.0166666675f;
+            data->cooldown = g_platform_move_speed * 0.0166666675f;
             data->active = 1;
             data->current = -1;
             return;

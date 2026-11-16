@@ -20,22 +20,22 @@ typedef struct { s16 a; s16 b; } Pair;
 typedef struct { float angle; s32 fix; } Vars;
 
 extern u8 *g_mothership_boss_moby MACRO_ADDR;
-extern s32 D_L23_001B1480 MACRO_ADDR;
-extern float D_L23_001B1470 MACRO_ADDR;
-extern s32 D_L23_001B1474 MACRO_ADDR;
-extern float D_L23_001B1478 MACRO_ADDR;
-extern s32 D_L23_001B147C MACRO_ADDR;
-extern float D_L23_001B39D8 MACRO_ADDR;
-extern s32 D_L23_001B1C68 __attribute__((sda));
-extern s32 D_L23_001B1C6C __attribute__((sda));
-extern s32 D_L23_001B1C70 __attribute__((sda));
-extern s32 D_L23_001B1C74 __attribute__((sda));
-extern s32 D_L23_001B1C7C __attribute__((sda));
-extern s32 D_L23_001B1C80 __attribute__((sda));
-extern float D_L23_001B1C84 __attribute__((sda));
-extern float D_L23_002A7F50[][4];
-extern float D_L23_002A8460[][2];
-extern Pair D_L23_002A81E0[][4];
+extern s32 g_spinning_quad_turn_speed MACRO_ADDR;
+extern float g_mothership_scale_factor MACRO_ADDR;
+extern s32 g_spinning_quad_period MACRO_ADDR;
+extern float g_spinning_quad_alpha_scale MACRO_ADDR;
+extern s32 g_spinning_quad_alpha_base MACRO_ADDR;
+extern float g_spinning_quad_scale MACRO_ADDR;
+extern s32 g_quad_alpha_a __attribute__((sda));
+extern s32 g_quad_alpha_b __attribute__((sda));
+extern s32 g_quad_alpha_c __attribute__((sda));
+extern s32 g_quad_alpha_d __attribute__((sda));
+extern s32 g_quad_effect_texture __attribute__((sda));
+extern s32 g_quad_l23_color __attribute__((sda));
+extern float g_quad_l23_depth __attribute__((sda));
+extern float g_spinning_quad_vertices[][4];
+extern float g_spinning_quad_uvs[][2];
+extern Pair g_spinning_quad_corner_pairs[][4];
 
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
@@ -67,19 +67,19 @@ void gfx_draw_spinning_quad_table(u8 *obj) {
 
     if (g_mothership_boss_moby != 0) {
         payload = *(Vars **)(obj + 0x68);
-        D_L23_001B39D8 = D_L23_001B1470 * 1.1f;
-        payload->angle = FastAddRotations(payload->angle, (float)D_L23_001B1480 * 0.00029088825f);
-        n = D_L23_001B1474;
+        g_spinning_quad_scale = g_mothership_scale_factor * 1.1f;
+        payload->angle = FastAddRotations(payload->angle, (float)g_spinning_quad_turn_speed * 0.00029088825f);
+        n = g_spinning_quad_period;
         wave = math_fast_sin_or_cos_b((float)(s32)(*(u16 *)(obj + 0x96) % n) * (1.0f / (float)n) * 3.1415927f);
-        fix = D_L23_001B147C;
+        fix = g_spinning_quad_alpha_base;
         base = fix;
-        fix = (s32)(wave * D_L23_001B1478) + base;
+        fix = (s32)(wave * g_spinning_quad_alpha_scale) + base;
         payload->fix = fix;
-        alpha = (u64)D_L23_001B1C68 | ((u64)D_L23_001B1C6C << 2);
-        alpha |= (u64)D_L23_001B1C70 << 4;
-        alpha |= (u64)D_L23_001B1C74 << 6;
+        alpha = (u64)g_quad_alpha_a | ((u64)g_quad_alpha_b << 2);
+        alpha |= (u64)g_quad_alpha_c << 4;
+        alpha |= (u64)g_quad_alpha_d << 6;
         q.w[3] = alpha | ((u64)payload->fix << 32);
-        q.w[1] = GetEffectTextureDescriptor(D_L23_001B1C7C);
+        q.w[1] = GetEffectTextureDescriptor(g_quad_effect_texture);
         q.w[2] = 0xFF9000000260ULL;
         q.w[0] = 0;
         VU1_addGSregister(0x47, 0x53001);
@@ -92,7 +92,7 @@ void gfx_draw_spinning_quad_table(u8 *obj) {
         qcopy_nc(v3, g_mothership_boss_moby + 0x10);
         *(TI128 *)v4 = 0;
         v4[3] = 1.0f;
-        v4[2] = D_L23_001B1C84;
+        v4[2] = g_quad_l23_depth;
         *(TI128 *)v5 = *(TI128 *)v4;
         func_L22_002F3B38(v5, v5, g_mothership_boss_moby + 0xE0);
         FastVecAdd(v3, g_mothership_boss_moby + 0x10, v5);
@@ -101,16 +101,16 @@ void gfx_draw_spinning_quad_table(u8 *obj) {
         euler_rotation_basis(x, v4);
         multiply_matrix3x3(m, m, x);
         v3[3] = 1.0f;
-        q.c[3] = D_L23_001B1C80;
-        q.c[2] = D_L23_001B1C80;
-        q.c[1] = D_L23_001B1C80;
-        q.c[0] = D_L23_001B1C80;
+        q.c[3] = g_quad_l23_color;
+        q.c[2] = g_quad_l23_color;
+        q.c[1] = g_quad_l23_color;
+        q.c[0] = g_quad_l23_color;
         for (i = 0; i < 40; i++) {
             for (j = 0; j < 4; j++) {
-                uv = D_L23_002A81E0[i][j].b;
-                FastVecScale(D_L23_001B39D8, &q.v[j], D_L23_002A7F50[D_L23_002A81E0[i][j].a]);
-                q.uv[j][0] = D_L23_002A8460[uv][0];
-                q.uv[j][1] = D_L23_002A8460[uv][1];
+                uv = g_spinning_quad_corner_pairs[i][j].b;
+                FastVecScale(g_spinning_quad_scale, &q.v[j], g_spinning_quad_vertices[g_spinning_quad_corner_pairs[i][j].a]);
+                q.uv[j][0] = g_spinning_quad_uvs[uv][0];
+                q.uv[j][1] = g_spinning_quad_uvs[uv][1];
             }
             draw_world_quad(&q, m, 0);
         }

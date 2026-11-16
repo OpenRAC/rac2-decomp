@@ -5,7 +5,7 @@
    name) reaches, as a one-instruction form.  The `sda` declaration is what makes cc1
    emit the bare symbol operand and the `.extern` the assembler needs. */
 
-extern s32 D_L08_001B1FA8 __attribute__((sda));
+extern s32 g_saved_entity_count __attribute__((sda));
 
 extern s32 moby_count_of_class(s32);
 
@@ -17,7 +17,7 @@ s32 level_get_saved_count(void)
     s32 second = moby_count_of_class(MOBY_CLASS_DESERT_DUNE_MONSTER);
     s32 sum = first + second + moby_count_of_class(0x8C4 /* moby class 2244 */);
 
-    D_L08_001B1FA8 = sum;
+    g_saved_entity_count = sum;
     return sum;
 }
 
@@ -36,7 +36,7 @@ typedef struct {
     s32 pad[3];
 } L08Target;
 
-extern L08Target D_L08_001B3490[3] MACRO_ADDR;
+extern L08Target g_lock_on_targets[3] MACRO_ADDR;
 
 /* A 0x40-byte pool entry from func_L00_002D70A0; its position vector is at 0x20. */
 typedef struct {
@@ -59,15 +59,15 @@ typedef struct {
 } L08Player;
 
 extern L08Player g_hero_state;
-extern L08Marker *D_L08_001B0318 __attribute__((sda));
-extern s32 D_L08_001B02FC __attribute__((sda));
-extern float D_L08_001B0300 __attribute__((sda));
-extern float D_L08_001B0304 __attribute__((sda));
-extern float D_L08_001B0308 __attribute__((sda));
-extern float D_L08_001B0310 __attribute__((sda));
-extern float D_L08_001B0314 __attribute__((sda));
-extern TI128 D_L08_001B9B00;
-extern s32 D_L08_001B258C MACRO_ADDR;
+extern L08Marker *g_lock_on_marker __attribute__((sda));
+extern s32 g_lock_on_hold_frames __attribute__((sda));
+extern float g_lock_on_offset_radius __attribute__((sda));
+extern float g_lock_on_marker_x_a __attribute__((sda));
+extern float g_lock_on_marker_x_b __attribute__((sda));
+extern float g_lock_on_marker_xc __attribute__((sda));
+extern float g_lock_on_marker_x8 __attribute__((sda));
+extern TI128 g_hero_position_vec;
+extern s32 g_lock_on_state MACRO_ADDR;
 
 extern void *memset(void *, int, unsigned int);
 extern int IsPointInCuboid(void *, int);
@@ -101,16 +101,16 @@ void lock_on_target_tracker_update(u8 *moby)
 
     switch (moby[0x20]) {
     case 0:
-        memset(&D_L08_001B3490[0], 0, 48);
-        memset(&D_L08_001B3490[1], 0, 48);
-        memset(&D_L08_001B3490[2], 0, 48);
-        D_L08_001B3490[0].dist = 100000.0f;
-        D_L08_001B3490[0].unk18 = 65535;
-        D_L08_001B3490[1].dist = 100000.0f;
-        D_L08_001B3490[1].unk18 = 65535;
-        D_L08_001B3490[2].dist = 100000.0f;
-        D_L08_001B3490[2].unk18 = 65535;
-        D_L08_001B0318 = 0;
+        memset(&g_lock_on_targets[0], 0, 48);
+        memset(&g_lock_on_targets[1], 0, 48);
+        memset(&g_lock_on_targets[2], 0, 48);
+        g_lock_on_targets[0].dist = 100000.0f;
+        g_lock_on_targets[0].unk18 = 65535;
+        g_lock_on_targets[1].dist = 100000.0f;
+        g_lock_on_targets[1].unk18 = 65535;
+        g_lock_on_targets[2].dist = 100000.0f;
+        g_lock_on_targets[2].unk18 = 65535;
+        g_lock_on_marker = 0;
         moby[0x20] = 1;
         return;
     case 1:
@@ -118,61 +118,61 @@ void lock_on_target_tracker_update(u8 *moby)
     default:
         return;
     }
-    if (*vars != -1 && IsPointInCuboid(&D_L08_001B9B00, *vars))
-        D_L08_001B258C = 2;
+    if (*vars != -1 && IsPointInCuboid(&g_hero_position_vec, *vars))
+        g_lock_on_state = 2;
     if (g_hero_state.mode == 0x31 && (vehicle = g_hero_state.vehicle) != 0) {
-        vec_build_spherical_offset(offset, D_L08_001B0300, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
-        FastVecAdd(&D_L08_001B3490[0].pos, offset, g_hero_state.vehicle + 0x10);
-        if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = cam_alloc_override_slot(5);
-            if (D_L08_001B0318 == 0)
+        vec_build_spherical_offset(offset, g_lock_on_offset_radius, *(float *)(vehicle + 0xF8), -*(float *)(vehicle + 0xF4) * 0.5f);
+        FastVecAdd(&g_lock_on_targets[0].pos, offset, g_hero_state.vehicle + 0x10);
+        if (g_lock_on_marker == 0) {
+            g_lock_on_marker = cam_alloc_override_slot(5);
+            if (g_lock_on_marker == 0)
                 goto shift;
         }
         if (*(s16 *)(g_hero_state.vehicle + 0xAA) == MOBY_CLASS_GLIDER) {
-            D_L08_001B0318->x0 = D_L08_001B0304;
-            D_L08_001B0318->xC = -1.0f;
-            D_L08_001B0318->x8 = -1.0f;
+            g_lock_on_marker->x0 = g_lock_on_marker_x_a;
+            g_lock_on_marker->xC = -1.0f;
+            g_lock_on_marker->x8 = -1.0f;
         } else {
-            D_L08_001B0318->x0 = D_L08_001B0308;
-            D_L08_001B0318->xC = D_L08_001B0310;
-            D_L08_001B0318->x8 = D_L08_001B0314;
+            g_lock_on_marker->x0 = g_lock_on_marker_x_b;
+            g_lock_on_marker->xC = g_lock_on_marker_xc;
+            g_lock_on_marker->x8 = g_lock_on_marker_x8;
         }
-        D_L08_001B0318->x1F = 1;
-        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
+        g_lock_on_marker->x1F = 1;
+        FastVecSub(g_lock_on_marker->pos, &g_lock_on_targets[0].pos, &g_hero_position_vec);
         goto shift;
     }
-    if (D_L08_001B3490[2].owner == D_L08_001B3490[1].owner)
-        D_L08_001B3490[1].unk1C = D_L08_001B3490[2].unk1C + 1;
-    if (D_L08_001B3490[1].owner != D_L08_001B3490[0].owner && D_L08_001B3490[1].owner != 0) {
-        hold_frames = D_L08_001B3490[1].unk1C;
-        if (hold_frames < D_L08_001B02FC)
-            hold_frames = D_L08_001B02FC;
-        D_L08_001B3490[0].unk18++;
-        if (D_L08_001B3490[0].unk18 >= hold_frames) {
-            CopyTarget(&D_L08_001B3490[0], &D_L08_001B3490[1]);
-            D_L08_001B3490[0].valid = 1;
+    if (g_lock_on_targets[2].owner == g_lock_on_targets[1].owner)
+        g_lock_on_targets[1].unk1C = g_lock_on_targets[2].unk1C + 1;
+    if (g_lock_on_targets[1].owner != g_lock_on_targets[0].owner && g_lock_on_targets[1].owner != 0) {
+        hold_frames = g_lock_on_targets[1].unk1C;
+        if (hold_frames < g_lock_on_hold_frames)
+            hold_frames = g_lock_on_hold_frames;
+        g_lock_on_targets[0].unk18++;
+        if (g_lock_on_targets[0].unk18 >= hold_frames) {
+            CopyTarget(&g_lock_on_targets[0], &g_lock_on_targets[1]);
+            g_lock_on_targets[0].valid = 1;
         }
-    } else if (D_L08_001B3490[0].valid == 0) {
-        CopyTarget(&D_L08_001B3490[0], &D_L08_001B3490[1]);
-        D_L08_001B3490[0].valid = 1;
+    } else if (g_lock_on_targets[0].valid == 0) {
+        CopyTarget(&g_lock_on_targets[0], &g_lock_on_targets[1]);
+        g_lock_on_targets[0].valid = 1;
     }
-    if (D_L08_001B3490[0].owner != 0) {
-        if (D_L08_001B0318 == 0) {
-            D_L08_001B0318 = cam_alloc_override_slot(5);
-            if (D_L08_001B0318 == 0)
+    if (g_lock_on_targets[0].owner != 0) {
+        if (g_lock_on_marker == 0) {
+            g_lock_on_marker = cam_alloc_override_slot(5);
+            if (g_lock_on_marker == 0)
                 goto shift;
         }
-        D_L08_001B0318->x0 = 7.0f;
-        D_L08_001B0318->x1F = 1;
-        FastVecSub(D_L08_001B0318->pos, &D_L08_001B3490[0].pos, &D_L08_001B9B00);
-    } else if (D_L08_001B0318 != 0) {
-        cam_end_override(D_L08_001B0318);
-        D_L08_001B0318 = 0;
+        g_lock_on_marker->x0 = 7.0f;
+        g_lock_on_marker->x1F = 1;
+        FastVecSub(g_lock_on_marker->pos, &g_lock_on_targets[0].pos, &g_hero_position_vec);
+    } else if (g_lock_on_marker != 0) {
+        cam_end_override(g_lock_on_marker);
+        g_lock_on_marker = 0;
     }
 shift:
-    CopyTarget(&D_L08_001B3490[2], &D_L08_001B3490[1]);
-    memset(&D_L08_001B3490[1], 0, 48);
-    D_L08_001B3490[1].unk18 = 65535;
-    D_L08_001B3490[1].dist = 100000.0f;
-    D_L08_001B3490[0].valid = 0;
+    CopyTarget(&g_lock_on_targets[2], &g_lock_on_targets[1]);
+    memset(&g_lock_on_targets[1], 0, 48);
+    g_lock_on_targets[1].unk18 = 65535;
+    g_lock_on_targets[1].dist = 100000.0f;
+    g_lock_on_targets[0].valid = 0;
 }

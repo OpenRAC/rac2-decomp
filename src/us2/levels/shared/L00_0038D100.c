@@ -4,9 +4,9 @@
 extern float func_002A7878_1(float low, float high);
 typedef unsigned char L00_0037F7E8_u8;
 extern L00_0037F7E8_u8 *func_002A08A0(void);
-extern L00_0037F7E8_u8 *D_L00_001B1EA8 __attribute__((sda));
+extern L00_0037F7E8_u8 *g_moby_l00_list_head __attribute__((sda));
 extern L00_0037F7E8_u8 ref_L00_001B267C_00[] __attribute__((sda));
-extern unsigned char D_001A7B2A __attribute__((sda));
+extern unsigned char g_hero_override_flag __attribute__((sda));
 typedef struct L00_0038BD00_Kind {
     unsigned char pad00[0x46];
     short type;
@@ -32,7 +32,7 @@ extern int pickup_check_stock_increase(char *value);
  * compared with the limit (2.7, or 10.0 when D_001A7B2A is set); a node of kind
  * 0x13 is then handed to func_003022A0, any other node to its own handler. A mode
  * of 0xFE or 0xFD, or a null next pointer, ends the walk. */
-void func_US2_L00_0038D100(char *object)
+void moby_trigger_nearby_response_us2(char *object)
 {
     L00_0038BD00_Node *s0;
     float limit;
@@ -43,9 +43,9 @@ void func_US2_L00_0038D100(char *object)
     L00_0038BD00_Kind *kind;
 
     limit = 2.7f;
-    if (D_001A7B2A != 0)
+    if (g_hero_override_flag != 0)
         limit = 10.0f;
-    s0 = (L00_0038BD00_Node *)D_L00_001B1EA8;
+    s0 = (L00_0038BD00_Node *)g_moby_l00_list_head;
     if (s0 == 0)
         return;
     step = 0.01745329424738884f;

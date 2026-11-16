@@ -1,8 +1,8 @@
 #include "common.h"
 typedef int qword __attribute__((mode(TI)));
 
-extern float D_L12_001B0B10 __attribute__((sda));
-extern u8 D_L12_001FEAC0[];
+extern float g_enemy_path_speed __attribute__((sda));
+extern u8 g_path_zone_table[];
 
 extern void FastVecSub(float *, const float *, const float *);
 extern float FastVecLength(float *);
@@ -14,7 +14,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 /* Moves the enemy along a path toward the next point and says when it has reached the end. */
 int AdvanceAlongPath(u8 *moby, u8 *route) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *home_path = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(vars + 0x158) << 2));
+    u8 *home_path = *(u8 **)(g_path_zone_table + (*(s32 *)(vars + 0x158) << 2));
     float entry[4];
     float dir[4];
     float rot[4];
@@ -34,15 +34,15 @@ int AdvanceAlongPath(u8 *moby, u8 *route) {
                       route + (*(s32 *)(vars + 0x168) << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
-        if (D_L12_001B0B10 * 0.016666668f < len)
-            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.016666668f);
+        if (g_enemy_path_speed * 0.016666668f < len)
+            vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.016666668f);
         FastVecAdd(moby + 0x10, moby + 0x10, dir);
     } else {
         FastVecSub(rot, home_path + 0x10, route + (*(s32 *)route << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
-        if (D_L12_001B0B10 * 0.016666668f < len)
-            vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.016666668f);
+        if (g_enemy_path_speed * 0.016666668f < len)
+            vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.016666668f);
         FastVecAdd(moby + 0x10, moby + 0x10, dir);
     }
     if (fast_vec_dist(moby + 0x10, entry) <= 0.5f) {

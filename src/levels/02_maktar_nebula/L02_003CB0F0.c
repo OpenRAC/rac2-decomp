@@ -18,7 +18,7 @@ struct L02NearObject;
 struct L02GroupObject;
 extern char g_hero_state[] NOT_SDA;
 typedef struct { char pad[0x18]; char *hit; int count; } L02Collision;
-extern L02Collision D_L02_001C0940;
+extern L02Collision g_collision_l02_result;
 extern char *g_route_polygons[];
 extern int g_frame_l02_counter[] __attribute__((sda));
 extern int linked_child_update(char *), moby_compute_aligned_direction(char *, void *);
@@ -192,8 +192,8 @@ void ranged_l02_enemy_update(char *self) {
         if (!*(short *)(state + 0x378) && *(u16 *)(self + 0x96) > 15) {
             moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
             contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 16, self, 0);
-            if (contact && D_L02_001C0940.hit && *(short *)(D_L02_001C0940.hit + 0xAA) == 0xC1B /* moby class 3099 */) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
-            if (contact && (col = &D_L02_001C0940)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
+            if (contact && g_collision_l02_result.hit && *(short *)(g_collision_l02_result.hit + 0xAA) == 0xC1B /* moby class 3099 */) { { moby_set_state((u8 *)self, 13, -1); break; } break; }
+            if (contact && (col = &g_collision_l02_result)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(state + 0x386)) {
                 if (!col->hit || (!moby_is_in_special_class_range(col->hit) && (!*(char **)(col->hit + 0x24) || *(short *)(*(char **)(col->hit + 0x24) + 0x46) != 22))) break;
             }
             { moby_set_state((u8 *)self, 11, -1); break; }
@@ -234,7 +234,7 @@ void ranged_l02_enemy_update(char *self) {
         if (!(((u8 *)self)[0x60] & 2)) break;
         moby_transform_joint_to_world(*(char **)(state + 0x370), 0, (char *)&work.aim.muzzle);
         collision = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 0, self, 0);
-        if (FastDecTimer((short *)(state + 0x380)) || (collision && D_L02_001C0940.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
+        if (FastDecTimer((short *)(state + 0x380)) || (collision && g_collision_l02_result.hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290)) {
             *(short *)(state + 0x378) += 15; { if (!math_random_int_below(3)) moby_set_state((u8 *)self, 12, -1); else moby_set_state((u8 *)self, 13, -1); break; }
         } else {
             angle = mat_fast_helper_a(*(float *)(state + 0x1F0) - *(float *)(self + 0x10), *(float *)(state + 0x1F4) - *(float *)(self + 0x14));

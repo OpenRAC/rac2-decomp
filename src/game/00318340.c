@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern int D_001B2758 MACRO_ADDR;
+extern int g_spark_slot_pool MACRO_ADDR;
 extern float math_random_float_range(float, float), math_random_signed_float_range(float, float);
 extern void vec_clear_128(void *), gravity_get_dir_at_object(void *, void *, int);
 extern char *moby_get_private_value_0(void *);
@@ -11,7 +11,7 @@ extern void moby_set_controller_speed_limits(void *, float, float, float, float)
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_set_state(void *, int, int), anim_start_blended(void *, int, int, int);
-extern float D_001BAFA8;
+extern float g_coll_ground_height;
 
 typedef int TI128_00318340 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128_00318340 q[0x260]; } Hero_00318340;
@@ -19,8 +19,8 @@ extern u8 g_hero_state[];
 extern char g_hero_position[];
 extern u8 g_sound_state[];
 
-extern char D_001A8BD0[16] MACRO_ADDR;
-extern char D_001AFA80[];
+extern char g_default_effect_vector[16] MACRO_ADDR;
+extern char g_str_hover_enemy_debug[];
 extern void STUB_printf(const char *, ...);
 extern void gfx_register_overlay_draw_callback(void (*)(char *), char *);
 extern int math_fast_float_d(void *);
@@ -434,7 +434,7 @@ void hover_enemy_update(char *obj)
         } else if (diff12 > 0.05f) {
             math_step_value_toward_target(obj + 0x18, pv + 0x290, h12, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            STUB_printf(D_001AFA80, *(s32 *)(pv + 0x2C0));
+            STUB_printf(g_str_hover_enemy_debug, *(s32 *)(pv + 0x2C0));
             moby_set_state(obj, 6, -1);
             if (*(u8 *)(obj + 0x43) != 0xE)
                 anim_start_blended(obj, 0xE, 0, 3);
@@ -524,7 +524,7 @@ void hover_enemy_update(char *obj)
             }
             if (moby_is_target_outside_turn_limit(obj, 10.0f) != 0) {
                 FastVecSub(to_target, pos, muzzle_pos);
-                qcopy(aim_dir, D_001A8BD0);
+                qcopy(aim_dir, g_default_effect_vector);
                 aim_dir[0] = 1.0f;
                 matrix_mul_vec3(aim_dir, aim_dir, obj + 0xC0);
                 FastVecCross(axis, aim_dir, to_target);
@@ -617,7 +617,7 @@ void hover_enemy_update(char *obj)
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(muzzle_pos, D_001A8BD0, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(muzzle_pos, g_default_effect_vector, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }

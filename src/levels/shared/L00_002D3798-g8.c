@@ -61,14 +61,14 @@ typedef struct {
 } Hero5940;
 
 extern Hero5940 g_hero_state;
-extern char D_L00_001B8FF0[], g_camera_l00_position[], D_L00_001BF220[];
-extern Quad5940 D_L00_001B8DD0;
+extern char g_cam_follow_matrix[], g_camera_l00_position[], g_hero_l00_position[];
+extern Quad5940 g_hero_saved_vector;
 /* Incomplete sda arrays are read with the assembler's lui/load macro, as in retail. */
-extern unsigned char D_001A7A44[] __attribute__((sda));
+extern unsigned char g_cheat_flags[] __attribute__((sda));
 extern int g_frame_l00_counter[] __attribute__((sda));
-extern float D_L00_001A7FE4[] __attribute__((sda));
-extern const float D_L00_001A7FE0 __attribute__((sda));
-extern float D_L00_001A7CE0 __attribute__((sda)), D_L00_001A7CE4 __attribute__((sda));
+extern float g_turn_rate_table[] __attribute__((sda));
+extern const float g_turn_rate_scale __attribute__((sda));
+extern float g_hero_item_time_scale __attribute__((sda)), g_hero_item_step_scale __attribute__((sda));
 
 extern int hero_is_slot_item_wrench(int);
 extern void func_002A0F48(void *);
@@ -120,19 +120,19 @@ void UpdateHeroHeldObject(void) {
     }
 
     mount = level_get_table_entry_address(g_hero_state.weapon);
-    copy_matrix_rotation(m, D_L00_001B8FF0);
-    qcopy_nc(&m[12], D_L00_001B8FF0 - 0x230);
+    copy_matrix_rotation(m, g_cam_follow_matrix);
+    qcopy_nc(&m[12], g_cam_follow_matrix - 0x230);
     m[15] = 1.0f;
     qcopy_nc(offset, mount);
     offset[0] += g_hero_state.offset;
-    if (D_001A7A44[0] && !hero_is_action_allowed())
+    if (g_cheat_flags[0] && !hero_is_action_allowed())
         offset[1] = -offset[1];
 
     /* Turn rate in degrees per second (FE4 while moving, FE0 otherwise) to radians per frame. */
     if (g_hero_state.speed > 0.02f)
-        turn = D_L00_001A7FE4[0] * 0.0002908882452175021f;
+        turn = g_turn_rate_table[0] * 0.0002908882452175021f;
     else
-        turn = D_L00_001A7FE0 * 0.0002908882452175021f;
+        turn = g_turn_rate_scale * 0.0002908882452175021f;
     ApproachValue(&g_hero_state.angleVelocity, turn, 0.006981317885220051f);
     g_hero_state.angle = FastAddRotations(g_hero_state.angle, g_hero_state.angleVelocity);
     offset[2] += math_fast_sin_or_cos_b(g_hero_state.angle) * 0.02f;
@@ -147,8 +147,8 @@ void UpdateHeroHeldObject(void) {
 
     if (g_hero_state.blend < 1.0f) {
         math_step_value_toward_target(&g_hero_state.blend, &g_hero_state.blendVelocity, 1.0f,
-                      D_L00_001A7CE0 * 0.016666667f, D_L00_001A7CE4 * 0.00027777778f,
-                      D_L00_001A7CE0 * 0.016666667f);
+                      g_hero_item_time_scale * 0.016666667f, g_hero_item_step_scale * 0.00027777778f,
+                      g_hero_item_time_scale * 0.016666667f);
         matrix_mul_vec3(temp, g_hero_state.transitionPos, &g_hero_state);
         FastVecAdd(temp, temp, g_hero_state.position);
         lerp_vector(obj->position, temp, obj->position, g_hero_state.blend);
@@ -168,7 +168,7 @@ void UpdateHeroHeldObject(void) {
         vec_scale_to_length(a, obj->rotMatrix[1], height * -1.2f);
         FastVecAdd(a, a, temp);
         if (CollLine(g_camera_l00_position, a, 0, g_hero_state.owner, 0)) {
-            target = (g_hero_state.offset - height) + fast_vec_dist(D_L00_001BF220, temp);
+            target = (g_hero_state.offset - height) + fast_vec_dist(g_hero_l00_position, temp);
             g_hero_state.offsetTarget = target;
             if (target > 0.0f)
                 g_hero_state.offsetTarget = 0.0f;
@@ -183,7 +183,7 @@ void UpdateHeroHeldObject(void) {
                   0.0041666669f, 0.0041666669f, 0.083333336f);
     copy_matrix3x4(g_hero_state.transform, m);
     qcopy_nc(&g_hero_state.vector760, m);
-    qcopy_nc(&g_hero_state.vector770, &D_L00_001B8DD0);
+    qcopy_nc(&g_hero_state.vector770, &g_hero_saved_vector);
 
     state = hero_is_action_allowed();
     if (state)
@@ -195,15 +195,15 @@ void UpdateHeroHeldObject(void) {
 }
 
 /* func_L00_002D5EB8 */
-extern int D_0018C350[];
-extern unsigned char D_001A7A00[] __attribute__((sda));
-extern int D_0018C2EC[];
-extern unsigned char D_001A7A28[] MACRO_ADDR;
+extern int g_collection_progress_table[];
+extern unsigned char g_player_stats[] __attribute__((sda));
+extern int g_request_enabled_flag[];
+extern unsigned char g_collection_progress_flags[] MACRO_ADDR;
 extern unsigned char g_item_slot_to_record[];
-extern int D_L00_001A903C;
+extern int g_collection_progress_flag;
 extern unsigned short g_subtitle_history __attribute__((section(".data")));
-extern int D_00139868[];
-extern int D_001A7398[] MACRO_ADDR;
+extern int g_help_entry_state[];
+extern int g_menu_choice_table[] MACRO_ADDR;
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
 /* One 0xE0-byte entry of D_L00_00262570, indexed through D_00139568. */
@@ -275,14 +275,14 @@ void hero_update_collection_progress(void)
         return;
     count = 4;
     {
-        int *p = D_0018C350;
+        int *p = g_collection_progress_table;
         math_sum_table_entries_under_limit(p, p - 1, &count);
     }
     for (j = 0; j < 10; j++)
-        if (D_001A7A28[j])
+        if (g_collection_progress_flags[j])
             count++;
-    if (*(int *)D_001A7A00 != count) {
-        if (ref_L00_002D5EB8_00 >= 11 && *(int *)D_001A7A00 < count) {
+    if (*(int *)g_player_stats != count) {
+        if (ref_L00_002D5EB8_00 >= 11 && *(int *)g_player_stats < count) {
             if (!g_subtitle_history)
                 hud_queue_hint_message(0x9A9, 0);
             effect_controller_spawn();
@@ -290,8 +290,8 @@ void hero_update_collection_progress(void)
             value_set_entry_by_index(0x1235, -1);
             snd_play_from_global_bank(6, 0, 0);
         }
-        D_0018C2EC[0] = count;
-        *(int *)D_001A7A00 = count;
+        g_request_enabled_flag[0] = count;
+        *(int *)g_player_stats = count;
     }
 
     for (i = 0; i < 56; i++) {
@@ -313,7 +313,7 @@ void hero_update_collection_progress(void)
             continue;
         {
             Entry1269 *e = &g_weapon_l00_table[g_item_slot_to_record[i]];
-            if ((D_00139868[i] >> 5) < e->limit || e->limit <= 0)
+            if ((g_help_entry_state[i] >> 5) < e->limit || e->limit <= 0)
                 continue;
             if (i == 31 || i == 9 || i == 45) {
                 gfx_set_screen_pair_run_effect(i, g_weapon_l00_table[g_item_slot_to_record[i]].value);
@@ -322,7 +322,7 @@ void hero_update_collection_progress(void)
             if (g_hero_state.weapon == i) {
                 if (!g_hero_state.f340)
                     continue;
-                if (D_001A7398[e->index] != i)
+                if (g_menu_choice_table[e->index] != i)
                     continue;
                 gfx_set_screen_pair_run_effect(i, e->value);
                 continue;
@@ -344,7 +344,7 @@ void hero_update_collection_progress(void)
         }
     }
 
-    if ((g_frame_l00_counter[0] & 127) || D_001A7A00[0x7A])
+    if ((g_frame_l00_counter[0] & 127) || g_player_stats[0x7A])
         return;
     ok = 1;
     for (i = 0; i < 56; i++) {
@@ -368,10 +368,10 @@ void hero_update_collection_progress(void)
             }
         }
     }
-    if (ok && !D_001A7A00[0x7A]) {
-        D_001A7A00[0x7A] = 1;
+    if (ok && !g_player_stats[0x7A]) {
+        g_player_stats[0x7A] = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index(0x1233, -1);
-        D_L00_001A903C = 1;
+        g_collection_progress_flag = 1;
     }
 }

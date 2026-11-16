@@ -8,10 +8,10 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L23_001AC790 __attribute__((sda));
-extern int D_L23_001B2F30 __attribute__((sda)), D_L23_001B2F38 __attribute__((sda));
+extern int g_shell_model_pointer __attribute__((sda));
+extern int g_water_l23_ripple_surface __attribute__((sda)), g_water_ripple_data __attribute__((sda));
 extern Collision g_last_ray_hit;
-extern Material D_L23_00266A70[];
+extern Material g_item_l23_material_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -73,7 +73,7 @@ void projectile_l23_update_bouncing(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L23_00266A70 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l23_material_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -85,7 +85,7 @@ void projectile_l23_update_bouncing(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L23_001B2F30, D_L23_001B2F38, 1,
+            RippleDisturb(g_water_l23_ripple_surface, g_water_ripple_data, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
@@ -121,7 +121,7 @@ void projectile_l23_update_bouncing(unsigned char *obj) {
                     goto finish;
                 reread = &g_last_ray_hit;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L23_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_shell_model_pointer && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);

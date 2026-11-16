@@ -19,13 +19,13 @@ extern void arena_push_point_out(void *,float);
 extern float fast_vec_dist(void *,void *);
 extern int moby_apply_damage_to_object(void *,void *,int);
 extern void vec_negate_and_forward(void *,void *,int);
-extern char *D_L22_001AF314;
-extern short D_L22_001B2A88;
-extern int D_L22_001B2A8C, D_L22_001B2A90;
-extern char D_L22_00189EA0[], D_L22_00189ED0[];
-extern float D_L22_001AF308;
-extern int D_L22_001B119C __attribute__((sda));
-extern char *D_L22_001C00D8 __attribute__((section(".data")));
+extern char *g_space_ship_owner_moby;
+extern short g_space_ship_mode;
+extern int g_flying_enemy_spawn_count, g_flying_enemy_spawn_blocked;
+extern char g_flying_enemy_target_point[], g_flying_enemy_home_point[];
+extern float g_enemy_random_scale;
+extern int g_flyer_default_state __attribute__((sda));
+extern char *g_collision_l22_hit __attribute__((section(".data")));
 /* State machine of a flying enemy. It sets up its stats at the start, then picks where to spawn or respawn near the hero and starts its animations. */
 void flying_enemy_update_states(char *obj) {
     Vec offset;
@@ -46,18 +46,18 @@ void flying_enemy_update_states(char *obj) {
         U16(obj,0x34)=(U16(obj,0x34)|0x41)&0xefff;
         moby_set_state(obj,1,4);
     } else if (state == 1) {
-        if (!D_L22_001AF314) goto finish;
+        if (!g_space_ship_owner_moby) goto finish;
         moby_set_state(obj,6,4);
         if (math_random_int_below(2)) {
             S16(ctx,0x178)=0;
             U16(obj,0x34)=(U16(obj,0x34)&0xffbe)|0x1000;
             I32(obj,0x98)=I32(PTR(obj,0x24),0x10);
             lane_pick_random_point_away_from_ship(obj+0x10,1,7.2f);
-            if (coll_test_point(obj+0x10,1,0,3.0f) && S16(D_L22_001C00D8,0xaa)==0xedd /* moby class 3805 */ && U8(D_L22_001C00D8,0x20)!=6) {
+            if (coll_test_point(obj+0x10,1,0,3.0f) && S16(g_collision_l22_hit,0xaa)==0xedd /* moby class 3805 */ && U8(g_collision_l22_hit,0x20)!=6) {
                 char *axis=obj+0xc0+16*math_random_int_below(2);
                 float scale;
-                if (math_random_int_below(2)) scale=D_L22_001AF308;
-                else scale=-D_L22_001AF308;
+                if (math_random_int_below(2)) scale=g_enemy_random_scale;
+                else scale=-g_enemy_random_scale;
                 FastVecScale(&offset,axis,scale);
                 FastVecAdd(obj+0x10,obj+0x10,&offset);
                 arena_push_point_out(obj+0x10,7.2f);
@@ -67,25 +67,25 @@ void flying_enemy_update_states(char *obj) {
             moby_set_state(obj,2,0);
             if (U8(obj,0x43)!=1) anim_start_blended(obj,1,0,0);
         } else I32(ctx,0x284)=state;
-    } else if (D_L22_001B2A88==2) {
-        if ((U16(D_L22_001AF314,0x34)^1)&1) {
+    } else if (g_space_ship_mode==2) {
+        if ((U16(g_space_ship_owner_moby,0x34)^1)&1) {
             float distance;
             if (state == 6) goto respawn;
             {
-                distance=fast_vec_dist(D_L22_00189EA0,obj+0x10);
-                if (U8(obj,0x20)!=6 && distance<55.0f) I32(ctx,0x288)=D_L22_001B2A88;
+                distance=fast_vec_dist(g_flying_enemy_target_point,obj+0x10);
+                if (U8(obj,0x20)!=6 && distance<55.0f) I32(ctx,0x288)=g_space_ship_mode;
             }
             if (U8(obj,0x20)==6 || distance>55.0f) {
 respawn:
-                if (D_L22_001B2A8C<16 && !D_L22_001B2A90) {
-                    D_L22_001B2A8C++;
+                if (g_flying_enemy_spawn_count<16 && !g_flying_enemy_spawn_blocked) {
+                    g_flying_enemy_spawn_count++;
                     S16(ctx,0x178)=0;
                     U16(obj,0x34)=(U16(obj,0x34)&0xffbe)|0x1000;
                     I32(obj,0x98)=I32(PTR(obj,0x24),0x10);
-                    qcopy(obj+0x10,D_L22_00189ED0);
+                    qcopy(obj+0x10,g_flying_enemy_home_point);
                     moby_set_state(obj,8,5);
-                    D_L22_001B2A90=D_L22_001B119C;
-                    I32(ctx,0x288)=D_L22_001B2A88;
+                    g_flying_enemy_spawn_blocked=g_flyer_default_state;
+                    I32(ctx,0x288)=g_space_ship_mode;
                 }
             }
         }

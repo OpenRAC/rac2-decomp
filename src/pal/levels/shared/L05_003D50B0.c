@@ -12,11 +12,11 @@ struct Sub_003D15E8 {
       int targetMode;
       char *target;
 };
-extern char *D_L05_001B251C MACRO_ADDR;
+extern char *g_feltzin_target_mobys MACRO_ADDR;
 extern char g_sound_state[];
 extern void *state_get_stored_pointer_value(char *);
 extern struct Sub_003D15E8 *moby_get_motion_data(char *);
-extern void func_PAL_L05_003D5628(char *);
+extern void moby_init_state_and_position_pal(char *);
 extern void vec_clear_128(void *);
 extern void level_append_object(char *, void *, int, int);
 extern void moby_l00_update_empty_3(void);
@@ -30,7 +30,7 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern int follower_get_state(char *);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
-extern void func_PAL_L05_003D5738(char *);
+extern void moby_spawn_effect_after_guards_pal(char *);
 extern int moby_can_take_next_step(char *);
 extern int list_count_objects_matching_value(char *, int);
 extern void moby_l05_set_state_value(char *, int);
@@ -52,7 +52,7 @@ void func_PAL_L05_003D5330(char *obj)
         *(unsigned char *)(obj + 0x30) = 0xff;
         if (!state_get_stored_pointer_value(obj))
             return;
-        func_PAL_L05_003D5628(obj);
+        moby_init_state_and_position_pal(obj);
         vec_clear_128(tmp);
         if (*(int *)(state + 0x264))
             level_append_object(obj, moby_l00_update_empty_3, 0, 0);
@@ -71,7 +71,7 @@ void func_PAL_L05_003D5330(char *obj)
     if (mode == one) {
         if (*(int *)(state + 0x260) != -1) {
             sub->targetMode = mode;
-            sub->target = D_L05_001B251C + (*(int *)(state + 0x260) << 8);
+            sub->target = g_feltzin_target_mobys + (*(int *)(state + 0x260) << 8);
             if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
                 char *sound1 = g_sound_state + *(int *)(state + 0x2f4) * 0x70;
 
@@ -88,11 +88,11 @@ void func_PAL_L05_003D5330(char *obj)
             *(float *)(state + 0x2c4) = math_fast_sin_or_cos_b(0.78539824f);
             *(float *)(state + 0x2cc) = math_fast_sin_or_cos_a(0.78539824f);
             if (sub->f108)
-                func_PAL_L05_003D5738(obj);
+                moby_spawn_effect_after_guards_pal(obj);
         } else {
             *(float *)(state + 0x2cc) = *(float *)(state + 0x28c) = 1.0f;
             if (sub->f108 && sub->f104)
-                func_PAL_L05_003D5738(obj);
+                moby_spawn_effect_after_guards_pal(obj);
         }
         if (moby_can_take_next_step(obj)) {
             if (list_count_objects_matching_value(obj, 5) <= 0)
@@ -120,7 +120,7 @@ extern int func_332AB8(int);
 extern void func_3719A8(int, int, char *, int);
 
 /* Spawns the object's effect after three guards, then runs the timer. */
-void func_PAL_L05_003D5738(char *object)
+void moby_spawn_effect_after_guards_pal(char *object)
 {
     char *s1 = *(char **)(object + 0x68);
     char *r;

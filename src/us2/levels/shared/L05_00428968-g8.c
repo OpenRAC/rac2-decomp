@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
-extern int D_L05_001B1504 __attribute__((sda));
+extern int g_glow_ring_draw_target_moby __attribute__((sda));
 extern int g_current_map_index;
 extern float fast_vec_dist(void *, void *);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
@@ -18,15 +18,15 @@ void func_US2_L05_00428968(char *object)
     char *state = *(char **)(object + 0x68);
     float distance;
 
-    if (D_L05_001B1504 != 0) {
+    if (g_glow_ring_draw_target_moby != 0) {
         char *pos = object + 0x10;
         char *aim;
         float scaled;
         float capped;
 
-        distance = fast_vec_dist((char *)D_L05_001B1504 + 0x10, pos);
+        distance = fast_vec_dist((char *)g_glow_ring_draw_target_moby + 0x10, pos);
         if (g_current_map_index == 0x14) {
-            vec_spring_to_target(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+            vec_spring_to_target(pos, (char *)g_glow_ring_draw_target_moby + 0x10, state + 0x40,
                           0.008888889f, 0.0033333333f, 1.0666667f);
         } else {
             if (distance < 60.0f) {
@@ -36,7 +36,7 @@ void func_US2_L05_00428968(char *object)
                 capped = *(float *)(aim + 0x24) * 0.3f;
                 if (capped > scaled)
                     *(float *)(object + 0x2C) = capped;
-                vec_spring_to_target(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+                vec_spring_to_target(pos, (char *)g_glow_ring_draw_target_moby + 0x10, state + 0x40,
                               0.0055555556f, 0.0016666667f, 0.5f);
             }
         }

@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern f32 math_random_signed_float_range(f32 low, f32 high);
-extern f32 D_001A8BD0[] __attribute__((sda));
+extern f32 g_default_effect_vector[] __attribute__((sda));
 typedef struct {
     TI128 position;
     int f10;
@@ -23,7 +23,7 @@ extern L_34730TI hero_copy_vector_to_out(int, L_34730TI *);
 typedef int TI __attribute__((mode(TI)));
 extern TI hero_copy_vector_to_out(int, TI *);
 
-char *func_PAL_00334028(void *a0, void *a1, void *a2)
+char *moby_spawn_directed_pal(void *a0, void *a1, void *a2)
 {
     TI128 localA;
     TI128 localB;

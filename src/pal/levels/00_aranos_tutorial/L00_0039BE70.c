@@ -7,11 +7,11 @@ extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, char *);
 extern void func_PAL_002AC290(char *, char *);
 extern void vec_add_random_offset(float *, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void func_PAL_002AC3C0(char *, char *);
 
-void func_PAL_L00_0039BE70(char *object)
+void moby_apply_hit_damage_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *hit = part_find_owned_effect_slot(object, 0x30001, 0);
@@ -36,7 +36,7 @@ void func_PAL_L00_0039BE70(char *object)
         func_PAL_002AC290(object, state);
         if (*(float *)(state + 0x24) < 0.0f) {
             vec_add_random_offset(direction, 0.6f);
-            func_PAL_002AC718(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects_pal(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             object[0x20] = 6;
         }
@@ -62,7 +62,7 @@ extern int CollLine(float *, float *, int, int, int);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern int moby_move_and_collide(char *, float *, float, float, float, int);
 
-void func_PAL_L00_0039C018(char *obj)
+void moby_spring_away_from_player_pal(char *obj)
 {
     char *e = *(char **)(obj + 0x68);
     char *d = g_hero_state;

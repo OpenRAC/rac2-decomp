@@ -47,10 +47,10 @@ extern void object_init_derived_c(void *, void *, void *);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern int grid_menu_update();
-extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADFC0[], D_001ADFC8[];
-extern char D_001ADF10[], D_001ADF18[], D_001ADF20[], D_001ADD60[], D_001AE250[];
-extern char D_001ADD58[], D_001AE030[], D_001ADFD8[];
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[], g_menu_frame_desc[], g_menu_panel_desc[];
+extern char g_info_panel_count_desc_first[], g_info_panel_count_desc_second[], g_info_panel_count_desc_third[], g_menu_hud_desc_body[], g_grid_menu_widget_defaults[];
+extern char g_menu_hud_desc_title[], g_menu_hud_label_desc_alt[], g_menu_icon_desc[];
+extern char *g_resident_data_base[] __attribute__((sda));
 
 /* Builds the grid menu: allocates its position, creates all labels and icons, and sets their colours and texts. */
 void grid_menu_construct(char *self, void *owner)
@@ -71,19 +71,19 @@ void grid_menu_construct(char *self, void *owner)
     *(int *)(self + 0x438) = 1;
     (*(float **)(self + 0x430))[0] = 250.0f;
     (*(float **)(self + 0x430))[1] = 207.0f;
-    object_init_derived_arrays(self, D_001ADC10, owner);
-    object_init_derived_arrays(self + 0x4C, D_001ADC18, owner);
-    object_init_derived_arrays(self + 0x98, D_001ADC20, owner);
-    object_init_derived_arrays(self + 0xE4, D_001ADC28, owner);
-    object_init_derived_arrays(self + 0x130, D_001ADFC0, owner);
-    object_init_derived_arrays(self + 0x17C, D_001ADFC8, owner);
-    hud_init_widget_defaults(self + 0x328, D_001ADF10, owner);
-    hud_init_widget_defaults(self + 0x370, D_001ADF18, owner);
-    hud_init_widget_defaults(self + 0x3B8, D_001ADF20, owner);
-    hud_init_widget_defaults(self + 0x298, D_001ADD60, owner);
-    hud_init_widget_defaults(self + 0x2E0, D_001AE250, owner);
-    hud_init_widget_defaults(self + 0x1C8, D_001ADD58, owner);
-    hud_init_widget_defaults(self + 0x210, D_001AE030, owner);
+    object_init_derived_arrays(self, g_menu_widget_desc_first, owner);
+    object_init_derived_arrays(self + 0x4C, g_menu_widget_desc_second, owner);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, owner);
+    object_init_derived_arrays(self + 0xE4, g_menu_widget_desc_fourth, owner);
+    object_init_derived_arrays(self + 0x130, g_menu_frame_desc, owner);
+    object_init_derived_arrays(self + 0x17C, g_menu_panel_desc, owner);
+    hud_init_widget_defaults(self + 0x328, g_info_panel_count_desc_first, owner);
+    hud_init_widget_defaults(self + 0x370, g_info_panel_count_desc_second, owner);
+    hud_init_widget_defaults(self + 0x3B8, g_info_panel_count_desc_third, owner);
+    hud_init_widget_defaults(self + 0x298, g_menu_hud_desc_body, owner);
+    hud_init_widget_defaults(self + 0x2E0, g_grid_menu_widget_defaults, owner);
+    hud_init_widget_defaults(self + 0x1C8, g_menu_hud_desc_title, owner);
+    hud_init_widget_defaults(self + 0x210, g_menu_hud_label_desc_alt, owner);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -100,16 +100,16 @@ void grid_menu_construct(char *self, void *owner)
     hud_set_widget_field_a(self + 0x298, 1);
     hud_set_widget_field_a(self + 0x2E0, 1);
     object_set_second_float4(self + 0x2E0, 0.9f, 0.9f, zero, zero);
-    object_set_helper_result(self, D_001A8CFC[0] + 0x8710, 0x9E);
-    object_set_helper_result(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9F);
-    object_set_helper_result(self + 0x98, D_001A8CFC[0] + 0x8710, 0xA0);
-    object_set_helper_result(self + 0xE4, D_001A8CFC[0] + 0x8710, 0xA1);
-    object_set_helper_result(self + 0x130, D_001A8CFC[0] + 0x8710, 0x5D);
-    object_set_helper_result(self + 0x17C, D_001A8CFC[0] + 0x8710, 0x5E);
+    object_set_helper_result(self, g_resident_data_base[0] + 0x8710, 0x9E);
+    object_set_helper_result(self + 0x4C, g_resident_data_base[0] + 0x8710, 0x9F);
+    object_set_helper_result(self + 0x98, g_resident_data_base[0] + 0x8710, 0xA0);
+    object_set_helper_result(self + 0xE4, g_resident_data_base[0] + 0x8710, 0xA1);
+    object_set_helper_result(self + 0x130, g_resident_data_base[0] + 0x8710, 0x5D);
+    object_set_helper_result(self + 0x17C, g_resident_data_base[0] + 0x8710, 0x5E);
     *(int *)(self + 0x43C) = 0;
     *(int *)(self + 0x440) = 0;
     *(int *)(self + 0x448) = 3;
-    object_init_derived_c(self + 0x258, D_001ADFD8, owner);
+    object_init_derived_c(self + 0x258, g_menu_icon_desc, owner);
     *object_get_fourth_field(self + 0x258) = 0x60F0F0B0;
     object_set_second_float4(self + 0x258, 32.0f, 32.0f, zero, zero);
     *object_get_fourth_field(self + 0x1C8) = 0x80F0F0F0;
@@ -128,7 +128,7 @@ void grid_menu_construct(char *self, void *owner)
 }
 
 typedef struct { unsigned char pad[6]; short id; short tail; } SelectionRow;
-extern SelectionRow D_001AA810[];
+extern SelectionRow g_grid_menu_selection_rows[];
 
 /* Handles the direction buttons while the cursor is in the first group of the grid menu. */
 void grid_menu_handle_input_first_group(DobboGridState312 *state, unsigned int buttons)
@@ -157,7 +157,7 @@ void grid_menu_handle_input_first_group(DobboGridState312 *state, unsigned int b
             state->row = 0;
         }
     }
-    state->index = D_001AA810[state->column].id;
+    state->index = g_grid_menu_selection_rows[state->column].id;
 }
 
 /* The cursor's cell table: the same ten-byte record shape as the selection rows above, but the
@@ -251,7 +251,7 @@ void grid_menu_handle_input_small_group(DobboGridState312 *state, unsigned int b
     state->index = state->column + state->row * 2;
 }
 
-extern short D_L00_001AAB76;
+extern short g_grid_menu_choice_value;
 /* Handles the direction buttons for the single-choice group, jumping the cursor to a fixed place. */
 void grid_menu_handle_input_single_choice(char *menu, unsigned int buttons)
 {
@@ -276,7 +276,7 @@ void grid_menu_handle_input_single_choice(char *menu, unsigned int buttons)
         *(int *)(menu + 0x448) = 3;
         *(int *)(menu + 0x43C) = 0;
     }
-    *(int *)(menu + 0x444) = D_L00_001AAB76;
+    *(int *)(menu + 0x444) = g_grid_menu_choice_value;
 }
 
 /* Per-mode lookup of the selected entry's id (the short at +0x42 of a 0xE0-byte record).
@@ -284,17 +284,17 @@ void grid_menu_handle_input_single_choice(char *menu, unsigned int buttons)
    under its own name (D_001A7AFE, the byte at +6 of the D_001A7AF8 flags) in this -G0 file. */
 extern unsigned char g_item_slot_to_record[];
 extern unsigned char g_item_owned_flags[];
-extern unsigned char D_001A7AFE __attribute__((sda));
+extern unsigned char g_starting_items_granted __attribute__((sda));
 extern unsigned char g_weapon_table[];
 typedef struct { unsigned char pad[0x42]; short field42; unsigned char rest[0xE0 - 0x44]; } Entry224;
 /* The four text ids, copied from their retail data: the build keeps no compiler .rodata. */
 typedef struct { int v[4]; } Ids_00344378;
-extern Ids_00344378 D_001AE260;
+extern Ids_00344378 g_grid_menu_text_ids;
 
 /* Returns the text id of the entry the cursor is on, or 0 if it cannot be picked. */
 int grid_menu_get_selected_text_id(DobboGridState312 *state)
 {
-    Ids_00344378 table = D_001AE260;
+    Ids_00344378 table = g_grid_menu_text_ids;
     int value;
 
     switch (state->mode) {
@@ -308,7 +308,7 @@ int grid_menu_get_selected_text_id(DobboGridState312 *state)
         return 0;
     }
     case 1:
-        if (D_001A7AFE != 0) {
+        if (g_starting_items_granted != 0) {
             value = ((Entry224 *)g_weapon_table)[g_item_slot_to_record[6]].field42;
             break;
         }

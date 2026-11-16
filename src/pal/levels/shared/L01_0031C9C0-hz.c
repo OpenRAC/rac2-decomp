@@ -47,9 +47,9 @@ typedef struct {
 extern MotionCollision motionCollision __asm__("D_L01_001BF900");
 
 extern char g_sound_state[];
-extern int D_L01_001B2088[] __attribute__((sda));
-extern MotionPath *D_L01_001B264C[] __attribute__((sda));
-extern float D_L01_001BF928;
+extern int g_oozla_intro_stage[] __attribute__((sda));
+extern MotionPath *g_swamp_patrol_positions[] __attribute__((sda));
+extern float g_ground_l01_height;
 extern void lerp_vector(void *, void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
@@ -154,12 +154,12 @@ static inline void MotionLandingSpeed(float *speed, float rising, float falling)
     }
 }
 
-void func_PAL_L01_0031C9C0(char *m, MotionState *state, int path, float height, float radius, float extent)
+void pushable_moby_update_pal(char *m, MotionState *state, int path, float height, float radius, float extent)
 {
     MotionVec old, start, delta, turn, target, change, samples[8], matrix[3], actual;
     float speed, gain, limit, accel, ground;
     int i, handle;
-    int phase = D_L01_001B2088[0];
+    int phase = g_oozla_intro_stage[0];
 
     if ((phase & 15) == (((int)m >> 8) & 15)) {
         float dist = fast_vec_dist(&motionHero.position, m + 0x10);
@@ -181,9 +181,9 @@ void func_PAL_L01_0031C9C0(char *m, MotionState *state, int path, float height, 
         }
         FastVecSub(&delta, m + 0x10, &motionHero.position);
         if (state->frame != -1 && IsPointInCuboid(m + 0x10, state->frame)) {
-            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
+            matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].inverse);
             delta.v[1] = 0;
-            matrix_mul_vec3(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
+            matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].forward);
         }
         gain = 4.0f;
         if (state->gain != 0) {
@@ -230,7 +230,7 @@ void func_PAL_L01_0031C9C0(char *m, MotionState *state, int path, float height, 
             delta.v[2] -= 1;
             ground = 0;
             if (CollLine(&start, &delta, 16, m, 0)) {
-                ground = D_L01_001BF928;
+                ground = g_ground_l01_height;
             }
             if (*(float *)(m + 0x18) < ground) {
                 *(float *)(m + 0x18) = ground;

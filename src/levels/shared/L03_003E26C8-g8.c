@@ -29,10 +29,10 @@ typedef struct {
     s16 sound;
 } PuzzlePath;
 
-extern PuzzleNode D_L03_0029BBF0[14];
-extern int D_0024A7B0[14][6];
-extern u16 D_L03_001B0B5C __attribute__((sda));
-extern f32 D_L03_001B36B0[4] __attribute__((sda));
+extern PuzzleNode g_puzzle_node_directions[14];
+extern int g_path_puzzle_adjacency[14][6];
+extern u16 g_path_puzzle_duration __attribute__((sda));
+extern f32 g_puzzle_rotation_quat[4] __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, f32);
 extern f32 FastVecDot(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
@@ -57,7 +57,7 @@ void InitializePathPuzzle(u8 *moby) {
     f32 similarity, limit;
 
     for (k = 0; k < 14; k++) {
-        vec_scale_to_length(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
+        vec_scale_to_length(&g_puzzle_node_directions[k], &g_puzzle_node_directions[k], 1.0f);
         path_state->facing[k] = 255;
     }
     path_state->facing[14] = 255;
@@ -66,25 +66,25 @@ void InitializePathPuzzle(u8 *moby) {
 
     for (row = 0; row < 14; row++)
         for (col = 0; col < 6; col++)
-            D_0024A7B0[row][col] = -1;
+            g_path_puzzle_adjacency[row][col] = -1;
 
     for (i = 0; i < 14; i++) {
         n = 0;
         for (j = 0; j < 14; j++) {
             if (i != j) {
-                node = &D_L03_0029BBF0[i];
-                similarity = FastVecDot(node, &D_L03_0029BBF0[j]);
+                node = &g_puzzle_node_directions[i];
+                similarity = FastVecDot(node, &g_puzzle_node_directions[j]);
                 limit = 0.5f;
                 if (node->x != 0.0f && node->y != 0.0f && node->z != 0.0f)
                     limit = -0.1f;
                 if (similarity > limit)
-                    D_0024A7B0[i][n++] = j;
+                    g_path_puzzle_adjacency[i][n++] = j;
             }
         }
     }
 
     mat_get_euler_angles(rotation, position);
-    mat_build_rotation_from_angles(D_L03_001B36B0, position);
+    mat_build_rotation_from_angles(g_puzzle_rotation_quat, position);
     func_001163A0(path_state->sound);
     path_puzzle_generate_route(moby);
     SelectPathStepNodes(moby);
@@ -98,7 +98,7 @@ void InitializePathPuzzle(u8 *moby) {
     path_state->order[0] = 0;
     path_state->visited[0] = 1;
     path_state->pending = -1;
-    path_state->timer = D_L03_001B0B5C;
+    path_state->timer = g_path_puzzle_duration;
     path_state->current = 0;
     path_state->last = 0;
     path_state->next = 0;

@@ -24,9 +24,9 @@
  */
 #include "common.h"
 
-extern s32 D_001A7908;
-extern s32 D_001A7290 __attribute__((nosda));
-extern s32 D_001A72C0 __attribute__((nosda));
+extern s32 g_menu_toggle_option;
+extern s32 g_iop_block_table __attribute__((nosda));
+extern s32 g_current_weapon_channel __attribute__((nosda));
 extern s32 g_hero_moby_default[];
 
 /* Resets a few global slot ids to -1 and clears a flag. */
@@ -34,9 +34,9 @@ void save_reset_slot_ids(void) {
     s32 *p;
 
     p = g_hero_moby_default;
-    D_001A7290 = -1;
+    g_iop_block_table = -1;
     p[6] = -1;
-    D_001A72C0 = -1;
+    g_current_weapon_channel = -1;
     p[12] = -1;
-    D_001A7908 = 0;
+    g_menu_toggle_option = 0;
 }

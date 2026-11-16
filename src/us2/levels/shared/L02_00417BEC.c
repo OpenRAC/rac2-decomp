@@ -11,8 +11,8 @@ extern int flag_set_first_pending(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern float FastAddRotations(float,float);
-extern SaveTable D_L02_0021E880, D_L02_0021F4F0;
-extern u8 D_0019B4A8[];
+extern SaveTable g_level_active_flags, g_cell_flags;
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
 
 /* Advance the captured child's rising and settling states. */
@@ -22,11 +22,11 @@ void func_US2_L02_00417BEC(u8 *object)
     if (state->child && moby_is_state_six(state->child)) {
         int save=g_current_map_index<<10;
         unsigned short index;
-        D_L02_0021E880.active[*(short *)(state->child+0xB2)]=0;
-        D_L02_0021F4F0.active[*(short *)(state->child+0xB2)]=0;
+        g_level_active_flags.active[*(short *)(state->child+0xB2)]=0;
+        g_cell_flags.active[*(short *)(state->child+0xB2)]=0;
         index=*(unsigned short *)(state->child+0xB2);
         {
-            u8 *entry=&D_0019B4A8[((short)index>>1)+save];
+            u8 *entry=&g_moby_nibble_table[((short)index>>1)+save];
             unsigned flags=*entry;
             unsigned value=flags&0xF8;
             if (index&1) value=flags&0x8F;

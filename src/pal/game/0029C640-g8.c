@@ -3,10 +3,10 @@
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern int func_PAL_0029C498(void);
 extern unsigned int level_get_word_a(void);
-extern void func_PAL_L00_0030E780(void);
+extern void module_l00_call_handler_pal(void);
 typedef int (*Fn)(void);
 typedef struct { void *cb; int pad; } Slot;
 typedef struct {
@@ -30,26 +30,26 @@ void func_PAL_0029C640(void)
     if (ref_L00_0030CDB0_00[0] != 0)
         return;
 
-    if (D_001A8CFC[0] == 0)
+    if (g_resident_data_base[0] == 0)
         goto states;
     func_PAL_0029C498();
-    fn = (Fn)((Sub *)(D_001A8CFC[0] + 0x38000))->cb2;
+    fn = (Fn)((Sub *)(g_resident_data_base[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)
             return;
     }
     result = 0;
     for (i = 0; i < 4; i++) {
-        sub = (Sub *)(D_001A8CFC[0] + 0x38000);
+        sub = (Sub *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot[i].cb != 0)
-            result |= ((Fn *)(D_001A8CFC[0] + 0x3FAA8))[i * 2]();
+            result |= ((Fn *)(g_resident_data_base[0] + 0x3FAA8))[i * 2]();
     }
     if (result != 0)
         return;
     for (i = 0; i < 2; i++) {
-        sub = (Sub *)(D_001A8CFC[0] + 0x38000);
+        sub = (Sub *)(g_resident_data_base[0] + 0x38000);
         if (sub->slot2[i].cb != 0)
-            result |= ((Fn *)(D_001A8CFC[0] + 0x3FAC8))[i * 2]();
+            result |= ((Fn *)(g_resident_data_base[0] + 0x3FAC8))[i * 2]();
     }
     if (result != 0)
         return;
@@ -60,11 +60,11 @@ states:
                 return;
         }
     }
-    g = D_001A8CFC[0];
+    g = g_resident_data_base[0];
     if (g != 0) {
         char *b = g + 0x38000;
         g = (char *)((Sub *)b)->cb1;
         ((Fn)g)();
-        func_PAL_L00_0030E780();
+        module_l00_call_handler_pal();
     }
 }

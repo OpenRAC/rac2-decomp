@@ -135,45 +135,45 @@ typedef struct {
 } JobaLight;
 
 extern char g_hero_state[];
-extern u8 D_001395B8[];
-extern u8 D_00139586[];
-extern s32 D_00139700[];
-extern s32 D_001A7904;
-extern u16 D_001A65D2[];
-extern s32 D_001A7A00;
-extern s32 D_001A7BC0;
-extern s32 D_001A7390;
+extern u8 g_game_flag_table[];
+extern u8 g_arena_choice_enabled[];
+extern s32 g_arena_timer_a[];
+extern s32 g_arena_state_flag;
+extern u16 g_arena_fade_value[];
+extern s32 g_player_stats;
+extern s32 g_frame_counter_2;
+extern s32 g_frame_counter;
 extern u8 g_music_state[];
 
-extern f32 D_L11_001A7CD8;
-extern s32 D_L11_001A8F00;
-extern s32 D_L11_001A8FF0;
-extern s32 D_L11_001A8FF4;
-extern s32 D_L11_001A9010;
-extern u16 **D_L11_001A9014;
-extern s32 D_L11_001AA170;
-extern u8 D_L11_001B14B0[8] __attribute__((sda));
-extern s32 D_L11_001B14B8[6] __attribute__((sda));
-extern s32 D_L11_001B14D0[2] __attribute__((sda));
-extern s32 D_L11_001B14D8[8] __attribute__((sda));
+extern f32 g_hero_speed_param;
+extern s32 g_arena_state;
+extern s32 g_hero_control_locked;
+extern s32 g_hero_l11_input_blocked;
+extern s32 g_arena_l11_active_flag;
+extern u16 **g_arena_light_lists;
+extern s32 g_arena_challenge_display_id;
+extern u8 g_arena_wave_limits[8] __attribute__((sda));
+extern s32 g_arena_wave_kill_targets_a[6] __attribute__((sda));
+extern s32 g_arena_wave_kill_targets_b[2] __attribute__((sda));
+extern s32 g_arena_wave_kill_targets_c[8] __attribute__((sda));
 extern JobaClass *g_arena_challenge_table[14] __attribute__((sda));
-extern f32 D_L11_001B1570[4] __attribute__((sda));
-extern f32 D_L11_001B1580 __attribute__((sda));
-extern f32 D_L11_001B1584 __attribute__((sda));
-extern s32 D_L11_001B1588 __attribute__((sda));
-extern f32 D_L11_001B1590[2];
-extern f32 D_L11_001B1598[2];
-extern char D_L11_001B15A0[];
-extern f32 D_L11_001B2FE0;
-extern s32 D_L11_001B30C8;
+extern f32 g_arena_hero_reset_direction[4] __attribute__((sda));
+extern f32 g_arena_hero_height_max __attribute__((sda));
+extern f32 g_arena_hero_height_min __attribute__((sda));
+extern s32 g_arena_saved_hero_word __attribute__((sda));
+extern f32 g_l11_laser_speed_range[2];
+extern f32 g_arena_spawn_delay_range[2];
+extern char g_str_count_line_format[];
+extern f32 g_arena_timer_fraction;
+extern s32 g_arena_progress_level;
 extern JobaMoby *g_moby_l11_table;
-extern s32 D_L11_001B3680;
-extern u8 *D_L11_001B368C;
-extern s32 D_L11_001B3770[2];
-extern JobaLight *D_L11_001B3C1C;
-extern JobaFlags D_L11_001BA780;
-extern s32 D_L11_001CAE40[];
-extern u8 D_L11_001FFA78[];
+extern s32 g_arena_saved_value;
+extern u8 *g_arena_camera_table;
+extern s32 g_arena_sound_handles[2];
+extern JobaLight *g_joba_lights;
+extern JobaFlags g_hero_l11_state_block;
+extern s32 g_enemy_freeze_flag[];
+extern u8 g_enemy_damage_accum[];
 /* One 0xE0-byte record of the level's selection table. */
 typedef struct {
     u8 pad0[4];
@@ -181,7 +181,7 @@ typedef struct {
     u8 pad5[0xE0 - 5];
 } JobaChoice;
 
-extern JobaChoice D_L11_00279BA0[];
+extern JobaChoice g_item_l11_record_table[];
 
 extern int sprintf(char *, const char *, ...);
 extern void mem_clear(void *, int, int);
@@ -322,20 +322,20 @@ void func_US2_L11_0043F9DC(u8 *obj) {
 
     st = OBJ->st;
     blast_call_helper_no_args();
-    D_L11_001A9010 = 1;
+    g_arena_l11_active_flag = 1;
     switch (OBJ->state) {
     case 0:
         arena_reset_state(obj);
         arena_run_helper_on_spawn_groups(obj);
-        D_L11_001A8FF0 = 0;
-        D_L11_001A8FF4 = 0;
+        g_hero_control_locked = 0;
+        g_hero_l11_input_blocked = 0;
         g_moby_l11_table[st->door].flags |= 1;
         g_moby_l11_table[st->door].hidden = 0;
-        if (D_001A7904 == 2) {
-            D_001A7904 = 0;
+        if (g_arena_state_flag == 2) {
+            g_arena_state_flag = 0;
             moby_set_state(obj, 2, -1);
             state_set_flag_one();
-            st->fade = D_001A65D2[0];
+            st->fade = g_arena_fade_value[0];
             gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1F;
         }
@@ -346,21 +346,21 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         } else if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger1) != 0) {
             TryClaimNotice(4, 0x2DD2, 1);
             moby_try_alloc_enter_state2(obj);
-        } else if (D_001395B8[arena_get_challenge_flag_index(1)] != 0) {
+        } else if (g_game_flag_table[arena_get_challenge_flag_index(1)] != 0) {
             if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger2) != 0) {
                 TryClaimNotice(4, 0x2DD2, 1);
                 moby_try_alloc_enter_state2(obj);
             }
         }
-        if (D_001A7904 == 2) {
-            D_001A7904 = 0;
+        if (g_arena_state_flag == 2) {
+            g_arena_state_flag = 0;
             moby_set_state(obj, 2, -1);
             state_set_flag_one();
-            st->fade = D_001A65D2[0];
+            st->fade = g_arena_fade_value[0];
             gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1F;
         }
-        D_L11_001A9010 = 0;
+        g_arena_l11_active_flag = 0;
         break;
     case 2:
         if (flag_set_first_pending(obj) != 0) {
@@ -369,35 +369,35 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             OBJ->phase = 0;
             g_moby_l11_table[st->door].flags |= 1;
             g_moby_l11_table[st->door].hidden = 0;
-            lt3 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lt3 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
             m1 = &g_moby_l11_table[st->lamp];
             lt3->height = 419.766f;
             m1->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1F) {
-                D_L11_001B2FE0 = IntToFloat(OBJ->timer) * 0.05f < 1.0f
+                g_arena_timer_fraction = IntToFloat(OBJ->timer) * 0.05f < 1.0f
                                      ? IntToFloat(OBJ->timer) * 0.05f
                                      : 1.0f;
             } else {
                 f32 v[4] __attribute__((aligned(16)));
 
-                st->fade = D_001A65D2[0];
+                st->fade = g_arena_fade_value[0];
                 gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
-                if (D_L11_001CAE40[0] != 1) {
+                if (g_enemy_freeze_flag[0] != 1) {
                     load_scene_chunk(1, st->music);
                 }
-                p1 = D_L11_001B368C + (st->camera << 7);
+                p1 = g_arena_camera_table + (st->camera << 7);
                 hero_reset_position_and_direction(p1 + 0x30, p1 + 0x70, 0x6F, 1);
                 level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
                 script_queue_keyed_request(st->music, st->volume);
-                *(TI128 *)v = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
+                *(TI128 *)v = *(TI128 *)(g_arena_camera_table + ((st->camera << 7) + 0x30));
                 v[2] += 2.0f;
-                SetCamera5Pose((char *)v, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
+                SetCamera5Pose((char *)v, (char *)(g_arena_camera_table + (st->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
             gfx_add_draw_callback_third(hud_draw_fade_bar, obj);
-            D_L11_001B2FE0 = 0.0f;
+            g_arena_timer_fraction = 0.0f;
             if (st->fade <= 0) {
                 OBJ->phase = 3;
                 hero_start_loader_state(0);
@@ -405,15 +405,15 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             }
         } else if (OBJ->phase == 3) {
             if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], arena_get_center_point(obj)) < 10.0f) {
-                if (D_001395B8[0x4A] == 0) {
-                    D_001395B8[0x4A] = 1;
+                if (g_game_flag_table[0x4A] == 0) {
+                    g_game_flag_table[0x4A] = 1;
                     OBJ->phase = 1;
                     moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate1], 1);
                     OBJ->timer = 0;
-                } else if (D_001395B8[arena_get_challenge_flag_index(0)] != 0) {
+                } else if (g_game_flag_table[arena_get_challenge_flag_index(0)] != 0) {
                     moby_set_state(obj, 4, -1);
                 } else {
-                    hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0, 1);
+                    hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
                     moby_set_state(obj, 8, -1);
@@ -421,9 +421,9 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 }
             }
         } else if (OBJ->phase == 1) {
-            if (OBJ->timer >= 0x3D && D_L11_001A8F00 != 2) {
-                if (D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
-                    hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0, 1);
+            if (OBJ->timer >= 0x3D && g_arena_state != 2) {
+                if (g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
+                    hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0, 1);
                     st->cls = 0;
                     st->wave = 0;
                     moby_set_state(obj, 8, -1);
@@ -453,13 +453,13 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             arena_run_member_handlers(obj);
             arena_set_group_a_active_count(obj, 0);
             arena_set_group_b_active_count(obj, 0);
-            hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0x6F, 1);
+            hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0x6F, 1);
             level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
             arena_start_intro_script(obj);
             st->mode = 5;
             joba_update_ribbon_scale(obj);
-            D_L11_001A8FF4 = 0;
-            D_L11_001A8FF0 = 0;
+            g_hero_l11_input_blocked = 0;
+            g_hero_control_locked = 0;
         }
         arena_update_intro_script(obj);
         break;
@@ -495,7 +495,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             }
             OBJ->timer = 0;
             OBJ->phase = 1;
-        } else if (((Hero *)g_hero_state)->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xF1) {
+        } else if (((Hero *)g_hero_state)->i[0x24CC / 4] > 0 && g_arena_state != 2 && OBJ->timer >= 0xF1) {
             arena_start_challenge_result_scene((char *)obj, st->cls);
             OBJ->state = 5;
             g_moby_l11_table[st->door].flags |= 1;
@@ -504,11 +504,11 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             arena_run_member_handlers(obj);
             arena_set_group_a_active_count(obj, 0);
             arena_set_group_b_active_count(obj, 0);
-            hero_reset_position_and_direction(arena_get_center_point(obj), D_L11_001B1570, 0x6F, 1);
+            hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0x6F, 1);
             level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
             arena_start_intro_script(obj);
-            D_L11_001A8FF4 = 0;
-            D_L11_001A8FF0 = 0;
+            g_hero_l11_input_blocked = 0;
+            g_hero_control_locked = 0;
         }
         break;
     case 6:
@@ -516,10 +516,10 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         break;
     case 7:
         if (flag_set_first_pending(obj) != 0) {
-            sel = D_001395B8[0x49];
-            if (sel != 0 && (D_001395B8[arena_get_challenge_flag_index(g_arena_challenge_table[sel]->id)] == 0 ||
+            sel = g_game_flag_table[0x49];
+            if (sel != 0 && (g_game_flag_table[arena_get_challenge_flag_index(g_arena_challenge_table[sel]->id)] == 0 ||
                              (sel >= 11 && flag_is_byte_set() == 0) ||
-                             (sel == 8 && D_00139586[0][D_L11_00279BA0].enabled == 0))) {
+                             (sel == 8 && g_arena_choice_enabled[0][g_item_l11_record_table].enabled == 0))) {
                 sel = 0;
             }
             st->result = sel;
@@ -545,21 +545,21 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 st->marks[k3] = 0;
             }
             for (k3 = 0; k3 < 6; k3++) {
-                st->limits[k3] = D_L11_001B14B0[k3];
+                st->limits[k3] = g_arena_wave_limits[k3];
             }
-            ((Hero *)g_hero_state)->i[0x24CC / 4] = D_001A7A00;
+            ((Hero *)g_hero_state)->i[0x24CC / 4] = g_player_stats;
             moby_update_class_specials((char *)obj);
             g_moby_l11_table[st->door].flags |= 1;
             g_moby_l11_table[st->door].hidden = 0;
             if (st->cls == 7) {
                 r1 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
                 ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
-                D_L11_001B1588 = r1;
+                g_arena_saved_hero_word = r1;
             } else if (st->cls == 8) {
                 r2 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
                 ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
-                D_00139700[0] = 300;
-                D_L11_001B1588 = r2;
+                g_arena_timer_a[0] = 300;
+                g_arena_saved_hero_word = r2;
             }
         }
         rec2 = &g_arena_challenge_table[st->cls]->records[st->wave];
@@ -574,8 +574,8 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 st->counts[k4] = 0;
             }
             st->lost = 0;
-            if (D_L11_001BA780.owner == st->owner) {
-                D_L11_001BA780.owner = 0;
+            if (g_hero_l11_state_block.owner == st->owner) {
+                g_hero_l11_state_block.owner = 0;
             }
             cls1 = st->cls;
             cls3 = (u16)st->cls;
@@ -583,10 +583,10 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             st->owner = 0;
             if (st->wave >= g_arena_challenge_table[cls1]->count) {
                 if (cls3 - 7U < 2) {
-                    ((Hero *)g_hero_state)->i[0x18D4 / 4] = D_L11_001B1588;
+                    ((Hero *)g_hero_state)->i[0x18D4 / 4] = g_arena_saved_hero_word;
                 }
                 st->result = st->cls;
-                if (st->result == 0 && D_001395B8[arena_get_challenge_flag_index(0)] == 0) {
+                if (st->result == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
                     moby_set_state(obj, 12, -1);
                     return;
                 }
@@ -612,7 +612,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 for (k5 = 0; k5 < 6; k5++) {
                     sum1 += st->counts[k5];
                 }
-                sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x30FF), D_L11_001B14B8[st->wave] + sum1 - st->lost,
+                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x30FF), g_arena_wave_kill_targets_a[st->wave] + sum1 - st->lost,
                               GetLocalizedString(0x2DF7));
                 level_l00_call_module_handler_with_arg_9((int)buf, -1);
                 moby_set_state(obj, 11, -1);
@@ -637,7 +637,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 for (k6 = 0; k6 < 6; k6++) {
                     sum2 += st->counts[k6];
                 }
-                sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x30FF), D_L11_001B14D0[st->wave] + sum2 - st->lost,
+                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x30FF), g_arena_wave_kill_targets_b[st->wave] + sum2 - st->lost,
                               GetLocalizedString(0x2DF7));
                 level_l00_call_module_handler_with_arg_9((int)buf, -1);
                 moby_set_state(obj, 11, -1);
@@ -646,7 +646,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 return;
             }
         }
-        if ((st->cls == 3 || st->cls == 11) && ((Hero *)g_hero_state)->i[0x24CC / 4] < D_001A7A00) {
+        if ((st->cls == 3 || st->cls == 11) && ((Hero *)g_hero_state)->i[0x24CC / 4] < g_player_stats) {
             level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x3100), -1);
             moby_set_state(obj, 11, -1);
             st->sound = 0;
@@ -684,14 +684,14 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 r3 = arena_activate_boss_of_class(obj, 0xD4A, 0);
                 st->sound = r3;
                 st->owner = r3;
-                if (D_L11_001BA780.owner == 0) {
-                    D_L11_001BA780.owner = r3;
-                    D_L11_001BA780.timer = 0;
+                if (g_hero_l11_state_block.owner == 0) {
+                    g_hero_l11_state_block.owner = r3;
+                    g_hero_l11_state_block.timer = 0;
                 }
                 snd1 = st->sound;
-                if (D_L11_001B3770[0] == 0) {
-                    D_L11_001B3770[0] = snd1;
-                    mem_clear(D_L11_001FFA78, 0, 0xE0);
+                if (g_arena_sound_handles[0] == 0) {
+                    g_arena_sound_handles[0] = snd1;
+                    mem_clear(g_enemy_damage_accum, 0, 0xE0);
                 }
                 arena_queue_voice_line(obj, 10);
                 script_queue_keyed_request(st->track, st->trackVolume);
@@ -715,13 +715,13 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
         arena_update_camera_guide(obj);
         joba_boss_pick_action_by_target(obj);
-        if ((D_001A7BC0 & 3) == 0) {
+        if ((g_frame_counter_2 & 3) == 0) {
             arena_mark_nearest_fighters_to_attack(obj);
         }
         arena_update_fighters_inside(obj);
         if (arena_get_challenge_display_id(st->cls) != -1) {
-            D_L11_001AA170 = arena_get_challenge_display_id(st->cls);
-            D_L11_001B3680 = D_001A7390;
+            g_arena_challenge_display_id = arena_get_challenge_display_id(st->cls);
+            g_arena_saved_value = g_frame_counter;
         }
         break;
     case 9:
@@ -732,14 +732,14 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                     r4 = arena_activate_boss_of_class(obj, 0xB3A, 0);
                     st->sound = r4;
                     st->owner = r4;
-                    if (D_L11_001BA780.owner == 0) {
-                        D_L11_001BA780.owner = r4;
-                        D_L11_001BA780.timer = 0;
+                    if (g_hero_l11_state_block.owner == 0) {
+                        g_hero_l11_state_block.owner = r4;
+                        g_hero_l11_state_block.timer = 0;
                     }
                     snd2 = st->sound;
-                    if (D_L11_001B3770[1] == 0) {
-                        D_L11_001B3770[1] = snd2;
-                        buf2 = D_L11_001FFA78;
+                    if (g_arena_sound_handles[1] == 0) {
+                        g_arena_sound_handles[1] = snd2;
+                        buf2 = g_enemy_damage_accum;
                         mem_clear(buf2 + 0xE0, 0, 0xE0);
                     }
                     arena_queue_voice_line(obj, 4);
@@ -751,13 +751,13 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             arena_queue_voice_line(obj, math_random_int_below(2) + 0x1B);
             for (k8 = 0; k8 < 4; k8++) {
                 st->phase[k8] = (f32)k8 * 0.25f;
-                st->speed[k8] = math_random_float_range(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.016666668f;
-                st->delay[k8] = math_random_float_range(D_L11_001B1598[0], D_L11_001B1598[1]);
+                st->speed[k8] = math_random_float_range(g_l11_laser_speed_range[0], g_l11_laser_speed_range[1]) * 0.016666668f;
+                st->delay[k8] = math_random_float_range(g_arena_spawn_delay_range[0], g_arena_spawn_delay_range[1]);
             }
         } else if (OBJ->phase == 0) {
             joba_update_ribbon_scale(obj);
             arena_update_loss_history(obj);
-            lt1 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lt1 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
             q1 = (u8 *)&g_moby_l11_table[st->lamp];
             if (lt1->height < 421.266f) {
                 f1 = lt1->height + 0.008333334f;
@@ -767,7 +767,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             if (((Hero *)g_hero_state)->ptr[0x33C / 4] == (void *)q1 && ((Hero *)g_hero_state)->i[0x340 / 4] != 0 &&
                 (((Hero *)g_hero_state)->i[0x2294 / 4] == 7 || OBJ->timer >= 0x12D)) {
                 ((Hero *)g_hero_state)->i[0xF0 / 4] = 0;
-                D_L11_001A7CD8 = 80.0f;
+                g_hero_speed_param = 80.0f;
                 ((Hero *)g_hero_state)->i[0xF4 / 4] = 0;
                 if (((Hero *)g_hero_state)->i[0x2294 / 4] != 7) {
                     if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x81) {
@@ -800,24 +800,24 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             if (ok2 != 0) {
                 arena_refresh_squad_slots(obj);
             }
-            if (D_L11_001A8FF4 == 0) {
+            if (g_hero_l11_input_blocked == 0) {
                 if (((Hero *)g_hero_state)->f[0x88 / 4] > 480.0f && ((Hero *)g_hero_state)->f[0x180 / 4] < 0.033333335f) {
-                    D_L11_001A8FF4 = 1;
-                    D_L11_001A8FF0 = 1;
+                    g_hero_l11_input_blocked = 1;
+                    g_hero_control_locked = 1;
                     moby_update_class_specials((char *)obj);
                     part_emit_object_sparks(obj, 5);
                 }
-                if (D_L11_001A8FF4 == 0) {
-                    if (((Hero *)g_hero_state)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)g_hero_state)->f[0x88 / 4]) {
+                if (g_hero_l11_input_blocked == 0) {
+                    if (((Hero *)g_hero_state)->f[0x88 / 4] < g_arena_hero_height_max && g_arena_hero_height_min < ((Hero *)g_hero_state)->f[0x88 / 4]) {
                         ((Hero *)g_hero_state)->h[0x1F0 / 2] = 1;
                     }
-                    if (D_L11_001A8FF4 == 0) {
+                    if (g_hero_l11_input_blocked == 0) {
                         goto tail9;
                     }
                 }
             }
             part_emit_object_sparks(obj, 0);
-            if (D_L11_001A8FF4 != 0 && st->mode == 3) {
+            if (g_hero_l11_input_blocked != 0 && st->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
                 rec6 = &g_arena_challenge_table[st->cls]->records[st->wave];
@@ -883,14 +883,14 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                         r5 = arena_activate_boss_of_class(obj, 0xB3A, 0);
                         st->sound = r5;
                         st->owner = r5;
-                        if (D_L11_001BA780.owner == 0) {
-                            D_L11_001BA780.owner = r5;
-                            D_L11_001BA780.timer = 0;
+                        if (g_hero_l11_state_block.owner == 0) {
+                            g_hero_l11_state_block.owner = r5;
+                            g_hero_l11_state_block.timer = 0;
                         }
                         snd3 = st->sound;
-                        if (D_L11_001B3770[1] == 0) {
-                            D_L11_001B3770[1] = snd3;
-                            buf3 = D_L11_001FFA78;
+                        if (g_arena_sound_handles[1] == 0) {
+                            g_arena_sound_handles[1] = snd3;
+                            buf3 = g_enemy_damage_accum;
                             mem_clear(buf3 + 0xE0, 0, 0xE0);
                         }
                         arena_queue_voice_line(obj, 4);
@@ -913,10 +913,10 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                     for (k12 = 0; k12 < 6; k12++) {
                         sum3 += st->counts[k12];
                     }
-                    sprintf(buf, D_L11_001B15A0, GetLocalizedString(0x30FF), D_L11_001B14D8[st->wave] + sum3 - st->lost,
+                    sprintf(buf, g_str_count_line_format, GetLocalizedString(0x30FF), g_arena_wave_kill_targets_c[st->wave] + sum3 - st->lost,
                                   GetLocalizedString(0x2DF7));
                     level_l00_call_module_handler_with_arg_9((int)buf, -1);
-                    lt4 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+                    lt4 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
                     m2 = &g_moby_l11_table[st->lamp];
                     lt4->height = 419.766f;
                     m2->y = 419.766f;
@@ -930,18 +930,18 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             joba_update_ribbon_scale(obj);
             if (OBJ->timer >= 0xB5) {
                 ((Hero *)g_hero_state)->h[0x348 / 2] = 0;
-                D_L11_001A7CD8 = 5.0f;
+                g_hero_speed_param = 5.0f;
                 hero_l11_enter_state(0x81, 1);
                 OBJ->phase = 3;
             }
         } else if (OBJ->phase == 3) {
-            D_L11_001A8FF4 = 0;
-            D_L11_001A8FF0 = 0;
-            if (((Hero *)g_hero_state)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)g_hero_state)->f[0x88 / 4]) {
+            g_hero_l11_input_blocked = 0;
+            g_hero_control_locked = 0;
+            if (((Hero *)g_hero_state)->f[0x88 / 4] < g_arena_hero_height_max && g_arena_hero_height_min < ((Hero *)g_hero_state)->f[0x88 / 4]) {
                 ((Hero *)g_hero_state)->h[0x1F0 / 2] = 1;
             }
             joba_update_ribbon_scale(obj);
-            lt2 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lt2 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
             m3 = &g_moby_l11_table[st->lamp];
             if (lt2->height > 419.766f) {
                 f2 = lt2->height - 0.008333334f;
@@ -954,14 +954,14 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                     st->counts[k13] = 0;
                 }
                 st->lost = 0;
-                if (D_L11_001BA780.owner == st->owner) {
-                    D_L11_001BA780.owner = 0;
+                if (g_hero_l11_state_block.owner == st->owner) {
+                    g_hero_l11_state_block.owner = 0;
                 }
                 cls2 = st->cls;
                 st->sound = 0;
                 st->owner = 0;
                 if (st->wave >= g_arena_challenge_table[cls2]->count) {
-                    if (cls2 == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
+                    if (cls2 == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
                         moby_set_state(obj, 13, -1);
                         OBJ->timer = 0xB4;
                     } else {
@@ -988,15 +988,15 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
         arena_update_camera_guide(obj);
         joba_boss_pick_action_by_target(obj);
-        if ((D_L11_001B30C8 & 7) == (slot1 & 7)) {
+        if ((g_arena_progress_level & 7) == (slot1 & 7)) {
             arena_update_fighters_inside(obj);
         }
-        if ((D_L11_001B30C8 & 0x3F) == (slot1 & 0x3F)) {
+        if ((g_arena_progress_level & 0x3F) == (slot1 & 0x3F)) {
             arena_mark_nearest_fighters_to_attack(obj);
         }
         if (arena_get_challenge_display_id(st->cls) != -1) {
-            D_L11_001AA170 = arena_get_challenge_display_id(st->cls);
-            D_L11_001B3680 = D_001A7390;
+            g_arena_challenge_display_id = arena_get_challenge_display_id(st->cls);
+            g_arena_saved_value = g_frame_counter;
         }
         break;
     }

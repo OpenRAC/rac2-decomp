@@ -5,16 +5,16 @@ extern void *D_0026CBE0[];
 extern int g_current_game_mode;
 extern int g_previous_game_mode;
 extern int g_requested_game_mode;
-extern int D_0018C2EC __attribute__((nosda));
-extern int D_001AA0F4 __attribute__((sda));
-extern int D_001AA0F8 __attribute__((sda));
-extern int D_001AA0FC __attribute__((sda));
-extern char *D_001AA104 __attribute__((sda));
-extern float D_001A8C7C;
+extern int g_request_enabled_flag __attribute__((nosda));
+extern int g_requested_setting_b __attribute__((sda));
+extern int g_pending_mode_arg_a __attribute__((sda));
+extern int g_pending_mode_arg_b __attribute__((sda));
+extern char *g_pending_mode_done_flag __attribute__((sda));
+extern float g_mode_fade_scale;
 extern float g_screen_fade;
-extern int D_001B1694;
-extern float D_001B90F0 __attribute__((nosda));
-extern int D_001ABD80;
+extern int g_mode_change_flag;
+extern float g_fov_tangent __attribute__((nosda));
+extern int g_moby_hide_mode_a;
 extern void RestoreMenuDisplayState(void);
 extern void menu_end(void);
 extern void mpeg_resume_after_movie(void);
@@ -51,7 +51,7 @@ extern void gfx_lighting_init_wrapper(void);
    `entering` only keep the labels alive. A handler reached through a table starts with no known
    values, so D_001A8BB8 is read again where retail reads it (the compare in the first handler of
    mode 3) without any qualifier on the global. */
-void func_US2_002B5B38(void)
+void mode_apply_pending_change_us2(void)
 {
     static void *leaving[12] = {&&L1_3, &&L1_4, &&L1_1, &&L1_2, &&L1_6, &&L1_5, &&L1_7, &&L1_8, &&L1_9, &&L1_0, &&L1_def, &&shared};
     static void *entering[11] = {&&L2_3, &&L2_0, &&L2_4, &&L2_1, &&L2_2, &&L2_6, &&L2_5, &&L2_7, &&L2_8, &&L2_9, &&L2_def};
@@ -61,17 +61,17 @@ void func_US2_002B5B38(void)
     g_previous_game_mode = mode;
     if (g_requested_game_mode == -2)
         return;
-    if (D_001AA0F4 > 0) {
-        D_001AA0F4--;
+    if (g_requested_setting_b > 0) {
+        g_requested_setting_b--;
         return;
     }
-    if (D_0018C2EC == 0)
+    if (g_request_enabled_flag == 0)
         return;
     if ((unsigned)mode >= 10)
         goto L1_def;
     goto *D_0026CBB0[mode];
 L1_3:
-    if (g_requested_game_mode != 4 || D_001AA0F8 == 8)
+    if (g_requested_game_mode != 4 || g_pending_mode_arg_a == 8)
         RestoreMenuDisplayState();
     goto E1;
 L1_4:
@@ -83,12 +83,12 @@ L1_1:
 L1_2:
     cutscene_end();
 shared:
-    D_001B90F0 = 0.62f;
+    g_fov_tangent = 0.62f;
     cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
     UpdateViewContext();
     goto E1;
 L1_6:
-    if (D_001AA0F8 != 4)
+    if (g_pending_mode_arg_a != 4)
         scene_end_playback();
     goto E1;
 L1_5:
@@ -115,56 +115,56 @@ E1:
     goto *D_0026CBE0[sel];
 L2_3:
     if (g_previous_game_mode != 4 || menu_get_mode() == 8)
-        menu_init_pause_state(D_001AA0F8);
+        menu_init_pause_state(g_pending_mode_arg_a);
 L2_0:
     hold = 0;
     goto E2;
 L2_4:
-    menu_set_mode(D_001AA0F8, D_001AA0FC);
+    menu_set_mode(g_pending_mode_arg_a, g_pending_mode_arg_b);
     goto E2;
 L2_1:
-    mpeg_start_movie_from_toc(D_001AA0FC);
+    mpeg_start_movie_from_toc(g_pending_mode_arg_b);
     hold = 0;
     goto E2;
 L2_2:
     if ((unsigned)(g_current_game_mode - 1) >= 2) {
         float f;
-        ApproachValue(&D_001A8C7C, 1.2f, 0.10000001f);
-        f = D_001A8C7C;
+        ApproachValue(&g_mode_fade_scale, 1.2f, 0.10000001f);
+        f = g_mode_fade_scale;
         g_screen_fade = f;
         if (1.0f < f)
             g_screen_fade = 1.0f;
         if (1.2f <= f) {
             hold = 0;
-            D_001A8C7C = 1.0f;
-            cutscene_start(D_001AA0F8);
+            g_mode_fade_scale = 1.0f;
+            cutscene_start(g_pending_mode_arg_a);
         } else {
             hold = 1;
         }
     } else {
-        cutscene_start(D_001AA0F8);
+        cutscene_start(g_pending_mode_arg_a);
     }
     goto E2;
 L2_6:
-    if (D_001AA0F8 == 5) {
-        data_set_small_value_and_refresh(D_001AA0FC, 1);
-    } else if (D_001AA0F8 == 6) {
+    if (g_pending_mode_arg_a == 5) {
+        data_set_small_value_and_refresh(g_pending_mode_arg_b, 1);
+    } else if (g_pending_mode_arg_a == 6) {
         scene_init_playback_state();
     } else {
         if (g_previous_game_mode == 3)
-            scene_init_list(D_001AA0FC);
+            scene_init_list(g_pending_mode_arg_b);
         else
             scene_reset_state_on_start();
-        D_001B1694 = 1;
+        g_mode_change_flag = 1;
     }
     goto E2;
 L2_5:
-    OpenVendorMenu(D_001AA0F8);
+    OpenVendorMenu(g_pending_mode_arg_a);
     goto E2;
 L2_7:
     {
-        int fallback = D_001ABD80;
-        moby_hide_all(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
+        int fallback = g_moby_hide_mode_a;
+        moby_hide_all(g_pending_mode_arg_a ? g_pending_mode_arg_a : fallback, g_pending_mode_arg_b);
     }
     goto E2;
 L2_8:
@@ -178,11 +178,11 @@ L2_def:
 E2:
     if (hold == 0) {
         int state;
-        if (D_001AA104 != 0)
-            *D_001AA104 = 1;
+        if (g_pending_mode_done_flag != 0)
+            *g_pending_mode_done_flag = 1;
         state = g_requested_game_mode;
         g_requested_game_mode = -2;
         g_current_game_mode = state;
-        D_001AA104 = 0;
+        g_pending_mode_done_flag = 0;
     }
 }

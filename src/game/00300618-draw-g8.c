@@ -47,9 +47,9 @@ typedef struct {
     unsigned short newPage;
 } TextureUpload;
 typedef struct { NativeCompactU64 color, coordinate, position, reserved18; } ScratchVertex;
-extern int D_001A72D0;
+extern int g_vram_cursor;
 extern int g_screen_offset_x[2];
-extern u8 D_001A7BB1;
+extern u8 g_display_mode_flag;
 extern int ref_00300AA8_00;
 extern TextureUpload ref_00300AA8_01[64];
 extern float nativeProjection[16] SDATA(ref_00300AA8_02);
@@ -91,8 +91,8 @@ void DrawNativeQuads(char *object, float x, float y, int flags, float frame, flo
         texture=&header->textures[index];
         width=(short)texture->compact.field0C;
         shift=width-6;
-        oldCursor=D_001A72D0>>8;
-        page=D_001A72D0+0x400;
+        oldCursor=g_vram_cursor>>8;
+        page=g_vram_cursor+0x400;
         height=page>>8;
         queued=ref_00300AA8_00;
         if ((int)shift<0) shift=0;
@@ -111,7 +111,7 @@ void DrawNativeQuads(char *object, float x, float y, int flags, float frame, flo
         width=one<<width;
         shift=width;
         width=page+shift;
-        D_001A72D0=width;
+        g_vram_cursor=width;
         texture->compact.field00=tex0_word;
         if (queued<64) {
             upload=&ref_00300AA8_01[queued];
@@ -130,7 +130,7 @@ void DrawNativeQuads(char *object, float x, float y, int flags, float frame, flo
     FastVecScale(transform+12,transform+12,166.66600036621094f);
     nativeProjection[0]=ref_00300AA8_03.scale[0]/ref_00300AA8_03.size[0];
     ref_00300AA8_02[9]=-(ref_00300AA8_03.scale[1]/ref_00300AA8_03.size[1]);
-    if (D_001A7BB1) ref_00300AA8_02[9]*=0.7500000596046448f;
+    if (g_display_mode_flag) ref_00300AA8_02[9]*=0.7500000596046448f;
     multiply_matrix(matrix,nativeProjection,transform);
     matrix[12]+=(float)g_screen_offset_x[0]+x*16.0f;
     matrix[13]+=(float)g_screen_offset_x[1]+y*16.0f;

@@ -10,21 +10,21 @@ typedef union { Q q; float f[4]; } V;
 
 /* An offset from a macro-addressed symbol is two words long and never fills a
    delay slot, while a bare macro-addressed scalar can. Retail shows both. */
-extern u8 D_001A7BD8[] MACRO_ADDR, D_L17_001A7C88[] MACRO_ADDR, D_001A7A40 MACRO_ADDR;
+extern u8 g_level_flag_bytes[] MACRO_ADDR, g_price_flag_block[] MACRO_ADDR, g_unlocked_item_flags MACRO_ADDR;
 #define D_001A7BDA D_001A7BD8[2]
 #define D_L17_001A7C8F D_L17_001A7C88[7]
-extern s32 D_L17_001B2964[] MACRO_ADDR;
+extern s32 g_message_switch_busy_flags[] MACRO_ADDR;
 #define BUSY D_L17_001B2964[1]
 
-extern s32 D_001397F0 NOT_SDA, D_00138324 NOT_SDA;
+extern s32 g_object_state_flags_g NOT_SDA, g_pad_held_flags NOT_SDA;
 extern s32 g_player_bolts MACRO_ADDR; /* the player's bolts */
-extern s32 D_L17_001A8F00 MACRO_ADDR, D_L17_001B2D0C MACRO_ADDR, g_moby_l17_pool MACRO_ADDR;
-extern u8 D_L17_001BFDC0[];
+extern s32 g_spark_effect_state MACRO_ADDR, g_linked_moby_base MACRO_ADDR, g_moby_l17_pool MACRO_ADDR;
+extern u8 g_request_l17_queue[];
 
 /* The two prices, read as scalars and as members of their table. */
 typedef struct { char pad[0x30]; s32 lo; s32 hi; } PriceTable;
-extern PriceTable D_L17_0028C550;
-extern s32 D_L17_0028C580 NOT_SDA, D_L17_0028C584 NOT_SDA;
+extern PriceTable g_vendor_l17_price_table;
+extern s32 g_vendor_price_low NOT_SDA, g_vendor_price_high NOT_SDA;
 #define PRICE_LT(m) (D_L17_001A7C8F ? (m) < D_L17_0028C584 : (m) < D_L17_0028C580)
 
 typedef struct { char pad[0x80]; char obj[0x60]; V pos; } HeroRecord;
@@ -69,8 +69,8 @@ void UpdateBoltPurchaseMoby(s32 obj) {
     moby_reset_matching_effects(obj);
     switch (B(obj, 0x20)) {
     case 0:
-        if (D_001A7BDA) goto destroy;
-        if (D_001397F0 & 0x200) {
+        if (g_joint_destroy_flag) goto destroy;
+        if (g_object_state_flags_g & 0x200) {
             s32 bolts = g_player_bolts;
             if (PRICE_LT(bolts)) moby_set_state(obj, 3, -1);
             else moby_set_state(obj, 4, -1);
@@ -80,22 +80,22 @@ void UpdateBoltPurchaseMoby(s32 obj) {
         moby_reset_vars_defaults(obj);
         break;
     case 1:
-        if (IsPointInCuboid(g_hero_state.obj, I(data, 0x120)) && req_push_queue(D_L17_001BFDC0, 0x89)) {
+        if (IsPointInCuboid(g_hero_state.obj, I(data, 0x120)) && req_push_queue(g_request_l17_queue, 0x89)) {
             level_apply_index_for_key(obj);
-            req_launch_queued(D_L17_001BFDC0);
+            req_launch_queued(g_request_l17_queue);
             moby_set_state(obj, 2, -1);
         }
         break;
     case 2:
         BUSY = 1;
-        if (D_L17_001A8F00 == 2) {
+        if (g_spark_effect_state == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
         if (!game_is_either_mode_two()) {
             BUSY = 0;
             {
-                s32 p = D_L17_001B2D0C + (I(data, 0x120) << 7);
+                s32 p = g_linked_moby_base + (I(data, 0x120) << 7);
                 hero_reset_position_and_direction(p + 0x30, p + 0x70, 0, 1);
             }
             B(obj, 0x31) = 1;
@@ -110,21 +110,21 @@ void UpdateBoltPurchaseMoby(s32 obj) {
     case 3:
         {
             s32 bolts = g_player_bolts;
-            if (D_L17_001A7C8F ? D_L17_0028C550.hi < bolts : D_L17_0028C550.lo < bolts) {
+            if (g_price_use_high_flag ? g_vendor_l17_price_table.hi < bolts : g_vendor_l17_price_table.lo < bolts) {
                 moby_set_state(obj, 4, -1);
                 break;
             }
         }
         if (hero_is_reachable_for_count(obj, 10, 4.f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x27d7, D_L17_001A7C8F ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
+            text_print_localized_formatted(0x27d7, g_price_use_high_flag ? g_vendor_l17_price_table.hi : g_vendor_l17_price_table.lo, -1);
             level_apply_index_for_key(obj);
         }
         break;
     case 4:
         {
             s32 bolts = g_player_bolts;
-            if (D_L17_001A7C8F ? bolts < D_L17_0028C550.hi : bolts < D_L17_0028C550.lo) {
+            if (g_price_use_high_flag ? bolts < g_vendor_l17_price_table.hi : bolts < g_vendor_l17_price_table.lo) {
                 func_L00_0030C710(180);
                 moby_set_state(obj, 3, -1);
                 break;
@@ -132,19 +132,19 @@ void UpdateBoltPurchaseMoby(s32 obj) {
         }
         if (hero_is_reachable_for_count(obj, 10, 4.f)) {
             func_L00_0030C710(180);
-            text_print_localized_formatted(0x27d8, D_L17_001A7C8F ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
+            text_print_localized_formatted(0x27d8, g_price_use_high_flag ? g_vendor_l17_price_table.hi : g_vendor_l17_price_table.lo, -1);
             level_apply_index_for_key(obj);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L17_001BFDC0, 0x8a)) {
-                req_push_queue(D_L17_001BFDC0, 0x12);
-                req_push_queue(D_L17_001BFDC0, 0x8b);
-                req_launch_queued(D_L17_001BFDC0);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_request_l17_queue, 0x8a)) {
+                req_push_queue(g_request_l17_queue, 0x12);
+                req_push_queue(g_request_l17_queue, 0x8b);
+                req_launch_queued(g_request_l17_queue);
                 moby_set_state(obj, 5, -1);
             }
         }
         break;
     case 5:
         BUSY = 1;
-        if (D_L17_001A8F00 == 2) {
+        if (g_spark_effect_state == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
@@ -152,10 +152,10 @@ void UpdateBoltPurchaseMoby(s32 obj) {
             BUSY = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
-            if (!D_001A7BDA) {
+            if (!g_joint_destroy_flag) {
                 {
                     s32 bolts = g_player_bolts;
-                    g_player_bolts = bolts - (D_L17_001A7C8F ? D_L17_0028C584 : D_L17_0028C580);
+                    g_player_bolts = bolts - (g_price_use_high_flag ? g_vendor_price_high : g_vendor_price_low);
                 }
                 func_L00_0030C710(180);
                 moby_mark_flag_and_append_to_list(0x12);
@@ -220,7 +220,7 @@ destroy:
         F(data, 0xe8) = yaw * .4f;
     }
 
-    if (D_001A7A40) F(data, 0x70) = 2.75f;
+    if (g_unlocked_item_flags) F(data, 0x70) = 2.75f;
     update_joint(obj, data, 0, speed, .3f);
     update_joint(obj, data + 0x80, 1, speed, .3f);
 }

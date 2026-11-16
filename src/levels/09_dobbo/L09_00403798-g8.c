@@ -8,16 +8,16 @@ typedef struct {
     char *owner;
 } DobboSoundAnchor;
 
-extern u16 D_L09_001B13C0 __attribute__((sda));
-extern int D_L09_001B13D4 __attribute__((sda));
-extern char D_L09_001B13D8[], g_hero_position[], g_sound_state[];
+extern u16 g_dobbo_timer_value __attribute__((sda));
+extern int g_dobbo_path_sound __attribute__((sda));
+extern char g_str_dobbo_path_debug[], g_hero_position[], g_sound_state[];
 extern struct {
     char pad[0x80];
     char position[0x10];
     char pad2[0x240C];
     char *target;
 } D_00189E20;
-extern int *D_L09_001FE6C0[];
+extern int *g_path_l09_table[];
 
 extern void dobbo_update_large_release_record(char *);
 extern void dobbo_restore_saved_height(char *);
@@ -74,7 +74,7 @@ void dobbo_path_enemy_update(char *obj)
     case 2:
         if (*(int *)(vars + 0x234) == 1 || *(s16 *)(vars + 0x26C)) {
             dobbo_alert_path_enemies(obj);
-            *(u16 *)(vars + 0x26C) = D_L09_001B13C0;
+            *(u16 *)(vars + 0x26C) = g_dobbo_timer_value;
             if ((u8)obj[0x43] != state)
                 anim_start_blended(obj, 2, 0, 5);
             moby_set_controller_speed_limits(obj, 0.0066666668f, 0.06666667f, 0.8377582f, 0.8377582f);
@@ -106,7 +106,7 @@ void dobbo_path_enemy_update(char *obj)
             if (*(u8 *)(obj + 0x43) != 0)
                 anim_start_blended(obj, 0, 0, 20);
         }
-        path = D_L09_001FE6C0[*(int *)(vars + 0x250)];
+        path = g_path_l09_table[*(int *)(vars + 0x250)];
         length = IntToFloat(*path);
         *(float *)(vars + 0x290) += length / (*(float *)(vars + 0x25C) * 60.0f);
         if (length <= *(float *)(vars + 0x290)) {
@@ -142,7 +142,7 @@ void dobbo_path_enemy_update(char *obj)
         if (flag_set_first_pending(obj)) {
             DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + *(s16 *)(vars + 0x274) * 0x70);
             if (entry->owner != obj || !entry->active)
-                *(s16 *)(vars + 0x274) = PlayMobySound(D_L09_001B13D4, 4, obj);
+                *(s16 *)(vars + 0x274) = PlayMobySound(g_dobbo_path_sound, 4, obj);
         }
         moby_turn_toward_target_and_step(obj, vars + 0x220, 0.0f);
         if (g_hero_state.target == obj || vec_distance_xy(obj + 0x10, g_hero_state.position) < 1.2f) {
@@ -161,7 +161,7 @@ void dobbo_path_enemy_update(char *obj)
     case 9:
         flags = moby_dispatch_action_by_kind(obj, vars + 0x50);
         if (flags & 1) {
-            STUB_printf(D_L09_001B13D8, *(s16 *)(vars + 0x274), *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_dobbo_path_debug, *(s16 *)(vars + 0x274), *(s16 *)(obj + 0xB2));
             index = *(s16 *)(vars + 0x274);
             if (index != -1) {
                 DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + index * 0x70);
@@ -178,7 +178,7 @@ void dobbo_path_enemy_update(char *obj)
             moby_mark_spawned(obj);
             return;
         } else if (flags & 2) {
-            *(u16 *)(vars + 0x26C) = D_L09_001B13C0;
+            *(u16 *)(vars + 0x26C) = g_dobbo_timer_value;
             moby_set_state(obj, 5, 3);
             PlayMobySound(3, 0, obj);
         }

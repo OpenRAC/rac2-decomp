@@ -31,7 +31,7 @@ typedef struct { float x, y, z, w; } V4_F213135aa;
 
     extern int coll_test_point(void *, int, void *, float);
 
-    extern int D_001BAF9C;
+    extern int g_hit_break_count;
 
 extern void FastVecScale(void *, void *, float);
 extern V4_F213135aa ref_00303210_00[];
@@ -45,7 +45,7 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 
 extern int coll_test_point(void *, int, void *, float);
 
-extern int D_001BAF9C;
+extern int g_hit_break_count;
 
 extern void moby_sort_entries_by_distance(void *);
 
@@ -86,13 +86,13 @@ NativeCompactHeader *func_00300618(NativeCompactHeader *header);
 
 /* func_00300F58 is defined in 00300F58-g8.c. */
 
-int func_PAL_003033A8(char *obj, char *obj2, float x, float y);
+int pickup_start_fly_to_target_pal(char *obj, char *obj2, float x, float y);
 
-int func_PAL_00303548(char *obj, char *obj2)
+int pickup_start_fly_if_idle_pal(char *obj, char *obj2)
 {
     if (*(u8 *)(obj + 32) != 3)
         return 3;
-    return func_PAL_003033A8(obj, obj2, 0.0f, 0.0f);
+    return pickup_start_fly_to_target_pal(obj, obj2, 0.0f, 0.0f);
 }
 
 /* func_00302A20 uses the quadword-copy profile in 00300618-qcopy.c. */

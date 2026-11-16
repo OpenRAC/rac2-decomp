@@ -74,20 +74,20 @@ typedef int HeroTI __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; HeroTI q[0x260]; } Hero;
 extern char g_hero_state[];
 /* These resident scalars/pointer are outside the GP-relative range. */
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 extern u8 g_sound_state[];
-extern BarlowUtilityQueueView D_L16_001BFD00;
-extern int D_L16_001A8F00;
-extern u8 *D_L16_001B16C0 __attribute__((sda));
-extern float D_L16_001B16E4 __attribute__((sda));
-extern float D_L16_001B16E8 __attribute__((sda));
-extern float D_L16_001B16EC __attribute__((sda));
-extern float D_L16_001B16F0 __attribute__((sda));
-extern float D_L16_001B16F4 __attribute__((sda));
-extern float D_L16_001B16F8 __attribute__((sda));
-extern unsigned int D_L16_001B2648;
-extern float D_L16_001B2564;
-extern float D_L16_001B9B00[4];
+extern BarlowUtilityQueueView g_request_l16_queue;
+extern int g_snivelak_state;
+extern u8 *g_snivelak_target __attribute__((sda));
+extern float g_snivelak_path_speed_a __attribute__((sda));
+extern float g_snivelak_path_speed_b __attribute__((sda));
+extern float g_snivelak_path_slot_arg_a __attribute__((sda));
+extern float g_snivelak_path_slot_arg_b __attribute__((sda));
+extern float g_snivelak_aim_time __attribute__((sda));
+extern float g_snivelak_aim_decay_rate __attribute__((sda));
+extern unsigned int g_frame_l16_counter;
+extern float g_snivelak_room_fade;
+extern float g_scene_origin_transform[4];
 
 /* Current C interfaces and retail-observed register banks for assembly callees. */
 extern void UpdateSnivelakBossDamage(u8 *);
@@ -165,11 +165,11 @@ void snivelak_update(u8 *moby)
     switch (moby[0x95]) {
     case 0:
         if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->entryArea) ||
-            (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->exitArea) && D_001395B8[0x83] == 1)) {
-            flags = D_001395B8;
+            (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x20], state->exitArea) && g_game_flag_table[0x83] == 1)) {
+            flags = g_game_flag_table;
             if (!flags[0x83]) {
-                if (req_push_queue((u8 *)&D_L16_001BFD00, 132)) {
-                    req_launch_queued(&D_L16_001BFD00);
+                if (req_push_queue((u8 *)&g_request_l16_queue, 132)) {
+                    req_launch_queued(&g_request_l16_queue);
                     game_set_stored_value_pair((int)snivelak_finish_boss_intro_state, (int)moby);
                     flags[0x83] = 1;
                     state->introStarted = 1;
@@ -198,16 +198,16 @@ void snivelak_update(u8 *moby)
         }
         break;
     case 1:
-        if (D_L16_001B16C0) {
-            state->target = D_L16_001B16C0;
+        if (g_snivelak_target) {
+            state->target = g_snivelak_target;
             moby_set_state(moby, 7, 2);
         }
         break;
     case 2:
-        if (!D_L16_001B16C0) moby_set_state(moby, 2, 1);
+        if (!g_snivelak_target) moby_set_state(moby, 2, 1);
         break;
     }
-    if (D_L16_001A8F00 == 2) return;
+    if (g_snivelak_state == 2) return;
 
     switch (moby[0x20]) {
     case 1:
@@ -222,7 +222,7 @@ void snivelak_update(u8 *moby)
             }
         }
         snivelak_find_closest_path_point(moby, &((Hero *)g_hero_state)->f[0x20]);
-        snivelak_move_along_path(moby, D_L16_001B16E4 * 0.016666668f);
+        snivelak_move_along_path(moby, g_snivelak_path_speed_a * 0.016666668f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 32.0f) {
             frame = moby_get_anim_value((char *)moby);
             if (math_fabs(frame - 5.0f) < 1.0f || math_fabs(frame - 21.0f) < 1.0f) {
@@ -254,7 +254,7 @@ void snivelak_update(u8 *moby)
             state->taunted = 1;
             RequestVoiceLine(moby, 16);
         }
-        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) snivelak_fire_body_shots(moby);
+        if ((g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) snivelak_fire_body_shots(moby);
         snivelak_find_closest_path_point(moby, &((Hero *)g_hero_state)->f[0x20]);
         if (((Hero *)g_hero_state)->i[0x8A5] == 129) moby_set_state(moby, 6, -1);
         else if (vec_distance_xy(moby + 0x10, state->destination) > 48.0f) moby_set_state(moby, 2, -1);
@@ -332,9 +332,9 @@ void snivelak_update(u8 *moby)
     case 7:
         if (flag_set_first_pending(moby)) {
             anim_play_on_self_or_child(moby, 10, 30, 6.0f);
-            path_pick_new_slot(moby, D_L16_001B16EC, D_L16_001B16F0);
+            path_pick_new_slot(moby, g_snivelak_path_slot_arg_a, g_snivelak_path_slot_arg_b);
         }
-        snivelak_move_along_path(moby, D_L16_001B16E8 * 0.016666668f);
+        snivelak_move_along_path(moby, g_snivelak_path_speed_b * 0.016666668f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) moby_set_state(moby, 8, -1);
         snivelak_switch_fly_hover_state(moby);
         break;
@@ -354,7 +354,7 @@ void snivelak_update(u8 *moby)
             anim_play_on_self_or_child(moby, 10, 30, 6.0f);
             snivelak_find_closest_path_point(moby, state->target + 0x10);
         }
-        snivelak_move_along_path(moby, D_L16_001B16E8 * 0.016666668f);
+        snivelak_move_along_path(moby, g_snivelak_path_speed_b * 0.016666668f);
         if (vec_distance_xy(moby + 0x10, state->destination) < 1.0f) {
             if (math_fabs(*(float *)(state->target + 0x18) - 120.0f) < 1.0f) moby_set_state(moby, 12, -1);
             else moby_set_state(moby, 11, -1);
@@ -365,7 +365,7 @@ void snivelak_update(u8 *moby)
             if (moby[0x43] != 22) anim_start_blended(moby, 22, 0, 20);
             anim_start_blended(state->body, 3, 0, 30);
             state->aimTimeout = 120;
-            state->aimTime = D_L16_001B16F4;
+            state->aimTime = g_snivelak_aim_time;
             state->aimBlend = 0.0f;
             state->verticalSpeed = 0.0f;
         }
@@ -376,7 +376,7 @@ void snivelak_update(u8 *moby)
         }
         math_approach_target_with_direction_mode((float *)(moby + 0xf8), angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
         if (FastDiffRots(angle, *(float *)(moby + 0xf8)) < 0.087266475f) {
-            ApproachValue(&state->aimTime, 0.0f, D_L16_001B16F8 * 0.016666668f);
+            ApproachValue(&state->aimTime, 0.0f, g_snivelak_aim_decay_rate * 0.016666668f);
             ApproachValue(&state->aimBlend, 1.0f, 0.06666667f);
             slot1 = g_sound_state + state->attackSound * 112;
             if (*(u8 **)(slot1 + 0x88) != state->body || !slot1[0x74])
@@ -431,7 +431,7 @@ void snivelak_update(u8 *moby)
         heading7 = (float *)(moby + 0xf8);
         angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(moby + 0x14));
         math_approach_target_with_direction_mode(heading7, angle, 0.00349065894f, 0.00349065894f, 0.209439546f, &state->turnVelocity, 0);
-        if (state->body[0x42] == state->body[0x43] && (D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) snivelak_fire_lobbed_shot(moby);
+        if (state->body[0x42] == state->body[0x43] && (g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) snivelak_fire_lobbed_shot(moby);
         if (*(unsigned short *)(moby + 0x96) > 180) moby_set_state(moby, 2, 1);
         break;
     case 14:
@@ -488,7 +488,7 @@ void snivelak_update(u8 *moby)
         heading8 = (float *)(moby + 0xf8);
         angle = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(moby + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(moby + 0x14));
         math_approach_target_with_direction_mode(heading8, angle, 0.00174532947f, 0.00174532947f, 0.104719773f, &state->turnVelocity, 0);
-        if ((D_L16_001B2648 & 15) == (((int)moby >> 8) & 15)) {
+        if ((g_frame_l16_counter & 15) == (((int)moby >> 8) & 15)) {
             *(BossQuadword *)work.vectors.offset = 0;
             work.vectors.offset[0] = math_random_signed_float_range(0.0f, 6.0f);
             work.vectors.offset[1] = math_random_signed_float_range(0.0f, 6.0f);
@@ -498,13 +498,13 @@ void snivelak_update(u8 *moby)
                 *(BossQuadword *)work.vectors.position = q;
             }
             FastVecAdd(work.vectors.position, work.vectors.position, moby + 0x10);
-            FastVecSub(work.vectors.offset, D_L16_001B9B00, work.vectors.position);
+            FastVecSub(work.vectors.offset, g_scene_origin_transform, work.vectors.position);
             vec_scale_to_length(work.vectors.offset, work.vectors.offset, 1.0f);
             part_spawn_blast_effect_moby(moby, work.vectors.position, work.vectors.offset, 0.0f);
             snd_play_from_class_bank(6, 0, (char *)moby, 0xf78);
         }
         if (state->body[0x42] == state->body[0x43] && state->body[0x41] > 29) transition_arm_shared(5, 5.0f, 15.0f);
-        if (D_L16_001B2564 >= 1.0f) {
+        if (g_snivelak_room_fade >= 1.0f) {
             moby_set_state(moby, 18, -1);
             moby[0x31] = 0;
             *(unsigned short *)(moby + 0x34) |= 1;
@@ -517,11 +517,11 @@ void snivelak_update(u8 *moby)
         state->bodyMode = 0;
         state->verticalSpeed -= 0.0055555557f;
         *(float *)(moby + 0x18) += state->verticalSpeed;
-        if (*(unsigned short *)(moby + 0x96) > 90 && D_001395B8[0x83] != 2 && req_push_queue((u8 *)&D_L16_001BFD00, 133)) {
+        if (*(unsigned short *)(moby + 0x96) > 90 && g_game_flag_table[0x83] != 2 && req_push_queue((u8 *)&g_request_l16_queue, 133)) {
             moby_set_state(moby, 19, -1);
-            req_push_queue((u8 *)&D_L16_001BFD00, 17);
-            req_push_queue((u8 *)&D_L16_001BFD00, 134);
-            req_launch_queued(&D_L16_001BFD00);
+            req_push_queue((u8 *)&g_request_l16_queue, 17);
+            req_push_queue((u8 *)&g_request_l16_queue, 134);
+            req_launch_queued(&g_request_l16_queue);
             game_set_stored_value_pair((int)snivelak_clean_up_boss_and_free, (int)moby);
         }
         break;
@@ -539,7 +539,7 @@ void snivelak_update(u8 *moby)
             *(unsigned short *)(state->arms[1] + 0x34) &= 0xefff;
             *(int *)(state->arms[1] + 0x98) = 0;
         }
-        if (D_L16_001A8F00 == 2) SetMobyAndGroupsEnabled(moby, 0);
+        if (g_snivelak_state == 2) SetMobyAndGroupsEnabled(moby, 0);
         break;
     }
     snivelak_part_update(moby);

@@ -3,46 +3,46 @@
 #include "common.h"
 typedef struct TodanoPartnerBlock { float x[12]; } TodanoPartnerBlock;
 typedef struct TodanoPartnerSlot { u8 pad[0x38]; u8 *object; u32 tail; } TodanoPartnerSlot;
-extern TodanoPartnerSlot D_L12_001C44C0[];
-extern u8 D_L12_001B9E00[];
+extern TodanoPartnerSlot g_contact_l12_push_table[];
+extern u8 g_hero_prev_position[];
 extern void func_PAL_L12_004184A0(u8 *);
 extern void enemy_apply_stored_values_helper(u8 *);
 extern void func_PAL_L12_00418BD8(u8 *);
 extern void moby_destroy_linked(u8 *);
 extern void guard_update_aim_point(u8 *);
 extern int func_PAL_002B1A50(u8 *, void *, int);
-extern int func_PAL_002B3F18(u8 *, void *, void *);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern int part_spawn_damage_debris_pal(u8 *, void *, void *);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int math_random_int_below(int);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern void FastVecScale(void *, void *, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(u8 *);
 extern int weapon_select_aim_target(u8 *, int, int, int, float, float);
-extern u8 D_L12_00188660[];
+extern u8 g_hero_l12_state_records[];
 extern s32 func_315148();
 extern void moby_set_state();
 extern s32 func_32D988();
 extern s32 func_2F15C8(void *arg0);
 extern s32 func_3205F8(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_364DF8(s32 arg0, s32 arg1, void *arg2);
-extern s32 D_L12_001B2E9C __attribute__((sda));
+extern s32 g_moby_list_start __attribute__((sda));
 extern s32 D_L12_001B2E9C_2;
-extern u16 *D_L12_001FB960[];
+extern u16 *g_moby_l12_group_lists[];
 extern s32 g_current_map_index __attribute__((sda));
 extern s32 GetFirstMobyInGroup(u8 **out, s32 kind, s32 arg2, s32 arg3);
 extern s32 GetNextMobyInGroup(u8 **out, u32 value, s32 arg2, s32 arg3);
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern u8 D_001A7A40 MACRO_ADDR;
-extern u32 D_001397DC, D_00138324;
-extern u8 D_L12_001C0000[];
+extern u8 g_unlocked_item_flags MACRO_ADDR;
+extern u32 g_object_state_flags_f, g_pad_held_flags;
+extern u8 g_requirement_queue[];
 extern u8 *CreateMoby(int);
 extern char *GetLocalizedString(int);
-extern s32 *D_L12_001FEAC0[];
+extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
 
-void func_PAL_L12_00419120(u8 *o) {
+void guard_handle_hit_handover_pal(u8 *o) {
     u8 *d = *(u8 **)(o+0x68);
     int old, result;
     if (!o[0x95]) func_PAL_L12_004184A0(o);
@@ -51,7 +51,7 @@ void func_PAL_L12_00419120(u8 *o) {
         if (partner && *(short *)(partner+0xAA)==0x114B && partner[0x20]!=254 && partner[0x20]!=253) {
             int index;
             if (partner[0xA8]!=255) {
-                TodanoPartnerSlot *slots=D_L12_001C44C0;
+                TodanoPartnerSlot *slots=g_contact_l12_push_table;
                 index=partner[0xA8];
                 if (slots[index].object==partner) {
                     o[0xA8]=index;
@@ -73,9 +73,9 @@ void func_PAL_L12_00419120(u8 *o) {
                 *(int *)(d+0x20)=0;
                 p=*(u8 **)(*(u8 **)(d+0x2F8)+0x68);
                 *(TodanoPartnerBlock *)(p+0x20)=*(TodanoPartnerBlock *)(d+0x20);
-                func_PAL_002B3F18(*(u8 **)(d+0x2F8),p+0x50,p+0x20);
+                part_spawn_damage_debris_pal(*(u8 **)(d+0x2F8),p+0x50,p+0x20);
                 func_PAL_L12_00418BD8(o);
-                func_PAL_002AC718(*(u8 **)(d+0x2F8),d+0xD0,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,0,0x810001);
+                SpawnExplosionEffects_pal(*(u8 **)(d+0x2F8),d+0xD0,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,0,0x810001);
                 moby_destroy_linked(o);
                 if (old>=4 && !math_random_int_below(2)) {
                     if (o[0x43]!=17) func_PAL_002A7E68(o,17,0,5);
@@ -98,7 +98,7 @@ void func_PAL_L12_00419120(u8 *o) {
                 u8 *p; u8 *other; int i;
                 p=*(u8 **)(*(u8 **)(d+0x2F8)+0x68);
                 *(TodanoPartnerBlock *)(p+0x20)=*(TodanoPartnerBlock *)(d+0x20);
-                func_PAL_002B3F18(*(u8 **)(d+0x2F8),p+0x50,p+0x20);
+                part_spawn_damage_debris_pal(*(u8 **)(d+0x2F8),p+0x50,p+0x20);
                 func_PAL_002A7E68(*(u8 **)(d+0x2F8),o[0x43],0,2);
                 *(float *)(*(u8 **)(d+0x2F8)+0x48)=*(float *)(o+0x48);
                 if (!(*(u16 *)(*(u8 **)(d+0x2F8)+0x7C)&0x80)) {
@@ -120,7 +120,7 @@ void func_PAL_L12_00419120(u8 *o) {
             }
         }
     }
-    if(o[0x31] && fast_vec_dist(o+0x10,D_L12_001B9E00)<24.0f) {
+    if(o[0x31] && fast_vec_dist(o+0x10,g_hero_prev_position)<24.0f) {
         moby_update_ground_check(o); o[0x6F]=22;
     }
     weapon_select_aim_target(o,*(int *)(d+0x2D8),0,0,0,0);
@@ -139,7 +139,7 @@ extern float mat_fast_helper_a(float,float);
 extern float fast_subtract_rotations(float,float);
 extern float math_random_float_range(float,float);
 
-void func_PAL_L12_004195E8(u8 *o) {
+void guard_aim_partner_hands_pal(u8 *o) {
     u8 *d=*(u8 **)(o+0x68); float v[4]; int i;
     u8 *p=*(u8 **)(d+0x2F8);
     if(p && *(short *)(p+0xAA)==0x114B && p[0x20]!=254 && p[0x20]!=253) {

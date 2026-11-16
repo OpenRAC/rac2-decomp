@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int D_001A72E0;
+extern int g_vram_zbuffer_address;
 
 extern int D_001A72E0_1;
 
@@ -24,7 +24,7 @@ void blast_draw_screen_flash(char *object)
 
     s1 = *(char **)(object + 0x68);
     if (*(int *)(s1 + 0x24) != 0) {
-        VU1_addGSregister(0x4E, (((long long)(D_001A72E0 >> 13) | 0x1000000) | (1LL << 32)));
+        VU1_addGSregister(0x4E, (((long long)(g_vram_zbuffer_address >> 13) | 0x1000000) | (1LL << 32)));
         gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (*(int *)(s1 + 0x24) << 24) | 0xFFFFFF);
         VU1_addGSregister(0x4E, (D_001A72E0_1 >> 13) | 0x1000000);
     }
@@ -39,18 +39,18 @@ void moby_clear_fading_list(void)
 
 typedef float QuadVector[4] __attribute__((aligned(16)));
 
-extern int D_L00_001B05E0 __attribute__((sda));
-extern int D_L00_001B05E4 __attribute__((sda));
-extern int D_L00_001B05E8 __attribute__((sda));
-extern int D_L00_001B05EC __attribute__((sda));
-extern int D_L00_001B05F0 __attribute__((sda));
-extern int D_L00_001B05F4 __attribute__((sda));
-extern int D_L00_001B05F8 __attribute__((sda));
-extern float D_L00_001B05FC __attribute__((sda));
+extern int g_blast_ring_gs_flag_a __attribute__((sda));
+extern int g_blast_ring_gs_flag_b __attribute__((sda));
+extern int g_blast_ring_gs_flag_c __attribute__((sda));
+extern int g_blast_ring_gs_flag_d __attribute__((sda));
+extern int g_blast_ring_gs_flag_e __attribute__((sda));
+extern int g_blast_ring_texture_id __attribute__((sda));
+extern int g_blast_ring_color __attribute__((sda));
+extern float g_blast_ring_scale __attribute__((sda));
 /* 64 quads of a shared mesh: per corner, a vertex index and a texture-coordinate index. */
-extern short D_L00_00297020[][4][2];
-extern QuadVector D_L00_00296B20[];
-extern float D_L00_00297420[][2];
+extern short g_blast_ring_quad_indices[][4][2];
+extern QuadVector g_blast_ring_vertices[];
+extern float g_blast_ring_uvs[][2];
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -76,12 +76,12 @@ void blast_draw_ring_mesh_large(char *object)
     int quad, corner;
     float *first_u, *first_v;
 
-    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(g_blast_ring_texture_id);
     registers[2] = 0xFF9000000260ULL;
-    registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
-    registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
-    registers[3] |= (unsigned long long)D_L00_001B05EC << 6;
-    registers[3] |= (unsigned long long)D_L00_001B05F0 << 32;
+    registers[3] = g_blast_ring_gs_flag_a | (unsigned long long)g_blast_ring_gs_flag_b << 2;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_c << 4;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_d << 6;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_e << 32;
     registers[0] = 0;
     vec_clear_128(matrix[0]);
     vec_clear_128(matrix[1]);
@@ -89,7 +89,7 @@ void blast_draw_ring_mesh_large(char *object)
     matrix[0][0] = *(float *)(state + 0x10) * 2.0f;
     matrix[1][1] = *(float *)(state + 0x10) * 2.0f;
     matrix[2][2] = *(float *)(state + 0x10) * 0.25f;
-    colors[0] = colors[1] = colors[2] = colors[3] = D_L00_001B05F8 + (*(int *)(state + 0x24) << 24);
+    colors[0] = colors[1] = colors[2] = colors[3] = g_blast_ring_color + (*(int *)(state + 0x24) << 24);
     ref_L00_003E5710_00(object + 0x10, matrix[3], 1);
     first_u = &uv[0][0];
     first_v = &uv[0][1];
@@ -100,12 +100,12 @@ void blast_draw_ring_mesh_large(char *object)
         v = first_v;
         u = first_u;
         for (corner = 0; corner < 4; corner++) {
-            int vertex = D_L00_00297020[quad][corner][0];
-            int texel = D_L00_00297020[quad][corner][1];
+            int vertex = g_blast_ring_quad_indices[quad][corner][0];
+            int texel = g_blast_ring_quad_indices[quad][corner][1];
 
-            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
-            *u = D_L00_00297420[texel][0];
-            *v = D_L00_00297420[texel][1];
+            FastVecScale(vertices[corner], g_blast_ring_vertices[vertex], g_blast_ring_scale);
+            *u = g_blast_ring_uvs[texel][0];
+            *v = g_blast_ring_uvs[texel][1];
             matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
             matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
             FastVecAdd(vertices[corner], vertices[corner], object + 0x10);
@@ -133,12 +133,12 @@ void blast_draw_ring_mesh_small(char *object)
     char *position;
     float *first_u, *first_v;
 
-    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(g_blast_ring_texture_id);
     registers[2] = 0xFF9000000260ULL;
-    registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
-    registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
-    registers[3] |= (unsigned long long)D_L00_001B05EC << 6;
-    registers[3] |= (unsigned long long)D_L00_001B05F0 << 32;
+    registers[3] = g_blast_ring_gs_flag_a | (unsigned long long)g_blast_ring_gs_flag_b << 2;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_c << 4;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_d << 6;
+    registers[3] |= (unsigned long long)g_blast_ring_gs_flag_e << 32;
     registers[0] = 0;
     vec_clear_128(matrix[0]);
     vec_clear_128(matrix[1]);
@@ -146,7 +146,7 @@ void blast_draw_ring_mesh_small(char *object)
     matrix[0][0] = *(float *)(state + 0x10) * 1.0f;
     matrix[1][1] = *(float *)(state + 0x10) * 1.0f;
     matrix[2][2] = *(float *)(state + 0x10) * 0.125f;
-    colors[0] = colors[1] = colors[2] = colors[3] = D_L00_001B05F8 + (*(int *)(state + 0x24) << 24);
+    colors[0] = colors[1] = colors[2] = colors[3] = g_blast_ring_color + (*(int *)(state + 0x24) << 24);
     ref_L00_003E5978_00(object + 0x10, matrix[3], 1);
     first_u = &uv[0][0];
     first_v = &uv[0][1];
@@ -158,12 +158,12 @@ void blast_draw_ring_mesh_small(char *object)
         v = first_v;
         u = first_u;
         for (corner = 0; corner < 4; corner++) {
-            int vertex = D_L00_00297020[quad][corner][0];
-            int texel = D_L00_00297020[quad][corner][1];
+            int vertex = g_blast_ring_quad_indices[quad][corner][0];
+            int texel = g_blast_ring_quad_indices[quad][corner][1];
 
-            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
-            *u = D_L00_00297420[texel][0];
-            *v = D_L00_00297420[texel][1];
+            FastVecScale(vertices[corner], g_blast_ring_vertices[vertex], g_blast_ring_scale);
+            *u = g_blast_ring_uvs[texel][0];
+            *v = g_blast_ring_uvs[texel][1];
             matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
             matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
             FastVecAdd(vertices[corner], vertices[corner], position);
@@ -184,12 +184,12 @@ extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x2290]; char *target; } Hero4BF0;
 extern Hero4BF0 g_hero_state;
 typedef struct { char pad[0x160]; float amount; int unused, timer, state; } Camera4BF0;
-extern Camera4BF0 D_L00_001B8C80;
-extern char *D_L00_001B2B50 __attribute__((sda));
-extern char *D_L00_001B2B54;
-extern int *D_L00_001B2B58[] MACRO_ADDR;
-extern float D_L00_001B05D4 __attribute__((sda));
-extern float D_L00_001B05D8 __attribute__((sda));
+extern Camera4BF0 g_scalar_transition_state;
+extern char *g_blast_effect_records __attribute__((sda));
+extern char *g_blast_l00_pool;
+extern int *g_blast_l00_ripple_particles[] MACRO_ADDR;
+extern float g_blast_uv_scroll_u __attribute__((sda));
+extern float g_blast_uv_scroll_v __attribute__((sda));
 extern char *D_L00_001B2B50_1 MACRO_ADDR;
 extern char *g_area_hit_targets[];
 extern int save_is_record_value(short,int);
@@ -242,12 +242,12 @@ void mini_nuke_blast_update(char *object)
         data->count=111;
         data->handle=AcquireEntitySlot(object,0,&allocation);
         mem=level_get_slot_body(*(short *)(object+0xAA),data->handle);
-        D_L00_001B2B50=mem;
-        D_L00_001B2B54=(char *)mem_align_size_16((int)(mem+0x50));
-        D_L00_001B2B58[0]=(int *)mem_align_size_16((int)(D_L00_001B2B54+0xA000));
+        g_blast_effect_records=mem;
+        g_blast_l00_pool=(char *)mem_align_size_16((int)(mem+0x50));
+        g_blast_l00_ripple_particles[0]=(int *)mem_align_size_16((int)(g_blast_l00_pool+0xA000));
         i=0;
-        do { D_L00_001B2B58[0][i]=0; i++; } while(i<144);
-        { char *p = D_L00_001B2B54+319*128+124;
+        do { g_blast_l00_ripple_particles[0][i]=0; i++; } while(i<144);
+        { char *p = g_blast_l00_pool+319*128+124;
         for(i=319;i>=0;i--,p-=128) *(int *)p=0; }
         *(int *)(D_L00_001B2B50_1+0x30)=0;
         qcopy(center,object+0x10);
@@ -259,9 +259,9 @@ void mini_nuke_blast_update(char *object)
         qcopy(query,center);
         query[3]=2.0f;
         if(math_fast_helper_a(query,100.0f)!=-1) {
-            D_L00_001B8C80.amount=0.45f;
-            D_L00_001B8C80.timer=40;
-            D_L00_001B8C80.state=0;
+            g_scalar_transition_state.amount=0.45f;
+            g_scalar_transition_state.timer=40;
+            g_scalar_transition_state.state=0;
         }
     }
     case 1: {
@@ -314,9 +314,9 @@ destroy:
         }
         break;
     }
-    D_L00_001B05D8-=0.04f;
-    if(D_L00_001B05D4 < -8.0f) D_L00_001B05D4+=8.0f;
-    if(D_L00_001B05D8 < -8.0f) D_L00_001B05D8+=8.0f;
+    g_blast_uv_scroll_v-=0.04f;
+    if(g_blast_uv_scroll_u < -8.0f) g_blast_uv_scroll_u+=8.0f;
+    if(g_blast_uv_scroll_v < -8.0f) g_blast_uv_scroll_v+=8.0f;
     blast_update_effect_records(object);
     ref_L00_003E4BF0_00(mini_nuke_blast_draw,object);
 }

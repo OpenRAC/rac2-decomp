@@ -37,33 +37,33 @@ typedef struct {
     char pad388[0x10];
     float z, w;
 } CameraState;
-extern CameraState D_L00_001B8C80;
-extern char D_L00_001B8DD0[];
+extern CameraState g_scalar_transition_state;
+extern char g_hero_saved_vector[];
 /* The incomplete array preserves the retail absolute address macro. */
-extern Quad D_L00_001B25B0[] __attribute__((sda));
-extern char D_L00_001B9000[], D_L00_001B9010[];
+extern Quad g_shop_quad_buffer[] __attribute__((sda));
+extern char g_scratch_vec_pair[], g_scratch_vec_secondary[];
 typedef struct {
     int words[2];
 } Pair;
-extern Pair D_L00_001AD858[];
+extern Pair g_shop_pair_table[];
 extern int g_screen_width[] __attribute__((sda));
 extern int g_screen_height[] __attribute__((sda));
-extern int D_001A72DC[] __attribute__((sda));
-extern int D_L00_001B25E4[] __attribute__((sda));
-extern int D_L00_001B25E8[] __attribute__((sda));
-extern int D_L00_001B25EC[] __attribute__((sda));
-extern int D_L00_001B25F0[] __attribute__((sda));
-extern int D_L00_001B25F4[] __attribute__((sda));
-extern int D_L00_001B25F8[] __attribute__((sda));
-extern char * D_L00_001A904C MACRO_ADDR;
-extern float D_L00_001BD370[];
-extern float D_L00_001AD570 __attribute__((sda));
-extern float D_L00_001AD574 __attribute__((sda));
-extern float D_L00_001AD578 __attribute__((sda));
-extern float D_L00_001B25E0 __attribute__((sda));
-extern int D_L00_001B18D4 MACRO_ADDR;
-extern int D_L00_001B18D8 MACRO_ADDR;
-extern int D_L00_001B2610 __attribute__((sda));
+extern int g_vram_display_address[] __attribute__((sda));
+extern int g_shop_color_start_r[] __attribute__((sda));
+extern int g_shop_color_start_g[] __attribute__((sda));
+extern int g_shop_color_start_b[] __attribute__((sda));
+extern int g_shop_color_end_r[] __attribute__((sda));
+extern int g_shop_color_end_g[] __attribute__((sda));
+extern int g_shop_color_end_b[] __attribute__((sda));
+extern char * g_bolt_counter_base MACRO_ADDR;
+extern float g_fast_math_ratio[];
+extern float g_shop_blend_factor __attribute__((sda));
+extern float g_shop_scale_start __attribute__((sda));
+extern float g_shop_scale_end __attribute__((sda));
+extern float g_menu_slide_scale __attribute__((sda));
+extern int g_screen_overlay_color MACRO_ADDR;
+extern int g_ring_animation_counter MACRO_ADDR;
+extern int g_shop_scene_param __attribute__((sda));
 extern int sceGsSyncV(int);
 extern void level_init_record_from_object();
 extern void gfx_build_view_matrices();
@@ -128,16 +128,16 @@ void shop_draw_purchase_menu_scene(void)
     float scale;
     int handle;
     gfx_append_draw_list_buffer_tag(0);
-    D_L00_001BD370[0] = 0.62f;
+    g_fast_math_ratio[0] = 0.62f;
     UpdateViewContext();
 
     switch (menu->state) {
     case 0:
         if (menu->initialize)
             *(unsigned short *)(menu->moby + 0x34) |= 1;
-        D_L00_001B18D4 = 0x100ff;
+        g_screen_overlay_color = 0x100ff;
         if (menu->initialize)
-            D_L00_001B18D4 = 127;
+            g_screen_overlay_color = 127;
         RenderFrame();
         *(unsigned short *)(menu->moby + 0x34) &= 0xfffe;
         if (!menu->initialize)
@@ -147,28 +147,28 @@ void shop_draw_purchase_menu_scene(void)
             menu->initialize = 0;
             gfx_wait_for_dma_status_bits(1);
             sceGsSyncV(0);
-            D_L00_001B18D8 = D_L00_001B18D8 + 1;
+            g_ring_animation_counter = g_ring_animation_counter + 1;
             SubmitBufferedDmaChain();
             gfx_swap_packet_buffer();
-            D_L00_001B2610 = 0x60000;
+            g_shop_scene_param = 0x60000;
             gfx_draw_item_with_pass(menu->capture);
             if (menu->use_camera) {
-                qcopy(&menu->saved, D_L00_001B8DD0);
+                qcopy(&menu->saved, g_hero_saved_vector);
                 /* Save the three camera basis vectors before resetting the view. */
                 {
-                    Quad * src = (Quad *)(D_L00_001B8DD0 + 0x220);
-                    Quad * dst = (Quad *)D_L00_001B25B0;
+                    Quad * src = (Quad *)(g_hero_saved_vector + 0x220);
+                    Quad * dst = (Quad *)g_shop_quad_buffer;
                     dst[0] = src[0];
                     dst[1] = src[1];
                     dst[2] = src[2];
                 }
-                qzero(D_L00_001B8DD0 + 0x220);
-                qzero(D_L00_001B9000);
-                qzero(D_L00_001B9010);
-                D_L00_001B8C80.x = 1;
-                D_L00_001B8C80.y = 1;
-                D_L00_001B8C80.z = 1;
-                D_L00_001B8C80.w = 1;
+                qzero(g_hero_saved_vector + 0x220);
+                qzero(g_scratch_vec_pair);
+                qzero(g_scratch_vec_secondary);
+                g_scalar_transition_state.x = 1;
+                g_scalar_transition_state.y = 1;
+                g_scalar_transition_state.z = 1;
+                g_scalar_transition_state.w = 1;
                 gfx_build_view_matrices();
             }
             {
@@ -186,28 +186,28 @@ void shop_draw_purchase_menu_scene(void)
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
-        gfx_upload_image_to_gs_packets(menu->capture, D_001A72DC[0], g_screen_height[0] << 11);
+        gfx_upload_image_to_gs_packets(menu->capture, g_vram_display_address[0], g_screen_height[0] << 11);
         SetupGifPaging(0);
         gfx_build_view_matrices();
         gfx_write_clear_color_packets();
-        if (D_L00_001AD570 >= 1.0f && menu->draw) {
+        if (g_shop_blend_factor >= 1.0f && menu->draw) {
             DrawMobysSetup();
             mem_fill_scratch_area();
             mem_save_scratch_area();
         }
         VU1_addGSregister(0x42, 0x8000000044ULL);
         {
-            float dr = (float)(D_L00_001B25F0[0] - D_L00_001B25E4[0]);
-            float dg = (float)(D_L00_001B25F4[0] - D_L00_001B25E8[0]);
-            float db = (float)(D_L00_001B25F8[0] - D_L00_001B25EC[0]);
-            float fr = (float)D_L00_001B25E4[0] + dr * D_L00_001AD570;
-            float fb = (float)D_L00_001B25EC[0] + db * D_L00_001AD570;
-            float fg = (float)D_L00_001B25E8[0] + dg * D_L00_001AD570;
+            float dr = (float)(g_shop_color_end_r[0] - g_shop_color_start_r[0]);
+            float dg = (float)(g_shop_color_end_g[0] - g_shop_color_start_g[0]);
+            float db = (float)(g_shop_color_end_b[0] - g_shop_color_start_b[0]);
+            float fr = (float)g_shop_color_start_r[0] + dr * g_shop_blend_factor;
+            float fb = (float)g_shop_color_start_b[0] + db * g_shop_blend_factor;
+            float fg = (float)g_shop_color_start_g[0] + dg * g_shop_blend_factor;
             red = (int)fr;
             green = (int)fg;
             blue = (int)fb;
         }
-        scale = D_L00_001AD574 + (D_L00_001AD578 - D_L00_001AD574) * D_L00_001AD570;
+        scale = g_shop_scale_start + (g_shop_scale_end - g_shop_scale_start) * g_shop_blend_factor;
         if (menu->mode == 0) {
             ids[0] = 0x67;
             ids[1] = 0x68;
@@ -228,20 +228,20 @@ void shop_draw_purchase_menu_scene(void)
             ids[1] = 0x7a;
             ids[2] = 0x7b;
         }
-        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[0]);
+        handle = table_find_by_id(g_bolt_counter_base + 0x8710, ids[0]);
         gfx_draw_scaled_object_two_axes(handle, (red << 24) | 0x442d00, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
-        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[1]);
+        handle = table_find_by_id(g_bolt_counter_base + 0x8710, ids[1]);
         gfx_draw_scaled_object_two_axes(handle, (green << 24) | 0x241700, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
-        handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[2]);
+        handle = table_find_by_id(g_bolt_counter_base + 0x8710, ids[2]);
         color = (blue << 24) | 0xf0c070;
         gfx_draw_scaled_object_two_axes(handle, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         if (menu->mode != 1) {
-            handle = table_find_by_id(D_L00_001A904C + 0x8710, ids[3]);
+            handle = table_find_by_id(g_bolt_counter_base + 0x8710, ids[3]);
             gfx_draw_scaled_object_two_axes(handle, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         }
         hud_update_record_handlers();
         level_run_callbacks_and_draw();
-        if (D_L00_001AD570 >= 1.0f) {
+        if (g_shop_blend_factor >= 1.0f) {
             ref_L00_0037A610_00();
             if (menu->mode == 0) {
                 DrawVendorPurchasePrompt();
@@ -266,7 +266,7 @@ void shop_draw_purchase_menu_scene(void)
                 if (menu->draw) {
                     gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
                     level_init_record_from_object(menu->models, menu->models + 0x100);
-                    pair = D_L00_001AD858[0];
+                    pair = g_shop_pair_table[0];
                     mat_transform_array(menu->models, 2, &pair, matrices);
                     {
                         char * models = menu->models;
@@ -288,7 +288,7 @@ void shop_draw_purchase_menu_scene(void)
                 shop_draw_vendor_item_list();
                 text_draw_scrolling_help();
                 if (menu->draw) {
-                    gfx_set_scissor_clamped(32, 386, (int)(D_L00_001B25E0 * 64.0f + 0.5f), (int)(D_L00_001B25E0 * 229.0f + 0.5f));
+                    gfx_set_scissor_clamped(32, 386, (int)(g_menu_slide_scale * 64.0f + 0.5f), (int)(g_menu_slide_scale * 229.0f + 0.5f));
                     handle = math_ping_pong_blend_values(0xffffff, 0x606060, 30, 1, 0);
                     if (menu->selected0 != -1)
                         gfx_pack_render_command_fields(menu->models + (menu->selected0 << 8), handle, 14, 14, 0);

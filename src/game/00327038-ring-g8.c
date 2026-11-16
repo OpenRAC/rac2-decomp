@@ -31,19 +31,19 @@ extern float math_ease_out_quad(float);
 extern float FastAddRotations(float, float);
 extern void draw_world_quad(void *, void *, int);
 extern RenderVec g_camera_eye_state;
-extern int D_001B01B4 __attribute__((sda));
-extern int D_001B01B8 __attribute__((sda));
-extern int D_001B01BC __attribute__((sda));
-extern int D_001B01C0 __attribute__((sda));
-extern int D_001B01C4 __attribute__((sda));
-extern int D_001B01C8 __attribute__((sda));
-extern unsigned int D_001B01CC __attribute__((sda));
-extern float D_001B00F4 __attribute__((sda));
+extern int g_distortion_ring_bits_base __attribute__((sda));
+extern int g_distortion_ring_bits_mid_a __attribute__((sda));
+extern int g_distortion_ring_bits_mid_b __attribute__((sda));
+extern int g_distortion_ring_bits_mid_c __attribute__((sda));
+extern int g_distortion_ring_bits_high __attribute__((sda));
+extern int g_distortion_ring_texture_id __attribute__((sda));
+extern unsigned int g_distortion_ring_color __attribute__((sda));
+extern float g_distortion_ring_duration __attribute__((sda));
 /* 48 quads of a flat ring of 98 vertices: per corner a vertex index and an
    index into the angle table, which holds an angle and its step. */
-extern short D_0026A6A0[][4][2];
-extern RenderVec D_0026A0A0[];
-extern float D_0022AC90[][2];
+extern short g_distortion_ring_faces[][4][2];
+extern RenderVec g_distortion_ring_vertices[];
+extern float g_random_angle_pairs[][2];
 
 /* Draws the object's ring facing the camera (D_001B5340), scaled by its
    state's size, with each corner's UV taken from its screen position and
@@ -63,13 +63,13 @@ void gfx_draw_distortion_ring(char *object)
     state = *(char **)(object + 0x68);
     up.word = 0;
     up.v[2] = 1.0f;
-    packet.tag[1] = GetEffectTextureDescriptor(D_001B01C8);
+    packet.tag[1] = GetEffectTextureDescriptor(g_distortion_ring_texture_id);
     packet.tag[2] = 0xFF9000000260LL;
-    flags = (long long)D_001B01B4;
-    flags |= (long long)D_001B01B8 << 2;
-    flags |= (long long)D_001B01BC << 4;
-    flags |= (long long)D_001B01C0 << 6;
-    flags |= (long long)D_001B01C4 << 32;
+    flags = (long long)g_distortion_ring_bits_base;
+    flags |= (long long)g_distortion_ring_bits_mid_a << 2;
+    flags |= (long long)g_distortion_ring_bits_mid_b << 4;
+    flags |= (long long)g_distortion_ring_bits_mid_c << 6;
+    flags |= (long long)g_distortion_ring_bits_high << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
     FastVecSub(&matrix[0], &g_camera_eye_state, object + 0x10);
@@ -81,25 +81,25 @@ void gfx_draw_distortion_ring(char *object)
     matrix[3].y = *(float *)(object + 0x14);
     matrix[3].z = *(float *)(object + 0x18);
     matrix[3].w = 1.0f;
-    packet.color[3] = D_001B01CC;
-    packet.color[2] = D_001B01CC;
-    packet.color[1] = D_001B01CC;
-    packet.color[0] = D_001B01CC;
+    packet.color[3] = g_distortion_ring_color;
+    packet.color[2] = g_distortion_ring_color;
+    packet.color[1] = g_distortion_ring_color;
+    packet.color[0] = g_distortion_ring_color;
     uv = &packet.uv[0][0];
     for (face = 0; face < 48; face++) {
         v = &packet.uv[0][1];
         u = uv;
         for (corner = 0; corner < 4; corner++) {
-            vtx = D_0026A6A0[face][corner][0];
-            index = D_0026A6A0[face][corner][1];
-            FastVecScale(&packet.vertex[corner], &D_0026A0A0[vtx], *(float *)(state + 0x24) * 2.0f);
+            vtx = g_distortion_ring_faces[face][corner][0];
+            index = g_distortion_ring_faces[face][corner][1];
+            FastVecScale(&packet.vertex[corner], &g_distortion_ring_vertices[vtx], *(float *)(state + 0x24) * 2.0f);
             transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
             gfx_world_to_screen_unit(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
-            c = math_fast_sin_or_cos_a(D_0022AC90[index][0]);
-            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x24) / D_001B00F4) * 0.0125f);
+            c = math_fast_sin_or_cos_a(g_random_angle_pairs[index][0]);
+            delta = c * math_ease_out_quad((1.0f - *(float *)(state + 0x24) / g_distortion_ring_duration) * 0.0125f);
             *u += delta;
-            s = math_fast_sin_or_cos_b(D_0022AC90[index][0]);
-            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x24) / D_001B00F4) * 0.0125f);
+            s = math_fast_sin_or_cos_b(g_random_angle_pairs[index][0]);
+            scale = math_ease_out_quad((1.0f - *(float *)(state + 0x24) / g_distortion_ring_duration) * 0.0125f);
             delta = -s;
             delta *= scale;
             *v += delta;
@@ -113,5 +113,5 @@ void gfx_draw_distortion_ring(char *object)
         draw_world_quad(&packet, 0, 0);
     }
     for (face = 0; face < 98; face++)
-        D_0022AC90[face][0] = FastAddRotations(D_0022AC90[face][0], D_0022AC90[face][1]);
+        g_random_angle_pairs[face][0] = FastAddRotations(g_random_angle_pairs[face][0], g_random_angle_pairs[face][1]);
 }

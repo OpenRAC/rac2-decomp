@@ -5,7 +5,7 @@ extern int math_fast_float_d(void *);
 extern void group_sync_counter(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastAddRotations(float, float);
-extern void func_PAL_003273B8(void *, void *, int, void *, float);
+extern void enemy_attach_turn_child_parts_pal(void *, void *, int, void *, float);
 extern void func_PAL_002B14F8(void *, void *, int, int, float);
 extern int math_fast_float_d(void *);
 
@@ -21,10 +21,10 @@ void func_PAL_L14_0042F0D8(unsigned char *self) {
     qcopy(state + 0x2d0, self + 0x10);
     if (self[0x95] == 1) {
         *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.25132746f);
-        func_PAL_003273B8(self, state + 0x300, 1, delta, *(float *)(state + 0x2fc));
+        enemy_attach_turn_child_parts_pal(self, state + 0x300, 1, delta, *(float *)(state + 0x2fc));
     } else {
         *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.013962637f);
-        func_PAL_003273B8(self, state + 0x300, 0, delta, *(float *)(state + 0x2fc));
+        enemy_attach_turn_child_parts_pal(self, state + 0x300, 0, delta, *(float *)(state + 0x2fc));
     }
     func_PAL_002B14F8(self, state + 0x230, 7, 1, 2.0f);
 }

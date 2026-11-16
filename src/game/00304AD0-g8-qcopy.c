@@ -14,7 +14,7 @@
 /* The 128-bit integer mode is what reaches retail's lq/sq copies. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float D_001AEBF0 __attribute__((sda));
+extern float g_projectile_speed __attribute__((sda));
 extern void FastVecAdd(void *a, void *b, void *c);
 extern void vec_add_object_direction_scaled(void *a, void *b, float c);
 extern int CollLine(void *a, void *b, int c, void *d, int e);
@@ -30,7 +30,7 @@ void projectile_move_check_hit(void *obj)
 
     *(TI128 *)&local = *(TI128 *)position;
     FastVecAdd(position, position, vars);
-    vec_add_object_direction_scaled(position, vars, D_001AEBF0 * 2.7777778e-05f);
+    vec_add_object_direction_scaled(position, vars, g_projectile_speed * 2.7777778e-05f);
     if (CollLine(&local, position, 0x10, moby, 0) != 0)
         *(unsigned char *)((char *)moby + 0x20) = 8;
 }

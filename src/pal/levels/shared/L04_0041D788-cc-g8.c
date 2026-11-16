@@ -8,11 +8,11 @@ typedef struct { char prefix[0x108]; float stick; char pad[0xA4]; unsigned int h
 
 extern struct { s32 pad; s32 flags; u8 rest[56]; } g_race_challenge_table[];
 extern int g_current_race_index __attribute__((sda));
-extern int D_L04_001B0938 __attribute__((sda));
+extern int g_race_trick_state __attribute__((sda));
 extern PadState g_pad_state;
-extern unsigned int D_00138330 NOT_SDA;
-extern unsigned int D_00138334 NOT_SDA;
-extern char D_L04_001B98C0[];
+extern unsigned int g_pad_pressed_rail NOT_SDA;
+extern unsigned int g_pad_held_rail NOT_SDA;
+extern char g_hoverbike_trick_offset_vec[];
 extern void level_clear_leftover_flag(void *);
 /* The EE passes the float arguments in their own registers; listing the 0x22 ahead of the 0.0f
    keeps both banks in order and gives retail's argument setup. */
@@ -87,19 +87,19 @@ void func_PAL_L04_0041D788(u8 *self, u8 *s)
     if (I(0x728) < 4
         && (height < 0.1f || FastVecDot(delta, delta) > 500.0f || math_fabs(F(0x6A4)) > 0.55f)) {
         if (math_fabs(F(0x6A4)) > 0.55f) {
-            D_L04_001B0938 = 4;
+            g_race_trick_state = 4;
         }
         I(0x724) = 0;
         return;
     }
     stick = pad_read_float_history(1);
-    if (I(0x73C) == -1 && (0.9f < stick || (stick < 0.4f && (D_00138334 & 0xF000)))) {
+    if (I(0x73C) == -1 && (0.9f < stick || (stick < 0.4f && (g_pad_held_rail & 0xF000)))) {
         if (F(0x740) == -999.0f) {
             if (0.9f < stick) {
                 F(0x740) = ReadPadFloatHistory(1);
                 I(0x758) = 0;
             } else {
-                unsigned int pressed = D_00138330;
+                unsigned int pressed = g_pad_pressed_rail;
 
                 if (pressed & 0x1000) {
                     F(0x740) = -1.5707964f;
@@ -197,7 +197,7 @@ void func_PAL_L04_0041D788(u8 *self, u8 *s)
         func_PAL_L04_003FE7B0(P(0x730), point, self, yaw, pitch, 0.0f, yaw, pitch);
         I(0x724) = 2;
     }
-    FastVecScale(offset, D_L04_001B98C0, F(0x6A4));
+    FastVecScale(offset, g_hoverbike_trick_offset_vec, F(0x6A4));
     FastVecAdd(offset, offset, self + 0x10);
     level_clear_leftover_flag(self);
     {

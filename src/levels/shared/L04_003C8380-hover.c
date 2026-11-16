@@ -4,9 +4,9 @@ typedef union { Quad q; float f[4]; int i[4]; } Vec;
 extern char ref_L04_00400EE0_00[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_race_time_ticks __attribute__((sda));
-extern u8 D_001A7A40[] __attribute__((sda));
-extern float D_L04_001BFB00[];
-extern char D_L04_001A8F20[] __attribute__((sda));
+extern u8 g_unlocked_item_flags[] __attribute__((sda));
+extern float g_scratch_direction_quad[];
+extern char g_effect_default_params[] __attribute__((sda));
 extern float coll_probe_ground_height_below(char *, int, float);
 extern int GetCollHitMaterial(void);
 extern void set_identity_matrix(float *);
@@ -241,7 +241,7 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
             *(Quad *)(bike + 0xD0) = delta.q;
         }
     }
-    if (D_001A7A40[7] != 0) F(0x2C0) = 2.5f;
+    if (g_unlocked_item_flags[7] != 0) F(0x2C0) = 2.5f;
     else F(0x2C0) = 1.0f;
     if (P(0x8C) != 0) moby_update_eased_node(P(0x8C), bike + 0x250, 0, 0.08f, 0.5f);
     if (!math_fast_float_d(bike + 0x178)) {
@@ -319,7 +319,7 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
             math_fast_float_d(bike + 0x148);
             if (I(0x148) == 0) bike[0xA4] = 0;
         } else if (bike[0xA5] == 0) {
-            vec_scale_to_length(v40.f, D_L04_001BFB00, 1.0f);
+            vec_scale_to_length(v40.f, g_scratch_direction_quad, 1.0f);
             mat_aim_with_spring(object + 0xC0, object + 0xF0, bike + 0x12C, &v40, 0.03f, 0.3f, 0.0f);
         } else {
             vec_build_spherical_offset(v40.f, 1.0f, FastAddRotations(OF(0xF8), 3.14159274f), 0.87266469f);
@@ -395,19 +395,19 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
         FastVecScale(v60.f, v60.f, math_random_float_range(0.7f, 1.0f));
         vec_build_spherical_offset(matrix[1].f, 0.0833333358f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(matrix[2].f, matrix[1].f, v60.f);
-        debris_spawn(object, 0xB3D, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        debris_spawn(object, 0xB3D, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(matrix[1].f, 0.0833333358f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(matrix[2].f, matrix[1].f, v60.f);
-        debris_spawn(object, 0xB3E, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        debris_spawn(object, 0xB3E, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(matrix[1].f, 0.0833333358f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(matrix[2].f, matrix[1].f, v60.f);
-        debris_spawn(object, 0xB3F, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], D_L04_001A8F20, 0.0f, D_L04_001A8F20);
+        debris_spawn(object, 0xB3F, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], g_effect_default_params, 0.0f, g_effect_default_params);
         vec_build_spherical_offset(matrix[1].f, 0.0833333358f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(matrix[2].f, matrix[1].f, v60.f);
-        debris_spawn(object, 0xB40, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        debris_spawn(object, 0xB40, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(matrix[1].f, 0.0833333358f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(matrix[2].f, matrix[1].f, v60.f);
-        debris_spawn(object, 0xB40, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], D_L04_001A8F20, 0.1f, D_L04_001A8F20);
+        debris_spawn(object, 0xB40, &matrix[0], object + 0xF0, 0, 0, 0.0f, &matrix[1], g_effect_default_params, 0.1f, g_effect_default_params);
         *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
         SpawnExplosion(&matrix[0], 0, 4, 4, 4, 8, 4, 0, 0.42f, 20.0f, 1, 0, 0, 0);
         if (P(0x8C) != 0) *(u16 *)(P(0x8C) + 0x34) |= 0x41;

@@ -33,22 +33,22 @@ typedef struct {
 typedef struct { u8 pad[0x18]; u8 *hit; s32 count; V point; } Collision;
 typedef struct { u8 pad[0x464]; u8 collected[0]; } LevelSaveState;
 
-extern Transform *D_L12_001B2F8C[] __attribute__((sda));
+extern Transform *g_path_waypoint_table[] __attribute__((sda));
 extern Transform *D_L12_001B2F8C_gp SDATA(D_L12_001B2F8C) __attribute__((sda));
-extern u8 *D_L12_001B090C[] __attribute__((sda));
+extern u8 *g_tracked_object_ptr[] __attribute__((sda));
 extern V g_hero_position NOT_SDA;
-extern LevelSaveState D_L12_0021EDF0;
-extern Collision D_L12_001C0240;
-extern u8 D_0019B4A8[];
+extern LevelSaveState g_object_flags;
+extern Collision g_collision_l12_result;
+extern u8 g_moby_nibble_table[];
 extern s32 g_current_map_index[] __attribute__((sda));
 extern s32 D_001A79F0_gp SDATA(D_001A79F0) __attribute__((sda));
-extern s32 D_001A7A00[] __attribute__((sda));
+extern s32 g_player_stats[] __attribute__((sda));
 extern void *g_hero_moby NOT_SDA;
-extern f32 D_L12_001B1BB0 __attribute__((sda));
-extern f32 D_L12_001B1BB4 __attribute__((sda));
-extern f32 D_L12_001B1BC0 __attribute__((sda));
-extern f32 D_L12_001B1BC4 __attribute__((sda));
-extern V D_L12_001B1BD0 __attribute__((sda));
+extern f32 g_barrier_depth_margin_back __attribute__((sda));
+extern f32 g_barrier_depth_margin_front __attribute__((sda));
+extern f32 g_barrier_point_z_offset __attribute__((sda));
+extern f32 g_barrier_push_strength __attribute__((sda));
+extern V g_barrier_hit_local_point __attribute__((sda));
 
 extern void moby_set_state(void *, s32, s32);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -85,11 +85,11 @@ void barrier_field_update(Moby7CA8 *self)
     case 0:
         rawIndex = self->uid;
         index = (s16)rawIndex;
-        if (D_L12_0021EDF0.collected[index])
+        if (g_object_flags.collected[index])
             goto active;
         {
             /* One 3-bit count per nibble; the low bit of the id picks the nibble. */
-            s32 bits = D_0019B4A8[(index >> 1) + (g_current_map_index[0] << 10)];
+            s32 bits = g_moby_nibble_table[(index >> 1) + (g_current_map_index[0] << 10)];
             if (rawIndex & 1) {
                 if ((bits >> 4) & 7)
                     goto active;
@@ -108,15 +108,15 @@ active:
         direction.q = 0;
         direction.f.z = 1;
         direction.f.w = 1;
-        matrix_mul_vec3(&direction, &direction, &D_L12_001B2F8C[0][vars->transform]);
+        matrix_mul_vec3(&direction, &direction, &g_path_waypoint_table[0][vars->transform]);
         length = FastVecLength(&direction);
         {
-            V *transform = &D_L12_001B2F8C[0][vars->transform].rows[7];
+            V *transform = &g_path_waypoint_table[0][vars->transform].rows[7];
             vars->depth = 1;
             euler_rotation_basis(rotation, transform);
         }
         matrix_from_basis_rows(matrix, rotation);
-        matrix_mul_vec3(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][vars->base].rows[4]);
+        matrix_mul_vec3(&hit, &g_barrier_hit_local_point, &g_path_waypoint_table[0][vars->base].rows[4]);
         ray_start.q = 0;
         ray_end.q = 0;
         ray_start.f.x = 1;
@@ -124,16 +124,16 @@ active:
         ray_end.f.x = 1;
         ray_end.f.w = 1;
         FastVecAdd(&ray_start, &ray_start, &hit);
-        matrix_mul_vec3(&ray_start, &ray_start, &D_L12_001B2F8C[0][vars->base]);
-        FastVecSub(&ray_end, &D_L12_001B2F8C[0][vars->base].rows[3], &ray_start);
-        FastVecAdd(&ray_start, &D_L12_001B2F8C[0][vars->base].rows[3], &ray_start);
+        matrix_mul_vec3(&ray_start, &ray_start, &g_path_waypoint_table[0][vars->base]);
+        FastVecSub(&ray_end, &g_path_waypoint_table[0][vars->base].rows[3], &ray_start);
+        FastVecAdd(&ray_start, &g_path_waypoint_table[0][vars->base].rows[3], &ray_start);
         ray_start.f.z += 2.5f;
         ray_end.f.z += 2.5f;
         vars->hit = 0;
         push_dir.q = 0;
         if (CollLine(&ray_start, &ray_end, 0x12, 0, 0)) {
-            V *collision = &D_L12_001C0240.point;
-            V *transform = &D_L12_001B2F8C[0][vars->transform].rows[3];
+            V *collision = &g_collision_l12_result.point;
+            V *transform = &g_path_waypoint_table[0][vars->transform].rows[3];
             vars->hit = 1;
             FastVecSub(&offset, collision, transform);
             transform_vector(&offset, &offset, matrix);
@@ -142,35 +142,35 @@ active:
                 f32 denominator = -length;
                 vars->depth = numerator / denominator;
             }
-            if (*(s16 *)(D_L12_001C0240.hit + 0xAA) == 0xFC4 /* moby class 4036 */) {
-                moby_transform_point_and_rotation_by_parent(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
+            if (*(s16 *)(g_collision_l12_result.hit + 0xAA) == 0xFC4 /* moby class 4036 */) {
+                moby_transform_point_and_rotation_by_parent(self, g_collision_l12_result.hit, &self->position, &self->rotation, &point, &normal);
                 point.f.z = 0;
                 FastVecSub(&tmp, &point, &self->position);
                 point.q = tmp.q;
                 point.f.z = 0;
                 qcopy(&push_dir, &point);
-                FastVecScale(&push_dir, &push_dir, D_L12_001B1BC4);
+                FastVecScale(&push_dir, &push_dir, g_barrier_push_strength);
             }
         }
         qcopy(&point, &g_hero_position);
-        point.f.z += D_L12_001B1BC0;
+        point.f.z += g_barrier_point_z_offset;
         if (IsPointInCuboid(&point, vars->transform)) {
-            FastVecSub(&offset, &g_hero_position, &D_L12_001B2F8C[0][vars->transform].rows[3]);
+            FastVecSub(&offset, &g_hero_position, &g_path_waypoint_table[0][vars->transform].rows[3]);
             transform_vector(&offset, &offset, matrix);
             offset.f.z = -offset.f.z / -length;
-            if (offset.f.z < vars->depth - (D_L12_001B1BB0 / length) * 1.5f ||
-                offset.f.z >= vars->depth + (D_L12_001B1BB4 / length) * 0.5f ||
+            if (offset.f.z < vars->depth - (g_barrier_depth_margin_back / length) * 1.5f ||
+                offset.f.z >= vars->depth + (g_barrier_depth_margin_front / length) * 0.5f ||
                 !vars->hit || vars->mode == 1) {
                 normal.q = 0;
                 normal.f.z = -3;
                 FastVecSub(&normal, &normal, &push_dir);
-                make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
+                make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(g_player_stats[0] / 2));
                 QueueMobyImpact(g_hero_moby, &impulse);
             }
         }
-        point.f.z = D_L12_001B2F8C[0][vars->transform].rows[3].f.z;
+        point.f.z = g_path_waypoint_table[0][vars->transform].rows[3].f.z;
         if (IsPointInCuboid(&point, vars->transform)) {
-            FastVecSub(&offset, &point, &D_L12_001B2F8C[0][vars->transform].rows[3]);
+            FastVecSub(&offset, &point, &g_path_waypoint_table[0][vars->transform].rows[3]);
             transform_vector(&offset, &offset, matrix);
             {
                 f32 numerator = -offset.f.z;
@@ -183,12 +183,12 @@ active:
                 uid = self->uid;
                 if (uid & 1) {
                     s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
-                    if (((D_0019B4A8[tableIndex] >> 4) & 7) != 7)
-                        D_0019B4A8[tableIndex] += 16;
+                    if (((g_moby_nibble_table[tableIndex] >> 4) & 7) != 7)
+                        g_moby_nibble_table[tableIndex] += 16;
                 } else {
                     s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
-                    if ((D_0019B4A8[tableIndex] & 7) != 7)
-                        ++D_0019B4A8[tableIndex];
+                    if ((g_moby_nibble_table[tableIndex] & 7) != 7)
+                        ++g_moby_nibble_table[tableIndex];
                 }
             }
         }
@@ -198,18 +198,18 @@ active:
             uid = self->uid;
             if (uid & 1) {
                 s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
-                if (((D_0019B4A8[tableIndex] >> 4) & 7) != 7)
-                    D_0019B4A8[tableIndex] += 16;
+                if (((g_moby_nibble_table[tableIndex] >> 4) & 7) != 7)
+                    g_moby_nibble_table[tableIndex] += 16;
             } else {
                 s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
-                if ((D_0019B4A8[tableIndex] & 7) != 7)
-                    ++D_0019B4A8[tableIndex];
+                if ((g_moby_nibble_table[tableIndex] & 7) != 7)
+                    ++g_moby_nibble_table[tableIndex];
             }
         }
         if (tracked_object_is_open() && !tracked_moby_is_active()) {
-            u8 *player = D_L12_001B090C[0];
+            u8 *player = g_tracked_object_ptr[0];
             qcopy_nc(&normal, player + 0x10);
-            if (math_fabs(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][vars->transform].rows[3].f.z) < 2)
+            if (math_fabs(*(f32 *)(player + 0x18) - g_path_waypoint_table[0][vars->transform].rows[3].f.z) < 2)
                 normal.f.z = D_L12_001B2F8C_gp[vars->transform].rows[3].f.z;
             if (IsPointInCuboid(&normal, vars->transform))
                 tracked_moby_set_state(1, -1);

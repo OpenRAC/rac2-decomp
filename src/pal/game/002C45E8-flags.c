@@ -9,7 +9,7 @@ void part_kill(void *);
 int FastDecTimer(short *);
 extern void FastVecAdd(char *, char *, char *);
 extern int CollLine(void *, void *, int, void *, void *);
-extern char D_001BAFA0[];
+extern char g_coll_hit_position[];
 extern void FastVecAdd(char *, char *, char *);
 extern int gfx_pack_color_floats(float, float, float, float);
 extern void FastVecAdd(char *, char *, char *);
@@ -23,7 +23,7 @@ void func_PAL_002C4810(char *p) {
  q=p+32;*(float *)(p+12)+=-120.00001f;
  FastVecAdd((char *)v,p+16,q);
  if(*(float *)q!=0 || *(float *)(q+4)!=0 || *(float *)(q+8)!=0){
- if(CollLine(p+16,v,2,p,0)){*(U128 *)(p+16)=*(U128 *)D_001BAFA0;vec_clear_128(q);*(float *)(p+12)+=*(float *)(p+12);}
+ if(CollLine(p+16,v,2,p,0)){*(U128 *)(p+16)=*(U128 *)g_coll_hit_position;vec_clear_128(q);*(float *)(p+12)+=*(float *)(p+12);}
  else {*(U128 *)(p+16)=*(U128 *)v;if(*(float *)(q+12)!=0)*(float *)(q+8)+=*(float *)(q+12);else *(float *)(q+8)+=-0.009072f;}}
  if(*(float *)(q+28)<=0 || FastDecTimer((short *)(p+10)) || *(float *)(p+12)<0 || v[0]<0.01f || v[1]<0.01f || v[2]<0.01f){part_kill(p);return;}
  *(float *)(q+16)+=-0.012f;if(*(float *)(q+16)<0)*(float *)(q+16)=0;

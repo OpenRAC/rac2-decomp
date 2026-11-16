@@ -27,7 +27,7 @@ extern Particle_002BE278 *part_alloc(int);
 extern int gfx_pack_color_floats(float, float, float, float);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern unsigned char *D_001F25A4;
+extern unsigned char *g_part_tex_white_flash;
 
 /* Spawns a white flash particle at position moving with velocity; growing, or
    shrinking when flag is set; a negative size picks a random one. */
@@ -57,7 +57,7 @@ void part_spawn_white_flash(TI128 *position, TI128 *velocity, int flag, float si
         else
             particle->size = size;
         particle->unk08 = 0;
-        particle->unk02 = *D_001F25A4;
+        particle->unk02 = *g_part_tex_white_flash;
         motion->alpha = 0.6f;
         particle->life = 0x50;
         motion->velocity = *velocity;

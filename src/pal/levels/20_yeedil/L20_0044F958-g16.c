@@ -8,14 +8,14 @@ typedef struct {
     int polygon;
     float correction[4], point[4], normal[4];
 } CollisionView;
-extern int D_L20_001A8F00;
-extern CollisionView D_L20_001C0400;
+extern int g_hero_vehicle_mode;
+extern CollisionView g_collision_contact;
 extern u8 *g_hero_moby __attribute__((nosda));
-extern float D_L20_001B23F8 __attribute__((sda));
-extern float D_L20_001B23FC __attribute__((sda));
-extern float D_L20_001B2400 __attribute__((sda));
+extern float g_yeedil_projectile_radius __attribute__((sda));
+extern float g_yeedil_projectile_spin_rate __attribute__((sda));
+extern float g_yeedil_projectile_bounce_min __attribute__((sda));
 extern float D_L20_001B2400_4[] MACRO_ADDR;
-extern float D_L20_001B2408 __attribute__((sda));
+extern float g_yeedil_projectile_shadow_size __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float FastVecLength(void *), vec_length_xy(void *);
@@ -23,7 +23,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_fast_normalize_helper(float, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
-extern void func_PAL_L20_0044FD80(char *, char *);
+extern void projectile_explode_pal(char *, char *);
 extern float math_random_float_range(float, float);
 extern float ApproachValue(float *, float, float);
 extern void euler_rotation_basis(void *, void *);
@@ -36,7 +36,7 @@ extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern int math_fast_float_d(int *);
 
-void func_PAL_L20_0044F958(u8 *moby)
+void yeedil_projectile_update_pal(u8 *moby)
 {
     float rate;
     float previous[4] __attribute__((aligned(16)));
@@ -47,30 +47,30 @@ void func_PAL_L20_0044F958(u8 *moby)
     float spin[12] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
     int collided;
-    if (D_L20_001A8F00 == 2) { moby_mark_spawned(moby); return; }
+    if (g_hero_vehicle_mode == 2) { moby_mark_spawned(moby); return; }
     if (moby[0x20] != 1) return;
     qcopy(previous, (float *)(moby + 0x10));
     collided = 0;
     FastVecAdd((float *)(moby + 0x10), (float *)(moby + 0x10), state);
-    if (FastVecLength(state) > D_L20_001B23F8 * 0.1f && CollLine(previous, (float *)(moby + 0x10), 2, moby, 0)) {
+    if (FastVecLength(state) > g_yeedil_projectile_radius * 0.1f && CollLine(previous, (float *)(moby + 0x10), 2, moby, 0)) {
         collided = 1;
-        vec_scale_to_length((float *)(moby + 0x10), D_L20_001C0400.normal, 0.01f);
-        FastVecAdd((float *)(moby + 0x10), (float *)(moby + 0x10), D_L20_001C0400.correction);
+        vec_scale_to_length((float *)(moby + 0x10), g_collision_contact.normal, 0.01f);
+        FastVecAdd((float *)(moby + 0x10), (float *)(moby + 0x10), g_collision_contact.correction);
     }
-    if (coll_test_point((float *)(moby + 0x10), 0, moby, D_L20_001B23F8 * 0.1f)) {
+    if (coll_test_point((float *)(moby + 0x10), 0, moby, g_yeedil_projectile_radius * 0.1f)) {
         collided = 1;
-        if (D_L20_001C0400.polygon < 0 &&
-            (D_L20_001C0400.object != *(u8 **)(moby + 0xb8) || !*(int *)(state + 0x20)) &&
-            *(short *)(D_L20_001C0400.object + 0xaa) != *(short *)(moby + 0xaa)) {
-            func_PAL_L20_0044FD80((char *)moby, (char *)(D_L20_001C0400.object == g_hero_moby ? 0x10001 : 0x10000));
+        if (g_collision_contact.polygon < 0 &&
+            (g_collision_contact.object != *(u8 **)(moby + 0xb8) || !*(int *)(state + 0x20)) &&
+            *(short *)(g_collision_contact.object + 0xaa) != *(short *)(moby + 0xaa)) {
+            projectile_explode_pal((char *)moby, (char *)(g_collision_contact.object == g_hero_moby ? 0x10001 : 0x10000));
             return;
         }
-        qcopy((float *)(moby + 0x10), D_L20_001C0400.point);
+        qcopy((float *)(moby + 0x10), g_collision_contact.point);
     }
-    if (collided) *(float *)(state + 8) = math_random_float_range(D_L20_001B2400, D_L20_001B2400_4[1]) * 0.020000001f;
+    if (collided) *(float *)(state + 8) = math_random_float_range(g_yeedil_projectile_bounce_min, D_L20_001B2400_4[1]) * 0.020000001f;
     else *(float *)(state + 8) -= *(float *)(state + 0x10);
     rate = vec_length_xy(state);
-    ApproachValue(&rate, D_L20_001B23FC * 0.020000001f, 0.002f);
+    ApproachValue(&rate, g_yeedil_projectile_spin_rate * 0.020000001f, 0.002f);
     vec_fast_normalize_helper(rate, state, state);
     *(ProjectileQuadword *)rotation = 0;
     rotation[2] = *(float *)(state + 0x14);
@@ -78,7 +78,7 @@ void func_PAL_L20_0044F958(u8 *moby)
     euler_rotation_basis(basis, angles);
     matrix_mul_vec3(state, state, basis);
     if (moby[0x31]) {
-        part_queue_ground_shadow((char *)moby, D_L20_001B2408);
+        part_queue_ground_shadow((char *)moby, g_yeedil_projectile_shadow_size);
         vec_copy_helper_a(rotation);
         FastVecCross(quaternion, rotation, state);
         vec_set_direction_with_complement(quaternion, quaternion, 0.031415932f);
@@ -86,5 +86,5 @@ void func_PAL_L20_0044F958(u8 *moby)
         multiply_matrix3x3(moby + 0xc0, spin, moby + 0xc0);
     }
     math_fast_float_d((int *)(state + 0x20));
-    if (math_fast_float_d((int *)(state + 0x18))) func_PAL_L20_0044FD80((char *)moby, 0);
+    if (math_fast_float_d((int *)(state + 0x18))) projectile_explode_pal((char *)moby, 0);
 }

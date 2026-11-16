@@ -2,15 +2,15 @@
 /* func_PAL_00295DD0, the PAL copy of func_002954C0: the same C, where rename func_002B7C80 becomes func_PAL_002B8838; rename func_002B7CE0 becomes func_PAL_002B8898. */
 /* Map cache reset: calls the boot-only stub func_00298170, which is defined
  * in 00294BC8.c, so this level-placed body lives in a unit of its own. */
-extern unsigned char D_001A7AFD __attribute__((section(".sdata")));
+extern unsigned char g_map_overlay_flag __attribute__((section(".sdata")));
 extern int D_001A79F0_3 __attribute__((sda));
 extern int g_map_overlay_state[];
 
 extern void map_empty_stub(void);
 extern int g_pause_menu_state[];
 extern void func_0029DEA8(int, int);
-extern int func_PAL_002B8838(void *, int, int);
-extern short func_PAL_002B8898(int);
+extern int load_read_disc_with_pause_pal(void *, int, int);
+extern short snd_pump_music_and_disc_read_pal(int);
 extern int gfx_send_buffer_slot_records(int, int, int, int);
 extern int gfx_upload_records_to_buffer_slot(int, int, int, int, int);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
@@ -26,7 +26,7 @@ typedef struct {
 } MapToc;
 extern MapToc g_copy_setup_data;
 
-void func_PAL_00295DD0(void)
+void map_reset_cache_and_reload_pal(void)
 {
     int *arena;
     int a, b, c;
@@ -54,12 +54,12 @@ void func_PAL_00295DD0(void)
     g_map_overlay_state[0x2AC / 4] = -1;
     g_map_overlay_state[0x2B0 / 4] = -1;
     if (g_map_overlay_state[0x238 / 4] == -1) goto empty;
-    if (g_map_overlay_state[0x23C / 4] == 0 && D_001A7AFD != 0) {
+    if (g_map_overlay_state[0x23C / 4] == 0 && g_map_overlay_flag != 0) {
         MapToc *toc = &g_copy_setup_data;
         int size = toc->files1[g_map_overlay_state[0x230 / 4]].size;
         e = size << 7;
-        func_PAL_002B8838((void *)c, toc->files1[g_map_overlay_state[0x230 / 4]].sector + toc->base, size);
-        func_PAL_002B8898(1);
+        load_read_disc_with_pause_pal((void *)c, toc->files1[g_map_overlay_state[0x230 / 4]].sector + toc->base, size);
+        snd_pump_music_and_disc_read_pal(1);
         g_map_overlay_state[0x23C / 4] = 1;
         g_map_overlay_state[0x240 / 4] = e;
         gfx_send_buffer_slot_records(g_map_overlay_state[0x28C / 4], g_map_overlay_state[0x238 / 4], 0, e);
@@ -74,7 +74,7 @@ void func_PAL_00295DD0(void)
         map[0x2B8 / 4] = size;
         gfx_upload_records_to_buffer_slot(map[0x28C / 4], map[0x238 / 4], 0, size, 0);
         map[0x24 / 4] = 1;
-        map[0x2A0 / 4] = D_001A79F0_3 + (D_001A7AFD ? 0x100 : 0);
+        map[0x2A0 / 4] = D_001A79F0_3 + (g_map_overlay_flag ? 0x100 : 0);
         map[0x234 / 4] = -2;
     }
     goto done;

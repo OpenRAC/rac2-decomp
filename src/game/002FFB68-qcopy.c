@@ -3,14 +3,14 @@
 
 typedef float V4_F2FFB68[4] __attribute__((aligned(16)));
 
-extern s16 D_001B231A MACRO_ADDR;
+extern s16 g_effect_object_id MACRO_ADDR;
 extern char g_weapon_table[];
 extern char g_hero_state[];
 
 /* Hero fields: a word in each 0x50-byte record from 0x1220 and a word table at 0x22E4. */
 typedef struct { u8 pad[0x1220]; s32 word; } HeroRec50;
 typedef struct { u8 pad[0x22E4]; s32 word[1]; } HeroTable;
-extern s32 D_001A7398[] MACRO_ADDR;
+extern s32 g_menu_choice_table[] MACRO_ADDR;
 
 extern void shop_setup_preview_object(void);
 extern void moby_mark_spawned(void *);
@@ -25,7 +25,7 @@ char *part_spawn_mode_effect_object(char *obj)
 {
     V4_F2FFB68 pos, rot;
     s32 mode = -1;
-    s16 id = D_001B231A;
+    s16 id = g_effect_object_id;
     char *rec;
     char *spawned;
     s32 slot;
@@ -54,7 +54,7 @@ char *part_spawn_mode_effect_object(char *obj)
         qcopy(spawned + 0xF0, rot);
         if (mode < 0) {
             slot = *(s32 *)(rec + 0xC);
-            D_001A7398[slot] = 0;
+            g_menu_choice_table[slot] = 0;
             ((HeroRec50 *)(g_hero_state + slot * 0x50))->word = 0;
             ((HeroTable *)g_hero_state)->word[slot] = 0;
         }

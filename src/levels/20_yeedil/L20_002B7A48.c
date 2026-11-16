@@ -17,7 +17,7 @@ typedef struct {
     unsigned char pad20[0x20]; Vec4 normal;
 } ContactView;
 #define VELOCITY ((char *)(D_00189E20 + 0xf0))
-extern unsigned char D_L20_001C0400[];
+extern unsigned char g_collision_contact[];
 #define PLAYER ((MotionView *)D_00189E20)
 #define CONTACT ((ContactView *)D_L20_001C0400)
 extern float cam_get_view_space_vector_length(char *);
@@ -36,7 +36,7 @@ extern float FastVecDot(void *, void *);
 
 extern u8 g_item_slot_to_record[];
 
-extern char D_L20_0026D970[];
+extern char g_item_l20_record_table[];
 
 extern s32 hero_slot_item_id(s32 index);
 
@@ -55,7 +55,7 @@ extern void hero_clear_queued_anim(void);
 extern void func_002A677C(s32);
 extern s32 hero_l20_set_state(s32, s32);
 extern void set_hero_animation(f32, s32, s32);
-extern s32 D_00138320[];
+extern s32 g_pad_pressed_flags[];
 extern void UpdateYeedilHeroCollisionCapsule(void);
 
 typedef struct {
@@ -130,7 +130,7 @@ void SetYeedilHeroVehicleMode(s32 new_mode, s32 animation, char *attach_object)
     *(s32 *)(block + 0xC14) = (s32)p2;
     *(s32 *)(block + 0x2290) = (s32)p2;
     if ((p0 & 0xFF) == 1) {
-        if (D_00138320[0] & 0x10) {
+        if (g_pad_pressed_flags[0] & 0x10) {
             hud_set_slot_contents(0x23, 0, (void *)weapon_wheel_init, (void *)UpdateRadialMenuSelection,
                           (void *)DrawRadialSelectorPanel, 0, 0);
             level_run_slot_callback(3);

@@ -8,7 +8,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void func_001290E0(int *, int *);
 extern unsigned char D_00189E20_1[];
 
-void func_PAL_L00_002B4230(void)
+void hero_cancel_velocity_into_wall_pal(void)
 {
     char *p = (char *)D_00189E20_1;
     float distance;

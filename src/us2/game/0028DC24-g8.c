@@ -9,14 +9,14 @@
 typedef struct { int xy[8][2]; } RadialPositions;
 typedef struct { int ids[8]; } RadialLabels;
 typedef struct { int icon, frame; int rest[5]; } RadialItem;
-extern RadialPositions D_001A8E30;
-extern RadialLabels D_001A8E70;
-extern short D_001B189C[] __attribute__((sda));
+extern RadialPositions g_radial_positions;
+extern RadialLabels g_radial_labels;
+extern short g_weapon_wheel_slot_state[] __attribute__((sda));
 extern int g_radial_slot_count;
 extern RadialItem **g_radial_menu_pages;
 extern int g_radial_menu_page_index __attribute__((sda));
-extern char *D_001A8CFC;
-extern float D_001B23A8;
+extern char *g_resident_data_base;
+extern float g_menu_alpha_scale;
 extern float IntToFloat(int);
 extern float FastAddRotations(float,float);
 extern float math_fast_sin_or_cos_a(float);
@@ -34,13 +34,13 @@ extern int text_draw_centered_small(int,int,u64,char *,int);
 
 static __inline__ void draw_background(char *tex, int color, float sx, float rot)
 {
-    gfx_draw_scaled_object_two_axes(tex, color, 129.0f, 208.0f, sx, D_001B23A8, rot);
+    gfx_draw_scaled_object_two_axes(tex, color, 129.0f, 208.0f, sx, g_menu_alpha_scale, rot);
 }
 
 int func_US2_0028DC24(unsigned char *o)
 {
-    int total = D_001B189C[2] + D_001B189C[4] + D_001B189C[3];
-    RadialPositions positions = D_001A8E30;
+    int total = g_weapon_wheel_slot_state[2] + g_weapon_wheel_slot_state[4] + g_weapon_wheel_slot_state[3];
+    RadialPositions positions = g_radial_positions;
     int colors[4], colors2[4];
     float open, text, angle, zero;
     char *tex;
@@ -58,36 +58,36 @@ int func_US2_0028DC24(unsigned char *o)
      * scheduling barrier, so the last draw loads $f12 before $a1 as retail (v1.01 has the same group) */
     do {
         zero = 0.0f;
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 8);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 8);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 9);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 9);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 10);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 10);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 11);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 11);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 12);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 12);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 13);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 13);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 14);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 14);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 15);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 15);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 7);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 7);
         draw_background(tex, 0x60442D00, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 7);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 7);
         draw_background(tex, 0x60442D00, -1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 134);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 134);
         draw_background(tex, 0x55F0C070, 1.0f, zero);
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 134);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 134);
         draw_background(tex, 0x55F0C070, -1.0f, zero);
     } while (0);
     if (*(int *)(o+0x74) >= 0) {
         colors[0] = math_ping_pong_blend_values(0x80442D00,0x80FFDE8D,25,0,0);
         previous = *(int *)(o+0x74)-1;
         if (previous < 0) previous = 7;
-        tex = (char *)table_find_by_id(D_001A8CFC + 0x8710, 16);
+        tex = (char *)table_find_by_id(g_resident_data_base + 0x8710, 16);
         draw_background(tex, colors[0], 1.0f, (float)previous);
         {
             int k = *(int *)(o+0x74);
@@ -103,48 +103,48 @@ int func_US2_0028DC24(unsigned char *o)
         if (!g_radial_menu_pages[g_radial_menu_page_index][i].icon) continue;
         frame = g_radial_menu_pages[g_radial_menu_page_index][i].frame;
         previous = 0;
-        if (frame == 6 && !D_001B189C[1]) frame = 7;
+        if (frame == 6 && !g_weapon_wheel_slot_state[1]) frame = 7;
         available = 0;
         switch (frame) {
         case 2:
-            if (D_001B189C[0]) {
+            if (g_weapon_wheel_slot_state[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x6000FF00;
                 available=1; previous=1;
             }
             break;
         case 3:
-            if (D_001B189C[0]) {
+            if (g_weapon_wheel_slot_state[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x6029A1FF;
                 previous=1; available=1;
             }
             break;
         case 0:
-            if (D_001B189C[0] && total < D_001B189C[0]) {
+            if (g_weapon_wheel_slot_state[0] && total < g_weapon_wheel_slot_state[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x600000FF;
                 previous=1; available=1;
             }
             break;
         case 1:
-            if (D_001B189C[0] && total < D_001B189C[0]) {
+            if (g_weapon_wheel_slot_state[0] && total < g_weapon_wheel_slot_state[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
                 colors[3]=colors[2]=colors[1]=colors[0]=0x60FF0000;
                 previous=1; available=1;
             }
             break;
         case 6: case 7:
-            if (D_001B189C[2]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (g_weapon_wheel_slot_state[2]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 4:
-            if (D_001B189C[3]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (g_weapon_wheel_slot_state[3]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 8:
-            if (D_001B189C[4]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (g_weapon_wheel_slot_state[4]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 9:
-            if (D_001B189C[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (g_weapon_wheel_slot_state[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         }
         if (previous) hud_draw_sprite_gradient(GetIconFrame(g_radial_menu_pages[g_radial_menu_page_index][i].icon,10),x+2,y+2,28,26,colors);
@@ -157,9 +157,9 @@ int func_US2_0028DC24(unsigned char *o)
     }
     sel = *(int *)(o+0x74);
     if (selectedAvailable && sel>=0 && sel<8) {
-        RadialLabels labels=D_001A8E70;
+        RadialLabels labels=g_radial_labels;
         int id=labels.ids[sel];
-        if (id==0x2DCA && D_001B189C[1]) id=0x2DCB;
+        if (id==0x2DCA && g_weapon_wheel_slot_state[1]) id=0x2DCB;
         label=(char *)GetLocalizedString(id);
         if (label && func_001157AC(label)) {
             float alpha = text * open;

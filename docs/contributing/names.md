@@ -61,3 +61,10 @@ same header) and check that nothing but source text changed.
 after the system (`hero_l04_update_state_machine`); globals `g_` + `snake_case`. Library and
 SDK routines keep their own spelling (`memchr`, `sceSifSendCmd`). Recovered names keep theirs.
 Names express observed behaviour unless their tier is recovered.
+
+A release's own symbols (`func_PAL_...`, `func_US2_...`, `D_PAL_...`, `D_US2_...`; see
+[../build/versions.md](../build/versions.md)) are named in the same table and go in
+`include/names/pal.h` and `us2.h`. A release's version of a USA v1.01 function takes the
+v1.01 name plus `_pal` or `_us2` (`hit_trigger_update_pal`); the counterpart comes from
+`build/<version>/carry.json` (changed code at the same place) or an identical fingerprint.
+Data names in release C state v1.01 addresses, so v1.01's global names apply there unchanged.

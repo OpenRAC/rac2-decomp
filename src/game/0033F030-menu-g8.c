@@ -3,13 +3,13 @@
 
 typedef struct { float x, y; } Pair;
 typedef struct { int value; } MenuColor;
-extern Pair D_001AE048[], D_001AE050[], D_001AE058[], D_001AE060[], D_001AE068[], D_001AE070[];
+extern Pair g_radial_menu_pos_first[], g_radial_menu_pos_second[], g_radial_menu_pos_third[], g_radial_menu_pos_fourth[], g_radial_menu_pos_fifth[], g_radial_menu_cursor_pos[];
 typedef struct { int value; char pad[20]; int id; } Item;
 typedef struct { Item *items; } Items;
 extern Items *g_radial_menu_pages;
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern unsigned char g_item_slot_to_record[];
-extern int D_00139868[];
+extern int g_help_entry_state[];
 extern char g_weapon_table[];
 extern struct { char pad[0x1C4]; int buttons; } g_pad_state;
 extern void *memset(void *, int, unsigned int);
@@ -38,11 +38,11 @@ int func_0033FB98(char *self, int buttons)
     memset(&offsetE4,0,8);
     memset(&offset130,0,8);
     memset(&offset4C,0,8);
-    offset828 = D_001AE048[0];
-    offset900 = D_001AE050[0];
-    offset8B8 = D_001AE058[0];
-    offset948 = D_001AE060[0];
-    offset990 = D_001AE068[0];
+    offset828 = g_radial_menu_pos_first[0];
+    offset900 = g_radial_menu_pos_second[0];
+    offset8B8 = g_radial_menu_pos_third[0];
+    offset948 = g_radial_menu_pos_fourth[0];
+    offset990 = g_radial_menu_pos_fifth[0];
     object_set_first_float4(self + 0x0, offset0.x + (*(Pair **)(self+0x80C))->x, offset0.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x4C, offset4C.x + (*(Pair **)(self+0x80C))->x, offset4C.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0xE4, offsetE4.x + (*(Pair **)(self+0x80C))->x, offsetE4.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
@@ -52,7 +52,7 @@ int func_0033FB98(char *self, int buttons)
     object_set_first_float4(self + 0x900, offset900.x + (*(Pair **)(self+0x80C))->x, offset900.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x948, offset948.x + (*(Pair **)(self+0x80C))->x, offset948.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x990, offset990.x + (*(Pair **)(self+0x80C))->x, offset990.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    offsetCursor=D_001AE070[0];
+    offsetCursor=g_radial_menu_cursor_pos[0];
     object_set_first_float4(self + 0x2A8, offsetCursor.x + (*(Pair **)(self+0x80C))->x, offsetCursor.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x2F4, offsetCursor.x + (*(Pair **)(self+0x80C))->x, offsetCursor.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     object_set_first_float4(self + 0x5A0, offsetCursor.x + (*(Pair **)(self+0x80C))->x, offsetCursor.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
@@ -67,7 +67,7 @@ int func_0033FB98(char *self, int buttons)
                 object_set_flag_value(child,1);
                 hud_set_widget_value_pair(child,g_radial_menu_pages->items[i].value,0);
             }
-            bar=menu_return_object_unchanged(D_001A8CFC+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
             object_set_flag_value(bar,0);
             firstColor.value = 0;
             secondColor.value = 0;
@@ -77,7 +77,7 @@ int func_0033FB98(char *self, int buttons)
                 int *primary = object_get_fourth_field(child);
                 *primary = (*primary & 0xFF000000) | (textColor.value & 0xFFFFFF);
             }
-            bar=menu_return_object_unchanged(D_001A8CFC+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
             object_set_flag_value(bar,1);
             object_set_first_pair(bar,firstColor.value,secondColor.value);
             meter_set_max(bar,100);
@@ -92,7 +92,7 @@ int func_0033FB98(char *self, int buttons)
                         *secondary = (*secondary & 0xFF000000) | (textColor.value & 0xFFFFFF);
                     }
                     if (*(int *)(g_weapon_table+g_item_slot_to_record[g_radial_menu_pages->items[i].id]*224+0x6C)>0)
-                        meter_set_value(bar,D_00139868[g_radial_menu_pages->items[i].id]>>5);
+                        meter_set_value(bar,g_help_entry_state[g_radial_menu_pages->items[i].id]>>5);
                 }
             }
         }

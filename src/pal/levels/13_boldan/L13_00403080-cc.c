@@ -8,7 +8,7 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 typedef short s16;
 extern s32 func_2AF870(u8 *);
-extern u8 D_L13_001B1E60[];
+extern u8 g_str_rising_platform_sound[];
 extern s32 g_current_map_index __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern f32 vec_distance_xy(void *, void *);
@@ -20,7 +20,7 @@ extern u8 g_hero_position[];
 extern s32 IsPointInCuboid(u8 *, s32);
 extern s32 IsPointInCuboid(u8 *, s32);
 extern s32 func_2AF870(u8 *);
-extern u8 D_L13_001B1E60[];
+extern u8 g_str_rising_platform_sound[];
 
 void func_PAL_L13_00403080(u8 *a0) {
     u8 *ptr = *(u8 **)(a0 + 0x68);

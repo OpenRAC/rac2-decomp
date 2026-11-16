@@ -33,11 +33,11 @@ extern HeroAnim g_hero_state;
 extern float IntToFloat(int);
 extern int FastDecTimer(void *);
 extern void cam_compute_offset(void *, int, float);
-extern int D_L00_001B1588 __attribute__((sda));
-extern u16 D_L00_001B1518 __attribute__((sda)), D_L00_001B152C __attribute__((sda)), D_L00_001B1530 __attribute__((sda)), D_L00_001B1534 __attribute__((sda));
-extern u16 D_L00_001B1540 __attribute__((sda)), D_L00_001B1544 __attribute__((sda)), D_L00_001B1548 __attribute__((sda)), D_L00_001B1550 __attribute__((sda));
-extern u16 D_L00_001B1554 __attribute__((sda)), D_L00_001B1558 __attribute__((sda)), D_L00_001B1560 __attribute__((sda)), D_L00_001B156C __attribute__((sda));
-extern float D_L00_001B153C __attribute__((sda)), D_L00_001B154C __attribute__((sda)), D_L00_001B155C __attribute__((sda)), D_L00_001B1570 __attribute__((sda));
+extern int g_weapon_anim_skip_flag __attribute__((sda));
+extern u16 g_camera_default_frame_count __attribute__((sda)), g_weapon_anim_ctrl4_frames __attribute__((sda)), g_weapon_anim_ctrl2_frames __attribute__((sda)), g_weapon_aim_in_frames __attribute__((sda));
+extern u16 g_weapon_aim15_in_frames __attribute__((sda)), g_weapon_aim_out_frames __attribute__((sda)), g_weapon_anim_return_frames __attribute__((sda)), g_weapon_aim5_in_frames __attribute__((sda));
+extern u16 g_weapon_anim_state12_frames __attribute__((sda)), g_weapon_anim_state12_exit_frames __attribute__((sda)), g_weapon_anim_timer2_frames __attribute__((sda)), g_weapon_anim_state9_exit_frames __attribute__((sda));
+extern float g_weapon_aim_in_level __attribute__((sda)), g_weapon_aim15_level __attribute__((sda)), g_weapon_aim5_level __attribute__((sda)), g_weapon_anim_base_level __attribute__((sda));
 
 /* Switch to state n, with t frames of blend. */
 #define GO(n, t) { s->prev = s->state; s->state = n; s->timer = t; s->rate = 1.0f / func_00283CE0(s->timer); return; }
@@ -56,25 +56,25 @@ void weapon_update_held_anim_state(char *moby)
 {
     char *moby_vars = *(char **)(moby + 0x70);
     Anim *s = (Anim *)(moby_vars + 0x60);
-    if (D_L00_001B1588) { D_L00_001B1588 = 0; return; }
+    if (g_weapon_anim_skip_flag) { g_weapon_anim_skip_flag = 0; return; }
     if (s->state == 0) {
-        if (g_hero_state.ctrl == 2 || g_hero_state.ctrl == 30) GO(1, D_L00_001B1530)
-        if (g_hero_state.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
-        if (g_hero_state.state == 12) GO(8, D_L00_001B1554)
-        if (g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
+        if (g_hero_state.ctrl == 2 || g_hero_state.ctrl == 30) GO(1, g_weapon_anim_ctrl2_frames)
+        if (g_hero_state.state == 15) AIM(3, g_weapon_aim15_in_frames, g_weapon_aim_out_frames, g_weapon_aim15_level, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
+        if (g_hero_state.state == 12) GO(8, g_weapon_anim_state12_frames)
+        if (g_hero_state.state == 11) AIM(6, g_weapon_aim_in_frames, g_weapon_aim_out_frames, g_weapon_aim_in_level, 0, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
         if ((unsigned)(g_hero_state.state - 13) < 2) {
-            AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
+            AIM(5, g_weapon_aim5_in_frames, g_weapon_anim_state12_frames, g_weapon_aim5_level, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
         }
-        if (g_hero_state.ctrl == 4) GO(2, D_L00_001B152C)
+        if (g_hero_state.ctrl == 4) GO(2, g_weapon_anim_ctrl4_frames)
         return;
     }
-    if (s->state == 2 && (g_hero_state.state == 0x81 || g_hero_state.state == 0x5B)) GO(1, D_L00_001B1530)
+    if (s->state == 2 && (g_hero_state.state == 0x81 || g_hero_state.state == 0x5B)) GO(1, g_weapon_anim_ctrl2_frames)
     if (s->state != 9 && s->state != 1 && g_hero_state.state == 0x14) {
         s->prev = s->state; s->state = 9;
-        s->timer2 = D_L00_001B1560;
+        s->timer2 = g_weapon_anim_timer2_frames;
         s->rate2 = 1.0f / IntToFloat(s->timer2);
-        s->timer = 0; s->rate = 1.0f; s->level = D_L00_001B1570; s->flag = 0;
-        cam_compute_offset(s->sound, 1, D_L00_001B1570);
+        s->timer = 0; s->rate = 1.0f; s->level = g_weapon_anim_base_level; s->flag = 0;
+        cam_compute_offset(s->sound, 1, g_weapon_anim_base_level);
         qcopy(s->b, s->a);
         return;
     }
@@ -83,41 +83,41 @@ void weapon_update_held_anim_state(char *moby)
         return;
     }
     if (s->state == 7) {
-        if (!g_hero_state.b49E) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-        if (g_hero_state.ctrl == 2) GO(1, D_L00_001B1548)
+        if (!g_hero_state.b49E) AIM(6, g_weapon_aim_in_frames, g_weapon_aim_out_frames, g_weapon_aim_in_level, 1, s->sound, s->a, s->b)
+        if (g_hero_state.ctrl == 2) GO(1, g_weapon_anim_return_frames)
     }
     if (s->state == 4 && g_hero_state.ctrl != 4) {
         if (g_hero_state.ctrl == 2) {
             s->prev = 4; s->state = 1;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
+            s->timer = g_weapon_anim_return_frames; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         } else {
             s->prev = 4; s->state = 0;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
+            s->timer = g_weapon_anim_return_frames; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         }
     }
-    if (s->state == 3 && g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-    if (s->state == 5 && g_hero_state.state == 12) GO(8, D_L00_001B1554)
-    if (s->state == 8 && g_hero_state.state != 12) GO(0, D_L00_001B1558)
-    if (s->state == 6 && g_hero_state.state != 11) GO(0, D_L00_001B1548)
-    if ((s->state == 3 || s->state == 5) && g_hero_state.ctrl != 4) GO(0, D_L00_001B1548)
+    if (s->state == 3 && g_hero_state.state == 11) AIM(6, g_weapon_aim_in_frames, g_weapon_aim_out_frames, g_weapon_aim_in_level, 1, s->sound, s->a, s->b)
+    if (s->state == 5 && g_hero_state.state == 12) GO(8, g_weapon_anim_state12_frames)
+    if (s->state == 8 && g_hero_state.state != 12) GO(0, g_weapon_anim_state12_exit_frames)
+    if (s->state == 6 && g_hero_state.state != 11) GO(0, g_weapon_anim_return_frames)
+    if ((s->state == 3 || s->state == 5) && g_hero_state.ctrl != 4) GO(0, g_weapon_anim_return_frames)
     if ((s->state == 9 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x37)) ||
         (s->state == 10 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x37))) {
         float one = 1.0f;
         char *q;
         s->prev = s->state; s->state = 1;
-        s->timer = D_L00_001B1548;
+        s->timer = g_weapon_anim_return_frames;
         s->rate = one / IntToFloat(s->timer);
         q = *(char **)(moby + 0x70) + 0x20;
-        *(short *)q = D_L00_001B1518;
+        *(short *)q = g_camera_default_frame_count;
         *(float *)(q + 0x24) = one / IntToFloat(*(short *)q);
         qcopy(moby + 0x40, moby);
         return;
     }
-    if (s->state == 9 && g_hero_state.state != 0x14) GO(10, D_L00_001B156C)
+    if (s->state == 9 && g_hero_state.state != 0x14) GO(10, g_weapon_anim_state9_exit_frames)
     if (s->state == 10 && FastDecTimer(&s->timer2)) {
         s->prev = s->state; s->state = 0;
-        s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
+        s->timer = g_weapon_anim_return_frames; s->rate = 1.0f / IntToFloat(s->timer);
     }
 }

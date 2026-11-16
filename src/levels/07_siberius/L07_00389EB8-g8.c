@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int D_L07_001B0AE0 __attribute__((sda));
+extern int g_moby_destroy_flag __attribute__((sda));
 
 extern void moby_mark_spawned(int);
 
@@ -9,7 +9,7 @@ extern void moby_mark_spawned(int);
 /* Per-frame update for moby class 3361: removes the object once the level flag is set. */
 void moby_destroy_when_level_flag(int moby)
 {
-    if (D_L07_001B0AE0 != 0)
+    if (g_moby_destroy_flag != 0)
         moby_mark_spawned(moby);
 }
 
@@ -27,17 +27,17 @@ extern void vec_clamp_length(void *, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 extern float vec_distance_xy(void *, void *);
-extern float D_L07_001B0C60 __attribute__((sda));
-extern float D_L07_001B0C64 __attribute__((sda));
-extern float D_L07_001B0C68 __attribute__((sda));
-extern float D_L07_001B0C6C __attribute__((sda));
-extern float D_L07_001B0C70 __attribute__((sda));
-extern float D_L07_001B0C74 __attribute__((sda));
-extern float D_L07_001B0C78 __attribute__((sda));
-extern float D_L07_001B0C7C __attribute__((sda));
-extern float D_L07_001B0C80 __attribute__((sda));
-extern float D_L07_001B0C84 __attribute__((sda));
-extern float D_L07_001B0C88 __attribute__((sda));
+extern float g_spin_x_rate __attribute__((sda));
+extern float g_spin_y_rate __attribute__((sda));
+extern float g_bob_l07_amplitude __attribute__((sda));
+extern float g_rotation_base_step __attribute__((sda));
+extern float g_rotation_step_a __attribute__((sda));
+extern float g_rotation_step_b __attribute__((sda));
+extern float g_motion_rate __attribute__((sda));
+extern float g_motion_maximum __attribute__((sda));
+extern float g_motion_scale __attribute__((sda));
+extern float g_turn_l07_limit __attribute__((sda));
+extern float g_turn_accel_limit __attribute__((sda));
 
 /* Steer the object's anchor toward its target (relative to the attached object when there is
    one) with a speed-limited, frame-scaled step, update the angular state, and return the
@@ -49,9 +49,9 @@ extern void euler_rotation_basis(void *, void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern float weapon_compute_shot_launch_speed(float *a, float *b, float *out, float d, float e);
 extern void matrix_from_basis_rows(void *, void *);
-extern float D_L07_001B0E30 __attribute__((sda));
-extern float D_L07_001B0E34 __attribute__((sda));
-extern float D_L07_001B0E38 __attribute__((sda));
+extern float g_debris_l07_gravity __attribute__((sda));
+extern float g_debris_speed __attribute__((sda));
+extern float g_debris_l07_scale_factor __attribute__((sda));
 
 /* The spawned object and its state block, as far as func_L07_003F43E0 uses them. */
 typedef struct {
@@ -98,9 +98,9 @@ char *SpawnBallisticMoby(char *parent, char *owner, char *spawn_pos, char *targe
         euler_rotation_basis(obj->mtx, obj->rot);
         obj->flags |= 0x100;
         vars = (F43E0Vars *)obj->pVars;
-        obj->scale = *(float *)(obj->pClass + 0x24) * D_L07_001B0E38;
-        speed = D_L07_001B0E34 * (1.0f / 60.0f);
-        gravity = D_L07_001B0E30 * (1.0f / 3600.0f);
+        obj->scale = *(float *)(obj->pClass + 0x24) * g_debris_l07_scale_factor;
+        speed = g_debris_speed * (1.0f / 60.0f);
+        gravity = g_debris_l07_gravity * (1.0f / 3600.0f);
         vars->owner = owner;
         FastVecSub(vars->vel, target_pos, obj->pos);
         vec_fast_normalize_helper(vars->vel, vars->vel, speed);

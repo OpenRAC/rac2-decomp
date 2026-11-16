@@ -5,16 +5,16 @@
    destination as the address temporary (`lui $v0 ; lbu $v0,%lo($v0)`, stores through $at). */
 
 /* The level timer, through $gp. */
-extern int D_L01_001AEC38 __attribute__((sda));
+extern int g_oozla_intro_timer __attribute__((sda));
 
 /* The level's mode word: one read, which reorg copies into a branch delay slot ($gp form there)
    and the fall-through keeps as the absolute macro (docs/build/compiler-notes.md, MACRO_ADDR). */
-extern int D_L01_001B2088 MACRO_ADDR;
+extern int g_oozla_intro_stage MACRO_ADDR;
 
 /* The one-shot flag byte, absolute: retail leaves the preceding bgtz slot empty, so cc1 must not
    take it for small data. */
-extern unsigned char D_001A7A6F __attribute__((nosda));
-extern int D_L01_001A907C MACRO_ADDR;
+extern unsigned char g_oozla_intro_done __attribute__((nosda));
+extern int g_flying_path_mode MACRO_ADDR;
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void value_set_entry_by_index(int, int);
 
@@ -24,16 +24,16 @@ extern void value_set_entry_by_index(int, int);
 void oozla_intro_sequence_trigger(char *effect_object) {
     if (*(unsigned char *)(effect_object + 0x20) == 0)
         *(unsigned char *)(effect_object + 0x30) = 0xFF;
-    if (D_L01_001B2088 == 2)
-        D_L01_001AEC38 = 0x42;
-    if (D_L01_001B2088 < 6)
+    if (g_oozla_intro_stage == 2)
+        g_oozla_intro_timer = 0x42;
+    if (g_oozla_intro_stage < 6)
         return;
-    if (D_L01_001AEC38 > 0)
+    if (g_oozla_intro_timer > 0)
         return;
-    if (D_001A7A6F != 0)
+    if (g_oozla_intro_done != 0)
         return;
-    D_001A7A6F = 1;
+    g_oozla_intro_done = 1;
     snd_play_from_global_bank(1, 0, 0);
     value_set_entry_by_index(0x1233, -1);
-    D_L01_001A907C = 1;
+    g_flying_path_mode = 1;
 }

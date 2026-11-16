@@ -32,7 +32,7 @@ typedef struct {
 
 extern char g_pause_menu_state[];
 extern char g_camera_eye_state[];
-extern float D_001B90F0[];
+extern float g_fov_tangent[];
 
 extern void gfx_select_packet_buffer_setup(void);
 extern void mem_copy_aligned(void *, void *, int);
@@ -45,8 +45,8 @@ extern void snd_send_cmd23(int);
 extern int flag_is_word_set(void);
 extern void music_Unpause(void);
 extern int snd_Pump(void);
-extern s32 func_PAL_002E5898(void);
-extern s16 func_PAL_002B8898(int);
+extern s32 UpdateSoundVoices_pal(void);
+extern s16 snd_pump_music_and_disc_read_pal(int);
 extern void pad_clear_port_state(void);
 
 void func_PAL_002CB5D0(void)
@@ -61,7 +61,7 @@ void func_PAL_002CB5D0(void)
     qcopy(dst, &s->field_050);
     qcopy(dst + 1, &s->field_060);
     mem_copy_aligned((char *)dst + 0x230, s->field_200, 0x30);
-    *(float *)D_001B90F0 = s->field_0F8;
+    *(float *)g_fov_tangent = s->field_0F8;
     UpdateViewContext();
     gfx_build_view_matrices();
     select_moby_context(0);
@@ -80,9 +80,9 @@ void func_PAL_002CB5D0(void)
             music_Unpause();
         snd_Pump();
     }
-    func_PAL_002E5898();
+    UpdateSoundVoices_pal();
     if (((GameState_PAL_2CB5D0 *)(void *)g_pause_menu_state)->field_0DB) {
-        func_PAL_002B8898(1);
+        snd_pump_music_and_disc_read_pal(1);
         ((GameState_PAL_2CB5D0 *)(void *)g_pause_menu_state)->field_0DB = 0;
     }
     pad_clear_port_state();

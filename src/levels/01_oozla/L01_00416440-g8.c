@@ -59,22 +59,22 @@ typedef struct {
 } GoldBoltHero;
 
 extern GoldBoltHero g_hero_state;
-extern u8 D_001A7B2A MACRO_ADDR;
-extern u8 D_001A7A45 MACRO_ADDR;
-extern f32 D_L01_001B1A58 __attribute__((sda));
-extern f32 D_L01_001B1A68 __attribute__((sda));
-extern f32 D_L01_001B1A6C __attribute__((sda));
-extern f32 D_L01_001B1A70 __attribute__((sda));
-extern f32 D_L01_001B1A74 __attribute__((sda));
-extern s32 D_L01_001B1A98 __attribute__((sda));
-extern s32 D_L01_001B21B0 MACRO_ADDR;
+extern u8 g_hero_override_flag MACRO_ADDR;
+extern u8 g_state_flag_c MACRO_ADDR;
+extern f32 g_bobbing_scale_factor __attribute__((sda));
+extern f32 g_spin_rate_x __attribute__((sda));
+extern f32 g_spin_rate_y __attribute__((sda));
+extern f32 g_spin_rate_z __attribute__((sda));
+extern f32 g_spin_rate_w __attribute__((sda));
+extern s32 g_random_effect_chance __attribute__((sda));
+extern s32 g_platinum_bolt_timer MACRO_ADDR;
 /* The same block src/levels/01_oozla/L01_003D2E50.c writes: a symbol-plus-offset store counts as
    two instructions, so it stays out of the jal delay slot. */
 extern struct {
     s16 f0, f2, f4, pad6;
     s32 busy;
 } D_L01_001B22A0 MACRO_ADDR;
-extern s32 D_L01_001B1FA8 MACRO_ADDR;
+extern s32 g_camera_lock_flag MACRO_ADDR;
 extern s32 D_L01_001B1FA8_gp SDATA(D_L01_001B1FA8);
 extern f32 math_random_angle(void);
 extern f32 FastAddRotations(f32, f32);
@@ -119,7 +119,7 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
 
     switch (moby->state) {
     case 0:
-        if (D_001A7B2A) {
+        if (g_hero_override_flag) {
             goto remove;
         }
         qcopy(&vars->home, &moby->pos);
@@ -128,9 +128,9 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
         moby->rot.y = math_random_angle();
         moby->rot.z = math_random_angle();
         moby->rot.w = math_random_angle();
-        vars->unk68 = D_L01_001B1A68 * SPIN;
-        vars->unk64 = D_L01_001B1A6C * SPIN;
-        vars->unk60 = D_L01_001B1A70 * SPIN;
+        vars->unk68 = g_spin_rate_x * SPIN;
+        vars->unk64 = g_spin_rate_y * SPIN;
+        vars->unk60 = g_spin_rate_z * SPIN;
         if (moby->unk32 < 0x40) {
             moby->unk32 = 0x40;
         }
@@ -138,13 +138,13 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
         gold_bolt_glow_init(moby);
         break;
     case 1:
-        moby->scale = moby->pclass->scale * D_L01_001B1A58;
-        moby->rot.x = FastAddRotations(moby->rot.x, D_L01_001B1A68 * SPIN);
-        moby->rot.y = FastAddRotations(moby->rot.y, D_L01_001B1A6C * SPIN);
-        moby->rot.z = FastAddRotations(moby->rot.z, D_L01_001B1A70 * SPIN);
-        moby->rot.w = FastAddRotations(moby->rot.w, D_L01_001B1A74 * SPIN);
+        moby->scale = moby->pclass->scale * g_bobbing_scale_factor;
+        moby->rot.x = FastAddRotations(moby->rot.x, g_spin_rate_x * SPIN);
+        moby->rot.y = FastAddRotations(moby->rot.y, g_spin_rate_y * SPIN);
+        moby->rot.z = FastAddRotations(moby->rot.z, g_spin_rate_z * SPIN);
+        moby->rot.w = FastAddRotations(moby->rot.w, g_spin_rate_w * SPIN);
         gfx_draw_glow_rings(moby);
-        if (!math_random_int_below(D_L01_001B1A98)) {
+        if (!math_random_int_below(g_random_effect_chance)) {
             part_spawn_sparkle_drift(moby);
         }
         if (!(vec_distance_xy(&moby->pos, &g_hero_state.pos) < 3.0f)) {
@@ -160,7 +160,7 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
             break;
         }
         if (vars->unkC != 0) {
-            D_L01_001B21B0 = 180;
+            g_platinum_bolt_timer = 180;
             value_set_entry_by_index(0xAAA, -1);
             help_unlock_entry(50);
             PlayMobySound(1, 0, moby);
@@ -198,16 +198,16 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
             anim_start_blended(moby, 1, 0, 0);
         }
         set_hero_animation(0x7B, 0, 0.0f);
-        if (D_001A7A45) {
+        if (g_state_flag_c) {
             moby->flags |= 0x8000;
         }
         g_hero_state.unk22BF = 1;
-        D_L01_001B1FA8 = 1;
+        g_camera_lock_flag = 1;
         moby->state = 2;
         vars->timer = 60;
         break;
     case 2:
-        D_L01_001B22A0.busy = 1;
+        g_cutscene_trigger_state.busy = 1;
         gold_bolt_cam_update(moby);
         qcopy(&moby->pos, &g_hero_state.pos);
         qcopy(&moby->rot, &g_hero_state.rot);
@@ -234,7 +234,7 @@ void GoldBoltUpdate(GoldBoltMoby *moby) {
         if (moby->seq != 0 || !math_fast_float_d(&vars->timer)) {
             break;
         }
-        D_L01_001B21B0 = 180;
+        g_platinum_bolt_timer = 180;
         value_set_entry_by_index(0x129A, -1);
         help_unlock_entry(50);
         D_L01_001B1FA8_gp = 0;

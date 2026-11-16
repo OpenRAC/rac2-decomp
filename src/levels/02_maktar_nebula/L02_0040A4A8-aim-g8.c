@@ -5,10 +5,10 @@
 
 extern u16 *g_entity_group_lists[];
 extern u8 *D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001B35B8 __attribute__((sda));
-extern float D_L02_001B1918 __attribute__((sda));
-extern float D_L02_001B191C __attribute__((sda));
-extern float D_L02_001B1920 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
+extern float g_robot_aim_distance_limit __attribute__((sda));
+extern float g_robot_aim_tolerance_degrees __attribute__((sda));
+extern float g_robot_turn_angle_degrees __attribute__((sda));
 
 extern void FastVecSub(float *, float *, float *);
 extern int moby_get_busy_flag(u8 *);
@@ -37,7 +37,7 @@ int robot_turn_toward_target(char *self) {
     if (GROUP == -1)
         return 0;
     for (list_entry = g_entity_group_lists[GROUP];
-         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && list_entry != 0 &&
+         (GROUP & 0xFF) != 0xFF && GROUP <= g_group_max_index && list_entry != 0 &&
          ((list_entry != 0 && (s16)list_entry[-1] >= 0) || list_entry == g_entity_group_lists[GROUP]);
          list_entry++) {
         target = (char *)D_L02_001B359C_1[0] + ((*list_entry & 0x7FFF) << 8);
@@ -45,16 +45,16 @@ int robot_turn_toward_target(char *self) {
             return 0;
         if (moby_get_busy_flag(target) == 0)
             continue;
-        if (!(vec_distance_xy(self + 0x10, target + 0x10) < D_L02_001B1918))
+        if (!(vec_distance_xy(self + 0x10, target + 0x10) < g_robot_aim_distance_limit))
             continue;
-        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B191C * 0.017453294f))
+        if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < g_robot_aim_tolerance_degrees * 0.017453294f))
             continue;
         if (list_entry == 0)
             return 0;
 
         FastVecSub(aim_point, (float *)(self + 0x10), (float *)(target + 0x10));
         axis = self + 0xE0;
-        turn_angle = D_L02_001B1920 * 0.017453294f;
+        turn_angle = g_robot_turn_angle_degrees * 0.017453294f;
         math_apply_axis_rotation_to_quat(aim_point, aim_point, axis,
                       0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turn_angle : turn_angle);
         FastVecAdd(aim_point, aim_point, target + 0x10);

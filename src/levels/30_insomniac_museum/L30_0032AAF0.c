@@ -9,17 +9,17 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_00139574;
+extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_l00_spawn_impact_burst(void *, void *, void *);
 extern void part_spawn_spark_puff(void *);
 extern char *g_hero_moby NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L30_001AC790 __attribute__((sda));
-extern int D_L30_001B34B0 __attribute__((sda)), D_L30_001B34B8 __attribute__((sda));
-extern Collision D_L30_001C0200;
-extern Material D_L30_002693F0[];
+extern int g_thrown_l30_model_id __attribute__((sda));
+extern int g_ripple_pos_x __attribute__((sda)), g_ripple_pos_y __attribute__((sda));
+extern Collision g_collision_l30_result;
+extern Material g_item_l30_material_table[];
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
@@ -48,7 +48,7 @@ extern void FastVecAdd(char *, char *, char *);
 
 
 extern char g_hero_position[];
-extern char D_00233A60[];
+extern char g_museum_water_grids[];
 extern char g_museum_water_grid_points[];
 
 extern void *memset(char *, int, int);
@@ -56,10 +56,10 @@ extern int IsPointInCuboid(char *, int);
 extern void anim_start_blended(char *, int, int, int);
 extern void cam_reset_entry(int);
 extern char g_music_state[];
-extern char D_001AEC98[];
-extern char D_001B9DC0[];
-extern char D_0018C0DC[];
-extern char D_00295BF0[];
+extern char g_museum_entry_vec[];
+extern char g_museum_trigger_table[];
+extern char g_museum_trigger_flag[];
+extern char g_museum_exhibit_models[];
 extern int func_2FB3C8(int);
 extern void func_3132D8(void *, unsigned int, int, int, int, int, int, int, int, int);
 extern void func_316DB8(char *);
@@ -122,7 +122,7 @@ void museum_water_init_grid(void) {
     int i;
     int j;
 
-    memset(D_00233A60, 0, 0x1B00);
+    memset(g_museum_water_grids, 0, 0x1B00);
     for (i = 0; i < 24; i++) {
         L30Pair2f *row = (L30Pair2f *)(g_museum_water_grid_points + i * 0xC0);
 
@@ -160,16 +160,16 @@ void museum_trigger_update(char *obj) {
         }
         break;
     case 1:
-        if (func_32C0D0(D_001B9DC0, *(int *)vars) != 0) {
-            *(unsigned char *)D_0018C0DC = 1;
+        if (func_32C0D0(g_museum_trigger_table, *(int *)vars) != 0) {
+            *(unsigned char *)g_museum_trigger_flag = 1;
             func_320FD0(obj, 2, -1);
         }
         break;
     case 2:
-        if (func_32C0D0(D_001B9DC0, *(int *)vars) != 0) {
-            *(unsigned char *)D_0018C0DC = 1;
+        if (func_32C0D0(g_museum_trigger_table, *(int *)vars) != 0) {
+            *(unsigned char *)g_museum_trigger_flag = 1;
         } else {
-            *(unsigned char *)D_0018C0DC = 0;
+            *(unsigned char *)g_museum_trigger_flag = 0;
             func_320FD0(obj, 1, -1);
         }
         break;
@@ -205,8 +205,8 @@ void museum_draw_selected_exhibit_entry(char *obj) {
 
     g_hero_state.mode = 5;
     g_hero_state.flag = 1;
-    buf = *(Vec6 *)D_001AEC98;
-    model = func_2FB3C8(*(int *)(D_00295BF0 + *(int *)(vars + 0x144) * 4));
+    buf = *(Vec6 *)g_museum_entry_vec;
+    model = func_2FB3C8(*(int *)(g_museum_exhibit_models + *(int *)(vars + 0x144) * 4));
     func_3132D8(&buf, 0x80F0F0F0, model, 1, 0, -1, 0, 0, 0, 0);
 }
 
@@ -269,7 +269,7 @@ void projectile_step_thrown_sparks(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L30_002693F0 + g_item_slot_to_record[12] * sizeof(Material)))->material;
+        ((Material *)((u32)g_item_l30_material_table + g_item_slot_to_record[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -281,14 +281,14 @@ void projectile_step_thrown_sparks(unsigned char *obj) {
         if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            RippleDisturb(D_L30_001B34B0, D_L30_001B34B8, 1,
+            RippleDisturb(g_ripple_pos_x, g_ripple_pos_y, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             vec_clear_128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L30_001C0200.point.f[2];
+            frame.position.f[2] = g_collision_l30_result.point.f[2];
             effect = moby_spawn_scaled_effect(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -308,16 +308,16 @@ void projectile_step_thrown_sparks(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L30_001C0200;
+            Collision *collision = &g_collision_l30_result;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L30_001C0200;
+                reread = &g_collision_l30_result;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+                if (*(int *)(model + 0x64) == g_thrown_l30_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -379,7 +379,7 @@ void projectile_step_thrown(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L30_002693F0)->material;
+    frame.packet.material = (g_bouncing_weapon_index + g_item_l30_material_table)->material;
     qcopy(&frame.packet.vector, ctx);
     vec_fast_normalize_helper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -389,16 +389,16 @@ void projectile_step_thrown(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L30_001C0200;
+        collision = &g_collision_l30_result;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L30_001C0200;
+            reread = &g_collision_l30_result;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
+            if (*(int *)(model + 0x64) == g_thrown_l30_model_id && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -410,7 +410,7 @@ void projectile_step_thrown(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L30_001C0200;
+            collision = &g_collision_l30_result;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

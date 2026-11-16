@@ -22,7 +22,7 @@ extern u8 *part_spawn_trailing_spark(V4 *, V4 *, s32, s32, s32, s32, f32);
 extern u8 *func_PAL_002BE9A8(V4 *, f32, f32, f32, f32, s32, V4 *, u32, s32);
 
 /* Adapted from RAC1 emit_beam_trail_particles (OpenRAC, GPL-3.0). */
-void func_PAL_0030A078(X *x) {
+void beam_spawn_trail_particles_pal(X *x) {
     V4 l0;
     V4 a;
     V4 d;

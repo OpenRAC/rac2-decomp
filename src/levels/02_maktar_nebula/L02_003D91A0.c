@@ -3,7 +3,7 @@
 extern int g_moby_l02_pool[] __attribute__((sda));
 /* Read-only view: these loads may pass the state stores, as in retail. */
 extern const int D_L02_001B359C_1[] __attribute__((sda));
-extern int D_L02_001FF6B8[];
+extern int g_boss_damage_totals[];
 extern int FloatToInt(float);
 extern void get_moby_color(char *, void *, void *, void *);
 extern void mem_clear(void *, int, int);
@@ -83,7 +83,7 @@ void walker_boss_update_damage(char *moby) {
         if (*(unsigned char *)(moby + 0x20) >= 5 && *(unsigned char *)(moby + 0x20) != 10 &&
             *(unsigned char *)(moby + 0x20) != 11) {
             *(float *)(vars + 0x20) -= damage_amount;
-            { int at = *(unsigned char *)(vars + 0x37) * 4 + 0xE0; *(int *)((char *)D_L02_001FF6B8 + at) += (int)(damage_amount * 32.0f); }
+            { int at = *(unsigned char *)(vars + 0x37) * 4 + 0xE0; *(int *)((char *)g_boss_damage_totals + at) += (int)(damage_amount * 32.0f); }
             if (*(short *)(vars + 0x140) == 0)
                 gfx_start_color_fade((int)moby, vars + 0x140);
             if (damage_amount > 3.0f && *(unsigned char *)(moby + 0x20) == 6 && *(unsigned char *)(moby + 0x42) == 7) {

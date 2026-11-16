@@ -10,7 +10,7 @@ typedef union {
 extern s32 moby_process_collision_hit(u8 *,s32,s32,s32);
 extern void moby_check_player_in_view_and_range(u8 *,s32,f32);
 extern void *state_get_stored_pointer_value(void);
-extern void func_PAL_L10_0041BD40(u8 *);
+extern void hrugis_boss_init_pal(u8 *);
 extern void hrugis_init_group_states(u8 *);
 extern void hrugis_release_group_effects(u8 *);
 extern void level_append_object(u8 *,void *,s32,void *);
@@ -18,7 +18,7 @@ extern u8 *SpawnAttachedObject(u8 *,s32);
 extern s32 hrugis_get_boss_difficulty(void);
 extern f32 IntToFloat(s32);
 extern u8 *moby_get_motion_data(u8 *);
-extern void func_PAL_L10_0041C2C8(u8 *);
+extern void hrugis_update_sway_speed_pal(u8 *);
 extern f32 FastAddRotations(f32,f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern f32 math_fast_sin_or_cos_a(f32);
@@ -32,7 +32,7 @@ extern void func_PAL_L10_0041C7A0(u8 *,s32,f32);
 extern char *func_PAL_L05_0042A240(void *,s32,f32,s32,s32,s32,s32,s32,s32,s32,s32,s32);
 extern void moby_detach_manipulator(u8 *,void *);
 extern void moby_mark_spawned(u8 *);
-extern void func_PAL_L10_0041BDF8(u8 *);
+extern void hrugis_launch_child_on_curve_pal(u8 *);
 extern void math_l00_interpolate_cubic_vector(void *,void *,void *,void *,void *,f32);
 extern void FastVecSub(void *,void *,void *);
 extern f32 FastVecLength(void *);
@@ -42,13 +42,13 @@ extern void moby_transform_joint_to_world(u8 *,s32,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void *func_PAL_L10_003A0590(void *,void *,s32,s32,u32,u32,f32,s32,s32,f32,f32,f32);
 extern void moby_reset_action_state(u8 *);
-extern u8 *D_001B251C MACRO_ADDR;
-extern f32 D_L10_001B0F40 __attribute__((sda));
-extern s32 D_L10_001B0F44 __attribute__((sda));
-extern s32 D_L10_001B0F48 __attribute__((sda));
-extern f32 D_L10_001B34D8 MACRO_ADDR;
+extern u8 *g_moby_pool_base MACRO_ADDR;
+extern f32 g_boss_time_limit __attribute__((sda));
+extern s32 g_boss_flag_a __attribute__((sda));
+extern s32 g_boss_flag_b __attribute__((sda));
+extern f32 g_boss_step_rate MACRO_ADDR;
 
-void func_PAL_L10_0041B3E8(u8 *obj) {
+void hrugis_boss_update_pal(u8 *obj) {
     Vec4 up;
     Vec4 probe;
     Vec4 oldpos;
@@ -72,28 +72,28 @@ void func_PAL_L10_0041B3E8(u8 *obj) {
         *(f32 *)(s + 0x2E0) = 1.0f;
         if (!state_get_stored_pointer_value())
             return;
-        func_PAL_L10_0041BD40(obj);
+        hrugis_boss_init_pal(obj);
         if (*(s32 *)(s + 0x2B4))
             level_append_object(obj, hrugis_init_group_states, 0, hrugis_release_group_effects);
-        D_L10_001B0F44 = 0;
-        D_L10_001B0F48 = 0;
-        D_L10_001B34D8 = 1.0f / (D_L10_001B0F40 * 5e+01f);
+        g_boss_flag_a = 0;
+        g_boss_flag_b = 0;
+        g_boss_step_rate = 1.0f / (g_boss_time_limit * 5e+01f);
         break;
     case 1:
         if (!*(u8 **)(s + 0x2C0))
             *(u8 **)(s + 0x2C0) = SpawnAttachedObject(obj, 1);
         if (!*(u8 **)(s + 0x2C4))
             *(u8 **)(s + 0x2C4) = SpawnAttachedObject(obj, 0);
-        D_L10_001B0F40 = IntToFloat(hrugis_get_boss_difficulty()) * 2.5f + 30.0f;
-        if (D_L10_001B0F40 > 60.0f)
-            D_L10_001B0F40 = 60.0f;
+        g_boss_time_limit = IntToFloat(hrugis_get_boss_difficulty()) * 2.5f + 30.0f;
+        if (g_boss_time_limit > 60.0f)
+            g_boss_time_limit = 60.0f;
         info = moby_get_motion_data(obj);
         if (*(s32 *)(s + 0x2B0) != -1) {
             *(s32 *)(info + 0x11C) = 1;
-            bank = D_001B251C;
+            bank = g_moby_pool_base;
             *(u8 **)(info + 0x120) = bank + (*(s32 *)(s + 0x2B0) << 8);
         }
-        func_PAL_L10_0041C2C8(obj);
+        hrugis_update_sway_speed_pal(obj);
         *(f32 *)(obj + 0xF8) = FastAddRotations(*(f32 *)(obj + 0xF8), *(f32 *)(s + 0x2CC));
         *(f32 *)(s + 0x2BC) = FastAddRotations(*(f32 *)(s + 0x2BC), *(f32 *)(s + 0x2D0));
         ((Vec4 *)(obj + 0x10))->f[2] = math_fast_sin_or_cos_b(*(f32 *)(s + 0x2BC)) * 4.0f + *(f32 *)(s + 0x2B8);
@@ -131,10 +131,10 @@ void func_PAL_L10_0041B3E8(u8 *obj) {
         *(u8 **)(s + 0x2C4) = 0;
         *(s32 *)(s + 0x2E0) = 0;
         obj[0x20] = 2;
-        func_PAL_L10_0041BDF8(obj);
+        hrugis_launch_child_on_curve_pal(obj);
         break;
     case 2:
-        func_PAL_L10_0041C2C8(obj);
+        hrugis_update_sway_speed_pal(obj);
         *(f32 *)(obj + 0xF8) = FastAddRotations(*(f32 *)(obj + 0xF8), *(f32 *)(s + 0x2CC));
         *(f32 *)(s + 0x2BC) = FastAddRotations(*(f32 *)(s + 0x2BC), *(f32 *)(s + 0x2D0));
         ((Vec4 *)(obj + 0x10))->f[2] = math_fast_sin_or_cos_b(*(f32 *)(s + 0x2BC)) * 4.0f + *(f32 *)(s + 0x2B8);
@@ -147,7 +147,7 @@ void func_PAL_L10_0041B3E8(u8 *obj) {
             }
             *(f32 *)(s + 0x2D4) += *(f32 *)(s + 0x2D8);
             if (*(f32 *)(s + 0x2D4) > 3.1415927f) {
-                t = D_L10_001B34D8;
+                t = g_boss_step_rate;
                 *(f32 *)(s + 0x2D4) = 3.1415927f;
                 *(f32 *)(s + 0x2E0) += t;
             }
@@ -190,10 +190,10 @@ void func_PAL_L10_0041B3E8(u8 *obj) {
                 *(u8 **)(s + 0x2C8) = 0;
                 info = moby_get_motion_data(obj);
                 ((Vec4 *)(s + 0x180))->f[0] = (f32)*(s32 *)(info + 0x148);
-                D_L10_001B0F48 = 1;
+                g_boss_flag_b = 1;
             }
         } else if (math_fast_float_d(s + 0x2DC)) {
-            func_PAL_L10_0041BDF8(obj);
+            hrugis_launch_child_on_curve_pal(obj);
         }
         if (*(f32 *)(s + 0x2E0) <= 0.5f)
             func_PAL_L10_0041C7A0(obj, 0, math_random_float_range(1.9f, 2.25f) - *(f32 *)(s + 0x2E0));
@@ -201,5 +201,5 @@ void func_PAL_L10_0041B3E8(u8 *obj) {
             func_PAL_L10_0041C508(obj, 0, math_random_float_range(2.0f, 3.0f) - *(f32 *)(s + 0x2E0));
         break;
     }
-    func_PAL_L10_0041C2C8(obj);
+    hrugis_update_sway_speed_pal(obj);
 }

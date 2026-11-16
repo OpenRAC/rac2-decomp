@@ -10,7 +10,7 @@ extern void set_hero_animation(void *a, void *b, float f);
 extern unsigned char D_00189E20_26[];
 
 /* guards a fixed data block on an enable byte, takes one of two early exits (setting a pending word and a flag, or skipping), calls two leaves with a scaled value when a byte field matches a threshold word, then clears a byte pair of the block */
-void func_PAL_L00_002AF6C0(void)
+void cancel_hero_item_animation_pal(void)
 {
     if (D_00189E20_26[8888] == 0)
         return;
@@ -90,7 +90,7 @@ typedef struct {
 extern HeldAnimationHero g_hero_state;
 extern unsigned char g_item_slot_to_record[];
 extern HeldAnimationItem g_weapon_l00_table[];
-extern HeldMatrixBuffers D_L00_001B7400[];
+extern HeldMatrixBuffers g_item_matrix_buffers[];
 extern int hero_slot_item_id(int);
 extern int get_ammo(int);
 extern float ApproachValue(float *, float, float);
@@ -114,7 +114,7 @@ void func_PAL_L00_002AF750(void)
 
     if (owner->active != 0 && owner->flags != 0) {
         if (get_ammo(-1) == 0)
-            func_PAL_L00_002AF6C0();
+            cancel_hero_item_animation_pal();
     }
     for (i = 0; i < 2; i++) {
         HeldAnimationHero *slotOwner = &g_hero_state;
@@ -124,8 +124,8 @@ void func_PAL_L00_002AF750(void)
 
         if (*slot == 0)
             continue;
-        (*slot)->firstMatrices = D_L00_001B7400[i].first;
-        (*slot)->secondMatrices = D_L00_001B7400[i].second;
+        (*slot)->firstMatrices = g_item_matrix_buffers[i].first;
+        (*slot)->secondMatrices = g_item_matrix_buffers[i].second;
         item = hero_slot_item_id(0);
         if (item == slotOwner->item) {
             HeldAnimationItem *definition = &g_weapon_l00_table[g_item_slot_to_record[item]];

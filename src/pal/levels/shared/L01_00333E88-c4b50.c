@@ -7,9 +7,9 @@ typedef struct { unsigned char header[16]; ParticlePayload_C4B50 position, veloc
 extern void FastVecAdd(void *, void *, void *);
 extern void part_kill(void *);
 extern float coll_get_heightmap_height(float *);
-extern float D_001B1DC0[];
-extern float D_001B1DC8;
-extern float D_001B1DD0;
+extern float g_particle_ground_vector[];
+extern float g_particle_floor_offset;
+extern float g_particle_min_floor_height;
 
 void func_PAL_L01_00333FF0(FallingParticle_C4B50 *self) {
     ParticlePayload_C4B50 motion, sample, sample_again;
@@ -24,13 +24,13 @@ void func_PAL_L01_00333FF0(FallingParticle_C4B50 *self) {
     old_x = (int)self->position.lane[0];
     old_y = (int)self->position.lane[1];
     FastVecAdd(self->position.lane, self->position.lane, motion.lane);
-    FastVecAdd(self->position.lane, self->position.lane, D_001B1DC0);
+    FastVecAdd(self->position.lane, self->position.lane, g_particle_ground_vector);
     if (old_x != (int)self->position.lane[0] || old_y != (int)self->position.lane[1]) {
         sample.quad = self->position.quad;
-        if (coll_get_heightmap_height(sample.lane) >= D_001B1DD0) {
+        if (coll_get_heightmap_height(sample.lane) >= g_particle_min_floor_height) {
             sample_again.quad = self->position.quad;
             floor = coll_get_heightmap_height(sample_again.lane);
-        } else floor = D_001B1DD0;
+        } else floor = g_particle_min_floor_height;
         if (self->position.lane[2] < floor) goto expired;
     }
     goto update;
@@ -43,6 +43,6 @@ update:
     motion.lane[2] = -0.00020000001f;
     motion.lane[3] = 0.0f;
     FastVecAdd(velocity, motion.lane, velocity);
-    velocity[3] = floor + D_001B1DC8;
+    velocity[3] = floor + g_particle_floor_offset;
     return;
 }

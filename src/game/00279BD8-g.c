@@ -32,7 +32,7 @@ typedef struct {
     float v9C;
 } Locals279BD8;
 extern CameraView279BD8 g_active_camera;
-extern float D_001B9250[];
+extern float g_projection_scale[];
 extern void set_identity_matrix(void *);
 extern void multiply_matrix(void *, void *, void *);
 extern void transform_vector(void *, void *, void *);
@@ -53,7 +53,7 @@ void gfx_project_world_point_to_screen(ScreenPoint279BD8 *screen_out, void *worl
     FastVecScale(&L.blk80, world_pos, 1024.0f);
     L.v8C = 1.0f;
     transform_vector(&L.v90, &L.blk80, &L.v40);
-    scale = D_001B9250[0] / L.v9C;
+    scale = g_projection_scale[0] / L.v9C;
     screen_out->unk8 = L.v98 * 0.0009765625f;
     x = L.v90 * scale + 2048.0f;
     y = L.v94 * scale + 2048.0f;

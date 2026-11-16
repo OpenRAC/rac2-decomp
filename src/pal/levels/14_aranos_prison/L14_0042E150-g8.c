@@ -6,7 +6,7 @@ extern float FastAddRotations(float a, float b);
 extern float math_fast_sin_or_cos_b(float a);
 extern int FastTweenColor(int a, int b, float c);
 extern unsigned short *g_group_entity_lists[];
-extern int D_L14_001B25B8;
+extern int g_group_link_limit;
 extern unsigned char *D_L14_001B259C_base[3] __asm__("D_L14_001B259C") __attribute__((sda));
 typedef struct {
     char pad0[0x220];
@@ -35,8 +35,8 @@ typedef struct {
     int b;
 } L14ColorPair;
 extern void group_marker_draw(L14Obj *);
-extern L14ColorPair D_L14_001B18C0[];
-extern int D_L14_001B20C8;
+extern L14ColorPair g_group_marker_colors[];
+extern int g_frame_tick_counter;
 extern void moby_transform_joint_point(void *moby, int joint, void *out);
 extern void gfx_add_draw_callback_first(void *, void *);
 
@@ -44,10 +44,10 @@ extern void gfx_add_draw_callback_first(void *, void *);
    first colour pair and, when its stamp is not the current one, refreshes every live class-0x112B
    entity of its group (joint 0 position into +0x220, then the stamp) and queues
    func_L14_00428BA0 for the owner. */
-void func_PAL_L14_0042E150(L14Obj *self)
+void group_marker_update_pulse_pal(L14Obj *self)
 {
     L14Cfg *state = self->cfg;
-    L14ColorPair colors = D_L14_001B18C0[0];
+    L14ColorPair colors = g_group_marker_colors[0];
     unsigned short *p;
     L14Obj *e;
     L14Cfg *s0;
@@ -59,9 +59,9 @@ void func_PAL_L14_0042E150(L14Obj *self)
     blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     state->blend = blend;
     self->tint = FastTweenColor(colors.a, colors.b, blend);
-    if (state->stamp != D_L14_001B20C8) {
+    if (state->stamp != g_frame_tick_counter) {
         for (p = g_group_entity_lists[self->group];
-             self->group != 0xFF && self->group <= D_L14_001B25B8 && p != 0 &&
+             self->group != 0xFF && self->group <= g_group_link_limit && p != 0 &&
              ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self->group]);
              p++) {
             e = (L14Obj *)(D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8));
@@ -74,7 +74,7 @@ void func_PAL_L14_0042E150(L14Obj *self)
                         if (e->kind != 0xFD) {
                             s0 = e->cfg;
                             moby_transform_joint_point(e, 0, &s0->vec);
-                            s0->stamp = D_L14_001B20C8;
+                            s0->stamp = g_frame_tick_counter;
                         }
                     }
                 }

@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern int D_L09_00255E90[];
-extern int D_L09_001B35E0[] MACRO_ADDR;
-extern int D_L09_001B36E0[] MACRO_ADDR;
-extern int D_L09_001B3720[] MACRO_ADDR;
+extern int g_sound_slot_ptrs[];
+extern int g_beam_slot_state_2[] MACRO_ADDR;
+extern int g_beam_slot_light_handle[] MACRO_ADDR;
+extern int g_beam_slot_light_handle_alt[] MACRO_ADDR;
 
 extern void gfx_free_point_light(int);
 
@@ -11,17 +11,17 @@ extern void gfx_free_point_light(int);
 int ReleaseRecordSlot(int id) {
     int i;
     for (i = 0; i < 16; i++) {
-        if (D_L09_00255E90[i * 2] == id || D_L09_00255E90[i * 2 + 1] == id) {
-            D_L09_001B35E0[i] = 0;
-            D_L09_00255E90[i * 2] = 0;
-            D_L09_00255E90[i * 2 + 1] = 0;
-            if (D_L09_001B36E0[i] != -1) {
-                gfx_free_point_light(D_L09_001B36E0[i]);
-                D_L09_001B36E0[i] = -1;
+        if (g_sound_slot_ptrs[i * 2] == id || g_sound_slot_ptrs[i * 2 + 1] == id) {
+            g_beam_slot_state_2[i] = 0;
+            g_sound_slot_ptrs[i * 2] = 0;
+            g_sound_slot_ptrs[i * 2 + 1] = 0;
+            if (g_beam_slot_light_handle[i] != -1) {
+                gfx_free_point_light(g_beam_slot_light_handle[i]);
+                g_beam_slot_light_handle[i] = -1;
             }
-            if (D_L09_001B3720[i] != -1) {
-                gfx_free_point_light(D_L09_001B3720[i]);
-                D_L09_001B3720[i] = -1;
+            if (g_beam_slot_light_handle_alt[i] != -1) {
+                gfx_free_point_light(g_beam_slot_light_handle_alt[i]);
+                g_beam_slot_light_handle_alt[i] = -1;
             }
             return 1;
         }

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern float D_L14_001B16B0 __attribute__((sda));
+extern float g_protopet_distance_threshold __attribute__((sda));
 extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 extern int moby_apply_damage_to_object(char *a0, char *a1, int a2);
 extern void part_spawn_explosion_with_sparks(char *a0, char *a1, float f12, float f13, int a2);
@@ -9,7 +9,7 @@ extern void SetDeathBits(char *a0, int a1, int a2);
 extern void moby_mark_spawned(char *a0);
 
 /* Resets the moby's scale when its model says so, then lets it fall or die. */
-void func_PAL_L14_00428798(char *a0)
+void protopet_holder_update_pal(char *a0)
 {
     char *s0 = a0;
     char *s1;
@@ -32,7 +32,7 @@ void func_PAL_L14_00428798(char *a0)
         part_spawn_explosion_with_sparks(s0, s0 + 0x10, 1.0f, 13.0f, -1);
         SetDeathBits(s0, 0, 3);
         moby_mark_spawned(s0);
-    } else if (*(float *)(s0 + 0x18) < D_L14_001B16B0) {
+    } else if (*(float *)(s0 + 0x18) < g_protopet_distance_threshold) {
         SetDeathBits(s0, 0, 3);
         moby_mark_spawned(s0);
     }
@@ -52,10 +52,10 @@ extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *
 extern unsigned long moby_dispatch_action_by_kind(void *, void *);
 
 extern char *g_moby_l14_pool;
-extern char *D_L14_001B268C;
-extern int D_L14_001B16B4 __attribute__((sda));
-extern int D_L14_001B16B8 __attribute__((sda));
-extern int D_L14_001B16BC __attribute__((sda));
+extern char *g_platform_projection_table;
+extern int g_enemy_random_timer_max __attribute__((sda));
+extern int g_enemy_random_timer_period __attribute__((sda));
+extern int g_enemy_random_chance_range __attribute__((sda));
 extern char g_hero_position[];
 
 /*
@@ -97,13 +97,13 @@ void func_PAL_L14_004288B0(char *self)
             if (*(unsigned char *)(self + 0x43) != 1)
                 anim_start_blended(self, 1, 0, 8);
             *(unsigned char *)(self + 0xBC) = 0;
-            *(unsigned short *)(self + 0x96) = math_random_int_below(D_L14_001B16B4 >> 1);
+            *(unsigned short *)(self + 0x96) = math_random_int_below(g_enemy_random_timer_max >> 1);
         } else {
             qcopy_nc(target, (void *)((*(int *)(state + 0x748) << 8) + (unsigned int)g_moby_l14_pool + 0x10));
             target[2] += 0.3f;
             actor_aim_at_target(self, g_moby_l14_pool + (*(int *)(state + 0x748) << 8) + 0x10);
-            if (*(unsigned char *)(self + 0xBC) == 0 && *(unsigned short *)(self + 0x96) > ((s32)(D_L14_001B16B4) * 5 + 2) / 6) {
-                *(unsigned short *)(self + 0x96) = math_random_int_below(D_L14_001B16B4 >> 1);
+            if (*(unsigned char *)(self + 0xBC) == 0 && *(unsigned short *)(self + 0x96) > ((s32)(g_enemy_random_timer_max) * 5 + 2) / 6) {
+                *(unsigned short *)(self + 0x96) = math_random_int_below(g_enemy_random_timer_max >> 1);
                 if (math_random_int_below(5) != 0 && *(unsigned char *)(self + 0x43) != 5)
                     anim_start_blended(self, 5, 0, 8);
             }
@@ -125,7 +125,7 @@ void func_PAL_L14_004288B0(char *self)
             }
         }
         if (*(int *)(state + 0x764) != -1)
-            actor_aim_at_target(self, D_L14_001B268C + (*(int *)(state + 0x764) << 7) + 0x30);
+            actor_aim_at_target(self, g_platform_projection_table + (*(int *)(state + 0x764) << 7) + 0x30);
         if (*(unsigned char *)(self + 0x60) & 2)
             moby_set_state(self, 5, 2);
         break;
@@ -152,7 +152,7 @@ void func_PAL_L14_004288B0(char *self)
                 }
             } else if (*(unsigned char *)(self + 0xBC) == 1) {
                 path_advance(self, state + 0x700, *(int *)(state + 0x734), state + 0x770, *(short *)(state + 0x77C), 1.0f);
-                if (*(unsigned short *)(self + 0x96) % D_L14_001B16B8 == 0 && math_random_int_below(D_L14_001B16BC) == 0) {
+                if (*(unsigned short *)(self + 0x96) % g_enemy_random_timer_period == 0 && math_random_int_below(g_enemy_random_chance_range) == 0) {
                     *(unsigned char *)(self + 0xBC) = 2;
                     if (*(unsigned char *)(self + 0x43) != math_random_int_below(2) + 12)
                         anim_start_blended(self, math_random_int_below(2) + 12, 0, 8);

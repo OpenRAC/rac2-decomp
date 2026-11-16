@@ -18,12 +18,12 @@ extern int text_draw_centered_large(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int g_notice_owner[] __attribute__((sda));
 extern int g_player_bolts[] __attribute__((sda)); /* the player's bolts */
-extern unsigned char D_001A7BB0[] __attribute__((sda));
+extern unsigned char g_language_settings[] __attribute__((sda));
 extern unsigned char g_bolt_multiplier[] __attribute__((sda)); /* bolt multiplier */
-extern char D_001AE6F8[], D_001AE700[], D_001AE708[]; /* "'", ".", "x%d" */
-extern int D_001ADAE8 __attribute__((sda));
-extern int D_001ADAEC __attribute__((sda));
-extern unsigned int D_001ADAF0 __attribute__((sda));
+extern char g_str_apostrophe[], g_str_period[], g_str_multiplier_format[]; /* "'", ".", "x%d" */
+extern int g_movie_text_x __attribute__((sda));
+extern int g_movie_text_y __attribute__((sda));
+extern unsigned int g_mpeg_foreground_color __attribute__((sda));
 
 /* A g++ 2.95 vtable entry: this-adjustment, index, function. */
 typedef struct HudVEntry {
@@ -122,11 +122,11 @@ void func_PAL_0034FD60(void *arg)
     digits = 1;
     n = g_player_bolts[0];
     while (n >= 10) { n /= 10; digits++; }
-    apostrophe = D_001A7BB0[4] != 3 && D_001A7BB0[4] != 5 && D_001A7BB0[4] != 4;
-    sprintf(separator, apostrophe ? D_001AE6F8 : D_001AE700);
+    apostrophe = g_language_settings[4] != 3 && g_language_settings[4] != 5 && g_language_settings[4] != 4;
+    sprintf(separator, apostrophe ? g_str_apostrophe : g_str_period);
     yoffset = apostrophe ? 21 : 11;
     xoffset = apostrophe ? -34 : -35;
-    if (D_001A7BB0[4] != 2) {
+    if (g_language_settings[4] != 2) {
         step = 3.0f;
         if (step < (float)digits) {
             float start = x + (float)xoffset;
@@ -144,13 +144,13 @@ void func_PAL_0034FD60(void *arg)
         }
     }
     if (g_bolt_multiplier[0] >= 2) {
-        sprintf(multiplierText, D_001AE708, g_bolt_multiplier[0]);
-        foreground = (D_001ADAF0 & 0xFFFFFF) | (color & 0xFF000000);
+        sprintf(multiplierText, g_str_multiplier_format, g_bolt_multiplier[0]);
+        foreground = (g_mpeg_foreground_color & 0xFFFFFF) | (color & 0xFF000000);
         shadow = color & 0xFF000000;
-        text_draw_centered_large(D_001ADAE8, D_001ADAEC + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8 + 2, D_001ADAEC + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(D_001ADAE8, D_001ADAEC, foreground, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y + 2, shadow, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y, foreground, multiplierText, -1);
     }
     DrawSegmentedRingMeter(object->final);
 }

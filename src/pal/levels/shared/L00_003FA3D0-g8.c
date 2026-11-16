@@ -25,18 +25,18 @@ typedef struct {
     char pad20[0x48];
     TrailSource *source;
 } TrailActor;
-extern float D_L00_001AF760 __attribute__((sda));
-extern float D_L00_001AF798 __attribute__((sda));
-extern float D_L00_001AF774 __attribute__((sda));
+extern float g_trail_time_step __attribute__((sda));
+extern float g_trail_u_scroll_step __attribute__((sda));
+extern float g_trail_rotation_rate __attribute__((sda));
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 extern int ref_L00_003A9000_00(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-extern float D_PAL_001B09B8 __attribute__((sda));
-extern float D_PAL_001B09F0 __attribute__((sda));
-extern float D_PAL_001B09CC __attribute__((sda));
+extern float g_slot_t_increment __attribute__((sda));
+extern float g_slot_u_increment __attribute__((sda));
+extern float g_rotation_length_scale __attribute__((sda));
 
 int func_PAL_L00_003FA5C8(TrailActor *self)
 {
@@ -53,13 +53,13 @@ int func_PAL_L00_003FA5C8(TrailActor *self)
         return 0;
     }
     qcopy_nc(&slots[source->index].b, &self->pos);
-    slots[source->index].t += D_PAL_001B09B8;
+    slots[source->index].t += g_slot_t_increment;
     if (slots[source->index].t >= 4.0f)
         slots[source->index].t -= 4.0f;
-    slots[source->index].u += D_PAL_001B09F0;
+    slots[source->index].u += g_slot_u_increment;
     if (slots[source->index].u >= 4.0f)
         slots[source->index].u -= 4.0f;
-    vec_scale_to_length(rot, source, D_PAL_001B09CC * 0.020000001f);
+    vec_scale_to_length(rot, source, g_rotation_length_scale * 0.020000001f);
     FastVecAdd(&slots[source->index], &slots[source->index], rot);
     FastVecAdd(&slots[source->index].a, &slots[source->index].a, rot);
     return 1;

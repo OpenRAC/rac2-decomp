@@ -1,6 +1,6 @@
 #include "names.h"
 extern unsigned char g_hero_state[];
-extern unsigned char D_L00_0025BE10[];
+extern unsigned char g_hero_item_attach_records[];
 extern int math_fast_float_d(int *);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
@@ -21,7 +21,7 @@ void UpdateHeroIdleRandomRotationTargets(void) {
     if (*(unsigned char *)(*(int *)(base + 0x2290) + 0x43) != 0) return;
     timers = (int *)(base + 0x11F0);
     heroBase = base;
-    jointTable = D_L00_0025BE10;
+    jointTable = g_hero_item_attach_records;
     for (i = 0; i < 4; i++) {
         char *targetBase;
         if (math_fast_float_d(&timers[i])) {

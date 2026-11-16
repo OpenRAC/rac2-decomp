@@ -52,20 +52,20 @@ typedef struct {
     unsigned short transform;
 } PlayerState;
 extern PlayerState g_hero_state;
-extern unsigned char D_001395C4[];
-extern int D_00138324[];
-extern char *D_L03_001B2B0C MACRO_ADDR;
-extern float D_L03_001B03E0 __attribute__((sda));
-extern float D_L03_001B03E8 __attribute__((sda));
-extern float D_L03_001B03EC;
+extern unsigned char g_tube_start_flags[];
+extern int g_pad_held_flags[];
+extern char *g_linked_effect_records MACRO_ADDR;
+extern float g_tube_start_spin_rate __attribute__((sda));
+extern float g_tube_start_alpha_min __attribute__((sda));
+extern float g_tube_start_alpha_max;
 /* One 8-byte colour pair: retail loads the first word through $gp and the second as a bare
    symbol plus offset, which the compiler treats as a two-instruction load. */
-extern int D_L03_001B03F0[2];
+extern int g_tube_start_color_pair[2];
 extern int D_L03_001B03F0_0 SDATA(D_L03_001B03F0);
-extern int D_L03_001B03F8 __attribute__((sda));
-extern float D_L03_001B03FC __attribute__((sda));
-extern float D_L03_001B0400 __attribute__((sda));
-extern float D_L03_001B0404 __attribute__((sda));
+extern int g_tube_start_tint_color __attribute__((sda));
+extern float g_tube_start_rate __attribute__((sda));
+extern float g_tube_start_step __attribute__((sda));
+extern float g_tube_start_scale_threshold __attribute__((sda));
 
 #define I(p,o) (*(int *)((p)+(o)))
 #define H(p,o) (*(unsigned short *)((p)+(o)))
@@ -91,7 +91,7 @@ void tube_start_update(char *actor)
         packedGreen = (green << 8) | 0x80000000;
         packedBlue = (blue << 16) | packedGreen;
         I(state,0x20) = packedBlue | red;
-        if (I(state,8) && !D_001395C4[0]) {
+        if (I(state,8) && !g_tube_start_flags[0]) {
             I(actor,0x98)=0;
             H(actor,0x34)=(H(actor,0x34)|0x41)&0xEFFF;
             moby_set_state(actor,5,-1);
@@ -102,7 +102,7 @@ void tube_start_update(char *actor)
         if (g_hero_state.interaction==actor && g_hero_state.interactionActive
             && vec_distance_xy(actor+0x10,g_hero_state.position)<2.0f) {
             TryClaimNotice(8,0x27A9,1);
-            if (hero_is_allowed_for_mode(8) && (D_00138324[0]&0x10)) {
+            if (hero_is_allowed_for_mode(8) && (g_pad_held_flags[0]&0x10)) {
                 PlayMobySound(0,0,actor);
                 angle=FastAddRotations(F(actor,0xF8),1.57079637f);
                 hero_start_target_state(actor+0x10,0,angle);
@@ -142,16 +142,16 @@ void tube_start_update(char *actor)
         g_hero_state.scale[0]=g_hero_state.scale[1]=1.0f-math_fast_sin_or_cos_b(F(state,0x1C));
         g_hero_state.scale[2]=2.0f-math_fast_sin_or_cos_a(F(state,0x1C));
         if (H(actor,0x96)==0x30) {
-            qcopy(pos,D_L03_001B2B0C+I(state,0)*128+0x30);
+            qcopy(pos,g_linked_effect_records+I(state,0)*128+0x30);
             pos[2]=coll_probe_ground_height_below(pos,0,0.5f);
-            qcopy(rot,D_L03_001B2B0C+I(state,0)*128+0x70);
+            qcopy(rot,g_linked_effect_records+I(state,0)*128+0x70);
             hero_reset_position_and_direction(pos,rot,0,1);
             if (I(state,0x10)!=-1) cam_reset_entry(I(state,0x10));
             moby_set_state(actor,4,-1);
         }
         break;
     case 4:
-        if (flag_set_first_pending(actor) && I(state,0xC)) D_001395C4[0]=1;
+        if (flag_set_first_pending(actor) && I(state,0xC)) g_tube_start_flags[0]=1;
         ApproachValue(state+0x1C,0.0f,0.104719773f);
         g_hero_state.transform=1;
         g_hero_state.scale[0]=g_hero_state.scale[1]=1.0f-math_fast_sin_or_cos_b(F(state,0x1C));
@@ -164,7 +164,7 @@ void tube_start_update(char *actor)
         }
         break;
     case 5:
-        if ((!I(state,8) && !flag_is_third_pending_set(actor)) || (I(state,8) && D_001395C4[0])) {
+        if ((!I(state,8) && !flag_is_third_pending_set(actor)) || (I(state,8) && g_tube_start_flags[0])) {
             moby_set_state(actor,6,-1);
             H(actor,0x34)|=0x100;
             basis_row=actor+0xC0; scale_factor=state+0x34;
@@ -178,28 +178,28 @@ void tube_start_update(char *actor)
         }
         break;
     case 6:
-        step=D_L03_001B0400*0.000277777785f;
-        rate=D_L03_001B03FC*0.0166666675f;
+        step=g_tube_start_step*0.000277777785f;
+        rate=g_tube_start_rate*0.0166666675f;
         if (flag_set_first_pending(actor)) PlayMobySound(1,0,actor);
         scale_factor=state+0x34;
         one=1.0f;
         i=0; basis_row=actor+0xC0; velocityPtr=state+0x24; scalePtr=scale_factor;
         for (;i<3;i++,basis_row+=16,velocityPtr+=4,scalePtr+=4,scale_factor+=4) {
-            if (F(scale_factor,0)<one && (!i || F(scale_factor,-4)>D_L03_001B0404)) {
+            if (F(scale_factor,0)<one && (!i || F(scale_factor,-4)>g_tube_start_scale_threshold)) {
                 math_step_value_toward_target(scalePtr,velocityPtr,1.0f,step,step,rate);
                 if (F(scale_factor,0)>one) F(scale_factor,0)=one;
                 vec_scale_to_length(basis_row,basis_row,F(scale_factor,0));
             }
         }
         if (F(state,0x34)>=1.0f && F(state,0x38)>=1.0f && F(state,0x3C)>=1.0f) moby_set_state(actor,1,-1);
-        tint=FastTweenColor(D_L03_001B03F8,I(state,0x20),F(state,0x3C));
+        tint=FastTweenColor(g_tube_start_tint_color,I(state,0x20),F(state,0x3C));
         tintB=(tint>>16)&255;
         tintG=(tint>>8)&255;
         set_moby_color(actor,tint&255,tintG,tintB);
         break;
     }
     if (B(actor,0x20)<5) {
-        F(state,0x30)=FastAddRotations(F(state,0x30),D_L03_001B03E0*0.000290888245f);
+        F(state,0x30)=FastAddRotations(F(state,0x30),g_tube_start_spin_rate*0.000290888245f);
         if (F(state,0x18)<1.0f) ApproachValue(state+0x18,1.0f,0.0333333351f);
         if (math_random_int_below(2)) {
             angle=math_random_angle();
@@ -208,9 +208,9 @@ void tube_start_update(char *actor)
             pos[2]=0;
             FastVecAdd(pos,pos,actor+0x10);
             pos[2]+=0.1f;
-            alpha=math_random_float_range(D_L03_001B03E8,D_L03_001B03EC);
+            alpha=math_random_float_range(g_tube_start_alpha_min,g_tube_start_alpha_max);
             scale=math_random_float_range(0,1);
-            color=FastTweenColor(D_L03_001B03F0_0,D_L03_001B03F0[1],scale);
+            color=FastTweenColor(D_L03_001B03F0_0,g_tube_start_color_pair[1],scale);
             speed=math_random_float_range(2,3);
             life=math_random_int_range(60,180);
             lifeByte = life;

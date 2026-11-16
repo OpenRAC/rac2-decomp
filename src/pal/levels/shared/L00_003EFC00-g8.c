@@ -3,19 +3,19 @@
 #include "common.h"
 extern int vec_fast_helper_b(void *);
 extern int g_frame_l00_counter __attribute__((sda));
-extern float D_L00_001B0748 __attribute__((sda));
-extern float D_L00_001B074C __attribute__((sda));
-extern float D_L00_001B0750 __attribute__((sda));
-extern float D_L00_001B0754 __attribute__((sda));
-extern float D_L00_001B0758 __attribute__((sda));
-extern int D_L00_001A8F00[] MACRO_ADDR;
-extern char D_L00_001B8FF0[];
+extern float g_homing_param __attribute__((sda));
+extern float g_homing_yaw_degrees __attribute__((sda));
+extern float g_homing_pitch_degrees __attribute__((sda));
+extern float g_homing_speed __attribute__((sda));
+extern float g_homing_target_height_offset __attribute__((sda));
+extern int g_game_l00_mode[] MACRO_ADDR;
+extern char g_cam_follow_matrix[];
 extern char g_hero_position[];
 extern char g_weapon_l00_table[][224];
 typedef struct { char pad[0x1F]; unsigned char selected; } Selection3EB8E8;
 extern Selection3EB8E8 g_item_slot_to_record;
-extern unsigned char *D_L00_001FEA14 NOT_SDA;
-extern char D_L00_001A8F20[] __attribute__((sda));
+extern unsigned char *g_effect_param_pointer_b NOT_SDA;
+extern char g_default_vector[] __attribute__((sda));
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern char *moby_get_or_find_target(void *, void *, int, float, float, float, float, float);
 extern void func_PAL_002A7E68(char *, int, int, int);
@@ -52,9 +52,9 @@ void func_PAL_L00_003EFC00(char *self, State3EB8E8 *st)
         return;
     moby_transform_joint_to_world(self, 1, pos);
     st->phase ^= 1;
-    obj = moby_get_or_find_target(pos, D_L00_001B8FF0, 0, D_L00_001B074C * 0.01745329424738884f,
-                            D_L00_001B0750 * 0.01745329424738884f, D_L00_001B0748,
-                            D_L00_001B074C * 0.01745329424738884f, D_L00_001B0750 * 0.01745329424738884f);
+    obj = moby_get_or_find_target(pos, g_cam_follow_matrix, 0, g_homing_yaw_degrees * 0.01745329424738884f,
+                            g_homing_pitch_degrees * 0.01745329424738884f, g_homing_param,
+                            g_homing_yaw_degrees * 0.01745329424738884f, g_homing_pitch_degrees * 0.01745329424738884f);
     if (obj) {
         if ((*(short *)(obj + 0xAA) == 0xEE1 || *(short *)(obj + 0xAA) == 0xEC0 || *(short *)(obj + 0xAA) == 0xED4) &&
             *(unsigned char *)(*(char **)(obj + 0x68) + 0x3B1) == 255) {
@@ -70,24 +70,24 @@ void func_PAL_L00_003EFC00(char *self, State3EB8E8 *st)
             func_PAL_002A7E68(self, 2, 0, 4);
         FastVecSub(v, self + 0x10, g_hero_position);
         dot = FastVecDot(v, self + 0xE0);
-        if (D_L00_001A8F00[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
+        if (g_game_l00_mode[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
             *(unsigned char *)(self + 0x42) == 2 && dot > 1.1f) {
             qcopy_nc(target, obj + 0x10);
             bone = moby_get_private_value_0(obj);
             if (bone)
                 target[2] += *(float *)(bone + 0x10);
             else
-                target[2] += D_L00_001B0758;
+                target[2] += g_homing_target_height_offset;
             angle = math_random_int_below(255);
-            part = part_spawn_gravity_fade(pos, D_L00_001A8F20, 2, 0x202080, angle, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
+            part = part_spawn_gravity_fade(pos, g_default_vector, 2, 0x202080, angle, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
             if (part)
-                part[2] = *D_L00_001FEA14;
-            part = part_spawn_gravity_fade(pos, D_L00_001A8F20, 2, 0x601080, (angle + 128) % 255, 127, 16,
+                part[2] = *g_effect_param_pointer_b;
+            part = part_spawn_gravity_fade(pos, g_default_vector, 2, 0x601080, (angle + 128) % 255, 127, 16,
                                  420000.0f, 420000.0f, 0.0f, 0);
             if (part)
-                part[2] = *D_L00_001FEA14;
+                part[2] = *g_effect_param_pointer_b;
             FastVecSub(dir, target, pos);
-            vec_scale_to_length(dir, dir, D_L00_001B0754);
+            vec_scale_to_length(dir, dir, g_homing_speed);
             FastVecAdd(pos, pos, dir);
             func_PAL_L00_003F10D8(pos, self, obj);
             PlayMobySound(0, 0, self);

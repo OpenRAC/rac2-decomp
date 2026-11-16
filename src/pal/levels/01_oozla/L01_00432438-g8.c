@@ -5,12 +5,12 @@ typedef float RouteVector[4] __attribute__((aligned(16)));
 typedef struct { short idx[8]; float angle[8]; float roll; } PathKeys;
 typedef struct { char pad0[0x20]; int path; int look; int target; float offset[3]; char pad38; unsigned char finished; char pad3a[2]; float speed; char pad40[0x18]; int lock; } CameraPath;
 typedef struct { int segment; float distance; float length; float scale; float travelled; short started; short stop; } PathMotion;
-extern unsigned char *D_L01_001B1F04;
-extern unsigned char *D_L01_001FE180[];
+extern unsigned char *g_camera_path_configs;
+extern unsigned char *g_path_l01_table[];
 extern unsigned char *g_moby_l01_table;
-extern unsigned char D_L01_001B96F0[];
-extern unsigned char D_0018A0E0[];
-extern int D_L01_001B1FA8;
+extern unsigned char g_water_view_matrix[];
+extern unsigned char g_hero_state_block[];
+extern int g_camera_lock_flag;
 extern int D_L01_001B1FA8_gp SDATA(D_L01_001B1FA8);
 extern int Spline_AdvanceByDistance(void *, void *, void *, void *, int, float);
 extern int FastDecTimer(void *);
@@ -30,16 +30,16 @@ void func_PAL_L01_00432438(unsigned char *camera)
 {
     RouteVector old, up, direction, target;
     unsigned char *v = *(unsigned char **)(camera + 0x70);
-    CameraPath *c = *(CameraPath **)(D_L01_001B1F04 + *(short *)(camera + 0x84) * 32 + 0x1c);
+    CameraPath *c = *(CameraPath **)(g_camera_path_configs + *(short *)(camera + 0x84) * 32 + 0x1c);
     PathMotion *motion = (PathMotion *)(v + 0x40);
     unsigned char *path;
     PathKeys *keys = (PathKeys *)(v + 0x58);
     int done, i, j, k, target_index, local_segment;
     float along, total, local_distance;
     if (!motion->started) {
-        unsigned char *start = D_L01_001FE180[c->path];
-        unsigned char *look = D_L01_001FE180[c->look];
-        if (c->lock) D_L01_001B1FA8 = 1;
+        unsigned char *start = g_path_l01_table[c->path];
+        unsigned char *look = g_path_l01_table[c->look];
+        if (c->lock) g_camera_lock_flag = 1;
         motion->started = 1;
         qcopy(camera + 0x30, start + 0x10);
         target_index = c->target;
@@ -48,18 +48,18 @@ void func_PAL_L01_00432438(unsigned char *camera)
             unsigned char *entity = g_moby_l01_table + target_index * 256;
             up[0] = src[0]; up[1] = src[1]; up[2] = src[2];
             *(int *)&up[3] = 0;
-            matrix_mul_vec3(up, up, D_L01_001B96F0);
+            matrix_mul_vec3(up, up, g_water_view_matrix);
             FastVecAdd(direction, entity + 0x10, up);
             FastVecSub(old, direction, camera + 0x30);
         } else FastVecSub(old, look + 0x10, camera + 0x30);
-        FastVecScale(up, D_0018A0E0, -1.0f);
+        FastVecScale(up, g_hero_state_block, -1.0f);
         vec_scale_to_length(camera, old, 1.0f);
         FastVecCross(camera + 0x10, camera, up);
         vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
         FastVecCross(camera + 0x20, camera + 0x10, camera);
         return;
     }
-    path = D_L01_001FE180[c->path];
+    path = g_path_l01_table[c->path];
     qcopy(old, camera + 0x30);
     done = Spline_AdvanceByDistance(path, camera + 0x30, &motion->segment, v + 0x44, 0, c->speed * 0.020000001f);
     if (motion->stop && FastDecTimer(v + 0x56)) done = 1;
@@ -91,16 +91,16 @@ void func_PAL_L01_00432438(unsigned char *camera)
         unsigned char *entity = g_moby_l01_table + target_index * 256;
         direction[0] = src[0]; direction[1] = src[1]; direction[2] = src[2];
         *(int *)&direction[3] = 0;
-        matrix_mul_vec3(direction, direction, D_L01_001B96F0);
+        matrix_mul_vec3(direction, direction, g_water_view_matrix);
         FastVecAdd(target, entity + 0x10, direction);
         FastVecSub(up, target, camera + 0x30);
     } else {
         float progress = motion->travelled / motion->length * motion->scale;
         local_segment = 0; local_distance = 0;
-        Spline_AdvanceByDistance(D_L01_001FE180[c->look], direction, &local_segment, &local_distance, 0, progress);
+        Spline_AdvanceByDistance(g_path_l01_table[c->look], direction, &local_segment, &local_distance, 0, progress);
         FastVecSub(up, direction, camera + 0x30);
     }
-    FastVecScale(direction, D_0018A0E0, -1.0f);
+    FastVecScale(direction, g_hero_state_block, -1.0f);
     vec_scale_to_length(camera, up, 1.0f);
     FastVecCross(camera + 0x10, camera, direction);
     vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);

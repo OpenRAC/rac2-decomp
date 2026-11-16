@@ -49,14 +49,14 @@ extern struct Rail *g_route_polygons[];
 extern char *g_moby_l02_pool __attribute__((section(".sdata")));
 extern int g_current_map_index;
 /* Two random ranges, each read as a lower and an upper bound. */
-extern int D_L02_001AEE30[] __attribute__((sda));
-extern float D_L02_001AEE38[] __attribute__((sda));
-extern float D_L02_001AEE80[3][4];
-extern float D_L02_001AEEB0[2][4];
-extern float D_L02_001AEED0[2][4];
-extern float D_L02_001AEEF0[2][4];
-extern float D_L02_001AEF10[2][4];
-extern float D_L02_001AEF30[2][4];
+extern int g_spin_time_range[] __attribute__((sda));
+extern float g_spin_rate_range[] __attribute__((sda));
+extern float g_matrix_template_rows[3][4];
+extern float g_vector_pair_template_a[2][4];
+extern float g_vector_pair_template_b[2][4];
+extern float g_vector_pair_template_c[2][4];
+extern float g_vector_pair_template_d[2][4];
+extern float g_vector_pair_template_e[2][4];
 extern float fast_vec_dist(void *, void *);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
@@ -123,9 +123,9 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
         data->enabled = 1;
         vec_clear_128(data->vector20);
         data->vector20[2] = data->f04 * math_random_signed_float_range(0.5f, 1.0f);
-        data->u76 = ((s32)math_random_int_range(D_L02_001AEE30[0], D_L02_001AEE30[1]) * 5 + 2) / 6;
+        data->u76 = ((s32)math_random_int_range(g_spin_time_range[0], g_spin_time_range[1]) * 5 + 2) / 6;
         data->f68 = math_random_angle();
-        data->f6c = math_random_signed_float_range(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0003490659f;
+        data->f6c = math_random_signed_float_range(g_spin_rate_range[0], g_spin_rate_range[1]) * 0.0003490659f;
         scale = object->scale / *(float *)(object->model + 0x24);
         data->i18 = -1;
         data->i1c = 0;
@@ -152,11 +152,11 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             qcopy(data->primary[2], vectors[2]);
             {
                 TI128 copy0, copy1, copy2;
-                copy0 = *(TI128 *)D_L02_001AEE80[0];
+                copy0 = *(TI128 *)g_matrix_template_rows[0];
                 *(TI128 *)vectors[3] = copy0;
-                copy1 = *(TI128 *)D_L02_001AEE80[1];
+                copy1 = *(TI128 *)g_matrix_template_rows[1];
                 *(TI128 *)vectors[4] = copy1;
-                copy2 = *(TI128 *)D_L02_001AEE80[2];
+                copy2 = *(TI128 *)g_matrix_template_rows[2];
                 *(TI128 *)vectors[5] = copy2;
             }
             source = &vectors[3];
@@ -180,8 +180,8 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
-                TI128 copy0 = *(TI128 *)D_L02_001AEEB0[0];
-                TI128 copy1 = *(TI128 *)D_L02_001AEEB0[1];
+                TI128 copy0 = *(TI128 *)g_vector_pair_template_a[0];
+                TI128 copy1 = *(TI128 *)g_vector_pair_template_a[1];
                 *(TI128 *)vectors[2] = copy0;
                 *(TI128 *)vectors[3] = copy1;
             }
@@ -210,8 +210,8 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
-                TI128 copy0 = *(TI128 *)D_L02_001AEED0[0];
-                TI128 copy1 = *(TI128 *)D_L02_001AEED0[1];
+                TI128 copy0 = *(TI128 *)g_vector_pair_template_b[0];
+                TI128 copy1 = *(TI128 *)g_vector_pair_template_b[1];
                 *(TI128 *)vectors[2] = copy0;
                 *(TI128 *)vectors[3] = copy1;
             }
@@ -240,8 +240,8 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
-                TI128 copy0 = *(TI128 *)D_L02_001AEEF0[0];
-                TI128 copy1 = *(TI128 *)D_L02_001AEEF0[1];
+                TI128 copy0 = *(TI128 *)g_vector_pair_template_c[0];
+                TI128 copy1 = *(TI128 *)g_vector_pair_template_c[1];
                 *(TI128 *)vectors[2] = copy0;
                 *(TI128 *)vectors[3] = copy1;
             }
@@ -330,8 +330,8 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
-                TI128 copy0 = *(TI128 *)D_L02_001AEF10[0];
-                TI128 copy1 = *(TI128 *)D_L02_001AEF10[1];
+                TI128 copy0 = *(TI128 *)g_vector_pair_template_d[0];
+                TI128 copy1 = *(TI128 *)g_vector_pair_template_d[1];
                 *(TI128 *)vectors[2] = copy0;
                 *(TI128 *)vectors[3] = copy1;
             }
@@ -393,8 +393,8 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
-                TI128 copy0 = *(TI128 *)D_L02_001AEF30[0];
-                TI128 copy1 = *(TI128 *)D_L02_001AEF30[1];
+                TI128 copy0 = *(TI128 *)g_vector_pair_template_e[0];
+                TI128 copy1 = *(TI128 *)g_vector_pair_template_e[1];
                 *(TI128 *)vectors[2] = copy0;
                 *(TI128 *)vectors[3] = copy1;
             }

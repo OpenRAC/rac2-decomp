@@ -14,7 +14,7 @@ typedef struct {
     Quad normal;
 } CollisionView;
 
-extern unsigned char D_L16_001BFF50[];
+extern unsigned char g_coll_view_buffer[];
 #define HIT ((CollisionView *)D_L16_001BFF50)
 
 /* Field names follow RAC1's hero collision step (hero_collision.c). */
@@ -56,7 +56,7 @@ typedef struct {
 
 extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record, as func_L16_002B59A0 reads it */
 #define PLAYER (&D_00189E20_view)
-extern int D_L16_001A8FF0 __attribute__((sda));
+extern int g_hero_l16_block_flag __attribute__((sda));
 
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
@@ -119,8 +119,8 @@ typedef struct {
 
 extern PlayerInputView g_hero_state;
 extern int g_current_map_index __attribute__((sda));
-extern int D_L16_001A9010 __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern int g_hero_special_enter_flag __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
 extern int hero_l16_enter_state(int, int);
@@ -145,7 +145,7 @@ void hero_read_command_start_action(void)
     if (command == 2 && !g_hero_state.inputLock &&
         (!g_hero_state.jumpCount || g_hero_state.elapsed < 2.5f)) {
         g_hero_state.jumpPressed = 1;
-        if (!g_hero_state.mode && D_001A7B0B) g_hero_state.pendingJump = 1;
+        if (!g_hero_state.mode && g_hero_input_enabled) g_hero_state.pendingJump = 1;
     }
     if (command == 3) g_hero_state.jump = 1;
     if (command == 11) g_hero_state.cancel = 1;
@@ -156,7 +156,7 @@ void hero_read_command_start_action(void)
         if (g_hero_state.attack && active &&
             (g_hero_state.state != 0x38 || g_hero_state.animationDone)) {
             if (g_hero_state.health) { hero_l16_enter_state(0x38,1); return; }
-            if (g_current_map_index == 2 && D_L16_001A9010) { hero_l16_enter_state(0x7d,1); return; }
+            if (g_current_map_index == 2 && g_hero_special_enter_flag) { hero_l16_enter_state(0x7d,1); return; }
             if (*(int *)(*(u8 **)(g_hero_state.object + 0x24) + 0x1f0)) { hero_l16_enter_state(0x79,1); return; }
             hero_l16_enter_state(0x39,1); return;
         }
@@ -212,7 +212,7 @@ int hero_l16_push_out_of_collision(int mode)
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_L16_001A8FF0) {
+            } else if (g_hero_l16_block_flag) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);

@@ -33,7 +33,7 @@ typedef struct {
     u8 fA9;
 } Moby_2A75E0;
 
-extern f32 D_001CD540[][4];
+extern f32 g_blend_matrices[][4];
 extern void anim_start_immediate(Moby_2A75E0 *, int, int);
 extern int moby_alloc_object_slot(void *);
 extern void func_002A2450(Moby_2A75E0 *, int);
@@ -54,7 +54,7 @@ void anim_start_blended_with_flags(Moby_2A75E0 *m, int anim, int f41, int frames
             if (flags & 1) slot_flags |= 0x100;
             if (flags & 2) slot_flags |= 0x200;
             func_002A2450(m, slot_flags);
-            qcopy(D_001CD540[slot], m->f80);
+            qcopy(g_blend_matrices[slot], m->f80);
             if (m->f42 != 0xFF) m->fA9 = m->f42;
             m->f42 = 0xFF;
             m->slot = slot;

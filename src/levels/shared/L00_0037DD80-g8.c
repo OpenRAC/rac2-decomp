@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The -G8 body of src/levels/shared/L00_0037DD80.c belongs here: its two words are
    reached through $gp, which the unit's own -G0 file cannot produce. Both words are
@@ -9,10 +10,10 @@
      0x1B26B0: the float runs through $gp, the absolute site clears it.
    A near miss of the body is in nonmatching/levels/func_L00_0037E5F0.c. */
 
-extern unsigned int D_L00_001B26B4 __attribute__((nosda));
+extern unsigned int g_fade_timer __attribute__((nosda));
 
 extern unsigned int D_L00_001B26B4_1;
 
 extern float D_L00_001B26B0_1;
 
-extern int D_L00_001B26B0 __attribute__((nosda));
+extern int g_fade_level __attribute__((nosda));

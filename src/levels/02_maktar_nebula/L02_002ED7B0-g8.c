@@ -13,11 +13,11 @@ extern void sky_update_effects(void);
 
 extern int g_current_map_index;
 
-extern int D_001A72E0;
+extern int g_vram_zbuffer_address;
 
-extern char D_L02_00280A10[];
+extern char g_level_background_data[];
 
-extern int D_L02_001B33D0;
+extern int g_level_background_ptr;
 
 /* func_L02_003CB090 needs a $gp member and an absolute one; the measured
    92-of-96-byte candidate is recorded in nonmatching/levels/func_L02_003CB090.c
@@ -37,15 +37,15 @@ extern char g_hero_position[];
 
 extern char g_camera_l02_position[];
 
-extern char *D_L02_001B368C;
+extern char *g_matrix_l02_record_table;
 
-extern float D_L02_001B2FE0 __attribute__((sda));
+extern float g_grab_highlight_level __attribute__((sda));
 
 
 /* Runs the level's background update each frame: the sky when the game state is 2, the normal backdrop otherwise. */
 void level_update_background(void) {
     gfx_resident_table_reset();
-    D_L02_001B33D0 = (int)D_L02_00280A10;
+    g_level_background_ptr = (int)g_level_background_data;
 
     if (g_current_map_index == 2)
         sky_update_effects();
@@ -53,7 +53,7 @@ void level_update_background(void) {
         gfx_update_all_view_transforms();
     gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
-    VU1_addGSregister(0x4E, 0x01000000 | (D_001A72E0 >> 13));
+    VU1_addGSregister(0x4E, 0x01000000 | (g_vram_zbuffer_address >> 13));
 }
 
 /* Flags the actor's target when its record is on screen, and refreshes it afterwards. */
@@ -64,17 +64,17 @@ void grab_target_update_highlight(char *self) {
     if (*(int *)(state + 0xDC) == 0) {
         if (IsPointInCuboid(g_hero_position, *(int *)(state + 0xC4)) != 0) {
             FastVecSub(offset, (float *)g_camera_l02_position,
-                          (float *)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x30));
-            matrix_mul_vec3(offset, offset, (float *)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x40));
+                          (float *)(g_matrix_l02_record_table + (*(int *)(state + 0xC4) << 7) + 0x30));
+            matrix_mul_vec3(offset, offset, (float *)(g_matrix_l02_record_table + (*(int *)(state + 0xC4) << 7) + 0x40));
             if (offset[0] > 0.0f) {
                 *(int *)(state + 0xDC) = 1;
                 timer_start_countdown(1, 10.0f);
             }
         }
     } else {
-        if (D_L02_001B2FE0 >= 1.0f) {
+        if (g_grab_highlight_level >= 1.0f) {
             hero_reset_position_and_direction((int)g_hero_position,
-                              (int)(D_L02_001B368C + (*(int *)(state + 0xC4) << 7) + 0x70), 0, 1);
+                              (int)(g_matrix_l02_record_table + (*(int *)(state + 0xC4) << 7) + 0x70), 0, 1);
             *(short *)(g_hero_position + 0x160) = 10;
         }
     }
@@ -106,7 +106,7 @@ int armed_enemy_has_partner_in_group(unsigned char *self) {
     return 0;
 }
 
-extern int D_L02_001B35B8 __attribute__((sda));
+extern int g_group_max_index __attribute__((sda));
 
 extern int weapon_select_aim_target(char *, int, float, float, int, int);
 
@@ -166,7 +166,7 @@ void armed_enemy_find_partner(char *self) {
         nearestEntity = 0;
         for (entry = g_entity_group_lists[*(unsigned char *)(self + 0x21)];
              *(unsigned char *)(self + 0x21) != 0xFF &&
-             *(unsigned char *)(self + 0x21) <= D_L02_001B35B8 && entry != 0 &&
+             *(unsigned char *)(self + 0x21) <= g_group_max_index && entry != 0 &&
              ((entry != 0 && (short)entry[-1] >= 0) ||
               entry == g_entity_group_lists[*(unsigned char *)(self + 0x21)]);
              entry++) {

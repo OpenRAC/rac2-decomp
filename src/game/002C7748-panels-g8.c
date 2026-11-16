@@ -36,20 +36,20 @@ typedef struct {
     float fade, step, target;
 } StateCBC58;
 extern StateCBC58 g_pause_menu_state;
-extern int g_screen_height, D_001A72DC;
-extern int D_001AB91C __attribute__((sda));
-extern volatile int D_001AB910 __attribute__((sda));
-extern int D_001AA450[14] SDATA(D_001AA450);
-extern int D_001AA43C __attribute__((sda));
-extern int D_001AB92C __attribute__((sda));
-extern int D_001AB930 __attribute__((sda));
-extern long D_001A7470 __attribute__((sda));
-extern char D_00259018[], D_0025A738[], D_0025A498[], D_0025A190[], D_0025A058[];
-extern PanelCBC58 D_00259EE0;
-extern char D_001AB920[], D_001AB928[];
+extern int g_screen_height, g_vram_display_address;
+extern int g_pause_debug_flag_a __attribute__((sda));
+extern volatile int g_pause_menu_busy_flag __attribute__((sda));
+extern int g_pause_panel_enabled_flags[14] SDATA(D_001AA450);
+extern int g_menu_panel_fill_color __attribute__((sda));
+extern int g_pause_debug_flag_b __attribute__((sda));
+extern int g_pause_second_pass_flag __attribute__((sda));
+extern long g_quad_texture __attribute__((sda));
+extern char g_menu_page_pause[], g_pause_page_d[], g_pause_page_c[], g_pause_page_b[], g_pause_page_a[];
+extern PanelCBC58 g_pause_panel;
+extern char g_str_pause_debug_a[], g_str_pause_debug_b[];
 typedef struct { char pad[0x1A0]; int flags; char pad1A4[0x20]; int pressed; } PadCBC58;
 extern PadCBC58 g_pad_state;
-extern void (*D_00210AD0)(void) __attribute__((nosda));
+extern void (*g_pause_panels_draw_hook)(void) __attribute__((nosda));
 extern void gfx_append_draw_list_buffer_tag(int);
 extern void gfx_upload_image_to_gs_packets(void *, int, int);
 extern void gfx_write_clear_color_packets(void);
@@ -80,24 +80,24 @@ void menu_draw_pause_panels(int mode)
     int left, top, right, bottom, tw, th;
     float delta;
     gfx_append_draw_list_buffer_tag(0);
-    gfx_upload_image_to_gs_packets(state->buffer, D_001A72DC, g_screen_height << 11);
+    gfx_upload_image_to_gs_packets(state->buffer, g_vram_display_address, g_screen_height << 11);
     if (!mode) {
     gfx_write_clear_color_packets();
     gfx_set_clear_color_packet(0,0,0,0x38);
     if (g_pause_menu_state.mode == 4 && state->active) {
-    if (D_001AB91C) {
+    if (g_pause_debug_flag_a) {
         void *page = state->page;
-        if (page == D_00259018) {
-            SetupGifPaging(0); D_00210AD0(); DoGifPaging(); return;
+        if (page == g_menu_page_pause) {
+            SetupGifPaging(0); g_pause_panels_draw_hook(); DoGifPaging(); return;
         }
-        if (page == D_0025A738) {
+        if (page == g_pause_page_d) {
             SetupGifPaging(0); hud_update_record_handlers(); level_run_callbacks_and_draw(); DoGifPaging(); return;
         }
-        if (page == D_0025A498 && !D_001AB910) {
+        if (page == g_pause_page_c && !g_pause_menu_busy_flag) {
             SetupGifPaging(0); func_0029C2D0(); DoGifPaging();
-        } else if (g_pause_menu_state.page == (void *)D_0025A190 && !D_001AB910) {
+        } else if (g_pause_menu_state.page == (void *)g_pause_page_b && !g_pause_menu_busy_flag) {
             SetupGifPaging(0); func_0029C340(); DoGifPaging(); return;
-        } else if (g_pause_menu_state.page == (void *)D_0025A058 && !D_001AB910) {
+        } else if (g_pause_menu_state.page == (void *)g_pause_page_a && !g_pause_menu_busy_flag) {
             ;
         }
     }
@@ -110,26 +110,26 @@ void menu_draw_pause_panels(int mode)
         panels = (PanelCBC58 **)((char *)panels + none);
     }
     if ((g_pad_state.flags&15)==15 && (g_pad_state.pressed&15))
-        STUB_printf(D_001AB920);
+        STUB_printf(g_str_pause_debug_a);
     for (j=0;j<14;j++) {
         StateCBC58 *st = &g_pause_menu_state;
-        if (D_001AA450[j]) {
+        if (g_pause_panel_enabled_flags[j]) {
             PageCBC58 *pg = st->page;
             if (panels && panels[j]) {
                 panels[j]->x = pg->bounds[j].x - pg->bounds[j].width/2;
                 panels[j]->y = st->page->bounds[j].y - st->page->bounds[j].height/2;
                 panels[j]->width = st->page->bounds[j].width;
                 panels[j]->height = st->page->bounds[j].height;
-                if (panels[j] == &D_00259EE0) panels[j]->height=256;
+                if (panels[j] == &g_pause_panel) panels[j]->height=256;
             }
         }
     }
     if ((g_pad_state.flags&15)==15 && (g_pad_state.pressed&15))
-        STUB_printf(D_001AB928);
+        STUB_printf(g_str_pause_debug_b);
     for (pass=0;pass<2;pass++) {
         for (i=0;i<14;i++) {
             PanelCBC58 *p;
-            if (!panels || !(p=panels[i]) || (p->flags&4) || !D_001AA450[i] || !p->draw) continue;
+            if (!panels || !(p=panels[i]) || (p->flags&4) || !g_pause_panel_enabled_flags[i] || !p->draw) continue;
             if (!pass && !(p->flags&2)) continue;
             if (pass==1 && (p->flags&2)) continue;
             if (p->flags&1) { p->draw(p); continue; }
@@ -140,7 +140,7 @@ void menu_draw_pause_panels(int mode)
             if ((panels[i]->draw == menu_set_clip_rect || panels[i]->draw == menu_fading_image_draw ||
                  panels[i]->draw == menu_text_list_draw_checkboxes || panels[i]->draw == menu_panel_draw) && !(panels[i]->flags&8)) {
                 gfx_setup_screen_copy_draw_state(lw,lh,0,1.0f);
-                gfx_draw_screen_rect_with_depth(0,0,1<<lw,1<<lh,D_001AA43C,0,0);
+                gfx_draw_screen_rect_with_depth(0,0,1<<lw,1<<lh,g_menu_panel_fill_color,0,0);
                 result=panels[i]->draw(panels[i]);
                 gfx_run_screen_effect_setup();
             } else result=panels[i]->draw(panels[i]);
@@ -162,10 +162,10 @@ void menu_draw_pause_panels(int mode)
                 if (w<h) { left=right/2-w*right/(h*2); right-=left; }
                 else { top=bottom/2-h*bottom/(w*2); bottom-=top; }
             } else if (!(result&16)) continue;
-            if (D_001AB92C)
-                DrawTexturedQuad(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,D_001A7470);
+            if (g_pause_debug_flag_b)
+                DrawTexturedQuad(x,y,w,h,left,top,right-left,bottom-top,0x80808080L,g_quad_texture);
         }
-        if (D_001AB930 && !pass && g_pause_menu_state.field168) {
+        if (g_pause_second_pass_flag && !pass && g_pause_menu_state.field168) {
             mem_restore_scratch_area(); tex_run_upload_and_setup(); gfx_wait_for_dma_status_bits(16); PatchMobyGifs();
             g_pause_menu_state.field168=0; g_pause_menu_state.field16C=0;
         }

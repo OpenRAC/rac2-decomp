@@ -50,9 +50,9 @@ typedef struct {
     PlatformVector points[2];
 } PlatformPath;
 extern PlatformPath *g_path_l17_table[];
-extern int D_L17_001B0340 __attribute__((sda));
-extern float D_L17_001B034C __attribute__((sda));
-extern float D_L17_001B0354 __attribute__((sda));
+extern int g_platform_l17_sound_flag __attribute__((sda));
+extern float g_platform_stop_angle_rate __attribute__((sda));
+extern float g_platform_turn_rate __attribute__((sda));
 typedef struct {
     u8 pad0[0x212];
     short mode212, mode214;
@@ -63,13 +63,13 @@ typedef struct {
 } PlatformHero;
 extern PlatformHero g_hero_state;
 extern float g_hero_position[];
-extern char *D_0018A15C NOT_SDA;
+extern char *g_platform_actor_ref NOT_SDA;
 extern int g_current_map_index;
-extern u8 D_0019B4A8[], D_0019B2E8[];
+extern u8 g_moby_nibble_table[], g_moby_group_flags[];
 typedef struct { u8 pad[0x464]; u8 collected[0]; } L17SaveState;
-extern L17SaveState D_L17_0021EBB0;
-extern int D_00138324 NOT_SDA;
-extern u8 D_L17_001DBF82[];
+extern L17SaveState g_level_l17_save_state;
+extern int g_pad_held_flags NOT_SDA;
+extern u8 g_platform_l17_sound_flag_2[];
 extern char g_sound_state[];
 extern int ride_platform_is_carrying(void *);
 extern void table_set_entry_field(void *, int);
@@ -105,7 +105,7 @@ static __inline__ void stopSound(u8 *object, PlatformVars *data)
 /* Updates a ride platform. State 1 idles until triggered; states 3 and 8 wait for input bit 0x10
    from the player standing on it; the others follow its entry, middle or exit path, chosen by
    moby->choice, forwards or back, and stop its sound on the way. */
-void func_US2_L17_003C76B8(u8 *object)
+void UpdateRidePlatform_us2(u8 *object)
 {
     PlatformVector oldPosition, oldRotation, delta;
     PlatformMoby *moby = (PlatformMoby *)object;
@@ -116,7 +116,7 @@ void func_US2_L17_003C76B8(u8 *object)
     table_set_entry_field(object, ride_platform_is_carrying(object));
     data->flags8C |= 1;
     data->flags3E |= 8;
-    if (D_L17_001B0340) {
+    if (g_platform_l17_sound_flag) {
         int i;
         for (i = 0; i < g_path_l17_table[data->entryPaths[0]]->count; i++)
             effect_create_timed(&g_path_l17_table[data->entryPaths[0]]->points[i],
@@ -151,9 +151,9 @@ void func_US2_L17_003C76B8(u8 *object)
         moby->flags = (moby->flags | 0x41) & 0xEFFF;
         moby->animation = 0;
         id = moby->uid;
-        if (D_L17_0021EBB0.collected[(s16)id]) goto destroy;
+        if (g_level_l17_save_state.collected[(s16)id]) goto destroy;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            int packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if ((id & 1) ? ((packed >> 4) & 7) : (packed & 7)) {
         destroy:
                 moby_mark_spawned(object);
@@ -163,7 +163,7 @@ void func_US2_L17_003C76B8(u8 *object)
         break;
     case 1: {
         int i;
-        if (data->enabled && (D_0019B2E8[moby->group + (g_current_map_index << 4)] & 0x80)) {
+        if (data->enabled && (g_moby_group_flags[moby->group + (g_current_map_index << 4)] & 0x80)) {
             for (i = 0; i < 5; i++) {
                 if (data->triggers[i] != -1 || data->selection == i)
                     ride_platform_select_entry(object);
@@ -181,14 +181,14 @@ void func_US2_L17_003C76B8(u8 *object)
         break;
     case 3:
         math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
-                     D_L17_001B034C * 4.848137450608192e-06f,
-                     D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f,
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
-                     D_L17_001B0354 * 4.848137450608192e-06f,
-                     D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_turn_rate * 4.848137450608192e-06f,
+                     g_platform_turn_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         if (g_hero_state.groundObject == object && g_hero_state.mode34E == 0) {
             TryClaimNotice(10, 0x133F, 1);
-            if (D_00138324 & 0x10) {
+            if (g_pad_held_flags & 0x10) {
                 data->progress = 0;
                 moby->state = 4;
                 data->point = 1;
@@ -210,36 +210,36 @@ void func_US2_L17_003C76B8(u8 *object)
         break;
     case 6:
         math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
-                     D_L17_001B034C * 4.848137450608192e-06f,
-                     D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f,
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
-                     D_L17_001B0354 * 4.848137450608192e-06f,
-                     D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_turn_rate * 4.848137450608192e-06f,
+                     g_platform_turn_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         exitRow = (PlatformPathRow *)data->exitPaths;
         if (exitRow->paths[moby->choice] != -1 &&
             fast_vec_dist(&moby->position, g_hero_position) > 15.0f) {
             moby->state = 7;
             data->point = 1;
-        } else if (exitRow->paths[moby->choice] == -1 && D_0018A15C != (char *)object)
+        } else if (exitRow->paths[moby->choice] == -1 && g_platform_actor_ref != (char *)object)
             moby->state = 1;
         goto updateSound;
     case 8:
         math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
-                     D_L17_001B034C * 4.848137450608192e-06f,
-                     D_L17_001B034C * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f,
+                     g_platform_stop_angle_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
-                     D_L17_001B0354 * 4.848137450608192e-06f,
-                     D_L17_001B0354 * 4.848137450608192e-06f, 0.20943954586982727f, 0);
+                     g_platform_turn_rate * 4.848137450608192e-06f,
+                     g_platform_turn_rate * 4.848137450608192e-06f, 0.20943954586982727f, 0);
         if (g_hero_state.groundObject == object && g_hero_state.mode34E == 0) {
             TryClaimNotice(10, 0x133F, 1);
-            if (D_00138324 & 0x10) {
+            if (g_pad_held_flags & 0x10) {
                 data->progress = 0;
                 moby->state = 9;
                 data->point = g_path_l17_table[data->middlePaths[moby->choice]]->count - 2;
             }
         }
 updateSound:
-        if (!snd_is_voice_playing_for_owner(object, data->sound) && D_L17_001DBF82[0] != 0xFF)
+        if (!snd_is_voice_playing_for_owner(object, data->sound) && g_platform_l17_sound_flag_2[0] != 0xFF)
             data->sound = snd_play_from_class_bank(1, 4, object, 0x922);
         break;
     case 9:

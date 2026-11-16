@@ -8,21 +8,21 @@
 extern int func_PAL_L16_004095E0(void *), flag_set_second_pending(void *);
 extern int math_random_int_range(int, int), FastDecTimer(short *);
 extern void func_PAL_002A7E68(void *, int, int, int), moby_set_state(void *, int, int);
-extern void func_PAL_002A7650(void *, int, int), vec_random_direction(void *, float, float);
+extern void SetDeathBits_pal(void *, int, int), vec_random_direction(void *, float, float);
 extern float math_fabs(float), math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, u8, float, float);
-extern void func_PAL_003120C0(void *), hero_copy_field_to_moby(void *), moby_mark_spawned(void *);
+extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, u8, float, float);
+extern void moby_fade_out_update_pal(void *), hero_copy_field_to_moby(void *), moby_mark_spawned(void *);
 extern int PlayMobySound(int, int, void *);
 extern void *func_PAL_L16_0040AC00(void *, int, int, int, int, int, int, int, float, int, int);
-extern int moby_start_effect_from_entry(int, float), func_PAL_L09_0032B088(char *, int);
+extern int moby_start_effect_from_entry(int, float), path_check_entry_for_moby_pal(char *, int);
 extern int func_PAL_L16_004099C0(void *, void *, float, float);
 extern float mat_fast_helper_a(float, float), vec_distance_xy(void *, void *), FastDiffRots(float, float);
 extern float math_approach_target_with_direction_mode(float *, float *, float, float, float, float, int);
 extern int func_PAL_002AF6C0(void *, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
-extern void *func_PAL_L16_0040A008(void *, void *, void *, int, float);
+extern void *snivelak_spawn_aimed_shot_pal(void *, void *, void *, int, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void func_PAL_L16_00409AD0(void *);
@@ -35,8 +35,8 @@ typedef struct {
     u8 *target2290;
 } PlayerView;
 extern PlayerView g_hero_state NOT_SDA;
-extern float D_L16_001A8F20[4] __attribute__((sda));
-extern u8 *D_L16_001BFF58 NOT_SDA;
+extern float g_particle_template[4] __attribute__((sda));
+extern u8 *g_aim_target_moby NOT_SDA;
 /* Partial view shared with the matched sibling death/debris update. */
 extern struct {
     u8 pad000[0x160];
@@ -101,32 +101,32 @@ void func_PAL_L16_00408420(u8 *moby)
         break;
     case 3:
         if (*(float *)(state + 0x20) <= 0.0f) {
-            func_PAL_002A7650(moby, 0, 3);
+            SetDeathBits_pal(moby, 0, 3);
             for (i = 0; i < 5; i++) {
                 vec_random_direction(position, 0.16000001f, 0.24000001f);
                 position[2] = math_fabs(position[2]);
                 position[2] *= 2.5f;
-                FastVecAdd(position, position, D_L16_001A8F20);
-                child = func_PAL_002735D0(moby, 1, *(short *)(moby + 0xaa), i,
+                FastVecAdd(position, position, g_particle_template);
+                child = cam_moby_create_pal(moby, 1, *(short *)(moby + 0xaa), i,
                     moby + 0x10, moby + 0xf0, position, 255, 30.0f, 15.0f);
-                *(void (**)(void *))(child + 0x64) = func_PAL_003120C0;
+                *(void (**)(void *))(child + 0x64) = moby_fade_out_update_pal;
             }
             PlayMobySound(0, 0, moby);
             func_PAL_L16_0040AC00(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 2.0f, 1, 1);
             func_PAL_L16_0040AC00(moby + 0x10, 0, 15, 10, 10, 10, 15, 1, 1.0f, 1, 1);
-            D_L16_001B99C0.damping = 0.1f;
-            D_L16_001B99C0.lifetime = 75;
-            D_L16_001B99C0.strength = 0.2f;
-            D_L16_001B99C0.duration = 50;
-            D_L16_001B99C0.timer = 0;
+            g_snivelak_hero_state.damping = 0.1f;
+            g_snivelak_hero_state.lifetime = 75;
+            g_snivelak_hero_state.strength = 0.2f;
+            g_snivelak_hero_state.duration = 50;
+            g_snivelak_hero_state.timer = 0;
             moby_mark_spawned(*(void **)(state + 0x274));
             position[0] = math_random_signed_float_range(0.5f, 4.0f) * 0.020000001f;
             position[1] = math_random_signed_float_range(0.0f, 4.0f) * 0.020000001f;
             position[2] = math_random_float_range(7.0f, 9.0f) * 0.020000001f;
             position[2] = math_fabs(position[2]);
             position[2] += position[2];
-            FastVecAdd(position, position, D_L16_001A8F20);
-            child = func_PAL_002735D0(moby, 3, 0xecb, 0, moby + 0x10,
+            FastVecAdd(position, position, g_particle_template);
+            child = cam_moby_create_pal(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, position, 255, 180.0f, 25.0f);
             hero_copy_field_to_moby(child);
             moby_mark_spawned(moby);
@@ -187,16 +187,16 @@ void func_PAL_L16_00408420(u8 *moby)
         moby_transform_joint_to_world((char *)moby, 2, (char *)position);
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
-        func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+        snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
-        func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+        snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         break;
     case 6:
         moby_start_effect_from_entry((int)moby, mat_fast_helper_a(g_hero_state.position80[0] - *(float *)(moby + 0x10),
             g_hero_state.position80[1] - *(float *)(moby + 0x14)));
-        if (func_PAL_L09_0032B088((char *)moby, *(int *)(state + 0x298)) &&
+        if (path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x298)) &&
             *(int *)(state + 0x29c) != -1) moby_set_state(moby, 7, -1);
         pitchField6 = (float *)(moby + 0xf4);
         pitch = mat_fast_helper_a(vec_distance_xy(moby + 0x10, g_hero_state.target2290 + 0x10),
@@ -211,25 +211,25 @@ void func_PAL_L16_00408420(u8 *moby)
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         break;
     case 7:
         moby_start_effect_from_entry((int)moby, mat_fast_helper_a(g_hero_state.position80[0] - *(float *)(moby + 0x10),
             g_hero_state.position80[1] - *(float *)(moby + 0x14)));
-        if (func_PAL_L09_0032B088((char *)moby, *(int *)(state + 0x29c)) &&
+        if (path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x29c)) &&
             *(int *)(state + 0x298) != -1) moby_set_state(moby, 6, -1);
         pitchField7 = (float *)(moby + 0xf4);
         pitch = mat_fast_helper_a(vec_distance_xy(moby + 0x10, g_hero_state.target2290 + 0x10),
@@ -244,19 +244,19 @@ void func_PAL_L16_00408420(u8 *moby)
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         break;
     case 4:
@@ -284,19 +284,19 @@ void func_PAL_L16_00408420(u8 *moby)
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         moby_transform_joint_to_world((char *)moby, 3, (char *)position);
         FastVecSub(aim, g_hero_state.aimPositionE0, position);
         vec_scale_to_length(aim, aim, 1.0000001f);
         if (!CollLine(position, g_hero_state.aimPositionE0, 0, moby, 0)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
-        } else if (D_L16_001BFF58 && (D_L16_001BFF58 == g_hero_state.target2290 ||
-                   *(short *)(D_L16_001BFF58 + 0xaa) != 0xebb)) {
-            func_PAL_L16_0040A008(moby, aim, position, 0, (float)state[0x34]);
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
+        } else if (g_aim_target_moby && (g_aim_target_moby == g_hero_state.target2290 ||
+                   *(short *)(g_aim_target_moby + 0xaa) != 0xebb)) {
+            snivelak_spawn_aimed_shot_pal(moby, aim, position, 0, (float)state[0x34]);
         }
         break;
     }

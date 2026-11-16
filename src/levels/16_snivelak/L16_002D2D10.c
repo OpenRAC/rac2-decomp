@@ -13,14 +13,14 @@ typedef struct {
     s32 i280;
 } T_001B99C0;
 
-extern T_001B99C0 D_L16_001B99C0;
+extern T_001B99C0 g_snivelak_hero_state;
 
 /* Starts the shared transition once, storing how fast it should step. */
 void transition_arm_shared(s32 mode, f32 first_duration, f32 second_duration) {
-    if (D_L16_001B99C0.f27C == 0.0f) {
-        D_L16_001B99C0.i280 = mode;
-        D_L16_001B99C0.f27C = 1.0f;
-        D_L16_001B99C0.f274 = 1.0f / first_duration;
-        D_L16_001B99C0.f278 = 1.0f / second_duration;
+    if (g_snivelak_hero_state.f27C == 0.0f) {
+        g_snivelak_hero_state.i280 = mode;
+        g_snivelak_hero_state.f27C = 1.0f;
+        g_snivelak_hero_state.f274 = 1.0f / first_duration;
+        g_snivelak_hero_state.f278 = 1.0f / second_duration;
     }
 }

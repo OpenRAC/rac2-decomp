@@ -63,7 +63,7 @@ void mpeg_restart_hardware(void *decoder) {
     r1_func_00127378(1);
 }
 
-extern char D_0013BDC8[];
+extern char g_str_mpeg_finish_picture_error[];
 extern void mpeg_report_error(void *, void *);
 extern void mpeg_output_picture(void *, int, int);
 extern void mpeg_output_field_pair(void *, int, int, int);
@@ -72,7 +72,7 @@ extern void mpeg_output_field_pair(void *, int, int, int);
 void mpeg_finish_picture(char *decoder) {
     int frame_number = *(int *)(decoder + 0x118);
     if (*(int *)(decoder + 0x120) != 0)
-        mpeg_report_error(decoder, D_0013BDC8);
+        mpeg_report_error(decoder, g_str_mpeg_finish_picture_error);
     else if (*(int *)(decoder + 0x174) == 3)
         mpeg_output_picture(decoder, *(int *)(decoder + 0x1BC), frame_number - 1);
     else

@@ -6,18 +6,18 @@ extern void func_L05_00418200(void *);
 extern void vec_clear_128(char *);
 extern unsigned int g_equipment_bits MACRO_ADDR;
 /* A pointer table whose slot 0 holds the active object (L30_003B3F70-g8.c also reads it as an array). */
-extern void *D_0018B650[] __attribute__((nosda));
+extern void *g_held_object_ptr[] __attribute__((nosda));
 extern char g_light_spot_sum[] MACRO_ADDR;
-extern char D_L05_001B3510[] MACRO_ADDR;
+extern char g_light_spot_position[] MACRO_ADDR;
 extern float g_light_spot_count;
 /* Model ids per equipment selector, one 4-entry table per D_001A7AF0 bit field. */
-extern short D_L05_001A8F70[] MACRO_ADDR;
-extern short D_L05_001A8F78[] MACRO_ADDR;
-extern short D_L05_001A8F80[] MACRO_ADDR;
-extern short D_L05_001A8F88[] MACRO_ADDR;
-extern short D_L05_001A8F90[] MACRO_ADDR;
-extern short D_L05_001A8F98[] MACRO_ADDR;
-extern short D_L05_001A8FA0[] MACRO_ADDR;
+extern short g_equipment_part_class_a[] MACRO_ADDR;
+extern short g_equipment_part_class_b[] MACRO_ADDR;
+extern short g_equipment_part_class_c[] MACRO_ADDR;
+extern short g_equipment_part_class_d[] MACRO_ADDR;
+extern short g_equipment_part_class_e[] MACRO_ADDR;
+extern short g_equipment_part_class_f[] MACRO_ADDR;
+extern short g_equipment_part_class_g[] MACRO_ADDR;
 extern char *equipment_spawn_part_moby(void *, float, int, int);
 extern char *CreateTransformClone(void *, float);
 extern int table_find_last_used_entry(int);
@@ -88,7 +88,7 @@ typedef struct {
 
 /* State 0 spawns the equipment parts chosen by the D_001A7AF0 selector bits; state 1 updates timers and the
  * position copy. */
-void func_PAL_L05_0041CA40(Obj_L05_00417D48 *o)
+void equipment_holder_update_pal(Obj_L05_00417D48 *o)
 {
     State_L05_00417D48 *st = o->pVar;
     int mode = o->state;
@@ -120,37 +120,37 @@ void func_PAL_L05_0041CA40(Obj_L05_00417D48 *o)
         o->modeBits |= 0x100;
         func_L05_00418200(o);
         vec_clear_128(g_light_spot_sum);
-        D_0018B650[0] = o;
+        g_held_object_ptr[0] = o;
         flags = g_equipment_bits & 3;
         g_light_spot_count = 0;
         o->modeBits |= 0x41;
-        st->f40 = equipment_spawn_part_moby(o, 0.05f, 0, D_L05_001A8F70[flags]);
+        st->f40 = equipment_spawn_part_moby(o, 0.05f, 0, g_equipment_part_class_a[flags]);
         if (st->f40) *(int *)(st->f40 + 0x98) = 0;
         flags = (g_equipment_bits >> 2) & 3;
-        id = D_L05_001A8F78[flags];
+        id = g_equipment_part_class_b[flags];
         st->f44 = equipment_spawn_part_moby(o, 0.05f, 0, id);
         st->f48 = equipment_spawn_part_moby(o, 0.05f, 1, id);
         if (st->f44) *(int *)(st->f44 + 0x98) = 0;
         if (st->f48) *(int *)(st->f48 + 0x98) = 0;
         flags = (g_equipment_bits >> 4) & 3;
-        st->f4C = equipment_spawn_part_moby(o, 0.05f, 0, D_L05_001A8F80[flags]);
+        st->f4C = equipment_spawn_part_moby(o, 0.05f, 0, g_equipment_part_class_c[flags]);
         if (st->f4C) *(int *)(st->f4C + 0x98) = 0;
         st->f50 = CreateTransformClone(o, 0.05f);
         flags = (g_equipment_bits >> 6) & 1;
-        id = D_L05_001A8F88[flags];
+        id = g_equipment_part_class_d[flags];
         st->fAC = equipment_spawn_part_moby(o, 0.05f, 0, id);
         st->f1F0 = equipment_spawn_part_moby(o, 0.05f, 1, id);
         if (st->fAC) *(int *)(st->fAC + 0x98) = 0;
         if (st->f1F0) *(int *)(st->f1F0 + 0x98) = 0;
         flags = (g_equipment_bits >> 9) & 1;
-        id = D_L05_001A8F98[flags];
+        id = g_equipment_part_class_f[flags];
         st->f1F4 = equipment_spawn_part_moby(o, 0.05f, 0, id);
         st->f1F8 = equipment_spawn_part_moby(o, 0.05f, 1, id);
         if (st->f1F4) *(int *)(st->f1F4 + 0x98) = 0;
         if (st->f1F8) *(int *)(st->f1F8 + 0x98) = 0;
         if (table_find_last_used_entry(3)) {
             flags = (g_equipment_bits >> 7) & 3;
-            id = D_L05_001A8F90[flags];
+            id = g_equipment_part_class_e[flags];
             if (id) {
                 st->f1FC = equipment_spawn_part_moby(o, 0.05f, 0, id);
                 st->f200 = equipment_spawn_part_moby(o, 0.05f, 1, id);
@@ -159,7 +159,7 @@ void func_PAL_L05_0041CA40(Obj_L05_00417D48 *o)
             }
         }
         flags = (g_equipment_bits >> 10) & 3;
-        id = D_L05_001A8FA0[flags];
+        id = g_equipment_part_class_g[flags];
         st->f204 = equipment_spawn_part_moby(o, 0.05f, 0, id);
         st->f208 = equipment_spawn_part_moby(o, 0.05f, 1, id);
         if (st->f204) *(int *)(st->f204 + 0x98) = 0;
@@ -184,7 +184,7 @@ void func_PAL_L05_0041CA40(Obj_L05_00417D48 *o)
         }
         if (!snd_is_voice_playing_for_owner(o, st->f30)) st->f30 = PlayMobySound(0, 4, o);
         wobbling_light_update(o);
-        qcopy(D_L05_001B3510, o->pos);
+        qcopy(g_light_spot_position, o->pos);
         load_forward_resident_address(o);
         break;
     }

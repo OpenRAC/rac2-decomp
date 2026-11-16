@@ -59,16 +59,16 @@ typedef struct {
 extern HazardPath *g_path_l17_table[];
 extern Moby *g_moby_l17_pool;
 extern Moby *D_L17_001B2C1C_1[] __attribute__((sda));
-extern int D_L17_001B2748 MACRO_ADDR;
-extern float D_L17_001AFCD0 __attribute__((sda)), D_L17_001AFCD4 __attribute__((sda));
-extern float D_L17_001AFCD8 __attribute__((sda)), D_L17_001AFCDC __attribute__((sda));
-extern float D_L17_001AFCE0 __attribute__((sda)), D_L17_001AFCE4 __attribute__((sda));
-extern float D_L17_001AFCE8 __attribute__((sda)), D_L17_001AFCEC __attribute__((sda));
-extern int D_L17_001AFCF0 __attribute__((sda));
+extern int g_flash_frame_counter MACRO_ADDR;
+extern float g_hazard_var24_a __attribute__((sda)), g_hazard_var20_a __attribute__((sda));
+extern float g_hazard_var28_a __attribute__((sda)), g_hazard_var10_a __attribute__((sda));
+extern float g_hazard_var24_b __attribute__((sda)), g_hazard_var20_b __attribute__((sda));
+extern float g_hazard_var28_b __attribute__((sda)), g_hazard_var10_b __attribute__((sda));
+extern int g_hazard_linked_flag __attribute__((sda));
 extern char g_hero_position[];
 extern SoundRecord g_sound_state[];
-extern char D_L17_001A8F20[] MACRO_ADDR;
-extern char D_L17_001AFCF8[], D_L17_001AFD28[];
+extern char g_effect_color_params[] MACRO_ADDR;
+extern char g_str_hazard_debug_a[], g_str_hazard_debug_b[];
 extern float vec_distance_xy(void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern float IntToFloat(int);
@@ -77,31 +77,31 @@ extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern void STUB_printf(const char *, ...);
 extern void moby_set_state(void *, int, int);
-extern int func_PAL_L17_003C07C0(void *);
-extern int func_PAL_L17_003C0A50(void *);
+extern int PlacePathFollowerChainAtStart_pal(void *);
+extern int UpdatePathFollowerChain_pal(void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int flag_set_first_pending(void *);
 extern int math_fast_float_d(int *);
-extern char *func_PAL_L00_003FB330(void *, float, int, int, int, int, int, int, int, int,
+extern char *SpawnExplosion_pal(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
-extern Moby *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
-extern void func_PAL_L00_003281C0(void *, int, float);
+extern Moby *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
+extern void part_spawn_scaled_bolts_pal(void *, int, float);
 extern void moby_mark_spawned(void *);
 
 /* Updates a path-linked hazard, its movement sound and its destruction effects. */
-void func_PAL_L17_003C0EA0(Moby *moby)
+void UpdatePathHazard_pal(Moby *moby)
 {
     HazardVars *vars = moby->vars;
     int flash;
     int color;
 
-    vars->x20 = moby->oClass == 0x8AD ? D_L17_001AFCD4 : D_L17_001AFCE4;
-    vars->x24 = moby->oClass == 0x8AD ? D_L17_001AFCD0 : D_L17_001AFCE0;
-    vars->x28 = moby->oClass == 0x8AD ? D_L17_001AFCD8 : D_L17_001AFCE8;
-    vars->x10 = moby->oClass == 0x8AD ? D_L17_001AFCDC : D_L17_001AFCEC;
+    vars->x20 = moby->oClass == 0x8AD ? g_hazard_var20_a : g_hazard_var20_b;
+    vars->x24 = moby->oClass == 0x8AD ? g_hazard_var24_a : g_hazard_var24_b;
+    vars->x28 = moby->oClass == 0x8AD ? g_hazard_var28_a : g_hazard_var28_b;
+    vars->x10 = moby->oClass == 0x8AD ? g_hazard_var10_a : g_hazard_var10_b;
 
-    flash = (D_L17_001B2748 + moby->uid) % 50 < 12;
+    flash = (g_flash_frame_counter + moby->uid) % 50 < 12;
     color = flash ? 0x80FFFFFF : 0x80404040;
     moby->color = color;
 
@@ -126,8 +126,8 @@ void func_PAL_L17_003C0EA0(Moby *moby)
         vars->sound = -1;
         vars->isLinked = 0;
         if (vars->path == -1 || g_path_l17_table[vars->path]->count < 2) {
-            STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
-            STUB_printf(D_L17_001AFD28);
+            STUB_printf(g_str_hazard_debug_a, moby->oClass, moby->uid);
+            STUB_printf(g_str_hazard_debug_b);
             moby_mark_spawned(moby);
             break;
         }
@@ -163,15 +163,15 @@ void func_PAL_L17_003C0EA0(Moby *moby)
         moby->state = 1;
         break;
     case 1:
-        func_PAL_L17_003C07C0(moby);
-        if (D_L17_001AFCF0 && !vars->isLinked)
+        PlacePathFollowerChainAtStart_pal(moby);
+        if (g_hazard_linked_flag && !vars->isLinked)
             moby->state = 2;
         else
             moby->state = 3;
         break;
     case 2:
-        if (D_L17_001AFCF0)
-            func_PAL_L17_003C0A50(moby);
+        if (g_hazard_linked_flag)
+            UpdatePathFollowerChain_pal(moby);
         if (part_find_owned_effect_slot(moby, 0x4010000, 1))
             moby_set_state(moby, 5, -1);
         moby->impactSlot = 0xFF;
@@ -199,21 +199,21 @@ void func_PAL_L17_003C0EA0(Moby *moby)
             float a, b;
             Moby *created;
             moby->updateDist = 1000000.0f;
-            func_PAL_L00_003FB330(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            SpawnExplosion_pal(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
-            func_PAL_002B15D8(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            func_PAL_002B15D8(moby, 11, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             a = math_random_float_range(-10.0f, 10.0f);
             b = math_random_float_range(20.0f, 30.0f);
-            created = func_PAL_002735D0(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
+            created = cam_moby_create_pal(moby, 2, 0x8AD, 2, pos, rot, g_effect_color_params, 255, a, b);
             if (created)
                 created->vars->sound = 0;
-            func_PAL_L00_003281C0(moby, 1, 0.0f);
+            part_spawn_scaled_bolts_pal(moby, 1, 0.0f);
             moby_mark_spawned(moby);
         } else {
             moby->updateDist = 1000000.0f;
-            func_PAL_L00_003FB330(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
-            func_PAL_002B15D8(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            func_PAL_L00_003281C0(moby, 1, 0.0f);
+            SpawnExplosion_pal(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            func_PAL_002B15D8(moby, 31, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_scaled_bolts_pal(moby, 1, 0.0f);
             moby_mark_spawned(moby);
         }
         break;

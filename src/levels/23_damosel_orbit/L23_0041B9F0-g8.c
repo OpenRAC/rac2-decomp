@@ -4,9 +4,9 @@ typedef int TI16 __attribute__((mode(TI)));
 /* The critical-edge profile preserves the shield pointer at both hit-path entries. */
 extern char *g_mothership_boss_moby __attribute__((sda));
 
-extern int D_L23_001B1694 __attribute__((sda));
+extern int g_charged_l23_blast_timer __attribute__((sda));
 
-extern TI16 D_L23_001B36E0;
+extern TI16 g_boss_effect_position;
 
 extern void FastVecAdd(char *, char *, char *);
 
@@ -18,17 +18,17 @@ extern void moby_mark_spawned(void *);
 
 
 /* the shield's two reach constants */
-extern float D_L23_001B16BC __attribute__((sda));
+extern float g_boss_gun_vec_scale_a __attribute__((sda));
 
-extern float D_L23_001B16C0 __attribute__((sda));
+extern float g_boss_gun_vec_scale_b __attribute__((sda));
 
 /* The section address model preserves retail's absolute scalar load through $at. */
-extern float D_L23_001B13CC MACRO_ADDR;
+extern float g_mothership_hit_damage_floor MACRO_ADDR;
 
 extern int g_hero_moby NOT_SDA;
 
 /* the hit-delay timer */
-extern int D_L23_001B3714;
+extern int g_boss_fight_timer;
 
 /* the camera block: its angle at +0x158 */
 typedef struct {
@@ -36,7 +36,7 @@ typedef struct {
     float f158;
 } Cam_0041B9F0;
 
-extern Cam_0041B9F0 D_L23_001BA500;
+extern Cam_0041B9F0 g_hero_l23_state_block;
 
 /* the player block */
 typedef struct {
@@ -102,17 +102,17 @@ void UpdateShieldHitsAndStrength(unsigned char *moby) {
     int i;
 
     boss_pick_strongest_generator();
-    math_fast_float_d(&D_L23_001B3714);
+    math_fast_float_d(&g_boss_fight_timer);
     if (*(int *)(st + 0x60C) == -1 && *(char **)(st + 0x610) == 0) {
-        FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+        FastVecScale(tmp, moby + 0xE0, g_boss_gun_vec_scale_a);
         FastVecAdd(tmp, tmp, moby + 0x10);
-        qcopy(&D_L23_001B36E0, tmp);
+        qcopy(&g_boss_effect_position, tmp);
         hit = part_find_owned_effect_slot(moby, 0x30000, 0);
         moby[0xA8] = 0xFF;
         FastDecTimer(st + 0x26);
         if (hit != 0) {
             if (*(short *)(st + 0x26) != 0 || *(int *)(st + 0x604) != 0
-                || (*(int *)(hit + 0x20) == g_hero_moby && D_L23_001B1694 < 0)) {
+                || (*(int *)(hit + 0x20) == g_hero_moby && g_charged_l23_blast_timer < 0)) {
                 hit = 0;
                 if (*(int *)(st + 0x604) != 0 && *(unsigned short *)(st + 0x26) == 0)
                     boss_start_fight_once();
@@ -127,7 +127,7 @@ void UpdateShieldHitsAndStrength(unsigned char *moby) {
                         char *child;
 
                         angle = FastAddRotations(math_random_signed_float_range(90.0f, 120.0f) * 0.017453294f,
-                                              D_L23_001BA500.f158);
+                                              g_hero_l23_state_block.f158);
                         speed = math_random_float_range(2.0f, 4.0f) * 0.016666668f;
                         vec[0] = math_fast_sin_or_cos_a(angle) * speed;
                         vec[1] = math_fast_sin_or_cos_b(angle) * speed;
@@ -164,23 +164,23 @@ void UpdateShieldHitsAndStrength(unsigned char *moby) {
             int k;
 
             moby_transform_joint_point(moby, *(int *)(st + 0x60C) + 1, mtx);
-            FastVecScale(tmp, (char *)(mtx + 4), D_L23_001B16C0);
+            FastVecScale(tmp, (char *)(mtx + 4), g_boss_gun_vec_scale_b);
             FastVecAdd(tmp, tmp, moby + 0x10);
-            qcopy(&D_L23_001B36E0, tmp);
+            qcopy(&g_boss_effect_position, tmp);
             for (k = 0; k < 5; k++) {
                 char *gen = ((char **)(st + 0x358))[k];
 
                 if (gen != 0) {
                     float v = *(float *)(*(char **)(gen + 0x68) + 0x20);
 
-                    if (D_L23_001B13CC < v)
+                    if (g_mothership_hit_damage_floor < v)
                         total += v;
                 }
             }
         } else {
-            FastVecScale(tmp, moby + 0xE0, D_L23_001B16BC);
+            FastVecScale(tmp, moby + 0xE0, g_boss_gun_vec_scale_a);
             FastVecAdd(tmp, tmp, moby + 0x10);
-            qcopy(&D_L23_001B36E0, tmp);
+            qcopy(&g_boss_effect_position, tmp);
         }
         held = *(char **)(st + 0x610);
         if (held != 0) {

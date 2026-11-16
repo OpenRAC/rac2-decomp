@@ -3,39 +3,39 @@
 
 /* func_PAL_002D6058, the PAL copy of func_002D5480: the same C, where the object offset 0x3BE08
    becomes 0x3C210 and the callees are PAL's own. */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_clear_counter(void);
-extern void func_PAL_003435C0(char *, char *, char *, char *);
+extern void tab_menu_set_tables_pal(char *, char *, char *, char *);
 extern void func_PAL_00343690(char *, int);
-extern char D_002615F8[], D_00261698[], D_00261750[];
+extern char g_extras_tab_table_a[], g_extras_tab_table_b[], g_extras_tab_table_c[];
 
 int func_PAL_002D6058(void)
 {
     menu_clear_counter();
-    if (D_001A8CFC[0] != 0) {
-        func_PAL_003435C0(D_001A8CFC[0] + 0x3C210, D_002615F8, D_00261698, D_00261750);
-        func_PAL_00343690(D_001A8CFC[0] + 0x3C210, 1);
+    if (g_resident_data_base[0] != 0) {
+        tab_menu_set_tables_pal(g_resident_data_base[0] + 0x3C210, g_extras_tab_table_a, g_extras_tab_table_b, g_extras_tab_table_c);
+        func_PAL_00343690(g_resident_data_base[0] + 0x3C210, 1);
     }
     return 0;
 }
 
 /* func_PAL_002D60C8, the PAL copy of func_L00_0034E950: the same C, calling PAL's func_PAL_0029D8A0. */
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_PAL_0029D8A0(int);
 
 int func_PAL_002D60C8(void)
 {
-    func_PAL_0029D8A0(D_00138344);
+    func_PAL_0029D8A0(g_menu_input_flags);
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029CF08(int);
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029CF08(int);
 
-int func_PAL_002D60F0(void) {
-    func_0029CF08(D_00138344);
+int menu_handle_buttons_pal(void) {
+    func_0029CF08(g_menu_input_flags);
     return 0;
 }
 
@@ -65,16 +65,16 @@ int func_PAL_002D62F0(void)
 }
 
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_set_value(char *, int);
-extern void func_PAL_00343F18(char *, char *);
-extern char D_00261540[];
+extern void list_menu_set_records_pal(char *, char *);
+extern char g_list_menu_records_first[];
 
 int func_PAL_002D6320(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        menu_set_value(D_001A8CFC[0] + 0x3EA78, 1);
-        func_PAL_00343F18(D_001A8CFC[0] + 0x3EA78, D_00261540);
+    if (g_resident_data_base[0] != 0) {
+        menu_set_value(g_resident_data_base[0] + 0x3EA78, 1);
+        list_menu_set_records_pal(g_resident_data_base[0] + 0x3EA78, g_list_menu_records_first);
     }
     return 0;
 }
@@ -93,15 +93,15 @@ int func_PAL_002D6448(void)
 
 
 extern void list_menu_set_enabled(char *, int);
-extern void func_PAL_003443E8(char *, char *);
+extern void list_menu_set_record_table_pal(char *, char *);
 
-extern char D_PAL_00261330[];
+extern char g_ui_object_data[];
 
 int func_PAL_002D6478(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        list_menu_set_enabled(D_001A8CFC[0] + 0x3E810, 1);
-        func_PAL_003443E8(D_001A8CFC[0] + 0x3E810, D_PAL_00261330);
+    if (g_resident_data_base[0] != 0) {
+        list_menu_set_enabled(g_resident_data_base[0] + 0x3E810, 1);
+        list_menu_set_record_table_pal(g_resident_data_base[0] + 0x3E810, g_ui_object_data);
     }
     return 0;
 }
@@ -118,7 +118,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CED8(void);
 
-long long func_PAL_002D64F8(void)
+long long menu_page_draw_gif_pal(void)
 {
     SetupGifPaging(0);
     func_0029CED8();
@@ -126,10 +126,10 @@ long long func_PAL_002D64F8(void)
     return 0;
 }
 
-extern int D_001C51D4;
+extern int g_menu_choice;
 
 int func_PAL_002D6528(void) {
-    D_001C51D4 = -1;
+    g_menu_choice = -1;
     return 0;
 }
 
@@ -137,8 +137,8 @@ int func_PAL_002D6528(void) {
 
 extern char g_pause_menu_state[];
 extern int g_current_map_index __attribute__((sda));
-extern volatile unsigned char D_001A7C01 __attribute__((sda));
-extern int D_001C51D0;
+extern volatile unsigned char g_mission_active_flag __attribute__((sda));
+extern int g_selected_map_index;
 extern int g_map_overlay_state[];
 extern void FadeToBlack(int);
 extern void menu_set_pause_scale_inverse(float);
@@ -153,7 +153,7 @@ extern int stub_empty_24(void);
 int func_PAL_002D6548(void)
 {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         char *root;
         int value;
@@ -175,13 +175,13 @@ int func_PAL_002D6548(void)
         result = 0;
     } else if (flags & 0xD00) {
         result = 1;
-        D_001C51D0 = g_current_map_index;
+        g_selected_map_index = g_current_map_index;
     } else if (flags & 0x40) {
         int *base = g_map_overlay_state;
         if (g_current_map_index != base[0x230 / 4]) {
             result = 1;
             snd_play_from_global_bank(4, 0, 0);
-            if (base[0x230 / 4] != 0 && D_001A7C01 == 0 && base[0x230 / 4] == 2) {
+            if (base[0x230 / 4] != 0 && g_mission_active_flag == 0 && base[0x230 / 4] == 2) {
                 request_begin_slot(6, 2, 1, 0x19, 0);
             } else if (stub_empty_24() && stub_empty_25()) {
                 data_set_small_value_and_refresh(g_map_overlay_state[0x230 / 4], 1);
@@ -203,7 +203,7 @@ finish:
 
 extern void func_0029CB20(void);
 
-int func_PAL_002D66E0(void) {
+int menu_page_draw_second_pal(void) {
     SetupGifPaging(0);
     func_0029CB20();
     DoGifPaging();
@@ -235,9 +235,9 @@ typedef struct {
     int f104;
 } Func002D5B58Root;
 extern int g_save_menu_flags __attribute__((sda));
-extern char D_001A7BB4 __attribute__((sda));
-extern int D_001C1220[];
-extern int D_001F29A0;
+extern char g_language __attribute__((sda));
+extern int g_map_targets[];
+extern int g_message_panel_flags;
 extern void *D_0026CD60[];
 extern void menu_clear_confirm_pending(void);
 extern void settings_store_four(int, int, int, int);
@@ -264,21 +264,21 @@ L4:
     snd_play_from_global_bank(4, 0, 0);
     menu_clear_confirm_pending();
     g_save_menu_flags = (g_save_menu_flags | 2) & ~4;
-    D_001F29A0 = 0;
+    g_message_panel_flags = 0;
     request_begin_slot(4, 1, 1, value, 0);
     goto done;
 L5:
     snd_play_from_global_bank(4, 0, 0);
     g_save_menu_flags = (g_save_menu_flags | 4) & ~2;
     request_begin_slot(4, 1, 1, value, 0);
-    D_001F29A0 = 1;
+    g_message_panel_flags = 1;
     goto done;
 L6: {
     Func002D5B58Root *root;
     int index = value >> 16;
     if (index != 0) {
         Func002D5B58Root *first = (Func002D5B58Root *)g_pause_menu_state;
-        first->fFC = D_001C1220[index];
+        first->fFC = g_map_targets[index];
     }
     root = (Func002D5B58Root *)g_pause_menu_state;
     root->f100 = root->f14;
@@ -332,7 +332,7 @@ L11: {
     goto done;
 }
 L9:
-    D_001A7BB4 = value;
+    g_language = value;
     ret = 1;
     *result = 0;
     goto done;

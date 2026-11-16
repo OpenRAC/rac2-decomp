@@ -11,7 +11,7 @@ extern void moby_mark_spawned(char *object);
 
 /* func_L20_00449FD0 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
 
-void func_PAL_L20_0044FD80(char *arg0, char *arg1) {
+void projectile_explode_pal(char *arg0, char *arg1) {
     SpawnExplosion(arg0 + 0x10, 0, 5, 4, 4, 4, 7, 0, 0.333f, 20.0f, 0, 0, 0, 0);
     if (arg1 != 0) {
         coll_sweep_from_object(*(char **)(arg0 + 0xB8), arg0 + 0x10, (int)arg1, 0, 1.5f,
@@ -38,7 +38,7 @@ extern void snd_stop_voice(int);
 
 /* func_L20_0044AA88 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */
 
-void func_PAL_L20_004507E0(char *arg0) {
+void turret_death_burst_pal(char *arg0) {
     union {
         TI128 q;
         float f[4];

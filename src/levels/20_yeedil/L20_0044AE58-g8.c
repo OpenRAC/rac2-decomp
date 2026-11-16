@@ -11,13 +11,13 @@
  * The contact vector is an array, so its address is a constant that reload
  * rematerialises at every use (addiu ...,$sp,0x20), and it takes the first stack slot. */
 
-extern int D_L20_001A8F00;
+extern int g_hero_vehicle_mode;
 
-extern int D_L20_001C0418 NOT_SDA;
+extern int g_hit_l20_result NOT_SDA;
 
-extern float D_L20_001B2468 __attribute__((sda));
+extern float g_homing_shot_radius __attribute__((sda));
 
-extern int D_L20_001B2460 __attribute__((sda));
+extern int g_homing_shot_trail_param __attribute__((sda));
 
 extern void moby_mark_spawned(void *object);
 
@@ -61,7 +61,7 @@ void homing_l20_shot_update(char *moby) {
     float spark_scratch[4] __attribute__((aligned(16)));
     u8 mode;
 
-    if (D_L20_001A8F00 == 2) {
+    if (g_hero_vehicle_mode == 2) {
         moby_mark_spawned(moby);
         return;
     }
@@ -84,8 +84,8 @@ void homing_l20_shot_update(char *moby) {
                       *(float *)(state + 0x30));
         ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
         FastVecAdd(new_pos, base, step);
-        if (coll_test_point(new_pos, 0, moby, D_L20_001B2468) != 0) {
-            int id = D_L20_001C0418;
+        if (coll_test_point(new_pos, 0, moby, g_homing_shot_radius) != 0) {
+            int id = g_hit_l20_result;
 
             if (id != 0 && id != *(int *)(moby + 0xB8)) {
                 moby_set_state(moby, 1, -1);
@@ -98,7 +98,7 @@ void homing_l20_shot_update(char *moby) {
         start_size = math_random_float_range(2.5f, 3.0f) * 210000.0f;
         end_size = math_random_float_range(0.2f, 0.4f) * 210000.0f;
         part_spawn_gravity_fade(moby + 0x10, spark_velocity, start_size, end_size, 0.0f, 0xF,
-                      D_L20_001B2460, 3, 0x50, 0, 0);
+                      g_homing_shot_trail_param, 3, 0x50, 0, 0);
     } break;
     case 1: {
         char *base;

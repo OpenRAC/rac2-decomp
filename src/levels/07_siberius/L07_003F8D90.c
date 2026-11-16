@@ -14,10 +14,10 @@ extern void value_set_and_smooth(void *, void *, s32, s32, f32);
 extern void moby_update_eased_node(void *, void *, s32, f32, f32);
 extern f32 vec_length_xy(void *);
 extern void FastVecScale(void *, void *, f32);
-extern f32 D_L07_001B1100[4] __attribute__((sda));
-extern f32 D_L07_001B10F0[4] __attribute__((sda));
-extern f32 D_L07_001B1110 __attribute__((sda));
-extern f32 D_L07_001B1114 __attribute__((sda));
+extern f32 g_gun_muzzle_offset[4] __attribute__((sda));
+extern f32 g_gun_aim_vector[4] __attribute__((sda));
+extern f32 g_gun_pitch_limit __attribute__((sda));
+extern f32 g_gun_aim_pitch_scale __attribute__((sda));
 /* Updates a Siberius gun enemy: turns its body and head joints to face the player within limits. */
 void siberius_gun_update_aim(u8 *moby)
 {
@@ -29,7 +29,7 @@ void siberius_gun_update_aim(u8 *moby)
     if (moby[0x95] < 2) hud_start_overlay(6, 0, *(f32 *)(vars + 0x20) / IntToFloat(*(s16 *)(vars + 0x24)));
     (*(u16 *)(moby + 0x96))++;
     math_fast_float_d(vars + 0x42C);
-    matrix_mul_vec3(pos, D_L07_001B1100, moby + 0xC0);
+    matrix_mul_vec3(pos, g_gun_muzzle_offset, moby + 0xC0);
     FastVecAdd(pos, pos, moby + 0x10);
     FastVecSub(delta, vars + 0x140, pos);
     vec_transform_by_object_or_given(moby, delta, delta, 0);
@@ -41,11 +41,11 @@ void siberius_gun_update_aim(u8 *moby)
     *(f32 *)(vars + 0x3C8) = angle * 0.5f;
     moby_update_eased_node(moby, vars + 0x360, 2, 0.03f, 0.3f);
     if ((u32)(moby[0x43] - 2) < 2) {
-        pitch = mat_fast_helper_a(vec_length_xy(delta), delta[2]) * D_L07_001B1114;
-        limit = D_L07_001B1110 * 0.0174532942f;
+        pitch = mat_fast_helper_a(vec_length_xy(delta), delta[2]) * g_gun_aim_pitch_scale;
+        limit = g_gun_pitch_limit * 0.0174532942f;
         if (pitch > limit) pitch = limit;
         else if (pitch < -limit) pitch = -limit;
-        FastVecScale(vars + 0x340, D_L07_001B10F0, pitch);
+        FastVecScale(vars + 0x340, g_gun_aim_vector, pitch);
         *(f32 *)(vars + 0x2C8) = angle * 0.5f;
     }
     moby_update_eased_node(moby, vars + 0x2E0, 3, 0.03f, 0.3f);

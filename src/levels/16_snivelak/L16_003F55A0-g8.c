@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
-extern int D_L16_001B10E0 __attribute__((sda));
+extern int g_burst_count __attribute__((sda));
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
@@ -20,7 +20,7 @@ void part_spawn_random_bursts_outside_box(char *object)
     float direction[4];
     int i;
     float scale;
-    for (i = 0; i < D_L16_001B10E0; ++i) {
+    for (i = 0; i < g_burst_count; ++i) {
         *(Quadword *)random = 0;
         random[0] = math_random_signed_float_range(0.0f, 26.0f);
         random[1] = math_random_signed_float_range(0.0f, 8.0f);

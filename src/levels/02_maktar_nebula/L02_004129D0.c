@@ -16,15 +16,15 @@ typedef struct { float f[2]; } BeamWidths;
 typedef struct { u8 b[2]; } BeamLayers;
 typedef struct { u32 rgba[2]; } BeamColours;
 
-extern const SparkRange D_L02_001B1C10;
-extern const SparkSizes D_L02_001B1C20;
-extern const SparkColours D_L02_001B1C28;
-extern const SparkKinds D_L02_001B1C30;
-extern const BeamWidths D_L02_001B1C38;
-extern const BeamLayers D_L02_001B1C40;
-extern const BeamColours D_L02_001B1C48;
-extern u8 *D_L02_001B368C __attribute__((sda));
-extern s32 D_L02_001A8F00 __attribute__((sda));
+extern const SparkRange g_spark_l02_range_2;
+extern const SparkSizes g_spark_sizes;
+extern const SparkColours g_spark_colours;
+extern const SparkKinds g_spark_kinds;
+extern const BeamWidths g_beam_widths;
+extern const BeamLayers g_beam_layers;
+extern const BeamColours g_beam_colours;
+extern u8 *g_matrix_l02_record_table __attribute__((sda));
+extern s32 g_arena_state_words __attribute__((sda));
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -51,13 +51,13 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
    segment, falling at a speed drawn between the last two range words. */
 /* Draws a wavy glowing beam from the object to a target object and throws off sparks along it. */
 void DrawWavyBeamToTarget(u8 *moby) {
-    SparkRange range = D_L02_001B1C10;
-    SparkSizes sizes = D_L02_001B1C20;
-    SparkColours colours = D_L02_001B1C28;
-    SparkKinds kinds = D_L02_001B1C30;
-    BeamWidths widths = D_L02_001B1C38;
-    BeamLayers layers = D_L02_001B1C40;
-    BeamColours beam = D_L02_001B1C48;
+    SparkRange range = g_spark_l02_range_2;
+    SparkSizes sizes = g_spark_sizes;
+    SparkColours colours = g_spark_colours;
+    SparkKinds kinds = g_spark_kinds;
+    BeamWidths widths = g_beam_widths;
+    BeamLayers layers = g_beam_layers;
+    BeamColours beam = g_beam_colours;
     Vec4 pts[13] __attribute__((aligned(16)));
     Vec4 delta __attribute__((aligned(16)));
     Vec4 front __attribute__((aligned(16)));
@@ -81,7 +81,7 @@ void DrawWavyBeamToTarget(u8 *moby) {
     state = *(u8 **)(moby + 0x68);
     matrix_mul_vec3(&front, &front, moby + 0xC0);
     FastVecAdd(&front, &front, moby + 0x10);
-    FastVecSub(&delta, D_L02_001B368C + (*(s32 *)state << 7) + 0x30, &front);
+    FastVecSub(&delta, g_matrix_l02_record_table + (*(s32 *)state << 7) + 0x30, &front);
     FastVecScale(&delta, &delta, amp / IntToFloat(12));
     qcopy(&pts[0], &front);
     for (i = 0; i < 12; i++) {
@@ -103,7 +103,7 @@ void DrawWavyBeamToTarget(u8 *moby) {
     col1 = FastTweenColor(beam.rgba[1] & 0xFFFFFF, beam.rgba[1], *(float *)(state + 0xC));
     DrawTwoLayerPolylineRibbon(pts, layers.b[0], layers.b[1], 13, col0, col1, widths.f[0], widths.f[1],
                       *(float *)(state + 0x10));
-    if (D_L02_001A8F00 == 0) {
+    if (g_arena_state_words == 0) {
         qzero_nc(&vel);
         seg = math_random_int_below(12);
         t = math_random_float_range(0.0f, 1.0f);

@@ -15,7 +15,7 @@ extern unsigned char *part_spawn_drifting(Vector *, float *, int, float, float);
 extern unsigned char *func_PAL_002C0838(Vector *, Vector *, int, int);
 
 /* Emit ground dust and scattered debris around the resident player's position. */
-void func_PAL_L00_002AAAC8(int dust, int debris, int model) {
+void part_emit_hero_dust_and_debris_pal(int dust, int debris, int model) {
     Vector velocity;
     Vector position;
     float angle, radius, size;

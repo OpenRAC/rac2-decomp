@@ -10,8 +10,8 @@ extern float math_random_float_range(float, float);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void DrawDoubleLayerQuadMesh(void);
 
-extern int D_L26_001A8FF0;
-extern float D_L26_001B0660 __attribute__((sda));
+extern int g_hero_tether_enabled;
+extern float g_flicker_rate __attribute__((sda));
 
 typedef struct { float f[2]; float g[2]; } Counters;
 
@@ -31,12 +31,12 @@ void quad_flicker_update(char *moby) {
         *(float *)(vars + 4) = 0.5f;
         break;
     case 1:
-        if (D_L26_001A8FF0 != 0) {
+        if (g_hero_tether_enabled != 0) {
             for (i = 0; i < 2; i = next) {
                 float value;
 
                 next = i + 1;
-                value = ((Counters *)vars)->f[i] + D_L26_001B0660 * 0.016666667f;
+                value = ((Counters *)vars)->f[i] + g_flicker_rate * 0.016666667f;
                 ((Counters *)vars)->f[i] = value;
                 if (1.0f < value) {
                     value = value - 1.0f;

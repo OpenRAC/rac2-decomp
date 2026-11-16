@@ -15,17 +15,17 @@ typedef float f32;
 
 typedef unsigned int u32;
 
-extern void D_00115E38(char *assertion, int line, char *file);
+extern void g_assert_fail(char *assertion, int line, char *file);
 
-extern char D_L00_001ADDD8[];
+extern char g_str_pool_cell_file[];
 
-extern char D_L00_001ADDF8[];
+extern char g_str_pool_init_message[];
 
 typedef struct { unsigned int f0, f4, f8, f12, f16, f20; } T;
 
 extern char D_L00_001ADDD8_1[];
 
-extern char D_L00_001ADE20[];
+extern char g_str_pool_alloc_message[];
 
 extern void D_00115E38_1(char *a0, int a1, char *a2);
 
@@ -54,8 +54,8 @@ typedef struct {
 } TextBox;
 
 extern int sprintf(char *, char *, ...); /* formats into a buffer */
-extern char D_001ADB58[], D_001ADB68[], D_001ADB78[], D_001ADB90[];
-extern char D_001ADBB0[], D_001ADBB8[], D_001ADBC8[];
+extern char g_str_framed_box_fmt_single_spaced[], g_str_framed_box_fmt_double_spaced[], g_str_framed_box_fmt_single_plain[], g_str_framed_box_fmt_double_plain[];
+extern char g_str_framed_box_fmt_single_short[], g_str_framed_box_fmt_double_short[], g_str_string_format[];
 extern int g_screen_width[] __attribute__((sda)); /* screen size: [1] = height */
 extern void text_draw_window_small(unsigned short *layout, unsigned long style, unsigned char *text, int length);
 extern void text_draw_window_medium(unsigned short *layout, unsigned long style, unsigned char *text, int length);
@@ -175,7 +175,7 @@ void *ui_return_self(void *self) {
 void pool_init_cells(int *pool, unsigned int cellSize, int memory, int capacity)
 {
     if (cellSize < 4)
-        D_00115E38(D_L00_001ADDD8, 37, D_L00_001ADDF8);
+        g_assert_fail(g_str_pool_cell_file, 37, g_str_pool_init_message);
     pool[1] = capacity;
     pool[2] = cellSize;
     pool[4] = 0;
@@ -204,7 +204,7 @@ void *pool_alloc_cell(T *pool)
     cellSize = pool->f8;
     if (pool->f4 < used + cellSize)
     {
-        D_00115E38_1(D_L00_001ADDD8_1, 83, D_L00_001ADE20);
+        D_00115E38_1(D_L00_001ADDD8_1, 83, g_str_pool_alloc_message);
         return 0;
     }
     cell = (void *)(pool->f0 + used);
@@ -245,9 +245,9 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern void object_set_helper_result(void *, int, int);
 extern void object_set_value_float(void *, float);
 extern void *memset(void *, int, unsigned int); /* memset */
-extern char D_001ADB40[]; /* "aTxBrack" */
-extern char D_001ADB50[]; /* "aTxTop" */
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char g_str_text_bracket_name[]; /* "aTxBrack" */
+extern char g_str_text_top_name[]; /* "aTxTop" */
+extern char *g_resident_data_base[] __attribute__((sda));
 
 /* Initialises a text panel: clears its state and, when a pool is given, takes four 16-byte
    cells from it with func_00336E40/func_00336DA8 (255,108 / colour 0x60442D00 / two cleared
@@ -303,13 +303,13 @@ void text_panel_init(char *panel, void *pool)
     }
     bracket = panel + 0x10;
     top = panel + 0x5C;
-    object_init_derived_arrays(bracket, D_001ADB40, pool);
-    object_set_helper_result(bracket, (int)(D_001A8CFC[0] + 0x8710), 0x57);
+    object_init_derived_arrays(bracket, g_str_text_bracket_name, pool);
+    object_set_helper_result(bracket, (int)(g_resident_data_base[0] + 0x8710), 0x57);
     object_set_value_float(bracket, 0.02f);
     object_set_flag_value(bracket, 1);
     *object_get_fourth_field(bracket) = 0x55F0C070;
-    object_init_derived_arrays(top, D_001ADB50, pool);
-    object_set_helper_result(top, (int)(D_001A8CFC[0] + 0x8710), 0x58);
+    object_init_derived_arrays(top, g_str_text_top_name, pool);
+    object_set_helper_result(top, (int)(g_resident_data_base[0] + 0x8710), 0x58);
     object_set_flag_value(top, 1);
     *object_get_fourth_field(top) = 0x55F0C070;
     **(int **)(panel + 12) = 0x80F0F0F0;
@@ -410,18 +410,18 @@ void text_draw_framed_box(void *object, short *box, int style, char *text, int m
     if (first) {
         if (second) {
             if (third) {
-                if (single) sprintf(buffer, D_001ADB58, text, 1, first, 1, second);
-                else sprintf(buffer, D_001ADB68, text, 1, 1, first, 1, second);
+                if (single) sprintf(buffer, g_str_framed_box_fmt_single_spaced, text, 1, first, 1, second);
+                else sprintf(buffer, g_str_framed_box_fmt_double_spaced, text, 1, 1, first, 1, second);
             } else {
-                if (single) sprintf(buffer, D_001ADB78, text, 1, first, second);
-                else sprintf(buffer, D_001ADB90, text, 1, 1, first, second);
+                if (single) sprintf(buffer, g_str_framed_box_fmt_single_plain, text, 1, first, second);
+                else sprintf(buffer, g_str_framed_box_fmt_double_plain, text, 1, 1, first, second);
             }
         } else {
-            if (single) sprintf(buffer, D_001ADBB0, text, 1, first);
-            else sprintf(buffer, D_001ADBB8, text, 1, 1, first);
+            if (single) sprintf(buffer, g_str_framed_box_fmt_single_short, text, 1, first);
+            else sprintf(buffer, g_str_framed_box_fmt_double_short, text, 1, 1, first);
         }
     } else {
-        sprintf(buffer, D_001ADBC8, text);
+        sprintf(buffer, g_str_string_format, text);
     }
     box[9] |= 4;
     switch (mode) {
@@ -467,7 +467,7 @@ typedef struct {
     char pad[0xB0];
     float fB0;
 } ViewState;
-extern ViewState D_001B9040;
+extern ViewState g_view_params;
 extern void UpdateViewContext(void);
 extern int object_get_stored_counter(void);
 extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, float, float, float);
@@ -481,8 +481,8 @@ void text_box_draw_frame(char *obj, unsigned int alpha, unsigned int color, floa
     ViewState *view;
     float saved, scale, uv, insetRight, insetLeft, border;
 
-    if (D_001A8CFC[0]) {
-        view = &D_001B9040;
+    if (g_resident_data_base[0]) {
+        view = &g_view_params;
         scale = 1.0f;
         saved = view->fB0;
         view->fB0 = 0.62f;

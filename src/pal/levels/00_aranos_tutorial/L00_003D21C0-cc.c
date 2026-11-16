@@ -91,7 +91,7 @@ typedef struct {
     ctx->child->animationData = 0
 
 /* Moves the lift between its two heights and updates its child and looping sound. */
-void func_PAL_L00_003D21C0(LiftObject *obj) {
+void UpdateAranosLift_pal(LiftObject *obj) {
     struct { Vec old, rotation, delta; } frame;
     LiftContext *ctx = obj->context;
     LiftObject *child;

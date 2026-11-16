@@ -81,7 +81,7 @@ extern f32 FastVecDot(void *, void *);
 extern f32 math_fast_angle_helper(f32);
 extern f32 FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern u8 D_L10_001B9680[];
+extern u8 g_view_origin_vec[];
 
 extern u32 *func_0037BA88(u8 *arg0);
 extern s32 func_003351C0(s32 mode);
@@ -126,14 +126,14 @@ extern void func_0037D7A0(u8 *a0, s32 a1, f32 f12);
 extern s32 func_0037D6E0(u8 *a0);
 extern void func_0037D528(u8 *a0);
 
-extern u8 *D_L10_0020B1E0[];
-extern u8 *D_001B251C;
-extern u8 D_L10_00265BA0[];
-extern u8 D_L10_00188660[];
-extern u8 D_L10_00221CD0[];
+extern u8 *g_unused_pointer_table[];
+extern u8 *g_moby_pool_base;
+extern u8 g_group_state_buffer[];
+extern u8 g_effect_l10_record_table[];
+extern u8 g_mission_state[];
 extern u8 g_sound_state[];
-extern s32 D_001B0F44 __attribute__((sda));
-extern s32 D_001B0F48 __attribute__((sda));
+extern s32 g_unused_sda_word_a __attribute__((sda));
+extern s32 g_unused_sda_word_b __attribute__((sda));
 
 
 /* func_L10_003170D0 is in L10_003170D0-scene-g8.c. */
@@ -396,7 +396,7 @@ void hanging_object_aim_joints(u8 *moby) {
     if (fast_vec_dist(matrix_a+12, *(u8 **)(hero_info+0x120)+0x10) <= 24.0f)
         qcopy(aim_dir, state);
     else {
-        FastVecSub((u8 *)aim_dir,D_L10_001B9680,(u8 *)(matrix_a+12));
+        FastVecSub((u8 *)aim_dir,g_view_origin_vec,(u8 *)(matrix_a+12));
         qcopy(state, aim_dir);
     }
     dot_value = FastVecDot(aim_dir,y_axis);
@@ -407,7 +407,7 @@ void hanging_object_aim_joints(u8 *moby) {
     if (FastVecDot(aim_dir,z_axis)>0.0f) angle=-angle;
     FastVecScale(manip_a+0x10,(u8 *)quat_a,math_fast_sin_or_cos_b(angle));
     *(f32 *)(manip_a+0x1C)=math_fast_sin_or_cos_a(angle);
-    FastVecSub((u8 *)aim_dir,D_L10_001B9680,(u8 *)(matrix_b+12));
+    FastVecSub((u8 *)aim_dir,g_view_origin_vec,(u8 *)(matrix_b+12));
     dot_value = FastVecDot(aim_dir,y_axis);
     FastVecScale((u8 *)temp,(u8 *)y_axis,dot_value);
     FastVecSub((u8 *)aim_dir,(u8 *)aim_dir,(u8 *)temp);
@@ -479,7 +479,7 @@ void snd_stop_moby_effect(u8 *moby) {
     s32 effect_id = *(s32 *)(vars + 0x26C);
 
     if (effect_id != -1) {
-        u8 *record = D_L10_00188660 + effect_id * 0x70;
+        u8 *record = g_effect_l10_record_table + effect_id * 0x70;
 
         if (*(u8 **)(record + 0x88) == moby && *(u8 *)(record + 0x74) != 0)
             func_00373410(effect_id);
@@ -491,7 +491,7 @@ extern f32 math_random_float_range(f32, f32);
 extern f32 math_random_angle(void);
 extern void vec_build_spherical_offset(void *, f32, f32, f32);
 extern void FastVecAdd(void *, void *, void *);
-extern u8 *D_001B2614 __attribute__((sda));
+extern u8 *g_spot_record_table __attribute__((sda));
 
 /* Sets up a small flying piece: puts it at a random spot around the chosen marker. */
 void hrugis_init_flying_piece(u8 *moby) {
@@ -503,7 +503,7 @@ void hrugis_init_flying_piece(u8 *moby) {
     *(u16 *)(moby + 0x34) |= 0x100;
     *(s32 *)((u8 *)func_0037BA88(moby) + 0x148) = 10;
     func_0037CCB0(moby, 1);
-    spot = D_001B2614 + *(s32 *)D_L10_00221CD0 * 128;
+    spot = g_spot_record_table + *(s32 *)g_mission_state * 128;
     *(s32 *)(vars + 0x26C) = -1;
     *(f32 *)(vars + 0x180) = 10.0f;
     *(s32 *)(vars + 0x268) = 0;
@@ -531,13 +531,13 @@ void hrugis_start_timed_effect(u8 *moby) {
 }
 
 
-extern u32 D_L10_001FB1E0[];
+extern u32 g_group_moby_id_lists[];
 extern u8 *D_001B251C_base[] __asm__("D_001B251C") __attribute__((sda));
 
 /* Sets every moby in the group to state 2. */
 void hrugis_set_group_states(u8 *group)
 {
-    u32 id_list = D_L10_001FB1E0[group[0x21]];
+    u32 id_list = g_group_moby_id_lists[group[0x21]];
     s16 *id_ptr;
     u8 *member;
 

@@ -8,7 +8,7 @@ extern void SetDeathBits(u8 *, s32, s32);
 extern s32 moby_run_slot_handler(s32, s32, s32);
 extern s32 weapon_select_aim_target(u8 *, s32, void *, s32, float, float);
 extern void protopet_set_ready_flag(u8 *);
-extern s32 D_0018C0B4;
+extern s32 g_game_mode;
 /* Checks if the Protopet was hit or lost its target, and switches its state when needed. */
 void protopet_check_hit_target(u8 *object)
 {
@@ -47,5 +47,5 @@ stop:
     }
     *(s32 *)(state + 0x248) = weapon_select_aim_target(object, *(s32 *)(state + 0x240), 0, 0, *(float *)(state + 0x244), 0.0f);
     if (*(u8 **)(state + 0x258)) protopet_set_ready_flag(*(u8 **)(state + 0x258));
-    if (D_0018C0B4 == 0x6F && (u32)(object[0x20] - 9) < 4) moby_set_state(object, 6, -1);
+    if (g_game_mode == 0x6F && (u32)(object[0x20] - 9) < 4) moby_set_state(object, 6, -1);
 }

@@ -21,10 +21,10 @@ typedef struct {
 extern TetherHero g_hero_state;
 /* The moby fields set at spawn (RAC1 struct Moby: state, update_dist, visible, draw_dist). */
 typedef struct { char pad00[0x20]; u8 state; char pad21[0xF]; u8 updateDist; u8 visible; s16 drawDist; } TetherActor;
-extern int D_L00_001B1BE8[] __attribute__((sda)), D_L00_001B1A4C[] __attribute__((sda));
-extern int D_L00_001A8FF0;
-extern float D_L00_001AF0E4 __attribute__((sda));
-extern float D_L00_001BF220[4];
+extern int g_cinematic_phase_flag[] __attribute__((sda)), g_visibomb_phase_flag[] __attribute__((sda));
+extern int g_hero_locked_flag;
+extern float g_visibomb_min_speed __attribute__((sda));
+extern float g_hero_l00_position[4];
 extern char *CreateMoby(int);
 extern char *moby_get_private_value_2(u8 *);
 extern float FastVecLength(void *);
@@ -45,13 +45,13 @@ char *visibomb_create_missile(char *owner, char *position, float yaw, float pitc
     float side[4];
     if (actor) {
         state = *(TetherState **)(actor + 0x68);
-        D_L00_001B1BE8[0] = 1;
+        g_cinematic_phase_flag[0] = 1;
         g_hero_state.current = actor;
         ((TetherActor *)actor)->updateDist = 0xFF;
         ((TetherActor *)actor)->visible = 1;
         ((TetherActor *)actor)->state = 1;
         ((TetherActor *)actor)->drawDist = 0xFF;
-        if (D_L00_001A8FF0) {
+        if (g_hero_locked_flag) {
             *(float *)(actor + 0xF8) = 0;
             *(float *)(actor + 0xF4) = 0;
         } else {
@@ -87,7 +87,7 @@ char *visibomb_create_missile(char *owner, char *position, float yaw, float pitc
         AttachManipulator((u8 *)actor, 1, state->matrix28);
         {
             char *attachment = tether_create_fin_piece(actor);
-            float dt = D_L00_001AF0E4;
+            float dt = g_visibomb_min_speed;
             state->attachment20 = attachment;
             state->field48 = dt * 0.016666668f;
         }
@@ -97,11 +97,11 @@ char *visibomb_create_missile(char *owner, char *position, float yaw, float pitc
         start[2] = ((float *)position)[2];
         if (CollLine(start, position, 0, g_hero_state.object, 0)) {
             *(u8 *)(actor + 0xBC) = 1;
-            qcopy(actor + 0x10, D_L00_001BF220);
+            qcopy(actor + 0x10, g_hero_l00_position);
         }
-        D_L00_001B1A4C[0] = 1;
+        g_visibomb_phase_flag[0] = 1;
         ForceClaimNotice(6, 0, 1);
-        if (D_L00_001A8FF0) {
+        if (g_hero_locked_flag) {
             *(u16 *)(actor + 0x34) |= 0x100;
             qcopy(actor + 0xC0, g_hero_state.axis);
             cam_compute_view_direction(actor + 0x10, actor + 0xE0, 1);

@@ -4,8 +4,8 @@ typedef int Quad __attribute__((mode(TI)));
 typedef struct __attribute__((packed)) { int values[2]; } Pair;
 
 /* An incomplete array: retail builds this address with lui + addiu into a register of its own. */
-extern Pair D_L00_001B1458[];
-extern int D_L00_001B1464 __attribute__((sda));
+extern Pair g_debris_choice_pair[];
+extern int g_debris_piece_counter __attribute__((sda));
 extern void vec_scale_to_length(void *, void *, float);
 extern float math_random_float_range(float, float);
 extern void *CreateType6DObject(void *, void *, int, float);
@@ -20,11 +20,11 @@ void part_spawn_debris_piece(char *self, void *position, Quad *src)
 
     temp.local = *src;
     vec_scale_to_length(&temp.local, &temp.local, 0.05f);
-    temp.choices = D_L00_001B1458[0];
+    temp.choices = g_debris_choice_pair[0];
     selected = temp.choices.values;
     size = math_random_float_range(0.05f, 0.1f);
-    selected += D_L00_001B1464 % 2;
+    selected += g_debris_piece_counter % 2;
     CreateType6DObject(position, &temp.local, *selected,
                        size * *(float *)(state + 0x50) * 0.1f);
-    D_L00_001B1464 += 1;
+    g_debris_piece_counter += 1;
 }

@@ -2,10 +2,10 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F41A4C0;
-extern s32 D_L17_001B1EE0 __attribute__((sda));
-extern s32 D_L17_001B1EE8 __attribute__((sda));
-extern s32 D_L17_001B1EF0 __attribute__((sda));
-extern s32 D_L17_001B1F10 __attribute__((sda));
+extern s32 g_spray_piece_table_a __attribute__((sda));
+extern s32 g_spray_piece_table_b __attribute__((sda));
+extern s32 g_spray_piece_table_c __attribute__((sda));
+extern s32 g_spray_piece_param __attribute__((sda));
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, s32, s32);
 extern void vec_local_to_world(char *, void *, float, float, float);
@@ -38,7 +38,7 @@ void spray_effect_update(char *object)
         *(u8 *)(object + 0xA8) = 0xFF;
         return;
     case 2:
-        part_explode_object_into_pieces(object, &D_L17_001B1EF0, &D_L17_001B1EE8, &D_L17_001B1EE0, 0xFFFF, 0, D_L17_001B1F10, 0, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(object, &g_spray_piece_table_c, &g_spray_piece_table_b, &g_spray_piece_table_a, 0xFFFF, 0, g_spray_piece_param, 0, 0xFFFF, 0xFF, 0);
         vec_local_offset_to_world(object, &origin, 0.0f, 0.0f, 20.0f);
         SpawnExplosion(&origin, 0, 0xC, 0xA, *(float *)(object + 0x2C) * 10.0f, 20.0f, 0xA, 0xA, 0, 0, 1, 0, 0, 0);
         moby_mark_spawned(object);

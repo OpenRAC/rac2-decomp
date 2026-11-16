@@ -8,7 +8,7 @@ extern float math_fast_sin_or_cos_b(float);
 
 extern void render_water_grids(char *, s32);
 
-extern char D_L18_002A9C40[];
+extern char g_water_l18_grid_data[];
 
 extern float g_camera_l18_position[];
 
@@ -26,7 +26,7 @@ extern int math_random_int_range(int, int);
 
 extern float math_random_angle(void);
 
-extern int D_L18_001C9D40;
+extern int g_color_effect_freed_flag;
 
 extern void gfx_draw_aimed_effect_packet(void *, int, float, int, float, int, int);
 
@@ -71,7 +71,7 @@ extern void draw_world_quad(void *, void *, int);
 
 /* Runs the shared effect routine with this level's effect data. It is handed to the effect controller as a callback. */
 void part_effect_callback(void) {
-    render_water_grids(D_L18_002A9C40, 0x12);
+    render_water_grids(g_water_l18_grid_data, 0x12);
 }
 
 /* Updates the two lightning arcs of the Extermibot beam: it eases their angles toward the targets and works out the sideways offsets. */
@@ -115,8 +115,8 @@ extern void make_hit_descriptor(void *,void *,int,void *,float);
 extern int CollLine(void *,void *,int,void *,void *);
 extern void part_spawn_large_spark_smoke(char *,int);
 
-extern struct { u8 pad[24];u8 *object;u8 pad1[4];float position[4] __attribute__((aligned(16))); } D_L18_001BFC00;
-extern int D_L18_001B2348 __attribute__((sda));
+extern struct { u8 pad[24];u8 *object;u8 pad1[4];float position[4] __attribute__((aligned(16))); } g_hero_ground_hit;
+extern int g_frame_l18_counter __attribute__((sda));
 typedef struct {
  u8 pad[0x7e4]; u8 *attached; u8 gap[0x1c]; s16 timer, mode;
 } DamoselBeamState;
@@ -166,10 +166,10 @@ void extermibot_beam_update(u8 *obj) {
    hit.type=5;hit.flags=3;hit.id=*(u16 *)(obj+0xaa);
    if(CollLine(vars+0x610,vars+0x620,0,obj,&hit)) {
     part_spawn_large_spark_smoke(vars+0x620,15);qcopy(vars+0x760,vars+0x620);H(vars,0x804)=0;
-    if(D_L18_001BFC00.object) {
-     float *point=D_L18_001BFC00.position;
+    if(g_hero_ground_hit.object) {
+     float *point=g_hero_ground_hit.position;
      u8 *attached;
-     H(vars,0x806)=3;attached=D_L18_001BFC00.object;P(vars,0x7e4)=attached;
+     H(vars,0x806)=3;attached=g_hero_ground_hit.object;P(vars,0x7e4)=attached;
      qcopy(vars+0x620,point);qcopy(vars+0x770,attached+0x10);
     } else H(vars,0x806)=4;
    }
@@ -180,7 +180,7 @@ void extermibot_beam_update(u8 *obj) {
   if(H(vars,0x804)<51 && (other=P(vars,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
    FastVecSub(delta,other+0x10,vars+0x770);FastVecAdd(vars+0x620,vars+0x620,delta);
    qcopy(vars+0x6c0,vars+0x620);qcopy(vars+0x770,P(vars,0x7e4)+0x10);
-   if((D_L18_001B2348&15)==(((int)obj>>8)&15))part_spawn_large_spark_smoke(vars+0x620,1);
+   if((g_frame_l18_counter&15)==(((int)obj>>8)&15))part_spawn_large_spark_smoke(vars+0x620,1);
   } else {
    DamoselBeamState *state=(DamoselBeamState *)vars;
    state->attached=0;state->mode=4;state->timer=0;
@@ -429,7 +429,7 @@ void part_spawn_small_spark_smoke(char *pos, int count) {
 
 /* func_L18_00439960 lives in L18_00437AA0.c. */
 
-extern int D_L18_001C9D40;
+extern int g_color_effect_freed_flag;
 
 extern float FastAddRotations(float, float);
 
@@ -452,7 +452,7 @@ void spinning_target_update(u8 *obj) {
     u8 *hit_flash;
     float hit_damage;
 
-    if (D_L18_001C9D40 != 0) return;
+    if (g_color_effect_freed_flag != 0) return;
     state = *(u8 **)(obj + 0x68);
     switch (*(u8 *)(obj + 0x20)) {
     case 0:

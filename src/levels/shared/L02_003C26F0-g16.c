@@ -44,31 +44,31 @@ typedef struct {
 
 extern PlayerView g_hero_state;
 extern InputView g_pad_state;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index;
-extern u8 D_001A7B1E;
+extern u8 g_challenge_nearby_flag;
 extern s16 g_music_state[];
 extern u8 g_item_slot_to_record[];
 typedef struct { u8 unknown00[0x14]; int sound; u8 unknown18[0xE0 - 0x18]; } SlotInfo;
-extern SlotInfo D_L02_00264A70[];
+extern SlotInfo g_material_l02_table[];
 typedef struct { u8 unknown[0x464]; u8 completed[0]; } ChallengeProgress;
-extern ChallengeProgress D_L02_0021F4F0;
-extern int D_L02_002004A4 __attribute__((nosda));
-extern int D_L02_001A8F00;
+extern ChallengeProgress g_cell_flags;
+extern int g_challenge_pad_flags __attribute__((nosda));
+extern int g_arena_state_words;
 extern char *g_moby_l02_pool;
-extern char *D_L02_001B368C;
+extern char *g_matrix_l02_record_table;
 extern u16 *g_entity_group_lists[];
-extern Vector D_L02_001AFD20 __attribute__((sda));
-extern Vector D_L02_001AFD30 __attribute__((sda));
-extern float D_L02_001AFD40 __attribute__((sda));
-extern float D_L02_001C0968 __attribute__((nosda));
+extern Vector g_challenge_row_vector __attribute__((sda));
+extern Vector g_challenge_axis_vector __attribute__((sda));
+extern float g_challenge_height_offset __attribute__((sda));
+extern float g_challenge_ground_height __attribute__((nosda));
 typedef struct { u8 unknown00[0x380]; Matrix transform; } ChallengeGlobals;
-extern ChallengeGlobals D_L02_001C8280;
+extern ChallengeGlobals g_challenge_globals;
 typedef struct { Vector from, to; u8 unknown20[0x30]; char *view; } CameraPath;
 extern CameraPath g_camera_l02_position;
-extern float D_L02_001B308C, D_L02_001B3090;
-extern char D_L02_002A4ED0[], D_L02_002A4F20[], D_L02_002A4F70[];
-extern char D_L02_001AFD48[], D_L02_001AFD80[], D_L02_001AFDB8[], D_L02_001AFDF0[];
+extern float g_screen_brightness, g_screen_alpha;
+extern char g_str_l02_challenge_debug_a_2[], g_str_l02_challenge_debug_b_2[], g_str_l02_challenge_debug_c_2[];
+extern char g_str_l02_challenge_debug_a[], g_str_l02_challenge_debug_b[], g_str_l02_challenge_debug_c[], g_str_challenge_debug_d[];
 
 extern void STUB_printf(const char *, ...);
 extern int CollLine(void *, void *, int, void *, int);
@@ -157,7 +157,7 @@ void challenge_controller_update(u8 *object)
             qcopy(&rotation, &position);
             rotation.f[2] -= 1.0f;
             if (CollLine(&target, &rotation, 2, object, 0))
-                *(float *)(object + 0x18) += (D_L02_001C0968 - position.f[2]) + D_L02_001AFD40;
+                *(float *)(object + 0x18) += (g_challenge_ground_height - position.f[2]) + g_challenge_height_offset;
         }
         state->retryTimer = 60;
         state->gateCount = 0;
@@ -165,13 +165,13 @@ void challenge_controller_update(u8 *object)
         state->rotatorCount = 0;
         state->completed = 0;
         state->decoration = 0;
-        records = D_L02_001B368C;
+        records = g_matrix_l02_record_table;
         *(float *)(records + state->record * 0x80 + 0x38) += 2.0f;
-        qcopy(&D_L02_001C8280.transform.row[1], records + state->record * 0x80 + 0x30);
-        qcopy(&D_L02_001C8280.transform.row[0], &D_L02_001AFD20);
-        qzero_nc(&D_L02_001C8280.transform.row[3]);
-        qzero_nc(&D_L02_001C8280.transform.row[2]);
-        D_L02_001C8280.transform.row[1].f[3] = 0.0f;
+        qcopy(&g_challenge_globals.transform.row[1], records + state->record * 0x80 + 0x30);
+        qcopy(&g_challenge_globals.transform.row[0], &g_challenge_row_vector);
+        qzero_nc(&g_challenge_globals.transform.row[3]);
+        qzero_nc(&g_challenge_globals.transform.row[2]);
+        g_challenge_globals.transform.row[1].f[3] = 0.0f;
         if (moby_count_group_not_in_state((u8)object[0x21], -1) >= 2) {
             list = g_entity_group_lists[(u8)object[0x21]];
             do {
@@ -197,20 +197,20 @@ void challenge_controller_update(u8 *object)
             } while (*(short *)list++ >= 0);
         }
         if (state->gateCount >= 20)
-            STUB_printf(D_L02_002A4ED0, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_a_2, *(short *)(object + 0xB2));
         if (state->platformCount >= 20)
-            STUB_printf(D_L02_002A4F20, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_b_2, *(short *)(object + 0xB2));
         if (state->rotatorCount >= 20)
-            STUB_printf(D_L02_002A4F70, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_c_2, *(short *)(object + 0xB2));
         if (state->rotatorCount == 0)
-            STUB_printf(D_L02_001AFD48, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_a, *(short *)(object + 0xB2));
         if (state->gateCount == 0)
-            STUB_printf(D_L02_001AFD80, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_b, *(short *)(object + 0xB2));
         if (state->platformCount == 0)
-            STUB_printf(D_L02_001AFDB8, *(short *)(object + 0xB2));
+            STUB_printf(g_str_l02_challenge_debug_c, *(short *)(object + 0xB2));
         id = *(u16 *)(object + 0xB2);
-        if (D_L02_0021F4F0.completed[(short)id] != 0
-            || (status = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400],
+        if (g_cell_flags.completed[(short)id] != 0
+            || (status = g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400],
                 (id & 1) ? ((status >> 4) & 7) != 0 : (status & 7) != 0)) {
                 moby_set_flag_bit((u8 *)object, 1);
             for (i = 0; i < 2; i++) {
@@ -229,12 +229,12 @@ void challenge_controller_update(u8 *object)
         u8 *ids;
         SlotInfo *slots;
         int nearby = moby_is_hero_inside_trigger_boxes(object);
-        int mode = D_L02_001A8F00;
+        int mode = g_arena_state_words;
 
-        if (nearby && D_001A7B1E) {
+        if (nearby && g_challenge_nearby_flag) {
             ForceClaimNotice(12, 0x27BD, 1);
             ids = g_item_slot_to_record;
-            slots = D_L02_00264A70;
+            slots = g_material_l02_table;
             if (load_is_class_cached(slots[ids[0x26]].sound) == 0) {
                 LoadClassIntoFreeCacheSlot(slots[ids[0x26]].sound);
             } else if (g_pad_state.buttons.word.high & 0x10) {
@@ -243,7 +243,7 @@ void challenge_controller_update(u8 *object)
                 moby_show_angles_debug(object);
                 moby_set_state((u8 *)object, 4, -1);
             }
-            mode = D_L02_001A8F00;
+            mode = g_arena_state_words;
         }
         if (mode != 2)
             spark_emitter_update(object);
@@ -289,7 +289,7 @@ void challenge_controller_update(u8 *object)
         float angle;
         ForceClaimNotice(1, 0, 1);
         moby_transform_joint_point(object, 1, (char *)&transform);
-        transform_vector(&rotation, &D_L02_001AFD30, &transform);
+        transform_vector(&rotation, &g_challenge_axis_vector, &transform);
         FastVecSub(&g_hero_state.velocity, &rotation, &g_hero_state.position);
         g_hero_state.velocity.f[2] = 0.0f;
         vec_clamp_length(g_hero_state.velocity.f, 0.025000002f);
@@ -324,7 +324,7 @@ void challenge_controller_update(u8 *object)
             set_hero_animation(0x55, 0, 0.0f);
         moby_transform_joint_to_world(object, 0, (char *)&position);
         if (fast_vec_dist(&g_camera_l02_position.from, &position) <= 0.5f) {
-            record = D_L02_001B368C + state->record * 0x80;
+            record = g_matrix_l02_record_table + state->record * 0x80;
             qcopy(&target, record + 0x30);
             qcopy(&rotation, record + 0x70);
             qcopy(&transform.row[0], &target);
@@ -343,12 +343,12 @@ void challenge_controller_update(u8 *object)
                 *(float *)(decoration + 0x18) += 15.0f;
                 *(u16 *)(state->decoration + 0x34) &= 0xFF7F;
             } else {
-                STUB_printf(D_L02_001AFDF0);
+                STUB_printf(g_str_challenge_debug_d);
             }
-            state->savedBrightness = D_L02_001B308C;
-            state->savedAlpha = D_L02_001B3090;
-            D_L02_001B308C = 100.0f;
-            D_L02_001B3090 = 255.0f;
+            state->savedBrightness = g_screen_brightness;
+            state->savedAlpha = g_screen_alpha;
+            g_screen_brightness = 100.0f;
+            g_screen_alpha = 255.0f;
             state->previousSelector = g_music_state[0x1E] != -1 ? g_music_state[0x1E] : g_music_state[0x24];
             script_queue_keyed_request(state->selector, state->selectorMode);
             moby_set_state((u8 *)object, 9, -1);
@@ -362,9 +362,9 @@ void challenge_controller_update(u8 *object)
         u16 *list;
         ForceClaimNotice(1, 0, 1);
         hero_l00_set_action(0x6F, 1);
-        record = D_L02_001B368C + state->record * 0x80;
+        record = g_matrix_l02_record_table + state->record * 0x80;
         if (fast_vec_dist(&g_camera_l02_position.from, record + 0x30) <= 1.0f) {
-            if (D_L02_001A8F00 == 7) {
+            if (g_arena_state_words == 7) {
                 *(u16 *)(object + 0x34) &= 0xFF7F;
                 if (moby_count_group_not_in_state((u8)object[0x21], -1) >= 2) {
                     list = g_entity_group_lists[(u8)object[0x21]];
@@ -400,7 +400,7 @@ void challenge_controller_update(u8 *object)
         char *vars;
         int i, j, k, m;
         int status;
-        if (D_L02_001A8F00 == 7) {
+        if (g_arena_state_words == 7) {
             gfx_add_draw_callback_first(menu_draw_challenge, object);
             if (g_pad_state.buttons.all & 0xE000000000ULL) {
                 moby_flip_element_turn_directions(object);
@@ -419,14 +419,14 @@ void challenge_controller_update(u8 *object)
                     *(float *)(state->rotators[i] + 0xF8) = *(float *)(*(char **)(state->rotators[i] + 0x68) + 0x10);
                     euler_rotation_basis(state->rotators[i] + 0xC0, state->rotators[i] + 0xF0);
                 }
-                D_L02_001B308C = state->savedBrightness;
-                D_L02_001B3090 = state->savedAlpha;
+                g_screen_brightness = state->savedBrightness;
+                g_screen_alpha = state->savedAlpha;
                 request_end_slot(0, 0);
                 if (state->restoreMode != -1)
                     cam_reset_entry(state->restoreMode);
                 script_queue_keyed_request(state->previousSelector, state->selectorMode);
                 moby_set_state((u8 *)object, 1, -1);
-            } else if (D_L02_002004A4 && PadPressedWithin(1, 60, 0)) {
+            } else if (g_challenge_pad_flags && PadPressedWithin(1, 60, 0)) {
                 if (PadPressedWithin(2, 60, 0)) {
                     if (state->platformCount > 0)
                         snd_play_from_class_bank(5, 0, state->platforms[0], 0x896 /* moby class 2198 */);
@@ -491,8 +491,8 @@ void challenge_controller_update(u8 *object)
                 *(float *)(state->rotators[m] + 0xF8) = *(float *)(*(char **)(state->rotators[m] + 0x68) + 0x10);
                 euler_rotation_basis(state->rotators[m] + 0xC0, state->rotators[m] + 0xF0);
             }
-            D_L02_001B308C = state->savedBrightness;
-            D_L02_001B3090 = state->savedAlpha;
+            g_screen_brightness = state->savedBrightness;
+            g_screen_alpha = state->savedAlpha;
             script_queue_keyed_request(state->previousSelector, state->selectorMode);
             moby_set_state((u8 *)object, 1, -1);
         }
@@ -502,7 +502,7 @@ void challenge_controller_update(u8 *object)
     case 8: {
         u16 id;
         int i, j, k;
-        if (D_L02_001A8F00 == 7) {
+        if (g_arena_state_words == 7) {
             gfx_add_draw_callback_first(menu_draw_challenge, object);
             for (i = 0; i < state->platformCount; i++) {
                 AdvancePathFollower(state->platforms[i], 1);
@@ -513,11 +513,11 @@ void challenge_controller_update(u8 *object)
                 break;
             id = *(u16 *)(object + 0xB2);
             if (id & 1) {
-                if (((D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] >> 4) & 7) != 7)
-                    D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] += 16;
+                if (((g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] >> 4) & 7) != 7)
+                    g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] += 16;
             } else {
-                if ((D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] & 7) != 7)
-                    D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] += 1;
+                if ((g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] & 7) != 7)
+                    g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] += 1;
             }
             moby_mark_table_entry_flagged((u8)object[0xB0]);
             moby_set_flag_bit((u8 *)object, 1);
@@ -533,8 +533,8 @@ void challenge_controller_update(u8 *object)
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
-            D_L02_001B308C = state->savedBrightness;
-            D_L02_001B3090 = state->savedAlpha;
+            g_screen_brightness = state->savedBrightness;
+            g_screen_alpha = state->savedAlpha;
             request_end_slot(0, 0);
             if (state->restoreMode != -1)
                 cam_reset_entry(state->restoreMode);
@@ -545,11 +545,11 @@ void challenge_controller_update(u8 *object)
                 break;
             id = *(u16 *)(object + 0xB2);
             if (id & 1) {
-                if (((D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] >> 4) & 7) != 7)
-                    D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] += 16;
+                if (((g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] >> 4) & 7) != 7)
+                    g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] += 16;
             } else {
-                if ((D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] & 7) != 7)
-                    D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400] += 1;
+                if ((g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] & 7) != 7)
+                    g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400] += 1;
             }
             moby_mark_table_entry_flagged((u8)object[0xB0]);
             moby_set_flag_bit((u8 *)object, 1);
@@ -565,8 +565,8 @@ void challenge_controller_update(u8 *object)
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
-            D_L02_001B308C = state->savedBrightness;
-            D_L02_001B3090 = state->savedAlpha;
+            g_screen_brightness = state->savedBrightness;
+            g_screen_alpha = state->savedAlpha;
             script_queue_keyed_request(state->previousSelector, state->selectorMode);
             moby_set_state((u8 *)object, 5, -1);
         }
@@ -577,7 +577,7 @@ void challenge_controller_update(u8 *object)
         char *actor;
         char *vars;
         int i;
-        if (D_L02_001A8F00 == 7) {
+        if (g_arena_state_words == 7) {
             gfx_add_draw_callback_first(menu_draw_challenge, object);
             if (state->retryTimer != 0) {
                 state->retryTimer--;
@@ -595,8 +595,8 @@ void challenge_controller_update(u8 *object)
                     *(float *)(state->rotators[i] + 0xF8) = *(float *)(*(char **)(state->rotators[i] + 0x68) + 0x10);
                     euler_rotation_basis(state->rotators[i] + 0xC0, state->rotators[i] + 0xF0);
                 }
-                D_L02_001B308C = state->savedBrightness;
-                D_L02_001B3090 = state->savedAlpha;
+                g_screen_brightness = state->savedBrightness;
+                g_screen_alpha = state->savedAlpha;
                 script_queue_keyed_request(state->previousSelector, state->selectorMode);
                 request_end_slot(0, 0);
                 moby_set_state((u8 *)object, 1, -1);
@@ -642,8 +642,8 @@ void challenge_controller_update(u8 *object)
                 *(float *)(state->rotators[i] + 0xF8) = *(float *)(*(char **)(state->rotators[i] + 0x68) + 0x10);
                 euler_rotation_basis(state->rotators[i] + 0xC0, state->rotators[i] + 0xF0);
             }
-            D_L02_001B308C = state->savedBrightness;
-            D_L02_001B3090 = state->savedAlpha;
+            g_screen_brightness = state->savedBrightness;
+            g_screen_alpha = state->savedAlpha;
             script_queue_keyed_request(state->previousSelector, state->selectorMode);
             moby_set_state((u8 *)object, 1, -1);
         }

@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
-extern unsigned char *D_001F26CC;
+extern unsigned char *g_part_tex_spinning_spark;
 
 /* Creates a small particle with a random size and spin at a position and velocity. Returns the new particle, or null if none are free. */
 unsigned char *part_spawn_spinning_spark(Quadword *position, Quadword *velocity, int lifetime) {
@@ -17,7 +17,7 @@ unsigned char *part_spawn_spinning_spark(Quadword *position, Quadword *velocity,
         particle[9] = FloatToInt(2.0f) + 0x40;
         particle[3] = 0x44;
         particle[1] = 0;
-        particle[2] = *D_001F26CC;
+        particle[2] = *g_part_tex_spinning_spark;
         *(float *)(particle + 0xC) = math_random_float_range(0.05f, 0.2f) * 210000.0f;
         particle[8] = math_random_int_below(255);
         *(short *)(particle + 0xA) = lifetime;

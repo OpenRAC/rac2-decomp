@@ -17,9 +17,9 @@ extern void gorn_finish_challenge_stage(u8 *a0, s32 a1);
 
 extern void moby_mark_spawned(u8 *a0);
 
-extern s32 D_L15_001B1534 __attribute__((sda));
-extern u8 *D_L15_001B1584 __attribute__((sda));
-extern u8 *D_L15_001B1588 __attribute__((sda));
+extern s32 g_cutscene_l15_started_flag __attribute__((sda));
+extern u8 *g_gorn_path_first_node __attribute__((sda));
+extern u8 *g_gorn_path_next_node __attribute__((sda));
 typedef struct StageState {
     s32 initial;
     s32 pad04[3];
@@ -27,9 +27,9 @@ typedef struct StageState {
     s32 pad14[6];
     s32 timer;
 } StageState;
-extern StageState D_L15_00221E10;
-extern s32 D_L15_001B2148;
-extern u8 *D_L15_001B2714;
+extern StageState g_gorn_challenge_vars;
+extern s32 g_gorn_challenge_count;
+extern u8 *g_scene_object_base;
 
 /* Applies both material passes to matching objects once, then advances the stage. */
 void func_US2_L15_00432858(u8 *arg0) {
@@ -37,9 +37,9 @@ void func_US2_L15_00432858(u8 *arg0) {
     s32 count;
     u8 **p;
 
-    if (D_L15_001B1534 == 0) {
-        D_L15_00221E10.timer = 0;
-        D_L15_001B1534 = 1;
+    if (g_cutscene_l15_started_flag == 0) {
+        g_gorn_challenge_vars.timer = 0;
+        g_cutscene_l15_started_flag = 1;
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
@@ -50,22 +50,22 @@ void func_US2_L15_00432858(u8 *arg0) {
             do {
                 if (*(s16 *)(*p + 0xAA) == 0xF93) {
                     entry_spawn_list_objects_with_flag(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
+                    func_L05_0037CEE0(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
                 }
                 n--;
                 p++;
             } while (n);
         }
-        if (D_L15_001B1584 != 0 && *(unsigned short *)(D_L15_001B1584 + 0x34) != 0) {
-            moby_mark_spawned(D_L15_001B1584);
-            D_L15_001B1584 = 0;
+        if (g_gorn_path_first_node != 0 && *(unsigned short *)(g_gorn_path_first_node + 0x34) != 0) {
+            moby_mark_spawned(g_gorn_path_first_node);
+            g_gorn_path_first_node = 0;
         }
-        if (D_L15_001B1588 != 0 && *(unsigned short *)(D_L15_001B1588 + 0x34) != 0) {
-            moby_mark_spawned(D_L15_001B1588);
-            D_L15_001B1588 = 0;
+        if (g_gorn_path_next_node != 0 && *(unsigned short *)(g_gorn_path_next_node + 0x34) != 0) {
+            moby_mark_spawned(g_gorn_path_next_node);
+            g_gorn_path_next_node = 0;
         }
     }
-    if (D_L15_00221E10.active == 0 && D_L15_001B2148 >= 6)
+    if (g_gorn_challenge_vars.active == 0 && g_gorn_challenge_count >= 6)
         gorn_finish_challenge_stage(arg0, 1);
 }

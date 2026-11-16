@@ -11,8 +11,8 @@ typedef struct {
     u64 a, b, c, d;
 } DobboBeamQuad;
 
-extern float D_L09_001B1200[4][4] __attribute__((sda)); /* quad corners */
-extern char D_L09_001B9A00[];                            /* camera position */
+extern float g_quad_l09_corner_table[4][4] __attribute__((sda)); /* quad corners */
+extern char g_camera_l09_position[];                            /* camera position */
 
 extern u64 GetEffectTextureDescriptor(int);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -55,7 +55,7 @@ void gfx_draw_spinning_layered_quads(char *moby) {
     qcopy(dir, src[0]);
     qcopy(mat[3], src[3]);
     mat[3][3] = 1.0f;
-    FastVecSub(v, D_L09_001B9A00, mat[3]);
+    FastVecSub(v, g_camera_l09_position, mat[3]);
     rot[2] = mat_fast_helper_a(v[0], v[1]);
     rot[1] = -mat_fast_helper_a(vec_length_xy(v), v[2]);
     rot[0] = 0.0f;
@@ -88,7 +88,7 @@ void gfx_draw_spinning_layered_quads(char *moby) {
         pk.col[0] = col;
         FastVecScale(t, dir, step);
         for (j = 0; j < 4; j++) {
-            FastVecScale(pk.m[j], D_L09_001B1200[j], size);
+            FastVecScale(pk.m[j], g_quad_l09_corner_table[j], size);
             transform_vector(pk.m[j], pk.m[j], mat);
             FastVecAdd(pk.m[j], pk.m[j], t);
         }
@@ -147,7 +147,7 @@ void beam_draw_tip_glow(char *moby)
     quad.d = 0x8000000048ULL;
     quad.a = 0;
     VU1_addGSregister(0x47, 0x51001);
-    FastVecSub(to_camera, D_L09_001B9A00, pos);
+    FastVecSub(to_camera, g_camera_l09_position, pos);
     rot[2] = mat_fast_helper_a(to_camera[0], to_camera[1]);
     rot[1] = -mat_fast_helper_a(vec_length_xy(to_camera), to_camera[2]);
     rot[0] = 0.0f;
@@ -172,7 +172,7 @@ void beam_draw_tip_glow(char *moby)
         quad.col[0] = 0x7F7F7F7F;
     }
     for (i = 0; i < 4; i++) {
-        FastVecScale(quad.m[i], D_L09_001B1200[i], 0.75f);
+        FastVecScale(quad.m[i], g_quad_l09_corner_table[i], 0.75f);
         transform_vector(quad.m[i], quad.m[i], mat);
     }
     draw_world_quad(&quad, 0, 0);

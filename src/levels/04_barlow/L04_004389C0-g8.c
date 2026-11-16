@@ -2,7 +2,7 @@
 #include "common.h"
 
 extern int g_current_map_index __attribute__((sda));
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern char *g_pHeroMoby[];
 extern s32 moby_count_group_not_in_state(u32, s32);
 extern int flag_is_byte_set(void);
@@ -32,7 +32,7 @@ void barlow_linked_fade_out_update(u8 *obj)
                     found = 0;
             }
         }
-        if (found == 0 || (D_0019B2E8[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+        if (found == 0 || (g_moby_group_flags[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
             PlayMobySound(0, 0, (char *)obj);
             obj[0x20] = 2;
         }

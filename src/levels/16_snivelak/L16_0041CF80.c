@@ -11,9 +11,9 @@ extern void FastVecCross(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *,void *,int);
-extern char D_L16_001B9B00[];
-extern float D_L16_001B1EA8[] __attribute__((sda));
-extern float D_L16_001B1EAC[] __attribute__((sda));
+extern char g_scene_origin_transform[];
+extern float g_quad_uv_x_table[] __attribute__((sda));
+extern float g_quad_uv_y_table[] __attribute__((sda));
 
 /* Draws the object's 25-unit beam along its heading: a wide tinted quad, then a narrow white core. */
 void DrawBeamQuads(char *object)
@@ -24,8 +24,8 @@ void DrawBeamQuads(char *object)
     ((float *)&local.direction)[1]=math_fast_sin_or_cos_b(*(float *)(object+0xf8))*25.0f;
     ((float *)&local.direction)[2]=0.0f;
     FastVecAdd(&local.end,object+0x10,&local.direction);
-    FastVecSub(&local.firstSide,object+0x10,D_L16_001B9B00);
-    FastVecSub(&local.secondSide,&local.end,D_L16_001B9B00);
+    FastVecSub(&local.firstSide,object+0x10,g_scene_origin_transform);
+    FastVecSub(&local.secondSide,&local.end,g_scene_origin_transform);
     FastVecCross(&local.firstSide,&local.firstSide,&local.direction);
     vec_scale_to_length(&local.firstSide,&local.firstSide,0.15f);
     FastVecCross(&local.secondSide,&local.secondSide,&local.direction);
@@ -36,8 +36,8 @@ void DrawBeamQuads(char *object)
     local.packet.header[0]=0;
     local.packet.colors[0] = local.packet.colors[1] = local.packet.colors[2] = local.packet.colors[3] = 0x80243278u;
     for (i = 0; i < 4; i++) {
-        local.packet.uv[i][0] = D_L16_001B1EA8[i * 2];
-        local.packet.uv[i][1] = D_L16_001B1EAC[i * 2];
+        local.packet.uv[i][0] = g_quad_uv_x_table[i * 2];
+        local.packet.uv[i][1] = g_quad_uv_y_table[i * 2];
     }
     FastVecSub(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[0]=local.scratch;
@@ -48,8 +48,8 @@ void DrawBeamQuads(char *object)
     FastVecAdd(&local.scratch,&local.end,&local.secondSide);
     local.packet.vertices[3]=local.scratch;
     draw_world_quad(&local.packet,0,0);
-    FastVecSub(&local.firstSide,object+0x10,D_L16_001B9B00);
-    FastVecSub(&local.secondSide,&local.end,D_L16_001B9B00);
+    FastVecSub(&local.firstSide,object+0x10,g_scene_origin_transform);
+    FastVecSub(&local.secondSide,&local.end,g_scene_origin_transform);
     FastVecCross(&local.firstSide,&local.firstSide,&local.direction);
     vec_scale_to_length(&local.firstSide,&local.firstSide,0.05f);
     FastVecCross(&local.secondSide,&local.secondSide,&local.direction);
@@ -60,8 +60,8 @@ void DrawBeamQuads(char *object)
     local.packet.header[0]=0;
     local.packet.colors[0] = local.packet.colors[1] = local.packet.colors[2] = local.packet.colors[3] = 0x80808080u;
     for (j = 0; j < 4; j++) {
-        local.packet.uv[j][0] = D_L16_001B1EA8[j * 2];
-        local.packet.uv[j][1] = D_L16_001B1EAC[j * 2];
+        local.packet.uv[j][0] = g_quad_uv_x_table[j * 2];
+        local.packet.uv[j][1] = g_quad_uv_y_table[j * 2];
     }
     FastVecSub(&local.scratch,object+0x10,&local.firstSide);
     local.packet.vertices[0]=local.scratch;

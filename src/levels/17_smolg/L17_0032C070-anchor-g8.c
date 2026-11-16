@@ -23,7 +23,7 @@ typedef struct {
 extern MotionAnchor *g_path_l17_table[];
 /* One macro pointer: a GP load in case 1's delay slots, absolute in case 4. */
 extern char *g_moby_l17_pool MACRO_ADDR;
-extern float D_L17_001B0240 __attribute__((sda)), D_L17_001B0244 __attribute__((sda));
+extern float g_anchor_move_seconds __attribute__((sda)), g_anchor_delay_seconds __attribute__((sda));
 extern MotionQuad g_hero_position[];
 extern int math_fast_float_d(void *);
 extern void platform_place_on_path_by_timer(void *, void *, void *);
@@ -78,14 +78,14 @@ void UpdateTriggeredAnchorMover(unsigned char *obj)
     case 2:
         if (!vars->blocked)
             vars->timer += 1.0f;
-        if (vars->timer >= D_L17_001B0240 * 60.0f)
-            vars->timer = D_L17_001B0240 * 60.0f;
+        if (vars->timer >= g_anchor_move_seconds * 60.0f)
+            vars->timer = g_anchor_move_seconds * 60.0f;
         if (vars->direction == 0)
             anchor = g_path_l17_table[vars->destination0];
         else
             anchor = g_path_l17_table[vars->destination1];
         platform_place_on_path_by_timer(obj, anchor, &frame.old);
-        if (vars->timer >= D_L17_001B0240 * 60.0f) {
+        if (vars->timer >= g_anchor_move_seconds * 60.0f) {
             if (vars->once0 && !vars->direction) {
                 vars->destination0 = -1;
                 obj[0x20] = 1;
@@ -113,7 +113,7 @@ void UpdateTriggeredAnchorMover(unsigned char *obj)
         break;
     case 4:
         vars->delay += 1.0f;
-        if (vars->delay >= D_L17_001B0244 * 60.0f) {
+        if (vars->delay >= g_anchor_delay_seconds * 60.0f) {
             MotionMoby *source_moby;
             obj[0x20] = 3;
             if (vars->direction == 0)

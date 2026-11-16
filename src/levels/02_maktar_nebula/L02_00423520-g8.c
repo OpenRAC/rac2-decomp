@@ -10,9 +10,9 @@ typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
 
 extern int g_hovering_object_count __attribute__((sda));
-extern float D_L02_001B2020 __attribute__((sda));
+extern float g_breakable_piece_speed_min __attribute__((sda));
 extern float D_L02_001B2020_1[8] __attribute__((sda));
-extern float D_L02_001B2040 __attribute__((sda));
+extern float g_breakable_piece_size_min __attribute__((sda));
 extern float D_L02_001B2040_1[4] __attribute__((sda));
 
 extern void moby_get_anim_entry_count(void *, void *, void *);
@@ -60,9 +60,9 @@ void breakable_piece_update(u8 *moby) {
         PlayMobySound(0, 0, moby);
         for (i = 0; i < 16; i++) {
             if ((partMask >> i) & 1) {
-                sizeA = math_random_float_range(D_L02_001B2040, D_L02_001B2040_1[1]);
+                sizeA = math_random_float_range(g_breakable_piece_size_min, D_L02_001B2040_1[1]);
                 sizeB = math_random_float_range(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
-                velocity[0] = math_random_float_range(D_L02_001B2020, D_L02_001B2020_1[4]) * 0.016666668f;
+                velocity[0] = math_random_float_range(g_breakable_piece_speed_min, D_L02_001B2020_1[4]) * 0.016666668f;
                 velocity[1] = math_random_signed_float_range(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.016666668f;
                 velocity[2] = math_random_float_range(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.016666668f;
                 matrix_mul_vec3(velocity, velocity, moby + 0xC0);

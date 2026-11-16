@@ -2,11 +2,11 @@
 extern int math_fast_float_d(int *);
 extern void moby_mark_spawned(void *);
 extern void vec_scale_to_length(void *,void *,float);
-extern char *D_L06_001B281C[] __attribute__((sda));
+extern char *g_moby_l06_table[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern int D_001A79F0_gp SDATA(D_001A79F0);
-extern unsigned char D_0019B2E8[], D_0019B4A8[];
-extern char D_L06_001AF320[],D_L06_001AF350[],D_L06_001AF380[];
+extern unsigned char g_moby_group_flags[], g_moby_nibble_table[];
+extern char g_str_l06_link_debug_a[],g_str_l06_link_debug_b[],g_str_l06_link_debug_c[];
 extern void STUB_printf(char *,...);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
@@ -20,16 +20,16 @@ void link_watcher_update(unsigned char *moby) {
     char *vars=*(char **)(moby+0x68);
     char *links=vars+0x18;
     char *link;
-    if(I14(vars,0x10)!=-1) target=D_L06_001B281C[0]+I14(vars,0x10)*256;
-    if((unsigned char)moby[0xb0]!=255 && (D_0019B2E8[(unsigned char)moby[0xb0]+D_001A79F0_gp*16]&128)) goto dispatch;
+    if(I14(vars,0x10)!=-1) target=g_moby_l06_table[0]+I14(vars,0x10)*256;
+    if((unsigned char)moby[0xb0]!=255 && (g_moby_group_flags[(unsigned char)moby[0xb0]+D_001A79F0_gp*16]&128)) goto dispatch;
     if(!(unsigned char)moby[0x20]) goto dispatch;
     { int j; char *scan;
     for(j=0;j<5;j++){ scan=links+j*8;
         if(I14(scan,0)!=-1) {
-            char *other=D_L06_001B281C[0]+I14(scan,0)*256;
+            char *other=g_moby_l06_table[0]+I14(scan,0)*256;
             if(other && *(short *)(other+0xaa)==*(short *)(scan+4) && (unsigned char)other[0x20]!=254 && (unsigned char)other[0x20]!=253) {
                 unsigned short bits=*(unsigned short *)(other+0xb2);
-                int n=D_0019B4A8[((short)bits>>1)+g_current_map_index[0]*1024];
+                int n=g_moby_nibble_table[((short)bits>>1)+g_current_map_index[0]*1024];
                 if (bits & 1) { if ((n >> 4) & 7) continue; }
                 else if (n & 7) continue;
                 if(((signed char)scan[6]==-1 || (unsigned char)other[0x20]!=(signed char)scan[6])) count++;
@@ -47,15 +47,15 @@ void link_watcher_update(unsigned char *moby) {
             else if(I14(vars,8)&0x40) qcopy(target+0x10,moby+0x10);
             if(I14(vars,8)&0x20) qcopy(moby+0xf0,target+0xf0);
             else if(I14(vars,8)&0x80) qcopy(target+0xf0,moby+0xf0);
-        } else STUB_printf(D_L06_001AF320);
+        } else STUB_printf(g_str_l06_link_debug_a);
         for(i=0,link=links;i<5;i++,link+=8) {
             if(I14(link,0)!=-1){
-                char *base = D_L06_001B281C[0];
+                char *base = g_moby_l06_table[0];
                 char *other=(char *)(I14(link,0)*256+(s32)base);
                 unsigned short uid=*(unsigned short *)(other+0xaa);
                 *(unsigned short *)(link+4)=uid;
-                STUB_printf(D_L06_001AF350,((char *)moby-base)>>8,i,I14(link,0),(short)uid);
-            } else STUB_printf(D_L06_001AF380,((char *)moby-D_L06_001B281C[0])>>8,i);
+                STUB_printf(g_str_l06_link_debug_b,((char *)moby-base)>>8,i,I14(link,0),(short)uid);
+            } else STUB_printf(g_str_l06_link_debug_c,((char *)moby-g_moby_l06_table[0])>>8,i);
         }
         {
             float size_a=F14(vars,0),size_b=F14(vars,4);

@@ -9,13 +9,13 @@ typedef struct { char pad[112]; float value; char tail[108]; } DamageClass;
 typedef struct { char pad[0x2290]; char *player; } PlayerRef;
 typedef struct { char pad[132]; int value; } SoundRecord;
 extern char g_area_hit_targets[];
-extern const QueryParams D_L00_001B0140;
+extern const QueryParams g_thrown_shot_query_params;
 extern char g_item_slot_to_record[];
-extern char D_L00_001BF220[];
+extern char g_hero_l00_position[];
 extern char g_sound_state[];
 extern char g_hero_state[];
 extern char g_weapon_l00_table[];
-extern int D_L00_001B0134 SDATA(D_L00_001B0134);
+extern int g_thrown_shot_initialized SDATA(D_L00_001B0134);
 extern void vec_transform_or_copy(void *, void *);
 extern void part_steer_effect_direction(int, void *, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -25,14 +25,14 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void vec_clear_128(void *);
 extern void gravity_get_dir_at_object(void *, void *, int);
 extern void func_PAL_00320D00(void *, int, int);
-extern int func_PAL_0032F0B8(void *, int, int);
+extern int StartAttachedEffect_pal(void *, int, int);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
-extern void func_PAL_0031F230(void *, void *, int);
-extern void func_PAL_0031FF78(void *);
+extern void spark_spawn_targeted_pal(void *, void *, int);
+extern void part_spawn_spark_burst_pal(void *);
 extern void spark_destroy_moby_free_slot(void *);
 extern void snd_stop_voice(int);
-extern void func_PAL_0031F500(void *);
+extern void spark_update_targeted_pal(void *);
 extern void glow_ring_update_entries(void *);
 extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);
@@ -97,7 +97,7 @@ void func_PAL_0031EBA0(char *self)
             *(short *)(event.raw + 26) = *(short *)(self + 0xAA);
             QueueMobyImpact(obj, event.raw);
             func_PAL_00320D00(self + 0x10, 10, 1);
-            func_PAL_0032F0B8(obj, 28, *(int *)(self + 0xB8));
+            StartAttachedEffect_pal(obj, 28, *(int *)(self + 0xB8));
             break;
         }
         if (!*(char **)(state + 0x38)) {
@@ -107,8 +107,8 @@ void func_PAL_0031EBA0(char *self)
             else
                 hit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
             if (hit == 1) {
-                qcopy(self + 0x10, D_L00_001BF220);
-                FastVecScale(temp.v, D_L00_001BF220 + 0x20, 0.0009765625f);
+                qcopy(self + 0x10, g_hero_l00_position);
+                FastVecScale(temp.v, g_hero_l00_position + 0x20, 0.0009765625f);
                 vec_scale_to_length(temp.v, temp.v, 0.1f);
                 FastVecAdd(self + 0x10, temp.v, self + 0x10);
                 *(int *)(state + 0x10) = 12;
@@ -133,14 +133,14 @@ void func_PAL_0031EBA0(char *self)
         }
         if (math_fast_float_d(state + 0x10)) {
             *(unsigned char *)(self + 0x20) = 4;
-            temp.params = D_L00_001B0140;
+            temp.params = g_thrown_shot_query_params;
             event.query.exclude = (QueryExclude){*(char **)(state + 0x38), 0};
             SelectBestTargetInCone(self + 0x10, self + 0xC0, 6.2831855f, 6.2831855f, &count,
                           event.query.targets, 3, &event.query.exclude,
                           10.0f, 0.0f, 0.0f, 0, &temp.params);
             for (i = 0; i < count; i++) {
                 for (j = 4; j >= 0; j--)
-                    func_PAL_0031F230(self, event.query.targets[i], 10);
+                    spark_spawn_targeted_pal(self, event.query.targets[i], 10);
                 PlayMobySound(1, 0, self);
             }
         }
@@ -151,8 +151,8 @@ void func_PAL_0031EBA0(char *self)
     case 4: {
         char *info;
         if (*(char **)(state + 0x38)) {
-            if (!D_L00_001B0134) {
-                D_L00_001B0134 = 1;
+            if (!g_thrown_shot_initialized) {
+                g_thrown_shot_initialized = 1;
                 PlayMobySound(3, 0, self);
             }
             info = moby_get_private_value_0(*(char **)(state + 0x38));
@@ -184,12 +184,12 @@ void func_PAL_0031EBA0(char *self)
             snd_stop_voice(*(int *)(state + 0x20));
         *(int *)(state + 0x20) = -1;
     }
-    func_PAL_0031F500(self);
+    spark_update_targeted_pal(self);
     glow_ring_update_entries(self);
     if (!save_is_record_value(*(int *)(state + 0x40), *(int *)(state + 0x3C))) {
         table_clear_entry_flag(*(int *)(state + 0x44));
         moby_mark_spawned(self);
     } else {
-        ref_L00_003CA730_00((void *)func_PAL_0031FF78, self);
+        ref_L00_003CA730_00((void *)part_spawn_spark_burst_pal, self);
     }
 }

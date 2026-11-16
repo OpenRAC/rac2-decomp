@@ -13,8 +13,8 @@ typedef struct {
     unsigned char pad18[0x1A];
     unsigned char x32;
 } Global001A7A00;
-extern Global001A7A00 D_001A7A00 __attribute__((section(".sdata")));
-extern int D_0018D198[], D_0018D208[];
+extern Global001A7A00 g_player_stats __attribute__((section(".sdata")));
+extern int g_level_idle_frame_counts[], g_level_bolt_scores[];
 extern char *ref_L00_00321878_03[];
 extern char ref_L00_00321878_04[], ref_L00_00321878_05[], ref_L00_00321878_06[], ref_L00_00321878_07[];
 extern void vec_clear_128(void *);
@@ -56,10 +56,10 @@ void part_spawn_bolt_pickups(char *object, int low, int high, int flags, int sur
     if (!flags || (!low && !high)) return;
     if (low <= 0) low=1;
     value=math_random_int_below(high-low+1)+low;
-    if (D_001A7A00.x0A || D_001A7A00.x0B) value*=2;
-    if (value<500 && enabled && D_0018D198[g_current_map_index]) {
-        int rate=D_0018D208[g_current_map_index]*3600/D_0018D198[g_current_map_index];
-        if (D_001A7A00.x0A || D_001A7A00.x0B) rate/=2;
+    if (g_player_stats.x0A || g_player_stats.x0B) value*=2;
+    if (value<500 && enabled && g_level_idle_frame_counts[g_current_map_index]) {
+        int rate=g_level_bolt_scores[g_current_map_index]*3600/g_level_idle_frame_counts[g_current_map_index];
+        if (g_player_stats.x0A || g_player_stats.x0B) rate/=2;
         #define limit ((int)ref_L00_00321878_01)
         if (rate<limit/2) {
             if (rate<=limit*3/10) {
@@ -69,7 +69,7 @@ void part_spawn_bolt_pickups(char *object, int low, int high, int flags, int sur
                 STUB_printf(ref_L00_00321878_05,(limit*19/30-rate)/(limit/15));
                 value=value*(limit*19/30-rate)/(limit/15);
             }
-            if (D_001A7A00.x0B) {
+            if (g_player_stats.x0B) {
                 if(value>limit*10/3) value=limit*10/3;
             } else if(value>limit*5/3) value=limit*5/3;
         } else if (limit<rate) {
@@ -101,8 +101,8 @@ void part_spawn_bolt_pickups(char *object, int low, int high, int flags, int sur
         }}}}}
 #undef TAKE
 #undef TAKE_MIN
-        if (D_001A7A00.x32) remaining /= D_001A7A00.x32;
-        D_001A7A00.x14 += remaining;
+        if (g_player_stats.x32) remaining /= g_player_stats.x32;
+        g_player_stats.x14 += remaining;
     } else {
 #define SPLIT(n, denom) if (remaining >= denom) { quotient = remaining / denom; n = quotient; remaining -= n * denom; }
         SPLIT(thousands, 1000); SPLIT(fivehundreds, 500); SPLIT(hundreds, 100);

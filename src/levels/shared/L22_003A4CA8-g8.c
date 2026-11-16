@@ -8,7 +8,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int D_L22_001AF34C __attribute__((sda));
+extern int g_space_ship_tilt_value __attribute__((sda));
 extern char g_hero_position[];
 
 extern void moby_transform_joint_point(void *, int, void *);
@@ -53,14 +53,14 @@ void space_ship_tilt_attached_part(char *obj) {
         func_002A0F48(*(char **)(state + 0x440));
         FastVecScale(u, state + 0x200, -1.0f);
         mat_align_to_dir(*(char **)(state + 0x440) + 0xC0, u, 0);
-        *(short *)(state + 0x460) = D_L22_001AF34C;
+        *(short *)(state + 0x460) = g_space_ship_tilt_value;
         return;
     }
     {
         short v = *(short *)(state + 0x460);
 
         if (v != 0) {
-            if (v == D_L22_001AF34C)
+            if (v == g_space_ship_tilt_value)
                 *(int *)(state + 0x458) = 0;
             *v0 = 0;
             ((float *)v0)[0] = 1.0f;

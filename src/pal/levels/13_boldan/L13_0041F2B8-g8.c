@@ -13,11 +13,11 @@ extern int math_random_int_range(int,int),math_random_int_below(int),FloatToInt(
 extern float math_random_float_range(float,float),math_random_signed_float_range(float,float),math_random_angle(void),IntToFloat(int),vec_distance_xy(void *,void *);
 extern void vec_clear_128(void *),vec_random_direction(void *,float,float),FastVecAdd(void *,void *,void *),FastVecScale(void *,void *,float),euler_to_matrix(void *,void *),transform_vector(void *,void *,void *);
 extern char *part_spawn_trail(void *,void *,void *,int,int,int,int,int,int);
-extern int D_L13_001B161C __attribute__((sda)),D_L13_001B1620 __attribute__((sda));
-extern float D_L13_001B16A0 __attribute__((sda)),D_L13_001B16A4 __attribute__((sda)),D_L13_001B16B8 __attribute__((sda));
-extern int D_L13_001B16C0 __attribute__((sda)),D_L13_001B16C4 __attribute__((sda)),D_L13_001B16AC __attribute__((sda)),D_L13_001B16B0 __attribute__((sda));
-extern char *D_L13_001B2A0C __attribute__((sda));
-extern char D_L13_001B98C0[];
+extern int g_lightning_beam_low_value __attribute__((sda)),g_lightning_beam_high_value __attribute__((sda));
+extern float g_lightning_beam_radius __attribute__((sda)),g_lightning_beam_jitter_speed __attribute__((sda)),g_lightning_beam_delta_w __attribute__((sda));
+extern int g_lightning_beam_head_color __attribute__((sda)),g_lightning_beam_tip_color __attribute__((sda)),g_lightning_beam_start_index __attribute__((sda)),g_lightning_beam_end_index __attribute__((sda));
+extern char *g_moby_slot_table __attribute__((sda));
+extern char g_camera_l13_position[];
 /* The two spark colours as read by the second loop's unused pick. */
 extern const int D_L13_001B16C0_1[], D_L13_001B16C4_1[];
 typedef struct { char pad0[0x10]; float position[4]; } MobyHead;
@@ -33,7 +33,7 @@ void func_PAL_L13_0041F2B8(char *moby) {
     int i = 0, j = 0, k = 0, branch = 0;
 
     ((MobyHead *)moby)->position[3] = 1.0f;
-    duration = math_random_int_range((D_L13_001B161C * 5 + 2) / 6, (D_L13_001B1620 * 5 + 2) / 6);
+    duration = math_random_int_range((g_lightning_beam_low_value * 5 + 2) / 6, (g_lightning_beam_high_value * 5 + 2) / 6);
     beam->s12=(short)duration;
     beam->r620=(short)duration;
     length=math_random_float_range(4.0f,8.0f);
@@ -49,10 +49,10 @@ void func_PAL_L13_0041F2B8(char *moby) {
             vec_clear_128(&path_steps[i]);
         } else {
             {
-                float radius = D_L13_001B16A0;
+                float radius = g_lightning_beam_radius;
                 vec_random_direction(&path[i], 0.0f, radius);
             }
-            vec_random_direction(&path_steps[i], 0.0f, D_L13_001B16A4 * (0.020000001f));
+            vec_random_direction(&path_steps[i], 0.0f, g_lightning_beam_jitter_speed * (0.020000001f));
         }
         y = path[i].f[1];
         path[i].f[3] = 1.0f;
@@ -75,7 +75,7 @@ void func_PAL_L13_0041F2B8(char *moby) {
 
     for (branch = 0; branch < 4; branch++) {
         int start;
-        float spread = (D_L13_001B16A0);
+        float spread = (g_lightning_beam_radius);
         vec_random_direction(&work, spread, spread);
         start = FloatToInt(math_random_float_range((float)branch * 6.0f, (float)(branch + 1) * 6.0f)) + 4;
         beam->cnt[branch] = (unsigned char)start;
@@ -94,17 +94,17 @@ void func_PAL_L13_0041F2B8(char *moby) {
             b_col = b_col + 0x520;
             for (k = 1; k < 4; k++) {
                 vec_random_direction(&delta, 0.1f, 0.1f);
-                vec_random_direction(b_col + k * 64, 0.0f, (D_L13_001B16A4) * (0.020000001f));
+                vec_random_direction(b_col + k * 64, 0.0f, (g_lightning_beam_jitter_speed) * (0.020000001f));
                 FastVecAdd(cur_col + k * 64, prev_col + (k - 1) * 64, &work);
                 FastVecAdd(cur_col + k * 64, cur_col + k * 64, &delta);
             }
         }
     }
 
-    if (vec_distance_xy(moby+0x10, D_L13_001B98C0) >= 4.0f) {
+    if (vec_distance_xy(moby+0x10, g_camera_l13_position) >= 4.0f) {
         int color;
         int l;
-        char *frame=(char *)((beam->idx<<7)+(int)D_L13_001B2A0C);
+        char *frame=(char *)((beam->idx<<7)+(int)g_moby_slot_table);
         beam->rotation[2]=*(float *)(frame+0x78);
         beam->rotation[1]=*(float *)(frame+0x74);
         beam->rotation[1]+=math_random_signed_float_range(0.0f,30.0f)*0.0174532942f;
@@ -114,15 +114,15 @@ void func_PAL_L13_0041F2B8(char *moby) {
         for (l = 0; l < 32; l += 8) {
             transform_vector(&work, &beam->pts[l], matrix);
             qcopy(&delta, &beam->off[l]);
-            delta.f[3] = (D_L13_001B16B8);
+            delta.f[3] = (g_lightning_beam_delta_w);
             {
                 int heads = math_random_int_below(2) != 0;
-                color = heads ? (D_L13_001B16C0) : (D_L13_001B16C4);
+                color = heads ? (g_lightning_beam_head_color) : (g_lightning_beam_tip_color);
             }
             {
                 int n = ((math_random_int_below(10) + 20) * 5 + 2) / 6;
-                int start = D_L13_001B16AC;
-                int end = D_L13_001B16B0;
+                int start = g_lightning_beam_start_index;
+                int end = g_lightning_beam_end_index;
                 part_spawn_trail(&work, &delta, &delta, start, end, l >> 1, 15, n, color);
             }
         }
@@ -130,7 +130,7 @@ void func_PAL_L13_0041F2B8(char *moby) {
             int n;
             transform_vector(&work, &beam->a[3][k], matrix);
             qcopy(&delta, &beam->b[3][k]);
-            delta.f[3] = (D_L13_001B16B8);
+            delta.f[3] = (g_lightning_beam_delta_w);
             {
                 /* Result unused, as in RAC1's second loop. */
                 int heads = math_random_int_below(2) != 0;
@@ -139,9 +139,9 @@ void func_PAL_L13_0041F2B8(char *moby) {
             n = ((math_random_int_below(10) + 20) * 5 + 2) / 6;
             {
                 {
-                int tip = D_L13_001B16C4;
-                int start = D_L13_001B16AC;
-                int end = D_L13_001B16B0;
+                int tip = g_lightning_beam_tip_color;
+                int start = g_lightning_beam_start_index;
+                int end = g_lightning_beam_end_index;
                 part_spawn_trail(&work, &delta, &delta, start, end, beam->cnt[k] >> 1, 15, n, tip);
             }
             }

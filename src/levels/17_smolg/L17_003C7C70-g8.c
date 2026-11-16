@@ -6,7 +6,7 @@ extern int FloatToInt(f32);
 
 extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 
-extern f32 D_L17_001B04B8 __attribute__((sda));
+extern f32 g_effect_spawner_seconds __attribute__((sda));
 
 extern void moby_set_state(void *, s32, s32);
 
@@ -18,13 +18,13 @@ extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32,
 
 extern void moby_mark_spawned(void *);
 
-extern s32 D_L17_001B1E00 __attribute__((sda));
+extern s32 g_hit_burst_piece_param __attribute__((sda));
 
-extern s32 D_L17_001B1DE0 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_c __attribute__((sda));
 
-extern s32 D_L17_001B1DD8 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_b __attribute__((sda));
 
-extern s32 D_L17_001B1DD0 __attribute__((sda));
+extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 
 /* Counts the record's own timer down once, then hands the sub-object's four packed
    colour bytes and the measured scale to the level's own setter. */
@@ -57,9 +57,9 @@ void effect_l17_spawner_update(s32 moby)
     packed |= vars[1] << 8;
     packed |= vars[0];
     scale = *(f32 *)&vars[4] * 210000.0f;
-    frames = FloatToInt(D_L17_001B04B8 * 60.0f);
+    frames = FloatToInt(g_effect_spawner_seconds * 60.0f);
     if (part_l17_spawn_fading(scale, moby_addr, packed, frames) != 0)
-        *(u16 *)(moby_addr + 0x96) = FloatToInt(D_L17_001B04B8 * 60.0f);
+        *(u16 *)(moby_addr + 0x96) = FloatToInt(g_effect_spawner_seconds * 60.0f);
     else
         *(u16 *)(moby_addr + 0x96) = 1;
 }
@@ -82,8 +82,8 @@ void hit_l17_burst_update(s32 moby)
         }
         break;
     case 2:
-        part_explode_object_into_pieces(moby, &D_L17_001B1DE0, &D_L17_001B1DD8, &D_L17_001B1DD0,
-                          0xFFFF, 0, D_L17_001B1E00, 0, 0xFFFF, 0xFF, 0);
+        part_explode_object_into_pieces(moby, &g_hit_burst_piece_table_c, &g_hit_burst_piece_table_b, &g_hit_burst_piece_table_a,
+                          0xFFFF, 0, g_hit_burst_piece_param, 0, 0xFFFF, 0xFF, 0);
         SpawnExplosion(moby + 0x10, 0, 12, 10, 10, 10, 0, 0,
                       *(f32 *)(moby + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
         moby_mark_spawned(moby);
@@ -187,10 +187,10 @@ typedef struct {
     s32 i450;
 } L17Vars;
 
-extern float D_L17_001B0CA8 __attribute__((sda));
-extern u8 D_L17_001B0CB8[4] __attribute__((sda));
-extern u8 D_L17_001B9BC0[];
-extern char D_L17_001B0CC8[]; /* "returned null\n" */
+extern float g_grulch_frame_scalar __attribute__((sda));
+extern u8 g_grulch_init_bytes[4] __attribute__((sda));
+extern u8 g_tether_origin_pos[];
+extern char g_str_returned_null[]; /* "returned null\n" */
 extern u8 *g_hero_moby NOT_SDA;
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void MoveCtl_Init(void *);
@@ -255,8 +255,8 @@ void grulch_init_state_check_hits(u8 *obj)
         MoveCtl_Init(&vars->t140);
         vars->t140.f0C = 2.5f;
         vars->t140.f08 = 2.0f;
-        vars->t140.i00 = FloatToInt(D_L17_001B0CA8 * 1024.0f);
-        vars->t140.f04 = D_L17_001B0CA8;
+        vars->t140.i00 = FloatToInt(g_grulch_frame_scalar * 1024.0f);
+        vars->t140.f04 = g_grulch_frame_scalar;
         vars->t140.f24 = vars->f40C * (1.0f / 60.0f);
         if (vars->v3D0.f[3] != 12439.4f) {
             vars->v3D0.q = *(Quad *)(obj + 0x10);
@@ -271,14 +271,14 @@ void grulch_init_state_check_hits(u8 *obj)
         vars->f330 = vars->f30;
         vars->b28 = 0;
         vars->i418 = 0;
-        vars->p310 = D_L17_001B0CB8;
+        vars->p310 = g_grulch_init_bytes;
         vars->f430 = (float)vars->b34;
         moby_set_state(obj, 1, 0);
         if (obj[0x43])
             anim_start_blended(obj, 0, 0, 0);
         vars->i450 = vars->i428;
     }
-    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_origin_pos) < 24.0f) {
         moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }
@@ -298,7 +298,7 @@ void grulch_init_state_check_hits(u8 *obj)
     vars->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
     target = vars->target;
     if (!target) {
-        STUB_printf(D_L17_001B0CC8);
+        STUB_printf(g_str_returned_null);
         target = g_hero_moby;
     }
     vars->p408 = target;
@@ -324,15 +324,15 @@ extern L17Player g_hero_state;
 
 /* The level's save record: one collected flag per object id from 0x464. */
 typedef struct { u8 pad[0x464]; u8 collected[0]; } L17SaveState;
-extern L17SaveState D_L17_0021EBB0;
+extern L17SaveState g_level_l17_save_state;
 
 /* The current level, read with the lw macro: absolute in ordinary flow, $gp in a
    delay slot. */
 extern s32 g_current_map_index MACRO_ADDR;
 /* Per-level save nibbles, 0x400 bytes a level, two object ids a byte. */
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 /* Per-level object flags, 16 bytes a level. */
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 
 /* Paths: a count, then 16-byte points from 0x10. */
 extern u8 *g_path_l17_table[];
@@ -387,8 +387,8 @@ void target_pad_update(u8 *obj)
         if (g_hero_state.target == obj) {
             if (pad_vars->group != -1) {
                 id = *(u16 *)(obj + 0xB2);
-                if (!D_L17_0021EBB0.collected[(s16)id]) {
-                    nibble = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+                if (!g_level_l17_save_state.collected[(s16)id]) {
+                    nibble = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
                     nibble = ((id & 1) ? nibble >> 4 : nibble) & 7;
                     if (!nibble) {
                         u16 slot;
@@ -396,11 +396,11 @@ void target_pad_update(u8 *obj)
                         cam_lock_entry(pad_vars->group);
                         slot = *(u16 *)(obj + 0xB2);
                         if (slot & 1) {
-                            counter = D_0019B4A8 + (((s16)slot >> 1) + (g_current_map_index << 10));
+                            counter = g_moby_nibble_table + (((s16)slot >> 1) + (g_current_map_index << 10));
                             if (((*counter >> 4) & 7) != 7)
                                 *counter += 16;
                         } else {
-                            counter = D_0019B4A8 + (((s16)slot >> 1) + (g_current_map_index << 10));
+                            counter = g_moby_nibble_table + (((s16)slot >> 1) + (g_current_map_index << 10));
                             if ((*counter & 7) != 7)
                                 *counter += 1;
                         }
@@ -454,7 +454,7 @@ void switch_l17_update(u8 *obj)
         vars->phase = math_random_angle();
         level = g_current_map_index;
         *(f32 *)(obj + 0x18) -= 0.35f;
-        if (D_0019B2E8[obj[0xB0] + level * 16] & 0x80) {
+        if (g_moby_group_flags[obj[0xB0] + level * 16] & 0x80) {
             obj[0xBC] = 2;
             *(u32 *)(obj + 0x78) = 0x80208020;
             obj[0x20] = 2;
@@ -483,7 +483,7 @@ void switch_l17_update(u8 *obj)
             *(u32 *)(obj + 0x78) = ((shade << 16) | green) | shade;
         }
         if ((g_hero_state.target == obj && !g_hero_state.state)
-            || (vars->trigger && (D_0019B2E8[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
+            || (vars->trigger && (g_moby_group_flags[obj[0xB0] + g_current_map_index * 16] & 0x80))) {
             obj[0x20] = 2;
             obj[0xBC] = 1;
             *(u32 *)(obj + 0x78) = 0x80208020;

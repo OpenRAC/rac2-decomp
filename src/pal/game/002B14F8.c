@@ -2,19 +2,19 @@
 #include "names.h"
 
 typedef unsigned char u8;
-extern u8 D_00139648;
-extern u8 D_001A7A47 __attribute__((sda));
+extern u8 g_save_baseline_count;
+extern u8 g_smooth_value_flag __attribute__((sda));
 extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float f13);
 extern u8 g_item_slot_to_record[];
 extern u8 g_weapon_table[];
-extern u8 D_001A7A60[] __attribute__((sda));
+extern u8 g_item_enabled_flags[] __attribute__((sda));
 
 /* Stores the third argument (or 1.0f) in the object's float at 0x70, and, when the fifth argument
    is set and that float differs from the one at 0x20, calls func_002AEC48 with the object's two
    first arguments, the fourth argument and the pair 0.03f, 0.3f. */
 void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
 {
-    if (D_001A7A47 != 0) {
+    if (g_smooth_value_flag != 0) {
         a1[28] = f12;
     } else {
         a1[28] = 1.0f;
@@ -27,7 +27,7 @@ void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
 }
 
 
-void func_PAL_002B1588(int first, int second)
+void value_set_entry_by_index_pal(int first, int second)
 {
     extern char *GetLocalizedString(int);
     extern void func_0029CC98(int, int);
@@ -36,7 +36,7 @@ void func_PAL_002B1588(int first, int second)
 
 extern void func_0029CC50(int, int, int);
 
-void func_PAL_002B15B8(int first, int second, int third) {
+void value_forward_three_args_pal(int first, int second, int third) {
     func_0029CC50(first, second, third);
 }
 
@@ -47,7 +47,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void matrix_mul_vec3(float *dst, float *src, char *table);
 extern void FastVecAdd(float *dst, float *src, float *arg);
 extern int D_L00_001A8FF0_1 __attribute__((sda));
-extern char *func_PAL_002735D0(char *self, int a1, int a2, int a3, char *p4, char *p5,
+extern char *cam_moby_create_pal(char *self, int a1, int a2, int a3, char *p4, char *p5,
                     float *buf, int b3, float fa, float fb);
 
 /* Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit. */
@@ -77,7 +77,7 @@ void func_PAL_002B15D8(char *self, int mask, float *arg2,
         FastVecAdd(buf, buf, arg2);
         fa = math_random_float_range(90.0f, 270.0f);
         fb = math_random_float_range(10.0f, 20.0f);
-        func_PAL_002735D0(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
+        cam_moby_create_pal(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
                 buf, arg3, fa, fb);
     }
 }

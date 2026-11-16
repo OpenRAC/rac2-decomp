@@ -1,31 +1,31 @@
 #include "common.h"
 
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
-extern int D_L05_00221D94[];
+extern int g_stream_scroll_flags[];
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_0019B2E8[];
-extern char *D_L05_001B251C;
-extern float D_L05_001B1680 __attribute__((sda));
-extern float D_L05_001B1688 __attribute__((sda));
-extern float D_L05_001B168C __attribute__((sda));
-extern float D_L05_001B1690 __attribute__((sda));
-extern float D_L05_001B1694 __attribute__((sda));
-extern float D_L05_001B1698 __attribute__((sda));
-extern float D_L05_001B169C __attribute__((sda));
-extern float D_L05_001B16D4 __attribute__((sda));
-extern float D_L05_001B16D8 __attribute__((sda));
-extern float D_L05_001B16DC __attribute__((sda));
-extern float D_L05_001B16E0 __attribute__((sda));
-extern float D_L05_001B16E4 __attribute__((sda));
-extern float D_L05_001B16E8 __attribute__((sda));
-extern float D_L05_001B16EC __attribute__((sda));
-extern float D_L05_001B16F0 __attribute__((sda));
-extern float D_L05_001B16F4 __attribute__((sda));
-extern float D_L05_001B16F8 __attribute__((sda));
-extern float D_L05_001B16FC __attribute__((sda));
-extern float D_L05_001B1704 __attribute__((sda));
-extern float D_L05_001B170C __attribute__((sda));
-extern void *D_L05_001B1728 __attribute__((sda));
+extern u8 g_moby_group_flags[];
+extern char *g_feltzin_target_mobys;
+extern float g_stream_ring_radius_a __attribute__((sda));
+extern float g_stream_speed_scale __attribute__((sda));
+extern float g_stream_speed_current __attribute__((sda));
+extern float g_stream_speed_velocity __attribute__((sda));
+extern float g_stream_speed_target_a __attribute__((sda));
+extern float g_stream_speed_target_b __attribute__((sda));
+extern float g_stream_span_a __attribute__((sda));
+extern float g_stream_scroll_u_a __attribute__((sda));
+extern float g_stream_scroll_u_speed __attribute__((sda));
+extern float g_stream_scroll_u_target_a __attribute__((sda));
+extern float g_stream_scroll_u_target_b __attribute__((sda));
+extern float g_stream_scroll_u_velocity __attribute__((sda));
+extern float g_stream_scroll_v_a __attribute__((sda));
+extern float g_stream_scroll_v_speed __attribute__((sda));
+extern float g_stream_scroll_v_target_a __attribute__((sda));
+extern float g_stream_scroll_v_target_b __attribute__((sda));
+extern float g_stream_scroll_v_velocity __attribute__((sda));
+extern float g_stream_scroll_w_a __attribute__((sda));
+extern float g_stream_scroll_x_a __attribute__((sda));
+extern float g_stream_scroll_y_a __attribute__((sda));
+extern void *g_scrolling_stream_actor __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -39,11 +39,11 @@ extern void gfx_draw_scrolling_stream_layers(void *);
 
 typedef union { float f[0x40]; int i[0x40]; u16 uh[0x80]; } Fields;
 
-void func_PAL_L05_00430828(u8 *actor)
+void scrolling_stream_update_pal(u8 *actor)
 {
     Vector position, step, rotation;
     u8 *state = *(u8 **)(actor + 0x68);
-    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+    if (g_stream_scroll_flags[0] != 0 || (g_moby_group_flags[actor[0xB0] + (g_current_map_index << 4)] & 0x80)) {
         moby_mark_spawned(actor);
         return;
     }
@@ -54,11 +54,11 @@ void func_PAL_L05_00430828(u8 *actor)
         euler_rotation_basis(actor + 0xC0, actor + 0xF0);
         actor[0x30] = 0xFF;
         actor[0x20] = 1;
-        ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (D_L05_001B1680 * D_L05_001B1688);
-        span = D_L05_001B169C;
+        ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (g_stream_ring_radius_a * g_stream_speed_scale);
+        span = g_stream_span_a;
         span *= 6.0f;
-        D_L05_001B16FC = D_L05_001B16F8 = D_L05_001B16E4 = D_L05_001B1690 = 0.0f;
-        D_L05_001B16E8 = D_L05_001B16D4 = D_L05_001B170C = D_L05_001B1704 = 0.0f;
+        g_stream_scroll_w_a = g_stream_scroll_v_velocity = g_stream_scroll_u_velocity = g_stream_speed_velocity = 0.0f;
+        g_stream_scroll_v_a = g_stream_scroll_u_a = g_stream_scroll_y_a = g_stream_scroll_x_a = 0.0f;
         ((Fields *)state)->f[0x20 / 4] = span;
         FastVecScale(&position, actor + 0xC0, span);
         FastVecAdd(&position, &position, actor + 0x10);
@@ -75,19 +75,19 @@ void func_PAL_L05_00430828(u8 *actor)
         char **child = (char **)state;
         int i;
         for (i = 6; i >= 0; i--, child++) {
-            *child = stream_spawn_piece(&position, &rotation, D_L05_001B1680, phase);
+            *child = stream_spawn_piece(&position, &rotation, g_stream_ring_radius_a, phase);
             phase += span;
             FastVecAdd(&position, &position, &step);
         }
         }
-        D_L05_001B1728 = actor;
+        g_scrolling_stream_actor = actor;
     }
     {
     int j;
     for (j = 0; j < 7; j++) {
         u8 *object = ((u8 **)state)[j];
         if (object != 0) {
-            float amount = D_L05_001B168C * 0.020000001f;
+            float amount = g_stream_speed_current * 0.020000001f;
             float *pos = (float *)(object + 0x10);
             u8 *objectState;
             amount += amount;
@@ -106,14 +106,14 @@ void func_PAL_L05_00430828(u8 *actor)
         }
     }
     }
-    if (*(int *)(*(char **)(D_L05_001B251C + (((Fields *)state)->i[0x1C / 4] << 8) + 0x68) + 0x34) != 0) {
-        D_L05_001B168C = math_step_spring_damper_clamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = math_step_spring_damper_clamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = math_step_spring_damper_clamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
+    if (*(int *)(*(char **)(g_feltzin_target_mobys + (((Fields *)state)->i[0x1C / 4] << 8) + 0x68) + 0x34) != 0) {
+        g_stream_speed_current = math_step_spring_damper_clamped(&g_stream_speed_velocity, g_stream_speed_current, g_stream_speed_target_b, 0.02f, 0.2f, 0.0f);
+        g_stream_scroll_u_speed = math_step_spring_damper_clamped(&g_stream_scroll_u_velocity, g_stream_scroll_u_speed, g_stream_scroll_u_target_b, 0.02f, 0.2f, 0.0f);
+        g_stream_scroll_v_speed = math_step_spring_damper_clamped(&g_stream_scroll_v_velocity, g_stream_scroll_v_speed, g_stream_scroll_v_target_b, 0.02f, 0.2f, 0.0f);
     } else {
-        D_L05_001B168C = math_step_spring_damper_clamped(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16D8 = math_step_spring_damper_clamped(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
-        D_L05_001B16EC = math_step_spring_damper_clamped(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
+        g_stream_speed_current = math_step_spring_damper_clamped(&g_stream_speed_velocity, g_stream_speed_current, g_stream_speed_target_a, 0.02f, 0.2f, 0.0f);
+        g_stream_scroll_u_speed = math_step_spring_damper_clamped(&g_stream_scroll_u_velocity, g_stream_scroll_u_speed, g_stream_scroll_u_target_a, 0.02f, 0.2f, 0.0f);
+        g_stream_scroll_v_speed = math_step_spring_damper_clamped(&g_stream_scroll_v_velocity, g_stream_scroll_v_speed, g_stream_scroll_v_target_a, 0.02f, 0.2f, 0.0f);
     }
     gfx_add_draw_callback_first(gfx_draw_scrolling_stream_layers, actor);
 }

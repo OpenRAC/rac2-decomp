@@ -21,16 +21,16 @@ extern f32 func_00309120(f32 f12);
 extern s32 moby_process_collision_hit(u8 *arg0, s32 a1, s32 a2, s32 a3);
 extern s32 snd_play_from_class_bank(s32 index, s32 value, u8 *object, s32 kind);
 extern s32 func_0037D6E0(u8 *a0);
-extern u8 *D_L10_0020B1E0[];
-extern u8 *D_001B251C;
-extern u8 D_L10_00265BA0[];
-extern u8 D_L10_00188660[];
-extern u8 D_L10_00221CD0[];
+extern u8 *g_unused_pointer_table[];
+extern u8 *g_moby_pool_base;
+extern u8 g_group_state_buffer[];
+extern u8 g_effect_l10_record_table[];
+extern u8 g_mission_state[];
 extern u8 g_sound_state[];
-extern s32 D_001B0F44 __attribute__((sda));
-extern s32 D_001B0F48 __attribute__((sda));
+extern s32 g_unused_sda_word_a __attribute__((sda));
+extern s32 g_unused_sda_word_b __attribute__((sda));
 
-void func_PAL_L10_0041BD40(u8 *arg0) {
+void hrugis_boss_init_pal(u8 *arg0) {
     u8 *s1 = *(u8 **)(arg0 + 0x68);
 
     *(s32 *)((u8 *)func_0037BA88(arg0) + 0x148) = 0x1E;

@@ -7,7 +7,7 @@ extern void mem_clear(char *, int, int);
 extern void AttachManipulator(char *, int, char *);
 extern void vec_random_direction(char *, float, float);
 extern void func_PAL_002B15D8(char *, int, char *, float, float, float, float, int);
-extern void func_PAL_L02_004009A0(char *, int, int);
+extern void moby_set_anim_type_three_pal(char *, int, int);
 extern void part_queue_moby_for_glow(char *, int, void *);
 extern void func_PAL_L02_003D5F20(char *, TI128 *);
 extern void enemy_release_effect_record(char *);
@@ -33,7 +33,7 @@ void func_PAL_L02_003D64F8(char *self, int flag1, int flag2) {
     *(int *)(self + 0x98) = 0;
     *(unsigned short *)(self + 0x34) &= 0xEFFF;
     if (flag1 == 0)
-        func_PAL_L02_004009A0(self, 0, -1);
+        moby_set_anim_type_three_pal(self, 0, -1);
     if (flag2 == 0)
         part_queue_moby_for_glow(self, 0, enemy_release_effect_record);
     else

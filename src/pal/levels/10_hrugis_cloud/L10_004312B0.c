@@ -12,7 +12,7 @@ extern f32 fast_subtract_rotations(f32, f32);
    moves the body up 6 (facing pi) or down 6 by the state flag; both states then ease the
    +0xF8 value with one of two helpers and copy the angle, that value and the position to
    the partner. */
-void func_PAL_L10_00431A50(u8 *object)
+void cloud_body_update_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
 

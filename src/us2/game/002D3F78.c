@@ -9,12 +9,12 @@ typedef struct {
     int fallback;
 } CallbackState;
 extern CallbackState g_pause_menu_state;
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029CA00(int);
 
-int func_US2_002D3F78(void) {
+int menu_page_update_3_us2(void) {
     int result = 0;
-    int flags = D_00138344;
+    int flags = g_menu_input_flags;
     if (flags & 0x10) {
         int value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
@@ -42,7 +42,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CA40(void);
 
-int func_US2_002D4000(void) {
+int menu_page_draw_5_us2(void) {
     SetupGifPaging(0);
     func_0029CA40();
     DoGifPaging();

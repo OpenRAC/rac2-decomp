@@ -12,8 +12,8 @@ typedef struct {
     unsigned short timers[4];
     unsigned char flags48, flags49;
 } BurstFlashTemplate;
-extern BurstPalette D_L00_001AA260[], D_L00_001AA278[];
-extern BurstFlashTemplate D_L00_00281760[] __attribute__((aligned(16)));
+extern BurstPalette g_burst_palette_a[], g_burst_palette_b[];
+extern BurstFlashTemplate g_burst_flash_template[] __attribute__((aligned(16)));
 extern void vec_clear_128(void *);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
@@ -25,7 +25,7 @@ extern char *func_PAL_003096D0(char *, char *, char *, float, int,
                           unsigned char, unsigned char, unsigned char, unsigned char);
 extern char *moby_spawn_template_effect(char *, void *, int, void *);
 
-void func_PAL_L00_00322198(char *parent, char *position, float scale, float flash)
+void part_l00_spawn_explosion_burst_pal(char *parent, char *position, float scale, float flash)
 {
     BurstVector zero;
     BurstPalette first, second;
@@ -37,8 +37,8 @@ void func_PAL_L00_00322198(char *parent, char *position, float scale, float flas
         int firstColor, secondColor, life, fadeLife;
         speed = math_random_float_range(8.0f, 10.0f) * 0.020000001f;
         size = scale * 500000.0f;
-        first = D_L00_001AA260[0];
-        second = D_L00_001AA278[0];
+        first = g_burst_palette_a[0];
+        second = g_burst_palette_b[0];
         firstColor = gfx_swap_packed_color_channels(first.values[math_random_int_below(6)], 1);
         secondColor = gfx_swap_packed_color_channels(second.values[math_random_int_below(6)], 1);
         life = math_random_int_range(12, 17);
@@ -62,15 +62,15 @@ void func_PAL_L00_00322198(char *parent, char *position, float scale, float flas
     }
     if (flash != 0.0f) {
         if (flash > 0.0f) {
-            D_L00_00281760[0].radius[1] = flash;
-            D_L00_00281760[0].radius[2] = flash;
-            D_L00_00281760[0].radius[0] = flash;
+            g_burst_flash_template[0].radius[1] = flash;
+            g_burst_flash_template[0].radius[2] = flash;
+            g_burst_flash_template[0].radius[0] = flash;
         } else {
-            D_L00_00281760[0].radius[1] = 13.0f;
-            D_L00_00281760[0].radius[2] = 13.0f;
-            D_L00_00281760[0].radius[0] = 13.0f;
+            g_burst_flash_template[0].radius[1] = 13.0f;
+            g_burst_flash_template[0].radius[2] = 13.0f;
+            g_burst_flash_template[0].radius[0] = 13.0f;
         }
-        moby_spawn_template_effect((char *)D_L00_00281760, position, 0, 0);
+        moby_spawn_template_effect((char *)g_burst_flash_template, position, 0, 0);
     }
 }
 

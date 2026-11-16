@@ -16,7 +16,7 @@ extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
 extern void func_PAL_L00_00419448(char *, char *, char *);
 extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
-extern char D_L00_001B8C80[];
+extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
     short timer;
@@ -48,7 +48,7 @@ typedef struct SpawnObject {
     float forward[4], right[4], up[4];
 } SpawnObject;
 
-char *func_PAL_L00_00418F28(float size, char *position, int trigger, int kind, int red, int green,
+char *parented_explosion_spawn_pal(float size, char *position, int trigger, int kind, int red, int green,
                         int blue, int enabled, int flags, int extra, int control, int extra2,
                         char *parent)
 {
@@ -64,7 +64,7 @@ char *func_PAL_L00_00418F28(float size, char *position, int trigger, int kind, i
         state = (ParentedSpawnState *)m->state;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
-        FastVecSub(direction, D_L00_001B8C80 + 0x140, object + 0x10);
+        FastVecSub(direction, g_scalar_transition_state + 0x140, object + 0x10);
         vec_scale_to_length(direction, direction, 1.0f);
         cam_compute_view_direction(object + 0x10, (char *)up, 1);
         qcopy(object + 0xc0, direction);
@@ -95,16 +95,16 @@ char *func_PAL_L00_00418F28(float size, char *position, int trigger, int kind, i
         if (math_fast_helper_a(sphere, 128.0f) == 1) {
             state->delay = 8;
             state->fade = 0.125f;
-            if (fast_vec_dist(position, D_L00_001B8C80 + 0x140) < 48.0f && trigger != 0) {
-                char *manager = D_L00_001B8C80;
+            if (fast_vec_dist(position, g_scalar_transition_state + 0x140) < 48.0f && trigger != 0) {
+                char *manager = g_scalar_transition_state;
                 *(int *)(manager + 0x16c) = 0;
                 *(int *)(manager + 0x168) = 17;
                 *(float *)(manager + 0x160) = 0.075f;
             }
             if (state->flags != 0) {
-                FastVecSub(difference, object + 0x10, D_L00_001B8C80 + 0x140);
+                FastVecSub(difference, object + 0x10, g_scalar_transition_state + 0x140);
                 vec_scale_to_length(difference, difference, 1.0f);
-                if (1.5707964f - math_fast_angle_helper(FastVecDot(difference, D_L00_001B8C80 + 0x370)) < 0.45378566f)
+                if (1.5707964f - math_fast_angle_helper(FastVecDot(difference, g_scalar_transition_state + 0x370)) < 0.45378566f)
                     state->flags = 1;
                 else
                     state->flags = 0;

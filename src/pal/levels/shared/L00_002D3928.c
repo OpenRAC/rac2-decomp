@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int s32;
@@ -9,19 +10,19 @@ typedef struct {
     u8 field149B[0xdf9]; s32 field2294;
 } NativeModeResident;
 extern NativeModeResident D_00189E20_8;
-extern s32 D_L00_001A8FF0 __attribute__((sda));
-extern volatile u8 D_001A7B08[4] __attribute__((sda));
+extern s32 g_hero_locked_flag __attribute__((sda));
+extern volatile u8 g_status_flag_b[4] __attribute__((sda));
 extern s32 D_L00_001A8FF4_1 __attribute__((sda));
-extern u8 D_0018A0E0[];
+extern u8 g_hero_state_block[];
 
 /* resident mode predicate: returns 0, 1 or 2 from the resident state words */
-s32 func_PAL_L00_002D3928(void) {
+s32 hero_get_movement_mode_pal(void) {
     s32 result = D_00189E20_8.field348;
-    if (D_L00_001A8FF0 != 0 && D_L00_001A8FF4_1 == 0) result = 2;
+    if (g_hero_locked_flag != 0 && D_L00_001A8FF4_1 == 0) result = 2;
     if (D_L00_001A8FF4_1 != 0 || D_00189E20_8.field2294 == 59 ||
         (D_00189E20_8.field2294 == 110 && D_00189E20_8.field149A == 0) ||
         D_00189E20_8.field2294 == 109 || D_00189E20_8.field218 != 0 ||
-        (D_00189E20_8.field1497 != 0 && D_001A7B08[3] != 0 &&
+        (D_00189E20_8.field1497 != 0 && g_status_flag_b[3] != 0 &&
          D_00189E20_8.field2294 == 0 && D_00189E20_8.field34E < 3)) result = 1;
     if (result == 1 && D_00189E20_8.field149A != 0) result = 0;
     return result;

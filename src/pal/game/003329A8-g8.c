@@ -5,7 +5,7 @@ extern void gfx_draw_shockwave_ring(void *);
 extern void part_draw_spinning_billboard_pair(void *, void *, int, float);
 extern float ref_L00_00330E48_00 __attribute__((sda));
 
-void func_PAL_003329A8(char *owner)
+void part_draw_ring_effect_and_trail_pal(char *owner)
 {
     char *data;
     gfx_append_vu1_preset_c();

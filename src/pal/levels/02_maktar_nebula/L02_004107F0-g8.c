@@ -5,14 +5,14 @@ extern s32 FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern void get_moby_color(u8 *, s32 *, s32 *, s32 *);
-extern void func_PAL_L02_00411DB0(u8 *);
+extern void blade_ball_explode_pal(u8 *);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(u8 *);
 extern s32 snd_is_voice_playing_for_owner(s32, s32);
 extern s32 PlayMobySound(s32, s32, char *);
 extern void snd_stop_voice(s32);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
-extern float func_PAL_002AA108(u8 *, u8 *);
+extern float moby_update_aim_target_strength_pal(u8 *, u8 *);
 extern void vec_scale_to_length(float *, float *, float);
 extern void vec_random_direction(float *, float, float);
 extern void FastVecAdd(float *, float *, float *);
@@ -22,12 +22,12 @@ extern void moby_set_state(u8 *, s32, s32);
 extern void blade_ball_update_targeting(u8 *);
 extern u8 g_camera_l02_position[];
 extern u8 g_sound_state[];
-extern float D_L02_001B194C __attribute__((sda));
-extern float D_L02_001B1950 __attribute__((sda));
-extern float D_L02_001B1954 __attribute__((sda));
-extern float D_L02_001B1958 __attribute__((sda));
-extern float D_L02_001B1960 __attribute__((sda));
-extern float D_L02_001B1964 __attribute__((sda));
+extern float g_blade_ball_push_speed __attribute__((sda));
+extern float g_blade_ball_random_spread_min __attribute__((sda));
+extern float g_blade_ball_random_spread_max __attribute__((sda));
+extern float g_blade_ball_up_speed __attribute__((sda));
+extern float g_blade_ball_angle_spread_min __attribute__((sda));
+extern float g_blade_ball_angle_spread_max __attribute__((sda));
 
 /* Maintain the held effect slot and react to contacts with another actor. */
 void func_PAL_L02_00411720(u8 *object)
@@ -63,7 +63,7 @@ void func_PAL_L02_00411720(u8 *object)
         *(float *)(state + 0x8C) = 0.004f;
         *(u32 *)(state + 0x98) |= 0x14;
         state[0x28] = 3;
-        func_PAL_L02_00411DB0(object);
+        blade_ball_explode_pal(object);
     }
     if (object[0x31] && fast_vec_dist(object + 0x10, g_camera_l02_position) < 24.0f) {
         moby_update_ground_check(object);
@@ -89,19 +89,19 @@ void func_PAL_L02_00411720(u8 *object)
         else if (object[0x31] == 0 && kind == 0xB89)
             *(s32 *)(contact + 0x2C) = 0;
     }
-    amount = func_PAL_002AA108(object, contact);
+    amount = moby_update_aim_target_strength_pal(object, contact);
     object[0xA8] = 0xFF;
     if (amount != 0.0f) {
         scale = 0.00040000002f;
-        push = D_L02_001B194C * scale;
+        push = g_blade_ball_push_speed * scale;
         *(float *)(state + 0x20) -= amount;
         vec_scale_to_length(velocity, (float *)(contact + 0x10), push);
-        vec_random_direction(random, D_L02_001B1950 * scale, D_L02_001B1954 * scale);
+        vec_random_direction(random, g_blade_ball_random_spread_min * scale, g_blade_ball_random_spread_max * scale);
         FastVecAdd(velocity, velocity, random);
-        velocity[2] = math_random_float_range(D_L02_001B1958, D_L02_001B1958) * scale;
+        velocity[2] = math_random_float_range(g_blade_ball_up_speed, g_blade_ball_up_speed) * scale;
         velocity[3] = 5627.925f;
         FastVecAdd((float *)(state + 0x100), (float *)(state + 0x100), velocity);
-        vec_random_direction(random, D_L02_001B1960 * 6.981318e-06f, D_L02_001B1964 * 6.981318e-06f);
+        vec_random_direction(random, g_blade_ball_angle_spread_min * 6.981318e-06f, g_blade_ball_angle_spread_max * 6.981318e-06f);
         *(float *)(state + 0x170) = FastAddRotations(*(float *)(state + 0x170), random[0]);
         *(float *)(state + 0x174) = FastAddRotations(*(float *)(state + 0x174), random[1]);
         *(float *)(state + 0x178) = FastAddRotations(*(float *)(state + 0x178), random[2]);
@@ -109,6 +109,6 @@ void func_PAL_L02_00411720(u8 *object)
         moby_set_state(object, 13, 4);
     }
     if (object[0x20] >= 2 && state[0x2E] == 2)
-        func_PAL_L02_00411DB0(object);
+        blade_ball_explode_pal(object);
     blade_ball_update_targeting(object);
 }

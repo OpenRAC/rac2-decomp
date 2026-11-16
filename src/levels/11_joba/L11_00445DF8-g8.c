@@ -5,7 +5,7 @@ extern const s32 ref_L11_00445DF8_01 __attribute__((sda));
 extern float ref_L11_00445DF8_02 __attribute__((sda));
 extern float ref_L11_00445DF8_03 __attribute__((sda));
 extern s32 ref_L11_00445DF8_04 __attribute__((sda));
-extern s32 D_001A7A00;
+extern s32 g_player_stats;
 extern char g_music_state[];
 extern char g_hero_state[];
 extern s32 math_fast_float_d(void *);
@@ -67,7 +67,7 @@ void joba_boss_start_random_action(char *moby, s32 count_delta, float accum_delt
         }
     }
     hero = g_hero_state;
-    if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * ref_L11_00445DF8_03) {
+    if ((float)*(s32 *)(hero + 0x24CC) < (float)g_player_stats * ref_L11_00445DF8_03) {
         id23 = 0x18;
         if (*(s16 *)(state + 0x2D0) == 0)
             candidates[num_candidates++] = id23;

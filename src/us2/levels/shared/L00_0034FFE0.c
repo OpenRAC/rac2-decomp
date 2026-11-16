@@ -6,7 +6,7 @@ extern void DoGifPaging(void);
 extern void module_l00_call_handler_10(void);
 
 /* Run the three measured setup calls with an explicit long zero, then return the defined integer zero. */
-int func_US2_L00_0034FFE0(void)
+int setup_l00_run_three_return_zero_8_us2(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_10();

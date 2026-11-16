@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "common.h"
-extern s32 D_001B2748;
+extern s32 g_flashing_frame;
 
 /* Scales the level's shared word by the object's own signed halfword, takes it modulo
    sixty and paints the object with 0x80FFFFFF when the remainder is under fifteen and
    with 0x80404040 otherwise; then it sets the sub-object's two flag words. */
-void func_PAL_L17_003C0758(s32 a0)
+void flashing_update_pal(s32 a0)
 {
-    s32 v1 = D_001B2748;
+    s32 v1 = g_flashing_frame;
     s32 d = 50;
     s32 v0 = *(short *)(a0 + 0xB2);
     s32 c1 = 0x80404040;
@@ -30,7 +30,7 @@ void func_PAL_L17_003C0758(s32 a0)
 
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
-extern float D_L17_001AF320 __attribute__((sda)), D_L17_001AF324 __attribute__((sda));
+extern float g_burst_l17_speed_scale __attribute__((sda)), g_burst_jitter_scale __attribute__((sda));
 extern char g_sound_state[];
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float, float);
@@ -40,7 +40,7 @@ extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
 extern void add_vectors(void *, void *, void *);
 extern int math_random_int_below(int);
-extern void *func_PAL_002C0FF0(void *, void *, int, void *, int, int);
+extern void *part_spawn_scaled_smoke_pal(void *, void *, int, void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void snd_stop_voice(int);
 
@@ -72,17 +72,17 @@ void func_PAL_L17_003A4A28(unsigned char *obj)
         qcopy(&position, obj + 0x10);
         euler_to_matrix(matrix, obj + 0xF0);
         vec_clear_128(&velocity);
-        velocity.f[0] = *(float *)state * (D_L17_001AF320 * 3.0f) * 0.020000001f;
-        FastVecScale(&jitter, &jitter, velocity.f[0] * D_L17_001AF324);
+        velocity.f[0] = *(float *)state * (g_burst_l17_speed_scale * 3.0f) * 0.020000001f;
+        FastVecScale(&jitter, &jitter, velocity.f[0] * g_burst_jitter_scale);
         transform_vector(&velocity, &velocity, matrix);
         add_vectors(&random, &velocity, &jitter);
         if (*(int *)(state + 0xC) >= 8 || math_random_int_below(8 - *(int *)(state + 0xC)) == 0) {
             FastVecScale(&step, &velocity, 0.33f);
-            func_PAL_002C0FF0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
+            part_spawn_scaled_smoke_pal(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
         if (*(int *)(state + 0xC) >= 8 || math_random_int_below(8 - *(int *)(state + 0xC)) == 0) {
             FastVecAdd(&position, &position, &step);
-            func_PAL_002C0FF0(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
+            part_spawn_scaled_smoke_pal(&position, &velocity, 0x40, obj, 0x80, 0x1FF);
         }
         if (math_fast_float_d(state + 0xC)) {
             int index;

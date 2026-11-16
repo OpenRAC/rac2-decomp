@@ -6,11 +6,11 @@ extern void FastVecSub(void *,void *,void *);
 extern float FastVecLength(void *),FastVecDot(void *,void *);
 extern float math_fast_angle_helper(float),math_fabs(float);
 extern int CollLine(void *,void *,int,void *,int);
-extern char D_L05_002A1800[];
-extern int D_L05_001B1B0C __attribute__((sda)),D_L05_001B1B08 __attribute__((sda));
-extern float D_L05_001B1B14 __attribute__((sda));
-extern int D_L05_001B2048;
-extern char D_L05_001B96C0[];
+extern char g_spawn_entry_table[];
+extern int g_ship_lock_duration_alt __attribute__((sda)),g_ship_lock_duration_normal __attribute__((sda));
+extern float g_ship_lock_angle_limit __attribute__((sda));
+extern int g_feltzin_mission_index;
+extern char g_origin_vec[];
 /* Keeps the ship's target lock. It looks for a new enemy to lock onto and drops the lock when the enemy dies, drifts off to the side or is hidden. */
 void ship_update_target_lock(char *object)
 {
@@ -22,11 +22,11 @@ void ship_update_target_lock(char *object)
     char *target;
     float *health;
     float length,dot;
-    if(index<0 || *(int *)((table=D_L05_002A1800)+index*40+20)<=0) {
+    if(index<0 || *(int *)((table=g_spawn_entry_table)+index*40+20)<=0) {
         *(int *)(state+0x18)=0; *(int *)(state+0x14)=0; *(int *)(state+0x1c)=0;
         return;
     }
-    limit=*(int *)(table+0x168)?D_L05_001B1B0C:D_L05_001B1B08;
+    limit=*(int *)(table+0x168)?g_ship_lock_duration_alt:g_ship_lock_duration_normal;
     target=*(char **)(state+0x18);
     if(!target) {
         char *nextTarget;
@@ -54,8 +54,8 @@ void ship_update_target_lock(char *object)
         if(length==0.0f) goto zeroLength;
         {
             *(int *)(object+0x98)=0;
-            if(math_fabs(1.5707964f-math_fast_angle_helper(dot/length))>D_L05_001B1B14*0.017453294f ||
-               (D_L05_001B2048%5==0 && CollLine(D_L05_001B96C0,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
+            if(math_fabs(1.5707964f-math_fast_angle_helper(dot/length))>g_ship_lock_angle_limit*0.017453294f ||
+               (g_feltzin_mission_index%5==0 && CollLine(g_origin_vec,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
                 *(int *)(state+0x18)=0; *(int *)(state+0x14)=0; *(int *)(state+0x1c)=0;
             } else { if(++*(int *)(state+0x1c)>limit) *(int *)(state+0x1c)=limit; }
             *(int *)(object+0x98)=*(int *)(*(char **)(object+0x24)+0x10);

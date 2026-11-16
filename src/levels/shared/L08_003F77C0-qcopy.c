@@ -28,7 +28,7 @@ typedef struct {
     float phase[16];
     float scale[16];
 } Sparkle;
-extern Sparkle D_L08_001B9E00;
+extern Sparkle g_lens_flare_2;
 /* Starts a set of eleven randomly coloured sparkles for the owner (once only), picking each
    one's colour, lifetime and size. */
 void part_start_sparkle_burst(void *owner)
@@ -37,34 +37,34 @@ void part_start_sparkle_burst(void *owner)
     unsigned int base_color;
     int green_part;
     float phase;
-    if (D_L08_001B9E00.active == 1) return;
-    D_L08_001B9E00.owner = owner;
-    D_L08_001B9E00.active = 1;
+    if (g_lens_flare_2.active == 1) return;
+    g_lens_flare_2.owner = owner;
+    g_lens_flare_2.active = 1;
     i = 1;
     base_color = 0x706080;
     for (; i < 12; ++i) {
         intensity = math_random_int_below(63) + 1;
         color_mode = math_random_int_below(6);
         switch (color_mode) {
-        case 0: D_L08_001B9E00.color[i] = intensity + base_color - (intensity << 16); break;
-        case 1: D_L08_001B9E00.color[i] = (intensity << 8) + (intensity + base_color); break;
-        case 2: D_L08_001B9E00.color[i] = (math_random_int_below(intensity) << 8) + (intensity + base_color); break;
+        case 0: g_lens_flare_2.color[i] = intensity + base_color - (intensity << 16); break;
+        case 1: g_lens_flare_2.color[i] = (intensity << 8) + (intensity + base_color); break;
+        case 2: g_lens_flare_2.color[i] = (math_random_int_below(intensity) << 8) + (intensity + base_color); break;
         case 3:
             red = math_random_int_below(intensity);
             green_part = (math_random_int_below(intensity) << 8) + base_color;
-            D_L08_001B9E00.color[i] = (red << 16) + green_part + intensity; break;
-        default: D_L08_001B9E00.color[i] = base_color; break;
+            g_lens_flare_2.color[i] = (red << 16) + green_part + intensity; break;
+        default: g_lens_flare_2.color[i] = base_color; break;
         }
-        D_L08_001B9E00.life[i] = math_random_int_below(3) + 1;
+        g_lens_flare_2.life[i] = math_random_int_below(3) + 1;
         phase = math_random_float_range(-0.95f, 2.5f);
-        D_L08_001B9E00.phase[i] = phase;
+        g_lens_flare_2.phase[i] = phase;
         phase = math_fabs(math_fast_sin_or_cos_a(math_fast_float_g(phase + 1)));
-        D_L08_001B9E00.scale[i] = phase * phase * phase * 1.7f;
-        D_L08_001B9E00.size[i] = 23;
+        g_lens_flare_2.scale[i] = phase * phase * phase * 1.7f;
+        g_lens_flare_2.size[i] = 23;
     }
-    D_L08_001B9E00.phase[0] = -1;
-    D_L08_001B9E00.scale[0] = 2;
-    D_L08_001B9E00.color[0] = 0x808080;
-    D_L08_001B9E00.life[0] = 0;
-    D_L08_001B9E00.size[0] = 127;
+    g_lens_flare_2.phase[0] = -1;
+    g_lens_flare_2.scale[0] = 2;
+    g_lens_flare_2.color[0] = 0x808080;
+    g_lens_flare_2.life[0] = 0;
+    g_lens_flare_2.size[0] = 127;
 }

@@ -17,7 +17,7 @@ extern int CollLine(void *, void *, int, int, int);
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern char g_sound_state[];
 extern char g_hero_state[];
-extern int D_00138320[];
+extern int g_pad_pressed_flags[];
 extern char g_hero_position[];
 
 typedef struct {
@@ -140,7 +140,7 @@ void ApplyHeroGravityAndJumpMotion(void)
 
             if (*(float *)(hero + 0x4B0) == 0.0f && *(float *)(hero + 0x4B4) == 0.0f)
                 zero = 1;
-            if ((D_00138320[0] & 0x40) || zero ||
+            if ((g_pad_pressed_flags[0] & 0x40) || zero ||
                 (hero_check = (char *)g_hero_state, *(int *)(hero_check + 0x2294) == 18)) {
                 char *hero = (char *)&g_hero_state;
 

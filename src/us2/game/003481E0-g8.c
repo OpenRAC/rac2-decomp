@@ -19,7 +19,7 @@ extern float ref_00347468_05 __attribute__((sda));
 extern float ref_00347468_06,ref_00347468_07,ref_00347468_08,ref_00347468_09;
 typedef struct {short a,b,c,id,e;} MenuGridEntry;
 extern MenuGridEntry ref_00347468_10[];
-extern unsigned char D_001A7A80[] __attribute__((sda));
+extern unsigned char g_movie_seen_flags[] __attribute__((sda));
 void func_US2_003481E0(char *o)
 {
  MenuIntegerPair pos=ref_00347468_00[0];
@@ -30,14 +30,14 @@ void func_US2_003481E0(char *o)
  v=*(float **)(o+0x438);object_set_first_float4(b,v[0]+ref_00347468_02,v[1]+ref_00347468_07,0.0f,0.0f);
  v=*(float **)(o+0x438);object_set_first_float4(c,v[0]+ref_00347468_01,v[1]+ref_00347468_06,0.0f,0.0f);
  object_set_first_float4(a,(float)pos.x,(float)pos.y,0.0f,0.0f);
- if(D_001A7A80[id]&1) {
+ if(g_movie_seen_flags[id]&1) {
   int x,y;
   hud_set_widget_value_pair(a,0xea98,0);
   object_set_flag_value(a,1);object_set_flag_value(b,1);object_set_flag_value(c,1);
   gfx_draw_screen_element_stored(b);gfx_draw_screen_element_stored(c);
   v=*(float **)(o+0x438);x=(int)(v[0]+ref_00347468_04);y=(int)(v[1]+ref_00347468_08);
   func_US2_00280440(x,y,0x80f0f0f0UL,GetLocalizedString(0x3065),-1,0xaf,0.7f);
- } else if(D_001A7A80[id]&4) {
+ } else if(g_movie_seen_flags[id]&4) {
   int x,y;
   hud_set_widget_value_pair(a,0xea98,1);
   object_set_flag_value(a,1);object_set_flag_value(b,1);object_set_flag_value(c,1);
@@ -47,7 +47,7 @@ void func_US2_003481E0(char *o)
  }
  hud_draw_colored_quad_widget(o+0x318);
  }
- if(D_001A7A80[id]&0x10) {
+ if(g_movie_seen_flags[id]&0x10) {
   int x,y;
   char *a=o+0x318,*b=o+0x3a0,*c=o+0x3ec;
   hud_set_widget_value_pair(a,0xea98,2);

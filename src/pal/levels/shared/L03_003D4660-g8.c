@@ -4,9 +4,9 @@
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern int D_L03_001A8F00;
-extern char D_L03_001A8F20[] __attribute__((sda)), D_L03_001BFDE0[], g_sound_state[];
-extern float D_L03_001B0590 __attribute__((sda)), D_L03_001B0594 __attribute__((sda));
+extern int g_hero_l03_mode;
+extern char g_effect_descriptor_default[] __attribute__((sda)), g_collision_start_point[], g_sound_state[];
+extern float g_vars_drift_rate_a __attribute__((sda)), g_vars_drift_rate_b __attribute__((sda));
 extern void moby_mark_spawned(void *);
 extern int moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *);
 extern void FastVecSub(void *,void *,void *),vec_transform_by_object_or_given(void *,void *,void *,int);
@@ -16,18 +16,18 @@ extern void matrix_mul_vec3(void *,void *,void *);
 extern void moby_set_state(void *,int,int),make_hit_descriptor(void *,void *,int,void *,float);
 extern int CollLine(void *,void *,int,void *,void *);
 extern float math_random_angle(void),math_random_float_range(float,float),math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
-extern void func_PAL_L03_003D5148(void *,void *,void *),vec_random_direction(void *,float,float);
+extern void part_spawn_emitter_pair_pal(void *,void *,void *),vec_random_direction(void *,float,float);
 extern int math_random_int_below(int),PlayMobySound(int,int,void *),math_fast_float_d(void *);
 extern void snd_stop_voice(int),gfx_add_draw_callback_first(void *,void *),gfx_l03_draw_glowing_beam(void *);
 
 /* Interpolates the emitter position, keeps it relative to its attachment,
  * emits particles while active, and releases its sound and object after fading. */
-void func_PAL_L03_003D4660(char *m) {
+void UpdateInterpolatedParticleEmitter_pal(char *m) {
     float tmp[4], a[4], b[4], hit[12], pos[4], vel[4];
     char *v = P(m, 0x68), *p, *e;
     float angle, speed;
 
-    if (D_L03_001A8F00 == 2) {
+    if (g_hero_l03_mode == 2) {
         moby_mark_spawned(m);
         return;
     }
@@ -54,7 +54,7 @@ void func_PAL_L03_003D4660(char *m) {
         qcopy(a, p);
         qcopy(b, p);
         b[2] -= F(v, 0x20) * 5.0f;
-        make_hit_descriptor(hit, m, 0x10001, D_L03_001A8F20, (float)I(v, 0x38));
+        make_hit_descriptor(hit, m, 0x10001, g_effect_descriptor_default, (float)I(v, 0x38));
         if (CollLine(a, b, 0, m, hit) && !P(v, 0x40)) {
             angle = math_random_angle();
             speed = math_random_float_range(0, 0.5f) * (0.020000001f);
@@ -62,13 +62,13 @@ void func_PAL_L03_003D4660(char *m) {
             pos[1] = math_fast_sin_or_cos_b(angle) * speed;
             pos[2] = 0;
             pos[2] = math_random_float_range(1, 2) * (0.020000001f);
-            func_PAL_L03_003D5148(m, D_L03_001BFDE0, pos);
+            part_spawn_emitter_pair_pal(m, g_collision_start_point, pos);
         }
         if (!P(v, 0x40) && !math_random_int_below(2)) {
             qcopy(pos, p);
             pos[2] -= math_random_float_range(0, 5);
             vec_random_direction(vel, 0, 0.040000003f);
-            func_PAL_L03_003D5148(m, pos, vel);
+            part_spawn_emitter_pair_pal(m, pos, vel);
         }
         e = (char *)(I(v, 0x3C) * 0x70);
         e = (char *)((int)e + (int)g_sound_state);
@@ -95,12 +95,12 @@ void func_PAL_L03_003D4660(char *m) {
         }
         break;
     }
-    F(v, 0x2C) += D_L03_001B0590 * (0.020000001f);
+    F(v, 0x2C) += g_vars_drift_rate_a * (0.020000001f);
     if (F(v, 0x2C) > 1)
         F(v, 0x2C) -= 1;
     else if (F(v, 0x2C) < 1)
         F(v, 0x2C) += 1;
-    F(v, 0x30) += D_L03_001B0594 * (0.020000001f);
+    F(v, 0x30) += g_vars_drift_rate_b * (0.020000001f);
     if (F(v, 0x30) > 1)
         F(v, 0x30) -= 1;
     gfx_add_draw_callback_first(gfx_l03_draw_glowing_beam, m);

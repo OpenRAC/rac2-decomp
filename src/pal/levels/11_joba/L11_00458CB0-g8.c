@@ -4,15 +4,15 @@
 extern float math_random_float_range(float a, float b);
 extern void vec_scale_to_length(char *a0, void *a1, float f12);
 extern void FastVecAdd(void *a0, void *a1, void *a2);
-extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
 extern char g_sound_state[];
-extern char D_L11_001BA8C0[];
+extern char g_hero_l11_position[];
 extern int FloatToInt(float);
 extern void moby_set_state(void *, int, int);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void get_moby_color(void *, void *, void *, void *);
 extern void moby_update_ground_check(void *);
-extern float func_PAL_002AA108(void *, void *);
+extern float moby_update_aim_target_strength_pal(void *, void *);
 extern void *part_find_owned_effect_slot(void *, unsigned int, int);
 extern float fast_vec_dist(void *, void *);
 extern int snd_is_voice_playing_for_owner(void *, int);
@@ -28,13 +28,13 @@ extern float FastVecLength(void *);
 extern float FastAddRotations(float, float);
 extern float func_L00_002EE290(void *);
 extern void drone_update_lock_on(char *);
-extern void func_PAL_L11_0045A9A8(char *);
+extern void drone_reset_to_idle_pal(char *);
 extern u8 *arena_get_center_point(u8 *);
 extern int arena_is_point_in_inner_zone(u8 *, u8 *);
 
 /* The launcher's state handler: re-arms the shot, aims the head at the level's
    target and hands the launch to the level's helpers. */
-void func_PAL_L11_0045A0D8(char *p)
+void drone_launcher_update_state_pal(char *p)
 {
     char *q = *(char **)(p + 0x68);
     float vec0[4];
@@ -74,13 +74,13 @@ void func_PAL_L11_0045A0D8(char *p)
         *(u8 *)(q + 0x28) = 3;
         *(int *)(q + 0x30) = 0;
         *(short *)(q + 0x1EC) = 0;
-        func_PAL_L11_0045A9A8(p);
+        drone_reset_to_idle_pal(p);
     }
     if (*(short *)(q + 0x1FC) == 0 && *(u8 *)(p + 0x20) != 0xE &&
-        D_L11_001A8FF4 == 0) {
+        g_hero_l11_input_blocked == 0) {
         *(u16 *)(p + 0x34) |= 0x400;
         if (*(u8 *)(p + 0x31) != 0) {
-            if (fast_vec_dist(p + 0x10, D_L11_001BA8C0) < 24.0f) {
+            if (fast_vec_dist(p + 0x10, g_hero_l11_position) < 24.0f) {
                 moby_update_ground_check(p);
                 *(u8 *)(p + 0x6F) = 0x16;
             }
@@ -116,7 +116,7 @@ void func_PAL_L11_0045A0D8(char *p)
                 *(int *)(ptr + 0x2C) = 0;
         }
     }
-    d = func_PAL_002AA108(p, ptr);
+    d = moby_update_aim_target_strength_pal(p, ptr);
     *(u8 *)(p + 0xA8) = 0xFF;
     *(float *)(q + 0x20) -= d;
     if (d != 0.0f) {
@@ -170,6 +170,6 @@ void func_PAL_L11_0045A0D8(char *p)
         }
     }
     if (*(u8 *)(p + 0x20) >= 2 && *(u8 *)(q + 0x2E) == 2)
-        func_PAL_L11_0045A9A8(p);
+        drone_reset_to_idle_pal(p);
     drone_update_lock_on(p);
 }

@@ -11,8 +11,8 @@ typedef struct {
     u16 halfE;
 } GsTextureUploadSlot;
 
-extern GsTextureUploadSlot D_001B9340[];
-extern u32 D_001B15FC __attribute__((sda));
+extern GsTextureUploadSlot g_upload_slots[];
+extern u32 g_palette_upload_count __attribute__((sda));
 
 u64 register_8bit_texture(int width_log2, int height_log2, u32 pixel_data, u32 palette_data, int palette_addr, int texture_addr)
 {
@@ -36,16 +36,16 @@ u64 register_8bit_texture(int width_log2, int height_log2, u32 pixel_data, u32 p
     palette_bits |= 0x400000000ULL;
     value |= palette_bits;
     result = value | 0x8000000000000000ULL;
-    count = D_001B15FC;
+    count = g_palette_upload_count;
     if (count < 0x40) {
-        D_001B9340[count].word0 = pixel_data;
-        D_001B9340[count].half6 = palette_addr >> 8;
-        D_001B9340[count].half4 = 0;
-        D_001B9340[count].word8 = palette_data;
-        D_001B9340[count].byteC = width_log2;
-        D_001B9340[count].byteD = height_log2;
-        D_001B9340[count].halfE = texture_addr >> 8;
-        D_001B15FC = count + 1;
+        g_upload_slots[count].word0 = pixel_data;
+        g_upload_slots[count].half6 = palette_addr >> 8;
+        g_upload_slots[count].half4 = 0;
+        g_upload_slots[count].word8 = palette_data;
+        g_upload_slots[count].byteC = width_log2;
+        g_upload_slots[count].byteD = height_log2;
+        g_upload_slots[count].halfE = texture_addr >> 8;
+        g_palette_upload_count = count + 1;
     }
     return result;
 }

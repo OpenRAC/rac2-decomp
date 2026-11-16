@@ -1,7 +1,7 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { float heading, pitch; int unused; float speed; } RailAngles;
-extern char *D_L00_001FDA80[];
+extern char *g_launch_path_table[];
 typedef struct { int paths[20]; float velocity[4]; float speed, radius; int initialized, pad6C, count; } RailState;
 typedef struct {
     char pad00[0x80]; float point[4]; char pad90[0x70]; float velocity[4];
@@ -29,7 +29,7 @@ void func_PAL_L00_003A1688(char *actor) {
     if (state->initialized == 0) {
         state->initialized = 1;
         for (path = 0; path < state->count; path++) {
-            char *initCurve = D_L00_001FDA80[state->paths[path]];
+            char *initCurve = g_launch_path_table[state->paths[path]];
             j = 0;
             if (j < *(int *)initCurve - 1) {
                 float *lengths = (float *)(initCurve + 0x1C);
@@ -51,7 +51,7 @@ void func_PAL_L00_003A1688(char *actor) {
     bestCurve = 0;
     bestDistance = 9999.0f;
     for (i = 0; i < state->count; i++) {
-        curve = D_L00_001FDA80[state->paths[i]];
+        curve = g_launch_path_table[state->paths[i]];
         find_nearest_path_point(curve, g_hero_state.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
         distance = fast_vec_dist(g_hero_state.point, point);
         if (distance < bestDistance) {

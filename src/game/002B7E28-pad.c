@@ -44,7 +44,7 @@ struct PadState {
 
 typedef struct PadState PadState;
 
-extern struct { s32 word; u8 mirror; u8 rest[7]; } D_001A7A40 MACRO_ADDR;
+extern struct { s32 word; u8 mirror; u8 rest[7]; } g_unlocked_item_flags MACRO_ADDR;
 extern float vec_length_xy(float *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
@@ -82,7 +82,7 @@ void pad_decode_reading(PadState *pad_state, u8 *buf, s32 len) {
             pad_state->analog[i] = IntToFloat(buf[i + 2]) * 0.003921569f;
         }
     }
-    if (D_001A7A40.mirror) {
+    if (g_unlocked_item_flags.mirror) {
         pad_state->analog[2] = -pad_state->analog[2];
         pad_state->analog[0] = -pad_state->analog[0];
         if (pad_state->held & 0x8000) {
@@ -118,7 +118,7 @@ void pad_decode_reading(PadState *pad_state, u8 *buf, s32 len) {
     pad_state->released_unmasked = pad_state->released;
     pad_state->held_unmasked = pad_state->held;
     pad_state->unk348 = pad_state->held;
-    if (D_001A7A40.mirror) {
+    if (g_unlocked_item_flags.mirror) {
         pad_state->analog_prev[2] = -pad_state->analog_prev[2];
         pad_state->analog_prev[0] = -pad_state->analog_prev[0];
         if (((s32)pad_state->held_unmasked) & 0x8000) {

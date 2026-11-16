@@ -9,11 +9,11 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern void gfx_add_draw_callback_third(void (*)(char *), char *);
 extern void gfx_draw_energy_blast(char *);
-extern float D_L05_001B1030 __attribute__((sda));
-extern float D_L05_001B1034 __attribute__((sda));
-extern float D_L05_001B1038 __attribute__((sda));
-extern float D_L05_001B1054 __attribute__((sda));
-extern float D_L05_001B1058 __attribute__((sda));
+extern float g_shot_base_speed __attribute__((sda));
+extern float g_shot_l05_speed_scale __attribute__((sda));
+extern float g_shot_life_distance __attribute__((sda));
+extern float g_shot_effect_start __attribute__((sda));
+extern float g_shot_effect_end __attribute__((sda));
 typedef int EffectVector __attribute__((mode(TI)));
 
 char *func_PAL_L05_0041EA08(char *owner, void *pos, void *dir, int color1, int color2, int orient, int kind, int value, float scale)
@@ -25,18 +25,18 @@ char *func_PAL_L05_0041EA08(char *owner, void *pos, void *dir, int color1, int c
     *(EffectVector *)up = 0;
     up[2] = 1.0f;
     if (obj) {
-        float initial = D_L05_001B1030;
+        float initial = g_shot_base_speed;
         int life;
         float start, end;
         st = *(char **)(obj + 0x68);
         *(int *)(st+0x30) = kind;
         speed = initial * (0.020000001f);
-        if (kind) speed = D_L05_001B1034 * (0.020000001f);
+        if (kind) speed = g_shot_l05_speed_scale * (0.020000001f);
         obj[0x20] = 0;
         *(unsigned char *)(obj+0x30) = 0xFF;
-        life = FloatToInt(D_L05_001B1038 / speed);
-        end = D_L05_001B1058;
-        start = D_L05_001B1054;
+        life = FloatToInt(g_shot_life_distance / speed);
+        end = g_shot_effect_end;
+        start = g_shot_effect_start;
         *(char **)(st+4) = owner;
         *(int *)st = life;
         *(float *)(st+0x3c) = start;

@@ -7,21 +7,21 @@ typedef struct {
     int c;
     int d;
 } Quad_L26_0040C8A8;
-extern void func_PAL_002B4D38(char *, char *, char *, char *, char *, char *, char *, char *,
+extern void moby_init_controller_params_pal(char *, char *, char *, char *, char *, char *, char *, char *,
                           char *, char *, char *);
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002B5050(char *, char *, int);
+extern void moby_update_sway_pal(char *, char *, int);
 extern int func_PAL_00289730(int, int);
-extern int D_L26_001A8FF0[] __attribute__((sda));
+extern int g_hero_tether_enabled[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda)) NOT_SDA;
 typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
 extern SubtitleHistory g_subtitle_history[];
-extern int D_0018C0B4 NOT_SDA;
-extern int D_L26_001B1748[] __attribute__((sda));
-extern unsigned int D_001A7390[] __attribute__((sda));
+extern int g_game_mode NOT_SDA;
+extern int g_frame_l26_counter[] __attribute__((sda));
+extern unsigned int g_frame_counter[] __attribute__((sda));
 
 typedef struct {
     int f0;
@@ -35,10 +35,10 @@ typedef struct {
     int f1a8;
 } D_0018C750_t;
 
-extern D_L26_0027D5C8_t D_L26_0027D5C8;
+extern D_L26_0027D5C8_t g_level_state_block;
 extern D_0018C750_t g_progress_statistics;
 
-void func_PAL_L26_00411C98(char *a0) {
+void looping_effect_update_pal(char *a0) {
     char *s1 = a0;
     char *s0 = *(char **)(s1 + 0x68);
     Quad_L26_0040C8A8 v;
@@ -48,7 +48,7 @@ void func_PAL_L26_00411C98(char *a0) {
         qzero_nc(&v);
         if (*(int *)(s0 + 0x120) != 0)
             v.b = (float)*(int *)(s0 + 0x120) * 1.7f;
-        func_PAL_002B4D38(s1, s0 + 0x60, (char *)&v, 0, 0, 0, 0, 0, 0, 0, 0);
+        moby_init_controller_params_pal(s1, s0 + 0x60, (char *)&v, 0, 0, 0, 0, 0, 0, 0, 0);
         if (*(int *)(s0 + 0x120) != 0) {
             *(int *)(s0 + 0xD0) = 0;
             *(int *)(s0 + 0x100) = 0;
@@ -57,7 +57,7 @@ void func_PAL_L26_00411C98(char *a0) {
         moby_set_state(s1, 1, -1);
         break;
     case 1:
-        func_PAL_002B5050(s1, s0 + 0x60, 0);
+        moby_update_sway_pal(s1, s0 + 0x60, 0);
         break;
     }
 }
@@ -78,8 +78,8 @@ void func_PAL_L26_0040C130(char *a0) {
         moby_set_state(m, 1, -1);
         break;
     case 1:
-        if (D_L26_001A8FF0[0] != 0) {
-            if (D_L26_0027D5C8.f0 == 0 && D_L26_0027D5C8.f24 == -1) {
+        if (g_hero_tether_enabled[0] != 0) {
+            if (g_level_state_block.f0 == 0 && g_level_state_block.f24 == -1) {
                 unsigned int flags = g_subtitle_history[28].levels;
                 flags &= (unsigned int)kind << g_current_map_index[0];
                 if (flags == 0) {
@@ -89,8 +89,8 @@ void func_PAL_L26_0040C130(char *a0) {
         }
         if (g_progress_statistics.f1a4 == 0 ||
             0x15F90u <
-                (unsigned int)(((s32)(D_001A7390[0]) * 5 + 2) / 6 - g_progress_statistics.f1a8)) {
-            if (D_0018C0B4 == 0 && D_L26_001B1748[0] >= 0x3E9) {
+                (unsigned int)(((s32)(g_frame_counter[0]) * 5 + 2) / 6 - g_progress_statistics.f1a8)) {
+            if (g_game_mode == 0 && g_frame_l26_counter[0] >= 0x3E9) {
                 unsigned int flags = g_subtitle_history[12].levels;
                 mask = 1u << g_current_map_index[0];
                 if ((flags & mask) == 0) {

@@ -1,8 +1,9 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_US2_0026EDE8 lives in 0026EDE8-loader.c. */
 
-unsigned int func_US2_0026F718(void)
+unsigned int stub_empty_2_us2(void)
 {
     return 0;
 }

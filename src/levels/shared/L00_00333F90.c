@@ -12,7 +12,7 @@ extern int FloatToInt(float);
 
 extern void FastVecSub(char *dst, char *first, char *second);
 
-extern unsigned char *D_L00_001FE98C;
+extern unsigned char *g_streak_effect_byte;
 
 /* Allocates the 0x13 object, fills its flags and its two 16-byte copies, and runs the
    two bound helpers over the record at +0x20. */
@@ -41,7 +41,7 @@ void *part_spawn_streak_effect(EffectVector *position, EffectVector *a1)
         record->b9 = FloatToInt(2.0f) + 0x20;
         record->b3 = 0x48;
         record->b1 = 3;
-        record->b2 = *D_L00_001FE98C;
+        record->b2 = *g_streak_effect_byte;
         qcopy(&record->position, position);
         endpoint = &record->endpoint;
         qcopy(endpoint, a1);

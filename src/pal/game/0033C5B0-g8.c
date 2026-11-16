@@ -1,18 +1,18 @@
 #include "include_asm.h"
 #include "names.h"
 extern float ref_L00_0033A688_00 __attribute__((sda));
-extern float D_001ADD0C;
+extern float g_circle_menu_label_offset_y;
 extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
    shared spawn helper with no rotation. */
-void func_PAL_0033C5B0(char *a0)
+void circle_menu_position_label_pal(char *a0)
 {
     if (*(int *)(a0 + 0x21C) != 0) {
         float *position = *(float **)(a0 + 0x20C);
 
         object_set_first_float4(a0 + 0x170, position[0] + ref_L00_0033A688_00,
-                      position[1] + D_001ADD0C, 0.0f, 0.0f);
+                      position[1] + g_circle_menu_label_offset_y, 0.0f, 0.0f);
     }
 }
 
@@ -28,13 +28,13 @@ extern void hud_draw_colored_quad_widget(char *);
 extern void hud_set_widget_value_pair(char *, int, int);
 extern char *GetLocalizedString(int);
 extern void text_label_draw(char *);
-extern float D_001ADD20 __attribute__((sda));
-extern float D_001ADD24;
-extern int D_001ADD10 __attribute__((sda));
-extern int D_001ADD14;
-extern float D_001ADD18 __attribute__((sda));
-extern float D_001ADD28 __attribute__((sda));
-extern float D_001ADD2C;
+extern float g_circle_menu_second_value_x __attribute__((sda));
+extern float g_circle_menu_second_value_y;
+extern int g_circle_menu_icon_offset_x __attribute__((sda));
+extern int g_circle_menu_icon_offset_y;
+extern float g_circle_menu_sin_scale __attribute__((sda));
+extern float g_circle_menu_self_offset_x __attribute__((sda));
+extern float g_circle_menu_self_offset_y;
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
 typedef struct { char pad[8]; short n; void (*fn)(char *); } Vtable_0033A6D8;
 #define ENTRY_0033A6D8 (*(Entry_0033A6D8 **)self)[i]
@@ -50,7 +50,7 @@ extern int *object_get_fourth_field(void *);
    hoisted out of the loop. The pointer to the modes is assigned where it is first used, and the
    cursor sprite (self + 4) reaches its virtual call through a variable: these decide which
    induction variable and which register the compiler picks. */
-void func_PAL_0033C600(char *self)
+void circle_menu_draw_pal(char *self)
 {
     if (*(int *)(self + 0x21C) != 0) {
         char *rec0 = self + 0x50;
@@ -59,11 +59,11 @@ void func_PAL_0033C600(char *self)
         int i;
 
         object_set_first_float4(rec0, position[0], position[1], 0.0f, 0.0f);
-        object_set_second_float4(rec0, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_second_float4(rec0, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0x80))->fn(rec0 + (*(Vtable_0033A6D8 **)(self + 0x80))->n);
         position = *(float **)(self + 0x20C);
         object_set_first_float4(rec1, position[0], position[1], 0.0f, 0.0f);
-        object_set_second_float4(rec1, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+        object_set_second_float4(rec1, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
         (*(Vtable_0033A6D8 **)(self + 0xCC))->fn(rec1 + (*(Vtable_0033A6D8 **)(self + 0xCC))->n);
         for (i = 0; i < *(int *)(self + 0x208); i++) {
             char *rec = self + 0x134;
@@ -75,8 +75,8 @@ void func_PAL_0033C600(char *self)
             sn = *(float *)(self + 0x214) * math_fast_sin_or_cos_b(ENTRY_0033A6D8.angle);
             hud_set_widget_value_pair(rec, ENTRY_0033A6D8.first, ENTRY_0033A6D8.second);
             position = *(float **)(self + 0x20C);
-            object_set_first_float4(rec, position[0] + (float)D_001ADD10 + cs,
-                          position[1] + (float)D_001ADD14 + D_001ADD18 * sn, 0.0f, 0.0f);
+            object_set_first_float4(rec, position[0] + (float)g_circle_menu_icon_offset_x + cs,
+                          position[1] + (float)g_circle_menu_icon_offset_y + g_circle_menu_sin_scale * sn, 0.0f, 0.0f);
             mode = (int *)(self + 0x1C8) + i;
             *object_get_fourth_field(rec) = (*mode == one) ? 0x80808080 : ENTRY_0033A6D8.color;
             object_set_flag_value(rec, *mode != 2);
@@ -84,11 +84,11 @@ void func_PAL_0033C600(char *self)
             if (i == *(int *)(self + 0x218)) {
                 char *cursor;
 
-                object_set_second_float4(self + 4, D_001ADD20, D_001ADD24, 0.0f, 0.0f);
+                object_set_second_float4(self + 4, g_circle_menu_second_value_x, g_circle_menu_second_value_y, 0.0f, 0.0f);
                 if (*mode != 2) {
                     position = *(float **)(self + 0x20C);
-                    object_set_first_float4(self + 4, position[0] + D_001ADD28 + cs,
-                                  position[1] + D_001ADD2C + D_001ADD18 * sn, 0.0f, 0.0f);
+                    object_set_first_float4(self + 4, position[0] + g_circle_menu_self_offset_x + cs,
+                                  position[1] + g_circle_menu_self_offset_y + g_circle_menu_sin_scale * sn, 0.0f, 0.0f);
                     {
                         int text = ENTRY_0033A6D8.text;
 
@@ -110,18 +110,18 @@ void func_PAL_0033C600(char *self)
 
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void object_set_helper_result(void *, void *, int);
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char *D_001A8CFC[] __attribute__((sda));
-extern char D_001ADC88[];
-extern int D_001ADD30 __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
+extern char g_circle_menu_icon_data[];
+extern int g_circle_menu_icon_colors __attribute__((sda));
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void object_set_helper_result(void *, void *, int);
-extern char D_001ADC80[], D_001ADC88[];
+extern char g_circle_menu_header_data[], g_circle_menu_icon_data[];
 
-void func_PAL_0033C928(char *obj, int *arr, char *third)
+void circle_menu_init_entries_pal(char *obj, int *arr, char *third)
 {
     char *p = obj + 4;
-    int *q = (int *)&D_001ADD30;
+    int *q = (int *)&g_circle_menu_icon_colors;
     int i;
     int n;
     int *out;
@@ -129,11 +129,11 @@ void func_PAL_0033C928(char *obj, int *arr, char *third)
 
     for (i = 3; i >= 0; i--) {
         if (*arr != 0) {
-            object_init_derived_arrays(p, D_001ADC88, *(int *)(obj + 0x210));
+            object_init_derived_arrays(p, g_circle_menu_icon_data, *(int *)(obj + 0x210));
             *(int *)object_get_fourth_field(p) = *q;
-            object_set_helper_result(p, D_001A8CFC[0] + 0x8710, *arr);
+            object_set_helper_result(p, g_resident_data_base[0] + 0x8710, *arr);
         } else {
-            object_set_helper_result(p, D_001A8CFC[0] + 0x8710, 0);
+            object_set_helper_result(p, g_resident_data_base[0] + 0x8710, 0);
             object_set_flag_value(p, 0);
         }
         p += 76;

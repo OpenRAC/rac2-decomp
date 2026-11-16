@@ -15,7 +15,7 @@ extern s32 math_random_int_below(s32);
 
 /* One-shot delay timer: the first pass stamps the resident block, the second one asks
    the helper twice and stores the sum of the two answers. */
-void func_PAL_L00_002A5310(void)
+void hero_update_effect_delay_timer_pal(void)
 {
     u8 *b = g_hero_state;
     s32 first_delay;

@@ -25,14 +25,14 @@
  */
 #include "common.h"
 
-extern s32  D_001B2754[] __attribute__((sda));
+extern s32  g_glow_ring_entries[] __attribute__((sda));
 
 /* Frees every glow ring entry that belongs to the given object. */
 void glow_ring_free_entries(s32 owner) {
     s32 entry;
     s32 remaining;
 
-    entry = D_001B2754[0];
+    entry = g_glow_ring_entries[0];
     remaining = 0x3F;
     do {
         if ((*(s32 *)((char *)(entry) + (0x10))) == owner) {

@@ -19,9 +19,9 @@ typedef struct {
     RetreatState *state;
 } RetreatObject;
 
-extern float D_L11_001B1DA0 SDATA(D_L11_001B1DA0);
-extern float D_L11_001B1DA4 SDATA(D_L11_001B1DA4);
-extern int D_L11_001B1DA8 SDATA(D_L11_001B1DA8);
+extern float g_fighter_retreat_distance SDATA(D_L11_001B1DA0);
+extern float g_fighter_close_distance SDATA(D_L11_001B1DA4);
+extern int g_fighter_retreat_chance SDATA(D_L11_001B1DA8);
 
 extern void moby_set_state(void *, int, int);
 extern float vec_distance_xy(void *, void *);
@@ -43,7 +43,7 @@ void fighter_choose_action(RetreatObject *object)
     }
 
     distance = vec_distance_xy(object->position, target + 0x10);
-    if (distance < D_L11_001B1DA4) {
+    if (distance < g_fighter_close_distance) {
         moby_set_state(object, 7, 3);
     } else {
         probe.q = 0;
@@ -54,7 +54,7 @@ void fighter_choose_action(RetreatObject *object)
         copy.q = probe.q;
         if (math_fast_helper_a(&copy, 128.0f) <= 0) {
             moby_set_state(object, 7, 3);
-        } else if (distance > D_L11_001B1DA0 || math_random_int_below(D_L11_001B1DA8) == 0) {
+        } else if (distance > g_fighter_retreat_distance || math_random_int_below(g_fighter_retreat_chance) == 0) {
             moby_set_state(object, 9, 3);
         } else {
             moby_set_state(object, 7, 3);

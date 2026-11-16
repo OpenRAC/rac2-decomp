@@ -9,22 +9,22 @@ typedef struct {
 } Vec3_00291158;
 
 /* the two ten-entry tables: the source heights and the scaled copy the pointer is aimed at */
-extern Vec3_00291158 D_00255B40[];
+extern Vec3_00291158 g_sky_shell_heights_2[];
 
-extern Vec3_00291158 D_00255BB8[];
+extern Vec3_00291158 g_sky_shell_scaled_heights[];
 
-extern Vec3_00291158 *D_001B1990 __attribute__((sda));
+extern Vec3_00291158 *g_sky_shell_heights __attribute__((sda));
 
 /* the mode word: 2 turns the reference axis from +x to -y */
 extern s32 g_current_game_mode MACRO_ADDR;
 
 /* the axis the reference is measured against */
-extern float D_001B5570[];
+extern float g_camera_basis_vectors[];
 
 /* the record whose count drives the per-entry pass, and the overflow entry's block */
-extern char *D_001B20C0 MACRO_ADDR;
+extern char *g_sky_shell_definition MACRO_ADDR;
 
-extern float D_001B20F0[] MACRO_ADDR;
+extern float g_view_matrix[] MACRO_ADDR;
 
 extern float FastVecDot(void *, void *);
 
@@ -47,18 +47,18 @@ void gfx_update_sky_shell_heights(void) {
 
     axis.q = 0;
     axis.f[0] = 1.0f;
-    D_001B1990 = D_00255BB8;
+    g_sky_shell_heights = g_sky_shell_scaled_heights;
     if (g_current_game_mode == 2) {
         axis.f[0] = 0.0f;
         axis.f[1] = -1.0f;
     }
-    scale = -FastVecDot(D_001B5570, &axis);
+    scale = -FastVecDot(g_camera_basis_vectors, &axis);
     for (j = 0; j < 10; j++) {
-        D_00255BB8[j].z = D_00255B40[j].z * scale;
+        g_sky_shell_scaled_heights[j].z = g_sky_shell_heights_2[j].z * scale;
     }
-    for (i = 0; i < *(short *)(D_001B20C0 + 6); i++) {
+    for (i = 0; i < *(short *)(g_sky_shell_definition + 6); i++) {
         if (i >= 10) {
-            set_identity_matrix(D_001B20F0);
+            set_identity_matrix(g_view_matrix);
         } else {
             cam_update_view_rotation(i);
         }

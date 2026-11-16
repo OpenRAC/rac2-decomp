@@ -42,19 +42,19 @@ extern void lerp_vector(void *, void *, void *, f32);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void *part_spawn_burst(void *, void *, s32, s32, s32, s32, f32, f32, f32, f32, f32);
-extern u8 D_L07_001A8F20[] MACRO_ADDR;
-extern s32 D_L07_001B0E54 __attribute__((sda));
-extern u32 D_L07_001B0E58 __attribute__((sda));
-extern s32 D_L07_001B0E70[] __attribute__((sda));
-extern f32 D_L07_001B0E40 __attribute__((sda));
-extern f32 D_L07_001B0E78 __attribute__((sda));
+extern u8 g_default_hit_direction[] MACRO_ADDR;
+extern s32 g_ring_particle_density __attribute__((sda));
+extern u32 g_trail_particle_color __attribute__((sda));
+extern s32 g_trail_size_range[] __attribute__((sda));
+extern f32 g_trail_growth_rate __attribute__((sda));
+extern f32 g_trail_life_range __attribute__((sda));
 extern f32 D_L07_001B0E78_4[] MACRO_ADDR;
-extern u32 D_L07_001B0E88 __attribute__((sda));
-extern u32 D_L07_001B0E8C;
-extern s32 D_L07_001B0E80 __attribute__((sda));
-extern s32 D_L07_001B0E84;
-extern f32 D_L07_001B0E90 __attribute__((sda));
-extern f32 D_L07_001B0E94;
+extern u32 g_ring_color_a __attribute__((sda));
+extern u32 g_ring_color_b;
+extern s32 g_ring_ribbon_layer_a __attribute__((sda));
+extern s32 g_ring_ribbon_layer_b;
+extern f32 g_ring_edge_param_a __attribute__((sda));
+extern f32 g_ring_edge_param_b;
 
 /* Sample a closed ring, perform its collision passes, then emit its particles. */
 /* Draws a ring-shaped wave around the object, hurts whatever it touches and throws sparks off the ring. */
@@ -75,27 +75,27 @@ void UpdateCollisionRing(u8 *object)
         if (*(u8 **)(state + 0x20) != 0)
             matrix_mul_vec3(&frame.points[i], &frame.points[i], *(u8 **)(state + 0x20) + 0xC0);
         FastVecAdd(&frame.points[i], &frame.points[i], object + 0x10);
-        frame.points[i].f[3] = D_L07_001B0E90;
+        frame.points[i].f[3] = g_ring_edge_param_a;
     }
     qcopy(&frame.points[32], &frame.points[0]);
     for (j = 0; j < 32; j++) {
-        make_hit_descriptor(&frame.work.query, object, 1, D_L07_001A8F20, *(f32 *)(state + 0x34));
+        make_hit_descriptor(&frame.work.query, object, 1, g_default_hit_direction, *(f32 *)(state + 0x34));
         frame.work.query.type = 0;
         frame.work.query.count = 1;
         frame.work.query.classId = *(u16 *)(object + 0xAA);
         CollLine(&frame.points[j], &frame.points[j + 1], 9, object, &frame.work.query);
     }
-    color0 = FastTweenColor(D_L07_001B0E88 & 0xFFFFFF, D_L07_001B0E88, *(f32 *)(state + 0x28));
-    color1 = FastTweenColor(D_L07_001B0E8C & 0xFFFFFF, D_L07_001B0E8C, *(f32 *)(state + 0x28));
-    DrawTwoLayerPolylineRibbon(frame.points, D_L07_001B0E80, D_L07_001B0E84, 33,
-                     color0, color1, D_L07_001B0E90, D_L07_001B0E94, *(f32 *)(state + 0x2C));
+    color0 = FastTweenColor(g_ring_color_a & 0xFFFFFF, g_ring_color_a, *(f32 *)(state + 0x28));
+    color1 = FastTweenColor(g_ring_color_b & 0xFFFFFF, g_ring_color_b, *(f32 *)(state + 0x28));
+    DrawTwoLayerPolylineRibbon(frame.points, g_ring_ribbon_layer_a, g_ring_ribbon_layer_b, 33,
+                     color0, color1, g_ring_edge_param_a, g_ring_edge_param_b, *(f32 *)(state + 0x2C));
     if (!level_is_resident_flag_clear())
         return;
-    for (k = 0; (f32)k < (f32)D_L07_001B0E54 * *(f32 *)(state + 0x24); k++) {
-        size = math_random_int_range(D_L07_001B0E70[0], D_L07_001B0E70[1]);
+    for (k = 0; (f32)k < (f32)g_ring_particle_density * *(f32 *)(state + 0x24); k++) {
+        size = math_random_int_range(g_trail_size_range[0], g_trail_size_range[1]);
         count = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
-        life = math_random_float_range(D_L07_001B0E78, D_L07_001B0E78_4[1]) * 210000.0f;
-        step = D_L07_001B0E40 * (1.0f / 60.0f);
+        life = math_random_float_range(g_trail_life_range, D_L07_001B0E78_4[1]) * 210000.0f;
+        step = g_trail_growth_rate * (1.0f / 60.0f);
         ApproachValue(&step, 0.0f, math_random_float_range(0.0f, 2.0f) * (1.0f / 60.0f));
         segment = math_random_int_below(32);
         next = (segment + 1) % 32;
@@ -105,7 +105,7 @@ void UpdateCollisionRing(u8 *object)
         frame.work.particle.direction.f[2] = 0.0f;
         vec_scale_to_length(&frame.work.particle.direction, &frame.work.particle.direction, step);
         frame.work.particle.point.f[3] = 2.0f;
-        color = D_L07_001B0E58;
+        color = g_trail_particle_color;
         FastTweenColor(color & 0xFFFFFF, color, *(f32 *)(state + 0x28));
         part_spawn_burst(&frame.work.particle.point, &frame.work.particle.direction,
                      size, (s32)color >> 24, color & 0xFFFFFF,

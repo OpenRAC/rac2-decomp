@@ -9,7 +9,7 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecAdd(float *, float *, int);
 extern void *part_spawn_ground_effect(float *, int, int, int, int, float *, int, float, float, float);
 
-void func_PAL_00327028(float *self, int unused, int a2)
+void part_spawn_drifting_puff_pair_pal(float *self, int unused, int a2)
 {
     float vec[4];
     float scale = math_random_float_range(0.10000000149011612f, 0.25f);

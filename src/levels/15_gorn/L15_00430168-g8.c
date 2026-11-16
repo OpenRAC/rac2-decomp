@@ -11,14 +11,14 @@
    used. */
 
 extern s32 g_screen_width MACRO_ADDR;
-extern u8 D_001A7A0A MACRO_ADDR;
-extern u8 *D_L15_001A904C MACRO_ADDR;
-extern f32 D_L15_001B2E84;
-extern s32 D_L15_001B2E80 MACRO_ADDR;
-extern s32 D_L15_001B36A4 MACRO_ADDR;
-extern s32 D_L15_001B15C8 __attribute__((sda));
-extern s32 D_L15_001B1520[] SDATA(D_L15_001B1520);
-extern s32 D_L15_001B15D8[][3] SDATA(D_L15_001B15D8);
+extern u8 g_extras_unlocked_flag MACRO_ADDR;
+extern u8 *g_challenge_menu_data MACRO_ADDR;
+extern f32 g_screen_l15_scale;
+extern s32 g_screen_l15_mode MACRO_ADDR;
+extern s32 g_gorn_finished_stage_num MACRO_ADDR;
+extern s32 g_gorn_selected_challenge __attribute__((sda));
+extern s32 g_challenge_completed_a[] SDATA(D_L15_001B1520);
+extern s32 g_gorn_reward_table[][3] SDATA(D_L15_001B15D8);
 
 extern f32 IntToFloat(s32);
 extern s32 FloatToInt(f32);
@@ -34,7 +34,7 @@ extern void text_draw_medium(s32, s32, u64, char *, s32);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L15_001B2E84 + 0.5f;
+    f32 scaled = value * g_screen_l15_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -47,7 +47,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
    which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L15_001B2E80;
+    int mode = g_screen_l15_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -70,26 +70,26 @@ s32 gorn_reward_panel_draw(void) {
     char *text;
     s32 x, y, count, index;
 
-    if (D_L15_001A904C != 0) {
-        sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x45);
-        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
-        sprite = table_find_by_id(D_L15_001A904C + 0x8710, 0x44);
-        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, D_L15_001B2E84, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
-        sprintf(buf, GetLocalizedString(0x2F72), D_L15_001B15C8 + 1);
+    if (g_challenge_menu_data != 0) {
+        sprite = table_find_by_id(g_challenge_menu_data + 0x8710, 0x45);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l15_scale, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
+        sprite = table_find_by_id(g_challenge_menu_data + 0x8710, 0x44);
+        gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l15_scale, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
+        sprintf(buf, GetLocalizedString(0x2F72), g_gorn_selected_challenge + 1);
         text = GetLocalizedString(0x2F93);
         x = FloatToInt(center);
-        y = screen_coord(D_L15_001B2E80, 46.0f, -2.0f);
+        y = screen_coord(g_screen_l15_mode, 46.0f, -2.0f);
         text_draw_centered_medium(x, y, 0x80F0F0F0, text, func_001157AC(text));
         text = GetLocalizedString(0x31CB);
         {
-            s32 ty = label_y(text, 131.0f, D_L15_001B2E84, 0.5f, 1);
+            s32 ty = label_y(text, 131.0f, g_screen_l15_scale, 0.5f, 1);
             text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
         }
-        index = D_L15_001B1520[D_L15_001B36A4] - 1;
+        index = g_challenge_completed_a[g_gorn_finished_stage_num] - 1;
         if (index >= 3)
             index = 2;
-        count = D_L15_001B15D8[D_L15_001B36A4][index];
-        if (D_001A7A0A != 0)
+        count = g_gorn_reward_table[g_gorn_finished_stage_num][index];
+        if (g_extras_unlocked_flag != 0)
             count *= 10;
         text = buf;
         if (count == 0)
@@ -97,12 +97,12 @@ s32 gorn_reward_panel_draw(void) {
         else
             sprintf(buf, GetLocalizedString(0x2FC6), count);
         {
-            s32 ty = label_y(text, 210.0f, D_L15_001B2E84, 0.5f, 1);
+            s32 ty = label_y(text, 210.0f, g_screen_l15_scale, 0.5f, 1);
             text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
         }
-        y = screen_coord(D_L15_001B2E80, 294.0f, 3.0f);
+        y = screen_coord(g_screen_l15_mode, 294.0f, 3.0f);
         text_draw_medium(117, y, 0x80F0F0F0, GetLocalizedString(0x31CC), -1);
-        y = screen_coord(D_L15_001B2E80, 294.0f, 3.0f);
+        y = screen_coord(g_screen_l15_mode, 294.0f, 3.0f);
         text_draw_medium(274, y, 0x80F0F0F0, GetLocalizedString(0x31CD), -1);
     }
     return 1;

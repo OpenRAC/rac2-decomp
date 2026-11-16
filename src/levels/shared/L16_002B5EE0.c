@@ -43,7 +43,7 @@ float moby_get_linked_float(const unsigned char *owner)
 }
 
 extern int func_002DA3C8(void *v, int a1, char *object, int a3, float f);
-extern char *D_L16_001C3FC0[];
+extern char *g_blocker_moby_table[];
 
 /* reports whether the first live marker in the run still carries the kind byte it looks for */
 /* func_L16_003960F8 uses its dedicated compiler profile. */
@@ -68,8 +68,8 @@ extern char *D_L16_001C3FC0[];
 
 /* func_L16_0040C5F0 is defined in L16_0040C5F0-g8.c. */
 
-extern char *D_L16_001B2C0C __attribute__((sda));
-extern char *D_L16_001B2B1C __attribute__((sda));
+extern char *g_beam_definition_table __attribute__((sda));
+extern char *g_moby_instance_table __attribute__((sda));
 
 /* copies the 16-byte record the object's two indices pick out of the chosen table into dst */
 /* Defined in L16_0040C7E8-g8.c. */
@@ -78,12 +78,12 @@ extern char *D_L16_001B2B1C __attribute__((sda));
 
 
 
-extern char *D_L16_001B9B50;
+extern char *g_linked_node_state_ptr;
 
 /* pushes the two axis values onto the linked node, unless the node is inert or a value is zero */
 void moby_push_axis_to_linked_node(float x, float y)
 {
-    char *st = D_L16_001B9B50;
+    char *st = g_linked_node_state_ptr;
     char *p;
 
     if (*(s16 *)(st + 0x86) != 0)

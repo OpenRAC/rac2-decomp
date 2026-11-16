@@ -14,7 +14,7 @@ typedef struct {
     Quad normal;
 } CollisionView;
 
-extern unsigned char D_L00_001BF210[];
+extern unsigned char g_collision_view[];
 #define HIT ((CollisionView *)D_L00_001BF210)
 
 /* Field names follow RAC1's hero collision step (hero_collision.c). */
@@ -56,7 +56,7 @@ typedef struct {
 
 extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record, as func_L00_002B55F0 reads it */
 #define PLAYER (&D_00189E20_view)
-extern int D_L16_001A8FF0 __attribute__((sda));
+extern int g_hero_l16_block_flag __attribute__((sda));
 
 extern void vec_clear_128(void *);
 extern void hero_check_timed_condition(void);
@@ -119,8 +119,8 @@ typedef struct {
 
 extern PlayerInputView g_hero_state;
 extern int g_current_map_index __attribute__((sda));
-extern int D_L11_001A9010 __attribute__((sda));
-extern u8 D_001A7B0B __attribute__((sda));
+extern int g_arena_l11_active_flag __attribute__((sda));
+extern u8 g_hero_input_enabled __attribute__((sda));
 
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 
@@ -155,7 +155,7 @@ int hero_push_out_of_collisions(int mode)
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, 0.6f);
-            } else if (D_L16_001A8FF0) {
+            } else if (g_hero_l16_block_flag) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
                 hero_build_relative_point(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);

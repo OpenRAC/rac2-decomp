@@ -59,11 +59,11 @@ typedef struct {
 extern Hero g_hero_state;
 extern SoundRecord g_sound_state[];
 extern LiftPath *g_path_l17_table[];
-extern int D_00138324[];
-extern float D_L17_001B0220 __attribute__((sda));
-extern float D_L17_001B0228 __attribute__((sda));
-extern float D_L17_001B022C __attribute__((sda));
-extern float D_L17_001B0234 __attribute__((sda));
+extern int g_pad_held_flags[];
+extern float g_lift_speed __attribute__((sda));
+extern float g_lift_record_value_a __attribute__((sda));
+extern float g_lift_record_value_b __attribute__((sda));
+extern float g_lift_record_value_c __attribute__((sda));
 extern int flag_is_third_pending_set(void *);
 extern int flag_set_first_pending(void *);
 extern int hero_get_target_state_kind(void);
@@ -74,7 +74,7 @@ extern void hero_start_target_state(void *, int, float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern void platform_attach_path_to_lift(void *);
-extern float *func_PAL_L00_002D7850(int);
+extern float *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(void *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern float math_fabs(float);
@@ -107,20 +107,20 @@ void func_PAL_L17_003C713C(Moby *moby)
             if (vars->needsTrigger && !flag_is_third_pending_set(moby))
                 goto finish;
             TryClaimNotice(8, 0x12EC, 1);
-            if (D_00138324[0] & 0x10) {
+            if (g_pad_held_flags[0] & 0x10) {
                 if (!vars->atLast) {
                     moby_set_state(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
                     FastVecSub(velocity, &path->points[1], &path->points[0]);
-                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+                    vec_scale_to_length(velocity, velocity, g_lift_speed * 0.020000001f);
                 } else {
                     moby_set_state(moby, 5, -1);
                     velocity = &vars->velocity;
                     point = path->count - 2;
                     vars->point = point;
                     FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
-                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+                    vec_scale_to_length(velocity, velocity, g_lift_speed * 0.020000001f);
                 }
                 break;
             }
@@ -168,16 +168,16 @@ void func_PAL_L17_003C713C(Moby *moby)
             g_hero_state.f214 = 4;
             platform_attach_path_to_lift(moby);
             if (!vars->hasRecord) {
-                float *record = func_PAL_L00_002D7850(5);
+                float *record = cam_alloc_override_slot_pal(5);
                 float value;
 
                 vars->record = record;
                 if (record) {
                     vars->hasRecord = 1;
-                    record[0] = D_L17_001B0228;
-                    value = D_L17_001B022C;
+                    record[0] = g_lift_record_value_a;
+                    value = g_lift_record_value_b;
                     vars->record[1] = value;
-                    vars->record[3] = D_L17_001B0234;
+                    vars->record[3] = g_lift_record_value_c;
                 }
             }
         }
@@ -217,7 +217,7 @@ void func_PAL_L17_003C713C(Moby *moby)
             point = vars->point - 1;
             vars->point = point;
             FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
-            vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.020000001f);
+            vec_scale_to_length(velocity, velocity, g_lift_speed * 0.020000001f);
         }
         break;
 
@@ -236,16 +236,16 @@ void func_PAL_L17_003C713C(Moby *moby)
             g_hero_state.f214 = 4;
             platform_attach_path_to_lift(moby);
             if (!vars->hasRecord) {
-                float *record = func_PAL_L00_002D7850(5);
+                float *record = cam_alloc_override_slot_pal(5);
                 float value;
 
                 vars->record = record;
                 if (record) {
                     vars->hasRecord = 1;
-                    record[0] = D_L17_001B0228;
-                    value = D_L17_001B022C;
+                    record[0] = g_lift_record_value_a;
+                    value = g_lift_record_value_b;
                     vars->record[1] = value;
-                    vars->record[3] = D_L17_001B0234;
+                    vars->record[3] = g_lift_record_value_c;
                 }
             }
         }

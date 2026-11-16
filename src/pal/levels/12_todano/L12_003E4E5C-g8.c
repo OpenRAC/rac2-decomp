@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 *D_L12_001B2E9C __attribute__((sda));
-extern u16 *D_L12_001FB960[];
-extern u16 D_L12_001B1834 __attribute__((sda));
-extern u8 *D_L12_001B090C __attribute__((sda));
-extern u8 *D_L12_001B1360 __attribute__((sda));
+extern u8 *g_moby_list_start __attribute__((sda));
+extern u16 *g_moby_l12_group_lists[];
+extern u16 g_slot_timer_reset_value __attribute__((sda));
+extern u8 *g_tracked_object_ptr __attribute__((sda));
+extern u8 *g_second_tracked_object __attribute__((sda));
 extern int FloatToInt(float);
 extern void moby_set_state(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);
@@ -16,13 +16,13 @@ extern void squirrel_alert_group(void *);
 extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern int point_in_path_xy(void *,void *,int,float);
 extern void func_PAL_002B14F8(void *,void *,int,int,float);
-extern u8 D_L12_001B9E00[];
+extern u8 g_hero_prev_position[];
 extern u8 *g_hero_moby NOT_SDA;
-extern u8 *D_L12_001FEAC0[];
-extern float D_L12_001B0A40 __attribute__((sda));
+extern u8 *g_path_zone_table[];
+extern float g_guard_zone_range __attribute__((sda));
 extern u8 g_hero_position[];
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern int D_0018C0B4 NOT_SDA;
+extern int g_game_mode NOT_SDA;
 
 /* Sets up the object's AI parameters on its first update, then refreshes its target state and
    clears it when the target leaves the object's zone. */
@@ -61,16 +61,16 @@ void func_PAL_L12_003E58E8(u8 *o) {
             *(u16 *)(o+0x34)=(*(u16 *)(o+0x34)|0x41)&0xEFFF;
         }
     }
-    if(o[0x31] && fast_vec_dist(o+0x10,D_L12_001B9E00)<24) {moby_update_ground_check(o);o[0x6F]=22;}
+    if(o[0x31] && fast_vec_dist(o+0x10,g_hero_prev_position)<24) {moby_update_ground_check(o);o[0x6F]=22;}
     if(func_PAL_002B1A50(o,d+0x60,0)) squirrel_alert_group(o);
     *(short *)(d+0x364)=weapon_select_aim_target(o,-1,0,0,*(float *)(d+0x36C),3);
     if(*(u8 **)(d+0x120)) *(u8 **)(d+0x368)=*(u8 **)(d+0x120); else *(u8 **)(d+0x368)=g_hero_moby;
     if(*(short *)(d+0x364)==1) {
-        float range=D_L12_001B0A40;
+        float range=g_guard_zone_range;
         if(*(int *)(d+0x130)!=-1) {
-            u8 *zone=D_L12_001FEAC0[*(int *)(d+0x130)];
+            u8 *zone=g_path_zone_table[*(int *)(d+0x130)];
             if(!point_in_path_xy(*(u8 **)(d+0x120)+0x10,zone+0x10,*(int *)zone,range)) *(short *)(d+0x364)=0;
         }
     }
-    func_PAL_002B14F8(o,d+0x3C0,1,1,D_L12_001B0A40);
+    func_PAL_002B14F8(o,d+0x3C0,1,1,g_guard_zone_range);
 }

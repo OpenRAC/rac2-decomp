@@ -15,9 +15,9 @@ extern int math_random_int_range(int, int);
 extern float FastAddRotations(float angle, float step);
 extern int moby_dispatch_action_by_kind(char *, char *);
 extern void snd_stop_voice(int);
-extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
+extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern float math_fast_sin_or_cos_b(float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void FastVecSub(void *, void *, void *);
@@ -25,13 +25,13 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern void func_002A677C(void *);
-extern int func_PAL_002B5BA8(void *, void *, float);
+extern int moby_turn_toward_target_and_step_pal(void *, void *, float);
 extern int coll_test_hit_at_bone(void *, int, float, float, int, float, int, int, int);
-extern void func_PAL_00319768(char *);
+extern void flyer_tick_timers_pal(char *);
 extern unsigned char g_sound_state[];
 extern unsigned char g_hero_state[];
 typedef struct { char pad[0x249C]; char *target; } Hero3173;
-extern char *D_L00_001FDA80[];
+extern char *g_launch_path_table[];
 #define FI(p,o) (*(int *)((p)+(o)))
 #define FF(p,o) (*(float *)((p)+(o)))
 #define FH(p,o) (*(short *)((p)+(o)))
@@ -104,9 +104,9 @@ void func_PAL_L00_003BD904(char *self)
                 if (FP(sound,0x88)==self && FB(sound,0x74)) snd_stop_voice(n);
             }
             FI(d,0x2A8)=-1;
-            func_PAL_L00_003FB330(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
+            SpawnExplosion_pal(self+0x10,0,0,0,0,20,45,1,0.3f,20.0f,1,0,0,0);
             PlayMobySound(0,0,self);
-            func_PAL_002A7650(self,0,3);
+            SetDeathBits_pal(self,0,3);
             moby_mark_spawned(self);
             return;
         }
@@ -135,7 +135,7 @@ void func_PAL_L00_003BD904(char *self)
         }
         break;
     case 4:
-        path=D_L00_001FDA80[FI(d,0x294)];
+        path=g_launch_path_table[FI(d,0x294)];
         if (FI(d,0x298)>=FI(path,0)) {
             FI(d,0x294)=-1;
             FF(d,0x28C)=coll_probe_ground_height_below(self+0x10,0,0.5f)+0.5f;
@@ -157,7 +157,7 @@ void func_PAL_L00_003BD904(char *self)
         break;
     case 5:
         savedHeight=FF(self,0x18);
-        func_PAL_002B5BA8(self,d+0x230,FF(d,0x290));
+        moby_turn_toward_target_and_step_pal(self,d+0x230,FF(d,0x290));
         FF(self,0x18)=savedHeight;
         if (vec_distance_xy(self+0x10,FP(d,0x240)+0x10)<1.3f) moby_set_state(self,7,-1);
         FF(self,0xF8)=FastAddRotations(FF(self,0xF8),0.03490659f);
@@ -201,7 +201,7 @@ void func_PAL_L00_003BD904(char *self)
         break;
     }
     if (FB(self,0x20)!=4 && FB(self,0x95)==2 && FF(self,0x18)<FF(d,0x28C)) FF(self,0x18)=FF(d,0x28C);
-    func_PAL_00319768(self);
+    flyer_tick_timers_pal(self);
 }
 #undef FI
 #undef FF

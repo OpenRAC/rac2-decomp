@@ -6,9 +6,9 @@ extern char * CreateMoby(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
-extern void func_PAL_L00_00401080(void *);
+extern void part_l00_spawn_spark_spray_2_pal(void *);
 
-void *func_PAL_L00_00400968(char *a0, char *a1, TI128 *a2, char *a3)
+void *spark_trail_create_pal(char *a0, char *a1, TI128 *a2, char *a3)
 {
     char *o = CreateMoby(0xD5E);
 
@@ -28,7 +28,7 @@ void *func_PAL_L00_00400968(char *a0, char *a1, TI128 *a2, char *a3)
         *(int *)(s0 + 0x38) = 0x11;
         *(float *)(s0 + 0x3C) = 1.0f / IntToFloat(0x11);
         *(char **)(s0 + 0x34) = a3;
-        func_PAL_L00_00401080(o + 0x10);
+        part_l00_spawn_spark_spray_2_pal(o + 0x10);
     }
     return o;
 }

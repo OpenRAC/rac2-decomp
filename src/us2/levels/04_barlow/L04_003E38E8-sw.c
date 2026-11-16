@@ -4,13 +4,13 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; void *ptr[0x980]; } Hero;
 extern char g_hero_state[];
-extern s32 D_L04_001C9C00[];
-extern s32 D_L04_001A8F00;
+extern s32 g_barlow_state_flags[];
+extern s32 g_game_l04_mode;
 extern s32 *g_route_path_table[];
-extern u8 *D_L04_001B25CC[] __attribute__((sda));
-extern char D_L04_001A8F20[] __attribute__((sda));
-extern u8 D_L04_001C7800[];
-extern TI128 D_L04_001BFAE0;
+extern u8 *g_linked_record_table[] __attribute__((sda));
+extern char g_effect_default_params[] __attribute__((sda));
+extern u8 g_creature_light_table[];
+extern TI128 g_spark_origin_quad;
 extern s32 barlow_enemy_update_core(u8 *);
 extern void object_update_age_timer(u8 *);
 extern void object_draw_linked_beam(u8 *);
@@ -53,7 +53,7 @@ extern s32 moby_move_to_target_temp_limits(u8 *, void *, f32, s32, f32, f32);
 extern f32 moby_get_anim_value(u8 *);
 extern void *part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
 extern s32 coll_test_hit_at_bone(void *, f32, f32, s32, s32, f32, s32, s32, s32);
-extern s32 func_US2_002AF9C8(u8 *, f32);
+extern s32 math_is_value_within_step_us2(u8 *, f32);
 extern void moby_set_flag_bit(u8 *, s32);
 extern s32 part_l00_alloc_effect_slot_2(void *, f32, f32, f32, f32, f32);
 extern s32 CollLine(void *, void *, s32, void *, void *);
@@ -64,12 +64,12 @@ extern void gfx_free_point_light(s32);
 extern s32 moby_step_controller(u8 *, void *, f32);
 extern void object_set_linked_states(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 
-void func_US2_L04_003E38E8(u8 *arg0) {
+void barlow_creature_update_us2(u8 *arg0) {
     u8 *data;
 
     data = *(u8 **)(arg0 + 0x68);
-    if (D_L04_001C9C00[0] == 1) {
-        if (D_L04_001A8F00 == 2) {
+    if (g_barlow_state_flags[0] == 1) {
+        if (g_game_l04_mode == 2) {
             *(s32 *)(arg0 + 0x98) = 0;
             *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
         } else {
@@ -163,7 +163,7 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 object_set_linked_states(arg0, 3, 1, 0, 0xC);
                 moby_set_state(arg0, 8, 1);
                 if (*(s32 *)(data + 0x2D4) != -1) {
-                    qcopy(data + 0x110, D_L04_001B25CC[0] + (*(s32 *)(data + 0x2D4) << 7) + 0x30);
+                    qcopy(data + 0x110, g_linked_record_table[0] + (*(s32 *)(data + 0x2D4) << 7) + 0x30);
                     if (*(f32 *)(data + 0x12C) == 0.0f)
                         *(f32 *)(data + 0x12C) = 4.0f;
                 }
@@ -497,8 +497,8 @@ void func_US2_L04_003E38E8(u8 *arg0) {
             n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
             *(f32 *)(data + 0x2B8) = g;
         }
         if (*(u16 *)(arg0 + 0x96) >= 0x2E) {
@@ -558,7 +558,7 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 object_set_linked_states(arg0, 6, 5, 0, 0xA);
                 break;
             }
-        } else if (func_US2_002AF9C8(arg0, 3.0f) != 0 && *(u8 **)(data + 0x2AC) != 0) {
+        } else if (math_is_value_within_step_us2(arg0, 3.0f) != 0 && *(u8 **)(data + 0x2AC) != 0) {
             f32 v0[4] __attribute__((aligned(16)));
             f32 v10[4] __attribute__((aligned(16)));
 
@@ -580,7 +580,7 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2E0) = k;
                 if (k >= 0) {
-                    l = D_L04_001C7800 + (k << 5);
+                    l = g_creature_light_table + (k << 5);
                     qcopy(l + 0x10, data + 0x260);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -610,7 +610,7 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 k = part_l00_alloc_effect_slot_2(arg0 + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
                 *(s32 *)(data + 0x2E0) = k;
                 if (k >= 0) {
-                    l = D_L04_001C7800 + (k << 5);
+                    l = g_creature_light_table + (k << 5);
                     qcopy(l + 0x10, data + 0x260);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;
@@ -639,8 +639,8 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L04_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.3f, f, 0x804020FF, 0, n, g_effect_default_params, 0.0f, 0);
+                part_spawn_ground_effect(v0, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
                 *(f32 *)(data + 0x2B8) = *(f32 *)(data + 0x2B8) + 1.0f;
             }
         }
@@ -660,9 +660,9 @@ void func_US2_L04_003E38E8(u8 *arg0) {
             *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
             FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
             if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
-                *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
+                *(TI128 *)(data + 0x270) = g_spark_origin_quad;
                 if (flag_is_third_pending_set(arg0) == 0) {
-                    part_l04_spawn_paired_sparks(&D_L04_001BFAE0, 0x1E);
+                    part_l04_spawn_paired_sparks(&g_spark_origin_quad, 0x1E);
                     moby_set_flag_bit(arg0, 1);
                 }
             }
@@ -673,17 +673,17 @@ void func_US2_L04_003E38E8(u8 *arg0) {
             qcopy(v30, data + 0x270);
             v30[2] -= 0.1f;
             f3 = f * 0.3f;
-            part_spawn_ground_effect(v30, 0x19, f3, f, 0xFF000080, 0, n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x19, f3, f, 0xFF000080, 0, n, g_effect_default_params, 0.0f, 0);
             n = -n;
             f04 = f * 0.04f;
             f4 = f * 0.4f;
-            part_spawn_ground_effect(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x260, 0xA, f3, f, 0x80CA00CB, 0, n, D_L04_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(data + 0x260, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, D_L04_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(v30, 5, f04, f4, 0x7F6F6FFF, 1, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(v30, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x260, 0xA, f3, f, 0x80CA00CB, 0, n, g_effect_default_params, 0.0f, 0);
+            part_spawn_ground_effect(data + 0x260, 0xA, f04, f4, 0x7F6F6FFF, 1, -n, g_effect_default_params, 0.0f, 0);
             gfx_add_draw_callback_third(object_draw_linked_beam, arg0);
             if (*(s32 *)(data + 0x2E0) >= 0) {
-                l = D_L04_001C7800 + (*(s32 *)(data + 0x2E0) << 5);
+                l = g_creature_light_table + (*(s32 *)(data + 0x2E0) << 5);
                 qcopy(l + 0x10, data + 0x270);
                 *(f32 *)(l + 0x1C) = 5.0f;
                 *(f32 *)(l + 0) = 1.0f;
@@ -711,9 +711,9 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                 *(u16 *)(req + 0x1A) = *(u16 *)(arg0 + 0xAA);
                 FastVecAdd(data + 0x270, data + 0x260, data + 0x270);
                 if (CollLine(data + 0x260, data + 0x270, 0, arg0, req) != 0) {
-                    *(TI128 *)(data + 0x270) = D_L04_001BFAE0;
+                    *(TI128 *)(data + 0x270) = g_spark_origin_quad;
                     if (flag_is_third_pending_set(arg0) == 0) {
-                        part_l04_spawn_paired_sparks(&D_L04_001BFAE0, 0x1E);
+                        part_l04_spawn_paired_sparks(&g_spark_origin_quad, 0x1E);
                         moby_set_flag_bit(arg0, 1);
                     }
                 }
@@ -725,14 +725,14 @@ void func_US2_L04_003E38E8(u8 *arg0) {
                     n = n - 1;
                 qcopy(v40, data + 0x270);
                 v40[2] -= 0.1f;
-                part_spawn_ground_effect(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x19, f * 0.3f, f, 0xFF000080, 0, n, g_effect_default_params, 0.0f, 0);
                 n = -n;
                 f4 = f * 0.4f;
-                part_spawn_ground_effect(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, D_L04_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, D_L04_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(v40, 5, f * 0.04f, f4, 0x7F6F6FFF, 1, n, g_effect_default_params, 0.0f, 0);
+                part_spawn_ground_effect(v40, 0x14, f4, f * 0.2f, 0xFF4080FF, 1, n, g_effect_default_params, 0.0f, 0);
                 gfx_add_draw_callback_third(object_draw_linked_beam, arg0);
                 if (*(s32 *)(data + 0x2E0) >= 0) {
-                    l = D_L04_001C7800 + (*(s32 *)(data + 0x2E0) << 5);
+                    l = g_creature_light_table + (*(s32 *)(data + 0x2E0) << 5);
                     qcopy(l + 0x10, data + 0x270);
                     *(f32 *)(l + 0x1C) = 5.0f;
                     *(f32 *)(l + 0) = 1.0f;

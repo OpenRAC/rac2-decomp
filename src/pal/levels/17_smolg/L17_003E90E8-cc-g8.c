@@ -5,13 +5,13 @@ typedef signed char s8;
 typedef float f32;
 extern void FastVecSub(char *, char *, char *);
 
-extern u8 D_L17_001B0CBB;
-extern u8 *D_L17_001AFB5C;
-extern f32 D_L17_001B0CD8 __attribute__((sda));
-extern f32 D_L17_001B0CDC __attribute__((sda));
-extern f32 D_L17_001B0CE0 __attribute__((sda));
-extern int D_L17_001B0CE4 __attribute__((sda));
-extern f32 D_L17_001B0CE8 __attribute__((sda));
+extern u8 g_grulch_anim_index;
+extern u8 *g_grulch_target_hero;
+extern f32 g_grulch_pull_speed __attribute__((sda));
+extern f32 g_grulch_pull_drift_speed __attribute__((sda));
+extern f32 g_grulch_pull_min_scale __attribute__((sda));
+extern int g_grulch_pull_decay __attribute__((sda));
+extern f32 g_grulch_pull_minimum __attribute__((sda));
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -29,42 +29,42 @@ int func_PAL_L17_003E90E8(u8 *object) {
     float heading, length, step, ratio, angle, minimum, scale, decay;
     u8 *target;
     int result;
-    if (object[0x43] != D_L17_001B0CBB)
-        func_PAL_002A7E68(object, D_L17_001B0CBB, 0, 8);
-    if (D_L17_001AFB5C) {
-        heading = mat_fast_helper_a(*(float *)(object + 0x10) - *(float *)(D_L17_001AFB5C + 0x10),
-                               *(float *)(object + 0x14) - *(float *)(D_L17_001AFB5C + 0x14));
+    if (object[0x43] != g_grulch_anim_index)
+        func_PAL_002A7E68(object, g_grulch_anim_index, 0, 8);
+    if (g_grulch_target_hero) {
+        heading = mat_fast_helper_a(*(float *)(object + 0x10) - *(float *)(g_grulch_target_hero + 0x10),
+                               *(float *)(object + 0x14) - *(float *)(g_grulch_target_hero + 0x14));
         angle = FastAddRotations(*(float *)(object + 0xF8),
             fast_subtract_rotations(heading, *(float *)(object + 0xF8)) * 0.1f);
-        target = D_L17_001AFB5C + 0x10;
+        target = g_grulch_target_hero + 0x10;
         *(float *)(object + 0xF8) = angle;
         FastVecSub((char *)delta, (char *)target, (char *)object + 0x10);
         delta[2] -= *(float *)(data + 0x330);
         length = FastVecLength(delta);
         if (length != 0.0f) {
             float fraction;
-            step = D_L17_001B0CD8 * 0.020000001f;
+            step = g_grulch_pull_speed * 0.020000001f;
             if (length < step)
                 step = length;
             fraction = step / length;
             FastVecScale(delta, delta, fraction);
             FastVecAdd(object + 0x10, object + 0x10, delta);
-            delta[0] = math_fast_sin_or_cos_a(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * D_L17_001B0CDC;
-            delta[1] = math_fast_sin_or_cos_b(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * D_L17_001B0CDC;
+            delta[0] = math_fast_sin_or_cos_a(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * g_grulch_pull_drift_speed;
+            delta[1] = math_fast_sin_or_cos_b(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * g_grulch_pull_drift_speed;
             delta[2] = 0.0f;
             FastVecAdd(object + 0x10, object + 0x10, delta);
         }
-        decay = IntToFloat((((int)(D_L17_001B0CE4) * 5 + 2) / 6));
-        minimum = D_L17_001B0CE8;
+        decay = IntToFloat((((int)(g_grulch_pull_decay) * 5 + 2) / 6));
+        minimum = g_grulch_pull_minimum;
         *(float *)(object + 0x2C) -= *(float *)(data + 0x340) / decay;
         if (*(float *)(object + 0x2C) < minimum)
             *(float *)(object + 0x2C) = minimum;
         ratio = *(float *)(object + 0x2C) / *(float *)(data + 0x340);
         if (ratio > 1.0f)
             ratio = 1.0f;
-        scale = D_L17_001B0CE0 + (*(float *)(data + 0x30) - D_L17_001B0CE0) * ratio;
+        scale = g_grulch_pull_min_scale + (*(float *)(data + 0x30) - g_grulch_pull_min_scale) * ratio;
         {
-            u8 *hero = D_L17_001AFB5C;
+            u8 *hero = g_grulch_target_hero;
             *(float *)(data + 0x330) = scale;
             if (!hero || hero[0x20] == 0x5A || (s8)hero[0x20] < 0)
                 result = 1;

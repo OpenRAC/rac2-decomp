@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_L30_003B3F70 updates a rideable hover moby: the prompt and boarding, turning, leaning,
  * thrust, ground height and collision, then the bobbing that runs in every state.
  * It needs -G8 for its small data, -ffast-math for min.s, and -g for the line label before
@@ -8,42 +9,42 @@ typedef union { Quad q; float f[4]; } Vec;
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
-extern float D_L30_001AF8EC __attribute__((sda));
-extern float D_L30_001AF914 __attribute__((sda));
-extern float D_L30_001AF8E4 __attribute__((sda));
-extern float D_L30_001AF910 __attribute__((sda));
-extern float D_L30_001AF8F0 __attribute__((sda));
-extern float D_L30_001AF8B8 __attribute__((sda));
-extern float D_L30_001AF8B0 __attribute__((sda));
-extern float D_L30_001AF8D0 __attribute__((sda));
-extern float D_L30_001AF8A4 __attribute__((sda));
-extern float D_L30_001AF904 __attribute__((sda));
-extern float D_L30_001AF8E8 __attribute__((sda));
-extern float D_L30_001AF8F8 __attribute__((sda));
-extern float D_L30_001AF8C8 __attribute__((sda));
-extern float D_L30_001AF960 __attribute__((sda));
-extern float D_L30_001AF8C4 __attribute__((sda));
-extern float D_L30_001AF900 __attribute__((sda));
-extern float D_L30_001AF90C __attribute__((sda));
-extern float D_L30_001AF8C0 __attribute__((sda));
-extern float D_L30_001AF8A8 __attribute__((sda));
-extern float D_L30_001AF8D4 __attribute__((sda));
-extern float D_L30_001AF95C __attribute__((sda));
-extern float D_L30_001AF908 __attribute__((sda));
-extern float D_L30_001AF8E0 __attribute__((sda));
-extern float D_L30_001AF8CC __attribute__((sda));
-extern float D_L30_001AF958 __attribute__((sda));
-extern float D_L30_001AF8AC __attribute__((sda));
-extern float D_L30_001AF954 __attribute__((sda));
-extern float D_L30_001AF950 __attribute__((sda));
-extern float D_L30_001AF8FC __attribute__((sda));
-extern float D_L30_001AF964 __attribute__((sda));
-extern float D_L30_001AF8BC __attribute__((sda));
-extern float D_L30_001AF8B4 __attribute__((sda));
-extern float D_L30_001AF8A0 __attribute__((sda));
-extern float D_L30_001AF8F4 __attribute__((sda));
-extern int D_L30_001AF8D8 __attribute__((sda));
-extern int D_L30_001AF8DC __attribute__((sda));
+extern float g_vehicle_lean_rate __attribute__((sda));
+extern float g_vehicle_drag_coeff __attribute__((sda));
+extern float g_vehicle_ground_friction __attribute__((sda));
+extern float g_vehicle_l30_speed_limit __attribute__((sda));
+extern float g_vehicle_lean_scale __attribute__((sda));
+extern float g_vehicle_l30_turn_rate __attribute__((sda));
+extern float g_vehicle_tilt_y_rate __attribute__((sda));
+extern float g_vehicle_l30_hover_spring __attribute__((sda));
+extern float g_vehicle_l30_bob_amplitude __attribute__((sda));
+extern float g_vehicle_pitch_rate_idle __attribute__((sda));
+extern float g_vehicle_air_friction __attribute__((sda));
+extern float g_vehicle_steer_scale __attribute__((sda));
+extern float g_vehicle_l30_max_speed __attribute__((sda));
+extern float g_vehicle_l30_min_speed __attribute__((sda));
+extern float g_vehicle_amount_scale __attribute__((sda));
+extern float g_vehicle_pitch_rate_moving __attribute__((sda));
+extern float g_vehicle_speed_blend __attribute__((sda));
+extern float g_vehicle_l30_vertical_damping __attribute__((sda));
+extern float g_vehicle_bob_speed __attribute__((sda));
+extern float g_vehicle_l30_probe_radius __attribute__((sda));
+extern float g_vehicle_l30_ground_offset __attribute__((sda));
+extern float g_vehicle_input_z_scale __attribute__((sda));
+extern float g_vehicle_l30_gravity __attribute__((sda));
+extern float g_vehicle_hover_height __attribute__((sda));
+extern float g_vehicle_contact_damage __attribute__((sda));
+extern float g_vehicle_tilt_x_degrees __attribute__((sda));
+extern float g_vehicle_hit_damage __attribute__((sda));
+extern float g_vehicle_radius_scale __attribute__((sda));
+extern float g_vehicle_lean_blend __attribute__((sda));
+extern float g_vehicle_start_health __attribute__((sda));
+extern float g_vehicle_l30_velocity_damping __attribute__((sda));
+extern float g_vehicle_tilt_z_rate __attribute__((sda));
+extern float g_vehicle_pickup_distance __attribute__((sda));
+extern float g_vehicle_reverse_scale __attribute__((sda));
+extern int g_vehicle_idle_anim __attribute__((sda));
+extern int g_vehicle_current_anim __attribute__((sda));
 extern char * part_find_owned_effect_slot(void *,int,int);
 extern float func_002A0558(void *,void *);
 extern int TryClaimNotice(int,int,int);
@@ -87,10 +88,10 @@ typedef struct {
 } Hero;
 typedef struct { char pad[0x18]; char *hit; int count; Vec vector, point, normal; } Collision;
 extern Hero g_hero_state NOT_SDA;
-extern Collision D_L30_001C0200 NOT_SDA;
-extern char D_0018B650[] NOT_SDA;
-extern int D_00138324 NOT_SDA;
-extern char D_L30_001B9DC0[] NOT_SDA;
+extern Collision g_collision_l30_result NOT_SDA;
+extern char g_held_object_ptr[] NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
+extern char g_camera_l30_position[] NOT_SDA;
 
 typedef struct { char pad[0x10]; int flags; char pad14[0x10]; float radius; } MobyClass;
 typedef struct {
@@ -134,22 +135,22 @@ void UpdateHoverVehicleMoby(HoverMoby *obj) {
     {
         MobyClass *cls=obj->mclass;
         in.active=0;
-        obj->radius=cls->radius*D_L30_001AF950;
+        obj->radius=cls->radius*g_vehicle_radius_scale;
     }
     switch(obj->state) {
     case 0:
         qzero(st);
-        st->health=D_L30_001AF964;
+        st->health=g_vehicle_start_health;
         obj->state=1;
         break;
     case 1:
-        if(func_002A0558(obj,g_hero_state.moby)<D_L30_001AF8A0 && g_hero_state.mode!=0x31) {
+        if(func_002A0558(obj,g_hero_state.moby)<g_vehicle_pickup_distance && g_hero_state.mode!=0x31) {
             int request = TryClaimNotice(7,0x2798,1)!=0;
-            if(D_00138324&16) in.active=request;
+            if(g_pad_held_flags&16) in.active=request;
         }
         if(in.active) {
             hero_l00_set_action(0x31,0);
-            set_hero_animation(D_L30_001AF8D8,0,15.0f);
+            set_hero_animation(g_vehicle_idle_anim,0,15.0f);
             qcopy_nc(&g_hero_state.rotation,&obj->rotation);
             qcopy_nc(&g_hero_state.position,&obj->position);
             g_hero_state.vehicle=obj;
@@ -161,100 +162,100 @@ void UpdateHoverVehicleMoby(HoverMoby *obj) {
         obj->flags=0;
         in.w=in.z=in.y=in.x=0.0f;
         if(obj->state==3) {
-            if(D_L30_001AF8DC!=D_L30_001AF8D8)set_hero_animation(D_L30_001AF8D8,0,15.0f);
+            if(g_vehicle_current_anim!=g_vehicle_idle_anim)set_hero_animation(g_vehicle_idle_anim,0,15.0f);
             hover_read_inputs_basic(&in.x,&in.y,&in.z,&in.w);
         }
         st->throttle=in.y;
         in.z*=0.01745329424738884f;
-        in.z*=D_L30_001AF908;
+        in.z*=g_vehicle_input_z_scale;
         speed=FastVecLength(st);
-        cap=D_L30_001AF8C8*(1.0f/60.0f);
-        limit=D_L30_001AF910*(1.0f/60.0f);
+        cap=g_vehicle_l30_max_speed*(1.0f/60.0f);
+        limit=g_vehicle_l30_speed_limit*(1.0f/60.0f);
         {
-            float amount=in.x*((speed<limit?speed:limit)/limit*D_L30_001AF90C+(1-D_L30_001AF90C));
+            float amount=in.x*((speed<limit?speed:limit)/limit*g_vehicle_speed_blend+(1-g_vehicle_speed_blend));
             amount*=0.0002908882452175021f;
-            st->heading=FastAddRotations(st->heading,D_L30_001AF8B8*amount);
+            st->heading=FastAddRotations(st->heading,g_vehicle_l30_turn_rate*amount);
         }
         {
             float rad=in.x*0.01745329424738884f;
-            float lean=D_L30_001AF8F0*rad;
-            lean*=D_L30_001AF8FC*in.y+(1-D_L30_001AF8FC);
-            st->lean+=(lean-obj->rotation.f[0])*D_L30_001AF8EC;
+            float lean=g_vehicle_lean_scale*rad;
+            lean*=g_vehicle_lean_blend*in.y+(1-g_vehicle_lean_blend);
+            st->lean+=(lean-obj->rotation.f[0])*g_vehicle_lean_rate;
         }
         frame.dir.f[0]=math_fast_sin_or_cos_a(st->heading);
         frame.dir.f[1]=math_fast_sin_or_cos_b(st->heading);
         frame.dir.f[2]=0;
-        if(in.y<0)in.y*=D_L30_001AF8F4;
+        if(in.y<0)in.y*=g_vehicle_reverse_scale;
         sign=1.0f;
         if(in.y<0) sign=-1.0f;
         {
             float magnitude=math_fabs(in.x), throttle=IntegerPower(2,(cap-speed)/cap);
-            float amount=in.y+D_L30_001AF8F8*magnitude*sign;
+            float amount=in.y+g_vehicle_steer_scale*magnitude*sign;
             amount*=0.00027777778450399637f;
-            amount*=D_L30_001AF8C4;
+            amount*=g_vehicle_amount_scale;
             thrust=amount*throttle;
         }
         FastVecAdd(&frame.old,&obj->position,st);
         height=coll_probe_ground_height_below(&frame.old,0,0.5f);
-        st->velocity.f[2]-=D_L30_001AF8E0*0.00027777778450399637f;
+        st->velocity.f[2]-=g_vehicle_l30_gravity*0.00027777778450399637f;
         if(height!=0) {
-            target=height+D_L30_001AF8CC;
+            target=height+g_vehicle_hover_height;
             if(target<frame.old.f[2]) {
-                st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(in.z,st->pitch)*D_L30_001AF904);
+                st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(in.z,st->pitch)*g_vehicle_pitch_rate_idle);
                 goto physics;
             } else if(frame.old.f[2]+0.1f<height) {
                 frame.old.f[2]=height;
-                FastVecScale(st,st,D_L30_001AF8E8);
+                FastVecScale(st,st,g_vehicle_air_friction);
             } else {
-                st->velocity.f[2]+=((target-frame.old.f[2])*D_L30_001AF8D0-st->velocity.f[2])*D_L30_001AF8D0;
+                st->velocity.f[2]+=((target-frame.old.f[2])*g_vehicle_l30_hover_spring-st->velocity.f[2])*g_vehicle_l30_hover_spring;
             }
-            part_spawn_spark_effect(&D_L30_001C0200.vector,obj->basis,speed*0.9f);
+            part_spawn_spark_effect(&g_collision_l30_result.vector,obj->basis,speed*0.9f);
             if(in.w>0) {
-                float drag=1-D_L30_001AF914*in.w;
+                float drag=1-g_vehicle_drag_coeff*in.w;
                 st->velocity.f[0]*=drag;
                 st->velocity.f[1]*=drag;
             }
             {
                 Vec *right=&frame.matrix[0], *up, *ahead=&frame.matrix[2];
-                vec_scale_to_length(ahead,&D_L30_001C0200.normal,1.0f);
+                vec_scale_to_length(ahead,&g_collision_l30_result.normal,1.0f);
                 up=&frame.matrix[1];
                 FastVecCross(up,obj->basis,ahead);
                 FastVecCross(right,up,ahead);
             }
             qzero_nc(&frame.matrix[3]);
             mat_get_euler_angles(&frame.matrix[0],&frame.pos);
-            st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(FastAddRotations(-frame.pos.f[1],in.z),st->pitch)*D_L30_001AF900);
-            FastVecScale(st,st,D_L30_001AF8BC);
+            st->pitch=FastAddRotations(st->pitch,fast_subtract_rotations(FastAddRotations(-frame.pos.f[1],in.z),st->pitch)*g_vehicle_pitch_rate_moving);
+            FastVecScale(st,st,g_vehicle_l30_velocity_damping);
             matrix_from_basis_rows(frame.scratch.inverse,obj->basis);
             transform_vector(st,st,frame.scratch.inverse);
-            st->velocity.f[1]*=D_L30_001AF8C0;
+            st->velocity.f[1]*=g_vehicle_l30_vertical_damping;
             matrix_mul_vec3(st,st,obj->basis);
             vec_scale_to_length(&frame.accel,obj->basis,thrust);
             FastVecAdd(st,st,&frame.accel);
         }
 physics:
-        make_hit_descriptor(&frame.matrix[0],obj,0x10000,st,D_L30_001AF954);
+        make_hit_descriptor(&frame.matrix[0],obj,0x10000,st,g_vehicle_hit_damage);
         qcopy_nc(&obj->position,&frame.old);
         moby_transform_joint_to_world(obj,0,&frame.matrix[3]);
-        frame.matrix[3].f[2]+=D_L30_001AF8D4;
+        frame.matrix[3].f[2]+=g_vehicle_l30_probe_radius;
         FastVecSub(&frame.pos,&obj->position,&frame.matrix[3]);
-        if(coll_test_point(&frame.matrix[3],0,obj,D_L30_001AF8D4) && D_L30_001C0200.hit!=g_hero_state.moby) {
-            FastVecAdd(&obj->position,&D_L30_001C0200.point,&frame.pos);
-            FastVecCross(&frame.scratch.contact.normal,&D_L30_001C0200.normal,st);
-            FastVecCross(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&D_L30_001C0200.normal);
+        if(coll_test_point(&frame.matrix[3],0,obj,g_vehicle_l30_probe_radius) && g_collision_l30_result.hit!=g_hero_state.moby) {
+            FastVecAdd(&obj->position,&g_collision_l30_result.point,&frame.pos);
+            FastVecCross(&frame.scratch.contact.normal,&g_collision_l30_result.normal,st);
+            FastVecCross(&frame.scratch.contact.delta,&frame.scratch.contact.normal,&g_collision_l30_result.normal);
             vec_scale_to_length(&frame.scratch.contact.delta,&frame.scratch.contact.delta,1.0f);
             vec_scale_to_length(st,&frame.scratch.contact.delta,FastVecDot(st,&frame.scratch.contact.delta));
-            FastVecScale(st,st,D_L30_001AF8E4);
-            part_spawn_spark_effect(&D_L30_001C0200.vector,obj->basis,0.0f);
+            FastVecScale(st,st,g_vehicle_ground_friction);
+            part_spawn_spark_effect(&g_collision_l30_result.vector,obj->basis,0.0f);
         }
         speed = FastVecLength(st);
-        if(D_L30_001AF960*(1.0f/60.0f)<speed) {
-            frame.matrix[3].f[2]+=D_L30_001AF95C;
-            coll_process_hit(&frame.matrix[3],0,obj,&frame.matrix[0],D_L30_001AF8D4);
+        if(g_vehicle_l30_min_speed*(1.0f/60.0f)<speed) {
+            frame.matrix[3].f[2]+=g_vehicle_l30_ground_offset;
+            coll_process_hit(&frame.matrix[3],0,obj,&frame.matrix[0],g_vehicle_l30_probe_radius);
             moby_transform_joint_to_world(obj,3,&frame.scratch.contact.delta);
-            coll_process_hit(&frame.scratch.contact.delta,0,obj,&frame.matrix[0],D_L30_001AF958);
+            coll_process_hit(&frame.scratch.contact.delta,0,obj,&frame.matrix[0],g_vehicle_contact_damage);
         }
-        if(!in.active && P(D_0018B650,0)==obj && (D_00138324&16))obj->state=4;
+        if(!in.active && P(g_held_object_ptr,0)==obj && (g_pad_held_flags&16))obj->state=4;
         break;
     case 4:
         obj->flags=obj->mclass->flags;
@@ -276,10 +277,10 @@ physics:
         break;
     }
     st->baseHeight=obj->position.f[2];
-    st->phase=FastAddRotations(st->phase,D_L30_001AF8A8*0.0002908882452175021f);
-    st->bob=math_fast_sin_or_cos_b(st->phase)*D_L30_001AF8A4;
+    st->phase=FastAddRotations(st->phase,g_vehicle_bob_speed*0.0002908882452175021f);
+    st->bob=math_fast_sin_or_cos_b(st->phase)*g_vehicle_l30_bob_amplitude;
     obj->position.f[2]+=st->bob;
-    moby_scale_owner_words_by_angles(obj,&st->tiltX,&st->tiltY,D_L30_001AF8AC*0.01745329424738884f,D_L30_001AF8B0*0.0002908882452175021f,D_L30_001AF8B4*0.0002908882452175021f);
+    moby_scale_owner_words_by_angles(obj,&st->tiltX,&st->tiltY,g_vehicle_tilt_x_degrees*0.01745329424738884f,g_vehicle_tilt_y_rate*0.0002908882452175021f,g_vehicle_tilt_z_rate*0.0002908882452175021f);
     obj->rotation.f[2]=st->heading;
     obj->rotation.f[0]=FastAddRotations(obj->rotation.f[0],st->lean);
     obj->rotation.f[1]=FastAddRotations(obj->rotation.f[1],st->pitch);
@@ -289,7 +290,7 @@ physics:
         gfx_add_draw_callback_first(hud_draw_vehicle_gauges,obj);
     }
     obj->flags=obj->mclass->flags;
-    if(obj->interaction && fast_vec_dist(&obj->position,D_L30_001B9DC0)<64.0f) {
+    if(obj->interaction && fast_vec_dist(&obj->position,g_camera_l30_position)<64.0f) {
         moby_update_ground_check(obj);
         obj->touchTimer=60;
     }

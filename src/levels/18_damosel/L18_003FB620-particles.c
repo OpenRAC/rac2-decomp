@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern int D_L18_001B05D4 __attribute__((sda));
-extern float D_L18_001B05C8 __attribute__((sda));
-extern float D_L18_001B05CC __attribute__((sda));
-extern float D_L18_001B05D0 __attribute__((sda));
+extern int g_trail_particle_count_max __attribute__((sda));
+extern float g_trail_position_jitter __attribute__((sda));
+extern float g_trail_l18_speed_min __attribute__((sda));
+extern float g_trail_l18_speed_max __attribute__((sda));
 typedef struct ParticleSettings {
     s32 *colorRange;
     s16 *sizeRange;
@@ -13,7 +13,7 @@ typedef struct ParticleSettings {
     f32 speed;
 } ParticleSettings;
 /* The shared particle constructor reads this complete 24-byte settings record. */
-extern ParticleSettings D_L18_001B05B0 __attribute__((sda));
+extern ParticleSettings g_trail_particle_settings __attribute__((sda));
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
@@ -32,13 +32,13 @@ void part_spawn_trail_particles(u8 *object)
     int count;
     int i;
 
-    count = math_random_int_below(D_L18_001B05D4) + 1;
+    count = math_random_int_below(g_trail_particle_count_max) + 1;
     for (i = 0; i < count; i++) {
         qcopy(position, object + 0x10);
-        vec_add_random_offset(position, D_L18_001B05C8);
+        vec_add_random_offset(position, g_trail_position_jitter);
         vec_scale_to_length(direction, object + 0xC0,
-                      -(math_random_float_range(D_L18_001B05CC, D_L18_001B05D0) * 0.016666668f));
-        enemy_spawn_record(position, direction, &D_L18_001B05B0, math_random_int_below(2),
+                      -(math_random_float_range(g_trail_l18_speed_min, g_trail_l18_speed_max) * 0.016666668f));
+        enemy_spawn_record(position, direction, &g_trail_particle_settings, math_random_int_below(2),
                           math_random_int_range(-2, 2));
     }
 }

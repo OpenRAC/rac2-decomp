@@ -26,7 +26,7 @@ extern void FastVecScale(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);
 extern float mat_measure_difference(Row *, Row *);
 
-void func_PAL_L00_002B0420(char *object, void *matrix, int filter)
+void FilterTransformHistory_pal(char *object, void *matrix, int filter)
 {
     Row sum[4];
     /* Retail accumulates into this scratch array without clearing it. */

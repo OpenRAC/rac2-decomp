@@ -24,7 +24,7 @@ extern void gfx_draw_projectile_trail(void);
 
 extern void moby_mark_spawned(int);
 
-extern char D_L20_001C0420[];
+extern char g_spark_position[];
 
 /* Flies a shot forward each frame, checks what it hits, and on a hit makes sparks and removes the shot. */
 void projectile_l20_update(char *moby) {
@@ -39,7 +39,7 @@ void projectile_l20_update(char *moby) {
     make_hit_descriptor(hit_info, (int)moby, 0x10001, velocity, *(float *)(vars + 0x2C));
     if (CollLine(vars, position, 0, *(int *)(moby + 0xB8), hit_info) != 0
         || math_fast_float_d(vars + 0x20) != 0) {
-        part_l20_spawn_spark_burst(D_L20_001C0420, 0x14, 1);
+        part_l20_spawn_spark_burst(g_spark_position, 0x14, 1);
         snd_play_from_class_bank(2, 0, moby, 0x12EF);
         moby_mark_spawned((int)moby);
     } else {

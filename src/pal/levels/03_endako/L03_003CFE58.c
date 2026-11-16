@@ -6,18 +6,18 @@ extern s32  PlayMobySound(s32 a0, s32 a1, char *a2);
 extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern f32  math_random_signed_float_range(f32 a0, f32 a1);
 extern f32  FastAddRotations(f32 a0, f32 a1);
-extern char D_L03_00188660[];
+extern char g_sound_l03_slot_table[];
 extern s32  func_312898(s32 a0, s32 a1, void *a2);
-extern u8  *D_L03_001B2A1C;
+extern u8  *g_moby_record_base;
 extern f32  D_00189E20_19;
-extern u8   D_001395BF;
-extern u8   D_001395C0;
-extern u8   D_001A7AFA;
-extern u8   D_001A7B32;
-extern u8   D_001A7AFB;
-extern u8   D_001A7B33;
-extern u8   D_001A7AFC;
-extern u8   D_001A7B34;
+extern u8   g_clank_scene_done_flag;
+extern u8   g_remote_view_done_flag;
+extern u8   g_barlow_hint_inside_flag;
+extern u8   g_unused_byte_c;
+extern u8   g_unused_byte_a;
+extern u8   g_unused_byte_d;
+extern u8   g_unused_byte_b;
+extern u8   g_unused_byte_e;
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
 /* func_L03_003C8660 is matched in its own unit, src/levels/03_endako/L03_003C8660-qcopy.c (-frac2-qcopy). */
@@ -50,7 +50,7 @@ void func_PAL_L03_003CFE58(char *a0)
         s32 v = *(s32 *)s1;
 
         if (v != 0) {
-            char *p = D_L03_00188660 + *(s32 *)(s1 + 8) * 0x70;
+            char *p = g_sound_l03_slot_table + *(s32 *)(s1 + 8) * 0x70;
 
             if (*(char **)(p + 0x88) != s0 || *(u8 *)(p + 0x74) == 0)
                 *(s32 *)(s1 + 8) = PlayMobySound(0, 4, s0);

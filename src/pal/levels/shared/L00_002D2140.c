@@ -12,7 +12,7 @@ extern int FindSlotTableKey(int, int *);
 extern int hero_slot_item_id(int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 
-void func_PAL_L00_002D2140(int a0, int a1, float f12)
+void hero_sync_linked_object_anims_pal(int a0, int a1, float f12)
 {
     char *p1;
     char *p2;

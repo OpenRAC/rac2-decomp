@@ -3,14 +3,14 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; f32 f[4]; } BarlowVector;
 extern u8 *g_moby_l04_pool MACRO_ADDR;
-extern u8 D_L04_001BF880[];
-extern int D_L04_001A8F00 MACRO_ADDR;
-extern int D_L04_001B2224[] __attribute__((sda));
+extern u8 g_request_l04_queue[];
+extern int g_game_l04_mode MACRO_ADDR;
+extern int g_cutscene_flags[] __attribute__((sda));
 typedef union { u8 b[0x2600]; s32 i[0x980]; f32 f[0x980]; TI128 q[0x260]; } Hero;
 extern u8 g_hero_state[];
-extern BarlowVector D_00189F00;
-extern f32 D_00189F30[4];
-extern u8 D_001A7A40 MACRO_ADDR;
+extern BarlowVector g_hero_target_point;
+extern f32 g_hero_zero_vector[4];
+extern u8 g_unlocked_item_flags MACRO_ADDR;
 extern void moby_reset_vars_defaults(void *);
 extern int hero_is_reachable_for_count(void *, int, f32);
 /* Interface assumption: retain the incoming owner/key in a0. The current
@@ -36,9 +36,9 @@ extern void FastVecSub(void *, void *, void *);
 extern f32 fast_subtract_rotations(f32, f32);
 extern f32 vec_length_xy(void *);
 extern void moby_update_eased_node(void *, void *, int, f32, f32);
-extern u32 D_001397A4;
+extern u32 g_object_state_flags_b;
 typedef union { u8 b[0x200]; u32 w[0x80]; } GameFlags;
-extern u8 D_001395B8[];
+extern u8 g_game_flag_table[];
 extern void conversation_clear_target_on_talk(void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void add_vectors(void *, void *, void *);
@@ -66,25 +66,25 @@ void barlow_hint_npc_update(u8 *object) {
         linked[0x31] = 0;
         *(u16 *)(linked + 0x34) |= 1;
         moby_reset_vars_defaults(object);
-        if (D_001397A4 & 0x20000000) moby_set_state(object, 4, -1);
+        if (g_object_state_flags_b & 0x20000000) moby_set_state(object, 4, -1);
         else moby_set_state(object, 1, -1);
         break;
     case 1:
         if (hero_is_reachable_for_count(object, 10, 6.5f)) {
             level_apply_index_for_key((int)object);
-            req_push_queue(D_L04_001BF880, 0x3D);
-            req_launch_queued(D_L04_001BF880);
+            req_push_queue(g_request_l04_queue, 0x3D);
+            req_launch_queued(g_request_l04_queue);
             moby_set_state(object, 2, -1);
         }
         break;
     case 2:
-        if (D_L04_001A8F00 == 2) {
+        if (g_game_l04_mode == 2) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
-        D_L04_001B2224[1] = 1;
+        g_cutscene_flags[1] = 1;
         if (!game_is_either_mode_two()) {
-            D_L04_001B2224[1] = 0;
+            g_cutscene_flags[1] = 0;
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= ~1;
             vec_scale_to_length(&target, object + 0xC0, 4.0f);
@@ -94,8 +94,8 @@ void barlow_hint_npc_update(u8 *object) {
         }
         break;
     case 3:
-        if (!((GameFlags *)D_001395B8)->b[0xA4]) {
-            ((GameFlags *)D_001395B8)->b[0xA4] = 1;
+        if (!((GameFlags *)g_game_flag_table)->b[0xA4]) {
+            ((GameFlags *)g_game_flag_table)->b[0xA4] = 1;
             message = GetLocalizedString(0x1137);
             settings_store_four(message, 0, GetLocalizedString(0x3296), 1);
             menu_set_size_limits(0x40, 0);
@@ -161,7 +161,7 @@ void barlow_hint_npc_update(u8 *object) {
         *(f32 *)(data + 0x68) = yaw * 0.6f;
         *(f32 *)(data + 0xE8) = yaw * 0.4f;
     }
-    if (D_001A7A40)
+    if (g_unlocked_item_flags)
         *(f32 *)(data + 0x70) = 2.75f;
     moby_update_eased_node(object, data, 0, rate, blend);
     moby_update_eased_node(object, data + 0x80, 1, rate, blend);

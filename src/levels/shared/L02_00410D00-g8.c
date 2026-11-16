@@ -1,8 +1,8 @@
 #include "names.h"
 typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
-extern float D_L02_001B1A48 __attribute__((sda));
-extern float D_L02_001B1A50 __attribute__((sda));
+extern float g_teleporter_child_height_offset __attribute__((sda));
+extern float g_teleporter_child_yaw_degrees __attribute__((sda));
 extern void euler_rotation_basis(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -20,8 +20,8 @@ void teleporter_update_orbiting_children(u8 *object)
         float height;
         float yaw;
         *(Quad *)(child+0x10)=*(Quad *)(object+0x10);
-        height=*(float *)(child+0x18)+D_L02_001B1A48;
-        yaw=D_L02_001B1A50*0.017453294f;
+        height=*(float *)(child+0x18)+g_teleporter_child_height_offset;
+        yaw=g_teleporter_child_yaw_degrees*0.017453294f;
         *(float *)(child+0x18)=height;
         *(float *)(*slot+0xF4)=yaw;
         distance=*(float *)(state+0x20)*2.4f-1.2f;

@@ -1,20 +1,21 @@
 #include "include_asm.h"
+#include "names.h"
 #include "moby_classes.h"
 #include "names.h"
 
-extern float D_L02_001B1030 __attribute__((sda));
+extern float g_actor_cycle_timer_rate __attribute__((sda));
 
-extern int D_L02_001AD410;
+extern int g_actor_shared_state;
 
-extern char D_L02_001B11D0[8] __attribute__((sda));
+extern char g_cutscene_camera_position[8] __attribute__((sda));
 
-extern char D_L02_001B11E0[8] __attribute__((sda));
+extern char g_cutscene_l02_camera_rotation[8] __attribute__((sda));
 
-extern char D_L02_001B11F0[8] __attribute__((sda));
+extern char g_cutscene_camera_pose_start[8] __attribute__((sda));
 
-extern char D_L02_001B1200[8] __attribute__((sda));
+extern char g_cutscene_camera_pose_end[8] __attribute__((sda));
 
-extern int D_L02_001B1210 __attribute__((sda));
+extern int g_cutscene_camera_mode_arg __attribute__((sda));
 
 extern void vec_clear_128(void *);
 
@@ -22,21 +23,21 @@ extern void SetCamera5Pose(char *, char *, int, int, int);
 
 /* Advances a repeating 0 to 1 timer in the actor data each frame. */
 void actor_advance_cycle_timer(void) {
-    int actorBase = D_L02_001AD410;
+    int actorBase = g_actor_shared_state;
     float *timerPtr = (float *)((char *)actorBase + 0x74);
     float newValue;
 
-    newValue = timerPtr[0] + D_L02_001B1030 * 1.6666667535901069641113281250e-02f;
+    newValue = timerPtr[0] + g_actor_cycle_timer_rate * 1.6666667535901069641113281250e-02f;
     timerPtr[0] = newValue;
     if (newValue > 1.0f)
         timerPtr[0] = newValue - 1.0f;
 }
 
-extern int D_001A8FF0;
+extern int g_hero_height_zone_active;
 
 /* Four bytes: cc1 then emits the address as a single `la`, which gas expands to an adjacent
    lui/addiu pair (an array of unknown size is split by cc1 itself). */
-extern char D_L02_001B3210[4];
+extern char g_arena_anchor_pos[4];
 
 extern void sky_shift_records_by_period(int, float);
 
@@ -73,21 +74,21 @@ void hero_update_height_zone_flags(char *moby) {
     if (g_hero_state.f88 < 420.0f && *(float *)(state + 0x98) >= 420.0f) {
         sky_shift_records_by_period(0, 420.0f);
         g_hero_state.b24F0 = 0;
-        D_001A8FF0 = 0;
+        g_hero_height_zone_active = 0;
     } else if (g_hero_state.f88 > 420.0f && *(float *)(state + 0x98) <= 420.0f) {
         sky_shift_records_by_period(1, 420.0f);
-        distance = fast_vec_dist(g_hero_state.pos, D_L02_001B3210);
-        if (D_001A8FF0 == 0 && distance < 150.0f) {
+        distance = fast_vec_dist(g_hero_state.pos, g_arena_anchor_pos);
+        if (g_hero_height_zone_active == 0 && distance < 150.0f) {
             int on = 1;
 
             g_hero_state.b24F0 = on;
-            D_001A8FF0 = on;
-        } else if (D_001A8FF0 != 0 && distance > 150.0f) {
+            g_hero_height_zone_active = on;
+        } else if (g_hero_height_zone_active != 0 && distance > 150.0f) {
             g_hero_state.b24F0 = 0;
-            D_001A8FF0 = 0;
+            g_hero_height_zone_active = 0;
         }
     }
-    if (D_001A8FF0 != 0) {
+    if (g_hero_height_zone_active != 0) {
         g_hero_state.b22C2 = 1;
         if (*(int *)(state + 0xDC) == 0) {
             *(int *)(state + 0xDC) = 1;
@@ -101,17 +102,17 @@ void hero_update_height_zone_flags(char *moby) {
 void cutscene_setup_camera(char *moby) {
     char buf[16];
     vec_clear_128(buf);
-    SetCamera5Pose(D_L02_001B11F0, D_L02_001B1200, 1, 0, 0);
-    SetCamera5Mode(2, D_L02_001B1210);
-    object_copy_vector_to_selected(D_L02_001B11D0);
-    cam_set_state_rotation(D_L02_001B11E0);
+    SetCamera5Pose(g_cutscene_camera_pose_start, g_cutscene_camera_pose_end, 1, 0, 0);
+    SetCamera5Mode(2, g_cutscene_camera_mode_arg);
+    object_copy_vector_to_selected(g_cutscene_camera_position);
+    cam_set_state_rotation(g_cutscene_l02_camera_rotation);
 }
 
 extern char g_camera_l02_position[];
-extern int D_L02_001B32E8;
+extern int g_hero_at_console_flag;
 extern void moby_set_state(char *, int, int);
 
-extern char *D_L02_001B1190[] __attribute__((sda));
+extern char *g_arena_challenge_table_2[] __attribute__((sda));
 
 /* Whether the pair of table entries the object names still agree with its own four words. */
 /* func_L02_003FCBF0 is defined in L02_003FCBF0-g8.c. */
@@ -123,12 +124,12 @@ typedef short s16;
 typedef int s32;
 typedef float f32;
 
-extern char *D_L02_001B1190[2] __attribute__((sda));
+extern char *g_arena_challenge_table_2[2] __attribute__((sda));
 extern unsigned char *g_moby_l02_pool[3] __attribute__((sda));
-extern s32 D_L02_001B35B8[] __attribute__((sda));
+extern s32 g_group_max_index[] __attribute__((sda));
 extern u32 g_entity_group_lists[];
-extern f32 D_L02_001B1258 __attribute__((sda));
-extern f32 D_L02_001B125C __attribute__((sda));
+extern f32 g_cutscene_camera_time __attribute__((sda));
+extern f32 g_cutscene_camera_angle __attribute__((sda));
 extern s32 moby_is_state_six(char *);
 extern s32 moby_is_state_one_cleared_vars(char *);
 extern s32 math_random_int_below(s32);
@@ -192,7 +193,7 @@ extern void teleporter_bind_captured_object(char *, char *, f32, f32);
 /* Tells nearby enemies from two groups to attack, a few at a time. */
 void arena_command_group_attacks(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    char *rec = *(char **)(D_L02_001B1190[*(s16 *)(state + 0x120)] + 4)
+    char *rec = *(char **)(g_arena_challenge_table_2[*(s16 *)(state + 0x120)] + 4)
                 + *(s16 *)(state + 0x122) * 0x14;
     char *buf[16];
     u16 *p;
@@ -219,7 +220,7 @@ extern char g_hero_position[];
 /* Picks a nearby entity for this actor to watch and stores it in a free slot. */
 void actor_pick_watched_entity(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    char *rec = *(char **)(D_L02_001B1190[*(s16 *)(state + 0x120)] + 4) + *(s16 *)(state + 0x122) * 0x14;
+    char *rec = *(char **)(g_arena_challenge_table_2[*(s16 *)(state + 0x120)] + 4) + *(s16 *)(state + 0x122) * 0x14;
     char *at = state + GROUP(0xD8) * 4;
     char *slot = *(char **)(at + 0xA8);
     s32 go = 0;
@@ -244,7 +245,7 @@ void actor_pick_watched_entity(char *moby) {
     idList = (u16 *)g_entity_group_lists[GROUP(0x44)];
     if (idList == 0)
         return;
-    for (idPtr = idList; (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= D_L02_001B35B8[0] && idPtr != 0 &&
+    for (idPtr = idList; (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= g_group_max_index[0] && idPtr != 0 &&
                 ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)g_entity_group_lists[GROUP(0x44)]);
          idPtr++) {
         entity = (char *)g_moby_l02_pool[0] + ((*idPtr & 0x7FFF) << 8);
@@ -266,7 +267,7 @@ void actor_pick_watched_entity(char *moby) {
             return;
     }
     for (idPtr = (u16 *)g_entity_group_lists[GROUP(0x44)];
-         (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= D_L02_001B35B8[0] && idPtr != 0 &&
+         (GROUP(0x44) & 0xFF) != 0xFF && GROUP(0x44) <= g_group_max_index[0] && idPtr != 0 &&
          ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == (u16 *)g_entity_group_lists[GROUP(0x44)]);
          idPtr++) {
         entity = (char *)g_moby_l02_pool[0] + ((*idPtr & 0x7FFF) << 8);
@@ -282,12 +283,12 @@ void actor_pick_watched_entity(char *moby) {
     }
 }
 
-extern unsigned char D_001395B8[0x100];
+extern unsigned char g_game_flag_table[0x100];
 
 /* D_001A7A0C, written as the second word of an 8-byte object: cc1 then counts the store as two
    instructions and keeps it out of func_L02_003FCDF8's delay slot, and the assembler gives the
    absolute `lui $at ; sw`. */
-extern int D_001A7A08[2];
+extern int g_challenge_score_words[2];
 
 extern int g_player_bolts;
 
@@ -320,7 +321,7 @@ void scene_start_count_views(char *moby, int sceneKind) {
     char *hero;
     int score;
 
-    if (sceneKind == 0 && D_001395B8[arena_get_challenge_save_index(0)] == 0) {
+    if (sceneKind == 0 && g_game_flag_table[arena_get_challenge_save_index(0)] == 0) {
         hero = (char *)&g_hero_state;
         savedWord = *(int *)(hero + 0x22C8);
         arena_start_announcer_message(moby, 7);
@@ -339,30 +340,30 @@ void scene_start_count_views(char *moby, int sceneKind) {
             arena_start_announcer_message(moby, math_random_int_below(5) + 2);
             break;
         }
-        D_001A7A08[1] = D_001A7A08[1] + moby_compute_scaled_entry_value_shifted(sceneKind);
+        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(sceneKind);
         score = moby_compute_scaled_entry_value(sceneKind);
         *(int *)(state + 0x110) = score;
         g_player_bolts = g_player_bolts + score;
         module_l00_call_handler_with_arg_4(0x168);
     }
-    D_001395B8[arena_get_challenge_save_index(sceneKind)] += 1;
+    g_game_flag_table[arena_get_challenge_save_index(sceneKind)] += 1;
     MemcardSave(0, -1);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern char D_L02_001B1730[8] __attribute__((sda));
-extern float D_L02_001B1750 __attribute__((sda));
-extern float D_L02_001B1754;
-extern u32 D_L02_001B1758 __attribute__((sda));
-extern u32 D_L02_001B175C;
-extern u32 D_L02_001B1760;
-extern u32 D_L02_001B1764;
-extern u32 D_L02_001B1768;
-extern u32 D_L02_001B176C;
-extern u32 D_L02_001B1770 __attribute__((sda));
-extern u32 D_L02_001B1774;
-extern u32 D_L02_001B1778;
+extern char g_spark_burst_vectors[8] __attribute__((sda));
+extern float g_spark_burst_speed_min __attribute__((sda));
+extern float g_spark_burst_speed_max;
+extern u32 g_spark_burst_a_word0 __attribute__((sda));
+extern u32 g_spark_burst_a_word1;
+extern u32 g_spark_burst_b_word0;
+extern u32 g_spark_burst_b_word1;
+extern u32 g_spark_burst_c_word0;
+extern u32 g_spark_burst_c_word1;
+extern u32 g_spark_burst_a_color __attribute__((sda));
+extern u32 g_spark_burst_b_color;
+extern u32 g_spark_burst_c_color;
 extern s32 g_frame_l02_counter;
 
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -382,7 +383,7 @@ void part_spawn_spark_bursts(char *moby, char *offsetVec) {
     float sparkVelocity[4];
     float tempVec[4];
     float *velocityPtr = sparkVelocity;
-    char *vecPtr = D_L02_001B1730;
+    char *vecPtr = g_spark_burst_vectors;
     s32 i;
     float speed;
 
@@ -391,21 +392,21 @@ void part_spawn_spark_bursts(char *moby, char *offsetVec) {
         vecPtr += 0x10;
         FastVecAdd(worldPos, worldPos, moby + 0x10);
         *(TI128 *)tempVec = 0;
-        speed = math_random_float_range(D_L02_001B1750, D_L02_001B1754);
+        speed = math_random_float_range(g_spark_burst_speed_min, g_spark_burst_speed_max);
         tempVec[2] = -(speed * 0.016666668f);
         *(TI128 *)sparkVelocity = *(TI128 *)tempVec;
         FastVecAdd(sparkVelocity, sparkVelocity, offsetVec);
         if (g_frame_l02_counter & 1) {
-            part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1758, D_L02_001B175C, math_random_int_range(0x12, 0x16), D_L02_001B1770, -10, 1);
+            part_spawn_scaling(worldPos, velocityPtr, g_spark_burst_a_word0, g_spark_burst_a_word1, math_random_int_range(0x12, 0x16), g_spark_burst_a_color, -10, 1);
         } else {
-            part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1760, D_L02_001B1764, math_random_int_range(0x14, 0x18), D_L02_001B1774, -10, 1);
+            part_spawn_scaling(worldPos, velocityPtr, g_spark_burst_b_word0, g_spark_burst_b_word1, math_random_int_range(0x14, 0x18), g_spark_burst_b_color, -10, 1);
         }
-        part_spawn_scaling(worldPos, velocityPtr, D_L02_001B1768, D_L02_001B176C, math_random_int_range(0xA, 0xF), D_L02_001B1778, -10, 1);
+        part_spawn_scaling(worldPos, velocityPtr, g_spark_burst_c_word0, g_spark_burst_c_word1, math_random_int_range(0xA, 0xF), g_spark_burst_c_color, -10, 1);
     }
 }
 
-extern s32 D_0018C2EC __attribute__((nosda));
-extern float D_L02_001B1534 __attribute__((sda));
+extern s32 g_request_enabled_flag __attribute__((nosda));
+extern float g_actor_health_fraction_scale __attribute__((sda));
 extern s32 arena_start_announcer_message(char *, s32);
 
 /* Picks the message to ask for after the entity the object is attending to (state word 0xD0),
@@ -429,14 +430,14 @@ void actor_pick_watched_message(char *moby) {
     switch (*(s16 *)(target + 0xAA)) {
     case 0x9F8: /* Chainblade */
         chainbladeVars = *(char **)(target + 0x68);
-        if ((float)D_0018C2EC <= 0.0f) {
+        if ((float)g_request_enabled_flag <= 0.0f) {
             msg = math_random_int_below(2) + 0x10;
             flagAddr = state + msg * 2;
             if (*(s16 *)(flagAddr + 0x1D0) != 0)
                 msg = -1;
         }
         if (*(s16 *)(state + 0x1F4) == 0) {
-            if (*(float *)(chainbladeVars + 0x20) < (float)*(s16 *)(chainbladeVars + 0x24) * D_L02_001B1534)
+            if (*(float *)(chainbladeVars + 0x20) < (float)*(s16 *)(chainbladeVars + 0x24) * g_actor_health_fraction_scale)
                 msg = 0x12;
         }
         if (*(s16 *)(state + 0x1F6) == 0) {
@@ -446,14 +447,14 @@ void actor_pick_watched_message(char *moby) {
         break;
     case 0xA44: /* B2 Brawler Legs */
         brawlerVars = *(char **)(target + 0x68);
-        if ((float)D_0018C2EC <= 0.0f) {
+        if ((float)g_request_enabled_flag <= 0.0f) {
             msg = math_random_int_below(2) + 0x16;
             flagAddr = state + msg * 2;
             if (*(s16 *)(flagAddr + 0x1D0) != 0)
                 msg = -1;
         }
         if (*(s16 *)(state + 0x200) == 0) {
-            if (*(float *)(brawlerVars + 0x20) < (float)*(s16 *)(brawlerVars + 0x24) * D_L02_001B1534)
+            if (*(float *)(brawlerVars + 0x20) < (float)*(s16 *)(brawlerVars + 0x24) * g_actor_health_fraction_scale)
                 msg = 0x18;
         }
         if (*(s16 *)(state + 0x202) == 0) {
@@ -466,8 +467,8 @@ void actor_pick_watched_message(char *moby) {
         arena_start_announcer_message(moby, msg);
 }
 
-extern s32 D_0018C0B4 __attribute__((nosda));
-extern u8 D_001395B8[];
+extern s32 g_game_mode __attribute__((nosda));
+extern u8 g_game_flag_table[];
 extern u8 g_item_slot_to_record[];
 
 typedef struct {
@@ -476,7 +477,7 @@ typedef struct {
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 
-extern L02_003FF9A0_Rec D_L02_00264A70[];
+extern L02_003FF9A0_Rec g_material_l02_table[];
 
 extern s32 hero_l00_set_action(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
@@ -500,27 +501,27 @@ void menu_select_next_usable(char *moby) {
     s32 i;
     L02_003FF9A0_Rec *record;
 
-    if (D_0018C0B4 != 0x6F)
+    if (g_game_mode != 0x6F)
         hero_l00_set_action(0x6F, 1);
     if (PadPressedWithin(0x40, 0x3C, 0) != 0) {
         moby_set_state(moby, 7, -1);
         for (i = *(s16 *)(state + 0x118) + 1; i < 0xE; i++) {
-            if (D_001395B8[arena_get_challenge_save_index(*(s32 *)(D_L02_001B1190[i] + 8))] == 0)
+            if (g_game_flag_table[arena_get_challenge_save_index(*(s32 *)(g_arena_challenge_table_2[i] + 8))] == 0)
                 continue;
             if (i >= 0xC && flag_is_byte_set() == 0)
                 continue;
             if (i == 7) {
-                record = &D_L02_00264A70[g_item_slot_to_record[0x1E]];
+                record = &g_material_l02_table[g_item_slot_to_record[0x1E]];
                 if (record->f4 == 0)
                     continue;
             }
             if (i == 8) {
-                record = &D_L02_00264A70[g_item_slot_to_record[0x2A]];
+                record = &g_material_l02_table[g_item_slot_to_record[0x2A]];
                 if (record->f4 == 0)
                     continue;
             }
             *(s16 *)(state + 0x118) = i;
-            D_001395B8[0x3C] = *(u8 *)(state + 0x118);
+            g_game_flag_table[0x3C] = *(u8 *)(state + 0x118);
             return;
         }
     } else if (PadPressedWithin(0x10, 0x3C, 0) != 0) {
@@ -530,12 +531,12 @@ void menu_select_next_usable(char *moby) {
     }
 }
 
-extern const float D_L02_001B1520 __attribute__((sda));
-extern const s32 D_L02_001B1524 __attribute__((sda));
-extern float D_L02_001B1528 __attribute__((sda));
-extern float D_L02_001B152C __attribute__((sda));
-extern s32 D_L02_001B1530 __attribute__((sda));
-extern s32 D_001A7A00;
+extern const float g_actor_idle_message_time_limit __attribute__((sda));
+extern const s32 g_actor_idle_message_count_limit __attribute__((sda));
+extern float g_actor_message_threshold __attribute__((sda));
+extern float g_actor_message_hero_scale __attribute__((sda));
+extern s32 g_actor_message_delay_base __attribute__((sda));
+extern s32 g_player_stats;
 extern char g_music_state[];
 extern s32 math_fast_float_d(void *);
 
@@ -584,7 +585,7 @@ void actor_pick_idle_message(char *moby, s32 countStep, float floatStep, float t
     count = *(s32 *)(state + 0xEC) + countStep;
     *(s32 *)(state + 0xEC) = count;
     *(float *)(state + 0xE8) = acc;
-    if (D_L02_001B1520 < acc || D_L02_001B1524 < count) {
+    if (g_actor_idle_message_time_limit < acc || g_actor_idle_message_count_limit < count) {
         listPtr = list;
         for (j = 0; j < 6; j++) {
             s32 id;
@@ -603,7 +604,7 @@ void actor_pick_idle_message(char *moby, s32 countStep, float floatStep, float t
         *(s32 *)(state + 0x100) = 300;
         *(s32 *)(state + 0xE8) = 0;
     }
-    if (D_L02_001B1528 < threshold) {
+    if (g_actor_message_threshold < threshold) {
         listPtr = list;
         for (k = 0; k < 3; k++) {
             s32 id = k + 0x1A;
@@ -613,7 +614,7 @@ void actor_pick_idle_message(char *moby, s32 countStep, float floatStep, float t
         }
     }
     hero = (char *)&g_hero_state;
-    if ((float)*(s32 *)(hero + 0x24CC) < (float)D_001A7A00 * D_L02_001B152C) {
+    if ((float)*(s32 *)(hero + 0x24CC) < (float)g_player_stats * g_actor_message_hero_scale) {
         id23 = 0x23;
         if (*(s16 *)(state + 0x216) == 0)
             list[candidateCount++] = id23;
@@ -626,21 +627,21 @@ void actor_pick_idle_message(char *moby, s32 countStep, float floatStep, float t
     }
     if (candidateCount != 0) {
         arena_start_announcer_message(moby, list[math_random_int_below(candidateCount)]);
-        *(s32 *)(state + 0xE4) = D_L02_001B1530 + math_random_int_below(D_L02_001B1530);
+        *(s32 *)(state + 0xE4) = g_actor_message_delay_base + math_random_int_below(g_actor_message_delay_base);
     }
 }
 
 extern void *cam_alloc_override_slot(s32);
 extern void cam_end_override(void *);
-extern f32 D_L02_001B1234 __attribute__((sda));
-extern f32 D_L02_001B1238 __attribute__((sda));
-extern f32 D_L02_001B123C __attribute__((sda));
-extern f32 D_L02_001B1240 __attribute__((sda));
-extern f32 D_L02_001B1244 __attribute__((sda));
-extern f32 D_L02_001B1248 __attribute__((sda));
-extern f32 D_L02_001B124C __attribute__((sda));
-extern f32 D_L02_001B1250 __attribute__((sda));
-extern f32 D_L02_001B1254 __attribute__((sda));
+extern f32 g_helper_offset_a_x __attribute__((sda));
+extern f32 g_helper_offset_a_y __attribute__((sda));
+extern f32 g_helper_offset_a_z __attribute__((sda));
+extern f32 g_helper_offset_b_x __attribute__((sda));
+extern f32 g_helper_offset_b_y __attribute__((sda));
+extern f32 g_helper_offset_b_z __attribute__((sda));
+extern f32 g_helper_offset_c_x __attribute__((sda));
+extern f32 g_helper_offset_c_y __attribute__((sda));
+extern f32 g_helper_offset_c_z __attribute__((sda));
 
 typedef struct {
     f32 x;
@@ -669,18 +670,18 @@ void actor_update_helper_offsets(u8 *moby) {
 
             if (attended != 0) {
                 if (*(s16 *)(attended + 0xAA) == MOBY_CLASS_CHAINBLADE) {
-                    obj->x = D_L02_001B1240;
-                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = D_L02_001B1244;
-                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = D_L02_001B1248;
+                    obj->x = g_helper_offset_b_x;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_b_y;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_b_z;
                 } else if (*(s16 *)(attended + 0xAA) == MOBY_CLASS_B2_BRAWLER_LEGS) {
-                    obj->x = D_L02_001B124C;
-                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = D_L02_001B1250;
-                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = D_L02_001B1254;
+                    obj->x = g_helper_offset_c_x;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_c_y;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_c_z;
                 }
             } else {
-                obj->x = D_L02_001B1234;
-                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = D_L02_001B1238;
-                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = D_L02_001B123C;
+                obj->x = g_helper_offset_a_x;
+                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_a_y;
+                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_a_z;
             }
         }
     } else {

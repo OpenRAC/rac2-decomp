@@ -38,13 +38,13 @@ extern void joba_enemy_reset(u8 *arg0);
 
 extern void joba_enemy_clear_counters(u8 *arg0);
 
-extern u8 D_L11_00188660[];
+extern u8 g_sound_l11_slot_table[];
 
-extern u8 D_L11_001BA8C0[];
+extern u8 g_hero_l11_position[];
 
-extern s32 D_L11_001A8FF0 __attribute__((sda));
+extern s32 g_hero_control_locked __attribute__((sda));
 
-extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern s32 g_hero_l11_input_blocked __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -54,7 +54,7 @@ extern f32 vec_distance_xy(u8 *a0, u8 *a1);
 
 extern void FastVecSub(f32 *a0, const f32 *a1, const f32 *a2);
 
-extern u8 D_L11_00189EA0[];
+extern u8 g_hero_l11_state_data[];
 
 extern void joba_beams_draw(u8 *arg0);
 
@@ -64,7 +64,7 @@ extern u8 *g_moby_l11_table[] __attribute__((sda));
 extern s32 g_current_map_index[] __attribute__((sda));
 
 /* Per-level flag bytes, sixteen per level. */
-extern u8 D_0019B2E8[][16];
+extern u8 g_moby_group_flags[][16];
 
 extern void vec_scale_to_length(void *, void *, f32);
 
@@ -93,7 +93,7 @@ void arachnoid_update(u8 *moby_arg) {
         if (joba_enemy_is_active(moby) != 0)
             return;
         if (*(u8 *)(moby + 0x31) != 0
-            && fast_vec_dist(moby + 0x10, D_L11_001BA8C0) < 48.0f) {
+            && fast_vec_dist(moby + 0x10, g_hero_l11_position) < 48.0f) {
             moby_update_ground_check(moby);
             *(u8 *)(moby + 0x6F) = 0x2D;
         }
@@ -131,7 +131,7 @@ void joba_enemy_init(u8 *moby_arg) {
 s32 joba_enemy_is_active(u8 *moby) {
     s32 result = 0;
 
-    if (D_L11_001A8FF0 == 0 || D_L11_001A8FF4 == 0)
+    if (g_hero_control_locked == 0 || g_hero_l11_input_blocked == 0)
         result = *(u8 *)(moby + 0x20) != 9;
     return result;
 }
@@ -215,7 +215,7 @@ void joba_enemy_clear_counters(u8 *moby_arg) {
     } while (i >= 0);
     sound_index = *(s32 *)(vars + 0x290);
     if (sound_index != -1) {
-        u8 *sound = D_L11_00188660 + sound_index * 0x70;
+        u8 *sound = g_sound_l11_slot_table + sound_index * 0x70;
         if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
             snd_stop_voice(sound_index);
         }
@@ -271,7 +271,7 @@ void swinging_linked_moby_update(u8 *moby_arg) {
             PlayMobySound(0, 0, moby);
             moby_set_state(moby, 2, -1);
         }
-        if (D_0019B2E8[g_current_map_index[0]][*(u8 *)(moby + 0xB0)] & 0x80) {
+        if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(moby + 0xB0)] & 0x80) {
             *(f32 *)(moby + 0xF0) = fast_subtract_rotations(*(f32 *)(moby + 0xF0), 1.5707964897155762f);
             moby_set_state(moby, 6, -1);
         }

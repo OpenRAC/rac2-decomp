@@ -8,13 +8,13 @@ extern int CollLine(void *, void *, int, int, void *);
 extern int math_fast_float_d(void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void gfx_add_draw_callback_third(void *, int);
-extern void func_PAL_L20_0039F518(char *);
-extern void func_PAL_L20_0039F810(char *, int, int);
+extern void EmitJitteredParticleTrail_pal(char *);
+extern void part_l20_spawn_spark_burst_pal(char *, int, int);
 extern void gfx_draw_projectile_trail(void);
 extern void moby_mark_spawned(int);
-extern char D_L20_001C0420[];
+extern char g_spark_position[];
 
-void func_PAL_L20_0039F390(char *arg0) {
+void projectile_l20_update_pal(char *arg0) {
     char *s0 = arg0 + 0x10;
     char *s3 = *(char **)(arg0 + 0x68);
     char *s1;
@@ -26,11 +26,11 @@ void func_PAL_L20_0039F390(char *arg0) {
     make_hit_descriptor(buf, (int)arg0, 0x10001, s1, *(float *)(s3 + 0x2C));
     if (CollLine(s3, s0, 0, *(int *)(arg0 + 0xB8), buf) != 0
         || math_fast_float_d(s3 + 0x20) != 0) {
-        func_PAL_L20_0039F810(D_L20_001C0420, 0x14, 1);
+        part_l20_spawn_spark_burst_pal(g_spark_position, 0x14, 1);
         snd_play_from_class_bank(2, 0, arg0, 0x12EF);
         moby_mark_spawned((int)arg0);
     } else {
-        func_PAL_L20_0039F518(arg0);
+        EmitJitteredParticleTrail_pal(arg0);
         gfx_add_draw_callback_third(gfx_draw_projectile_trail, (int)arg0);
     }
 }
@@ -38,7 +38,7 @@ void func_PAL_L20_0039F390(char *arg0) {
 extern char *CreateMoby(int);
 
 /* Spawns an object of type 0x12F2 and fills its position and its sub-record vector. */
-char *func_PAL_L20_0039F488(char *arg0, char *arg1, char *arg2, float f12) {
+char *projectile_l20_spawn_pal(char *arg0, char *arg1, char *arg2, float f12) {
     char *v;
     char *o = CreateMoby(0x12F2);
 

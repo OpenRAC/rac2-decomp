@@ -10,7 +10,7 @@ extern float ref_L02_0043F4C8_3 __attribute__((sda));
 extern float ref_L02_0043F4C8_4 __attribute__((sda));
 extern float ref_L02_0043F4C8_5 __attribute__((sda));
 extern u8 g_hero_state[];
-extern u8 D_L02_001A8F20[] MACRO_ADDR;
+extern u8 g_zero_l02_vector[] MACRO_ADDR;
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float,float);
 extern int math_random_int_below(int);
@@ -32,12 +32,12 @@ extern float math_fast_float_e(float,float,float);
 extern int CollLine(void *,void *,int,void *,int);
 extern int flag_set_first_pending(void *);
 extern int PlayMobySound(int,int,char *);
-extern void func_PAL_L01_002E2968(void *,void *,int,int,int,float,float,float);
+extern void part_l01_spawn_spark_burst_pal(void *,void *,int,int,int,float,float,float);
 extern int FastDecTimer(short *);
 extern void vec_clear_128(void *);
-extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
+extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void func_PAL_002B15D8(char *,int,float *,u8,float,float,float,float);
-extern void func_PAL_L00_003281C0(void *,int,float);
+extern void part_spawn_scaled_bolts_pal(void *,int,float);
 extern void moby_mark_spawned(void *);
 extern void func_PAL_L02_00445550(void *);
 
@@ -119,7 +119,7 @@ void func_PAL_L02_00444F60(u8 *object)
         delta.f[2]=0.080000006f;
         workspace.tilt.angles.f[2]=-0.5f;
         FastVecAdd(&workspace.tilt.angles,&workspace.tilt.angles,object+0x10);
-        if(!math_random_int_below(2)) func_PAL_L01_002E2968(&workspace.tilt.angles,&delta,1,0x40F0F0F0,1,0.008f,0.9f,1.04f);
+        if(!math_random_int_below(2)) part_l01_spawn_spark_burst_pal(&workspace.tilt.angles,&delta,1,0x40F0F0F0,1,0.008f,0.9f,1.04f);
         *(float *)(object+0xF4)=FastAddRotations(*(float *)(object+0xF4),*(float *)(effect+0x30));
         *(float *)(object+0xF8)=FastAddRotations(*(float *)(object+0xF8),*(float *)(effect+0x34));
         FastVecAdd(object+0x10,object+0x10,effect+0x20);
@@ -127,9 +127,9 @@ void func_PAL_L02_00444F60(u8 *object)
         break;
     case 3:
         if(*(short *)(effect+0x3C)) vec_clear_128(effect+0x20);
-        func_PAL_002AC718(object,D_L02_001A8F20,object+0x10,0.0f,0.0f,10,5,15,0.0f,0.0f,9.0f,*(float *)(object+0x2C)*10.0f,-1,0.0f,0,0,-1,0,0x810001);
+        SpawnExplosionEffects_pal(object,g_zero_l02_vector,object+0x10,0.0f,0.0f,10,5,15,0.0f,0.0f,9.0f,*(float *)(object+0x2C)*10.0f,-1,0.0f,0,0,-1,0,0x810001);
         func_PAL_002B15D8((char *)object,0x3FFF,(float *)(effect+0x20),255,3.0f,6.0f,3.0f,6.0f);
-        func_PAL_L00_003281C0(object,3,0.0f);
+        part_spawn_scaled_bolts_pal(object,3,0.0f);
         PlayMobySound(1,0,object);
         moby_mark_spawned(object);
         return;

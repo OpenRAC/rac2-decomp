@@ -25,18 +25,18 @@
  */
 #include "common.h"
 
-extern s8 D_00141B00[];
-extern s8 D_00141B80[];
-extern s8 D_001430C0[];
-extern s32 D_00137E6C;
-extern s32 D_00137E68;
+extern s8 g_mc_rpc_client[];
+extern s8 g_mc_format_request[];
+extern s8 g_mc_rpc_result[];
+extern s32 g_mc_sema;
+extern s32 g_mc_result_code;
 extern void SignalSema(s32);
 extern s32 PollSema(s32);
 extern s32 sceSifCallRpc(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 /* Sends a memory card command that takes a port and a slot (probably the format command). */
 s32 sceMcFormat(s32 port, s32 slot) {
-    s8 *client = D_00141B00;
+    s8 *client = g_mc_rpc_client;
     s8 *request;
     s32 slot_copy = slot;
     s32 port_copy;
@@ -46,17 +46,17 @@ s32 sceMcFormat(s32 port, s32 slot) {
         return -0x64;
     }
     port_copy = port;
-    if (PollSema(D_00137E6C) < 0) {
+    if (PollSema(g_mc_sema) < 0) {
         return -0xC8;
     }
-    request = D_00141B80;
+    request = g_mc_format_request;
     *(s32 *)(request + 4) = port_copy;
     *(s32 *)(request + 8) = slot_copy;
-    result = sceSifCallRpc((s32)client, 0x10, 1, (s32)request, 0x30, (s32)D_001430C0, 4, 0, 0);
+    result = sceSifCallRpc((s32)client, 0x10, 1, (s32)request, 0x30, (s32)g_mc_rpc_result, 4, 0, 0);
     if (result == 0) {
-        D_00137E68 = 0x10;
+        g_mc_result_code = 0x10;
     } else {
-        SignalSema(D_00137E6C);
+        SignalSema(g_mc_sema);
     }
     return result;
 }

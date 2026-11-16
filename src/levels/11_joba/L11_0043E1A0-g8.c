@@ -15,13 +15,13 @@ typedef short s16;
 typedef float f32;
 
 /* Small-data controls: the four measured globals the level's script hooks share. */
-extern s32 D_L11_001B1530 __attribute__((sda));
+extern s32 g_arena_intro_script_handle_a __attribute__((sda));
 
-extern s32 D_L11_001B1540 __attribute__((sda));
+extern s32 g_arena_intro_script_handle_b __attribute__((sda));
 
-extern s32 D_L11_001B1550 __attribute__((sda));
+extern s32 g_arena_intro_script_handle_c __attribute__((sda));
 
-extern s32 D_L11_001B1560 __attribute__((sda));
+extern s32 g_arena_intro_script_handle_d __attribute__((sda));
 
 extern void func_3004A8(void *);
 
@@ -33,9 +33,9 @@ extern void func_4881A8(void *);
 
 extern void func_488200(void *);
 
-extern u32 D_L11_001B32E8[1];
+extern u32 g_arena_script_flags[1];
 
-extern u8 D_L11_001BA8C0[];
+extern u8 g_hero_l11_position[];
 
 extern u8 *g_moby_l11_table[3] __attribute__((sda));
 
@@ -98,7 +98,7 @@ s32 arena_l11_is_wave_complete(u8 *obj) {
 
 /* The group count and the entity table's base, as the walks below reach them: the count through
    $gp, the base as a bare symbol (a three-word `sda` array keeps the `lui`/`lw` pair). */
-extern s32 D_L11_001B35B8 __attribute__((sda));
+extern s32 g_tribe_group_limit __attribute__((sda));
 
 extern u8 *D_L11_001B359C_abs[3] __attribute__((sda));
 
@@ -145,7 +145,7 @@ void arena_choose_next_squad_member(u8 *obj) {
         listStart = (u16 *)g_group_id_lists[GROUP(0xC4)];
         if (listStart == 0)
             return;
-        for (cursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && cursor != 0 &&
+        for (cursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= g_tribe_group_limit && cursor != 0 &&
                     ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0xC4)]);
              cursor++) {
             member = D_L11_001B359C_abs[0] + ((*cursor & 0x7FFF) << 8);
@@ -162,7 +162,7 @@ void arena_choose_next_squad_member(u8 *obj) {
         slots = (u8 **)(state + 0x120);
         if (*(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) == 0) {
             for (cursor = (u16 *)g_group_id_lists[GROUP(0xC4)];
-                 (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && cursor != 0 &&
+                 (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= g_tribe_group_limit && cursor != 0 &&
                  ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0xC4)]);
                  cursor++) {
                 member = D_L11_001B359C_abs[0] + ((*cursor & 0x7FFF) << 8);
@@ -181,13 +181,13 @@ void arena_choose_next_squad_member(u8 *obj) {
 }
 
 /* The four angle and length constants the script reads through $gp. */
-extern f32 D_L11_001B15AC __attribute__((sda));
+extern f32 g_arena_fighter_param_min __attribute__((sda));
 
-extern f32 D_L11_001B15B0 __attribute__((sda));
+extern f32 g_arena_fighter_param_max __attribute__((sda));
 
-extern f32 D_L11_001B15B4 __attribute__((sda));
+extern f32 g_arena_fighter_turn_step __attribute__((sda));
 
-extern f32 D_L11_001B15B8 __attribute__((sda));
+extern f32 g_arena_fighter_velocity_scale __attribute__((sda));
 
 extern float FastAddRotations(float, float);
 
@@ -218,10 +218,10 @@ extern void drone_init_state(char *, int, int);
 void arena_start_intro_script(void) {
     s32 buffer[4];
     func_3004A8(buffer);
-    func_4882F0(&D_L11_001B1550, &D_L11_001B1560, 1, 0, 0);
+    func_4882F0(&g_arena_intro_script_handle_c, &g_arena_intro_script_handle_d, 1, 0, 0);
     func_488268(2, 0x168);
-    func_4881A8(&D_L11_001B1530);
-    func_488200(&D_L11_001B1540);
+    func_4881A8(&g_arena_intro_script_handle_a);
+    func_488200(&g_arena_intro_script_handle_b);
 }
 
 /* Turns the script's angle around the actor and hands the result to the level's
@@ -230,8 +230,8 @@ void arena_start_intro_script(void) {
 void arena_update_intro_script(u8 *obj) {
     s32 objState;
 
-    D_L11_001B32E8[0] = 1;
-    if (func_282E48(D_L11_001BA8C0, &D_L11_001B1530) < 0.01f) {
+    g_arena_script_flags[0] = 1;
+    if (func_282E48(g_hero_l11_position, &g_arena_intro_script_handle_a) < 0.01f) {
         objState = obj[0x20];
         if (objState == 4) {
             func_32C9E0(obj, 7, -1);
@@ -239,8 +239,8 @@ void arena_update_intro_script(u8 *obj) {
             func_32C9E0(obj, 6, -1);
         }
         func_488268(1, 0);
-        func_4881A8(&D_L11_001B1530);
-        func_488200(&D_L11_001B1540);
+        func_4881A8(&g_arena_intro_script_handle_a);
+        func_488200(&g_arena_intro_script_handle_b);
     }
 }
 
@@ -249,17 +249,17 @@ void arena_update_intro_script(u8 *obj) {
 /* Places a fighter in the arena, turns it toward the middle and starts it. It also counts the fighter as used. */
 s32 arena_place_and_start_fighter(u8 *object, u8 *fighter) {
     u8 *state = *(u8 **)(object + 0x68);
-    f32 turnStep = D_L11_001B15B4;
+    f32 turnStep = g_arena_fighter_turn_step;
     f32 value;
 
     value = FastAddRotations(*(f32 *)(state + 0x19C), turnStep);
     *(f32 *)(state + 0x19C) = value;
     value = math_fast_sin_or_cos_a(value);
-    *(f32 *)(fighter + 0x10) = D_L11_001B15B8 * value;
+    *(f32 *)(fighter + 0x10) = g_arena_fighter_velocity_scale * value;
     value = math_fast_sin_or_cos_b(*(f32 *)(state + 0x19C));
-    *(f32 *)(fighter + 0x14) = D_L11_001B15B8 * value;
+    *(f32 *)(fighter + 0x14) = g_arena_fighter_velocity_scale * value;
     FastVecAdd(fighter + 0x10, fighter + 0x10, arena_get_center_point(object));
-    *(f32 *)(fighter + 0x18) = math_random_float_range(D_L11_001B15AC, D_L11_001B15B0);
+    *(f32 *)(fighter + 0x18) = math_random_float_range(g_arena_fighter_param_min, g_arena_fighter_param_max);
     *(f32 *)(fighter + 0xF4) = -1.570796489715576171875f;
     *(s32 *)(fighter + 0xF0) = 0;
     *(f32 *)(fighter + 0xF8) = *(f32 *)(state + 0x19C);
@@ -292,8 +292,8 @@ s32 arena_place_and_start_fighter(u8 *object, u8 *fighter) {
 /* The group count once more, read bare (`lui`/`lw`) in these walks, under a second name: the
    scalar above is read through $gp. */
 extern s32 D_L11_001B35B8_1[] __attribute__((sda));
-extern f32 D_L11_001B1614 __attribute__((sda));
-extern f32 D_L11_001B1618 __attribute__((sda));
+extern f32 g_arena_spawn_time_scale __attribute__((sda));
+extern f32 g_arena_spawn_angle_scale __attribute__((sda));
 extern s32 moby_is_state_six(u8 *);
 extern s32 moby_is_state_one_cleared_vars(u8 *);
 extern s32 math_random_int_below(s32);
@@ -373,21 +373,21 @@ void arena_assign_fighters_to_spawns(u8 *object) {
     HALF(0x12, 0x174)
 }
 
-extern const f32 D_L11_001B15BC __attribute__((sda));
-extern const f32 D_L11_001B15C0 __attribute__((sda));
-extern const f32 D_L11_001B15C4 __attribute__((sda));
-extern const f32 D_L11_001B15C8 __attribute__((sda));
-extern const f32 D_L11_001B15CC __attribute__((sda));
-extern const f32 D_L11_001B15D0 __attribute__((sda));
-extern const f32 D_L11_001B15D4 __attribute__((sda));
-extern const f32 D_L11_001B15D8 __attribute__((sda));
-extern const f32 D_L11_001B15DC __attribute__((sda));
-extern const f32 D_L11_001B15E0 __attribute__((sda));
-extern const f32 D_L11_001B15E4 __attribute__((sda));
-extern const f32 D_L11_001B15E8 __attribute__((sda));
-extern const f32 D_L11_001B15EC __attribute__((sda));
-extern const f32 D_L11_001B15F0 __attribute__((sda));
-extern const f32 D_L11_001B15F4 __attribute__((sda));
+extern const f32 g_arena_camera_guide_a_x __attribute__((sda));
+extern const f32 g_arena_camera_guide_a_y __attribute__((sda));
+extern const f32 g_arena_camera_guide_a_z __attribute__((sda));
+extern const f32 g_arena_camera_guide_b_x __attribute__((sda));
+extern const f32 g_arena_camera_guide_b_y __attribute__((sda));
+extern const f32 g_arena_camera_guide_b_z __attribute__((sda));
+extern const f32 g_arena_camera_guide_c_x __attribute__((sda));
+extern const f32 g_arena_camera_guide_c_y __attribute__((sda));
+extern const f32 g_arena_camera_guide_c_z __attribute__((sda));
+extern const f32 g_arena_camera_guide_d_x __attribute__((sda));
+extern const f32 g_arena_camera_guide_d_y __attribute__((sda));
+extern const f32 g_arena_camera_guide_d_z __attribute__((sda));
+extern const f32 g_arena_camera_guide_e_x __attribute__((sda));
+extern const f32 g_arena_camera_guide_e_y __attribute__((sda));
+extern const f32 g_arena_camera_guide_e_z __attribute__((sda));
 extern u8 g_hero_state[];
 extern void *cam_alloc_override_slot(s32);
 extern void cam_end_override(void *);
@@ -407,18 +407,18 @@ void arena_update_camera_guide(u8 *obj) {
             GUIDE = cam_alloc_override_slot(5);
         } else if (*(void **)(s + 0x180) != 0) {
             if (*(u8 **)(s + 0x184) == 0) {
-                SET_GUIDE(D_L11_001B15BC, D_L11_001B15C0, D_L11_001B15C4);
+                SET_GUIDE(g_arena_camera_guide_a_x, g_arena_camera_guide_a_y, g_arena_camera_guide_a_z);
                 return;
             }
             if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4A /* moby class 3402 */)
-                SET_GUIDE(D_L11_001B15D4, D_L11_001B15D8, D_L11_001B15DC);
+                SET_GUIDE(g_arena_camera_guide_c_x, g_arena_camera_guide_c_y, g_arena_camera_guide_c_z);
             if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4B /* moby class 3403 */)
-                SET_GUIDE(D_L11_001B15EC, D_L11_001B15F0, D_L11_001B15F4);
+                SET_GUIDE(g_arena_camera_guide_e_x, g_arena_camera_guide_e_y, g_arena_camera_guide_e_z);
             else if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == MOBY_CLASS_ARACHNOID)
-                SET_GUIDE(D_L11_001B15E0, D_L11_001B15E4, D_L11_001B15E8);
+                SET_GUIDE(g_arena_camera_guide_d_x, g_arena_camera_guide_d_y, g_arena_camera_guide_d_z);
         } else if (obj[0x20] == 9) {
             u8 *player = g_hero_state;
-            SET_GUIDE(D_L11_001B15C8, D_L11_001B15CC, D_L11_001B15D0);
+            SET_GUIDE(g_arena_camera_guide_b_x, g_arena_camera_guide_b_y, g_arena_camera_guide_b_z);
             if (*(f32 *)(player + 0x88) > ((f32 *)arena_get_center_point(obj))[2] + 16.0f) {
                 if (*(u16 *)(obj + 0x96) < 500)
                     cam_set_strength_and_steer_target(arena_get_center_point(obj), 0.17453295f, 0.0f);
@@ -426,7 +426,7 @@ void arena_update_camera_guide(u8 *obj) {
                     cam_set_strength_and_steer_target(arena_get_center_point(obj), 0.008726647f, 0.0f);
             }
         } else {
-            SET_GUIDE(D_L11_001B15BC, D_L11_001B15C0, D_L11_001B15C4);
+            SET_GUIDE(g_arena_camera_guide_a_x, g_arena_camera_guide_a_y, g_arena_camera_guide_a_z);
         }
     } else {
         cam_end_override(GUIDE);

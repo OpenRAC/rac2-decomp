@@ -2,20 +2,20 @@
 
 #include "common.h"
 extern void *part_find_owned_effect_slot(u8 *, s32, s32);
-extern f32 func_PAL_002AA108(u8 *, s32);
+extern f32 moby_update_aim_target_strength_pal(u8 *, s32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void moby_set_state(u8 *, u8, s32);
-extern f32 D_L07_001B0FD0 __attribute__((sda));
+extern f32 g_bomb_scale __attribute__((sda));
 typedef struct { u8 pad[0x20]; f32 angle; u8 pad24[12]; u32 flags; } SpinnerState;
 
-void func_PAL_L07_003FB4A0(u8 *a0)
+void homing_bomb_tick_fuse_pal(u8 *a0)
 {
     SpinnerState *s1 = *(SpinnerState **)(a0 + 0x68);
 
     if (*(u8 *)(a0 + 0x20) == 0) {
         f32 scale;
         s1->flags = 0;
-        scale = D_L07_001B0FD0;
+        scale = g_bomb_scale;
         *(f32 *)(a0 + 0x2C) = *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24) * scale;
         moby_set_state(a0, 1, -1);
         *(u32 *)(a0 + 0x98) = 0;
@@ -24,7 +24,7 @@ void func_PAL_L07_003FB4A0(u8 *a0)
     }
     {
         s32 id = part_find_owned_effect_slot(a0, 0x10000, 0);
-        f32 angle = func_PAL_002AA108(a0, id);
+        f32 angle = moby_update_aim_target_strength_pal(a0, id);
         ApproachValue(&s1->angle, 0.0f, angle);
     }
     if (s1->angle <= 0.0f)
@@ -34,8 +34,8 @@ void func_PAL_L07_003FB4A0(u8 *a0)
 
 typedef int SibQuad __attribute__((mode(TI)));
 typedef union { SibQuad quad; float value[4]; } SibVector;
-extern float D_L07_001B0FE0 __attribute__((sda));
-extern float D_L07_001B0FE4 __attribute__((sda));
+extern float g_bomb_rate __attribute__((sda));
+extern float g_bomb_elapsed_param __attribute__((sda));
 extern void FastVecSub(void *, void *, void *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void vec_scale_to_length(void *, void *, float);
@@ -55,8 +55,8 @@ void func_PAL_L07_003FB570(u8 *self, float *target)
     float rate, elapsed;
     state = *(u8 **)(self + 0x68);
     FastVecSub(&offset, target, position);
-    rate = D_L07_001B0FE0 * (0.00040000002f);
-    elapsed = D_L07_001B0FE4 * (0.020000001f);
+    rate = g_bomb_rate * (0.00040000002f);
+    elapsed = g_bomb_elapsed_param * (0.020000001f);
     movement = state + 0x50;
     offset.value[2] = 0.0f;
     math_step_value_toward_target((float *)(self + 0x18), (float *)(state + 0x5C), *(float *)(state + 0x60), rate, rate, elapsed);

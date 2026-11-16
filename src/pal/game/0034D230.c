@@ -86,7 +86,7 @@ void func_PAL_0034ED50(char *self, int x)
 
 extern int func_PAL_002A9FA0(int, int, int, int, int);
 extern void object_set_flag_value(void *, int);
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_PAL_002A9FA0(int, int, int, int, int);
 extern float *object_get_field_a(void *);
 extern void object_set_flag_value(void *, int);
@@ -95,7 +95,7 @@ void func_PAL_0034EF38(char *object, int arg, float value)
 {
     int *result;
     char *child;
-    if (D_00138344 & 0xF000)
+    if (g_menu_input_flags & 0xF000)
         func_PAL_002A9FA0(0, 0, 1, 0, 1);
     child = object + 0x5D8;
     result = (int *)object_get_fourth_field((unsigned char *)child);

@@ -38,7 +38,7 @@ typedef struct GrelbinMoby {
 extern int g_current_map_index __attribute__((sda));
 extern u8 g_hero_position[];
 typedef struct { u8 pad0[0x464]; u8 active[0]; } GrelbinEntityFlags;
-extern GrelbinEntityFlags D_L19_0021EA30;
+extern GrelbinEntityFlags g_trigger_active_table;
 extern GrelbinMoby *g_moby_l19_array __attribute__((sda));
 extern void func_00318240(GrelbinMoby *,int,int);
 extern void func_0030DFE8(GrelbinMoby *);
@@ -46,10 +46,10 @@ extern void *func_0031A8C8(GrelbinMoby *,int,int);
 extern GrelbinMoby *func_0030DC80(int);
 extern void func_00326780(void *,void *);
 extern int func_002DBF58(void *,void *,int,void *,int);
-extern u8 D_L19_001BFEC0[];
+extern u8 g_hit_matrix_buf[];
 extern void func_00323098(void *,void *,int);
 extern void func_003299C8(void *,float,float,float,float);
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 extern void func_00317748(void *,int,int);
 extern void func_00310760(void *);
 extern void func_0031CA60(void *);
@@ -69,7 +69,7 @@ typedef struct {
     int mode;
 } GrelbinPlayer;
 extern GrelbinPlayer g_hero_state;
-extern GrelbinMoby *D_L19_001B2A28 MACRO_ADDR;
+extern GrelbinMoby *g_leviathan_other_moby MACRO_ADDR;
 extern int func_00326D70(void *,int,float,int,float,int);
 extern float func_002EBB00(void *,void *);
 typedef struct {
@@ -162,7 +162,7 @@ int leviathan_update_helper(GrelbinMoby *moby)
             qcopy(top,moby->position); qcopy(bottom,moby->position);
             top[2]+=1.f; bottom[2]-=10.f;
             func_002DBF58(top,bottom,2,moby,0);
-            func_00323098(vars->source->transform,D_L19_001BFEC0,0);
+            func_00323098(vars->source->transform,g_hit_matrix_buf,0);
         }
         {
         float half=0.5f;
@@ -184,8 +184,8 @@ int leviathan_update_helper(GrelbinMoby *moby)
     {
         u16 id=moby->uid;
         int value;
-        if (D_L19_0021EA30.active[(s16)id]) goto replace;
-        value=D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+        if (g_trigger_active_table.active[(s16)id]) goto replace;
+        value=g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
         if ((id&1) ? ((value>>4)&7) : (value&7)) {
         replace:
         {
@@ -210,8 +210,8 @@ int leviathan_update_helper(GrelbinMoby *moby)
         spawn=func_0030DC80(0x1266 /* moby class 4710 */);
         if(!spawn) goto success;
         id=moby->uid;
-        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if(((*count>>4)&7)!=7) *count+=16;}
-        else { count=((s16)id>>1)+(g_current_map_index<<10)+D_0019B4A8; if((*count&7)!=7) *count+=1;}
+        if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if(((*count>>4)&7)!=7) *count+=16;}
+        else { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if((*count&7)!=7) *count+=1;}
         spawn->opacity=80;spawn->flags|=0x800;spawn->drawDistance=255;spawn->group=255;
         spawn->state=0;spawn->bBC=0;spawn->b31=1;
         qcopy(spawn->position,vars->source->position);
@@ -262,7 +262,7 @@ int leviathan_update_helper(GrelbinMoby *moby)
         }
     }
     if(g_hero_state.mode==49) qcopy(vars->targetPosition,g_hero_state.position);
-    other_moby=D_L19_001B2A28;
+    other_moby=g_leviathan_other_moby;
     while(other_moby) {
         if(((GrelbinMoby *)other_moby)->classId==MOBY_CLASS_YETI && moby->state!=4 && moby->state!=9 && moby->state!=8 && vars->health>0.f) {
             if(moby->state==7 && moby->timer>=16) break;

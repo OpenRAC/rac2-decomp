@@ -4,7 +4,7 @@
 extern int g_current_map_index;
 extern int TryClaimNotice(int, int, int);
 
-void func_PAL_L06_003E7350(char *moby, unsigned event) {
+void hud_show_event_notice_pal(char *moby, unsigned event) {
     char *st=*(char **)(moby+0x68);
     switch(event) {
     case 0:

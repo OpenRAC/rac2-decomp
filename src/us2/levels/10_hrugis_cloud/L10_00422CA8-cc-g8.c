@@ -34,35 +34,35 @@ typedef struct {
     s32 blinkOn;
 } HudBlinkVars;
 
-extern u8 *D_L10_001B13F0 __attribute__((sda));
-extern s32 D_L10_001B13A0 __attribute__((sda));
-extern s32 D_L10_001B13F4 __attribute__((sda));
-extern s32 D_L10_001B13F8 __attribute__((sda));
-extern s32 D_L10_001B13FC __attribute__((sda));
-extern s32 D_L10_001B14C0 __attribute__((sda));
-extern s32 D_L10_001B14B8 __attribute__((sda));
-extern s32 D_L10_001B14A8 __attribute__((sda));
-extern s32 D_L10_001B1428 __attribute__((sda));
-extern s32 D_L10_001B141C __attribute__((sda));
-extern void *D_L10_001B13D0 __attribute__((sda));
-extern void *D_L10_001B13D4 __attribute__((sda));
-extern void *D_L10_001B13D8 __attribute__((sda));
-extern void *D_L10_001B13DC __attribute__((sda));
-extern void *D_L10_001B13E0 __attribute__((sda));
-extern void *D_L10_001B13E4 __attribute__((sda));
-extern u8 *D_L10_001A904C MACRO_ADDR;
-extern s32 D_L10_001B14C4 MACRO_ADDR;
-extern s32 D_L10_001B14BC MACRO_ADDR;
-extern s32 D_L10_001B14AC MACRO_ADDR;
-extern f32 D_L10_001B2D84;
-extern s32 D_L10_001B2D80 MACRO_ADDR;
+extern u8 *g_hud_blink_moby __attribute__((sda));
+extern s32 g_selected_mission_kind __attribute__((sda));
+extern s32 g_hud_boss_flag_latched __attribute__((sda));
+extern s32 g_hud_blink_timer_first __attribute__((sda));
+extern s32 g_hud_blink_timer_second __attribute__((sda));
+extern s32 g_hud_panel_third_x __attribute__((sda));
+extern s32 g_hud_panel_second_x __attribute__((sda));
+extern s32 g_hud_panel_first_x __attribute__((sda));
+extern s32 g_mission_record_index __attribute__((sda));
+extern s32 g_gate_frame_counter __attribute__((sda));
+extern void *g_hud_label_sprite_first __attribute__((sda));
+extern void *g_hud_label_sprite_second __attribute__((sda));
+extern void *g_hud_label_sprite_third __attribute__((sda));
+extern void *g_hud_blink_sprite_first __attribute__((sda));
+extern void *g_hud_blink_sprite_second __attribute__((sda));
+extern void *g_hud_blink_sprite_third __attribute__((sda));
+extern u8 *g_hud_sprite_table_base MACRO_ADDR;
+extern s32 g_hud_panel_third_y MACRO_ADDR;
+extern s32 g_hud_panel_second_y MACRO_ADDR;
+extern s32 g_hud_panel_first_y MACRO_ADDR;
+extern f32 g_screen_l10_scale;
+extern s32 g_screen_layout_mode MACRO_ADDR;
 extern s32 g_screen_width MACRO_ADDR;
-extern s32 D_L10_001B3550 MACRO_ADDR;
-extern HudMissionState D_L10_00221CD0;
-extern f32 D_L10_001AC5E0, D_L10_001AC5E4;
-extern char D_L10_001B14C8[], D_L10_001B14D0[], D_L10_001B1518[];
-extern Block D_L10_001B14E8, D_L10_001B14F8, D_L10_001B1508;
-extern HudWeapon D_L10_002A3C70[];
+extern s32 g_mission_time_value MACRO_ADDR;
+extern HudMissionState g_mission_state;
+extern f32 g_hud_label_offset_x, g_hud_label_offset_y;
+extern char g_str_hud_score_format[], g_str_hud_time_format[], g_str_hud_value_format[];
+extern Block g_hud_color_block_first, g_hud_color_block_second, g_hud_color_block_third;
+extern HudWeapon g_reward_slot_table[];
 
 extern void DrawFadingHudIconPairs(s32, s32, s32, s32);
 extern void *level_find_object_by_class_id(s32);
@@ -72,7 +72,7 @@ extern char *GetLocalizedString(s32);
 extern s32 sprintf(char *, char *, ...);
 extern void text_draw_medium(s32, s32, u64, char *, s32);
 extern s32 hrugis_take_boss_flag_a(void), hrugis_take_boss_flag_b(void);
-extern int func_US2_L00_0030EFB8(char *, s32);
+extern int level_l00_call_module_handler_with_arg_9_us2(char *, s32);
 extern s32 math_fast_float_d(s32 *);
 extern void math_split_time_into_parts(s32, s32 *, s32 *, s32 *);
 extern void *table_find_by_id(void *, s32);
@@ -93,7 +93,7 @@ extern void func_US2_0029CC48(void), hud_draw_object_markers(void);
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
-    f32 scaled = value * D_L10_001B2D84 + 0.5f;
+    f32 scaled = value * g_screen_l10_scale + 0.5f;
 
     if (mode == 1)
         return (s32)(scaled + offset);
@@ -106,7 +106,7 @@ static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
    which see the block they end. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L10_001B2D80;
+    int mode = g_screen_layout_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -128,11 +128,11 @@ s32 func_US2_L10_00422CA8(void) {
     Block b0, b1, b2;
     s32 a, b, c, score, idx, newidx, color, textX;
     void *object;
-    HudBlinkVars *data = *(HudBlinkVars **)(D_L10_001B13F0 + 0x68);
+    HudBlinkVars *data = *(HudBlinkVars **)(g_hud_blink_moby + 0x68);
     f32 x, y, ratio, tmp, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
 
-    switch (D_L10_001B13A0) {
+    switch (g_selected_mission_kind) {
     case 0:
         DrawFadingHudIconPairs(0, 1, 0, 1);
         object = level_find_object_by_class_id(0xf85);
@@ -141,23 +141,23 @@ s32 func_US2_L10_00422CA8(void) {
         else
             score = 0;
         label = GetLocalizedString(0x306e);
-        sprintf(text, D_L10_001B14C8, label, score);
-        textX = D_L10_001B14C0 - 65;
-        text_draw_medium(textX, label_y((void *)textX, D_L10_001B14C4 - 8, D_L10_001B2D84, 0.5f, 1), 0x80808080, text, 128);
-        if (hrugis_take_boss_flag_a() && D_L10_001B13F4) {
-            D_L10_001B13F4 = 0;
-            D_L10_001B13F8 = 180;
+        sprintf(text, g_str_hud_score_format, label, score);
+        textX = g_hud_panel_third_x - 65;
+        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
+        if (hrugis_take_boss_flag_a() && g_hud_boss_flag_latched) {
+            g_hud_boss_flag_latched = 0;
+            g_hud_blink_timer_first = 180;
         }
         if (hrugis_take_boss_flag_b()) {
-            D_L10_001B13F4 = 1;
-            D_L10_001B13FC = 180;
+            g_hud_boss_flag_latched = 1;
+            g_hud_blink_timer_second = 180;
         }
-        if (D_L10_001B13F8)
-            func_US2_L00_0030EFB8(GetLocalizedString(0x306f), -1);
-        if (D_L10_001B13FC)
-            func_US2_L00_0030EFB8(GetLocalizedString(0x3070), -1);
-        math_fast_float_d(&D_L10_001B13F8);
-        math_fast_float_d(&D_L10_001B13FC);
+        if (g_hud_blink_timer_first)
+            level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x306f), -1);
+        if (g_hud_blink_timer_second)
+            level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x3070), -1);
+        math_fast_float_d(&g_hud_blink_timer_first);
+        math_fast_float_d(&g_hud_blink_timer_second);
         break;
     case 1: {
         f32 half = 0.5f;
@@ -165,14 +165,14 @@ s32 func_US2_L10_00422CA8(void) {
 
         DrawFadingHudIconPairs(0, 1, 1, 1);
         label = GetLocalizedString(0x3071);
-        fmt = D_L10_001B14C8;
+        fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf93)));
-        textX = D_L10_001B14B8 - 65;
-        text_draw_medium(textX, label_y((void *)textX, D_L10_001B14BC - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
+        textX = g_hud_panel_second_x - 65;
+        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_second_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         label = GetLocalizedString(0x3072);
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xcbe)));
-        textX = D_L10_001B14C0 - 65;
-        text_draw_medium(textX, label_y((void *)textX, D_L10_001B14C4 - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
+        textX = g_hud_panel_third_x - 65;
+        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     case 2: {
@@ -181,10 +181,10 @@ s32 func_US2_L10_00422CA8(void) {
 
         DrawFadingHudIconPairs(0, 1, 0, 1);
         label = GetLocalizedString(0x3073);
-        fmt = D_L10_001B14C8;
+        fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf8e)));
-        textX2 = D_L10_001B14C0 - 70;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L10_001B14C4 - 8, D_L10_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        textX2 = g_hud_panel_third_x - 70;
+        text_draw_medium(textX2, label_y((void *)textX2, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
@@ -193,72 +193,72 @@ s32 func_US2_L10_00422CA8(void) {
 
         DrawFadingHudIconPairs(1, 1, 0, 1);
         label = GetLocalizedString(0x306d);
-        sprintf(text, D_L10_001B14C8, label, D_L10_001B141C);
-        textX = D_L10_001B14C0 - 65;
-        text_draw_medium(textX, label_y((void *)textX, D_L10_001B14C4 - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
-        math_split_time_into_parts(D_L10_001B3550, &a, &b, &c);
+        sprintf(text, g_str_hud_score_format, label, g_gate_frame_counter);
+        textX = g_hud_panel_third_x - 65;
+        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
+        math_split_time_into_parts(g_mission_time_value, &a, &b, &c);
         label = GetLocalizedString(0x2e19);
-        sprintf(text, D_L10_001B14D0, label, a, b, c);
-        textX2 = D_L10_001B14A8 - 80;
-        text_draw_medium(textX2, label_y((void *)textX2, D_L10_001B14AC - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_hud_time_format, label, a, b, c);
+        textX2 = g_hud_panel_first_x - 80;
+        text_draw_medium(textX2, label_y((void *)textX2, g_hud_panel_first_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     }
 
-    if (D_L10_001A904C) {
-        D_L10_001B13D0 = table_find_by_id(D_L10_001A904C + 0x8710, 128);
-        D_L10_001B13D4 = table_find_by_id(D_L10_001A904C + 0x8710, 129);
-        D_L10_001B13D8 = table_find_by_id(D_L10_001A904C + 0x8710, 130);
-        D_L10_001B13DC = table_find_by_id(D_L10_001A904C + 0x8710, 131);
-        D_L10_001B13E0 = table_find_by_id(D_L10_001A904C + 0x8710, 132);
-        D_L10_001B13E4 = table_find_by_id(D_L10_001A904C + 0x8710, 133);
+    if (g_hud_sprite_table_base) {
+        g_hud_label_sprite_first = table_find_by_id(g_hud_sprite_table_base + 0x8710, 128);
+        g_hud_label_sprite_second = table_find_by_id(g_hud_sprite_table_base + 0x8710, 129);
+        g_hud_label_sprite_third = table_find_by_id(g_hud_sprite_table_base + 0x8710, 130);
+        g_hud_blink_sprite_first = table_find_by_id(g_hud_sprite_table_base + 0x8710, 131);
+        g_hud_blink_sprite_second = table_find_by_id(g_hud_sprite_table_base + 0x8710, 132);
+        g_hud_blink_sprite_third = table_find_by_id(g_hud_sprite_table_base + 0x8710, 133);
         x = IntToFloat(g_screen_width) * 0.5f;
-        y = screen_coord(D_L10_001B2D80, 200.0f, 4.0f);
-        gfx_draw_scaled_object(D_L10_001B13D0, x, y, 0x60442d00, 1.0f, 0.0f);
-        gfx_draw_scaled_object(D_L10_001B13D4, x, y, 0x55f0c070, 1.0f, 0.0f);
+        y = screen_coord(g_screen_layout_mode, 200.0f, 4.0f);
+        gfx_draw_scaled_object(g_hud_label_sprite_first, x, y, 0x60442d00, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_hud_label_sprite_second, x, y, 0x55f0c070, 1.0f, 0.0f);
 
         /* The weapon's level gauge, red to green in one, two or three segments. */
         idx = table_find_last_used_entry(6);
-        ratio = IntToFloat(D_L10_002A3C70[idx].value) / IntToFloat(D_L10_002A3C70[idx].maxLevel);
+        ratio = IntToFloat(g_reward_slot_table[idx].value) / IntToFloat(g_reward_slot_table[idx].maxLevel);
         switch (idx) {
         case 6:
             if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L10_001B13E0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L10_001B13E4, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L10_001B13E0, x, y, 0x8000ff00, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_third, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L10_001B13E0, x, y, (s32)tweenColor, 1.0f, 0.0f);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, 0x8000ff00, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(D_L10_001B13DC, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
             }
             break;
         }
 
         /* Health bar: blinks below 30%. */
-        fill = D_L10_00221CD0.health * 0.01f;
+        fill = g_mission_state.health * 0.01f;
         if (fill > 0.3f) {
             data->blinkOn = 1;
         } else if (math_fast_float_d(&data->blinkTimer)) {
@@ -273,8 +273,8 @@ s32 func_US2_L10_00422CA8(void) {
 
         /* Ammo bar. */
         idx = table_find_last_used_entry(7);
-        ratio = IntToFloat(D_L10_002A3C70[idx].value);
-        fill = ratio / IntToFloat(D_L10_002A3C70[idx].maxAmmo);
+        ratio = IntToFloat(g_reward_slot_table[idx].value);
+        fill = ratio / IntToFloat(g_reward_slot_table[idx].maxAmmo);
         color = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         base = IntToFloat(450);
         end = IntToFloat(386);
@@ -287,37 +287,37 @@ s32 func_US2_L10_00422CA8(void) {
             gfx_draw_screen_rectangle(450, 8, (s32)tmp, 19, 1, colors2);
 
         /* Weapon icons and the fill count. */
-        b0 = D_L10_001B14E8;
-        b1 = D_L10_001B14F8;
-        b2 = D_L10_001B1508;
+        b0 = g_hud_color_block_first;
+        b1 = g_hud_color_block_second;
+        b2 = g_hud_color_block_third;
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &b1);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &b0);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L10_002A3C70[table_find_last_used_entry(D_L10_001B1428)].icon), 21, 7, 30, 30, &b2);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].icon), 21, 7, 30, 30, &b2);
         hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &b1);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, D_L10_002A3C70[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
-        sprintf(text, D_L10_001B1518, D_L10_002A3C70[table_find_last_used_entry(D_L10_001B1428)].value,
-                      D_L10_002A3C70[table_find_last_used_entry(D_L10_001B1428)].maxAmmo);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_reward_slot_table[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
+        sprintf(text, g_str_hud_value_format, g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].value,
+                      g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].maxAmmo);
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         /* Weapon switch. */
         func_US2_L05_00327640(2);
         newidx = level_lookup_step_table();
         if (newidx >= 0) {
-            D_L10_002A3C70[table_find_last_used_entry(D_L10_001B1428)].active = 0;
-            D_L10_001B1428 = newidx;
-            D_L10_002A3C70[table_find_last_used_entry(newidx)].active = 1;
+            g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].active = 0;
+            g_mission_record_index = newidx;
+            g_reward_slot_table[table_find_last_used_entry(newidx)].active = 1;
         }
-        gfx_draw_scaled_object(D_L10_001B13D8, x, y, 0x80f0f0f0, 1.0f, 0.0f);
+        gfx_draw_scaled_object(g_hud_label_sprite_third, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
     func_US2_0029CC48();
-    sprite0 = table_find_by_id(D_L10_001A904C + 0x8710, 186);
+    sprite0 = table_find_by_id(g_hud_sprite_table_base + 0x8710, 186);
     /* data, done with, holds the second sprite. */
-    data = table_find_by_id(D_L10_001A904C + 0x8710, 187);
-    sprite2 = table_find_by_id(D_L10_001A904C + 0x8710, 188);
-    gfx_draw_scaled_object(sprite0, D_L10_001AC5E0 + 4.0f, label_y(sprite0, D_L10_001AC5E4 + 4.0f, D_L10_001B2D84, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
-    gfx_draw_scaled_object(data, D_L10_001AC5E0 + 4.0f, label_y(data, D_L10_001AC5E4 + 4.0f, D_L10_001B2D84, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
-    gfx_draw_scaled_object(sprite2, D_L10_001AC5E0 + 4.0f, label_y(sprite2, D_L10_001AC5E4 + 4.0f, D_L10_001B2D84, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
+    data = table_find_by_id(g_hud_sprite_table_base + 0x8710, 187);
+    sprite2 = table_find_by_id(g_hud_sprite_table_base + 0x8710, 188);
+    gfx_draw_scaled_object(sprite0, g_hud_label_offset_x + 4.0f, label_y(sprite0, g_hud_label_offset_y + 4.0f, g_screen_l10_scale, 0.5f, 1), 0x60442d00, 0.8f, 0.0f);
+    gfx_draw_scaled_object(data, g_hud_label_offset_x + 4.0f, label_y(data, g_hud_label_offset_y + 4.0f, g_screen_l10_scale, 0.5f, 1), 0x60241700, 0.8f, 0.0f);
+    gfx_draw_scaled_object(sprite2, g_hud_label_offset_x + 4.0f, label_y(sprite2, g_hud_label_offset_y + 4.0f, g_screen_l10_scale, 0.5f, 1), 0x55f0c070, 0.8f, 0.0f);
     hud_draw_object_markers();
     return 1;
 }

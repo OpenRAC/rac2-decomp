@@ -7,7 +7,7 @@ extern void cancel_hero_item_animation(void);
 
 /* Gates the level transition on the shared block: the state word must be 0, 2 or 3, the byte at
  * +0x22B8 non-zero, the counter at +0x1D8 below 6 and the timer at +0x24B8 below 0.7. */
-int func_PAL_L00_002C8F98(void)
+int hero_try_start_transition_pal(void)
 {
     char *p = D_00189E20_4;
     int state = *(int *)(p + 0x2294);

@@ -5,8 +5,8 @@
    fade duration D * 60 is scaled to 50 Hz as (D * 300 + 2) / 6, and D is read from PAL's own copy
    of the value, not the one func_PAL_L06_004042F8 reads, so it has a name of its own. */
 #include "common.h"
-extern char *D_L06_001B281C;
-extern char D_L06_001B9840[];
+extern char *g_moby_l06_table;
+extern char g_hero_l06_position[];
 extern float fast_vec_dist(char *,char *);
 extern void set_scale_matrix(void *,float);
 extern void euler_to_matrix(void *,void *);
@@ -17,19 +17,19 @@ extern int FastTweenColor(int,int,float);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void FastVecAdd(void *,void *,void *);
 extern void draw_world_quad(void *,void *,int);
-extern int D_L06_001AF550 __attribute__((sda)),D_L06_001AF554 __attribute__((sda)),D_L06_001AF558 __attribute__((sda)),D_L06_001AF55C __attribute__((sda));
-extern int D_L06_001AF570 __attribute__((sda)),D_L06_001AF574 __attribute__((sda));
-extern float D_L06_001AF578[] SDATA(D_L06_001AF578);
-extern float D_L06_001AF5A0[] SDATA(D_L06_001AF5A0);
+extern int g_ribbon_l06_blend_a __attribute__((sda)),g_ribbon_l06_blend_b __attribute__((sda)),g_ribbon_l06_blend_c __attribute__((sda)),g_ribbon_l06_blend_d __attribute__((sda));
+extern int g_ribbon_color_start __attribute__((sda)),g_ribbon_color_end __attribute__((sda));
+extern float g_ribbon_uv_table[] SDATA(D_L06_001AF578);
+extern float g_ribbon_vertex_offsets[] SDATA(D_L06_001AF5A0);
 extern float ref_PAL_L06_003E8E68_00 __attribute__((sda));
-extern float D_L06_001AF57C[7] __attribute__((sda));
-extern float D_L06_001AF71C;
-extern int D_L06_001B31B0,D_L06_001B31B4;
+extern float g_ribbon_uv_init_table[7] __attribute__((sda));
+extern float g_texture_scroll_step;
+extern int g_ripple_grid_duration,g_ripple_grid_fade_start;
 typedef unsigned int Quad57 __attribute__((mode(TI)));
 
 void func_PAL_L06_003E8E68(u8 *moby) {
     char *data = (*(char **)(moby + 0x68));
-    char *base = *(char **)((*(int *)(data + 0xc) << 8) + (int)D_L06_001B281C + 0x68);
+    char *base = *(char **)((*(int *)(data + 0xc) << 8) + (int)g_moby_l06_table + 0x68);
     char scratch[(unsigned int)*(int *)(data + 4) * 0x40];
     struct {
         struct {
@@ -52,7 +52,7 @@ void func_PAL_L06_003E8E68(u8 *moby) {
     float *matrix2, *uv1, *uv2;
 
     {
-        float distance = fast_vec_dist(moby + 0x10, D_L06_001B9840);
+        float distance = fast_vec_dist(moby + 0x10, g_hero_l06_position);
         if (distance > 48.0f) fade = (80.0f - distance) * 0.03125f;
         else fade = 1.0f;
     }
@@ -72,9 +72,9 @@ void func_PAL_L06_003E8E68(u8 *moby) {
     }
     {
         u64 texture = GetEffectTextureDescriptor(14);
-        u64 packet_flags = (u64)D_L06_001AF550 | ((u64)D_L06_001AF554 << 2);
-        packet_flags |= (u64)D_L06_001AF558 << 4;
-        packet_flags |= (u64)D_L06_001AF55C << 6;
+        u64 packet_flags = (u64)g_ribbon_l06_blend_a | ((u64)g_ribbon_l06_blend_b << 2);
+        packet_flags |= (u64)g_ribbon_l06_blend_c << 4;
+        packet_flags |= (u64)g_ribbon_l06_blend_d << 6;
         packet_flags |= 0x8000000000ULL;
         ((u64 *)buffers.back.uv)[5] = texture;
         ((u64 *)buffers.front.uv)[5] = texture;
@@ -88,7 +88,7 @@ void func_PAL_L06_003E8E68(u8 *moby) {
     {
         int k;
         for (k = 0; k < 4; k++) {
-            uv1[k * 2] = uv2[k * 2] = D_L06_001AF57C[k * 2];
+            uv1[k * 2] = uv2[k * 2] = g_ribbon_uv_init_table[k * 2];
         }
     }
     group = 0;
@@ -98,12 +98,12 @@ void func_PAL_L06_003E8E68(u8 *moby) {
         row = 0;
         do {
             int next;
-            phase += D_L06_001AF71C;
+            phase += g_texture_scroll_step;
             if (phase > 1.0f) phase -= 1.0f;
             next_row = row + 1;
             for (j = 0; j < 4; j++) {
                 matrix1[j * 2] = matrix2[j * 2] =
-                    D_L06_001AF578[j * 2] + phase + *(float *)(base + 0x12de0);
+                    g_ribbon_uv_table[j * 2] + phase + *(float *)(base + 0x12de0);
             }
             for (i = 0; i < *(int *)(data + 4); i = next) {
                 int offset;
@@ -116,14 +116,14 @@ void func_PAL_L06_003E8E68(u8 *moby) {
                 ages = age_base + 0x2c00;
                 age = *(int *)(ages + (order[i] * 4 + group_age));
                 group_vertices = group * 0x2580;
-                if (age > D_L06_001B31B4) {
-                    progress = IntToFloat(age - D_L06_001B31B4) /
-                               IntToFloat(D_L06_001B31B0 - D_L06_001B31B4);
+                if (age > g_ripple_grid_fade_start) {
+                    progress = IntToFloat(age - g_ripple_grid_fade_start) /
+                               IntToFloat(g_ripple_grid_duration - g_ripple_grid_fade_start);
                 } else {
                     progress = 1.0f - IntToFloat(age) /
-                               IntToFloat(D_L06_001B31B4);
+                               IntToFloat(g_ripple_grid_fade_start);
                 }
-                color = FastTweenColor(D_L06_001AF570, D_L06_001AF574, progress);
+                color = FastTweenColor(g_ribbon_color_start, g_ribbon_color_end, progress);
                 color = (color & 0xffffff) +
                         (FloatToInt(fade * fade *
                          IntToFloat((int)color >> 24)) << 24);
@@ -142,7 +142,7 @@ void func_PAL_L06_003E8E68(u8 *moby) {
                 buffers.back.color[1] = color;
                 buffers.back.color[0] = color;
                 for (; vertex < 4; vertex++) {
-                    FastVecAdd(buffers.back.xyz[vertex], (char *)D_L06_001AF5A0 + vertex * 0x10,
+                    FastVecAdd(buffers.back.xyz[vertex], (char *)g_ribbon_vertex_offsets + vertex * 0x10,
                         (char *)((float (*)[80])(base + group_vertices))[(row + (vertex >> 1))] + order[i] * 0x10);
                 }
                 draw_world_quad(buffers.back.xyz, scratch + offset, 0);

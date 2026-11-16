@@ -6,7 +6,7 @@ extern char *CreateMoby(int);
 extern float math_random_float_range(float, float);
 extern void func_002A0F48(void *);
 
-char *func_PAL_0032B4A8(int id, void *data, void *source)
+char *part_spawn_flying_chunk_b_pal(int id, void *data, void *source)
 {
     char *self = CreateMoby(0xBD8);
     char *state;

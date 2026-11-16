@@ -1,10 +1,10 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L20_001AECF0 __attribute__((sda));
-extern float D_L20_001AECF4 __attribute__((sda));
-extern float D_L20_001AECF8 __attribute__((sda));
-extern float D_L20_001AECFC __attribute__((sda));
+extern float g_trooper_speed_scale __attribute__((sda));
+extern float g_trooper_turn_limit __attribute__((sda));
+extern float g_trooper_turn_accel __attribute__((sda));
+extern float g_trooper_spin_speed __attribute__((sda));
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_change_class_from_tables(void *, int);
 extern void moby_set_state(void *, int, int);
@@ -69,7 +69,7 @@ typedef struct {
     unsigned char bA8;
 } Object0039D340;
 
-void func_PAL_L20_003A0288(Object0039D340 *object) {
+void trooper_setup_stats_target_pal(Object0039D340 *object) {
     State0039D340 *st = object->state;
     unsigned char *event;
     unsigned char *target;
@@ -105,10 +105,10 @@ void func_PAL_L20_003A0288(Object0039D340 *object) {
         st->f80 = 0.52359884977340698f;
         st->f84 = 0.10000000149011612f;
         object->h7C = 15;
-        moby_set_controller_speed_limits(object, D_L20_001AECF4 * 0.00040000002f,
-                     D_L20_001AECF0 * 0.020000001f,
-                     D_L20_001AECFC * 6.981318e-06f,
-                     D_L20_001AECF8 * 0.0003490659f);
+        moby_set_controller_speed_limits(object, g_trooper_turn_limit * 0.00040000002f,
+                     g_trooper_speed_scale * 0.020000001f,
+                     g_trooper_spin_speed * 6.981318e-06f,
+                     g_trooper_turn_accel * 0.0003490659f);
         if (st->s24 == 0) {
             st->s24 = 10;
             st->f20 = 10.0f;

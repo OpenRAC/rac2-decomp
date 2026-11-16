@@ -30,13 +30,13 @@ typedef struct {
 
 extern int g_blade_trail_count __attribute__((sda));
 
-extern int D_L02_001B0370 __attribute__((sda));
+extern int g_curved_path_edge_color_end __attribute__((sda));
 
-extern int D_L02_001B0374 __attribute__((sda));
+extern int g_curved_path_edge_color_start __attribute__((sda));
 
-extern TI128 D_L02_002412A0[];
+extern TI128 g_curve_tangent_rows[];
 
-extern TI128 D_L02_002415C0[];
+extern TI128 g_curve_point_rows[];
 
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 
@@ -70,14 +70,14 @@ void gfx_draw_curved_path_segments(void) {
         previousValue = 0;
         step = 1.0f / IntToFloat(g_blade_trail_count - 1);
         for (i = 0; i < g_blade_trail_count - 1; i++) {
-            pointRows = D_L02_002415C0;
-            tangentRows = D_L02_002412A0;
+            pointRows = g_curve_point_rows;
+            tangentRows = g_curve_tangent_rows;
             segment.p0 = pointRows[i];
             segment.t0 = tangentRows[i];
             segment.p1 = pointRows[i + 1];
             segment.t1 = tangentRows[i + 1];
             fraction = IntToFloat(i) * step;
-            edgeValue = FastTweenColor(D_L02_001B0374, D_L02_001B0370, fraction * fraction);
+            edgeValue = FastTweenColor(g_curved_path_edge_color_start, g_curved_path_edge_color_end, fraction * fraction);
             segment.e1 = previousValue;
             segment.e0 = previousValue;
             segment.e3 = edgeValue;

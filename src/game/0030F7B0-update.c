@@ -109,8 +109,8 @@ typedef struct {
 
 extern int g_game_time MACRO_ADDR;   /* the frame counter */
 extern char g_hero_state[];
-extern char D_001BF000[];
-extern int D_0018C0BC;
+extern char g_nearby_mobys[];
+extern int g_hero_mode;
 
 #define HERO ((CrateHero *)D_00189E20)
 
@@ -259,7 +259,7 @@ void CrateUpdate(CrateMoby *moby)
             burst.f14 = 0x30000;
             target = coll_process_hit(position, 16, HERO->moby, 0, radius * 3.0f);
             if (target != 0) {
-                moby_queue_knockback_for_nodes(moby, position, D_001BF000, target, HERO->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
+                moby_queue_knockback_for_nodes(moby, position, g_nearby_mobys, target, HERO->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
             }
             vars->burstFrame++;
         } else if (vars->respawns != 0) {
@@ -341,7 +341,7 @@ void CrateUpdate(CrateMoby *moby)
         } else {
             moby->color = vars->savedColor;
         }
-        if (moby->command == 1 || D_0018C0BC == 22) {
+        if (moby->command == 1 || g_hero_mode == 22) {
             moby->color = vars->savedColor;
             DestroyCrate(moby, 1, 0);
             crate_drop_loot(moby);

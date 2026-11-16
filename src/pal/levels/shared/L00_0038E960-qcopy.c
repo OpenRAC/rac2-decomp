@@ -11,7 +11,7 @@ extern void *part_spawn_ground_effect(float *, int, int, int, int, float *, floa
 
 /* Throws `count` sparks from the position: each is a random direction and a random drift of
    the position itself, and goes out as a pair of particles, one of each sign. */
-void func_PAL_L00_0038E960(float *position, int count)
+void part_l00_spawn_spark_pairs_pal(float *position, int count)
 {
     float dir[4];
     float save[4];

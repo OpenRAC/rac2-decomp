@@ -12,10 +12,10 @@ typedef struct { u8 pad[0x2B2]; s16 direction; u8 pad2B4[0x326-0x2B4]; s16 probe
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define S(p,o) (*(s16 *)((u8 *)(p)+(o)))
 extern float g_hero_position[] __attribute__((aligned(16)));
-extern float D_L23_001AFA50 __attribute__((sda));
-extern int D_L23_001AFA54 __attribute__((sda));
-extern u8 *D_L23_001C0A98 NOT_SDA;
-extern int *D_L23_001B36A8;
+extern float g_enemy_probe_length __attribute__((sda));
+extern int g_enemy_timer_base __attribute__((sda));
+extern u8 *g_tether_l23_hit_result NOT_SDA;
+extern int *g_path_piece_table;
 extern u8 *g_path_lists[];
 extern L23PathLinks g_path_end_masks[];
 extern void mothership_project_point_onto_surface(char *,float);
@@ -69,16 +69,16 @@ void UpdatePathFollowing(u8 *object)
         if (enemy_probe_ahead_point(object)) {
             qcopy(destination, (state+0x2D0));
             qcopy((state+0x2E0), (object+0x10));
-            S(state,0x26E)=math_random_int_range(-D_L23_001AFA54/2,D_L23_001AFA54/2)+D_L23_001AFA54;
+            S(state,0x26E)=math_random_int_range(-g_enemy_timer_base/2,g_enemy_timer_base/2)+g_enemy_timer_base;
             goto follow;
         }
         goto follow;
     }
     {
         ((L23PathState *)state)->probeHit=0;
-        FastVecScale(node,object+0xC0,D_L23_001AFA50);
+        FastVecScale(node,object+0xC0,g_enemy_probe_length);
         FastVecAdd(node,node,object+0x10);
-    if (CollLine(object+0x10,node,17,object,0) && D_L23_001C0A98 && *(s16 *)(D_L23_001C0A98+0xAA)==0x7E5 /* moby class 2021 */) {
+    if (CollLine(object+0x10,node,17,object,0) && g_tether_l23_hit_result && *(s16 *)(g_tether_l23_hit_result+0xAA)==0x7E5 /* moby class 2021 */) {
         choice=math_random_int_below(3);
         switch (choice) {
         case 0: side=1.0f; S(state,0x26C)=1; break;
@@ -97,10 +97,10 @@ void UpdatePathFollowing(u8 *object)
             FastVecAdd(state+0x2D0,object+0x10,direction);
             mothership_project_point_onto_surface((char *)state+0x2D0,0.0f);
         }
-        base=D_L23_001AFA54;
+        base=g_enemy_timer_base;
         S(state,0x2B0)=0;
         ((L23PathState *)state)->probeHit=1;
-        S(state,0x26E)=math_random_int_range(-base/2,base/2)+D_L23_001AFA54;
+        S(state,0x26E)=math_random_int_range(-base/2,base/2)+g_enemy_timer_base;
         goto follow;
     }
     }
@@ -117,7 +117,7 @@ follow:
     case 1: {
         u8 *path;
         SelectNearestPathNode(object,1);
-        path=g_path_lists[D_L23_001B36A8[S(state,0x2B4)]];
+        path=g_path_lists[g_path_piece_table[S(state,0x2B4)]];
         {
             int initialIndex=S(state,0x2B6);
             qcopy(node, (path+0x10+initialIndex*16));
@@ -156,9 +156,9 @@ follow:
         if (fast_vec_dist(state+0x300,reference)<20.0f && arrived) { S(state,0x2B0)=4; goto update; }
         if (fast_vec_dist(object+0x10,state+0x2C0)<2.0f) {
             next=S(state,0x2B6)+((L23PathState *)state)->direction;
-            if (next<0) path_choose_next_piece((char *)object,g_path_end_masks[D_L23_001B36A8[S(state,0x2B4)]].first,1,1);
+            if (next<0) path_choose_next_piece((char *)object,g_path_end_masks[g_path_piece_table[S(state,0x2B4)]].first,1,1);
             else {
-                pathIndex=D_L23_001B36A8[S(state,0x2B4)];
+                pathIndex=g_path_piece_table[S(state,0x2B4)];
                 if (next>=I(g_path_lists[pathIndex],0)) {
                     path_choose_next_piece((char *)object,g_path_end_masks[pathIndex].last,1,1);
                     goto loadPath;
@@ -166,7 +166,7 @@ follow:
                 S(state,0x2B6)=next;
             }
 loadPath:
-            path=g_path_lists[D_L23_001B36A8[S(state,0x2B4)]];
+            path=g_path_lists[g_path_piece_table[S(state,0x2B4)]];
             qcopy((state+0x2C0), (path+0x10+S(state,0x2B6)*16));
             mothership_project_point_onto_surface((char *)state+0x2C0,0.0f);
         }

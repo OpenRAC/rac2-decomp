@@ -1,16 +1,17 @@
+#include "names.h"
 /* func_PAL_L12_0038C940, the PAL copy of func_L12_00389BC0: the same C, where wrap state[5] (({e}) * 8.0f). */
 #include "common.h"
 
 typedef struct { float rows[4][4]; } TodanoMatrix;
-extern TodanoMatrix D_L12_001AEE40 __attribute__((sda));
+extern TodanoMatrix g_water_wave_matrix __attribute__((sda));
 /* The initialization uses GP addressing; updates use absolute field addresses. */
 extern TodanoMatrix matrixGP SDATA(D_L12_001AEE40);
 extern unsigned char g_hero_position[];
-extern int D_L12_001B363C __attribute__((sda));
-extern int D_L12_001B29C8[] __attribute__((sda));
-extern float D_L12_001B3640[4] __attribute__((aligned(16), sda));
-extern float D_L12_001AEF4C SDATA(D_L12_001AEF4C);
-extern float D_L12_001AEF50 SDATA(D_L12_001AEF50);
+extern int g_water_wave_state_id __attribute__((sda));
+extern int g_frame_l12_counter[] __attribute__((sda));
+extern float g_water_wave_position[4] __attribute__((aligned(16), sda));
+extern float g_water_wave_speed_min SDATA(D_L12_001AEF4C);
+extern float g_water_wave_speed_max SDATA(D_L12_001AEF50);
 extern void gfx_draw_water_wave_strips(void *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
@@ -21,8 +22,8 @@ typedef union { Quad q; float f[4]; } Vec;
 typedef struct { char pad[0x18]; char *hit; int count; Vec point; char gap[0x10]; Vec normal; } Collision;
 typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern Collision D_L12_001C0240;
-extern Material D_L12_002636F0[];
+extern Collision g_collision_l12_result;
+extern Material g_item_l12_material_table[];
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_b(float);
 /* func_L12_002CF7B0 is in the sibling file L12_002CF7B0-decider.c (its own profile). */
@@ -75,21 +76,21 @@ void func_PAL_L12_0038C940(unsigned char *object)
         break;
     case 1:
         gfx_add_draw_callback_first(gfx_draw_water_wave_strips, object);
-        D_L12_001B363C = mode;
-        qcopy(D_L12_001B3640, g_hero_position);
+        g_water_wave_state_id = mode;
+        qcopy(g_water_wave_position, g_hero_position);
         *(short *)(g_hero_position + 0x17E) = 5;
-        D_L12_001B3640[3] = 48.0f;
-        D_L12_001B3640[2] = math_fast_sin_or_cos_b((float)(D_L12_001B29C8[0] % 360) * 0.01744444482028484344482421875f - 3.14f) * 0.25f + 59.5f;
+        g_water_wave_position[3] = 48.0f;
+        g_water_wave_position[2] = math_fast_sin_or_cos_b((float)(g_frame_l12_counter[0] % 360) * 0.01744444482028484344482421875f - 3.14f) * 0.25f + 59.5f;
         state[4] += ((state[5]) * 1.2f);
         if (state[4] >= 8.0f) state[4] -= 8.0f;
         a = math_fast_sin_or_cos_b(state[0] * 3.141590118408203125f) * 0.01f;
         b = math_fast_sin_or_cos_b(state[1] * 3.141590118408203125f) * 0.025f;
         c = math_fast_sin_or_cos_b(state[2] * 3.141590118408203125f) * 0.01f;
         d = math_fast_sin_or_cos_b(state[3] * 3.141590118408203125f) * 0.025f;
-        D_L12_001AEE40.rows[0][2] += a;
-        D_L12_001AEE40.rows[1][2] += b;
-        D_L12_001AEE40.rows[2][2] += c;
-        D_L12_001AEE40.rows[3][2] += d;
+        g_water_wave_matrix.rows[0][2] += a;
+        g_water_wave_matrix.rows[1][2] += b;
+        g_water_wave_matrix.rows[2][2] += c;
+        g_water_wave_matrix.rows[3][2] += d;
         state[0] += 0.01f;
         state[1] += 0.01f;
         state[2] += 0.01f;
@@ -98,7 +99,7 @@ void func_PAL_L12_0038C940(unsigned char *object)
         if (state[1] > 2.0f) state[1] = 0.0f;
         if (state[2] > 2.0f) state[2] = 0.0f;
         if (state[3] > 2.0f) state[3] = 0.0f;
-        state[5] = math_random_float_range(D_L12_001AEF4C, D_L12_001AEF50);
+        state[5] = math_random_float_range(g_water_wave_speed_min, g_water_wave_speed_max);
         break;
     case 2:
         if (vec_distance_xy(object + 0x10, g_hero_position) < 64.0f)

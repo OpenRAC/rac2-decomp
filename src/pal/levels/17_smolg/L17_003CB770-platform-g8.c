@@ -31,15 +31,15 @@ typedef struct {
     int player;   /* 0xCC */
 } PlatformVars;
 
-extern int D_L17_001B2748;
+extern int g_flash_frame_counter;
 extern char *g_path_l17_table[];
 extern char *g_moby_l17_pool;
 extern char g_hero_position[];
-extern float D_L17_001B03A0 __attribute__((sda));
-extern float D_L17_001B03A4 __attribute__((sda));
-extern float D_L17_001B03A8 __attribute__((sda));
-extern float D_L17_001B03AC __attribute__((sda));
-extern float D_L17_001C0028 NOT_SDA;
+extern float g_platform_move_seconds_a __attribute__((sda));
+extern float g_platform_move_seconds_b __attribute__((sda));
+extern float g_platform_wait_seconds __attribute__((sda));
+extern float g_platform_speed_step __attribute__((sda));
+extern float g_platform_height NOT_SDA;
 extern float math_fast_sin_or_cos_b(float);
 extern u32 FastTweenColor(u32, u32, float);
 extern void func_PAL_L17_003CB570(void *, void *, void *, float);
@@ -56,7 +56,7 @@ void func_PAL_L17_003CB770(char *object)
 {
     Vec old, delta, lower, upper;
     PlatformVars *state = (PlatformVars *)P(object, 0x68);
-    float angle = (float)(D_L17_001B2748 % 150) * 0.006666667f * 2.0f * 3.1415927f;
+    float angle = (float)(g_flash_frame_counter % 150) * 0.006666667f * 2.0f * 3.1415927f;
 
     if (angle > 3.1415927f)
         angle -= 6.2831855f;
@@ -83,10 +83,10 @@ void func_PAL_L17_003CB770(char *object)
             break;
         case 1:
             state->timer += 1.0f;
-            if (state->timer >= (D_L17_001B03A0 * 300.0f + 2.0f) * 0.16666667f)
-                state->timer = (D_L17_001B03A0 * 300.0f + 2.0f) * 0.16666667f;
-            func_PAL_L17_003CB570(object, path, &old, D_L17_001B03A0);
-            if (state->timer >= (D_L17_001B03A0 * 300.0f + 2.0f) * 0.16666667f) {
+            if (state->timer >= (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f)
+                state->timer = (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f;
+            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_a);
+            if (state->timer >= (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f) {
                 state->wait = 0;
                 state->state1 = 2;
             }
@@ -95,17 +95,17 @@ void func_PAL_L17_003CB770(char *object)
             if (state->state2)
                 break;
             state->wait += 1.0f;
-            if (state->wait >= (D_L17_001B03A8 * 300.0f + 2.0f) * 0.16666667f) {
+            if (state->wait >= (g_platform_wait_seconds * 300.0f + 2.0f) * 0.16666667f) {
                 state->state1 = 3;
                 U(trigger, 0xbc) = 0;
-                state->timer = (D_L17_001B03A0 * 300.0f + 2.0f) * 0.16666667f;
+                state->timer = (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f;
             }
             break;
         case 3:
             state->timer -= 1.0f;
             if (state->timer <= 0.0f)
                 state->timer = 0;
-            func_PAL_L17_003CB570(object, path, &old, D_L17_001B03A0);
+            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_a);
             if (state->timer <= 0.0f)
                 state->state1 = 0;
             break;
@@ -136,17 +136,17 @@ void func_PAL_L17_003CB770(char *object)
             break;
         case 1:
             state->timer += 1.0f;
-            if (state->timer >= (D_L17_001B03A4 * 300.0f + 2.0f) * 0.16666667f)
-                state->timer = (D_L17_001B03A4 * 300.0f + 2.0f) * 0.16666667f;
-            func_PAL_L17_003CB570(object, path, &old, D_L17_001B03A4);
-            if (state->timer >= (D_L17_001B03A4 * 300.0f + 2.0f) * 0.16666667f) {
+            if (state->timer >= (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f)
+                state->timer = (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f;
+            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_b);
+            if (state->timer >= (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f) {
                 state->wait = 0;
                 state->state2 = 2;
             }
             break;
         case 2:
             state->wait += 1.0f;
-            if (state->wait >= (D_L17_001B03A8 * 300.0f + 2.0f) * 0.16666667f) {
+            if (state->wait >= (g_platform_wait_seconds * 300.0f + 2.0f) * 0.16666667f) {
                 if (!IsPointInCuboid(g_hero_position, state->player)) {
                     state->state2 = 3;
                     snd_play_from_class_bank(1, 0, object, 0x93b);
@@ -163,11 +163,11 @@ void func_PAL_L17_003CB770(char *object)
             qcopy(&upper, object + 16);
             upper.f[2] += 0.5f;
             if (CollLine(&upper, &lower, 2, object, 0))
-                height = D_L17_001C0028;
+                height = g_platform_height;
             else
                 height = 0.0f;
             if (height < F(object, 0x18)) {
-                state->speed += D_L17_001B03AC * 0.00040000002f;
+                state->speed += g_platform_speed_step * 0.00040000002f;
                 F(object, 0x18) -= state->speed;
             } else {
                 state->speed = 0;

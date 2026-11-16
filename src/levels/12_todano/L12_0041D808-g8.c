@@ -15,7 +15,7 @@ typedef struct {
     s32 timer;
 } LiftVars;
 
-extern u8 *D_L12_001B2F8C MACRO_ADDR;
+extern u8 *g_path_waypoint_table MACRO_ADDR;
 
 typedef struct {
     u8 pad0[0x80];
@@ -36,7 +36,7 @@ typedef struct {
 
 extern u8 g_sound_state[];
 extern u8 *g_hero_moby NOT_SDA;
-extern s32 D_00138324 NOT_SDA;
+extern s32 g_pad_held_flags NOT_SDA;
 
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fabs(f32);
@@ -76,14 +76,14 @@ void UpdateTodanoRotatingLift(u8 *self)
         break;
     case 2:
         vars->targetHeight = vars->destination ?
-            F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38) : vars->origin[2];
+            F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38) : vars->origin[2];
         vars->targetAngle = vars->destination ?
-            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x78),
                           4.7123894691467285f) : vars->origin[3];
-        y = F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38);
+        y = F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38);
         if (g_hero_state.lift == self && g_hero_state.active) {
             TryClaimNotice(8, 0x279A, 1);
-            if (D_00138324 & 16) {
+            if (g_pad_held_flags & 16) {
                 vars->destination = (vars->destination + 1) & 1;
                 moby_set_state(self, 3, -1);
             }
@@ -117,9 +117,9 @@ void UpdateTodanoRotatingLift(u8 *self)
             vars->speed = 0;
         }
         vars->targetHeight = vars->destination ?
-            F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x38) : vars->origin[2];
+            F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38) : vars->origin[2];
         vars->targetAngle = vars->destination ?
-            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)D_L12_001B2F8C), 0x78),
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x78),
                           4.7123894691467285f) : vars->origin[3];
         target = vars->targetHeight;
         speed = 0.003888889f;

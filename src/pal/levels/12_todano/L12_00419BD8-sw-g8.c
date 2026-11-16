@@ -1,11 +1,11 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 D_L12_001B1828 __attribute__((sda));
-extern s32 func_PAL_L09_003FC418(void *, s32);
+extern s32 g_guard_attack_sequence_value __attribute__((sda));
+extern s32 path_is_entry_reachable_pal(void *, s32);
 extern s32 enemy_select_path(void *, s32, s32);
 extern s32 math_random_int_range(s32, s32);
-extern void func_PAL_L12_00417C90(void *, s32, s32, s32);
+extern void guard_switch_animation_pal(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 extern s32 path_toggle_handle_cache(void *);
 extern s32 func_001163B0(void);
@@ -15,7 +15,7 @@ void func_PAL_L12_00419E70(u8 *self)
 {
     u8 *v=*(u8 **)(self+0x68);
     s32 ready=1;
-    if (*(s32 *)(v+0x2DC)!=-1) ready=func_PAL_L09_003FC418(self,*(s32 *)(v+0x2DC))!=0;
+    if (*(s32 *)(v+0x2DC)!=-1) ready=path_is_entry_reachable_pal(self,*(s32 *)(v+0x2DC))!=0;
     if (ready) {
         switch(self[0x95]) {
         case 3:
@@ -23,10 +23,10 @@ void func_PAL_L12_00419E70(u8 *self)
             if (v[0x302]&2) v[0x302]=0;
             enemy_select_path(self,*(s32 *)(v+0x2BC),-1);
             if (v[0x30E]) {
-                func_PAL_L12_00417C90(self,4,0,math_random_int_range(7,12));
+                guard_switch_animation_pal(self,4,0,math_random_int_range(7,12));
                 moby_set_state(self,4,5);
             } else {
-                func_PAL_L12_00417C90(self,12,0,math_random_int_range(7,12));
+                guard_switch_animation_pal(self,12,0,math_random_int_range(7,12));
                 moby_set_state(self,8,5);
             }
             break;
@@ -37,9 +37,9 @@ void func_PAL_L12_00419E70(u8 *self)
         case 5: {
             s32 r=path_toggle_handle_cache(self);
             if (!v[0x303] || r) {
-                func_PAL_L12_00417C90(self,12,0,math_random_int_range(7,12));
+                guard_switch_animation_pal(self,12,0,math_random_int_range(7,12));
                 moby_set_state(self,8,5);
-                *(u16 *)(v+0x2E4)=((s32)(D_L12_001B1828) * 5 + 2) / 6;
+                *(u16 *)(v+0x2E4)=((s32)(g_guard_attack_sequence_value) * 5 + 2) / 6;
             }
             break;
         }
@@ -48,7 +48,7 @@ void func_PAL_L12_00419E70(u8 *self)
             path_toggle_handle_cache(self);
             if(self[0x60]&2) {
                 s32 side=func_001163B0()&1;
-                func_PAL_L12_00417C90(self,side,0,math_random_int_range(10,20));
+                guard_switch_animation_pal(self,side,0,math_random_int_range(10,20));
                 moby_set_state(self,5,-1);
             }
             break;

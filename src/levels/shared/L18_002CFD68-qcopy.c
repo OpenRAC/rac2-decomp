@@ -54,8 +54,8 @@ void hero_attach_to_object(s32 mode, s32 index, u8 *object)
 }
 
 extern u8 g_hero_state[];
-extern u8 D_L18_001B4E00[], D_L18_001B5400[];
-extern s32 D_L18_001A8F00[] __attribute__((sda));
+extern u8 g_anim_entry_table_a[], g_anim_entry_table_b[];
+extern s32 g_game_l18_mode_state[] __attribute__((sda));
 extern char *moby_get_private_value_0(u8 *);
 extern void level_store_value_pair(s32, s32);
 extern void hero_reset_speeds_and_vectors(void);
@@ -111,14 +111,14 @@ void hero_detach_from_object(s32 keep)
     hero_clear_queued_anim();
     current = *(u8 **)(g_hero_state + 0x2290);
     if (current[0x42] != 255) {
-        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)D_L18_001B4E00);
+        value = anim_copy_entry_data((char *)current, current[0x42], current[0x40], (s32)g_anim_entry_table_a);
         *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x58) = value;
     }
     current = *(u8 **)(g_hero_state + 0x2290);
-    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)D_L18_001B5400);
+    value = anim_copy_entry_data((char *)current, current[0x43], current[0x41], (s32)g_anim_entry_table_b);
     *(s32 *)(*(u8 **)(g_hero_state + 0x2290) + 0x5C) = value;
     if (*(s32 *)(g_hero_state + 0x2294) != 0x61) goto reset;
-    switch (D_L18_001A8F00[0]) {
+    switch (g_game_l18_mode_state[0]) {
     case 2:
     case 6:
         goto done;

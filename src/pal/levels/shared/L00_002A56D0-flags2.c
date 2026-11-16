@@ -19,7 +19,7 @@ typedef struct {
     unsigned int color;
 } Hero5CB0;
 extern Hero5CB0 g_hero_state;
-extern unsigned char D_001A7A40[] __attribute__((sda));
+extern unsigned char g_unlocked_item_flags[] __attribute__((sda));
 extern char *CreateMoby(int);
 extern void func_002A0F48(char *);
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -34,7 +34,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 
 /* Create and pose the hero effect object, then advance and blend its colors. */
-void func_PAL_L00_002A5B40(void)
+void UpdateHeroJointEffect_pal(void)
 {
     float joint[4] __attribute__((aligned(16)));
     float matrix[16] __attribute__((aligned(16)));
@@ -73,7 +73,7 @@ void func_PAL_L00_002A5B40(void)
             copy_matrix3x4(g_hero_state.object + 0xC0, matrix);
             func_002A0F48(g_hero_state.object);
             scale = 1.7f;
-            if (D_001A7A40[3])
+            if (g_unlocked_item_flags[3])
                 scale = 3.1f;
             if (g_hero_state.timer)
                 scale *= 1.4f;

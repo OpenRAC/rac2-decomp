@@ -23,7 +23,7 @@ extern char *spark_trail_create(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
 extern int StartAttachedEffect(int, int, char *);
 extern int g_hero_moby;
-extern unsigned char D_00139582;
+extern unsigned char g_ray_weapon_index;
 extern L00AimState g_collision_result;
 extern L00AimEntry g_weapon_l00_table[];
 
@@ -44,7 +44,7 @@ char *beam_trace_and_apply_damage(char *source, char *start, char *end, char *im
         FastVecSub(ray, (char *)g_collision_result.vector_20, start);
         spark_trail_create(start, ray, (char *)g_collision_result.vector_20, 1);
         if (g_collision_result.object_18 != 0) {
-            baseDamage = (g_weapon_l00_table + D_00139582)->value_70;
+            baseDamage = (g_weapon_l00_table + g_ray_weapon_index)->value_70;
             distance = fast_vec_dist((char *)g_collision_result.vector_20, start);
             if (distance < 10.0f) {
                 *(float *)(impactInfo + 0x1C) = baseDamage;

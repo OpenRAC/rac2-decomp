@@ -6,12 +6,12 @@ typedef unsigned char u8;
 typedef float f32;
 extern void menu_set_entry_table(unsigned char *owner, float *records);
 extern u8 g_item_owned_flags[] __attribute__((section(".sdata")));
-extern u8 D_001A7A80[] __attribute__((section(".sdata")));
+extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 
 /* func_00347F80 is built from 00345358-wrap.c. */
 
 
-void func_PAL_0034A230(u8 *a0,f32 *a1) {
+void menu_set_entry_table_pal(u8 *a0,f32 *a1) {
  f32 *end;
  *(f32 **)(a0+0x68)=a1;
  *(s32 *)(a0+0xC0)=0;

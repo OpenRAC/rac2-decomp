@@ -8,18 +8,18 @@ extern Rac2Native_3e18d05650488ad4_FallbackU32 g_save_menu_flags;
 
 extern int D_001A7420_1;
 
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 
 extern void UpdateBoltCounter(int);
 
-extern int D_L00_001A904C;
+extern int g_bolt_counter_base;
 
 extern void DrawBoltCounterDeltas(int);
 
 /* Calls the bolt counter update only when the level has the counter enabled. */
 void hud_update_bolt_counter_if_enabled(int argument)
 {
-    if (D_L00_001A904C != 0) {
+    if (g_bolt_counter_base != 0) {
         UpdateBoltCounter(argument);
     }
 }
@@ -27,7 +27,7 @@ void hud_update_bolt_counter_if_enabled(int argument)
 /* Calls the bolt counter delta drawing only when the level has the counter enabled. */
 void hud_draw_bolt_counter_deltas_if_enabled(int argument)
 {
-    if (D_L00_001A904C != 0) {
+    if (g_bolt_counter_base != 0) {
         DrawBoltCounterDeltas(argument);
     }
 }
@@ -37,7 +37,7 @@ struct LoadSlots_L00 {
     int slot[4];
 };
 
-extern struct LoadSlots_L00 D_00152CD0;
+extern struct LoadSlots_L00 g_load_slots;
 extern int ref_L00_00304AE8_00 __attribute__((sda));
 
 /* The level's copy of the load-slot release: same body as func_00294130 with the slot cursor in the level's small data. */
@@ -45,7 +45,7 @@ void load_release_slot(int *entry, int doRelease)
 {
     if (doRelease != 0) {
         if (entry[1] >= 0) {
-            D_00152CD0.slot[entry[1]] = entry[0];
+            g_load_slots.slot[entry[1]] = entry[0];
             if (entry[1] != ref_L00_00304AE8_00)
                 goto out;
             ref_L00_00304AE8_00 = entry[1] ^ 1;
@@ -74,11 +74,11 @@ typedef struct RelocBlock_00300378 {
 extern u32 g_collision_result[4];
 
 /* The same two pointers under two names: the stores of 0 are absolute `lui $at` stores in retail, the others $gp-relative. */
-extern RelocBlock_00300378 *D_L00_001B1AC0 __attribute__((section(".sdata")));
+extern RelocBlock_00300378 *g_reloc_block_first __attribute__((section(".sdata")));
 
 extern RelocBlock_00300378 *D_L00_001B1AC0_1 __attribute__((sda));
 
-extern RelocBlock_00300378 *D_L00_001B1AC4 __attribute__((section(".sdata")));
+extern RelocBlock_00300378 *g_reloc_block_second __attribute__((section(".sdata")));
 
 extern RelocBlock_00300378 *D_L00_001B1AC4_1 __attribute__((sda));
 
@@ -94,7 +94,7 @@ void level_relocate_header_blocks(u8 *header)
         for (i = 0; i < D_L00_001B1AC0_1->count; i++)
             D_L00_001B1AC0_1->items[i].ptr = (int)D_L00_001B1AC0_1 + D_L00_001B1AC0_1->items[i].ptr;
     } else {
-        D_L00_001B1AC0 = 0;
+        g_reloc_block_first = 0;
     }
     if (*(int *)(header + 8) != 0) {
         int i;
@@ -103,7 +103,7 @@ void level_relocate_header_blocks(u8 *header)
         for (i = 0; i < D_L00_001B1AC4_1->count; i++)
             D_L00_001B1AC4_1->items[i].ptr = (int)D_L00_001B1AC4_1 + D_L00_001B1AC4_1->items[i].ptr;
     } else {
-        D_L00_001B1AC4 = 0;
+        g_reloc_block_second = 0;
     }
 }
 
@@ -113,19 +113,19 @@ typedef struct {
     unsigned long long tag2;
 } Packet_FE268;
 
-extern unsigned long long D_001A72C8;
-extern unsigned int D_001A72C0;
-extern void *D_L00_001BF1B4[];
-extern Packet_FE268 D_L00_001C91C0[];
-extern unsigned long long D_L00_001A9510 __attribute__((sda));
+extern unsigned long long g_gs_packet_data;
+extern unsigned int g_current_weapon_channel;
+extern void *g_render_group_ptrs[];
+extern Packet_FE268 g_gs_register_packet[];
+extern unsigned long long g_gs_register_packet_data __attribute__((sda));
 extern void tex_relocate_render_groups(void *, int, void *);
 
 /* Writes a GS register packet from the given value and sends it for drawing. */
 void gfx_send_gs_register_packet(unsigned int value)
 {
-    D_001A72C0 = value;
-    D_L00_001C91C0[0].data = D_001A72C8;
-    D_L00_001C91C0[0].tag1 = 0x0000FFA0000000E0ULL;
-    D_L00_001C91C0[0].tag2 = 0x0040000400004000ULL;
-    tex_relocate_render_groups(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
+    g_current_weapon_channel = value;
+    g_gs_register_packet[0].data = g_gs_packet_data;
+    g_gs_register_packet[0].tag1 = 0x0000FFA0000000E0ULL;
+    g_gs_register_packet[0].tag2 = 0x0040000400004000ULL;
+    tex_relocate_render_groups(g_render_group_ptrs[0], 0, &g_gs_register_packet_data);
 }

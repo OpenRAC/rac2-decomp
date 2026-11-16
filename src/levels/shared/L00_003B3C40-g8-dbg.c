@@ -10,14 +10,14 @@ extern int math_random_int_below(int);
 extern float IntToFloat(int);
 extern char *SpawnSpinningSparkParticle(char *, float, float, float, float, int, char *, int, int);
 extern char g_camera_l00_position[];
-extern char D_L00_001A8F20[] MACRO_ADDR;
-extern float D_L00_001AF8FC __attribute__((sda));
-extern int D_L00_001AF900 __attribute__((sda));
-extern int D_L00_001AF904 __attribute__((sda));
-extern float D_L00_001AF908 __attribute__((sda));
-extern float D_L00_001AF90C __attribute__((sda));
-extern int D_L00_001AF910 __attribute__((sda));
-extern int D_L00_001AF914 __attribute__((sda));
+extern char g_default_vector[] MACRO_ADDR;
+extern float g_spark_burst_speed __attribute__((sda));
+extern int g_spark_burst_color __attribute__((sda));
+extern int g_spark_burst_angle_count __attribute__((sda));
+extern float g_spark_burst_depth __attribute__((sda));
+extern float g_spark_second_speed __attribute__((sda));
+extern int g_spark_second_color __attribute__((sda));
+extern int g_spark_second_alpha __attribute__((sda));
 
 /* Throws out a few spark particles away from the camera, plus an occasional puff of smoke, around the object. */
 void part_spawn_spark_burst_away_from_camera(char *object)
@@ -29,17 +29,17 @@ void part_spawn_spark_burst_away_from_camera(char *object)
     float t;
     char *p;
     position.q = 0;
-    position.f[2] = D_L00_001AF908;
+    position.f[2] = g_spark_burst_depth;
     FastVecSub(a, g_camera_l00_position, object + 0x10);
     math_apply_axis_rotation_to_quat(b, &position, a, math_random_angle());
     FastVecAdd(c, object + 0x10, b);
     r = math_random_int_below(0x10);
     if (math_random_int_below(2))
         r = -r;
-    angle = D_L00_001AF904;
-    t = D_L00_001AF908 / IntToFloat(angle);
+    angle = g_spark_burst_angle_count;
+    t = g_spark_burst_depth / IntToFloat(angle);
     vec_scale_to_length(d, b, -t);
-    p = SpawnSpinningSparkParticle((char *)c, 0.5f, 1.0f, 0.99f, D_L00_001AF8FC * 210000.0f, r, (char *)d, D_L00_001AF900, 0);
+    p = SpawnSpinningSparkParticle((char *)c, 0.5f, 1.0f, 0.99f, g_spark_burst_speed * 210000.0f, r, (char *)d, g_spark_burst_color, 0);
     if (p) {
         char *s = p + 0x20;
         *(short *)(p + 0xA) = angle;
@@ -50,13 +50,13 @@ void part_spawn_spark_burst_away_from_camera(char *object)
     if (math_random_int_below(3) == 0) {
         vec_scale_to_length(a, a, -0.5f);
         FastVecAdd(c, object + 0x10, a);
-        p = SpawnSpinningSparkParticle((char *)c, 0.1f, 1.0f, 0.8f, D_L00_001AF90C * 210000.0f, r, D_L00_001A8F20, (D_L00_001AF910 & 0xFFFFFF) | (D_L00_001AF914 << 24), 0);
+        p = SpawnSpinningSparkParticle((char *)c, 0.1f, 1.0f, 0.8f, g_spark_second_speed * 210000.0f, r, g_default_vector, (g_spark_second_color & 0xFFFFFF) | (g_spark_second_alpha << 24), 0);
         if (p) {
             char *s = p + 0x20;
             *(short *)(p + 0xA) = 0x3C;
             p[3] = 0x44;
             *(int *)(s + 4) = 3;
-            s[0xA] = *(unsigned char *)&D_L00_001AF914;
+            s[0xA] = *(unsigned char *)&g_spark_second_alpha;
             s[0xB] = *(unsigned char *)(p + 0xA);
         }
     }

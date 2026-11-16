@@ -16,9 +16,9 @@ extern void entity_start_launch_to_target(char *e, void *v, float a, float b, fl
 extern s32 hero_l00_set_action(int a0, int a1);
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool MACRO_ADDR;
-extern int D_L14_001B25B8 __attribute__((sda));
+extern int g_group_link_limit __attribute__((sda));
 struct Projection { char pad[0x38]; float height; char tail[0x44]; };
-extern struct Projection *D_L14_001B268C MACRO_ADDR;
+extern struct Projection *g_platform_projection_table MACRO_ADDR;
 extern char g_hero_state[];
 
 /* Only the observed table/group fields are described. */
@@ -43,7 +43,7 @@ void UpdateLaunchVolume(char *self) {
 
     matrix_from_basis_rows(mtx, self + 0xC0);
     for (list_entry = g_group_entity_lists[state->groupIndex];
-         (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= D_L14_001B25B8 &&
+         (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= g_group_link_limit &&
          list_entry != 0 && ((list_entry != 0 && (short)list_entry[-1] >= 0) || list_entry == g_group_entity_lists[state->groupIndex]);
          list_entry++) {
         member = ((*list_entry & 0x7FFF) << 8) + g_moby_l14_pool;
@@ -57,9 +57,9 @@ void UpdateLaunchVolume(char *self) {
                 local_offset[0] = local_offset[0] + 2.0f;
                 inside = math_fabs(local_offset[0]) < 1.0f && math_fabs(local_offset[1]) < 1.0f;
                 if (inside) {
-                    transform_vector(projected, local_offset, &D_L14_001B268C[state->tableIndex]);
+                    transform_vector(projected, local_offset, &g_platform_projection_table[state->tableIndex]);
                     entity_start_launch_to_target((char *)member, projected,
-                                      D_L14_001B268C[state->tableIndex].height +
+                                      g_platform_projection_table[state->tableIndex].height +
                                           math_random_float_range(1.0f, 2.0f),
                                       0.0055555557f, 0.0055555557f);
                 }
@@ -75,9 +75,9 @@ void UpdateLaunchVolume(char *self) {
         local_offset[0] = local_offset[0] + 2.0f;
         inside = math_fabs(local_offset[0]) < 1.0f && math_fabs(local_offset[1]) < 1.0f;
         if (inside) {
-            transform_vector(projected, local_offset, &D_L14_001B268C[state->tableIndex]);
+            transform_vector(projected, local_offset, &g_platform_projection_table[state->tableIndex]);
             hero_now = g_hero_state;
-            top_height = D_L14_001B268C[state->tableIndex].height + 1.5f;
+            top_height = g_platform_projection_table[state->tableIndex].height + 1.5f;
             rise_height = top_height - *(float *)(hero_now + 0x88);
             rise_height *= 2.0f; duration = square_root(rise_height / 0.0055555557f);
             fall_height = (top_height - projected[2]) * 2.0f; duration += square_root(fall_height / 0.0055555557f);

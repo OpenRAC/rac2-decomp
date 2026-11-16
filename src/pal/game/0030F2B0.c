@@ -6,7 +6,7 @@ extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, char *);
 extern void func_PAL_002AC290(char *, char *);
 extern void vec_add_random_offset(float *, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void func_PAL_002AC3C0(char *, char *);
 
@@ -35,7 +35,7 @@ void func_PAL_0030FB38(char *object)
         func_PAL_002AC290(object, state);
         if (*(float *)(state + 0x24) < 0.0f) {
             vec_add_random_offset(direction, 0.6f);
-            func_PAL_002AC718(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
+            SpawnExplosionEffects_pal(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
             object[0x20] = 6;
         }

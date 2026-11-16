@@ -13,9 +13,9 @@ typedef struct {
     char *spawned[1];
 } SpawnSlots_L00_003FEAC8;
 
-extern u8 D_00139581[];
+extern u8 g_hoverbomb_weapon_index[];
 extern TableEntry_L00_003FEAC8 g_weapon_l00_table[];
-extern float D_L00_001B0C14 __attribute__((sda));
+extern float g_linked_effect_scale __attribute__((sda));
 
 extern void ref_L00_003FEAC8_00(void *unused, void *pos, void *direction);
 extern float ref_L00_003FEAC8_01(void *vec);
@@ -24,7 +24,7 @@ extern char *ref_L00_003FEAC8_03(void *pos, void *direction, void *owner, float 
 
 /* Sparks along direction from pos, then spawns an object there, stores it in the owner's
    slot and links it back to the owner. */
-void func_PAL_L00_004033A8(char *obj, char *pos, void *direction, int slot)
+void part_spawn_linked_effect_with_sparks_pal(char *obj, char *pos, void *direction, int slot)
 {
     SpawnSlots_L00_003FEAC8 *slots = *(SpawnSlots_L00_003FEAC8 **)(obj + 0x68);
     float dir[4] __attribute__((aligned(16)));
@@ -34,11 +34,11 @@ void func_PAL_L00_004033A8(char *obj, char *pos, void *direction, int slot)
     char *spawned;
 
     qcopy(dir, direction);
-    entry = g_weapon_l00_table + D_00139581[0];
+    entry = g_weapon_l00_table + g_hoverbomb_weapon_index[0];
     scale = entry->scale;
     ref_L00_003FEAC8_00(obj, pos, direction);
     length = ref_L00_003FEAC8_01(dir);
-    spawned = ref_L00_003FEAC8_03(pos, dir, obj, length, scale, ref_L00_003FEAC8_02(1, 25), D_L00_001B0C14);
+    spawned = ref_L00_003FEAC8_03(pos, dir, obj, length, scale, ref_L00_003FEAC8_02(1, 25), g_linked_effect_scale);
     slots->spawned[slot] = spawned;
     if (spawned != 0) {
         *(char **)(spawned + 0xB8) = obj;

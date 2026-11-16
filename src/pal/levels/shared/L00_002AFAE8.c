@@ -51,16 +51,16 @@ typedef struct {
 } HeroItemsCreateState;
 extern HeroItemsCreateState D_00189E20_items;
 extern unsigned char g_item_slot_to_record[];
-extern unsigned char D_001A7A00[] __attribute__((sda));
-extern int D_001A7398[] __attribute__((sda));
+extern unsigned char g_player_stats[] __attribute__((sda));
+extern int g_menu_choice_table[] __attribute__((sda));
 extern int g_item_ammo_counts[];
-extern int D_L00_001B18D8[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 typedef struct {
     char pad0[0xA0];
     short joint;
     char padA2[14];
 } HeroItemEase;
-extern HeroItemEase D_0018B9A0[];
+extern HeroItemEase g_hero_item_ease_table[];
 typedef struct {
     char pad0[0x14];
     int object;
@@ -71,35 +71,35 @@ typedef struct {
     char pad2[0x50];
 } HeroItemDefinition;
 extern HeroItemDefinition g_weapon_l00_table[];
-extern void func_PAL_00295298(int);
+extern void SwitchCachedDiscAsset_pal(int);
 extern HeroItemMoby *CreateMoby(int);
 extern void mem_clear(void *, int, int);
 extern char *tether_create_holder(int);
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
 #define HERO_ITEMS (&D_00189E20_items)
-extern int D_L00_001B18D8[] __attribute__((sda));
+extern int g_ring_animation_counter[] __attribute__((sda));
 
 /* Spawns the mobys for the hero's equipped item slots, releasing disabled slots. */
-void func_PAL_L00_002AFAE8(void)
+void SpawnHeroItemMobies_pal(void)
 {
     HeroItemMoby *moby;
     int disabled;
 
-    if (!HERO_ITEMS->slots[0].moby && D_L00_001B18D8[0] > HERO_ITEMS->slots[0].respawnFrame &&
+    if (!HERO_ITEMS->slots[0].moby && g_ring_animation_counter[0] > HERO_ITEMS->slots[0].respawnFrame &&
         (!HERO_ITEMS->pendingItem || HERO_ITEMS->pendingItem == HERO_ITEMS->selectedItem0)) {
         int id = HERO_ITEMS->selectedItem0;
         int saved, i;
 
         if (!id) {
-            if (D_001A7A00[8] || (saved = D_001A7398[0]) == 0)
+            if (g_player_stats[8] || (saved = g_menu_choice_table[0]) == 0)
                 id = 10;
             else
                 id = saved;
         }
-        func_PAL_00295298(ITEM_DEF(id)->object);
+        SwitchCachedDiscAsset_pal(ITEM_DEF(id)->object);
         for (i = 0; i < 3; i++) {
-            mem_clear(&D_0018B9A0[i], 0, sizeof(HeroItemEase));
-            D_0018B9A0[i].joint = -1;
+            mem_clear(&g_hero_item_ease_table[i], 0, sizeof(HeroItemEase));
+            g_hero_item_ease_table[i].joint = -1;
         }
         HERO_ITEMS->slots[0].id = id;
         moby = CreateMoby(ITEM_DEF(id)->object);
@@ -129,11 +129,11 @@ void func_PAL_L00_002AFAE8(void)
         int id = HERO_ITEMS->selectedItem3;
 
         if (!id) {
-            id = D_001A7398[3];
+            id = g_menu_choice_table[3];
             if (!id || id == 8 || id == 4) {
-                id = D_001A7A00[0x9] ? 3 : 2;
+                id = g_player_stats[0x9] ? 3 : 2;
                 if (id)
-                    D_001A7398[3] = id;
+                    g_menu_choice_table[3] = id;
             }
         }
         HERO_ITEMS->slots[3].id = id;
@@ -171,8 +171,8 @@ void func_PAL_L00_002AFAE8(void)
     }
 
     disabled = 0;
-    if (*(short *)(D_001A7A00 + 0x18) == 4 || D_001A7A00[0x49]
-        || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
+    if (*(short *)(g_player_stats + 0x18) == 4 || g_player_stats[0x49]
+        || g_player_stats[0x42] || g_player_stats[0x4B] || g_player_stats[0x4A])
         disabled = 1;
     if (HERO_ITEMS->slots[2].moby && disabled) {
         moby_mark_spawned(HERO_ITEMS->slots[2].moby);
@@ -180,7 +180,7 @@ void func_PAL_L00_002AFAE8(void)
     }
     if (!HERO_ITEMS->slots[2].moby && !disabled) {
         HeroItemMoby *slotMoby;
-        int id = D_001A7398[2];
+        int id = g_menu_choice_table[2];
 
         if (!id)
             id = 47;
@@ -201,8 +201,8 @@ void func_PAL_L00_002AFAE8(void)
     }
 
     disabled = 0;
-    if (*(short *)(D_001A7A00 + 0x18) == 4 || D_001A7A00[0x49]
-        || D_001A7A00[0x42] || D_001A7A00[0x4B] || D_001A7A00[0x4A])
+    if (*(short *)(g_player_stats + 0x18) == 4 || g_player_stats[0x49]
+        || g_player_stats[0x42] || g_player_stats[0x4B] || g_player_stats[0x4A])
         disabled = 1;
     if (disabled) {
         if (HERO_ITEMS->slots[1].moby) {
@@ -216,9 +216,9 @@ void func_PAL_L00_002AFAE8(void)
     }
     if (!HERO_ITEMS->slots[1].moby && !disabled) {
         if (g_frame_l00_counter[0] < 3)
-            HERO_ITEMS->slots[1].id = D_001A7398[1] = (*(short *)(D_001A7A00 + 0x24));
+            HERO_ITEMS->slots[1].id = g_menu_choice_table[1] = (*(short *)(g_player_stats + 0x24));
         else
-            HERO_ITEMS->slots[1].id = D_001A7398[1];
+            HERO_ITEMS->slots[1].id = g_menu_choice_table[1];
         if (!HERO_ITEMS->slots[1].id)
             HERO_ITEMS->slots[1].id = 52;
         moby = CreateMoby(ITEM_DEF(HERO_ITEMS->slots[1].id)->object);
@@ -245,7 +245,7 @@ void func_PAL_L00_002AFAE8(void)
         }
     }
 
-    if (!HERO_ITEMS->slots[4].moby && D_001A7A00[0xFD]) {
+    if (!HERO_ITEMS->slots[4].moby && g_player_stats[0xFD]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(5)->object);
@@ -260,7 +260,7 @@ void func_PAL_L00_002AFAE8(void)
             HERO_ITEMS->slots[4].state = 2;
         }
     }
-    if (!HERO_ITEMS->slots[4].other && D_001A7A00[0x12A]) {
+    if (!HERO_ITEMS->slots[4].other && g_player_stats[0x12A]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(50)->object);
@@ -273,7 +273,7 @@ void func_PAL_L00_002AFAE8(void)
             HERO_ITEMS->slots[4].state = 2;
         }
     }
-    if (!HERO_ITEMS->slots[4].extra && D_001A7A00[0xFF]) {
+    if (!HERO_ITEMS->slots[4].extra && g_player_stats[0xFF]) {
         HeroItemMoby *slotMoby;
 
         slotMoby = CreateMoby(ITEM_DEF(7)->object);

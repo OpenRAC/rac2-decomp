@@ -17,9 +17,9 @@ typedef struct Node {
     s16 fAA;
 } Node;
 
-extern int D_L13_001A8F00 __attribute__((sda));
-extern int D_001BD5F0 __attribute__((nosda));
-extern Node *D_L13_001B2928[1] __attribute__((sda));
+extern int g_level_progress_state __attribute__((sda));
+extern int g_level_state_word __attribute__((nosda));
+extern Node *g_flag_node_list_head[1] __attribute__((sda));
 
 /* state 0 starts the effect, state 1 flags every live node of four ids */
 /* Starts an effect, then in state 1 marks every live object of four kinds with a flag while the level is in a special mode. */
@@ -32,8 +32,8 @@ void flag_nodes_effect_update(u8 *moby) {
         moby[0x20] = 1;
         break;
     case 1:
-        if (D_L13_001A8F00 == 2 && D_001BD5F0 == 3) {
-            for (node = D_L13_001B2928[0]; node != 0; node = node->next) {
+        if (g_level_progress_state == 2 && g_level_state_word == 3) {
+            for (node = g_flag_node_list_head[0]; node != 0; node = node->next) {
                 s16 class_id = node->fAA;
 
                 if (class_id == 0x1F4 || class_id == 0xEA3 || class_id == 0xEA4 || class_id == 0x11EB) {

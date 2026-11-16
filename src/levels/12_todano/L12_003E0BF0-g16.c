@@ -1,9 +1,9 @@
 #include "common.h"
 extern int g_current_map_index MACRO_ADDR;
-extern u8 D_0019B2E8[];
-extern float D_L12_001B0A20 __attribute__((sda));
-extern float D_L12_001B0A24 __attribute__((sda));
-extern float D_L12_001B0A30[4] __attribute__((sda));
+extern u8 g_moby_group_flags[];
+extern float g_squirrel_speed_limit_a __attribute__((sda));
+extern float g_squirrel_speed_limit_b __attribute__((sda));
+extern float g_squirrel_vec[4] __attribute__((sda));
 typedef struct TodanoPlayerView { u8 pad[0x80]; float position[4]; } TodanoPlayerView;
 extern TodanoPlayerView g_hero_state;
 extern u8 *g_hero_moby NOT_SDA;
@@ -53,7 +53,7 @@ void mutant_squirrel_update(u8 *moby) {
             moby[0x31]=0;
 
         }
-        if(D_0019B2E8[moby[0xB0]+(g_current_map_index<<4)]&0x80) {
+        if(g_moby_group_flags[moby[0xB0]+(g_current_map_index<<4)]&0x80) {
             if(*(int *)(vars+0x13C)==-1) {
                 moby_set_state(moby,1,0);
                 if(moby[0x43]) anim_start_blended(moby,0,0,0);
@@ -70,7 +70,7 @@ void mutant_squirrel_update(u8 *moby) {
         }
         break; }
     case 0:
-        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.001111111138f,D_L12_001B0A20*0.0166666675359f,0.0008726647356525064f,0.104719772935f);
+        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.001111111138f,g_squirrel_speed_limit_a*0.0166666675359f,0.0008726647356525064f,0.104719772935f);
         if(*(short *)(vars+0x364)==1) {
             moby_set_state(moby,5,2);
             if(moby[0x43]!=2) anim_start_blended(moby,2,0,10);
@@ -82,7 +82,7 @@ void mutant_squirrel_update(u8 *moby) {
         }
         break;
     case 1:
-        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
+        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.003333333414f,g_squirrel_speed_limit_b*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
         if(*(short *)(vars+0x364)==1) {
             moby_set_state(moby,6,2);
             if(moby[0x43]!=7) anim_start_blended(moby,7,0,10);
@@ -92,7 +92,7 @@ void mutant_squirrel_update(u8 *moby) {
         }
         break;
     case 2:
-        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
+        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.003333333414f,g_squirrel_speed_limit_b*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
         if(*(short *)(vars+0x364)!=1) {
             moby_set_state(moby,3,1);
             if(moby[0x43]!=3) anim_start_blended(moby,3,0,20);
@@ -128,7 +128,7 @@ void mutant_squirrel_update(u8 *moby) {
         }
         break; }
     case 4:
-        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.004444444552f,D_L12_001B0A24*0.0166666675359f,0.0034906589426100254f,0.20943954587f);
+        if(flag_set_second_pending(moby)) moby_set_controller_speed_limits(moby,0.004444444552f,g_squirrel_speed_limit_b*0.0166666675359f,0.0034906589426100254f,0.20943954587f);
         break;
     }
     switch(moby[0x20]) {
@@ -217,7 +217,7 @@ void mutant_squirrel_update(u8 *moby) {
             anim_time=moby_get_anim_value(moby);
             if(11.0f<=anim_time) {
                 int release=1;
-                matrix_mul_vec3(temp,D_L12_001B0A30,moby+0xC0);
+                matrix_mul_vec3(temp,g_squirrel_vec,moby+0xC0);
                 FastVecAdd(temp,temp,moby+0x10);
                 if(!(14.0f<=anim_time)) release=0;
                 sub_object_start_move(*(u8 **)(vars+0x374),temp,moby+0xF0,release);

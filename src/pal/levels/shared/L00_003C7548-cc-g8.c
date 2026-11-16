@@ -23,7 +23,7 @@ extern char g_weapon_l00_table[];
 
 /* A float in the boot's small data: the sda attribute and this unit's -G8 make the
    reference to it $gp-relative, the way retail has it. */
-extern float D_001AFF08 __attribute__((sda));
+extern float g_moby_fire_shot_extra __attribute__((sda));
 
 extern void vec_scale_to_length(void *a0, void *a1, float f);
 
@@ -71,7 +71,7 @@ void func_PAL_L00_003C7548(char *a0, char *a1)
         vec_compute_object_to_target(mode, a1, scratch, f20);
 
     f0 = FastVecLength(scratch);
-    f14 = D_001AFF08;
+    f14 = g_moby_fire_shot_extra;
     v = func_PAL_L00_003AD088(a1, scratch, a0, 0, f0, f21, f14);
     *(int *)ctx = (int)v;
     if (v != 0) {

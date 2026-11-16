@@ -5,7 +5,7 @@ extern float math_step_value_toward_target(char *, char *, float, float, float, 
 extern int math_blend_scaled_count(char *, char *, int, int, float, float);
 extern void FastVecScale(char *, char *, float);
 
-void func_PAL_L06_0045F1F0(char *a0, char *a1, float f, float g, float h)
+void actor_apply_fall_move_pal(char *a0, char *a1, float f, float g, float h)
 {
     char buf[16];
     char *q = a1;

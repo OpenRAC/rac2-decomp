@@ -7,7 +7,7 @@ extern int PlayMobySound(s32, s32, u8 *);
 extern f32 math_approach_target_with_direction_mode(f32 *, f32, u8 *, f32, f32, f32, s32);
 extern void moby_set_state(u8 *, s32, s32);
 
-void func_PAL_L13_003F3F88(u8 *a0) {
+void swinging_update_pal(u8 *a0) {
     u8 *vars = *(u8 **)(a0 + 0x68);
     u16 counter;
     s32 next_counter;

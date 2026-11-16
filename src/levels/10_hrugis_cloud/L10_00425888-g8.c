@@ -11,7 +11,7 @@
    and the absolute macro form of the same address (D_L10_001B1390_4). */
 extern s32 g_mission_completion_counts __attribute__((sda));
 extern s32 D_L10_001B1390_4[] MACRO_ADDR;
-extern u8 D_L10_001395B8[];
+extern u8 g_mission_save_block[];
 
 void mission_store_completion_counts(void) {
     if (g_mission_completion_counts > 0x7F) g_mission_completion_counts = 0x7F;
@@ -19,8 +19,8 @@ void mission_store_completion_counts(void) {
     if (D_L10_001B1390_4[2] > 0x7F) D_L10_001B1390_4[2] = 0x7F;
     if (D_L10_001B1390_4[3] > 0x7F) D_L10_001B1390_4[3] = 0x7F;
 
-    D_L10_001395B8[0x66] = g_mission_completion_counts;
-    D_L10_001395B8[0x67] = D_L10_001B1390_4[1];
-    D_L10_001395B8[0x68] = D_L10_001B1390_4[2];
-    D_L10_001395B8[0x69] = D_L10_001B1390_4[3];
+    g_mission_save_block[0x66] = g_mission_completion_counts;
+    g_mission_save_block[0x67] = D_L10_001B1390_4[1];
+    g_mission_save_block[0x68] = D_L10_001B1390_4[2];
+    g_mission_save_block[0x69] = D_L10_001B1390_4[3];
 }

@@ -37,15 +37,15 @@ extern char g_hero_state[];
 extern u8 g_item_slot_to_record[];
 extern u8 g_sound_state[];
 extern LevelClass g_weapon_l00_table[];
-extern CamMode D_L00_0025D990[];
+extern CamMode g_hero_l00_action_table[];
 extern CollResult g_collision_result __attribute__((aligned(16)));
 extern char *g_area_hit_targets __attribute__((nosda));
-extern int D_001A72C0;
+extern int g_current_weapon_channel;
 extern void hud_add_moby_marker(void *, int, int, int, int, int, float, float, float);
 extern void ref_L00_0038BF18_00(void *, void *);
 extern void UpdateTrailStrips(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_L00_0038E7D0(char *);
+extern void weapon_sync_anim_to_hero_pal(char *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
@@ -63,7 +63,7 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern int GetCollHitMaterial(void);
 extern int moby_is_missing_or_class_502(char *);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L00_0038EB58(char *);
+extern void part_spawn_weapon_impact_sparks_pal(char *);
 extern void part_queue_impact_effect(void *, void *, int, void *, void *, float);
 extern int math_is_below_plane_within_depth(float);
 extern void hero_apply_mode_transform_reversed(void *, void *, float);
@@ -78,7 +78,7 @@ extern void mat_apply_offset_to_object(void *, float, float, float);
 extern int math_fast_float_d(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float ApproachValue(float *, float, float);
-extern void func_PAL_L00_0038EDD8(char *);
+extern void moby_trigger_nearby_response_pal(char *);
 extern void func_PAL_L00_002D29D0(int);
 extern void snd_stop_voice(int);
 extern int hero_play_sound(int, int);
@@ -86,9 +86,9 @@ extern void level_release_slot_list(void *);
 extern int moby_is_in_special_class_range(char *);
 extern float *moby_get_private_value_0(char *);
 extern void LerpVector4(void *, void *, void *, float);
-extern void func_PAL_L00_0038E960(void *, int);
+extern void part_l00_spawn_spark_pairs_pal(void *, int);
 
-void func_PAL_L00_0038EFF0(char *m)
+void wrench_update_pal(char *m)
 {
     f32 vec[8][4] __attribute__((aligned(16)));
     char *pv;
@@ -133,7 +133,7 @@ void func_PAL_L00_0038EFF0(char *m)
         if (pv != 0 && *(f32 *)(pv + 0x70) != 0.0f) {
             ref_L00_0038BF18_00(UpdateTrailStrips, m);
         }
-        if (D_001A72C0 == 0) {
+        if (g_current_weapon_channel == 0) {
             *(u16 *)(m + 0x34) &= ~0x10;
         } else {
             *(u32 *)(m + 0x78) = 0x80909090;
@@ -163,7 +163,7 @@ void func_PAL_L00_0038EFF0(char *m)
             && *(u8 *)(m + 0x43) != 1) {
             func_PAL_002A7E68(m, 1, 0, 4);
         }
-        func_PAL_L00_0038E7D0(m);
+        weapon_sync_anim_to_hero_pal(m);
         if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x13 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x20 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A
             && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6D && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x14
             && *(u8 *)(m + 0x43) >= 3 && *(u8 *)(m + 0x43) < 6) {
@@ -174,7 +174,7 @@ void func_PAL_L00_0038EFF0(char *m)
             *(u16 *)(pv + 0x74) += 1;
         }
         *(f32 *)(m + 0x48) = ((Hero *)g_hero_state)->f[0xC20 / 4];
-        cm = &D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]];
+        cm = &g_hero_l00_action_table[((Hero *)g_hero_state)->h[0xBFC / 2]];
         if (((Hero *)g_hero_state)->i[0x229C / 4] != 6 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A) {
             return;
         }
@@ -221,7 +221,7 @@ void func_PAL_L00_0038EFF0(char *m)
         moby_transform_joint_to_world(((Hero *)g_hero_state)->ptr[0x2290 / 4], 0, &((Hero *)g_hero_state)->b[0xB60]);
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x13 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6D || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2A) {
             yaw = mat_fast_helper_a(((Hero *)g_hero_state)->f[0xB70 / 4] - ((Hero *)g_hero_state)->f[0x80 / 4], ((Hero *)g_hero_state)->f[0xB74 / 4] - ((Hero *)g_hero_state)->f[0x84 / 4]);
-            if (D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]].i4 == 1) {
+            if (g_hero_l00_action_table[((Hero *)g_hero_state)->h[0xBFC / 2]].i4 == 1) {
                 yaw = FastAddRotations(yaw, -1.57079649f);
             } else {
                 yaw = FastAddRotations(yaw, 1.57079649f);
@@ -256,7 +256,7 @@ void func_PAL_L00_0038EFF0(char *m)
                     && (g_collision_result.moby == 0 || moby_is_missing_or_class_502(g_collision_result.moby) != 0)) {
                     ((Hero *)g_hero_state)->h[0xBFE / 2] = 1;
                     PlayMobySound(2, 0, m);
-                    func_PAL_L00_0038EB58(m);
+                    part_spawn_weapon_impact_sparks_pal(m);
                     if (g_collision_result.moby != 0) {
                         if (((Hero *)g_hero_state)->b[0x22C3] == 0) {
                             vec[3][0] = math_fast_sin_or_cos_a(yaw);
@@ -276,7 +276,7 @@ void func_PAL_L00_0038EFF0(char *m)
                 hero_apply_mode_transform_reversed(vec[0], vec[0], 0.7f);
                 hero_apply_mode_transform_reversed(vec[1], vec[1], -0.9f);
                 if (CollLine(vec[0], vec[1], 2, 0, 0) != 0) {
-                    func_PAL_L00_0038EB58(m);
+                    part_spawn_weapon_impact_sparks_pal(m);
                 }
             }
         }
@@ -309,7 +309,7 @@ void func_PAL_L00_0038EFF0(char *m)
                     || *(s16 *)(*(char **)(g_collision_result.moby + 0x24) + 0x46) != 0x14)) {
                 ((Hero *)g_hero_state)->h[0xBFE / 2] = 1;
                 PlayMobySound(record_is_current_byte_one(), 0, m);
-                func_PAL_L00_0038EB58(m);
+                part_spawn_weapon_impact_sparks_pal(m);
             }
             FastVecSub(vec[5], &((Hero *)g_hero_state)->b[0xB70], &((Hero *)g_hero_state)->b[0xB60]);
             vec_scale_to_length(vec[5], vec[5], FastVecLength(vec[5]) - 0.085f);
@@ -336,7 +336,7 @@ void func_PAL_L00_0038EFF0(char *m)
             }
             ((Hero *)g_hero_state)->h[0xBFE / 2] = 1;
             PlayMobySound(record_is_current_byte_one(), 0, m);
-            func_PAL_L00_0038EB58(m);
+            part_spawn_weapon_impact_sparks_pal(m);
         }
         break;
     case 10:
@@ -384,7 +384,7 @@ void func_PAL_L00_0038EFF0(char *m)
             FastVecScale(vec[1], vec[1], 0.98f);
             done = 0;
             FastVecAdd(pos, pos, vec[1]);
-            func_PAL_L00_0038EDD8(m);
+            moby_trigger_nearby_response_pal(m);
             FastVecSub(vec[1], &((Hero *)g_hero_state)->b[0x1200], pos);
             *(f32 *)(pv + 0x64) = *(f32 *)(pv + 0x64) + 0.00036f;
             *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) + *(f32 *)(pv + 0x64);
@@ -442,7 +442,7 @@ void func_PAL_L00_0038EFF0(char *m)
                 PlayMobySound(2, 0, m);
             }
             if (*(u8 *)(m + 0x20) == 10) {
-                func_PAL_L00_0038EB58(m);
+                part_spawn_weapon_impact_sparks_pal(m);
                 *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) * 0.5f;
                 *(u8 *)(m + 0x20) = 11;
             }
@@ -472,7 +472,7 @@ void func_PAL_L00_0038EFF0(char *m)
                 if (r == 0 || *(s16 *)((char *)r + 0x1C) == 0 || *(char **)((char *)r + 0x18) != m) {
                     *(TI128 *)vec[7] = *(TI128 *)(g_collision_result.moby + 0x10);
                     LerpVector4(vec[6], vec[5], vec[7], 0.5f);
-                    func_PAL_L00_0038E960(vec[6], 5);
+                    part_l00_spawn_spark_pairs_pal(vec[6], 5);
                     *(int *)(pv + 0x6C) = 0x19;
                     ((Hero *)g_hero_state)->h[0xBFE / 2] = 1;
                     PlayMobySound(record_is_current_byte_one(), 0, m);

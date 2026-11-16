@@ -1,10 +1,10 @@
 #include "include_asm.h"
 #include "names.h"
-extern char *D_001A8CFC;
+extern char *g_resident_data_base;
 extern int info_panel_update(void *, int);
 
 int func_US2_0029D248(int value) {
-    if (D_001A8CFC != 0)
-        return info_panel_update(D_001A8CFC + 0x3BA58, value);
+    if (g_resident_data_base != 0)
+        return info_panel_update(g_resident_data_base + 0x3BA58, value);
     return 0;
 }

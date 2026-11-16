@@ -6,23 +6,23 @@ extern void *D_0026CBE0[];
 extern int g_current_game_mode;
 extern int g_previous_game_mode;
 extern int g_requested_game_mode;
-extern int D_0018C2EC __attribute__((nosda));
-extern int D_001AA0F4 __attribute__((sda));
-extern int D_001AA0F8 __attribute__((sda));
-extern int D_001AA0FC __attribute__((sda));
-extern char *D_001AA104 __attribute__((sda));
-extern float D_001A8C7C;
+extern int g_request_enabled_flag __attribute__((nosda));
+extern int g_requested_setting_b __attribute__((sda));
+extern int g_pending_mode_arg_a __attribute__((sda));
+extern int g_pending_mode_arg_b __attribute__((sda));
+extern char *g_pending_mode_done_flag __attribute__((sda));
+extern float g_mode_fade_scale;
 extern float g_screen_fade;
-extern int D_001B1694;
-extern float D_001B90F0 __attribute__((nosda));
-extern int D_001ABD80;
+extern int g_mode_change_flag;
+extern float g_fov_tangent __attribute__((nosda));
+extern int g_moby_hide_mode_a;
 extern void func_PAL_002CB5D0(void);
 extern void menu_end(void);
 extern void mpeg_resume_after_movie(void);
-extern void func_PAL_002F66F8(void);
+extern void cutscene_end_pal(void);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void UpdateViewContext(void);
-extern void func_PAL_002E8030(void);
+extern void scene_end_playback_pal(void);
 extern void func_PAL_002F96D8(void);
 extern void moby_show_all(void);
 extern void func_PAL_00300300(void);
@@ -34,12 +34,12 @@ extern void func_PAL_002CAAF0(int);
 extern void menu_set_mode(int, int);
 extern void mpeg_start_movie_from_toc(int);
 extern float ApproachValue(float *, float, float);
-extern void func_PAL_002F6318(int);
+extern void cutscene_start_pal(int);
 extern void data_set_small_value_and_refresh(int, int);
 extern void scene_init_playback_state(void);
 extern void scene_init_list(int);
-extern void func_PAL_002E7E00(void);
-extern void func_PAL_002F90E8(int);
+extern void scene_reset_state_on_start_pal(void);
+extern void OpenVendorMenu_pal(int);
 extern void moby_hide_all(int, int);
 extern void func_PAL_00300130(void);
 extern void func_PAL_00291A20(void);
@@ -62,17 +62,17 @@ void func_PAL_002B57D0(void)
     g_previous_game_mode = mode;
     if (g_requested_game_mode == -2)
         return;
-    if (D_001AA0F4 > 0) {
-        D_001AA0F4--;
+    if (g_requested_setting_b > 0) {
+        g_requested_setting_b--;
         return;
     }
-    if (D_0018C2EC == 0)
+    if (g_request_enabled_flag == 0)
         return;
     if ((unsigned)mode >= 10)
         goto L1_def;
     goto *D_0026CBB0[mode];
 L1_3:
-    if (g_requested_game_mode != 4 || D_001AA0F8 == 8)
+    if (g_requested_game_mode != 4 || g_pending_mode_arg_a == 8)
         func_PAL_002CB5D0();
     goto E1;
 L1_4:
@@ -82,15 +82,15 @@ L1_1:
     mpeg_resume_after_movie();
     goto shared;
 L1_2:
-    func_PAL_002F66F8();
+    cutscene_end_pal();
 shared:
-    D_001B90F0 = 0.62f;
+    g_fov_tangent = 0.62f;
     cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
     UpdateViewContext();
     goto E1;
 L1_6:
-    if (D_001AA0F8 != 4)
-        func_PAL_002E8030();
+    if (g_pending_mode_arg_a != 4)
+        scene_end_playback_pal();
     goto E1;
 L1_5:
     func_PAL_002F96D8();
@@ -116,56 +116,56 @@ E1:
     goto *D_0026CBE0[sel];
 L2_3:
     if (g_previous_game_mode != 4 || menu_get_mode() == 8)
-        func_PAL_002CAAF0(D_001AA0F8);
+        func_PAL_002CAAF0(g_pending_mode_arg_a);
 L2_0:
     hold = 0;
     goto E2;
 L2_4:
-    menu_set_mode(D_001AA0F8, D_001AA0FC);
+    menu_set_mode(g_pending_mode_arg_a, g_pending_mode_arg_b);
     goto E2;
 L2_1:
-    mpeg_start_movie_from_toc(D_001AA0FC);
+    mpeg_start_movie_from_toc(g_pending_mode_arg_b);
     hold = 0;
     goto E2;
 L2_2:
     if ((unsigned)(g_current_game_mode - 1) >= 2) {
         float f;
-        ApproachValue(&D_001A8C7C, 1.4f, 0.120000005f);
-        f = D_001A8C7C;
+        ApproachValue(&g_mode_fade_scale, 1.4f, 0.120000005f);
+        f = g_mode_fade_scale;
         g_screen_fade = f;
         if (1.0f < f)
             g_screen_fade = 1.0f;
         if (1.4f <= f) {
             hold = 0;
-            D_001A8C7C = 1.0f;
-            func_PAL_002F6318(D_001AA0F8);
+            g_mode_fade_scale = 1.0f;
+            cutscene_start_pal(g_pending_mode_arg_a);
         } else {
             hold = 1;
         }
     } else {
-        func_PAL_002F6318(D_001AA0F8);
+        cutscene_start_pal(g_pending_mode_arg_a);
     }
     goto E2;
 L2_6:
-    if (D_001AA0F8 == 5) {
-        data_set_small_value_and_refresh(D_001AA0FC, 1);
-    } else if (D_001AA0F8 == 6) {
+    if (g_pending_mode_arg_a == 5) {
+        data_set_small_value_and_refresh(g_pending_mode_arg_b, 1);
+    } else if (g_pending_mode_arg_a == 6) {
         scene_init_playback_state();
     } else {
         if (g_previous_game_mode == 3)
-            scene_init_list(D_001AA0FC);
+            scene_init_list(g_pending_mode_arg_b);
         else
-            func_PAL_002E7E00();
-        D_001B1694 = 1;
+            scene_reset_state_on_start_pal();
+        g_mode_change_flag = 1;
     }
     goto E2;
 L2_5:
-    func_PAL_002F90E8(D_001AA0F8);
+    OpenVendorMenu_pal(g_pending_mode_arg_a);
     goto E2;
 L2_7:
     {
-        int fallback = D_001ABD80;
-        moby_hide_all(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
+        int fallback = g_moby_hide_mode_a;
+        moby_hide_all(g_pending_mode_arg_a ? g_pending_mode_arg_a : fallback, g_pending_mode_arg_b);
     }
     goto E2;
 L2_8:
@@ -179,12 +179,12 @@ L2_def:
 E2:
     if (hold == 0) {
         int state;
-        if (D_001AA104 != 0)
-            *D_001AA104 = 1;
+        if (g_pending_mode_done_flag != 0)
+            *g_pending_mode_done_flag = 1;
         state = g_requested_game_mode;
         g_requested_game_mode = -2;
         g_current_game_mode = state;
-        D_001AA104 = 0;
+        g_pending_mode_done_flag = 0;
     }
 }
 
@@ -216,7 +216,7 @@ typedef struct {
     char pad8[0xCC - 0xC4];
     float fCC;                           
 } Ctl_002B52A0;
-extern float D_001AA108 __attribute__((sda));
+extern float g_controller_velocity_limit __attribute__((sda));
 extern float math_approach_target_with_direction_mode(void *, float, void *, int, float, float, float);
 extern float FastDiffRots(float, float);
 extern void vec_clear_128(void *);
@@ -234,7 +234,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float vec_length_xy(void *);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 
-void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x)
+void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x)
 {
     float local[4] __attribute__((aligned(16)));
     float local2[4] __attribute__((aligned(16)));
@@ -261,10 +261,10 @@ void func_PAL_002B5E58(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, flo
             if (ctl->w80 != 0) {
                 x = FastAddRotations(mat_fast_helper_a(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
                 h = fast_subtract_rotations(h, x);
-                if (D_001AA108 < h)
-                    h = D_001AA108;
-                else if (h < -D_001AA108)
-                    h = -D_001AA108;
+                if (g_controller_velocity_limit < h)
+                    h = g_controller_velocity_limit;
+                else if (h < -g_controller_velocity_limit)
+                    h = -g_controller_velocity_limit;
                 h = FastAddRotations(h, x);
             }
             local[0] = math_fast_sin_or_cos_a(h) * scale;

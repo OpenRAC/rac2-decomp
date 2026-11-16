@@ -25,7 +25,7 @@ extern int g_race_time_ticks;
 
 /* Updates the record's flag from the two point tests, prints the message when the
    record has one and its counter runs, then advances the counter and the value. */
-void func_PAL_L04_00408930(void *a0, L04_004044B8_Record *s0)
+void racer_update_checkpoint_progress_pal(void *a0, L04_004044B8_Record *s0)
 {
     char *s1 = (char *)a0 + 0x10;
     int v;

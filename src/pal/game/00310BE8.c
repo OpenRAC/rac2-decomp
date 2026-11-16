@@ -2,14 +2,14 @@
 #include "names.h"
 
 
-extern unsigned char D_0018C0DF;
+extern unsigned char g_swingshot_peer_flag;
 extern int D_L00_002A27F0[];
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_mark_spawned(void *);
 extern void func_002A10E8(void *);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_00311E78(unsigned char *self)
+void swingshot_hook_update_pal(unsigned char *self)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     unsigned char *peer;
@@ -25,7 +25,7 @@ void func_PAL_00311E78(unsigned char *self)
     if (peer == 0 || *(short *)(peer + 0xAA) != 0xD0 || peer[0x20] == 0xFE ||
         peer[0x20] == 0xFD || *(unsigned char **)(*(unsigned char **)(peer + 0x68) + 0x14) != self)
         goto destroy;
-    if ((*(unsigned short *)(peer + 0x34) & 1) || D_0018C0DF != 0)
+    if ((*(unsigned short *)(peer + 0x34) & 1) || g_swingshot_peer_flag != 0)
         *(unsigned short *)(self + 0x34) |= 0x41;
     else
         *(unsigned short *)(self + 0x34) &= 0xFFBE;
@@ -96,21 +96,21 @@ finish:
     func_002A10E8(self);
 }
 
-extern char *D_001AD7EC __attribute__((sda));
-extern float D_001B1690[] __attribute__((sda));
+extern char *g_turret_target_moby __attribute__((sda));
+extern float g_tick_time_scale[] __attribute__((sda));
 extern void moby_carry_with_surface(char *, char *);
 extern int cam_moby_update(unsigned char *);
 extern int math_random_int_below(int);
 extern void moby_set_state(unsigned char *, unsigned char, int);
 
-void func_PAL_003120C0(unsigned char *self)
+void moby_fade_out_update_pal(unsigned char *self)
 {
-    if (D_001AD7EC != 0)
-        moby_carry_with_surface((char *)self, D_001AD7EC);
+    if (g_turret_target_moby != 0)
+        moby_carry_with_surface((char *)self, g_turret_target_moby);
     switch (self[0x20]) {
     case 0:
         if (cam_moby_update(self) != 0 ||
-            (D_001B1690[0] > 0.949999988079071044921875f && math_random_int_below(10) == 0)) {
+            (g_tick_time_scale[0] > 0.949999988079071044921875f && math_random_int_below(10) == 0)) {
             moby_set_state(self, 1, -1);
             *(unsigned short *)(self + 0x34) |= 0x2800;
         }

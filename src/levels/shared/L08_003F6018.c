@@ -8,9 +8,9 @@ extern void STUB_printf(const char *format, ...);
 extern void update_moby_animation_state(u8 *object);
 extern void hero_copy_field_to_moby(u8 *object);
 extern void func_002A0F48(u8 *object);
-extern char D_L08_001B0B68[];
-extern char D_L08_001B0BA8[];
-extern int D_L08_001B2508 MACRO_ADDR;
+extern char g_str_pool_alloc_child_debug[];
+extern char g_str_pool_alloc_owner_debug[];
+extern int g_frame_l08_counter MACRO_ADDR;
 
 /* Bounded view of the owner's two pool slots and their status bytes. */
 typedef struct {
@@ -75,7 +75,7 @@ u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
         if (head_part != 0)
             *(SpawnQuad *)(head_part + 0x80) = *(SpawnQuad *)direction;
         else
-            STUB_printf(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
+            STUB_printf(g_str_pool_alloc_child_debug, *(short *)(child + 0xaa), *(short *)(child + 0xb2), g_frame_l08_counter);
         if (vars->smallScale)
             *(float *)(child + 0x2c) = *(float *)(*(u8 **)(child + 0x24) + 0x24) * 0.1f;
         if (*(short *)(owner + 0xb4) < *(short *)(child + 0xb4))
@@ -100,6 +100,6 @@ u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
         }
         return result;
     }
-    STUB_printf(D_L08_001B0BA8, *(short *)(owner + 0xb2), D_L08_001B2508);
+    STUB_printf(g_str_pool_alloc_owner_debug, *(short *)(owner + 0xb2), g_frame_l08_counter);
     return 0;
 }

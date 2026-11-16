@@ -18,21 +18,21 @@ extern void cam_mode_noop(void *);
 extern void swingshot_nodes_update_attached(void *);
 extern void path_upload_points_to_world(void *,s32);
 extern void moby_build_matrix(void *);
-extern void func_PAL_L07_00414008(void *);
+extern void ship_update_attached_parts_pal(void *);
 extern void vec_transform_by_object_or_given(void *,void *,void *,s32);
-extern void func_PAL_L00_002B3000(void);
-extern s32 *D_L07_001FDEC0[];
-extern u8 *D_L07_001ADAAC MACRO_ADDR;
+extern void hero_record_play_counters_pal(void);
+extern s32 *g_path_l07_table[];
+extern u8 *g_snowfall_target_moby MACRO_ADDR;
 extern u8 g_sound_state[];
-extern u8 D_001886F0[];
-extern u8 D_L07_001B9200[];
-extern f32 D_L07_001B1784 __attribute__((sda));
-extern f32 D_L07_001B1788 __attribute__((sda));
-extern f32 D_L07_001B1708 __attribute__((sda));
+extern u8 g_ship_sound_table[];
+extern u8 g_hero_position_block[];
+extern f32 g_ship_rider_height_step __attribute__((sda));
+extern f32 g_ship_rider_turn_step __attribute__((sda));
+extern f32 g_ship_rider_bend __attribute__((sda));
 typedef struct {u8 pad[0x80];f32 pos[4];u8 rest[0x31c-0x90];f32 health;u8 pad320[0x33c-0x320];s32 mode;u8 pad340[0x3a0-0x340];u8 *object;} Player;
 extern Player g_hero_state;
 typedef struct {u8 pad[0xe0];f32 pathpos[5];u8 *objects[5];u8 pad108[0x1a0-0x108];f32 target;f32 speed;} State;
-void func_PAL_L07_00413B40(u8 *obj)
+void ship_move_riders_along_path_pal(u8 *obj)
 {
  f32 oldpos[4],oldrot[4],delta[4],relative[4];
  s32 j,id;
@@ -42,15 +42,15 @@ void func_PAL_L07_00413B40(u8 *obj)
  s32 pathid=*(s32 *)(p+0x90);
  s32 *path;
  State *ps=(State *)p;
- D_L07_001ADAAC=0;
- path=D_L07_001FDEC0[pathid];
+ g_snowfall_target_moby=0;
+ path=g_path_l07_table[pathid];
  target=ps->target;
  speed=ps->speed;
  ApproachValue(p+0x11c,target,speed);
  sound=g_sound_state+*(s32 *)(p+0x1ac)*0x70;
  if(*(u8 **)(sound+0x88)!=obj || !sound[0x74]) *(s32 *)(p+0x1ac)=PlayMobySound(2,12,obj);
  id=*(s32 *)(p+0x1ac);
- if(id!=-1) qcopy(D_001886F0+id*0x70,D_L07_001B9200);
+ if(id!=-1) qcopy(g_ship_sound_table+id*0x70,g_hero_position_block);
  {
  s32 i;
  for(i=0;i<5;i++) {
@@ -59,31 +59,31 @@ void func_PAL_L07_00413B40(u8 *obj)
   qcopy_nc(oldpos,child+0x10);
   qcopy_nc(oldrot,child+0xf0);
   path_sample_position(path,1,child+0x10,child+0xf0,0,ps->pathpos[i]);
-  bend=D_L07_001B1708;
-  *(f32 *)(child+0x18)+=D_L07_001B1784;
+  bend=g_ship_rider_bend;
+  *(f32 *)(child+0x18)+=g_ship_rider_height_step;
   path_compute_heading_and_tilt(path,ps->pathpos[i],child+0xf0,bend);
   func_002A0F48(child);
   ps->pathpos[i]+=*(f32 *)(p+0x11c);
   if(ps->pathpos[i]>=(f32)path[0]) ps->pathpos[i]-=(f32)path[0];
-  step=D_L07_001B1788*0.0003490659f;
+  step=g_ship_rider_turn_step*0.0003490659f;
   for(j=0;j<8;j++) *(f32 *)(state+0x15b4+j*0x20)=FastAddRotations(*(f32 *)(state+0x15b4+j*0x20),step);
   FastVecSub(delta,child+0x10,oldpos);
   mat_combine_and_store(state+0x20,delta,oldrot,child+0xf0);
   if(g_hero_state.object==child || (*(u8 **)(state+0x108) && g_hero_state.object==*(u8 **)(state+0x108)) || (*(u8 **)(state+0x10c) && g_hero_state.object==*(u8 **)(state+0x10c))) {
-   D_L07_001ADAAC=child;
+   g_snowfall_target_moby=child;
    snow_emitter_update_effect(ps->pathpos[i]);
   }
   cam_mode_noop(child);
   swingshot_nodes_update_attached(child);
   path_upload_points_to_world(child,i);
   moby_build_matrix(child);
-  if(*(s16 *)(child+0xaa)==0x11d9 || *(s16 *)(child+0xaa)==0x11db) func_PAL_L07_00414008(child);
-  if(D_L07_001ADAAC) {
-   FastVecSub(relative,g_hero_state.pos,D_L07_001ADAAC+0x10);
-   vec_transform_by_object_or_given(D_L07_001ADAAC,relative,relative,0);
-   if(relative[2]<-3.0f && g_hero_state.mode==0) func_PAL_L00_002B3000();
+  if(*(s16 *)(child+0xaa)==0x11d9 || *(s16 *)(child+0xaa)==0x11db) ship_update_attached_parts_pal(child);
+  if(g_snowfall_target_moby) {
+   FastVecSub(relative,g_hero_state.pos,g_snowfall_target_moby+0x10);
+   vec_transform_by_object_or_given(g_snowfall_target_moby,relative,relative,0);
+   if(relative[2]<-3.0f && g_hero_state.mode==0) hero_record_play_counters_pal();
   }
-  if(g_hero_state.mode==0 && g_hero_state.health<1.0f) func_PAL_L00_002B3000();
+  if(g_hero_state.mode==0 && g_hero_state.health<1.0f) hero_record_play_counters_pal();
  }
 }
 }

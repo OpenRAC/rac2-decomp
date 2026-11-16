@@ -20,20 +20,20 @@
 typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
 typedef struct { char pad[0x14]; char *screen; } Screen;
-extern char D_001AB988[], D_001AB990[], D_001AB998[], D_001AB9A0[];
-extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], g_item_slot_to_record[];
-extern unsigned char g_item_owned_flags[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
-extern int D_001C51D0 NOT_SDA;
+extern char g_str_label_text_a[], g_str_label_text_b[], g_str_two_string_fmt[], g_str_label_text_c[];
+extern unsigned char g_font_glyphs_small[], g_font_glyphs_large[], g_font_glyphs_medium[], g_item_slot_to_record[];
+extern unsigned char g_item_owned_flags[] MACRO_ADDR, g_game_flag_table[] MACRO_ADDR, g_item_enabled_flags[] MACRO_ADDR;
+extern int g_selected_map_index NOT_SDA;
 extern int g_is_pal_video[] MACRO_ADDR;
 extern int g_current_map_index __attribute__((sda));
-extern int D_001AA440 __attribute__((sda));
-extern int D_001AB984 __attribute__((sda));
-extern int D_001AB9A8 __attribute__((sda));
-extern int D_001AB974 __attribute__((sda));
-extern int D_001AB9AC __attribute__((sda));
-extern int D_00138320[];
-extern char *D_001F2854 NOT_SDA;
-extern char D_0025A498[];
+extern int g_label_default_color __attribute__((sda));
+extern int g_label_line_height __attribute__((sda));
+extern int g_label_centered_flag __attribute__((sda));
+extern int g_label_origin_y __attribute__((sda));
+extern int g_label_outline_flag __attribute__((sda));
+extern int g_pad_pressed_flags[];
+extern char *g_active_menu_object NOT_SDA;
+extern char g_pause_page_c[];
 extern void VU1_addGSregister(int, long);
 extern int menu_list_active_entries(int *, unsigned int *, int *, int);
 extern int text_find_pair_in_table(short, int, unsigned short *);
@@ -47,8 +47,8 @@ extern void DoGifPaging(void), gfx_disable_screen_flag(void), gfx_enable_screen_
 extern char *GetLocalizedString(int);
 extern void func_PAL_00280A30(void *, long, char *, long, long, unsigned char *);
 extern void func_PAL_002804A8(void *, long, char *, long, long, unsigned char *, float);
-extern char D_PAL_001F2840[];
-extern char D_PAL_0025BF30[];
+extern char g_hud_screen_data[];
+extern char g_hud_screen_default[];
 extern void gfx_draw_box_outline(int, int, int, int, int);
 #define ST (*(char **)(D_001F2854 + 0xE8))
 #define TEXT(id) func_00288FB8(id)
@@ -76,8 +76,8 @@ int func_PAL_002CD520(unsigned char *w) {
     int originY, originX;
     Win win;
     Win tmp;
-    char *text = D_001AB988;
-    unsigned char *glyphs = D_00263B50;
+    char *text = g_str_label_text_a;
+    unsigned char *glyphs = g_font_glyphs_small;
     int font;
     int f0, flags, g, f, content, variant = 0, a21, a23, colour, t, wflags;
     /* func_0027C878's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
@@ -90,11 +90,11 @@ int func_PAL_002CD520(unsigned char *w) {
     f0 = *(int *)(w + 0x30);
     if (f0 & 8) {
         font = 3;
-        glyphs = D_00264290;
+        glyphs = g_font_glyphs_large;
     }
     if (f0 & 0x10) {
         font = 2;
-        glyphs = D_00263EF0;
+        glyphs = g_font_glyphs_medium;
     }
     VU1_addGSregister(0x42, 0x44);
     ((void (*)(int, long))VU1_addGSregister)(0x47, 0x2004B);
@@ -106,10 +106,10 @@ int func_PAL_002CD520(unsigned char *w) {
             content = -1;
         }
     } else if (flags & 0x40) {
-        content = D_001C51D0 - 1;
+        content = g_selected_map_index - 1;
     } else if (flags & 4) {
-        if (*(int *)(w + 0x44) < pal_frames(D_001AA440, 6)) {
-            *(int *)(w + 0x44) = pal_frames(D_001AA440, 6);
+        if (*(int *)(w + 0x44) < pal_frames(g_label_default_color, 6)) {
+            *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
         }
         content = 0;
         *(int *)(w + 0x48) = 0;
@@ -126,7 +126,7 @@ int func_PAL_002CD520(unsigned char *w) {
         if (*(short *)(cell + 4) == 0) {
             id = g_item_owned_flags[*(short *)(cell + 6)];
         } else {
-            id = D_001395B8[*(short *)(cell + 6)];
+            id = g_game_flag_table[*(short *)(cell + 6)];
         }
         if (id == 0) {
             content = -1;
@@ -150,15 +150,15 @@ int func_PAL_002CD520(unsigned char *w) {
     }
 
     if (*(int *)(w + 0x44) == -1) {
-        *(int *)(w + 0x44) = pal_frames(D_001AA440, 6);
+        *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
         *(int *)(w + 0x48) = content;
         *(int *)(w + 0x4C) = variant;
     }
     if (content != *(int *)(w + 0x48)) {
         int fade;
-        t = pal_frames(D_001AA440, 6);
+        t = pal_frames(g_label_default_color, 6);
         if (t < *(int *)(w + 0x44)) {
-            *(int *)(w + 0x44) = pal_frames(D_001AA440, 6);
+            *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
         }
         fade = *(int *)(w + 0x44);
         { int was = fade < 1; fade--; if (was) fade = 0; }
@@ -191,14 +191,14 @@ int func_PAL_002CD520(unsigned char *w) {
         if (*(int *)(w + 0x34) == 0) return 1;
         text = TEXT(*(int *)(w + 0x34));
     } else if ((g & 0x100) && content == -1) {
-        text = D_001AB990;
+        text = g_str_label_text_b;
     } else if (*(int *)(w + 0x34) != 0) {
         unsigned int at = (unsigned int)(content * *(int *)(w + 0x38)) >> 2 << 2;
         char *table = *(char **)(w + 0x34);
         text = TEXT(*(int *)(at + (unsigned int)(table + variant * 4)));
     }
     if ((*(int *)(w + 0x30) & 0x11E4) == 0 && ((unsigned char *)&g_item_owned_flags)[content] == 0) {
-        text = D_001AB990;
+        text = g_str_label_text_b;
     }
     if (*(int *)(w + 0x30) & 0x200) {
         unsigned int at = (unsigned int)(content * *(int *)(w + 0x38)) >> 2 << 2;
@@ -206,7 +206,7 @@ int func_PAL_002CD520(unsigned char *w) {
         int id = *(int *)(at + (unsigned int)table);
         if (id != 0xB4B && id != 0xB52 && id != 0xB56) {
             do { /* FAKEMATCH: loop group weights the text references (allocation priority) */
-            sprintf(buf, D_001AB998, TEXT(0xB44), text);
+            sprintf(buf, g_str_two_string_fmt, TEXT(0xB44), text);
             text = buf;
             } while (0);
         }
@@ -219,12 +219,12 @@ int func_PAL_002CD520(unsigned char *w) {
         if (helpResult < 0) text = TEXT(0x112C);
         a21 += 8;
     }
-    if (*(int *)(w + 0x30) & 0x800) if (D_001A7A60[content] == 0) {
+    if (*(int *)(w + 0x30) & 0x800) if (g_item_enabled_flags[content] == 0) {
         text = TEXT(0xBD1);
         f |= 3;
     }
     if (text == 0) {
-        text = D_001AB9A0;
+        text = g_str_label_text_c;
     }
     do { /* FAKEMATCH: nested loop groups weight the wflags/a23 references (allocation priority) */
     wflags = 8;
@@ -242,7 +242,7 @@ int func_PAL_002CD520(unsigned char *w) {
 
     SetupGifPaging(0);
     tex = GetEffectTextureDescriptor(font);
-    if (SCREEN == D_0025A498 || D_001AB9A8 != 0) { do { originY = a21; do originX = a23 + 1; while (0); } while (0); /* FAKEMATCH: loop groups weight a21/a23 */ } else { originX = 1; originY = D_001AB974; }
+    if (SCREEN == g_pause_page_c || g_label_centered_flag != 0) { do { originY = a21; do originX = a23 + 1; while (0); } while (0); /* FAKEMATCH: loop groups weight a21/a23 */ } else { originX = 1; originY = g_label_origin_y; }
     memset(&tmp, 0, 0x18);
     tmp.s[0] = originY;
     tmp.s[1] = *(unsigned short *)(w + 0x24) + originY;
@@ -250,11 +250,11 @@ int func_PAL_002CD520(unsigned char *w) {
     tmp.s[3] = translated_edge(*(unsigned short *)(w + 0x20), originX - 4);
     tmp.s[4] = a23;
     tmp.s[5] = a21 - (*(int *)(w + 0x3C) >> 4);
-    tmp.s[8] = *(int *)&D_001AB984;
+    tmp.s[8] = *(int *)&g_label_line_height;
     tmp.s[9] = wflags;
     tmp.s[11] = -(*(unsigned short *)(w + 0x3C) & 0xF);
     win = tmp;
-    if (D_001AB9AC) gfx_draw_box_outline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
+    if (g_label_outline_flag) gfx_draw_box_outline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
     if (*(int *)(w + 0x30) & 0x10000) {
         win.s[1] = *(unsigned short *)(w + 0x24) - 1;
     }
@@ -278,7 +278,7 @@ int func_PAL_002CD520(unsigned char *w) {
     id = a21 - id;
     set_anchor(&win, id);
     /* FAKEMATCH: dead shift/unshift on stand-in globals (v1.01 func_002CC6B0's win_shift/win_unshift) */
-    m = D_001AB974; k = D_001AB9A8;
+    m = g_label_origin_y; k = g_label_centered_flag;
     win.s[5] += m; win.s[5] += k; win.s[5] -= m;
     m = *(int *)(w + 0x30);
     set_top(&win, win.s[0]);
@@ -294,22 +294,22 @@ int func_PAL_002CD520(unsigned char *w) {
     }
     if (*(int *)(w + 0x30) & 0x400) {
         /* FAKEMATCH: y holds gap*3 and then the s[0] copy */
-        y = *(int *)&D_001AB984 << 1; y += *(int *)&D_001AB984;
+        y = *(int *)&g_label_line_height << 1; y += *(int *)&g_label_line_height;
         x = (unsigned short)win.s[7] + y;
         y = (unsigned short)win.s[0];
         win.s[0] = y;
         win.s[5] = win.s[5] + x;
         /* FAKEMATCH: second dead shift/unshift pair */
-        m = D_001AB9A8; k = D_001AB974;
+        m = g_label_centered_flag; k = g_label_origin_y;
         win.s[5] += m; win.s[0] += k; win.s[0] -= k; win.s[5] -= m;
         /* FAKEMATCH: dead stand-in values: combine cancels the pairs, the four loads stay until
            reload and hold a2..t1 while the scroll address is live, then flow2 deletes them */
-        { int sa = D_001AB9AC, sb = D_001AA440, sc = g_current_map_index, sd = D_001C51D0;
+        { int sa = g_label_outline_flag, sb = g_label_default_color, sc = g_current_map_index, sd = g_selected_map_index;
         win.s[5] += sa + sb; win.s[5] -= sa + sb; win.s[0] += sc + sd; win.s[0] -= sc + sd; }
         DRAW_SCALED(colour, text);
         if (*(int *)(w + 0x30) & 0x400) {
-            ((LabelSO *)w)->so += (D_00138320[0] & 0xF) == 0xF ? 10 : 3;
-            ((LabelSO *)w)->so %= (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
+            ((LabelSO *)w)->so += (g_pad_pressed_flags[0] & 0xF) == 0xF ? 10 : 3;
+            ((LabelSO *)w)->so %= (win.s[7] + *(int *)&g_label_line_height * 3) << 4;
         }
     }
     DoGifPaging();

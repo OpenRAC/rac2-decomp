@@ -2,10 +2,10 @@
 /* func_US2_L11_00433090, the USA v2.00 copy of func_L11_00431860: the same C, where the
    counter increment is guarded by the release-only D_US2_001A9050 and type 0xed8 is also tested. */
 #include "common.h"
-extern int D_US2_001A9050;
-extern int D_L11_001AED04;
-extern int D_L11_001AED00;
-extern char D_L11_001BA8C0[];
+extern int g_level_event_state;
+extern int g_active_rider_count;
+extern int g_enemy_spawn_enabled;
+extern char g_hero_l11_position[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -27,7 +27,7 @@ void func_US2_L11_00433090(u8 *obj) {
  u8 *d=*(u8 **)(obj+0x68); int state; u8 *p;
  if (!obj[0x20]) {
   float height;
-  if(!D_US2_001A9050) D_L11_001AED04++;
+  if(!g_level_event_state) g_active_rider_count++;
   height=coll_probe_ground_height_below(obj+0x10,0,0.5f);
   *(void **)(d+0x18)=d+0x140;
   *(float *)(obj+0x18)=height;
@@ -51,7 +51,7 @@ void func_US2_L11_00433090(u8 *obj) {
   *(float *)(obj+0x48)=math_random_float_range(0.5f,1.25f);
   if (I(0x2bc)!=-1) moby_set_state(obj,2,-1);
  }
- if(obj[0x31] && fast_vec_dist(obj+0x10,D_L11_001BA8C0)<24.0f) {moby_update_ground_check(obj);obj[0x6f]=22;}
+ if(obj[0x31] && fast_vec_dist(obj+0x10,g_hero_l11_position)<24.0f) {moby_update_ground_check(obj);obj[0x6f]=22;}
  if(obj[0x95]!=3) {
   float height=coll_probe_ground_height_below(obj+0x10,0,0.5f);
   *(float *)(obj+0x18)-=1.146666765f;
@@ -60,7 +60,7 @@ void func_US2_L11_00433090(u8 *obj) {
  state=moby_apply_damage_to_object(obj,d+0x60,0);
  if(state) {
   p=*(u8 **)(d+0x38);
-  if(p) {int type=*(short *)(p+0xaa); if(type!=0xed8 && type!=0x47 && type!=0xdd9 && type!=0xd1b && type!=0xce7 && type!=0xd07 && type) D_L11_001AED00=0;}
+  if(p) {int type=*(short *)(p+0xaa); if(type!=0xed8 && type!=0x47 && type!=0xdd9 && type!=0xd1b && type!=0xce7 && type!=0xd07 && type) g_enemy_spawn_enabled=0;}
   I(0x2a0)=0;
   if(I(0x2b0)>=0) {gfx_free_point_light(I(0x2b0));I(0x2b0)=-1;}
   if(state==5) {I(0xf0)=0;F(0xf4)=0.837758183f;}

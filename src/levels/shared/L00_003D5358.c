@@ -5,9 +5,9 @@ typedef union { Quad q; float v[4]; } Vector;
 extern float math_random_float_range(float low, float high);
 extern void moby_transform_joint_to_world(char *object, int joint, void *out);
 extern void *part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
-extern char D_L00_001B02E8 __attribute__((sda));
-extern char D_L00_001B02F8 __attribute__((sda));
-extern char D_L00_001B0308 __attribute__((sda));
+extern char g_drift_particle_desc_a __attribute__((sda));
+extern char g_drift_particle_desc_b __attribute__((sda));
+extern char g_drift_particle_desc_c __attribute__((sda));
 
 
 extern char g_hero_state[] __attribute__((nosda));
@@ -24,10 +24,10 @@ extern float FastVecLength(void *vector);
 extern float math_approach_with_velocity(float *position, float target, float *velocity, float acceleration, float damping, float limit, int direction);
 
 
-extern float D_L00_001B03D4 __attribute__((sda));
-extern float D_L00_001B03DC __attribute__((sda));
-extern float D_L00_001B03E0 __attribute__((sda));
-extern float D_L00_001B03E4 __attribute__((sda));
+extern float g_unused_level_float_a __attribute__((sda));
+extern float g_unused_level_float_b __attribute__((sda));
+extern float g_unused_level_float_c __attribute__((sda));
+extern float g_direction_step_scale __attribute__((sda));
 extern char *SelectBestEligibleTarget(void *axis, int mode, int flag, float value, float z, float low, float high);
 extern void CalculateAimedLaunchVelocity(void *velocity, void *position, int handle, int mode, float a, float b, float c, float d);
 extern void math_apply_axis_rotation_to_quat(void *out, void *source, void *axis, float angle);

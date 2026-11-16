@@ -37,7 +37,7 @@ extern void vec_add_along_axis(void *, void *, void *, float);
 extern void euler_to_matrix(void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void vec_fast_divide_helper(void *, void *, float);
-extern float D_001BAFC0[];
+extern float g_coll_hit_normal[];
 #define PF(p,o) (*(float *)((char *)(p)+(o)))
 #define PI(p,o) (*(int *)((char *)(p)+(o)))
 #define PB(p,o) (*(u8 *)((char *)(p)+(o)))
@@ -70,10 +70,10 @@ void UpdateCollidingEffectParticle(Particle_BB100 *particle)
     config = motion->config;
     if ((config->flags&1) && CollLine(particle->position,next,4,particle,0)) {
         velocity[0]=motion->velocity[0]; velocity[1]=motion->velocity[1]; velocity[2]=motion->velocity[2];
-        vec_add_along_axis(temp,velocity,D_001BAFC0,config->bounce);
+        vec_add_along_axis(temp,velocity,g_coll_hit_normal,config->bounce);
         motion->velocity[0]=temp[0]; motion->velocity[1]=temp[1]; motion->velocity[2]=temp[2];
-        vec_scale_to_length(offset,D_001BAFC0,0.055f);
-        FastVecAdd((char *)particle->position,(char *)(D_001BAFC0-8),(char *)offset);
+        vec_scale_to_length(offset,g_coll_hit_normal,0.055f);
+        FastVecAdd((char *)particle->position,(char *)(g_coll_hit_normal-8),(char *)offset);
     } else *(Quad_BB100 *)particle->position=*(Quad_BB100 *)next;
     if (config->flags&2) {
         r=Fe617c30b_FUN_00283CE0((PB(particle,4)<<8)|motion->fractional[0])* (1.0f/65535.0f);

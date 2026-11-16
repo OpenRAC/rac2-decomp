@@ -3,8 +3,8 @@
 extern int math_random_int_below(int);
 extern void moby_mark_spawned(char *);
 extern void moby_set_state(char *, int, int);
-extern float D_L00_001B19D0;
-extern char D_L00_001B8FF0[];
+extern float g_effect_fade_value_b;
+extern char g_cam_follow_matrix[];
 extern int cam_moby_update(char *);
 extern int subtract_integer_with_clamp(int);
 extern float math_fabs(float);
@@ -23,7 +23,7 @@ void glow_fade_update(char *obj)
 
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        if (cam_moby_update(obj) != 0 || (D_L00_001B19D0 > 0.8f && math_random_int_below(10) == 0)) {
+        if (cam_moby_update(obj) != 0 || (g_effect_fade_value_b > 0.8f && math_random_int_below(10) == 0)) {
             moby_set_state(obj, 1, -1);
             *(u16 *)(obj + 0x34) |= 0x2800;
         }
@@ -37,7 +37,7 @@ void glow_fade_update(char *obj)
         *(u8 *)(obj + 0x23) -= 2;
         break;
     }
-    shade = math_fabs(FastVecDot(obj + 0xC0, D_L00_001B8FF0));
+    shade = math_fabs(FastVecDot(obj + 0xC0, g_cam_follow_matrix));
     shade = shade * (shade * shade * shade * shade);
     if (*(u16 *)(obj + 0x96) != 0) {
         shade = (float)(10 - subtract_integer_with_clamp(*(u16 *)(obj + 0x96) - 10)) * 0.1f;

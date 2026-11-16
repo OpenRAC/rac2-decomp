@@ -17,8 +17,8 @@ extern int FloatToInt(float);
 extern int FastTweenColor(int, int, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern void vec_add_random_offset(void *, float);
-extern int D_L02_001B2410[2] __attribute__((sda));
-extern int D_L02_001B2418[2] __attribute__((sda));
+extern int g_spark_fan_colors_a[2] __attribute__((sda));
+extern int g_spark_fan_colors_b[2] __attribute__((sda));
 
 void func_PAL_L02_00433B90(u8 *a0, float lo, float hi) {
     float v10[4];
@@ -55,8 +55,8 @@ void func_PAL_L02_00433B90(u8 *a0, float lo, float hi) {
         v60[2] = -k * (float)(a + b + c);
         FastVecAdd(v60, v60, v50);
         v60[3] = 0.01f;
-        c0 = FastTweenColor(D_L02_001B2410[0], D_L02_001B2410[1], math_random_float_range(0.0f, 1.0f));
-        c1 = FastTweenColor(D_L02_001B2418[0], D_L02_001B2418[1], math_random_float_range(0.0f, 1.0f));
+        c0 = FastTweenColor(g_spark_fan_colors_a[0], g_spark_fan_colors_a[1], math_random_float_range(0.0f, 1.0f));
+        c1 = FastTweenColor(g_spark_fan_colors_b[0], g_spark_fan_colors_b[1], math_random_float_range(0.0f, 1.0f));
         *(TI128 *)v70 = *(TI128 *)v20;
         vec_add_random_offset(v70, 0.25f);
         part_spawn_trail(v70, v50, v60, c0, c1, a, b, c, 0x1003C);

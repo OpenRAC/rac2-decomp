@@ -42,7 +42,7 @@ typedef struct PlayerMotionView {
     int state;                           
 } PlayerMotionView;
 extern PlayerMotionView g_hero_state;
-extern void func_PAL_L00_002D4668(void *, void *, void *);
+extern void UpdateHeroAttachment_pal(void *, void *, void *);
 extern float cam_get_view_space_vector_length(void *);
 extern float cam_get_view_space_height(void *);
 extern void cam_set_view_space_height(void *, void *, float);
@@ -50,7 +50,7 @@ extern void cam_set_view_space_vector_length(void *, void *, float);
 extern void cam_project_vector_onto_view_plane(void *, void *);
 extern float hero_get_speed_along_forward(MotionVector *);
 extern void hero_resolve_collision_with_rewind(void);
-extern void func_PAL_L00_002B5178(void);
+extern void EaseHeroPositionToGoal_pal(void);
 extern void UpdateOozlaHeroGroundContacts(void);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -61,7 +61,7 @@ extern float FastVecDot(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
 /* Apply the hero's velocity, resolve contacts, then measure the movement that resulted. */
-void func_PAL_L01_002B62B8(void)
+void ApplyHeroMovementAndResolveDisplacement_pal(void)
 {
     MotionVector start __attribute__((aligned(16)));
     /* The horizontal velocity, then the resolved velocity, then the position before the platform move. */
@@ -71,7 +71,7 @@ void func_PAL_L01_002B62B8(void)
     float zero;
 
     qcopy(&start, &g_hero_state.position);
-    func_PAL_L00_002D4668(g_hero_state.ledgeMoby, &g_hero_state.platformDelta, &g_hero_state.rotation);
+    UpdateHeroAttachment_pal(g_hero_state.ledgeMoby, &g_hero_state.platformDelta, &g_hero_state.rotation);
 
     /* Keep a step within the collision radius, and a fall within the ground distance. */
     if (g_hero_state.state == 20 || g_hero_state.state == 91 ||
@@ -104,7 +104,7 @@ void func_PAL_L01_002B62B8(void)
         hero_resolve_collision_with_rewind();
         UpdateOozlaHeroGroundContacts();
         FastVecSub(&g_hero_state.displacement, &g_hero_state.position, &start);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     } else {
         UpdateOozlaHeroGroundContacts();
     }
@@ -162,7 +162,7 @@ void func_PAL_L01_002B62B8(void)
         hero_resolve_collision_with_rewind();
         UpdateOozlaHeroGroundContacts();
         FastVecSub(&g_hero_state.displacement, &g_hero_state.position, &start);
-        func_PAL_L00_002B5178();
+        EaseHeroPositionToGoal_pal();
     }
     FastVecSub(&g_hero_state.platformCarry, &g_hero_state.position, &work);
     g_hero_state.platformDistance = FastVecLength(&g_hero_state.platformCarry);

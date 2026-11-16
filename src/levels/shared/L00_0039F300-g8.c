@@ -9,13 +9,13 @@ extern void math_apply_axis_rotation_to_quat(char *a, char *b, char *c, float va
 
 extern void vec_scale_to_length(char *a, char *b, float value);
 
-extern char D_L00_0023A670[];
+extern char g_nanotech_ball_axes[];
 
-extern char D_L00_0023A6F0[];
+extern char g_nanotech_ball_basis_vectors[];
 
-extern float D_L00_001AF448 __attribute__((sda));
+extern float g_effect_vector_rotation_angle __attribute__((sda));
 
-extern float D_L00_001AF470 __attribute__((sda));
+extern float g_effect_vector_length __attribute__((sda));
 
 /* Fills eight 0x10-byte records: two helpers per record, the second one a quarter scale. */
 
@@ -24,7 +24,7 @@ void part_init_effect_vector_table(void)
     int i;
 
     for (i = 0; i < 8; i++) {
-        math_apply_axis_rotation_to_quat(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_0023A6F0 + i * 0x10, D_L00_001AF448);
-        vec_scale_to_length(D_L00_0023A670 + i * 0x10, D_L00_0023A670 + i * 0x10, D_L00_001AF470);
+        math_apply_axis_rotation_to_quat(g_nanotech_ball_axes + i * 0x10, g_nanotech_ball_axes + i * 0x10, g_nanotech_ball_basis_vectors + i * 0x10, g_effect_vector_rotation_angle);
+        vec_scale_to_length(g_nanotech_ball_axes + i * 0x10, g_nanotech_ball_axes + i * 0x10, g_effect_vector_length);
     }
 }

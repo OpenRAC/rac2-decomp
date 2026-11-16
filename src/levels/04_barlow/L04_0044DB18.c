@@ -12,11 +12,11 @@ typedef union { Quad q; float f[4]; } BeastVector;
 typedef struct {
     u8 reserved00[0x18]; u8 enabled, count, kind; u8 reserved1B[0x65]; u8 payload[1];
 } DispatchContext;
-extern u8 D_00139646[];
+extern u8 g_tribesman_flag[];
 extern u8 *g_route_path_table[];
 extern u16 *g_moby_l04_group_lists[];
 extern u8 *g_moby_l04_pool __attribute__((sda));
-extern int D_L04_001B24F8 __attribute__((sda));
+extern int g_tribesman_group_limit __attribute__((sda));
 extern int tribesman_update_common(u8 *);
 extern int flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
@@ -83,7 +83,7 @@ void tribesman_l04_update(u8 *object)
         if ((I(0x258) == 1 || (I(0x560) != 0 && S(0x274) == 2)) &&
             math_fabs(*(float *)(P(0x240) + 0x18) - OF(0x18)) < 2.0f) {
             if (math_fast_float_d(state + 0x2B0)) {
-                D_00139646[0] = 1;
+                g_tribesman_flag[0] = 1;
                 if (I(0x29C) != -1) {
                     if (object[0x43] != 12) anim_start_blended(object, 12, 0, 10);
                     moby_set_state(object, 22, 2);
@@ -478,7 +478,7 @@ void tribesman_l04_update(u8 *object)
         }
         if (I(0x548) != 0) {
             if (enemy_walk_toward_target(object, state + 0x230, OF(0xF8), 7.0f, 0.25f, F(0x2A8)) &&
-                object[0x21] <= D_L04_001B24F8 && moby_count_group_not_in_state(object[0x21], -1) > 1) {
+                object[0x21] <= g_tribesman_group_limit && moby_count_group_not_in_state(object[0x21], -1) > 1) {
                 u16 *list = g_moby_l04_group_lists[object[0x21]];
                 do {
                     other = *(u8 **)(g_moby_l04_pool + ((*list & 0x7FFF) << 8) + 0x68);

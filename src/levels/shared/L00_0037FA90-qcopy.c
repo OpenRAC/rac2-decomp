@@ -22,7 +22,7 @@ extern void FastVecCross(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void FastVecScale(void *, void *, float);
 
-extern L00_0037FA90_TI128 D_L00_001BF220;
+extern L00_0037FA90_TI128 g_hero_l00_position;
 /* The input at +0x230 and the lower vector share this measured data block. */
 extern char g_camera_l00_position[0x240];
 
@@ -48,7 +48,7 @@ void math_compute_aim_direction(char *result, char *target, float blend, float l
     origin -= 0x230;
     FastVecAdd(probe, probe, origin);
     if (CollLine(origin, probe, 0, g_hero_state.f2290, 0) != 0)
-        *(L00_0037FA90_TI128 *)probe = D_L00_001BF220;
+        *(L00_0037FA90_TI128 *)probe = g_hero_l00_position;
     FastVecSub(result, probe, target);
     vec_scale_to_length(result, result, 1.0f);
     alignment = FastVecDot(result, g_hero_state.f760);

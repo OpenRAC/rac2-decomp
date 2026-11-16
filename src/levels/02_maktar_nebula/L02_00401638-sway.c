@@ -4,7 +4,7 @@ extern void moby_set_state(char *,int,int);
 extern float ApproachValue(float *,float,float);
 extern int math_fast_float_d(void *);
 extern char *g_route_polygons[];
-extern char D_L02_001A8F20[] MACRO_ADDR, g_camera_l02_position[];
+extern char g_zero_l02_vector[] MACRO_ADDR, g_camera_l02_position[];
 extern float fast_vec_dist(void *, void *);
 extern int FloatToInt(float);
 extern float mat_fast_helper_a(float,float), FastDiffRots(float,float);
@@ -107,7 +107,7 @@ void sway_path_update(char *moby) {
     if(*(u8 *)(moby+0x20)>=2){
         void *hit_moby=part_find_owned_effect_slot(moby,0x10000,0); x=moby_update_aim_target_strength(moby,hit_moby);
         ApproachValue((float *)(vars+0x20),0.0f,x); *(u8 *)(moby+0xa8)=255;
-        if(*(float *)(vars+0x20)==0.0f){PlayMobySound(2,0,moby);part_spawn_masked_debris(moby,0x7f7,D_L02_001A8F20,255,5.0f,10.0f,5.0f,10.0f);FastVecSub(&scratch,g_camera_l02_position,moby+0x10);vec_scale_to_length(&scratch,&scratch,1.0f);part_spawn_blast_effect_moby(moby,moby+0x10,&scratch,0.0f);moby_mark_spawned(moby);}
+        if(*(float *)(vars+0x20)==0.0f){PlayMobySound(2,0,moby);part_spawn_masked_debris(moby,0x7f7,g_zero_l02_vector,255,5.0f,10.0f,5.0f,10.0f);FastVecSub(&scratch,g_camera_l02_position,moby+0x10);vec_scale_to_length(&scratch,&scratch,1.0f);part_spawn_blast_effect_moby(moby,moby+0x10,&scratch,0.0f);moby_mark_spawned(moby);}
     }
 }
 

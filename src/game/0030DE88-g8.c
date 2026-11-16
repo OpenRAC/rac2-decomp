@@ -6,8 +6,8 @@ typedef union {
     float f[4];
 } Vec4_0030DE88;
 
-extern float D_001AF044 __attribute__((sda));
-extern char D_0018A550[];
+extern float g_beam_particle_speed __attribute__((sda));
+extern char g_hero_matrix[];
 
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -35,9 +35,9 @@ void SpawnEffectBurst(u8 *moby, int count)
         float inner;
         float size;
         float life;
-        vec_random_direction(&velocity, 0.0f, D_001AF044);
+        vec_random_direction(&velocity, 0.0f, g_beam_particle_speed);
         velocity.f[0] = math_fabs(velocity.f[0]);
-        matrix_mul_vec3(&velocity, &velocity, D_0018A550);
+        matrix_mul_vec3(&velocity, &velocity, g_hero_matrix);
         spin = math_random_int_range(-8, 8);
         inner = 0.3f;
         size = math_random_float_range(0.2f, 0.6f);

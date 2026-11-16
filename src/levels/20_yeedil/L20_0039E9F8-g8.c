@@ -6,9 +6,9 @@
 
 #define FLD(base, T, off) (((struct { u8 pad[off]; T v; } *)(base))->v)
 
-extern float D_L20_001AED10 __attribute__((sda));
-extern float D_L20_001AED0C __attribute__((sda));
-extern char *D_L20_001B308C __attribute__((nosda));
+extern float g_swing_turn_speed __attribute__((sda));
+extern float g_swing_spin_speed __attribute__((sda));
+extern char *g_linked_moby_table __attribute__((nosda));
 
 extern float FastAddRotations(float, float);
 extern float FastDiffRots(float, float);
@@ -28,9 +28,9 @@ void object_swing_along_arc(char *obj) {
     float target;
     float r;
 
-    entry = (char *)((FLD(state, int, 0x84) << 7) + (unsigned int)D_L20_001B308C);
-    turn = D_L20_001AED10 * 0.00027777778f;
-    spin = D_L20_001AED0C * 0.016666668f;
+    entry = (char *)((FLD(state, int, 0x84) << 7) + (unsigned int)g_linked_moby_table);
+    turn = g_swing_turn_speed * 0.00027777778f;
+    spin = g_swing_spin_speed * 0.016666668f;
     target = FLD(entry, float, 0x78);
     if (FLD(state, int, 0x190) < 0) {
         target = FastAddRotations(target, 3.1415927f);
@@ -52,5 +52,5 @@ void object_swing_along_arc(char *obj) {
     }
     vec_store_helper(obj + 0x10);
     FLD(obj, float, 0x10) = FLD(state, float, 0x194);
-    transform_vector(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
+    transform_vector(obj + 0x10, obj + 0x10, g_linked_moby_table + (FLD(state, int, 0x84) << 7));
 }

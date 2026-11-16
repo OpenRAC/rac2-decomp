@@ -15,8 +15,8 @@ extern EffectSelector g_item_slot_to_record __attribute__((nosda));
 extern EffectMaterial g_weapon_l00_table[] __attribute__((nosda));
 extern char g_area_hit_targets[] __attribute__((nosda));
 extern char g_camera_l00_position[] __attribute__((nosda));
-extern EffectSix D_L00_001AF858 __attribute__((nosda));
-extern EffectSix D_L00_001AF870 __attribute__((nosda));
+extern EffectSix g_burst_effect_a __attribute__((nosda));
+extern EffectSix g_burst_effect_b __attribute__((nosda));
 
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
@@ -63,8 +63,8 @@ void func_PAL_L00_003B4DC0(float x, float y, float z)
         for (count = 0; count < n; count++) {
             speed = math_random_float_range(8.0f, 10.0f) * (0.020000001f);
             speed -= fade * (0.020000001f);
-            a = D_L00_001AF858;
-            b = D_L00_001AF870;
+            a = g_burst_effect_a;
+            b = g_burst_effect_b;
             {
                 int choice = math_random_int_below(6);
                 EffectMaterial *entry = g_weapon_l00_table + g_item_slot_to_record.index;

@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern char D_L01_00189E20[];
+extern char g_hero_l01_state_block[];
 extern void FastVecScale(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
 extern void FastVecSub(void *, const void *, const void *);
@@ -10,7 +10,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern float cam_get_view_space_angle(void *);
 extern float cam_get_view_space_height(void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern char D_L01_001BF940[];
+extern char g_ground_normal[];
 
 extern char g_coll_line_hit_point[];
 typedef int MotionQuad __attribute__((mode(TI)));
@@ -21,7 +21,7 @@ float hero_solve_fall_collision_time(float time, float acceleration, float heigh
     float end[4], direction[4], curve[4], start[4];
     float root0a, root0b, root1a, root1b, root2a, root2b;
     float speed, position;
-    char *state = D_L01_00189E20;
+    char *state = g_hero_l01_state_block;
     switch (*(unsigned char *)(state + 0x22C3)) {
     case 0: {
         float half;
@@ -34,12 +34,12 @@ float hero_solve_fall_collision_time(float time, float acceleration, float heigh
             coll_push_vector_from_negative_axes(direction, end);
             qcopy(direction, pos);
             if (CollLine(direction, end, 0x322, 0, 0)) {
-                if (cam_get_view_space_angle(D_L01_001BF940) <= 0.8726647f)
-                    height = *(float *)(D_L01_001BF940 - 0x18);
+                if (cam_get_view_space_angle(g_ground_normal) <= 0.8726647f)
+                    height = *(float *)(g_ground_normal - 0x18);
             }
         }
         if (height > 0.0f) {
-            char *root = D_L01_00189E20;
+            char *root = g_hero_l01_state_block;
             half = acceleration * -0.5f;
             if (math_solve_quadratic(&root0a, &root0b, half,
                     *(float *)(root + 0xF8) - half,

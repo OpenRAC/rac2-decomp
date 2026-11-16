@@ -9,7 +9,7 @@ extern void moby_set_light_color(void *a0, int a1);
 extern float FastAddRotations(float, float);
 extern float math_random_float_range(float low, float high);
 
-void func_PAL_L01_00322798(void *a0, float *a1, int a2) {
+void glow_flicker_update_pal(void *a0, float *a1, int a2) {
     unsigned char *p = (unsigned char *)a0;
     float r;
     int i;

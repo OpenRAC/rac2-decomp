@@ -27,7 +27,7 @@ typedef struct {
     float fA0;
     float fA4;
 } JobaRingState;
-extern JobaObject *D_L11_001C4D80[];
+extern JobaObject *g_damage_target_list[];
 extern float fast_vec_dist(void *, void *);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -42,7 +42,7 @@ extern void FastVecSub(float *out, float *a, float *b);
 extern void joba_ring_effect_draw_sprites(void);
 
 /* Keeps the ring's points inside the configured radial and angular limits. */
-void func_PAL_L11_0045C810(JobaObject *obj)
+void joba_ring_effect_update_pal(JobaObject *obj)
 {
     JobaRingState *state = obj->state;
     float *point;

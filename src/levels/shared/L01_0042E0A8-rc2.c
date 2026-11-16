@@ -31,7 +31,7 @@ typedef struct {
     f32 w;
 } vec4_local;
 
-extern s8 D_00190000[];
+extern s8 g_data_block_base[];
 f32 ref_L01_0042E0A8_00(f32);
 void ref_L01_0042E0A8_01(void *, void *, void *);
 void ref_L01_0042E0A8_02(void *, void *, void *);
@@ -45,7 +45,7 @@ void box_exit_trigger_update(void *moby) {
     vec4_local input;
     vec4_local transformed;
 
-    ref_L01_0042E0A8_01(&input, D_00190000 - 0x6160, self + 0x40);
+    ref_L01_0042E0A8_01(&input, g_data_block_base - 0x6160, self + 0x40);
     input.w = 0.0f;
     ref_L01_0042E0A8_02(&transformed, &input, self + 0x50);
     if ((ref_L01_0042E0A8_00(transformed.x) <= limit) &&

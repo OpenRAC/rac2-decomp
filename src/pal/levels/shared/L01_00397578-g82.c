@@ -13,7 +13,7 @@ extern float math_fabs(float);
 extern int FastTweenColor(int, int, float);
 extern int FloatToInt(float);
 extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, int, int, float);
-extern char D_L01_001B94C0[];
+extern char g_level_origin_vec[];
 extern int ref_L01_00397A28_00 __attribute__((sda));
 extern int ref_L01_00397A28_01 __attribute__((sda));
 extern int ref_L01_00397A28_02 __attribute__((sda));
@@ -35,7 +35,7 @@ void func_PAL_L01_0039AE48(char *m) {
         scale = (160.0f - moby_get_anim_value(m)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
-    FastVecSub(a, D_L01_001B94C0, b);
+    FastVecSub(a, g_level_origin_vec, b);
     vec_scale_to_length(a, a, -0.3f);
     vec_scale_to_length(c, a, 0.1f);
     FastVecAdd(a, a, b);

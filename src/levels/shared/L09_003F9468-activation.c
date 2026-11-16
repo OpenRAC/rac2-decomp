@@ -7,8 +7,8 @@ extern int FastDecTimer(void *);
 extern void STUB_printf(const char *, ...);
 extern int moby_fuse_linked_objects(void *, void *, void *, char **, int);
 extern char g_hero_position[];
-extern char D_L09_001B10E0[];
-extern int D_L09_001B2388[] __attribute__((sda));
+extern char g_str_enemy_activation_debug[];
+extern int g_frame_l09_counter[] __attribute__((sda));
 typedef struct ActivationState ActivationState;
 typedef struct ActivationClass {
     char pad00[0x10];
@@ -97,7 +97,7 @@ int enemy_process_activation(ActivationObject *obj)
             int i;
             s->disabled = 0;
             s->command = 0;
-            STUB_printf(D_L09_001B10E0, D_L09_001B2388[0], obj->id, 0);
+            STUB_printf(g_str_enemy_activation_debug, g_frame_l09_counter[0], obj->id, 0);
             obj->flags &= ~1;
             obj->enabled = 1;
             obj->update = obj->type->update;

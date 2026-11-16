@@ -10,8 +10,8 @@ typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
 extern unsigned char g_hero_state[];
 typedef struct { Vector sphere; int *path; int mode; int pad[2]; } RailEntry;
-extern RailEntry *D_L00_001B16C0[] __attribute__((sda));
-extern int D_L00_001B16C4[] __attribute__((sda));
+extern RailEntry *g_rail_table[] __attribute__((sda));
+extern int g_rail_count[] __attribute__((sda));
 extern float fast_vec_dist(const void *, const void *);
 extern float vec_distance_xy(const void *, const void *);
 extern float math_fabs(float);
@@ -31,7 +31,7 @@ int nearest_rail_point(Vector *source, void **pathOut, Vector *destination,
     Vector *p = &origin;
     unsigned char *hero;
     origin.q = source->q;
-    for (index = 0; index < D_L00_001B16C4[0]; ++index) {
+    for (index = 0; index < g_rail_count[0]; ++index) {
         if (excludePath && RAILS[index].path == excludePath) continue;
         if (requiredPath && RAILS[index].path != requiredPath) continue;
         if (*RAILS[index].path == 0) continue;

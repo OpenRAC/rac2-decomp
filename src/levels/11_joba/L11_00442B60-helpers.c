@@ -2,7 +2,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 
-extern TI128 D_L11_001BAAF0;
+extern TI128 g_arena_reference_dir;
 
 extern f32 g_hero_position[];
 
@@ -23,7 +23,7 @@ s32 arena_is_entity_far_in_direction(u8 *moby) {
     Vector hero_dir;
     s32 result;
 
-    qcopy(&reference_dir,&D_L11_001BAAF0);
+    qcopy(&reference_dir,&g_arena_reference_dir);
     reference_dir.f[2] = 0;
     vec_scale_to_length(&reference_dir, &reference_dir, 1.0f);
     result = 0;

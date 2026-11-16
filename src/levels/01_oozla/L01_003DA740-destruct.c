@@ -7,14 +7,14 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } EffectVector;
 
-extern int D_L01_001AEC38 MACRO_ADDR;
-extern int D_L01_001B3468 MACRO_ADDR;
-extern int D_L01_001B15E0[] NOT_SDA;
+extern int g_oozla_intro_timer MACRO_ADDR;
+extern int g_breakable_count MACRO_ADDR;
+extern int g_breakable_active_limit[] NOT_SDA;
 extern float D_L01_001B2090_gp[] SDATA(D_L01_001B2090);
 extern float D_L01_001B208C_gp[] SDATA(D_L01_001B208C);
 extern float D_L01_001B1640_gp[] SDATA(D_L01_001B1640);
-extern float D_L01_001B1644[] NOT_SDA;
-extern float D_L01_001B1648[] NOT_SDA;
+extern float g_breakable_effect_offset_y_alt[] NOT_SDA;
+extern float g_breakable_offset_z[] NOT_SDA;
 
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
@@ -66,12 +66,12 @@ void breakable_l01_object_update_2(DestructionMoby *object)
 
     switch (object->state) {
     case 0:
-        D_L01_001AEC38++;
+        g_oozla_intro_timer++;
         moby_set_state(object, 1, -1);
         break;
     case 1:
         if (part_find_owned_effect_slot(object, 0x4010000, 0) && !state->blocked) {
-            D_L01_001AEC38--;
+            g_oozla_intro_timer--;
             moby_set_state(object, 2, -1);
         }
         object->hit_slot = 255;
@@ -79,11 +79,11 @@ void breakable_l01_object_update_2(DestructionMoby *object)
     case 2:
         FastVecScale(velocity, object->rot_row1, -0.06666667014360428f);
         if (object->visible && D_L01_001B2090_gp[0] < 0.9f && D_L01_001B208C_gp[0] < 0.9f &&
-            D_L01_001B3468 < D_L01_001B15E0[0]) {
+            g_breakable_count < g_breakable_active_limit[0]) {
             part_spawn_masked_debris(object, 0x3F, velocity, 255, 1.0f, 3.0f, 2.0f, 5.0f);
             tilt.q = 0;
             tilt.f[1] = -0.015000000596046448f;
-            vec_local_offset_to_world(object, position, D_L01_001B1640_gp[0], D_L01_001B1644[0], D_L01_001B1648[0]);
+            vec_local_offset_to_world(object, position, D_L01_001B1640_gp[0], g_breakable_effect_offset_y_alt[0], g_breakable_offset_z[0]);
             matrix_mul_vec3(tilt.f, tilt.f, object->rot_row0);
             part_l01_spawn_spark_burst(position, tilt.f, 10, 0x3F7FFF3F, 0, 0.0066666672937572f, 1.0f, 1.0299999713897705f);
         } else
@@ -98,10 +98,10 @@ void breakable_l01_object_update_2(DestructionMoby *object)
             object->collision_disable = 0;
             object->flags |= 1;
             state->timer = 120;
-            D_L01_001B3468++;
+            g_breakable_count++;
         }
         if (math_fast_float_d(&state->timer)) {
-            D_L01_001B3468--;
+            g_breakable_count--;
             moby_mark_spawned(object);
         }
         break;

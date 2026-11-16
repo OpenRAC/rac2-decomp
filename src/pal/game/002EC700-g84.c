@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern unsigned int D_00139768[];
-extern char D_001339B0[];
+extern unsigned int g_request_flag_table[];
+extern char g_str_movie_name[];
 extern char g_copy_setup_data[];
 typedef struct { char pad[0x6B]; unsigned char flags; } Player;
 extern Player g_sound_state;
@@ -10,12 +10,12 @@ typedef struct { char pad[0x34]; int frame; char pad38[0x14]; int buffer; } Scen
 extern Scene g_scene_playback_state;
 typedef struct { unsigned long long texture; unsigned short image, palette; short width,height; } Texture;
 typedef struct { char pad[0x20]; Texture desc; } Graphics;
-extern Graphics D_001B9740;
-extern int g_current_game_mode MACRO_ADDR, D_001B1598 MACRO_ADDR, D_001A72D4 MACRO_ADDR;
-extern char *D_001B1604;
+extern Graphics g_texture_upload_params;
+extern int g_current_game_mode MACRO_ADDR, g_frame_counter_3 MACRO_ADDR, g_vram_frame_base MACRO_ADDR;
+extern char *g_texture_data_base;
 typedef struct { char pad[0x6C]; int arena; } Runtime;
-extern Runtime D_001BAEC0;
-extern unsigned char D_001A7BB4;
+extern Runtime g_loader_memory;
+extern unsigned char g_language;
 extern int cutscene_map_id_to_index(int);
 extern void snd_send_cmd50_five_values(int,int,int,int,int);
 extern void gfx_wait_for_dma_status_bits(unsigned long long);
@@ -31,13 +31,13 @@ extern int sceGsSyncVCallback(void *);
 extern void gfx_reset_packet_buffer(void);
 extern int gfx_wait_paths_idle(int,int);
 extern int sceGsSyncV(int);
-extern int func_PAL_002B8838(void *,int,int);
+extern int load_read_disc_with_pause_pal(void *,int,int);
 extern int sceGsExecLoadImage(void *,void *);
-extern int func_PAL_00351140(int,int,void *,void *,int,int);
+extern int mpeg_play_movie_2_pal(int,int,void *,void *,int,int);
 #define W(p,o) (*(int *)((p)+(o)))
 
 /* Loads the movie and its texture, plays it from aligned workspace, then restores the GS. */
-int func_PAL_002ECD08(unsigned int id) {
+int mpeg_play_movie_by_id_pal(unsigned int id) {
     typedef struct {
         long q[12];
     } LoadImage __attribute__((aligned(16)));
@@ -52,7 +52,7 @@ int func_PAL_002ECD08(unsigned int id) {
     long low, high, dimensions;
     unsigned long long texture;
     g_current_game_mode = result;
-    if (id<0xB1) *(unsigned int *)((id >> 2) * 4 + (int)D_00139768)|=result<<(id&31);
+    if (id<0xB1) *(unsigned int *)((id >> 2) * 4 + (int)g_request_flag_table)|=result<<(id&31);
     index = cutscene_map_id_to_index(id);
     table = g_copy_setup_data;
     sectors = (int *)(table+8);
@@ -65,7 +65,7 @@ int func_PAL_002ECD08(unsigned int id) {
     snd_send_cmd50_five_values(2, 0, 0, 0, 0);
     gfx_wait_for_dma_status_bits(1);
     sceGsSyncV(0);
-    D_001B1598 = 1+D_001B1598;
+    g_frame_counter_3 = 1+g_frame_counter_3;
     SubmitBufferedDmaChain();
     gfx_swap_packet_buffer();
     FlushCache(0);
@@ -76,35 +76,35 @@ int func_PAL_002ECD08(unsigned int id) {
     snd_clear_all_voices();
     snd_wait_for_music_idle();
     snd_CheckLoadInProgress(0);
-    arena = (char *)(D_001BAEC0.arena-0x2C0000);
+    arena = (char *)(g_loader_memory.arena-0x2C0000);
     work = arena-0xE0000;
     buffer = work-0x4000;
     bytes = *(int *)((index<<4)+(int)sizes);
-    func_PAL_002B8838(buffer, *(int *)((index<<4)+(int)sectors)+W(table, 4), (bytes+0x7FF)/0x800);
-    graphics = &D_001B9740;
+    load_read_disc_with_pause_pal(buffer, *(int *)((index<<4)+(int)sectors)+W(table, 4), (bytes+0x7FF)/0x800);
+    graphics = &g_texture_upload_params;
     desc = &graphics->desc;
     g_scene_playback_state.buffer = (int)buffer;
     g_scene_playback_state.frame = 0;
-    func_00126288(&image, ((D_001A72D4+0x400)<<8)>>16, (short)((result<<desc->width)>>6), 0x13, 0, 0, result<<desc->width, result<<desc->height);
+    func_00126288(&image, ((g_vram_frame_base+0x400)<<8)>>16, (short)((result<<desc->width)>>6), 0x13, 0, 0, result<<desc->width, result<<desc->height);
     FlushCache(0);
-    sceGsExecLoadImage(&image, D_001B1604+(desc->image<<4));
+    sceGsExecLoadImage(&image, g_texture_data_base+(desc->image<<4));
     gfx_wait_paths_idle(0, 0);
-    func_00126288(&image, (D_001A72D4<<8)>>16, 1, 0, 0, 0, 16, 16);
+    func_00126288(&image, (g_vram_frame_base<<8)>>16, 1, 0, 0, 0, 16, 16);
     FlushCache(0);
-    sceGsExecLoadImage(&image, D_001B1604+(desc->palette<<4));
+    sceGsExecLoadImage(&image, g_texture_data_base+(desc->palette<<4));
     gfx_wait_paths_idle(0, 0);
-    low = ((long)((result<<desc->width)>>6)<<14) | (long)((D_001A72D4+0x400)>>8);
+    low = ((long)((result<<desc->width)>>6)<<14) | (long)((g_vram_frame_base+0x400)>>8);
     dimensions = ((long)desc->width<<26) | 0x1300000L;
     low = low | dimensions;
     low = low | ((long)desc->height<<30);
-    high = ((long)(D_001A72D4>>8)<<37) | 0x400000000L;
+    high = ((long)(g_vram_frame_base>>8)<<37) | 0x400000000L;
     texture = (low | high) | 0x4000000000000000ULL;
     graphics->desc.texture = texture;
-    result = func_PAL_00351140(data, size, (void *)(((int)arena+63)&-64), (void *)(((int)work+63)&-64), D_001A7BB4, 0)!=0;
+    result = mpeg_play_movie_2_pal(data, size, (void *)(((int)arena+63)&-64), (void *)(((int)work+63)&-64), g_language, 0)!=0;
     sceGsSyncV(0);
     gfx_wait_paths_idle(0, 0);
-    sceGsSyncVCallback(D_001339B0);
-    sceGsExecLoadImage(&image, D_001B1604+(graphics->desc.palette<<4));
+    sceGsSyncVCallback(g_str_movie_name);
+    sceGsExecLoadImage(&image, g_texture_data_base+(graphics->desc.palette<<4));
     gfx_wait_paths_idle(0, 0);
     graphics->desc.texture = 0;
     gfx_reset_packet_buffer();

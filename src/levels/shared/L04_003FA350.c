@@ -7,7 +7,7 @@ extern float FastVecLength(const void *);
 /* Optional final argument is a 40-byte hit packet; both probes pass null. */
 extern int CollLine(const void *, const void *, int, void *, const void *);
 extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
-extern unsigned char D_L04_001BFAE0[];
+extern unsigned char g_spark_origin_quad[];
 
 typedef struct {
     float point[4];
@@ -26,7 +26,7 @@ void projectile_steer_around_walls(char *projectile, float *heading, float *pitc
     FastVecScale(probe, vector, 17.0f);
     FastVecAdd(probe, probe, projectile + 0x10);
     if (CollLine(projectile + 0x10, probe, 0, projectile, 0)) {
-        hit = (CollisionSteeringHit *)D_L04_001BFAE0;
+        hit = (CollisionSteeringHit *)g_spark_origin_quad;
         FastVecSub(vector, projectile + 0x10, hit->point);
         distance = FastVecLength(vector);
         FastVecCross(probe, vector, hit->normal);
@@ -38,7 +38,7 @@ void projectile_steer_around_walls(char *projectile, float *heading, float *pitc
     FastVecScale(vector, projectile + 0xe0, -3.0f);
     FastVecAdd(probe, vector, projectile + 0x10);
     if (CollLine(projectile + 0x10, probe, 0, projectile, 0)) {
-        FastVecSub(vector, projectile + 0x10, D_L04_001BFAE0);
+        FastVecSub(vector, projectile + 0x10, g_spark_origin_quad);
         distance = FastVecLength(vector);
         if (distance <= 1.0f) {
             if (*pitch > 0.0f) *pitch = 0.0f;

@@ -30,35 +30,35 @@ typedef struct {
     s16 amount;
 } PuzzleState;
 
-extern int D_L03_001B0B50 __attribute__((sda));
-extern int D_L03_001B0B58 __attribute__((sda));
-extern u32 D_L03_001B0B84 __attribute__((sda));
-extern u32 D_L03_001B0B88 __attribute__((sda));
-extern u32 D_L03_001B0B8C __attribute__((sda));
-extern u32 D_L03_001B0B94 __attribute__((sda));
-extern int D_L03_001B0B98 __attribute__((sda));
-extern int D_L03_001B0BA8 __attribute__((sda));
-extern int D_L03_001B0BB8 __attribute__((sda));
-extern float D_L03_001B0BC8 __attribute__((sda));
-extern float D_L03_001B0BCC __attribute__((sda));
-extern float D_L03_001B0BD0 __attribute__((sda));
-extern float D_L03_001B0BD4 __attribute__((sda));
-extern float D_L03_001B0BD8[8] __attribute__((sda, section(".sdata")));
-extern float D_L03_001B3284[] __attribute__((sda));
+extern int g_path_puzzle_step_count __attribute__((sda));
+extern int g_path_puzzle_timer_max __attribute__((sda));
+extern u32 g_path_puzzle_color_a __attribute__((sda));
+extern u32 g_path_puzzle_color_b __attribute__((sda));
+extern u32 g_path_puzzle_link_color __attribute__((sda));
+extern u32 g_path_puzzle_link_end_color __attribute__((sda));
+extern int g_path_puzzle_rect_color __attribute__((sda));
+extern int g_path_puzzle_label_left __attribute__((sda));
+extern int g_path_puzzle_label_rect_x __attribute__((sda));
+extern float g_path_puzzle_label_draw_x __attribute__((sda));
+extern float g_path_puzzle_label_size __attribute__((sda));
+extern float g_path_puzzle_label_scale_x __attribute__((sda));
+extern float g_path_puzzle_label_scale_y __attribute__((sda));
+extern float g_path_puzzle_label_corner_table[8] __attribute__((sda, section(".sdata")));
+extern float g_screen_l03_scale[] __attribute__((sda));
 extern float D_L03_001B3284_1 __attribute__((sda));
-extern PuzzleNode D_L03_0029BBF0[14];
-extern int D_0024A7B0[14][6];
-extern u8 *D_L03_001A904C;
+extern PuzzleNode g_puzzle_node_directions[14];
+extern int g_path_puzzle_adjacency[14][6];
+extern u8 *g_menu_data_base;
 extern int g_frame_l03_counter;
-extern int D_L03_001B3280;
+extern int g_screen_l03_mode;
 /* Absolute views of the cell colours, the bar box and the cell box, whose first words are read
    through $gp. */
 extern int D_L03_001B0B98_1[] MACRO_ADDR;
 extern int D_L03_001B0BA8_1[] MACRO_ADDR;
 extern int D_L03_001B0BB8_1[] MACRO_ADDR;
-extern Vec D_L03_001B0BF8, D_L03_001B0C08;
-extern float D_L03_001B0BDC[] MACRO_ADDR;
-extern char D_L03_001B0C18[];
+extern Vec g_path_puzzle_label_ids, g_path_puzzle_label_offsets;
+extern float g_path_puzzle_label_scale_table[] MACRO_ADDR;
+extern char g_str_path_puzzle_label_format[];
 
 extern void path_puzzle_draw_link_strip(u8 *, u32, u32, void *, void *, float, int);
 extern void FastVecCross(void *, void *, void *);
@@ -96,7 +96,7 @@ static __inline__ int hud_size(int mode, float value, float scale, float half)
    result: flow deletes it after allocation. */
 static __inline__ int scaled_coord(int value, float scale, float half, int active)
 {
-    int mode = D_L03_001B3280;
+    int mode = g_screen_l03_mode;
     float scaled = (float)value * scale + half;
     int result = (int)scaled;
 
@@ -110,7 +110,7 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
    do not change the result: flow deletes them after allocation. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
-    int mode = D_L03_001B3280;
+    int mode = g_screen_l03_mode;
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
@@ -136,16 +136,16 @@ void DrawPathPuzzleHud(u8 *moby)
         PuzzleNode tip, axis;
         Matrix rotation;
 
-        if (vars->mode == D_L03_001B0B50)
-            color = D_L03_001B0B88;
+        if (vars->mode == g_path_puzzle_step_count)
+            color = g_path_puzzle_color_b;
         else
-            color = D_L03_001B0B84;
+            color = g_path_puzzle_color_a;
         i = 0;
         if (vars->route[1] != 255)
             do {
                 j = i + 1;
-                path_puzzle_draw_link_strip(moby, color, color, &D_L03_0029BBF0[vars->route[i]],
-                                  &D_L03_0029BBF0[vars->route[j]], vars->phase, D_L03_001B0B94);
+                path_puzzle_draw_link_strip(moby, color, color, &g_puzzle_node_directions[vars->route[i]],
+                                  &g_puzzle_node_directions[vars->route[j]], vars->phase, g_path_puzzle_link_end_color);
                 i = j;
                 if (i >= 15)
                     break;
@@ -155,10 +155,10 @@ void DrawPathPuzzleHud(u8 *moby)
             int i, j, k, found;
 
             for (i = 0; i < 6; i++) {
-                k = D_0024A7B0[vars->node][i];
+                k = g_path_puzzle_adjacency[vars->node][i];
                 if (k == vars->previous || k == -1)
                     continue;
-                if (vars->mode == D_L03_001B0B50 && k == vars->path[1])
+                if (vars->mode == g_path_puzzle_step_count && k == vars->path[1])
                     continue;
                 found = 0;
                 for (j = 0; j < 6 && vars->visited[j] != 255; j++)
@@ -166,30 +166,30 @@ void DrawPathPuzzleHud(u8 *moby)
                         found = 1;
                         break;
                     }
-                FastVecCross(&axis, &D_L03_0029BBF0[vars->node], &D_L03_0029BBF0[k]);
+                FastVecCross(&axis, &g_puzzle_node_directions[vars->node], &g_puzzle_node_directions[k]);
                 vec_set_direction_with_complement(&axis, &axis, 0.17453294992446899f);
                 quaternion_to_rotation_basis(&axis, &rotation);
-                matrix_mul_vec3(&tip, &D_L03_0029BBF0[vars->node], &rotation);
+                matrix_mul_vec3(&tip, &g_puzzle_node_directions[vars->node], &rotation);
                 vec_scale_to_length(&tip, &tip, 1.0f);
                 if (found)
-                    path_puzzle_draw_link_strip(moby, D_L03_001B0B8C & 0xFFFFFF, D_L03_001B0B8C, &tip,
-                                      &D_L03_0029BBF0[vars->node], -vars->phase, 0);
+                    path_puzzle_draw_link_strip(moby, g_path_puzzle_link_color & 0xFFFFFF, g_path_puzzle_link_color, &tip,
+                                      &g_puzzle_node_directions[vars->node], -vars->phase, 0);
             }
         }
     }
-    if (D_L03_001A904C) {
+    if (g_menu_data_base) {
         char *s;
         int y, entry = 0x8710;
         float z, half;
 
         half = 0.5f;
-        s = table_find_by_id(D_L03_001A904C + entry, 0xCB);
-        y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
+        s = table_find_by_id(g_menu_data_base + entry, 0xCB);
+        y = label_y(s, g_path_puzzle_label_size, g_screen_l03_scale[0], half, 1);
         z = 0.0f;
-        gfx_draw_scaled_object_two_axes(s, 0x60442D00, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
-        s = table_find_by_id(D_L03_001A904C + entry, 0xCC);
-        y = label_y(s, D_L03_001B0BCC, D_L03_001B3284[0], half, 1);
-        gfx_draw_scaled_object_two_axes(s, 0x55F0C070, D_L03_001B0BC8, (float)y, D_L03_001B0BD0, D_L03_001B0BD4, z);
+        gfx_draw_scaled_object_two_axes(s, 0x60442D00, g_path_puzzle_label_draw_x, (float)y, g_path_puzzle_label_scale_x, g_path_puzzle_label_scale_y, z);
+        s = table_find_by_id(g_menu_data_base + entry, 0xCC);
+        y = label_y(s, g_path_puzzle_label_size, g_screen_l03_scale[0], half, 1);
+        gfx_draw_scaled_object_two_axes(s, 0x55F0C070, g_path_puzzle_label_draw_x, (float)y, g_path_puzzle_label_scale_x, g_path_puzzle_label_scale_y, z);
     }
     half = 0.5f;
     {
@@ -200,11 +200,11 @@ void DrawPathPuzzleHud(u8 *moby)
                           math_fast_sin_or_cos_b(IntToFloat(g_frame_l03_counter % 60) * 0.10471976548433304f
                                         - 3.14159274f) * half + half);
         a = IntToFloat(vars->amount);
-        b = IntToFloat(D_L03_001B0B58);
-        left = D_L03_001B0BA8 + 2;
+        b = IntToFloat(g_path_puzzle_timer_max);
+        left = g_path_puzzle_label_left + 2;
         x = FloatToInt((float)(D_L03_001B0BA8_1[1] - D_L03_001B0BA8_1[3] - 4) * a / b
                           + (float)(D_L03_001B0BA8_1[3] - 2));
-        t = D_L03_001B3284[0];
+        t = g_screen_l03_scale[0];
         top = scaled_coord(x, t, half, 1);
         right = D_L03_001B0BA8_1[2] - 2;
         bottom = scaled_coord(D_L03_001B0BA8_1[3] - 2, t, half, 1);
@@ -215,9 +215,9 @@ void DrawPathPuzzleHud(u8 *moby)
         float step, fx;
 
         a = IntToFloat(D_L03_001B0BB8_1[1] - D_L03_001B0BB8_1[3]);
-        b = IntToFloat(D_L03_001B0B50);
+        b = IntToFloat(g_path_puzzle_step_count);
         step = a / b;
-        for (i = 0; i < D_L03_001B0B50; i++) {
+        for (i = 0; i < g_path_puzzle_step_count; i++) {
             float scale;
 
             x = FloatToInt((float)D_L03_001B0BB8_1[3] + (float)i * step);
@@ -226,22 +226,22 @@ void DrawPathPuzzleHud(u8 *moby)
             scale = D_L03_001B3284_1;
             if (i >= vars->count) {
                 bottom = scaled_coord(end, scale, half, 1);
-                top = hud_size(D_L03_001B3280, fx, scale, half);
-                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
+                top = hud_size(g_screen_l03_mode, fx, scale, half);
+                AppendScreenRectPacket(g_path_puzzle_label_rect_x, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[2], 0);
                 {
                     float t;
 
-                    left = D_L03_001B0BB8 + 2;
-                    t = D_L03_001B3284[0];
+                    left = g_path_puzzle_label_rect_x + 2;
+                    t = g_screen_l03_scale[0];
                     bottom = scaled_coord(end + 2, t, half, 1);
                     right = D_L03_001B0BB8_1[2] - 2;
                     top = scaled_coord(x - 2, t, half, 1);
-                    AppendScreenRectPacket(left, bottom, right, top, D_L03_001B0B98, 0);
+                    AppendScreenRectPacket(left, bottom, right, top, g_path_puzzle_rect_color, 0);
                 }
             } else {
                 bottom = scaled_coord(end, scale, half, 1);
-                top = hud_size(D_L03_001B3280, fx, scale, half);
-                AppendScreenRectPacket(D_L03_001B0BB8, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
+                top = hud_size(g_screen_l03_mode, fx, scale, half);
+                AppendScreenRectPacket(g_path_puzzle_label_rect_x, bottom, D_L03_001B0BB8_1[2], top, D_L03_001B0B98_1[1], 0);
             }
         }
     }
@@ -250,16 +250,16 @@ void DrawPathPuzzleHud(u8 *moby)
         Vec ids, offs;
         char text[128];
 
-        ids = D_L03_001B0BF8;
-        offs = D_L03_001B0C08;
+        ids = g_path_puzzle_label_ids;
+        offs = g_path_puzzle_label_offsets;
         for (i = 0; i < 4; i++) {
             float a, offset;
 
-            sprintf(text, D_L03_001B0C18, GetLocalizedString(ids.x[i]));
-            x = FloatToInt(D_L03_001B0BD8[i * 2]);
+            sprintf(text, g_str_path_puzzle_label_format, GetLocalizedString(ids.x[i]));
+            x = FloatToInt(g_path_puzzle_label_corner_table[i * 2]);
             offset = (float)offs.x[i];
-            a = D_L03_001B0BDC[i * 2] * D_L03_001B3284[0] + 0.5f;
-            if (D_L03_001B3280 == 1)
+            a = g_path_puzzle_label_scale_table[i * 2] * g_screen_l03_scale[0] + 0.5f;
+            if (g_screen_l03_mode == 1)
                 y = (int)(a + offset);
             else
                 y = (int)a;

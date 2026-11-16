@@ -15,9 +15,9 @@ typedef struct {
 } Ref_L00_0032E4F0_Block;
 
 extern Ref_L00_0032E4F0_Block ref_L00_0032E4F0_00;
-extern float D_001B0870 __attribute__((sda));
-extern int D_001B0820 __attribute__((sda));
-extern int D_001B0824 __attribute__((sda));
+extern float g_cam_zoom_scale __attribute__((sda));
+extern int g_cam_zoom_effect_source __attribute__((sda));
+extern int g_cam_zoom_effect_target __attribute__((sda));
 extern float ref_L00_0032E4F0_04;
 extern void UpdateViewContext(void);
 
@@ -26,8 +26,8 @@ void func_PAL_00330020(float size)
     Ref_L00_0032E4F0_Block *block;
     float zoom;
 
-    D_001B0824 = ((s32)(D_001B0820) * 5 + 2) / 6;
-    zoom = size * (D_001B0870 * 1024.0f);
+    g_cam_zoom_effect_target = ((s32)(g_cam_zoom_effect_source) * 5 + 2) / 6;
+    zoom = size * (g_cam_zoom_scale * 1024.0f);
     block = &ref_L00_0032E4F0_00;
     block->field_22C = 100.0f;
     block->field_218 = 0;

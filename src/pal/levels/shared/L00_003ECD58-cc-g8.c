@@ -1,11 +1,12 @@
+#include "names.h"
 /* func_PAL_L00_003ECD58, the PAL copy of func_L00_003E8A98: the same C, where rename func_L00_003EA188 becomes func_PAL_L00_003EE450. */
 #include "common.h"
-extern float D_L00_0024F7C0[4][32];
-extern float D_L00_0029AE20[5][4];
-extern float D_L00_001B2B80[4] MACRO_ADDR;
-extern float D_L00_001B06DC __attribute__((sda));
-extern float D_L00_001B06E0 __attribute__((sda));
-extern float D_L00_001B06C4 __attribute__((sda));
+extern float g_charge_weapon_effect_table[4][32];
+extern float g_plasma_coil_beam_points[5][4];
+extern float g_plasma_coil_anchor[4] MACRO_ADDR;
+extern float g_plasma_coil_angle_a __attribute__((sda));
+extern float g_plasma_coil_angle_b __attribute__((sda));
+extern float g_charge_min __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void part_update_wave_offsets(int, float *, int);
 extern void get_moby_joint_matrices(void *, int, int *, void *);
@@ -35,20 +36,20 @@ void func_PAL_L00_003ECD58(void *object)
     float *first;
     VU1_addGSregister(0x47, 0x53001ULL);
     state = *(char **)(moby + 0x68);
-    part_update_wave_offsets((int)moby, D_L00_0024F7C0[0], 4);
+    part_update_wave_offsets((int)moby, g_charge_weapon_effect_table[0], 4);
     lookup = 0;
     get_moby_joint_matrices(moby, 1, &lookup, matrix);
     matrix[3][0] = 0.0f;
     matrix[3][1] = 0.0f;
     matrix[3][2] = 0.0f;
     matrix[3][3] = 1.0f;
-    D_L00_0029AE20[1][0] = -math_fast_sin_or_cos_a(D_L00_001B06E0) * 0.0151f;
-    D_L00_0029AE20[1][2] = math_fast_sin_or_cos_a(D_L00_001B06DC) * 0.0149f;
-    D_L00_0029AE20[1][1] = -(math_fast_sin_or_cos_b(D_L00_001B06DC) * 0.015f + 0.4f);
-    D_L00_001B06DC = FastAddRotations(D_L00_001B06DC, 0.5026549f);
-    D_L00_001B06E0 = FastAddRotations(D_L00_001B06E0, 0.4956736f);
+    g_plasma_coil_beam_points[1][0] = -math_fast_sin_or_cos_a(g_plasma_coil_angle_b) * 0.0151f;
+    g_plasma_coil_beam_points[1][2] = math_fast_sin_or_cos_a(g_plasma_coil_angle_a) * 0.0149f;
+    g_plasma_coil_beam_points[1][1] = -(math_fast_sin_or_cos_b(g_plasma_coil_angle_a) * 0.015f + 0.4f);
+    g_plasma_coil_angle_a = FastAddRotations(g_plasma_coil_angle_a, 0.5026549f);
+    g_plasma_coil_angle_b = FastAddRotations(g_plasma_coil_angle_b, 0.4956736f);
     {
-        float *src = D_L00_0029AE20[0], *dst;
+        float *src = g_plasma_coil_beam_points[0], *dst;
         first = attachments[0];
         dst = first;
         for (i = 0; i < 5; i++) {
@@ -61,15 +62,15 @@ void func_PAL_L00_003ECD58(void *object)
     part_spawn_random_effect((int)moby, (int)points[0], 0x7F7F2020, 0x40, 0.11f);
     part_spawn_random_effect((int)moby, (int)points[0], 0x7FFF4040, 0x78, 0.05f);
     moby_get_attachment_point(moby, 0, (char *)points[1], (char *)attachments[1]);
-    if (D_L00_001B2B80[3] == -1.0f) {
-        qcopy(D_L00_001B2B80, points[1]);
-        D_L00_001B2B80[3] = 0.0f;
+    if (g_plasma_coil_anchor[3] == -1.0f) {
+        qcopy(g_plasma_coil_anchor, points[1]);
+        g_plasma_coil_anchor[3] = 0.0f;
     } else {
         int changed = 0;
-        vec_spring_to_target(D_L00_001B2B80, points[1], &changed, 0.3f, 0.24000001f, 0.6f);
+        vec_spring_to_target(g_plasma_coil_anchor, points[1], &changed, 0.3f, 0.24000001f, 0.6f);
     }
-    part_spawn_random_effect((int)moby, (int)D_L00_001B2B80, 0x7F00397F, 0x40, 2.0f * *(float *)(state + 0x10) * 0.082499996f);
-    part_spawn_random_effect((int)moby, (int)D_L00_001B2B80, 0x7F0072FF, 0x78, 2.0f * *(float *)(state + 0x10) * 0.0375f);
+    part_spawn_random_effect((int)moby, (int)g_plasma_coil_anchor, 0x7F00397F, 0x40, 2.0f * *(float *)(state + 0x10) * 0.082499996f);
+    part_spawn_random_effect((int)moby, (int)g_plasma_coil_anchor, 0x7F0072FF, 0x78, 2.0f * *(float *)(state + 0x10) * 0.0375f);
     moby_get_attachment_point(moby, 1, (char *)points[2], (char *)attachments[2]);
     part_spawn_random_effect((int)moby, (int)points[2], 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)points[2], 0x7FFF4040, 0x78, 0.025f);
@@ -79,54 +80,54 @@ void func_PAL_L00_003ECD58(void *object)
     moby_get_attachment_point(moby, 3, (char *)points[4], (char *)attachments[4]);
     part_spawn_random_effect((int)moby, (int)points[4], 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)points[4], 0x7FFF4040, 0x78, 0.025f);
-    gfx_draw_lightning_arc(moby, points[0], D_L00_001B2B80, D_L00_0024F7C0[0]);
-    vec_compute_arc_side_direction(moby, D_L00_001B2B80, normal, *(float *)(state + 0x10) * 0.35f);
-    FastVecSub(side, D_L00_001B2B80, points[2]);
+    gfx_draw_lightning_arc(moby, points[0], g_plasma_coil_anchor, g_charge_weapon_effect_table[0]);
+    vec_compute_arc_side_direction(moby, g_plasma_coil_anchor, normal, *(float *)(state + 0x10) * 0.35f);
+    FastVecSub(side, g_plasma_coil_anchor, points[2]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0x10) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2B80);
-    gfx_draw_lightning_arc(moby, points[2], endpoint, D_L00_0024F7C0[1]);
+    FastVecAdd(endpoint, side, g_plasma_coil_anchor);
+    gfx_draw_lightning_arc(moby, points[2], endpoint, g_charge_weapon_effect_table[1]);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7FFF4040, 0x78, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > D_L00_001B06C4)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > g_charge_min)
         func_PAL_L00_003EE450(endpoint, 1, 0.0f);
-    FastVecSub(side, D_L00_001B2B80, points[3]);
+    FastVecSub(side, g_plasma_coil_anchor, points[3]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0x10) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2B80);
-    gfx_draw_lightning_arc(moby, points[3], endpoint, D_L00_0024F7C0[2]);
+    FastVecAdd(endpoint, side, g_plasma_coil_anchor);
+    gfx_draw_lightning_arc(moby, points[3], endpoint, g_charge_weapon_effect_table[2]);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7FFF4040, 0x78, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > D_L00_001B06C4)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > g_charge_min)
         func_PAL_L00_003EE450(endpoint, 1, 0.0f);
-    FastVecSub(side, D_L00_001B2B80, points[4]);
+    FastVecSub(side, g_plasma_coil_anchor, points[4]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
     vec_scale_to_length(side, side, *(float *)(state + 0x10) * 0.45f);
-    FastVecAdd(endpoint, side, D_L00_001B2B80);
-    gfx_draw_lightning_arc(moby, points[4], endpoint, D_L00_0024F7C0[3]);
+    FastVecAdd(endpoint, side, g_plasma_coil_anchor);
+    gfx_draw_lightning_arc(moby, points[4], endpoint, g_charge_weapon_effect_table[3]);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)endpoint, 0x7FFF4040, 0x78, 0.025f);
-    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > D_L00_001B06C4)
+    if (func_001163B0() % 11 == 0 && *(float *)(state + 0x10) > g_charge_min)
         func_PAL_L00_003EE450(endpoint, 1, 0.0f);
     moby_transform_joint_to_world(moby, 1, (char *)muzzle);
-    gfx_draw_lightning_arc(moby, muzzle, points[2], D_L00_0024F7C0[3]);
+    gfx_draw_lightning_arc(moby, muzzle, points[2], g_charge_weapon_effect_table[3]);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7FFF4040, 0x78, 0.025f);
     moby_transform_joint_to_world(moby, 2, (char *)muzzle);
-    gfx_draw_lightning_arc(moby, muzzle, points[3], D_L00_0024F7C0[2]);
+    gfx_draw_lightning_arc(moby, muzzle, points[3], g_charge_weapon_effect_table[2]);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7FFF4040, 0x78, 0.025f);
     moby_transform_joint_to_world(moby, 3, (char *)muzzle);
-    gfx_draw_lightning_arc(moby, muzzle, points[4], D_L00_0024F7C0[1]);
+    gfx_draw_lightning_arc(moby, muzzle, points[4], g_charge_weapon_effect_table[1]);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7F7F2020, 0x40, 0.055f);
     part_spawn_random_effect((int)moby, (int)muzzle, 0x7FFF4040, 0x78, 0.025f);
     if (func_001163B0() % 11 == 0) {

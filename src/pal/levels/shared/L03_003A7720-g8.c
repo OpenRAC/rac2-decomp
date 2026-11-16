@@ -15,7 +15,7 @@ extern float ref_L03_003C4240_05 __attribute__((sda));
 
 /* Turns the object with its state: it stops when the state has no time left, otherwise it
    spreads the turn over the frame and lets the state and the object react to it. */
-void func_PAL_L03_003C8250(unsigned char *a0) {
+void moby_turn_toward_move_direction_pal(unsigned char *a0) {
     unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
     unsigned char *v;
     float f;
@@ -49,10 +49,10 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_clamp_length(float *, float);
-extern float D_L03_001AFF08 __attribute__((sda));
-extern float D_L03_001AFF04 __attribute__((sda));
+extern float g_moby_l03_push_scale __attribute__((sda));
+extern float g_moby_push_clamp __attribute__((sda));
 
-void func_PAL_L03_003C8378(u8 *object, void *target)
+void moby_push_toward_target_pal(u8 *object, void *target)
 {
     float delta[4];
     u8 *state;
@@ -67,9 +67,9 @@ void func_PAL_L03_003C8378(u8 *object, void *target)
     }
     FastVecSub(delta, object + 0x10, target);
     delta[2] = 0.0f;
-    vec_scale_to_length(delta, delta, (D_L03_001AFF08 + D_L03_001AFF08) * 0.00040000002f);
+    vec_scale_to_length(delta, delta, (g_moby_l03_push_scale + g_moby_l03_push_scale) * 0.00040000002f);
     FastVecAdd(state + 0x1B0, state + 0x1B0, delta);
-    vec_clamp_length((float *)(state + 0x1B0), D_L03_001AFF04 * 0.020000001f);
+    vec_clamp_length((float *)(state + 0x1B0), g_moby_push_clamp * 0.020000001f);
 }
 
 extern float math_fast_sin_or_cos_b(float);
@@ -125,7 +125,7 @@ typedef struct {
    func_L03_003C4800 for the object with func_L00_002E6CF0. The kind selects its arm through the
    level's jump table; `cases` only keeps the labels alive, and the labels are named after the
    kind that reaches them. */
-void func_PAL_L03_003C8588(L03Obj *a0) {
+void moby_pulse_tint_pal(L03Obj *a0) {
     static void *cases[9] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c1, &&c8};
     L03State *s1 = a0->state;
     int pair[2];

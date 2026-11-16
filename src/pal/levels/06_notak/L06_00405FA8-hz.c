@@ -17,7 +17,7 @@ extern char *func_PAL_L06_00469110(char *moby, float *position, float *velocity,
  * the 0.0f a second use, so loop.c keeps it in a callee-saved register
  * instead of substituting it into the single call argument. This unit is
  * built with -g, as line notes bound haifa-sched's regions here. */
-void func_PAL_L06_00405FA8(char *moby)
+void part_emit_rings_pal(char *moby)
 {
     float position[4];
     float velocity[4];

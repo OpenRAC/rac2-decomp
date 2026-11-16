@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_L08_003D1E50: the hero-NPC state machine shared by Tabora, Dobbo and Grelbin
  * (levels 08, 09, 19), dispatched on moby byte 0x20 over the NPC block at moby+0x68.
  * Own unit: -G8 for the $gp tuning constants, -g for the nop pairs before div.s,
@@ -13,62 +14,62 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; int i[4]; } Vec;
 
 /* $gp-relative tuning constants (retail reads them as one-instruction gp loads). */
-extern float D_L08_001AFFD0 __attribute__((sda));
-extern float D_L08_001AFFD4 __attribute__((sda));
-extern float D_L08_001AFFD8 __attribute__((sda));
-extern s32 D_L08_001AFFDC __attribute__((sda));
-extern s32 D_L08_001AFFE0 __attribute__((sda));
-extern s32 D_L08_001AFFE4 __attribute__((sda));
-extern float D_L08_001AFFE8 __attribute__((sda));
-extern float D_L08_001AFFF8 __attribute__((sda));
-extern float D_L08_001AFFFC __attribute__((sda));
-extern float D_L08_001B0000 __attribute__((sda));
-extern float D_L08_001B000C __attribute__((sda));
-extern float D_L08_001B0010 __attribute__((sda));
-extern float D_L08_001B0014 __attribute__((sda));
-extern float D_L08_001B0018 __attribute__((sda));
-extern float D_L08_001B0070 __attribute__((sda));
-extern float D_L08_001B007C __attribute__((sda));
-extern s32 D_L08_001B0084 __attribute__((sda));
-extern float D_L08_001B0088 __attribute__((sda));
-extern float D_L08_001B008C __attribute__((sda));
-extern s32 D_L08_001B0090 __attribute__((sda));
-extern float D_L08_001B0094 __attribute__((sda));
-extern float D_L08_001B0098 __attribute__((sda));
-extern float D_L08_001B009C __attribute__((sda));
-extern float D_L08_001B00A0 __attribute__((sda));
-extern float D_L08_001B00A4 __attribute__((sda));
-extern float D_L08_001B00A8 __attribute__((sda));
-extern float D_L08_001B00FC __attribute__((sda));
-extern float D_L08_001B0100 __attribute__((sda));
-extern float D_L08_001B0104 __attribute__((sda));
-extern s32 D_L08_001B0108 __attribute__((sda));
-extern float D_L08_001B010C __attribute__((sda));
-extern float D_L08_001B0124 __attribute__((sda));
-extern float D_L08_001B0128 __attribute__((sda));
-extern s32 D_L08_001B0130 __attribute__((sda));
-extern float D_L08_001B0134 __attribute__((sda));
-extern float D_L08_001B0138 __attribute__((sda));
-extern float D_L08_001B013C __attribute__((sda));
-extern s32 D_L08_001B0140 __attribute__((sda));
-extern float D_L08_001B3410;
+extern float g_vehicle_df8_step __attribute__((sda));
+extern float g_vehicle_hero_near_distance __attribute__((sda));
+extern float g_vehicle_hero_far_distance __attribute__((sda));
+extern s32 g_vehicle_timer_start __attribute__((sda));
+extern s32 g_vehicle_timer_length __attribute__((sda));
+extern s32 g_vehicle_timer_margin __attribute__((sda));
+extern float g_vehicle_target_angle_degrees __attribute__((sda));
+extern float g_vehicle_l08_max_speed __attribute__((sda));
+extern float g_vehicle_speed_accel __attribute__((sda));
+extern float g_vehicle_l08_turn_rate __attribute__((sda));
+extern float g_vehicle_slope_threshold __attribute__((sda));
+extern float g_vehicle_slow_speed __attribute__((sda));
+extern float g_vehicle_slope_limit __attribute__((sda));
+extern float g_vehicle_cruise_speed __attribute__((sda));
+extern float g_vehicle_bank_limit_degrees __attribute__((sda));
+extern float g_vehicle_df28_blend_scale __attribute__((sda));
+extern s32 g_vehicle_df50_frames __attribute__((sda));
+extern float g_vehicle_decel_a __attribute__((sda));
+extern float g_vehicle_angle_limit_degrees __attribute__((sda));
+extern s32 g_vehicle_df50_reset __attribute__((sda));
+extern float g_vehicle_angle_threshold_degrees __attribute__((sda));
+extern float g_vehicle_yaw_step __attribute__((sda));
+extern float g_vehicle_decel_b __attribute__((sda));
+extern float g_vehicle_df64_offset __attribute__((sda));
+extern float g_vehicle_param_copy_a __attribute__((sda));
+extern float g_vehicle_param_copy_b __attribute__((sda));
+extern float g_vehicle_push_speed __attribute__((sda));
+extern float g_vehicle_max_reverse_speed __attribute__((sda));
+extern float g_vehicle_reverse_limit __attribute__((sda));
+extern s32 g_vehicle_df50_alt_frames __attribute__((sda));
+extern float g_vehicle_decel_c __attribute__((sda));
+extern float g_vehicle_l08_velocity_damping __attribute__((sda));
+extern float g_vehicle_velocity_length_scale __attribute__((sda));
+extern s32 g_vehicle_threshold_frames __attribute__((sda));
+extern float g_vehicle_target_angle_step __attribute__((sda));
+extern float g_vehicle_angle_step_zero __attribute__((sda));
+extern float g_vehicle_unk_ratio_scale __attribute__((sda));
+extern s32 g_vehicle_active_flag __attribute__((sda));
+extern float g_vehicle_saved_x;
 typedef struct { u8 bytes[0x100]; } HeroCDF98;
-extern HeroCDF98 *D_L08_001B29DC;
-extern float D_L08_001B2094;
-extern float D_L08_001B2098;
-extern float D_L08_001B3414;
-extern s32 D_00138324[];
+extern HeroCDF98 *g_moby_array;
+extern float g_vehicle_collision_x;
+extern float g_vehicle_collision_y;
+extern float g_vehicle_saved_y;
+extern s32 g_pad_held_flags[];
 typedef struct { float f[0x100]; } StateCDF98;
-extern StateCDF98 D_L08_001B99C0;
-extern char D_L08_001B9B00[];
-extern char D_L08_001A8F20[] MACRO_ADDR;
-extern char D_L08_001B0148[];
-extern char D_L08_001B0168[];
-extern char D_L08_001B0180[];
-extern u8 D_001A7B0D;
-extern s32 D_0018B650[];
+extern StateCDF98 g_hero_l08_extra_state;
+extern char g_hero_position_vec[];
+extern char g_str_effect_name[] MACRO_ADDR;
+extern char g_str_vehicle_debug_printf[];
+extern char g_str_vehicle_debug_message_a[];
+extern char g_str_vehicle_debug_message_b[];
+extern u8 g_level_flag_byte_2;
+extern s32 g_held_object_ptr[];
 typedef struct { u8 bytes[0x80]; } TargetCDF98;
-extern TargetCDF98 *D_L08_001B2ACC;
+extern TargetCDF98 *g_collision_box_table;
 typedef struct {
     u32 handle;
     u8 active;
@@ -81,7 +82,7 @@ typedef struct {
     VoiceCDF98 voice;
 } VoiceSlotCDF98;
 extern u8 g_sound_state[];
-extern void *D_0018A15C[];
+extern void *g_platform_actor_ref[];
 
 extern int func_001163B0(void);
 extern void STUB_printf(void *, ...);
@@ -106,7 +107,7 @@ extern void moby_set_state(void *, int, int);
 extern float math_random_float_range(float, float);
 extern void moby_update_ground_check(void *);
 extern void StepAngleTowardTarget(void *, int, float, float);
-extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int IsPointInCuboid(void *, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int TryClaimNotice(int, int, int);
@@ -116,11 +117,11 @@ extern void *func_PAL_002BE9A8(void *, int, void *, float, float, int, int, floa
 extern void snd_stop_voice(int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void hero_reset_speeds_and_vectors(void);
-extern void func_PAL_L00_002B3000(void);
-extern void func_PAL_L00_002D2668(int, int, float);
+extern void hero_record_play_counters_pal(void);
+extern void set_hero_animation_pal(int, int, float);
 extern void script_queue_keyed_request(int, int);
 extern int func_PAL_L08_002D3078(int, int);
-extern void func_PAL_L08_003D12C0(void *, void *);
+extern void cam_update_aim_values_pal(void *, void *);
 extern void hero_move_with_mount_to_transform(void *, void *);
 extern void hero_save_transform_snap_object(void *, void *);
 extern void func_PAL_L08_003D1540(void *, void *, float);
@@ -176,14 +177,14 @@ void func_PAL_L08_003D1E50(u8 *obj)
     case 0:
         id = DI(0x6C);
         if (id > 0) {
-            HeroCDF98 *table = D_L08_001B29DC;
+            HeroCDF98 *table = g_moby_array;
             qcopy(d, table[id].bytes + 0x10);
             qcopy(d + 0x10, table[id].bytes + 0xF0);
             moby_place_at_stored_transform(obj);
         } else {
-            STUB_printf(D_L08_001B0148, *(s16 *)(obj + 0xB2));
+            STUB_printf(g_str_vehicle_debug_printf, *(s16 *)(obj + 0xB2));
         }
-        DF(8) = DF(8) + D_L08_001AFFD0;
+        DF(8) = DF(8) + g_vehicle_df8_step;
         moby_transform_joint_to_world(obj, 8, d + 0x30);
         FastVecSub(d + 0x30, obj + 0x10, d + 0x30);
         matrix_from_basis_rows(scratch.inverse, obj + 0xC0);
@@ -199,17 +200,17 @@ void func_PAL_L08_003D1E50(u8 *obj)
         DI(0xB0) = 0;
         break;
     case 1:
-        if (D_001A7B0D == 0)
+        if (g_level_flag_byte_2 == 0)
             return;
         {
             if (DI(0x6C) < 0) {
-                if (fast_vec_dist(d, g_hero_state.pos) < D_L08_001AFFD4 && g_hero_state.unk2294 != 0x31) {
+                if (fast_vec_dist(d, g_hero_state.pos) < g_vehicle_hero_near_distance && g_hero_state.unk2294 != 0x31) {
                     SetAnimation(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
                 }
             } else {
-                u8 *q = (u8 *)D_0018A15C[0];
-                if (q != 0 && *(s16 *)(q + 0xAA) == 0x988 && q == D_L08_001B29DC[DI(0x6C)].bytes) {
+                u8 *q = (u8 *)g_platform_actor_ref[0];
+                if (q != 0 && *(s16 *)(q + 0xAA) == 0x988 && q == g_moby_array[DI(0x6C)].bytes) {
                     SetAnimation(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
                 }
@@ -221,22 +222,22 @@ void func_PAL_L08_003D1E50(u8 *obj)
         hero_save_transform_snap_object(obj, d);
         if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != 0x988) {
             SetAnimation(obj, 0, 0, 0xA);
-            qcopy(d, D_L08_001B29DC[DI(0x6C)].bytes + 0x10);
-            DF(8) = DF(8) + D_L08_001AFFD0;
+            qcopy(d, g_moby_array[DI(0x6C)].bytes + 0x10);
+            DF(8) = DF(8) + g_vehicle_df8_step;
             moby_set_state(obj, 1, -1);
         }
         ok = TryClaimNotice(7, 0x12f0, 1) != 0;
-        if (OB(0x20) == 2 && (D_00138324[0] & 0x40)) {
-            if (ok && g_hero_state.target == D_L08_001B29DC[DI(0x6C)].bytes && g_hero_state.unk340 != 0
+        if (OB(0x20) == 2 && (g_pad_held_flags[0] & 0x40)) {
+            if (ok && g_hero_state.target == g_moby_array[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
                 func_PAL_L08_002D3078(0x31, 0);
-                func_PAL_L00_002D2668(0x87, 0, 3.0f);
+                set_hero_animation_pal(0x87, 0, 3.0f);
                 ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
-                q = D_L08_001B29DC[DI(0x6C)].bytes;
-                vec_scale_to_length(d + 0x20, q + 0xC0, D_L08_001B00FC * 0.020000001f);
-                DF(0x28) = D_L08_001B0100 * 0.020000001f;
-                DI(0x50) = ((s32)(D_L08_001B0108) * 5 + 2) / 6;
+                q = g_moby_array[DI(0x6C)].bytes;
+                vec_scale_to_length(d + 0x20, q + 0xC0, g_vehicle_push_speed * 0.020000001f);
+                DF(0x28) = g_vehicle_max_reverse_speed * 0.020000001f;
+                DI(0x50) = ((s32)(g_vehicle_df50_alt_frames) * 5 + 2) / 6;
                 DF(0x18) = *(float *)(q + 0xF8);
                 g_hero_state.unk1830 = obj;
                 DI(0x9C) = 0;
@@ -248,7 +249,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
     case 3: {
         if (flag_set_first_pending(obj) != 0) {
             if (DI(0xBC) != -1) {
-                STUB_printf(D_L08_001B0168);
+                STUB_printf(g_str_vehicle_debug_message_a);
                 script_queue_keyed_request(DI(0xBC), DI(0xB8));
             }
             DI(0xB0) = 0x19;
@@ -258,15 +259,15 @@ void func_PAL_L08_003D1E50(u8 *obj)
         }
         if (DI(0x9C) != 0 || g_hero_state.unkC38 > 10.0f) {
             DI(0x9C) = DI(0x9C) | 4;
-            StepAngleTowardTarget(d + 0x14, 0, D_L08_001AFFE8 * 0.017453294f, D_L08_001B0134 * 0.0003490659f);
-            if (D_L08_001B0140 != 0)
+            StepAngleTowardTarget(d + 0x14, 0, g_vehicle_target_angle_degrees * 0.017453294f, g_vehicle_target_angle_step * 0.0003490659f);
+            if (g_vehicle_active_flag != 0)
                 FastVecAdd(d, d, d + 0x20);
-            DF(0x28) = DF(0x28) - D_L08_001B010C * 0.00040000002f;
-            if (DF(0x28) < -(D_L08_001B0104 * 0.020000001f))
+            DF(0x28) = DF(0x28) - g_vehicle_decel_c * 0.00040000002f;
+            if (DF(0x28) < -(g_vehicle_reverse_limit * 0.020000001f))
                 DI(0x9C) = DI(0x9C) | 1;
             if (g_hero_state.unkC28 & 2) {
                 DI(0x9C) = DI(0x9C) | 2;
-                func_PAL_L00_002D2668(0x81, 0, 12.0f);
+                set_hero_animation_pal(0x81, 0, 12.0f);
             }
             if (math_fast_float_d(d + 0x50) != 0) {
                 if (DI(0x9C) == 7) {
@@ -276,22 +277,22 @@ void func_PAL_L08_003D1E50(u8 *obj)
                         SetAnimation(obj, 1, 0, 5);
                         snd_play_from_class_bank(0, 0, obj, 0x988);
                     }
-                    DI(0x50) = (((s32)(D_L08_001AFFDC) * 5 + 2) / 6);
+                    DI(0x50) = (((s32)(g_vehicle_timer_start) * 5 + 2) / 6);
                     func_PAL_L08_002D3078(0x31, 0);
-                    func_PAL_L00_002D2668(0x81, 0, 12.0f);
+                    set_hero_animation_pal(0x81, 0, 12.0f);
                     ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
-                    if (D_L08_001B0140 != 0)
-                        DF(0x14) = D_L08_001AFFE8 * 0.017453294f;
+                    if (g_vehicle_active_flag != 0)
+                        DF(0x14) = g_vehicle_target_angle_degrees * 0.017453294f;
                     DF(0x54) = 0.07200001f;
                     qzero_nc(d + 0x20);
                     DI(0xA8) = 0;
                     DF(0x58) = DF(8);
-                    func_PAL_L08_003D12C0(d + 0xA8, obj);
+                    cam_update_aim_values_pal(d + 0xA8, obj);
                     DF(0x64) = 0.0f;
-                    D_L08_001B3410 = D_L08_001B2094;
-                    D_L08_001B3414 = D_L08_001B2098;
-                    D_L08_001B2094 = D_L08_001B00A4;
-                    D_L08_001B2098 = D_L08_001B00A8;
+                    g_vehicle_saved_x = g_vehicle_collision_x;
+                    g_vehicle_saved_y = g_vehicle_collision_y;
+                    g_vehicle_collision_x = g_vehicle_param_copy_a;
+                    g_vehicle_collision_y = g_vehicle_param_copy_b;
                     g_hero_state.unk1830 = obj;
                     moby_set_state(obj, 5, -1);
                 }
@@ -302,7 +303,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
         break;
     }
     case 4:
-        if (D_L08_001AFFD8 < vec_distance_xy(obj + 0x10, g_hero_state.pos)) {
+        if (g_vehicle_hero_far_distance < vec_distance_xy(obj + 0x10, g_hero_state.pos)) {
             SetAnimation(obj, 0, 0, 0xA);
             moby_set_state(obj, 1, -1);
         }
@@ -313,21 +314,21 @@ void func_PAL_L08_003D1E50(u8 *obj)
             if (slot->voice.owner != obj || slot->voice.active == 0)
                 DI(0xAC) = snd_play_from_class_bank(1, 4, obj, 0x988);
         }
-        func_PAL_L08_003D12C0(d + 0xA8, obj);
+        cam_update_aim_values_pal(d + 0xA8, obj);
         DF(0x28) = -math_fast_sin_or_cos_b(DF(0x14)) * DF(0x54);
         {
             float c = DF(0x54) * math_fast_sin_or_cos_a(DF(0x14));
             DF(0x20) = c * math_fast_sin_or_cos_a(DF(0x18));
             DF(0x24) = c * math_fast_sin_or_cos_b(DF(0x18));
         }
-        if ((((s32)(D_L08_001AFFE0) * 5 + 2) / 6) >= DI(0x50)) {
+        if ((((s32)(g_vehicle_timer_length) * 5 + 2) / 6) >= DI(0x50)) {
             if (OH(0x34) & 1) {
                 OH(0x34) = OH(0x34) & 0xFFFE;
                 OB(0x31) = 1;
                 SetAnimation(obj, 1, 0, 0xA);
             }
             {
-                float r = IntToFloat((((s32)(D_L08_001AFFE0) * 5 + 2) / 6) - DI(0x50)) / IntToFloat(D_L08_001AFFE0);
+                float r = IntToFloat((((s32)(g_vehicle_timer_length) * 5 + 2) / 6) - DI(0x50)) / IntToFloat(g_vehicle_timer_length);
                 DF(0x64) = r;
                 if (r > 1.0f)
                     DF(0x64) = 1.0f;
@@ -340,26 +341,26 @@ void func_PAL_L08_003D1E50(u8 *obj)
             FastVecScale(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
             FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
         }
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         if (func_PAL_L08_003D1A30(obj, &saved) == 0) {
-            float sp = DF(0x54) + D_L08_001AFFFC * 0.00040000002f;
-            float top = D_L08_001AFFF8 * 0.020000001f;
+            float sp = DF(0x54) + g_vehicle_speed_accel * 0.00040000002f;
+            float top = g_vehicle_l08_max_speed * 0.020000001f;
             float rate;
             DF(0x54) = sp;
             if (top < sp)
                 DF(0x54) = top;
-            rate = D_L08_001B0000 * 0.0003490659f;
-            if (DI(0x50) < ((s32)(D_L08_001AFFDC) * 5 + 2) / 6 - ((s32)(D_L08_001AFFE4) * 5 + 2) / 6 && D_L08_001B0140 != 0)
+            rate = g_vehicle_l08_turn_rate * 0.0003490659f;
+            if (DI(0x50) < ((s32)(g_vehicle_timer_start) * 5 + 2) / 6 - ((s32)(g_vehicle_timer_margin) * 5 + 2) / 6 && g_vehicle_active_flag != 0)
                 DF(0x14) = fast_subtract_rotations(DF(0x14), rate);
             if (DF(0x14) < 0.0f)
                 DF(0x14) = 0.0f;
             if (math_fast_float_d(d + 0x50) != 0) {
                 SetAnimation(obj, 2, 0, 0xA);
-                func_PAL_L00_002D2668(0x82, 0, 12.0f);
+                set_hero_animation_pal(0x82, 0, 12.0f);
                 DF(0x40) = 0.0f;
                 DF(0x48) = 0.0f;
-                DF(0x44) = -(D_L08_001B0000 * 0.0003490659f);
+                DF(0x44) = -(g_vehicle_l08_turn_rate * 0.0003490659f);
                 moby_set_state(obj, 6, -1);
             }
         }
@@ -370,7 +371,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
     }
     case 6: {
         float t;
-        func_PAL_L08_003D12C0(d + 0xA8, obj);
+        cam_update_aim_values_pal(d + 0xA8, obj);
         {
             VoiceSlotCDF98 *slot = (VoiceSlotCDF98 *)(g_sound_state + DI(0xAC) * 0x70);
             if (slot->voice.owner != obj || slot->voice.active == 0)
@@ -380,39 +381,39 @@ void func_PAL_L08_003D1E50(u8 *obj)
         t = DF(0x5C);
         if (t < -0.4f) {
             if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x85 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x85) {
-                func_PAL_L00_002D2668(0x85, 0, 12.0f);
+                set_hero_animation_pal(0x85, 0, 12.0f);
                 snd_play_from_class_bank(2, 0, obj, 0x988);
             }
         } else if (t > 0.4f) {
             if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x86 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x86) {
-                func_PAL_L00_002D2668(0x86, 0, 12.0f);
+                set_hero_animation_pal(0x86, 0, 12.0f);
                 snd_play_from_class_bank(2, 0, obj, 0x988);
             }
         } else {
-            if (D_L08_001B0070 * 4.986656e-05f < DF(0x44)) {
+            if (g_vehicle_bank_limit_degrees * 4.986656e-05f < DF(0x44)) {
                 if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x83 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x83)
-                    func_PAL_L00_002D2668(0x83, 0, 21.0f);
-            } else if (DF(0x44) < -D_L08_001B0070 * 4.986656e-05f) {
+                    set_hero_animation_pal(0x83, 0, 21.0f);
+            } else if (DF(0x44) < -g_vehicle_bank_limit_degrees * 4.986656e-05f) {
                 if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x81 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x81) {
-                    func_PAL_L00_002D2668(0x81, 0, 21.0f);
+                    set_hero_animation_pal(0x81, 0, 21.0f);
                     if (DI(0xB0) == 0) {
                         snd_play_from_class_bank(3, 0, obj, 0x988);
                         DI(0xB0) = 0x25;
                     }
                 }
             } else if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x82 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x82) {
-                func_PAL_L00_002D2668(0x82, 0, 17.0f);
+                set_hero_animation_pal(0x82, 0, 17.0f);
             }
         }
         {
-            float a = DF(8), b = DF(0x58), c = D_L08_001B0014;
+            float a = DF(8), b = DF(0x58), c = g_vehicle_slope_limit;
             if (a - b <= c) {
                 if (DI(0x98) == 0) {
                     float s = DF(0x54);
-                    DF(0x54) = s + (((D_L08_001B0018 * 0.020000001f) - s) * 0.14400001f);
+                    DF(0x54) = s + (((g_vehicle_cruise_speed * 0.020000001f) - s) * 0.14400001f);
                 }
             } else {
-                float e = D_L08_001B000C;
+                float e = g_vehicle_slope_threshold;
                 float k = b - a;
                 float lo, sp, top;
                 k += e;
@@ -421,18 +422,18 @@ void func_PAL_L08_003D1E50(u8 *obj)
                     k = 1.0f;
                 else if (k < 0.0f)
                     k = 0.0f;
-                lo = D_L08_001B0018 * 0.020000001f;
+                lo = g_vehicle_cruise_speed * 0.020000001f;
                 k = 1.0f - k;
-                sp = lo + (k * ((D_L08_001B0010 * 0.020000001f) - lo));
+                sp = lo + (k * ((g_vehicle_slow_speed * 0.020000001f) - lo));
                 if (DI(0x98) == 0 || sp < DF(0x54))
                     DF(0x54) = DF(0x54) + ((sp - DF(0x54)) * 0.14400001f);
-                top = D_L08_001B0018 * 0.020000001f;
+                top = g_vehicle_cruise_speed * 0.020000001f;
                 if (top < DF(0x54))
                     DF(0x54) = top;
             }
         }
         if (DF(0x64) < 1.0f) {
-            float w = DF(0x64) + D_L08_001B00A0 * 1.2f;
+            float w = DF(0x64) + g_vehicle_df64_offset * 1.2f;
             DF(0x64) = w;
             if (w > 1.0f)
                 DF(0x64) = 1.0f;
@@ -443,20 +444,20 @@ void func_PAL_L08_003D1E50(u8 *obj)
         } else {
             vec_build_spherical_offset(d + 0x20, DF(0x54), DF(0x18), -DF(0x14));
         }
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
-        D_L08_001B99C0.f[0x3C8 / 4] = D_L08_001B99C0.f[0x3C8 / 4]
-            + (((DF(0x28) * D_L08_001B007C) - D_L08_001B99C0.f[0x3C8 / 4]) * 0.72f);
-        if (D_L08_001B000C < DF(8) - DF(0x58)) {
+        g_hero_l08_extra_state.f[0x3C8 / 4] = g_hero_l08_extra_state.f[0x3C8 / 4]
+            + (((DF(0x28) * g_vehicle_df28_blend_scale) - g_hero_l08_extra_state.f[0x3C8 / 4]) * 0.72f);
+        if (g_vehicle_slope_threshold < DF(8) - DF(0x58)) {
             float ang, lim;
             SetAnimation(obj, 2, 0, 3);
-            func_PAL_L00_002D2668(0x84, 0, 12.0f);
+            set_hero_animation_pal(0x84, 0, 12.0f);
             ang = DF(0x14);
-            lim = D_L08_001B008C * 0.017453294f;
+            lim = g_vehicle_angle_limit_degrees * 0.017453294f;
             DI(0x60) = 0;
-            DI(0x50) = D_L08_001B0084;
+            DI(0x50) = g_vehicle_df50_frames;
             if (lim < ang)
-                DF(0x68) = fast_subtract_rotations(lim, ang) / IntToFloat(D_L08_001B0084);
+                DF(0x68) = fast_subtract_rotations(lim, ang) / IntToFloat(g_vehicle_df50_frames);
             else
                 DF(0x68) = 0.0f;
             moby_set_state(obj, 7, -1);
@@ -468,20 +469,20 @@ void func_PAL_L08_003D1E50(u8 *obj)
         break;
     }
     case 7: {
-        func_PAL_L08_003D12C0(d + 0xA8, obj);
+        cam_update_aim_values_pal(d + 0xA8, obj);
         if (math_fast_float_d(d + 0x50) != 0) {
-            DI(0x50) = D_L08_001B0090;
+            DI(0x50) = g_vehicle_df50_reset;
             moby_set_state(obj, 8, -1);
         }
-        DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00040000002f);
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_a * 0.00040000002f);
         FastVecAdd(d, d, d + 0x20);
         DF(0x54) = FastVecLength(d + 0x20);
-        t = IntToFloat(DI(0x50)) / IntToFloat(D_L08_001B0084);
+        t = IntToFloat(DI(0x50)) / IntToFloat(g_vehicle_df50_frames);
         if (t > 1.0f)
             t = 1.0f;
         else if (t < 0.0f)
             t = 0.0f;
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
             DF(0x14) = FastAddRotations(DF(0x14), DF(0x68));
         func_PAL_L08_003D1540(obj, d, 1.0f);
         func_PAL_L08_003D1A30(obj, &saved);
@@ -489,17 +490,17 @@ void func_PAL_L08_003D1E50(u8 *obj)
         break;
     }
     case 8: {
-        func_PAL_L08_003D12C0(d + 0xA8, obj);
-        if (D_L08_001B0094 * 0.017453294f < DF(0x14) && DF(8) - DF(0x58) < D_L08_001B000C) {
-            func_PAL_L00_002D2668(0x82, 0, 12.0f);
+        cam_update_aim_values_pal(d + 0xA8, obj);
+        if (g_vehicle_angle_threshold_degrees * 0.017453294f < DF(0x14) && DF(8) - DF(0x58) < g_vehicle_slope_threshold) {
+            set_hero_animation_pal(0x82, 0, 12.0f);
             SetAnimation(obj, 2, 0, 0xA);
             DF(0x64) = 0.0f;
             moby_set_state(obj, 6, -1);
         } else {
             math_fast_float_d(d + 0x50);
         }
-        DF(0x28) = DF(0x28) + (-D_L08_001B0088 * 0.00040000002f);
-        if (D_L08_001B0140 != 0)
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_a * 0.00040000002f);
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         DF(0x54) = FastVecLength(d + 0x20);
         func_PAL_L08_003D1540(obj, d, 1.0f);
@@ -508,7 +509,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
         break;
     }
     case 9: {
-        func_PAL_L08_003D12C0(d + 0xA8, obj);
+        cam_update_aim_values_pal(d + 0xA8, obj);
         if (flag_set_first_pending(obj) != 0) {
             if (DI(0xAC) != -1) {
                 if (((VoiceSlotCDF98 *)(g_sound_state + DI(0xAC) * 0x70))->voice.owner == obj
@@ -519,19 +520,19 @@ void func_PAL_L08_003D1E50(u8 *obj)
             snd_play_from_class_bank(4, 0, obj, 0x988);
             DI(0xB0) = 0xc;
         }
-        if (D_L08_001B0140 != 0)
-            DF(0x18) = FastAddRotations(DF(0x18), D_L08_001B0098 * 0.0003490659f);
-        DF(0x28) = DF(0x28) + (-D_L08_001B009C * 0.00040000002f);
-        if (D_L08_001B0140 != 0)
+        if (g_vehicle_active_flag != 0)
+            DF(0x18) = FastAddRotations(DF(0x18), g_vehicle_yaw_step * 0.0003490659f);
+        DF(0x28) = DF(0x28) + (-g_vehicle_decel_b * 0.00040000002f);
+        if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         hero_move_with_mount_to_transform(obj, d);
         func_PAL_L08_003D1A30(obj, &saved);
         if (DF(0x28) > 0.0f || DF(8) < 12.0f || FastVecLength(d + 0x20) < 0.020000001f
-            || (s32)OH(0x96) > ((s32)(D_L08_001B0130) * 5 + 2) / 6) {
-            func_PAL_002AC718(obj, D_L08_001A8F20, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
+            || (s32)OH(0x96) > ((s32)(g_vehicle_threshold_frames) * 5 + 2) / 6) {
+            SpawnExplosionEffects_pal(obj, g_str_effect_name, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
                           -1, 15.0f, 1, 1, -1, 0, 0x810001);
-            D_0018B650[0] = 0;
-            func_PAL_L00_002B3000();
+            g_held_object_ptr[0] = 0;
+            hero_record_play_counters_pal();
         }
         break;
     }
@@ -545,9 +546,9 @@ void func_PAL_L08_003D1E50(u8 *obj)
         DI(0xAC) = -1;
         dist = fast_vec_dist(d, d + 0x80);
         lim = DF(0x94) < dist ? DF(0x94) : dist;
-        if (D_L08_001B0140 != 0) {
-            StepAngleTowardTarget(d + 0x14, 0, 0.0f, D_L08_001B0138 * 0.0003490659f);
-            StepAngleTowardTarget(d + 0x10, 0, 0.0f, D_L08_001B0138 * 0.0003490659f);
+        if (g_vehicle_active_flag != 0) {
+            StepAngleTowardTarget(d + 0x14, 0, 0.0f, g_vehicle_angle_step_zero * 0.0003490659f);
+            StepAngleTowardTarget(d + 0x10, 0, 0.0f, g_vehicle_angle_step_zero * 0.0003490659f);
         }
         if ((OB(0x60) & 2) && OB(0x42) == 3) {
             SetAnimation(obj, 0, 0, 0xA);
@@ -556,10 +557,10 @@ void func_PAL_L08_003D1E50(u8 *obj)
         }
         if (lim < dist) {
             FastVecSub(&scratch.v.velocity, d + 0x80, d);
-            vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * D_L08_001B0128);
-            FastVecScale(d + 0x20, d + 0x20, D_L08_001B0124);
+            vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * g_vehicle_velocity_length_scale);
+            FastVecScale(d + 0x20, d + 0x20, g_vehicle_l08_velocity_damping);
             FastVecAdd(d + 0x20, d + 0x20, &scratch.v.velocity);
-            if (D_L08_001B0140 != 0)
+            if (g_vehicle_active_flag != 0)
                 FastVecAdd(d, d, d + 0x20);
             hero_move_with_mount_to_transform(obj, d);
             break;
@@ -568,18 +569,18 @@ void func_PAL_L08_003D1E50(u8 *obj)
         DF(0x94) = 0.0f;
         if (g_hero_state.unkC28 & 2) {
             g_hero_state.unk1830 = 0;
-            D_L08_001B2094 = D_L08_001B3410;
-            D_L08_001B2098 = D_L08_001B3414;
+            g_vehicle_collision_x = g_vehicle_saved_x;
+            g_vehicle_collision_y = g_vehicle_saved_y;
             DI(0x50) = 0;
             func_PAL_L08_002D3078(0, 1);
             hero_reset_speeds_and_vectors();
             SetAnimation(obj, 0, 0, 0xA);
             if (DI(0x6C) > 0) {
-                qcopy(d, D_L08_001B29DC[DI(0x6C)].bytes + 0x10);
+                qcopy(d, g_moby_array[DI(0x6C)].bytes + 0x10);
                 moby_place_at_stored_transform(obj);
             }
             if (DI(0xC4) != -1) {
-                STUB_printf(D_L08_001B0180);
+                STUB_printf(g_str_vehicle_debug_message_b);
                 script_queue_keyed_request(DI(0xC4), DI(0xC0));
             }
             moby_set_state(obj, 1, -1);
@@ -598,7 +599,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
         if (DF(8) > 1013.0f) DF(8) = 1013.0f;
         if ((u32)(OB(0x20) - 5) < 5) {
             if (OB(0x31) != 0) {
-                if (fast_vec_dist(obj + 0x10, D_L08_001B9B00) < 80.0f) {
+                if (fast_vec_dist(obj + 0x10, g_hero_position_vec) < 80.0f) {
                     moby_update_ground_check(obj);
                     OB(0x6F) = 0x4B;
                 }
@@ -621,18 +622,18 @@ void func_PAL_L08_003D1E50(u8 *obj)
             slot = (s32 *)(d + 0x70);
             for (i = 0; i < 4; i++) {
                 if (slot[i] != 0xFF && IsPointInCuboid(d, slot[i]) != 0
-                    && *(float *)(D_L08_001B2ACC[slot[i]].bytes + 0x38) < g_hero_state.pos[2]) {
+                    && *(float *)(g_collision_box_table[slot[i]].bytes + 0x38) < g_hero_state.pos[2]) {
                     /* Written out: SetAnimation's int compare would keep 3 in a saved register across the loop. */
                     if (OB(0x43) != 3)
                         func_PAL_002A7E68(obj, 3, 0, 2);
-                    func_PAL_L00_002D2668(0x88, 0, 12.0f);
-                    qcopy(d + 0x80, D_L08_001B2ACC[slot[i]].bytes + 0x30);
+                    set_hero_animation_pal(0x88, 0, 12.0f);
+                    qcopy(d + 0x80, g_collision_box_table[slot[i]].bytes + 0x30);
                     DF(0x90) = fast_vec_dist(g_hero_state.pos, d + 0x80);
                     {
                         float m = FastVecLength(d + 0x20) > 0.080000006f ? FastVecLength(d + 0x20) : 0.080000006f;
                         DF(0x94) = m;
                     }
-                    g_hero_state.unkC20 = D_L08_001B013C / (DF(0x90) / DF(0x94));
+                    g_hero_state.unkC20 = g_vehicle_unk_ratio_scale / (DF(0x90) / DF(0x94));
                     moby_set_state(obj, 0xA, -1);
                 }
             }

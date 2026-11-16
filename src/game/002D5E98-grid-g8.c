@@ -4,11 +4,11 @@ extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 
-extern int D_001ABAD8 __attribute__((sda)), D_001ABADC __attribute__((sda)), D_001ABAE8 __attribute__((sda));
-extern int D_001AA43C __attribute__((sda));
-extern int D_001B1598;
+extern int g_grid_cell_width __attribute__((sda)), g_grid_cell_height __attribute__((sda)), g_grid_cell_gap __attribute__((sda));
+extern int g_menu_panel_fill_color __attribute__((sda));
+extern int g_frame_counter_3;
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
-extern unsigned char D_001395B8[];
+extern unsigned char g_game_flag_table[];
 extern unsigned int help_find_record_marker_by_class(unsigned int);
 extern int subtract_integer_with_clamp(int);
 extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
@@ -37,11 +37,11 @@ int DrawMenuItemGrid(char *object)
     VU1_addGSregister(66, 0x8000000044ULL);
     VU1_addGSregister(71, 11);
     SetupGifPaging(0);
-    width = D_001ABAD8;
-    height = D_001ABADC;
+    width = g_grid_cell_width;
+    height = g_grid_cell_height;
     areaWidth = *(int *)(object + 0x20) << 4;
     areaHeight = *(int *)(object + 0x24) << 4;
-    gap = D_001ABAE8;
+    gap = g_grid_cell_gap;
     if (*(int *)(object + 0x44) >= 2) {
         xStart = *(int *)(object + 0x34) << 4;
         xStep = width + (areaWidth -
@@ -73,7 +73,7 @@ int DrawMenuItemGrid(char *object)
             bottom = y + height;
             right = x + width;
             state = 0;
-            if (record[2] == 0 ? *(g_item_owned_flags + record[3]) : *(D_001395B8 + record[3])) {
+            if (record[2] == 0 ? *(g_item_owned_flags + record[3]) : *(g_game_flag_table + record[3])) {
                 if ((unsigned short)record[2] == 0) {
                     entry = &g_weapon_table[g_item_slot_to_record[record[3]]];
                     state = 0;
@@ -90,8 +90,8 @@ int DrawMenuItemGrid(char *object)
                         menu_row_icon_draw(object, record, column, row, x >> 4, (y >> 4) + 36);
                 }
                 if (active && *(int *)(object + 0x3C) == index) {
-                    pulse = (unsigned int)(((subtract_integer_with_clamp((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
-                    colour = state == 4 ? (unsigned long)(int)0x80101010u : (unsigned long)D_001AA43C;
+                    pulse = (unsigned int)(((subtract_integer_with_clamp((g_frame_counter_3 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
+                    colour = state == 4 ? (unsigned long)(int)0x80101010u : (unsigned long)g_menu_panel_fill_color;
                     AppendScreenRectPacket(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
                     AppendScreenRectPacket(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
                 }
@@ -102,8 +102,8 @@ int DrawMenuItemGrid(char *object)
                 if (state == 2)
                     AppendScreenRectPacket(x - 64, y - 64, right + 64, bottom + 64, 0x60202020UL, 1);
             } else if (active && *(int *)(object + 0x3C) == index) {
-                pulse = (unsigned int)(((subtract_integer_with_clamp((D_001B1598 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
-                colour = (unsigned long)D_001AA43C;
+                pulse = (unsigned int)(((subtract_integer_with_clamp((g_frame_counter_3 & 63) - 32) + 64) * 0x10202) | 0x80000000u);
+                colour = (unsigned long)g_menu_panel_fill_color;
                 AppendScreenRectPacket(x - 48, y - 48, right + 48, bottom + 48, pulse, 1);
                 AppendScreenRectPacket(x - 16, y - 16, right + 16, bottom + 16, colour, 1);
             }

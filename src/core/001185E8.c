@@ -2,12 +2,12 @@
 
 
 /* Shared retail scratch. Requested precision is not bounded here. */
-extern char D_0013C080[];
+extern char g_float_digits_buffer[];
 
-extern char D_0013A490[];
-extern char D_0013A498[];
-extern char D_0013A4A0[];
-extern char D_0013A4A8[];
+extern char g_str_float_special_a[];
+extern char g_str_float_special_b[];
+extern char g_str_float_special_c[];
+extern char g_str_float_special_d[];
 
 extern int RoundDecimalDigits(char *buf, int len);
 
@@ -43,15 +43,15 @@ char *str_format_float_digits(double value, int ndigits, char ch, int dot) {
     n &= ~0xFFFF;
     switch (n) {
     case 0x7FF00000:
-        return D_0013A490;
+        return g_str_float_special_a;
     case 0xFFF00000:
-        return D_0013A498;
+        return g_str_float_special_b;
     case 0x7FF80000:
     case 0x7FFC0000:
     case 0xFFFC0000:
-        return D_0013A4A0;
+        return g_str_float_special_c;
     case 0xFFF80000:
-        return D_0013A4A8;
+        return g_str_float_special_d;
     }
     } while (0);
 
@@ -59,11 +59,11 @@ char *str_format_float_digits(double value, int ndigits, char ch, int dot) {
     integer_count = 0;
     n = 0;
     if (value < 0) {
-        D_0013C080[0] = '-';
-        p = D_0013C080 + 1;
+        g_float_digits_buffer[0] = '-';
+        p = g_float_digits_buffer + 1;
         value = -value;
     } else {
-        p = D_0013C080;
+        p = g_float_digits_buffer;
     }
 
     if (value >= 1.0) {
@@ -168,5 +168,5 @@ skip:
     } else {
         p[len + 1] = 0;
     }
-    return D_0013C080;
+    return g_float_digits_buffer;
 }

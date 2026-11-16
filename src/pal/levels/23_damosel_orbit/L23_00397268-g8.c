@@ -116,18 +116,18 @@ typedef struct {
     u8 pad000[0x20];
     Info_003BF9B0 *info;  
 } Found_003BF9B0;
-extern f32 D_L23_001AFA58 __attribute__((sda));
-extern s32 D_L23_001B1424 __attribute__((sda));
+extern f32 g_enemy_timer_float_base __attribute__((sda));
+extern s32 g_boss_part_age_counter __attribute__((sda));
 extern s32 ref_L23_003BF9B0_00;
-extern s32 D_L23_001B1650 __attribute__((sda));
-extern s32 D_L23_001B36AC;
-extern s32 D_L23_001B36F0;
+extern s32 g_flying_enemy_active_flag __attribute__((sda));
+extern s32 g_enemy_relocate_count;
+extern s32 g_enemy_effect_param;
 extern u8 g_camera_l23_position[];
 extern Moby_003BF9B0 *CreateMoby(s32);
 extern void set_identity_rotation_rows(void *);
 extern void moby_reset_idle_clear_links(Moby_003BF9B0 *);
 extern s32 FloatToInt(f32);
-extern void func_PAL_L23_003C5480(Moby_003BF9B0 *);
+extern void enemy_relocate_near_hero_pal(Moby_003BF9B0 *);
 extern void moby_set_controller_speed_limits(Moby_003BF9B0 *, f32, f32, f32, f32);
 extern f32 fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(Moby_003BF9B0 *);
@@ -144,7 +144,7 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
     if (moby->state == 0) {
         f32 fps;
 
-        vars->f2A8 = D_L23_001AFA58;
+        vars->f2A8 = g_enemy_timer_float_base;
         vars->f3B4 = -1;
         vars->f3BE = 0;
         vars->f26C = 0;
@@ -165,7 +165,7 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
         vars->f1AF = -1;
         vars->f1B2 = -1;
         vars->f1B3 = -1;
-        fps = D_L23_001B36F0;
+        fps = g_enemy_effect_param;
         vars->f15C = 0.70000005f;
         vars->f188 = 3;
         vars->f174 = 4.0f;
@@ -189,8 +189,8 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
         vars->f58 = 2.75f;
         vars->f5C = 2.75f;
         vars->f80 = 0.78539824f;
-        vars->f20 = D_L23_001B36F0;
-        vars->f24 = D_L23_001B36F0;
+        vars->f20 = g_enemy_effect_param;
+        vars->f24 = g_enemy_effect_param;
         vars->f28 = 3;
         vars->f26 = 50;
         vars->f88 |= 0x81;
@@ -202,11 +202,11 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
         moby_reset_idle_clear_links(moby);
         vars->f48 = FloatToInt(12.0f);
         vars->f4A = FloatToInt(14.4f);
-    } else if (ref_L23_003BF9B0_00 != 0 && D_L23_001B1424 == 0) {
-        if (D_L23_001B36AC < 10)
-            func_PAL_L23_003C5480(moby);
+    } else if (ref_L23_003BF9B0_00 != 0 && g_boss_part_age_counter == 0) {
+        if (g_enemy_relocate_count < 10)
+            enemy_relocate_near_hero_pal(moby);
         else
-            D_L23_001B1650 = 0;
+            g_flying_enemy_active_flag = 0;
     }
     if (moby->state == 13)
         return;

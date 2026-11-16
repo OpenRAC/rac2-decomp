@@ -2,8 +2,8 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern u8 *D_001B251C[] __attribute__((sda));
-extern void func_PAL_L10_003FA370(u8 *);
+extern u8 *g_moby_pool_base[] __attribute__((sda));
+extern void hrugis_beam_init_pal(u8 *);
 extern void DrawHrugisBeamEffect(u8 *);
 extern void moby_l00_update_empty_2(void);
 extern void *state_get_stored_pointer_value();
@@ -23,7 +23,7 @@ extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 
-void func_PAL_L10_003FA158(u8 *a0) {
+void hrugis_beam_update_pal(u8 *a0) {
     f32 v0[4] __attribute__((aligned(16)));
     f32 a[4][4] __attribute__((aligned(16)));
     f32 d[4] __attribute__((aligned(16)));
@@ -43,7 +43,7 @@ void func_PAL_L10_003FA158(u8 *a0) {
         if (state_get_stored_pointer_value() == 0) {
             return;
         }
-        func_PAL_L10_003FA370(a0);
+        hrugis_beam_init_pal(a0);
         if (*(int *)(s5 + 0x268) != 0) {
             level_append_object(a0, moby_l00_update_empty_2, 0, 0);
         }
@@ -54,7 +54,7 @@ void func_PAL_L10_003FA158(u8 *a0) {
         s1 = (f32 *)(a0 + 0xD0);
         *(int *)(moby_get_motion_data(a0) + 0x14C) = 0;
         ang = FastAddRotations(*(f32 *)(s5 + 0x27C), 0.013962637f);
-        obj = D_001B251C[0] + (*(int *)(s5 + 0x260) << 8);
+        obj = g_moby_pool_base[0] + (*(int *)(s5 + 0x260) << 8);
         *(f32 *)(s5 + 0x27C) = ang;
         moby_transform_joint_point(obj, *(int *)(s5 + 0x26C), a);
         vec_scale_to_length(d, a[1], 50.0f);

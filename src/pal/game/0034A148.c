@@ -6,7 +6,7 @@
 typedef int s32;
 typedef unsigned char u8;
 
-void func_PAL_0034A2A0(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xB8) = a1; *(s32 *)(a0 + 0xBC) = a2; }
+void menu_set_settings_pal(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xB8) = a1; *(s32 *)(a0 + 0xBC) = a2; }
 
 void func_PAL_0034A2B0(int param_1, unsigned int param_2)
 {
@@ -16,7 +16,7 @@ void func_PAL_0034A2B0(int param_1, unsigned int param_2)
 
 typedef float f32;
 
-void func_PAL_0034A2B8(u8 *a0,f32 f0,f32 f1) {
+void menu_set_position_pal(u8 *a0,f32 f0,f32 f1) {
  (*(f32 **)(a0+0x5C))[0]=f0;
  (*(f32 **)(a0+0x5C))[1]=f1;
  (*(s32 **)(a0+0x5C))[2]=0;
@@ -24,24 +24,24 @@ void func_PAL_0034A2B8(u8 *a0,f32 f0,f32 f1) {
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_0034A2E0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x60) = a1; }
+void menu_set_selected_index_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x60) = a1; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_0034A2E8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0xCC) = a1; }
+void menu_set_field_bc_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0xCC) = a1; }
 
 extern int menu_get_selected_index(unsigned char *);
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_PAL_0034A2F0(u8 *a0) { return *(s32 *)(a0 + 0x60); }
+s32 menu_get_selected_index_pal(u8 *a0) { return *(s32 *)(a0 + 0x60); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 func_PAL_0034A2F8(u8 *a0) { return *(s32 *)(a0 + 0xC0); }
+s32 menu_get_entry_count_pal(u8 *a0) { return *(s32 *)(a0 + 0xC0); }
 
 
 extern void *Faac80289_FUN_003361A8(char *p);
 extern char *Faac80289_FUN_00336968(char *p);
 
-char *func_PAL_0034A690(char *a0)
+char *menu_init_seven_labels_pal(char *a0)
 {
     char *p = a0 + 536;
     int i;
@@ -62,8 +62,8 @@ char *func_PAL_0034A690(char *a0)
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_0034A738(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x4B8) = a1; }
+void menu_set_field_448_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x4B8) = a1; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_PAL_0034A740(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x4BC) = a1; }
+void menu_set_field_44c_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x4BC) = a1; }
 

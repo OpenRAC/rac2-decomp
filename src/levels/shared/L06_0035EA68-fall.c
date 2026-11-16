@@ -24,8 +24,8 @@ extern int coll_test_point(void *, float, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecSub(void *, void *, void *);
-extern int *D_L06_001C3D00[];
-extern Vec4 D_L06_001BFCA0, D_L06_001BFCB0;
+extern int *g_candidate_list[];
+extern Vec4 g_trace_start_pos, g_trace_hit_info;
 /* Adapted from OpenRAC/rac1-decomp (GPL-3.0),
  * src/overlays/shared/moby_ground_collision.c, mine_fall. */
 /* Drops a falling object under gravity, lands it on the ground and slides it along walls. Returns flags that say what it touched. */
@@ -158,7 +158,7 @@ int mine_fall(char *moby, char *st) {
     FastVecAdd(sweep_end, end_pos, st);
     count = coll_process_hit(IntToFloat(*(int *)(st + 0x20)) * 0.0010742187732830644f, sweep_end, 16, moby, 0);
     if (i < count) {
-        int **list_ptr = D_L06_001C3D00;
+        int **list_ptr = g_candidate_list;
         int remaining = count;
         do {
             if (moby_is_in_special_class_range(*list_ptr) != 0) {
@@ -172,11 +172,11 @@ int mine_fall(char *moby, char *st) {
     tmp = FastVecLength(st);
     if ((float)*(int *)(st + 0x20) * unit_scale < tmp) {
         CollLine(start_pos, end_pos, 36, moby, 0);
-        qcopy(end_pos, &D_L06_001BFCA0);
+        qcopy(end_pos, &g_trace_start_pos);
     }
     if (coll_test_point(end_pos, IntToFloat(*(int *)(st + 0x20)) * unit_scale, 36, moby) != 0) {
         flags |= 2;
-        hit = &D_L06_001BFCB0;
+        hit = &g_trace_hit_info;
         qcopy((moby + 0x10), hit);
         one = 1.0f;
         *(float *)(moby + 0x18) = *(float *)(moby + 0x18) - *(float *)(st + 0x28);

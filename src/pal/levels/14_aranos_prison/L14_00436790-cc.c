@@ -4,8 +4,8 @@
    which gives the three spilled PRE bases retail's stack slots. */
 #include "common.h"
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
-extern char D_L14_001B9500[];
-extern char D_0018A0E0[];
+extern char g_tether_l14_origin_vec[];
+extern char g_hero_state_block[];
 extern void VU1_addGSregister(unsigned int, unsigned long);
 extern void gfx_init_quad_packet_state(void *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
@@ -20,7 +20,7 @@ typedef struct {
     long long mode;
     char pad[24];
 } PrisonQuad;
-extern float D_L14_002602F0[32], D_L14_00260270[32];
+extern float g_spark_quad_progress[32], g_spark_quad_angles[32];
 extern float math_random_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 
@@ -34,24 +34,24 @@ void func_PAL_L14_00436790(void *arg)
     unsigned long testOn = 0x53001, testOff = 0x5360B;
     float scale;
     for (i = 0; i < 32; i++) {
-        D_L14_002602F0[i]+=1.0f/((*(int *)(state+0xa8) * 5 + 2) / 6);
-        if (D_L14_002602F0[i]>1.0f) { D_L14_002602F0[i]=0; D_L14_00260270[i]=math_random_float_range(-1.57079637f,1.57079637f); }
+        g_spark_quad_progress[i]+=1.0f/((*(int *)(state+0xa8) * 5 + 2) / 6);
+        if (g_spark_quad_progress[i]>1.0f) { g_spark_quad_progress[i]=0; g_spark_quad_angles[i]=math_random_float_range(-1.57079637f,1.57079637f); }
     }
     gfx_init_quad_packet_state(&q,*(int *)(state+0xb0),1,alpha);
     q.mode=mode;
     q.uv[0][0]=0; q.uv[0][1]=0; q.uv[1][0]=0; q.uv[1][1]=1;
     q.uv[2][0]=1; q.uv[2][1]=0; q.uv[3][0]=1; q.uv[3][1]=1;
-    FastVecSub(right,D_L14_001B9500,object+16);
+    FastVecSub(right,g_tether_l14_origin_vec,object+16);
     vec_scale_to_length(right,right,*(float *)(state+0x80)*0.5f);
-    vec_scale_to_length(axis,D_0018A0E0,-1.0f);
+    vec_scale_to_length(axis,g_hero_state_block,-1.0f);
     for (i = 0; i < 32; i++) {
-        if (*(float *)(state+0xac)<D_L14_002602F0[i]) color=*(int *)(state+0x98);
-        else color=FastTweenColor(*(int *)(state+0x94),*(int *)(state+0x98),D_L14_002602F0[i]/ *(float *)(state+0xac));
+        if (*(float *)(state+0xac)<g_spark_quad_progress[i]) color=*(int *)(state+0x98);
+        else color=FastTweenColor(*(int *)(state+0x94),*(int *)(state+0x98),g_spark_quad_progress[i]/ *(float *)(state+0xac));
         q.color[0]=q.color[1]=q.color[2]=q.color[3]=color;
-        math_apply_axis_rotation_to_quat(rotated,axis,right,D_L14_00260270[i]);
+        math_apply_axis_rotation_to_quat(rotated,axis,right,g_spark_quad_angles[i]);
         FastVecCross(delta,right,rotated);
-        vec_scale_to_length(delta,delta,*(float *)(state+0xb4)*(1.0f-D_L14_002602F0[i]));
-        scale=*(float *)(state+0xa4)+D_L14_002602F0[i]*(*(float *)(state+0xa0)-*(float *)(state+0xa4));
+        vec_scale_to_length(delta,delta,*(float *)(state+0xb4)*(1.0f-g_spark_quad_progress[i]));
+        scale=*(float *)(state+0xa4)+g_spark_quad_progress[i]*(*(float *)(state+0xa0)-*(float *)(state+0xa4));
         if (scale>1.0f) scale=1.0f;
         VU1_addGSregister(reg,testOn);
         for (j = 0; j < corners; j++) {

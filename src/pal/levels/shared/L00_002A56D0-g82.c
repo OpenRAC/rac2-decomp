@@ -17,14 +17,14 @@ typedef struct {
     short disabled;
 } Hero5840;
 extern Hero5840 g_hero_state;
-extern unsigned char D_001A7A43;
-extern float D_L00_001A7CF8 SDATA(D_L00_001A7CF8);
+extern unsigned char g_state_flag_b;
+extern float g_glow_scale SDATA(D_L00_001A7CF8);
 extern int g_frame_l00_counter;
-extern Vector D_L00_001A7E60[4] SDATA(D_L00_001A7E60);
-extern Vector D_L00_001A7EA0[4] SDATA(D_L00_001A7EA0);
-extern Vector D_L00_001A7EE0[4] SDATA(D_L00_001A7EE0);
-extern int D_L00_001A7F20[4] SDATA(D_L00_001A7F20);
-extern float D_L00_0025DEE0[22];
+extern Vector g_hero_effect_quat_table[4] SDATA(D_L00_001A7E60);
+extern Vector g_hero_effect_scale_table[4] SDATA(D_L00_001A7EA0);
+extern Vector g_hero_effect_translation_table[4] SDATA(D_L00_001A7EE0);
+extern int g_hero_effect_manipulator_ids[4] SDATA(D_L00_001A7F20);
+extern float g_hero_effect_blend_table[22];
 extern float ApproachValue(float *, float, float);
 extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);
@@ -39,15 +39,15 @@ extern void FastVecScale(void *, void *, float);
  * Adapted from RAC1's update_hero_glow_and_extra_manipulators
  * (src/overlays/shared/hero_idle_and_animation.c, GPL-3.0).
  */
-void func_PAL_L00_002A56D0(void) {
+void UpdateHeroGlowAndExtraManipulators_pal(void) {
     unsigned char *h0, *g, *g2;
     unsigned char *object;
     int alpha, k, t3, red, blue, green, g_wave, r_wave, b_wave, period;
     float normalized, wave, amplitude;
-    if (D_001A7A43)
-        ApproachValue(&D_L00_001A7CF8, 1.8f, 0.05f);
+    if (g_state_flag_b)
+        ApproachValue(&g_glow_scale, 1.8f, 0.05f);
     else
-        ApproachValue(&D_L00_001A7CF8, 1.0f, 0.05f);
+        ApproachValue(&g_glow_scale, 1.0f, 0.05f);
     h0 = (unsigned char *)&g_hero_state;
     if ((unsigned int)(h0[0x22B4] - 1) < 2)
         object = *(unsigned char **)(h0 + 0x2290);
@@ -113,18 +113,18 @@ void func_PAL_L00_002A56D0(void) {
                 moby_detach_manipulator((char *)object, (char *)&g_hero_state.effects[i]);
     } else {
         int i, j;
-        const Vector *scale = D_L00_001A7EA0;
+        const Vector *scale = g_hero_effect_scale_table;
         for (i = 0; i < 4; scale++, i++) {
             if (!g_hero_state.effects[i].attached) {
-                AttachManipulator(object, D_L00_001A7F20[i], (unsigned char *)&g_hero_state.effects[i]);
+                AttachManipulator(object, g_hero_effect_manipulator_ids[i], (unsigned char *)&g_hero_state.effects[i]);
                 g_hero_state.effects[i].absolute = 1;
-                qcopy(&g_hero_state.effects[i].quat, &D_L00_001A7E60[i]);
+                qcopy(&g_hero_state.effects[i].quat, &g_hero_effect_quat_table[i]);
                 qcopy(&g_hero_state.effects[i].scale, scale);
-                qcopy(&g_hero_state.effects[i].translation, &D_L00_001A7EE0[i]);
+                qcopy(&g_hero_state.effects[i].translation, &g_hero_effect_translation_table[i]);
                 FastVecScale(&g_hero_state.effects[i].translation, &g_hero_state.effects[i].translation, *(float *)(object + 0x2C));
             }
         }
         for (j = 0; j < 4; j++)
-            g_hero_state.effects[j].blend = D_L00_0025DEE0[g_hero_state.timer];
+            g_hero_state.effects[j].blend = g_hero_effect_blend_table[g_hero_state.timer];
     }
 }

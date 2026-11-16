@@ -1,13 +1,14 @@
+#include "names.h"
 /* func_PAL_L03_003CBB00, the PAL copy of func_L03_003C7AC0: the same C, where 1.0f / 60.0f becomes
    0.020000001f; 0.000277777785f becomes 0.00040000002f. */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L03_001B01BC __attribute__((sda)),D_L03_001B01A4 __attribute__((sda)),D_L03_001B01B4 __attribute__((sda)),D_L03_001B01AC __attribute__((sda));
-extern float D_L03_001B01A8 __attribute__((sda)),D_L03_001B01B8 __attribute__((sda)),D_L03_001B01B0 __attribute__((sda));
-extern u8 D_L03_001B01D4 __attribute__((sda));
-extern float D_L03_001B9998 NOT_SDA, D_L03_001BFDE8 NOT_SDA;
+extern float g_held_platform_turn_degrees __attribute__((sda)),g_held_platform_move_scale __attribute__((sda)),g_held_platform_other_move_scale __attribute__((sda)),g_held_platform_special_move_scale __attribute__((sda));
+extern float g_held_platform_clamp_scale __attribute__((sda)),g_held_platform_other_clamp_scale __attribute__((sda)),g_held_platform_special_clamp_scale __attribute__((sda));
+extern u8 g_held_platform_state_byte __attribute__((sda));
+extern float g_hero_l03_aux_state NOT_SDA, g_collision_hit_height NOT_SDA;
 typedef struct { float vec[4]; char pad[0x2d4]; int mode; } PlayerState;
-extern PlayerState D_0018BDD0;
+extern PlayerState g_player_state;
 typedef struct { char pad[0x74]; u8 active; char pad75[0x13]; char *owner; } L03ControlEntry;
 extern u8 g_sound_state[];
 extern float FastAddRotations(float,float);
@@ -25,7 +26,7 @@ extern int path_push_point_away(int,void *,void *,float);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern int CollLine(void *,void *,int,void *,int);
 extern void moby_update_ground_check(void *);
-void func_PAL_L03_003CBB00(char *obj)
+void held_platform_move_by_input_pal(char *obj)
 {
     float a[4],b[4],c[4];
     union { float m[12]; struct { float pad[4], d[4]; } v; } scratch;
@@ -34,11 +35,11 @@ void func_PAL_L03_003CBB00(char *obj)
     int id;
     if(*(u8 *)(obj+0x20)==2) {
         *(TI128 *)c=0;
-        c[2]=FastAddRotations(D_L03_001B9998,D_L03_001B01BC*0.017453294f);
+        c[2]=FastAddRotations(g_hero_l03_aux_state,g_held_platform_turn_degrees*0.017453294f);
         *(TI128 *)(b)=*(TI128 *)(c);
         euler_rotation_basis(scratch.m,b);
-        qcopy(a,D_0018BDD0.vec);
-        if(FastVecLength(a)>0.0f && D_0018BDD0.mode==0x31) {
+        qcopy(a,g_player_state.vec);
+        if(FastVecLength(a)>0.0f && g_player_state.mode==0x31) {
             L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+*(int *)(state+0x108)*0x70);
             if(entry->owner!=obj || !entry->active)
                 *(int *)(state+0x108)=PlayMobySound(0,4,obj);
@@ -54,9 +55,9 @@ void func_PAL_L03_003CBB00(char *obj)
         matrix_mul_vec3(a,a,scratch.m);
         other=*(char **)(state+0xf0);
         if(other) {
-            if(*(short *)(other+0xaa)==0xb85) FastVecScale(a,a,D_L03_001B01AC*(0.020000001f));
-            else FastVecScale(a,a,D_L03_001B01B4*(0.020000001f));
-        } else FastVecScale(a,a,D_L03_001B01A4*(0.020000001f));
+            if(*(short *)(other+0xaa)==0xb85) FastVecScale(a,a,g_held_platform_special_move_scale*(0.020000001f));
+            else FastVecScale(a,a,g_held_platform_other_move_scale*(0.020000001f));
+        } else FastVecScale(a,a,g_held_platform_move_scale*(0.020000001f));
     } else {
         id=*(int *)(state+0x108);
         if(id!=-1) {
@@ -70,10 +71,10 @@ void func_PAL_L03_003CBB00(char *obj)
     b[2]=0;
     other=*(char **)(state+0xf0);
     if(other) {
-        if(*(short *)(other+0xaa)==0xb85) vec_clamp_length(b,D_L03_001B01B0*0.00040000002f);
-        else vec_clamp_length(b,D_L03_001B01B8*0.00040000002f);
+        if(*(short *)(other+0xaa)==0xb85) vec_clamp_length(b,g_held_platform_special_clamp_scale*0.00040000002f);
+        else vec_clamp_length(b,g_held_platform_other_clamp_scale*0.00040000002f);
     } else {
-        vec_clamp_length(b,D_L03_001B01A8*0.00040000002f);
+        vec_clamp_length(b,g_held_platform_clamp_scale*0.00040000002f);
     }
     FastVecAdd(state+0xe0,state+0xe0,b);
     FastVecAdd(obj+0x10,obj+0x10,state+0xe0);
@@ -83,7 +84,7 @@ void func_PAL_L03_003CBB00(char *obj)
     scratch.m[2]+=20.0f;
     qcopy(scratch.v.d,c);
     scratch.v.d[2]+=0.5f;
-    if(CollLine(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=D_L03_001BFDE8;
+    if(CollLine(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=g_collision_hit_height;
     moby_update_ground_check(obj);
-    *(u8 *)(obj+0xbd)=D_L03_001B01D4;
+    *(u8 *)(obj+0xbd)=g_held_platform_state_byte;
 }

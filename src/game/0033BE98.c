@@ -75,8 +75,8 @@ char *screen_adjust_menu_destroy(char *object)
 
 
 typedef struct { int ids[2]; } SolTextPair;
-extern SolTextPair D_L00_001AE110;
-extern char D_L00_001AE118[];
+extern SolTextPair g_toggle_menu_text_pair;
+extern char g_str_toggle_menu_format[];
 /* Resident byte at 0x001A7BB1 is shared by all programs. */
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
@@ -92,8 +92,8 @@ void onoff_menu_draw(char *object)
     char *second;
     char *format;
     prompt_bar_draw(object + 8);
-    pair = D_L00_001AE110;
-    format = D_L00_001AE118;
+    pair = g_toggle_menu_text_pair;
+    format = g_str_toggle_menu_format;
     first = GetLocalizedString(0x31E4);
     second = GetLocalizedString(pair.ids[*(unsigned char *)0x001A7BB1 != 0]);
     sprintf(buffer, format, first, second);

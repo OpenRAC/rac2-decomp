@@ -14,9 +14,9 @@ extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
 extern void SpawnTintedEffects(void *, void *, int, int, void *, unsigned int, void *, float, float, float, float);
 extern void moby_mark_spawned(void *);
 /* Required component/range reads do not establish the complete owning allocations. */
-extern float D_L09_001AF9E0[] SDATA(D_L09_001AF9E0);
-extern float D_L09_001AF9D8[] SDATA(D_L09_001AF9D8);
-extern float D_L09_001AF9D0[] SDATA(D_L09_001AF9D0);
+extern float g_death_piece_params_a[] SDATA(D_L09_001AF9E0);
+extern float g_death_piece_params_b[] SDATA(D_L09_001AF9D8);
+extern float g_death_piece_params_c[] SDATA(D_L09_001AF9D0);
 
 /* Death of a three-state object: it picks its animation, waits for the hit, then spawns the
    closing effects and retires itself. */
@@ -43,7 +43,7 @@ void death_sequence_update(u8 *self)
     case 2:
         effect = moby_l00_spawn_child(self, 0x12A1, 0);
         if (effect)
-            part_explode_object_into_pieces(effect, D_L09_001AF9E0, D_L09_001AF9D8, D_L09_001AF9D0, 0xFFFF, 0,
+            part_explode_object_into_pieces(effect, g_death_piece_params_a, g_death_piece_params_b, g_death_piece_params_c, 0xFFFF, 0,
                               -1, 0x16, 0xFFFF, 0xFF, 0);
         SpawnExplosion(self + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         v.bits = 0;

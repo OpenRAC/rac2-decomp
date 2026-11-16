@@ -6,13 +6,13 @@ typedef unsigned int u32;
 typedef short s16;
 typedef int s32;
 
-extern u16 D_L02_001B14F8 __attribute__((sda));
-extern s32 D_L02_001B14F0 __attribute__((sda));
-extern s32 D_L02_001B14F4 __attribute__((sda));
-extern s32 D_L02_001B14EC __attribute__((sda));
-extern s32 D_L02_001B1500 __attribute__((sda));
-extern s32 D_L02_001B1504 __attribute__((sda));
-extern s32 D_L02_001B1508 __attribute__((sda));
+extern u16 g_screen_wipe_height_step __attribute__((sda));
+extern s32 g_screen_wipe_band_color_start __attribute__((sda));
+extern s32 g_screen_wipe_band_count __attribute__((sda));
+extern s32 g_screen_wipe_fill_color __attribute__((sda));
+extern s32 g_screen_wipe_max_band_height __attribute__((sda));
+extern s32 g_screen_wipe_band_color_end __attribute__((sda));
+extern s32 g_screen_wipe_margin __attribute__((sda));
 extern short g_screen_adjust_offsets[];
 extern float IntToFloat(short);
 extern void VU1_addGSregister(int, long long);
@@ -43,10 +43,10 @@ void func_US2_L02_00401A20(char *a0) {
     s32 m;
     short *screen;
 
-    *(u16 *)(state + 0x124) -= D_L02_001B14F8;
+    *(u16 *)(state + 0x124) -= g_screen_wipe_height_step;
     if (*(s16 *)(state + 0x124) < 0)
         *(s16 *)(state + 0x124) = 0;
-    color = D_L02_001B14F0;
+    color = g_screen_wipe_band_color_start;
     f20 = IntToFloat(*(u16 *)(state + 0x124));
     height = (float)g_screen_adjust_offsets[0xA9];
     f20 = f20 / height;
@@ -58,13 +58,13 @@ void func_US2_L02_00401A20(char *a0) {
         color |= (s32)(f20 * scale) << 24;
     }
     VU1_addGSregister(0x42, 0x8000000049LL);
-    for (i = 0; i < D_L02_001B14F4; i++)
+    for (i = 0; i < g_screen_wipe_band_count; i++)
         AppendScreenRectPacket(0, 0, g_screen_adjust_offsets[0xA8], g_screen_adjust_offsets[0xA9], color, 0);
     VU1_addGSregister(0x42, 0x8000000044LL);
     screen = g_screen_adjust_offsets;
-    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
+    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), g_screen_wipe_fill_color, 0);
     id = func_US2_0027CED8(0x10);
-    color = D_L02_001B1504;
+    color = g_screen_wipe_band_color_end;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
@@ -74,8 +74,8 @@ void func_US2_L02_00401A20(char *a0) {
     VU1_addGSregister(0x42, 0x8000000048LL);
     h = *(s16 *)(state + 0x124);
     n = screen[0xA9] - h;
-    if (D_L02_001B1500 < n)
-        n = D_L02_001B1500;
-    m = D_L02_001B1508;
+    if (g_screen_wipe_max_band_height < n)
+        n = g_screen_wipe_max_band_height;
+    m = g_screen_wipe_margin;
     DrawTexturedQuad(-m, h - (n >> 1), screen[0xA8] + m * 2, n, 0, 0, 0x20, 0x20, color, id);
 }

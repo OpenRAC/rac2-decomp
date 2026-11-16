@@ -6,13 +6,13 @@ typedef struct {
     unsigned char pad1[0x48];
 } Rec_42550;
 
-extern float D_L20_001B2124 __attribute__((sda));
+extern float g_yeedil_grab_turn_scale __attribute__((sda));
 
-extern float D_L20_001B2134 __attribute__((sda));
+extern float g_yeedil_jump_velocity_scale __attribute__((sda));
 
 extern char g_hero_state[];
 
-extern Rec_42550 *D_L20_001B308C;
+extern Rec_42550 *g_linked_moby_table;
 
 extern float ApproachValue(float *, float, float);
 
@@ -41,7 +41,7 @@ int UpdateBouncingMoby(char *moby) {
     ApproachValue((float *)(self + 0x48), 1.0f, 0.033333335f);
 
     if (*(u8 *)(self + 0x94) == 2) {
-        StepAngleTowardTarget(vars + 0x1804, 1, 0.0f, D_L20_001B2124 * 0.00014544412f);
+        StepAngleTowardTarget(vars + 0x1804, 1, 0.0f, g_yeedil_grab_turn_scale * 0.00014544412f);
     }
     value = *(float *)(vars + 0xF8);
     hero = g_hero_state;
@@ -63,7 +63,7 @@ int UpdateBouncingMoby(char *moby) {
             *(unsigned short *)(hero + 0x1F0) = 5;
         }
         path_index = *(int *)(vars + 0x230);
-        path_point = (Rec_42550 *)((path_index << 7) + (unsigned int)D_L20_001B308C);
+        path_point = (Rec_42550 *)((path_index << 7) + (unsigned int)g_linked_moby_table);
         value = mat_fast_helper_a(path_point->point_x - *(float *)(self + 0x10), path_point->point_y - *(float *)(self + 0x14));
         moby_start_effect_from_entry(self, value);
 
@@ -77,7 +77,7 @@ int UpdateBouncingMoby(char *moby) {
         float velocity;
         *(float *)(self + 0x18) = *(float *)(vars + 0xE0);
         PlayMobySound(0, 0, self);
-        velocity = *(float *)(vars + 0xF8) * -D_L20_001B2134;
+        velocity = *(float *)(vars + 0xF8) * -g_yeedil_jump_velocity_scale;
         *(float *)(vars + 0xF8) = velocity;
         if (velocity < 0.016666668f) {
             *(int *)(vars + 0xF8) = 0;

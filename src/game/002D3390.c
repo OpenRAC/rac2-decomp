@@ -59,15 +59,15 @@ unsigned long long menu_page_draw_9(void)
     return 0;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern float ref_L00_002D33C0_00[];
 extern void ref_L00_002D33C0_01(unsigned char *, float *);
 
 /* Sets up the model preview helper object for the menu if the menu is open. */
 int menu_preview_helper_init(void)
 {
-    if (D_001A8CFC[0] != 0)
-        ref_L00_002D33C0_01((unsigned char *)(D_001A8CFC[0] + 0x3EDB8), ref_L00_002D33C0_00);
+    if (g_resident_data_base[0] != 0)
+        ref_L00_002D33C0_01((unsigned char *)(g_resident_data_base[0] + 0x3EDB8), ref_L00_002D33C0_00);
     return 0;
 }
 
@@ -123,37 +123,37 @@ int menu_page_draw_10(void) {
     return 0;
 }
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void item_menu_set_title_mode(char *, int);
 extern void item_menu_fill_list(char *, char *);
 extern void item_menu_clear_selection_state(char *);
 extern void item_menu_set_extra_value(char *, char *);
-extern char D_00259F58[];
-extern char D_0025D0E0[];
+extern char g_menu_item_table_first[];
+extern char g_preview_extra_value_first[];
 
 /* Sets up the first model preview object of the menu with its model data. */
 int menu_preview_object_init_first(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        item_menu_set_title_mode(D_001A8CFC[0] + 0x3C108, 0);
-        item_menu_fill_list(D_001A8CFC[0] + 0x3C108, D_00259F58);
-        item_menu_clear_selection_state(D_001A8CFC[0] + 0x3C108);
-        item_menu_set_extra_value(D_001A8CFC[0] + 0x3C108, D_0025D0E0);
+    if (g_resident_data_base[0] != 0) {
+        item_menu_set_title_mode(g_resident_data_base[0] + 0x3C108, 0);
+        item_menu_fill_list(g_resident_data_base[0] + 0x3C108, g_menu_item_table_first);
+        item_menu_clear_selection_state(g_resident_data_base[0] + 0x3C108);
+        item_menu_set_extra_value(g_resident_data_base[0] + 0x3C108, g_preview_extra_value_first);
     }
     return 0;
 }
 
-extern char D_00259CE0[];
-extern char D_0025D288[];
+extern char g_menu_item_table_second[];
+extern char g_preview_extra_value_second[];
 
 /* Sets up the second model preview object of the menu with its model data. */
 int menu_preview_object_init_second(void)
 {
-    if (D_001A8CFC[0] != 0) {
-        item_menu_set_title_mode(D_001A8CFC[0] + 0x3C108, 1);
-        item_menu_fill_list(D_001A8CFC[0] + 0x3C108, D_00259CE0);
-        item_menu_clear_selection_state(D_001A8CFC[0] + 0x3C108);
-        item_menu_set_extra_value(D_001A8CFC[0] + 0x3C108, D_0025D288);
+    if (g_resident_data_base[0] != 0) {
+        item_menu_set_title_mode(g_resident_data_base[0] + 0x3C108, 1);
+        item_menu_fill_list(g_resident_data_base[0] + 0x3C108, g_menu_item_table_second);
+        item_menu_clear_selection_state(g_resident_data_base[0] + 0x3C108);
+        item_menu_set_extra_value(g_resident_data_base[0] + 0x3C108, g_preview_extra_value_second);
     }
     return 0;
 }
@@ -172,13 +172,13 @@ extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
-extern PreviewChoice D_0026CFD0[];
-extern int D_001B23A0[] __attribute__((sda));
-extern float D_001B23A4[] __attribute__((sda));
+extern PreviewChoice g_preview_choices[];
+extern int g_hud_mode[] __attribute__((sda));
+extern float g_hud_scale[] __attribute__((sda));
 /* A screen coordinate scaled for the display; mode 1 also takes an offset in unscaled pixels. */
 static __inline__ int scaled_screen_coord(int mode, float value, float offset)
 {
-    float scaled = value * D_001B23A4[0] + 0.5f;
+    float scaled = value * g_hud_scale[0] + 0.5f;
     if (mode == 1)
         return (int)(scaled + offset);
     return (int)scaled;
@@ -187,8 +187,8 @@ static __inline__ int scaled_screen_coord(int mode, float value, float offset)
 static __inline__ int scaled_screen_size(int mode, float value, int adjust)
 {
     if (mode != 0)
-        return (int)(value * D_001B23A4[0] + 0.5f) + adjust;
-    return (int)(value * D_001B23A4[0] + 0.5f);
+        return (int)(value * g_hud_scale[0] + 0.5f) + adjust;
+    return (int)(value * g_hud_scale[0] + 0.5f);
 }
 
 /* Draws the icon of preview choice `index` at column `x`, fading its left and right edges by their
@@ -207,7 +207,7 @@ void DrawPreviewChoiceIcon(int index, int x)
     double distance;
     int mode;
 
-    texture = GetIconFrame(0xea97, D_0026CFD0[index].icon);
+    texture = GetIconFrame(0xea97, g_preview_choices[index].icon);
     distance = __extendsfdf2(256.0f - (float)left);
     if (__cmpdf2(distance, 0.0) < 0)
         distance = __subdf3(0.0, distance);
@@ -226,7 +226,7 @@ void DrawPreviewChoiceIcon(int index, int x)
     right <<= 24;
     colors[2] = colors[0] = leftAlpha | baseColor;
     colors[3] = colors[1] = right | baseColor;
-    mode = D_001B23A0[0];
+    mode = g_hud_mode[0];
     y = scaled_screen_coord(mode, 334.0f, 4.0f);
     height = scaled_screen_size(mode, 40.0f, 0);
     hud_draw_sprite_gradient(texture, left, y, 40, height, colors);
@@ -248,23 +248,23 @@ int menu_update_choice_number(void)
 /* func_002D4E48 is in the -G8 sibling. */
 
 
-extern int D_0025BA80;
+extern int g_menu_choice_counter;
 
 /* Clears the menu counter back to zero. */
 int menu_clear_counter_2(void) {
-    D_0025BA80 = 0;
+    g_menu_choice_counter = 0;
     return 0;
 }
 
 
 
-extern char *D_001A8CFC[] __attribute__((sda));
+extern char *g_resident_data_base[] __attribute__((sda));
 extern void *tab_menu_get_selected_value(void *);
 
 /* Stores the preview object of the open menu into the given menu item. */
 int menu_item_set_preview(char *object) {
-    if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = tab_menu_get_selected_value(D_001A8CFC[0] + 0x3BE08);
+    if (g_resident_data_base[0] != 0)
+        *(void **)(object + 0x34) = tab_menu_get_selected_value(g_resident_data_base[0] + 0x3BE08);
     return 0;
 }
 
@@ -275,33 +275,33 @@ int menu_item_set_preview(char *object) {
 extern void menu_clear_counter(void);
 extern void tab_menu_set_tables(char *, char *, char *, char *);
 extern void tab_menu_switch_tab(char *, int);
-extern char D_002615F8[], D_00261698[], D_00261750[];
+extern char g_extras_tab_table_a[], g_extras_tab_table_b[], g_extras_tab_table_c[];
 
 /* Sets up the preview object of the open menu with its data tables and turns it on. */
 int menu_preview_data_init(void)
 {
     menu_clear_counter();
-    if (D_001A8CFC[0] != 0) {
-        tab_menu_set_tables(D_001A8CFC[0] + 0x3BE08, D_002615F8, D_00261698, D_00261750);
-        tab_menu_switch_tab(D_001A8CFC[0] + 0x3BE08, 1);
+    if (g_resident_data_base[0] != 0) {
+        tab_menu_set_tables(g_resident_data_base[0] + 0x3BE08, g_extras_tab_table_a, g_extras_tab_table_b, g_extras_tab_table_c);
+        tab_menu_switch_tab(g_resident_data_base[0] + 0x3BE08, 1);
     }
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
 int menu_handle_buttons(void) {
-    func_0029CF08(D_00138344);
+    func_0029CF08(g_menu_input_flags);
     return 0;
 }
 
-extern int D_00138344;
+extern int g_menu_input_flags;
 extern int func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
 int menu_handle_buttons_alt(void) {
-    func_0029CF08(D_00138344);
+    func_0029CF08(g_menu_input_flags);
     return 0;
 }

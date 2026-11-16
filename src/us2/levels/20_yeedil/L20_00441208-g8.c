@@ -3,9 +3,9 @@
 /* func_US2_L20_00441208, the USA v2.00 copy of func_L20_0043FC70: the same C, where the arm
    for reaching zero clears st + 0x280 and calls func_US2_002A7AA8 and func_L01_003E9CF8
    instead of moving the object, and also sets obj + 0xA8 only there. */
-extern float D_L20_001B1FE4 __attribute__((sda));
-extern float D_L20_001B1FE8 __attribute__((sda));
-extern float D_L20_001B2BE8;
+extern float g_yeedil_small_speed_b __attribute__((sda));
+extern float g_yeedil_small_accel_a __attribute__((sda));
+extern float g_level_shared_float;
 extern char g_hero_state[];
 extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
@@ -37,8 +37,8 @@ void func_US2_L20_00441208(char *arg0) {
         *(float *)(st + 0x80) = 0.785398245f;
         {
             float angle = math_random_signed_float_range(18.0f, 22.0f) * 0.0174532942f;
-            float speed = D_L20_001B1FE4 * 0.0166666675f;
-            float accel = D_L20_001B1FE8 * 0.00027777778f;
+            float speed = g_yeedil_small_speed_b * 0.0166666675f;
+            float accel = g_yeedil_small_accel_a * 0.00027777778f;
 
             *(short *)(st + 0x132) = 0x78;
             *(short *)(st + 0x134) = 0xB4;
@@ -63,7 +63,7 @@ void func_US2_L20_00441208(char *arg0) {
         }
     }
 
-    *(float *)(st + 0x180) = D_L20_001B2BE8;
+    *(float *)(st + 0x180) = g_level_shared_float;
     if (*(unsigned char *)(arg0 + 0x20) == 6) {
         return;
     }

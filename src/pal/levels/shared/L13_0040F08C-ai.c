@@ -14,14 +14,14 @@ typedef struct { u8 pad0[0x30]; TI128 v; u8 pad40[0x40]; } L13Cam;
 extern char g_hero_state[];
 extern float g_hero_position[];
 extern u8 *g_hero_moby;
-extern u8 *D_L13_001B291C __attribute__((section(".sdata")));
-extern u8 *D_L13_001B2A0C __attribute__((section(".sdata")));
-extern char D_L13_001BFD00[];
-extern s32 *D_L13_001FE580[];
-extern char D_L13_001B11F8[];
-extern char D_L13_001B1200[];
-extern char D_L13_001B1208[];
-extern char D_L13_001B1218[];
+extern u8 *g_object_table_base __attribute__((section(".sdata")));
+extern u8 *g_moby_slot_table __attribute__((section(".sdata")));
+extern char g_collision_l13_result[];
+extern s32 *g_guard_path_table[];
+extern char g_str_guard_alt_msg_a[];
+extern char g_str_guard_alt_msg_b[];
+extern char g_str_guard_alt_msg_c[];
+extern char g_str_guard_alt_msg_d[];
 extern s32 g_current_map_index[] __attribute__((section(".sdata")));
 
 extern void STUB_printf(void *);
@@ -32,7 +32,7 @@ extern float vec_distance_xy(void *, void *);
 extern int math_fast_float_d(void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
-extern void func_PAL_002A7650(void *, int, int);
+extern void SetDeathBits_pal(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
@@ -42,22 +42,22 @@ extern int func_PAL_002AF6C0(void *, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
-extern int func_PAL_002B6CD8(void *, void *);
+extern int path_follow_nodes_pal(void *, void *);
 extern int path_set_follower_nodes(void *, void *, int, int);
-extern int func_PAL_L01_00323068(void *, void *);
+extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int moby_start_effect_from_entry(void *, float);
 extern void part_queue_moby_for_glow(void *, int, void *);
 extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
 extern int rps_judge_round(void *);
 extern int func_PAL_L13_00410C98(void *);
 extern void guard_alt_update_hit_timer(void *);
-extern u8 *func_PAL_L12_0040CBA0(void *, void *, void *, int, float);
-extern int func_PAL_002B5E10(void *);
+extern u8 *blast_projectile_spawn_pal(void *, void *, void *, int, float);
+extern int moby_step_at_own_position_pal(void *);
 extern int flag_set_second_pending(void *);
 extern void moby_mark_spawned(void *);
-extern int func_PAL_L13_0040DF68(char *, char *);
-extern int func_PAL_L13_0040E1B0(void *, void *);
-extern void func_PAL_L13_0040EDF0(void *);
+extern int creature_move_along_ground_pal(char *, char *);
+extern int AdvancePathWaypoint_pal(void *, void *);
+extern void moby_turn_toward_hero_pal(void *);
 
 /* The per-frame update of the second level-13 guard kind, built like func_L13_00406F18:
    the action states (+0x95), the animation states (+0x20), then the shared timer update. */
@@ -100,7 +100,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
                     *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
                 }
@@ -133,7 +133,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
                     *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
                 }
@@ -150,7 +150,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         s32 i;
         u8 *e;
         if (*(s32 *)(st + 0x298) != 0 && (i = *(s32 *)(st + 0x29C)) != -1) {
-            e = D_L13_001B291C + (i << 8);
+            e = g_object_table_base + (i << 8);
             if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD) {
                 *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
                 *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
@@ -221,7 +221,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
     }
     case 6: {
         u8 *e;
-        e = D_L13_001B291C + (*(s32 *)(st + 0x29C) << 8);
+        e = g_object_table_base + (*(s32 *)(st + 0x29C) << 8);
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD || *(s32 *)(st + 0x2B8) == 1) {
             *(s32 *)(st + 0x298) = 0;
             if (*(s32 *)(st + 0x2A0) != -1) {
@@ -244,7 +244,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         break;
     }
     case 4:
-        func_PAL_002B5E10(a0);
+        moby_step_at_own_position_pal(a0);
         if (*(s32 *)(st + 0x250) == 1) {
             moby_set_state(a0, 0x13, 5);
             if (a0[0x43] != 0xF) {
@@ -253,7 +253,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         }
         break;
     case 5:
-        func_PAL_002B5E10(a0);
+        moby_step_at_own_position_pal(a0);
         if (*(s32 *)(st + 0x250) != 1 && *(s32 *)(st + 0x254) != 1 && a0[0x20] != 0x12) {
             moby_set_state(a0, 1, 4);
             if (a0[0x43] != 0xD) {
@@ -281,7 +281,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 }
             }
             if (*(s32 *)(st + 0x2A8) != 0) {
-                u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x2AC) << 8);
+                u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                 e[0x20] = 3;
                 *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
             }
@@ -314,7 +314,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
             if (p != 0 && *(s16 *)(p + 0xAA) == 0xEA9) {
                 moby_mark_spawned(p);
             }
-            func_PAL_002A7650(a0, 0, 3);
+            SetDeathBits_pal(a0, 0, 3);
             part_queue_moby_for_glow(a0, 0, 0);
             return;
         }
@@ -373,13 +373,13 @@ void func_PAL_L13_0040F08C(u8 *a0)
             }
             if (a0[0x43] == 0x13) {
                 *(s32 *)(st + 0x2C4) = 0;
-                STUB_printf(D_L13_001B11F8);
+                STUB_printf(g_str_guard_alt_msg_a);
             } else if (a0[0x43] == 0x15) {
                 *(s32 *)(st + 0x2C4) = 1;
-                STUB_printf(D_L13_001B1200);
+                STUB_printf(g_str_guard_alt_msg_b);
             } else {
                 *(s32 *)(st + 0x2C4) = 2;
-                STUB_printf(D_L13_001B1208);
+                STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
@@ -391,13 +391,13 @@ void func_PAL_L13_0040F08C(u8 *a0)
             }
             if (a0[0x43] == 0x13) {
                 *(s32 *)(st + 0x2C4) = 0;
-                STUB_printf(D_L13_001B11F8);
+                STUB_printf(g_str_guard_alt_msg_a);
             } else if (a0[0x43] == 0x15) {
                 *(s32 *)(st + 0x2C4) = 1;
-                STUB_printf(D_L13_001B1200);
+                STUB_printf(g_str_guard_alt_msg_b);
             } else {
                 *(s32 *)(st + 0x2C4) = 2;
-                STUB_printf(D_L13_001B1208);
+                STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
@@ -434,7 +434,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         break;
     case 7:
         if (*(s32 *)(st + 0x2A4) != 0) {
-            if (func_PAL_L13_0040E1B0(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
+            if (AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
                 moby_set_state(a0, 8, -1);
                 if (math_random_int_below(2) == 1) {
                     if (a0[0x43] != 1) {
@@ -452,7 +452,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 }
             }
         } else {
-            if (func_PAL_002B6CD8(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)]) != 0) {
+            if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
                 moby_set_state(a0, 8, -1);
                 if (math_random_int_below(2) == 1) {
                     if (a0[0x43] != 1) {
@@ -475,12 +475,12 @@ void func_PAL_L13_0040F08C(u8 *a0)
         s32 *path;
         float d;
         if (a0[0x60] & 2) {
-            path = D_L13_001FE580[*(s32 *)(st + 0x2B0)];
+            path = g_guard_path_table[*(s32 *)(st + 0x2B0)];
             d = vec_distance_xy(a0 + 0x10, path + 4);
             if (vec_distance_xy(a0 + 0x10, path + *path * 4) < d) {
-                path_set_follower_nodes(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)], 0, *path - 1);
+                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], 0, *path - 1);
             } else {
-                path_set_follower_nodes(a0, D_L13_001FE580[*(s32 *)(st + 0x2B0)], *path - 1, 0);
+                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], *path - 1, 0);
             }
             moby_set_state(a0, 7, -1);
             if (a0[0x43] != 2) {
@@ -506,7 +506,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         }
         break;
     case 6: {
-        u8 *e = D_L13_001B291C + (*(s32 *)(st + 0x264) << 8);
+        u8 *e = g_object_table_base + (*(s32 *)(st + 0x264) << 8);
         moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(e + 0x10) - *(float *)(a0 + 0x10),
                                              *(float *)(e + 0x14) - *(float *)(a0 + 0x14)));
         break;
@@ -522,9 +522,9 @@ void func_PAL_L13_0040F08C(u8 *a0)
     case 27: {
         s32 r;
         if (*(s32 *)(st + 0x2A4) != 0) {
-            r = func_PAL_L13_0040E1B0(a0, D_L13_001FE580[*(s32 *)(st + 0x2A0)]);
+            r = AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
         } else {
-            r = func_PAL_002B6CD8(a0, D_L13_001FE580[*(s32 *)(st + 0x2A0)]);
+            r = path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
         }
         if (r != 0 || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             if (a0[0x43] != 5) {
@@ -546,7 +546,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         }
         break;
     case 16:
-        if (func_PAL_002B6CD8(a0, D_L13_001FE580[*(s32 *)(st + 0x278)]) != 0) {
+        if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x278)]) != 0) {
             *(s32 *)(st + 0x288) = 1;
             moby_set_state(a0, 0x11, -1);
             if (a0[0x43] != 0xD) {
@@ -555,7 +555,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         }
         break;
     case 17:
-        STUB_printf(D_L13_001B1218);
+        STUB_printf(g_str_guard_alt_msg_d);
         moby_set_state(a0, 1, -1);
         break;
     case 18: {
@@ -566,7 +566,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
             if (i != -1) {
                 j = *(s32 *)(st + 0x354);
                 if (j != -1) {
-                    u8 *base = D_L13_001B291C;
+                    u8 *base = g_object_table_base;
                     (base + (i << 8))[0x20] = 4;
                     (base + (j << 8))[0x20] = 4;
                     *(s32 *)(st + 0x350) = -1;
@@ -574,11 +574,11 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 }
             }
         }
-        *(TI128 *)m = ((L13Cam *)D_L13_001B2A0C)[*(s32 *)(st + 0x268)].v;
+        *(TI128 *)m = ((L13Cam *)g_moby_slot_table)[*(s32 *)(st + 0x268)].v;
         if (*(s32 *)(st + 0x2A4) != 0) {
-            func_PAL_L13_0040DF68(a0, m);
+            creature_move_along_ground_pal(a0, m);
         } else {
-            func_PAL_L01_00323068(a0, m);
+            moby_l01_turn_toward_target_pal(a0, m);
         }
         if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
             moby_set_state(a0, 0x15, -1);
@@ -602,9 +602,9 @@ void func_PAL_L13_0040F08C(u8 *a0)
     case 29:
         *(TI128 *)m = *(TI128 *)(st + 0x360);
         if (*(s32 *)(st + 0x2A4) != 0) {
-            func_PAL_L13_0040DF68(a0, m);
+            creature_move_along_ground_pal(a0, m);
         } else {
-            func_PAL_L01_00323068(a0, m);
+            moby_l01_turn_toward_target_pal(a0, m);
         }
         if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
             moby_set_state(a0, 0x15, -1);
@@ -626,7 +626,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         break;
     case 15:
         if (*(s32 *)(st + 0x2A4) != 0) {
-            if (func_PAL_L13_0040E1B0(a0, D_L13_001FE580[*(s32 *)(st + 0x294)]) != 0) {
+            if (AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0) {
                 moby_set_state(a0, 0x15, -1);
                 if (a0[0x43] != 5) {
                     func_PAL_002A7E68(a0, 5, 0, 0x8);
@@ -638,7 +638,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 }
                 *(s32 *)(st + 0x294) = -1;
             }
-        } else if (func_PAL_002B6CD8(a0, D_L13_001FE580[*(s32 *)(st + 0x294)]) != 0
+        } else if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0
                    || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
             moby_set_state(a0, 0x15, -1);
             if (a0[0x43] != 5) {
@@ -684,7 +684,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 }
                 moby_set_state(a0, 0x15, -1);
             } else {
-                hit = *(u8 **)(D_L13_001BFD00 + 0x18);
+                hit = *(u8 **)(g_collision_l13_result + 0x18);
                 if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(st + 0x200)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                  || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x200
@@ -724,7 +724,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
                                              *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
         if (*(s32 *)(st + 0x2A4) != 0) {
-            func_PAL_L13_0040EDF0(a0);
+            moby_turn_toward_hero_pal(a0);
         }
         if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
             if (FastDiffRots(*(float *)(a0 + 0xF8),
@@ -733,7 +733,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
                 FastVecSub(v, st + 0x1F0, m);
                 vec_scale_to_length(v, v, 0.6f);
-                func_PAL_L12_0040CBA0(a0, v, m, 0, st[0x34]);
+                blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
                 (*(s32 *)(st + 0x26C))++;
             }
         }
@@ -764,7 +764,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
         moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
                                              *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
         if (*(s32 *)(st + 0x2A4) != 0) {
-            func_PAL_L13_0040EDF0(a0);
+            moby_turn_toward_hero_pal(a0);
         }
         if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
             if (FastDiffRots(*(float *)(a0 + 0xF8),
@@ -774,7 +774,7 @@ void func_PAL_L13_0040F08C(u8 *a0)
                 moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
                 FastVecSub(v, st + 0x1F0, m);
                 vec_scale_to_length(v, v, 0.6f);
-                func_PAL_L12_0040CBA0(a0, v, m, 0, st[0x34]);
+                blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
             }
         }
         if ((a0[0x60] & 2) && *(s32 *)(st + 0x26C) > 0) {
@@ -797,13 +797,13 @@ void func_PAL_L13_0040F08C(u8 *a0)
         moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
                                              *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
         if (*(s32 *)(st + 0x2A4) != 0) {
-            func_PAL_L13_0040EDF0(a0);
+            moby_turn_toward_hero_pal(a0);
         }
         if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
             moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
             FastVecSub(v, st + 0x1F0, m);
             vec_scale_to_length(v, v, 0.50000006f);
-            func_PAL_L12_0040CBA0(a0, v, m, 0, st[0x34]);
+            blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
             (*(s32 *)(st + 0x26C))++;
         }
         break;

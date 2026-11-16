@@ -19,17 +19,17 @@ typedef struct {
     int sound;
 } BeamState;
 
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 D_0019B4A8[], g_hero_position[], D_L12_001C0260[], g_sound_state[];
-extern BeamVolume *D_L12_001B2F8C MACRO_ADDR;
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 g_moby_nibble_table[], g_hero_position[], g_line_end_point[], g_sound_state[];
+extern BeamVolume *g_path_waypoint_table MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
-extern u8 *D_L12_001B090C MACRO_ADDR;
-extern u8 *D_L12_001B1360 MACRO_ADDR;
-extern float D_L12_001B1D00[] MACRO_ADDR;
+extern u8 *g_tracked_object_ptr MACRO_ADDR;
+extern u8 *g_second_tracked_object MACRO_ADDR;
+extern float g_sweeping_beam_offset[] MACRO_ADDR;
 extern float D_L12_001B1D00_gp[] SDATA(D_L12_001B1D00);
 extern float D_L12_001B1D10_gp[] SDATA(D_L12_001B1D10);
 extern u8 *g_hero_moby NOT_SDA;
-extern u8 D_L12_0041BF88[];
+extern u8 g_sweeping_beam_draw_callback[];
 
 extern void helper_clear_states(u8 *), beam_restore_child_collision(u8 *), helper_push_objects(u8 *);
 extern void moby_mark_spawned(void *);
@@ -60,10 +60,10 @@ void sweeping_beam_update(u8 *self)
         u16 id = *(u16 *)(self + 0xB2);
         int i;
 
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto Destroy;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            int packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
@@ -79,16 +79,16 @@ Destroy:
         state->phase = math_random_float_range(0.0f, 1.0f);
         state->f30 = -10.0f;
         {
-            float length = FastVecLength(D_L12_001B2F8C[state->index].axis1);
+            float length = FastVecLength(g_path_waypoint_table[state->index].axis1);
 
             state->width = length + length;
-            length = FastVecLength(D_L12_001B2F8C[state->index].axis2);
+            length = FastVecLength(g_path_waypoint_table[state->index].axis2);
             state->length = length + length;
         }
-        FastVecSub(state->start, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
-        FastVecAdd(state->end, D_L12_001B2F8C[state->index].position, D_L12_001B2F8C[state->index].axis1);
+        FastVecSub(state->start, g_path_waypoint_table[state->index].position, g_path_waypoint_table[state->index].axis1);
+        FastVecAdd(state->end, g_path_waypoint_table[state->index].position, g_path_waypoint_table[state->index].axis1);
         {
-            BeamVolume *volumes = D_L12_001B2F8C;
+            BeamVolume *volumes = g_path_waypoint_table;
             BeamVolume *volume = (BeamVolume *)((u32)(state->index << 7) + (u32)volumes);
 
             state->start[2] += 1.5f - volume->axis2[2];
@@ -104,20 +104,20 @@ Destroy:
         for (i = 0; i < 2; i++) {
             u8 *obj;
 
-            if (D_L12_001B2F8C[state->index].axis2[2] < 2.0f && i > 0)
+            if (g_path_waypoint_table[state->index].axis2[2] < 2.0f && i > 0)
                 continue;
             obj = CreateMoby(0xFDF);
             if (obj) {
                 moby_init_child_from_parent(obj, self);
-                qcopy(obj + 0xF0, D_L12_001B2F8C[state->index].rotation);
+                qcopy(obj + 0xF0, g_path_waypoint_table[state->index].rotation);
                 euler_rotation_basis(obj + 0xC0, obj + 0xF0);
                 obj[0x31] = 0;
                 *(u16 *)(obj + 0x34) |= 0x105;
                 *(u128 *)local = 0;
                 local[1] = -1.0f;
                 local[2] = -1.0f;
-                matrix_mul_vec3(delta, local, &D_L12_001B2F8C[state->index]);
-                FastVecAdd(obj + 0x10, delta, D_L12_001B2F8C[state->index].position);
+                matrix_mul_vec3(delta, local, &g_path_waypoint_table[state->index]);
+                FastVecAdd(obj + 0x10, delta, g_path_waypoint_table[state->index].position);
                 *(float *)(obj + 0x18) += i * 3.0f;
                 func_002A0F48(obj);
                 {
@@ -142,7 +142,7 @@ Destroy:
         float height = state->width * 0.5f;
 
         state->heights[0] = state->heights[1] = state->heights[2] = height;
-        euler_rotation_basis(matrix, D_L12_001B2F8C[state->index].rotation);
+        euler_rotation_basis(matrix, g_path_waypoint_table[state->index].rotation);
     }
     matrix_from_basis_rows(inverse, matrix);
     qcopy(start, state->start);
@@ -154,19 +154,19 @@ Destroy:
         do {
             if (!CollLine(start, end, 2, 0, 0))
                 break;
-            FastVecSub(delta, D_L12_001C0260, D_L12_001B2F8C[state->index].position);
+            FastVecSub(delta, g_line_end_point, g_path_waypoint_table[state->index].position);
             matrix_mul_vec3(delta, delta, inverse);
             if (state->heights[j] - delta[1] > 1.5f) {
                 u16 id = *(u16 *)(self + 0xB2);
 
                 if (id & 1) {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                     u8 packed = *counter;
 
                     if (((packed >> 4) & 7) != 7)
                         *counter = packed + 16;
                 } else {
-                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+                    u8 *counter = (u8 *)(((s16)id >> 1) + (g_current_map_index << 10)) + (int)g_moby_nibble_table;
                     u8 packed = *counter;
 
                     if ((packed & 7) != 7)
@@ -209,7 +209,7 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            FastVecSub(delta, g_hero_position, D_L12_001B2F8C[state->index].position);
+            FastVecSub(delta, g_hero_position, g_path_waypoint_table[state->index].position);
             matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height && delta[0] <= D_L12_001B1D10_gp[0]) {
                 beam_restore_child_collision(self);
@@ -218,11 +218,11 @@ Destroy:
                     pos = local;
                 } else {
                     D_L12_001B1D00_gp[0] = -0.5f;
-                    D_L12_001B1D00[2] = -1.0f;
+                    g_sweeping_beam_offset[2] = -1.0f;
                     matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                     D_L12_001B1D00_gp[0] = 3.0f;
-                    D_L12_001B1D00[2] = -3.0f;
+                    g_sweeping_beam_offset[2] = -3.0f;
                 }
                 make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
                 QueueMobyImpact(g_hero_moby, event);
@@ -237,7 +237,7 @@ Destroy:
                 height = state->heights[1];
             else
                 height = state->heights[0];
-            FastVecSub(delta, g_hero_position + 0x60, D_L12_001B2F8C[state->index].position);
+            FastVecSub(delta, g_hero_position + 0x60, g_path_waypoint_table[state->index].position);
             matrix_mul_vec3(delta, delta, inverse);
             if (delta[1] < height) {
                 beam_restore_child_collision(self);
@@ -246,11 +246,11 @@ Destroy:
                     pos = local;
                 } else {
                     D_L12_001B1D00_gp[0] = -0.5f;
-                    D_L12_001B1D00[2] = -1.0f;
+                    g_sweeping_beam_offset[2] = -1.0f;
                     matrix_mul_vec3(local, D_L12_001B1D00_gp, matrix);
                     pos = local;
                     D_L12_001B1D00_gp[0] = 3.0f;
-                    D_L12_001B1D00[2] = -3.0f;
+                    g_sweeping_beam_offset[2] = -3.0f;
                 }
                 make_hit_descriptor(event, self, 0x10001, pos, 2.0f);
                 QueueMobyImpact(g_hero_moby, event);
@@ -258,23 +258,23 @@ Destroy:
         }
     }
     if (tracked_object_is_open() && !tracked_moby_is_active()) {
-        u8 *candidate = D_L12_001B090C;
+        u8 *candidate = g_tracked_object_ptr;
 
         qcopy(delta, candidate + 0x10);
-        if (math_fabs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
-            delta[2] = D_L12_001B2F8C[state->index].position[2];
+        if (math_fabs(*(float *)(candidate + 0x18) - g_path_waypoint_table[state->index].position[2]) < 2.0f)
+            delta[2] = g_path_waypoint_table[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
             tracked_moby_set_state(1, -1);
     }
     if (second_tracked_object_is_open()) {
-        u8 *candidate = D_L12_001B1360;
+        u8 *candidate = g_second_tracked_object;
 
         qcopy(delta, candidate + 0x10);
-        if (math_fabs(*(float *)(candidate + 0x18) - D_L12_001B2F8C[state->index].position[2]) < 2.0f)
-            delta[2] = D_L12_001B2F8C[state->index].position[2];
+        if (math_fabs(*(float *)(candidate + 0x18) - g_path_waypoint_table[state->index].position[2]) < 2.0f)
+            delta[2] = g_path_waypoint_table[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
             global_object_start(1, -1);
     }
-    gfx_add_draw_callback_first(D_L12_0041BF88, self);
+    gfx_add_draw_callback_first(g_sweeping_beam_draw_callback, self);
     helper_push_objects(self);
 }

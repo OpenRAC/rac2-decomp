@@ -7,7 +7,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
-extern unsigned char *D_L08_001FF794;
+extern unsigned char *g_particle_color_ptr;
 unsigned char *func_PAL_L08_0034C4A8(void *position, void *velocity, int kind, void *owner)
 {
     unsigned char *particle = part_alloc(0x45);
@@ -24,7 +24,7 @@ unsigned char *func_PAL_L08_0034C4A8(void *position, void *velocity, int kind, v
         particle[3] = 0x48;
         *(float *)(particle + 0xc) = math_random_float_range(8000.0f, 50000.0f);
         particle[8] = math_random_int_below(256);
-        particle[2] = *D_L08_001FF794;
+        particle[2] = *g_particle_color_ptr;
         lifetime = (((int)(math_random_int_range(10, 30)) * 5 + 2) / 6);
         *(short *)(particle + 0xa) = lifetime;
         {

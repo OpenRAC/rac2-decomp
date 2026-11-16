@@ -17,7 +17,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern float square_root(float);
 extern float math_random_float_range(float,float);
 extern void gfx_draw_double_layer_quad(char *);
-extern float D_L06_001A8F50[4] __attribute__((sda));
+extern float g_sway_direction_vec[4] __attribute__((sda));
 #define F38(p,o) (*(float *)((char *)(p)+(o)))
 #define I38(p,o) (*(int *)((char *)(p)+(o)))
 /* Updates a swaying effect moby (class 4535): it sways along an arc, then shrinks away and is removed. */
@@ -61,7 +61,7 @@ void swaying_effect_update(unsigned char *moby) {
             bend=height*(wave>=0.0f ? square_root(wave)+bend : bend-square_root(-wave))*0.25f;
             offset=F38(vars,0x38)*wave*wave*0.6366197f*F38(vars,0x40)*0.5f;
             F38(moby,0xf4)=-(F38(vars,0x40)*wave+1.5707965f);
-            FastVecScale(tmp,D_L06_001A8F50,offset);
+            FastVecScale(tmp,g_sway_direction_vec,offset);
         }
         FastVecAdd(moby+0x10,tmp,vars);
         FastVecScale(tmp,vars+0x10,bend);

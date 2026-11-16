@@ -35,7 +35,7 @@ extern float vec_distance_xy(char *, float *);
 extern float fast_vec_dist(char *, char *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
-extern int D_001A8CA0 __attribute__((sda));
+extern int g_ground_check_inhibit __attribute__((sda));
 extern int g_hero_moby;
 
 /* Rates how good a target is to aim at: its distance, made worse when it is off to the side, and worse again for the player. */
@@ -45,10 +45,10 @@ float weapon_rate_aim_target(char *object, char *target)
     char *destination = target + 0x10;
     float distance;
     float value = vec_distance_xy(position, (float *)destination);
-    if (D_001A8CA0 != 0)
+    if (g_ground_check_inhibit != 0)
         value = fast_vec_dist(position, destination);
     distance = value;
-    if (D_001A8CA0 == 0) {
+    if (g_ground_check_inhibit == 0) {
         float angle = mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
                                   *(float *)(target + 0x14) - *(float *)(object + 0x14));
         angle = FastDiffRots(angle, *(float *)(object + 0xF8));
@@ -81,11 +81,11 @@ typedef struct {
     int value;
     char remainder[0xA428];
 } Record_2B4038;
-extern Record_2B4038 D_00240450[];
+extern Record_2B4038 g_effect_record_table_2[];
 
 /* Tells whether the saved record at the given index holds the given value. */
 int save_is_record_value(int value, int index) {
-    return D_00240450[index].value == value;
+    return g_effect_record_table_2[index].value == value;
 }
 
 typedef int PoseVector128 __attribute__((mode(TI)));
@@ -125,18 +125,18 @@ void moby_rotate_about_point(char *self, PoseVector128 *point, float x, float y,
 
 /* func_002B44C0 is defined in 002B44C0-sway-g0.c. */
 
-extern int D_001AA0F0 __attribute__((sda));
+extern int g_requested_setting_a __attribute__((sda));
 
 /* Stores a value in a global setting. */
 void request_set_setting_a(int value) {
-    D_001AA0F0 = value;
+    g_requested_setting_a = value;
 }
 
-extern int D_001AA0F4 __attribute__((sda));
+extern int g_requested_setting_b __attribute__((sda));
 
 /* Stores a value in a second global setting. */
 void request_set_setting_b(int value) {
-    D_001AA0F4 = value;
+    g_requested_setting_b = value;
 }
 
 extern int g_requested_game_mode __attribute__((sda));

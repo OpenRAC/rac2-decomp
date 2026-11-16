@@ -7,7 +7,7 @@
 extern void cam_compute_view_direction(void *,void *,int);
 extern void vec_scale_to_length(void *,void *,float);
 extern char *CreateMoby(int);
-extern unsigned char D_00139580;
+extern unsigned char g_seeker_weapon_index;
 typedef struct { char pad[0x50]; float scale; char tail[0x8C]; } EffectTiming;
 extern EffectTiming g_weapon_l00_table[];
 extern int FloatToInt(float);
@@ -26,7 +26,7 @@ char *effect_spawn_owned_moby(void *position,void *velocity,void *unused,void *o
  if(moby) {
  FIELD_U8(moby,0x30)=255; FIELD_S16(moby,0x32)=255; FIELD_U8(moby,0x31)=1; FIELD_U8(moby,0x20)=0;
  vars=*(char **)(moby+0x68);
- denominator=((EffectTiming *)((char *)g_weapon_l00_table+D_00139580*sizeof(EffectTiming)))->scale*(1.0f/60.0f);
+ denominator=((EffectTiming *)((char *)g_weapon_l00_table+g_seeker_weapon_index*sizeof(EffectTiming)))->scale*(1.0f/60.0f);
  duration=40.0f/denominator;
  ticks=FloatToInt(duration);
  inverse=1.0f/duration;

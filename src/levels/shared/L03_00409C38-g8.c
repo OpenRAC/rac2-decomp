@@ -23,8 +23,8 @@ typedef struct {
     s32 f98;
 } L03Moby9C38;
 
-extern f32 D_L03_001B1654 __attribute__((sda));
-extern f32 D_L03_001B1658 __attribute__((sda));
+extern f32 g_slim_ship_turn_rate __attribute__((sda));
+extern f32 g_slim_ship_accel __attribute__((sda));
 
 extern void moby_set_state(void *, int, int);
 extern void moby_update_ground_check(void *);
@@ -43,7 +43,7 @@ void moby_start_drop(L03Moby9C38 *self, s32 quiet) {
         if (quiet == 0) {
             self->pos[2] = self->pos[2] + 10.0f;
             math_step_value_toward_target(&self->pos[2], &vars->drop, vars->height, 1.0f,
-                          D_L03_001B1654 * 0.00027777778f, D_L03_001B1658 * 0.016666668f);
+                          g_slim_ship_turn_rate * 0.00027777778f, g_slim_ship_accel * 0.016666668f);
         }
     }
     self->flags |= 0x400;

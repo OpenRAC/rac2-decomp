@@ -10,10 +10,10 @@
 
 typedef int Quad003D54B0 __attribute__((mode(TI)));
 
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern u8 g_sound_state[];
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern char D_L00_001B0318[];
+extern char g_default_vector[] __attribute__((sda));
+extern char g_str_flying_enemy_debug[];
 
 extern int robot_init_check_health(char *);
 extern void moby_mark_spawned(void *);
@@ -67,7 +67,7 @@ void flying_l00_enemy_update(char *self)
         return;
     }
 
-    if (D_L00_001A8F00 == 2) {
+    if (g_game_l00_mode == 2) {
         *(u16 *)(self + 0x34) |= 0x41;
         *(u16 *)(self + 0x34) &= ~0x1000;
         *(int *)(self + 0x98) = 0;
@@ -83,7 +83,7 @@ void flying_l00_enemy_update(char *self)
         if (flag_set_second_pending(self) != 0)
             moby_set_controller_speed_limits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (*(int *)(vars + 0x258) == 1 && *(int *)(vars + 0x294) != 0
-            && math_fabs(*(float *)(self + 0x18) - *(float *)(vars + 0x238)) < 2.0f && D_L00_001A8F00 != 2) {
+            && math_fabs(*(float *)(self + 0x18) - *(float *)(vars + 0x238)) < 2.0f && g_game_l00_mode != 2) {
             moby_set_state(self, 0xB, 4);
             if (*(u8 *)(self + 0x43) != 1)
                 anim_start_blended(self, 1, 0, 4);
@@ -257,7 +257,7 @@ void flying_l00_enemy_update(char *self)
         } else {
             int index;
             char *child;
-            STUB_printf(D_L00_001B0318, *(int *)(vars + 0x2A0));
+            STUB_printf(g_str_flying_enemy_debug, *(int *)(vars + 0x2A0));
             index = *(int *)(vars + 0x2C0);
             if (index != -1) {
                 u8 *slot = g_sound_state + index * 0x70;
@@ -348,7 +348,7 @@ void flying_l00_enemy_update(char *self)
                                         *(float *)(target + 0x14) - *(float *)(self + 0x14)));
         }
         if (*(u8 *)(self + 0x42) == 0x1C)
-            part_spawn_joint_hit_effects(*(float *)(vars + 0x298), self, D_L00_001A8F20, 4);
+            part_spawn_joint_hit_effects(*(float *)(vars + 0x298), self, g_default_vector, 4);
         break;
     case 13: {
         char *target;

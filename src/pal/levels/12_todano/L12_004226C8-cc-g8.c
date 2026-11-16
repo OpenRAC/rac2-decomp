@@ -2,23 +2,23 @@
 /* func_PAL_L12_004226C8, the PAL copy of func_L12_0041D3B0: the same C, where rename func_0032C700 becomes func_PAL_L00_003FB330; rename func_002B0A68 becomes func_PAL_002B15D8; rename func_L12_0041E8F8 becomes func_PAL_L12_00423C50; scale D_L12_001B1DC0 / 2; wrap D_L12_001B1DC0 (((int)({e}) * 5 + 2) / 6). */
 #include "common.h"
 
-extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern u8 D_0019B4A8[];
+extern struct { u8 pad[0x464]; u8 flags[0]; } g_object_flags;
+extern u8 g_moby_nibble_table[];
 extern s32 g_current_map_index __attribute__((sda));
-extern u8 *D_L12_001B2E9C MACRO_ADDR;
+extern u8 *g_moby_list_start MACRO_ADDR;
 extern u8 *D_L12_001B2E9C_gp SDATA(D_L12_001B2E9C);
-extern s32 D_L12_001B1DC0 __attribute__((sda));
+extern s32 g_break_child_duration __attribute__((sda));
 /* The burst helper reads a vector at this GP-relative address. */
-extern f32 D_L12_001B1DD0[] SDATA(D_L12_001B1DD0);
+extern f32 g_explosion_position_offset[] SDATA(D_L12_001B1DD0);
 extern u8 g_hero_position[];
 
 extern void moby_mark_spawned(void *);
 extern s32 linked_moby_is_finished(void *);
-extern void func_PAL_L12_00423C50(void *);
+extern void linked_moby_trigger_burst_pal(void *);
 extern void moby_set_state(void *, s32, s32);
 extern s32 math_fast_float_d(void *);
 /* Eight GPR inputs, four stack inputs and two FP inputs, in their EE ABI order. */
-extern void *func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32,
+extern void *SpawnExplosion_pal(void *, s32, s32, s32, s32, s32, s32, s32,
                          s32, s32, s32, s32, f32, f32);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_transform_and_set_height(void *, void *, void *, void *, f32);
@@ -39,9 +39,9 @@ void func_PAL_L12_004226C8(u8 *self)
         self[0x20] = 1;
         *(f32 *)(v + 0x10) = *(f32 *)(self + 0x18);
         id = *(u16 *)(self + 0xB2);
-        if (D_L12_0021EDF0.flags[(s16)id])
+        if (g_object_flags.flags[(s16)id])
             goto Destroy0;
-        packed = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+        packed = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
         if (id & 1) {
             if ((packed >> 4) & 7)
                 goto Destroy0;
@@ -71,7 +71,7 @@ Destroy0:
         break;
     }
     case 4: {
-        u8 *b = D_L12_001B2E9C;
+        u8 *b = g_moby_list_start;
         s32 *p4;
         s32 i4;
 
@@ -88,7 +88,7 @@ Destroy0:
     }
     case 2:
         moby_set_state(self, 3, -1);
-        *(s32 *)(v + 0x14) = (((int)(D_L12_001B1DC0) * 5 + 2) / 6);
+        *(s32 *)(v + 0x14) = (((int)(g_break_child_duration) * 5 + 2) / 6);
         break;
 
     case 3: {
@@ -98,7 +98,7 @@ Destroy0:
         s32 i3b;
 
         if (math_fast_float_d(v + 0x14)) {
-            func_PAL_L00_003FB330(D_L12_001B1DD0, 1, 14, 10, 15, 10, 20, 1,
+            SpawnExplosion_pal(g_explosion_position_offset, 1, 14, 10, 15, 10, 20, 1,
                           1, 1, 0, 0, 2.0f, 20.0f);
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
@@ -111,11 +111,11 @@ Destroy0:
             for (i3 = 0; i3 < 3; i3++) {
                 if (p3[i3] != -1) {
                     D_L12_001B2E9C_gp[(p3[i3] << 8) + 0x20] = 4;
-                    func_PAL_L12_00423C50(D_L12_001B2E9C + (p3[i3] << 8));
+                    linked_moby_trigger_burst_pal(g_moby_list_start + (p3[i3] << 8));
                 }
             }
         }
-        if (*(s32 *)(v + 0x14) == (((int)(D_L12_001B1DC0 / 2) * 5 + 2) / 6)) {
+        if (*(s32 *)(v + 0x14) == (((int)(g_break_child_duration / 2) * 5 + 2) / 6)) {
             p3b = (s32 *)v;
             for (i3b = 0; i3b < 3; i3b++) {
                 if (p3b[i3b] != -1)
@@ -141,11 +141,11 @@ Destroy0:
         }
         id = *(u16 *)(self + 0xB2);
         if (id & 1) {
-            counter = &D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            counter = &g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if (((*counter >> 4) & 7) != 7)
                 *counter += 16;
         } else {
-            counter = &D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
+            counter = &g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index << 10)];
             if ((*counter & 7) != 7)
                 *counter += 1;
         }

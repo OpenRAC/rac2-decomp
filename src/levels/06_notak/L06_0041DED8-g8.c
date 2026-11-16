@@ -1,15 +1,15 @@
 #include "include_asm.h"
 #include "common.h"
 
-extern char *D_L06_001B281C __attribute__((sda));
+extern char *g_moby_l06_table __attribute__((sda));
 
-extern u8 *D_L06_001FB3A0[];
+extern u8 *g_group_l06_id_lists[];
 extern void moby_set_state(char *, int, int);
 extern void anim_start_blended(char *, int, int, int);
 extern int math_random_int_range(int, int);
 extern int PlayMobySound(int, int, char *);
 extern int g_current_map_index;
-extern unsigned char D_0019B2E8[];
+extern unsigned char g_moby_group_flags[];
 extern char *g_path_list[];
 extern float path_l01_compute_segment_lengths(char *);
 extern void mem_clear(char *, int, int);
@@ -23,11 +23,11 @@ typedef struct {
     char pad1834[0xA60]; int mode;
 } ControllerGlobals;
 extern ControllerGlobals g_hero_state;
-extern char D_L06_00188660[], D_L06_001B9840[];
-extern char D_L06_002AA500[], D_L06_00257CC0[], D_L06_002DF000[], D_L06_00257FC0[], D_L06_002DF060[];
-extern int D_L06_001B1858[] SDATA(D_L06_001B1858);
-extern int D_L06_001B187C SDATA(D_L06_001B187C);
-extern int D_L06_001B1880 SDATA(D_L06_001B1880);
+extern char g_effect_target_records[], g_hero_l06_position[];
+extern char g_effect_items[], g_effect_models[], g_effect_data[], g_effect_aux_buffer[], g_effect_more_data[];
+extern int g_effect_group_counts[] SDATA(D_L06_001B1858);
+extern int g_effect_context_a SDATA(D_L06_001B187C);
+extern int g_effect_context_b SDATA(D_L06_001B1880);
 extern void effect_pool_clear(void), gfx_add_draw_callback_third(void);
 extern int snd_start_in_slot(int, int, char *);
 extern void snd_stop_voice(int);
@@ -50,11 +50,11 @@ void actor_alert_group(u8 *moby)
 
     if (moby[0x21] == 0xFF)
         return;
-    id_list = D_L06_001FB3A0[moby[0x21]];
+    id_list = g_group_l06_id_lists[moby[0x21]];
     if (id_list == 0)
         return;
     id_cursor = id_list;
-    moby_base = D_L06_001B281C;
+    moby_base = g_moby_l06_table;
     for (;;) {
         char *other = moby_base + ((*(unsigned short *)id_cursor & 0x7FFF) << 8);
 
@@ -69,11 +69,11 @@ void actor_alert_group(u8 *moby)
     }
 }
 
-extern int D_L06_001B2838;
-extern char *D_L06_001B2480;
-extern float D_L06_001B1090 __attribute__((sda));
-extern char D_L06_002E20C8[];
-extern char D_L06_002E2128[];
+extern int g_moby_l06_group_count;
+extern char *g_path_record_table;
+extern float g_creature_wander_time_a __attribute__((sda));
+extern char g_str_notak_debug_a[];
+extern char g_str_notak_debug_b[];
 extern void STUB_printf(const char *, ...);
 extern void math_trap_always(void);
 extern int FloatToInt(float);
@@ -106,9 +106,9 @@ void notak_enemy_update(u8 *moby)
     if (moby[0x20] == 0) {
         char *path_record;
 
-        if (D_L06_001B2838 < moby[0x21]) {
-            STUB_printf(D_L06_002E20C8);
-            STUB_printf(D_L06_002E2128);
+        if (g_moby_l06_group_count < moby[0x21]) {
+            STUB_printf(g_str_notak_debug_a);
+            STUB_printf(g_str_notak_debug_b);
             math_trap_always();
         }
         moby[0x30] = 0x40;
@@ -138,8 +138,8 @@ void notak_enemy_update(u8 *moby)
         H(0x1E2) = 120;
         H(0x1E4) = 180;
         F(0x1D4) = 3.0f;
-        F(0x1D0) = D_L06_001B1090 * 0.0166666675f;
-        path_record = D_L06_001B2480 + I(0x210) * 0x30;
+        F(0x1D0) = g_creature_wander_time_a * 0.0166666675f;
+        path_record = g_path_record_table + I(0x210) * 0x30;
         if (*(short *)(path_record + 0x30) != 0)
             I(0x13C) = **(int **)(path_record + 0x3C);
         F(0x328) = math_random_angle();
@@ -155,7 +155,7 @@ void notak_enemy_update(u8 *moby)
                 anim_start_blended((char *)moby, 0, 0, 0);
         }
     }
-    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, D_L06_001B9840) < 24.0f) {
+    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, g_hero_l06_position) < 24.0f) {
         moby_update_ground_check(moby);
         moby[0x6F] = 0x16;
     }
@@ -187,11 +187,11 @@ void actor_alert_group_and_markers(u8 *arg0)
 
     if (arg0[0x21] == 0xFF)
         return;
-    list = D_L06_001FB3A0[arg0[0x21]];
+    list = g_group_l06_id_lists[arg0[0x21]];
     if (list == 0)
         return;
     p = list;
-    a2 = D_L06_001B281C;
+    a2 = g_moby_l06_table;
     for (;;) {
         char *q = a2 + ((*(unsigned short *)p & 0x7FFF) << 8);
 
@@ -216,8 +216,8 @@ void actor_alert_group_and_markers(u8 *arg0)
    while D_L06_001B2838 is a plain int: its `.extern` comes last in the file, which leaves a load
    in a branch delay slot on $gp and every other load on `lui`/`lw`. */
 extern unsigned char *D_L06_001B281C_base[3] __asm__("D_L06_001B281C") __attribute__((sda));
-extern int D_L06_001B2838;
-extern int D_L06_001B2348;
+extern int g_moby_l06_group_count;
+extern int g_game_l06_frame_counter;
 
 /* Overlays for an owner (L06Obj) and the state block it points to (L06Cfg); only the fields the
    next two functions touch are named. */
@@ -251,7 +251,7 @@ typedef struct {
 } L06ColorPair;
 
 extern void marker_draw_group(L06Obj *);
-extern L06ColorPair D_L06_001B1098[];
+extern L06ColorPair g_marker_color_pairs[];
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
@@ -265,7 +265,7 @@ extern void gfx_add_draw_callback_first(void *, void *);
 void marker_update_pulse(L06Obj *self)
 {
     L06Cfg *vars = self->cfg;
-    L06ColorPair colors = D_L06_001B1098[0];
+    L06ColorPair colors = g_marker_color_pairs[0];
     unsigned short *id_cursor;
     L06Obj *entity;
     L06Cfg *entity_vars;
@@ -277,10 +277,10 @@ void marker_update_pulse(L06Obj *self)
     blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
     vars->blend = blend;
     self->tint = FastTweenColor(colors.a, colors.b, blend);
-    if (vars->stamp != D_L06_001B2348) {
-        for (id_cursor = (unsigned short *)D_L06_001FB3A0[self->group];
-             self->group != 0xFF && self->group <= D_L06_001B2838 && id_cursor != 0 &&
-             ((id_cursor != 0 && (short)id_cursor[-1] >= 0) || id_cursor == (unsigned short *)D_L06_001FB3A0[self->group]);
+    if (vars->stamp != g_game_l06_frame_counter) {
+        for (id_cursor = (unsigned short *)g_group_l06_id_lists[self->group];
+             self->group != 0xFF && self->group <= g_moby_l06_group_count && id_cursor != 0 &&
+             ((id_cursor != 0 && (short)id_cursor[-1] >= 0) || id_cursor == (unsigned short *)g_group_l06_id_lists[self->group]);
              id_cursor++) {
             entity = (L06Obj *)(D_L06_001B281C_base[0] + ((*id_cursor & 0x7FFF) << 8));
             if (entity == 0)
@@ -292,7 +292,7 @@ void marker_update_pulse(L06Obj *self)
                         if (entity->kind != 0xFD) {
                             entity_vars = entity->cfg;
                             moby_transform_joint_point(entity, 0, &entity_vars->vec);
-                            entity_vars->stamp = D_L06_001B2348;
+                            entity_vars->stamp = g_game_l06_frame_counter;
                         }
                     }
                 }
@@ -305,8 +305,8 @@ void marker_update_pulse(L06Obj *self)
 /* D_L06_001B10A0 is only used for its address, taken through $gp. D_L06_001B10B0 is one 8-byte
    object: its first word is loaded in a branch delay slot (so on $gp), its second as a bare
    symbol, which is how retail loads the two colours. */
-extern int D_L06_001B10A0 __attribute__((sda));
-extern int D_L06_001B10B0[2];
+extern int g_marker_corner_vec __attribute__((sda));
+extern int g_marker_tween_colors[2];
 extern void FastVecScale(void *out, void *in, float scale);
 extern void transform_vector(void *a, void *b, void *c);
 extern void gfx_l00_draw_billboard_quad(void *buf, int color, float f12, float f13);
@@ -324,11 +324,11 @@ void marker_draw_group(L06Obj *self)
 
     if (self->group == 0xFF)
         return;
-    q = (unsigned short *)D_L06_001FB3A0[self->group];
+    q = (unsigned short *)g_group_l06_id_lists[self->group];
     if (q == 0)
         return;
-    for (p = q; self->group != 0xFF && self->group <= D_L06_001B2838 && p != 0 &&
-                ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)D_L06_001FB3A0[self->group]);
+    for (p = q; self->group != 0xFF && self->group <= g_moby_l06_group_count && p != 0 &&
+                ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)g_group_l06_id_lists[self->group]);
          p++) {
         e = (L06Obj *)(D_L06_001B281C_base[0] + ((*p & 0x7FFF) << 8));
         if (e == 0)
@@ -338,10 +338,10 @@ void marker_draw_group(L06Obj *self)
                 if (e->kind != 0xFE) {
                     if (e->kind != 0xFD) {
                         s0 = e->cfg;
-                        FastVecScale(buf, &D_L06_001B10A0, s0->scale);
+                        FastVecScale(buf, &g_marker_corner_vec, s0->scale);
                         transform_vector(buf, buf, &s0->vec);
                         gfx_l00_draw_billboard_quad(buf,
-                                          FastTweenColor(D_L06_001B10B0[0], D_L06_001B10B0[1],
+                                          FastTweenColor(g_marker_tween_colors[0], g_marker_tween_colors[1],
                                                         s0->blend),
                                           s0->scale * 0.2f, 0.08f);
                     }
@@ -353,9 +353,9 @@ void marker_draw_group(L06Obj *self)
 
 /* The level's three turn angles, in degrees (37, 41 and 70); the step below turns them into
    radians per frame. The first one is read through $gp, the other two absolutely. */
-extern float D_L06_001B18D0 __attribute__((sda));
-extern float D_L06_001B18D4;
-extern float D_L06_001B18D8;
+extern float g_ring_spin_speed_x __attribute__((sda));
+extern float g_ring_spin_speed_y;
+extern float g_ring_spin_speed_z;
 
 extern float func_32E5D0(float, float);
 extern void func_32DE28(void *, void *);
@@ -382,9 +382,9 @@ void object_ring_spin_update(char *moby)
     float two = 2.0f;
     int i;
 
-    *(float *)(vars + 0x120) = func_32E5D0(*(float *)(vars + 0x120), D_L06_001B18D0 * step);
-    *(float *)(vars + 0x124) = func_32E5D0(*(float *)(vars + 0x124), D_L06_001B18D4 * step);
-    *(float *)(vars + 0x128) = func_32E5D0(*(float *)(vars + 0x128), D_L06_001B18D8 * step);
+    *(float *)(vars + 0x120) = func_32E5D0(*(float *)(vars + 0x120), g_ring_spin_speed_x * step);
+    *(float *)(vars + 0x124) = func_32E5D0(*(float *)(vars + 0x124), g_ring_spin_speed_y * step);
+    *(float *)(vars + 0x128) = func_32E5D0(*(float *)(vars + 0x128), g_ring_spin_speed_z * step);
     func_32DE28(axes, vars + 0x120);
     for (i = 7; i >= 0; i--) {
         func_32DA88(v0, point_ptr, axes);
@@ -406,7 +406,7 @@ int follower_init_and_check_hits(unsigned char *moby)
     char *vars = *(char **)(moby + 0x68);
     int hit_result, old_mode;
     if (moby[0x20] == 0) {
-        if ((D_0019B2E8[moby[0xB0] + (g_current_map_index << 4)] & 0x80) && *(int *)(vars + 0x33C)) return 1;
+        if ((g_moby_group_flags[moby[0xB0] + (g_current_map_index << 4)] & 0x80) && *(int *)(vars + 0x33C)) return 1;
         *(int *)(vars + 0x2AC) = 0;
         *(unsigned short *)(moby + 0x34) |= 0x800;
         *(int *)(vars + 0x254) = -1;
@@ -461,22 +461,22 @@ void effect_group_update(unsigned char *moby)
     vars = *(char **)(moby + 0x68);
     if (!vars) return;
     count = 1;
-    if (*(int *)(vars + 0x18) != -1) count = D_L06_001B1858[*(int *)(vars + 0x18)];
+    if (*(int *)(vars + 0x18) != -1) count = g_effect_group_counts[*(int *)(vars + 0x18)];
     count += *(int *)(vars + 0x10);
     context.kind = 48; context.count = count;
-    context.a = &D_L06_001B187C; context.b = &D_L06_001B1880;
-    context.items = D_L06_002AA500; context.models = D_L06_00257CC0; context.data = D_L06_002DF000;
-    context.states = D_L06_001B1858; context.aux = D_L06_00257FC0; context.more = D_L06_002DF060;
+    context.a = &g_effect_context_a; context.b = &g_effect_context_b;
+    context.items = g_effect_items; context.models = g_effect_models; context.data = g_effect_data;
+    context.states = g_effect_group_counts; context.aux = g_effect_aux_buffer; context.more = g_effect_more_data;
     context.update = effect_pool_clear; context.callback = gfx_add_draw_callback_third;
     context.owner = moby;
     if (*(unsigned char *)(vars + 0x14) == 0 && *(int *)(vars + 0x18) != -1) {
-        char *firstTarget = D_L06_00188660 + *(int *)(vars + 0x38) * 0x70;
+        char *firstTarget = g_effect_target_records + *(int *)(vars + 0x38) * 0x70;
         if (*(unsigned char **)(firstTarget + 0x88) != moby || *(unsigned char *)(firstTarget + 0x74) == 0)
             *(int *)(vars + 0x38) = snd_start_in_slot(20, 4, (char *)moby);
     } else {
         id = *(int *)(vars + 0x38);
         if (id != -1) {
-            char *secondTarget = D_L06_00188660 + id * 0x70;
+            char *secondTarget = g_effect_target_records + id * 0x70;
             if (*(unsigned char **)(secondTarget + 0x88) == moby && *(unsigned char *)(secondTarget + 0x74)) snd_stop_voice(id);
         }
         *(int *)(vars + 0x38) = -1;
@@ -501,10 +501,10 @@ void effect_group_update(unsigned char *moby)
         break;
     }
     water_update_ripple_patches(&context);
-    if (*(int *)(vars + 0x28) != -1 && !IsPointInCuboid(D_L06_001B9840, *(int *)(vars + 0x28))) {
+    if (*(int *)(vars + 0x28) != -1 && !IsPointInCuboid(g_hero_l06_position, *(int *)(vars + 0x28))) {
         allowed = 1;
-        if (*(int *)(D_L06_001B9840 + 0x2C0)) {
-            qcopy(position, D_L06_001B9840);
+        if (*(int *)(g_hero_l06_position + 0x2C0)) {
+            qcopy(position, g_hero_l06_position);
             position[2] = *(float *)vars;
             if (IsPointInCuboid((char *)position, *(int *)(vars + 0x28))) allowed = 0;
         }

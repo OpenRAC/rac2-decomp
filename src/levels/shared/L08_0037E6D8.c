@@ -11,16 +11,16 @@ typedef struct {
     s32 items[8];
 } Group;
 
-extern Group D_L08_001BD800;
+extern Group g_tabora_scene;
 extern void level_apply_nearest_env_preset(s32);
 
 /* hands the group's first member on, then copies its 8-byte word at +0x38 to every other member */
 void moby_copy_group_word_to_members(void)
 {
-    s32 first = D_L08_001BD800.items[0];
+    s32 first = g_tabora_scene.items[0];
     s32 i;
 
     level_apply_nearest_env_preset(first);
-    for (i = 1; i < D_L08_001BD800.count; i++)
-        *(u64 *)(D_L08_001BD800.items[i] + 0x38) = *(u64 *)(first + 0x38);
+    for (i = 1; i < g_tabora_scene.count; i++)
+        *(u64 *)(g_tabora_scene.items[i] + 0x38) = *(u64 *)(first + 0x38);
 }

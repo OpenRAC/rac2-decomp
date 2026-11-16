@@ -3,12 +3,12 @@
 /* func_PAL_L00_002CB3E0, the PAL copy of func_L00_002CB038. */
 extern char D_00189E20_36[];
 
-extern unsigned char D_001A7A80[] __attribute__((sda));
-extern unsigned int D_00138320;
+extern unsigned char g_movie_seen_flags[] __attribute__((sda));
+extern unsigned int g_pad_pressed_flags;
 extern unsigned char g_pad_state[];
-extern unsigned int D_001A7390 __attribute__((sda));
+extern unsigned int g_frame_counter __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
-extern unsigned char D_L00_001B8C80[];
+extern unsigned char g_scalar_transition_state[];
 
 typedef struct {
     unsigned short count;
@@ -29,7 +29,7 @@ void func_PAL_L00_002CB3E0(void)
     int screen = *(int *)(hero + 0x1248);
     char *object;
 
-    if (screen < 0 || !(D_001A7A80[screen] & 0x20) || *(int *)(hero + 0x2294) == 0x31) {
+    if (screen < 0 || !(g_movie_seen_flags[screen] & 0x20) || *(int *)(hero + 0x2294) == 0x31) {
         *(int *)(hero + 0x1450) = 0;
         return;
     }
@@ -37,15 +37,15 @@ void func_PAL_L00_002CB3E0(void)
     if (object) {
         if (30.0f < fast_vec_dist(hero + 0x80, object + 0x10))
             *(int *)(hero + 0x1450) = 0;
-        if ((D_00138320 & 3) != 3)
+        if ((g_pad_pressed_flags & 3) != 3)
             *(int *)(hero + 0x1450) = 0;
         if (!*(char **)(hero + 0x1450) || (*(unsigned short *)(*(char **)(hero + 0x1450) + 0x34) & 0x1000))
             return;
         *(int *)(hero + 0x1450) = 0;
         if (g_progress_statistics[36].count < 0xFFFF)
             g_progress_statistics[36].count++;
-        if ((((int)(D_001A7390) * 5 + 2) / 6) > g_progress_statistics[36].best)
-            g_progress_statistics[36].best = ((int)(D_001A7390) * 5 + 2) / 6;
+        if ((((int)(g_frame_counter) * 5 + 2) / 6) > g_progress_statistics[36].best)
+            g_progress_statistics[36].best = ((int)(g_frame_counter) * 5 + 2) / 6;
         g_progress_statistics[36].levels = (g_progress_statistics[36].levels | (1u << g_current_map_index)) | 0x80000000u;
         return;
     }
@@ -53,7 +53,7 @@ void func_PAL_L00_002CB3E0(void)
         unsigned char *pad = g_pad_state;
         if ((*(unsigned int *)(pad + 0x1A0) & 3) == 3 && (*(unsigned int *)(pad + 0x1A4) & 3) != 0) {
             float radius = 25.0f;
-            unsigned char *camera = D_L00_001B8C80;
+            unsigned char *camera = g_scalar_transition_state;
             float nearAngle = 0.6108652949333191f;
             float farAngle = 1.2217305898666382f;
             char *found = SelectBestEligibleTarget(camera + 0x370, radius, *(float *)(camera + 0x158), nearAngle, farAngle, 5, 1);

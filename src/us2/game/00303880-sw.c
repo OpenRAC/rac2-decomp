@@ -10,11 +10,11 @@ extern int math_fast_float_d(int *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void surface_grid_update_wave_tables(void *);
 extern void surface_grid_update_heights(void *);
-extern void func_US2_00303B98(void *);
+extern void surface_grid_update_us2(void *);
 extern void surface_grid_spawn_effect(void *);
 extern void surface_grid_draw(void *);
 extern void gfx_register_early_draw_callback(void (*)(void *), void *);
-extern float D_002222E0[];
+extern float g_surface_grid_noise_table[];
 
 void func_US2_00303880(unsigned char *object)
 {
@@ -33,8 +33,8 @@ void func_US2_00303880(unsigned char *object)
         if(!FIELD(int,work,0x40)) {
             object[0x30]=255;
             for(i=0;i<64;++i) {
-                D_002222E0[i * 8 + 2]=math_random_float_range(0.5f,2);
-                D_002222E0[i * 8 + 3]=math_random_float_range(0.002f,0.006f);
+                g_surface_grid_noise_table[i * 8 + 2]=math_random_float_range(0.5f,2);
+                g_surface_grid_noise_table[i * 8 + 3]=math_random_float_range(0.002f,0.006f);
             }
         }
         moby_set_state(object,1,-1);return;
@@ -60,6 +60,6 @@ void func_US2_00303880(unsigned char *object)
     default:break;
     }
     if(!FIELD(int,work,0x40))surface_grid_update_wave_tables(object);
-    surface_grid_update_heights(object);func_US2_00303B98(object);surface_grid_spawn_effect(object);
+    surface_grid_update_heights(object);surface_grid_update_us2(object);surface_grid_spawn_effect(object);
     gfx_register_early_draw_callback(surface_grid_draw,object);
 }

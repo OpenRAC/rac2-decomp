@@ -21,7 +21,7 @@ typedef struct Moby_L05_0041C118 {
 /* The moby of class 0xFBF, found once. */
 extern Moby_L05_0041C118 *g_homing_pickup_target __attribute__((sda));
 /* The head of the moby list. */
-extern Moby_L05_0041C118 *D_L05_001B2528;
+extern Moby_L05_0041C118 *g_moby_l05_list_head;
 
 extern Moby_L05_0041C118 *CreateMoby(int);
 extern void vec_clear_128(float *);
@@ -44,7 +44,7 @@ Moby_L05_0041C118 *pickup_spawn_homing(Moby_L05_0041C118 *caller)
         vec_clear_128(moby->rot);
         moby->rot[2] = math_random_angle();
         if (g_homing_pickup_target == 0) {
-            for (other = D_L05_001B2528; other != 0; other = other->pChain) {
+            for (other = g_moby_l05_list_head; other != 0; other = other->pChain) {
                 if (other->oClass == 0xFBF /* moby class 4031 */)
                     g_homing_pickup_target = other;
             }

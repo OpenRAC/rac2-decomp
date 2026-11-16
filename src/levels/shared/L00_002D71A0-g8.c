@@ -15,9 +15,9 @@ typedef struct {
 
 typedef struct { char pad[256]; float x, y; } InputState;
 
-extern char D_L00_001BB9F0[];
+extern char g_cam_l00_override_slots[];
 #define SLOT(i) ((OverrideRecord *)(D_L00_001BB9F0 + (i) * 64))
-extern int D_L00_001B1884 __attribute__((sda));
+extern int g_cam_override_selected_slot __attribute__((sda));
 extern char g_pad_state[];
 extern void cam_end_override(void *);
 extern void cam_set_value_target(int, int, float, float, float, float);
@@ -56,11 +56,11 @@ int cam_update_overrides(void)
             }
         }
     }
-    if (selected >= 0 && D_L00_001B1884 >= 0 && selected != D_L00_001B1884 &&
-        SLOT(D_L00_001B1884)->blend >= 0.0f &&
+    if (selected >= 0 && g_cam_override_selected_slot >= 0 && selected != g_cam_override_selected_slot &&
+        SLOT(g_cam_override_selected_slot)->blend >= 0.0f &&
         SLOT(selected)->blend < 0.0f)
         cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
-    D_L00_001B1884 = selected;
+    g_cam_override_selected_slot = selected;
     if (selected >= 0) {
 
     if (SLOT(selected)->primary >= 0.0f) {

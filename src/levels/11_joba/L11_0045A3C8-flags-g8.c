@@ -16,8 +16,8 @@ extern void FastVecScale(void *,void *,float);
 extern void draw_world_quad(void *,void *,int);
 /* Observed target prefix: retail addresses its position at base + 0x140. */
 typedef struct { u8 reserved[0x140]; float position[4]; } FlareTargetView;
-extern FlareTargetView D_L11_001BA780 __attribute__((nosda));
-extern u32 D_L11_001B2014 __attribute__((sda));
+extern FlareTargetView g_hero_l11_state_block __attribute__((nosda));
+extern u32 g_effect_quad_color __attribute__((sda));
 
 /* Submit one billboarding flare at the object's current endpoint. */
 /* Same body as func_L02_00422BB8, with this function's own callees. */
@@ -35,11 +35,11 @@ void gfx_l11_draw_billboard_flare(u8 *object)
     packet.setup=0xFF9000000260ULL;
     packet.state=0x8000000048ULL;
     packet.reserved=0;
-    color=(D_L11_001B2014&0xFFFFFF)+(math_random_int_range(32,48)<<24);
+    color=(g_effect_quad_color&0xFFFFFF)+(math_random_int_range(32,48)<<24);
     packet.color[3]=color; packet.color[2]=color; packet.color[1]=color; packet.color[0]=color;
     rotation[3]=0;
-    rotation[2]=mat_fast_helper_a(D_L11_001BA780.position[0]-*(float *)(object+0x10),D_L11_001BA780.position[1]-*(float *)(object+0x14));
-    rotation[1]=-mat_fast_helper_a(vec_distance_xy(object+0x10,D_L11_001BA780.position),D_L11_001BA780.position[2]-*(float *)(object+0x18));
+    rotation[2]=mat_fast_helper_a(g_hero_l11_state_block.position[0]-*(float *)(object+0x10),g_hero_l11_state_block.position[1]-*(float *)(object+0x14));
+    rotation[1]=-mat_fast_helper_a(vec_distance_xy(object+0x10,g_hero_l11_state_block.position),g_hero_l11_state_block.position[2]-*(float *)(object+0x18));
     rotation[0]=math_random_angle();
     euler_to_matrix(transform,rotation);
     transform[12]=*(float *)(object+0x10); transform[13]=*(float *)(object+0x14); transform[14]=*(float *)(object+0x18); transform[15]=1;

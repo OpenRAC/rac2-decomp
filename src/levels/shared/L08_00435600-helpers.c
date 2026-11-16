@@ -25,7 +25,7 @@ struct SpawnObject {
 extern SpawnObject *CreateMoby(s32);
 extern void func_002A0F48(void *);
 
-extern float D_L08_001B1F94 __attribute__((sda));
+extern float g_attached_effect_scale __attribute__((sda));
 /* Creates the effect object for the owner and starts it at the given position. */
 /* Installs the same aligned input vector in the owner and its attached state. */
 SpawnObject *part_spawn_attached_effect(u8 *owner, SpawnVector *position)
@@ -37,7 +37,7 @@ SpawnObject *part_spawn_attached_effect(u8 *owner, SpawnVector *position)
         object->intensity = 255;
         object->colour = 255;
         object->mode = 0;
-        object->scale = object->blueprint->scale * D_L08_001B1F94;
+        object->scale = object->blueprint->scale * g_attached_effect_scale;
         state = object->state;
         state->owner = owner;
         qcopy(&state->position, position);

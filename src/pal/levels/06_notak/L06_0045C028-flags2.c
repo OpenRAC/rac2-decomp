@@ -9,7 +9,7 @@ extern void func_PAL_002B15D8(char *, int, char *, float, float, float, float, i
 extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(char *);
 
-void func_PAL_L06_0045C220(char *a0)
+void spinning_trigger_burst_update_pal(char *a0)
 {
     int state = *(unsigned char *)(a0 + 0x20);
     char *o = *(char **)(a0 + 0x68);

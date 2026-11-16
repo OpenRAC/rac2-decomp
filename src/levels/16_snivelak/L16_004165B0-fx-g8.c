@@ -24,7 +24,7 @@ typedef struct {
     int flag;
 } Global;
 extern Global g_hero_state;
-extern char D_001B9B00[];
+extern char g_turret_debris_vectors[];
 /* Field view at the effect table's original base, not its record stride. */
 
 typedef struct {
@@ -34,13 +34,13 @@ typedef struct {
     char *owner;
 } Effect;
 extern char g_sound_state[];
-extern int D_L16_001B1704, D_00138324 __attribute__((nosda));
-extern unsigned short D_001941DC __attribute__((nosda)), D_0018CDF0 __attribute__((nosda));
-extern char *D_L16_001B2B1C;
-extern int D_L16_001B16C0, D_L16_001A8FB4;
-extern int D_L16_001A8FB0 __attribute__((sda));
-extern int D_L16_001B1A80 __attribute__((sda));
-extern float D_L16_001B1A90 __attribute__((sda)), D_L16_001B1A94 __attribute__((sda));
+extern int g_snivelak_voice_cue_count, g_pad_held_flags __attribute__((nosda));
+extern unsigned short g_turret_stage_value __attribute__((nosda)), g_turret_target_id __attribute__((nosda));
+extern char *g_moby_instance_table;
+extern int g_snivelak_target, g_snivelak_turret_state;
+extern int g_snivelak_turret_timer __attribute__((sda));
+extern int g_turret_local_offset __attribute__((sda));
+extern float g_turret_angle_offset __attribute__((sda)), g_turret_hero_range __attribute__((sda));
 extern void func_00309C08(char *), func_0031DB68(char *, char *, char *), func_00313DD0(char *, int, int);
 extern void func_002ED888(int, int), func_002E7968(char *, char *, char *), func_002E7488(char *, char *, char *);
 extern int func_00321930(char *), func_00357288(int, int, char *);
@@ -74,7 +74,7 @@ void snivelak_turret_update(char *self) {
         F(vars, 0x7c) = F(self, 0xf8);
         F(vars, 0x94) = 4.0f;
         func_00313DD0(self, 1, -1);
-        if (D_L16_001B1704 >= 2 && D_001941DC < 3)
+        if (g_snivelak_voice_cue_count >= 2 && g_turret_stage_value < 3)
             func_002ED888(0xa0b, 0x62);
         break;
     case 1:
@@ -85,19 +85,19 @@ void snivelak_turret_update(char *self) {
         if ((state == 4 && g_hero_state.target != self) || ((hero_view = &g_hero_state), H(hero_view, 0x34e) >= 20))
             B(self, 0x20) = 1;
         else if (state == 1 && hero_view->target == self && hero_view->active) {
-            func_002E7968(buf, (char *)&D_L16_001B1A80, self + 0xc0);
+            func_002E7968(buf, (char *)&g_turret_local_offset, self + 0xc0);
             func_002E7488(buf, buf, self + 0x10);
             func_002B9578(buf, self + 0xf0, 0x31, 0);
             g_hero_state.owner = self;
-            func_00433528(D_001B9B00, D_001B9B00 + 0x10, 3, 60, 0);
-            D_0018CDF0 = 0xffff;
-            D_L16_001B16C0 = (int)self;
+            func_00433528(g_turret_debris_vectors, g_turret_debris_vectors + 0x10, 3, 60, 0);
+            g_turret_target_id = 0xffff;
+            g_snivelak_target = (int)self;
             func_00313DD0(self, 2, -1);
             break;
         }
-        if (func_002E73F8(F(self, 0x18) - F(vars, 0x78) + D_L16_001B1A90) > 0.01f)
-            func_00317348((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78) - D_L16_001B1A90, 0.0005555555690079927f, 0.0005555555690079927f, 0.03333333507180214f);
-        if (func_002E7680(self + 0x10, (char *)&g_hero_state.x) > D_L16_001B1A94) {
+        if (func_002E73F8(F(self, 0x18) - F(vars, 0x78) + g_turret_angle_offset) > 0.01f)
+            func_00317348((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78) - g_turret_angle_offset, 0.0005555555690079927f, 0.0005555555690079927f, 0.03333333507180214f);
+        if (func_002E7680(self + 0x10, (char *)&g_hero_state.x) > g_turret_hero_range) {
             angle = func_002E84F0(func_002E7B60(g_hero_state.x - F(self, 0x10), g_hero_state.y - F(self, 0x14)), 3.1415927410125732f);
             func_00317800((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.10471977293491364f, 0);
         }
@@ -107,7 +107,7 @@ void snivelak_turret_update(char *self) {
             func_00357288(3, 0, self);
             I(vars, 0x90) = 0;
         }
-        angle = func_002E7B60(F((char *)((I(vars, 0x64) << 8) + (int)D_L16_001B2B1C), 0x10) - F(self, 0x10), F((char *)((I(vars, 0x64) << 8) + (int)D_L16_001B2B1C), 0x14) - F(self, 0x14));
+        angle = func_002E7B60(F((char *)((I(vars, 0x64) << 8) + (int)g_moby_instance_table), 0x10) - F(self, 0x10), F((char *)((I(vars, 0x64) << 8) + (int)g_moby_instance_table), 0x14) - F(self, 0x14));
         func_00317348((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78), 0.0016666667070239782f, 0.0016666667070239782f, 0.10000000894069672f);
         func_00317800((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, 0);
         if (func_002E73F8(func_002E8538(F(self, 0xf8), angle)) < 0.174532949924469f) {
@@ -124,7 +124,7 @@ void snivelak_turret_update(char *self) {
         }
         if (func_002E73F8(F(self, 0x18) - F(vars, 0x78)) <= F(vars, 0x98) && func_002E85D8(F(self, 0xf8), angle) <= 0.0872664749622345f)
             func_00313DD0(self, 3, -1);
-        D_0018CDF0 = 0xffff;
+        g_turret_target_id = 0xffff;
         turret_set_camera_matrices(self);
         FireAlternatingMuzzleShot(self);
         cam_update_turret_follow(self);
@@ -134,7 +134,7 @@ void snivelak_turret_update(char *self) {
         break;
     case 3:
         func_002D43B0(self, 0x600fff0f, 0, 0x26, -1, 4, 1.0f, 0.0f, 90.0f);
-        if ((D_00138324 & 16) || g_hero_state.mode != 0x31) {
+        if ((g_pad_held_flags & 16) || g_hero_state.mode != 0x31) {
             turret_reset_camera_state(self);
             func_00313DD0(self, 4, -1);
             if (I(vars, 0xa4) != -1) {
@@ -143,8 +143,8 @@ void snivelak_turret_update(char *self) {
                     func_00356F88(I(vars, 0xa4));
             }
             I(vars, 0xa4) = -1;
-            D_L16_001A8FB4 = 2;
-            D_L16_001A8FB0 = 30;
+            g_snivelak_turret_state = 2;
+            g_snivelak_turret_timer = 30;
         } else {
             UpdateSnivelakSteering(self);
             FireAlternatingMuzzleShot(self);

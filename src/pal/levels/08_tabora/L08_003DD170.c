@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern u8 D_L08_001B9B00[];
+extern u8 g_hero_position_vec[];
 extern f32 fast_vec_dist(void *, void *);
 extern f32 IntToFloat(int);
 extern f32 math_fabs(f32);
@@ -17,19 +17,19 @@ typedef struct {
 extern f32 func_3278F0(f32, f32);
 extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
-extern f32 D_L08_001BFF68;
-extern f32 D_00189EA8;
+extern f32 g_ground_height_result;
+extern f32 g_hero_height_limit;
 extern f32 coll_find_ground_height(Quad *, f32, f32, f32, f32);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float, float);
 extern float vec_distance_xy(void *, void *);
-extern int func_PAL_002B5BA8(u8 *, void *, float);
+extern int moby_turn_toward_target_and_step_pal(u8 *, void *, float);
 extern float FastVecLength(void *);
 extern float math_fabs(float);
-extern u8 D_001A7B00[] __attribute__((sda));
-extern u8 D_L08_001BFD00[];
-extern u8 *D_L08_001B2ACC[] __attribute__((sda));
+extern u8 g_inventory_have_flags[] __attribute__((sda));
+extern u8 g_request_l08_queue[];
+extern u8 *g_collision_box_table[] __attribute__((sda));
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern f32 math_random_angle(void);
@@ -56,7 +56,7 @@ int func_PAL_L08_003DD170(u8 *object, float accel, float unused1, float damping,
         (object[0x20] == 8 && object[0x95] != 0) ||
         vec_distance_xy(object + 0x10, state + 0x3F0) < 5.0f)
         *(float *)(state + 0x470) = 0;
-    result = func_PAL_002B5BA8(object, state + 0x3F0, *(float *)(state + 0x470));
+    result = moby_turn_toward_target_and_step_pal(object, state + 0x3F0, *(float *)(state + 0x470));
     amount = FastVecLength(state + 0x1C0);
     amount += math_fabs(*(float *)(state + 0x1D4));
     if (result & 15) {
@@ -140,8 +140,8 @@ extern s32 math_fast_float_d();
 extern s32 math_random_int_range(s32, s32);
 extern s32 func_2EA300(void *, void *, s32, s32, s32);
 extern s32 func_3357E8(Ent *, void *, s32);
-extern s32 D_L08_001A8F00[] __attribute__((sda));
-extern s32 D_L08_001B2700[] __attribute__((sda));
+extern s32 g_cutscene_l08_active_flag[] __attribute__((sda));
+extern s32 g_glider_flag_table[] __attribute__((sda));
 extern s32 IsPointInCuboid(void *, s32);
 extern s32 req_push_queue(void *, s32);
 extern s32 req_launch_queued(void *);
@@ -180,7 +180,7 @@ extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, 
 extern void copy_matrix_rotation(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern int D_0018C0BC;
+extern int g_hero_mode;
 extern void FastVecAdd(void *, void *, void *);
 extern unsigned char *effect_create_timed(void *, void *, int, int, int, int, int, float);
 extern int coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
@@ -206,7 +206,7 @@ void func_PAL_L08_003DD918(char *object)
     qcopy_nc(start,origin);
     vec_scale_to_length(end,matrix,3.0f);
     if (*(int *)(state+0x250)) {
-        if ((unsigned)(D_0018C0BC-17)<2) end[2]=*(float *)(state+0x218)-start[2];
+        if ((unsigned)(g_hero_mode-17)<2) end[2]=*(float *)(state+0x218)-start[2];
         else end[2]=*(float *)(state+0x248)-start[2];
         if (end[2]>1.2f) end[2]=1.2f;
         else if(end[2]<-1.2f) end[2]=-1.2f;

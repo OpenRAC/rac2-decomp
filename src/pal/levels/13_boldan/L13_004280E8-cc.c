@@ -14,11 +14,11 @@ typedef struct {
 } PlatformHero;
 extern PlatformHero g_hero_state;
 extern u8 g_sound_state[] NOT_SDA;
-extern u8 *D_L13_001BFD18;
-extern int D_L13_001B2448 MACRO_ADDR;
+extern u8 *g_hit_l13_result;
+extern int g_game_l13_frame_counter MACRO_ADDR;
 extern void snd_stop_voice(int);
 extern int hero_is_current_selected_id(void *);
-extern u8 *func_PAL_L00_002D7850(int);
+extern u8 *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(void *);
 extern void moby_set_state(void *,int,int);
 extern int coll_test_point(void *,int,void *,float);
@@ -60,7 +60,7 @@ void func_PAL_L13_004280E8(u8 *m) {
         if(hero_is_current_selected_id(m)) {
             if(F(m,0x18)==F(d,0x98)) {
                 if(I(d,0xB4)) {
-                    P(d,0xB8)=func_PAL_L00_002D7850(5);
+                    P(d,0xB8)=cam_alloc_override_slot_pal(5);
                     F(P(d,0xB8),0)=1.0f;
                     F(P(d,0xB8),4)=4.5f;
                     I(d,0xBC)=1;
@@ -68,7 +68,7 @@ void func_PAL_L13_004280E8(u8 *m) {
                 moby_set_state(m,2,-1);
             } else {
                 if(I(d,0xB4)) {
-                    P(d,0xB8)=func_PAL_L00_002D7850(5);
+                    P(d,0xB8)=cam_alloc_override_slot_pal(5);
                     F(P(d,0xB8),0)=1.0f;
                     F(P(d,0xB8),4)=4.5f;
                     I(d,0xBC)=1;
@@ -89,7 +89,7 @@ void func_PAL_L13_004280E8(u8 *m) {
             I(d,0xB0)=-1;
             if(!hero_is_current_selected_id(m)) m[0x20]=1;
         } else if(!coll_test_point(m+0x10,1,m,2.8f) ||
-            (F(m,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==m) || (D_L13_001BFD18 && *(short *)(D_L13_001BFD18+0xAA)==0xEA3))) {
+            (F(m,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==m) || (g_hit_l13_result && *(short *)(g_hit_l13_result+0xAA)==0xEA3))) {
             { u8 *sound=g_sound_state+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=PlayMobySound(0,4,m); }
             math_step_value_toward_target((float *)(m+0x18),(float *)(d+0x64),F(d,0x88),0.0028000001f,0.0024f,0.120000005f);
         } else {
@@ -115,7 +115,7 @@ void func_PAL_L13_004280E8(u8 *m) {
         if(n!=-1) { u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n); }
         I(d,0xB0)=-1; break;
     }
-    f=(float)D_L13_001B2448*(0.02f);
+    f=(float)g_game_l13_frame_counter*(0.02f);
     tickPhase=(int)f;
     f-=(float)tickPhase;
     if(!(tickPhase&1)) f=1.0f-f;

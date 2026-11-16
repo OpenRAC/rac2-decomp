@@ -38,30 +38,30 @@ extern int TryClaimNotice(int, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_clear_128(void *);
 extern float FastAddRotations(float, float);
-extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
+extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void camera_select_remote_view(char *, void *, void *);
 extern void SetCamera5Pose(void *, void *, int, int, int);
 extern void console_start_remote_view(char *);
 extern void console_end_remote_view(char *);
 extern void cam_set_mode_state(int);
-extern void func_PAL_0029C1A8(int);
+extern void level_clear_table_entry_pal(int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
-extern int func_PAL_L03_004244D8(void *);
+extern int entity_prepare_shot_pal(void *);
 extern void moby_set_flag_bit(void *, int);
-extern int func_PAL_0029C158(void *, void *, int);
+extern int level_set_table_entry_pal(void *, void *, int);
 extern int menu_draw_two_line_panel(void);
 
 extern Hero6A28 g_hero_state;
 extern char g_hero_position[];
-extern char *D_L03_001B2A1C MACRO_ADDR;
+extern char *g_moby_record_base MACRO_ADDR;
 extern char *D_L03_001B2A1C_GP SDATA(D_L03_001B2A1C);
-extern char *D_0018B650 NOT_SDA;
-extern int D_00138324 NOT_SDA;
-extern AimState6A28 D_L03_001B9840;
-extern char D_L03_003C7010[];
+extern char *g_held_object_ptr NOT_SDA;
+extern int g_pad_held_flags NOT_SDA;
+extern AimState6A28 g_hero_l03_state_alias;
+extern char g_str_camera_console_entry[];
 
-void func_PAL_L03_003CAA68(char *obj)
+void camera_console_update_pal(char *obj)
 {
     char mat[0x40] __attribute__((aligned(16)));
     float local[4] __attribute__((aligned(16)));
@@ -98,7 +98,7 @@ void func_PAL_L03_003CAA68(char *obj)
                     break;
                 }
                 TryClaimNotice(8, 0x12FA, 1);
-                if (hero_is_allowed_for_mode(8) && (D_00138324 & 0x10)) {
+                if (hero_is_allowed_for_mode(8) && (g_pad_held_flags & 0x10)) {
                     moby_set_state(obj, 3, -1);
                     *(Quad *)pos = 0;
                     pos[0] = 2.0f;
@@ -106,11 +106,11 @@ void func_PAL_L03_003CAA68(char *obj)
                     FastVecAdd(pos, pos, obj + 0x10);
                     vec_clear_128(rot);
                     rot[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
-                    func_PAL_L00_002B9CD8(pos, rot, 0x31, 1);
-                    D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
+                    hero_reset_position_and_direction_pal(pos, rot, 0x31, 1);
+                    g_held_object_ptr = g_moby_record_base + (*(int *)vars << 8);
                     camera_select_remote_view(obj, cam1, cam2);
                     SetCamera5Pose(cam1, cam2, 1, 0, 0);
-                    console_start_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
+                    console_start_remote_view(g_moby_record_base + (*(int *)vars << 8));
                 }
             }
         }
@@ -118,26 +118,26 @@ void func_PAL_L03_003CAA68(char *obj)
 
     case 3:
         g_hero_state.mode = 5;
-        if (D_00138324 & 0x10) {
+        if (g_pad_held_flags & 0x10) {
             cam_set_mode_state(0);
-            func_PAL_L00_002B9CD8(g_hero_state.pos, g_hero_state.rot, 0, 1);
+            hero_reset_position_and_direction_pal(g_hero_state.pos, g_hero_state.rot, 0, 1);
             g_hero_state.field1830 = 0;
-            console_end_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
-            D_L03_001B9840.f = 64.42f;
-            D_L03_001B9840.b1 = 1;
-            D_L03_001B9840.b0 = 0;
+            console_end_remote_view(g_moby_record_base + (*(int *)vars << 8));
+            g_hero_l03_state_alias.f = 64.42f;
+            g_hero_l03_state_alias.b1 = 1;
+            g_hero_l03_state_alias.b0 = 0;
             moby_set_state(obj, 2, -1);
-            func_PAL_0029C1A8(0);
+            level_clear_table_entry_pal(0);
         } else {
             camera_select_remote_view(obj, mat, mat + 0x10);
             object_copy_vector_to_selected(mat);
             cam_set_state_rotation(mat + 0x10);
             if (*(int *)(vars + 0x1C) != -1
-                && func_PAL_L03_004244D8(D_L03_001B2A1C_GP + (*(int *)(vars + 0x1C) << 8))) {
+                && entity_prepare_shot_pal(D_L03_001B2A1C_GP + (*(int *)(vars + 0x1C) << 8))) {
                 if (*(int *)(vars + 0x20) != -1)
                     moby_set_flag_bit(D_L03_001B2A1C_GP + (*(int *)(vars + 0x20) << 8), 1);
             }
-            func_PAL_0029C158(D_L03_003C7010, menu_draw_two_line_panel, 0);
+            level_set_table_entry_pal(g_str_camera_console_entry, menu_draw_two_line_panel, 0);
         }
         break;
     }

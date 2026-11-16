@@ -5,12 +5,12 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 typedef int TI_F41eb487e __attribute__((mode(TI)));
 extern char D_00189E20_5[];
-extern void func_PAL_L00_002B9130(void);
+extern void hero_update_lean_reference_pal(void);
 extern void hero_rotate_matrix(float, float, float);
 extern float math_approach_with_velocity(float *position, float target, float *velocity,
                           float acceleration, float damping, float limit, int direction);
 
-void func_PAL_L00_002B92F0(void)
+void hero_ease_lean_to_upright_pal(void)
 {
     char *base = (char *)&D_00189E20_5;
     TI_F41eb487e v;
@@ -40,5 +40,5 @@ void func_PAL_L00_002B92F0(void)
         return;
     if (mode >= 3)
         return;
-    func_PAL_L00_002B9130();
+    hero_update_lean_reference_pal();
 }

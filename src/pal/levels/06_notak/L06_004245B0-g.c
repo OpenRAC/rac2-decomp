@@ -10,7 +10,7 @@ extern int PlayMobySound(int, int, void *);
 extern float math_ease_out_quad(float);
 extern int moby_move_and_collide(void *, void *, int, float, float, float);
 extern float MobySpringTurn(void *, float, float, float, float, void *);
-extern char D_L06_00188660[];
+extern char g_effect_target_records[];
 
 /* Steps the follower's weight toward its goal and blends the state vectors; returns 1 on arrival. */
 int func_PAL_L06_004248E8(char *object, float a, float b, float c, float d)
@@ -29,7 +29,7 @@ int func_PAL_L06_004248E8(char *object, float a, float b, float c, float d)
     FastVecSub(v, (float *)(state + 0x220), (float *)(object + 0x10));
     dist = FastVecLength(v);
     cur = FastVecLength((float *)(state + 0x230));
-    rec = D_L06_00188660 + *(int *)(state + 0x254) * 0x70;
+    rec = g_effect_target_records + *(int *)(state + 0x254) * 0x70;
     ratio = cur / unit;
     if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
         *(int *)(state + 0x254) = PlayMobySound(0, 4, object);

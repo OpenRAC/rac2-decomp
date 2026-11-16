@@ -15,11 +15,11 @@ extern void entity_spawn_particle_pair(void *);
 extern float math_step_value_toward_target(void *,float,void *,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void entity_tick_timers(void *);
-extern float D_L07_001B0A88 __attribute__((sda));
-extern float D_L07_001B0A8C __attribute__((sda));
-extern float D_L07_001B0A90 __attribute__((sda));
-extern float D_L07_001B0A94 __attribute__((sda));
-extern float D_L07_001B0A98[] __attribute__((sda));
+extern float g_group_entity_accel_param __attribute__((sda));
+extern float g_group_entity_speed_param __attribute__((sda));
+extern float g_group_entity_length_threshold __attribute__((sda));
+extern float g_group_entity_sweep_radius __attribute__((sda));
+extern float g_group_entity_turn_range[] __attribute__((sda));
 struct PlayerState1310 { char pad[0x229C]; int state; char pad2[0x1FC]; void *target; };
 extern struct PlayerState1310 g_hero_state;
 /* Advance the entity state machine, movement and recovery scaling. */
@@ -50,7 +50,7 @@ void group_entity_update(unsigned char *moby)
         entity_move_to_tracked_height(moby,goal_pos,0,1);
         break;
     case 3:
-        if(flag_set_first_pending(moby)) *(float *)(vars+0x250)=math_random_signed_float_range(D_L07_001B0A98[0],D_L07_001B0A98[1])*0.01745329424738884f;
+        if(flag_set_first_pending(moby)) *(float *)(vars+0x250)=math_random_signed_float_range(g_group_entity_turn_range[0],g_group_entity_turn_range[1])*0.01745329424738884f;
         if(entity_move_to_tracked_height(moby,vars+0x100,*(float *)(vars+0x250),1)<2) moby_set_state(moby,4,-1);
         break;
     case 4:
@@ -62,7 +62,7 @@ void group_entity_update(unsigned char *moby)
         if(flag_set_first_pending(moby) && moby[0x43]!=3) anim_start_blended(moby,3,0,2);
         entity_move_to_tracked_height(moby,vars+0x100,*(float *)(vars+0x250),1);
         if(*(unsigned short *)(moby+0x96)>10)
-            coll_sweep_from_object(moby,moby+0x10,D_L07_001B0A94,(float)*(unsigned char *)(vars+0x34),1,0x4000001,0,1,0);
+            coll_sweep_from_object(moby,moby+0x10,g_group_entity_sweep_radius,(float)*(unsigned char *)(vars+0x34),1,0x4000001,0,1,0);
         if(*(unsigned short *)(moby+0x96)>30 &&
             (g_hero_state.state==7 || g_hero_state.state==20) &&
             g_hero_state.target==moby) moby_set_state(moby,6,-1);
@@ -85,10 +85,10 @@ void group_entity_update(unsigned char *moby)
         lengths[1]=FastVecLength(moby+0xC0);
         lengths[0]=FastVecLength(moby+0xE0);
         {
-            float a=D_L07_001B0A88*0.0002777777845f;
-            float b=D_L07_001B0A8C*0.01666666754f;
+            float a=g_group_entity_accel_param*0.0002777777845f;
+            float b=g_group_entity_speed_param*0.01666666754f;
             math_step_value_toward_target(&lengths[0],1,vars+0x254,a,a,b);
-            if(lengths[0]>D_L07_001B0A90) math_step_value_toward_target(&lengths[1],1,vars+0x258,a,a,b);
+            if(lengths[0]>g_group_entity_length_threshold) math_step_value_toward_target(&lengths[1],1,vars+0x258,a,a,b);
         }
         for(i=0;i<2;i++) vec_scale_to_length(moby+0xC0+i*16,moby+0xC0+i*16,lengths[1]);
         vec_scale_to_length(moby+0xE0,moby+0xE0,lengths[0]);

@@ -12,7 +12,7 @@ typedef struct {
     float uv[8];
     long reserved, texture, state, flags;
 } QuadPacket;
-extern Vector D_L20_001B9FC0;
+extern Vector g_camera_l20_position;
 extern void gfx_init_quad_packet_state(QuadPacket *,int,int,int);
 extern void FastVecSub(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
@@ -43,7 +43,7 @@ void gfx_draw_ribbon_along_points(Vector *points,int count,int texture1,int text
     bevel.uv[0]=0; bevel.uv[1]=0; bevel.uv[2]=0; bevel.uv[3]=1;
     bevel.uv[4]=1; bevel.uv[5]=0; bevel.uv[6]=1; bevel.uv[7]=1;
     next=(first+1)%count;
-    FastVecSub(&radial,&points[first],&D_L20_001B9FC0);
+    FastVecSub(&radial,&points[first],&g_camera_l20_position);
     FastVecSub(&tangent,&points[next],&points[first]);
     FastVecCross(&cross,&tangent,&radial);
     vec_scale_to_length(&cross,&cross,width1);
@@ -54,7 +54,7 @@ void gfx_draw_ribbon_along_points(Vector *points,int count,int texture1,int text
     current=next;
     previous=first;
     while (current!=last) {
-        FastVecSub(&radial,&points[current],&D_L20_001B9FC0);
+        FastVecSub(&radial,&points[current],&g_camera_l20_position);
         FastVecSub(&tangent,&points[current],&points[previous]);
         FastVecCross(&cross,&tangent,&radial);
         vec_scale_to_length(&cross,&cross,width1);
@@ -69,29 +69,29 @@ void gfx_draw_ribbon_along_points(Vector *points,int count,int texture1,int text
         previous=current;
         current=(previous+1)%count;
     }
-    FastVecSub(&previousRadial,&points[first],&D_L20_001B9FC0);
+    FastVecSub(&previousRadial,&points[first],&g_camera_l20_position);
     previousLength=FastVecLength(&previousRadial);
     fraction=step;
     current=next;
     while (current!=last) {
-        FastVecSub(&nextRadial,&points[current],&D_L20_001B9FC0);
+        FastVecSub(&nextRadial,&points[current],&g_camera_l20_position);
         nextLength=FastVecLength(&nextRadial);
         if (previousLength<nextLength) {
             if (previousLength==0.0f) qcopy(&equalRadial1,&nextRadial);
             else FastVecScale(&equalRadial1,&previousRadial,nextLength/previousLength);
-            FastVecAdd(&left,&D_L20_001B9FC0,&nextRadial);
-            FastVecAdd(&right,&D_L20_001B9FC0,&equalRadial1);
+            FastVecAdd(&left,&g_camera_l20_position,&nextRadial);
+            FastVecAdd(&right,&g_camera_l20_position,&equalRadial1);
         } else {
             if (nextLength==0.0f) qcopy(&equalRadial2,&previousRadial);
             else FastVecScale(&equalRadial2,&nextRadial,previousLength/nextLength);
-            FastVecAdd(&left,&D_L20_001B9FC0,&equalRadial2);
-            FastVecAdd(&right,&D_L20_001B9FC0,&previousRadial);
+            FastVecAdd(&left,&g_camera_l20_position,&equalRadial2);
+            FastVecAdd(&right,&g_camera_l20_position,&previousRadial);
         }
         FastVecSub(&tangent,&right,&left);
         FastVecScale(&offset,&tangent,inset);
         FastVecSub(&left,&left,&offset);
         FastVecAdd(&right,&right,&offset);
-        FastVecSub(&scaledRadial,&D_L20_001B9FC0,&left);
+        FastVecSub(&scaledRadial,&g_camera_l20_position,&left);
         FastVecCross(&cross,&scaledRadial,&tangent);
         vec_scale_to_length(&scaledCross,&cross,width2);
         FastVecAdd(&bevel.vertex[0],&left,&scaledCross);

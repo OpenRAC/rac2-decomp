@@ -40,20 +40,20 @@ typedef struct {
     unsigned char prefix[0x1C];
     unsigned char index;
 } EffectMaterialSelector;
-extern EffectAngles D_L00_001AFDA8;
+extern EffectAngles g_effect_angles;
 extern EffectMaterialSelector g_item_slot_to_record;
 extern EffectMaterialEntry g_weapon_l00_table[];
-extern int D_L00_001AFDA0 __attribute__((sda));
+extern int g_effect_moby_count __attribute__((sda));
 extern char *func_PAL_L00_003BEE68(EffectObject *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
-extern int func_PAL_0032F0B8(void *, int, int);
+extern int StartAttachedEffect_pal(void *, int, int);
 extern char *SelectBestTargetInCone(void *, float, void *, float, float, float, void *,
                           void *, int, int, float, int, void *);
 extern int pair_is_owner_key_free(void *, void *);
 extern void KeyOwnerTableInsert(void *, void *, int);
-extern void func_PAL_L00_003BF548(void *, void *, int);
+extern void spark_spawn_orbiting_record_pal(void *, void *, int);
 extern int PlayMobySound(int, int, void *);
 extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
@@ -67,10 +67,10 @@ extern void table_clear_entry_flag(int);
 extern void pair_clear_owner_key_entries(void *);
 extern void gfx_free_point_light(int);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_L00_003BF7F8(void *);
+extern void effect_update_spark_slots_pal(void *);
 extern void spark_update_orbit(void *);
 extern void ref_L00_003BAC30_00(void *, EffectObject *);
-extern void func_PAL_L00_003BF2F8(void *);
+extern void spark_draw_projectile_pal(void *);
 
 /* Updates motion and hits, then shrinks, emits particles and releases resources. */
 void func_PAL_L01_003BA750(EffectObject *self)
@@ -89,7 +89,7 @@ void func_PAL_L01_003BA750(EffectObject *self)
     float scale;
     float ratio;
 
-    angles = D_L00_001AFDA8;
+    angles = g_effect_angles;
     switch (self->phase) {
     case 0:
     case 1:
@@ -106,14 +106,14 @@ void func_PAL_L01_003BA750(EffectObject *self)
             packet.field_19 = 3;
             packet.id = self->id;
             QueueMobyImpact(result, &packet);
-            func_PAL_0032F0B8(result, 0x3E, self->f_B8);
+            StartAttachedEffect_pal(result, 0x3E, self->f_B8);
         }
         SelectBestTargetInCone(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
                       &count, hits, 15, 0, 0.0f, 0, &angles);
         for (i = 0; i < count; i++) {
             if (state->f54 < 15 && pair_is_owner_key_free(self, hits[i])) {
                 KeyOwnerTableInsert(self, hits[i], 120);
-                func_PAL_L00_003BF548(self, hits[i], 10);
+                spark_spawn_orbiting_record_pal(self, hits[i], 10);
                 PlayMobySound(0, 0, self);
             }
         }
@@ -143,7 +143,7 @@ void func_PAL_L01_003BA750(EffectObject *self)
             table_clear_entry_flag(state->f50);
             pair_clear_owner_key_entries(self);
             handle = state->light_index;
-            D_L00_001AFDA0--;
+            g_effect_moby_count--;
             if (handle != -1)
                 gfx_free_point_light(handle);
             moby_mark_spawned(self);
@@ -151,7 +151,7 @@ void func_PAL_L01_003BA750(EffectObject *self)
         }
         break;
     }
-    func_PAL_L00_003BF7F8(self);
+    effect_update_spark_slots_pal(self);
     spark_update_orbit(self);
-    ref_L00_003BAC30_00(func_PAL_L00_003BF2F8, self);
+    ref_L00_003BAC30_00(spark_draw_projectile_pal, self);
 }

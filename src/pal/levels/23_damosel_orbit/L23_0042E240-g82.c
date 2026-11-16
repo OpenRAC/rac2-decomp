@@ -2,10 +2,10 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern float D_L23_001B1B8C __attribute__((sda));
-extern s32 D_L23_001B1AE8 __attribute__((sda));
-extern s32 D_L23_001B1AEC __attribute__((sda));
-extern u8 D_L23_001A8F20[] MACRO_ADDR;
+extern float g_fast_shot_child_param __attribute__((sda));
+extern s32 g_fast_shot_trail_id __attribute__((sda));
+extern s32 g_fast_shot_spark_effect __attribute__((sda));
+extern u8 g_zero_l23_vec[] MACRO_ADDR;
 extern void *CreateMoby(s32);
 extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
@@ -16,7 +16,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
 extern void *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
 
-u8 *func_PAL_L23_0042E5E0(u8 *parent, TI128 *a1, TI128 *a2, s32 b, float f) {
+u8 *fast_shot_create_child_pal(u8 *parent, TI128 *a1, TI128 *a2, s32 b, float f) {
     u8 *obj = CreateMoby(0x1237);
     u8 *payload;
     float rotationRandom;
@@ -44,14 +44,14 @@ u8 *func_PAL_L23_0042E5E0(u8 *parent, TI128 *a1, TI128 *a2, s32 b, float f) {
         math_apply_axis_rotation_to_quat(obj + 0xC0, obj + 0xC0, obj + 0xD0, rotationRandom);
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         obj[0x23] = 0x80;
-        *(float *)(obj + 0x2C) = D_L23_001B1B8C;
+        *(float *)(obj + 0x2C) = g_fast_shot_child_param;
         *(u16 *)(obj + 0x34) |= 0x100;
         *(s32 *)(payload + 0x24) = 0;
         particleRandom = math_random_float_range(8.0f, 10.0f);
-        trail = D_L23_001B1AE8;
+        trail = g_fast_shot_trail_id;
         *(s32 *)(payload + 0x2C) = 0;
-        part_spawn_ground_effect(obj + 0x10, 0xC, trail, 0, 10, D_L23_001A8F20, particleRandom * 0.3f, particleRandom, 0.0f, 0);
-        part_spawn_ground_effect(obj + 0x10, 0xC, D_L23_001B1AEC, 1, -10, D_L23_001A8F20, particleRandom * 0.04f, particleRandom * 0.4f, 0.0f, 0);
+        part_spawn_ground_effect(obj + 0x10, 0xC, trail, 0, 10, g_zero_l23_vec, particleRandom * 0.3f, particleRandom, 0.0f, 0);
+        part_spawn_ground_effect(obj + 0x10, 0xC, g_fast_shot_spark_effect, 1, -10, g_zero_l23_vec, particleRandom * 0.04f, particleRandom * 0.4f, 0.0f, 0);
     }
     return obj;
 }

@@ -15,7 +15,7 @@ extern int moby_l01_turn_toward_target(char *, char *);
 
 extern int moby_turn_toward_target_and_step(char *, float *, float);
 
-extern char *D_L09_001B285C __attribute__((sda));
+extern char *g_moby_record_table __attribute__((sda));
 
 extern char *D_L09_001FFFB560[];
 
@@ -34,11 +34,11 @@ extern s32 func_325E78(char *a0, s32 a1);
 extern void func_318450(char *a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                         f32 f12, f32 f13, f32 f14);
 
-extern char D_L09_00189EA0[];
+extern char g_dobbo_target_point[];
 
 extern void dobbo_set_linked_state(s32 a0, u8 a1);
 
-extern char D_L09_001B9C30[];
+extern char g_camera_matrix[];
 
 extern f32 func_2EA578(char *a0, char *a1);
 
@@ -125,7 +125,7 @@ void dobbo_alert_path_enemies(char *obj) {
         return;
     }
     list = (s16 *)list_ptr;
-    moby_table = D_L09_001B285C;
+    moby_table = g_moby_record_table;
     do {
         member = moby_table + ((*(u16 *)list & 0x7FFF) << 8);
         if (*(s8 *)(member + 0x20) >= 0) {
@@ -159,7 +159,7 @@ void dobbo_alert_group_wake_first(char *obj, s32 mode) {
     if (moby_count_group_not_in_state(*(u8 *)(self + 0x21), -1) < 2) {
         return;
     }
-    moby_table = D_L09_001B285C;
+    moby_table = g_moby_record_table;
     list = (u16 *)D_L09_001FFFB560[*(u8 *)(self + 0x21)];
     do {
         member = moby_table + ((*list & 0x7FFF) << 8);
@@ -234,7 +234,7 @@ void dobbo_alert_wandering_group(char *obj) {
         return;
     }
     list = (s16 *)list_ptr;
-    moby_table = D_L09_001B285C;
+    moby_table = g_moby_record_table;
     do {
         member = moby_table + ((*(u16 *)list & 0x7FFF) << 8);
         if (*(s8 *)(member + 0x20) >= 0) {
@@ -259,7 +259,7 @@ void dobbo_set_linked_state(s32 moby_index, u8 new_state) {
     if (moby_index == -1) {
         return;
     }
-    moby = D_L09_001B285C;
+    moby = g_moby_record_table;
     moby += moby_index << 8;
     if (moby == 0) {
         return;
@@ -293,7 +293,7 @@ void dobbo_release_linked(char *obj) {
     if (link_index == -1) {
         return;
     }
-    *(u8 *)((char *)((link_index << 8) + (s32)D_L09_001B285C) + 0xBC) = 1;
+    *(u8 *)((char *)((link_index << 8) + (s32)g_moby_record_table) + 0xBC) = 1;
     *(s32 *)(vars + 0x5C) = -1;
 }
 
@@ -348,7 +348,7 @@ void dobbo_apply_setting_linked(char *controller, char *target, s32 enable, s32 
    three offsets when the caller asks for it. */
 void dobbo_apply_setting_by_index(char *controller, s32 index, char *settings, s32 enable) {
     char *vars = settings;
-    char *target = D_L09_001B285C + (index << 8);
+    char *target = g_moby_record_table + (index << 8);
 
     if (target == 0) {
         return;
@@ -379,22 +379,22 @@ void dobbo_apply_setting_group(char *controller, char *settings, s32 group, s32 
 /* func_L09_00408478 reads D_001A7AF8[k] and stores D_L09_001B25A0[2] as elements of sda arrays:
  * (mem (const (plus sym k))) is a two-word move, so these stay out of delay slots. */
 extern u8 g_item_owned_flags[] __attribute__((sda));
-extern u8 D_001395D7[];
-extern u8 D_001395D8[];
+extern u8 g_dobbo_setting_flag_a[];
+extern u8 g_dobbo_setting_flag_b[];
 typedef struct { char pad[0x5c]; int state; int flags; } DobboPlayerFlags;
-extern DobboPlayerFlags D_00139768;
+extern DobboPlayerFlags g_request_flag_table;
 extern char g_hero_position[];
-extern u8 D_0019B2E8[];
-extern int D_00138324;
-extern char D_L09_001B1458[], D_L09_001B1480[], D_L09_001B1498[], D_L09_001B14C0[], D_L09_001B14E8[], D_L09_001B14F8[], D_L09_001B1518[], D_L09_001B1540[];
-extern char D_L09_001BFC00[], D_L09_0021DDE0[];
+extern u8 g_moby_group_flags[];
+extern int g_pad_held_flags;
+extern char g_str_dobbo_setting_a[], g_str_dobbo_setting_b[], g_str_dobbo_setting_c[], g_str_dobbo_setting_d[], g_str_dobbo_setting_e[], g_str_dobbo_setting_f[], g_str_dobbo_setting_g[], g_str_dobbo_setting_h[];
+extern char g_request_l09_queue[], g_dobbo_record_template[];
 extern int g_player_bolts SDATA(D_001A79F8);
 extern int g_current_map_index SDATA(D_001A79F0);
-extern char *D_L09_001B294C SDATA(D_L09_001B294C);
-extern int D_L09_001A8F00[] __attribute__((sda));
-extern int D_L09_001B25A0[] __attribute__((sda));
-extern int D_L09_0028E350[];
-extern int D_L09_0028E360, D_L09_0028E364;
+extern char *g_dobbo_point_table SDATA(D_L09_001B294C);
+extern int g_game_l09_mode[] __attribute__((sda));
+extern int g_dobbo_setting_flags[] __attribute__((sda));
+extern int g_dobbo_prices[];
+extern int g_dobbo_currency_limit_low, g_dobbo_currency_limit_high;
 extern void STUB_printf(char *, ...);
 extern void moby_set_state(char *, int, int);
 extern void moby_reset_vars_defaults(char *);
@@ -431,59 +431,59 @@ void UpdateDobboPaidOfferNpc(u8 *obj)
             moby_set_state(obj, 9, -1);
             break;
         }
-        if (D_00139768.flags & 1) {
-            STUB_printf(D_L09_001B1458);
+        if (g_request_flag_table.flags & 1) {
+            STUB_printf(g_str_dobbo_setting_a);
             startCurrency = g_player_bolts;
             if (g_item_owned_flags[0x197]) {
-                if (startCurrency < D_L09_0028E364)
+                if (startCurrency < g_dobbo_currency_limit_high)
                     goto start_six;
                 else
                     moby_set_state(obj, 7, 1);
             } else {
-                if (startCurrency < D_L09_0028E360) {
+                if (startCurrency < g_dobbo_currency_limit_low) {
                 start_six:
                     moby_set_state(obj, 6, 1);
                 } else
                     moby_set_state(obj, 7, 1);
             }
-        } else if (D_00139768.state < 0) {
-            STUB_printf(D_L09_001B1480);
-            if (D_001395D7[0]) {
+        } else if (g_request_flag_table.state < 0) {
+            STUB_printf(g_str_dobbo_setting_b);
+            if (g_dobbo_setting_flag_a[0]) {
                 obj[0x30] = 0xff;
-                STUB_printf(D_L09_001B1498);
+                STUB_printf(g_str_dobbo_setting_c);
                 moby_set_state(obj, 4, 1);
             } else {
                 obj[0x30] = 0xff;
-                STUB_printf(D_L09_001B14C0);
+                STUB_printf(g_str_dobbo_setting_d);
                 moby_set_state(obj, 3, 0);
             }
         } else {
-            STUB_printf(D_L09_001B14E8);
+            STUB_printf(g_str_dobbo_setting_e);
             moby_set_state(obj, 1, 0);
         }
         moby_reset_vars_defaults(obj);
         break;
     case 1:
         if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
-            STUB_printf(D_L09_001B14F8);
-            if (req_push_queue(D_L09_001BFC00, 0x5f)) {
+            STUB_printf(g_str_dobbo_setting_f);
+            if (req_push_queue(g_request_l09_queue, 0x5f)) {
                 level_apply_index_for_key(obj);
-                req_launch_queued(D_L09_001BFC00);
+                req_launch_queued(g_request_l09_queue);
                 moby_set_state(obj, 2, -1);
             }
         }
         break;
     case 2:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00[0] == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode[0] == 2) {
             obj[0x31] = 0;
             *(u16 *)(obj + 0x34) |= 1;
         }
         if (game_is_either_mode_two())
             break;
-        D_L09_001B25A0[2] = 0;
+        g_dobbo_setting_flags[2] = 0;
         if (*(int *)(vars + 8) != -1) {
-            entry = D_L09_001B294C;
+            entry = g_dobbo_point_table;
             entry += *(int *)(vars + 8) << 7;
             hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
         }
@@ -494,16 +494,16 @@ void UpdateDobboPaidOfferNpc(u8 *obj)
     case 3:
         obj[0x30] = 0xff;
         if (flag_is_third_pending_set(obj)) {
-            D_001395D7[0] = 1;
+            g_dobbo_setting_flag_a[0] = 1;
             moby_set_state(obj, 4, 1);
         }
         break;
     case 4:
         obj[0x30] = 0xff;
         if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
-            STUB_printf(D_L09_001B1518);
-            if (req_push_queue(D_L09_001BFC00, 0x60)) {
-                req_launch_queued(D_L09_001BFC00);
+            STUB_printf(g_str_dobbo_setting_g);
+            if (req_push_queue(g_request_l09_queue, 0x60)) {
+                req_launch_queued(g_request_l09_queue);
                 game_set_slowdown_factor();
                 moby_set_state(obj, 5, -1);
             }
@@ -511,30 +511,30 @@ void UpdateDobboPaidOfferNpc(u8 *obj)
         break;
     case 5:
         obj[0x30] = 0x40;
-        if (D_L09_001A8F00[0] == 2) {
+        if (g_game_l09_mode[0] == 2) {
             obj[0x31] = 0;
             *(u16 *)(obj + 0x34) |= 1;
         }
-        D_L09_001B25A0[2] = 1;
+        g_dobbo_setting_flags[2] = 1;
         if (game_is_either_mode_two())
             break;
-        D_L09_001B25A0[2] = 0;
+        g_dobbo_setting_flags[2] = 0;
         if (*(int *)(vars + 8) != -1) {
-            entry = D_L09_001B294C;
+            entry = g_dobbo_point_table;
             entry += *(int *)(vars + 8) << 7;
             hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
         }
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
-        D_001395D8[0] = 1;
+        g_dobbo_setting_flag_b[0] = 1;
         offerCurrency = g_player_bolts;
         if (g_item_owned_flags[0x197]) {
-            if (offerCurrency < D_L09_0028E364)
+            if (offerCurrency < g_dobbo_currency_limit_high)
                 goto offer_six;
             else
                 moby_set_state(obj, 7, -1);
         } else {
-            if (offerCurrency < D_L09_0028E360) {
+            if (offerCurrency < g_dobbo_currency_limit_low) {
             offer_six:
                 moby_set_state(obj, 6, -1);
             } else
@@ -544,67 +544,67 @@ void UpdateDobboPaidOfferNpc(u8 *obj)
     case 6:
         currency = g_player_bolts;
         if (g_item_owned_flags[0x197]) {
-            if (D_L09_0028E350[5] < currency)
+            if (g_dobbo_prices[5] < currency)
                 goto change_seven;
         } else {
-            if (D_L09_0028E350[4] < currency) {
+            if (g_dobbo_prices[4] < currency) {
             change_seven:
                 moby_set_state(obj, 7, -1);
                 break;
             }
         }
         if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
-            text_print_localized_formatted(0x27d1, g_item_owned_flags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
+            text_print_localized_formatted(0x27d1, g_item_owned_flags[0x197] ? g_dobbo_prices[5] : g_dobbo_prices[4], -1);
             level_apply_index_for_key(obj);
         }
         break;
     case 7:
         currency = g_player_bolts;
         if (g_item_owned_flags[0x197]) {
-            if (currency < D_L09_0028E350[5])
+            if (currency < g_dobbo_prices[5])
                 goto change_six;
         } else {
-            if (currency < D_L09_0028E350[4]) {
+            if (currency < g_dobbo_prices[4]) {
             change_six:
                 moby_set_state(obj, 6, -1);
                 break;
             }
         }
         if (hero_is_reachable_for_count(obj, 10, 2.5f)) {
-            text_print_localized_formatted(0x27d2, g_item_owned_flags[0x197] ? D_L09_0028E350[5] : D_L09_0028E350[4], -1);
+            text_print_localized_formatted(0x27d2, g_item_owned_flags[0x197] ? g_dobbo_prices[5] : g_dobbo_prices[4], -1);
             level_apply_index_for_key(obj);
-            if ((D_00138324 & 0x10) && req_push_queue(D_L09_001BFC00, 10)) {
-                STUB_printf(D_L09_001B1540);
+            if ((g_pad_held_flags & 0x10) && req_push_queue(g_request_l09_queue, 10)) {
+                STUB_printf(g_str_dobbo_setting_h);
                 balance = g_player_bolts;
                 if (g_item_owned_flags[0x197])
-                    remaining = balance - D_L09_0028E350[5];
+                    remaining = balance - g_dobbo_prices[5];
                 else
-                    remaining = balance - D_L09_0028E350[4];
+                    remaining = balance - g_dobbo_prices[4];
                 g_player_bolts = remaining;
-                req_push_queue(D_L09_001BFC00, 0x61);
-                req_push_queue(D_L09_001BFC00, 0x62);
-                req_launch_queued(D_L09_001BFC00);
+                req_push_queue(g_request_l09_queue, 0x61);
+                req_push_queue(g_request_l09_queue, 0x62);
+                req_launch_queued(g_request_l09_queue);
                 moby_set_state(obj, 8, -1);
             }
         }
         break;
     case 8:
-        D_L09_001B25A0[2] = 1;
-        if (D_L09_001A8F00[0] == 2) {
+        g_dobbo_setting_flags[2] = 1;
+        if (g_game_l09_mode[0] == 2) {
             obj[0x31] = 0;
             *(u16 *)(obj + 0x34) |= 1;
         }
         if (game_is_either_mode_two())
             break;
-        D_L09_001B25A0[2] = 0;
+        g_dobbo_setting_flags[2] = 0;
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
         moby_mark_flag_and_append_to_list(10);
         snd_play_indexed(10);
         moby_set_state(obj, 9, -1);
-        record_add_or_update_entry(obj + 0x20, 1, obj, 1, D_L09_0021DDE0);
+        record_add_or_update_entry(obj + 0x20, 1, obj, 1, g_dobbo_record_template);
         if (obj[0xb0] != 0xff) {
-            if (!(D_0019B2E8[obj[0xb0] + (g_current_map_index << 4)] & 0x80))
+            if (!(g_moby_group_flags[obj[0xb0] + (g_current_map_index << 4)] & 0x80))
                 moby_mark_table_entry_flagged(obj[0xb0]);
             level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         } else
@@ -649,8 +649,8 @@ void door_init_slide_motion(char *obj) {
     *(f32 *)(vars + 0x0) = 0.2f;
     *(f32 *)(vars + 0x4) = 0.2f;
     func_2EACD0(rotation, self + 0xF0);
-    angle_a = func_2EA3E0(func_2EA578(rotation, D_L09_001B9C30));
-    angle_b = func_2EA3E0(func_2EA578(self + 0xD0, D_L09_001B9C30));
+    angle_a = func_2EA3E0(func_2EA578(rotation, g_camera_matrix));
+    angle_b = func_2EA3E0(func_2EA578(self + 0xD0, g_camera_matrix));
     if (angle_b < angle_a) {
         *(s32 *)(vars + 0x14) = 1;
     } else {

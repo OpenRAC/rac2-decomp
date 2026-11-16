@@ -44,7 +44,7 @@ typedef struct {
     u8 *converted[14];
 } ControllerPrefix;
 
-void func_PAL_L22_003F8A68(u8 *obj) {
+void barrier_pieces_update_pal(u8 *obj) {
     u8 *ctl=P(obj,0x68);
     float matrix[12] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));

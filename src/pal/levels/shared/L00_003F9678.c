@@ -12,7 +12,7 @@ typedef struct {
     int active;
     char pad[12];
 } CollisionRequest5238;
-extern unsigned char D_0013957F;
+extern unsigned char g_beam_weapon_index;
 typedef struct { char prefix[0x50]; float speed; char gap[0x1c]; float distance; char rest[0x6c]; } Tuning;
 extern Tuning g_weapon_l00_table[];
 extern char *g_hero_moby;
@@ -20,13 +20,13 @@ extern char g_collision_result[];
 typedef struct { char prefix[0x18]; char *object; char gap[4]; TI128 position; } HitResultView;
 extern void vec_scale_to_length(void *,void *,float);
 extern int CollLine(char *,void *,int,char *,void *);
-extern void func_PAL_L00_003F97D0(char *,char *);
+extern void ApplyAreaHitOrEmitParticles_pal(char *,char *);
 extern int level_has_pending_inner_flag(char *);
 extern int func_PAL_00335DD0(char *,int,int);
 
-int func_PAL_L00_003F9678(char *object,char *source)
+int vaporizer_bolt_test_hit_pal(char *object,char *source)
 {
-    unsigned int settingsIndex = D_0013957F;
+    unsigned int settingsIndex = g_beam_weapon_index;
     Tuning *settings = g_weapon_l00_table + settingsIndex;
     CollisionRequest5238 request;
     TI128 position;
@@ -46,7 +46,7 @@ int func_PAL_L00_003F9678(char *object,char *source)
     if (CollLine(source,&position,0,g_hero_moby,&request) != 0) {
         char *hitPosition = g_collision_result + 0x20;
         HitResultView *result;
-        func_PAL_L00_003F97D0(object,hitPosition);
+        ApplyAreaHitOrEmitParticles_pal(object,hitPosition);
         result = (HitResultView *)(hitPosition - 0x20);
         if (result->object == 0) return 1;
         if (level_has_pending_inner_flag(result->object) != 0) return 1;

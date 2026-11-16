@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern float D_001AE0E0 __attribute__((sda));
-extern float D_001AE0DC;
-extern float D_001AE0D8 __attribute__((sda));
+extern float g_tab_menu_cursor_step_y __attribute__((sda));
+extern float g_tab_menu_cursor_base_y;
+extern float g_tab_menu_cursor_offset_x __attribute__((sda));
 extern void object_set_first_float4(void *, float, float, float, float);
 
 /* Moves the tab cursor to the spot for the selected tab. */
@@ -13,15 +13,15 @@ void tab_menu_position_cursor(char *self)
     float *position = *(float **)(self + 0x218);
     int *base = (int *)(self + (index << 2));
 
-    object_set_first_float4(self + 0x130, D_001AE0D8 + position[0],
-            (D_001AE0DC + D_001AE0E0 * (float)base[0x6E]) + position[1],
+    object_set_first_float4(self + 0x130, g_tab_menu_cursor_offset_x + position[0],
+            (g_tab_menu_cursor_base_y + g_tab_menu_cursor_step_y * (float)base[0x6E]) + position[1],
             0.0f, 0.0f);
 }
 
-extern float D_001AE0E8 __attribute__((sda));
-extern float D_001AE0EC;
-extern float D_001AE0F0 __attribute__((sda));
-extern float D_001AE0F4 __attribute__((sda));
+extern float g_tab_menu_list_offset_x __attribute__((sda));
+extern float g_tab_menu_list_offset_y;
+extern float g_tab_menu_list_setting_first __attribute__((sda));
+extern float g_tab_menu_list_setting_second __attribute__((sda));
 extern void menu_set_position(void *, float, float);
 extern void menu_set_settings(void *, int, int);
 extern void *UpdateMenuListSelection(void *, int);
@@ -34,8 +34,8 @@ void tab_menu_update_list(char *self, int arg)
     char *child = self + 0x228;
     int old;
     float *position = *(float **)(self + 0x218);
-    menu_set_position(child, position[0] + D_001AE0E8, position[1] + D_001AE0EC);
-    menu_set_settings(child, (int)D_001AE0F0, (int)D_001AE0F4);
+    menu_set_position(child, position[0] + g_tab_menu_list_offset_x, position[1] + g_tab_menu_list_offset_y);
+    menu_set_settings(child, (int)g_tab_menu_list_setting_first, (int)g_tab_menu_list_setting_second);
     UpdateMenuListSelection(child, arg);
     old = *(int *)(indices + (*(int *)(self + 0x2FC) << 2));
     *(int *)(indices + (*(int *)(self + 0x2FC) << 2)) = menu_get_selected_index(child);
@@ -49,8 +49,8 @@ void tab_menu_update_list(char *self, int arg)
    second one in the program's data segment; both move with the program, so
    both are externs.  The retail's guard is an UNSIGNED comparison (sltiu), so
    a negative index takes the early return as well. */
-extern int D_001AE0C8 __attribute__((sda));
-extern char D_002652F0[];
+extern int g_tab_menu_tab_values __attribute__((sda));
+extern char g_tab_menu_records[];
 extern void menu_set_selected_index(void *, int);
 extern void menu_set_entry_table(unsigned char *, float *);
 extern char *GetLocalizedString(int);
@@ -64,8 +64,8 @@ void tab_menu_switch_tab(char *self, int idx)
     float scale;
     unsigned char *child;
     if ((unsigned int)idx > 2) return;
-    *(int *)(self + 0x1C4) = ((int *)&D_001AE0C8)[idx];
-    *(int *)(self + 0x1C8) = (int)(D_002652F0 + idx * 0x20);
+    *(int *)(self + 0x1C4) = ((int *)&g_tab_menu_tab_values)[idx];
+    *(int *)(self + 0x1C8) = (int)(g_tab_menu_records + idx * 0x20);
     *(int *)(self + 0x1CC) = (idx == 0) ? 7 : ((idx == 1) ? 8 : 6);
     if (idx != 0) {
         if (idx == 2) scale = 2.0f;

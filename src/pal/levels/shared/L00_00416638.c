@@ -3,7 +3,7 @@
 #include "common.h"
 extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 extern void FastVecScale(void *a0, void *a1, float f12);
-extern void func_PAL_L00_00416DC8(char *a0);
+extern void lightning_arcs_update_owned_pal(char *a0);
 extern char ref_L00_004117B8_00[];
 
 /* func_L00_004115E8 is defined in L00_004096B0-g8.c. */
@@ -12,7 +12,7 @@ extern char ref_L00_004117B8_00[];
    set, folds it into a sixteen-byte buffer: the record's own transform, then the scale of its
    +0x0C word, then its first three words added to the buffer. The block's address differs
    from level to level, so it takes a per-level name. */
-void func_PAL_L00_00416638(char *a0)
+void tracked_target_offsets_update_pal(char *a0)
 {
     char *s0 = ref_L00_004117B8_00;
     char *s2 = a0;
@@ -33,6 +33,6 @@ void func_PAL_L00_00416638(char *a0)
         }
         s0 = s0 + 0x30;
     }
-    func_PAL_L00_00416DC8(s2);
+    lightning_arcs_update_owned_pal(s2);
 }
 

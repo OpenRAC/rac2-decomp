@@ -23,7 +23,7 @@ extern void moby_mark_spawned(void *);
 extern void FastVecScale(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
 extern void func_002A0F48(void *);
-extern Vector D_L20_001B9FC0;
+extern Vector g_camera_l20_position;
 
 /* Updates moby class 4464: a rotating object that turns for a set time, plays a sound while turning, and keeps a copy of itself and any riders moving with it. */
 void rotating_object_update(unsigned char *moby) {
@@ -113,7 +113,7 @@ clone_failed:
             *(unsigned char **)(state + 0x88) = 0;
         } else {
             *(Quadword *)(child + 0xF0) = *(Quadword *)(moby + 0xF0);
-            FastVecSub(&offset, &D_L20_001B9FC0, moby + 0x10);
+            FastVecSub(&offset, &g_camera_l20_position, moby + 0x10);
             FastVecScale(&offset, &offset, 0.01f);
             FastVecAdd(*(unsigned char **)(state + 0x88) + 0x10, &offset, moby + 0x10);
             func_002A0F48(*(unsigned char **)(state + 0x88));

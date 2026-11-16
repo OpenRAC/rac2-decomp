@@ -2,14 +2,14 @@
 #include "names.h"
 
 extern void DrawItemGrid(int *);
-extern char D_0025E328[];
-extern int D_001AE304 __attribute__((sda));
-extern int D_001AE308 __attribute__((sda));
-extern int D_001AE310 __attribute__((sda));
-extern int D_001AE318 __attribute__((sda));
-extern int D_001AE320 __attribute__((sda));
-extern int D_001AE328 __attribute__((sda));
-extern int D_001AE330 __attribute__((sda));
+extern char g_help_pending_entries[];
+extern int g_item_grid_third_mode_desc_a __attribute__((sda));
+extern int g_item_grid_third_mode_desc_b __attribute__((sda));
+extern int g_item_grid_third_mode_desc_c __attribute__((sda));
+extern int g_item_grid_third_mode_desc_d __attribute__((sda));
+extern int g_item_grid_third_mode_desc_e __attribute__((sda));
+extern int g_item_grid_third_mode_desc_f __attribute__((sda));
+extern int g_item_grid_third_mode_desc_g __attribute__((sda));
 
 void func_US2_00345F00(char *o)
 {
@@ -26,31 +26,31 @@ void func_US2_00345F00(char *o)
     f[21] = *(int *)(o + 0x4B8) == 2;
     f[3] = *(int *)(o + 0x4AC);
     f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&D_001AE330;
-    f[1] = D_001AE304;
-    f[2] = D_001AE308;
-    f[0] = (int)D_0025E328;
+    f[9] = (int)&g_item_grid_third_mode_desc_g;
+    f[1] = g_item_grid_third_mode_desc_a;
+    f[2] = g_item_grid_third_mode_desc_b;
+    f[0] = (int)g_help_pending_entries;
     f[17] = (int)(o + 0x220);
     f[10] = (int)(o + 0x130);
     f[12] = (int)(o + 0x17C);
     f[15] = (int)(o + 0x278);
     f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&D_001AE328;
-    f[7] = (int)&D_001AE320;
-    f[6] = (int)&D_001AE318;
-    f[5] = (int)&D_001AE310;
+    f[8] = (int)&g_item_grid_third_mode_desc_f;
+    f[7] = (int)&g_item_grid_third_mode_desc_e;
+    f[6] = (int)&g_item_grid_third_mode_desc_d;
+    f[5] = (int)&g_item_grid_third_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
-extern char D_001AA810[];
-extern int D_001AE398 __attribute__((sda));
-extern int D_001AE39C __attribute__((sda));
-extern int D_001AE3A0 __attribute__((sda));
-extern int D_001AE3A8 __attribute__((sda));
-extern int D_001AE3B0 __attribute__((sda));
-extern int D_001AE3B8 __attribute__((sda));
-extern int D_001AE3C0 __attribute__((sda));
+extern char g_grid_menu_selection_rows[];
+extern int g_item_grid_first_mode_desc_a __attribute__((sda));
+extern int g_item_grid_first_mode_desc_b __attribute__((sda));
+extern int g_item_grid_first_mode_desc_c __attribute__((sda));
+extern int g_item_grid_first_mode_desc_d __attribute__((sda));
+extern int g_item_grid_first_mode_desc_e __attribute__((sda));
+extern int g_item_grid_first_mode_desc_f __attribute__((sda));
+extern int g_item_grid_first_mode_desc_g __attribute__((sda));
 
 void func_US2_003461D0(char *o)
 {
@@ -67,70 +67,70 @@ void func_US2_003461D0(char *o)
     f[21] = *(int *)(o + 0x4B8) == 0;
     f[3] = *(int *)(o + 0x4AC);
     f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&D_001AE3C0;
-    f[1] = D_001AE398;
-    f[2] = D_001AE39C;
-    f[0] = (int)D_001AA810;
+    f[9] = (int)&g_item_grid_first_mode_desc_g;
+    f[1] = g_item_grid_first_mode_desc_a;
+    f[2] = g_item_grid_first_mode_desc_b;
+    f[0] = (int)g_grid_menu_selection_rows;
     f[17] = (int)(o + 0x220);
     f[10] = (int)(o + 0x130);
     f[12] = (int)(o + 0x17C);
     f[15] = (int)(o + 0x278);
     f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&D_001AE3B8;
-    f[7] = (int)&D_001AE3B0;
-    f[6] = (int)&D_001AE3A8;
-    f[5] = (int)&D_001AE3A0;
+    f[8] = (int)&g_item_grid_first_mode_desc_f;
+    f[7] = (int)&g_item_grid_first_mode_desc_e;
+    f[6] = (int)&g_item_grid_first_mode_desc_d;
+    f[5] = (int)&g_item_grid_first_mode_desc_c;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
-extern float D_L04_001AE1E0 __attribute__((sda));
-extern float D_L04_001AE1E8 __attribute__((sda));
-extern float D_L04_001AE1F0 __attribute__((sda));
-extern float D_L04_001AE1F8 __attribute__((sda));
-extern float D_L04_001AE1E4;
-extern float D_L04_001AE1EC;
-extern float D_L04_001AE1F4;
-extern float D_L04_001AE1FC;
+extern float g_info_panel_counter_x0 __attribute__((sda));
+extern float g_info_panel_counter_x1 __attribute__((sda));
+extern float g_info_panel_counter_x2 __attribute__((sda));
+extern float g_info_panel_counter_offset_x __attribute__((sda));
+extern float g_info_panel_counter_y0;
+extern float g_info_panel_counter_y1;
+extern float g_info_panel_counter_y2;
+extern float g_info_panel_counter_offset_y;
 struct pos {
     float x;
     float y;
 };
 
-extern float D_US2_001AE298 __attribute__((sda));
-extern float D_US2_001AE29C;
-extern float D_US2_001AE2A0 __attribute__((sda));
-extern float D_US2_001AE2A4;
-extern float D_US2_001AE2A8 __attribute__((sda));
-extern float D_US2_001AE2AC;
-extern float D_US2_001AE2B0 __attribute__((sda));
-extern float D_US2_001AE2B4;
+extern float g_object_offset_x_a_2 __attribute__((sda));
+extern float g_object_offset_y_a_2;
+extern float g_object_offset_x_b_2 __attribute__((sda));
+extern float g_object_offset_y_b_2;
+extern float g_object_offset_x_c_2 __attribute__((sda));
+extern float g_object_offset_y_c_2;
+extern float g_object_offset_x_d_2 __attribute__((sda));
+extern float g_object_offset_y_d_2;
 
 void func_US2_003457A0(char *self)
 {
     float zero = 0.0f;
 
-    object_set_first_float4(self + 872, D_US2_001AE298 + (*(struct pos **)(self + 1184))->x,
-            D_US2_001AE29C + (*(struct pos **)(self + 1184))->y, zero, zero);
-    object_set_first_float4(self + 960, D_US2_001AE2A0 + (*(struct pos **)(self + 1184))->x,
-            D_US2_001AE2A4 + (*(struct pos **)(self + 1184))->y, zero, zero);
-    object_set_first_float4(self + 1048, D_US2_001AE2A8 + (*(struct pos **)(self + 1184))->x,
-            D_US2_001AE2AC + (*(struct pos **)(self + 1184))->y, zero, zero);
-    object_set_first_float4(self + 784, D_US2_001AE2B0 + (*(struct pos **)(self + 1184))->x,
-            D_US2_001AE2B4 + (*(struct pos **)(self + 1184))->y, zero, zero);
+    object_set_first_float4(self + 872, g_object_offset_x_a_2 + (*(struct pos **)(self + 1184))->x,
+            g_object_offset_y_a_2 + (*(struct pos **)(self + 1184))->y, zero, zero);
+    object_set_first_float4(self + 960, g_object_offset_x_b_2 + (*(struct pos **)(self + 1184))->x,
+            g_object_offset_y_b_2 + (*(struct pos **)(self + 1184))->y, zero, zero);
+    object_set_first_float4(self + 1048, g_object_offset_x_c_2 + (*(struct pos **)(self + 1184))->x,
+            g_object_offset_y_c_2 + (*(struct pos **)(self + 1184))->y, zero, zero);
+    object_set_first_float4(self + 784, g_object_offset_x_d_2 + (*(struct pos **)(self + 1184))->x,
+            g_object_offset_y_d_2 + (*(struct pos **)(self + 1184))->y, zero, zero);
 }
 
 
 
-extern char D_US2_001AA850[];
-extern int D_US2_001AE348 __attribute__((sda));
-extern int D_US2_001AE340 __attribute__((sda));
-extern int D_US2_001AE320 __attribute__((sda));
-extern int D_US2_001AE324 __attribute__((sda));
-extern int D_US2_001AE338 __attribute__((sda));
-extern int D_US2_001AE330 __attribute__((sda));
-extern int D_US2_001AE328 __attribute__((sda));
+extern char g_str_object_label_a[];
+extern int g_object_desc_a_nine __attribute__((sda));
+extern int g_object_desc_a_eight __attribute__((sda));
+extern int g_object_desc_a_one __attribute__((sda));
+extern int g_object_desc_a_two __attribute__((sda));
+extern int g_object_desc_a_seven __attribute__((sda));
+extern int g_object_desc_a_six __attribute__((sda));
+extern int g_object_desc_a_five __attribute__((sda));
 
 void func_US2_00345FF0(char *o)
 {
@@ -147,33 +147,33 @@ void func_US2_00345FF0(char *o)
     f[21] = *(int *)(o + 0x4B8) == 1;
     f[3] = *(int *)(o + 0x4AC);
     f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&D_US2_001AE348;
-    f[1] = D_US2_001AE320;
-    f[2] = D_US2_001AE324;
-    f[0] = (int)D_US2_001AA850;
+    f[9] = (int)&g_object_desc_a_nine;
+    f[1] = g_object_desc_a_one;
+    f[2] = g_object_desc_a_two;
+    f[0] = (int)g_str_object_label_a;
     f[17] = (int)(o + 0x220);
     f[10] = (int)(o + 0x130);
     f[12] = (int)(o + 0x17C);
     f[15] = (int)(o + 0x278);
     f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&D_US2_001AE340;
-    f[7] = (int)&D_US2_001AE338;
-    f[6] = (int)&D_US2_001AE330;
-    f[5] = (int)&D_US2_001AE328;
+    f[8] = (int)&g_object_desc_a_eight;
+    f[7] = (int)&g_object_desc_a_seven;
+    f[6] = (int)&g_object_desc_a_six;
+    f[5] = (int)&g_object_desc_a_five;
     f[22] = 1;
     DrawItemGrid(f);
 }
 
 
 
-extern char D_US2_001AA890[];
-extern int D_US2_001AE378 __attribute__((sda));
-extern int D_US2_001AE370 __attribute__((sda));
-extern int D_US2_001AE350 __attribute__((sda));
-extern int D_US2_001AE354 __attribute__((sda));
-extern int D_US2_001AE368 __attribute__((sda));
-extern int D_US2_001AE360 __attribute__((sda));
-extern int D_US2_001AE358 __attribute__((sda));
+extern char g_str_object_label_b[];
+extern int g_object_desc_b_nine __attribute__((sda));
+extern int g_object_desc_b_eight __attribute__((sda));
+extern int g_object_desc_b_one __attribute__((sda));
+extern int g_object_desc_b_two __attribute__((sda));
+extern int g_object_desc_b_seven __attribute__((sda));
+extern int g_object_desc_b_six __attribute__((sda));
+extern int g_object_desc_b_five __attribute__((sda));
 
 void func_US2_003460E0(char *o)
 {
@@ -190,19 +190,19 @@ void func_US2_003460E0(char *o)
     f[21] = *(int *)(o + 0x4B8) == 3;
     f[3] = *(int *)(o + 0x4AC);
     f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&D_US2_001AE378;
-    f[1] = D_US2_001AE350;
-    f[2] = D_US2_001AE354;
-    f[0] = (int)D_US2_001AA890;
+    f[9] = (int)&g_object_desc_b_nine;
+    f[1] = g_object_desc_b_one;
+    f[2] = g_object_desc_b_two;
+    f[0] = (int)g_str_object_label_b;
     f[17] = (int)(o + 0x220);
     f[10] = (int)(o + 0x130);
     f[12] = (int)(o + 0x17C);
     f[15] = (int)(o + 0x278);
     f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&D_US2_001AE370;
-    f[7] = (int)&D_US2_001AE368;
-    f[6] = (int)&D_US2_001AE360;
-    f[5] = (int)&D_US2_001AE358;
+    f[8] = (int)&g_object_desc_b_eight;
+    f[7] = (int)&g_object_desc_b_seven;
+    f[6] = (int)&g_object_desc_b_six;
+    f[5] = (int)&g_object_desc_b_five;
     f[22] = 1;
     DrawItemGrid(f);
 }

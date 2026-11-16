@@ -6,7 +6,7 @@
 
 extern char g_pad_state[];
 extern char g_hero_state[];
-extern int D_L00_001A8F00 MACRO_ADDR;
+extern int g_game_l00_mode MACRO_ADDR;
 extern char g_hero_position[];
 
 extern void hero_l00_update_frame(void);
@@ -39,8 +39,8 @@ extern void hero_update_items_frame(void);
 extern int hero_is_action_allowed(void);
 extern void gfx_fade_screen_effect(void);
 extern void ApplyHeroAxisScales(void);
-extern void func_US2_L00_002A67F8(void);
-extern void func_US2_L00_002D6258(void);
+extern void hero_update_stat_trackers_us2(void);
+extern void hero_update_collection_progress_us2(void);
 extern void hero_check_targeting_triggers(void);
 extern void UpdateHeroAimAndTransitions(void);
 extern int hero_is_in_swing_or_grind_mode(void);
@@ -91,7 +91,7 @@ void func_US2_L00_002A6DD0(void) {
     FindGrindRail();
     hero_find_ledge_candidate();
     func_US2_L00_002CB650();
-    if (D_L00_001A8F00 == 2 || D_L00_001A8F00 == 6) {
+    if (g_game_l00_mode == 2 || g_game_l00_mode == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
             hero_set_objects_flag_bit();
         else
@@ -134,8 +134,8 @@ void func_US2_L00_002A6DD0(void) {
     }
     gfx_fade_screen_effect();
     ApplyHeroAxisScales();
-    func_US2_L00_002A67F8();
-    func_US2_L00_002D6258();
+    hero_update_stat_trackers_us2();
+    hero_update_collection_progress_us2();
     hero_check_targeting_triggers();
     UpdateHeroAimAndTransitions();
     {

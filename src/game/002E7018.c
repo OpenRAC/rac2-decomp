@@ -4,7 +4,7 @@ extern char D_00189E20_9[];
 
 extern char D_001A63A8_3[];
 
-extern short D_00152C2A;
+extern short g_scene_reset_flag;
 
 extern void func_002B72E8_1();
 
@@ -19,9 +19,9 @@ typedef struct {
  u8 prefix[0x30];s32 state;u8 gap0[0x1c];u8 *current;u8 gap1[0x138];s32 bank[2];
 } NativeContext;
 
-extern NativeContext D_L24_001BC3C0;
+extern NativeContext g_data_bank_context;
 
-extern u8 D_L24_0028AAC0[];
+extern u8 g_data_bank_object[];
 
 /* One-shot init: raises an int flag, forces a state word outside {6,7} to 5, runs three calls, then clears a 16-bit global. */
 /* Resets the scene state when a scene starts. */
@@ -44,7 +44,7 @@ void scene_reset_state_on_start(void)
     UpdateSoundVoices();
     subtitle_clear_state();
     level_transition_scene_start(0);
-    D_00152C2A = 0;
+    g_scene_reset_flag = 0;
 }
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
@@ -54,14 +54,14 @@ typedef struct { char pad[0xC]; int start; int end; } Range2E7090;
 typedef struct { char pad[0x30]; int selected; int base; int page; int row; char pad40[0x6C - 0x40]; int start; int destination; } List2E7090;
 
 extern float g_screen_fade MACRO_ADDR;
-extern int D_001B15A4 MACRO_ADDR;
+extern int g_screen_flash_alpha MACRO_ADDR;
 extern Menu2E7090 g_hero_moby_default;
-extern int D_001B22B0 MACRO_ADDR;
-extern Range2E7090 D_001BAEC0;
+extern int g_packet_buffer_size MACRO_ADDR;
+extern Range2E7090 g_loader_memory;
 extern List2E7090 g_scene_playback_state;
 extern int g_current_map_index MACRO_ADDR;
 extern int g_is_pal_video MACRO_ADDR;
-extern int D_001B1680 MACRO_ADDR;
+extern int g_small_data_value MACRO_ADDR;
 extern void gfx_select_packet_buffer_setup(void);
 extern void load_select_segment_update_world(int);
 extern int MemcardSave(int, int);
@@ -76,14 +76,14 @@ void scene_init_list(int level)
     int base;
 
     g_screen_fade = 1.0f;
-    D_001B15A4 = 0;
+    g_screen_flash_alpha = 0;
     menu->active = 0;
     menu->slot = none;
     gfx_select_packet_buffer_setup();
-    base = D_001B22B0 - 0x60000;
-    g_scene_playback_state.start = D_001BAEC0.start + base;
-    g_scene_playback_state.destination = D_001BAEC0.end + base;
-    D_001B22B0 = base;
+    base = g_packet_buffer_size - 0x60000;
+    g_scene_playback_state.start = g_loader_memory.start + base;
+    g_scene_playback_state.destination = g_loader_memory.end + base;
+    g_packet_buffer_size = base;
     if (g_current_map_index == level) {
         level_transition_scene_start(3);
         level = g_is_pal_video ? 0x50 : 0x60;
@@ -93,7 +93,7 @@ void scene_init_list(int level)
         g_scene_playback_state.page = g_scene_playback_state.base % level;
     } else {
         MemcardSave(0, level);
-        D_001B1680 = level;
+        g_small_data_value = level;
         menu->active = 1;
         menu->slot = none;
     }
@@ -128,7 +128,7 @@ void ship_draw_engine_flames(void *object)
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void DrawTexturedQuad(int, char *, int, int, int, int, int, int, unsigned long long, unsigned long long);
 extern char *g_screen_height __attribute__((sda));
-extern unsigned long long D_001B2168 __attribute__((sda));
+extern unsigned long long g_fade_strip_packet __attribute__((sda));
 
 /* Draws a fading overlay strip across the screen with the given see-through amount. */
 void gfx_draw_fade_strip(int alpha)
@@ -140,7 +140,7 @@ void gfx_draw_fade_strip(int alpha)
     VU1_addGSregister(0x47, 0x31801ULL);
     VU1_addGSregister(0x42, 0x8000000044ULL);
     color = (alpha << 24) | 0x00808080;
-    packet = D_001B2168;
+    packet = g_fade_strip_packet;
     dst = g_screen_height;
     DrawTexturedQuad(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
     VU1_addGSregister(0x47, 0x5360BULL);
@@ -155,8 +155,8 @@ void gfx_draw_fade_strip(int alpha)
 
 /* func_002E9268 is in 002E9268.c. */
 
-extern short D_00152C20;
-extern int D_001B1594 __attribute__((sda));
+extern short g_transition_mode;
+extern int g_render_layer_flags __attribute__((sda));
 extern void gfx_render_frame_all_layers(void);
 extern void RenderFrame(void);
 extern void transition_render_scene(void);
@@ -164,13 +164,13 @@ extern void transition_render_scene(void);
 /* Draws the background of the transition screen for the current transition type. */
 void transition_draw_background(void)
 {
-    switch (D_00152C20) {
+    switch (g_transition_mode) {
     case 0:
     case 3:
         gfx_render_frame_all_layers();
         break;
     case 1:
-        D_001B1594 = 127;
+        g_render_layer_flags = 127;
         RenderFrame();
         break;
     case 2:
@@ -246,10 +246,10 @@ int scene_load_chunk_data(int index)
 /* selects the level data bank when the resident context is in state 9 */
 void level_select_data_bank(void) {
  s32 index=-1;
- if(D_L24_001BC3C0.state==9) index=1;
+ if(g_data_bank_context.state==9) index=1;
  if(index!=-1) {
-  D_L24_001BC3C0.current=D_L24_0028AAC0;
-  *(s32 *)(D_L24_0028AAC0+0x68)=D_L24_001BC3C0.bank[index];
+  g_data_bank_context.current=g_data_bank_object;
+  *(s32 *)(g_data_bank_object+0x68)=g_data_bank_context.bank[index];
  }
 }
 

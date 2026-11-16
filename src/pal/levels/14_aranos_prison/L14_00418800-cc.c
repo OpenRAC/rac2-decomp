@@ -7,7 +7,7 @@ extern int flag_set_first_pending(void *);
 extern void snd_stop_voice(int);
 extern char g_sound_state[];
 extern void gfx_draw_scrolling_surface_quad(void *);
-extern char D_L14_001B9500[];
+extern char g_tether_l14_origin_vec[];
 extern float math_fast_sin_or_cos_b(float);
 extern char g_hero_position[];
 /* The same entity-base pointer is read both absolutely and through $gp. */
@@ -17,7 +17,7 @@ extern void moby_mark_spawned(void *);
 
 typedef int PrisonQword __attribute__((mode(TI)));
 typedef struct { PrisonQword v[4]; } PrisonMatrix;
-extern PrisonMatrix D_L14_001B1A00;
+extern PrisonMatrix g_billboard_matrix;
 
 extern void gfx_draw_rotated_billboard(void *, int, int, int, float, float, float);
 extern float math_wrap_angle_full_turn(float);
@@ -36,8 +36,8 @@ typedef struct {
 } PrisonGadget;
 
 extern SubtitleHistory g_subtitle_history[];
-extern u8 D_0019B2E8[];
-extern PrisonGadget D_L14_002686F0[];
+extern u8 g_moby_group_flags[];
+extern PrisonGadget g_item_l14_materials[];
 extern int g_current_map_index __attribute__((sda));
 /* True once the gadget in slot 10 has been upgraded. */
 
@@ -76,14 +76,14 @@ unsigned int func_PAL_L14_00418800(unsigned int param_1)
 
 /* The level's own jump table (the label of the data blob at 0x002AA360). */
 /* Dispatches on the owner's animation step and plays the matching bone animation. */
-extern char D_L14_001B9500[];
+extern char g_tether_l14_origin_vec[];
 
 /* Restarts the owner's animation: two timed fades, the counter, then the panic state. */
 /* func_L14_00423E50 is defined in L14_00423E50-gu.c (it needs -frac2-gcse-unsplit-edges). */
 
 /* The 0x100-byte entity record (PrisonEntity, declared further down), with only the
    fields this function uses. */
-extern u8 D_0019B2E8[];
+extern u8 g_moby_group_flags[];
 extern char g_hero_position[];
 extern int g_current_map_index __attribute__((sda));
 extern int IsPointInCuboid(void *, int);

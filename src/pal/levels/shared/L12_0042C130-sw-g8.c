@@ -6,16 +6,16 @@
 #define U(p,o) (*(u16 *)((char *)(p)+(o)))
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-extern float D_L12_001B21C0 __attribute__((sda));
-extern float D_L12_001B21C4 __attribute__((sda));
+extern float g_hopping_enemy_hop_rate __attribute__((sda));
+extern float g_hopping_enemy_alt_hop_rate __attribute__((sda));
 /* A float pair (lower, upper) read through two address forms. The sda incomplete array has no
  * .extern, so the assembler builds the upper bound with $at, and read as symbol+offset that load
  * stays ahead of the call while the lower bound takes the delay slot. The SDATA view gives the
  * $gp lower bound. */
-extern float D_L12_001B21C8[] __attribute__((sda));
+extern float g_hopping_enemy_random_range[] __attribute__((sda));
 extern float D_L12_001B21C8_gp[] SDATA(D_L12_001B21C8);
-extern int D_L12_001B29C8[] __attribute__((sda));
-extern char D_0018A0E0[], g_hero_position[];
+extern int g_frame_l12_counter[] __attribute__((sda));
+extern char g_hero_state_block[], g_hero_position[];
 extern int g_hero_moby[];
 extern void func_PAL_L12_0042CD98(void *);
 extern int flag_set_second_pending(void *);
@@ -27,7 +27,7 @@ extern int FastDecTimer(void *);
 extern void moby_set_state(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern int moby_dispatch_action_by_kind(void *,void *);
-extern void func_PAL_L12_0042D378(void *);
+extern void hopping_enemy_play_death_blast_pal(void *);
 extern int coll_point_inside_region(void *,int);
 extern void vec_clear_128(void *);
 extern float FastVecDot(void *,void *);
@@ -39,7 +39,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *,void *,void *);
 extern void path_clamp_move_to_area(void *,void *,void *,int,float);
-extern int func_PAL_L12_0042D200(void *,void *,int);
+extern int moby_step_shared_movement_pal(void *,void *,int);
 extern int moby_check_target_point_from_offset(void *,void *);
 extern int moby_count_group_side_from_object(void *,int,int);
 extern void moby_turn_toward_target_limited(void *);
@@ -50,8 +50,8 @@ extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 extern int coll_sweep_from_object(void *,void *,int,int,int,int,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void func_PAL_L07_003FB6B0(void *);
-extern void func_PAL_L12_0042D258(void *);
-extern void func_PAL_L12_0042D5E8(void *);
+extern void hopping_enemy_tick_timers_pal(void *);
+extern void pulsing_group_update_pal(void *);
 
 void func_PAL_L12_0042C130(char *obj) {
     char *s = *(char **)(obj+0x68);
@@ -65,7 +65,7 @@ void func_PAL_L12_0042C130(char *obj) {
     case 0:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.0072000003f,0.080000006f,0.010053098f,0.5026549f);
-            F(s,0x1D0)=D_L12_001B21C4*0.020000001f;
+            F(s,0x1D0)=g_hopping_enemy_alt_hop_rate*0.020000001f;
             F(s,0x124)=0.0096f;
             F(s,0x134)=0.5f;
             H(s,0x35A)=((s32)(math_random_int_range(0,30)) * 5 + 2) / 6;
@@ -83,7 +83,7 @@ void func_PAL_L12_0042C130(char *obj) {
     case 1:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.0072000003f,0.080000006f,0.025132746f,1.2566373f);
-            F(s,0x1D0)=D_L12_001B21C0*0.020000001f;
+            F(s,0x1D0)=g_hopping_enemy_hop_rate*0.020000001f;
             F(s,0x134)=0.05f;
         }
         if (H(s,0x334)==1) moby_set_state(obj,9,2);
@@ -92,7 +92,7 @@ void func_PAL_L12_0042C130(char *obj) {
     case 2:
         if (flag_set_second_pending(obj)) {
             moby_set_controller_speed_limits(obj,0.0072000003f,0.080000006f,0.025132746f,1.2566373f);
-            F(s,0x1D0)=D_L12_001B21C0*0.020000001f;
+            F(s,0x1D0)=g_hopping_enemy_hop_rate*0.020000001f;
             F(s,0x124)=0.0096f;
             F(s,0x134)=0.05f;
             H(s,0x35A)=((s32)(math_random_int_range(0,30)) * 5 + 2) / 6;
@@ -105,7 +105,7 @@ void func_PAL_L12_0042C130(char *obj) {
     case 3:
         vec=*(Quad *)(obj+0x10);
         flags=moby_dispatch_action_by_kind(obj,s+0x50);
-        if (flags&1) func_PAL_L12_0042D378(obj);
+        if (flags&1) hopping_enemy_play_death_blast_pal(obj);
         else if (!coll_point_inside_region(obj+0x10,W(s,0x230))) {
             qcopy(obj+0x10,&vec);
             vec_clear_128(s+0xD0);
@@ -129,7 +129,7 @@ void func_PAL_L12_0042C130(char *obj) {
         if (B(obj,0x43)==1) {
             if (B(obj,0x60)&2) func_PAL_002A7E68(obj,0,0,17);
         } else if (H(s,0x332)==0) {
-            if (!H(s,0x358) || FastVecDot(s+0x320,D_0018A0E0)>0.8f) moby_set_state(obj,2,-1);
+            if (!H(s,0x358) || FastVecDot(s+0x320,g_hero_state_block)>0.8f) moby_set_state(obj,2,-1);
         }
         break;
     case 2:
@@ -145,7 +145,7 @@ void func_PAL_L12_0042C130(char *obj) {
                 path_clamp_move_to_area(&vec,s+0x310,s+0x310,W(s,0x238),1.5f);
             }
         }
-        func_PAL_L12_0042D200(obj,s+0x310,0);
+        moby_step_shared_movement_pal(obj,s+0x310,0);
         if (U(obj,0x96)>25 && (F(s,0x1CC)<=0.5f || U(obj,0x96)>150)) moby_set_state(obj,1,-1);
         break;
     case 3:
@@ -176,9 +176,9 @@ void func_PAL_L12_0042C130(char *obj) {
     case 4:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=6) func_PAL_002A7E68(obj,6,0,8);
-            F(s,0x354)=math_random_float_range(D_L12_001B21C8_gp[0],D_L12_001B21C8[1])+0.5f;
+            F(s,0x354)=math_random_float_range(D_L12_001B21C8_gp[0],g_hopping_enemy_random_range[1])+0.5f;
         }
-        if ((func_PAL_L12_0042D200(obj,s+0x300,0)&128) || vec_distance_xy(obj+0x10,g_hero_position)>F(s,0x354)) {
+        if ((moby_step_shared_movement_pal(obj,s+0x300,0)&128) || vec_distance_xy(obj+0x10,g_hero_position)>F(s,0x354)) {
             if (math_random_int_below(2)) moby_set_state(obj,6,-1);
             else moby_set_state(obj,7,-1);
         }
@@ -196,7 +196,7 @@ void func_PAL_L12_0042C130(char *obj) {
                 path_clamp_move_to_area(&vec,s+0x310,s+0x310,W(s,0x238),1.5f);
             }
         }
-        func_PAL_L12_0042D200(obj,s+0x310,0);
+        moby_step_shared_movement_pal(obj,s+0x310,0);
         if (U(obj,0x96)>25 && (F(s,0x1CC)<=0.5f || U(obj,0x96)>150)) moby_set_state(obj,3,-1);
         break;
     case 8:
@@ -208,7 +208,7 @@ void func_PAL_L12_0042C130(char *obj) {
     case 9:
         if (flag_set_first_pending(obj) && B(obj,0x43)!=6) func_PAL_002A7E68(obj,6,0,4);
         if (!(U(obj,0x96)&3)) F(s,0x33C)=(float)moby_count_group_side_from_object(obj,g_hero_moby[0],-1)*0.087266475f;
-        func_PAL_L12_0042D200(obj,s+0x1F0,1);
+        moby_step_shared_movement_pal(obj,s+0x1F0,1);
         moby_turn_toward_target_limited(obj);
         if (F(s,0x1CC)<=1.25f) moby_set_state(obj,10,-1);
         break;
@@ -224,10 +224,10 @@ void func_PAL_L12_0042C130(char *obj) {
     case 14:
         if (flag_set_first_pending(obj)) {
             if (B(obj,0x43)!=10) func_PAL_002A7E68(obj,10,0,5);
-            W(s,0x1BC)=D_L12_001B29C8[0];
+            W(s,0x1BC)=g_frame_l12_counter[0];
         }
         vec_scale_to_length(&vec,s+0x1A0,1.0f);
-        func_PAL_L12_0042D200(obj,&vec,0);
+        moby_step_shared_movement_pal(obj,&vec,0);
         func_PAL_L07_003FB6B0(obj);
         coll_sweep_from_object(obj,obj+0x10,0x4000000,0,1,0,0.6f,(float)B(s,0x34),1.0f);
         if (F(s,0x190)>=F(obj,0x18)) {
@@ -236,8 +236,8 @@ void func_PAL_L12_0042C130(char *obj) {
             W(s,0x138)&=~0x11;
         }
         break;
-    case 12: func_PAL_L12_0042D378(obj); break;
+    case 12: hopping_enemy_play_death_blast_pal(obj); break;
     }
-    func_PAL_L12_0042D258(obj);
-    if (B(obj,0x31)) func_PAL_L12_0042D5E8(obj);
+    hopping_enemy_tick_timers_pal(obj);
+    if (B(obj,0x31)) pulsing_group_update_pal(obj);
 }

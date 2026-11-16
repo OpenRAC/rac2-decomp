@@ -23,7 +23,7 @@ extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
 extern void draw_world_quad(void *, int, int);
 extern float IntToFloat(int);
-extern char D_L05_001B96C0[];
+extern char g_origin_vec[];
 
 /* Draw two textured strips along the points, scrolling the wider strip's U coordinate. */
 /* Draws a two-layer scrolling ribbon through a list of points, one band at a time. */
@@ -76,7 +76,7 @@ void DrawScrollingTwoLayerRibbon(char *obj, int count, Vec98A *points, int n)
     outer.uv[7] = 1;
     FastVecSub(&tangent, points + 1, points);
     vec_scale_to_length(&tangent, &tangent, 1.0f);
-    FastVecSub(&view, D_L05_001B96C0, points);
+    FastVecSub(&view, g_origin_vec, points);
     FastVecCross(&right, &view, &tangent);
     vec_scale_to_length(&right, &right, 1.0f);
     FastVecCross(&view, &tangent, &right);
@@ -102,7 +102,7 @@ void DrawScrollingTwoLayerRibbon(char *obj, int count, Vec98A *points, int n)
             FastVecScale(&outer.p[3], &outer.p[2], -1.0f);
             FastVecSub(&tangent, following, current);
             vec_scale_to_length(&tangent, &tangent, 1.0f);
-            FastVecSub(&view, D_L05_001B96C0, current);
+            FastVecSub(&view, g_origin_vec, current);
             FastVecCross(&right, &view, &tangent);
             vec_scale_to_length(&right, &right, 1.0f);
             FastVecCross(&view, &tangent, &right);

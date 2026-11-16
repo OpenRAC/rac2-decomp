@@ -3,13 +3,13 @@
 #include "common.h"
 extern int FloatToInt(f32);
 extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
-extern f32 D_L17_001B04B8 __attribute__((sda));
+extern f32 g_effect_spawner_seconds __attribute__((sda));
 extern void moby_set_state(void *, s32, s32);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
-extern s32 D_L17_001B1E00 __attribute__((sda));
-extern s32 D_L17_001B1DE0 __attribute__((sda));
-extern s32 D_L17_001B1DD8 __attribute__((sda));
-extern s32 D_L17_001B1DD0 __attribute__((sda));
+extern s32 g_hit_burst_piece_param __attribute__((sda));
+extern s32 g_hit_burst_piece_table_c __attribute__((sda));
+extern s32 g_hit_burst_piece_table_b __attribute__((sda));
+extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 extern char *g_moby_l17_pool __attribute__((sda));
 typedef int Quad __attribute__((mode(TI)));
 #define I(p,o) (*(int *)((u8 *)(p)+(o)))
@@ -98,10 +98,10 @@ typedef struct {
     u8 pad434[0x1C];
     s32 i450;
 } L17Vars;
-extern float D_L17_001B0CA8 __attribute__((sda));
-extern u8 D_L17_001B0CB8[4] __attribute__((sda));
-extern u8 D_L17_001B9BC0[];
-extern char D_L17_001B0CC8[];
+extern float g_grulch_frame_scalar __attribute__((sda));
+extern u8 g_grulch_init_bytes[4] __attribute__((sda));
+extern u8 g_tether_origin_pos[];
+extern char g_str_returned_null[];
 extern u8 *g_hero_moby NOT_SDA;
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void MoveCtl_Init(void *);
@@ -115,8 +115,8 @@ extern void moby_l17_set_group_alert_flag(void *);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
 extern void STUB_printf(void *, ...);
 extern s32 g_current_map_index MACRO_ADDR;
-extern u8 D_0019B4A8[];
-extern u8 D_0019B2E8[];
+extern u8 g_moby_nibble_table[];
+extern u8 g_moby_group_flags[];
 extern u8 *g_path_l17_table[];
 extern f32 FastAddRotations(f32, f32);
 extern f32 math_fast_sin_or_cos_b(f32);
@@ -174,8 +174,8 @@ void func_PAL_L17_003E89B0(u8 *obj)
         MoveCtl_Init(&p->t140);
         p->t140.f0C = 2.5f;
         p->t140.f08 = 2.0f;
-        p->t140.i00 = FloatToInt(D_L17_001B0CA8 * 1024.0f);
-        p->t140.f04 = D_L17_001B0CA8;
+        p->t140.i00 = FloatToInt(g_grulch_frame_scalar * 1024.0f);
+        p->t140.f04 = g_grulch_frame_scalar;
         p->t140.f24 = p->f40C * (0.020000001f);
         if (p->v3D0.f[3] != 12439.4f) {
             p->v3D0.q = *(Quad *)(obj + 0x10);
@@ -190,14 +190,14 @@ void func_PAL_L17_003E89B0(u8 *obj)
         p->f330 = p->f30;
         p->b28 = 0;
         p->i418 = 0;
-        p->p310 = D_L17_001B0CB8;
+        p->p310 = g_grulch_init_bytes;
         p->f430 = (float)p->b34;
         moby_set_state(obj, 1, 0);
         if (obj[0x43])
             func_PAL_002A7E68(obj, 0, 0, 0);
         p->i450 = p->i428;
     }
-    if (obj[0x31] && fast_vec_dist(obj + 0x10, D_L17_001B9BC0) < 24.0f) {
+    if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_origin_pos) < 24.0f) {
         moby_update_ground_check(obj);
         obj[0x6F] = 22;
     }
@@ -217,7 +217,7 @@ void func_PAL_L17_003E89B0(u8 *obj)
     p->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
     target = p->target;
     if (!target) {
-        STUB_printf(D_L17_001B0CC8);
+        STUB_printf(g_str_returned_null);
         target = g_hero_moby;
     }
     p->p408 = target;

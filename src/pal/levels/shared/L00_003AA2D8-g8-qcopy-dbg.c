@@ -12,8 +12,8 @@ typedef struct {
     VectorBits velocity, origin;
 } BeamState;
 extern WeaponEntry g_weapon_l00_table[];
-extern unsigned char D_0013957F[];
-extern unsigned int D_L00_001AF6D4 __attribute__((sda));
+extern unsigned char g_beam_weapon_index[];
+extern unsigned int g_beam_spawn_slot_counter __attribute__((sda));
 extern char g_camera_l00_position[];
 extern int save_is_record_value(int, int);
 extern char *CreateMoby(int);
@@ -28,7 +28,7 @@ extern void func_PAL_L00_003AC5A8(void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern int func_PAL_L00_003AB850(char *, void *);
+extern int beam_test_segment_hit_pal(char *, void *);
 
 /* Spawn and configure one moving beam effect. */
 char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode)
@@ -49,7 +49,7 @@ char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode
         *(unsigned char *)(moby + 0x20) = 0;
         state->mode = mode;
         vec_add_transformed_or_copy(state, velocity, position);
-        speed = (g_weapon_l00_table + D_0013957F[0])->speed * (0.020000001f);
+        speed = (g_weapon_l00_table + g_beam_weapon_index[0])->speed * (0.020000001f);
         state->frames = ((s32)(FloatToInt(128.0f / speed)) * 5 + 2) / 6;
         state->rate = 1.0f / IntToFloat(state->frames);
         state->handle = handle;
@@ -57,10 +57,10 @@ char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode
         cam_compute_view_direction(moby + 0x10, (char *)normal, 1);
         FastVecScale(normal, normal, -1.0f);
         moby_build_axis_vectors(moby, (char *)normal);
-        if (D_L00_001AF6D4 >= 4)
-            D_L00_001AF6D4 = 0;
-        state->slot = D_L00_001AF6D4;
-        D_L00_001AF6D4 = (int)(D_L00_001AF6D4 + 1) % 3;
+        if (g_beam_spawn_slot_counter >= 4)
+            g_beam_spawn_slot_counter = 0;
+        state->slot = g_beam_spawn_slot_counter;
+        g_beam_spawn_slot_counter = (int)(g_beam_spawn_slot_counter + 1) % 3;
         func_PAL_L00_003AC5A8(moby);
         if (mode == 1) {
             qcopy(&state->origin, g_camera_l00_position);
@@ -69,7 +69,7 @@ char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode
         if (mode == 2) {
             qcopy(previous, position);
             FastVecAdd(moby + 0x10, position, velocity);
-            if (func_PAL_L00_003AB850(moby, previous))
+            if (beam_test_segment_hit_pal(moby, previous))
                 *(unsigned char *)(moby + 0x20) = 2;
         }
     }

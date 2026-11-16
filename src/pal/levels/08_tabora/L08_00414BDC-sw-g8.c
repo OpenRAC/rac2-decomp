@@ -25,30 +25,30 @@ typedef struct {
     int count;
     UpdateVec point, extra, normal;
 } UpdateCollision;
-extern char D_L00_001B2C00[] MACRO_ADDR;
+extern char g_global_object_vector[] MACRO_ADDR;
 extern UpdateCollision g_collision_result;
-extern char D_L00_001BF240[];
+extern char g_hero_l00_velocity[];
 extern char g_hero_state[];
 extern char *g_follow_camera_object __attribute__((nosda));
-extern int D_L00_001A904C[] MACRO_ADDR;
-extern int D_0018C0B4 __attribute__((nosda));
-extern int D_00138324 __attribute__((nosda));
-extern int D_L00_001A8F00 __attribute__((sda));
-extern float D_L00_001B0C98 __attribute__((sda));
-extern char *D_L00_001B0CA0 __attribute__((sda));
-extern int D_L00_001B0CA4 __attribute__((sda));
-extern float D_L00_001B0CAC __attribute__((sda));
-extern float D_L00_001B0CB0 __attribute__((sda));
-extern int D_L00_001B2C10[] MACRO_ADDR;
+extern int g_bolt_counter_base[] MACRO_ADDR;
+extern int g_game_mode __attribute__((nosda));
+extern int g_pad_held_flags __attribute__((nosda));
+extern int g_game_l00_mode __attribute__((sda));
+extern float g_global_object_timer_rate __attribute__((sda));
+extern char *g_global_object_data __attribute__((sda));
+extern int g_global_object_initial_state __attribute__((sda));
+extern float g_spider_bot_probe_distance __attribute__((sda));
+extern float g_spider_bot_shadow_size __attribute__((sda));
+extern int g_global_object_timer[] MACRO_ADDR;
 extern int update_timer SDATA(D_L00_001B2C10);
-extern int D_L00_001B2C14[] MACRO_ADDR;
+extern int g_global_object_flag[] MACRO_ADDR;
 extern int update_collision SDATA(D_L00_001B2C14);
-extern int D_L00_001B2C18[] MACRO_ADDR;
+extern int g_global_object_state[] MACRO_ADDR;
 extern int update_water SDATA(D_L00_001B2C18);
-extern int D_L00_001B2C28[] MACRO_ADDR;
+extern int g_object_effect_slot[] MACRO_ADDR;
 extern int update_handle SDATA(D_L00_001B2C28);
-extern char *D_L00_001ADB2C[] MACRO_ADDR;
-extern float D_L00_00254650[][2];
+extern char *g_active_tether_object[] MACRO_ADDR;
+extern float g_ring_effect_angles[][2];
 extern void moby_forward_position_call(void *, void *, int);
 extern void moby_get_facing_direction(void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -59,7 +59,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int ForceClaimNotice(int, int, int);
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float, float);
-extern void func_PAL_0029C0F0(int, void (*)(void *));
+extern void level_store_value_pair_pal(int, void (*)(void *));
 extern int spider_bot_draw_timer(void *);
 extern void ref_L00_003FFBA0_00(void);
 extern void linked_object_activate_data(void);
@@ -72,7 +72,7 @@ extern void part_setup_object_effect_entry(void *, void *, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void func_PAL_00331948(void *), moby_steer_heading_to_aim(void *), func_PAL_00331A48(void *);
-extern void func_PAL_L00_00406680(void *), snd_play_on_threshold_crossing(void);
+extern void nearby_typed_objects_notify_pal(void *), snd_play_on_threshold_crossing(void);
 extern int math_fast_float_d(void *);
 extern int CollideSweptSphere(UpdateQuery *);
 extern int weapon_get_group(int);
@@ -85,7 +85,7 @@ extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(void *, v
 extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern void euler_rotation_basis(void *, void *), func_PAL_00331118(void *);
 extern void gfx_register_final_draw_callback(void (*)(void *), void *);
-extern void func_PAL_003329A8(void *);
+extern void part_draw_ring_effect_and_trail_pal(void *);
 extern void part_queue_ground_shadow(void *, float);
 #define I(p, n) (*(int *)((char *)(p) + (n)))
 #define F(p, n) (*(float *)((char *)(p) + (n)))
@@ -107,19 +107,19 @@ void func_PAL_L08_00414BDC(char *obj)
     char *hero;
 
     if (STATE(obj) >= 2)
-    moby_forward_position_call(obj, D_L00_001B2C00, 1);
+    moby_forward_position_call(obj, g_global_object_vector, 1);
     else
-    moby_get_facing_direction(obj + 0x10, D_L00_001B2C00);
-    FastVecScale(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
-    FastVecScale(&scratch.ahead, obj + 0xE0, D_L00_001B0CAC);
+    moby_get_facing_direction(obj + 0x10, g_global_object_vector);
+    FastVecScale(g_global_object_vector, g_global_object_vector, -1.0f);
+    FastVecScale(&scratch.ahead, obj + 0xE0, g_spider_bot_probe_distance);
     FastVecAdd(&scratch.ahead, obj + 0x10, &scratch.ahead);
     FastVecScale(&scratch.behind, obj + 0xE0, -1.0f);
     FastVecAdd(&scratch.behind, obj + 0x10, &scratch.behind);
     if (CollLine(&scratch.ahead, &scratch.behind, 2, obj, 0)) {
         if (GetCollHitMaterial() == 2) {
-            FastVecScale(D_L00_001B2C00, D_L00_001BF240, 0.0009765625f);
-            vec_scale_to_length(D_L00_001B2C00, D_L00_001B2C00, -1.0f);
-            D_L00_001B2C14[0] = 1;
+            FastVecScale(g_global_object_vector, g_hero_l00_velocity, 0.0009765625f);
+            vec_scale_to_length(g_global_object_vector, g_global_object_vector, -1.0f);
+            g_global_object_flag[0] = 1;
         } else {
             update_collision = 0;
         }
@@ -129,7 +129,7 @@ void func_PAL_L08_00414BDC(char *obj)
         update_water = 0;
     } else {
         update_collision = 0;
-        D_L00_001B2C18[0] = 0;
+        g_global_object_state[0] = 0;
     }
     ForceClaimNotice(6, 0, 1);
     switch (STATE(obj)) {
@@ -138,20 +138,20 @@ void func_PAL_L08_00414BDC(char *obj)
         I(vars, 0x58) = 0;
         F(obj, 0x2C) = 0.00025f;
         I(obj, 0x98) = 0;
-        particles = D_L00_00254650;
+        particles = g_ring_effect_angles;
         for (i = 97; i >= 0; i--) {
             (*particles)[0] = math_random_angle();
             (*particles)[1] = math_random_signed_float_range(720.0f, 2160.0f) * 0.0003490659f;
             particles++;
         }
         update_timer = 1500;
-        if (D_L00_001A904C[0])
-            func_PAL_0029C0F0(0, spider_bot_draw_timer);
+        if (g_bolt_counter_base[0])
+            level_store_value_pair_pal(0, spider_bot_draw_timer);
         /* fall through */
     case 1:
         hero = g_hero_state;
         action = I(hero, 0x2294);
-        if (action == 98 || D_L00_001A8F00 == 2 || action == 111 || action == 100 ||
+        if (action == 98 || g_game_l00_mode == 2 || action == 111 || action == 100 ||
             action == 99 || action == 23 || action == 24 || action == 129 || action == 39) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 7;
@@ -164,7 +164,7 @@ void func_PAL_L08_00414BDC(char *obj)
             F(obj, 0x2C) = 0.023f;
         qcopy(&scratch.previous, obj + 0x10);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
-        part_steer_effect_direction(D_L00_001B2C28[0], vars, 0);
+        part_steer_effect_direction(g_object_effect_slot[0], vars, 0);
         vec_transform_or_copy(obj + 0x10, obj + 0x10);
         shop_trigger_current_state_effect(vars, vars);
         vec_add_object_direction_scaled(obj + 0x10, vars, 0.0044f);
@@ -185,7 +185,7 @@ void func_PAL_L08_00414BDC(char *obj)
     case 2:
         STATE(obj) = 3;
         PlayMobySound(2, 0, obj);
-        if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
+        if (g_game_mode != 28 || g_game_l00_mode == 2) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
@@ -195,17 +195,17 @@ void func_PAL_L08_00414BDC(char *obj)
         func_PAL_00331948(obj);
         moby_steer_heading_to_aim(obj);
         func_PAL_00331A48(obj);
-        func_PAL_L00_00406680(obj);
+        nearby_typed_objects_notify_pal(obj);
         snd_play_on_threshold_crossing();
-        if (math_fast_float_d(D_L00_001B2C10)) {
+        if (math_fast_float_d(g_global_object_timer)) {
             STATE(obj) = 9;
             I(vars, 0x60) = 8;
         }
-        if (D_00138324 & 32) {
+        if (g_pad_held_flags & 32) {
             STATE(obj) = 9;
             I(vars, 0x60) = 8;
         }
-        if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
+        if (g_game_mode != 28 || g_game_l00_mode == 2) {
             ref_L00_003FFBA0_00();
             STATE(obj) = 9;
             I(vars, 0x60) = 0;
@@ -257,17 +257,17 @@ void func_PAL_L08_00414BDC(char *obj)
             func_PAL_0032F3B8(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
-            if (D_0018C0B4 != 28 || D_L00_001A8F00 == 2) {
+            if (g_game_mode != 28 || g_game_l00_mode == 2) {
                 ref_L00_003FFBA0_00();
                 I(vars, 0x60) = 0;
             } else
-                I(vars, 0x60) = ((s32)D_L00_001B0CA4 * 5 + 2) / 6;
+                I(vars, 0x60) = ((s32)g_global_object_initial_state * 5 + 2) / 6;
             I(vars, 0x64) = 0;
         }
         break;
     case 6:
         QueueRadialMobyImpacts(obj);
-        F(vars, 0x64) += D_L00_001B0C98 * 0.020000001f;
+        F(vars, 0x64) += g_global_object_timer_rate * 0.020000001f;
         if (math_fast_float_d(vars + 0x60) && !I(vars, 0x68))
             STATE(obj) = 8;
         break;
@@ -276,7 +276,7 @@ void func_PAL_L08_00414BDC(char *obj)
             STATE(obj) = 8;
         break;
     case 8:
-        if (D_0018C0B4 == 28)
+        if (g_game_mode == 28)
             func_PAL_L08_002D3078(0, 1);
         if (*(short *)(g_follow_camera_object + 0x86) == 27)
             ref_L00_003FFBA0_00();
@@ -284,21 +284,21 @@ void func_PAL_L08_00414BDC(char *obj)
         slot_free(I(vars, 0x6C));
         slot_free(I(vars, 0x70));
         slot_free(I(vars, 0x74));
-        D_L00_001B0CA0 = 0;
-        func_PAL_0029C0F0(0, 0);
+        g_global_object_data = 0;
+        level_store_value_pair_pal(0, 0);
         moby_mark_spawned(obj);
         return;
     }
-    if (STATE(obj) >= 2 && D_L00_001ADB2C[0]) {
+    if (STATE(obj) >= 2 && g_active_tether_object[0]) {
         copy_matrix_rotation(scratch.workspace.attachment.transform, obj + 0xC0);
         mat_get_euler_angles(scratch.workspace.attachment.transform, &scratch.workspace.attachment.angles);
-        moby_transform_point_and_rotation_by_parent(obj, D_L00_001ADB2C[0], obj + 0x10,
+        moby_transform_point_and_rotation_by_parent(obj, g_active_tether_object[0], obj + 0x10,
                      &scratch.workspace.attachment.angles, obj + 0x10,
                      &scratch.workspace.attachment.adjusted);
         euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
     }
     if ((unsigned int)(STATE(obj) - 2) < 2)
         func_PAL_00331118(obj);
-    gfx_register_final_draw_callback(func_PAL_003329A8, obj);
-    part_queue_ground_shadow(obj, D_L00_001B0CB0);
+    gfx_register_final_draw_callback(part_draw_ring_effect_and_trail_pal, obj);
+    part_queue_ground_shadow(obj, g_spider_bot_shadow_size);
 }

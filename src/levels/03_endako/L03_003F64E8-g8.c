@@ -14,13 +14,13 @@ extern f32 fast_subtract_rotations(f32 a, f32 b);
 extern f32 math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
 
 /* The level's own two floats. */
-extern f32 D_L03_001B1090 __attribute__((sda));
-extern f32 D_L03_001B1094 __attribute__((sda));
+extern f32 g_endako_boss_view_angle_x __attribute__((sda));
+extern f32 g_endako_boss_view_angle_y __attribute__((sda));
 
 /* The boot's block and its pointer word. */
 typedef struct { u8 pad[0x80]; f32 x, y; } Hero;
 extern Hero g_hero_state;
-extern u8 *D_L03_001B99D0 __attribute__((nosda));
+extern u8 *g_endako_boss_state_ptr __attribute__((nosda));
 
 /* Eases a view angle toward the boss relative to the hero while the boss is awake. */
 void endako_boss_ease_view_angle(u8 *entity) {
@@ -41,13 +41,13 @@ void endako_boss_ease_view_angle(u8 *entity) {
     if (*(u8 **)(state + 0x2C8) == 0)
         *(u8 **)(state + 0x2C8) = cam_alloc_override_slot(5);
     obj = *(u8 **)(state + 0x2C8);
-    { f32 x = D_L03_001B1090; f32 y = D_L03_001B1094;
+    { f32 x = g_endako_boss_view_angle_x; f32 y = g_endako_boss_view_angle_y;
     *(f32 *)obj = x;
     *(f32 *)(*(u8 **)(state + 0x2C8) + 4) = y; }
 
     f12 = *(f32 *)(entity + 0x10) - g_hero_state.x;
     f13 = *(f32 *)(entity + 0x14) - g_hero_state.y;
-    s0 = *(u8 **)(D_L03_001B99D0 + 0x70);
+    s0 = *(u8 **)(g_endako_boss_state_ptr + 0x70);
     first = mat_fast_helper_a(f12, f13);
     /* The base moves on between the two reads: combine cannot then fold the
      * second read's address, so retail's addiu and based load remain. */

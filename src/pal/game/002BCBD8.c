@@ -9,7 +9,7 @@ extern float square_root(float), fast_vec_dist(void *,void *), IntToFloat(int);
 extern void FastVecScale(void *,void *,float);
 extern int vec_fast_helper_a(void *);
 extern int math_random_int_range(int,int);
-extern float D_001B168C MACRO_ADDR;
+extern float g_frame_time_scale MACRO_ADDR;
 void func_PAL_002BCBD8(char *p)
 {
     char *q=p+32;
@@ -91,7 +91,7 @@ life=math_random_int_range((unsigned char)q[0x1b]*2,(unsigned char)q[0x1b]*3);
         else if((unsigned char)p[3]==0x48) *(short *)(p+10)=0;
         else *(int *)(p+4)=(*(int *)(p+4)&0xffffff)|((*(short *)(p+10)*15/i)<<24);
         remaining = (short *)(p + 10);
-        if(D_001B168C>1.0f) FastDecTimer(remaining);
+        if(g_frame_time_scale>1.0f) FastDecTimer(remaining);
         if(FastDecTimer(remaining)) part_kill(p);
     }
 }
@@ -103,7 +103,7 @@ extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
-extern unsigned char *D_001F2574, *D_001F25A4;
+extern unsigned char *g_part_tex_flash, *g_part_tex_white_flash;
 
 /* func_002BC508 is in 002BC508-g8.c. */
 
@@ -120,7 +120,7 @@ char *func_PAL_002BD400(char *pos, int spin, int color, float spread, float low,
         *(float *)(p + 12) = size;
         p[1] = 0;
         p[8] = 0;
-        p[2] = D_001F2574[0];
+        p[2] = g_part_tex_flash[0];
         *(float *)(p + 16) += math_random_signed_float_range(0.0f, spread);
         *(float *)(p + 20) += math_random_signed_float_range(0.0f, spread);
         *(float *)(p + 24) += math_random_signed_float_range(0.0f, spread);

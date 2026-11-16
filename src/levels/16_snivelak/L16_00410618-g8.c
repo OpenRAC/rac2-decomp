@@ -1,9 +1,10 @@
+#include "names.h"
 /* Uses -g to preserve the measured line-label padding before four divisions. */
 #include "common.h"
-extern u8 D_001395B8[];
-extern u8 *D_L16_001B2B1C[] __attribute__((sda));
-extern u8 *D_L16_001B16C0 __attribute__((sda));
-extern int D_L16_001B16C4 __attribute__((sda));
+extern u8 g_game_flag_table[];
+extern u8 *g_moby_instance_table[] __attribute__((sda));
+extern u8 *g_snivelak_target __attribute__((sda));
+extern int g_snivelak_divisor __attribute__((sda));
 extern u8 g_sound_state[];
 extern void SetMobyAndGroupsEnabled(u8 *, int);
 extern void moby_mark_spawned(void *);
@@ -35,9 +36,9 @@ void UpdateSnivelakBossDamage(u8 *moby)
     int i, threshold, sound;
     float quantum, amount, divisor;
     if (!moby[0x20]) {
-        if (D_001395B8[0x83] == 2) {
+        if (g_game_flag_table[0x83] == 2) {
             SetMobyAndGroupsEnabled(moby, 0);
-            moby_mark_spawned(D_L16_001B2B1C[0] + *(int *)(state + 0x174) * 256);
+            moby_mark_spawned(g_moby_instance_table[0] + *(int *)(state + 0x174) * 256);
             moby_mark_spawned(moby);
             return;
         }
@@ -47,7 +48,7 @@ void UpdateSnivelakBossDamage(u8 *moby)
         }
         speech = state + 0x310;
         state[0x2e] = 1;
-        divisor = IntToFloat(D_L16_001B16C4);
+        divisor = IntToFloat(g_snivelak_divisor);
         quantum = (float)*(short *)(state + 0x24);
         quantum /= divisor;
         threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
@@ -63,9 +64,9 @@ void UpdateSnivelakBossDamage(u8 *moby)
         }
         {
             int bodyIndex = *(int *)(state + 0x174);
-            u8 *pool = D_L16_001B2B1C[0];
+            u8 *pool = g_moby_instance_table[0];
             float initialHeight = *(float *)(moby + 0x18);
-            D_L16_001B16C0 = 0;
+            g_snivelak_target = 0;
             *(float *)(state + 0x264) = initialHeight;
             *(u8 **)(state + 0x1f0) = pool + bodyIndex * 256;
         }
@@ -80,7 +81,7 @@ void UpdateSnivelakBossDamage(u8 *moby)
         snivelak_copy_position_pair_after_setup(moby);
         moby_set_state(moby, 1, 0);
         anim_play_on_self_or_child(moby, 0, 0, 0.0f);
-        if (D_001395B8[0x83] == 1) {
+        if (g_game_flag_table[0x83] == 1) {
             snivelak_clean_up_arena_mobys(moby);
             SetMobyAndGroupsEnabled(moby, 1);
         } else SetMobyAndGroupsEnabled(moby, 0);
@@ -101,8 +102,8 @@ void UpdateSnivelakBossDamage(u8 *moby)
         else gfx_start_color_fade((int)moby, (char *)(state + 0x50));
         amount = moby_update_aim_target_strength(moby, damage);
         ApproachValue((float *)(state + 0x20), 0.0f, amount);
-        if (D_L16_001B16C0 && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
-            divisor = IntToFloat(D_L16_001B16C4);
+        if (g_snivelak_target && moby[0x95] != 3 && *(float *)(state + 0x20) < *(float *)(state + 0x248)) {
+            divisor = IntToFloat(g_snivelak_divisor);
             quantum = (float)*(short *)(state + 0x24);
             quantum /= divisor;
             threshold = FloatToInt((*(float *)(state + 0x20) - 1.0f) / quantum);
@@ -115,7 +116,7 @@ void UpdateSnivelakBossDamage(u8 *moby)
                 if (*(u8 **)(soundRecord + 0x88) == *(u8 **)(state + 0x1f0) && soundRecord[0x74]) snd_stop_voice(sound);
             }
             {
-                u8 *target = D_L16_001B16C0;
+                u8 *target = g_snivelak_target;
                 *(int *)(state + 0x368) = -1;
                 *(u8 **)(state + 0x24c) = target;
             }

@@ -4,24 +4,24 @@
 
 typedef unsigned char u8;
 typedef unsigned short u16;
-extern u8 D_001A7B2B;
+extern u8 g_focus_lock_flag;
 extern int g_current_map_index;
-extern u8 D_0019B4A8[];
+extern u8 g_moby_nibble_table[];
 typedef struct { u8 prefix[0x464]; u8 flags[1]; } LevelFlags;
-extern LevelFlags D_L11_0021F8B0;
+extern LevelFlags g_level_flags;
 extern u8 g_hero_position[];
 extern u8 g_sound_state[];
 extern u8 *g_moby_l11_table __attribute__((sda));
 extern int moby_is_in_selected_zone(void *);
 extern void state_set_flag_one(void);
-extern void func_PAL_L00_002B9CD8(float *, float *, int, int);
+extern void hero_reset_position_and_direction_pal(float *, float *, int, int);
 extern float vec_distance_xy(void *, void *);
 extern int snd_start_in_slot(int, int, int);
 extern void snd_stop_voice(int);
 extern int flag_is_third_pending_set(u8 *);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L11_004791F0(u8 *object) {
+void collectible_spot_update_pal(u8 *object) {
     float position[4];
     float rotation[4];
     int *state = *(int **)(object + 0x68);
@@ -29,11 +29,11 @@ void func_PAL_L11_004791F0(u8 *object) {
     u8 *record;
     u8 *counter;
     if (object[0x20] == 0) {
-        if (D_001A7B2B) {
+        if (g_focus_lock_flag) {
             u16 id = *(u16 *)(object + 0xB2);
             int bits;
-            if (D_L11_0021F8B0.flags[(short)id] == 0) {
-                bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
+            if (g_level_flags.flags[(short)id] == 0) {
+                bits = g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400];
                 if (*(u16 *)(object + 0xB2) & 1) bits = (bits >> 4) & 7;
                 else bits &= 7;
                 if (bits == 0 && moby_is_in_selected_zone(object + 0x10)) {
@@ -44,7 +44,7 @@ void func_PAL_L11_004791F0(u8 *object) {
                     rotation[2] = 2.3561947f;
                     rotation[0] = 0;
                     rotation[1] = 0;
-                    func_PAL_L00_002B9CD8(position, rotation, 0, 1);
+                    hero_reset_position_and_direction_pal(position, rotation, 0, 1);
                 }
             }
         }
@@ -67,8 +67,8 @@ void func_PAL_L11_004791F0(u8 *object) {
     if (!flag_is_third_pending_set(object)) {
         u16 id = *(u16 *)(object + 0xB2);
         int bits;
-        if (!D_L11_0021F8B0.flags[(short)id]) {
-            bits = D_0019B4A8[((short)id >> 1) + g_current_map_index * 0x400];
+        if (!g_level_flags.flags[(short)id]) {
+            bits = g_moby_nibble_table[((short)id >> 1) + g_current_map_index * 0x400];
             if ((*(u16 *)(object + 0xB2) & 1)
                 ? ((bits >> 4) & 7) != 0
                 : (bits & 7) != 0) goto cleanup;
@@ -82,10 +82,10 @@ cleanup:
     {
         int counter_id = *(u16 *)(object + 0xB2);
         if (counter_id & 1) {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = &D_0019B4A8[((short)counter_id >> 1) + g_current_map_index * 0x400];
+            counter = &g_moby_nibble_table[((short)counter_id >> 1) + g_current_map_index * 0x400];
             if ((*counter & 7) != 7) ++*counter;
         }
     }

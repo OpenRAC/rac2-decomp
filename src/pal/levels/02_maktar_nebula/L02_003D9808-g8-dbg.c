@@ -7,10 +7,10 @@
 
 typedef int Vector __attribute__((mode(TI)));
 /* The trajectory table has at least the five observed entries; full extent unknown. */
-extern float D_L02_001B0190[] SDATA(D_L02_001B0190);
-extern float D_L02_001B01E4 __attribute__((sda));
-extern float D_L02_001B01E8 __attribute__((sda));
-extern float D_L02_001B01B8;
+extern float g_chainblade_throw_trajectory[] SDATA(D_L02_001B0190);
+extern float g_chainblade_chain_offset_a __attribute__((sda));
+extern float g_chainblade_chain_offset_b __attribute__((sda));
+extern float g_chainblade_ground_height;
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void moby_transform_joint_point(char *, int, char *);
 extern void copy_matrix3x4(void *, void *);
@@ -28,7 +28,7 @@ extern int FloatToInt(float);
  * match 0032C700-explosion.c. Floats-first is the order the matched callers L16_0041EE90-g8.c,
  * shared/L00_003AB388-hit.c, shared/L00_003F5390-g8.c and shared/L04_00402D90.c use; it puts the
  * size move ahead of the integer arguments, as retail schedules it. */
-extern char *func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, char *);
+extern char *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, char *);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 
 int func_PAL_L02_003D9808(char *self, int joint) {
@@ -57,7 +57,7 @@ int func_PAL_L02_003D9808(char *self, int joint) {
     copy_matrix3x4(rotation, matrix);
     mat_normalize_columns(rotation);
     qcopy(direction, rotation);
-    travel = (origin[2] - D_L02_001B01B8) / math_fast_sin_or_cos_a(1.15f);
+    travel = (origin[2] - g_chainblade_ground_height) / math_fast_sin_or_cos_a(1.15f);
     FastVecScale(impact, direction, travel);
     FastVecAdd(impact, impact, origin);
     travel -= 5.3f;
@@ -77,14 +77,14 @@ int func_PAL_L02_003D9808(char *self, int joint) {
                 phase = (outbound * 5.0f + 2.0f) * ((float)i * 0.058333337f) - (time - ((outbound + 5.0f) * 5.0f + 2.0f) * 0.16666667f) * 1.8000001f;
                 if (phase < 0.0f) phase = 0.0f;
             }
-            vec_scale_to_length(delta, direction, phase + *(float *)((char *)D_L02_001B0190 + trajectoryOffset));
+            vec_scale_to_length(delta, direction, phase + *(float *)((char *)g_chainblade_throw_trajectory + trajectoryOffset));
             FastVecAdd(*slots + 0x10, origin, delta);
             func_002A10E8(*slots);
             if (*(char **)(state + 0x300)) chainblade_free_effect_trail(*(char **)(state + 0x300));
-            vec_scale_to_length(offset, rotation + 8, D_L02_001B01E8);
+            vec_scale_to_length(offset, rotation + 8, g_chainblade_chain_offset_b);
             FastVecAdd(origin, *(char **)(state + 0x2A0) + 0x10, offset);
             qcopy(end, *(char **)(state + 0x2B0) + 0x10);
-            vec_scale_to_length(offset, rotation + 4, D_L02_001B01E4);
+            vec_scale_to_length(offset, rotation + 4, g_chainblade_chain_offset_a);
             FastVecAdd(origin, origin, offset);
             *(char **)(state + 0x300) = chainblade_spawn_effect_trail(origin, end, 0.2f);
         }
@@ -96,7 +96,7 @@ int func_PAL_L02_003D9808(char *self, int joint) {
     if (elapsed > FloatToInt(outbound) + 6) return 1;
     elapsed = *(short *)(state + 0x31E);
     if (elapsed > FloatToInt(outbound) + 1 && *(short *)(state + 0x320) == 0) {
-        func_PAL_L00_003FB330(impact, 0.5f, 20.0f, 0, 25, 20, 20, 20, 45, 0, 1, 0, 0, 0);
+        SpawnExplosion_pal(impact, 0.5f, 20.0f, 0, 25, 20, 20, 20, 45, 0, 1, 0, 0, 0);
         coll_sweep_from_object(self, impact, 0x10001, 0, 1, 0, 0.5f, (float)*(unsigned char *)(state + 0x35), 1.0f);
         *(short *)(state + 0x320) = 1;
     }

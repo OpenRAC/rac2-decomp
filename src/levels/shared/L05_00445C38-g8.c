@@ -1,13 +1,13 @@
 #include "common.h"
 
-extern float D_L05_001B98F0[];
-extern int D_L05_001B1C24 SDATA(D_L05_001B1C24);
-extern int D_L05_001B1C28 SDATA(D_L05_001B1C28);
-extern float D_L05_001B1C2C SDATA(D_L05_001B1C2C);
-extern float D_L05_001B1C30 SDATA(D_L05_001B1C30);
-extern float D_L05_001B1C34 SDATA(D_L05_001B1C34);
-extern float D_L05_001B1C38 SDATA(D_L05_001B1C38);
-extern int D_L05_001B1C3C SDATA(D_L05_001B1C3C);
+extern float g_unit_dir_vec[];
+extern int g_ship_trail_texture SDATA(D_L05_001B1C24);
+extern int g_ship_trail_blend SDATA(D_L05_001B1C28);
+extern float g_ship_trail_start_size SDATA(D_L05_001B1C2C);
+extern float g_ship_trail_end_size SDATA(D_L05_001B1C30);
+extern float g_ship_trail_random_offset SDATA(D_L05_001B1C34);
+extern float g_ship_trail_step_scale SDATA(D_L05_001B1C38);
+extern int g_ship_trail_step_count SDATA(D_L05_001B1C3C);
 extern void FastVecScale(void *, void *, float);
 extern float IntToFloat(int);
 extern float math_random_angle(void);
@@ -22,17 +22,17 @@ void part_spawn_impact_trail(unsigned char *object)
     float step[4], position[4], particle[4];
     float fraction, size, heading, inverse;
     int i;
-    FastVecScale(step, D_L05_001B98F0, -D_L05_001B1C38);
+    FastVecScale(step, g_unit_dir_vec, -g_ship_trail_step_scale);
     qcopy(position, state + 0x90);
-    inverse = 1.0f / IntToFloat(D_L05_001B1C3C);
-    for (i = 0; i < D_L05_001B1C3C; i++) {
+    inverse = 1.0f / IntToFloat(g_ship_trail_step_count);
+    for (i = 0; i < g_ship_trail_step_count; i++) {
         fraction = IntToFloat(i) * inverse;
-        size = D_L05_001B1C2C;
-        size += (D_L05_001B1C30 - size) * fraction;
+        size = g_ship_trail_start_size;
+        size += (g_ship_trail_end_size - size) * fraction;
         heading = math_random_angle();
         qcopy(particle, position);
-        vec_add_random_offset(particle, D_L05_001B1C34);
-        gfx_draw_billboard_quad(particle, D_L05_001B1C24, D_L05_001B1C28, 1, size, 0.0f, heading);
+        vec_add_random_offset(particle, g_ship_trail_random_offset);
+        gfx_draw_billboard_quad(particle, g_ship_trail_texture, g_ship_trail_blend, 1, size, 0.0f, heading);
         FastVecAdd(position, position, step);
     }
 }

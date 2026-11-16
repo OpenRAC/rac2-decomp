@@ -1,16 +1,16 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern float D_L12_001B1C74 __attribute__((sda));
-extern float D_L12_001B1C70 __attribute__((sda));
-extern u8 D_L12_001B9E00[];
+extern float g_path_enemy_rate __attribute__((sda));
+extern float g_path_enemy_scale_factor __attribute__((sda));
+extern u8 g_hero_prev_position[];
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A7E68(char *, int, int, int);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
 
-void func_PAL_L12_0041F568(char *self) {
+void path_enemy_init_scale_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     float rate;
 
@@ -32,7 +32,7 @@ void func_PAL_L12_0041F568(char *self) {
             float turn = 0.261799425f;
             float step = 0.008f;
             float pi = 3.14159012f;
-            rate = D_L12_001B1C74 * 0.020000001f;
+            rate = g_path_enemy_rate * 0.020000001f;
             *(float *)(state + 0x154) = quarter;
             *(float *)(state + 0x120) = fraction;
             *(float *)(state + 0x12C) = *(float *)(state + 0x128) = *(float *)(state + 0x124) = half;
@@ -45,9 +45,9 @@ void func_PAL_L12_0041F568(char *self) {
         *(int *)(state + 0x11C) = 0;
         *(int *)(state + 0x258) = 0;
     }
-    *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * D_L12_001B1C70;
+    *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * g_path_enemy_scale_factor;
     if (*(u8 *)(self + 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, D_L12_001B9E00) < 24.0f) {
+        if (fast_vec_dist(self + 0x10, g_hero_prev_position) < 24.0f) {
             moby_update_ground_check(self);
             *(u8 *)(self + 0x6F) = 0x16;
         }

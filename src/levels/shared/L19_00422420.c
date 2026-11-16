@@ -7,14 +7,14 @@ typedef unsigned char u8;
 typedef int s32;
 
 extern u8 g_sound_state[];
-extern u8 D_0019B2E8[];
-extern u8 D_0019B4A8[];
+extern u8 g_moby_group_flags[];
+extern u8 g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
 extern u8 *g_moby_l19_array __attribute__((sda));
-extern u8 D_L19_001B2860[] MACRO_ADDR;
+extern u8 g_level_marker_flags[] MACRO_ADDR;
 typedef struct { u8 pad[0x464]; u8 slot[1]; } SlotTable;
-extern SlotTable D_L19_0021DDC0;
-extern SlotTable D_L19_0021EA30;
+extern SlotTable g_marker_slot_table;
+extern SlotTable g_trigger_active_table;
 extern void vec_scale_to_length(void *, void *, float);
 extern void set_moby_color(void *, int, int, int);
 extern void moby_set_state(u8 *, u8, s32);
@@ -47,7 +47,7 @@ void level_marker_update_fading(u8 *actor)
         *(short *)(state + 0xa) = -1;
         *(float *)(state + 4) = 1.0f;
         set_moby_color(actor, 0x80, 0x80, 0x80);
-        if (actor[0xb0] != 0xff && (D_0019B2E8[actor[0xb0] + g_current_map_index * 16] & 0x80))
+        if (actor[0xb0] != 0xff && (g_moby_group_flags[actor[0xb0] + g_current_map_index * 16] & 0x80))
             moby_set_state(actor, 3, -1);
         break;
     case 1: {
@@ -59,7 +59,7 @@ void level_marker_update_fading(u8 *actor)
         if (index != -1) {
             u8 *entry = g_moby_l19_array + index * 0x100;
             if (entry && entry[0x20] != 0xfe && entry[0x20] != 0xfd) {
-                flags = D_0019B4A8[((int)(*(unsigned short *)(entry + 0xb2) << 16) >> 17) + g_current_map_index * 0x400];
+                flags = g_moby_nibble_table[((int)(*(unsigned short *)(entry + 0xb2) << 16) >> 17) + g_current_map_index * 0x400];
                 if (*(unsigned short *)(entry + 0xb2) & 1) {
                     if ((flags >> 4) & 7)
                         goto active;
@@ -98,10 +98,10 @@ void level_marker_update_fading(u8 *actor)
             gfx_free_point_light(*(short *)(state + 0xa));
             *(short *)(state + 0xa) = -1;
         }
-        D_L19_0021DDC0.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
-        if (actor[0xb0] == 0xff || (!(*(D_L19_001B2860 + actor[0xb0]) & 0x80) &&
-                (D_0019B2E8[actor[0xb0] + g_current_map_index * 16] & 0x80)))
-            D_L19_0021EA30.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
+        g_marker_slot_table.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
+        if (actor[0xb0] == 0xff || (!(*(g_level_marker_flags + actor[0xb0]) & 0x80) &&
+                (g_moby_group_flags[actor[0xb0] + g_current_map_index * 16] & 0x80)))
+            g_trigger_active_table.slot[*(short *)(actor + 0xb2)] = actor[0xb0] + 2;
         moby_mark_spawned(actor);
         return;
     }

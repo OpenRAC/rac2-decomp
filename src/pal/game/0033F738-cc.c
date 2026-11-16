@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_0033F738, the PAL copy of func_0033D868: the same C, where template sibling func_PAL_L00_00437BA8; rename-macro func_0033AE28 becomes func_PAL_0033CD50; rename Fc558ca70_D_001A7B95 becomes D_PAL_001A7C3A; rename Fc558ca70_D_001A7B94 becomes D_PAL_001A7C3B. */
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
@@ -9,7 +10,7 @@
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
-extern unsigned char D_PAL_001A7C38[] __attribute__((sda));
+extern unsigned char g_pal_toggle_flags[] __attribute__((sda));
 
 int func_PAL_0033F738(char *a0, int a1)
 {
@@ -32,10 +33,10 @@ int func_PAL_0033F738(char *a0, int a1)
         Fc558ca70_FUN_002E5E58(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_PAL_001A7C38[2] = D_PAL_001A7C38[2] == 0;
+            g_pal_toggle_flags[2] = g_pal_toggle_flags[2] == 0;
             break;
         case 1:
-            D_PAL_001A7C38[3] = D_PAL_001A7C38[3] == 0;
+            g_pal_toggle_flags[3] = g_pal_toggle_flags[3] == 0;
             break;
         }
     }

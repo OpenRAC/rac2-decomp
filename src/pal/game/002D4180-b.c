@@ -2,12 +2,12 @@
 #include "names.h"
 extern int g_pad_state[];
 extern char g_pause_menu_state[];
-extern int D_001A8CFC __attribute__((sda));
+extern int g_resident_data_base __attribute__((sda));
 extern int func_0029C920(int);
 extern int list_page_get_selected_record(int);
 extern void menu_start_action(int);
 
-int func_PAL_002D4238(void)
+int menu_page_update_with_preview_pal(void)
 {
     int result = 0;
     int *state = g_pad_state;
@@ -35,8 +35,8 @@ finish:
         result = 1;
     else {
         func_0029C920(flags);
-        if ((state[0x1C4 / 4] & 0x40) && D_001A8CFC) {
-            char *entry = (char *)list_page_get_selected_record(D_001A8CFC + 0x3F4A0);
+        if ((state[0x1C4 / 4] & 0x40) && g_resident_data_base) {
+            char *entry = (char *)list_page_get_selected_record(g_resident_data_base + 0x3F4A0);
             struct { short unused; unsigned short id; int value; } request;
             request.id = *(unsigned short *)(entry + 8);
             request.value = *(int *)(entry + 12);

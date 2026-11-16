@@ -3,11 +3,11 @@
 
 extern void RenderFrame(void);
 
-extern unsigned int D_L00_001B18D4;
+extern unsigned int g_screen_overlay_color;
 
 /* Sets a draw setting to a fixed value and renders the frame. */
 void gfx_set_draw_mode_and_render(void) {
- D_L00_001B18D4 = 0x100FF;
+ g_screen_overlay_color = 0x100FF;
  RenderFrame();
 }
 
@@ -19,26 +19,26 @@ extern void gfx_set_clear_color_packet(int, int, int, int);
 void gfx_clear_screen_and_render(void) {
  gfx_append_draw_list_buffer_tag(0);
  gfx_set_clear_color_packet(0, 0, 0, 0x80);
- D_L00_001B18D4 = 0xF0;
+ g_screen_overlay_color = 0xF0;
  RenderFrame();
 }
 
-extern int D_L00_001B19A8;
+extern int g_draw_flag_enabled;
 
 /* Turns a draw flag on. */
 void gfx_enable_draw_flag(void) {
-    D_L00_001B19A8 = 1;
+    g_draw_flag_enabled = 1;
 }
 
 /* Turns a draw flag off. */
 void gfx_disable_draw_flag(void) {
-    D_L00_001B19A8 = 0;
+    g_draw_flag_enabled = 0;
 }
 
 /* ---- 0x002E73E0: a counter bump around three measured callees. ---- */
 
-extern int D_L00_001B18D8;
-extern int D_001A72DC;
+extern int g_ring_animation_counter;
+extern int g_vram_display_address;
 extern int g_screen_height;
 
 extern void ref_L00_002E73E0_00(int);
@@ -51,7 +51,7 @@ extern int sceGsSyncV(int);
 void gfx_draw_item_with_pass(void *item) {
     ref_L00_002E73E0_00(1);
     sceGsSyncV(0);
-    D_L00_001B18D8 = D_L00_001B18D8 + 1;
+    g_ring_animation_counter = g_ring_animation_counter + 1;
     ref_L00_002E73E0_01();
-    ref_L00_002E73E0_02(item, D_001A72DC, g_screen_height << 11);
+    ref_L00_002E73E0_02(item, g_vram_display_address, g_screen_height << 11);
 }

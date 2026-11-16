@@ -17,7 +17,7 @@ extern void vec_scale_to_length(float *, float *, float);
 /* Like func_002C8A38 with a second vector at +0x30 scaled into the motion. Its
  * address e is an integer: retail loads that vector's last two words only after
  * the first vector is stored, the order alias analysis gives an untraced base. */
-void func_PAL_002C9A98(char *p)
+void part_update_color_changing_pal(char *p)
 {
     char *d = p + 32;
     int e = (int)p + 48;

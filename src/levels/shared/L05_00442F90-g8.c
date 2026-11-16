@@ -12,7 +12,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern int FastDecTimer(void *);
 extern void vec_fast_normalize3(void *,void *,void *,float);
 extern void quaternion_to_rotation_basis(void *,void *);
-extern short D_L05_001B1BC8 __attribute__((sda)), D_L05_001B1BC4 __attribute__((sda));
+extern short g_ship_turn_anim_early __attribute__((sda)), g_ship_turn_anim_default __attribute__((sda));
 /* Smoothly turns the ship toward a new heading over a short time. Returns 1 while the turn is in progress. */
 int ship_update_turn_animation(char *object)
 {
@@ -23,8 +23,8 @@ int ship_update_turn_animation(char *object)
  float angle = FastVecDot(&up,object+0x20);
  if ((*(unsigned long *)(state+0x18)&0xFFFFFF00000000UL)==0x2000000000000UL) {
  *(float *)(state+0x24)=1.5707963705062866f-math_fast_angle_helper(angle);
- if (*(float *)(state+0x24)<1.5707964897155762f) *(short *)(state+0x1c)=D_L05_001B1BC8;
- else *(short *)(state+0x1c)=D_L05_001B1BC4;
+ if (*(float *)(state+0x24)<1.5707964897155762f) *(short *)(state+0x1c)=g_ship_turn_anim_early;
+ else *(short *)(state+0x1c)=g_ship_turn_anim_default;
  *(float *)(state+0x20)=1.0f/IntToFloat(*(short *)(state+0x1c));
  }
  }

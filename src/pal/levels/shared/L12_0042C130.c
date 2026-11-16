@@ -7,8 +7,8 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef int s32;
 typedef float f32;
-extern s32 D_L12_001B2E9C __attribute__((sda));
-extern s32 D_L12_001A8FF0 __attribute__((sda));
+extern s32 g_moby_list_start __attribute__((sda));
+extern s32 g_hero_l12_lock_flag __attribute__((sda));
 extern int FastDecTimer(s32);
 extern void moby_update_eased_node(s32, s32, s32, f32, f32);
 extern void func_PAL_002B14F8(s32, s32, s32, s32, f32);
@@ -20,7 +20,7 @@ extern void func_PAL_002B14F8(s32, s32, s32, s32, f32);
 /* func_L12_004277F0 is defined in L12_004277F0-g8.c. */
 
 
-void func_PAL_L12_0042D258(s32 a0) {
+void hopping_enemy_tick_timers_pal(s32 a0) {
     s32 s1 = a0;
     s32 s0 = *(u32 *)(s1 + 0x68);
 
